@@ -747,12 +747,22 @@ void goto_convertt::convert_cpp_delete(
   // we call the destructor, and then free
   const exprt &destructor=
     static_cast<const exprt &>(code.find(ID_destructor));
+    
+  irep_idt delete_identifier;
+  
+  if(code.get_statement()==ID_cpp_delete_array)
+    delete_identifier="c::__delete_array";
+  else if(code.get_statement()==ID_cpp_delete)
+    delete_identifier="c::__delete";
+  else
+    assert(false);
   
   if(destructor.is_not_nil())
   {
-    if(code.get_statement()=="cpp_delete[]")
+    if(code.get_statement()==ID_cpp_delete_array)
     {
       // build loop
+
     }
     else if(code.get_statement()==ID_cpp_delete)
     {
@@ -769,9 +779,10 @@ void goto_convertt::convert_cpp_delete(
   }
   
   // now do "free"
-  exprt delete_symbol=symbol_expr(ns.lookup("c::__delete"));
+  exprt delete_symbol=symbol_expr(ns.lookup(delete_identifier));
   
   assert(to_code_type(delete_symbol.type()).arguments().size()==1);
+
   typet arg_type=
     to_code_type(delete_symbol.type()).arguments().front().type();
   
