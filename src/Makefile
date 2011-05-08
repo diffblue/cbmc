@@ -13,7 +13,7 @@ util.dir: big-int.dir
 languages: util.dir langapi.dir \
            cpp.dir ansi-c.dir
 
-goto-instrument.dir: goto-programs.dir languages.dir pointer-analysis.dir
+goto-instrument.dir: languages goto-programs.dir pointer-analysis.dir
 
 cbmc.dir: languages solvers.dir goto-symex.dir \
           pointer-analysis.dir goto-programs.dir goto-symex.dir
