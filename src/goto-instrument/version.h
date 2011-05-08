@@ -1,0 +1,1 @@
+#define GOTO_INSTRUMENT_VERSION "1.0"

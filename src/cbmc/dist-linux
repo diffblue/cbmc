@@ -1,0 +1,63 @@
+#!/bin/bash
+umask u=rwx,g=rx,o=rx
+
+make
+strip cbmc
+
+VERSION=`./cbmc --version`
+VERSION_FILE=`echo $VERSION | sed "y/./-/"`
+BITS=`getconf LONG_BIT`
+# UNAME_M=`uname -m`
+DEB_ARCH=`dpkg --print-architecture`
+
+echo $VERSION_FILE
+
+(cd ../goto-cc; make; strip goto-cc)
+(cd ../hw-cbmc; make; strip hw-cbmc)
+(cd ../goto-instrument; make; strip goto-instrument)
+
+mkdir /tmp/cbmc-dist
+cp ../hw-cbmc/hw-cbmc ../cbmc/cbmc ../goto-cc/goto-cc \
+  ../goto-instrument/goto-instrument /tmp/cbmc-dist/
+cp ../../LICENSE /tmp/cbmc-dist/
+cd /tmp/cbmc-dist
+tar cfz cbmc-${VERSION_FILE}-linux-${BITS}.tgz hw-cbmc cbmc \
+  goto-cc goto-instrument LICENSE
+
+mkdir debian
+mkdir debian/DEBIAN
+mkdir debian/usr
+mkdir debian/usr/bin
+cp hw-cbmc cbmc goto-cc goto-instrument \
+  debian/usr/bin/
+
+cat > debian/DEBIAN/control << EOM
+Package: cbmc
+Version: $VERSION
+Section: devel
+Priority: optional
+Architecture: ${DEB_ARCH}
+Essential: no
+Depends: gcc
+Recommends: mozilla | netscape  
+Suggests: docbook 
+Installed-Size: 4971
+Maintainer: Daniel Kroening [kroening@comlab.ox.ac.uk]
+Provides: cbmc
+Description: CBMC is a Bounded Model Checker for C and C++ programs.
+ .
+ CBMC generates traces that demonstrate how an assertion can be violated,
+ or proves that the assertion cannot be violated within a given number
+ of loop iterations.
+EOM
+
+echo Building cbmc_${VERSION}_${DEB_ARCH}.deb 
+dpkg -b debian cbmc_${VERSION}_${DEB_ARCH}.deb 
+
+echo Copying.
+scp cbmc-${VERSION_FILE}-linux-${BITS}.tgz \
+    cbmc_${VERSION}_${DEB_ARCH}.deb \
+  kroening@dkr0.inf.ethz.ch:/home/www/cprover.org/cbmc/download/
+
+cd /tmp
+rm -R /tmp/cbmc-dist

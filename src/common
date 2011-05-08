@@ -1,0 +1,36 @@
+first_target: all
+
+CFLAGS+=$(GCCFLAGS) $(INCLUDES)
+CXXFLAGS+=$(GCCFLAGS) $(INCLUDES)
+
+.SUFFIXES:	.C .d .cpp
+
+.C.o:
+	$(CXX) -c $(CXXFLAGS) -o $@ $<
+
+.cpp.o:
+	$(CXX) -c $(CXXFLAGS) -o $@ $<
+
+.c.o:
+	$(CC) -c $(CFLAGS) -o $@ $<
+
+# this one is for Visual Studio's compiler:
+%.obj:%.cpp
+	$(CXX) $(CXXFLAGS) /nologo /c /GF /EHsc $< /Fo$@
+
+%.obj:%.c
+	$(CC) $(INCLUDES) /nologo /c /GF /EHsc $< /Fo$@
+
+#
+# include a dependency file if one exists
+#
+
+# ifeq (.depend,$(wildcard .depend))
+# include .depend
+# endif
+
+D_FILES1 = $(SRC:.c=.d)
+D_FILES = $(D_FILES1:.cpp=.d)
+
+-include $(D_FILES)
+
