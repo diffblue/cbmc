@@ -1,0 +1,17 @@
+Here a few minimalistic coding rules for the cprover source tree:
+
+a) 2 spaces indent, no tabs
+b) no "using namespace std;"
+c) Avoid new/delete, use containers instead.
+d) Avoid unnecessary #includes, especially in header files
+e) No lines wider than 80 chars
+f) Put matching { } into the same column
+g) If a method is bigger than a page, break it into parts
+h) Avoid destructive updates if possible. The irept has
+   constant time copy.
+
+Architecture-specific code:
+
+a) Avoid if possible.
+b) Use __LINUX__, __MACH__, and _WIN32 to distinguish the architectures.
+c) Don't include architecture-specific header files without #ifdef ...

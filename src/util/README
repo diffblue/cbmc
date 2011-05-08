@@ -1,0 +1,94 @@
+//
+// predefined expressions IDs
+//
+
+Constants
+
+  constant
+
+Variables/Symbols
+
+  symbol
+
+Operators for most Types
+
+  typecast 
+  = (equality)
+  notequal
+  if
+  
+  cond:
+    operands: alternating sequence of condition, expression
+    condition is of boolean type
+    expression of the type of the cond expression
+    the first match wins
+
+  case:
+    first operand: comparison element
+    remaining operands: alternating sequence of expression, expression
+    first expression is of type of comparison element
+    second expression of the type of the case expression
+
+  case-unique
+    as case, but cases are guaranteed to be unique
+
+Operators for Numbers, Bitvectors
+
+  +
+  *
+  /
+  <
+  >
+  <=
+  >=
+  mod
+  unary-
+
+Boolean Operators  
+
+  =>
+  <=>
+  not      
+  and      
+  or       
+  xor      
+  
+Bitwise Operators
+
+  ashr        // arithmetic, not cyclic
+  lshr        // not arithmetic, not cyclic
+  shl         // not cyclic
+  bitnot
+  bitand
+  bitor
+  bitxor
+  extractbit  // two operands, first bv, second integer. result: bool
+  extractbits // three operands, first bv, second/third integer, result: bv
+
+Model Checking
+
+  |=
+  
+Software
+
+  Hoare
+  
+Operators for structures
+
+  member      // projection which gets
+              // a member of a structure (operand)
+  
+Pointer Operators
+
+  dereference
+  address_of
+  points_to_something
+  
+Misc
+
+  sequent (Gentzen sequent)
+  
+  trans      // Transition systems:
+                 0: general constraints, other modules
+                 1: initial state constraints
+                 2: transition relation

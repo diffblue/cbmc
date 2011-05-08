@@ -1,0 +1,29 @@
+#!/bin/bash
+
+make
+strip cbmc.exe
+
+VERSION=`./cbmc.exe --version`
+VERSION_FILE=`echo $VERSION | sed "y/./-/"`
+
+echo $VERSION_FILE
+
+(cd ../goto-cc; make; strip goto-cc.exe ; cp goto-cc.exe goto-cl.exe)
+(cd ../hw-cbmc; make; strip hw-cbmc.exe)
+(cd ../goto-instrument; make; strip goto-instrument.exe)
+
+mkdir /tmp/cbmc-dist
+cp ../hw-cbmc/hw-cbmc.exe ../cbmc/cbmc.exe \
+   ../goto-cc/goto-cl.exe ../goto-instrument/goto-instrument.exe \
+   /tmp/cbmc-dist/
+cp ../../LICENSE /tmp/cbmc-dist/LICENSE.txt
+unix2dos /tmp/cbmc-dist/LICENSE.txt
+cd /tmp/cbmc-dist
+zip -9 cbmc-${VERSION_FILE}-win.zip hw-cbmc.exe cbmc.exe \
+  goto-instrument.exe LICENSE.txt README.txt
+
+echo Copying.
+scp cbmc-${VERSION_FILE}-win.zip kroening@dkr0.inf.ethz.ch:/home/www/cprover.org/cbmc/download/
+
+cd /tmp
+rm -R /tmp/cbmc-dist

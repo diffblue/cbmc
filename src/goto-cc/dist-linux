@@ -1,0 +1,25 @@
+#!/bin/bash
+make
+strip goto-cc
+
+VERSION=`./goto-cc --version`
+VERSION_FILE=`echo $VERSION | sed "y/./-/"`
+
+echo $VERSION_FILE
+
+(cd ../goto-cc; make; strip goto-cc)
+(cd ../goto-instrument; make; strip goto-instrument)
+
+mkdir /tmp/goto-cc-dist
+cp goto-cc /tmp/goto-cc-dist/
+cp ../goto-instrument/goto-instrument /tmp/goto-cc-dist/
+cp ../../LICENSE /tmp/goto-cc-dist/
+cd /tmp/goto-cc-dist
+tar cfz goto-cc-${VERSION_FILE}-linux.tgz goto-cc \
+  goto-instrument LICENSE
+
+echo Copying.
+scp goto-cc-${VERSION_FILE}-linux.tgz kroening@dkr0.inf.ethz.ch:/home/www/cprover.org/goto-cc/download/
+
+cd /tmp
+rm -R /tmp/goto-cc-dist
