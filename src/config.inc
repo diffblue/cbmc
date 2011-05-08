@@ -13,7 +13,7 @@ LIBEXT = .a
 OBJEXT = .o
 EXEEXT =
 GCCFLAGS = -Wall -MMD -O2
-LINKFLAGS = -static
+#LINKFLAGS = -static
 LINKLIB = ld -r -o $@ $^
 
 # MacOS Fat Binaries
@@ -44,27 +44,8 @@ LINKLIB = ld -r -o $@ $^
 #CHAFF = ../../zChaff
 #BOOLEFORCE = ../../booleforce-0.4
 #MINISAT = ../../MiniSat-p_v1.14
-MINISAT2 = ../../minisat-2.2.0
+MINISAT2 = ~/progr/minisat-2.2.0
 #SMVSAT =
 
 LANGUAGES = ansi-c csp intrep pvs smvlang verilog vhdl netlist cpp specc \
             xmllang promela pascal bplang csharp smtlang nsf mdllang java
-
-# modules that we have
-#MODULE_PROVER = 1
-#MODULE_IPP = 1
-#MODULE_INTERPOLATION = 1
-#MODULE_BV_REFINEMENT = 1
-#MODULE_SATQE = 1
-MODULE_CPP = 1
-#MODULE_SMTLANG = 1
-#MODULE_SPECC = 1
-#MODULE_VERILOG = 1
-#MODULE_VHDL = 1
-#MODULE_PASCAL = 1
-#MODULE_PHP = 1
-#MODULE_SIMPLIFYLANG = 1
-#MODULE_HW_CBMC = 1
-#MODULE_CEMC = 1
-#MODULE_FLOATBV = 1
-#MODULE_SMV = 1
