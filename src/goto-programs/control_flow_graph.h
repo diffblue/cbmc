@@ -23,6 +23,10 @@ class CFG_nodet
 {
 public:
 
+        virtual ~CFG_nodet()
+        {
+        }
+
 	/* code, function, location and type determine the instruction represented by the CFG node */
 	codet code;
 	irep_idt function;
