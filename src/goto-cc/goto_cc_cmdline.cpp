@@ -8,6 +8,8 @@ Date:   April 2010
 
 \*******************************************************************/
 
+#include <string.h>
+
 #include <assert.h>
 
 #include "goto_cc_cmdline.h"

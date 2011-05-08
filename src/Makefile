@@ -11,7 +11,7 @@ include common
 util.dir: big-int.dir
 
 languages: util.dir langapi.dir \
-           cpp.dir ansi-c.dir
+           cpp.dir ansi-c.dir xmllang.dir
 
 goto-instrument.dir: languages goto-programs.dir pointer-analysis.dir
 
