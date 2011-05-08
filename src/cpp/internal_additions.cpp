@@ -71,9 +71,10 @@ void cpp_internal_additions(std::ostream &out)
   // auxiliaries for new/delete
   out << "extern \"C\" void *__new(__typeof__(sizeof(int)));" << std::endl;  
   out << "extern \"C\" void *__new_array(__typeof__(sizeof(int)), __typeof__(sizeof(int)));" << std::endl;  
+  out << "extern \"C\" void *__placement_new(__typeof__(sizeof(int)), void *);" << std::endl;  
+  out << "extern \"C\" void *__placement_new_array(__typeof__(sizeof(int)), __typeof__(sizeof(int)), void *);" << std::endl;
   out << "extern \"C\" void __delete(void *);" << std::endl;  
   out << "extern \"C\" void __delete_array(void *);" << std::endl;  
-  out << "extern \"C\" void *__placement_new(__typeof__(sizeof(int)), void *);" << std::endl;  
   
   // __CPROVER namespace
   out << "namespace __CPROVER { }" << std::endl;

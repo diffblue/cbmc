@@ -892,14 +892,6 @@ void cpp_typecheckt::typecheck_expr_new(exprt &expr)
 
     expr.set(ID_statement, ID_cpp_new_array);
 
-    // this must not have an initializer
-    if(expr.operands().size()!=0)
-    {
-      err_location(expr.op0());
-      str << "new with array type must not use explicit construction";
-      throw 0;
-    }
-
     // save the size expression
     expr.set(ID_size, to_array_type(expr.type()).size());
 
@@ -931,6 +923,15 @@ void cpp_typecheckt::typecheck_expr_new(exprt &expr)
 
   // not yet typechecked-stuff
   exprt &initializer=static_cast<exprt &>(expr.add(ID_initializer));
+  
+  // arrays must not have an initializer
+  if(!initializer.operands().empty() &&
+     expr.get(ID_statement)==ID_cpp_new_array)
+  {
+    err_location(expr.op0());
+    str << "new with array type must not use initializer";
+    throw 0;
+  }
 
   exprt code=
     cpp_constructor(
