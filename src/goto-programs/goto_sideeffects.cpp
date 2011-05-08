@@ -488,7 +488,7 @@ void goto_convertt::remove_cpp_delete(
 
   codet tmp;
   
-  tmp.set_statement(ID_cpp_delete);
+  tmp.set_statement(expr.get_statement());
   tmp.location()=expr.location();
   tmp.copy_to_operands(expr.op0());
   tmp.set(ID_destructor, expr.find(ID_destructor));
