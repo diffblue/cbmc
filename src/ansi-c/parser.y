@@ -1916,29 +1916,24 @@ msc_seh_statement:
           TOK_MSC_TRY compound_statement
           TOK_MSC_EXCEPT '(' comma_expression ')' compound_statement
         {
-          $$=$2; /* EXCEPT-Block is ignored */
-          to_code(stack($$)).make_block();
-          code_labelt l;
-          l.set_label("try-exit");
-          l.operands()[0] = code_skipt();
-          stack($$).move_to_operands(l);
+          $$=$1;
+          statement($$, ID_msc_try_except);
+          mto($$, $2);
+          mto($$, $5);
+          mto($$, $7);
         }
         | TOK_MSC_TRY compound_statement
           TOK_MSC_FINALLY compound_statement
         {
-          $$=$2;
-          to_code(stack($$)).make_block();
-          code_labelt l;
-          l.set_label("try-exit");
-          l.operands()[0] = code_skipt();
-          stack($$).move_to_operands(l);
-          mto($$, $4); /* FINALLY is added to the block */
+          $$=$1;
+          statement($$, ID_msc_try_finally);
+          mto($$, $2);
+          mto($$, $4);
         }
         | TOK_MSC_LEAVE
         {
           $$=$1;
-          statement($$, ID_goto);
-          stack($$).set(ID_destination, "try-exit");
+          statement($$, ID_msc_leave);
         }
         ;
 
