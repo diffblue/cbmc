@@ -51,6 +51,22 @@ exprt convert_character_literal(
       typet type=force_integer_type?int_type():wchar_t_type();
       result=from_integer(value[0], type);
     }
+    else if(value.size()>=2 && value.size()<=4)
+    {
+      // TODO: need to double-check. GCC seems to say that each
+      // character is wchar_t wide.
+      mp_integer x=0;
+
+      for(unsigned i=0; i<value.size(); i++)
+      {
+        mp_integer z=(unsigned char)(value[i]);
+        z=z<<((value.size()-i-1)*8);
+        x+=z;
+      }
+
+      // always wchar_t
+      result=from_integer(x, wchar_t_type());
+    }
     else
       throw "wide literals with "+i2string(value.size())+
             " characters are not supported";
