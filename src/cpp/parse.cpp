@@ -5724,16 +5724,17 @@ bool Parser::rMSC_tryStatement(codet &statement)
   if(lex->GetToken(tk)!=MSC_TRY)
     return false;
 
-  codet body;
+  set_location(statement, tk);
+    
+  codet body1, body2;
 
-  if(!rCompoundStatement(body))
+  if(!rCompoundStatement(body1))
     return false;
     
-  statement=body;
-
   if(lex->LookAhead(0)==MSC_EXCEPT)
   {
     lex->GetToken(tk);
+    statement.set_statement(ID_msc_try_except);
     
     // get '(' comma.expression ')'
     
@@ -5746,13 +5747,16 @@ bool Parser::rMSC_tryStatement(codet &statement)
 
     if(lex->GetToken(tk3)!=')')
       return false;
-
-    if(!rCompoundStatement(body))
+      
+    if(!rCompoundStatement(body2))
       return false;
+      
+    statement.move_to_operands(body1, exp, body2);
   }
   else if(lex->LookAhead(0)==MSC_FINALLY)
   {
     lex->GetToken(tk);
+    statement.set_statement(ID_msc_try_finally);
 
     // get '(' comma.expression ')'
     
@@ -5765,9 +5769,11 @@ bool Parser::rMSC_tryStatement(codet &statement)
 
     if(lex->GetToken(tk3)!=')')
       return false;
-
-    if(!rCompoundStatement(body))
+      
+    if(!rCompoundStatement(body2))
       return false;
+
+    statement.move_to_operands(body1, exp, body2);
   }
   else
     return false;
