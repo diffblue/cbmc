@@ -158,9 +158,15 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
   start_typecheck_code();
 
   // save current return type
-  typet old_return_type = return_type;
+  typet old_return_type=return_type;
 
   return_type=function_type.return_type();
+
+  // constructor, destructor?
+  if(return_type.id()==ID_constructor ||
+     return_type.id()==ID_destructor)
+    return_type=empty_typet();
+  
   typecheck_code(to_code(symbol.value));
 
   symbol.value.type()=symbol.type;
