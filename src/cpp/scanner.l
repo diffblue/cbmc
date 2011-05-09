@@ -179,6 +179,7 @@ __extension__       { loc(); return Ignore; }
 _inline             { loc(); return INLINE; }
 __inline            { loc(); return INLINE; }
 __inline__          { loc(); return INLINE; }
+__interface         { loc(); return MSC_Keyword(INTERFACE); }
 __forceinline       { loc(); return MSC_Keyword(INLINE); }
 __noreturn__        { loc(); return Ignore; }
 restrict            { loc(); return Ignore; }
