@@ -5758,22 +5758,10 @@ bool Parser::rMSC_tryStatement(codet &statement)
     lex->GetToken(tk);
     statement.set_statement(ID_msc_try_finally);
 
-    // get '(' comma.expression ')'
-    
-    if(lex->GetToken(tk2)!='(')
-      return false;
-
-    exprt exp;
-    if(!rCommaExpression(exp))
-      return false;
-
-    if(lex->GetToken(tk3)!=')')
-      return false;
-      
     if(!rCompoundStatement(body2))
       return false;
 
-    statement.move_to_operands(body1, exp, body2);
+    statement.move_to_operands(body1, body2);
   }
   else
     return false;
