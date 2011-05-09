@@ -247,6 +247,19 @@ void ansi_c_convertt::convert_code(codet &code)
 
     convert_code(to_code(code.op3()));
   }
+  else if(statement==ID_msc_try_except)
+  {
+    assert(code.operands().size()==3);
+    convert_code(to_code(code.op0()));
+    convert_expr(code.op1());
+    convert_code(to_code(code.op2()));
+  }
+  else if(statement==ID_msc_try_finally)
+  {
+    assert(code.operands().size()==2);
+    convert_code(to_code(code.op0()));
+    convert_code(to_code(code.op1()));
+  }
   else if(statement==ID_switch)
   {
     assert(code.operands().size()==2);
