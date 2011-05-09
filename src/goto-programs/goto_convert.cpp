@@ -393,6 +393,12 @@ void goto_convertt::convert(
   else if(statement==ID_cpp_delete ||
           statement=="cpp_delete[]")
     convert_cpp_delete(code, dest);
+  else if(statement==ID_msc_try_except)
+    convert_msc_try_except(code, dest);
+  else if(statement==ID_msc_try_finally)
+    convert_msc_try_finally(code, dest);
+  else if(statement==ID_msc_leave)
+    convert_msc_leave(code, dest);
   else
     copy(code, OTHER, dest);
 
@@ -1803,6 +1809,79 @@ void goto_convertt::convert_bp_abortif(
   goto_programt::targett t=dest.add_instruction(ASSERT);
   t->guard.swap(op);
   t->location=code.location();
+}
+
+/*******************************************************************\
+
+Function: goto_convertt::convert_msc_try_finally
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void goto_convertt::convert_msc_try_finally(
+  const codet &code,
+  goto_programt &dest)
+{
+  if(code.operands().size()!=2)
+  {
+    err_location(code);
+    throw "msc_try_finally expects two arguments";
+  }
+
+  convert(to_code(code.op0()), dest);
+  
+  // todo: generate exception tracking
+}
+
+/*******************************************************************\
+
+Function: goto_convertt::convert_msc_try_except
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void goto_convertt::convert_msc_try_except(
+  const codet &code,
+  goto_programt &dest)
+{
+  if(code.operands().size()!=3)
+  {
+    err_location(code);
+    throw "msc_try_except expects three arguments";
+  }
+
+  convert(to_code(code.op0()), dest);
+  
+  // todo: generate exception tracking
+}
+
+/*******************************************************************\
+
+Function: goto_convertt::convert_msc_leave
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void goto_convertt::convert_msc_leave(
+  const codet &code,
+  goto_programt &dest)
+{
+  // todo: should throw (silent) exception
 }
 
 /*******************************************************************\
