@@ -207,6 +207,10 @@ _Complex            { loc(); return COMPLEX; }
 __complex__         { loc(); return COMPLEX; }
 __real__            { loc(); return REAL; }
 __imag__            { loc(); return IMAG; }
+__try               { loc(); return MSC_Keyword(MSC_TRY); }
+__except            { loc(); return MSC_Keyword(MSC_EXCEPT); }
+__leave             { loc(); return MSC_Keyword(MSC_LEAVE); }
+__finally           { loc(); return MSC_Keyword(MSC_FINALLY); }
 auto                { loc(); return AUTO; }
 bool                { loc(); return BOOLEAN; }
 break               { loc(); return BREAK; }

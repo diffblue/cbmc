@@ -141,6 +141,8 @@ protected:
   bool rDoStatement(codet &);
   bool rForStatement(codet &);
   bool rTryStatement(codet &);
+  bool rMSC_tryStatement(codet &);
+  bool rMSC_leaveStatement(codet &);
   bool rGCCAsmStatement(codet &);
   bool rMSCAsmStatement(codet &);
 
@@ -5271,6 +5273,12 @@ bool Parser::rStatement(codet &statement)
   case TRY:
     return rTryStatement(statement);
 
+  case MSC_TRY:
+    return rMSC_tryStatement(statement);
+
+  case MSC_LEAVE:
+    return rMSC_leaveStatement(statement);
+
   case BREAK:
   case CONTINUE:
     lex->GetToken(tk1);
@@ -5702,6 +5710,59 @@ bool Parser::rTryStatement(codet &statement)
     //                 body));
   }
   while(lex->LookAhead(0)==CATCH);
+
+  return true;
+}
+
+bool Parser::rMSC_tryStatement(codet &statement)
+{
+  // These are for 'structured exception handling',
+  // and are a relic from Visual C.
+  
+  Token tk, op, cp;
+
+  if(lex->GetToken(tk)!=MSC_TRY)
+    return false;
+
+  codet body;
+
+  if(!rCompoundStatement(body))
+    return false;
+    
+  statement=body;
+
+  if(lex->LookAhead(0)==MSC_EXCEPT)
+  {
+    lex->GetToken(tk);
+
+    if(!rCompoundStatement(body))
+      return false;
+  }
+  else if(lex->LookAhead(0)==MSC_FINALLY)
+  {
+    lex->GetToken(tk);
+
+    if(!rCompoundStatement(body))
+      return false;
+  }
+  else
+    return false;
+
+  return true;
+}
+
+bool Parser::rMSC_leaveStatement(codet &statement)
+{
+  // These are for 'structured exception handling',
+  // and are a relic from Visual C.
+  
+  Token tk;
+
+  if(lex->GetToken(tk)!=MSC_LEAVE)
+    return false;
+
+  statement=codet("msc_leave");
+  set_location(statement, tk);
 
   return true;
 }
