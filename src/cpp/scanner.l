@@ -59,7 +59,7 @@ floating_constant (({fractional_constant}{exponent_part}?)|([0-9]+{exponent_part
 
 integer_suffix [uUlL]
 iw_suffix       ("i8"|"i16"|"i32"|"i64"|"i128")
-integer_suffix_opt {integer_suffix}*|{iw_suffix}?
+integer_suffix_opt {integer_suffix}*{iw_suffix}?
 decimal_constant [1-9][0-9]*{integer_suffix_opt}
 octal_constant "0"[0-7]*{integer_suffix_opt}
 hex_constant "0"[xX][0-9a-fA-F]+{integer_suffix_opt}

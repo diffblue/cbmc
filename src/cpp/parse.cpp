@@ -5719,7 +5719,7 @@ bool Parser::rMSC_tryStatement(codet &statement)
   // These are for 'structured exception handling',
   // and are a relic from Visual C.
   
-  Token tk, op, cp;
+  Token tk, tk2, tk3;
 
   if(lex->GetToken(tk)!=MSC_TRY)
     return false;
@@ -5734,6 +5734,18 @@ bool Parser::rMSC_tryStatement(codet &statement)
   if(lex->LookAhead(0)==MSC_EXCEPT)
   {
     lex->GetToken(tk);
+    
+    // get '(' comma.expression ')'
+    
+    if(lex->GetToken(tk2)!='(')
+      return false;
+
+    exprt exp;
+    if(!rCommaExpression(exp))
+      return false;
+
+    if(lex->GetToken(tk3)!=')')
+      return false;
 
     if(!rCompoundStatement(body))
       return false;
@@ -5741,6 +5753,18 @@ bool Parser::rMSC_tryStatement(codet &statement)
   else if(lex->LookAhead(0)==MSC_FINALLY)
   {
     lex->GetToken(tk);
+
+    // get '(' comma.expression ')'
+    
+    if(lex->GetToken(tk2)!='(')
+      return false;
+
+    exprt exp;
+    if(!rCommaExpression(exp))
+      return false;
+
+    if(lex->GetToken(tk3)!=')')
+      return false;
 
     if(!rCompoundStatement(body))
       return false;
