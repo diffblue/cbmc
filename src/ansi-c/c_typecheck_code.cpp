@@ -92,6 +92,24 @@ void c_typecheck_baset::typecheck_code(codet &code)
   else if(statement==ID_gcc_local_label)
   {
   }
+  else if(statement==ID_msc_try_finally)
+  {
+    assert(code.operands().size()==2);
+    typecheck_code(to_code(code.op0()));
+    typecheck_code(to_code(code.op1()));
+  }
+  else if(statement==ID_msc_try_except)
+  {
+    assert(code.operands().size()==3);
+    typecheck_code(to_code(code.op0()));
+    typecheck_expr(code.op1());
+    typecheck_code(to_code(code.op2()));
+  }
+  else if(statement==ID_msc_leave)
+  {
+    // fine as is, but should check that we
+    // are in a 'try' block
+  }
   else
   {
     err_location(code);
