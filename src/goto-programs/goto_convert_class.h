@@ -187,6 +187,9 @@ protected:
   void convert_atomic_end(const codet &code, goto_programt &dest);
   void convert_bp_enforce(const codet &code, goto_programt &dest);
   void convert_bp_abortif(const codet &code, goto_programt &dest);
+  void convert_msc_try_finally(const codet &code, goto_programt &dest);
+  void convert_msc_try_except(const codet &code, goto_programt &dest);
+  void convert_msc_leave(const codet &code, goto_programt &dest);
   void convert(const codet &code, goto_programt &dest);
   void copy(const codet &code, goto_program_instruction_typet type, goto_programt &dest);
 
