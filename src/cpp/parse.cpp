@@ -418,7 +418,7 @@ bool Parser::isTypeSpecifier()
        || t==WCHAR_T
        || t==INT8 || t==INT16 || t==INT32 || t==INT64 || t==PTR32 || t==PTR64
        || t==VOID || t==BOOLEAN
-       || t==CLASS || t==STRUCT || t==UNION || t==ENUM
+       || t==CLASS || t==STRUCT || t==UNION || t==ENUM || t==INTERFACE
        || t==TYPENAME
        || t==INT64
        || t==TYPEOF
@@ -808,7 +808,8 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
 
     Token tk1, tk2;
 
-    if(lex->GetToken(tk1)!=CLASS || lex->GetToken(tk2)!=Identifier)
+    if(lex->GetToken(tk1)!=CLASS ||
+       lex->GetToken(tk2)!=Identifier)
       return false;
 
     //Ptree cspec=new PtreeClassSpec(new LeafReserved(tk1),
@@ -1639,7 +1640,7 @@ bool Parser::optIntegralTypeOrClassSpec(typet &p)
   std::cout << "Parser::optIntegralTypeOrClassSpec 3\n";
   #endif // DEBUG
 
-  if(t==CLASS || t==STRUCT || t==UNION)
+  if(t==CLASS || t==STRUCT || t==UNION || t==INTERFACE)
     return rClassSpec(p);
   else if(t==ENUM)
     return rEnumSpec(p);
@@ -3133,7 +3134,7 @@ bool Parser::rEnumBody(irept &body)
   | {userdef.keyword} class.key name ':' base.specifiers class.body
 
   class.key
-  : CLASS | STRUCT | UNION
+  : CLASS | STRUCT | UNION | INTERFACE
 */
 bool Parser::rClassSpec(typet &spec)
 {
@@ -3144,7 +3145,7 @@ bool Parser::rClassSpec(typet &spec)
   #endif
 
   int t=lex->GetToken(tk);
-  if(t!=CLASS && t!=STRUCT && t!=UNION)
+  if(t!=CLASS && t!=STRUCT && t!=UNION && t!=INTERFACE)
     return false;
 
   #ifdef DEBUG
@@ -3156,11 +3157,13 @@ bool Parser::rClassSpec(typet &spec)
     spec=typet(ID_struct);
     spec.set(ID_C_class, true);
   }
-  else if(t==STRUCT)
+  else if(t==INTERFACE) // MS-specific
   {
     spec=typet(ID_struct);
-    spec.set(ID_C_class, false);
+    spec.set(ID_C_interface, true);
   }
+  else if(t==STRUCT)
+    spec=typet(ID_struct);
   else if(t==UNION)
     spec=typet(ID_union);
   else
@@ -3168,21 +3171,13 @@ bool Parser::rClassSpec(typet &spec)
 
   set_location(spec, tk);
 
-  #if 0
-  Ptree comments=lex->GetComments();
-  spec=new PtreeClassSpec(new LeafReserved(tk), nil, comments);
-  if(head.is_not_nil())
-    spec=new PtreeClassSpec(head, spec, comments);
-  #endif
-
   #ifdef DEBUG
   std::cout << "Parser::rClassSpec 3\n";
   #endif
 
   if(lex->LookAhead(0)=='{')
   {
-    //encode.NoName();
-    //spec=Ptree::Snoc(spec, Ptree::List(nil, nil));
+    // no tag
     #ifdef DEBUG
     std::cout << "Parser::rClassSpec 4\n";
     #endif
@@ -3200,8 +3195,8 @@ bool Parser::rClassSpec(typet &spec)
     std::cout << "Parser::rClassSpec 5\n";
     #endif
 
-    //spec=Ptree::Snoc(spec, name);
     t=lex->LookAhead(0);
+
     if(t==':')
     {
       if(!rBaseSpecifiers(spec.add(ID_bases)))
@@ -3209,12 +3204,10 @@ bool Parser::rClassSpec(typet &spec)
     }
     else if(t=='{')
     {
-      //spec=Ptree::Snoc(spec, nil);
     }
     else
     {
-      //((PtreeClassSpec*)spec)->encoded_name=encode.Get();
-      return true;        // class.key Identifier
+      return true;
     }
   }
 
@@ -3222,7 +3215,6 @@ bool Parser::rClassSpec(typet &spec)
   std::cout << "Parser::rClassSpec 6\n";
   #endif
 
-  //((PtreeClassSpec*)spec)->encoded_name=encode.Get();
   exprt body;
 
   if(!rClassBody(body))
@@ -3232,7 +3224,6 @@ bool Parser::rClassSpec(typet &spec)
   std::cout << "Parser::rClassSpec 7\n";
   #endif
 
-  //spec=Ptree::Snoc(spec, body);
   ((exprt&)spec.add(ID_body)).operands().swap(body.operands());
   return true;
 }

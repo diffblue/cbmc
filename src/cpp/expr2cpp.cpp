@@ -228,6 +228,8 @@ std::string expr2cppt::convert_rec(
       
       if(symbol.type.get_bool(ID_C_class))
         dest+="class";
+      else if(symbol.type.get_bool(ID_C_interface))
+        dest+="__interface"; // MS-specific
       else
         dest+="struct";
 
@@ -257,6 +259,8 @@ std::string expr2cppt::convert_rec(
 
     if(src.get_bool(ID_C_class))
       dest+="class";
+    else if(src.get_bool(ID_C_interface))
+      dest+="__interface"; // MS-specific
     else
       dest+="struct";
 
