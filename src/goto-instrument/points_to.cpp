@@ -100,7 +100,7 @@ bool points_tot::transform(cfgt::iterator e)
     
   case ASSIGN:
     {
-      const code_assignt &code_assign=to_code_assign(instruction.code);
+      // const code_assignt &code_assign=to_code_assign(instruction.code);
       
     }    
     break;
