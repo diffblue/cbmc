@@ -41,6 +41,7 @@ ifneq ($(MINISAT2),)
   MINISAT2_INCLUDE=-I $(MINISAT2)
   MINISAT2_LIB=$(MINISAT2)/simp/SimpSolver$(OBJEXT) $(MINISAT2)/core/Solver$(OBJEXT)
   CXXFLAGS += -DHAVE_MINISAT2 -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS
+  GCCFLAGS := $(filter-out -pedantic, $(GCCFLAGS)) -Wno-parentheses 
 endif
 
 ifneq ($(SMVSAT),)
