@@ -17,7 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 namespace Minisat
 {
   class Solver;
-};
+}
 
 class satcheck_minisat_baset:public cnf_solvert
 {
