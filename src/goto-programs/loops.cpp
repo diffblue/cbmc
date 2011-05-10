@@ -535,7 +535,7 @@ void loop_infot::loopt::find_simple_induction_variables(std::set<induction_varia
 
 	for(CFGt::nodes_const_sett::const_iterator it = nodes.begin(); it != nodes.end(); it++)
 	{
-		if(NULL != (*it)->successor_next && NULL != (*it)->successor_jump && (!contains(*((*it)->successor_next))) || !contains(*((*it)->successor_jump)))
+		if(NULL != (*it)->successor_next && NULL != (*it)->successor_jump && ((!contains(*((*it)->successor_next))) || !contains(*((*it)->successor_jump))))
 		{
 			if(critical_path.end() == critical_path.find(*it))
 			{

@@ -34,7 +34,7 @@ typedef enum { NO_INSTRUCTION_TYPE=0,
                DEAD=15,         // marks the end-of-live of a local variable
                FUNCTION_CALL=16,// call a function
                THROW=17,        // throw an exception
-               CATCH=18,         // catch an exception
+               CATCH=18         // catch an exception
              }
   goto_program_instruction_typet;
 
