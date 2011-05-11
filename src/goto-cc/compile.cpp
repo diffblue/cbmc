@@ -193,7 +193,7 @@ bool compilet::add_input_file(const std::string &filename)
 {
   size_t r=filename.rfind('.', filename.length()-1);
 
-  if (r!=std::string::npos)
+  if(r!=std::string::npos)
   {
     std::string ext = filename.substr(r+1, filename.length());
 
@@ -344,25 +344,26 @@ bool compilet::find_library(const std::string &name)
     tmp = *it + "/lib";
     #endif
     std::ifstream in((tmp+name+".a").c_str());
-    if (in.is_open())
+    if(in.is_open())
       add_input_file(tmp+name+".a");
     else
     {
       std::string libname = tmp+name+".so";
-      if (is_elf_file(libname))
-          std::cout << "Warning: Cannot read ELF library " << libname << "."
-            << std::endl;
 
-      if (cmdline.isset("xml"))
+      if(is_elf_file(libname))
+          std::cout << "Warning: Cannot read ELF library " << libname << "."
+                    << std::endl;
+
+      if(cmdline.isset("xml"))
       {
-        if (is_xml_file(libname))
+        if(is_xml_file(libname))
           add_input_file(libname);
         else
           return false;
       }
       else
       {
-        if (is_binary_file(libname))
+        if(is_binary_file(libname))
           add_input_file(libname);
         else
           return false;
@@ -1485,6 +1486,22 @@ compilet::~compilet()
        it!=tmp_dirs.end();
        it++)
   {
+    #ifdef _WIN32
+    
+    std::string pattern=*it+"\\*";
+    
+    struct _finddata_t info;
+    
+    intptr_t handle=_findfirst(pattern.c_str(), &info);
+    
+    if(handle!=-1)
+    {
+      unlink(info.name);
+      
+      while(_findnext(handle, &info)!=-1)
+        unlink(info.name);
+    }
+    #else
     DIR *dir=opendir(it->c_str());
 
     if(dir!=NULL)
@@ -1496,6 +1513,7 @@ compilet::~compilet()
 
       closedir(dir);
     }
+    #endif
 
     rmdir(it->c_str());
   }
