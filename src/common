@@ -18,6 +18,9 @@ CXXFLAGS+=$(GCCFLAGS) $(INCLUDES)
 %.obj:%.cpp
 	$(CXX) $(CXXFLAGS) /nologo /c /GF /EHsc $< /Fo$@
 
+%.obj:%.cc
+	$(CXX) $(CXXFLAGS) /nologo /c /GF /EHsc $< /Fo$@
+
 %.obj:%.c
 	$(CC) $(INCLUDES) /nologo /c /GF /EHsc $< /Fo$@
 
