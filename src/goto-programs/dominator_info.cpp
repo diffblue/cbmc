@@ -83,12 +83,14 @@ dominator_infot::dominator_infot(const CFGt& cfg) : the_cfg(cfg)
 						intersection_of_incoming_dominators = dominators_of[*it2];
 					} else {
 						CFGt::nodes_const_sett intersection;
+						#ifndef _WIN32 // the following isn't widely available
 						set_intersection(
 								intersection_of_incoming_dominators.begin(),
 								intersection_of_incoming_dominators.end(),
 								dominators_of[*it2].begin(),
 								dominators_of[*it2].end(),
 								std::insert_iterator<CFGt::nodes_const_sett >(intersection, intersection.begin()));
+                                                #endif
 
 						intersection_of_incoming_dominators = intersection;
 					}
