@@ -11,7 +11,7 @@ all : $(PRG)
 clean :
 	$(RM) $(OBJ) $(PRG)
 
-.cc.o:
+.cc$(OBJEXT):
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
 $(PRG): $(OBJ)
