@@ -6,7 +6,7 @@
 
 #ifdef _WIN32
 #define random() rand()
-#define nextafterf(a) throw "no nextafterf";
+#define nextafterf(a, b) throw "no nextafterf";
 #endif
 
 #include "ieee_float.h"
@@ -211,8 +211,8 @@ void check_conversion(int i)
 void check_nextafter(int i)
 {
   float f1 = random_float();
-  float f2 = nextafterf(f1,PINF);
-  float f3 = nextafterf(f1,NINF);
+  float f2 = nextafterf(f1, PINF);
+  float f3 = nextafterf(f1, NINF);
   
   ieee_floatt i1, i2, i3;
   
