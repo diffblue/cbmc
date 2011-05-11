@@ -6,7 +6,7 @@
 
 #ifdef _WIN32
 #define random() rand()
-#define nextafterf(a, b) throw "no nextafterf";
+#define nextafterf(a, b) (throw "no nextafterf", 0);
 #endif
 
 #include "ieee_float.h"
