@@ -59,7 +59,6 @@ Date: June 2006
 #include <windows.h>
 #include <direct.h>
 #include <errno.h>
-#include <dirent.h>
 #define chdir _chdir
 #define popen _popen
 #define pclose _pclose
