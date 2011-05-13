@@ -28,6 +28,7 @@ Date: June 2006
 #include <replace_symbol.h>
 #include <base_type.h>
 #include <xml.h>
+#include <i2string.h>
 
 #include <ansi-c/ansi_c_language.h>
 #include <ansi-c/c_link_class.h>
@@ -834,30 +835,29 @@ bool compilet::write_bin_object_file(
   const contextt &lcontext,
   goto_functionst &functions)
 {
-  print(8, "Writing binary format object " + filename);
+  print(8, "Writing binary format object `" + filename + "'");
 
   // symbols
-  print(8, "Symbols in table: " +
-           to_string((unsigned long) lcontext.symbols.size()));
+  print(8, "Symbols in table: "+
+           to_string(lcontext.symbols.size()));
 
-  std::ofstream f(filename.c_str(), std::ios::binary);
-  if (!f.is_open())
+  std::ofstream outfile(filename.c_str(), std::ios::binary);
+
+  if(!outfile.is_open())
   {
-    error("Error opening file " + filename);
+    error("Error opening file `"+filename+"'");
     return true;
   }
 
-  if(write_goto_binary(f, lcontext, functions))
+  if(write_goto_binary(outfile, lcontext, functions))
     return true;
 
-  unsigned cnt = function_body_count(functions);
-  if (verbosity>=9)
-  {
-    std::cout << "Functions: " << functions.function_map.size() << "; ";
-    std::cout << cnt << " have a body." << std::endl;
-  }
+  unsigned cnt=function_body_count(functions);
 
-  f.close();
+  debug("Functions: "+i2string(functions.function_map.size())+"; "+
+        i2string(cnt)+" have a body.");
+
+  outfile.close();
 
   if(cmdline.isset("dot"))
   {
