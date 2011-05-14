@@ -184,6 +184,10 @@ static const char *options_no_arg[]=
   "--no_multifile",
   "-Ospace",
   "-Otime",
+  "-O1",
+  "-O2",
+  "-O3",
+  "-O4",
   "--brief_diagnostics",
   "--no_brief_diagnostics",
   "--remarks",
@@ -196,6 +200,7 @@ static const char *options_no_arg[]=
   "--translate_g++",
   "--translate_gcc",
   "--translate_gld",
+  "-W",
   NULL
 };
 
@@ -213,7 +218,6 @@ static const char *options_with_prefix[]=
   "--depend_format=",
   "--info=",
   "--compatible=",
-  "--cpu=",
   "--fpu=",
   "--fp16_format=",
   "--fpmode=",
@@ -244,9 +248,6 @@ static const char *options_with_prefix[]=
   "--configure_cpp_headers=",
   "--configure_extra_includes=",
   "--configure_extra_libraries=",
-  "Warmscc,"
-  "-W",
-  "-O",
   NULL
 };
 
@@ -262,7 +263,10 @@ static const char *options_with_arg[]=
   "-L",
   "-I",
   "-J",
+  "-Warmcc,",
   "-o",
+  "--cpu",
+  "--apcs",
   NULL
 };
 
