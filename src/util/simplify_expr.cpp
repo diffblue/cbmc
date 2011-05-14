@@ -1240,6 +1240,62 @@ bool simplify_exprt::simplify_bitwise(exprt &expr)
   if(!is_bitvector_type(expr.type()))
     return true;
     
+  // check if these are really boolean
+  if(expr.type().id()!=ID_bool)
+  {
+    bool all_bool=true;
+    
+    forall_operands(it, expr)
+      if(it->id()==ID_typecast &&
+         it->operands().size()==1 &&
+         ns.follow(it->op0().type()).id()==ID_bool)
+      {
+      }
+      else if(it->is_zero() || it->is_one())
+      {
+      }
+      else
+        all_bool=false;
+        
+    if(all_bool)
+    {
+      // re-write to boolean+typecast
+      exprt new_expr=expr;
+      
+      if(expr.id()==ID_bitand)
+        new_expr.id(ID_and);
+      else if(expr.id()==ID_bitor)
+        new_expr.id(ID_or);
+      else if(expr.id()==ID_bitxor)
+        new_expr.id(ID_xor);
+      else
+        assert(false);
+        
+      Forall_operands(it, new_expr)
+      {
+        if(it->id()==ID_typecast)
+        {
+          exprt tmp;
+          tmp=it->op0();
+          it->swap(tmp);
+        }
+        else if(it->is_zero())
+          it->make_false();
+        else if(it->is_one())
+          it->make_true();
+      }
+        
+      new_expr.type()=bool_typet();
+      simplify_node(new_expr);
+
+      new_expr.make_typecast(expr.type());
+      simplify_node(new_expr);
+      
+      expr.swap(new_expr);
+      return false;
+    }
+  }
+
   bool result=true;
     
   // try to merge constants
