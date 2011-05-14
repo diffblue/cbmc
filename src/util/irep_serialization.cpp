@@ -147,12 +147,15 @@ void irep_serializationt::reference_convert(
   const irept &irep,
   std::ostream &out)
 {
-  ireps_containert::ireps_on_writet::const_iterator fi = 
-    ireps_container.ireps_on_write.find(irep);
+  unsigned h=ireps_container.irep_full_hash_container.number(irep);
+
+  // should be merged with insert
+  ireps_containert::ireps_on_writet::const_iterator fi=
+    ireps_container.ireps_on_write.find(h);
 
   if(fi==ireps_container.ireps_on_write.end()) 
-  {           
-    unsigned id=insert_on_write(irep);
+  {         
+    unsigned id=insert_on_write(h);
     write_long(out, id);
     write_irep(out, irep);
   }
@@ -174,21 +177,17 @@ Function: irep_serializationt::insert_on_write
  
 \*******************************************************************/
 
-unsigned long irep_serializationt::insert_on_write( const irept& i ) 
+unsigned long irep_serializationt::insert_on_write(unsigned h) 
 {
   std::pair<ireps_containert::ireps_on_writet::const_iterator,bool> res=
     ireps_container.ireps_on_write.insert(
-      std::pair<irept, unsigned long>
-      (i, ireps_container.ireps_on_write.size()));
+      std::pair<unsigned, unsigned long>
+      (h, ireps_container.ireps_on_write.size()));
 
   if(!res.second)
-  {
     return ireps_container.ireps_on_write.size();
-  }
   else
-  {
     return res.first->second;
-  }      
 }
 
 /*******************************************************************\
