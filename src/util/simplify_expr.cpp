@@ -1239,10 +1239,12 @@ bool simplify_exprt::simplify_bitwise(exprt &expr)
 {
   if(!is_bitvector_type(expr.type()))
     return true;
-  
-  unsigned width=bv_width(expr.type());
     
   bool result=true;
+    
+  // try to merge constants
+  
+  unsigned width=bv_width(expr.type());
     
   while(expr.operands().size()>=2)
   {
@@ -1294,6 +1296,25 @@ bool simplify_exprt::simplify_bitwise(exprt &expr)
     result=false;
   }
 
+  // now erase zeros out of bitor, bitxor
+
+  if(expr.id()==ID_bitor || expr.id()==ID_bitxor)
+  {
+    for(exprt::operandst::iterator
+        it=expr.operands().begin();
+        it!=expr.operands().end();
+        ) // no it++
+    {
+      if(it->is_zero())
+      {
+        it=expr.operands().erase(it);
+        result=false;
+      }
+      else
+        it++;
+    }
+  }
+  
   if(expr.operands().size()==1)
   {
     exprt tmp;
