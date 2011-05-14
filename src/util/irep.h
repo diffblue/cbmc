@@ -246,7 +246,9 @@ protected:
   dt *data;
   
   void remove_ref(dt *old_data);  
-  
+  void detatch();
+
+public:  
   const dt &read() const;
 
   inline dt &write()
@@ -255,10 +257,10 @@ protected:
     return *data;
   }
   
-  void detatch();
   #else
   dt data;
-  
+
+public:
   inline const dt &read() const
   {
     return data;
