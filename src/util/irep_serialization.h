@@ -15,6 +15,7 @@ Date: May 2007
 
 #include "irep.h"
 #include "hash_cont.h"
+#include "irep_hash_container.h"
 
 void write_long(std::ostream &, unsigned); 
 void write_string(std::ostream &, const std::string &);
@@ -61,8 +62,8 @@ public:
     typedef std::vector<std::pair<bool, irept> > ireps_on_readt;
     ireps_on_readt ireps_on_read;
 
-    typedef hash_map_cont<
-      irept, unsigned long, irep_full_hash, irep_content_eq> ireps_on_writet;
+    irep_full_hash_containert irep_full_hash_container;
+    typedef std::map<unsigned, unsigned long> ireps_on_writet;
     ireps_on_writet ireps_on_write;
     
     typedef std::vector<bool> string_mapt;
@@ -73,6 +74,7 @@ public:
     
     void clear()
     { 
+      irep_full_hash_container.clear();
       ireps_on_write.clear(); 
       ireps_on_read.clear();
       string_map.clear();
@@ -87,7 +89,7 @@ public:
     clear(); 
   };
   
-  unsigned long insert_on_write(const irept&);
+  unsigned long insert_on_write(unsigned h);
   unsigned long insert_on_read(unsigned id, const irept&);
   
   void reference_convert(std::istream&, irept &irep);
