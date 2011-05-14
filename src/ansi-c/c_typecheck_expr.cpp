@@ -2306,7 +2306,17 @@ void c_typecheck_baset::typecheck_expr_binary_arithmetic(exprt &expr)
   }
   else
   {
-    implicit_typecast_arithmetic(op0, op1);
+    // promote?
+    
+    if((expr.id()==ID_bitor ||
+        expr.id()==ID_bitand ||
+        expr.id()==ID_bitxor) &&
+        o_type0==o_type1)
+    {
+      // as an optimization, we don't up-promote on bit-wise ops
+    }
+    else
+      implicit_typecast_arithmetic(op0, op1);
 
     const typet &type0=follow(op0.type());
     const typet &type1=follow(op1.type());
@@ -2345,6 +2355,19 @@ void c_typecheck_baset::typecheck_expr_binary_arithmetic(exprt &expr)
       {
         if(is_number(type0))
         {
+          expr.type()=type0;
+          return;
+        }
+        else if(type0.id()==ID_bool)
+        {
+          if(expr.id()==ID_bitand)
+            expr.id(ID_and);
+          else if(expr.id()==ID_bitor)
+            expr.id(ID_or);
+          else if(expr.id()==ID_bitxor)
+            expr.id(ID_xor);
+          else
+            assert(false);
           expr.type()=type0;
           return;
         }
