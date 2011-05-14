@@ -672,11 +672,14 @@ Function: irept::hash
 
 size_t irept::hash() const
 {
+  const irept::subt &sub=get_sub();
+  const irept::named_subt &named_sub=get_named_sub();
+
   size_t result=hash_string(id());
 
-  forall_irep(it, get_sub()) result=result^it->hash();
+  forall_irep(it, sub) result=result^it->hash();
 
-  forall_named_irep(it, get_named_sub())
+  forall_named_irep(it, named_sub)
   {
     result=result^hash_string(it->first);
     result=result^it->second.hash();
@@ -699,17 +702,21 @@ Function: irept::full_hash
 
 size_t irept::full_hash() const
 {
+  const irept::subt &sub=get_sub();
+  const irept::named_subt &named_sub=get_named_sub();
+  const irept::named_subt &comments=get_comments();
+
   size_t result=hash_string(id());
 
-  forall_irep(it, get_sub()) result=result^it->full_hash();
+  forall_irep(it, sub) result=result^it->full_hash();
 
-  forall_named_irep(it, get_named_sub())
+  forall_named_irep(it, named_sub)
   {
     result=result^hash_string(it->first);
     result=result^it->second.full_hash();
   }
 
-  forall_named_irep(it, get_comments())
+  forall_named_irep(it, comments)
   {
     result=result^hash_string(it->first);
     result=result^it->second.full_hash();
