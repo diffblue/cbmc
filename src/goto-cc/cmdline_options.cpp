@@ -251,9 +251,6 @@ bool cmdline_optionst::doit()
   {
     config.ansi_c.mode=configt::ansi_ct::MODE_ARM;
 
-    if(cmdline.isset(""))
-      compiler.only_preprocess=true;
-
     if(cmdline.isset('E'))
       compiler.only_preprocess=true;
 
