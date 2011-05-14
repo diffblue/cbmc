@@ -1371,16 +1371,25 @@ void c_typecheck_baset::typecheck_expr_trinary(if_exprt &expr)
     implicit_typecast(operands[2], expr.type());
   }
 
-  if(follow(operands[1].type())==follow(operands[2].type()))
-  {
-    expr.type()=operands[1].type();
-    return;
-  }
-
   if(operands[1].type().id()==ID_empty ||
      operands[2].type().id()==ID_empty)
   {
     expr.type()=empty_typet();
+    return;
+  }
+
+  if(follow(operands[1].type())==follow(operands[2].type()))
+  {
+    expr.type()=operands[1].type();
+    
+    // GCC says: "A conditional expression is a valid lvalue
+    // if its type is not void and the true and false branches
+    // are both valid lvalues."
+    
+    if(operands[1].get_bool(ID_C_lvalue) &&
+       operands[2].get_bool(ID_C_lvalue))
+      expr.set(ID_C_lvalue, true);
+    
     return;
   }
 
