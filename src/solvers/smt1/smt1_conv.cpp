@@ -119,10 +119,13 @@ void smt1_convt::set_value(
 
     identifier.value=pointer_logic.pointer_expr(p, type);
   }
-  else if(type.id()==ID_struct ||
-          type.id()==ID_union)
+  else if(type.id()==ID_struct)
   {
-    identifier.value=binary2struct(to_struct_union_type(type), v);
+    identifier.value=binary2struct(to_struct_type(type), v);
+  }
+  else if(type.id()==ID_union)
+  {
+    identifier.value=binary2union(to_union_type(type), v);
   }
 }
 
@@ -2913,10 +2916,10 @@ Function: smt1_convt::binary2struct
 \*******************************************************************/
 
 exprt smt1_convt::binary2struct(
-  const struct_union_typet &type,
+  const struct_typet &type,
   const std::string &binary) const
 {
-  const struct_union_typet::componentst &components=type.components();
+  const struct_typet::componentst &components=type.components();
 
   // std::cout << "S: " << stype << std::endl;
 
@@ -2943,10 +2946,14 @@ exprt smt1_convt::binary2struct(
     std::string cval=binary.substr(inx, sub_size);
     // std::cout << "CV[" << sub_size << "]: " << cval << std::endl;
 
-    if(comp.type().id()==ID_struct ||
-       comp.type().id()==ID_union)
+    if(comp.type().id()==ID_struct)
     {
-      exprt c = binary2struct(to_struct_union_type(comp.type()), cval);
+      exprt c=binary2struct(to_struct_type(comp.type()), cval);
+      e.move_to_operands(c);
+    }
+    else if(comp.type().id()==ID_union)
+    {
+      exprt c=binary2union(to_union_type(comp.type()), cval);
       e.move_to_operands(c);
     }
     else
@@ -2958,6 +2965,39 @@ exprt smt1_convt::binary2struct(
   }
 
   return e;
+}
+
+/*******************************************************************\
+
+Function: smt1_convt::binary2union
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+exprt smt1_convt::binary2union(
+  const union_typet &type,
+  const std::string &binary) const
+{
+  const union_typet::componentst &components=type.components();
+
+  // std::cout << "S: " << stype << std::endl;
+
+  unsigned total_width=boolbv_width(type);
+
+  if(total_width==0)
+    throw "failed to get union width";
+
+  // std::cout << "B: " << binary << std::endl;
+
+  exprt e(type.id(), type);
+
+  // todo
+  return nil_exprt();  
 }
 
 /*******************************************************************\

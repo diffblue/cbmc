@@ -148,7 +148,11 @@ protected:
   string2array_mapt string2array_map;
   
   exprt binary2struct(
-    const class struct_union_typet &type, 
+    const class struct_typet &type, 
+    const std::string &binary) const;  
+
+  exprt binary2union(
+    const class union_typet &type, 
     const std::string &binary) const;  
 };
 
