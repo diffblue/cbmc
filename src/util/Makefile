@@ -31,6 +31,10 @@ ifdef MODULE_FLOATBV
   CXXFLAGS += -DHAVE_FLOATBV
 endif
 
+# all the others will need irep_ids.h,
+# which we first need to generate
+.NOTPARALLEL:
+
 ###############################################################################
 
 irep_ids.h: irep_ids_convert$(EXEEXT) irep_ids.txt
