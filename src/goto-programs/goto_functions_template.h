@@ -96,7 +96,7 @@ public:
 
   irep_idt main_id() const
   {
-    return "main";
+    return ID_main;
   }
   
   void swap(goto_functions_templatet &other)
