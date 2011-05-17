@@ -21,6 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "remove_skip.h"
 #include "goto_function_pointers.h"
+#include "compute_called_functions.h"
 
 /*******************************************************************\
 
@@ -49,10 +50,6 @@ protected:
   bool remove_function_pointers(goto_programt &goto_program);
 
   std::set<irep_idt> address_taken;
-
-  void compute_address_taken(const exprt &src);
-  void compute_address_taken(const goto_programt &goto_program);
-  void compute_address_taken(const goto_functionst &goto_functions);
   
   typedef std::map<irep_idt, code_typet> type_mapt;
   type_mapt type_map;
@@ -61,76 +58,6 @@ protected:
     const code_typet &call_type,
     const code_typet &function_type);
 };
-
-/*******************************************************************\
-
-Function: remove_function_pointerst::compute_address_taken
-
-  Inputs:
-
- Outputs:
-
- Purpose: get all functions whose address is taken
-
-\*******************************************************************/
-
-void remove_function_pointerst::compute_address_taken(
-  const exprt &src)
-{
-  forall_operands(it, src)
-    compute_address_taken(*it);
-    
-  if(src.id()==ID_address_of &&
-     src.type().id()==ID_pointer &&
-     src.type().subtype().id()==ID_code)
-  {
-    assert(src.operands().size()==1);
-    const exprt &op=src.op0();
-    if(op.id()==ID_symbol)
-      address_taken.insert(to_symbol_expr(op).get_identifier());
-  }
-}
-
-/*******************************************************************\
-
-Function: compute_address_taken
-
-  Inputs:
-
- Outputs:
-
- Purpose: get all functions whose address is taken
-
-\*******************************************************************/
-
-void remove_function_pointerst::compute_address_taken(
-  const goto_programt &goto_program)
-{
-  forall_goto_program_instructions(it, goto_program)
-  {
-    compute_address_taken(it->guard);
-    compute_address_taken(it->code);
-  }
-}
-
-/*******************************************************************\
-
-Function: remove_function_pointerst::compute_address_taken
-
-  Inputs:
-
- Outputs:
-
- Purpose: get all functions whose address is taken
-
-\*******************************************************************/
-
-void remove_function_pointerst::compute_address_taken(
-  const goto_functionst &goto_functions)
-{
-  forall_goto_functions(it, goto_functions)
-    compute_address_taken(it->second.body);
-}
 
 /*******************************************************************\
 
@@ -355,7 +282,7 @@ void remove_function_pointerst::operator()(goto_functionst &functions)
 {
   bool did_something=false;
   
-  compute_address_taken(functions);
+  compute_address_taken_functions(functions, address_taken);
 
   // build type map
   for(goto_functionst::function_mapt::iterator f_it=
