@@ -35,6 +35,7 @@ struct cprover_library_entryt
 #include "cprover_library.inc"
 
 void add_cprover_library(
+  const std::set<irep_idt> &functions,
   contextt &context,
   message_handlert &message_handler)
 {
@@ -58,14 +59,17 @@ void add_cprover_library(
   {
     irep_idt id=e->function;
     
-    contextt::symbolst::const_iterator old=
-      context.symbols.find(id);
-
-    if(old!=context.symbols.end() &&
-       old->second.value.is_nil())
+    if(functions.find(id)!=functions.end())
     {
-      count++;
-      library_text << e->model << std::endl;
+      contextt::symbolst::const_iterator old=
+        context.symbols.find(id);
+
+      if(old!=context.symbols.end() &&
+         old->second.value.is_nil())
+      {
+        count++;
+        library_text << e->model << std::endl;
+      }
     }
   }
 
