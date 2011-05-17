@@ -161,7 +161,6 @@ Function: c_final
 
 bool c_final(contextt &context, message_handlert &message_handler)
 {
-  add_cprover_library(context, message_handler);
   add_external_objects(context, message_handler);
 
   return false;
