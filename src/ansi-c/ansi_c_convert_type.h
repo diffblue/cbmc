@@ -29,7 +29,7 @@ public:
            bv_cnt, bv_width;
            
   bool transparent_union, packed, aligned;
-  exprt vector_size;
+  exprt vector_size, alignment;
 
   // storage spec
   c_storage_spect c_storage_spec;
@@ -57,6 +57,7 @@ public:
     ptr32_cnt=ptr64_cnt=
     bv_cnt=0;
     vector_size.make_nil();
+    alignment.make_nil();
     bv_width=0;
     
     packed=aligned=transparent_union=false;
