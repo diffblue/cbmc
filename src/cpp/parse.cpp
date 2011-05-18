@@ -128,6 +128,7 @@ protected:
   bool rPostfixExpr(exprt &);
   bool rPrimaryExpr(exprt &);
   bool rMSCTypePredicate(exprt &);
+  bool rMSCuuidof(exprt &);
   bool rVarName(exprt &);
   bool rVarNameCore(exprt &);
   bool isTemplateArgs();
@@ -4762,6 +4763,55 @@ bool Parser::rPostfixExpr(exprt &exp)
 }
 
 /*
+  __uuidof( expression )
+  __uuidof( type )
+*/  
+
+bool Parser::rMSCuuidof(exprt &expr)
+{
+  Token tk;
+
+  if(lex->GetToken(tk)!=MSC_UUIDOF)
+    return false;
+
+  if(lex->GetToken(tk)!='(')
+    return false;
+
+  {
+    typet tname;
+    Token cp;
+
+    cpp_token_buffert::post pos=lex->Save();
+
+    if(rTypeName(tname))
+    {
+      if(lex->GetToken(cp)==')')
+      {
+        expr=exprt(ID_msc_uuidof);
+        expr.add(ID_type_arg).swap(tname);
+        set_location(expr, tk);
+        return true;
+      }
+    }
+
+    lex->Restore(pos);
+  }
+
+  exprt unary;
+
+  if(!rUnaryExpr(unary))
+    return false;
+
+  if(lex->GetToken(tk)!=')')
+    return false;
+
+  expr=exprt(ID_msc_uuidof);
+  expr.move_to_operands(unary);
+  set_location(expr, tk);
+  return true;
+}
+
+/*
   __is_base_of ( base, derived )
   __is_convertible_to ( from, to )
   __is_class ( t )
@@ -4896,6 +4946,9 @@ bool Parser::rPrimaryExpr(exprt &exp)
   case MSC_TYPE_PREDICATE:
   case MSC_BINARY_TYPE_PREDICATE:
     return rMSCTypePredicate(exp);
+
+  case MSC_UUIDOF:
+    return rMSCuuidof(exp);
 
   default:
     {
