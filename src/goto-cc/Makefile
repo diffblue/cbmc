@@ -38,7 +38,7 @@ endif
 ###############################################################################
 
 goto-cc$(EXEEXT): $(OBJ)
-	$(CXX) $(LINKFLAGS) -o $@ $(OBJ) $(LIBS) 
+	$(LINKBIN) $(OBJ)
 
 clean:
 	rm -f $(SRC:.cpp=$(OBJEXT)) $(SRC:.cpp=.d) goto-cc$(EXEEXT)
