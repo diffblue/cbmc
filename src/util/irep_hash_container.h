@@ -32,7 +32,15 @@ protected:
 
   // this is the first level: address of the content
   
-  typedef hash_map_cont<const void *, unsigned> ptr_hasht;
+  struct pointer_hash
+  {
+    inline size_t operator()(const void *p) const
+    {
+      return (size_t)p;
+    }
+  };
+
+  typedef hash_map_cont<const void *, unsigned, pointer_hash> ptr_hasht;
   ptr_hasht ptr_hash;
 
   // this is the second level: content
