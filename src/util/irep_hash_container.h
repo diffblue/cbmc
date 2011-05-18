@@ -27,6 +27,16 @@ public:
   }
   
 protected:
+  // replacing the following two hash-tables by
+  // std::maps doesn't make much difference in performance
+
+  // this is the first level: address of the content
+  
+  typedef hash_map_cont<const void *, unsigned> ptr_hasht;
+  ptr_hasht ptr_hash;
+
+  // this is the second level: content
+      
   typedef std::vector<unsigned> packedt;
   
   struct vector_hash
@@ -40,15 +50,9 @@ protected:
     }
   };
 
-  // replacing the following two hash-tables by
-  // maps doesn't make much difference in performance
-    
   typedef hash_numbering<packedt, vector_hash> numberingt;
   numberingt numbering;
   
-  typedef hash_map_cont<const void *, unsigned> ptr_hasht;
-  ptr_hasht ptr_hash;
-
   void pack(const irept &irep, packedt &);
   
   bool full;
