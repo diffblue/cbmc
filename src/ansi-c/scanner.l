@@ -386,7 +386,13 @@ void ansi_c_scanner_init()
                     return make_identifier();
                 }
 
-"__asm__"       { BEGIN(GCC_ASM); }
+"__asm__"       { if(PARSER.mode==ansi_c_parsert::GCC ||
+                     PARSER.mode==ansi_c_parsert::CW ||
+                     PARSER.mode==ansi_c_parsert::ARM)
+                    BEGIN(GCC_ASM);
+                  else
+                    return make_identifier();
+                }
 
 "[repeatable"   { BEGIN(MSC_ANNOTATION); }
 "[source_annotation_attribute" { BEGIN(MSC_ANNOTATION); }
@@ -394,6 +400,7 @@ void ansi_c_scanner_init()
 "[SA_Pre"       { BEGIN(MSC_ANNOTATION); }
 "[SA_Post"      { BEGIN(MSC_ANNOTATION); }
 "[SA_FormatString" { BEGIN(MSC_ANNOTATION); }
+"[SA_Success"   { BEGIN(MSC_ANNOTATION); }
 
 "__declspec"    { if(PARSER.mode==ansi_c_parsert::MSC ||
                      PARSER.mode==ansi_c_parsert::CW ||
