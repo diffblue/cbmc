@@ -61,7 +61,7 @@ endif
 ###############################################################################
 
 cbmc$(EXEEXT): $(OBJ)
-	$(CXX) $(LINKFLAGS) -o $@ $(OBJ) $(LIBS)
+	$(LINKBIN) $(OBJ)
 
 clean:
 	rm -f $(SRC:.cpp=$(OBJEXT)) cbmc$(EXEEXT)
