@@ -118,13 +118,14 @@ pragma          "#"{horizontal_white}*pragma{horizontal_white}.*"\n"
 .      { /* Throw away */ }
 }
 
-"[repeatable" { BEGIN(MSC_ANNOTATION); }
-"[source_annotation_attribute" { BEGIN(MSC_ANNOTATION); }
-"[returnvalue"  { BEGIN(MSC_ANNOTATION); }
-"[SA_Pre"       { BEGIN(MSC_ANNOTATION); }
-"[SA_Post"      { BEGIN(MSC_ANNOTATION); }
-"[SA_FormatString" { BEGIN(MSC_ANNOTATION); }
-"[SA_Success"   { BEGIN(MSC_ANNOTATION); }
+"["{ws}"repeatable"   { BEGIN(MSC_ANNOTATION); }
+"["{ws}"source_annotation_attribute" { BEGIN(MSC_ANNOTATION); }
+"["{ws}"returnvalue"  { BEGIN(MSC_ANNOTATION); }
+"["{ws}"SA_Pre"       { BEGIN(MSC_ANNOTATION); }
+"["{ws}"SA_Post"      { BEGIN(MSC_ANNOTATION); }
+"["{ws}"SA_FormatString" { BEGIN(MSC_ANNOTATION); }
+"["{ws}"SA_Success"   { BEGIN(MSC_ANNOTATION); }
+"["{ws}"uuid"         { BEGIN(MSC_ANNOTATION); }
 
 "__pragma"      { BEGIN(MSC_PRAGMA); PARSER.parenthesis_counter=0; }
 
