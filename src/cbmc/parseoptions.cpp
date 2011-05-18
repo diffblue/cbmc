@@ -23,6 +23,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/string_abstraction.h>
 #include <goto-programs/string_instrumentation.h>
 #include <goto-programs/loop_numbers.h>
+#include <goto-programs/link_to_library.h>
 
 #include <pointer-analysis/value_set_analysis.h>
 #include <pointer-analysis/goto_program_dereference.h>
@@ -454,6 +455,9 @@ bool cbmc_parseoptionst::get_goto_program(
       goto_convert(
         context, bmc.options, goto_functions,
         ui_message_handler);
+        
+      link_to_library(
+        context, goto_functions, bmc.options, ui_message_handler);
     }
 
     if(cmdline.isset("interpreter"))
