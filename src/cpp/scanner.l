@@ -124,6 +124,7 @@ pragma          "#"{horizontal_white}*pragma{horizontal_white}.*"\n"
 "[SA_Pre"       { BEGIN(MSC_ANNOTATION); }
 "[SA_Post"      { BEGIN(MSC_ANNOTATION); }
 "[SA_FormatString" { BEGIN(MSC_ANNOTATION); }
+"[SA_Success"   { BEGIN(MSC_ANNOTATION); }
 
 "__pragma"      { BEGIN(MSC_PRAGMA); PARSER.parenthesis_counter=0; }
 
