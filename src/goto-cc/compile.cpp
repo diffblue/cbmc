@@ -74,22 +74,6 @@ Date: June 2006
 
 unsigned compilet::subgraphscount;
 
-std::string to_string(unsigned long l) {
-  std::string res = "";
-  char x[20];
-  sprintf(x, "%ld", l);
-  res = x;
-  return res;
-}
-
-std::string to_string(long l) {
-  std::string res = "";
-  char x[20];
-  sprintf(x, "%ld", l);
-  res = x;
-  return res;
-}
-
 /*******************************************************************\
 
 Function: compilet::doit
@@ -140,10 +124,10 @@ bool compilet::doit()
 
   // Work through the given source files
   print(8, "No. of source files: " +
-    to_string((unsigned long) source_files.size()));
+    i2string((unsigned long) source_files.size()));
 
   print(8, "No. of object files: " +
-    to_string((unsigned long) object_files.size()));
+    i2string((unsigned long) object_files.size()));
 
   if(source_files.size()==0 && object_files.size()==0)
   {
@@ -839,7 +823,7 @@ bool compilet::write_bin_object_file(
 
   // symbols
   print(8, "Symbols in table: "+
-           to_string(lcontext.symbols.size()));
+           i2string(lcontext.symbols.size()));
 
   std::ofstream outfile(filename.c_str(), std::ios::binary);
 
@@ -918,7 +902,7 @@ bool compilet::write_xml_object_file(
   xml_goto_function_convertt gfconverter(irepc);
 
   xmlt syms("symbols");
-  print(8, "Symbols in table: " + to_string((unsigned long) lcontext.symbols.size()));
+  print(8, "Symbols in table: " + i2string((unsigned long) lcontext.symbols.size()));
   forall_symbols(it, lcontext.symbols)
   {
     const symbolt &sym = it->second;
