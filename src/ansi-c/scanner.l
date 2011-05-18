@@ -402,6 +402,9 @@ void ansi_c_scanner_init()
 "["{ws}"SA_FormatString" { BEGIN(MSC_ANNOTATION); }
 "["{ws}"SA_Success"   { BEGIN(MSC_ANNOTATION); }
 "["{ws}"uuid"         { BEGIN(MSC_ANNOTATION); }
+"["{ws}"emitidl"      { BEGIN(MSC_ANNOTATION); }
+"["{ws}"module"       { BEGIN(MSC_ANNOTATION); }
+"["{ws}"export"       { BEGIN(MSC_ANNOTATION); }
 
 
 "__declspec"    { if(PARSER.mode==ansi_c_parsert::MSC ||
