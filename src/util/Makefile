@@ -46,7 +46,7 @@ irep_ids.inc: irep_ids_convert$(EXEEXT) irep_ids.txt
 irep_ids.cpp: irep_ids.inc irep_ids.h
 
 irep_ids_convert$(EXEEXT): irep_ids_convert$(OBJEXT)
-	$(CXX) $(LINKFLAGS) -o $@ irep_ids_convert$(OBJEXT)
+	$(LINKBIN) irep_ids_convert$(OBJEXT)
 
 $(OBJ): irep_ids.h
 
@@ -62,4 +62,4 @@ clean:
 ieee_float_test$(OBJEXT): irep_ids.h  
 
 ieee_float_test$(EXEEXT): ieee_float_test$(OBJEXT) ieee_float$(OBJEXT) util$(LIBEXT)
-	$(CXX) $(LINKFLAGS) -o $@ util$(LIBEXT) ieee_float_test$(OBJEXT) ../big-int/bigint$(OBJEXT)
+	$(LINKBIN) util$(LIBEXT) ieee_float_test$(OBJEXT) ../big-int/bigint$(OBJEXT)
