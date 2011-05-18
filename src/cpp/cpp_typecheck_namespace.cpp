@@ -31,7 +31,7 @@ void cpp_typecheckt::convert(cpp_namespace_spect &namespace_spec)
 
   if(name=="")
   {
-    // unique namespace
+    // "unique namespace"
     err_location(namespace_spec);
     throw "unique namespace not supported yet";
   }
@@ -47,12 +47,23 @@ void cpp_typecheckt::convert(cpp_namespace_spect &namespace_spec)
 
   if(it!=context.symbols.end())
   {
-    if(it->second.type.id()!="namespace")
+    if(namespace_spec.alias().is_not_nil())
     {
       err_location(namespace_spec);
-      str << "symbol `" << final_name << "' previously declared" << std::endl;
+      str << "namespace alias `" << final_name 
+          << "' previously declared" << std::endl;
       str << "location of previous declaration: "
-          << it->second.location << std::endl;
+          << it->second.location;
+      throw 0;
+    }
+  
+    if(it->second.type.id()!=ID_namespace)
+    {
+      err_location(namespace_spec);
+      str << "namespace `" << final_name 
+          << "' previously declared" << std::endl;
+      str << "location of previous declaration: "
+          << it->second.location;
       throw 0;
     }
 
@@ -77,10 +88,19 @@ void cpp_typecheckt::convert(cpp_namespace_spect &namespace_spec)
     cpp_scopes.new_namespace(final_name);
   }
 
-  // do the declarations
-  for(cpp_namespace_spect::itemst::iterator
-      it=namespace_spec.items().begin();
-      it!=namespace_spec.items().end();
-      it++)
-    convert(*it);
+  if(namespace_spec.alias().is_not_nil())
+  {
+    cpp_typecheck_resolvet resolver(*this);
+    cpp_scopet &s=resolver.resolve_namespace(namespace_spec.alias());
+    cpp_scopes.current_scope().add_using_scope(s);
+  }
+  else
+  {
+    // do the declarations
+    for(cpp_namespace_spect::itemst::iterator
+        it=namespace_spec.items().begin();
+        it!=namespace_spec.items().end();
+        it++)
+      convert(*it);
+  }
 }

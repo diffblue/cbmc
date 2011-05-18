@@ -11,11 +11,14 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <expr.h>
 
+#include "cpp_name.h"
+
 class cpp_namespace_spect:public exprt
 {
 public:
   inline cpp_namespace_spect():exprt(ID_cpp_namespace_spec)
   {
+    add("alias").make_nil();
   }
   
   typedef std::vector<class cpp_itemt> itemst;
@@ -40,14 +43,14 @@ public:
     set(ID_namespace, _namespace);
   }
   
-  inline irept &alias()
+  inline cpp_namet &alias()
   {
-    return add("alias");
+    return static_cast<cpp_namet &>(add("alias"));
   }
   
-  inline const irept &alias() const
+  inline const cpp_namet &alias() const
   {
-    return find("alias");
+    return static_cast<const cpp_namet &>(find("alias"));
   }
   
   void output(std::ostream &out) const;
