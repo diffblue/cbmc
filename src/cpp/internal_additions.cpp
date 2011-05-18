@@ -132,6 +132,8 @@ void cpp_internal_additions(std::ostream &out)
   out << "extern \"C\" {" << std::endl;
   out << architecture_strings;
   out << "}" << std::endl;
+  
+  // Microsoft stuff
 
   // type_info infrastructure -- the standard wants this to be in the
   // std:: namespace, but MS has it in the root namespace
