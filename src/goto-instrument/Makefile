@@ -42,7 +42,7 @@ endif
 ###############################################################################
 
 goto-instrument$(EXEEXT): $(OBJ)
-	$(CXX) $(LINKFLAGS) -o $@ $(OBJ) $(LIBS)
+	$(LINKBIN) $(OBJ)
 
 clean:
 	rm -f $(SRC:.cpp=$(OBJEXT)) goto-instrument$(EXEEXT)
