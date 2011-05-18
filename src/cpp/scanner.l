@@ -126,6 +126,9 @@ pragma          "#"{horizontal_white}*pragma{horizontal_white}.*"\n"
 "["{ws}"SA_FormatString" { BEGIN(MSC_ANNOTATION); }
 "["{ws}"SA_Success"   { BEGIN(MSC_ANNOTATION); }
 "["{ws}"uuid"         { BEGIN(MSC_ANNOTATION); }
+"["{ws}"emitidl"      { BEGIN(MSC_ANNOTATION); }
+"["{ws}"module"       { BEGIN(MSC_ANNOTATION); }
+"["{ws}"export"       { BEGIN(MSC_ANNOTATION); }
 
 "__pragma"      { BEGIN(MSC_PRAGMA); PARSER.parenthesis_counter=0; }
 
@@ -213,6 +216,7 @@ __try               { loc(); return MSC_Keyword(MSC_TRY); }
 __except            { loc(); return MSC_Keyword(MSC_EXCEPT); }
 __leave             { loc(); return MSC_Keyword(MSC_LEAVE); }
 __finally           { loc(); return MSC_Keyword(MSC_FINALLY); }
+__uuidof 	    { loc(); return MSC_Keyword(MSC_UUIDOF); }
 auto                { loc(); return AUTO; }
 bool                { loc(); return BOOLEAN; }
 break               { loc(); return BREAK; }
