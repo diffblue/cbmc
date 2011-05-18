@@ -15,6 +15,7 @@ EXEEXT =
 GCCFLAGS = -Wall -MMD -O2
 #LINKFLAGS = -static
 LINKLIB = ld -r -o $@ $^
+LINKBIN = $(CXX) $(LINKFLAGS) -o $@ $(LIBS)
 
 # MacOS Fat Binaries
 # LIBEXT = .a
@@ -23,6 +24,7 @@ LINKLIB = ld -r -o $@ $^
 # GCCFLAGS = -Wall -MMD -O2 -force_cpusubtype_ALL -arch i386 -arch ppc -arch x86_64
 # LINKFLAGS = -force_cpusubtype_ALL -arch i386 -arch ppc -arch x86_64
 # LINKLIB = ld -r -o $@ $^
+# LINKBIN = $(CXX) $(LINKFLAGS) -o $@ $(LIBS)
 
 # use these for Cygwin:
 # LIBEXT = .a
@@ -31,6 +33,7 @@ LINKLIB = ld -r -o $@ $^
 # GCCFLAGS = -Wall -MMD -O2 -mno-cygwin
 # LINKFLAGS = -mno-cygwin
 # LINKLIB = ld -r -o $@ $^
+# LINKBIN = $(CXX) $(LINKFLAGS) -o $@ $(LIBS)
 
 # use these for Visual Studio:
 # LIBEXT = .lib
@@ -39,12 +42,13 @@ LINKLIB = ld -r -o $@ $^
 # CXX = cl
 # CC = cl
 # LINKLIB = lib /NOLOGO /OUT:$@ $^
+# LINKBIN = $(CXX) $(LINKFLAGS) /Fe$@ $(LIBS)
 
 # SAT-solvers we have
 #CHAFF = ../../zChaff
 #BOOLEFORCE = ../../booleforce-0.4
 #MINISAT = ../../MiniSat-p_v1.14
-MINISAT2 = ../../minisat-2.2.0
+MINISAT2 = ../../../../minisat-2.2.0
 #SMVSAT =
 
 LANGUAGES = ansi-c csp intrep pvs smvlang verilog vhdl netlist cpp specc \
