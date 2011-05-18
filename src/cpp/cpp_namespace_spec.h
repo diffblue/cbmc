@@ -14,38 +14,38 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 class cpp_namespace_spect:public exprt
 {
 public:
-  cpp_namespace_spect():exprt(ID_cpp_namespace_spec)
+  inline cpp_namespace_spect():exprt(ID_cpp_namespace_spec)
   {
   }
   
   typedef std::vector<class cpp_itemt> itemst;
 
-  const itemst &items() const
+  inline const itemst &items() const
   {
     return (const itemst &)operands();
   }
 
-  itemst &items()
+  inline itemst &items()
   {
     return (itemst &)operands();
   }
   
-  const irep_idt &get_namespace() const
+  inline const irep_idt &get_namespace() const
   {
     return get(ID_namespace);
   }
 
-  void set_namespace(const irep_idt &_namespace)
+  inline void set_namespace(const irep_idt &_namespace)
   {
     set(ID_namespace, _namespace);
   }
   
-  irept &alias()
+  inline irept &alias()
   {
     return add("alias");
   }
   
-  const irept &alias() const
+  inline const irept &alias() const
   {
     return find("alias");
   }
