@@ -51,7 +51,7 @@ protected:
   bool rTemplateDecl2(typet &, TemplateDeclKind &kind);
   bool rTempArgList(irept &);
   bool rTempArgDeclaration(cpp_declarationt &);
-  bool rExternTemplateDecl(Ptree &);
+  bool rExternTemplateDecl(irept &);
 
   bool rDeclaration(cpp_declarationt &);
   bool rIntegralDeclaration(cpp_declarationt &, cpp_storage_spect &, cpp_member_spect &, typet &, typet &);
@@ -68,24 +68,24 @@ protected:
   bool rAttribute();
   bool optIntegralTypeOrClassSpec(typet &);
   bool rConstructorDecl(cpp_declaratort &, typet &);
-  bool optThrowDecl(Ptree &);
+  bool optThrowDecl(irept &);
 
   bool rDeclarators(cpp_declarationt::declaratorst &, bool, bool=false);
   bool rDeclaratorWithInit(cpp_declaratort &, bool, bool);
   bool rDeclarator(cpp_declaratort &, DeclKind, bool, bool, bool=false);
   bool rDeclaratorQualifier();
   bool optPtrOperator(typet &);
-  bool rMemberInitializers(Ptree &);
+  bool rMemberInitializers(irept &);
   bool rMemberInit(exprt &);
 
-  bool rName(Ptree &);
+  bool rName(irept &);
   bool rOperatorName(irept &);
-  bool rCastOperatorName(Ptree &);
-  bool rPtrToMember(Ptree &);
+  bool rCastOperatorName(irept &);
+  bool rPtrToMember(irept &);
   bool rTemplateArgs(irept &);
 
   bool rArgDeclListOrInit(exprt &, bool&, bool);
-  bool rArgDeclList(Ptree &);
+  bool rArgDeclList(irept &);
   bool rArgDeclaration(cpp_declarationt &);
 
   bool rFunctionArguments(exprt &);
@@ -97,7 +97,7 @@ protected:
   bool rBaseSpecifiers(irept &);
   bool rClassBody(exprt &);
   bool rClassMember(cpp_itemt &);
-  bool rAccessDecl(Ptree &);
+  bool rAccessDecl(irept &);
 
   bool rCommaExpression(exprt &);
 
@@ -472,43 +472,48 @@ bool Parser::rLinkageSpec(cpp_linkage_spect &linkage_spec)
 /*
   namespace.spec
   : NAMESPACE Identifier definition
+  | NAMESPACE Identifier = name
   | NAMESPACE { Identifier } linkage.body
 */
 
 bool Parser::rNamespaceSpec(cpp_namespace_spect &namespace_spec)
 {
   Token tk1, tk2;
-  std::string name;
+
   if(lex->GetToken(tk1)!=NAMESPACE)
     return false;
+
+  std::string name;
 
   if(lex->LookAhead(0)=='{')
     name="";
   else
+  {
     if(lex->GetToken(tk2)==Identifier)
       name.swap(tk2.text);
     else
       return false;
+  }
 
   namespace_spec=cpp_namespace_spect();
   set_location(namespace_spec, tk1);
   namespace_spec.set_namespace(name);
 
-  if(lex->LookAhead(0)=='{')
+  switch(lex->LookAhead(0))
   {
-    if(!rLinkageBody(namespace_spec.items()))
-      return false;
+  case '{':
+    return rLinkageBody(namespace_spec.items());
+    
+  case '=': // namespace alias
+    lex->GetToken(tk2); // eat =
+    return rName(namespace_spec.alias());
+
+  default:
+    namespace_spec.items().push_back(cpp_itemt());
+    return rDefinition(namespace_spec.items().back());
   }
-  else
-  {
-    cpp_itemt item;
 
-    if(!rDefinition(item))
-      return false;
-
-    namespace_spec.items().push_back(item);
-  }
-
+  // unreachable
   return true;
 }
 
@@ -621,7 +626,7 @@ bool Parser::rTemplateDecl(cpp_declarationt &decl)
     break;
 
   case tdk_instantiation:
-    // Repackage the decl as a PtreeTemplateInstantiation
+    // Repackage the decl
     decl=body;
     assert(0);
     // assumes that decl has the form: [nil [class ...] ;]
@@ -864,7 +869,7 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
    extern.template.decl
    : EXTERN TEMPLATE declaration
 */
-bool Parser::rExternTemplateDecl(Ptree &decl)
+bool Parser::rExternTemplateDecl(irept &decl)
 {
   Token tk1, tk2;
 
@@ -1769,7 +1774,7 @@ bool Parser::rConstructorDecl(
 
   if(lex->LookAhead(0)==':')
   {
-    Ptree mi;
+    irept mi;
 
     if(rMemberInitializers(mi))
       constructor.member_initializers().swap(mi);
@@ -1800,11 +1805,11 @@ bool Parser::rConstructorDecl(
   throw.decl : THROW '(' (name {','})* {name} ')'
              : THROW '(' '...' ')'
 */
-bool Parser::optThrowDecl(Ptree &throw_decl)
+bool Parser::optThrowDecl(irept &throw_decl)
 {
   Token tk;
   int t;
-  Ptree p=get_nil_irep();
+  irept p=get_nil_irep();
 
   if(lex->LookAhead(0)==THROW)
   {
@@ -1818,7 +1823,7 @@ bool Parser::optThrowDecl(Ptree &throw_decl)
 
     for(;;)
     {
-      Ptree q;
+      irept q;
       t=lex->LookAhead(0);
       if(t=='\0')
         return false;
@@ -2124,7 +2129,7 @@ bool Parser::rDeclarator(
         // loop should end here
       }
 
-      Ptree throw_decl;
+      irept throw_decl;
       optThrowDecl(throw_decl); // ignore in this version
 
       if(lex->LookAhead(0)==':')
@@ -2277,7 +2282,7 @@ bool Parser::optPtrOperator(typet &ptrs)
   member.initializers
   : ':' member.init (',' member.init)*
 */
-bool Parser::rMemberInitializers(Ptree &init)
+bool Parser::rMemberInitializers(irept &init)
 {
   Token tk;
 
@@ -2311,9 +2316,7 @@ bool Parser::rMemberInitializers(Ptree &init)
 */
 bool Parser::rMemberInit(exprt &init)
 {
-  Ptree name;
-  exprt args;
-  Token tk1, tk2;
+  irept name;
 
   if(!rName(name))
     return false;
@@ -2321,10 +2324,14 @@ bool Parser::rMemberInit(exprt &init)
   init=codet(ID_member_initializer);
   init.add(ID_member).swap(name);
 
+  Token tk1, tk2;
+
   if(lex->GetToken(tk1)!='(')
     return false;
 
   set_location(init, tk1);
+
+  exprt args;
 
   if(!rFunctionArguments(args))
     return false;
@@ -2348,7 +2355,7 @@ bool Parser::rMemberInit(exprt &init)
   Don't use this function for parsing an expression
   It always regards '<' as the beginning of template arguments.
 */
-bool Parser::rName(Ptree &name)
+bool Parser::rName(irept &name)
 {
   #ifdef DEBUG
   std::cout << "Parser::rName 0\n";
@@ -2533,7 +2540,7 @@ bool Parser::rOperatorName(irept &name)
     {(ptr.operator)*}
 */
 
-bool Parser::rCastOperatorName(Ptree &name)
+bool Parser::rCastOperatorName(irept &name)
 {
   typet cv1, cv2, type_name, ptr;
 
@@ -2594,7 +2601,7 @@ bool Parser::rCastOperatorName(Ptree &name)
   ptr.to.member
   : {'::'} (identifier {template.args} '::')+ '*'
 */
-bool Parser::rPtrToMember(Ptree &ptr_to_mem)
+bool Parser::rPtrToMember(irept &ptr_to_mem)
 {
   #ifdef DEBUG
   std::cout << "Parser::rPtrToMember 0\n";
@@ -2848,9 +2855,9 @@ bool Parser::rArgDeclListOrInit(
     : empty
     | arg.declaration ( ',' arg.declaration )* {{ ',' } Ellipses}
 */
-bool Parser::rArgDeclList(Ptree &arglist)
+bool Parser::rArgDeclList(irept &arglist)
 {
-  Ptree list;
+  irept list;
 
   list.clear();
   for(;;)
@@ -3423,16 +3430,16 @@ bool Parser::rClassMember(cpp_itemt &member)
   access.decl
   : name ';'                e.g. <qualified class>::<member name>;
 */
-bool Parser::rAccessDecl(Ptree &mem)
+bool Parser::rAccessDecl(irept &mem)
 {
-  Ptree name;
+  irept name;
   Token tk;
 
   if(!rName(name))
-      return false;
+    return false;
 
   if(lex->GetToken(tk)!=';')
-      return false;
+    return false;
 
   //mem=new PtreeAccessDecl(new PtreeName(name, encode),
   //                           Ptree::List(new Leaf(tk)));
@@ -3958,9 +3965,6 @@ bool Parser::rAdditiveExpr(exprt &exp)
 */
 bool Parser::rMultiplyExpr(exprt &exp)
 {
-  Token tk;
-  Ptree right;
-
   #ifdef DEBUG
   std::cout << "Parser::rMultiplyExpr 0\n";
   #endif
@@ -4370,7 +4374,7 @@ bool Parser::isAllocateExpr(int t)
 bool Parser::rAllocateExpr(exprt &exp)
 {
   Token tk;
-  Ptree head=get_nil_irep();
+  irept head=get_nil_irep();
 
   #ifdef DEBUG
   std::cout << "Parser::rAllocateExpr 0\n";

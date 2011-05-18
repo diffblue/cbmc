@@ -40,6 +40,16 @@ public:
     set(ID_namespace, _namespace);
   }
   
+  irept &alias()
+  {
+    return add("alias");
+  }
+  
+  const irept &alias() const
+  {
+    return find("alias");
+  }
+  
   void output(std::ostream &out) const;
 };
 
