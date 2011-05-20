@@ -89,7 +89,7 @@ pragma          "#"{horizontal_white}*pragma{horizontal_white}.*"\n"
 
 %{
 #define loc() (PARSER.current_token().text=yytext,PARSER.set_location())
-#define MSC_Keyword(x) (PARSER.mode==cpp_parsert::MSC?x:Identifier)
+#define MSC_Keyword(x) (PARSER.mode==cpp_parsert::MSC?x:TOK_Identifier)
 %}
 
 <INITIAL>"/*"	{ BEGIN(COMMENT1); }	/* begin C comment state */
@@ -139,11 +139,11 @@ pragma          "#"{horizontal_white}*pragma{horizontal_white}.*"\n"
 <MSC_ASM1>[^{^}]* { loc();
                     PARSER.current_token().data=exprt(yytext);
                     BEGIN(INITIAL);
-                    return StringL; }
+                    return TOK_StringL; }
 
 <MSC_ASM2>[^}]* { loc();
                   PARSER.current_token().data=exprt(yytext);
-                  return StringL; }
+                  return TOK_StringL; }
 <MSC_ASM2>"}"   { BEGIN(INITIAL); loc(); return '}'; }
 
 <MSC_DECLSPEC>")"    { PARSER.parenthesis_counter--;
@@ -163,189 +163,189 @@ pragma          "#"{horizontal_white}*pragma{horizontal_white}.*"\n"
 ({v_tab}|{c_return}|{form_feed})+
 ({horizontal_white}|{v_tab}|{c_return}|{form_feed})*"\n"
 
-__alignof__         { loc(); return SIZEOF; }
+__alignof__         { loc(); return TOK_SIZEOF; }
 __asm__|asm|__asm   { if(PARSER.mode==cpp_parsert::MSC)
                       {
                         BEGIN(MSC_ASM1);
-                        return MSC_ASM;
+                        return TOK_MSC_ASM;
                       }
                       else
                       {
                         loc();
-                        return GCC_ASM;
+                        return TOK_GCC_ASM;
                       }
                     }
 __attribute         { BEGIN(GCC_ATTRIBUTE); PARSER.parenthesis_counter=0; }
 __attribute__       { BEGIN(GCC_ATTRIBUTE); PARSER.parenthesis_counter=0; }
-_cdecl|__cdecl 	    { loc(); return MSC_Keyword(CDECL); }
-__const             { loc(); return CONST; }
+_cdecl|__cdecl 	    { loc(); return MSC_Keyword(TOK_CDECL); }
+__const             { loc(); return TOK_CONST; }
 __declspec          { BEGIN(MSC_DECLSPEC); PARSER.parenthesis_counter=0; }
-__extension__       { loc(); return Ignore; }
-_inline             { loc(); return INLINE; }
-__inline            { loc(); return INLINE; }
-__inline__          { loc(); return INLINE; }
-__interface         { loc(); return MSC_Keyword(INTERFACE); }
-__forceinline       { loc(); return MSC_Keyword(INLINE); }
-__noreturn__        { loc(); return Ignore; }
-restrict            { loc(); return Ignore; }
-__restrict__        { loc(); return Ignore; }
-__restrict          { loc(); return Ignore; }
-__stdcall           { loc(); return MSC_Keyword(STDCALL); }
-__fastcall          { loc(); return MSC_Keyword(FASTCALL); }
-__clrcall           { loc(); return MSC_Keyword(CLRCALL); }
-__signed            { loc(); return SIGNED; }
-__signed__          { loc(); return SIGNED; }
-__vector            { loc(); return Ignore; }
-__volatile__        { loc(); return VOLATILE; }
-typeof              { loc(); return TYPEOF; }
-__typeof            { loc(); return TYPEOF; }
-__typeof__          { loc(); return TYPEOF; }
-__int8              { loc(); return MSC_Keyword(INT8); }
-__int16             { loc(); return MSC_Keyword(INT16); }
-__int32             { loc(); return MSC_Keyword(INT32); }
-__int64             { loc(); return MSC_Keyword(INT64); }
-__ptr32             { loc(); return MSC_Keyword(PTR32); }
-__ptr64             { loc(); return MSC_Keyword(PTR64); }
-__thiscall          { loc(); return Ignore; }
-__w64               { loc(); return Ignore; }
-_Complex            { loc(); return COMPLEX; }
-__complex__         { loc(); return COMPLEX; }
-__real__            { loc(); return REAL; }
-__imag__            { loc(); return IMAG; }
-__try               { loc(); return MSC_Keyword(MSC_TRY); }
-__except            { loc(); return MSC_Keyword(MSC_EXCEPT); }
-__leave             { loc(); return MSC_Keyword(MSC_LEAVE); }
-__finally           { loc(); return MSC_Keyword(MSC_FINALLY); }
-__uuidof 	    { loc(); return MSC_Keyword(MSC_UUIDOF); }
-auto                { loc(); return AUTO; }
-bool                { loc(); return BOOLEAN; }
-break               { loc(); return BREAK; }
-case                { loc(); return CASE; }
-catch               { loc(); return CATCH; }
-char                { loc(); return CHAR; }
-class               { loc(); return CLASS; }
-const               { loc(); return CONST; }
-continue            { loc(); return CONTINUE; }
-default             { loc(); return DEFAULT; }
-delete              { loc(); return DELETE; }
-decltype            { loc(); return DECLTYPE; }
-do                  { loc(); return DO; }
-double              { loc(); return DOUBLE; }
-else                { loc(); return ELSE; }
-enum                { loc(); return ENUM; }
-explicit            { loc(); return EXPLICIT; }
-extern              { loc(); return EXTERN; }
-float               { loc(); return FLOAT; }
-for                 { loc(); return FOR; }
-friend              { loc(); return FRIEND; }
-goto                { loc(); return GOTO; }
-if                  { loc(); return IF; }
-inline              { loc(); return INLINE; }
-int                 { loc(); return INT; }
-long                { loc(); return LONG; }
-mutable             { loc(); return MUTABLE; }
-namespace           { loc(); return NAMESPACE; }
-new                 { loc(); return NEW; }
-noreturn            { loc(); return Ignore; }
-operator            { loc(); return OPERATOR; }
-private             { loc(); return PRIVATE; }
-protected           { loc(); return PROTECTED; }
-public              { loc(); return PUBLIC; }
-register            { loc(); return REGISTER; }
-return              { loc(); return RETURN; }
-short               { loc(); return SHORT; }
-signed              { loc(); return SIGNED; }
-sizeof              { loc(); return SIZEOF; }
-static              { loc(); return STATIC; }
-static_assert       { loc(); return STATIC_ASSERT; }
-struct              { loc(); return STRUCT; }
-switch              { loc(); return SWITCH; }
-template            { loc(); return TEMPLATE; }
-this                { loc(); return THIS; }
-throw               { loc(); return THROW; }
-try                 { loc(); return TRY; }
-typedef             { loc(); return TYPEDEF; }
-typeid              { loc(); return TYPEID; }
-typename            { loc(); return TYPENAME; }
-union               { loc(); return UNION; }
-unsigned            { loc(); return UNSIGNED; }
-using               { loc(); return USING; }
-virtual             { loc(); return VIRTUAL; }
-void                { loc(); return VOID; }
-volatile            { loc(); return VOLATILE; }
-wchar_t	            { loc(); return WCHAR_T; }
-while               { loc(); return WHILE; }
-__CPROVER_thread_local { loc(); return THREAD_LOCAL; }
+__extension__       { loc(); return TOK_Ignore; }
+_inline             { loc(); return TOK_INLINE; }
+__inline            { loc(); return TOK_INLINE; }
+__inline__          { loc(); return TOK_INLINE; }
+__interface         { loc(); return MSC_Keyword(TOK_INTERFACE); }
+__forceinline       { loc(); return MSC_Keyword(TOK_INLINE); }
+__noreturn__        { loc(); return TOK_Ignore; }
+restrict            { loc(); return TOK_Ignore; }
+__restrict__        { loc(); return TOK_Ignore; }
+__restrict          { loc(); return TOK_Ignore; }
+__stdcall           { loc(); return MSC_Keyword(TOK_STDCALL); }
+__fastcall          { loc(); return MSC_Keyword(TOK_FASTCALL); }
+__clrcall           { loc(); return MSC_Keyword(TOK_CLRCALL); }
+__signed            { loc(); return TOK_SIGNED; }
+__signed__          { loc(); return TOK_SIGNED; }
+__vector            { loc(); return TOK_Ignore; }
+__volatile__        { loc(); return TOK_VOLATILE; }
+typeof              { loc(); return TOK_TYPEOF; }
+__typeof            { loc(); return TOK_TYPEOF; }
+__typeof__          { loc(); return TOK_TYPEOF; }
+__int8              { loc(); return MSC_Keyword(TOK_INT8); }
+__int16             { loc(); return MSC_Keyword(TOK_INT16); }
+__int32             { loc(); return MSC_Keyword(TOK_INT32); }
+__int64             { loc(); return MSC_Keyword(TOK_INT64); }
+__ptr32             { loc(); return MSC_Keyword(TOK_PTR32); }
+__ptr64             { loc(); return MSC_Keyword(TOK_PTR64); }
+__thiscall          { loc(); return TOK_Ignore; }
+__w64               { loc(); return TOK_Ignore; }
+_Complex            { loc(); return TOK_COMPLEX; }
+__complex__         { loc(); return TOK_COMPLEX; }
+__real__            { loc(); return TOK_REAL; }
+__imag__            { loc(); return TOK_IMAG; }
+__try               { loc(); return MSC_Keyword(TOK_MSC_TRY); }
+__except            { loc(); return MSC_Keyword(TOK_MSC_EXCEPT); }
+__leave             { loc(); return MSC_Keyword(TOK_MSC_LEAVE); }
+__finally           { loc(); return MSC_Keyword(TOK_MSC_FINALLY); }
+__uuidof 	    { loc(); return MSC_Keyword(TOK_MSC_UUIDOF); }
+auto                { loc(); return TOK_AUTO; }
+bool                { loc(); return TOK_BOOLEAN; }
+break               { loc(); return TOK_BREAK; }
+case                { loc(); return TOK_CASE; }
+catch               { loc(); return TOK_CATCH; }
+char                { loc(); return TOK_CHAR; }
+class               { loc(); return TOK_CLASS; }
+const               { loc(); return TOK_CONST; }
+continue            { loc(); return TOK_CONTINUE; }
+default             { loc(); return TOK_DEFAULT; }
+delete              { loc(); return TOK_DELETE; }
+decltype            { loc(); return TOK_DECLTYPE; }
+do                  { loc(); return TOK_DO; }
+double              { loc(); return TOK_DOUBLE; }
+else                { loc(); return TOK_ELSE; }
+enum                { loc(); return TOK_ENUM; }
+explicit            { loc(); return TOK_EXPLICIT; }
+extern              { loc(); return TOK_EXTERN; }
+float               { loc(); return TOK_FLOAT; }
+for                 { loc(); return TOK_FOR; }
+friend              { loc(); return TOK_FRIEND; }
+goto                { loc(); return TOK_GOTO; }
+if                  { loc(); return TOK_IF; }
+inline              { loc(); return TOK_INLINE; }
+int                 { loc(); return TOK_INT; }
+long                { loc(); return TOK_LONG; }
+mutable             { loc(); return TOK_MUTABLE; }
+namespace           { loc(); return TOK_NAMESPACE; }
+new                 { loc(); return TOK_NEW; }
+noreturn            { loc(); return TOK_Ignore; }
+operator            { loc(); return TOK_OPERATOR; }
+private             { loc(); return TOK_PRIVATE; }
+protected           { loc(); return TOK_PROTECTED; }
+public              { loc(); return TOK_PUBLIC; }
+register            { loc(); return TOK_REGISTER; }
+return              { loc(); return TOK_RETURN; }
+short               { loc(); return TOK_SHORT; }
+signed              { loc(); return TOK_SIGNED; }
+sizeof              { loc(); return TOK_SIZEOF; }
+static              { loc(); return TOK_STATIC; }
+static_assert       { loc(); return TOK_STATIC_ASSERT; }
+struct              { loc(); return TOK_STRUCT; }
+switch              { loc(); return TOK_SWITCH; }
+template            { loc(); return TOK_TEMPLATE; }
+this                { loc(); return TOK_THIS; }
+throw               { loc(); return TOK_THROW; }
+try                 { loc(); return TOK_TRY; }
+typedef             { loc(); return TOK_TYPEDEF; }
+typeid              { loc(); return TOK_TYPEID; }
+typename            { loc(); return TOK_TYPENAME; }
+union               { loc(); return TOK_UNION; }
+unsigned            { loc(); return TOK_UNSIGNED; }
+using               { loc(); return TOK_USING; }
+virtual             { loc(); return TOK_VIRTUAL; }
+void                { loc(); return TOK_VOID; }
+volatile            { loc(); return TOK_VOLATILE; }
+wchar_t	            { loc(); return TOK_WCHAR_T; }
+while               { loc(); return TOK_WHILE; }
+__CPROVER_thread_local { loc(); return TOK_THREAD_LOCAL; }
 
 %{
 /* a huge batch of MS extensions
    http://msdn.microsoft.com/en-us/library/ms177194(v=vs.80).aspx */
 %}
 
-"__has_assign"      { loc(); return MSC_Keyword(MSC_TYPE_PREDICATE); }
-"__has_copy"        { loc(); return MSC_Keyword(MSC_TYPE_PREDICATE); }
-"__has_finalizer"   { loc(); return MSC_Keyword(MSC_TYPE_PREDICATE); }
-"__has_nothrow_assign" { loc(); return MSC_Keyword(MSC_TYPE_PREDICATE); }
-"__has_nothrow_constructor" { loc(); return MSC_Keyword(MSC_TYPE_PREDICATE); }
-"__has_nothrow_copy" { loc(); return MSC_Keyword(MSC_TYPE_PREDICATE); }
-"__has_trivial_assign" { loc(); return MSC_Keyword(MSC_TYPE_PREDICATE); }
-"__has_trivial_constructor" { loc(); return MSC_Keyword(MSC_TYPE_PREDICATE); }
-"__has_trivial_copy" { loc(); return MSC_Keyword(MSC_TYPE_PREDICATE); }
-"__has_trivial_destructor" { loc(); return MSC_Keyword(MSC_TYPE_PREDICATE); }
-"__has_user_destructor" { loc(); return MSC_Keyword(MSC_TYPE_PREDICATE); }
-"__has_virtual_destructor" { loc(); return MSC_Keyword(MSC_TYPE_PREDICATE); }
-"__is_abstract"     { loc(); return MSC_Keyword(MSC_TYPE_PREDICATE); }
-"__is_base_of"      { loc(); return MSC_Keyword(MSC_BINARY_TYPE_PREDICATE); }
-"__is_class"        { loc(); return MSC_Keyword(MSC_TYPE_PREDICATE); }
-"__is_convertible_to" { loc(); return MSC_Keyword(MSC_BINARY_TYPE_PREDICATE); }
-"__is_delegate"     { loc(); return MSC_Keyword(MSC_TYPE_PREDICATE); }
-"__is_empty"        { loc(); return MSC_Keyword(MSC_TYPE_PREDICATE); }
-"__is_enum"         { loc(); return MSC_Keyword(MSC_TYPE_PREDICATE); }
-"__is_interface_class" { loc(); return MSC_Keyword(MSC_TYPE_PREDICATE); }
-"__is_pod"          { loc(); return MSC_Keyword(MSC_TYPE_PREDICATE); }
-"__is_polymorphic"  { loc(); return MSC_Keyword(MSC_TYPE_PREDICATE); }
-"__is_ref_array"    { loc(); return MSC_Keyword(MSC_TYPE_PREDICATE); }
-"__is_ref_class"    { loc(); return MSC_Keyword(MSC_TYPE_PREDICATE); }
-"__is_sealed"       { loc(); return MSC_Keyword(MSC_TYPE_PREDICATE); }
-"__is_simple_value_class" { loc(); return MSC_Keyword(MSC_TYPE_PREDICATE); }
-"__is_union"        { loc(); return MSC_Keyword(MSC_TYPE_PREDICATE); }
-"__is_value_class"  { loc(); return MSC_Keyword(MSC_TYPE_PREDICATE); }
+"__has_assign"      { loc(); return MSC_Keyword(TOK_MSC_TYPE_PREDICATE); }
+"__has_copy"        { loc(); return MSC_Keyword(TOK_MSC_TYPE_PREDICATE); }
+"__has_finalizer"   { loc(); return MSC_Keyword(TOK_MSC_TYPE_PREDICATE); }
+"__has_nothrow_assign" { loc(); return MSC_Keyword(TOK_MSC_TYPE_PREDICATE); }
+"__has_nothrow_constructor" { loc(); return MSC_Keyword(TOK_MSC_TYPE_PREDICATE); }
+"__has_nothrow_copy" { loc(); return MSC_Keyword(TOK_MSC_TYPE_PREDICATE); }
+"__has_trivial_assign" { loc(); return MSC_Keyword(TOK_MSC_TYPE_PREDICATE); }
+"__has_trivial_constructor" { loc(); return MSC_Keyword(TOK_MSC_TYPE_PREDICATE); }
+"__has_trivial_copy" { loc(); return MSC_Keyword(TOK_MSC_TYPE_PREDICATE); }
+"__has_trivial_destructor" { loc(); return MSC_Keyword(TOK_MSC_TYPE_PREDICATE); }
+"__has_user_destructor" { loc(); return MSC_Keyword(TOK_MSC_TYPE_PREDICATE); }
+"__has_virtual_destructor" { loc(); return MSC_Keyword(TOK_MSC_TYPE_PREDICATE); }
+"__is_abstract"     { loc(); return MSC_Keyword(TOK_MSC_TYPE_PREDICATE); }
+"__is_base_of"      { loc(); return MSC_Keyword(TOK_MSC_BINARY_TYPE_PREDICATE); }
+"__is_class"        { loc(); return MSC_Keyword(TOK_MSC_TYPE_PREDICATE); }
+"__is_convertible_to" { loc(); return MSC_Keyword(TOK_MSC_BINARY_TYPE_PREDICATE); }
+"__is_delegate"     { loc(); return MSC_Keyword(TOK_MSC_TYPE_PREDICATE); }
+"__is_empty"        { loc(); return MSC_Keyword(TOK_MSC_TYPE_PREDICATE); }
+"__is_enum"         { loc(); return MSC_Keyword(TOK_MSC_TYPE_PREDICATE); }
+"__is_interface_class" { loc(); return MSC_Keyword(TOK_MSC_TYPE_PREDICATE); }
+"__is_pod"          { loc(); return MSC_Keyword(TOK_MSC_TYPE_PREDICATE); }
+"__is_polymorphic"  { loc(); return MSC_Keyword(TOK_MSC_TYPE_PREDICATE); }
+"__is_ref_array"    { loc(); return MSC_Keyword(TOK_MSC_TYPE_PREDICATE); }
+"__is_ref_class"    { loc(); return MSC_Keyword(TOK_MSC_TYPE_PREDICATE); }
+"__is_sealed"       { loc(); return MSC_Keyword(TOK_MSC_TYPE_PREDICATE); }
+"__is_simple_value_class" { loc(); return MSC_Keyword(TOK_MSC_TYPE_PREDICATE); }
+"__is_union"        { loc(); return MSC_Keyword(TOK_MSC_TYPE_PREDICATE); }
+"__is_value_class"  { loc(); return MSC_Keyword(TOK_MSC_TYPE_PREDICATE); }
 
 {identifier}        { loc();
-                      return Identifier; // or TYPDEFname
+                      return TOK_Identifier; // or TYPDEFname
                     }
 
 {decimal_constant}  { loc();
                       PARSER.current_token().data=convert_integer_literal(yytext, 10);
-                      return Constant;
+                      return TOK_Constant;
                     }
 
 {octal_constant}    { loc();
                       PARSER.current_token().data=convert_integer_literal(yytext, 8);
-                      return Constant;
+                      return TOK_Constant;
                     }
 
 {hex_constant}      { loc();
                       PARSER.current_token().data=convert_integer_literal(yytext, 16);
-                      return Constant;
+                      return TOK_Constant;
                     }
 
 {floating_constant} {
                       loc();
                       PARSER.current_token().data=convert_float_literal(yytext);
-                      return Constant;
+                      return TOK_Constant;
                     }
 
 "L"?[']{c_char}+['] { 
                       loc();
                       PARSER.current_token().data=convert_character_literal(yytext, false);
-                      return Constant;
+                      return TOK_Constant;
                     }
 
 "L"?["]{s_char}*["] {
                       loc();
                       PARSER.current_token().data=convert_string_literal(yytext);
-                      return StringL;
+                      return TOK_StringL;
                     }
 
 "("                 { loc(); return yytext[0]; }
@@ -383,31 +383,31 @@ __CPROVER_thread_local { loc(); return THREAD_LOCAL; }
 ";"                 { loc(); return ';'; }
 "="                 { loc(); return '='; }
 
-".*"                { loc(); return PmOp; }
-"->*"               { loc(); return PmOp; }
-"::"                { loc(); return Scope; }
-"->"                { loc(); return ArrowOp; }
-"++"                { loc(); return IncOp; }
-"--"                { loc(); return IncOp; }
-"<<"                { loc(); return ShiftOp; }
-">>"                { loc(); return ShiftOp; }
-"<="                { loc(); return RelOp; }
-">="                { loc(); return RelOp; }
-"=="                { loc(); return EqualOp; }
-"!="                { loc(); return EqualOp; }
-"&&"                { loc(); return ANDAND; }
-"||"                { loc(); return LogOrOp; }
-"*="                { loc(); return AssignOp; }
-"/="                { loc(); return AssignOp; }
-"%="                { loc(); return AssignOp; }
-"+="                { loc(); return AssignOp; }
-"-="                { loc(); return AssignOp; }
-"<<="               { loc(); return AssignOp; }
-">>="               { loc(); return AssignOp; }
-"&="                { loc(); return AssignOp; }
-"^="                { loc(); return AssignOp; }
-"|="                { loc(); return AssignOp; }
-"..."               { loc(); return Ellipsis; }
+".*"                { loc(); return TOK_PmOp; }
+"->*"               { loc(); return TOK_PmOp; }
+"::"                { loc(); return TOK_Scope; }
+"->"                { loc(); return TOK_ArrowOp; }
+"++"                { loc(); return TOK_IncOp; }
+"--"                { loc(); return TOK_IncOp; }
+"<<"                { loc(); return TOK_ShiftOp; }
+">>"                { loc(); return TOK_ShiftOp; }
+"<="                { loc(); return TOK_RelOp; }
+">="                { loc(); return TOK_RelOp; }
+"=="                { loc(); return TOK_EqualOp; }
+"!="                { loc(); return TOK_EqualOp; }
+"&&"                { loc(); return TOK_ANDAND; }
+"||"                { loc(); return TOK_LogOrOp; }
+"*="                { loc(); return TOK_AssignOp; }
+"/="                { loc(); return TOK_AssignOp; }
+"%="                { loc(); return TOK_AssignOp; }
+"+="                { loc(); return TOK_AssignOp; }
+"-="                { loc(); return TOK_AssignOp; }
+"<<="               { loc(); return TOK_AssignOp; }
+">>="               { loc(); return TOK_AssignOp; }
+"&="                { loc(); return TOK_AssignOp; }
+"^="                { loc(); return TOK_AssignOp; }
+"|="                { loc(); return TOK_AssignOp; }
+"..."               { loc(); return TOK_Ellipsis; }
 
 .                   { yycpperror("unknown character"); }
 }

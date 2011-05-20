@@ -137,7 +137,7 @@ void cpp_token_buffert::read_token()
   {
     kind=yycpplex();
   }
-  while(kind==Ignore);
+  while(kind==TOK_Ignore);
 
   tokens.back().kind=kind;
   tokens.back().pos=token_vector.size()-1;
