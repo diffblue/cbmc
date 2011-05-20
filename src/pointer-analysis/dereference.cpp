@@ -183,13 +183,8 @@ exprt dereferencet::dereference(
             << std::endl;
   #endif
 
-  if(value==failure_value &&
-     options.get_bool_option("pointer-check"))
-  {
-    dereference_callback.dereference_failure(
-      "pointer dereference",
-      "invalid pointer", guard);
-  }
+  if(value==failure_value)
+    invalid_pointer(pointer, guard);
 
   return value;
 }
@@ -226,14 +221,7 @@ void dereferencet::add_checks(
   
   // if it's empty, we have a problem
   if(points_to_set.empty())
-  {
-    if(options.get_bool_option("pointer-check"))
-    {
-      dereference_callback.dereference_failure(
-        "pointer dereference",
-        "invalid pointer", guard);
-    }
-  }
+    invalid_pointer(pointer, guard);
   else
   {
     for(value_setst::valuest::const_iterator
@@ -297,6 +285,40 @@ bool dereferencet::dereference_type_compare(
 
 /*******************************************************************\
 
+Function: dereferencet::invalid_pointer
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void dereferencet::invalid_pointer(
+  const exprt &pointer, const guardt &guard)
+{
+  if(!options.get_bool_option("pointer-check"))
+    return;
+    
+  // constraint that it actually is an invalid pointer
+
+  exprt invalid_pointer_expr("invalid-pointer", bool_typet());
+  invalid_pointer_expr.copy_to_operands(pointer);
+  
+  // produce new guard
+  
+  guardt tmp_guard(guard);
+  tmp_guard.add(invalid_pointer_expr);
+
+  dereference_callback.dereference_failure(
+    "pointer dereference",
+    "invalid pointer", 
+    tmp_guard);
+}
+
+/*******************************************************************\
+
 Function: dereferencet::build_reference_to
 
   Inputs:
@@ -324,23 +346,7 @@ void dereferencet::build_reference_to(
   if(what.id()==ID_unknown ||
      what.id()==ID_invalid)
   {
-    if(options.get_bool_option("pointer-check"))
-    {
-      // constraint that it actually is an invalid pointer
-
-      exprt invalid_pointer_expr("invalid-pointer", bool_typet());
-      invalid_pointer_expr.copy_to_operands(pointer_expr);
-      
-      // produce new guard
-      
-      guardt tmp_guard(guard);
-      tmp_guard.add(invalid_pointer_expr);
-      dereference_callback.dereference_failure(
-        "pointer dereference",
-        "invalid pointer", 
-        tmp_guard);
-    }
-    
+    invalid_pointer(pointer_expr, guard);
     return;
   }
   

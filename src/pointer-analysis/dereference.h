@@ -107,6 +107,8 @@ private:
   
   void bounds_check(const class index_exprt &expr, const guardt &guard);
   void valid_check(const exprt &expr, const guardt &guard, const modet mode);
+  
+  void invalid_pointer(const exprt &expr, const guardt &guard);
 
   bool memory_model(
     exprt &value,
