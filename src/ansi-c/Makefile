@@ -35,7 +35,7 @@ y.tab.h: y.tab.cpp
         mv y.tab.cpp.h y.tab.h ; fi
 
 lex.yy.cpp: scanner.l
-	$(LEX) -Pyyansi_c -olex.yy.cpp scanner.l
+	$(LEX) -Pyyansi_c -o$@ scanner.l
 
 # extra dependencies
 y.tab$(OBJEXT): y.tab.cpp y.tab.h
