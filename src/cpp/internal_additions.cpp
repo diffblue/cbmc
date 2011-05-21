@@ -139,5 +139,13 @@ void cpp_internal_additions(std::ostream &out)
   // std:: namespace, but MS has it in the root namespace
   if(config.ansi_c.mode==configt::ansi_ct::MODE_VISUAL_STUDIO)
     out << "class type_info;" << std::endl;
+    
+  // MS ATL-related stuff
+  if(config.ansi_c.mode==configt::ansi_ct::MODE_VISUAL_STUDIO)
+  {
+    out << "namespace ATL; " << std::endl;
+    out << "void ATL::AtlThrowImpl(long);" << std::endl;  
+    out << "void __stdcall ATL::AtlThrowLastWin32();" << std::endl;  
+  }
 }
 
