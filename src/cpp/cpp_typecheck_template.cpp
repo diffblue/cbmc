@@ -893,14 +893,13 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
 
   for(unsigned i=0; i<parameters.size(); i++)
   {
-    const exprt &parameter=parameters[i];
+    const template_parametert &parameter=parameters[i];
     
     if(i>=args.size())
     {
       // Check for default parameter.
       // These may depend on previous arguments.
-      exprt default_value=
-        static_cast<const exprt &>(parameter.find("#default"));
+      exprt default_value=parameter.default_parameter();
 
       if(default_value.is_nil())
       {
