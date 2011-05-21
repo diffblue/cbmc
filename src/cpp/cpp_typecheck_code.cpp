@@ -42,6 +42,10 @@ void cpp_typecheckt::typecheck_code(codet &code)
     code.type()=code_typet();
     typecheck_member_initializer(code);
   }
+  else if(statement==ID_msc_if_exists ||
+          statement==ID_msc_if_not_exists)
+  {
+  }
   else
     c_typecheck_baset::typecheck_code(code);
 }
