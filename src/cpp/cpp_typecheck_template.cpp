@@ -890,7 +890,8 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
         << args.size() << ")";
     throw 0;
   }
-
+  
+  // check for defaults
   for(unsigned i=0; i<parameters.size(); i++)
   {
     const template_parametert &parameter=parameters[i];
@@ -909,9 +910,21 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
       
       args.push_back(default_value);
       
-      // we need to enter the template scope to typecheck these
+      // these can only be typechecked once the instance is
+      // known, as they may depend on earlier parameters
     }
+  }
 
+  // now the numbers should match
+  assert(args.size()==parameters.size());  
+  
+  // do the typechecking
+  template_mapt old_template_map;
+  old_template_map=template_map;
+
+  for(unsigned i=0; i<parameters.size(); i++)
+  {
+    const template_parametert &parameter=parameters[i];
     exprt &arg=args[i];
 
     if(parameter.id()==ID_type)
@@ -951,11 +964,17 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
       typecheck_expr(arg);
       simplify(arg, *this);
       implicit_typecast(arg, parameter.type());
-    }    
+    }
+    
+    // set right away -- this is for the benefit of default
+    // parameters
+    
+    template_map.set(parameter, arg);
   }
-
-  assert(args.size()==parameters.size());
   
+  // restore template map
+  template_map.swap(old_template_map);
+
   return result;
 }
 
