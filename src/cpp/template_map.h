@@ -47,6 +47,10 @@ public:
     expr_map.clear();
   }
   
+  void set(
+    const template_parametert &parameter,
+    const exprt &value);
+  
   void build(
     const template_typet &template_type,
     const cpp_template_args_tct &template_args);

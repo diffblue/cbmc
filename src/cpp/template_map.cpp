@@ -260,37 +260,46 @@ void template_mapt::build(
       i_it++, t_it++)
   {
     assert(t_it!=template_parameters.end());
-
-    const exprt &t=*t_it;
-    const exprt &i=*i_it;
-    
-    if(t.id()==ID_type)
-    {
-      if(i.id()!=ID_type)
-        assert(false); // typechecked before!
-
-      typet tmp=i.type();
-
-      irep_idt identifier=t.type().get(ID_identifier);
-      type_map[identifier] = tmp;
-      
-      #if 0
-      std::cout << "T-arg " << identifier << ":=" << to_string(tmp) << std::endl;
-      #endif
-    }
-    else
-    {
-      if(i.id()==ID_type)
-        assert(false); // typechecked before!
-
-      irep_idt identifier=t.get(ID_identifier);
-      expr_map[identifier]=i;
-
-      #if 0
-      std::cout << "T-arg " << identifier << ":=" << to_string(i) << std::endl;
-      #endif
-    }    
+    set(*t_it, *i_it);
   }
+}
+
+/*******************************************************************\
+
+Function: template_mapt::set
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void template_mapt::set(
+  const template_parametert &parameter,
+  const exprt &value)
+{
+  if(parameter.id()==ID_type)
+  {
+    if(parameter.id()!=ID_type)
+      assert(false); // typechecked before!
+
+    typet tmp=value.type();
+
+    irep_idt identifier=parameter.type().get(ID_identifier);
+    type_map[identifier]=tmp;
+  }
+  else
+  {
+    // must be non-type
+  
+    if(value.id()==ID_type)
+      assert(false); // typechecked before!
+
+    irep_idt identifier=parameter.get(ID_identifier);
+    expr_map[identifier]=value;
+  }    
 }
 
 /*******************************************************************\
