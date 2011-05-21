@@ -140,7 +140,9 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
   else if(expr.id()==ID_msc_uuidof)
   {
     // these appear to have type "struct _GUID *"
+    // and they are lvalues!
     expr.type()=pointer_typet(empty_typet());
+    expr.set(ID_C_lvalue, true);
   }
   else
     c_typecheck_baset::typecheck_expr_main(expr);
