@@ -129,6 +129,7 @@ protected:
   bool rPrimaryExpr(exprt &);
   bool rMSCTypePredicate(exprt &);
   bool rMSCuuidof(exprt &);
+  bool rMSC_if_existsExpr(exprt &);
   bool rVarName(exprt &);
   bool rVarNameCore(exprt &);
   bool isTemplateArgs();
@@ -2957,7 +2958,7 @@ bool Parser::rArgDeclaration(cpp_declarationt &declaration)
   | '{' initialize.expr (',' initialize.expr)* {','} '}'
 */
 bool Parser::rInitializeExpr(exprt &expr)
-{
+{  
   if(lex->LookAhead(0)!='{')
     return rExpression(expr);
 
@@ -2977,7 +2978,23 @@ bool Parser::rInitializeExpr(exprt &expr)
   while(t!='}')
   {
     exprt tmp;
-  
+
+    if(t==TOK_MSC_IF_EXISTS ||
+       t==TOK_MSC_IF_NOT_EXISTS)
+    {
+      // TODO
+      Token tk;
+      exprt name;
+      lex->GetToken(tk);
+      if(lex->GetToken(tk)!='(') return false;
+      if(!rVarName(name)) return false;
+      if(lex->GetToken(tk)!=')') return false;
+      if(lex->GetToken(tk)!='{') return false;
+      if(!rInitializeExpr(name)) return false;
+      if(lex->LookAhead(0)==',') lex->GetToken(tk);
+      if(lex->GetToken(tk)!='}') return false;
+    }
+    
     if(!rInitializeExpr(tmp))
     {
       if(!SyntaxError())
@@ -4820,9 +4837,54 @@ bool Parser::rMSCuuidof(exprt &expr)
 }
 
 /*
-  __if_exists ( identifier ) { statements }
-  __if_not_exists ( identifier ) { statements }
+  __if_exists ( identifier ) { token stream }
+  __if_not_exists ( identifier ) { token stream }
 */  
+
+bool Parser::rMSC_if_existsExpr(exprt &expr)
+{
+  Token tk1;
+
+  lex->GetToken(tk1);
+  
+  if(tk1.kind!=TOK_MSC_IF_EXISTS &&
+     tk1.kind!=TOK_MSC_IF_NOT_EXISTS)
+    return false;
+    
+  Token tk2;
+
+  if(lex->GetToken(tk2)!='(')
+    return false;
+
+  exprt name;
+
+  if(!rVarName(name))
+    return false;
+
+  if(lex->GetToken(tk2)!=')')
+    return false;
+
+  if(lex->GetToken(tk2)!='{')
+    return false;
+
+  exprt op;
+
+  if(!rUnaryExpr(op))
+    return false;
+
+  if(lex->GetToken(tk2)!='}')
+    return false;
+
+  expr=exprt(
+    tk1.kind==TOK_MSC_IF_EXISTS?ID_msc_if_exists:
+                                ID_msc_if_not_exists);
+
+  expr.move_to_operands(name, op);
+  
+  set_location(expr, tk1);
+
+  return true;
+}
 
 bool Parser::rMSC_if_existsStatement(codet &code)
 {
@@ -4847,18 +4909,31 @@ bool Parser::rMSC_if_existsStatement(codet &code)
   if(lex->GetToken(tk2)!=')')
     return false;
 
-  codet block;
-
-  if(!rCompoundStatement(block))
+  if(lex->GetToken(tk2)!='{')
     return false;
 
-  exprt expr=exprt(
+  codet block;
+
+  while(lex->LookAhead(0)!='}')
+  {
+    codet statement;
+
+    if(!rStatement(statement))
+      return false;
+
+    block.move_to_operands(statement);
+  }
+
+  if(lex->GetToken(tk2)!='}')
+    return false;
+
+  code=codet(
     tk1.kind==TOK_MSC_IF_EXISTS?ID_msc_if_exists:
                                 ID_msc_if_not_exists);
 
-  expr.move_to_operands(name, block);
+  code.move_to_operands(name, block);
   
-  set_location(expr, tk1);
+  set_location(code, tk1);
 
   return true;
 }
@@ -5001,6 +5076,12 @@ bool Parser::rPrimaryExpr(exprt &exp)
 
   case TOK_MSC_UUIDOF:
     return rMSCuuidof(exp);
+
+  // not quite appropriate: these allow more general
+  // token streams, not just expressions
+  case TOK_MSC_IF_EXISTS:
+  case TOK_MSC_IF_NOT_EXISTS:
+    return rMSC_if_existsExpr(exp);
 
   default:
     {
@@ -5388,10 +5469,6 @@ bool Parser::rStatement(codet &statement)
   case TOK_MSC_LEAVE:
     return rMSC_leaveStatement(statement);
     
-  case TOK_MSC_IF_EXISTS:
-  case TOK_MSC_IF_NOT_EXISTS:
-    return rMSC_if_existsStatement(statement);
-
   case TOK_BREAK:
   case TOK_CONTINUE:
     lex->GetToken(tk1);
@@ -5516,6 +5593,10 @@ bool Parser::rStatement(codet &statement)
 
   case TOK_MSC_ASM:
     return rMSCAsmStatement(statement);
+
+  case TOK_MSC_IF_EXISTS:
+  case TOK_MSC_IF_NOT_EXISTS:
+    return rMSC_if_existsStatement(statement);
 
   case TOK_Identifier:
     if(lex->LookAhead(1)==':')        // label statement
