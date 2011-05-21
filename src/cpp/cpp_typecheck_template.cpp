@@ -422,7 +422,10 @@ std::string cpp_typecheckt::template_class_identifier(
 
   // these are probably not needed -- templates
   // should be unique in a namespace
-  forall_expr(it, template_type.parameters())
+  for(template_typet::parameterst::const_iterator
+      it=template_type.parameters().begin();
+      it!=template_type.parameters().end();
+      it++)
   {
     if(counter!=0) identifier+=",";
   
@@ -776,7 +779,10 @@ cpp_scopet &cpp_typecheckt::typecheck_template_parameters(
 
   unsigned anon_count=0;
 
-  Forall_expr(it, parameters)
+  for(template_typet::parameterst::iterator
+      it=parameters.begin();
+      it!=parameters.end();
+      it++)
   {
     exprt &parameter=*it;
 
