@@ -502,4 +502,6 @@ msc_try_except
 msc_try_finally
 msc_leave
 msc_uuidof
+msc_if_exists
+msc_if_not_exists
 alias
