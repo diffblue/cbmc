@@ -13,23 +13,36 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_template_parameter.h"
 
+class template_parametert:public exprt
+{
+public:
+  inline exprt &default_parameter()
+  {
+    return static_cast<exprt &>(add("#default"));
+  }
+
+  inline const exprt &default_parameter() const
+  {
+    return static_cast<const exprt &>(find("#default"));
+  }
+};
+
 class template_typet:public typet
 {
 public:
-  template_typet()
+  inline template_typet():typet(ID_template)
   {
-    id(ID_template);
   }
 
-  typedef exprt::operandst parameterst;
+  typedef std::vector<template_parametert> parameterst;
 
-  parameterst &parameters()
+  inline parameterst &parameters()
   {
     // todo: will change to 'parameters'
     return (parameterst &)add(ID_arguments).get_sub();
   }
 
-  const parameterst &parameters() const
+  inline const parameterst &parameters() const
   {
     // todo: will change to 'parameters'
     return (const parameterst &)find(ID_arguments).get_sub();
