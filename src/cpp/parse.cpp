@@ -146,6 +146,7 @@ protected:
   bool rMSC_leaveStatement(codet &);
   bool rGCCAsmStatement(codet &);
   bool rMSCAsmStatement(codet &);
+  bool rMSC_if_existsStatement(codet &);
 
   bool rExprStatement(codet &);
   bool rDeclarationStatement(codet &);
@@ -4819,6 +4820,50 @@ bool Parser::rMSCuuidof(exprt &expr)
 }
 
 /*
+  __if_exists ( identifier ) { statements }
+  __if_not_exists ( identifier ) { statements }
+*/  
+
+bool Parser::rMSC_if_existsStatement(codet &code)
+{
+  Token tk1;
+
+  lex->GetToken(tk1);
+  
+  if(tk1.kind!=TOK_MSC_IF_EXISTS &&
+     tk1.kind!=TOK_MSC_IF_NOT_EXISTS)
+    return false;
+    
+  Token tk2;
+
+  if(lex->GetToken(tk2)!='(')
+    return false;
+
+  exprt name;
+
+  if(!rVarName(name))
+    return false;
+
+  if(lex->GetToken(tk2)!=')')
+    return false;
+
+  codet block;
+
+  if(!rCompoundStatement(block))
+    return false;
+
+  exprt expr=exprt(
+    tk1.kind==TOK_MSC_IF_EXISTS?ID_msc_if_exists:
+                                ID_msc_if_not_exists);
+
+  expr.move_to_operands(name, block);
+  
+  set_location(expr, tk1);
+
+  return true;
+}
+
+/*
   __is_base_of ( base, derived )
   __is_convertible_to ( from, to )
   __is_class ( t )
@@ -5342,6 +5387,10 @@ bool Parser::rStatement(codet &statement)
 
   case TOK_MSC_LEAVE:
     return rMSC_leaveStatement(statement);
+    
+  case TOK_MSC_IF_EXISTS:
+  case TOK_MSC_IF_NOT_EXISTS:
+    return rMSC_if_existsStatement(statement);
 
   case TOK_BREAK:
   case TOK_CONTINUE:
