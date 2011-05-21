@@ -153,7 +153,7 @@ void cpp_typecheckt::typecheck_template_class(
       previous_symbol->second.type.swap(declaration);
 
       // we also replace the template scope (the old one could be deleted)
-      cpp_scopes.id_map[symbol_name] = &template_scope;
+      cpp_scopes.id_map[symbol_name]=&template_scope;
     }
 
     assert(cpp_scopes.id_map[symbol_name]->id_class == cpp_idt::TEMPLATE_SCOPE);
@@ -890,11 +890,16 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
         << args.size() << ")";
     throw 0;
   }
+
+  // we will modify the template map
+  template_mapt old_template_map;
+  old_template_map=template_map;
   
   // check for defaults
   for(unsigned i=0; i<parameters.size(); i++)
   {
     const template_parametert &parameter=parameters[i];
+    cpp_save_scopet cpp_saved_scope(cpp_scopes);
     
     if(i>=args.size())
     {
@@ -910,21 +915,15 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
       
       args.push_back(default_value);
       
-      // these can only be typechecked once the instance is
-      // known, as they may depend on earlier parameters
+      // these need to be typechecked in the scope of the template,
+      // not in the current scope!
+      cpp_idt *template_scope=cpp_scopes.id_map[template_symbol.name];
+      assert(template_scope!=NULL);
+      cpp_scopes.go_to(*template_scope);
     }
-  }
 
-  // now the numbers should match
-  assert(args.size()==parameters.size());  
-  
-  // do the typechecking
-  template_mapt old_template_map;
-  old_template_map=template_map;
-
-  for(unsigned i=0; i<parameters.size(); i++)
-  {
-    const template_parametert &parameter=parameters[i];
+    assert(i<args.size());
+    
     exprt &arg=args[i];
 
     if(parameter.id()==ID_type)
@@ -974,6 +973,9 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
   
   // restore template map
   template_map.swap(old_template_map);
+
+  // now the numbers should match
+  assert(args.size()==parameters.size());
 
   return result;
 }
