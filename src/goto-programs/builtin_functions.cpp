@@ -1007,10 +1007,11 @@ void goto_convertt::do_function_call_symbol(
   {
     do_printf(lhs, function, arguments, dest);
   }
-  else if(identifier=="c::__assert_rtn" ||
-          identifier=="c::__assert_fail")
+  else if(identifier=="c::__assert_fail")
   {
     // __assert_fail is Linux
+    // These take four arguments:
+    // "expression", "file.c", line, __func__
 
     if(arguments.size()!=4)
     {
@@ -1034,7 +1035,9 @@ void goto_convertt::do_function_call_symbol(
   }
   else if(identifier=="c::__assert_rtn")
   {
-    // __assert_rtn is MACOS
+    // __assert_rtn has been seen on MacOS    
+    // It takes four arguments:
+    // __func__, "file.c", line, "expression"
 
     if(arguments.size()!=4)
     {
@@ -1053,7 +1056,7 @@ void goto_convertt::do_function_call_symbol(
     t->location=function.location();
     t->location.set("user-provided", true);
     t->location.set(ID_property, ID_assertion);
-    t->location.set("comment", description);
+    t->location.set(ID_comment, description);
     // we ignore any LHS
   }
   else if(identifier=="c::_wassert")
