@@ -2230,10 +2230,11 @@ const irep_idt goto_convertt::get_string_constant(
   
     if(index_op.id()==ID_string_constant)
       return index_op.get(ID_value);
-
-    if(index_op.id()==ID_symbol)
+    else if(index_op.id()==ID_symbol)
     {
-      //const symbolt &symbol=ns.lookup(index_op.get(ID_identifier));
+//      const symbolt &symbol=
+//        ns.lookup(to_symbol_expr(index_op));
+        
       return "";
     }
   }
