@@ -1061,7 +1061,8 @@ void goto_convertt::do_function_call_symbol(
   }
   else if(identifier=="c::_wassert")
   {
-    // this is Windows
+    // This is Windows. The arguments are
+    // L"expression", L"file.c", line
 
     if(arguments.size()!=3)
     {
