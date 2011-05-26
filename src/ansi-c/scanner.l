@@ -823,14 +823,17 @@ void ansi_c_scanner_init()
 
 <GCC_ATTRIBUTE2>{ // an attribute is following -- these may be keywords!
 
-"vector_size" |
-"__vector_size__"   { BEGIN(GCC_ATTRIBUTE3); loc(); return TOK_GCC_ATTRIBUTE_VECTOR_SIZE; }
+"aligned" |
+"__aligned__"       { BEGIN(GCC_ATTRIBUTE3); loc(); return TOK_GCC_ATTRIBUTE_ALIGNED; }
 
 "packed" |
 "__packed__"        { BEGIN(GCC_ATTRIBUTE3); loc(); return TOK_GCC_ATTRIBUTE_PACKED; }
 
 "transparent_union" |
 "__transparent_union__" { BEGIN(GCC_ATTRIBUTE3); loc(); return TOK_GCC_ATTRIBUTE_TRANSPARENT_UNION; }
+
+"vector_size" |
+"__vector_size__"   { BEGIN(GCC_ATTRIBUTE3); PARSER.attribute=TOK_GCC_ATTRIBUTE_VECTOR_SIZE; loc(); return '('; }
 
 {ws}                { /* ignore */ }
 {newline}           { /* ignore */ }
@@ -842,7 +845,11 @@ void ansi_c_scanner_init()
 <GCC_ATTRIBUTE3>{ // an attribute we do process
 "("             { PARSER.parenthesis_counter++; loc(); return '('; }
 ")"             { if(PARSER.parenthesis_counter==0)
+                  {
                     BEGIN(GCC_ATTRIBUTE5);
+                    loc();
+                    return TOK_GCC_ATTRIBUTE_END;
+                  }
                   else
                   {
                     PARSER.parenthesis_counter--;
@@ -851,7 +858,11 @@ void ansi_c_scanner_init()
                   }
                 }
 ","             { if(PARSER.parenthesis_counter==0)
+                  {
                     BEGIN(GCC_ATTRIBUTE2);
+                    loc();
+                    return TOK_GCC_ATTRIBUTE_END;
+                  }
                   else
                   {
                     loc();
