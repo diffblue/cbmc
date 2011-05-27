@@ -56,11 +56,12 @@ public:
     scopes.push_back(scopet());
   }
 
-  // internal state scanner
+  // internal state of the scanner
   std::string string_literal;
   bool tag_following;
   bool asm_block_following;
   unsigned parenthesis_counter;
+  int attribute; // for GCC attributes
   
   enum { LANGUAGE, EXPRESSION } grammar;
 
