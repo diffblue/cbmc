@@ -833,7 +833,7 @@ void ansi_c_scanner_init()
 "__transparent_union__" { BEGIN(GCC_ATTRIBUTE3); loc(); return TOK_GCC_ATTRIBUTE_TRANSPARENT_UNION; }
 
 "vector_size" |
-"__vector_size__"   { BEGIN(GCC_ATTRIBUTE3); PARSER.attribute=TOK_GCC_ATTRIBUTE_VECTOR_SIZE; loc(); return '('; }
+"__vector_size__"   { BEGIN(GCC_ATTRIBUTE3); loc(); return TOK_GCC_ATTRIBUTE_VECTOR_SIZE; }
 
 {ws}                { /* ignore */ }
 {newline}           { /* ignore */ }
