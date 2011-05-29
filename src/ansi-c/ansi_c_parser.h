@@ -61,7 +61,6 @@ public:
   bool tag_following;
   bool asm_block_following;
   unsigned parenthesis_counter;
-  int attribute; // for GCC attributes
   
   enum { LANGUAGE, EXPRESSION } grammar;
 

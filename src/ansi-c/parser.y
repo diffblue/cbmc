@@ -112,10 +112,10 @@ extern char *yyansi_ctext;
 %token  TOK_TYPEOF      "typeof"
 %token  TOK_GCC_ASM     "__asm__"
 %token  TOK_GCC_ASM_PAREN "__asm__ (with parentheses)"
-%token  TOK_GCC_ATTRIBUTE_ALIGNED "__attribute__((aligned))"
-%token  TOK_GCC_ATTRIBUTE_TRANSPARENT_UNION "__attribute__((transparent_union))"
-%token  TOK_GCC_ATTRIBUTE_PACKED "__attribute__((packed))"
-%token  TOK_GCC_ATTRIBUTE_VECTOR_SIZE "__attribute__((vector_size))"
+%token  TOK_GCC_ATTRIBUTE_ALIGNED "aligned"
+%token  TOK_GCC_ATTRIBUTE_TRANSPARENT_UNION "transparent_union"
+%token  TOK_GCC_ATTRIBUTE_PACKED "packed"
+%token  TOK_GCC_ATTRIBUTE_VECTOR_SIZE "vector_size"
 %token  TOK_GCC_ATTRIBUTE_END ")"
 %token  TOK_GCC_LABEL   "__label__"
 %token  TOK_MSC_ASM     "__asm"
@@ -837,6 +837,10 @@ type_qualifier:
 	| TOK_VOLATILE { $$=$1; set($$, ID_volatile); }
 	| TOK_PTR32    { $$=$1; set($$, ID_ptr32); }
 	| TOK_PTR64    { $$=$1; set($$, ID_ptr64); }
+        | TOK_GCC_ATTRIBUTE_ALIGNED TOK_GCC_ATTRIBUTE_END
+        { $$=$1; set($$, ID_aligned); }
+        | TOK_GCC_ATTRIBUTE_ALIGNED '(' comma_expression')' TOK_GCC_ATTRIBUTE_END
+        { $$=$1; set($$, ID_aligned); mto($$, $3); }
 	;
 
 basic_declaration_specifier:
@@ -1154,10 +1158,6 @@ gcc_type_attribute:
         { $$=$1; set($$, ID_packed); }
         | TOK_GCC_ATTRIBUTE_TRANSPARENT_UNION TOK_GCC_ATTRIBUTE_END
         { $$=$1; set($$, ID_transparent_union); }
-        | TOK_GCC_ATTRIBUTE_ALIGNED TOK_GCC_ATTRIBUTE_END
-        { $$=$1; set($$, ID_aligned); }
-        | TOK_GCC_ATTRIBUTE_ALIGNED '(' comma_expression')' TOK_GCC_ATTRIBUTE_END
-        { $$=$1; set($$, ID_aligned); mto($$, $3); }
         | TOK_GCC_ATTRIBUTE_VECTOR_SIZE '(' comma_expression ')' TOK_GCC_ATTRIBUTE_END
         { $$=$1; set($$, ID_vector); stack($$).add(ID_size)=stack($3); }
         ;
