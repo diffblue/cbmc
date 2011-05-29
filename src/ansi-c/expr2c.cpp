@@ -1499,7 +1499,11 @@ std::string expr2ct::convert_object_descriptor(
   result+=", ";
   result+=convert(src.op1());
   result+=", ";
-  result+=convert(src.type());
+  
+  if(src.type().is_nil())
+    result+="--";
+  else
+    result+=convert(src.type());
 
   result+=">";
 
