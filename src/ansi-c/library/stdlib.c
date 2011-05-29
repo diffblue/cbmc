@@ -77,11 +77,8 @@ inline void *malloc(size_t malloc_size)
   
   // record the object size for non-determistic bounds checking
   _Bool record_malloc;
-  if(record_malloc)
-  {
-    __CPROVER_malloc_object=res;
-    __CPROVER_malloc_size=malloc_size;
-  }
+  __CPROVER_malloc_object=record_malloc?res:__CPROVER_malloc_object;
+  __CPROVER_malloc_size=record_malloc?malloc_size:__CPROVER_malloc_size;
   
   return res;
 }
