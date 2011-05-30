@@ -479,6 +479,8 @@ bool exprt::is_zero() const
     else if(type_id==ID_pointer)
     {
       if(value==ID_NULL) return true;
+      mp_integer int_value=binary2integer(id2string(value), false);
+      if(int_value==0) return true;
     }
   }
 
