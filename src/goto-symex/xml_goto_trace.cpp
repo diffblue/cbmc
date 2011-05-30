@@ -68,6 +68,7 @@ xmlt convert(
     else if(type.id()==ID_pointer)
     {
       result.name="pointer";
+      result.set_attribute("binary", expr.get_string(ID_value));
       if(expr.get(ID_value)==ID_NULL)
         result.data="NULL";
     }
