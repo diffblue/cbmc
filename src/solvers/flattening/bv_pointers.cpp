@@ -606,7 +606,7 @@ exprt bv_pointerst::bv_get_rec(
   if(!is_ptr(type))
     return SUB::bv_get_rec(bv, unknown, offset, type);
 
-  std::string value_addr, value_offset;
+  std::string value_addr, value_offset, value;
 
   for(unsigned i=0; i<bits; i++)
   {
@@ -623,18 +623,30 @@ exprt bv_pointerst::bv_get_rec(
        case tvt::TV_UNKNOWN: ch='0'; break;
        default: assert(false);
       }
+      
+    value=ch+value;
 
     if(i<offset_bits)
       value_offset=ch+value_offset;
     else
       value_addr=ch+value_addr;
   }
+  
+  // we treat these like bit-vector constants, but with
+  // some additional annotation
+
+  constant_exprt result(type);
+  result.set_value(value);
 
   pointer_logict::pointert pointer;
   pointer.object=integer2long(binary2integer(value_addr, false));
   pointer.offset=binary2integer(value_offset, true);
+  
+  // we add the elaborated expression as operand
+  result.copy_to_operands(
+    pointer_logic.pointer_expr(pointer, type));
 
-  return pointer_logic.pointer_expr(pointer, type);
+  return result;
 }
 
 /*******************************************************************\
