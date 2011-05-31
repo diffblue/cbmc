@@ -1586,6 +1586,9 @@ std::string expr2ct::convert_constant(
   {
     mp_integer int_value=binary2integer(id2string(value), type.id()==ID_signedbv);
     dest=integer2string(int_value);
+    
+    if(src.find("#c_sizeof_type").is_not_nil())
+      dest+=" [["+convert(static_cast<const typet &>(src.find("#c_sizeof_type")))+"]]";
   }
   else if(type.id()==ID_floatbv)
   {
@@ -1633,14 +1636,28 @@ std::string expr2ct::convert_constant(
   }
   else if(type.id()==ID_pointer)
   {
-    if(value==ID_NULL)
+    if(src.is_zero())
       dest="NULL";
-    else if(value=="INVALID" ||
-            has_prefix(id2string(value), "INVALID-") ||
-            value=="NULL+offset")
-      dest=id2string(value);
     else
-      return convert_norep(src, precedence);
+    {
+      // we prefer the annotation
+      if(src.operands().size()!=1)
+        return convert_norep(src, precedence);
+
+      if(src.op0().id()==ID_constant)
+      {        
+        const irep_idt &op_value=src.op0().get(ID_value);
+    
+        if(op_value=="INVALID" ||
+           has_prefix(id2string(op_value), "INVALID-") ||
+           op_value=="NULL+offset")
+          dest=id2string(op_value);
+        else
+          return convert_norep(src, precedence);
+      }
+      else
+        return convert(src.op0(), precedence);
+    }
   }
   else
     return convert_norep(src, precedence);
