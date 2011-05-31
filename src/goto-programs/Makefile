@@ -13,8 +13,7 @@ SRC = goto_convert.cpp goto_function.cpp goto_main.cpp goto_sideeffects.cpp \
       goto_program_template.cpp write_goto_binary.cpp remove_unreachable.cpp \
       remove_unused_functions.cpp dynamic_memory.cpp dump_c.cpp \
       wp.cpp goto_rw.cpp goto_clean_expr.cpp safety_checker.cpp \
-      control_flow_graph.cpp depth_first_spanning_tree.cpp dominator_info.cpp \
-      loops.cpp compute_called_functions.cpp link_to_library.cpp
+      compute_called_functions.cpp link_to_library.cpp
 
 OBJ = $(SRC:.cpp=$(OBJEXT))
 
