@@ -44,6 +44,17 @@ void basic_symext::symex_malloc(
   dynamic_counter++;
   
   exprt size=code.op0();
+  typet object_type;
+  
+  {
+    exprt tmp_size=size;
+    state.rename(tmp_size, ns); // to allow constant propagation
+    object_type=
+      static_cast<const typet &>(tmp_size.find("#c_sizeof_type"));
+  }
+  
+  if(object_type.is_nil())
+    object_type=array_typet(uchar_type(), size);
   
   // value
   symbolt symbol;
@@ -51,18 +62,27 @@ void basic_symext::symex_malloc(
   symbol.base_name="dynamic_object"+i2string(dynamic_counter);
   symbol.name="symex_dynamic::"+id2string(symbol.base_name);
   symbol.lvalue=true;
-  symbol.type=array_typet(uchar_type(), size);
+  symbol.type=object_type;
   symbol.type.set("#dynamic", true);
   symbol.mode=ID_C;
 
   new_context.add(symbol);
   
-  exprt rhs(ID_address_of, pointer_typet());
+  address_of_exprt rhs;
   
-  exprt index_expr(ID_index, symbol.type.subtype());
-  index_expr.copy_to_operands(symbol_expr(symbol), gen_zero(index_type()));
-  rhs.type().subtype()=symbol.type.subtype();
-  rhs.move_to_operands(index_expr);
+  if(object_type.id()==ID_array)
+  {
+    rhs.type()=pointer_typet(symbol.type.subtype());
+    index_exprt index_expr(symbol.type.subtype());
+    index_expr.array()=symbol_expr(symbol);
+    index_expr.index()=gen_zero(index_type());
+    rhs.op0()=index_expr;
+  }
+  else
+  {
+    rhs.op0()=symbol_expr(symbol);
+    rhs.type()=pointer_typet(symbol.type);
+  }
   
   if(rhs.type()!=lhs.type())
     rhs.make_typecast(lhs.type());
