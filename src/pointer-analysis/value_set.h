@@ -25,6 +25,10 @@ public:
   {
   }
 
+  static bool field_sensitive(
+    const irep_idt &id,
+    const typet &type);
+
   unsigned location_number;
   static object_numberingt object_numbering;
 
@@ -79,37 +83,7 @@ public:
     return insert(dest, object_numbering.number(src), objectt(offset));
   }
   
-  bool insert(object_mapt &dest, unsigned n, const objectt &object) const
-  {
-    if(dest.read().find(n)==dest.read().end())
-    {
-      // new
-      dest.write()[n]=object;
-      return true;
-    }
-    else
-    {
-      objectt &old=dest.write()[n];
-      
-      if(old.offset_is_set && object.offset_is_set)
-      {
-        if(old.offset==object.offset)
-          return false;
-        else
-        {
-          old.offset_is_set=false;
-          return true;
-        }
-      }
-      else if(!old.offset_is_set)
-        return false;
-      else
-      {
-        old.offset_is_set=false;
-        return true;
-      }
-    }
-  }
+  bool insert(object_mapt &dest, unsigned n, const objectt &object) const;
   
   bool insert(object_mapt &dest, const exprt &expr, const objectt &object) const
   {
@@ -162,40 +136,8 @@ public:
     values.clear();
   }
   
-  void add_var(const idt &id, const std::string &suffix)
-  {
-    get_entry(id, suffix);
-  }
-
-  void add_var(const entryt &e)
-  {
-    get_entry(e.identifier, e.suffix);
-  }
+  entryt &get_entry(const entryt &e, const typet &type);
   
-  entryt &get_entry(const idt &id, const std::string &suffix)
-  {
-    return get_entry(entryt(id, suffix));
-  }
-  
-  entryt &get_entry(const entryt &e)
-  {
-    std::string index=id2string(e.identifier)+e.suffix;
-
-    std::pair<valuest::iterator, bool> r=
-      values.insert(std::pair<idt, entryt>(index, e));
-
-    return r.first->second;
-  }
-  
-  void add_vars(const std::list<entryt> &vars)
-  {
-    for(std::list<entryt>::const_iterator
-        it=vars.begin();
-        it!=vars.end();
-        it++)
-      add_var(*it);
-  }
-
   void output(
     const namespacet &ns,
     std::ostream &out) const;

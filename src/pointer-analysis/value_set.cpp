@@ -31,6 +31,108 @@ object_numberingt value_sett::object_numbering;
    
 /*******************************************************************\
 
+Function: value_sett::field_sensitive
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool value_sett::field_sensitive(
+  const irep_idt &id,
+  const typet &type)
+{
+  // we always track fields on these
+  if(has_prefix(id2string(id), "value_set::dynamic_object") ||
+     id=="value_set::return_value" ||
+     id=="value_set::memory")
+    return true;
+
+  // otherwise it has to be a struct
+  return type.id()==ID_struct;
+}
+
+/*******************************************************************\
+
+Function: value_sett::insert
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+value_sett::entryt &value_sett::get_entry(
+  const entryt &e,
+  const typet &type)
+{
+  irep_idt index;
+
+  if(field_sensitive(e.identifier, type))
+    index=id2string(e.identifier)+e.suffix;
+  else
+    index=e.identifier;
+
+  std::pair<valuest::iterator, bool> r=
+    values.insert(std::pair<idt, entryt>(index, e));
+
+  return r.first->second;
+}
+
+/*******************************************************************\
+
+Function: value_sett::insert
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool value_sett::insert(
+  object_mapt &dest,
+  unsigned n,
+  const objectt &object) const
+{
+  if(dest.read().find(n)==dest.read().end())
+  {
+    // new
+    dest.write()[n]=object;
+    return true;
+  }
+  else
+  {
+    objectt &old=dest.write()[n];
+    
+    if(old.offset_is_set && object.offset_is_set)
+    {
+      if(old.offset==object.offset)
+        return false;
+      else
+      {
+        old.offset_is_set=false;
+        return true;
+      }
+    }
+    else if(!old.offset_is_set)
+      return false;
+    else
+    {
+      old.offset_is_set=false;
+      return true;
+    }
+  }
+}
+
+/*******************************************************************\
+
 Function: value_sett::output
 
   Inputs:
@@ -103,8 +205,11 @@ void value_sett::output(
           result+=integer2string(o_it->second.offset)+"";
         else
           result+="*";
-        
-        result+=", "+from_type(ns, identifier, o.type());
+
+        if(o.type().is_nil())
+          result+=", ?";
+        else
+          result+=", "+from_type(ns, identifier, o.type());
       
         result+=">";
       }
@@ -184,15 +289,8 @@ bool value_sett::make_union(const value_sett::valuest &new_values)
 
     if(it2==values.end())
     {
-      // we always track these
-      if(has_prefix(id2string(it->second.identifier),
-           "value_set::dynamic_object") ||
-         it->second.identifier=="value_set::return_value")
-      {
-        values.insert(*it);
-        result=true;
-      }
-
+      values.insert(*it);
+      result=true;
       continue;
     }
       
@@ -358,6 +456,10 @@ void value_sett::get_value_set_rec(
       // look it up
       valuest::const_iterator v_it=
         values.find(expr.get_string(ID_identifier)+suffix);
+
+      // not found? try without suffix
+      if(v_it==values.end())
+        v_it=values.find(expr.get_string(ID_identifier));
         
       if(v_it!=values.end())
         make_union(dest, v_it->second.object_map);
@@ -564,7 +666,7 @@ void value_sett::get_value_set_rec(
       insert(dest, dynamic_object, 0);
     }
     else if(statement==ID_cpp_new ||
-            statement=="cpp_new[]")
+            statement==ID_cpp_new_array)
     {
       assert(suffix=="");
       assert(expr_type.id()==ID_pointer);
@@ -644,19 +746,52 @@ void value_sett::get_value_set_rec(
   {
     const dynamic_object_exprt &dynamic_object=
       to_dynamic_object_expr(expr);
-  
-    const std::string name=
+      
+    const std::string prefix=
       "value_set::dynamic_object"+
-      dynamic_object.instance().get_string(ID_value)+
-      suffix;
+      dynamic_object.instance().get_string(ID_value);
+
+    // first try with suffix
+    const std::string full_name=prefix+suffix;
   
     // look it up
-    valuest::const_iterator v_it=values.find(name);
+    valuest::const_iterator v_it=values.find(full_name);
+    
+    // not found? try without suffix
+    if(v_it==values.end())
+      v_it=values.find(prefix);
 
     if(v_it==values.end())
       insert(dest, exprt(ID_unknown, original_type));
     else
       make_union(dest, v_it->second.object_map);
+  }
+  else if(expr.id()==ID_byte_extract_little_endian ||
+          expr.id()==ID_byte_extract_big_endian)
+  {
+    if(expr.operands().size()!=2)
+      throw "byte_extract takes two operands";
+      
+    // we just pass through
+    get_value_set_rec(expr.op0(), dest, suffix, original_type, ns);
+  }
+  else if(expr.id()==ID_byte_update_little_endian ||
+          expr.id()==ID_byte_update_big_endian)
+  {
+    if(expr.operands().size()!=3)
+      throw "byte_update takes three operands";
+      
+    // we just pass through
+    get_value_set_rec(expr.op0(), dest, suffix, original_type, ns);
+    get_value_set_rec(expr.op2(), dest, suffix, original_type, ns);
+    
+    // we could have checked object size to be more precise
+  }
+  else
+  {
+    #if 0
+    std::cout << "WARNING: not doing " << expr.id() << std::endl;
+    #endif
   }
 
   #if 0
@@ -1138,17 +1273,20 @@ void value_sett::assign_rec(
       it!=values_rhs.read().end(); 
       it++)
     std::cout << "ASSIGN_REC RHS: " << 
-      object_numbering[it->first] << std::endl;
+      from_expr(ns, "", object_numbering[it->first]) << std::endl;
+  std::cout << std::endl;
   #endif
 
   if(lhs.id()==ID_symbol)
   {
     const irep_idt &identifier=lhs.get(ID_identifier);
     
+    entryt &e=get_entry(entryt(identifier, suffix), lhs.type());
+    
     if(add_to_sets)
-      make_union(get_entry(identifier, suffix).object_map, values_rhs);
+      make_union(e.object_map, values_rhs);
     else
-      get_entry(identifier, suffix).object_map=values_rhs;
+      e.object_map=values_rhs;
   }
   else if(lhs.id()==ID_dynamic_object)
   {
@@ -1158,8 +1296,10 @@ void value_sett::assign_rec(
     const std::string name=
       "value_set::dynamic_object"+
       dynamic_object.instance().get_string(ID_value);
+      
+    entryt &e=get_entry(entryt(name, suffix), lhs.type());
 
-    make_union(get_entry(name, suffix).object_map, values_rhs);
+    make_union(e.object_map, values_rhs);
   }
   else if(lhs.id()==ID_dereference)
   {
@@ -1279,7 +1419,6 @@ void value_sett::do_function_call(
   for(unsigned i=0; i<arguments.size(); i++)
   {
     const std::string identifier="value_set::dummy_arg_"+i2string(i);
-    add_var(identifier, "");
     exprt dummy_lhs=symbol_exprt(identifier, arguments[i].type());
     assign(dummy_lhs, arguments[i], ns, true);
   }
@@ -1296,8 +1435,6 @@ void value_sett::do_function_call(
     const irep_idt &identifier=it->get_identifier();
     if(identifier=="") continue;
 
-    add_var(identifier, "");
-  
     const exprt v_expr=
       symbol_exprt("value_set::dummy_arg_"+i2string(i), it->type());
     

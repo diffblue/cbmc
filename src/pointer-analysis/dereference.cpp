@@ -123,6 +123,7 @@ exprt dereferencet::dereference(
   {
     // yes!
     failure_value=symbol_expr(*failed_symbol);
+    failure_value.set("#invalid_object", true);
   }
   else
   {
@@ -139,11 +140,10 @@ exprt dereferencet::dereference(
     get_new_name(symbol, ns);
 
     failure_value=symbol_expr(symbol);
+    failure_value.set("#invalid_object", true);
     
     new_context.move(symbol);
   }
-  
-  failure_value.set("#invalid_object", true);
 
   // collect objects the pointer may point to
   value_setst::valuest points_to_set;
@@ -158,8 +158,7 @@ exprt dereferencet::dereference(
     std::cout << "P: " << from_expr(ns, "", *it) << std::endl;
   #endif
 
-  // now build big case split
-  // only "good" objects
+  // now build big case split, but we only do "good" objects
 
   exprt value=failure_value;
   
@@ -168,13 +167,15 @@ exprt dereferencet::dereference(
       it!=points_to_set.end();
       it++)
   {
+    // the dereference has value "new_value" if "pointer_guard"
+    // evaluates to true
     exprt new_value, pointer_guard;
     
     build_reference_to(
       *it, mode, pointer, guard,
       new_value, pointer_guard);
       
-    if(new_value.is_not_nil())
+    if(new_value.is_not_nil() && !pointer_guard.is_false())
       value=if_exprt(pointer_guard, new_value, value);
   }
   
@@ -296,7 +297,8 @@ Function: dereferencet::invalid_pointer
 \*******************************************************************/
 
 void dereferencet::invalid_pointer(
-  const exprt &pointer, const guardt &guard)
+  const exprt &pointer,
+  const guardt &guard)
 {
   if(!options.get_bool_option("pointer-check"))
     return;
@@ -310,7 +312,7 @@ void dereferencet::invalid_pointer(
   
   guardt tmp_guard(guard);
   tmp_guard.add(invalid_pointer_expr);
-
+  
   dereference_callback.dereference_failure(
     "pointer dereference",
     "invalid pointer", 
@@ -394,19 +396,20 @@ void dereferencet::build_reference_to(
   {
     //const dynamic_object_exprt &dynamic_object=
     //  to_dynamic_object_expr(root_object);
+
+    // constraint that it actually is a dynamic object
+    exprt dynamic_object_expr(ID_dynamic_object, bool_typet());
+    dynamic_object_expr.copy_to_operands(pointer_expr);
     
-    // can't remove here
-  
+    // this is also our guard
+    pointer_guard=dynamic_object_expr;
+    
+    // can't remove here  
     value=exprt(ID_dereference, dereference_type);
     value.copy_to_operands(pointer_expr);
 
     if(options.get_bool_option("pointer-check"))
     {
-      // constraint that it actually is a dynamic object
-
-      exprt dynamic_object_expr(ID_dynamic_object, bool_typet());
-      dynamic_object_expr.copy_to_operands(pointer_expr);
-
       //if(!dynamic_object.valid().is_true())
       {
         // check if it is still alive
@@ -785,7 +788,7 @@ Function: dereferencet::memory_model
 
 \*******************************************************************/
 
-static unsigned bv_width(const typet &type)
+inline static unsigned bv_width(const typet &type)
 {
   return atoi(type.get(ID_width).c_str());
 }
@@ -809,14 +812,27 @@ bool dereferencet::memory_model(
 
   const typet from_type=value.type();
 
-  // first, check if it's really just a conversion,
-  // i.e., both are bit-vector types and the size is
-  // exacly the same
+  // first, check if it's really just a type coercion,
+  // i.e., both have exactly the same (constant) size
 
   if(is_a_bv_type(from_type) &&
-     is_a_bv_type(to_type) &&
-     bv_width(from_type)==bv_width(to_type))
-    return memory_model_conversion(value, to_type, guard, offset);
+     is_a_bv_type(to_type))
+  {
+    if(bv_width(from_type)==bv_width(to_type))
+      return memory_model_conversion(value, to_type, guard, offset);
+  }
+  else
+  {
+    // we may allow this on _anything_ that has a size
+
+    #if 0    
+    mp_integer from_size=pointer_offset_size(ns, from_type);
+    mp_integer to_size=pointer_offset_size(ns, to_type);
+    
+    if(from_size>=1 && from_size==to_size)
+      return memory_model_conversion(value, to_type, guard, offset);
+    #endif
+  }
 
   // otherwise, we will stich it together from bytes
   
