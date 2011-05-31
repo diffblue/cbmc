@@ -1501,7 +1501,7 @@ std::string expr2ct::convert_object_descriptor(
   result+=", ";
   
   if(src.type().is_nil())
-    result+="--";
+    result+="?";
   else
     result+=convert(src.type());
 
