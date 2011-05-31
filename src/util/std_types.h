@@ -23,6 +23,14 @@ public:
   }
 };
 
+class nil_typet:public typet
+{
+public:
+  inline nil_typet():typet(static_cast<const typet &>(get_nil_irep()))
+  {
+  }
+};
+
 class empty_typet:public typet
 {
 public:
