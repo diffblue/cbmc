@@ -49,12 +49,16 @@ void basic_symext::symex_malloc(
   {
     exprt tmp_size=size;
     state.rename(tmp_size, ns); // to allow constant propagation
+
     object_type=
       static_cast<const typet &>(tmp_size.find("#c_sizeof_type"));
+
+    if(object_type.is_nil())
+      object_type=array_typet(uchar_type(), tmp_size);
+      
+    // must use renamed size in the above,
+    // or it can change!
   }
-  
-  if(object_type.is_nil())
-    object_type=array_typet(uchar_type(), size);
   
   // value
   symbolt symbol;
