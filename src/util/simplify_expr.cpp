@@ -166,6 +166,10 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
 
     exprt new_expr(ID_constant, expr.type());
 
+    // preserve the sizeof type annotation
+    typet c_sizeof_type=
+      static_cast<const typet &>(operand.find("#c_sizeof_type"));
+      
     if(op_type_id==ID_integer ||
        op_type_id==ID_natural ||
        op_type_id==ID_c_enum ||
@@ -269,6 +273,10 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
       {
         new_expr.set(ID_value, integer2binary(int_value, expr_width));
         expr.swap(new_expr);
+
+        if(c_sizeof_type.is_not_nil())
+          expr.set("#c_sizeof_type", c_sizeof_type);
+
         return false;
       }
       
@@ -2390,6 +2398,44 @@ bool simplify_exprt::get_values(
 
 /*******************************************************************\
 
+Function: simplify_exprt::simplify_inequality_address_of
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool simplify_exprt::simplify_inequality_address_of(exprt &expr)
+{
+  assert(expr.type().id()==ID_bool);
+  assert(expr.operands().size()==2);
+  assert(expr.op0().id()==ID_address_of);
+  assert(expr.op1().id()==ID_address_of);
+  assert(expr.id()==ID_equal || expr.id()==ID_notequal);
+
+  if(expr.op0().operands().size()!=1) return true;
+  if(expr.op1().operands().size()!=1) return true;
+  
+  if(expr.op0().op0().id()==ID_symbol &&
+     expr.op1().op0().id()==ID_symbol)
+  {
+    bool equal=
+       expr.op0().op0().get(ID_identifier)==
+       expr.op0().op0().get(ID_identifier);
+       
+    expr.make_bool(expr.id()==ID_equal?equal:!equal);
+    
+    return false;
+  }
+  
+  return true;
+}
+
+/*******************************************************************\
+
 Function: simplify_exprt::simplify_inequality
 
   Inputs:
@@ -2411,6 +2457,12 @@ bool simplify_exprt::simplify_inequality(exprt &expr)
   // types must match
   if(!base_type_eq(expr.op0().type(), expr.op1().type(), ns))
     return true;
+    
+  // see if we are comparing pointers that are address_of
+  if(expr.op0().id()==ID_address_of &&
+     expr.op1().id()==ID_address_of &&
+     (expr.id()==ID_equal || expr.id()==ID_notequal))
+    return simplify_inequality_address_of(expr);
 
   // first see if we compare to a constant
   
