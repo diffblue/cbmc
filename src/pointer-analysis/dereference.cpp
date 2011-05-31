@@ -113,38 +113,6 @@ exprt dereferencet::dereference(
   std::cout << "DEREF: " << from_expr(ns, "", pointer) << std::endl;
   #endif
 
-  // first see if we have a "failed object" for this pointer
-  
-  const symbolt *failed_symbol;
-  exprt failure_value;
-
-  if(dereference_callback.has_failed_symbol(
-       pointer, failed_symbol))
-  {
-    // yes!
-    failure_value=symbol_expr(*failed_symbol);
-    failure_value.set("#invalid_object", true);
-  }
-  else
-  {
-    // else: produce new symbol
-
-    symbolt symbol;
-    symbol.name="symex::invalid_object"+i2string(invalid_counter++);
-    symbol.base_name="invalid_object";
-    symbol.type=type;
-
-    // make it a lvalue, so we can assign to it
-    symbol.lvalue=true;
-    
-    get_new_name(symbol, ns);
-
-    failure_value=symbol_expr(symbol);
-    failure_value.set("#invalid_object", true);
-    
-    new_context.move(symbol);
-  }
-
   // collect objects the pointer may point to
   value_setst::valuest points_to_set;
   
@@ -158,25 +126,81 @@ exprt dereferencet::dereference(
     std::cout << "P: " << from_expr(ns, "", *it) << std::endl;
   #endif
 
-  // now build big case split, but we only do "good" objects
+  // get the values of these
 
-  exprt value=failure_value;
-  
+  std::list<valuet> values;
+
   for(value_setst::valuest::const_iterator
       it=points_to_set.begin();
       it!=points_to_set.end();
       it++)
+    values.push_back(build_reference_to(*it, mode, pointer, guard));
+
+  // can this fail?
+  bool may_fail=values.empty();
+  
+  for(std::list<valuet>::const_iterator
+      it=values.begin();
+      it!=values.end();
+      it++)
+    if(it->value.is_nil()) may_fail=true;
+
+  if(may_fail)
   {
-    // the dereference has value "new_value" if "pointer_guard"
-    // evaluates to true
-    exprt new_value, pointer_guard;
+    // first see if we have a "failed object" for this pointer
     
-    build_reference_to(
-      *it, mode, pointer, guard,
-      new_value, pointer_guard);
+    const symbolt *failed_symbol;
+    exprt failure_value;
+
+    if(dereference_callback.has_failed_symbol(
+         pointer, failed_symbol))
+    {
+      // yes!
+      failure_value=symbol_expr(*failed_symbol);
+      failure_value.set("#invalid_object", true);
+    }
+    else
+    {
+      // else: produce new symbol
+
+      symbolt symbol;
+      symbol.name="symex::invalid_object"+i2string(invalid_counter++);
+      symbol.base_name="invalid_object";
+      symbol.type=type;
+
+      // make it a lvalue, so we can assign to it
+      symbol.lvalue=true;
       
-    if(new_value.is_not_nil() && !pointer_guard.is_false())
-      value=if_exprt(pointer_guard, new_value, value);
+      get_new_name(symbol, ns);
+
+      failure_value=symbol_expr(symbol);
+      failure_value.set("#invalid_object", true);
+      
+      new_context.move(symbol);
+    }
+
+    valuet value;
+    value.value=failure_value;
+    value.pointer_guard.make_true();    
+    values.push_front(value);
+  }
+  
+  // now build big case split, but we only do "good" objects
+  
+  exprt value=nil_exprt();
+
+  for(std::list<valuet>::const_iterator
+      it=values.begin();
+      it!=values.end();
+      it++)
+  {
+    if(it->value.is_not_nil())
+    {
+      if(value.is_nil()) // first?
+        value=it->value;
+      else
+        value=if_exprt(it->pointer_guard, it->value, value);
+    }
   }
   
   #if 0
@@ -184,59 +208,10 @@ exprt dereferencet::dereference(
             << std::endl;
   #endif
 
-  if(value==failure_value)
+  if(values.size()==1 && may_fail)
     invalid_pointer(pointer, guard);
 
   return value;
-}
-
-/*******************************************************************\
-
-Function: dereferencet::add_checks
-
-  Inputs: expression to be checked under guard and mode
-
- Outputs:
-
- Purpose: add pointer safety checks for given expression
-
-\*******************************************************************/
-
-void dereferencet::add_checks(
-  const exprt &pointer,
-  const guardt &guard,
-  const modet mode)
-{
-  if(pointer.type().id()!=ID_pointer)
-    throw "dereference expected pointer type, but got "+
-          pointer.type().pretty();
-
-  #if 0
-  std::cout << "ADD CHECK: " << pointer.pretty() << std::endl;
-  #endif
-
-  // collect objects the pointer may point to
-  value_setst::valuest points_to_set;
-
-  dereference_callback.get_value_set(pointer, points_to_set);
-  
-  // if it's empty, we have a problem
-  if(points_to_set.empty())
-    invalid_pointer(pointer, guard);
-  else
-  {
-    for(value_setst::valuest::const_iterator
-        it=points_to_set.begin();
-        it!=points_to_set.end();
-        it++)
-    {
-      exprt new_value, pointer_guard;
-
-      build_reference_to(
-        *it, mode, pointer, guard,
-        new_value, pointer_guard);
-    }
-  }
 }
 
 /*******************************************************************\
@@ -331,25 +306,20 @@ Function: dereferencet::build_reference_to
 
 \*******************************************************************/
 
-void dereferencet::build_reference_to(
+dereferencet::valuet dereferencet::build_reference_to(
   const exprt &what,
   const modet mode,
   const exprt &pointer_expr,
-  const guardt &guard,
-  exprt &value,
-  exprt &pointer_guard)
+  const guardt &guard)
 {
   const typet &dereference_type=
     ns.follow(pointer_expr.type()).subtype();
 
-  value.make_nil();
-  pointer_guard.make_false();
-  
   if(what.id()==ID_unknown ||
      what.id()==ID_invalid)
   {
     invalid_pointer(pointer_expr, guard);
-    return;
+    return valuet();
   }
   
   if(what.id()!=ID_object_descriptor)
@@ -363,6 +333,8 @@ void dereferencet::build_reference_to(
   #if 0
   std::cout << "O: " << from_expr(ns, "", root_object) << std::endl;
   #endif
+  
+  valuet result;
   
   if(root_object.id()=="NULL-object")
   {
@@ -402,11 +374,10 @@ void dereferencet::build_reference_to(
     dynamic_object_expr.copy_to_operands(pointer_expr);
     
     // this is also our guard
-    pointer_guard=dynamic_object_expr;
+    result.pointer_guard=dynamic_object_expr;
     
-    // can't remove here  
-    value=exprt(ID_dereference, dereference_type);
-    value.copy_to_operands(pointer_expr);
+    // can't remove here, turn into *p
+    result.value=dereference_exprt(pointer_expr, dereference_type);
 
     if(options.get_bool_option("pointer-check"))
     {
@@ -458,8 +429,8 @@ void dereferencet::build_reference_to(
           
           assert(ns.follow(malloc_object.type()).id()==ID_pointer);
           
-          pointer_guard=exprt(ID_same_object, bool_typet());
-          pointer_guard.copy_to_operands(pointer_expr, malloc_object);
+          result.pointer_guard=exprt(ID_same_object, bool_typet());
+          result.pointer_guard.copy_to_operands(pointer_expr, malloc_object);
           
           exprt object_offset=unary_exprt(
             ID_pointer_offset, pointer_expr, index_type());
@@ -482,7 +453,7 @@ void dereferencet::build_reference_to(
             inequality(sum, ID_gt, malloc_size);
 
           guardt tmp_guard(guard);
-          tmp_guard.add(pointer_guard);
+          tmp_guard.add(result.pointer_guard);
           tmp_guard.add(inequality);
           dereference_callback.dereference_failure(
             "pointer dereference",
@@ -511,7 +482,7 @@ void dereferencet::build_reference_to(
     else
     {
       // not quite ok
-      value=typecast_exprt(index_expr, dereference_type);
+      result.value=typecast_exprt(index_expr, dereference_type);
     }
   }
   else
@@ -526,16 +497,16 @@ void dereferencet::build_reference_to(
       if(ns.follow(equality.lhs().type())!=ns.follow(equality.rhs().type()))
         equality.lhs().make_typecast(equality.rhs().type());
 
-      pointer_guard=equality;
+      result.pointer_guard=equality;
     }
     else
     {
-      pointer_guard=exprt(ID_same_object, bool_typet());
-      pointer_guard.copy_to_operands(pointer_expr, object_pointer);
+      result.pointer_guard=exprt(ID_same_object, bool_typet());
+      result.pointer_guard.copy_to_operands(pointer_expr, object_pointer);
     }
 
     guardt tmp_guard(guard);
-    tmp_guard.add(pointer_guard);
+    tmp_guard.add(result.pointer_guard);
     
     valid_check(object, tmp_guard, mode);
     
@@ -549,10 +520,10 @@ void dereferencet::build_reference_to(
       // The simplest case: types match, and offset is zero!
       // This is great, we are almost done.
 
-      value=object;
+      result.value=object;
 
       if(object_type!=ns.follow(dereference_type))
-        value.make_typecast(dereference_type);
+        result.value.make_typecast(dereference_type);
     }
     else if(root_object_type.id()==ID_array &&
             dereference_type_compare(root_object_type.subtype(), dereference_type))
@@ -596,21 +567,21 @@ void dereferencet::build_reference_to(
 
       bounds_check(index_expr, guard);
       
-      value=index_expr;
+      result.value=index_expr;
 
-      if(ns.follow(value.type())!=ns.follow(dereference_type))
-        value.make_typecast(dereference_type);
+      if(ns.follow(result.value.type())!=ns.follow(dereference_type))
+        result.value.make_typecast(dereference_type);
     }
     else
     {
       // we extract something from the root object
-      value=o.root_object();
+      result.value=o.root_object();
 
       // this is relative to the root object
       const exprt offset=
         unary_exprt(ID_pointer_offset, pointer_expr, index_type());
     
-      if(memory_model(value, dereference_type, tmp_guard, offset))
+      if(memory_model(result.value, dereference_type, tmp_guard, offset))
       {
         // ok, done
       }
@@ -619,7 +590,7 @@ void dereferencet::build_reference_to(
         if(options.get_bool_option("pointer-check"))
         {
           std::string msg="memory model not applicable (got `";
-          msg+=from_type(ns, "", value.type());
+          msg+=from_type(ns, "", result.value.type());
           msg+="', expected `";
           msg+=from_type(ns, "", dereference_type);
           msg+="')";
@@ -629,11 +600,12 @@ void dereferencet::build_reference_to(
             msg, tmp_guard);
         }
 
-        value.make_nil();
-        return; // give up, no way that this is ok
+        return valuet(); // give up, no way that this is ok
       }
     }
   }
+  
+  return result;
 }
 
 /*******************************************************************\
