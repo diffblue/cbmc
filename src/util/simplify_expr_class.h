@@ -63,6 +63,7 @@ public:
   bool simplify_inequality(exprt &expr);
   bool simplify_inequality_constant(exprt &expr);
   bool simplify_inequality_not_constant(exprt &expr);
+  bool simplify_inequality_address_of(exprt &expr);
   bool simplify_ieee_float_relation(exprt &expr);
   bool simplify_lambda(exprt &expr);
   bool simplify_with(exprt &expr);
