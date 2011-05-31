@@ -28,7 +28,7 @@ Follow these instructions:
 
 2) Adjust src/config.inc for the paths to a).
 
-3) Adjust src/solvers/satcheck.h to select which SAT solver to use
+3) Adjust src/solvers/sat/satcheck.h to select which SAT solver to use
    as the default.
 
 4) Adjust the file src/utils/hash_cont.h
