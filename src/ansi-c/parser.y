@@ -837,10 +837,6 @@ type_qualifier:
 	| TOK_VOLATILE { $$=$1; set($$, ID_volatile); }
 	| TOK_PTR32    { $$=$1; set($$, ID_ptr32); }
 	| TOK_PTR64    { $$=$1; set($$, ID_ptr64); }
-        | TOK_GCC_ATTRIBUTE_ALIGNED TOK_GCC_ATTRIBUTE_END
-        { $$=$1; set($$, ID_aligned); }
-        | TOK_GCC_ATTRIBUTE_ALIGNED '(' comma_expression')' TOK_GCC_ATTRIBUTE_END
-        { $$=$1; set($$, ID_aligned); mto($$, $3); }
 	;
 
 basic_declaration_specifier:
@@ -1160,6 +1156,10 @@ gcc_type_attribute:
         { $$=$1; set($$, ID_transparent_union); }
         | TOK_GCC_ATTRIBUTE_VECTOR_SIZE '(' comma_expression ')' TOK_GCC_ATTRIBUTE_END
         { $$=$1; set($$, ID_vector); stack($$).add(ID_size)=stack($3); }
+        | TOK_GCC_ATTRIBUTE_ALIGNED TOK_GCC_ATTRIBUTE_END
+        { $$=$1; set($$, ID_aligned); }
+        | TOK_GCC_ATTRIBUTE_ALIGNED '(' comma_expression')' TOK_GCC_ATTRIBUTE_END
+        { $$=$1; set($$, ID_aligned); mto($$, $3); }
         ;
 
 member_declaration_list_opt:
