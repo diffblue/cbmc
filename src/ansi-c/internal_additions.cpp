@@ -82,10 +82,6 @@ void ansi_c_internal_additions(std::string &code)
     "const void *__CPROVER_malloc_object=0;\n"
     "__CPROVER_size_t __CPROVER_malloc_size;\n"
 
-    // obsolete, will go away
-    "_Bool __CPROVER_alloc[__CPROVER_constant_infinity_uint];\n"
-    "__CPROVER_size_t __CPROVER_alloc_size[__CPROVER_constant_infinity_uint];\n"
-    
     // this is ANSI-C
     "extern __CPROVER_thread_local const char __func__[__CPROVER_constant_infinity_uint];\n"
     
