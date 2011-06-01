@@ -151,14 +151,16 @@ protected:
 
   void typecheck_template_class(cpp_declarationt &declaration);
 
-  void typecheck_template_function(cpp_declarationt &declaration);
+  void typecheck_function_template(cpp_declarationt &declaration);
+
+  void typecheck_template_member_function(cpp_declarationt &declaration);
 
   std::string template_class_identifier(
     const irep_idt &base_name,
     const template_typet &template_type,
     const cpp_template_args_non_tct &partial_specialization_args);
     
-  std::string template_function_identifier(
+  std::string function_template_identifier(
     const irep_idt &base_name,
     const template_typet &template_type,
     const typet &function_type);
