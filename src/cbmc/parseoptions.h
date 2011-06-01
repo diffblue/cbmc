@@ -25,7 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(document-subgoals)(all-claims)D:I:(depth):" \
   "(div-by-zero-check)(no-unwinding-assertions)" \
   "(partial-loops)" \
-  "(xml-ui)(xml-interface)" \
+  "(xml-ui)(xml-interface)(vcd):" \
   "(cvc)(smt1)(smt2)(boolector)(yices)(z3)" \
   "(no-pretty-names)(overflow-check)(beautify-greedy)(beautify-pbs)" \
   "(floatbv)(fixedbv)(no-assertions)(no-assumptions)(nan-check)" \
