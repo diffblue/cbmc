@@ -987,6 +987,10 @@ void cpp_typecheck_resolvet::resolve_scope(
           recursive?cpp_scopet::RECURSIVE:cpp_scopet::QUALIFIED,
           cpp_idt::TEMPLATE,
           id_set);
+
+//        std::cout << "S: " << cpp_typecheck.cpp_scopes.current_scope().identifier << std::endl;
+//        cpp_typecheck.cpp_scopes.current_scope().print(std::cout);
+//        std::cout << "X: " << id_set.size() <<std::endl;
           
         const symbolt &symb_tmpl=
           disambiguate_template_classes(base_name, id_set, template_args);
@@ -1002,7 +1006,7 @@ void cpp_typecheck_resolvet::resolve_scope(
           base_name,
           recursive?cpp_scopet::RECURSIVE:cpp_scopet::QUALIFIED,
           id_set);
-
+          
         filter_for_named_scopes(id_set);
 
         if(id_set.empty())
@@ -1081,7 +1085,8 @@ const symbolt &cpp_typecheck_resolvet::disambiguate_template_classes(
   {
     cpp_typecheck.show_instantiation_stack(cpp_typecheck.str);
     cpp_typecheck.err_location(location);
-    cpp_typecheck.str << "template scope `" << base_name << "' not found";
+    cpp_typecheck.str << "template scope `"
+                      << base_name << "' not found";
     throw 0;
   }
 
@@ -2444,22 +2449,30 @@ void cpp_typecheck_resolvet::filter_for_named_scopes(
     }
     else if(id.id_class==cpp_scopet::TEMPLATE_ARGUMENT)
     {
-      // maybe it is a scope
-      exprt e = cpp_typecheck.template_map.lookup(id.identifier);
+      // a template argument may be a scope: it could
+      // be instantiated with a class/struct
+      exprt e=cpp_typecheck.template_map.lookup(id.identifier);
+      
+      if(e.id()!=ID_type)
+        continue; // expressions are definitively not a scope
 
-      if(e.id() != ID_type)
-        continue; // it's definitively not a scope
-
-      if(e.type().id() == ID_symbol)
+      if(e.type().id()==ID_symbol)
       {
-        irep_idt identifier=e.type().get(ID_identifier);
+        symbol_typet type=to_symbol_type(e.type());
 
         while(true)
         {
+          irep_idt identifier=type.get_identifier();
+
           const symbolt &symbol=cpp_typecheck.lookup(identifier);
           assert(symbol.is_type);
-
-          if(symbol.type.id()==ID_struct)
+          
+          if(symbol.type.id()==ID_symbol)
+            type=to_symbol_type(symbol.type);
+          else if(symbol.type.id()==ID_struct ||
+                  symbol.type.id()==ID_incomplete_struct ||
+                  symbol.type.id()==ID_union ||
+                  symbol.type.id()==ID_incomplete_union)
           {
             // this is a scope, too!
             cpp_idt &class_id=
@@ -2469,9 +2482,7 @@ void cpp_typecheck_resolvet::filter_for_named_scopes(
             new_set.insert(&class_id);
             break;
           }
-          else if(symbol.type.id()==ID_symbol)
-            identifier=symbol.type.get(ID_identifier);
-          else
+          else // give up
             break;
         }
       }
