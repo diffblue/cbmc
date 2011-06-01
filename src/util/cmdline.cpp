@@ -341,7 +341,7 @@ bool cmdlinet::parse(int argc, const char **argv, const char *optstring)
         {
           i++;
           if(i==argc) return true;
-          if(argv[i][0]=='-') return true;
+          if(argv[i][0]=='-' && argv[i][1]!=0) return true;
           options[optnr].values.push_back(argv[i]);
         }
         else
