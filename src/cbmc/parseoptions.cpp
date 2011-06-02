@@ -157,9 +157,6 @@ void cbmc_parseoptionst::get_command_line_options(optionst &options)
   if(cmdline.isset("unwindset"))
     options.set_option("unwindset", cmdline.getval("unwindset"));
 
-  if(cmdline.isset("vcd"))
-    options.set_option("vcd", cmdline.getval("vcd"));
-
   // substitution previous expressions
   if(cmdline.isset("no-substitution"))
     options.set_option("substitution", false);
@@ -818,6 +815,5 @@ void cbmc_parseoptionst::help()
     " --version                    show version and exit\n"
     " --xml-ui                     use XML-formatted output\n"
     " --xml-interface              stdio-XML interface\n"
-    " --vcd filename               dump trace in the Value Change Dump trace format\n"
     "\n";
 }
