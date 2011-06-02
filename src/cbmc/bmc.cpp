@@ -25,7 +25,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-symex/slice.h>
 #include <goto-symex/slice_by_trace.h>
 #include <goto-symex/xml_goto_trace.h>
-#include <goto-symex/vcd_goto_trace.h>
 
 #include "bmc.h"
 #include "counterexample_beautification_greedy.h"
@@ -66,6 +65,7 @@ void bmc_baset::error_trace(const prop_convt &prop_conv)
   goto_tracet goto_trace;
   build_goto_trace(equation, prop_conv, goto_trace);
   
+  #if 0
   if(options.get_option("vcd")!="")
   {
     if(options.get_option("vcd")=="-")
@@ -76,30 +76,29 @@ void bmc_baset::error_trace(const prop_convt &prop_conv)
       output_vcd(ns, goto_trace, out);
     }
   }
-  else
+  #endif
+  
+  switch(ui)
   {
-    switch(ui)
+  case ui_message_handlert::PLAIN:
+    std::cout << std::endl << "Counterexample:" << std::endl;
+    show_goto_trace(std::cout, ns, goto_trace);
+    break;
+  
+  case ui_message_handlert::OLD_GUI:
+    show_goto_trace_gui(std::cout, ns, goto_trace);
+    break;
+  
+  case ui_message_handlert::XML_UI:
     {
-    case ui_message_handlert::PLAIN:
-      std::cout << std::endl << "Counterexample:" << std::endl;
-      show_goto_trace(std::cout, ns, goto_trace);
-      break;
-    
-    case ui_message_handlert::OLD_GUI:
-      show_goto_trace_gui(std::cout, ns, goto_trace);
-      break;
-    
-    case ui_message_handlert::XML_UI:
-      {
-        xmlt xml;
-        convert(ns, goto_trace, xml);
-        std::cout << xml << std::endl;
-      }
-      break;
-    
-    default:
-      assert(false);
+      xmlt xml;
+      convert(ns, goto_trace, xml);
+      std::cout << xml << std::endl;
     }
+    break;
+  
+  default:
+    assert(false);
   }
 }
 
