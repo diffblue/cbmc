@@ -50,8 +50,8 @@ public:
     // minimum alignment (in structs) measured in bytes
     unsigned alignment;
     
-    typedef enum { NO_ENDIANESS, IS_LITTLE_ENDIAN, IS_BIG_ENDIAN } endianesst;
-    endianesst endianess;
+    typedef enum { NO_ENDIANNESS, IS_LITTLE_ENDIAN, IS_BIG_ENDIAN } endiannesst;
+    endiannesst endianness;
 
     typedef enum { NO_OS, OS_LINUX, OS_MACOS, OS_WIN } ost;
     ost os;
