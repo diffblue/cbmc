@@ -27,7 +27,7 @@ Author: Daniel Kroening
 #include <fcntl.h>
 #endif
 
-#ifdef __linux__
+#if defined(__linux__) || defined(__FreeBSD_kernel__)
 #include <unistd.h>
 #include <sys/time.h>
 #include <fcntl.h>
