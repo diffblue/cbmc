@@ -823,7 +823,7 @@ bool compilet::write_bin_object_file(
 
   // symbols
   print(8, "Symbols in table: "+
-           i2string(lcontext.symbols.size()));
+           i2string((unsigned long)lcontext.symbols.size()));
 
   std::ofstream outfile(filename.c_str(), std::ios::binary);
 
