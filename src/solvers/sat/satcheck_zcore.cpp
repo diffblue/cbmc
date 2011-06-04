@@ -15,6 +15,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "satcheck_zcore.h"
 
+#include <cstdlib>
+#include <cstring>
+
 /*******************************************************************\
 
 Function: satcheck_zcoret::satcheck_zcoret
