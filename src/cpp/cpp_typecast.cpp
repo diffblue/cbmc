@@ -609,7 +609,7 @@ void cpp_typecastt::implicit_typecast_followed(
       }
       else if(count > 1)
       {
-        errors.push_back("constructor-conversion is ambigious");
+        errors.push_back("constructor-conversion is ambiguous");
         return;
       }
 

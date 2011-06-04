@@ -372,7 +372,7 @@ void cpp_typecheckt::typecheck_template_member_function(
     err_location(cpp_name);
     str << "template function/member identifier `"
         << cpp_name.get_sub().front().get(ID_identifier)
-        << "' is ambigious";
+        << "' is ambiguous";
     throw 0;
   }
   else if((*(id_set.begin()))->id_class!=cpp_idt::TEMPLATE)

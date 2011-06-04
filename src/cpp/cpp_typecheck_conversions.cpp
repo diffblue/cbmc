@@ -1156,7 +1156,7 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
             exprt tmp_expr;
             if(standard_conversion_sequence(expr, arg1_type, tmp_expr, tmp_rank))
             {
-              // check if it's ambigious
+              // check if it's ambiguous
               if(found)
                 return false;
               found = true;
@@ -1204,7 +1204,7 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
               tmp_rank = 0;
               if(standard_conversion_sequence(expr_pfrom, pto, expr_ptmp, tmp_rank))
               {
-                // check if it's ambigious
+                // check if it's ambiguous
                 if(found)
                   return false;
                 found = true;
@@ -1308,7 +1308,7 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
         exprt tmp_expr;
         if(standard_conversion_sequence(func_expr,type, tmp_expr, tmp_rank))
         {
-          // check if it's ambigious
+          // check if it's ambiguous
           if(found)
             return false;
           found = true;
