@@ -231,7 +231,7 @@ bool configt::set(const cmdlinet &cmdline)
   ansi_c.use_fixed_for_float=true;
   #endif
 
-  ansi_c.endianess=ansi_ct::NO_ENDIANESS;
+  ansi_c.endianness=ansi_ct::NO_ENDIANNESS;
   ansi_c.os=ansi_ct::NO_OS;
   ansi_c.arch=ansi_ct::NO_ARCH;
   ansi_c.lib=configt::ansi_ct::LIB_NONE;
@@ -290,7 +290,7 @@ bool configt::set(const cmdlinet &cmdline)
     ansi_c.mode=ansi_ct::MODE_GCC;
     ansi_c.os=configt::ansi_ct::OS_LINUX;
     ansi_c.arch=configt::ansi_ct::ARCH_I386;
-    ansi_c.endianess=configt::ansi_ct::IS_LITTLE_ENDIAN;
+    ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
     ansi_c.lib=configt::ansi_ct::LIB_FULL;
   }
 
@@ -300,7 +300,7 @@ bool configt::set(const cmdlinet &cmdline)
     ansi_c.mode=ansi_ct::MODE_VISUAL_STUDIO;
     ansi_c.os=configt::ansi_ct::OS_WIN;
     ansi_c.arch=configt::ansi_ct::ARCH_I386;
-    ansi_c.endianess=configt::ansi_ct::IS_LITTLE_ENDIAN;
+    ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
     ansi_c.lib=configt::ansi_ct::LIB_FULL;
     ansi_c.set_32();
     ansi_c.wchar_t_width=2*8;
@@ -311,7 +311,7 @@ bool configt::set(const cmdlinet &cmdline)
     ansi_c.mode=ansi_ct::MODE_VISUAL_STUDIO;
     ansi_c.os=configt::ansi_ct::OS_WIN;
     ansi_c.arch=configt::ansi_ct::ARCH_X86_64;
-    ansi_c.endianess=configt::ansi_ct::IS_LITTLE_ENDIAN;
+    ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
     ansi_c.lib=configt::ansi_ct::LIB_FULL;
     ansi_c.set_64();
     ansi_c.wchar_t_width=2*8;
@@ -322,7 +322,7 @@ bool configt::set(const cmdlinet &cmdline)
     ansi_c.mode=ansi_ct::MODE_GCC;
     ansi_c.os=configt::ansi_ct::OS_MACOS;
     ansi_c.arch=configt::ansi_ct::ARCH_I386;
-    ansi_c.endianess=configt::ansi_ct::IS_LITTLE_ENDIAN;
+    ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
     ansi_c.lib=configt::ansi_ct::LIB_FULL;
   }
 
@@ -331,7 +331,7 @@ bool configt::set(const cmdlinet &cmdline)
     ansi_c.mode=ansi_ct::MODE_GCC;
     ansi_c.os=configt::ansi_ct::OS_MACOS;
     ansi_c.arch=configt::ansi_ct::ARCH_PPC;
-    ansi_c.endianess=configt::ansi_ct::IS_BIG_ENDIAN;
+    ansi_c.endianness=configt::ansi_ct::IS_BIG_ENDIAN;
     ansi_c.lib=configt::ansi_ct::LIB_FULL;
   }
   
@@ -339,7 +339,7 @@ bool configt::set(const cmdlinet &cmdline)
   {
     ansi_c.os=configt::ansi_ct::NO_OS;
     ansi_c.arch=configt::ansi_ct::NO_ARCH;
-    ansi_c.endianess=configt::ansi_ct::NO_ENDIANESS;
+    ansi_c.endianness=configt::ansi_ct::NO_ENDIANNESS;
     ansi_c.lib=configt::ansi_ct::LIB_NONE;
   }
   else if(ansi_c.os==configt::ansi_ct::NO_OS)
@@ -347,7 +347,7 @@ bool configt::set(const cmdlinet &cmdline)
     // this is the default
     ansi_c.os=configt::ansi_ct::OS_LINUX;
     ansi_c.arch=configt::ansi_ct::ARCH_I386;
-    ansi_c.endianess=configt::ansi_ct::IS_LITTLE_ENDIAN;
+    ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
     ansi_c.lib=configt::ansi_ct::LIB_FULL;
     #ifdef _WIN32
     ansi_c.os=configt::ansi_ct::OS_WIN;
@@ -368,10 +368,10 @@ bool configt::set(const cmdlinet &cmdline)
     ansi_c.lib=configt::ansi_ct::LIB_NONE;
   
   if(cmdline.isset("little-endian"))
-    ansi_c.endianess=configt::ansi_ct::IS_LITTLE_ENDIAN;
+    ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
 
   if(cmdline.isset("big-endian"))
-    ansi_c.endianess=configt::ansi_ct::IS_BIG_ENDIAN;
+    ansi_c.endianness=configt::ansi_ct::IS_BIG_ENDIAN;
 
   if(cmdline.isset("little-endian") &&
      cmdline.isset("big-endian"))
@@ -454,6 +454,6 @@ void configt::ansi_ct::set_from_context(const contextt &context)
   wchar_t_width=from_ns(ns, "wchar_t_width");
   alignment=from_ns(ns, "alignment");
   use_fixed_for_float=from_ns(ns, "fixed_for_float");
-  endianess=(endianesst)from_ns(ns, "endianess");
+  endianness=(endiannesst)from_ns(ns, "endianness");
 }
 
