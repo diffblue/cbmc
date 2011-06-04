@@ -183,7 +183,7 @@ Function: qbf_qube_coret::is_in_core
 
 bool qbf_qube_coret::is_in_core(literalt l) const
 {
-  throw ("Not suppported");
+  throw ("Not supported");
 }
 
 /*******************************************************************\
