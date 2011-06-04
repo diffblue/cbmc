@@ -160,5 +160,5 @@ void ansi_c_architecture_strings(std::string &code)
   code+=architecture_string(config.ansi_c.double_width, "double_width");
   code+=architecture_string(config.ansi_c.long_double_width, "long_double_width");
   code+=architecture_string(config.ansi_c.wchar_t_width, "wchar_t_width");
-  code+=architecture_string(config.ansi_c.endianess, "endianess");
+  code+=architecture_string(config.ansi_c.endianness, "endianness");
 }
