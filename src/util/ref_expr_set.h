@@ -19,6 +19,7 @@ extern const hash_set_cont<exprt, irep_hash> empty_expr_set;
 
 struct ref_expr_set_dt
 {
+  ref_expr_set_dt() {}
   typedef hash_set_cont<exprt, irep_hash> expr_sett;
   expr_sett expr_set;
   
