@@ -887,8 +887,8 @@ bool dereferencet::memory_model_bytes(
   if(from_type.id()==ID_code || to_type.id()==ID_code)
     return false;
 
-  // won't do this without a committment to an endianess
-  if(config.ansi_c.endianess==configt::ansi_ct::NO_ENDIANESS)
+  // won't do this without a committment to an endianness
+  if(config.ansi_c.endianness==configt::ansi_ct::NO_ENDIANNESS)
     return false; 
 
   // But everything else we will try!
@@ -950,7 +950,7 @@ Function: dereferencet::byte_extract_id
 
 irep_idt dereferencet::byte_extract_id()
 {
-  switch(config.ansi_c.endianess)
+  switch(config.ansi_c.endianness)
   {
   case configt::ansi_ct::IS_LITTLE_ENDIAN:
     return ID_byte_extract_little_endian;
