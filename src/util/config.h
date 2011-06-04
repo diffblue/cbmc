@@ -49,6 +49,10 @@ public:
     
     // minimum alignment (in structs) measured in bytes
     unsigned alignment;
+
+    // maximum minimum size of the operands for a machine 
+    // instruction (in bytes)
+    unsigned memory_operand_size;
     
     typedef enum { NO_ENDIANNESS, IS_LITTLE_ENDIAN, IS_BIG_ENDIAN } endiannesst;
     endiannesst endianness;
