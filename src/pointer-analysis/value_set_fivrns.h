@@ -74,6 +74,7 @@ public:
   class object_map_dt
   {
   public:
+    object_map_dt() {}
     const static object_map_dt empty;
     
     typedef std::map<unsigned, objectt> objmapt;

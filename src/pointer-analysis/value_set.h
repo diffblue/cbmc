@@ -56,6 +56,7 @@ public:
   class object_map_dt:public std::map<unsigned, objectt>
   {
   public:
+    object_map_dt() {}
     const static object_map_dt empty;
   };
   
