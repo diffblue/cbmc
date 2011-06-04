@@ -974,8 +974,6 @@ bool cpp_typecheckt::standard_conversion_sequence(
     typet sub_from=curr_expr.type();
     typet sub_to=type;
 
-    bool do_qual = false;
-
     do
     {
       typet tmp_from = sub_from.subtype();
@@ -991,7 +989,6 @@ bool cpp_typecheckt::standard_conversion_sequence(
 
       if(qual_from!=qual_to)
       {
-        do_qual=true;
         rank+=1;
         break;
       }

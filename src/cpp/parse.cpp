@@ -2020,7 +2020,6 @@ bool Parser::rDeclarator(
   bool is_statement)
 {
   int t;
-  bool recursive_decl=false;
 
   #ifdef DEBUG
   std::cout << "Parser::rDeclarator2 1\n";
@@ -2058,8 +2057,6 @@ bool Parser::rDeclarator(
 
     Token op;
     lex->GetToken(op);
-
-    recursive_decl=true;
 
     cpp_declaratort declarator2;
     if(!rDeclarator(declarator2, kind, true, true, false))
@@ -4677,7 +4674,7 @@ bool Parser::rPostfixExpr(exprt &exp)
 
   exprt e;
   Token cp, op;
-  int t, t2;
+  int t2;
 
   for(;;)
   {
@@ -4751,7 +4748,6 @@ bool Parser::rPostfixExpr(exprt &exp)
     case '.':
     case TOK_ArrowOp:
       t2=lex->GetToken(op);
-      t=lex->LookAhead(0);
 
       #ifdef DEBUG
       std::cout << "Parser::rPostfixExpr 5\n";
