@@ -666,7 +666,7 @@ bool c_preprocess_arm(
   //command+=" -D__ARMCC_VERSION=410000";
 //  command+=" -D__arm__";
 
-//  if(config.ansi_c.endianess==configt::ansi_ct::IS_BIG_ENDIAN)
+//  if(config.ansi_c.endianness==configt::ansi_ct::IS_BIG_ENDIAN)
 //    command+=" -D__BIG_ENDIAN";
 
 //  if(config.ansi_c.char_is_unsigned)
