@@ -25,7 +25,7 @@ $(patsubst %, %.dir, $(DIRS)):
 	$(MAKE) $(MAKEARGS) -C $(basename $@)
 
 clean: $(patsubst %, %_clean, $(DIRS))
-	rm -f *.o
+	rm -f *.o $(shell find . -name "*.d")
 
 dep: $(patsubst %, %_dep, $(DIRS))
 
