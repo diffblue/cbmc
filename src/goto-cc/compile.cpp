@@ -1247,8 +1247,6 @@ Function: compilet::escape
 
 std::string &compilet::escape(std::string &str)
 {
-  char last = '\0';
-
   for(unsigned i=0; i<str.size(); i++)
   {
     if(str[i]=='\n')
@@ -1267,7 +1265,6 @@ std::string &compilet::escape(std::string &str)
       str.insert(i, "\\");
       i++;
     }
-    last = str[i];
   }
 
   return str;
