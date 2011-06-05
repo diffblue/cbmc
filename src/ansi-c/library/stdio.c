@@ -41,15 +41,15 @@ inline int puts(const char *s)
 #define __CPROVER_STDLIB_H_INCLUDED
 #endif
 
-inline FILE *fopen(const char *filename, const char *m)
+inline FILE *fopen(const char *filename, const char *mode)
 {
   __CPROVER_HIDE:;
-  FILE *f=malloc(sizeof(FILE));
-
   #ifdef __CPROVER_STRING_ABSTRACTION
-  __CPROVER_assert(__CPROVER_is_zero_string(f), "fopen zero-termination of 1st argument");
-  __CPROVER_assert(__CPROVER_is_zero_string(m), "fopen zero-termination of 2nd argument");
+  __CPROVER_assert(__CPROVER_is_zero_string(filename), "fopen zero-termination of 1st argument");
+  __CPROVER_assert(__CPROVER_is_zero_string(mode), "fopen zero-termination of 2nd argument");
   #endif
+
+  FILE *f=malloc(sizeof(FILE));
 
   return f;
 }
@@ -81,15 +81,15 @@ inline int fclose(FILE *stream)
 #define __CPROVER_STDLIB_H_INCLUDED
 #endif
 
-inline FILE *fdopen(int handle, const char *m)
+inline FILE *fdopen(int handle, const char *mode)
 {
   __CPROVER_HIDE:;
-  FILE *f=malloc(sizeof(FILE));
-
   #ifdef __CPROVER_STRING_ABSTRACTION
-  __CPROVER_assert(__CPROVER_is_zero_string(m),
+  __CPROVER_assert(__CPROVER_is_zero_string(mode),
     "fdopen zero-termination of 2nd argument");
   #endif
+
+  FILE *f=malloc(sizeof(FILE));
 
   return f;
 }
@@ -387,6 +387,7 @@ size_t fwrite(
   FILE *stream)
 {
   __CPROVER_HIDE:;
+  *stream;
   size_t nwrite;
   __CPROVER_assume(nwrite<=nitems);
   return nwrite;
