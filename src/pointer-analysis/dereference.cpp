@@ -464,25 +464,40 @@ dereferencet::valuet dereferencet::build_reference_to(
   }
   else if(root_object.id()==ID_integer_address)
   {
-    // this is stuff like *((char *)5)
-    const symbolt &memory_symbol=ns.lookup(CPROVER_PREFIX "memory");
-    
+    // This is stuff like *((char *)5).
+    // This is turned into an access to __CPROVER_memory[...].
+
+    const symbolt &memory_symbol=ns.lookup(CPROVER_PREFIX "memory");    
     exprt symbol_expr=symbol_exprt(memory_symbol.name, memory_symbol.type);
 
     exprt pointer_offset=unary_exprt(
       ID_pointer_offset, pointer_expr, index_type());
-    
-    exprt index_expr=index_exprt(symbol_expr, pointer_offset);
-    index_expr.type()=ns.follow(memory_symbol.type).subtype();
 
-    if(base_type_eq(index_expr.type(), dereference_type, ns))
+    if(base_type_eq(
+         ns.follow(memory_symbol.type).subtype(), 
+         dereference_type, ns))
     {
-      // types match already, what a coincidence!
+      // Types match already, what a coincidence!
+      // We can use an index expression.
+
+      exprt index_expr=index_exprt(symbol_expr, pointer_offset);
+      index_expr.type()=ns.follow(memory_symbol.type).subtype();
+      result.value=index_expr;
     }
     else
     {
-      // not quite ok
-      result.value=typecast_exprt(index_expr, dereference_type);
+      // We need to use byte_extract.
+      // Won't do this without a committment to an endianness.
+
+      if(config.ansi_c.endianness==configt::ansi_ct::NO_ENDIANNESS)
+      {
+      }
+      else
+      {
+        exprt byte_extract(byte_extract_id(), dereference_type);
+        byte_extract.copy_to_operands(symbol_expr, pointer_offset);
+        result.value=byte_extract;
+      }
     }
   }
   else
@@ -726,8 +741,15 @@ void dereferencet::bounds_check(
 
   const exprt &size_expr=
     to_array_type(array_type).size();
-
-  if(size_expr.id()!=ID_infinity)
+    
+  if(size_expr.id()==ID_infinity)
+  {
+  }
+  else if(size_expr.is_zero() && expr.array().id()==ID_member)
+  {
+    // this is a variable-sized struct field
+  }
+  else
   {
     if(size_expr.is_nil())
       throw "index array operand of wrong type";
