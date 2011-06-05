@@ -179,7 +179,7 @@ __attribute         { BEGIN(GCC_ATTRIBUTE); PARSER.parenthesis_counter=0; }
 __attribute__       { BEGIN(GCC_ATTRIBUTE); PARSER.parenthesis_counter=0; }
 _cdecl|__cdecl 	    { loc(); return MSC_Keyword(TOK_CDECL); }
 __const             { loc(); return TOK_CONST; }
-__declspec          { BEGIN(MSC_DECLSPEC); PARSER.parenthesis_counter=0; }
+_declspec|__declspec { BEGIN(MSC_DECLSPEC); PARSER.parenthesis_counter=0; }
 __extension__       { loc(); return TOK_Ignore; }
 __if_exists         { loc(); return MSC_Keyword(TOK_MSC_IF_EXISTS); }
 __if_not_exists     { loc(); return MSC_Keyword(TOK_MSC_IF_NOT_EXISTS); }
