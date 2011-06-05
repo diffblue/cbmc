@@ -407,7 +407,8 @@ void ansi_c_scanner_init()
 "["{ws}"export"       { BEGIN(MSC_ANNOTATION); }
 
 
-"__declspec"    { if(PARSER.mode==ansi_c_parsert::MSC ||
+"__declspec" |
+"_declspec"     { if(PARSER.mode==ansi_c_parsert::MSC ||
                      PARSER.mode==ansi_c_parsert::CW ||
                      PARSER.mode==ansi_c_parsert::ARM)
                   {
