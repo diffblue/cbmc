@@ -332,15 +332,16 @@ void smt1_convt::convert_byte_update(const exprt &expr)
 
   mp_integer i;
   if(to_integer(expr.op1(), i))
-    throw "byte_extract takes constant as second parameter";
+    throw "byte_update takes constant as second operand";
 
   unsigned w=boolbv_width(expr.op0().type());
 
   if(w==0)
-    throw "failed to get width of byte_extract operand";
+    throw "failed to get width of byte_update operand";
 
   mp_integer upper, lower; // of the byte
   mp_integer max=w-1;
+
   if(expr.id()==ID_byte_update_little_endian)
   {
     upper = ((i+1)*8)-1;
