@@ -30,39 +30,57 @@ void link_to_library(
   const optionst &options,
   message_handlert &message_handler)
 {
-  std::set<irep_idt> called_functions;
-  compute_called_functions(goto_functions, called_functions);
-  
-  // eliminate those for which we already have a body
+  // this needs a fixedpoint, as library functions
+  // may depend on other library functions
 
-  std::set<irep_idt> missing_functions;
+  std::set<irep_idt> added_functions;
 
-  for(std::set<irep_idt>::const_iterator
-      it=called_functions.begin();
-      it!=called_functions.end();
-      it++)
+  while(true)
   {
-    goto_functionst::function_mapt::const_iterator
-      f_it=goto_functions.function_map.find(*it);
-    
-    if(f_it!=goto_functions.function_map.end() &&
-       f_it->second.body_available)
+    std::set<irep_idt> called_functions;
+    compute_called_functions(goto_functions, called_functions);
+  
+    // eliminate those for which we already have a body
+
+    std::set<irep_idt> missing_functions;
+
+    for(std::set<irep_idt>::const_iterator
+        it=called_functions.begin();
+        it!=called_functions.end();
+        it++)
     {
-      // it's overridden!
+      goto_functionst::function_mapt::const_iterator
+        f_it=goto_functions.function_map.find(*it);
+      
+      if(f_it!=goto_functions.function_map.end() &&
+         f_it->second.body_available)
+      {
+        // it's overridden!
+      }
+      else if(added_functions.find(*it)!=added_functions.end())
+      {
+        // already added
+      }
+      else
+        missing_functions.insert(*it);
     }
-    else
-      missing_functions.insert(*it);
-  }
-  
-  add_cprover_library(missing_functions, context, message_handler);
+    
+    // done?
+    if(missing_functions.empty()) break;
+    
+    add_cprover_library(missing_functions, context, message_handler);
 
-  // convert to CFG
-  for(std::set<irep_idt>::const_iterator
-      it=missing_functions.begin();
-      it!=missing_functions.end();
-      it++)
-  {
-    if(context.symbols.find(*it)!=context.symbols.end())
-      goto_convert(*it, context, options, goto_functions, message_handler);
+    // convert to CFG
+    for(std::set<irep_idt>::const_iterator
+        it=missing_functions.begin();
+        it!=missing_functions.end();
+        it++)
+    {
+      if(context.symbols.find(*it)!=context.symbols.end())
+        goto_convert(*it, context, options, goto_functions, message_handler);
+        
+      added_functions.insert(*it);
+    }
+    
   }
 }
