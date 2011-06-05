@@ -90,6 +90,7 @@ void configt::ansi_ct::set_LP64()
   char_is_unsigned=false;
   wchar_t_width=4*8;
   alignment=1;
+  memory_operand_size=int_width/8;
 }
 
 /*******************************************************************\
@@ -103,6 +104,10 @@ Function: configt::ansi_ct::set_ILP64
  Purpose: int=64, long=64, pointer=64
 
 \*******************************************************************/
+
+// TODO: find the alignment restrictions (per type) of the different
+// architectures (currently: sizeof=alignedof)
+// TODO: implement the __attribute__((__aligned__(val)))
 
 void configt::ansi_ct::set_ILP64()
 {
@@ -118,6 +123,7 @@ void configt::ansi_ct::set_ILP64()
   char_is_unsigned=false;
   wchar_t_width=4*8;
   alignment=1;
+  memory_operand_size=int_width/8;
 }
 
 /*******************************************************************\
@@ -146,6 +152,7 @@ void configt::ansi_ct::set_LLP64()
   char_is_unsigned=false;
   wchar_t_width=4*8;
   alignment=1;
+  memory_operand_size=int_width/8;
 }
 
 /*******************************************************************\
@@ -174,6 +181,7 @@ void configt::ansi_ct::set_ILP32()
   char_is_unsigned=false;
   wchar_t_width=4*8;
   alignment=1;
+  memory_operand_size=int_width/8;
 }
 
 /*******************************************************************\
@@ -202,6 +210,7 @@ void configt::ansi_ct::set_LP32()
   char_is_unsigned=false;
   wchar_t_width=4*8;
   alignment=1;
+  memory_operand_size=int_width/8;
 }
 
 /*******************************************************************\
@@ -455,5 +464,8 @@ void configt::ansi_ct::set_from_context(const contextt &context)
   alignment=from_ns(ns, "alignment");
   use_fixed_for_float=from_ns(ns, "fixed_for_float");
   endianness=(endiannesst)from_ns(ns, "endianness");
+
+  //memory_operand_size=from_ns(ns, "memory_operand_size");
+  memory_operand_size=int_width/8;
 }
 
