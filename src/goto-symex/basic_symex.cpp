@@ -170,7 +170,7 @@ void basic_symext::symex_assign(statet &state, const code_assignt &code)
     else if(statement==ID_printf)
       symex_printf(state, lhs, side_effect_expr);
     else
-      throw "symex_assign: unexpected sideeffect: "+id2string(statement);
+      throw "symex_assign: unexpected side effect: "+id2string(statement);
   }
   else
   {
