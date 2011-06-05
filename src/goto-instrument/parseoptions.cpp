@@ -38,6 +38,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "full_slicer.h"
 #include "show_locations.h"
 #include "points_to.h"
+#include "alignment_checks.h"
 
 /*******************************************************************\
 
@@ -184,6 +185,14 @@ int goto_instrument_parseoptionst::doit()
       goto_functions.output(ns, std::cout);
       return 0;
     }
+
+    // experimental: print structs
+    if(cmdline.isset("show-struct-alignment"))
+    {
+      print_struct_alignment_problems(context, std::cout);
+      return 0;
+    }
+    // end of experiment
 
     if(cmdline.isset("show-locations"))
     {
@@ -411,6 +420,7 @@ void goto_instrument_parseoptionst::help()
     " --document-claims            generate claim documentation\n"
     " --show-symbol-table          show symbol table\n"
     " --show-goto-functions        show goto program\n"
+    " --show-struct-alignment      show struct members that might be concurrently accessed\n"
     " --dump-c                     generate C source\n"
     " --interpreter                do concrete execution\n"
     "\n"
