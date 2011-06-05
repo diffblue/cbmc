@@ -40,6 +40,12 @@ std::string array_name(
   {
     return "string constant";
   }
+  else if(expr.id()==ID_member)
+  {
+    assert(expr.operands().size()==1);
+    return array_name(ns, expr.op0())+"."+
+           expr.get_string(ID_component_name);
+  }
 
   return "array";
 }
