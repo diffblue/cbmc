@@ -30,6 +30,11 @@ Function: basic_symext::symex_malloc
 
 \*******************************************************************/
 
+inline static typet c_sizeof_type(const exprt &expr)
+{
+  return static_cast<const typet &>(expr.find("#c_sizeof_type"));
+}
+
 void basic_symext::symex_malloc(
   statet &state,
   const exprt &lhs,
@@ -50,8 +55,30 @@ void basic_symext::symex_malloc(
     exprt tmp_size=size;
     state.rename(tmp_size, ns); // to allow constant propagation
 
-    object_type=
-      static_cast<const typet &>(tmp_size.find("#c_sizeof_type"));
+    // is this a product?
+    // we catch the case sizeof(type)*number
+    if(tmp_size.id()==ID_mult && tmp_size.operands().size()==2)
+    {
+      typet type=nil_typet();
+      exprt size;
+      
+      if(c_sizeof_type(tmp_size.op0()).is_not_nil())
+      {
+        object_type=array_typet(
+          c_sizeof_type(tmp_size.op0()),
+          tmp_size.op1());
+      }
+      else if(c_sizeof_type(tmp_size.op1()).is_not_nil())
+      {
+        object_type=array_typet(
+          c_sizeof_type(tmp_size.op1()),
+          tmp_size.op0());
+      }
+      else
+        object_type.make_nil();
+    }
+    else
+      object_type=c_sizeof_type(tmp_size);
 
     if(object_type.is_nil())
       object_type=array_typet(uchar_type(), tmp_size);
