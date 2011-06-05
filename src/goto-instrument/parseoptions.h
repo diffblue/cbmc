@@ -25,6 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(nan-check)(no-nan-check)" \
   "(overflow-check)(no-overflow-check)" \
   "(show-goto-functions)(show-value-sets)" \
+  "(show-struct-alignment)" \
   "(show-uninitialized)(show-locations)" \
   "(full-slice)" \
   "(show-symbol-table)(show-claims)(show-points-to)" \
