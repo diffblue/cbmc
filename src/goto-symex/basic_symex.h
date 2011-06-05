@@ -80,13 +80,6 @@ protected:
   
   void read(exprt &expr);
   void replace_nondet(exprt &expr);
-
-  #if 0  
-  void assignment(
-    statet &state,
-    const exprt &lhs,
-    exprt &rhs);
-  #endif
 };
 
 void basic_symex(
