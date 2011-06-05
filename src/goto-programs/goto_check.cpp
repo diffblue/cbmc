@@ -332,12 +332,20 @@ void goto_checkt::bounds_check(
   }
 
   {
-    if(array_type.find(ID_size).is_nil())
+    if(to_array_type(array_type).size().is_nil())
       throw "index array operand of wrong type";
 
-    const exprt &size=(const exprt &)array_type.find(ID_size);
+    const exprt &size=to_array_type(array_type).size();
 
-    if(size.id()!=ID_infinity)
+    if(size.id()==ID_infinity)
+    {
+    }
+    else if(size.is_zero() &&
+            expr.op0().id()==ID_member)
+    {
+      // a variable sized struct member
+    }
+    else
     {
       exprt inequality(ID_lt, bool_typet());
       inequality.copy_to_operands(index, size);
