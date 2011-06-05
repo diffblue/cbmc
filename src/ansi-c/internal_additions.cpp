@@ -156,6 +156,7 @@ void ansi_c_architecture_strings(std::string &code)
   code+=architecture_string(config.ansi_c.int_width, "word_size"); // old 
   code+=architecture_string(config.ansi_c.use_fixed_for_float, "fixed_for_float");
   code+=architecture_string(config.ansi_c.alignment, "alignment");
+  code+=architecture_string(config.ansi_c.memory_operand_size, "memory_operand_size");
   code+=architecture_string(config.ansi_c.single_width, "single_width");
   code+=architecture_string(config.ansi_c.double_width, "double_width");
   code+=architecture_string(config.ansi_c.long_double_width, "long_double_width");
