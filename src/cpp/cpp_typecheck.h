@@ -121,14 +121,15 @@ protected:
   void convert_function(symbolt &symbol);
 
   void convert_pmop(exprt& expr);
-  void convert_anonymous_union(
-        cpp_declarationt &declaration,
-        codet& new_code);
 
-  void convert_compound_ano_union(
-       const cpp_declarationt &declaration,
-       const irep_idt &access,
-       struct_typet::componentst &components);
+  void convert_anonymous_union(
+    cpp_declarationt &declaration,
+    codet &new_code);
+
+  void convert_anon_struct_union_member(
+    const cpp_declarationt &declaration,
+    const irep_idt &access,
+    struct_typet::componentst &components);
 
   //
   // Templates
@@ -344,7 +345,7 @@ protected:
   cpp_scopet &typecheck_template_parameters(
     template_typet &type);
 
-  void typecheck_compound_type(typet &type);
+  void typecheck_compound_type(struct_union_typet &type);
   void check_array_types(typet &type);
   void typecheck_enum_type(typet &type);
 

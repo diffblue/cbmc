@@ -57,7 +57,7 @@ void cpp_typecheckt::convert_anonymous_union(
   new_code.reserve_operands(declaration.declarators().size());
 
   // unnamed object
-  std::string identifier = "#anon"+i2string(anon_counter++);
+  std::string identifier="#anon_union"+i2string(anon_counter++);
 
   irept name(ID_name);
   name.set(ID_identifier, identifier);
@@ -116,7 +116,8 @@ void cpp_typecheckt::convert_anonymous_union(
     id.is_member=true;
   }
 
-  context.symbols[union_symbol.name].type.set("#unnamed_object", symbol.base_name);
+  context.symbols[union_symbol.name].type.set(
+    "#unnamed_object", symbol.base_name);
 
   code.swap(new_code);
 }
