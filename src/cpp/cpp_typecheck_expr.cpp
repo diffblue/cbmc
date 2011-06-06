@@ -1239,23 +1239,23 @@ void cpp_typecheckt::typecheck_expr_member(
     cpp_namet component_cpp_name=
       to_cpp_name(expr.find("component_cpp_name"));
 
-    // get that scope
+    // go to the scope of the struct/union
     cpp_save_scopet save_scope(cpp_scopes);
     cpp_scopes.set_scope(struct_identifier);
 
-    // resolve member
+    // resolve the member name in this scope
     cpp_typecheck_fargst new_fargs(fargs);
     new_fargs.add_object(op0);
 
     exprt symbol_expr=resolve(
-            component_cpp_name,
-            cpp_typecheck_resolvet::VAR,
-            new_fargs);
+                        component_cpp_name,
+                        cpp_typecheck_resolvet::VAR,
+                        new_fargs);
 
     if(symbol_expr.id()==ID_dereference)
     {
       assert(symbol_expr.get_bool(ID_C_implicit));
-      exprt tmp = symbol_expr.op0();
+      exprt tmp=symbol_expr.op0();
       symbol_expr.swap(tmp);
     }
 
@@ -1269,8 +1269,8 @@ void cpp_typecheckt::typecheck_expr_member(
 
     if(symbol_expr.id()==ID_symbol)
     {
-      if(symbol_expr.type().id() == ID_code
-         && symbol_expr.type().get(ID_return_type)==ID_constructor)
+      if(symbol_expr.type().id()==ID_code &&
+         symbol_expr.type().get(ID_return_type)==ID_constructor)
       {
         err_location(expr);
         str << "error: member `" 
