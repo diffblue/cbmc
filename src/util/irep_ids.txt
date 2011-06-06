@@ -384,8 +384,8 @@ template
 template_type
 template_args
 template_parameter
-C_template
-C_template_arguments
+C_template #template
+C_template_arguments #template_arguments
 typename
 C
 cpp
