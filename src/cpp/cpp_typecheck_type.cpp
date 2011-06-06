@@ -80,7 +80,7 @@ void cpp_typecheckt::typecheck_type(typet &type)
   else if(type.id()==ID_struct ||
           type.id()==ID_union)
   {
-    typecheck_compound_type(type);
+    typecheck_compound_type(to_struct_union_type(type));
   }
   else if(type.id()==ID_pointer)
   {
