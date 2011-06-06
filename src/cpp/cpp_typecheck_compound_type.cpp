@@ -84,11 +84,9 @@ Purpose:
 
 \*******************************************************************/
 
-void cpp_typecheckt::typecheck_compound_type(typet &type)
+void cpp_typecheckt::typecheck_compound_type(
+  struct_union_typet &type)
 {
-  assert(type.id()==ID_struct ||
-         type.id()==ID_union);
-
   // first save qualifiers
   c_qualifierst qualifiers(type);
 
@@ -98,14 +96,14 @@ void cpp_typecheckt::typecheck_compound_type(typet &type)
   type.remove(ID_C_restricted);
 
   // get the tag name
-
   bool anonymous=type.find(ID_tag).is_nil();
   
   std::string identifier, base_name;
 
   if(anonymous)
   {
-    base_name=identifier="#anon"+i2string(anon_counter++);
+    base_name=identifier=
+      "#anon_"+type.id_string()+i2string(anon_counter++);
     type.set("#is_anonymous", true);
   }
   else
@@ -976,19 +974,21 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
         throw 0;
       }
 
-      typet final_type = follow(declaration.type());
+      typet final_type=follow(declaration.type());
 
+      // anonymous member?
       if(declaration.declarators().empty() &&
          final_type.get_bool("#is_anonymous"))
       {
+        // we only allow this on struct/union types
         if(final_type.id()!=ID_union &&
            final_type.id()!=ID_struct)
         {
           err_location(declaration.type());
-          throw "declaration in compound does not declare anything";
+          throw "member declaration does not declare anything";
         }
 
-        convert_compound_ano_union(
+        convert_anon_struct_union_member(
           declaration, access, components);
 
         continue;
@@ -1002,11 +1002,11 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
         // Skip the constructors until all the data members
         // are discovered
         if(declaration.is_destructor())
-          found_dtor = true;
+          found_dtor=true;
 
         if(declaration.is_constructor())
         {
-          found_ctor = true;
+          found_ctor=true;
           continue;
         }
 
@@ -1358,7 +1358,7 @@ void cpp_typecheckt::adjust_method_type(
 
 /*******************************************************************\
 
-Function: cpp_typecheckt::convert_compound_ano_union
+Function: cpp_typecheckt::convert_anon_struct_union_member
 
 Inputs:
 
@@ -1368,77 +1368,87 @@ Purpose:
 
 \*******************************************************************/
 
-void cpp_typecheckt::convert_compound_ano_union(
+void cpp_typecheckt::convert_anon_struct_union_member(
   const cpp_declarationt &declaration,
   const irep_idt &access,
   struct_typet::componentst &components)
 {
-  symbolt &union_symbol =
+  symbolt &struct_union_symbol=
     context.symbols[follow(declaration.type()).get(ID_name)];
 
-  if(declaration.storage_spec().is_static()
-     || declaration.storage_spec().is_mutable())
+  if(declaration.storage_spec().is_static() ||
+     declaration.storage_spec().is_mutable())
   {
-    err_location(union_symbol.type.location());
+    err_location(struct_union_symbol.type.location());
     throw "storage class is not allowed here";
   }
 
-  // unnamed object
-  irep_idt base_name = "#anon"+i2string(anon_counter++);
+  if(!cpp_is_pod(struct_union_symbol.type))
+  {
+    err_location(struct_union_symbol.type.location());
+    str << "anonymous struct/union member is not POD";
+    throw 0;
+  }
+
+  // produce an anonymous member
+  irep_idt base_name="#anon_member"+i2string(anon_counter++);
+
   irep_idt identifier=
-  cpp_identifier_prefix(current_mode)+"::"+
-  cpp_scopes.current_scope().prefix+
-  base_name.c_str();
+    cpp_identifier_prefix(current_mode)+"::"+
+    cpp_scopes.current_scope().prefix+
+    base_name.c_str();
 
   typet symbol_type(ID_symbol);
-  symbol_type.set(ID_identifier, union_symbol.name);
+  symbol_type.set(ID_identifier, struct_union_symbol.name);
 
   struct_typet::componentt component;
   component.set(ID_name, identifier);
-  component.type() = symbol_type;
+  component.type()=symbol_type;
   component.set(ID_access, access);
   component.set(ID_base_name, base_name);
   component.set(ID_pretty_name, base_name);
 
   components.push_back(component);
-
-  if(!cpp_is_pod(union_symbol.type))
-  {
-    err_location(union_symbol.type.location());
-    str << "anonymous union is not POD";
-    throw 0;
-  }
+  
+  const struct_union_typet &struct_union_type=
+    to_struct_union_type(follow(declaration.type()));
+    
+  const struct_union_typet::componentst &struct_union_components=
+    struct_union_type.components();
 
   // do scoping
-  forall_irep(it, union_symbol.type.add(ID_components).get_sub())
+  for(struct_union_typet::componentst::const_iterator
+      it=struct_union_components.begin();
+      it!=struct_union_components.end();
+      it++)
   {
-    if(it->find(ID_type).id()==ID_code)
+    if(it->type().id()==ID_code)
     {
-      err_location(union_symbol.type.location());
-      str << "anonymous union " << union_symbol.base_name
-          << " shall not have function members";
+      err_location(struct_union_symbol.type.location());
+      str << "anonymous struct/union member `" << struct_union_symbol.base_name
+          << "' shall not have function members";
       throw 0;
     }
 
-    const irep_idt& base_name = it->get(ID_base_name);
+    const irep_idt &base_name=it->get_base_name();
 
     if(cpp_scopes.current_scope().contains(base_name))
     {
-      err_location(union_symbol.type.location());
+      err_location(struct_union_symbol.type.location());
       str << "`" << base_name << "' already in scope";
       throw 0;
     }
 
     cpp_idt &id=cpp_scopes.current_scope().insert(base_name);
-    id.id_class = cpp_idt::SYMBOL;
+    id.id_class=cpp_idt::SYMBOL;
     id.identifier=it->get(ID_name);
-    id.class_identifier=union_symbol.name;
+    id.class_identifier=struct_union_symbol.name;
     id.is_member=true;
   }
   
   put_compound_into_scope(component);
 
-  union_symbol.type.set("#unnamed_object", base_name);
+  struct_union_symbol.type.set("#unnamed_object", base_name);
 }
 
 /*******************************************************************\
