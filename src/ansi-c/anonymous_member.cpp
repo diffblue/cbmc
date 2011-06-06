@@ -13,6 +13,41 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
+Function: make_member_expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+static exprt make_member_expr(
+  const exprt &struct_union,
+  const struct_union_typet::componentt &component,
+  const namespacet &ns)
+{
+  member_exprt result(
+    struct_union, component.get_name(), component.type());
+
+  if(struct_union.get_bool(ID_C_lvalue))
+    result.set(ID_C_lvalue, true);
+
+  // todo: should to typedef chains properly    
+  const typet &type=
+    ns.follow(struct_union.type());
+
+  if(result.get_bool(ID_C_constant) ||
+     type.get_bool(ID_C_constant) ||
+     struct_union.type().get_bool(ID_C_constant))
+    result.set(ID_C_constant, true);
+    
+  return result;
+}
+
+/*******************************************************************\
+
 Function: get_component_rec
 
   Inputs:
@@ -41,13 +76,13 @@ exprt get_component_rec(
   {
     if(it->get_name()==component_name)
     {
-      return member_exprt(struct_union, component_name);
+      return make_member_expr(struct_union, *it, ns);
     }
     else if(it->get_anonymous())
     {
-      exprt tmp1=member_exprt(struct_union, it->get_name(), it->type());
-      exprt tmp2=get_component_rec(tmp1, component_name, ns);
-      if(tmp2.is_not_nil()) return tmp2;
+      exprt tmp=make_member_expr(struct_union, *it, ns);
+      exprt result=get_component_rec(tmp, component_name, ns);
+      if(result.is_not_nil()) return result;
     }
   }
   
