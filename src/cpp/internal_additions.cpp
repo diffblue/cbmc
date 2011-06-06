@@ -135,10 +135,16 @@ void cpp_internal_additions(std::ostream &out)
   
   // Microsoft stuff
 
-  // type_info infrastructure -- the standard wants this to be in the
-  // std:: namespace, but MS has it in the root namespace
   if(config.ansi_c.mode==configt::ansi_ct::MODE_VISUAL_STUDIO)
+  {
+    // type_info infrastructure -- the standard wants this to be in the
+    // std:: namespace, but MS has it in the root namespace
     out << "class type_info;" << std::endl;
+    
+    // this is the return type of __uuidof(...),
+    // in the root namespace
+    out << "struct _GUID;" << std::endl;
+  }
     
   // MS ATL-related stuff
   if(config.ansi_c.mode==configt::ansi_ct::MODE_VISUAL_STUDIO)
