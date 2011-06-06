@@ -1,6 +1,6 @@
 /*******************************************************************\
 
-Module: C++ Language Type Checking
+Module: ANSI-C Language Type Checking
 
 Author: Daniel Kroening, kroening@kroening.com
 
