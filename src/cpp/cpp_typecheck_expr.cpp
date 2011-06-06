@@ -335,7 +335,9 @@ Purpose:
 
 void cpp_typecheckt::typecheck_expr_member(exprt &expr)
 {
-  typecheck_expr_member(expr, cpp_typecheck_fargst());
+  typecheck_expr_member(
+    expr,
+    cpp_typecheck_fargst());
 }
 
 /*******************************************************************\
@@ -1182,8 +1184,8 @@ void cpp_typecheckt::typecheck_expr_member(
     throw 0;
   }
 
-  add_implicit_dereference(expr.op0());
   exprt &op0=expr.op0();
+  add_implicit_dereference(op0);
 
   #ifdef CPP_SYSTEMC_EXTENSION
   if(expr.op0().type().id()==ID_signedbv ||
@@ -1206,7 +1208,7 @@ void cpp_typecheckt::typecheck_expr_member(
   }
 
   const irep_idt &struct_identifier=
-    op0.type().get(ID_identifier);
+    to_symbol_type(op0.type()).get_identifier();
 
   const symbolt &struct_symbol=lookup(struct_identifier);
 
@@ -1214,7 +1216,7 @@ void cpp_typecheckt::typecheck_expr_member(
      struct_symbol.type.id()==ID_incomplete_union)
   {
     err_location(expr);
-    str << "error: member operator got incomplete structure type "
+    str << "error: member operator got incomplete type "
            "on left hand side";
     throw 0;
   }
@@ -1223,18 +1225,19 @@ void cpp_typecheckt::typecheck_expr_member(
      struct_symbol.type.id()!=ID_union)
   {
     err_location(expr);
-    str << "error: member operator requires structure type "
+    str << "error: member operator requires struct/union type "
            "on left hand side but got `"
-    << to_string(struct_symbol.type) << "'";
+        << to_string(struct_symbol.type) << "'";
     throw 0;
   }
 
-  const struct_typet &type=to_struct_type(struct_symbol.type);
+  const struct_union_typet &type=
+    to_struct_union_type(struct_symbol.type);
 
   if(expr.find("component_cpp_name").is_not_nil())
   {
     cpp_namet component_cpp_name=
-      static_cast<const cpp_namet &>(expr.find("component_cpp_name"));
+      to_cpp_name(expr.find("component_cpp_name"));
 
     // get that scope
     cpp_save_scopet save_scope(cpp_scopes);
@@ -1291,12 +1294,13 @@ void cpp_typecheckt::typecheck_expr_member(
           throw 0;
         }
       }
-      expr = symbol_expr;
+
+      expr=symbol_expr;
       return;
     }
     else if(symbol_expr.id()==ID_constant)
     {
-      expr = symbol_expr;
+      expr=symbol_expr;
       return;
     }
 
@@ -1317,6 +1321,7 @@ void cpp_typecheckt::typecheck_expr_member(
          follow(expr.op0().type()).id()==ID_union);
 
   exprt member;
+
   if(get_component(expr.location(),
                    expr.op0(),
                    component_name,
