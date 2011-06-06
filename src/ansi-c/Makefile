@@ -7,7 +7,7 @@ SRC = c_typecast.cpp y.tab.cpp lex.yy.cpp ansi_c_parser.cpp \
       c_typecheck_expr.cpp c_typecheck_type.cpp string_constant.cpp \
       c_qualifiers.cpp c_typecheck_argc_argv.cpp ansi_c_parse_tree.cpp \
       preprocessor_line.cpp ansi_c_convert.cpp ansi_c_convert_type.cpp \
-      type2name.cpp cprover_library.cpp \
+      type2name.cpp cprover_library.cpp anonymous_member.cpp \
       printf_formatter.cpp internal_additions.cpp \
       ansi_c_declaration.cpp designator.cpp concatenate_strings.cpp \
       literals/parse_float.cpp literals/unescape_string.cpp \
