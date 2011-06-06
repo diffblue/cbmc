@@ -476,7 +476,7 @@ notif0
 notif1
 task
 C_little_endian #little_endian
-C_offset
+C_offset #offset
 C_tag_only_declaration #tag_only_declaration
 tag_symbol
 generate_block
