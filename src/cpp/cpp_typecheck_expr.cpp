@@ -1327,7 +1327,7 @@ void cpp_typecheckt::typecheck_expr_member(
                    component_name,
                    member))
   {
-    // because of possible anonymous unions
+    // because of possible anonymous members
     expr.swap(member);
   }
   else
