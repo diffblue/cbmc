@@ -884,6 +884,14 @@ void ansi_c_scanner_init()
                 }
 {ws}            { /* ignore */ }
 {newline}       { /* ignore */ }
+"<<"		{ loc(); return TOK_SHIFTLEFT; }
+">>"		{ loc(); return TOK_SHIFTRIGHT; }
+"<="		{ loc(); return TOK_LE; }
+">="		{ loc(); return TOK_GE; }
+"=="		{ loc(); return TOK_EQ; }
+"!="		{ loc(); return TOK_NE; }
+"&&"		{ loc(); return TOK_ANDAND; }
+"||"		{ loc(); return TOK_OROR; }
 .               { loc(); return yytext[0]; }
 }
 
