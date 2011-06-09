@@ -19,6 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "c_types.h"
 #include "c_typecheck_base.h"
 #include "string_constant.h"
+#include "anonymous_member.h"
 
 /*******************************************************************\
 
@@ -796,7 +797,8 @@ designatort c_typecheck_baset::make_designator(
               entry.type=tmp_type;
             }
             else if(c_it->get_anonymous() &&
-                    has_component_rec(c_it->type(), component_name))
+                    has_component_rec(
+                      c_it->type(), component_name, *this))
             {
               entry.index=number;
               entry.size=components.size();
