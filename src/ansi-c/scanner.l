@@ -76,7 +76,7 @@ digit		[0-9]
 bindigit	[01]
 octdigit	[0-7]
 hexdigit	[0-9a-fA-F]
-identifier	(({letter}|"_")({letter}|{digit}|"_"|"$")*)
+identifier	(({letter}|"_"|"$")({letter}|{digit}|"_"|"$")*)
 integer		{digit}+
 binary		{bindigit}+
 iw_suffix       ("i8"|"i16"|"i32"|"i64"|"i128")
