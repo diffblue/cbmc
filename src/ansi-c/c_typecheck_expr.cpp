@@ -25,6 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "c_typecheck_base.h"
 #include "c_sizeof.h"
 #include "string_constant.h"
+#include "anonymous_member.h"
 
 /*******************************************************************\
 
@@ -296,7 +297,7 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
         const struct_union_typet &struct_union_type=
           to_struct_union_type(type);
         
-        if(!has_component_rec(struct_union_type, component_name))
+        if(!has_component_rec(struct_union_type, component_name, *this))
         {
           err_location(expr);    
           throw "offset-of of member failed to find component `"+
@@ -320,7 +321,7 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
           }
           else if(c_it->get_anonymous())
           {
-            if(has_component_rec(c_it->type(), component_name))
+            if(has_component_rec(c_it->type(), component_name, *this))
             {
               typet tmp=follow(c_it->type());
               type=tmp;
@@ -1165,52 +1166,6 @@ Function: c_typecheck_baset::typecheck_expr_member
 
 \*******************************************************************/
 
-bool c_typecheck_baset::has_component_rec(
-  const typet &type,
-  const irep_idt &component_name)
-{
-  if(type.id()==ID_symbol)
-    return has_component_rec(follow(type), component_name);
-  else if(type.id()==ID_struct || type.id()==ID_union)
-  {
-    const struct_union_typet &struct_union_type=
-      to_struct_union_type(type);
-    
-    const struct_union_typet::componentst &components=
-      struct_union_type.components();
-
-    for(struct_union_typet::componentst::const_iterator
-        it=components.begin();
-        it!=components.end();
-        it++)
-    {
-      if(it->get_name()==component_name)
-        return true;
-      else if(it->get_anonymous())
-      {
-        if(has_component_rec(it->type(), component_name))
-          return true;
-      }
-    }
-    
-    return false;
-  }
-  else
-    return false;
-}
-
-/*******************************************************************\
-
-Function: c_typecheck_baset::typecheck_expr_member
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void c_typecheck_baset::typecheck_expr_member(exprt &expr)
 {
   if(expr.operands().size()!=1)
@@ -1249,58 +1204,44 @@ void c_typecheck_baset::typecheck_expr_member(exprt &expr)
   const irep_idt &component_name=
     expr.get(ID_component_name);
 
-  const struct_union_typet::componentst &components=
-    struct_union_type.components();
-
-  struct_union_typet::componentt component;
-
-  component.make_nil();
-
   // first try to find directly
-
-  for(struct_union_typet::componentst::const_iterator
-      it=components.begin();
-      it!=components.end();
-      it++)
-  {
-    if(it->get_name()==component_name)
-    {
-      component=*it;
-      break;
-    }
-  }
+  struct_union_typet::componentt component=
+    struct_union_type.get_component(component_name);
 
   // if that fails, search the anonymous members
 
   if(component.is_nil())
   {
-    for(struct_union_typet::componentst::const_iterator
-        it=components.begin();
-        it!=components.end();
-        it++)
-    {
-      // look into anonymous members, possibly recursively
-      if(it->get_anonymous() &&
-         has_component_rec(it->type(), component_name))
-      {
-        // re-write, this is a bit wasteful
-        member_exprt tmp;
-        tmp.set_component_name(it->get_name());
-        tmp.op0()=expr.op0();
-        typecheck_expr_member(tmp);
-        expr.op0().swap(tmp);
-        typecheck_expr_member(expr);
-        return;
-      }
-    }
+    exprt tmp=get_component_rec(op0, component_name, *this);
 
-    // give up
-    err_location(expr);
-    str << "member `" << component_name
-        << "' not found in `"
-        << to_string(type) << "'";
-    throw 0;
+    if(tmp.is_nil())
+    {
+      // give up
+      err_location(expr);
+      str << "member `" << component_name
+          << "' not found in `"
+          << to_string(type) << "'";
+      throw 0;
+    }
+    
+    // done!
+    expr.swap(tmp);
+    return;
   }
+
+  expr.type()=component.type();
+
+  if(op0.get_bool(ID_C_lvalue))
+    expr.set(ID_C_lvalue, true);
+
+  if(op0.get_bool(ID_C_constant) || type.get_bool(ID_C_constant))
+    expr.set(ID_C_constant, true);
+
+  // copy method identifier
+  const irep_idt &identifier=component.get(ID_C_identifier);
+
+  if(identifier!=irep_idt())
+    expr.set(ID_C_identifier, identifier);
 
   const irep_idt &access=component.get_access();
 
@@ -1311,20 +1252,6 @@ void c_typecheck_baset::typecheck_expr_member(exprt &expr)
         << "' is " << access;
     throw 0;
   }
-
-  expr.type()=component.type();
-
-  if(op0.get_bool(ID_C_lvalue))
-    expr.set(ID_C_lvalue, true);
-
-  if(op0.get_bool(ID_C_constant))
-    expr.set(ID_C_constant, true);
-
-  // copy method identifier
-  const irep_idt &identifier=component.get(ID_C_identifier);
-
-  if(identifier!=irep_idt())
-    expr.set(ID_C_identifier, identifier);
 }
 
 /*******************************************************************\

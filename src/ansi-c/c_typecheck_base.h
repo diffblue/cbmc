@@ -199,7 +199,6 @@ protected:
   virtual void typecheck_expr_address_of(exprt &expr);
   virtual void typecheck_expr_dereference(exprt &expr);
   virtual void typecheck_expr_member(exprt &expr);
-  bool has_component_rec(const typet &type, const irep_idt &component_name);
   virtual void typecheck_expr_ptrmember(exprt &expr);
   virtual void typecheck_expr_rel(exprt &expr);
   virtual void adjust_float_rel(exprt &expr);
