@@ -20,6 +20,12 @@ Date: June 2006
 #include <dirent.h>
 #endif
 
+#ifdef __CYGWIN__
+#include <unistd.h>
+#include <errno.h>
+#include <dirent.h>
+#endif
+
 #include <fstream>
 #include <sstream>
 
