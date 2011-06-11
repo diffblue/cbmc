@@ -51,7 +51,7 @@ void cpp_scanner_init()
 }
 %}
 
-identifier [a-zA-Z_][0-9a-zA-Z_$]*
+identifier [a-zA-Z_$][0-9a-zA-Z_$]*
 
 exponent_part [eE][-+]?[0-9]+
 fractional_constant ([0-9]*"."[0-9]+)|([0-9]+".")
