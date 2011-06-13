@@ -33,6 +33,7 @@ Function: goto_inlinet::parameter_assignments
 
 void goto_inlinet::parameter_assignments(
   const locationt &location,
+  const irep_idt &function_name,
   const code_typet &code_type,
   const exprt::operandst &arguments,
   goto_programt &dest)
@@ -77,7 +78,7 @@ void goto_inlinet::parameter_assignments(
       decl->code=code_declt(symbol_expr(symbol));
       decl->code.location()=location;
       decl->location=location;
-      decl->function=location.get_function(); 
+      decl->function=function_name; 
     }
 
     // nil means "don't assign"
@@ -135,7 +136,7 @@ void goto_inlinet::parameter_assignments(
       dest.add_instruction(ASSIGN);
       dest.instructions.back().location=location;
       dest.instructions.back().code.swap(assignment);
-      dest.instructions.back().function=location.get_function();      
+      dest.instructions.back().function=function_name;      
     }
 
     it1++;
@@ -194,7 +195,7 @@ void goto_inlinet::replace_return(
 
         assignment->code=code_assign;
         assignment->location=it->location;
-        assignment->function=it->location.get_function();
+        assignment->function=it->function;
         
         if(constrain.is_not_nil() && !constrain.is_true())
         {
@@ -215,7 +216,7 @@ void goto_inlinet::replace_return(
         expression->code=codet(ID_expression);
         expression->code.move_to_operands(it->code.op0());
         expression->location=it->location;
-        expression->function=it->location.get_function();
+        expression->function=it->function;
         
         dest.insert_before_swap(it, *expression);
         it++;
@@ -366,7 +367,7 @@ void goto_inlinet::expand_function_call(
     replace_return(tmp2, lhs, constrain);
 
     goto_programt tmp;
-    parameter_assignments(tmp2.instructions.front().location, f.type, arguments, tmp);
+    parameter_assignments(tmp2.instructions.front().location, identifier, f.type, arguments, tmp);
     tmp.destructive_append(tmp2);
 
     if(f.type.get_bool("#hide"))
@@ -380,7 +381,7 @@ void goto_inlinet::expand_function_call(
           replace_location(it->location, new_location);
           replace_location(it->guard, new_location);
           replace_location(it->code, new_location);
-          it->function=new_location.get_function();
+          it->function=target->function;
         }
       }
     }
@@ -416,7 +417,7 @@ void goto_inlinet::expand_function_call(
       goto_programt::targett t=tmp.add_instruction();
       t->make_other();
       t->location=target->location;
-      t->function=target->location.get_function();
+      t->function=target->function;
       t->code=codet(ID_expression);
       t->code.copy_to_operands(*it);
     }
@@ -433,7 +434,7 @@ void goto_inlinet::expand_function_call(
     
       goto_programt::targett t=tmp.add_instruction(ASSIGN);
       t->location=target->location;
-      t->function=target->location.get_function();
+      t->function=target->function;
       t->code.swap(code);
     }
 
