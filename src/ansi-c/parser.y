@@ -2260,7 +2260,7 @@ paren_postfix_typedef_declarator:	/* Declarator */
 simple_paren_typedef_declarator:
 	  typedef_name
 	| '(' simple_paren_typedef_declarator ')'
-	{ $$ = $3; }
+	{ $$ = $2; }
 	;
 
 identifier_declarator:
