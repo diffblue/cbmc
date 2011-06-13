@@ -1,7 +1,7 @@
 What architecture?
 ------------------
 
-CPROVER compiles with in the following environments:
+CPROVER compiles in the following environments:
 - Linux
 - MacOS X
 - Cygwin (using -mno-cygwin)
@@ -16,8 +16,14 @@ How to compile?
 
 Follow these instructions:
 
-1) You need a SAT solver (in source). We recommend MiniSat2, which
-   can be downloaded at
+0) You need a C/C++ compiler, Flex and Bison, and GNU make.
+
+1) You need a SAT solver (in source). We recommend MiniSat2. Many
+   Linux distributions now have a package for MiniSat2; e.g.,
+   try "apt-get install minisat2" on Debian-like distributions.
+
+   Alternatively, the source of MiniSat2 can be be downloaded at
+   the following address:
 
    http://minisat.se/downloads/minisat-2.2.0.tar.gz
 
@@ -29,15 +35,15 @@ Follow these instructions:
 2) Adjust src/config.inc for the paths to a).
 
 3) Adjust src/solvers/sat/satcheck.h to select which SAT solver to use
-   as the default.
+   (MiniSat2 with simplifier is the default).
 
 4) Adjust the file src/utils/hash_cont.h
 
    Depending on the version of your STL, you need to adjust a preprocessor
    command:
-   a) Recent versions of Linux run with STL_HASH_TR1.
+   a) Recent versions of Linux run with "STL_HASH_TR1".
    b) Cygwin requires "STL_HASH_GNU".
-   c) Visual Studio: please get Visual Studio 10 and use STL_HASH_TR1.
+   c) Visual Studio: please get Visual Studio 10 and use "STL_HASH_TR1".
 
 5) Recent versions of Cygwin have issues with MingW support; specifically,
    the linker fails to find crt2.o. Do the following to fix this before
