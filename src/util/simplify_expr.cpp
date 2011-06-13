@@ -168,7 +168,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
 
     // preserve the sizeof type annotation
     typet c_sizeof_type=
-      static_cast<const typet &>(operand.find("#c_sizeof_type"));
+      static_cast<const typet &>(operand.find(ID_C_c_sizeof_type));
       
     if(op_type_id==ID_integer ||
        op_type_id==ID_natural ||
@@ -275,7 +275,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
         expr.swap(new_expr);
 
         if(c_sizeof_type.is_not_nil())
-          expr.set("#c_sizeof_type", c_sizeof_type);
+          expr.set(ID_c_sizeof_type, c_sizeof_type);
 
         return false;
       }
@@ -786,6 +786,8 @@ bool simplify_exprt::simplify_multiplication(exprt &expr)
 
   // true if we have found a constant
   bool found = false;
+  
+  typet c_sizeof_type=nil_typet();
 
   // scan all the operands
   for(exprt::operandst::iterator it=operands.begin();
@@ -807,8 +809,13 @@ bool simplify_exprt::simplify_multiplication(exprt &expr)
     bool do_erase = false;
 
     // if this is a constant of the same time as the result
-    if(it->is_constant() && it->type() == expr.type())
+    if(it->is_constant() && it->type()==expr.type())
     {
+      // preserve the sizeof type annotation
+      if(c_sizeof_type.is_nil())
+        c_sizeof_type=
+          static_cast<const typet &>(operand.find(ID_C_c_sizeof_type));
+
       if(found)
       {
 	// update the constant factor
@@ -817,20 +824,25 @@ bool simplify_exprt::simplify_multiplication(exprt &expr)
       else
       {
 	// set it as the constant factor if this is the first
-	constant = it;
-	found = true;
+	constant=it;
+	found=true;
       }
     }
 
     // erase the factor if necessary
     if(do_erase)
     {
-      it = operands.erase(it);
+      it=operands.erase(it);
       result = false;
     }
     else
-     // move to the next operand
-     it++;
+      it++; // move to the next operand
+  }
+  
+  if(c_sizeof_type.is_not_nil())
+  {
+    assert(found);
+    constant->set(ID_C_c_sizeof_type, c_sizeof_type);
   }
 
   if(operands.size()==1)
