@@ -50,10 +50,10 @@ protected:
   bool empty_clause_added;
 };
 
-class satcheck_minisatt:public satcheck_minisat_baset
+class satcheck_minisat_coret:public satcheck_minisat_baset
 {
 public:
-  satcheck_minisatt();
+  satcheck_minisat_coret();
   virtual const std::string solver_text();
 };
 
