@@ -99,7 +99,7 @@ const std::string satcheck_minisat_baset::solver_text()
 
 /*******************************************************************\
 
-Function: satcheck_minisatt::solver_text
+Function: satcheck_minisat_coret::solver_text
 
   Inputs:
 
@@ -109,7 +109,7 @@ Function: satcheck_minisatt::solver_text
 
 \*******************************************************************/
 
-const std::string satcheck_minisatt::solver_text()
+const std::string satcheck_minisat_coret::solver_text()
 {
   return "MiniSAT2 without simplifier";
 }
@@ -276,7 +276,7 @@ void satcheck_minisat_baset::set_assignment(literalt a, bool value)
 
 /*******************************************************************\
 
-Function: satcheck_minisatt::satcheck_minisatt
+Function: satcheck_minisat_coret::satcheck_minisatt
 
   Inputs:
 
@@ -286,14 +286,14 @@ Function: satcheck_minisatt::satcheck_minisatt
 
 \*******************************************************************/
 
-satcheck_minisatt::satcheck_minisatt()
+satcheck_minisat_coret::satcheck_minisat_coret()
 {
   solver=new Minisat::Solver;
 }
 
 /*******************************************************************\
 
-Function: satcheck_minisatt::satcheck_minisat_simpt
+Function: satcheck_minisat_simpt::satcheck_minisat_simpt
 
   Inputs:
 
