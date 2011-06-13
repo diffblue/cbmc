@@ -65,6 +65,7 @@ protected:
     
   void parameter_assignments(
     const locationt &location,
+    const irep_idt &function_name,
     const code_typet &code_type,
     const exprt::operandst &arguments,
     goto_programt &dest);
