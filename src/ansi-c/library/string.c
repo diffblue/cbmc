@@ -96,7 +96,7 @@ inline char *strncpy(char *dst, const char *src, size_t n)
 
 inline char *strcat(char *dst, const char *src)
 {
-  __CPROVER_HIDE:
+  __CPROVER_HIDE:;
   #ifdef __CPROVER_STRING_ABSTRACTION
   size_t new_size;
   __CPROVER_assert(__CPROVER_is_zero_string(dst), "strcat zero-termination of 1st argument");
@@ -139,7 +139,7 @@ inline char *strcat(char *dst, const char *src)
 
 inline char *strncat(char *dst, const char *src, size_t n)
 {
-  __CPROVER_HIDE:
+  __CPROVER_HIDE:;
   #ifdef __CPROVER_STRING_ABSTRACTION
   size_t additional, new_size;
   __CPROVER_assert(__CPROVER_is_zero_string(dst), "strncat zero-termination of 1st argument");
@@ -209,7 +209,7 @@ inline int strcmp(const char *s1, const char *s2)
 
 inline int strncmp(const char *s1, const char *s2, size_t n)
 {
-  __CPROVER_HIDE:
+  __CPROVER_HIDE:;
   if(s1!=0 && s1==s2) return 0;
   #ifdef __CPROVER_STRING_ABSTRACTION
   __CPROVER_assert(__CPROVER_is_zero_string(s1) || __CPROVER_buffer_size(s1)>=n, "strncmp zero-termination of 1st argument");
@@ -229,7 +229,7 @@ inline int strncmp(const char *s1, const char *s2, size_t n)
 
 inline size_t strlen(const char *s)
 {
-  __CPROVER_HIDE:
+  __CPROVER_HIDE:;
   #ifdef __CPROVER_STRING_ABSTRACTION
   __CPROVER_assert(__CPROVER_is_zero_string(s), "strlen zero-termination");
   return __CPROVER_zero_string_length(s);
