@@ -13,7 +13,9 @@
 
 #define PINF (std::numeric_limits<float>::infinity())
 #define NINF (-std::numeric_limits<float>::infinity())
+#ifndef NZERO
 #define NZERO (-0.0f)
+#endif
 #define PZERO (0.0f)
 
 #ifndef NAN
