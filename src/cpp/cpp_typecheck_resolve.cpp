@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <ansi-c/c_types.h>
 #include <ansi-c/ansi_c_expr.h>
+#include <ansi-c/anonymous_member.h>
 
 #include "cpp_typecheck.h"
 #include "cpp_typecheck_resolve.h"
@@ -334,7 +335,8 @@ exprt cpp_typecheck_resolvet::convert_identifier(
     }
     else if(identifier.id_class==cpp_scopet::SYMBOL)
     {
-      // A non-static, non-type member. There has to be an object.
+      // A non-static, non-type member.
+      // There has to be an object.
       e=exprt(ID_member);
       e.set(ID_component_name, identifier.identifier);
       e.location()=location;
@@ -348,26 +350,7 @@ exprt cpp_typecheck_resolvet::convert_identifier(
                 << cpp_typecheck.cpp_scopes.current_scope().this_class_identifier << std::endl;
       #endif
       
-      // find the object of the member expression
-      if(compound_symbol.type.find("#unnamed_object").is_not_nil())
-      {
-        cpp_scopet::id_sett id_set;
-
-        cpp_typecheck.cpp_scopes.current_scope().lookup(
-          compound_symbol.type.get("#unnamed_object"),
-          cpp_scopet::RECURSIVE,
-          id_set);
-
-        assert(id_set.size()==1);
-
-        // recursive call        
-        object=convert_identifier(
-          **(id_set.begin()),
-          VAR, fargs);
-
-        assert(object.is_not_nil());
-      }
-      else if(fargs.has_object)
+      if(fargs.has_object)
       {
         // the object is given to us in fargs
         assert(!fargs.operands.empty());
@@ -391,10 +374,11 @@ exprt cpp_typecheck_resolvet::convert_identifier(
       if(object_type.id()==ID_struct || 
          object_type.id()==ID_union)
       {
-        const struct_union_typet &object_struct=to_struct_union_type(object_type);
-
-        if(object_struct.get_component(identifier.identifier).is_nil())
-          object.make_nil();
+        if(!has_component_rec(
+             to_struct_union_type(object_type),
+             identifier.identifier,
+             cpp_typecheck))
+          object.make_nil(); // failed!
       }
       else
         object.make_nil();

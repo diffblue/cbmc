@@ -757,9 +757,9 @@ void cpp_typecheckt::put_compound_into_scope(
         id_it++)
     {
       const cpp_idt &id=**id_it;
+
       // the name is already in the scope
       // this is ok if they belong to different categories
-
       if(!id.is_class() && !id.is_enum())
       {
         err_location(compound);
@@ -1358,6 +1358,71 @@ void cpp_typecheckt::adjust_method_type(
 
 /*******************************************************************\
 
+Function: cpp_typecheckt::add_anonymous_members_to_scope
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
+void cpp_typecheckt::add_anonymous_members_to_scope(
+  const symbolt &struct_union_symbol)
+{
+  const struct_union_typet &struct_union_type=
+    to_struct_union_type(struct_union_symbol.type);
+
+  const struct_union_typet::componentst &struct_union_components=
+    struct_union_type.components();
+
+  // do scoping -- the members of the struct/union
+  // should be visible in the containing struct/union,
+  // and that recursively!
+
+  for(struct_union_typet::componentst::const_iterator
+      it=struct_union_components.begin();
+      it!=struct_union_components.end();
+      it++)
+  {
+    if(it->type().id()==ID_code)
+    {
+      err_location(struct_union_symbol.type.location());
+      str << "anonymous struct/union member `"
+          << struct_union_symbol.base_name
+          << "' shall not have function members";
+      throw 0;
+    }
+
+    if(it->get_anonymous())
+    {
+      const symbolt &symbol=lookup(it->type().get(ID_identifier));
+      // recrusive call
+      add_anonymous_members_to_scope(symbol);
+    }
+    else
+    {
+      const irep_idt &base_name=it->get_base_name();
+
+      if(cpp_scopes.current_scope().contains(base_name))
+      {
+        err_location(*it);
+        str << "`" << base_name << "' already in scope";
+        throw 0;
+      }
+      
+      cpp_idt &id=cpp_scopes.current_scope().insert(base_name);
+      id.id_class=cpp_idt::SYMBOL;
+      id.identifier=it->get(ID_name);
+      id.class_identifier=struct_union_symbol.name;
+      id.is_member=true;
+    }
+  }
+}
+
+/*******************************************************************\
+
 Function: cpp_typecheckt::convert_anon_struct_union_member
 
 Inputs:
@@ -1391,7 +1456,7 @@ void cpp_typecheckt::convert_anon_struct_union_member(
   }
 
   // produce an anonymous member
-  irep_idt base_name="#anon_member"+i2string(anon_counter++);
+  irep_idt base_name="#anon_member"+i2string(components.size());
 
   irep_idt identifier=
     cpp_identifier_prefix(current_mode)+"::"+
@@ -1404,48 +1469,16 @@ void cpp_typecheckt::convert_anon_struct_union_member(
   struct_typet::componentt component;
   component.set(ID_name, identifier);
   component.type()=symbol_type;
-  component.set(ID_access, access);
-  component.set(ID_base_name, base_name);
-  component.set(ID_pretty_name, base_name);
+  component.set_access(access);
+  component.set_base_name(base_name);
+  component.set_pretty_name(base_name);
+  component.set_anonymous(true);
+  component.location()=declaration.location();
 
   components.push_back(component);
   
-  const struct_union_typet &struct_union_type=
-    to_struct_union_type(follow(declaration.type()));
+  add_anonymous_members_to_scope(struct_union_symbol);
     
-  const struct_union_typet::componentst &struct_union_components=
-    struct_union_type.components();
-
-  // do scoping
-  for(struct_union_typet::componentst::const_iterator
-      it=struct_union_components.begin();
-      it!=struct_union_components.end();
-      it++)
-  {
-    if(it->type().id()==ID_code)
-    {
-      err_location(struct_union_symbol.type.location());
-      str << "anonymous struct/union member `" << struct_union_symbol.base_name
-          << "' shall not have function members";
-      throw 0;
-    }
-
-    const irep_idt &base_name=it->get_base_name();
-
-    if(cpp_scopes.current_scope().contains(base_name))
-    {
-      err_location(struct_union_symbol.type.location());
-      str << "`" << base_name << "' already in scope";
-      throw 0;
-    }
-
-    cpp_idt &id=cpp_scopes.current_scope().insert(base_name);
-    id.id_class=cpp_idt::SYMBOL;
-    id.identifier=it->get(ID_name);
-    id.class_identifier=struct_union_symbol.name;
-    id.is_member=true;
-  }
-  
   put_compound_into_scope(component);
 
   struct_union_symbol.type.set("#unnamed_object", base_name);
