@@ -376,6 +376,7 @@ protected:
   void typecheck_enum_body(symbolt &symbol);
   void typecheck_function_bodies();
   void typecheck_compound_bases(struct_typet &type);
+  void add_anonymous_members_to_scope(const symbolt &struct_union_symbol);
 
   void move_member_initializers(
     irept &initializers,
