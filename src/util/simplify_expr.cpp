@@ -275,7 +275,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
         expr.swap(new_expr);
 
         if(c_sizeof_type.is_not_nil())
-          expr.set(ID_c_sizeof_type, c_sizeof_type);
+          expr.set(ID_C_c_sizeof_type, c_sizeof_type);
 
         return false;
       }
@@ -814,7 +814,7 @@ bool simplify_exprt::simplify_multiplication(exprt &expr)
       // preserve the sizeof type annotation
       if(c_sizeof_type.is_nil())
         c_sizeof_type=
-          static_cast<const typet &>(operand.find(ID_C_c_sizeof_type));
+          static_cast<const typet &>(it->find(ID_C_c_sizeof_type));
 
       if(found)
       {
