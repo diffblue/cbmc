@@ -1146,7 +1146,15 @@ gcc_type_attribute_opt:
         {
           init($$);
         }
-        | gcc_type_attribute
+        | gcc_type_attribute_list
+        ;
+
+gcc_type_attribute_list:
+          gcc_type_attribute
+        | gcc_type_attribute_list gcc_type_attribute
+        {
+          merge_types($1, $2);
+        }
         ;
 
 gcc_type_attribute:
