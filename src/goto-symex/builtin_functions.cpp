@@ -32,7 +32,7 @@ Function: basic_symext::symex_malloc
 
 inline static typet c_sizeof_type(const exprt &expr)
 {
-  return static_cast<const typet &>(expr.find("#c_sizeof_type"));
+  return static_cast<const typet &>(expr.find(ID_C_c_sizeof_type));
 }
 
 void basic_symext::symex_malloc(
