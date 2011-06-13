@@ -1639,8 +1639,8 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
 
   exprt &f_op=expr.function();
 
-  // f_op is not yet typechecked, in contrast to the other arguments
-  // this is a big special case
+  // f_op is not yet typechecked, in contrast to the other arguments.
+  // This is a big special case!
 
   if(f_op.id()==ID_symbol)
   {
@@ -1648,9 +1648,17 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
 
     if(context.symbols.find(f_op.get(ID_identifier))==context.symbols.end())
     {
-      // maybe this is an undeclared function
-      // let's just add it
+      // This is an undeclared function. Let's just add it.
       const irep_idt &identifier=f_op.get(ID_identifier);
+
+      // We do a bit of return-type guessing, but just a bit
+      typet return_type=int_type();
+      
+      if(identifier=="c::malloc" ||
+         identifier=="c::realloc" ||
+         identifier=="c::reallocf" ||
+         identifier=="c::valloc")
+        return_type=pointer_typet(empty_typet()); // void *
 
       symbolt new_symbol;
 
@@ -1659,8 +1667,9 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
       new_symbol.location=expr.location();
       new_symbol.type=code_typet();
       new_symbol.type.set("#incomplete", true);
-      new_symbol.type.add(ID_return_type)=int_type();
-      // TODO: should add arguments
+      new_symbol.type.add(ID_return_type)=return_type;
+
+      // TODO: should also guess some argument types
 
       symbolt *symbol_ptr;
       move_symbol(new_symbol, symbol_ptr);
