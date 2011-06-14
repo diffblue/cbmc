@@ -212,7 +212,7 @@ bool c_preprocess_visual_studio(
 
     if(config.ansi_c.pointer_width==64)
     {
-      command_file << "/D__PTRDIFF_TYPE__=long long int"  << std::endl;
+      command_file << "\"/D__PTRDIFF_TYPE__=long long int\""  << std::endl;
       // yes, both _WIN32 and _WIN64 get defined
       command_file << "/D_WIN64" << std::endl;
     }
