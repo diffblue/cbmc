@@ -13,4 +13,12 @@ BOOL QueryPerformanceFrequency(LARGE_INTEGER *lpFrequency)
   return 1;
 }
 
-          
+/* FUNCTION: ExitThread */
+
+#include <windows.h>
+
+VOID ExitThread(DWORD dwExitCode)
+{
+  // never returns
+  __CPROVER_assume(0);
+}
