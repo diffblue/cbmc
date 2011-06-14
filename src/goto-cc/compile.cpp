@@ -14,6 +14,12 @@ Date: June 2006
 #include <dirent.h>
 #endif
 
+#ifdef __FreeBSD_kernel__
+#include <unistd.h>
+#include <errno.h>
+#include <dirent.h>
+#endif
+
 #ifdef __MACH__
 #include <unistd.h>
 #include <errno.h>
