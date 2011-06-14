@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <arith_tools.h>
 #include <cprover_prefix.h>
 #include <std_types.h>
+#include <pointer_offset_size.h>
 
 #include <ansi-c/c_types.h>
 
@@ -49,36 +50,35 @@ void basic_symext::symex_malloc(
   dynamic_counter++;
   
   exprt size=code.op0();
-  typet object_type;
+  typet object_type=nil_typet();
   
   {
     exprt tmp_size=size;
     state.rename(tmp_size, ns); // to allow constant propagation
 
-    // is this a product?
-    // we catch the case sizeof(type)*number
-    if(tmp_size.id()==ID_mult && tmp_size.operands().size()==2)
+    typet tmp_type=c_sizeof_type(tmp_size);
+
+    if(tmp_type.is_not_nil())
     {
-      typet type=nil_typet();
-      exprt size;
-      
-      if(c_sizeof_type(tmp_size.op0()).is_not_nil())
+      // Did the size get multiplied?
+      mp_integer elem_size=pointer_offset_size(ns, tmp_type);
+      mp_integer alloc_size;
+      if(elem_size<1 || to_integer(tmp_size, alloc_size))
       {
-        object_type=array_typet(
-          c_sizeof_type(tmp_size.op0()),
-          tmp_size.op1());
-      }
-      else if(c_sizeof_type(tmp_size.op1()).is_not_nil())
-      {
-        object_type=array_typet(
-          c_sizeof_type(tmp_size.op1()),
-          tmp_size.op0());
       }
       else
-        object_type.make_nil();
+      {
+        if(alloc_size==elem_size)
+          object_type=tmp_type;
+        else
+        {
+          mp_integer elements=alloc_size/elem_size;
+          
+          if(elements*elem_size==alloc_size)
+            object_type=array_typet(tmp_type, from_integer(elements, tmp_size.type()));
+        }
+      }
     }
-    else
-      object_type=c_sizeof_type(tmp_size);
 
     if(object_type.is_nil())
       object_type=array_typet(uchar_type(), tmp_size);
