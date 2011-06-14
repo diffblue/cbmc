@@ -57,7 +57,7 @@ dpkg -b debian cbmc_${VERSION}_${DEB_ARCH}.deb
 echo Copying.
 scp cbmc-${VERSION_FILE}-linux-${BITS}.tgz \
     cbmc_${VERSION}_${DEB_ARCH}.deb \
-  kroening@dkr0.inf.ethz.ch:/home/www/cprover.org/cbmc/download/
+  kroening@dkr-srv.comlab.ox.ac.uk:/srv/www/cprover.org/cbmc/download/
 
 cd /tmp
 rm -R /tmp/cbmc-dist
