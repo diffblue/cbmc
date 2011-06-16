@@ -624,10 +624,13 @@ void c_typecastt::implicit_typecast_arithmetic(
   // an unsigned int."
   
   // The second case can arise if we promote an unsigned int, or
-  // if sizeof(short)=sizeof(int),and we are promoting an unsigned short.
+  // an unsigned type that is as large as unsigned int.
 
   if(config.ansi_c.short_int_width==config.ansi_c.int_width &&
      max_type==USHORT)
+    max_type=UINT;
+  else if(config.ansi_c.char_width==config.ansi_c.int_width &&
+          max_type==UCHAR)
     max_type=UINT;
   else
     max_type=std::max(max_type, INT);
