@@ -222,8 +222,26 @@ void cpp_typecheckt::typecheck_type(typet &type)
     {
       typet tmp_type=
         static_cast<const typet &>(type.find(ID_type_arg));
-      typecheck_type(tmp_type);
-      type=tmp_type;
+
+      if(tmp_type.id()==ID_cpp_name)
+      {
+        // this may be ambiguous -- it can be either a type or
+        // an expression
+
+        cpp_typecheck_fargst fargs;
+
+        exprt symbol_expr=resolve(
+          to_cpp_name(static_cast<const irept &>(tmp_type)),
+          cpp_typecheck_resolvet::BOTH,
+          fargs);
+
+        type=symbol_expr.type();
+      }
+      else
+      {
+        typecheck_type(tmp_type);
+        type=tmp_type;
+      }
     }
     else
     {
