@@ -2763,7 +2763,6 @@ bool Parser::rTemplateArgs(irept &template_args)
         exp.id("ambiguous");
       lex->Restore(pos);
       rTypeName(a);
-
     }
     else
     {
@@ -2797,6 +2796,8 @@ bool Parser::rTemplateArgs(irept &template_args)
      case TOK_ShiftOp:
       if(tk2.text[0]=='>')
       {
+        // the newer C++ standards frown on this!
+
         // turn >> into > > // TODO
         //lex->GetOnlyClosingBracket(tk2);
         //temp_args=Ptree::List(new Leaf(tk1), args,
