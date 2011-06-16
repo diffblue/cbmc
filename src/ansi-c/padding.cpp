@@ -131,4 +131,38 @@ void add_padding(struct_typet &type, const namespacet &ns)
     mp_integer size=pointer_offset_size(ns, it_type);
     offset+=size;
   }
+  
+  // there may be a need for 'end of struct' padding
+
+  if(!components.empty())
+  {
+    struct_typet::componentt &c=components.front();
+
+    unsigned a=1;
+
+    if(!c.get_is_bit_field())
+      a=alignment(c.type(), ns);
+
+    if(a!=1)
+    {
+      // we may need to align it
+      unsigned displacement=integer2long(offset%a);
+
+      if(displacement!=0)
+      {
+        unsigned pad=a-displacement;
+      
+        unsignedbv_typet padding_type;
+        padding_type.set_width(pad*8);
+        
+        struct_typet::componentt component;
+        component.type()=padding_type;
+        component.set_name("$pad"+i2string(padding_counter++));
+        component.set_is_padding(true);
+        
+        components.push_back(component);
+      }
+    }
+    
+  }  
 }
