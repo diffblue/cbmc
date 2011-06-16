@@ -169,6 +169,16 @@ public:
     {
       return set(ID_C_is_padding, is_padding);
     }
+
+    inline const bool get_is_bit_field() const
+    {
+      return get_bool(ID_C_is_bit_field);
+    }
+
+    inline void set_is_bit_field(bool is_bit_field)
+    {
+      return set(ID_C_is_bit_field, is_bit_field);
+    }
   };
 
   typedef std::vector<componentt> componentst;
