@@ -17,7 +17,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "cmdline.h"
 #include "parseoptions.h"
-#include "signal_catcher.h"
 
 /*******************************************************************\
 
@@ -97,9 +96,6 @@ int parseoptions_baset::main()
     help();
     return EX_OK;
   }
-  
-  // install signal catcher
-  install_signal_catcher();
 
   return doit();
 }
