@@ -118,6 +118,8 @@ exprt c_sizeoft::sizeof_rec(const typet &type)
            sub_type.id()!=ID_unsignedbv)
           return nil_exprt();
           
+        // We just sum them up.
+        // This assumes they are properly padded.
         bit_field_width+=sub_type.get_int(ID_width);
       }
       else
@@ -133,7 +135,7 @@ exprt c_sizeoft::sizeof_rec(const typet &type)
     }
     
     if(bit_field_width!=0)
-      dest=plus_exprt(dest, from_integer(bit_field_width, size_type()));
+      dest=plus_exprt(dest, from_integer(bit_field_width/8, size_type()));
   }
   else if(type.id()==ID_union)
   {
