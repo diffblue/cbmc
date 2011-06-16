@@ -47,6 +47,10 @@ exprt c_sizeoft::sizeof_rec(const typet &type)
   }
   else if(type.id()==ID_pointer)
   {
+    // the following is an MS extension
+    if(type.get_bool(ID_C_ptr32))
+      return from_integer(4, size_type());
+             
     unsigned bits=config.ansi_c.pointer_width;
     unsigned bytes=bits/8;
     if((bits%8)!=0) bytes++;
