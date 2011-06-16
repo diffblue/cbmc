@@ -10,6 +10,7 @@ fixedbv
 C_location #location
 C_end_location #end_location
 C_is_padding #is_padding
+C_is_bit_field #is_bit_field
 file
 line
 column
