@@ -619,9 +619,19 @@ void c_typecastt::implicit_typecast_arithmetic(
 
   c_typet max_type=std::max(c_type1, c_type2);
 
-  // the minimum promotion is to INT
-  max_type=std::max(max_type, INT);
+  // "If an int can represent all values of the original type, the
+  // value is converted to an int; otherwise, it is converted to
+  // an unsigned int."
+  
+  // The second case can arise if we promote an unsigned int, or
+  // if sizeof(short)=sizeof(int),and we are promoting an unsigned short.
 
+  if(config.ansi_c.short_int_width==config.ansi_c.int_width &&
+     max_type==USHORT)
+    max_type=UINT;
+  else
+    max_type=std::max(max_type, INT);
+  
   implicit_typecast_arithmetic(expr1, max_type);
   implicit_typecast_arithmetic(expr2, max_type);
   
