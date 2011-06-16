@@ -17,17 +17,18 @@ Author: Daniel Kroening, kroening@kroening.com
 namespace Minisat
 {
   class Solver;
+  class SimpSolver;
 }
 
-class satcheck_minisat_baset:public cnf_solvert
+// select one: basic solver or with simplification
+
+#define USE_MINISAT_SIMPLIFIER
+
+class satcheck_minisatt:public cnf_solvert
 {
 public:
-  satcheck_minisat_baset():solver(NULL)
-  {
-    empty_clause_added=false;
-  }
-  
-  virtual ~satcheck_minisat_baset();
+  satcheck_minisatt();
+  virtual ~satcheck_minisatt();
   
   virtual resultt prop_solve();
   virtual tvt l_get(literalt a) const;
@@ -44,24 +45,15 @@ public:
   virtual bool has_is_in_conflict() const { return true; }
   
 protected:
+  #ifdef USE_MINISAT_SIMPLIFIER
+  Minisat::SimpSolver *solver;
+  #else
   Minisat::Solver *solver;
+  #endif
+  
   void add_variables();
   bvt assumptions;
   bool empty_clause_added;
-};
-
-class satcheck_minisat_coret:public satcheck_minisat_baset
-{
-public:
-  satcheck_minisat_coret();
-  virtual const std::string solver_text();
-};
-
-class satcheck_minisat_simpt:public satcheck_minisat_baset
-{
-public:
-  satcheck_minisat_simpt();
-  virtual const std::string solver_text();
 };
 
 #endif

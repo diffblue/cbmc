@@ -42,7 +42,7 @@ typedef satcheck_minisatt satcheckt;
 
 #include "satcheck_minisat2.h"
 
-typedef satcheck_minisat_coret satcheckt;
+typedef satcheck_minisatt satcheckt;
 
 #else
 #error NO SAT CHECKER
