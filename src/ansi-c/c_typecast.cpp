@@ -72,7 +72,7 @@ Function: c_implicit_typecast_arithmetic
 
  Outputs:
 
- Purpose:
+ Purpose: perform arithmetic prompotions and conversions
 
 \*******************************************************************/
 
@@ -306,6 +306,8 @@ c_typecastt::c_typet c_typecastt::get_c_type(
   {
     if(width<=config.ansi_c.char_width)
       return CHAR;
+    else if(width<=config.ansi_c.short_int_width)
+      return SHORT;
     else if(width<=config.ansi_c.int_width)
       return INT;
     else if(width<=config.ansi_c.long_int_width)
@@ -317,6 +319,8 @@ c_typecastt::c_typet c_typecastt::get_c_type(
   {
     if(width<=config.ansi_c.char_width)
       return UCHAR;
+    else if(width<=config.ansi_c.short_int_width)
+      return USHORT;
     else if(width<=config.ansi_c.int_width)
       return UINT;
     else if(width<=config.ansi_c.long_int_width)
@@ -396,8 +400,10 @@ void c_typecastt::implicit_typecast_arithmetic(
     return;
 
   case BOOL:       new_type=bool_typet(); break;
-  case CHAR:       assert(false); // should always be promoted
-  case UCHAR:      assert(false); // should always be promoted
+  case CHAR:       assert(false); // should always be promoted to int
+  case UCHAR:      assert(false); // should always be promoted to int
+  case SHORT:      assert(false); // should always be promoted to int
+  case USHORT:     assert(false); // should always be promoted to int
   case INT:        new_type=int_type(); break;
   case UINT:       new_type=uint_type(); break;
   case LONG:       new_type=long_int_type(); break;
@@ -612,7 +618,9 @@ void c_typecastt::implicit_typecast_arithmetic(
           c_type2=get_c_type(type2);
 
   c_typet max_type=std::max(c_type1, c_type2);
-  max_type=std::max(max_type, INT); // minimum promotion
+
+  // the minimum promotion is to INT
+  max_type=std::max(max_type, INT);
 
   implicit_typecast_arithmetic(expr1, max_type);
   implicit_typecast_arithmetic(expr2, max_type);
