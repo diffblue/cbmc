@@ -129,7 +129,9 @@ void add_padding(struct_typet &type, const namespacet &ns)
     }
     
     mp_integer size=pointer_offset_size(ns, it_type);
-    offset+=size;
+    
+    if(size!=-1)
+      offset+=size;
   }
   
   // there may be a need for 'end of struct' padding
