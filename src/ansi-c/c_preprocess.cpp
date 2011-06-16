@@ -390,7 +390,6 @@ bool c_preprocess_gcc(
     command+=" -D__FLT_MIN__=1.17549435e-38F";
     command+=" -D__DEC64_DEN__=0.000000000000001E-383DD";
     command+=" -D__CHAR_BIT__=8";
-    command+=" -D__WCHAR_MAX__=2147483647";
     command+=" -D__DBL_DENORM_MIN__=4.9406564584124654e-324";
     command+=" -D__FLT_EVAL_METHOD__=0";
     command+=" -D__DBL_MIN_10_EXP__=\"(-307)\"";
@@ -419,7 +418,6 @@ bool c_preprocess_gcc(
     command+=" -D__DBL_MAX_EXP__=1024";
     command+=" -D__DEC128_EPSILON__=1E-33DL";
     command+=" -D__SSE2_MATH__=1";
-    command+=" -D__LONG_LONG_MAX__=9223372036854775807LL";
     command+=" -D__GXX_ABI_VERSION=1002";
     command+=" -D__FLT_MIN_EXP__=\"(-125)\"";
     command+=" -D__DBL_MIN__=2.2250738585072014e-308";
@@ -450,7 +448,6 @@ bool c_preprocess_gcc(
     command+=" -D__k8__=1";
     command+=" -D__pic__=2";
     command+=" -D__FLT_DIG__=6";
-    command+=" -D__INT_MAX__=2147483647";
     command+=" -D__FLT_MAX_EXP__=128";
     //command+=" -D__BLOCKS__=1";
     command+=" -D__DBL_MANT_DIG__=53";
