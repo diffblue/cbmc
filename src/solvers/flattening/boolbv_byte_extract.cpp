@@ -40,9 +40,9 @@ void boolbvt::convert_byte_extract(const exprt &expr, bvt &bv)
 
   bool little_endian;
   
-  if(expr.id()=="byte_extract_little_endian")
+  if(expr.id()==ID_byte_extract_little_endian)
     little_endian=true;
-  else if(expr.id()=="byte_extract_big_endian")
+  else if(expr.id()==ID_byte_extract_big_endian)
     little_endian=false;
   else
     assert(false);
