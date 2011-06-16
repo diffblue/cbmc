@@ -36,12 +36,18 @@ exprt c_sizeoft::sizeof_rec(const typet &type)
      type.id()==ID_floatbv ||
      type.id()==ID_fixedbv ||
      type.id()==ID_c_enum ||
-     type.id()==ID_incomplete_c_enum ||
-     type.id()==ID_pointer)
+     type.id()==ID_incomplete_c_enum)
   {
     // We round up to bytes.
     // See special treatment for bit-fields below.
     unsigned bits=atoi(type.get(ID_width).c_str());
+    unsigned bytes=bits/8;
+    if((bits%8)!=0) bytes++;
+    dest=from_integer(bytes, size_type());
+  }
+  else if(type.id()==ID_pointer)
+  {
+    unsigned bits=config.ansi_c.pointer_width;
     unsigned bytes=bits/8;
     if((bits%8)!=0) bytes++;
     dest=from_integer(bytes, size_type());
