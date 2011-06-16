@@ -8,26 +8,28 @@ ifneq ($(CHAFF),)
   CHAFF_LIB=$(CHAFF)/libsat.a
 endif
 
-ifneq ($(BOOLEFORCE),)
-  BOOLEFORCE_SRC=sat/satcheck_booleforce.cpp
-  BOOLEFORCE_INCLUDE=-I $(BOOLEFORCE)
-  BOOLEFORCE_LIB=$(BOOLEFORCE)/libbooleforce.a
-endif
+# Booleforce, Boolector, Z3 are currently broken -- use SMT instead
 
-ifneq ($(Z3),)
-  Z3_SRC=z3/z3_capi.cpp z3/z3_conv.cpp z3/z3_prop.cpp z3/z3_dec.cpp
-  Z3_INCLUDE=-I $(Z3)
-  Z3_LIB=
-  CXXFLAGS += -DHAVE_Z3
-endif
+#ifneq ($(BOOLEFORCE),)
+#  BOOLEFORCE_SRC=sat/satcheck_booleforce.cpp
+#  BOOLEFORCE_INCLUDE=-I $(BOOLEFORCE)
+#  BOOLEFORCE_LIB=$(BOOLEFORCE)/libbooleforce.a
+#endif
 
-ifneq ($(BOOLECTOR),)
-  BOOLECTOR_SRC=boolector/boolector_get.cpp \
-                boolector/boolector_prop.cpp boolector/boolector_dec.cpp
-  BOOLECTOR_INCLUDE=-I $(BOOLECTOR)
-  BOOLECTOR_LIB=$(BOOLECTOR)/lib/libboolector.a
-  CXXFLAGS += -DHAVE_BOOLECTOR
-endif
+#ifneq ($(Z3),)
+#  Z3_SRC=z3/z3_capi.cpp z3/z3_conv.cpp z3/z3_prop.cpp z3/z3_dec.cpp
+#  Z3_INCLUDE=-I $(Z3)
+#  Z3_LIB=
+#  CXXFLAGS += -DHAVE_Z3
+#endif
+
+#ifneq ($(BOOLECTOR),)
+#  BOOLECTOR_SRC=boolector/boolector_get.cpp \
+#                boolector/boolector_prop.cpp boolector/boolector_dec.cpp
+#  BOOLECTOR_INCLUDE=-I $(BOOLECTOR)
+#  BOOLECTOR_LIB=$(BOOLECTOR)/lib/libboolector.a
+#  CXXFLAGS += -DHAVE_BOOLECTOR
+#endif
 
 ifneq ($(MINISAT),)
   MINISAT_SRC=sat/satcheck_minisat.cpp 
