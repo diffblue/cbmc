@@ -34,33 +34,21 @@ exprt c_sizeoft::sizeof_rec(const typet &type)
   if(type.id()==ID_signedbv ||
      type.id()==ID_unsignedbv ||
      type.id()==ID_floatbv ||
-     type.id()==ID_fixedbv)
+     type.id()==ID_fixedbv ||
+     type.id()==ID_c_enum ||
+     type.id()==ID_incomplete_c_enum ||
+     type.id()==ID_pointer)
   {
+    // We round up to bytes.
+    // See special treatment for bit-fields below.
     unsigned bits=atoi(type.get(ID_width).c_str());
-    unsigned bytes=bits/8;
-    if((bits%8)!=0) bytes++;
-    dest=from_integer(bytes, size_type());
-  }
-  else if(type.id()==ID_c_enum ||
-          type.id()==ID_incomplete_c_enum)
-  {
-    dest=from_integer(config.ansi_c.int_width/8, size_type());
-  }
-  else if(type.id()==ID_pointer)
-  {
-    // references fall into this category as well!
-  
-    // the following is an MS extension
-    if(type.get_bool(ID_C_ptr32))
-      return from_integer(4, size_type());
-
-    unsigned bits=config.ansi_c.pointer_width;
     unsigned bytes=bits/8;
     if((bits%8)!=0) bytes++;
     dest=from_integer(bytes, size_type());
   }
   else if(type.id()==ID_bool)
   {
+    // We fit booleans into a byte.
     dest=from_integer(1, size_type());
   }
   else if(type.id()==ID_array)
@@ -101,6 +89,8 @@ exprt c_sizeoft::sizeof_rec(const typet &type)
       to_struct_type(type).components();
 
     dest=from_integer(0, size_type());
+    
+    mp_integer bit_field_width=0;
 
     for(struct_typet::componentst::const_iterator
         it=components.begin();
@@ -109,11 +99,20 @@ exprt c_sizeoft::sizeof_rec(const typet &type)
     {
       if(it->get_bool(ID_is_type))
         continue;
-      
-      const typet &sub_type=it->type();
+        
+      const typet &sub_type=ns.follow(it->type());
 
       if(sub_type.id()==ID_code)
       {
+      }
+      else if(it->get_is_bit_field())
+      {
+        // this needs to be a signedbv/unsignedbv
+        if(sub_type.id()!=ID_signedbv &&
+           sub_type.id()!=ID_unsignedbv)
+          return nil_exprt();
+          
+        bit_field_width+=sub_type.get_int(ID_width);
       }
       else
       {
@@ -126,6 +125,9 @@ exprt c_sizeoft::sizeof_rec(const typet &type)
         dest=sum;
       }
     }
+    
+    if(bit_field_width!=0)
+      dest=plus_exprt(dest, from_integer(bit_field_width, size_type()));
   }
   else if(type.id()==ID_union)
   {
