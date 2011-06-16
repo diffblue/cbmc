@@ -65,11 +65,15 @@ protected:
   
   // these are in promotion order
 
-  enum c_typet { BOOL, CHAR, UCHAR, INT, UINT, LONG, ULONG,
+  enum c_typet { BOOL,
+                 CHAR, UCHAR,
+                 SHORT, USHORT,
+                 INT, UINT,
+                 LONG, ULONG,
                  LONGLONG, ULONGLONG,
-                 INTEGER,
-                 SINGLE, DOUBLE, LONGDOUBLE,
-                 RATIONAL, REAL,
+                 INTEGER, // these are unbounded integers
+                 SINGLE, DOUBLE, LONGDOUBLE, // float
+                 RATIONAL, REAL, // these are infinite precision
                  VOIDPTR, PTR, OTHER };
 
   c_typet get_c_type(const typet &type);
