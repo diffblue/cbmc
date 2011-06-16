@@ -44,7 +44,7 @@ void convert(const bvt &bv, Minisat::vec<Minisat::Lit> &dest)
 
 /*******************************************************************\
 
-Function: satcheck_minisat_baset::l_get
+Function: satcheck_minisatt::l_get
 
   Inputs:
 
@@ -54,7 +54,7 @@ Function: satcheck_minisat_baset::l_get
 
 \*******************************************************************/
 
-tvt satcheck_minisat_baset::l_get(literalt a) const
+tvt satcheck_minisatt::l_get(literalt a) const
 {
   if(a.is_true())
     return tvt(true);
@@ -82,7 +82,7 @@ tvt satcheck_minisat_baset::l_get(literalt a) const
 
 /*******************************************************************\
 
-Function: satcheck_minisat_baset::solver_text
+Function: satcheck_minisatt::solver_text
 
   Inputs:
 
@@ -92,48 +92,18 @@ Function: satcheck_minisat_baset::solver_text
 
 \*******************************************************************/
 
-const std::string satcheck_minisat_baset::solver_text()
+const std::string satcheck_minisatt::solver_text()
 {
-  return "MiniSAT2 (base)";
-}
-
-/*******************************************************************\
-
-Function: satcheck_minisat_coret::solver_text
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-const std::string satcheck_minisat_coret::solver_text()
-{
-  return "MiniSAT2 without simplifier";
-}
-
-/*******************************************************************\
-
-Function: satcheck_minisat_simpt::solver_text
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-const std::string satcheck_minisat_simpt::solver_text()
-{
+  #ifdef USE_MINISAT_SIMPLIFIER
   return "MiniSAT2 with simplifier";
+  #else
+  return "MiniSAT2 without simplifier";
+  #endif
 }
 
 /*******************************************************************\
 
-Function: satcheck_minisat_baset::add_variables
+Function: satcheck_minisatt::add_variables
 
   Inputs:
 
@@ -143,7 +113,7 @@ Function: satcheck_minisat_baset::add_variables
 
 \*******************************************************************/
 
-void satcheck_minisat_baset::add_variables()
+void satcheck_minisatt::add_variables()
 {
   while((unsigned)solver->nVars()<no_variables())
     solver->newVar();
@@ -151,7 +121,7 @@ void satcheck_minisat_baset::add_variables()
 
 /*******************************************************************\
 
-Function: satcheck_minisat_baset::lcnf
+Function: satcheck_minisatt::lcnf
 
   Inputs:
 
@@ -161,7 +131,7 @@ Function: satcheck_minisat_baset::lcnf
 
 \*******************************************************************/
 
-void satcheck_minisat_baset::lcnf(const bvt &bv)
+void satcheck_minisatt::lcnf(const bvt &bv)
 {
   bvt new_bv;
   
@@ -190,7 +160,7 @@ void satcheck_minisat_baset::lcnf(const bvt &bv)
 
 /*******************************************************************\
 
-Function: satcheck_minisat_baset::prop_solve
+Function: satcheck_minisatt::prop_solve
 
   Inputs:
 
@@ -200,7 +170,7 @@ Function: satcheck_minisat_baset::prop_solve
 
 \*******************************************************************/
 
-propt::resultt satcheck_minisat_baset::prop_solve()
+propt::resultt satcheck_minisatt::prop_solve()
 {
   assert(status!=ERROR);
 
@@ -251,7 +221,7 @@ propt::resultt satcheck_minisat_baset::prop_solve()
 
 /*******************************************************************\
 
-Function: satcheck_minisat_baset::set_assignment
+Function: satcheck_minisatt::set_assignment
 
   Inputs:
 
@@ -261,7 +231,7 @@ Function: satcheck_minisat_baset::set_assignment
 
 \*******************************************************************/
 
-void satcheck_minisat_baset::set_assignment(literalt a, bool value)
+void satcheck_minisatt::set_assignment(literalt a, bool value)
 {
   assert(!a.is_constant());
 
@@ -286,31 +256,20 @@ Function: satcheck_minisat_coret::satcheck_minisatt
 
 \*******************************************************************/
 
-satcheck_minisat_coret::satcheck_minisat_coret()
+satcheck_minisatt::satcheck_minisatt()
 {
-  solver=new Minisat::Solver;
-}
+  empty_clause_added=false;
 
-/*******************************************************************\
-
-Function: satcheck_minisat_simpt::satcheck_minisat_simpt
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-satcheck_minisat_simpt::satcheck_minisat_simpt()
-{
+  #ifdef USE_MINISAT_SIMPLIFIER
   solver=new Minisat::SimpSolver;
+  #else
+  solver=new Minisat::Solver;
+  #endif
 }
 
 /*******************************************************************\
 
-Function: satcheck_minisat_baset::~satcheck_minisat_baset
+Function: satcheck_minisatt::~satcheck_minisatt
 
   Inputs:
 
@@ -320,14 +279,14 @@ Function: satcheck_minisat_baset::~satcheck_minisat_baset
 
 \*******************************************************************/
 
-satcheck_minisat_baset::~satcheck_minisat_baset()
+satcheck_minisatt::~satcheck_minisatt()
 {
   delete solver;
 }
 
 /*******************************************************************\
 
-Function: satcheck_minisat_baset::is_in_conflict
+Function: satcheck_minisatt::is_in_conflict
 
   Inputs:
 
@@ -337,7 +296,7 @@ Function: satcheck_minisat_baset::is_in_conflict
 
 \*******************************************************************/
 
-bool satcheck_minisat_baset::is_in_conflict(literalt a) const
+bool satcheck_minisatt::is_in_conflict(literalt a) const
 {
   int v=a.var_no();
 
@@ -350,7 +309,7 @@ bool satcheck_minisat_baset::is_in_conflict(literalt a) const
 
 /*******************************************************************\
 
-Function: satcheck_minisat_baset::set_assumptions
+Function: satcheck_minisatt::set_assumptions
 
   Inputs:
 
@@ -360,7 +319,7 @@ Function: satcheck_minisat_baset::set_assumptions
 
 \*******************************************************************/
 
-void satcheck_minisat_baset::set_assumptions(const bvt &bv)
+void satcheck_minisatt::set_assumptions(const bvt &bv)
 {
   assumptions=bv;
 
