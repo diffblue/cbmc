@@ -2166,6 +2166,12 @@ void c_typecheck_baset::typecheck_expr_unary_boolean(exprt &expr)
   exprt &operand=expr.op0();
 
   implicit_typecast_bool(operand);
+  
+  // This is not quite accurate: the standard says the result
+  // should be of type 'int'.
+  // We do 'bool' anyway to get more compact formulae. Eventually,
+  // this should be achieved by means of simplification, and not
+  // in the frontend.
   expr.type()=typet(ID_bool);
 }
 
@@ -2438,6 +2444,11 @@ void c_typecheck_baset::typecheck_expr_binary_boolean(exprt &expr)
   implicit_typecast_bool(expr.op0());
   implicit_typecast_bool(expr.op1());
 
+  // This is not quite accurate: the standard says the result
+  // should be of type 'int'.
+  // We do 'bool' anyway to get more compact formulae. Eventually,
+  // this should be achieved by means of simplification, and not
+  // in the frontend.
   expr.type()=typet(ID_bool);
 }
 
