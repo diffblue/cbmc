@@ -37,7 +37,7 @@ protected:
     
     if(result.is_nil()) return result;
     
-    result.set(ID_c_sizeof_type, type);
+    result.set(ID_C_c_sizeof_type, type);
     return result;
   }
 };
