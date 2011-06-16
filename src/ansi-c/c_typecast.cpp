@@ -623,8 +623,8 @@ void c_typecastt::implicit_typecast_arithmetic(
   // value is converted to an int; otherwise, it is converted to
   // an unsigned int."
   
-  // The second case can arise if we promote an unsigned int, or
-  // an unsigned type that is as large as unsigned int.
+  // The second case can arise if we promote any unsigned type
+  // that is as large as unsigned int.
 
   if(config.ansi_c.short_int_width==config.ansi_c.int_width &&
      max_type==USHORT)
