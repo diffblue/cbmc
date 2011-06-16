@@ -26,6 +26,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "c_sizeof.h"
 #include "string_constant.h"
 #include "anonymous_member.h"
+#include "padding.h"
 
 /*******************************************************************\
 
@@ -677,7 +678,7 @@ void c_typecheck_baset::typecheck_expr_alignof(exprt &expr)
   }
 
   // we only care about the type
-  unsigned a=alignment(argument_type);
+  unsigned a=alignment(argument_type, *this);
   
   exprt tmp=from_integer(a, size_type());
   tmp.location()=expr.location();
