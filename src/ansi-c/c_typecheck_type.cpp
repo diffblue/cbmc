@@ -48,7 +48,7 @@ void c_typecheck_baset::typecheck_type(typet &type)
   {
   }
   else if(type.id()==ID_c_bitfield)
-    typecheck_c_bitfield_type(type);
+    typecheck_c_bit_field_type(type);
   else if(type.id()==ID_typeof)
     typecheck_typeof_type(type);
   else if(type.id()==ID_symbol)
@@ -246,6 +246,14 @@ Function: c_typecheck_baset::typecheck_compound_type
 void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
 {
   struct_union_typet::componentst &components=type.components();
+  
+  // mark bit-fields
+  for(struct_union_typet::componentst::iterator
+      it=components.begin();
+      it!=components.end();
+      it++)
+    if(it->type().id()==ID_c_bitfield)
+      it->set_is_bit_field(true);
 
   // check subtypes
   for(struct_union_typet::componentst::iterator
@@ -429,6 +437,10 @@ void c_typecheck_baset::add_padding(struct_typet &type)
       it!=components.end();
       it++)
   {
+    // bit-fields do not get padded
+    if(it->get_is_bit_field())
+      continue;
+  
     const typet &it_type=it->type();
     unsigned a=alignment(it_type);
     
@@ -467,7 +479,7 @@ void c_typecheck_baset::add_padding(struct_typet &type)
 
 /*******************************************************************\
 
-Function: c_typecheck_baset::typecheck_c_bitfield_type
+Function: c_typecheck_baset::typecheck_c_bit_field_type
 
   Inputs:
 
@@ -477,18 +489,17 @@ Function: c_typecheck_baset::typecheck_c_bitfield_type
 
 \*******************************************************************/
 
-void c_typecheck_baset::typecheck_c_bitfield_type(typet &type)
+void c_typecheck_baset::typecheck_c_bit_field_type(typet &type)
 {
   typecheck_type(type.subtype());
 
-  // we turn this into unsigedbv/signedbv
-  exprt &size=static_cast<exprt &>(type.add(ID_size));
+  exprt &width_expr=static_cast<exprt &>(type.add(ID_size));
 
-  typecheck_expr(size);
-  make_constant_index(size);
+  typecheck_expr(width_expr);
+  make_constant_index(width_expr);
 
   mp_integer i;
-  if(to_integer(size, i))
+  if(to_integer(width_expr, i))
   {
     err_location(type);
     throw "failed to convert bit field width";
@@ -497,7 +508,7 @@ void c_typecheck_baset::typecheck_c_bitfield_type(typet &type)
   if(i<0)
   {
     err_location(type);
-    throw "bit field size is negative";
+    throw "bit field width is negative";
   }
 
   const typet &base_type=follow(type.subtype());
@@ -507,9 +518,10 @@ void c_typecheck_baset::typecheck_c_bitfield_type(typet &type)
     if(i>1)
     {
       err_location(type);
-      throw "bit field size too large";
+      throw "bit field width too large";
     }
 
+    // We don't use bool, as it's really a byte long.
     type.id(ID_unsignedbv);
     type.set(ID_width, integer2long(i));
   }
@@ -517,19 +529,17 @@ void c_typecheck_baset::typecheck_c_bitfield_type(typet &type)
           base_type.id()==ID_unsignedbv ||
           base_type.id()==ID_c_enum)
   {
-    unsigned width=atoi(base_type.get(ID_width).c_str());
+    unsigned width=base_type.get_int(ID_width);
 
     if(i>width)
     {
       err_location(type);
-      throw "bit field size too large";
+      throw "bit field width too large";
     }
-
-    width=integer2long(i);
 
     typet tmp(base_type);
     type.swap(tmp);
-    type.set(ID_width, width);
+    type.set(ID_width, integer2string(i));
   }
   else
   {
