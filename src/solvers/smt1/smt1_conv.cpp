@@ -2181,7 +2181,7 @@ void smt1_convt::convert_with(const exprt &expr)
       smt1_prop.out << ")";
 
       // the mask
-      smt1_prop.out << " (bvneg (bvshl";
+      smt1_prop.out << " (bvnot (bvshl";
 
       smt1_prop.out << " (concat";
       smt1_prop.out << " (repeat[" << array_bits-elem_width << "] bv0[1])";
