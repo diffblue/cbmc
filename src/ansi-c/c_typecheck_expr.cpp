@@ -2497,6 +2497,13 @@ void c_typecheck_baset::typecheck_side_effect_assignment(exprt &expr)
   const typet &final_type0=follow(type0);
 
   expr.type()=type0;
+  
+  if(final_type0.id()==ID_empty)
+  {
+    err_location(expr);
+    str << "cannot assign void";
+    throw 0;
+  }
 
   if(!op0.get_bool(ID_C_lvalue))
   {
