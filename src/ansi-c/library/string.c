@@ -357,13 +357,13 @@ inline void *memmove(void *dest, const void *src, size_t n)
   else
     __CPROVER_is_zero_string(dest)=0;
   #else
-  if (dest-src >= n)
+  if(dest-src>=n)
   {
-    for(size_t i=0; i<n ; i++) dest[i]=src[i];
+    for(size_t i=0; i<n; i++) ((char *)dest)[i]=((const char *)src)[i];
   }
   else 
   {
-    for(size_t i=n; i>0 ; i--) dest[i-1]=src[i-1];
+    for(size_t i=n; i>0; i--) ((char *)dest)[i-1]=((const char *)src)[i-1];
   }
   #endif
   return dest;
