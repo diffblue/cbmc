@@ -713,12 +713,14 @@ bool boolbvt::boolbv_set_equality_to_true(const exprt &expr)
 
   if(operands.size()==2)
   {
+    const typet &type=ns.follow(operands[0].type());
+
     if(operands[0].id()==ID_symbol &&
-       operands[0].type()==operands[1].type() &&
-       operands[0].type().id()!=ID_bool)
+       type==ns.follow(operands[1].type()) &&
+       type.id()!=ID_bool)
     {
       // see if it is an unbounded array
-      if(is_unbounded_array(operands[0].type()))
+      if(is_unbounded_array(type))
         return true;
 
       bvt bv1;
@@ -726,8 +728,6 @@ bool boolbvt::boolbv_set_equality_to_true(const exprt &expr)
       
       const irep_idt &identifier=
         operands[0].get(ID_identifier);
-
-      const typet &type=operands[0].type();
 
       for(unsigned i=0; i<bv1.size(); i++)
         map.set_literal(identifier, i, type, bv1[i]);
