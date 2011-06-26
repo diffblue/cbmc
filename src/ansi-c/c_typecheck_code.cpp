@@ -735,6 +735,7 @@ void c_typecheck_baset::typecheck_return(codet &code)
   {
     if(return_type.id()!=ID_empty)
     {
+      // gcc doesn't actually complain, it just warns!
       err_location(code);
       throw "function expected to return a value";
     }
@@ -747,6 +748,7 @@ void c_typecheck_baset::typecheck_return(codet &code)
     {
       if(code.op0().type().id()!=ID_empty)
       {
+        // gcc doesn't actually complain, it just warns!
         err_location(code);
         throw "function not expected to return a value";
       }
