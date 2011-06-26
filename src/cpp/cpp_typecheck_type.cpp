@@ -7,7 +7,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 \*******************************************************************/
 
 #include <location.h>
-#include <simplify_expr_class.h>
+
 #include <ansi-c/c_qualifiers.h>
 
 #include "cpp_typecheck.h"
@@ -134,27 +134,12 @@ void cpp_typecheckt::typecheck_type(typet &type)
   }
   else if(type.id()==ID_array)
   {
-    exprt &size_expr=static_cast<exprt &>(type.add(ID_size));
+    exprt &size_expr=to_array_type(type).size();
 
     if(size_expr.is_nil())
       type.id(ID_incomplete_array);
     else
-    {
       typecheck_expr(size_expr);
-
-      simplify_exprt expr_simplifier(*this);
-      expr_simplifier.simplify(size_expr);
-
-      if(size_expr.id()!=ID_unassigned &&
-         size_expr.id()!=ID_constant &&
-         size_expr.id()!=ID_infinity)
-      {
-        err_location(type);
-        str << "failed to determine size of array: " <<
-          expr2cpp(size_expr, context);
-        throw 0;
-      }
-    }
 
     typecheck_type(type.subtype());
 
