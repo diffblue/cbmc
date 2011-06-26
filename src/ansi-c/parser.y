@@ -2125,7 +2125,9 @@ KnR_parameter_declaring_list:
 	| KnR_parameter_declaring_list ',' declarator
         {
           $$=$1;
-          const irept &t=stack($1).find(ID_type);
+          // need to get type from $1
+          assert(!stack($1).get_sub().empty());
+          const irept &t=stack($1).get_sub().back().find(ID_type);
           exprt tmp;
           PARSER.new_declaration(t, stack($3), tmp);
           stack($$).move_to_sub(tmp);
