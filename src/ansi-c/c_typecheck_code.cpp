@@ -733,11 +733,12 @@ void c_typecheck_baset::typecheck_return(codet &code)
 {
   if(code.operands().size()==0)
   {
-    if(return_type.id()!=ID_empty)
+    if(follow(return_type).id()!=ID_empty)
     {
       // gcc doesn't actually complain, it just warns!
-      err_location(code);
-      throw "function expected to return a value";
+      // We'll put a zero here.
+      exprt zero=zero_initializer(return_type, code.location());
+      code.copy_to_operands(zero);
     }
   }
   else if(code.operands().size()==1)
@@ -746,12 +747,9 @@ void c_typecheck_baset::typecheck_return(codet &code)
 
     if(return_type.id()==ID_empty)
     {
+      // gcc doesn't actually complain, it just warns!
       if(code.op0().type().id()!=ID_empty)
-      {
-        // gcc doesn't actually complain, it just warns!
-        err_location(code);
-        throw "function not expected to return a value";
-      }
+        code.op0().make_typecast(return_type);
     }
     else
       implicit_typecast(code.op0(), return_type);
