@@ -9,7 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <assert.h>
 
 #include <config.h>
-#include <simplify_expr_class.h>
 #include <expr_util.h>
 #include <std_expr.h>
 #include <base_type.h>
