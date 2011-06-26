@@ -213,7 +213,6 @@ Function: standard_conversion_integral_promotion
   Outputs: True iff the integral pormotion is possible.
            The result of the conversion is stored in 'new_expr'.
 
-
   Purpose:  Integral-promotion conversion
 
   An rvalue of type char, signed char, unsigned char, short int,
@@ -285,7 +284,6 @@ bool cpp_typecheckt::standard_conversion_integral_promotion(
   return false;
 }
 
-
 /*******************************************************************\
 
 Function: standard_conversion_floating_point_promotion
@@ -338,7 +336,6 @@ Function: standard_conversion_integral_conversion
 
   Outputs: True iff the integral pormotion is possible.
            The result of the conversion is stored in 'new_expr'.
-
 
   Purpose:  Integral conversion
 
@@ -748,19 +745,19 @@ bool cpp_typecheckt::standard_conversion_boolean(
   if(expr.get_bool(ID_C_lvalue))
     return false;
 
-  if(expr.type().id() != ID_signedbv
-     && expr.type().id() != ID_unsignedbv
-     && expr.type().id() != ID_pointer
-     && follow(expr.type()).id() != ID_c_enum)
-      return false;
+  if(expr.type().id() != ID_signedbv &&
+     expr.type().id() != ID_unsignedbv &&
+     expr.type().id() != ID_pointer && 
+     follow(expr.type()).id() != ID_c_enum)
+    return false;
 
   c_qualifierst qual_from;
   qual_from.read(expr.type());
 
-  typet Bool(ID_bool);
+  bool_typet Bool;
   qual_from.write(Bool);
 
-  new_expr = expr;
+  new_expr=expr;
   new_expr.make_typecast(Bool);
   return true;
 }
