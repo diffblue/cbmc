@@ -139,14 +139,38 @@ void goto_checkt::overflow_check(
     overflow.id(overflow.id_string()+"-"+i2string(new_width));
   }
 
-  overflow.make_not();
-
-  add_guarded_claim(
-    overflow,
-    "arithmetic overflow on "+expr.id_string(),
-    "overflow",
-    expr.find_location(),
-    guard);
+  if(expr.operands().size()>=3)
+  {
+    // The overflow checks are binary!
+    // We break these up.
+  
+    for(unsigned i=1; i<expr.operands().size(); i++)
+    {
+      exprt tmp;
+      
+      tmp=expr;
+      tmp.operands().resize(i-1);
+      overflow.operands().resize(2);
+      overflow.op0()=tmp;
+      overflow.op1()=expr.operands()[i];
+    
+      add_guarded_claim(
+        not_exprt(overflow),
+        "arithmetic overflow on "+expr.id_string(),
+        "overflow",
+        expr.find_location(),
+        guard);
+    }
+  }
+  else
+  {
+    add_guarded_claim(
+      not_exprt(overflow),
+      "arithmetic overflow on "+expr.id_string(),
+      "overflow",
+      expr.find_location(),
+      guard);
+  }
 }
 
 /*******************************************************************\
