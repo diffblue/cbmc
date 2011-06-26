@@ -113,7 +113,8 @@ void goto_checkt::overflow_check(
   if(!options.get_bool_option("overflow-check"))
     return;
 
-  // first, check type
+  // First, check type.
+  // Overflow is only meaningful on signed integer types.
   if(expr.type().id()!=ID_signedbv)
     return;
 
