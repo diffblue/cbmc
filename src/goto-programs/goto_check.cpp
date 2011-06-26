@@ -148,8 +148,14 @@ void goto_checkt::overflow_check(
     {
       exprt tmp;
       
-      tmp=expr;
-      tmp.operands().resize(i-1);
+      if(i==1)
+        tmp=expr.op0();
+      else
+      {
+        tmp=expr;
+        tmp.operands().resize(i);
+      }
+      
       overflow.operands().resize(2);
       overflow.op0()=tmp;
       overflow.op1()=expr.operands()[i];
