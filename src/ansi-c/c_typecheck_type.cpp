@@ -128,9 +128,11 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
   
   // the size need not be a constant!
   // we simplify it, for the benefit of array initialisation
-  simplify(size, *this);
+  
+  exprt tmp_size=size;
+  simplify(tmp_size, *this);
 
-  if(size.is_constant())
+  if(tmp_size.is_constant())
   {
     mp_integer s;
     if(to_integer(size, s))
@@ -148,6 +150,8 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
              "but got " << s;
       throw 0;
     }
+    
+    size=tmp_size;
   }
 }
 
@@ -205,6 +209,7 @@ void c_typecheck_baset::typecheck_vector_type(vector_typet &type)
     throw 0;
   }
   
+  // the subtype must have constant size
   exprt size_expr=c_sizeof(type.subtype(), *this);
   
   simplify(size_expr, *this);
