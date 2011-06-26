@@ -747,7 +747,7 @@ declaring_list:
           initializer_opt
 	{
 	  init($$);
-	  stack($$).add(ID_type)=stack($1);
+	  stack($$).add(ID_type)=stack($1); // save for later
 	  decl_statement($$, $5, $6);
 	}
 	| type_specifier declarator
@@ -763,7 +763,7 @@ declaring_list:
           initializer_opt
 	{
 	  init($$);
-	  stack($$).add(ID_type)=stack($1);
+	  stack($$).add(ID_type)=stack($1); // save for later
 	  decl_statement($$, $5, $6);
 	}
 	| declaring_list ',' declarator
@@ -2111,6 +2111,7 @@ KnR_parameter_declaring_list:
 	  declaration_specifier declarator
         {
           init($$);
+          stack($$).add(ID_type)=stack($1); // save for later
           exprt tmp;
           PARSER.new_declaration(stack($1), stack($2), tmp);
           stack($$).move_to_sub(tmp);
@@ -2118,6 +2119,7 @@ KnR_parameter_declaring_list:
 	| type_specifier declarator
         {
           init($$);
+          stack($$).add(ID_type)=stack($1); // save for later
           exprt tmp;
           PARSER.new_declaration(stack($1), stack($2), tmp);
           stack($$).move_to_sub(tmp);
@@ -2126,8 +2128,7 @@ KnR_parameter_declaring_list:
         {
           $$=$1;
           // need to get type from $1
-          assert(!stack($1).get_sub().empty());
-          const irept &t=stack($1).get_sub().back().find(ID_type);
+          const irept &t=stack($1).type();
           exprt tmp;
           PARSER.new_declaration(t, stack($3), tmp);
           stack($$).move_to_sub(tmp);
