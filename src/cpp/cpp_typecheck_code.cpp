@@ -269,7 +269,7 @@ void cpp_typecheckt::typecheck_decl(codet &code)
   if(code.operands().size()!=1)
   {
     err_location(code);
-    throw "declaration expected to have 1 operand";
+    throw "declaration expected to have one operand";
   }
 
   assert(code.op0().id()==ID_cpp_declaration);
@@ -299,10 +299,10 @@ void cpp_typecheckt::typecheck_decl(codet &code)
   codet new_code(ID_decl_block);
   new_code.reserve_operands(declaration.declarators().size());
 
-  // do the declarators (optional)
+  // Do the declarators (optional).
   Forall_cpp_declarators(it, declaration)
   {
-    cpp_declaratort &declarator = *it;
+    cpp_declaratort &declarator=*it;
     cpp_declarator_convertert cpp_declarator_converter(*this);
 
     cpp_declarator_converter.is_typedef=is_typedef;
@@ -317,15 +317,12 @@ void cpp_typecheckt::typecheck_decl(codet &code)
     decl_statement.location()=symbol.location;
     decl_statement.copy_to_operands(cpp_symbol_expr(symbol));
 
-    // do we have an initializer?
-    // and please, it's not code?
-    if(symbol.value.is_not_nil())
+    // Do we have an initializer that's not code?
+    if(symbol.value.is_not_nil() &&
+       symbol.value.id()!=ID_code)
     {
-      if(symbol.value.id()!=ID_code)
-      {
-        decl_statement.copy_to_operands(symbol.value);
-        assert(follow(decl_statement.op1().type())==follow(symbol.type));
-      }
+      decl_statement.copy_to_operands(symbol.value);
+      assert(follow(decl_statement.op1().type())==follow(symbol.type));
     }
     
     new_code.move_to_operands(decl_statement);
