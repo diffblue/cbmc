@@ -688,13 +688,13 @@ void c_typecastt::do_typecast(exprt &dest, const typet &type)
     {
       // preserve #c_sizeof_type -- don't make it a reference!
       const irept c_sizeof_type=
-        dest.op0().find("#c_sizeof_type");
+        dest.op0().find(ID_C_c_sizeof_type);
 
       simplify_exprt simplify_expr(ns);
       simplify_expr.simplify_typecast(dest);
 
       if(c_sizeof_type.is_not_nil())
-        dest.add("#c_sizeof_type")=c_sizeof_type;
+        dest.add(ID_C_c_sizeof_type)=c_sizeof_type;
     }
   }
 }
