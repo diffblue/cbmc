@@ -2416,6 +2416,7 @@ void cpp_typecheckt::typecheck_side_effect_assignment(exprt &expr)
     return;
   }
 
+  // It's a non-POD.
   // Turn into an operator call
 
   std::string strop="operator";
