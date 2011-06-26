@@ -23,6 +23,49 @@ inline char *__builtin___strcpy_chk(char *dst, const char *src, __CPROVER_size_t
   return dst;
 }
 
+/* FUNCTION: __builtin___strcat_chk */
+
+__inline char *__builtin___strcat_chk(char *dst, const char *src, __CPROVER_size_t s)
+{
+  __CPROVER_HIDE:;
+  #ifdef __CPROVER_STRING_ABSTRACTION
+  __CPROVER_size_t new_size;
+  __CPROVER_assert(__CPROVER_is_zero_string(dst), "strcat zero-termination of 1st argument");
+  __CPROVER_assert(__CPROVER_is_zero_string(src), "strcat zero-termination of 2nd argument");
+  new_size=__CPROVER_zero_string_length(dst)+__CPROVER_zero_string_length(src);
+  __CPROVER_assert(__CPROVER_buffer_size(dst)>new_size,
+                   "strcat buffer overflow");
+  __CPROVER_size_t old_size=__CPROVER_zero_string_length(dst);
+  //"  for(size_t i=0; i<__CPROVER_zero_string_length(src); i++)
+  //"    dst[old_size+i];
+  dst[new_size]=0;
+  __CPROVER_is_zero_string(dst)=1;
+  __CPROVER_zero_string_length(dst)=new_size;
+  #else
+  __CPROVER_size_t i=0;
+  while(dst[i]!=0) i++;
+
+  __CPROVER_size_t j=0;
+  char ch;
+  do
+  {
+    char ch=src[j];
+    dst[i]=ch;
+    i++;
+    j++;
+  }
+  while(ch!=(char)0);
+  #endif
+  return dst;
+}                        
+
+/* FUNCTION: __builtin___strncat_chk */
+
+__inline char *__builtin___strncat_chk(
+  char *dest, const char *src, __CPROVER_size_t len, __CPROVER_size_t s)
+{
+}                        
+
 /* FUNCTION: strcpy */
 
 #ifndef __CPROVER_STRING_H_INCLUDED
