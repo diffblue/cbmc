@@ -2240,7 +2240,7 @@ void cpp_typecheckt::typecheck_side_effect_assignment(exprt &expr)
   if(expr.operands().size()!=2)
     throw "assignment side-effect expected to have two operands";
     
-  typet type0(expr.op0().type());
+  typet type0=expr.op0().type();
 
   if(is_reference(type0))
     type0=type0.subtype();
@@ -2267,7 +2267,6 @@ void cpp_typecheckt::typecheck_side_effect_assignment(exprt &expr)
       int width = atoi(extractbits.op0().type().get(ID_width).c_str());
       int left  = atoi(extractbits.op1().get(ID_C_cformat).c_str());
       int right = atoi(extractbits.op2().get(ID_C_cformat).c_str());
-
 
       std::string mask;
 
