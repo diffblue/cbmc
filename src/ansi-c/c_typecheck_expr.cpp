@@ -372,6 +372,7 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
     }
   }
 
+  // we make an effort to produce a constant
   simplify(result, *this);
   result.location()=expr.location();
 
@@ -1982,6 +1983,7 @@ void c_typecheck_baset::do_special_functions(
         throw "__builtin_constant_p expects one argument";
       }
 
+      // try to produce constant
       exprt tmp1=expr.arguments().front();
       simplify(tmp1, *this);
 
