@@ -9,7 +9,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <expr_util.h>
 #include <arith_tools.h>
 #include <std_expr.h>
-#include <simplify_expr_class.h>
 
 #include <ansi-c/c_types.h>
 #include <ansi-c/c_sizeof.h>
@@ -153,10 +152,12 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
     else
       implicit_typecast(symbol.value, symbol.type);
 
+    #if 0
     simplify_exprt simplify(*this);
     exprt tmp_value = symbol.value;
     if(!simplify.simplify(tmp_value))
       symbol.value.swap(tmp_value);
+    #endif
   }
   else
   {
