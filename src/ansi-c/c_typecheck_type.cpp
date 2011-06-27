@@ -135,11 +135,11 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
   if(tmp_size.is_constant())
   {
     mp_integer s;
-    if(to_integer(size, s))
+    if(to_integer(tmp_size, s))
     {
       err_location(location);
       str << "failed to convert constant: "
-          << size.pretty();
+          << tmp_size.pretty();
       throw 0;
     }
 
