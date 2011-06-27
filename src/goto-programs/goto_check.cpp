@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <array_name.h>
 #include <arith_tools.h>
 #include <base_type.h>
+#include <ieee_float.h>
 
 #include "goto_check.h"
 
@@ -163,6 +164,30 @@ void goto_checkt::overflow_check(
       add_guarded_claim(
         no_overflow_upper,
         "arithmetic overflow on unsigned to signed type conversion",
+        "overflow",
+        expr.find_location(),
+        guard);
+    }
+    else if(old_type.id()==ID_floatbv)
+    {
+      unsigned new_width=expr.type().get_int(ID_width);
+
+      // Note that the fractional part is truncated!
+      ieee_floatt upper(to_floatbv_type(old_type));
+      upper.from_integer(power(2, new_width-1));
+      binary_relation_exprt no_overflow_upper(ID_lt);
+      no_overflow_upper.lhs()=expr.op0();
+      no_overflow_upper.rhs()=upper.to_expr();
+
+      ieee_floatt lower(to_floatbv_type(old_type));
+      lower.from_integer(-power(2, new_width-1)-1);
+      binary_relation_exprt no_overflow_lower(ID_gt);
+      no_overflow_lower.lhs()=expr.op0();
+      no_overflow_lower.rhs()=lower.to_expr();
+
+      add_guarded_claim(
+        and_exprt(no_overflow_lower, no_overflow_upper),
+        "arithmetic overflow on float to signed integer type conversion",
         "overflow",
         expr.find_location(),
         guard);
