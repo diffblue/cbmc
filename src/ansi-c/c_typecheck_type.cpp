@@ -126,8 +126,8 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
   typecheck_expr(size);
   make_index_type(size);
   
-  // the size need not be a constant!
-  // we simplify it, for the benefit of array initialisation
+  // The size need not be a constant!
+  // We simplify it, for the benefit of array initialisation.
   
   exprt tmp_size=size;
   simplify(tmp_size, *this);
@@ -153,6 +153,8 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
     
     size=tmp_size;
   }
+  else if(tmp_size.id()==ID_infinity)
+    size=tmp_size;
 }
 
 /*******************************************************************\
