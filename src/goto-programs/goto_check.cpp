@@ -115,29 +115,64 @@ void goto_checkt::overflow_check(
 
   // First, check type.
   // Overflow is only meaningful on signed integer types.
-  if(expr.type().id()!=ID_signedbv)
+  if(ns.follow(expr.type()).id()!=ID_signedbv)
     return;
 
   // add overflow subgoal
 
-  exprt overflow("overflow-"+expr.id_string(), bool_typet());
-  overflow.operands()=expr.operands();
-
   if(expr.id()==ID_typecast)
   {
+    // conversion to signed int may overflow
+  
     if(expr.operands().size()!=1)
       throw "typecast takes one operand";
 
-    const typet &old_type=expr.op0().type();
+    const typet &old_type=ns.follow(expr.op0().type());
+    
+    if(old_type.id()==ID_signedbv)
+    {
+      unsigned new_width=expr.type().get_int(ID_width);
+      unsigned old_width=old_type.get_int(ID_width);
+      if(new_width>=old_width) return; // always ok
 
-    unsigned new_width=atoi(expr.type().get(ID_width).c_str());
-    unsigned old_width=atoi(old_type.get(ID_width).c_str());
+      binary_relation_exprt no_overflow_upper(ID_le);
+      no_overflow_upper.lhs()=expr.op0();
+      no_overflow_upper.rhs()=from_integer(power(2, new_width-1)-1, old_type);
 
-    if(old_type.id()==ID_unsignedbv) new_width--;
-    if(new_width>=old_width) return;
+      binary_relation_exprt no_overflow_lower(ID_ge);
+      no_overflow_lower.lhs()=expr.op0();
+      no_overflow_lower.rhs()=from_integer(-power(2, new_width-1), old_type);
 
-    overflow.id(overflow.id_string()+"-"+i2string(new_width));
+      add_guarded_claim(
+        and_exprt(no_overflow_lower, no_overflow_upper),
+        "arithmetic overflow on signed type conversion",
+        "overflow",
+        expr.find_location(),
+        guard);
+    }
+    else if(old_type.id()==ID_unsignedbv)
+    {
+      unsigned new_width=expr.type().get_int(ID_width);
+      unsigned old_width=old_type.get_int(ID_width);
+      if(new_width>=old_width+1) return; // always ok
+
+      binary_relation_exprt no_overflow_upper(ID_le);
+      no_overflow_upper.lhs()=expr.op0();
+      no_overflow_upper.rhs()=from_integer(power(2, new_width-1)-1, old_type);
+
+      add_guarded_claim(
+        no_overflow_upper,
+        "arithmetic overflow on unsigned to signed type conversion",
+        "overflow",
+        expr.find_location(),
+        guard);
+    }
+
+    return;
   }
+
+  exprt overflow("overflow-"+expr.id_string(), bool_typet());
+  overflow.operands()=expr.operands();
 
   if(expr.operands().size()>=3)
   {
