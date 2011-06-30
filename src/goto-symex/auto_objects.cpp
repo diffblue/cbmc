@@ -58,9 +58,11 @@ void goto_symext::initialize_auto_object(
   const exprt &expr,
   statet &state)
 {
-  if(ns.follow(expr.type()).id()==ID_struct)
+  const typet &type=ns.follow(expr.type());
+
+  if(type.id()==ID_struct)
   {
-    const struct_typet &struct_type=to_struct_type(expr.type());
+    const struct_typet &struct_type=to_struct_type(type);
     const struct_typet::componentst &components=struct_type.components();
     
     for(struct_typet::componentst::const_iterator
