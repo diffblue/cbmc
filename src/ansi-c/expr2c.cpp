@@ -2152,6 +2152,12 @@ std::string expr2ct::convert_overflow(
   std::string dest="overflow(\"";
   dest+=src.id().c_str()+9;
   dest+="\"";
+  
+  if(!src.operands().empty())
+  {
+    dest+=", ";
+    dest+=convert(src.op0().type());
+  }
 
   forall_operands(it, src)
   {
