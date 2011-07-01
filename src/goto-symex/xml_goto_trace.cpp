@@ -72,6 +72,11 @@ xmlt convert(
       if(expr.get(ID_value)==ID_NULL)
         result.data="NULL";
     }
+    else if(type.id()==ID_bool)
+    {
+      result.name="boolean";
+      result.data=expr.is_true()?"TRUE":"FALSE";
+    }
   }
   else if(expr.id()==ID_array)
   {
