@@ -297,57 +297,75 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
       
         const struct_union_typet &struct_union_type=
           to_struct_union_type(type);
-        
-        if(!has_component_rec(struct_union_type, component_name, *this))
+          
+        // direct member?
+        if(struct_union_type.has_component(component_name))
         {
-          err_location(expr);    
-          throw "offset-of of member failed to find component `"+
-                id2string(component_name)+"' in `"+to_string(type)+"'";
-        }
+          found=true;
 
-        const struct_union_typet::componentst &components=
-          struct_union_type.components();
-        
-        for(struct_union_typet::componentst::const_iterator
-            c_it=components.begin();
-            c_it!=components.end();
-            c_it++)
-        {
-          if(c_it->get_name()==component_name)
-          {
-            typet tmp=follow(c_it->type());
-            type=tmp;
-            found=true;
-            break;
-          }
-          else if(c_it->get_anonymous())
-          {
-            if(has_component_rec(c_it->type(), component_name, *this))
-            {
-              typet tmp=follow(c_it->type());
-              type=tmp;
-              assert(type.id()==ID_union || type.id()==ID_struct);
-              break; // we run into another iteration of the outer loop
-            }
-          }
-         
           if(type.id()==ID_struct)
           {
-            exprt sub_size=c_sizeof(c_it->type(), *this);
+            exprt o=c_offsetof(to_struct_type(type), component_name, *this);
 
-            if(sub_size.is_nil())
+            if(o.is_nil())
             {
               err_location(expr);
-              str << "offsetof failed to determine size of `"
-                  << to_string(c_it->type()) << "'";
+              str << "offsetof failed to determine offset of `"
+                  << component_name << "'";
               throw 0;
             }
           
-            if(sub_size.type()!=size_type())
-              sub_size.make_typecast(size_type());
+            if(o.type()!=size_type())
+              o.make_typecast(size_type());
 
-            result=plus_exprt(result, sub_size);
+            result=plus_exprt(result, o);
           }
+        }
+        else
+        {
+          // maybe anonymous?
+          
+          const struct_union_typet::componentst &components=
+            struct_union_type.components();
+        
+          for(struct_union_typet::componentst::const_iterator
+              c_it=components.begin();
+              c_it!=components.end();
+              c_it++)
+          {
+            if(c_it->get_anonymous())
+            {
+              if(has_component_rec(c_it->type(), component_name, *this))
+              {
+                if(type.id()==ID_struct)
+                {
+                  exprt o=c_offsetof(to_struct_type(type), c_it->get_name(), *this);
+
+                  if(o.is_nil())
+                  {
+                    err_location(expr);
+                    str << "offsetof failed to determine offset of `"
+                        << component_name << "'";
+                    throw 0;
+                  }
+                
+                  if(o.type()!=size_type())
+                    o.make_typecast(size_type());
+
+                  result=plus_exprt(result, o);
+                }
+
+                typet tmp=follow(c_it->type());
+                type=tmp;
+                assert(type.id()==ID_union || type.id()==ID_struct);
+                break; // we run into another iteration of the outer loop
+              }
+            }
+          }
+         
+          err_location(expr);    
+          throw "offset-of of member failed to find component `"+
+                id2string(component_name)+"' in `"+to_string(type)+"'";
         }
       }
     }
