@@ -26,6 +26,10 @@ public:
     return c_sizeof(type);
   }
 
+  exprt c_offsetof(
+    const struct_typet &type,
+    const irep_idt &component_name);
+
 protected:
   const namespacet &ns;
 
@@ -43,3 +47,8 @@ protected:
 };
 
 exprt c_sizeof(const typet &src, const namespacet &ns);
+
+exprt c_offsetof(
+  const struct_typet &src,
+  const irep_idt &component_name,
+  const namespacet &ns);
