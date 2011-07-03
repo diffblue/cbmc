@@ -195,6 +195,76 @@ exprt c_sizeoft::sizeof_rec(const typet &type)
 
 /*******************************************************************\
 
+Function: c_sizeoft::c_offsetof
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+exprt c_sizeoft::c_offsetof(
+  const struct_typet &type,
+  const irep_idt &component_name)
+{
+  const struct_typet::componentst &components=
+    type.components();
+
+  exprt dest=from_integer(0, size_type());
+  
+  mp_integer bit_field_width=0;
+
+  for(struct_typet::componentst::const_iterator
+      it=components.begin();
+      it!=components.end();
+      it++)
+  {
+    if(it->get_name()==component_name)
+    {
+      // done
+      if(bit_field_width!=0)
+        dest=plus_exprt(dest, from_integer(bit_field_width/8, size_type()));
+      return dest;
+    }
+  
+    if(it->get_bool(ID_is_type))
+      continue;
+      
+    const typet &sub_type=ns.follow(it->type());
+
+    if(sub_type.id()==ID_code)
+    {
+    }
+    else if(it->get_is_bit_field())
+    {
+      // this needs to be a signedbv/unsignedbv
+      if(sub_type.id()!=ID_signedbv &&
+         sub_type.id()!=ID_unsignedbv)
+        return nil_exprt();
+        
+      // We just sum them up.
+      // This assumes they are properly padded.
+      bit_field_width+=sub_type.get_int(ID_width);
+    }
+    else
+    {
+      exprt tmp=sizeof_rec(sub_type);
+
+      if(tmp.is_nil())
+        return tmp;
+
+      exprt sum=plus_exprt(dest, tmp);
+      dest=sum;
+    }
+  }
+
+  return nil_exprt();
+}
+
+/*******************************************************************\
+
 Function: c_sizeof
 
   Inputs:
@@ -212,3 +282,27 @@ exprt c_sizeof(const typet &src, const namespacet &ns)
   simplify(tmp, ns);
   return tmp;
 }
+
+/*******************************************************************\
+
+Function: c_offsetof
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+exprt c_offsetof(
+  const struct_typet &src,
+  const irep_idt &component_name,
+  const namespacet &ns)
+{
+  c_sizeoft c_sizeof_inst(ns);
+  exprt tmp=c_sizeof_inst.c_offsetof(src, component_name);
+  simplify(tmp, ns);
+  return tmp;
+}
+
