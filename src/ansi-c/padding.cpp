@@ -110,6 +110,7 @@ void add_padding(struct_typet &type, const namespacet &ns)
           component.type()=padding_type;
           component.set_name("$bit_field_pad"+i2string(padding_counter++));
           component.set_is_padding(true);
+          component.set_is_bit_field(true);
           
           it=components.insert(it, component);
           it++; // skip over
@@ -132,6 +133,7 @@ void add_padding(struct_typet &type, const namespacet &ns)
       component.type()=padding_type;
       component.set_name("$bit_field_pad"+i2string(padding_counter++));
       component.set_is_padding(true);
+      component.set_is_bit_field(true);
       
       components.push_back(component);
     }  
@@ -196,7 +198,6 @@ void add_padding(struct_typet &type, const namespacet &ns)
         component.type()=padding_type;
         component.set_name("$pad"+i2string(padding_counter++));
         component.set_is_padding(true);
-        component.set_is_bit_field(true);
         
         it=components.insert(it, component);
         it++; // skip over
