@@ -79,11 +79,67 @@ Function: add_padding
 
 void add_padding(struct_typet &type, const namespacet &ns)
 {
+  struct_typet::componentst &components=type.components();
+
+  // first do padding for bit-fields
+
+  {  
+    unsigned padding_counter=0;
+    unsigned bit_field_bits=0;
+
+    for(struct_typet::componentst::iterator
+        it=components.begin();
+        it!=components.end();
+        it++)
+    {
+      if(it->get_is_bit_field())
+      {
+        // count the bits
+        bit_field_bits+=it->type().get_int(ID_width);
+      }
+      else if(bit_field_bits!=0)
+      {
+        // not on a byte-boundary?
+        if((bit_field_bits%8)!=0)
+        {
+          unsigned pad=8-bit_field_bits%8;
+          unsignedbv_typet padding_type;
+          padding_type.set_width(pad);
+          
+          struct_typet::componentt component;
+          component.type()=padding_type;
+          component.set_name("$bit_field_pad"+i2string(padding_counter++));
+          component.set_is_padding(true);
+          
+          it=components.insert(it, component);
+          it++; // skip over
+        
+          bit_field_bits+=pad;
+        }
+
+        bit_field_bits=0;
+      }
+    }
+
+    // Add padding at the end?
+    if((bit_field_bits%8)!=0)
+    {
+      unsigned pad=8-bit_field_bits%8;
+      unsignedbv_typet padding_type;
+      padding_type.set_width(pad);
+      
+      struct_typet::componentt component;
+      component.type()=padding_type;
+      component.set_name("$bit_field_pad"+i2string(padding_counter++));
+      component.set_is_padding(true);
+      
+      components.push_back(component);
+    }  
+  }
+
   // packed?
   if(type.get_bool(ID_packed))
-    return;  
-
-  struct_typet::componentst &components=type.components();
+    return; // done
 
   mp_integer offset=0;
   unsigned padding_counter=0;
@@ -109,24 +165,6 @@ void add_padding(struct_typet &type, const namespacet &ns)
     }
     else if(bit_field_bits!=0)
     {
-      // not on a byte-boundary?
-      if((bit_field_bits%8)!=0)
-      {
-        unsigned pad=8-bit_field_bits%8;
-        unsignedbv_typet padding_type;
-        padding_type.set_width(pad);
-        
-        struct_typet::componentt component;
-        component.type()=padding_type;
-        component.set_name("$pad"+i2string(padding_counter++));
-        component.set_is_padding(true);
-        
-        it=components.insert(it, component);
-        it++; // skip over
-      
-        bit_field_bits+=pad;
-      }
-      
       // these are now assumed to be multiples of 8
       offset+=bit_field_bits/8;
       bit_field_bits=0;

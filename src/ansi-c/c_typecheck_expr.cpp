@@ -320,6 +320,8 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
 
             result=plus_exprt(result, o);
           }
+          
+          type=struct_union_type.get_component(component_name).type();
         }
         else
         {
@@ -327,6 +329,8 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
           
           const struct_union_typet::componentst &components=
             struct_union_type.components();
+            
+          bool found2=false;
         
           for(struct_union_typet::componentst::const_iterator
               c_it=components.begin();
@@ -358,14 +362,18 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
                 typet tmp=follow(c_it->type());
                 type=tmp;
                 assert(type.id()==ID_union || type.id()==ID_struct);
+                found2=true;
                 break; // we run into another iteration of the outer loop
               }
             }
           }
          
-          err_location(expr);    
-          throw "offset-of of member failed to find component `"+
-                id2string(component_name)+"' in `"+to_string(type)+"'";
+          if(!found2)
+          {
+            err_location(expr);    
+            throw "offset-of of member failed to find component `"+
+                  id2string(component_name)+"' in `"+to_string(type)+"'";
+          }
         }
       }
     }
