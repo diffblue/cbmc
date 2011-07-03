@@ -179,6 +179,16 @@ public:
     {
       return set(ID_C_is_bit_field, is_bit_field);
     }
+
+    inline const typet &get_bit_field_type() const
+    {
+      return static_cast<const typet &>(find(ID_C_bit_field_type));
+    }
+
+    inline void set_bit_field_type(const typet &_type)
+    {
+      set(ID_C_bit_field_type, _type);
+    }
   };
 
   typedef std::vector<componentt> componentst;
