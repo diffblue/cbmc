@@ -261,7 +261,12 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
       it!=components.end();
       it++)
     if(it->type().id()==ID_c_bitfield)
+    {
       it->set_is_bit_field(true);
+      typet tmp=it->type().subtype();
+      typecheck_type(tmp);
+      it->set_bit_field_type(tmp);
+    }
 
   // check subtypes
   for(struct_union_typet::componentst::iterator
