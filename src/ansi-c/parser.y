@@ -1227,8 +1227,8 @@ member_declaring_list:
 	{
 	  init($$, ID_declaration_list);
 
-	  // save the type_specifier
-	  stack($$).add("declaration_type")=stack($2);
+	  // save the type_specifier for later
+	  stack($$).add(ID_type)=stack($2);
 
 	  exprt declaration;
 	  PARSER.new_declaration(stack($2), stack($3), declaration, false, false);
@@ -1239,7 +1239,7 @@ member_declaring_list:
 	{
 	  exprt declaration;
 
-	  irept declaration_type(stack($1).find("declaration_type"));
+	  irept declaration_type(stack($1).find(ID_type));
 	  PARSER.new_declaration(declaration_type, stack($3), declaration, false, false);
 
 	  $$=$1;
