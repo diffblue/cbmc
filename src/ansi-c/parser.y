@@ -665,7 +665,7 @@ comma_expression_opt:
 declaration:
 	  declaration_specifier ';'
 	{
-	  // type only!
+	  // type only, no identifier!
 	  codet decl(ID_decl_type);
 	  decl.add(ID_type_arg).swap(stack($1));
 	  init($$);
@@ -673,7 +673,7 @@ declaration:
 	}
 	| type_specifier ';'
 	{
-	  // type only!
+	  // type only, no identifier!
 	  codet decl(ID_decl_type);
 	  decl.add(ID_type_arg).swap(stack($1));
 	  init($$);
@@ -799,6 +799,7 @@ type_specifier:
 
 declaration_qualifier_list:
           storage_class
+	| gcc_type_attribute_list
 	| type_qualifier_list storage_class
 	{
 	  $$=$1;
@@ -859,7 +860,8 @@ basic_declaration_specifier:
 	{
 	  $$=$1;
 	  merge_types($$, $2);
-	};
+	}
+	;
 
 basic_type_specifier:
 	  basic_type_name gcc_type_attribute_opt
@@ -880,7 +882,8 @@ basic_type_specifier:
 	{
 	  $$=$1;
 	  merge_types($$, $2);
-	};
+	}
+	;
 
 sue_declaration_specifier:
           declaration_qualifier_list elaborated_type_name
@@ -915,7 +918,7 @@ sue_type_specifier:
 	;
 
 typedef_declaration_specifier:
-	typedef_type_specifier storage_class
+	  typedef_type_specifier storage_class
 	{
 	  $$=$1;
 	  merge_types($$, $2);
@@ -933,7 +936,7 @@ typedef_declaration_specifier:
 	;
 
 typeof_declaration_specifier:
-	typeof_type_specifier storage_class
+	  typeof_type_specifier storage_class
 	{
 	  $$=$1;
 	  merge_types($$, $2);
@@ -1201,7 +1204,7 @@ member_declaration:
 	;
 
 member_default_declaring_list:
-	  gcc_type_attribute_opt
+          gcc_type_attribute_opt
 	  type_qualifier_list member_identifier_declarator
 	{
 	  init($$, ID_declaration_list);
@@ -1222,7 +1225,7 @@ member_default_declaring_list:
 	;
 
 member_declaring_list:
-	  gcc_type_attribute_opt
+          gcc_type_attribute_opt
 	  type_specifier member_declarator
 	{
 	  init($$, ID_declaration_list);
@@ -2108,6 +2111,9 @@ KnR_parameter_declaration:
 	;
 
 KnR_parameter_declaring_list:
+/*
+ The following conflicts due to gcc type attributes!
+ 
 	  declaration_specifier declarator
         {
           init($$);
@@ -2116,7 +2122,9 @@ KnR_parameter_declaring_list:
           PARSER.new_declaration(stack($1), stack($2), tmp);
           stack($$).move_to_sub(tmp);
         }
-	| type_specifier declarator
+	| 
+*/	
+	  type_specifier declarator
         {
           init($$);
           stack($$).add(ID_type)=stack($1); // save for later
