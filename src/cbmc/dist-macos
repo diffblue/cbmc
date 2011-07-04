@@ -40,7 +40,7 @@ echo "Building cbmc-${VERSION_FILE}.pkg (${BITS} bits)"
 
 echo Copying.
 scp /tmp/cbmc-dist/cbmc-${VERSION_FILE}.pkg \
-  kroening@dkr-srv.comlab.ox.ac.uk:/home/www/cprover.org/cbmc/download/
+  kroening@dkr-srv.comlab.ox.ac.uk:/srv/www/cprover.org/cbmc/download/
 
 cd /tmp
 rm -R /tmp/cbmc-dist
