@@ -1239,7 +1239,7 @@ member_declaring_list:
 	{
 	  exprt declaration;
 
-	  irept declaration_type(stack($1).find(ID_type));
+	  irept declaration_type=stack($1).find(ID_type);
 	  PARSER.new_declaration(declaration_type, stack($3), declaration, false, false);
 
 	  $$=$1;
