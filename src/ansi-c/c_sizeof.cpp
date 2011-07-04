@@ -107,12 +107,12 @@ exprt c_sizeoft::sizeof_rec(const typet &type)
         it!=components.end();
         it++)
     {
-      if(it->get_bool(ID_is_type))
-        continue;
-        
       const typet &sub_type=ns.follow(it->type());
 
-      if(sub_type.id()==ID_code)
+      if(it->get_bool(ID_is_type))
+      {
+      }
+      else if(sub_type.id()==ID_code)
       {
       }
       else if(it->get_is_bit_field())
@@ -133,8 +133,7 @@ exprt c_sizeoft::sizeof_rec(const typet &type)
         if(tmp.is_nil())
           return tmp;
 
-        exprt sum=plus_exprt(dest, tmp);
-        dest=sum;
+        dest=plus_exprt(dest, tmp);
       }
     }
     
