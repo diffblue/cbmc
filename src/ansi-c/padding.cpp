@@ -232,13 +232,26 @@ void add_padding(struct_typet &type, const namespacet &ns)
     
       unsignedbv_typet padding_type;
       padding_type.set_width(pad*8);
+
+      struct_typet::componentst::iterator it;
       
+      // we need to insert before any 'flexible member'
+      if(!components.empty() &&
+         components.back().type().id()==ID_array &&
+         to_array_type(components.back().type()).size().is_zero())
+      {
+        it=components.end();
+        it--;
+      }
+      else
+        it=components.end();
+
       struct_typet::componentt component;
       component.type()=padding_type;
       component.set_name("$pad"+i2string(padding_counter++));
       component.set_is_padding(true);
       
-      components.push_back(component);
+      components.insert(it, component);
     }
   }
 }
