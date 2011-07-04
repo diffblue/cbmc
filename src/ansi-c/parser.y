@@ -2136,11 +2136,11 @@ KnR_parameter_declaring_list:
         ;
 
 function_head:
-	  identifier_declarator /* void */
+	  identifier_declarator /* no return type given */
 	{
 	  init($$);
-	  irept type(ID_int);
-	  PARSER.new_declaration(type, stack($1), stack($$));
+	  irept return_type(ID_int);
+	  PARSER.new_declaration(return_type, stack($1), stack($$));
 	  create_function_scope(stack($$));
 	}
 	| declaration_specifier declarator
@@ -2189,7 +2189,7 @@ parameter_typedef_declarator:
 	| clean_typedef_declarator
 	;
 
-clean_typedef_declarator:	/* Declarator */
+clean_typedef_declarator:
 	  clean_postfix_typedef_declarator
 	| '*' parameter_typedef_declarator
 	{
@@ -2243,7 +2243,7 @@ paren_typedef_declarator:
 	}
 	;
 
-paren_postfix_typedef_declarator:	/* Declarator */
+paren_postfix_typedef_declarator:
 	  '(' paren_typedef_declarator ')'
 	{ $$ = $2; }
 	| '(' simple_paren_typedef_declarator postfixing_abstract_declarator ')'
