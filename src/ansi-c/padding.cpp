@@ -212,6 +212,12 @@ void add_padding(struct_typet &type, const namespacet &ns)
       offset+=size;
   }
   
+  if(bit_field_bits!=0)
+  {
+    // these are now assumed to be multiples of 8
+    offset+=bit_field_bits/8;
+  }
+
   // There may be a need for 'end of struct' padding.
   // We use 'max_alignment'.
 
