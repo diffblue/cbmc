@@ -306,13 +306,6 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
     }
   }
   
-  // we may add some minimal padding inside structs (not unions)
-  // unless there is an attribute that says that the struct is
-  // 'packed'
-
-  if(type.id()==ID_struct)
-    add_padding(to_struct_type(type), *this);
-
   // we allow a zero-length (GCC) or incomplete (C99) array
   // as _last_ member!
 
@@ -342,6 +335,13 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
       }
     }
   }  
+
+  // we may add some minimal padding inside structs (not unions)
+  // unless there is an attribute that says that the struct is
+  // 'packed'
+
+  if(type.id()==ID_struct)
+    add_padding(to_struct_type(type), *this);
 }
 
 /*******************************************************************\
