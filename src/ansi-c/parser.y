@@ -799,12 +799,17 @@ type_specifier:
 
 declaration_qualifier_list:
           storage_class
-	| gcc_type_attribute_list
 	| type_qualifier_list storage_class
 	{
 	  $$=$1;
 	  merge_types($$, $2);
 	}
+	| gcc_type_attribute
+        | declaration_qualifier_list gcc_type_attribute
+        {
+	  $$=$1;
+	  merge_types($$, $2);
+        }
 	| declaration_qualifier_list declaration_qualifier
 	{
 	  $$=$1;
