@@ -111,8 +111,9 @@ void smt1_convt::set_value(
   }
   else if(type.id()==ID_pointer)
   {
-    assert(v.size()==BV_ADDR_BITS+config.ansi_c.pointer_width);
+    assert(v.size()==config.ansi_c.pointer_width);
 
+    // TODO
     pointer_logict::pointert p;
     p.object=integer2long(binary2integer(std::string(v, 0, BV_ADDR_BITS), false));
     p.offset=binary2integer(std::string(v, BV_ADDR_BITS, std::string::npos), true);
@@ -166,7 +167,7 @@ void smt1_convt::array_index(const exprt &expr)
   
   typet t=array_index_type();
   if(t==expr.type()) return convert_expr(expr, true);
-  exprt tmp("typecast", t);
+  exprt tmp(ID_typecast, t);
   tmp.copy_to_operands(expr);
   convert_expr(tmp, true);
 }
@@ -740,13 +741,17 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
   {
     convert_mul(expr);
   }
-  else if(expr.id()==ID_address_of ||
-          expr.id()=="implicit_address_of" ||
-          expr.id()=="reference_to")
+  else if(expr.id()==ID_address_of)
   {
     assert(expr.operands().size()==1);
     assert(expr.type().id()==ID_pointer);
     convert_address_of_rec(expr.op0());
+  }
+  else if(expr.id()=="implicit_address_of" ||
+          expr.id()=="reference_to")
+  {
+    // old stuff
+    assert(false);
   }
   else if(expr.id()==ID_array_of)
   {
