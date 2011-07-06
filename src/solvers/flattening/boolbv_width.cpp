@@ -107,7 +107,7 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
       max_width=std::max(max_width, sub_width);
     }
 
-    entry.total_width=integer2long(address_bits(components.size()))+max_width;
+    entry.total_width=max_width;
   }
   else if(type.id()==ID_bool)
     entry.total_width=1;

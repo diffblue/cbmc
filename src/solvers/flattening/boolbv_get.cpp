@@ -181,39 +181,21 @@ exprt boolbvt::bv_get_rec(
     }
     else if(type.id()==ID_union)
     {
-      const irept &components=
-        type.find(ID_components);
+      const union_typet &union_type=to_union_type(type);
+      const union_typet::componentst &components=union_type.components();
+      
+      assert(!components.empty());
 
-      unsigned component_bits=
-        integer2long(address_bits(components.get_sub().size()));
-      unsigned component_nr=0;
-
-      for(unsigned i=0; i<component_bits; i++)
-      {
-        unsigned bit_nr=width-component_bits+i+offset;
-        if(unknown[bit_nr]) return nil_exprt();
-
-        switch(prop.l_get(bv[bit_nr]).get_value())
-        {
-         case tvt::TV_FALSE: break;
-         case tvt::TV_TRUE:  component_nr|=(1<<i); break;
-         case tvt::TV_UNKNOWN: break; // default
-         default: return nil_exprt();
-        }
-      }
-        
-      if(component_nr>=components.get_sub().size())
-        return nil_exprt();
+      // Any idea that's better than just returning the first component?      
+      unsigned component_nr=0;      
 
       exprt value(ID_union, type);
       value.operands().resize(1);
 
       value.set(ID_component_name,
-                components.get_sub()[component_nr].get(ID_name));
+                components[component_nr].get_name());
       
-      const typet &subtype=
-        static_cast<const typet &>(
-          components.get_sub()[component_nr].find(ID_type));
+      const typet &subtype=components[component_nr].type();
 
       value.op0()=bv_get_rec(bv, unknown, offset, subtype);
 

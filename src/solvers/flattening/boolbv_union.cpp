@@ -46,22 +46,4 @@ void boolbvt::convert_union(const exprt &expr, bvt &bv)
   // pad with nondets
   for(unsigned i=op_bv.size(); i<bv.size(); i++)
     bv[i]=prop.new_variable();
-
-  const irep_idt &component_name=expr.get("component_name");
-  const irept &components=expr.type().find("components");
-
-  const union_typet &union_type=to_union_type(expr.type());
-
-  if(!union_type.has_component(component_name))
-    throw "union: component not found";
-
-  unsigned number=union_type.component_number(component_name);
-
-  unsigned component_bits=
-    integer2long(address_bits(components.get_sub().size()));
-
-  unsigned offset=width-component_bits;
-
-  for(unsigned i=0; i<component_bits; i++)
-    bv[offset+i]=const_literal((number>>i)&1);
 }

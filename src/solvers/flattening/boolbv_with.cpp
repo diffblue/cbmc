@@ -311,22 +311,5 @@ void boolbvt::convert_with_union(
 
   for(unsigned i=0; i<op2_bv.size(); i++)
     next_bv[i]=op2_bv[i];
-    
-  const struct_typet &s_type=to_struct_type(type);
-
-  const irep_idt &component_name=op1.get(ID_component_name);
-
-  if(!s_type.has_component(component_name))
-    throw "with/union: component not found";
-
-  unsigned number=s_type.component_number(component_name);
-
-  unsigned component_bits=
-    integer2long(address_bits(s_type.components().size()));
-
-  unsigned offset=next_bv.size()-component_bits;
-
-  for(unsigned i=0; i<component_bits; i++)
-    next_bv[offset+i]=const_literal((number>>i)&1);
 }
 
