@@ -219,11 +219,11 @@ void smt1_convt::convert_address_of_rec(const exprt &expr)
       exprt new_index_expr=expr;
       new_index_expr.op1()=gen_zero(index.type());
 
-      exprt address_of_expr("address_of", pointer_typet());
+      exprt address_of_expr(ID_address_of, pointer_typet());
       address_of_expr.type().subtype()=array.type().subtype();
       address_of_expr.copy_to_operands(new_index_expr);
 
-      exprt plus_expr("+", address_of_expr.type());
+      exprt plus_expr(ID_plus, address_of_expr.type());
       plus_expr.copy_to_operands(address_of_expr, index);
 
       convert_expr(plus_expr, true);
@@ -249,8 +249,8 @@ void smt1_convt::convert_address_of_rec(const exprt &expr)
 
       mp_integer offset=member_offset(ns, struct_type, component_name);
 
-      typet index_type("unsignedbv");
-      index_type.set("width", config.ansi_c.pointer_width);
+      typet index_type(ID_unsignedbv);
+      index_type.set(ID_width, config.ansi_c.pointer_width);
 
       smt1_prop.out << "(bvadd ";
       convert_address_of_rec(struct_op);
@@ -1621,7 +1621,7 @@ void smt1_convt::convert_constant(const constant_exprt &expr, bool bool_as_bv)
   {
     const irep_idt &value=expr.get(ID_value);
 
-    if(value=="NULL")
+    if(value==ID_NULL)
     {
       smt1_prop.out << "(concat"
                     << " bv" << pointer_logic.get_null_object()
@@ -1740,7 +1740,9 @@ Function: smt1_convt::convert_is_dynamic_object
 
 \*******************************************************************/
 
-void smt1_convt::convert_is_dynamic_object(const exprt &expr, bool bool_as_bv)
+void smt1_convt::convert_is_dynamic_object(
+  const exprt &expr,
+  bool bool_as_bv)
 {
   std::vector<unsigned> dynamic_objects;
   pointer_logic.get_dynamic_objects(dynamic_objects);
@@ -1901,10 +1903,10 @@ void smt1_convt::convert_plus(const exprt &expr)
 
     exprt p=expr.op0(), i=expr.op1();
 
-    if(p.type().id()!="pointer")
+    if(p.type().id()!=ID_pointer)
       p.swap(i);
 
-    if(p.type().id()!="pointer")
+    if(p.type().id()!=ID_pointer)
       throw "unexpected mixture in pointer arithmetic";
 
     mp_integer element_size=
