@@ -74,11 +74,14 @@ exprt get_component_rec(
       it!=components.end();
       it++)
   {
+    const typet &type=ns.follow(it->type());
+  
     if(it->get_name()==component_name)
     {
       return make_member_expr(struct_union, *it, ns);
     }
-    else if(it->get_anonymous())
+    else if(it->get_anonymous() &&
+            (type.id()==ID_struct || type.id()==ID_union))
     {
       exprt tmp=make_member_expr(struct_union, *it, ns);
       exprt result=get_component_rec(tmp, component_name, ns);
