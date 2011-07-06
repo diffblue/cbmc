@@ -50,14 +50,6 @@ ifdef MODULE_PHP
   CXXFLAGS += -DHAVE_PHP
 endif
 
-ifneq ($(Z3),)
-  CXXFLAGS += -DHAVE_Z3
-endif
-
-ifneq ($(BOOLECTOR),)
-  CXXFLAGS += -DHAVE_BOOLECTOR
-endif
-
 ###############################################################################
 
 cbmc$(EXEEXT): $(OBJ)
