@@ -112,11 +112,16 @@ void smt1_convt::set_value(
   else if(type.id()==ID_pointer)
   {
     assert(v.size()==config.ansi_c.pointer_width);
+    
+    unsigned i=config.ansi_c.pointer_width-BV_ADDR_BITS;
 
-    // TODO
     pointer_logict::pointert p;
-    p.object=integer2long(binary2integer(std::string(v, 0, BV_ADDR_BITS), false));
-    p.offset=binary2integer(std::string(v, BV_ADDR_BITS, std::string::npos), true);
+    p.object=integer2long(
+      binary2integer(
+        std::string(v, i, std::string::npos), false));
+
+    p.offset=binary2integer(
+      std::string(v, 0, i), true);
 
     identifier.value=pointer_logic.pointer_expr(p, type);
   }
@@ -191,10 +196,10 @@ void smt1_convt::convert_address_of_rec(const exprt &expr)
      expr.id()==ID_string_constant)
   {
     smt1_prop.out
-      << "(concat bv"
-      << pointer_logic.add_object(expr)
-      << "[" << BV_ADDR_BITS << "]"
-      << " bv0[" << config.ansi_c.pointer_width << "])";
+      << "(concat bv0["
+      << config.ansi_c.pointer_width-BV_ADDR_BITS << "] "
+      << "bv" << pointer_logic.add_object(expr)
+      << "[" << BV_ADDR_BITS << "])";
   }
   else if(expr.id()==ID_index)
   {
@@ -254,9 +259,9 @@ void smt1_convt::convert_address_of_rec(const exprt &expr)
 
       smt1_prop.out << "(bvadd ";
       convert_address_of_rec(struct_op);
-      smt1_prop.out << "(zero_extend[" << BV_ADDR_BITS << "] ";
+      smt1_prop.out << " ";
       convert_expr(from_integer(offset, index_type), true);
-      smt1_prop.out << "))";
+      smt1_prop.out << ")";
     }
     else
       throw "unexpected type of member operand";
@@ -811,26 +816,26 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
   {
     assert(expr.operands().size()==1);
     assert(expr.op0().type().id()==ID_pointer);
-    smt1_prop.out << "(extract["
-                  << (config.ansi_c.pointer_width-1)
+    smt1_prop.out << "(zero_extend[" << BV_ADDR_BITS << "] (extract["
+                  << (config.ansi_c.pointer_width-1-BV_ADDR_BITS)
                   << ":0] ";
     convert_expr(expr.op0(), true);
-    smt1_prop.out << ")";
+    smt1_prop.out << "))";
     assert(bv_width(expr.type())==config.ansi_c.pointer_width);
   }
   else if(expr.id()==ID_pointer_object)
   {
     assert(expr.operands().size()==1);
     assert(expr.op0().type().id()==ID_pointer);
-    unsigned ext=bv_width(expr.type())-BV_ADDR_BITS;
+    signed int ext=(int)bv_width(expr.type())-(int)BV_ADDR_BITS;
 
     if(ext>0)
       smt1_prop.out << "(zero_extend[" << ext << "] ";
 
     smt1_prop.out << "(extract["
-                  << (config.ansi_c.pointer_width+BV_ADDR_BITS-1)
+                  << (config.ansi_c.pointer_width-1)
                   << ":"
-                  << config.ansi_c.pointer_width << "] ";
+                  << config.ansi_c.pointer_width-1-BV_ADDR_BITS << "] ";
     convert_expr(expr.op0(), true);
     smt1_prop.out << ")";
 
@@ -844,15 +849,15 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
     from_bool_begin(expr.type(), bool_as_bv);
 
     smt1_prop.out << "(= (extract["
-                  << (config.ansi_c.pointer_width+BV_ADDR_BITS-1)
+                  << (config.ansi_c.pointer_width-1)
                   << ":"
-                  << config.ansi_c.pointer_width << "] ";
+                  << config.ansi_c.pointer_width-BV_ADDR_BITS << "] ";
     convert_expr(expr.op0(), true);
     smt1_prop.out << ")";
     smt1_prop.out << " (extract["
-                  << (config.ansi_c.pointer_width+BV_ADDR_BITS-1)
+                  << (config.ansi_c.pointer_width-1)
                   << ":"
-                  << config.ansi_c.pointer_width << "] ";
+                  << config.ansi_c.pointer_width-BV_ADDR_BITS << "] ";
     convert_expr(expr.op1(), true);
     smt1_prop.out << "))";
 
@@ -871,8 +876,8 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
     from_bool_begin(expr.type(), bool_as_bv);
 
     smt1_prop.out << "(= (extract["
-                  << (config.ansi_c.pointer_width+BV_ADDR_BITS-1)
-                  << ":" << config.ansi_c.pointer_width << "] ";
+                  << (config.ansi_c.pointer_width-1)
+                  << ":" << config.ansi_c.pointer_width-BV_ADDR_BITS << "] ";
     convert_expr(expr.op0(), true);
     smt1_prop.out << ") bv" << pointer_logic.get_invalid_object()
                   << "[" << BV_ADDR_BITS << "])";
@@ -1434,19 +1439,16 @@ void smt1_convt::convert_typecast(const typecast_exprt &expr, bool bool_as_bv)
             op_type.id()==ID_signedbv)
     {
       unsigned from_width=bv_width(op_type);
-      smt1_prop.out << "(concat"
-                    << " bv" << pointer_logic.get_null_object()
-                    << "[" << BV_ADDR_BITS << "] ";
 
       if(from_width==config.ansi_c.pointer_width)
         convert_expr(op, true);
       else if(from_width<config.ansi_c.pointer_width)
       {
-        smt1_prop.out << "(sign_extend["
+        smt1_prop.out << "(zero_extend["
                       << (config.ansi_c.pointer_width-from_width)
                       << "] ";
         convert_expr(op, true);
-        smt1_prop.out << ")"; // sign_extend
+        smt1_prop.out << ")"; // zero_extend
       }
       else // from_width>config.ansi_c.pointer_width
       {
@@ -1456,8 +1458,6 @@ void smt1_convt::convert_typecast(const typecast_exprt &expr, bool bool_as_bv)
         convert_expr(op, true);
         smt1_prop.out << ")"; // extract
       }
-        
-      smt1_prop.out << ")"; // concat
     }
     else
       throw "TODO typecast3 "+op_type.id_string()+" -> pointer";
@@ -1624,10 +1624,10 @@ void smt1_convt::convert_constant(const constant_exprt &expr, bool bool_as_bv)
     if(value==ID_NULL)
     {
       smt1_prop.out << "(concat"
+                    << " bv0[" << config.ansi_c.pointer_width-BV_ADDR_BITS
+                    << "]"
                     << " bv" << pointer_logic.get_null_object()
-                    << "[" << BV_ADDR_BITS << "]"
-                    << " bv0[" << config.ansi_c.pointer_width
-                    << "])";
+                    << "[" << BV_ADDR_BITS << "])";
     }
     else
       throw "unknown pointer constant: "+id2string(value);
@@ -1759,8 +1759,8 @@ void smt1_convt::convert_is_dynamic_object(
     // let is only allowed in formulas
 
     smt1_prop.out << "(let (?obj (extract["
-                  << (config.ansi_c.pointer_width+BV_ADDR_BITS-1)
-                  << ":" << config.ansi_c.pointer_width << "] ";
+                  << (config.ansi_c.pointer_width-1)
+                  << ":" << config.ansi_c.pointer_width-BV_ADDR_BITS << "] ";
     convert_expr(expr.op0(), true);
     smt1_prop.out << ")) ";
 
@@ -1915,7 +1915,6 @@ void smt1_convt::convert_plus(const exprt &expr)
     smt1_prop.out << "(bvadd ";
     convert_expr(p, true);
     smt1_prop.out << " ";
-    smt1_prop.out << "(zero_extend[" << BV_ADDR_BITS << "] ";
 
     if(element_size>=2)
     {
@@ -1927,7 +1926,7 @@ void smt1_convt::convert_plus(const exprt &expr)
     else
       convert_expr(i, true);
 
-    smt1_prop.out << "))";
+    smt1_prop.out << ")";
   }
   else if(expr.type().id()==ID_rational ||
           expr.type().id()==ID_integer)
