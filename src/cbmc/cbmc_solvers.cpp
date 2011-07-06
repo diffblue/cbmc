@@ -12,14 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <bv_refinement/bv_refinement_loop.h>
 #endif
 
-#ifdef HAVE_BOOLECTOR
-#include <solvers/boolector/boolector_dec.h>
-#endif
-
-#ifdef HAVE_Z3
-#include <solvers/z3/z3_dec.h>
-#endif
-
 #include <solvers/smt1/smt1_dec.h>
 #include <solvers/smt2/smt2_dec.h>
 #include <solvers/cvc/cvc_dec.h>
@@ -314,12 +306,7 @@ Function: bmc_baset::decide_boolector
 
 bool bmc_baset::decide_boolector()
 {
-  #ifdef HAVE_BOOLECTOR
-  boolector_dect boolector_dec;
-  return decide(boolector_dec);
-  #else
   return decide_smt1(smt1_dect::BOOLECTOR);
-  #endif
 }
 
 /*******************************************************************\
@@ -336,12 +323,7 @@ Function: bmc_baset::decide_z3
 
 bool bmc_baset::decide_z3()
 {
-  #ifdef HAVE_Z3
-  z3_dect z3_dec;
-  return decide(z3_dec);
-  #else
   return decide_smt1(smt1_dect::Z3);
-  #endif
 }
 
 /*******************************************************************\
