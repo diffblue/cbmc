@@ -2698,19 +2698,14 @@ void smt1_convt::convert_type(const typet &type)
   {    
     const array_typet &array_type=to_array_type(type);
     
-    if(array_type.size().id()==ID_infinity)
-      smt1_prop.out << "Array";
-    else
-    {
-      smt1_prop.out << "Array[" << array_index_bits << ":";
-  
-      unsigned width=boolbv_width(array_type.subtype());
-      
-      if(width==0)
-        throw "failed to get width of array subtype";
-  
-      smt1_prop.out << width << "]";
-    }
+    smt1_prop.out << "Array[" << array_index_bits << ":";
+
+    unsigned width=boolbv_width(array_type.subtype());
+    
+    if(width==0)
+      throw "failed to get width of array subtype";
+
+    smt1_prop.out << width << "]";
   }
   else if(type.id()==ID_bool)
   {
