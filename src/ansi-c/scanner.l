@@ -394,18 +394,26 @@ void ansi_c_scanner_init()
                     return make_identifier();
                 }
 
-"["{ws}"repeatable"   { BEGIN(MSC_ANNOTATION); }
-"["{ws}"source_annotation_attribute" { BEGIN(MSC_ANNOTATION); }
-"["{ws}"returnvalue"  { BEGIN(MSC_ANNOTATION); }
-"["{ws}"SA_Pre"       { BEGIN(MSC_ANNOTATION); }
-"["{ws}"SA_Post"      { BEGIN(MSC_ANNOTATION); }
-"["{ws}"SA_FormatString" { BEGIN(MSC_ANNOTATION); }
-"["{ws}"SA_Success"   { BEGIN(MSC_ANNOTATION); }
-"["{ws}"uuid"         { BEGIN(MSC_ANNOTATION); }
-"["{ws}"emitidl"      { BEGIN(MSC_ANNOTATION); }
-"["{ws}"module"       { BEGIN(MSC_ANNOTATION); }
-"["{ws}"export"       { BEGIN(MSC_ANNOTATION); }
-
+"["{ws}"repeatable" |
+"["{ws}"source_annotation_attribute" |
+"["{ws}"returnvalue" |
+"["{ws}"SA_Pre" |
+"["{ws}"SA_Post" |
+"["{ws}"SA_FormatString" |
+"["{ws}"SA_Success" |
+"["{ws}"uuid" |
+"["{ws}"emitidl" |
+"["{ws}"module" |
+"["{ws}"export"  { if(PARSER.mode==ansi_c_parsert::MSC)
+	             BEGIN(MSC_ANNOTATION);
+                   else
+	           {
+	             yyless(1); // puts all but [ back into stream
+	             loc();
+	             PARSER.tag_following=false;
+	             return yytext[0];
+	           }
+                 }
 
 "__declspec" |
 "_declspec"     { if(PARSER.mode==ansi_c_parsert::MSC ||
