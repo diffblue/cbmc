@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <bitvector.h>
 #include <fixedbv.h>
 #include <pointer_offset_size.h>
+#include <base_type.h>
 
 #include <ansi-c/string_constant.h>
 
@@ -679,7 +680,7 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
           expr.id()==ID_notequal)
   {
     assert(expr.operands().size()==2);
-    assert(expr.op0().type()==expr.op1().type());
+    assert(base_type_eq(expr.op0().type(), expr.op1().type(), ns));
 
     // this may have to be converted
     from_bool_begin(expr.type(), bool_as_bv);
