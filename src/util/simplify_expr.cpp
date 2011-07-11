@@ -2867,9 +2867,10 @@ bool simplify_exprt::simplify_inequality_constant(exprt &expr)
               expr.op0().type().id()==ID_pointer)
       {
         // (type)ptr == NULL -> ptr == NULL
+        // note that 'ptr' may be an integer
         exprt op=expr.op0().op0();
         expr.op0().swap(op);
-        expr.op1().type()=expr.op0().type(); // fix type
+        expr.op1()=gen_zero(expr.op0().type());
         simplify_inequality(expr); // do again!
         return false;
       }
