@@ -423,6 +423,8 @@ bool bmc_baset::run(const goto_functionst &goto_functions)
       return decide_cvc();
     else if(options.get_bool_option("dimacs"))
       return write_dimacs();
+    else if(options.get_bool_option("opensmt"))
+      return decide_opensmt();
     else if(options.get_bool_option("refine"))
       return decide_bv_refinement();
     else if(options.get_bool_option("smt1"))
