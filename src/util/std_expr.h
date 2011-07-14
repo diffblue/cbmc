@@ -1325,4 +1325,31 @@ public:
 const function_application_exprt &to_function_application_expr(const exprt &expr);
 function_application_exprt &to_function_application_expr(exprt &expr);
 
+class concatenation_exprt:public exprt
+{
+public:
+  concatenation_exprt():exprt(ID_concatenation)
+  {
+  }
+
+  concatenation_exprt(const typet &_type):exprt(ID_concatenation, _type)
+  {
+  }
+
+  friend inline const concatenation_exprt &to_concatenation_expr(const exprt &expr)
+  {
+    assert(expr.id()==ID_concatenation);
+    return static_cast<const concatenation_exprt &>(expr);
+  }
+
+  friend inline concatenation_exprt &to_concatenation_expr(exprt &expr)
+  {
+    assert(expr.id()==ID_concatenation);
+    return static_cast<concatenation_exprt &>(expr);
+  }
+};
+
+const concatenation_exprt &to_concatenation_expr(const exprt &expr);
+concatenation_exprt &to_concatenation_expr(exprt &expr);
+
 #endif
