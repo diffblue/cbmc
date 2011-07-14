@@ -187,7 +187,8 @@ void smt2_convt::convert_address_of_rec(const exprt &expr)
 {
   if(expr.id()==ID_symbol ||
      expr.id()==ID_constant ||
-     expr.id()==ID_string_constant)
+     expr.id()==ID_string_constant ||
+     expr.id()==ID_label)
   {
     smt2_prop.out
       << "((ind tuple 2) (ind bv"

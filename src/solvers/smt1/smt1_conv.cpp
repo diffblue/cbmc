@@ -194,7 +194,8 @@ void smt1_convt::convert_address_of_rec(const exprt &expr)
 {
   if(expr.id()==ID_symbol ||
      expr.id()==ID_constant ||
-     expr.id()==ID_string_constant)
+     expr.id()==ID_string_constant ||
+     expr.id()==ID_label)
   {
     smt1_prop.out
       << "(concat bv0["
