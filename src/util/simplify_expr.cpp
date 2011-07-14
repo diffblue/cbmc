@@ -574,6 +574,23 @@ bool simplify_exprt::simplify_address_of_arg(exprt &expr)
       if(!simplify_rec(expr.op0())) result=false;
       if(!simplify_address_of_arg(expr.op1())) result=false;
       if(!simplify_address_of_arg(expr.op2())) result=false;
+
+      // op0 is a constant?
+      if(expr.op0().is_true())
+      {
+        result=false;
+        exprt tmp;
+        tmp.swap(expr.op1());
+        expr.swap(tmp);
+      }
+      else if(expr.op0().is_false())
+      {
+        result=false;
+        exprt tmp;
+        tmp.swap(expr.op2());
+        expr.swap(tmp);
+      }
+      
       return result;
     }
   }
@@ -4020,7 +4037,8 @@ Function: simplify_exprt::simplify
 
   Inputs:
 
- Outputs:
+ Outputs: returns true if expression unchanged;
+          returns false if changed
 
  Purpose:
 
