@@ -1196,6 +1196,31 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
       throw "unsupported type for "+expr.id_string()+
             ": "+expr.op0().type().id_string();
   }
+  else if(expr.id()==ID_array)
+  {
+    // array constructor
+    array_expr_mapt::const_iterator it=array_expr_map.find(expr);
+    assert(it!=array_expr_map.end());
+
+    assert(expr.operands().size()!=0);
+
+    forall_operands(it, expr)
+      smt1_prop.out << "(store ";
+
+    smt1_prop.out << it->second;
+
+    unsigned i=0;
+    forall_operands(it, expr)
+    {
+      exprt index=from_integer(i, unsignedbv_typet(array_index_bits));
+      smt1_prop.out << " ";
+      convert_expr(index, true);
+      smt1_prop.out << " ";
+      convert_expr(*it, true);
+      smt1_prop.out << ")";
+      i++;
+    }
+  }
   else
     throw "smt1_convt::convert_expr: `"+
           expr.id_string()+"' is unsupported";
@@ -1673,30 +1698,8 @@ void smt1_convt::convert_constant(const constant_exprt &expr, bool bool_as_bv)
   }
   else if(expr.type().id()==ID_array)
   {
-    array_init_mapt::const_iterator it=array_init_map.find(expr);
-    assert(it!=array_init_map.end());
-
-    std::string tmp;
-    tmp = it->second.as_string();
-
-    assert(expr.operands().size()!=0);
-
-    forall_operands(it, expr)
-      smt1_prop.out << "(store ";
-
-    smt1_prop.out << it->second;
-
-    unsigned i=0;
-    forall_operands(it, expr)
-    {
-      exprt inx = from_integer(i, unsignedbv_typet(array_index_bits));
-      smt1_prop.out << " ";
-      convert_expr(inx, true);
-      smt1_prop.out << " ";
-      convert_expr(*it, true);
-      smt1_prop.out << ")";
-      i++;
-    }
+    // this should be the 'array' expression
+    assert(false);
   }
   else if(expr.type().id()==ID_rational)
   {
@@ -2674,19 +2677,18 @@ void smt1_convt::find_symbols(const exprt &expr)
       array_of_map[expr]=id;
     }
   }
-  else if(expr.id()==ID_constant)
+  else if(expr.id()==ID_array)
   {
-    if(expr.type().id()==ID_array &&
-       array_init_map.find(expr)==array_init_map.end())
+    if(array_expr_map.find(expr)==array_expr_map.end())
     {
       // introduce a temporary array.
-      irep_idt id="array_init'"+i2string(array_init_map.size());
+      irep_idt id="array_init'"+i2string(array_expr_map.size());
       smt1_prop.out << ":extrafuns(("
                     << id
                     << " ";
       convert_type(expr.type());
       smt1_prop.out << "))" << std::endl;
-      array_init_map[expr]=id;
+      array_expr_map[expr]=id;
     }
   }
   else if(expr.id()==ID_string_constant)
@@ -2697,13 +2699,13 @@ void smt1_convt::find_symbols(const exprt &expr)
       string2array_map[expr]=t;
 
       // introduce a temporary array.
-      irep_idt id="string'"+i2string(array_init_map.size());
+      irep_idt id="string'"+i2string(array_expr_map.size());
       smt1_prop.out << ":extrafuns(("
                     << id
                     << " ";
       convert_type(t.type());
       smt1_prop.out << "))" << std::endl;
-      array_init_map[t]=id;
+      array_expr_map[t]=id;
     }
   }
 

@@ -135,13 +135,13 @@ protected:
   
   unsigned array_index_bits;
   
-  // for replacing 'array_of'
+  // for replacing 'array_of' expressions
   typedef std::map<exprt, irep_idt> array_of_mapt;
   array_of_mapt array_of_map;
   
-  // for replacing 'array initializers'
-  typedef std::map<exprt, irep_idt> array_init_mapt;
-  array_init_mapt array_init_map;
+  // for replacing 'array' expressions
+  typedef std::map<exprt, irep_idt> array_expr_mapt;
+  array_expr_mapt array_expr_map;
   
   // for replacing string constants
   typedef std::map<exprt, exprt> string2array_mapt;
