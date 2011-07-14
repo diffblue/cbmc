@@ -26,14 +26,16 @@ LINKBIN = $(CXX) $(LINKFLAGS) -o $@ $(LIBS)
 # LINKLIB = ld -r -o $@ $^
 # LINKBIN = $(CXX) $(LINKFLAGS) -o $@ $(LIBS)
 
-# use these for Cygwin:
+# use these for Cygwin/MingW32:
 # LIBEXT = .a
 # OBJEXT = .o
 # EXEEXT =
 # GCCFLAGS = -Wall -MMD -O2 -mno-cygwin
-# LINKFLAGS = -mno-cygwin
+# LINKFLAGS = -static
 # LINKLIB = ld -r -o $@ $^
 # LINKBIN = $(CXX) $(LINKFLAGS) -o $@ $(LIBS)
+# CC = i686-pc-mingw32-gcc
+# CXX = i686-pc-mingw32-g++
 
 # use these for Visual Studio:
 # LIBEXT = .lib
