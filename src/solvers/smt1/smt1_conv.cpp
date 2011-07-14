@@ -268,6 +268,18 @@ void smt1_convt::convert_address_of_rec(const exprt &expr)
       throw "unexpected type of member operand";
 
   }
+  else if(expr.id()==ID_if)
+  {
+    assert(expr.operands().size()==3);
+
+    smt1_prop.out << "(ite ";
+    convert_expr(expr.op0(), false);
+    smt1_prop.out << " ";
+    convert_expr(expr.op1(), true);
+    smt1_prop.out << " ";
+    convert_expr(expr.op2(), true);
+    smt1_prop.out << ")";
+  }
   else
     throw "don't know how to take address of: "+expr.id_string();
 }
@@ -798,7 +810,24 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
 
       convert_expr(expr.op0(), true);
       smt1_prop.out << " ";
-      convert_expr(expr.op1(), true);
+      
+      // SMT1 requires the shift distance to have the same width as
+      // the value that is shifted -- odd!
+
+      unsigned width_op0=boolbv_width(expr.op0().type());
+      unsigned width_op1=boolbv_width(expr.op1().type());
+
+      if(width_op0==width_op1)
+        convert_expr(expr.op1(), true);
+      else if(width_op0>width_op1)
+      {
+        smt1_prop.out << "(zero_extend[" << width_op0-width_op1 << "] ";
+        convert_expr(expr.op1(), true);
+        smt1_prop.out << ")"; // zero_extend
+      }
+      else
+        throw "unsupported shift-operand widths";
+                                                                                                                                                                
       smt1_prop.out << ")";
     }
     else
