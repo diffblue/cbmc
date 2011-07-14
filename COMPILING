@@ -2,13 +2,17 @@ What architecture?
 ------------------
 
 CPROVER compiles in the following environments:
+
 - Linux
+
 - MacOS X
-- Cygwin (using -mno-cygwin)
-- Microsoft's Visual Studio 2010
+
+- Cygwin (using the i686-pc-mingw32-g++ cross compiler)
+
+- Microsoft's Visual Studio 2010 (older versions won't work)
 
 You need to adjust config.inc to reflect the environment. The default is
-Linux.
+set up for a recent version of Linux.
 
 
 How to compile?
@@ -32,23 +36,20 @@ Follow these instructions:
    Alternatively, you may use zchaff, Booleforce, or
    SMV-SAT (if you work for Cadence).
 
-2) Adjust src/config.inc for the paths to a).
+2) Adjust src/config.inc for the paths to item 1).
 
-3) Adjust src/solvers/sat/satcheck.h to select which SAT solver to use
-   (MiniSat2 with simplifier is the default).
+3) If desired, adjust src/solvers/sat/satcheck.h to select which SAT
+   solver to use (MiniSat2 with simplifier is the default).
 
 4) Adjust the file src/utils/hash_cont.h
 
-   Depending on the version of your STL, you need to adjust a preprocessor
+   Depending on the version of your STL, you may need to adjust a preprocessor
    command:
+
    a) Recent versions of Linux run with "STL_HASH_TR1".
-   b) Cygwin requires "STL_HASH_GNU".
+   b) Recent versions of Cygwin/MingW work with "STL_HASH_TR1".
    c) Visual Studio: please get Visual Studio 10 and use "STL_HASH_TR1".
 
-5) Recent versions of Cygwin have issues with MingW support; specifically,
-   the linker fails to find crt2.o. Do the following to fix this before
-   starting compilation:
+   Older Linux or MingW systems may require "STL_HASH_GNU".
 
-   export LIBRARY_PATH=/usr/lib/mingw
-
-6) Type cd src; make - that should do it.
+5) Type cd src; make - that should do it.
