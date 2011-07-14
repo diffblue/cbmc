@@ -34,8 +34,9 @@ std::string smt1_dect::decision_procedure_text() const
   return "SMT "+logic+" using "+
     (solver==BOOLECTOR?"Boolector":
      solver==CVC3?"CVC3":
-     solver==Z3?"Z3":
+     solver==OPENSMT?"OpenSMT":
      solver==YICES?"Yices":
+     solver==Z3?"Z3":
      "(unknown)");
 }
 
@@ -118,17 +119,24 @@ decision_proceduret::resultt smt1_dect::dec_solve()
             + temp_result_filename;
     break;
 
-  case YICES:
-    command = "yices -smt -e "
+  case BOOLECTOR:
+    command = "boolector --smt "
+            + temp_out_filename
+            + " -fm --output "
+            + temp_result_filename;
+    break;
+
+  case OPENSMT:
+    command = "todo "
             + temp_out_filename
             + " > "
             + temp_result_filename;
     break;
 
-  case BOOLECTOR:
-    command = "boolector --smt "
+  case YICES:
+    command = "yices -smt -e "
             + temp_out_filename
-            + " -fm --output "
+            + " > "
             + temp_result_filename;
     break;
 
@@ -153,14 +161,17 @@ decision_proceduret::resultt smt1_dect::dec_solve()
 
   switch(solver)
   {
+  case BOOLECTOR:
+    return read_result_boolector(in);
+
   case CVC3:
     return read_result_cvc3(in);
 
+  case OPENSMT:
+    return read_result_opensmt(in);
+
   case YICES:
     return read_result_yices(in);
-
-  case BOOLECTOR:
-    return read_result_boolector(in);
 
   case Z3:
     return read_result_z3(in);
@@ -233,6 +244,23 @@ decision_proceduret::resultt smt1_dect::read_result_boolector(std::istream &in)
   else
     error("Unexpected result from SMT-Solver: "+line);
 
+  return D_ERROR;
+}
+
+/*******************************************************************\
+
+Function: smt1_dect::read_result_opensmt
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+decision_proceduret::resultt smt1_dect::read_result_opensmt(std::istream &in)
+{
   return D_ERROR;
 }
 
