@@ -77,6 +77,7 @@ protected:
   virtual bool decide_smt1(smt1_dect::solvert solver);
   virtual bool decide_smt2(smt2_dect::solvert solver);
   virtual bool decide_boolector();
+  virtual bool decide_opensmt();
   virtual bool decide_z3();
   virtual void smt1_convert(std::ostream &out);
   virtual void smt2_convert(std::ostream &out);

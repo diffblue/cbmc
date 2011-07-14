@@ -311,6 +311,23 @@ bool bmc_baset::decide_boolector()
 
 /*******************************************************************\
 
+Function: bmc_baset::decide_opensmt
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool bmc_baset::decide_opensmt()
+{
+  return decide_smt1(smt1_dect::OPENSMT);
+}
+
+/*******************************************************************\
+
 Function: bmc_baset::decide_z3
 
   Inputs:
