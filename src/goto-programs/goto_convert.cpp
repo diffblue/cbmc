@@ -517,11 +517,6 @@ void goto_convertt::convert_expression(
     tmp_code.else_case().location()=expr.location();
     convert_ifthenelse(tmp_code, dest);
   }
-  else if(expr.id()==ID_statement_expression)
-  {
-    assert(expr.operands().size()==1);
-    convert(to_code(expr.op0()), dest);
-  }
   else
   {
     clean_expr(expr, dest, false); // result _not_ used
