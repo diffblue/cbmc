@@ -265,9 +265,13 @@ void smt1_convt::convert_address_of_rec(const exprt &expr)
       convert_expr(from_integer(offset, index_type), true);
       smt1_prop.out << ")";
     }
+    else if(struct_op_type.id()==ID_union)
+    {
+      // these all have offset 0
+      convert_address_of_rec(struct_op);
+    }
     else
       throw "unexpected type of member operand";
-
   }
   else if(expr.id()==ID_if)
   {
