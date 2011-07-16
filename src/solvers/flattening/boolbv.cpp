@@ -329,6 +329,22 @@ void boolbvt::convert_bitvector(const exprt &expr, bvt &bv)
     
     return;
   }
+  #ifdef HAVE_FLOATBV
+  else if(expr.id()=="float_debug1" ||
+          expr.id()=="float_debug2")
+  {
+    assert(expr.operands().size()==2);
+    bvt bv0, bv1;
+    convert_bitvector(expr.op0(), bv0);
+    convert_bitvector(expr.op1(), bv1);
+    float_utilst float_utils(prop);
+    float_utils.spec=to_floatbv_type(expr.type());
+    bv=expr.id()=="float_debug1"?
+      float_utils.debug1(bv0, bv1):
+      float_utils.debug2(bv0, bv1);
+    return;
+  }
+  #endif
 
   return conversion_failed(expr, bv);
 }
