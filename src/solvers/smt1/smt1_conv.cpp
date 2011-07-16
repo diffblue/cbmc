@@ -553,38 +553,18 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
   {
     convert_constant(to_constant_expr(expr), bool_as_bv);
   }
-  else if(expr.id()==ID_concatenation ||
-          expr.id()==ID_bitand ||
-          expr.id()==ID_bitor ||
-          expr.id()==ID_bitxor ||
-          expr.id()==ID_bitnand ||
-          expr.id()==ID_bitnor)
-  {
-    assert(expr.operands().size()>=2);
-
-    smt1_prop.out << "(";
-
-    if(expr.id()==ID_concatenation)
-      smt1_prop.out << "concat";
-    else if(expr.id()==ID_bitand)
-      smt1_prop.out << "bvand";
-    else if(expr.id()==ID_bitor)
-      smt1_prop.out << "bvor";
-    else if(expr.id()==ID_bitxor)
-      smt1_prop.out << "bvxor";
-    else if(expr.id()==ID_bitnand)
-      smt1_prop.out << "bvnand";
-    else if(expr.id()==ID_bitnor)
-      smt1_prop.out << "bvnor";
-
-    forall_operands(it, expr)
-    {
-      smt1_prop.out << " ";
-      convert_expr(*it, true);
-    }
-
-    smt1_prop.out << ")";
-  }
+  else if(expr.id()==ID_concatenation)
+    convert_nary(expr, "concat", true);
+  else if(expr.id()==ID_bitand)
+    convert_nary(expr, "bvand", true);
+  else if(expr.id()==ID_bitor)
+    convert_nary(expr, "bvor", true);
+  else if(expr.id()==ID_bitxor)
+    convert_nary(expr, "bvxor", true);
+  else if(expr.id()==ID_bitnand)
+    convert_nary(expr, "bvnand", true);
+  else if(expr.id()==ID_bitnor)
+    convert_nary(expr, "bvnor", true);
   else if(expr.id()==ID_bitnot)
   {
     assert(expr.operands().size()==1);
@@ -1920,15 +1900,7 @@ void smt1_convt::convert_plus(const exprt &expr)
      expr.type().id()==ID_signedbv ||
      expr.type().id()==ID_fixedbv)
   {
-    smt1_prop.out << "(bvadd";
-
-    forall_operands(it, expr)
-    {
-      smt1_prop.out << " ";
-      convert_expr(*it, true);
-    }
-
-    smt1_prop.out << ")";
+    convert_nary(expr, "bvadd", true);
   }
   else if(expr.type().id()==ID_pointer)
   {
@@ -1965,15 +1937,7 @@ void smt1_convt::convert_plus(const exprt &expr)
   else if(expr.type().id()==ID_rational ||
           expr.type().id()==ID_integer)
   {
-    smt1_prop.out << "(+";
-
-    forall_operands(it, expr)
-    {
-      smt1_prop.out << " ";
-      convert_expr(*it, true);
-    }
-
-    smt1_prop.out << ")";
+    convert_nary(expr, "+", true);
   }  
   else
     throw "unsupported type for +: "+expr.type().id_string();
@@ -3091,4 +3055,45 @@ void smt1_convt::flatten_array(const exprt &op)
   #if 0
   smt1_prop.out << ")"; // let
   #endif
+}
+
+/*******************************************************************\
+
+Function: smt1_convt::convert_nary
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void smt1_convt::convert_nary(
+  const exprt &expr,
+  const irep_idt op_string,
+  bool bool_as_bv)
+{
+  unsigned num_ops=expr.operands().size();
+
+  assert(num_ops > 0);
+
+  if(num_ops==1)
+    convert_expr(expr.op0(), bool_as_bv);
+  else
+  {
+    exprt::operandst::const_iterator it=expr.operands().begin();
+
+    for(unsigned i=0; i<num_ops-1; ++i, ++it)
+    {
+      smt1_prop.out << " (" << op_string << " ";
+      convert_expr(*it, bool_as_bv);
+    }
+
+    smt1_prop.out << " ";
+    convert_expr(*it, bool_as_bv);
+
+    // do the many closing parentheses
+    smt1_prop.out << std::string (num_ops-1, ')');
+  }
 }
