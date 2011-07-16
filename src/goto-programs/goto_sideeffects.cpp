@@ -618,6 +618,7 @@ void goto_convertt::remove_statement_expression(
   if(!result_is_used)
   {
     convert(code, dest);
+    expr.make_nil();
     return;
   }
   
