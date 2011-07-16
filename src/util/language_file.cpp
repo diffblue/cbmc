@@ -8,6 +8,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <fstream>
 
+#include <i2string.h>
+
 #include "language.h"
 #include "language_file.h"
 #include "strstream2string.h"
@@ -153,19 +155,34 @@ bool language_filest::typecheck(contextt &context)
   }
 
   // build module map
+  
+  unsigned collision_counter=0;
 
   for(filemapt::iterator fm_it=filemap.begin();
       fm_it!=filemap.end(); fm_it++)
   {
-    std::set<std::string> &modules=fm_it->second.modules;
+    const language_filet::modulest &modules=
+      fm_it->second.modules;
 
-    for(std::set<std::string>::const_iterator mo_it=modules.begin();
-        mo_it!=modules.end(); mo_it++)
+    for(language_filet::modulest::const_iterator
+        mo_it=modules.begin();
+        mo_it!=modules.end();
+        mo_it++)
     {
+      // these may collide, and then get renamed
+      std::string module_name=*mo_it;
+      
+      while(modulemap.find(module_name)!=modulemap.end())
+      {
+        module_name=*mo_it+"#"+i2string(collision_counter);
+        collision_counter++;
+      }
+      
       language_modulet module;
       module.file=&fm_it->second;
-      module.name=*mo_it;
-      modulemap.insert(std::pair<std::string, language_modulet>(module.name, module));
+      module.name=module_name;
+      modulemap.insert(
+        std::pair<std::string, language_modulet>(module.name, module));
     }
   }
 
