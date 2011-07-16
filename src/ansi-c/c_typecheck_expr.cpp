@@ -1770,6 +1770,7 @@ void c_typecheck_baset::do_special_functions(
   side_effect_expr_function_callt &expr)
 {
   const exprt &f_op=expr.function();
+  const locationt &location=expr.location();
 
   // some built-in functions
   if(f_op.id()==ID_symbol)
@@ -1786,6 +1787,7 @@ void c_typecheck_baset::do_special_functions(
 
       exprt same_object_expr("same-object", bool_typet());
       same_object_expr.operands()=expr.arguments();
+      same_object_expr.location()=location;
       expr.swap(same_object_expr);
     }
     else if(identifier==CPROVER_PREFIX "buffer_size")
@@ -1798,6 +1800,7 @@ void c_typecheck_baset::do_special_functions(
 
       exprt buffer_size_expr("buffer_size", uint_type());
       buffer_size_expr.operands()=expr.arguments();
+      buffer_size_expr.location()=location;
       expr.swap(buffer_size_expr);
     }
     else if(identifier==CPROVER_PREFIX "is_zero_string")
@@ -1811,6 +1814,7 @@ void c_typecheck_baset::do_special_functions(
       exprt is_zero_string_expr("is_zero_string", bool_typet());
       is_zero_string_expr.operands()=expr.arguments();
       is_zero_string_expr.set(ID_C_lvalue, true); // make it an lvalue
+      is_zero_string_expr.location()=location;
       expr.swap(is_zero_string_expr);
     }
     else if(identifier==CPROVER_PREFIX "zero_string_length")
@@ -1824,6 +1828,7 @@ void c_typecheck_baset::do_special_functions(
       exprt zero_string_length_expr("zero_string_length", uint_type());
       zero_string_length_expr.operands()=expr.arguments();
       zero_string_length_expr.set(ID_C_lvalue, true); // make it an lvalue
+      zero_string_length_expr.location()=location;
       expr.swap(zero_string_length_expr);
     }
     else if(identifier==CPROVER_PREFIX "DYNAMIC_OBJECT")
@@ -1833,6 +1838,7 @@ void c_typecheck_baset::do_special_functions(
 
       exprt dynamic_object_expr=exprt(ID_dynamic_object, expr.type());
       dynamic_object_expr.operands()=expr.arguments();
+      dynamic_object_expr.location()=location;
       expr.swap(dynamic_object_expr);
     }
     else if(identifier==CPROVER_PREFIX "POINTER_OFFSET")
@@ -1842,6 +1848,7 @@ void c_typecheck_baset::do_special_functions(
 
       exprt pointer_offset_expr=exprt(ID_pointer_offset, expr.type());
       pointer_offset_expr.operands()=expr.arguments();
+      pointer_offset_expr.location()=location;
       expr.swap(pointer_offset_expr);
     }
     else if(identifier==CPROVER_PREFIX "POINTER_OBJECT")
@@ -1851,6 +1858,7 @@ void c_typecheck_baset::do_special_functions(
 
       exprt pointer_object_expr=exprt(ID_pointer_object, expr.type());
       pointer_object_expr.operands()=expr.arguments();
+      pointer_object_expr.location()=location;
       expr.swap(pointer_object_expr);
     }
     else if(identifier==CPROVER_PREFIX "isnan")
@@ -1863,6 +1871,7 @@ void c_typecheck_baset::do_special_functions(
 
       exprt isnan_expr(ID_isnan, bool_typet());
       isnan_expr.operands()=expr.arguments();
+      isnan_expr.location()=location;
       expr.swap(isnan_expr);
     }
     else if(identifier==CPROVER_PREFIX "isfinite")
@@ -1875,6 +1884,7 @@ void c_typecheck_baset::do_special_functions(
 
       exprt isfinite_expr(ID_isfinite, bool_typet());
       isfinite_expr.operands()=expr.arguments();
+      isfinite_expr.location()=location;
       expr.swap(isfinite_expr);
     }
     else if(identifier==CPROVER_PREFIX "abs" ||
@@ -1891,6 +1901,7 @@ void c_typecheck_baset::do_special_functions(
 
       exprt abs_expr(ID_abs, expr.type());
       abs_expr.operands()=expr.arguments();
+      abs_expr.location()=location;
       expr.swap(abs_expr);
     }
     else if(identifier==CPROVER_PREFIX "malloc")
@@ -1903,7 +1914,7 @@ void c_typecheck_baset::do_special_functions(
 
       exprt malloc_expr=side_effect_exprt(ID_malloc);
       malloc_expr.type()=expr.type();
-      malloc_expr.location()=expr.location();
+      malloc_expr.location()=location;
       malloc_expr.operands()=expr.arguments();
       expr.swap(malloc_expr);
     }
@@ -1917,6 +1928,7 @@ void c_typecheck_baset::do_special_functions(
 
       exprt isinf_expr(ID_isinf, bool_typet());
       isinf_expr.operands()=expr.arguments();
+      isinf_expr.location()=location;
       expr.swap(isinf_expr);
     }
     else if(identifier==CPROVER_PREFIX "isnormal")
@@ -1929,6 +1941,7 @@ void c_typecheck_baset::do_special_functions(
 
       exprt isnormal_expr(ID_isnormal, bool_typet());
       isnormal_expr.operands()=expr.arguments();
+      isnormal_expr.location()=location;
       expr.swap(isnormal_expr);
     }
     else if(identifier==CPROVER_PREFIX "sign")
@@ -1941,7 +1954,7 @@ void c_typecheck_baset::do_special_functions(
 
       exprt sign_expr(ID_sign, bool_typet());
       sign_expr.operands()=expr.arguments();
-      sign_expr.location()=expr.location();
+      sign_expr.location()=location;
       expr.swap(sign_expr);
     }
     else if(identifier==CPROVER_PREFIX "equal")
@@ -1954,7 +1967,7 @@ void c_typecheck_baset::do_special_functions(
       
       equality_exprt equality_expr;
       equality_expr.operands()=expr.arguments();
-      equality_expr.location()=expr.location();
+      equality_expr.location()=location;
       
       if(!base_type_eq(equality_expr.lhs().type(),
                        equality_expr.rhs().type(), *this))
@@ -2014,7 +2027,25 @@ void c_typecheck_baset::do_special_functions(
       simplify(tmp1, *this);
 
       exprt tmp2=from_integer(tmp1.is_constant(), expr.type());      
+      tmp2.location()=location;
       expr.swap(tmp2);
+    }
+    else if(identifier==CPROVER_PREFIX "float_debug1" ||
+            identifier==CPROVER_PREFIX "float_debug2")
+    {
+      if(expr.arguments().size()!=2)
+      {
+        err_location(f_op);
+        throw "float_debug expects two operands";
+      }
+
+      const irep_idt &id=
+        identifier==CPROVER_PREFIX "float_debug1"?
+        "float_debug1":"float_debug2";
+      exprt float_debug_expr(id, expr.type());
+      float_debug_expr.operands()=expr.arguments();
+      float_debug_expr.location()=location;
+      expr.swap(float_debug_expr);
     }
   }
 }
