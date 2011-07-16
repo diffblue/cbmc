@@ -154,6 +154,12 @@ protected:
   exprt binary2union(
     const class union_typet &type, 
     const std::string &binary) const;  
+
+  // flattens multi-operand expressions into binary
+  // expressions
+  void convert_nary(const exprt &expr, 
+                    const irep_idt op_string,
+                    bool bool_as_bv);
 };
 
 #endif
