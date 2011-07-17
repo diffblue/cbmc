@@ -544,7 +544,10 @@ void goto_checkt::add_guarded_claim(
   
   if(assertions.insert(new_expr).second)
   {
-    goto_programt::targett t=new_code.add_instruction(ASSERT);
+    goto_program_instruction_typet type=
+      options.get_bool_option("assert-to-assume")?ASSUME:ASSERT;
+
+    goto_programt::targett t=new_code.add_instruction(type);
 
     t->guard.swap(new_expr);
     t->location=location;
