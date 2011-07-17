@@ -109,7 +109,10 @@ void goto_program_dereferencet::dereference_failure(
   
     if(!guard_expr.is_true())
     {
-      goto_programt::targett t=new_code.add_instruction(ASSERT);
+      goto_program_instruction_typet type=
+        options.get_bool_option("assert-to-assume")?ASSUME:ASSERT;
+
+      goto_programt::targett t=new_code.add_instruction(type);
       t->guard.swap(guard_expr);
       t->location=dereference_location;
       t->location.set(ID_property, property);
