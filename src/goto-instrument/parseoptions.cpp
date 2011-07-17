@@ -288,6 +288,12 @@ void goto_instrument_parseoptionst::instrument_goto_program(
 {
   optionst options;
 
+  // use assumptions instead of assertions?
+  if(cmdline.isset("assert-to-assume"))
+    options.set_option("assert-to-assume", true);
+  else
+    options.set_option("assert-to-assume", false);
+
   // check array bounds
   if(cmdline.isset("bounds-check"))
     options.set_option("bounds-check", true);

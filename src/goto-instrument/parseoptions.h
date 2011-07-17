@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(bounds-check)(no-bounds-check)" \
   "(pointer-check)(no-pointer-check)" \
   "(leak-check)" \
+  "(assert-to-assume)" \
   "(div-by-zero-check)(no-div-by-zero-check)" \
   "(no-assertions)(no-assumptions)(uninitialized-check)" \
   "(nan-check)(no-nan-check)" \
