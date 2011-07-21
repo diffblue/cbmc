@@ -30,17 +30,12 @@ inline void abort(void)
 
 /* FUNCTION: calloc */
 
-#ifndef __CPROVER_STDLIB_H_INCLUDED
-#include <stdlib.h>
-#define __CPROVER_STDLIB_H_INCLUDED
-#endif
-
 #undef calloc
 
-inline void *calloc(size_t nmemb, size_t size)
+inline void *calloc(__CPROVER_size_t nmemb, __CPROVER_size_t size)
 {
   __CPROVER_HIDE:;
-  size_t total_size=nmemb*size;
+  __CPROVER_size_t total_size=nmemb*size;
   void *res;
   res=malloc(total_size);
   #ifdef __CPROVER_STRING_ABSTRACTION
@@ -57,14 +52,7 @@ inline void *calloc(size_t nmemb, size_t size)
 
 /* FUNCTION: malloc */
 
-#ifndef __CPROVER_STDLIB_H_INCLUDED
-#include <stdlib.h>
-#define __CPROVER_STDLIB_H_INCLUDED
-#endif
-
-#undef malloc
-
-inline void *malloc(size_t malloc_size)
+inline void *malloc(__CPROVER_size_t malloc_size)
 {
   // realistically, malloc may return NULL,
   // and __CPROVER_malloc doesn't, but no one cares
@@ -85,18 +73,13 @@ inline void *malloc(size_t malloc_size)
 
 /* FUNCTION: free */
 
-#ifndef __CPROVER_STDLIB_H_INCLUDED
-#include <stdlib.h>
-#define __CPROVER_STDLIB_H_INCLUDED
-#endif
-
 #undef free
 
 inline void free(void *ptr)
 {
   __CPROVER_HIDE:;
   // If ptr is NULL, no operation is performed.
-  if(ptr!=NULL)
+  if(ptr!=0)
   {
     // is it dynamic?
     __CPROVER_assert(__CPROVER_DYNAMIC_OBJECT(ptr),
@@ -116,11 +99,6 @@ inline void free(void *ptr)
 
 /* FUNCTION: atoi */
 
-#ifndef __CPROVER_STDLIB_H_INCLUDED
-#include <stdlib.h>
-#define __CPROVER_STDLIB_H_INCLUDED
-#endif
-
 #undef atoi
 
 inline int atoi(const char *nptr)
@@ -135,11 +113,6 @@ inline int atoi(const char *nptr)
 }
 
 /* FUNCTION: atol */
-
-#ifndef __CPROVER_STDLIB_H_INCLUDED
-#include <stdlib.h>
-#define __CPROVER_STDLIB_H_INCLUDED
-#endif
 
 #undef atol
 
@@ -171,7 +144,7 @@ inline char *getenv(const char *name)
   if(!found) return 0;
 
   char *buffer;
-  size_t buf_size;
+  __CPROVER_size_t buf_size;
 
   __CPROVER_assume(buf_size>=1);
   buffer=(char *)__CPROVER_malloc(buf_size);
