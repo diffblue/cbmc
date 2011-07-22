@@ -455,12 +455,12 @@ bool cbmc_parseoptionst::get_goto_program(
       goto_convert(
         context, bmc.options, goto_functions,
         ui_message_handler);
-        
-      // finally add the library
-      status("Adding CPROVER library");      
-      link_to_library(
-        context, goto_functions, bmc.options, ui_message_handler);
     }
+
+    // finally add the library
+    status("Adding CPROVER library");      
+    link_to_library(
+      context, goto_functions, bmc.options, ui_message_handler);
 
     if(cmdline.isset("interpreter"))
     {
