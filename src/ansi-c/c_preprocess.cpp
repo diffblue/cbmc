@@ -197,7 +197,7 @@ bool c_preprocess_visual_studio(
 
   message_streamt message_stream(message_handler);
 
-  // use VC98 CL
+  // use Visual Studio's CL
   
   std::string stderr_file=get_temporary_file("tmp.stderr", "");
   std::string command_file_name=get_temporary_file("tmp.cl-cmd", "");
@@ -256,7 +256,7 @@ bool c_preprocess_visual_studio(
   {
     unlink(tmpi.c_str());
     unlink(stderr_file.c_str());
-    message_stream.error("Preprocessing failed (fopen failed)");
+    message_stream.error("CL Preprocessing failed (fopen failed)");
     return true;
   }
 
@@ -283,7 +283,7 @@ bool c_preprocess_visual_studio(
   if(result!=0)
   {
     message_stream.error_parse(1);
-    message_stream.error("Preprocessing failed");
+    message_stream.error("CL Preprocessing failed");
     return true;
   }
   else
@@ -577,7 +577,7 @@ bool c_preprocess_gcc(
   {
     unlink(tmpi.c_str());
     unlink(stderr_file.c_str());
-    message_stream.error("Preprocessing failed (fopen failed)");
+    message_stream.error("GCC preprocessing failed (fopen failed)");
     return true;
   }
   #else
@@ -597,7 +597,7 @@ bool c_preprocess_gcc(
   else
   {
     unlink(stderr_file.c_str());
-    message_stream.error("Preprocessing failed (popen failed)");
+    message_stream.error("GCC preprocessing failed (popen failed)");
     return true;
   }
   #endif
@@ -615,7 +615,7 @@ bool c_preprocess_gcc(
   if(result!=0)
   {
     message_stream.error_parse(1);
-    message_stream.error("Preprocessing failed");
+    message_stream.error("GCC preprocessing failed");
     return true;
   }
   else
@@ -727,7 +727,7 @@ bool c_preprocess_arm(
   {
     unlink(tmpi.c_str());
     unlink(stderr_file.c_str());
-    message_stream.error("Preprocessing failed (fopen failed)");
+    message_stream.error("ARMCC preprocessing failed (fopen failed)");
     return true;
   }
   #else
@@ -747,7 +747,7 @@ bool c_preprocess_arm(
   else
   {
     unlink(stderr_file.c_str());
-    message_stream.error("Preprocessing failed (popen failed)");
+    message_stream.error("ARMCC preprocessing failed (popen failed)");
     return true;
   }
   #endif
@@ -765,7 +765,7 @@ bool c_preprocess_arm(
   if(result!=0)
   {
     message_stream.error_parse(1);
-    message_stream.error("Preprocessing failed");
+    message_stream.error("ARMCC preprocessing failed");
     return true;
   }
   else
