@@ -603,9 +603,12 @@ void c_typecheck_baset::do_designated_initializer(
     }
     else if(value.id()==ID_string_constant)
     {
-      // we stop for initializers that are string-constants,
-      // which are like arrays
-      if(type.id()==ID_array || type.id()==ID_incomplete_array)
+      // We stop for initializers that are string-constants,
+      // which are like arrays. We only do so if we are to
+      // initialize an array of scalars.
+      if((type.id()==ID_array || type.id()==ID_incomplete_array) &&
+         (follow(type.subtype()).id()==ID_signedbv ||
+          follow(type.subtype()).id()==ID_unsignedbv))
       {
         *dest=do_initializer_rec(value, type, force_constant);
         return; // done
