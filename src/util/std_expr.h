@@ -1352,4 +1352,33 @@ public:
 const concatenation_exprt &to_concatenation_expr(const exprt &expr);
 concatenation_exprt &to_concatenation_expr(exprt &expr);
 
+class same_object_exprt:public exprt
+{
+public:
+  same_object_exprt(const exprt &obj1, const exprt &obj2):
+    exprt("same-object", bool_typet())
+  {
+    copy_to_operands(obj1, obj2);
+  }
+};
+
+class sideeffect_exprt:public exprt
+{
+public:
+  sideeffect_exprt(
+    const irep_idt &_statement,
+    const typet &type):exprt(ID_sideeffect, type)
+  {
+    set(ID_statement, _statement);
+  }
+};
+
+class nondet_exprt:public sideeffect_exprt
+{
+public:
+  explicit nondet_exprt(const typet &_type):sideeffect_exprt(ID_nondet, _type)
+  {
+  }
+};
+
 #endif
