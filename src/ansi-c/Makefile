@@ -45,7 +45,7 @@ cprover_library$(OBJEXT): cprover_library.inc
 ###############################################################################
 
 library/converter$(EXEEXT):
-	$(CXX) $(LINKFLAGS) -o $@ library/converter.cpp
+	$(LINKBIN) library/converter.cpp
 	
 cprover_library.inc: library/converter library/*.c
 	cat library/*.c | library/converter > $@
