@@ -12,6 +12,6 @@ clean :
 	$(RM) $(OBJ) $(PRG)
 
 $(PRG): $(OBJ)
-	$(CXX) $(CXXFLAGS) -o $(PRG) $(OBJ)
+	$(LINKBIN) $(OBJ)
 
 dep:
