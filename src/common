@@ -16,13 +16,13 @@ CXXFLAGS+=$(GCCFLAGS) $(INCLUDES)
 
 # this one is for Visual Studio's compiler:
 %.obj:%.cpp
-	$(CXX) $(CXXFLAGS) /nologo /c /GF /EHsc $< /Fo$@
+	$(CXX) $(CXXFLAGS) /nologo /c /O2 /GF /EHsc /O2 $< /Fo$@
 
 %.obj:%.cc
-	$(CXX) $(CXXFLAGS) /nologo /c /GF /EHsc $< /Fo$@
+	$(CXX) $(CXXFLAGS) /nologo /c /O2 /GF /EHsc $< /Fo$@
 
 %.obj:%.c
-	$(CC) $(INCLUDES) /nologo /c /GF /EHsc $< /Fo$@
+	$(CC) $(INCLUDES) /nologo /c /O2 /GF /EHsc $< /Fo$@
 
 #
 # include a dependency file if one exists
