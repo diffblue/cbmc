@@ -496,6 +496,8 @@ negedge
 task_enable
 pointer_and_address_pair
 user_specified_predicate
+user_specified_parameter_predicates
+user_specified_return_predicates
 unassigned
 new_object
 complex_real
