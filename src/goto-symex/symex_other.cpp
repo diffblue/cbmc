@@ -145,7 +145,7 @@ void goto_symext::symex_other(
     assignment.rhs()=array_of_exprt(clean_code.op1(), clean_code.op0().type());
     basic_symext::symex_assign(state, assignment);    
   }
-  else if(statement==ID_user_specified_predicate)
+  else if(statement==ID_user_specified_predicate || statement==ID_user_specified_parameter_predicates || statement == ID_user_specified_return_predicates)
   {
 	  // like skip
   }
