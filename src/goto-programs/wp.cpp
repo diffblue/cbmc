@@ -347,15 +347,17 @@ exprt wp(
   else if(statement==ID_skip)
     return post;
   else if(statement==ID_decl)
-    return post;
+    return post; // ignored
   else if(statement==ID_assert)
     return post;   
   else if(statement==ID_expression)
     return post;
   else if(statement==ID_printf)
-    return post;
+    return post; // ignored
   else if(statement==ID_free)
-    return post;
+    return post; // ignored
+  else if(statement==ID_asm)
+    return post; // ignored
   else
     throw "sorry, wp("+id2string(statement)+"...) not implemented";
 }
