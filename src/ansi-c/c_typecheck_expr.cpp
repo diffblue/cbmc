@@ -742,6 +742,14 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
   
   if(expr_type.id()==ID_struct)
   {
+    // Already the same? Just remove.
+    if(base_type_eq(expr_type, op.type(), *this))
+    {
+      exprt tmp=op;
+      expr=tmp;
+      return;
+    }
+
     // typecast to struct: this is a GCC extension
     if(op.id()!=ID_initializer_list)
     {
@@ -749,10 +757,10 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
       str << "type cast to struct requires initializer_list argument";
       throw 0;
     }
-    
+  
     // just do a normal initialization    
     do_initializer(op, expr_type, false);
-    
+  
     // just remove typecast
     exprt tmp=op;
     expr=tmp;
@@ -761,9 +769,17 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
   }
   else if(expr_type.id()==ID_union)
   {
-    // this is a GCC extension. It's either a 'temporary union',
+    // Already the same? Just remove.
+    if(base_type_eq(expr_type, op.type(), *this))
+    {
+      exprt tmp=op;
+      expr=tmp;
+      return;
+    }
+
+    // This is a GCC extension. It's either a 'temporary union',
     // where the argument is expected to be a 'initializer_list',
-    // or a cast from one of the member types
+    // or a cast from one of the member types.
 
     if(op.id()==ID_initializer_list)
     {
@@ -797,7 +813,7 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
         return;
       }
     }
-
+    
     err_location(expr);
     str << "type cast to union either requires initializer list "
            "argument or an expression with a member type";
