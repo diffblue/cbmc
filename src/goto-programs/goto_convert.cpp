@@ -326,27 +326,7 @@ void goto_convertt::convert_gcc_local_label(
   const codet &code,
   goto_programt &dest)
 {
-  if(code.operands().size()!=1)
-  {
-    err_location(code);
-    throw "gcc local label statement expected to have one operand";
-  }
-  
-  // grab the label
-  const irep_idt &label=code.get(ID_label);
-  
-  goto_programt tmp;
-  convert(to_code(code.op0()), tmp);
-
-  goto_programt::targett target=tmp.instructions.begin();
-  dest.destructive_append(tmp);
-
-  if(!label.empty())
-  {
-    targets.labels.insert(std::pair<irep_idt, goto_programt::targett>
-                          (label, target));
-    target->labels.push_front(label);
-  }
+  // ignore for now
 }
 
 /*******************************************************************\
