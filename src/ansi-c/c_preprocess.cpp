@@ -309,6 +309,93 @@ bool c_preprocess_codewarrior(
   std::ostream &outstream,
   message_handlert &message_handler)
 {
+  // check extension
+  if(is_dot_i_file(file))
+    return c_preprocess_none(file, outstream, message_handler);
+
+  // preprocessing
+  message_streamt message_stream(message_handler);
+
+  std::string stderr_file=get_temporary_file("tmp.stderr", "");
+
+  std::string command;
+  
+  command="mwcceppc -E -P -D__CPROVER__ -ppopt line -ppopt full";
+
+  for(std::list<std::string>::const_iterator
+      it=config.ansi_c.defines.begin();
+      it!=config.ansi_c.defines.end();
+      it++)
+    command+=" -D'"+*it+"'";
+
+  for(std::list<std::string>::const_iterator
+      it=config.ansi_c.include_paths.begin();
+      it!=config.ansi_c.include_paths.end();
+      it++)
+    command+=" -I'"+*it+"'";
+
+  for(std::list<std::string>::const_iterator
+      it=config.ansi_c.include_files.begin();
+      it!=config.ansi_c.include_files.end();
+      it++)
+    command+=" -include '"+*it+"'";
+
+  for(std::list<std::string>::const_iterator
+      it=config.ansi_c.preprocessor_options.begin();
+      it!=config.ansi_c.preprocessor_options.end();
+      it++)
+    command+=" "+*it;
+    
+  int result;
+
+  std::string tmpi=get_temporary_file("tmp.cl", "");
+  command+=" \""+file+"\"";
+  command+=" -o \""+tmpi+"\"";
+  command+=" 2> \""+stderr_file+"\"";
+
+  result=system(command.c_str());
+
+  FILE *stream=fopen(tmpi.c_str(), "r");
+
+  if(stream!=NULL)
+  {
+    char ch;
+    while((ch=fgetc(stream))!=EOF)
+      outstream << ch;
+
+    fclose(stream);
+    unlink(tmpi.c_str());
+  }
+  else
+  {
+    unlink(tmpi.c_str());
+    unlink(stderr_file.c_str());
+    message_stream.error("Preprocessing failed (fopen failed)");
+    return true;
+  }
+
+  // errors/warnings
+  {
+    std::ifstream stderr_stream(stderr_file.c_str());
+    char ch;
+    while((stderr_stream.read(&ch, 1))!=NULL)
+      message_stream.str << ch;
+  }
+
+  unlink(stderr_file.c_str());
+
+  if(result!=0)
+  {
+    message_stream.error_parse(1);
+    message_stream.error("Preprocessing failed");
+    return true;
+  }
+  else
+    message_stream.error_parse(2);
+
+  return false;
+
+  #if 0
   message_streamt message_stream(message_handler);
 
   // CodeWarrior prepends some header to the file,
@@ -344,6 +431,7 @@ bool c_preprocess_codewarrior(
   }
   
   return false;
+  #endif
 }
 
 /*******************************************************************\

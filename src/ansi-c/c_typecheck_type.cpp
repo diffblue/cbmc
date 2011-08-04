@@ -316,9 +316,7 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
   {
     typet &type=it->type();
   
-    if((type.id()==ID_array &&
-        to_array_type(type).size().is_zero()) ||
-       type.id()==ID_incomplete_array)
+    if(type.id()==ID_incomplete_array)
     {
       // needs to be last member
       if(it!=--components.end())
@@ -328,11 +326,8 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
       }
       
       // if it's incomplete, make it zero
-      if(type.id()==ID_incomplete_array)
-      {
-        type.id(ID_array);
-        type.set(ID_size, gen_zero(index_type()));
-      }
+      type.id(ID_array);
+      type.set(ID_size, gen_zero(index_type()));
     }
   }  
 
