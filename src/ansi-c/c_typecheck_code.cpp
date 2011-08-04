@@ -90,8 +90,7 @@ void c_typecheck_baset::typecheck_code(codet &code)
   else if(statement==ID_start_thread)
     typecheck_start_thread(code);
   else if(statement==ID_gcc_local_label)
-  {
-  }
+    typecheck_gcc_local_label(code);
   else if(statement==ID_msc_try_finally)
   {
     assert(code.operands().size()==2);
@@ -209,12 +208,14 @@ void c_typecheck_baset::typecheck_block(codet &code)
         if(it2->is_not_nil())
           new_ops.move_to_operands(*it2);
     }
-    else if(code_op.get_statement()==ID_label)
+    else if(code_op.get_statement()==ID_label ||
+            code_op.get_statement()==ID_gcc_local_label)
     {
       // these may be nested
       codet *code_ptr=&code_op;
       
-      while(code_ptr->get_statement()==ID_label)
+      while(code_ptr->get_statement()==ID_label ||
+            code_ptr->get_statement()==ID_gcc_local_label)
       {
         assert(code_ptr->operands().size()==1);
         code_ptr=&to_code(code_ptr->op0());
@@ -605,6 +606,29 @@ void c_typecheck_baset::typecheck_label(code_labelt &code)
       implicit_typecast(*it, switch_op_type);
     }
   }
+}
+
+/*******************************************************************\
+
+Function: c_typecheck_baset::typecheck_gcc_local_label
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void c_typecheck_baset::typecheck_gcc_local_label(codet &code)
+{
+  if(code.operands().size()!=1)
+  {
+    err_location(code);
+    throw "gcc local label expected to have one operand";
+  }
+
+  typecheck_code(to_code(code.op0()));
 }
 
 /*******************************************************************\
