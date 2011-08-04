@@ -12,6 +12,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <std_code.h>
 #include <namespace.h>
 
-exprt wp(const codet &code, const exprt &post, const namespacet &ns);
+// This computes the weakest precondition of the given program
+// piece 'code' with respect to the expression 'post'.
+
+exprt wp(
+  const codet &code,
+  const exprt &post,
+  const namespacet &ns);
 
 #endif
