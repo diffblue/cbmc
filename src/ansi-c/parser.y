@@ -890,6 +890,7 @@ basic_type_specifier:
 	}
 	;
 
+/* no gcc type attributes after the following! */
 sue_declaration_specifier:
           declaration_qualifier_list elaborated_type_name
 	{
@@ -908,6 +909,7 @@ sue_declaration_specifier:
 	}
 	;
 
+/* no gcc type attributes after the following! */
 sue_type_specifier:
 	  elaborated_type_name
 	| type_qualifier_list elaborated_type_name
@@ -923,52 +925,64 @@ sue_type_specifier:
 	;
 
 typedef_declaration_specifier:
-	  typedef_type_specifier storage_class
+	  typedef_type_specifier storage_class gcc_type_attribute_opt
 	{
 	  $$=$1;
 	  merge_types($$, $2);
+	  merge_types($$, $3);
 	}
-	| declaration_qualifier_list typedef_name
+	| declaration_qualifier_list typedef_name gcc_type_attribute_opt
 	{
 	  $$=$1;
 	  merge_types($$, $2);
+	  merge_types($$, $3);
 	}
-	| typedef_declaration_specifier declaration_qualifier
+	| typedef_declaration_specifier declaration_qualifier gcc_type_attribute_opt
 	{
 	  $$=$1;
 	  merge_types($$, $2);
+	  merge_types($$, $3);
 	}
 	;
 
 typeof_declaration_specifier:
-	  typeof_type_specifier storage_class
+	  typeof_type_specifier storage_class gcc_type_attribute_opt
 	{
 	  $$=$1;
 	  merge_types($$, $2);
+	  merge_types($$, $3);
 	}
-	| declaration_qualifier_list typeof_specifier
+	| declaration_qualifier_list typeof_specifier gcc_type_attribute_opt
 	{
 	  $$=$1;
 	  merge_types($$, $2);
+	  merge_types($$, $3);
 	}
-	| typeof_declaration_specifier declaration_qualifier
+	| typeof_declaration_specifier declaration_qualifier gcc_type_attribute_opt
 	{
 	  $$=$1;
 	  merge_types($$, $2);
+	  merge_types($$, $3);
 	}
 	;
 
 typedef_type_specifier:
-          typedef_name
-	| type_qualifier_list typedef_name
+          typedef_name gcc_type_attribute_opt
+        {
+	  $$=$1;
+	  merge_types($$, $2);
+        }
+	| type_qualifier_list typedef_name gcc_type_attribute_opt
 	{
 	  $$=$1;
 	  merge_types($$, $2);
+	  merge_types($$, $3);
 	}
-	| typedef_type_specifier type_qualifier
+	| typedef_type_specifier type_qualifier gcc_type_attribute_opt
 	{
 	  $$=$1;
 	  merge_types($$, $2);
+	  merge_types($$, $3);
 	}
 	;
 
