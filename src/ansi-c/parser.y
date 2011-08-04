@@ -1865,7 +1865,7 @@ iteration_statement:
 	;
 
 jump_statement:
-	TOK_GOTO comma_expression ';'	
+	  TOK_GOTO comma_expression ';'	
 	{
 	  $$=$1;
 	  if(stack($2).id()==ID_symbol)
@@ -1892,13 +1892,26 @@ jump_statement:
 	;
 
 gcc_local_label_statement:
-	TOK_GCC_LABEL identifier_or_typedef_name ';'
+	  TOK_GCC_LABEL label_list ';'
 	{ 
 	  $$=$1;
 	  statement($$, ID_gcc_local_label);
-	  stack($$).set(ID_label, stack($2).get(ID_C_base_name));
+	  stack($$).operands().swap(stack($2).operands());
         }
 	;
+
+label_list:
+          identifier_or_typedef_name
+        {
+          init($$);
+          mto($$, $1);
+        }
+        | label_list ',' identifier_or_typedef_name
+        {
+          $$=$1;
+          mto($$, $2);
+        }
+        ;
 
 gcc_asm_statement:
           TOK_GCC_ASM_PAREN volatile_opt '(' gcc_asm_commands ')' ';'
@@ -1917,7 +1930,7 @@ gcc_asm_statement:
 	;
 
 msc_asm_statement:
-	TOK_MSC_ASM '{' TOK_ASM_STRING '}'
+	  TOK_MSC_ASM '{' TOK_ASM_STRING '}'
 	{ $$=$1;
 	  statement($$, ID_asm);
 	  stack($$).set(ID_flavor, ID_msc);
