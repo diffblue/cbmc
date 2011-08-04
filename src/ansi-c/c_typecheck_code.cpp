@@ -87,7 +87,7 @@ void c_typecheck_baset::typecheck_code(codet &code)
   }
   else if(statement==ID_asm)
     typecheck_asm(code);
-  else if(statement=="start_thread")
+  else if(statement==ID_start_thread)
     typecheck_start_thread(code);
   else if(statement==ID_gcc_local_label)
   {
