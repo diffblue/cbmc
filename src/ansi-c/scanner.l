@@ -892,6 +892,7 @@ void ansi_c_scanner_init()
                 }
 {ws}            { /* ignore */ }
 {newline}       { /* ignore */ }
+"sizeof"	{ loc(); return TOK_SIZEOF; }
 "<<"		{ loc(); return TOK_SHIFTLEFT; }
 ">>"		{ loc(); return TOK_SHIFTRIGHT; }
 "<="		{ loc(); return TOK_LE; }
@@ -900,6 +901,7 @@ void ansi_c_scanner_init()
 "!="		{ loc(); return TOK_NE; }
 "&&"		{ loc(); return TOK_ANDAND; }
 "||"		{ loc(); return TOK_OROR; }
+{identifier}	{ return make_identifier(); }
 .               { loc(); return yytext[0]; }
 }
 
