@@ -1135,10 +1135,12 @@ aggregate_name:
 	| aggregate_key
           gcc_type_attribute_opt
 	  identifier_or_typedef_name
+	  gcc_type_attribute_opt
 	{
 	  do_tag($1, $3);
 	  $$=$3;
 	  merge_types($$, $2);
+	  merge_types($$, $4);
 	}
 	;
 

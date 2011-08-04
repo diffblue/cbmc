@@ -228,7 +228,7 @@ void ansi_c_scanner_init()
 /*** keywords ***/
 %}
 
-<GRAMMAR>{
+<GRAMMAR,GCC_ATTRIBUTE3>{
 "auto"		{ loc(); return TOK_AUTO; }
 "_Bool"		{ loc(); return TOK_BOOL; }
 "break"		{ loc(); return TOK_BREAK; }
@@ -680,7 +680,7 @@ void ansi_c_scanner_init()
 
   /* operands following */
 
-<GRAMMAR>{
+<GRAMMAR,GCC_ATTRIBUTE3>{
 "->"		{ loc(); return TOK_ARROW; }
 "++"		{ loc(); return TOK_INCR; }
 "--"		{ loc(); return TOK_DECR; }
@@ -892,15 +892,6 @@ void ansi_c_scanner_init()
                 }
 {ws}            { /* ignore */ }
 {newline}       { /* ignore */ }
-"sizeof"	{ loc(); return TOK_SIZEOF; }
-"<<"		{ loc(); return TOK_SHIFTLEFT; }
-">>"		{ loc(); return TOK_SHIFTRIGHT; }
-"<="		{ loc(); return TOK_LE; }
-">="		{ loc(); return TOK_GE; }
-"=="		{ loc(); return TOK_EQ; }
-"!="		{ loc(); return TOK_NE; }
-"&&"		{ loc(); return TOK_ANDAND; }
-"||"		{ loc(); return TOK_OROR; }
 {identifier}	{ return make_identifier(); }
 .               { loc(); return yytext[0]; }
 }
