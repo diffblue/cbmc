@@ -348,6 +348,8 @@ void goto_convertt::convert(
     convert_function_call(to_code_function_call(code), dest);
   else if(statement==ID_label)
     convert_label(to_code_label(code), dest);
+  else if(statement==ID_gcc_local_label)
+    convert_gcc_local_label(code, dest);
   else if(statement==ID_for)
     convert_for(code, dest);
   else if(statement==ID_while)
