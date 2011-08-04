@@ -2353,7 +2353,7 @@ parameter_abstract_declarator:
 	| parameter_postfix_abstract_declarator
 	;
 
-postfixing_abstract_declarator:	/* AbstrDeclarator */
+postfixing_abstract_declarator:
 	  array_abstract_declarator
 	| '(' ')'
 	{
