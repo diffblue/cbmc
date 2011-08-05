@@ -235,7 +235,8 @@ protected:
   // this cleans expressions in array types
   virtual void clean_type(
     const symbolt &base_symbol,
-    typet &type);
+    typet &type,
+    std::list<codet> &code);
   
   typedef hash_set_cont<irep_idt, irep_id_hash> already_cleanedt;
   already_cleanedt already_cleaned;

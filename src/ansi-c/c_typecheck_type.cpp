@@ -589,7 +589,8 @@ Function: c_typecheck_baset::clean_type
 
 void c_typecheck_baset::clean_type(
   const symbolt &base_symbol,
-  typet &type)
+  typet &type,
+  std::list<codet> &code)
 {
   if(type.id()==ID_symbol)
   {
@@ -599,14 +600,14 @@ void c_typecheck_baset::clean_type(
     {
       contextt::symbolst::iterator s_it=context.symbols.find(identifier);
       assert(s_it!=context.symbols.end());
-      clean_type(base_symbol, s_it->second.type);
+      clean_type(base_symbol, s_it->second.type, code);
     }
   }
   else if(type.id()==ID_array)
   {
     array_typet &array_type=to_array_type(type);
   
-    clean_type(base_symbol, array_type.subtype());
+    clean_type(base_symbol, array_type.subtype(), code);
 
     // the size need not be a constant!
     // this was simplified already by typecheck_array_type
@@ -664,7 +665,7 @@ void c_typecheck_baset::clean_type(
         it=components.begin();
         it!=components.end();
         it++)
-      clean_type(base_symbol, it->type());
+      clean_type(base_symbol, it->type(), code);
   }
   else if(type.id()==ID_code)
   {
@@ -672,7 +673,7 @@ void c_typecheck_baset::clean_type(
   }
   else if(type.id()==ID_pointer)
   {
-    clean_type(base_symbol, type.subtype());
+    clean_type(base_symbol, type.subtype(), code);
   }
   else if(type.id()==ID_vector)
   {
