@@ -31,10 +31,6 @@ ifdef MODULE_FLOATBV
   CXXFLAGS += -DHAVE_FLOATBV
 endif
 
-# all the others will need irep_ids.h,
-# which we first need to generate
-.NOTPARALLEL:
-
 ###############################################################################
 
 irep_ids.h: irep_ids_convert$(EXEEXT) irep_ids.txt
@@ -48,6 +44,8 @@ irep_ids.cpp: irep_ids.inc irep_ids.h
 irep_ids_convert$(EXEEXT): irep_ids_convert$(OBJEXT)
 	$(LINKBIN) irep_ids_convert$(OBJEXT)
 
+# Most of the others will need irep_ids.h,
+# which we first need to generate.
 $(OBJ): irep_ids.h
 
 util$(LIBEXT): $(OBJ)
