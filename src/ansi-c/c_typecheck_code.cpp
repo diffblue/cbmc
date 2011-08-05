@@ -324,7 +324,7 @@ void c_typecheck_baset::typecheck_decl(codet &code)
      code.operands().size()!=2)
   {
     err_location(code);
-    throw "decl expected to have 0-2 arguments";
+    throw "decl expected to have 1 or 2 arguments";
   }
 
   // op0 must be symbol
@@ -349,6 +349,14 @@ void c_typecheck_baset::typecheck_decl(codet &code)
   }
 
   symbolt &symbol=s_it->second;
+  
+  // see if code got generated for the type
+  {
+    const irept &clean_type_code=symbol.type.find(ID_C_clean_type_code);
+    if(clean_type_code.is_not_nil())
+    {
+    }
+  }
 
   // see if it's a typedef
   // or a function
