@@ -178,7 +178,8 @@ void c_typecheck_baset::typecheck_symbol(symbolt &symbol)
   // and now that we have the proper name
   // we clean the type of any side-effects
   // (needs to be done before next symbol)
-  clean_type(symbol, symbol.type);
+  std::list<codet> clean_type_code;
+  clean_type(symbol, symbol.type, clean_type_code);
   
   // set the pretty name
   if(symbol.is_type &&
