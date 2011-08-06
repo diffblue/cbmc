@@ -61,6 +61,17 @@ public:
   {
   }
   
+  explicit code_blockt(const std::list<codet> &_list)
+  {
+    operandst &o=operands();
+    o.reserve(_list.size());
+    for(std::list<codet>::const_iterator
+        it=_list.begin();
+        it!=_list.end();
+        it++)
+      o.push_back(*it);        
+  }
+  
   void add(const codet &code)
   {
     copy_to_operands(code);
