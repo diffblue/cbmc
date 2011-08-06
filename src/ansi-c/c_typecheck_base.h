@@ -241,7 +241,8 @@ protected:
   typedef hash_set_cont<irep_idt, irep_id_hash> already_cleanedt;
   already_cleanedt already_cleaned;
 
-  // this is for storing side-effects found in types  
+  // This is for storing side-effects found in types.
+  // The id is the identifier of the symbol containing the type.
   typedef hash_map_cont<irep_idt, codet, irep_id_hash> clean_codet;
   clean_codet clean_code;
   
