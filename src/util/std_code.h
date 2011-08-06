@@ -61,7 +61,7 @@ public:
   {
   }
   
-  explicit code_blockt(const std::list<codet> &_list)
+  explicit code_blockt(const std::list<codet> &_list):codet(ID_block)
   {
     operandst &o=operands();
     o.reserve(_list.size());
