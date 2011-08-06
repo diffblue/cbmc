@@ -182,10 +182,10 @@ void c_typecheck_baset::typecheck_symbol(symbolt &symbol)
     std::list<codet> clean_type_code;
     clean_type(symbol, symbol.type, clean_type_code);
     
-    // We store the code that was generated for the
-    // type in the type of the symbol.
+    // We store the code that was generated for the type
+    // for later use when we see the declaration.
     if(!clean_type_code.empty())
-      symbol.type.set(ID_C_clean_type_code, code_blockt(clean_type_code));
+      clean_code[symbol.name]=code_blockt(clean_type_code);
   }
     
   // set the pretty name

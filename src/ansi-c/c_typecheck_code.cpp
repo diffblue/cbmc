@@ -172,6 +172,29 @@ void c_typecheck_baset::typecheck_decl_block(codet &code)
 {
   Forall_operands(it, code)
     typecheck_code(to_code(*it));
+
+  // unwind any decl-blocks inside the decl block
+  
+  exprt::operandst new_ops;
+  new_ops.reserve(code.operands().size());
+
+  Forall_operands(it1, code)
+  {
+    if(it1->is_nil()) continue;
+
+    codet &code_op=to_code(*it1);
+  
+    if(code_op.get_statement()==ID_decl_block)
+    {
+      Forall_operands(it2, code_op)
+        if(it2->is_not_nil())
+          new_ops.push_back(*it2);
+    }
+    else
+      new_ops.push_back(code_op);
+  }
+
+  code.operands().swap(new_ops);
 }
 
 /*******************************************************************\
@@ -352,9 +375,21 @@ void c_typecheck_baset::typecheck_decl(codet &code)
   
   // see if code got generated for the type
   {
-    const irept &clean_type_code=symbol.type.find(ID_C_clean_type_code);
-    if(clean_type_code.is_not_nil())
+    clean_codet::iterator it=clean_code.find(symbol.name);
+
+    if(it!=clean_code.end())
     {
+      codet c=it->second;
+      
+      // do again
+      clean_code.erase(it);
+      typecheck_decl(code);
+    
+      // build a decl-block
+      codet decl_block(ID_decl_block);
+      decl_block.copy_to_operands(c, code);
+      code.swap(decl_block);
+      return;
     }
   }
 

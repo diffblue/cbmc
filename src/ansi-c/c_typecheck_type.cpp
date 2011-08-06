@@ -618,6 +618,8 @@ void c_typecheck_baset::clean_type(
        size.id()!=ID_infinity)
     {
       // Need to pull out! We insert new symbol.
+      
+      locationt location=size.find_location();
       unsigned count=0;
       irep_idt temp_identifier;
       std::string suffix;
@@ -638,6 +640,7 @@ void c_typecheck_baset::clean_type(
       new_symbol.file_local=true;
       new_symbol.is_type=false;
       new_symbol.value.make_nil();
+      new_symbol.location=location;
       context.add(new_symbol);
 
       // produce the code that initializes the symbol      
@@ -647,9 +650,10 @@ void c_typecheck_baset::clean_type(
       code_assignt assignment;
       assignment.lhs()=symbol_expr;
       assignment.rhs()=size;
-      assignment.location()=array_type.size().location();
+      assignment.location()=location;
 
       // store the code
+      code.push_back(assignment);
 
       // fix type
       size=symbol_expr;
