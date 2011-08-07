@@ -48,14 +48,24 @@ Function: ansi_c_parsert::lookup
 
 \*******************************************************************/
 
-ansi_c_id_classt ansi_c_parsert::lookup(std::string &name, bool tag) const
+ansi_c_id_classt ansi_c_parsert::lookup(
+  std::string &name,
+  bool tag,
+  bool label) const
 {
-  const std::string scope_name=tag?"tag-"+name:name;
+  // labels and tags have a separate name space
+  const std::string scope_name=
+    tag?"tag-"+name:
+    label?"label-"+name:
+    name;
   
   for(scopest::const_reverse_iterator it=scopes.rbegin();
-      it!=scopes.rend(); it++)
+      it!=scopes.rend();
+      it++)
   {
-    scopet::name_mapt::const_iterator n_it=it->name_map.find(scope_name);
+    scopet::name_mapt::const_iterator n_it=
+      it->name_map.find(scope_name);
+
     if(n_it!=it->name_map.end())
     {
       name=it->prefix+scope_name;
