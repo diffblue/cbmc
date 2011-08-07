@@ -76,7 +76,11 @@ public:
   {
   public:
     ansi_c_id_classt id_class;
-    std::string base_name;
+    irep_idt base_name;
+    
+    identifiert():id_class(ANSI_C_UNKNOWN)
+    {
+    }
   };
  
   class scopet
@@ -150,7 +154,10 @@ public:
     scopes.back().prefix=current.prefix+prefix;
   }
 
-  ansi_c_id_classt lookup(std::string &name, bool tag) const;
+  ansi_c_id_classt lookup(
+    std::string &name,
+    bool tag,
+    bool label) const;
 
   static ansi_c_id_classt get_class(const typet &type);
   
@@ -159,6 +166,13 @@ public:
     std::string n="#anon";
     n+=i2string(current_scope().anon_counter++);
     return n;
+  }
+  
+  irep_idt lookup_label(const irep_idt id)
+  {
+    std::string name=id2string(id);
+    lookup(name, false, true);
+    return name;
   }
 };
 

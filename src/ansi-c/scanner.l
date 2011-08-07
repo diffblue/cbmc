@@ -47,8 +47,10 @@ int make_identifier()
   std::string base_name(yytext);
   std::string identifier(base_name);
 
+  // figure out if this is a typedef or something else
   ansi_c_id_classt result=
-    PARSER.lookup(identifier, PARSER.tag_following);
+    PARSER.lookup(identifier, PARSER.tag_following, false);
+
   PARSER.tag_following=false;
 
   stack(yyansi_clval).id(ID_symbol);

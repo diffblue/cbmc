@@ -436,11 +436,12 @@ unary_expression:
 	}
 	| TOK_ANDAND identifier_or_typedef_name
 	{ $$=$1;
+	  irep_idt identifier=PARSER.lookup_label(stack($2).get(ID_C_base_name));
 	  set($$, ID_address_of);
 	  stack($$).operands().resize(1);
 	  stack($$).op0()=stack($2);
 	  stack($$).op0().id(ID_label);
-	  stack($$).op0().set(ID_identifier, stack($2).get(ID_C_base_name));
+	  stack($$).op0().set(ID_identifier, identifier);
 	}
 	| '*' cast_expression
 	{ $$=$1;
@@ -1723,7 +1724,8 @@ labeled_statement:
 	{
 	  $$=$2;
 	  statement($$, ID_label);
-	  stack($$).set(ID_label, stack($1).get(ID_C_base_name));
+	  irep_idt identifier=PARSER.lookup_label(stack($1).get(ID_C_base_name));
+	  stack($$).set(ID_label, identifier);
 	  mto($$, $3);
 	}
 	| TOK_CASE constant_expression ':' statement
@@ -1887,7 +1889,8 @@ jump_statement:
 	  if(stack($2).id()==ID_symbol)
 	  {
 	    statement($$, ID_goto);
-	    stack($$).set(ID_destination, stack($2).get(ID_C_base_name));
+	    irep_idt identifier=PARSER.lookup_label(stack($2).get(ID_C_base_name));
+	    stack($$).set(ID_destination, identifier);
           }
           else
           {
@@ -1917,8 +1920,12 @@ gcc_local_label_statement:
 	  // put these into the scope
 	  forall_operands(it, stack($$))
 	  {
-	    //irep_idt id=
-	    //PARSER.current_scope().
+	    // labels have a separate name space
+	    irep_idt base_name=it->get(ID_identifier);
+	    irep_idt id="label-"+id2string(base_name);
+	    ansi_c_parsert::identifiert &i=PARSER.current_scope().name_map[id];
+	    i.id_class=ANSI_C_LOCAL_LABEL;
+	    i.base_name=base_name;
 	  }
         }
 	;
@@ -1932,7 +1939,7 @@ gcc_local_label_list:
         | gcc_local_label_list ',' gcc_local_label
         {
           $$=$1;
-          mto($$, $2);
+          mto($$, $3);
         }
         ;
         
