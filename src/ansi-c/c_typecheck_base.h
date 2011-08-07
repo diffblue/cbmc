@@ -234,18 +234,13 @@ protected:
 
   // this cleans expressions in array types
   virtual void clean_type(
-    const symbolt &base_symbol,
+    const irep_idt &base_symbol_identifier,
     typet &type,
     std::list<codet> &code);
   
   typedef hash_set_cont<irep_idt, irep_id_hash> already_cleanedt;
   already_cleanedt already_cleaned;
 
-  // This is for storing side-effects found in types.
-  // The id is the identifier of the symbol containing the type.
-  typedef hash_map_cont<irep_idt, codet, irep_id_hash> clean_codet;
-  clean_codet clean_code;
-  
   void make_index_type(exprt &expr);
 
   // environment

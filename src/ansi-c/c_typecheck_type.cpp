@@ -588,7 +588,7 @@ Function: c_typecheck_baset::clean_type
 \*******************************************************************/
 
 void c_typecheck_baset::clean_type(
-  const symbolt &base_symbol,
+  const irep_idt &base_symbol_identifier,
   typet &type,
   std::list<codet> &code)
 {
@@ -600,14 +600,14 @@ void c_typecheck_baset::clean_type(
     {
       contextt::symbolst::iterator s_it=context.symbols.find(identifier);
       assert(s_it!=context.symbols.end());
-      clean_type(base_symbol, s_it->second.type, code);
+      clean_type(identifier, s_it->second.type, code);
     }
   }
   else if(type.id()==ID_array)
   {
     array_typet &array_type=to_array_type(type);
   
-    clean_type(base_symbol, array_type.subtype(), code);
+    clean_type(base_symbol_identifier, array_type.subtype(), code);
 
     // the size need not be a constant!
     // this was simplified already by typecheck_array_type
@@ -617,8 +617,9 @@ void c_typecheck_baset::clean_type(
     if(!size.is_constant() &&
        size.id()!=ID_infinity)
     {
-      // Need to pull out! We insert new symbol.
+      const symbolt &base_symbol=lookup(base_symbol_identifier);
       
+      // Need to pull out! We insert new symbol.
       locationt location=size.find_location();
       unsigned count=0;
       irep_idt temp_identifier;
@@ -669,7 +670,7 @@ void c_typecheck_baset::clean_type(
         it=components.begin();
         it!=components.end();
         it++)
-      clean_type(base_symbol, it->type(), code);
+      clean_type(base_symbol_identifier, it->type(), code);
   }
   else if(type.id()==ID_code)
   {
@@ -677,7 +678,7 @@ void c_typecheck_baset::clean_type(
   }
   else if(type.id()==ID_pointer)
   {
-    clean_type(base_symbol, type.subtype(), code);
+    clean_type(base_symbol_identifier, type.subtype(), code);
   }
   else if(type.id()==ID_vector)
   {

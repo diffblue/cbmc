@@ -326,6 +326,22 @@ void c_typecheck_baset::typecheck_decl_type(codet &code)
   assert(code.operands().size()==0);
   // Type only! May have side-effects in it!
   
+  std::list<codet> clean_code;
+  
+  typet &type=static_cast<typet &>(code.add(ID_type_arg));
+
+  // replace if needed
+  replace_symbol(type);
+  
+  clean_type(irep_idt(), type, clean_code);
+  
+  if(!clean_code.empty())
+  {
+    // build a decl-block
+    codet decl_block(ID_decl_block);
+    decl_block.copy_to_operands(code_blockt(clean_code), code);
+    code.swap(decl_block);
+  }
 }
 
 /*******************************************************************\
@@ -374,26 +390,25 @@ void c_typecheck_baset::typecheck_decl(codet &code)
 
   symbolt &symbol=s_it->second;
   
-  // see if code got generated for the type
+  // There may be side-effects in the type.  
   {
-    clean_codet::iterator it=clean_code.find(symbol.name);
-
-    if(it!=clean_code.end())
+    std::list<codet> clean_code;
+    clean_type(symbol.name, symbol.type, clean_code);
+    code.type()=symbol.type;
+  
+    if(!clean_code.empty())
     {
-      codet c=it->second;
-      
       // do again
-      clean_code.erase(it);
       typecheck_decl(code);
-    
+
       // build a decl-block
       codet decl_block(ID_decl_block);
-      decl_block.copy_to_operands(c, code);
+      decl_block.copy_to_operands(code_blockt(clean_code), code);
       code.swap(decl_block);
       return;
     }
   }
-
+  
   // see if it's a typedef
   // or a function
   // or static
