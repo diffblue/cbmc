@@ -324,7 +324,8 @@ Function: c_typecheck_baset::typecheck_decl
 void c_typecheck_baset::typecheck_decl_type(codet &code)
 {
   assert(code.operands().size()==0);
-  // type only!
+  // Type only! May have side-effects in it!
+  
 }
 
 /*******************************************************************\
