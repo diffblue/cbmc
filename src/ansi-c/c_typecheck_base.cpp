@@ -175,6 +175,7 @@ void c_typecheck_baset::typecheck_symbol(symbolt &symbol)
     symbol.name=new_name;
   }
 
+  #if 0
   {
     // and now that we have the proper name
     // we clean the type of any side-effects
@@ -187,6 +188,7 @@ void c_typecheck_baset::typecheck_symbol(symbolt &symbol)
     if(!clean_type_code.empty())
       clean_code[symbol.name]=code_blockt(clean_type_code);
   }
+  #endif
     
   // set the pretty name
   if(symbol.is_type &&

@@ -730,13 +730,20 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
   if(expr.operands().size()!=1)
   {
     err_location(expr);
-    error("typecast operator expects one operand");
+    str << "typecast operator expects one operand";
     throw 0;
   }
 
   exprt &op=expr.op0();
 
   typecheck_type(expr.type());
+  
+  {
+    // first clean the type of any side-effects
+    std::list<codet> clean_code;
+    clean_type(irep_idt(), expr.type(), clean_code);
+    
+  }
 
   const typet expr_type=follow(expr.type());
   
