@@ -742,7 +742,20 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
     // first clean the type of any side-effects
     std::list<codet> clean_code;
     clean_type(irep_idt(), expr.type(), clean_code);
+
+    if(!clean_code.empty())
+    {
+      sideeffect_exprt sideeffect_expr(ID_statement_expression, empty_typet());
+      sideeffect_expr.copy_to_operands(code_blockt(clean_code));
     
+      // We merge the side-effect into the operand, using
+      // a comma-expression.
+      // I.e., (type)e becomes (type)(side-effect, e)
+    
+      exprt comma_expr(ID_comma, op.type());
+      comma_expr.copy_to_operands(sideeffect_expr, op);
+      op.swap(comma_expr);
+    }
   }
 
   const typet expr_type=follow(expr.type());
