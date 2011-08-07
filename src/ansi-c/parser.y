@@ -1908,25 +1908,35 @@ jump_statement:
 	;
 
 gcc_local_label_statement:
-	  TOK_GCC_LABEL label_list ';'
+	  TOK_GCC_LABEL gcc_local_label_list ';'
 	{ 
 	  $$=$1;
 	  statement($$, ID_gcc_local_label);
 	  stack($$).operands().swap(stack($2).operands());
+	  
+	  // put these into the scope
+	  forall_operands(it, stack($$))
+	  {
+	    //irep_idt id=
+	    //PARSER.current_scope().
+	  }
         }
 	;
 
-label_list:
-          identifier_or_typedef_name
+gcc_local_label_list:
+          gcc_local_label
         {
           init($$);
           mto($$, $1);
         }
-        | label_list ',' identifier_or_typedef_name
+        | gcc_local_label_list ',' gcc_local_label
         {
           $$=$1;
           mto($$, $2);
         }
+        ;
+        
+gcc_local_label: identifier_or_typedef_name
         ;
 
 gcc_asm_statement:

@@ -20,7 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "ansi_c_parse_tree.h"
 
 typedef enum { ANSI_C_UNKNOWN, ANSI_C_SYMBOL, ANSI_C_TYPEDEF,
-               ANSI_C_TAG } ansi_c_id_classt;
+               ANSI_C_TAG, ANSI_C_LOCAL_LABEL } ansi_c_id_classt;
 
 int yyansi_cparse();
 

@@ -188,7 +188,9 @@ void ansi_c_parsert::new_declaration(
 
     if(put_into_scope)
     {
-      scopet &scope = (mode==MSC && is_tag)?root_scope():current_scope();
+      // the following is bad!
+      scopet &scope=
+        (mode==MSC && is_tag)?root_scope():current_scope();
 
       // see if already in scope
       scopet::name_mapt::const_iterator n_it=
