@@ -104,7 +104,7 @@ SRC = $(CHAFF_SRC) $(BOOLEFORCE_SRC) $(MINISAT_SRC) $(MINISAT2_SRC) \
       flattening/boolbv_quantifier.cpp flattening/boolbv_struct.cpp \
       flattening/boolbv_byte_update.cpp flattening/boolbv_array_of.cpp \
       flattening/boolbv_map.cpp flattening/boolbv_type.cpp \
-      flattening/boolbv_union.cpp
+      flattening/boolbv_union.cpp flattening/flatten_byte_operators.cpp
 
 OBJ = $(SRC:.cpp=$(OBJEXT))
 
