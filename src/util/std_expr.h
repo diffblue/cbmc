@@ -213,7 +213,14 @@ public:
     operands().resize(2);
   }
 
-  inline explicit binary_exprt(const irep_idt &id):exprt(id)
+  inline explicit binary_exprt(const irep_idt &_id):exprt(_id)
+  {
+    operands().resize(2);
+  }
+
+  inline binary_exprt(
+    const irep_idt &_id,
+    const typet &_type):exprt(_id, _type)
   {
     operands().resize(2);
   }
@@ -885,6 +892,131 @@ public:
   }
 };
 
+class shift_exprt:public binary_exprt
+{
+public:
+  explicit inline shift_exprt(const irep_idt &_id):binary_exprt(_id)
+  {
+  }
+
+  inline shift_exprt(const irep_idt &_id, const typet &_type):binary_exprt(_id, _type)
+  {
+  }
+
+  inline shift_exprt(const exprt &_src, const irep_idt &_id, const exprt &_distance):
+    binary_exprt(_src, _id, _distance)
+  {
+  }
+
+  inline exprt &distance()
+  {
+    return op1();
+  }
+
+  inline const exprt &distance() const
+  {
+    return op1();
+  }
+};
+
+class shl_exprt:public shift_exprt
+{
+public:
+  inline shl_exprt():shift_exprt(ID_shl)
+  {
+  }
+
+  inline shl_exprt(const exprt &_src, const exprt &_distance):shift_exprt(_src, ID_shl, _distance)
+  {
+  }
+  
+  inline exprt &distance()
+  {
+    return op1();
+  }
+
+  inline const exprt &distance() const
+  {
+    return op1();
+  }
+};
+
+class ashr_exprt:public shift_exprt
+{
+public:
+  inline ashr_exprt():shift_exprt(ID_shl)
+  {
+  }
+
+  inline ashr_exprt(const exprt &_src, const exprt &_distance):shift_exprt(_src, ID_ashr, _distance)
+  {
+  }
+  
+  inline exprt &distance()
+  {
+    return op1();
+  }
+
+  inline const exprt &distance() const
+  {
+    return op1();
+  }
+};
+
+class lshr_exprt:public shift_exprt
+{
+public:
+  inline lshr_exprt():shift_exprt(ID_shl)
+  {
+  }
+
+  inline lshr_exprt(const exprt &_src, const exprt &_distance):shift_exprt(_src, ID_lshr, _distance)
+  {
+  }
+  
+  inline exprt &distance()
+  {
+    return op1();
+  }
+
+  inline const exprt &distance() const
+  {
+    return op1();
+  }
+};
+
+class extractbit_exprt:public exprt
+{
+public:
+  inline extractbit_exprt():exprt(ID_extractbit)
+  {
+  }
+
+  inline extractbit_exprt(
+    const exprt &_src,
+    const exprt &_index):exprt(ID_extractbit, bool_typet())
+  {
+    copy_to_operands(_src, _index);
+  }
+};
+
+class extractbits_exprt:public exprt
+{
+public:
+  inline extractbits_exprt():exprt(ID_extractbits)
+  {
+  }
+
+  inline extractbits_exprt(
+    const exprt &_src,
+    const exprt &_lower,
+    const exprt &_upper,
+    const typet &_type):exprt(ID_extractbits, _type)
+  {
+    copy_to_operands(_src, _lower, _upper);
+  }
+};
+
 class address_of_exprt:public exprt
 {
 public:
@@ -1044,7 +1176,10 @@ extern inline if_exprt &to_if_expr(exprt &expr)
 class with_exprt:public exprt
 {
 public:
-  with_exprt(const exprt &_old, const exprt &_where, const exprt &_new_value):
+  with_exprt(
+    const exprt &_old,
+    const exprt &_where,
+    const exprt &_new_value):
     exprt(ID_with, _old.type())
   {
     copy_to_operands(_old, _where, _new_value);
@@ -1096,6 +1231,66 @@ extern inline with_exprt &to_with_expr(exprt &expr)
 {
   assert(expr.id()==ID_with && expr.operands().size()==3);
   return static_cast<with_exprt &>(expr);
+}
+
+class array_update_exprt:public exprt
+{
+public:
+  array_update_exprt(
+    const exprt &_array,
+    const exprt &_index,
+    const exprt &_new_value):
+    exprt(ID_array_update, _array.type())
+  {
+    copy_to_operands(_array, _index, _new_value);
+  }
+
+  inline array_update_exprt():exprt(ID_array_update)
+  {
+    operands().resize(3);
+  }
+  
+  inline exprt &array()
+  {
+    return op0();
+  }
+
+  inline const exprt &array() const
+  {
+    return op0();
+  }
+
+  inline exprt &index()
+  {
+    return op1();
+  }
+
+  inline const exprt &index() const
+  {
+    return op1();
+  }
+
+  inline exprt &new_value()
+  {
+    return op2();
+  }
+
+  inline const exprt &new_value() const
+  {
+    return op2();
+  }
+};
+
+extern inline const array_update_exprt &to_array_update_expr(const exprt &expr)
+{
+  assert(expr.id()==ID_array_update && expr.operands().size()==3);
+  return static_cast<const array_update_exprt &>(expr);
+}
+
+extern inline array_update_exprt &to_array_update_expr(exprt &expr)
+{
+  assert(expr.id()==ID_array_update && expr.operands().size()==3);
+  return static_cast<array_update_exprt &>(expr);
 }
 
 class member_exprt:public exprt
