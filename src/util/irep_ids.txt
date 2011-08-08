@@ -511,3 +511,6 @@ msc_if_not_exists
 alias
 auto_object
 C_c_sizeof_type #c_sizeof_type
+array_update
+struct_update
+union_update
