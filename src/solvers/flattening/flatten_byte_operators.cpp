@@ -30,8 +30,8 @@ exprt flatten_byte_extract(
   const exprt &src,
   const namespacet &ns)
 {
-  assert(src.id()==ID_byte_update_little_endian ||
-         src.id()==ID_byte_update_big_endian);
+  assert(src.id()==ID_byte_extract_little_endian ||
+         src.id()==ID_byte_extract_big_endian);
   assert(src.operands().size()==2);
 
   unsigned width=
@@ -74,7 +74,12 @@ exprt flatten_byte_extract(
       throw "flatten_byte_extract can only do byte-array right now";
   }
   else
-    throw "flatten_byte_extract can only do array right now";
+  {
+    // we turn that into extractbits
+    extract_bits_exprt extract_bits;
+    
+    
+  }
 }
 
 /*******************************************************************\
@@ -131,7 +136,7 @@ exprt flatten_byte_update(
         with_expr.type()=src.type();
         with_expr.old()=result;
         with_expr.where()=plus_exprt(src.op1(), i_expr);
-        with_expr.new_value()=byte_extract_expr;
+        with_expr.new_value()=flatten_byte_extract(byte_extract_expr, ns);
       }
       
       return result;
@@ -141,4 +146,60 @@ exprt flatten_byte_update(
   }
   else
     throw "flatten_byte_update can only do array right now";
+}
+
+/*******************************************************************\
+
+Function: has_byte_operators
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool has_byte_operator(const exprt &src)
+{
+  if(src.id()==ID_byte_update_little_endian ||
+     src.id()==ID_byte_update_big_endian ||
+     src.id()==ID_byte_extract_little_endian ||
+     src.id()==ID_byte_extract_big_endian)
+    return true;
+  
+  forall_operands(it, src)
+    if(has_byte_operator(*it)) return true;
+  
+  return false;
+}
+
+/*******************************************************************\
+
+Function: flatten_byte_operators
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+exprt flatten_byte_operators(const exprt &src, const namespacet &ns)
+{
+  exprt tmp=src;
+  
+  // destroys any sharing, should use hash table
+  Forall_operands(it, tmp)
+    flatten_byte_operators(*it, ns);
+
+  if(src.id()==ID_byte_update_little_endian ||
+     src.id()==ID_byte_update_big_endian)
+    return flatten_byte_update(src, ns);
+  else if(src.id()==ID_byte_extract_little_endian ||
+          src.id()==ID_byte_extract_big_endian)
+    return flatten_byte_extract(src, ns);
+    
+  return src;
 }

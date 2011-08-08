@@ -14,5 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 exprt flatten_byte_extract(const exprt &src, const namespacet &ns);
 exprt flatten_byte_update(const exprt &src, const namespacet &ns);
+exprt flatten_byte_operators(const exprt &src, const namespacet &ns);
+bool has_byte_operator(const exprt &src);
 
 #endif
