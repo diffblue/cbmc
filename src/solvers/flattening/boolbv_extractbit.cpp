@@ -26,7 +26,7 @@ Function: boolbvt::convert_extractbit
 
 \*******************************************************************/
 
-literalt boolbvt::convert_extractbit(const exprt &expr)
+literalt boolbvt::convert_extractbit(const extractbit_exprt &expr)
 {
   const exprt::operandst &operands=expr.operands();
 

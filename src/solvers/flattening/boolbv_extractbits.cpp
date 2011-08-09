@@ -23,7 +23,7 @@ Function: boolbvt::convert_extractbits
 
 \*******************************************************************/
 
-void boolbvt::convert_extractbits(const exprt &expr, bvt &bv)
+void boolbvt::convert_extractbits(const extractbits_exprt &expr, bvt &bv)
 {
   unsigned width=boolbv_width(expr.type());
   
@@ -43,6 +43,8 @@ void boolbvt::convert_extractbits(const exprt &expr, bvt &bv)
 
   convert_bv(expr.op0(), bv0);
 
+  // We only do constants for now.
+  // Should implement a shift here.
   if(to_integer(expr.op1(), o1) ||
      to_integer(expr.op2(), o2))
     return conversion_failed(expr, bv);
