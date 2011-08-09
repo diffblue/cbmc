@@ -283,7 +283,7 @@ void boolbvt::convert_bitvector(const exprt &expr, bvt &bv)
   else if(expr.id()==ID_replication)
     return convert_replication(expr, bv);
   else if(expr.id()==ID_extractbits)
-    return convert_extractbits(expr, bv);
+    return convert_extractbits(to_extractbits_expr(expr), bv);
   else if(expr.id()==ID_bitnot || expr.id()==ID_bitand ||
           expr.id()==ID_bitor || expr.id()==ID_bitxor)
     return convert_bitwise(expr, bv);
@@ -556,7 +556,7 @@ literalt boolbvt::convert_rest(const exprt &expr)
           expr.id()==ID_lt  || expr.id()==ID_gt)
     return convert_bv_rel(expr);
   else if(expr.id()==ID_extractbit)
-    return convert_extractbit(expr);
+    return convert_extractbit(to_extractbit_expr(expr));
   else if(expr.id()==ID_forall)
     return convert_quantifier(expr);
   else if(expr.id()==ID_exists)
