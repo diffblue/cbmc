@@ -990,6 +990,7 @@ class extractbit_exprt:public exprt
 public:
   inline extractbit_exprt():exprt(ID_extractbit)
   {
+    operands().resize(2);
   }
 
   inline extractbit_exprt(
@@ -997,6 +998,26 @@ public:
     const exprt &_index):exprt(ID_extractbit, bool_typet())
   {
     copy_to_operands(_src, _index);
+  }
+
+  exprt &src()
+  {
+    return op0();
+  }
+
+  exprt &index()
+  {
+    return op1();
+  }
+
+  const exprt &src() const
+  {
+    return op0();
+  }
+
+  const exprt &index() const
+  {
+    return op1();
   }
 };
 
@@ -1017,6 +1038,7 @@ class extractbits_exprt:public exprt
 public:
   inline extractbits_exprt():exprt(ID_extractbits)
   {
+    operands().resize(3);
   }
 
   // the ordering upper-lower matches the SMT-LIB
