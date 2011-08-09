@@ -42,7 +42,7 @@ static void get_alloc_type_rec(
   typet &type,
   exprt &size)
 {
-  const irept &sizeof_type=src.find("#c_sizeof_type");
+  const irept &sizeof_type=src.find(ID_C_c_sizeof_type);
 
   if(!sizeof_type.is_nil())
   {
