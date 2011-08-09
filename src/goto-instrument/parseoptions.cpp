@@ -375,7 +375,7 @@ void goto_instrument_parseoptionst::instrument_goto_program(
     // add pointer checks
     status("Adding Pointer Checks");
     pointer_checks(
-      goto_functions, ns, options, value_set_analysis);
+      goto_functions, context, options, value_set_analysis);
   }
 
   // add failed symbols
