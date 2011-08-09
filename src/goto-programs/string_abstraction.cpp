@@ -168,23 +168,18 @@ Function: string_abstractiont::build_type
 
 \*******************************************************************/
 
-exprt string_abstractiont::member(const exprt &a, whatt what)
+typet string_abstractiont::build_type(whatt what)
 {
-  if(a.is_nil()) return a;
-  
-  member_exprt result;
-  result.type()=build_type(what);
-  result.struct_op()=a;
+  typet type;
 
   switch(what)
   {
-  case IS_ZERO: result.set_component_name("is_zero"); break;
-  case SIZE: result.set_component_name("size"); break;
-  case LENGTH: result.set_component_name("length"); break;
-  default: assert(false);
+  case IS_ZERO: type=bool_typet(); break;
+  case LENGTH:  type=uint_type(); break;
+  case SIZE:    type=uint_type(); break;
   }
 
-  return result;
+  return type;
 }
 
 /*******************************************************************\
@@ -433,24 +428,44 @@ Function: string_abstractiont::make_decl_and_def
 
 \*******************************************************************/
 
-typet string_abstractiont::build_type(whatt what)
+void string_abstractiont::make_decl_and_def(goto_programt &dest,
+    goto_programt::targett ref_instr,
+    const irep_idt &identifier,
+    const irep_idt &source_sym)
 {
-  typet type;
+  const symbolt &symbol=ns.lookup(identifier);
+  symbol_exprt sym_expr=symbol_expr(symbol);
 
-  switch(what)
+  goto_programt::targett decl1=dest.add_instruction();
+  decl1->make_decl();
+  decl1->location=ref_instr->location;
+  decl1->function=ref_instr->function;
+  decl1->code=code_declt(sym_expr);
+  decl1->code.location()=ref_instr->location;
+
+  exprt val=symbol.value;
+  // initialize pointers with suitable objects
+  if(val.is_nil())
   {
-  case IS_ZERO: type=bool_typet(); break;
-  case LENGTH:  type=uint_type(); break;
-  case SIZE:    type=uint_type(); break;
-  default: assert(false);
+    const symbolt &orig=ns.lookup(source_sym);
+    val=make_val_or_dummy_rec(dest, ref_instr, symbol, ns.follow(orig.type));
   }
 
-  return type;
+  // may still be nil (structs, then assignments have been done already)
+  if(val.is_not_nil())
+  {
+    goto_programt::targett assignment1=dest.add_instruction();
+    assignment1->make_assignment();
+    assignment1->location=ref_instr->location;
+    assignment1->function=ref_instr->function;
+    assignment1->code=code_assignt(sym_expr, val);
+    assignment1->code.location()=ref_instr->location;
+  }
 }
 
 /*******************************************************************\
 
-Function: string_abstractiont::build_unknown
+Function: string_abstractiont::make_val_or_dummy_rec
 
   Inputs:
 
@@ -460,36 +475,78 @@ Function: string_abstractiont::build_unknown
 
 \*******************************************************************/
 
-exprt string_abstractiont::build_unknown(whatt what, bool write)
+exprt string_abstractiont::make_val_or_dummy_rec(goto_programt &dest,
+    goto_programt::targett ref_instr,
+    const symbolt &symbol, const typet &source_type)
 {
-  typet type=build_type(what);
+  const typet &eff_type=ns.follow(symbol.type);
 
-  if(write)
-    return exprt("NULL-object", type);
-
-  exprt result;
-
-  switch(what)
+  if(eff_type.id()==ID_array || eff_type.id()==ID_pointer)
   {
-  case IS_ZERO:
-    result=false_exprt();
-    break;
+    const typet &source_subt=is_ptr_string_struct(eff_type)?
+      source_type:ns.follow(source_type.subtype());
+    symbol_exprt sym_expr=add_dummy_symbol_and_value(
+        dest, ref_instr, symbol, irep_idt(),
+        eff_type.subtype(), source_subt);
 
-  case LENGTH:
-  case SIZE:
-    result=exprt(ID_sideeffect, type);
-    result.set(ID_statement, ID_nondet);
-    break;
+    if(eff_type.id()==ID_array)
+      return array_of_exprt(sym_expr, eff_type);
+    else
+      return address_of_exprt(sym_expr);
+  }
+  else if(eff_type.id()==ID_union ||
+      (eff_type.id()==ID_struct && !type_eq(eff_type, string_struct, ns)))
+  {
+    const struct_union_typet &su_source=to_struct_union_type(source_type);
+    const struct_union_typet::componentst &s_components=
+      su_source.components();
+    const struct_union_typet &struct_union_type=to_struct_union_type(eff_type);
+    const struct_union_typet::componentst &components=
+      struct_union_type.components();
+    unsigned seen=0;
 
-  default: assert(false);
+    struct_union_typet::componentst::const_iterator it2=components.begin();
+    for(struct_union_typet::componentst::const_iterator
+        it=s_components.begin();
+        it!=s_components.end() && it2!=components.end();
+        ++it)
+    {
+      if(it->get_name()!=it2->get_name())
+        continue;
+
+      const typet &eff_sub_type=ns.follow(it2->type());
+      if(eff_sub_type.id() == ID_pointer ||
+          eff_sub_type.id() == ID_array ||
+          eff_sub_type.id() == ID_struct ||
+          eff_sub_type.id() == ID_union)
+      {
+        symbol_exprt sym_expr=add_dummy_symbol_and_value(
+            dest, ref_instr, symbol, it2->get_name(),
+            it2->type(), ns.follow(it->type()));
+
+        member_exprt member(symbol_expr(symbol), it2->get_name(), it2->type());
+
+        goto_programt::targett assignment1=dest.add_instruction();
+        assignment1->make_assignment();
+        assignment1->location=ref_instr->location;
+        assignment1->function=ref_instr->function;
+        assignment1->code=code_assignt(member, sym_expr);
+        assignment1->code.location()=ref_instr->location;
+      }
+
+      ++seen;
+      ++it2;
+    }
+
+    assert(components.size()==seen);
   }
 
-  return result;
+  return nil_exprt();
 }
 
 /*******************************************************************\
 
-Function: string_abstractiont::build_unknown
+Function: string_abstractiont::add_dummy_symbol_and_value
 
   Inputs:
 
@@ -1170,7 +1227,6 @@ Function: string_abstractiont::build_unknown
 
 \*******************************************************************/
 
-#if 0
 exprt string_abstractiont::build_unknown(whatt what, bool write)
 {
   typet type=build_type(what);
@@ -1194,7 +1250,6 @@ exprt string_abstractiont::build_unknown(whatt what, bool write)
 
   return result;
 }
-#endif
 
 /*******************************************************************\
 
@@ -1753,7 +1808,6 @@ Function: string_abstractiont::member
 
 \*******************************************************************/
 
-#if 0
 exprt string_abstractiont::member(const exprt &a, whatt what)
 {
   if(a.is_nil()) return a;
@@ -1773,5 +1827,4 @@ exprt string_abstractiont::member(const exprt &a, whatt what)
 
   return result;
 }
-#endif
 
