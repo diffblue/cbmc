@@ -30,23 +30,21 @@ public:
   string_abstractiont(
     contextt &_context,
     message_handlert &_message_handler);
-  
+
   void operator()(goto_programt &dest);
   void operator()(goto_functionst &dest);
 
-  exprt is_zero_string(
-    const exprt &object,
-    bool write,
-    const locationt &location);
+protected:
+  const std::string arg_suffix;
+  std::string sym_suffix;
+  contextt &context;
+  namespacet ns;
+  unsigned temporary_counter;
 
-  exprt zero_string_length(
-    const exprt &object,
-    bool write,
-    const locationt &location);
+  typedef ::std::map< typet, typet > abstraction_types_mapt;
+  abstraction_types_mapt abstraction_types_map;
 
-  exprt buffer_size(
-    const exprt &object,
-    const locationt &location);
+  ::std::set< irep_idt > current_args;
 
   static bool has_string_macros(const exprt &expr);
 
@@ -54,12 +52,6 @@ public:
     exprt &expr,
     bool lhs,
     const locationt &location);
-  
-  typet get_string_struct(void) { return string_struct; }
-
-protected:
-  contextt &context;
-  namespacet ns;
 
   void move_lhs_arithmetic(exprt &lhs, exprt &rhs);
 
@@ -75,6 +67,8 @@ protected:
     return bv_width(type)==config.ansi_c.char_width;
   }
 
+  inline bool is_ptr_string_struct(const typet &type) const;
+
   void make_type(exprt &dest, const typet &type)
   {
     if(dest.is_not_nil() &&
@@ -82,46 +76,84 @@ protected:
       dest.make_typecast(type);
   }
 
-  void abstract(goto_programt &dest, goto_programt::targett it);
-  void abstract_assign(goto_programt &dest, goto_programt::targett it);
-  void abstract_pointer_assign(goto_programt &dest, goto_programt::targett it);
+  goto_programt::targett abstract(goto_programt &dest, goto_programt::targett it);
+  goto_programt::targett abstract_assign(goto_programt &dest, goto_programt::targett it);
+  goto_programt::targett abstract_pointer_assign(goto_programt &dest, goto_programt::targett it);
   void abstract_char_assign(goto_programt &dest, goto_programt::targett it);
+  void char_assign(
+    goto_programt &dest,
+    goto_programt::targett target,
+    const exprt &new_lhs,
+    const exprt &lhs,
+    const exprt &rhs);
   void abstract_function_call(goto_programt &dest, goto_programt::targett it);
+  goto_programt::targett abstract_return(goto_programt &dest, goto_programt::targett it);
+
+  goto_programt::targett value_assignments(goto_programt &dest,
+      goto_programt::targett it,
+      const exprt& lhs, const exprt& rhs);
+  goto_programt::targett value_assignments_if(
+    goto_programt &dest,
+    goto_programt::targett target,
+    const exprt& lhs, const if_exprt& rhs);
+  goto_programt::targett value_assignments_string_struct(
+    goto_programt &dest,
+    goto_programt::targett target,
+    const exprt& lhs, const exprt& rhs);
 
   typedef enum { IS_ZERO, LENGTH, SIZE } whatt;
 
+  static typet build_type(whatt what);
   exprt build(
     const exprt &pointer,
     whatt what,
     bool write,
     const locationt &location);
-
-  exprt build(const exprt &ptr, bool write);
-  exprt build_symbol_ptr(const exprt &object);
-  exprt build_symbol_buffer(const exprt &object);
-  exprt build_symbol_constant(const irep_idt &str);
+  bool build(const exprt &object, exprt &dest, bool write);
+  bool build_wrap(const exprt &object, exprt &dest, bool write);
+  bool build_if(const if_exprt &o_if, exprt &dest, bool write);
+  bool build_symbol(const symbol_exprt &sym, exprt &dest);
+  bool build_symbol_constant(const irep_idt &str, exprt &dest);
   exprt build_unknown(whatt what, bool write);
-  exprt build_unknown(bool write);
-  static typet build_type(whatt what);
-
-  exprt sub(const exprt &a, const exprt &b)
-  {
-    if(b.is_nil() || b.is_zero()) return a;
-    exprt result("-", a.type());
-    result.copy_to_operands(a, b);
-    make_type(result.op1(), result.type());
-    return result;
-  }
+  exprt build_unknown(const typet &type, bool write);
+  const typet& build_abstraction_type(const typet &type);
+  bool build_pointer(const exprt &object, exprt &dest, bool write);
+  void build_new_symbol(const symbolt &symbol,
+      const irep_idt &identifier, const typet &type);
 
   exprt member(const exprt &a, whatt what);
+  irep_idt abstract_ret_val_name(const symbolt &fct);
 
   typet string_struct;
-  goto_programt initialization;  
+  goto_programt initialization;
 
-  typedef std::map<irep_idt, irep_idt> localst;
+  typedef hash_map_cont<irep_idt, irep_idt, irep_id_hash> localst;
   localst locals;
-  
+
   void abstract(goto_programt &dest);
+
+  void add_str_arguments(
+      const irep_idt& name,
+      goto_functionst::goto_functiont &fct);
+  void add_argument(
+    code_typet::argumentst &str_args,
+    const symbolt &fct_symbol,
+    const typet &type,
+    const irep_idt &base_name,
+    const irep_idt &identifier);
+  void make_decl_and_def(goto_programt &dest, goto_programt::targett ref_instr,
+    const irep_idt &identifier, const irep_idt &source_sym);
+  exprt make_val_or_dummy_rec(goto_programt &dest,
+      goto_programt::targett ref_instr,
+      const symbolt &symbol, const typet &source_type);
+  symbol_exprt add_dummy_symbol_and_value(
+    goto_programt &dest,
+    goto_programt::targett ref_instr,
+    const symbolt &symbol,
+    const irep_idt &component_name,
+    const typet &type,
+    const typet &source_type);
+  void declare_define_locals(goto_programt &dest);
 };
 
 
