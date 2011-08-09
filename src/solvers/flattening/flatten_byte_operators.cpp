@@ -61,7 +61,7 @@ exprt flatten_byte_extract(
       {
         index_exprt index_expr(subtype);
         index_expr.array()=src.op0();
-        index_expr.index()=from_integer(i, integer_typet());
+        index_expr.index()=from_integer(i, src.op1().type());
         op[i]=index_expr;
       }
       
@@ -120,16 +120,17 @@ exprt flatten_byte_extract(
     if(src.op1().is_constant())
     {
       // We turn that into extractbits, using the obvious encoding.
-      
+
       mp_integer i;
-      if(!to_integer(src.op1(), i))
+      if(to_integer(src.op1(), i))
         assert(false);
         
       extractbits_exprt extractbits;
-
+      
       extractbits.src()=src.op0();
-      extractbits.upper()=from_integer((i+width)*8, integer_typet());
-      extractbits.lower()=from_integer(i*8, integer_typet());
+      extractbits.type()=src.type();
+      extractbits.upper()=from_integer((i+width)*8-1, src.op1().type());
+      extractbits.lower()=from_integer(i*8, src.op1().type());
       
       return extractbits;
     }
@@ -176,7 +177,7 @@ exprt flatten_byte_update(
        subtype.get_int(ID_width)==8)
     {
       // apply 'with' width times
-      exprt result=src;
+      exprt result=src.op0();
       
       for(unsigned i=0; i<width; i++)
       {
@@ -195,6 +196,8 @@ exprt flatten_byte_update(
         with_expr.old()=result;
         with_expr.where()=plus_exprt(src.op1(), i_expr);
         with_expr.new_value()=flatten_byte_extract(byte_extract_expr, ns);
+        
+        result.swap(with_expr);
       }
       
       return result;
@@ -250,14 +253,17 @@ exprt flatten_byte_operators(const exprt &src, const namespacet &ns)
   
   // destroys any sharing, should use hash table
   Forall_operands(it, tmp)
-    flatten_byte_operators(*it, ns);
+  {
+    exprt tmp=flatten_byte_operators(*it, ns);
+    it->swap(tmp);
+  }
 
   if(src.id()==ID_byte_update_little_endian ||
      src.id()==ID_byte_update_big_endian)
-    return flatten_byte_update(src, ns);
+    return flatten_byte_update(tmp, ns);
   else if(src.id()==ID_byte_extract_little_endian ||
           src.id()==ID_byte_extract_big_endian)
-    return flatten_byte_extract(src, ns);
-    
-  return src;
+    return flatten_byte_extract(tmp, ns);
+  else
+    return tmp;
 }
