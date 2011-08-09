@@ -1170,6 +1170,7 @@ Function: string_abstractiont::build_unknown
 
 \*******************************************************************/
 
+#if 0
 exprt string_abstractiont::build_unknown(whatt what, bool write)
 {
   typet type=build_type(what);
@@ -1193,6 +1194,7 @@ exprt string_abstractiont::build_unknown(whatt what, bool write)
 
   return result;
 }
+#endif
 
 /*******************************************************************\
 
@@ -1751,6 +1753,7 @@ Function: string_abstractiont::member
 
 \*******************************************************************/
 
+#if 0
 exprt string_abstractiont::member(const exprt &a, whatt what)
 {
   if(a.is_nil()) return a;
@@ -1770,4 +1773,5 @@ exprt string_abstractiont::member(const exprt &a, whatt what)
 
   return result;
 }
+#endif
 
