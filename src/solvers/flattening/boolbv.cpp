@@ -537,8 +537,10 @@ literalt boolbvt::convert_rest(const exprt &expr)
   }
 
   // flatten any byte_* operators
+  #if 0
   if(has_byte_operator(expr))
     return convert_rest(flatten_byte_operators(expr, ns));
+  #endif
 
   const exprt::operandst &operands=expr.operands();
 
