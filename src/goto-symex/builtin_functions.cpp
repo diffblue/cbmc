@@ -31,9 +31,24 @@ Function: basic_symext::symex_malloc
 
 \*******************************************************************/
 
-inline static typet c_sizeof_type(const exprt &expr)
+inline static typet c_sizeof_type_rec(const exprt &expr)
 {
-  return static_cast<const typet &>(expr.find(ID_C_c_sizeof_type));
+  const irept &sizeof_type=expr.find(ID_C_c_sizeof_type);
+
+  if(!sizeof_type.is_nil())
+  {
+    return static_cast<const typet &>(sizeof_type);
+  }
+  else if(expr.id()==ID_mult)
+  {
+    forall_operands(it, expr)
+    {
+      typet t=c_sizeof_type_rec(*it);
+      if(t.is_not_nil()) return t;
+    }
+  }
+  
+  return nil_typet();
 }
 
 void basic_symext::symex_malloc(
@@ -56,26 +71,38 @@ void basic_symext::symex_malloc(
     exprt tmp_size=size;
     state.rename(tmp_size, ns); // to allow constant propagation
 
-    typet tmp_type=c_sizeof_type(tmp_size);
-
-    if(tmp_type.is_not_nil())
+    // special treatment for sizeof(T)*x
+    if(tmp_size.id()==ID_mult &&
+       tmp_size.operands().size()==2 &&
+       tmp_size.op0().find(ID_C_c_sizeof_type).is_not_nil())
     {
-      // Did the size get multiplied?
-      mp_integer elem_size=pointer_offset_size(ns, tmp_type);
-      mp_integer alloc_size;
-      if(elem_size<1 || to_integer(tmp_size, alloc_size))
+      object_type=array_typet(
+        c_sizeof_type_rec(tmp_size.op0()),
+        tmp_size.op1());      
+    }
+    else
+    {
+      typet tmp_type=c_sizeof_type_rec(tmp_size);
+      
+      if(tmp_type.is_not_nil())
       {
-      }
-      else
-      {
-        if(alloc_size==elem_size)
-          object_type=tmp_type;
+        // Did the size get multiplied?
+        mp_integer elem_size=pointer_offset_size(ns, tmp_type);
+        mp_integer alloc_size;
+        if(elem_size<1 || to_integer(tmp_size, alloc_size))
+        {
+        }
         else
         {
-          mp_integer elements=alloc_size/elem_size;
-          
-          if(elements*elem_size==alloc_size)
-            object_type=array_typet(tmp_type, from_integer(elements, tmp_size.type()));
+          if(alloc_size==elem_size)
+            object_type=tmp_type;
+          else
+          {
+            mp_integer elements=alloc_size/elem_size;
+            
+            if(elements*elem_size==alloc_size)
+              object_type=array_typet(tmp_type, from_integer(elements, tmp_size.type()));
+          }
         }
       }
     }
