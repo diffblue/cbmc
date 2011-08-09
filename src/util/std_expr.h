@@ -1000,6 +1000,18 @@ public:
   }
 };
 
+extern inline const extractbit_exprt &to_extractbit_expr(const exprt &expr)
+{
+  assert(expr.id()==ID_extractbit && expr.operands().size()==2);
+  return static_cast<const extractbit_exprt &>(expr);
+}
+
+extern inline extractbit_exprt &to_extractbit_expr(exprt &expr)
+{
+  assert(expr.id()==ID_extractbit && expr.operands().size()==2);
+  return static_cast<extractbit_exprt &>(expr);
+}
+
 class extractbits_exprt:public exprt
 {
 public:
@@ -1048,6 +1060,18 @@ public:
   }
 
 };
+
+extern inline const extractbits_exprt &to_extractbits_expr(const exprt &expr)
+{
+  assert(expr.id()==ID_extractbits && expr.operands().size()==3);
+  return static_cast<const extractbits_exprt &>(expr);
+}
+
+extern inline extractbits_exprt &to_extractbits_expr(exprt &expr)
+{
+  assert(expr.id()==ID_extractbits && expr.operands().size()==3);
+  return static_cast<extractbits_exprt &>(expr);
+}
 
 class address_of_exprt:public exprt
 {
