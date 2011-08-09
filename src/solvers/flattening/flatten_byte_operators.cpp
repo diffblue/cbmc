@@ -22,7 +22,8 @@ Function: flatten_byte_extract
 
  Outputs:
 
- Purpose:
+ Purpose: rewrite byte extraction from an array to byte extraction 
+          from a concatenation of array index expressions
 
 \*******************************************************************/
 
@@ -33,6 +34,9 @@ exprt flatten_byte_extract(
   assert(src.id()==ID_byte_extract_little_endian ||
          src.id()==ID_byte_extract_big_endian);
   assert(src.operands().size()==2);
+
+  if(src.id()==ID_byte_extract_big_endian) 
+    throw "byte_extract flattening of big endian not done yet";
 
   unsigned width=
     integer2long(pointer_offset_size(ns, src.type()));
@@ -71,14 +75,68 @@ exprt flatten_byte_extract(
       }
     }
     else
-      throw "flatten_byte_extract can only do byte-array right now";
+    {
+      #if 0
+      const exprt &root=src.op0();
+      const exprt &offset=src.op1();
+      const typet &array_type=ns.follow(root.type());
+      const typet &offset_type=ns.follow(offset.type());
+      const typet &element_type=ns.follow(array_type.subtype());
+      mp_integer element_width=pointer_offset_size(ns, element_type);
+      
+      if(element_width==-1) return src; // failed
+
+      mp_integer result_width=pointer_offset_size(ns, src.type());
+      mp_integer num_elements=(element_width+result_width-2)/element_width+1;
+
+      // compute new root and offset
+      concatenation_exprt concat(
+        unsignedbv_typet(integer2long(element_width*8*num_elements)));
+
+      exprt first_index=
+        (element_width==1)?offset 
+        : div_exprt(offset, from_integer(element_width, offset_type)); // 8*offset/el_w
+
+      for(mp_integer i=num_elements; i>0; --i)
+      {
+        plus_exprt index(first_index, from_integer(i-1, offset_type));
+        concat.copy_to_operands(index_exprt(root, index));
+      }
+
+      mod_exprt new_offset(offset, from_integer(element_width, offset_type));
+
+      exprt tmp(ID_byte_extract_little_endian, src.type());
+      tmp.copy_to_operands(concat, new_offset);
+
+      return tmp;
+      #endif
+      
+      throw "byte_extract on non-byte arrays still to be implemented";
+    }
   }
   else
   {
-    // we turn that into extractbits
-    extract_bits_exprt extract_bits;
-    
-    
+    // is the offset a constant?
+    if(src.op1().is_constant())
+    {
+      // We turn that into extractbits, using the obvious encoding.
+      
+      mp_integer i;
+      if(!to_integer(src.op1(), i))
+        assert(false);
+        
+      extractbits_exprt extractbits;
+
+      extractbits.src()=src.op0();
+      extractbits.upper()=from_integer((i+width)*8, integer_typet());
+      extractbits.lower()=from_integer(i*8, integer_typet());
+      
+      return extractbits;
+    }
+    else
+    {
+      throw "byte_extract with non-constant offset";
+    }
   }
 }
 
