@@ -180,7 +180,8 @@ Function: goto_symex_statet::constant_propagation
 
 bool goto_symex_statet::constant_propagation(const exprt &expr) const
 {
-  if(expr.is_constant()) return true;
+  if(expr.is_constant())
+    return true;
   
   if(expr.id()==ID_address_of)
   {
@@ -199,6 +200,15 @@ bool goto_symex_statet::constant_propagation(const exprt &expr) const
     forall_operands(it, expr)
       if(!constant_propagation(*it))
         return false;
+
+    return true;
+  }
+  else if(expr.id()==ID_mult)
+  {
+    // propagate stuff with sizeof in it
+    forall_operands(it, expr)
+      if(it->find(ID_C_c_sizeof_type).is_not_nil())
+        return true;
 
     return true;
   }
