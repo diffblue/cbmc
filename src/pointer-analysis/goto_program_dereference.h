@@ -102,13 +102,13 @@ void remove_pointers(
 
 void pointer_checks(
   goto_programt &goto_program,
-  const namespacet &ns,
+  contextt &context,
   const optionst &options,
   value_setst &value_sets);
 
 void pointer_checks(
   goto_functionst &goto_functions,
-  const namespacet &ns,
+  contextt &context,
   const optionst &options,
   value_setst &value_sets);
 
