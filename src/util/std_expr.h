@@ -1007,14 +1007,46 @@ public:
   {
   }
 
+  // the ordering upper-lower matches the SMT-LIB
   inline extractbits_exprt(
     const exprt &_src,
-    const exprt &_lower,
     const exprt &_upper,
+    const exprt &_lower,
     const typet &_type):exprt(ID_extractbits, _type)
   {
     copy_to_operands(_src, _lower, _upper);
   }
+  
+  exprt &src()
+  {
+    return op0();
+  }
+
+  exprt &upper()
+  {
+    return op1();
+  }
+
+  exprt &lower()
+  {
+    return op2();
+  }
+
+  const exprt &src() const
+  {
+    return op0();
+  }
+
+  const exprt &upper() const
+  {
+    return op1();
+  }
+
+  const exprt &lower() const
+  {
+    return op2();
+  }
+
 };
 
 class address_of_exprt:public exprt
