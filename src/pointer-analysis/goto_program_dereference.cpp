@@ -575,13 +575,13 @@ Function: pointer_checks
 
 void pointer_checks(
   goto_programt &goto_program,
-  const namespacet &ns,
+  contextt &context,
   const optionst &options,
   value_setst &value_sets)
 {
-  contextt new_context;
+  namespacet ns(context);
   goto_program_dereferencet
-    goto_program_dereference(ns, new_context, options, value_sets);
+    goto_program_dereference(ns, context, options, value_sets);
   goto_program_dereference.pointer_checks(goto_program);
 }                    
 
@@ -599,13 +599,13 @@ Function: pointer_checks
 
 void pointer_checks(
   goto_functionst &goto_functions,
-  const namespacet &ns,
+  contextt &context,
   const optionst &options,
   value_setst &value_sets)
 {
-  contextt new_context;
+  namespacet ns(context);
   goto_program_dereferencet
-    goto_program_dereference(ns, new_context, options, value_sets);
+    goto_program_dereference(ns, context, options, value_sets);
   goto_program_dereference.pointer_checks(goto_functions);
 }                    
 
