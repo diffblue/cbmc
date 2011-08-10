@@ -402,8 +402,11 @@ void string_abstractiont::declare_define_locals(goto_programt &dest)
   {
     goto_programt::targett ref_instr=dest.instructions.begin();
     bool has_decl=false;
+
     available_declst::const_iterator entry=available_decls.find(l_it->first);
-    if(available_decls.end() != entry) {
+
+    if(available_declst::const_iterator(available_decls.end())!=entry)
+    {
       ref_instr=entry->second;
       has_decl=true;
     }
