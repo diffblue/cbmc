@@ -221,18 +221,22 @@ public:
 
   void compute_incoming_edges();
 
-  // insertion that preserves jumps to "target"
+  // Insertion that preserves jumps to "target".
+  // The instruction is destroyed.
   void insert_before_swap(targett target, instructiont &instruction)
   {
+    assert(target!=instructions.end());
     targett next=target;
     next++;
     instructions.insert(next, instructiont())->swap(*target);
     target->swap(instruction);
   }
   
-  // insertion that preserves jumps to "target"
+  // Insertion that preserves jumps to "target".
+  // The program p is destroyed.
   void insert_before_swap(targett target, goto_program_templatet<codeT, guardT> &p)
   {
+    assert(target!=instructions.end());
     if(p.instructions.empty()) return;
     insert_before_swap(target, p.instructions.front());
     targett next=target;
