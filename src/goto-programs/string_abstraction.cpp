@@ -415,7 +415,7 @@ void string_abstractiont::declare_define_locals(goto_programt &dest)
     make_decl_and_def(tmp, ref_instr, l_it->second, l_it->first);
 
     if(has_decl) ++ref_instr;
-    dest.destructive_insert(ref_instr, tmp);
+    dest.insert_before_swap(ref_instr, tmp);
   }
 }
 
@@ -581,7 +581,8 @@ symbol_exprt string_abstractiont::add_dummy_symbol_and_value(
   new_symbol.module=symbol.module;
   new_symbol.base_name=id2string(symbol.base_name)+suffix;
   new_symbol.mode=symbol.mode;
-  new_symbol.pretty_name=id2string(symbol.pretty_name)+suffix;
+  new_symbol.pretty_name=id2string(
+      symbol.pretty_name.empty()?symbol.base_name:symbol.pretty_name)+suffix;
   new_symbol.is_statevar=true;
   new_symbol.static_lifetime=false;
   new_symbol.thread_local=true;
@@ -720,7 +721,7 @@ goto_programt::targett string_abstractiont::abstract_assign(
   if(type.id()==ID_pointer || type.id()==ID_array)
     return abstract_pointer_assign(dest, target);
   else if(is_char_type(type))
-    abstract_char_assign(dest, target);
+    return abstract_char_assign(dest, target);
 
   return target;
 }
@@ -849,10 +850,13 @@ goto_programt::targett string_abstractiont::abstract_return(
   const symbolt &str_symbol=ns.lookup(identifier);
   symbol_exprt sym_expr=symbol_expr(str_symbol);
 
-  goto_programt::targett is_null=dest.insert_before(target);
-  is_null->function=target->function;
-  is_null->location=target->location;
-  is_null->make_goto(target, equal_exprt(sym_expr,
+  goto_programt::instructiont is_null;
+  is_null.function=target->function;
+  is_null.location=target->location;
+  dest.insert_before_swap(target, is_null);
+  goto_programt::targett next=target;
+  ++next;
+  target->make_goto(next, equal_exprt(sym_expr,
         null_pointer_exprt(to_pointer_type(sym_expr.type()))));
 
   exprt new_retval;
@@ -861,13 +865,13 @@ goto_programt::targett string_abstractiont::abstract_return(
     new_retval=build_unknown(abstract_ret_type, false);
 
   if(is_ptr_argument(abstract_ret_type))
-    return value_assignments(dest, target, sym_expr, new_retval);
+    return value_assignments(dest, next, sym_expr, new_retval);
   else
   {
     exprt lhs_deref=dereference_exprt(sym_expr,
         sym_expr.type().subtype());
 
-    return value_assignments(dest, target, lhs_deref, new_retval);
+    return value_assignments(dest, next, lhs_deref, new_retval);
   }
 }
 
@@ -1362,7 +1366,8 @@ void string_abstractiont::build_new_symbol(const symbolt &symbol,
   new_symbol.module=symbol.module;
   new_symbol.base_name=id2string(symbol.base_name)+sym_suffix;
   new_symbol.mode=symbol.mode;
-  new_symbol.pretty_name=id2string(symbol.pretty_name)+sym_suffix;
+  new_symbol.pretty_name=id2string(
+      symbol.pretty_name.empty()?symbol.base_name:symbol.pretty_name)+sym_suffix;
   new_symbol.is_statevar=true;
   new_symbol.static_lifetime=symbol.static_lifetime;
   new_symbol.thread_local=symbol.thread_local;
@@ -1497,12 +1502,14 @@ goto_programt::targett string_abstractiont::abstract_pointer_assign(
 
   if(lhs.type().id()==ID_pointer && !unknown)
   {
-    goto_programt::targett assignment=dest.insert_before(target);
-    assignment->make_assignment();
-    assignment->location=target->location;
-    assignment->function=target->function;
-    assignment->code=code_assignt(new_lhs, new_rhs);
-    assignment->code.location()=target->location;
+    goto_programt::instructiont assignment;
+    assignment.make_assignment();
+    assignment.location=target->location;
+    assignment.function=target->function;
+    assignment.code=code_assignt(new_lhs, new_rhs);
+    assignment.code.location()=target->location;
+    dest.insert_before_swap(target, assignment);
+    ++target;
 
     return target;
   }
@@ -1524,7 +1531,7 @@ Function: string_abstractiont::abstract_char_assign
 
 \*******************************************************************/
 
-void string_abstractiont::abstract_char_assign(
+goto_programt::targett string_abstractiont::abstract_char_assign(
   goto_programt &dest,
   goto_programt::targett target)
 {
@@ -1538,7 +1545,7 @@ void string_abstractiont::abstract_char_assign(
 
   // we only care if the constant zero is assigned
   if(!rhsp->is_zero())
-    return;
+    return target;
 
   // index into a character array
   if(lhs.id()==ID_index)
@@ -1557,7 +1564,7 @@ void string_abstractiont::abstract_char_assign(
       if_exprt min_expr(binary_relation_exprt(new_length, ID_lt, i2),
           new_length, i2);
 
-      char_assign(dest, target, new_lhs, i2, min_expr);
+      return char_assign(dest, target, new_lhs, i2, min_expr);
     }
   }
   else if(lhs.id()==ID_dereference)
@@ -1570,10 +1577,12 @@ void string_abstractiont::abstract_char_assign(
       assert(i2.is_not_nil());
 
       make_type(ptr.offset, build_type(LENGTH));
-      char_assign(dest, target, new_lhs, i2,
+      return char_assign(dest, target, new_lhs, i2,
           ptr.offset.is_nil()?gen_zero(build_type(LENGTH)):ptr.offset);
     }
   }
+
+  return target;
 }
 
 /*******************************************************************\
@@ -1588,7 +1597,7 @@ Function: string_abstractiont::char_assign
 
 \*******************************************************************/
 
-void string_abstractiont::char_assign(
+goto_programt::targett string_abstractiont::char_assign(
   goto_programt &dest,
   goto_programt::targett target,
   const exprt &new_lhs,
@@ -1618,8 +1627,11 @@ void string_abstractiont::char_assign(
       assignment2->code.op0(),
       assignment2->code.op1());
 
-  target++;
-  dest.destructive_insert(target, tmp);
+  dest.insert_before_swap(target, tmp);
+  ++target;
+  ++target;
+
+  return target;
 }
 
 /*******************************************************************\
@@ -1725,16 +1737,12 @@ goto_programt::targett string_abstractiont::value_assignments_if(
   value_assignments(tmp, goto_out, lhs, rhs.true_case());
   value_assignments(tmp, else_target, lhs, rhs.false_case());
 
-  goto_programt::targett skip=tmp.add_instruction(SKIP);
-  skip->function=target->function;
-  skip->location=target->location;
-  skip->swap(*target);
+  goto_programt::targett last=target;
+  ++last;
+  dest.insert_before_swap(target, tmp);
+  --last;
 
-  target++;
-  dest.destructive_insert(target, tmp);
-  target--;
-
-  return target;
+  return last;
 }
 
 /*******************************************************************\
@@ -1787,16 +1795,12 @@ goto_programt::targett string_abstractiont::value_assignments_string_struct(
     assignment->location=target->location;
   }
 
-  goto_programt::targett skip=tmp.add_instruction(SKIP);
-  skip->function=target->function;
-  skip->location=target->location;
-  skip->swap(*target);
+  goto_programt::targett last=target;
+  ++last;
+  dest.insert_before_swap(target, tmp);
+  --last;
 
-  target++;
-  dest.destructive_insert(target, tmp);
-  target--;
-
-  return target;
+  return last;
 }
 
 /*******************************************************************\
