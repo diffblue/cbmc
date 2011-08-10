@@ -92,114 +92,42 @@ public:
     bool is_target() const
     { return target_number!=unsigned(-1); }
     
-    void make_goto()
+    inline void clear(goto_program_instruction_typet _type)
     {
-      type=GOTO;
+      type=_type;
       targets.clear();
       guard.make_true();
       code.make_nil();
     }
      
-    void make_return()
-    {
-      type=RETURN;
-      targets.clear();
-      guard.make_true();
-      code.make_nil();
-    }
-     
-    void make_function_call(const codeT &_code)
-    {
-      type=FUNCTION_CALL;
-      targets.clear();
-      guard.make_true();
-      code=_code;
-    }
-    
-    void make_skip()
-    {
-      type=SKIP;
-      targets.clear();
-      guard.make_true();
-      code.make_nil();
-    }
-     
-    void make_throw()
-    {
-      type=THROW;
-      targets.clear();
-      guard.make_true();
-      code.make_nil();
-    }
-     
-    void make_catch()
-    {
-      type=CATCH;
-      targets.clear();
-      guard.make_true();
-      code.make_nil();
-    }
-     
-    void make_assertion(const guardT &g)
-    {
-      type=ASSERT;
-      targets.clear();
-      guard=g;
-      code.make_nil();
-    }
-     
-    void make_assumption(const guardT &g)
-    {
-      type=ASSUME;
-      targets.clear();
-      guard=g;
-      code.make_nil();
-    }
-     
-    void make_assignment()
-    {
-      type=ASSIGN;
-      targets.clear();
-      guard.make_nil();
-      code.make_nil();
-    }
-     
-    void make_goto(typename std::list<class instructiont>::iterator _target)
+    inline void make_goto() { clear(GOTO); }
+    inline void make_return() { clear(RETURN); }
+    inline void make_function_call(const codeT &_code) { clear(FUNCTION_CALL); code=_code; }
+    inline void make_skip() { clear(SKIP); }
+    inline void make_throw() { clear(THROW); }
+    inline void make_catch() { clear(CATCH); }
+    inline void make_assertion(const guardT &g) { clear(ASSERT); guard=g; }
+    inline void make_assumption(const guardT &g) { clear(ASSUME); guard=g; }
+    inline void make_assignment() { clear(ASSIGN); }
+    inline void make_other() { clear(OTHER); }
+    inline void make_decl() { clear(DECL); }
+    inline void make_dead() { clear(DEAD); }
+
+    inline void make_goto(
+      typename std::list<class instructiont>::iterator _target)
     {
       make_goto();
       targets.push_back(_target);
     }
     
-    void make_goto(typename std::list<class instructiont>::iterator _target, const guardT &g)
+    inline void make_goto(
+      typename std::list<class instructiont>::iterator _target,
+      const guardT &g)
     {
       make_goto(_target);
       guard=g;
     }
-    
-    void make_other()
-    {
-      type=OTHER;
-      targets.clear();
-      guard.make_true();
-      code.make_nil();
-    }
-    
-    void make_decl()
-    {
-      type=DECL;
-      targets.clear();
-      guard.make_true();
-      code.make_nil();
-    }
-    
-    void make_dead()
-    {
-      type=DEAD;
-      targets.clear();
-      guard.make_true();
-      code.make_nil();
-    }
-    
+
     inline bool is_goto         () const { return type==GOTO;          }
     inline bool is_return       () const { return type==RETURN;        }
     inline bool is_assign       () const { return type==ASSIGN;        }
@@ -285,105 +213,11 @@ public:
   
   void get_successors(
     targett target,
-    targetst &successors)
-  {
-    successors.clear();
-    if(target==instructions.end()) return;
-
-    targett next=target;
-    next++;
-    
-    const instructiont &i=*target;
-  
-    if(i.is_goto())
-    {
-      for(typename targetst::const_iterator
-          t_it=i.targets.begin();
-          t_it!=i.targets.end();
-          t_it++)
-        successors.push_back(*t_it);
-  
-      if(!i.guard.is_true())
-        successors.push_back(next);
-    }
-    else if(i.is_start_thread())
-    {
-      for(typename targetst::const_iterator
-          t_it=i.targets.begin();
-          t_it!=i.targets.end();
-          t_it++)
-        successors.push_back(*t_it);
-  
-      successors.push_back(next);
-    }
-    else if(i.is_end_thread())
-    {
-      // no successors
-    }
-    else if(i.is_return())
-    {
-      // the successor is the end_function at the end
-      successors.push_back(--instructions.end());
-    }
-    else if(i.is_assume())
-    {
-      if(!i.guard.is_false())
-        successors.push_back(next);
-    }
-    else
-      successors.push_back(next);
-  }
+    targetst &successors);
 
   void get_successors(
     const_targett target,
-    const_targetst &successors) const
-  {
-    successors.clear();
-    if(target==instructions.end()) return;
-
-    const_targett next=target;
-    next++;
-    
-    const instructiont &i=*target;
-  
-    if(i.is_goto())
-    {
-      for(typename targetst::const_iterator
-          t_it=i.targets.begin();
-          t_it!=i.targets.end();
-          t_it++)
-        successors.push_back(*t_it);
-  
-      if(!i.guard.is_true())
-        successors.push_back(next);
-    }
-    else if(i.is_start_thread())
-    {
-      for(typename targetst::const_iterator
-          t_it=i.targets.begin();
-          t_it!=i.targets.end();
-          t_it++)
-        successors.push_back(*t_it);
-  
-      successors.push_back(next);
-    }
-    else if(i.is_end_thread())
-    {
-      // no successors
-    }
-    else if(i.is_return())
-    {
-      // the successor is the end_function at the end
-      successors.push_back(--instructions.end());
-    }
-    else if(i.is_assume())
-    {
-      if(!i.guard.is_false())
-        successors.push_back(next);
-    }
-    else
-      successors.push_back(next);
-  }
+    const_targetst &successors) const;
 
   void compute_incoming_edges();
 
@@ -484,17 +318,9 @@ public:
   }
   
   // compute loop numbers
-  void compute_loop_numbers()
-  {
-    unsigned nr=0;
-    for(typename instructionst::iterator
-        it=instructions.begin();
-        it!=instructions.end();
-        it++)
-      if(it->is_backwards_goto())
-        it->loop_number=nr++;
-  }
-  
+  void compute_loop_numbers();
+
+  // update all indices  
   void update();
   
   // empty program?
@@ -526,6 +352,122 @@ public:
   
   bool has_assertion() const;
 }; 
+
+template <class codeT, class guardT>
+void goto_program_templatet<codeT, guardT>::compute_loop_numbers()
+{
+  unsigned nr=0;
+  for(typename instructionst::iterator
+      it=instructions.begin();
+      it!=instructions.end();
+      it++)
+    if(it->is_backwards_goto())
+      it->loop_number=nr++;
+}
+
+template <class codeT, class guardT>
+void goto_program_templatet<codeT, guardT>::get_successors(
+  targett target,
+  targetst &successors)
+{
+  successors.clear();
+  if(target==instructions.end()) return;
+
+  targett next=target;
+  next++;
+  
+  const instructiont &i=*target;
+
+  if(i.is_goto())
+  {
+    for(typename targetst::const_iterator
+        t_it=i.targets.begin();
+        t_it!=i.targets.end();
+        t_it++)
+      successors.push_back(*t_it);
+
+    if(!i.guard.is_true())
+      successors.push_back(next);
+  }
+  else if(i.is_start_thread())
+  {
+    for(typename targetst::const_iterator
+        t_it=i.targets.begin();
+        t_it!=i.targets.end();
+        t_it++)
+      successors.push_back(*t_it);
+
+    successors.push_back(next);
+  }
+  else if(i.is_end_thread())
+  {
+    // no successors
+  }
+  else if(i.is_return())
+  {
+    // the successor is the end_function at the end
+    successors.push_back(--instructions.end());
+  }
+  else if(i.is_assume())
+  {
+    if(!i.guard.is_false())
+      successors.push_back(next);
+  }
+  else
+    successors.push_back(next);
+}
+
+template <class codeT, class guardT>
+void goto_program_templatet<codeT, guardT>::get_successors(
+  const_targett target,
+  const_targetst &successors) const
+{
+  successors.clear();
+  if(target==instructions.end()) return;
+
+  const_targett next=target;
+  next++;
+  
+  const instructiont &i=*target;
+
+  if(i.is_goto())
+  {
+    for(typename targetst::const_iterator
+        t_it=i.targets.begin();
+        t_it!=i.targets.end();
+        t_it++)
+      successors.push_back(*t_it);
+
+    if(!i.guard.is_true())
+      successors.push_back(next);
+  }
+  else if(i.is_start_thread())
+  {
+    for(typename targetst::const_iterator
+        t_it=i.targets.begin();
+        t_it!=i.targets.end();
+        t_it++)
+      successors.push_back(*t_it);
+
+    successors.push_back(next);
+  }
+  else if(i.is_end_thread())
+  {
+    // no successors
+  }
+  else if(i.is_return())
+  {
+    // the successor is the end_function at the end
+    successors.push_back(--instructions.end());
+  }
+  else if(i.is_assume())
+  {
+    if(!i.guard.is_false())
+      successors.push_back(next);
+  }
+  else
+    successors.push_back(next);
+}
 
 #include <langapi/language_util.h>
 #include <iomanip>
