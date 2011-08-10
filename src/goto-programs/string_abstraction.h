@@ -79,8 +79,8 @@ protected:
   goto_programt::targett abstract(goto_programt &dest, goto_programt::targett it);
   goto_programt::targett abstract_assign(goto_programt &dest, goto_programt::targett it);
   goto_programt::targett abstract_pointer_assign(goto_programt &dest, goto_programt::targett it);
-  void abstract_char_assign(goto_programt &dest, goto_programt::targett it);
-  void char_assign(
+  goto_programt::targett abstract_char_assign(goto_programt &dest, goto_programt::targett it);
+  goto_programt::targett char_assign(
     goto_programt &dest,
     goto_programt::targett target,
     const exprt &new_lhs,
