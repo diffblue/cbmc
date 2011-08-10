@@ -7,7 +7,8 @@ CPROVER compiles in the following environments:
 
 - MacOS X
 
-- Cygwin (using the i686-pc-mingw32-g++ cross compiler)
+- Cygwin
+  (We recommend g++-3. Don't use the i686-pc-mingw32-g++ cross compiler.)
 
 - Microsoft's Visual Studio 2010 (older versions won't work)
 
@@ -21,6 +22,8 @@ How to compile?
 Follow these instructions:
 
 0) You need a C/C++ compiler, Flex and Bison, and GNU make.
+   If you have Windows, and don't have these, we recommend you
+   install Cygwin.
 
 1) You need a SAT solver (in source). We recommend MiniSat2. Many
    Linux distributions now have a package for MiniSat2; e.g.,
@@ -47,7 +50,8 @@ Follow these instructions:
    command:
 
    a) Recent versions of Linux run with "STL_HASH_TR1".
-   b) Recent versions of Cygwin/MingW work with "STL_HASH_TR1".
+   b) Recent versions of Cygwin/MingW work with "STL_HASH_TR1";
+      for g++-3, use "STL_HASH_GNU".
    c) Visual Studio: please get Visual Studio 10 and use "STL_HASH_TR1".
 
    Older Linux or MingW systems may require "STL_HASH_GNU".
