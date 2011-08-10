@@ -134,6 +134,7 @@ extern char *yyansi_ctext;
 %token  TOK_CPROVER_BITVECTOR "__CPROVER_bitvector"
 %token  TOK_REAL        "__real__"
 %token  TOK_IMAG        "__imag__"
+%token  TOK_STATIC_ASSERT "_Static_assert"
 
 /*** special scanner reports ***/
 

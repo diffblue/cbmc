@@ -678,6 +678,24 @@ void ansi_c_scanner_init()
                   else
                     return make_identifier();
                 }
+
+  /* This is a C1X keyword */
+
+"_Thread_local" { if(PARSER.mode==ansi_c_parsert::GCC ||
+                     PARSER.mode==ansi_c_parsert::ARM)
+                    { loc(); return TOK_THREAD_LOCAL; }
+                  else
+                    return make_identifier();
+                }
+
+  /* This is a C1X keyword */
+
+"_Static_assert" { if(PARSER.mode==ansi_c_parsert::GCC ||
+                      PARSER.mode==ansi_c_parsert::ARM)
+                    { loc(); return TOK_STATIC_ASSERT; }
+                  else
+                    return make_identifier();
+                }
 }
 
   /* operands following */
