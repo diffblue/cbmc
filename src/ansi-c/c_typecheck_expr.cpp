@@ -676,7 +676,7 @@ void c_typecheck_baset::typecheck_expr_sizeof(exprt &expr)
 
   new_expr.swap(expr);
 
-  expr.add("#c_sizeof_type")=type;
+  expr.add(ID_C_c_sizeof_type)=type;
 }
 
 /*******************************************************************\
