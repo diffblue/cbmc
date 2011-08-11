@@ -683,7 +683,18 @@ declaration:
 	}
 	| declaring_list ';'
 	| default_declaring_list ';'
+	| static_assert_declaration
 	;
+	
+static_assert_declaration:
+          TOK_STATIC_ASSERT '(' unary_expression ',' unary_expression ')' ';'
+        {
+          init($$, ID_declaration);
+          stack($$).set(ID_is_static_assert, true);
+          stack($$).set(ID_value, stack($3));
+          stack($$).set(ID_comment, stack($5));
+        }
+        ;
 
 default_declaring_list:
 	  declaration_qualifier_list identifier_declarator
@@ -1223,6 +1234,11 @@ member_declaration:
 	| ';' /* empty declaration */
 	{
 	  init($$, ID_declaration_list);
+	}
+	| static_assert_declaration
+	{
+	  init($$, ID_declaration_list);
+	  mto($$, $1);
 	}
 	;
 
