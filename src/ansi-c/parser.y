@@ -1193,7 +1193,7 @@ gcc_type_attribute:
         | TOK_GCC_ATTRIBUTE_ALIGNED TOK_GCC_ATTRIBUTE_END
         { $$=$1; set($$, ID_aligned); }
         | TOK_GCC_ATTRIBUTE_ALIGNED '(' comma_expression')' TOK_GCC_ATTRIBUTE_END
-        { $$=$1; set($$, ID_aligned); mto($$, $3); }
+        { $$=$1; set($$, ID_aligned); stack($$).set(ID_size, $3); }
         ;
 
 member_declaration_list_opt:

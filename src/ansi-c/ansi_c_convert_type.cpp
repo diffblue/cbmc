@@ -95,7 +95,6 @@ void ansi_c_convert_typet::read_rec(const typet &type)
     {
       err_location(location);
       error("bit vector width has to be constant");
-      std::cout << type.pretty() << std::endl;
       throw 0;
     }
     
@@ -139,7 +138,10 @@ void ansi_c_convert_typet::read_rec(const typet &type)
   else if(type.id()==ID_packed)
     packed=true;
   else if(type.id()==ID_aligned)
+  {
     aligned=true;
+    alignment=static_cast<const exprt &>(type.find(ID_size));
+  }
   else if(type.id()==ID_transparent_union)
     transparent_union=true;
   else if(type.id()==ID_vector)
@@ -362,6 +364,9 @@ void ansi_c_convert_typet::write(typet &type)
   if(packed && type.id()==ID_struct)
     type.set(ID_packed, true);
 
+  /*
+  need to make sure types with different alignment are still the same
   if(aligned)
-    type.set(ID_aligned, true);
+     type.set(ID_aligned, true);
+  */
 }
