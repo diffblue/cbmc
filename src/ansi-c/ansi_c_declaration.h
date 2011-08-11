@@ -148,6 +148,16 @@ public:
     set(ID_is_extern, is_extern);
   }
   
+  bool get_is_static_assert() const
+  {
+    return get_bool(ID_is_static_assert);
+  }
+  
+  void set_is_static_assert(bool is_static_assert)
+  {
+    set(ID_is_static_assert, is_static_assert);
+  }
+  
   void to_symbol(symbolt &symbol) const;
 };
 
