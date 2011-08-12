@@ -112,11 +112,15 @@ protected:
   bool build(const exprt &object, exprt &dest, bool write);
   bool build_wrap(const exprt &object, exprt &dest, bool write);
   bool build_if(const if_exprt &o_if, exprt &dest, bool write);
+  bool build_array(const array_exprt &object, exprt &dest, bool write);
   bool build_symbol(const symbol_exprt &sym, exprt &dest);
-  bool build_symbol_constant(const irep_idt &str, exprt &dest);
+  bool build_symbol_constant(const mp_integer &zero_length,
+      const mp_integer &buf_size, exprt &dest);
   exprt build_unknown(whatt what, bool write);
   exprt build_unknown(const typet &type, bool write);
   const typet& build_abstraction_type(const typet &type);
+  const typet& build_abstraction_type_rec(const typet &type,
+      const abstraction_types_mapt &known);
   bool build_pointer(const exprt &object, exprt &dest, bool write);
   void build_new_symbol(const symbolt &symbol,
       const irep_idt &identifier, const typet &type);
