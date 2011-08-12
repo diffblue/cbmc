@@ -14,7 +14,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <prefix.h>
 
 #include <ansi-c/c_types.h>
-#include <ansi-c/ansi_c_expr.h>
+#include <ansi-c/string_constant.h>
 #include <ansi-c/anonymous_member.h>
 
 #include "cpp_typecheck.h"
