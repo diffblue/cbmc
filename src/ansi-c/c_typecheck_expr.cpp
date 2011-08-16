@@ -2001,7 +2001,7 @@ void c_typecheck_baset::do_special_functions(
         throw "equal expects two operands";
       }
       
-      equality_exprt equality_expr;
+      equal_exprt equality_expr;
       equality_expr.operands()=expr.arguments();
       equality_expr.location()=location;
       
