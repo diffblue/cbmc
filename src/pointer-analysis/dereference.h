@@ -66,7 +66,7 @@ public:
     const guardt &guard,
     const modet mode);
     
-  bool has_dereference(const exprt &expr) const;
+  static bool has_dereference(const exprt &expr);
 
   typedef hash_set_cont<exprt, irep_hash> expr_sett;
 

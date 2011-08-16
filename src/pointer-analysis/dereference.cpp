@@ -46,7 +46,7 @@ Function: dereferencet::has_dereference
 
 \*******************************************************************/
 
-bool dereferencet::has_dereference(const exprt &expr) const
+bool dereferencet::has_dereference(const exprt &expr)
 {
   forall_operands(it, expr)
     if(has_dereference(*it))
