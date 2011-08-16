@@ -60,6 +60,12 @@ public:
   virtual ~dereferencet() { }
   
   typedef enum { READ, WRITE } modet;
+  
+  // The method 'dereference' dereferences the
+  // pointer-expression 'pointer',
+  // assuming that the guard 'guard' holds,
+  // in mode 'mode'. The resulting expression
+  // is returned.
 
   virtual exprt dereference(
     const exprt &pointer,
