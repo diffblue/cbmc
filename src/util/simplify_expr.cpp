@@ -103,7 +103,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
   // elminiate casts to bool
   if(expr_type==bool_typet())
   {
-    equality_exprt equality;
+    equal_exprt equality;
     equality.location()=expr.location();
     equality.lhs()=expr.op0();
     equality.rhs()=gen_zero(ns.follow(expr.op0().type()));
@@ -3253,7 +3253,7 @@ bool simplify_exprt::simplify_index(index_exprt &expr)
     {
       // turn (a with i:=x)[j] into (i==j)?x:a[j]
       // watch out that the type of i and j might be different
-      equality_exprt equality_expr(expr.op1(), with_expr.op1());
+      equal_exprt equality_expr(expr.op1(), with_expr.op1());
       
       if(equality_expr.lhs().type()!=equality_expr.rhs().type())
         equality_expr.rhs().make_typecast(equality_expr.lhs().type());
