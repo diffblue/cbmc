@@ -48,7 +48,7 @@ void symex_target_equationt::assignment(
   SSA_step.rhs=rhs;
   SSA_step.assignment_type=assignment_type;
 
-  SSA_step.cond_expr=equality_exprt(SSA_step.lhs, SSA_step.rhs);
+  SSA_step.cond_expr=equal_exprt(SSA_step.lhs, SSA_step.rhs);
   SSA_step.type=goto_trace_stept::ASSIGNMENT;
   SSA_step.source=source;
 }
@@ -430,7 +430,7 @@ void symex_target_equationt::convert_io(
           symbol_exprt symbol;
           symbol.type()=tmp.type();
           symbol.set_identifier("symex::io::"+i2string(io_count++));
-          dec_proc.set_to(equality_exprt(tmp, symbol), true);
+          dec_proc.set_to(equal_exprt(tmp, symbol), true);
           it->converted_io_args.push_back(symbol);
         }
       }
