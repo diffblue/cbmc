@@ -142,7 +142,7 @@ void goto_convertt::finish_computed_gotos(goto_programt &goto_program)
       exprt label_expr(ID_label, empty_typet());
       label_expr.set(ID_identifier, l_it->first);
 
-      equality_exprt guard;
+      equal_exprt guard;
       
       guard.lhs()=pointer;
       guard.rhs()=address_of_exprt(label_expr);
@@ -1178,7 +1178,7 @@ void goto_convertt::case_guard(
 
   forall_expr(it, case_op)
   {
-    equality_exprt eq_expr;
+    equal_exprt eq_expr;
     eq_expr.lhs()=value;
     eq_expr.rhs()=*it;
     dest.move_to_operands(eq_expr);

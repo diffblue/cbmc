@@ -715,7 +715,7 @@ void invariant_sett::strengthen_rec(const exprt &expr)
         lhs_member_expr.type()=it->type();
         rhs_member_expr.type()=it->type();
 
-        equality_exprt equality;
+        equal_exprt equality;
         equality.lhs()=lhs_member_expr;
         equality.rhs()=rhs_member_expr;
         
@@ -1004,7 +1004,7 @@ void invariant_sett::nnf(exprt &expr, bool negate)
     if(expr.op0().type().id()=="unsignedbv" ||
        expr.op0().type().id()=="signedbv")
     {
-      equality_exprt tmp;
+      equal_exprt tmp;
       tmp.lhs()=expr.op0();
       tmp.rhs()=gen_zero(expr.op0().type());
       nnf(tmp, !negate);
@@ -1419,7 +1419,7 @@ void invariant_sett::assignment(
   const exprt &lhs,
   const exprt &rhs)
 {
-  equality_exprt equality;
+  equal_exprt equality;
   equality.lhs()=lhs;
   equality.rhs()=rhs;
   
