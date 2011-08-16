@@ -70,9 +70,8 @@ void boolbvt::convert_byte_extract(const exprt &expr, bvt &bv)
 
     // add implications
 
-    equality_exprt equality;
-    equality.operands().resize(2);
-    equality.op0()=op1; // index operand
+    equal_exprt equality;
+    equality.lhs()=op1; // index operand
 
     typet constant_type=op1.type(); // type of index operand
 
@@ -81,7 +80,7 @@ void boolbvt::convert_byte_extract(const exprt &expr, bvt &bv)
 
     for(unsigned i=0; i<bytes; i++)
     {
-      equality.op1()=from_integer(i, constant_type);
+      equality.rhs()=from_integer(i, constant_type);
 
       unsigned offset=i*byte_width;
 
@@ -99,15 +98,14 @@ void boolbvt::convert_byte_extract(const exprt &expr, bvt &bv)
   {
     bv.resize(width);
 
-    equality_exprt equality;
-    equality.operands().resize(2);
-    equality.op0()=op1; // index operand
+    equal_exprt equality;
+    equality.lhs()=op1; // index operand
 
     typet constant_type(op1.type()); // type of index operand
     
     for(unsigned i=0; i<bytes; i++)
     {
-      equality.op1()=from_integer(i, constant_type);
+      equality.rhs()=from_integer(i, constant_type);
         
       literalt e=convert(equality);
 

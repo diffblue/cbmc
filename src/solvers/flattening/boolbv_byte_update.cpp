@@ -81,7 +81,7 @@ void boolbvt::convert_byte_update(const exprt &expr, bvt &bv)
   for(unsigned offset=0; offset<bv.size(); offset+=byte_width)
   {
     // index condition
-    equality_exprt equality;
+    equal_exprt equality;
     equality.lhs()=op1;
     equality.rhs()=from_integer(offset/byte_width, op1.type());
     literalt equal=convert(equality);

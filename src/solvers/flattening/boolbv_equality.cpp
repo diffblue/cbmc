@@ -25,37 +25,37 @@ Function: boolbvt::convert_equality
 
 \*******************************************************************/
 
-literalt boolbvt::convert_equality(const equality_exprt &expr)
+literalt boolbvt::convert_equality(const equal_exprt &expr)
 {
-  if(!base_type_eq(expr.op0().type(), expr.op1().type(), ns))
+  if(!base_type_eq(expr.lhs().type(), expr.rhs().type(), ns))
   {
-    std::cout << "######### op0: " << expr.op0().pretty() << std::endl;
-    std::cout << "######### op1: " << expr.op1().pretty() << std::endl;
+    std::cout << "######### lhs: " << expr.lhs().pretty() << std::endl;
+    std::cout << "######### rhs: " << expr.rhs().pretty() << std::endl;
     throw "equality without matching types";
   }
 
   // see if it is an unbounded array
-  if(is_unbounded_array(expr.op0().type()))
+  if(is_unbounded_array(expr.lhs().type()))
     return record_array_equality(expr);
 
   bvt bv0, bv1;
   
-  convert_bv(expr.op0(), bv0);
-  convert_bv(expr.op1(), bv1);
+  convert_bv(expr.lhs(), bv0);
+  convert_bv(expr.rhs(), bv1);
     
   if(bv0.size()!=bv1.size())
   {
-    std::cerr << "op0: " << expr.op0().pretty() << std::endl;
-    std::cerr << "op0 size: " << bv0.size() << std::endl;
-    std::cerr << "op1: " << expr.op1().pretty() << std::endl;
-    std::cerr << "op1 size: " << bv1.size() << std::endl;
+    std::cerr << "lhs: " << expr.lhs().pretty() << std::endl;
+    std::cerr << "lhs size: " << bv0.size() << std::endl;
+    std::cerr << "rhs: " << expr.rhs().pretty() << std::endl;
+    std::cerr << "rhs size: " << bv1.size() << std::endl;
     throw "unexpected size mismatch on equality";
   }
 
   if(bv0.size()==0)
     throw "got zero-size BV";
 
-  if(expr.op0().type().id()=="verilogbv")
+  if(expr.lhs().type().id()=="verilogbv")
   {
     // TODO
   }

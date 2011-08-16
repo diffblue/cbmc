@@ -109,7 +109,7 @@ protected:
   virtual literalt convert_reduction(const exprt &expr);
   virtual literalt convert_extractbit(const extractbit_exprt &expr);
   virtual literalt convert_overflow(const exprt &expr);
-  virtual literalt convert_equality(const class equality_exprt &expr);
+  virtual literalt convert_equality(const class equal_exprt &expr);
   virtual literalt convert_ieee_float_rel(const exprt &expr);
   virtual literalt convert_quantifier(const exprt &expr);
 

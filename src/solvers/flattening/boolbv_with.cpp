@@ -159,11 +159,7 @@ void boolbvt::convert_with_array(
   {
     exprt counter=from_integer(i, counter_type);
 
-    equality_exprt eq_expr;
-    eq_expr.lhs()=op1;
-    eq_expr.rhs()=counter;
-
-    literalt eq_lit=convert(eq_expr);
+    literalt eq_lit=convert(equal_exprt(op1, counter));
 
     unsigned offset=integer2long(i*op2_bv.size());
 
@@ -211,11 +207,7 @@ void boolbvt::convert_with_bv(
   {
     exprt counter=from_integer(i, counter_type);
 
-    equality_exprt eq_expr;
-    eq_expr.lhs()=op1;
-    eq_expr.rhs()=counter;
-
-    literalt eq_lit=convert(eq_expr);
+    literalt eq_lit=convert(equal_exprt(op1, counter));
 
     next_bv[i]=prop.lselect(eq_lit, l, prev_bv[i]);
   }

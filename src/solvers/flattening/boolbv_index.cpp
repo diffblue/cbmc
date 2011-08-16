@@ -110,7 +110,7 @@ void boolbvt::convert_index(const index_exprt &expr, bvt &bv)
 
     // add implications
 
-    equality_exprt index_equality;
+    equal_exprt index_equality;
     index_equality.lhs()=index; // index operand
 
     bvt equal_bv;
@@ -137,7 +137,7 @@ void boolbvt::convert_index(const index_exprt &expr, bvt &bv)
   {
     bv.resize(width);
 
-    equality_exprt equality;
+    equal_exprt equality;
     equality.lhs()=index; // index operand
 
     typet constant_type=index.type(); // type of index operand
