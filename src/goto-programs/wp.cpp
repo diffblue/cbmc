@@ -198,7 +198,7 @@ void substitute_rec(
         exprt what_address=address_of_exprt(what);
         exprt dest_address=address_of_exprt(dest);
 
-        equality_exprt alias_cond=equality_exprt(what_address, dest_address);
+        equal_exprt alias_cond=equal_exprt(what_address, dest_address);
         
         if_exprt if_expr;
 
