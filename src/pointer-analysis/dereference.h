@@ -46,6 +46,13 @@ public:
 class dereferencet
 {
 public:
+  /*! \brief Constructor 
+   * \param _ns Namespace
+   * \param _new_context A context to store new symbols in
+   * \param _options Options, in particular whether pointer checks are
+            to be performed
+   * \param _dereference_callback Callback object for error reporting
+  */
   dereferencet(
     const namespacet &_ns,
     contextt &_new_context,
@@ -61,17 +68,27 @@ public:
   
   typedef enum { READ, WRITE } modet;
   
-  // The method 'dereference' dereferences the
-  // pointer-expression 'pointer',
-  // assuming that the guard 'guard' holds,
-  // in mode 'mode'. The resulting expression
-  // is returned.
+  /*! 
+   * The method 'dereference' dereferences the
+   * given pointer-expression. Any errors are
+   * reported to the callback method given in the
+   * constructor.
+   *
+   * \param pointer A pointer-typed expression, to
+            be dereferenced.
+   * \param guard A guard, which is assumed to hold when
+            dereferencing.
+   * \param mode Indicates whether the dereferencing
+            is a load or store.
+  */
 
   virtual exprt dereference(
     const exprt &pointer,
     const guardt &guard,
     const modet mode);
     
+  /*! \brief Returns 'true' iff the given expression contains unary '*'
+  */
   static bool has_dereference(const exprt &expr);
 
   typedef hash_set_cont<exprt, irep_hash> expr_sett;
