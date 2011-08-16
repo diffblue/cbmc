@@ -9,6 +9,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_STD_EXPR_H
 #define CPROVER_STD_EXPR_H
 
+/*! \file util/std_expr.h
+ * \brief API to expression classes
+ *
+ * \author Daniel Kroening <kroening@kroening.com>
+ * \date   Sun Jul 31 21:54:44 BST 2011
+*/
+
 #include <assert.h>
 
 #include <expr.h>
@@ -44,6 +51,8 @@ extern inline transt &to_trans(exprt &expr)
   return static_cast<transt &>(expr);
 }
 
+/*! \brief Expression to hold a symbol (variable)
+*/
 class symbol_exprt:public exprt
 {
 public:
@@ -51,15 +60,25 @@ public:
   {
   }
 
+  /*! \brief Constructor 
+   * \param identifier Name of symbol
+  */
   inline explicit symbol_exprt(const irep_idt &identifier):exprt(ID_symbol)
   {
     set_identifier(identifier);
   }
 
+  /*! \brief Constructor 
+   * \param  type Type of symbol
+  */
   inline explicit symbol_exprt(const typet &type):exprt(ID_symbol, type)
   {
   }
 
+  /*! \brief Constructor 
+   * \param identifier Name of symbol
+   * \param  type Type of symbol
+  */
   inline symbol_exprt(const irep_idt &identifier,
                       const typet &type):exprt(ID_symbol, type)
   {
@@ -77,6 +96,14 @@ public:
   }
 };
 
+/*! \brief Cast a generic exprt to a \ref symbol_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * symbol_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref symbol_exprt
+*/
 extern inline const symbol_exprt &to_symbol_expr(const exprt &expr)
 {
   assert(expr.id()==ID_symbol && !expr.has_operands());
@@ -89,6 +116,8 @@ extern inline symbol_exprt &to_symbol_expr(exprt &expr)
   return static_cast<symbol_exprt &>(expr);
 }
 
+/*! \brief Generic base class for unary expressions
+*/
 class unary_exprt:public exprt
 {
 public:
@@ -120,6 +149,8 @@ public:
   }
 };
 
+/*! \brief The unary minus expression
+*/
 class unary_minus_exprt:public unary_exprt
 {
 public:
@@ -135,6 +166,8 @@ public:
   }
 };
 
+/*! \brief A generic base class for expressions that are predicates
+*/
 class predicate_exprt:public exprt
 {
 public:
@@ -163,6 +196,8 @@ public:
   }
 };
 
+/*! \brief A generic base class for relations, i.e., binary predicates
+*/
 class binary_relation_exprt:public predicate_exprt
 {
 public:
@@ -205,6 +240,8 @@ public:
   }
 };
 
+/*! \brief A generic base class for binary expressions
+*/
 class binary_exprt:public exprt
 {
 public:
@@ -245,6 +282,8 @@ public:
   }
 };
 
+/*! \brief The plus expression
+*/
 class plus_exprt:public binary_exprt
 {
 public:
@@ -355,35 +394,6 @@ extern inline mod_exprt &to_mod_expr(exprt &expr)
   assert(expr.id()==ID_mod && expr.operands().size()==2);
   return static_cast<mod_exprt &>(expr);
 }
-
-// WILL GO AWAY
-
-class equality_exprt:public binary_relation_exprt
-{
-public:
-  inline equality_exprt():binary_relation_exprt(ID_equal)
-  {
-  }
-
-  inline equality_exprt(const exprt &_lhs, const exprt &_rhs):
-    binary_relation_exprt(_lhs, ID_equal, _rhs)
-  {
-  }
-};
-
-extern inline const equality_exprt &to_equality_expr(const exprt &expr)
-{
-  assert(expr.id()==ID_equal && expr.operands().size()==2);
-  return static_cast<const equality_exprt &>(expr);
-}
-
-extern inline equality_exprt &to_equality_expr(exprt &expr)
-{
-  assert(expr.id()==ID_equal && expr.operands().size()==2);
-  return static_cast<equality_exprt &>(expr);
-}
-
-// USE THIS ONE
 
 class equal_exprt:public binary_relation_exprt
 {
