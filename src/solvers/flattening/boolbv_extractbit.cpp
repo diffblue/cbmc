@@ -65,7 +65,7 @@ literalt boolbvt::convert_extractbit(const extractbit_exprt &expr)
     unsignedbv_typet index_type;
     index_type.set_width(integer2long(index_width));
 
-    equality_exprt equality;
+    equal_exprt equality;
     equality.lhs()=operands[1]; // index operand
 
     if(index_type!=equality.lhs().type())

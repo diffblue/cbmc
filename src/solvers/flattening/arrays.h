@@ -27,7 +27,7 @@ public:
   
   typedef equalityt SUB;
   
-  literalt record_array_equality(const class equality_exprt &expr);
+  literalt record_array_equality(const class equal_exprt &expr);
   void record_array_index(const class index_exprt &expr);
 
 protected:

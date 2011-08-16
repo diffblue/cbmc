@@ -67,7 +67,7 @@ Function: arrayst::record_array_equality
 \*******************************************************************/
 
 literalt arrayst::record_array_equality(
-  const equality_exprt &equality)
+  const equal_exprt &equality)
 {
   const exprt &op0=equality.op0();
   const exprt &op1=equality.op1();
@@ -253,7 +253,7 @@ void arrayst::add_array_Ackermann_constraints()
             continue;
         
           // index equality
-          equality_exprt indices_equal(*i1, *i2);
+          equal_exprt indices_equal(*i1, *i2);
 
           if(indices_equal.op0().type()!=
              indices_equal.op1().type())
@@ -274,7 +274,7 @@ void arrayst::add_array_Ackermann_constraints()
             index_exprt index_expr2=index_expr1;
             index_expr2.index()=*i2;
           
-            equality_exprt values_equal(index_expr1, index_expr2);
+            equal_exprt values_equal(index_expr1, index_expr2);
 
             bvt implication;
             implication.reserve(2);
@@ -355,7 +355,7 @@ void arrayst::add_array_constraints(
     
     assert(index_expr1.type()==index_expr2.type());
 
-    equality_exprt equality_expr(index_expr1, index_expr2);
+    equal_exprt equality_expr(index_expr1, index_expr2);
     
     // add constraint
     bvt bv;
@@ -437,7 +437,7 @@ void arrayst::add_array_constraints_with(
       assert(false);
     }
 
-    set_to_true(equality_exprt(index_expr, value));
+    set_to_true(equal_exprt(index_expr, value));
   }
 
   // use other array index applications for "else" case
@@ -457,7 +457,7 @@ void arrayst::add_array_constraints_with(
       if(other_index.type()!=index.type())
         other_index.make_typecast(index.type());
 
-      literalt guard_lit=convert(equality_exprt(index, other_index));
+      literalt guard_lit=convert(equal_exprt(index, other_index));
 
       if(guard_lit!=const_literal(true))
       {
@@ -473,7 +473,7 @@ void arrayst::add_array_constraints_with(
 
         assert(index_expr1.type()==index_expr2.type());
 
-        equality_exprt equality_expr(index_expr1, index_expr2);
+        equal_exprt equality_expr(index_expr1, index_expr2);
         
         literalt equality_lit=convert(equality_expr);
 
@@ -521,7 +521,7 @@ void arrayst::add_array_constraints_array_of(
     assert(base_type_eq(index_expr.type(), expr.op0().type(), ns));
 
     // add constraint
-    set_to_true(equality_exprt(index_expr, expr.op0()));
+    set_to_true(equal_exprt(index_expr, expr.op0()));
   }
 }
 
@@ -570,7 +570,7 @@ void arrayst::add_array_constraints_if(
     // add implication
     bvt bv;
     bv.push_back(prop.lnot(cond_lit));
-    bv.push_back(convert(equality_exprt(index_expr1, index_expr2)));
+    bv.push_back(convert(equal_exprt(index_expr1, index_expr2)));
     prop.lcnf(bv);
   }
 
@@ -596,7 +596,7 @@ void arrayst::add_array_constraints_if(
     // add implication
     bvt bv;
     bv.push_back(cond_lit);
-    bv.push_back(convert(equality_exprt(index_expr1, index_expr2)));
+    bv.push_back(convert(equal_exprt(index_expr1, index_expr2)));
     prop.lcnf(bv);
   }
 }

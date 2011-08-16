@@ -547,14 +547,15 @@ literalt boolbvt::convert_rest(const exprt &expr)
   if(expr.id()==ID_typecast)
     return convert_typecast(expr);
   else if(expr.id()==ID_equal)
-    return convert_equality(to_equality_expr(expr));
+    return convert_equality(to_equal_expr(expr));
   else if(expr.id()==ID_notequal)
   {
     if(expr.operands().size()!=2)
       throw "notequal expects two operands";
-
-    equality_exprt e(expr.op0(), expr.op1());
-    return prop.lnot(convert_equality(e));
+    
+    return prop.lnot(
+      convert_equality(
+        equal_exprt(expr.op0(), expr.op1())));
   }
   else if(expr.id()==ID_ieee_float_equal ||
           expr.id()==ID_ieee_float_notequal)
