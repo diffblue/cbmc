@@ -83,7 +83,7 @@ void goto_symext::replace_array_equal(exprt &expr)
       expr.make_false();
     else
     {
-      equality_exprt equality_expr(expr.op0(), expr.op1());
+      equal_exprt equality_expr(expr.op0(), expr.op1());
       expr.swap(equality_expr);
     }
   }
