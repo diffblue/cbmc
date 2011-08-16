@@ -346,7 +346,7 @@ dereferencet::valuet dereferencet::build_reference_to(
       
       if(o.offset().is_zero())
       {
-        tmp_guard.add(equality_exprt(pointer_expr, null_pointer));
+        tmp_guard.add(equal_exprt(pointer_expr, null_pointer));
 
         dereference_callback.dereference_failure(
           "pointer dereference",
@@ -507,7 +507,7 @@ dereferencet::valuet dereferencet::build_reference_to(
     
     if(o.offset().is_zero())
     {
-      equality_exprt equality(pointer_expr, object_pointer);
+      equal_exprt equality(pointer_expr, object_pointer);
 
       if(ns.follow(equality.lhs().type())!=ns.follow(equality.rhs().type()))
         equality.lhs().make_typecast(equality.rhs().type());
@@ -872,7 +872,7 @@ bool dereferencet::memory_model_conversion(
 
   if(options.get_bool_option("pointer-check"))
   {
-    equality_exprt offset_not_zero(offset, gen_zero(offset.type()));
+    equal_exprt offset_not_zero(offset, gen_zero(offset.type()));
     offset_not_zero.make_not();
   
     guardt tmp_guard(guard);
