@@ -199,7 +199,7 @@ void remove_function_pointerst::remove_function_pointer(
       address_of.make_typecast(pointer.type());
     
     goto_programt::targett t3=new_code_gotos.add_instruction();
-    t3->make_goto(t1, equality_exprt(pointer, address_of));
+    t3->make_goto(t1, equal_exprt(pointer, address_of));
   }
 
   goto_programt new_code;
