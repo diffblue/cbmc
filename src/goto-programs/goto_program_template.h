@@ -286,7 +286,7 @@ public:
 
   // these assume that the targets are computed and numbered
   std::ostream &output(
-    const class namespacet &ns,
+    const namespacet &ns,
     const irep_idt &identifier,
     std::ostream &out) const;
   
@@ -296,7 +296,7 @@ public:
   }
   
   virtual std::ostream& output_instruction(
-    const class namespacet &ns,
+    const namespacet &ns,
     const irep_idt &identifier,
     std::ostream &out,
     typename instructionst::const_iterator it) const=0;

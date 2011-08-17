@@ -26,7 +26,7 @@ public:
     from_type(type);
   }
   
-  void from_type(const class typet &type);
+  void from_type(const typet &type);
 
   bv_spect():width(0), is_signed(false)
   {

@@ -12,6 +12,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "cmdline.h"
 #include "ieee_float.h"
 
+class contextt;
+class namespacet;
+
 class configt
 {
 public:
@@ -45,7 +48,7 @@ public:
     void set_ILP32(); // int=32, long=32, pointer=32
     void set_LP32();  // int=16, long=32, pointer=32
 
-    void set_from_context(const class contextt &context);
+    void set_from_context(const contextt &context);
     
     // minimum alignment (in structs) measured in bytes
     unsigned alignment;
@@ -78,7 +81,7 @@ public:
     bool string_abstraction;
     
   protected:
-    int from_ns(const class namespacet &ns, const std::string &what);
+    int from_ns(const namespacet &ns, const std::string &what);
   } ansi_c;
   
   struct verilogt

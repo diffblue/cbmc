@@ -24,7 +24,7 @@ public:
   }
 
   void record(
-    const class function_application_exprt &function_application);
+    const function_application_exprt &function_application);
 
   virtual void post_process()
   {

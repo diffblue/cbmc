@@ -36,6 +36,11 @@ protected:
   smt1_propt smt1_prop;
 };
 
+class typecast_exprt;
+class constant_exprt;
+class index_exprt;
+class member_exprt;
+
 class smt1_convt:
   protected smt1_prop_wrappert,
   public prop_convt
@@ -72,10 +77,10 @@ protected:
   // specific expressions go here
   void convert_byte_update(const exprt &expr);
   void convert_byte_extract(const exprt &expr);
-  void convert_typecast(const class typecast_exprt &expr, bool bool_as_bv);
+  void convert_typecast(const typecast_exprt &expr, bool bool_as_bv);
   void convert_struct(const exprt &expr);
   void convert_union(const exprt &expr);
-  void convert_constant(const class constant_exprt &expr, bool bool_as_bv);
+  void convert_constant(const constant_exprt &expr, bool bool_as_bv);
   void convert_relation(const exprt &expr, bool bool_as_bv);
   void convert_is_dynamic_object(const exprt &expr, bool bool_as_bv);
   void convert_plus(const exprt &expr);
@@ -83,8 +88,8 @@ protected:
   void convert_div(const exprt &expr);
   void convert_mul(const exprt &expr);
   void convert_mod(const exprt &expr);
-  void convert_index(const class index_exprt &expr, bool bool_as_bv);
-  void convert_member(const class member_exprt &expr, bool bool_as_bv);
+  void convert_index(const index_exprt &expr, bool bool_as_bv);
+  void convert_member(const member_exprt &expr, bool bool_as_bv);
   void convert_overflow(const exprt &expr);
   void convert_with(const exprt &expr);
   
@@ -148,11 +153,11 @@ protected:
   string2array_mapt string2array_map;
   
   exprt binary2struct(
-    const class struct_typet &type, 
+    const struct_typet &type, 
     const std::string &binary) const;  
 
   exprt binary2union(
-    const class union_typet &type, 
+    const union_typet &type, 
     const std::string &binary) const;  
 
   // flattens multi-operand expressions into binary
