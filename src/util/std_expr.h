@@ -21,6 +21,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <expr.h>
 #include <std_types.h>
 
+/*! \defgroup gr_std_expr Conversion to specific expressions
+ *  Conversion to subclasses of @ref exprt
+*/
+
+/*! \brief TO_BE_DOCUMENTED
+*/
 class transt:public exprt
 {
 public:
@@ -39,12 +45,25 @@ public:
   inline const exprt &trans() const { return op2(); }
 };
 
+/*! \brief Cast a generic exprt to a \ref transt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * transt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref transt
+ *
+ * \ingroup gr_std_expr
+*/
 extern inline const transt &to_trans(const exprt &expr)
 {
   assert(expr.id()==ID_trans && expr.operands().size()==3);
   return static_cast<const transt &>(expr);
 }
 
+/*! \copydoc to_trans(const exprt &)
+ * \ingroup gr_std_expr
+*/
 extern inline transt &to_trans(exprt &expr)
 {
   assert(expr.id()==ID_trans && expr.operands().size()==3);
@@ -103,6 +122,8 @@ public:
  *
  * \param expr Source expression
  * \return Object of type \ref symbol_exprt
+ *
+ * \ingroup gr_std_expr
 */
 extern inline const symbol_exprt &to_symbol_expr(const exprt &expr)
 {
@@ -110,6 +131,9 @@ extern inline const symbol_exprt &to_symbol_expr(const exprt &expr)
   return static_cast<const symbol_exprt &>(expr);
 }
 
+/*! \copydoc to_symbol_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
 extern inline symbol_exprt &to_symbol_expr(exprt &expr)
 {
   assert(expr.id()==ID_symbol && !expr.has_operands());
@@ -299,6 +323,8 @@ public:
   }
 };
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class minus_exprt:public binary_exprt
 {
 public:
@@ -314,6 +340,8 @@ public:
   }
 };
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class mult_exprt:public binary_exprt
 {
 public:
@@ -329,18 +357,33 @@ public:
   }
 };
 
+/*! \brief Cast a generic exprt to a \ref mult_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * mult_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref mult_exprt
+ *
+ * \ingroup gr_std_expr
+*/
 extern inline const mult_exprt &to_mult_expr(const exprt &expr)
 {
   assert(expr.id()==ID_mult && expr.operands().size()>=2);
   return static_cast<const mult_exprt &>(expr);
 }
 
+/*! \copydoc to_mult_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
 extern inline mult_exprt &to_mult_expr(exprt &expr)
 {
   assert(expr.id()==ID_mult && expr.operands().size()>=2);
   return static_cast<mult_exprt &>(expr);
 }
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class div_exprt:public binary_exprt
 {
 public:
@@ -356,18 +399,33 @@ public:
   }
 };
 
+/*! \brief Cast a generic exprt to a \ref div_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * div_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref div_exprt
+ *
+ * \ingroup gr_std_expr
+*/
 extern inline const div_exprt &to_div_expr(const exprt &expr)
 {
   assert(expr.id()==ID_div && expr.operands().size()==2);
   return static_cast<const div_exprt &>(expr);
 }
 
+/*! \copydoc to_div_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
 extern inline div_exprt &to_div_expr(exprt &expr)
 {
   assert(expr.id()==ID_div && expr.operands().size()==2);
   return static_cast<div_exprt &>(expr);
 }
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class mod_exprt:public binary_exprt
 {
 public:
@@ -383,18 +441,33 @@ public:
   }
 };
 
+/*! \brief Cast a generic exprt to a \ref mod_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * mod_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref mod_exprt
+ *
+ * \ingroup gr_std_expr
+*/
 extern inline const mod_exprt &to_mod_expr(const exprt &expr)
 {
   assert(expr.id()==ID_mod && expr.operands().size()==2);
   return static_cast<const mod_exprt &>(expr);
 }
 
+/*! \copydoc to_mod_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
 extern inline mod_exprt &to_mod_expr(exprt &expr)
 {
   assert(expr.id()==ID_mod && expr.operands().size()==2);
   return static_cast<mod_exprt &>(expr);
 }
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class equal_exprt:public binary_relation_exprt
 {
 public:
@@ -408,18 +481,33 @@ public:
   }
 };
 
+/*! \brief Cast a generic exprt to an \ref equal_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * equal_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref equal_exprt
+ *
+ * \ingroup gr_std_expr
+*/
 extern inline const equal_exprt &to_equal_expr(const exprt &expr)
 {
   assert(expr.id()==ID_equal && expr.operands().size()==2);
   return static_cast<const equal_exprt &>(expr);
 }
 
+/*! \copydoc to_equal_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
 extern inline equal_exprt &to_equal_expr(exprt &expr)
 {
   assert(expr.id()==ID_equal && expr.operands().size()==2);
   return static_cast<equal_exprt &>(expr);
 }
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class index_exprt:public exprt
 {
 public:
@@ -481,9 +569,24 @@ public:
   }
 };
 
+/*! \brief Cast a generic exprt to an \ref index_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * index_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref index_exprt
+ *
+ * \ingroup gr_std_expr
+*/
 const index_exprt &to_index_expr(const exprt &expr);
+/*! \copydoc to_index_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
 index_exprt &to_index_expr(exprt &expr);
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class array_of_exprt:public exprt
 {
 public:
@@ -523,9 +626,24 @@ public:
   }
 };
 
+/*! \brief Cast a generic exprt to an \ref array_of_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * array_of_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref array_of_exprt
+ *
+ * \ingroup gr_std_expr
+*/
 const array_of_exprt &to_array_of_expr(const exprt &expr);
+/*! \copydoc to_array_of_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
 array_of_exprt &to_array_of_expr(exprt &expr);
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class array_exprt:public exprt
 {
 public:
@@ -551,9 +669,24 @@ public:
   }
 };
 
+/*! \brief Cast a generic exprt to an \ref array_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * array_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref array_exprt
+ *
+ * \ingroup gr_std_expr
+*/
 const array_exprt &to_array_expr(const exprt &expr);
+/*! \copydoc to_array_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
 array_exprt &to_array_expr(exprt &expr);
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class union_exprt:public exprt
 {
 public:
@@ -611,9 +744,24 @@ public:
   }
 };
 
+/*! \brief Cast a generic exprt to a \ref union_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * union_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref union_exprt
+ *
+ * \ingroup gr_std_expr
+*/
 const union_exprt &to_union_expr(const exprt &expr);
+/*! \copydoc to_union_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
 union_exprt &to_union_expr(exprt &expr);
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class struct_exprt:public exprt
 {
 public:
@@ -639,9 +787,24 @@ public:
   }
 };
 
+/*! \brief Cast a generic exprt to a \ref struct_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * struct_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref struct_exprt
+ *
+ * \ingroup gr_std_expr
+*/
 const struct_exprt &to_struct_expr(const exprt &expr);
+/*! \copydoc to_struct_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
 struct_exprt &to_struct_expr(exprt &expr);
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class object_descriptor_exprt:public exprt
 {
 public:
@@ -698,9 +861,24 @@ public:
   }
 };
 
+/*! \brief Cast a generic exprt to an \ref object_descriptor_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * object_descriptor_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref object_descriptor_exprt
+ *
+ * \ingroup gr_std_expr
+*/
 const object_descriptor_exprt &to_object_descriptor_expr(const exprt &expr);
+/*! \copydoc to_object_descriptor_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
 object_descriptor_exprt &to_object_descriptor_expr(exprt &expr);
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class dynamic_object_exprt:public exprt
 {
 public:
@@ -751,9 +929,24 @@ public:
   }
 };
 
+/*! \brief Cast a generic exprt to a \ref dynamic_object_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * dynamic_object_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref dynamic_object_exprt
+ *
+ * \ingroup gr_std_expr
+*/
 const dynamic_object_exprt &to_dynamic_object_expr(const exprt &expr);
+/*! \copydoc to_dynamic_object_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
 dynamic_object_exprt &to_dynamic_object_expr(exprt &expr);
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class typecast_exprt:public exprt
 {
 public:
@@ -778,18 +971,33 @@ public:
   }
 };
 
+/*! \brief Cast a generic exprt to a \ref typecast_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * typecast_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref typecast_exprt
+ *
+ * \ingroup gr_std_expr
+*/
 extern inline const typecast_exprt &to_typecast_expr(const exprt &expr)
 {
   assert(expr.id()==ID_typecast && expr.operands().size()==1);
   return static_cast<const typecast_exprt &>(expr);
 }
 
+/*! \copydoc to_typecast_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
 extern inline typecast_exprt &to_typecast_expr(exprt &expr)
 {
   assert(expr.id()==ID_typecast && expr.operands().size()==1);
   return static_cast<typecast_exprt &>(expr);
 }
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class and_exprt:public exprt
 {
 public:
@@ -813,6 +1021,8 @@ public:
   }
 };
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class implies_exprt:public exprt
 {
 public:
@@ -828,6 +1038,8 @@ public:
   }
 };
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class or_exprt:public exprt
 {
 public:
@@ -851,6 +1063,8 @@ public:
   }
 };
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class bitnot_exprt:public unary_exprt
 {
 public:
@@ -863,6 +1077,8 @@ public:
   }
 };
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class bitor_exprt:public exprt
 {
 public:
@@ -876,6 +1092,8 @@ public:
   }
 };
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class bitxor_exprt:public exprt
 {
 public:
@@ -889,6 +1107,8 @@ public:
   }
 };
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class bitand_exprt:public exprt
 {
 public:
@@ -902,6 +1122,8 @@ public:
   }
 };
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class shift_exprt:public binary_exprt
 {
 public:
@@ -929,6 +1151,8 @@ public:
   }
 };
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class shl_exprt:public shift_exprt
 {
 public:
@@ -951,6 +1175,8 @@ public:
   }
 };
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class ashr_exprt:public shift_exprt
 {
 public:
@@ -973,6 +1199,8 @@ public:
   }
 };
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class lshr_exprt:public shift_exprt
 {
 public:
@@ -995,6 +1223,8 @@ public:
   }
 };
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class extractbit_exprt:public exprt
 {
 public:
@@ -1031,18 +1261,33 @@ public:
   }
 };
 
+/*! \brief Cast a generic exprt to an \ref extractbit_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * extractbit_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref extractbit_exprt
+ *
+ * \ingroup gr_std_expr
+*/
 extern inline const extractbit_exprt &to_extractbit_expr(const exprt &expr)
 {
   assert(expr.id()==ID_extractbit && expr.operands().size()==2);
   return static_cast<const extractbit_exprt &>(expr);
 }
 
+/*! \copydoc to_extractbit_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
 extern inline extractbit_exprt &to_extractbit_expr(exprt &expr)
 {
   assert(expr.id()==ID_extractbit && expr.operands().size()==2);
   return static_cast<extractbit_exprt &>(expr);
 }
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class extractbits_exprt:public exprt
 {
 public:
@@ -1093,18 +1338,33 @@ public:
 
 };
 
+/*! \brief Cast a generic exprt to an \ref extractbits_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * extractbits_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref extractbits_exprt
+ *
+ * \ingroup gr_std_expr
+*/
 extern inline const extractbits_exprt &to_extractbits_expr(const exprt &expr)
 {
   assert(expr.id()==ID_extractbits && expr.operands().size()==3);
   return static_cast<const extractbits_exprt &>(expr);
 }
 
+/*! \copydoc to_extractbits_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
 extern inline extractbits_exprt &to_extractbits_expr(exprt &expr)
 {
   assert(expr.id()==ID_extractbits && expr.operands().size()==3);
   return static_cast<extractbits_exprt &>(expr);
 }
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class address_of_exprt:public exprt
 {
 public:
@@ -1132,18 +1392,33 @@ public:
   }
 };
 
+/*! \brief Cast a generic exprt to an \ref address_of_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * address_of_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref address_of_exprt
+ *
+ * \ingroup gr_std_expr
+*/
 extern inline const address_of_exprt &to_address_of_expr(const exprt &expr)
 {
   assert(expr.id()==ID_address_of && expr.operands().size()==1);
   return static_cast<const address_of_exprt &>(expr);
 }
 
+/*! \copydoc to_address_of_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
 extern inline address_of_exprt &to_address_of_expr(exprt &expr)
 {
   assert(expr.id()==ID_address_of && expr.operands().size()==1);
   return static_cast<address_of_exprt &>(expr);
 }
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class not_exprt:public exprt
 {
 public:
@@ -1158,6 +1433,8 @@ public:
   }
 };
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class dereference_exprt:public exprt
 {
 public:
@@ -1192,18 +1469,33 @@ public:
   }
 };
 
+/*! \brief Cast a generic exprt to a \ref dereference_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * dereference_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref dereference_exprt
+ *
+ * \ingroup gr_std_expr
+*/
 extern inline const dereference_exprt &to_dereference_expr(const exprt &expr)
 {
   assert(expr.id()==ID_dereference && expr.operands().size()==1);
   return static_cast<const dereference_exprt &>(expr);
 }
 
+/*! \copydoc to_dereference_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
 extern inline dereference_exprt &to_dereference_expr(exprt &expr)
 {
   assert(expr.id()==ID_dereference && expr.operands().size()==1);
   return static_cast<dereference_exprt &>(expr);
 }
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class if_exprt:public exprt
 {
 public:
@@ -1249,18 +1541,33 @@ public:
   }
 };
 
+/*! \brief Cast a generic exprt to an \ref if_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * if_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref if_exprt
+ *
+ * \ingroup gr_std_expr
+*/
 extern inline const if_exprt &to_if_expr(const exprt &expr)
 {
   assert(expr.id()==ID_if && expr.operands().size()==3);
   return static_cast<const if_exprt &>(expr);
 }
 
+/*! \copydoc to_if_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
 extern inline if_exprt &to_if_expr(exprt &expr)
 {
   assert(expr.id()==ID_if && expr.operands().size()==3);
   return static_cast<if_exprt &>(expr);
 }
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class with_exprt:public exprt
 {
 public:
@@ -1309,18 +1616,33 @@ public:
   }
 };
 
+/*! \brief Cast a generic exprt to a \ref with_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * with_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref with_exprt
+ *
+ * \ingroup gr_std_expr
+*/
 extern inline const with_exprt &to_with_expr(const exprt &expr)
 {
   assert(expr.id()==ID_with && expr.operands().size()==3);
   return static_cast<const with_exprt &>(expr);
 }
 
+/*! \copydoc to_with_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
 extern inline with_exprt &to_with_expr(exprt &expr)
 {
   assert(expr.id()==ID_with && expr.operands().size()==3);
   return static_cast<with_exprt &>(expr);
 }
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class array_update_exprt:public exprt
 {
 public:
@@ -1369,18 +1691,33 @@ public:
   }
 };
 
+/*! \brief Cast a generic exprt to an \ref array_update_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * array_update_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref array_update_exprt
+ *
+ * \ingroup gr_std_expr
+*/
 extern inline const array_update_exprt &to_array_update_expr(const exprt &expr)
 {
   assert(expr.id()==ID_array_update && expr.operands().size()==3);
   return static_cast<const array_update_exprt &>(expr);
 }
 
+/*! \copydoc to_array_update_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
 extern inline array_update_exprt &to_array_update_expr(exprt &expr)
 {
   assert(expr.id()==ID_array_update && expr.operands().size()==3);
   return static_cast<array_update_exprt &>(expr);
 }
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class member_exprt:public exprt
 {
 public:
@@ -1442,18 +1779,33 @@ public:
   }
 };
 
+/*! \brief Cast a generic exprt to a \ref member_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * member_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref member_exprt
+ *
+ * \ingroup gr_std_expr
+*/
 inline const member_exprt &to_member_expr(const exprt &expr)
 {
   assert(expr.id()==ID_member);
   return static_cast<const member_exprt &>(expr);
 }
 
+/*! \copydoc to_member_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
 inline member_exprt &to_member_expr(exprt &expr)
 {
   assert(expr.id()==ID_member);
   return static_cast<member_exprt &>(expr);
 }
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class isnan_exprt:public predicate_exprt
 {
 public:
@@ -1468,6 +1820,8 @@ public:
   }
 };
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class ieee_float_equal_exprt:public binary_relation_exprt
 {
 public:
@@ -1481,6 +1835,8 @@ public:
   }
 };
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class type_exprt:public exprt
 {
 public:
@@ -1493,6 +1849,8 @@ public:
   }
 };
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class constant_exprt:public exprt
 {
 public:
@@ -1515,18 +1873,33 @@ public:
   }
 };
 
+/*! \brief Cast a generic exprt to a \ref constant_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * constant_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref constant_exprt
+ *
+ * \ingroup gr_std_expr
+*/
 inline const constant_exprt &to_constant_expr(const exprt &expr)
 {
   assert(expr.id()==ID_constant);
   return static_cast<const constant_exprt &>(expr);
 }
 
+/*! \copydoc to_constant_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
 inline constant_exprt &to_constant_expr(exprt &expr)
 {
   assert(expr.id()==ID_constant);
   return static_cast<constant_exprt &>(expr);
 }
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class true_exprt:public constant_exprt
 {
 public:
@@ -1536,6 +1909,8 @@ public:
   }
 };
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class false_exprt:public constant_exprt
 {
 public:
@@ -1545,6 +1920,8 @@ public:
   }
 };
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class nil_exprt:public exprt
 {
 public:
@@ -1553,6 +1930,8 @@ public:
   }
 };
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class null_pointer_exprt:public constant_exprt
 {
 public:
@@ -1562,6 +1941,8 @@ public:
   }
 };
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class function_application_exprt:public exprt
 {
 public:
@@ -1605,9 +1986,24 @@ public:
   }
 };
 
+/*! \brief Cast a generic exprt to a \ref function_application_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * function_application_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref function_application_exprt
+ *
+ * \ingroup gr_std_expr
+*/
 const function_application_exprt &to_function_application_expr(const exprt &expr);
+/*! \copydoc to_function_application_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
 function_application_exprt &to_function_application_expr(exprt &expr);
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class concatenation_exprt:public exprt
 {
 public:
@@ -1632,9 +2028,24 @@ public:
   }
 };
 
+/*! \brief Cast a generic exprt to a \ref concatenation_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * concatenation_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref concatenation_exprt
+ *
+ * \ingroup gr_std_expr
+*/
 const concatenation_exprt &to_concatenation_expr(const exprt &expr);
+/*! \copydoc to_concatenation_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
 concatenation_exprt &to_concatenation_expr(exprt &expr);
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class same_object_exprt:public exprt
 {
 public:
@@ -1645,6 +2056,8 @@ public:
   }
 };
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class sideeffect_exprt:public exprt
 {
 public:
@@ -1656,6 +2069,8 @@ public:
   }
 };
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class nondet_exprt:public sideeffect_exprt
 {
 public:

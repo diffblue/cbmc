@@ -14,6 +14,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "irep.h"
 #include "location.h"
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class typet:public irept
 {
  public:
