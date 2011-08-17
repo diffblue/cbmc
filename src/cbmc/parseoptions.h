@@ -65,11 +65,12 @@ protected:
   virtual int do_bmc(bmc_baset &bmc, const goto_functionst &goto_functions);
 
   virtual bool get_goto_program(
-    bmc_baset &bmc,
+    const optionst &options,
+    bmct &bmc,
     goto_functionst &goto_functions);
 
   virtual bool process_goto_program(
-    bmc_baset &bmc,
+    const optionst &options,
     goto_functionst &goto_functions);
     
   bool set_claims(goto_functionst &goto_functions);
