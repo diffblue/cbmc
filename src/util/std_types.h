@@ -9,12 +9,25 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_STD_TYPES_H
 #define CPROVER_STD_TYPES_H
 
+/*! \file util/std_types.h
+ * \brief API to type classes
+ *
+ * \author Daniel Kroening <kroening@kroening.com>
+ * \date   Sun Jul 31 21:54:44 BST 2011
+*/
+
 #include <assert.h>
 
 #include <type.h>
 #include <expr.h>
 #include <mp_arith.h>
 
+/*! \defgroup gr_std_types Conversion to specific types
+ *  Conversion to subclasses of @ref typet
+*/
+
+/*! \brief TO_BE_DOCUMENTED
+*/
 class bool_typet:public typet
 {
 public:
@@ -23,6 +36,8 @@ public:
   }
 };
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class nil_typet:public typet
 {
 public:
@@ -31,6 +46,8 @@ public:
   }
 };
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class empty_typet:public typet
 {
 public:
@@ -39,6 +56,8 @@ public:
   }
 };
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class integer_typet:public typet
 {
 public:
@@ -47,6 +66,8 @@ public:
   }
 };
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class rational_typet:public typet
 {
 public:
@@ -55,6 +76,8 @@ public:
   }
 };
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class real_typet:public typet
 {
 public:
@@ -63,6 +86,8 @@ public:
   }
 };
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class symbol_typet:public typet
 {
 public:
@@ -86,20 +111,33 @@ public:
   }  
 };
 
+/*! \brief Cast a generic typet to a \ref symbol_typet
+ *
+ * This is an unchecked conversion. \a type must be known to be \ref
+ * symbol_typet.
+ *
+ * \param type Source type
+ * \return Object of type \ref symbol_typet
+ *
+ * \ingroup gr_std_types
+*/
 extern inline const symbol_typet &to_symbol_type(const typet &type)
 {
   assert(type.id()==ID_symbol);
   return static_cast<const symbol_typet &>(type);
 }
 
+/*! \copydoc to_symbol_type(const typet &)
+ * \ingroup gr_std_types
+*/
 extern inline symbol_typet &to_symbol_type(typet &type)
 {
   assert(type.id()==ID_symbol);
   return static_cast<symbol_typet &>(type);
 }
 
-// structs
-
+/*! \brief Base type of C structs and unions, and C++ classes
+*/
 class struct_union_typet:public typet
 {
 public:
@@ -215,6 +253,16 @@ public:
   typet component_type(const irep_idt &component_name) const;
 };
 
+/*! \brief Cast a generic typet to a \ref struct_union_typet
+ *
+ * This is an unchecked conversion. \a type must be known to be \ref
+ * struct_union_typet.
+ *
+ * \param type Source type
+ * \return Object of type \ref struct_union_typet
+ *
+ * \ingroup gr_std_types
+*/
 extern inline const struct_union_typet &to_struct_union_type(const typet &type)
 {
   assert(type.id()==ID_struct ||
@@ -223,6 +271,9 @@ extern inline const struct_union_typet &to_struct_union_type(const typet &type)
   return static_cast<const struct_union_typet &>(type);
 }
 
+/*! \copydoc to_struct_union_type(const typet &)
+ * \ingroup gr_std_types
+*/
 extern inline struct_union_typet &to_struct_union_type(typet &type)
 {
   assert(type.id()==ID_struct ||
@@ -231,6 +282,8 @@ extern inline struct_union_typet &to_struct_union_type(typet &type)
   return static_cast<struct_union_typet &>(type);
 }
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class struct_typet:public struct_union_typet
 {
 public:
@@ -241,6 +294,16 @@ public:
   bool is_prefix_of(const struct_typet &other) const;
 };
 
+/*! \brief Cast a generic typet to a \ref struct_typet
+ *
+ * This is an unchecked conversion. \a type must be known to be \ref
+ * struct_typet.
+ *
+ * \param type Source type
+ * \return Object of type \ref struct_typet
+ *
+ * \ingroup gr_std_types
+*/
 extern inline const struct_typet &to_struct_type(const typet &type)
 {
   assert(type.id()==ID_struct ||
@@ -249,6 +312,9 @@ extern inline const struct_typet &to_struct_type(const typet &type)
   return static_cast<const struct_typet &>(type);
 }
 
+/*! \copydoc to_struct_type(const typet &)
+ * \ingroup gr_std_types
+*/
 extern inline struct_typet &to_struct_type(typet &type)
 {
   assert(type.id()==ID_struct ||
@@ -257,6 +323,8 @@ extern inline struct_typet &to_struct_type(typet &type)
   return static_cast<struct_typet &>(type);
 }
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class union_typet:public struct_union_typet
 {
 public:
@@ -265,20 +333,33 @@ public:
   }
 };
 
+/*! \brief Cast a generic typet to a \ref union_typet
+ *
+ * This is an unchecked conversion. \a type must be known to be \ref
+ * union_typet.
+ *
+ * \param type Source type
+ * \return Object of type \ref union_typet
+ *
+ * \ingroup gr_std_types
+*/
 extern inline const union_typet &to_union_type(const typet &type)
 {
   assert(type.id()==ID_union);
   return static_cast<const union_typet &>(type);
 }
 
+/*! \copydoc to_union_type(const typet &)
+ * \ingroup gr_std_types
+*/
 extern inline union_typet &to_union_type(typet &type)
 {
   assert(type.id()==ID_union);
   return static_cast<union_typet &>(type);
 }
 
-// functions
-
+/*! \brief Base type of functions
+*/
 class code_typet:public typet
 {
 public:
@@ -376,18 +457,33 @@ public:
   }
 };
 
+/*! \brief Cast a generic typet to a \ref code_typet
+ *
+ * This is an unchecked conversion. \a type must be known to be \ref
+ * code_typet.
+ *
+ * \param type Source type
+ * \return Object of type \ref code_typet
+ *
+ * \ingroup gr_std_types
+*/
 extern inline const code_typet &to_code_type(const typet &type)
 {
   assert(type.id()==ID_code);
   return static_cast<const code_typet &>(type);
 }
 
+/*! \copydoc to_code_type(const typet &)
+ * \ingroup gr_std_types
+*/
 extern inline code_typet &to_code_type(typet &type)
 {
   assert(type.id()==ID_code);
   return static_cast<code_typet &>(type);
 }
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class array_typet:public typet
 {
 public:
@@ -414,19 +510,33 @@ public:
 
 };
 
+/*! \brief Cast a generic typet to an \ref array_typet
+ *
+ * This is an unchecked conversion. \a type must be known to be \ref
+ * array_typet.
+ *
+ * \param type Source type
+ * \return Object of type \ref array_typet
+ *
+ * \ingroup gr_std_types
+*/
 extern inline const array_typet &to_array_type(const typet &type)
 {
   assert(type.id()==ID_array);
   return static_cast<const array_typet &>(type);
 }
 
+/*! \copydoc to_array_type(const typet &)
+ * \ingroup gr_std_types
+*/
 extern inline array_typet &to_array_type(typet &type)
 {
   assert(type.id()==ID_array);
   return static_cast<array_typet &>(type);
 }
 
-// generic base class
+/*! \brief Base class of bitvector types
+*/
 class bitvector_typet:public typet
 {
 public:
@@ -442,11 +552,23 @@ public:
   }
 };
 
+/*! \brief Cast a generic typet to a \ref bitvector_typet
+ *
+ * This is an unchecked conversion. \a type must be known to be \ref
+ * bitvector_typet.
+ *
+ * \param type Source type
+ * \return Object of type \ref bitvector_typet
+ *
+ * \ingroup gr_std_types
+*/
 inline const bitvector_typet &to_bitvector_type(const typet &type)
 {
   return static_cast<const bitvector_typet &>(type);
 }
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class pointer_typet:public bitvector_typet
 {
 public:
@@ -467,18 +589,33 @@ public:
   }
 };
 
+/*! \brief Cast a generic typet to a \ref pointer_typet
+ *
+ * This is an unchecked conversion. \a type must be known to be \ref
+ * pointer_typet.
+ *
+ * \param type Source type
+ * \return Object of type \ref pointer_typet
+ *
+ * \ingroup gr_std_types
+*/
 extern inline const pointer_typet &to_pointer_type(const typet &type)
 {
   assert(type.id()==ID_pointer);
   return static_cast<const pointer_typet &>(type);
 }
 
+/*! \copydoc to_pointer_type(const typet &)
+ * \ingroup gr_std_types
+*/
 extern inline pointer_typet &to_pointer_type(typet &type)
 {
   assert(type.id()==ID_pointer);
   return static_cast<pointer_typet &>(type);
 }
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class reference_typet:public pointer_typet
 {
 public:
@@ -488,9 +625,15 @@ public:
   }
 };
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 bool is_reference(const typet &type);
+/*! \brief TO_BE_DOCUMENTED
+*/
 bool is_rvalue_reference(const typet &type);
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class bv_typet:public bitvector_typet
 {
 public:
@@ -504,18 +647,33 @@ public:
   }
 };
 
+/*! \brief Cast a generic typet to a \ref bv_typet
+ *
+ * This is an unchecked conversion. \a type must be known to be \ref
+ * bv_typet.
+ *
+ * \param type Source type
+ * \return Object of type \ref bv_typet
+ *
+ * \ingroup gr_std_types
+*/
 inline const bv_typet &to_bv_type(const typet &type)
 {
   assert(type.id()==ID_bv);
   return static_cast<const bv_typet &>(type);
 }
 
+/*! \copydoc to_bv_type(const typet &)
+ * \ingroup gr_std_types
+*/
 inline bv_typet &to_bv_type(typet &type)
 {
   assert(type.id()==ID_bv);
   return static_cast<bv_typet &>(type);
 }
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class unsignedbv_typet:public bitvector_typet
 {
 public:
@@ -529,18 +687,33 @@ public:
   }
 };
 
+/*! \brief Cast a generic typet to an \ref unsignedbv_typet
+ *
+ * This is an unchecked conversion. \a type must be known to be \ref
+ * unsignedbv_typet.
+ *
+ * \param type Source type
+ * \return Object of type \ref unsignedbv_typet
+ *
+ * \ingroup gr_std_types
+*/
 inline const unsignedbv_typet &to_unsignedbv_type(const typet &type)
 {
   assert(type.id()==ID_unsignedbv);
   return static_cast<const unsignedbv_typet &>(type);
 }
 
+/*! \copydoc to_unsignedbv_type(const typet &)
+ * \ingroup gr_std_types
+*/
 inline unsignedbv_typet &to_unsignedbv_type(typet &type)
 {
   assert(type.id()==ID_unsignedbv);
   return static_cast<unsignedbv_typet &>(type);
 }
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class signedbv_typet:public bitvector_typet
 {
 public:
@@ -554,18 +727,33 @@ public:
   }
 };
 
+/*! \brief Cast a generic typet to a \ref signedbv_typet
+ *
+ * This is an unchecked conversion. \a type must be known to be \ref
+ * signedbv_typet.
+ *
+ * \param type Source type
+ * \return Object of type \ref signedbv_typet
+ *
+ * \ingroup gr_std_types
+*/
 inline const signedbv_typet &to_signedbv_type(const typet &type)
 {
   assert(type.id()==ID_signedbv);
   return static_cast<const signedbv_typet &>(type);
 }
 
+/*! \copydoc to_signedbv_type(const typet &)
+ * \ingroup gr_std_types
+*/
 inline signedbv_typet &to_signedbv_type(typet &type)
 {
   assert(type.id()==ID_signedbv);
   return static_cast<signedbv_typet &>(type);
 }
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class fixedbv_typet:public bitvector_typet
 {
 public:
@@ -592,8 +780,20 @@ public:
   }
 };
 
+/*! \brief Cast a generic typet to a \ref fixedbv_typet
+ *
+ * This is an unchecked conversion. \a type must be known to be \ref
+ * fixedbv_typet.
+ *
+ * \param type Source type
+ * \return Object of type \ref fixedbv_typet
+ *
+ * \ingroup gr_std_types
+*/
 const fixedbv_typet &to_fixedbv_type(const typet &type);
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class floatbv_typet:public bitvector_typet
 {
 public:
@@ -620,8 +820,20 @@ public:
   }
 };
 
+/*! \brief Cast a generic typet to a \ref floatbv_typet
+ *
+ * This is an unchecked conversion. \a type must be known to be \ref
+ * floatbv_typet.
+ *
+ * \param type Source type
+ * \return Object of type \ref floatbv_typet
+ *
+ * \ingroup gr_std_types
+*/
 const floatbv_typet &to_floatbv_type(const typet &type);
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class string_typet:public typet
 {
 public:
@@ -636,8 +848,20 @@ public:
   }
 };
 
+/*! \brief Cast a generic typet to a \ref string_typet
+ *
+ * This is an unchecked conversion. \a type must be known to be \ref
+ * string_typet.
+ *
+ * \param type Source type
+ * \return Object of type \ref string_typet
+ *
+ * \ingroup gr_std_types
+*/
 const string_typet &to_string_type(const typet &type);
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class range_typet:public typet
 {
 public:
@@ -658,8 +882,20 @@ public:
   void set_to(const mp_integer &to);
 };
 
+/*! \brief Cast a generic typet to a \ref range_typet
+ *
+ * This is an unchecked conversion. \a type must be known to be \ref
+ * range_typet.
+ *
+ * \param type Source type
+ * \return Object of type \ref range_typet
+ *
+ * \ingroup gr_std_types
+*/
 const range_typet &to_range_type(const typet &type);
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class vector_typet:public typet
 {
 public:
@@ -686,12 +922,25 @@ public:
 
 };
 
+/*! \brief Cast a generic typet to a \ref vector_typet
+ *
+ * This is an unchecked conversion. \a type must be known to be \ref
+ * vector_typet.
+ *
+ * \param type Source type
+ * \return Object of type \ref vector_typet
+ *
+ * \ingroup gr_std_types
+*/
 extern inline const vector_typet &to_vector_type(const typet &type)
 {
   assert(type.id()==ID_vector);
   return static_cast<const vector_typet &>(type);
 }
 
+/*! \copydoc to_vector_type(const typet &)
+ * \ingroup gr_std_types
+*/
 extern inline vector_typet &to_vector_type(typet &type)
 {
   assert(type.id()==ID_vector);

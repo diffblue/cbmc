@@ -37,7 +37,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #define Forall_expr_list(it, expr) \
   for(expr_listt::iterator it=(expr).begin(); \
       it!=(expr).end(); it++)
-      
+
+/*! \brief TO_BE_DOCUMENTED
+*/
 class exprt:public irept
 {
 public:
