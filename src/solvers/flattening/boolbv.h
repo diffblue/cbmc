@@ -109,12 +109,12 @@ protected:
   virtual literalt convert_reduction(const exprt &expr);
   virtual literalt convert_extractbit(const extractbit_exprt &expr);
   virtual literalt convert_overflow(const exprt &expr);
-  virtual literalt convert_equality(const class equal_exprt &expr);
+  virtual literalt convert_equality(const equal_exprt &expr);
   virtual literalt convert_ieee_float_rel(const exprt &expr);
   virtual literalt convert_quantifier(const exprt &expr);
 
   virtual void convert_index(const exprt &array, const mp_integer &index, bvt &bv);
-  virtual void convert_index(const class index_exprt &expr, bvt &bv);
+  virtual void convert_index(const index_exprt &expr, bvt &bv);
   virtual void convert_byte_extract(
     unsigned width, const exprt &expr,
     const mp_integer &index, bvt &bv, bool little_endian);
@@ -187,7 +187,7 @@ protected:
 
   virtual exprt bv_get_unbounded_array(
     const irep_idt &identifier,
-    const class array_typet &type) const;
+    const array_typet &type) const;
                     
   virtual exprt bv_get_rec(
     const bvt &bv,

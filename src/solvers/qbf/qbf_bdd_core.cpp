@@ -19,6 +19,7 @@ Author: CM Wintersteiger
 
 #include <cuddObj.hh> // CUDD Library
 
+/*! \cond */
 // FIX FOR THE CUDD LIBRARY
 
 inline DdNode *
@@ -27,6 +28,7 @@ DD::getNode() const
     return node;
 
 } // DD::getNode
+/*! \endcond */
 
 
 #include "qbf_bdd_core.h"

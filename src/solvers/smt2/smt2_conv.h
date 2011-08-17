@@ -34,6 +34,11 @@ protected:
   smt2_propt smt2_prop;
 };
 
+class typecast_exprt;
+class constant_exprt;
+class index_exprt;
+class member_exprt;
+
 class smt2_convt:
   protected smt2_prop_wrappert,
   public prop_convt
@@ -67,10 +72,10 @@ protected:
   // specific expressions go here
   void convert_byte_update(const exprt &expr);
   void convert_byte_extract(const exprt &expr);
-  void convert_typecast(const class typecast_exprt &expr);
+  void convert_typecast(const typecast_exprt &expr);
   void convert_struct(const exprt &expr);
   void convert_union(const exprt &expr);
-  void convert_constant(const class constant_exprt &expr);
+  void convert_constant(const constant_exprt &expr);
   void convert_relation(const exprt &expr);
   void convert_is_dynamic_object(const exprt &expr);
   void convert_plus(const exprt &expr);
@@ -78,8 +83,8 @@ protected:
   void convert_div(const exprt &expr);
   void convert_mul(const exprt &expr);
   void convert_mod(const exprt &expr);
-  void convert_index(const class index_exprt &expr);
-  void convert_member(const class member_exprt &expr);
+  void convert_index(const index_exprt &expr);
+  void convert_member(const member_exprt &expr);
   void convert_overflow(const exprt &expr);
   void convert_with(const exprt &expr);
   

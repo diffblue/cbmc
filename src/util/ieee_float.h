@@ -15,6 +15,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <expr.h>
 #include <format_spec.h>
 
+class floatbv_typet;
+
 class ieee_float_spect
 {
 public:
@@ -22,12 +24,12 @@ public:
   
   mp_integer bias() const;
   
-  ieee_float_spect(const class floatbv_typet &type)
+  ieee_float_spect(const floatbv_typet &type)
   {
     from_type(type);
   }
   
-  void from_type(const class floatbv_typet &type);
+  void from_type(const floatbv_typet &type);
 
   ieee_float_spect():f(0), e(0)
   {

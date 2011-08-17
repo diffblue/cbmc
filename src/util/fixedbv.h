@@ -12,6 +12,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <mp_arith.h>
 #include <format_spec.h>
 
+class exprt;
+class fixedbv_typet;
+
 class fixedbv_spect
 {
 public:
@@ -26,7 +29,7 @@ public:
   {
   }
   
-  fixedbv_spect(const class fixedbv_typet &type);
+  fixedbv_spect(const fixedbv_typet &type);
 
   inline unsigned get_fraction_bits() const
   {
@@ -43,11 +46,11 @@ public:
   {
   }
 
-  explicit fixedbvt(const class exprt &expr);
+  explicit fixedbvt(const exprt &expr);
 
   void from_integer(const mp_integer &i);
   mp_integer to_integer() const; // this rounds to zero
-  void from_expr(const class exprt &expr);
+  void from_expr(const exprt &expr);
   exprt to_expr() const;
   void round(const fixedbv_spect &dest_spec);
 
