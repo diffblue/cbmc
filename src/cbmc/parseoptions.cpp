@@ -324,7 +324,7 @@ int cbmc_parseoptionst::doit()
 
   goto_functionst goto_functions;
 
-  if(get_goto_program(bmc, goto_functions))
+  if(get_goto_program(bmc.options, bmc, goto_functions))
     return 6;
 
   if(cmdline.isset("show-claims"))
@@ -394,7 +394,8 @@ Function: cbmc_parseoptionst::get_goto_program
 \*******************************************************************/
   
 bool cbmc_parseoptionst::get_goto_program(
-  bmc_baset &bmc,
+  const optionst &options,
+  bmct &bmc,
   goto_functionst &goto_functions)
 {
   if(cmdline.args.size()==0)
@@ -453,14 +454,14 @@ bool cbmc_parseoptionst::get_goto_program(
       status("Generating GOTO Program");
 
       goto_convert(
-        context, bmc.options, goto_functions,
+        context, options, goto_functions,
         ui_message_handler);
     }
 
     // finally add the library
     status("Adding CPROVER library");      
     link_to_library(
-      context, goto_functions, bmc.options, ui_message_handler);
+      context, goto_functions, options, ui_message_handler);
 
     if(cmdline.isset("interpreter"))
     {
@@ -469,7 +470,7 @@ bool cbmc_parseoptionst::get_goto_program(
       return true;
     }
 
-    if(process_goto_program(bmc, goto_functions))
+    if(process_goto_program(options, goto_functions))
       return true;
   }
 
@@ -579,7 +580,7 @@ Function: cbmc_parseoptionst::process_goto_program
 \*******************************************************************/
   
 bool cbmc_parseoptionst::process_goto_program(
-  bmc_baset &bmc,
+  const optionst &options,
   goto_functionst &goto_functions)
 {
   try
@@ -599,7 +600,7 @@ bool cbmc_parseoptionst::process_goto_program(
     
     status("Generic Property Instrumentation");
     // add generic checks
-    goto_check(ns, bmc.options, goto_functions);
+    goto_check(ns, options, goto_functions);
     
     if(cmdline.isset("string-abstraction"))
     {
@@ -630,7 +631,7 @@ bool cbmc_parseoptionst::process_goto_program(
 
       // add pointer checks
       pointer_checks(
-        goto_functions, context, bmc.options, value_set_analysis);
+        goto_functions, context, options, value_set_analysis);
     }
 
     // recalculate numbers, etc.
