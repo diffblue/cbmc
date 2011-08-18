@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_PROP_SMT2_DEC_H
 #define CPROVER_PROP_SMT2_DEC_H
 
+/*! \defgroup gr_smt2 SMT-LIB 2.x Interface */
+
 #include <fstream>
 
 #include "smt2_conv.h"
@@ -24,6 +26,9 @@ protected:
   std::string temp_out_filename, temp_result_filename;
 };
 
+/*! \brief TO_BE_DOCUMENTED
+    \ingroup gr_smt2
+*/
 class smt2_dect:protected smt2_temp_filet, public smt2_convt
 {
 public:
