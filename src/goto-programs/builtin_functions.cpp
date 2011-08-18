@@ -772,20 +772,7 @@ void goto_convertt::do_function_call_symbol(
     throw "error: function `"+id2string(identifier)+"' type mismatch: expected code";
   }
   
-  bool is_assume=identifier==CPROVER_PREFIX "assume" ||
-                 identifier=="specc::__CPROVER_assume";
-
-  bool is_assert=identifier=="c::assert" ||
-                 identifier=="specc::assert";
-
-  bool is_predicate=identifier==CPROVER_PREFIX "predicate" ||
-                 identifier=="specc::__CPROVER_predicate";
-  bool is_parameter_predicates=identifier==CPROVER_PREFIX "parameter_predicates" ||
-                 identifier=="specc::__CPROVER_parameter_predicates";
-  bool is_return_predicates=identifier==CPROVER_PREFIX "return_predicates" ||
-                 identifier=="specc::__CPROVER_return_predicates";
-
-  if(is_assume || is_assert || is_predicate)
+  if(identifier==CPROVER_PREFIX "predicate")
   {
     if(arguments.size()!=1)
     {
@@ -793,48 +780,36 @@ void goto_convertt::do_function_call_symbol(
       throw "`"+id2string(identifier)+"' expected to have one argument";
     }
 
-    if(is_predicate)
+    goto_programt::targett t=dest.add_instruction(OTHER);
+    t->guard=arguments.front();
+    t->location=function.location();
+    t->location.set("user-provided", true);
+    t->code=codet(ID_user_specified_predicate);
+  }
+  else if(identifier==CPROVER_PREFIX "assume" ||
+          identifier=="c::assert")
+  {
+    if(arguments.size()!=1)
     {
-      goto_programt::targett t=dest.add_instruction(OTHER);
-      t->guard=arguments.front();
-      t->location=function.location();
-      t->location.set("user-provided", true);
-      t->code=codet(ID_user_specified_predicate);
-      return;
+      err_location(function);
+      throw "`"+id2string(identifier)+"' expected to have one argument";
     }
 
-    if(is_assume && !options.get_bool_option("assumptions"))
+    if(identifier==CPROVER_PREFIX "assume" &&
+       !options.get_bool_option("assumptions"))
       return;
 
-    if(is_assert && !options.get_bool_option("assertions"))
+    if(identifier=="c::assert" &&
+       !options.get_bool_option("assertions"))
       return;
-
-    if(is_parameter_predicates || is_return_predicates)
-    {
-      if(arguments.size() != 0)
-      {
-              err_location(function);
-          throw "`"+id2string(identifier)+"' expected to have no arguments";
-      }
-      goto_programt::targett t = dest.add_instruction(OTHER);
-      t->location = function.location();
-      t->location.set("user-provided", true);
-
-      if(is_parameter_predicates)
-        t->code=codet(ID_user_specified_parameter_predicates);
-      else
-        t->code=codet(ID_user_specified_return_predicates);
-
-      return;
-    }
 
     goto_programt::targett t=dest.add_instruction(
-      is_assume?ASSUME:ASSERT);
+      (identifier==CPROVER_PREFIX "assume")?ASSUME:ASSERT);
     t->guard=arguments.front();
     t->location=function.location();
     t->location.set("user-provided", true);
 
-    if(is_assert)
+    if(identifier=="c::assert")
       t->location.set(ID_property, ID_assertion);
     
     if(lhs.is_not_nil())
