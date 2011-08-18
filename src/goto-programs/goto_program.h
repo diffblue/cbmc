@@ -15,6 +15,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_program_template.h"
 
+/*! \brief TO_BE_DOCUMENTED
+    \ingroup gr_goto_programs
+*/
 class goto_programt:public goto_program_templatet<codet, exprt>
 {
 public:

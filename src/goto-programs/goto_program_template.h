@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_PROGRAM_TEMPLATE_H
 #define CPROVER_GOTO_PROGRAM_TEMPLATE_H
 
+/*! \defgroup gr_goto_programs Goto programs */
+
 #include <assert.h>
 
 #include <iostream>
@@ -41,6 +43,7 @@ typedef enum { NO_INSTRUCTION_TYPE=0,
 std::ostream &operator<<(std::ostream &, goto_program_instruction_typet);
 
 /*! \brief TO_BE_DOCUMENTED
+    \ingroup gr_goto_programs
 */
 template <class codeT, class guardT>
 class goto_program_templatet
