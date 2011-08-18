@@ -793,15 +793,14 @@ void goto_convertt::do_function_call_symbol(
       throw "`"+id2string(identifier)+"' expected to have one argument";
     }
 
-    if(is_predicate) {
-    	goto_programt::targett t = dest.add_instruction(OTHER);
-    	t->guard = arguments.front();
-    	t->location = function.location();
-    	t->location.set("user-provided", true);
-    	t->code = ID_user_specified_predicate;
-		t->code.set_statement(ID_user_specified_predicate);
-	  return;
-
+    if(is_predicate)
+    {
+      goto_programt::targett t=dest.add_instruction(OTHER);
+      t->guard=arguments.front();
+      t->location=function.location();
+      t->location.set("user-provided", true);
+      t->code=codet(ID_user_specified_predicate);
+      return;
     }
 
     if(is_assume && !options.get_bool_option("assumptions"))
@@ -812,23 +811,21 @@ void goto_convertt::do_function_call_symbol(
 
     if(is_parameter_predicates || is_return_predicates)
     {
-  	  if(arguments.size() != 0)
-  	  {
-  		  err_location(function);
-  	      throw "`"+id2string(identifier)+"' expected to have no arguments";
-  	  }
-  	  goto_programt::targett t = dest.add_instruction(OTHER);
-  	  t->location = function.location();
-  	  t->location.set("user-provided", true);
-  	  if(is_parameter_predicates)
-  	  {
-		  t->code = ID_user_specified_parameter_predicates;
-		  t->code.set_statement(ID_user_specified_parameter_predicates);
-  	  } else {
-		  t->code = ID_user_specified_return_predicates;
-		  t->code.set_statement(ID_user_specified_return_predicates);
-  	  }
-  	  return;
+      if(arguments.size() != 0)
+      {
+              err_location(function);
+          throw "`"+id2string(identifier)+"' expected to have no arguments";
+      }
+      goto_programt::targett t = dest.add_instruction(OTHER);
+      t->location = function.location();
+      t->location.set("user-provided", true);
+
+      if(is_parameter_predicates)
+        t->code=codet(ID_user_specified_parameter_predicates);
+      else
+        t->code=codet(ID_user_specified_return_predicates);
+
+      return;
     }
 
     goto_programt::targett t=dest.add_instruction(
