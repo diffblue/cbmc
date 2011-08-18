@@ -45,6 +45,8 @@ public:
   propt &prop;
 };
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class prop_convt:public prop_conv_baset
 {
 public:

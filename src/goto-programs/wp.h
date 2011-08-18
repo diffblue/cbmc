@@ -12,9 +12,17 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <std_code.h>
 #include <namespace.h>
 
-// This computes the weakest precondition of the given program
-// piece 'code' with respect to the expression 'post'.
+/*! \defgroup gr_wp Weakest precondition */
 
+/*! \brief Compute the weakest precondition of the given program
+ * piece \a code with respect to the expression \a post.
+ * \param code  Program
+ * \param post  Postcondition
+ * \param ns    Namespace
+ * \return Weakest precondition
+ *
+ * \ingroup gr_wp
+*/
 exprt wp(
   const codet &code,
   const exprt &post,
