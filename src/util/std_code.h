@@ -13,6 +13,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "expr.h"
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class codet:public exprt
 {
 public:

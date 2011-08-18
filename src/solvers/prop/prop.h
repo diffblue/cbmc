@@ -18,6 +18,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "literal.h"
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class propt:public messaget
 {
 public:

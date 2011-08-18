@@ -15,6 +15,8 @@ Author: Daniel Kroening, kroening@kroening.com
 class contextt;
 class namespacet;
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class configt
 {
 public:

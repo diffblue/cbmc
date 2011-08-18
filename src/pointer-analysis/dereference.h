@@ -20,6 +20,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "value_sets.h"
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class dereference_callbackt
 {
 public:
@@ -43,6 +45,8 @@ public:
     const symbolt *&symbol)=0;
 };
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class dereferencet
 {
 public:

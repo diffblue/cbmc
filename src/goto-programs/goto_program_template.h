@@ -40,6 +40,8 @@ typedef enum { NO_INSTRUCTION_TYPE=0,
 
 std::ostream &operator<<(std::ostream &, goto_program_instruction_typet);
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 template <class codeT, class guardT>
 class goto_program_templatet
 {
@@ -59,6 +61,8 @@ public:
     return *this;
   }
 
+  /*! \brief TO_BE_DOCUMENTED
+  */
   class instructiont
   {
   public:

@@ -41,6 +41,8 @@ public:
   virtual bool lookup(const irep_idt &name, const symbolt *&symbol) const=0;
 };
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class namespacet:public namespace_baset
 {
 public:
