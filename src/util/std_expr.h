@@ -1088,7 +1088,7 @@ public:
   {
   }
 
-  inline bitor_exprt(const exprt &op0, const exprt &op1):
+  inline bitor_exprt(const exprt &_op0, const exprt &_op1):
     exprt(ID_bitor, _op0.type())
   {
     copy_to_operands(_op0, _op1);
@@ -2052,7 +2052,7 @@ concatenation_exprt &to_concatenation_expr(exprt &expr);
 class same_object_exprt:public binary_relation_exprt
 {
 public:
-  inline same_object_exprt(const exprt &ptr1, const exprt &ptr2)
+  inline same_object_exprt(const exprt &ptr1, const exprt &ptr2):
     binary_relation_exprt(ptr1, "same-object", ptr2)
   {
   }

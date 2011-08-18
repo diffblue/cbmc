@@ -14,6 +14,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <string>
 #include <iostream>
 
+/*! \defgroup gr_xml XML file processing */
+
+/*! \brief TO_BE_DOCUMENTED
+    \ingroup xml
+*/
 class xmlt
 {
 public:
