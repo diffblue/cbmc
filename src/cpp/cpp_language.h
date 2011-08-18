@@ -9,10 +9,15 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #ifndef CPROVER_CPP_LANGUAGE_H
 #define CPROVER_CPP_LANGUAGE_H
 
+/*! \defgroup gr_cpp C++ front-end */
+
 #include <language.h>
 
 #include "cpp_parse_tree.h"
 
+/*! \brief TO_BE_DOCUMENTED
+    \ingroup gr_cpp
+*/
 class cpp_languaget:public languaget
 {
 public:
