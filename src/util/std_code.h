@@ -18,21 +18,22 @@ Author: Daniel Kroening, kroening@kroening.com
 class codet:public exprt
 {
 public:
-  codet():exprt(ID_code, typet(ID_code))
+  inline codet():exprt(ID_code, typet(ID_code))
   {
   }
   
-  codet(const irep_idt &statement):exprt(ID_code, typet(ID_code))
+  inline explicit codet(const irep_idt &statement):
+    exprt(ID_code, typet(ID_code))
   {
     set_statement(statement);
   }
   
-  void set_statement(const irep_idt &statement)
+  inline void set_statement(const irep_idt &statement)
   {
     set(ID_statement, statement);
   }
 
-  const irep_idt &get_statement() const
+  inline const irep_idt &get_statement() const
   {
     return get(ID_statement);
   }
@@ -56,10 +57,12 @@ extern inline codet &to_code(exprt &expr)
   return static_cast<codet &>(expr);
 }
 
+/*! \brief Sequential composition
+*/
 class code_blockt:public codet
 {
 public:
-  code_blockt():codet(ID_block)
+  inline code_blockt():codet(ID_block)
   {
   }
   
@@ -74,7 +77,7 @@ public:
       o.push_back(*it);        
   }
   
-  void add(const codet &code)
+  inline void add(const codet &code)
   {
     copy_to_operands(code);
   }
@@ -92,6 +95,8 @@ extern inline code_blockt &to_code_block(codet &code)
   return static_cast<code_blockt &>(code);
 }
 
+/*! \brief Skip
+*/
 class code_skipt:public codet
 {
 public:
@@ -100,35 +105,37 @@ public:
   }
 };
 
+/*! \brief Assignment
+*/
 class code_assignt:public codet
 {
 public:
-  code_assignt():codet(ID_assign)
+  inline code_assignt():codet(ID_assign)
   {
     operands().resize(2);
   }
   
-  code_assignt(const exprt &lhs, const exprt &rhs):codet(ID_assign)
+  inline code_assignt(const exprt &lhs, const exprt &rhs):codet(ID_assign)
   {
     copy_to_operands(lhs, rhs);
   }
   
-  exprt &lhs()
+  inline exprt &lhs()
   {
     return op0();
   }
 
-  exprt &rhs()
+  inline exprt &rhs()
   {
     return op1();
   }
 
-  const exprt &lhs() const
+  inline const exprt &lhs() const
   {
     return op0();
   }
 
-  const exprt &rhs() const
+  inline const exprt &rhs() const
   {
     return op1();
   }
@@ -146,35 +153,37 @@ extern inline code_assignt &to_code_assign(codet &code)
   return static_cast<code_assignt &>(code);
 }
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class code_declt:public codet
 {
 public:
-  code_declt():codet(ID_decl)
+  inline code_declt():codet(ID_decl)
   {
     operands().resize(1);
   }
   
-  explicit code_declt(const exprt &symbol):codet(ID_decl)
+  inline explicit code_declt(const exprt &symbol):codet(ID_decl)
   {
     copy_to_operands(symbol);
   }
   
-  exprt &symbol()
+  inline exprt &symbol()
   {
     return op0();
   }
 
-  const exprt &symbol() const
+  inline const exprt &symbol() const
   {
     return op0();
   }
   
-  exprt &initializer()
+  inline exprt &initializer()
   {
     return op0();
   }
 
-  const exprt &initializer() const
+  inline const exprt &initializer() const
   {
     return op0();
   }
@@ -198,25 +207,27 @@ public:
 const code_declt &to_code_decl(const codet &code);
 code_declt &to_code_decl(codet &code);
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class code_assumet:public codet
 {
 public:
-  code_assumet():codet(ID_assume)
+  inline code_assumet():codet(ID_assume)
   {
     operands().reserve(1);
   }
 
-  explicit code_assumet(const exprt &expr):codet(ID_assume)
+  inline explicit code_assumet(const exprt &expr):codet(ID_assume)
   {
     copy_to_operands(expr);
   }
 
-  const exprt assumption() const
+  inline const exprt assumption() const
   {
     return op0();
   }
 
-  exprt assumption()
+  inline exprt assumption()
   {
     return op0();
   }
@@ -234,20 +245,22 @@ extern inline code_assumet &to_code_assume(codet &code)
   return static_cast<code_assumet &>(code);
 }
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class code_assertt:public codet
 {
 public:
-  code_assertt():codet(ID_assert)
+  inline code_assertt():codet(ID_assert)
   {
     operands().reserve(1);
   }
   
-  const exprt assertion() const
+  inline const exprt assertion() const
   {
     return op0();
   }
 
-  exprt assertion()
+  inline exprt assertion()
   {
     return op0();
   }
@@ -265,6 +278,8 @@ extern inline code_assertt &to_code_assert(codet &code)
   return static_cast<code_assertt &>(code);
 }
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class code_ifthenelset:public codet
 {
 public:
@@ -316,44 +331,46 @@ extern inline code_ifthenelset &to_code_ifthenelse(codet &code)
   return static_cast<code_ifthenelset &>(code);
 }
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class code_function_callt:public codet
 {
 public:
-  code_function_callt():codet(ID_function_call)
+  inline code_function_callt():codet(ID_function_call)
   {
     operands().resize(3);
     lhs().make_nil();
     op2().id(ID_arguments);
   }
   
-  exprt &lhs()
+  inline exprt &lhs()
   {
     return op0();
   }
 
-  const exprt &lhs() const
+  inline const exprt &lhs() const
   {
     return op0();
   }
 
-  exprt &function()
+  inline exprt &function()
   {
     return op1();
   }
 
-  const exprt &function() const
+  inline const exprt &function() const
   {
     return op1();
   }
 
   typedef exprt::operandst argumentst;
 
-  argumentst &arguments()
+  inline argumentst &arguments()
   {
     return op2().operands();
   }
 
-  const argumentst &arguments() const
+  inline const argumentst &arguments() const
   {
     return op2().operands();
   }
@@ -371,26 +388,33 @@ extern inline code_function_callt &to_code_function_call(codet &code)
   return static_cast<code_function_callt &>(code);
 }
 
+/*! \brief Return from a function
+*/
 class code_returnt:public codet
 {
 public:
-  code_returnt():codet(ID_return)
+  inline code_returnt():codet(ID_return)
   {
     operands().reserve(1);
   }
   
-  const exprt &return_value() const
+  explicit inline code_returnt(const exprt &_op):codet(ID_return)
+  {
+    copy_to_operands(_op);
+  }
+  
+  inline const exprt &return_value() const
   {
     return op0();
   }
   
-  exprt &return_value()
+  inline exprt &return_value()
   {
     operands().resize(1);
     return op0();
   }
   
-  bool has_return_value() const
+  inline bool has_return_value() const
   {
     return operands().size()==1;
   }
@@ -408,10 +432,12 @@ extern inline code_returnt &to_code_return(codet &code)
   return static_cast<code_returnt &>(code);
 }
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class code_labelt:public codet
 {
 public:
-  code_labelt():codet(ID_label)
+  inline code_labelt():codet(ID_label)
   {
     operands().resize(1);
   }
@@ -421,17 +447,17 @@ public:
     return get_bool(ID_default);
   }
 
-  const exprt::operandst &case_op() const
+  inline const exprt::operandst &case_op() const
   {
     return static_cast<const exprt &>(find(ID_case)).operands();
   }
   
-  const irep_idt &get_label() const
+  inline const irep_idt &get_label() const
   {
     return get(ID_label);
   }
 
-  void set_label(const irep_idt &label)
+  inline void set_label(const irep_idt &label)
   {
     set(ID_label, label);
   }
@@ -449,10 +475,12 @@ extern inline code_labelt &to_code_label(codet &code)
   return static_cast<code_labelt &>(code);
 }
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class code_breakt:public codet
 {
 public:
-  code_breakt():codet(ID_break)
+  inline code_breakt():codet(ID_break)
   {
   }
 };
@@ -469,10 +497,12 @@ extern inline code_breakt &to_code_break(codet &code)
   return static_cast<code_breakt &>(code);
 }
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class code_continuet:public codet
 {
 public:
-  code_continuet():codet(ID_break)
+  inline code_continuet():codet(ID_continue)
   {
   }
 };
@@ -489,39 +519,41 @@ extern inline code_continuet &to_code_continue(codet &code)
   return static_cast<code_continuet &>(code);
 }
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class code_expressiont:public codet
 {
 public:
-  code_expressiont():codet(ID_expression)
+  inline code_expressiont():codet(ID_expression)
   {
     operands().resize(1);
   }
   
-  explicit code_expressiont(const exprt &expr):codet(ID_expression)
+  inline explicit code_expressiont(const exprt &expr):codet(ID_expression)
   {
     operands().push_back(expr);
   }
   
-  friend code_expressiont &to_code_expression(codet &code)
+  inline friend code_expressiont &to_code_expression(codet &code)
   {
     assert(code.get_statement()==ID_expression &&
            code.operands().size()==1);
     return static_cast<code_expressiont &>(code);
   }
 
-  friend const code_expressiont &to_code_expression(const codet &code)
+  inline friend const code_expressiont &to_code_expression(const codet &code)
   {
     assert(code.get_statement()==ID_expression &&
            code.operands().size()==1);
     return static_cast<const code_expressiont &>(code);
   }
   
-  const exprt &expression() const
+  inline const exprt &expression() const
   {
     return op0();
   }
 
-  exprt &expression()
+  inline exprt &expression()
   {
     return op0();
   }
@@ -530,32 +562,34 @@ public:
 code_expressiont &to_code_expression(codet &code);
 const code_expressiont &to_code_expression(const codet &code);
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class side_effect_exprt:public exprt
 {
 public:
-  explicit side_effect_exprt(const irep_idt &statement):exprt(ID_sideeffect)
+  inline explicit side_effect_exprt(const irep_idt &statement):exprt(ID_sideeffect)
   {
     set_statement(statement);
   }
 
-  friend side_effect_exprt &to_side_effect_expr(exprt &expr)
+  inline friend side_effect_exprt &to_side_effect_expr(exprt &expr)
   {
     assert(expr.id()==ID_sideeffect);
     return static_cast<side_effect_exprt &>(expr);
   }
 
-  friend const side_effect_exprt &to_side_effect_expr(const exprt &expr)
+  inline friend const side_effect_exprt &to_side_effect_expr(const exprt &expr)
   {
     assert(expr.id()==ID_sideeffect);
     return static_cast<const side_effect_exprt &>(expr);
   }
   
-  const irep_idt &get_statement() const
+  inline const irep_idt &get_statement() const
   {
     return get(ID_statement);
   }
 
-  void set_statement(const irep_idt &statement)
+  inline void set_statement(const irep_idt &statement)
   {
     return set(ID_statement, statement);
   }
@@ -564,56 +598,60 @@ public:
 side_effect_exprt &to_side_effect_expr(exprt &expr);
 const side_effect_exprt &to_side_effect_expr(const exprt &expr);
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class side_effect_expr_nondett:public side_effect_exprt
 {
 public:
-  side_effect_expr_nondett():side_effect_exprt("nondet")
+  inline side_effect_expr_nondett():side_effect_exprt(ID_nondet)
   {
   }
 
-  explicit side_effect_expr_nondett(const typet &t):side_effect_exprt("nondet")
+  inline explicit side_effect_expr_nondett(const typet &_type):
+    side_effect_exprt(ID_nondet, _type)
   {
-    type()=t;
   }
 };
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class side_effect_expr_function_callt:public side_effect_exprt
 {
 public:
-  side_effect_expr_function_callt():side_effect_exprt(ID_function_call)
+  inline side_effect_expr_function_callt():side_effect_exprt(ID_function_call)
   {
     operands().resize(2);
     op1().id(ID_arguments);
   }
 
-  exprt &function()
+  inline exprt &function()
   {
     return op0();
   }
 
-  const exprt &function() const
+  inline const exprt &function() const
   {
     return op0();
   }
 
-  exprt::operandst &arguments()
+  inline exprt::operandst &arguments()
   {
     return op1().operands();
   }
 
-  const exprt::operandst &arguments() const
+  inline const exprt::operandst &arguments() const
   {
     return op1().operands();
   }
 
-  friend side_effect_expr_function_callt &to_side_effect_expr_function_call(exprt &expr)
+  inline friend side_effect_expr_function_callt &to_side_effect_expr_function_call(exprt &expr)
   {
     assert(expr.id()==ID_sideeffect);
     assert(expr.get(ID_statement)==ID_function_call);
     return static_cast<side_effect_expr_function_callt &>(expr);
   }
 
-  friend const side_effect_expr_function_callt &to_side_effect_expr_function_call(const exprt &expr)
+  inline friend const side_effect_expr_function_callt &to_side_effect_expr_function_call(const exprt &expr)
   {
     assert(expr.id()==ID_sideeffect);
     assert(expr.get(ID_statement)==ID_function_call);

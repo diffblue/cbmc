@@ -200,7 +200,8 @@ public:
     type()=typet(ID_bool);
   }
 
-  inline predicate_exprt(const irep_idt &_id):exprt(_id, typet(ID_bool))
+  explicit inline predicate_exprt(const irep_idt &_id):
+    exprt(_id, typet(ID_bool))
   {
   }
 
@@ -1063,7 +1064,7 @@ public:
   }
 };
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief Bit-wise negation of bit-vectors
 */
 class bitnot_exprt:public unary_exprt
 {
@@ -1072,7 +1073,8 @@ public:
   {
   }
 
-  explicit inline bitnot_exprt(const exprt &op):unary_exprt(ID_bitnot, op)
+  explicit inline bitnot_exprt(const exprt &op):
+    unary_exprt(ID_bitnot, op)
   {
   }
 };
@@ -1086,9 +1088,10 @@ public:
   {
   }
 
-  inline bitor_exprt(const exprt &op0, const exprt &op1):exprt(ID_bitor, op0.type())
+  inline bitor_exprt(const exprt &op0, const exprt &op1):
+    exprt(ID_bitor, _op0.type())
   {
-    copy_to_operands(op0, op1);
+    copy_to_operands(_op0, _op1);
   }
 };
 
@@ -1101,9 +1104,10 @@ public:
   {
   }
 
-  inline bitxor_exprt(const exprt &op0, const exprt &op1):exprt(ID_bitxor, op0.type())
+  inline bitxor_exprt(const exprt &_op0, const exprt &_op1):
+    exprt(ID_bitxor, _op0.type())
   {
-    copy_to_operands(op0, op1);
+    copy_to_operands(_op0, _op1);
   }
 };
 
@@ -1116,13 +1120,14 @@ public:
   {
   }
 
-  inline bitand_exprt(const exprt &op0, const exprt &op1):exprt(ID_bitand, op0.type())
+  inline bitand_exprt(const exprt &_op0, const exprt &_op1):
+    exprt(ID_bitand, _op0.type())
   {
-    copy_to_operands(op0, op1);
+    copy_to_operands(_op0, _op1);
   }
 };
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief A base class for shift operators
 */
 class shift_exprt:public binary_exprt
 {
@@ -1151,7 +1156,7 @@ public:
   }
 };
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief Left shift
 */
 class shl_exprt:public shift_exprt
 {
@@ -1175,7 +1180,7 @@ public:
   }
 };
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief Arithmetic right shift
 */
 class ashr_exprt:public shift_exprt
 {
@@ -1199,7 +1204,7 @@ public:
   }
 };
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief Logical right shift
 */
 class lshr_exprt:public shift_exprt
 {
@@ -1223,21 +1228,20 @@ public:
   }
 };
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief Extracts a single bit of a bit-vector operand
 */
-class extractbit_exprt:public exprt
+class extractbit_exprt:public predicate_exprt
 {
 public:
-  inline extractbit_exprt():exprt(ID_extractbit)
+  inline extractbit_exprt():predicate_exprt(ID_extractbit)
   {
     operands().resize(2);
   }
 
   inline extractbit_exprt(
     const exprt &_src,
-    const exprt &_index):exprt(ID_extractbit, bool_typet())
+    const exprt &_index):predicate_exprt(ID_extractbit, _src, _index)
   {
-    copy_to_operands(_src, _index);
   }
 
   exprt &src()
@@ -1286,7 +1290,7 @@ extern inline extractbit_exprt &to_extractbit_expr(exprt &expr)
   return static_cast<extractbit_exprt &>(expr);
 }
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief Extracts a sub-range of a bit-vector operand
 */
 class extractbits_exprt:public exprt
 {
@@ -1417,7 +1421,7 @@ extern inline address_of_exprt &to_address_of_expr(exprt &expr)
   return static_cast<address_of_exprt &>(expr);
 }
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief Boolean negation
 */
 class not_exprt:public exprt
 {
@@ -1494,7 +1498,7 @@ extern inline dereference_exprt &to_dereference_expr(exprt &expr)
   return static_cast<dereference_exprt &>(expr);
 }
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief The trinary if-then-else operator
 */
 class if_exprt:public exprt
 {
@@ -1804,7 +1808,7 @@ inline member_exprt &to_member_expr(exprt &expr)
   return static_cast<member_exprt &>(expr);
 }
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief Evaluates to true if the operand is NaN
 */
 class isnan_exprt:public predicate_exprt
 {
@@ -1820,7 +1824,7 @@ public:
   }
 };
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief IEEE-floating-point equality
 */
 class ieee_float_equal_exprt:public binary_relation_exprt
 {
@@ -1835,7 +1839,7 @@ public:
   }
 };
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief An expression denoting a type
 */
 class type_exprt:public exprt
 {
@@ -1849,7 +1853,7 @@ public:
   }
 };
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief A constant literal expression
 */
 class constant_exprt:public exprt
 {
@@ -1898,7 +1902,7 @@ inline constant_exprt &to_constant_expr(exprt &expr)
   return static_cast<constant_exprt &>(expr);
 }
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief The boolean constant true
 */
 class true_exprt:public constant_exprt
 {
@@ -1909,7 +1913,7 @@ public:
   }
 };
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief The boolean constant false
 */
 class false_exprt:public constant_exprt
 {
@@ -1930,7 +1934,7 @@ public:
   }
 };
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief The null pointer constant
 */
 class null_pointer_exprt:public constant_exprt
 {
@@ -1972,18 +1976,6 @@ public:
   {
     return op1().operands();
   }
-
-  friend inline const function_application_exprt &to_function_application_expr(const exprt &expr)
-  {
-    assert(expr.id()==ID_function_application && expr.operands().size()==2);
-    return static_cast<const function_application_exprt &>(expr);
-  }
-
-  friend inline function_application_exprt &to_function_application_expr(exprt &expr)
-  {
-    assert(expr.id()==ID_function_application && expr.operands().size()==2);
-    return static_cast<function_application_exprt &>(expr);
-  }
 };
 
 /*! \brief Cast a generic exprt to a \ref function_application_exprt
@@ -1996,37 +1988,47 @@ public:
  *
  * \ingroup gr_std_expr
 */
-const function_application_exprt &to_function_application_expr(const exprt &expr);
+extern inline const function_application_exprt &to_function_application_expr(const exprt &expr)
+{
+  assert(expr.id()==ID_function_application && expr.operands().size()==2);
+  return static_cast<const function_application_exprt &>(expr);
+}
+
 /*! \copydoc to_function_application_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-function_application_exprt &to_function_application_expr(exprt &expr);
+extern inline function_application_exprt &to_function_application_expr(exprt &expr)
+{
+  assert(expr.id()==ID_function_application && expr.operands().size()==2);
+  return static_cast<function_application_exprt &>(expr);
+}
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief Concatenation of bit-vector operands
 */
 class concatenation_exprt:public exprt
 {
 public:
-  concatenation_exprt():exprt(ID_concatenation)
+  inline concatenation_exprt():exprt(ID_concatenation)
   {
   }
 
-  concatenation_exprt(const typet &_type):exprt(ID_concatenation, _type)
+  inline concatenation_exprt(const typet &_type):
+    exprt(ID_concatenation, _type)
   {
-  }
-
-  friend inline const concatenation_exprt &to_concatenation_expr(const exprt &expr)
-  {
-    assert(expr.id()==ID_concatenation);
-    return static_cast<const concatenation_exprt &>(expr);
-  }
-
-  friend inline concatenation_exprt &to_concatenation_expr(exprt &expr)
-  {
-    assert(expr.id()==ID_concatenation);
-    return static_cast<concatenation_exprt &>(expr);
   }
 };
+
+extern inline const concatenation_exprt &to_concatenation_expr(const exprt &expr)
+{
+  assert(expr.id()==ID_concatenation);
+  return static_cast<const concatenation_exprt &>(expr);
+}
+
+extern inline concatenation_exprt &to_concatenation_expr(exprt &expr)
+{
+  assert(expr.id()==ID_concatenation);
+  return static_cast<concatenation_exprt &>(expr);
+}
 
 /*! \brief Cast a generic exprt to a \ref concatenation_exprt
  *
@@ -2044,15 +2046,15 @@ const concatenation_exprt &to_concatenation_expr(const exprt &expr);
 */
 concatenation_exprt &to_concatenation_expr(exprt &expr);
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief Evaluates to true if the two pointer
+           operands point to the same object
 */
-class same_object_exprt:public exprt
+class same_object_exprt:public binary_relation_exprt
 {
 public:
-  same_object_exprt(const exprt &obj1, const exprt &obj2):
-    exprt("same-object", bool_typet())
+  inline same_object_exprt(const exprt &ptr1, const exprt &ptr2)
+    binary_relation_exprt(ptr1, "same-object", ptr2)
   {
-    copy_to_operands(obj1, obj2);
   }
 };
 
@@ -2061,9 +2063,19 @@ public:
 class sideeffect_exprt:public exprt
 {
 public:
-  sideeffect_exprt(
+  inline sideeffect_exprt(
     const irep_idt &_statement,
     const typet &type):exprt(ID_sideeffect, type)
+  {
+    set_statement(_statement);
+  }
+  
+  inline irep_idt get_statement() const
+  {
+    return get(ID_statement);
+  }
+
+  inline void set_statement(const irep_idt &_statement)
   {
     set(ID_statement, _statement);
   }
@@ -2074,7 +2086,8 @@ public:
 class nondet_exprt:public sideeffect_exprt
 {
 public:
-  explicit nondet_exprt(const typet &_type):sideeffect_exprt(ID_nondet, _type)
+  inline explicit nondet_exprt(const typet &_type):
+    sideeffect_exprt(ID_nondet, _type)
   {
   }
 };
