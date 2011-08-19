@@ -164,3 +164,52 @@ void symbolt::from_irep(const irept &src)
   is_extern=src.get_bool("is_extern");
   is_volatile=src.get_bool("is_volatile");
 }
+
+
+/*******************************************************************\
+
+Function: is_global
+
+  Inputs: symbol
+
+ Outputs: boolean
+
+ Purpose: decides whether the symbol is a global variable
+
+\*******************************************************************/
+bool is_global(const symbolt& symbol)
+{
+	return symbol.static_lifetime && !symbol.thread_local;
+}
+
+/*******************************************************************\
+
+Function: is_thread_local
+
+  Inputs: symbol
+
+ Outputs: boolean
+
+ Purpose: decides whether the symbol is a thread local variable
+
+\*******************************************************************/
+bool is_thread_local(const symbolt& symbol)
+{
+	return symbol.static_lifetime && symbol.thread_local;
+}
+
+/*******************************************************************\
+
+Function: is_procedure_local
+
+  Inputs: symbol
+
+ Outputs: boolean
+
+ Purpose: decides whether the symbol is a procedure local variable
+
+\*******************************************************************/
+bool is_procedure_local(const symbolt& symbol)
+{
+	return !symbol.static_lifetime;
+}
