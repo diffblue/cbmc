@@ -24,10 +24,11 @@ Author: Daniel Kroening, kroening@kroening.com
   "(bounds-check)(outfile):(pointer-check)" \
   "(document-subgoals)(all-claims)D:I:(depth):" \
   "(div-by-zero-check)(no-unwinding-assertions)" \
+  "(signed-overflow-check)(unsigned-overflow-check)" \
   "(partial-loops)" \
   "(xml-ui)(xml-interface)(vcd):" \
   "(cvc)(smt1)(smt2)(boolector)(yices)(z3)(opensmt)" \
-  "(no-pretty-names)(overflow-check)(beautify-greedy)(beautify-pbs)" \
+  "(no-pretty-names)(beautify-greedy)(beautify-pbs)" \
   "(floatbv)(fixedbv)(no-assertions)(no-assumptions)(nan-check)" \
   "(dimacs)(refine)" \
   "(16)(32)(64)(LP64)(ILP64)(LLP64)(ILP32)(LP32)" \
@@ -38,7 +39,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(version)" \
   "(i386-linux)(i386-macos)(i386-win32)(win32)(winx64)" \
   "(ppc-macos)(unsigned-char)" \
-  "(arrays-uf-always)(arrays-uf-never)(interpreter)" \
+  "(arrays-uf-always)(arrays-uf-never)" \
   "(string-abstraction)(no-arch)" \
   "(round-to-nearest)(round-to-plus-inf)(round-to-minus-inf)(round-to-zero)" \
   "(decide)" // legacy, and will eventually disappear

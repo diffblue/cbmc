@@ -30,11 +30,13 @@ class bmc_baset:public messaget
 {
 public:
   bmc_baset(
+    const optionst &_options,
     const namespacet &_ns,
     symex_bmct &_symex,
     symex_target_equationt &_equation,
     message_handlert &_message_handler):
     messaget(_message_handler),
+    options(_options),
     ns(_ns),
     symex(_symex),
     equation(_equation),
@@ -42,8 +44,6 @@ public:
   {
   }
  
-  optionst options;
-  
   virtual bool run(const goto_functionst &goto_functions);
   virtual ~bmc_baset() { }
 
@@ -57,6 +57,7 @@ public:
   void set_ui(language_uit::uit _ui) { ui=_ui; }
   
 protected:
+  const optionst &options;  
   const namespacet &ns;
   symex_bmct &symex;
   symex_target_equationt &equation;
@@ -105,9 +106,10 @@ class bmct:public bmc_baset
 {
 public:
   bmct(
+    const optionst &_options,
     const contextt &_context,
     message_handlert &_message_handler):
-    bmc_baset(_ns, _symex, _equation, _message_handler),
+    bmc_baset(_options, _ns, _symex, _equation, _message_handler),
     _ns(_context, new_context),
     _equation(ns),
     _symex(ns, new_context, _equation)
