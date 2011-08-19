@@ -176,10 +176,16 @@ void cbmc_parseoptionst::get_command_line_options(optionst &options)
     options.set_option("div-by-zero-check", false);
 
   // check overflow/underflow
-  if(cmdline.isset("overflow-check"))
-    options.set_option("overflow-check", true);
+  if(cmdline.isset("signed-overflow-check"))
+    options.set_option("signed-overflow-check", true);
   else
-    options.set_option("overflow-check", false);
+    options.set_option("signed-overflow-check", false);
+
+  // check overflow/underflow
+  if(cmdline.isset("unsigned-overflow-check"))
+    options.set_option("unsigned-overflow-check", true);
+  else
+    options.set_option("unsigned-overflow-check", false);
 
   // check for NaN (not a number)
   if(cmdline.isset("nan-check"))
@@ -306,13 +312,14 @@ int cbmc_parseoptionst::doit()
   
   register_languages();
 
-  bmct bmc(context, ui_message_handler);
+  optionst options;
+  bmct bmc(options, context, ui_message_handler);
 
   //
   // command line options
   //
 
-  get_command_line_options(bmc.options);
+  get_command_line_options(options);
   set_verbosity(bmc);
   set_verbosity(*this);
   
@@ -324,7 +331,7 @@ int cbmc_parseoptionst::doit()
 
   goto_functionst goto_functions;
 
-  if(get_goto_program(bmc.options, bmc, goto_functions))
+  if(get_goto_program(options, bmc, goto_functions))
     return 6;
 
   if(cmdline.isset("show-claims"))
@@ -462,13 +469,6 @@ bool cbmc_parseoptionst::get_goto_program(
     status("Adding CPROVER library");      
     link_to_library(
       context, goto_functions, options, ui_message_handler);
-
-    if(cmdline.isset("interpreter"))
-    {
-      status("Starting interpreter");
-      interpreter(context, goto_functions);
-      return true;
-    }
 
     if(process_goto_program(options, goto_functions))
       return true;
@@ -770,13 +770,13 @@ void cbmc_parseoptionst::help()
     " --round-to-plus-inf          IEEE floating point rounding mode\n"
     " --round-to-minus-inf         IEEE floating point rounding mode\n"
     " --round-to-zero              IEEE floating point rounding mode\n"
-    " --interpreter                do concrete execution\n"
     "\n"
     "Program instrumentation options:\n"
     " --bounds-check               enable array bounds checks\n"
     " --div-by-zero-check          enable division by zero checks\n"
     " --pointer-check              enable pointer checks\n"
-    " --overflow-check             enable arithmetic over- and underflow checks\n"
+    " --signed-overflow-check      enable arithmetic over- and underflow checks\n"
+    " --unsigned-overflow-check    enable arithmetic over- and underflow checks\n"
     " --nan-check                  check floating-point for NaN\n"
     " --all-claims                 keep all claims\n"
     " --show-claims                only show claims\n"
