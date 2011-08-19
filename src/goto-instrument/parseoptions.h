@@ -24,7 +24,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(div-by-zero-check)(no-div-by-zero-check)" \
   "(no-assertions)(no-assumptions)(uninitialized-check)" \
   "(nan-check)(no-nan-check)" \
-  "(overflow-check)(no-overflow-check)" \
+  "(signed-overflow-check)(unsigned-overflow-check)" \
   "(show-goto-functions)(show-value-sets)" \
   "(show-struct-alignment)" \
   "(show-uninitialized)(show-locations)" \
