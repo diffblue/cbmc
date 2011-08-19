@@ -307,10 +307,16 @@ void goto_instrument_parseoptionst::instrument_goto_program(
     options.set_option("div-by-zero-check", false);
 
   // check overflow/underflow
-  if(cmdline.isset("overflow-check"))
-    options.set_option("overflow-check", true);
+  if(cmdline.isset("signed-overflow-check"))
+    options.set_option("signed-overflow-check", true);
   else
-    options.set_option("overflow-check", false);
+    options.set_option("signed-overflow-check", false);
+
+  // check overflow/underflow
+  if(cmdline.isset("unsigned-overflow-check"))
+    options.set_option("unsigned-overflow-check", true);
+  else
+    options.set_option("unsigned-overflow-check", false);
 
   // check for NaN (not a number)
   if(cmdline.isset("nan-check"))
@@ -435,7 +441,8 @@ void goto_instrument_parseoptionst::help()
     " --bounds-check               add array bounds checks\n"
     " --div-by-zero-check          add division by zero checks\n"
     " --pointer-check              add pointer checks\n"
-    " --overflow-check             add arithmetic over- and underflow checks\n"
+    " --signed-overflow-check      add arithmetic over- and underflow checks\n"
+    " --unsigned-overflow-check    add arithmetic over- and underflow checks\n"
     " --nan-check                  add floating-point NaN checks\n"
     " --uninitialized-check        add checks for uninitialized locals (experimental)\n"
     " --error-label label          check that label is unreachable\n"
