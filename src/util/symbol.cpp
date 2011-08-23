@@ -165,6 +165,50 @@ void symbolt::from_irep(const irept &src)
   is_volatile=src.get_bool("is_volatile");
 }
 
+/*******************************************************************\
+
+Function: symbolt::swap
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void symbolt::swap(symbolt &b)
+{
+  #define SYM_SWAP1(x) x.swap(b.x)
+  
+  SYM_SWAP1(type);
+  SYM_SWAP1(value);
+  SYM_SWAP1(name);
+  SYM_SWAP1(pretty_name);
+  SYM_SWAP1(module);
+  SYM_SWAP1(base_name);
+  SYM_SWAP1(mode);
+  SYM_SWAP1(location);
+
+  #define SYM_SWAP2(x) std::swap(x, b.x)
+  
+  SYM_SWAP2(ordering);
+  SYM_SWAP2(theorem);
+  SYM_SWAP2(is_type);
+  SYM_SWAP2(is_macro);
+  SYM_SWAP2(is_exported);
+  SYM_SWAP2(is_input);
+  SYM_SWAP2(is_output);
+  SYM_SWAP2(is_statevar);
+  SYM_SWAP2(is_actual);
+  SYM_SWAP2(free_var);
+  SYM_SWAP2(lvalue);
+  SYM_SWAP2(static_lifetime);
+  SYM_SWAP2(thread_local);
+  SYM_SWAP2(file_local);
+  SYM_SWAP2(is_extern);
+  SYM_SWAP2(is_volatile);
+}
 
 /*******************************************************************\
 
@@ -177,6 +221,7 @@ Function: is_global
  Purpose: decides whether the symbol is a global variable
 
 \*******************************************************************/
+
 bool is_global(const symbolt& symbol)
 {
 	return symbol.static_lifetime && !symbol.thread_local;
@@ -193,6 +238,7 @@ Function: is_thread_local
  Purpose: decides whether the symbol is a thread local variable
 
 \*******************************************************************/
+
 bool is_thread_local(const symbolt& symbol)
 {
 	return symbol.static_lifetime && symbol.thread_local;
@@ -209,6 +255,7 @@ Function: is_procedure_local
  Purpose: decides whether the symbol is a procedure local variable
 
 \*******************************************************************/
+
 bool is_procedure_local(const symbolt& symbol)
 {
 	return !symbol.static_lifetime;
