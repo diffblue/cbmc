@@ -271,7 +271,7 @@ void basic_symext::symex_assign_symbol(
     tmp_new_rhs.swap(new_rhs);
   }
   
-  exprt original_lhs=lhs;
+  symbol_exprt original_lhs=lhs;
   state.get_original_name(original_lhs);
   
   state.rename(new_rhs, ns);
