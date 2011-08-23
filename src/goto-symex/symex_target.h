@@ -9,8 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_SYMEX_SYMEX_TARGET_H
 #define CPROVER_GOTO_SYMEX_SYMEX_TARGET_H
 
-#include <expr.h>
-#include <symbol.h>
+#include <std_expr.h>
 #include <guard.h>
 
 #include <goto-programs/goto_program.h>
@@ -39,10 +38,10 @@ public:
   
   typedef enum { STATE, HIDDEN } assignment_typet;
 
-  // write to a variable - must be symbol
+  // write to a variable - lhs must be symbol
   virtual void assignment(
     const guardt &guard,
-    const exprt &lhs,
+    const symbol_exprt &lhs,
     const exprt &original_lhs,
     const exprt &rhs,
     const sourcet &source,

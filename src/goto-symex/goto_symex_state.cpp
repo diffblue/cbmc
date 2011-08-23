@@ -294,7 +294,7 @@ Function: goto_symex_statet::assignment
 \*******************************************************************/
 
 void goto_symex_statet::assignment(
-  exprt &lhs,
+  symbol_exprt &lhs,
   const exprt &rhs,
   const namespacet &ns,
   bool record_value)
@@ -304,8 +304,7 @@ void goto_symex_statet::assignment(
   // the type might need renaming
   rename(lhs.type(), ns);
 
-  const irep_idt &identifier=
-    lhs.get(ID_identifier);
+  const irep_idt &identifier=lhs.get_identifier();
     
   // identifier should be l0 or l1, make sure it's l1
   
@@ -318,7 +317,7 @@ void goto_symex_statet::assignment(
     
   level2.rename(l1_identifier, entry.count);
   
-  lhs.set(ID_identifier, level2.name(l1_identifier, entry.count));
+  lhs.set_identifier(level2.name(l1_identifier, entry.count));
   
   if(record_value)
   {
