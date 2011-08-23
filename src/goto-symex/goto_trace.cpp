@@ -95,13 +95,7 @@ void goto_trace_stept::output(
 
   if(pc->is_other() || pc->is_assign())
   {
-    irep_idt identifier;
-
-    if(original_lhs.is_not_nil())
-      identifier=original_lhs.get(ID_identifier);
-    else
-      identifier=lhs.get(ID_identifier);
-
+    irep_idt identifier=lhs_object.get_identifier();
     out << "  " << identifier
         << " = " << from_expr(ns, identifier, value)
         << std::endl;
@@ -277,13 +271,7 @@ void show_goto_trace_gui(
     }
     else if(it->type==goto_trace_stept::ASSIGNMENT)
     {
-      irep_idt identifier;
-
-      if(it->original_lhs.is_not_nil())
-        identifier=it->original_lhs.get(ID_identifier);
-      else
-        identifier=it->lhs.get(ID_identifier);
-
+      irep_idt identifier=it->lhs_object.get_identifier();
       std::string value_string=from_expr(ns, identifier, it->value);
       
       const symbolt *symbol;
@@ -438,9 +426,9 @@ void show_goto_trace(
 
     case goto_trace_stept::ASSIGNMENT:
       if(it->pc->is_assign() ||
-         it->pc->is_return() || // lhs!
+         it->pc->is_return() || // returns have a lhs!
          it->pc->is_function_call() ||
-         (it->pc->is_other() && it->lhs.is_not_nil()))
+         (it->pc->is_other() && it->lhs_object.is_not_nil()))
       {
         if(prev_step_nr!=it->step_nr || first_step)
         {
@@ -449,7 +437,7 @@ void show_goto_trace(
           show_state_header(out, *it, it->pc->location, it->step_nr);
         }
 
-        counterexample_value(out, ns, it->original_lhs,
+        counterexample_value(out, ns, it->lhs_object,
                              it->value, pretty_names);
       }
       break;

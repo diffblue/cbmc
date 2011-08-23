@@ -51,11 +51,10 @@ void build_goto_trace(
     goto_trace_stept &goto_trace_step=goto_trace.steps.back();
     
     goto_trace_step.thread_nr=SSA_step.source.thread_nr;
-    goto_trace_step.lhs=SSA_step.lhs;
-    goto_trace_step.rhs=SSA_step.rhs;
     goto_trace_step.pc=SSA_step.source.pc;
     goto_trace_step.comment=SSA_step.comment;
-    goto_trace_step.original_lhs=SSA_step.original_lhs;
+    // goto_trace_step.full_lhs=SSA_step.original_lhs; // TODO
+    goto_trace_step.lhs_object=SSA_step.original_lhs;
     goto_trace_step.type=SSA_step.type;
     goto_trace_step.step_nr=step_nr;
     goto_trace_step.format_string=SSA_step.format_string;

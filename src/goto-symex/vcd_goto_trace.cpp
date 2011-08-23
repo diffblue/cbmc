@@ -132,9 +132,8 @@ void output_vcd(
   {
     if(it->is_assignment())
     {
-      exprt lhs=it->original_lhs.is_not_nil()?it->original_lhs:it->lhs;
-      irep_idt identifier=lhs.get(ID_identifier);
-      const typet &type=lhs.type();
+      irep_idt identifier=it->lhs_object.get_identifier();
+      const typet &type=it->lhs_object.type();
         
       unsigned number=n.number(identifier);
 
@@ -150,7 +149,7 @@ void output_vcd(
               type.id()==ID_bv)
         width=string2integer(type.get_string(ID_width));
       else
-        width=pointer_offset_size(ns, lhs.type())*8;
+        width=pointer_offset_size(ns, type)*8;
         
       if(width>=1)
         out << "$var reg " << width << " V" << number << " "
@@ -172,9 +171,8 @@ void output_vcd(
     {
     case goto_trace_stept::ASSIGNMENT:
       {
-        exprt lhs=it->original_lhs.is_not_nil()?it->original_lhs:it->lhs;
-        irep_idt identifier=lhs.get(ID_identifier);
-        const typet &type=lhs.type();
+        irep_idt identifier=it->lhs_object.get_identifier();
+        const typet &type=it->lhs_object.type();
 
         out << '#' << timestamp << std::endl;
         timestamp++;
