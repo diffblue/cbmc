@@ -49,7 +49,7 @@ public:
 
   irep_idt merge_identifier;
 
-  exprt merge_symbol;
+  symbol_exprt merge_symbol;
 
   void read_trace(std::string filename);
 

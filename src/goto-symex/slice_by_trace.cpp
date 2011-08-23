@@ -40,8 +40,8 @@ void symex_slice_by_tracet::slice_by_trace(std::string trace_files,
   std::cout << "Slicing by trace..." << std::endl;
 
   merge_identifier = "goto_symex::\\merge";
-  merge_symbol=exprt("symbol", typet("bool"));
-  merge_symbol.set("identifier", merge_identifier);
+  merge_symbol=symbol_exprt(typet("bool"));
+  merge_symbol.set_identifier(merge_identifier);
 
   std::vector<exprt> trace_conditions;
 
