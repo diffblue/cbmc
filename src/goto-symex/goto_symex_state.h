@@ -146,7 +146,7 @@ public:
   void rename(typet &type, const namespacet &ns);
   
   void assignment(
-    exprt &lhs,
+    symbol_exprt &lhs,
     const exprt &rhs,
     const namespacet &ns,
     bool record_value);

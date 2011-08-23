@@ -277,7 +277,7 @@ void basic_symext::symex_assign_symbol(
   state.rename(new_rhs, ns);
   do_simplify(new_rhs);
 
-  exprt new_lhs=lhs;
+  symbol_exprt new_lhs=lhs;
   state.assignment(new_lhs, new_rhs, ns, constant_propagation);
 
   guardt tmp_guard(state.guard);

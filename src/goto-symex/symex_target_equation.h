@@ -25,10 +25,10 @@ class symex_target_equationt:public symex_targett
 public:
   symex_target_equationt(const namespacet &_ns):ns(_ns) { }
 
-  // assignment to a variable - must be symbol
+  // assignment to a variable - lhs must be symbol
   virtual void assignment(
     const guardt &guard,
-    const exprt &lhs,
+    const symbol_exprt &lhs,
     const exprt &original_lhs,
     const exprt &rhs,
     const sourcet &source,
@@ -99,7 +99,8 @@ public:
     literalt guard_literal;
 
     // for ASSIGNMENT  
-    exprt lhs, rhs, original_lhs;
+    symbol_exprt lhs;
+    exprt rhs, original_lhs;
     assignment_typet assignment_type;
     
     // for ASSUME/ASSERT

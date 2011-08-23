@@ -572,14 +572,14 @@ void symex_slice_by_tracet::assign_merges(
   size_t merge_count = (merge_map_back.size()) - 1;
   for (std::vector<exprt>::reverse_iterator i = merge_map_back.rbegin();
        i != merge_map_back.rend(); i++) {
-    exprt merge_sym =exprt("symbol", typet("bool"));
-    merge_sym.set("identifier", id2string(merge_identifier)+"#"+i2string(merge_count));
+    symbol_exprt merge_sym(typet("bool"));
+    merge_sym.set_identifier(id2string(merge_identifier)+"#"+i2string(merge_count));
     merge_count--;
     guardt t_guard;
     t_guard.make_true();
     symex_targett::sourcet empty_source;
 
-    exprt merge_copy (*i);
+    exprt merge_copy(*i);
 
     equation.SSA_steps.push_front(symex_target_equationt::SSA_stept());
     symex_target_equationt::SSA_stept &SSA_step = equation.SSA_steps.front();  
