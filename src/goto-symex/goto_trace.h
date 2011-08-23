@@ -15,6 +15,7 @@ Date: July 2005
 #include <vector>
 
 #include <pretty_names.h>
+#include <std_expr.h>
 
 #include <goto-programs/goto_program.h>
 
@@ -49,14 +50,14 @@ public:
   // for assert
   std::string comment;
 
-  // in SSA
-  exprt lhs, rhs;
+  // the object being assigned
+  symbol_exprt lhs_object;
   
-  // this is a constant
+  // A constant with the new value of the object
   exprt value;
   
-  // original expression
-  exprt original_lhs;
+  // the full, original lhs expression
+  exprt full_lhs;
 
   // for INPUT/OUTPUT
   irep_idt format_string, io_id;
@@ -75,10 +76,9 @@ public:
     cond_value(false),
     formatted(false)
   {
-    lhs.make_nil();
-    rhs.make_nil();
+    lhs_object.make_nil();
     value.make_nil();
-    original_lhs.make_nil();
+    full_lhs.make_nil();
     cond_expr.make_nil();
   }
 };
