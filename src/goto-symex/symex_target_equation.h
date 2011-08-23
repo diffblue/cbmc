@@ -29,7 +29,7 @@ public:
   virtual void assignment(
     const guardt &guard,
     const symbol_exprt &lhs,
-    const exprt &original_lhs,
+    const symbol_exprt &original_lhs,
     const exprt &rhs,
     const sourcet &source,
     assignment_typet assignment_type);
@@ -99,8 +99,8 @@ public:
     literalt guard_literal;
 
     // for ASSIGNMENT  
-    symbol_exprt lhs;
-    exprt rhs, original_lhs;
+    symbol_exprt lhs, original_lhs;
+    exprt rhs;
     assignment_typet assignment_type;
     
     // for ASSUME/ASSERT
