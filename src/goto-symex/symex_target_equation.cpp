@@ -32,7 +32,7 @@ Function: symex_target_equationt::assignment
 void symex_target_equationt::assignment(
   const guardt &guard,
   const symbol_exprt &lhs,
-  const exprt &original_lhs,
+  const symbol_exprt &original_lhs,
   const exprt &rhs,
   const sourcet &source,
   assignment_typet assignment_type)
