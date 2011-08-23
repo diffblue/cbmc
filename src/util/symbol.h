@@ -9,12 +9,24 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_SYMBOL_H
 #define CPROVER_SYMBOL_H
 
+/*! \file util/symbol.h
+ * \brief Symbol table entry
+ *
+ * \author Daniel Kroening <kroening@kroening.com>
+ * \date   Sun Jul 31 21:54:44 BST 2011
+*/
+
+/*! \defgroup gr_symbol_table Symbol Table
+*/
+
 #include <iostream>
 #include <algorithm>
 
 #include "expr.h"
 #include "location.h"
 
+/*! \brief TO_BE_DOCUMENTED
+*/
 class symbolt
 {
 public:
@@ -65,41 +77,10 @@ public:
     name=module=base_name=mode=pretty_name="";
   }
      
-  void swap(symbolt &b)
-  {
-    #define SYM_SWAP1(x) x.swap(b.x)
-    
-    SYM_SWAP1(type);
-    SYM_SWAP1(value);
-    SYM_SWAP1(name);
-    SYM_SWAP1(pretty_name);
-    SYM_SWAP1(module);
-    SYM_SWAP1(base_name);
-    SYM_SWAP1(mode);
-    SYM_SWAP1(location);
-
-    #define SYM_SWAP2(x) std::swap(x, b.x)
-    
-    SYM_SWAP2(ordering);
-    SYM_SWAP2(theorem);
-    SYM_SWAP2(is_type);
-    SYM_SWAP2(is_macro);
-    SYM_SWAP2(is_exported);
-    SYM_SWAP2(is_input);
-    SYM_SWAP2(is_output);
-    SYM_SWAP2(is_statevar);
-    SYM_SWAP2(is_actual);
-    SYM_SWAP2(free_var);
-    SYM_SWAP2(lvalue);
-    SYM_SWAP2(static_lifetime);
-    SYM_SWAP2(thread_local);
-    SYM_SWAP2(file_local);
-    SYM_SWAP2(is_extern);
-    SYM_SWAP2(is_volatile);
-  }
-  
+  void swap(symbolt &b);
   void show(std::ostream &out) const;
 
+  // serialization
   void to_irep(irept &dest) const;
   void from_irep(const irept &src);
 };
@@ -125,12 +106,11 @@ typedef std::list<const symbolt *> symbolptr_listt;
   for(symbolptr_listt::iterator it=(list).begin(); \
       it!=(list).end(); it++)
 
-
+// the following should move elsewhere
 bool is_global(const symbolt& symbol);
 
 bool is_thread_local(const symbolt& symbol);
 
 bool is_procedure_local(const symbolt& symbol);
-
 
 #endif
