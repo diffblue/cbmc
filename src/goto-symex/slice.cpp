@@ -154,8 +154,8 @@ Function: symex_slicet::slice_assignment
 void symex_slicet::slice_assignment(
   symex_target_equationt::SSA_stept &SSA_step)
 {
-  assert(SSA_step.lhs.id()==ID_symbol);
-  const irep_idt &id=SSA_step.lhs.get(ID_identifier);
+  assert(SSA_step.ssa_lhs.id()==ID_symbol);
+  const irep_idt &id=SSA_step.ssa_lhs.get_identifier();
 
   if(depends.find(id)==depends.end())
   {
@@ -163,7 +163,7 @@ void symex_slicet::slice_assignment(
     SSA_step.ignore=true;
   }
   else
-    get_symbols(SSA_step.rhs);
+    get_symbols(SSA_step.ssa_rhs);
 }
 
 /*******************************************************************\
@@ -210,8 +210,8 @@ void symex_slicet::collect_open_variables(
       break;
 
     case goto_trace_stept::ASSIGNMENT:
-      get_symbols(SSA_step.rhs);
-      lhs.insert(SSA_step.lhs.get(ID_identifier));
+      get_symbols(SSA_step.ssa_rhs);
+      lhs.insert(SSA_step.ssa_lhs.get_identifier());
       break;
 
     case goto_trace_stept::OUTPUT:

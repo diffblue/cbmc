@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <find_symbols.h>
 #include <expr_util.h>
+#include <std_expr.h>
 
 #include "goto_symex_state.h"
 #include "postcondition.h"
@@ -101,11 +102,11 @@ bool postconditiont::is_used_address_of(
   const exprt &expr,
   const irep_idt &identifier)
 {
-  if(expr.id()=="symbol")
+  if(expr.id()==ID_symbol)
   {
     // leave alone
   }
-  else if(expr.id()=="index")
+  else if(expr.id()==ID_index)
   {
     assert(expr.operands().size()==2);
 
@@ -113,13 +114,12 @@ bool postconditiont::is_used_address_of(
       is_used_address_of(expr.op0(), identifier) ||
       is_used(expr.op1(), identifier);
   }
-  else if(expr.id()=="member")
+  else if(expr.id()==ID_member)
   {
     assert(expr.operands().size()==1);
     return is_used_address_of(expr.op0(), identifier);
   }
-  else if(expr.id()=="dereference" || 
-          expr.id()=="implicit_dereference")
+  else if(expr.id()==ID_dereference)
   {
     assert(expr.operands().size()==1);
     return is_used(expr.op0(), identifier);
@@ -163,8 +163,8 @@ Function: postconditiont::strengthen
 
 void postconditiont::weaken(exprt &dest)
 {
-  if(dest.id()=="and" &&
-     dest.type().id()=="bool") // this distributes over "and"
+  if(dest.id()==ID_and &&
+     dest.type()==bool_typet()) // this distributes over "and"
   {
     Forall_operands(it, dest)
       weaken(*it);
@@ -176,7 +176,7 @@ void postconditiont::weaken(exprt &dest)
   // if lhs is mentioned in dest, we use "true".
   
   const irep_idt &lhs_identifier=
-    s.get_original_name(SSA_step.lhs.get("identifier"));
+    s.get_original_name(SSA_step.ssa_lhs.get_identifier());
 
   if(is_used(dest, lhs_identifier))
     dest.make_true();
@@ -199,16 +199,16 @@ Function: postconditiont::strengthen
 void postconditiont::strengthen(exprt &dest)
 {
   const irep_idt &lhs_identifier=
-    s.get_original_name(SSA_step.lhs.get("identifier"));
+    s.get_original_name(SSA_step.ssa_lhs.get_identifier());
 
-  if(!is_used(SSA_step.rhs, lhs_identifier))
+  if(!is_used(SSA_step.ssa_rhs, lhs_identifier))
   {
     // we don't do arrays or structs
-    if(SSA_step.lhs.type().id()=="array" ||
-       SSA_step.lhs.type().id()=="struct") return;
+    if(SSA_step.ssa_lhs.type().id()==ID_array ||
+       SSA_step.ssa_lhs.type().id()==ID_struct)
+      return;
   
-    exprt equality("=", typet("bool"));
-    equality.copy_to_operands(SSA_step.lhs, SSA_step.rhs);
+    equal_exprt equality(SSA_step.ssa_lhs, SSA_step.ssa_rhs);
     s.get_original_name(equality);
 
     if(dest.is_true())
@@ -234,20 +234,17 @@ bool postconditiont::is_used(
   const exprt &expr,
   const irep_idt &identifier)
 {
-  if(expr.id()=="address_of" ||
-     expr.id()=="reference_to" ||
-     expr.id()=="implicit_address_of")
+  if(expr.id()==ID_address_of)
   {
     // only do index!
     assert(expr.operands().size()==1);
     return is_used_address_of(expr.op0(), identifier);
   }
-  else if(expr.id()=="symbol")
+  else if(expr.id()==ID_symbol)
   {
-    return s.get_original_name(expr.get("identifier"))==identifier;
+    return s.get_original_name(expr.get(ID_identifier))==identifier;
   }
-  else if(expr.id()=="dereference" ||
-          expr.id()=="implicit_dereference")
+  else if(expr.id()==ID_dereference)
   {
     assert(expr.operands().size()==1);
 

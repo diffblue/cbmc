@@ -102,23 +102,22 @@ Function: preconditiont::compute_address_of
 
 void preconditiont::compute_address_of(exprt &dest)
 {
-  if(dest.id()=="symbol")
+  if(dest.id()==ID_symbol)
   {
     // leave alone
   }
-  else if(dest.id()=="index")
+  else if(dest.id()==ID_index)
   {
     assert(dest.operands().size()==2);
     compute_address_of(dest.op0());
     compute(dest.op1());
   }
-  else if(dest.id()=="member")
+  else if(dest.id()==ID_member)
   {
     assert(dest.operands().size()==1);
     compute_address_of(dest.op0());
   }
-  else if(dest.id()=="dereference" || 
-          dest.id()=="implicit_dereference")
+  else if(dest.id()==ID_dereference)
   {
     assert(dest.operands().size()==1);
     compute(dest.op0());
@@ -156,30 +155,27 @@ Function: preconditiont::compute_rec
 
 void preconditiont::compute_rec(exprt &dest)
 {
-  if(dest.id()=="address_of" ||
-     dest.id()=="reference_to" ||
-     dest.id()=="implicit_address_of")
+  if(dest.id()==ID_address_of)
   {
     // only do index!
     assert(dest.operands().size()==1);
     compute_address_of(dest.op0());
   }
-  else if(dest.id()=="symbol")
+  else if(dest.id()==ID_symbol)
   {
-    if(dest.get("identifier")==
-       s.get_original_name(SSA_step.lhs.get("identifier")))
+    if(dest.get(ID_identifier)==
+       s.get_original_name(SSA_step.ssa_lhs.get_identifier()))
     {
-      dest=SSA_step.rhs;
+      dest=SSA_step.ssa_rhs;
       s.get_original_name(dest);
     }
   }
-  else if(dest.id()=="dereference" ||
-          dest.id()=="implicit_dereference")
+  else if(dest.id()==ID_dereference)
   {
     assert(dest.operands().size()==1);
 
     const irep_idt &lhs_identifier=
-      s.get_original_name(SSA_step.lhs.get("identifier"));
+      s.get_original_name(SSA_step.ssa_lhs.get_identifier());
   
     // aliasing may happen here
 

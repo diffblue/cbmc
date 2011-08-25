@@ -30,7 +30,7 @@ public:
     const guardt &guard,
     const symbol_exprt &lhs,
     const symbol_exprt &original_lhs,
-    const exprt &rhs,
+    const exprt &ssa_rhs,
     const sourcet &source,
     assignment_typet assignment_type);
     
@@ -99,8 +99,8 @@ public:
     literalt guard_literal;
 
     // for ASSIGNMENT  
-    symbol_exprt lhs, original_lhs;
-    exprt rhs;
+    symbol_exprt ssa_lhs, original_lhs_object;
+    exprt ssa_rhs;
     assignment_typet assignment_type;
     
     // for ASSUME/ASSERT

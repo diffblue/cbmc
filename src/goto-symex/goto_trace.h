@@ -11,6 +11,13 @@ Date: July 2005
 #ifndef CPROVER_GOTO_SYMEX_GOTO_TRACE_H
 #define CPROVER_GOTO_SYMEX_GOTO_TRACE_H
 
+/*! \file goto-symex/goto_trace.h
+ * \brief Traces through goto programs
+ *
+ * \author Daniel Kroening <kroening@kroening.com>
+ * \date   Sun Jul 31 21:54:44 BST 2011
+*/
+
 #include <iostream>
 #include <vector>
 
@@ -19,6 +26,9 @@ Date: July 2005
 
 #include <goto-programs/goto_program.h>
 
+/*! \brief TO_BE_DOCUMENTED
+ * \ingroup gr_goto_symex
+*/
 class goto_trace_stept 
 {
 public:
@@ -83,6 +93,9 @@ public:
   }
 };
 
+/*! \brief TO_BE_DOCUMENTED
+ * \ingroup gr_goto_symex
+*/
 class goto_tracet
 {
 public:
