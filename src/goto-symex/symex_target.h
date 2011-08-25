@@ -41,9 +41,9 @@ public:
   // write to a variable - lhs must be symbol
   virtual void assignment(
     const guardt &guard,
-    const symbol_exprt &lhs,
-    const symbol_exprt &original_lhs,
-    const exprt &rhs,
+    const symbol_exprt &ssa_lhs,
+    const symbol_exprt &original_lhs_object,
+    const exprt &ssa_rhs,
     const sourcet &source,
     assignment_typet assignment_type)=0;
 

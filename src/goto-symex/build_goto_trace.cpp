@@ -54,15 +54,15 @@ void build_goto_trace(
     goto_trace_step.pc=SSA_step.source.pc;
     goto_trace_step.comment=SSA_step.comment;
     // goto_trace_step.full_lhs=SSA_step.original_lhs; // TODO
-    goto_trace_step.lhs_object=SSA_step.original_lhs;
+    goto_trace_step.lhs_object=SSA_step.original_lhs_object;
     goto_trace_step.type=SSA_step.type;
     goto_trace_step.step_nr=step_nr;
     goto_trace_step.format_string=SSA_step.format_string;
     goto_trace_step.io_id=SSA_step.io_id;
     goto_trace_step.formatted=SSA_step.formatted;
     
-    if(SSA_step.lhs.is_not_nil())
-      goto_trace_step.value=prop_conv.get(SSA_step.lhs);
+    if(SSA_step.ssa_lhs.is_not_nil())
+      goto_trace_step.value=prop_conv.get(SSA_step.ssa_lhs);
     
     for(std::list<exprt>::const_iterator
         j=SSA_step.converted_io_args.begin();

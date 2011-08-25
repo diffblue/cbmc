@@ -110,7 +110,7 @@ void symex_slice_by_tracet::slice_by_trace(std::string trace_files,
   symex_target_equationt::SSA_stept &SSA_step = equation.SSA_steps.front(); 
 
   SSA_step.guard_expr=t_guard.as_expr();
-  SSA_step.lhs.make_nil();
+  SSA_step.ssa_lhs.make_nil();
   SSA_step.cond_expr.swap(trace_condition);
   SSA_step.type=goto_trace_stept::ASSUME;
   SSA_step.source=empty_source;
@@ -464,7 +464,7 @@ void symex_slice_by_tracet::slice_SSA_steps(
       
       if (implications.count(guard) != 0) {
 	it->cond_expr.make_true();
-	it->rhs.make_true();
+	it->ssa_rhs.make_true();
 	it->guard_expr.make_false();
 	sliced_SSA_steps++;
 	if (it->is_output() || it->is_location())
@@ -482,7 +482,7 @@ void symex_slice_by_tracet::slice_SSA_steps(
 	
 	if (implications.count(neg_expr) != 0) {
 	  it->cond_expr.make_true();
-	  it->rhs.make_true();
+	  it->ssa_rhs.make_true();
 	  it->guard_expr.make_false();
 	  sliced_SSA_steps++;
 	  if (it->is_output() || it->is_location())
@@ -495,28 +495,30 @@ void symex_slice_by_tracet::slice_SSA_steps(
       }
     }
 
-    if (!sliced_SSA_step && it->is_assignment())
+    if(!sliced_SSA_step && it->is_assignment())
     {
-      if (it->rhs.id() == "if")
+      if(it->ssa_rhs.id()==ID_if)
       {
 	conds_seen++;
-	exprt cond_copy (it->rhs.op0());
+	exprt cond_copy (it->ssa_rhs.op0());
 	simplify(cond_copy, ns);
 	
 	if (implications.count(cond_copy) != 0) {
 	  sliced_conds++;
-	  exprt t_copy1 (it->rhs.op1());
-	  exprt t_copy2 (it->rhs.op1());
-	  it->rhs = t_copy1;
+	  exprt t_copy1 (it->ssa_rhs.op1());
+	  exprt t_copy2 (it->ssa_rhs.op1());
+	  it->ssa_rhs = t_copy1;
 	  it->cond_expr.op1().swap(t_copy2);
-	} else {
+	}
+	else
+	{
 	  cond_copy.make_not();
 	  simplify(cond_copy, ns);
 	  if (implications.count(cond_copy) != 0) {
 	    sliced_conds++;
-	    exprt f_copy1 (it->rhs.op2());
-	    exprt f_copy2 (it->rhs.op2());
-	    it->rhs = f_copy1;
+	    exprt f_copy1 (it->ssa_rhs.op2());
+	    exprt f_copy2 (it->ssa_rhs.op2());
+	    it->ssa_rhs = f_copy1;
 	    it->cond_expr.op1().swap(f_copy2);
 	  }
 	}
@@ -585,12 +587,12 @@ void symex_slice_by_tracet::assign_merges(
     symex_target_equationt::SSA_stept &SSA_step = equation.SSA_steps.front();  
     
     SSA_step.guard_expr=t_guard.as_expr();
-    SSA_step.lhs=merge_sym;
-    SSA_step.original_lhs=merge_symbol;
-    SSA_step.rhs.swap(merge_copy);
+    SSA_step.ssa_lhs=merge_sym;
+    SSA_step.original_lhs_object=merge_symbol;
+    SSA_step.ssa_rhs.swap(merge_copy);
     SSA_step.assignment_type=symex_targett::HIDDEN;
     
-    SSA_step.cond_expr=equal_exprt(SSA_step.lhs, SSA_step.rhs);
+    SSA_step.cond_expr=equal_exprt(SSA_step.ssa_lhs, SSA_step.ssa_rhs);
     SSA_step.type=goto_trace_stept::ASSIGNMENT;
     SSA_step.source=empty_source;
   }
