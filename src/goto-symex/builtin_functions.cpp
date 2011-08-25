@@ -148,7 +148,7 @@ void basic_symext::symex_malloc(
   state.rename(rhs, ns);
   
   guardt guard;
-  symex_assign_rec(state, lhs, rhs, guard, VISIBLE);
+  symex_assign_rec(state, lhs, lhs, rhs, guard, VISIBLE);
 }
 
 /*******************************************************************\
@@ -365,7 +365,7 @@ void basic_symext::symex_cpp_new(
   state.rename(rhs, ns);
 
   guardt guard;
-  symex_assign_rec(state, lhs, rhs, guard, VISIBLE);
+  symex_assign_rec(state, lhs, lhs, rhs, guard, VISIBLE);
 }
 
 /*******************************************************************\

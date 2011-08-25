@@ -70,11 +70,11 @@ void basic_symext::symex(statet &state, const codet &code)
     rhs.set(ID_identifier, "symex::nondet"+i2string(nondet_count++));
     rhs.location()=code.location();
 
-    exprt new_lhs(code.op0());
+    exprt new_lhs=code.op0();
     read(new_lhs);
 
     guardt guard; // NOT the state guard!
-    symex_assign_rec(state, new_lhs, rhs, guard, VISIBLE);
+    symex_assign_rec(state, new_lhs, new_lhs, rhs, guard, VISIBLE);
   }
   else if(statement==ID_expression)
   {
@@ -134,7 +134,9 @@ Function: basic_symext::symex_assign
 
 \*******************************************************************/
 
-void basic_symext::symex_assign(statet &state, const code_assignt &code)
+void basic_symext::symex_assign(
+  statet &state,
+  const code_assignt &code)
 {
   exprt lhs=code.lhs();
   exprt rhs=code.rhs();
@@ -175,7 +177,7 @@ void basic_symext::symex_assign(statet &state, const code_assignt &code)
   else
   {
     guardt guard; // NOT the state guard!
-    symex_assign_rec(state, lhs, rhs, guard, VISIBLE);
+    symex_assign_rec(state, lhs, lhs, rhs, guard, VISIBLE);
   }
 }
 
@@ -210,20 +212,21 @@ Function: basic_symext::symex_assign_rec
 void basic_symext::symex_assign_rec(
   statet &state,
   const exprt &lhs,
+  const exprt &full_lhs,
   const exprt &rhs,
   guardt &guard,
   visibilityt visibility)
 {
   if(lhs.id()==ID_symbol)
-    symex_assign_symbol(state, to_symbol_expr(lhs), rhs, guard, visibility);
+    symex_assign_symbol(state, to_symbol_expr(lhs), full_lhs, rhs, guard, visibility);
   else if(lhs.id()==ID_index)
-    symex_assign_array(state, to_index_expr(lhs), rhs, guard, visibility);
+    symex_assign_array(state, to_index_expr(lhs), full_lhs, rhs, guard, visibility);
   else if(lhs.id()==ID_member)
-    symex_assign_member(state, to_member_expr(lhs), rhs, guard, visibility);
+    symex_assign_member(state, to_member_expr(lhs), full_lhs, rhs, guard, visibility);
   else if(lhs.id()==ID_if)
-    symex_assign_if(state, to_if_expr(lhs), rhs, guard, visibility);
+    symex_assign_if(state, to_if_expr(lhs), full_lhs, rhs, guard, visibility);
   else if(lhs.id()==ID_typecast)
-    symex_assign_typecast(state, to_typecast_expr(lhs), rhs, guard, visibility);
+    symex_assign_typecast(state, to_typecast_expr(lhs), full_lhs, rhs, guard, visibility);
   else if(lhs.id()==ID_string_constant ||
           lhs.id()=="NULL-object" ||
           lhs.id()=="zero_string" ||
@@ -234,7 +237,7 @@ void basic_symext::symex_assign_rec(
   }
   else if(lhs.id()==ID_byte_extract_little_endian ||
           lhs.id()==ID_byte_extract_big_endian)
-    symex_assign_byte_extract(state, lhs, rhs, guard, visibility);
+    symex_assign_byte_extract(state, lhs, full_lhs, rhs, guard, visibility);
   else
     throw "assignment to `"+lhs.id_string()+"' not handled";
 }
@@ -254,6 +257,7 @@ Function: basic_symext::symex_assign_symbol
 void basic_symext::symex_assign_symbol(
   statet &state,
   const symbol_exprt &lhs,
+  const exprt &full_lhs,
   const exprt &rhs,
   guardt &guard,
   visibilityt visibility)
@@ -286,7 +290,7 @@ void basic_symext::symex_assign_symbol(
   // do the assignment
   target.assignment(
     tmp_guard,
-    new_lhs, original_lhs,
+    new_lhs, original_lhs, full_lhs,
     new_rhs, 
     state.source,
     symex_targett::STATE);
@@ -307,6 +311,7 @@ Function: basic_symext::symex_assign_typecast
 void basic_symext::symex_assign_typecast(
   statet &state,
   const typecast_exprt &lhs,
+  const exprt &full_lhs,
   const exprt &rhs,
   guardt &guard,
   visibilityt visibility)
@@ -319,7 +324,7 @@ void basic_symext::symex_assign_typecast(
   
   rhs_typecasted.make_typecast(lhs.op0().type());
   
-  symex_assign_rec(state, lhs.op0(), rhs_typecasted, guard, visibility);
+  symex_assign_rec(state, lhs.op0(), full_lhs, rhs_typecasted, guard, visibility);
 }
 
 /*******************************************************************\
@@ -337,6 +342,7 @@ Function: basic_symext::symex_assign_array
 void basic_symext::symex_assign_array(
   statet &state,
   const index_exprt &lhs,
+  const exprt &full_lhs,
   const exprt &rhs,
   guardt &guard,
   visibilityt visibility)
@@ -364,7 +370,7 @@ void basic_symext::symex_assign_array(
   exprt new_rhs(ID_with, lhs_type);
   new_rhs.copy_to_operands(lhs_array, lhs_index, rhs);
 
-  symex_assign_rec(state, lhs_array, new_rhs, guard, visibility);
+  symex_assign_rec(state, lhs_array, full_lhs, new_rhs, guard, visibility);
 }
 
 /*******************************************************************\
@@ -382,6 +388,7 @@ Function: basic_symext::symex_assign_member
 void basic_symext::symex_assign_member(
   statet &state,
   const member_exprt &lhs,
+  const exprt &full_lhs,
   const exprt &rhs,
   guardt &guard,
   visibilityt visibility)
@@ -434,7 +441,7 @@ void basic_symext::symex_assign_member(
   new_rhs.copy_to_operands(lhs_struct, exprt(ID_member_name), rhs);
   new_rhs.op1().set(ID_component_name, component_name);
 
-  symex_assign_rec(state, lhs_struct, new_rhs, guard, visibility);
+  symex_assign_rec(state, lhs_struct, full_lhs, new_rhs, guard, visibility);
 }
 
 /*******************************************************************\
@@ -452,6 +459,7 @@ Function: basic_symext::symex_assign_if
 void basic_symext::symex_assign_if(
   statet &state,
   const if_exprt &lhs,
+  const exprt &full_lhs,
   const exprt &rhs,
   guardt &guard,
   visibilityt visibility)
@@ -467,14 +475,16 @@ void basic_symext::symex_assign_if(
   if(!renamed_guard.is_false())  
   {
     guard.add(renamed_guard);
-    symex_assign_rec(state, lhs.true_case(), rhs, guard, visibility);
+    // should also change full_lhs
+    symex_assign_rec(state, lhs.true_case(), full_lhs, rhs, guard, visibility);
     guard.resize(old_guard_size);
   }
    
   if(!renamed_guard.is_true())
   { 
     guard.add(gen_not(renamed_guard));
-    symex_assign_rec(state, lhs.false_case(), rhs, guard, visibility);
+    // should also change full_lhs
+    symex_assign_rec(state, lhs.false_case(), full_lhs, rhs, guard, visibility);
     guard.resize(old_guard_size);
   }
 }
@@ -494,6 +504,7 @@ Function: basic_symext::symex_assign_byte_extract
 void basic_symext::symex_assign_byte_extract(
   statet &state,
   const exprt &lhs,
+  const exprt &full_lhs,
   const exprt &rhs,
   guardt &guard,
   visibilityt visibility)
@@ -507,16 +518,16 @@ void basic_symext::symex_assign_byte_extract(
   exprt new_rhs;
 
   if(lhs.id()==ID_byte_extract_little_endian)
-    new_rhs.id("byte_update_little_endian");
+    new_rhs.id(ID_byte_update_little_endian);
   else if(lhs.id()==ID_byte_extract_big_endian)
-    new_rhs.id("byte_update_big_endian");
+    new_rhs.id(ID_byte_update_big_endian);
   else
     assert(false);
 
   new_rhs.copy_to_operands(lhs.op0(), lhs.op1(), rhs);
   new_rhs.type()=lhs.op0().type();
 
-  symex_assign_rec(state, lhs.op0(), new_rhs, guard, visibility);
+  symex_assign_rec(state, lhs.op0(), full_lhs, new_rhs, guard, visibility);
 }
 
 /*******************************************************************\

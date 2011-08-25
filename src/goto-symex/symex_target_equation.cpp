@@ -33,6 +33,7 @@ void symex_target_equationt::assignment(
   const guardt &guard,
   const symbol_exprt &ssa_lhs,
   const symbol_exprt &original_lhs_object,
+  const exprt &full_lhs,
   const exprt &ssa_rhs,
   const sourcet &source,
   assignment_typet assignment_type)
@@ -45,6 +46,7 @@ void symex_target_equationt::assignment(
   SSA_step.guard_expr=guard.as_expr();
   SSA_step.ssa_lhs=ssa_lhs;
   SSA_step.original_lhs_object=original_lhs_object;
+  SSA_step.full_lhs=full_lhs;
   SSA_step.ssa_rhs=ssa_rhs;
   SSA_step.assignment_type=assignment_type;
 
@@ -73,8 +75,6 @@ void symex_target_equationt::location(
   SSA_stept &SSA_step=SSA_steps.back();
   
   SSA_step.guard_expr=guard.as_expr();
-  SSA_step.ssa_lhs.make_nil();
-  SSA_step.original_lhs_object.make_nil();
   SSA_step.type=goto_trace_stept::LOCATION;
   SSA_step.source=source;
 }
@@ -101,8 +101,6 @@ void symex_target_equationt::output(
   SSA_stept &SSA_step=SSA_steps.back();
   
   SSA_step.guard_expr=guard.as_expr();
-  SSA_step.ssa_lhs.make_nil();
-  SSA_step.original_lhs_object.make_nil();
   SSA_step.type=goto_trace_stept::OUTPUT;
   SSA_step.source=source;
   SSA_step.io_args=args;
@@ -132,8 +130,6 @@ void symex_target_equationt::output_fmt(
   SSA_stept &SSA_step=SSA_steps.back();
   
   SSA_step.guard_expr=guard.as_expr();
-  SSA_step.ssa_lhs.make_nil();
-  SSA_step.original_lhs_object.make_nil();
   SSA_step.type=goto_trace_stept::OUTPUT;
   SSA_step.source=source;
   SSA_step.io_args=args;
@@ -164,8 +160,6 @@ void symex_target_equationt::input(
   SSA_stept &SSA_step=SSA_steps.back();
   
   SSA_step.guard_expr=guard.as_expr();
-  SSA_step.ssa_lhs.make_nil();
-  SSA_step.original_lhs_object.make_nil();
   SSA_step.type=goto_trace_stept::INPUT;
   SSA_step.source=source;
   SSA_step.io_args=args;
@@ -193,8 +187,6 @@ void symex_target_equationt::assumption(
   SSA_stept &SSA_step=SSA_steps.back();
   
   SSA_step.guard_expr=guard.as_expr();
-  SSA_step.ssa_lhs.make_nil();
-  SSA_step.original_lhs_object.make_nil();
   SSA_step.cond_expr=cond;
   SSA_step.type=goto_trace_stept::ASSUME;
   SSA_step.source=source;
@@ -222,8 +214,6 @@ void symex_target_equationt::assertion(
   SSA_stept &SSA_step=SSA_steps.back();
   
   SSA_step.guard_expr=guard.as_expr();
-  SSA_step.ssa_lhs.make_nil();
-  SSA_step.original_lhs_object.make_nil();
   SSA_step.cond_expr=cond;
   SSA_step.type=goto_trace_stept::ASSERT;
   SSA_step.source=source;

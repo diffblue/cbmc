@@ -63,12 +63,12 @@ public:
   // the object being assigned
   symbol_exprt lhs_object;
   
-  // A constant with the new value of the object
-  exprt value;
-  
   // the full, original lhs expression
   exprt full_lhs;
 
+  // A constant with the new value of the object
+  exprt value;
+  
   // for INPUT/OUTPUT
   irep_idt format_string, io_id;
   typedef std::list<exprt> io_argst;

@@ -28,8 +28,9 @@ public:
   // assignment to a variable - lhs must be symbol
   virtual void assignment(
     const guardt &guard,
-    const symbol_exprt &lhs,
+    const symbol_exprt &ssa_lhs,
     const symbol_exprt &original_lhs,
+    const exprt &full_lhs,
     const exprt &ssa_rhs,
     const sourcet &source,
     assignment_typet assignment_type);
@@ -100,6 +101,7 @@ public:
 
     // for ASSIGNMENT  
     symbol_exprt ssa_lhs, original_lhs_object;
+    exprt full_lhs;
     exprt ssa_rhs;
     assignment_typet assignment_type;
     
@@ -119,6 +121,10 @@ public:
     
     SSA_stept():
       guard_expr(static_cast<const exprt &>(get_nil_irep())),
+      ssa_lhs(static_cast<const symbol_exprt &>(get_nil_irep())),
+      original_lhs_object(static_cast<const symbol_exprt &>(get_nil_irep())),
+      full_lhs(static_cast<const exprt &>(get_nil_irep())),
+      ssa_rhs(static_cast<const exprt &>(get_nil_irep())),
       cond_expr(static_cast<const exprt &>(get_nil_irep())),
       formatted(false),
       ignore(false)

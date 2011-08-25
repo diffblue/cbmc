@@ -57,13 +57,13 @@ protected:
   
   typedef enum { VISIBLE, HIDDEN } visibilityt;
   
-  void symex_assign_rec(statet &state, const exprt &lhs, const exprt &rhs, guardt &guard, visibilityt visibility);
-  void symex_assign_symbol(statet &state, const symbol_exprt &lhs, const exprt &rhs, guardt &guard, visibilityt visibility);
-  void symex_assign_typecast(statet &state, const typecast_exprt &lhs, const exprt &rhs, guardt &guard, visibilityt visibility);
-  void symex_assign_array(statet &state, const index_exprt &lhs, const exprt &rhs, guardt &guard, visibilityt visibility);
-  void symex_assign_member(statet &state, const member_exprt &lhs, const exprt &rhs, guardt &guard, visibilityt visibility);
-  void symex_assign_if(statet &state, const if_exprt &lhs, const exprt &rhs, guardt &guard, visibilityt visibility);
-  void symex_assign_byte_extract(statet &state, const exprt &lhs, const exprt &rhs, guardt &guard, visibilityt visibility);
+  void symex_assign_rec(statet &state, const exprt &lhs, const exprt &full_lhs, const exprt &rhs, guardt &guard, visibilityt visibility);
+  void symex_assign_symbol(statet &state, const symbol_exprt &lhs, const exprt &full_lhs, const exprt &rhs, guardt &guard, visibilityt visibility);
+  void symex_assign_typecast(statet &state, const typecast_exprt &lhs, const exprt &full_lhs, const exprt &rhs, guardt &guard, visibilityt visibility);
+  void symex_assign_array(statet &state, const index_exprt &lhs, const exprt &full_lhs, const exprt &rhs, guardt &guard, visibilityt visibility);
+  void symex_assign_member(statet &state, const member_exprt &lhs, const exprt &full_lhs, const exprt &rhs, guardt &guard, visibilityt visibility);
+  void symex_assign_if(statet &state, const if_exprt &lhs, const exprt &full_lhs, const exprt &rhs, guardt &guard, visibilityt visibility);
+  void symex_assign_byte_extract(statet &state, const exprt &lhs, const exprt &full_lhs, const exprt &rhs, guardt &guard, visibilityt visibility);
   
   virtual void symex_malloc        (statet &state, const exprt &lhs, const side_effect_exprt &code);
   virtual void symex_cpp_delete    (statet &state, const codet &code);
