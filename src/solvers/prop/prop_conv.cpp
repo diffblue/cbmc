@@ -596,10 +596,6 @@ Function: prop_convt::get
 
 exprt prop_convt::get(const exprt &expr) const
 {
-  exprt dest;
-
-  dest.make_nil();
-
   tvt value;
 
   if(expr.type().id()==ID_bool &&
@@ -607,13 +603,21 @@ exprt prop_convt::get(const exprt &expr) const
   {
     switch(value.get_value())
     {
-     case tvt::TV_TRUE:  dest.make_true(); return dest;
-     case tvt::TV_FALSE: dest.make_false(); return dest;
-     case tvt::TV_UNKNOWN: dest.make_false(); return dest; // default
+     case tvt::TV_TRUE:  return true_exprt();
+     case tvt::TV_FALSE: return false_exprt();
+     case tvt::TV_UNKNOWN: return false_exprt(); // default
     }
   }
+  
+  exprt tmp=expr;
+  
+  Forall_operands(it, tmp)
+  {
+    exprt tmp_op=get(*it);
+    it->swap(tmp_op);
+  }
 
-  return dest;
+  return tmp;
 }
 
 /*******************************************************************\
