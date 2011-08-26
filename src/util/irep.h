@@ -89,15 +89,15 @@ public:
 
   inline irept &operator=(const irept &irep)
   {
-    assert(&irep!=this); // check if we assign to ourselves
-
     #ifdef IREP_DEBUG
     std::cout << "ASSIGN\n";
     #endif
 
+    // Ordering is important here!
+    // Consider self-assignment!
+    if(irep.data!=NULL) irep.data->ref_count++;
     remove_ref(data);
     data=irep.data;
-    if(data!=NULL) data->ref_count++;
     return *this;
   }
 
