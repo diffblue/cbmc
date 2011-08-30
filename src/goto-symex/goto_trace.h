@@ -66,7 +66,7 @@ public:
   exprt full_lhs;
 
   // A constant with the new value of the object
-  exprt value;
+  exprt lhs_object_value;
   
   // for INPUT/OUTPUT
   irep_idt format_string, io_id;
@@ -86,7 +86,7 @@ public:
     formatted(false)
   {
     lhs_object.make_nil();
-    value.make_nil();
+    lhs_object_value.make_nil();
     full_lhs.make_nil();
     cond_expr.make_nil();
   }

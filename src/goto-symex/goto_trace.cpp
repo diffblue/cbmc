@@ -97,7 +97,7 @@ void goto_trace_stept::output(
   {
     irep_idt identifier=lhs_object.get_identifier();
     out << "  " << identifier
-        << " = " << from_expr(ns, identifier, value)
+        << " = " << from_expr(ns, identifier, lhs_object_value)
         << std::endl;
   }
   else if(pc->is_assert())
@@ -271,7 +271,7 @@ void show_goto_trace_gui(
     else if(it->type==goto_trace_stept::ASSIGNMENT)
     {
       irep_idt identifier=it->lhs_object.get_identifier();
-      std::string value_string=from_expr(ns, identifier, it->value);
+      std::string value_string=from_expr(ns, identifier, it->lhs_object_value);
       
       const symbolt *symbol;
       irep_idt base_name;
@@ -282,7 +282,7 @@ void show_goto_trace_gui(
 
       out << identifier << ","
           << base_name << ","
-          << it->value.type().to_string() << ","
+          << it->lhs_object_value.type().to_string() << ","
           << value_string << std::endl
           << it->step_nr << std::endl
           << it->pc->location.get_file() << std::endl
@@ -404,7 +404,7 @@ void show_goto_trace(
           show_state_header(out, *it, it->pc->location, it->step_nr);
         }
 
-        counterexample_value(out, ns, it->lhs_object, it->value);
+        counterexample_value(out, ns, it->lhs_object, it->lhs_object_value);
       }
       break;
 

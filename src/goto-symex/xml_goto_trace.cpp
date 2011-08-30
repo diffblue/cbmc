@@ -180,11 +180,11 @@ void convert(
 
         std::string value_string, binary_string, type_string;
         
-        if(it->value.is_not_nil())
-          value_string=from_expr(ns, identifier, it->value);
+        if(it->lhs_object_value.is_not_nil())
+          value_string=from_expr(ns, identifier, it->lhs_object_value);
 
-        if(it->value.type().is_not_nil())
-          type_string=from_type(ns, identifier, it->value.type());
+        if(it->lhs_object_value.type().is_not_nil())
+          type_string=from_type(ns, identifier, it->lhs_object_value.type());
 
         const symbolt *symbol;
         irep_idt base_name, display_name;
@@ -207,8 +207,8 @@ void convert(
         xml_assignment.new_element("type").data=id2string(type_string);
         xml_assignment.new_element("step_nr").data=i2string(it->step_nr);
 
-        if(it->value.is_not_nil())
-          xml_assignment.new_element("value_expression").new_element(convert(it->value, ns));
+        if(it->lhs_object_value.is_not_nil())
+          xml_assignment.new_element("value_expression").new_element(convert(it->lhs_object_value, ns));
       }
       break;
       

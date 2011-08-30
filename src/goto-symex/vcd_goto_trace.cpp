@@ -182,16 +182,16 @@ void output_vcd(
         // booleans are special in VCD
         if(type.id()==ID_bool)
         {
-          if(it->value.is_true())
+          if(it->lhs_object_value.is_true())
             out << "1" << "V" << number << std::endl;
-          else if(it->value.is_false())
+          else if(it->lhs_object_value.is_false())
             out << "0" << "V" << number << std::endl;
           else
             out << "x" << "V" << number << std::endl;
         }
         else
         {
-          std::string binary=as_vcd_binary(it->value, ns);
+          std::string binary=as_vcd_binary(it->lhs_object_value, ns);
 
           if(binary!="")
             out << "b" << binary << " V" << number << " " << std::endl;
