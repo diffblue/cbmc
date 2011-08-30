@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_CBMC_PRETTY_NAMES_H
 #define CPROVER_CBMC_PRETTY_NAMES_H
 
+// THIS FILE WILL GO AWAY
+
 #include <set>
 #include <map>
 
