@@ -130,11 +130,6 @@ void show_goto_trace(
   const namespacet &ns,
   const goto_tracet &goto_trace);
 
-void show_goto_trace(
-  std::ostream &out,
-  const namespacet &ns,
-  const goto_tracet &goto_trace);
-  
 void counterexample_value(
   std::ostream &out,
   const namespacet &ns,
