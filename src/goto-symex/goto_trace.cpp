@@ -10,6 +10,8 @@ Author: Daniel Kroening
 
 #include <assert.h>
 
+#include <arith_tools.h>
+
 #include <ansi-c/printf_formatter.h>
 #include <langapi/language_util.h>
 
@@ -120,7 +122,7 @@ void goto_trace_stept::output(
 
 /*******************************************************************\
 
-Function: counterexample_value
+Function: counterexample_value_binary
 
   Inputs:
 
@@ -200,12 +202,13 @@ Function: counterexample_value
 void counterexample_value(
   std::ostream &out,
   const namespacet &ns,
-  const exprt &lhs,
+  const symbol_exprt &lhs_object,
+  const exprt &full_lhs,
   const exprt &value)
 {
-  const irep_idt &identifier=lhs.get(ID_identifier);
+  const irep_idt &identifier=lhs_object.get_identifier();
   std::string value_string;
-
+  
   if(value.is_nil())
     value_string="(assignment removed)";
   else
@@ -216,19 +219,9 @@ void counterexample_value(
     value_string+=" ("+counterexample_value_binary(value, ns)+")";
   }
 
-  #if 1  
-  std::string name=id2string(identifier);
-  
-  const symbolt *symbol;
-  if(!ns.lookup(identifier, symbol))
-    if(symbol->pretty_name!="")
-      name=id2string(symbol->pretty_name);
-      
-  #else
-  std::string name=pretty_names.pretty_name(identifier)
-  #endif
-  
-  out << "  " << name << "=" << value_string
+  out << "  "
+      << from_expr(ns, identifier, full_lhs)
+      << "=" << value_string
       << std::endl;
 }
 
@@ -404,7 +397,11 @@ void show_goto_trace(
           show_state_header(out, *it, it->pc->location, it->step_nr);
         }
 
-        counterexample_value(out, ns, it->lhs_object, it->lhs_object_value);
+        #if 0
+        counterexample_value(out, ns, it->lhs_object, it->full_lhs, it->full_lhs_value);
+        #else
+        counterexample_value(out, ns, it->lhs_object, it->lhs_object, it->lhs_object_value);
+        #endif
       }
       break;
 

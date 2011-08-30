@@ -33,7 +33,8 @@ void symex_target_equationt::assignment(
   const guardt &guard,
   const symbol_exprt &ssa_lhs,
   const symbol_exprt &original_lhs_object,
-  const exprt &full_lhs,
+  const exprt &ssa_full_lhs,
+  const exprt &original_full_lhs,
   const exprt &ssa_rhs,
   const sourcet &source,
   assignment_typet assignment_type)
@@ -46,7 +47,8 @@ void symex_target_equationt::assignment(
   SSA_step.guard_expr=guard.as_expr();
   SSA_step.ssa_lhs=ssa_lhs;
   SSA_step.original_lhs_object=original_lhs_object;
-  SSA_step.full_lhs=full_lhs;
+  SSA_step.ssa_full_lhs=ssa_full_lhs;
+  SSA_step.original_full_lhs=original_full_lhs;
   SSA_step.ssa_rhs=ssa_rhs;
   SSA_step.assignment_type=assignment_type;
 

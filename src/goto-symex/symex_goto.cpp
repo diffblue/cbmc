@@ -141,7 +141,7 @@ void goto_symext::symex_goto(statet &state)
 
       target.assignment(
         guard,
-        new_lhs, guard_symbol_expr, guard_symbol_expr,
+        new_lhs, guard_symbol_expr, new_lhs, guard_symbol_expr,
         new_rhs,
         state.source,
         symex_targett::HIDDEN);
@@ -346,7 +346,7 @@ void goto_symext::phi_function(
 
     target.assignment(
       true_guard,
-      new_lhs, lhs, lhs,
+      new_lhs, lhs, new_lhs, lhs,
       rhs,
       dest_state.source,
       symex_targett::HIDDEN);
