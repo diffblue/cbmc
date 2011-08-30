@@ -201,8 +201,7 @@ void counterexample_value(
   std::ostream &out,
   const namespacet &ns,
   const exprt &lhs,
-  const exprt &value,
-  const pretty_namest &pretty_names)
+  const exprt &value)
 {
   const irep_idt &identifier=lhs.get(ID_identifier);
   std::string value_string;
@@ -360,38 +359,6 @@ void show_goto_trace(
   const namespacet &ns,
   const goto_tracet &goto_trace)
 {
-  pretty_namest pretty_names;
-
-  {
-    pretty_namest::symbolst pretty_symbols;
-
-    forall_symbols(it, ns.get_context().symbols)
-      pretty_symbols.insert(it->first);
-
-    pretty_names.get_pretty_names(pretty_symbols, ns);
-  }
-  
-  show_goto_trace(out, ns, pretty_names, goto_trace);
-}
-
-/*******************************************************************\
-
-Function: show_goto_trace
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void show_goto_trace(
-  std::ostream &out,
-  const namespacet &ns,
-  const pretty_namest &pretty_names,
-  const goto_tracet &goto_trace)
-{
   unsigned prev_step_nr=0;
   bool first_step=true;
 
@@ -437,8 +404,7 @@ void show_goto_trace(
           show_state_header(out, *it, it->pc->location, it->step_nr);
         }
 
-        counterexample_value(out, ns, it->lhs_object,
-                             it->value, pretty_names);
+        counterexample_value(out, ns, it->lhs_object, it->value);
       }
       break;
 

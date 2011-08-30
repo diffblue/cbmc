@@ -21,7 +21,6 @@ Date: July 2005
 #include <iostream>
 #include <vector>
 
-#include <pretty_names.h>
 #include <std_expr.h>
 
 #include <goto-programs/goto_program.h>
@@ -134,15 +133,13 @@ void show_goto_trace(
 void show_goto_trace(
   std::ostream &out,
   const namespacet &ns,
-  const pretty_namest &pretty_names,
   const goto_tracet &goto_trace);
   
 void counterexample_value(
   std::ostream &out,
   const namespacet &ns,
   const irep_idt &identifier,
-  const exprt &value,
-  const pretty_namest &pretty_names);
+  const exprt &value);
 
 std::string counterexample_value_binary(
   const exprt &expr,
