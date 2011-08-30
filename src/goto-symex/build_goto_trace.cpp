@@ -63,7 +63,7 @@ void build_goto_trace(
     goto_trace_step.formatted=SSA_step.formatted;
     
     if(SSA_step.ssa_lhs.is_not_nil())
-      goto_trace_step.value=prop_conv.get(SSA_step.ssa_lhs);
+      goto_trace_step.lhs_object_value=prop_conv.get(SSA_step.ssa_lhs);
     
     for(std::list<exprt>::const_iterator
         j=SSA_step.converted_io_args.begin();
