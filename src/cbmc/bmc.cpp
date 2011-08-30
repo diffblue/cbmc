@@ -63,7 +63,7 @@ void bmc_baset::error_trace(const prop_convt &prop_conv)
   status("Building error trace");
 
   goto_tracet goto_trace;
-  build_goto_trace(equation, prop_conv, goto_trace);
+  build_goto_trace(equation, prop_conv, ns, goto_trace);
   
   #if 0
   if(options.get_option("vcd")!="")
