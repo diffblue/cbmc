@@ -121,7 +121,7 @@ void goto_symext::argument_assignments(
       }
       
       guardt guard;
-      symex_assign_symbol(state, lhs, lhs, rhs, guard, VISIBLE);
+      symex_assign_symbol(state, lhs, nil_exprt(), rhs, guard, VISIBLE);
     }
 
     it1++;

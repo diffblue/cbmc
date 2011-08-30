@@ -65,6 +65,8 @@ protected:
   void symex_assign_if(statet &state, const if_exprt &lhs, const exprt &full_lhs, const exprt &rhs, guardt &guard, visibilityt visibility);
   void symex_assign_byte_extract(statet &state, const exprt &lhs, const exprt &full_lhs, const exprt &rhs, guardt &guard, visibilityt visibility);
   
+  static exprt add_to_lhs(const exprt &lhs, const exprt &what);
+  
   virtual void symex_malloc        (statet &state, const exprt &lhs, const side_effect_exprt &code);
   virtual void symex_cpp_delete    (statet &state, const codet &code);
   virtual void symex_cpp_new       (statet &state, const exprt &lhs, const side_effect_exprt &code);

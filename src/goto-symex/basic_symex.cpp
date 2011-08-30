@@ -74,7 +74,7 @@ void basic_symext::symex(statet &state, const codet &code)
     read(new_lhs);
 
     guardt guard; // NOT the state guard!
-    symex_assign_rec(state, new_lhs, new_lhs, rhs, guard, VISIBLE);
+    symex_assign_rec(state, new_lhs, nil_exprt(), rhs, guard, VISIBLE);
   }
   else if(statement==ID_expression)
   {
@@ -177,7 +177,7 @@ void basic_symext::symex_assign(
   else
   {
     guardt guard; // NOT the state guard!
-    symex_assign_rec(state, lhs, lhs, rhs, guard, VISIBLE);
+    symex_assign_rec(state, lhs, nil_exprt(), rhs, guard, VISIBLE);
   }
 }
 
@@ -195,6 +195,46 @@ Function: basic_symext::read
 
 void basic_symext::read(exprt &expr)
 {
+}
+
+/*******************************************************************\
+
+Function: basic_symext::symex_assign_rec
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+exprt basic_symext::add_to_lhs(
+  const exprt &lhs,
+  const exprt &what)
+{
+  assert(lhs.id()!=ID_symbol);
+  exprt tmp_what=what;
+
+  if(tmp_what.id()!=ID_symbol)
+  {
+    assert(tmp_what.operands().size()>=1);
+    tmp_what.op0().make_nil();
+  }
+
+  exprt new_lhs=lhs;
+
+  exprt *p=&new_lhs;
+
+  while(p->is_not_nil())
+  {
+    assert(p->id()!=ID_symbol);
+    assert(p->operands().size()>=1);
+    p=&p->op0();
+  }
+
+  *p=tmp_what;
+  return new_lhs;
 }
 
 /*******************************************************************\
@@ -262,27 +302,32 @@ void basic_symext::symex_assign_symbol(
   guardt &guard,
   visibilityt visibility)
 {
-  exprt new_rhs=rhs;
+  exprt ssa_rhs=rhs;
   
   // put assignment guard into the rhs
   if(!guard.empty())
   {
-    if_exprt tmp_new_rhs;
-    tmp_new_rhs.type()=new_rhs.type();
-    tmp_new_rhs.cond()=guard.as_expr();
-    tmp_new_rhs.true_case()=new_rhs;
-    tmp_new_rhs.false_case()=lhs;
-    tmp_new_rhs.swap(new_rhs);
+    if_exprt tmp_ssa_rhs;
+    tmp_ssa_rhs.type()=ssa_rhs.type();
+    tmp_ssa_rhs.cond()=guard.as_expr();
+    tmp_ssa_rhs.true_case()=ssa_rhs;
+    tmp_ssa_rhs.false_case()=lhs;
+    tmp_ssa_rhs.swap(ssa_rhs);
   }
   
   symbol_exprt original_lhs=lhs;
   state.get_original_name(original_lhs);
   
-  state.rename(new_rhs, ns);
-  do_simplify(new_rhs);
+  state.rename(ssa_rhs, ns);
+  do_simplify(ssa_rhs);
 
-  symbol_exprt new_lhs=lhs;
-  state.assignment(new_lhs, new_rhs, ns, constant_propagation);
+  exprt ssa_full_lhs=full_lhs;
+  state.rename(ssa_full_lhs, ns);
+  
+  symbol_exprt ssa_lhs=lhs;
+  state.assignment(ssa_lhs, ssa_rhs, ns, constant_propagation);
+  
+  ssa_full_lhs=add_to_lhs(ssa_full_lhs, ssa_lhs);
 
   guardt tmp_guard(state.guard);
   tmp_guard.append(guard);
@@ -290,8 +335,9 @@ void basic_symext::symex_assign_symbol(
   // do the assignment
   target.assignment(
     tmp_guard,
-    new_lhs, original_lhs, full_lhs,
-    new_rhs, 
+    ssa_lhs, original_lhs,
+    ssa_full_lhs, add_to_lhs(full_lhs, original_lhs),
+    ssa_rhs, 
     state.source,
     symex_targett::STATE);
 }
@@ -321,10 +367,12 @@ void basic_symext::symex_assign_typecast(
   assert(lhs.operands().size()==1);
   
   exprt rhs_typecasted=rhs;
-  
   rhs_typecasted.make_typecast(lhs.op0().type());
   
-  symex_assign_rec(state, lhs.op0(), full_lhs, rhs_typecasted, guard, visibility);
+  exprt new_full_lhs=add_to_lhs(full_lhs, lhs);
+  
+  symex_assign_rec(
+    state, lhs.op0(), new_full_lhs, rhs_typecasted, guard, visibility);
 }
 
 /*******************************************************************\
@@ -354,8 +402,8 @@ void basic_symext::symex_assign_array(
   if(lhs.operands().size()!=2)
     throw "index must have two operands";
 
-  const exprt &lhs_array=lhs.op0();
-  const exprt &lhs_index=lhs.op1();
+  const exprt &lhs_array=lhs.array();
+  const exprt &lhs_index=lhs.index();
   const typet &lhs_type=ns.follow(lhs_array.type());
 
   if(lhs_type.id()!=ID_array)
@@ -369,8 +417,11 @@ void basic_symext::symex_assign_array(
 
   exprt new_rhs(ID_with, lhs_type);
   new_rhs.copy_to_operands(lhs_array, lhs_index, rhs);
+  
+  exprt new_full_lhs=add_to_lhs(full_lhs, lhs);
 
-  symex_assign_rec(state, lhs_array, full_lhs, new_rhs, guard, visibility);
+  symex_assign_rec(
+    state, lhs_array, new_full_lhs, new_rhs, guard, visibility);
 }
 
 /*******************************************************************\
@@ -440,8 +491,11 @@ void basic_symext::symex_assign_member(
   exprt new_rhs(ID_with, struct_type);
   new_rhs.copy_to_operands(lhs_struct, exprt(ID_member_name), rhs);
   new_rhs.op1().set(ID_component_name, component_name);
+  
+  exprt new_full_lhs=add_to_lhs(full_lhs, lhs);
 
-  symex_assign_rec(state, lhs_struct, full_lhs, new_rhs, guard, visibility);
+  symex_assign_rec(
+    state, lhs_struct, new_full_lhs, new_rhs, guard, visibility);
 }
 
 /*******************************************************************\
@@ -475,7 +529,6 @@ void basic_symext::symex_assign_if(
   if(!renamed_guard.is_false())  
   {
     guard.add(renamed_guard);
-    // should also change full_lhs
     symex_assign_rec(state, lhs.true_case(), full_lhs, rhs, guard, visibility);
     guard.resize(old_guard_size);
   }
@@ -483,7 +536,6 @@ void basic_symext::symex_assign_if(
   if(!renamed_guard.is_true())
   { 
     guard.add(gen_not(renamed_guard));
-    // should also change full_lhs
     symex_assign_rec(state, lhs.false_case(), full_lhs, rhs, guard, visibility);
     guard.resize(old_guard_size);
   }
@@ -526,8 +578,11 @@ void basic_symext::symex_assign_byte_extract(
 
   new_rhs.copy_to_operands(lhs.op0(), lhs.op1(), rhs);
   new_rhs.type()=lhs.op0().type();
+  
+  exprt new_full_lhs=add_to_lhs(full_lhs, lhs);
 
-  symex_assign_rec(state, lhs.op0(), full_lhs, new_rhs, guard, visibility);
+  symex_assign_rec(
+    state, lhs.op0(), new_full_lhs, new_rhs, guard, visibility);
 }
 
 /*******************************************************************\

@@ -65,8 +65,8 @@ public:
   // the full, original lhs expression
   exprt full_lhs;
 
-  // A constant with the new value of the object
-  exprt lhs_object_value;
+  // A constant with the new value
+  exprt lhs_object_value, full_lhs_value;
   
   // for INPUT/OUTPUT
   irep_idt format_string, io_id;
@@ -88,6 +88,7 @@ public:
     lhs_object.make_nil();
     lhs_object_value.make_nil();
     full_lhs.make_nil();
+    full_lhs_value.make_nil();
     cond_expr.make_nil();
   }
 };

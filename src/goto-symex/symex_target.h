@@ -43,7 +43,8 @@ public:
     const guardt &guard,
     const symbol_exprt &ssa_lhs,
     const symbol_exprt &original_lhs_object,
-    const exprt &full_lhs,
+    const exprt &ssa_full_lhs,
+    const exprt &original_full_lhs,
     const exprt &ssa_rhs,
     const sourcet &source,
     assignment_typet assignment_type)=0;
