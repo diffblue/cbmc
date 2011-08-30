@@ -27,6 +27,7 @@ Function: build_goto_trace
 void build_goto_trace(
   const symex_target_equationt &target,
   const prop_convt &prop_conv,
+  const namespacet &ns,
   goto_tracet &goto_trace)
 {
   unsigned step_nr=0;
