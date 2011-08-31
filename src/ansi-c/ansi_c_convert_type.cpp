@@ -84,6 +84,23 @@ void ansi_c_convert_typet::read_rec(const typet &type)
     int32_cnt++;
   else if(type.id()==ID_int64)
     int64_cnt++;
+  else if(type.id()==ID_gcc_attribute_mode)
+  {
+    const exprt &size_expr=
+      static_cast<const exprt &>(type.find(ID_size));
+    if(size_expr.id()=="__QI__")
+      gcc_mode_QI=true;
+    else if(size_expr.id()=="__HI__")
+      gcc_mode_HI=true;
+    else if(size_expr.id()=="__SI__")
+      gcc_mode_SI=true;
+    else if(size_expr.id()=="__DI__")
+      gcc_mode_DI=true;
+    else
+    {
+      // we ignore without whining
+    }
+  }
   else if(type.id()==ID_bv)
   {
     bv_cnt++;
@@ -280,8 +297,21 @@ void ansi_c_convert_typet::write(typet &type)
     // get width
 
     unsigned width;
-
-    if(int8_cnt || int16_cnt || int32_cnt || int64_cnt || bv_cnt)
+    
+    if(gcc_mode_QI || gcc_mode_HI || gcc_mode_SI || gcc_mode_DI)
+    {
+      if(gcc_mode_QI)
+        width=1*8;
+      else if(gcc_mode_HI)
+        width=2*8;
+      else if(gcc_mode_SI)
+        width=4*8;
+      else if(gcc_mode_DI)
+        width=8*8;
+      else
+        assert(false);
+    }
+    else if(int8_cnt || int16_cnt || int32_cnt || int64_cnt || bv_cnt)
     {
       if(long_cnt || char_cnt || short_cnt)
       {
