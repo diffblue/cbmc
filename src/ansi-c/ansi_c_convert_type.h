@@ -27,6 +27,7 @@ public:
   unsigned int8_cnt, int16_cnt, int32_cnt, int64_cnt,
            ptr32_cnt, ptr64_cnt,
            bv_cnt, bv_width;
+  bool gcc_mode_QI, gcc_mode_HI, gcc_mode_SI, gcc_mode_DI;
            
   bool transparent_union, packed, aligned;
   exprt vector_size, alignment;
@@ -59,6 +60,7 @@ public:
     vector_size.make_nil();
     alignment.make_nil();
     bv_width=0;
+    gcc_mode_QI=gcc_mode_HI=gcc_mode_SI=gcc_mode_DI=false;
     
     packed=aligned=transparent_union=false;
 
