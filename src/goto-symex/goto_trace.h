@@ -74,6 +74,8 @@ public:
   io_argst io_args;
   bool formatted;
 
+  /*! \brief outputs the trace step in ASCII to a given stream
+  */
   void output(
     const class namespacet &ns,
     std::ostream &out) const;
@@ -110,6 +112,8 @@ public:
     steps.clear();
   }
   
+  /*! \brief outputs the trace in ASCII to a given stream
+  */
   void output(
     const class namespacet &ns,
     std::ostream &out) const;
@@ -130,15 +134,5 @@ void show_goto_trace(
   std::ostream &out,
   const namespacet &ns,
   const goto_tracet &goto_trace);
-
-void counterexample_value(
-  std::ostream &out,
-  const namespacet &ns,
-  const irep_idt &identifier,
-  const exprt &value);
-
-std::string counterexample_value_binary(
-  const exprt &expr,
-  const namespacet &ns);
 
 #endif
