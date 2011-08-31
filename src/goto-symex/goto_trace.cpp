@@ -347,6 +347,18 @@ Function: show_goto_trace
 
 \*******************************************************************/
 
+bool is_index_member_symbol(const exprt &src)
+{
+  if(src.id()==ID_index)
+    return is_index_member_symbol(src.op0());
+  else if(src.id()==ID_member)
+    return is_index_member_symbol(src.op0());
+  else if(src.id()==ID_symbol)
+    return true;
+  else
+    return false;
+}
+
 void show_goto_trace(
   std::ostream &out,
   const namespacet &ns,
@@ -397,11 +409,11 @@ void show_goto_trace(
           show_state_header(out, *it, it->pc->location, it->step_nr);
         }
 
-        #if 0
-        counterexample_value(out, ns, it->lhs_object, it->full_lhs, it->full_lhs_value);
-        #else
-        counterexample_value(out, ns, it->lhs_object, it->lhs_object, it->lhs_object_value);
-        #endif
+        // see if the full lhs is something clean
+        if(is_index_member_symbol(it->full_lhs))
+          counterexample_value(out, ns, it->lhs_object, it->full_lhs, it->full_lhs_value);
+        else
+          counterexample_value(out, ns, it->lhs_object, it->lhs_object, it->lhs_object_value);
       }
       break;
 
