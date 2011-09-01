@@ -212,13 +212,17 @@ bool goto_symex_statet::constant_propagation(const exprt &expr) const
 
     return true;
   }
+  else if(expr.id()==ID_array)
+  {
+    forall_operands(it, expr)
+      if(!constant_propagation(*it))
+        return false;
+        
+    return true;
+  }
   else if(expr.id()==ID_array_of)
   {
-    /* This is slow
-    if(expr.operands().size()==1)
-      return constant_propagation(expr.op0());
-    */
-    return false;
+    return constant_propagation(expr.op0());
   }
   else if(expr.id()==ID_with)
   {
@@ -506,7 +510,7 @@ void goto_symex_statet::level2t::rename(exprt &expr)
   if(expr.id()==ID_symbol)
   {
     const irep_idt &identifier=expr.get(ID_identifier);
-
+    
     // first see if it's already an l2 name
 
     if(original_identifiers.find(identifier)!=
