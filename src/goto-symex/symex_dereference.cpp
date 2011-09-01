@@ -216,7 +216,10 @@ void goto_symext::dereference(
   statet &state,
   const bool write)
 {
-  // needs to be renamed to level 1
+  // The expression needs to be renamed to level 1
+  // in order to distinguish addresses of local variables
+  // from different frames. Would be enough to rename
+  // symbols whose address is taken.
   assert(!state.call_stack.empty());
   state.top().level1.rename(expr);
 
