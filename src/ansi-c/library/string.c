@@ -221,6 +221,7 @@ inline int strcmp(const char *s1, const char *s2)
   __CPROVER_assert(__CPROVER_is_zero_string(s1), "strcmp zero-termination of 1st argument");
   __CPROVER_assert(__CPROVER_is_zero_string(s2), "strcmp zero-termination of 2nd argument");
   if(__CPROVER_zero_string_length(s1) != __CPROVER_zero_string_length(s2)) __CPROVER_assume(retval!=0);
+  return retval;
   #else
   __CPROVER_size_t i=0;
   unsigned char ch1, ch2;
@@ -240,8 +241,8 @@ inline int strcmp(const char *s1, const char *s2)
     i++;
   }
   while(ch1!=0 && ch2!=0);
+  return 0;
   #endif
-  return retval;
 }
 
 /* FUNCTION: strncmp */
@@ -261,6 +262,25 @@ inline int strncmp(const char *s1, const char *s2, size_t n)
   __CPROVER_assert(__CPROVER_is_zero_string(s1) || __CPROVER_buffer_size(s1)>=n, "strncmp zero-termination of 1st argument");
   __CPROVER_assert(__CPROVER_is_zero_string(s2) || __CPROVER_buffer_size(s2)>=n, "strncmp zero-termination of 2nd argument");
   #else
+  __CPROVER_size_t i=0;
+  unsigned char ch1, ch2;
+  do
+  {
+    ch1=s1[i];
+    ch2=s2[i];
+
+    if(ch1==ch2)
+    {
+    }
+    else if(ch1<ch2)
+      return -1;
+    else
+      return 1;
+
+    i++;
+  }
+  while(ch1!=0 && ch2!=0 && i<n);
+  return 0;
   #endif
 }
 
