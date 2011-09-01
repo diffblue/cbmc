@@ -222,21 +222,24 @@ inline int strcmp(const char *s1, const char *s2)
   __CPROVER_assert(__CPROVER_is_zero_string(s2), "strcmp zero-termination of 2nd argument");
   if(__CPROVER_zero_string_length(s1) != __CPROVER_zero_string_length(s2)) __CPROVER_assume(retval!=0);
   #else
-  __CPROVER_size_t i;
+  __CPROVER_size_t i=0;
   unsigned char ch1, ch2;
-  while(1)
+  do
   {
     ch1=s1[i];
     ch2=s2[i];
+
     if(ch1==ch2)
     {
-      if(ch1==(char)0) return 0;
     }
     else if(ch1<ch2)
       return -1;
     else
       return 1;
+
+    i++;
   }
+  while(ch1!=0 && ch2!=0);
   #endif
   return retval;
 }
