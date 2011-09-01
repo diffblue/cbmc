@@ -245,6 +245,51 @@ inline int strcmp(const char *s1, const char *s2)
   #endif
 }
 
+/* FUNCTION: strcasecmp */
+
+#ifndef __CPROVER_STRING_H_INCLUDED
+#include <string.h>
+#define __CPROVER_STRING_H_INCLUDED
+#endif
+
+#undef strcasecmp
+
+inline int strcasecmp(const char *s1, const char *s2)
+{
+  __CPROVER_HIDE:;
+  int retval;
+  if(s1!=0 && s1==s2) return 0;
+  #ifdef __CPROVER_STRING_ABSTRACTION
+  __CPROVER_assert(__CPROVER_is_zero_string(s1), "strcasecmp zero-termination of 1st argument");
+  __CPROVER_assert(__CPROVER_is_zero_string(s2), "strcasecmp zero-termination of 2nd argument");
+  if(__CPROVER_zero_string_length(s1) != __CPROVER_zero_string_length(s2)) __CPROVER_assume(retval!=0);
+  return retval;
+  #else
+  __CPROVER_size_t i=0;
+  unsigned char ch1, ch2;
+  do
+  {
+    ch1=s1[i];
+    ch2=s2[i];
+    
+    if(ch1>='A' && ch1<='Z') ch1+=('a'-'A');
+    if(ch2>='A' && ch2<='Z') ch2+=('a'-'A');
+
+    if(ch1==ch2)
+    {
+    }
+    else if(ch1<ch2)
+      return -1;
+    else
+      return 1;
+
+    i++;
+  }
+  while(ch1!=0 && ch2!=0);
+  return 0;
+  #endif
+}
+
 /* FUNCTION: strncmp */
 
 #ifndef __CPROVER_STRING_H_INCLUDED
@@ -268,6 +313,50 @@ inline int strncmp(const char *s1, const char *s2, size_t n)
   {
     ch1=s1[i];
     ch2=s2[i];
+
+    if(ch1==ch2)
+    {
+    }
+    else if(ch1<ch2)
+      return -1;
+    else
+      return 1;
+
+    i++;
+  }
+  while(ch1!=0 && ch2!=0 && i<n);
+  return 0;
+  #endif
+}
+
+/* FUNCTION: strncasecmp */
+
+#ifndef __CPROVER_STRING_H_INCLUDED
+#include <string.h>
+#define __CPROVER_STRING_H_INCLUDED
+#endif
+
+#undef strncasecmp
+
+inline int strncasecmp(const char *s1, const char *s2, size_t n)
+{
+  __CPROVER_HIDE:;
+  int retval;
+  if(s1!=0 && s1==s2) return 0;
+  #ifdef __CPROVER_STRING_ABSTRACTION
+  __CPROVER_assert(__CPROVER_is_zero_string(s1), "strncasecmp zero-termination of 1st argument");
+  __CPROVER_assert(__CPROVER_is_zero_string(s2), "strncasecmp zero-termination of 2nd argument");
+  return retval;
+  #else
+  __CPROVER_size_t i=0;
+  unsigned char ch1, ch2;
+  do
+  {
+    ch1=s1[i];
+    ch2=s2[i];
+    
+    if(ch1>='A' && ch1<='Z') ch1+=('a'-'A');
+    if(ch2>='A' && ch2<='Z') ch2+=('a'-'A');
 
     if(ch1==ch2)
     {
@@ -319,13 +408,14 @@ inline size_t strlen(const char *s)
 #endif
 
 #undef strdup
+#undef strcpy
 
 inline char *strdup(const char *str)
 {
   __CPROVER_HIDE:;
   __CPROVER_size_t bufsz;
-  bufsz=(strlen(str)+1)*sizeof(char);
-  char *cpy=malloc(bufsz);
+  bufsz=(strlen(str)+1);
+  char *cpy=(char *)malloc(bufsz*sizeof(char));
   if(cpy==((void *)0)) return 0;
   #ifdef __CPROVER_STRING_ABSTRACTION
   __CPROVER_assume(__CPROVER_buffer_size(cpy)==bufsz);
