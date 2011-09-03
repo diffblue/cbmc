@@ -333,6 +333,116 @@ extern inline code_ifthenelset &to_code_ifthenelse(codet &code)
 
 /*! \brief TO_BE_DOCUMENTED
 */
+class code_whilet:public codet
+{
+public:
+  inline code_whilet():codet(ID_while)
+  {
+    operands().resize(2);
+  }
+  
+  inline const exprt &cond() const
+  {
+    return op0();
+  }
+  
+  inline exprt &cond()
+  {
+    return op0();
+  }
+  
+  inline const codet &body() const
+  {
+    return to_code(op1());
+  }
+
+  inline codet &body()
+  {
+    return static_cast<codet &>(op1());
+  }
+};
+
+extern inline const code_whilet &to_code_while(const codet &code)
+{
+  assert(code.get_statement()==ID_while &&
+         code.operands().size()==2);
+  return static_cast<const code_whilet &>(code);
+}
+
+extern inline code_whilet &to_code_while(codet &code)
+{
+  assert(code.get_statement()==ID_while &&
+         code.operands().size()==2);
+  return static_cast<code_whilet &>(code);
+}
+
+/*! \brief TO_BE_DOCUMENTED
+*/
+class code_fort:public codet
+{
+public:
+  inline code_fort():codet(ID_for)
+  {
+    operands().resize(4);
+  }
+  
+  inline const codet &init() const
+  {
+    return to_code(op0());
+  }
+
+  inline codet &init()
+  {
+    return static_cast<codet &>(op0());
+  }
+
+  inline const exprt &cond() const
+  {
+    return op1();
+  }
+  
+  inline exprt &cond()
+  {
+    return op1();
+  }
+  
+  inline const exprt &iter() const
+  {
+    return op2();
+  }
+  
+  inline exprt &iter()
+  {
+    return op2();
+  }
+  
+  inline const codet &body() const
+  {
+    return to_code(op3());
+  }
+
+  inline codet &body()
+  {
+    return static_cast<codet &>(op3());
+  }
+};
+
+extern inline const code_fort &to_code_for(const codet &code)
+{
+  assert(code.get_statement()==ID_for &&
+         code.operands().size()==4);
+  return static_cast<const code_fort &>(code);
+}
+
+extern inline code_fort &to_code_for(codet &code)
+{
+  assert(code.get_statement()==ID_for &&
+         code.operands().size()==4);
+  return static_cast<code_fort &>(code);
+}
+
+/*! \brief TO_BE_DOCUMENTED
+*/
 class code_function_callt:public codet
 {
 public:
