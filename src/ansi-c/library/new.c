@@ -34,7 +34,8 @@ inline void __delete(void *ptr)
 {
   __CPROVER_HIDE:;
   // If ptr is NULL, no operation is performed.
-  if(ptr!=NULL)
+  // This is a requirement by the standard, not generosity!
+  if(ptr!=0)
   {
     // is it dynamic?
     __CPROVER_assert(__CPROVER_DYNAMIC_OBJECT(ptr),
