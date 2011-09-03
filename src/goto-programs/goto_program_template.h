@@ -297,12 +297,12 @@ public:
     const irep_idt &identifier,
     std::ostream &out) const;
   
-  std::ostream& output(std::ostream &out) const
+  std::ostream &output(std::ostream &out) const
   {
     return output(namespacet(contextt()), "", out);
   }
   
-  virtual std::ostream& output_instruction(
+  virtual std::ostream &output_instruction(
     const namespacet &ns,
     const irep_idt &identifier,
     std::ostream &out,
