@@ -2,11 +2,13 @@
 
 inline void *__new(__typeof__(sizeof(int)) malloc_size)
 {
+  // The constructor call is done by the front-end.
+  // This just does memory allocation.
   __CPROVER_HIDE:;
   void *res;
   res=__CPROVER_malloc(malloc_size);
 
-  // make sure it's not recorded as deallocated
+  // ensure it's not recorded as deallocated
   __CPROVER_deallocated=(res==__CPROVER_deallocated)?0:__CPROVER_deallocated;
   
   // record the object size for non-determistic bounds checking
@@ -24,6 +26,7 @@ inline void *__new(__typeof__(sizeof(int)) malloc_size)
 
 inline void *__placement_new(__typeof__(sizeof(int)) malloc_size, void *p)
 {
+  // The constructor call is done by the front-end.
   __CPROVER_HIDE:;
   return p;
 }
@@ -39,17 +42,15 @@ inline void __delete(void *ptr)
   {
     // is it dynamic?
     __CPROVER_assert(__CPROVER_DYNAMIC_OBJECT(ptr),
-                     "delete argument is dynamic object");
+                     "delete argument must be dynamic object");
     __CPROVER_assert(__CPROVER_POINTER_OFFSET(ptr)==0,
-                     "delete argument has offset zero");
+                     "delete argument must have offset zero");
 
     // catch double delete
-    if(__CPROVER_deallocated==ptr)
-      __CPROVER_assert(0, "double delete");
+    __CPROVER_assert(__CPROVER_deallocated!=ptr, "double delete");
     
     // non-deterministically record as deallocated
-    _Bool record;
-    if(record) __CPROVER_deallocated=ptr;
+    __CPROVER_deallocated=record?ptr:__CPROVER_deallocated;
   }
 }
 
