@@ -834,7 +834,7 @@ std::string expr2ct::convert_statement_expression(
   if(src.operands().size()!=1)
     return convert_norep(src, precedence);
 
-  return "{"+convert_code(to_code(src.op0()), 2)+"}";
+  return "({"+convert_code(to_code(src.op0()), 0)+"})";
 }
 
 /*******************************************************************\
@@ -2195,7 +2195,7 @@ std::string expr2ct::indent_str(unsigned indent)
 
 /*******************************************************************\
 
-Function: expr2ct::convert_code_while
+Function: expr2ct::convert_code_asm
 
   Inputs:
 
@@ -2213,7 +2213,7 @@ std::string expr2ct::convert_code_asm(
   dest+="asm(";
   if(src.operands().size()==1)
     dest+=convert(src.op0());
-  dest+=");\n";
+  dest+=");";
   return dest;
 }
 
@@ -2230,7 +2230,7 @@ Function: expr2ct::convert_code_while
 \*******************************************************************/
 
 std::string expr2ct::convert_code_while(
-  const codet &src,
+  const code_whilet &src,
   unsigned indent)
 {
   if(src.operands().size()!=2)
@@ -2240,17 +2240,15 @@ std::string expr2ct::convert_code_while(
   }
 
   std::string dest=indent_str(indent);
-  dest+="while("+convert(src.op0());
+  dest+="while("+convert(src.cond());
 
-  if(src.op1().is_nil())
-    dest+=");\n";
+  if(src.body().is_nil())
+    dest+=");";
   else
   {
     dest+=")\n";
-    dest+=convert_code(to_code(src.op1()), indent+2);
+    dest+=convert_code(src.body(), indent+2);
   }
-
-  dest+="\n";
 
   return dest;
 }
@@ -2280,17 +2278,16 @@ std::string expr2ct::convert_code_dowhile(
   std::string dest=indent_str(indent);
 
   if(src.op1().is_nil())
-    dest+="do; ";
+    dest+="do;";
   else
   {
     dest+="do\n";
     dest+=convert_code(to_code(src.op1()), indent+2);
     dest+=indent_str(indent);
+    dest+="\n";
   }
 
-  dest+="while("+convert(src.op0())+");\n";
-
-  dest+="\n";
+  dest+="while("+convert(src.op0())+");";
 
   return dest;
 }
@@ -2308,7 +2305,7 @@ Function: expr2ct::convert_code_ifthenelse
 \*******************************************************************/
 
 std::string expr2ct::convert_code_ifthenelse(
-  const codet &src,
+  const code_ifthenelset &src,
   unsigned indent)
 {
   if(src.operands().size()!=3 &&
@@ -2319,25 +2316,22 @@ std::string expr2ct::convert_code_ifthenelse(
   }
 
   std::string dest=indent_str(indent);
-  dest+="if("+convert(src.op0())+")\n";
+  dest+="if("+convert(src.cond())+")\n";
 
-  if(src.op1().is_nil())
+  if(src.then_case().is_nil())
   {
     dest+=indent_str(indent+2);
     dest+=";\n";
   }
   else
-    dest+=convert_code(to_code(src.op1()), indent+2);
+    dest+=convert_code(src.then_case(), indent+2);
 
-  if(src.operands().size()==3 &&
-     !src.operands().back().is_nil())
+  if(src.operands().size()==3 && !src.else_case().is_nil())
   {
     dest+=indent_str(indent);
     dest+="else\n";
-    dest+=convert_code(to_code(src.operands().back()), indent+2);
+    dest+=convert_code(src.else_case(), indent+2);
   }
-
-  dest+="\n";
 
   return dest;
 }
@@ -2371,7 +2365,7 @@ std::string expr2ct::convert_code_return(
   if(src.operands().size()==1)
     dest+=" "+convert(src.op0());
 
-  dest+=";\n";
+  dest+=";";
 
   return dest;
 }
@@ -2395,7 +2389,7 @@ std::string expr2ct::convert_code_goto(
   std:: string dest=indent_str(indent);
   dest+="goto ";
   dest+=src.get_string(ID_destination);
-  dest+=";\n";
+  dest+=";";
 
   return dest;
 }
@@ -2418,7 +2412,7 @@ std::string expr2ct::convert_code_break(
 {
   std::string dest=indent_str(indent);
   dest+="break";
-  dest+=";\n";
+  dest+=";";
 
   return dest;
 }
@@ -2470,7 +2464,7 @@ std::string expr2ct::convert_code_switch(
   }
 
   dest+=indent_str(indent);
-  dest+="}\n";
+  dest+="}";
 
   return dest;
 }
@@ -2493,7 +2487,7 @@ std::string expr2ct::convert_code_continue(
 {
   std::string dest=indent_str(indent);
   dest+="continue";
-  dest+=";\n";
+  dest+=";";
 
   return dest;
 }
@@ -2532,7 +2526,7 @@ std::string expr2ct::convert_code_decl(
   if(src.operands().size()==2)
     dest+=" = "+convert(src.op1());
 
-  dest+=";\n";
+  dest+=";";
 
   return dest;
 }
@@ -2550,7 +2544,7 @@ Function: expr2ct::convert_code_for
 \*******************************************************************/
 
 std::string expr2ct::convert_code_for(
-  const codet &src,
+  const code_fort &src,
   unsigned indent)
 {
   if(src.operands().size()!=4)
@@ -2574,15 +2568,13 @@ std::string expr2ct::convert_code_for(
     if(i!=2) dest+=";";
   }
 
-  if(src.op3().is_nil())
+  if(src.body().is_nil())
     dest+=");\n";
   else
   {
     dest+=")\n";
-    dest+=convert_code(to_code(src.op3()), indent+2);
+    dest+=convert_code(src.body(), indent+2);
   }
-
-  dest+="\n";
 
   return dest;
 }
@@ -2600,7 +2592,7 @@ Function: expr2ct::convert_code_block
 \*******************************************************************/
 
 std::string expr2ct::convert_code_block(
-  const codet &src,
+  const code_blockt &src,
   unsigned indent)
 {
   assert(indent>=2);
@@ -2610,13 +2602,15 @@ std::string expr2ct::convert_code_block(
   forall_operands(it, src)
   {
     if(it->get(ID_statement)==ID_block)
-      dest+=convert_code_block(to_code(*it), indent+2);
+      dest+=convert_code_block(to_code_block(to_code(*it)), indent+2);
     else
       dest+=convert_code(to_code(*it), indent);
+
+    dest+="\n";
   }
 
   dest+=indent_str(indent-2);
-  dest+="}\n";
+  dest+="}";
 
   return dest;
 }
@@ -2649,8 +2643,6 @@ std::string expr2ct::convert_code_expression(
   }
 
   dest+=expr_str+";";
-
-  dest+="\n";
   return dest;
 }
 
@@ -2676,28 +2668,28 @@ std::string expr2ct::convert_code(
     return convert_code_expression(src, indent);
 
   if(statement==ID_block)
-    return convert_code_block(src, indent);
+    return convert_code_block(to_code_block(src), indent);
 
   if(statement==ID_switch)
     return convert_code_switch(src, indent);
 
   if(statement==ID_for)
-    return convert_code_for(src, indent);
+    return convert_code_for(to_code_for(src), indent);
 
   if(statement==ID_while)
-    return convert_code_while(src, indent);
+    return convert_code_while(to_code_while(src), indent);
 
   if(statement==ID_asm)
     return convert_code_asm(src, indent);
 
   if(statement==ID_skip)
-    return indent_str(indent)+";\n";
+    return indent_str(indent)+";";
 
   if(statement==ID_dowhile)
     return convert_code_dowhile(src, indent);
 
   if(statement==ID_ifthenelse)
-    return convert_code_ifthenelse(src, indent);
+    return convert_code_ifthenelse(to_code_ifthenelse(src), indent);
 
   if(statement==ID_return)
     return convert_code_return(src, indent);
@@ -2727,7 +2719,7 @@ std::string expr2ct::convert_code(
     return convert_code_decl(src, indent);
 
   if(statement==ID_assign)
-    return convert_code_assign(src, indent);
+    return convert_code_assign(to_code_assign(src), indent);
 
   if(statement==ID_init)
     return convert_code_init(src, indent);
@@ -2770,12 +2762,12 @@ Function: expr2ct::convert_code_assign
 \*******************************************************************/
 
 std::string expr2ct::convert_code_assign(
-  const codet &src,
+  const code_assignt &src,
   unsigned indent)
 {
   std::string tmp=convert_binary(src, "=", 2, true);
 
-  std::string dest=indent_str(indent)+tmp+";\n";
+  std::string dest=indent_str(indent)+tmp+";";
 
   return dest;
 }
@@ -3195,7 +3187,7 @@ Function: expr2ct::convert_code
 
 std::string expr2ct::convert_code(const codet &src)
 {
-  return convert_code(src, 2);
+  return convert_code(src, 0);
 }
 
 /*******************************************************************\
