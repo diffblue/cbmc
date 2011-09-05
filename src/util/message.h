@@ -114,31 +114,31 @@ protected:
 class messaget:public message_clientt
 {
 public:
-  messaget()
+  inline messaget()
   {
   }
    
-  messaget(message_handlert &_message_handler):
+  inline explicit messaget(message_handlert &_message_handler):
     message_clientt(_message_handler)
   {
   }
    
-  virtual void print(const std::string &message)
+  inline void print(const std::string &message)
   { print(1, message); }
 
-  void status(const std::string &message)
+  inline void status(const std::string &message)
   { print(6, message); }
   
-  void result(const std::string &message)
+  inline void result(const std::string &message)
   { print(4, message); }
    
-  void warning(const std::string &message)
+  inline void warning(const std::string &message)
   { print(2, message); }
    
-  void debug(const std::string &message)
+  inline void debug(const std::string &message)
   { print(9, message); }
    
-  void status(
+  inline void status(
     const std::string &message,
     const std::string &file)
   {
@@ -147,13 +147,13 @@ public:
     print(6, message, -1, location);
   }
    
-  void error(const std::string &message)
+  inline void error(const std::string &message)
   { print(1, message); }
 
-  void statistics(const std::string &message)
+  inline void statistics(const std::string &message)
   { print(8, message); }
 
-  void error(
+  inline void error(
     const std::string &message,
     const std::string &file)
   {
