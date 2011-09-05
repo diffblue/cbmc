@@ -14,7 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
-Function: big_endian_mapt::output
+Function: endianness_mapt::output
 
   Inputs:
 
@@ -24,7 +24,7 @@ Function: big_endian_mapt::output
 
 \*******************************************************************/
 
-void big_endian_mapt::output(std::ostream &out) const
+void endianness_mapt::output(std::ostream &out) const
 {
   for(unsigned i=0; i<map.size(); i++)
   {
@@ -35,7 +35,7 @@ void big_endian_mapt::output(std::ostream &out) const
 
 /*******************************************************************\
 
-Function: big_endian_mapt::build_rec
+Function: endianness_mapt::build_rec
 
   Inputs:
 
@@ -45,10 +45,10 @@ Function: big_endian_mapt::build_rec
 
 \*******************************************************************/
 
-void big_endian_mapt::build_rec(const typet &src)
+void endianness_mapt::build_rec(const typet &src, bool little_endian)
 {
   if(src.id()==ID_symbol)
-    build_rec(ns.follow(src));
+    build_rec(ns.follow(src), little_endian);
   else if(src.id()==ID_unsignedbv ||
           src.id()==ID_signedbv ||
           src.id()==ID_fixedbv ||
@@ -58,9 +58,13 @@ void big_endian_mapt::build_rec(const typet &src)
     mp_integer s=pointer_offset_size(ns, src); // error is -1
     unsigned s_int=integer2long(s), base=map.size();
 
-    // these do get re-ordered!
     for(unsigned i=0; i<s_int; i++)
-      map.push_back(base+s_int-i-1);
+    {
+      if(little_endian)
+        map.push_back(base+i);
+      else
+        map.push_back(base+s_int-i-1); // these do get re-ordered!
+    }
   }
   else if(src.id()==ID_struct)
   {
@@ -71,7 +75,7 @@ void big_endian_mapt::build_rec(const typet &src)
         it=struct_type.components().begin();
         it!=struct_type.components().end();
         it++)
-      build_rec(it->type());
+      build_rec(it->type(), little_endian);
   }
   else if(src.id()==ID_array)
   {
@@ -83,7 +87,7 @@ void big_endian_mapt::build_rec(const typet &src)
     {
       while(s>0)
       {
-        build_rec(array_type.subtype());
+        build_rec(array_type.subtype(), little_endian);
         --s;
       }
     }
