@@ -30,6 +30,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "../floatbv/float_utils.h"
 #endif
 
+#include "flatten_byte_operators.h"
+
 //#define DEBUG
 
 /*******************************************************************\
@@ -331,8 +333,8 @@ void boolbvt::convert_bitvector(const exprt &expr, bvt &bv)
     return;
   }
   #ifdef HAVE_FLOATBV
-  else if(expr.id()=="float_debug1" ||
-          expr.id()=="float_debug2")
+  else if(expr.id()==ID_float_debug1 ||
+          expr.id()==ID_float_debug2)
   {
     assert(expr.operands().size()==2);
     bvt bv0, bv1;
@@ -340,7 +342,7 @@ void boolbvt::convert_bitvector(const exprt &expr, bvt &bv)
     convert_bitvector(expr.op1(), bv1);
     float_utilst float_utils(prop);
     float_utils.spec=to_floatbv_type(expr.type());
-    bv=expr.id()=="float_debug1"?
+    bv=expr.id()==ID_float_debug1?
       float_utils.debug1(bv0, bv1):
       float_utils.debug2(bv0, bv1);
     return;
@@ -535,6 +537,12 @@ literalt boolbvt::convert_rest(const exprt &expr)
     std::cerr << expr << std::endl;
     throw "boolbvt::convert_rest got non-boolean operand";
   }
+  
+  // we perform some re-writing on the byte operators
+  #if 0
+  if(has_byte_operator(expr))
+    return convert_rest(flatten_byte_operators(expr, ns));
+  #endif
 
   // flatten any byte_* operators
   #if 0
