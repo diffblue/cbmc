@@ -7,6 +7,7 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <std_expr.h>
+#include <i2string.h>
 
 #include <langapi/language_util.h>
 
@@ -430,3 +431,108 @@ std::list<exprt> objects_written(
   
   return dest;
 }
+
+/*******************************************************************\
+
+Function: as_string
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+std::string as_string(
+  const class namespacet &ns,
+  const goto_programt::instructiont &i)
+{
+  std::string result;
+
+  switch(i.type)
+  {
+  case NO_INSTRUCTION_TYPE:
+    return "(NO INSTRUCTION TYPE)";
+    
+  case GOTO:
+    if(!i.guard.is_true())
+    {
+      result+="IF "
+            +from_expr(ns, i.function, i.guard)
+            +" THEN ";
+    }
+
+    result+="GOTO ";
+    
+    for(goto_programt::instructiont::targetst::const_iterator
+        gt_it=i.targets.begin();
+        gt_it!=i.targets.end();
+        gt_it++)
+    {
+      if(gt_it!=i.targets.begin()) result+=", ";
+      result+=i2string((*gt_it)->target_number);
+    }
+    return result;
+    
+  case RETURN:
+  case OTHER:
+  case DECL:
+  case DEAD:
+  case FUNCTION_CALL:
+  case ASSIGN:
+    return from_expr(ns, i.function, i.code);
+    
+  case ASSUME:
+  case ASSERT:
+    if(i.is_assume())
+      result+="ASSUME ";
+    else
+      result+="ASSERT ";
+      
+    result+=from_expr(ns, i.function, i.guard);
+
+    {
+      const irep_idt &comment=i.location.get(ID_comment);
+      if(comment!="") result+="/* "+id2string(comment)+" */";
+    }
+    return result;
+
+  case SKIP:
+    return "SKIP";
+    
+  case END_FUNCTION:
+    return "END_FUNCTION";
+    
+  case LOCATION:
+    return "LOCATION";
+    
+  case THROW:
+    return "THROW";
+    
+  case CATCH:
+    return "CATCH";
+    
+  case ATOMIC_BEGIN:
+    return "ATOMIC_BEGIN";
+    
+  case ATOMIC_END:
+    return "ATOMIC_END";
+    
+  case START_THREAD:
+    result+="START THREAD ";
+
+    if(i.targets.size()==1)
+      result+=i2string(i.targets.front()->target_number);
+    return result;
+    
+  case END_THREAD:
+    return "END THREAD";
+    
+  default:
+    throw "unknown statement";
+  }
+
+  return "";
+}
+
