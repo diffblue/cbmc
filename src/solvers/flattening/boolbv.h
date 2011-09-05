@@ -115,9 +115,6 @@ protected:
 
   virtual void convert_index(const exprt &array, const mp_integer &index, bvt &bv);
   virtual void convert_index(const index_exprt &expr, bvt &bv);
-  virtual void convert_byte_extract(
-    unsigned width, const exprt &expr,
-    const mp_integer &index, bvt &bv, bool little_endian);
   virtual void convert_byte_extract(const exprt &expr, bvt &bv);
   virtual void convert_byte_update(const exprt &expr, bvt &bv);
   virtual void convert_constraint_select_one(const exprt &expr, bvt &bv);

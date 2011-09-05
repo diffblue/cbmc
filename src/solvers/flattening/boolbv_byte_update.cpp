@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <assert.h>
 
 #include <arith_tools.h>
+#include <byte_operators.h>
 
 #include "boolbv.h"
 
@@ -57,7 +58,7 @@ void boolbvt::convert_byte_update(const exprt &expr, bvt &bv)
   if(!to_integer(op1, index))
   {
     // yes!
-    mp_integer offset;
+    mp_integer offset=index*8;
     
     if(offset+update_width>mp_integer(bv.size()) || offset<0)
     {
@@ -65,8 +66,21 @@ void boolbvt::convert_byte_update(const exprt &expr, bvt &bv)
     }
     else
     {
-      for(unsigned i=0; i<update_width; i++)
-        bv[integer2long(offset+i)]=op2_bv[i];
+      if(little_endian)
+      {
+        for(unsigned i=0; i<update_width; i++)
+          bv[integer2long(offset+i)]=op2_bv[i];
+      }
+      else
+      {
+        endianness_mapt map_op0(op0.type(), little_endian, ns);
+        endianness_mapt map_op2(op2.type(), little_endian, ns);
+        
+        unsigned offset_i=integer2long(offset);
+        
+        for(unsigned i=0; i<update_width; i++)
+          bv[map_op0.map_bit(offset_i+i)]=op2_bv[map_op2.map_bit(i)];
+      }
     }
 
     return;
@@ -81,8 +95,16 @@ void boolbvt::convert_byte_update(const exprt &expr, bvt &bv)
     equality.rhs()=from_integer(offset/byte_width, op1.type());
     literalt equal=convert(equality);
     
+    endianness_mapt map_op0(op0.type(), little_endian, ns);
+    endianness_mapt map_op2(op2.type(), little_endian, ns);
+
     for(unsigned bit=0; bit<update_width; bit++)
       if(offset+bit<bv.size())
-        bv[offset+bit]=prop.lselect(equal, op2_bv[bit], bv[offset+bit]);
+      {
+        unsigned bv_o=map_op0.map_bit(offset+bit);
+        unsigned op2_bv_o=map_op2.map_bit(bit);
+        
+        bv[bv_o]=prop.lselect(equal, op2_bv[op2_bv_o], bv[bv_o]);
+      }
   }
 }

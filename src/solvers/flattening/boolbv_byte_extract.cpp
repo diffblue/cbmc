@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <arith_tools.h>
 #include <std_expr.h>
+#include <byte_operators.h>
 
 #include "boolbv.h"
 
@@ -46,16 +47,45 @@ void boolbvt::convert_byte_extract(const exprt &expr, bvt &bv)
     little_endian=false;
   else
     assert(false);
+
+  // first do op0
+
+  bvt op0_bv;  
+  convert_bv(op0, op0_bv);
     
   // see if the byte number is constant
 
   mp_integer index;
   if(!to_integer(op1, index))
-    return convert_byte_extract(width, expr.op0(), index, bv, little_endian);
+  {
+    bv.resize(width);
+    
+    unsigned byte_width=8;
+    mp_integer offset=index*byte_width;
+    
+    if(mp_integer(op0_bv.size())<offset+width || offset<0)
+    {
+      // out of bounds
+      for(unsigned i=0; i<width; i++)
+        bv[i]=prop.new_variable();
+    }
+    else
+    {
+      endianness_mapt op0_map(op0.type(), little_endian, ns);
+      endianness_mapt bv_map(expr.type(), little_endian, ns);
 
-  bvt op0_bv;
-  
-  convert_bv(op0, op0_bv);
+      std::cout << "W: " << width << " " << bv_map.size()*8 << std::endl;
+      assert(width==byte_width*bv_map.size());
+      
+      unsigned offset_i=integer2long(offset);
+
+      for(unsigned i=0; i<width; i++)
+        bv[bv_map.map_bit(i)]=
+          op0_bv[op0_map.map_bit(offset_i+i)];
+    }
+    
+    return;
+  }
 
   unsigned byte_width=8;
   unsigned bytes=op0_bv.size()/byte_width;
@@ -128,49 +158,3 @@ void boolbvt::convert_byte_extract(const exprt &expr, bvt &bv)
     }    
   }
 }
-
-/*******************************************************************\
-
-Function: boolbvt::convert_byte_extract
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void boolbvt::convert_byte_extract(
-  unsigned width,
-  const exprt &expr,
-  const mp_integer &index,
-  bvt &bv,
-  bool little_endian)
-{
-  bv.resize(width);
-  
-  bvt tmp;
-  convert_bv(expr, tmp); // recursive call
-
-  unsigned byte_width=8;
-  mp_integer offset;
-  
-  if(little_endian)
-    offset=index*byte_width;
-  else
-    offset=(mp_integer(tmp.size()/byte_width)-index-1)*byte_width;
-
-  if(mp_integer(tmp.size())<offset+width || offset<0)
-  {
-    // out of bounds
-    for(unsigned i=0; i<width; i++)
-      bv[i]=prop.new_variable();
-  }
-  else
-  {
-    for(unsigned i=0; i<width; i++)
-      bv[i]=tmp[integer2long(offset+i)];
-  }
-}
-
