@@ -158,7 +158,8 @@ mp_integer pointer_offset_size(
           type.id()==ID_unsignedbv ||
           type.id()==ID_fixedbv ||
           type.id()==ID_floatbv ||
-          type.id()==ID_bv)
+          type.id()==ID_bv ||
+          type.id()==ID_c_enum)
   {
     unsigned width=bv_width(type);
     unsigned bytes=width/8;
