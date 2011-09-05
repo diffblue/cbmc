@@ -16,7 +16,10 @@ Author: Daniel Kroening, kroening@kroening.com
  * \date   Sun Jul 31 21:54:44 BST 2011
 */
 
+#include <vector>
+
 #include <expr.h>
+#include <namespace.h>
 
 /*! \brief TO_BE_DOCUMENTED
 */
@@ -140,6 +143,53 @@ extern inline byte_update_big_endiant &to_byte_update_big_endian(exprt &expr)
 {
   assert(expr.id()==ID_byte_update_big_endian && expr.operands().size()==3);
   return static_cast<byte_update_big_endiant &>(expr);
+}
+
+/*! \brief Maps a big-endian offset to a little-endian offset
+*/
+class big_endian_mapt
+{
+public:
+  big_endian_mapt(const typet &type, const namespacet &_ns):ns(_ns)
+  {
+    build(type);
+  }
+
+  inline unsigned map_bit(unsigned bit) const
+  {
+    unsigned byte=bit/8;
+    return map_byte(byte)*8+bit%8;
+  }
+  
+  inline unsigned map_byte(unsigned byte) const
+  {
+    assert(byte<map.size());
+    return map[byte];
+  }
+  
+  unsigned size() const
+  {
+    return map.size();
+  }
+  
+  inline void build(const typet &type)
+  {
+    build_rec(type);
+  }
+  
+  void output(std::ostream &) const;
+
+protected:
+  const namespacet &ns;
+  std::vector<unsigned> map;
+
+  void build_rec(const typet &type);
+};
+
+extern inline std::ostream &operator << (std::ostream &out, const big_endian_mapt &m)
+{
+  m.output(out);
+  return out;
 }
 
 #endif
