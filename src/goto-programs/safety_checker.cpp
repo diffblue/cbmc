@@ -25,3 +25,23 @@ safety_checkert::safety_checkert(const namespacet &_ns):
 {
 }
 
+/*******************************************************************\
+
+Function: safety_checkert::safety_checkert
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+safety_checkert::safety_checkert(
+  const namespacet &_ns,
+  message_handlert &_message_handler):
+  messaget(_message_handler),
+  ns(_ns)
+{
+}
+
