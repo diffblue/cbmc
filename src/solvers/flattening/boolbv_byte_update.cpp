@@ -59,11 +59,6 @@ void boolbvt::convert_byte_update(const exprt &expr, bvt &bv)
     // yes!
     mp_integer offset;
     
-    if(little_endian)
-      offset=index*byte_width;
-    else
-      offset=(mp_integer(bv.size()/byte_width)-index-1)*byte_width;
-
     if(offset+update_width>mp_integer(bv.size()) || offset<0)
     {
       // out of bounds
