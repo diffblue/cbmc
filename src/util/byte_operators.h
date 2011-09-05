@@ -147,12 +147,12 @@ extern inline byte_update_big_endiant &to_byte_update_big_endian(exprt &expr)
 
 /*! \brief Maps a big-endian offset to a little-endian offset
 */
-class big_endian_mapt
+class endianness_mapt
 {
 public:
-  big_endian_mapt(const typet &type, const namespacet &_ns):ns(_ns)
+  endianness_mapt(const typet &type, bool little_endian, const namespacet &_ns):ns(_ns)
   {
-    build(type);
+    build(type, little_endian);
   }
 
   inline unsigned map_bit(unsigned bit) const
@@ -172,9 +172,9 @@ public:
     return map.size();
   }
   
-  inline void build(const typet &type)
+  inline void build(const typet &type, bool little_endian)
   {
-    build_rec(type);
+    build_rec(type, little_endian);
   }
   
   void output(std::ostream &) const;
@@ -183,10 +183,10 @@ protected:
   const namespacet &ns;
   std::vector<unsigned> map;
 
-  void build_rec(const typet &type);
+  void build_rec(const typet &type, bool little_endian);
 };
 
-extern inline std::ostream &operator << (std::ostream &out, const big_endian_mapt &m)
+extern inline std::ostream &operator << (std::ostream &out, const endianness_mapt &m)
 {
   m.output(out);
   return out;
