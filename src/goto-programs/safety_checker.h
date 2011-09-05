@@ -20,7 +20,12 @@ Author: Daniel Kroening, kroening@kroening.com
 class safety_checkert:public messaget
 {
 public:
-  explicit safety_checkert(const namespacet &_ns);
+  explicit safety_checkert(
+    const namespacet &_ns);
+
+  explicit safety_checkert(
+    const namespacet &_ns,
+    message_handlert &_message_handler);
 
   typedef enum { SAFE, UNSAFE, ERROR } resultt;
 
@@ -35,7 +40,7 @@ public:
 
 protected:
   // the namespace
-  namespacet ns;
+  const namespacet &ns;
 };
 
 #endif

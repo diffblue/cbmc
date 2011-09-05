@@ -21,10 +21,10 @@ Author: Daniel Kroening, kroening@kroening.com
 class goto_programt:public goto_program_templatet<codet, exprt>
 {
 public:
-  std::ostream& output_instruction(
+  std::ostream &output_instruction(
     const class namespacet &ns,
     const irep_idt &identifier,
-    std::ostream& out,
+    std::ostream &out,
     instructionst::const_iterator it) const;
 
   goto_programt() { }
@@ -35,11 +35,13 @@ public:
 };
 
 #define forall_goto_program_instructions(it, program) \
-  for(goto_programt::instructionst::const_iterator it=(program).instructions.begin(); \
+  for(goto_programt::instructionst::const_iterator \
+      it=(program).instructions.begin(); \
       it!=(program).instructions.end(); it++)
 
 #define Forall_goto_program_instructions(it, program) \
-  for(goto_programt::instructionst::iterator it=(program).instructions.begin(); \
+  for(goto_programt::instructionst::iterator \
+      it=(program).instructions.begin(); \
       it!=(program).instructions.end(); it++)
  
 extern inline bool operator<(const goto_programt::const_targett i1,
@@ -53,5 +55,9 @@ std::list<exprt> objects_written(const goto_programt::instructiont &);
 
 std::list<exprt> expressions_read(const goto_programt::instructiont &);
 std::list<exprt> expressions_written(const goto_programt::instructiont &);
+
+std::string as_string(
+  const namespacet &ns,
+  const goto_programt::instructiont &);
 
 #endif
