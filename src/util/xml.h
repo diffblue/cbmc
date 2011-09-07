@@ -99,26 +99,27 @@ public:
   void swap(xmlt &xml);
   void clear();
 
-  friend std::ostream& operator <<(
-    std::ostream &out,
-    const xmlt &xml)
-  {
-    xml.output(out);
-    return out;
-  }
-
   void output(
     std::ostream &out,
     unsigned indent=0) const;
+
+  static void escape(const std::string &s, std::ostream &out);
+  static std::string unescape(const std::string &s);
 
 protected:
   static void do_indent(
     std::ostream &out,
     unsigned indent);
 
-  static void escape(const std::string &s, std::ostream &out);
   static void escape_attribute(const std::string &s, std::ostream &out);
-  static std::string unescape(const std::string &s);
 };
+
+extern inline std::ostream& operator <<(
+  std::ostream &out,
+  const xmlt &xml)
+{
+  xml.output(out);
+  return out;
+}
 
 #endif
