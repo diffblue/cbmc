@@ -81,6 +81,12 @@ void xmlt::output(std::ostream &out, unsigned indent) const
     out << '"';
   }
 
+  if(elements.empty() && data.empty())
+  {
+    out << "/>" << std::endl;;
+    return;
+  }
+
   out << '>';
 
   if(elements.empty())
