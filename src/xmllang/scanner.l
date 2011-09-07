@@ -54,17 +54,17 @@ string		\"([^"&]|{esc})*\"|\'([^'&]|{esc})*\'
 
 %s CONTENT
 %s PI
-
+%s DTD
 
 %%
 
-<INITIAL>{ws}		{/* skip */}
+<INITIAL,PI>{ws}		{/* skip */}
 <INITIAL>"/"		{return SLASH;}
-<INITIAL>"="		{return EQ;}
+<INITIAL,PI>"="		{return EQ;}
 <INITIAL>{close}	{BEGIN(CONTENT); return CLOSE;}
-<INITIAL>{name}		{yyxmllval.s=strdup(yytext); return NAME;}
-<INITIAL>{string}	{yyxmllval.s=strdup(yytext); return VALUE;}
-<INITIAL>"?"{close}	{BEGIN(INITIAL); return ENDPI;}
+<INITIAL,PI>{name}		{yyxmllval.s=strdup(yytext); return NAME;}
+<INITIAL,PI>{string}	{yyxmllval.s=strdup(yytext); return VALUE;}
+<INITIAL,PI>"?"{close}	{BEGIN(INITIAL); return ENDPI;}
 
 {open}{ws}?{name}	{BEGIN(INITIAL); yyxmllval.s=word(yytext); return START;}
 {open}{ws}?"/"		{BEGIN(INITIAL); return END;}
@@ -72,10 +72,11 @@ string		\"([^"&]|{esc})*\"|\'([^'&]|{esc})*\'
 {open}"?"		{BEGIN(PI); yyxmllval.s=word(yytext); return STARTPI;}
 {comment}		{yyxmllval.s=strdup(yytext); return COMMENT;}
 
-<PI>"?"{close}		{BEGIN(INITIAL); return ENDPI;}
-<PI>{data}		{yyxmllval.s=strdup(yytext); return DATA;}
-
 <CONTENT>{data}		{yyxmllval.s=strdup(yytext); return DATA;}
+
+<INITIAL>{open}"!"{ws}?"DOCTYPE"   {BEGIN(DTD); /* skip */}
+<DTD>.   {/* skip */}
+<DTD>\]{close}    {BEGIN(INITIAL); /* skip */}
 
 .			{ yyxmlerror("unexpected charater"); }
 {nl}			{/* skip, must be an extra one at EOF */;}

@@ -45,17 +45,20 @@ public:
     stack.clear();
     stack.push_back(&parse_tree.element);
   }
-  
-  static std::string unescape(const char *s);
 };
 
 extern xml_parsert xml_parser;
 
 int yyxmlerror(const std::string &error);
 
-// 'do it all' function
+// 'do it all' functions
 bool parse_xml(
   std::istream &in,
+  const std::string &filename,
+  message_handlert &message_handler,
+  xmlt &dest);
+
+bool parse_xml(
   const std::string &filename,
   message_handlert &message_handler,
   xmlt &dest);
