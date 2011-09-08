@@ -99,6 +99,10 @@ Function: smt1_dect::dec_solve
 
 decision_proceduret::resultt smt1_dect::dec_solve()
 {
+  // SMT1 is really not incremental
+  assert(!dec_solve_was_called);
+  dec_solve_was_called=true;
+
   post_process();
 
   // this closes the SMT benchmark
