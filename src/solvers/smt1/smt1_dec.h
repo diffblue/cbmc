@@ -43,7 +43,8 @@ public:
     smt1_temp_filet(),
     smt1_convt(_ns, _benchmark, _source, _logic, temp_out),
     logic(_logic),
-    solver(_solver)
+    solver(_solver),
+    dec_solve_was_called(false)
   {
   }
   
@@ -53,6 +54,7 @@ public:
 protected:
   std::string logic;
   solvert solver;
+  bool dec_solved_was_called;
 
   resultt read_result_boolector(std::istream &in);
   resultt read_result_cvc3(std::istream &in);
