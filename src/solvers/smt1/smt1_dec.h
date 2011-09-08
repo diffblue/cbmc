@@ -54,7 +54,7 @@ public:
 protected:
   std::string logic;
   solvert solver;
-  bool dec_solved_was_called;
+  bool dec_solve_was_called;
 
   resultt read_result_boolector(std::istream &in);
   resultt read_result_cvc3(std::istream &in);
