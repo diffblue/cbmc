@@ -2595,21 +2595,21 @@ std::string expr2ct::convert_code_block(
   const code_blockt &src,
   unsigned indent)
 {
-  assert(indent>=2);
-  std::string dest=indent_str(indent-2);
+  assert(indent>=0);
+  std::string dest=indent_str(indent);
   dest+="{\n";
 
   forall_operands(it, src)
   {
-    if(it->get(ID_statement)==ID_block)
-      dest+=convert_code_block(to_code_block(to_code(*it)), indent+2);
-    else
+    if(it->get(ID_statement)==ID_label)
       dest+=convert_code(to_code(*it), indent);
+    else
+      dest+=convert_code(to_code(*it), indent+2);
 
     dest+="\n";
   }
 
-  dest+=indent_str(indent-2);
+  dest+=indent_str(indent);
   dest+="}";
 
   return dest;
@@ -2734,7 +2734,7 @@ std::string expr2ct::convert_code(
     return convert_code_function_call(to_code_function_call(src), indent);
 
   if(statement==ID_label)
-    return convert_code_label(src, indent);
+    return convert_code_label(to_code_label(src), indent);
 
   if(statement==ID_free)
     return convert_code_free(src, indent);
@@ -2890,7 +2890,7 @@ std::string expr2ct::convert_code_function_call(
     return convert_norep(src, precedence);
   }
 
-  std::string dest;
+  std::string dest=indent_str(indent);
 
   if(src.lhs().is_not_nil())
   {
@@ -3126,26 +3126,26 @@ Function: expr2ct::convert_code_label
 \*******************************************************************/
 
 std::string expr2ct::convert_code_label(
-  const codet &src,
+  const code_labelt &src,
   unsigned indent)
 {
   bool first=true;
   std::string labels_string;
 
   {
-    const irept::named_subt &labels=src.find(ID_labels).get_named_sub();
-
-    forall_named_irep(it, labels)
+    irep_idt label=src.get_label();
+    
+    if(label!=irep_idt())
     {
       if(first) { labels_string+="\n"; first=false; }
       labels_string+=indent_str(indent);
-      labels_string+=name2string(it->first);
+      labels_string+=name2string(label);
       labels_string+=":\n";
     }
 
-    const exprt &case_expr=(exprt &)src.find(ID_case);
+    const exprt::operandst &case_op=src.case_op();
 
-    forall_operands(it, case_expr)
+    forall_expr(it, case_op)
     {
       if(first) { labels_string+="\n"; first=false; }
       labels_string+=indent_str(indent);
@@ -3154,7 +3154,7 @@ std::string expr2ct::convert_code_label(
       labels_string+=":\n";
     }
 
-    if(src.get_bool(ID_default))
+    if(src.is_default())
     {
       if(first) { labels_string+="\n"; first=false; }
       labels_string+=indent_str(indent);
@@ -3168,7 +3168,7 @@ std::string expr2ct::convert_code_label(
     return convert_norep(src, precedence);
   }
 
-  std::string tmp=convert_code(to_code(src.op0()), indent);
+  std::string tmp=convert_code(src.code(), indent+2);
 
   return labels_string+tmp;
 }
