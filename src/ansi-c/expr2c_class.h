@@ -124,7 +124,7 @@ protected:
 
   std::string convert_code(const codet &src);
   virtual std::string convert_code(const codet &src, unsigned indent);
-  std::string convert_code_label(const codet &src, unsigned indent);
+  std::string convert_code_label(const code_labelt &src, unsigned indent);
   std::string convert_code_asm(const codet &src, unsigned indent);
   std::string convert_code_assign(const code_assignt &src, unsigned indent);
   std::string convert_code_free(const codet &src, unsigned indent);
