@@ -14,9 +14,9 @@ Date: June 2006
 #include <symbol.h>
 #include <xml.h>
 #include <replace_symbol.h>
+#include <options.h>
 
 #include <langapi/language_ui.h>
-#include <goto-programs/goto_threads.h>
 #include <goto-programs/goto_functions.h>
 
 class compilet: public language_uit
