@@ -126,7 +126,7 @@ bool ansi_c_languaget::parse(
   std::istringstream codestr(code);
 
   ansi_c_parser.clear();
-  ansi_c_parser.filename="<built-in>";
+  ansi_c_parser.filename=ID_built_in;
   ansi_c_parser.in=&codestr;
   ansi_c_parser.set_message_handler(message_handler);
   ansi_c_parser.grammar=ansi_c_parsert::LANGUAGE;
