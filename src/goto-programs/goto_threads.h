@@ -11,6 +11,7 @@ Date: June 2003
 #ifndef CPROVER_GOTO_THREADS_H
 #define CPROVER_GOTO_THREADS_H
 
+#if 0 // this file is going away
 #include <iostream>
 
 #include <std_code.h>
@@ -69,5 +70,6 @@ void goto_convert(
   const optionst &options,
   goto_threadst &goto_threads,
   message_handlert &message_handler);
+#endif
 
 #endif
