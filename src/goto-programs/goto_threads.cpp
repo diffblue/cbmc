@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#if 0
 #include <assert.h>
 
 #include <i2string.h>
@@ -202,3 +203,5 @@ void goto_convert(
   if(goto_thread_convert.get_error_found())
     throw 0;
 }
+
+#endif
