@@ -1712,15 +1712,37 @@ void compilet::convert_symbols(goto_functionst &dest)
   goto_convert_functionst converter(context, options, dest,
                                     ui_message_handler);
 
-  Forall_symbols(it, context.symbols)
+  // the compilation may add symbols!
+
+  contextt::symbolst::size_type before=0;
+  
+  while(before!=context.symbols.size())
   {
-    if(it->second.type.id()==ID_code &&
-       it->second.value.id()!="compiled" &&
-       it->second.value.is_not_nil())
+    before=context.symbols.size();
+
+    typedef std::set<irep_idt> symbols_sett;
+    symbols_sett symbols;
+  
+    Forall_symbols(it, context.symbols)
+      symbols.insert(it->first);
+
+    // the symbol table itertors aren't stable
+    for(symbols_sett::const_iterator
+        it=symbols.begin();
+        it!=symbols.end();
+        ++it)
     {
-      print(9, "Compiling "+id2string(it->first));
-      converter.convert_function(it->first);
-      it->second.value=exprt("compiled");
+      contextt::symbolst::iterator s_it=context.symbols.find(*it);
+      assert(s_it!=context.symbols.end());
+
+      if(s_it->second.type.id()==ID_code &&
+          s_it->second.value.id()!="compiled" &&
+          s_it->second.value.is_not_nil())
+      {
+        print(9, "Compiling "+id2string(s_it->first));
+        converter.convert_function(s_it->first);
+        s_it->second.value=exprt("compiled");
+      }
     }
   }
 }
