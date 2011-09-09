@@ -2004,6 +2004,11 @@ extern inline function_application_exprt &to_function_application_expr(exprt &ex
 }
 
 /*! \brief Concatenation of bit-vector operands
+ *
+ * This expression takes any number of operands
+ * (a restriction to make this binary will happen in the future).
+ * The ordering of the operands is the same as in the _new_ SMT 1.x standard,
+ * i.e., most-significant operands come first.
 */
 class concatenation_exprt:public exprt
 {
@@ -2012,23 +2017,18 @@ public:
   {
   }
 
-  inline concatenation_exprt(const typet &_type):
+  explicit inline concatenation_exprt(const typet &_type):
     exprt(ID_concatenation, _type)
   {
   }
+  
+  explicit inline concatenation_exprt(
+    const exprt &_op0, const exprt &_op1, const typet &_type):
+    exprt(ID_concatenation, _type)
+  {
+    copy_to_operands(_op0, _op1);
+  }  
 };
-
-extern inline const concatenation_exprt &to_concatenation_expr(const exprt &expr)
-{
-  assert(expr.id()==ID_concatenation);
-  return static_cast<const concatenation_exprt &>(expr);
-}
-
-extern inline concatenation_exprt &to_concatenation_expr(exprt &expr)
-{
-  assert(expr.id()==ID_concatenation);
-  return static_cast<concatenation_exprt &>(expr);
-}
 
 /*! \brief Cast a generic exprt to a \ref concatenation_exprt
  *
@@ -2040,11 +2040,20 @@ extern inline concatenation_exprt &to_concatenation_expr(exprt &expr)
  *
  * \ingroup gr_std_expr
 */
-const concatenation_exprt &to_concatenation_expr(const exprt &expr);
+extern inline const concatenation_exprt &to_concatenation_expr(const exprt &expr)
+{
+  assert(expr.id()==ID_concatenation);
+  return static_cast<const concatenation_exprt &>(expr);
+}
+
 /*! \copydoc to_concatenation_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-concatenation_exprt &to_concatenation_expr(exprt &expr);
+extern inline concatenation_exprt &to_concatenation_expr(exprt &expr)
+{
+  assert(expr.id()==ID_concatenation);
+  return static_cast<concatenation_exprt &>(expr);
+}
 
 /*! \brief Evaluates to true if the two pointer
            operands point to the same object
