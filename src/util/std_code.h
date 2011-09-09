@@ -571,6 +571,16 @@ public:
   {
     set(ID_label, label);
   }
+  
+  codet &code()
+  {
+    return static_cast<codet &>(op0());
+  }
+
+  const codet &code() const
+  {
+    return static_cast<const codet &>(op0());
+  }
 };
 
 extern inline const code_labelt &to_code_label(const codet &code)
