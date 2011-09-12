@@ -93,11 +93,14 @@ public:
     std::cout << "ASSIGN\n";
     #endif
 
-    // Ordering is important here!
-    // Consider self-assignment!
-    if(irep.data!=NULL) irep.data->ref_count++;
-    remove_ref(data);
-    data=irep.data;
+    // Ordering is very important here!
+    // Consider self-assignment, which may destroy 'irep'
+    dt *irep_data=irep.data;
+    if(irep_data!=NULL) irep_data->ref_count++;
+
+    remove_ref(data); // this may kill 'irep'
+    data=irep_data;
+
     return *this;
   }
 
