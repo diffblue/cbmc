@@ -30,7 +30,7 @@ include ../common
 
 all: goto-cc$(EXEEXT)
 
-ifdef MODULE_CPP
+ifneq ($(wildcard ../cpp/Makefile),)
   OBJ += ../cpp/cpp$(LIBEXT)
   CXXFLAGS += -D HAVE_CPP
 endif
