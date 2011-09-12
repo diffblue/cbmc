@@ -27,7 +27,7 @@ include ../common
 
 all: util$(LIBEXT) ieee_float_test$(EXEEXT)
 
-ifdef MODULE_FLOATBV
+ifneq ($(wildcard ../floatbv/Makefile),)
   CXXFLAGS += -DHAVE_FLOATBV
 endif
 

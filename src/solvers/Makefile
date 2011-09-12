@@ -93,7 +93,7 @@ ifneq ($(CUDD),)
 endif
 endif
 
-ifdef MODULE_FLOATBV
+ifneq ($(wildcard ../floatbv/Makefile),)
   CXXFLAGS += -DHAVE_FLOATBV
   OBJ += ../floatbv/floatbv$(LIBEXT)
 endif
