@@ -25,27 +25,27 @@ include ../common
 
 all: cbmc$(EXEEXT)
 
-ifdef MODULE_BV_REFINEMENT
+ifneq ($(wildcard ../bv_refinement/Makefile),)
   OBJ += ../bv_refinement/bv_refinement$(LIBEXT)
   CXXFLAGS += -DHAVE_BV_REFINEMENT
 endif
 
-ifdef MODULE_CPP
+ifneq ($(wildcard ../cpp/Makefile),)
   OBJ += ../cpp/cpp$(LIBEXT)
   CXXFLAGS += -DHAVE_CPP
 endif
 
-ifdef MODULE_JAVA
+ifneq ($(wildcard ../java/Makefile),)
   OBJ += ../java/java$(LIBEXT)
   CXXFLAGS += -DHAVE_JAVA
 endif
 
-ifdef MODULE_SPECC
+ifneq ($(wildcard ../specc/Makefile),)
   OBJ += ../specc/specc$(LIBEXT)
   CXXFLAGS += -DHAVE_SPECC
 endif
 
-ifdef MODULE_PHP
+ifneq ($(wildcard ../php/Makefile),)
   OBJ += ../php/php$(LIBEXT)
   CXXFLAGS += -DHAVE_PHP
 endif
