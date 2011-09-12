@@ -529,10 +529,14 @@ void c_typecheck_baset::do_designated_initializer(
     {
       if(index>=dest->operands().size())
       {
-        if(type.id()==ID_incomplete_array)
+        if(type.id()==ID_incomplete_array ||
+           (type.id()==ID_array && to_array_type(type).size().is_zero()))
         {
+          // we are willing to grow an incomplete or zero-sized array
           exprt zero=zero_initializer(type.subtype(), value.location());
           dest->operands().resize(integer2long(index)+1, zero);
+          
+          // todo: adjust type!
         }
         else
         {
