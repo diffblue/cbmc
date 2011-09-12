@@ -3987,6 +3987,15 @@ bool simplify_exprt::simplify_node(exprt &expr)
     result=simplify_multiplication(expr) && result;
   else if(expr.id()==ID_unary_minus)
     result=simplify_unary_minus(expr) && result;
+  else if(expr.id()==ID_unary_plus)
+  {
+    if(expr.operands().size()==1)
+    {
+      // simply remove, this is always 'nop'
+      expr=expr.op0();
+      result=false;
+    }
+  }
   else if(expr.id()==ID_not)
     result=simplify_not(expr) && result;
   else if(expr.id()==ID_implies || expr.id()=="<=>" ||
