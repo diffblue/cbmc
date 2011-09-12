@@ -1653,6 +1653,13 @@ designated_initializer:
           stack($$).add(ID_designator).swap(stack($1));
           mto($$, $3);
         }
+        /* the following two are obsolete GCC extensions */
+        | designated_initializer_designator constant_expression
+        {
+          init($$, ID_designated_initializer);
+          stack($$).add(ID_designator).swap(stack($1));
+          mto($$, $2);
+        }
         | member_name ':' initializer
         {
           // yet another GCC speciality
