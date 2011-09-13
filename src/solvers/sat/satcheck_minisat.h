@@ -15,14 +15,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "cnf.h"
 #include "resolution_proof.h"
 
-class satcheck_minisat_baset:public cnf_solvert
+class satcheck_minisat1_baset:public cnf_solvert
 {
 public:
-  satcheck_minisat_baset():solver(NULL)
+  satcheck_minisat1_baset():solver(NULL)
   {
   }
   
-  virtual ~satcheck_minisat_baset();
+  virtual ~satcheck_minisat1_baset();
   
   virtual const std::string solver_text();
   virtual resultt prop_solve();
@@ -48,7 +48,7 @@ protected:
   bool empty_clause_added;
 };
 
-class satcheck_minisatt:public satcheck_minisat_baset
+class satcheck_minisatt:public satcheck_minisat1_baset
 {
 public:
   satcheck_minisatt();

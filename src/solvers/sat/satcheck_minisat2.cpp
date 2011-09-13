@@ -44,7 +44,7 @@ void convert(const bvt &bv, Minisat::vec<Minisat::Lit> &dest)
 
 /*******************************************************************\
 
-Function: satcheck_minisat_baset::l_get
+Function: satcheck_minisat2_baset::l_get
 
   Inputs:
 
@@ -55,7 +55,7 @@ Function: satcheck_minisat_baset::l_get
 \*******************************************************************/
 
 template<typename T>
-tvt satcheck_minisat_baset<T>::l_get(literalt a) const
+tvt satcheck_minisat2_baset<T>::l_get(literalt a) const
 {
   if(a.is_true())
     return tvt(true);
@@ -117,7 +117,7 @@ const std::string satcheck_minisat_simplifiert::solver_text()
 
 /*******************************************************************\
 
-Function: satcheck_minisat_baset::add_variables
+Function: satcheck_minisat2_baset::add_variables
 
   Inputs:
 
@@ -128,7 +128,7 @@ Function: satcheck_minisat_baset::add_variables
 \*******************************************************************/
 
 template<typename T>
-void satcheck_minisat_baset<T>::add_variables()
+void satcheck_minisat2_baset<T>::add_variables()
 {
   while((unsigned)solver->nVars()<no_variables())
     solver->newVar();
@@ -136,7 +136,7 @@ void satcheck_minisat_baset<T>::add_variables()
 
 /*******************************************************************\
 
-Function: satcheck_minisat_baset::lcnf
+Function: satcheck_minisat2_baset::lcnf
 
   Inputs:
 
@@ -147,7 +147,7 @@ Function: satcheck_minisat_baset::lcnf
 \*******************************************************************/
 
 template<typename T>
-void satcheck_minisat_baset<T>::lcnf(const bvt &bv)
+void satcheck_minisat2_baset<T>::lcnf(const bvt &bv)
 {
   bvt new_bv;
   
@@ -176,7 +176,7 @@ void satcheck_minisat_baset<T>::lcnf(const bvt &bv)
 
 /*******************************************************************\
 
-Function: satcheck_minisat_baset::prop_solve
+Function: satcheck_minisat2_baset::prop_solve
 
   Inputs:
 
@@ -187,7 +187,7 @@ Function: satcheck_minisat_baset::prop_solve
 \*******************************************************************/
 
 template<typename T>
-propt::resultt satcheck_minisat_baset<T>::prop_solve()
+propt::resultt satcheck_minisat2_baset<T>::prop_solve()
 {
   assert(status!=ERROR);
 
@@ -238,7 +238,7 @@ propt::resultt satcheck_minisat_baset<T>::prop_solve()
 
 /*******************************************************************\
 
-Function: satcheck_minisat_baset::set_assignment
+Function: satcheck_minisat2_baset::set_assignment
 
   Inputs:
 
@@ -249,7 +249,7 @@ Function: satcheck_minisat_baset::set_assignment
 \*******************************************************************/
 
 template<typename T>
-void satcheck_minisat_baset<T>::set_assignment(literalt a, bool value)
+void satcheck_minisat2_baset<T>::set_assignment(literalt a, bool value)
 {
   assert(!a.is_constant());
 
@@ -264,7 +264,7 @@ void satcheck_minisat_baset<T>::set_assignment(literalt a, bool value)
 
 /*******************************************************************\
 
-Function: satcheck_minisat_baset::satcheck_minisat_baset
+Function: satcheck_minisat2_baset::satcheck_minisat2_baset
 
   Inputs:
 
@@ -275,7 +275,7 @@ Function: satcheck_minisat_baset::satcheck_minisat_baset
 \*******************************************************************/
 
 template<typename T>
-satcheck_minisat_baset<T>::satcheck_minisat_baset()
+satcheck_minisat2_baset<T>::satcheck_minisat2_baset()
 {
   empty_clause_added=false;
   solver=NULL;
@@ -317,7 +317,7 @@ satcheck_minisat_simplifiert::satcheck_minisat_simplifiert()
 
 /*******************************************************************\
 
-Function: satcheck_minisat_baset::~satcheck_minisat_baset
+Function: satcheck_minisat2_baset::~satcheck_minisat2_baset
 
   Inputs:
 
@@ -328,14 +328,14 @@ Function: satcheck_minisat_baset::~satcheck_minisat_baset
 \*******************************************************************/
 
 template<typename T>
-satcheck_minisat_baset<T>::~satcheck_minisat_baset()
+satcheck_minisat2_baset<T>::~satcheck_minisat2_baset()
 {
   delete solver;
 }
 
 /*******************************************************************\
 
-Function: satcheck_minisat_baset::is_in_conflict
+Function: satcheck_minisat2_baset::is_in_conflict
 
   Inputs:
 
@@ -346,7 +346,7 @@ Function: satcheck_minisat_baset::is_in_conflict
 \*******************************************************************/
 
 template<typename T>
-bool satcheck_minisat_baset<T>::is_in_conflict(literalt a) const
+bool satcheck_minisat2_baset<T>::is_in_conflict(literalt a) const
 {
   int v=a.var_no();
 
@@ -359,7 +359,7 @@ bool satcheck_minisat_baset<T>::is_in_conflict(literalt a) const
 
 /*******************************************************************\
 
-Function: satcheck_minisat_baset::set_assumptions
+Function: satcheck_minisat2_baset::set_assumptions
 
   Inputs:
 
@@ -370,7 +370,7 @@ Function: satcheck_minisat_baset::set_assumptions
 \*******************************************************************/
 
 template<typename T>
-void satcheck_minisat_baset<T>::set_assumptions(const bvt &bv)
+void satcheck_minisat2_baset<T>::set_assumptions(const bvt &bv)
 {
   assumptions=bv;
 
