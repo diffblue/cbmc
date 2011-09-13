@@ -26,11 +26,11 @@ namespace Minisat
 }
 
 template<typename T>
-class satcheck_minisat_baset:public cnf_solvert
+class satcheck_minisat2_baset:public cnf_solvert
 {
 public:
-  satcheck_minisat_baset();
-  virtual ~satcheck_minisat_baset();
+  satcheck_minisat2_baset();
+  virtual ~satcheck_minisat2_baset();
   
   virtual resultt prop_solve();
   virtual tvt l_get(literalt a) const;
@@ -54,7 +54,7 @@ protected:
 };
 
 class satcheck_minisat_no_simplifiert:
-  public satcheck_minisat_baset<Minisat::Solver>
+  public satcheck_minisat2_baset<Minisat::Solver>
 {
 public:
   satcheck_minisat_no_simplifiert();
@@ -62,7 +62,7 @@ public:
 };
 
 class satcheck_minisat_simplifiert:
-  public satcheck_minisat_baset<Minisat::SimpSolver>
+  public satcheck_minisat2_baset<Minisat::SimpSolver>
 {
 public:
   satcheck_minisat_simplifiert();
