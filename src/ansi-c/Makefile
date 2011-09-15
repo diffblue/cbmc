@@ -22,8 +22,8 @@ include ../config.inc
 include ../common
 
 CLEANFILES = ansi-c$(LIBEXT) \
-						 y.tab.h y.tab.cpp lex.yy.cpp y.tab.cpp.output y.output \
-						 library/converter$(EXEEXT) cprover_library.inc
+  y.tab.h y.tab.cpp lex.yy.cpp y.tab.cpp.output y.output \
+  library/converter$(EXEEXT) cprover_library.inc
 
 all: ansi-c$(LIBEXT)
 
