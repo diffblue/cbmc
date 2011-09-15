@@ -6,12 +6,12 @@ SRC = symex_target.cpp symex_target_equation.cpp basic_symex.cpp \
       precondition.cpp postcondition.cpp symex_clean_expr.cpp \
       symex_dereference_state.cpp vcd_goto_trace.cpp auto_objects.cpp
 
-OBJ = $(SRC:.cpp=$(OBJEXT))
-
 INCLUDES= -I .. -I ../util
 
 include ../config.inc
 include ../common
+
+CLEANFILES = goto-symex$(LIBEXT)
 
 all: goto-symex$(LIBEXT)
 
@@ -19,7 +19,4 @@ all: goto-symex$(LIBEXT)
 
 goto-symex$(LIBEXT): $(OBJ)
 	$(LINKLIB)
-
-clean:
-	rm -f $(OBJ) goto-symex$(LIBEXT)
 

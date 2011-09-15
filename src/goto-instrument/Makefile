@@ -2,8 +2,8 @@ SRC = main.cpp parseoptions.cpp document_claims.cpp languages.cpp \
       uninitialized.cpp uninitialized_domain.cpp full_slicer.cpp \
       object_id.cpp show_locations.cpp points_to.cpp \
       alignment_checks.cpp
-OBJ = $(SRC:.cpp=$(OBJEXT)) \
-      ../ansi-c/ansi-c$(LIBEXT) \
+
+OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../big-int/bigint$(OBJEXT) \
       ../goto-programs/goto-programs$(LIBEXT) \
       ../goto-symex/goto-symex$(LIBEXT) \
@@ -15,6 +15,8 @@ INCLUDES= -I .. -I ../util
 
 LIBS =
 
+CLEANFILES = goto-instrument$(EXEEXT)
+
 include ../config.inc
 include ../common
 
@@ -22,28 +24,26 @@ all: goto-instrument$(EXEEXT)
 
 ifneq ($(wildcard ../cpp/Makefile),)
   OBJ += ../cpp/cpp$(LIBEXT)
-  CXXFLAGS += -DHAVE_CPP
+  CP_CXXFLAGS += -DHAVE_CPP
 endif
 
 ifneq ($(wildcard ../java/Makefile),)
   OBJ += ../java/java$(LIBEXT)
-  CXXFLAGS += -DHAVE_JAVA
+  CP_CXXFLAGS += -DHAVE_JAVA
 endif
 
 ifneq ($(wildcard ../specc/Makefile),)
   OBJ += ../specc/specc$(LIBEXT)
-  CXXFLAGS += -DHAVE_SPECC
+  CP_CXXFLAGS += -DHAVE_SPECC
 endif
 
 ifneq ($(wildcard ../php/Makefile),)
   OBJ += ../php/php$(LIBEXT)
-  CXXFLAGS += -DHAVE_PHP
+  CP_CXXFLAGS += -DHAVE_PHP
 endif
 
 ###############################################################################
 
 goto-instrument$(EXEEXT): $(OBJ)
-	$(LINKBIN) $(OBJ)
+	$(LINKBIN)
 
-clean:
-	rm -f $(SRC:.cpp=$(OBJEXT)) goto-instrument$(EXEEXT)

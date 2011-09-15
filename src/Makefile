@@ -3,9 +3,6 @@ DIRS = ansi-c big-int cbmc cpp goto-cc goto-instrument goto-programs \
 
 all: cbmc.dir goto-cc.dir goto-instrument.dir
 
-include config.inc
-include common
-
 ###############################################################################
 
 util.dir: big-int.dir
@@ -28,16 +25,8 @@ $(patsubst %, %.dir, $(DIRS)):
 	$(MAKE) $(MAKEARGS) -C $(basename $@)
 
 clean: $(patsubst %, %_clean, $(DIRS))
-	rm -f *.o $(shell find . -name "*.d")
-
-dep: $(patsubst %, %_dep, $(DIRS))
 
 $(patsubst %, %_clean, $(DIRS)):
 	if [ -e $(patsubst %_clean, %, $@)/. ] ; then \
 		$(MAKE) $(MAKEARGS) -C $(patsubst %_clean, %, $@) clean ; \
-	fi
-
-$(patsubst %, %_dep, $(DIRS)):
-	if [ -e $(patsubst %_dep, %, $@)/. ] ; then \
-		$(MAKE) $(MAKEARGS) -C $(patsubst %_dep, %, $@) dep ; \
 	fi

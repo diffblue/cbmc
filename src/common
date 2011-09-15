@@ -1,28 +1,153 @@
+# Build platform (use one of AUTO, Unix, OSX_Universal, MSVC, Cygwin, MinGW)
+ifeq ($(BUILD_ENV),AUTO)
+uname = $(shell uname)
+ifeq ($(uname),windows32)
+  BUILD_ENV_ := MSVC
+else ifeq ($(filter-out MINGW32_%, $(uname)),)
+  BUILD_ENV_ := MinGW
+else ifeq ($(filter-out CYGWIN_%, $(uname)),)
+  BUILD_ENV_ := MinGW
+else
+  BUILD_ENV_ := Unix
+endif
+else
+  BUILD_ENV_ := $(BUILD_ENV)
+endif
+
+ifeq ($(filter-out Unix Cygwin MinGW OSX_Universal,$(BUILD_ENV_)),)
+  # Linux etc.
+  LIBEXT = .a
+  OBJEXT = .o
+  EXEEXT =
+  CFLAGS ?= -Wall -O2
+  CXXFLAGS ?= -Wall -O2
+  CP_CFLAGS = -MMD
+  CP_CXXFLAGS = -MMD -DSTL_HASH_TR1
+  #LINKFLAGS = -static
+ifeq ($(BUILD_ENV_),OSX_Universal)
+  # MacOS Fat Binaries
+  CP_CXXFLAGS += -force_cpusubtype_ALL -arch i386 -arch ppc -arch x86_64
+  CP_CFLAGS += -force_cpusubtype_ALL -arch i386 -arch ppc -arch x86_64
+  LINKFLAGS += -force_cpusubtype_ALL -arch i386 -arch ppc -arch x86_64
+endif
+  LINKLIB = ld -r -o $@ $^
+  LINKBIN = $(CXX) $(LINKFLAGS) -o $@ $^ $(LIBS)
+ifeq ($(origin CC),default)
+  CC     = gcc
+  #CC     = icc
+endif
+ifeq ($(origin CXX),default)
+  CXX    = g++
+  #CXX    = icpc
+endif
+ifeq ($(origin YACC),default)
+  YACC   = bison -y
+endif
+  YFLAGS ?= -v
+ifeq ($(origin LEX),default)
+  LEX    = flex
+endif
+
+
+else ifeq ($(BUILD_ENV_),Cygwin)
+  # use these for Cygwin:
+  LIBEXT = .a
+  OBJEXT = .o
+  EXEEXT =
+  CFLAGS ?= -Wall -O2
+  CXXFLAGS ?= -Wall -O2
+  CP_CFLAGS = -MMD -mno-cygwin
+  CP_CXXFLAGS = -MMD -DSTL_HASH_GNU -mno-cygwin
+  LINKFLAGS = -static
+  LINKLIB = ld -r -o $@ $^
+  LINKBIN = $(CXX) $(LINKFLAGS) -o $@ $^ $(LIBS)
+ifeq ($(origin CC),default)
+  CC     = gcc
+  #GCC 4.5.3 is broken
+	#CC = i686-pc-mingw32-gcc
+endif
+ifeq ($(origin CXX),default)
+  CXX    = g++
+  #GCC 4.5.3 is broken
+  #CXX = i686-pc-mingw32-g++
+endif
+ifeq ($(origin YACC),default)
+  YACC   = bison -y
+endif
+  YFLAGS ?= -v
+ifeq ($(origin LEX),default)
+  LEX    = flex
+endif
+
+
+else ifeq ($(BUILD_ENV_),MSVC)
+  # use these for Visual Studio:
+  LIBEXT = .lib
+  OBJEXT = .obj
+  EXEEXT = .exe
+  CFLAGS ?= /O2 /GF
+  CXXFLAGS ?= /O2 /GF
+  CP_CFLAGS =
+  CP_CXXFLAGS = -DSTL_HASH_STDEXT
+  LINKLIB = lib /NOLOGO /OUT:$@ $^
+  LINKBIN = $(CXX) $(LINKFLAGS) /Fe$@ $^ $(LIBS)
+ifeq ($(origin CC),default)
+  CC = cl
+endif
+ifeq ($(origin CXX),default)
+  CXX = cl
+endif
+ifeq ($(origin YACC),default)
+  YACC   = bison -y
+endif
+  YFLAGS ?= -v
+ifeq ($(origin LEX),default)
+  LEX    = flex
+endif
+
+
+else
+  $(error Invalid setting for BUILD_ENV: $(BUILD_ENV_))
+endif
+
+
 first_target: all
 
-CFLAGS+=$(GCCFLAGS) $(INCLUDES)
-CXXFLAGS+=$(GCCFLAGS) $(INCLUDES)
+CP_CFLAGS += $(CFLAGS) $(INCLUDES)
+CP_CXXFLAGS += $(CXXFLAGS) $(INCLUDES)
 
-.SUFFIXES:	.C .d .cpp
+OBJ += $(patsubst %.cpp, %$(OBJEXT), $(filter %.cpp, $(SRC)))
+OBJ += $(patsubst %.cc, %$(OBJEXT), $(filter %.cc, $(SRC)))
 
-.C.o:
-	$(CXX) -c $(CXXFLAGS) -o $@ $<
+.SUFFIXES:	.cc .d .cpp
 
-.cpp.o:
-	$(CXX) -c $(CXXFLAGS) -o $@ $<
+%.o:%.cpp
+	$(CXX) -c $(CP_CXXFLAGS) -o $@ $<
 
-.c.o:
-	$(CC) -c $(CFLAGS) -o $@ $<
+%.o:%.cc
+	$(CXX) -c $(CP_CXXFLAGS) -o $@ $<
+
+%.o:%.c
+	$(CC) -c $(CP_CFLAGS) -o $@ $<
 
 # this one is for Visual Studio's compiler:
 %.obj:%.cpp
-	$(CXX) $(CXXFLAGS) /nologo /c /O2 /GF /EHsc /O2 $< /Fo$@
+	$(CXX) $(CP_CXXFLAGS) /nologo /c /EHsc $< /Fo$@
 
 %.obj:%.cc
-	$(CXX) $(CXXFLAGS) /nologo /c /O2 /GF /EHsc $< /Fo$@
+	$(CXX) $(CP_CXXFLAGS) /nologo /c /EHsc $< /Fo$@
 
 %.obj:%.c
-	$(CC) $(INCLUDES) /nologo /c /O2 /GF /EHsc $< /Fo$@
+	$(CC) $(CP_CFLAGS) /nologo /c /EHsc $< /Fo$@
+
+clean:
+	$(RM) $(patsubst %.cpp, %$(OBJEXT), $(filter %.cpp, $(SRC))) \
+		$(patsubst %.cpp, %.d, $(filter %.cpp, $(SRC))) \
+		$(patsubst %.cc, %$(OBJEXT), $(filter %.cc, $(SRC))) \
+		$(patsubst %.cc, %.d, $(filter %.cc, $(SRC))) \
+		$(CLEANFILES)
+
+.PHONY: first_target clean all
 
 #
 # include a dependency file if one exists

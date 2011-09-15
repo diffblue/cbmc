@@ -1,17 +1,12 @@
-RM = rm -f
-
 include ../config.inc
 include ../common
 
-OBJ = bigint-test$(OBJEXT) bigint-func$(OBJEXT) bigint$(OBJEXT)
+SRC = bigint-test.cc bigint-func.cc bigint.cc
 PRG = test-bigint$(EXEEXT)
+CLEANFILES = $(PRG)
 
 all : $(PRG)
 
-clean :
-	$(RM) $(OBJ) $(PRG)
-
 $(PRG): $(OBJ)
-	$(LINKBIN) $(OBJ)
+	$(LINKBIN)
 
-dep:

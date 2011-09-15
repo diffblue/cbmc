@@ -14,16 +14,18 @@ SRC = c_typecast.cpp y.tab.cpp lex.yy.cpp ansi_c_parser.cpp \
       literals/convert_float_literal.cpp \
       literals/convert_character_literal.cpp \
       literals/convert_integer_literal.cpp \
-      literals/convert_string_literal.cpp 
-
-OBJ = $(SRC:.cpp=$(OBJEXT))
+      literals/convert_string_literal.cpp
 
 INCLUDES= -I .. -I ../util
 
 include ../config.inc
 include ../common
 
-all: ansi-c$(LIBEXT) library/converter$(EXEEXT)
+CLEANFILES = ansi-c$(LIBEXT) \
+						 y.tab.h y.tab.cpp lex.yy.cpp y.tab.cpp.output y.output \
+						 library/converter$(EXEEXT) cprover_library.inc
+
+all: ansi-c$(LIBEXT)
 
 ###############################################################################
 
@@ -44,10 +46,10 @@ cprover_library$(OBJEXT): cprover_library.inc
 
 ###############################################################################
 
-library/converter$(EXEEXT):
-	$(LINKBIN) library/converter.cpp
+library/converter$(EXEEXT): library/converter.cpp
+	$(LINKBIN)
 	
-cprover_library.inc: library/converter library/*.c
+cprover_library.inc: library/converter$(EXEEXT) library/*.c
 	cat library/*.c | library/converter > $@
 
 cprover_library.cpp: cprover_library.inc
@@ -57,7 +59,3 @@ cprover_library.cpp: cprover_library.inc
 ansi-c$(LIBEXT): $(OBJ) 
 	$(LINKLIB)
 
-clean:
-	rm -f $(OBJ) ansi-c$(LIBEXT)
-	rm -f y.tab.h y.tab.cpp lex.yy.cpp y.tab.cpp.output y.output
-	rm -f library/converter$(EXEEXT) cprover_library.inc
