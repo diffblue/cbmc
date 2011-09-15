@@ -12,8 +12,7 @@ SRC = goto-cc.cpp \
       xml_binaries/xml_goto_program_hashing.cpp \
       xml_binaries/read_goto_object.cpp
 
-OBJ = $(SRC:.cpp=$(OBJEXT)) \
-      ../big-int/bigint$(OBJEXT) \
+OBJ += ../big-int/bigint$(OBJEXT) \
       ../goto-programs/goto-programs$(LIBEXT) \
       ../pointer-analysis/pointer-analysis$(LIBEXT) \
       ../util/util$(LIBEXT) \
@@ -25,6 +24,8 @@ INCLUDES= -I .. -I ../util
 
 LIBS =
 
+CLEANFILES = goto-cc$(EXEEXT)
+
 include ../config.inc
 include ../common
 
@@ -32,13 +33,11 @@ all: goto-cc$(EXEEXT)
 
 ifneq ($(wildcard ../cpp/Makefile),)
   OBJ += ../cpp/cpp$(LIBEXT)
-  CXXFLAGS += -D HAVE_CPP
+  CP_CXXFLAGS += -D HAVE_CPP
 endif
 
 ###############################################################################
 
 goto-cc$(EXEEXT): $(OBJ)
-	$(LINKBIN) $(OBJ)
+	$(LINKBIN)
 
-clean:
-	rm -f $(SRC:.cpp=$(OBJEXT)) $(SRC:.cpp=.d) goto-cc$(EXEEXT)

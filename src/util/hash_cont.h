@@ -14,7 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 // #define STL_HASH_NONE
 // #define STL_HASH_STDEXT
 // #define STL_HASH_GNU
-#define STL_HASH_TR1
+// #define STL_HASH_TR1
 
 #if defined(STL_HASH_NONE)
 

@@ -1,12 +1,12 @@
 SRC = xml_language.cpp xml_parser.cpp y.tab.cpp lex.yy.cpp xml_typecheck.cpp \
       xml_parse_tree.cpp
 
-OBJ = $(SRC:.cpp=$(OBJEXT))
-
 INCLUDES= -I .. -I ../util
 
 include ../config.inc
 include ../common
+
+CLEANFILES =xmllang$(LIBEXT) y.tab.h y.tab.cpp lex.yy.cpp y.tab.cpp.output y.output
 
 all: xmllang$(LIBEXT)
 
@@ -29,9 +29,3 @@ lex.yy.cpp: scanner.l
 y.tab$(OBJEXT): y.tab.cpp y.tab.h
 lex.yy$(OBJEXT): y.tab.cpp lex.yy.cpp y.tab.h
 
-clean:
-	rm -f $(OBJ) \
-	      y.tab.h y.tab.cpp lex.yy.cpp y.tab.cpp.output y.output \
-	      xmllang$(LIBEXT)
-
-dep: y.tab.cpp y.tab.h lex.yy.cpp

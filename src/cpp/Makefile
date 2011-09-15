@@ -20,16 +20,16 @@ SRC = cpp_id.cpp cpp_language.cpp expr2cpp.cpp cpp_parser.cpp \
       cpp_typecheck_enum_type.cpp cpp_typecheck_bases.cpp \
       cpp_typecheck_constructor.cpp cpp_typecheck_virtual_table.cpp
 
-OBJ = $(SRC:.cpp=$(OBJEXT))
-
 INCLUDES= -I .. -I ../util
 
 include ../config.inc
 include ../common
 
+CLEANFILES = cpp$(LIBEXT) lex.yy.cpp y.tab.cpp.output
+
 all: cpp$(LIBEXT)
 
-GCCFLAGS += -D CPP_SYSTEMC_EXTENSION
+CP_CXXFLAGS += -D CPP_SYSTEMC_EXTENSION
 
 ###############################################################################
 
@@ -40,9 +40,4 @@ lex.yy.cpp: scanner.l
 	$(LEX) -Pyycpp -olex.yy.cpp scanner.l
 
 lex.yy$(OBJEXT): lex.yy.cpp
-
-clean:
-	rm -f $(OBJ) cpp$(LIBEXT) lex.yy.cpp y.tab.cpp.output
-
-dep: lex.yy.cpp
 

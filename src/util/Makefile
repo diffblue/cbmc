@@ -18,17 +18,22 @@ SRC = arith_tools.cpp base_type.cpp cmdline.cpp config.cpp context.cpp \
       bv_arithmetic.cpp tempdir.cpp tempfile.cpp timer.cpp \
       irep_ids.cpp byte_operators.cpp
 
-OBJ = $(SRC:.cpp=$(OBJEXT))
-
 INCLUDES= -I .. -I .
+
+LIBS = ../big-int/bigint$(OBJEXT)
 
 include ../config.inc
 include ../common
 
+CLEANFILES = util$(LIBEXT) \
+						 irep_ids.h irep_ids.inc \
+						 ieee_float_test$(EXEEXT) ieee_float_test$(OBJEXT) ieee_float_test.d \
+						 irep_ids_convert$(EXEEXT) irep_ids_convert$(OBJEXT) irep_ids_convert.d
+
 all: util$(LIBEXT) ieee_float_test$(EXEEXT)
 
 ifneq ($(wildcard ../floatbv/Makefile),)
-  CXXFLAGS += -DHAVE_FLOATBV
+  CP_CXXFLAGS += -DHAVE_FLOATBV
 endif
 
 ###############################################################################
@@ -42,7 +47,7 @@ irep_ids.inc: irep_ids_convert$(EXEEXT) irep_ids.txt
 irep_ids.cpp: irep_ids.inc irep_ids.h
 
 irep_ids_convert$(EXEEXT): irep_ids_convert$(OBJEXT)
-	$(LINKBIN) irep_ids_convert$(OBJEXT)
+	$(LINKBIN)
 
 # Most of the others will need irep_ids.h,
 # which we first need to generate.
@@ -51,13 +56,7 @@ $(OBJ): irep_ids.h
 util$(LIBEXT): $(OBJ)
 	$(LINKLIB)
 
-clean:
-	rm -f $(OBJ) util$(LIBEXT)
-	rm -f irep_ids.h irep_ids.inc
-	rm -f ieee_float_test$(EXEEXT) ieee_float_test$(OBJEXT)
-	rm -f irep_ids_convert$(EXEEXT) irep_ids_convert$(OBJEXT)          
-
 ieee_float_test$(OBJEXT): irep_ids.h  
 
-ieee_float_test$(EXEEXT): ieee_float_test$(OBJEXT) ieee_float$(OBJEXT) util$(LIBEXT)
-	$(LINKBIN) util$(LIBEXT) ieee_float_test$(OBJEXT) ../big-int/bigint$(OBJEXT)
+ieee_float_test$(EXEEXT): ieee_float_test$(OBJEXT) util$(LIBEXT)
+	$(LINKBIN)

@@ -6,12 +6,12 @@ SRC = value_set.cpp goto_program_dereference.cpp value_set_analysis.cpp \
       value_set_analysis_fivrns.cpp value_set_fivrns.cpp \
       value_set_domain_fivrns.cpp
 
-OBJ = $(SRC:.cpp=$(OBJEXT))
-
 INCLUDES= -I .. -I ../util
 
 include ../config.inc
 include ../common
+
+CLEANFILES = pointer-analysis$(LIBEXT)
 
 all: pointer-analysis$(LIBEXT)
 
@@ -19,7 +19,4 @@ all: pointer-analysis$(LIBEXT)
 
 pointer-analysis$(LIBEXT): $(OBJ)
 	$(LINKLIB)
-
-clean:
-	rm -f $(OBJ) pointer-analysis$(LIBEXT)
 

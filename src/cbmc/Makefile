@@ -5,8 +5,7 @@ SRC = main.cpp parseoptions.cpp bmc.cpp dimacs.cpp languages.cpp \
       counterexample_beautification_greedy.cpp \
       counterexample_beautification_pbs.cpp
 
-OBJ = $(SRC:.cpp=$(OBJEXT)) \
-      ../ansi-c/ansi-c$(LIBEXT) \
+OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../big-int/bigint$(OBJEXT) \
       ../goto-programs/goto-programs$(LIBEXT) \
       ../goto-symex/goto-symex$(LIBEXT) \
@@ -23,37 +22,37 @@ LIBS =
 include ../config.inc
 include ../common
 
+CLEANFILES = cbmc$(EXEEXT)
+
 all: cbmc$(EXEEXT)
 
 ifneq ($(wildcard ../bv_refinement/Makefile),)
   OBJ += ../bv_refinement/bv_refinement$(LIBEXT)
-  CXXFLAGS += -DHAVE_BV_REFINEMENT
+  CP_CXXFLAGS += -DHAVE_BV_REFINEMENT
 endif
 
 ifneq ($(wildcard ../cpp/Makefile),)
   OBJ += ../cpp/cpp$(LIBEXT)
-  CXXFLAGS += -DHAVE_CPP
+  CP_CXXFLAGS += -DHAVE_CPP
 endif
 
 ifneq ($(wildcard ../java/Makefile),)
   OBJ += ../java/java$(LIBEXT)
-  CXXFLAGS += -DHAVE_JAVA
+  CP_CXXFLAGS += -DHAVE_JAVA
 endif
 
 ifneq ($(wildcard ../specc/Makefile),)
   OBJ += ../specc/specc$(LIBEXT)
-  CXXFLAGS += -DHAVE_SPECC
+  CP_CXXFLAGS += -DHAVE_SPECC
 endif
 
 ifneq ($(wildcard ../php/Makefile),)
   OBJ += ../php/php$(LIBEXT)
-  CXXFLAGS += -DHAVE_PHP
+  CP_CXXFLAGS += -DHAVE_PHP
 endif
 
 ###############################################################################
 
 cbmc$(EXEEXT): $(OBJ)
-	$(LINKBIN) $(OBJ)
+	$(LINKBIN)
 
-clean:
-	rm -f $(SRC:.cpp=$(OBJEXT)) cbmc$(EXEEXT)
