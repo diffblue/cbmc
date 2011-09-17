@@ -2453,7 +2453,7 @@ bool simplify_exprt::simplify_inequality_address_of(exprt &expr)
   {
     bool equal=
        expr.op0().op0().get(ID_identifier)==
-       expr.op0().op0().get(ID_identifier);
+       expr.op1().op0().get(ID_identifier);
        
     expr.make_bool(expr.id()==ID_equal?equal:!equal);
     
