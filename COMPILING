@@ -13,7 +13,8 @@ CPROVER compiles in the following environments:
 - Microsoft's Visual Studio 2010 (older versions won't work)
 
 You need to adjust config.inc to reflect the environment. The default is
-set up for a recent version of Linux.
+set up for a recent version of Linux. You also need GNU Make version 3.81 or
+higher.
 
 
 How to compile?
