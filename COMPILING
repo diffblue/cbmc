@@ -13,8 +13,7 @@ CPROVER compiles in the following environments:
 - Microsoft's Visual Studio 2010 (older versions won't work)
 
 You need to adjust config.inc to reflect the environment. The default is
-set up for a recent version of Linux. You also need GNU Make version 3.81 or
-higher.
+set up for a recent version of Linux. 
 
 
 How to compile?
@@ -23,6 +22,7 @@ How to compile?
 Follow these instructions:
 
 0) You need a C/C++ compiler, Flex and Bison, and GNU make.
+   The GNU Make needs to be version 3.81 or higher.
    If you have Windows, and don't have these, we recommend you
    install Cygwin.
 
@@ -30,7 +30,7 @@ Follow these instructions:
    Linux distributions now have a package for MiniSat2; e.g.,
    try "apt-get install minisat2" on Debian-like distributions.
 
-   Alternatively, the source of MiniSat2 can be be downloaded at
+   Windows and Mac users can download the source of MiniSat2 at
    the following address:
 
    http://minisat.se/downloads/minisat-2.2.0.tar.gz
@@ -45,16 +45,16 @@ Follow these instructions:
 3) If desired, adjust src/solvers/sat/satcheck.h to select which SAT
    solver to use (MiniSat2 with simplifier is the default).
 
-4) Adjust the file src/utils/hash_cont.h
-
-   Depending on the version of your STL, you may need to adjust a preprocessor
-   command:
+4) Depending on the version of your STL, you may need to adjust a preprocessor
+   command in the file src/common:
 
    a) Recent versions of Linux run with "STL_HASH_TR1".
    b) Recent versions of Cygwin/MingW work with "STL_HASH_TR1";
       for g++-3, use "STL_HASH_GNU".
    c) Visual Studio: please get Visual Studio 10 and use "STL_HASH_TR1".
 
-   Older Linux or MingW systems may require "STL_HASH_GNU".
+   Older Linux or MingW systems may require "STL_HASH_GNU". The
+   file src/common tries to guess a reasonable default based on
+   your environment.
 
 5) Type cd src; make - that should do it.
