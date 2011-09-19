@@ -2471,7 +2471,7 @@ Function: simplify_exprt::simplify_inequality
 
  Outputs:
 
- Purpose:
+ Purpose: simplifies inequalities !=, <=, <, >=, >, and also ==
 
 \*******************************************************************/
 
@@ -2502,7 +2502,8 @@ bool simplify_exprt::simplify_inequality(exprt &expr)
   exprt tmp1=expr.op1();
   ns.follow_symbol(tmp0.type());
   ns.follow_symbol(tmp1.type());
-  
+
+  // are _both_ constant?  
   if(op0_is_const && op1_is_const)
   {
     if(tmp0.id()==ID_bool)
@@ -2635,15 +2636,20 @@ bool simplify_exprt::simplify_inequality(exprt &expr)
     
     expr.op0().swap(expr.op1());
     
+    // one is constant
     simplify_inequality_constant(expr);
     return false;
   }
   else if(op1_is_const)
   {
+    // one is constant
     return simplify_inequality_constant(expr); 
   }
   else
+  {
+    // both are not constant
     return simplify_inequality_not_constant(expr);
+  }
     
   assert(false);
   return false;
@@ -2836,7 +2842,7 @@ bool simplify_exprt::simplify_inequality_not_constant(exprt &expr)
 
 Function: simplify_exprt::simplify_inequality_constant
 
-  Inputs:
+  Inputs: an inequality with a constant on the RHS
 
  Outputs:
 
@@ -2994,10 +3000,18 @@ bool simplify_exprt::simplify_inequality_constant(exprt &expr)
      expr.op0().op0().type().id()==ID_bool)
   {
     // we re-write (TYPE)boolean == 0 -> !boolean
-    if(expr.op1().is_zero())
+    if(expr.op1().is_zero() && expr.id()==ID_equal)
     {
       exprt tmp=expr.op0().op0();
       tmp.make_not();
+      expr.swap(tmp);
+      return false;
+    }
+
+    // we re-write (TYPE)boolean != 0 -> boolean
+    if(expr.op1().is_zero() && expr.id()==ID_notequal)
+    {
+      exprt tmp=expr.op0().op0();
       expr.swap(tmp);
       return false;
     }
