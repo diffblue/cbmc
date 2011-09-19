@@ -6,7 +6,7 @@ ifeq ($(uname),windows32)
 else ifeq ($(filter-out MINGW32_%, $(uname)),)
   BUILD_ENV_ := MinGW
 else ifeq ($(filter-out CYGWIN_%, $(uname)),)
-  BUILD_ENV_ := MinGW
+  BUILD_ENV_ := Cygwin
 else
   BUILD_ENV_ := Unix
 endif
@@ -14,7 +14,7 @@ else
   BUILD_ENV_ := $(BUILD_ENV)
 endif
 
-ifeq ($(filter-out Unix Cygwin MinGW OSX_Universal,$(BUILD_ENV_)),)
+ifeq ($(filter-out Unix MinGW OSX_Universal,$(BUILD_ENV_)),)
   # Linux etc.
   LIBEXT = .a
   OBJEXT = .o
@@ -58,7 +58,7 @@ else ifeq ($(BUILD_ENV_),Cygwin)
   CXXFLAGS ?= -Wall -O2
   CP_CFLAGS = -MMD -mno-cygwin
   CP_CXXFLAGS = -MMD -DSTL_HASH_GNU -mno-cygwin
-  LINKFLAGS = -static
+  LINKFLAGS = -static -mno-cygwin
   LINKLIB = ld -r -o $@ $^
   LINKBIN = $(CXX) $(LINKFLAGS) -o $@ $^ $(LIBS)
 ifeq ($(origin CC),default)
