@@ -88,7 +88,7 @@ else ifeq ($(BUILD_ENV_),MSVC)
   CFLAGS ?= /O2 /GF
   CXXFLAGS ?= /O2 /GF
   CP_CFLAGS =
-  CP_CXXFLAGS = -DSTL_HASH_STDEXT
+  CP_CXXFLAGS = -DSTL_HASH_TR1
   LINKLIB = lib /NOLOGO /OUT:$@ $^
   LINKBIN = $(CXX) $(LINKFLAGS) /Fe$@ $^ $(LIBS)
 ifeq ($(origin CC),default)
