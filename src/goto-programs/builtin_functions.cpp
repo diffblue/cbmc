@@ -808,7 +808,7 @@ void goto_convertt::do_function_call_symbol(
     t->code=codet(ID_user_specified_predicate);
   }
   else if(identifier==CPROVER_PREFIX "assume" ||
-          identifier=="c::assert")
+          identifier=="c::__VERIFIER_assume")
   {
     if(arguments.size()!=1)
     {
@@ -816,22 +816,36 @@ void goto_convertt::do_function_call_symbol(
       throw "`"+id2string(identifier)+"' expected to have one argument";
     }
 
-    if(identifier==CPROVER_PREFIX "assume" &&
-       !options.get_bool_option("assumptions"))
+    if(!options.get_bool_option("assumptions"))
       return;
 
-    if(identifier=="c::assert" &&
-       !options.get_bool_option("assertions"))
-      return;
-
-    goto_programt::targett t=dest.add_instruction(
-      (identifier==CPROVER_PREFIX "assume")?ASSUME:ASSERT);
+    goto_programt::targett t=dest.add_instruction(ASSUME);
     t->guard=arguments.front();
     t->location=function.location();
     t->location.set("user-provided", true);
 
-    if(identifier=="c::assert")
-      t->location.set(ID_property, ID_assertion);
+    if(lhs.is_not_nil())
+    {
+      err_location(function);
+      throw id2string(identifier)+" expected not to have LHS";
+    }
+  }
+  else if(identifier=="c::assert")
+  {
+    if(arguments.size()!=1)
+    {
+      err_location(function);
+      throw "`"+id2string(identifier)+"' expected to have one argument";
+    }
+
+    if(!options.get_bool_option("assertions"))
+      return;
+
+    goto_programt::targett t=dest.add_instruction(ASSERT);
+    t->guard=arguments.front();
+    t->location=function.location();
+    t->location.set("user-provided", true);
+    t->location.set(ID_property, ID_assertion);
     
     if(lhs.is_not_nil())
     {
