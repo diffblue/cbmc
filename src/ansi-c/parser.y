@@ -2611,7 +2611,6 @@ postfix_abstract_declarator:
         | '(' unary_abstract_declarator ')' postfixing_abstract_declarator
         {
           /* note: this is a pointer ($2) to a function ($4) */
-          /* or an array ($4) of pointers with name ($2)! */
           $$=$2;
           make_subtype($$, $4);
         }
@@ -2626,7 +2625,6 @@ parameter_postfix_abstract_declarator:
         | '(' parameter_unary_abstract_declarator ')' parameter_postfixing_abstract_declarator
         {
           /* note: this is a pointer ($2) to a function ($4) */
-          /* or an array ($4) of pointers with name ($2)! */
           $$=$2;
           make_subtype($$, $4);
         }
