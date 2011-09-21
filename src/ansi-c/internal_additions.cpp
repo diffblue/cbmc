@@ -49,6 +49,7 @@ void ansi_c_internal_additions(std::string &code)
   code+=
     "typedef __typeof__(sizeof(int)) __CPROVER_size_t;\n"
     "void __CPROVER_assume(_Bool assumption);\n"
+    "void __VERIFIER_assume(_Bool assumption);\n"
     "void assert(_Bool assertion);\n"
     "void __CPROVER_assert(_Bool assertion, const char *description);\n"
     "_Bool __CPROVER_equal();\n"
