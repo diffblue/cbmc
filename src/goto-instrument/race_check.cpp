@@ -79,7 +79,7 @@ const symbolt &w_guardst::get_guard_symbol(const irep_idt &object)
   symbolt new_symbol;
   new_symbol.name=identifier;
   new_symbol.base_name=identifier;
-  new_symbol.type=typet("bool");
+  new_symbol.type=bool_typet();
   new_symbol.static_lifetime=true;
   new_symbol.value.make_false();
   
@@ -262,11 +262,10 @@ void race_check(
   goto_functionst::function_mapt::iterator
     m_it=goto_functions.function_map.find(goto_functions.main_id());
 
-  if(m_it!=goto_functions.function_map.end())
-  {
-    goto_programt &main=m_it->second.body;
-    w_guards.add_initialization(main);
-  }
-  
+  if(m_it==goto_functions.function_map.end())
+    throw "Race check instrumentation needs an entry point";
+
+  goto_programt &main=m_it->second.body;
+  w_guards.add_initialization(main);
   goto_functions.update();
 }
