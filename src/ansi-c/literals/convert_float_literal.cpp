@@ -51,22 +51,40 @@ exprt convert_float_literal(const std::string &src)
 
   if(config.ansi_c.use_fixed_for_float)
   {
-    unsigned width=atoi(result.type().get(ID_width).c_str());
+    unsigned width=result.type().get_int(ID_width);
     unsigned fraction_bits;
-    const irep_idt &integer_bits=result.type().get(ID_integer_bits);
+    const irep_idt integer_bits=result.type().get(ID_integer_bits);
+    
+    assert(width!=0);
 
     if(integer_bits==irep_idt())
-      fraction_bits=width/2;
+      fraction_bits=width/2; // default
     else
       fraction_bits=width-atoi(integer_bits.c_str());
 
     mp_integer factor=mp_integer(1)<<fraction_bits;
     mp_integer value=significand*factor;
+    
+    if(value!=0)
+    {
+      if(exponent<0)
+        value/=power(10, -exponent);
+      else
+      {
+        value*=power(10, exponent);    
 
-    if(exponent<0)
-      value/=power(10, -exponent);
-    else
-      value*=power(10, exponent);
+        if(value>=power(2, width-1))
+        {
+          // saturate: use "biggest value"
+          value=power(2, width-1)-1;
+        }
+        else if(value<=-power(2, width-1)-1)
+        {
+          // saturate: use "smallest value"
+          value=-power(2, width-1);
+        }
+      }
+    }
 
     result.set(ID_value, integer2binary(value, width));  
   }
