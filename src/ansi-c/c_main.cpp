@@ -86,6 +86,7 @@ void static_lifetime_init(
       
       // special values
       if(identifier==CPROVER_PREFIX "constant_infinity_uint" ||
+         identifier==CPROVER_PREFIX "memory" ||
          identifier=="c::__func__" ||
          identifier=="c::__FUNCTION__" ||
          identifier=="c::__PRETTY_FUNCTION__")
