@@ -1,7 +1,7 @@
 SRC = main.cpp parseoptions.cpp document_claims.cpp languages.cpp \
       uninitialized.cpp uninitialized_domain.cpp full_slicer.cpp \
       object_id.cpp show_locations.cpp points_to.cpp \
-      alignment_checks.cpp
+      alignment_checks.cpp race_check.cpp rw_set.cpp
 
 OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../big-int/bigint$(OBJEXT) \
