@@ -49,6 +49,8 @@ public:
 class ieee_floatt
 {
 public:
+  // ROUND_TO_EVEN is also known as "round to nearest, ties to even", and
+  // is the IEEE default
   typedef enum {
     ROUND_TO_EVEN, ROUND_TO_ZERO, ROUND_TO_PLUS_INF, ROUND_TO_MINUS_INF,
     UNKNOWN, NONDETERMINISTIC }
@@ -57,7 +59,6 @@ public:
   rounding_modet rounding_mode;
 
   ieee_float_spect spec;
-
   
   ieee_floatt(const ieee_float_spect &_spec):
     rounding_mode(ROUND_TO_EVEN),
