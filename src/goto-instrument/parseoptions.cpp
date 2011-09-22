@@ -39,6 +39,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "show_locations.h"
 #include "points_to.h"
 #include "alignment_checks.h"
+#include "weak_memory.h"
+#include "race_check.h"
 
 /*******************************************************************\
 
@@ -365,7 +367,9 @@ void goto_instrument_parseoptionst::instrument_goto_program(
       get_message_handler(), goto_functions);
   }
 
-  if(cmdline.isset("pointer-check"))
+  if(cmdline.isset("pointer-check") ||
+     cmdline.isset("race-check") ||
+     cmdline.isset("tso"))
   {
     status("Function Pointer Removal");
     remove_function_pointers(ns, goto_functions);
@@ -378,11 +382,33 @@ void goto_instrument_parseoptionst::instrument_goto_program(
     value_set_analysist value_set_analysis(ns);
     value_set_analysis(goto_functions);
 
-    // add pointer checks
-    status("Adding Pointer Checks");
-    pointer_checks(
-      goto_functions, context, options, value_set_analysis);
+    if(cmdline.isset("pointer-check"))
+    {
+      // add pointer checks
+      status("Adding Pointer Checks");
+      pointer_checks(
+        goto_functions, context, options, value_set_analysis);
+    }
+
+    if(cmdline.isset("race-check"))
+    {
+      status("Adding Race Checks");
+      race_check(
+        value_set_analysis,
+        context,
+        goto_functions);
+    }
+
+    if(cmdline.isset("tso"))
+    {
+      status("Adding TSO Instrumentation");
+      weak_memory_tso(
+        value_set_analysis,
+        context,
+        goto_functions);
+    }
   }
+  
 
   // add failed symbols
   add_failed_symbols(context);
