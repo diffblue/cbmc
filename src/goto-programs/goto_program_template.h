@@ -119,6 +119,8 @@ public:
     inline void make_other() { clear(OTHER); }
     inline void make_decl() { clear(DECL); }
     inline void make_dead() { clear(DEAD); }
+    inline void make_atomic_begin() { clear(ATOMIC_BEGIN); }
+    inline void make_atomic_end() { clear(ATOMIC_END); }
 
     inline void make_goto(
       typename std::list<class instructiont>::iterator _target)
