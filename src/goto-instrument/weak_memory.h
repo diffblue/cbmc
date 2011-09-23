@@ -21,4 +21,9 @@ void weak_memory_tso(
   class contextt &context,
   goto_functionst &goto_functions);
 
+void weak_memory(
+  value_setst &value_sets,
+  class contextt &context,
+  goto_functionst &goto_functions);
+
 #endif

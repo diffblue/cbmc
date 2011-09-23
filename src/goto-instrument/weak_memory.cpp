@@ -32,8 +32,8 @@ public:
   {
   public:
     // older stuff has the higher index
-    irep_idt w_used0, w_used1, w_used2;
-    irep_idt w_buff0, w_buff1, w_buff2;
+    irep_idt w_used0, w_used1;
+    irep_idt w_buff0, w_buff1;
     
     typet type;
   };
@@ -115,10 +115,8 @@ const shared_bufferst::varst &shared_bufferst::operator()(const irep_idt &object
 
   vars.w_used0=add(object, "$w_used0", bool_typet());
   vars.w_used1=add(object, "$w_used1", bool_typet());
-  vars.w_used2=add(object, "$w_used2", bool_typet());
   vars.w_buff0=add(object, "$w_buff0", symbol.type);
   vars.w_buff1=add(object, "$w_buff1", symbol.type);
-  vars.w_buff2=add(object, "$w_buff2", symbol.type);
   
   return vars;
 }
@@ -183,7 +181,6 @@ void shared_bufferst::add_initialization(goto_programt &goto_program) const
     location.make_nil();
     assignment(goto_program, t, location, it->second.w_used0, false_exprt());
     assignment(goto_program, t, location, it->second.w_used1, false_exprt());
-    assignment(goto_program, t, location, it->second.w_used2, false_exprt());
   }
 }
 
@@ -282,7 +279,7 @@ void weak_memory_tso(
       instruction.location=location;
       i_it++;
       
-      // we first perform (non-deterministically) up to 3 writes for
+      // we first perform (non-deterministically) up to 2 writes for
       // stuff that is potentially read
       forall_rw_set_entries(e_it, rw_set)
         if(e_it->second.r)
@@ -290,37 +287,30 @@ void weak_memory_tso(
           const shared_bufferst::varst &vars=shared_buffers(e_it->second.object);
           irep_idt choice0=shared_buffers.choice("0");
           irep_idt choice1=shared_buffers.choice("1");
-          irep_idt choice2=shared_buffers.choice("2");
           
           symbol_exprt choice0_expr=symbol_exprt(choice0, bool_typet());
           symbol_exprt choice1_expr=symbol_exprt(choice1, bool_typet());
-          symbol_exprt choice2_expr=symbol_exprt(choice2, bool_typet());
         
           symbol_exprt w_buff0_expr=symbol_exprt(vars.w_buff0, vars.type);
           symbol_exprt w_buff1_expr=symbol_exprt(vars.w_buff1, vars.type);
-          symbol_exprt w_buff2_expr=symbol_exprt(vars.w_buff2, vars.type);
           
           symbol_exprt w_used0_expr=symbol_exprt(vars.w_used0, bool_typet());
           symbol_exprt w_used1_expr=symbol_exprt(vars.w_used1, bool_typet());
-          symbol_exprt w_used2_expr=symbol_exprt(vars.w_used2, bool_typet());
           
           exprt nondet_bool_expr=nondet_exprt(bool_typet());
           
           exprt choice0_rhs=and_exprt(nondet_bool_expr, w_used0_expr);
           exprt choice1_rhs=and_exprt(nondet_bool_expr, w_used1_expr);
-          exprt choice2_rhs=and_exprt(nondet_bool_expr, w_used2_expr);
           
-          // throw 3 Boolean dice        
+          // throw 2 Boolean dice
           shared_buffers.assignment(goto_program, i_it, location, choice0, choice0_rhs);
           shared_buffers.assignment(goto_program, i_it, location, choice1, choice1_rhs);
-          shared_buffers.assignment(goto_program, i_it, location, choice2, choice2_rhs);
           
           exprt lhs=symbol_exprt(e_it->second.object, vars.type);
           
           exprt value=
             if_exprt(choice0_expr, w_buff0_expr,
-              if_exprt(choice1_expr, w_buff1_expr,
-                if_exprt(choice2_expr, w_buff2_expr, lhs)));
+              if_exprt(choice1_expr, w_buff1_expr, lhs));
 
           // write one of the buffer entries
           shared_buffers.assignment(goto_program, i_it, location, e_it->second.object, value);
@@ -328,11 +318,9 @@ void weak_memory_tso(
           // update 'used' flags
           exprt w_used0_rhs=if_exprt(choice0_expr, false_exprt(), w_used0_expr);
           exprt w_used1_rhs=and_exprt(if_exprt(choice1_expr, false_exprt(), w_used1_expr), w_used0_expr);
-          exprt w_used2_rhs=and_exprt(if_exprt(choice2_expr, false_exprt(), w_used2_expr), w_used1_expr);
 
           shared_buffers.assignment(goto_program, i_it, location, vars.w_used0, w_used0_rhs);
           shared_buffers.assignment(goto_program, i_it, location, vars.w_used1, w_used1_rhs);
-          shared_buffers.assignment(goto_program, i_it, location, vars.w_used2, w_used2_rhs);
         }
 
       // now rotate the write buffers for anything that is written
@@ -341,13 +329,11 @@ void weak_memory_tso(
         {
           const shared_bufferst::varst &vars=shared_buffers(e_it->second.object);
         
-          // w_used2=w_used1; w_used1=w_used0; w_used0=true;
-          shared_buffers.assignment(goto_program, i_it, location, vars.w_used2, vars.w_used1);
+          // w_used1=w_used0; w_used0=true;
           shared_buffers.assignment(goto_program, i_it, location, vars.w_used1, vars.w_used0);
           shared_buffers.assignment(goto_program, i_it, location, vars.w_used0, true_exprt());
 
-          // w_buff2=w_buff1; w_buff1=w_buff0; w_buff0=RHS;
-          shared_buffers.assignment(goto_program, i_it, location, vars.w_buff2, vars.w_buff1);
+          // w_buff1=w_buff0; w_buff0=RHS;
           shared_buffers.assignment(goto_program, i_it, location, vars.w_buff1, vars.w_buff0);
           shared_buffers.assignment(goto_program, i_it, location, vars.w_buff0, original_instruction.code.op1());
         }
@@ -391,3 +377,33 @@ void weak_memory_tso(
   shared_buffers.add_aux_code(goto_functions);
   goto_functions.update();
 }
+
+/*******************************************************************\
+
+Function: weak_memory_tso
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void weak_memory(
+  value_setst &value_sets,
+  class contextt &context,
+  goto_functionst &goto_functions)
+{
+  shared_bufferst shared_buffers(context);
+
+  #if 0
+  Forall_goto_functions(f_it, goto_functions)
+    if(f_it->first!=CPROVER_PREFIX "initialize")
+      weak_memory(value_sets, context, f_it->second.body, shared_buffers);
+  #endif
+
+  shared_buffers.add_aux_code(goto_functions);
+  goto_functions.update();
+}
+

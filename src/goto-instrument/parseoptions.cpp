@@ -401,8 +401,17 @@ void goto_instrument_parseoptionst::instrument_goto_program(
 
     if(cmdline.isset("tso"))
     {
-      status("Adding TSO Instrumentation");
+      status("Adding weak memory (TSO) Instrumentation");
       weak_memory_tso(
+        value_set_analysis,
+        context,
+        goto_functions);
+    }
+
+    if(cmdline.isset("weak-mem"))
+    {
+      status("Adding weak memory Instrumentation");
+      weak_memory(
         value_set_analysis,
         context,
         goto_functions);
