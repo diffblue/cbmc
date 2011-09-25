@@ -62,6 +62,7 @@ int main(int argc, const char **argv)
   {
     // this is the Visual Studio personality
     ms_cl_cmdlinet cmdline;
+    cmdline.parse_env();
     cmdline_optionst cmdline_options(cmdline);
     cmdline_options.my_name=base_name;
     return cmdline_options.main(argc, argv);

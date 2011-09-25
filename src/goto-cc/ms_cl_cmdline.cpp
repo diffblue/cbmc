@@ -52,55 +52,81 @@ const char *non_ms_cl_options[]=
   NULL
 };
 
-bool ms_cl_cmdlinet::parse(int argc, const char **argv)
+bool ms_cl_cmdlinet::parse(const std::vector<std::string> &options)
+{
+  for(unsigned i=0; i<options.size(); i++)
+  {
+    // is it a non-cl option?
+    if(strncmp(options[i].c_str(), "--", 2)==0)
+    {
+      process_non_cl_option(options[i]);
+
+      if(options[i]=="--verbosity")
+        if(i<options.size()-1)
+        {
+          set("verbosity", options[i+1]);
+          i++; // skip ahead
+        }
+    }
+    else if(!options[i].empty() && options[i][0]=='@')
+    {
+      process_response_file(std::string(options[i], 1, std::string::npos));
+    }
+    else if(options[i]=="/link" ||
+            options[i]=="-link")
+    {
+      // anything that follows goes to the linker
+      i=options.size()-1;
+    }
+    else
+      process_cl_option(options[i]);
+  }
+
+  return false;
+}
+
+/*******************************************************************\
+ 
+Function: ms_cl_cmdlinet::parse_env
+ 
+  Inputs:
+ 
+ Outputs: none
+ 
+ Purpose:
+ 
+\*******************************************************************/
+
+void ms_cl_cmdlinet::parse_env()
 {
   // first do environment
   const char *CL_env=getenv("CL");
   
   if(CL_env!=NULL)
-  {
-    const char *ptr=CL_env;
-    while(*ptr!=0)
-    {
-      while(*ptr==' ') ptr++;
-      
-      unsigned cnt=0;
-      while(ptr[cnt]!=0 && ptr[cnt]!=' ') cnt++;
-      
-      std::string tmp=std::string(ptr, 0, cnt);
-      process_cl_option(tmp);
-    }
-  }
+    process_response_file_line(std::string(CL_env));
+}
 
+/*******************************************************************\
+ 
+Function: ms_cl_cmdlinet::parse
+ 
+  Inputs: argument count, argument strings
+ 
+ Outputs: none
+ 
+ Purpose: parses the commandline options into a cmdlinet
+ 
+\*******************************************************************/
+
+bool ms_cl_cmdlinet::parse(int argc, const char **argv)
+{
+  std::vector<std::string> options;
+
+  // skip argv[0]
   for(int i=1; i<argc; i++)
-  {
-    // is it a non-cl option?
-    if(strncmp(argv[i], "--", 2)==0)
-    {
-      process_non_cl_option(argv[i]);
-
-      if(std::string(argv[i])=="--verbosity")
-        if(i<argc-1)
-        {
-          set("verbosity", argv[i+1]);
-          i++; // skip ahead
-        }
-    }
-    else if(argv[i][0]=='@')
-    {
-      process_response_file(argv[i]+1);
-    }
-    else if(strcmp(argv[i], "/link")==0 ||
-            strcmp(argv[i], "-link")==0)
-    {
-      // anything that follows goes to the linker
-      i=argc-1;
-    }
-    else
-      process_cl_option(argv[i]);
-  }
-
-  return false;
+    options.push_back(argv[i]);
+  
+  return parse(options);
 }
 
 /*******************************************************************\
@@ -126,12 +152,19 @@ static std::istream &my_wgetline(std::istream &in, std::string &dest)
     char ch1, ch2;
     in.get(ch1);
     in.get(ch2);
+    
+    if(!in)
+    {
+      if(!dest.empty()) in.clear();
+      break;
+    }
 
     if(ch1=='\r')
     {
     }
     else if(ch1=='\n')
     {
+      in.clear();
       break;
     }
     else if(ch1==0)
@@ -210,22 +243,24 @@ void ms_cl_cmdlinet::process_response_file_line(const std::string &line)
   if(line.empty()) return;
   if(line[0]=='#') return;
 
+  std::vector<std::string> options;
   std::string option;
 
   for(unsigned i=0; i<line.size(); i++)
   {
-    char ch=line[i++];
+    char ch=line[i];
     
     if(ch==' ')
     {
-      process_cl_option(option);
+      if(!option.empty()) options.push_back(option);
       option.clear();
     }
     else
       option+=ch;
   }
 
-  process_cl_option(option);
+  if(!option.empty()) options.push_back(option);
+
 }
 
 /*******************************************************************\
