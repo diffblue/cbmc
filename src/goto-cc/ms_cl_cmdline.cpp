@@ -132,22 +132,19 @@ void ms_cl_cmdlinet::process_response_file(const std::string &file)
   if(line[0]==char(0xff) && line[1]==char(0xfe))
   {
     // Unicode!
-    infile.close();
+    infile.seekg(2);
     
-    std::wifstream winfile(file.c_str());
-    // skip over the header bytes
-    winfile.seekg(2);
-
-    std::wstring wline;
-    while(getline(winfile, wline))
+    while(getline(infile, line))
     {
       // We should support this properly,
       // but will just strip right now.
-      line.resize(wline.size());
-      for(unsigned i=0; i<wline.size(); i++)
-        line[i]=wline[i]; // truncate
+      std::string tmp;
+      tmp.resize(line.size()/2);
       
-      process_cl_option(line);
+      for(unsigned i=0; i<line.size(); i++)
+        tmp[i]=line[i*2+1]; // truncate
+        
+      process_cl_option(tmp);
     }
   }
   else
