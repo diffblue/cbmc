@@ -19,13 +19,13 @@ Date: June 2006
 #include <langapi/language_ui.h>
 #include <goto-programs/goto_functions.h>
 
-class compilet: public language_uit
+class compilet:public language_uit
 {
 public:
   optionst options;
   namespacet ns;
   goto_functionst compiled_functions;
-  bool act_as_ld, only_preprocess;
+  bool act_as_ld, only_preprocess, echo_file_name;
   std::string working_directory;
 
   std::list<std::string> library_paths;
@@ -43,11 +43,11 @@ public:
   
   ~compilet();
   
-  bool add_input_file( const std::string& );
-  bool find_library( const std::string& );
-  bool is_xml_file( const std::string& );
-  bool is_binary_file( const std::string& );
-  bool is_elf_file( const std::string& );
+  bool add_input_file(const std::string &);
+  bool find_library(const std::string &);
+  bool is_xml_file(const std::string &);
+  bool is_binary_file(const std::string &);
+  bool is_elf_file(const std::string &);
 
   bool parse(const std::string &filename);
   bool parse_stdin();
@@ -55,8 +55,8 @@ public:
   bool compile();
   bool link();
 
-  bool parse_source( const std::string& );
-  bool parse_object( const std::string&, goto_functionst& );
+  bool parse_source(const std::string &);
+  bool parse_object(const std::string &, goto_functionst &);
 
   bool write_object_file( const std::string &, const contextt &, 
                           goto_functionst &);
@@ -67,7 +67,7 @@ public:
 
 protected:
   cmdlinet &cmdline;
-  std::string& escape(std::string&);
+  std::string &escape(std::string &);
   static unsigned subgraphscount;
 
   void write_edge( std::ostream&,

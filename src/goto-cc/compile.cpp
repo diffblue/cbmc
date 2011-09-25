@@ -121,7 +121,7 @@ bool compilet::doit()
 
   add_compiler_specific_defines(config);
 
-  // Parse commandline for source and object filenames
+  // Parse commandline for source and object file names
   for(unsigned i=0; i<_cmdline.args.size(); i++)
     if(add_input_file(_cmdline.args[i]))
       return true;
@@ -180,18 +180,18 @@ Function: compilet::add_input_file
 
  Outputs: false on success, true on error.
 
- Purpose: puts input filenames into a list and does preprocessing for
+ Purpose: puts input file names into a list and does preprocessing for
           libraries.
 
 \*******************************************************************/
 
-bool compilet::add_input_file(const std::string &filename)
+bool compilet::add_input_file(const std::string &file_name)
 {
-  size_t r=filename.rfind('.', filename.length()-1);
+  size_t r=file_name.rfind('.', file_name.length()-1);
 
   if(r!=std::string::npos)
   {
-    std::string ext = filename.substr(r+1, filename.length());
+    std::string ext = file_name.substr(r+1, file_name.length());
 
     if(ext=="a")
     {
@@ -218,21 +218,21 @@ bool compilet::add_input_file(const std::string &filename)
       }
       
       #ifdef _WIN32
-      if (filename[0]!='/' && filename[1]!=':')
+      if (file_name[0]!='/' && file_name[1]!=':')
       #else
-      if (filename[0]!='/')
+      if (file_name[0]!='/')
       #endif
       {
         cmd << "ar t " <<
         #ifdef _WIN32
-          working_directory << "\\" <<  filename;
+          working_directory << "\\" << file_name;
         #else
-          working_directory << "/" <<  filename;
+          working_directory << "/" << file_name;
         #endif
       }
       else
       {
-        cmd << "ar t " << filename;
+        cmd << "ar t " << file_name;
       }
 
       FILE *stream = popen(cmd.str().c_str(), "r");
@@ -262,21 +262,21 @@ bool compilet::add_input_file(const std::string &filename)
       pclose(stream);
       cmd.str("");
       #ifdef _WIN32
-      if(filename[0]!='/' && filename[1]!=':')
+      if(file_name[0]!='/' && file_name[1]!=':')
       #else
-      if(filename[0]!='/')
+      if(file_name[0]!='/')
       #endif
       {
         cmd << "ar x " <<
         #ifdef _WIN32
-          working_directory << "\\" <<  filename;
+          working_directory << "\\" << file_name;
         #else
-          working_directory << "/" <<  filename;
+          working_directory << "/" << file_name;
         #endif
       }
       else
       {
-        cmd << "ar x " << filename;
+        cmd << "ar x " << file_name;
       }
 
       stream = popen(cmd.str().c_str(), "r");
@@ -289,25 +289,25 @@ bool compilet::add_input_file(const std::string &filename)
     {
       if(cmdline.isset("xml"))
       {
-        if(is_xml_file(filename))
-          object_files.push_back(filename);
+        if(is_xml_file(file_name))
+          object_files.push_back(file_name);
       }
       else
       {
-        if(is_binary_file(filename))
-          object_files.push_back(filename);
+        if(is_binary_file(file_name))
+          object_files.push_back(file_name);
       }
     }
     else if(ext==object_file_extension ||
             ext=="la" || ext=="lo") // Object file recognized
-      object_files.push_back(filename);
+      object_files.push_back(file_name);
     else // assume source file
-      source_files.push_back(filename);
+      source_files.push_back(file_name);
   }
   else
   {
     // don't care about no extensions
-    source_files.push_back(filename);
+    source_files.push_back(file_name);
   }
 
   return false;
@@ -383,10 +383,10 @@ Function: compilet::is_xml_file
 
 \*******************************************************************/
 
-bool compilet::is_xml_file(const std::string &filename)
+bool compilet::is_xml_file(const std::string &file_name)
 {
   std::fstream in;
-  in.open(filename.c_str(), std::ios::in);
+  in.open(file_name.c_str(), std::ios::in);
 
   if(in.is_open())
   {
@@ -414,10 +414,10 @@ Function: compilet::is_binary_file
 
 \*******************************************************************/
 
-bool compilet::is_binary_file(const std::string &filename)
+bool compilet::is_binary_file(const std::string &file_name)
 {
   std::fstream in;
-  in.open(filename.c_str(), std::ios::in);
+  in.open(file_name.c_str(), std::ios::in);
 
   if(in.is_open())
   {
@@ -444,11 +444,11 @@ Function: compilet::is_elf_file
 
 \*******************************************************************/
 
-bool compilet::is_elf_file(const std::string &filename)
+bool compilet::is_elf_file(const std::string &file_name)
 {
   std::fstream in;
 
-  in.open(filename.c_str(), std::ios::in);
+  in.open(file_name.c_str(), std::ios::in);
   if(in.is_open())
   {
     char buf[4];
@@ -495,10 +495,10 @@ bool compilet::link()
   // parse object files
   while(object_files.size()>0)
   {
-    std::string filename=object_files.front();
+    std::string file_name=object_files.front();
     object_files.pop_front();
 
-    if(parse_object(filename, compiled_functions))
+    if(parse_object(file_name, compiled_functions))
       return true;
   }
 
@@ -608,10 +608,14 @@ bool compilet::compile()
 {
   while(!source_files.empty())
   {
-    std::string filename=source_files.front();
+    std::string file_name=source_files.front();
     source_files.pop_front();
+    
+    // Visual Studio always prints the name of the file it's doing
+    if(echo_file_name)
+      status(file_name);
 
-    bool r=parse_source(filename); // don't break the program!
+    bool r=parse_source(file_name); // don't break the program!
 
     if(!r && !doLink && !only_preprocess)
     {
@@ -637,9 +641,9 @@ bool compilet::compile()
       if(output_file_object=="")
       {
         if(cmdline.isset('S')) // compile, but don't assemble
-          cfn=get_base_name(filename) + ".s";
+          cfn=get_base_name(file_name) + ".s";
         else
-          cfn=get_base_name(filename) + "." + object_file_extension;
+          cfn=get_base_name(file_name) + "." + object_file_extension;
       }
       else
       {
@@ -663,7 +667,7 @@ bool compilet::compile()
 
 Function: compilet::parse
 
-  Inputs: filename
+  Inputs: file_name
 
  Outputs: true on error, false otherwise
 
@@ -671,23 +675,23 @@ Function: compilet::parse
 
 \*******************************************************************/
 
-bool compilet::parse(const std::string &filename)
+bool compilet::parse(const std::string &file_name)
 {
-  if(filename=="-") return parse_stdin();
+  if(file_name=="-") return parse_stdin();
 
-  std::ifstream infile(filename.c_str());
+  std::ifstream infile(file_name.c_str());
 
   if(!infile)
   {
-    error("failed to open input file", filename);
+    error("failed to open input file", file_name);
     return true;
   }
 
-  languaget *languagep=get_language_from_filename(filename);
+  languaget *languagep=get_language_from_filename(file_name);
 
   if(languagep==NULL)
   {
-    error("failed to figure out type of file", filename);
+    error("failed to figure out type of file", file_name);
     return true;
   }
 
@@ -696,13 +700,13 @@ bool compilet::parse(const std::string &filename)
 
   std::pair<language_filest::filemapt::iterator, bool>
   res=language_files.filemap.insert(
-    std::pair<std::string, language_filet>(filename, language_file));
+    std::pair<std::string, language_filet>(file_name, language_file));
 
   language_filet &lf=res.first->second;
-  lf.filename=filename;
+  lf.filename=file_name;
   lf.language=languagep;
 
-  print(8, "Parsing: "+filename);
+  print(8, "Parsing: "+file_name);
 
   if(only_preprocess)
   {
@@ -722,11 +726,11 @@ bool compilet::parse(const std::string &filename)
       }
     }
 
-    language.preprocess(infile, filename, *os, get_message_handler());
+    language.preprocess(infile, file_name, *os, get_message_handler());
   }
   else
   {
-    if(language.parse(infile, filename, get_message_handler()))
+    if(language.parse(infile, file_name, get_message_handler()))
     {
       if(get_ui()==ui_message_handlert::PLAIN)
         error("PARSING ERROR");
@@ -742,7 +746,7 @@ bool compilet::parse(const std::string &filename)
 
 Function: compilet::parse_stdin
 
-  Inputs: filename
+  Inputs: file_name
 
  Outputs: true on error, false otherwise
 
@@ -793,7 +797,7 @@ bool compilet::parse_stdin()
 
 Function: compilet::write_object_file
 
-  Inputs: filename, functions table
+  Inputs: file_name, functions table
 
  Outputs: true on error, false otherwise
 
@@ -803,21 +807,21 @@ Function: compilet::write_object_file
 \*******************************************************************/
 
 bool compilet::write_object_file(
-  const std::string &filename,
+  const std::string &file_name,
   const contextt &lcontext,
   goto_functionst &functions)
 {
   if(cmdline.isset("xml"))
-    return write_xml_object_file(filename, lcontext, functions);
+    return write_xml_object_file(file_name, lcontext, functions);
   else
-    return write_bin_object_file(filename, lcontext, functions);
+    return write_bin_object_file(file_name, lcontext, functions);
 }
 
 /*******************************************************************\
 
 Function: compilet::write_bin_object_file
 
-  Inputs: filename, functions table
+  Inputs: file_name, functions table
 
  Outputs: true on error, false otherwise
 
@@ -827,21 +831,21 @@ Function: compilet::write_bin_object_file
 \*******************************************************************/
 
 bool compilet::write_bin_object_file(
-  const std::string &filename,
+  const std::string &file_name,
   const contextt &lcontext,
   goto_functionst &functions)
 {
-  print(8, "Writing binary format object `" + filename + "'");
+  print(8, "Writing binary format object `" + file_name + "'");
 
   // symbols
   print(8, "Symbols in table: "+
            i2string((unsigned long)lcontext.symbols.size()));
 
-  std::ofstream outfile(filename.c_str(), std::ios::binary);
+  std::ofstream outfile(file_name.c_str(), std::ios::binary);
 
   if(!outfile.is_open())
   {
-    error("Error opening file `"+filename+"'");
+    error("Error opening file `"+file_name+"'");
     return true;
   }
 
@@ -858,7 +862,7 @@ bool compilet::write_bin_object_file(
   if(cmdline.isset("dot"))
   {
     std::ofstream dgf;
-    write_dot_header(filename, dgf);
+    write_dot_header(file_name, dgf);
 
     for (goto_functionst::function_mapt::iterator it=
            functions.function_map.begin();
@@ -881,7 +885,7 @@ bool compilet::write_bin_object_file(
 
 Function: compilet::write_xml_object_file
 
-  Inputs: filename, functions table
+  Inputs: file_name, functions table
 
  Outputs: true on error, false otherwise
 
@@ -891,16 +895,16 @@ Function: compilet::write_xml_object_file
 \*******************************************************************/
 
 bool compilet::write_xml_object_file(
-  const std::string &filename,
+  const std::string &file_name,
   const contextt &lcontext,
   goto_functionst &functions)
 {
-  print(8, "Writing xml format object " + filename);
+  print(8, "Writing xml format object " + file_name);
 
-  std::ofstream f(filename.c_str());
+  std::ofstream f(file_name.c_str());
   if(!f.is_open())
   {
-    error("Error opening file " + filename);
+    error("Error opening file " + file_name);
     return true;
   }
 
@@ -930,7 +934,7 @@ bool compilet::write_xml_object_file(
 
   std::ofstream dgf;
   if (cmdline.isset("dot"))
-    write_dot_header(filename, dgf);
+    write_dot_header(file_name, dgf);
     for ( goto_functionst::function_mapt::iterator it=functions.function_map.begin();
           it != functions.function_map.end();
           it++)
@@ -1286,7 +1290,7 @@ std::string &compilet::escape(std::string &str)
 
 Function: compilet::parse_source
 
-  Inputs: filename
+  Inputs: file_name
 
  Outputs: true on error, false otherwise
 
@@ -1294,16 +1298,16 @@ Function: compilet::parse_source
 
 \*******************************************************************/
 
-bool compilet::parse_source(const std::string &filename)
+bool compilet::parse_source(const std::string &file_name)
 {
-  if(parse(filename))
+  if(parse(file_name))
     return true;
     
   if(typecheck()) // we just want to typecheck this one file here
     return true;
     
   // so we remove it from the list afterwards
-  language_files.filemap.erase(filename);
+  language_files.filemap.erase(file_name);
   return false;
 }
 
@@ -1311,7 +1315,7 @@ bool compilet::parse_source(const std::string &filename)
 
 Function: compilet::parse_object
 
-  Inputs: a filename
+  Inputs: a file_name
 
  Outputs: true on error, false otherwise
 
@@ -1320,22 +1324,22 @@ Function: compilet::parse_object
 \*******************************************************************/
 
 bool compilet::parse_object(
-  const std::string &filename,
+  const std::string &file_name,
   goto_functionst &functions)
 {
   std::ifstream infile;
   if(cmdline.isset("xml"))
-    infile.open(filename.c_str());
+    infile.open(file_name.c_str());
   else
-    infile.open(filename.c_str(), std::ios::binary);
+    infile.open(file_name.c_str(), std::ios::binary);
 
   if(!infile)
   {
-    error("failed to open input file", filename);
+    error("failed to open input file", file_name);
     return true;
   }
 
-  print(8, "Parsing: " + filename);
+  print(8, "Parsing: " + file_name);
 
   // we parse to a temporary context
   contextt temp_context;
@@ -1344,13 +1348,13 @@ bool compilet::parse_object(
 
   if(cmdline.isset("xml"))
   {
-    if(read_goto_object(infile, filename, temp_context,
+    if(read_goto_object(infile, file_name, temp_context,
                          temp_functions, *message_handler))
       return true;
   }
   else
   {
-    if(read_bin_goto_object(infile, filename, temp_context,
+    if(read_bin_goto_object(infile, file_name, temp_context,
                              temp_functions, *message_handler))
       return true;
   }
@@ -1441,10 +1445,11 @@ compilet::compilet(cmdlinet &_cmdline):
   ns(context),
   cmdline(_cmdline)
 {
-  doLink = false;
-  act_as_ld = false;
-  only_preprocess = false;
-  subgraphscount = 0;
+  doLink=false;
+  act_as_ld=false;
+  only_preprocess=false;
+  echo_file_name=false;
+  subgraphscount=0;
 
   unsigned bsize=50;
   char *buf = (char*) malloc(sizeof(char)*bsize);
@@ -1524,10 +1529,10 @@ Function: compilet::write_dot_file
 \*******************************************************************/
 
 bool compilet::write_dot_header(
-  const std::string &filename,
+  const std::string &file_name,
   std::ofstream &dgf)
 {
-  std::string dgfilename = filename + ".dot";
+  std::string dgfilename = file_name + ".dot";
   if (verbosity>=9)
     status("Writing dot graph to " + dgfilename);
   dgf.open(dgfilename.c_str());
