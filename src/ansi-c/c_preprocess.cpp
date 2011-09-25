@@ -244,14 +244,7 @@ bool c_preprocess_visual_studio(
   
   // we get the one from VCINSTALLDIR to prevent recursion
   
-  std::string cl_path;
-  
-  {
-    const char *p=getenv("VCINSTALLDIR");
-    if(p!=NULL) cl_path=std::string(p)+"\\BIN\\";
-  }
-
-  std::string command=cl_path+"CL @"+command_file_name;
+  std::string command="CL @"+command_file_name;
   command+=" > \""+tmpi+"\"";
   command+=" 2> \""+stderr_file+"\"";
 
