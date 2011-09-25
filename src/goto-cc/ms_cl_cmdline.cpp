@@ -125,10 +125,37 @@ void ms_cl_cmdlinet::process_response_file(const std::string &file)
               << std::endl;
     return;
   }
-  
+
+  // these may be Unicode -- which is indicated by 0xff 0xfe
   std::string line;
-  while(getline(infile, line))
-    process_cl_option(line);
+  getline(infile, line);
+  if(line[0]==char(0xff) && line[1]==char(0xfe))
+  {
+    // Unicode!
+    infile.close();
+    
+    std::wifstream winfile(file.c_str());
+    // skip over the header bytes
+    winfile.seekg(2);
+
+    std::wstring wline;
+    while(getline(winfile, wline))
+    {
+      // We should support this properly,
+      // but will just strip right now.
+      line.resize(wline.size());
+      for(unsigned i=0; i<wline.size(); i++)
+        line[i]=wline[i]; // truncate
+      
+      process_cl_option(line);
+    }
+  }
+  else
+  {
+    // normal ASCII
+    while(getline(infile, line))
+      process_cl_option(line);
+  }
 }
 
 /*******************************************************************\
