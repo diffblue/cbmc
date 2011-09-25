@@ -103,8 +103,6 @@ bool cmdline_optionst::doit()
 
   compilet compiler(cmdline);
 
-  transform(my_name.begin(), my_name.end(), my_name.begin(), tolower);
-
   if(has_prefix(my_name, "ld") ||
      has_prefix(my_name, "goto-ld") ||
      has_prefix(my_name, "link") ||
@@ -150,7 +148,7 @@ bool cmdline_optionst::doit()
 
   if(cmdline.isset("verbosity"))
     verbosity=atoi(cmdline.getval("verbosity"));
-  
+
   compiler.set_verbosity(verbosity);
   set_verbosity(verbosity);
 
