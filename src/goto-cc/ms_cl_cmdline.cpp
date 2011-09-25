@@ -399,6 +399,8 @@ const char *ms_cl_prefixes[]=
   "Zc:", // arg1[,arg2] C++ language conformance, where arguments can be:
   "ZI", //  enable Edit and Continue debug info
   "openmp", //  enable OpenMP 2.0 language extensions
+  "analyze",
+  "errorReport",
   "?",
   "help", //  print this help message
   "FC", //  use full pathnames in diagnostics /H<num> max external name length
