@@ -214,7 +214,7 @@ void ms_cl_cmdlinet::process_response_file_line(const std::string &line)
 
   for(unsigned i=0; i<line.size(); i++)
   {
-    char ch=line[i];
+    char ch=line[i++];
     
     if(ch==' ')
     {
