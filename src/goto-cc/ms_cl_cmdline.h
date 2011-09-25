@@ -23,11 +23,14 @@ public:
     mode=VISUAL_STUDIO;
   }
   
+  void parse_env();
+  
 protected:
   void process_non_cl_option(const std::string &s);
   void process_cl_option(const std::string &s);
   void process_response_file(const std::string &file);
   void process_response_file_line(const std::string &line);
+  bool parse(const std::vector<std::string> &);
 };
 
 #endif /*MS_CL_CMDLINE_H_*/
