@@ -161,9 +161,11 @@ void ms_cl_cmdlinet::process_response_file(const std::string &file)
   if(line[0]==char(0xff) && line[1]==char(0xfe))
   {
     // Unicode!
-    infile.seekg(2);
+    // re-open -- should be using wifstream
+    std::ifstream infile2(file.c_str());
+    infile2.seekg(2);
     
-    while(my_wgetline(infile, line))
+    while(my_wgetline(infile2, line))
       process_cl_option(line);
   }
   else
