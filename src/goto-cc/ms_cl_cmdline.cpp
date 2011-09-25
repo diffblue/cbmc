@@ -275,6 +275,7 @@ void ms_cl_cmdlinet::process_response_file_line(const std::string &line)
 
   if(!option.empty()) options.push_back(option);
 
+  parse(options);
 }
 
 /*******************************************************************\
