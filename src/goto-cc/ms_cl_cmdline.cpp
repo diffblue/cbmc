@@ -105,7 +105,7 @@ bool ms_cl_cmdlinet::parse(int argc, const char **argv)
 
 /*******************************************************************\
  
-Function: ms_cl_cmdlinet::process_non_cl_option
+Function: ms_cl_cmdlinet::process_response_file
  
   Inputs: 
  
@@ -114,6 +114,35 @@ Function: ms_cl_cmdlinet::process_non_cl_option
  Purpose: 
  
 \*******************************************************************/
+
+std::istream &my_wgetline(std::istream &in, std::string &dest)
+{
+  // We should support this properly,
+  // but will just strip right now.
+  dest.clear();
+
+  while(in)
+  {
+    char ch1, ch2;
+    in.get(ch1);
+    in.get(ch2);
+
+    if(ch1=='\r')
+    {
+    }
+    else if(ch1=='\n')
+    {
+      break;
+    }
+    else if(ch1==0)
+    {
+    }
+    else
+      dest+=ch1;
+  }
+        
+  return in;
+}
 
 void ms_cl_cmdlinet::process_response_file(const std::string &file)
 {
@@ -134,18 +163,8 @@ void ms_cl_cmdlinet::process_response_file(const std::string &file)
     // Unicode!
     infile.seekg(2);
     
-    while(getline(infile, line))
-    {
-      // We should support this properly,
-      // but will just strip right now.
-      std::string tmp;
-      tmp.resize(line.size()/2);
-      
-      for(unsigned i=0; i<line.size(); i++)
-        tmp[i]=line[i*2+1]; // truncate
-        
-      process_cl_option(tmp);
-    }
+    while(my_wgetline(infile, line))
+      process_cl_option(line);
   }
   else
   {
