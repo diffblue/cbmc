@@ -26,6 +26,28 @@ Function: main
  
 \*******************************************************************/
 
+std::string to_lower_string(const std::string &s)
+{
+  std::string result=s;
+  
+  for(unsigned i=0; i<result.size(); i++)
+    result[i]=tolower(result[i]);
+    
+  return result;
+}
+
+/*******************************************************************\
+ 
+Function: main
+ 
+  Inputs:
+ 
+ Outputs:
+ 
+ Purpose:
+ 
+\*******************************************************************/
+
 int main(int argc, const char **argv)
 {  
   if(argv==NULL || argc<1)
@@ -34,7 +56,9 @@ int main(int argc, const char **argv)
     return 1;
   }
 
-  std::string base_name=get_base_name(argv[0]);
+  // we do 'to_lower_string' because of Windows
+  std::string base_name=
+    to_lower_string(get_base_name(argv[0]));
   
   if(base_name=="goto-link" || base_name=="link" ||
      base_name=="goto-cl" || base_name=="cl")
