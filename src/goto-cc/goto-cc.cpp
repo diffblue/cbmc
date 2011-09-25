@@ -29,10 +29,7 @@ Function: main
 std::string to_lower_string(const std::string &s)
 {
   std::string result=s;
-  
-  for(unsigned i=0; i<result.size(); i++)
-    result[i]=tolower(result[i]);
-    
+  transform(result.begin(), result.end(), result.begin(), tolower);
   return result;
 }
 
