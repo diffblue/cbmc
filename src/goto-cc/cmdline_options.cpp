@@ -525,7 +525,7 @@ int cmdline_optionst::main(int argc, const char **argv)
   try
   {
     if(doit())
-      return EX_USAGE;
+      return EX_USAGE; // error
     else
       return EX_OK;
   }
