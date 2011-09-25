@@ -105,17 +105,17 @@ bool ms_cl_cmdlinet::parse(int argc, const char **argv)
 
 /*******************************************************************\
  
-Function: ms_cl_cmdlinet::process_response_file
+Function: my_wgetline
  
   Inputs: 
  
- Outputs: none
+ Outputs:
  
  Purpose: 
  
 \*******************************************************************/
 
-std::istream &my_wgetline(std::istream &in, std::string &dest)
+static std::istream &my_wgetline(std::istream &in, std::string &dest)
 {
   // We should support this properly,
   // but will just strip right now.
@@ -144,6 +144,18 @@ std::istream &my_wgetline(std::istream &in, std::string &dest)
   return in;
 }
 
+/*******************************************************************\
+ 
+Function: ms_cl_cmdlinet::process_response_file
+ 
+  Inputs: 
+ 
+ Outputs: none
+ 
+ Purpose: 
+ 
+\*******************************************************************/
+
 void ms_cl_cmdlinet::process_response_file(const std::string &file)
 {
   std::ifstream infile(file.c_str());
@@ -166,14 +178,54 @@ void ms_cl_cmdlinet::process_response_file(const std::string &file)
     infile2.seekg(2);
     
     while(my_wgetline(infile2, line))
-      process_cl_option(line);
+      process_response_file_line(line);
   }
   else
   {
     // normal ASCII
     while(getline(infile, line))
-      process_cl_option(line);
+      process_response_file_line(line);
   }
+}
+
+/*******************************************************************\
+ 
+Function: ms_cl_cmdlinet::process_response_file_line
+ 
+  Inputs: 
+ 
+ Outputs: none
+ 
+ Purpose: 
+ 
+\*******************************************************************/
+
+void ms_cl_cmdlinet::process_response_file_line(const std::string &line)
+{
+  // In a response file, multiple compiler options and source-code files can
+  // appear on one line.  A single compiler-option specification must appear
+  // on one line (cannot span multiple lines).  Response files can have
+  // comments that begin with the # symbol.
+
+  if(line.empty()) return;
+  if(line[0]=='#') return;
+
+  std::string option;
+
+  for(unsigned i=0; i<line.size(); i++)
+  {
+    char ch=line[i];
+    
+    if(ch==' ')
+    {
+      process_cl_option(option);
+      option.clear();
+    }
+    else
+      option+=ch;
+  }
+
+  process_cl_option(option);
 }
 
 /*******************************************************************\
