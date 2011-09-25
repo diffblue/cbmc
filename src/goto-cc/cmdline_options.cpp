@@ -328,6 +328,8 @@ bool cmdline_optionst::doit()
 
     compiler.doLink=!( cmdline.isset('E') || cmdline.isset('P') ||
                        cmdline.isset('c') );
+                       
+    compiler.echo_file_name=true;
 
     if(cmdline.isset("Fo"))
     {
