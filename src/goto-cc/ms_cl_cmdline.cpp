@@ -78,6 +78,15 @@ bool ms_cl_cmdlinet::parse(const std::vector<std::string> &options)
       // anything that follows goes to the linker
       i=options.size()-1;
     }
+    else if(options[i].size()==2 &&
+            (options[i]=="/D" || options[i]=="-D") &&
+            i!=options.size()-1)
+    {
+      // this requires special treatment, as you can do "/D something"
+      std::string tmp="/D"+options[i+1];
+      i++;
+      process_cl_option(tmp);
+    }
     else
       process_cl_option(options[i]);
   }
@@ -245,15 +254,20 @@ void ms_cl_cmdlinet::process_response_file_line(const std::string &line)
 
   std::vector<std::string> options;
   std::string option;
+  bool in_quotes=false;
 
   for(unsigned i=0; i<line.size(); i++)
   {
     char ch=line[i];
     
-    if(ch==' ')
+    if(ch==' ' && !in_quotes)
     {
       if(!option.empty()) options.push_back(option);
       option.clear();
+    }
+    else if(ch=='"')
+    {
+      in_quotes=!in_quotes;
     }
     else
       option+=ch;
