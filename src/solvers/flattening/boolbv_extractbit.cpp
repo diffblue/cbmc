@@ -38,15 +38,19 @@ literalt boolbvt::convert_extractbit(const extractbit_exprt &expr)
 
   mp_integer o;
 
-  if(!to_integer(operands[1], o)) // constant?
+  // constant?
+  if(operands[1].is_constant())
   {
+    if(to_integer(operands[1], o))
+      throw "extractbit failed to convert constant index";
+
     if(o<0 || o>=bv0.size())
       return prop.new_variable(); // out of range!
     else
       return bv0[integer2long(o)];
   }
 
-  if(operands[0].type().id()=="verilogbv")
+  if(operands[0].type().id()==ID_verilogbv)
   {
     // TODO
     assert(false);
