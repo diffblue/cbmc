@@ -36,11 +36,11 @@ literalt boolbvt::convert_extractbit(const extractbit_exprt &expr)
   bvt bv0;
   convert_bv(operands[0], bv0);
 
-  mp_integer o;
-
   // constant?
   if(operands[1].is_constant())
   {
+    mp_integer o;
+  
     if(to_integer(operands[1], o))
       throw "extractbit failed to convert constant index";
 
