@@ -242,8 +242,6 @@ bool c_preprocess_visual_studio(
   
   std::string tmpi=get_temporary_file("tmp.cl", "");
   
-  // we get the one from VCINSTALLDIR to prevent recursion
-  
   std::string command="CL @"+command_file_name;
   command+=" > \""+tmpi+"\"";
   command+=" 2> \""+stderr_file+"\"";
