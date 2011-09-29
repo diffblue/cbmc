@@ -374,10 +374,15 @@ void bv_pointerst::convert_pointer_type(const exprt &expr, bvt &bv)
   }
   else if(expr.id()==ID_constant)
   {
-    if(expr.get(ID_value)!=ID_NULL)
-      throw "found non-NULL pointer constant";
+    irep_idt value=to_constant_expr(expr).get_value();
 
-    encode(pointer_logic.get_null_object(), bv);
+    if(value==ID_NULL)
+      encode(pointer_logic.get_null_object(), bv);
+    else
+    {
+      mp_integer i=string2integer(id2string(value), 2);
+      bv=bv_utils.build_constant(i, bits);
+    }
 
     return;
   }
