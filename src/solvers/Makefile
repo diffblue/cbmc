@@ -103,6 +103,10 @@ ifneq ($(wildcard ../floatbv/Makefile),)
   OBJ += ../floatbv/floatbv$(LIBEXT)
 endif
 
+# extra dependencies
+
+-include $(SRC:.cpp=.d)
+
 ###############################################################################
 
 solvers$(LIBEXT): $(OBJ) $(CHAFF_LIB) $(BOOLEFORCE_LIB) $(MINISAT_LIB) \
