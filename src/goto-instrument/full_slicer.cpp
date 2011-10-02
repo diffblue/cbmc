@@ -191,7 +191,39 @@ object_id_sett full_slicert::transform(cfgt::iterator e)
     break;
   
   case FUNCTION_CALL:
-    // these are like assignments for the arguments
+    {
+      // these are like assignments for the arguments
+      // and for the LHS
+      const code_function_callt &code_function_call=
+        to_code_function_call(instruction.code);
+
+      #if 0      
+      object_id_sett w;
+      get_objects_w(code_function_call, w);
+      
+      bool found=false;
+
+      // does it write something we need?
+      for(object_id_sett::const_iterator
+          o_it1=w.begin(); o_it1!=w.end(); o_it1++)
+      {
+        object_id_sett::iterator o_it2=result.find(*o_it1);
+        if(o_it2!=result.end())
+        {
+          found=true;
+          // remove what is written
+          result.erase(o_it2);
+        }
+      }
+
+      if(found)
+      {
+        e->node_required=true;
+        // add what it reads
+        get_objects_r(code_assign, result);
+      }
+      #endif
+    }    
     break;
   
   default:;
