@@ -43,6 +43,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "weak_memory.h"
 #include "race_check.h"
 #include "nondet_volatile.h"
+#include "interrupt.h"
 
 /*******************************************************************\
 
@@ -371,7 +372,8 @@ void goto_instrument_parseoptionst::instrument_goto_program(
 
   if(cmdline.isset("pointer-check") ||
      cmdline.isset("race-check") ||
-     cmdline.isset("tso"))
+     cmdline.isset("tso") ||
+     cmdline.isset("interrupt"))
   {
     status("Function Pointer Removal");
     remove_function_pointers(ns, goto_functions);
@@ -418,8 +420,18 @@ void goto_instrument_parseoptionst::instrument_goto_program(
         context,
         goto_functions);
     }
-  }
-  
+
+    // Interrupt handler
+    if(cmdline.isset("interrupt"))
+    {
+      status("Instrumenting interrupt handler");
+      interrupt(
+        value_set_analysis,
+        context,
+        goto_functions,
+        cmdline.getval("interrupt"));
+    }
+  }  
 
   // add failed symbols
   add_failed_symbols(context);

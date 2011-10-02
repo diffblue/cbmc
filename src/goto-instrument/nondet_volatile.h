@@ -11,6 +11,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/goto_functions.h>
 
+bool is_volatile(
+  const contextt &context,
+  const typet &type);
+
 void nondet_volatile(
   contextt &context,
   goto_functionst &goto_functions);
