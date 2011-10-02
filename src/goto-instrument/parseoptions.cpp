@@ -44,6 +44,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "race_check.h"
 #include "nondet_volatile.h"
 #include "interrupt.h"
+#include "mmio.h"
 
 /*******************************************************************\
 
