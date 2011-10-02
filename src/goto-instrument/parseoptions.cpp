@@ -25,6 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/string_abstraction.h>
 #include <goto-programs/string_instrumentation.h>
 #include <goto-programs/loop_numbers.h>
+#include <goto-programs/reachability_slicer.h>
 
 #include <pointer-analysis/value_set_analysis.h>
 #include <pointer-analysis/goto_program_dereference.h>
@@ -428,6 +429,13 @@ void goto_instrument_parseoptionst::instrument_goto_program(
   // add loop ids
   goto_functions.compute_loop_numbers();
   
+  // reachability slice?
+  if(cmdline.isset("reachability-slice"))
+  {
+    status("Performing a reachability slice");
+    reachability_slicer(goto_functions);
+  }
+
   // full slice?
   if(cmdline.isset("full-slice"))
   {
@@ -481,6 +489,10 @@ void goto_instrument_parseoptionst::help()
     " --nan-check                  add floating-point NaN checks\n"
     " --uninitialized-check        add checks for uninitialized locals (experimental)\n"
     " --error-label label          check that label is unreachable\n"
+    "\n"
+    "Slicing:\n"
+    " --reachability-slicer        slice away instructions that can't reach assertions\n"
+    " --full-slice                 slice away instructions that don't affect assertions\n"
     "\n"
     "Other options:\n"
     " --version                    show version and exit\n"
