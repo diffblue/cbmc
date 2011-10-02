@@ -42,6 +42,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "alignment_checks.h"
 #include "weak_memory.h"
 #include "race_check.h"
+#include "nondet_volatile.h"
 
 /*******************************************************************\
 
@@ -429,6 +430,13 @@ void goto_instrument_parseoptionst::instrument_goto_program(
   // add loop ids
   goto_functions.compute_loop_numbers();
   
+  // nondet volatile?
+  if(cmdline.isset("nondet-volatile"))
+  {
+    status("Making volatile variables non-deterministic");
+    nondet_volatile(context, goto_functions);
+  }
+
   // reachability slice?
   if(cmdline.isset("reachability-slice"))
   {
@@ -479,7 +487,7 @@ void goto_instrument_parseoptionst::help()
     " --dump-c                     generate C source\n"
     " --interpreter                do concrete execution\n"
     "\n"
-    "Instrumentation options:\n"
+    "Safety checks:\n"
     " --no-assertions              ignore user assertions\n"
     " --bounds-check               add array bounds checks\n"
     " --div-by-zero-check          add division by zero checks\n"
@@ -489,6 +497,9 @@ void goto_instrument_parseoptionst::help()
     " --nan-check                  add floating-point NaN checks\n"
     " --uninitialized-check        add checks for uninitialized locals (experimental)\n"
     " --error-label label          check that label is unreachable\n"
+    "\n"
+    "Semantic transformations:\n"
+    " --nondet-volatile            makes reads from volatile variables non-deterministic\n"
     "\n"
     "Slicing:\n"
     " --reachability-slicer        slice away instructions that can't reach assertions\n"
