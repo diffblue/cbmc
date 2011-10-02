@@ -29,7 +29,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(show-goto-functions)(show-value-sets)" \
   "(show-struct-alignment)" \
   "(show-uninitialized)(show-locations)" \
-  "(full-slice)" \
+  "(full-slice)(reachability-slice)" \
   "(show-symbol-table)(show-claims)(show-points-to)" \
   "(error-label):(string-abstraction)" \
   "(verbosity):(version)(xml-ui)"
