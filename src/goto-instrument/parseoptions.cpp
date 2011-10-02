@@ -431,6 +431,16 @@ void goto_instrument_parseoptionst::instrument_goto_program(
         goto_functions,
         cmdline.getval("interrupt"));
     }
+
+    // Memory-mapped I/O
+    if(cmdline.isset("mmio"))
+    {
+      status("Instrumenting memory-mapped I/O");
+      mmio(
+        value_set_analysis,
+        context,
+        goto_functions);
+    }
   }  
 
   // add failed symbols
@@ -512,6 +522,8 @@ void goto_instrument_parseoptionst::help()
     "\n"
     "Semantic transformations:\n"
     " --nondet-volatile            makes reads from volatile variables non-deterministic\n"
+    " --interrupt function         instruments an interrupt handler function\n"
+    " --mmio                       instruments memory-mapped I/O\n"
     "\n"
     "Slicing:\n"
     " --reachability-slicer        slice away instructions that can't reach assertions\n"
