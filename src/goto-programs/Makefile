@@ -1,5 +1,5 @@
 SRC = goto_convert.cpp goto_function.cpp goto_main.cpp goto_sideeffects.cpp \
-      goto_program.cpp basic_blocks.cpp goto_threads.cpp goto_check.cpp \
+      goto_program.cpp basic_blocks.cpp goto_check.cpp \
       goto_function_pointers.cpp goto_functions.cpp goto_inline.cpp \
       remove_skip.cpp goto_convert_functions.cpp string_instrumentation.cpp \
       builtin_functions.cpp show_claims.cpp destructor.cpp set_claims.cpp \
