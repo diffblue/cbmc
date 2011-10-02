@@ -11,7 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_functions.h"
 
-void slicer(goto_functionst &goto_functions);
-void slicer(goto_programt &goto_program);
+void reachability_slicer(goto_functionst &goto_functions);
+void reachability_slicer(goto_programt &goto_program);
 
 #endif

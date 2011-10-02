@@ -10,15 +10,15 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <i2string.h>
 
-#include "slicer.h"
+#include "reachability_slicer.h"
 #include "remove_skip.h"
 #include "remove_unreachable.h"
 #include "cfg.h"
-#include "slicer_class.h"
+#include "reachability_slicer_class.h"
 
 /*******************************************************************\
 
-Function: slicert::fixedpoint_assertions
+Function: reachability_slicert::fixedpoint_assertions
 
   Inputs:
 
@@ -28,7 +28,7 @@ Function: slicert::fixedpoint_assertions
 
 \*******************************************************************/
 
-void slicert::fixedpoint_assertions()
+void reachability_slicert::fixedpoint_assertions()
 {
   queuet queue;
 
@@ -61,7 +61,7 @@ void slicert::fixedpoint_assertions()
 
 /*******************************************************************\
 
-Function: slicert::fixedpoint_threads
+Function: reachability_slicert::fixedpoint_threads
 
   Inputs:
 
@@ -71,7 +71,7 @@ Function: slicert::fixedpoint_threads
 
 \*******************************************************************/
 
-void slicert::fixedpoint_threads()
+void reachability_slicert::fixedpoint_threads()
 {
   queuet queue;
 
@@ -103,7 +103,7 @@ void slicert::fixedpoint_threads()
 
 /*******************************************************************\
 
-Function: slicert::slice
+Function: reachability_slicert::slice
 
   Inputs:
 
@@ -113,7 +113,7 @@ Function: slicert::slice
 
 \*******************************************************************/
 
-void slicert::slice(goto_functionst &goto_functions)
+void reachability_slicert::slice(goto_functionst &goto_functions)
 {
   // now replace those instructions that do not reach any assertions
   // by self-loops
@@ -140,7 +140,7 @@ void slicert::slice(goto_functionst &goto_functions)
 
 /*******************************************************************\
 
-Function: slicert::slice
+Function: reachability_slicert::slice
 
   Inputs:
 
@@ -150,7 +150,7 @@ Function: slicert::slice
 
 \*******************************************************************/
 
-void slicert::slice(goto_programt &goto_program)
+void reachability_slicert::slice(goto_programt &goto_program)
 {
   // now replace those instructions that do not reach any assertions
   // by assume(false)
@@ -172,7 +172,7 @@ void slicert::slice(goto_programt &goto_program)
 
 /*******************************************************************\
 
-Function: slicer
+Function: reachability_slicer
 
   Inputs:
 
@@ -182,14 +182,14 @@ Function: slicer
 
 \*******************************************************************/
 
-void slicer(goto_programt &goto_program)
+void reachability_slicer(goto_programt &goto_program)
 {
-  slicert()(goto_program);
+  reachability_slicert()(goto_program);
 }
 
 /*******************************************************************\
 
-Function: slicer
+Function: reachability_slicer
 
   Inputs:
 
@@ -199,7 +199,7 @@ Function: slicer
 
 \*******************************************************************/
 
-void slicer(goto_functionst &goto_functions)
+void reachability_slicer(goto_functionst &goto_functions)
 {
-  slicert()(goto_functions);
+  reachability_slicert()(goto_functions);
 }

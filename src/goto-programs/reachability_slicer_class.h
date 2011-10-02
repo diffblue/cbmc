@@ -14,13 +14,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
-   Class: slicert
+   Class: reachability_slicert
 
  Purpose:
 
 \*******************************************************************/
 
-class slicert
+class reachability_slicert
 {
 public:
   void operator()(goto_functionst &goto_functions)
