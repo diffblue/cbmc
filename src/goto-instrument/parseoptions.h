@@ -25,6 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(no-assertions)(no-assumptions)(uninitialized-check)" \
   "(nan-check)(no-nan-check)" \
   "(race-check)(tso)(weak-mem)" \
+  "(nondet-volatile)" \
   "(signed-overflow-check)(unsigned-overflow-check)" \
   "(show-goto-functions)(show-value-sets)" \
   "(show-struct-alignment)" \
