@@ -14,23 +14,6 @@ Date: September 2011
 
 /*******************************************************************\
 
-Function: nondet_volatile_lhs
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void nondet_volatile_lhs(const contextt &context, exprt &expr)
-{
-  // todo
-}
-
-/*******************************************************************\
-
 Function: is_volatile
 
   Inputs:
@@ -87,6 +70,41 @@ void nondet_volatile_rhs(const contextt &context, exprt &expr)
       nondet_exprt nondet_expr(t);
       expr.swap(nondet_expr);
     }
+  }
+}
+
+/*******************************************************************\
+
+Function: nondet_volatile_lhs
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void nondet_volatile_lhs(const contextt &context, exprt &expr)
+{
+  if(expr.id()==ID_if)
+  {
+    nondet_volatile_rhs(context, to_if_expr(expr).cond());
+    nondet_volatile_lhs(context, to_if_expr(expr).true_case());
+    nondet_volatile_lhs(context, to_if_expr(expr).false_case());
+  }
+  else if(expr.id()==ID_index)
+  {
+    nondet_volatile_lhs(context, to_index_expr(expr).array());
+    nondet_volatile_rhs(context, to_index_expr(expr).index());
+  }
+  else if(expr.id()==ID_member)
+  {
+    nondet_volatile_lhs(context, to_member_expr(expr).struct_op());
+  }
+  else if(expr.id()==ID_dereference)
+  {
+    nondet_volatile_rhs(context, to_dereference_expr(expr).pointer());
   }
 }
 
