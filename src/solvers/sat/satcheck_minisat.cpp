@@ -115,7 +115,7 @@ void minisat_prooft::chain(const vec<ClauseId> &cs, const vec<Var> &xs)
 
 /*******************************************************************\
 
-Function: satcheck_minisat_baset::l_get
+Function: satcheck_minisat1_baset::l_get
 
   Inputs:
 
@@ -125,7 +125,7 @@ Function: satcheck_minisat_baset::l_get
 
 \*******************************************************************/
 
-tvt satcheck_minisat_baset::l_get(literalt a) const
+tvt satcheck_minisat1_baset::l_get(literalt a) const
 {
   if(a.is_true())
     return tvt(true);
@@ -151,7 +151,7 @@ tvt satcheck_minisat_baset::l_get(literalt a) const
 
 /*******************************************************************\
 
-Function: satcheck_minisat_baset::solver_text
+Function: satcheck_minisat1_baset::solver_text
 
   Inputs:
 
@@ -161,14 +161,14 @@ Function: satcheck_minisat_baset::solver_text
 
 \*******************************************************************/
 
-const std::string satcheck_minisat_baset::solver_text()
+const std::string satcheck_minisat1_baset::solver_text()
 {
   return "MiniSAT 1.14p";
 }
 
 /*******************************************************************\
 
-Function: satcheck_minisat_baset::add_variables
+Function: satcheck_minisat1_baset::add_variables
 
   Inputs:
 
@@ -178,7 +178,7 @@ Function: satcheck_minisat_baset::add_variables
 
 \*******************************************************************/
 
-void satcheck_minisat_baset::add_variables()
+void satcheck_minisat1_baset::add_variables()
 {
 
   while((unsigned)solver->nVars()<no_variables())
@@ -187,7 +187,7 @@ void satcheck_minisat_baset::add_variables()
 
 /*******************************************************************\
 
-Function: satcheck_minisat_baset::lcnf
+Function: satcheck_minisat1_baset::lcnf
 
   Inputs:
 
@@ -197,7 +197,7 @@ Function: satcheck_minisat_baset::lcnf
 
 \*******************************************************************/
 
-void satcheck_minisat_baset::lcnf(const bvt &bv)
+void satcheck_minisat1_baset::lcnf(const bvt &bv)
 {
   bvt new_bv;
   
@@ -226,7 +226,7 @@ void satcheck_minisat_baset::lcnf(const bvt &bv)
 
 /*******************************************************************\
 
-Function: satcheck_minisat_baset::prop_solve
+Function: satcheck_minisat1_baset::prop_solve
 
   Inputs:
 
@@ -236,7 +236,7 @@ Function: satcheck_minisat_baset::prop_solve
 
 \*******************************************************************/
 
-propt::resultt satcheck_minisat_baset::prop_solve()
+propt::resultt satcheck_minisat1_baset::prop_solve()
 {
   assert(status!=ERROR);
 
@@ -284,7 +284,7 @@ propt::resultt satcheck_minisat_baset::prop_solve()
 
 /*******************************************************************\
 
-Function: satcheck_minisat_baset::set_assignment
+Function: satcheck_minisat1_baset::set_assignment
 
   Inputs:
 
@@ -294,7 +294,7 @@ Function: satcheck_minisat_baset::set_assignment
 
 \*******************************************************************/
 
-void satcheck_minisat_baset::set_assignment(literalt a, bool value)
+void satcheck_minisat1_baset::set_assignment(literalt a, bool value)
 {
   unsigned v=a.var_no();
   bool sign=a.sign();
@@ -305,7 +305,7 @@ void satcheck_minisat_baset::set_assignment(literalt a, bool value)
 
 /*******************************************************************\
 
-Function: satcheck_minisat_baset::is_in_conflict
+Function: satcheck_minisat1_baset::is_in_conflict
 
   Inputs:
 
@@ -315,7 +315,7 @@ Function: satcheck_minisat_baset::is_in_conflict
 
 \*******************************************************************/
 
-bool satcheck_minisat_baset::is_in_conflict(literalt a) const
+bool satcheck_minisat1_baset::is_in_conflict(literalt a) const
 {
   int v=a.var_no();
 
@@ -330,7 +330,7 @@ bool satcheck_minisat_baset::is_in_conflict(literalt a) const
 
 /*******************************************************************\
 
-Function: satcheck_minisat_baset::set_assumptions
+Function: satcheck_minisat1_baset::set_assumptions
 
   Inputs:
 
@@ -340,7 +340,7 @@ Function: satcheck_minisat_baset::set_assumptions
 
 \*******************************************************************/
 
-void satcheck_minisat_baset::set_assumptions(const bvt &bv)
+void satcheck_minisat1_baset::set_assumptions(const bvt &bv)
 {
   assumptions=bv;
 
@@ -440,7 +440,7 @@ satcheck_minisat_coret::~satcheck_minisat_coret()
 
 /*******************************************************************\
 
-Function: satcheck_minisat_baset::~satcheck_minisat_baset
+Function: satcheck_minisat1_baset::~satcheck_minisat1_baset
 
   Inputs:
 
@@ -450,7 +450,7 @@ Function: satcheck_minisat_baset::~satcheck_minisat_baset
 
 \*******************************************************************/
 
-satcheck_minisat_baset::~satcheck_minisat_baset()
+satcheck_minisat1_baset::~satcheck_minisat1_baset()
 {
   delete solver;
 }
