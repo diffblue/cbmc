@@ -26,6 +26,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "location.h"
 
 /*! \brief Symbol table entry.
+    \ingroup gr_symbol_table
 
     This is a symbol in the symbol table, stored in an
     object of type contextt.
