@@ -25,7 +25,9 @@ Author: Daniel Kroening, kroening@kroening.com
  *  Conversion to subclasses of @ref exprt
 */
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief A transition system, consisting of
+           state invariant, initial state predicate,
+           and transition predicate
 */
 class transt:public exprt
 {
@@ -324,7 +326,7 @@ public:
   }
 };
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief binary minus
 */
 class minus_exprt:public binary_exprt
 {
@@ -341,7 +343,7 @@ public:
   }
 };
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief binary multiplication
 */
 class mult_exprt:public binary_exprt
 {
@@ -383,7 +385,7 @@ extern inline mult_exprt &to_mult_expr(exprt &expr)
   return static_cast<mult_exprt &>(expr);
 }
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief division (integer and real)
 */
 class div_exprt:public binary_exprt
 {
@@ -425,7 +427,7 @@ extern inline div_exprt &to_div_expr(exprt &expr)
   return static_cast<div_exprt &>(expr);
 }
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief binary modulo
 */
 class mod_exprt:public binary_exprt
 {
@@ -467,7 +469,7 @@ extern inline mod_exprt &to_mod_expr(exprt &expr)
   return static_cast<mod_exprt &>(expr);
 }
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief equality
 */
 class equal_exprt:public binary_relation_exprt
 {
@@ -507,7 +509,7 @@ extern inline equal_exprt &to_equal_expr(exprt &expr)
   return static_cast<equal_exprt &>(expr);
 }
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief array index operator
 */
 class index_exprt:public exprt
 {
@@ -586,7 +588,7 @@ const index_exprt &to_index_expr(const exprt &expr);
 */
 index_exprt &to_index_expr(exprt &expr);
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief array constructor from single element
 */
 class array_of_exprt:public exprt
 {
@@ -643,7 +645,7 @@ const array_of_exprt &to_array_of_expr(const exprt &expr);
 */
 array_of_exprt &to_array_of_expr(exprt &expr);
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief array constructor from list of elements
 */
 class array_exprt:public exprt
 {
@@ -686,7 +688,7 @@ const array_exprt &to_array_expr(const exprt &expr);
 */
 array_exprt &to_array_expr(exprt &expr);
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief union constructor from single element
 */
 class union_exprt:public exprt
 {
@@ -761,7 +763,7 @@ const union_exprt &to_union_expr(const exprt &expr);
 */
 union_exprt &to_union_expr(exprt &expr);
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief struct constructor from list of elements
 */
 class struct_exprt:public exprt
 {
@@ -946,7 +948,7 @@ const dynamic_object_exprt &to_dynamic_object_expr(const exprt &expr);
 */
 dynamic_object_exprt &to_dynamic_object_expr(exprt &expr);
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief semantic type conversion
 */
 class typecast_exprt:public exprt
 {
@@ -997,7 +999,7 @@ extern inline typecast_exprt &to_typecast_expr(exprt &expr)
   return static_cast<typecast_exprt &>(expr);
 }
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief boolean AND
 */
 class and_exprt:public exprt
 {
@@ -1022,7 +1024,7 @@ public:
   }
 };
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief boolean implication
 */
 class implies_exprt:public exprt
 {
@@ -1039,7 +1041,7 @@ public:
   }
 };
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief boolean OR
 */
 class or_exprt:public exprt
 {
@@ -1079,7 +1081,7 @@ public:
   }
 };
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief Bit-wise OR
 */
 class bitor_exprt:public exprt
 {
@@ -1095,7 +1097,7 @@ public:
   }
 };
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief Bit-wise XOR
 */
 class bitxor_exprt:public exprt
 {
@@ -1111,7 +1113,7 @@ public:
   }
 };
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief Bit-wise AND
 */
 class bitand_exprt:public exprt
 {
@@ -1367,7 +1369,7 @@ extern inline extractbits_exprt &to_extractbits_expr(exprt &expr)
   return static_cast<extractbits_exprt &>(expr);
 }
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief Operator to return the address of an object
 */
 class address_of_exprt:public exprt
 {
@@ -1437,7 +1439,7 @@ public:
   }
 };
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief Operator to dereference a pointer
 */
 class dereference_exprt:public exprt
 {
@@ -1570,7 +1572,9 @@ extern inline if_exprt &to_if_expr(exprt &expr)
   return static_cast<if_exprt &>(expr);
 }
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief Operator to update elements in structs and arrays
+    \remark This expression will eventually be replaced by separate
+            array and struct update operators.
 */
 class with_exprt:public exprt
 {
@@ -1720,7 +1724,7 @@ extern inline array_update_exprt &to_array_update_expr(exprt &expr)
   return static_cast<array_update_exprt &>(expr);
 }
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief Extract member of struct
 */
 class member_exprt:public exprt
 {
@@ -1924,7 +1928,7 @@ public:
   }
 };
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief The NIL expression
 */
 class nil_exprt:public exprt
 {
@@ -2067,7 +2071,7 @@ public:
   }
 };
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief Base class for all side effects
 */
 class sideeffect_exprt:public exprt
 {
@@ -2090,7 +2094,7 @@ public:
   }
 };
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief A side effect that returns a non-deterministically chosen value
 */
 class nondet_exprt:public sideeffect_exprt
 {
