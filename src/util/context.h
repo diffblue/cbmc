@@ -9,6 +9,15 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_CONTEXT_H
 #define CPROVER_CONTEXT_H
 
+/*! \file util/context.h
+ * \brief Symbol table
+ *
+ * \author Daniel Kroening <kroening@kroening.com>
+*/
+
+/*! \defgroup gr_symbol_table Symbol Table
+*/
+
 #include <iostream>
 
 #include <map>
@@ -39,6 +48,9 @@ typedef std::multimap<irep_idt, irep_idt> symbol_module_mapt;
                                          it_end=(expr).upper_bound(module); \
       it!=it_end; it++)
 
+/*! \brief The symbol table
+    \ingroup gr_symbol_table
+*/
 class contextt
 {
 public:
