@@ -26,7 +26,7 @@ Author: Daniel Kroening, kroening@kroening.com
  *  Conversion to subclasses of @ref typet
 */
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief The Booleans
 */
 class bool_typet:public typet
 {
@@ -36,7 +36,7 @@ public:
   }
 };
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief The NIL type
 */
 class nil_typet:public typet
 {
@@ -46,7 +46,7 @@ public:
   }
 };
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief The empty type
 */
 class empty_typet:public typet
 {
@@ -56,7 +56,7 @@ public:
   }
 };
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief Unbounded, signed integers
 */
 class integer_typet:public typet
 {
@@ -66,7 +66,7 @@ public:
   }
 };
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief Unbounded, signed rational numbers
 */
 class rational_typet:public typet
 {
@@ -76,7 +76,7 @@ public:
   }
 };
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief Unbounded, signed real numbers
 */
 class real_typet:public typet
 {
@@ -86,7 +86,7 @@ public:
   }
 };
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief A reference into the symbol table
 */
 class symbol_typet:public typet
 {
@@ -282,7 +282,7 @@ extern inline struct_union_typet &to_struct_union_type(typet &type)
   return static_cast<struct_union_typet &>(type);
 }
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief Structure type
 */
 class struct_typet:public struct_union_typet
 {
@@ -290,7 +290,8 @@ public:
   struct_typet():struct_union_typet(ID_struct)
   {
   }
-    
+
+  /// returns true if the object is a prefix of \ref other    
   bool is_prefix_of(const struct_typet &other) const;
 };
 
@@ -323,7 +324,7 @@ extern inline struct_typet &to_struct_type(typet &type)
   return static_cast<struct_typet &>(type);
 }
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief The union type
 */
 class union_typet:public struct_union_typet
 {
@@ -482,7 +483,7 @@ extern inline code_typet &to_code_type(typet &type)
   return static_cast<code_typet &>(type);
 }
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief arrays with given size
 */
 class array_typet:public typet
 {
@@ -567,7 +568,7 @@ inline const bitvector_typet &to_bitvector_type(const typet &type)
   return static_cast<const bitvector_typet &>(type);
 }
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief The pointer type
 */
 class pointer_typet:public bitvector_typet
 {
@@ -614,7 +615,7 @@ extern inline pointer_typet &to_pointer_type(typet &type)
   return static_cast<pointer_typet &>(type);
 }
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief The reference type
 */
 class reference_typet:public pointer_typet
 {
@@ -632,7 +633,7 @@ bool is_reference(const typet &type);
 */
 bool is_rvalue_reference(const typet &type);
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief fixed-width bit-vector without numerical interpretation
 */
 class bv_typet:public bitvector_typet
 {
@@ -672,7 +673,7 @@ inline bv_typet &to_bv_type(typet &type)
   return static_cast<bv_typet &>(type);
 }
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief Fixed-width bit-vector with unsigned binary interpretation
 */
 class unsignedbv_typet:public bitvector_typet
 {
@@ -712,7 +713,7 @@ inline unsignedbv_typet &to_unsignedbv_type(typet &type)
   return static_cast<unsignedbv_typet &>(type);
 }
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief Fixed-width bit-vector with two's complement interpretation
 */
 class signedbv_typet:public bitvector_typet
 {
@@ -752,7 +753,7 @@ inline signedbv_typet &to_signedbv_type(typet &type)
   return static_cast<signedbv_typet &>(type);
 }
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief Fixed-width bit-vector with signed fixed-point interpretation
 */
 class fixedbv_typet:public bitvector_typet
 {
@@ -792,7 +793,7 @@ public:
 */
 const fixedbv_typet &to_fixedbv_type(const typet &type);
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief Fixed-width bit-vector with IEEE floating-point interpretation
 */
 class floatbv_typet:public bitvector_typet
 {
