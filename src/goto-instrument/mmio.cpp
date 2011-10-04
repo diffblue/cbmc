@@ -79,7 +79,7 @@ void mmio(
           symbol_exprt w_used0_expr=symbol_exprt(vars.w_used0, bool_typet());
           symbol_exprt w_used1_expr=symbol_exprt(vars.w_used1, bool_typet());
           
-          exprt nondet_bool_expr=nondet_exprt(bool_typet());
+          exprt nondet_bool_expr=side_effect_nondet_exprt(bool_typet());
           
           exprt choice0_rhs=and_exprt(nondet_bool_expr, w_used0_expr);
           exprt choice1_rhs=and_exprt(nondet_bool_expr, w_used1_expr);

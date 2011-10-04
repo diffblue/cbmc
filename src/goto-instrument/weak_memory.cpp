@@ -10,6 +10,7 @@ Date: September 2011
 
 #include <hash_cont.h>
 #include <std_expr.h>
+#include <std_code.h>
 #include <expr_util.h>
 #include <guard.h>
 #include <cprover_prefix.h>
@@ -297,7 +298,7 @@ void weak_memory_tso(
           symbol_exprt w_used0_expr=symbol_exprt(vars.w_used0, bool_typet());
           symbol_exprt w_used1_expr=symbol_exprt(vars.w_used1, bool_typet());
           
-          exprt nondet_bool_expr=nondet_exprt(bool_typet());
+          exprt nondet_bool_expr=side_effect_expr_nondett(bool_typet());
           
           exprt choice0_rhs=and_exprt(nondet_bool_expr, w_used0_expr);
           exprt choice1_rhs=and_exprt(nondet_bool_expr, w_used1_expr);

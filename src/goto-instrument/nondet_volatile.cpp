@@ -67,7 +67,7 @@ void nondet_volatile_rhs(const contextt &context, exprt &expr)
       t.remove(ID_C_volatile);
     
       // replace by nondet
-      nondet_exprt nondet_expr(t);
+      side_effect_expr_nondett nondet_expr(t);
       expr.swap(nondet_expr);
     }
   }
