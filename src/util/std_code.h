@@ -13,7 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "expr.h"
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief A statement in a programming language
 */
 class codet:public exprt
 {
@@ -153,7 +153,7 @@ extern inline code_assignt &to_code_assign(codet &code)
   return static_cast<code_assignt &>(code);
 }
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief A declaration of a local variable
 */
 class code_declt:public codet
 {
@@ -207,7 +207,7 @@ public:
 const code_declt &to_code_decl(const codet &code);
 code_declt &to_code_decl(codet &code);
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief An assumption
 */
 class code_assumet:public codet
 {
@@ -245,7 +245,7 @@ extern inline code_assumet &to_code_assume(codet &code)
   return static_cast<code_assumet &>(code);
 }
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief An assertion
 */
 class code_assertt:public codet
 {
@@ -278,7 +278,7 @@ extern inline code_assertt &to_code_assert(codet &code)
   return static_cast<code_assertt &>(code);
 }
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief An if-then-else
 */
 class code_ifthenelset:public codet
 {
@@ -331,7 +331,7 @@ extern inline code_ifthenelset &to_code_ifthenelse(codet &code)
   return static_cast<code_ifthenelset &>(code);
 }
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief A `while' instruction
 */
 class code_whilet:public codet
 {
@@ -376,7 +376,7 @@ extern inline code_whilet &to_code_while(codet &code)
   return static_cast<code_whilet &>(code);
 }
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief A `for' instruction
 */
 class code_fort:public codet
 {
@@ -441,7 +441,12 @@ extern inline code_fort &to_code_for(codet &code)
   return static_cast<code_fort &>(code);
 }
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief A function call
+    
+    The function call instruction has three operands.
+    The first is the expression that is used to store
+    the return value. The second is the function called.
+    The third is a vector of argument values.
 */
 class code_function_callt:public codet
 {
@@ -542,7 +547,7 @@ extern inline code_returnt &to_code_return(codet &code)
   return static_cast<code_returnt &>(code);
 }
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief A label for branch targets
 */
 class code_labelt:public codet
 {
@@ -595,7 +600,7 @@ extern inline code_labelt &to_code_label(codet &code)
   return static_cast<code_labelt &>(code);
 }
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief A break for `for' and `while' loops
 */
 class code_breakt:public codet
 {
@@ -617,7 +622,7 @@ extern inline code_breakt &to_code_break(codet &code)
   return static_cast<code_breakt &>(code);
 }
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief A continue for `for' and `while' loops
 */
 class code_continuet:public codet
 {
@@ -639,7 +644,7 @@ extern inline code_continuet &to_code_continue(codet &code)
   return static_cast<code_continuet &>(code);
 }
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief An expression statement
 */
 class code_expressiont:public codet
 {
@@ -682,7 +687,8 @@ public:
 code_expressiont &to_code_expression(codet &code);
 const code_expressiont &to_code_expression(const codet &code);
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief An expression containing a side effect
+    \renark The ID will eventually change to ID_side_effect
 */
 class side_effect_exprt:public exprt
 {
@@ -724,7 +730,7 @@ public:
 side_effect_exprt &to_side_effect_expr(exprt &expr);
 const side_effect_exprt &to_side_effect_expr(const exprt &expr);
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief A side effect that returns a non-deterministically chosen value
 */
 class side_effect_expr_nondett:public side_effect_exprt
 {
@@ -739,7 +745,7 @@ public:
   }
 };
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief A function call side effect
 */
 class side_effect_expr_function_callt:public side_effect_exprt
 {
