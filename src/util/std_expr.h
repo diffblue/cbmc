@@ -2072,6 +2072,7 @@ public:
 };
 
 /*! \brief Base class for all side effects
+    \remark Will eventually be replaced by side_effect_exprt
 */
 class sideeffect_exprt:public exprt
 {
@@ -2095,6 +2096,7 @@ public:
 };
 
 /*! \brief A side effect that returns a non-deterministically chosen value
+    \remark Will be replaced by side_effect_nondet_exprt
 */
 class nondet_exprt:public sideeffect_exprt
 {
