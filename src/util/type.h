@@ -14,11 +14,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "irep.h"
 #include "location.h"
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief The type of an expression
 */
 class typet:public irept
 {
- public:
+public:
   typet() { }
    
   explicit typet(const irep_idt &_id):irept(_id) { }
