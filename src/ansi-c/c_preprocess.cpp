@@ -314,13 +314,13 @@ bool c_preprocess_visual_studio(
         it=config.ansi_c.defines.begin();
         it!=config.ansi_c.defines.end();
         it++)
-      command_file << "/D\"" << *it << "\"" << std::endl;
+      command_file << "/D"+shell_quote(*it) << std::endl;
 
     for(std::list<std::string>::const_iterator
         it=config.ansi_c.include_paths.begin();
         it!=config.ansi_c.include_paths.end();
         it++)
-      command_file << "/I\"" << *it << "\"" << std::endl;
+      command_file << "/I"+shell_quote(*it) << std::endl;
 
     command_file << file << std::endl;
   }
