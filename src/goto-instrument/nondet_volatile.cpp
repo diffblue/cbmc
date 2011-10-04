@@ -137,15 +137,19 @@ void nondet_volatile(
     }
     else if(instruction.is_function_call())
     {
+      // these have arguments and a return LHS
+      
       code_function_callt &code_function_call=
         to_code_function_call(instruction.code);
 
+      // do arguments
       for(exprt::operandst::iterator
           it=code_function_call.arguments().begin();
           it!=code_function_call.arguments().end();
           it++)
         nondet_volatile_rhs(context, *it);
       
+      // do return value
       nondet_volatile_lhs(context, code_function_call.lhs());
     }
     else if(instruction.is_assert() ||
