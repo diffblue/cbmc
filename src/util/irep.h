@@ -54,6 +54,8 @@ typedef string_hash irep_id_hash;
 
 #include <iostream>
 
+/*! \brief Base class for tree-like data structures with sharing
+*/
 class irept
 {
 public:

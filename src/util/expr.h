@@ -38,7 +38,7 @@ Author: Daniel Kroening, kroening@kroening.com
   for(expr_listt::iterator it=(expr).begin(); \
       it!=(expr).end(); it++)
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief Base class for all expressions
 */
 class exprt:public irept
 {
@@ -54,6 +54,7 @@ public:
   explicit exprt(const irep_idt &_id):irept(_id) { }
   exprt(const irep_idt &_id, const typet &_type):irept(_id) { type()=_type; }
  
+  /// returns the type of the expression
   typet &type() { return static_cast<typet &>(add(ID_type)); }
   const typet &type() const { return static_cast<const typet &>(find(ID_type)); }
 
@@ -128,13 +129,15 @@ public:
   void copy_to_operands(const exprt &e1, const exprt &e2); // does not destroy expr
   void copy_to_operands(const exprt &e1, const exprt &e2, const exprt &e3); // does not destroy expr
 
+  // the following are deprecated -- use constructors instead
   void make_typecast(const typet &_type);
   void make_not();
-  
+
   void make_true();
   void make_false();
   void make_bool(bool value);
   void negate();
+
   bool sum(const exprt &expr);
   bool mul(const exprt &expr);
   bool subtract(const exprt &expr);
