@@ -15,7 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class contextt;
 class namespacet;
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief Globally accessible architectural configuration
 */
 class configt
 {
