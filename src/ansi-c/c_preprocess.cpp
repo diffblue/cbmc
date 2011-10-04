@@ -75,6 +75,91 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
+Function: shell_quote
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: quote a string for bash and CMD
+
+\*******************************************************************/
+
+std::string shell_quote(const std::string &src)
+{
+  #ifdef _WIN32
+  // first check if quoting is needed at all
+  
+  if(src.find(' ')==std::string::npos &&
+     src.find('"')==std::string::npos &&
+     src.find('&')==std::string::npos &&
+     src.find('|')==std::string::npos &&
+     src.find('(')==std::string::npos &&
+     src.find(')')==std::string::npos &&
+     src.find('<')==std::string::npos &&
+     src.find('>')==std::string::npos &&
+     src.find('^')==std::string::npos)
+  {
+    // seems fine -- return as is
+    return src;
+  }
+  
+  std::string result;
+  
+  result+='"';
+
+  for(unsigned i=0; i<src.size(); i++)
+  {
+    const char ch=src[i];
+    if(ch=='"') result+='"'; // quotes are doubled
+    result+=ch;
+  }  
+  
+  result+='"';
+
+  return result;
+
+  #else
+
+  // first check if quoting is needed at all
+  
+  if(src.find(' ')==std::string::npos &&
+     src.find('"')==std::string::npos &&
+     src.find('*')==std::string::npos &&
+     src.find('$')==std::string::npos &&
+     src.find('\\')==std::string::npos &&
+     src.find('?')==std::string::npos &&
+     src.find('&')==std::string::npos &&
+     src.find('|')==std::string::npos &&
+     src.find('>')==std::string::npos &&
+     src.find('<')==std::string::npos &&
+     src.find('^')==std::string::npos &&
+     src.find('\'')==std::string::npos)
+  {
+    // seems fine -- return as is
+    return src;
+  }
+  
+  std::string result;
+  
+  // the single quotes catch everything but themselves!
+  result+='\'';
+
+  for(unsigned i=0; i<src.size(); i++)
+  {
+    const char ch=src[i];
+    if(ch=='\'') result+="'\\''";
+    result+=ch;
+  }  
+  
+  result+='\'';
+
+  return result;
+  #endif
+}
+
+/*******************************************************************\
+
 Function: c_preprocess
 
   Inputs:
@@ -618,19 +703,19 @@ bool c_preprocess_gcc(
       it=config.ansi_c.defines.begin();
       it!=config.ansi_c.defines.end();
       it++)
-    command+=" -D'"+*it+"'";
+    command+=" -D"+shell_quote(*it);
 
   for(std::list<std::string>::const_iterator
       it=config.ansi_c.include_paths.begin();
       it!=config.ansi_c.include_paths.end();
       it++)
-    command+=" -I'"+*it+"'";
+    command+=" -I"+shell_quote(*it);
 
   for(std::list<std::string>::const_iterator
       it=config.ansi_c.include_files.begin();
       it!=config.ansi_c.include_files.end();
       it++)
-    command+=" -include '"+*it+"'";
+    command+=" -include "+shell_quote(*it);
 
   for(std::list<std::string>::const_iterator
       it=config.ansi_c.preprocessor_options.begin();
