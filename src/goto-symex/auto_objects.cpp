@@ -73,16 +73,24 @@ void goto_symext::initialize_auto_object(
       const typet &t=ns.follow(it->type());
       if(t.id()==ID_pointer)
       {
-        member_exprt member_expr;
-        member_expr.struct_op()=expr;
-        member_expr.set_component_name(it->get_name());
-        member_expr.type()=it->type();
+        const typet &subtype=ns.follow(t.subtype());
         
-        address_of_exprt rhs=
-          address_of_exprt(make_auto_object(t.subtype()));
+        // we don't like function pointers and
+        // we don't like void *
+        if(subtype.id()!=ID_code &&
+           subtype.id()!=ID_empty)
+        {
+          member_exprt member_expr;
+          member_expr.struct_op()=expr;
+          member_expr.set_component_name(it->get_name());
+          member_expr.type()=it->type();
+          
+          address_of_exprt rhs=
+            address_of_exprt(make_auto_object(t.subtype()));
 
-        code_assignt assignment(member_expr, rhs);
-        symex_assign(state, assignment);
+          code_assignt assignment(member_expr, rhs);
+          symex_assign(state, assignment);
+        }
       }
     }
   }
