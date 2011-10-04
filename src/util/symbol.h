@@ -25,18 +25,36 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "expr.h"
 #include "location.h"
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief Symbol table entry.
+
+    This is a symbol in the symbol table, stored in an
+    object of type contextt.
 */
 class symbolt
 {
 public:
+  /// Type of symbol
   typet type;
+  
+  /// Initial value of symbol
   exprt value;
+  
+  /// Source code location of definition of symbol
   locationt location;
+  
+  /// The unique identifier
   irep_idt name;
+  
+  /// Name of module the symbol belongs to
   irep_idt module;
+  
+  /// Base (non-scoped) name
   irep_idt base_name;
+  
+  /// Language mode
   irep_idt mode;
+  
+  /// Language-specific display name
   irep_idt pretty_name;
   
   const irep_idt &display_name() const
