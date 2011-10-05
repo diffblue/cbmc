@@ -259,7 +259,14 @@ bool configt::set(const cmdlinet &cmdline)
     ansi_c.set_32();
     
   if(cmdline.isset("64"))
-    ansi_c.set_64();
+  {
+    // there are numerous flavors!
+    #ifdef _WIN32
+    ansi_c.set_LLP64();
+    #else
+    ansi_c.set_LP64();
+    #endif
+  }
 
   if(cmdline.isset("LP64"))
     ansi_c.set_LP64();  // int=32, long=64, pointer=64
