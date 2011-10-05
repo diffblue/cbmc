@@ -322,7 +322,8 @@ bool configt::set(const cmdlinet &cmdline)
     ansi_c.arch=configt::ansi_ct::ARCH_X86_64;
     ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
     ansi_c.lib=configt::ansi_ct::LIB_FULL;
-    ansi_c.set_64();
+    // note that sizeof(void *)==8, but sizeof(long)==4!
+    ansi_c.set_LLP64();
     ansi_c.wchar_t_width=2*8;
   }
 
