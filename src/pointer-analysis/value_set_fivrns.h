@@ -197,8 +197,6 @@ public:
   
   typedef hash_set_cont<exprt, irep_hash> expr_sett;
 
-  static void add_objects(const entryt &src, expr_sett &dest);
-  
   #ifdef USE_DSTRING   
   typedef std::map<idt, entryt> valuest;  
   #else
