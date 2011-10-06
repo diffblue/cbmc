@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <location.h>
 #include <i2string.h>
 #include <expr_util.h>
+#include <std_types.h>
 #include <guard.h>
 #include <simplify_expr.h>
 #include <array_name.h>
@@ -207,6 +208,28 @@ void goto_checkt::overflow_check(
       // todo
     }
 
+    return;
+  }
+  else if(expr.id()==ID_div)
+  {
+    assert(expr.operands().size()==2);
+
+    // undefined for signed division INT_MIN/-1
+    if(type.id()==ID_signedbv)
+    {
+      equal_exprt int_min_eq(
+        expr.op0(), to_signedbv_type(type).smallest_expr());
+
+      equal_exprt minus_one_eq(
+        expr.op1(), from_integer(-1, type));
+
+      add_guarded_claim(
+        not_exprt(and_exprt(int_min_eq, minus_one_eq)),
+        "arithmetic overflow on signed division",
+        "overflow",
+        expr.find_location(),
+        guard);
+    }
     return;
   }
 
@@ -685,13 +708,17 @@ void goto_checkt::check_rec(
   {
     div_by_zero_check(expr, guard);
     nan_check(expr, guard);
+    
+    if(expr.type().id()==ID_signedbv)
+      overflow_check(expr, guard);
   }
   else if(expr.id()==ID_plus || expr.id()==ID_minus ||
           expr.id()==ID_mult ||
           expr.id()==ID_unary_minus ||
           expr.id()==ID_typecast)
   {
-    if(expr.type().id()==ID_signedbv)
+    if(expr.type().id()==ID_signedbv ||
+       expr.type().id()==ID_unsignedbv)
       overflow_check(expr, guard);
     else if(expr.type().id()==ID_floatbv)
       nan_check(expr, guard);
