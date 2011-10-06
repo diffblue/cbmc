@@ -686,6 +686,11 @@ public:
   {
     set_width(width);
   }
+  
+  mp_integer smallest() const;
+  mp_integer largest() const;
+  class constant_exprt smallest_expr() const;
+  class constant_exprt largest_expr() const;
 };
 
 /*! \brief Cast a generic typet to an \ref unsignedbv_typet
@@ -726,6 +731,11 @@ public:
   {
     set_width(width);
   }
+
+  mp_integer smallest() const;
+  mp_integer largest() const;
+  class constant_exprt smallest_expr() const;
+  class constant_exprt largest_expr() const;
 };
 
 /*! \brief Cast a generic typet to a \ref signedbv_typet

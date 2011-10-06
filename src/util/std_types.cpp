@@ -8,7 +8,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <stdlib.h>
 
+#include "arith_tools.h"
 #include "std_types.h"
+#include "std_expr.h"
 
 /*******************************************************************\
 
@@ -291,5 +293,73 @@ Function: range_typet::get_to
 mp_integer range_typet::get_to() const
 {
   return string2integer(get_string(ID_to));
+}
+
+/*******************************************************************\
+
+Function: signedbv_typet::smallest
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+mp_integer signedbv_typet::smallest() const
+{
+  return -power(2, get_width()-1);
+}
+
+/*******************************************************************\
+
+Function: signedbv_typet::largest
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+mp_integer signedbv_typet::largest() const
+{
+  return power(2, get_width()-1)-1;
+}
+
+/*******************************************************************\
+
+Function: signedbv_typet::smallest_expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+constant_exprt signedbv_typet::smallest_expr() const
+{
+  return to_constant_expr(from_integer(smallest(), *this));
+}
+
+/*******************************************************************\
+
+Function: signedbv_typet::largest_expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+constant_exprt signedbv_typet::largest_expr() const
+{
+  return to_constant_expr(from_integer(largest(), *this));
 }
 
