@@ -447,8 +447,10 @@ void value_sett::get_value_set_rec(
   }
   else if(expr.id()==ID_symbol)
   {
-    // is it a pointer, array or struct?
+    // is it a pointer, integer, array or struct?
     if(expr_type.id()==ID_pointer ||
+       expr_type.id()==ID_signedbv ||
+       expr_type.id()==ID_unsignedbv ||
        expr_type.id()==ID_struct ||
        expr_type.id()==ID_union ||
        expr_type.id()==ID_array)
@@ -465,12 +467,6 @@ void value_sett::get_value_set_rec(
         make_union(dest, v_it->second.object_map);
       else
         insert(dest, exprt(ID_unknown, original_type));
-    }
-    else if(expr_type.id()==ID_signedbv ||
-            expr_type.id()==ID_unsignedbv)
-    {
-      // integer got turned into a pointer
-      insert(dest, exprt(ID_integer_address, uchar_type()));
     }
     else
       insert(dest, exprt(ID_unknown, original_type));
@@ -512,6 +508,7 @@ void value_sett::get_value_set_rec(
   }
   else if(expr.id()=="reference_to")
   {
+    // old stuff, will go away
     object_mapt reference_set;
     
     get_reference_set(expr, reference_set, ns);
@@ -576,71 +573,69 @@ void value_sett::get_value_set_rec(
     else
       insert(dest, exprt(ID_unknown, original_type));
   }
-  else if(expr.id()==ID_plus || expr.id()==ID_minus)
+  else if(expr.id()==ID_plus ||
+          expr.id()==ID_minus)
   {
     if(expr.operands().size()<2)
       throw expr.id_string()+" expected to have at least two operands";
 
-    if(expr_type.id()==ID_pointer)
+    object_mapt pointer_expr_set;
+    mp_integer i;
+    bool i_is_set=false;
+
+    // special case for pointer+integer
+
+    if(expr.operands().size()==2 &&
+       expr_type.id()==ID_pointer)
     {
-      // find the pointer operand
-      const exprt *ptr_operand=NULL;
-
-      forall_operands(it, expr)
-        if(it->type().id()==ID_pointer)
-        {
-          if(ptr_operand==NULL)
-            ptr_operand=&(*it);
-          else
-            throw "more than one pointer operand in pointer arithmetic";
-        }
-
-      if(ptr_operand==NULL)
-        throw "pointer type sum expected to have pointer operand";
-        
-      mp_integer i;
-      bool i_is_set=false;
-
-      if(expr.operands().size()==2)
+      exprt ptr_operand;
+      
+      if(expr.op0().type().id()!=ID_pointer &&
+         expr.op0().is_constant())
       {
-        if(expr.op0().type().id()!=ID_pointer)
-          i_is_set=!to_integer(expr.op0(), i);
-        else
-          i_is_set=!to_integer(expr.op1(), i);
-          
-        if(i_is_set)
-        {
-          i*=pointer_offset_size(ns, ptr_operand->type().subtype());
-
-          if(expr.id()==ID_minus) i.negate();
-        }
+        i_is_set=!to_integer(expr.op0(), i);
+        ptr_operand=expr.op1();
       }
+      else
+      {
+        i_is_set=!to_integer(expr.op1(), i);
+        ptr_operand=expr.op0();
+      }
+        
+      if(i_is_set)
+      {
+        i*=pointer_offset_size(ns, ptr_operand.type().subtype());
 
-      object_mapt pointer_expr_set;
+        if(expr.id()==ID_minus) i.negate();
+      }
 
       get_value_set_rec(
-        *ptr_operand, pointer_expr_set, "", ptr_operand->type(), ns);
-      
-      for(object_map_dt::const_iterator
-          it=pointer_expr_set.read().begin();
-          it!=pointer_expr_set.read().end();
-          it++)
-      {
-        objectt object=it->second;
-
-        // adjust by offset      
-        if(object.offset_is_zero() && i_is_set)
-          object.offset=i;
-        else
-          object.offset_is_set=false;
-          
-        insert(dest, it->first, object);
-      }
+        ptr_operand, pointer_expr_set, "", ptr_operand.type(), ns);
     }
     else
     {
-      // some other arithmetic
-      insert(dest, exprt(ID_unknown, original_type));
+      // we get the points-to for all operands, even integers
+      forall_operands(it, expr)
+      {
+        get_value_set_rec(
+          *it, pointer_expr_set, "", it->type(), ns);
+      }
+    }
+
+    for(object_map_dt::const_iterator
+        it=pointer_expr_set.read().begin();
+        it!=pointer_expr_set.read().end();
+        it++)
+    {
+      objectt object=it->second;
+
+      // adjust by offset      
+      if(object.offset_is_zero() && i_is_set)
+        object.offset=i;
+      else
+        object.offset_is_set=false;
+        
+      insert(dest, it->first, object);
     }
   }
   else if(expr.id()==ID_sideeffect)
