@@ -690,7 +690,8 @@ bool simplify_exprt::simplify_pointer_offset(exprt &expr)
 
     if(op_type.id()==ID_pointer)
     {
-      // this just passes through, remove typecast
+      // Cast from pointer to pointer.
+      // This just passes through, remove typecast.
       exprt tmp=ptr.op0();
       ptr=tmp;
     
@@ -698,14 +699,41 @@ bool simplify_exprt::simplify_pointer_offset(exprt &expr)
       simplify_node(expr);
       return false;
     }
-    else if(op_type.id()==ID_signedbv || op_type.id()==ID_unsignedbv)
+    else if(op_type.id()==ID_signedbv ||
+            op_type.id()==ID_unsignedbv)
     {
+      // Cast from integer to pointer, say (int *)x.
+      
+      // We do a bit of special treatment for (TYPE *)(a+(int)&o),
+      // which is re-written to 'a'.
+
+      typet type=ns.follow(expr.type());      
       exprt tmp=ptr.op0();
-      if(op_type!=ns.follow(expr.type()))
-        tmp.make_typecast(expr.type());
-      expr=tmp;
-      simplify_node(expr);
-      return false;
+      if(tmp.id()==ID_plus && tmp.operands().size()==2)
+      {
+        if(tmp.op0().id()==ID_typecast &&
+           tmp.op0().operands().size()==1 &&
+           tmp.op0().op0().id()==ID_address_of)
+        {
+          expr=tmp.op1();
+          if(type!=expr.type())
+            expr.make_typecast(type);
+
+          simplify_node(expr);
+          return false;
+        }
+        else if(tmp.op1().id()==ID_typecast &&
+                tmp.op1().operands().size()==1 &&
+                tmp.op1().op0().id()==ID_address_of)
+        {
+          expr=tmp.op0();
+          if(type!=expr.type())
+            expr.make_typecast(type);
+
+          simplify_node(expr);
+          return false;
+        }
+      }
     }
   }
   else if(ptr.id()==ID_plus) // pointer arithmetic
@@ -3380,14 +3408,45 @@ bool simplify_exprt::simplify_object(exprt &expr)
   }
   else if(expr.id()==ID_typecast)
   {
-    if(expr.operands().size()==1 &&
-       ns.follow(expr.op0().type()).id()==ID_pointer)
+    const typet &op_type=ns.follow(expr.op0().type());
+  
+    assert(expr.operands().size()==1);
+    
+    if(op_type.id()==ID_pointer)
     {
+      // cast from pointer to pointer
       exprt tmp;
       tmp.swap(expr.op0());
       expr.swap(tmp);
       simplify_object(expr);
       return false;
+    }
+    else if(op_type.id()==ID_signedbv || op_type.id()==ID_unsignedbv)
+    {
+      // cast from integer to pointer
+
+      // We do a bit of special treatment for (TYPE *)(a+(int)&o),
+      // which is re-written to '&o'.
+
+      typet type=ns.follow(expr.type());      
+      exprt tmp=expr.op0();
+      if(tmp.id()==ID_plus && tmp.operands().size()==2)
+      {
+        if(tmp.op0().id()==ID_typecast &&
+           tmp.op0().operands().size()==1 &&
+           tmp.op0().op0().id()==ID_address_of)
+        {
+          expr=tmp.op0().op0();
+          return false;
+        }
+        else if(tmp.op1().id()==ID_typecast &&
+                tmp.op1().operands().size()==1 &&
+                tmp.op1().op0().id()==ID_address_of)
+        {
+          expr=tmp.op1();
+          return false;
+        }
+      }
     }
   }
 
