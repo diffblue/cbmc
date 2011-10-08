@@ -3428,7 +3428,6 @@ bool simplify_exprt::simplify_object(exprt &expr)
       // We do a bit of special treatment for (TYPE *)(a+(int)&o),
       // which is re-written to '&o'.
 
-      typet type=ns.follow(expr.type());      
       exprt tmp=expr.op0();
       if(tmp.id()==ID_plus && tmp.operands().size()==2)
       {
@@ -3443,7 +3442,7 @@ bool simplify_exprt::simplify_object(exprt &expr)
                 tmp.op1().operands().size()==1 &&
                 tmp.op1().op0().id()==ID_address_of)
         {
-          expr=tmp.op1();
+          expr=tmp.op1().op0();
           return false;
         }
       }
