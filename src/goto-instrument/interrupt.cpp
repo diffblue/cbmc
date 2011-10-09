@@ -119,6 +119,10 @@ void interrupt(
     throw "interrupt handler `"+id2string(interrupt_handler)+"' is ambiguous";
 
   symbol_exprt isr=matches.front();
+  
+  if(!to_code_type(isr.type()).arguments().empty())
+    throw "interrupt handler `"+id2string(interrupt_handler)+
+          "' must not have arguments";
 
   // we first figure out which objects are read/written by the ISR
 
