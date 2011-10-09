@@ -374,7 +374,7 @@ void goto_instrument_parseoptionst::instrument_goto_program(
   if(cmdline.isset("pointer-check") ||
      cmdline.isset("race-check") ||
      cmdline.isset("tso") ||
-     cmdline.isset("interrupt"))
+     cmdline.isset("isr"))
   {
     status("Function Pointer Removal");
     remove_function_pointers(ns, goto_functions);
@@ -423,14 +423,14 @@ void goto_instrument_parseoptionst::instrument_goto_program(
     }
 
     // Interrupt handler
-    if(cmdline.isset("interrupt"))
+    if(cmdline.isset("isr"))
     {
       status("Instrumenting interrupt handler");
       interrupt(
         value_set_analysis,
         context,
         goto_functions,
-        cmdline.getval("interrupt"));
+        cmdline.getval("isr"));
     }
 
     // Memory-mapped I/O
@@ -523,7 +523,7 @@ void goto_instrument_parseoptionst::help()
     "\n"
     "Semantic transformations:\n"
     " --nondet-volatile            makes reads from volatile variables non-deterministic\n"
-    " --interrupt function         instruments an interrupt handler function\n"
+    " --isr function               instruments an interrupt service routine\n"
     " --mmio                       instruments memory-mapped I/O\n"
     "\n"
     "Slicing:\n"
