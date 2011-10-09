@@ -41,7 +41,6 @@ void rw_sett::compute()
           target->is_assert())
   {
     read(target->guard);
-    assign(target->code.op0(), target->code.op1());
   }
   else if(target->is_function_call())
   {
