@@ -55,7 +55,7 @@ public:
   typedef hash_map_cont<irep_idt, entryt, irep_id_hash> entriest;
   entriest entries;
   
-  void compute(const codet &code);
+  void compute();
   
   rw_sett(const namespacet &_ns,
           value_setst &_value_sets,
@@ -64,16 +64,7 @@ public:
           value_sets(_value_sets),
           target(_target)
   {
-  }
-  
-  rw_sett(const namespacet &_ns,
-          value_setst &_value_sets,
-          goto_programt::const_targett _target,
-          const codet &code):ns(_ns),
-          value_sets(_value_sets),
-          target(_target)
-  {
-    compute(code);
+    compute();
   }
   
   void read(const exprt &expr)
@@ -84,6 +75,11 @@ public:
   void read(const exprt &expr, const guardt &guard)
   {
     read_write_rec(expr, true, false, "", guard);
+  }
+  
+  void write(const exprt &expr)
+  {
+    read_write_rec(expr, false, true, "", guardt());
   }
   
 protected:

@@ -48,7 +48,7 @@ void mmio(
     
     if(instruction.is_assign())
     {
-      rw_sett rw_set(ns, value_sets, i_it, instruction.code);
+      rw_sett rw_set(ns, value_sets, i_it);
       
       if(rw_set.entries.empty()) continue;
   

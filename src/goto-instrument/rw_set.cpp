@@ -10,6 +10,7 @@ Date: February 2006
 
 #include <expr_util.h>
 #include <std_expr.h>
+#include <std_code.h>
 #include <namespace.h>
 
 #include <pointer-analysis/goto_program_dereference.h>
@@ -28,14 +29,36 @@ Function: rw_sett::compute
 
 \*******************************************************************/
 
-void rw_sett::compute(const codet &code)
+void rw_sett::compute()
 {
-  const irep_idt &statement=code.get_statement();
-  
-  if(statement==ID_assign)
+  if(target->is_assign())
   {
-    assert(code.operands().size()==2);
-    assign(code.op0(), code.op1());
+    assert(target->code.operands().size()==2);
+    assign(target->code.op0(), target->code.op1());
+  }
+  else if(target->is_goto() ||
+          target->is_assume() ||
+          target->is_assert())
+  {
+    read(target->guard);
+    assign(target->code.op0(), target->code.op1());
+  }
+  else if(target->is_function_call())
+  {
+    const code_function_callt &code_function_call=
+      to_code_function_call(target->code);
+
+    read(code_function_call.function());
+    
+    // do operands
+    for(code_function_callt::argumentst::const_iterator
+        it=code_function_call.arguments().begin();
+        it!=code_function_call.arguments().end();
+        it++)
+      read(*it);
+    
+    if(code_function_call.lhs().is_not_nil())
+      write(code_function_call.lhs());
   }
 }
 
