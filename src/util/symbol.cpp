@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "symbol.h"
 #include "location.h"
+#include "std_expr.h"
 
 /*******************************************************************\
 
@@ -224,7 +225,7 @@ Function: is_global
 
 bool is_global(const symbolt& symbol)
 {
-	return symbol.static_lifetime && !symbol.thread_local;
+  return symbol.static_lifetime && !symbol.thread_local;
 }
 
 /*******************************************************************\
@@ -241,7 +242,7 @@ Function: is_thread_local
 
 bool is_thread_local(const symbolt& symbol)
 {
-	return symbol.static_lifetime && symbol.thread_local;
+  return symbol.static_lifetime && symbol.thread_local;
 }
 
 /*******************************************************************\
@@ -258,5 +259,25 @@ Function: is_procedure_local
 
 bool is_procedure_local(const symbolt& symbol)
 {
-	return !symbol.static_lifetime;
+  return !symbol.static_lifetime;
 }
+
+/*******************************************************************\
+
+Function: symbolt::symbol_expr
+
+  Inputs: symbol
+
+ Outputs: boolean
+
+ Purpose: decides whether the symbol is a procedure local variable
+
+\*******************************************************************/
+
+symbol_exprt symbolt::symbol_expr() const
+{
+  symbol_exprt tmp(type);
+  tmp.set_identifier(name);
+  return tmp;
+}
+

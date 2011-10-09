@@ -102,6 +102,8 @@ public:
   // serialization
   void to_irep(irept &dest) const;
   void from_irep(const irept &src);
+  
+  class symbol_exprt symbol_expr() const;
 };
 
 std::ostream &operator<<(std::ostream &out,
