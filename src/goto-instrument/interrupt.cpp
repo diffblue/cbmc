@@ -67,7 +67,7 @@ void interrupt(
 
     t_goto->make_goto(t_orig);
     t_goto->location=location;
-    t_goto->guard=side_effect_expr_nondett();
+    t_goto->guard=side_effect_expr_nondett(bool_typet());
 
     t_call->make_function_call(isr_call);
     t_call->location=location;
