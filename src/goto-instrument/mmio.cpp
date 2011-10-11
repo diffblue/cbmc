@@ -48,9 +48,9 @@ void mmio(
     
     if(instruction.is_assign())
     {
-      rw_sett rw_set(ns, value_sets, i_it);
+      rw_set_loct rw_set(ns, value_sets, i_it);
       
-      if(rw_set.entries.empty()) continue;
+      if(rw_set.empty()) continue;
   
       #if 0    
       goto_programt::instructiont original_instruction;

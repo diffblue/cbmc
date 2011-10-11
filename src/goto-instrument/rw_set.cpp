@@ -19,7 +19,7 @@ Date: February 2006
 
 /*******************************************************************\
 
-Function: rw_sett::compute
+Function: rw_set_loct::compute
 
   Inputs:
 
@@ -29,7 +29,7 @@ Function: rw_sett::compute
 
 \*******************************************************************/
 
-void rw_sett::compute()
+void rw_set_loct::compute()
 {
   if(target->is_assign())
   {
@@ -63,7 +63,7 @@ void rw_sett::compute()
 
 /*******************************************************************\
 
-Function: rw_sett::assign
+Function: rw_set_loct::assign
 
   Inputs:
 
@@ -73,7 +73,7 @@ Function: rw_sett::assign
 
 \*******************************************************************/
 
-void rw_sett::assign(const exprt &lhs, const exprt &rhs)
+void rw_set_loct::assign(const exprt &lhs, const exprt &rhs)
 {
   read(rhs);
   read_write_rec(lhs, false, true, "", guardt());
@@ -81,7 +81,7 @@ void rw_sett::assign(const exprt &lhs, const exprt &rhs)
 
 /*******************************************************************\
 
-Function: rw_sett::read_write_rec
+Function: rw_set_loct::read_write_rec
 
   Inputs:
 
@@ -91,7 +91,7 @@ Function: rw_sett::read_write_rec
 
 \*******************************************************************/
 
-void rw_sett::read_write_rec(
+void rw_set_loct::read_write_rec(
   const exprt &expr,
   bool r, bool w,
   const std::string &suffix,
@@ -120,12 +120,20 @@ void rw_sett::read_write_rec(
     }
     
     irep_idt object=id2string(symbol_expr.get_identifier())+suffix;
+
+    if(r)
+    {
+      entryt &entry=r_entries[object];
+      entry.object=object;
+      entry.guard=guard.as_expr(); // should 'OR'
+    }
     
-    entryt &entry=entries[object];
-    entry.object=object;
-    entry.r=entry.r || r;
-    entry.w=entry.w || w;
-    entry.guard=guard.as_expr();
+    if(w)
+    {
+      entryt &entry=w_entries[object];
+      entry.object=object;
+      entry.guard=guard.as_expr(); // should 'OR'
+    }
   }
   else if(expr.id()==ID_member)
   {
@@ -145,7 +153,7 @@ void rw_sett::read_write_rec(
     assert(expr.operands().size()==1);
     read(expr.op0(), guard);
 
-    exprt tmp(expr.op0());
+    exprt tmp=expr.op0();
     dereference(target, tmp, ns, value_sets);
 
     read_write_rec(tmp, r, w, suffix, guard);
@@ -174,3 +182,41 @@ void rw_sett::read_write_rec(
       read_write_rec(*it, r, w, suffix, guard);
   }
 }
+
+/*******************************************************************\
+
+Function: rw_set_functiont::compute_rec
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void rw_set_functiont::compute_rec(const exprt &function)
+{
+  if(function.id()==ID_symbol)
+  {
+    const irep_idt &id=to_symbol_expr(function).get_identifier();
+
+    goto_functionst::function_mapt::const_iterator f_it=
+      goto_functions.function_map.find(id);
+
+    if(f_it!=goto_functions.function_map.end())
+    {
+      const goto_programt &body=f_it->second.body;
+
+      forall_goto_program_instructions(i_it, body)
+      {
+        *this+=rw_set_loct(ns, value_sets, i_it);
+      }
+    }
+  }
+  else if(function.id()==ID_if)
+  {
+    compute_rec(to_if_expr(function).true_case());
+    compute_rec(to_if_expr(function).false_case());
+  }
+} 
