@@ -268,9 +268,9 @@ void weak_memory_tso(
     
     if(instruction.is_assign())
     {
-      rw_sett rw_set(ns, value_sets, i_it);
+      rw_set_loct rw_set(ns, value_sets, i_it);
       
-      if(rw_set.entries.empty()) continue;
+      if(rw_set.empty()) continue;
       
       goto_programt::instructiont original_instruction;
       original_instruction.swap(instruction);
@@ -282,62 +282,60 @@ void weak_memory_tso(
       
       // we first perform (non-deterministically) up to 2 writes for
       // stuff that is potentially read
-      forall_rw_set_entries(e_it, rw_set)
-        if(e_it->second.r)
-        {
-          const shared_bufferst::varst &vars=shared_buffers(e_it->second.object);
-          irep_idt choice0=shared_buffers.choice("0");
-          irep_idt choice1=shared_buffers.choice("1");
-          
-          symbol_exprt choice0_expr=symbol_exprt(choice0, bool_typet());
-          symbol_exprt choice1_expr=symbol_exprt(choice1, bool_typet());
+      forall_rw_set_r_entries(e_it, rw_set)
+      {
+        const shared_bufferst::varst &vars=shared_buffers(e_it->second.object);
+        irep_idt choice0=shared_buffers.choice("0");
+        irep_idt choice1=shared_buffers.choice("1");
         
-          symbol_exprt w_buff0_expr=symbol_exprt(vars.w_buff0, vars.type);
-          symbol_exprt w_buff1_expr=symbol_exprt(vars.w_buff1, vars.type);
-          
-          symbol_exprt w_used0_expr=symbol_exprt(vars.w_used0, bool_typet());
-          symbol_exprt w_used1_expr=symbol_exprt(vars.w_used1, bool_typet());
-          
-          exprt nondet_bool_expr=side_effect_expr_nondett(bool_typet());
-          
-          exprt choice0_rhs=and_exprt(nondet_bool_expr, w_used0_expr);
-          exprt choice1_rhs=and_exprt(nondet_bool_expr, w_used1_expr);
-          
-          // throw 2 Boolean dice
-          shared_buffers.assignment(goto_program, i_it, location, choice0, choice0_rhs);
-          shared_buffers.assignment(goto_program, i_it, location, choice1, choice1_rhs);
-          
-          exprt lhs=symbol_exprt(e_it->second.object, vars.type);
-          
-          exprt value=
-            if_exprt(choice0_expr, w_buff0_expr,
-              if_exprt(choice1_expr, w_buff1_expr, lhs));
+        symbol_exprt choice0_expr=symbol_exprt(choice0, bool_typet());
+        symbol_exprt choice1_expr=symbol_exprt(choice1, bool_typet());
+      
+        symbol_exprt w_buff0_expr=symbol_exprt(vars.w_buff0, vars.type);
+        symbol_exprt w_buff1_expr=symbol_exprt(vars.w_buff1, vars.type);
+        
+        symbol_exprt w_used0_expr=symbol_exprt(vars.w_used0, bool_typet());
+        symbol_exprt w_used1_expr=symbol_exprt(vars.w_used1, bool_typet());
+        
+        exprt nondet_bool_expr=side_effect_expr_nondett(bool_typet());
+        
+        exprt choice0_rhs=and_exprt(nondet_bool_expr, w_used0_expr);
+        exprt choice1_rhs=and_exprt(nondet_bool_expr, w_used1_expr);
+        
+        // throw 2 Boolean dice
+        shared_buffers.assignment(goto_program, i_it, location, choice0, choice0_rhs);
+        shared_buffers.assignment(goto_program, i_it, location, choice1, choice1_rhs);
+        
+        exprt lhs=symbol_exprt(e_it->second.object, vars.type);
+        
+        exprt value=
+          if_exprt(choice0_expr, w_buff0_expr,
+            if_exprt(choice1_expr, w_buff1_expr, lhs));
 
-          // write one of the buffer entries
-          shared_buffers.assignment(goto_program, i_it, location, e_it->second.object, value);
-          
-          // update 'used' flags
-          exprt w_used0_rhs=if_exprt(choice0_expr, false_exprt(), w_used0_expr);
-          exprt w_used1_rhs=and_exprt(if_exprt(choice1_expr, false_exprt(), w_used1_expr), w_used0_expr);
+        // write one of the buffer entries
+        shared_buffers.assignment(goto_program, i_it, location, e_it->second.object, value);
+        
+        // update 'used' flags
+        exprt w_used0_rhs=if_exprt(choice0_expr, false_exprt(), w_used0_expr);
+        exprt w_used1_rhs=and_exprt(if_exprt(choice1_expr, false_exprt(), w_used1_expr), w_used0_expr);
 
-          shared_buffers.assignment(goto_program, i_it, location, vars.w_used0, w_used0_rhs);
-          shared_buffers.assignment(goto_program, i_it, location, vars.w_used1, w_used1_rhs);
-        }
+        shared_buffers.assignment(goto_program, i_it, location, vars.w_used0, w_used0_rhs);
+        shared_buffers.assignment(goto_program, i_it, location, vars.w_used1, w_used1_rhs);
+      }
 
       // now rotate the write buffers for anything that is written
-      forall_rw_set_entries(e_it, rw_set)
-        if(e_it->second.w)
-        {
-          const shared_bufferst::varst &vars=shared_buffers(e_it->second.object);
-        
-          // w_used1=w_used0; w_used0=true;
-          shared_buffers.assignment(goto_program, i_it, location, vars.w_used1, vars.w_used0);
-          shared_buffers.assignment(goto_program, i_it, location, vars.w_used0, true_exprt());
+      forall_rw_set_w_entries(e_it, rw_set)
+      {
+        const shared_bufferst::varst &vars=shared_buffers(e_it->second.object);
+      
+        // w_used1=w_used0; w_used0=true;
+        shared_buffers.assignment(goto_program, i_it, location, vars.w_used1, vars.w_used0);
+        shared_buffers.assignment(goto_program, i_it, location, vars.w_used0, true_exprt());
 
-          // w_buff1=w_buff0; w_buff0=RHS;
-          shared_buffers.assignment(goto_program, i_it, location, vars.w_buff1, vars.w_buff0);
-          shared_buffers.assignment(goto_program, i_it, location, vars.w_buff0, original_instruction.code.op1());
-        }
+        // w_buff1=w_buff0; w_buff0=RHS;
+        shared_buffers.assignment(goto_program, i_it, location, vars.w_buff1, vars.w_buff0);
+        shared_buffers.assignment(goto_program, i_it, location, vars.w_buff0, original_instruction.code.op1());
+      }
 
       // ATOMIC_END
       i_it=goto_program.insert_before(i_it);

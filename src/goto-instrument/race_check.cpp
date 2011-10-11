@@ -35,13 +35,12 @@ public:
     return symbol_expr(get_guard_symbol(object));
   }
   
-  const exprt get_w_guard_expr(const rw_sett::entryt &entry)
+  const exprt get_w_guard_expr(const rw_set_baset::entryt &entry)
   {
-    assert(entry.w);
     return get_guard_symbol_expr(entry.object);
   }
   
-  const exprt get_assertion(const rw_sett::entryt &entry)
+  const exprt get_assertion(const rw_set_baset::entryt &entry)
   {
     return gen_not(get_guard_symbol_expr(entry.object));
   }
@@ -122,6 +121,31 @@ void w_guardst::add_initialization(goto_programt &goto_program) const
 
 /*******************************************************************\
 
+Function: comment
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+std::string comment(const rw_set_baset::entryt &entry, bool write)
+{
+  std::string result;
+  if(write)
+    result="W/W";
+  else
+    result="R/W";
+
+  result+=" data race on ";
+  result+=id2string(entry.object);
+  return result;
+}
+
+/*******************************************************************\
+
 Function: race_check
 
   Inputs:
@@ -146,9 +170,9 @@ void race_check(
     
     if(instruction.is_assign())
     {
-      rw_sett rw_set(ns, value_sets, i_it);
+      rw_set_loct rw_set(ns, value_sets, i_it);
       
-      if(rw_set.entries.empty()) continue;
+      if(rw_set.empty()) continue;
       
       goto_programt::instructiont original_instruction;
       original_instruction.swap(instruction);
@@ -157,19 +181,18 @@ void race_check(
       i_it++;
 
       // now add assignments for what is written -- set
-      forall_rw_set_entries(e_it, rw_set)
-        if(e_it->second.w)
-        {      
-          goto_programt::targett t=goto_program.insert_before(i_it);
+      forall_rw_set_w_entries(e_it, rw_set)
+      {      
+        goto_programt::targett t=goto_program.insert_before(i_it);
 
-          t->type=ASSIGN;
-          t->code=code_assignt(
-            w_guards.get_w_guard_expr(e_it->second),
-            e_it->second.get_guard());
+        t->type=ASSIGN;
+        t->code=code_assignt(
+          w_guards.get_w_guard_expr(e_it->second),
+          e_it->second.guard);
 
-          t->location=original_instruction.location;
-          i_it=++t;
-        }
+        t->location=original_instruction.location;
+        i_it=++t;
+      }
 
       // insert original statement here
       {
@@ -179,28 +202,37 @@ void race_check(
       }
 
       // now add assignments for what is written -- reset
-      forall_rw_set_entries(e_it, rw_set)
-        if(e_it->second.w)
-        {      
-          goto_programt::targett t=goto_program.insert_before(i_it);
+      forall_rw_set_w_entries(e_it, rw_set)
+      {      
+        goto_programt::targett t=goto_program.insert_before(i_it);
 
-          t->type=ASSIGN;
-          t->code=code_assignt(
-            w_guards.get_w_guard_expr(e_it->second),
-            false_exprt());
+        t->type=ASSIGN;
+        t->code=code_assignt(
+          w_guards.get_w_guard_expr(e_it->second),
+          false_exprt());
 
-          t->location=original_instruction.location;
-          i_it=++t;
-        }
+        t->location=original_instruction.location;
+        i_it=++t;
+      }
 
-      // now add assertion for what is read and written
-      forall_rw_set_entries(e_it, rw_set)
+      // now add assertions for what is read and written
+      forall_rw_set_r_entries(e_it, rw_set)
       {
         goto_programt::targett t=goto_program.insert_before(i_it);
 
         t->make_assertion(w_guards.get_assertion(e_it->second));
         t->location=original_instruction.location;
-        t->location.set("comment", e_it->second.get_comment());
+        t->location.set_comment(comment(e_it->second, false));
+        i_it=++t;
+      }
+
+      forall_rw_set_w_entries(e_it, rw_set)
+      {
+        goto_programt::targett t=goto_program.insert_before(i_it);
+
+        t->make_assertion(w_guards.get_assertion(e_it->second));
+        t->location=original_instruction.location;
+        t->location.set_comment(comment(e_it->second, true));
         i_it=++t;
       }
 
