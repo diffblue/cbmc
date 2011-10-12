@@ -112,9 +112,9 @@ void smt1_convt::set_value(
   }
   else if(type.id()==ID_pointer)
   {
-    assert(v.size()==config.ansi_c.pointer_width);
+    assert(v.size()==bv_width(type));
     
-    unsigned i=config.ansi_c.pointer_width-BV_ADDR_BITS;
+    unsigned i=v.size()-BV_ADDR_BITS;
 
     pointer_logict::pointert p;
     p.object=integer2long(
@@ -1338,15 +1338,15 @@ void smt1_convt::convert_typecast(const typecast_exprt &expr, bool bool_as_bv)
     }
     else if(op_type.id()==ID_pointer) // from pointer to int
     {
-      unsigned from_width=config.ansi_c.pointer_width;
+      unsigned from_width=bv_width(op_type);
 
       if(from_width<to_width) // extend
       {
-        smt1_prop.out << "(sign_extend[";
+        smt1_prop.out << "(zero_extend[";
         smt1_prop.out << (to_width-from_width)
-                      << "] (extract[ " << (to_width-1) << ":0] ";
+                      << "] ";
         convert_expr(op, true);
-        smt1_prop.out << "))";
+        smt1_prop.out << ")";
       }
       else // chop off extra bits
       {
