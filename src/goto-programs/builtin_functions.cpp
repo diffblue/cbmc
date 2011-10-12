@@ -823,6 +823,10 @@ void goto_convertt::do_function_call_symbol(
     t->guard=arguments.front();
     t->location=function.location();
     t->location.set("user-provided", true);
+    
+    // let's double-check the type of the argument
+    if(t->guard.type().id()!=ID_bool)
+      t->guard.make_typecast(bool_typet());
 
     if(lhs.is_not_nil())
     {
@@ -847,6 +851,10 @@ void goto_convertt::do_function_call_symbol(
     t->location.set("user-provided", true);
     t->location.set(ID_property, ID_assertion);
     
+    // let's double-check the type of the argument
+    if(t->guard.type().id()!=ID_bool)
+      t->guard.make_typecast(bool_typet());
+
     if(lhs.is_not_nil())
     {
       err_location(function);
@@ -874,6 +882,10 @@ void goto_convertt::do_function_call_symbol(
     t->location.set(ID_property, ID_assertion);
     t->location.set(ID_comment, description);
     
+    // let's double-check the type of the argument
+    if(t->guard.type().id()!=ID_bool)
+      t->guard.make_typecast(bool_typet());
+
     if(lhs.is_not_nil())
     {
       err_location(function);
