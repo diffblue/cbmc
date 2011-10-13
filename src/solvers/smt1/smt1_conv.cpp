@@ -1,6 +1,6 @@
 /*******************************************************************\
 
-Module: SMT Backend
+Module: SMT Version 1 Backend
 
 Author: Daniel Kroening, kroening@kroening.com
 
@@ -8,7 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <assert.h>
 
-#include <config.h>
 #include <arith_tools.h>
 #include <expr_util.h>
 #include <std_types.h>
@@ -18,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <fixedbv.h>
 #include <pointer_offset_size.h>
 #include <base_type.h>
+#include <ieee_float.h>
 
 #include <ansi-c/string_constant.h>
 
@@ -190,7 +190,9 @@ Function: smt1_convt::convert_address_of_rec
 
 \*******************************************************************/
 
-void smt1_convt::convert_address_of_rec(const exprt &expr)
+void smt1_convt::convert_address_of_rec(
+  const exprt &expr,
+  const pointer_typet &result_type)
 {
   if(expr.id()==ID_symbol ||
      expr.id()==ID_constant ||
@@ -200,7 +202,7 @@ void smt1_convt::convert_address_of_rec(const exprt &expr)
     smt1_prop.out
       << "(concat"
       << " bv" << pointer_logic.add_object(expr) << "[" << BV_ADDR_BITS << "]"
-      << " bv0[" << config.ansi_c.pointer_width-BV_ADDR_BITS << "]"
+      << " bv0[" << bv_width(result_type)-BV_ADDR_BITS << "]"
       << ")";
   }
   else if(expr.id()==ID_index)
@@ -216,7 +218,7 @@ void smt1_convt::convert_address_of_rec(const exprt &expr)
       if(array.type().id()==ID_pointer)
         convert_expr(array, true);
       else if(array.type().id()==ID_array)
-        convert_address_of_rec(array);
+        convert_address_of_rec(array, result_type);
       else
         assert(false);
     }
@@ -257,10 +259,10 @@ void smt1_convt::convert_address_of_rec(const exprt &expr)
       mp_integer offset=member_offset(ns, struct_type, component_name);
 
       typet index_type(ID_unsignedbv);
-      index_type.set(ID_width, config.ansi_c.pointer_width);
+      index_type.set(ID_width, bv_width(result_type));
 
       smt1_prop.out << "(bvadd ";
-      convert_address_of_rec(struct_op);
+      convert_address_of_rec(struct_op, result_type);
       smt1_prop.out << " ";
       convert_expr(from_integer(offset, index_type), true);
       smt1_prop.out << ")";
@@ -268,7 +270,7 @@ void smt1_convt::convert_address_of_rec(const exprt &expr)
     else if(struct_op_type.id()==ID_union)
     {
       // these all have offset 0
-      convert_address_of_rec(struct_op);
+      convert_address_of_rec(struct_op, result_type);
     }
     else
       throw "unexpected type of member operand";
@@ -280,9 +282,9 @@ void smt1_convt::convert_address_of_rec(const exprt &expr)
     smt1_prop.out << "(ite ";
     convert_expr(expr.op0(), false);
     smt1_prop.out << " ";
-    convert_expr(expr.op1(), true);
+    convert_address_of_rec(expr.op1(), result_type);
     smt1_prop.out << " ";
-    convert_expr(expr.op2(), true);
+    convert_address_of_rec(expr.op2(), result_type);
     smt1_prop.out << ")";
   }
   else
@@ -752,7 +754,7 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
   {
     assert(expr.operands().size()==1);
     assert(expr.type().id()==ID_pointer);
-    convert_address_of_rec(expr.op0());
+    convert_address_of_rec(expr.op0(), to_pointer_type(expr.type()));
   }
   else if(expr.id()=="implicit_address_of" ||
           expr.id()=="reference_to")
@@ -835,26 +837,28 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
   {
     assert(expr.operands().size()==1);
     assert(expr.op0().type().id()==ID_pointer);
+    unsigned op_width=bv_width(expr.op0().type());
     smt1_prop.out << "(zero_extend[" << BV_ADDR_BITS << "] (extract["
-                  << (config.ansi_c.pointer_width-1-BV_ADDR_BITS)
+                  << (op_width-1-BV_ADDR_BITS)
                   << ":0] ";
     convert_expr(expr.op0(), true);
     smt1_prop.out << "))";
-    assert(bv_width(expr.type())==config.ansi_c.pointer_width);
+    assert(bv_width(expr.type())==op_width);
   }
   else if(expr.id()==ID_pointer_object)
   {
     assert(expr.operands().size()==1);
     assert(expr.op0().type().id()==ID_pointer);
+    unsigned op_width=bv_width(expr.op0().type());
     signed int ext=(int)bv_width(expr.type())-(int)BV_ADDR_BITS;
 
     if(ext>0)
       smt1_prop.out << "(zero_extend[" << ext << "] ";
 
     smt1_prop.out << "(extract["
-                  << (config.ansi_c.pointer_width-1)
+                  << (op_width-1)
                   << ":"
-                  << config.ansi_c.pointer_width-1-BV_ADDR_BITS << "] ";
+                  << op_width-1-BV_ADDR_BITS << "] ";
     convert_expr(expr.op0(), true);
     smt1_prop.out << ")";
 
@@ -863,20 +867,25 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
   else if(expr.id()=="same-object")
   {
     assert(expr.operands().size()==2);
+    assert(expr.op0().type().id()==ID_pointer);
+    assert(expr.op1().type().id()==ID_pointer);
+
+    unsigned op0_width=bv_width(expr.op0().type());
+    unsigned op1_width=bv_width(expr.op1().type());
 
     // this may have to be converted
     from_bool_begin(expr.type(), bool_as_bv);
-
+    
     smt1_prop.out << "(= (extract["
-                  << (config.ansi_c.pointer_width-1)
+                  << (op0_width-1)
                   << ":"
-                  << config.ansi_c.pointer_width-BV_ADDR_BITS << "] ";
+                  << op0_width-BV_ADDR_BITS << "] ";
     convert_expr(expr.op0(), true);
     smt1_prop.out << ")";
     smt1_prop.out << " (extract["
-                  << (config.ansi_c.pointer_width-1)
+                  << (op1_width-1)
                   << ":"
-                  << config.ansi_c.pointer_width-BV_ADDR_BITS << "] ";
+                  << op1_width-BV_ADDR_BITS << "] ";
     convert_expr(expr.op1(), true);
     smt1_prop.out << "))";
 
@@ -890,13 +899,15 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
   else if(expr.id()=="invalid-pointer")
   {
     assert(expr.operands().size()==1);
+    assert(expr.op0().type().id()==ID_pointer);
+    unsigned op_width=bv_width(expr.op0().type());
 
     // this may have to be converted
     from_bool_begin(expr.type(), bool_as_bv);
 
     smt1_prop.out << "(= (extract["
-                  << (config.ansi_c.pointer_width-1)
-                  << ":" << config.ansi_c.pointer_width-BV_ADDR_BITS << "] ";
+                  << (op_width-1)
+                  << ":" << op_width-BV_ADDR_BITS << "] ";
     convert_expr(expr.op0(), true);
     smt1_prop.out << ") bv" << pointer_logic.get_invalid_object()
                   << "[" << BV_ADDR_BITS << "])";
@@ -1474,6 +1485,8 @@ void smt1_convt::convert_typecast(const typecast_exprt &expr, bool bool_as_bv)
   }
   else if(expr_type.id()==ID_pointer)
   {
+    unsigned to_width=bv_width(expr_type);
+  
     if(op_type.id()==ID_pointer)
     {
       // this just passes through
@@ -1484,20 +1497,20 @@ void smt1_convt::convert_typecast(const typecast_exprt &expr, bool bool_as_bv)
     {
       unsigned from_width=bv_width(op_type);
 
-      if(from_width==config.ansi_c.pointer_width)
-        convert_expr(op, true);
-      else if(from_width<config.ansi_c.pointer_width)
+      if(from_width==to_width)
+        convert_expr(op, true); // pass through
+      else if(from_width<to_width)
       {
         smt1_prop.out << "(zero_extend["
-                      << (config.ansi_c.pointer_width-from_width)
+                      << (to_width-from_width)
                       << "] ";
         convert_expr(op, true);
         smt1_prop.out << ")"; // zero_extend
       }
-      else // from_width>config.ansi_c.pointer_width
+      else // from_width>to_width
       {
         smt1_prop.out << "(extract["
-                      << config.ansi_c.pointer_width
+                      << to_width
                       << ":0] ";
         convert_expr(op, true);
         smt1_prop.out << ")"; // extract
@@ -1670,7 +1683,7 @@ void smt1_convt::convert_constant(const constant_exprt &expr, bool bool_as_bv)
       smt1_prop.out << "(concat"
                     << " bv" << pointer_logic.get_null_object()
                     << "[" << BV_ADDR_BITS << "]"
-                    << " bv0[" << config.ansi_c.pointer_width-BV_ADDR_BITS
+                    << " bv0[" << bv_width(expr.type())-BV_ADDR_BITS
                     << "]"
                     << ")"; // concat
     }
@@ -1771,6 +1784,8 @@ void smt1_convt::convert_is_dynamic_object(
   pointer_logic.get_dynamic_objects(dynamic_objects);
 
   assert(expr.operands().size()==1);
+  assert(expr.op0().type().id()==ID_pointer);
+  unsigned op_width=bv_width(expr.op0().type());
 
   // this may have to be converted
   from_bool_begin(expr.type(), bool_as_bv);
@@ -1782,8 +1797,8 @@ void smt1_convt::convert_is_dynamic_object(
     // let is only allowed in formulas
 
     smt1_prop.out << "(let (?obj (extract["
-                  << (config.ansi_c.pointer_width-1)
-                  << ":" << config.ansi_c.pointer_width-BV_ADDR_BITS << "] ";
+                  << (op_width-1)
+                  << ":" << op_width-BV_ADDR_BITS << "] ";
     convert_expr(expr.op0(), true);
     smt1_prop.out << ")) ";
 
@@ -1936,7 +1951,7 @@ void smt1_convt::convert_plus(const exprt &expr)
       smt1_prop.out << "(bvmul ";
       convert_expr(i, true);
       smt1_prop.out << " bv" << element_size
-                    << "[" << config.ansi_c.pointer_width << "])";
+                    << "[" << bv_width(expr.type()) << "])";
     }
     else
       convert_expr(i, true);
@@ -1961,7 +1976,7 @@ Function: smt1_convt::convert_minus
  Outputs:
 
  Purpose:
-e
+
 \*******************************************************************/
 
 void smt1_convt::convert_minus(const exprt &expr)
@@ -1975,7 +1990,7 @@ void smt1_convt::convert_minus(const exprt &expr)
     smt1_prop.out << "(bvsub ";
 
     if(expr.op0().type().id()==ID_pointer)
-      smt1_prop.out << "(extract[" << config.ansi_c.pointer_width-1 << ":0] ";
+      smt1_prop.out << "(extract[" << bv_width(expr.op0().type())-1 << ":0] ";
     convert_expr(expr.op0(), true);
     if(expr.op0().type().id()==ID_pointer)
       smt1_prop.out << ")";
@@ -1983,7 +1998,7 @@ void smt1_convt::convert_minus(const exprt &expr)
     smt1_prop.out << " ";
 
     if(expr.op1().type().id()==ID_pointer)
-      smt1_prop.out << "(extract[" << config.ansi_c.pointer_width-1 << ":0] ";
+      smt1_prop.out << "(extract[" << bv_width(expr.op1().type())-1 << ":0] ";
     convert_expr(expr.op1(), true);
     if(expr.op1().type().id()==ID_pointer)
       smt1_prop.out << ")";

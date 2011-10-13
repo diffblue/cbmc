@@ -1,6 +1,6 @@
 /*******************************************************************\
 
-Module:
+Module: SMT Version 1 Backend
 
 Author: Daniel Kroening, kroening@kroening.com
 Revision: Roberto Bruttomesso, roberto.bruttomesso@unisi.ch
@@ -114,7 +114,8 @@ protected:
 
   // pointers
   pointer_logict pointer_logic;
-  void convert_address_of_rec(const exprt &expr);  
+  void convert_address_of_rec(
+    const exprt &expr, const pointer_typet &result_type);
 
   // keeps track of all symbols
   struct identifiert
