@@ -101,7 +101,8 @@ protected:
 
   // pointers
   pointer_logict pointer_logic;
-  void convert_address_of_rec(const exprt &expr);
+  void convert_address_of_rec(
+    const exprt &expr, const pointer_typet &result_type);
 
   // keeps track of all symbols
   struct identifiert

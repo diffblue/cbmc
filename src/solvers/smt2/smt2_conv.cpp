@@ -8,7 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <assert.h>
 
-#include <config.h>
 #include <arith_tools.h>
 #include <expr_util.h>
 #include <std_types.h>
@@ -17,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <bitvector.h>
 #include <fixedbv.h>
 #include <pointer_offset_size.h>
+#include <ieee_float.h>
 
 #include <ansi-c/string_constant.h>
 
@@ -112,7 +112,7 @@ void smt2_convt::set_value(
   {
     // TODO
     #if 0
-    assert(v.size()==BV_ADDR_BITS+config.ansi_c.pointer_width);
+    assert(v.size()==bv_width(type);
 
     pointer_logict::pointert p;
     p.object=integer2long(binary2integer(std::string(v, 0, BV_ADDR_BITS), false));
@@ -183,7 +183,9 @@ Function: smt2_convt::convert_address_of_rec
 
 \*******************************************************************/
 
-void smt2_convt::convert_address_of_rec(const exprt &expr)
+void smt2_convt::convert_address_of_rec(
+  const exprt &expr,
+  const pointer_typet &result_type)
 {
   if(expr.id()==ID_symbol ||
      expr.id()==ID_constant ||
@@ -193,7 +195,7 @@ void smt2_convt::convert_address_of_rec(const exprt &expr)
     smt2_prop.out
       << "((ind tuple 2) (ind bv"
       << pointer_logic.add_object(expr) << " " << BV_ADDR_BITS << ")"
-      << " (ind bv0 " << config.ansi_c.pointer_width << "))";
+      << " (ind bv0 " << bv_width(result_type)-BV_ADDR_BITS << "))";
   }
   else if(expr.id()==ID_index)
   {
@@ -208,7 +210,7 @@ void smt2_convt::convert_address_of_rec(const exprt &expr)
       if(array.type().id()==ID_pointer)
         convert_expr(array);
       else if(array.type().id()==ID_array)
-        convert_address_of_rec(array);
+        convert_address_of_rec(array, result_type);
       else
         assert(false);
     }
@@ -249,17 +251,28 @@ void smt2_convt::convert_address_of_rec(const exprt &expr)
       mp_integer offset=member_offset(ns, struct_type, component_name);
 
       typet index_type(ID_unsignedbv);
-      index_type.set(ID_width, config.ansi_c.pointer_width);
+      index_type.set(ID_width, bv_width(result_type));
 
       smt2_prop.out << "(bvadd ";
-      convert_address_of_rec(struct_op);
-      smt2_prop.out << "((ind zero_extend " << BV_ADDR_BITS << ") ";
+      convert_address_of_rec(struct_op, result_type);
       convert_expr(from_integer(offset, index_type));
-      smt2_prop.out << "))"; // zero_extend, bvadd
+      smt2_prop.out << ")"; // bvadd
     }
     else
       throw "unexpected type of member operand";
 
+  }
+  else if(expr.id()==ID_if)
+  {
+    assert(expr.operands().size()==3);
+
+    smt2_prop.out << "(ite ";
+    convert_expr(expr.op0());
+    smt2_prop.out << " ";
+    convert_address_of_rec(expr.op1(), result_type);
+    smt2_prop.out << " ";
+    convert_address_of_rec(expr.op2(), result_type);
+    smt2_prop.out << ")";
   }
   else
     throw "don't know how to take address of: "+expr.id_string();
@@ -653,7 +666,7 @@ void smt2_convt::convert_expr(const exprt &expr)
   {
     assert(expr.operands().size()==1);
     assert(expr.type().id()==ID_pointer);
-    convert_address_of_rec(expr.op0());
+    convert_address_of_rec(expr.op0(), to_pointer_type(expr.type()));
   }
   else if(expr.id()==ID_array_of)
   {
@@ -1113,7 +1126,7 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
     }
     else if(op_type.id()==ID_pointer) // from pointer to int
     {
-      unsigned from_width=config.ansi_c.pointer_width;
+      unsigned from_width=bv_width(op_type);
 
       if(from_width<to_width) // extend
       {
@@ -1252,6 +1265,8 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
   }
   else if(expr_type.id()==ID_pointer)
   {
+    unsigned to_width=bv_width(expr_type);
+  
     if(op_type.id()==ID_pointer)
     {
       // this just passes through
@@ -1265,21 +1280,19 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
                     << "(ind bv" << pointer_logic.get_null_object()
                     << BV_ADDR_BITS << ") ";
 
-      if(from_width==config.ansi_c.pointer_width)
+      if(from_width==to_width)
         convert_expr(op);
-      else if(from_width<config.ansi_c.pointer_width)
+      else if(from_width<to_width)
       {
         smt2_prop.out << "((ind sign_extend "
-                      << (config.ansi_c.pointer_width-from_width)
+                      << (to_width-from_width)
                       << ") ";
         convert_expr(op);
         smt2_prop.out << ")"; // sign_extend
       }
-      else // from_width>config.ansi_c.pointer_width
+      else // from_width>to_width
       {
-        smt2_prop.out << "((ind extract "
-                      << config.ansi_c.pointer_width
-                      << " 0) ";
+        smt2_prop.out << "((ind extract " << to_width << " 0) ";
         convert_expr(op);
         smt2_prop.out << ")"; // extract
       }
@@ -1457,7 +1470,7 @@ void smt2_convt::convert_constant(const constant_exprt &expr)
       smt2_prop.out << "((ind tuple 2)"
                     << " (ind bv" << pointer_logic.get_null_object()
                     << " " << BV_ADDR_BITS << ")"
-                    << " (ind bv0 " << config.ansi_c.pointer_width
+                    << " (ind bv0 " << bv_width(expr.type())
                     << "))";
     }
     else
@@ -1729,7 +1742,7 @@ void smt2_convt::convert_plus(const exprt &expr)
       smt2_prop.out << "(bvmul ";
       convert_expr(i);
       smt2_prop.out << " (ind bv" << element_size
-                    << " " << config.ansi_c.pointer_width << "))";
+                    << " " << bv_width(expr.type()) << "))";
     }
     else
       convert_expr(i);
@@ -1776,7 +1789,7 @@ void smt2_convt::convert_minus(const exprt &expr)
 
     if(expr.op0().type().id()==ID_pointer)
       smt2_prop.out << "((ind extract "
-                    << config.ansi_c.pointer_width-1 << " 0) ";
+                    << bv_width(expr.op0().type())-1 << " 0) ";
     convert_expr(expr.op0());
     if(expr.op0().type().id()==ID_pointer)
       smt2_prop.out << ")";
@@ -1785,7 +1798,7 @@ void smt2_convt::convert_minus(const exprt &expr)
 
     if(expr.op1().type().id()==ID_pointer)
       smt2_prop.out << "((ind extract "
-                    << config.ansi_c.pointer_width-1 << " 0) ";
+                    << bv_width(expr.op1().type())-1 << " 0) ";
     convert_expr(expr.op1());
     if(expr.op1().type().id()==ID_pointer)
       smt2_prop.out << ")";
