@@ -557,18 +557,19 @@ void value_sett::get_value_set_rec(
     
     if(op_type.id()==ID_pointer)
     {
-      // we just ignore pointer TCs
+      // pointer-to-pointer -- we just ignore these
       get_value_set_rec(expr.op0(), dest, suffix, original_type, ns);
     }
     else if(op_type.id()==ID_unsignedbv ||
             op_type.id()==ID_signedbv)
     {
-      // an integer constant got turned into a pointer
+      // integer-to-pointer
       
       if(expr.op0().is_zero())
         insert(dest, exprt("NULL-object", expr_type.subtype()), 0);
-      else
-        insert(dest, exprt(ID_integer_address, uchar_type()));
+      else // pass through
+        get_value_set_rec(
+          expr.op0(), dest, "", expr.type(), ns);
     }
     else
       insert(dest, exprt(ID_unknown, original_type));
