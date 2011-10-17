@@ -35,7 +35,7 @@ typedef satcheck_booleforcet satcheckt;
 
 #include "satcheck_minisat.h"
 
-typedef satcheck_minisatt satcheckt;
+typedef satcheck_minisat1t satcheckt;
 
 #else
 #ifdef SATCHECK_MINISAT2

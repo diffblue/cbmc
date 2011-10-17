@@ -48,17 +48,17 @@ protected:
   bool empty_clause_added;
 };
 
-class satcheck_minisatt:public satcheck_minisat1_baset
+class satcheck_minisat1t:public satcheck_minisat1_baset
 {
 public:
-  satcheck_minisatt();
+  satcheck_minisat1t();
 };
 
-class satcheck_minisat_prooft:public satcheck_minisatt
+class satcheck_minisat1_prooft:public satcheck_minisat1t
 {
 public:
-  satcheck_minisat_prooft();
-  ~satcheck_minisat_prooft();
+  satcheck_minisat1_prooft();
+  ~satcheck_minisat1_prooft();
   
   virtual const std::string solver_text();
   simple_prooft &get_resolution_proof();
@@ -69,11 +69,11 @@ protected:
   class minisat_prooft *minisat_proof;
 };
 
-class satcheck_minisat_coret:public satcheck_minisat_prooft
+class satcheck_minisat1_coret:public satcheck_minisat1_prooft
 {
 public:
-  satcheck_minisat_coret();
-  ~satcheck_minisat_coret();
+  satcheck_minisat1_coret();
+  ~satcheck_minisat1_coret();
 
   virtual const std::string solver_text();
   virtual resultt prop_solve();

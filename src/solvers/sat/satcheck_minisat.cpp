@@ -352,7 +352,7 @@ void satcheck_minisat1_baset::set_assumptions(const bvt &bv)
 
 /*******************************************************************\
 
-Function: satcheck_minisatt::satcheck_minisatt
+Function: satcheck_minisat1t::satcheck_minisat1t
 
   Inputs:
 
@@ -362,7 +362,7 @@ Function: satcheck_minisatt::satcheck_minisatt
 
 \*******************************************************************/
 
-satcheck_minisatt::satcheck_minisatt()
+satcheck_minisat1t::satcheck_minisat1t()
 {
   empty_clause_added=false;
   solver=new Solver;
@@ -370,7 +370,7 @@ satcheck_minisatt::satcheck_minisatt()
 
 /*******************************************************************\
 
-Function: satcheck_minisat_prooft::satcheck_minisat_prooft
+Function: satcheck_minisat1_prooft::satcheck_minisat1_prooft
 
   Inputs:
 
@@ -380,7 +380,7 @@ Function: satcheck_minisat_prooft::satcheck_minisat_prooft
 
 \*******************************************************************/
 
-satcheck_minisat_prooft::satcheck_minisat_prooft():satcheck_minisatt()
+satcheck_minisat1_prooft::satcheck_minisat1_prooft():satcheck_minisat1t()
 {
   minisat_proof=new minisat_prooft;
   proof=new Proof(*minisat_proof);
@@ -390,7 +390,7 @@ satcheck_minisat_prooft::satcheck_minisat_prooft():satcheck_minisatt()
 
 /*******************************************************************\
 
-Function: satcheck_minisat_prooft::~satcheck_minisat_prooft
+Function: satcheck_minisat1_prooft::~satcheck_minisat1_prooft
 
   Inputs:
 
@@ -400,7 +400,7 @@ Function: satcheck_minisat_prooft::~satcheck_minisat_prooft
 
 \*******************************************************************/
 
-satcheck_minisat_prooft::~satcheck_minisat_prooft()
+satcheck_minisat1_prooft::~satcheck_minisat1_prooft()
 {
   delete proof;
   delete minisat_proof;
@@ -408,7 +408,7 @@ satcheck_minisat_prooft::~satcheck_minisat_prooft()
 
 /*******************************************************************\
 
-Function: satcheck_minisat_coret::satcheck_minisat_coret
+Function: satcheck_minisat1_coret::satcheck_minisat1_coret
 
   Inputs:
 
@@ -418,13 +418,13 @@ Function: satcheck_minisat_coret::satcheck_minisat_coret
 
 \*******************************************************************/
 
-satcheck_minisat_coret::satcheck_minisat_coret()
+satcheck_minisat1_coret::satcheck_minisat1_coret()
 {
 }
 
 /*******************************************************************\
 
-Function: satcheck_minisat_coret::~satcheck_minisat_coret
+Function: satcheck_minisat1_coret::~satcheck_minisat1_coret
 
   Inputs:
 
@@ -434,7 +434,7 @@ Function: satcheck_minisat_coret::~satcheck_minisat_coret
 
 \*******************************************************************/
 
-satcheck_minisat_coret::~satcheck_minisat_coret()
+satcheck_minisat1_coret::~satcheck_minisat1_coret()
 {
 }
 
@@ -457,7 +457,7 @@ satcheck_minisat1_baset::~satcheck_minisat1_baset()
 
 /*******************************************************************\
 
-Function: satcheck_minisat_prooft::solver_text
+Function: satcheck_minisat1_prooft::solver_text
 
   Inputs:
 
@@ -467,14 +467,14 @@ Function: satcheck_minisat_prooft::solver_text
 
 \*******************************************************************/
 
-const std::string satcheck_minisat_prooft::solver_text()
+const std::string satcheck_minisat1_prooft::solver_text()
 {
   return "MiniSAT + Proof";
 }
 
 /*******************************************************************\
 
-Function: satcheck_minisat_coret::prop_solve
+Function: satcheck_minisat1_coret::prop_solve
 
   Inputs:
 
@@ -484,11 +484,11 @@ Function: satcheck_minisat_coret::prop_solve
 
 \*******************************************************************/
 
-propt::resultt satcheck_minisat_coret::prop_solve()
+propt::resultt satcheck_minisat1_coret::prop_solve()
 {
   propt::resultt r;
 
-  r=satcheck_minisat_prooft::prop_solve();
+  r=satcheck_minisat1_prooft::prop_solve();
 
   if(status==UNSAT)
   {
@@ -501,7 +501,7 @@ propt::resultt satcheck_minisat_coret::prop_solve()
 
 /*******************************************************************\
 
-Function: satcheck_minisat_coret::solver_text
+Function: satcheck_minisat1_coret::solver_text
 
   Inputs:
 
@@ -511,14 +511,14 @@ Function: satcheck_minisat_coret::solver_text
 
 \*******************************************************************/
 
-const std::string satcheck_minisat_coret::solver_text()
+const std::string satcheck_minisat1_coret::solver_text()
 {
   return "MiniSAT + Core";
 }
 
 /*******************************************************************\
 
-Function: satcheck_minisat_coret::solver_text
+Function: satcheck_minisat1_prooft::get_resolution_proof
 
   Inputs:
 
@@ -528,7 +528,7 @@ Function: satcheck_minisat_coret::solver_text
 
 \*******************************************************************/
 
-simple_prooft &satcheck_minisat_prooft::get_resolution_proof()
+simple_prooft &satcheck_minisat1_prooft::get_resolution_proof()
 {
   return minisat_proof->resolution_proof;
 }
