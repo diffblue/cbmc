@@ -32,7 +32,7 @@ typedef satcheck_booleforce_coret satcheck_coret;
 
 #include "satcheck_minisat.h"
 
-typedef satcheck_minisat_coret satcheck_coret;
+typedef satcheck_minisat1_coret satcheck_coret;
 
 #else
 #error NO SAT CHECKER WITH CORE EXTRACTOR
