@@ -1599,6 +1599,8 @@ std::string expr2ct::convert_constant(
       if(src.type()==float_type())
         dest+="f";
       else if(src.type()==double_type())
+        dest+=""; // ANSI-C: double is default
+      else if(src.type()==long_double_type())
         dest+="l";
     }
   }
