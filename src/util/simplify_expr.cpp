@@ -1159,7 +1159,7 @@ bool simplify_exprt::simplify_addition(exprt &expr)
   
   assert(expr.id()==ID_plus);
   
-  // count constants
+  // count the constants
   unsigned count=0;
   forall_operands(it, expr)
     if(is_number(it->type()) && it->is_constant())
@@ -1193,7 +1193,7 @@ bool simplify_exprt::simplify_addition(exprt &expr)
   }
   
   // delete non-float zeros 
-  // (for float's the result of 0.0 + (-0.0) may not be -0.0 in std rounding)
+  // (for floats the result of 0.0 + (-0.0) need not be -0.0 in std rounding)
   for(exprt::operandst::iterator
       it=operands.begin();
       it!=operands.end();
