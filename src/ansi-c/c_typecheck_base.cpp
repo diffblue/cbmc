@@ -142,11 +142,8 @@ void c_typecheck_baset::typecheck_symbol(symbolt &symbol)
   }
   else if(symbol.file_local)
   {
-    // file-local stuff -- we rename to prevent collisions with
-    // non-file local symbols with the same name
+    // file-local stuff -- stays as is
     // collisions are resolved during linking
-    assert(has_prefix(new_name, prefix));
-    new_name=prefix+"$file::"+std::string(new_name, prefix.size(), std::string::npos);
   }
   else if(symbol.is_extern && !is_function)
   {
@@ -214,10 +211,6 @@ void c_typecheck_baset::typecheck_symbol(symbolt &symbol)
     // just strip the c::
     symbol.pretty_name=
       std::string(new_name, prefix.size(), std::string::npos);
-      
-    // strip the $file::
-    if(has_prefix(id2string(symbol.pretty_name), "$file::"))
-      symbol.pretty_name=std::string(id2string(symbol.pretty_name), 7, std::string::npos);
   }
   
   // see if we have it already
