@@ -80,7 +80,7 @@ void c_typecheck_baset::typecheck_code_type(code_typet &type)
     type.make_ellipsis();
   }
   else if(arguments.size()==1 &&
-          arguments[0].type().id()==ID_empty)
+          follow(arguments[0].type()).id()==ID_empty)
   {
     // if we just have one argument of type void, remove it
     arguments.clear();
