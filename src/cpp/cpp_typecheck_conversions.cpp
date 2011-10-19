@@ -901,7 +901,7 @@ bool cpp_typecheckt::standard_conversion_sequence(
   curr_expr.swap(new_expr);
 
   // need to consider #cpp_type
-  if(curr_expr.type()!=type ||
+  if(follow(curr_expr.type())!=follow(type) ||
      curr_expr.type().get(ID_C_cpp_type)!=type.get(ID_C_cpp_type))
   {
     if(type.id()==ID_signedbv ||
