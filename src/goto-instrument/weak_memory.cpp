@@ -22,6 +22,8 @@ Date: September 2011
 #include "weak_memory.h"
 #include "rw_set.h"
 
+typedef enum { RMO, TSO } modelt;
+
 class shared_bufferst
 {
 public:
@@ -244,7 +246,7 @@ void shared_bufferst::assignment(
 
 /*******************************************************************\
 
-Function: weak_memory_tso
+Function: weak_memory
 
   Inputs:
 
@@ -254,11 +256,12 @@ Function: weak_memory_tso
 
 \*******************************************************************/
 
-void weak_memory_tso(
+void weak_memory(
   value_setst &value_sets,
   contextt &context,
   goto_programt &goto_program,
-  shared_bufferst &shared_buffers)
+  shared_bufferst &shared_buffers,
+  modelt model)
 {
   namespacet ns(context);
 
@@ -275,7 +278,8 @@ void weak_memory_tso(
       goto_programt::instructiont original_instruction;
       original_instruction.swap(instruction);
       const locationt &location=original_instruction.location;
-      
+
+      // we make the whole thing atomic      
       instruction.make_atomic_begin();
       instruction.location=location;
       i_it++;
@@ -352,7 +356,7 @@ void weak_memory_tso(
 
 /*******************************************************************\
 
-Function: weak_memory_tso
+Function: weak_memory
 
   Inputs:
 
@@ -362,16 +366,18 @@ Function: weak_memory_tso
 
 \*******************************************************************/
 
-void weak_memory_tso(
+void weak_memory(
   value_setst &value_sets,
   class contextt &context,
-  goto_functionst &goto_functions)
+  goto_functionst &goto_functions,
+  modelt model)
 {
   shared_bufferst shared_buffers(context);
 
   Forall_goto_functions(f_it, goto_functions)
-    if(f_it->first!=CPROVER_PREFIX "initialize")
-      weak_memory_tso(value_sets, context, f_it->second.body, shared_buffers);
+    if(f_it->first!=CPROVER_PREFIX "initialize" &&
+       f_it->first!=ID_main)
+      weak_memory(value_sets, context, f_it->second.body, shared_buffers, model);
 
   shared_buffers.add_aux_code(goto_functions);
   goto_functions.update();
@@ -389,20 +395,31 @@ Function: weak_memory_tso
 
 \*******************************************************************/
 
-void weak_memory(
+void weak_memory_tso(
   value_setst &value_sets,
   class contextt &context,
   goto_functionst &goto_functions)
 {
-  shared_bufferst shared_buffers(context);
+  weak_memory(value_sets, context, goto_functions, TSO);
+}
 
-  #if 0
-  Forall_goto_functions(f_it, goto_functions)
-    if(f_it->first!=CPROVER_PREFIX "initialize")
-      weak_memory(value_sets, context, f_it->second.body, shared_buffers);
-  #endif
+/*******************************************************************\
 
-  shared_buffers.add_aux_code(goto_functions);
-  goto_functions.update();
+Function: weak_memory_rmo
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void weak_memory_rmo(
+  value_setst &value_sets,
+  class contextt &context,
+  goto_functionst &goto_functions)
+{
+  weak_memory(value_sets, context, goto_functions, RMO);
 }
 

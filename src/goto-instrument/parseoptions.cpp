@@ -413,10 +413,10 @@ void goto_instrument_parseoptionst::instrument_goto_program(
         goto_functions);
     }
 
-    if(cmdline.isset("weak-mem"))
+    if(cmdline.isset("rmo"))
     {
-      status("Adding weak memory Instrumentation");
-      weak_memory(
+      status("Adding weak memory (RMO) Instrumentation");
+      weak_memory_rmo(
         value_set_analysis,
         context,
         goto_functions);
