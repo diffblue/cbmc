@@ -101,30 +101,13 @@ void rw_set_loct::read_write_rec(
   {
     const symbol_exprt &symbol_expr=to_symbol_expr(expr);
 
-    const symbolt *symbol;
-    if(!ns.lookup(symbol_expr.get_identifier(), symbol))
-    {
-      if(!symbol->static_lifetime)
-        return; // ignore for now
-        
-      if(symbol->thread_local)
-        return; // must ignore
-        
-      if(symbol->name=="c::__CPROVER_alloc" ||
-         symbol->name=="c::__CPROVER_alloc_size" ||
-         symbol->name=="c::stdin" ||
-         symbol->name=="c::stdout" ||
-         symbol->name=="c::stderr" ||
-         symbol->name=="c::sys_nerr")
-        return; // ignore for now
-    }
-    
     irep_idt object=id2string(symbol_expr.get_identifier())+suffix;
 
     if(r)
     {
       entryt &entry=r_entries[object];
       entry.object=object;
+      entry.symbol_expr=symbol_expr;
       entry.guard=guard.as_expr(); // should 'OR'
     }
     
@@ -132,6 +115,7 @@ void rw_set_loct::read_write_rec(
     {
       entryt &entry=w_entries[object];
       entry.object=object;
+      entry.symbol_expr=symbol_expr;
       entry.guard=guard.as_expr(); // should 'OR'
     }
   }

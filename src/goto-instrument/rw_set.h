@@ -26,6 +26,7 @@ class rw_set_baset
 public:
   struct entryt
   {
+    symbol_exprt symbol_expr;
     irep_idt object;
     exprt guard;
     
@@ -36,6 +37,12 @@ public:
   
   typedef hash_map_cont<irep_idt, entryt, irep_id_hash> entriest;
   entriest r_entries, w_entries;
+  
+  void swap(rw_set_baset &other)
+  {
+    std::swap(other.r_entries, r_entries);
+    std::swap(other.w_entries, w_entries);
+  }
   
   inline rw_set_baset &operator += (const rw_set_baset &other)
   {
