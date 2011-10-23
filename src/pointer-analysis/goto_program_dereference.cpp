@@ -523,10 +523,11 @@ Function: remove_pointers
 void remove_pointers(
   goto_programt &goto_program,
   contextt &context,
-  const optionst &options,
   value_setst &value_sets)
 {
   namespacet ns(context);
+  
+  optionst options;
 
   goto_program_dereferencet
     goto_program_dereference(ns, context, options, value_sets);
@@ -549,10 +550,11 @@ Function: remove_pointers
 void remove_pointers(
   goto_functionst &goto_functions,
   contextt &context,
-  const optionst &options,
   value_setst &value_sets)
 {
   namespacet ns(context);
+  
+  optionst options;
 
   goto_program_dereferencet
     goto_program_dereference(ns, context, options, value_sets);
