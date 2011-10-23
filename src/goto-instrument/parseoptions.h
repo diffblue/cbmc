@@ -19,6 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(all)(document-claims)(dump-c)" \
   "(bounds-check)(no-bounds-check)" \
   "(pointer-check)(no-pointer-check)" \
+  "(remove-pointers)" \
   "(leak-check)" \
   "(assert-to-assume)" \
   "(div-by-zero-check)(no-div-by-zero-check)" \

@@ -395,6 +395,14 @@ void goto_instrument_parseoptionst::instrument_goto_program(
         goto_functions, context, options, value_set_analysis);
     }
 
+    if(cmdline.isset("remove-pointers"))
+    {
+      // removing pointers
+      status("Removing Pointers");
+      remove_pointers(
+        goto_functions, context, value_set_analysis);
+    }
+
     if(cmdline.isset("race-check"))
     {
       status("Adding Race Checks");
