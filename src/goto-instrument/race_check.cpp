@@ -146,6 +146,76 @@ std::string comment(const rw_set_baset::entryt &entry, bool write)
 
 /*******************************************************************\
 
+Function: is_shared
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool is_shared(
+  const namespacet &ns,
+  const symbol_exprt &symbol_expr)
+{
+  const irep_idt &identifier=symbol_expr.get_identifier();
+
+  if(identifier=="c::__CPROVER_alloc" ||
+     identifier=="c::__CPROVER_alloc_size" ||
+     identifier=="c::stdin" ||
+     identifier=="c::stdout" ||
+     identifier=="c::stderr" ||
+     identifier=="c::sys_nerr")
+    return false; // no race check
+
+  const symbolt &symbol=ns.lookup(identifier);
+
+  if(!symbol.static_lifetime)
+    return false; // these are local
+    
+  if(symbol.thread_local)
+    return false; // these are local
+    
+  return true;
+}
+
+/*******************************************************************\
+
+Function: race_check
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool has_shared_entries(
+  const namespacet &ns,
+  const rw_set_baset &rw_set)
+{
+  for(rw_set_baset::entriest::const_iterator
+      it=rw_set.r_entries.begin();
+      it!=rw_set.r_entries.end();
+      it++)
+    if(is_shared(ns, it->second.symbol_expr))
+      return true;
+
+  for(rw_set_baset::entriest::const_iterator
+      it=rw_set.w_entries.begin();
+      it!=rw_set.w_entries.end();
+      it++)
+    if(is_shared(ns, it->second.symbol_expr))
+      return true;
+
+  return false;
+}
+
+/*******************************************************************\
+
 Function: race_check
 
   Inputs:
@@ -172,7 +242,8 @@ void race_check(
     {
       rw_set_loct rw_set(ns, value_sets, i_it);
       
-      if(rw_set.empty()) continue;
+      if(!has_shared_entries(ns, rw_set))
+        continue;
       
       goto_programt::instructiont original_instruction;
       original_instruction.swap(instruction);
@@ -183,6 +254,8 @@ void race_check(
       // now add assignments for what is written -- set
       forall_rw_set_w_entries(e_it, rw_set)
       {      
+        if(!is_shared(ns, e_it->second.symbol_expr)) continue;
+        
         goto_programt::targett t=goto_program.insert_before(i_it);
 
         t->type=ASSIGN;
@@ -204,6 +277,8 @@ void race_check(
       // now add assignments for what is written -- reset
       forall_rw_set_w_entries(e_it, rw_set)
       {      
+        if(!is_shared(ns, e_it->second.symbol_expr)) continue;
+
         goto_programt::targett t=goto_program.insert_before(i_it);
 
         t->type=ASSIGN;
@@ -218,6 +293,8 @@ void race_check(
       // now add assertions for what is read and written
       forall_rw_set_r_entries(e_it, rw_set)
       {
+        if(!is_shared(ns, e_it->second.symbol_expr)) continue;
+
         goto_programt::targett t=goto_program.insert_before(i_it);
 
         t->make_assertion(w_guards.get_assertion(e_it->second));
@@ -228,6 +305,8 @@ void race_check(
 
       forall_rw_set_w_entries(e_it, rw_set)
       {
+        if(!is_shared(ns, e_it->second.symbol_expr)) continue;
+
         goto_programt::targett t=goto_program.insert_before(i_it);
 
         t->make_assertion(w_guards.get_assertion(e_it->second));
@@ -288,7 +367,9 @@ void race_check(
   w_guardst w_guards(context);
 
   Forall_goto_functions(f_it, goto_functions)
-    race_check(value_sets, context, f_it->second.body, w_guards);
+    if(f_it->first!=ID_main &&
+       f_it->first!="c::__CPROVER_initialize")
+      race_check(value_sets, context, f_it->second.body, w_guards);
 
   // get "main"
   goto_functionst::function_mapt::iterator
