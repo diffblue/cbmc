@@ -15,8 +15,10 @@ Date: September 2011
 #include <guard.h>
 #include <cprover_prefix.h>
 #include <prefix.h>
+#include <i2string.h>
 
 #include <pointer-analysis/value_sets.h>
+#include <pointer-analysis/goto_program_dereference.h>
 #include <goto-programs/remove_skip.h>
 
 #include "weak_memory.h"
@@ -34,9 +36,17 @@ public:
   class varst
   {
   public:
-    // older stuff has the higher index
+    // Older stuff has the higher index.
+    // The 'used' bits are set when a 'buff' is in use.
+    // Cleared on flush.
     irep_idt w_used0, w_used1;
     irep_idt w_buff0, w_buff1;
+
+    // Read pointer. Set to true when last read
+    // from that buffer. Cleared on flush.
+    // Read from buffer with _lower_ index that
+    // is set (which is newer data).
+    irep_idt r_indx0, r_indx1;
     
     typet type;
   };
@@ -46,7 +56,13 @@ public:
 
   const varst &operator()(const irep_idt &object);
   
-  void add_aux_code(goto_functionst &goto_functions) const;
+  void add_initialization_code(goto_functionst &goto_functions) const;
+
+  void nondet_flush(
+    goto_programt &goto_program,
+    goto_programt::targett &t,
+    const locationt &location,
+    const irep_idt &object);
 
   void assignment(
     goto_programt &goto_program,
@@ -120,6 +136,8 @@ const shared_bufferst::varst &shared_bufferst::operator()(const irep_idt &object
   vars.w_used1=add(object, "$w_used1", bool_typet());
   vars.w_buff0=add(object, "$w_buff0", symbol.type);
   vars.w_buff1=add(object, "$w_buff1", symbol.type);
+  vars.r_indx0=add(object, "$w_indx0", bool_typet());
+  vars.r_indx1=add(object, "$w_indx1", bool_typet());
   
   return vars;
 }
@@ -184,12 +202,14 @@ void shared_bufferst::add_initialization(goto_programt &goto_program) const
     location.make_nil();
     assignment(goto_program, t, location, it->second.w_used0, false_exprt());
     assignment(goto_program, t, location, it->second.w_used1, false_exprt());
+    assignment(goto_program, t, location, it->second.r_indx0, false_exprt());
+    assignment(goto_program, t, location, it->second.r_indx1, false_exprt());
   }
 }
 
 /*******************************************************************\
 
-Function: shared_bufferst::add_aux_code
+Function: shared_bufferst::add_initialization_code
 
   Inputs:
 
@@ -199,7 +219,7 @@ Function: shared_bufferst::add_aux_code
 
 \*******************************************************************/
 
-void shared_bufferst::add_aux_code(goto_functionst &goto_functions) const
+void shared_bufferst::add_initialization_code(goto_functionst &goto_functions) const
 {
   // get "main"
   goto_functionst::function_mapt::iterator
@@ -246,6 +266,101 @@ void shared_bufferst::assignment(
 
 /*******************************************************************\
 
+Function: shared_bufferst::nondet_flush
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void shared_bufferst::nondet_flush(
+  goto_programt &goto_program,
+  goto_programt::targett &target,
+  const locationt &location,
+  const irep_idt &object)
+{
+  const varst &vars=(*this)(object);
+  irep_idt choice0=choice("0");
+  irep_idt choice1=choice("1");
+  
+  symbol_exprt choice0_expr=symbol_exprt(choice0, bool_typet());
+  symbol_exprt choice1_expr=symbol_exprt(choice1, bool_typet());
+
+  symbol_exprt w_buff0_expr=symbol_exprt(vars.w_buff0, vars.type);
+  symbol_exprt w_buff1_expr=symbol_exprt(vars.w_buff1, vars.type);
+  
+  symbol_exprt w_used0_expr=symbol_exprt(vars.w_used0, bool_typet());
+  symbol_exprt w_used1_expr=symbol_exprt(vars.w_used1, bool_typet());
+  
+  exprt nondet_bool_expr=side_effect_expr_nondett(bool_typet());
+  
+  exprt choice0_rhs=and_exprt(nondet_bool_expr, w_used0_expr);
+  exprt choice1_rhs=and_exprt(nondet_bool_expr, w_used1_expr);
+  
+  // throw 2 Boolean dice
+  assignment(goto_program, target, location, choice0, choice0_rhs);
+  assignment(goto_program, target, location, choice1, choice1_rhs);
+  
+  exprt lhs=symbol_exprt(object, vars.type);
+  
+  exprt value=
+    if_exprt(choice0_expr, w_buff0_expr,
+      if_exprt(choice1_expr, w_buff1_expr, lhs));
+
+  // write one of the buffer entries
+  assignment(goto_program, target, location, object, value);
+  
+  // update 'used' flags
+  exprt w_used0_rhs=if_exprt(choice0_expr, false_exprt(), w_used0_expr);
+  exprt w_used1_rhs=and_exprt(if_exprt(choice1_expr, false_exprt(), w_used1_expr), w_used0_expr);
+
+  assignment(goto_program, target, location, vars.w_used0, w_used0_rhs);
+  assignment(goto_program, target, location, vars.w_used1, w_used1_rhs);
+}
+
+/*******************************************************************\
+
+Function: is_buffered
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool is_buffered(
+  const namespacet &ns,
+  const symbol_exprt &symbol_expr)
+{
+  const irep_idt &identifier=symbol_expr.get_identifier();
+
+  if(identifier=="c::__CPROVER_alloc" ||
+     identifier=="c::__CPROVER_alloc_size" ||
+     identifier=="c::stdin" ||
+     identifier=="c::stdout" ||
+     identifier=="c::stderr" ||
+     identifier=="c::sys_nerr" ||
+     has_prefix(id2string(identifier), "__unbuffered_"))
+    return false; // not buffered
+
+  const symbolt &symbol=ns.lookup(identifier);
+
+  if(!symbol.static_lifetime)
+    return false; // these are local
+    
+  if(symbol.thread_local)
+    return false; // these are local
+    
+  return true;
+}
+
+/*******************************************************************\
+
 Function: weak_memory
 
   Inputs:
@@ -287,59 +402,34 @@ void weak_memory(
       // we first perform (non-deterministically) up to 2 writes for
       // stuff that is potentially read
       forall_rw_set_r_entries(e_it, rw_set)
-      {
-        const shared_bufferst::varst &vars=shared_buffers(e_it->second.object);
-        irep_idt choice0=shared_buffers.choice("0");
-        irep_idt choice1=shared_buffers.choice("1");
-        
-        symbol_exprt choice0_expr=symbol_exprt(choice0, bool_typet());
-        symbol_exprt choice1_expr=symbol_exprt(choice1, bool_typet());
-      
-        symbol_exprt w_buff0_expr=symbol_exprt(vars.w_buff0, vars.type);
-        symbol_exprt w_buff1_expr=symbol_exprt(vars.w_buff1, vars.type);
-        
-        symbol_exprt w_used0_expr=symbol_exprt(vars.w_used0, bool_typet());
-        symbol_exprt w_used1_expr=symbol_exprt(vars.w_used1, bool_typet());
-        
-        exprt nondet_bool_expr=side_effect_expr_nondett(bool_typet());
-        
-        exprt choice0_rhs=and_exprt(nondet_bool_expr, w_used0_expr);
-        exprt choice1_rhs=and_exprt(nondet_bool_expr, w_used1_expr);
-        
-        // throw 2 Boolean dice
-        shared_buffers.assignment(goto_program, i_it, location, choice0, choice0_rhs);
-        shared_buffers.assignment(goto_program, i_it, location, choice1, choice1_rhs);
-        
-        exprt lhs=symbol_exprt(e_it->second.object, vars.type);
-        
-        exprt value=
-          if_exprt(choice0_expr, w_buff0_expr,
-            if_exprt(choice1_expr, w_buff1_expr, lhs));
+        if(is_buffered(ns, e_it->second.symbol_expr))
+          shared_buffers.nondet_flush(
+            goto_program, i_it, location, e_it->second.object);
 
-        // write one of the buffer entries
-        shared_buffers.assignment(goto_program, i_it, location, e_it->second.object, value);
-        
-        // update 'used' flags
-        exprt w_used0_rhs=if_exprt(choice0_expr, false_exprt(), w_used0_expr);
-        exprt w_used1_rhs=and_exprt(if_exprt(choice1_expr, false_exprt(), w_used1_expr), w_used0_expr);
-
-        shared_buffers.assignment(goto_program, i_it, location, vars.w_used0, w_used0_rhs);
-        shared_buffers.assignment(goto_program, i_it, location, vars.w_used1, w_used1_rhs);
-      }
-
-      // now rotate the write buffers for anything that is written
+      // Now perform the write(s).
       forall_rw_set_w_entries(e_it, rw_set)
-      {
-        const shared_bufferst::varst &vars=shared_buffers(e_it->second.object);
+        if(is_buffered(ns, e_it->second.symbol_expr))
+        {
+          // We rotate the write buffers for anything that is written.
+          const shared_bufferst::varst &vars=shared_buffers(e_it->second.object);
       
-        // w_used1=w_used0; w_used0=true;
-        shared_buffers.assignment(goto_program, i_it, location, vars.w_used1, vars.w_used0);
-        shared_buffers.assignment(goto_program, i_it, location, vars.w_used0, true_exprt());
+          // w_used1=w_used0; w_used0=true;
+          shared_buffers.assignment(goto_program, i_it, location, vars.w_used1, vars.w_used0);
+          shared_buffers.assignment(goto_program, i_it, location, vars.w_used0, true_exprt());
 
-        // w_buff1=w_buff0; w_buff0=RHS;
-        shared_buffers.assignment(goto_program, i_it, location, vars.w_buff1, vars.w_buff0);
-        shared_buffers.assignment(goto_program, i_it, location, vars.w_buff0, original_instruction.code.op1());
-      }
+          // w_buff1=w_buff0; w_buff0=RHS;
+          shared_buffers.assignment(goto_program, i_it, location, vars.w_buff1, vars.w_buff0);
+          shared_buffers.assignment(goto_program, i_it, location, vars.w_buff0, original_instruction.code.op1());
+
+          // we want to read what we write (uniproc)
+          shared_buffers.assignment(goto_program, i_it, location, vars.r_indx0, true_exprt());
+        }
+        else
+        {
+          // unbuffered
+          shared_buffers.assignment(
+            goto_program, i_it, location, e_it->second.object, original_instruction.code.op1());
+        }
 
       // ATOMIC_END
       i_it=goto_program.insert_before(i_it);
@@ -352,6 +442,70 @@ void weak_memory(
   }
   
   remove_skip(goto_program);  
+}
+
+/*******************************************************************\
+
+Function: introduce_temporaries
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: all access to shared variables is pushed into assignments
+
+\*******************************************************************/
+
+void introduce_temporaries(
+  value_setst &value_sets,
+  contextt &context,
+  const irep_idt &function,
+  goto_programt &goto_program)
+{
+  namespacet ns(context);
+  unsigned tmp_counter=0;
+
+  Forall_goto_program_instructions(i_it, goto_program)
+  {
+    goto_programt::instructiont &instruction=*i_it;
+
+    if(instruction.is_goto() ||
+       instruction.is_assert() ||
+       instruction.is_assume())
+    {
+      rw_set_loct rw_set(ns, value_sets, i_it);
+      if(rw_set.empty()) continue;
+      
+      symbolt new_symbol;
+      new_symbol.base_name="$tmp_guard";
+      new_symbol.name=id2string(function)+"$tmp_guard"+i2string(tmp_counter++);
+      new_symbol.type=bool_typet();
+      new_symbol.static_lifetime=true;
+      new_symbol.thread_local=true;
+      new_symbol.value.make_nil();
+      
+      symbol_exprt symbol_expr=::symbol_expr(new_symbol);
+      
+      symbolt *symbol_ptr;
+      context.move(new_symbol, symbol_ptr);
+      
+      goto_programt::instructiont new_i;
+      new_i.make_assignment();
+      new_i.code=code_assignt(symbol_expr, instruction.guard);
+      new_i.location=instruction.location;
+      new_i.function=instruction.function;
+
+      // replace guard
+      instruction.guard=symbol_expr;
+      goto_program.insert_before_swap(i_it, new_i);
+
+      i_it++; // step forward
+    }
+    else if(instruction.is_function_call())
+    {
+      // TODO
+    }
+  }
 }
 
 /*******************************************************************\
@@ -372,6 +526,16 @@ void weak_memory(
   goto_functionst &goto_functions,
   modelt model)
 {
+  // get rid of pointers
+  remove_pointers(goto_functions, context, value_sets);
+
+  // all access to shared variables is pushed into assignments
+  Forall_goto_functions(f_it, goto_functions)
+    if(f_it->first!=CPROVER_PREFIX "initialize" &&
+       f_it->first!=ID_main)
+    introduce_temporaries(value_sets, context, f_it->first, f_it->second.body);
+
+  // now add buffers
   shared_bufferst shared_buffers(context);
 
   Forall_goto_functions(f_it, goto_functions)
@@ -379,7 +543,10 @@ void weak_memory(
        f_it->first!=ID_main)
       weak_memory(value_sets, context, f_it->second.body, shared_buffers, model);
 
-  shared_buffers.add_aux_code(goto_functions);
+  // initialization code for buffers
+  shared_buffers.add_initialization_code(goto_functions);
+  
+  // update counters etc.
   goto_functions.update();
 }
 
