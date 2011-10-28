@@ -651,6 +651,36 @@ void value_sett::get_value_set_rec(
       insert(dest, it->first, object);
     }
   }
+  else if(expr.id()==ID_mult)
+  {
+    // this is to do stuff like
+    // (int*)((sel*(ulong)&a)+((sel^0x1)*(ulong)&b))
+    
+    if(expr.operands().size()<2)
+      throw expr.id_string()+" expected to have at least two operands";
+
+    object_mapt pointer_expr_set;
+
+    // we get the points-to for all operands, even integers
+    forall_operands(it, expr)
+    {
+      get_value_set_rec(
+        *it, pointer_expr_set, "", it->type(), ns);
+    }
+
+    for(object_map_dt::const_iterator
+        it=pointer_expr_set.read().begin();
+        it!=pointer_expr_set.read().end();
+        it++)
+    {
+      objectt object=it->second;
+
+      // kill any offset
+      object.offset_is_set=false;
+        
+      insert(dest, it->first, object);
+    }
+  }
   else if(expr.id()==ID_sideeffect)
   {
     const irep_idt &statement=expr.get(ID_statement);
