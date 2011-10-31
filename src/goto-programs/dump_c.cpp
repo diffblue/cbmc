@@ -1795,9 +1795,9 @@ string goto2cppt::expr_to_string(
       std::string src = expr_to_string(expr.op0(),local_renaming);
       std::string value = expr_to_string(expr.op2(),local_renaming);
       std::string member =
-        renaming.at(expr.get(ID_component_name)).as_string();
+        renaming[expr.get(ID_component_name)].as_string();
       std::string type =
-        renaming.at(t.get(ID_name)).as_string();
+        renaming[t.get(ID_name)].as_string();
 
       return "__with("+ src+ ", &" + type + "::" + member + ", " +
         value + ")";
