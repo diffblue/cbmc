@@ -1456,6 +1456,14 @@ void ieee_floatt::next_representable(bool greater)
   
   bool old_sign = get_sign();
 
+  if(is_zero())
+  {
+    unpack(1);
+    set_sign(!greater);
+
+    return;
+  }
+
   if(is_infinity())
   {
     if(get_sign() == greater)
@@ -1466,28 +1474,45 @@ void ieee_floatt::next_representable(bool greater)
     return;
   }
   
-  int dir;
+  bool dir;
   if(greater)
   {
     if(get_sign())
-      dir = -1;
+      dir = false;
     else
-      dir = 1;
+      dir = true;
   } 
   else
   {
     if(get_sign())
-      dir = 1;
+      dir = true;
     else
-      dir = -1;
+      dir = false;
   }
 
-  mp_integer new_exp = exponent;
-  mp_integer new_frac = fraction + dir;
-  
-  if(get_sign())
-    new_frac.negate();
+  set_sign(false);
 
-  build(new_frac, new_exp);
+  mp_integer old = pack();
+  if(dir)
+    ++old;
+  else
+    --old;
+
+  unpack(old);
+
+  //sign change impossible (zero case caught earler)
+  set_sign(old_sign);
+
+  //mp_integer new_exp = exponent;
+  //mp_integer new_frac = fraction + dir;
+
+  //std::cout << exponent << ":" << fraction << std::endl;
+  //std::cout << new_exp << ":" << new_frac << std::endl;
+  
+  //if(get_sign())
+  //  new_frac.negate();
+
+  //new_exp -= spec.f;
+  //build(new_frac, new_exp);
 }
 

@@ -23,6 +23,18 @@
 #endif
 
 
+std::string float2binary(float f)
+{
+  union 
+  {
+    float f;
+    int i;
+  } c;
+
+  c.f = f;
+  return integer2binary(c.i,32);
+}
+
 float random_float()
 {
   union
@@ -219,8 +231,10 @@ void check_nextafter(int i)
   ieee_floatt i1, i2, i3;
   
   i1.from_float(f1);
-  i2.from_float(f2);
-  i3.from_float(f3);
+  i2 = i1;
+  i2.increment();
+  i3 = i1;
+  i3.decrement();
 
   if((f1 != i1.to_float() && !(f1 != f1 && i1.is_NaN())) ||
      (f2 != i2.to_float() && !(f2 != f2 && i2.is_NaN())) ||
@@ -230,8 +244,14 @@ void check_nextafter(int i)
               << "float: " << f1 << " " << f2 << " " << f3 << std::endl
               << "ieee_float: " << i1.to_float() << " " 
                   << i2.to_float() << " " << i3.to_float() << std::endl;
+    std::cout << "Binary representation: " << std::endl 
+              << "     float: " << float2binary(f1) << " " 
+              << float2binary(f2) << " " << float2binary(f3) << std::endl
+              << "ieee_float: " << float2binary(i1.to_float()) << " " 
+                  << float2binary(i2.to_float()) 
+                  << " " << float2binary(i3.to_float()) << std::endl;
+ 
   }
-
 }
 
 void check_minmax()
@@ -259,7 +279,7 @@ int main()
 
   for(unsigned i=0; i<100000000; i++)
   {
-    if(i%100000==0) std::cout << "*********** " << i << std::endl;
+    if(i%10000==0) std::cout << "*********** " << i << std::endl;
     check_arithmetic(i);
     check_comparison(i);
     check_conversion(i);
