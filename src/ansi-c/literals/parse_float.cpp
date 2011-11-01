@@ -24,52 +24,136 @@ void parse_float(
   const std::string &src,
   mp_integer &significand,
   mp_integer &exponent,
+  unsigned &exponent_base,
   bool &is_float, bool &is_long)
 {
-  // <INITIAL>{digits}{dot}{digits}{exponent}?{floatsuffix}?
-  // <INITIAL>{digits}{dot}{exponent}?{floatsuffix}?
-  // <INITIAL>{dot}{digits}{exponent}?{floatsuffix}?
-  // <INITIAL>{digits}{exponent}{floatsuffix}?
+  // {digits}{dot}{digits}{exponent}?{floatsuffix}?
+  // {digits}{dot}{exponent}?{floatsuffix}?
+  // {dot}{digits}{exponent}?{floatsuffix}?
+  // {digits}{exponent}{floatsuffix}?
+
+  // Hex format (C99):
+  // 0x{hexdigits}{dot}{hexdigits}[pP]{exponent}{floatsuffix}?
+  // 0x{hexdigits}{dot}[pP]{exponent}{floatsuffix}?
 
   const char *p=src.c_str();
 
   std::string str_whole_number,
               str_fraction_part,
               str_exponent;
-
-  // get whole number part
-  while(*p!='.' && *p!=0 && *p!='e' && *p!='E' &&
-        *p!='f' && *p!='F' && *p!='l' && *p!='L')
+              
+  exponent_base=10;
+  
+  // is this hex?
+  
+  if(src.size()>=2 && src[0]=='0' && src[1]=='x')
   {
-    str_whole_number+=*p;
-    p++;
+    // skip the 0x
+    p+=2;
+  
+    exponent_base=2;
+  
+    // get whole number part
+    while(*p!='.' && *p!=0 && *p!='p' && *p!='P')
+    {
+      str_whole_number+=*p;
+      p++;
+    }
+
+    // skip dot
+    if(*p=='.')
+      p++;
+
+    // get fraction part
+    while(*p!=0 && *p!='p' && *p!='P')
+    {
+      str_fraction_part+=*p;
+      p++;
+    }
+
+    // skip P
+    if(*p=='p' || *p=='P')
+      p++;
+
+    // skip +
+    if(*p=='+')
+      p++;
+
+    // get exponent
+    while(*p!=0 && *p!='f' && *p!='F' && *p!='l' && *p!='L')
+    {
+      str_exponent+=*p;
+      p++;
+    }
+
+    std::string str_number=str_whole_number+
+                           str_fraction_part;
+
+    if(str_number.empty())
+      significand=0;
+    else
+      significand=string2integer(str_number, 16);
+
+    if(str_exponent.empty())
+      exponent=0;
+    else
+      exponent=string2integer(str_exponent, 16);
+
+    // adjust exponent
+    exponent-=str_fraction_part.size()*4; // each digit has 4 bits
   }
-
-  // skip dot
-  if(*p=='.')
-    p++;
-
-  // get fraction part
-  while(*p!=0 && *p!='e' && *p!='E' &&
-         *p!='f' && *p!='F' && *p!='l' && *p!='L')
+  else
   {
-    str_fraction_part+=*p;
-    p++;
-  }
+    // get whole number part
+    while(*p!='.' && *p!=0 && *p!='e' && *p!='E' &&
+          *p!='f' && *p!='F' && *p!='l' && *p!='L')
+    {
+      str_whole_number+=*p;
+      p++;
+    }
 
-  // skip E
-  if(*p=='e' || *p=='E')
-    p++;
+    // skip dot
+    if(*p=='.')
+      p++;
 
-  // skip +
-  if(*p=='+')
-    p++;
+    // get fraction part
+    while(*p!=0 && *p!='e' && *p!='E' &&
+           *p!='f' && *p!='F' && *p!='l' && *p!='L')
+    {
+      str_fraction_part+=*p;
+      p++;
+    }
 
-  // get exponent
-  while(*p!=0 && *p!='f' && *p!='F' && *p!='l' && *p!='L')
-  {
-    str_exponent+=*p;
-    p++;
+    // skip E
+    if(*p=='e' || *p=='E')
+      p++;
+
+    // skip +
+    if(*p=='+')
+      p++;
+
+    // get exponent
+    while(*p!=0 && *p!='f' && *p!='F' && *p!='l' && *p!='L')
+    {
+      str_exponent+=*p;
+      p++;
+    }
+
+    std::string str_number=str_whole_number+
+                           str_fraction_part;
+
+    if(str_number.empty())
+      significand=0;
+    else
+      significand=string2integer(str_number, 10);
+
+    if(str_exponent.empty())
+      exponent=0;
+    else
+      exponent=string2integer(str_exponent, 10);
+
+    // adjust exponent
+    exponent-=str_fraction_part.size();
   }
 
   // get flags
@@ -84,20 +168,4 @@ void parse_float(
 
     p++;
   }
-
-  std::string str_number=str_whole_number+
-                         str_fraction_part;
-
-  if(str_number.empty())
-    significand=0;
-  else
-    significand=string2integer(str_number);
-
-  if(str_exponent.empty())
-    exponent=0;
-  else
-    exponent=string2integer(str_exponent);
-
-  // adjust exponent
-  exponent-=str_fraction_part.size();
 }

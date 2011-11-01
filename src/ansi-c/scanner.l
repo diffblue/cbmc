@@ -113,7 +113,10 @@ fraction	{integer}
 float1		{integer}"."{fraction}?({exponent})?
 float2		"."{fraction}({exponent})?
 float3		{integer}{exponent}
-float		{float1}|{float2}|{float3}
+hexfloat1       "0"[xX]{hexdigit}+"."{hexdigit}+[pP][+-]?{integer}
+hexfloat2       "0"[xX]{hexdigit}+"."[pP][+-]?{integer}
+hexfloat3       "0"[xX]{hexdigit}+[pP][+-]?{integer}
+float		{float1}|{float2}|{float3}|{hexfloat1}|{hexfloat2}|{hexfloat3}
 float_f		{float}[fF]|{integer}[fF]
 float_l		{float}[lL]
 bitvector	{binary}[bB]

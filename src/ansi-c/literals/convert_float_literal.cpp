@@ -35,8 +35,9 @@ exprt convert_float_literal(const std::string &src)
   mp_integer significand;
   mp_integer exponent;
   bool is_float, is_long;
+  unsigned base;
   
-  parse_float(src, significand, exponent, is_float, is_long);
+  parse_float(src, significand, exponent, base, is_float, is_long);
 
   exprt result=exprt(ID_constant);
   
@@ -71,10 +72,10 @@ exprt convert_float_literal(const std::string &src)
     if(value!=0)
     {
       if(exponent<0)
-        value/=power(10, -exponent);
+        value/=power(base, -exponent);
       else
       {
-        value*=power(10, exponent);    
+        value*=power(base, exponent);    
 
         if(value>=power(2, width-1))
         {
@@ -96,7 +97,13 @@ exprt convert_float_literal(const std::string &src)
     ieee_floatt a;
 
     a.spec=to_floatbv_type(result.type());
-    a.from_base10(significand, exponent);
+    
+    if(base==10)
+      a.from_base10(significand, exponent);
+    else if(base==2) // hex
+      a.build(significand, exponent);
+    else
+      assert(false);
 
     result.set(ID_value,
       integer2binary(a.pack(), a.spec.width()));  

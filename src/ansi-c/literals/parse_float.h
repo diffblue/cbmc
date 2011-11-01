@@ -16,7 +16,8 @@ Author: Daniel Kroening, kroening@kroening.com
 void parse_float(
   const std::string &src,
   mp_integer &significand,
-  mp_integer &exponent, // base 10
+  mp_integer &exponent,
+  unsigned &exponent_base, // 2 (hex) or 10
   bool &is_float,
   bool &is_long);
 
