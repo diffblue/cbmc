@@ -116,7 +116,7 @@ int goto_instrument_parseoptionst::doit()
       namespacet ns(context);
 
       status("Function Pointer Removal");
-      remove_function_pointers(ns, goto_functions);
+      remove_function_pointers(ns, goto_functions, false);
 
       status("Partial Inlining");
       goto_partial_inline(goto_functions, ns, ui_message_handler);
@@ -134,7 +134,7 @@ int goto_instrument_parseoptionst::doit()
       namespacet ns(context);
 
       status("Function Pointer Removal");
-      remove_function_pointers(ns, goto_functions);
+      remove_function_pointers(ns, goto_functions, false);
 
       status("Partial Inlining");
       goto_partial_inline(goto_functions, ns, ui_message_handler);
@@ -377,7 +377,7 @@ void goto_instrument_parseoptionst::instrument_goto_program(
      cmdline.isset("isr"))
   {
     status("Function Pointer Removal");
-    remove_function_pointers(ns, goto_functions);
+    remove_function_pointers(ns, goto_functions, cmdline.isset("pointer-check"));
 
     // do partial inlining
     status("Partial Inlining");
