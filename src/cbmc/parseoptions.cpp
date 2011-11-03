@@ -592,7 +592,8 @@ bool cbmc_parseoptionst::process_goto_program(
         context, get_message_handler(), goto_functions);
 
     status("Function Pointer Removal");
-    remove_function_pointers(ns, goto_functions);
+    remove_function_pointers(ns, goto_functions,
+      cmdline.isset("pointer-check"));
 
     status("Partial Inlining");
     // do partial inlining

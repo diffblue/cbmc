@@ -17,6 +17,7 @@ Date: June 2003
 // and replace by case-split
 void remove_function_pointers(
   const namespacet &ns,
-  goto_functionst &functions);
+  goto_functionst &functions,
+  bool add_safety_assertion);
 
 #endif
