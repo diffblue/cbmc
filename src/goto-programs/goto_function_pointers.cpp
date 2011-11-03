@@ -57,7 +57,52 @@ protected:
   bool is_type_compatible(
     const code_typet &call_type,
     const code_typet &function_type);
+
+  bool arg_is_type_compatible(
+    const typet &call_type,
+    const typet &function_type);
 };
+
+/*******************************************************************\
+
+Function: remove_function_pointerst::arg_is_type_compatible
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool remove_function_pointerst::arg_is_type_compatible(
+  const typet &call_type,
+  const typet &function_type)
+{
+  if(type_eq(call_type, function_type, ns)) return true;
+  
+  // any integer-vs-enum-vs-pointer is ok
+  if(call_type.id()==ID_signedbv ||
+     call_type.id()==ID_unsigned ||
+     call_type.id()==ID_bool ||
+     call_type.id()==ID_pointer ||
+     call_type.id()==ID_c_enum)
+  {
+    if(function_type.id()==ID_signedbv ||
+       function_type.id()==ID_unsigned ||
+       function_type.id()==ID_bool ||
+       function_type.id()==ID_pointer ||
+       function_type.id()==ID_c_enum)
+      return true;
+     
+    return false;
+  }
+  
+  // structs/unions need to match,
+  // which could be made more generous
+ 
+  return false; 
+}
 
 /*******************************************************************\
 
@@ -83,8 +128,8 @@ bool remove_function_pointerst::is_type_compatible(
   }
   else
   {
-    if(!type_eq(call_type.return_type(),
-                function_type.return_type(), ns))
+    if(!arg_is_type_compatible(call_type.return_type(),
+                               function_type.return_type()))
       return false;
   }
 
@@ -103,10 +148,9 @@ bool remove_function_pointerst::is_type_compatible(
     if(call_arguments.size()!=function_arguments.size())
       return false;
     
-    // the following is also quite strict
     for(unsigned i=0; i<call_arguments.size(); i++)
-      if(!type_eq(call_arguments[i].type(),
-                  function_arguments[i].type(), ns))
+      if(!arg_is_type_compatible(call_arguments[i].type(),
+                                 function_arguments[i].type()))
         return false;
   }
   
