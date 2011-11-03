@@ -364,7 +364,8 @@ Function: remove_function_pointers
 
 void remove_function_pointers(
   const namespacet &ns,
-  goto_functionst &functions)
+  goto_functionst &functions,
+  bool add_safety_assertion)
 {
   remove_function_pointerst rfp(ns);
   rfp(functions);
