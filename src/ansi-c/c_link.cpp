@@ -187,7 +187,8 @@ void c_linkt::duplicate_non_type(
   symbolt &new_symbol)
 {
   // first check if file-local
-  if(new_symbol.file_local)
+  if(new_symbol.file_local ||
+     old_symbol.file_local)
   {
     // we just always rename these
     irep_idt old_identifier=new_symbol.name;
@@ -355,26 +356,39 @@ Function: c_linkt::typecheck
 
 void c_linkt::typecheck()
 {
-  // we first take care of file-local non-type symbols
-  forall_symbols(it, src_context.symbols)
-    if(it->second.file_local && !it->second.is_type &&
-       main_context.symbols.find(it->first)!=main_context.symbols.end())
+  // We first take care of file-local non-type symbols.
+  // These are static functions, or static variables
+  // inside function bodies.
+  
+  forall_symbols(src_it, src_context.symbols)
+    if(!src_it->second.is_type)
     {
-      // collision!
-      irep_idt new_identifier=rename(it->first);
-      replace_symbol.insert(
-        it->first, symbol_exprt(new_identifier, it->second.type));
+      const contextt::symbolst::const_iterator
+        main_symbol=main_context.symbols.find(src_it->first);
+        
+      if(main_symbol==main_context.symbols.end())
+        continue;
+
+      // file-local?
+      if(src_it->second.file_local ||
+         main_symbol->second.file_local)
+      {
+        // collision!
+        irep_idt new_identifier=rename(src_it->first);
+        replace_symbol.insert(
+          src_it->first, symbol_exprt(new_identifier, src_it->second.type));
+      }
     }
 
   // we inspect all the symbols in src_context
   
   forall_symbols(it, src_context.symbols)
-    inspect_symbol(it->first);
+    inspect_src_symbol(it->first);
 }
 
 /*******************************************************************\
 
-Function: c_linkt::inspect_symbol
+Function: c_linkt::inspect_src_symbol
 
   Inputs:
 
@@ -384,7 +398,7 @@ Function: c_linkt::inspect_symbol
 
 \*******************************************************************/
 
-void c_linkt::inspect_symbol(const irep_idt &identifier)
+void c_linkt::inspect_src_symbol(const irep_idt &identifier)
 {
   // are we doing it already?
   if(!processing.insert(identifier).second)
@@ -402,7 +416,7 @@ void c_linkt::inspect_symbol(const irep_idt &identifier)
       s_it=symbols.begin();
       s_it!=symbols.end();
       s_it++)
-    inspect_symbol(*s_it);
+    inspect_src_symbol(*s_it);
     
   // first order of business is to apply renaming
   replace_symbol.replace(new_symbol.value);
@@ -416,7 +430,7 @@ void c_linkt::inspect_symbol(const irep_idt &identifier)
     duplicate(main_s_it->second, new_symbol); // handle the collision
   else
   {
-    // add into dest context -- should never fail,
+    // add into destination context -- should never fail,
     // as there is no collision
     
     bool result=main_context.move(new_symbol);

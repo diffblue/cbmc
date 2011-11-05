@@ -46,7 +46,7 @@ protected:
     symbolt &old_symbol,
     symbolt &new_symbol);
 
-  void inspect_symbol(const irep_idt &identifier);
+  void inspect_src_symbol(const irep_idt &identifier);
   
   irep_idt rename(const irep_idt &old_identifier);
 
