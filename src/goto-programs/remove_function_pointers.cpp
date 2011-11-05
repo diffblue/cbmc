@@ -39,6 +39,8 @@ public:
   }
 
   void operator()(goto_functionst &functions);
+  
+  bool add_safety_assertion;
 
 protected:
   const namespacet &ns;
@@ -216,11 +218,11 @@ void remove_function_pointerst::remove_function_pointer(
   }
   
   // the final target is a skip
-  
   goto_programt final_skip;
+
   goto_programt::targett t_final=final_skip.add_instruction();
   t_final->make_skip();
-
+  
   // build the calls and gotos
 
   goto_programt new_code_calls;
@@ -231,14 +233,16 @@ void remove_function_pointerst::remove_function_pointer(
       it!=functions.end();
       it++)
   {
-    // call
+    // call function
     goto_programt::targett t1=new_code_calls.add_instruction();
     t1->make_function_call(code);
     to_code_function_call(t1->code).function()=*it;
+    
+    // goto final
     goto_programt::targett t2=new_code_calls.add_instruction();
     t2->make_goto(t_final, true_exprt());
   
-    // goto
+    // goto to call
     address_of_exprt address_of;
     address_of.object()=*it;
     address_of.type()=pointer_typet();
@@ -251,6 +255,17 @@ void remove_function_pointerst::remove_function_pointer(
     t3->make_goto(t1, equal_exprt(pointer, address_of));
   }
 
+  // fall-through
+  if(add_safety_assertion)
+  {
+    goto_programt::targett t=new_code_gotos.add_instruction();
+    t->make_assertion(false_exprt());
+    #if 0
+    t->location.set(ID_property, "pointer dereference");
+    t->location.set(ID_comment, "invalid function pointer");
+    #endif
+  }
+  
   goto_programt new_code;
   
   // patch them all together
@@ -264,11 +279,11 @@ void remove_function_pointerst::remove_function_pointer(
   
   goto_programt::targett next_target=target;
   next_target++;
+  
+  goto_program.destructive_insert(next_target, new_code);
 
-  goto_program.instructions.splice(next_target, new_code.instructions);
-
-  // we preserve the dereferencing to possibly catch
-  // pointer-related errors
+  // We preserve the original dereferencing to possibly catch
+  // further pointer-related errors.
   code_expressiont code_expression;
   code_expression.location()=function.location();
   code_expression.expression()=function;
@@ -373,5 +388,6 @@ void remove_function_pointers(
   bool add_safety_assertion)
 {
   remove_function_pointerst rfp(ns);
+  rfp.add_safety_assertion=add_safety_assertion;
   rfp(functions);
 }
