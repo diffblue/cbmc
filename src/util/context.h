@@ -80,16 +80,17 @@ public:
    
   void show(std::ostream &out) const;
   
+  // deprecated -- will go away
   const irept &value(const irep_idt &name) const;
   
-  void swap(contextt &other)
+  inline void swap(contextt &other)
   {
     symbols.swap(other.symbols);
     symbol_base_map.swap(other.symbol_base_map);
     symbol_module_map.swap(other.symbol_module_map);
   }
   
-  bool has_symbol(const irep_idt &name) const
+  inline bool has_symbol(const irep_idt &name) const
   {
     return symbols.find(name)!=symbols.end();
   }
