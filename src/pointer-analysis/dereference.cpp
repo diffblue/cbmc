@@ -815,18 +815,6 @@ bool dereferencet::memory_model(
     if(bv_width(from_type)==bv_width(to_type))
       return memory_model_conversion(value, to_type, guard, offset);
   }
-  else
-  {
-    // we may allow this on _anything_ that has a size
-
-    #if 0    
-    mp_integer from_size=pointer_offset_size(ns, from_type);
-    mp_integer to_size=pointer_offset_size(ns, to_type);
-    
-    if(from_size>=1 && from_size==to_size)
-      return memory_model_conversion(value, to_type, guard, offset);
-    #endif
-  }
 
   // otherwise, we will stich it together from bytes
   
@@ -915,10 +903,30 @@ bool dereferencet::memory_model_bytes(
 
   // But everything else we will try!
   // We just rely on byte_extract to do the job!
+  
+  exprt result;
 
-  exprt byte_extract(byte_extract_id(), to_type);
-  byte_extract.copy_to_operands(value, offset);
-  value=byte_extract;
+  // see if we have an array of bytes already,
+  // and we want something byte-sized
+  if(ns.follow(from_type).id()==ID_array &&
+     pointer_offset_size(ns, ns.follow(from_type).subtype())==1 &&
+     pointer_offset_size(ns, to_type)==1)
+  {
+    // yes, can use 'index'
+    exprt result=index_exprt(value, offset, ns.follow(from_type).subtype());
+    
+    // possibly need to convert
+    if(!base_type_eq(result.type(), to_type, ns))
+      result.make_typecast(to_type);
+  }
+  else
+  {
+    // no, use 'byte_extract'
+    result=exprt(byte_extract_id(), to_type);
+    result.copy_to_operands(value, offset);
+  }
+  
+  value=result;
 
   // are we within the bounds?
   if(options.get_bool_option("pointer-check"))
