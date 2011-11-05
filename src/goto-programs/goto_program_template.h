@@ -267,6 +267,7 @@ public:
     next++;
     p.instructions.erase(p.instructions.begin());
     instructions.splice(next, p.instructions);
+    // BUG: The iterators to p-instructions are invalidated!
   }
   
   //! Insertion before the given target
@@ -290,6 +291,7 @@ public:
   {
     instructions.splice(instructions.end(),
                         p.instructions);
+    // BUG: The iterators to p-instructions are invalidated!
   }
 
   //! Inserts the given program at the given location.
@@ -300,6 +302,7 @@ public:
   {
     instructions.splice(target,
                         p.instructions);
+    // BUG: The iterators to p-instructions are invalidated!
   }
 
   //! Adds an instruction at the end.
