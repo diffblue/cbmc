@@ -74,7 +74,6 @@ void boolbvt::convert_byte_extract(const exprt &expr, bvt &bv)
       endianness_mapt op0_map(op0.type(), little_endian, ns);
       endianness_mapt bv_map(expr.type(), little_endian, ns);
 
-      std::cout << "W: " << width << " " << bv_map.size()*8 << std::endl;
       assert(width==byte_width*bv_map.size());
       
       unsigned offset_i=integer2long(offset);
