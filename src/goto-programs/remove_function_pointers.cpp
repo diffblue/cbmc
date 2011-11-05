@@ -20,7 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ansi-c/c_types.h>
 
 #include "remove_skip.h"
-#include "goto_function_pointers.h"
+#include "remove_function_pointers.h"
 #include "compute_called_functions.h"
 
 /*******************************************************************\

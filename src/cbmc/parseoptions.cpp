@@ -13,7 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <expr_util.h>
 
 #include <goto-programs/goto_convert_functions.h>
-#include <goto-programs/goto_function_pointers.h>
+#include <goto-programs/remove_function_pointers.h>
 #include <goto-programs/goto_check.h>
 #include <goto-programs/goto_inline.h>
 #include <goto-programs/show_claims.h>
