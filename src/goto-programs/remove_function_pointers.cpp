@@ -142,6 +142,11 @@ bool remove_function_pointerst::is_type_compatible(
   {
     // always ok
   }
+  else if(call_type.has_ellipsis() &&
+          call_arguments.empty())
+  {
+    // always ok
+  }
   else
   {
     // we are quite strict here, could be much more generous
