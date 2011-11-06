@@ -1545,12 +1545,6 @@ void c_typecheck_baset::typecheck_expr_dereference(exprt &expr)
   }
   else if(op_type.id()==ID_pointer)
   {
-    if(op_type.subtype().id()==ID_empty)
-    {
-      err_location(expr);
-      warning("operand of unary * is a void pointer");
-    }
-
     expr.type()=op_type.subtype();
   }
   else
