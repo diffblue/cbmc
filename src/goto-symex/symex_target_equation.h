@@ -110,6 +110,9 @@ public:
     exprt cond_expr; 
     literalt cond_literal;
     std::string comment;
+    
+    // Priority of assertions. Higher values mean higher importance.
+    unsigned priority;
 
     // for INPUT/OUTPUT
     irep_idt format_string, io_id;
