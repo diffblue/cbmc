@@ -388,9 +388,11 @@ void goto_symext::loop_bound_exceeded(
   {
     if(unwinding_assertions)
     {
-      // generate unwinding assertion
+      // Generate unwinding assertion.
+      // These have low priority.
       claim(negated_cond,
             "unwinding assertion loop "+i2string(loop_number),
+            1,
             state);
     }
     else
