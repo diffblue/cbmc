@@ -74,6 +74,7 @@ public:
     const guardt &guard,
     const exprt &cond,
     const std::string &msg,
+    const unsigned priority,
     const sourcet &source);
 
   void convert(prop_convt &prop_conv);
