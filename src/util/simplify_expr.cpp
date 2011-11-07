@@ -3658,7 +3658,11 @@ bool simplify_exprt::simplify_member(member_exprt &expr)
 
   if(op.id()==ID_with)
   {
-    if(op.operands().size()>=3)
+    // the following optimization only works on structs,
+    // and not on unions
+  
+    if(op.operands().size()>=3 &&
+       op_type.id()==ID_struct)
     {
       exprt::operandst &operands=op.operands();
 
