@@ -49,6 +49,8 @@ void show_claims(
     const irep_idt description=
       (comment==""?"assertion":comment);
       
+    unsigned priority=location.get_priority();
+      
     unsigned &count=claim_counter[function];
     
     count++;
@@ -76,6 +78,7 @@ void show_claims(
         xml.new_element("description").data=id2string(description);        
         xml.new_element("property").data=id2string(property);        
         xml.new_element("expression").data=from_expr(ns, identifier, it->guard);
+        xml.new_element("priority").data=i2string(priority);
           
         std::cout << xml << std::endl;
       }
@@ -86,8 +89,8 @@ void show_claims(
 
       std::cout << "  " << it->location << std::endl
                 << "  " << description << std::endl
-                << "  " << from_expr(ns, identifier, it->guard)
-                << std::endl
+                << "  " << from_expr(ns, identifier, it->guard) << std::endl
+                << "  priority " << priority << std::endl
                 << std::endl;
       break;
 
