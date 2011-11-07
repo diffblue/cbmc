@@ -210,6 +210,7 @@ void symex_target_equationt::assertion(
   const guardt &guard,
   const exprt &cond,
   const std::string &msg,
+  const unsigned priority,
   const sourcet &source)
 {
   SSA_steps.push_back(SSA_stept());
@@ -220,6 +221,7 @@ void symex_target_equationt::assertion(
   SSA_step.type=goto_trace_stept::ASSERT;
   SSA_step.source=source;
   SSA_step.comment=msg;
+  SSA_step.priority=priority;
 }
 
 /*******************************************************************\

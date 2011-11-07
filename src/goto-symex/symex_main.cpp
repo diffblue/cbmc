@@ -62,7 +62,7 @@ void goto_symext::claim(
   state.guard.guard_expr(expr);
   
   remaining_claims++;
-  target.assertion(state.guard, expr, msg, state.source);
+  target.assertion(state.guard, expr, msg, priority, state.source);
 }
 
 /*******************************************************************\
