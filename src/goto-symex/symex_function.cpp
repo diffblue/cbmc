@@ -243,8 +243,9 @@ void goto_symext::symex_function_call_code(
   // see if it's too much
   if(get_unwind_recursion(identifier, unwinding_counter))
   {
+    // these have low priority
     if(options.get_bool_option("unwinding-assertions"))
-      claim(false_exprt(), "recursion unwinding assertion", state);
+      claim(false_exprt(), "recursion unwinding assertion", 1, state);
 
     state.source.pc++;
     return;

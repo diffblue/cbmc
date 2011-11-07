@@ -46,6 +46,7 @@ Function: goto_symext::claim
 void goto_symext::claim(
   const exprt &claim_expr,
   const std::string &msg,
+  unsigned priority,
   statet &state)
 {
   total_claims++;
@@ -233,9 +234,10 @@ void goto_symext::symex_step(
       {
         std::string msg=id2string(state.source.pc->location.get_comment());
         if(msg=="") msg="assertion";
+        unsigned priority=state.source.pc->location.get_priority();
         exprt tmp(instruction.guard);
         clean_expr(tmp, state, false);
-        claim(tmp, msg, state);
+        claim(tmp, msg, priority, state);
       }
 
     state.source.pc++;
