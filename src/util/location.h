@@ -16,74 +16,84 @@ class locationt:public irept
 public:
   std::string as_string() const;
   
-  const irep_idt &get_file() const
+  inline const irep_idt &get_file() const
   {
     return get(ID_file);
   }
 
-  const irep_idt &get_line() const
+  inline const irep_idt &get_line() const
   {
     return get(ID_line);
   }
 
-  const irep_idt &get_column() const
+  inline const irep_idt &get_column() const
   {
     return get(ID_column);
   }
 
-  const irep_idt &get_function() const
+  inline const irep_idt &get_function() const
   {
     return get(ID_function);
   }
 
-  const irep_idt &get_property() const
+  inline const irep_idt &get_property() const
   {
     return get(ID_property);
   }
 
-  const irep_idt &get_comment() const
+  inline const irep_idt &get_comment() const
   {
     return get(ID_comment);
   }
+  
+  inline unsigned get_priority() const
+  {
+    return get_int(ID_priority);
+  }
 
-  void set_file(const irep_idt &file)
+  inline void set_file(const irep_idt &file)
   {
     set(ID_file, file);
   }
 
-  void set_line(const irep_idt &line)
+  inline void set_line(const irep_idt &line)
   {
     set(ID_line, line);
   }
 
-  void set_line(unsigned line)
+  inline void set_line(unsigned line)
   {
     set(ID_line, line);
   }
 
-  void set_column(const irep_idt &column)
+  inline void set_column(const irep_idt &column)
   {
     set(ID_column, column);
   }
 
-  void set_column(unsigned column)
+  inline void set_column(unsigned column)
   {
     set(ID_column, column);
   }
 
-  void set_function(const irep_idt &function)
+  inline void set_function(const irep_idt &function)
   {
     set(ID_function, function);
   }
 
-  void set_property(const irep_idt &property)
+  inline void set_property(const irep_idt &property)
   {
     set(ID_property, property);
   }
 
-  void set_comment(const irep_idt &comment)
+  inline void set_comment(const irep_idt &comment)
   {
     set(ID_comment, comment);
+  }
+  
+  inline void set_priority(unsigned priority)
+  {
+    set(ID_priority, priority);
   }
 
 };
