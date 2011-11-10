@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <assert.h>
 
 #include "arith_tools.h"
-#include "bitvector.h"
+#include "std_types.h"
 
 /*******************************************************************\
 
@@ -94,9 +94,16 @@ exprt from_integer(
     expr.set(ID_value, integer2string(int_value));
     return expr;
   }
-  else if(type_id==ID_unsignedbv || type_id==ID_signedbv)
+  else if(type_id==ID_unsignedbv)
   {
-    expr.set(ID_value, integer2binary(int_value, bv_width(type)));
+    unsigned width=to_unsignedbv_type(type).get_width();
+    expr.set(ID_value, integer2binary(int_value, width));
+    return expr;
+  }
+  else if(type_id==ID_signedbv)
+  {
+    unsigned width=to_signedbv_type(type).get_width();
+    expr.set(ID_value, integer2binary(int_value, width));
     return expr;
   }
   else if(type_id==ID_bool)
