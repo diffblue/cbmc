@@ -26,14 +26,12 @@ Function: smt2_propt::smt2_propt
 
 smt2_propt::smt2_propt(
   const std::string &benchmark,
-  const std::string &notes,
+  const std::string &source,
   const std::string &logic,
   std::ostream &_out):out(_out)
 {
-  out << "(benchmark " << benchmark << std::endl;
-  out << ":notes \"" << notes << "\"" << std::endl;
-  out << ":status unknown" << std::endl;
-  out << ":logic " << logic << " ; SMT 2" << std::endl;
+  out << "(set-info :source \"" << notes << "\"" << std::endl;
+  out << "(set-logic " << logic << ") ; SMT 2" << std::endl;
   _no_variables=0;
 }
 
@@ -68,8 +66,7 @@ Function: smt2_propt::finalize
 void smt2_propt::finalize()
 {
   out << std::endl;
-  out << ":formula true" << std::endl;
-  out << ") ; benchmark" << std::endl;
+  out << "; end of SMT2 file" << std::endl;
 }
 
 /*******************************************************************\
