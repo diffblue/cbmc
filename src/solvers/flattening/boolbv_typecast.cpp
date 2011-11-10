@@ -294,9 +294,12 @@ void boolbvt::convert_typecast(const exprt &expr, bvt &bv)
     case IS_SIGNED:
     case IS_C_ENUM:
       {
+        // We do sign extension for any source type
+        // that is signed, independently of the
+        // destination type.
+        // E.g., ((short)(ulong)(short)-1)==-1
         bool sign_extension=
-          (dest_bvtype==IS_SIGNED || dest_bvtype==IS_C_ENUM) &&
-          (op_bvtype==IS_SIGNED || op_bvtype==IS_C_ENUM);
+          op_bvtype==IS_SIGNED || op_bvtype==IS_C_ENUM;
 
         for(unsigned i=0; i<dest_width; i++)
         {
