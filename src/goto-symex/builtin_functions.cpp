@@ -70,7 +70,7 @@ void basic_symext::symex_malloc(
   {
     exprt tmp_size=size;
     state.rename(tmp_size, ns); // to allow constant propagation
-
+    
     // special treatment for sizeof(T)*x
     if(tmp_size.id()==ID_mult &&
        tmp_size.operands().size()==2 &&
@@ -89,7 +89,7 @@ void basic_symext::symex_malloc(
         // Did the size get multiplied?
         mp_integer elem_size=pointer_offset_size(ns, tmp_type);
         mp_integer alloc_size;
-        if(elem_size<1 || to_integer(tmp_size, alloc_size))
+        if(elem_size<0 || to_integer(tmp_size, alloc_size))
         {
         }
         else
