@@ -87,13 +87,13 @@ literalt smt2_propt::land(const bvt &bv)
 
   literalt l=new_variable();
 
-  out << ":assumption ; land" << std::endl;
+  out << "(assert ; land" << std::endl;
   out << " (= " << smt2_literal(l) << " (and";
   
   for(unsigned int i=0; i<bv.size(); i++)
     out << " " << smt2_literal(bv[i]);
 
-  out << "))" << std::endl;
+  out << ")))" << std::endl;
 
   return l;
 }
@@ -116,13 +116,13 @@ literalt smt2_propt::lor(const bvt &bv)
 
   literalt l=new_variable();
 
-  out << ":assumption ; lor" << std::endl;
+  out << "(assert ; lor" << std::endl;
   out << " (= " << smt2_literal(l) << " (or";
 
   for(unsigned int i=0; i<bv.size(); i++)
     out << " " << smt2_literal(bv[i]);
 
-  out << "))" << std::endl;
+  out << ")))" << std::endl;
 
   return l;
 }
@@ -148,13 +148,13 @@ literalt smt2_propt::lxor(const bvt &bv)
 
   literalt l=new_variable();
 
-  out << ":assumption ; lxor" << std::endl;
+  out << "(assert ; lxor" << std::endl;
   out << " (= " << smt2_literal(l) << " (xor";
 
   for(unsigned int i=0; i<bv.size(); i++)
     out << " " << smt2_literal(bv[i]);
 
-  out << "))" << std::endl;
+  out << ")))" << std::endl;
 
   return l;
 }
@@ -183,11 +183,11 @@ literalt smt2_propt::land(literalt a, literalt b)
 
   literalt l=new_variable();
 
-  out << ":assumption ; land" << std::endl;
+  out << "(assert ; land" << std::endl;
   out << " (= " << smt2_literal(l) << " (and";
   out << " " << smt2_literal(a);
   out << " " << smt2_literal(b);
-  out << "))" << std::endl;
+  out << ")))" << std::endl;
 
   return l;
 }
@@ -216,11 +216,11 @@ literalt smt2_propt::lor(literalt a, literalt b)
 
   literalt l=new_variable();
 
-  out << ":assumption ; lor" << std::endl;
+  out << "(assert ; lor" << std::endl;
   out << " (= " << smt2_literal(l) << " (or";
   out << " " << smt2_literal(a);
   out << " " << smt2_literal(b);
-  out << "))" << std::endl;
+  out << ")))" << std::endl;
 
   return l;
 }
@@ -266,7 +266,7 @@ literalt smt2_propt::lxor(literalt a, literalt b)
 
   literalt l=new_variable();
 
-  out << ":assumption ; lxor" << std::endl;
+  out << "(assert ; lxor" << std::endl;
   out << " (= " << smt2_literal(l) << " (xor";
   out << " " << smt2_literal(a);
   out << " " << smt2_literal(b);
@@ -370,10 +370,10 @@ literalt smt2_propt::lselect(literalt a, literalt b, literalt c)
 
   literalt l=new_variable();
 
-  out << ":assumption ; lselect" << std::endl;
+  out << "(assert ; lselect" << std::endl;
   out << " (= " << smt2_literal(l) << "(if_then_else "
       << smt2_literal(a) << " " << smt2_literal(b) << " "
-      << smt2_literal(c) << ")" << std::endl;
+      << smt2_literal(c) << ")))" << std::endl;
 
   return l;
 }
@@ -396,7 +396,7 @@ literalt smt2_propt::new_variable()
   l.set(_no_variables, false);
   _no_variables++;
   
-  out << ":extrafuns((" << smt2_literal(l) << " Bool))" << std::endl;
+  out << "(declare-fun " << smt2_literal(l) << " () Bool)" << std::endl;
 
   return l;
 }
@@ -416,11 +416,11 @@ Function: smt2_propt::lcnf
 void smt2_propt::lcnf(const bvt &bv)
 {
   out << std::endl;
-  out << ":assumption ; lcnf" << std::endl;
+  out << "(assert ; lcnf" << std::endl;
   out << " ";
 
   if(bv.empty())
-    out << "false ; the empty clause";
+    out << "false";
   else if(bv.size()==1)
     out << smt2_literal(bv.front());
   else
@@ -433,7 +433,7 @@ void smt2_propt::lcnf(const bvt &bv)
     out << ")";
   }
 
-  out << std::endl;
+  out << ")" <<  std::endl;
 }
 
 /*******************************************************************\
