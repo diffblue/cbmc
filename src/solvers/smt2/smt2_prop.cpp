@@ -86,15 +86,15 @@ literalt smt2_propt::land(const bvt &bv)
 {
   out << std::endl;
 
-  literalt l=new_variable();
+  literalt l=define_new_variable();
 
-  out << "(assert ; land" << std::endl;
-  out << " (= " << smt2_literal(l) << " (and";
+  out << "; land" << std::endl;
+  out << " (and";
   
   for(unsigned int i=0; i<bv.size(); i++)
     out << " " << smt2_literal(bv[i]);
 
-  out << ")))" << std::endl;
+  out << "))" << std::endl;
 
   return l;
 }
@@ -115,15 +115,15 @@ literalt smt2_propt::lor(const bvt &bv)
 {
   out << std::endl;
 
-  literalt l=new_variable();
+  literalt l=define_new_variable();
 
-  out << "(assert ; lor" << std::endl;
-  out << " (= " << smt2_literal(l) << " (or";
+  out << "; lor" << std::endl;
+  out << " (or";
 
   for(unsigned int i=0; i<bv.size(); i++)
     out << " " << smt2_literal(bv[i]);
 
-  out << ")))" << std::endl;
+  out << "))" << std::endl;
 
   return l;
 }
@@ -147,15 +147,15 @@ literalt smt2_propt::lxor(const bvt &bv)
 
   out << std::endl;
 
-  literalt l=new_variable();
+  literalt l=define_new_variable();
 
-  out << "(assert ; lxor" << std::endl;
-  out << " (= " << smt2_literal(l) << " (xor";
+  out << "; lxor" << std::endl;
+  out << " (xor";
 
   for(unsigned int i=0; i<bv.size(); i++)
     out << " " << smt2_literal(bv[i]);
 
-  out << ")))" << std::endl;
+  out << "))" << std::endl;
 
   return l;
 }
@@ -182,13 +182,13 @@ literalt smt2_propt::land(literalt a, literalt b)
 
   out << std::endl;
 
-  literalt l=new_variable();
+  literalt l=define_new_variable();
 
-  out << "(assert ; land" << std::endl;
-  out << " (= " << smt2_literal(l) << " (and";
+  out << "; land" << std::endl;
+  out << " (and";
   out << " " << smt2_literal(a);
   out << " " << smt2_literal(b);
-  out << ")))" << std::endl;
+  out << "))" << std::endl;
 
   return l;
 }
@@ -215,13 +215,13 @@ literalt smt2_propt::lor(literalt a, literalt b)
   
   out << std::endl;
 
-  literalt l=new_variable();
+  literalt l=define_new_variable();
 
-  out << "(assert ; lor" << std::endl;
-  out << " (= " << smt2_literal(l) << " (or";
+  out << "; lor" << std::endl;
+  out << " (or";
   out << " " << smt2_literal(a);
   out << " " << smt2_literal(b);
-  out << ")))" << std::endl;
+  out << "))" << std::endl;
 
   return l;
 }
@@ -267,8 +267,8 @@ literalt smt2_propt::lxor(literalt a, literalt b)
 
   literalt l=new_variable();
 
-  out << "(assert ; lxor" << std::endl;
-  out << " (= " << smt2_literal(l) << " (xor";
+  out << "; lxor" << std::endl;
+  out << " (xor";
   out << " " << smt2_literal(a);
   out << " " << smt2_literal(b);
   out << "))" << std::endl;
@@ -369,12 +369,12 @@ literalt smt2_propt::lselect(literalt a, literalt b, literalt c)
 
   out << std::endl;
 
-  literalt l=new_variable();
+  literalt l=define_new_variable();
 
-  out << "(assert ; lselect" << std::endl;
-  out << " (= " << smt2_literal(l) << "(if_then_else "
+  out << "; lselect" << std::endl;
+  out << " (if_then_else "
       << smt2_literal(a) << " " << smt2_literal(b) << " "
-      << smt2_literal(c) << ")))" << std::endl;
+      << smt2_literal(c) << "))" << std::endl;
 
   return l;
 }
@@ -398,6 +398,31 @@ literalt smt2_propt::new_variable()
   _no_variables++;
   
   out << "(declare-fun " << smt2_literal(l) << " () Bool)" << std::endl;
+
+  return l;
+}
+
+/*******************************************************************\
+
+Function: smt2_propt::define_new_variable
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+literalt smt2_propt::define_new_variable()
+{
+  literalt l;
+  l.set(_no_variables, false);
+  _no_variables++;
+  
+  out << "(define-fun " << smt2_literal(l) << " () Bool ";
+  // The command is continued elsewhere, and the
+  // closing parenthesis is missing!
 
   return l;
 }

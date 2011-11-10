@@ -74,6 +74,8 @@ protected:
   literalt def_smt2_literal();
   
   std::vector<tvt> assignment;
+  
+  void literalt define_new_variable();
 };
 
 #endif
