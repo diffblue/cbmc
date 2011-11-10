@@ -75,7 +75,7 @@ protected:
   
   std::vector<tvt> assignment;
   
-  void literalt define_new_variable();
+  literalt define_new_variable();
 };
 
 #endif
