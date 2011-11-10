@@ -40,7 +40,7 @@ void symex_slice_by_tracet::slice_by_trace(std::string trace_files,
   std::cout << "Slicing by trace..." << std::endl;
 
   merge_identifier = "goto_symex::\\merge";
-  merge_symbol=symbol_exprt(typet("bool"));
+  merge_symbol=symbol_exprt(typet(ID_bool));
   merge_symbol.set_identifier(merge_identifier);
 
   std::vector<exprt> trace_conditions;
@@ -66,7 +66,7 @@ void symex_slice_by_tracet::slice_by_trace(std::string trace_files,
   if (trace_conditions.size() == 1) {
     trace_condition = trace_conditions[0];
   } else {
-    trace_condition = exprt("and",typet("bool"));
+    trace_condition = exprt(ID_and, typet(ID_bool));
     trace_condition.operands().reserve(trace_conditions.size());
     for (std::vector<exprt>::iterator i = trace_conditions.begin();
 	 i != trace_conditions.end(); i++) {
@@ -83,20 +83,20 @@ void symex_slice_by_tracet::slice_by_trace(std::string trace_files,
   {
     exprt g_copy (*i);
 
-    if (g_copy.id() == "symbol" || g_copy.id() == "not")
+    if (g_copy.id() == ID_symbol || g_copy.id() == ID_not)
     {
       g_copy.make_not();
       simplify(g_copy, ns);
       implications.insert(g_copy);
     }
-    else if (g_copy.id() == "and")
+    else if (g_copy.id() == ID_and)
     {
       exprt copy_last (g_copy.operands().back());
       copy_last.make_not();
       simplify(copy_last, ns);
       implications.insert(copy_last);
     }
-    else if (!(g_copy.id() == "constant")) {
+    else if (!(g_copy.id() == ID_constant)) {
       throw "Guards should only be and, symbol, constant, or not.";
     }
   }
@@ -309,8 +309,8 @@ void symex_slice_by_tracet::compute_ts_back(
 	if ((t[j].is_true()) || (t[j].is_false())) {
 	  merge.push_back(t[j]);
 	} else {
-	  exprt merge_sym =exprt("symbol", typet("bool"));
-	  merge_sym.set("identifier", id2string(merge_identifier)+"#"+
+	  exprt merge_sym =exprt(ID_symbol, typet(ID_bool));
+	  merge_sym.set(ID_identifier, id2string(merge_identifier)+"#"+
 			i2string(merge_count++));
 	  exprt t_copy (t[j]);
 	  merge_map_back.push_back(t_copy);
@@ -322,7 +322,7 @@ void symex_slice_by_tracet::compute_ts_back(
       }
 
       for(size_t j = 0; j < t.size(); j++) {
-	exprt u_lhs = exprt("and", typet("bool"));
+	exprt u_lhs = exprt(ID_and, typet(ID_bool));
 	if ((j < sigma.size()) && (matches(sigma[j],event))) {
 	  u_lhs.operands().reserve(2);
 	  u_lhs.copy_to_operands(guard);
@@ -332,19 +332,19 @@ void symex_slice_by_tracet::compute_ts_back(
 	    for (std::vector<irep_idt>::iterator k = sigma_vals[j].begin();
 		 k != sigma_vals[j].end(); k++) {
 	      
-	      exprt equal_cond=exprt("=", typet("bool"));
+	      exprt equal_cond=exprt("=", typet(ID_bool));
 	      equal_cond.operands().reserve(2);
 	      equal_cond.copy_to_operands(*pvi);
 	      // Should eventually change to handle non-bv types!
-	      exprt constant_value = exprt("constant",(*pvi).type());
+	      exprt constant_value = exprt(ID_constant, (*pvi).type());
 	      std::string bit_string = 
 		integer2binary(atoi(k->c_str()), bv_width((*pvi).type()));
-	      constant_value.set("value", bit_string);
+	      constant_value.set(ID_value, bit_string);
 	      equal_cond.move_to_operands(constant_value);
 	      eq_conds.push_back(equal_cond);
 	      pvi++;
 	    }
-	    exprt val_merge = exprt("and", typet("bool"));
+	    exprt val_merge = exprt(ID_and, typet(ID_bool));
 	    val_merge.operands().reserve(eq_conds.size()+1);
 	    val_merge.copy_to_operands(merge[j+1]);
 	    for (std::list<exprt>::iterator k = eq_conds.begin(); 
@@ -365,7 +365,7 @@ void symex_slice_by_tracet::compute_ts_back(
 	} else {
 	  u_lhs.make_false();
 	}
-	exprt u_rhs = exprt ("and", typet("bool"));
+	exprt u_rhs = exprt (ID_and, typet(ID_bool));
 	if ((semantics != ":suffix") || (j != 0)) {
 	  u_rhs.operands().reserve(2);
 	  u_rhs.copy_to_operands(guard);
@@ -374,7 +374,7 @@ void symex_slice_by_tracet::compute_ts_back(
 	} else {
 	  u_rhs.swap(merge[j]);
 	}
-	exprt u_j = exprt ("or", typet("bool"));
+	exprt u_j = exprt (ID_or, typet(ID_bool));
 	u_j.operands().reserve(2);
 	u_j.copy_to_operands(u_lhs);
 	u_j.copy_to_operands(u_rhs);
@@ -457,7 +457,7 @@ void symex_slice_by_tracet::slice_SSA_steps(
     //it->output(ns,std::cout);
     //std::cout << "-----------------" << std::endl;
 
-    if ((guard.id() == "symbol") || (guard.id() == "not"))
+    if ((guard.id() == ID_symbol) || (guard.id() == ID_not))
     {
       guard.make_not();
       simplify(guard, ns);
@@ -472,7 +472,7 @@ void symex_slice_by_tracet::slice_SSA_steps(
 	sliced_SSA_step = true;
       }
     }
-    else if(guard.id()=="and")
+    else if(guard.id()==ID_and)
     {
       Forall_operands(git,guard)
       {
@@ -490,7 +490,7 @@ void symex_slice_by_tracet::slice_SSA_steps(
 	  sliced_SSA_step = true;
 	  break; // Sliced, so no need to consider the rest
 	}
-      } else if (guard.id() == "or") {
+      } else if (guard.id() == ID_or) {
 	std::cout << "Guarded by an OR." << std::endl;
       }
     }
@@ -574,7 +574,7 @@ void symex_slice_by_tracet::assign_merges(
   size_t merge_count = (merge_map_back.size()) - 1;
   for (std::vector<exprt>::reverse_iterator i = merge_map_back.rbegin();
        i != merge_map_back.rend(); i++) {
-    symbol_exprt merge_sym(typet("bool"));
+    symbol_exprt merge_sym(typet(ID_bool));
     merge_sym.set_identifier(id2string(merge_identifier)+"#"+i2string(merge_count));
     merge_count--;
     guardt t_guard;
@@ -614,8 +614,8 @@ std::set<exprt> symex_slice_by_tracet::implied_guards(exprt e)
 {
   std::set<exprt> s;
 
-  if (e.id() == "symbol") { // Guard or merge
-    const char* merge_loc = strstr(e.get("identifier").c_str(),"merge#");
+  if (e.id() == ID_symbol) { // Guard or merge
+    const char* merge_loc = strstr(e.get(ID_identifier).c_str(),"merge#");
     if (merge_loc == NULL) {
       exprt e_copy (e);
       simplify(e_copy, ns);
@@ -632,12 +632,12 @@ std::set<exprt> symex_slice_by_tracet::implied_guards(exprt e)
 	return merge_impl_cache_back[i].second;
       }
     }
-  } else if (e.id() == "not") { // Definitely a guard
+  } else if (e.id() == ID_not) { // Definitely a guard
     exprt e_copy(e);
     simplify(e_copy, ns);
     s.insert(e_copy);
     return s;
-  } else if (e.id() == "and") { // Descend into and
+  } else if (e.id() == ID_and) { // Descend into and
     Forall_operands(it,e) {
       std::set<exprt> r = implied_guards(*it);
       for (std::set<exprt>::iterator i = r.begin();
@@ -646,7 +646,7 @@ std::set<exprt> symex_slice_by_tracet::implied_guards(exprt e)
       }
     }
     return s;
-  } else if (e.id() == "or") { // Descend into or
+  } else if (e.id() == ID_or) { // Descend into or
     std::vector<std::set<exprt> > rs;
     Forall_operands(it,e) {
       rs.push_back(implied_guards(*it));
