@@ -737,7 +737,7 @@ default_declaring_list:
         ;
 
 post_declarator_attributes:
-          TOK_GCC_ASM_PAREN volatile_opt '(' gcc_asm_commands ')'
+          TOK_GCC_ASM_PAREN volatile_or_goto_opt '(' gcc_asm_commands ')'
         {
         }
         ;
@@ -2001,7 +2001,7 @@ gcc_local_label: identifier_or_typedef_name
         ;
 
 gcc_asm_statement:
-          TOK_GCC_ASM_PAREN volatile_opt '(' gcc_asm_commands ')' ';'
+          TOK_GCC_ASM_PAREN volatile_or_goto_opt '(' gcc_asm_commands ')' ';'
         { $$=$1;
           statement($$, ID_asm);
           stack($$).set(ID_flavor, ID_gcc);
@@ -2056,15 +2056,17 @@ msc_seh_statement:
         }
         ;
 
-volatile_opt:
+volatile_or_goto_opt:
           /* nothing */
         | TOK_VOLATILE
+        | TOK_GOTO
         ;
 
 /* asm ( assembler template
            : output operands                  // optional
            : input operands                   // optional
            : list of clobbered registers      // optional
+           : list of C labels                 // optional
            );
 */
 
@@ -2085,6 +2087,11 @@ gcc_asm_commands:
             mto($$, $1);
           }
         | gcc_asm_assembler_template gcc_asm_outputs gcc_asm_inputs gcc_asm_clobbered_registers
+          {
+            init($$);
+            mto($$, $1);
+          }
+        | gcc_asm_assembler_template gcc_asm_outputs gcc_asm_inputs gcc_asm_clobbered_registers gcc_asm_labels
           {
             init($$);
             mto($$, $1);
@@ -2137,6 +2144,16 @@ gcc_asm_clobbered_register:
 gcc_asm_clobbered_registers_list:
           gcc_asm_clobbered_register
         | gcc_asm_clobbered_registers_list ',' gcc_asm_clobbered_register
+        ;
+
+gcc_asm_labels:
+          ':' gcc_asm_labels_list
+        | ':'
+        ;
+
+gcc_asm_labels_list:
+          gcc_local_label
+        | gcc_asm_labels_list ',' gcc_local_label
         ;
 
 /*** External Definitions ***********************************************/
