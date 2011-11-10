@@ -61,26 +61,26 @@ void interpretert::evaluate(
   const exprt &expr,
   std::vector<mp_integer> &dest) const
 {
-  if(expr.id()=="constant")
+  if(expr.id()==ID_constant)
   {
-    if(expr.type().id()=="struct")
+    if(expr.type().id()==ID_struct)
     {
     }
-    else if(expr.type().id()=="floatbv")
+    else if(expr.type().id()==ID_floatbv)
     {
       ieee_floatt f;
       f.from_expr(expr);
       dest.push_back(f.pack());
       return;
     }
-    else if(expr.type().id()=="fixedbv")
+    else if(expr.type().id()==ID_fixedbv)
     {
       fixedbvt f;
       f.from_expr(expr);
       dest.push_back(f.get_value());
       return;
     }
-    else if(expr.type().id()=="bool")
+    else if(expr.type().id()==ID_bool)
     {
       dest.push_back(expr.is_true());
       return;
@@ -95,14 +95,14 @@ void interpretert::evaluate(
       }
     }
   }
-  else if(expr.id()=="struct")
+  else if(expr.id()==ID_struct)
   {
     dest.reserve(get_size(expr.type()));
     bool error=false;
 
     forall_operands(it, expr)
     {
-      if(it->type().id()=="code") continue;
+      if(it->type().id()==ID_code) continue;
 
       unsigned sub_size=get_size(it->type());
       if(sub_size==0) continue;
@@ -125,7 +125,7 @@ void interpretert::evaluate(
     dest.clear();
   }
   else if(expr.id()=="=" ||
-          expr.id()=="notequal" ||
+          expr.id()==ID_notequal ||
           expr.id()=="<=" ||
           expr.id()==">=" ||
           expr.id()=="<" ||
@@ -145,7 +145,7 @@ void interpretert::evaluate(
     
       if(expr.id()=="=")
         dest.push_back(op0==op1);
-      else if(expr.id()=="notequal")
+      else if(expr.id()==ID_notequal)
         dest.push_back(op0!=op1);
       else if(expr.id()=="<=")
         dest.push_back(op0<=op1);
@@ -159,7 +159,7 @@ void interpretert::evaluate(
 
     return;
   }
-  else if(expr.id()=="or")
+  else if(expr.id()==ID_or)
   {
     if(expr.operands().size()<1)
       throw id2string(expr.id())+" expects at least one operand";
@@ -182,7 +182,7 @@ void interpretert::evaluate(
 
     return;
   }
-  else if(expr.id()=="if")
+  else if(expr.id()==ID_if)
   {
     if(expr.operands().size()!=3)
       throw "if expects three operands";
@@ -203,7 +203,7 @@ void interpretert::evaluate(
 
     return;
   }
-  else if(expr.id()=="and")
+  else if(expr.id()==ID_and)
   {
     if(expr.operands().size()<1)
       throw id2string(expr.id())+" expects at least one operand";
@@ -226,7 +226,7 @@ void interpretert::evaluate(
 
     return;
   }
-  else if(expr.id()=="not")
+  else if(expr.id()==ID_not)
   {
     if(expr.operands().size()!=1)
       throw id2string(expr.id())+" expects one operand";
@@ -259,14 +259,14 @@ void interpretert::evaluate(
     // type-dependent!
     mp_integer result;
     
-    if(expr.type().id()=="fixedbv")
+    if(expr.type().id()==ID_fixedbv)
     {
       fixedbvt f;
       f.spec=to_fixedbv_type(expr.type());
       f.from_integer(1);
       result=f.get_value();
     }
-    else if(expr.type().id()=="floatbv")
+    else if(expr.type().id()==ID_floatbv)
     {
       ieee_floatt f;
       f.spec=to_floatbv_type(expr.type());
@@ -282,7 +282,7 @@ void interpretert::evaluate(
       evaluate(*it, tmp);
       if(tmp.size()==1)
       {
-        if(expr.type().id()=="fixedbv")
+        if(expr.type().id()==ID_fixedbv)
         {
           fixedbvt f1, f2;
           f1.spec=to_fixedbv_type(expr.type());
@@ -292,7 +292,7 @@ void interpretert::evaluate(
           f1*=f2;
           result=f1.get_value();
         }
-        else if(expr.type().id()=="floatbv")
+        else if(expr.type().id()==ID_floatbv)
         {
           ieee_floatt f1, f2;
           f1.spec=to_floatbv_type(expr.type());
@@ -348,7 +348,7 @@ void interpretert::evaluate(
       dest.push_back(-tmp0.front());
     return;
   }
-  else if(expr.id()=="address_of")
+  else if(expr.id()==ID_address_of)
   {
     if(expr.operands().size()!=1)
       throw "address_of expects one operand";
@@ -356,17 +356,17 @@ void interpretert::evaluate(
     dest.push_back(evaluate_address(expr.op0()));
     return;
   }
-  else if(expr.id()=="dereference" ||
-          expr.id()=="index" ||
-          expr.id()=="symbol" ||
-          expr.id()=="member")
+  else if(expr.id()==ID_dereference ||
+          expr.id()==ID_index ||
+          expr.id()==ID_symbol ||
+          expr.id()==ID_member)
   {
     mp_integer a=evaluate_address(expr);
     dest.resize(get_size(expr.type()));
     read(a, dest);
     return;
   }
-  else if(expr.id()=="typecast")
+  else if(expr.id()==ID_typecast)
   {
     if(expr.operands().size()!=1)
       throw "typecast expects one operand";
@@ -378,31 +378,33 @@ void interpretert::evaluate(
     {
       const mp_integer &value=tmp.front();
 
-      if(expr.type().id()=="pointer")
+      if(expr.type().id()==ID_pointer)
       {
         dest.push_back(value);
         return;
       }
-      else if(expr.type().id()=="signedbv")
+      else if(expr.type().id()==ID_signedbv)
       {
-        const std::string s=integer2binary(value, bv_width(expr.type()));
+        const std::string s=
+          integer2binary(value, to_signedbv_type(expr.type()).get_width());
         dest.push_back(binary2integer(s, true));
         return;
       }
-      else if(expr.type().id()=="unsigedbv")
+      else if(expr.type().id()==ID_unsignedbv)
       {
-        const std::string s=integer2binary(value, bv_width(expr.type()));
+        const std::string s=
+          integer2binary(value, to_unsignedbv_type(expr.type()).get_width());
         dest.push_back(binary2integer(s, false));        
         return;
       }
-      else if(expr.type().id()=="bool")
+      else if(expr.type().id()==ID_bool)
       {
         dest.push_back(value!=0);
         return;
       }
     }
   }
-  else if(expr.id()=="ashr")
+  else if(expr.id()==ID_ashr)
   {
     if(expr.operands().size()!=2)
       throw "ashr expects two operands";
@@ -436,9 +438,9 @@ Function: interpretert::evaluate_address
 
 mp_integer interpretert::evaluate_address(const exprt &expr) const
 {
-  if(expr.id()=="symbol")
+  if(expr.id()==ID_symbol)
   {
-    const irep_idt &identifier=expr.get("identifier");
+    const irep_idt &identifier=expr.get(ID_identifier);
     
     interpretert::memory_mapt::const_iterator m_it1=
       memory_map.find(identifier);
@@ -455,7 +457,7 @@ mp_integer interpretert::evaluate_address(const exprt &expr) const
         return m_it2->second;
     }
   }
-  else if(expr.id()=="dereference")
+  else if(expr.id()==ID_dereference)
   {
     if(expr.operands().size()!=1)
       throw "dereference expects one operand";
@@ -466,7 +468,7 @@ mp_integer interpretert::evaluate_address(const exprt &expr) const
     if(tmp0.size()==1)
       return tmp0.front();
   }
-  else if(expr.id()=="index")
+  else if(expr.id()==ID_index)
   {
     if(expr.operands().size()!=2)
       throw "index expects two operands";
@@ -477,7 +479,7 @@ mp_integer interpretert::evaluate_address(const exprt &expr) const
     if(tmp1.size()==1)
       return evaluate_address(expr.op0())+tmp1.front();
   }
-  else if(expr.id()=="member")
+  else if(expr.id()==ID_member)
   {
     if(expr.operands().size()!=1)
       throw "member expects one operand";

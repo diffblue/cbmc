@@ -64,7 +64,7 @@ protected:
        type.id()!=ID_unsignedbv)
       return false;
 
-    return bv_width(type)==config.ansi_c.char_width;
+    return to_bitvector_type(type).get_width()==config.ansi_c.char_width;
   }
 
   inline bool is_ptr_string_struct(const typet &type) const;
