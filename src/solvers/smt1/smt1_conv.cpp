@@ -1637,7 +1637,9 @@ Function: smt1_convt::convert_constant
 
 \*******************************************************************/
 
-void smt1_convt::convert_constant(const constant_exprt &expr, bool bool_as_bv)
+void smt1_convt::convert_constant(
+  const constant_exprt &expr,
+  bool bool_as_bv)
 {
   if(expr.type().id()==ID_unsignedbv ||
      expr.type().id()==ID_signedbv ||
@@ -1680,6 +1682,7 @@ void smt1_convt::convert_constant(const constant_exprt &expr, bool bool_as_bv)
 
     if(value==ID_NULL)
     {
+      assert(bv_width(expr.type())!=0);
       smt1_prop.out << "(concat"
                     << " bv" << pointer_logic.get_null_object()
                     << "[" << BV_ADDR_BITS << "]"
