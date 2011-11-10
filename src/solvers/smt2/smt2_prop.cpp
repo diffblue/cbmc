@@ -66,6 +66,7 @@ Function: smt2_propt::finalize
 void smt2_propt::finalize()
 {
   out << std::endl;
+  out << "(check-sat)" << std::endl;
   out << "; end of SMT2 file" << std::endl;
 }
 
