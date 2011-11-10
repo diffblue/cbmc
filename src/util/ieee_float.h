@@ -100,18 +100,27 @@ public:
   void make_NaN();
   void make_plus_infinity();
   void make_minus_infinity();
+  void make_fltmax();
+  void make_fltmin();
 
   // set to next representable number towards plus or minus infinity
   void next_representable(bool greater);
-  void increment(bool distinguish_zero=false) { 
-    if(is_zero() && get_sign() && distinguish_zero) negate();
-    else next_representable(true); }
-  void decrement(bool distinguish_zero=false) { 
-    if(is_zero() && !get_sign() && distinguish_zero) negate();
-    else next_representable(false); }
 
-  void make_fltmax();
-  void make_fltmin();
+  void increment(bool distinguish_zero=false)
+  { 
+    if(is_zero() && get_sign() && distinguish_zero)
+      negate();
+    else
+      next_representable(true);
+  }
+
+  void decrement(bool distinguish_zero=false)
+  { 
+    if(is_zero() && !get_sign() && distinguish_zero)
+      negate();
+    else
+      next_representable(false);
+  }
 
   bool is_zero() const {return !NaN && !infinity && fraction==0 && exponent==0;}
   bool get_sign() const { return sign; }
@@ -128,18 +137,21 @@ public:
   void unpack(const mp_integer &i);
   void from_double(const double d);
   void from_float(const float f);
+
+  // perfroms conversions from ieee float-point format
+  // to something else
   double to_double() const;
   float to_float() const;
   bool is_double() const;
   bool is_float() const;
   mp_integer pack() const;
-  void align();
-
-  // performs conversion from ieee floating point format  
   void extract(mp_integer &_exponent, mp_integer &_fraction) const;
-  void change_spec(const ieee_float_spect &dest_spec);
   mp_integer to_integer() const; // this rounds to zero
 
+  // conversions
+  void change_spec(const ieee_float_spect &dest_spec);
+
+  // output
   void print(std::ostream &out) const;
 
   std::string to_ansi_c_string() const
@@ -149,10 +161,16 @@ public:
   
   std::string format(const format_spect &format_spec) const;
   
+  friend inline std::ostream& operator << (std::ostream &out, const ieee_floatt &f)
+  {
+    return out << f.to_ansi_c_string();
+  }
+
   // expressions
   exprt to_expr() const;
   void from_expr(const exprt &expr);
-  
+
+  // the usual opertors  
   ieee_floatt &operator /= (const ieee_floatt &other);
   ieee_floatt &operator *= (const ieee_floatt &other);
   ieee_floatt &operator += (const ieee_floatt &other);
@@ -169,20 +187,13 @@ public:
   friend bool operator !=(const ieee_floatt &a, const ieee_floatt &b);
   friend bool operator ==(const ieee_floatt &a, int i);
 
-  // these do IEEE equality  
-  bool ieee_equal(const ieee_floatt &a, const ieee_floatt &b);
-  bool ieee_not_equal(const ieee_floatt &a, const ieee_floatt &b);
-
-  friend std::ostream& operator << (std::ostream &out, const ieee_floatt &f)
-  {
-    return out << f.to_ansi_c_string();
-  }
-  
+  // these do IEEE equality, i.e., NAN!=NAN
   friend bool ieee_equal(const ieee_floatt &a, const ieee_floatt &b);
   friend bool ieee_not_equal(const ieee_floatt &a, const ieee_floatt &b);
   
 protected:
   void divide_and_round(mp_integer &fraction, const mp_integer &factor);
+  void align();
 
   // we store the number unpacked
   bool sign;
