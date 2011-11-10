@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <std_types.h>
 #include <std_expr.h>
 #include <i2string.h>
-#include <bitvector.h>
 #include <fixedbv.h>
 #include <pointer_offset_size.h>
 #include <base_type.h>

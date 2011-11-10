@@ -72,8 +72,10 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
     return entry;
     
   entry.total_width=0;
+  
+  const irep_idt type_id=type.id();
 
-  if(type.id()==ID_struct)
+  if(type_id==ID_struct)
   {
     const struct_typet::componentst &components=
       to_struct_type(type).components();
@@ -91,7 +93,7 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
     
     entry.total_width=offset;
   }
-  else if(type.id()==ID_union)
+  else if(type_id==ID_union)
   {
     const union_typet::componentst &components=
       to_union_type(type).components();
@@ -109,24 +111,40 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
 
     entry.total_width=max_width;
   }
-  else if(type.id()==ID_bool)
+  else if(type_id==ID_bool)
     entry.total_width=1;
-  else if(type.id()==ID_signedbv ||
-          type.id()==ID_unsignedbv ||
-          type.id()==ID_floatbv ||
-          type.id()==ID_fixedbv ||
-          type.id()==ID_bv)
+  else if(type_id==ID_signedbv)
   {
-    entry.total_width=bv_width(type);
+    entry.total_width=to_signedbv_type(type).get_width();
     assert(entry.total_width!=0);
   }
-  else if(type.id()==ID_verilogbv)
+  else if(type_id==ID_unsignedbv)
+  {
+    entry.total_width=to_unsignedbv_type(type).get_width();
+    assert(entry.total_width!=0);
+  }
+  else if(type_id==ID_floatbv)
+  {
+    entry.total_width=to_floatbv_type(type).get_width();
+    assert(entry.total_width!=0);
+  }
+  else if(type_id==ID_fixedbv)
+  {
+    entry.total_width=to_fixedbv_type(type).get_width();
+    assert(entry.total_width!=0);
+  }
+  else if(type_id==ID_bv)
+  {
+    entry.total_width=to_bv_type(type).get_width();
+    assert(entry.total_width!=0);
+  }
+  else if(type_id==ID_verilogbv)
   {
     // we encode with two bits
     entry.total_width=type.get_int(ID_width)*2;
     assert(entry.total_width!=0);
   }
-  else if(type.id()==ID_range)
+  else if(type_id==ID_range)
   {
     mp_integer from=string2integer(type.get_string(ID_from)),
                  to=string2integer(type.get_string(ID_to));
@@ -139,7 +157,7 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
       assert(entry.total_width!=0);
     }
   }
-  else if(type.id()==ID_array)
+  else if(type_id==ID_array)
   {
     const array_typet &array_type=to_array_type(type);
     unsigned sub_width=operator()(array_type.subtype());
@@ -154,7 +172,7 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
     else
       entry.total_width=integer2long(array_size*sub_width);
   }
-  else if(type.id()==ID_vector)
+  else if(type_id==ID_vector)
   {
     const vector_typet &vector_type=to_vector_type(type);
     unsigned sub_width=operator()(vector_type.subtype());
@@ -169,10 +187,10 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
     else
       entry.total_width=integer2long(vector_size*sub_width);
   }
-  else if(type.id()==ID_code)
+  else if(type_id==ID_code)
   {
   }
-  else if(type.id()==ID_enum)
+  else if(type_id==ID_enum)
   {
     // get number of necessary bits
 
@@ -180,18 +198,18 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
     entry.total_width=integer2long(address_bits(size));
     assert(entry.total_width!=0);
   }
-  else if(type.id()==ID_c_enum ||
-          type.id()==ID_incomplete_c_enum)
+  else if(type_id==ID_c_enum ||
+          type_id==ID_incomplete_c_enum)
   {
     entry.total_width=type.get_int(ID_width);
     assert(entry.total_width!=0);
   }
-  else if(type.id()==ID_pointer ||
-          type.id()==ID_reference)
+  else if(type_id==ID_pointer ||
+          type_id==ID_reference)
   {
     entry.total_width=config.ansi_c.pointer_width;
   }
-  else if(type.id()==ID_symbol)
+  else if(type_id==ID_symbol)
     entry=get_entry(ns.follow(type));
   
   return entry;
