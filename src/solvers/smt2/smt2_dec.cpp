@@ -100,7 +100,7 @@ decision_proceduret::resultt smt2_dect::dec_solve()
 {
   post_process();
 
-  // this closes the SMT benchmark
+  // this closes the SMT2 file
   smt2_prop.finalize();
   temp_out.close();
 

@@ -18,7 +18,7 @@ class smt2_propt:public propt
 public:
   smt2_propt(
     const std::string &_benchmark,
-    const std::string &_notes,
+    const std::string &_source,
     const std::string &_logic,
     std::ostream &_out);
   virtual ~smt2_propt();
