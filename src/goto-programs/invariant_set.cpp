@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <std_expr.h>
 #include <simplify_expr.h>
 #include <base_type.h>
+#include <std_types.h>
 
 #include <ansi-c/c_types.h>
 #include <langapi/language_util.h>
@@ -154,20 +155,21 @@ Function: inv_object_storet::build_string
 std::string inv_object_storet::build_string(const exprt &expr) const
 {
   // we ignore some casts
-  if(expr.id()=="typecast")
+  if(expr.id()==ID_typecast)
   {
     assert(expr.operands().size()==1);
     
-    if(expr.type().id()=="signedbv" ||
-       expr.type().id()=="unsignedbv")
+    if(expr.type().id()==ID_signedbv ||
+       expr.type().id()==ID_unsignedbv)
     {
-      if(expr.op0().type().id()=="signedbv" ||
-         expr.op0().type().id()=="unsignedbv")
+      if(expr.op0().type().id()==ID_signedbv ||
+         expr.op0().type().id()==ID_unsignedbv)
       {
-        if(bv_width(expr.type())>=bv_width(expr.op0().type()))
+        if(to_bitvector_type(expr.type()).get_width()>=
+           to_bitvector_type(expr.op0().type()).get_width())
           return build_string(expr.op0());
       }
-      else if(expr.op0().type().id()=="bool")
+      else if(expr.op0().type().id()==ID_bool)
       {
         return build_string(expr.op0());
       }
@@ -179,8 +181,8 @@ std::string inv_object_storet::build_string(const exprt &expr) const
   if(expr.is_constant())
   {
     // NULL?
-    if(expr.type().id()=="pointer")
-      if(expr.get("value")=="NULL")
+    if(expr.type().id()==ID_pointer)
+      if(expr.get(ID_value)==ID_NULL)
         return "0";
   
     mp_integer i;
@@ -194,14 +196,14 @@ std::string inv_object_storet::build_string(const exprt &expr) const
   if(is_constant_address(expr))
     return from_expr(ns, "", expr);
   
-  if(expr.id()=="member")
+  if(expr.id()==ID_member)
   {
     assert(expr.operands().size()==1);
-    return build_string(expr.op0())+"."+expr.get_string("component_name");
+    return build_string(expr.op0())+"."+expr.get_string(ID_component_name);
   }
   
-  if(expr.id()=="symbol")
-    return expr.get_string("identifier");
+  if(expr.id()==ID_symbol)
+    return expr.get_string(ID_identifier);
 
   return "";
 }
@@ -240,9 +242,7 @@ Function: inv_object_storet::is_constant_address
 
 bool inv_object_storet::is_constant_address(const exprt &expr)
 {
-  if(expr.id()=="address_of" ||
-     expr.id()=="implicit_address_of" ||
-     expr.id()=="reference_to")
+  if(expr.id()==ID_address_of)
     if(expr.operands().size()==1)
       return is_constant_address_rec(expr.op0());
   
@@ -263,14 +263,14 @@ Function: inv_object_storet::is_constant_address_rec
 
 bool inv_object_storet::is_constant_address_rec(const exprt &expr)
 {
-  if(expr.id()=="symbol")
+  if(expr.id()==ID_symbol)
     return true;
-  else if(expr.id()=="member")
+  else if(expr.id()==ID_member)
   {
     assert(expr.operands().size()==1);
     return is_constant_address_rec(expr.op0());
   }
-  else if(expr.id()=="index")
+  else if(expr.id()==ID_index)
   {
     assert(expr.operands().size()==2);
     if(expr.op1().is_constant())
@@ -552,9 +552,9 @@ void invariant_sett::add_type_bounds(const exprt &expr, const typet &type)
 {
   if(expr.type()==type) return;
 
-  if(type.id()=="unsignedbv")
+  if(type.id()==ID_unsignedbv)
   {
-    unsigned op_width=bv_width(type);
+    unsigned op_width=to_unsignedbv_type(type).get_width();
 
     if(op_width<=8)
     {
@@ -599,7 +599,7 @@ Function: invariant_sett::strengthen_rec
 
 void invariant_sett::strengthen_rec(const exprt &expr)
 {
-  if(expr.type().id()!="bool")
+  if(expr.type().id()!=ID_bool)
     throw "non-Boolean argument to strengthen()";
 
   #if 0
@@ -621,11 +621,11 @@ void invariant_sett::strengthen_rec(const exprt &expr)
     // wow, that's strong
     make_false();
   }
-  else if(expr.id()=="not")
+  else if(expr.id()==ID_not)
   {
     // give up, we expect NNF
   }
-  else if(expr.id()=="and")
+  else if(expr.id()==ID_and)
   {
     forall_operands(it, expr)
       strengthen_rec(*it);
@@ -638,7 +638,7 @@ void invariant_sett::strengthen_rec(const exprt &expr)
     // special rule: x <= (a & b)
     // implies:      x<=a && x<=b
 
-    if(expr.op1().id()=="bitand")
+    if(expr.op1().id()==ID_bitand)
     {
       const exprt &bitand_op=expr.op1();
       
@@ -692,14 +692,14 @@ void invariant_sett::strengthen_rec(const exprt &expr)
     
     const typet &op_type=ns->follow(expr.op0().type());
     
-    if(op_type.id()=="struct")
+    if(op_type.id()==ID_struct)
     {
       const struct_typet &struct_type=to_struct_type(op_type);
   
       const struct_typet::componentst &c=struct_type.components();
   
-      exprt lhs_member_expr("member");
-      exprt rhs_member_expr("member");
+      exprt lhs_member_expr(ID_member);
+      exprt rhs_member_expr(ID_member);
       lhs_member_expr.copy_to_operands(expr.op0());
       rhs_member_expr.copy_to_operands(expr.op1());
   
@@ -708,10 +708,10 @@ void invariant_sett::strengthen_rec(const exprt &expr)
           it!=c.end();
           it++)
       {
-        const irep_idt &component_name=it->get("name");
+        const irep_idt &component_name=it->get(ID_name);
 
-        lhs_member_expr.set("component_name", component_name);
-        rhs_member_expr.set("component_name", component_name);
+        lhs_member_expr.set(ID_component_name, component_name);
+        rhs_member_expr.set(ID_component_name, component_name);
         lhs_member_expr.type()=it->type();
         rhs_member_expr.type()=it->type();
 
@@ -729,7 +729,7 @@ void invariant_sett::strengthen_rec(const exprt &expr)
     // special rule: x = (a & b)
     // implies:      x<=a && x<=b
 
-    if(expr.op1().id()=="bitand")
+    if(expr.op1().id()==ID_bitand)
     {
       const exprt &bitand_op=expr.op1();
       
@@ -743,7 +743,7 @@ void invariant_sett::strengthen_rec(const exprt &expr)
       
       return;
     }
-    else if(expr.op0().id()=="bitand")
+    else if(expr.op0().id()==ID_bitand)
     {
       exprt tmp(expr);
       std::swap(tmp.op0(), tmp.op1());
@@ -752,12 +752,12 @@ void invariant_sett::strengthen_rec(const exprt &expr)
     }
     
     // special rule: x = (type) y
-    if(expr.op1().id()=="typecast")
+    if(expr.op1().id()==ID_typecast)
     {
       assert(expr.op1().operands().size()==1);
       add_type_bounds(expr.op0(), expr.op1().op0().type());
     }
-    else if(expr.op0().id()=="typecast")
+    else if(expr.op0().id()==ID_typecast)
     {
       assert(expr.op0().operands().size()==1);
       add_type_bounds(expr.op1(), expr.op0().op0().type());
@@ -785,7 +785,7 @@ void invariant_sett::strengthen_rec(const exprt &expr)
     else if(!has_eq(p))
       add_eq(p);
   }
-  else if(expr.id()=="notequal")
+  else if(expr.id()==ID_notequal)
   {
     assert(expr.operands().size()==2);
     
@@ -836,7 +836,7 @@ Function: invariant_sett::implies
 
 tvt invariant_sett::implies_rec(const exprt &expr) const
 {
-  if(expr.type().id()!="bool")
+  if(expr.type().id()!=ID_bool)
     throw "implies: non-Boolean expression";
     
   #if 0
@@ -848,11 +848,11 @@ tvt invariant_sett::implies_rec(const exprt &expr) const
 
   if(expr.is_true())
     return tvt(true);
-  else if(expr.id()=="not")
+  else if(expr.id()==ID_not)
   {
     // give up, we expect NNF
   }
-  else if(expr.id()=="and")
+  else if(expr.id()==ID_and)
   {
     forall_operands(it, expr)
       if(implies_rec(*it)!=tvt(true))
@@ -860,7 +860,7 @@ tvt invariant_sett::implies_rec(const exprt &expr) const
       
     return tvt(true);
   }
-  else if(expr.id()=="or")
+  else if(expr.id()==ID_or)
   {
     forall_operands(it, expr)
       if(implies_rec(*it)==tvt(true))
@@ -869,7 +869,7 @@ tvt invariant_sett::implies_rec(const exprt &expr) const
   else if(expr.id()=="<=" ||
           expr.id()=="<" ||
           expr.id()=="=" ||
-          expr.id()=="notequal")
+          expr.id()==ID_notequal)
   {
     assert(expr.operands().size()==2);
 
@@ -906,7 +906,7 @@ tvt invariant_sett::implies_rec(const exprt &expr) const
     }
     else if(expr.id()=="=")
       return is_eq(p);
-    else if(expr.id()=="notequal")
+    else if(expr.id()==ID_notequal)
       return is_ne(p);
     else
       assert(false);
@@ -941,7 +941,7 @@ void invariant_sett::get_bounds(unsigned a, boundst &bounds) const
       return;
     }
     
-    if(e_a.type().id()=="unsignedbv")
+    if(e_a.type().id()==ID_unsignedbv)
       bounds=lower_interval(mp_integer(0));
   }
 
@@ -964,7 +964,7 @@ Function: invariant_sett::nnf
 
 void invariant_sett::nnf(exprt &expr, bool negate)
 {
-  if(expr.type().id()!="bool")
+  if(expr.type().id()!=ID_bool)
     throw "nnf: non-Boolean expression";
 
   if(expr.is_true())
@@ -975,7 +975,7 @@ void invariant_sett::nnf(exprt &expr, bool negate)
   {
     if(negate) expr.make_true();
   }
-  else if(expr.id()=="not")
+  else if(expr.id()==ID_not)
   {
     assert(expr.operands().size()==1);
     nnf(expr.op0(), !negate);
@@ -983,26 +983,26 @@ void invariant_sett::nnf(exprt &expr, bool negate)
     tmp.swap(expr.op0());
     expr.swap(tmp);
   }
-  else if(expr.id()=="and")
+  else if(expr.id()==ID_and)
   {
-    if(negate) expr.id("or");
+    if(negate) expr.id(ID_or);
     
     Forall_operands(it, expr)
       nnf(*it, negate);
   }
-  else if(expr.id()=="or")
+  else if(expr.id()==ID_or)
   {
-    if(negate) expr.id("and");
+    if(negate) expr.id(ID_and);
     
     Forall_operands(it, expr)
       nnf(*it, negate);
   }
-  else if(expr.id()=="typecast")
+  else if(expr.id()==ID_typecast)
   {
     assert(expr.operands().size()==1);
 
-    if(expr.op0().type().id()=="unsignedbv" ||
-       expr.op0().type().id()=="signedbv")
+    if(expr.op0().type().id()==ID_unsignedbv ||
+       expr.op0().type().id()==ID_signedbv)
     {
       equal_exprt tmp;
       tmp.lhs()=expr.op0();
@@ -1055,9 +1055,9 @@ void invariant_sett::nnf(exprt &expr, bool negate)
   }
   else if(expr.id()=="=")
   {
-    if(negate) expr.id("notequal");
+    if(negate) expr.id(ID_notequal);
   }
-  else if(expr.id()=="notequal")
+  else if(expr.id()==ID_notequal)
   {
     if(negate) expr.id("=");
   }
@@ -1083,16 +1083,14 @@ Function: invariant_sett::simplify
 void invariant_sett::simplify(
   exprt &expr) const
 {
-  if(expr.id()=="address_of" ||
-     expr.id()=="implicit_address_of" ||
-     expr.id()=="reference_to")
+  if(expr.id()==ID_address_of)
     return;
 
   Forall_operands(it, expr)
     simplify(*it);
 
-  if(expr.id()=="symbol" ||
-     expr.id()=="member")
+  if(expr.id()==ID_symbol ||
+     expr.id()==ID_member)
   {
     exprt tmp=get_constant(expr);
     if(tmp.is_not_nil())
@@ -1140,12 +1138,12 @@ exprt invariant_sett::get_constant(const exprt &expr) const
           mp_integer value;
           assert(!to_integer(e, value));
           
-          if(expr.type().id()=="pointer")
+          if(expr.type().id()==ID_pointer)
           {
             if(value==0)
             {
-              exprt tmp("constant", expr.type());
-              tmp.set("value", "NULL");
+              exprt tmp(ID_constant, expr.type());
+              tmp.set(ID_value, ID_NULL);
               return tmp;
             }
           }
@@ -1157,7 +1155,7 @@ exprt invariant_sett::get_constant(const exprt &expr) const
           if(e.type()==expr.type())
             return e;
             
-          exprt tmp("typecast", expr.type());
+          exprt tmp(ID_typecast, expr.type());
           tmp.copy_to_operands(e);
           return tmp;
         }
@@ -1346,17 +1344,17 @@ Function: invariant_sett::modifies
 
 void invariant_sett::modifies(const exprt &lhs)
 {
-  if(lhs.id()=="symbol" ||
-     lhs.id()=="member")
+  if(lhs.id()==ID_symbol ||
+     lhs.id()==ID_member)
   {
     unsigned a;
     if(!get_object(lhs, a)) modifies(a);
   }
-  else if(lhs.id()=="index")
+  else if(lhs.id()==ID_index)
   {
     // we don't track arrays
   }
-  else if(lhs.id()=="dereference")
+  else if(lhs.id()==ID_dereference)
   {
     // be very, very conservative for now
     make_true();
@@ -1366,14 +1364,14 @@ void invariant_sett::modifies(const exprt &lhs)
     // be very, very conservative for now
     make_true();
   }
-  else if(lhs.id()=="if")
+  else if(lhs.id()==ID_if)
   {
     // we just assume both are changed
     assert(lhs.operands().size()==3);
     modifies(lhs.op1());
     modifies(lhs.op2());
   }
-  else if(lhs.id()=="typecast")
+  else if(lhs.id()==ID_typecast)
   {
     // just go down
     assert(lhs.operands().size()==1);
@@ -1385,8 +1383,8 @@ void invariant_sett::modifies(const exprt &lhs)
   else if(lhs.id()=="dynamic_size")
   {
   }
-  else if(lhs.id()=="byte_extract_little_endian" ||
-          lhs.id()=="byte_extract_big_endian")
+  else if(lhs.id()==ID_byte_extract_little_endian ||
+          lhs.id()==ID_byte_extract_big_endian)
   {
     // just go down
     assert(lhs.operands().size()==2);
@@ -1448,53 +1446,53 @@ Function: invariant_sett::apply_code
 
 void invariant_sett::apply_code(const codet &code)
 {
-  const irep_idt &statement=code.get("statement");
+  const irep_idt &statement=code.get(ID_statement);
 
-  if(statement=="block")
+  if(statement==ID_block)
   {
     forall_operands(it, code)
       apply_code(to_code(*it));
   }
-  else if(statement=="assign" ||
-          statement=="init")
+  else if(statement==ID_assign ||
+          statement==ID_init)
   {
     if(code.operands().size()!=2)
       throw "assignment expected to have two operands";
 
     assignment(code.op0(), code.op1());
   }
-  else if(statement=="decl")
+  else if(statement==ID_decl)
   {
     if(code.operands().size()==2)
       assignment(code.op0(), code.op1());
     else
       modifies(code.op0());
   }
-  else if(statement=="expression")
+  else if(statement==ID_expression)
   {
     // this never modifies anything
   }
-  else if(statement=="function_call")
+  else if(statement==ID_function_call)
   {
     // may be a desaster
     make_true();
   }
-  else if(statement=="cpp_delete" ||
+  else if(statement==ID_cpp_delete ||
           statement=="cpp_delete[]")
   {
     // does nothing
   }
-  else if(statement=="free")
+  else if(statement==ID_free)
   {
     // does nothing
   }
-  else if(statement=="printf")
+  else if(statement==ID_printf)
   {
     // does nothing
   }
   else if(statement=="lock" || 
           statement=="unlock" ||
-          statement=="asm")
+          statement==ID_asm)
   {
     // ignore for now
   }
