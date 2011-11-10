@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <language_file.h>
 #include <language.h>
 #include <ui_message.h>
+#include <cmdline.h>
 
 class language_uit:public messaget
 {
