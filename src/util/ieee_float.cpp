@@ -354,6 +354,12 @@ void ieee_floatt::extract(
   mp_integer &_fraction,
   mp_integer &_exponent) const
 {
+  if(is_zero())
+  {
+    _fraction=_exponent=0;
+    return;
+  }
+
   _exponent=exponent;
   _fraction=fraction;
 
