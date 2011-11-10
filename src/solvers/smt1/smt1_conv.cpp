@@ -98,7 +98,7 @@ void smt1_convt::set_value(
      type.id()==ID_bv ||
      type.id()==ID_fixedbv)
   {
-    assert(v.size()==bv_width(type));
+    assert(v.size()==boolbv_width(type));
     constant_exprt c(type);
     c.set_value(v);
     identifier.value=c;
@@ -112,7 +112,7 @@ void smt1_convt::set_value(
   }
   else if(type.id()==ID_pointer)
   {
-    assert(v.size()==bv_width(type));
+    assert(v.size()==boolbv_width(type));
     
     unsigned i=v.size()-BV_ADDR_BITS;
 
@@ -202,7 +202,7 @@ void smt1_convt::convert_address_of_rec(
     smt1_prop.out
       << "(concat"
       << " bv" << pointer_logic.add_object(expr) << "[" << BV_ADDR_BITS << "]"
-      << " bv0[" << bv_width(result_type)-BV_ADDR_BITS << "]"
+      << " bv0[" << boolbv_width(result_type)-BV_ADDR_BITS << "]"
       << ")";
   }
   else if(expr.id()==ID_index)
@@ -259,7 +259,7 @@ void smt1_convt::convert_address_of_rec(
       mp_integer offset=member_offset(ns, struct_type, component_name);
 
       typet index_type(ID_unsignedbv);
-      index_type.set(ID_width, bv_width(result_type));
+      index_type.set(ID_width, boolbv_width(result_type));
 
       smt1_prop.out << "(bvadd ";
       convert_address_of_rec(struct_op, result_type);
@@ -837,20 +837,20 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
   {
     assert(expr.operands().size()==1);
     assert(expr.op0().type().id()==ID_pointer);
-    unsigned op_width=bv_width(expr.op0().type());
+    unsigned op_width=boolbv_width(expr.op0().type());
     smt1_prop.out << "(zero_extend[" << BV_ADDR_BITS << "] (extract["
                   << (op_width-1-BV_ADDR_BITS)
                   << ":0] ";
     convert_expr(expr.op0(), true);
     smt1_prop.out << "))";
-    assert(bv_width(expr.type())==op_width);
+    assert(boolbv_width(expr.type())==op_width);
   }
   else if(expr.id()==ID_pointer_object)
   {
     assert(expr.operands().size()==1);
     assert(expr.op0().type().id()==ID_pointer);
-    unsigned op_width=bv_width(expr.op0().type());
-    signed int ext=(int)bv_width(expr.type())-(int)BV_ADDR_BITS;
+    unsigned op_width=boolbv_width(expr.op0().type());
+    signed int ext=(int)boolbv_width(expr.type())-(int)BV_ADDR_BITS;
 
     if(ext>0)
       smt1_prop.out << "(zero_extend[" << ext << "] ";
@@ -870,8 +870,8 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
     assert(expr.op0().type().id()==ID_pointer);
     assert(expr.op1().type().id()==ID_pointer);
 
-    unsigned op0_width=bv_width(expr.op0().type());
-    unsigned op1_width=bv_width(expr.op1().type());
+    unsigned op0_width=boolbv_width(expr.op0().type());
+    unsigned op1_width=boolbv_width(expr.op1().type());
 
     // this may have to be converted
     from_bool_begin(expr.type(), bool_as_bv);
@@ -900,7 +900,7 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
   {
     assert(expr.operands().size()==1);
     assert(expr.op0().type().id()==ID_pointer);
-    unsigned op_width=bv_width(expr.op0().type());
+    unsigned op_width=boolbv_width(expr.op0().type());
 
     // this may have to be converted
     from_bool_begin(expr.type(), bool_as_bv);
@@ -1118,7 +1118,7 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
 
     const typet &op_type=expr.op0().type();
 
-    unsigned width=bv_width(op_type);
+    unsigned width=boolbv_width(op_type);
 
     if(op_type.id()==ID_signedbv)
     {
@@ -1274,13 +1274,13 @@ void smt1_convt::convert_typecast(const typecast_exprt &expr, bool bool_as_bv)
           expr_type.id()==ID_unsignedbv ||
           expr_type.id()==ID_c_enum)
   {
-    unsigned to_width=bv_width(expr_type);
+    unsigned to_width=boolbv_width(expr_type);
 
     if(op_type.id()==ID_signedbv || // from signedbv
        op_type.id()==ID_unsignedbv || // from unsigedbv
        op_type.id()==ID_c_enum)
     {
-      unsigned from_width=bv_width(op_type);
+      unsigned from_width=boolbv_width(op_type);
 
       if(from_width==to_width)
         convert_expr(op, true); // ignore
@@ -1349,7 +1349,7 @@ void smt1_convt::convert_typecast(const typecast_exprt &expr, bool bool_as_bv)
     }
     else if(op_type.id()==ID_pointer) // from pointer to int
     {
-      unsigned from_width=bv_width(op_type);
+      unsigned from_width=boolbv_width(op_type);
 
       if(from_width<to_width) // extend
       {
@@ -1485,7 +1485,7 @@ void smt1_convt::convert_typecast(const typecast_exprt &expr, bool bool_as_bv)
   }
   else if(expr_type.id()==ID_pointer)
   {
-    unsigned to_width=bv_width(expr_type);
+    unsigned to_width=boolbv_width(expr_type);
   
     if(op_type.id()==ID_pointer)
     {
@@ -1495,7 +1495,7 @@ void smt1_convt::convert_typecast(const typecast_exprt &expr, bool bool_as_bv)
     else if(op_type.id()==ID_unsignedbv ||
             op_type.id()==ID_signedbv)
     {
-      unsigned from_width=bv_width(op_type);
+      unsigned from_width=boolbv_width(op_type);
 
       if(from_width==to_width)
         convert_expr(op, true); // pass through
@@ -1651,7 +1651,7 @@ void smt1_convt::convert_constant(
     if(to_integer(expr, value))
       throw "failed to convert bitvector constant";
 
-    unsigned width=bv_width(expr.type());
+    unsigned width=boolbv_width(expr.type());
 
     if(value<0) value=power(2, width)+value;
 
@@ -1682,11 +1682,11 @@ void smt1_convt::convert_constant(
 
     if(value==ID_NULL)
     {
-      assert(bv_width(expr.type())!=0);
+      assert(boolbv_width(expr.type())!=0);
       smt1_prop.out << "(concat"
                     << " bv" << pointer_logic.get_null_object()
                     << "[" << BV_ADDR_BITS << "]"
-                    << " bv0[" << bv_width(expr.type())-BV_ADDR_BITS
+                    << " bv0[" << boolbv_width(expr.type())-BV_ADDR_BITS
                     << "]"
                     << ")"; // concat
     }
@@ -1788,7 +1788,7 @@ void smt1_convt::convert_is_dynamic_object(
 
   assert(expr.operands().size()==1);
   assert(expr.op0().type().id()==ID_pointer);
-  unsigned op_width=bv_width(expr.op0().type());
+  unsigned op_width=boolbv_width(expr.op0().type());
 
   // this may have to be converted
   from_bool_begin(expr.type(), bool_as_bv);
@@ -1954,7 +1954,7 @@ void smt1_convt::convert_plus(const exprt &expr)
       smt1_prop.out << "(bvmul ";
       convert_expr(i, true);
       smt1_prop.out << " bv" << element_size
-                    << "[" << bv_width(expr.type()) << "])";
+                    << "[" << boolbv_width(expr.type()) << "])";
     }
     else
       convert_expr(i, true);
@@ -1993,7 +1993,7 @@ void smt1_convt::convert_minus(const exprt &expr)
     smt1_prop.out << "(bvsub ";
 
     if(expr.op0().type().id()==ID_pointer)
-      smt1_prop.out << "(extract[" << bv_width(expr.op0().type())-1 << ":0] ";
+      smt1_prop.out << "(extract[" << boolbv_width(expr.op0().type())-1 << ":0] ";
     convert_expr(expr.op0(), true);
     if(expr.op0().type().id()==ID_pointer)
       smt1_prop.out << ")";
@@ -2001,7 +2001,7 @@ void smt1_convt::convert_minus(const exprt &expr)
     smt1_prop.out << " ";
 
     if(expr.op1().type().id()==ID_pointer)
-      smt1_prop.out << "(extract[" << bv_width(expr.op1().type())-1 << ":0] ";
+      smt1_prop.out << "(extract[" << boolbv_width(expr.op1().type())-1 << ":0] ";
     convert_expr(expr.op1(), true);
     if(expr.op1().type().id()==ID_pointer)
       smt1_prop.out << ")";
