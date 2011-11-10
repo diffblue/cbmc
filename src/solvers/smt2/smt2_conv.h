@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <hash_cont.h>
 
 #include <solvers/prop/prop_conv.h>
+#include <solvers/flattening/boolbv_width.h>
 #include <solvers/flattening/pointer_logic.h>
 
 #include "smt2_prop.h"
@@ -52,6 +53,7 @@ public:
     std::ostream &_out):
     smt2_prop_wrappert(_benchmark, _notes, _logic, _out),
     prop_convt(_ns, smt2_prop),
+    boolbv_width(_ns),
     pointer_logic(_ns),
     array_index_bits(32)
   { }
@@ -60,6 +62,8 @@ public:
   virtual resultt dec_solve();
 
 protected:
+  boolbv_widtht boolbv_width;
+
   // overloading
   virtual literalt convert(const exprt &expr);
   virtual void set_to(const exprt &expr, bool value);
