@@ -1466,11 +1466,8 @@ void smt2_convt::convert_constant(const constant_exprt &expr)
 
     if(value==ID_NULL)
     {
-      smt2_prop.out << "((_ tuple 2)"
-                    << " (_ bv" << pointer_logic.get_null_object()
-                    << " " << BV_ADDR_BITS << ")"
-                    << " (_ bv0 " << boolbv_width(expr.type())
-                    << "))";
+      smt2_prop.out << "(_ bv0 " << boolbv_width(expr.type())
+                    << ")";
     }
     else
       throw "unknown pointer constant: "+id2string(value);
@@ -2209,6 +2206,41 @@ void smt2_convt::set_to(const exprt &expr, bool value)
 
   smt2_prop.out << std::endl;
 
+  assert(expr.type().id()==ID_bool);
+  
+  // special treatment for "set_to(a=b, true)" where
+  // a is a new symbol
+
+  if(expr.id()==ID_equal && value==true)
+  {
+    const equal_exprt &equal_expr=to_equal_expr(expr);
+
+    if(equal_expr.lhs().id()==ID_symbol)
+    {
+      const irep_idt &identifier=to_symbol_expr(equal_expr.lhs()).get_identifier();
+      
+      if(identifier_map.find(identifier)==identifier_map.end())
+      {
+        identifiert &id=identifier_map[identifier];
+
+        assert(id.type.is_nil());
+
+        id.type=equal_expr.lhs().type();
+
+        smt2_prop.out << "(define-fun ; set_to true" << std::endl
+                      << " " << convert_identifier(identifier)
+                      << " () ";
+
+        convert_type(equal_expr.lhs().type());
+        smt2_prop.out << " ";
+        convert_expr(equal_expr.rhs());
+
+        smt2_prop.out << ")" << std::endl;
+        return; // done
+      }
+    }
+  }
+
   find_symbols(expr);
 
   #if 0
@@ -2219,8 +2251,6 @@ void smt2_convt::set_to(const exprt &expr, bool value)
   smt2_prop.out << "(assert ; set_to "
                 << (value?"true":"false") << std::endl
                 << " ";
-
-  assert(expr.type().id()==ID_bool);
 
   if(!value)
   {
