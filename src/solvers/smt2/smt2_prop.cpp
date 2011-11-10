@@ -30,7 +30,7 @@ smt2_propt::smt2_propt(
   const std::string &logic,
   std::ostream &_out):out(_out)
 {
-  out << "(set-info :source \"" << source << "\"" << std::endl;
+  out << "(set-info :source \"" << source << "\")" << std::endl;
   out << "(set-logic " << logic << ") ; SMT 2" << std::endl;
   _no_variables=0;
 }
