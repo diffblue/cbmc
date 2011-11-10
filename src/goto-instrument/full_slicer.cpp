@@ -192,12 +192,12 @@ object_id_sett full_slicert::transform(cfgt::iterator e)
   
   case FUNCTION_CALL:
     {
+      #if 0      
       // these are like assignments for the arguments
       // and for the LHS
       const code_function_callt &code_function_call=
         to_code_function_call(instruction.code);
 
-      #if 0      
       object_id_sett w;
       get_objects_w(code_function_call, w);
       
