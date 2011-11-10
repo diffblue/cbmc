@@ -116,9 +116,9 @@ protected:
   
   bool is_string_type(const typet &t) const
   {
-    return ((t.id()=="pointer" || t.id()=="array") && 
-            (t.subtype().id()=="signedbv" || t.subtype().id()=="unsignedbv") &&
-            (bv_width(t.subtype())==config.ansi_c.char_width));
+    return ((t.id()==ID_pointer || t.id()==ID_array) && 
+            (t.subtype().id()==ID_signedbv || t.subtype().id()==ID_unsignedbv) &&
+            (to_bitvector_type(t.subtype()).get_width()==config.ansi_c.char_width));
   }
   
   void invalidate_buffer(
