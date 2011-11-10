@@ -431,11 +431,11 @@ literalt smt2_convt::convert(const exprt &expr)
 
   find_symbols(expr);
 
-  literalt l=smt2_prop.new_variable();
-  smt2_prop.out << "(assert ; convert " << std::endl
-                << " (= " << smt2_prop.smt2_literal(l) << " ";
+  literalt l=smt2_prop.define_new_variable();
+  smt2_prop.out << "; convert " << std::endl
+                << " ";
   convert_expr(expr);
-  smt2_prop.out << "))" << std::endl;
+  smt2_prop.out << ")" << std::endl;
 
   return l;
 }
