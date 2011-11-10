@@ -47,7 +47,7 @@ exprt gen_zero(const typet &type)
           type_id==ID_fixedbv)
   {
     std::string value;
-    unsigned width=bv_width(type);
+    unsigned width=to_bitvector_type(type).get_width();
 
     for(unsigned i=0; i<width; i++)
       value+='0';
@@ -99,7 +99,7 @@ exprt gen_one(const typet &type)
           type_id==ID_c_enum)
   {
     std::string value;
-    unsigned width=bv_width(type);
+    unsigned width=to_bitvector_type(type).get_width();
     for(unsigned i=0; i<width-1; i++)
       value+='0';
     value+='1';
