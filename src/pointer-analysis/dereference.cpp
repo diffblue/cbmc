@@ -913,7 +913,7 @@ bool dereferencet::memory_model_bytes(
      pointer_offset_size(ns, to_type)==1)
   {
     // yes, can use 'index'
-    exprt result=index_exprt(value, offset, ns.follow(from_type).subtype());
+    result=index_exprt(value, offset, ns.follow(from_type).subtype());
     
     // possibly need to convert
     if(!base_type_eq(result.type(), to_type, ns))
