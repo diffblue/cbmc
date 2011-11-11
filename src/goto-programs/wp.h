@@ -28,4 +28,11 @@ exprt wp(
   const exprt &post,
   const namespacet &ns);
 
+/*! \brief approximate the non-deterministic choice
+           in a way cheaper than by (proper) quantification
+ * \ingroup gr_wp
+*/           
+           
+void approximate_nondet(exprt &dest);
+
 #endif
