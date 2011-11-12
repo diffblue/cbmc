@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <expr.h>
 #include <arith_tools.h>
 #include <std_types.h>
-#include <bitvector.h>
 #include <config.h>
 
 #include "pointer_offset_size.h"
