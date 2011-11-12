@@ -14,7 +14,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <simplify_expr.h>
 #include <i2string.h>
 #include <str_getline.h>
-#include <bitvector.h>
 #include <arith_tools.h>
 #include <std_expr.h>
 
@@ -332,14 +331,11 @@ void symex_slice_by_tracet::compute_ts_back(
 	    for (std::vector<irep_idt>::iterator k = sigma_vals[j].begin();
 		 k != sigma_vals[j].end(); k++) {
 	      
-	      exprt equal_cond=exprt("=", typet(ID_bool));
+	      exprt equal_cond=exprt(ID_equal, bool_typet());
 	      equal_cond.operands().reserve(2);
 	      equal_cond.copy_to_operands(*pvi);
 	      // Should eventually change to handle non-bv types!
-	      exprt constant_value = exprt(ID_constant, (*pvi).type());
-	      std::string bit_string = 
-		integer2binary(atoi(k->c_str()), bv_width((*pvi).type()));
-	      constant_value.set(ID_value, bit_string);
+	      exprt constant_value=from_integer(atoi(k->c_str()), (*pvi).type());
 	      equal_cond.move_to_operands(constant_value);
 	      eq_conds.push_back(equal_cond);
 	      pvi++;
