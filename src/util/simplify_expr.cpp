@@ -186,8 +186,10 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
         return false;
       }
 
-      if(expr_type_id==ID_unsignedbv || expr_type_id==ID_signedbv)
+      if(expr_type_id==ID_unsignedbv ||
+         expr_type_id==ID_signedbv)
       {
+        unsigned expr_width=to_bitvector_type(expr_type).get_width();
         new_expr.set(ID_value, integer2binary(int_value, expr_width));
         expr.swap(new_expr);
         return false;
@@ -271,6 +273,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
          expr_type_id==ID_signedbv ||
          expr_type_id==ID_bv)
       {
+        unsigned expr_width=to_bitvector_type(expr_type).get_width();
         new_expr.set(ID_value, integer2binary(int_value, expr_width));
         expr.swap(new_expr);
 
@@ -368,6 +371,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
          expr_type_id==ID_signedbv ||
          expr_type_id==ID_floatbv)
       {
+        unsigned expr_width=to_bitvector_type(expr_type).get_width();
         mp_integer int_value=binary2integer(
           id2string(value), false);
         new_expr.set(ID_value, integer2binary(int_value, expr_width));
@@ -1365,7 +1369,7 @@ bool simplify_exprt::simplify_bitwise(exprt &expr)
     
   // try to merge constants
   
-  unsigned width=bv_width(expr.type());
+  unsigned width=to_bitvector_type(expr.type()).get_width();
     
   while(expr.operands().size()>=2)
   {
@@ -1466,7 +1470,7 @@ bool simplify_exprt::simplify_extractbit(exprt &expr)
   if(!is_bitvector_type(op0_type))
     return true;
   
-  unsigned width=bv_width(op0_type);
+  unsigned width=to_bitvector_type(op0_type).get_width();
 
   assert(expr.operands().size()==2);
 
@@ -3864,7 +3868,7 @@ bool simplify_exprt::simplify_extractbits(exprt &expr)
 
   if(expr.op0().is_constant())
   {
-    unsigned width=bv_width(op0_type);
+    unsigned width=to_bitvector_type(op0_type).get_width();
     mp_integer start, end;
     
     if(to_integer(expr.op1(), start))
