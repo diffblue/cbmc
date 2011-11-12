@@ -354,7 +354,7 @@ void ieee_floatt::extract(
   mp_integer &_fraction,
   mp_integer &_exponent) const
 {
-  if(is_zero())
+  if(is_zero() || is_NaN() || is_infinity())
   {
     _fraction=_exponent=0;
     return;
