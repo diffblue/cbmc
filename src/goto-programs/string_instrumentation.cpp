@@ -12,7 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <message_stream.h>
 #include <arith_tools.h>
 #include <config.h>
-#include <bitvector.h>
 
 #include <goto-programs/format_strings.h>
 #include <ansi-c/c_types.h>

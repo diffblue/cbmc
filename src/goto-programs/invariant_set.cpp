@@ -9,7 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <context.h>
 #include <namespace.h>
 #include <expr_util.h>
-#include <bitvector.h>
 #include <arith_tools.h>
 #include <std_expr.h>
 #include <simplify_expr.h>

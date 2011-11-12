@@ -12,7 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <context.h>
 #include <message_stream.h>
 #include <config.h>
-#include <bitvector.h>
+#include <std_expr.h>
 
 #include "goto_functions.h"
 
@@ -80,22 +80,27 @@ protected:
   goto_programt::targett abstract_assign(goto_programt &dest, goto_programt::targett it);
   goto_programt::targett abstract_pointer_assign(goto_programt &dest, goto_programt::targett it);
   goto_programt::targett abstract_char_assign(goto_programt &dest, goto_programt::targett it);
+
   goto_programt::targett char_assign(
     goto_programt &dest,
     goto_programt::targett target,
     const exprt &new_lhs,
     const exprt &lhs,
     const exprt &rhs);
+
   void abstract_function_call(goto_programt &dest, goto_programt::targett it);
+
   goto_programt::targett abstract_return(goto_programt &dest, goto_programt::targett it);
 
   goto_programt::targett value_assignments(goto_programt &dest,
       goto_programt::targett it,
       const exprt& lhs, const exprt& rhs);
+
   goto_programt::targett value_assignments_if(
     goto_programt &dest,
     goto_programt::targett target,
-    const exprt& lhs, const if_exprt& rhs);
+    const exprt &lhs, const if_exprt &rhs);
+
   goto_programt::targett value_assignments_string_struct(
     goto_programt &dest,
     goto_programt::targett target,
@@ -109,6 +114,7 @@ protected:
     whatt what,
     bool write,
     const locationt &location);
+
   bool build(const exprt &object, exprt &dest, bool write);
   bool build_wrap(const exprt &object, exprt &dest, bool write);
   bool build_if(const if_exprt &o_if, exprt &dest, bool write);
@@ -116,6 +122,7 @@ protected:
   bool build_symbol(const symbol_exprt &sym, exprt &dest);
   bool build_symbol_constant(const mp_integer &zero_length,
       const mp_integer &buf_size, exprt &dest);
+
   exprt build_unknown(whatt what, bool write);
   exprt build_unknown(const typet &type, bool write);
   const typet& build_abstraction_type(const typet &type);
@@ -139,17 +146,21 @@ protected:
   void add_str_arguments(
       const irep_idt& name,
       goto_functionst::goto_functiont &fct);
+
   void add_argument(
     code_typet::argumentst &str_args,
     const symbolt &fct_symbol,
     const typet &type,
     const irep_idt &base_name,
     const irep_idt &identifier);
+
   void make_decl_and_def(goto_programt &dest, goto_programt::targett ref_instr,
     const irep_idt &identifier, const irep_idt &source_sym);
+
   exprt make_val_or_dummy_rec(goto_programt &dest,
       goto_programt::targett ref_instr,
       const symbolt &symbol, const typet &source_type);
+
   symbol_exprt add_dummy_symbol_and_value(
     goto_programt &dest,
     goto_programt::targett ref_instr,
@@ -157,9 +168,9 @@ protected:
     const irep_idt &component_name,
     const typet &type,
     const typet &source_type);
+
   void declare_define_locals(goto_programt &dest);
 };
-
 
 // keep track of length of strings
 

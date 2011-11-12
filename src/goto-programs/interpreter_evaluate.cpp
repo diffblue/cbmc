@@ -8,7 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <assert.h>
 
-#include <bitvector.h>
 #include <ieee_float.h>
 #include <fixedbv.h>
 #include <std_expr.h>
