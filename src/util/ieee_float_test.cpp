@@ -232,20 +232,20 @@ void check_nextafter(int i)
   
   i1.from_float(f1);
   i2 = i1;
-  i2.increment();
+  i2.increment(false);
   i3 = i1;
-  i3.decrement();
+  i3.decrement(false);
 
   if((f1 != i1.to_float() && !(f1 != f1 && i1.is_NaN())) ||
      (f2 != i2.to_float() && !(f2 != f2 && i2.is_NaN())) ||
      (f3 != i3.to_float() && !(f3 != f3 && i3.is_NaN())))
   {
     std::cout << "Incorrect nextafter: " << std::endl 
-              << "float: " << f1 << " " << f2 << " " << f3 << std::endl
+              << "mach float: " << f1 << " " << f2 << " " << f3 << std::endl
               << "ieee_float: " << i1.to_float() << " " 
                   << i2.to_float() << " " << i3.to_float() << std::endl;
     std::cout << "Binary representation: " << std::endl 
-              << "     float: " << float2binary(f1) << " " 
+              << "mach float: " << float2binary(f1) << " " 
               << float2binary(f2) << " " << float2binary(f3) << std::endl
               << "ieee_float: " << float2binary(i1.to_float()) << " " 
                   << float2binary(i2.to_float()) 
@@ -272,6 +272,21 @@ void check_minmax()
             << (t.to_float() == FLT_MIN) <<  ")" << std::endl;
 }
 
+void check_build_extract()
+{
+  float f = random_float();
+  ieee_floatt t;
+  t.from_float(f);
+
+  mp_integer old_frac, old_exp;
+  t.extract(old_frac, old_exp);
+  mp_integer frac_bak=old_frac, exp_bak=old_exp;
+  t.build(old_frac, old_exp);
+  t.extract(old_frac, old_exp);
+  if(frac_bak != old_frac || exp_bak != old_exp)
+    std::cout << "extract - build - extract is broken for " << t << std::endl;
+}
+
 int main()
 {
   srand(time(0));
@@ -284,5 +299,6 @@ int main()
     check_comparison(i);
     check_conversion(i);
     check_nextafter(i);
+    check_build_extract();
   }
 }

@@ -104,8 +104,6 @@ public:
   void make_fltmin();
 
   // set to next representable number towards plus or minus infinity
-  void next_representable(bool greater);
-
   void increment(bool distinguish_zero=false)
   { 
     if(is_zero() && get_sign() && distinguish_zero)
@@ -194,6 +192,7 @@ public:
 protected:
   void divide_and_round(mp_integer &fraction, const mp_integer &factor);
   void align();
+  void next_representable(bool greater);
 
   // we store the number unpacked
   bool sign;
