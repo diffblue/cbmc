@@ -240,8 +240,10 @@ exprt c_sizeoft::c_offsetof(
     else if(it->get_is_bit_field())
     {
       // this needs to be a signedbv/unsignedbv
+      // or an enum
       if(sub_type.id()!=ID_signedbv &&
-         sub_type.id()!=ID_unsignedbv)
+         sub_type.id()!=ID_unsignedbv &&
+         sub_type.id()!=ID_c_enum)
         return nil_exprt();
         
       // We just sum them up.
