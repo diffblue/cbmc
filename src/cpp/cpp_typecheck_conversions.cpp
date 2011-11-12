@@ -7,7 +7,6 @@ Author:
 \*******************************************************************/
 
 #include <config.h>
-#include <bitvector.h>
 #include <arith_tools.h>
 #include <expr_util.h>
 #include <std_types.h>
