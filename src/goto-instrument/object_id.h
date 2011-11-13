@@ -25,6 +25,11 @@ public:
     id=symbol_expr.get_identifier();
   }
   
+  explicit object_idt(const irep_idt &identifier)
+  {
+    id=identifier;
+  }
+  
   friend std::ostream &operator << (std::ostream &out, const object_idt &x)
   {
     return out << x.id;
@@ -47,5 +52,7 @@ typedef std::set<object_idt> object_id_sett;
 void get_objects(const exprt &expr, object_id_sett &dest);
 void get_objects_r(const code_assignt &assign, object_id_sett &);
 void get_objects_w(const code_assignt &assign, object_id_sett &);
+void get_objects_w_lhs(const exprt &lhs, object_id_sett &);
+void get_objects_r_lhs(const exprt &lhs, object_id_sett &);
 
 #endif
