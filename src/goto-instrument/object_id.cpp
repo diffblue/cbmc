@@ -130,3 +130,37 @@ void get_objects_w(const code_assignt &assign, object_id_sett &dest)
   get_objects_rec(LHS_W, assign.lhs(), dest, "");
 }
 
+/*******************************************************************\
+
+Function: get_objects_w_lhs
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void get_objects_w(const exprt &lhs, object_id_sett &dest)
+{
+  get_objects_rec(LHS_W, lhs, dest, "");
+}
+
+/*******************************************************************\
+
+Function: get_objects_r_lhs
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void get_objects_r_lhs(const exprt &lhs, object_id_sett &dest)
+{
+  get_objects_rec(LHS_R, lhs, dest, "");
+}
+
