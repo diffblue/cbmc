@@ -36,8 +36,11 @@ void full_slicert::fixedpoint()
     if(e_it->first->is_assert())
     {
       get_objects(e_it->first->guard, e_it->second.required_objects);
+      e_it->second.node_required=true;
       queue.push(&e_it->second);
     }
+    else if(e_it->first->is_end_function())
+      e_it->second.node_required=true; // always retained
 
   // process queue until empty
   while(!queue.empty())
@@ -90,8 +93,7 @@ void full_slicert::slice(goto_functionst &goto_functions)
       Forall_goto_program_instructions(i_it, f_it->second.body)
       {
         const cfgt::entryt &e=cfg.entry_map[i_it];
-        if(!e.node_required &&
-           !i_it->is_end_function())
+        if(!e.node_required)
           i_it->make_skip();
       }
     }
