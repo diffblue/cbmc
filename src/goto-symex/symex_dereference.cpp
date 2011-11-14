@@ -8,10 +8,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <simplify_expr.h>
 #include <expr_util.h>
+#include <pointer_offset_size.h>
+#include <arith_tools.h>
 
 #include <pointer-analysis/dereference.h>
 #include <pointer-analysis/rewrite_index.h>
 #include <langapi/language_util.h>
+#include <ansi-c/c_types.h>
 
 #include "goto_symex.h"
 #include "renaming_ns.h"
@@ -67,6 +70,104 @@ void goto_symext::dereference_rec_address_of(
     
     dereference_rec(expr, state, guard, false);
   }
+}
+
+/*******************************************************************\
+
+Function: goto_symext::is_index_member_symbol_if
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool goto_symext::is_index_member_symbol_if(const exprt &expr)
+{
+  // Could be member, could be if, could be index.
+
+  if(expr.id()==ID_member)
+  {
+    return is_index_member_symbol_if(
+      to_member_expr(expr).struct_op());
+  }
+  else if(expr.id()==ID_if)
+  {
+    return
+      is_index_member_symbol_if(to_if_expr(expr).true_case()) &&
+      is_index_member_symbol_if(to_if_expr(expr).false_case());
+  }
+  else if(expr.id()==ID_index)
+  {
+    return is_index_member_symbol_if(to_index_expr(expr).array());
+  }
+  else if(expr.id()==ID_symbol)
+    return true;
+  else
+    return false;
+}
+
+/*******************************************************************\
+
+Function: goto_symext::address_arithmetic
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+exprt goto_symext::address_arithmetic(
+  const exprt &expr,
+  statet &state,
+  guardt &guard)
+{
+  if(expr.id()==ID_index)
+  {
+    exprt base=address_arithmetic(to_index_expr(expr).array(), state, guard);
+    exprt sum=exprt(ID_plus, base.type());
+    sum.copy_to_operands(base, to_index_expr(expr).index());
+    dereference_rec(sum.op1(), state, guard, false);
+    return sum;
+  }
+  else if(expr.id()==ID_member)
+  {
+    const exprt &struct_op=to_member_expr(expr).struct_op();
+  
+    const typet &type=ns.follow(struct_op.type());
+    
+    assert(type.id()==ID_struct ||
+           type.id()==ID_union);
+
+    exprt base=address_arithmetic(struct_op, state, guard);
+
+    if(type.id()==ID_union)
+      return typecast_exprt(base, pointer_typet(expr.type()));
+
+    // do (member_type *)((char *)base)+offset
+    typecast_exprt tc1(base, pointer_typet(char_type()));
+
+    mp_integer offset=member_offset(
+        ns, to_struct_type(type),
+        to_member_expr(expr).get_component_name());
+
+    if(offset>=0)
+    {
+      exprt sum=exprt(ID_plus, tc1.type());
+      sum.copy_to_operands(tc1, from_integer(offset, size_type()));
+    
+      return typecast_exprt(sum, pointer_typet(expr.type()));
+    }
+  }
+
+  // give up, just dereference
+  exprt tmp=expr;
+  dereference_rec_address_of(tmp, state, guard);
+  return address_of_exprt(tmp);
 }
 
 /*******************************************************************\
@@ -159,7 +260,7 @@ void goto_symext::dereference_rec(
     address_of_exprt &address_of_expr=to_address_of_expr(expr);
     
     exprt &object=address_of_expr.object();
-  
+
     if(object.id()==ID_dereference)
     {
       // ANSI-C guarantees &*p == p no matter what p is,
@@ -171,25 +272,16 @@ void goto_symext::dereference_rec(
       // do rec. call, as p itself might have dereferencing in it
       dereference_rec(expr, state, guard, false);
     }
+    else if(is_index_member_symbol_if(object))
+    {
+      // simply dereference, this yields "&object"
+      dereference_rec_address_of(object, state, guard);
+    }
     else
     {
-      // We first try the simplifier: this is to support stuff like
-      // ((char *)&((type *) 0)->mem - (char *)((type *) 0)))
-      // If this fails, we simply dereference.
-
-      exprt tmp_copy=expr;
-      simplify(tmp_copy, ns);
-
-      if(tmp_copy.is_constant() ||
-         (tmp_copy.id()==ID_typecast &&
-          tmp_copy.operands().size()==1 &&
-          tmp_copy.op0().is_constant()))
-      {
-        tmp_copy.location()=expr.location();
-        expr=tmp_copy;
-      }
-      else
-        dereference_rec_address_of(object, state, guard);
+      // fallback: do address arithmetic
+      exprt result=address_arithmetic(object, state, guard);
+      expr.swap(result);
     }
   }
   else
