@@ -159,8 +159,15 @@ exprt goto_symext::address_arithmetic(
     {
       exprt sum=exprt(ID_plus, tc1.type());
       sum.copy_to_operands(tc1, from_integer(offset, size_type()));
+      
+      pointer_typet dest_type;
+
+      if(expr.type().id()==ID_array)
+        dest_type.subtype()=expr.type().subtype();
+      else
+        dest_type.subtype()=expr.type();
     
-      return typecast_exprt(sum, pointer_typet(expr.type()));
+      return typecast_exprt(sum, dest_type);
     }
   }
   else if(expr.id()==ID_dereference)
