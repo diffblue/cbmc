@@ -1,6 +1,6 @@
 SRC = c_typecast.cpp y.tab.cpp lex.yy.cpp ansi_c_parser.cpp \
       expr2c.cpp ansi_c_language.cpp c_sizeof.cpp c_main.cpp \
-      c_types.cpp c_final.cpp trans_unit.cpp ansi_c_typecheck.cpp \
+      c_types.cpp trans_unit.cpp ansi_c_typecheck.cpp \
       c_link.cpp c_preprocess.cpp c_link_type_eq.cpp \
       c_typecheck_base.cpp c_typecheck_initializer.cpp \
       c_typecheck_typecast.cpp c_typecheck_code.cpp \
