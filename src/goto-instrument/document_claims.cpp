@@ -173,23 +173,6 @@ std::string escape_html(const std::string &s)
 
 /*******************************************************************\
 
-Function: emphasize
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-std::string emphasize(const std::string &s)
-{
-  return "{\\ttb{}"+s+"}";
-}
-
-/*******************************************************************\
-
 Function: is_empty
 
   Inputs:
@@ -306,13 +289,36 @@ void document_claimst::get_code(
   {
     std::string line_no=i2string(it->line_number);
 
-    while(line_no.size()<4)
-      line_no=" "+line_no;
+    std::string tmp;
 
-    std::string tmp=line_no+"  "+escape_latex(it->text, true);
+    switch(format)
+    {
+    case LATEX:
+      while(line_no.size()<4)
+        line_no=" "+line_no;
+    
+      line_no+"  ";
+    
+      tmp+=escape_latex(it->text, true);
 
-    if(it->line_number==line_int)
-      tmp=emphasize(tmp);
+      if(it->line_number==line_int)
+        tmp="{\\ttb{}"+tmp+"}";
+        
+      break;
+      
+    case HTML:
+      while(line_no.size()<4)
+        line_no="&nbsp;"+line_no;
+    
+      line_no+"&nbsp;&nbsp;";
+    
+      tmp+=escape_html(it->text);
+
+      if(it->line_number==line_int)
+        tmp="<em>"+tmp+"</em>";
+        
+      break;
+    }
 
     dest+=tmp+"\n";
   }
@@ -363,29 +369,61 @@ void document_claimst::doit()
 
     get_code(location, code);
 
-    out << "\\claimlocation{File "
-        << escape_latex(location.get_string("file"), false)
-        << " function "
-        << escape_latex(location.get_string("function"), false)
-        << "}" << std::endl;
-
-    out << std::endl;
-
-    for(std::set<irep_idt>::const_iterator
-        s_it=it->second.comment_set.begin();
-        s_it!=it->second.comment_set.end();
-        s_it++)
-      out << "\\claim{" << escape_latex(id2string(*s_it), false)
+    switch(format)
+    {
+    case LATEX:
+      out << "\\claimlocation{File "
+          << escape_latex(location.get_string("file"), false)
+          << " function "
+          << escape_latex(location.get_string("function"), false)
           << "}" << std::endl;
 
-    out << std::endl;
+      out << std::endl;
 
-    out << "\\begin{alltt}\\claimcode\n"
-        << code
-        << "\\end{alltt}\n";
+      for(std::set<irep_idt>::const_iterator
+          s_it=it->second.comment_set.begin();
+          s_it!=it->second.comment_set.end();
+          s_it++)
+        out << "\\claim{" << escape_latex(id2string(*s_it), false)
+            << "}" << std::endl;
 
-    out << std::endl;
-    out << std::endl;
+      out << std::endl;
+
+      out << "\\begin{alltt}\\claimcode\n"
+          << code
+          << "\\end{alltt}\n";
+
+      out << std::endl;
+      out << std::endl;
+      break;
+    
+    case HTML:
+      out << "<div class=\"claim\"><div class=\"location\">File "
+          << escape_html(location.get_string("file"))
+          << " function "
+          << escape_html(location.get_string("function"))
+          << "</div>" << std::endl;
+
+      out << std::endl;
+
+      for(std::set<irep_idt>::const_iterator
+          s_it=it->second.comment_set.begin();
+          s_it!=it->second.comment_set.end();
+          s_it++)
+        out << "<div class=\"description\">" << std::endl
+            << escape_html(id2string(*s_it)) << std::endl
+            << "</div>" << std::endl;
+
+      out << std::endl;
+
+      out << "<div class=\"code\">\n"
+          << code
+          << "</div>" << std::endl;
+
+      out << "</div>" << std::endl;
+      out << std::endl;
+      break;
+    }
   }
 }
 
