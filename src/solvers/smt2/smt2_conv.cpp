@@ -110,15 +110,13 @@ void smt2_convt::set_value(
   else if(type.id()==ID_pointer)
   {
     // TODO
-    #if 0
-    assert(v.size()==boolbv_width(type);
+    assert(v.size()==boolbv_width(type));
 
     pointer_logict::pointert p;
     p.object=integer2long(binary2integer(std::string(v, 0, BV_ADDR_BITS), false));
     p.offset=binary2integer(std::string(v, BV_ADDR_BITS, std::string::npos), true);
 
     identifier.value=pointer_logic.pointer_expr(p, type);
-    #endif
   }
   else if(type.id()==ID_struct)
   {
@@ -192,7 +190,7 @@ void smt2_convt::convert_address_of_rec(
      expr.id()==ID_label)
   {
     smt2_prop.out
-      << "((_ tuple 2) (_ bv"
+      << "(concat (_ bv"
       << pointer_logic.add_object(expr) << " " << BV_ADDR_BITS << ")"
       << " (_ bv0 " << boolbv_width(result_type)-BV_ADDR_BITS << "))";
   }
@@ -252,6 +250,7 @@ void smt2_convt::convert_address_of_rec(
       typet index_type(ID_unsignedbv);
       index_type.set(ID_width, boolbv_width(result_type));
 
+      // pointer arithmetic
       smt2_prop.out << "(bvadd ";
       convert_address_of_rec(struct_op, result_type);
       convert_expr(from_integer(offset, index_type));
@@ -725,35 +724,55 @@ void smt2_convt::convert_expr(const exprt &expr)
   {
     assert(expr.operands().size()==1);
     assert(expr.op0().type().id()==ID_pointer);
-    smt2_prop.out << "((_ project 2 2) ";
+    unsigned offset_bits=boolbv_width(expr.op0().type())-BV_ADDR_BITS;
+    unsigned result_width=boolbv_width(expr.type());
+
+    // max extract width    
+    if(offset_bits>result_width) offset_bits=result_width;
+    
+    // too few bits?
+    if(result_width>offset_bits)
+      smt2_prop.out << "((_ zero_extend " << result_width-offset_bits << ") ";
+    
+    smt2_prop.out << "((_ extract " << offset_bits-1 << " 0) ";
     convert_expr(expr.op0());
     smt2_prop.out << ")";
+
+    if(result_width>offset_bits)
+      smt2_prop.out << ")"; // zero_extend
   }
   else if(expr.id()==ID_pointer_object)
   {
     assert(expr.operands().size()==1);
     assert(expr.op0().type().id()==ID_pointer);
     unsigned ext=boolbv_width(expr.type())-BV_ADDR_BITS;
+    unsigned pointer_width=boolbv_width(expr.op0().type());
 
     if(ext>0)
       smt2_prop.out << "((_ zero_extend " << ext << ") ";
 
-    smt2_prop.out << "((_ project 2 1) ";
+    smt2_prop.out << "((_ extract "
+                  << pointer_width-1 << " "
+                  << pointer_width-BV_ADDR_BITS << ") ";
     convert_expr(expr.op0());
     smt2_prop.out << ")";
 
     if(ext>0)
-      smt2_prop.out << ")";
+      smt2_prop.out << ")"; // zero_extend
   }
   else if(expr.id()=="same-object")
   {
     assert(expr.operands().size()==2);
+    unsigned pointer_width0=boolbv_width(expr.op0().type());
+    unsigned pointer_width1=boolbv_width(expr.op1().type());
 
-    smt2_prop.out << "(= ((_ project 2 1) ";
+    smt2_prop.out << "(= ((_ extract " << pointer_width0-1
+                  << " " << pointer_width0-BV_ADDR_BITS << ") ";
     convert_expr(expr.op0());
     smt2_prop.out << ")";
 
-    smt2_prop.out << " ((_ project 2 1) ";
+    smt2_prop.out << " ((_ extract " << pointer_width1-1
+                  << " " << pointer_width1-BV_ADDR_BITS << ") ";
     convert_expr(expr.op1());
     smt2_prop.out << "))";
   }
@@ -765,7 +784,10 @@ void smt2_convt::convert_expr(const exprt &expr)
   {
     assert(expr.operands().size()==1);
 
-    smt2_prop.out << "(= ((_ project 2 1) ";
+    unsigned pointer_width=boolbv_width(expr.op0().type());
+    smt2_prop.out << "(= ((_ extract "
+                  << pointer_width-1 << " "
+                  << pointer_width-BV_ADDR_BITS << ") ";
     convert_expr(expr.op0());
     smt2_prop.out << ") (_ bv" << pointer_logic.get_invalid_object()
                   << " " << BV_ADDR_BITS << "))";
@@ -1131,16 +1153,15 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
       {
         smt2_prop.out << "((_ sign_extend ";
         smt2_prop.out << (to_width-from_width)
-                      << ") (_ project 2 2) ";
+                      << ") ";
         convert_expr(op);
-        smt2_prop.out << "))";
+        smt2_prop.out << ")";
       }
       else // chop off extra bits
       {
-        smt2_prop.out << "((_ extract " << (to_width-1) << " 0) "
-                      << "(_ project 2 2) ";
+        smt2_prop.out << "((_ extract " << (to_width-1) << " 0) ";
         convert_expr(op);
-        smt2_prop.out << "))";
+        smt2_prop.out << ")";
       }
     }
     else
@@ -1274,10 +1295,9 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
     else if(op_type.id()==ID_unsigned ||
             op_type.id()==ID_signedbv)
     {
+      // integer to pointer
+    
       unsigned from_width=boolbv_width(op_type);
-      smt2_prop.out << "(_ tuple 2 "
-                    << "(_ bv" << pointer_logic.get_null_object()
-                    << BV_ADDR_BITS << ") ";
 
       if(from_width==to_width)
         convert_expr(op);
@@ -1295,8 +1315,6 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
         convert_expr(op);
         smt2_prop.out << ")"; // extract
       }
-        
-      smt2_prop.out << ")"; // tuple
     }
     else
       throw "TODO typecast3 "+op_type.id_string()+" -> pointer";
@@ -1585,7 +1603,11 @@ void smt2_convt::convert_is_dynamic_object(const exprt &expr)
     smt2_prop.out << "false";
   else
   {
-    smt2_prop.out << "(let ((?obj ((_ project 2 1) ";
+    unsigned pointer_width=boolbv_width(expr.op0().type());
+  
+    smt2_prop.out << "(let ((?obj ((_ extract " 
+                  << pointer_width-1 << " "
+                  << pointer_width-BV_ADDR_BITS << ") ";
     convert_expr(expr.op0());
     smt2_prop.out << "))) ";
 
