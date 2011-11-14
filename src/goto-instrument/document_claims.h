@@ -10,7 +10,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/goto_functions.h>
 
-void document_claims(
+void document_claims_latex(
+  const namespacet &ns,
+  const goto_functionst &goto_functions,
+  std::ostream &out);
+
+void document_claims_html(
   const namespacet &ns,
   const goto_functionst &goto_functions,
   std::ostream &out);
