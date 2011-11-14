@@ -172,10 +172,17 @@ int goto_instrument_parseoptionst::doit()
       return 0;
     }
 
-    if(cmdline.isset("document-claims"))
+    if(cmdline.isset("document-claims-html"))
     {
       const namespacet ns(context);
-      document_claims(ns, goto_functions, std::cout);
+      document_claims_html(ns, goto_functions, std::cout);
+      return 0;
+    }
+
+    if(cmdline.isset("document-claims-latex"))
+    {
+      const namespacet ns(context);
+      document_claims_latex(ns, goto_functions, std::cout);
       return 0;
     }
 
@@ -511,7 +518,8 @@ void goto_instrument_parseoptionst::help()
     "Main options:\n"
     " --show-loops                 show the loops in the program\n"
     " --show-claims                show claims\n"
-    " --document-claims            generate claim documentation\n"
+    " --document-claims-html       generate HTML claim documentation\n"
+    " --document-claims-latex      generate Latex claim documentation\n"
     " --show-symbol-table          show symbol table\n"
     " --show-goto-functions        show goto program\n"
     " --show-struct-alignment      show struct members that might be concurrently accessed\n"

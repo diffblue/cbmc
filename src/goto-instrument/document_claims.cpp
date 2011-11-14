@@ -15,15 +15,61 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #define MAXWIDTH 62
 
-struct linet
+class document_claimst
 {
-  std::string text;
-  int line_number;
+public:
+  document_claimst(
+    const namespacet &_ns,
+    const goto_functionst &_goto_functions,
+    std::ostream &_out):
+    ns(_ns),
+    goto_functions(_goto_functions),
+    out(_out)
+  {
+  }
+  
+  void html()
+  {
+    format=HTML;
+    doit();
+  }
+
+  void latex()
+  {
+    format=LATEX;
+    doit();
+  }
+
+private:
+  const namespacet &ns;
+  const goto_functionst &goto_functions;
+  std::ostream &out;
+    
+  struct linet
+  {
+    std::string text;
+    int line_number;
+  };
+
+  static void strip_space(std::list<linet> &lines);
+
+  void get_code(
+    const locationt &location,
+    std::string &dest);
+    
+  struct doc_claimt
+  {
+    std::set<irep_idt> comment_set;
+  };
+
+  enum { HTML, LATEX } format;
+  
+  void doit();
 };
 
 /*******************************************************************\
 
-Function: strip_space
+Function: document_claimst::strip_space
 
   Inputs:
 
@@ -33,7 +79,7 @@ Function: strip_space
 
 \*******************************************************************/
 
-void strip_space(std::list<linet> &lines)
+void document_claimst::strip_space(std::list<linet> &lines)
 {
   unsigned strip=50;
 
@@ -97,6 +143,36 @@ std::string escape_latex(const std::string &s, bool alltt)
 
 /*******************************************************************\
 
+Function: escape_html
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+std::string escape_html(const std::string &s)
+{
+  std::string dest;
+
+  for(unsigned i=0; i<s.size(); i++)
+  {
+    switch(s[i])
+    {
+    case '&': dest+="&amp;"; break;
+    case '<': dest+="&lt;"; break;
+    case '>': dest+="&gt;"; break;
+    default: dest+=s[i];
+    }
+  }
+
+  return dest;
+}
+
+/*******************************************************************\
+
 Function: emphasize
 
   Inputs:
@@ -109,35 +185,7 @@ Function: emphasize
 
 std::string emphasize(const std::string &s)
 {
-  #if 0
-  std::string dest;
-  bool bold_mode=false;
-
-  for(unsigned i=0; i<s.size(); i++)
-  {
-    bool new_mode=isalnum(s[i]) ||
-                  s[i]=='.' || s[i]==',';
-
-    if(new_mode!=bold_mode)
-    {
-      if(new_mode)
-        dest+="{\\bf{";
-      else
-        dest+="}}";
-      
-      bold_mode=new_mode;
-    }
-
-    dest+=s[i];
-  }
-
-  if(bold_mode)
-    dest+="}}";
-
-  return dest;
-  #else
   return "{\\ttb{}"+s+"}";
-  #endif
 }
 
 /*******************************************************************\
@@ -163,7 +211,7 @@ bool is_empty(const std::string &s)
 
 /*******************************************************************\
 
-Function: get_code
+Function: document_claimst::get_code
 
   Inputs:
 
@@ -173,12 +221,14 @@ Function: get_code
 
 \*******************************************************************/
 
-void get_code(const irept &location, std::string &dest)
+void document_claimst::get_code(
+  const locationt &location,
+  std::string &dest)
 {
   dest="";
 
-  const irep_idt &file=location.get("file");
-  const irep_idt &line=location.get("line");
+  const irep_idt &file=location.get_file();
+  const irep_idt &line=location.get_line();
 
   if(file=="" || line=="") return;
 
@@ -186,7 +236,7 @@ void get_code(const irept &location, std::string &dest)
 
   if(!in)
   {
-    dest+="unable to open ";
+    dest+="ERROR: unable to open ";
     dest+=id2string(file);
     dest+="\n";
     return;
@@ -270,7 +320,7 @@ void get_code(const irept &location, std::string &dest)
 
 /*******************************************************************\
 
-Function: document_claims
+Function: document_claimst::doit
 
   Inputs:
 
@@ -280,17 +330,9 @@ Function: document_claims
 
 \*******************************************************************/
 
-struct doc_claimt
+void document_claimst::doit()
 {
-  std::set<irep_idt> comment_set;
-};
-
-void document_claims(
-  const namespacet &ns,
-  const goto_functionst &goto_functions,
-  std::ostream &out)
-{
-  typedef std::map<irept, doc_claimt> claim_sett;
+  typedef std::map<locationt, doc_claimt> claim_sett;
   claim_sett claim_set;
 
   forall_goto_functions(f_it, goto_functions)
@@ -303,12 +345,12 @@ void document_claims(
       {
         locationt new_location;
 
-        new_location.set("file", i_it->location.get("file"));
-        new_location.set("line", i_it->location.get("line"));
-        new_location.set("function", i_it->location.get("function"));
+        new_location.set_file(i_it->location.get_file());
+        new_location.set_line(i_it->location.get_line());
+        new_location.set_function(i_it->location.get_function());
 
         claim_set[new_location].comment_set.
-          insert(i_it->location.get("comment"));
+          insert(i_it->location.get_comment());
       }
     }
   }
@@ -317,7 +359,7 @@ void document_claims(
       it!=claim_set.end(); it++)
   {
     std::string code;
-    const irept &location=it->first;
+    const locationt &location=it->first;
 
     get_code(location, code);
 
@@ -346,3 +388,44 @@ void document_claims(
     out << std::endl;
   }
 }
+
+/*******************************************************************\
+
+Function: document_claims_html
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void document_claims_html(
+  const namespacet &ns,
+  const goto_functionst &goto_functions,
+  std::ostream &out)
+{
+  document_claimst(ns, goto_functions, out).html();
+}
+
+/*******************************************************************\
+
+Function: document_claims_latex
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void document_claims_latex(
+  const namespacet &ns,
+  const goto_functionst &goto_functions,
+  std::ostream &out)
+{
+  document_claimst(ns, goto_functions, out).latex();
+}
+

@@ -16,7 +16,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/goto_functions.h>
 
 #define GOTO_INSTRUMENT_OPTIONS \
-  "(all)(document-claims)(dump-c)" \
+  "(all)" \
+  "(document-claims-latex)(document-claims-html)" \
+  "(dump-c)" \
   "(bounds-check)(no-bounds-check)" \
   "(pointer-check)(no-pointer-check)" \
   "(remove-pointers)" \
