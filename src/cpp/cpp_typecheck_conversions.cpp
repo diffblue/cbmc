@@ -52,10 +52,10 @@ bool cpp_typecheckt::standard_conversion_lvalue_to_rvalue(
 {
   assert(expr.get_bool(ID_C_lvalue));
 
-  if(expr.type().id()== ID_code ||
-     expr.type().id()== ID_incomplete_array || 
-     expr.type().id()== ID_incomplete_struct ||
-     expr.type().id()== ID_incomplete_union)
+  if(expr.type().id()==ID_code ||
+     expr.type().id()==ID_incomplete_array || 
+     expr.type().id()==ID_incomplete_struct ||
+     expr.type().id()==ID_incomplete_union)
     return false;
 
   new_expr=expr;
@@ -2116,8 +2116,8 @@ bool cpp_typecheckt::reinterpret_typecast(
         return false;
     }
 
-    if(e.type().id() == ID_array ||
-       e.type().id() == ID_incomplete_array )
+    if(e.type().id()==ID_array ||
+       e.type().id()==ID_incomplete_array)
     {
       if(standard_conversion_array_to_pointer(e,tmp))
         e.swap(tmp);
