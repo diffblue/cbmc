@@ -242,7 +242,7 @@ void cpp_typecheckt::zero_initializer(
       const array_typet &array_type=to_array_type(type);
       const exprt &size_expr=array_type.size();
 
-      if(size_expr.id()=="infinity")
+      if(size_expr.id()==ID_infinity)
         return; // don't initialize
 
       mp_integer size;
@@ -262,13 +262,12 @@ void cpp_typecheckt::zero_initializer(
   }
   else if(final_type.id()==ID_union)
   {
-    c_sizeoft so(*this);
+    c_sizeoft c_sizeof(*this);
 
-    // Select the largest component
+    // Select the largest component for zero-initialization
     mp_integer comp_size=0;
 
-    exprt comp;
-    comp.make_nil();
+    exprt comp=nil_exprt();
 
     forall_irep(it, final_type.find(ID_components).get_sub())
     {
@@ -279,16 +278,16 @@ void cpp_typecheckt::zero_initializer(
       if(component.type().id()==ID_code)
         continue;
 
-      exprt exs=so(component.type());
+      exprt component_size=c_sizeof(component.type());
 
       mp_integer size;
-      bool to_int = !to_integer(exs,size);
-      assert(to_int);
-
-      if(size>comp_size)
+      if(!to_integer(exs, size))
       {
-        comp_size=size;
-        comp=component;
+        if(size>comp_size)
+        {
+          comp_size=size;
+          comp=component;
+        }
       }
     }
 
@@ -303,7 +302,7 @@ void cpp_typecheckt::zero_initializer(
 
       exprt member(ID_member);
       member.copy_to_operands(object);
-      member.set("component_cpp_name", cpp_name);
+      member.set(ID_component_cpp_name, cpp_name);
       zero_initializer(member, comp.type(), location, ops);
     }
   }
