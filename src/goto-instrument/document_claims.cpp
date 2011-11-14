@@ -398,7 +398,8 @@ void document_claimst::doit()
       break;
     
     case HTML:
-      out << "<div class=\"claim\"><div class=\"location\">File "
+      out << "<div class=\"claim\">" << std::endl
+          << "<div class=\"location\">File "
           << escape_html(location.get_string("file"))
           << " function "
           << escape_html(location.get_string("function"))
@@ -418,9 +419,9 @@ void document_claimst::doit()
 
       out << "<div class=\"code\">\n"
           << code
-          << "</div>" << std::endl;
+          << "</div> <!-- code -->" << std::endl;
 
-      out << "</div>" << std::endl;
+      out << "</div> <!-- claim -->" << std::endl;
       out << std::endl;
       break;
     }
