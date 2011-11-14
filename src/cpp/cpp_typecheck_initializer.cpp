@@ -265,7 +265,7 @@ void cpp_typecheckt::zero_initializer(
     c_sizeoft c_sizeof(*this);
 
     // Select the largest component for zero-initialization
-    mp_integer comp_size=0;
+    mp_integer max_comp_size=0;
 
     exprt comp=nil_exprt();
 
@@ -280,18 +280,18 @@ void cpp_typecheckt::zero_initializer(
 
       exprt component_size=c_sizeof(component.type());
 
-      mp_integer size;
-      if(!to_integer(exs, size))
+      mp_integer size_int;
+      if(!to_integer(component_size, size_int))
       {
-        if(size>comp_size)
+        if(size_int>max_comp_size)
         {
-          comp_size=size;
+          max_comp_size=size_int;
           comp=component;
         }
       }
     }
 
-    if(comp_size>0)
+    if(max_comp_size>0)
     {
       irept name(ID_name);
       name.set(ID_identifier, comp.get(ID_base_name));
@@ -302,7 +302,7 @@ void cpp_typecheckt::zero_initializer(
 
       exprt member(ID_member);
       member.copy_to_operands(object);
-      member.set(ID_component_cpp_name, cpp_name);
+      member.set("component_cpp_name", cpp_name);
       zero_initializer(member, comp.type(), location, ops);
     }
   }
