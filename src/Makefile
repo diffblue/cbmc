@@ -1,4 +1,4 @@
-DIRS = ansi-c big-int cbmc cpp goto-cc goto-instrument goto-programs \
+DIRS = ansi-c big-int cbmc cpp goto-cc goto-instrument goto-programs floatbv \
        goto-symex langapi pointer-analysis solvers util xmllang
 
 all: cbmc.dir goto-cc.dir goto-instrument.dir
