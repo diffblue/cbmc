@@ -38,6 +38,8 @@
   "char *__builtin___strcpy_chk(char *dest, const char *src, unsigned size);\n" \
   "char *__builtin_strncpy(char *dest, const char *src, unsigned n);\n" \
   "char *__builtin___strncpy_chk(char *dest, const char *src, unsigned n, unsigned size);\n" \
+  "char *__builtin___stpcpy(char *s1, const char *s2);\n" \
+  "char *__builtin___stpncpy_chk(char *s1, const char *s2, unsigned n, unsigned size);\n" \
   "void __builtin_exit(int status);\n" \
   "char *__builtin_strchr(const char *s, int c);\n" \
   "unsigned __builtin_strspn(const char *s, const char *accept);\n" \
