@@ -163,11 +163,24 @@ exprt goto_symext::address_arithmetic(
       return typecast_exprt(sum, pointer_typet(expr.type()));
     }
   }
+  else if(expr.id()==ID_dereference)
+  {
+    // just grab the pointer
+    return to_dereference_expr(expr).pointer();
+  }
 
   // give up, just dereference
   exprt tmp=expr;
   dereference_rec_address_of(tmp, state, guard);
-  return address_of_exprt(tmp);
+  
+  // turn &array into &array[0]
+  if(ns.follow(tmp.type()).id()==ID_array)
+  {
+    index_exprt tmp2(tmp, gen_zero(index_type()));
+    return address_of_exprt(tmp2);
+  }
+  else
+    return address_of_exprt(tmp);
 }
 
 /*******************************************************************\
