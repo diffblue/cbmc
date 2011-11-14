@@ -260,6 +260,11 @@ void cpp_typecheckt::zero_initializer(
       }
     }
   }
+  else if(final_type.id()==ID_incomplete_array)
+  {
+    // don't touch for now
+    // (the linker will look at these again)
+  }
   else if(final_type.id()==ID_union)
   {
     c_sizeoft c_sizeof(*this);
