@@ -508,6 +508,16 @@ public:
   {
     return static_cast<exprt &>(add(ID_size));
   }
+  
+  inline bool is_complete() const
+  {
+    return size().is_not_nil();
+  }
+
+  inline bool is_incomplete() const
+  {
+    return size().is_nil();
+  }
 
 };
 
