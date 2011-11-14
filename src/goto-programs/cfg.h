@@ -25,6 +25,7 @@ template<class T>
 class cfg_baset
 {
 public:
+  // these are the CFG nodes
   struct entryt: public T
   {
     typedef std::list<struct entryt *> entriest;
