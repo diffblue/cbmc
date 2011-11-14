@@ -17,6 +17,8 @@ goto-instrument.dir: languages goto-programs.dir pointer-analysis.dir
 
 cbmc.dir: languages solvers.dir goto-symex.dir \
           pointer-analysis.dir goto-programs.dir goto-symex.dir
+          
+solvers.dir: floatbv.dir
 
 goto-cc.dir: languages pointer-analysis.dir goto-programs.dir
 
