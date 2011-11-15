@@ -132,6 +132,7 @@ public:
       original_full_lhs(static_cast<const exprt &>(get_nil_irep())),
       ssa_rhs(static_cast<const exprt &>(get_nil_irep())),
       cond_expr(static_cast<const exprt &>(get_nil_irep())),
+      priority(0),
       formatted(false),
       ignore(false)
     {
