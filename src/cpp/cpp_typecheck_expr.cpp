@@ -355,14 +355,14 @@ Purpose:
 
 void cpp_typecheckt::typecheck_expr_sizeof(exprt &expr)
 {
-  // we need to overload, as "sizeof-type" may be
-  // parsed as an expression!
-
+  // We need to overload, "sizeof-expression" can be mis-parsed
+  // as a type.
+  
   if(expr.operands().size()==0)
   {
     const typet &type=
       static_cast<const typet &>(expr.find(ID_type_arg));
-
+      
     if(type.id()==ID_cpp_name)
     {
       // this may be ambiguous -- it can be either a type or
@@ -381,8 +381,30 @@ void cpp_typecheckt::typecheck_expr_sizeof(exprt &expr)
         expr.remove(ID_type_arg);
       }
     }
-  }
+    else if(type.id()==ID_array)
+    {
+      // sizeof(expr[index]) can be parsed as an array type!
+      
+      if(type.subtype().id()==ID_cpp_name)
+      {
+        cpp_typecheck_fargst fargs;
 
+        exprt symbol_expr=resolve(
+          to_cpp_name(static_cast<const irept &>(type.subtype())),
+          cpp_typecheck_resolvet::BOTH,
+          fargs);
+
+        if(symbol_expr.id()!=ID_type)
+        {
+          // _NOT_ a type
+          index_exprt index_expr(symbol_expr, to_array_type(type).size());
+          expr.copy_to_operands(index_expr);
+          expr.remove(ID_type_arg);
+        }
+      }
+    }
+  }
+  
   c_typecheck_baset::typecheck_expr_sizeof(expr);
 }
 
