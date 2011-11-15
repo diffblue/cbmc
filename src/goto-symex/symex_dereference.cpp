@@ -131,6 +131,8 @@ exprt goto_symext::address_arithmetic(
     exprt base=address_arithmetic(to_index_expr(expr).array(), state, guard);
     exprt sum=exprt(ID_plus, base.type());
     sum.copy_to_operands(base, to_index_expr(expr).index());
+
+    // there could be dereferencing in the index
     dereference_rec(sum.op1(), state, guard, false);
     return sum;
   }
@@ -172,8 +174,11 @@ exprt goto_symext::address_arithmetic(
   }
   else if(expr.id()==ID_dereference)
   {
-    // just grab the pointer
-    return to_dereference_expr(expr).pointer();
+    // just grab the pointer, but be wary of further dereferencing
+    // in the pointer itself
+    exprt tmp=to_dereference_expr(expr).pointer();
+    dereference_rec(tmp, state, guard, false);
+    return tmp;
   }
 
   // give up, just dereference
