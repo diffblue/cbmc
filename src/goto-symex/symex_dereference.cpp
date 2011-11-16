@@ -234,8 +234,10 @@ void goto_symext::dereference_rec(
       options,
       symex_dereference_state);      
     
+    // std::cout << "**** " << from_expr(ns, "", tmp1) << std::endl;
     exprt tmp2=dereference.dereference(
       tmp1, guard, write?dereferencet::WRITE:dereferencet::READ);
+    //std::cout << "**** " << from_expr(ns, "", tmp2) << std::endl;
 
     expr.swap(tmp2);
     
