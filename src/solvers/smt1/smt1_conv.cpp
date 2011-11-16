@@ -1853,7 +1853,8 @@ void smt1_convt::convert_relation(const exprt &expr, bool bool_as_bv)
 
   smt1_prop.out << "(";
 
-  if(op_type.id()==ID_unsignedbv)
+  if(op_type.id()==ID_unsignedbv ||
+     op_type.id()==ID_pointer)
   {
     if(expr.id()==ID_le)
       smt1_prop.out << "bvule";
