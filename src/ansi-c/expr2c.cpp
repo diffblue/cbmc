@@ -589,7 +589,7 @@ std::string expr2ct::convert_with(
         
       assert(comp_expr.is_not_nil());
         
-      op1=comp_expr.get_string(ID_pretty_name);
+      op1="."+comp_expr.get_string(ID_pretty_name);
       p1=10;
     }
     else
