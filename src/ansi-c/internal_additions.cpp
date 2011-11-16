@@ -137,7 +137,7 @@ void ansi_c_internal_additions(std::string &code)
 
 /*******************************************************************\
 
-Function: architecture_string
+Function: architecture_strings
 
   Inputs:
 
