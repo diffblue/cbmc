@@ -543,9 +543,9 @@ dereferencet::valuet dereferencet::build_reference_to(
     else if(root_object_type.id()==ID_array &&
             dereference_type_compare(root_object_type.subtype(), dereference_type))
     {
-      // we have an array with a subtype that matches
-      // the dereferencing type
-      // we will require well-alignedness!
+      // We have an array with a subtype that matches
+      // the dereferencing type.
+      // We will require well-alignedness!
       
       exprt offset;
 
@@ -595,7 +595,7 @@ dereferencet::valuet dereferencet::build_reference_to(
       // this is relative to the root object
       const exprt offset=
         unary_exprt(ID_pointer_offset, pointer_expr, index_type());
-    
+
       if(memory_model(result.value, dereference_type, tmp_guard, offset))
       {
         // ok, done
@@ -893,11 +893,11 @@ bool dereferencet::memory_model_bytes(
 {
   const typet from_type=value.type();
   
-  // we refuse to convert to/from code
+  // We simply refuse to convert to/from code.
   if(from_type.id()==ID_code || to_type.id()==ID_code)
     return false;
 
-  // won't do this without a committment to an endianness
+  // We won't do this without a committment to an endianness.
   if(config.ansi_c.endianness==configt::ansi_ct::NO_ENDIANNESS)
     return false; 
 
@@ -906,11 +906,13 @@ bool dereferencet::memory_model_bytes(
   
   exprt result;
 
-  // see if we have an array of bytes already,
-  // and we want something byte-sized
+  // See if we have an array of bytes already,
+  // and we want something byte-sized.
   if(ns.follow(from_type).id()==ID_array &&
      pointer_offset_size(ns, ns.follow(from_type).subtype())==1 &&
-     pointer_offset_size(ns, to_type)==1)
+     pointer_offset_size(ns, to_type)==1 &&
+     is_a_bv_type(ns.follow(from_type).subtype()) &&
+     is_a_bv_type(to_type))
   {
     // yes, can use 'index'
     result=index_exprt(value, offset, ns.follow(from_type).subtype());
