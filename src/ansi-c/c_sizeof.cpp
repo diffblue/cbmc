@@ -65,33 +65,36 @@ exprt c_sizeoft::sizeof_rec(const typet &type)
   {
     const exprt &size_expr=
       to_array_type(type).size();
-
-    exprt tmp_dest=sizeof_rec(type.subtype());
-
-    if(tmp_dest.is_nil())
-      return tmp_dest;
-
-    mp_integer a, b;
-
-    if(!to_integer(tmp_dest, a) &&
-       !to_integer(size_expr, b))
+      
+    if(size_expr.is_nil())
     {
-      dest=from_integer(a*b, size_type());
+      // treated like an empty array
+      dest=from_integer(0, size_type());
     }
     else
     {
-      dest.id(ID_mult);
-      dest.type()=size_type();
-      dest.copy_to_operands(size_expr);
-      dest.move_to_operands(tmp_dest);
-      c_implicit_typecast(dest.op0(), dest.type(), ns);
-      c_implicit_typecast(dest.op1(), dest.type(), ns);
+      exprt tmp_dest=sizeof_rec(type.subtype());
+
+      if(tmp_dest.is_nil())
+        return tmp_dest;
+
+      mp_integer a, b;
+
+      if(!to_integer(tmp_dest, a) &&
+         !to_integer(size_expr, b))
+      {
+        dest=from_integer(a*b, size_type());
+      }
+      else
+      {
+        dest.id(ID_mult);
+        dest.type()=size_type();
+        dest.copy_to_operands(size_expr);
+        dest.move_to_operands(tmp_dest);
+        c_implicit_typecast(dest.op0(), dest.type(), ns);
+        c_implicit_typecast(dest.op1(), dest.type(), ns);
+      }
     }
-  }
-  else if(type.id()==ID_incomplete_array)
-  {
-    // treated like an empty array
-    dest=from_integer(0, size_type());
   }
   else if(type.id()==ID_struct)
   {

@@ -2529,14 +2529,16 @@ array_abstract_declarator:
           '[' ']'
         {
           $$=$1;
-          set($$, ID_incomplete_array);
+          set($$, ID_array);
           stack($$).add(ID_subtype)=irept(ID_abstract);
+          stack($$).add(ID_size).make_nil();
         }
         | '[' '*' ']'
         {
           $$=$1;
-          set($$, ID_incomplete_array);
+          set($$, ID_array);
           stack($$).add(ID_subtype)=irept(ID_abstract);
+          stack($$).add(ID_size).make_nil();
         }
         | '[' constant_expression ']'
         {

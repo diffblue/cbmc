@@ -34,15 +34,16 @@ typet build_float_type(unsigned width)
   }
   else
   {
-    floatbv_typet result=floatbv_typet();
-    result.set_width(width);
+    floatbv_typet result;
 
     switch(width)
     {
-    case 32: result.set_f(23); break;
-    case 64: result.set_f(52); break;
+    case 32: result=ieee_float_spect::single_precision().to_type(); break;
+    case 64: result=ieee_float_spect::double_precision().to_type(); break;
     default: assert(false);
     }
+    
+    assert(width==result.get_width());
 
     return result;
   }

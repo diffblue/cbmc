@@ -71,12 +71,11 @@ std::string type2name(const typet &type)
   }
   else if(type.id()==ID_array)
   {
-    const array_typet &t = to_array_type(type);
-    result+="ARR" + t.size().get(ID_value).as_string();
-  }
-  else if(type.id()==ID_incomplete_array)
-  {    
-    result+="ARR?"; 
+    const array_typet &t=to_array_type(type);
+    if(t.size().is_nil())
+      result+="ARR?";
+    else
+      result+="ARR" + t.size().get(ID_value).as_string();
   }
   else if(type.id()==ID_symbol)
   {

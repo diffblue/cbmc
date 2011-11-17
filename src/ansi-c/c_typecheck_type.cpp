@@ -38,8 +38,6 @@ void c_typecheck_baset::typecheck_type(typet &type)
     typecheck_code_type(to_code_type(type));
   else if(type.id()==ID_array)
     typecheck_array_type(to_array_type(type));
-  else if(type.id()==ID_incomplete_array)
-    typecheck_type(type.subtype());
   else if(type.id()==ID_pointer)
     typecheck_type(type.subtype());
   else if(type.id()==ID_struct ||
@@ -122,39 +120,43 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
   // check subtype
   typecheck_type(type.subtype());
 
-  // check size  
-  typecheck_expr(size);
-  make_index_type(size);
+  // check size, if any
   
-  // The size need not be a constant!
-  // We simplify it, for the benefit of array initialisation.
-  
-  exprt tmp_size=size;
-  simplify(tmp_size, *this);
-
-  if(tmp_size.is_constant())
+  if(size.is_not_nil())
   {
-    mp_integer s;
-    if(to_integer(tmp_size, s))
-    {
-      err_location(location);
-      str << "failed to convert constant: "
-          << tmp_size.pretty();
-      throw 0;
-    }
-
-    if(s<0)
-    {
-      err_location(location);
-      str << "array size must not be negative, "
-             "but got " << s;
-      throw 0;
-    }
+    typecheck_expr(size);
+    make_index_type(size);
     
-    size=tmp_size;
+    // The size need not be a constant!
+    // We simplify it, for the benefit of array initialisation.
+    
+    exprt tmp_size=size;
+    simplify(tmp_size, *this);
+
+    if(tmp_size.is_constant())
+    {
+      mp_integer s;
+      if(to_integer(tmp_size, s))
+      {
+        err_location(location);
+        str << "failed to convert constant: "
+            << tmp_size.pretty();
+        throw 0;
+      }
+
+      if(s<0)
+      {
+        err_location(location);
+        str << "array size must not be negative, "
+               "but got " << s;
+        throw 0;
+      }
+      
+      size=tmp_size;
+    }
+    else if(tmp_size.id()==ID_infinity)
+      size=tmp_size;
   }
-  else if(tmp_size.id()==ID_infinity)
-    size=tmp_size;
 }
 
 /*******************************************************************\
@@ -316,7 +318,8 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
   {
     typet &type=it->type();
   
-    if(type.id()==ID_incomplete_array)
+    if(type.id()==ID_array &&
+       to_array_type(type).size().is_nil())
     {
       // needs to be last member
       if(it!=--components.end())
@@ -554,8 +557,7 @@ Function: c_typecheck_baset::adjust_function_argument
 
 void c_typecheck_baset::adjust_function_argument(typet &type) const
 {
-  if(type.id()==ID_array ||
-     type.id()==ID_incomplete_array)
+  if(type.id()==ID_array)
   {
     type.id(ID_pointer);
     type.remove(ID_size);
@@ -614,7 +616,8 @@ void c_typecheck_baset::clean_type(
     
     exprt &size=array_type.size();
     
-    if(!size.is_constant() &&
+    if(size.is_not_nil() &&
+       !size.is_constant() &&
        size.id()!=ID_infinity)
     {
       const symbolt &base_symbol=lookup(base_symbol_identifier);

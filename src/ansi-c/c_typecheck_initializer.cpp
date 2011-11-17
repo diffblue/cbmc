@@ -71,47 +71,49 @@ exprt c_typecheck_baset::zero_initializer(
   else if(type_id==ID_array)
   {
     const array_typet &array_type=to_array_type(type);
-    exprt tmpval=zero_initializer(array_type.subtype(), location);
-
-    mp_integer array_size;
-
-    if(array_type.size().id()==ID_infinity)
+    
+    if(array_type.size().is_nil())
     {
-      exprt value(ID_array_of, type);
-      value.copy_to_operands(tmpval);
+      // we initialize this with an empty array
+
+      array_exprt value(type);
+      value.type().id(ID_array);
+      value.type().set(ID_size, gen_zero(size_type()));
       value.location()=location;
       return value;
     }
-    else if(to_integer(array_type.size(), array_size))
+    else
     {
-      err_location(location);
-      str << "failed to zero-initialize array of non-fixed size `"
-          << to_string(array_type.size()) << "'";
-      throw 0;
+      exprt tmpval=zero_initializer(array_type.subtype(), location);
+
+      mp_integer array_size;
+
+      if(array_type.size().id()==ID_infinity)
+      {
+        exprt value(ID_array_of, type);
+        value.copy_to_operands(tmpval);
+        value.location()=location;
+        return value;
+      }
+      else if(to_integer(array_type.size(), array_size))
+      {
+        err_location(location);
+        str << "failed to zero-initialize array of non-fixed size `"
+            << to_string(array_type.size()) << "'";
+        throw 0;
+      }
+        
+      if(array_size<0)
+      {
+        err_location(location);
+        throw "failed to zero-initialize array of with negative size";
+      }
+
+      array_exprt value(type);
+      value.operands().resize(integer2long(array_size), tmpval);
+      value.location()=location;
+      return value;
     }
-      
-    if(array_size<0)
-    {
-      err_location(location);
-      throw "failed to zero-initialize array of with negative size";
-    }
-
-    exprt value(ID_array, type);
-    value.operands().resize(integer2long(array_size), tmpval);
-    value.location()=location;
-
-    return value;
-  }
-  else if(type_id==ID_incomplete_array)
-  {
-    // we initialize this with an empty array
-
-    exprt value(ID_array, type);
-    value.type().id(ID_array);
-    value.type().set(ID_size, gen_zero(size_type()));
-    value.location()=location;
-
-    return value;
   }
   else if(type_id==ID_struct)
   {
@@ -179,8 +181,10 @@ void c_typecheck_baset::do_initializer(
 {
   exprt result=do_initializer_rec(initializer, type, force_constant);
 
-  if(type.id()==ID_incomplete_array)
-    assert(result.type().id()==ID_array);
+  // any arrays must have a size
+  if(type.id()==ID_array)
+    assert(result.type().id()==ID_array &&
+           to_array_type(result.type()).size().is_not_nil());
     
   initializer=result;
 }
@@ -218,8 +222,7 @@ exprt c_typecheck_baset::do_initializer_rec(
     
   if(value.id()==ID_array &&
      value.get_bool(ID_C_string_constant) &&
-     (full_type.id()==ID_array ||
-      full_type.id()==ID_incomplete_array) &&
+     full_type.id()==ID_array &&
      (full_type.subtype().id()==ID_signedbv ||
       full_type.subtype().id()==ID_unsignedbv) &&
       full_type.subtype().get(ID_width)==value.type().subtype().get(ID_width))
@@ -232,7 +235,8 @@ exprt c_typecheck_baset::do_initializer_rec(
     Forall_operands(it, tmp)
       it->type()=full_type.subtype();
 
-    if(full_type.id()==ID_array)
+    if(full_type.id()==ID_array &&
+       to_array_type(full_type).is_complete())
     {
       // check size
       mp_integer array_size;
@@ -267,8 +271,7 @@ exprt c_typecheck_baset::do_initializer_rec(
   }
   
   if(value.id()==ID_string_constant &&
-     (full_type.id()==ID_array ||
-      full_type.id()==ID_incomplete_array) &&
+     full_type.id()==ID_array &&
      (full_type.subtype().id()==ID_signedbv ||
       full_type.subtype().id()==ID_unsignedbv) &&
       full_type.subtype().get(ID_width)==char_type().get(ID_width))
@@ -281,7 +284,8 @@ exprt c_typecheck_baset::do_initializer_rec(
 
     exprt tmp2=tmp1.to_array_expr();
 
-    if(full_type.id()==ID_array)
+    if(full_type.id()==ID_array &&
+       to_array_type(full_type).is_complete())
     {
       // check size
       mp_integer array_size;
@@ -315,7 +319,8 @@ exprt c_typecheck_baset::do_initializer_rec(
     return tmp2;
   }
   
-  if(full_type.id()==ID_incomplete_array)
+  if(full_type.id()==ID_array &&
+     to_array_type(full_type).size().is_nil())
   {
     err_location(value);
     str << "type `"
@@ -363,7 +368,7 @@ void c_typecheck_baset::do_initializer(symbolt &symbol)
       const typet &final_type=follow(symbol.type);
       
       if(final_type.id()!=ID_incomplete_struct &&
-         final_type.id()!=ID_incomplete_array &&
+         !(final_type.id()==ID_array && to_array_type(final_type).is_incomplete()) &&
          final_type.id()!=ID_empty)
       {
         // zero initializer
@@ -375,8 +380,10 @@ void c_typecheck_baset::do_initializer(symbolt &symbol)
     {
       typecheck_expr(symbol.value);
       do_initializer(symbol.value, symbol.type, true);
-      
-      if(follow(symbol.type).id()==ID_incomplete_array)
+
+      // need to adjust size?
+      if(follow(symbol.type).id()==ID_array &&
+         to_array_type(follow(symbol.type)).size().is_nil())
         symbol.type=symbol.value.type();
     }
   }
@@ -402,7 +409,9 @@ void c_typecheck_baset::do_initializer(symbolt &symbol)
       typecheck_expr(symbol.value);
       do_initializer(symbol.value, symbol.type, true);
       
-      if(follow(symbol.type).id()==ID_incomplete_array)
+      // need to adjust sie?
+      if(follow(symbol.type).id()==ID_array &&
+         to_array_type(follow(symbol.type)).size().is_nil())
         symbol.type=symbol.value.type();
     }
   }
@@ -453,23 +462,26 @@ void c_typecheck_baset::designator_enter(
   }
   else if(entry.type.id()==ID_array)
   {
-    mp_integer array_size;
-
-    if(to_integer(to_array_type(entry.type).size(), array_size))
+    if(to_array_type(entry.type).size().is_nil())
     {
-      err_location(to_array_type(entry.type).size());
-      str << "array has non-constant size `"
-          << to_string(to_array_type(entry.type).size()) << "'";
-      throw 0;
+      entry.size=0;
+      entry.subtype=entry.type.subtype();
     }
+    else
+    {
+      mp_integer array_size;
 
-    entry.size=integer2long(array_size);
-    entry.subtype=entry.type.subtype();
-  }
-  else if(entry.type.id()==ID_incomplete_array)
-  {
-    entry.size=0;
-    entry.subtype=entry.type.subtype();
+      if(to_integer(to_array_type(entry.type).size(), array_size))
+      {
+        err_location(to_array_type(entry.type).size());
+        str << "array has non-constant size `"
+            << to_string(to_array_type(entry.type).size()) << "'";
+        throw 0;
+      }
+
+      entry.size=integer2long(array_size);
+      entry.subtype=entry.type.subtype();
+    }
   }
   else
     assert(false);
@@ -524,13 +536,13 @@ void c_typecheck_baset::do_designated_initializer(
     assert(type.id()!=ID_symbol);
 
     if(type.id()==ID_array ||
-       type.id()==ID_struct ||
-       type.id()==ID_incomplete_array)
+       type.id()==ID_struct)
     {
       if(index>=dest->operands().size())
       {
-        if(type.id()==ID_incomplete_array ||
-           (type.id()==ID_array && to_array_type(type).size().is_zero()))
+        if(type.id()==ID_array && 
+           (to_array_type(type).size().is_zero() ||
+            to_array_type(type).size().is_nil()))
         {
           // we are willing to grow an incomplete or zero-sized array
           exprt zero=zero_initializer(type.subtype(), value.location());
@@ -582,8 +594,7 @@ void c_typecheck_baset::do_designated_initializer(
     // do we initialize a scalar?
     if(type.id()!=ID_struct &&
        type.id()!=ID_union &&
-       type.id()!=ID_array &&
-       type.id()!=ID_incomplete_array)
+       type.id()!=ID_array)
     {
       // The initializer for a scalar shall be a single expression,
       // * optionally enclosed in braces. *
@@ -610,7 +621,7 @@ void c_typecheck_baset::do_designated_initializer(
       // We stop for initializers that are string-constants,
       // which are like arrays. We only do so if we are to
       // initialize an array of scalars.
-      if((type.id()==ID_array || type.id()==ID_incomplete_array) &&
+      if(type.id()==ID_array &&
          (follow(type.subtype()).id()==ID_signedbv ||
           follow(type.subtype()).id()==ID_unsignedbv))
       {
@@ -662,7 +673,8 @@ void c_typecheck_baset::increment_designator(designatort &designator)
 
     entry.index++;
     
-    if(entry.type.id()==ID_incomplete_array)
+    if(entry.type.id()==ID_array &&
+       to_array_type(entry.type).size().is_nil())
       return; // we will keep going forever
 
     if(entry.type.id()==ID_struct &&
@@ -723,8 +735,7 @@ designatort c_typecheck_baset::make_designator(
 
     assert(type.id()!=ID_symbol);
 
-    if(type.id()==ID_array ||
-       type.id()==ID_incomplete_array)
+    if(type.id()==ID_array)
     {
       if(d_op.id()!=ID_index)
       {
@@ -744,7 +755,7 @@ designatort c_typecheck_baset::make_designator(
         throw "expected constant array index designator";
       }
 
-      if(type.id()==ID_incomplete_array)
+      if(to_array_type(type).size().is_nil())
         size=0;
       else if(to_integer(to_array_type(type).size(), size))
       {
@@ -871,17 +882,24 @@ exprt c_typecheck_baset::do_initializer_list(
 
   exprt result;
   if(type.id()==ID_struct ||
-     type.id()==ID_array ||
      type.id()==ID_union)
   {
     // start with zero everywhere
     result=zero_initializer(type, value.location());
   }
-  else if(type.id()==ID_incomplete_array)
+  else if(type.id()==ID_array)
   {
-    // start with empty array
-    result=exprt(ID_array, type);
-    result.location()=value.location();
+    if(to_array_type(type).size().is_nil())
+    {
+      // start with empty array
+      result=exprt(ID_array, type);
+      result.location()=value.location();
+    }
+    else
+    {
+      // start with zero everywhere
+      result=zero_initializer(type, value.location());
+    }
   }
   else
   {
@@ -910,7 +928,7 @@ exprt c_typecheck_baset::do_initializer_list(
     increment_designator(current_designator);
   }
   
-  if(type.id()==ID_incomplete_array)
+  if(type.id()==ID_array && to_array_type(type).size().is_nil())
   {
     // make complete
     unsigned size=result.operands().size();

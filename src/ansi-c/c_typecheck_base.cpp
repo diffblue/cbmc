@@ -277,12 +277,11 @@ void c_typecheck_baset::typecheck_new_symbol(symbolt &symbol)
   }
   else
   {
-    if(symbol.type.id()==ID_incomplete_array ||
-       symbol.type.id()==ID_array)
+    if(symbol.type.id()==ID_array)
     {
       // Insert a new type symbol for the array.
       // We do this because we want a convenient way
-      // of making the type complete later on
+      // of adjusting the size of the type later on.
 
       symbolt new_symbol;
       new_symbol.name=id2string(symbol.name)+"$type";
@@ -499,14 +498,18 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
   if(final_old!=final_new)
   {
     if(final_old.id()==ID_array &&
-       final_new.id()==ID_incomplete_array &&
+       to_array_type(final_old).size().is_not_nil() &&
+       final_new.id()==ID_array &&
+       to_array_type(final_new).size().is_nil() &&
        final_old.subtype()==final_new.subtype())
     {
       // this is ok, just use old type
       new_symbol.type=old_symbol.type;
     }
-    else if(final_old.id()==ID_incomplete_array &&
+    else if(final_old.id()==ID_array &&
+            to_array_type(final_old).size().is_nil() &&
             final_new.id()==ID_array &&
+            to_array_type(final_new).size().is_not_nil() &&
             final_old.subtype()==final_new.subtype())
     {
       // this is also ok
@@ -514,7 +517,7 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
       {
         // fix the symbol, not just the type
         const irep_idt identifier=
-          old_symbol.type.get(ID_identifier);
+          to_symbol_type(old_symbol.type).get_identifier();
 
         contextt::symbolst::iterator s_it=context.symbols.find(identifier);
   

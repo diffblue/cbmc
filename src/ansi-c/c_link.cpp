@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <i2string.h>
 #include <std_expr.h>
 #include <std_types.h>
+#include <simplify_expr.h>
 
 #include "c_link_type_eq.h"
 #include "expr2c.h"
@@ -141,15 +142,12 @@ void c_linkt::duplicate_type(
   {
     // ignore
   }
-  else if(ns.follow(old_symbol.type).id()==ID_incomplete_array &&
+  else if(ns.follow(old_symbol.type).id()==ID_array &&
           ns.follow(new_symbol.type).id()==ID_array)
   {
-    old_symbol.type=new_symbol.type; // store new type
-  }
-  else if(ns.follow(old_symbol.type).id()==ID_array &&
-          ns.follow(new_symbol.type).id()==ID_incomplete_array)
-  {
-    // ignore
+    if(to_array_type(ns.follow(old_symbol.type)).size().is_nil() &&
+       to_array_type(ns.follow(new_symbol.type)).size().is_not_nil())
+      old_symbol.type=new_symbol.type; // store new type
   }
   else
   {
@@ -270,16 +268,12 @@ void c_linkt::duplicate_non_type(
 
     if(!base_type_eq(old_symbol.type, new_symbol.type, ns))
     {
-      if(ns.follow(old_symbol.type).id()==ID_incomplete_array &&
+      if(ns.follow(old_symbol.type).id()==ID_array &&
          ns.follow(new_symbol.type).id()==ID_array)
       {
-        // store new type
-        old_symbol.type=new_symbol.type;
-      }
-      else if(ns.follow(old_symbol.type).id()==ID_array &&
-              ns.follow(new_symbol.type).id()==ID_incomplete_array)
-      {
-        // ignore
+        if(to_array_type(ns.follow(old_symbol.type)).size().is_nil() &&
+           to_array_type(ns.follow(new_symbol.type)).size().is_not_nil())
+          old_symbol.type=new_symbol.type; // store new type
       }
       else if(old_symbol.type.id()==ID_incomplete_struct &&
               new_symbol.type.id()==ID_struct)
@@ -293,9 +287,9 @@ void c_linkt::duplicate_non_type(
         // ignore
       }
       else if(ns.follow(old_symbol.type).id()==ID_pointer &&
-              ns.follow(new_symbol.type).id()==ID_incomplete_array)
+              ns.follow(new_symbol.type).id()==ID_array)
       {
-        // ignore
+        // ignore, but could be trouble
       }
       else
       {
@@ -324,19 +318,33 @@ void c_linkt::duplicate_non_type(
         // new_symbol wins
         old_symbol.value=new_symbol.value;
       }
-      else if(!base_type_eq(old_symbol.value, new_symbol.value, ns))
+      else
       {
-        err_location(new_symbol.value);
-        str << "error: conflicting initializers for variable `"
-            << old_symbol.name
-            << "'" << std::endl;
-        str << "old value: " << to_string(old_symbol.value)
-            << std::endl;
-        str << "Module: " << old_symbol.module << std::endl;
-        str << "new value: " << to_string(new_symbol.value)
-            << std::endl;
-        str << "Module: " << new_symbol.module;
-        throw 0;
+        // try simplifier
+        exprt tmp_old=old_symbol.value,
+              tmp_new=new_symbol.value;
+              
+        simplify(tmp_old, ns);
+        simplify(tmp_new, ns);
+        
+        if(base_type_eq(tmp_old, tmp_new, ns))
+        {
+          // ok, the same
+        }
+        else
+        {
+          err_location(new_symbol.value);
+          str << "error: conflicting initializers for variable `"
+              << old_symbol.name
+              << "'" << std::endl;
+          str << "old value: " << to_string(tmp_old)
+              << std::endl;
+          str << "Module: " << old_symbol.module << std::endl;
+          str << "new value: " << to_string(tmp_new)
+              << std::endl;
+          str << "Module: " << new_symbol.module;
+          throw 0;
+        }
       }
     }
   }

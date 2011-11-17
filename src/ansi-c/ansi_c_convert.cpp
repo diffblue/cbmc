@@ -439,19 +439,13 @@ void ansi_c_convertt::convert_type(
     convert_type(array_type.subtype(), sub_storage_spec);
     c_storage_spec|=sub_storage_spec;
 
-    convert_expr(array_type.size());
+    if(array_type.size().is_not_nil())
+      convert_expr(array_type.size());
   }
   else if(type.id()==ID_bv)
   {
     exprt &size=static_cast<exprt &>(type.add(ID_size));
     convert_expr(size);
-  }
-  else if(type.id()==ID_incomplete_array)
-  {
-    c_storage_spect sub_storage_spec;
-
-    convert_type(type.subtype(), sub_storage_spec);
-    c_storage_spec|=sub_storage_spec;
   }
   else if(type.id()==ID_struct ||
           type.id()==ID_union)

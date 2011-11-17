@@ -26,9 +26,10 @@ Function: alignment
 
 unsigned alignment(const typet &type, const namespacet &ns)
 {
-  if(type.id()==ID_array ||
-     type.id()==ID_incomplete_array)
+  if(type.id()==ID_array)
+  {
     return alignment(type.subtype(), ns);
+  }
   else if(type.id()==ID_struct || type.id()==ID_union)
   {
     const struct_union_typet::componentst &components=
