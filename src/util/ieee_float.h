@@ -20,6 +20,8 @@ class floatbv_typet;
 class ieee_float_spect
 {
 public:
+  // Bits for fraction (excluding hidden bit) and exponent,
+  // respectively
   unsigned f, e;
   
   mp_integer bias() const;
@@ -37,6 +39,7 @@ public:
 
   inline unsigned width() const
   {
+    // add one for the sign bit
     return f+e+1;
   }  
 
