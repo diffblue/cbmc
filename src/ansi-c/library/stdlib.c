@@ -67,6 +67,7 @@ inline void *malloc(__CPROVER_size_t malloc_size)
   _Bool record_malloc;
   __CPROVER_malloc_object=record_malloc?res:__CPROVER_malloc_object;
   __CPROVER_malloc_size=record_malloc?malloc_size:__CPROVER_malloc_size;
+  __CPROVER_malloc_is_new_array=record_malloc?0:__CPROVER_malloc_is_new_array;
   
   return res;
 }
@@ -90,6 +91,12 @@ inline void free(void *ptr)
     // catch double free
     if(__CPROVER_deallocated==ptr)
       __CPROVER_assert(0, "double free");
+      
+    // catch people who try to use free(...) for stuff
+    // allocated with new[]
+    __CPROVER_assert(__CPROVER_malloc_object!=ptr ||
+                     !__CPROVER_malloc_is_new_array,
+                     "free called for new[] object");
     
     // non-deterministically record as deallocated
     _Bool record;
