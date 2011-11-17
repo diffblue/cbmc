@@ -2489,7 +2489,7 @@ void smt2_convt::convert_type(const typet &type)
                     << floatbv_type.get_f() << ")";
     else
       smt2_prop.out << "(_ BitVec "
-                    << floatbv_type(type).get_width() << ")";
+                    << floatbv_type.get_width() << ")";
   }
   else if(type.id()==ID_rational)
     smt2_prop.out << "Real";
