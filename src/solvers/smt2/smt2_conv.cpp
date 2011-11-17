@@ -2471,7 +2471,6 @@ void smt2_convt::convert_type(const typet &type)
                   << boolbv_width(type) << ")";
   }
   else if(type.id()==ID_bv ||
-          type.id()==ID_floatbv ||
           type.id()==ID_fixedbv ||
           type.id()==ID_unsignedbv ||
           type.id()==ID_signedbv ||
@@ -2479,6 +2478,18 @@ void smt2_convt::convert_type(const typet &type)
   {
     smt2_prop.out << "(_ BitVec "
                   << to_bitvector_type(type).get_width() << ")";
+  }
+  else if(type.id()==ID_floatbv)
+  {
+    const floatbv_typet &floatbv_type=to_floatbv_type(type);
+  
+    if(use_FPA_theory)
+      smt2_prop.out << "(_ FP "
+                    << floatbv_type.get_e() << " "
+                    << floatbv_type.get_f() << ")";
+    else
+      smt2_prop.out << "(_ BitVec "
+                    << floatbv_type(type).get_width() << ")";
   }
   else if(type.id()==ID_rational)
     smt2_prop.out << "Real";

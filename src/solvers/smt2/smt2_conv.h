@@ -54,6 +54,7 @@ public:
     smt2_prop_wrappert(_benchmark, _notes, _logic, _out),
     prop_convt(_ns, smt2_prop),
     boolbv_width(_ns),
+    use_FPA_theory(false),
     pointer_logic(_ns),
     array_index_bits(32)
   { }
@@ -63,6 +64,7 @@ public:
 
 protected:
   boolbv_widtht boolbv_width;
+  bool use_FPA_theory;
 
   // overloading
   virtual literalt convert(const exprt &expr);
