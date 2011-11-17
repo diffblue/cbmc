@@ -381,8 +381,7 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
     {
       assert(m_it->operands().size()==1);
 
-      if(type.id()!=ID_array &&
-         type.id()!=ID_incomplete_array)
+      if(type.id()!=ID_array)
       {
         err_location(expr);
         throw "offsetof of index expects array type";
@@ -839,8 +838,7 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
            "argument or an expression with a member type";
     throw 0;
   }
-  else if(expr_type.id()==ID_array ||
-          expr_type.id()==ID_incomplete_array)
+  else if(expr_type.id()==ID_array)
   {
     // this is a GCC extension called 'array constructor'
     // the argument is expected to be an 'initializer_list'
@@ -888,8 +886,7 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
      op_type.id()==ID_pointer)
   {
   }
-  else if(op_type.id()==ID_array ||
-          op_type.id()==ID_incomplete_array)
+  else if(op_type.id()==ID_array)
   {
     index_exprt index;
     index.array()=op;
@@ -986,10 +983,8 @@ void c_typecheck_baset::typecheck_expr_index(exprt &expr)
     const typet &index_full_type=follow(index_expr.type());
 
     if(array_full_type.id()!=ID_array &&
-       array_full_type.id()!=ID_incomplete_array &&
        array_full_type.id()!=ID_pointer &&
        (index_full_type.id()==ID_array ||
-        index_full_type.id()==ID_incomplete_array ||
         index_full_type.id()==ID_pointer))
       std::swap(array_expr, index_expr);
   }
@@ -998,8 +993,7 @@ void c_typecheck_baset::typecheck_expr_index(exprt &expr)
 
   const typet &final_array_type=follow(array_expr.type());
 
-  if(final_array_type.id()==ID_array ||
-     final_array_type.id()==ID_incomplete_array)
+  if(final_array_type.id()==ID_array)
   {
     if(array_expr.get_bool(ID_C_lvalue))
       expr.set(ID_C_lvalue, true);
@@ -1088,7 +1082,6 @@ void c_typecheck_baset::typecheck_expr_rel(exprt &expr)
     {
       const typet &final_type=follow(o_type0);
       if(final_type.id()!=ID_array &&
-         final_type.id()!=ID_incomplete_array &&
          final_type.id()!=ID_incomplete_struct)
       {
         adjust_float_rel(expr);
@@ -1534,8 +1527,7 @@ void c_typecheck_baset::typecheck_expr_dereference(exprt &expr)
 
   const typet op_type=follow(op.type());
 
-  if(op_type.id()==ID_array ||
-     op_type.id()==ID_incomplete_array)
+  if(op_type.id()==ID_array)
   {
     // *a is the same as a[0]
     expr.id(ID_index);
@@ -2152,7 +2144,7 @@ void c_typecheck_baset::typecheck_function_call_arguments(
       // don't know type, just do standard conversion
       
       const typet &type=follow(op.type());
-      if(type.id()==ID_array || type.id()==ID_incomplete_array)
+      if(type.id()==ID_array)
       {
         pointer_typet dest_type;
         dest_type.subtype()=empty_typet();

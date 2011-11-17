@@ -201,7 +201,6 @@ static void make_subtype(typet &dest, typet &src)
   #endif
   
   assert(src.id()==ID_array ||
-         src.id()==ID_incomplete_array ||
          src.id()==ID_pointer ||
          src.id()==ID_code ||
          src.id()==ID_merged_type ||
@@ -223,7 +222,6 @@ static void make_subtype(typet &dest, typet &src)
 
     if(sub->id()==ID_pointer ||
        sub->id()==ID_array ||
-       sub->id()==ID_incomplete_array ||
        sub->id()==ID_code)
     {
       // walk down
@@ -426,8 +424,10 @@ static void create_function_scope(exprt &expr)
       if(it->id()==ID_declaration)
       {
         ansi_c_declarationt &arg_decl=to_ansi_c_declaration(*it);
-        
-        if(arg_decl.type().id()==ID_incomplete_array)
+       
+        // incomplete array type?
+        if(arg_decl.type().id()==ID_array &&
+           arg_decl.type().subtype().is_nil())
           arg_decl.type().id(ID_pointer);
 
         if(arg_decl.get_base_name()==irep_idt())

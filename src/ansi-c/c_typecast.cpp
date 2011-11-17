@@ -212,7 +212,6 @@ bool check_c_implicit_typecast(
     if(dest_type.id()==ID_fixedbv) return false;
   }
   else if(src_type_id==ID_array ||
-          src_type_id==ID_incomplete_array ||
           src_type_id==ID_pointer)
   {
     if(dest_type.id()==ID_pointer)
@@ -227,9 +226,8 @@ bool check_c_implicit_typecast(
         return false;
     }
     
-    if((dest_type.id()==ID_array ||
-        dest_type.id()==ID_incomplete_array) &&
-       (src_type.subtype()==dest_type.subtype())) return false;
+    if(dest_type.id()==ID_array &&
+       src_type.subtype()==dest_type.subtype()) return false;
 
     if(dest_type.id()==ID_bool) return false;
     if(dest_type.id()==ID_unsignedbv) return false;
@@ -346,8 +344,7 @@ c_typecastt::c_typet c_typecastt::get_c_type(
     else
       return PTR;
   }
-  else if(type.id()==ID_array ||
-          type.id()==ID_incomplete_array)
+  else if(type.id()==ID_array)
   {
     return PTR;
   }
@@ -389,8 +386,7 @@ void c_typecastt::implicit_typecast_arithmetic(
   switch(c_type)
   {
   case PTR:
-    if(expr_type.id()==ID_array ||
-       expr_type.id()==ID_incomplete_array)
+    if(expr_type.id()==ID_array)
     {
       new_type.id(ID_pointer);
       new_type.subtype()=expr_type.subtype();
@@ -421,8 +417,7 @@ void c_typecastt::implicit_typecast_arithmetic(
   if(new_type!=expr_type)
   {
     if(new_type.id()==ID_pointer &&
-       (expr_type.id()==ID_array ||
-        expr_type.id()==ID_incomplete_array))
+       expr_type.id()==ID_array)
     {
       exprt index_expr(ID_index, expr_type.subtype());
       index_expr.reserve_operands(2);
@@ -535,8 +530,7 @@ void c_typecastt::implicit_typecast_followed(
     }
   
     if(src_type.id()==ID_pointer ||
-       src_type.id()==ID_array ||
-       src_type.id()==ID_incomplete_array)
+       src_type.id()==ID_array)
     {
       // we are quite generous about pointers
       
@@ -666,8 +660,7 @@ void c_typecastt::do_typecast(exprt &dest, const typet &type)
   
   const typet &dest_type=ns.follow(dest.type());
 
-  if(dest_type.id()==ID_array || 
-     dest_type.id()==ID_incomplete_array)
+  if(dest_type.id()==ID_array)
   {
     index_exprt index;
     index.array()=dest;

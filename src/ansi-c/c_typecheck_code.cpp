@@ -430,7 +430,8 @@ void c_typecheck_baset::typecheck_decl(codet &code)
     typecheck_expr(code.op1());
     do_initializer(code.op1(), symbol.type, false);
 
-    if(follow(symbol.type).id()==ID_incomplete_array)
+    if(follow(symbol.type).id()==ID_array &&
+       to_array_type(follow(symbol.type)).size().is_nil())
       symbol.type=code.op1().type();
   }
   
@@ -460,11 +461,13 @@ Function: c_typecheck_baset::is_complete_type
 bool c_typecheck_baset::is_complete_type(const typet &type) const
 {
   if(type.id()==ID_incomplete_struct ||
-     type.id()==ID_incomplete_union ||
-     type.id()==ID_incomplete_array)
+     type.id()==ID_incomplete_union)
     return false;
   else if(type.id()==ID_array)
+  {
+    if(to_array_type(type).size().is_nil()) return false;
     return is_complete_type(type.subtype());
+  }
   else if(type.id()==ID_struct || type.id()==ID_union)
   {
     const struct_union_typet::componentst &components=
