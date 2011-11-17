@@ -37,6 +37,10 @@ public:
   {
   }
 
+  ieee_float_spect(unsigned _f, unsigned _e):f(_f), e(_e)
+  {
+  }
+
   inline unsigned width() const
   {
     // add one for the sign bit
@@ -47,6 +51,17 @@ public:
   mp_integer max_fraction() const;
   
   class floatbv_typet to_type() const;
+
+  // the well-know standard formats  
+  inline static ieee_float_spect single_precision()
+  {
+    return ieee_float_spect(23, 8);
+  }
+
+  inline static ieee_float_spect double_precision()
+  {
+    return ieee_float_spect(52, 11);
+  }
 };
 
 class ieee_floatt
