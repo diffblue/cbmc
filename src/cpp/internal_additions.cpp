@@ -75,6 +75,7 @@ void cpp_internal_additions(std::ostream &out)
   out << "extern \"C\" void *__placement_new_array(__typeof__(sizeof(int)), __typeof__(sizeof(int)), void *);" << std::endl;
   out << "extern \"C\" void __delete(void *);" << std::endl;  
   out << "extern \"C\" void __delete_array(void *);" << std::endl;  
+  out << "extern \"C\" bool __CPROVER_malloc_is_new_array=0;" << std::endl;
   
   // __CPROVER namespace
   out << "namespace __CPROVER { }" << std::endl;
