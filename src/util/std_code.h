@@ -688,7 +688,7 @@ code_expressiont &to_code_expression(codet &code);
 const code_expressiont &to_code_expression(const codet &code);
 
 /*! \brief An expression containing a side effect
-    \renark The ID will eventually change to ID_side_effect
+    \remark The ID will eventually change to ID_side_effect
 */
 class side_effect_exprt:public exprt
 {
