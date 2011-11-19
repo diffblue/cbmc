@@ -291,7 +291,7 @@ public:
   {
   }
 
-  /// returns true if the object is a prefix of \ref other    
+  /// returns true if the object is a prefix of \a other    
   bool is_prefix_of(const struct_typet &other) const;
 };
 
