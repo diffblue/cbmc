@@ -301,6 +301,9 @@ std::string expr2ct::convert_rec(
   }
   else if(src.id()==ID_array)
   {
+    if(to_array_type(src).size().is_nil())
+      return convert(src.subtype())+" []";
+
     std::string size_string=convert(to_array_type(src).size());
     return convert(src.subtype())+" ["+size_string+"]";
   }
