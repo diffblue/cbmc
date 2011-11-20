@@ -53,8 +53,8 @@ public:
     std::ostream &_out):
     smt2_prop_wrappert(_benchmark, _notes, _logic, _out),
     prop_convt(_ns, smt2_prop),
-    boolbv_width(_ns),
     use_FPA_theory(false),
+    boolbv_width(_ns),
     pointer_logic(_ns),
     array_index_bits(32)
   { }
@@ -62,9 +62,10 @@ public:
   virtual ~smt2_convt() { }
   virtual resultt dec_solve();
 
+  bool use_FPA_theory;
+
 protected:
   boolbv_widtht boolbv_width;
-  bool use_FPA_theory;
 
   // overloading
   virtual literalt convert(const exprt &expr);
