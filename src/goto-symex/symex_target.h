@@ -9,10 +9,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_SYMEX_SYMEX_TARGET_H
 #define CPROVER_GOTO_SYMEX_SYMEX_TARGET_H
 
-#include <std_expr.h>
-#include <guard.h>
-
 #include <goto-programs/goto_program.h>
+
+class guardt;
+class symbol_exprt;
 
 class symex_targett
 {

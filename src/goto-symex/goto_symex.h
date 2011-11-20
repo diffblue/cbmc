@@ -12,10 +12,13 @@ Author: Daniel Kroening, kroening@kroening.com
 /*! \defgroup goto_symex Symbolic execution of goto programs
 */
 
-#include <std_types.h>
 #include <goto-programs/goto_functions.h>
 
 #include "basic_symex.h"
+#include "goto_symex_state.h"
+
+class typet;
+class code_typet;
 
 class goto_symext:
   public basic_symext

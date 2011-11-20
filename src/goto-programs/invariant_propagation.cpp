@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <expr_util.h>
 #include <simplify_expr.h>
 #include <base_type.h>
+#include <context.h>
+#include <std_expr.h>
 
 #include "invariant_propagation.h"
 

@@ -10,8 +10,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_FIND_MACROS_H
 
 #include "hash_cont.h"
-#include "expr.h"
-#include "namespace.h"
+#include "irep.h"
+
+class exprt;
+class namespacet;
 
 typedef hash_set_cont<irep_idt, irep_id_hash> find_macros_sett;
 

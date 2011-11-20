@@ -14,6 +14,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "equality.h"
 
+class array_of_exprt;
+class equal_exprt;
+class if_exprt;
+class index_exprt;
+class with_exprt;
+
 class arrayst:public equalityt
 {
 public:

@@ -15,16 +15,17 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <hash_cont.h>
 #include <mp_arith.h>
-#include <std_types.h>
-#include <std_expr.h>
-
-#include <solvers/prop/prop_conv.h>
+#include <expr.h>
 
 #include "bv_utils.h"
 #include "boolbv_width.h"
 #include "boolbv_map.h"
 #include "arrays.h"
 #include "functions.h"
+
+class extractbit_exprt;
+class extractbits_exprt;
+class member_exprt;
 
 class boolbvt:public arrayst
 {

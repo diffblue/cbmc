@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_THREEVAL_H
 #define CPROVER_THREEVAL_H
 
-#include <iostream>
+#include <ostream>
 
 //
 // three valued logic

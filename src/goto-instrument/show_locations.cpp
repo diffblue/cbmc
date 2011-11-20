@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <iostream>
+
 #include <xml.h>
 #include <i2string.h>
 #include <xml_irep.h>

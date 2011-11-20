@@ -12,10 +12,11 @@ Author: CM Wintersteiger
 #define GOTO_BINARY_VERSION 2
 
 #include <ostream>
+#include <string>
 
-#include <context.h>
-#include <goto-programs/goto_functions.h>
-#include <message.h>
+class contextt;
+class goto_functionst;
+class message_handlert;
 
 bool write_goto_binary(
   std::ostream &out,

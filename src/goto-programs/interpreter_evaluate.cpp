@@ -6,7 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <assert.h>
+#include <cassert>
+#include <iostream>
 
 #include <ieee_float.h>
 #include <fixedbv.h>

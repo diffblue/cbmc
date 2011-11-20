@@ -11,12 +11,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 // decision procedure wrapper for boolean propositional logics
 
-#include <vector>
-
 #include <message.h>
-#include <threeval.h>
 
 #include "literal.h"
+
+class tvt;
 
 /*! \brief TO_BE_DOCUMENTED
 */

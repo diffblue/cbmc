@@ -9,9 +9,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_STD_CODE_H
 #define CPROVER_STD_CODE_H
 
-#include <assert.h>
+#include <cassert>
 
-#include "expr.h"
+#include <expr.h>
 
 /*! \brief A statement in a programming language
 */

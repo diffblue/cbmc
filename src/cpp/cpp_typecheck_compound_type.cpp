@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
+#include <algorithm>
+
 #include <i2string.h>
 #include <arith_tools.h>
 #include <expr_util.h>

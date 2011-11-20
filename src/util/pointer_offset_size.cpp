@@ -6,7 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <assert.h>
+#include <cassert>
 
 #include <expr.h>
 #include <arith_tools.h>
@@ -14,6 +14,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <config.h>
 
 #include "pointer_offset_size.h"
+#include "namespace.h"
+#include "symbol.h"
 
 /*******************************************************************\
 

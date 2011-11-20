@@ -12,8 +12,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 
 #include <mp_arith.h>
-#include <expr.h>
-#include <format_spec.h>
+#include "format_spec.h"
+
+class exprt;
+class typet;
 
 class bv_spect
 {

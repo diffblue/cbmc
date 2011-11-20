@@ -6,10 +6,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <ctype.h>
-#include <stdio.h>
+#include <cctype>
+#include <cstdio>
+#include <iostream>
 
 #include <std_types.h>
+#include <context.h>
 
 #include "interpreter.h"
 #include "interpreter_class.h"

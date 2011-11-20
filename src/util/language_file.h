@@ -9,18 +9,22 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_LANGUAGE_FILE_H
 #define CPROVER_LANGUAGE_FILE_H
 
-#include <iostream>
+#include <ostream>
 #include <set>
+#include <string>
 
-#include "message.h"
-#include "context.h"
+#include <message.h>
+
+class contextt;
+class language_filet;
+class languaget;
 
 class language_modulet
 {
 public:
   std::string name;
   bool type_checked, in_progress;
-  class language_filet *file;
+  language_filet *file;
   
   language_modulet()
   { type_checked=in_progress=false; }
@@ -32,7 +36,7 @@ public:
   typedef std::set<std::string> modulest;
   modulest modules;
 
-  class languaget *language;
+  languaget *language;
   std::string filename;
   
   void get_modules();

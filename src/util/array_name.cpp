@@ -7,6 +7,9 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include "array_name.h"
+#include "expr.h"
+#include "namespace.h"
+#include "symbol.h"
 
 /*******************************************************************\
 

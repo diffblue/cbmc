@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <i2string.h>
 #include <prefix.h>
 #include <cprover_prefix.h>
+#include <context.h>
+#include <std_expr.h>
 
 #include "goto_symex.h"
 

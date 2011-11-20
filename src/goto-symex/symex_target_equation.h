@@ -10,15 +10,16 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_BASIC_SYMEX_EQUATION_H
 
 #include <list>
-#include <map>
-
-#include <namespace.h>
 
 #include <goto-programs/goto_program.h>
-#include <solvers/prop/prop_conv.h>
+#include <solvers/prop/literal.h>
 
 #include "symex_target.h"
 #include "goto_trace.h"
+
+class decision_proceduret;
+class namespacet;
+class prop_convt;
 
 class symex_target_equationt:public symex_targett
 {

@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "get_module.h"
 #include "message_stream.h"
+#include "context.h"
 
 /*******************************************************************\
 

@@ -9,8 +9,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_WP_H
 #define CPROVER_WP_H
 
-#include <std_code.h>
-#include <namespace.h>
+class codet;
+class exprt;
+class namespacet;
 
 /*! \defgroup gr_wp Weakest precondition */
 

@@ -9,12 +9,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_RATIONAL_H
 #define CPROVER_RATIONAL_H
 
-#include <assert.h>
-
+#include <cassert>
 #include <vector>
 
 #include <mp_arith.h>
-#include <expr.h>
+
+class exprt;
 
 class rationalt
 {

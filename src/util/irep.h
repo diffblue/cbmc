@@ -10,11 +10,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_IREP_H
 
 #include <vector>
-#include <list>
 #include <map>
 #include <string>
-
-#include <assert.h>
+#include <cassert>
+#include <ostream>
 
 #define USE_DSTRING
 #define SHARING
@@ -52,7 +51,9 @@ typedef string_hash irep_id_hash;
   for(irept::named_subt::iterator it=(irep).begin(); \
       it!=(irep).end(); it++)
 
+#ifdef IREP_DEBUG
 #include <iostream>
+#endif
 
 /*! \brief Base class for tree-like data structures with sharing
 */

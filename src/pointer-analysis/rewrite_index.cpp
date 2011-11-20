@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <std_expr.h>
+
 #include "rewrite_index.h"
 
 /*******************************************************************\

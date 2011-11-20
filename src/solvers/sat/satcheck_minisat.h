@@ -10,7 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_SATCHECK_MINISAT_H
 
 #include <vector>
-#include <set>
 
 #include "cnf.h"
 #include "resolution_proof.h"

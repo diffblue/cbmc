@@ -14,7 +14,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <set>
 #include <map>
 
-#include <namespace.h>
+#include <irep.h>
+
+class namespacet;
 
 class pretty_namest
 {

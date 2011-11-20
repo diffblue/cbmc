@@ -485,6 +485,7 @@ Function: irept::to_string
 \*******************************************************************/
 
 #include "lispirep.h"
+#include "lispexpr.h"
 
 std::string irept::to_string() const
 {

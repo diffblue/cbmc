@@ -6,7 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <assert.h>
+#include <cassert>
+#include <cstdlib>
 
 #include <expr_util.h>
 #include <i2string.h>
@@ -14,10 +15,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cprover_prefix.h>
 #include <std_types.h>
 #include <pointer_offset_size.h>
+#include <context.h>
+#include <std_expr.h>
+#include <std_code.h>
 
 #include <ansi-c/c_types.h>
 
 #include "basic_symex.h"
+#include "goto_symex_state.h"
 
 /*******************************************************************\
 

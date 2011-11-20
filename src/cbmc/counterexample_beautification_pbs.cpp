@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <bitvector.h>
 #include <expr_util.h>
 #include <arith_tools.h>
+#include <symbol.h>
 
 #include "counterexample_beautification_pbs.h"
 

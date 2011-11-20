@@ -6,11 +6,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <assert.h>
+#include <cassert>
 
 #include <expr_util.h>
 #include <rename.h>
 #include <base_type.h>
+#include <std_expr.h>
 
 #include "goto_symex.h"
 

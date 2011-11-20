@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "arith_tools.h"
 #include "fixedbv.h"
 #include "ieee_float.h"
+#include "expr.h"
 
 /*******************************************************************\
 

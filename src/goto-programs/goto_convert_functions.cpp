@@ -12,6 +12,7 @@ Date: June 2003
 
 #include <base_type.h>
 #include <std_code.h>
+#include <context.h>
 
 #include "goto_convert_functions.h"
 #include "goto_inline.h"

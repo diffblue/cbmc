@@ -6,6 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <context.h>
+#include <namespace.h>
+#include <std_expr.h>
+
 #include "add_failed_symbols.h"
 
 /*******************************************************************\

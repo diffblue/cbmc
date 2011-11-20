@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <string.h>
-
+#include <cstring>
+#include <cstdlib>
 #include <set>
 #include <fstream>
 
@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <str_getline.h>
 #include <arith_tools.h>
 #include <std_expr.h>
+#include <guard.h>
 
 #include <langapi/language_util.h>
 

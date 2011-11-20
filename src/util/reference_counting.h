@@ -9,8 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef __REFERENCE_COUNTING_H
 #define __REFERENCE_COUNTING_H
 
-#include <assert.h>
-
+#include <cassert>
 #include <iostream>
 
 template<typename T>

@@ -11,9 +11,10 @@ Date: June 2003
 #ifndef CPROVER_GOTO_FUNCTIONS_TEMPLATE_H
 #define CPROVER_GOTO_FUNCTIONS_TEMPLATE_H
 
-#include <iostream>
+#include <ostream>
 
 #include <std_types.h>
+#include <symbol.h>
 
 template <class bodyT>
 class goto_function_templatet

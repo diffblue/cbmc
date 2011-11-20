@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <fstream>
 #include <memory>
+#include <cstdlib>
 
 #include <config.h>
 #include <expr_util.h>

@@ -27,6 +27,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "rational_tools.h"
 #include "config.h"
 #include "base_type.h"
+#include "namespace.h"
+#include "threeval.h"
 
 //#define DEBUGX
 

@@ -6,12 +6,15 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <algorithm>
+
 #include <std_expr.h>
 #include <std_code.h>
 #include <expr_util.h>
 #include <message_stream.h>
 #include <arith_tools.h>
 #include <config.h>
+#include <context.h>
 
 #include <goto-programs/format_strings.h>
 #include <ansi-c/c_types.h>

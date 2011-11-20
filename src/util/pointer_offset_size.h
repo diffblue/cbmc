@@ -10,10 +10,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_POINTER_OFFSET_SIZE_H
 
 #include <mp_arith.h>
-#include <expr.h>
-#include <std_types.h>
-#include <namespace.h>
-#include <std_types.h>
+#include <irep.h>
+
+class exprt;
+class namespacet;
+class struct_typet;
+class typet;
 
 // these return -1 on failure
 mp_integer member_offset(

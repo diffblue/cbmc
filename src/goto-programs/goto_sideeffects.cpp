@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <rename.h>
 #include <cprover_prefix.h>
 #include <i2string.h>
+#include <symbol.h>
 
 #include <ansi-c/c_types.h>
 

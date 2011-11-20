@@ -1,4 +1,5 @@
-#include <expr.h>
+class exprt;
+class typet;
 
 void expand_map(exprt &expr);
 

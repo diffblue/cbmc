@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <identifier.h>
 
 #include "pretty_names.h"
+#include "namespace.h"
+#include "symbol.h"
 
 /*******************************************************************\
 

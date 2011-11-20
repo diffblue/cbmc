@@ -6,7 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <assert.h>
+#include <cassert>
+#include <cstdlib>
 
 #include <expr_util.h>
 #include <c_misc.h>
@@ -19,6 +20,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <std_expr.h>
 #include <cprover_prefix.h>
 #include <pointer_offset_size.h>
+#include <context.h>
+#include <guard.h>
+#include <options.h>
 
 #include <ansi-c/c_types.h>
 #include <ansi-c/c_typecast.h>

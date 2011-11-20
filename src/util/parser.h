@@ -1,7 +1,7 @@
 #ifndef CPROVER_PARSER_H
 #define CPROVER_PARSER_H
 
-#include <iostream>
+#include <istream>
 #include <string>
 #include <vector>
 

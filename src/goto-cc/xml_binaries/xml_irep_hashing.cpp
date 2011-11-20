@@ -9,6 +9,7 @@ Date: July 2006
 \*******************************************************************/
 
 #include <sstream>
+#include <iostream>
 
 #include "xml_irep_hashing.h" 
 #include "string_hash.h"

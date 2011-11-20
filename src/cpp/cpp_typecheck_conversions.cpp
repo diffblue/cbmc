@@ -6,6 +6,8 @@ Author:
 
 \*******************************************************************/
 
+#include <cstdlib>
+
 #include <config.h>
 #include <arith_tools.h>
 #include <expr_util.h>

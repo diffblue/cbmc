@@ -8,9 +8,13 @@ Author: Daniel Kroening
 
 \*******************************************************************/
 
-#include <assert.h>
+#include <cassert>
 
+#include <threeval.h>
 #include <simplify_expr.h>
+
+#include <solvers/prop/prop_conv.h>
+#include <solvers/prop/prop.h>
 
 #include "build_goto_trace.h"
 

@@ -16,11 +16,12 @@ Author: Daniel Kroening, kroening@kroening.com
  * \date   Sun Jul 31 21:54:44 BST 2011
 */
 
-#include <assert.h>
+#include <cassert>
 
-#include <type.h>
 #include <expr.h>
 #include <mp_arith.h>
+
+class constant_exprt;
 
 /*! \defgroup gr_std_types Conversion to specific types
  *  Conversion to subclasses of @ref typet
@@ -699,8 +700,8 @@ public:
   
   mp_integer smallest() const;
   mp_integer largest() const;
-  class constant_exprt smallest_expr() const;
-  class constant_exprt largest_expr() const;
+  constant_exprt smallest_expr() const;
+  constant_exprt largest_expr() const;
 };
 
 /*! \brief Cast a generic typet to an \ref unsignedbv_typet
@@ -744,8 +745,8 @@ public:
 
   mp_integer smallest() const;
   mp_integer largest() const;
-  class constant_exprt smallest_expr() const;
-  class constant_exprt largest_expr() const;
+  constant_exprt smallest_expr() const;
+  constant_exprt largest_expr() const;
 };
 
 /*! \brief Cast a generic typet to a \ref signedbv_typet

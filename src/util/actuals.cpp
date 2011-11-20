@@ -7,6 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include "actuals.h"
+#include "expr.h"
+#include "replace_symbol.h"
 
 /*******************************************************************\
 

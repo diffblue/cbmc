@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <cstdlib>
+
 #include <config.h>
 #include <arith_tools.h>
 #include <simplify_expr.h>

@@ -22,6 +22,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <fixedbv.h>
 #include <prefix.h>
 #include <lispirep.h>
+#include <lispexpr.h>
+#include <symbol.h>
 
 #include "expr2c.h"
 #include "c_types.h"

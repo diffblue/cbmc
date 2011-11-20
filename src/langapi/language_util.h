@@ -9,7 +9,11 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #ifndef CPROVER_LANGUAGE_UTIL_H
 #define CPROVER_LANGUAGE_UTIL_H
 
-#include <namespace.h>
+#include <irep.h>
+
+class exprt;
+class namespacet;
+class typet;
 
 std::string from_expr(
   const namespacet &ns,

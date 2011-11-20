@@ -12,7 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 #include <string>
 
-#include "message.h"
+#include <message.h>
 
 class preprocessort:public messaget
 {

@@ -8,9 +8,10 @@ Author: Daniel Kroening
 
 \*******************************************************************/
 
-#include <assert.h>
+#include <cassert>
 
 #include <arith_tools.h>
+#include <symbol.h>
 
 #include <ansi-c/printf_formatter.h>
 #include <langapi/language_util.h>

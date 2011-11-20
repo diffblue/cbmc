@@ -15,7 +15,7 @@ Date: February 2006
 #include <guard.h>
 #include <std_code.h>
 #include <namespace.h>
-#include <expr_util.h>
+#include <std_expr.h>
 
 #include <pointer-analysis/value_sets.h>
 

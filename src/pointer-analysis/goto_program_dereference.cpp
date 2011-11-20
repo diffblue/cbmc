@@ -9,6 +9,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <simplify_expr.h>
 #include <base_type.h>
 #include <std_code.h>
+#include <context.h>
+#include <guard.h>
+#include <options.h>
 
 #include "goto_program_dereference.h"
 

@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include "string_hash.h"
 #include "irep_hash_container.h"
+#include "irep.h"
 
 /*******************************************************************\
 

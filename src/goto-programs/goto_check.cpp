@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <arith_tools.h>
 #include <base_type.h>
 #include <ieee_float.h>
+#include <std_expr.h>
 
 #include "goto_check.h"
 

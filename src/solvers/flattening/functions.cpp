@@ -13,6 +13,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <std_types.h>
 #include <std_expr.h>
 
+#include <solvers/prop/prop.h>
+
 #include "functions.h"
 
 /*******************************************************************\

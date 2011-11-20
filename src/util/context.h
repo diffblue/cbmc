@@ -18,14 +18,12 @@ Author: Daniel Kroening, kroening@kroening.com
 /*! \defgroup gr_symbol_table Symbol Table
 */
 
-#include <iostream>
+#include <ostream>
 
 #include <map>
 
 #include <hash_cont.h>
-#include <type.h>
 #include <symbol.h>
-#include <string_hash.h>
 
 #define forall_symbols(it, expr) \
   for(contextt::symbolst::const_iterator it=(expr).begin(); \

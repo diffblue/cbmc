@@ -9,9 +9,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_POINTER_ANALYSIS_FAILED_SYMBOLS_H
 #define CPROVER_POINTER_ANALYSIS_FAILED_SYMBOLS_H
 
-#include <context.h>
-#include <namespace.h>
-#include <std_expr.h>
+#include <irep.h>
+
+class contextt;
+class exprt;
+class namespacet;
+class symbol_exprt;
 
 void add_failed_symbols(contextt &context);
 

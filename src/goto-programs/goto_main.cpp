@@ -7,6 +7,7 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <rename.h>
+#include <context.h>
 
 #include "goto_convert_class.h"
 

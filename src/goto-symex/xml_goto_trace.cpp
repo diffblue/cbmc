@@ -8,13 +8,14 @@ Author: Daniel Kroening
 
 \*******************************************************************/
 
-#include <assert.h>
+#include <cassert>
 
 #include <xml_irep.h>
 #include <i2string.h>
 #include <arith_tools.h>
 #include <ieee_float.h>
 #include <fixedbv.h>
+#include <symbol.h>
 
 #include <ansi-c/printf_formatter.h>
 #include <langapi/language_util.h>

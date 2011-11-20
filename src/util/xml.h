@@ -12,7 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <list>
 #include <map>
 #include <string>
-#include <iostream>
+#include <ostream>
 
 /*! \defgroup gr_xml XML file processing */
 

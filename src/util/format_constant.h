@@ -9,8 +9,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_FORMAT_CONSTANT_H
 #define CPROVER_FORMAT_CONSTANT_H
 
-#include "expr.h"
+#include <string>
+
 #include "format_spec.h"
+
+class exprt;
 
 class format_constantt:public format_spect
 {

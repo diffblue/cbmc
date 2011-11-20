@@ -11,12 +11,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*! \defgroup gr_goto_programs Goto programs */
 
-#include <assert.h>
-
-#include <iostream>
+#include <cassert>
+#include <ostream>
 #include <set>
 
 #include <namespace.h>
+#include <location.h>
 
 typedef enum { NO_INSTRUCTION_TYPE=0,
                GOTO=1,          // branch, possibly guarded

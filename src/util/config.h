@@ -9,9 +9,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_UTIL_CONFIG_H
 #define CPROVER_UTIL_CONFIG_H
 
-#include "cmdline.h"
+#include <list>
+
 #include "ieee_float.h"
 
+class cmdlinet;
 class contextt;
 class namespacet;
 

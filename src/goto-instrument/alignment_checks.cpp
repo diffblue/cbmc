@@ -8,6 +8,7 @@ Author:
 
 #include <pointer_offset_size.h>
 #include <config.h>
+#include <context.h>
 
 #include "alignment_checks.h"
 
