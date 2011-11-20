@@ -258,6 +258,9 @@ void cbmc_parseoptionst::get_command_line_options(optionst &options)
   if(cmdline.isset("smt2"))
     options.set_option("smt2", true);
 
+  if(cmdline.isset("fpa"))
+    options.set_option("fpa", true);
+
   if(cmdline.isset("yices"))
     options.set_option("yices", true);
 

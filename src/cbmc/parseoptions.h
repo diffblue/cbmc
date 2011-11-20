@@ -27,7 +27,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(signed-overflow-check)(unsigned-overflow-check)" \
   "(partial-loops)" \
   "(xml-ui)(xml-interface)(vcd):" \
-  "(cvc)(smt1)(smt2)(boolector)(yices)(z3)(opensmt)" \
+  "(cvc)(smt1)(smt2)(boolector)(yices)(z3)(opensmt)(fpa)" \
   "(no-pretty-names)(beautify-greedy)(beautify-pbs)" \
   "(floatbv)(fixedbv)(no-assertions)(no-assumptions)(nan-check)" \
   "(dimacs)(refine)" \
