@@ -551,6 +551,19 @@ void smt2_convt::convert_expr(const exprt &expr)
       convert_expr(expr.op0());
       smt2_prop.out << ")";
     }
+    else if(expr.type().id()==ID_floatbv)
+    {
+      if(use_FPA_theory)
+      {
+        smt2_prop.out << "(- "; // no rounding
+        convert_expr(expr.op0());
+        smt2_prop.out << ")";
+      }
+      else
+      {
+        // TODO
+      }
+    }
     else
     {
       smt2_prop.out << "(bvneg ";
@@ -631,6 +644,54 @@ void smt2_convt::convert_expr(const exprt &expr)
       smt2_prop.out << " ";
       convert_expr(expr.op1());
       smt2_prop.out << ")";
+    }
+  }
+  else if(expr.id()==ID_ieee_float_equal ||
+          expr.id()==ID_ieee_float_notequal)
+  {
+    assert(expr.operands().size()==2);
+    assert(expr.op0().type()==expr.op1().type());
+
+    // These are not the same as (= A B)!
+
+    if(use_FPA_theory)
+    {
+      if(expr.id()==ID_ieee_float_notequal)
+      {
+        smt2_prop.out << "(not (== ";
+        convert_expr(expr.op0());
+        smt2_prop.out << " ";
+        convert_expr(expr.op1());
+        smt2_prop.out << "))";
+      }
+      else
+      {
+        smt2_prop.out << "(== ";
+        convert_expr(expr.op0());
+        smt2_prop.out << " ";
+        convert_expr(expr.op1());
+        smt2_prop.out << ")";
+      }
+    }
+    else
+    {
+      // TODO: NAN check!
+      if(expr.id()==ID_ieee_float_notequal)
+      {
+        smt2_prop.out << "(not (= ";
+        convert_expr(expr.op0());
+        smt2_prop.out << " ";
+        convert_expr(expr.op1());
+        smt2_prop.out << "))";
+      }
+      else
+      {
+        smt2_prop.out << "(= ";
+        convert_expr(expr.op0());
+        smt2_prop.out << " ";
+        convert_expr(expr.op1());
+        smt2_prop.out << ")";
+      }
     }
   }
   else if(expr.id()==ID_le ||
@@ -918,12 +979,26 @@ void smt2_convt::convert_expr(const exprt &expr)
     }
     else if(type.id()==ID_floatbv)
     {
-      unsigned result_width=to_floatbv_type(type).get_width();
-      smt2_prop.out << "(bvand ";
-      convert_expr(expr.op0());
-      smt2_prop.out << " (_ bv"
-                    << (power(2, result_width-1)-1)
-                    << " " << result_width << "))";
+      const floatbv_typet &floatbv_type=to_floatbv_type(type);
+
+      if(use_FPA_theory)
+      {
+        smt2_prop.out << "(abs (_ FP "
+                      << floatbv_type.get_e() << " "
+                      << floatbv_type.get_f() << ") ";
+        convert_expr(expr.op0());
+        smt2_prop.out << ")";
+      }
+      else
+      {
+        // bit-level encoding
+        unsigned result_width=floatbv_type.get_width();
+        smt2_prop.out << "(bvand ";
+        convert_expr(expr.op0());
+        smt2_prop.out << " (_ bv"
+                      << (power(2, result_width-1)-1)
+                      << " " << result_width << "))";
+      }
     }
     else
       throw "abs with unsupported operand type";
@@ -936,6 +1011,20 @@ void smt2_convt::convert_expr(const exprt &expr)
 
     if(op_type.id()==ID_fixedbv)
       smt2_prop.out << "false";
+    else if(op_type.id()==ID_floatbv)
+    {
+      const floatbv_typet &floatbv_type=to_floatbv_type(op_type);
+      if(use_FPA_theory)
+      {
+        smt2_prop.out << "(isNaN ";
+        convert(expr.op0());
+        smt2_prop.out << floatbv_type.get_f() << ")";
+      }
+      else
+      {
+        // TODO
+      }
+    }
     else
       throw "isnan with unsupported operand type";
   }
@@ -948,6 +1037,20 @@ void smt2_convt::convert_expr(const exprt &expr)
 
     if(op_type.id()==ID_fixedbv)
       smt2_prop.out << "true";
+    else if(op_type.id()==ID_floatbv)
+    {
+      const floatbv_typet &floatbv_type=to_floatbv_type(op_type);
+      if(use_FPA_theory)
+      {
+        smt2_prop.out << "(not (isFinite ";
+        convert(expr.op0());
+        smt2_prop.out << floatbv_type.get_f() << "))";
+      }
+      else
+      {
+        // TODO
+      }
+    }
     else
       throw "isfinite with unsupported operand type";
   }
@@ -960,6 +1063,20 @@ void smt2_convt::convert_expr(const exprt &expr)
 
     if(op_type.id()==ID_fixedbv)
       smt2_prop.out << "false";
+    else if(op_type.id()==ID_floatbv)
+    {
+      const floatbv_typet &floatbv_type=to_floatbv_type(op_type);
+      if(use_FPA_theory)
+      {
+        smt2_prop.out << "(isFinite ";
+        convert(expr.op0());
+        smt2_prop.out << floatbv_type.get_f() << ")";
+      }
+      else
+      {
+        // TODO
+      }
+    }
     else
       throw "isinf with unsupported operand type";
   }
@@ -972,6 +1089,20 @@ void smt2_convt::convert_expr(const exprt &expr)
 
     if(op_type.id()==ID_fixedbv)
       smt2_prop.out << "true";
+    else if(op_type.id()==ID_floatbv)
+    {
+      const floatbv_typet &floatbv_type=to_floatbv_type(op_type);
+      if(use_FPA_theory)
+      {
+        smt2_prop.out << "(isNormal ";
+        convert(expr.op0());
+        smt2_prop.out << floatbv_type.get_f() << ")";
+      }
+      else
+      {
+        // TODO
+      }
+    }
     else
       throw "isnormal with unsupported operand type";
   }
@@ -1471,12 +1602,29 @@ void smt2_convt::convert_constant(const constant_exprt &expr)
   }
   else if(expr.type().id()==ID_floatbv)
   {
-    ieee_float_spect spec(to_floatbv_type(expr.type()));
+    const floatbv_typet &floatbv_type=
+      to_floatbv_type(expr.type());
+  
+    if(use_FPA_theory)
+    {
+      ieee_floatt v=ieee_floatt(expr);
+      smt2_prop.out << "((_ asFloat "
+                    << floatbv_type.get_e() << " "
+                    << floatbv_type.get_f() << ") "
+                    << "(RNE " << v.get_sign() << " "
+                    << v.get_fraction() << " "
+                    << v.get_exponent() << "))";
+    }
+    else
+    {
+      // produce corresponding bit-vector
+      ieee_float_spect spec(floatbv_type);
 
-    std::string v_str=id2string(expr.get(ID_value));
-    mp_integer v=binary2integer(v_str, false);
+      std::string v_str=id2string(expr.get(ID_value));
+      mp_integer v=binary2integer(v_str, false);
 
-    smt2_prop.out << "(_ bv" << v << " " << spec.width() << ")";
+      smt2_prop.out << "(_ bv" << v << " " << spec.width() << ")";
+    }
   }
   else if(expr.type().id()==ID_pointer)
   {
@@ -1687,6 +1835,41 @@ void smt2_convt::convert_relation(const exprt &expr)
     smt2_prop.out << " ";
     convert_expr(expr.op1());
   }
+  else if(op_type.id()==ID_floatbv)
+  {
+    if(use_FPA_theory)
+    {
+      if(expr.id()==ID_le)
+        smt2_prop.out << "<=";
+      else if(expr.id()==ID_lt)
+        smt2_prop.out << "<";
+      else if(expr.id()==ID_ge)
+        smt2_prop.out << ">=";
+      else if(expr.id()==ID_gt)
+        smt2_prop.out << ">";
+
+      smt2_prop.out << " ";
+      convert_expr(expr.op0());
+      smt2_prop.out << " ";
+      convert_expr(expr.op1());
+    }
+    else
+    {
+      if(expr.id()==ID_le)
+        smt2_prop.out << "bvsle";
+      else if(expr.id()==ID_lt)
+        smt2_prop.out << "bvslt";
+      else if(expr.id()==ID_ge)
+        smt2_prop.out << "bvsge";
+      else if(expr.id()==ID_gt)
+        smt2_prop.out << "bvsgt";
+
+      smt2_prop.out << " ";
+      convert_expr(expr.op0());
+      smt2_prop.out << " ";
+      convert_expr(expr.op1());
+    }
+  }
   else if(op_type.id()==ID_rational || 
           op_type.id()==ID_integer)
   {
@@ -1733,6 +1916,27 @@ void smt2_convt::convert_plus(const exprt &expr)
     }
 
     smt2_prop.out << ")";
+  }
+  else if(expr.type().id()==ID_floatbv)
+  {
+    // really ought to be binary only
+    
+    if(use_FPA_theory)
+    {
+      smt2_prop.out << "(+ RNE ";
+
+      forall_operands(it, expr)
+      {
+        smt2_prop.out << " ";
+        convert_expr(*it);
+      }
+
+      smt2_prop.out << ")";
+    }
+    else
+    {
+      // TODO
+    }
   }
   else if(expr.type().id()==ID_pointer)
   {
@@ -1804,24 +2008,25 @@ void smt2_convt::convert_minus(const exprt &expr)
      expr.type().id()==ID_fixedbv)
   {
     smt2_prop.out << "(bvsub ";
-
-    if(expr.op0().type().id()==ID_pointer)
-      smt2_prop.out << "((_ extract "
-                    << boolbv_width(expr.op0().type())-1 << " 0) ";
     convert_expr(expr.op0());
-    if(expr.op0().type().id()==ID_pointer)
-      smt2_prop.out << ")";
-
     smt2_prop.out << " ";
-
-    if(expr.op1().type().id()==ID_pointer)
-      smt2_prop.out << "((_ extract "
-                    << boolbv_width(expr.op1().type())-1 << " 0) ";
     convert_expr(expr.op1());
-    if(expr.op1().type().id()==ID_pointer)
-      smt2_prop.out << ")";
-
     smt2_prop.out << ")";
+  }
+  else if(expr.type().id()==ID_floatbv)
+  {
+    if(use_FPA_theory)
+    {
+      smt2_prop.out << "(- ";
+      convert_expr(expr.op0());
+      smt2_prop.out << " ";
+      convert_expr(expr.op1());
+      smt2_prop.out << ")";
+    }
+    else
+    {
+      // TODO
+    }
   }
   else if(expr.type().id()==ID_pointer)
   {
@@ -1882,6 +2087,21 @@ void smt2_convt::convert_div(const exprt &expr)
 
     smt2_prop.out << "))";
   }
+  else if(expr.type().id()==ID_floatbv)
+  {
+    if(use_FPA_theory)
+    {
+      smt2_prop.out << "(/ RNE ";
+      convert_expr(expr.op0());
+      smt2_prop.out << " ";
+      convert_expr(expr.op1());
+      smt2_prop.out << ")";
+    }
+    else
+    {
+      // TODO
+    }
+  }
   else
     throw "unsupported type for /: "+expr.type().id_string();
 }
@@ -1921,6 +2141,34 @@ void smt2_convt::convert_mul(const exprt &expr)
       }
 
       last=it;
+    }
+  }
+  if(expr.type().id()==ID_floatbv)
+  {
+    if(use_FPA_theory)
+    {
+      forall_operands(it, expr)
+        if(it!=expr.operands().begin())
+          smt2_prop.out << "(* RNE ";
+
+      exprt::operandst::const_iterator last;
+
+      forall_operands(it, expr)
+      {
+        if(it!=expr.operands().begin())
+        {
+          convert_expr(*last);
+          smt2_prop.out << " ";
+          convert_expr(*it);
+          smt2_prop.out << ")";
+        }
+
+        last=it;
+      }
+    }
+    else
+    {
+      // TODO
     }
   }
   else if(expr.type().id()==ID_fixedbv)
