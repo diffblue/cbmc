@@ -6,11 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <assert.h>
-
+#include <cassert>
 #include <stack>
 
 #include <i2string.h>
+#include <threeval.h>
 
 #include "satcheck_minisat.h"
 

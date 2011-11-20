@@ -13,10 +13,13 @@ Author: Daniel Kroening, kroening@kroening.com
  * \date   Sun Jul 31 21:54:44 BST 2011
 */
 
-#include "expr.h"
-#include "symbol.h"
-#include "std_types.h"
-#include "std_expr.h"
+#include "irep.h"
+
+class exprt;
+class pointer_typet;
+class symbol_exprt;
+class symbolt;
+class typet;
 
 /*! \deprecated This function will eventually be removed. Use functions from
  * \ref util/std_expr.h instead.

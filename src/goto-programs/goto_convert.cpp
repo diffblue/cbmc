@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <expr_util.h>
 #include <prefix.h>
 #include <std_expr.h>
+#include <context.h>
 
 #include <ansi-c/c_types.h>
 

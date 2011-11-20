@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <arith_tools.h>
 
 #include "byte_operators.h"
+#include "namespace.h"
 
 /*******************************************************************\
 

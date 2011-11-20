@@ -9,9 +9,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_PROPSOLVE_AIG_PROP_H
 #define CPROVER_PROPSOLVE_AIG_PROP_H
 
-#include <assert.h>
-
+#include <cassert>
 #include <iostream>
+
+#include <threeval.h>
 
 #include "aig.h"
 

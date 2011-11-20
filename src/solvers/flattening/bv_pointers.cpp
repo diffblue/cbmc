@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <std_expr.h>
 #include <expr_util.h>
 #include <pointer_offset_size.h>
+#include <threeval.h>
 
 #include "bv_pointers.h"
 

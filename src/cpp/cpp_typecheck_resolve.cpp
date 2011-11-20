@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
+#include <cstdlib>
+#include <algorithm>
+
 #include <expr_util.h>
 #include <std_types.h>
 #include <std_expr.h>

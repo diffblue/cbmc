@@ -8,12 +8,16 @@ Author: Daniel Kroening, kroening@kroening.com
 
 //#define DEBUG
 
-#include <assert.h>
+#include <cassert>
+#include <iostream>
 
 #include <std_expr.h>
 #include <std_types.h>
 #include <arith_tools.h>
 #include <base_type.h>
+#include <namespace.h>
+
+#include <solvers/prop/prop.h>
 
 #include "arrays.h"
 

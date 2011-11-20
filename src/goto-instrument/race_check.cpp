@@ -12,6 +12,7 @@ Date: February 2006
 #include <std_expr.h>
 #include <expr_util.h>
 #include <guard.h>
+#include <context.h>
 
 #include <pointer-analysis/value_sets.h>
 #include <goto-programs/remove_skip.h>

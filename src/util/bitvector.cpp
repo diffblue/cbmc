@@ -6,9 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <stdlib.h>
+#include <cstdlib>
 
 #include "bitvector.h"
+#include "type.h"
 
 /*******************************************************************\
 

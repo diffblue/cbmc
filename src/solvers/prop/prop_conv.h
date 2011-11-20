@@ -14,13 +14,16 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_PROP_CONV_H
 
 #include <string>
-#include <list>
+#include <map>
 
 #include <hash_cont.h>
 #include <decision_procedure.h>
-#include <threeval.h>
+#include <expr.h>
 
-#include "prop.h"
+#include "literal.h"
+
+class propt;
+class tvt;
 
 class prop_conv_baset:public decision_proceduret
 {

@@ -15,7 +15,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <langapi/language_ui.h>
 
 #include "xml_interface.h"
-#include "bmc.h"
+
+class bmc_baset;
+class bmct;
+class goto_functionst;
+class optionst;
 
 #define CBMC_OPTIONS \
   "(program-only)(function):(preprocess)(slice-by-trace):" \

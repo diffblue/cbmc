@@ -11,7 +11,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "std_types.h"
 #include "base_type.h"
-#include "union_find.h"
+#include "namespace.h"
+#include "symbol.h"
 
 /*******************************************************************\
 

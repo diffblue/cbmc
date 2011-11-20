@@ -9,15 +9,17 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_SIMPLIFY_EXPR_CLASS_H
 #define CPROVER_SIMPLIFY_EXPR_CLASS_H
 
-#include <hash_cont.h>
 #include <map>
 #include <set>
 
-#include <expr.h>
+#include <type.h>
 #include <mp_arith.h>
-#include <threeval.h>
-#include <std_expr.h>
-#include <namespace.h>
+
+class exprt;
+class index_exprt;
+class member_exprt;
+class namespacet;
+class tvt;
 
 #define forall_value_list(it, value_list) \
   for(simplify_exprt::value_listt::const_iterator it=(value_list).begin(); \

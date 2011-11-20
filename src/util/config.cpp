@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "config.h"
 #include "context.h"
 #include "arith_tools.h"
+#include "cmdline.h"
 
 configt config;
 

@@ -11,10 +11,6 @@ Date: June 2003
 #ifndef CPROVER_GOTO_FUNCTIONS_H
 #define CPROVER_GOTO_FUNCTIONS_H
 
-#include <iostream>
-
-#include <std_types.h>
-
 #include "goto_program.h"
 #include "goto_functions_template.h"
 

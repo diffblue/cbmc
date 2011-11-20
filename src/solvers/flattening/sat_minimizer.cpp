@@ -6,9 +6,10 @@ Author: Georg Weissenbacher, georg.weissenbacher@inf.ethz.ch
 
 \*******************************************************************/
 
-#include <assert.h>
+#include <cassert>
 
 #include <i2string.h>
+#include <threeval.h>
 
 #include <solvers/sat/satcheck.h>
 

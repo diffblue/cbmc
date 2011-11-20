@@ -6,7 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <assert.h>
+#include <cassert>
 
 #include <base_type.h>
 #include <simplify_expr.h>
@@ -14,10 +14,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cprover_prefix.h>
 #include <expr_util.h>
 #include <std_expr.h>
+#include <context.h>
+#include <guard.h>
 
 #include <ansi-c/c_types.h>
 
 #include "basic_symex.h"
+#include "goto_symex_state.h"
 
 unsigned basic_symext::nondet_count=0;
 unsigned basic_symext::dynamic_counter=0;

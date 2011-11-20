@@ -10,7 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_TYPECHECK_H
 
 #include "message_stream.h"
-#include "expr.h"
 
 class typecheckt:public message_streamt
 {

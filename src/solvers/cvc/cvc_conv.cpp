@@ -6,8 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <assert.h>
+#include <cassert>
 #include <ctype.h>
+#include <cstdlib>
 
 #include <arith_tools.h>
 #include <std_types.h>

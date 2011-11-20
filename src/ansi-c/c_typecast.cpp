@@ -6,12 +6,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <assert.h>
+#include <cassert>
+#include <cstdlib>
 
 #include <config.h>
 #include <expr_util.h>
 #include <std_expr.h>
 #include <base_type.h>
+#include <symbol.h>
 
 #include "c_typecast.h"
 #include "c_types.h"

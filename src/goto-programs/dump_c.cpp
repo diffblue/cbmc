@@ -6,7 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <cstdlib>
+#include <iostream>
+
 #include <prefix.h>
+#include <context.h>
 
 #include <ansi-c/expr2c.h>
 

@@ -8,8 +8,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <algorithm>
 
-#include "i2string.h"
 #include "rename.h"
+#include "i2string.h"
+#include "symbol.h"
+#include "expr.h"
+#include "namespace.h"
 
 /*******************************************************************\
 

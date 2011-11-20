@@ -34,6 +34,8 @@ Date: June 2006
 
 #include <fstream>
 #include <sstream>
+#include <cstdlib>
+#include <algorithm>
 
 #include <config.h>
 #include <tempdir.h>
@@ -41,6 +43,7 @@ Date: June 2006
 #include <base_type.h>
 #include <xml.h>
 #include <i2string.h>
+#include <cmdline.h>
 
 #include <ansi-c/ansi_c_language.h>
 #include <ansi-c/c_link_class.h>

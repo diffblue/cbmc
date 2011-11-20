@@ -6,8 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <context.h>
-#include <message.h>
+#include <string>
+
+class contextt;
+class message_handlert;
+class symbolt;
 
 const symbolt &get_module(
   const contextt &context,

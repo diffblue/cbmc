@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
+#include <cstdlib>
+
 #include <expr_util.h>
 #include <i2string.h>
 #include <std_types.h>

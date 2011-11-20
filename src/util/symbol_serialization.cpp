@@ -10,6 +10,7 @@ Date: May 2007
 
 #include "symbol_serialization.h"
 #include "irep_serialization.h"
+#include "symbol.h"
 
 /*******************************************************************\
  

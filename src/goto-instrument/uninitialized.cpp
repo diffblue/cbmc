@@ -10,6 +10,7 @@ Date: January 2010
 
 #include <std_code.h>
 #include <std_expr.h>
+#include <context.h>
 
 #include "uninitialized_domain.h"
 

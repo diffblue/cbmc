@@ -11,8 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <list>
 
-#include "irep.h"
-#include "location.h"
+#include <location.h>
 
 /*! \brief The type of an expression
 */

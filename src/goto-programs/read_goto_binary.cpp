@@ -8,6 +8,8 @@ Author:
 
 #include <fstream>
 
+#include <message.h>
+
 #include "read_goto_binary.h"
 #include "read_bin_goto_object.h"
 

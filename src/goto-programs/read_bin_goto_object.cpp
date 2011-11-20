@@ -10,6 +10,7 @@ Date: June 2006
 
 #include <namespace.h>
 #include <message_stream.h>
+#include <context.h>
 
 #include "read_bin_goto_object.h"
 #include "goto_function_serialization.h"

@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <prefix.h>
 #include <cprover_prefix.h>
 #include <xml_irep.h>
+#include <context.h>
 
 #include <langapi/language_util.h>
 

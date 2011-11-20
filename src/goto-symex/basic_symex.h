@@ -9,17 +9,22 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_BASIC_SYMEX_H
 #define CPROVER_BASIC_SYMEX_H
 
-#include <map>
-#include <set>
-
 #include <options.h>
-#include <namespace.h>
-#include <replace_expr.h>
-#include <std_code.h>
-#include <std_expr.h>
 
-#include "symex_target.h"
-#include "goto_symex_state.h"
+class contextt;
+class code_assignt;
+class code_function_callt;
+class codet;
+class exprt;
+class goto_symex_statet;
+class guardt;
+class if_exprt;
+class index_exprt;
+class member_exprt;
+class namespacet;
+class side_effect_exprt;
+class symex_targett;
+class typecast_exprt;
 
 class basic_symext
 {

@@ -11,6 +11,7 @@ Author: CM Wintersteiger
 #include <message.h>
 #include <irep_serialization.h>
 #include <symbol_serialization.h>
+#include <context.h>
 
 #include <goto-programs/goto_function_serialization.h>
 

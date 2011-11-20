@@ -12,11 +12,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <set>
 
 #include <mp_arith.h>
-#include <namespace.h>
 #include <reference_counting.h>
 
 #include "object_numbering.h"
 #include "value_sets.h"
+
+class namespacet;
 
 class value_sett
 {

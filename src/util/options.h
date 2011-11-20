@@ -10,7 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_OPTIONS_H
 
 #include <string>
-#include <list>
 #include <map>
 
 class optionst

@@ -16,9 +16,8 @@ Author: Daniel Kroening, kroening@kroening.com
  * \date   Sun Jul 31 21:54:44 BST 2011
 */
 
-#include <assert.h>
+#include <cassert>
 
-#include <expr.h>
 #include <std_types.h>
 
 /*! \defgroup gr_std_expr Conversion to specific expressions

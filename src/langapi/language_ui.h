@@ -10,11 +10,11 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #define CPROVER_LANGUAGE_UI_H
 
 #include <message.h>
-#include <parseoptions.h>
 #include <language_file.h>
-#include <language.h>
+#include <context.h>
 #include <ui_message.h>
-#include <cmdline.h>
+
+class cmdlinet;
 
 class language_uit:public messaget
 {

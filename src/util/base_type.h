@@ -9,9 +9,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_BASE_TYPE_H
 #define CPROVER_BASE_TYPE_H
 
-#include <type.h>
-#include <namespace.h>
 #include <union_find.h>
+#include <irep.h>
+
+class exprt;
+class typet;
+class namespacet;
 
 // these go away
 void __old_base_type(typet &type, const namespacet &ns);

@@ -8,6 +8,9 @@ Date: May 2007
 
 \*******************************************************************/
 
+#include <cstdlib>
+#include <iostream>
+
 #include <i2string.h>
 
 #include "goto_program_irep.h"

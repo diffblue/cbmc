@@ -9,8 +9,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_IREP_HASH_H
 #define CPROVER_IREP_HASH_H
 
+#include <vector>
+
 #include "numbering.h"
-#include "irep.h"
+#include "hash_cont.h"
+
+class irept;
 
 class irep_hash_container_baset
 {

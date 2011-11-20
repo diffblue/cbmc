@@ -10,10 +10,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_LANGUAGE_H
 
 #include <set>
+#include <iostream>
+#include <string>
 
-#include "context.h"
-#include "namespace.h"
-#include "message.h"
+class contextt;
+class exprt;
+class message_handlert;
+class namespacet;
+class typet;
 
 class languaget
 {

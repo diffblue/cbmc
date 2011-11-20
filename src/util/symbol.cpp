@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <cstdlib>
+
 #include "symbol.h"
 #include "location.h"
 #include "std_expr.h"

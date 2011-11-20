@@ -10,6 +10,9 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <memory>
 
 #include <i2string.h>
+#include <namespace.h>
+#include <language.h>
+#include <cmdline.h>
 
 #include "language_ui.h"
 #include "mode.h"

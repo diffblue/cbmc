@@ -6,10 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <assert.h>
-
+#include <cassert>
+#include <cstdlib>
 #include <map>
 #include <set>
+#include <iostream>
 
 #include <symbol.h>
 #include <mp_arith.h>
@@ -19,6 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <std_types.h>
 #include <prefix.h>
 #include <std_expr.h>
+#include <threeval.h>
 
 #include <ansi-c/string_constant.h>
 

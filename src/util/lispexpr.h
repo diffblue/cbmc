@@ -10,7 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_LISPEXPR_H
 
 #ifdef _WIN32
-#include <string.h>
+#include <cstring>
 #define strcasecmp _strcmpi
 #else
 #include <strings.h>
@@ -18,7 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <string>
 #include <vector>
-#include <iostream>
+#include <ostream>
 
 class lispsymbolt:public std::string
 {

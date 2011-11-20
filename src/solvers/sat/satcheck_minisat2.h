@@ -9,9 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_SATCHECK_MINISAT2_H
 #define CPROVER_SATCHECK_MINISAT2_H
 
-#include <vector>
-#include <set>
-
 #include "cnf.h"
 
 // Select one: basic solver or with simplification.

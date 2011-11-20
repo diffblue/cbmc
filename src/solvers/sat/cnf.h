@@ -9,8 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_PROP_CNF_H
 #define CPROVER_PROP_CNF_H
 
-#include <list>
-
 #include <solvers/prop/prop.h>
 
 class cnft:public propt

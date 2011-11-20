@@ -10,8 +10,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_DECISION_PROCEDURE_H
 
 #include <message.h>
-#include <expr.h>
-#include <namespace.h>
+
+class exprt;
+class namespacet;
 
 class decision_proceduret:public messaget
 {

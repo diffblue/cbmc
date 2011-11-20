@@ -9,8 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_SIMPLIFY_EXPR_H
 #define CPROVER_SIMPLIFY_EXPR_H
 
-#include <expr.h>
-#include <namespace.h>
+class exprt;
+class namespacet;
 
 //
 // simplify an expression

@@ -13,7 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <stack>
 #include <map>
 #include <vector>
-#include <iostream>
+#include <ostream>
 #include <cassert>
 
 class empty_nodet

@@ -15,8 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 //
 
 #include <hash_cont.h>
-
-#include "expr.h"
+#include <expr.h>
 
 typedef hash_map_cont<exprt, exprt, irep_hash> replace_mapt;
 

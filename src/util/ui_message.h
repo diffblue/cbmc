@@ -11,8 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <message.h>
 
-#include <iostream>
-
 class ui_message_handlert:public message_handlert
 {
 public:

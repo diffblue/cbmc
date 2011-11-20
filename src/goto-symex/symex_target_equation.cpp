@@ -6,13 +6,15 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <assert.h>
+#include <cassert>
 
 #include <i2string.h>
 #include <std_expr.h>
 #include <expr_util.h>
 
 #include <langapi/language_util.h>
+#include <solvers/prop/prop_conv.h>
+#include <solvers/prop/prop.h>
 
 #include "goto_symex_state.h"
 #include "symex_target_equation.h"

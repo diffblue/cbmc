@@ -7,6 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include "lispirep.h"
+#include "irep.h"
+#include "lispexpr.h"
 
 /*******************************************************************\
 

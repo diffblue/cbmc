@@ -19,7 +19,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <vector>
 
 #include <expr.h>
-#include <namespace.h>
+
+class namespacet;
 
 /*! \brief TO_BE_DOCUMENTED
 */

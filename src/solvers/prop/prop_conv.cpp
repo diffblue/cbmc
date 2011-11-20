@@ -6,13 +6,15 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <assert.h>
-
+#include <cassert>
+#include <cstdlib>
 #include <map>
 
 #include <std_expr.h>
 #include <symbol.h>
+#include <threeval.h>
 
+#include "prop.h"
 #include "prop_conv.h"
 
 //#define DEBUG

@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <iostream>
+
 #include <xml.h>
 #include <i2string.h>
 #include <xml_irep.h>
@@ -13,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <langapi/language_util.h>
 
 #include "show_claims.h"
+#include "goto_functions.h"
 
 /*******************************************************************\
 

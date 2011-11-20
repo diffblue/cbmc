@@ -9,12 +9,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_IEEE_FLOAT_H
 #define CPROVER_IEEE_FLOAT_H
 
-#include <iostream>
+#include <ostream>
 
 #include <mp_arith.h>
-#include <expr.h>
 #include <format_spec.h>
 
+class exprt;
 class floatbv_typet;
 
 class ieee_float_spect

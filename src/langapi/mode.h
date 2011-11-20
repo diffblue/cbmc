@@ -9,7 +9,9 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #ifndef CPROVER_MODE_H
 #define CPROVER_MODE_H
 
-#include <language.h>
+#include <irep.h>
+
+class languaget;
 
 languaget *get_language_from_mode(const irep_idt &mode);
 languaget *get_language_from_filename(const std::string &filename);

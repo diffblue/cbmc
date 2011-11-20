@@ -1,8 +1,10 @@
-#include <stdlib.h>
+#include <cstdlib>
 #include <time.h>
 #include <limits>
 #include <float.h>
-#include <math.h>
+#include <cmath>
+#include <iostream>
+#include <cassert>
 
 #ifdef _WIN32
 #define random() rand()

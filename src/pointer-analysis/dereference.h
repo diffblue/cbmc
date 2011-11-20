@@ -10,15 +10,18 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_POINTER_ANALYSIS_DEREFERENCE_H
 
 #include <set>
+#include <string>
 
-#include <expr.h>
 #include <hash_cont.h>
-#include <guard.h>
-#include <namespace.h>
-#include <options.h>
 #include <std_expr.h>
 
 #include "value_sets.h"
+
+class contextt;
+class guardt;
+class optionst;
+class modet;
+class symbolt;
 
 /*! \brief TO_BE_DOCUMENTED
 */

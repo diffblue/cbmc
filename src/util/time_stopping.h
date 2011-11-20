@@ -11,7 +11,8 @@ Date: February 2004
 #ifndef CPROVER_TIME_STOPPING_H
 #define CPROVER_TIME_STOPPING_H
 
-#include <iostream>
+#include <ostream>
+#include <string>
 
 typedef unsigned long long fine_timet;
 

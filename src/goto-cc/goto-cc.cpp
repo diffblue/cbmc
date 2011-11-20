@@ -8,6 +8,9 @@ Date: May 2006
  
 \*******************************************************************/
 
+#include <algorithm>
+#include <iostream>
+
 #include "cmdline_options.h"
 #include "get_base_name.h"
 #include "gcc_cmdline.h"

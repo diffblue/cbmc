@@ -19,11 +19,9 @@ Author: Daniel Kroening, kroening@kroening.com
 /*! \defgroup gr_symbol_table Symbol Table
 */
 
-#include <iostream>
-#include <algorithm>
+#include <ostream>
 
-#include "expr.h"
-#include "location.h"
+#include <expr.h>
 
 /*! \brief Symbol table entry.
     \ingroup gr_symbol_table

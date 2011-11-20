@@ -9,7 +9,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_NAMESPACE_H
 #define CPROVER_NAMESPACE_H
 
-#include "context.h"
+#include <irep.h>
+
+class contextt;
+class exprt;
+class symbolt;
+class typet;
 
 class namespace_baset
 {

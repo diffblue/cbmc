@@ -8,10 +8,13 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <list>
 #include <memory>
+#include <set>
 
 #ifdef _WIN32
-#include <string.h>
+#include <cstring>
 #endif
+
+#include <language.h>
 
 #include "mode.h"
 

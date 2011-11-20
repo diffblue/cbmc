@@ -9,6 +9,7 @@ Date: September 2011
 \*******************************************************************/
 
 #include <std_expr.h>
+#include <context.h>
 
 #include "nondet_volatile.h"
 

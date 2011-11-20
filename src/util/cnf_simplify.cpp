@@ -6,9 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <assert.h>
+#include <cassert>
 
 #include "cnf_simplify.h"
+#include "expr.h"
 
 void cnf_propagate_not(exprt &expr);
 void cnf_join_binary(exprt &expr);

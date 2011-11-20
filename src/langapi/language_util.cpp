@@ -11,6 +11,10 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "language_util.h"
 #include "mode.h"
 
+#include <context.h>
+#include <namespace.h>
+#include <language.h>
+
 /*******************************************************************\
 
 Function: from_expr

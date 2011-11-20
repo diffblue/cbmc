@@ -11,6 +11,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <iostream>
 
+#include <threeval.h>
+
 #include <solvers/prop/prop.h>
 
 class smt2_propt:public propt

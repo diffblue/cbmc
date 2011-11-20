@@ -19,6 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <simplify_expr.h>
 #include <std_code.h>
 #include <std_expr.h>
+#include <symbol.h>
 
 #include <ansi-c/c_types.h>
 

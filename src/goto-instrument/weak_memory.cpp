@@ -16,6 +16,7 @@ Date: September 2011
 #include <cprover_prefix.h>
 #include <prefix.h>
 #include <i2string.h>
+#include <context.h>
 
 #include <pointer-analysis/value_sets.h>
 #include <pointer-analysis/goto_program_dereference.h>

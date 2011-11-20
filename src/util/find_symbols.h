@@ -12,8 +12,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <set>
 
 #include "hash_cont.h"
-#include "string_hash.h"
-#include "expr.h"
+#include "irep.h"
+
+class exprt;
+class typet;
 
 typedef hash_set_cont<irep_idt, irep_id_hash> find_symbols_sett;
 

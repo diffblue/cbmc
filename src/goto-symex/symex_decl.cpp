@@ -6,10 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <assert.h>
+#include <cassert>
 
 #include <expr_util.h>
 #include <rename.h>
+#include <std_expr.h>
 
 #include <pointer-analysis/add_failed_symbols.h>
 
