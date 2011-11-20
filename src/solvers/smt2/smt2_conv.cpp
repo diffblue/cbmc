@@ -2165,7 +2165,7 @@ void smt2_convt::convert_mul(const exprt &expr)
       last=it;
     }
   }
-  if(expr.type().id()==ID_floatbv)
+  else if(expr.type().id()==ID_floatbv)
   {
     if(use_FPA_theory)
     {
