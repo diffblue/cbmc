@@ -143,11 +143,11 @@ aliasingt aliasing(
   // nor will a struct alias with an array
   
   if(e1.id()==ID_index || e1.id()==ID_struct)
-    if(e1.id()!=e2.id())
+    if(e2.id()!=ID_dereference && e1.id()!=e2.id())
       return A_MUSTNOT;
 
   if(e2.id()==ID_index || e2.id()==ID_struct)
-    if(e1.id()!=e2.id())
+    if(e2.id()!=ID_dereference && e1.id()!=e2.id())
       return A_MUSTNOT;
 
   // we give up, and say it may
