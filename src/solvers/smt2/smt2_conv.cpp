@@ -561,7 +561,7 @@ void smt2_convt::convert_expr(const exprt &expr)
       }
       else
       {
-        // TODO
+        throw "TODO: unary minus for floatbv";
       }
     }
     else
@@ -1022,7 +1022,7 @@ void smt2_convt::convert_expr(const exprt &expr)
       }
       else
       {
-        // TODO
+        throw "TODO: isNaN for flaotbv";
       }
     }
     else
@@ -1042,13 +1042,13 @@ void smt2_convt::convert_expr(const exprt &expr)
       const floatbv_typet &floatbv_type=to_floatbv_type(op_type);
       if(use_FPA_theory)
       {
-        smt2_prop.out << "(not (isFinite ";
+        smt2_prop.out << "(isFinite ";
         convert(expr.op0());
-        smt2_prop.out << floatbv_type.get_f() << "))";
+        smt2_prop.out << floatbv_type.get_f() << ")";
       }
       else
       {
-        // TODO
+        throw "TODO: isfinite for floatbv";
       }
     }
     else
@@ -1068,13 +1068,13 @@ void smt2_convt::convert_expr(const exprt &expr)
       const floatbv_typet &floatbv_type=to_floatbv_type(op_type);
       if(use_FPA_theory)
       {
-        smt2_prop.out << "(isFinite ";
+        smt2_prop.out << "(not (isFinite ";
         convert(expr.op0());
-        smt2_prop.out << floatbv_type.get_f() << ")";
+        smt2_prop.out << floatbv_type.get_f() << "))";
       }
       else
       {
-        // TODO
+        throw "TODO: isinf for floatbv";
       }
     }
     else
@@ -1100,7 +1100,7 @@ void smt2_convt::convert_expr(const exprt &expr)
       }
       else
       {
-        // TODO
+        throw "TODO: isNormal for floatbv";
       }
     }
     else
@@ -1957,7 +1957,7 @@ void smt2_convt::convert_plus(const exprt &expr)
     }
     else
     {
-      // TODO
+      throw "TODO: + for floatbv";
     }
   }
   else if(expr.type().id()==ID_pointer)
@@ -2047,7 +2047,7 @@ void smt2_convt::convert_minus(const exprt &expr)
     }
     else
     {
-      // TODO
+      throw "TODO: - for floatbv";
     }
   }
   else if(expr.type().id()==ID_pointer)
@@ -2121,7 +2121,7 @@ void smt2_convt::convert_div(const exprt &expr)
     }
     else
     {
-      // TODO
+      throw "TODO: / for floatbv";
     }
   }
   else
@@ -2190,7 +2190,7 @@ void smt2_convt::convert_mul(const exprt &expr)
     }
     else
     {
-      // TODO
+      throw "TODO: * for floatbv";
     }
   }
   else if(expr.type().id()==ID_fixedbv)
