@@ -1230,7 +1230,7 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
         smt2_prop.out << ")";
       }
     }
-    else if(op_type.id()==ID_fixedbv) // from fixedbv
+    else if(op_type.id()==ID_fixedbv) // from fixedbv to int
     {
       const fixedbv_typet &fixedbv_type=to_fixedbv_type(op_type);
 
@@ -1255,7 +1255,20 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
         smt2_prop.out << ")";
       }
     }
-    else if(op_type.id()==ID_bool) // from boolean
+    else if(op_type.id()==ID_floatbv) // from floatbv to int
+    {
+      //const floatbv_typet &floatbv_type=to_floatbv_type(op_type);
+
+      if(use_FPA_theory)
+      {
+        smt2_prop.out << "((_ BVfromFPA " << to_width << ") ";
+        convert_expr(op);
+        smt2_prop.out << ")";
+      }
+      else
+        throw "TODO: floatbv -> int";
+    }
+    else if(op_type.id()==ID_bool) // from boolean to int
     {
       smt2_prop.out << "(ite ";
       convert_expr(op);
@@ -1473,11 +1486,43 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
         throw "TODO typecast4 floatbv -> floatbv";
       }
     }
+    else if(op_type.id()==ID_signedbv)
+    {
+      const floatbv_typet &dst=to_floatbv_type(expr_type);
+
+      if(use_FPA_theory)
+      {
+        smt2_prop.out << "((_ FPAfromBV " << dst.get_e() << " "
+                      << dst.get_f() << ") (RNE (";
+        convert_expr(op);
+        smt2_prop.out << "))";
+      }
+      else
+      {
+        throw "TODO typecast5 floatbv -> int";
+      }
+    }
+    else if(op_type.id()==ID_unsignedbv)
+    {
+      const floatbv_typet &dst=to_floatbv_type(expr_type);
+
+      if(use_FPA_theory)
+      {
+        smt2_prop.out << "((_ FPAfromBV " << dst.get_e() << " "
+                      << dst.get_f() << ") (RNE (";
+        convert_expr(op);
+        smt2_prop.out << "))";
+      }
+      else
+      {
+        throw "TODO typecast6 floatbv -> int";
+      }
+    }
     else
-      throw "TODO typecast5 floatbv -> "+op_type.id_string();
+      throw "TODO typecast7 floatbv -> "+op_type.id_string();
   }
   else
-    throw "TODO typecast6 "+op_type.id_string()+" -> "+expr_type.id_string();
+    throw "TODO typecast8 "+op_type.id_string()+" -> "+expr_type.id_string();
 }
 
 /*******************************************************************\
