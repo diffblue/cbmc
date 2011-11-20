@@ -1454,8 +1454,30 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
   {
     throw "TODO range typecast";
   }
+  else if(expr_type.id()==ID_floatbv)
+  {
+    if(op_type.id()==ID_floatbv)
+    {
+//      const floatbv_typet &src=to_floatbv_type(op_type);
+      const floatbv_typet &dst=to_floatbv_type(expr_type);
+
+      if(use_FPA_theory)
+      {
+        smt2_prop.out << "((_ cast " << dst.get_e() << " "
+                      << dst.get_f() << ") (RNE (";
+        convert_expr(op);
+        smt2_prop.out << "))";
+      }
+      else
+      {
+        throw "TODO typecast4 floatbv -> floatbv";
+      }
+    }
+    else
+      throw "TODO typecast5 floatbv -> "+op_type.id_string();
+  }
   else
-    throw "TODO typecast4 ? -> "+expr_type.id_string();
+    throw "TODO typecast6 "+op_type.id_string()+" -> "+expr_type.id_string();
 }
 
 /*******************************************************************\
