@@ -362,7 +362,7 @@ bool flow_insensitive_analysis_baset::do_function_call(
     r->code.move_to_operands(rhs);    
     
     goto_programt::targett t=temp.add_instruction(END_FUNCTION);    
-    t->code.set("identifier", code.function());
+    t->code.set(ID_identifier, code.function());
     t->function=f_it->first;
     t->location_number=1;
     
@@ -438,9 +438,9 @@ bool flow_insensitive_analysis_baset::do_function_call_rec(
 { 
   bool new_data = false;
   
-  if(function.id()=="symbol")
+  if(function.id()==ID_symbol)
   {
-    const irep_idt &identifier=function.get("identifier");
+    const irep_idt &identifier=function.get(ID_identifier);
     
     if(recursion_set.find(identifier)!=recursion_set.end())
     {
@@ -469,7 +469,7 @@ bool flow_insensitive_analysis_baset::do_function_call_rec(
     
     recursion_set.erase(identifier);
   }
-  else if(function.id()=="if")
+  else if(function.id()==ID_if)
   {
     if(function.operands().size()!=3)
       throw "if takes three arguments";
@@ -490,7 +490,7 @@ bool flow_insensitive_analysis_baset::do_function_call_rec(
         state,
         goto_functions) || new_data;
   }
-  else if(function.id()=="dereference")
+  else if(function.id()==ID_dereference)
   {
     // get value set
     expr_sett values;
@@ -502,13 +502,13 @@ bool flow_insensitive_analysis_baset::do_function_call_rec(
         it!=values.end();
         it++)
     {
-      if(it->id()=="object_descriptor")
+      if(it->id()==ID_object_descriptor)
       {
         const object_descriptor_exprt &o=to_object_descriptor_expr(*it);
         
         // ... but only if they are actually functions.
         goto_functionst::function_mapt::const_iterator it=
-          goto_functions.function_map.find(o.object().get("identifier"));
+          goto_functions.function_map.find(o.object().get(ID_identifier));
         
         if (it!=goto_functions.function_map.end())
         {
@@ -527,7 +527,7 @@ bool flow_insensitive_analysis_baset::do_function_call_rec(
   {
     // ignore, can't be a function
   }
-  else if(function.id()=="member" || function.id()=="index")
+  else if(function.id()==ID_member || function.id()==ID_index)
   {
     // ignore, can't be a function
   }

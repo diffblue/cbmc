@@ -340,12 +340,12 @@ void satcheck_smvsat_interpolatort::build_aig(
       e.make_true();
     else if(n<=satsolver->num_variables())
     { // a SAT variable
-      e.id("symbol");
-      e.set("identifier", n);
+      e.id(ID_symbol);
+      e.set(ID_identifier, n);
     }
     else
     {
-      e.id("and");
+      e.id(ID_and);
       e.operands().resize(2);
       
       unsigned g0=interpolator_satsolver.aig_arg(n, 0);

@@ -52,7 +52,7 @@ bool read_bin_goto_object_v1(
     symbol.from_irep(t);
     
     if(!symbol.is_type &&
-       symbol.type.id()=="code")
+       symbol.type.id()==ID_code)
     {
       // makes sure there is an empty function
       // for every function symbol and fixes
@@ -138,7 +138,7 @@ bool read_bin_goto_object_v2(
     sym.is_extern = flags & (1 << 1);
     sym.is_volatile = flags & 1;
     
-    if(!sym.is_type && sym.type.id()=="code")
+    if(!sym.is_type && sym.type.id()==ID_code)
     {
       // makes sure there is an empty function
       // for every function symbol and fixes

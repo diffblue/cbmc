@@ -28,10 +28,10 @@ Function: boolbvt::convert_div
 
 void boolbvt::convert_div(const exprt &expr, bvt &bv)
 {
-  if(expr.type().id()!="unsignedbv" &&
-     expr.type().id()!="signedbv" &&
-     expr.type().id()!="fixedbv" &&
-     expr.type().id()!="floatbv")
+  if(expr.type().id()!=ID_unsignedbv &&
+     expr.type().id()!=ID_signedbv &&
+     expr.type().id()!=ID_fixedbv &&
+     expr.type().id()!=ID_floatbv)
     return conversion_failed(expr, bv);
 
   unsigned width=boolbv_width(expr.type());
@@ -57,7 +57,7 @@ void boolbvt::convert_div(const exprt &expr, bvt &bv)
 
   bvt res, rem;
 
-  if(expr.type().id()=="fixedbv")
+  if(expr.type().id()==ID_fixedbv)
   {
     unsigned fraction_bits=
       to_fixedbv_type(expr.type()).get_fraction_bits();
@@ -74,7 +74,7 @@ void boolbvt::convert_div(const exprt &expr, bvt &bv)
     // cut it down again
     res.resize(width);
   }
-  else if(expr.type().id()=="floatbv")
+  else if(expr.type().id()==ID_floatbv)
   {
     #ifdef HAVE_FLOATBV
     float_utilst float_utils(prop);
@@ -87,7 +87,7 @@ void boolbvt::convert_div(const exprt &expr, bvt &bv)
   else
   {
     bv_utilst::representationt rep=
-      expr.type().id()=="signedbv"?bv_utilst::SIGNED:
+      expr.type().id()==ID_signedbv?bv_utilst::SIGNED:
                                    bv_utilst::UNSIGNED;
 
     bv_utils.divider(op0, op1, res, rem, rep);

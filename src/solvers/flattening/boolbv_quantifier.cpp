@@ -89,9 +89,9 @@ void boolbvt::post_process_quantifiers()
       inst_bv.push_back(convert(dest));
     }
 
-    if(expr.id()=="forall")
+    if(expr.id()==ID_forall)
       prop.set_equal(prop.land(inst_bv), q_it->l);
-    else if(expr.id()=="exists")
+    else if(expr.id()==ID_exists)
       prop.set_equal(prop.lor(inst_bv), q_it->l);
     else
       assert(false);

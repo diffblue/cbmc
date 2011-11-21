@@ -863,7 +863,7 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
 
     if(ext>0) smt1_prop.out << ")";
   }
-  else if(expr.id()=="same-object")
+  else if(expr.id()==ID_same_object)
   {
     assert(expr.operands().size()==2);
     assert(expr.op0().type().id()==ID_pointer);
@@ -1109,11 +1109,11 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
     else
       throw "isnormal with unsupported operand type";
   }
-  else if(expr.id()=="overflow-+" ||
-          expr.id()=="overflow--")
+  else if(expr.id()==ID_overflow_plus ||
+          expr.id()==ID_overflow_minus)
   {
     assert(expr.operands().size()==2);
-    bool subtract=expr.id()=="overflow--";
+    bool subtract=expr.id()==ID_overflow_minus;
 
     const typet &op_type=expr.op0().type();
 
@@ -1155,7 +1155,7 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
     else
       throw "overflow check on unknown type: "+op_type.id_string();
   }
-  else if(expr.id()=="overflow-*")
+  else if(expr.id()==ID_overflow_mult)
   {
     assert(expr.operands().size()==2);
     throw "not yet implemented: overflow-*";
@@ -1556,7 +1556,7 @@ void smt1_convt::convert_struct(const exprt &expr)
     unsigned nr_ops=0;
 
     for(unsigned i=0; i<components.size(); i++)
-      if(expr.operands()[i].type().id()!="code")
+      if(expr.operands()[i].type().id()!=ID_code)
         nr_ops++;
 
     for(unsigned i=1; i<nr_ops; i++) // one less
@@ -3044,7 +3044,7 @@ void smt1_convt::flatten_array(const exprt &op)
   const typet &elem_type=array_type.subtype();
   const exprt &size=array_type.size();
 
-  if(size.id()!="constant")
+  if(size.id()!=ID_constant)
     throw ("non-constant size array cannot be flattened.");
 
   mp_integer sizei;

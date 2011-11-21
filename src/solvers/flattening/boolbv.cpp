@@ -819,7 +819,7 @@ Function: boolbvt::make_bv_expr
 
 void boolbvt::make_bv_expr(const typet &type, const bvt &bv, exprt &dest)
 {
-  dest=exprt("bv_literals", type);
+  dest=exprt(ID_bv_literals, type);
   irept::subt &bv_sub=dest.add(ID_bv).get_sub();
 
   bv_sub.resize(bv.size());

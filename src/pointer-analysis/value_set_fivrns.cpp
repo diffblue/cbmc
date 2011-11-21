@@ -234,8 +234,8 @@ exprt value_set_fivrnst::to_expr(object_map_dt::const_iterator it) const
 {
   const exprt &object=object_numbering[it->first];
   
-  if(object.id()=="invalid" ||
-     object.id()=="unknown")
+  if(object.id()==ID_invalid ||
+     object.id()==ID_unknown)
     return object;
 
   object_descriptor_exprt od;
@@ -407,25 +407,25 @@ void value_set_fivrnst::get_value_set_rec(
   std::cout << std::endl;
   #endif
 
-  if(expr.id()=="unknown" || expr.id()=="invalid")
+  if(expr.id()==ID_unknown || expr.id()==ID_invalid)
   {
-    insert_from(dest, exprt("unknown", original_type));
+    insert_from(dest, exprt(ID_unknown, original_type));
     return;
   }  
-  else if(expr.id()=="index")
+  else if(expr.id()==ID_index)
   {
     assert(expr.operands().size()==2);
 
     const typet &type=ns.follow(expr.op0().type());
 
-    assert(type.id()=="array" ||
-           type.id()=="incomplete_array");
+    assert(type.id()==ID_array ||
+           type.id()==ID_incomplete_array);
            
     get_value_set_rec(expr.op0(), dest, "[]"+suffix, original_type, ns);
     
     return;
   }
-  else if(expr.id()=="member")
+  else if(expr.id()==ID_member)
   {
     assert(expr.operands().size()==1);
 
@@ -433,13 +433,13 @@ void value_set_fivrnst::get_value_set_rec(
     {
       const typet &type=ns.follow(expr.op0().type());
       
-      assert(type.id()=="struct" ||
-             type.id()=="union" ||
-             type.id()=="incomplete_struct" ||
-             type.id()=="incomplete_union");
+      assert(type.id()==ID_struct ||
+             type.id()==ID_union ||
+             type.id()==ID_incomplete_struct ||
+             type.id()==ID_incomplete_union);
              
       const std::string &component_name=
-        expr.get_string("component_name");
+        expr.get_string(ID_component_name);
       
       get_value_set_rec(expr.op0(), dest, "."+component_name+suffix, 
                         original_type, ns);
@@ -447,11 +447,11 @@ void value_set_fivrnst::get_value_set_rec(
       return;
     }
   }
-  else if(expr.id()=="symbol")
+  else if(expr.id()==ID_symbol)
   {
     // just keep a reference to the ident in the set
     // (if it exists)
-    irep_idt ident = expr.get_string("identifier")+suffix;
+    irep_idt ident = expr.get_string(ID_identifier)+suffix;
 
 		if(has_prefix(id2string(ident), alloc_adapter_prefix))
 		{
@@ -469,7 +469,7 @@ void value_set_fivrnst::get_value_set_rec(
 	    }
 		}
   }
-  else if(expr.id()=="if")
+  else if(expr.id()==ID_if)
   {
     if(expr.operands().size()!=3)
       throw "if takes three operands";
@@ -481,7 +481,7 @@ void value_set_fivrnst::get_value_set_rec(
 
     return;
   }
-  else if(expr.id()=="address_of")
+  else if(expr.id()==ID_address_of)
   {
     if(expr.operands().size()!=1)
       throw expr.id_string()+" expected to have one operand";
@@ -490,7 +490,7 @@ void value_set_fivrnst::get_value_set_rec(
     
     return;
   }
-  else if(expr.id()=="dereference" ||
+  else if(expr.id()==ID_dereference ||
           expr.id()=="implicit_dereference")
   {
     object_mapt reference_set;
@@ -532,14 +532,14 @@ void value_set_fivrnst::get_value_set_rec(
   else if(expr.is_constant())
   {
     // check if NULL
-    if(expr.get("value")=="NULL" &&
-       expr.type().id()=="pointer")
+    if(expr.get(ID_value)==ID_NULL &&
+       expr.type().id()==ID_pointer)
     {
       insert_from(dest, exprt("NULL-object", expr.type().subtype()), 0);
       return;
     }
   }
-  else if(expr.id()=="typecast")
+  else if(expr.id()==ID_typecast)
   {
     if(expr.operands().size()!=1)
       throw "typecast takes one operand";
@@ -549,18 +549,18 @@ void value_set_fivrnst::get_value_set_rec(
     
     return;
   }
-  else if(expr.id()=="+" || expr.id()=="-")
+  else if(expr.id()==ID_plus || expr.id()==ID_minus)
   {
     if(expr.operands().size()<2)
       throw expr.id_string()+" expected to have at least two operands";
 
-    if(expr.type().id()=="pointer")
+    if(expr.type().id()==ID_pointer)
     {
       // find the pointer operand
       const exprt *ptr_operand=NULL;
 
       forall_operands(it, expr)
-        if(it->type().id()=="pointer")
+        if(it->type().id()==ID_pointer)
         {
           if(ptr_operand==NULL)
             ptr_operand=&(*it);
@@ -582,13 +582,13 @@ void value_set_fivrnst::get_value_set_rec(
         if(object.offset_is_zero() &&
            expr.operands().size()==2)
         {
-          if(expr.op0().type().id()!="pointer")
+          if(expr.op0().type().id()!=ID_pointer)
           {
             mp_integer i;
             if(to_integer(expr.op0(), i))
               object.offset_is_set=false;
             else
-              object.offset=(expr.id()=="+")? i : -i;
+              object.offset=(expr.id()==ID_plus)? i : -i;
           }
           else
           {
@@ -596,7 +596,7 @@ void value_set_fivrnst::get_value_set_rec(
             if(to_integer(expr.op1(), i))
               object.offset_is_set=false;
             else
-              object.offset=(expr.id()=="+")? i : -i;
+              object.offset=(expr.id()==ID_plus)? i : -i;
           }
         }
         else
@@ -608,18 +608,18 @@ void value_set_fivrnst::get_value_set_rec(
       return;
     }
   }
-  else if(expr.id()=="sideeffect")
+  else if(expr.id()==ID_sideeffect)
   {
-    const irep_idt &statement=expr.get("statement");
+    const irep_idt &statement=expr.get(ID_statement);
     
-    if(statement=="function_call")
+    if(statement==ID_function_call)
     {
       // these should be gone
       throw "unexpected function_call sideeffect";
     }
-    else if(statement=="malloc")
+    else if(statement==ID_malloc)
     {
-      if(expr.type().id()!="pointer")
+      if(expr.type().id()!=ID_pointer)
         throw "malloc expected to return pointer type";
       
       assert(suffix=="");
@@ -630,49 +630,49 @@ void value_set_fivrnst::get_value_set_rec(
       dynamic_object_exprt dynamic_object(dynamic_type);
       // let's make up a `unique' number for this object...
       dynamic_object.instance()=from_integer( 
-                   (from_function << 16) | from_target_index, typet("natural"));
+                   (from_function << 16) | from_target_index, typet(ID_natural));
       dynamic_object.valid()=true_exprt();
 
       insert_from(dest, dynamic_object, 0);
       return;          
     }
-    else if(statement=="cpp_new" ||
-            statement=="cpp_new[]")
+    else if(statement==ID_cpp_new ||
+            statement==ID_cpp_new_array)
     {
       assert(suffix=="");
-      assert(expr.type().id()=="pointer");
+      assert(expr.type().id()==ID_pointer);
 
       dynamic_object_exprt dynamic_object(expr.type().subtype());
       // let's make up a unique number for this object...
       dynamic_object.instance()=from_integer( 
-                   (from_function << 16) | from_target_index, typet("natural"));
+                   (from_function << 16) | from_target_index, typet(ID_natural));
       dynamic_object.valid()=true_exprt();
 
       insert_from(dest, dynamic_object, 0);
       return;
     }
   }
-  else if(expr.id()=="struct")
+  else if(expr.id()==ID_struct)
   {
     // this is like a static struct object
     insert_from(dest, address_of_exprt(expr), 0);
     return;
   }
-  else if(expr.id()=="with" ||
-          expr.id()=="array_of" ||
-          expr.id()=="array")
+  else if(expr.id()==ID_with ||
+          expr.id()==ID_array_of ||
+          expr.id()==ID_array)
   {
     // these are supposed to be done by assign()
     throw "unexpected value in get_value_set: "+expr.id_string();
   }
-  else if(expr.id()=="dynamic_object")
+  else if(expr.id()==ID_dynamic_object)
   {
     const dynamic_object_exprt &dynamic_object=
       to_dynamic_object_expr(expr);
   
     const std::string name=
       "value_set::dynamic_object"+
-      dynamic_object.instance().get_string("value")+
+      dynamic_object.instance().get_string(ID_value)+
       suffix;
   
     // look it up
@@ -685,7 +685,7 @@ void value_set_fivrnst::get_value_set_rec(
     }
   }
 
-  insert_from(dest, exprt("unknown", original_type));
+  insert_from(dest, exprt(ID_unknown, original_type));
 }
 
 /*******************************************************************\
@@ -705,9 +705,9 @@ void value_set_fivrnst::dereference_rec(
   exprt &dest) const
 {
   // remove pointer typecasts
-  if(src.id()=="typecast")
+  if(src.id()==ID_typecast)
   {
-    assert(src.type().id()=="pointer");
+    assert(src.type().id()==ID_pointer);
 
     if(src.operands().size()!=1)
       throw "typecast expects one operand";
@@ -763,19 +763,19 @@ void value_set_fivrnst::get_reference_set_rec(
   std::cout << "GET_REFERENCE_SET_REC EXPR: " << from_expr(ns, "", expr) << std::endl;
   #endif
 
-  if(expr.id()=="symbol" ||
-     expr.id()=="dynamic_object" ||
+  if(expr.id()==ID_symbol ||
+     expr.id()==ID_dynamic_object ||
      expr.id()==ID_string_constant)
   {
-    if(expr.type().id()=="array" &&
-       expr.type().subtype().id()=="array")
+    if(expr.type().id()==ID_array &&
+       expr.type().subtype().id()==ID_array)
       insert_from(dest, expr);
     else    
       insert_from(dest, expr, 0);
 
     return;
   }
-  else if(expr.id()=="dereference" ||
+  else if(expr.id()==ID_dereference ||
           expr.id()=="implicit_dereference")
   {
     if(expr.operands().size()!=1)
@@ -790,7 +790,7 @@ void value_set_fivrnst::get_reference_set_rec(
 
     return;
   }
-  else if(expr.id()=="index")
+  else if(expr.id()==ID_index)
   {
     if(expr.operands().size()!=2)
       throw "index expected to have two operands";
@@ -799,8 +799,8 @@ void value_set_fivrnst::get_reference_set_rec(
     const exprt &offset=expr.op1();
     const typet &array_type=ns.follow(array.type());
     
-    assert(array_type.id()=="array" ||
-           array_type.id()=="incomplete_array");
+    assert(array_type.id()==ID_array ||
+           array_type.id()==ID_incomplete_array);
 
     
     object_mapt array_references;
@@ -812,11 +812,11 @@ void value_set_fivrnst::get_reference_set_rec(
     {
       const exprt &object=object_numbering[a_it->first];
 
-      if(object.id()=="unknown")
-        insert_from(dest, exprt("unknown", expr.type()));
+      if(object.id()==ID_unknown)
+        insert_from(dest, exprt(ID_unknown, expr.type()));
       else
       {
-        exprt index_expr("index", expr.type());
+        exprt index_expr(ID_index, expr.type());
         index_expr.operands().resize(2);
         index_expr.op0()=object;
         index_expr.op1()=gen_zero(index_type());
@@ -843,9 +843,9 @@ void value_set_fivrnst::get_reference_set_rec(
     
     return;
   }
-  else if(expr.id()=="member")
+  else if(expr.id()==ID_member)
   {
-    const irep_idt &component_name=expr.get("component_name");
+    const irep_idt &component_name=expr.get(ID_component_name);
 
     if(expr.operands().size()!=1)
       throw "member expected to have one operand";
@@ -862,23 +862,23 @@ void value_set_fivrnst::get_reference_set_rec(
       const exprt &object=object_numbering[it->first];
       const typet &obj_type=ns.follow(object.type());
       
-      if(object.id()=="unknown")
-        insert_from(dest, exprt("unknown", expr.type()));
-      else if(object.id()=="dynamic_object" &&
-              obj_type.id()!="struct" && 
-              obj_type.id()!="union")
+      if(object.id()==ID_unknown)
+        insert_from(dest, exprt(ID_unknown, expr.type()));
+      else if(object.id()==ID_dynamic_object &&
+              obj_type.id()!=ID_struct && 
+              obj_type.id()!=ID_union)
       {
         // we catch dynamic objects of the wrong type,
         // to avoid non-integral typecasts.        
-        insert_from(dest, exprt("unknown", expr.type()));
+        insert_from(dest, exprt(ID_unknown, expr.type()));
       }
       else
       {
         objectt o=it->second;
 
-        exprt member_expr("member", expr.type());
+        exprt member_expr(ID_member, expr.type());
         member_expr.copy_to_operands(object);
-        member_expr.set("component_name", component_name);
+        member_expr.set(ID_component_name, component_name);
         
         // adjust type?
         if(ns.follow(struct_op.type())!=ns.follow(object.type()))
@@ -890,7 +890,7 @@ void value_set_fivrnst::get_reference_set_rec(
 
     return;
   }
-  else if(expr.id()=="if")
+  else if(expr.id()==ID_if)
   {
     if(expr.operands().size()!=3)
       throw "if takes three operands";
@@ -900,7 +900,7 @@ void value_set_fivrnst::get_reference_set_rec(
     return;
   }
 
-  insert_from(dest, exprt("unknown", expr.type()));
+  insert_from(dest, exprt(ID_unknown, expr.type()));
 }
 
 /*******************************************************************\
@@ -927,7 +927,7 @@ void value_set_fivrnst::assign(
   std::cout << "ASSIGN RHS: " << from_expr(ns, "", rhs) << std::endl;  
   #endif
 
-  if(rhs.id()=="if")
+  if(rhs.id()==ID_if)
   {
     if(rhs.operands().size()!=3)
       throw "if takes three operands";
@@ -939,8 +939,8 @@ void value_set_fivrnst::assign(
 
   const typet &type=ns.follow(lhs.type());
   
-  if(type.id()=="struct" ||
-     type.id()=="union")
+  if(type.id()==ID_struct ||
+     type.id()==ID_union)
   {
     const struct_typet &struct_type=to_struct_type(type);
     
@@ -952,19 +952,19 @@ void value_set_fivrnst::assign(
         c_it++, no++)
     {
       const typet &subtype=c_it->type();
-      const irep_idt &name=c_it->get("name");
+      const irep_idt &name=c_it->get(ID_name);
 
       // ignore methods
-      if(subtype.id()=="code") continue;
+      if(subtype.id()==ID_code) continue;
     
-      exprt lhs_member("member", subtype);
-      lhs_member.set("component_name", name);
+      exprt lhs_member(ID_member, subtype);
+      lhs_member.set(ID_component_name, name);
       lhs_member.copy_to_operands(lhs);
 
       exprt rhs_member;
     
-      if(rhs.id()=="unknown" ||
-         rhs.id()=="invalid")
+      if(rhs.id()==ID_unknown ||
+         rhs.id()==ID_invalid)
       {
         rhs_member=exprt(rhs.id(), subtype);
       }
@@ -978,13 +978,13 @@ void value_set_fivrnst::assign(
         
         assert(base_type_eq(rhs.type(), type, ns));
       
-        if(rhs.id()=="struct" ||
-           rhs.id()=="constant")
+        if(rhs.id()==ID_struct ||
+           rhs.id()==ID_constant)
         {
           assert(no<rhs.operands().size());
           rhs_member=rhs.operands()[no];
         }
-        else if(rhs.id()=="with")
+        else if(rhs.id()==ID_with)
         {
           assert(rhs.operands().size()==3);
 
@@ -992,7 +992,7 @@ void value_set_fivrnst::assign(
           const exprt &member_operand=rhs.op1();
 
           const irep_idt &component_name=
-            member_operand.get("component_name");
+            member_operand.get(ID_component_name);
 
           if(component_name==name)
           {
@@ -1002,29 +1002,29 @@ void value_set_fivrnst::assign(
           else
           {
             // no! do op0
-            rhs_member=exprt("member", subtype);
+            rhs_member=exprt(ID_member, subtype);
             rhs_member.copy_to_operands(rhs.op0());
-            rhs_member.set("component_name", name);
+            rhs_member.set(ID_component_name, name);
           }
         }
         else
         {
-          rhs_member=exprt("member", subtype);
+          rhs_member=exprt(ID_member, subtype);
           rhs_member.copy_to_operands(rhs);
-          rhs_member.set("component_name", name);
+          rhs_member.set(ID_component_name, name);
         }
 
         assign(lhs_member, rhs_member, ns, add_to_sets);
       }
     }
   }
-  else if(type.id()=="array")
+  else if(type.id()==ID_array)
   {
-    exprt lhs_index("index", type.subtype());
-    lhs_index.copy_to_operands(lhs, exprt("unknown", index_type()));
+    exprt lhs_index(ID_index, type.subtype());
+    lhs_index.copy_to_operands(lhs, exprt(ID_unknown, index_type()));
 
-    if(rhs.id()=="unknown" ||
-       rhs.id()=="invalid")
+    if(rhs.id()==ID_unknown ||
+       rhs.id()==ID_invalid)
     {
       assign(lhs_index, exprt(rhs.id(), type.subtype()), ns, add_to_sets);
     }    
@@ -1032,34 +1032,34 @@ void value_set_fivrnst::assign(
     {
       assert(base_type_eq(rhs.type(), type, ns));
         
-      if(rhs.id()=="array_of")
+      if(rhs.id()==ID_array_of)
       {
         assert(rhs.operands().size()==1);
 //        std::cout << "AOF: " << rhs.op0() << std::endl;
         assign(lhs_index, rhs.op0(), ns, add_to_sets);
       }
-      else if(rhs.id()=="array" ||
-              rhs.id()=="constant")
+      else if(rhs.id()==ID_array ||
+              rhs.id()==ID_constant)
       {
         forall_operands(o_it, rhs)
         {
           assign(lhs_index, *o_it, ns, add_to_sets);
         }
       }
-      else if(rhs.id()=="with")
+      else if(rhs.id()==ID_with)
       {
         assert(rhs.operands().size()==3);
 
-        exprt op0_index("index", type.subtype());
-        op0_index.copy_to_operands(rhs.op0(), exprt("unknown", index_type()));
+        exprt op0_index(ID_index, type.subtype());
+        op0_index.copy_to_operands(rhs.op0(), exprt(ID_unknown, index_type()));
 
         assign(lhs_index, op0_index, ns, add_to_sets);
         assign(lhs_index, rhs.op2(), ns, true);
       }
       else
       {
-        exprt rhs_index("index", type.subtype());
-        rhs_index.copy_to_operands(rhs, exprt("unknown", index_type()));
+        exprt rhs_index(ID_index, type.subtype());
+        rhs_index.copy_to_operands(rhs, exprt(ID_unknown, index_type()));
         assign(lhs_index, rhs_index, ns, true);
       }
     }
@@ -1092,7 +1092,7 @@ void value_set_fivrnst::do_free(
   const namespacet &ns)
 {  
   // op must be a pointer
-  if(op.type().id()!="pointer")
+  if(op.type().id()!=ID_pointer)
     throw "free expected to have pointer-type operand";
 
   // find out what it points to    
@@ -1108,7 +1108,7 @@ void value_set_fivrnst::do_free(
   {
     const exprt &object=object_numbering[it->first];
 
-    if(object.id()=="dynamic_object")
+    if(object.id()==ID_dynamic_object)
     {
       const dynamic_object_exprt &dynamic_object=
         to_dynamic_object_expr(object);
@@ -1135,7 +1135,7 @@ void value_set_fivrnst::do_free(
     {
       const exprt &object=object_numbering[o_it->first];
 
-      if(object.id()=="dynamic_object")
+      if(object.id()==ID_dynamic_object)
       {
         const exprt &instance=
           to_dynamic_object_expr(object).instance();
@@ -1147,7 +1147,7 @@ void value_set_fivrnst::do_free(
           // adjust
           objectt o=o_it->second;
           exprt tmp(object);
-          to_dynamic_object_expr(tmp).valid()=exprt("unknown");
+          to_dynamic_object_expr(tmp).valid()=exprt(ID_unknown);
           insert_to(new_object_map, tmp, o);
           changed=true;
         }
@@ -1193,9 +1193,9 @@ void value_set_fivrnst::assign_rec(
     std::cout << "ASSIGN_REC RHS: " << to_expr(it) << std::endl;
   #endif  
 
-  if(lhs.id()=="symbol")
+  if(lhs.id()==ID_symbol)
   {
-    const irep_idt &identifier=lhs.get("identifier");        
+    const irep_idt &identifier=lhs.get(ID_identifier);        
 
     if(has_prefix(id2string(identifier), 
                   "value_set::dynamic_object") ||
@@ -1215,14 +1215,14 @@ void value_set_fivrnst::assign_rec(
       make_union(temp_entry.object_map, values_rhs);
     }
   }
-  else if(lhs.id()=="dynamic_object")
+  else if(lhs.id()==ID_dynamic_object)
   {
     const dynamic_object_exprt &dynamic_object=
       to_dynamic_object_expr(lhs);
   
     const std::string name=
       "value_set::dynamic_object"+
-      dynamic_object.instance().get_string("value");
+      dynamic_object.instance().get_string(ID_value);
 
     entryt &temp_entry = get_temporary_entry(name, suffix);
     
@@ -1234,7 +1234,7 @@ void value_set_fivrnst::assign_rec(
     
     make_union(temp_entry.object_map, values_rhs);
   }
-  else if(lhs.id()=="dereference" ||
+  else if(lhs.id()==ID_dereference ||
           lhs.id()=="implicit_dereference")
   {
     if(lhs.operands().size()!=1)
@@ -1247,36 +1247,36 @@ void value_set_fivrnst::assign_rec(
     {
       const exprt &object=object_numbering[it->first];
 
-      if(object.id()!="unknown")
+      if(object.id()!=ID_unknown)
         assign_rec(object, values_rhs, suffix, ns, add_to_sets);
     }
   }
-  else if(lhs.id()=="index")
+  else if(lhs.id()==ID_index)
   {
     if(lhs.operands().size()!=2)
       throw "index expected to have two operands";
       
     const typet &type=ns.follow(lhs.op0().type());
       
-    assert(type.id()=="array" || type.id()=="incomplete_array");
+    assert(type.id()==ID_array || type.id()==ID_incomplete_array);
 
     assign_rec(lhs.op0(), values_rhs, "[]"+suffix, ns, add_to_sets);
   }
-  else if(lhs.id()=="member")
+  else if(lhs.id()==ID_member)
   {
     if(lhs.operands().size()!=1)
       throw "member expected to have one operand";
     
     if(lhs.op0().is_nil()) return;
   
-    const std::string &component_name=lhs.get_string("component_name");
+    const std::string &component_name=lhs.get_string(ID_component_name);
 
     const typet &type=ns.follow(lhs.op0().type());
 
-    assert(type.id()=="struct" ||
-           type.id()=="union" ||
-           type.id()=="incomplete_struct" ||
-           type.id()=="incomplete_union");
+    assert(type.id()==ID_struct ||
+           type.id()==ID_union ||
+           type.id()==ID_incomplete_struct ||
+           type.id()==ID_incomplete_union);
            
     assign_rec(lhs.op0(), values_rhs, "."+component_name+suffix, 
                ns, add_to_sets);
@@ -1296,7 +1296,7 @@ void value_set_fivrnst::assign_rec(
   {
     // evil as well
   }
-  else if(lhs.id()=="typecast")
+  else if(lhs.id()==ID_typecast)
   {
     const typecast_exprt &typecast_expr=to_typecast_expr(lhs);
   
@@ -1309,8 +1309,8 @@ void value_set_fivrnst::assign_rec(
   {
     // ignore
   }
-  else if(lhs.id()=="byte_extract_little_endian" ||
-          lhs.id()=="byte_extract_big_endian")
+  else if(lhs.id()==ID_byte_extract_little_endian ||
+          lhs.id()==ID_byte_extract_big_endian)
   {
     assert(lhs.operands().size()==2);
     assign_rec(lhs.op0(), values_rhs, suffix, ns, true);
@@ -1439,53 +1439,53 @@ void value_set_fivrnst::apply_code(
   const exprt &code,
   const namespacet &ns)
 {
-  const irep_idt &statement=code.get("statement");
+  const irep_idt &statement=code.get(ID_statement);
 
-  if(statement=="block")
+  if(statement==ID_block)
   {
     forall_operands(it, code)
       apply_code(*it, ns);
   }
-  else if(statement=="function_call")
+  else if(statement==ID_function_call)
   {
     // shouldn't be here
     assert(false);
   }
-  else if(statement=="assign" ||
-          statement=="init")
+  else if(statement==ID_assign ||
+          statement==ID_init)
   {
     if(code.operands().size()!=2)
       throw "assignment expected to have two operands";
 
     assign(code.op0(), code.op1(), ns);
   }
-  else if(statement=="decl")
+  else if(statement==ID_decl)
   {
     if(code.operands().size()!=1)
       throw "decl expected to have one operand";
 
     const exprt &lhs=code.op0();
 
-    if(lhs.id()!="symbol")
+    if(lhs.id()!=ID_symbol)
       throw "decl expected to have symbol on lhs";
     
-    assign(lhs, exprt("invalid", lhs.type()), ns);
+    assign(lhs, exprt(ID_invalid, lhs.type()), ns);
   }
-  else if(statement=="specc_notify" ||
-          statement=="specc_wait")
+  else if(statement==ID_specc_notify ||
+          statement==ID_specc_wait)
   {
     // ignore, does not change variables
   }
-  else if(statement=="expression")
+  else if(statement==ID_expression)
   {
     // can be ignored, we don't expect sideeffects here
   }
-  else if(statement=="cpp_delete" ||
-          statement=="cpp_delete[]")
+  else if(statement==ID_cpp_delete ||
+          statement==ID_cpp_delete_array)
   {
     // does nothing
   }
-  else if(statement=="free")
+  else if(statement==ID_free)
   {
     // this may kill a valid bit
 
@@ -1498,19 +1498,19 @@ void value_set_fivrnst::apply_code(
   {
     // ignore for now
   }
-  else if(statement=="asm")
+  else if(statement==ID_asm)
   {
     // ignore for now, probably not safe
   }
-  else if(statement=="nondet")
+  else if(statement==ID_nondet)
   {
     // doesn't do anything
   }
-  else if(statement=="printf")
+  else if(statement==ID_printf)
   {
     // doesn't do anything
   }
-  else if(statement=="return")
+  else if(statement==ID_return)
   {
     // this is turned into an assignment
     if(code.operands().size()==1)

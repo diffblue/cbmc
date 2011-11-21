@@ -43,7 +43,7 @@ void bv_cbmct::convert_waitfor(const exprt &expr, bvt &bv)
   {
     // constraint: new_cycle>=old_cycle
 
-    exprt rel_expr(">=", bool_typet());
+    exprt rel_expr(ID_ge, bool_typet());
     rel_expr.copy_to_operands(new_cycle, old_cycle);
     set_to_true(rel_expr);
   }
@@ -53,12 +53,12 @@ void bv_cbmct::convert_waitfor(const exprt &expr, bvt &bv)
 
     exprt one=from_integer(1, bound.type());
 
-    exprt bound_plus1("+", bound.type());
+    exprt bound_plus1(ID_plus, bound.type());
     bound_plus1.reserve_operands(2);
     bound_plus1.copy_to_operands(bound);
     bound_plus1.move_to_operands(one);
 
-    exprt rel_expr("<=", bool_typet());
+    exprt rel_expr(ID_le, bool_typet());
     rel_expr.copy_to_operands(new_cycle, bound_plus1);
     set_to_true(rel_expr);
   }
@@ -67,7 +67,7 @@ void bv_cbmct::convert_waitfor(const exprt &expr, bvt &bv)
   {
     // replace cycle_var by old_cycle+i;
 
-    exprt old_cycle_plus_i("+", old_cycle.type());
+    exprt old_cycle_plus_i(ID_plus, old_cycle.type());
     old_cycle_plus_i.operands().resize(2);
     old_cycle_plus_i.op0()=old_cycle;
     old_cycle_plus_i.op1()=from_integer(i, old_cycle.type());
@@ -83,22 +83,22 @@ void bv_cbmct::convert_waitfor(const exprt &expr, bvt &bv)
     //     assume(property);
 
     {
-      exprt cycle_le_bound("<=", bool_typet());
+      exprt cycle_le_bound(ID_le, bool_typet());
       cycle_le_bound.operands().resize(2);
       cycle_le_bound.op0()=old_cycle_plus_i;
       cycle_le_bound.op1()=bound;
 
-      exprt cycle_lt_new_cycle("<", bool_typet());
+      exprt cycle_lt_new_cycle(ID_lt, bool_typet());
       cycle_lt_new_cycle.operands().resize(2);
       cycle_lt_new_cycle.op0()=old_cycle_plus_i;
       cycle_lt_new_cycle.op1()=new_cycle;
 
-      exprt and_expr("and", bool_typet());
+      exprt and_expr(ID_and, bool_typet());
       and_expr.operands().resize(2);
       and_expr.op0().swap(cycle_le_bound);
       and_expr.op1().swap(cycle_lt_new_cycle);
 
-      exprt top_impl("=>", bool_typet());
+      exprt top_impl(ID_implies, bool_typet());
       top_impl.reserve_operands(2);
       top_impl.move_to_operands(and_expr);
       top_impl.copy_to_operands(tmp_predicate);
@@ -108,22 +108,22 @@ void bv_cbmct::convert_waitfor(const exprt &expr, bvt &bv)
     }
 
     {
-      exprt cycle_le_bound("<=", bool_typet());
+      exprt cycle_le_bound(ID_le, bool_typet());
       cycle_le_bound.operands().resize(2);
       cycle_le_bound.op0()=old_cycle_plus_i;
       cycle_le_bound.op1()=bound;
 
-      exprt cycle_eq_new_cycle("=", bool_typet());
+      exprt cycle_eq_new_cycle(ID_equal, bool_typet());
       cycle_eq_new_cycle.operands().resize(2);
       cycle_eq_new_cycle.op0()=old_cycle_plus_i;
       cycle_eq_new_cycle.op1()=new_cycle;
 
-      exprt and_expr("and", bool_typet());
+      exprt and_expr(ID_and, bool_typet());
       and_expr.operands().resize(2);
       and_expr.op0().swap(cycle_le_bound);
       and_expr.op1().swap(cycle_eq_new_cycle);
 
-      exprt top_impl("=>", bool_typet());
+      exprt top_impl(ID_implies, bool_typet());
       top_impl.reserve_operands(2);
       top_impl.move_to_operands(and_expr);
       top_impl.copy_to_operands(tmp_predicate);
@@ -160,7 +160,7 @@ void bv_cbmct::convert_waitfor_symbol(const exprt &expr, bvt &bv)
 
   // constraint: result<=bound
 
-  exprt rel_expr("<=", bool_typet());
+  exprt rel_expr(ID_le, bool_typet());
   rel_expr.copy_to_operands(result, bound);
   set_to_true(rel_expr);
 

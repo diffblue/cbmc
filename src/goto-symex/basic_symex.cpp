@@ -84,7 +84,7 @@ void basic_symext::symex(statet &state, const codet &code)
     // ignore
   }
   else if(statement==ID_cpp_delete ||
-          statement=="cpp_delete[]")
+          statement==ID_cpp_delete_array)
     symex_cpp_delete(state, code);
   else if(statement==ID_free)
   {
@@ -168,7 +168,7 @@ void basic_symext::symex_assign(
       throw "symex_assign: unexpected function call: "+id2string(identifier);
     }
     else if(statement==ID_cpp_new ||
-            statement=="cpp_new[]")
+            statement==ID_cpp_new_array)
       symex_cpp_new(state, lhs, side_effect_expr);
     else if(statement==ID_malloc)
       symex_malloc(state, lhs, side_effect_expr);

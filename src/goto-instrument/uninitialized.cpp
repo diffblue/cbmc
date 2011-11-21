@@ -65,7 +65,7 @@ void uninitializedt::get_tracking(goto_programt::const_targett i_it)
 
   forall_expr_list(o_it, objects)
   {
-    if(o_it->id()=="symbol")
+    if(o_it->id()==ID_symbol)
     {
       const irep_idt &identifier=to_symbol_expr(*o_it).get_identifier();
       const std::set<irep_idt> &uninitialized=
@@ -73,7 +73,7 @@ void uninitializedt::get_tracking(goto_programt::const_targett i_it)
       if(uninitialized.find(identifier)!=uninitialized.end())
         tracking.insert(identifier);
     }
-    else if(o_it->id()=="dereference")
+    else if(o_it->id()==ID_dereference)
     {
     }
   }
@@ -169,7 +169,7 @@ void uninitializedt::add_assertions(goto_programt &goto_program)
       // check tracking variables
       forall_expr_list(it, read)
       {
-        if(it->id()=="symbol")
+        if(it->id()==ID_symbol)
         {
           const irep_idt &identifier=to_symbol_expr(*it).get_identifier();
           const std::set<irep_idt> &uninitialized=
@@ -197,7 +197,7 @@ void uninitializedt::add_assertions(goto_programt &goto_program)
       // set tracking variables
       forall_expr_list(it, written)
       {
-        if(it->id()=="symbol")
+        if(it->id()==ID_symbol)
         {
           const irep_idt &identifier=to_symbol_expr(*it).get_identifier();
 

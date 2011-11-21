@@ -57,7 +57,7 @@ literalt boolbvt::convert_equality(const equal_exprt &expr)
   if(bv0.size()==0)
     throw "got zero-size BV";
 
-  if(expr.lhs().type().id()=="verilogbv")
+  if(expr.lhs().type().id()==ID_verilogbv)
   {
     // TODO
   }

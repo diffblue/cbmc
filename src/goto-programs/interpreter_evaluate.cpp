@@ -124,12 +124,12 @@ void interpretert::evaluate(
       
     dest.clear();
   }
-  else if(expr.id()=="=" ||
+  else if(expr.id()==ID_equal ||
           expr.id()==ID_notequal ||
-          expr.id()=="<=" ||
-          expr.id()==">=" ||
-          expr.id()=="<" ||
-          expr.id()==">")
+          expr.id()==ID_le ||
+          expr.id()==ID_ge ||
+          expr.id()==ID_lt ||
+          expr.id()==ID_gt)
   {
     if(expr.operands().size()!=2)
       throw id2string(expr.id())+" expects two operands";
@@ -143,17 +143,17 @@ void interpretert::evaluate(
       const mp_integer &op0=tmp0.front();
       const mp_integer &op1=tmp1.front();
     
-      if(expr.id()=="=")
+      if(expr.id()==ID_equal)
         dest.push_back(op0==op1);
       else if(expr.id()==ID_notequal)
         dest.push_back(op0!=op1);
-      else if(expr.id()=="<=")
+      else if(expr.id()==ID_le)
         dest.push_back(op0<=op1);
-      else if(expr.id()==">=")
+      else if(expr.id()==ID_ge)
         dest.push_back(op0>=op1);
-      else if(expr.id()=="<")
+      else if(expr.id()==ID_lt)
         dest.push_back(op0<op1);
-      else if(expr.id()==">")
+      else if(expr.id()==ID_gt)
         dest.push_back(op0>op1);
     }
 
@@ -239,7 +239,7 @@ void interpretert::evaluate(
 
     return;
   }
-  else if(expr.id()=="+")
+  else if(expr.id()==ID_plus)
   {
     mp_integer result=0;
 
@@ -254,7 +254,7 @@ void interpretert::evaluate(
     dest.push_back(result);
     return;
   }
-  else if(expr.id()=="*")
+  else if(expr.id()==ID_mult)
   {
     // type-dependent!
     mp_integer result;
@@ -310,7 +310,7 @@ void interpretert::evaluate(
     dest.push_back(result);
     return;
   }
-  else if(expr.id()=="-")
+  else if(expr.id()==ID_minus)
   {
     if(expr.operands().size()!=2)
       throw "- expects two operands";
@@ -323,7 +323,7 @@ void interpretert::evaluate(
       dest.push_back(tmp0.front()-tmp1.front());
     return;
   }
-  else if(expr.id()=="/")
+  else if(expr.id()==ID_div)
   {
     if(expr.operands().size()!=2)
       throw "/ expects two operands";
@@ -336,7 +336,7 @@ void interpretert::evaluate(
       dest.push_back(tmp0.front()/tmp1.front());
     return;
   }
-  else if(expr.id()=="unary-")
+  else if(expr.id()==ID_unary_minus)
   {
     if(expr.operands().size()!=1)
       throw "unary- expects one operand";

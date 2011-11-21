@@ -73,10 +73,10 @@ void uninitialized_domaint::find_dirty(
   const namespacet &ns,
   const exprt &expr)
 {
-  if(expr.id()=="address_of")
+  if(expr.id()==ID_address_of)
   {
     const address_of_exprt &address_of_expr=to_address_of_expr(expr);
-    if(address_of_expr.object().id()=="symbol")
+    if(address_of_expr.object().id()==ID_symbol)
     {
       const irep_idt &identifier=
         to_symbol_expr(address_of_expr.object()).get_identifier();
@@ -103,11 +103,11 @@ Function: uninitialized_domaint::assign
 
 void uninitialized_domaint::assign(const exprt &lhs)
 {
-  if(lhs.id()=="index")
+  if(lhs.id()==ID_index)
     assign(to_index_expr(lhs).array());
-  else if(lhs.id()=="member")
+  else if(lhs.id()==ID_member)
     assign(to_member_expr(lhs).struct_op());
-  else if(lhs.id()=="symbol")
+  else if(lhs.id()==ID_symbol)
     uninitialized.erase(to_symbol_expr(lhs).get_identifier());
 }
 

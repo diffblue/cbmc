@@ -154,7 +154,7 @@ void counterexample_beautification_greedyt::minimize(
 
     unsigned bit=offset+width-bit_nr-1;
 
-    // std::cout << "XX: " << expr.get("identifier")
+    // std::cout << "XX: " << expr.get(ID_identifier)
     //           << " bit=" << bit_nr <<std::endl;
 
     if(type.id()==ID_signedbv) // signed?

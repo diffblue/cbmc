@@ -163,14 +163,14 @@ void invariant_propagationt::get_objects_rec(
 {
   const typet &t=ns.follow(src.type());
 
-  if(t.id()=="struct" ||
-     t.id()=="union")
+  if(t.id()==ID_struct ||
+     t.id()==ID_union)
   {
     const struct_typet &struct_type=to_struct_type(t);
     
     const struct_typet::componentst &c=struct_type.components();
     
-    exprt member_expr("member");
+    exprt member_expr(ID_member);
     member_expr.copy_to_operands(src);
     
     for(struct_typet::componentst::const_iterator
@@ -178,13 +178,13 @@ void invariant_propagationt::get_objects_rec(
         it!=c.end();
         it++)
     {
-      member_expr.set("component_name", it->get_string("name"));
+      member_expr.set(ID_component_name, it->get_string(ID_name));
       member_expr.type()=it->type();
       // recursive call
       get_objects_rec(member_expr, dest);
     }
   }
-  else if(t.id()=="array")
+  else if(t.id()==ID_array)
   {
     //get_objects_rec(identifier, suffix+"[]", t.subtype(), dest);
     //we don't track these
@@ -303,19 +303,19 @@ Function: invariant_propagationt::check_type
 
 bool invariant_propagationt::check_type(const typet &type) const
 {
-  if(type.id()=="pointer")
+  if(type.id()==ID_pointer)
     return true;
-  else if(type.id()=="struct" ||
-          type.id()=="union")
+  else if(type.id()==ID_struct ||
+          type.id()==ID_union)
     return false;
-  else if(type.id()=="array")
+  else if(type.id()==ID_array)
     return false;
-  else if(type.id()=="symbol")
+  else if(type.id()==ID_symbol)
     return check_type(ns.follow(type));
-  else if(type.id()=="unsignedbv" ||
-          type.id()=="signedbv")
+  else if(type.id()==ID_unsignedbv ||
+          type.id()==ID_signedbv)
     return true;
-  else if(type.id()=="bool")
+  else if(type.id()==ID_bool)
     return true;
   
   return false;

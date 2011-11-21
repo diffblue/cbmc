@@ -33,7 +33,7 @@ void interpretert::operator()()
   build_memory_map();
   
   const goto_functionst::function_mapt::const_iterator
-    main_it=goto_functions.function_map.find("main");
+    main_it=goto_functions.function_map.find(ID_main);
 
   if(main_it==goto_functions.function_map.end())
     throw "main not found";
@@ -260,7 +260,7 @@ void interpretert::execute_other()
 {
   const irep_idt &statement=PC->code.get_statement();
   
-  if(statement=="expression")
+  if(statement==ID_expression)
   {
     assert(PC->code.operands().size()==1);
     std::vector<mp_integer> rhs;
@@ -284,7 +284,7 @@ Function: interpretert::execute_decl
 
 void interpretert::execute_decl()
 {
-  assert(PC->code.get_statement()=="decl");
+  assert(PC->code.get_statement()==ID_decl);
 }
 
 /*******************************************************************\
@@ -488,8 +488,8 @@ void interpretert::execute_function_call()
     for(unsigned i=0; i<arguments.size(); i++)
     {
       const code_typet::argumentt &a=arguments[i];
-      exprt symbol_expr("symbol", a.type());
-      symbol_expr.set("identifier", a.get_identifier());
+      exprt symbol_expr(ID_symbol, a.type());
+      symbol_expr.set(ID_identifier, a.get_identifier());
       assert(i<argument_values.size());
       assign(evaluate_address(symbol_expr), argument_values[i]);
     }
@@ -548,7 +548,7 @@ void interpretert::build_memory_map(const symbolt &symbol)
 {
   unsigned size=0;
 
-  if(symbol.type.id()=="code")
+  if(symbol.type.id()==ID_code)
   {
     size=1;
   }
@@ -587,43 +587,43 @@ Function: interpretert::get_size
 
 unsigned interpretert::get_size(const typet &type) const
 {
-  if(type.id()=="struct")
+  if(type.id()==ID_struct)
   {
     const irept::subt &components=
-      type.find("components").get_sub();
+      type.find(ID_components).get_sub();
 
     unsigned sum=0;
 
     forall_irep(it, components)
     {
-      const typet &sub_type=static_cast<const typet &>(it->find("type"));
+      const typet &sub_type=static_cast<const typet &>(it->find(ID_type));
 
-      if(sub_type.id()!="code")
+      if(sub_type.id()!=ID_code)
         sum+=get_size(sub_type);
     }
     
     return sum;
   }
-  else if(type.id()=="union")
+  else if(type.id()==ID_union)
   {
     const irept::subt &components=
-      type.find("components").get_sub();
+      type.find(ID_components).get_sub();
 
     unsigned max_size=0;
 
     forall_irep(it, components)
     {
-      const typet &sub_type=static_cast<const typet &>(it->find("type"));
+      const typet &sub_type=static_cast<const typet &>(it->find(ID_type));
 
-      if(sub_type.id()!="code")
+      if(sub_type.id()!=ID_code)
         max_size=std::max(max_size, get_size(sub_type));
     }
 
     return max_size;    
   }
-  else if(type.id()=="array")
+  else if(type.id()==ID_array)
   {
-    const exprt &size_expr=static_cast<const exprt &>(type.find("size"));
+    const exprt &size_expr=static_cast<const exprt &>(type.find(ID_size));
 
     unsigned subtype_size=get_size(type.subtype());
 
@@ -633,7 +633,7 @@ unsigned interpretert::get_size(const typet &type) const
     else
       return subtype_size;
   }
-  else if(type.id()=="symbol")
+  else if(type.id()==ID_symbol)
   {
     return get_size(ns.follow(type));
   }

@@ -91,7 +91,7 @@ literalt bv_pointerst::convert_rest(const exprt &expr)
       }
     }
   }
-  else if(expr.id()=="same-object")
+  else if(expr.id()==ID_same_object)
   {
     if(operands.size()==2 &&
        is_ptr(operands[0].type()) &&

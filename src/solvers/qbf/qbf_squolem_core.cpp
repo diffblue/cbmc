@@ -386,10 +386,10 @@ const exprt qbf_squolem_coret::f_get(literalt l)
     const exprt &sym=it->second.first;
     unsigned index=it->second.second;
 
-    exprt extract_expr("extractbit", typet("bool"));
+    exprt extract_expr(ID_extractbit, typet(ID_bool));
     extract_expr.copy_to_operands(sym);
-    typet uint_type("unsignedbv");
-    uint_type.set("width", 32);
+    typet uint_type(ID_unsignedbv);
+    uint_type.set(ID_width, 32);
     extract_expr.copy_to_operands(from_integer(index, uint_type));
 
     if(l.sign()) extract_expr.negate();
@@ -416,7 +416,7 @@ const exprt qbf_squolem_coret::f_get(literalt l)
 
     if(wsp==NULL || wsp->size()==0)
     {
-//      res=exprt("nondet_bool", typet("bool"));
+//      res=exprt(ID_nondet_bool, typet(ID_bool));
       res=false_exprt(); // just set it to zero
     }
     else if(wsp->pSize<=wsp->nSize)
@@ -449,7 +449,7 @@ const exprt qbf_squolem_coret::f_get_cnf(WitnessStack *wsp)
 {
   Clause *p=wsp->negWits;
 
-  if(!p) return exprt("true", typet("bool"));
+  if(!p) return exprt(ID_true, typet(ID_bool));
 
   exprt::operandst operands;
 
@@ -502,7 +502,7 @@ const exprt qbf_squolem_coret::f_get_dnf(WitnessStack *wsp)
 {
   Clause *p=wsp->posWits;
 
-  if(!p) return exprt("false", typet("bool"));
+  if(!p) return exprt(ID_false, typet(ID_bool));
 
   exprt::operandst operands;
 

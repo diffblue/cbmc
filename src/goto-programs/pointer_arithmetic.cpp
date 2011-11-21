@@ -44,7 +44,7 @@ Function: pointer_arithmetict::read
 
 void pointer_arithmetict::read(const exprt &src)
 {
-  if(src.id()=="+")
+  if(src.id()==ID_plus)
   {
     forall_operands(it, src)
     {
@@ -54,7 +54,7 @@ void pointer_arithmetict::read(const exprt &src)
         add_to_offset(*it);
     }
   }
-  else if(src.id()=="-")
+  else if(src.id()==ID_minus)
   {
     assert(src.operands().size()==2);
     read(src.op0());
@@ -103,7 +103,7 @@ void pointer_arithmetict::add_to_offset(const exprt &src)
 {
   if(offset.is_nil())
     offset=src;
-  else if(offset.id()=="+")
+  else if(offset.id()==ID_plus)
     offset.copy_to_operands(src);
   else
   {

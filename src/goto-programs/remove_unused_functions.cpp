@@ -28,7 +28,7 @@ void remove_unused_functions(
 {
   std::set<irep_idt> used_functions;
   std::list<goto_functionst::function_mapt::iterator> unused_functions;
-  find_used_functions("main", functions, used_functions);
+  find_used_functions(ID_main, functions, used_functions);
     
   for(goto_functionst::function_mapt::iterator it=
         functions.function_map.begin();
@@ -94,9 +94,9 @@ void find_used_functions(
             to_code_function_call(to_code(it->code));
           
           // check that this is actually a simple call
-          assert(call.function().id()=="symbol");
+          assert(call.function().id()==ID_symbol);
           
-          find_used_functions(call.function().get("identifier"), 
+          find_used_functions(call.function().get(ID_identifier), 
                               functions, 
                               seen);
         }

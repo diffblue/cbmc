@@ -94,8 +94,8 @@ Function: cvc_convt::gen_array_index_type
 
 typet cvc_convt::gen_array_index_type()
 {
-  typet t("signedbv");
-  t.set("width", 32);
+  typet t(ID_signedbv);
+  t.set(ID_width, 32);
   return t;
 }
 
@@ -136,7 +136,7 @@ void cvc_convt::convert_array_index(const exprt &expr)
   }
   else
   {
-    exprt tmp("typecast", gen_array_index_type());
+    exprt tmp(ID_typecast, gen_array_index_type());
     tmp.copy_to_operands(expr);
     convert_cvc_expr(tmp);
   }
@@ -156,8 +156,8 @@ Function: cvc_convt::convert_address_of_rec
 
 void cvc_convt::convert_address_of_rec(const exprt &expr)
 {
-  if(expr.id()=="symbol" ||
-     expr.id()=="constant" ||
+  if(expr.id()==ID_symbol ||
+     expr.id()==ID_constant ||
      expr.id()==ID_string_constant)
   {
     cvc_prop.out
@@ -166,7 +166,7 @@ void cvc_convt::convert_address_of_rec(const exprt &expr)
       << ", offset:="
       << bin_zero(config.ansi_c.pointer_width) << " #)";
   }
-  else if(expr.id()=="index")
+  else if(expr.id()==ID_index)
   {
     if(expr.operands().size()!=2)
       throw "index takes two operands";
@@ -176,9 +176,9 @@ void cvc_convt::convert_address_of_rec(const exprt &expr)
 
     if(index.is_zero())
     {
-      if(array.type().id()=="pointer")
+      if(array.type().id()==ID_pointer)
         convert_cvc_expr(array);
-      else if(array.type().id()=="array")
+      else if(array.type().id()==ID_array)
         convert_address_of_rec(array);
       else
         assert(false);
@@ -189,9 +189,9 @@ void cvc_convt::convert_address_of_rec(const exprt &expr)
       cvc_prop.out << cvc_pointer_type();
       cvc_prop.out << " = ";
       
-      if(array.type().id()=="pointer")
+      if(array.type().id()==ID_pointer)
         convert_cvc_expr(array);
-      else if(array.type().id()=="array")
+      else if(array.type().id()==ID_array)
         convert_address_of_rec(array);
       else
         assert(false);
@@ -203,7 +203,7 @@ void cvc_convt::convert_address_of_rec(const exprt &expr)
       cvc_prop.out << "))";
     }
   }
-  else if(expr.id()=="member")
+  else if(expr.id()==ID_member)
   {
     if(expr.operands().size()!=1)
       throw "member takes one operand";
@@ -223,8 +223,8 @@ void cvc_convt::convert_address_of_rec(const exprt &expr)
       to_struct_type(struct_op.type()),
       component_name);
     
-    typet index_type("unsignedbv");
-    index_type.set("width", config.ansi_c.pointer_width);
+    typet index_type(ID_unsignedbv);
+    index_type.set(ID_width, config.ansi_c.pointer_width);
 
     exprt index=from_integer(offset, index_type);
 
@@ -327,7 +327,7 @@ Function: cvc_convt::convert_as_bv
 
 void cvc_convt::convert_as_bv(const exprt &expr)
 {
-  if(expr.type().id()=="bool")
+  if(expr.type().id()==ID_bool)
   {
     if(expr.is_true())
       cvc_prop.out << "0bin1";
@@ -375,24 +375,24 @@ Function: cvc_convt::convert_cvc_expr
 
 void cvc_convt::convert_cvc_expr(const exprt &expr)
 {
-  if(expr.id()=="symbol")
+  if(expr.id()==ID_symbol)
   {
-    convert_identifier(expr.get_string("identifier"));
+    convert_identifier(expr.get_string(ID_identifier));
   }
-  else if(expr.id()=="nondet_symbol")
+  else if(expr.id()==ID_nondet_symbol)
   {
-    convert_identifier("nondet$"+expr.get_string("identifier"));
+    convert_identifier("nondet$"+expr.get_string(ID_identifier));
   }
-  else if(expr.id()=="typecast")
+  else if(expr.id()==ID_typecast)
   {
     assert(expr.operands().size()==1);
     const exprt &op=expr.op0();
     
-    if(expr.type().id()=="bool")
+    if(expr.type().id()==ID_bool)
     {
-      if(op.type().id()=="signedbv" ||
-         op.type().id()=="unsignedbv" ||
-         op.type().id()=="pointer")
+      if(op.type().id()==ID_signedbv ||
+         op.type().id()==ID_unsignedbv ||
+         op.type().id()==ID_pointer)
       {
         convert_cvc_expr(op);
         cvc_prop.out << "/=";
@@ -403,14 +403,14 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
         throw "TODO typecast1 "+op.type().id_string()+" -> bool";
       }
     }
-    else if(expr.type().id()=="signedbv" ||
-            expr.type().id()=="unsignedbv")
+    else if(expr.type().id()==ID_signedbv ||
+            expr.type().id()==ID_unsignedbv)
     {
-      unsigned to_width=atoi(expr.type().get("width").c_str());
+      unsigned to_width=atoi(expr.type().get(ID_width).c_str());
       
-      if(op.type().id()=="signedbv")
+      if(op.type().id()==ID_signedbv)
       {
-        unsigned from_width=atoi(op.type().get("width").c_str());
+        unsigned from_width=atoi(op.type().get(ID_width).c_str());
         
         if(from_width==to_width)
           convert_cvc_expr(op);
@@ -427,9 +427,9 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
           cvc_prop.out << ")[" << (to_width-1) << ":0]";
         }
       }
-      else if(op.type().id()=="unsignedbv")
+      else if(op.type().id()==ID_unsignedbv)
       {
-        unsigned from_width=atoi(op.type().get("width").c_str());
+        unsigned from_width=atoi(op.type().get(ID_width).c_str());
         
         if(from_width==to_width)
           convert_cvc_expr(op);
@@ -453,7 +453,7 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
           cvc_prop.out << ")[" << (to_width-1) << ":0]";
         }
       }
-      else if(op.type().id()=="bool")
+      else if(op.type().id()==ID_bool)
       {
         if(to_width>1)
         {
@@ -481,9 +481,9 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
               " -> "+expr.type().id_string();
       }
     }
-    else if(expr.type().id()=="pointer")
+    else if(expr.type().id()==ID_pointer)
     {
-      if(op.type().id()=="pointer")
+      if(op.type().id()==ID_pointer)
       {
         convert_cvc_expr(op);
       }
@@ -493,7 +493,7 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
     else
       throw "TODO typecast4 ? -> "+expr.type().id_string();
   }
-  else if(expr.id()=="struct")
+  else if(expr.id()==ID_struct)
   {
     cvc_prop.out << "(# ";
     
@@ -511,20 +511,20 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
         it++, i++)
     {
       if(i!=0) cvc_prop.out << ", ";
-      cvc_prop.out << it->get("name");
+      cvc_prop.out << it->get(ID_name);
       cvc_prop.out << ":=";
       convert_cvc_expr(expr.operands()[i]);
     }
     
     cvc_prop.out << " #)";
   }
-  else if(expr.id()=="constant")
+  else if(expr.id()==ID_constant)
   {
-    if(expr.type().id()=="unsignedbv" ||
-       expr.type().id()=="signedbv" ||
-       expr.type().id()=="bv")
+    if(expr.type().id()==ID_unsignedbv ||
+       expr.type().id()==ID_signedbv ||
+       expr.type().id()==ID_bv)
     {
-      const irep_idt &value=expr.get("value");
+      const irep_idt &value=expr.get(ID_value);
       
       if(value.size()==8 ||
          value.size()==16 ||
@@ -545,9 +545,9 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
         cvc_prop.out << "0bin" << value;
       }
     }
-    else if(expr.type().id()=="pointer")
+    else if(expr.type().id()==ID_pointer)
     {
-      const irep_idt &value=expr.get("value");
+      const irep_idt &value=expr.get(ID_value);
       
       if(value=="NULL")
       {
@@ -559,7 +559,7 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
       else
         throw "unknown pointer constant: "+id2string(value);
     }
-    else if(expr.type().id()=="bool")
+    else if(expr.type().id()==ID_bool)
     {
       if(expr.is_true())
         cvc_prop.out << "TRUE";
@@ -568,7 +568,7 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
       else
         throw "unknown boolean constant";
     }
-    else if(expr.type().id()=="array")
+    else if(expr.type().id()==ID_array)
     {
       cvc_prop.out << "ARRAY (i: " << array_index_type() << "):";
       
@@ -591,11 +591,11 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
       convert_cvc_expr(expr.op0());
       cvc_prop.out << "\n  ENDIF";
     }
-    else if(expr.type().id()=="integer" ||
-            expr.type().id()=="natural" ||
-            expr.type().id()=="range")
+    else if(expr.type().id()==ID_integer ||
+            expr.type().id()==ID_natural ||
+            expr.type().id()==ID_range)
     {
-      cvc_prop.out << expr.get("value");
+      cvc_prop.out << expr.get(ID_value);
     }
     else
     {
@@ -603,9 +603,9 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
       throw "unknown constant: "+expr.type().id_string();
     }
   }
-  else if(expr.id()=="concatenation" || 
-          expr.id()=="bitand" ||
-          expr.id()=="bitor")
+  else if(expr.id()==ID_concatenation || 
+          expr.id()==ID_bitand ||
+          expr.id()==ID_bitor)
   {
     cvc_prop.out << "(";
 
@@ -613,11 +613,11 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
     {
       if(it!=expr.operands().begin())
       {
-        if(expr.id()=="concatenation")
+        if(expr.id()==ID_concatenation)
           cvc_prop.out << " @ ";
-        else if(expr.id()=="bitand")
+        else if(expr.id()==ID_bitand)
           cvc_prop.out << " & ";
-        else if(expr.id()=="bitor")
+        else if(expr.id()==ID_bitor)
           cvc_prop.out << " | ";
       }
 
@@ -626,7 +626,7 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
 
     cvc_prop.out << ")";
   }
-  else if(expr.id()=="bitxor")
+  else if(expr.id()==ID_bitxor)
   {
     assert(!expr.operands().empty());
   
@@ -656,7 +656,7 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
       cvc_prop.out << ")";
     }
   }
-  else if(expr.id()=="bitnand")
+  else if(expr.id()==ID_bitnand)
   {
     assert(expr.operands().size()==2);
 
@@ -666,18 +666,18 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
     convert_cvc_expr(expr.op1());
     cvc_prop.out << ")";
   }
-  else if(expr.id()=="bitnot")
+  else if(expr.id()==ID_bitnot)
   {
     assert(expr.operands().size()==1);
     cvc_prop.out << "~(";
     convert_cvc_expr(expr.op0());
     cvc_prop.out << ")";
   }
-  else if(expr.id()=="unary-")
+  else if(expr.id()==ID_unary_minus)
   {
     assert(expr.operands().size()==1);
-    if(expr.type().id()=="unsignedbv" ||
-       expr.type().id()=="signedbv")
+    if(expr.type().id()==ID_unsignedbv ||
+       expr.type().id()==ID_signedbv)
     {
       cvc_prop.out << "BVUMINUS(";
       convert_cvc_expr(expr.op0());
@@ -686,7 +686,7 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
     else
       throw "unsupported type for unary-: "+expr.type().id_string();
   }
-  else if(expr.id()=="if")
+  else if(expr.id()==ID_if)
   {
     assert(expr.operands().size()==3);
     cvc_prop.out << "IF ";
@@ -697,11 +697,11 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
     convert_cvc_expr(expr.op2());
     cvc_prop.out << " ENDIF";
   }
-  else if(expr.id()=="and" ||
-          expr.id()=="or" ||
-          expr.id()=="xor")
+  else if(expr.id()==ID_and ||
+          expr.id()==ID_or ||
+          expr.id()==ID_xor)
   {
-    assert(expr.type().id()=="bool");
+    assert(expr.type().id()==ID_bool);
     
     if(expr.operands().size()>=2)
     {
@@ -709,11 +709,11 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
       {
         if(it!=expr.operands().begin())
         {
-          if(expr.id()=="and")
+          if(expr.id()==ID_and)
             cvc_prop.out << " AND ";
-          else if(expr.id()=="or")
+          else if(expr.id()==ID_or)
             cvc_prop.out << " OR ";
-          else if(expr.id()=="xor")
+          else if(expr.id()==ID_xor)
             cvc_prop.out << " XOR ";
         }
         
@@ -729,58 +729,58 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
     else
       assert(false);
   }
-  else if(expr.id()=="not")
+  else if(expr.id()==ID_not)
   {
     assert(expr.operands().size()==1);
     cvc_prop.out << "NOT (";
     convert_cvc_expr(expr.op0());
     cvc_prop.out << ")";
   }
-  else if(expr.id()=="=" ||
-          expr.id()=="notequal")
+  else if(expr.id()==ID_equal ||
+          expr.id()==ID_notequal)
   {
     assert(expr.operands().size()==2);
     assert(expr.op0().type()==expr.op1().type());
 
-    if(expr.op0().type().id()=="bool")
+    if(expr.op0().type().id()==ID_bool)
     {
-      if(expr.id()=="notequal") cvc_prop.out << "NOT (";
+      if(expr.id()==ID_notequal) cvc_prop.out << "NOT (";
       cvc_prop.out << "(";
       convert_cvc_expr(expr.op0());
       cvc_prop.out << ") <=> (";
       convert_cvc_expr(expr.op1());
       cvc_prop.out << ")";
-      if(expr.id()=="notequal") cvc_prop.out << ")";
+      if(expr.id()==ID_notequal) cvc_prop.out << ")";
     }
     else
     {
       cvc_prop.out << "(";
       convert_cvc_expr(expr.op0());
       cvc_prop.out << ")";
-      cvc_prop.out << (expr.id()=="="?"=":"/=");
+      cvc_prop.out << (expr.id()==ID_equal?"=":"/=");
       cvc_prop.out << "(";
       convert_cvc_expr(expr.op1());
       cvc_prop.out << ")";
     }
   }
-  else if(expr.id()=="<=" ||
-          expr.id()=="<" ||
-          expr.id()==">=" ||
-          expr.id()==">")
+  else if(expr.id()==ID_le ||
+          expr.id()==ID_lt ||
+          expr.id()==ID_ge ||
+          expr.id()==ID_gt)
   {
     assert(expr.operands().size()==2);
     
     const typet &op_type=expr.op0().type();
 
-    if(op_type.id()=="unsignedbv")
+    if(op_type.id()==ID_unsignedbv)
     {
-      if(expr.id()=="<=")
+      if(expr.id()==ID_le)
         cvc_prop.out << "BVLE";
-      else if(expr.id()=="<")
+      else if(expr.id()==ID_lt)
         cvc_prop.out << "BVLT";
-      else if(expr.id()==">=")
+      else if(expr.id()==ID_ge)
         cvc_prop.out << "BVGE";
-      else if(expr.id()==">")
+      else if(expr.id()==ID_gt)
         cvc_prop.out << "BVGT";
       
       cvc_prop.out << "(";
@@ -789,15 +789,15 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
       convert_cvc_expr(expr.op1());
       cvc_prop.out << ")";
     }
-    else if(op_type.id()=="signedbv")
+    else if(op_type.id()==ID_signedbv)
     {
-      if(expr.id()=="<=")
+      if(expr.id()==ID_le)
         cvc_prop.out << "SBVLE";
-      else if(expr.id()=="<")
+      else if(expr.id()==ID_lt)
         cvc_prop.out << "SBVLT";
-      else if(expr.id()==">=")
+      else if(expr.id()==ID_ge)
         cvc_prop.out << "SBVGE";
-      else if(expr.id()==">")
+      else if(expr.id()==ID_gt)
         cvc_prop.out << "SBVGT";
       
       cvc_prop.out << "(";
@@ -809,14 +809,14 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
     else
       throw "unsupported type for "+expr.id_string()+": "+expr.type().id_string();
   }
-  else if(expr.id()=="+")
+  else if(expr.id()==ID_plus)
   {
     if(expr.operands().size()>=2)
     {
-      if(expr.type().id()=="unsignedbv" ||
-         expr.type().id()=="signedbv")
+      if(expr.type().id()==ID_unsignedbv ||
+         expr.type().id()==ID_signedbv)
       {
-        cvc_prop.out << "BVPLUS(" << expr.type().get("width");
+        cvc_prop.out << "BVPLUS(" << expr.type().get(ID_width);
 
         forall_operands(it, expr)
         {
@@ -826,19 +826,19 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
           
         cvc_prop.out << ")";
       }
-      else if(expr.type().id()=="pointer")
+      else if(expr.type().id()==ID_pointer)
       {
         if(expr.operands().size()!=2)
           throw "pointer arithmetic with more than two operands";
         
         const exprt *p, *i;
         
-        if(expr.op0().type().id()=="pointer")
+        if(expr.op0().type().id()==ID_pointer)
         {
           p=&expr.op0();
           i=&expr.op1();
         }
-        else if(expr.op1().type().id()=="pointer")
+        else if(expr.op1().type().id()==ID_pointer)
         {
           p=&expr.op1();
           i=&expr.op0();
@@ -864,14 +864,14 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
     else
       assert(false);
   }
-  else if(expr.id()=="-")
+  else if(expr.id()==ID_minus)
   {
     if(expr.operands().size()==2)
     {
-      if(expr.type().id()=="unsignedbv" ||
-         expr.type().id()=="signedbv")
+      if(expr.type().id()==ID_unsignedbv ||
+         expr.type().id()==ID_signedbv)
       {
-        cvc_prop.out << "BVSUB(" << expr.type().get("width") << ", ";
+        cvc_prop.out << "BVSUB(" << expr.type().get(ID_width) << ", ";
         convert_cvc_expr(expr.op0());
         cvc_prop.out << ", ";
         convert_cvc_expr(expr.op1());
@@ -887,19 +887,19 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
     else
       assert(false);
   }
-  else if(expr.id()=="/")
+  else if(expr.id()==ID_div)
   {
     assert(expr.operands().size()==2);
 
-    if(expr.type().id()=="unsignedbv" ||
-       expr.type().id()=="signedbv")
+    if(expr.type().id()==ID_unsignedbv ||
+       expr.type().id()==ID_signedbv)
     {
-      if(expr.type().id()=="unsignedbv")
+      if(expr.type().id()==ID_unsignedbv)
         cvc_prop.out << "BVDIV";
       else
         cvc_prop.out << "SBVDIV";
 
-      cvc_prop.out << "(" << expr.type().get("width") << ", ";
+      cvc_prop.out << "(" << expr.type().get(ID_width) << ", ";
       convert_cvc_expr(expr.op0());
       cvc_prop.out << ", ";
       convert_cvc_expr(expr.op1());
@@ -908,19 +908,19 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
     else
       throw "unsupported type for /: "+expr.type().id_string();
   }
-  else if(expr.id()=="mod")
+  else if(expr.id()==ID_mod)
   {
     assert(expr.operands().size()==2);
 
-    if(expr.type().id()=="unsignedbv" ||
-       expr.type().id()=="signedbv")
+    if(expr.type().id()==ID_unsignedbv ||
+       expr.type().id()==ID_signedbv)
     {
-      if(expr.type().id()=="unsignedbv")
+      if(expr.type().id()==ID_unsignedbv)
         cvc_prop.out << "BVMOD";
       else
         cvc_prop.out << "SBVMOD";
 
-      cvc_prop.out << "(" << expr.type().get("width") << ", ";
+      cvc_prop.out << "(" << expr.type().get(ID_width) << ", ";
       convert_cvc_expr(expr.op0());
       cvc_prop.out << ", ";
       convert_cvc_expr(expr.op1());
@@ -929,14 +929,14 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
     else
       throw "unsupported type for mod: "+expr.type().id_string();
   }
-  else if(expr.id()=="*")
+  else if(expr.id()==ID_mult)
   {
     if(expr.operands().size()==2)
     {
-      if(expr.type().id()=="unsignedbv" ||
-         expr.type().id()=="signedbv")
+      if(expr.type().id()==ID_unsignedbv ||
+         expr.type().id()==ID_signedbv)
       {
-        cvc_prop.out << "BVMULT(" << expr.type().get("width") << ", ";
+        cvc_prop.out << "BVMULT(" << expr.type().get(ID_width) << ", ";
         convert_cvc_expr(expr.op0());
         cvc_prop.out << ", ";
         convert_cvc_expr(expr.op1());
@@ -952,23 +952,23 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
     else
       assert(false);
   }
-  else if(expr.id()=="address_of" ||
+  else if(expr.id()==ID_address_of ||
           expr.id()=="implicit_address_of" ||
           expr.id()=="reference_to")
   {
     assert(expr.operands().size()==1);
-    assert(expr.type().id()=="pointer");
+    assert(expr.type().id()==ID_pointer);
     convert_address_of_rec(expr.op0());
   }
-  else if(expr.id()=="array_of")
+  else if(expr.id()==ID_array_of)
   {
-    assert(expr.type().id()=="array");
+    assert(expr.type().id()==ID_array);
     assert(expr.operands().size()==1);
     cvc_prop.out << "(ARRAY (i: " << array_index_type() << "): ";
     convert_array_value(expr.op0());
     cvc_prop.out << ")";
   }
-  else if(expr.id()=="index")
+  else if(expr.id()==ID_index)
   {
     assert(expr.operands().size()==2);
     cvc_prop.out << "(";
@@ -977,25 +977,25 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
     convert_array_index(expr.op1());
     cvc_prop.out << "]";
   }
-  else if(expr.id()=="ashr" ||
-          expr.id()=="lshr" ||
-          expr.id()=="shl")
+  else if(expr.id()==ID_ashr ||
+          expr.id()==ID_lshr ||
+          expr.id()==ID_shl)
   {
     assert(expr.operands().size()==2);
 
-    if(expr.type().id()=="unsignedbv" ||
-       expr.type().id()=="signedbv")
+    if(expr.type().id()==ID_unsignedbv ||
+       expr.type().id()==ID_signedbv)
     {
-      if(expr.id()=="ashr")
+      if(expr.id()==ID_ashr)
         cvc_prop.out << "BVASHR";
-      else if(expr.id()=="lshr")
+      else if(expr.id()==ID_lshr)
         cvc_prop.out << "BVLSHR";
-      else if(expr.id()=="shl")
+      else if(expr.id()==ID_shl)
         cvc_prop.out << "BVSHL";
       else
         assert(false);
 
-      cvc_prop.out << "(" << expr.type().get("width") << ", ";
+      cvc_prop.out << "(" << expr.type().get(ID_width) << ", ";
       convert_cvc_expr(expr.op0());
       cvc_prop.out << ", ";
       convert_cvc_expr(expr.op1());
@@ -1004,7 +1004,7 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
     else
       throw "unsupported type for "+expr.id_string()+": "+expr.type().id_string();
   }
-  else if(expr.id()=="with")
+  else if(expr.id()==ID_with)
   {
     assert(expr.operands().size()>=1);
     cvc_prop.out << "(";
@@ -1017,21 +1017,21 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
       const exprt &index=expr.operands()[i];
       const exprt &value=expr.operands()[i+1];
 
-      if(expr.type().id()=="struct")
+      if(expr.type().id()==ID_struct)
       {
-        cvc_prop.out << " WITH ." << index.get("component_name");
+        cvc_prop.out << " WITH ." << index.get(ID_component_name);
         cvc_prop.out << ":=(";
         convert_array_value(value);
         cvc_prop.out << ")";
       }
-      else if(expr.type().id()=="union")
+      else if(expr.type().id()==ID_union)
       {
-        cvc_prop.out << " WITH ." << index.get("component_name");
+        cvc_prop.out << " WITH ." << index.get(ID_component_name);
         cvc_prop.out << ":=(";
         convert_array_value(value);
         cvc_prop.out << ")";
       }
-      else if(expr.type().id()=="array")
+      else if(expr.type().id()==ID_array)
       {
         cvc_prop.out << " WITH [";
         convert_array_index(index);
@@ -1043,14 +1043,14 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
         throw "with expects struct or array type, but got "+expr.type().id_string();
     }
   }
-  else if(expr.id()=="member")
+  else if(expr.id()==ID_member)
   {
     assert(expr.operands().size()==1);
     convert_cvc_expr(expr.op0());
     cvc_prop.out << ".";
-    cvc_prop.out << expr.get("component_name");
+    cvc_prop.out << expr.get(ID_component_name);
   }
-  else if(expr.id()=="pointer_offset")
+  else if(expr.id()==ID_pointer_offset)
   {
     assert(expr.operands().size()==1);
     cvc_prop.out << "(";
@@ -1058,7 +1058,7 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
     cvc_prop.out << ").offset";
   }
   #if 0
-  else if(expr.id()=="pointer_object")
+  else if(expr.id()==ID_pointer_object)
   {
     assert(expr.operands().size()==1);
     cvc_prop.out << "(";
@@ -1067,7 +1067,7 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
     // TODO, this has the wrong type
   }
   #endif
-  else if(expr.id()=="same-object")
+  else if(expr.id()==ID_same_object)
   {
     assert(expr.operands().size()==2);
     cvc_prop.out << "(";
@@ -1080,12 +1080,12 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
   {
     convert_cvc_expr(to_string_constant(expr).to_array_expr());
   }
-  else if(expr.id()=="extractbit")
+  else if(expr.id()==ID_extractbit)
   {
     assert(expr.operands().size()==2);
 
-    if(expr.op0().type().id()=="unsignedbv" ||
-       expr.op0().type().id()=="signedbv")
+    if(expr.op0().type().id()==ID_unsignedbv ||
+       expr.op0().type().id()==ID_signedbv)
     {
       cvc_prop.out << "(";
       convert_cvc_expr(expr.op0());
@@ -1099,7 +1099,7 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
     else
       throw "unsupported type for "+expr.id_string()+": "+expr.op0().type().id_string();
   }
-  else if(expr.id()=="replication")
+  else if(expr.id()==ID_replication)
   {
     assert(expr.operands().size()==2);
   
@@ -1139,7 +1139,7 @@ Function: cvc_convt::set_to
 
 void cvc_convt::set_to(const exprt &expr, bool value)
 {
-  if(value && expr.id()=="and")
+  if(value && expr.id()==ID_and)
   {
     forall_operands(it, expr)
       set_to(*it, true);
@@ -1151,13 +1151,13 @@ void cvc_convt::set_to(const exprt &expr, bool value)
 
   cvc_prop.out << "%% set_to " << (value?"true":"false") << std::endl;
 
-  if(expr.id()=="=" && value)
+  if(expr.id()==ID_equal && value)
   {
     assert(expr.operands().size()==2);
     
-    if(expr.op0().id()=="symbol")
+    if(expr.op0().id()==ID_symbol)
     {
-      const irep_idt &identifier=expr.op0().get("identifier");
+      const irep_idt &identifier=expr.op0().get(ID_identifier);
       
       identifiert &id=identifier_map[identifier];
 
@@ -1220,12 +1220,12 @@ void cvc_convt::find_symbols(const exprt &expr)
   forall_operands(it, expr)
     find_symbols(*it);
     
-  if(expr.id()=="symbol")
+  if(expr.id()==ID_symbol)
   {
-    if(expr.type().id()=="code")
+    if(expr.type().id()==ID_code)
       return;
 
-    const irep_idt &identifier=expr.get("identifier");
+    const irep_idt &identifier=expr.get(ID_identifier);
 
     identifiert &id=identifier_map[identifier];
 
@@ -1239,12 +1239,12 @@ void cvc_convt::find_symbols(const exprt &expr)
       cvc_prop.out << ";" << std::endl;
     }
   }  
-  else if(expr.id()=="nondet_symbol")
+  else if(expr.id()==ID_nondet_symbol)
   {
-    if(expr.type().id()=="code")
+    if(expr.type().id()==ID_code)
       return;
 
-    const irep_idt identifier="nondet$"+expr.get_string("identifier");
+    const irep_idt identifier="nondet$"+expr.get_string(ID_identifier);
 
     identifiert &id=identifier_map[identifier];
 
@@ -1274,24 +1274,24 @@ Function: cvc_convt::convert_cvc_type
 
 void cvc_convt::convert_cvc_type(const typet &type)
 {
-  if(type.id()=="array")
+  if(type.id()==ID_array)
   {
     const array_typet &array_type=to_array_type(type);
     
     cvc_prop.out << "ARRAY " << array_index_type()
                  << " OF ";
                  
-    if(array_type.subtype().id()=="bool")
+    if(array_type.subtype().id()==ID_bool)
       cvc_prop.out << "BITVECTOR(1)";
     else
       convert_cvc_type(array_type.subtype());
   }
-  else if(type.id()=="bool")
+  else if(type.id()==ID_bool)
   {
     cvc_prop.out << "BOOLEAN";
   }
-  else if(type.id()=="struct" ||
-          type.id()=="union")
+  else if(type.id()==ID_struct ||
+          type.id()==ID_union)
   {
     const struct_typet &struct_type=to_struct_type(type);
   
@@ -1307,23 +1307,23 @@ void cvc_convt::convert_cvc_type(const typet &type)
     {
       if(it!=components.begin()) cvc_prop.out << ",";
       cvc_prop.out << " ";
-      cvc_prop.out << it->get("name");
+      cvc_prop.out << it->get(ID_name);
       cvc_prop.out << ": ";
       convert_cvc_type(it->type());
     }
     
     cvc_prop.out << " #]";
   }
-  else if(type.id()=="pointer" ||
-          type.id()=="reference")
+  else if(type.id()==ID_pointer ||
+          type.id()==ID_reference)
   {
     cvc_prop.out << cvc_pointer_type();
   }
-  else if(type.id()=="integer")
+  else if(type.id()==ID_integer)
   {
     cvc_prop.out << "INT";
   }
-  else if(type.id()=="signedbv")
+  else if(type.id()==ID_signedbv)
   {
     unsigned width=to_signedbv_type(type).get_width();
       
@@ -1332,7 +1332,7 @@ void cvc_convt::convert_cvc_type(const typet &type)
   
     cvc_prop.out << "BITVECTOR(" << width << ")";
   }
-  else if(type.id()=="unsignedbv")
+  else if(type.id()==ID_unsignedbv)
   {
     unsigned width=to_unsignedbv_type(type).get_width();
       
@@ -1359,13 +1359,13 @@ Function: cvc_convt::find_symbols
 
 void cvc_convt::find_symbols(const typet &type)
 {
-  if(type.id()=="array")
+  if(type.id()==ID_array)
   {
     const array_typet &array_type=to_array_type(type);
     find_symbols(array_type.size());
   }
-  else if(type.id()=="struct" ||
-          type.id()=="union")
+  else if(type.id()==ID_struct ||
+          type.id()==ID_union)
   {
   }
 }
