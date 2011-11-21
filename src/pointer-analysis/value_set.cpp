@@ -720,8 +720,9 @@ void value_sett::get_value_set_rec(
   }
   else if(expr.id()==ID_struct)
   {
-    // this is like a static struct object
-    insert(dest, address_of_exprt(expr), 0);
+    // a struct constructor, which may contain addresses
+    forall_operands(it, expr)
+      get_value_set_rec(*it, dest, suffix, original_type, ns);
   }
   else if(expr.id()==ID_with)
   {
@@ -774,11 +775,17 @@ void value_sett::get_value_set_rec(
       make_union(dest, tmp_map2);
     }
   }
-  else if(expr.id()==ID_array_of ||
-          expr.id()==ID_array)
+  else if(expr.id()==ID_array)
   {
-    // give up
-    insert(dest, exprt(ID_unknown, original_type));
+    // an array constructur, possibly containing addresses
+    forall_operands(it, expr)
+      get_value_set_rec(*it, dest, suffix, original_type, ns);
+  }
+  else if(expr.id()==ID_array_of)
+  {
+    // an array constructor, possibly containing an address
+    assert(expr.operands().size()==1);
+    get_value_set_rec(expr.op0(), dest, suffix, original_type, ns);
   }
   else if(expr.id()==ID_dynamic_object)
   {
