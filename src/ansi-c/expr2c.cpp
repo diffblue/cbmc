@@ -3648,13 +3648,13 @@ std::string expr2ct::convert(
   else if(src.id()=="predicate_next_symbol")
     return convert_predicate_next_symbol(src, precedence);
 
-  else if(src.id()=="quantified_symbol")
+  else if(src.id()=="quant_symbol")
     return convert_quantified_symbol(src, precedence);
 
-  else if(src.id()=="nondet_bool")
+  else if(src.id()==ID_nondet_bool)
     return convert_nondet_bool(src, precedence);
 
-  else if(src.id()=="object_descriptor")
+  else if(src.id()==ID_object_descriptor)
     return convert_object_descriptor(src, precedence);
 
   else if(src.id()=="Hoare")
@@ -3699,13 +3699,16 @@ std::string expr2ct::convert(
   else if(src.id()==ID_cond)
     return convert_cond(src, precedence);
 
-  else if(std::string(src.id_string(), 0, 9)=="overflow-")
+  else if(src.id()==ID_overflow_unary_minus ||
+      src.id()==ID_overflow_minus ||
+      src.id()==ID_overflow_mult ||
+      src.id()==ID_overflow_plus)
     return convert_overflow(src, precedence);
 
   else if(src.id()==ID_unknown)
     return "*";
 
-  else if(src.id()=="invalid")
+  else if(src.id()==ID_invalid)
     return "#";
 
   else if(src.id()==ID_extractbit)

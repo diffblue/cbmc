@@ -155,8 +155,8 @@ void value_set_analysis_fivrt::get_entries_rec(
 {
   const typet &t=ns.follow(type);
 
-  if(t.id()=="struct" ||
-     t.id()=="union")
+  if(t.id()==ID_struct ||
+     t.id()==ID_union)
   {
     const struct_typet &struct_type=to_struct_type(t);
     
@@ -169,12 +169,12 @@ void value_set_analysis_fivrt::get_entries_rec(
     {
       get_entries_rec(
         identifier,
-        suffix+"."+it->get_string("name"),
+        suffix+"."+it->get_string(ID_name),
         it->type(),
         dest);
     }
   }
-  else if(t.id()=="array")
+  else if(t.id()==ID_array)
   {
     get_entries_rec(identifier, suffix+"[]", t.subtype(), dest);
   }
@@ -269,19 +269,19 @@ Function: value_set_analysis_fivrt::check_type
 
 bool value_set_analysis_fivrt::check_type(const typet &type)
 {
-  if(type.id()=="pointer")
+  if(type.id()==ID_pointer)
   {
     switch(track_options) {
       case TRACK_ALL_POINTERS:
         { return true; break; }
       case TRACK_FUNCTION_POINTERS:
       {
-        if(type.id()=="pointer")
+        if(type.id()==ID_pointer)
         {
           const typet *t = &type;
-          while (t->id()=="pointer") t = &(t->subtype());
+          while (t->id()==ID_pointer) t = &(t->subtype());
                   
-          return (t->id()=="code");
+          return (t->id()==ID_code);
         }
         
         break;
@@ -290,8 +290,8 @@ bool value_set_analysis_fivrt::check_type(const typet &type)
         break;
     }
   }
-  else if(type.id()=="struct" ||
-          type.id()=="union")
+  else if(type.id()==ID_struct ||
+          type.id()==ID_union)
   {
     const struct_typet &struct_type=to_struct_type(type);
     
@@ -306,9 +306,9 @@ bool value_set_analysis_fivrt::check_type(const typet &type)
       if(check_type(it->type())) return true;
     }    
   }
-  else if(type.id()=="array")
+  else if(type.id()==ID_array)
     return check_type(type.subtype());
-  else if(type.id()=="symbol")
+  else if(type.id()==ID_symbol)
     return check_type(ns.follow(type));
   
   return false;      

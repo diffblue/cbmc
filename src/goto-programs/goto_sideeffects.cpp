@@ -710,10 +710,10 @@ void goto_convertt::remove_side_effect(
           statement==ID_predecrement)
     remove_pre(expr, dest);
   else if(statement==ID_cpp_new ||
-          statement=="cpp_new[]")
+          statement==ID_cpp_new_array)
     remove_cpp_new(expr, dest, result_is_used);
   else if(statement==ID_cpp_delete ||
-          statement=="cpp_delete[]")
+          statement==ID_cpp_delete_array)
     remove_cpp_delete(expr, dest, result_is_used);
   else if(statement==ID_malloc)
     remove_malloc(expr, dest, result_is_used);

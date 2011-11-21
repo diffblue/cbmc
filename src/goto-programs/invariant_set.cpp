@@ -631,8 +631,8 @@ void invariant_sett::strengthen_rec(const exprt &expr)
     forall_operands(it, expr)
       strengthen_rec(*it);
   }
-  else if(expr.id()=="<=" ||
-          expr.id()=="<")
+  else if(expr.id()==ID_le ||
+          expr.id()==ID_lt)
   {
     assert(expr.operands().size()==2);
     
@@ -663,7 +663,7 @@ void invariant_sett::strengthen_rec(const exprt &expr)
     bool have_i0=!to_integer(expr.op0(), i0);
     bool have_i1=!to_integer(expr.op1(), i1);
     
-    if(expr.id()=="<=")
+    if(expr.id()==ID_le)
     {
       if(have_i0)
         add_bounds(p.second, lower_interval(i0));
@@ -672,7 +672,7 @@ void invariant_sett::strengthen_rec(const exprt &expr)
       else
         add_le(p);
     }
-    else if(expr.id()=="<")
+    else if(expr.id()==ID_lt)
     {
       if(have_i0)
         add_bounds(p.second, lower_interval(i0+1));
@@ -687,7 +687,7 @@ void invariant_sett::strengthen_rec(const exprt &expr)
     else
       assert(false);
   }
-  else if(expr.id()=="=")
+  else if(expr.id()==ID_equal)
   {
     assert(expr.operands().size()==2);
     
@@ -738,7 +738,7 @@ void invariant_sett::strengthen_rec(const exprt &expr)
       {
         exprt tmp(expr);
         tmp.op1()=*it;
-        tmp.id("<=");
+        tmp.id(ID_le);
         strengthen_rec(tmp);
       }
       
@@ -867,9 +867,9 @@ tvt invariant_sett::implies_rec(const exprt &expr) const
       if(implies_rec(*it)==tvt(true))
         return tvt(true);
   }
-  else if(expr.id()=="<=" ||
-          expr.id()=="<" ||
-          expr.id()=="=" ||
+  else if(expr.id()==ID_le ||
+          expr.id()==ID_lt ||
+          expr.id()==ID_equal ||
           expr.id()==ID_notequal)
   {
     assert(expr.operands().size()==2);
@@ -883,7 +883,7 @@ tvt invariant_sett::implies_rec(const exprt &expr) const
     
     tvt r;
     
-    if(expr.id()=="<=")
+    if(expr.id()==ID_le)
     {
       r=is_le(p);
       if(!r.is_unknown()) return r;
@@ -894,7 +894,7 @@ tvt invariant_sett::implies_rec(const exprt &expr) const
       
       return b0<=b1;
     }
-    else if(expr.id()=="<")
+    else if(expr.id()==ID_lt)
     {
       r=is_lt(p);
       if(!r.is_unknown()) return r;
@@ -905,7 +905,7 @@ tvt invariant_sett::implies_rec(const exprt &expr) const
       
       return b0<b1;
     }
-    else if(expr.id()=="=")
+    else if(expr.id()==ID_equal)
       return is_eq(p);
     else if(expr.id()==ID_notequal)
       return is_ne(p);
@@ -1016,51 +1016,51 @@ void invariant_sett::nnf(exprt &expr, bool negate)
       if(negate) expr.make_not();
     }
   }
-  else if(expr.id()=="<=")
+  else if(expr.id()==ID_le)
   {
     if(negate)
     {
       // !a<=b <-> !b=>a <-> b<a
-      expr.id("<");
+      expr.id(ID_lt);
       std::swap(expr.op0(), expr.op1());
     }
   }
-  else if(expr.id()=="<")
+  else if(expr.id()==ID_lt)
   {
     if(negate)
     {
       // !a<b <-> !b>a <-> b<=a
-      expr.id("<=");
+      expr.id(ID_le);
       std::swap(expr.op0(), expr.op1());
     }
   }
-  else if(expr.id()==">=")
+  else if(expr.id()==ID_ge)
   {
     if(negate)
-      expr.id("<");
+      expr.id(ID_lt);
     else
     {
-      expr.id("<=");
+      expr.id(ID_le);
       std::swap(expr.op0(), expr.op1());
     }
   }
-  else if(expr.id()==">")
+  else if(expr.id()==ID_gt)
   {
     if(negate)
-      expr.id("<=");
+      expr.id(ID_le);
     else
     {
-      expr.id("<");
+      expr.id(ID_lt);
       std::swap(expr.op0(), expr.op1());
     }
   }
-  else if(expr.id()=="=")
+  else if(expr.id()==ID_equal)
   {
     if(negate) expr.id(ID_notequal);
   }
   else if(expr.id()==ID_notequal)
   {
-    if(negate) expr.id("=");
+    if(negate) expr.id(ID_equal);
   }
   else
   {
@@ -1479,7 +1479,7 @@ void invariant_sett::apply_code(const codet &code)
     make_true();
   }
   else if(statement==ID_cpp_delete ||
-          statement=="cpp_delete[]")
+          statement==ID_cpp_delete_array)
   {
     // does nothing
   }

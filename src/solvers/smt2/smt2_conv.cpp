@@ -821,7 +821,7 @@ void smt2_convt::convert_expr(const exprt &expr)
     if(ext>0)
       smt2_prop.out << ")"; // zero_extend
   }
-  else if(expr.id()=="same-object")
+  else if(expr.id()==ID_same_object)
   {
     assert(expr.operands().size()==2);
     unsigned pointer_width0=boolbv_width(expr.op0().type());
@@ -1106,13 +1106,13 @@ void smt2_convt::convert_expr(const exprt &expr)
     else
       throw "isnormal with unsupported operand type";
   }
-  else if(expr.id()=="overflow-+" ||
-          expr.id()=="overflow--")
+  else if(expr.id()==ID_overflow_plus ||
+          expr.id()==ID_overflow_minus)
   {
     assert(expr.operands().size()==2);
     assert(expr.type().id()==ID_bool);
 
-    bool subtract=expr.id()=="overflow--";
+    bool subtract=expr.id()==ID_overflow_minus;
     const typet &op_type=expr.op0().type();
     unsigned width=boolbv_width(op_type);
 
@@ -1149,7 +1149,7 @@ void smt2_convt::convert_expr(const exprt &expr)
     else
       throw "overflow check on unknown type: "+op_type.id_string();
   }
-  else if(expr.id()=="overflow-*")
+  else if(expr.id()==ID_overflow_mult)
   {
     assert(expr.operands().size()==2);
     throw "not yet implemented: overflow-*";

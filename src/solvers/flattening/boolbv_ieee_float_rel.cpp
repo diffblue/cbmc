@@ -31,7 +31,7 @@ literalt boolbvt::convert_ieee_float_rel(const exprt &expr)
 {
   #ifdef HAVE_FLOATBV
   const exprt::operandst &operands=expr.operands();
-  const std::string &rel=expr.id_string();
+  const irep_idt &rel=expr.id();
 
   if(operands.size()==2)
   {
@@ -51,9 +51,9 @@ literalt boolbvt::convert_ieee_float_rel(const exprt &expr)
       float_utilst float_utils(prop);
       float_utils.spec=to_floatbv_type(op0.type());
 
-      if(rel=="ieee_float_equal")
+      if(rel==ID_ieee_float_equal)
         return float_utils.relation(bv0, float_utilst::EQ, bv1);
-      else if(rel=="ieee_float_notequal")
+      else if(rel==ID_ieee_float_notequal)
         return prop.lnot(float_utils.relation(bv0, float_utilst::EQ, bv1));
       else
         return SUB::convert_rest(expr);

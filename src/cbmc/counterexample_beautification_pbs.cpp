@@ -37,10 +37,10 @@ void counterexample_beautification_pbst::beautify(
 {
   // array or struct?
 
-  if(type.id()=="array")
+  if(type.id()==ID_array)
   {
     // get size
-    const exprt &size_expr=(exprt &)type.find("size");
+    const exprt &size_expr=(exprt &)type.find(ID_size);
     mp_integer size_int, i;
 
     if(to_integer(size_expr, size_int)) return;
@@ -59,15 +59,15 @@ void counterexample_beautification_pbst::beautify(
       offset+=width;
     }    
   }
-  else if(type.id()=="struct")
+  else if(type.id()==ID_struct)
   {
-    const irept::subt &components=type.find("components").get_sub();
+    const irept::subt &components=type.find(ID_components).get_sub();
 
     boolbv_widtht boolbv_width(ns);
   
     forall_irep(it, components)
     {
-      const typet &subtype=(typet &)it->find("type");
+      const typet &subtype=(typet &)it->find(ID_type);
       unsigned width=boolbv_width(subtype);
 
       if(width==0) continue;
@@ -77,19 +77,19 @@ void counterexample_beautification_pbst::beautify(
       offset+=width;
     }
   }
-  else if(type.id()=="symbol")
+  else if(type.id()==ID_symbol)
   {
-    const symbolt &s=ns.lookup(type.get("identifier"));
+    const symbolt &s=ns.lookup(type.get(ID_identifier));
     beautify(pbs, bv_cbmc, ns, expr, s.type, offset);
   }
-  else if(type.id()=="pointer")
+  else if(type.id()==ID_pointer)
   {
     // no beautification for pointers right now
   }
-  else if(type.id()=="signedbv" ||
-          type.id()=="unsignedbv")
+  else if(type.id()==ID_signedbv ||
+          type.id()==ID_unsignedbv)
   {
-    bool is_signed=type.id()=="signedbv";
+    bool is_signed=type.id()==ID_signedbv;
 
     boolbv_widtht boolbv_width(ns);
 

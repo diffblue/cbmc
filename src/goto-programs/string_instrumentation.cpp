@@ -264,7 +264,7 @@ void string_instrumentationt::do_function_call(
   exprt &function=call.function();
   //const exprt &lhs=call.lhs();
   
-  if(function.id()=="symbol")
+  if(function.id()==ID_symbol)
   {
     const irep_idt &identifier=
       to_symbol_expr(function).get_identifier();
@@ -393,7 +393,7 @@ void string_instrumentationt::do_snprintf(
   assertion->location.set("comment", "snprintf buffer overflow");
   
   exprt bufsize = buffer_size(arguments[0]);
-  assertion->make_assertion(binary_relation_exprt(bufsize, ">=", arguments[1]));
+  assertion->make_assertion(binary_relation_exprt(bufsize, ID_ge, arguments[1]));
   
   do_format_string_read(tmp, target, arguments, 2, 3, "snprintf");
   
@@ -478,8 +478,8 @@ void string_instrumentationt::do_format_string_read(
 {
   const exprt &format_arg = arguments[format_string_inx];
   
-  if(format_arg.id()=="address_of" &&
-     format_arg.op0().id()=="index" &&
+  if(format_arg.id()==ID_address_of &&
+     format_arg.op0().id()==ID_index &&
      format_arg.op0().op0().id()==ID_string_constant)
   {
     format_token_listt token_list;
@@ -507,7 +507,7 @@ void string_instrumentationt::do_format_string_read(
           
           exprt temp(arg);
           
-          if(arg_type.id()!="pointer")
+          if(arg_type.id()!=ID_pointer)
           {
             index_exprt index;
             index.array()=temp;
@@ -555,7 +555,7 @@ void string_instrumentationt::do_format_string_read(
         
         exprt temp(arg);
                   
-        if(arg_type.id()!="pointer")
+        if(arg_type.id()!=ID_pointer)
         {
           index_exprt index;
           index.array()=temp;
@@ -592,8 +592,8 @@ void string_instrumentationt::do_format_string_write(
 {
   const exprt &format_arg = arguments[format_string_inx];
     
-  if(format_arg.id()=="address_of" &&
-     format_arg.op0().id()=="index" &&
+  if(format_arg.id()==ID_address_of &&
+     format_arg.op0().id()==ID_index &&
      format_arg.op0().op0().id()==ID_string_constant) // constant format
   {
     format_token_listt token_list;
@@ -627,22 +627,22 @@ void string_instrumentationt::do_format_string_write(
           if(it->field_width!=0)
           {
             exprt fwidth = from_integer(it->field_width, uint_type());
-            exprt fw_1("+", uint_type());
+            exprt fw_1(ID_plus, uint_type());
             exprt one = gen_one(uint_type());
             fw_1.move_to_operands(fwidth);
             fw_1.move_to_operands(one); // +1 for 0-char
             
             exprt fw_lt_bs;
             
-            if(arg_type.id()=="pointer")
-              fw_lt_bs=binary_relation_exprt(fw_1, "<=", buffer_size(argument));
+            if(arg_type.id()==ID_pointer)
+              fw_lt_bs=binary_relation_exprt(fw_1, ID_le, buffer_size(argument));
             else
             {
               index_exprt index;
               index.array()=argument;
               index.index()=gen_zero(uint_type());
               address_of_exprt aof(index);
-              fw_lt_bs=binary_relation_exprt(fw_1, "<=", buffer_size(aof));
+              fw_lt_bs=binary_relation_exprt(fw_1, ID_le, buffer_size(aof));
             }
             
             assertion->make_assertion(fw_lt_bs);
@@ -673,7 +673,7 @@ void string_instrumentationt::do_format_string_write(
           goto_programt::targett assignment=dest.add_instruction(ASSIGN);
           assignment->location=target->location;
           
-          exprt lhs("dereference", arg_type.subtype());
+          exprt lhs(ID_dereference, arg_type.subtype());
           lhs.copy_to_operands(argument);
           
           exprt rhs=side_effect_expr_nondett(lhs.type());
@@ -718,7 +718,7 @@ void string_instrumentationt::do_format_string_write(
         goto_programt::targett assignment = dest.add_instruction(ASSIGN);
         assignment->location=target->location;
         
-        exprt lhs("dereference", arg_type.subtype());
+        exprt lhs(ID_dereference, arg_type.subtype());
         lhs.copy_to_operands(arguments[i]);
         
         exprt rhs=side_effect_expr_nondett(lhs.type());
@@ -979,17 +979,17 @@ void string_instrumentationt::do_strerror(
     goto_programt::targett assumption1=tmp.add_instruction();
 
     assumption1->make_assumption(binary_relation_exprt(
-      symbol_expr(symbol_size), "notequal",
+      symbol_expr(symbol_size), ID_notequal,
       gen_zero(symbol_size.type)));
 
     assumption1->location=it->location;
   }
 
   // return a pointer to some magic buffer
-  exprt index=exprt("index", char_type());
+  exprt index=exprt(ID_index, char_type());
   index.copy_to_operands(symbol_expr(symbol_buf), gen_zero(uint_type()));
 
-  exprt ptr=exprt("address_of", pointer_typet());
+  exprt ptr=exprt(ID_address_of, pointer_typet());
   ptr.type().subtype()=char_type();
   ptr.copy_to_operands(index);
 
@@ -1067,7 +1067,7 @@ void string_instrumentationt::invalidate_buffer(
   goto_programt::targett increment=dest.add_instruction(ASSIGN);
   increment->location=target->location;  
   
-  exprt plus("+", uint_type());
+  exprt plus(ID_plus, uint_type());
   plus.copy_to_operands(symbol_expr(cntr_sym));
   plus.copy_to_operands(gen_one(uint_type()));
   
@@ -1084,7 +1084,7 @@ void string_instrumentationt::invalidate_buffer(
   
   exprt cnt_bs, bufp;
   
-  if(buf_type.id()=="pointer")
+  if(buf_type.id()==ID_pointer)
     bufp = buffer;
   else
   {
@@ -1095,8 +1095,8 @@ void string_instrumentationt::invalidate_buffer(
     bufp = address_of_exprt(index);
   }
   
-  exprt deref("dereference", buf_type.subtype());
-  exprt b_plus_i("+", bufp.type());
+  exprt deref(ID_dereference, buf_type.subtype());
+  exprt b_plus_i(ID_plus, bufp.type());
   b_plus_i.copy_to_operands(bufp);
   b_plus_i.copy_to_operands(symbol_expr(cntr_sym));
   deref.copy_to_operands(b_plus_i);
@@ -1105,11 +1105,11 @@ void string_instrumentationt::invalidate_buffer(
   
   if(limit==0)
     check->guard=
-          binary_relation_exprt(symbol_expr(cntr_sym), ">=", 
+          binary_relation_exprt(symbol_expr(cntr_sym), ID_ge, 
                                 buffer_size(bufp));
   else
     check->guard=
-          binary_relation_exprt(symbol_expr(cntr_sym), ">", 
+          binary_relation_exprt(symbol_expr(cntr_sym), ID_gt, 
                                 from_integer(limit, uint_type()));
   
   exprt nondet=side_effect_expr_nondett(buf_type.subtype());

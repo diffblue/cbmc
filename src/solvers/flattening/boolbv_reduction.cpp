@@ -36,11 +36,11 @@ literalt boolbvt::convert_reduction(const exprt &expr)
 
   enum { O_OR, O_AND, O_XOR } op;
 
-  if(expr.id()=="reduction_or" || expr.id()=="reduction_nor")
+  if(expr.id()==ID_reduction_or || expr.id()==ID_reduction_nor)
     op=O_OR;
-  else if(expr.id()=="reduction_and" || expr.id()=="reduction_nand")
+  else if(expr.id()==ID_reduction_and || expr.id()==ID_reduction_nand)
     op=O_AND;
-  else if(expr.id()=="reduction_xor" || expr.id()=="reduction_xnor")
+  else if(expr.id()==ID_reduction_xor || expr.id()==ID_reduction_xnor)
     op=O_XOR;
   else
     throw "unexpected reduction operator";
@@ -56,9 +56,9 @@ literalt boolbvt::convert_reduction(const exprt &expr)
     }
   }
 
-  if(expr.id()=="reduction_nor" ||
-     expr.id()=="reduction_nand" ||
-     expr.id()=="reduction_xnor")
+  if(expr.id()==ID_reduction_nor ||
+     expr.id()==ID_reduction_nand ||
+     expr.id()==ID_reduction_xnor)
     l=prop.lnot(l);
   
   return l; 

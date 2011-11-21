@@ -487,11 +487,11 @@ const exprt qbf_bdd_certificatet::f_get(literalt l)
     const exprt &sym=it->second.first;
     unsigned index=it->second.second;
 
-    exprt extract_expr("extractbit", typet("bool"));
+    exprt extract_expr(ID_extractbit, typet(ID_bool));
     extract_expr.copy_to_operands(sym);
 
-    typet uint_type("unsignedbv");
-    uint_type.set("width", 32);
+    typet uint_type(ID_unsignedbv);
+    uint_type.set(ID_width, 32);
     extract_expr.copy_to_operands(from_integer(index, uint_type));
 
     if(l.sign()) extract_expr.negate();

@@ -257,7 +257,7 @@ void goto_symext::symex_function_call_code(
   
     if(call.lhs().is_not_nil())
     {
-      exprt rhs=exprt("nondet_symbol", call.lhs().type());
+      exprt rhs=exprt(ID_nondet_symbol, call.lhs().type());
       rhs.set(ID_identifier, "symex::"+i2string(nondet_count++));
       rhs.location()=call.location();
       code_assignt code(call.lhs(), rhs);

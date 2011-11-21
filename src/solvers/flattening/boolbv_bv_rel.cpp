@@ -30,7 +30,7 @@ Function: boolbvt::convert_bv_rel
 literalt boolbvt::convert_bv_rel(const exprt &expr)
 {
   const exprt::operandst &operands=expr.operands();
-  const std::string &rel=expr.id_string();
+  const irep_idt &rel=expr.id();
 
   if(operands.size()==2)
   {
@@ -54,13 +54,13 @@ literalt boolbvt::convert_bv_rel(const exprt &expr)
         float_utilst float_utils(prop);
         float_utils.spec=to_floatbv_type(op0.type());
 
-        if(rel=="<=")
+        if(rel==ID_le)
           return float_utils.relation(bv0, float_utilst::LE, bv1);
-        else if(rel=="<")
+        else if(rel==ID_lt)
           return float_utils.relation(bv0, float_utilst::LT, bv1);
-        else if(rel==">=")
+        else if(rel==ID_ge)
           return float_utils.relation(bv0, float_utilst::GE, bv1);
-        else if(rel==">")
+        else if(rel==ID_gt)
           return float_utils.relation(bv0, float_utilst::GT, bv1);
         else
           return SUB::convert_rest(expr);
@@ -68,22 +68,22 @@ literalt boolbvt::convert_bv_rel(const exprt &expr)
         return SUB::convert_rest(expr);
         #endif
       }
-      else if((op0.type().id()=="range" &&
+      else if((op0.type().id()==ID_range &&
                op1.type()==op0.type()) ||
                bvtype0==IS_SIGNED ||
                bvtype0==IS_UNSIGNED ||
                bvtype0==IS_FIXED)
       {
         literalt literal;
-        bool or_equal=(rel=="<=" || rel==">=");
+        bool or_equal=(rel==ID_le || rel==ID_ge);
 
         bv_utilst::representationt rep=
           ((bvtype0==IS_SIGNED) || (bvtype0==IS_FIXED))?bv_utilst::SIGNED:
                                                         bv_utilst::UNSIGNED;
 
-        if(rel=="<=" || rel=="<")
+        if(rel==ID_le || rel==ID_lt)
           literal=bv_utils.lt_or_le(or_equal, bv0, bv1, rep);
-        else if(rel==">=" || rel==">")
+        else if(rel==ID_ge || rel==ID_gt)
           literal=bv_utils.lt_or_le(or_equal, bv1, bv0, rep);
                                               // swapped
         else
