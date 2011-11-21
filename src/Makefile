@@ -13,11 +13,11 @@ $(patsubst %, %.dir, $(filter-out big-int util, $(DIRS))): util.dir
 languages: util.dir langapi.dir \
            cpp.dir ansi-c.dir xmllang.dir
 
-goto-instrument.dir: languages goto-programs.dir pointer-analysis.dir
+goto-instrument.dir: languages goto-programs.dir pointer-analysis.dir goto-symex.dir
 
 cbmc.dir: languages solvers.dir goto-symex.dir \
-          pointer-analysis.dir goto-programs.dir goto-symex.dir
-          
+          pointer-analysis.dir goto-programs.dir
+
 solvers.dir: floatbv.dir
 
 goto-cc.dir: languages pointer-analysis.dir goto-programs.dir
