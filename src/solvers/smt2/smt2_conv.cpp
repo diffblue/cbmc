@@ -1017,7 +1017,7 @@ void smt2_convt::convert_expr(const exprt &expr)
       if(use_FPA_theory)
       {
         smt2_prop.out << "(isNaN ";
-        convert(expr.op0());
+        convert_expr(expr.op0());
         smt2_prop.out << floatbv_type.get_f() << ")";
       }
       else
@@ -1043,7 +1043,7 @@ void smt2_convt::convert_expr(const exprt &expr)
       if(use_FPA_theory)
       {
         smt2_prop.out << "(isFinite ";
-        convert(expr.op0());
+        convert_expr(expr.op0());
         smt2_prop.out << floatbv_type.get_f() << ")";
       }
       else
@@ -1069,7 +1069,7 @@ void smt2_convt::convert_expr(const exprt &expr)
       if(use_FPA_theory)
       {
         smt2_prop.out << "(not (isFinite ";
-        convert(expr.op0());
+        convert_expr(expr.op0());
         smt2_prop.out << floatbv_type.get_f() << "))";
       }
       else
@@ -1095,7 +1095,7 @@ void smt2_convt::convert_expr(const exprt &expr)
       if(use_FPA_theory)
       {
         smt2_prop.out << "(isNormal ";
-        convert(expr.op0());
+        convert_expr(expr.op0());
         smt2_prop.out << floatbv_type.get_f() << ")";
       }
       else
