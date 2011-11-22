@@ -59,6 +59,35 @@ public:
     original_identifierst original_identifiers;
   };
   
+  // level 0 -- threads!
+  // renaming built for one particular interleaving
+
+  #if 0
+  struct level0t:public renaming_levelt
+  {
+  public:
+    std::string name(
+      const irep_idt &identifier,
+      unsigned thread_nr) const;
+
+    typedef std::map<irep_idt, unsigned> current_namest;
+    current_namest current_names;
+
+    virtual void rename(exprt &expr) { assert(false); }
+    virtual void rename(exprt &expr, const namespacet& ns, unsigned thread_nr);
+    virtual void rename(typet &type, const namespacet& ns, unsigned thread_nr);
+    virtual void rename(irep_idt& identifier, const namespacet& ns, unsigned thread_nr);
+    virtual std::string operator()(const irep_idt &identifier) const;
+    std::string operator()(const irep_idt &identifier, const namespacet&, unsigned thread_nr) const;
+    virtual void remove(const irep_idt &identifier) { current_names.erase(identifier); }
+
+    level0t() { }
+    virtual ~level0t() { }
+
+    virtual void print(std::ostream &out) const;
+  } level0;
+  #endif
+
   // level 1 -- function frames
   // this is to preserve locality in case of recursion
   
@@ -159,17 +188,21 @@ public:
   const irep_idt &get_original_name(const irep_idt &identifier) const;
   void get_original_name(exprt &expr) const;
   
-  // does both levels of renaming
-  std::string current_name(const irep_idt &identifier) const
+  // does all levels of renaming
+  std::string current_name(
+      const namespacet &ns,
+      const irep_idt &identifier) const
   {
-    return current_name(level2, identifier);
+    return current_name(level2, ns, identifier);
   }
 
   std::string current_name(
     const level2t &level2,
+    const namespacet &ns,
     const irep_idt &identifier) const
   {
     return level2(top().level1(identifier));
+    //return level2(top().level1(level0(identifier, ns, source.thread_nr)));
   }
   
   // uses level 1 names, and is used to
@@ -195,9 +228,10 @@ public:
 
   std::string current_name(
     const goto_statet &goto_state,
+    const namespacet &ns,
     const irep_idt &identifier) const
   {
-    return current_name(goto_state.level2, identifier);
+    return current_name(goto_state.level2, ns, identifier);
   }
   
   // gotos
