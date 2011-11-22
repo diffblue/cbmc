@@ -1069,7 +1069,7 @@ void bv_utilst::signed_divider(
     res[i]=prop.lselect(result_sign, neg_res[i], res[i]);
 
   for(unsigned i=0; i<res.size(); i++)
-    rem[i]=prop.lselect(result_sign, neg_rem[i], rem[i]);
+    rem[i]=prop.lselect(sign_0, neg_rem[i], rem[i]);
 }
 
 /*******************************************************************\
