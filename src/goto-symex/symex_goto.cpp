@@ -317,11 +317,11 @@ void goto_symext::phi_function(
 
     if(dest_state.guard.is_false())
     {
-      rhs=symbol_exprt(dest_state.current_name(goto_state, symbol.name), type);
+      rhs=symbol_exprt(dest_state.current_name(goto_state, ns, symbol.name), type);
     }
     else if(goto_state.guard.is_false())
     {
-      rhs=symbol_exprt(dest_state.current_name(symbol.name), type);
+      rhs=symbol_exprt(dest_state.current_name(ns, symbol.name), type);
     }
     else
     {      
@@ -333,8 +333,8 @@ void goto_symext::phi_function(
       rhs=if_exprt();
       rhs.type()=type;
       rhs.op0()=tmp_guard.as_expr();
-      rhs.op1()=symbol_exprt(dest_state.current_name(goto_state, symbol.name), type);
-      rhs.op2()=symbol_exprt(dest_state.current_name(symbol.name), type);
+      rhs.op1()=symbol_exprt(dest_state.current_name(goto_state, ns, symbol.name), type);
+      rhs.op2()=symbol_exprt(dest_state.current_name(ns, symbol.name), type);
     }
 
     symbol_exprt lhs=symbol_expr(symbol);
