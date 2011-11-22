@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_IREP_HASH_H
 #define CPROVER_IREP_HASH_H
 
+#include <cstdlib>  // for size_t
 #include <vector>
 
 #include "numbering.h"
