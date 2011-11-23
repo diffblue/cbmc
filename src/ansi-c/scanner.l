@@ -450,6 +450,7 @@ typeid              { return cpp_keyword(TOK_TYPEID); }
 typename            { return cpp_keyword(TOK_TYPENAME); }
 using               { return cpp_keyword(TOK_USING); }
 virtual             { return cpp_keyword(TOK_VIRTUAL); }
+wchar_t             { return cpp_keyword(TOK_WCHAR_T); } // already really ANSI-C!
 ".*"                { return cpp_operator(TOK_PMOP); }
 "->*"               { return cpp_operator(TOK_PMOP); }
 "::"                { return cpp_operator(TOK_SCOPE); }
