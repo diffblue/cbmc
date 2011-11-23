@@ -168,6 +168,8 @@ extern char *yyansi_ctext;
 %token TOK_TRY
 %token TOK_SCOPE       "::"
 %token TOK_PMOP        ".*" // also ->*
+%token TOK_MSC_UNARY_TYPE_PREDICATE
+%token TOK_MSC_BINARY_TYPE_PREDICATE
 
 /*** grammar selection ***/
 
