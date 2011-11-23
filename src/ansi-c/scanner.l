@@ -75,6 +75,17 @@ int cpp_keyword(int token)
     return make_identifier();
 }
 
+int msc_cpp_keyword(int token)
+{
+  if(PARSER.cpp && PARSER.mode==ansi_c_parsert::MSC)
+  {
+    loc();
+    return token;
+  }
+  else
+    return make_identifier();
+}
+
 int cpp_operator(int token)
 {
   if(PARSER.cpp)
@@ -454,6 +465,40 @@ wchar_t             { return cpp_keyword(TOK_WCHAR_T); } // already really ANSI-
 ".*"                { return cpp_operator(TOK_PMOP); }
 "->*"               { return cpp_operator(TOK_PMOP); }
 "::"                { return cpp_operator(TOK_SCOPE); }
+
+%{
+/* a huge batch of MS C++ extensions
+   http://msdn.microsoft.com/en-us/library/ms177194(v=vs.80).aspx */
+%}
+
+"__has_assign"      { loc(); return msc_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__has_copy"        { loc(); return msc_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__has_finalizer"   { loc(); return msc_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__has_nothrow_assign" { loc(); return msc_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__has_nothrow_constructor" { loc(); return msc_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__has_nothrow_copy" { loc(); return msc_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__has_trivial_assign" { loc(); return msc_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__has_trivial_constructor" { loc(); return msc_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__has_trivial_copy" { loc(); return msc_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__has_trivial_destructor" { loc(); return msc_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__has_user_destructor" { loc(); return msc_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__has_virtual_destructor" { loc(); return msc_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__is_abstract"     { loc(); return msc_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__is_base_of"      { loc(); return msc_cpp_keyword(TOK_MSC_BINARY_TYPE_PREDICATE); }
+"__is_class"        { loc(); return msc_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__is_convertible_to" { loc(); return msc_cpp_keyword(TOK_MSC_BINARY_TYPE_PREDICATE); }
+"__is_delegate"     { loc(); return msc_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__is_empty"        { loc(); return msc_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__is_enum"         { loc(); return msc_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__is_interface_class" { loc(); return msc_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__is_pod"          { loc(); return msc_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__is_polymorphic"  { loc(); return msc_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__is_ref_array"    { loc(); return msc_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__is_ref_class"    { loc(); return msc_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__is_sealed"       { loc(); return msc_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__is_simple_value_class" { loc(); return msc_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__is_union"        { loc(); return msc_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__is_value_class"  { loc(); return msc_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
 
 "["{ws}"repeatable" |
 "["{ws}"source_annotation_attribute" |
