@@ -75,6 +75,20 @@ int cpp_keyword(int token)
     return make_identifier();
 }
 
+int cpp_operator(int token)
+{
+  if(PARSER.cpp)
+  {
+    loc();
+    return token;
+  }
+  else
+  {
+    yyansi_cerror("C++ operator not allowed in C mode");
+    return TOK_SCANNER_ERROR;
+  }
+}
+
 /*** macros for easier rule definition **********************************/
 %}
 
@@ -411,7 +425,7 @@ void ansi_c_scanner_init()
                 }
 
 %{
-/* C++ Keywords */
+/* C++ Keywords and Operators */
 %}
 
 bool                { return cpp_keyword(TOK_BOOL); }
@@ -436,6 +450,9 @@ typeid              { return cpp_keyword(TOK_TYPEID); }
 typename            { return cpp_keyword(TOK_TYPENAME); }
 using               { return cpp_keyword(TOK_USING); }
 virtual             { return cpp_keyword(TOK_VIRTUAL); }
+".*"                { return cpp_operator(TOK_PMOP); }
+"->*"               { return cpp_operator(TOK_PMOP); }
+"::"                { return cpp_operator(TOK_SCOPE); }
 
 "["{ws}"repeatable" |
 "["{ws}"source_annotation_attribute" |

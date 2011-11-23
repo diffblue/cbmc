@@ -165,6 +165,8 @@ extern char *yyansi_ctext;
 %token TOK_USING
 %token TOK_VIRTUAL
 %token TOK_TRY
+%token TOK_SCOPE       "::"
+%token TOK_PMOP        ".*" // also ->*
 
 /*** grammar selection ***/
 
