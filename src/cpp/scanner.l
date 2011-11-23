@@ -89,7 +89,7 @@ pragma          "#"{horizontal_white}*pragma{horizontal_white}.*"\n"
 
 %{
 #define loc() (PARSER.current_token().text=yytext,PARSER.set_location())
-#define MSC_Keyword(x) (PARSER.mode==cpp_parsert::MSC?x:TOK_Identifier)
+#define MSC_Keyword(x) (PARSER.mode==cpp_parsert::MSC?x:TOK_IDENTIFIER)
 %}
 
 <INITIAL>"/*"	{ BEGIN(COMMENT1); }	/* begin C comment state */
@@ -139,11 +139,11 @@ pragma          "#"{horizontal_white}*pragma{horizontal_white}.*"\n"
 <MSC_ASM1>[^{^}]* { loc();
                     PARSER.current_token().data=exprt(yytext);
                     BEGIN(INITIAL);
-                    return TOK_StringL; }
+                    return TOK_STRING; }
 
 <MSC_ASM2>[^}]* { loc();
                   PARSER.current_token().data=exprt(yytext);
-                  return TOK_StringL; }
+                  return TOK_STRING; }
 <MSC_ASM2>"}"   { BEGIN(INITIAL); loc(); return '}'; }
 
 <MSC_DECLSPEC>")"    { PARSER.parenthesis_counter--;
@@ -180,7 +180,7 @@ __attribute__       { BEGIN(GCC_ATTRIBUTE); PARSER.parenthesis_counter=0; }
 _cdecl|__cdecl 	    { loc(); return MSC_Keyword(TOK_CDECL); }
 __const             { loc(); return TOK_CONST; }
 _declspec|__declspec { BEGIN(MSC_DECLSPEC); PARSER.parenthesis_counter=0; }
-__extension__       { loc(); return TOK_Ignore; }
+__extension__       { /* ignore */ }
 __if_exists         { loc(); return MSC_Keyword(TOK_MSC_IF_EXISTS); }
 __if_not_exists     { loc(); return MSC_Keyword(TOK_MSC_IF_NOT_EXISTS); }
 _inline             { loc(); return TOK_INLINE; }
@@ -188,16 +188,16 @@ __inline            { loc(); return TOK_INLINE; }
 __inline__          { loc(); return TOK_INLINE; }
 __interface         { loc(); return MSC_Keyword(TOK_INTERFACE); }
 __forceinline       { loc(); return MSC_Keyword(TOK_INLINE); }
-__noreturn__        { loc(); return TOK_Ignore; }
-restrict            { loc(); return TOK_Ignore; }
-__restrict__        { loc(); return TOK_Ignore; }
-__restrict          { loc(); return TOK_Ignore; }
+__noreturn__        { /* ignore */ }
+restrict            { /* ignore */ }
+__restrict__        { /* ignroe */ }
+__restrict          { /* ignore */ }
 __stdcall           { loc(); return MSC_Keyword(TOK_STDCALL); }
 __fastcall          { loc(); return MSC_Keyword(TOK_FASTCALL); }
 __clrcall           { loc(); return MSC_Keyword(TOK_CLRCALL); }
 __signed            { loc(); return TOK_SIGNED; }
 __signed__          { loc(); return TOK_SIGNED; }
-__vector            { loc(); return TOK_Ignore; }
+__vector            { /* ignore */ }
 __volatile__        { loc(); return TOK_VOLATILE; }
 typeof              { loc(); return TOK_TYPEOF; }
 __typeof            { loc(); return TOK_TYPEOF; }
@@ -208,8 +208,8 @@ __int32             { loc(); return MSC_Keyword(TOK_INT32); }
 __int64             { loc(); return MSC_Keyword(TOK_INT64); }
 __ptr32             { loc(); return MSC_Keyword(TOK_PTR32); }
 __ptr64             { loc(); return MSC_Keyword(TOK_PTR64); }
-__thiscall          { loc(); return TOK_Ignore; }
-__w64               { loc(); return TOK_Ignore; }
+__thiscall          { /* ignore */ }
+__w64               { /* ignore */ }
 _Complex            { loc(); return TOK_COMPLEX; }
 __complex__         { loc(); return TOK_COMPLEX; }
 __real__            { loc(); return TOK_REAL; }
@@ -220,7 +220,7 @@ __leave             { loc(); return MSC_Keyword(TOK_MSC_LEAVE); }
 __finally           { loc(); return MSC_Keyword(TOK_MSC_FINALLY); }
 __uuidof 	    { loc(); return MSC_Keyword(TOK_MSC_UUIDOF); }
 auto                { loc(); return TOK_AUTO; }
-bool                { loc(); return TOK_BOOLEAN; }
+bool                { loc(); return TOK_BOOL; }
 break               { loc(); return TOK_BREAK; }
 case                { loc(); return TOK_CASE; }
 catch               { loc(); return TOK_CATCH; }
@@ -248,7 +248,7 @@ long                { loc(); return TOK_LONG; }
 mutable             { loc(); return TOK_MUTABLE; }
 namespace           { loc(); return TOK_NAMESPACE; }
 new                 { loc(); return TOK_NEW; }
-noreturn            { loc(); return TOK_Ignore; }
+noreturn            { /* ignore */ }
 operator            { loc(); return TOK_OPERATOR; }
 private             { loc(); return TOK_PRIVATE; }
 protected           { loc(); return TOK_PROTECTED; }
@@ -284,70 +284,70 @@ __CPROVER_thread_local { loc(); return TOK_THREAD_LOCAL; }
    http://msdn.microsoft.com/en-us/library/ms177194(v=vs.80).aspx */
 %}
 
-"__has_assign"      { loc(); return MSC_Keyword(TOK_MSC_TYPE_PREDICATE); }
-"__has_copy"        { loc(); return MSC_Keyword(TOK_MSC_TYPE_PREDICATE); }
-"__has_finalizer"   { loc(); return MSC_Keyword(TOK_MSC_TYPE_PREDICATE); }
-"__has_nothrow_assign" { loc(); return MSC_Keyword(TOK_MSC_TYPE_PREDICATE); }
-"__has_nothrow_constructor" { loc(); return MSC_Keyword(TOK_MSC_TYPE_PREDICATE); }
-"__has_nothrow_copy" { loc(); return MSC_Keyword(TOK_MSC_TYPE_PREDICATE); }
-"__has_trivial_assign" { loc(); return MSC_Keyword(TOK_MSC_TYPE_PREDICATE); }
-"__has_trivial_constructor" { loc(); return MSC_Keyword(TOK_MSC_TYPE_PREDICATE); }
-"__has_trivial_copy" { loc(); return MSC_Keyword(TOK_MSC_TYPE_PREDICATE); }
-"__has_trivial_destructor" { loc(); return MSC_Keyword(TOK_MSC_TYPE_PREDICATE); }
-"__has_user_destructor" { loc(); return MSC_Keyword(TOK_MSC_TYPE_PREDICATE); }
-"__has_virtual_destructor" { loc(); return MSC_Keyword(TOK_MSC_TYPE_PREDICATE); }
-"__is_abstract"     { loc(); return MSC_Keyword(TOK_MSC_TYPE_PREDICATE); }
+"__has_assign"      { loc(); return MSC_Keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__has_copy"        { loc(); return MSC_Keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__has_finalizer"   { loc(); return MSC_Keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__has_nothrow_assign" { loc(); return MSC_Keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__has_nothrow_constructor" { loc(); return MSC_Keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__has_nothrow_copy" { loc(); return MSC_Keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__has_trivial_assign" { loc(); return MSC_Keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__has_trivial_constructor" { loc(); return MSC_Keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__has_trivial_copy" { loc(); return MSC_Keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__has_trivial_destructor" { loc(); return MSC_Keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__has_user_destructor" { loc(); return MSC_Keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__has_virtual_destructor" { loc(); return MSC_Keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__is_abstract"     { loc(); return MSC_Keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
 "__is_base_of"      { loc(); return MSC_Keyword(TOK_MSC_BINARY_TYPE_PREDICATE); }
-"__is_class"        { loc(); return MSC_Keyword(TOK_MSC_TYPE_PREDICATE); }
+"__is_class"        { loc(); return MSC_Keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
 "__is_convertible_to" { loc(); return MSC_Keyword(TOK_MSC_BINARY_TYPE_PREDICATE); }
-"__is_delegate"     { loc(); return MSC_Keyword(TOK_MSC_TYPE_PREDICATE); }
-"__is_empty"        { loc(); return MSC_Keyword(TOK_MSC_TYPE_PREDICATE); }
-"__is_enum"         { loc(); return MSC_Keyword(TOK_MSC_TYPE_PREDICATE); }
-"__is_interface_class" { loc(); return MSC_Keyword(TOK_MSC_TYPE_PREDICATE); }
-"__is_pod"          { loc(); return MSC_Keyword(TOK_MSC_TYPE_PREDICATE); }
-"__is_polymorphic"  { loc(); return MSC_Keyword(TOK_MSC_TYPE_PREDICATE); }
-"__is_ref_array"    { loc(); return MSC_Keyword(TOK_MSC_TYPE_PREDICATE); }
-"__is_ref_class"    { loc(); return MSC_Keyword(TOK_MSC_TYPE_PREDICATE); }
-"__is_sealed"       { loc(); return MSC_Keyword(TOK_MSC_TYPE_PREDICATE); }
-"__is_simple_value_class" { loc(); return MSC_Keyword(TOK_MSC_TYPE_PREDICATE); }
-"__is_union"        { loc(); return MSC_Keyword(TOK_MSC_TYPE_PREDICATE); }
-"__is_value_class"  { loc(); return MSC_Keyword(TOK_MSC_TYPE_PREDICATE); }
+"__is_delegate"     { loc(); return MSC_Keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__is_empty"        { loc(); return MSC_Keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__is_enum"         { loc(); return MSC_Keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__is_interface_class" { loc(); return MSC_Keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__is_pod"          { loc(); return MSC_Keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__is_polymorphic"  { loc(); return MSC_Keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__is_ref_array"    { loc(); return MSC_Keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__is_ref_class"    { loc(); return MSC_Keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__is_sealed"       { loc(); return MSC_Keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__is_simple_value_class" { loc(); return MSC_Keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__is_union"        { loc(); return MSC_Keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__is_value_class"  { loc(); return MSC_Keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
 
 {identifier}        { loc();
-                      return TOK_Identifier; // or TYPDEFname
+                      return TOK_IDENTIFIER; // or TYPDEFname
                     }
 
 {decimal_constant}  { loc();
                       PARSER.current_token().data=convert_integer_literal(yytext, 10);
-                      return TOK_Constant;
+                      return TOK_INTEGER;
                     }
 
 {octal_constant}    { loc();
                       PARSER.current_token().data=convert_integer_literal(yytext, 8);
-                      return TOK_Constant;
+                      return TOK_INTEGER;
                     }
 
 {hex_constant}      { loc();
                       PARSER.current_token().data=convert_integer_literal(yytext, 16);
-                      return TOK_Constant;
+                      return TOK_INTEGER;
                     }
 
 {floating_constant} {
                       loc();
                       PARSER.current_token().data=convert_float_literal(yytext);
-                      return TOK_Constant;
+                      return TOK_FLOATING;
                     }
 
 "L"?[']{c_char}+['] { 
                       loc();
                       PARSER.current_token().data=convert_character_literal(yytext, false);
-                      return TOK_Constant;
+                      return TOK_CHARACTER;
                     }
 
 "L"?["]{s_char}*["] {
                       loc();
                       PARSER.current_token().data=convert_string_literal(yytext);
-                      return TOK_StringL;
+                      return TOK_STRING;
                     }
 
 "("                 { loc(); return yytext[0]; }
@@ -387,10 +387,10 @@ __CPROVER_thread_local { loc(); return TOK_THREAD_LOCAL; }
 
 ".*"                { loc(); return TOK_PmOp; }
 "->*"               { loc(); return TOK_PmOp; }
-"::"                { loc(); return TOK_Scope; }
+"::"                { loc(); return TOK_SCOPE; }
 "->"                { loc(); return TOK_ArrowOp; }
-"++"                { loc(); return TOK_IncOp; }
-"--"                { loc(); return TOK_IncOp; }
+"++"                { loc(); return TOK_INCR; }
+"--"                { loc(); return TOK_DECR; }
 "<<"                { loc(); return TOK_ShiftOp; }
 ">>"                { loc(); return TOK_ShiftOp; }
 "<="                { loc(); return TOK_RelOp; }
@@ -409,7 +409,7 @@ __CPROVER_thread_local { loc(); return TOK_THREAD_LOCAL; }
 "&="                { loc(); return TOK_AssignOp; }
 "^="                { loc(); return TOK_AssignOp; }
 "|="                { loc(); return TOK_AssignOp; }
-"..."               { loc(); return TOK_Ellipsis; }
+"..."               { loc(); return TOK_ELLIPSIS; }
 
 .                   { yycpperror("unknown character"); }
 }
