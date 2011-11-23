@@ -29,7 +29,7 @@ class ansi_c_parsert:public parsert
 public:
   ansi_c_parse_treet parse_tree;
   
-  ansi_c_parsert()
+  ansi_c_parsert():cpp(false)
   {
   }
   
@@ -71,6 +71,9 @@ public:
   // ICC is Intel's C compiler
   // CW is CodeWarrior (with GCC extensions enabled)
   // ARM is ARM's RealView
+
+  // recognize C++ keywords  
+  bool cpp;
 
   class identifiert
   {

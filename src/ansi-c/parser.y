@@ -142,6 +142,30 @@ extern char *yyansi_ctext;
 %token TOK_SCANNER_ERROR /* used by scanner to report errors */
 %token TOK_SCANNER_EOF   /* used by scanner to report end of import */
 
+/*** these exist only for the benefit of the C++ frontend */
+
+%token TOK_CATCH
+%token TOK_CLASS
+%token TOK_DELETE
+%token TOK_DECLTYPE
+%token TOK_EXPLICIT
+%token TOK_FRIEND
+%token TOK_MUTABLE
+%token TOK_NAMESPACE
+%token TOK_NEW
+%token TOK_OPERATOR
+%token TOK_PRIVATE
+%token TOK_PROTECTED
+%token TOK_PUBLIC
+%token TOK_TEMPLATE
+%token TOK_THIS
+%token TOK_THROW
+%token TOK_TYPEID
+%token TOK_TYPENAME
+%token TOK_USING
+%token TOK_VIRTUAL
+%token TOK_TRY
+
 /*** grammar selection ***/
 
 %token TOK_PARSE_LANGUAGE

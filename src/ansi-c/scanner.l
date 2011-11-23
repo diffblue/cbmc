@@ -64,6 +64,17 @@ int make_identifier()
     return TOK_IDENTIFIER;
 }
 
+int cpp_keyword(int token)
+{
+  if(PARSER.cpp)
+  {
+    loc();
+    return token;
+  }
+  else
+    return make_identifier();
+}
+
 /*** macros for easier rule definition **********************************/
 %}
 
@@ -305,21 +316,21 @@ void ansi_c_scanner_init()
                 }
 
 "__complex__"	{ if(PARSER.mode==ansi_c_parsert::GCC ||
-                        PARSER.mode==ansi_c_parsert::ARM)
+                     PARSER.mode==ansi_c_parsert::ARM)
                     { loc(); return TOK_COMPLEX; }
                   else
                     return make_identifier();
                 }
 
 "__real__"	{ if(PARSER.mode==ansi_c_parsert::GCC ||
-                        PARSER.mode==ansi_c_parsert::ARM)
+                     PARSER.mode==ansi_c_parsert::ARM)
                     { loc(); return TOK_REAL; }
                   else
                     return make_identifier();
                 }
 
 "__imag__"	{ if(PARSER.mode==ansi_c_parsert::GCC ||
-                        PARSER.mode==ansi_c_parsert::ARM)
+                     PARSER.mode==ansi_c_parsert::ARM)
                     { loc(); return TOK_IMAG; }
                   else
                     return make_identifier();
@@ -399,6 +410,33 @@ void ansi_c_scanner_init()
                     return make_identifier();
                 }
 
+%{
+/* C++ Keywords */
+%}
+
+bool                { return cpp_keyword(TOK_BOOL); }
+catch               { return cpp_keyword(TOK_CATCH); }
+class               { return cpp_keyword(TOK_CLASS); }
+delete              { return cpp_keyword(TOK_DELETE); }
+decltype            { return cpp_keyword(TOK_DECLTYPE); }
+explicit            { return cpp_keyword(TOK_EXPLICIT); }
+friend              { return cpp_keyword(TOK_FRIEND); }
+mutable             { return cpp_keyword(TOK_MUTABLE); }
+namespace           { return cpp_keyword(TOK_NAMESPACE); }
+new                 { return cpp_keyword(TOK_NEW); }
+operator            { return cpp_keyword(TOK_OPERATOR); }
+private             { return cpp_keyword(TOK_PRIVATE); }
+protected           { return cpp_keyword(TOK_PROTECTED); }
+public              { return cpp_keyword(TOK_PUBLIC); }
+static_assert       { return cpp_keyword(TOK_STATIC_ASSERT); }
+template            { return cpp_keyword(TOK_TEMPLATE); }
+this                { return cpp_keyword(TOK_THIS); }
+throw               { return cpp_keyword(TOK_THROW); }
+typeid              { return cpp_keyword(TOK_TYPEID); }
+typename            { return cpp_keyword(TOK_TYPENAME); }
+using               { return cpp_keyword(TOK_USING); }
+virtual             { return cpp_keyword(TOK_VIRTUAL); }
+
 "["{ws}"repeatable" |
 "["{ws}"source_annotation_attribute" |
 "["{ws}"returnvalue" |
@@ -416,7 +454,7 @@ void ansi_c_scanner_init()
 	             yyless(1); // puts all but [ back into stream
 	             loc();
 	             PARSER.tag_following=false;
-	             return yytext[0];
+	             return yytext[0]; // returns the [
 	           }
                  }
 
@@ -607,7 +645,8 @@ void ansi_c_scanner_init()
                     return make_identifier();
                 }
 
-"typeof"        { if(PARSER.mode==ansi_c_parsert::GCC ||
+"typeof"        { if(PARSER.cpp ||
+                     PARSER.mode==ansi_c_parsert::GCC ||
                      PARSER.mode==ansi_c_parsert::ICC ||
                      PARSER.mode==ansi_c_parsert::CW ||
                      PARSER.mode==ansi_c_parsert::ARM)
@@ -641,9 +680,16 @@ void ansi_c_scanner_init()
                     return make_identifier();
                 }
 
-"__try" |
-"try"           { if(PARSER.mode==ansi_c_parsert::MSC)
+"__try"         { if(PARSER.mode==ansi_c_parsert::MSC)
                     { loc(); return TOK_MSC_TRY; }
+                  else
+                    return make_identifier();
+                }
+
+"try"           { if(PARSER.cpp) // C++?
+                    { loc(); return TOK_TRY; }
+                  else if(PARSER.mode==ansi_c_parsert::MSC)
+                    { loc(); return TOK_MSC_TRY; }                    
                   else
                     return make_identifier();
                 }
