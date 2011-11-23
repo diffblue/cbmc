@@ -61,6 +61,7 @@ extern char *yyansi_ctext;
 %token TOK_UNSIGNED  "unsigned"
 %token TOK_VOID      "void"
 %token TOK_VOLATILE  "volatile"
+%token TOK_WCHAR_T   "wchar_t"
 %token TOK_WHILE     "while"
 
 /*** multi-character operators ***/
