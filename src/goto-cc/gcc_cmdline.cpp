@@ -220,6 +220,7 @@ bool gcc_cmdlinet::parse(int argc, const char **argv)
     } 
     else if( // options that have a separated argument
         strcmp(argv[i], "--verbosity")==0 || // NON-GCC
+        strcmp(argv[i], "--function")==0 || // NON-GCC
         strcmp(argv[i], "-aux-info")==0 ||
         strcmp(argv[i], "--param")==0 ||
         strcmp(argv[i], "-idirafter")==0 ||

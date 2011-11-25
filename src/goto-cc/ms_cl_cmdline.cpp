@@ -49,6 +49,7 @@ const char *non_ms_cl_options[]=
   "--xml",
   "--partial-inlining",
   "--verbosity",
+  "--function",
   NULL
 };
 
@@ -67,6 +68,8 @@ bool ms_cl_cmdlinet::parse(const std::vector<std::string> &options)
           set("verbosity", options[i+1]);
           i++; // skip ahead
         }
+      else if(options[i]=="--function")
+        i++; // skip ahead
     }
     else if(!options[i].empty() && options[i][0]=='@')
     {
