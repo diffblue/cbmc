@@ -88,6 +88,7 @@ void ansi_c_convert_typet::read_rec(const typet &type)
   {
     const exprt &size_expr=
       static_cast<const exprt &>(type.find(ID_size));
+      
     if(size_expr.id()=="__QI__")
       gcc_mode_QI=true;
     else if(size_expr.id()=="__HI__")
@@ -157,7 +158,12 @@ void ansi_c_convert_typet::read_rec(const typet &type)
   else if(type.id()==ID_aligned)
   {
     aligned=true;
-    alignment=static_cast<const exprt &>(type.find(ID_size));
+
+    // may come with size or not
+    if(type.find(ID_size).is_nil())
+      alignment=exprt(ID_default);
+    else
+      alignment=static_cast<const exprt &>(type.find(ID_size));
   }
   else if(type.id()==ID_transparent_union)
     transparent_union=true;
@@ -394,9 +400,6 @@ void ansi_c_convert_typet::write(typet &type)
   if(packed && type.id()==ID_struct)
     type.set(ID_packed, true);
 
-  /*
-  need to make sure types with different alignment are still the same
   if(aligned)
-     type.set(ID_aligned, true);
-  */
+    type.set(ID_C_alignment, alignment);
 }

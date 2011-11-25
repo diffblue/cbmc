@@ -1243,7 +1243,7 @@ gcc_type_attribute:
         | TOK_GCC_ATTRIBUTE_ALIGNED TOK_GCC_ATTRIBUTE_END
         { $$=$1; set($$, ID_aligned); }
         | TOK_GCC_ATTRIBUTE_ALIGNED '(' comma_expression ')' TOK_GCC_ATTRIBUTE_END
-        { $$=$1; set($$, ID_aligned); stack($$).set(ID_size, $3); }
+        { $$=$1; set($$, ID_aligned); stack($$).set(ID_size, stack($3)); }
         | TOK_GCC_ATTRIBUTE_MODE '(' identifier ')' TOK_GCC_ATTRIBUTE_END
         { $$=$1; set($$, ID_gcc_attribute_mode); stack($$).set(ID_size, stack($3).get(ID_identifier)); }
         ;
