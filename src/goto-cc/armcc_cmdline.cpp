@@ -258,6 +258,7 @@ static const char *options_with_arg[]=
 {
   // goto-cc specific
   "--verbosity",
+  "--function",
 
   // armcc-specific
   "-D",
