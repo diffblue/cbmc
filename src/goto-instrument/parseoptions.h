@@ -29,6 +29,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(nan-check)(no-nan-check)" \
   "(race-check)(tso)(rmo)" \
   "(nondet-volatile)(isr):" \
+  "(stack-depth):" \
   "(signed-overflow-check)(unsigned-overflow-check)" \
   "(show-goto-functions)(show-value-sets)" \
   "(show-struct-alignment)" \

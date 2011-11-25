@@ -46,6 +46,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "nondet_volatile.h"
 #include "interrupt.h"
 #include "mmio.h"
+#include "stack_depth.h"
 
 /*******************************************************************\
 
@@ -372,6 +373,14 @@ void goto_instrument_parseoptionst::instrument_goto_program(
     add_uninitialized_locals_assertions(context, goto_functions);
   }
   
+  // check for maximum call stack size
+  if(cmdline.isset("stack-depth"))
+  {
+    status("Adding check for maximum call stack size");
+    stack_depth(context, goto_functions,
+        atoi(cmdline.getval("stack-depth")));
+  }
+
   if(cmdline.isset("string-abstraction"))
   {
     status("String Abstraction");
@@ -537,6 +546,7 @@ void goto_instrument_parseoptionst::help()
     " --nan-check                  add floating-point NaN checks\n"
     " --uninitialized-check        add checks for uninitialized locals (experimental)\n"
     " --error-label label          check that label is unreachable\n"
+    " --stack-depth n              add check that call stack size of non-inlined functions never exceeds n\n"
     "\n"
     "Semantic transformations:\n"
     " --nondet-volatile            makes reads from volatile variables non-deterministic\n"
