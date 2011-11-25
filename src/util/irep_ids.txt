@@ -445,6 +445,7 @@ gcc_attribute
 packed
 transparent_union
 aligned
+C_alignment #alignment
 vector
 abstract
 bit
