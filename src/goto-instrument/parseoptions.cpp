@@ -47,6 +47,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "interrupt.h"
 #include "mmio.h"
 #include "stack_depth.h"
+#include "nondet_static.h"
 
 /*******************************************************************\
 
@@ -381,6 +382,14 @@ void goto_instrument_parseoptionst::instrument_goto_program(
         atoi(cmdline.getval("stack-depth")));
   }
 
+  // ignore default/user-specified initialization of variables with static
+  // lifetime
+  if(cmdline.isset("nondet-static"))
+  {
+    status("Adding nondeterministic initialization of static/global variables");
+    nondet_static(ns, goto_functions);
+  }
+
   if(cmdline.isset("string-abstraction"))
   {
     status("String Abstraction");
@@ -552,6 +561,7 @@ void goto_instrument_parseoptionst::help()
     " --nondet-volatile            makes reads from volatile variables non-deterministic\n"
     " --isr function               instruments an interrupt service routine\n"
     " --mmio                       instruments memory-mapped I/O\n"
+    " --nondet-static              add nondeterministic initialization of variables with static lifetime\n"
     "\n"
     "Slicing:\n"
     " --reachability-slicer        slice away instructions that can't reach assertions\n"
