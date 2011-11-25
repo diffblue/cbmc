@@ -464,7 +464,16 @@ virtual             { return cpp_keyword(TOK_VIRTUAL); }
 wchar_t             { return cpp_keyword(TOK_WCHAR_T); } // already really ANSI-C!
 ".*"                { return cpp_operator(TOK_PMOP); }
 "->*"               { return cpp_operator(TOK_PMOP); }
-"::"                { return cpp_operator(TOK_SCOPE); }
+"::"                { if(PARSER.cpp)
+                        return cpp_operator(TOK_SCOPE);
+                      else
+                      {
+                        yyless(1); // puts all but one : back into stream
+                        loc();
+                        PARSER.tag_following=false;
+                        return ':';
+                      }
+                    }
 
 %{
 /* a huge batch of MS C++ extensions
@@ -810,7 +819,7 @@ wchar_t             { return cpp_keyword(TOK_WCHAR_T); } // already really ANSI-
                 }
 }
 
-  /* operands following */
+  /* operators following */
 
 <GRAMMAR,GCC_ATTRIBUTE3>{
 "->"		{ loc(); return TOK_ARROW; }
@@ -910,6 +919,7 @@ wchar_t             { return cpp_keyword(TOK_WCHAR_T); } // already really ANSI-
                   return yytext[0];
                 }
 
+  /* This catches all one-character operators */
 .		{ loc(); PARSER.tag_following=false; return yytext[0]; }
 }
 
