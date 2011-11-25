@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <config.h>
 #include <i2string.h>
 #include <pointer_offset_size.h>
+#include <simplify_expr.h>
+#include <arith_tools.h>
 
 #include "padding.h"
 
@@ -218,10 +220,21 @@ void add_padding(struct_typet &type, const namespacet &ns)
     // these are now assumed to be multiples of 8
     offset+=bit_field_bits/8;
   }
+  
+  // any explicit alignment for the struct?
+  if(type.find(ID_C_alignment).is_not_nil())
+  {
+    const exprt &alignment=static_cast<const exprt &>(type.find(ID_C_alignment));
+    exprt tmp=alignment;
+    simplify(tmp, ns);
+    mp_integer tmp_i;
+    if(!to_integer(tmp, tmp_i) && tmp_i>max_alignment)
+      max_alignment=integer2long(tmp_i);
+  }
 
   // There may be a need for 'end of struct' padding.
   // We use 'max_alignment'.
-
+  
   if(max_alignment>1)
   {
     // we may need to align it
@@ -234,25 +247,13 @@ void add_padding(struct_typet &type, const namespacet &ns)
       unsignedbv_typet padding_type;
       padding_type.set_width(pad*8);
 
-      struct_typet::componentst::iterator it;
-      
-      // we need to insert before any 'flexible member'
-      if(!components.empty() &&
-         components.back().type().id()==ID_array &&
-         to_array_type(components.back().type()).size().is_zero())
-      {
-        it=components.end();
-        it--;
-      }
-      else
-        it=components.end();
-
+      // we insert after any final 'flexible member'
       struct_typet::componentt component;
       component.type()=padding_type;
       component.set_name("$pad"+i2string(padding_counter++));
       component.set_is_padding(true);
       
-      components.insert(it, component);
+      components.push_back(component);
     }
   }
 }
