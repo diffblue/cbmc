@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "context.h"
 #include "arith_tools.h"
 #include "cmdline.h"
+#include "simplify_expr.h"
 
 configt config;
 
@@ -433,10 +434,13 @@ int configt::ansi_ct::from_ns(const namespacet &ns, const std::string &what)
 
   if(ns.lookup(id, symbol))
     throw "failed to find "+id2string(id);
+    
+  exprt tmp=symbol->value;
+  simplify(tmp, ns);
   
   mp_integer int_value;
   
-  if(to_integer(symbol->value, int_value))
+  if(to_integer(tmp, int_value))
     throw "failed to convert "+id2string(id);
     
   return integer2long(int_value);
