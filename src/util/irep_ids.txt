@@ -443,6 +443,7 @@ storage_spec
 member_spec
 gcc_attribute
 packed
+C_packed #packed
 transparent_union
 aligned
 C_alignment #alignment
