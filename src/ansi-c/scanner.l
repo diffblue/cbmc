@@ -64,6 +64,18 @@ int make_identifier()
     return TOK_IDENTIFIER;
 }
 
+int MSC_Keyword(int token)
+{
+  if(PARSER.mode==ansi_c_parsert::MSC)
+  {
+    loc();
+    PARSER.tag_following=false;
+    return token;
+  }
+  else
+    return make_identifier();
+}
+
 int cpp_keyword(int token)
 {
   if(PARSER.cpp)
@@ -75,7 +87,7 @@ int cpp_keyword(int token)
     return make_identifier();
 }
 
-int msc_cpp_keyword(int token)
+int MSC_cpp_keyword(int token)
 {
   if(PARSER.cpp && PARSER.mode==ansi_c_parsert::MSC)
   {
@@ -307,21 +319,10 @@ void ansi_c_scanner_init()
 "volatile"	{ loc(); return TOK_VOLATILE; }
 "while"		{ loc(); return TOK_WHILE; }
 
-"__int8"        { if(PARSER.mode==ansi_c_parsert::MSC)
-                    { loc(); return TOK_INT8; }
-                  else
-                    return make_identifier();
-                }
-"__int16"       { if(PARSER.mode==ansi_c_parsert::MSC)
-                    { loc(); return TOK_INT16; }
-                  else
-                    return make_identifier();
-                }
-"__int32"       { if(PARSER.mode==ansi_c_parsert::MSC)
-                    { loc(); return TOK_INT32; }
-                  else
-                    return make_identifier();
-                }
+"__int8"        { return MSC_Keyword(TOK_INT8); }
+"__int16"       { return MSC_Keyword(TOK_INT16); }
+"__int32"       { return MSC_Keyword(TOK_INT32); }
+
 "__int64"       { if(PARSER.mode==ansi_c_parsert::MSC ||
                      PARSER.mode==ansi_c_parsert::ARM ||
                      PARSER.mode==ansi_c_parsert::CW)
@@ -329,16 +330,16 @@ void ansi_c_scanner_init()
                   else
                     return make_identifier();
                 }
-"__ptr32"       { if(PARSER.mode==ansi_c_parsert::MSC)
-                    { loc(); return TOK_PTR32; }
-                  else
-                    return make_identifier();
-                }
-"__ptr64"       { if(PARSER.mode==ansi_c_parsert::MSC)
-                    { loc(); return TOK_PTR64; }
-                  else
-                    return make_identifier();
-                }
+"__ptr32"       { return MSC_Keyword(TOK_PTR32); }
+"__ptr64"       { return MSC_Keyword(TOK_PTR64); }
+
+%{
+/*
+"__stdcall"     { return MSC_Keyword(TOK_STDCALL); }
+"__fastcall"    { return MSC_Keyword(TOK_FASTCALL); }
+"__clrcall"     { return MSC_Keyword(TOK_CLRCALL); }
+*/
+%}
 
 "__complex__"	{ if(PARSER.mode==ansi_c_parsert::GCC ||
                      PARSER.mode==ansi_c_parsert::ARM)
@@ -480,34 +481,37 @@ wchar_t             { return cpp_keyword(TOK_WCHAR_T); } // already really ANSI-
    http://msdn.microsoft.com/en-us/library/ms177194(v=vs.80).aspx */
 %}
 
-"__has_assign"      { loc(); return msc_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
-"__has_copy"        { loc(); return msc_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
-"__has_finalizer"   { loc(); return msc_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
-"__has_nothrow_assign" { loc(); return msc_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
-"__has_nothrow_constructor" { loc(); return msc_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
-"__has_nothrow_copy" { loc(); return msc_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
-"__has_trivial_assign" { loc(); return msc_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
-"__has_trivial_constructor" { loc(); return msc_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
-"__has_trivial_copy" { loc(); return msc_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
-"__has_trivial_destructor" { loc(); return msc_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
-"__has_user_destructor" { loc(); return msc_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
-"__has_virtual_destructor" { loc(); return msc_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
-"__is_abstract"     { loc(); return msc_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
-"__is_base_of"      { loc(); return msc_cpp_keyword(TOK_MSC_BINARY_TYPE_PREDICATE); }
-"__is_class"        { loc(); return msc_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
-"__is_convertible_to" { loc(); return msc_cpp_keyword(TOK_MSC_BINARY_TYPE_PREDICATE); }
-"__is_delegate"     { loc(); return msc_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
-"__is_empty"        { loc(); return msc_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
-"__is_enum"         { loc(); return msc_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
-"__is_interface_class" { loc(); return msc_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
-"__is_pod"          { loc(); return msc_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
-"__is_polymorphic"  { loc(); return msc_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
-"__is_ref_array"    { loc(); return msc_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
-"__is_ref_class"    { loc(); return msc_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
-"__is_sealed"       { loc(); return msc_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
-"__is_simple_value_class" { loc(); return msc_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
-"__is_union"        { loc(); return msc_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
-"__is_value_class"  { loc(); return msc_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__has_assign"      { loc(); return MSC_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__has_copy"        { loc(); return MSC_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__has_finalizer"   { loc(); return MSC_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__has_nothrow_assign" { loc(); return MSC_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__has_nothrow_constructor" { loc(); return MSC_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__has_nothrow_copy" { loc(); return MSC_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__has_trivial_assign" { loc(); return MSC_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__has_trivial_constructor" { loc(); return MSC_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__has_trivial_copy" { loc(); return MSC_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__has_trivial_destructor" { loc(); return MSC_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__has_user_destructor" { loc(); return MSC_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__has_virtual_destructor" { loc(); return MSC_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__is_abstract"     { loc(); return MSC_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__is_base_of"      { loc(); return MSC_cpp_keyword(TOK_MSC_BINARY_TYPE_PREDICATE); }
+"__is_class"        { loc(); return MSC_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__is_convertible_to" { loc(); return MSC_cpp_keyword(TOK_MSC_BINARY_TYPE_PREDICATE); }
+"__is_delegate"     { loc(); return MSC_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__is_empty"        { loc(); return MSC_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__is_enum"         { loc(); return MSC_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__is_interface_class" { loc(); return MSC_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__is_pod"          { loc(); return MSC_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__is_polymorphic"  { loc(); return MSC_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__is_ref_array"    { loc(); return MSC_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__is_ref_class"    { loc(); return MSC_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__is_sealed"       { loc(); return MSC_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__is_simple_value_class" { loc(); return MSC_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__is_union"        { loc(); return MSC_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+"__is_value_class"  { loc(); return MSC_cpp_keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
+
+"__if_exists"       { loc(); return MSC_cpp_keyword(TOK_MSC_IF_EXISTS); }
+"__if_not_exists"   { loc(); return MSC_cpp_keyword(TOK_MSC_IF_NOT_EXISTS); }
 
 "["{ws}"repeatable" |
 "["{ws}"source_annotation_attribute" |

@@ -129,6 +129,11 @@ extern char *yyansi_ctext;
 %token TOK_MSC_FINALLY "finally"
 %token TOK_MSC_EXCEPT  "except"
 %token TOK_MSC_LEAVE   "leave"
+%token TOK_INTERFACE   "__interface"
+%token TOK_CDECL       "__cdecl"
+%token TOK_STDCALL     "__stdcall"
+%token TOK_FASTCALL    "__fastcall"
+%token TOK_CLRCALL     "__clrcall"
 %token TOK_FORALL      "forall"
 %token TOK_EXISTS      "exists"
 %token TOK_THREAD_LOCAL "thread_local"
@@ -171,6 +176,8 @@ extern char *yyansi_ctext;
 %token TOK_MSC_UNARY_TYPE_PREDICATE
 %token TOK_MSC_BINARY_TYPE_PREDICATE
 %token TOK_MSC_UUIDOF  "__uuidof"
+%token TOK_MSC_IF_EXISTS "__if_exists"
+%token TOK_MSC_IF_NOT_EXISTS "__if_not_exists"
 
 /*** grammar selection ***/
 
