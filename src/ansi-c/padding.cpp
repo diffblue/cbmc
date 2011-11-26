@@ -190,8 +190,9 @@ void add_padding(struct_typet &type, const namespacet &ns)
       offset+=bit_field_bits/8;
       bit_field_bits=0;
     }
-    else if(it->type().get_bool(ID_C_packed))
-      continue; // the field is "packed"
+    else if(it->type().get_bool(ID_C_packed) ||
+            ns.follow(it->type()).get_bool(ID_C_packed))
+      continue; // the field or type is "packed"
     
     const typet &it_type=it->type();
     unsigned a=alignment(it_type, ns);
