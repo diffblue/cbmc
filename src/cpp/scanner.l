@@ -385,10 +385,10 @@ __CPROVER_thread_local { loc(); return TOK_THREAD_LOCAL; }
 ";"                 { loc(); return ';'; }
 "="                 { loc(); return '='; }
 
-".*"                { loc(); return TOK_PmOp; }
-"->*"               { loc(); return TOK_PmOp; }
+".*"                { loc(); return TOK_DOTPM; }
+"->*"               { loc(); return TOK_ARROWPM; }
 "::"                { loc(); return TOK_SCOPE; }
-"->"                { loc(); return TOK_ArrowOp; }
+"->"                { loc(); return TOK_ARROW; }
 "++"                { loc(); return TOK_INCR; }
 "--"                { loc(); return TOK_DECR; }
 "<<"                { loc(); return TOK_SHIFTLEFT; }

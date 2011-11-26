@@ -2471,7 +2471,7 @@ bool Parser::rName(irept &name)
   operator.name
   : '+' | '-' | '*' | '/' | '%' | '^' | '&' | '|' | '~'
   | '!' | '=' | '<' | '>' | AssignOp | ShiftOp | EqualOp
-  | RelOp | LogAndOp | LogOrOp | IncOp | ',' | PmOp | ArrowOp
+  | RelOp | LogAndOp | LogOrOp | IncOp | ',' | DOTPM | ARROWPM | ArrowOp
   | NEW {'[' ']'}
   | DELETE {'[' ']'}
   | '(' ')'
@@ -2496,7 +2496,7 @@ bool Parser::rOperatorName(irept &name)
      t==TOK_LE || t==TOK_GE || 
      t==TOK_ANDAND || t==TOK_OROR || 
      t==TOK_INCR || t==TOK_DECR ||
-     t==',' || t==TOK_PmOp || t==TOK_ArrowOp)
+     t==',' || t==TOK_DOTPM || t==TOK_ARROWPM || t==TOK_ARROW)
   {
     lex->GetToken(tk);
     name=irept(tk.text);
@@ -4037,7 +4037,8 @@ bool Parser::rMultiplyExpr(exprt &exp)
 /*
   pm.expr        (pointer to member .*, ->*)
   : cast.expr
-  | pm.expr PmOp cast.expr
+  | pm.expr DOTPM cast.expr
+  | pm.expr ARROWPM cast.expr
 */
 bool Parser::rPmExpr(exprt &exp)
 {
@@ -4052,7 +4053,8 @@ bool Parser::rPmExpr(exprt &exp)
   std::cout << "Parser::rPmExpr 1\n";
   #endif
 
-  while(lex->LookAhead(0)==TOK_PmOp)
+  while(lex->LookAhead(0)==TOK_DOTPM ||
+        lex->LookAhead(0)==TOK_ARROWPM)
   {
     Token tk;
     lex->GetToken(tk);
@@ -4759,7 +4761,7 @@ bool Parser::rPostfixExpr(exprt &exp)
       break;
 
     case '.':
-    case TOK_ArrowOp:
+    case TOK_ARROW:
       t2=lex->GetToken(op);
 
       #ifdef DEBUG
@@ -4779,7 +4781,7 @@ bool Parser::rPostfixExpr(exprt &exp)
 
         if(t2=='.')
           exp=exprt(ID_member);
-        else // ArrowOp
+        else // ARROW
           exp=exprt(ID_ptrmember);
 
         exp.move_to_operands(left);
