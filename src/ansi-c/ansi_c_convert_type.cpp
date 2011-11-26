@@ -397,8 +397,8 @@ void ansi_c_convert_typet::write(typet &type)
   if(transparent_union)
     type.set(ID_transparent_union, true);
 
-  if(packed && type.id()==ID_struct)
-    type.set(ID_packed, true);
+  if(packed)
+    type.set(ID_C_packed, true);
 
   if(aligned)
     type.set(ID_C_alignment, alignment);
