@@ -28,6 +28,20 @@ Function: alignment
 
 unsigned alignment(const typet &type, const namespacet &ns)
 {
+  // explicitly given?
+  if(type.find(ID_C_alignment).is_not_nil())
+  {
+    const exprt &alignment=
+      static_cast<const exprt &>(type.find(ID_C_alignment));
+    exprt tmp=alignment;
+    simplify(tmp, ns);
+    mp_integer tmp_i;
+    if(!to_integer(tmp, tmp_i))
+      return integer2long(tmp_i);
+  }
+  
+  // compute default
+
   if(type.id()==ID_array)
   {
     return alignment(type.subtype(), ns);
@@ -184,7 +198,7 @@ void add_padding(struct_typet &type, const namespacet &ns)
       
     if(max_alignment<a) 
       max_alignment=a;
-  
+      
     if(a!=1)
     {
       // we may need to align it
