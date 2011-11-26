@@ -1317,7 +1317,8 @@ member_default_declaring_list:
 
 member_declaring_list:
           gcc_type_attribute_opt
-          type_specifier member_declarator
+          type_specifier
+          member_declarator
         {
           // TODO merge_types($2, $1); // type attribute
 
@@ -1351,7 +1352,11 @@ member_declarator:
           if(stack($2).is_not_nil())
             make_subtype($$, $2);
 
-          // TODO merge_types($$, $3); // type attribute
+          if(stack($3).is_not_nil()) // type attribute
+          {
+            merge_types(stack($3), stack($$));
+            stack($$).swap(stack($3));
+          }
         }
         | /* empty */
         {
@@ -1361,7 +1366,12 @@ member_declarator:
         {
           $$=$1;
           stack($$).add(ID_subtype)=irept(ID_abstract);
-          // TODO merge_types($$, $2); // type attribute
+
+          if(stack($2).is_not_nil()) // type attribute
+          {
+            merge_types(stack($2), stack($$));
+            stack($$).swap(stack($2));
+          }
         }
         ;
 
@@ -1369,14 +1379,25 @@ member_identifier_declarator:
           identifier_declarator bit_field_size_opt gcc_type_attribute_opt
         {
           $$=$1;
-          make_subtype($$, $2);
-          // TODO merge_types($$, $3); // type attribute
+          if(stack($2).is_not_nil())
+            make_subtype($$, $2);
+          
+          if(stack($3).is_not_nil()) // type attribute
+          {
+            merge_types(stack($3), stack($$));
+            stack($$).swap(stack($3));
+          }
         }
         | bit_field_size gcc_type_attribute_opt
         {
           $$=$1;
           stack($$).add(ID_subtype)=irept(ID_abstract);
-          // TODO merge_types($$, $2); // type attribute
+
+          if(stack($2).is_not_nil()) // type attribute
+          {
+            merge_types(stack($2), stack($$));
+            stack($$).swap(stack($2));
+          }
         }
         ;
 
