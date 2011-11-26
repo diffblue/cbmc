@@ -86,10 +86,10 @@ extern char *yyansi_ctext;
 %token TOK_MODASSIGN   "%="
 %token TOK_PLUSASSIGN  "+="
 %token TOK_MINUSASSIGN "-="
-%token TOK_SLASSIGN    "<<="
-%token TOK_SRASSIGN    ">>="
+%token TOK_SHLASSIGN   "<<="
+%token TOK_SHRASSIGN   ">>="
 %token TOK_ANDASSIGN   "&="
-%token TOK_EORASSIGN   "^="
+%token TOK_XORASSIGN   "^="
 %token TOK_ORASSIGN    "|="
 
 /*** scanner parsed tokens (these have a value!) ***/
@@ -665,13 +665,13 @@ assignment_expression:
         { binary($$, $1, $2, ID_sideeffect, $3); stack($$).set(ID_statement, ID_assign_plus); }
         | cast_expression TOK_MINUSASSIGN assignment_expression
         { binary($$, $1, $2, ID_sideeffect, $3); stack($$).set(ID_statement, ID_assign_minus); }
-        | cast_expression TOK_SLASSIGN assignment_expression
+        | cast_expression TOK_SHLASSIGN assignment_expression
         { binary($$, $1, $2, ID_sideeffect, $3); stack($$).set(ID_statement, ID_assign_shl); }
-        | cast_expression TOK_SRASSIGN assignment_expression
+        | cast_expression TOK_SHRASSIGN assignment_expression
         { binary($$, $1, $2, ID_sideeffect, $3); stack($$).set(ID_statement, ID_assign_shr); }
         | cast_expression TOK_ANDASSIGN assignment_expression
         { binary($$, $1, $2, ID_sideeffect, $3); stack($$).set(ID_statement, ID_assign_bitand); }
-        | cast_expression TOK_EORASSIGN assignment_expression
+        | cast_expression TOK_XORASSIGN assignment_expression
         { binary($$, $1, $2, ID_sideeffect, $3); stack($$).set(ID_statement, ID_assign_bitxor); }
         | cast_expression TOK_ORASSIGN assignment_expression
         { binary($$, $1, $2, ID_sideeffect, $3); stack($$).set(ID_statement, ID_assign_bitor); }

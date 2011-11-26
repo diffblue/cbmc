@@ -840,10 +840,10 @@ wchar_t             { return cpp_keyword(TOK_WCHAR_T); } // already really ANSI-
 "%="		{ loc(); return TOK_MODASSIGN; }
 "+="		{ loc(); return TOK_PLUSASSIGN; }
 "-="		{ loc(); return TOK_MINUSASSIGN; }
-"<<="		{ loc(); return TOK_SLASSIGN; }
-">>="		{ loc(); return TOK_SRASSIGN; }
+"<<="		{ loc(); return TOK_SHLASSIGN; }
+">>="		{ loc(); return TOK_SHRASSIGN; }
 "&="		{ loc(); return TOK_ANDASSIGN; }
-"^="		{ loc(); return TOK_EORASSIGN; }
+"^="		{ loc(); return TOK_XORASSIGN; }
 "|="		{ loc(); return TOK_ORASSIGN; }
 }
 
