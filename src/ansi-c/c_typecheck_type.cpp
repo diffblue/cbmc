@@ -34,6 +34,14 @@ Function: c_typecheck_baset::typecheck_type
 
 void c_typecheck_baset::typecheck_type(typet &type)
 {
+  // do we have alignment?
+  if(type.find(ID_C_alignment).is_not_nil())
+  {
+    exprt &alignment=static_cast<exprt &>(type.add(ID_C_alignment));
+    typecheck_expr(alignment);
+    make_constant(alignment);
+  }
+
   if(type.id()==ID_code)
     typecheck_code_type(to_code_type(type));
   else if(type.id()==ID_array)
