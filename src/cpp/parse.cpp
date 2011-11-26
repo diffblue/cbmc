@@ -2486,7 +2486,13 @@ bool Parser::rOperatorName(irept &name)
   int t=lex->LookAhead(0);
   if(t=='+' || t=='-' || t=='*' || t=='/' || t=='%' || t=='^' ||
      t=='&' || t=='|' || t=='~' || t=='!' || t=='=' || t=='<' ||
-     t=='>' || t==TOK_AssignOp || t==TOK_ShiftOp || t==TOK_EqualOp ||
+     t=='>' || 
+     t==TOK_MULTASSIGN || t==TOK_DIVASSIGN || t==TOK_MODASSIGN ||
+     t==TOK_PLUSASSIGN || t==TOK_MINUSASSIGN || t==TOK_SHLASSIGN ||
+     t==TOK_SHRASSIGN  || t==TOK_ANDASSIGN ||
+     t==TOK_XORASSIGN  || t==TOK_ORASSIGN ||     
+     t==TOK_ShiftOp ||
+     t==TOK_EQUAL || t==TOK_NOTEQUAL ||
      t==TOK_RelOp || t==TOK_ANDAND || t==TOK_LogOrOp || t==TOK_INCR || t==TOK_DECR ||
      t==',' || t==TOK_PmOp || t==TOK_ArrowOp)
   {
@@ -3532,7 +3538,11 @@ bool Parser::rExpression(exprt &exp)
 
   int t=lex->LookAhead(0);
 
-  if(t=='=' || t==TOK_AssignOp)
+  if(t=='=' || 
+     t==TOK_MULTASSIGN || t==TOK_DIVASSIGN || t==TOK_MODASSIGN ||
+     t==TOK_PLUSASSIGN || t==TOK_MINUSASSIGN || t==TOK_SHLASSIGN ||
+     t==TOK_SHRASSIGN  || t==TOK_ANDASSIGN ||
+     t==TOK_XORASSIGN  || t==TOK_ORASSIGN)
   {
     lex->GetToken(tk);
 
@@ -3555,25 +3565,25 @@ bool Parser::rExpression(exprt &exp)
 
     if(t=='=')
       exp.set(ID_statement, ID_assign);
-    else if(tk.text=="+=")
+    else if(t==TOK_PLUSASSIGN)
       exp.set(ID_statement, ID_assign_plus);
-    else if(tk.text=="-=")
+    else if(t==TOK_MINUSASSIGN)
       exp.set(ID_statement, ID_assign_minus);
-    else if(tk.text=="*=")
+    else if(t==TOK_MULTASSIGN)
       exp.set(ID_statement, ID_assign_mult);
-    else if(tk.text=="/=")
+    else if(t==TOK_DIVASSIGN)
       exp.set(ID_statement, ID_assign_div);
-    else if(tk.text=="%=")
+    else if(t==TOK_MODASSIGN)
       exp.set(ID_statement, ID_assign_mod);
-    else if(tk.text=="<<=")
+    else if(t==TOK_SHLASSIGN)
       exp.set(ID_statement, ID_assign_shl);
-    else if(tk.text==">>=")
+    else if(t==TOK_SHRASSIGN)
       exp.set(ID_statement, ID_assign_shr);
-    else if(tk.text=="&=")
+    else if(t==TOK_ANDASSIGN)
       exp.set(ID_statement, ID_assign_bitand);
-    else if(tk.text=="^=")
+    else if(t==TOK_XORASSIGN)
       exp.set(ID_statement, ID_assign_bitxor);
-    else if(tk.text=="|=")
+    else if(t==TOK_ORASSIGN)
       exp.set(ID_statement, ID_assign_bitor);
 
     exp.move_to_operands(left, right);
@@ -3842,7 +3852,8 @@ bool Parser::rEqualityExpr(exprt &exp, bool temp_args)
   std::cout << "Parser::rEqualityExpr 1\n";
   #endif
 
-  while(lex->LookAhead(0)==TOK_EqualOp)
+  while(lex->LookAhead(0)==TOK_EQUAL ||
+        lex->LookAhead(0)==TOK_NOTEQUAL)
   {
     Token tk;
     lex->GetToken(tk);
@@ -3854,7 +3865,7 @@ bool Parser::rEqualityExpr(exprt &exp, bool temp_args)
     exprt left;
     left.swap(exp);
 
-    exp=exprt(tk.text=="=="?ID_equal:ID_notequal);
+    exp=exprt(tk.kind==TOK_EQUAL?ID_equal:ID_notequal);
     exp.move_to_operands(left, right);
     set_location(exp, tk);
   }

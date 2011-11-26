@@ -395,20 +395,20 @@ __CPROVER_thread_local { loc(); return TOK_THREAD_LOCAL; }
 ">>"                { loc(); return TOK_ShiftOp; }
 "<="                { loc(); return TOK_RelOp; }
 ">="                { loc(); return TOK_RelOp; }
-"=="                { loc(); return TOK_EqualOp; }
-"!="                { loc(); return TOK_EqualOp; }
+"=="                { loc(); return TOK_EQUAL; }
+"!="                { loc(); return TOK_NOTEQUAL; }
 "&&"                { loc(); return TOK_ANDAND; }
 "||"                { loc(); return TOK_LogOrOp; }
-"*="                { loc(); return TOK_AssignOp; }
-"/="                { loc(); return TOK_AssignOp; }
-"%="                { loc(); return TOK_AssignOp; }
-"+="                { loc(); return TOK_AssignOp; }
-"-="                { loc(); return TOK_AssignOp; }
-"<<="               { loc(); return TOK_AssignOp; }
-">>="               { loc(); return TOK_AssignOp; }
-"&="                { loc(); return TOK_AssignOp; }
-"^="                { loc(); return TOK_AssignOp; }
-"|="                { loc(); return TOK_AssignOp; }
+"*="                { loc(); return TOK_MULTASSIGN; }
+"/="                { loc(); return TOK_DIVASSIGN; }
+"%="                { loc(); return TOK_MODASSIGN; }
+"+="                { loc(); return TOK_PLUSASSIGN; }
+"-="                { loc(); return TOK_MINUSASSIGN; }
+"<<="               { loc(); return TOK_SHLASSIGN; }
+">>="               { loc(); return TOK_SHRASSIGN; }
+"&="                { loc(); return TOK_ANDASSIGN; }
+"^="                { loc(); return TOK_XORASSIGN; }
+"|="                { loc(); return TOK_ORASSIGN; }
 "..."               { loc(); return TOK_ELLIPSIS; }
 
 .                   { yycpperror("unknown character"); }
