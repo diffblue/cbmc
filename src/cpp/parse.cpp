@@ -2492,8 +2492,10 @@ bool Parser::rOperatorName(irept &name)
      t==TOK_SHRASSIGN  || t==TOK_ANDASSIGN ||
      t==TOK_XORASSIGN  || t==TOK_ORASSIGN ||     
      t==TOK_SHIFTLEFT  || t==TOK_SHIFTRIGHT ||
-     t==TOK_EQUAL || t==TOK_NOTEQUAL ||
-     t==TOK_RelOp || t==TOK_ANDAND || t==TOK_OROR || t==TOK_INCR || t==TOK_DECR ||
+     t==TOK_EQ || t==TOK_NE ||
+     t==TOK_LE || t==TOK_GE || 
+     t==TOK_ANDAND || t==TOK_OROR || 
+     t==TOK_INCR || t==TOK_DECR ||
      t==',' || t==TOK_PmOp || t==TOK_ArrowOp)
   {
     lex->GetToken(tk);
@@ -3849,8 +3851,8 @@ bool Parser::rEqualityExpr(exprt &exp, bool temp_args)
   std::cout << "Parser::rEqualityExpr 1\n";
   #endif
 
-  while(lex->LookAhead(0)==TOK_EQUAL ||
-        lex->LookAhead(0)==TOK_NOTEQUAL)
+  while(lex->LookAhead(0)==TOK_EQ ||
+        lex->LookAhead(0)==TOK_NE)
   {
     Token tk;
     lex->GetToken(tk);
@@ -3862,7 +3864,7 @@ bool Parser::rEqualityExpr(exprt &exp, bool temp_args)
     exprt left;
     left.swap(exp);
 
-    exp=exprt(tk.kind==TOK_EQUAL?ID_equal:ID_notequal);
+    exp=exprt(tk.kind==TOK_EQ?ID_equal:ID_notequal);
     exp.move_to_operands(left, right);
     set_location(exp, tk);
   }
@@ -3891,7 +3893,7 @@ bool Parser::rRelationalExpr(exprt &exp, bool temp_args)
   int t;
 
   while(t=lex->LookAhead(0),
-        (t==TOK_RelOp || t=='<' || (t=='>' && !temp_args)))
+        (t==TOK_LE || t==TOK_GE || t=='<' || (t=='>' && !temp_args)))
   {
     Token tk;
     lex->GetToken(tk);
