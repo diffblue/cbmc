@@ -224,7 +224,8 @@ void add_padding(struct_typet &type, const namespacet &ns)
   // any explicit alignment for the struct?
   if(type.find(ID_C_alignment).is_not_nil())
   {
-    const exprt &alignment=static_cast<const exprt &>(type.find(ID_C_alignment));
+    const exprt &alignment=
+      static_cast<const exprt &>(type.find(ID_C_alignment));
     exprt tmp=alignment;
     simplify(tmp, ns);
     mp_integer tmp_i;

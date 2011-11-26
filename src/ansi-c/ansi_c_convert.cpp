@@ -356,6 +356,10 @@ void ansi_c_convertt::convert_type(
     c_storage_spec=ansi_c_convert_type.c_storage_spec;
   }
 
+  // do we have alignment?
+  if(type.find(ID_C_alignment).is_not_nil())
+    convert_expr(static_cast<exprt &>(type.add(ID_C_alignment)));
+
   if(type.id()==ID_pointer)
   {
     c_storage_spect sub_storage_spec;
@@ -503,6 +507,7 @@ void ansi_c_convertt::convert_type(
     convert_type(vector_type.subtype(), sub_storage_spec);
     c_storage_spec|=sub_storage_spec;
   }
+  
 }
 
 /*******************************************************************\
