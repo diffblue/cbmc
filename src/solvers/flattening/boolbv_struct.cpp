@@ -29,9 +29,6 @@ void boolbvt::convert_struct(const exprt &expr, bvt &bv)
 
   unsigned width=boolbv_width(struct_type);
   
-  if(width==0)
-    return conversion_failed(expr, bv);
-
   const struct_typet::componentst &components=struct_type.components();
 
   if(expr.operands().size()!=components.size())
