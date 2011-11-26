@@ -2491,9 +2491,9 @@ bool Parser::rOperatorName(irept &name)
      t==TOK_PLUSASSIGN || t==TOK_MINUSASSIGN || t==TOK_SHLASSIGN ||
      t==TOK_SHRASSIGN  || t==TOK_ANDASSIGN ||
      t==TOK_XORASSIGN  || t==TOK_ORASSIGN ||     
-     t==TOK_ShiftOp ||
+     t==TOK_SHIFTLEFT  || t==TOK_SHIFTRIGHT ||
      t==TOK_EQUAL || t==TOK_NOTEQUAL ||
-     t==TOK_RelOp || t==TOK_ANDAND || t==TOK_LogOrOp || t==TOK_INCR || t==TOK_DECR ||
+     t==TOK_RelOp || t==TOK_ANDAND || t==TOK_OROR || t==TOK_INCR || t==TOK_DECR ||
      t==',' || t==TOK_PmOp || t==TOK_ArrowOp)
   {
     lex->GetToken(tk);
@@ -2791,25 +2791,22 @@ bool Parser::rTemplateArgs(irept &template_args)
     Token tk2;
     switch(lex->GetToken(tk2))
     {
-     case '>':
+    case '>':
       return true;
 
-     case ',':
+    case ',':
       break;
 
-     case TOK_ShiftOp:
-      if(tk2.text[0]=='>')
-      {
-        // the newer C++ standards frown on this!
+    case TOK_SHIFTRIGHT: // turn >> into > >
+      // the newer C++ standards frown on this!
 
-        // turn >> into > > // TODO
-        //lex->GetOnlyClosingBracket(tk2);
-        //temp_args=Ptree::List(new Leaf(tk1), args,
-        //                      new Leaf(tk2.ptr, 1));
-        return false;
-      }
+      // turn >> into > > // TODO
+      //lex->GetOnlyClosingBracket(tk2);
+      //temp_args=Ptree::List(new Leaf(tk1), args,
+      //                      new Leaf(tk2.ptr, 1));
+      return false;
 
-     default:
+    default:
       return false;
     }
   }
@@ -3662,7 +3659,7 @@ bool Parser::rLogicalOrExpr(exprt &exp, bool temp_args)
   std::cout << "Parser::rLogicalOrExpr 1\n";
   #endif
 
-  while(lex->LookAhead(0)==TOK_LogOrOp)
+  while(lex->LookAhead(0)==TOK_OROR)
   {
     Token tk;
     lex->GetToken(tk);
@@ -3932,7 +3929,8 @@ bool Parser::rShiftExpr(exprt &exp)
   std::cout << "Parser::rShiftExpr 1\n";
   #endif
 
-  while(lex->LookAhead(0)==TOK_ShiftOp)
+  while(lex->LookAhead(0)==TOK_SHIFTLEFT ||
+        lex->LookAhead(0)==TOK_SHIFTRIGHT)
   {
     Token tk;
     lex->GetToken(tk);
@@ -3944,7 +3942,7 @@ bool Parser::rShiftExpr(exprt &exp)
     exprt left;
     left.swap(exp);
 
-    exp=exprt((tk.text==">>")?ID_shr:ID_shl);
+    exp=exprt((tk.kind==TOK_SHIFTRIGHT)?ID_shr:ID_shl);
     exp.move_to_operands(left, right);
     set_location(exp, tk);
   }
