@@ -28,6 +28,7 @@ Function: alignment
 
 unsigned alignment(const typet &type, const namespacet &ns)
 {
+  #if 0
   // explicitly given?
   if(type.find(ID_C_alignment).is_not_nil())
   {
@@ -39,6 +40,7 @@ unsigned alignment(const typet &type, const namespacet &ns)
     if(!to_integer(tmp, tmp_i))
       return integer2long(tmp_i);
   }
+  #endif
   
   // compute default
 
@@ -156,8 +158,8 @@ void add_padding(struct_typet &type, const namespacet &ns)
     }  
   }
 
-  // packed?
-  if(type.get_bool(ID_packed))
+  // Is the struct packed?
+  if(type.get_bool(ID_C_packed))
     return; // done
 
   mp_integer offset=0;
@@ -188,6 +190,8 @@ void add_padding(struct_typet &type, const namespacet &ns)
       offset+=bit_field_bits/8;
       bit_field_bits=0;
     }
+    else if(it->type().get_bool(ID_C_packed))
+      continue; // the field is "packed"
     
     const typet &it_type=it->type();
     unsigned a=alignment(it_type, ns);
