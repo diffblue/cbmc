@@ -391,14 +391,14 @@ __CPROVER_thread_local { loc(); return TOK_THREAD_LOCAL; }
 "->"                { loc(); return TOK_ArrowOp; }
 "++"                { loc(); return TOK_INCR; }
 "--"                { loc(); return TOK_DECR; }
-"<<"                { loc(); return TOK_ShiftOp; }
-">>"                { loc(); return TOK_ShiftOp; }
+"<<"                { loc(); return TOK_SHIFTLEFT; }
+">>"                { loc(); return TOK_SHIFTRIGHT; }
 "<="                { loc(); return TOK_RelOp; }
 ">="                { loc(); return TOK_RelOp; }
 "=="                { loc(); return TOK_EQUAL; }
 "!="                { loc(); return TOK_NOTEQUAL; }
 "&&"                { loc(); return TOK_ANDAND; }
-"||"                { loc(); return TOK_LogOrOp; }
+"||"                { loc(); return TOK_OROR; }
 "*="                { loc(); return TOK_MULTASSIGN; }
 "/="                { loc(); return TOK_DIVASSIGN; }
 "%="                { loc(); return TOK_MODASSIGN; }
