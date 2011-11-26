@@ -172,7 +172,8 @@ extern char *yyansi_ctext;
 %token TOK_VIRTUAL
 %token TOK_TRY
 %token TOK_SCOPE       "::"
-%token TOK_PMOP        ".*" // also ->*
+%token TOK_DOTPM       ".*"
+%token TOK_ARROWPM     "->*"
 %token TOK_MSC_UNARY_TYPE_PREDICATE
 %token TOK_MSC_BINARY_TYPE_PREDICATE
 %token TOK_MSC_UUIDOF  "__uuidof"
