@@ -62,14 +62,13 @@ bool ms_cl_cmdlinet::parse(const std::vector<std::string> &options)
     {
       process_non_cl_option(options[i]);
 
-      if(options[i]=="--verbosity")
+      if(options[i]=="--verbosity" ||
+          options[i]=="--function")
         if(i<options.size()-1)
         {
-          set("verbosity", options[i+1]);
+          set(options[i].substr(2), options[i+1]);
           i++; // skip ahead
         }
-      else if(options[i]=="--function")
-        i++; // skip ahead
     }
     else if(!options[i].empty() && options[i][0]=='@')
     {
