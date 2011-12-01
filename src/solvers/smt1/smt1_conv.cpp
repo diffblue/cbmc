@@ -1944,6 +1944,10 @@ void smt1_convt::convert_plus(const exprt &expr)
 
     mp_integer element_size=
       pointer_offset_size(ns, expr.type().subtype());
+      
+    // adjust width if needed    
+    if(boolbv_width(i.type())!=boolbv_width(expr.type()))
+      i.make_typecast(signedbv_typet(boolbv_width(expr.type())));
 
     smt1_prop.out << "(bvadd ";
     convert_expr(p, true);
