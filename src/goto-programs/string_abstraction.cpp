@@ -1382,7 +1382,7 @@ exprt string_abstractiont::build_unknown(const typet &type, bool write)
   new_symbol.name=identifier;
   new_symbol.module="$tmp";
   new_symbol.base_name=identifier;
-  new_symbol.mode="C";
+  new_symbol.mode=ID_C;
   new_symbol.pretty_name=identifier;
   new_symbol.is_statevar=true;
   new_symbol.static_lifetime=false;
@@ -1505,7 +1505,7 @@ bool string_abstractiont::build_symbol_constant(const mp_integer &zero_length,
     new_symbol.value.make_nil();
     new_symbol.name=identifier;
     new_symbol.base_name=base;
-    new_symbol.mode="C";
+    new_symbol.mode=ID_C;
     new_symbol.pretty_name=base;
     new_symbol.is_statevar=true;
     new_symbol.static_lifetime=true;

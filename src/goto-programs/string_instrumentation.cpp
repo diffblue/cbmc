@@ -941,7 +941,7 @@ void string_instrumentationt::do_strerror(
     new_symbol_size.base_name="__strerror_buffer_size";
     new_symbol_size.pretty_name=new_symbol_size.base_name;
     new_symbol_size.name=identifier_size;
-    new_symbol_size.mode="C";
+    new_symbol_size.mode=ID_C;
     new_symbol_size.type=uint_type();
     new_symbol_size.is_statevar=true;
     new_symbol_size.lvalue=true;
@@ -951,7 +951,7 @@ void string_instrumentationt::do_strerror(
     type.subtype()=char_type();
     type.size()=symbol_expr(new_symbol_size);
     symbolt new_symbol_buf;
-    new_symbol_buf.mode="C";
+    new_symbol_buf.mode=ID_C;
     new_symbol_buf.type=type;
     new_symbol_buf.is_statevar=true;
     new_symbol_buf.lvalue=true;
@@ -1040,7 +1040,7 @@ void string_instrumentationt::invalidate_buffer(
     new_symbol.base_name="$counter";
     new_symbol.pretty_name=new_symbol.base_name;
     new_symbol.name=cntr_id;
-    new_symbol.mode="C";
+    new_symbol.mode=ID_C;
     new_symbol.type=uint_type();
     new_symbol.is_statevar=true;
     new_symbol.lvalue=true;
