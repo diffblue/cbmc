@@ -379,6 +379,53 @@ bool c_preprocess_visual_studio(
 
 /*******************************************************************\
 
+Function: postprocess_codewarrior
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: post-processing specifically for CodeWarrior
+
+\*******************************************************************/
+
+void postprocess_codewarrior(
+  std::istream &instream,
+  std::ostream &outstream)
+{
+  // CodeWarrior prepends some header to the file,
+  // marked with '#' signs.
+  // We skip over it.
+  //
+  // CodeWarrior has an ugly way of marking lines, e.g.:
+  //
+  // /* #line 1      "__ppc_eabi_init.cpp"   /* stack depth 0 */
+  //
+  // We remove the initial '/* ' prefix
+  
+  std::string line;
+  
+  while(instream)
+  {
+    str_getline(instream, line);
+    
+    if(line.size()>=2 &&
+       line[0]=='#' && (line[1]=='#' || line[1]==' ' || line[1]=='\t'))
+    {
+      // skip the line!
+    }
+    else if(line.size()>=3 &&
+            line[0]=='/' && line[1]=='*' && line[2]==' ')
+    {
+      outstream << line.c_str()+3 << std::endl; // strip the '/* '
+    }
+    else
+      outstream << line << std::endl;
+  }
+}
+
+/*******************************************************************\
+
 Function: c_preprocess_codewarrior
 
   Inputs:
@@ -440,15 +487,13 @@ bool c_preprocess_codewarrior(
 
   result=system(command.c_str());
 
-  FILE *stream=fopen(tmpi.c_str(), "r");
+  std::ifstream stream_i(tmpi.c_str());
 
-  if(stream!=NULL)
+  if(stream_i)
   {
-    char ch;
-    while((ch=fgetc(stream))!=EOF)
-      outstream << ch;
+    postprocess_codewarrior(stream_i, outstream);
 
-    fclose(stream);
+    stream_i.close();
     unlink(tmpi.c_str());
   }
   else
@@ -483,39 +528,6 @@ bool c_preprocess_codewarrior(
   #if 0
   message_streamt message_stream(message_handler);
 
-  // CodeWarrior prepends some header to the file,
-  // marked with '#' signs.
-  // We skip over it.
-  //
-  // CodeWarrior has an ugly way of marking lines, e.g.:
-  //
-  // /* #line 1      "__ppc_eabi_init.cpp"   /* stack depth 0 */
-  //
-  // We remove the initial '/* ' prefix
-  
-  std::ifstream in(file.c_str());
-  
-  std::string line;
-  
-  while(in)
-  {
-    str_getline(in, line);
-    
-    if(line.size()>=1 &&
-       line[0]=='#' && (line[1]=='#' || line[1]==' ' || line[1]=='\t'))
-    {
-      // skip the line!
-    }
-    else if(line.size()>=3 &&
-            line[0]=='/' && line[1]=='*' && line[2]==' ')
-    {
-      outstream << line.c_str()+3 << std::endl; // strip the '/* '
-    }
-    else
-      outstream << line << std::endl;
-  }
-  
-  return false;
   #endif
 }
 
@@ -972,11 +984,19 @@ bool c_preprocess_none(
     message_stream.error("failed to open `"+file+"'");
     return true;
   }
+  
+  if(config.ansi_c.mode==configt::ansi_ct::MODE_CODEWARRIOR)
+  {
+    // special treatment for "/* #line"
+    postprocess_codewarrior(infile, outstream);
+  }
+  else
+  {
+    char ch;
 
-  char ch;
-
-  while(infile.read(&ch, 1))
-    outstream << ch;
+    while(infile.read(&ch, 1))
+      outstream << ch;
+  }
 
   return false;
 }
