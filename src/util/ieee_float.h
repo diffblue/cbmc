@@ -138,7 +138,7 @@ public:
       next_representable(false);
   }
 
-  bool is_zero() const {return !NaN && !infinity && fraction==0 && exponent==0;}
+  bool is_zero() const { return !NaN && !infinity && fraction==0 && exponent==0; }
   bool get_sign() const { return sign; }
   bool is_NaN() const { return NaN; }
   bool is_infinity() const { return !NaN && infinity; }
