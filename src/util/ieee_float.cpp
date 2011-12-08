@@ -991,7 +991,10 @@ Function: operator ==
 bool operator ==(const ieee_floatt &a, const ieee_floatt &b)
 {
   // packed equality!
-  if(a.NaN && b.NaN) return true;
+  if(a.NaN && b.NaN)
+    return true;
+  else if(a.NaN || b.NaN)
+    return false;
 
   if(a.infinity && b.infinity &&
      a.sign == b.sign) return true;
