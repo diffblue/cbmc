@@ -6,12 +6,13 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 
 \*******************************************************************/
 
-#include "string2int.h"
-
 #include <cerrno>
 #include <cstdlib>
 #include <limits>
 #include <cassert>
+#include <string>
+
+#include "string2int.h"
 
 /*******************************************************************\
 
@@ -26,7 +27,7 @@ Function: safe_string2number
 \*******************************************************************/
 
 template <typename T>
-inline T safe_string2number(const char *str, int base)
+inline T safe_str2number(const char *str, int base)
 {
   int errno_bak=errno;
   errno=0;
@@ -42,6 +43,40 @@ inline T safe_string2number(const char *str, int base)
 
 /*******************************************************************\
 
+Function: safe_str2int
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+int safe_str2int(const char *str, int base)
+{
+  return safe_str2number<int>(str, base);
+}
+
+/*******************************************************************\
+
+Function: safe_str2unsigned
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+unsigned safe_str2unsigned(const char *str, int base)
+{
+  return safe_str2number<unsigned>(str, base);
+}
+
+/*******************************************************************\
+
 Function: safe_string2int
 
   Inputs:
@@ -52,9 +87,9 @@ Function: safe_string2int
 
 \*******************************************************************/
 
-int safe_string2int(const char *str, int base)
+int safe_str2int(const std::string &str, int base)
 {
-  return safe_string2number<int>(str, base);
+  return safe_str2number<int>(str.c_str(), base);
 }
 
 /*******************************************************************\
@@ -69,8 +104,8 @@ Function: safe_string2unsigned
 
 \*******************************************************************/
 
-unsigned safe_string2unsigned(const char *str, int base)
+unsigned safe_str2unsigned(const std::string &str, int base)
 {
-  return safe_string2number<unsigned>(str, base);
+  return safe_str2number<unsigned>(str.c_str(), base);
 }
 
