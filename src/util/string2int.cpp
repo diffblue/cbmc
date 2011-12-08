@@ -15,7 +15,7 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 
 /*******************************************************************\
 
-Function: safe_str2number
+Function: safe_string2number
 
   Inputs:
 
@@ -26,7 +26,7 @@ Function: safe_str2number
 \*******************************************************************/
 
 template <typename T>
-T safe_str2number(const char *str, int base)
+T safe_string2number(const char *str, int base)
 {
   int errno_bak=errno;
   errno=0;
@@ -42,7 +42,7 @@ T safe_str2number(const char *str, int base)
 
 /*******************************************************************\
 
-Function: safe_str2int
+Function: safe_string2int
 
   Inputs:
 
@@ -52,14 +52,14 @@ Function: safe_str2int
 
 \*******************************************************************/
 
-int safe_str2int(const char *str, int base)
+int safe_string2int(const char *str, int base)
 {
-  return safe_str2number<int>(str, base);
+  return safe_string2number<int>(str, base);
 }
 
 /*******************************************************************\
 
-Function: safe_str2unsigned
+Function: safe_string2unsigned
 
   Inputs:
 
@@ -69,8 +69,8 @@ Function: safe_str2unsigned
 
 \*******************************************************************/
 
-unsigned safe_str2unsigned(const char *str, int base)
+unsigned safe_string2unsigned(const char *str, int base)
 {
-  return safe_str2number<unsigned>(str, base);
+  return safe_string2number<unsigned>(str, base);
 }
 
