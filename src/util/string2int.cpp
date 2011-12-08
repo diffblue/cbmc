@@ -26,7 +26,7 @@ Function: safe_string2number
 \*******************************************************************/
 
 template <typename T>
-T safe_string2number(const char *str, int base)
+inline T safe_string2number(const char *str, int base)
 {
   int errno_bak=errno;
   errno=0;
