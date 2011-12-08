@@ -10,13 +10,12 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 #include <cstdlib>
 #include <limits>
 #include <cassert>
-#include <string>
 
 #include "string2int.h"
 
 /*******************************************************************\
 
-Function: safe_string2number
+Function: safe_str2number
 
   Inputs:
 
@@ -87,7 +86,7 @@ Function: safe_string2int
 
 \*******************************************************************/
 
-int safe_str2int(const std::string &str, int base)
+int safe_string2int(const std::string &str, int base)
 {
   return safe_str2number<int>(str.c_str(), base);
 }
@@ -104,7 +103,7 @@ Function: safe_string2unsigned
 
 \*******************************************************************/
 
-unsigned safe_str2unsigned(const std::string &str, int base)
+unsigned safe_string2unsigned(const std::string &str, int base)
 {
   return safe_str2number<unsigned>(str.c_str(), base);
 }
