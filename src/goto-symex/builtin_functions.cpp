@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <context.h>
 #include <std_expr.h>
 #include <std_code.h>
+#include <simplify_expr.h>
 
 #include <ansi-c/c_types.h>
 
@@ -158,7 +159,7 @@ void basic_symext::symex_malloc(
 
 /*******************************************************************\
 
-Function: basic_symext::get_string_argument
+Function: basic_symext::get_string_argument_rec
 
   Inputs:
 
@@ -168,12 +169,12 @@ Function: basic_symext::get_string_argument
 
 \*******************************************************************/
 
-irep_idt get_string_argument(const exprt &src)
+irep_idt get_string_argument_rec(const exprt &src)
 {
   if(src.id()==ID_typecast)
   {
     assert(src.operands().size()==1);
-    return get_string_argument(src.op0());
+    return get_string_argument_rec(src.op0());
   }
   else if(src.id()==ID_address_of)
   {
@@ -192,6 +193,25 @@ irep_idt get_string_argument(const exprt &src)
   }
   
   return "";
+}
+
+/*******************************************************************\
+
+Function: basic_symext::get_string_argument
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+irep_idt get_string_argument(const exprt &src, const namespacet &ns)
+{
+  exprt tmp=src;
+  simplify(tmp, ns);
+  return get_string_argument_rec(tmp);
 }
 
 /*******************************************************************\
@@ -224,7 +244,7 @@ void basic_symext::symex_printf(
     args.push_back(operands[i]);
     
   const irep_idt format_string=
-    get_string_argument(operands[0]);
+    get_string_argument(operands[0], ns);
 
   if(format_string!="")
     target.output_fmt(state.guard, state.source, "printf", format_string, args);
@@ -261,7 +281,7 @@ void basic_symext::symex_input(
     state.rename(args.back(), ns);
   }
 
-  const irep_idt input_id=get_string_argument(id_arg);
+  const irep_idt input_id=get_string_argument(id_arg, ns);
 
   target.input(state.guard, state.source, input_id, args);
 }
@@ -297,7 +317,7 @@ void basic_symext::symex_output(
     state.rename(args.back(), ns);
   }
 
-  const irep_idt output_id=get_string_argument(id_arg);
+  const irep_idt output_id=get_string_argument(id_arg, ns);
 
   target.output(state.guard, state.source, output_id, args);
 }
