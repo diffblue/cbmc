@@ -375,6 +375,31 @@ public:
   }
 };
 
+/*! \brief Cast a generic exprt to a \ref minus_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * minus_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref minus_exprt
+ *
+ * \ingroup gr_std_expr
+*/
+extern inline const minus_exprt &to_minus_expr(const exprt &expr)
+{
+  assert(expr.id()==ID_minus && expr.operands().size()>=2);
+  return static_cast<const minus_exprt &>(expr);
+}
+
+/*! \copydoc to_minus_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
+extern inline minus_exprt &to_minus_expr(exprt &expr)
+{
+  assert(expr.id()==ID_minus && expr.operands().size()>=2);
+  return static_cast<minus_exprt &>(expr);
+}
+
 /*! \brief binary multiplication
 */
 class mult_exprt:public binary_exprt
