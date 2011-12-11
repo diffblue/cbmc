@@ -1371,6 +1371,9 @@ std::string expr2ct::convert_symbol(
 
   if(ns_collision.find(id)==ns_collision.end())
     dest=id_shorthand(src);
+  else if(src.operands().size()==1 &&
+        src.op0().id()==ID_predicate_passive_symbol)
+    dest=src.op0().get(ID_identifier).as_string();
   else
     dest=id2string(id);
 
@@ -1438,6 +1441,26 @@ std::string expr2ct::convert_predicate_next_symbol(
 {
   const std::string &id=src.get_string(ID_identifier);
   return "pns("+id+")";
+}
+
+/*******************************************************************\
+
+Function: expr2ct::convert_predicate_passive_symbol
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+std::string expr2ct::convert_predicate_passive_symbol(
+  const exprt &src,
+  unsigned &precedence)
+{
+  const std::string &id=src.get_string(ID_identifier);
+  return "pps("+id+")";
 }
 
 /*******************************************************************\
@@ -3642,11 +3665,14 @@ std::string expr2ct::convert(
   else if(src.id()==ID_nondet_symbol)
     return convert_nondet_symbol(src, precedence);
 
-  else if(src.id()=="predicate_symbol")
+  else if(src.id()==ID_predicate_symbol)
     return convert_predicate_symbol(src, precedence);
 
-  else if(src.id()=="predicate_next_symbol")
+  else if(src.id()==ID_predicate_next_symbol)
     return convert_predicate_next_symbol(src, precedence);
+
+  else if(src.id()==ID_predicate_passive_symbol)
+    return convert_predicate_passive_symbol(src, precedence);
 
   else if(src.id()=="quant_symbol")
     return convert_quantified_symbol(src, precedence);

@@ -164,6 +164,7 @@ protected:
   virtual std::string convert_symbol(const exprt &src, unsigned &precedence);
   std::string convert_predicate_symbol(const exprt &src, unsigned &precedence);
   std::string convert_predicate_next_symbol(const exprt &src, unsigned &precedence);
+  std::string convert_predicate_passive_symbol(const exprt &src, unsigned &precedence);
   std::string convert_nondet_symbol(const exprt &src, unsigned &precedence);
   std::string convert_quantified_symbol(const exprt &src, unsigned &precedence);
   std::string convert_nondet_bool(const exprt &src, unsigned &precedence);
