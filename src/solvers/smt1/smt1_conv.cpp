@@ -735,7 +735,7 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
   }
   else if(expr.id()==ID_minus)
   {
-    convert_minus(expr);
+    convert_minus(to_minus_expr(expr));
   }
   else if(expr.id()==ID_div)
   {
@@ -2009,7 +2009,7 @@ Function: smt1_convt::convert_minus
 
 \*******************************************************************/
 
-void smt1_convt::convert_minus(const exprt &expr)
+void smt1_convt::convert_minus(const minus_exprt &expr)
 {
   assert(expr.operands().size()==2);
 

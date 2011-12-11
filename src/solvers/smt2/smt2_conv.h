@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <set>
 
 #include <hash_cont.h>
+#include <std_expr.h>
 
 #include <solvers/prop/prop_conv.h>
 #include <solvers/flattening/boolbv_width.h>
