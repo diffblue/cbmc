@@ -333,6 +333,31 @@ public:
   }
 };
 
+/*! \brief Cast a generic exprt to a \ref plus_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * plus_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref plus_exprt
+ *
+ * \ingroup gr_std_expr
+*/
+extern inline const plus_exprt &to_plus_expr(const exprt &expr)
+{
+  assert(expr.id()==ID_plus && expr.operands().size()>=2);
+  return static_cast<const plus_exprt &>(expr);
+}
+
+/*! \copydoc to_plus_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
+extern inline plus_exprt &to_plus_expr(exprt &expr)
+{
+  assert(expr.id()==ID_plus && expr.operands().size()>=2);
+  return static_cast<plus_exprt &>(expr);
+}
+
 /*! \brief binary minus
 */
 class minus_exprt:public binary_exprt
