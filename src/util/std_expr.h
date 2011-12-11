@@ -323,6 +323,14 @@ public:
     binary_exprt(_lhs, ID_plus, _rhs)
   {
   }
+
+  inline plus_exprt(
+    const exprt &_lhs,
+    const exprt &_rhs,
+    const typet &_type):
+    binary_exprt(_lhs, ID_plus, _rhs, _type)
+  {
+  }
 };
 
 /*! \brief binary minus
