@@ -83,7 +83,7 @@ protected:
   void convert_constant(const constant_exprt &expr, bool bool_as_bv);
   void convert_relation(const exprt &expr, bool bool_as_bv);
   void convert_is_dynamic_object(const exprt &expr, bool bool_as_bv);
-  void convert_plus(const exprt &expr);
+  void convert_plus(const plus_exprt &expr);
   void convert_minus(const exprt &expr);
   void convert_div(const exprt &expr);
   void convert_mul(const exprt &expr);
