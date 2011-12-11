@@ -14,6 +14,7 @@ Revision: Roberto Bruttomesso, roberto.bruttomesso@unisi.ch
 #include <set>
 
 #include <hash_cont.h>
+#include <std_expr.h>
 
 #include <solvers/prop/prop_conv.h>
 #include <solvers/flattening/pointer_logic.h>
@@ -84,7 +85,7 @@ protected:
   void convert_relation(const exprt &expr, bool bool_as_bv);
   void convert_is_dynamic_object(const exprt &expr, bool bool_as_bv);
   void convert_plus(const plus_exprt &expr);
-  void convert_minus(const exprt &expr);
+  void convert_minus(const minus_exprt &expr);
   void convert_div(const div_exprt &expr);
   void convert_mult(const mult_exprt &expr);
   void convert_mod(const mod_exprt &expr);
