@@ -731,7 +731,7 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
   }
   else if(expr.id()==ID_plus)
   {
-    convert_plus(expr);
+    convert_plus(to_plus_expr(expr));
   }
   else if(expr.id()==ID_minus)
   {
@@ -1919,7 +1919,7 @@ Function: smt1_convt::convert_plus
 
 \*******************************************************************/
 
-void smt1_convt::convert_plus(const exprt &expr)
+void smt1_convt::convert_plus(const plus_exprt &expr)
 {
   assert(expr.operands().size()>=2);
 
@@ -1931,39 +1931,62 @@ void smt1_convt::convert_plus(const exprt &expr)
   }
   else if(expr.type().id()==ID_pointer)
   {
-    if(expr.operands().size()!=2)
-      throw "pointer arithmetic with more than two operands";
-
-    exprt p=expr.op0(), i=expr.op1();
-
-    if(p.type().id()!=ID_pointer)
-      p.swap(i);
-
-    if(p.type().id()!=ID_pointer)
-      throw "unexpected mixture in pointer arithmetic";
-
-    mp_integer element_size=
-      pointer_offset_size(ns, expr.type().subtype());
-      
-    // adjust width if needed    
-    if(boolbv_width(i.type())!=boolbv_width(expr.type()))
-      i.make_typecast(signedbv_typet(boolbv_width(expr.type())));
-
-    smt1_prop.out << "(bvadd ";
-    convert_expr(p, true);
-    smt1_prop.out << " ";
-
-    if(element_size>=2)
+    if(expr.operands().size()<2)
+      throw "pointer arithmetic with less than two operands";
+  
+    if(expr.operands().size()==2)
     {
-      smt1_prop.out << "(bvmul ";
-      convert_expr(i, true);
-      smt1_prop.out << " bv" << element_size
-                    << "[" << boolbv_width(expr.type()) << "])";
+      exprt p=expr.op0(), i=expr.op1();
+
+      if(p.type().id()!=ID_pointer)
+        p.swap(i);
+
+      if(p.type().id()!=ID_pointer)
+        throw "unexpected mixture in pointer arithmetic";
+
+      mp_integer element_size=
+        pointer_offset_size(ns, expr.type().subtype());
+        
+      // adjust width if needed    
+      if(boolbv_width(i.type())!=boolbv_width(expr.type()))
+        i.make_typecast(signedbv_typet(boolbv_width(expr.type())));
+
+      smt1_prop.out << "(bvadd ";
+      convert_expr(p, true);
+      smt1_prop.out << " ";
+
+      if(element_size>=2)
+      {
+        smt1_prop.out << "(bvmul ";
+        convert_expr(i, true);
+        smt1_prop.out << " bv" << element_size
+                      << "[" << boolbv_width(expr.type()) << "])";
+      }
+      else
+        convert_expr(i, true);
+
+      smt1_prop.out << ")";
     }
     else
-      convert_expr(i, true);
+    {
+      // more than two operands
+      exprt p;
+      typet integer_type=signedbv_typet(boolbv_width(expr.type()));
+      exprt integer_sum(ID_plus, integer_type);
+      
+      forall_operands(it, expr)
+        if(it->type().id()==ID_pointer)
+          p=*it;
+        else
+          integer_sum.copy_to_operands(*it);
+          
+      Forall_operands(it, integer_sum)
+        if(it->type()!=expr.type())
+          it->make_typecast(expr.type());
 
-    smt1_prop.out << ")";
+      plus_exprt pointer_arithmetic(p, integer_sum, expr.type());
+      convert_plus(pointer_arithmetic);
+    }
   }
   else if(expr.type().id()==ID_rational ||
           expr.type().id()==ID_integer)
