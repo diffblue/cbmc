@@ -38,8 +38,11 @@ void c_typecheck_baset::typecheck_type(typet &type)
   if(type.find(ID_C_alignment).is_not_nil())
   {
     exprt &alignment=static_cast<exprt &>(type.add(ID_C_alignment));
-    typecheck_expr(alignment);
-    make_constant(alignment);
+    if(alignment.id()!=ID_default)
+    {
+      typecheck_expr(alignment);
+      make_constant(alignment);
+    }
   }
 
   if(type.id()==ID_code)
