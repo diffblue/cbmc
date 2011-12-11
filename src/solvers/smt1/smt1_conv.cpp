@@ -739,15 +739,15 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
   }
   else if(expr.id()==ID_div)
   {
-    convert_div(expr);
+    convert_div(to_div_expr(expr));
   }
   else if(expr.id()==ID_mod)
   {
-    convert_mod(expr);
+    convert_mod(to_mod_expr(expr));
   }
   else if(expr.id()==ID_mult)
   {
-    convert_mul(expr);
+    convert_mult(to_mult_expr(expr));
   }
   else if(expr.id()==ID_address_of)
   {
@@ -1745,7 +1745,7 @@ Function: smt1_convt::convert_mod
 
 \*******************************************************************/
 
-void smt1_convt::convert_mod(const exprt &expr)
+void smt1_convt::convert_mod(const mod_exprt &expr)
 {
   assert(expr.operands().size()==2);
 
@@ -2060,7 +2060,7 @@ Function: smt1_convt::convert_div
 
 \*******************************************************************/
 
-void smt1_convt::convert_div(const exprt &expr)
+void smt1_convt::convert_div(const div_exprt &expr)
 {
   assert(expr.operands().size()==2);
 
@@ -2101,7 +2101,7 @@ void smt1_convt::convert_div(const exprt &expr)
 
 /*******************************************************************\
 
-Function: smt1_convt::convert_mul
+Function: smt1_convt::convert_mult
 
   Inputs:
 
@@ -2111,7 +2111,7 @@ Function: smt1_convt::convert_mul
 
 \*******************************************************************/
 
-void smt1_convt::convert_mul(const exprt &expr)
+void smt1_convt::convert_mult(const mult_exprt &expr)
 {
   assert(expr.operands().size()>=2);
 

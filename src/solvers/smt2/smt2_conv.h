@@ -86,10 +86,10 @@ protected:
   void convert_relation(const exprt &expr);
   void convert_is_dynamic_object(const exprt &expr);
   void convert_plus(const plus_exprt &expr);
-  void convert_minus(const exprt &expr);
-  void convert_div(const exprt &expr);
-  void convert_mul(const exprt &expr);
-  void convert_mod(const exprt &expr);
+  void convert_minus(const minus_exprt &expr);
+  void convert_div(const div_exprt &expr);
+  void convert_mult(const mult_exprt &expr);
+  void convert_mod(const mod_exprt &expr);
   void convert_index(const index_exprt &expr);
   void convert_member(const member_exprt &expr);
   void convert_overflow(const exprt &expr);

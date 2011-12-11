@@ -85,9 +85,9 @@ protected:
   void convert_is_dynamic_object(const exprt &expr, bool bool_as_bv);
   void convert_plus(const plus_exprt &expr);
   void convert_minus(const exprt &expr);
-  void convert_div(const exprt &expr);
-  void convert_mul(const exprt &expr);
-  void convert_mod(const exprt &expr);
+  void convert_div(const div_exprt &expr);
+  void convert_mult(const mult_exprt &expr);
+  void convert_mod(const mod_exprt &expr);
   void convert_index(const index_exprt &expr, bool bool_as_bv);
   void convert_member(const member_exprt &expr, bool bool_as_bv);
   void convert_overflow(const exprt &expr);
