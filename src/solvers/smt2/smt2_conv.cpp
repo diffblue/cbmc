@@ -453,8 +453,32 @@ Function: smt2_convt::convert_identifier
 
 std::string smt2_convt::convert_identifier(const irep_idt &identifier)
 {
-  // TODO: need to search for '|' in there
-  std::string result="|"+id2string(identifier)+"|";
+  // Backslashes are disallowed in quoted symbols just for simplicity. 
+  // Otherwise, for Common Lisp compatibility they would have to be treated
+  // as escaping symbols.
+  
+  std::string result="|";
+  
+  for(unsigned i=0; i<identifier.size(); i++)
+  {
+    char ch=identifier[i];
+    
+    switch(ch)
+    {
+    case '|':
+    case '\\':
+    case '&':
+      result+="&";
+      result+=i2string(ch);
+      result+=';';
+      break;
+      
+    default:
+      result+=ch;
+    }
+  }
+  
+  result+='|';
   return result;
 }
 
