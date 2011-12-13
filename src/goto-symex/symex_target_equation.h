@@ -37,6 +37,13 @@ public:
     const sourcet &source,
     assignment_typet assignment_type);
     
+  // declare fresh variable - lhs must be symbol
+  virtual void decl(
+    const guardt &guard,
+    const symbol_exprt &ssa_lhs,
+    const symbol_exprt &original_lhs_object,
+    const sourcet &source);
+
   // just record a location
   virtual void location(
     const guardt &guard,
@@ -98,11 +105,12 @@ public:
     bool is_assignment() const { return type==goto_trace_stept::ASSIGNMENT; }
     bool is_location() const   { return type==goto_trace_stept::LOCATION; }
     bool is_output() const     { return type==goto_trace_stept::OUTPUT; }
+    bool is_decl() const       { return type==goto_trace_stept::DECL; }
     
     exprt guard_expr;
     literalt guard_literal;
 
-    // for ASSIGNMENT  
+    // for ASSIGNMENT and DECL
     symbol_exprt ssa_lhs, original_lhs_object;
     exprt ssa_full_lhs, original_full_lhs;
     exprt ssa_rhs;

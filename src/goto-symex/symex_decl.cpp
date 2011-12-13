@@ -44,7 +44,7 @@ void goto_symext::symex_decl(statet &state)
     throw "decl expects symbol as first operand";
 
   // just do the L1 renaming to preserve locality
-  const irep_idt &identifier=code.op0().get(ID_identifier);
+  const irep_idt &identifier=to_symbol_expr(code.op0()).get_identifier();
 
   irep_idt l1_identifier=state.top().level1(identifier);
 
@@ -98,4 +98,14 @@ void goto_symext::symex_decl(statet &state)
     l1_lhs.set_identifier(l1_identifier);
     state.value_set.assign(l1_lhs, rhs, ns);
   }
+  
+  // record the declaration
+  symbol_exprt original_lhs=to_symbol_expr(code.op0());
+  symbol_exprt ssa_lhs=original_lhs;
+  state.rename(ssa_lhs, ns);
+  
+  target.decl(
+    state.guard,
+    ssa_lhs, original_lhs,
+    state.source);
 }

@@ -64,6 +64,7 @@ void goto_trace_stept::output(
   case goto_trace_stept::ASSUME: out << "ASSUME"; break;
   case goto_trace_stept::LOCATION: out << "LOCATION"; break;
   case goto_trace_stept::ASSIGNMENT: out << "ASSIGNMENT"; break;
+  case goto_trace_stept::DECL: out << "DECL"; break;
   case goto_trace_stept::OUTPUT: out << "OUTPUT"; break;
   case goto_trace_stept::INPUT: out << "INPUT"; break;
   default: assert(false);
@@ -89,6 +90,8 @@ void goto_trace_stept::output(
     out << "OTHER  ";
   else if(pc->is_assign())
     out << "ASSIGN ";
+  else if(pc->is_decl())
+    out << "DECL   ";
   else if(pc->is_function_call())
     out << "CALL   ";
   else
@@ -416,6 +419,17 @@ void show_goto_trace(
         else
           counterexample_value(out, ns, it->lhs_object, it->lhs_object, it->lhs_object_value);
       }
+      break;
+
+    case goto_trace_stept::DECL:
+      if(prev_step_nr!=it->step_nr || first_step)
+      {
+        first_step=false;
+        prev_step_nr=it->step_nr;
+        show_state_header(out, *it, it->pc->location, it->step_nr);
+      }
+
+      counterexample_value(out, ns, it->lhs_object, it->full_lhs, it->full_lhs_value);
       break;
 
     case goto_trace_stept::OUTPUT:

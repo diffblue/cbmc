@@ -172,6 +172,7 @@ void convert(
       break;
       
     case goto_trace_stept::ASSIGNMENT:
+    case goto_trace_stept::DECL:
       {
         irep_idt identifier=it->lhs_object.get_identifier();
         xmlt &xml_assignment=xml.new_element("assignment");

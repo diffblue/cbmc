@@ -61,6 +61,38 @@ void symex_target_equationt::assignment(
 
 /*******************************************************************\
 
+Function: symex_target_equationt::decl
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: declare a fresh variable
+
+\*******************************************************************/
+
+void symex_target_equationt::decl(
+  const guardt &guard,
+  const symbol_exprt &ssa_lhs,
+  const symbol_exprt &original_lhs_object,
+  const sourcet &source)
+{
+  assert(ssa_lhs.is_not_nil());
+  
+  SSA_steps.push_back(SSA_stept());
+  SSA_stept &SSA_step=SSA_steps.back();
+  
+  SSA_step.guard_expr=guard.as_expr();
+  SSA_step.ssa_lhs=ssa_lhs;
+  SSA_step.ssa_full_lhs=ssa_lhs;
+  SSA_step.original_lhs_object=original_lhs_object;
+  SSA_step.original_full_lhs=original_lhs_object;
+  SSA_step.type=goto_trace_stept::DECL;
+  SSA_step.source=source;
+}
+
+/*******************************************************************\
+
 Function: symex_target_equationt::location
 
   Inputs:
@@ -495,6 +527,7 @@ void symex_target_equationt::SSA_stept::output(
   case goto_trace_stept::ASSUME: out << "ASSUME" << std::endl; break;
   case goto_trace_stept::LOCATION: out << "LOCATION" << std::endl; break;
   case goto_trace_stept::OUTPUT: out << "OUTPUT" << std::endl; break;
+  case goto_trace_stept::DECL: out << "DECL" << std::endl; break;
 
   case goto_trace_stept::ASSIGNMENT:
     out << "ASSIGNMENT (";
