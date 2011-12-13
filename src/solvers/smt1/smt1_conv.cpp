@@ -1981,11 +1981,11 @@ void smt1_convt::convert_plus(const plus_exprt &expr)
           integer_sum.copy_to_operands(*it);
           
       Forall_operands(it, integer_sum)
-        if(it->type()!=expr.type())
-          it->make_typecast(expr.type());
+        if(it->type()!=integer_type)
+          it->make_typecast(integer_type);
 
       plus_exprt pointer_arithmetic(p, integer_sum, expr.type());
-      convert_plus(pointer_arithmetic);
+      convert_plus(pointer_arithmetic); // recursive call
     }
   }
   else if(expr.type().id()==ID_rational ||
