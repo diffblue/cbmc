@@ -297,7 +297,14 @@ void goto_convertt::convert_label(
 
   if(!case_op.empty())
   {
-    exprt::operandst &case_op_dest=targets.cases[target];
+    cases_mapt::iterator cases_entry=targets.cases_map.find(target);
+    if(cases_entry==targets.cases_map.end())
+    {
+      targets.cases.push_back(std::make_pair(target, caset()));
+      cases_entry=targets.cases_map.insert(std::make_pair(
+            target, --targets.cases.end())).first;
+    }
+    exprt::operandst &case_op_dest=cases_entry->second->second;
     
     case_op_dest.reserve(case_op_dest.size()+case_op.size());
     
@@ -1249,6 +1256,7 @@ void goto_convertt::convert_switch(
   targets.set_break(z);
   targets.set_default(z);
   targets.cases.clear();
+  targets.cases_map.clear();
 
   goto_programt tmp;
 
