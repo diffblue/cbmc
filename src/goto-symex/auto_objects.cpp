@@ -91,7 +91,7 @@ void goto_symext::initialize_auto_object(
             address_of_exprt(make_auto_object(t.subtype()));
 
           code_assignt assignment(member_expr, rhs);
-          symex_assign(state, assignment);
+          symex_assign(state, assignment); /* TODO: needs clean */
         }
       }
     }
