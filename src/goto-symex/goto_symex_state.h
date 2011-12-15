@@ -102,8 +102,9 @@ public:
     typedef std::map<irep_idt, unsigned> current_namest;
     current_namest current_names;
 
+    using renaming_levelt::rename;
+
     virtual void rename(exprt &expr);
-    virtual void rename(typet &type) { renaming_levelt::rename(type); }
     virtual std::string operator()(const irep_idt &identifier) const;
     virtual void remove(const irep_idt &identifier) { current_names.erase(identifier); }
     
@@ -124,8 +125,9 @@ public:
   struct level2t:public renaming_levelt
   {
   public:
+    using renaming_levelt::rename;
+
     virtual void rename(exprt &expr);
-    virtual void rename(typet &type) { renaming_levelt::rename(type); }
     void rename_address(exprt &expr);
     virtual std::string operator()(const irep_idt &identifier) const;
     virtual void remove(const irep_idt &identifier) { current_names.erase(identifier); }
