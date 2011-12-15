@@ -260,7 +260,7 @@ void goto_symext::symex_function_call_code(
       exprt rhs=exprt(ID_nondet_symbol, call.lhs().type());
       rhs.set(ID_identifier, "symex::"+i2string(nondet_count++));
       rhs.location()=call.location();
-      state.top().level1.rename(rhs);
+      state.rename(rhs, ns, goto_symex_statet::L1);
       code_assignt code(call.lhs(), rhs);
       basic_symext::symex_assign(state, to_code_assign(code)); /* TODO: clean_expr? */
     }

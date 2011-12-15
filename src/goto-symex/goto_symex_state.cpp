@@ -365,7 +365,10 @@ Function: goto_symex_statet::rename
 
 \*******************************************************************/
 
-void goto_symex_statet::rename(exprt &expr, const namespacet &ns)
+void goto_symex_statet::rename(
+  exprt &expr,
+  const namespacet &ns,
+  levelt level)
 {
   // rename all the symbols with their last known value
   
@@ -373,8 +376,15 @@ void goto_symex_statet::rename(exprt &expr, const namespacet &ns)
 
   if(expr.id()==ID_symbol)
   {
-    top().level1.rename(expr);
-    level2.rename(expr);
+    if(level==L1)
+    {
+      top().level1.rename(expr);
+    }
+    else if(level==L2)
+    {
+      top().level1.rename(expr);
+      level2.rename(expr);
+    }
   }
   else if(expr.id()==ID_address_of)
   {
@@ -385,7 +395,7 @@ void goto_symex_statet::rename(exprt &expr, const namespacet &ns)
   {
     // do this recursively
     Forall_operands(it, expr)
-      rename(*it, ns);
+      rename(*it, ns, level);
   }
 }
 

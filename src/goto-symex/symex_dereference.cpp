@@ -340,7 +340,7 @@ void goto_symext::dereference(
   // from different frames. Would be enough to rename
   // symbols whose address is taken.
   assert(!state.call_stack.empty());
-  state.top().level1.rename(expr);
+  state.rename(expr, ns, goto_symex_statet::L1);
 
   // start the recursion!
   guardt guard;  
