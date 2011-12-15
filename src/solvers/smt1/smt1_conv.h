@@ -133,7 +133,10 @@ protected:
   
   void set_value(
     identifiert &identifier,
-    const std::string &v);
+    const std::string &v)
+  {
+    identifier.value=ce_value(identifier.type, v);
+  }
   
   typedef hash_map_cont<irep_idt, identifiert, irep_id_hash>
     identifier_mapt;
@@ -153,6 +156,10 @@ protected:
   // for replacing string constants
   typedef std::map<exprt, exprt> string2array_mapt;
   string2array_mapt string2array_map;
+  
+  exprt ce_value(
+    const typet &type,
+    const std::string &v) const;
   
   exprt binary2struct(
     const struct_typet &type, 

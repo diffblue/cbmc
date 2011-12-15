@@ -68,13 +68,20 @@ exprt smt1_convt::get(const exprt &expr) const
     if(it!=identifier_map.end())
       return it->second.value;
   }
+  else if(expr.id()==ID_member)
+  {
+    const member_exprt &member_expr=to_member_expr(expr);
+    exprt tmp=get(member_expr.struct_op());
+    if(tmp.is_nil()) return nil_exprt();
+    return member_exprt(tmp, member_expr.get_component_name(), expr.type());
+  }
 
-  return static_cast<const exprt &>(get_nil_irep());
+  return nil_exprt();
 }
 
 /*******************************************************************\
 
-Function: smt1_convt::set_value
+Function: smt1_convt::ce_value
 
   Inputs:
 
@@ -84,13 +91,12 @@ Function: smt1_convt::set_value
 
 \*******************************************************************/
 
-void smt1_convt::set_value(
-  identifiert &identifier,
-  const std::string &v)
+exprt smt1_convt::ce_value(
+  const typet &type,
+  const std::string &v) const
 {
-  identifier.value.make_nil();
-
-  const typet &type=ns.follow(identifier.type);
+  if(type.id()==ID_symbol)
+    return ce_value(ns.follow(type), v);
 
   if(type.id()==ID_signedbv ||
      type.id()==ID_unsignedbv ||
@@ -100,14 +106,14 @@ void smt1_convt::set_value(
     assert(v.size()==boolbv_width(type));
     constant_exprt c(type);
     c.set_value(v);
-    identifier.value=c;
+    return c;
   }
   else if(type.id()==ID_bool)
   {
     if(v=="1")
-      identifier.value.make_true();
+      return true_exprt();
     else if(v=="0")
-      identifier.value.make_false();
+      return false_exprt();
   }
   else if(type.id()==ID_pointer)
   {
@@ -123,16 +129,18 @@ void smt1_convt::set_value(
     p.offset=binary2integer(
       std::string(v, 0, i), true);
 
-    identifier.value=pointer_logic.pointer_expr(p, type);
+    return pointer_logic.pointer_expr(p, type);
   }
   else if(type.id()==ID_struct)
   {
-    identifier.value=binary2struct(to_struct_type(type), v);
+    return binary2struct(to_struct_type(type), v);
   }
   else if(type.id()==ID_union)
   {
-    identifier.value=binary2union(to_union_type(type), v);
+    return binary2union(to_union_type(type), v);
   }
+
+  return nil_exprt();
 }
 
 /*******************************************************************\
@@ -2974,49 +2982,30 @@ exprt smt1_convt::binary2struct(
 {
   const struct_typet::componentst &components=type.components();
 
-  // std::cout << "S: " << stype << std::endl;
-
   unsigned total_width=boolbv_width(type);
 
   if(total_width==0)
     throw "failed to get struct width";
 
-  // std::cout << "B: " << binary << std::endl;
+  exprt e(ID_struct, type);
+  e.operands().resize(components.size());
 
-  exprt e(type.id(), type);
-
-  unsigned inx=binary.size();
+  unsigned index=binary.size();
   for(unsigned i=0; i<components.size(); i++)
   {
-    const struct_union_typet::componentt &comp=components[i];
+    const struct_typet::componentt &comp=components[i];
+    const typet &sub_type=ns.follow(comp.type());
 
-    unsigned sub_size=boolbv_width(comp.type());
+    unsigned sub_size=boolbv_width(sub_type);
     
     if(sub_size==0)
       throw "failed to get component width";
 
-    inx-=sub_size;
-    std::string cval=binary.substr(inx, sub_size);
-    // std::cout << "CV[" << sub_size << "]: " << cval << std::endl;
-
-    if(comp.type().id()==ID_struct)
-    {
-      exprt c=binary2struct(to_struct_type(comp.type()), cval);
-      e.move_to_operands(c);
-    }
-    else if(comp.type().id()==ID_union)
-    {
-      exprt c=binary2union(to_union_type(comp.type()), cval);
-      e.move_to_operands(c);
-    }
-    else
-    {
-      constant_exprt c(comp.type());
-      c.set_value(cval);
-      e.move_to_operands(c);
-    }
+    index-=sub_size;
+    std::string cval=binary.substr(index, sub_size);
+    e.operands()[i]=ce_value(sub_type, cval);
   }
-
+  
   return e;
 }
 

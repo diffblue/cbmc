@@ -66,8 +66,15 @@ exprt smt2_convt::get(const exprt &expr) const
     if(it!=identifier_map.end())
       return it->second.value;
   }
+  else if(expr.id()==ID_member)
+  {
+    const member_exprt &member_expr=to_member_expr(expr);
+    exprt tmp=get(member_expr.struct_op());
+    if(tmp.is_nil()) return nil_exprt();
+    return member_exprt(tmp, member_expr.get_component_name(), expr.type());
+  }
 
-  return static_cast<const exprt &>(get_nil_irep());
+  return nil_exprt();
 }
 
 /*******************************************************************\
