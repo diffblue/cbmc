@@ -128,7 +128,6 @@ public:
     using renaming_levelt::rename;
 
     virtual void rename(exprt &expr);
-    void rename_address(exprt &expr);
     virtual std::string operator()(const irep_idt &identifier) const;
     virtual void remove(const irep_idt &identifier) { current_names.erase(identifier); }
 
