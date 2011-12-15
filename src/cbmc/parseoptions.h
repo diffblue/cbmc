@@ -16,7 +16,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "xml_interface.h"
 
-class bmc_baset;
 class bmct;
 class goto_functionst;
 class optionst;
@@ -24,7 +23,7 @@ class optionst;
 #define CBMC_OPTIONS \
   "(program-only)(function):(preprocess)(slice-by-trace):" \
   "(no-simplify)(unwind):(unwindset):(slice-formula)" \
-  "(debug-level):(no-substitution)(no-simplify-if)" \
+  "(debug-level):(no-propagation)(no-simplify-if)" \
   "(bounds-check)(outfile):(pointer-check)" \
   "(document-subgoals)(all-claims)D:I:(depth):" \
   "(div-by-zero-check)(no-unwinding-assertions)" \
@@ -67,7 +66,7 @@ protected:
   virtual void register_languages();
 
   virtual void get_command_line_options(optionst &options);
-  virtual int do_bmc(bmc_baset &bmc, const goto_functionst &goto_functions);
+  virtual int do_bmc(bmct &bmc, const goto_functionst &goto_functions);
 
   virtual bool get_goto_program(
     const optionst &options,
@@ -83,7 +82,7 @@ protected:
   void set_verbosity(messaget &message);
   
   // get any additional stuff before finalizing
-  virtual bool get_modules(bmc_baset &bmc)
+  virtual bool get_modules(bmct &bmc)
   {
     return false;
   }

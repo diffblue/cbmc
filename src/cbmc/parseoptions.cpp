@@ -159,11 +159,11 @@ void cbmc_parseoptionst::get_command_line_options(optionst &options)
   if(cmdline.isset("unwindset"))
     options.set_option("unwindset", cmdline.getval("unwindset"));
 
-  // substitution previous expressions
-  if(cmdline.isset("no-substitution"))
-    options.set_option("substitution", false);
+  // constant propagation
+  if(cmdline.isset("no-propagation"))
+    options.set_option("propagation", false);
   else
-    options.set_option("substitution", true);
+    options.set_option("propagation", true);
 
   // check array bounds
   if(cmdline.isset("bounds-check"))
@@ -317,14 +317,14 @@ int cbmc_parseoptionst::doit()
   
   register_languages();
 
-  optionst options;
-  bmct bmc(options, context, ui_message_handler);
-
   //
   // command line options
   //
 
+  optionst options;
   get_command_line_options(options);
+
+  bmct bmc(options, context, ui_message_handler);
   set_verbosity(bmc);
   set_verbosity(*this);
   
@@ -700,7 +700,7 @@ Function: cbmc_parseoptionst::do_bmc
 \*******************************************************************/
 
 int cbmc_parseoptionst::do_bmc(
-  bmc_baset &bmc,
+  bmct &bmc,
   const goto_functionst &goto_functions)
 {
   bmc.set_ui(get_ui());

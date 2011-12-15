@@ -23,7 +23,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
-Function: bmc_baset::decide_default
+Function: bmct::decide_default
 
   Inputs:
 
@@ -33,7 +33,7 @@ Function: bmc_baset::decide_default
 
 \*******************************************************************/
 
-bool bmc_baset::decide_default()
+bool bmct::decide_default()
 {
   #if 1
   sat_minimizert satcheck;
@@ -108,7 +108,7 @@ bool bmc_baset::decide_default()
 
 /*******************************************************************\
 
-Function: bmc_baset::bv_refinement
+Function: bmct::bv_refinement
 
   Inputs:
 
@@ -118,7 +118,7 @@ Function: bmc_baset::bv_refinement
 
 \*******************************************************************/
 
-bool bmc_baset::decide_bv_refinement()
+bool bmct::decide_bv_refinement()
 {
   #ifdef HAVE_BV_REFINEMENT
   satcheckt satcheck;
@@ -135,7 +135,7 @@ bool bmc_baset::decide_bv_refinement()
 
 /*******************************************************************\
 
-Function: bmc_baset::decide_smt1
+Function: bmct::decide_smt1
 
   Inputs:
 
@@ -145,7 +145,7 @@ Function: bmc_baset::decide_smt1
 
 \*******************************************************************/
 
-bool bmc_baset::decide_smt1(smt1_dect::solvert solver)
+bool bmct::decide_smt1(smt1_dect::solvert solver)
 {
   const std::string &filename=options.get_option("outfile");
   
@@ -178,7 +178,7 @@ bool bmc_baset::decide_smt1(smt1_dect::solvert solver)
 
 /*******************************************************************\
 
-Function: bmc_baset::smt1_convert
+Function: bmct::smt1_convert
 
   Inputs:
 
@@ -188,7 +188,7 @@ Function: bmc_baset::smt1_convert
 
 \*******************************************************************/
 
-void bmc_baset::smt1_convert(std::ostream &out)
+void bmct::smt1_convert(std::ostream &out)
 {
   smt1_convt smt1_conv(
     ns,
@@ -206,7 +206,7 @@ void bmc_baset::smt1_convert(std::ostream &out)
 
 /*******************************************************************\
 
-Function: bmc_baset::decide_smt2
+Function: bmct::decide_smt2
 
   Inputs:
 
@@ -216,7 +216,7 @@ Function: bmc_baset::decide_smt2
 
 \*******************************************************************/
 
-bool bmc_baset::decide_smt2(smt2_dect::solvert solver)
+bool bmct::decide_smt2(smt2_dect::solvert solver)
 {
   const std::string &filename=options.get_option("outfile");
   
@@ -253,7 +253,7 @@ bool bmc_baset::decide_smt2(smt2_dect::solvert solver)
 
 /*******************************************************************\
 
-Function: bmc_baset::smt2_convert
+Function: bmct::smt2_convert
 
   Inputs:
 
@@ -263,7 +263,7 @@ Function: bmc_baset::smt2_convert
 
 \*******************************************************************/
 
-void bmc_baset::smt2_convert(std::ostream &out)
+void bmct::smt2_convert(std::ostream &out)
 {
   smt2_convt smt2_conv(
     ns,
@@ -284,7 +284,7 @@ void bmc_baset::smt2_convert(std::ostream &out)
 
 /*******************************************************************\
 
-Function: bmc_baset::decide_cvc
+Function: bmct::decide_cvc
 
   Inputs:
 
@@ -294,14 +294,14 @@ Function: bmc_baset::decide_cvc
 
 \*******************************************************************/
 
-bool bmc_baset::decide_cvc()
+bool bmct::decide_cvc()
 {
   return decide_smt1(smt1_dect::CVC3);
 }
 
 /*******************************************************************\
 
-Function: bmc_baset::decide_boolector
+Function: bmct::decide_boolector
 
   Inputs:
 
@@ -311,14 +311,14 @@ Function: bmc_baset::decide_boolector
 
 \*******************************************************************/
 
-bool bmc_baset::decide_boolector()
+bool bmct::decide_boolector()
 {
   return decide_smt1(smt1_dect::BOOLECTOR);
 }
 
 /*******************************************************************\
 
-Function: bmc_baset::decide_opensmt
+Function: bmct::decide_opensmt
 
   Inputs:
 
@@ -328,14 +328,14 @@ Function: bmc_baset::decide_opensmt
 
 \*******************************************************************/
 
-bool bmc_baset::decide_opensmt()
+bool bmct::decide_opensmt()
 {
   return decide_smt1(smt1_dect::OPENSMT);
 }
 
 /*******************************************************************\
 
-Function: bmc_baset::decide_z3
+Function: bmct::decide_z3
 
   Inputs:
 
@@ -345,14 +345,14 @@ Function: bmc_baset::decide_z3
 
 \*******************************************************************/
 
-bool bmc_baset::decide_z3()
+bool bmct::decide_z3()
 {
   return decide_smt1(smt1_dect::Z3);
 }
 
 /*******************************************************************\
 
-Function: bmc_baset::decide_yices
+Function: bmct::decide_yices
 
   Inputs:
 
@@ -362,7 +362,7 @@ Function: bmc_baset::decide_yices
 
 \*******************************************************************/
 
-bool bmc_baset::decide_yices()
+bool bmct::decide_yices()
 {
   return decide_smt1(smt1_dect::YICES);
 }
