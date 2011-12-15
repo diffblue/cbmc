@@ -193,7 +193,7 @@ Function: smt1_dect::read_result_boolector
 
  Outputs:
 
- Purpose:
+ Purpose: read model produced by Boolector
 
 \*******************************************************************/
 
