@@ -171,8 +171,10 @@ public:
 
     virtual void print(std::ostream &out) const;
   } level2;
+  
+  typedef enum { L1, L2 } levelt;
 
-  void rename(exprt &expr, const namespacet &ns);
+  void rename(exprt &expr, const namespacet &ns, levelt level=L2);
   void rename_address(exprt &expr, const namespacet &ns);
   void rename(typet &type, const namespacet &ns);
   
