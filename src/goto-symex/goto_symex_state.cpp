@@ -693,6 +693,72 @@ const irep_idt &goto_symex_statet::renaming_levelt::get_original_name(
   return it->second;
 }
 
+ /*******************************************************************\
+ 
+Function: goto_symex_statet::get_original_name
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void goto_symex_statet::get_original_name(typet &type) const
+{
+  // rename all the symbols with their last known value
+
+  if(type.id()==ID_array)
+  {
+    get_original_name(type.subtype());
+    get_original_name((exprt &)type.add(ID_size));
+  }
+  else if(type.id()==ID_struct ||
+          type.id()==ID_union ||
+          type.id()==ID_class)
+  {
+    // TODO
+  }
+  else if(type.id()==ID_pointer)
+  {
+    get_original_name(type.subtype());
+  }
+}
+
+/*******************************************************************\
+
+Function: goto_symex_statet::renaming_levelt::get_original_name
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void goto_symex_statet::renaming_levelt::get_original_name(typet &type) const
+{
+  // rename all the symbols with their last known value
+
+  if(type.id()==ID_array)
+  {
+    get_original_name(type.subtype());
+    get_original_name((exprt &)type.add(ID_size));
+  }
+  else if(type.id()==ID_struct ||
+          type.id()==ID_union ||
+          type.id()==ID_class)
+  {
+    // TODO
+  }
+  else if(type.id()==ID_pointer)
+  {
+    get_original_name(type.subtype());
+  }
+}
+
 /*******************************************************************\
 
 Function: goto_symex_statet::get_original_identifier

@@ -45,6 +45,7 @@ public:
   public:
     virtual const irep_idt &get_original_name(const irep_idt &identifier) const;
     virtual void get_original_name(exprt &expr) const;
+    virtual void get_original_name(typet &type) const;
     virtual void rename(exprt &expr)=0;
     virtual void rename(typet &type);
     virtual void remove(const irep_idt &identifier)=0;
@@ -125,6 +126,7 @@ public:
   public:
     virtual void rename(exprt &expr);
     virtual void rename(typet &type) { renaming_levelt::rename(type); }
+    void rename_address(exprt &expr);
     virtual std::string operator()(const irep_idt &identifier) const;
     virtual void remove(const irep_idt &identifier) { current_names.erase(identifier); }
 
@@ -184,9 +186,10 @@ public:
   bool constant_propagation(const exprt &expr) const;
   bool constant_propagation_reference(const exprt &expr) const;
 
-  // undoes both levels of renaming
+  // undoes all levels of renaming
   const irep_idt &get_original_name(const irep_idt &identifier) const;
   void get_original_name(exprt &expr) const;
+  void get_original_name(typet &type) const;
   
   // does all levels of renaming
   std::string current_name(
