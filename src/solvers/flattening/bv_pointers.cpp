@@ -545,8 +545,8 @@ void bv_pointerst::convert_bitvector(const exprt &expr, bvt &bv)
     // we need to strip off the object part
     op0.resize(offset_bits);
 
-    // we add zeros if needed
-    bv=bv_utils.zero_extension(op0, width);
+    // we do a sign extension to permit negative offsets
+    bv=bv_utils.sign_extension(op0, width);
 
     return;
   }
