@@ -61,7 +61,215 @@ void goto_symex_statet::initialize(const goto_functionst &goto_functions)
 
 /*******************************************************************\
 
-Function: goto_symex_statet::name_frame
+Function: goto_symex_statet::level0t::name
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+#if 0
+std::string goto_symex_statet::level0t::name(
+  const irep_idt &identifier,
+  unsigned thread_nr) const
+{
+  return id2string(identifier)+"!"+i2string(thread_nr);
+}
+#endif
+
+/*******************************************************************\
+
+Function: goto_symex_statet::level0t::rename
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+#if 0
+void goto_symex_statet::level0t::rename(
+  exprt &expr,
+  const namespacet &ns,
+  unsigned thread_nr)
+{
+  // rename all symbols according to thread number
+
+  rename(expr.type(), ns, thread_nr);
+
+  if(expr.id()==ID_symbol && expr.type().id()!=ID_code)
+  {
+    irep_idt temp = expr.get(ID_identifier);
+    rename(temp, ns, thread_nr);
+    expr.set(ID_identifier, temp);
+  }
+  else if(expr.id()==ID_address_of)
+  {
+    assert(expr.operands().size()==1);
+    rename(expr.op0(), ns, thread_nr);
+  }
+  else
+  {
+    // do this recursively
+    Forall_operands(it, expr)
+      rename(*it, ns, thread_nr);
+  }
+}
+#endif
+
+/*******************************************************************\
+
+Function: goto_symex_statet::level0t::rename
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+#if 0
+void goto_symex_statet::level0t::rename(
+  typet &type,
+  const namespacet &ns,
+  unsigned thread_nr)
+{
+  // copied from goto_symex_statet::rename(typet &type, const namespacet& ns)
+  // rename all symbols according to thread number
+
+  if(type.id()==ID_array)
+  {
+    rename(type.subtype(), ns, thread_nr);
+    rename(static_cast<exprt &>(type.add(ID_size)), ns, thread_nr);
+  }
+  else if(type.id()==ID_struct ||
+          type.id()==ID_union ||
+          type.id()==ID_class)
+  {
+    // TODO
+  }
+  else if(type.id()==ID_pointer)
+  {
+    // rename(type.subtype(), ns);
+    // don't do this, or it might get cyclic
+  }
+  else if(type.id()==ID_symbol)
+  {
+    const symbolt &symbol=ns.lookup(type.get(ID_identifier));
+    type=symbol.type;
+    rename(type, ns, thread_nr);
+  }
+}
+#endif
+
+/*******************************************************************\
+
+Function: goto_symex_statet::level0t::rename
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+#if 0
+void goto_symex_statet::level0t::rename(
+  irep_idt &identifier,
+  const namespacet &ns,
+  unsigned thread_nr)
+{
+  if(original_identifiers.end() == original_identifiers.find(identifier))
+  {
+    if(identifier=="goto_symex::\\guard" || is_global(ns.lookup(identifier)))
+      return;
+
+    irep_idt backup = identifier;
+    identifier = name(identifier, thread_nr);
+    original_identifiers[identifier] = backup;
+  }
+  else
+  {
+    irep_idt backup = identifier;
+    identifier = name(original_identifiers[backup], thread_nr);
+    original_identifiers[identifier] = original_identifiers[backup];
+  }
+}
+#endif
+
+/*******************************************************************\
+
+Function: goto_symex_statet::level0t::print
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+#if 0
+void goto_symex_statet::level0t::print(std::ostream &out) const
+{
+  assert(false);
+}
+#endif
+
+/*******************************************************************\
+
+Function: goto_symex_statet::level0t::operator()
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+#if 0
+std::string goto_symex_statet::level0t::operator()(
+  const irep_idt &identifier) const
+{
+  assert(false);
+  return "";
+}
+#endif
+
+/*******************************************************************\
+
+Function: goto_symex_statet::level0t::operator()
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+#if 0
+std::string goto_symex_statet::level0t::operator()(
+  const irep_idt &identifier, const namespacet& ns, unsigned thread_nr) const
+{
+  if(identifier=="goto_symex::\\guard" || is_global(ns.lookup(identifier)))
+    return id2string(identifier);
+
+  return name(identifier, thread_nr);
+}
+#endif
+
+/*******************************************************************\
+
+Function: goto_symex_statet::level1t::name
 
   Inputs:
 
@@ -80,7 +288,7 @@ std::string goto_symex_statet::level1t::name(
 
 /*******************************************************************\
 
-Function: goto_symex_statet::name_count
+Function: goto_symex_statet::level2t::name
 
   Inputs:
 
@@ -99,7 +307,7 @@ std::string goto_symex_statet::level2t::name(
 
 /*******************************************************************\
 
-Function: goto_symex_statet::current_number
+Function: goto_symex_statet::level2t::current_number
 
   Inputs:
 
