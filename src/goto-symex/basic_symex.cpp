@@ -62,7 +62,7 @@ void basic_symext::symex(statet &state, const codet &code)
   if(statement==ID_block)
     symex_block(state, code);
   else if(statement==ID_assign)
-    symex_assign(state, to_code_assign(code));
+    symex_assign(state, to_code_assign(code)); /* TODO: expression must be clean */
   else if(statement==ID_decl)
   {
     // behaves like non-deterministic assignment

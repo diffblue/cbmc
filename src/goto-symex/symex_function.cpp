@@ -260,8 +260,9 @@ void goto_symext::symex_function_call_code(
       exprt rhs=exprt(ID_nondet_symbol, call.lhs().type());
       rhs.set(ID_identifier, "symex::"+i2string(nondet_count++));
       rhs.location()=call.location();
+      state.top().level1.rename(rhs);
       code_assignt code(call.lhs(), rhs);
-      basic_symext::symex(state, code);
+      basic_symext::symex_assign(state, to_code_assign(code)); /* TODO: clean_expr? */
     }
 
     state.source.pc++;
@@ -413,7 +414,7 @@ void goto_symext::return_assignment(statet &state)
   {
     exprt value(code.op0());
     
-    dereference(value, state, false);
+    dereference(value, state, false); /* TODO: clean_expr? */
   
     if(frame.return_value.is_not_nil())
     {
