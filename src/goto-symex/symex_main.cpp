@@ -86,6 +86,7 @@ void goto_symext::operator()(
 {
   state.source.is_set=true;
   state.source.pc=goto_program.instructions.begin();
+  state.source.thread_nr=0;
   state.top().end_of_function=--goto_program.instructions.end();
   state.top().calling_location=state.top().end_of_function;
 
