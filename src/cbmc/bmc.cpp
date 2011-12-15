@@ -32,7 +32,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
-Function: bmc_baset::do_unwind_module
+Function: bmct::do_unwind_module
 
   Inputs:
 
@@ -42,14 +42,14 @@ Function: bmc_baset::do_unwind_module
 
 \*******************************************************************/
 
-void bmc_baset::do_unwind_module(
+void bmct::do_unwind_module(
   decision_proceduret &decision_procedure)
 {
 }
 
 /*******************************************************************\
 
-Function: bmc_baset::error_trace
+Function: bmct::error_trace
 
   Inputs:
 
@@ -59,7 +59,7 @@ Function: bmc_baset::error_trace
 
 \*******************************************************************/
 
-void bmc_baset::error_trace(const prop_convt &prop_conv)
+void bmct::error_trace(const prop_convt &prop_conv)
 {
   status("Building error trace");
 
@@ -105,7 +105,7 @@ void bmc_baset::error_trace(const prop_convt &prop_conv)
 
 /*******************************************************************\
 
-Function: bmc_baset::do_conversion
+Function: bmct::do_conversion
 
   Inputs:
 
@@ -115,7 +115,7 @@ Function: bmc_baset::do_conversion
 
 \*******************************************************************/
 
-void bmc_baset::do_conversion(prop_convt &prop_conv)
+void bmct::do_conversion(prop_convt &prop_conv)
 {
   // convert HDL
   do_unwind_module(prop_conv);
@@ -130,7 +130,7 @@ void bmc_baset::do_conversion(prop_convt &prop_conv)
 
 /*******************************************************************\
 
-Function: bmc_baset::run_decision_procedure
+Function: bmct::run_decision_procedure
 
   Inputs:
 
@@ -141,7 +141,7 @@ Function: bmc_baset::run_decision_procedure
 \*******************************************************************/
 
 decision_proceduret::resultt
-bmc_baset::run_decision_procedure(prop_convt &prop_conv)
+bmct::run_decision_procedure(prop_convt &prop_conv)
 {
   status("Passing problem to "+prop_conv.decision_procedure_text());
 
@@ -173,7 +173,7 @@ bmc_baset::run_decision_procedure(prop_convt &prop_conv)
 
 /*******************************************************************\
 
-Function: bmc_baset::report_success
+Function: bmct::report_success
 
   Inputs:
 
@@ -183,7 +183,7 @@ Function: bmc_baset::report_success
 
 \*******************************************************************/
 
-void bmc_baset::report_success()
+void bmct::report_success()
 {
   status("VERIFICATION SUCCESSFUL");
 
@@ -217,7 +217,7 @@ void bmc_baset::report_success()
 
 /*******************************************************************\
 
-Function: bmc_baset::report_failure
+Function: bmct::report_failure
 
   Inputs:
 
@@ -227,7 +227,7 @@ Function: bmc_baset::report_failure
 
 \*******************************************************************/
 
-void bmc_baset::report_failure()
+void bmct::report_failure()
 {
   status("VERIFICATION FAILED");
 
@@ -255,7 +255,7 @@ void bmc_baset::report_failure()
 
 /*******************************************************************\
 
-Function: bmc_baset::show_program
+Function: bmct::show_program
 
   Inputs:
 
@@ -265,7 +265,7 @@ Function: bmc_baset::show_program
 
 \*******************************************************************/
 
-void bmc_baset::show_program()
+void bmct::show_program()
 {
   unsigned count=1;
 
@@ -313,7 +313,7 @@ void bmc_baset::show_program()
 
 /*******************************************************************\
 
-Function: bmc_baset::run
+Function: bmct::run
 
   Inputs:
 
@@ -323,7 +323,7 @@ Function: bmc_baset::run
 
 \*******************************************************************/
 
-bool bmc_baset::run(const goto_functionst &goto_functions)
+bool bmct::run(const goto_functionst &goto_functions)
 {
   //symex.total_claims=0;
   symex.set_message_handler(get_message_handler());
@@ -463,7 +463,7 @@ bool bmc_baset::run(const goto_functionst &goto_functions)
 
 /*******************************************************************\
 
-Function: bmc_baset::decide
+Function: bmct::decide
 
   Inputs:
 
@@ -473,7 +473,7 @@ Function: bmc_baset::decide
 
 \*******************************************************************/
 
-bool bmc_baset::decide(prop_convt &prop_conv)
+bool bmct::decide(prop_convt &prop_conv)
 {
   if(options.get_bool_option("beautify-pbs") ||
      options.get_bool_option("beautify-greedy"))
@@ -505,7 +505,7 @@ bool bmc_baset::decide(prop_convt &prop_conv)
 
 /*******************************************************************\
 
-Function: bmc_baset::setup_unwind
+Function: bmct::setup_unwind
 
   Inputs:
 
@@ -515,7 +515,7 @@ Function: bmc_baset::setup_unwind
 
 \*******************************************************************/
 
-void bmc_baset::setup_unwind()
+void bmct::setup_unwind()
 {
   const std::string &set=options.get_option("unwindset");
   unsigned int length=set.length();

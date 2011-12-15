@@ -15,7 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
-Function: bmc_baset::write_dimacs
+Function: bmct::write_dimacs
 
   Inputs:
 
@@ -25,7 +25,7 @@ Function: bmc_baset::write_dimacs
 
 \*******************************************************************/
 
-bool bmc_baset::write_dimacs()
+bool bmct::write_dimacs()
 {
   const std::string &filename=options.get_option("outfile");
   
@@ -44,7 +44,7 @@ bool bmc_baset::write_dimacs()
 
 /*******************************************************************\
 
-Function: bmc_baset::write_dimacs
+Function: bmct::write_dimacs
 
   Inputs:
 
@@ -54,7 +54,7 @@ Function: bmc_baset::write_dimacs
 
 \*******************************************************************/
 
-bool bmc_baset::write_dimacs(std::ostream &out)
+bool bmct::write_dimacs(std::ostream &out)
 {
   dimacs_cnft dimacs_cnf;
   dimacs_cnf.set_message_handler(get_message_handler());

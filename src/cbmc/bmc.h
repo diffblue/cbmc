@@ -26,26 +26,25 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "symex_bmc.h"
 
-class bmc_baset:public messaget
+class bmct:public messaget
 {
 public:
-  bmc_baset(
+  bmct(
     const optionst &_options,
-    const namespacet &_ns,
-    symex_bmct &_symex,
-    symex_target_equationt &_equation,
+    const contextt &_context,
     message_handlert &_message_handler):
     messaget(_message_handler),
     options(_options),
-    ns(_ns),
-    symex(_symex),
-    equation(_equation),
+    ns(_context, new_context),
+    equation(ns),
+    symex(ns, new_context, equation),
     ui(ui_message_handlert::PLAIN)
   {
+    symex.constant_propagation=options.get_bool_option("propagation");
   }
  
   virtual bool run(const goto_functionst &goto_functions);
-  virtual ~bmc_baset() { }
+  virtual ~bmct() { }
 
   // additional stuff   
   expr_listt bmc_constraints;  
@@ -58,9 +57,10 @@ public:
   
 protected:
   const optionst &options;  
-  const namespacet &ns;
-  symex_bmct &symex;
-  symex_target_equationt &equation;
+  contextt new_context;
+  namespacet ns;
+  symex_target_equationt equation;
+  symex_bmct symex;
  
   // use gui format
   language_uit::uit ui;
@@ -100,27 +100,6 @@ protected:
 
   virtual void error_trace(
     const prop_convt &prop_conv);
-};
-
-class bmct:public bmc_baset
-{
-public:
-  bmct(
-    const optionst &_options,
-    const contextt &_context,
-    message_handlert &_message_handler):
-    bmc_baset(_options, _ns, _symex, _equation, _message_handler),
-    _ns(_context, new_context),
-    _equation(ns),
-    _symex(ns, new_context, _equation)
-  {
-  }
- 
-protected:
-  contextt new_context;
-  namespacet _ns;
-  symex_target_equationt _equation;
-  symex_bmct _symex;
 };
 
 #endif
