@@ -133,6 +133,10 @@ void symex_slicet::slice(symex_target_equationt::SSA_stept &SSA_step)
 
   case goto_trace_stept::OUTPUT:
     break;
+    
+  case goto_trace_stept::DECL:
+    // ignore for now
+    break;
 
   default:
     assert(false);  
@@ -215,6 +219,10 @@ void symex_slicet::collect_open_variables(
       break;
 
     case goto_trace_stept::OUTPUT:
+      break;
+
+    case goto_trace_stept::DECL:
+      // ignore for now
       break;
 
     default:
