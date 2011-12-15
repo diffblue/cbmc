@@ -617,7 +617,7 @@ void goto_symex_statet::renaming_levelt::rename(typet &type)
   if(type.id()==ID_array)
   {
     rename(type.subtype());
-    rename((exprt &)type.add(ID_size));
+    rename(to_array_type(type).size());
   }
   else if(type.id()==ID_struct ||
           type.id()==ID_union ||
@@ -722,7 +722,7 @@ void goto_symex_statet::get_original_name(typet &type) const
   if(type.id()==ID_array)
   {
     get_original_name(type.subtype());
-    get_original_name((exprt &)type.add(ID_size));
+    get_original_name(to_array_type(type).size());
   }
   else if(type.id()==ID_struct ||
           type.id()==ID_union ||
@@ -755,7 +755,7 @@ void goto_symex_statet::renaming_levelt::get_original_name(typet &type) const
   if(type.id()==ID_array)
   {
     get_original_name(type.subtype());
-    get_original_name((exprt &)type.add(ID_size));
+    get_original_name(to_array_type(type).size());
   }
   else if(type.id()==ID_struct ||
           type.id()==ID_union ||
@@ -771,7 +771,7 @@ void goto_symex_statet::renaming_levelt::get_original_name(typet &type) const
 
 /*******************************************************************\
 
-Function: goto_symex_statet::get_original_identifier
+Function: goto_symex_statet::get_original_name
 
   Inputs:
 
