@@ -298,8 +298,8 @@ void goto_symext::phi_function(
     if(*it==guard_identifier)
       continue; // just a guard, don't bother
       
-    if(goto_state.level2.current_number(*it)==
-       dest_state.level2.current_number(*it))
+    if(goto_state.level2.current_count(*it)==
+       dest_state.level2.current_count(*it))
       continue; // not at all changed
 
     irep_idt original_identifier=

@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <assert.h>
 
 #include <guard.h>
+#include <std_expr.h>
 
 #include <pointer-analysis/value_set.h>
 #include <goto-programs/goto_functions.h>
@@ -43,22 +44,43 @@ public:
   struct renaming_levelt
   {
   public:
+    virtual irep_idt current_name(const irep_idt &identifier) const=0;
+    virtual irep_idt name(const irep_idt &identifier, unsigned count) const=0;
+    virtual ~renaming_levelt() { }
+
     typedef std::map<irep_idt, unsigned> current_namest;
     current_namest current_names;
-
-    virtual void remove(const irep_idt &identifier) { current_names.erase(identifier); }
-
-    virtual const irep_idt &get_original_name(const irep_idt &identifier) const;
-    virtual void get_original_name(exprt &expr) const;
-    virtual void get_original_name(typet &type) const;
-
-    virtual void operator()(exprt &expr, const namespacet &ns)=0;
-    virtual void operator()(typet &type, const namespacet &ns);
-    virtual std::string operator()(const irep_idt &identifier) const=0;
     
-    virtual ~renaming_levelt() { }
-    
-    virtual void print(std::ostream &out) const { }
+    void remove(const irep_idt &identifier) { current_names.erase(identifier); }
+    const irep_idt &get_original_name(const irep_idt &identifier) const;
+    void get_original_name(exprt &expr) const;
+    void get_original_name(typet &type) const;
+    void print(std::ostream &out) const;
+    unsigned current_count(const irep_idt &identifier) const;
+
+    irep_idt operator()(const irep_idt &identifier)
+    {
+      // see if it's already renamed
+      if(original_identifiers.find(identifier)!=
+         original_identifiers.end())
+        return identifier;
+
+      // record
+      irep_idt i=current_name(identifier);
+      original_identifiers[i]=identifier;
+      return i;
+    }
+
+    void operator()(symbol_exprt &expr)
+    {
+      expr.set_identifier(operator()(expr.get_identifier()));
+    }
+
+    void rename(const irep_idt &identifier, unsigned count)
+    {
+      current_names[identifier]=count;
+      original_identifiers[name(identifier, count)]=identifier;
+    }
 
   protected:
     original_identifierst original_identifiers;
@@ -71,18 +93,10 @@ public:
   struct level0t:public renaming_levelt
   {
   public:
-    std::string name(
-      const irep_idt &identifier,
-      unsigned thread_nr) const;
-
-    virtual void rename(irep_idt& identifier, const namespacet& ns, unsigned thread_nr);
-    virtual void operator()(exprt &expr, const namespacet &ns) { assert(false); }
-    virtual std::string operator()(const irep_idt &identifier) const;
+    virtual irep_idt name(const irep_idt &identifier, unsigned thread_nr) const;
 
     level0t() { }
     virtual ~level0t() { }
-
-    virtual void print(std::ostream &out) const;
   } level0;
   #endif
 
@@ -92,25 +106,27 @@ public:
   struct level1t:public renaming_levelt
   {
   public:
-    std::string name(
-      const irep_idt &identifier,
-      unsigned frame) const;
-      
-    using renaming_levelt::operator();
-
-    virtual void operator()(exprt &expr, const namespacet &ns);
-    virtual std::string operator()(const irep_idt &identifier) const;
+    virtual irep_idt name(const irep_idt &identifier, unsigned frame) const;
     
-    void rename(const irep_idt &identifier, unsigned frame)
+    virtual irep_idt current_name(const irep_idt &identifier) const
     {
-      current_names[identifier]=frame;
-      original_identifiers[name(identifier, frame)]=identifier;
+      // see if it's already renamed
+      if(original_identifiers.find(identifier)!=
+         original_identifiers.end())
+        return identifier;
+
+      // rename only if needed
+      const current_namest::const_iterator it=
+        current_names.find(identifier);
+    
+      if(it==current_names.end())
+        return identifier;
+      else
+        return name(identifier, it->second);
     }
 
     level1t() { }
     virtual ~level1t() { }
-
-    virtual void print(std::ostream &out) const;
   };
   
   // level 2 -- SSA
@@ -118,37 +134,7 @@ public:
   struct level2t:public renaming_levelt
   {
   public:
-    using renaming_levelt::operator();
-
-    virtual void operator()(exprt &expr, const namespacet &ns);
-    virtual std::string operator()(const irep_idt &identifier) const;
-    virtual void remove(const irep_idt &identifier) { current_names.erase(identifier); }
-
-    std::string name(
-      const irep_idt &identifier,
-      unsigned count) const;
-
-    struct valuet
-    {
-      unsigned count;
-      exprt constant;
-      
-      valuet():
-        count(0),
-        constant(static_cast<const exprt &>(get_nil_irep()))
-      {
-      }
-    };
-    
-    typedef std::map<irep_idt, valuet> current_namest;
-    current_namest current_names;
-    
-    void rename(const irep_idt &identifier, unsigned count)
-    {
-      valuet &entry=current_names[identifier];
-      entry.count=count;
-      original_identifiers[name(identifier, entry.count)]=identifier;
-    }
+    virtual irep_idt name(const irep_idt &identifier, unsigned count) const;
 
     void get_variables(std::set<irep_idt> &vars) const
     {
@@ -158,13 +144,35 @@ public:
         vars.insert(it->first);
     }
 
-    unsigned current_number(const irep_idt &identifier) const;
+    virtual irep_idt current_name(const irep_idt &identifier) const
+    {
+      // see if it's already renamed
+      if(original_identifiers.find(identifier)!=
+         original_identifiers.end())
+        return identifier;
+
+      // _always_ rename
+      return name(identifier, current_count(identifier));
+    }
 
     level2t() { }
     virtual ~level2t() { }
-
-    virtual void print(std::ostream &out) const;
   } level2;
+  
+  // this maps L1 names to (L2) constants
+  class propagationt
+  {
+  public:
+    typedef std::map<irep_idt, exprt> valuest;
+    valuest values;
+    void operator()(exprt &expr);
+
+    void remove(const irep_idt &identifier)
+    {
+      values.erase(identifier);
+    }
+    
+  } propagation;
   
   typedef enum { L1, L2 } levelt;
 
@@ -188,19 +196,19 @@ public:
   void get_original_name(typet &type) const;
   
   // does all levels of renaming
-  std::string current_name(
+  irep_idt current_name(
       const namespacet &ns,
-      const irep_idt &identifier) const
+      const irep_idt &identifier)
   {
     return current_name(level2, ns, identifier);
   }
 
-  std::string current_name(
+  irep_idt current_name(
     const level2t &level2,
     const namespacet &ns,
-    const irep_idt &identifier) const
+    const irep_idt &identifier)
   {
-    return level2(top().level1(identifier));
+    return level2.current_name(top().level1.current_name(identifier));
     //return level2(top().level1(level0(identifier, ns, source.thread_nr)));
   }
   
@@ -225,10 +233,10 @@ public:
     }
   };
 
-  std::string current_name(
+  irep_idt current_name(
     const goto_statet &goto_state,
     const namespacet &ns,
-    const irep_idt &identifier) const
+    const irep_idt &identifier)
   {
     return current_name(goto_state.level2, ns, identifier);
   }
