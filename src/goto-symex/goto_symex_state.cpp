@@ -586,12 +586,12 @@ void goto_symex_statet::rename(
   {
     if(level==L1)
     {
-      top().level1.rename(expr);
+      top().level1(expr, ns);
     }
     else if(level==L2)
     {
-      top().level1.rename(expr);
-      level2.rename(expr);
+      top().level1(expr, ns);
+      level2(expr, ns);
     }
   }
   else if(expr.id()==ID_address_of)
@@ -630,7 +630,7 @@ void goto_symex_statet::rename_address(
   if(expr.id()==ID_symbol)
   {
     // only do L1!
-    top().level1.rename(expr);
+    top().level1(expr, ns);
   }
   else if(expr.id()==ID_index)
   {
@@ -663,7 +663,7 @@ void goto_symex_statet::rename_address(
 
 /*******************************************************************\
 
-Function: goto_symex_statet::level1t::rename
+Function: goto_symex_statet::level1t::operator()
 
   Inputs:
 
@@ -673,11 +673,11 @@ Function: goto_symex_statet::level1t::rename
 
 \*******************************************************************/
 
-void goto_symex_statet::level1t::rename(exprt &expr)
+void goto_symex_statet::level1t::operator()(exprt &expr, const namespacet &ns)
 {
   // rename all the symbols with their last known value
   
-  rename(expr.type());
+  operator()(expr.type(), ns);
 
   if(expr.id()==ID_symbol)
   {
@@ -698,18 +698,18 @@ void goto_symex_statet::level1t::rename(exprt &expr)
   else if(expr.id()==ID_address_of)
   {
     assert(expr.operands().size()==1);
-    rename(expr.op0());
+    operator()(expr.op0(), ns);
   }
   else
   {
     // do this recursively
     Forall_operands(it, expr)
-      rename(*it);
+      operator()(*it, ns);
   }
 }
 /*******************************************************************\
 
-Function: goto_symex_statet::level2t::rename
+Function: goto_symex_statet::level2t::operator()
 
   Inputs:
 
@@ -719,11 +719,11 @@ Function: goto_symex_statet::level2t::rename
 
 \*******************************************************************/
 
-void goto_symex_statet::level2t::rename(exprt &expr)
+void goto_symex_statet::level2t::operator()(exprt &expr, const namespacet &ns)
 {
   // rename all the symbols with their last known value
   
-  rename(expr.type());
+  operator()(expr.type(), ns);
 
   if(expr.id()==ID_symbol)
   {
@@ -760,7 +760,7 @@ void goto_symex_statet::level2t::rename(exprt &expr)
   {
     // do this recursively
     Forall_operands(it, expr)
-      rename(*it);
+      operator()(*it, ns);
   }
 }
 
@@ -808,7 +808,7 @@ void goto_symex_statet::rename(
 
 /*******************************************************************\
 
-Function: goto_symex_statet::rename
+Function: goto_symex_statet::renaming_levelt::operator()
 
   Inputs:
 
@@ -818,14 +818,14 @@ Function: goto_symex_statet::rename
 
 \*******************************************************************/
 
-void goto_symex_statet::renaming_levelt::rename(typet &type)
+void goto_symex_statet::renaming_levelt::operator()(typet &type, const namespacet &ns)
 {
   // rename all the symbols with their last known value
 
   if(type.id()==ID_array)
   {
-    rename(type.subtype());
-    rename(to_array_type(type).size());
+    operator()(type.subtype(), ns);
+    operator()(to_array_type(type).size(), ns);
   }
   else if(type.id()==ID_struct ||
           type.id()==ID_union ||
@@ -835,7 +835,7 @@ void goto_symex_statet::renaming_levelt::rename(typet &type)
   }
   else if(type.id()==ID_pointer)
   {
-    rename(type.subtype());
+    operator()(type.subtype(), ns);
   }
 }
 
