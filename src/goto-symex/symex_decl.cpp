@@ -71,8 +71,8 @@ void goto_symext::symex_decl(statet &state)
   
   if(it!=state.level2.current_names.end())
   {
-    state.level2.rename(l1_identifier, it->second.count+1);
-    it->second.constant.make_nil();
+    state.level2.rename(l1_identifier, it->second+1);
+    state.propagation.remove(l1_identifier);
   }
   
   // in case of pointers, put something into the value set

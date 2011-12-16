@@ -136,52 +136,6 @@ Function: goto_symex_statet::level0t::rename
 
 #if 0
 void goto_symex_statet::level0t::rename(
-  typet &type,
-  const namespacet &ns,
-  unsigned thread_nr)
-{
-  // copied from goto_symex_statet::rename(typet &type, const namespacet& ns)
-  // rename all symbols according to thread number
-
-  if(type.id()==ID_array)
-  {
-    rename(type.subtype(), ns, thread_nr);
-    rename(static_cast<exprt &>(type.add(ID_size)), ns, thread_nr);
-  }
-  else if(type.id()==ID_struct ||
-          type.id()==ID_union ||
-          type.id()==ID_class)
-  {
-    // TODO
-  }
-  else if(type.id()==ID_pointer)
-  {
-    // rename(type.subtype(), ns);
-    // don't do this, or it might get cyclic
-  }
-  else if(type.id()==ID_symbol)
-  {
-    const symbolt &symbol=ns.lookup(type.get(ID_identifier));
-    type=symbol.type;
-    rename(type, ns, thread_nr);
-  }
-}
-#endif
-
-/*******************************************************************\
-
-Function: goto_symex_statet::level0t::rename
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-#if 0
-void goto_symex_statet::level0t::rename(
   irep_idt &identifier,
   const namespacet &ns,
   unsigned thread_nr)
@@ -201,25 +155,6 @@ void goto_symex_statet::level0t::rename(
     identifier = name(original_identifiers[backup], thread_nr);
     original_identifiers[identifier] = original_identifiers[backup];
   }
-}
-#endif
-
-/*******************************************************************\
-
-Function: goto_symex_statet::level0t::print
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-#if 0
-void goto_symex_statet::level0t::print(std::ostream &out) const
-{
-  assert(false);
 }
 #endif
 
@@ -279,7 +214,7 @@ Function: goto_symex_statet::level1t::name
 
 \*******************************************************************/
 
-std::string goto_symex_statet::level1t::name(
+irep_idt goto_symex_statet::level1t::name(
   const irep_idt &identifier,
   unsigned frame) const
 {
@@ -298,7 +233,7 @@ Function: goto_symex_statet::level2t::name
 
 \*******************************************************************/
 
-std::string goto_symex_statet::level2t::name(
+irep_idt goto_symex_statet::level2t::name(
   const irep_idt &identifier,
   unsigned count) const
 {
@@ -307,7 +242,7 @@ std::string goto_symex_statet::level2t::name(
 
 /*******************************************************************\
 
-Function: goto_symex_statet::level2t::current_number
+Function: goto_symex_statet::renaming_levelt::current_count
 
   Inputs:
 
@@ -317,60 +252,11 @@ Function: goto_symex_statet::level2t::current_number
 
 \*******************************************************************/
 
-unsigned goto_symex_statet::level2t::current_number(
+unsigned goto_symex_statet::renaming_levelt::current_count(
   const irep_idt &identifier) const
 {
   current_namest::const_iterator it=current_names.find(identifier);
-  if(it==current_names.end()) return 0;
-  return it->second.count;
-}
-
-/*******************************************************************\
-
-Function: goto_symex_statet::level1t::operator()
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-std::string goto_symex_statet::level1t::operator()(
-  const irep_idt &identifier) const
-{
-  current_namest::const_iterator it=
-    current_names.find(identifier);
-
-  if(it==current_names.end())
-    return id2string(identifier);
-
-  return name(identifier, it->second);
-}
-
-/*******************************************************************\
-
-Function: goto_symex_statet::level2t::operator()
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-std::string goto_symex_statet::level2t::operator()(
-  const irep_idt &identifier) const
-{
-  current_namest::const_iterator it=
-    current_names.find(identifier);
-
-  if(it==current_names.end())
-    return name(identifier, 0);
-
-  return name(identifier, it->second.count);
+  return it==current_names.end()?0:it->second;
 }
 
 /*******************************************************************\
@@ -520,28 +406,23 @@ void goto_symex_statet::assignment(
     
   // identifier should be l0 or l1, make sure it's l1
   
-  const std::string l1_identifier=top().level1(identifier);
+  irep_idt l1_identifier=top().level1(identifier);
 
   // do the l2 renaming 
-  level2t::valuet &entry=level2.current_names[l1_identifier];
+  unsigned &count=level2.current_names[l1_identifier];
 
-  entry.count++;
+  count++;
     
-  level2.rename(l1_identifier, entry.count);
+  level2.rename(l1_identifier, count);
   
-  lhs.set_identifier(level2.name(l1_identifier, entry.count));
+  lhs.set_identifier(level2.name(l1_identifier, count));
+
+  // for value propagation -- the RHS is L2
   
-  if(record_value)
-  {
-    // for constant propagation
-    
-    if(constant_propagation(rhs))
-      entry.constant=rhs;
-    else
-      entry.constant.make_nil();
-  }
+  if(record_value && constant_propagation(rhs))
+    propagation.values[l1_identifier]=rhs;
   else
-    entry.constant.make_nil();
+    propagation.remove(l1_identifier);
       
   {
     // update value sets
@@ -559,6 +440,39 @@ void goto_symex_statet::assignment(
   value_set.output(ns, std::cout);
   std::cout << "**********************" << std::endl;
   #endif
+}
+
+/*******************************************************************\
+
+Function: goto_symex_statet::propagationt::operator()
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void goto_symex_statet::propagationt::operator()(exprt &expr)
+{
+  if(expr.id()==ID_symbol)
+  {
+    valuest::const_iterator it=
+      values.find(to_symbol_expr(expr).get_identifier());
+    if(it!=values.end())
+      expr=it->second;
+  }
+  else if(expr.id()==ID_address_of)
+  {
+    // ignore
+  }
+  else
+  {
+    // do this recursively
+    Forall_operands(it, expr)
+      operator()(*it);
+  }
 }
 
 /*******************************************************************\
@@ -584,14 +498,30 @@ void goto_symex_statet::rename(
 
   if(expr.id()==ID_symbol)
   {
+    irep_idt identifier=to_symbol_expr(expr).get_identifier();
+  
     if(level==L1)
     {
-      top().level1(expr, ns);
+      identifier=top().level1(identifier);
+      expr.set(ID_identifier, identifier);
     }
     else if(level==L2)
     {
-      top().level1(expr, ns);
-      level2(expr, ns);
+      // L1
+      identifier=top().level1(identifier);
+      
+      // apply propagation
+      propagationt::valuest::const_iterator p_it=
+        propagation.values.find(identifier);
+
+      if(p_it!=propagation.values.end())
+        expr=p_it->second; // already L2
+      else
+      {
+        // L2
+        identifier=level2(identifier);
+        expr.set(ID_identifier, identifier);
+      }
     }
   }
   else if(expr.id()==ID_address_of)
@@ -630,7 +560,7 @@ void goto_symex_statet::rename_address(
   if(expr.id()==ID_symbol)
   {
     // only do L1!
-    top().level1(expr, ns);
+    top().level1(to_symbol_expr(expr));
   }
   else if(expr.id()==ID_index)
   {
@@ -658,109 +588,6 @@ void goto_symex_statet::rename_address(
     // that all the operands are addresses
     Forall_operands(it, expr)
       rename_address(*it, ns);
-  }
-}
-
-/*******************************************************************\
-
-Function: goto_symex_statet::level1t::operator()
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void goto_symex_statet::level1t::operator()(exprt &expr, const namespacet &ns)
-{
-  // rename all the symbols with their last known value
-  
-  operator()(expr.type(), ns);
-
-  if(expr.id()==ID_symbol)
-  {
-    const irep_idt &identifier=expr.get(ID_identifier);
-
-    // first see if it's already an l1 name
-    
-    if(original_identifiers.find(identifier)!=
-       original_identifiers.end())
-      return;
-    
-    const current_namest::const_iterator it=
-      current_names.find(identifier);
-    
-    if(it!=current_names.end())
-      expr.set(ID_identifier, name(identifier, it->second));
-  }
-  else if(expr.id()==ID_address_of)
-  {
-    assert(expr.operands().size()==1);
-    operator()(expr.op0(), ns);
-  }
-  else
-  {
-    // do this recursively
-    Forall_operands(it, expr)
-      operator()(*it, ns);
-  }
-}
-/*******************************************************************\
-
-Function: goto_symex_statet::level2t::operator()
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void goto_symex_statet::level2t::operator()(exprt &expr, const namespacet &ns)
-{
-  // rename all the symbols with their last known value
-  
-  operator()(expr.type(), ns);
-
-  if(expr.id()==ID_symbol)
-  {
-    const irep_idt &identifier=expr.get(ID_identifier);
-    
-    // first see if it's already an l2 name
-
-    if(original_identifiers.find(identifier)!=
-       original_identifiers.end())
-      return;
-    
-    const current_namest::const_iterator it=
-      current_names.find(identifier);
-    
-    if(it!=current_names.end())
-    {
-      if(it->second.constant.is_not_nil())
-        expr=it->second.constant;
-      else
-        expr.set(ID_identifier, name(identifier, it->second.count));
-    }
-    else
-    {
-      std::string new_identifier=name(identifier, 0);
-      original_identifiers[new_identifier]=identifier;
-      expr.set(ID_identifier, new_identifier);
-    }
-  }
-  else if(expr.id()==ID_address_of)
-  {
-    // do nothing
-  }
-  else
-  {
-    // do this recursively
-    Forall_operands(it, expr)
-      operator()(*it, ns);
   }
 }
 
@@ -808,7 +635,7 @@ void goto_symex_statet::rename(
 
 /*******************************************************************\
 
-Function: goto_symex_statet::renaming_levelt::operator()
+Function: goto_symex_statet::renaming_levelt::print
 
   Inputs:
 
@@ -818,25 +645,14 @@ Function: goto_symex_statet::renaming_levelt::operator()
 
 \*******************************************************************/
 
-void goto_symex_statet::renaming_levelt::operator()(typet &type, const namespacet &ns)
+void goto_symex_statet::renaming_levelt::print(std::ostream &out) const
 {
-  // rename all the symbols with their last known value
-
-  if(type.id()==ID_array)
-  {
-    operator()(type.subtype(), ns);
-    operator()(to_array_type(type).size(), ns);
-  }
-  else if(type.id()==ID_struct ||
-          type.id()==ID_union ||
-          type.id()==ID_class)
-  {
-    // TODO
-  }
-  else if(type.id()==ID_pointer)
-  {
-    operator()(type.subtype(), ns);
-  }
+  for(current_namest::const_iterator
+      it=current_names.begin();
+      it!=current_names.end();
+      it++)
+    out << it->first << " --> "
+        << name(it->first, it->second) << std::endl;
 }
 
 /*******************************************************************\
@@ -995,48 +811,3 @@ const irep_idt &goto_symex_statet::get_original_name(
   return top().level1.get_original_name(
          level2.get_original_name(identifier));
 }
-
-/*******************************************************************\
-
-Function: goto_symex_statet::level1t::print
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void goto_symex_statet::level1t::print(std::ostream &out) const
-{
-  for(current_namest::const_iterator
-      it=current_names.begin();
-      it!=current_names.end();
-      it++)
-    out << it->first << " --> "
-        << name(it->first, it->second) << std::endl;
-}
-
-/*******************************************************************\
-
-Function: goto_symex_statet::level2t::print
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void goto_symex_statet::level2t::print(std::ostream &out) const
-{
-  for(current_namest::const_iterator
-      it=current_names.begin();
-      it!=current_names.end();
-      it++)
-    out << it->first << " --> "
-        << name(it->first, it->second.count) << std::endl;
-}
-
