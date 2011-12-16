@@ -43,13 +43,17 @@ public:
   struct renaming_levelt
   {
   public:
+    typedef std::map<irep_idt, unsigned> current_namest;
+    current_namest current_names;
+
+    virtual void remove(const irep_idt &identifier) { current_names.erase(identifier); }
+
     virtual const irep_idt &get_original_name(const irep_idt &identifier) const;
     virtual void get_original_name(exprt &expr) const;
     virtual void get_original_name(typet &type) const;
-    virtual void rename(exprt &expr)=0;
-    virtual void rename(typet &type);
-    virtual void remove(const irep_idt &identifier)=0;
 
+    virtual void operator()(exprt &expr, const namespacet &ns)=0;
+    virtual void operator()(typet &type, const namespacet &ns);
     virtual std::string operator()(const irep_idt &identifier) const=0;
     
     virtual ~renaming_levelt() { }
@@ -71,16 +75,9 @@ public:
       const irep_idt &identifier,
       unsigned thread_nr) const;
 
-    typedef std::map<irep_idt, unsigned> current_namest;
-    current_namest current_names;
-
-    virtual void rename(exprt &expr) { assert(false); }
-    virtual void rename(exprt &expr, const namespacet& ns, unsigned thread_nr);
-    virtual void rename(typet &type, const namespacet& ns, unsigned thread_nr);
     virtual void rename(irep_idt& identifier, const namespacet& ns, unsigned thread_nr);
+    virtual void operator()(exprt &expr, const namespacet &ns) { assert(false); }
     virtual std::string operator()(const irep_idt &identifier) const;
-    std::string operator()(const irep_idt &identifier, const namespacet&, unsigned thread_nr) const;
-    virtual void remove(const irep_idt &identifier) { current_names.erase(identifier); }
 
     level0t() { }
     virtual ~level0t() { }
@@ -99,14 +96,10 @@ public:
       const irep_idt &identifier,
       unsigned frame) const;
       
-    typedef std::map<irep_idt, unsigned> current_namest;
-    current_namest current_names;
+    using renaming_levelt::operator();
 
-    using renaming_levelt::rename;
-
-    virtual void rename(exprt &expr);
+    virtual void operator()(exprt &expr, const namespacet &ns);
     virtual std::string operator()(const irep_idt &identifier) const;
-    virtual void remove(const irep_idt &identifier) { current_names.erase(identifier); }
     
     void rename(const irep_idt &identifier, unsigned frame)
     {
@@ -125,9 +118,9 @@ public:
   struct level2t:public renaming_levelt
   {
   public:
-    using renaming_levelt::rename;
+    using renaming_levelt::operator();
 
-    virtual void rename(exprt &expr);
+    virtual void operator()(exprt &expr, const namespacet &ns);
     virtual std::string operator()(const irep_idt &identifier) const;
     virtual void remove(const irep_idt &identifier) { current_names.erase(identifier); }
 
