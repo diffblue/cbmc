@@ -32,8 +32,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "../floatbv/float_utils.h"
 #endif
 
-#include "flatten_byte_operators.h"
-
 //#define DEBUG
 
 /*******************************************************************\
