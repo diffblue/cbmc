@@ -6,7 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <assert.h>
+#include <iostream>
+
+#include <cassert>
 
 #include <arith_tools.h>
 #include <byte_operators.h>
