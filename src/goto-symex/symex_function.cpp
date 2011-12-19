@@ -121,6 +121,7 @@ void goto_symext::argument_assignments(
       }
       
       guardt guard;
+      state.rename(lhs, ns, goto_symex_statet::L1);
       symex_assign_symbol(state, lhs, nil_exprt(), rhs, guard, VISIBLE);
     }
 
@@ -382,8 +383,14 @@ void goto_symext::locality(
       it!=local_identifiers.end();
       it++)
   {
-    frame.level1.rename(*it, frame_nr);
-    irep_idt l1_name=frame.level1(*it);
+    // get L0 name
+    irep_idt l0_name=state.rename(*it, ns, goto_symex_statet::L0);
+    
+    // do L1 renaming
+    frame.level1.rename(l0_name, frame_nr);
+
+    // store
+    irep_idt l1_name=frame.level1(l0_name);
     frame.local_variables.insert(l1_name);
   }
 }

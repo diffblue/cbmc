@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <context.h>
+
 #include "symex_dereference_state.h"
 #include "renaming_ns.h"
 
@@ -54,9 +56,16 @@ bool symex_dereference_statet::has_failed_symbol(
     const irep_idt &failed_symbol=
       ptr_symbol.type.get("#failed_symbol");    
       
-    if(failed_symbol=="") return false;
-
-    return !renaming_ns.lookup(failed_symbol, symbol);
+    if(failed_symbol!="" &&
+        !renaming_ns.lookup(failed_symbol, symbol))
+    {
+      symbolt sym=*symbol;
+      symbolt *sym_ptr=0;
+      sym.name=state.rename(sym.name, renaming_ns, goto_symex_statet::L1);
+      goto_symex.new_context.move(sym, sym_ptr);
+      symbol=sym_ptr;
+      return true;
+    }
   }
   
   return false;
