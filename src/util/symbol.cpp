@@ -225,7 +225,7 @@ Function: is_global
 
 \*******************************************************************/
 
-bool is_global(const symbolt& symbol)
+bool is_global(const symbolt &symbol)
 {
   return symbol.static_lifetime && !symbol.thread_local;
 }
@@ -242,7 +242,7 @@ Function: is_thread_local
 
 \*******************************************************************/
 
-bool is_thread_local(const symbolt& symbol)
+bool is_thread_local(const symbolt &symbol)
 {
   return symbol.static_lifetime && symbol.thread_local;
 }
@@ -259,7 +259,7 @@ Function: is_procedure_local
 
 \*******************************************************************/
 
-bool is_procedure_local(const symbolt& symbol)
+bool is_procedure_local(const symbolt &symbol)
 {
   return !symbol.static_lifetime;
 }
