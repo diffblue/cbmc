@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <guard.h>
 #include <std_expr.h>
+#include <i2string.h>
 
 #include <pointer-analysis/value_set.h>
 #include <goto-programs/goto_functions.h>
@@ -88,17 +89,27 @@ public:
   
   // level 0 -- threads!
   // renaming built for one particular interleaving
-
-  #if 0
   struct level0t:public renaming_levelt
   {
   public:
-    virtual irep_idt name(const irep_idt &identifier, unsigned thread_nr) const;
+    virtual irep_idt name(const irep_idt &identifier, unsigned thread_nr) const
+    {
+      return id2string(identifier)+"!"+i2string(thread_nr);
+    }
+
+    virtual irep_idt current_name(const irep_idt &identifier) const
+    {
+      assert(false);
+    }
+
+    irep_idt operator()(
+      const irep_idt &identifier,
+      const namespacet &ns,
+      unsigned thread_nr) const;
 
     level0t() { }
     virtual ~level0t() { }
   } level0;
-  #endif
 
   // level 1 -- function frames
   // this is to preserve locality in case of recursion
@@ -106,7 +117,10 @@ public:
   struct level1t:public renaming_levelt
   {
   public:
-    virtual irep_idt name(const irep_idt &identifier, unsigned frame) const;
+    virtual irep_idt name(const irep_idt &identifier, unsigned frame) const
+    {
+      return id2string(identifier)+"@"+i2string(frame);
+    }
     
     virtual irep_idt current_name(const irep_idt &identifier) const
     {
@@ -134,7 +148,10 @@ public:
   struct level2t:public renaming_levelt
   {
   public:
-    virtual irep_idt name(const irep_idt &identifier, unsigned count) const;
+    virtual irep_idt name(const irep_idt &identifier, unsigned count) const
+    {
+      return id2string(identifier)+"#"+i2string(count);
+    }
 
     void get_variables(std::set<irep_idt> &vars) const
     {
@@ -174,11 +191,14 @@ public:
     
   } propagation;
   
-  typedef enum { L1, L2 } levelt;
+  typedef enum { L0, L1, L2 } levelt;
 
+  // performs renaming _up to_ the given level
+  irep_idt rename(const irep_idt &identifier, const namespacet &ns, levelt level=L2);
   void rename(exprt &expr, const namespacet &ns, levelt level=L2);
-  void rename_address(exprt &expr, const namespacet &ns);
-  void rename(typet &type, const namespacet &ns);
+  void rename(typet &type, const namespacet &ns, levelt level=L2);
+  
+  void rename_address(exprt &expr, const namespacet &ns, levelt level);
   
   void assignment(
     symbol_exprt &lhs,
@@ -208,8 +228,13 @@ public:
     const namespacet &ns,
     const irep_idt &identifier)
   {
-    return level2.current_name(top().level1.current_name(identifier));
-    //return level2(top().level1(level0(identifier, ns, source.thread_nr)));
+    #if 0
+    return level2.current_name(
+           top().level1.current_name(
+           level0(identifier, ns, source.thread_nr)));
+    #endif
+    return level2.current_name(
+           top().level1.current_name(identifier));
   }
   
   // uses level 1 names, and is used to

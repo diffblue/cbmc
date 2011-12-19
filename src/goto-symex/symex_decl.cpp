@@ -44,9 +44,8 @@ void goto_symext::symex_decl(statet &state)
     throw "decl expects symbol as first operand";
 
   // just do the L1 renaming to preserve locality
-  const irep_idt &identifier=to_symbol_expr(code.op0()).get_identifier();
-
-  irep_idt l1_identifier=state.top().level1(identifier);
+  const irep_idt &l0_identifier=to_symbol_expr(code.op0()).get_identifier();
+  irep_idt l1_identifier=state.top().level1(l0_identifier);
 
   // forget the old l2 renaming to avoid SSA for it
   state.level2.remove(l1_identifier);
@@ -55,9 +54,9 @@ void goto_symext::symex_decl(statet &state)
   while(state.declaration_history.find(l1_identifier)!=
         state.declaration_history.end())
   {
-    unsigned index=state.top().level1.current_names[identifier];
-    state.top().level1.rename(identifier, index+1);
-    l1_identifier=state.top().level1(identifier);
+    unsigned index=state.top().level1.current_names[l0_identifier];
+    state.top().level1.rename(l0_identifier, index+1);
+    l1_identifier=state.top().level1(l0_identifier);
   }
 
   state.declaration_history.insert(l1_identifier); 
@@ -96,6 +95,7 @@ void goto_symext::symex_decl(statet &state)
     symbol_exprt l1_lhs;
     l1_lhs.type()=code.op0().type();
     l1_lhs.set_identifier(l1_identifier);
+    state.rename(rhs, ns, goto_symex_statet::L1);
     state.value_set.assign(l1_lhs, rhs, ns);
   }
   

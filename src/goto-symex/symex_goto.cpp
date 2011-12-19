@@ -135,6 +135,7 @@ void goto_symext::symex_goto(statet &state)
       rhs.make_not();
       
       symbol_exprt new_lhs=guard_symbol_expr;
+      state.rename(new_lhs, ns, goto_symex_statet::L1);
       state.assignment(new_lhs, new_rhs, ns, false);
       
       guardt guard;
@@ -339,7 +340,8 @@ void goto_symext::phi_function(
 
     symbol_exprt lhs=symbol_expr(symbol);
     symbol_exprt new_lhs=lhs;
-    
+
+    dest_state.rename(new_lhs, ns, goto_symex_statet::L1);
     dest_state.assignment(new_lhs, rhs, ns, false);
     
     guardt true_guard;

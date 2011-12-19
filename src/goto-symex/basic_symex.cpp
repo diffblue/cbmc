@@ -328,6 +328,7 @@ void basic_symext::symex_assign_symbol(
   state.rename(ssa_full_lhs, ns);
   
   symbol_exprt ssa_lhs=lhs;
+  state.rename(ssa_lhs, ns, goto_symex_statet::L1);
   state.assignment(ssa_lhs, ssa_rhs, ns, constant_propagation);
   
   ssa_full_lhs=add_to_lhs(ssa_full_lhs, ssa_lhs);
