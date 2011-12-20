@@ -34,6 +34,7 @@ std::string smt2_dect::decision_procedure_text() const
   return "SMT "+logic+" using "+
     (solver==BOOLECTOR?"Boolector":
      solver==CVC3?"CVC3":
+     solver==MATHSAT?"MathSAT":
      solver==Z3?"Z3":
      solver==YICES?"Yices":
      "(unknown)");
@@ -132,6 +133,12 @@ decision_proceduret::resultt smt2_dect::dec_solve()
             + temp_result_filename;
     break;
 
+  case MATHSAT:
+    command = "mathsat -input=smt2"
+              " < "+temp_out_filename
+            + " > "+temp_result_filename;
+    break;
+
   case Z3:
     command = "z3 -m "
             + temp_out_filename
@@ -158,6 +165,9 @@ decision_proceduret::resultt smt2_dect::dec_solve()
 
   case YICES:
     return read_result_yices(in);
+    
+  case MATHSAT:
+    return read_result_mathsat(in);
 
   case BOOLECTOR:
     return read_result_boolector(in);
@@ -259,6 +269,63 @@ decision_proceduret::resultt smt2_dect::read_result_yices(std::istream &in)
   error("Unexpected result from SMT-Solver");
 
   return D_ERROR;
+}
+
+/*******************************************************************\
+
+Function: smt2_dect::read_result_mathsat
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+decision_proceduret::resultt smt2_dect::read_result_mathsat(std::istream &in)
+{
+  std::string line;
+  decision_proceduret::resultt res=D_ERROR;
+
+  smt2_prop.reset_assignment();
+
+  typedef hash_map_cont<std::string, std::string, string_hash> valuest;
+  valuest values;
+
+  while(str_getline(in, line))
+  {
+    if(line=="(sat)")
+      res = D_SATISFIABLE;
+    else if(line=="(unsat)")
+      res = D_UNSATISFIABLE;
+    else
+    {
+    }
+  }
+
+  for(identifier_mapt::iterator
+      it=identifier_map.begin();
+      it!=identifier_map.end();
+      it++)
+  {
+    it->second.value.make_nil();
+    std::string conv_id=convert_identifier(it->first);
+    std::string value=values[conv_id];
+    if(value=="") continue;
+    // TODO
+    set_value(it->second, value);
+  }
+
+  // Booleans
+  for(unsigned v=0; v<smt2_prop.no_variables(); v++)
+  {
+    std::string value=values["B"+i2string(v)];
+    if(value=="") continue;
+    smt2_prop.set_assignment(literalt(v, false), value=="true");
+  }
+
+  return res;
 }
 
 /*******************************************************************\

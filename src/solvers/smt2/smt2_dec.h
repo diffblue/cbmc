@@ -32,7 +32,7 @@ protected:
 class smt2_dect:protected smt2_temp_filet, public smt2_convt
 {
 public:
-  typedef enum { BOOLECTOR, CVC3, YICES, Z3 } solvert;
+  typedef enum { BOOLECTOR, CVC3, MATHSAT, YICES, Z3 } solvert;
 
   smt2_dect(
     const namespacet &_ns,
@@ -56,6 +56,7 @@ protected:
 
   resultt read_result_boolector(std::istream &in);
   resultt read_result_cvc3(std::istream &in);
+  resultt read_result_mathsat(std::istream &in);
   resultt read_result_yices(std::istream &in);
   resultt read_result_z3(std::istream &in);
   
