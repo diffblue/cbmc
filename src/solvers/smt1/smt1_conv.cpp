@@ -93,51 +93,67 @@ Function: smt1_convt::ce_value
 
 exprt smt1_convt::ce_value(
   const typet &type,
-  const std::string &v) const
+  const std::string &index,
+  const std::string &value) const
 {
   if(type.id()==ID_symbol)
-    return ce_value(ns.follow(type), v);
+    return ce_value(ns.follow(type), index, value);
 
   if(type.id()==ID_signedbv ||
      type.id()==ID_unsignedbv ||
      type.id()==ID_bv ||
      type.id()==ID_fixedbv)
   {
-    assert(v.size()==boolbv_width(type));
+    assert(value.size()==boolbv_width(type));
     constant_exprt c(type);
-    c.set_value(v);
+    c.set_value(value);
     return c;
   }
   else if(type.id()==ID_bool)
   {
-    if(v=="1")
+    if(value=="1")
       return true_exprt();
-    else if(v=="0")
+    else if(value=="0")
       return false_exprt();
   }
   else if(type.id()==ID_pointer)
   {
-    assert(v.size()==boolbv_width(type));
+    assert(value.size()==boolbv_width(type));
     
-    unsigned i=v.size()-BV_ADDR_BITS;
+    unsigned i=value.size()-BV_ADDR_BITS;
 
     pointer_logict::pointert p;
     p.object=integer2long(
       binary2integer(
-        std::string(v, i, std::string::npos), false));
+        std::string(value, i, std::string::npos), false));
 
     p.offset=binary2integer(
-      std::string(v, 0, i), true);
+      std::string(value, 0, i), true);
 
     return pointer_logic.pointer_expr(p, type);
   }
   else if(type.id()==ID_struct)
   {
-    return binary2struct(to_struct_type(type), v);
+    return binary2struct(to_struct_type(type), value);
   }
   else if(type.id()==ID_union)
   {
-    return binary2union(to_union_type(type), v);
+    return binary2union(to_union_type(type), value);
+  }
+  else if(type.id()==ID_array)
+  {
+    exprt value_expr=ce_value(type.subtype(), "", value);
+  
+    // use index, recusive call
+    exprt index_expr=
+      ce_value(signedbv_typet(value.size()), "", index);
+    
+    if(index_expr.is_nil()) return nil_exprt();
+    
+    exprt array_list("array-list", type);
+    array_list.copy_to_operands(index_expr, value_expr);
+    
+    return array_list;
   }
 
   return nil_exprt();
@@ -3003,7 +3019,7 @@ exprt smt1_convt::binary2struct(
 
     index-=sub_size;
     std::string cval=binary.substr(index, sub_size);
-    e.operands()[i]=ce_value(sub_type, cval);
+    e.operands()[i]=ce_value(sub_type, "", cval);
   }
   
   return e;
