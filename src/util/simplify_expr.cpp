@@ -693,7 +693,7 @@ bool simplify_exprt::simplify_pointer_offset(exprt &expr)
     if(ptr.operands().size()!=1) return true;
     
     const typet &op_type=ns.follow(ptr.op0().type());
-
+    
     if(op_type.id()==ID_pointer)
     {
       // Cast from pointer to pointer.
@@ -710,34 +710,46 @@ bool simplify_exprt::simplify_pointer_offset(exprt &expr)
     {
       // Cast from integer to pointer, say (int *)x.
       
-      // We do a bit of special treatment for (TYPE *)(a+(int)&o),
-      // which is re-written to 'a'.
-
-      typet type=ns.follow(expr.type());      
-      exprt tmp=ptr.op0();
-      if(tmp.id()==ID_plus && tmp.operands().size()==2)
+      if(ptr.op0().is_constant())
       {
-        if(tmp.op0().id()==ID_typecast &&
-           tmp.op0().operands().size()==1 &&
-           tmp.op0().op0().id()==ID_address_of)
-        {
-          expr=tmp.op1();
-          if(type!=expr.type())
-            expr.make_typecast(type);
+        // (T *)0x1234 -> 0x1234
+        exprt tmp=ptr.op0();
+        tmp.make_typecast(expr.type());
+        simplify_node(tmp);
+        expr.swap(tmp);
+        return false;
+      }
+      else
+      {
+        // We do a bit of special treatment for (TYPE *)(a+(int)&o),
+        // which is re-written to 'a'.
 
-          simplify_node(expr);
-          return false;
-        }
-        else if(tmp.op1().id()==ID_typecast &&
-                tmp.op1().operands().size()==1 &&
-                tmp.op1().op0().id()==ID_address_of)
+        typet type=ns.follow(expr.type());      
+        exprt tmp=ptr.op0();
+        if(tmp.id()==ID_plus && tmp.operands().size()==2)
         {
-          expr=tmp.op0();
-          if(type!=expr.type())
-            expr.make_typecast(type);
+          if(tmp.op0().id()==ID_typecast &&
+             tmp.op0().operands().size()==1 &&
+             tmp.op0().op0().id()==ID_address_of)
+          {
+            expr=tmp.op1();
+            if(type!=expr.type())
+              expr.make_typecast(type);
 
-          simplify_node(expr);
-          return false;
+            simplify_node(expr);
+            return false;
+          }
+          else if(tmp.op1().id()==ID_typecast &&
+                  tmp.op1().operands().size()==1 &&
+                  tmp.op1().op0().id()==ID_address_of)
+          {
+            expr=tmp.op0();
+            if(type!=expr.type())
+              expr.make_typecast(type);
+
+            simplify_node(expr);
+            return false;
+          }
         }
       }
     }
