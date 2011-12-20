@@ -435,7 +435,7 @@ bool bmct::run(const goto_functionst &goto_functions)
       return decide_smt1(smt1_dect::BOOLECTOR);
     else if(options.get_bool_option("smt2"))
       // this is the 'default' smt2 solver
-      return decide_smt2(smt2_dect::BOOLECTOR);
+      return decide_smt2(smt2_dect::MATHSAT);
     else if(options.get_bool_option("yices"))
       return decide_yices();
     else if(options.get_bool_option("z3"))
