@@ -330,7 +330,7 @@ Function: bmct::decide_mathsat
 
 bool bmct::decide_mathsat()
 {
-  return decide_smt1(smt1_dect::MATHSAT);
+  return decide_smt2(smt2_dect::MATHSAT);
 }
 
 /*******************************************************************\
