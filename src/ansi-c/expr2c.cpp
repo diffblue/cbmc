@@ -3304,6 +3304,35 @@ std::string expr2ct::convert_extractbit(
 
 /*******************************************************************\
 
+Function: expr2ct::convert_extractbits
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+std::string expr2ct::convert_extractbits(
+  const exprt &src,
+  unsigned precedence)
+{
+  if(src.operands().size()!=3)
+    return convert_norep(src, precedence);
+
+  std::string dest=convert(src.op0(), precedence);
+  dest+='[';
+  dest+=convert(src.op1(), precedence);
+  dest+=", ";
+  dest+=convert(src.op2(), precedence);
+  dest+=']';
+
+  return dest;
+}
+
+/*******************************************************************\
+
 Function: expr2ct::convert
 
   Inputs:
@@ -3739,6 +3768,9 @@ std::string expr2ct::convert(
 
   else if(src.id()==ID_extractbit)
     return convert_extractbit(src, precedence);
+
+  else if(src.id()==ID_extractbits)
+    return convert_extractbits(src, precedence);
 
   else if(src.id()==ID_initializer_list)
     return convert_initializer_list(src, precedence=15);

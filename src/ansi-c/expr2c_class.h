@@ -108,6 +108,10 @@ protected:
     const exprt &src,
     unsigned precedence);
 
+  std::string convert_extractbits(
+    const exprt &src,
+    unsigned precedence);
+
   std::string convert_unary(
     const exprt &src, const std::string &symbol,
     unsigned precedence);
