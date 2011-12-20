@@ -129,9 +129,8 @@ decision_proceduret::resultt smt1_dect::dec_solve()
   case BOOLECTOR:
     // –rwl0 disables rewriting, which makes things slower,
     // but in return values for arrays appear
-    command = "boolector --smt "
+    command = "boolector -rwl0 --smt "
             + temp_out_filename
-            + " –rwl0"
             + " -fm --output "
             + temp_result_filename;
     break;
@@ -236,15 +235,15 @@ decision_proceduret::resultt smt1_dect::read_result_boolector(std::istream &in)
         // Boolector offers array values as follows:
         // ID[INDEX] VALUE
         
-        if(id[id.size()-1]==']') // array?
+        if(id!="" && id[id.size()-1]==']') // array?
         {
           std::size_t pos2=id.find('[');
           
           if(pos2!=std::string::npos)
           {
-            id=std::string(id, 0, pos2-1);
-            values[id].value=value;
-            values[id].index=std::string(id, pos2+1, id.size()-pos2-1);
+            std::string new_id=std::string(id, 0, pos2);
+            values[new_id].value=value;
+            values[new_id].index=std::string(id, pos2+1, id.size()-pos2-2);
           }
         }
         else
@@ -408,7 +407,6 @@ decision_proceduret::resultt smt1_dect::read_result_mathsat(std::istream &in)
           std::size_t pos3=id.rfind(' ');
           std::string index=std::string(pos3+1, id.size()-pos3-1);
           id=std::string(id, 8, pos3-8);
-          std::cout << ">" << id << "< >" << index << "<" << std::endl;
         }
         else
           values[id].value=value;
@@ -487,14 +485,9 @@ decision_proceduret::resultt smt1_dect::read_result_z3(std::istream &in)
     std::string value=values[conv_id];
     if(value=="") continue;
 
-//    std::cout << it->first << " := " << value << std::endl;
-
     exprt e;
     if(string_to_expr_z3(it->second.type, value, e))
-    {
-//      std::cout << "E: " << e << std::endl;
       it->second.value=e;
-    }
     else
       set_value(it->second, "", value);
   }
@@ -571,8 +564,6 @@ bool smt1_dect::string_to_expr_z3(
   }
   else if(value.substr(0,6)=="(store")
   {
-//    std::cout << "STR: " << value << std::endl;
-
     size_t p1=value.rfind(' ')+1;
     size_t p2=value.rfind(' ', p1-2)+1;
 
@@ -581,10 +572,6 @@ bool smt1_dect::string_to_expr_z3(
     std::string elem = value.substr(p1, value.size()-p1-1);
     std::string inx = value.substr(p2, p1-p2-1);
     std::string array = value.substr(7, p2-8);
-
-//    std::cout << "ELEM: " << elem << std::endl;
-//    std::cout << "INX: " << inx << std::endl;
-//    std::cout << "ARR: " << array << std::endl;
 
     exprt old;
     if(!string_to_expr_z3(type, array, old)) return false;
@@ -696,8 +683,6 @@ decision_proceduret::resultt smt1_dect::read_result_cvc3(std::istream &in)
           {
             std::string t=var; var=val; val=t;
           }
-
-//          std::cout << "OPS: " << ops << std::endl;
         }
         else if(line.substr(pos+1,3)=="not")
         {
@@ -710,9 +695,6 @@ decision_proceduret::resultt smt1_dect::read_result_cvc3(std::istream &in)
           assert(var.find(' ')==std::string::npos);
           val = "true";
         }
-
-//        std::cout << "VAR: " << var << std::endl;
-//        std::cout << "VAL: " << val << std::endl;
 
         values[var]=val;
       }
@@ -728,8 +710,6 @@ decision_proceduret::resultt smt1_dect::read_result_cvc3(std::istream &in)
     std::string conv_id=convert_identifier(it->first);
     std::string value=values[conv_id];
     if(value=="") continue;
-
-//    std::cout << it->first << " := " << value << std::endl;
 
     if(value.substr(0,2)=="bv")
     {

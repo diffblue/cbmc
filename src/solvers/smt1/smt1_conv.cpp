@@ -146,13 +146,13 @@ exprt smt1_convt::ce_value(
   
     // use index, recusive call
     exprt index_expr=
-      ce_value(signedbv_typet(value.size()), "", index);
-    
+      ce_value(signedbv_typet(index.size()), "", index);
+      
     if(index_expr.is_nil()) return nil_exprt();
     
     exprt array_list("array-list", type);
     array_list.copy_to_operands(index_expr, value_expr);
-    
+
     return array_list;
   }
 
