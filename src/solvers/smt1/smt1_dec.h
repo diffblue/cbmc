@@ -67,6 +67,8 @@ protected:
     const typet &type, 
     const std::string &value, exprt &e) const;  
 
+  std::string mathsat_value(const std::string &src);
+
   struct value_indext
   {
     std::string value, index;

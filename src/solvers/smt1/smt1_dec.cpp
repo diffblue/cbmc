@@ -14,6 +14,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <tempfile.h>
 #include <arith_tools.h>
 #include <i2string.h>
+#include <string2int.h>
+#include <prefix.h>
 
 #include "smt1_dec.h"
 
@@ -149,10 +151,9 @@ decision_proceduret::resultt smt1_dect::dec_solve()
     break;
 
   case MATHSAT:
-    command = "mathsat "
-            + temp_out_filename
-            + " > "
-            + temp_result_filename;
+    command = "mathsat -model -input=smt"
+              " < "+temp_out_filename
+            + " > "+temp_result_filename;
     break;
 
   case Z3:
@@ -345,6 +346,34 @@ Function: smt1_dect::read_result_mathsat
 
 \*******************************************************************/
 
+std::string smt1_dect::mathsat_value(const std::string &src)
+{
+  std::size_t pos=src.find('[');
+
+  if(std::string(src, 0, 2)=="bv" && 
+     pos!=std::string::npos &&
+     src[src.size()-1]==']') 
+  {
+    unsigned width=safe_string2unsigned(std::string(src, pos+1, src.size()-pos-2));
+    mp_integer i=string2integer(std::string(src, 2, pos-2));
+    return integer2binary(i, width);
+  }
+  
+  return "";
+}
+
+/*******************************************************************\
+
+Function: smt1_dect::read_result_mathsat
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 decision_proceduret::resultt smt1_dect::read_result_mathsat(std::istream &in)
 {
   std::string line;
@@ -352,7 +381,7 @@ decision_proceduret::resultt smt1_dect::read_result_mathsat(std::istream &in)
 
   smt1_prop.reset_assignment();
 
-  typedef hash_map_cont<std::string, std::string, string_hash> valuest;
+  typedef hash_map_cont<std::string, value_indext, string_hash> valuest;
   valuest values;
 
   while(str_getline(in, line))
@@ -364,13 +393,26 @@ decision_proceduret::resultt smt1_dect::read_result_mathsat(std::istream &in)
     else if(line.size()>=1 && line[0]=='(')
     {
       // (= c_h39__h39___CPROVER_malloc_size_h39_35_h39_1 bv0[64])
+      // (= (select __h64_0 bv0[32]) bv5[8])
       std::size_t pos1=line.find(' ');
       std::size_t pos2=line.rfind(' ');
       if(pos1!=std::string::npos &&
          pos2!=std::string::npos &&
          pos1!=pos2)
-        values[std::string(line, pos1, pos2-pos1-1)]=
-          std::string(line, pos2, line.size()-pos2-1);
+      {
+        std::string id=std::string(line, pos1+1, pos2-pos1-1);
+        std::string value=std::string(line, pos2+1, line.size()-pos2-2);
+        
+        if(has_prefix(id, "(select "))
+        {
+          std::size_t pos3=id.rfind(' ');
+          std::string index=std::string(pos3+1, id.size()-pos3-1);
+          id=std::string(id, 8, pos3-8);
+          std::cout << ">" << id << "< >" << index << "<" << std::endl;
+        }
+        else
+          values[id].value=value;
+      }
     }
   }
 
@@ -381,22 +423,16 @@ decision_proceduret::resultt smt1_dect::read_result_mathsat(std::istream &in)
   {
     it->second.value.make_nil();
     std::string conv_id=convert_identifier(it->first);
-    std::string value=values[conv_id];
-    if(value=="") continue;
-    #if 0
-    value=string_
-    exprt e;
-    if(string_to_expr_mathsat(it->second.type, value, e))
-      it->second.value=e;
-    else
-      set_value(it->second, value);
-    #endif
+    std::string value=mathsat_value(values[conv_id].value);
+
+    if(value!="")
+      set_value(it->second, "", value);
   }
 
   // Booleans
   for(unsigned v=0; v<smt1_prop.no_variables(); v++)
   {
-    std::string value=values["B"+i2string(v)];
+    std::string value=values["B"+i2string(v)].value;
     if(value=="") continue;
     smt1_prop.set_assignment(literalt(v, false), value=="true");
   }
