@@ -26,7 +26,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "boolbv.h"
 #include "boolbv_type.h"
-#include "flatten_byte_operators.h"
 
 #ifdef HAVE_FLOATBV
 #include "../floatbv/float_utils.h"
@@ -538,18 +537,6 @@ literalt boolbvt::convert_rest(const exprt &expr)
     throw "boolbvt::convert_rest got non-boolean operand";
   }
   
-  // we perform some re-writing on the byte operators
-  #if 0
-  if(has_byte_operator(expr))
-    return convert_rest(flatten_byte_operators(expr, ns));
-  #endif
-
-  // flatten any byte_* operators
-  #if 0
-  if(has_byte_operator(expr))
-    return convert_rest(flatten_byte_operators(expr, ns));
-  #endif
-
   const exprt::operandst &operands=expr.operands();
 
   if(expr.id()==ID_typecast)
