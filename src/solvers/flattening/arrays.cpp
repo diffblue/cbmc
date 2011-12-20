@@ -180,8 +180,13 @@ void arrayst::collect_arrays(const exprt &a)
   else if(a.id()==ID_array_of)
   {
   }
+  else if(a.id()==ID_byte_update_little_endian ||
+          a.id()==ID_byte_update_big_endian)
+  {
+    assert(0);
+  }
   else
-    throw "unexpected array expression: `"+a.id_string()+"'";
+    throw "unexpected array expression (collect_arrays): `"+a.id_string()+"'";
 }
 
 /*******************************************************************\
@@ -403,8 +408,13 @@ void arrayst::add_array_constraints(
           to_member_expr(expr).struct_op().id()==ID_symbol)
   {
   }
+  else if(expr.id()==ID_byte_update_little_endian ||
+          expr.id()==ID_byte_update_big_endian)
+  {
+    assert(0);
+  }
   else
-    throw "unexpected array expression: `"+expr.id_string()+"'";
+    throw "unexpected array expression (add_array_constraints): `"+expr.id_string()+"'";
 }
 
 /*******************************************************************\

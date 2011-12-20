@@ -53,15 +53,16 @@ exprt flatten_byte_extract(
         subtype.id()==ID_signedbv) &&
        subtype.get_int(ID_width)==8)
     {
-      // get 'width'-bytes, and concatenate
+      // get 'width'-many bytes, and concatenate
       exprt::operandst op;
       op.resize(width);
       
       for(unsigned i=0; i<width; i++)
       {
+        plus_exprt offset(from_integer(i, src.op1().type()), src.op1());
         index_exprt index_expr(subtype);
         index_expr.array()=src.op0();
-        index_expr.index()=from_integer(i, src.op1().type());
+        index_expr.index()=offset;
         op[i]=index_expr;
       }
       
@@ -162,9 +163,9 @@ exprt flatten_byte_update(
   assert(src.operands().size()==3);
 
   unsigned width=
-    integer2long(pointer_offset_size(ns, src.type()));
+    integer2long(pointer_offset_size(ns, src.op2().type()));
   
-  const typet &t=src.op0().type();
+  const typet &t=ns.follow(src.op0().type());
   
   if(t.id()==ID_array)
   {
@@ -176,7 +177,7 @@ exprt flatten_byte_update(
         subtype.id()==ID_signedbv) &&
        subtype.get_int(ID_width)==8)
     {
-      // apply 'with' width times
+      // apply 'array-update-with' width times
       exprt result=src.op0();
       
       for(unsigned i=0; i<width; i++)
@@ -188,14 +189,16 @@ exprt flatten_byte_update(
           subtype);
           
         exprt i_expr=from_integer(i, ns.follow(src.op1().type()));
+        exprt where=plus_exprt(src.op1(), i_expr);
           
-        byte_extract_expr.copy_to_operands(src.op1(), i_expr);
+        byte_extract_expr.copy_to_operands(src.op0(), where);
           
         with_exprt with_expr;
         with_expr.type()=src.type();
         with_expr.old()=result;
-        with_expr.where()=plus_exprt(src.op1(), i_expr);
-        with_expr.new_value()=flatten_byte_extract(byte_extract_expr, ns);
+        with_expr.where()=where;
+        //with_expr.new_value()=flatten_byte_extract(byte_extract_expr, ns);
+        with_expr.new_value()=byte_extract_expr;
         
         result.swap(with_expr);
       }
