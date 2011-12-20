@@ -182,23 +182,35 @@ exprt flatten_byte_update(
       
       for(unsigned i=0; i<width; i++)
       {
-        exprt byte_extract_expr(
-          src.id()==ID_byte_update_little_endian?ID_byte_extract_little_endian:
-          src.id()==ID_byte_update_big_endian?ID_byte_extract_big_endian:
-          throw "unexpected src.id()",
-          subtype);
-          
         exprt i_expr=from_integer(i, ns.follow(src.op1().type()));
-        exprt where=plus_exprt(src.op1(), i_expr);
+
+        exprt new_value;
+        
+        if(i==0 && width==1) // bytes?
+        {
+          new_value=src.op2();
+          if(new_value.type()!=subtype)
+            new_value.make_typecast(subtype);
+        }
+        else
+        {
+          exprt byte_extract_expr(
+            src.id()==ID_byte_update_little_endian?ID_byte_extract_little_endian:
+            src.id()==ID_byte_update_big_endian?ID_byte_extract_big_endian:
+            throw "unexpected src.id()",
+            subtype);
           
-        byte_extract_expr.copy_to_operands(src.op0(), where);
+          byte_extract_expr.copy_to_operands(src.op2(), i_expr);
+          new_value=flatten_byte_extract(byte_extract_expr, ns);
+        }
+
+        exprt where=plus_exprt(src.op1(), i_expr);
           
         with_exprt with_expr;
         with_expr.type()=src.type();
         with_expr.old()=result;
         with_expr.where()=where;
-        //with_expr.new_value()=flatten_byte_extract(byte_extract_expr, ns);
-        with_expr.new_value()=byte_extract_expr;
+        with_expr.new_value()=new_value;
         
         result.swap(with_expr);
       }
