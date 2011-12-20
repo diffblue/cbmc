@@ -496,6 +496,12 @@ std::string smt1_convt::convert_identifier(const irep_idt &identifier)
   std::string s=id2string(identifier), dest;
   dest.reserve(s.size());
 
+  // a sequence of letters, digits, dots (.), single quotes (’), and
+  // underscores (_), starting with a letter
+  
+  // MathSAT does not really seem to like the single quotes '
+  // so we avoid these.
+
   for(std::string::const_iterator
       it=s.begin();
       it!=s.end();
@@ -503,7 +509,7 @@ std::string smt1_convt::convert_identifier(const irep_idt &identifier)
   {
     char ch=*it;
 
-    if(isalnum(ch) || ch=='.' || ch=='_')
+    if(isalnum(ch) || ch=='_')
       dest+=ch;
     else if(ch==':')
     {
@@ -511,21 +517,27 @@ std::string smt1_convt::convert_identifier(const irep_idt &identifier)
       next_it++;
       if(next_it!=s.end() && *next_it==':')
       {
-        dest.append("''");
+        dest.append(".S");
         it=next_it;
       }
       else
-      {
-        dest+='\'';
-        dest.append(i2string(ch));
-        dest+='\'';
-      }
+        dest+=".C";
     }
+    else if(ch=='#')
+      dest+=".H";
+    else if(ch=='$')
+      dest+=".D";
+    else if(ch=='!')
+      dest+=".E";
+    else if(ch=='.')
+      dest+="..";
+    else if(ch=='%')
+      dest+=".P";
     else
     {
-      dest+='\'';
+      dest+='.';
       dest.append(i2string(ch));
-      dest+='\'';
+      dest+='.';
     }
   }
 
@@ -3043,14 +3055,10 @@ exprt smt1_convt::binary2union(
 {
   //const union_typet::componentst &components=type.components();
 
-  // std::cout << "S: " << stype << std::endl;
-
   unsigned total_width=boolbv_width(type);
 
   if(total_width==0)
     throw "failed to get union width";
-
-  // std::cout << "B: " << binary << std::endl;
 
   exprt e(type.id(), type);
 
