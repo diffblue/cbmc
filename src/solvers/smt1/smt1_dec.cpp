@@ -177,6 +177,9 @@ decision_proceduret::resultt smt1_dect::dec_solve()
   case YICES:
     return read_result_yices(in);
 
+  case MATHSAT:
+    return read_result_mathsat(in);
+
   case Z3:
     return read_result_z3(in);
 
@@ -207,15 +210,34 @@ decision_proceduret::resultt smt1_dect::read_result_boolector(std::istream &in)
   {
     smt1_prop.reset_assignment();
 
-    typedef hash_map_cont<std::string, std::string, string_hash> valuest;
+    typedef hash_map_cont<std::string, value_indext, string_hash> valuest;
     valuest values;
 
     while(str_getline(in, line))
     {
       std::size_t pos=line.find(' ');
-      if(pos!=std::string::npos)
-        values[std::string(line, 0, pos)]=
-          std::string(line, pos+1, std::string::npos);
+      if(pos!=std::string::npos && pos!=0)
+      {
+        std::string id=std::string(line, 0, pos);
+        std::string value=std::string(line, pos+1, std::string::npos);
+      
+        // Boolector offers array values as follows:
+        // ID[INDEX] VALUE
+        
+        if(id[id.size()-1]==']') // array?
+        {
+          std::size_t pos2=id.find('[');
+          
+          if(pos2!=std::string::npos)
+          {
+            id=std::string(id, 0, pos2-1);
+            values[id].value=value;
+            values[id].index=std::string(id, pos2+1, id.size()-pos2-1);
+          }
+        }
+        else
+          values[id].value=value;
+      }
     }
 
     // Theory variables
@@ -227,16 +249,16 @@ decision_proceduret::resultt smt1_dect::read_result_boolector(std::istream &in)
     {
       it->second.value.make_nil();
       std::string conv_id=convert_identifier(it->first);
-      std::string value=values[conv_id];
+      std::string value=values[conv_id].value;
       if(value=="") continue;
-      set_value(it->second, value);
+      set_value(it->second, values[conv_id].index, value);
     }
 
     // Booleans
 
     for(unsigned v=0; v<smt1_prop.no_variables(); v++)
     {
-      std::string value=values["B"+i2string(v)];
+      std::string value=values["B"+i2string(v)].value;
       if(value=="") continue;
       smt1_prop.set_assignment(literalt(v, false), value=="1");
     }
@@ -302,6 +324,78 @@ decision_proceduret::resultt smt1_dect::read_result_yices(std::istream &in)
 
 /*******************************************************************\
 
+Function: smt1_dect::read_result_mathsat
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+decision_proceduret::resultt smt1_dect::read_result_mathsat(std::istream &in)
+{
+  std::string line;
+  decision_proceduret::resultt res = D_ERROR;
+
+  smt1_prop.reset_assignment();
+
+  typedef hash_map_cont<std::string, std::string, string_hash> valuest;
+  valuest values;
+
+  #if 0
+  while(str_getline(in, line))
+  {
+    if(line=="sat")
+      res = D_SATISFIABLE;
+    else if(line=="unsat")
+      res = D_UNSATISFIABLE;
+    else
+    {
+      std::size_t pos=line.find(" -> ");
+      if(pos!=std::string::npos)
+        values[std::string(line, 0, pos)]=
+          std::string(line, pos+4, std::string::npos);
+    }
+  }
+
+  for(identifier_mapt::iterator
+      it=identifier_map.begin();
+      it!=identifier_map.end();
+      it++)
+  {
+    it->second.value.make_nil();
+    std::string conv_id=convert_identifier(it->first);
+    std::string value=values[conv_id];
+    if(value=="") continue;
+
+//    std::cout << it->first << " := " << value << std::endl;
+
+    exprt e;
+    if(string_to_expr_z3(it->second.type, value, e))
+    {
+//      std::cout << "E: " << e << std::endl;
+      it->second.value=e;
+    }
+    else
+      set_value(it->second, value);
+  }
+
+  // Booleans
+  for(unsigned v=0; v<smt1_prop.no_variables(); v++)
+  {
+    std::string value=values["B"+i2string(v)];
+    if(value=="") continue;
+    smt1_prop.set_assignment(literalt(v, false), value=="true");
+  }
+  #endif
+
+  return res;
+}
+
+/*******************************************************************\
+
 Function: smt1_dect::read_result_z3
 
   Inputs:
@@ -356,7 +450,7 @@ decision_proceduret::resultt smt1_dect::read_result_z3(std::istream &in)
       it->second.value=e;
     }
     else
-      set_value(it->second, value);
+      set_value(it->second, "", value);
   }
 
   // Booleans
@@ -600,7 +694,7 @@ decision_proceduret::resultt smt1_dect::read_result_cvc3(std::istream &in)
       std::string binary=integer2binary(string2integer(v,10),
                                         string2integer(w,10).to_ulong());
 
-      set_value(it->second, binary);
+      set_value(it->second, "", binary);
     }
     else if(value=="false")
       it->second.value.make_false();
@@ -617,7 +711,7 @@ decision_proceduret::resultt smt1_dect::read_result_cvc3(std::istream &in)
         it->second.value = fit->first;
     }
     else
-      set_value(it->second, value);
+      set_value(it->second, "", value);
   }
 
   // Booleans
