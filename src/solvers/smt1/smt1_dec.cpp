@@ -31,11 +31,12 @@ Function: smt1_dect::decision_procedure_text
 
 std::string smt1_dect::decision_procedure_text() const
 {
-  return "SMT "+logic+" using "+
+  return "SMT1 "+logic+" using "+
     (solver==BOOLECTOR?"Boolector":
      solver==CVC3?"CVC3":
      solver==OPENSMT?"OpenSMT":
      solver==YICES?"Yices":
+     solver==MATHSAT?"MathSAT":
      solver==Z3?"Z3":
      "(unknown)");
 }
@@ -148,7 +149,7 @@ decision_proceduret::resultt smt1_dect::dec_solve()
     break;
 
   case MATHSAT:
-    command = "? "
+    command = "mathsat "
             + temp_out_filename
             + " > "
             + temp_result_filename;
