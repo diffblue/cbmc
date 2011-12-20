@@ -124,8 +124,11 @@ decision_proceduret::resultt smt1_dect::dec_solve()
     break;
 
   case BOOLECTOR:
+    // –rwl0 disables rewriting, which makes things slower,
+    // but in return values for arrays appear
     command = "boolector --smt "
             + temp_out_filename
+            + " –rwl0"
             + " -fm --output "
             + temp_result_filename;
     break;
@@ -139,6 +142,13 @@ decision_proceduret::resultt smt1_dect::dec_solve()
 
   case YICES:
     command = "yices -smt -e "
+            + temp_out_filename
+            + " > "
+            + temp_result_filename;
+    break;
+
+  case MATHSAT:
+    command = "? "
             + temp_out_filename
             + " > "
             + temp_result_filename;
