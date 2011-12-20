@@ -355,19 +355,22 @@ decision_proceduret::resultt smt1_dect::read_result_mathsat(std::istream &in)
   typedef hash_map_cont<std::string, std::string, string_hash> valuest;
   valuest values;
 
-  #if 0
   while(str_getline(in, line))
   {
     if(line=="sat")
-      res = D_SATISFIABLE;
+      res=D_SATISFIABLE;
     else if(line=="unsat")
-      res = D_UNSATISFIABLE;
-    else
+      res=D_UNSATISFIABLE;
+    else if(line.size()>=1 && line[0]=='(')
     {
-      std::size_t pos=line.find(" -> ");
-      if(pos!=std::string::npos)
-        values[std::string(line, 0, pos)]=
-          std::string(line, pos+4, std::string::npos);
+      // (= c_h39__h39___CPROVER_malloc_size_h39_35_h39_1 bv0[64])
+      std::size_t pos1=line.find(' ');
+      std::size_t pos2=line.rfind(' ');
+      if(pos1!=std::string::npos &&
+         pos2!=std::string::npos &&
+         pos1!=pos2)
+        values[std::string(line, pos1, pos2-pos1-1)]=
+          std::string(line, pos2, line.size()-pos2-1);
     }
   }
 
@@ -380,17 +383,14 @@ decision_proceduret::resultt smt1_dect::read_result_mathsat(std::istream &in)
     std::string conv_id=convert_identifier(it->first);
     std::string value=values[conv_id];
     if(value=="") continue;
-
-//    std::cout << it->first << " := " << value << std::endl;
-
+    #if 0
+    value=string_
     exprt e;
-    if(string_to_expr_z3(it->second.type, value, e))
-    {
-//      std::cout << "E: " << e << std::endl;
+    if(string_to_expr_mathsat(it->second.type, value, e))
       it->second.value=e;
-    }
     else
       set_value(it->second, value);
+    #endif
   }
 
   // Booleans
@@ -400,7 +400,6 @@ decision_proceduret::resultt smt1_dect::read_result_mathsat(std::istream &in)
     if(value=="") continue;
     smt1_prop.set_assignment(literalt(v, false), value=="true");
   }
-  #endif
 
   return res;
 }
