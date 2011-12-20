@@ -420,6 +420,8 @@ bool bmct::run(const goto_functionst &goto_functions)
 
     if(options.get_bool_option("boolector"))
       return decide_boolector();
+    else if(options.get_bool_option("mathsat"))
+      return decide_mathsat();
     else if(options.get_bool_option("cvc"))
       return decide_cvc();
     else if(options.get_bool_option("dimacs"))
