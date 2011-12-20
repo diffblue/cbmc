@@ -318,6 +318,23 @@ bool bmct::decide_boolector()
 
 /*******************************************************************\
 
+Function: bmct::decide_mathsat
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool bmct::decide_mathsat()
+{
+  return decide_smt1(smt1_dect::MATHSAT);
+}
+
+/*******************************************************************\
+
 Function: bmct::decide_opensmt
 
   Inputs:
