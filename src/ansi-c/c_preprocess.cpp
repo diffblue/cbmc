@@ -322,7 +322,7 @@ bool c_preprocess_visual_studio(
         it++)
       command_file << "/I"+shell_quote(*it) << std::endl;
 
-    command_file << file << std::endl;
+    command_file << "\"" << file << "\"" << std::endl;
   }
   
   std::string tmpi=get_temporary_file("tmp.cl", "");
