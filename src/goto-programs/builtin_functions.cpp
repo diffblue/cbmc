@@ -928,7 +928,7 @@ void goto_convertt::do_function_call_symbol(
     do_prob_uniform(lhs, function, arguments, dest);
   }
   else if(has_prefix(id2string(identifier), "c::nondet_") ||
-          has_prefix(id2string(identifier), "cpp::nondet_"))
+          has_prefix(id2string(identifier), "c::__VERIFIER_nondet_"))
   {
     // make it a side effect if there is an LHS
     if(lhs.is_nil()) return;
