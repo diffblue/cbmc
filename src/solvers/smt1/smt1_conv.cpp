@@ -75,6 +75,22 @@ exprt smt1_convt::get(const exprt &expr) const
     if(tmp.is_nil()) return nil_exprt();
     return member_exprt(tmp, member_expr.get_component_name(), expr.type());
   }
+  else if(expr.id()==ID_index)
+  {
+    const index_exprt &index_expr=to_index_expr(expr);
+    exprt tmp_array=get(index_expr.array());
+    exprt tmp_index=get(index_expr.index());
+    if(tmp_array.is_nil() || tmp_index.is_nil()) return nil_exprt();
+    return index_exprt(tmp_array, tmp_index, expr.type());
+  }
+  else if(expr.id()==ID_constant)
+    return expr;
+  else if(expr.id()==ID_typecast)
+  {
+    exprt tmp=get(to_typecast_expr(expr).op());
+    if(tmp.is_nil()) return nil_exprt();
+    return typecast_exprt(tmp, expr.type());
+  }
 
   return nil_exprt();
 }
@@ -152,7 +168,7 @@ exprt smt1_convt::ce_value(
     
     exprt array_list("array-list", type);
     array_list.copy_to_operands(index_expr, value_expr);
-
+    
     return array_list;
   }
 

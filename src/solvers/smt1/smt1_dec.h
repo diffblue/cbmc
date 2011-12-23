@@ -69,11 +69,13 @@ protected:
 
   std::string mathsat_value(const std::string &src);
 
-  struct value_indext
+  struct valuet
   {
-    std::string value, index;
+    // map from array index to value
+    typedef std::map<std::string, std::string> index_value_mapt;
+    index_value_mapt index_value_map;
+    std::string value;
   };
-
 };
 
 #endif
