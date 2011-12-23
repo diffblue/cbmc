@@ -172,11 +172,11 @@ std::string counterexample_value_binary(
   }
   else if(expr.id()==ID_struct)
   {
-    std::string result;
+    std::string result="{ ";
   
     forall_operands(it, expr)
     {
-      if(result=="") result="{ "; else result+=", ";
+      if(it!=expr.operands().begin()) result+=", ";
       result+=counterexample_value_binary(*it, ns);
     }
       
