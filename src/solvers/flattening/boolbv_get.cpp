@@ -99,9 +99,6 @@ exprt boolbvt::bv_get_rec(
 
   unsigned width=boolbv_width(type);
   
-  if(width==0)
-    return nil_exprt();
-
   assert(bv.size()==unknown.size());
   assert(bv.size()>=offset+width);
 

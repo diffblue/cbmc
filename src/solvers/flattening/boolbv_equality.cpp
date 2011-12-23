@@ -69,7 +69,11 @@ literalt boolbvt::convert_equality(const equal_exprt &expr)
   }
 
   if(bv0.size()==0)
-    throw "got zero-size BV";
+  {
+    // An empty bit-vector comparison. It's not clear
+    // what this is meant to say.
+    return prop.new_variable();
+  }
 
   if(expr.lhs().type().id()==ID_verilogbv)
   {
