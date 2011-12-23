@@ -295,11 +295,11 @@ decision_proceduret::resultt smt2_dect::read_result_mathsat(std::istream &in)
 
   while(str_getline(in, line))
   {
-    if(line=="(sat)")
-      res = D_SATISFIABLE;
-    else if(line=="(unsat)")
-      res = D_UNSATISFIABLE;
-    else
+    if(line=="sat")
+      res=D_SATISFIABLE;
+    else if(line=="unsat")
+      res=D_UNSATISFIABLE;
+    else if(line!="" && line[0]=='(')
     {
     }
   }
@@ -313,7 +313,6 @@ decision_proceduret::resultt smt2_dect::read_result_mathsat(std::istream &in)
     std::string conv_id=convert_identifier(it->first);
     std::string value=values[conv_id];
     if(value=="") continue;
-    // TODO
     set_value(it->second, value);
   }
 

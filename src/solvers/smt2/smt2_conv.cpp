@@ -2365,7 +2365,12 @@ void smt2_convt::convert_with(const exprt &expr)
       const exprt &value=expr.operands()[i+1];
 
       smt2_prop.out << " ";
-      convert_expr(index);
+
+      if(index.type()!=array_index_type())
+        convert_expr(typecast_exprt(index, array_index_type()));
+      else
+        convert_expr(index);
+
       smt2_prop.out << " ";
 
       convert_expr(value);
@@ -2617,6 +2622,8 @@ void smt2_convt::set_to(const exprt &expr, bool value)
         assert(id.type.is_nil());
 
         id.type=equal_expr.lhs().type();
+        find_symbols(id.type);
+        find_symbols(equal_expr.rhs());
 
         smt2_prop.out << "(define-fun ; set_to true" << std::endl
                       << " " << convert_identifier(identifier)
@@ -2689,7 +2696,7 @@ void smt2_convt::find_symbols(const exprt &expr)
       identifier="nondet_"+id2string(expr.get(ID_identifier));
 
     identifiert &id=identifier_map[identifier];
-
+    
     if(id.type.is_nil())
     {
       id.type=expr.type();
