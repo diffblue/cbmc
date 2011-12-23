@@ -299,8 +299,20 @@ decision_proceduret::resultt smt2_dect::read_result_mathsat(std::istream &in)
       res=D_SATISFIABLE;
     else if(line=="unsat")
       res=D_UNSATISFIABLE;
-    else if(line!="" && line[0]=='(')
+    else if(line.size()>=2 && line[0]=='(')
     {
+      // ( (B0 true) )
+      std::size_t pos1=line.find('(', 1);
+      std::size_t pos2=line.find(' ', pos1);
+      std::size_t pos3=line.find(')', pos2);
+      if(pos1!=std::string::npos &&
+         pos2!=std::string::npos &&
+         pos3!=std::string::npos)
+      {
+        std::string id=std::string(line, pos1+1, pos2-pos1-1);
+        std::string value=std::string(line, pos2+1, pos3-pos2-1);
+        values[id]=value;
+      }
     }
   }
 
