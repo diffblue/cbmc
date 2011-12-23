@@ -245,7 +245,7 @@ literalt prop_convt::convert_bool(const exprt &expr)
   }
   else if(expr.id()==ID_symbol)
   {
-    return get_literal(expr.get(ID_identifier));
+    return get_literal(to_symbol_expr(expr).get_identifier());
   }
   else if(expr.id()==ID_literal)
   {
@@ -390,7 +390,7 @@ bool prop_convt::set_equality_to_true(const exprt &expr)
     if(expr.op0().id()==ID_symbol)
     {
       const irep_idt &identifier=
-        expr.op0().get(ID_identifier);
+        to_symbol_expr(expr.op0()).get_identifier();
 
       literalt tmp=convert(expr.op1());
 
