@@ -71,6 +71,16 @@ void smt2_propt::finalize()
 {
   out << std::endl;
   out << "(check-sat)" << std::endl;
+  out << std::endl;
+  
+  for(smt2_identifierst::const_iterator
+      it=smt2_identifiers.begin();
+      it!=smt2_identifiers.end();
+      it++)
+    out << "(get-value (" << *it << "))" << std::endl;
+  
+  out << std::endl;
+  
   out << "; end of SMT2 file" << std::endl;
 }
 
@@ -486,6 +496,8 @@ std::string smt2_propt::smt2_literal(literalt l)
     return "true";
     
   std::string v="B"+i2string(l.var_no());
+  
+  smt2_identifiers.insert(v);
 
   if(l.sign())
     return "(not "+v+")";  
