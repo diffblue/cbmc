@@ -2625,8 +2625,11 @@ void smt2_convt::set_to(const exprt &expr, bool value)
         find_symbols(id.type);
         find_symbols(equal_expr.rhs());
 
+        std::string smt2_identifier=convert_identifier(identifier);
+        smt2_prop.smt2_identifiers.insert(smt2_identifier);
+
         smt2_prop.out << "(define-fun ; set_to true" << std::endl
-                      << " " << convert_identifier(identifier)
+                      << " " << smt2_identifier
                       << " () ";
 
         convert_type(equal_expr.lhs().type());
@@ -2700,9 +2703,13 @@ void smt2_convt::find_symbols(const exprt &expr)
     if(id.type.is_nil())
     {
       id.type=expr.type();
+      
+      std::string smt2_identifier=convert_identifier(identifier);
+      
+      smt2_prop.smt2_identifiers.insert(smt2_identifier);
 
       smt2_prop.out << "(declare-fun "
-                    << convert_identifier(identifier)
+                    << smt2_identifier
                     << " () ";
       convert_type(expr.type());
       smt2_prop.out << ")" << std::endl;

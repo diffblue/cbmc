@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_PROP_SMT2_PROP_H
 
 #include <iostream>
+#include <set>
 
 #include <threeval.h>
 
@@ -78,6 +79,9 @@ protected:
   std::vector<tvt> assignment;
   
   literalt define_new_variable();
+  
+  typedef std::set<std::string> smt2_identifierst;
+  smt2_identifierst smt2_identifiers;
 };
 
 #endif
