@@ -1704,6 +1704,9 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
       // We do a bit of return-type guessing, but just a bit
       typet return_type=int_type();
       
+      // The following isn't really right and sound, but there
+      // are too many idiots out there who use malloc and the like
+      // without the right header file.
       if(identifier=="c::malloc" ||
          identifier=="c::realloc" ||
          identifier=="c::reallocf" ||
