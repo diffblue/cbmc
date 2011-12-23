@@ -136,7 +136,14 @@ protected:
     const std::string &index,
     const std::string &value)
   {
-    identifier.value=ce_value(identifier.type, index, value);
+    exprt tmp=ce_value(identifier.type, index, value);
+    if(tmp.id()=="array-list" && identifier.value.id()=="array-list")
+    {
+      forall_operands(it, tmp)
+        identifier.value.copy_to_operands(*it);
+    }
+    else
+      identifier.value=tmp;
   }
   
   typedef hash_map_cont<irep_idt, identifiert, irep_id_hash>

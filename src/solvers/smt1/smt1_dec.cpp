@@ -221,7 +221,7 @@ decision_proceduret::resultt smt1_dect::read_result_boolector(std::istream &in)
   {
     smt1_prop.reset_assignment();
 
-    typedef hash_map_cont<std::string, value_indext, string_hash> valuest;
+    typedef hash_map_cont<std::string, valuet, string_hash> valuest;
     valuest values;
 
     while(str_getline(in, line))
@@ -233,7 +233,10 @@ decision_proceduret::resultt smt1_dect::read_result_boolector(std::istream &in)
         std::string value=std::string(line, pos+1, std::string::npos);
       
         // Boolector offers array values as follows:
+        //
         // ID[INDEX] VALUE
+        //
+        // There may be more than one line per ID
         
         if(id!="" && id[id.size()-1]==']') // array?
         {
@@ -242,8 +245,8 @@ decision_proceduret::resultt smt1_dect::read_result_boolector(std::istream &in)
           if(pos2!=std::string::npos)
           {
             std::string new_id=std::string(id, 0, pos2);
-            values[new_id].value=value;
-            values[new_id].index=std::string(id, pos2+1, id.size()-pos2-2);
+            std::string index=std::string(id, pos2+1, id.size()-pos2-2);
+            values[new_id].index_value_map[index]=value;
           }
         }
         else
@@ -260,9 +263,13 @@ decision_proceduret::resultt smt1_dect::read_result_boolector(std::istream &in)
     {
       it->second.value.make_nil();
       std::string conv_id=convert_identifier(it->first);
-      std::string value=values[conv_id].value;
-      if(value=="") continue;
-      set_value(it->second, values[conv_id].index, value);
+      const valuet &v=values[conv_id];
+
+      for(valuet::index_value_mapt::const_iterator
+          i_it=v.index_value_map.begin(); i_it!=v.index_value_map.end(); i_it++)
+        set_value(it->second, i_it->first, i_it->second);
+        
+      if(v.value!="") set_value(it->second, "", v.value);
     }
 
     // Booleans
@@ -380,7 +387,7 @@ decision_proceduret::resultt smt1_dect::read_result_mathsat(std::istream &in)
 
   smt1_prop.reset_assignment();
 
-  typedef hash_map_cont<std::string, value_indext, string_hash> valuest;
+  typedef hash_map_cont<std::string, valuet, string_hash> valuest;
   valuest values;
 
   while(str_getline(in, line))
@@ -401,12 +408,14 @@ decision_proceduret::resultt smt1_dect::read_result_mathsat(std::istream &in)
       {
         std::string id=std::string(line, pos1+1, pos2-pos1-1);
         std::string value=std::string(line, pos2+1, line.size()-pos2-2);
-        
+
         if(has_prefix(id, "(select "))
         {
+          #if 0
           std::size_t pos3=id.rfind(' ');
           std::string index=std::string(pos3+1, id.size()-pos3-1);
           id=std::string(id, 8, pos3-8);
+          #endif
         }
         else
           values[id].value=value;
