@@ -499,9 +499,6 @@ void boolbvt::convert_symbol(const exprt &expr, bvt &bv)
 {
   unsigned width=boolbv_width(expr.type());
 
-  if(width==0)
-    return conversion_failed(expr, bv);
-
   bv.resize(width);
   
   const irep_idt &identifier=expr.get(ID_identifier);
@@ -509,12 +506,20 @@ void boolbvt::convert_symbol(const exprt &expr, bvt &bv)
   if(identifier.empty())
     throw "convert_symbol got empty identifier";
 
-  for(unsigned i=0; i<width; i++)
-    bv[i]=map.get_literal(identifier, i, expr.type());
+  if(width==0)
+  {
+    // just put in map
+    map.get_map_entry(identifier, expr.type());
+  }
+  else
+  {
+    for(unsigned i=0; i<width; i++)
+      bv[i]=map.get_literal(identifier, i, expr.type());
 
-  for(unsigned i=0; i<width; i++)
-    if(bv[i].var_no()>=prop.no_variables() &&
-      !bv[i].is_constant()) { std::cout << identifier << std::endl; abort(); }
+    for(unsigned i=0; i<width; i++)
+      if(bv[i].var_no()>=prop.no_variables() &&
+        !bv[i].is_constant()) { std::cout << identifier << std::endl; abort(); }
+  }
 }
    
 /*******************************************************************\
