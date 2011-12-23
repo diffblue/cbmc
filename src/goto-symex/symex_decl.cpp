@@ -45,35 +45,25 @@ void goto_symext::symex_decl(statet &state)
 
   // just do the L1 renaming to preserve locality
   const irep_idt &l0_identifier=to_symbol_expr(code.op0()).get_identifier();
-  irep_idt l1_identifier=state.top().level1(l0_identifier);
 
-  // forget the old l2 renaming to avoid SSA for it
-  state.level2.remove(l1_identifier);
+  irep_idt l1_identifier;
 
-  // increase the frame if we have seen this declaration before
-  while(state.declaration_history.find(l1_identifier)!=
-        state.declaration_history.end())
+  do
   {
     unsigned index=state.top().level1.current_names[l0_identifier];
     state.top().level1.rename(l0_identifier, index+1);
     l1_identifier=state.top().level1(l0_identifier);
   }
-
+  while(state.declaration_history.find(l1_identifier)!=
+        state.declaration_history.end());
+  
+  // forget the old L2 renaming to avoid SSA for it
+  state.level2.remove(l1_identifier);
+  state.propagation.remove(l1_identifier);
   state.declaration_history.insert(l1_identifier); 
   
   state.top().local_variables.insert(l1_identifier);
     
-  // seen it before?
-  // it should get a fresh value in any case
-  statet::level2t::current_namest::iterator it=
-    state.level2.current_names.find(l1_identifier);
-  
-  if(it!=state.level2.current_names.end())
-  {
-    state.level2.rename(l1_identifier, it->second+1);
-    state.propagation.remove(l1_identifier);
-  }
-  
   // in case of pointers, put something into the value set
   if(ns.follow(code.op0().type()).id()==ID_pointer)
   {
