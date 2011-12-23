@@ -87,6 +87,7 @@ public:
 
   void convert(prop_convt &prop_conv);
   void convert_assignments(decision_proceduret &decision_procedure) const;
+  void convert_decls(prop_convt &prop_conv) const;
   void convert_assumptions(prop_convt &prop_conv);
   void convert_assertions(prop_convt &prop_conv);
   void convert_guards(prop_convt &prop_conv);
