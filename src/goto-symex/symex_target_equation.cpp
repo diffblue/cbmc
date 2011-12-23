@@ -89,6 +89,10 @@ void symex_target_equationt::decl(
   SSA_step.original_full_lhs=original_lhs_object;
   SSA_step.type=goto_trace_stept::DECL;
   SSA_step.source=source;
+
+  // the condition is trivially true, and only
+  // there so we see the symbols
+  SSA_step.cond_expr=equal_exprt(SSA_step.ssa_lhs, SSA_step.ssa_lhs);
 }
 
 /*******************************************************************\
@@ -275,6 +279,7 @@ void symex_target_equationt::convert(
 {
   convert_guards(prop_conv);
   convert_assignments(prop_conv);
+  convert_decls(prop_conv);
   convert_assumptions(prop_conv);
   convert_assertions(prop_conv);
   convert_io(prop_conv);
@@ -299,9 +304,33 @@ void symex_target_equationt::convert_assignments(
       it!=SSA_steps.end(); it++)
   {
     if(it->is_assignment() && !it->ignore)
+      decision_procedure.set_to_true(it->cond_expr);
+  }
+}
+
+/*******************************************************************\
+
+Function: symex_target_equationt::convert_decls
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void symex_target_equationt::convert_decls(
+  prop_convt &prop_conv) const
+{
+  for(SSA_stepst::const_iterator it=SSA_steps.begin();
+      it!=SSA_steps.end(); it++)
+  {
+    if(it->is_decl() && !it->ignore)
     {
-      exprt tmp(it->cond_expr);
-      decision_procedure.set_to_true(tmp);
+      // The result is not used, these have no impact on
+      // the satisfiability of the formula.
+      prop_conv.convert(it->cond_expr);
     }
   }
 }
@@ -327,10 +356,7 @@ void symex_target_equationt::convert_guards(
     if(it->ignore)
       it->guard_literal=const_literal(false);
     else
-    {
-      exprt tmp(it->guard_expr);
-      it->guard_literal=prop_conv.convert(tmp);
-    }
+      it->guard_literal=prop_conv.convert(it->guard_expr);
   }
 }
 
@@ -357,10 +383,7 @@ void symex_target_equationt::convert_assumptions(
       if(it->ignore)
         it->cond_literal=const_literal(true);
       else
-      {
-        exprt tmp(it->cond_expr);
-        it->cond_literal=prop_conv.convert(tmp);
-      }
+        it->cond_literal=prop_conv.convert(it->cond_expr);
     }
   }
 }
@@ -456,6 +479,7 @@ void symex_target_equationt::convert_io(
           o_it++)
       {
         exprt tmp=*o_it;
+        
         if(tmp.is_constant() ||
            tmp.id()==ID_string_constant)
           it->converted_io_args.push_back(tmp);
