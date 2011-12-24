@@ -44,8 +44,12 @@ void goto_symext::symex_decl(statet &state)
     throw "decl expects symbol as first operand";
 
   // just do the L1 renaming to preserve locality
-  const irep_idt &l0_identifier=to_symbol_expr(code.op0()).get_identifier();
-
+  const irep_idt &identifier=
+    to_symbol_expr(code.op0()).get_identifier();
+    
+  const irep_idt l0_identifier=
+    state.rename(identifier, ns, goto_symex_statet::L0);
+    
   irep_idt l1_identifier;
 
   do
@@ -56,7 +60,7 @@ void goto_symext::symex_decl(statet &state)
   }
   while(state.declaration_history.find(l1_identifier)!=
         state.declaration_history.end());
-  
+
   // forget the old L2 renaming to avoid SSA for it
   state.level2.remove(l1_identifier);
   state.propagation.remove(l1_identifier);

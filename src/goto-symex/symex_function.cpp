@@ -274,7 +274,7 @@ void goto_symext::symex_function_call_code(
   exprt::operandst arguments=call.arguments();
   for(unsigned i=0; i<arguments.size(); i++)
     state.rename(arguments[i], ns);
-
+  
   // increase unwinding counter
   unwinding_counter++;
   
@@ -363,7 +363,9 @@ Function: goto_symext::locality
 
  Outputs:
 
- Purpose:
+ Purpose: preserves locality of local variables of a given
+          function by applying L1 renaming to the local
+          identifiers
 
 \*******************************************************************/
 

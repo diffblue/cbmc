@@ -62,9 +62,7 @@ public:
     irep_idt operator()(const irep_idt &identifier)
     {
       // see if it's already renamed
-      if(original_identifiers.find(identifier)!=
-         original_identifiers.end())
-        return identifier;
+      if(is_renamed(identifier)) return identifier;
 
       // record
       irep_idt i=current_name(identifier);
@@ -72,7 +70,7 @@ public:
       return i;
     }
 
-    void operator()(symbol_exprt &expr)
+    inline void operator()(symbol_exprt &expr)
     {
       expr.set_identifier(operator()(expr.get_identifier()));
     }
@@ -81,6 +79,11 @@ public:
     {
       current_names[identifier]=count;
       original_identifiers[name(identifier, count)]=identifier;
+    }
+    
+    inline bool is_renamed(const irep_idt &identifier) const
+    {
+      return original_identifiers.find(identifier)!=original_identifiers.end();
     }
 
   protected:
@@ -105,7 +108,7 @@ public:
     irep_idt operator()(
       const irep_idt &identifier,
       const namespacet &ns,
-      unsigned thread_nr) const;
+      unsigned thread_nr);
 
     level0t() { }
     virtual ~level0t() { }
@@ -125,8 +128,7 @@ public:
     virtual irep_idt current_name(const irep_idt &identifier) const
     {
       // see if it's already renamed
-      if(original_identifiers.find(identifier)!=
-         original_identifiers.end())
+      if(is_renamed(identifier))
         return identifier;
 
       // rename only if needed
@@ -164,8 +166,7 @@ public:
     virtual irep_idt current_name(const irep_idt &identifier) const
     {
       // see if it's already renamed
-      if(original_identifiers.find(identifier)!=
-         original_identifiers.end())
+      if(is_renamed(identifier))
         return identifier;
 
       // _always_ rename
@@ -191,7 +192,7 @@ public:
     
   } propagation;
   
-  typedef enum { L0, L1, L2 } levelt;
+  typedef enum { L0=0, L1=1, L2=2 } levelt;
 
   // performs renaming _up to_ the given level
   irep_idt rename(const irep_idt &identifier, const namespacet &ns, levelt level=L2);
@@ -201,8 +202,8 @@ public:
   void rename_address(exprt &expr, const namespacet &ns, levelt level);
   
   void assignment(
-    symbol_exprt &lhs,
-    const exprt &rhs,
+    symbol_exprt &lhs, // L0/L1
+    const exprt &rhs,  // L2
     const namespacet &ns,
     bool record_value);
 
@@ -228,13 +229,9 @@ public:
     const namespacet &ns,
     const irep_idt &identifier)
   {
-    #if 0
     return level2.current_name(
            top().level1.current_name(
            level0(identifier, ns, source.thread_nr)));
-    #endif
-    return level2.current_name(
-           top().level1.current_name(identifier));
   }
   
   // uses level 1 names, and is used to
