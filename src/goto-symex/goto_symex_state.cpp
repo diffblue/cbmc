@@ -6,7 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <assert.h>
+#include <cstdlib>
+#include <cassert>
 
 #include <std_expr.h>
 #include <prefix.h>
