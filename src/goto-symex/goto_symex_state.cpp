@@ -74,15 +74,39 @@ Function: goto_symex_statet::level0t::operator()
 irep_idt goto_symex_statet::level0t::operator()(
   const irep_idt &identifier,
   const namespacet &ns,
-  unsigned thread_nr) const
+  unsigned thread_nr)
 {
-  if(identifier=="goto_symex::\\guard")
-    return identifier;
-    
-  if(is_global(ns.lookup(identifier)))
+  // already renamed?
+  if(original_identifiers.find(identifier)!=original_identifiers.end())
     return identifier;
 
-  return name(identifier, thread_nr);
+  if(identifier=="goto_symex::\\guard")
+  {
+    original_identifiers[identifier]=identifier;
+    return identifier;
+  }
+
+  const symbolt *s;
+  if(ns.lookup(identifier, s))
+  {
+    std::cerr << "level0: failed to find " << identifier << std::endl;
+    abort();
+  }
+  
+  // don't rename globals or code
+  if(s->type.id()==ID_code || is_global(*s))
+  {
+    original_identifiers[identifier]=identifier;
+    return identifier;
+  }
+
+  // rename!    
+  irep_idt new_identifier=name(identifier, thread_nr);
+  
+  // remember that
+  original_identifiers[new_identifier]=identifier;
+
+  return new_identifier;
 }
 
 /*******************************************************************\
@@ -348,17 +372,21 @@ irep_idt goto_symex_statet::rename(
   switch(level)
   {
   case L0:
-    return identifier;
-    //return level0(identifier, ns, source.thread_nr);
+    return level0(identifier, ns, source.thread_nr);
     
   case L1:
-    //identifier=level0(identifier, ns, source.thread_nr); // L0
-    return top().level1(identifier);
+    {
+      if(level2.is_renamed(identifier)) return identifier;
+      if(top().level1.is_renamed(identifier)) return identifier;
+      irep_idt l0_identifier=level0(identifier, ns, source.thread_nr);
+      return top().level1(l0_identifier);
+    }
   
   case L2:
     {
-      //identifier=level0(identifier, ns, source.thread_nr); // L0
-      irep_idt l1_identifier=top().level1(identifier);
+      if(level2.is_renamed(identifier)) return identifier;
+      irep_idt l0_identifier=level0(identifier, ns, source.thread_nr);
+      irep_idt l1_identifier=top().level1(l0_identifier);
       return level2(l1_identifier); // L2
     }
     
@@ -399,19 +427,22 @@ void goto_symex_statet::rename(
     }  
     else if(level==L2)
     {
-      identifier=rename(identifier, ns, L1);
-
-      // We also consider propagation if we go up to L2.
-      // L1 identifiers are used for propagation!
-      propagationt::valuest::const_iterator p_it=
-        propagation.values.find(identifier);
-
-      if(p_it!=propagation.values.end())
-        expr=p_it->second; // already L2
-      else
+      if(!level2.is_renamed(identifier))
       {
-        identifier=level2(identifier); // L2
-        to_symbol_expr(expr).set_identifier(identifier);
+        identifier=rename(identifier, ns, L1);
+
+        // We also consider propagation if we go up to L2.
+        // L1 identifiers are used for propagation!
+        propagationt::valuest::const_iterator p_it=
+          propagation.values.find(identifier);
+
+        if(p_it!=propagation.values.end())
+          expr=p_it->second; // already L2
+        else
+        {
+          identifier=level2(identifier); // L2
+          to_symbol_expr(expr).set_identifier(identifier);
+        }
       }
     }
     
@@ -447,40 +478,43 @@ void goto_symex_statet::rename_address(
   levelt level)
 {
   // rename all the symbols with their last known value
-
-  rename(expr.type(), ns, level);
-
+  
   if(expr.id()==ID_symbol)
   {
     // only do L1!
     rename(expr, ns, L1);
   }
-  else if(expr.id()==ID_index)
-  {
-    assert(expr.operands().size()==2);
-    rename_address(expr.op0(), ns, level);
-    
-    // the index is not an address
-    rename(expr.op1(), ns, level);
-  }
-  else if(expr.id()==ID_if)
-  {
-    // the condition is not an address
-    if_exprt &if_expr=to_if_expr(expr);
-    rename(if_expr.cond(), ns, level);
-    rename_address(if_expr.true_case(), ns, level);
-    rename_address(if_expr.false_case(), ns, level);
-  }
-  else if(expr.id()==ID_member)
-  {
-    rename_address(to_member_expr(expr).struct_op(), ns, level);
-  }
   else
   {
-    // do this recursively; we assume here
-    // that all the operands are addresses
-    Forall_operands(it, expr)
-      rename_address(*it, ns, level);
+    rename(expr.type(), ns, level);
+  
+    if(expr.id()==ID_index)
+    {
+      assert(expr.operands().size()==2);
+      rename_address(expr.op0(), ns, level);
+    
+      // the index is not an address
+      rename(expr.op1(), ns, level);
+    }
+    else if(expr.id()==ID_if)
+    {
+      // the condition is not an address
+      if_exprt &if_expr=to_if_expr(expr);
+      rename(if_expr.cond(), ns, level);
+      rename_address(if_expr.true_case(), ns, level);
+      rename_address(if_expr.false_case(), ns, level);
+    }
+    else if(expr.id()==ID_member)
+    {
+      rename_address(to_member_expr(expr).struct_op(), ns, level);
+    }
+    else
+    {
+      // do this recursively; we assume here
+      // that all the operands are addresses
+      Forall_operands(it, expr)
+        rename_address(*it, ns, level);
+    }
   }
 }
 
