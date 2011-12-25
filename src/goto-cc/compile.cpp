@@ -204,11 +204,11 @@ bool compilet::add_input_file(const std::string &file_name)
       char td[] = "goto-cc.XXXXXX";
       #endif
 
-      std::string tstr = get_temporary_directory(td);
+      std::string tstr=get_temporary_directory(td);
 
       if(tstr=="")
       {
-        error("Cannot create temporary directory.");
+        error("Cannot create temporary directory");
         return true;
       }
 
@@ -216,14 +216,14 @@ bool compilet::add_input_file(const std::string &file_name)
       std::stringstream cmd("");
       if(chdir(tmp_dirs.back().c_str())!=0)
       {
-        error("Cannot switch to temporary directory.");
+        error("Cannot switch to temporary directory");
         return true;
       }
       
       #ifdef _WIN32
-      if (file_name[0]!='/' && file_name[1]!=':')
+      if(file_name[0]!='/' && file_name[1]!=':')
       #else
-      if (file_name[0]!='/')
+      if(file_name[0]!='/')
       #endif
       {
         cmd << "ar t " <<
@@ -239,7 +239,7 @@ bool compilet::add_input_file(const std::string &file_name)
       }
 
       FILE *stream = popen(cmd.str().c_str(), "r");
-      if (stream!=NULL)
+      if(stream!=NULL)
       {
         std::string line;
         char ch;
@@ -264,6 +264,7 @@ bool compilet::add_input_file(const std::string &file_name)
       }
       pclose(stream);
       cmd.str("");
+
       #ifdef _WIN32
       if(file_name[0]!='/' && file_name[1]!=':')
       #else
@@ -282,7 +283,7 @@ bool compilet::add_input_file(const std::string &file_name)
         cmd << "ar x " << file_name;
       }
 
-      stream = popen(cmd.str().c_str(), "r");
+      stream=popen(cmd.str().c_str(), "r");
       pclose(stream);
 
       if(chdir(working_directory.c_str())!=0)
@@ -332,6 +333,7 @@ Function: compilet::find_library
 bool compilet::find_library(const std::string &name)
 {
   std::string tmp;
+
   for(std::list<std::string>::const_iterator
       it=library_paths.begin();
       it!=library_paths.end();
@@ -342,7 +344,9 @@ bool compilet::find_library(const std::string &name)
     #else
     tmp = *it + "/lib";
     #endif
+
     std::ifstream in((tmp+name+".a").c_str());
+
     if(in.is_open())
       add_input_file(tmp+name+".a");
     else
@@ -396,7 +400,7 @@ bool compilet::is_xml_file(const std::string &file_name)
     char buf[5];
     for (unsigned i=0; i<5; i++)
       buf[i] = in.get();
-    if (buf[0]=='<' && buf[1]=='?' &&
+    if(buf[0]=='<' && buf[1]=='?' &&
         buf[2]=='x' && buf[3]=='m' && buf[4]=='l')
       return true;
   }
@@ -427,7 +431,7 @@ bool compilet::is_binary_file(const std::string &file_name)
     char buf[3];
     for (unsigned i=0; i<3; i++)
       buf[i] = in.get();
-    if (buf[0]=='G' && buf[1]=='B' && buf[2]=='F')
+    if(buf[0]=='G' && buf[1]=='B' && buf[2]=='F')
       return true;
   }
   
@@ -457,7 +461,7 @@ bool compilet::is_elf_file(const std::string &file_name)
     char buf[4];
     for (unsigned i=0; i<4; i++)
       buf[i] = in.get();
-    if (buf[0]==0x7f && buf[1]=='E' &&
+    if(buf[0]==0x7f && buf[1]=='E' &&
         buf[2]=='L' && buf[3]=='F')
       return true;
   }
@@ -529,7 +533,7 @@ bool compilet::link()
     forall_symbols(it, context.symbols)
     {
       const symbolt &symbol = it->second;
-      if (symbol.mode!="" &&
+      if(symbol.mode!="" &&
             find(seen_modes.begin(), seen_modes.end(), symbol.mode)
             == seen_modes.end())
       {
@@ -554,16 +558,16 @@ bool compilet::link()
       std::list<irep_idt>::iterator c =
         find(seen_modes.begin(), seen_modes.end(), "C");
 
-      if (c!=seen_modes.end() && cpp!=seen_modes.end())
+      if(c!=seen_modes.end() && cpp!=seen_modes.end())
         seen_modes.erase(c);
 
       std::list<irep_idt>::iterator it = seen_modes.begin();
-      for (; it!=seen_modes.end(); it++)
+      for(; it!=seen_modes.end(); it++)
       {
         languaget *language=get_language_from_mode(*it);
-        if (language)
+        if(language)
         {
-          if (language->final(context, ui_message_handler))
+          if(language->final(context, ui_message_handler))
             return true;
         }
         else
@@ -867,13 +871,13 @@ bool compilet::write_bin_object_file(
     std::ofstream dgf;
     write_dot_header(file_name, dgf);
 
-    for (goto_functionst::function_mapt::iterator it=
-           functions.function_map.begin();
-         it!=functions.function_map.end();
-         it++)
+    for(goto_functionst::function_mapt::iterator
+        it=functions.function_map.begin();
+        it!=functions.function_map.end();
+        it++)
     {
-      if (it->second.body_available)
-          write_dot_subgraph(dgf, id2string(it->first), it->second.body);
+      if(it->second.body_available)
+        write_dot_subgraph(dgf, id2string(it->first), it->second.body);
     }
 
     do_dot_function_calls(dgf);
@@ -929,30 +933,32 @@ bool compilet::write_xml_object_file(
   }
 
   xmlt funs("functions");
-  if (verbosity>=9)
+  if(verbosity>=9)
   {
     std::cout << "Functions: " << functions.function_map.size() << "; ";
     std::cout << function_body_count(functions) << " have a body." << std::endl;
   }
 
   std::ofstream dgf;
-  if (cmdline.isset("dot"))
-    write_dot_header(file_name, dgf);
-    for ( goto_functionst::function_mapt::iterator it=functions.function_map.begin();
-          it != functions.function_map.end();
-          it++)
-    {
-      if (it->second.body_available)
-      {
-        xmlt &fun = funs.new_element("function");
-        fun.set_attribute("name", id2string(it->first));
-        gfconverter.convert(it->second, fun);
-        if (dgf.is_open())
-          write_dot_subgraph(dgf, id2string(it->first), it->second.body);
-      }
-    }
 
-  if (dgf.is_open())
+  if(cmdline.isset("dot"))
+    write_dot_header(file_name, dgf);
+
+  for(goto_functionst::function_mapt::iterator it=functions.function_map.begin();
+      it != functions.function_map.end();
+      it++)
+  {
+    if(it->second.body_available)
+    {
+      xmlt &fun = funs.new_element("function");
+      fun.set_attribute("name", id2string(it->first));
+      gfconverter.convert(it->second, fun);
+      if(dgf.is_open())
+        write_dot_subgraph(dgf, id2string(it->first), it->second.body);
+    }
+  }
+
+  if(dgf.is_open())
   {
     do_dot_function_calls(dgf);
     dgf << "}" << std::endl;
@@ -996,7 +1002,7 @@ void compilet::write_dot_subgraph(
   const goto_programt::instructionst& instructions =
     goto_program.instructions;  
   
-  if (instructions.size()==0)
+  if(instructions.size()==0)
   {
     out << "Node_" << subgraphscount << "_0 " <<
       "[shape=Mrecord,fontsize=22,label=\"?\"];" << std::endl;
@@ -1007,7 +1013,7 @@ void compilet::write_dot_subgraph(
     goto_programt::const_targetst worklist;
     worklist.push_back(instructions.begin());
     
-    while (!worklist.empty())
+    while(!worklist.empty())
     {
       goto_programt::const_targett it=worklist.front();
       worklist.pop_front();
@@ -1018,7 +1024,7 @@ void compilet::write_dot_subgraph(
       std::stringstream tmp("");
       if(it->is_goto())
       {
-        if (it->guard.is_true())
+        if(it->guard.is_true())
           tmp.str("Goto");
         else
         {
@@ -1028,33 +1034,33 @@ void compilet::write_dot_subgraph(
           tmp << escape(t) << "?";
         }
       }
-      else if (it->is_assume())
+      else if(it->is_assume())
       {
         std::string t = from_expr(ns, "", it->guard);
         while (t[ t.size()-1 ]=='\n')
           t = t.substr(0,t.size()-1);
         tmp << "Assume\\n(" << escape(t) << ")";
       }
-      else if (it->is_assert())
+      else if(it->is_assert())
       {
         std::string t = from_expr(ns, "", it->guard);
         while (t[ t.size()-1 ]=='\n')
           t = t.substr(0,t.size()-1);
         tmp << "Assert\\n(" << escape(t) << ")";
       }
-      else if (it->is_skip())
+      else if(it->is_skip())
         tmp.str("Skip");
-      else if (it->is_end_function())            
+      else if(it->is_end_function())            
         tmp.str("End of Function");      
-      else if (it->is_location())
+      else if(it->is_location())
         tmp.str("Location");
-      else if (it->is_dead())
+      else if(it->is_dead())
         tmp.str("Dead");
-      else if (it->is_atomic_begin())
+      else if(it->is_atomic_begin())
         tmp.str("Atomic Begin");
-      else if (it->is_atomic_end())
+      else if(it->is_atomic_end())
         tmp.str("Atomic End");
-      else if (it->is_function_call())
+      else if(it->is_function_call())
       {
         std::string t = from_expr(ns, "", it->code);
         while (t[ t.size()-1 ]=='\n')
@@ -1068,7 +1074,7 @@ void compilet::write_dot_subgraph(
         fc.operands().push_back(it->code.op1());  
         function_calls.push_back(fc);
       }
-      else if (it->is_assign() ||
+      else if(it->is_assign() ||
                it->is_return() ||
                it->is_other())      
       {
@@ -1077,20 +1083,20 @@ void compilet::write_dot_subgraph(
           t = t.substr(0,t.size()-1);
         tmp.str(escape(t));
       }
-      else if (it->is_start_thread())
+      else if(it->is_start_thread())
         tmp.str("Start of Thread");
-      else if (it->is_end_thread())
+      else if(it->is_end_thread())
         tmp.str("End of Thread");
-      else if (it->is_throw())
+      else if(it->is_throw())
         tmp.str("THROW");
-      else if (it->is_catch())
+      else if(it->is_catch())
         tmp.str("CATCH");
       else
         tmp.str("UNKNOWN");
 
       out << "Node_" << subgraphscount << "_" << it->location_number;
       out << " [shape="; 
-      if (it->is_goto() && !it->guard.is_true() && !it->guard.is_false())
+      if(it->is_goto() && !it->guard.is_true() && !it->guard.is_false())
         out << "diamond";
       else
         out <<"Mrecord";
@@ -1104,7 +1110,7 @@ void compilet::write_dot_subgraph(
 
       std::string tlabel="true";
       std::string flabel="false";
-      if (fres.size()==0 || tres.size()==0)
+      if(fres.size()==0 || tres.size()==0)
       {
         tlabel="";
         flabel="";
@@ -1152,10 +1158,10 @@ void compilet::do_dot_function_calls(std::ostream &out)
   {
     std::list<exprt>::const_iterator cit=clusters.begin();
     for (;cit!=clusters.end();cit++)
-      if (cit->get("name")==it->op1().get(ID_identifier))
+      if(cit->get("name")==it->op1().get(ID_identifier))
         break;
 
-    if (cit!=clusters.end())
+    if(cit!=clusters.end())
     {
       out << it->op0().id() <<
         " -> " "Node_" << cit->get("nr") << "_0" <<
@@ -1203,18 +1209,18 @@ void compilet::find_next(
   std::set<goto_programt::const_targett> &tres,
   std::set<goto_programt::const_targett> &fres)
 {
-  if (it->is_goto() && !it->guard.is_false())
+  if(it->is_goto() && !it->guard.is_false())
   {
     goto_programt::targetst::const_iterator gtit = it->targets.begin();
     for (; gtit!=it->targets.end(); gtit++)
       tres.insert((*gtit));
   }
 
-  if (it->is_goto() && it->guard.is_true())
+  if(it->is_goto() && it->guard.is_true())
     return;
   
   goto_programt::const_targett next = it; next++;
-  if (next!=instructions.end())
+  if(next!=instructions.end())
     fres.insert(next);
 }
 
@@ -1240,10 +1246,10 @@ void compilet::write_edge(
   out << "Node_" << subgraphscount << "_" << from.location_number;
   out << " -> ";
   out << "Node_" << subgraphscount << "_" << to.location_number << " ";
-  if (label!="")
+  if(label!="")
     {
       out << "[fontsize=20,label=\"" << label << "\"";
-      if (from.is_backwards_goto() &&
+      if(from.is_backwards_goto() &&
           from.location_number > to.location_number)
         out << ",color=red";
       out << "]";
@@ -1367,7 +1373,7 @@ bool compilet::parse_object(
       it!=temp_context.symbols.end();
       it++)
   {
-    if (  it->second.mode!="" &&
+    if(  it->second.mode!="" &&
           find(  seen_modes.begin(),
                  seen_modes.end(),
                  it->second.mode)
@@ -1536,10 +1542,10 @@ bool compilet::write_dot_header(
   std::ofstream &dgf)
 {
   std::string dgfilename = file_name + ".dot";
-  if (verbosity>=9)
+  if(verbosity>=9)
     status("Writing dot graph to " + dgfilename);
   dgf.open(dgfilename.c_str());
-  if (!dgf.is_open())
+  if(!dgf.is_open())
   {
     error("Error opening file: " + dgfilename);
     return true;
@@ -1568,7 +1574,7 @@ unsigned compilet::function_body_count(const goto_functionst &functions)
           functions.function_map.begin();
         it != functions.function_map.end();
         it++)
-    if (it->second.body_available)
+    if(it->second.body_available)
       fbs++;
 
   return fbs;
