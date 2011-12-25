@@ -32,6 +32,16 @@ Date: June 2006
 #include <dirent.h>
 #endif
 
+#ifdef _WIN32
+#include <io.h>
+#include <windows.h>
+#include <direct.h>
+#include <errno.h>
+#define chdir _chdir
+#define popen _popen
+#define pclose _pclose
+#endif
+
 #include <fstream>
 #include <sstream>
 #include <cstdlib>
@@ -69,16 +79,6 @@ Date: June 2006
 #include "get_base_name.h"
 #include "compile.h"
 #include "version.h"
-
-#ifdef _WIN32
-#include <io.h>
-#include <windows.h>
-#include <direct.h>
-#include <errno.h>
-#define chdir _chdir
-#define popen _popen
-#define pclose _pclose
-#endif
 
 #define DOTGRAPHSETTINGS  "color=black;" \
                           "orientation=portrait;" \
