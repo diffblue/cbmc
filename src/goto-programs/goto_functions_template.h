@@ -147,7 +147,7 @@ void goto_functions_templatet<bodyT>::output(
       out << std::endl;
       
       const symbolt &symbol=ns.lookup(it->first);
-      out << symbol.display_name() << ":" << std::endl;
+      out << symbol.display_name() << " (" << symbol.name << "):" << std::endl;
       it->second.body.output(ns, symbol.name, out);
     }
   }
