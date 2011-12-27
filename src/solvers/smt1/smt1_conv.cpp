@@ -359,14 +359,14 @@ void smt1_convt::convert_byte_extract(const exprt &expr)
 
   if(expr.id()==ID_byte_extract_little_endian)
   {
-    upper = ((i+1)*8)-1;
-    lower = i*8;
+    upper=((i+1)*8)-1;
+    lower=i*8;
   }
   else
   {
     mp_integer max=w-1;
-    upper = max-(i*8);
-    lower = max-((i+1)*8-1);
+    upper=max-(i*8);
+    lower=max-((i+1)*8-1);
   }
 
   smt1_prop.out << "(extract[" << upper << ":" << lower << "] ";
