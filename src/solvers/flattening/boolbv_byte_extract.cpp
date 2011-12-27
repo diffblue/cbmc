@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <byte_operators.h>
 
 #include "boolbv.h"
+#include "flatten_byte_operators.h"
 
 /*******************************************************************\
 
@@ -31,6 +32,14 @@ void boolbvt::convert_byte_extract(const exprt &expr, bvt &bv)
   if(expr.operands().size()!=2)
     throw "byte_extract takes two operands";
 
+  // if we extract from an unbounded array, call the flattening code
+  if(is_unbounded_array(expr.op0().type()))
+  {
+    exprt tmp=flatten_byte_extract(expr, ns);
+    convert_bv(tmp, bv);
+    return;
+  }
+
   unsigned width=boolbv_width(expr.type());
 
   if(width==0)
@@ -38,7 +47,7 @@ void boolbvt::convert_byte_extract(const exprt &expr, bvt &bv)
     
   const exprt &op0=expr.op0();
   const exprt &op1=expr.op1();
-
+  
   bool little_endian;
   
   if(expr.id()==ID_byte_extract_little_endian)
@@ -49,10 +58,10 @@ void boolbvt::convert_byte_extract(const exprt &expr, bvt &bv)
     assert(false);
 
   // first do op0
-
+  
   bvt op0_bv;  
   convert_bv(op0, op0_bv);
-    
+  
   // see if the byte number is constant
 
   mp_integer index;
