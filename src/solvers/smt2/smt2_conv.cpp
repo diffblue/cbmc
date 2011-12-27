@@ -297,35 +297,9 @@ Function: smt2_convt::convert_byte_extract
 
 void smt2_convt::convert_byte_extract(const exprt &expr)
 {
-  mp_integer i;
-  if(to_integer(expr.op1(), i))
-    throw "byte_extract takes constant as second parameter";
-
-  boolbv_widtht boolbv_width(ns);
-  
-  unsigned w=boolbv_width(expr.op0().type());
-  if(w==0)
-    throw "failed to get width of byte_extract operand";
-
-  smt2_prop.out << "";
-
-  mp_integer upper, lower;
-
-  if(expr.id()==ID_byte_extract_little_endian)
-  {
-    upper = ((i+1)*8)-1;
-    lower = i*8;
-  }
-  else
-  {
-    mp_integer max=w-1;
-    upper = max-(i*8);
-    lower = max-((i+1)*8-1);
-  }
-
-  smt2_prop.out << "((_ extract " << upper << " " << lower << ") ";
-  convert_expr(expr.op0());
-  smt2_prop.out << ")";
+  // we just run the flattener
+  exprt flattened_expr=flatten_byte_extract(expr, ns);
+  convert_expr(flattened_expr, bool_as_bv);
 }
 
 /*******************************************************************\
@@ -927,6 +901,48 @@ void smt2_convt::convert_expr(const exprt &expr)
         tmp.op0()=expr.op1();
         convert_expr(tmp);
         smt2_prop.out << ")) bin1)"; // bvlshr, extract, =
+      }
+    }
+    else
+      throw "unsupported type for "+expr.id_string()+
+            ": "+expr.op0().type().id_string();
+  }
+  else if(expr.id()==ID_extractbits)
+  {
+    assert(expr.operands().size()==3);
+
+    if(expr.op0().type().id()==ID_unsignedbv ||
+       expr.op0().type().id()==ID_signedbv ||
+       expr.op0().type().id()==ID_bv ||
+       expr.op0().type().id()==ID_fixedbv)
+    {
+      if(expr.op1().is_constant() &&
+         expr.op2().is_constant())
+      {
+        mp_integer op1_i, op2_i;
+        if(to_integer(expr.op1(), op1_i))
+          throw "extractbits: to_integer failed";
+
+        if(to_integer(expr.op2(), op2_i))
+          throw "extractbits: to_integer failed";
+
+        smt2_prop.out << "((_ extract " << op1_i << " " << op2_i << ") ";
+        convert_expr(expr.op0());
+        smt2_prop.out << ")";
+      }
+      else
+      {
+        #if 0
+        smt2_prop.out << "(= ((_ extract 0 0) ";
+        // the arguments of the shift need to have the same width
+        smt2_prop.out << "(bvlshr ";
+        convert_expr(expr.op0());
+        typecast_exprt tmp(expr.op0().type());
+        tmp.op0()=expr.op1();
+        convert_expr(tmp);
+        smt2_prop.out << ")) bin1)"; // bvlshr, extract, =
+        #endif
+        throw "smt2: extractbits with non-constant index";
       }
     }
     else
