@@ -76,8 +76,8 @@ protected:
   void convert_type(const typet &type);
   
   // specific expressions go here
-  void convert_byte_update(const exprt &expr);
-  void convert_byte_extract(const exprt &expr);
+  void convert_byte_update(const exprt &expr, bool bool_as_bv);
+  void convert_byte_extract(const exprt &expr, bool bool_as_bv);
   void convert_typecast(const typecast_exprt &expr, bool bool_as_bv);
   void convert_struct(const exprt &expr);
   void convert_union(const exprt &expr);

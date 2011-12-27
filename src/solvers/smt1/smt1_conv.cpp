@@ -24,6 +24,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <solvers/flattening/boolbv_width.h>
 #include <solvers/flattening/pointer_logic.h>
+#include <solvers/flattening/flatten_byte_operators.h>
 
 #include "smt1_conv.h"
 
@@ -342,36 +343,13 @@ Function: smt1_convt::convert_byte_extract
 
 \*******************************************************************/
 
-void smt1_convt::convert_byte_extract(const exprt &expr)
+void smt1_convt::convert_byte_extract(
+  const exprt &expr,
+  bool bool_as_bv)
 {
-  mp_integer i;
-  if(to_integer(expr.op1(), i))
-    throw "byte_extract takes constant as second parameter";
-
-  unsigned w=boolbv_width(expr.op0().type());
-
-  if(w==0)
-    throw "failed to get width of byte_extract operand";
-
-  smt1_prop.out << "";
-
-  mp_integer upper, lower;
-
-  if(expr.id()==ID_byte_extract_little_endian)
-  {
-    upper=((i+1)*8)-1;
-    lower=i*8;
-  }
-  else
-  {
-    mp_integer max=w-1;
-    upper=max-(i*8);
-    lower=max-((i+1)*8-1);
-  }
-
-  smt1_prop.out << "(extract[" << upper << ":" << lower << "] ";
-  convert_expr(expr.op0(), true);
-  smt1_prop.out << ")";
+  // we just run the flattener
+  exprt flattened_expr=flatten_byte_extract(expr, ns);
+  convert_expr(flattened_expr, bool_as_bv);
 }
 
 /*******************************************************************\
@@ -386,7 +364,9 @@ Function: smt1_convt::convert_byte_update
 
 \*******************************************************************/
 
-void smt1_convt::convert_byte_update(const exprt &expr)
+void smt1_convt::convert_byte_update(
+  const exprt &expr,
+  bool bool_as_bv)
 {
   assert(expr.operands().size()==3);
 
@@ -1040,12 +1020,12 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
   else if(expr.id()==ID_byte_extract_little_endian ||
           expr.id()==ID_byte_extract_big_endian)
   {
-    convert_byte_extract(expr);
+    convert_byte_extract(expr, bool_as_bv);
   }
   else if(expr.id()==ID_byte_update_little_endian ||
           expr.id()==ID_byte_update_big_endian)
   {
-    convert_byte_update(expr);
+    convert_byte_update(expr, bool_as_bv);
   }
   else if(expr.id()==ID_width)
   {
@@ -1235,13 +1215,34 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
        expr.op0().type().id()==ID_bv ||
        expr.op0().type().id()==ID_fixedbv)
     {
-      smt1_prop.out << "(extract[";
-      convert_expr(expr.op1(), bool_as_bv);
-      smt1_prop.out << ":";
-      convert_expr(expr.op2(), bool_as_bv);
-      smt1_prop.out << "] ";
-      convert_expr(expr.op0(), bool_as_bv);
-      smt1_prop.out << ")";
+      if(expr.op1().is_constant() &&
+         expr.op2().is_constant())
+      {
+        mp_integer op1_i, op2_i;
+        
+        if(to_integer(expr.op1(), op1_i))
+          throw "extractbits: to_integer failed";
+
+        if(to_integer(expr.op2(), op2_i))
+          throw "extractbits: to_integer failed";
+
+        smt1_prop.out << "(extract[" << op1_i << ":" << op2_i << "] ";
+        convert_expr(expr.op0(), true);
+        smt1_prop.out << ")";
+      }
+      else
+      {
+        #if 0
+        smt1_prop.out << "(extract[";
+        convert_expr(expr.op1(), bool_as_bv);
+        smt1_prop.out << ":";
+        convert_expr(expr.op2(), bool_as_bv);
+        smt1_prop.out << "] ";
+        convert_expr(expr.op0(), bool_as_bv);
+        smt1_prop.out << ")";
+        #endif
+        throw "smt1 todo: extractbits with variable bits";
+      }
     }
     else
       throw "unsupported type for "+expr.id_string()+
@@ -3159,24 +3160,26 @@ void smt1_convt::convert_nary(
 {
   unsigned num_ops=expr.operands().size();
 
-  assert(num_ops > 0);
+  assert(num_ops>0);
 
   if(num_ops==1)
     convert_expr(expr.op0(), bool_as_bv);
   else
   {
-    exprt::operandst::const_iterator it=expr.operands().begin();
+    exprt::operandst::const_iterator it=
+      expr.operands().begin();
 
     for(unsigned i=0; i<num_ops-1; ++i, ++it)
     {
-      smt1_prop.out << " (" << op_string << " ";
+      smt1_prop.out << "(" << op_string << " ";
       convert_expr(*it, bool_as_bv);
+      smt1_prop.out << " ";
     }
 
-    smt1_prop.out << " ";
+    // final one
     convert_expr(*it, bool_as_bv);
 
     // do the many closing parentheses
-    smt1_prop.out << std::string (num_ops-1, ')');
+    smt1_prop.out << std::string(num_ops-1, ')');
   }
 }
