@@ -1204,6 +1204,16 @@ public:
   {
   }
 
+  inline exprt &op()
+  {
+    return op0();
+  }
+
+  inline const exprt &op() const
+  {
+    return op0();
+  }
+
   inline exprt &distance()
   {
     return op1();
@@ -1227,16 +1237,6 @@ public:
   inline shl_exprt(const exprt &_src, const exprt &_distance):shift_exprt(_src, ID_shl, _distance)
   {
   }
-  
-  inline exprt &distance()
-  {
-    return op1();
-  }
-
-  inline const exprt &distance() const
-  {
-    return op1();
-  }
 };
 
 /*! \brief Arithmetic right shift
@@ -1251,16 +1251,6 @@ public:
   inline ashr_exprt(const exprt &_src, const exprt &_distance):shift_exprt(_src, ID_ashr, _distance)
   {
   }
-  
-  inline exprt &distance()
-  {
-    return op1();
-  }
-
-  inline const exprt &distance() const
-  {
-    return op1();
-  }
 };
 
 /*! \brief Logical right shift
@@ -1274,16 +1264,6 @@ public:
 
   inline lshr_exprt(const exprt &_src, const exprt &_distance):shift_exprt(_src, ID_lshr, _distance)
   {
-  }
-  
-  inline exprt &distance()
-  {
-    return op1();
-  }
-
-  inline const exprt &distance() const
-  {
-    return op1();
   }
 };
 
