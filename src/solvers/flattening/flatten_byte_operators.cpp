@@ -171,8 +171,8 @@ exprt flatten_byte_update(
          src.id()==ID_byte_update_big_endian);
   assert(src.operands().size()==3);
 
-  unsigned width=
-    integer2long(pointer_offset_size(ns, src.op2().type()));
+  mp_integer element_size=
+    pointer_offset_size(ns, src.op2().type());
   
   const typet &t=ns.follow(src.op0().type());
   
@@ -181,25 +181,29 @@ exprt flatten_byte_update(
     const array_typet &array_type=to_array_type(t);
     const typet &subtype=array_type.subtype();
     
-    // array of scalars?
+    // array of bitvectors?
     if(subtype.id()==ID_unsignedbv ||
-       subtype.id()==ID_signedbv)
+       subtype.id()==ID_signedbv ||
+       subtype.id()==ID_floatbv)
     {
-      unsigned sub_width=subtype.get_int(ID_width);
+      mp_integer sub_size=pointer_offset_size(ns, subtype);
+      
+      if(sub_size==-1)
+        throw "can't flatten byte_update for sub-type without size";
 
       // byte array?
-      if(sub_width==8)
+      if(sub_size==1)
       {
-        // apply 'array-update-with' width times
+        // apply 'array-update-with' element_size times
         exprt result=src.op0();
         
-        for(unsigned i=0; i<width; i++)
+        for(mp_integer i=0; i<element_size; ++i)
         {
           exprt i_expr=from_integer(i, ns.follow(src.op1().type()));
 
           exprt new_value;
           
-          if(i==0 && width==1) // bytes?
+          if(i==0 && element_size==1) // bytes?
           {
             new_value=src.op2();
             if(new_value.type()!=subtype)
@@ -230,9 +234,29 @@ exprt flatten_byte_update(
         
         return result;
       }
-      else
+      else // sub_size!=1
       {
-        throw "flatten_byte_update can only do byte-array right now";
+        if(element_size==1) // byte-granularity update
+        {
+          div_exprt div_offset(src.op1(), from_integer(sub_size, src.op1().type()));
+          mod_exprt mod_offset(src.op1(), from_integer(sub_size, src.op1().type()));
+        
+          index_exprt index_expr(src.op0(), div_offset, array_type.subtype());
+          
+          exprt byte_update_expr(src.id(), array_type.subtype());
+          byte_update_expr.copy_to_operands(index_expr, mod_offset, src.op2());
+
+          // Call recurisvely, the array is gone!            
+          exprt flattened_byte_update_expr=
+            flatten_byte_update(byte_update_expr, ns);
+            
+          with_exprt with_expr(
+            src.op0(), div_offset, flattened_byte_update_expr);
+            
+          return with_expr;
+        }
+        else
+          throw "flatten_byte_update can only do byte updates of non-byte arrays right now";
       }
     }
     else
@@ -240,8 +264,47 @@ exprt flatten_byte_update(
       throw "flatten_byte_update can only do arrays of scalars right now";
     }
   }
+  else if(t.id()==ID_signedbv ||
+          t.id()==ID_unsignedbv ||
+          t.id()==ID_floatbv)
+  {
+    // do a shift, mask and OR
+    unsigned width=to_bitvector_type(t).get_width();
+    
+    if(element_size*8>width)
+      throw "flatten_byte_update to update element that is too large";
+    
+    // build mask
+    exprt mask=
+      bitnot_exprt(
+        from_integer(power(2, element_size*8)-1, unsignedbv_typet(width)));
+      
+    const typet &offset_type=ns.follow(src.op1().type());
+    mult_exprt offset_times_eight(src.op1(), from_integer(8, offset_type));
+    
+    // shift the mask
+    shl_exprt shl_expr(mask, offset_times_eight);
+
+    // do the 'AND'
+    bitand_exprt bitand_expr(src.op0(), mask);
+
+    // zero-extend the value
+    concatenation_exprt value_extended(
+      from_integer(0, unsignedbv_typet(width-integer2long(element_size)*8)), 
+      src.op2(), t);
+    
+    // shift the value
+    shl_exprt value_shifted(value_extended, offset_times_eight);
+    
+    // do the 'OR'
+    bitor_exprt bitor_expr(bitand_expr, value_shifted);
+    
+    return bitor_expr;
+  }
   else
-    throw "flatten_byte_update can only do array right now";
+  {
+    throw "flatten_byte_update can only do array and scalars right now";
+  }
 }
 
 /*******************************************************************\
