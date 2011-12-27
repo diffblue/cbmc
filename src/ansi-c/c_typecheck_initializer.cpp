@@ -181,10 +181,20 @@ void c_typecheck_baset::do_initializer(
 {
   exprt result=do_initializer_rec(initializer, type, force_constant);
 
-  // any arrays must have a size
   if(type.id()==ID_array)
-    assert(result.type().id()==ID_array &&
-           to_array_type(result.type()).size().is_not_nil());
+  {
+    // any arrays must have a size
+    const typet &result_type=follow(result.type());
+    assert(result_type.id()==ID_array &&
+           to_array_type(result_type).size().is_not_nil());
+           
+    // we don't allow initialisation with symbols of array type
+    if(result.id()!=ID_array)
+    {
+      err_location(result);
+      throw "invalid array initializer";
+    }
+  }
     
   initializer=result;
 }
