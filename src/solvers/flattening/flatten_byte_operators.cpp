@@ -35,6 +35,15 @@ exprt flatten_byte_extract(
          src.id()==ID_byte_extract_big_endian);
   assert(src.operands().size()==2);
 
+  bool little_endian;
+  
+  if(src.id()==ID_byte_extract_little_endian)
+    little_endian=true;
+  else if(src.id()==ID_byte_extract_big_endian)
+    little_endian=false;
+  else
+    assert(false);
+  
   if(src.id()==ID_byte_extract_big_endian) 
     throw "byte_extract flattening of big endian not done yet";
 
@@ -59,7 +68,11 @@ exprt flatten_byte_extract(
       
       for(unsigned i=0; i<width; i++)
       {
-        plus_exprt offset(from_integer(i, src.op1().type()), src.op1());
+        // the most significant byte comes first in the concatenation!
+        unsigned offset_i=
+          little_endian?(width-i-1):i;
+        
+        plus_exprt offset(from_integer(offset_i, src.op1().type()), src.op1());
         index_exprt index_expr(subtype);
         index_expr.array()=src.op0();
         index_expr.index()=offset;
