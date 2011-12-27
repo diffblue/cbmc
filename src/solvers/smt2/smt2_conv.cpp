@@ -22,6 +22,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <langapi/language_util.h>
 
 #include <solvers/flattening/boolbv_width.h>
+#include <solvers/flattening/flatten_byte_operators.h>
 
 #include "smt2_conv.h"
 
@@ -299,7 +300,7 @@ void smt2_convt::convert_byte_extract(const exprt &expr)
 {
   // we just run the flattener
   exprt flattened_expr=flatten_byte_extract(expr, ns);
-  convert_expr(flattened_expr, bool_as_bv);
+  convert_expr(flattened_expr);
 }
 
 /*******************************************************************\
