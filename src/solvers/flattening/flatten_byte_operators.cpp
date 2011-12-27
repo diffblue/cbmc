@@ -81,16 +81,15 @@ exprt flatten_byte_extract(
       
       if(width==1)
         return op[0];
-      else
+      else // width>=2
       {
         concatenation_exprt concatenation(src.type());
         concatenation.operands().swap(op);
         return concatenation;
       }
     }
-    else
+    else // non-byte array
     {
-      #if 0
       const exprt &root=src.op0();
       const exprt &offset=src.op1();
       const typet &array_type=ns.follow(root.type());
@@ -98,7 +97,8 @@ exprt flatten_byte_extract(
       const typet &element_type=ns.follow(array_type.subtype());
       mp_integer element_width=pointer_offset_size(ns, element_type);
       
-      if(element_width==-1) return src; // failed
+      if(element_width==-1) // failed
+        throw "failed to flatten non-byte array with unknown element width";
 
       mp_integer result_width=pointer_offset_size(ns, src.type());
       mp_integer num_elements=(element_width+result_width-2)/element_width+1;
@@ -117,41 +117,37 @@ exprt flatten_byte_extract(
         concat.copy_to_operands(index_exprt(root, index));
       }
 
-      mod_exprt new_offset(offset, from_integer(element_width, offset_type));
+      // the new offset is width%offset
+      exprt new_offset=
+        (element_width==1)?from_integer(0, offset_type):
+        mod_exprt(offset, from_integer(element_width, offset_type));
 
-      exprt tmp(ID_byte_extract_little_endian, src.type());
+      // build new byte-extract expression
+      exprt tmp(src.id(), src.type());
       tmp.copy_to_operands(concat, new_offset);
 
       return tmp;
-      #endif
-      
-      throw "byte_extract on non-byte arrays still to be implemented";
     }
   }
-  else
+  else // non-array
   {
-    // is the offset a constant?
-    if(src.op1().is_constant())
-    {
-      // We turn that into extractbits, using the obvious encoding.
+    // We turn that into logical right shift and extractbits
+    
+    const exprt &offset=src.op1();
+    const typet &offset_type=ns.follow(offset.type());
 
-      mp_integer i;
-      if(to_integer(src.op1(), i))
-        assert(false);
+    mult_exprt times_eight(offset, from_integer(8, offset_type));
         
-      extractbits_exprt extractbits;
+    lshr_exprt left_shift(src.op0(), times_eight);
+
+    extractbits_exprt extractbits;
+    
+    extractbits.src()=left_shift;
+    extractbits.type()=src.type();
+    extractbits.upper()=from_integer(width*8-1, offset_type);
+    extractbits.lower()=from_integer(0, offset_type);
       
-      extractbits.src()=src.op0();
-      extractbits.type()=src.type();
-      extractbits.upper()=from_integer((i+width)*8-1, src.op1().type());
-      extractbits.lower()=from_integer(i*8, src.op1().type());
-      
-      return extractbits;
-    }
-    else
-    {
-      throw "byte_extract with non-constant offset";
-    }
+    return extractbits;
   }
 }
 
