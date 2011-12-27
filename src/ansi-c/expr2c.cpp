@@ -3646,6 +3646,9 @@ std::string expr2ct::convert(
   else if(src.id()==ID_width)
     return convert_function(src, "WIDTH", precedence=15);
 
+  else if(src.id()==ID_concatenation)
+    return convert_function(src, "CONCATENATION", precedence=15);
+
   else if(src.id()==ID_ieee_float_notequal)
     return convert_function(src, "IEEE_FLOAT_NOTEQUAL", precedence=15);
 
