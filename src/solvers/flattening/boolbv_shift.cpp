@@ -23,16 +23,16 @@ Function: boolbvt::convert_shift
 void boolbvt::convert_shift(const exprt &expr, bvt &bv)
 {
   if(expr.type().id()!=ID_unsignedbv &&
-     expr.type().id()!=ID_signedbv)
+     expr.type().id()!=ID_signedbv &&
+     expr.type().id()!=ID_floatbv &&
+     expr.type().id()!=ID_pointer &&
+     expr.type().id()!=ID_bv)
     return conversion_failed(expr, bv);
 
   unsigned width=boolbv_width(expr.type());
   
   if(width==0)
     return conversion_failed(expr, bv);
-
-  if(width==0)
-    throw "zero length bit vector type: "+expr.type().to_string();
 
   if(expr.operands().size()!=2)
     throw "shifting takes two operands";
