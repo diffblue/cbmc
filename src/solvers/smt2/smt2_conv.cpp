@@ -489,8 +489,7 @@ void smt2_convt::convert_expr(const exprt &expr)
   {
     irep_idt id=expr.get(ID_identifier);
     assert(id!="");
-
-    smt2_prop.out << "nondet_" << convert_identifier(id);
+    smt2_prop.out << convert_identifier("nondet_"+id2string(id));
   }
   else if(expr.id()==ID_typecast)
   {

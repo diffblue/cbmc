@@ -325,6 +325,16 @@ decision_proceduret::resultt smt2_dect::read_result_mathsat(std::istream &in)
     std::string conv_id=convert_identifier(it->first);
     std::string value=values[conv_id];
     if(value=="") continue;
+    if (value.substr(0, 5) == "(_ bv") {
+      // value is "(_ bvDECIMAL_VALUE SIZE"
+      // convert to binary
+      value = value.substr(5);
+      size_t pos = value.find(' ');
+      std::string v = value.substr(0, pos);
+      std::string w = value.substr(pos+1);
+      value = integer2binary(string2integer(v, 10),
+                             string2integer(w, 10).to_ulong());
+    }
     set_value(it->second, value);
   }
 
