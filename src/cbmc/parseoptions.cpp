@@ -819,7 +819,7 @@ void cbmc_parseoptionst::help()
     " --smt1                       output subgoals in SMT1 syntax (experimental)\n"
     " --smt2                       output subgoals in SMT2 syntax (experimental)\n"
     " --boolector                  use Boolector (experimental)\n"
-    " --boolector                  use MathSAT (experimental)\n"
+    " --mathsat                    use MathSAT (experimental)\n"
     " --cvc                        use CVC3 (experimental)\n"
     " --yices                      use Yices (experimental)\n"
     " --z3                         use Z3 (experimental)\n"
