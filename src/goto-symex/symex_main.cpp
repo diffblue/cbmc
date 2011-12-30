@@ -324,6 +324,12 @@ void goto_symext::symex_step(
     // these don't have path semantics
     state.source.pc++;
     break;
+    
+  case CATCH:
+    throw "CATCH not yet implemented";
+  
+  case THROW:
+    throw "THROW not yet implemented";
   
   default:
     assert(false);

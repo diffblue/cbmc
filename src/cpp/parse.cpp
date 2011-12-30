@@ -5869,7 +5869,7 @@ bool Parser::rForStatement(codet &statement)
 */
 bool Parser::rTryStatement(codet &statement)
 {
-  Token tk, op, cp;
+  Token tk;
 
   if(lex->GetToken(tk)!=TOK_TRY)
     return false;
@@ -5877,21 +5877,27 @@ bool Parser::rTryStatement(codet &statement)
   statement=codet(ID_catch);
   set_location(statement, tk);
 
-  codet body;
-  cpp_declarationt handler;
+  {
+    codet body;
 
-  if(!rCompoundStatement(body))
-    return false;
+    if(!rCompoundStatement(body))
+      return false;
 
-  statement.move_to_operands(body);
+    statement.move_to_operands(body);
+  }
 
+  // iterate while there are catch clauses
   do
   {
+    Token op, cp;
+    
     if(lex->GetToken(tk)!=TOK_CATCH)
       return false;
 
     if(lex->GetToken(op)!='(')
       return false;
+
+    cpp_declarationt declaration;
 
     if(lex->LookAhead(0)==TOK_ELLIPSIS)
     {
@@ -5900,20 +5906,22 @@ bool Parser::rTryStatement(codet &statement)
     }
     else
     {
-      if(!rArgDeclaration(handler))
+      if(!rArgDeclaration(declaration))
         return false;
     }
 
     if(lex->GetToken(cp)!=')')
       return false;
+  
+    codet body;
 
     if(!rCompoundStatement(body))
       return false;
 
+    // we prepend the declaration to the body
     // TODO
-    //st=Ptree::Snoc(st, Ptree::List(new LeafReserved(tk),
-    //                 new Leaf(op), handler, new Leaf(cp),
-    //                 body));
+    
+    statement.move_to_operands(body);
   }
   while(lex->LookAhead(0)==TOK_CATCH);
 

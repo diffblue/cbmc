@@ -64,6 +64,10 @@ Function: cpp_typecheckt::typecheck_catch
 
 void cpp_typecheckt::typecheck_catch(codet &code)
 {
+  Forall_operands(it, code)
+  {
+    typecheck_code(to_code(*it));
+  }
 }
 
 /*******************************************************************\
