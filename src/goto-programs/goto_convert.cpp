@@ -428,9 +428,12 @@ void goto_convertt::convert(
     convert_msc_try_finally(code, dest);
   else if(statement==ID_msc_leave)
     convert_msc_leave(code, dest);
+  else if(statement==ID_catch) // C++ try/catch
+    convert_catch(code, dest);
   else
     copy(code, OTHER, dest);
 
+  // make sure dest is never empty
   if(dest.instructions.empty())
   {
     dest.add_instruction(SKIP);
@@ -1907,6 +1910,53 @@ void goto_convertt::convert_msc_leave(
   goto_programt &dest)
 {
   // todo: should throw (silent) exception
+}
+
+/*******************************************************************\
+
+Function: goto_convertt::convert_catch
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void goto_convertt::convert_catch(
+  const codet &code,
+  goto_programt &dest)
+{
+  assert(code.operands().size()>=2);
+  
+  // add the CATCH instruction to 'dest'
+  goto_programt::targett catch_instruction=dest.add_instruction();
+  catch_instruction->make_catch();
+  catch_instruction->code.set_statement(ID_catch);
+
+  // add a SKIP target for the end of everything
+  goto_programt end;
+  goto_programt::targett end_target=end.add_instruction();
+  end_target->make_skip();
+  
+  // the first operand is the 'try' block
+  convert(to_code(code.op0()), dest);
+  
+  // add a goto to the end of the 'try' block
+  dest.add_instruction()->make_goto(end_target);
+
+  for(unsigned i=1; i<code.operands().size(); i++)
+  {
+    // convert to 'dest'
+    convert(to_code(code.operands()[i]), dest);
+
+    // add a goto to the end of the 'catch' block
+    dest.add_instruction()->make_goto(end_target);
+  }
+
+  // add end-target  
+  dest.destructive_append(end);
 }
 
 /*******************************************************************\
