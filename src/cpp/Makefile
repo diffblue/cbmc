@@ -16,7 +16,7 @@ SRC = cpp_id.cpp cpp_language.cpp expr2cpp.cpp cpp_parser.cpp \
       cpp_final.cpp cpp_typecheck_conversions.cpp\
       cpp_typecheck_declaration.cpp cpp_declarator_converter.cpp \
       cpp_declaration.cpp cpp_namespace_spec.cpp \
-      cpp_typecheck_using.cpp \
+      cpp_typecheck_using.cpp cpp_exception_id.cpp \
       cpp_typecheck_enum_type.cpp cpp_typecheck_bases.cpp \
       cpp_typecheck_constructor.cpp cpp_typecheck_virtual_table.cpp
 

@@ -25,6 +25,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_typecheck.h"
 #include "cpp_convert_type.h"
 #include "cpp_class_type.h"
+#include "cpp_exception_id.h"
 #include "expr2cpp.h"
 
 /*******************************************************************\
@@ -883,14 +884,20 @@ void cpp_typecheckt::typecheck_expr_throw(exprt &expr)
   assert(expr.operands().size()==1 ||
          expr.operands().size()==0);
 
-  // nothing really to do; one can throw _almost_ anything
   if(expr.operands().size()==1)
   {
-    if(follow(expr.op0().type()).id()==ID_empty)
+    // nothing really to do; one can throw _almost_ anything
+    const typet &exception_type=expr.op0().type();
+  
+    if(follow(exception_type).id()==ID_empty)
     {
       err_location(expr.op0());
       throw "cannot throw void";
     }
+    
+    // annotate the relevant exception IDs
+    expr.set(ID_exception_list, 
+             cpp_exception_list(exception_type, *this));
   }
 }
 
