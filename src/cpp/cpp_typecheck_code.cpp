@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_declarator_converter.h"
 #include "cpp_template_type.h"
 #include "cpp_util.h"
+#include "cpp_exception_id.h"
 
 /*******************************************************************\
 
@@ -64,9 +65,34 @@ Function: cpp_typecheckt::typecheck_catch
 
 void cpp_typecheckt::typecheck_catch(codet &code)
 {
-  Forall_operands(it, code)
+  codet::operandst &operands=code.operands();
+
+  for(codet::operandst::iterator
+      it=operands.begin();
+      it!=operands.end();
+      it++)
   {
-    typecheck_code(to_code(*it));
+    code_blockt &block=to_code_block(to_code(*it));
+
+    typecheck_code(block);
+
+    // is it a catch block?
+    if(it!=operands.begin())
+    {
+      const code_blockt &code_block=to_code_block(block);
+      assert(code_block.operands().size()>=1);
+      const codet &first_instruction=to_code(code_block.op0());
+      assert(first_instruction.get_statement()==ID_decl);
+
+      // get the declaration
+      const code_declt &code_decl=to_code_decl(first_instruction);
+
+      // get the type
+      const typet &type=code_decl.op0().type();
+      
+      // annotate exception ID
+      it->set(ID_exception_id, cpp_exception_id(type, *this));
+    }
   }
 }
 
@@ -308,7 +334,6 @@ void cpp_typecheckt::typecheck_decl(codet &code)
   {
     cpp_declaratort &declarator=*it;
     cpp_declarator_convertert cpp_declarator_converter(*this);
-
     cpp_declarator_converter.is_typedef=is_typedef;
 
     const symbolt &symbol=
