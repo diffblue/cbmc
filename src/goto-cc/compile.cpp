@@ -56,6 +56,27 @@ Date: June 2006
 
 unsigned compilet::subgraphscount;
 
+#ifdef __linux__
+#include <unistd.h>
+#endif
+
+#ifdef __FreeBSD_kernel__
+#include <unistd.h>
+#endif
+
+#ifdef __MACH__
+#include <unistd.h>
+#endif
+
+#ifdef __CYGWIN__
+#include <unistd.h>
+#endif
+
+#ifdef _WIN32
+#include <direct.h>
+#define chdir _chdir
+#endif
+
 /*******************************************************************\
 
 Function: compilet::doit
