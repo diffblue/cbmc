@@ -56,6 +56,8 @@ Date: June 2006
 
 unsigned compilet::subgraphscount;
 
+// the following are for chdir
+
 #ifdef __linux__
 #include <unistd.h>
 #endif
