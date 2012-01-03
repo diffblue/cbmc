@@ -8,40 +8,6 @@ Date: June 2006
 
 \*******************************************************************/
 
-#ifdef __linux__
-#include <unistd.h>
-#include <errno.h>
-#include <dirent.h>
-#endif
-
-#ifdef __FreeBSD_kernel__
-#include <unistd.h>
-#include <errno.h>
-#include <dirent.h>
-#endif
-
-#ifdef __MACH__
-#include <unistd.h>
-#include <errno.h>
-#include <dirent.h>
-#endif
-
-#ifdef __CYGWIN__
-#include <unistd.h>
-#include <errno.h>
-#include <dirent.h>
-#endif
-
-#ifdef _WIN32
-#include <io.h>
-#include <windows.h>
-#include <direct.h>
-#include <errno.h>
-#define chdir _chdir
-#define popen _popen
-#define pclose _pclose
-#endif
-
 #include <fstream>
 #include <sstream>
 #include <cstdlib>
@@ -54,6 +20,7 @@ Date: June 2006
 #include <xml.h>
 #include <i2string.h>
 #include <cmdline.h>
+#include <file_util.h>
 
 #include <ansi-c/ansi_c_language.h>
 #include <ansi-c/c_link_class.h>
@@ -1459,17 +1426,7 @@ compilet::compilet(cmdlinet &_cmdline):
   only_preprocess=false;
   echo_file_name=false;
   subgraphscount=0;
-
-  unsigned bsize=50;
-  char *buf = (char*) malloc(sizeof(char)*bsize);
-  errno=0;
-  while(buf && getcwd(buf, bsize-1)==NULL && errno==ERANGE)
-  {
-    bsize*=2;
-    buf = (char*) realloc(buf, sizeof(char)*bsize);
-  }
-  working_directory = buf;
-  if(buf) free(buf);
+  working_directory=get_current_working_directory();
 }
 
 /*******************************************************************\
@@ -1488,41 +1445,10 @@ compilet::~compilet()
 {
   // clean up temp dirs
 
-  for (std::list<std::string>::const_iterator it = tmp_dirs.begin();
-       it!=tmp_dirs.end();
-       it++)
-  {
-    #ifdef _WIN32
-    
-    std::string pattern=*it+"\\*";
-    
-    struct _finddata_t info;
-    
-    intptr_t handle=_findfirst(pattern.c_str(), &info);
-    
-    if(handle!=-1)
-    {
-      unlink(info.name);
-      
-      while(_findnext(handle, &info)!=-1)
-        unlink(info.name);
-    }
-    #else
-    DIR *dir=opendir(it->c_str());
-
-    if(dir!=NULL)
-    {
-      struct dirent *ent;
-
-      while((ent=readdir(dir))!=NULL)
-        remove((*it + "/" + ent->d_name).c_str());
-
-      closedir(dir);
-    }
-    #endif
-
-    rmdir(it->c_str());
-  }
+  for(std::list<std::string>::const_iterator it = tmp_dirs.begin();
+      it!=tmp_dirs.end();
+      it++)
+    delete_directory(*it);
 }
 
 /*******************************************************************\
