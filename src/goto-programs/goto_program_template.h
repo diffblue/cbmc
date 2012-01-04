@@ -54,7 +54,7 @@ public:
       \param[in] src an empty goto program
       \remark Use copy_from to copy non-empty goto-programs
   */
-  goto_program_templatet(const goto_program_templatet &src)
+  inline goto_program_templatet(const goto_program_templatet &src)
   {
     // DO NOT COPY ME! I HAVE POINTERS IN ME!
     assert(src.instructions.empty());
@@ -64,7 +64,7 @@ public:
       \param[in] src an empty goto program
       \remark Use copy_from to copy non-empty goto-programs
   */
-  goto_program_templatet &operator=(const goto_program_templatet &src)
+  inline goto_program_templatet &operator=(const goto_program_templatet &src)
   {
     // DO NOT COPY ME! I HAVE POINTERS IN ME!
     assert(src.instructions.empty());
@@ -107,7 +107,7 @@ public:
     std::set<targett> incoming_edges;
 
     //! is this node a branch target?
-    bool is_target() const
+    inline bool is_target() const
     { return target_number!=unsigned(-1); }
 
     //! clear the node    
@@ -168,7 +168,7 @@ public:
     inline bool is_end_thread   () const { return type==END_THREAD;    }
     inline bool is_end_function () const { return type==END_FUNCTION;  }
 
-    instructiont():
+    inline instructiont():
       location(static_cast<const locationt &>(get_nil_irep())),
       type(NO_INSTRUCTION_TYPE),
       location_number(0),
@@ -177,7 +177,7 @@ public:
       guard.make_true();
     }
 
-    instructiont(goto_program_instruction_typet _type):
+    inline instructiont(goto_program_instruction_typet _type):
       location(static_cast<const locationt &>(get_nil_irep())),
       type(_type),
       location_number(0),
@@ -272,14 +272,14 @@ public:
   
   //! Insertion before the given target
   //! \return newly inserted location
-  targett insert_before(targett target)
+  inline targett insert_before(targett target)
   {
     return instructions.insert(target, instructiont());
   }
   
   //! Insertion after the given target
   //! \return newly inserted location
-  targett insert_after(targett target)
+  inline targett insert_after(targett target)
   {
     targett t=target;
     t++;
@@ -307,7 +307,7 @@ public:
 
   //! Adds an instruction at the end.
   //! \return The newly added instruction.
-  targett add_instruction()
+  inline targett add_instruction()
   {
     instructions.push_back(instructiont());
     return --instructions.end();
@@ -315,7 +315,7 @@ public:
 
   //! Adds an instruction of given type at the end.
   //! \return The newly added instruction.
-  targett add_instruction(goto_program_instruction_typet type)
+  inline targett add_instruction(goto_program_instruction_typet type)
   {
     instructions.push_back(instructiont(type));
     return --instructions.end();
@@ -328,7 +328,7 @@ public:
     std::ostream &out) const;
 
   //! Output goto-program to given stream  
-  std::ostream &output(std::ostream &out) const
+  inline std::ostream &output(std::ostream &out) const
   {
     return output(namespacet(contextt()), "", out);
   }
@@ -354,7 +354,7 @@ public:
   }
   
   //! Compute location numbers
-  void compute_location_numbers()
+  inline void compute_location_numbers()
   {
     unsigned nr=0;
     compute_location_numbers(nr);
@@ -367,7 +367,7 @@ public:
   void update();
   
   //! Is the program empty?
-  bool empty() const
+  inline bool empty() const
   {
     return instructions.empty();
   }
@@ -382,13 +382,13 @@ public:
   }
 
   //! Swap the goto program   
-  void swap(goto_program_templatet<codeT, guardT> &program)
+  inline void swap(goto_program_templatet<codeT, guardT> &program)
   {
     program.instructions.swap(instructions);
   }
 
   //! Clear the goto program  
-  void clear()
+  inline void clear()
   {
     instructions.clear();
   }
@@ -586,7 +586,10 @@ void goto_program_templatet<codeT, guardT>::compute_target_numbers()
       it++)
   {
     if(it->is_target())
+    {
       it->target_number=++cnt;
+      assert(it->target_number!=0);
+    }
   }
 
   // check the targets!
@@ -604,7 +607,10 @@ void goto_program_templatet<codeT, guardT>::compute_target_numbers()
     {
       targett t=*t_it;
       if(t!=instructions.end())
+      {
         assert(t->target_number!=0);
+        assert(t->target_number!=unsigned(-1));
+      }
     }
   }
   
