@@ -81,7 +81,8 @@ void goto_symext::symex_throw(statet &state)
     instruction.code.find(ID_exception_list).get_sub();
 
   // go through the call stack, beginning with the top
-  
+
+  #if 0  
   for(goto_symex_statet::call_stackt::const_reverse_iterator
       s_it=state.call_stack.rbegin();
       s_it!=state.call_stack.rend();
@@ -105,6 +106,7 @@ void goto_symext::symex_throw(statet &state)
       }
     }
   }
+  #endif
   
   // An un-caught exception. Behaves like assume(0);
   state.guard.add(false_exprt());
