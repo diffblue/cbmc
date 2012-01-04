@@ -12,24 +12,32 @@ Date: January 2012
 #include <unistd.h>
 #include <errno.h>
 #include <dirent.h>
+#include <stdlib.h>
+#include <stdio.h>
 #endif
 
 #ifdef __FreeBSD_kernel__
 #include <unistd.h>
 #include <errno.h>
 #include <dirent.h>
+#include <stdlib.h>
+#include <stdio.h>
 #endif
 
 #ifdef __MACH__
 #include <unistd.h>
 #include <errno.h>
 #include <dirent.h>
+#include <stdlib.h>
+#include <stdio.h>
 #endif
 
 #ifdef __CYGWIN__
 #include <unistd.h>
 #include <errno.h>
 #include <dirent.h>
+#include <stdlib.h>
+#include <stdio.h>
 #endif
 
 #ifdef _WIN32
