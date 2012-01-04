@@ -326,10 +326,14 @@ void goto_symext::symex_step(
     break;
     
   case CATCH:
-    throw "CATCH not yet implemented";
+    symex_catch(state);
+    state.source.pc++;
+    break;
   
   case THROW:
-    throw "THROW not yet implemented";
+    symex_throw(state);
+    state.source.pc++;
+    break;
   
   default:
     assert(false);

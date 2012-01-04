@@ -113,6 +113,28 @@ void cfg_baset<T>::compute_edges(
         entry.successors.push_back(&entry_map[t]);
     }
   }
+  else if(instruction.is_catch())
+  {
+    if(next_PC!=goto_program.instructions.end())
+      entry.successors.push_back(&entry_map[next_PC]);
+
+    // Not ideal, but preserves targets
+    // Ideally, the throw statements should have those as successors
+
+    for(goto_programt::instructiont::targetst::const_iterator
+        t_it=instruction.targets.begin();
+        t_it!=instruction.targets.end();
+        t_it++)
+    {
+      goto_programt::const_targett t=*t_it;
+      if(t!=goto_program.instructions.end())
+        entry.successors.push_back(&entry_map[t]);
+    }
+  }
+  else if(instruction.is_throw())
+  {
+    // no (trivial) successors
+  }
   else if(instruction.is_start_thread())
   {
     if(next_PC!=goto_program.instructions.end())

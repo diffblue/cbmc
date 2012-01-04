@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_SYMEX_GOTO_SYMEX_STATE_H
 #define CPROVER_GOTO_SYMEX_GOTO_SYMEX_STATE_H
 
-#include <assert.h>
+#include <cassert>
 
 #include <guard.h>
 #include <std_expr.h>
@@ -267,10 +267,13 @@ public:
   typedef std::list<goto_statet> goto_state_listt;
   typedef std::map<goto_programt::const_targett, goto_state_listt> goto_state_mapt;
 
-  // function calls
+  // stack frames -- these are used for function calls and
+  // for exceptions
   class framet
   {
   public:
+    // function calls
+  
     irep_idt function_identifier;
     goto_state_mapt goto_state_map;
     level1t level1;
@@ -286,6 +289,10 @@ public:
       return_value(static_cast<const exprt &>(get_nil_irep()))
     {
     }
+
+    // exceptions
+    typedef std::map<irep_idt, goto_programt::targett> catch_mapt;
+    catch_mapt catch_map;
   };
   
   typedef std::vector<framet> call_stackt;
@@ -302,7 +309,7 @@ public:
     assert(!call_stack.empty());
     return call_stack.back();
   }
-
+  
   inline framet &new_frame() { call_stack.push_back(framet()); return call_stack.back(); }
   inline void pop_frame() { call_stack.pop_back(); }
   inline const framet &previous_frame() { return *(--(--call_stack.end())); }
