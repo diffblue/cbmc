@@ -126,11 +126,46 @@ std::ostream& goto_programt::output_instruction(
     break;
     
   case THROW:
-    out << "THROW" << std::endl;
+    out << "THROW";
+
+    {
+      const irept::subt &exception_list=
+        it->code.find(ID_exception_list).get_sub();
+    
+      for(irept::subt::const_iterator
+          it=exception_list.begin();
+          it!=exception_list.end();
+          it++)
+        out << " " << it->id();
+    }
+    
+    if(it->code.operands().size()==1)
+      out << ": " << from_expr(ns, identifier, it->code.op0());
+    
+    out << std::endl;
     break;
     
   case CATCH:
-    out << "CATCH" << std::endl;
+    out << "CATCH ";
+    
+    {
+      unsigned i=0;
+      const irept::subt &exception_list=
+        it->code.find(ID_exception_list).get_sub();
+      assert(it->targets.size()==exception_list.size());
+      for(instructiont::targetst::const_iterator
+          gt_it=it->targets.begin();
+          gt_it!=it->targets.end();
+          gt_it++,
+          i++)
+      {
+        if(gt_it!=it->targets.begin()) out << ", ";
+        out << exception_list[i].id() << "->"
+            << (*gt_it)->target_number;
+      }
+    }
+      
+    out << std::endl;
     break;
     
   case ATOMIC_BEGIN:

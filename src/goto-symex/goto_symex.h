@@ -187,6 +187,11 @@ protected:
   std::map<irep_idt, unsigned> function_unwind;
   std::map<irep_idt, unsigned> function_frame;
   std::map<symex_targett::sourcet, unsigned> unwind_map;
+  
+  // exceptions
+  
+  void symex_throw(statet &state);
+  void symex_catch(statet &state);
 };
 
 #endif
