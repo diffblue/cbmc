@@ -20,7 +20,7 @@ cp ../../LICENSE /tmp/cbmc-dist/LICENSE.txt
 unix2dos /tmp/cbmc-dist/LICENSE.txt
 cd /tmp/cbmc-dist
 zip -9 cbmc-${VERSION_FILE}-win.zip hw-cbmc.exe cbmc.exe \
-  goto-instrument.exe LICENSE.txt README.txt
+  goto-instrument.exe goto-cl.exe LICENSE.txt
 
 echo Copying.
 scp cbmc-${VERSION_FILE}-win.zip kroening@dkr-srv.cs.ox.ac.uk:/srv/www/cprover.org/cbmc/download/
