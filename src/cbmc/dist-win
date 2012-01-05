@@ -23,7 +23,7 @@ zip -9 cbmc-${VERSION_FILE}-win.zip hw-cbmc.exe cbmc.exe \
   goto-instrument.exe LICENSE.txt README.txt
 
 echo Copying.
-scp cbmc-${VERSION_FILE}-win.zip kroening@dkr-srv.comlab.ox.ac.uk:/srv/www/cprover.org/cbmc/download/
+scp cbmc-${VERSION_FILE}-win.zip kroening@dkr-srv.cs.ox.ac.uk:/srv/www/cprover.org/cbmc/download/
 
 cd /tmp
 rm -R /tmp/cbmc-dist
