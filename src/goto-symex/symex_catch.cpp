@@ -74,9 +74,9 @@ Function: goto_symext::symex_throw
 
 void goto_symext::symex_throw(statet &state)
 {
+  #if 0  
   const goto_programt::instructiont &instruction=*state.source.pc;
 
-  #if 0  
   // get the list of exceptions thrown
   const irept::subt &exceptions_thrown=
     instruction.code.find(ID_exception_list).get_sub();
