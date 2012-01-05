@@ -76,13 +76,13 @@ void goto_symext::symex_throw(statet &state)
 {
   const goto_programt::instructiont &instruction=*state.source.pc;
 
+  #if 0  
   // get the list of exceptions thrown
   const irept::subt &exceptions_thrown=
     instruction.code.find(ID_exception_list).get_sub();
 
   // go through the call stack, beginning with the top
 
-  #if 0  
   for(goto_symex_statet::call_stackt::const_reverse_iterator
       s_it=state.call_stack.rbegin();
       s_it!=state.call_stack.rend();
