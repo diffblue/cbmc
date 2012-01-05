@@ -1797,7 +1797,7 @@ void goto_convertt::convert_bp_enforce(
         // add to constraint
         assert(it->code.operands().size()==2);
         it->code.op1()=
-          gen_and(it->code.op1(), constraint);
+          and_exprt(it->code.op1(), constraint);
       }
     }
   }

@@ -668,7 +668,7 @@ void c_typecastt::do_typecast(exprt &dest, const typet &type)
     index.array()=dest;
     index.index()=gen_zero(index_type());
     index.type()=dest_type.subtype();
-    dest=gen_address_of(index);
+    dest=address_of_exprt(index);
     if(ns.follow(dest.type())!=ns.follow(type))
       dest.make_typecast(type);
     return;
