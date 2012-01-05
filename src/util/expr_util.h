@@ -33,21 +33,6 @@ exprt gen_not(const exprt &op);
 exprt gen_unary(const irep_idt &id, const typet &type, const exprt &op);
 /*! \copydoc gen_zero(const typet &) */
 exprt gen_binary(const irep_idt &id, const typet &type, const exprt &op1, const exprt &op2);
-/*! \copydoc gen_zero(const typet &) */
-exprt gen_and(const exprt &op1, const exprt &op2);
-/*! \copydoc gen_zero(const typet &) */
-exprt gen_and(const exprt &op1, const exprt &op2, const exprt &op3);
-/*! \copydoc gen_zero(const typet &) */
-exprt gen_or(const exprt &op1, const exprt &op2);
-/*! \copydoc gen_zero(const typet &) */
-exprt gen_or(const exprt &op1, const exprt &op2, const exprt &op3);
-/*! \copydoc gen_zero(const typet &) */
-exprt gen_implies(const exprt &op1, const exprt &op2);
-/*! \copydoc gen_zero(const typet &) */
-exprt gen_address_of(const exprt &op);
-
-/*! \copydoc gen_zero(const typet &) */
-pointer_typet gen_pointer_type(const typet &subtype);
 
 /*! \copydoc gen_zero(const typet &) */
 void gen_and(exprt &expr);

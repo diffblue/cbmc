@@ -214,7 +214,7 @@ void postconditiont::strengthen(exprt &dest)
     if(dest.is_true())
       dest.swap(equality);
     else
-      dest=gen_and(dest, equality);
+      dest=and_exprt(dest, equality);
   }
 }  
 

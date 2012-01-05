@@ -892,7 +892,7 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
     index.array()=op;
     index.index()=gen_zero(index_type());
     index.type()=op_type.subtype();
-    op=gen_address_of(index);
+    op=address_of_exprt(index);
   }
   else if(op_type.id()==ID_empty)
   {
