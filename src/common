@@ -29,8 +29,10 @@ ifeq ($(BUILD_ENV_),OSX_Universal)
   CP_CXXFLAGS += -force_cpusubtype_ALL -arch i386 -arch ppc -arch x86_64
   CP_CFLAGS += -force_cpusubtype_ALL -arch i386 -arch ppc -arch x86_64
   LINKFLAGS += -force_cpusubtype_ALL -arch i386 -arch ppc -arch x86_64
-endif
+  LINKLIB = /usr/bin/libtool -static -o $@ $^
+else
   LINKLIB = ld -r -o $@ $^
+endif
   LINKBIN = $(CXX) $(LINKFLAGS) -o $@ $^ $(LIBS)
 ifeq ($(origin CC),default)
   CC     = gcc
