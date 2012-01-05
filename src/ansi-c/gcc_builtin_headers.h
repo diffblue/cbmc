@@ -92,4 +92,45 @@
   "void __sync_synchronize();\n" \
   "int __sync_lock_test_and_set(volatile void *, ...);\n" \
   "void __sync_lock_release(volatile void *, ...);\n" \
+  "float __builtin_acosf(float);\n" \
+  "long double __builtin_acosl(long double);\n" \
+  "float __builtin_asinf(float);\n" \
+  "long double __builtin_asinl(long double);\n" \
+  "float __builtin_atanf(float);\n" \
+  "long double __builtin_atanl(long double);\n" \
+  "float __builtin_atan2f(float, float);\n" \
+  "long double __builtin_atan2l(long double, long double);\n" \
+  "float __builtin_ceilf(float);\n" \
+  "long double __builtin_ceill(long double);\n" \
+  "float __builtin_coshf(float);\n" \
+  "long double __builtin_coshl(long double);\n" \
+  "float __builtin_expf(float);\n" \
+  "long double __builtin_expl(long double);\n" \
+  "float __builtin_floorf(float);\n" \
+  "long double __builtin_floorl(long double);\n" \
+  "float __builtin_fmodf(float, float);\n" \
+  "long double __builtin_fmodl(long double, long double);\n" \
+  "float __builtin_frexpf(float, int*);\n" \
+  "long double __builtin_frexpl(long double, int*);\n" \
+  "float __builtin_ldexpf(float , int exp);\n" \
+  "long double __builtin_ldexpl(long double, int);\n" \
+  "float __builtin_logf(float);\n" \
+  "long double __builtin_logl(long double);\n" \
+  "float __builtin_log10f(float);\n" \
+  "long double __builtin_log10l(long double);\n" \
+  "float __builtin_modff(float, float*);\n" \
+  "long double __builtin_modfl(long double, long double*);\n" \
+  "float __builtin_powf(float, float);\n" \
+  "long double __builtin_powl(long double, long double);\n" \
+  "double __builtin_powi(double, int);\n" \
+  "float __builtin_powif(float, int);\n" \
+  "long double __builtin_powil(long double, int);\n" \
+  "float __builtin_sinhf(float);\n" \
+  "long double __builtin_sinhl(long double);\n" \
+  "float __builtin_tanf(float);\n" \
+  "long double __builtin_tanl(long double);\n" \
+  "float __builtin_tanhf(float);\n" \
+  "long double __builtin_tanhl(long double);\n" \
+  "long double __builtin_parityl(long double);\n" \
+  "long double __builtin_parityll(long double);\n" \
   "\n\n"
