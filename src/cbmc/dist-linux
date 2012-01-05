@@ -42,7 +42,7 @@ Depends: gcc
 Recommends: mozilla | netscape  
 Suggests: docbook 
 Installed-Size: 4971
-Maintainer: Daniel Kroening [kroening@comlab.ox.ac.uk]
+Maintainer: Daniel Kroening [kroening@cs.ox.ac.uk]
 Provides: cbmc
 Description: CBMC is a Bounded Model Checker for C and C++ programs.
  .
@@ -57,7 +57,7 @@ dpkg -b debian cbmc_${VERSION}_${DEB_ARCH}.deb
 echo Copying.
 scp cbmc-${VERSION_FILE}-linux-${BITS}.tgz \
     cbmc_${VERSION}_${DEB_ARCH}.deb \
-  kroening@dkr-srv.comlab.ox.ac.uk:/srv/www/cprover.org/cbmc/download/
+  kroening@dkr-srv.cs.ox.ac.uk:/srv/www/cprover.org/cbmc/download/
 
 cd /tmp
 rm -R /tmp/cbmc-dist
