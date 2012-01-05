@@ -1083,18 +1083,16 @@ public:
 
 /*! \brief boolean implication
 */
-class implies_exprt:public exprt
+class implies_exprt:public binary_exprt
 {
 public:
-  inline implies_exprt():exprt(ID_implies, bool_typet())
+  inline implies_exprt():binary_exprt(ID_implies, bool_typet())
   {
-    operands().resize(2);
   }
 
   inline implies_exprt(const exprt &op0, const exprt &op1):
-    exprt(ID_implies, bool_typet())
+    binary_exprt(op0, ID_implies, op1, bool_typet())
   {
-    copy_to_operands(op0, op1);
   }
 };
 
