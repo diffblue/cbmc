@@ -518,11 +518,11 @@ bool smt2_dect::string_to_expr_z3(
   else if(value.substr(0,8)=="array_of")
   {
     // We assume that array_of has only concrete arguments...
-    irep_idt id(value);
-    array_of_mapt::const_iterator fit=array_of_map.begin();
-    while(fit!=array_of_map.end() && fit->second!=id) fit++;
+    irep_idt id=value;
+    defined_expressionst::const_iterator fit=defined_expressions.begin();
+    while(fit!=defined_expressions.end() && fit->second!=id) fit++;
 
-    if(fit==array_of_map.end()) return false;
+    if(fit==defined_expressions.end()) return false;
 
     e = fit->first;
 
@@ -655,12 +655,12 @@ decision_proceduret::resultt smt2_dect::read_result_cvc3(std::istream &in)
     else if(value.substr(0,8)=="array_of")
     {
       // We assume that array_of has only concrete arguments...
-      irep_idt id(value);
-      array_of_mapt::const_iterator fit=array_of_map.begin();
-      while(fit!=array_of_map.end() && fit->second!=id) fit++;
+      irep_idt id=value;
+      defined_expressionst::const_iterator fit=defined_expressions.begin();
+      while(fit!=defined_expressions.end() && fit->second!=id) fit++;
 
-      if(fit!=array_of_map.end())
-        it->second.value = fit->first;
+      if(fit!=defined_expressions.end())
+        it->second.value=fit->first;
     }
     else
       set_value(it->second, value);
