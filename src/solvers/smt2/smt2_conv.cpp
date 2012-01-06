@@ -736,14 +736,8 @@ void smt2_convt::convert_expr(const exprt &expr)
   {
     assert(expr.type().id()==ID_array);
     assert(expr.operands().size()==1);
-
-    // const array_typet &array_type=to_array_type(expr.type());
-
-    // not really there in SMT, so we replace it
-    // this is an over-approximation
-    array_of_mapt::const_iterator it=array_of_map.find(expr);
-    assert(it!=array_of_map.end());
-
+    defined_expressionst::const_iterator it=defined_expressions.find(expr);
+    assert(it!=defined_expressions.end());
     smt2_prop.out << it->second;
   }
   else if(expr.id()==ID_index)
@@ -866,11 +860,9 @@ void smt2_convt::convert_expr(const exprt &expr)
   }
   else if(expr.id()==ID_string_constant)
   {
-    exprt tmp;
-    string2array_mapt::const_iterator fit=string2array_map.find(expr);
-    assert(fit!=string2array_map.end());
-
-    convert_expr(fit->second);
+    defined_expressionst::const_iterator it=defined_expressions.find(expr);
+    assert(it!=defined_expressions.end());
+    smt2_prop.out << it->second;
   }
   else if(expr.id()==ID_extractbit)
   {
@@ -1200,6 +1192,12 @@ void smt2_convt::convert_expr(const exprt &expr)
   {
     assert(expr.operands().size()==2);
     throw "not yet implemented: overflow-*";
+  }
+  else if(expr.id()==ID_array)
+  {
+    defined_expressionst::const_iterator it=defined_expressions.find(expr);
+    assert(it!=defined_expressions.end());
+    smt2_prop.out << it->second;
   }
   else
     throw "smt2_convt::convert_expr: `"+
@@ -1763,30 +1761,9 @@ void smt2_convt::convert_constant(const constant_exprt &expr)
   }
   else if(expr.type().id()==ID_array)
   {
-    array_init_mapt::const_iterator it=array_init_map.find(expr);
-    assert(it!=array_init_map.end());
-
-    std::string tmp;
-    tmp = it->second.as_string();
-
-    assert(expr.operands().size()!=0);
-
-    forall_operands(it, expr)
-      smt2_prop.out << "(store ";
-
+    defined_expressionst::const_iterator it=defined_expressions.find(expr);
+    assert(it!=defined_expressions.end());
     smt2_prop.out << it->second;
-
-    unsigned i=0;
-    forall_operands(it, expr)
-    {
-      exprt inx = from_integer(i, unsignedbv_typet(array_index_bits));
-      smt2_prop.out << " ";
-      convert_expr(inx);
-      smt2_prop.out << " ";
-      convert_expr(*it);
-      smt2_prop.out << ")";
-      i++;
-    }
   }
   else if(expr.type().id()==ID_rational)
   {
@@ -2733,72 +2710,69 @@ void smt2_convt::find_symbols(const exprt &expr)
   }
   else if(expr.id()==ID_array_of)
   {
-    if(array_of_map.find(expr)==array_of_map.end())
+    if(defined_expressions.find(expr)==defined_expressions.end())
     {
-      irep_idt id="array_of'"+i2string(array_of_map.size());
-      smt2_prop.out << "; the following is a poor substitute for lambda i. x" << std::endl;
-      smt2_prop.out << "(declare-fun "
-                    << id
-                    << " () ";
+      irep_idt id="array_of."+i2string(defined_expressions.size());
+      smt2_prop.out << "; the following is a substitute for lambda i. x" << std::endl;
+      smt2_prop.out << "(declare-fun " << id << " () ";
       convert_type(expr.type());
       smt2_prop.out << ")" << std::endl;
 
-      // we can initialize array_ofs if they have
-      // a constant size and a constant element
-      if(expr.type().find(ID_size)!=get_nil_irep() &&
-         expr.op0().id()==ID_constant)
-      {
-        const array_typet &array_type=to_array_type(expr.type());
-        mp_integer size;
+      // use a quantifier instead of the lambda
+      #if 0 // not really working in any sover yet!
+      smt2_prop.out << "(assert (forall ((i ";
+      convert_type(array_index_type());
+      smt2_prop.out << ")) (= (select " << id << " i) ";
+      convert_expr(expr.op0());
+      smt2_prop.out << ")))" << std::endl;
+      #endif
 
-        if(!to_integer(array_type.size(), size))
-        {
-          // since we can't use quantifiers, let's enumerate...
-          for(mp_integer i=0; i<size; ++i)
-          {
-            smt2_prop.out
-              << "(assert (= (select " << id
-              << " (_ bv"
-              << i << " " << array_index_bits << ")) ";
-            convert_expr(expr.op0());
-            smt2_prop.out << "))" << std::endl;
-          }
-        }
-      }
-
-      array_of_map[expr]=id;
+      defined_expressions[expr]=id;
     }
   }
-  else if(expr.id()==ID_constant)
+  else if(expr.id()==ID_array)
   {
-    if(expr.type().id()==ID_array &&
-       array_init_map.find(expr)==array_init_map.end())
+    if(defined_expressions.find(expr)==defined_expressions.end())
     {
-      // introduce a temporary array.
-      irep_idt id="array_init'"+i2string(array_init_map.size());
-      smt2_prop.out << "(declare-fun "
-                    << id
-                    << " () ";
+      irep_idt id="array."+i2string(defined_expressions.size());
+      smt2_prop.out << "; the following is a substitute for an array constructor" << std::endl;
+      smt2_prop.out << "(declare-fun " << id << " () ";
       convert_type(expr.type());
       smt2_prop.out << ")" << std::endl;
-      array_init_map[expr]=id;
+
+      for(unsigned i=0; i<expr.operands().size(); i++)
+      {
+        smt2_prop.out << "(assert (= (select " << id 
+                      << " (_ bv" << i << " " << array_index_bits << ")) ";
+        convert_expr(expr.operands()[i]);
+        smt2_prop.out << "))" << std::endl;
+      }
+
+      defined_expressions[expr]=id;
     }
   }
   else if(expr.id()==ID_string_constant)
   {
-    if(string2array_map.find(expr)==string2array_map.end())
+    if(defined_expressions.find(expr)==defined_expressions.end())
     {
-      exprt t=to_string_constant(expr).to_array_expr();
-      string2array_map[expr]=t;
-
       // introduce a temporary array.
-      irep_idt id="string'"+i2string(array_init_map.size());
-      smt2_prop.out << "(declare-fun "
-                    << id
-                    << " () ";
-      convert_type(t.type());
+      exprt tmp=to_string_constant(expr).to_array_expr();
+
+      irep_idt id="string."+i2string(defined_expressions.size());
+      smt2_prop.out << "; the following is a substitute for a string" << std::endl;
+      smt2_prop.out << "(declare-fun " << id << " () ";
+      convert_type(expr.type());
       smt2_prop.out << ")" << std::endl;
-      array_init_map[t]=id;
+
+      for(unsigned i=0; i<tmp.operands().size(); i++)
+      {
+        smt2_prop.out << "(assert (= (select " << id 
+                      << " (_ bv" << i << " " << array_index_bits << ")_ ";
+        convert_expr(tmp.operands()[i]);
+        smt2_prop.out << "))" << std::endl;
+      }
+
+      defined_expressions[expr]=id;
     }
   }
 
