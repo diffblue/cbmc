@@ -105,7 +105,7 @@ public:
   typedef std::list<goto_trace_stept> stepst;
   stepst steps;
   
-  std::string mode;
+  irep_idt mode;
   
   inline void clear()
   {
@@ -123,6 +123,11 @@ public:
   {
     other.steps.swap(steps);
     other.mode.swap(mode);
+  }
+  
+  inline void add_step(const goto_trace_stept &step)
+  {
+    steps.push_back(step);
   }
 };
 
