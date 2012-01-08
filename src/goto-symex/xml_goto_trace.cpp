@@ -137,7 +137,7 @@ void convert(
 {
   xml=xmlt("goto_trace");
   
-  xml.new_element("mode").data=goto_trace.mode;
+  xml.new_element("mode").data=id2string(goto_trace.mode);
 
   locationt previous_location;
 
