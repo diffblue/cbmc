@@ -85,9 +85,8 @@ class goto2cppt
 {
 public:
   goto2cppt(
-    const namespacet &_ns,
     const goto_functionst &_goto_functions,
-    std::ostream &_out):
+    const namespacet &_ns):
     goto_functions(_goto_functions),
     ns(_ns)
   {
@@ -1800,6 +1799,7 @@ void dump_c(
   const namespacet &ns,
   std::ostream &out)
 {
-  out << goto2cppt(src, ns);
+  goto2cppt goto2cpp(src, ns);
+  out << goto2cpp;
 }
 
