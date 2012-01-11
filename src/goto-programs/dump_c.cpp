@@ -1164,49 +1164,51 @@ std::string goto2cppt::expr_to_string(
           expr.id()==ID_le  || expr.id()==ID_ge)
   {
     assert(expr.operands().size() == 2);
-    return "(" + expr_to_string(expr.op0(),local_renaming) + id2string(expr.id())
-         + expr_to_string(expr.op1(),local_renaming) + ")";
+    return "("+expr_to_string(expr.op0(), local_renaming)+id2string(expr.id())
+              +expr_to_string(expr.op1(), local_renaming)+")";
   }
   else if(expr.id()==ID_mod)
   {
     assert(expr.operands().size() == 2);
-    return "(" + expr_to_string(expr.op0(),local_renaming) + "%"
-         + expr_to_string(expr.op1(),local_renaming) + ")";
+    return "("+expr_to_string(expr.op0(), local_renaming)+"%"
+              +expr_to_string(expr.op1(), local_renaming)+")";
   }
-  else if(expr.id()== ID_equal)
+  else if(expr.id()==ID_equal)
   {
     assert(expr.operands().size() == 2);
-    return "(" + expr_to_string(expr.op0(),local_renaming) +" == " + expr_to_string(expr.op1(),local_renaming) + ")";
+    return "("+expr_to_string(expr.op0(), local_renaming)+"=="
+              +expr_to_string(expr.op1(), local_renaming)+")";
   }
-  else if(expr.id() == ID_notequal)
+  else if(expr.id()==ID_notequal)
   {
     assert(expr.operands().size() == 2);
-    return "(" + expr_to_string(expr.op0(),local_renaming) +" != " + expr_to_string(expr.op1(),local_renaming) + ")";
+    return "("+expr_to_string(expr.op0(), local_renaming)+"!="
+              +expr_to_string(expr.op1(), local_renaming)+")";
   }
-  else if(expr.id() == ID_and)
+  else if(expr.id()==ID_and)
   {
     assert(expr.operands().size() >= 2);
-    std::string str = "( ";
-    str +=  expr_to_string(expr.operands()[0],local_renaming);
-    for(unsigned i = 1; i < expr.operands().size(); i++ )
-      str += " && " + expr_to_string(expr.operands()[i],local_renaming);
-    str += ")";
+    std::string str="(";
+    str+=expr_to_string(expr.operands()[0], local_renaming);
+    for(unsigned i=1; i<expr.operands().size(); i++)
+      str+=" && "+expr_to_string(expr.operands()[i], local_renaming);
+    str+=")";
     return str;
   }
   else if(expr.id() == ID_or)
   {
     assert(expr.operands().size() >= 1);
-    std::string str = "( ";
-    str +=  expr_to_string(expr.operands()[0],local_renaming);
+    std::string str="(";
+    str+=expr_to_string(expr.operands()[0],local_renaming);
     for(unsigned i = 1; i < expr.operands().size(); i++ )
-      str += " || " + expr_to_string(expr.operands()[i],local_renaming);
-    str += ")";
+      str += " || "+expr_to_string(expr.operands()[i], local_renaming);
+    str+=")";
     return str;
   }
-  else if(expr.id() == ID_not)
+  else if(expr.id()==ID_not)
   {
     assert(expr.operands().size() == 1);
-    return "(!" + expr_to_string(expr.op0(),local_renaming) + ")";
+    return "(!"+expr_to_string(expr.op0(), local_renaming)+")";
   }
   else if(expr.id() == ID_bitand)
   {
@@ -1223,15 +1225,17 @@ std::string goto2cppt::expr_to_string(
             " & " + expr_to_string(expr.operands()[1],local_renaming) +")";
     }
     else
-      str = expr_to_string(expr.operands()[0],local_renaming)
-            + " &= " + expr_to_string(expr.operands()[1],local_renaming);
+      str = expr_to_string(expr.operands()[0], local_renaming)
+            + " &= " + expr_to_string(expr.operands()[1], local_renaming);
 
     for(unsigned i = 2; i < expr.operands().size(); i++ )
-      str += " &= " + expr_to_string(expr.operands()[i],local_renaming);
-    str = "(" + str + ")";
+      str += " &= " + expr_to_string(expr.operands()[i], local_renaming);
+
+    str="("+str+")";
+
     return str;
   }
-  else if(expr.id() == ID_bitor)
+  else if(expr.id()==ID_bitor)
   {
     assert(expr.operands().size() >= 2);
 
@@ -1256,7 +1260,7 @@ std::string goto2cppt::expr_to_string(
     return str;
 
   }
-  else if(expr.id() == ID_bitxor)
+  else if(expr.id()==ID_bitxor)
   {
     std::string str;
     
@@ -1274,22 +1278,26 @@ std::string goto2cppt::expr_to_string(
             + " ^= " + expr_to_string(expr.operands()[1],local_renaming);
     for(unsigned i = 2; i < expr.operands().size(); i++ )
       str += " ^= " + expr_to_string(expr.operands()[i],local_renaming);
+
     str = "(" + str + ")";
+
     return str;
   }
-  else if(expr.id() == ID_bitnot)
+  else if(expr.id()==ID_bitnot)
   {
     assert(expr.operands().size() == 1);
     return "(~ " + expr_to_string(expr.op0(),local_renaming) + ")";
   }
-  else if(expr.id() == ID_shl)
+  else if(expr.id()==ID_shl)
   {
     assert(expr.operands().size() == 2);
 
     std::string shf_str;
-    if(expr.op1().id() == ID_constant)
+    if(expr.op1().id()==ID_constant)
     {
-      assert(expr.op1().type().id() == ID_unsignedbv || expr.op1().type().id() == ID_signedbv);
+      assert(expr.op1().type().id() == ID_unsignedbv ||
+             expr.op1().type().id() == ID_signedbv);
+
       std::string width_str = id2string(expr.op1().type().get(ID_width));
       mp_integer width = string2integer(width_str,10);
       assert(width != 0);
@@ -1310,29 +1318,32 @@ std::string goto2cppt::expr_to_string(
     }
     return "(" + expr_to_string(expr.op0(),local_renaming) +" <<= " + shf_str + " )";
   }
-
   else if(expr.id() == ID_lshr || expr.id() == ID_ashr)
   {
     assert(expr.operands().size() == 2);
 
-    if(expr.op1().id() == ID_constant)
+    if(expr.op1().id()==ID_constant)
     {
-      assert(expr.op1().type().id() == ID_unsignedbv || expr.op1().type().id() == ID_signedbv);
+      assert(expr.op1().type().id() == ID_unsignedbv ||
+             expr.op1().type().id() == ID_signedbv);
+
       std::string width_str = id2string(expr.op1().type().get(ID_width));
       mp_integer width = string2integer(width_str,10);
       assert(width != 0);
       mp_integer cst = string2integer(id2string(expr.op1().get(ID_value)),2);
       std::string str = integer2string(cst, 10);
       assert(str != "");
-      return "(" + expr_to_string(expr.op0(),local_renaming) +" >> "+str + " )";
+      return "(" + expr_to_string(expr.op0(), local_renaming) +" >> "+str + " )";
     }
 
-    return "(" + expr_to_string(expr.op0(),local_renaming) +" >> " + expr_to_string(expr.op1(),local_renaming) + ".to_int() )";
+    return "("+expr_to_string(expr.op0(), local_renaming)+" >> "+
+               expr_to_string(expr.op1(), local_renaming)+".to_int() )";
   }
   else if(expr.id() == ID_unary_minus)
   {
     assert(expr.operands().size() == 1);
-    return "( " + type_to_string(expr.op0().type())+"(0) - "  + expr_to_string(expr.op0(),local_renaming) + " ) ";
+    return "(" + type_to_string(expr.op0().type())+"(0) - "+
+           expr_to_string(expr.op0(), local_renaming) + " ) ";
   }
   else if(expr.id() == ID_constant)
   {
@@ -1366,11 +1377,11 @@ std::string goto2cppt::expr_to_string(
     }
 
     if(expr.type().id() == ID_bool)
-      return id2string(expr.get(ID_value));
+      return expr.get_string(ID_value);
 
     if(expr.type().id() == ID_pointer)
     {
-      assert(expr.get(ID_value) == "NULL");
+      assert(expr.get(ID_value)==ID_NULL);
       return "0";
     }
 
@@ -1398,14 +1409,14 @@ std::string goto2cppt::expr_to_string(
       }
     }
 
-    if(expr.type().id() == ID_c_enum)
+    if(expr.type().id()==ID_c_enum)
     {
       std::string str = "__signedbv<" + id2string(expr.type().get(ID_width)) +
         "> (" + id2string(expr.get(ID_value)) + ")";
       return str;
     }
 
-    if(expr.type().id() == ID_symbol)
+    if(expr.type().id()==ID_symbol)
     {
       typet final_type = ns.follow(expr.type());
       exprt expr2(expr);
@@ -1427,7 +1438,6 @@ std::string goto2cppt::expr_to_string(
       if(subtype.id() == ID_struct &&
           op_subtype.id() == ID_struct)
       {
-
         std::list<irep_idt> wkl;
 
         wkl.push_back(subtype.get(ID_name));
@@ -1443,7 +1453,6 @@ std::string goto2cppt::expr_to_string(
           for(unsigned i = 0; i < subs.size(); i++)
             wkl.push_back(subs[i].find(ID_type).get(ID_identifier));
         }
-
 
         if(bases.count(op_subtype.get(ID_name)))
         {
@@ -1474,27 +1483,28 @@ std::string goto2cppt::expr_to_string(
 
         std::cerr << "Warning conversion from " << op_subtype.get("name")
                   << " to " << subtype.get(ID_name) << " is not safe!\n";
-
       }
     }
 
     return "((" + type_to_string(expr.type()) + ") " +
            expr_to_string(expr.op0(),local_renaming) + ")";
   }
-  else if(expr.id() == ID_address_of)
+  else if(expr.id()==ID_address_of)
   {
     assert(expr.operands().size() == 1);
-    return "(&" + expr_to_string(expr.op0(),local_renaming) + ")";
+    return "(&"+expr_to_string(expr.op0(), local_renaming)+")";
   }
-  else if(expr.id() == ID_index)
+  else if(expr.id()==ID_index)
   {
     assert(expr.operands().size() == 2);
 
-    if(expr.op1().id() == ID_constant)
+    if(expr.op1().id()==ID_constant)
     {
-      assert(expr.op1().type().id() == ID_unsignedbv || expr.op1().type().id() == ID_signedbv);
+      assert(expr.op1().type().id() == ID_unsignedbv ||
+             expr.op1().type().id() == ID_signedbv);
+
       std::string width_str = id2string(expr.op1().type().get(ID_width));
-      mp_integer width = string2integer(width_str,10);
+      mp_integer width = string2integer(width_str, 10);
       assert(width != 0);
       mp_integer cst = string2integer(id2string(expr.op1().get(ID_value)), 2);
       std::string str = integer2string(cst, 10);
@@ -1502,8 +1512,8 @@ std::string goto2cppt::expr_to_string(
       return "(" +expr_to_string(expr.op0(),local_renaming) + "[" + str + " ] )";
     }
 
-    return "(" +expr_to_string(expr.op0(),local_renaming) +
-           "[" + expr_to_string(expr.op1(),local_renaming) + ".to_int() ] )";
+    return "(" +expr_to_string(expr.op0(), local_renaming) +
+           "[" + expr_to_string(expr.op1(), local_renaming) + ".to_int() ] )";
   }
   else if(expr.id() == ID_extractbits)
   {
@@ -1533,22 +1543,24 @@ std::string goto2cppt::expr_to_string(
     return "((" + expr_to_string(expr.op0(), local_renaming) + ")[ "
            + expr_to_string(expr.op1(), local_renaming) + " ])";
   }
-  else if(expr.id() == ID_sideeffect)
+  else if(expr.id()==ID_sideeffect)
   {
-    if(expr.get(ID_statement) == ID_cpp_new)
+    const irep_idt &statement=to_sideeffect_expr(expr).get_statement();
+  
+    if(statement==ID_cpp_new)
     {
-      assert(expr.type().id() == ID_pointer);
-      return "new " + type_to_string(expr.type().subtype())+ "()";
+      assert(expr.type().id()==ID_pointer);
+      return "new "+type_to_string(expr.type().subtype())+"()";
     }
-    else if(expr.get(ID_statement) == "cpp_new[]")
+    else if(statement==ID_cpp_new_array)
     {
-        assert(expr.type().id() == ID_pointer);
-        return "(new " + type_to_string(expr.type().subtype()) +
-               "[ " + expr_to_string((const exprt &)expr.find(ID_size), local_renaming) + ".to_int()])";
+      assert(expr.type().id()==ID_pointer);
+      return "(new " + type_to_string(expr.type().subtype()) +
+             "[ " + expr_to_string((const exprt &)expr.find(ID_size), local_renaming) + ".to_int()])";
     }
-    else if(expr.get(ID_statement) == "nondet")
+    else if(statement==ID_nondet)
     {
-      return "__nondet<"+type_to_string(expr.type())+ " >()";
+      return "__nondet<"+type_to_string(expr.type())+">()";
     }
   }
   else if(expr.id() == ID_string_constant)
@@ -1570,11 +1582,12 @@ std::string goto2cppt::expr_to_string(
     filtered_value +="\\000\\000\\000";
     return "((__signedbv<8>*)\""+ filtered_value +"\")";
   }
-  else if(expr.id() == ID_if)
+  else if(expr.id()==ID_if)
   {
-    assert(expr.operands().size() == 3);
-    return "("+ expr_to_string(expr.op0(),local_renaming)+ "? "+ expr_to_string(expr.op1(),local_renaming) +
-           ": " + expr_to_string(expr.op2(),local_renaming) + ")";
+    assert(expr.operands().size()==3);
+    return "("+expr_to_string(expr.op0(), local_renaming)+
+           "? "+expr_to_string(expr.op1(), local_renaming)+
+           ":"+expr_to_string(expr.op2(), local_renaming)+")";
   }
   else if(expr.id() == ID_infinity)
   {
@@ -1597,9 +1610,9 @@ std::string goto2cppt::expr_to_string(
       std::string W = expr_to_string(
           to_array_type(expr.type()).size(), local_renaming);
 
-      std::string src = expr_to_string(expr.op0(),local_renaming);
-      std::string index = expr_to_string(expr.op1(),local_renaming);
-      std::string value = expr_to_string(expr.op2(),local_renaming);
+      std::string src = expr_to_string(expr.op0(), local_renaming);
+      std::string index = expr_to_string(expr.op1(), local_renaming);
+      std::string value = expr_to_string(expr.op2(), local_renaming);
 
       std::string ret = "(__array< "+ T + ", " + W  + " >&)";
 
@@ -1620,7 +1633,7 @@ std::string goto2cppt::expr_to_string(
     }
     else
     {
-      const typet& t = ns.follow(expr.type());
+      const typet &t=ns.follow(expr.type());
       assert(t.id() == ID_struct);
       std::string src = expr_to_string(expr.op0(),local_renaming);
       std::string value = expr_to_string(expr.op2(),local_renaming);
@@ -1651,7 +1664,6 @@ std::string goto2cppt::expr_to_string(
       to_struct_type(ns.follow(expr.type()));
     const struct_typet::componentst& components = struct_type.components();
     const exprt::operandst& operands = expr.operands();
-
 
     std::string ret = renaming[struct_type.get(ID_name)].as_string() + "(";
     
