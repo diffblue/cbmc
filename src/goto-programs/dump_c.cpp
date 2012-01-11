@@ -1,6 +1,6 @@
 /*******************************************************************\
 
-Module: 
+Module: Dump Goto-Program as C/C++ Source
 
 Author: Daniel Kroening, kroening@kroening.com
 
@@ -11,6 +11,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <prefix.h>
 #include <context.h>
+#include <std_expr.h>
+#include <config.h>
+#include <namespace.h>
 
 #include <ansi-c/expr2c.h>
 
@@ -40,7 +43,7 @@ std::string convert_id(const irep_idt &id)
 
 /*******************************************************************\
 
-Function: gen_indent
+Function: indent
 
   Inputs:
 
@@ -50,9 +53,20 @@ Function: gen_indent
 
 \*******************************************************************/
 
-void gen_indent(unsigned indent, std::ostream &out)
+struct indent
 {
-  for(unsigned i=0; i<indent; i++) out << ' ' << ' ';
+  inline explicit indent(unsigned _n):n(_n)
+  {
+  }
+
+  unsigned n;
+};
+
+std::ostream &operator << (std::ostream &out, const indent &indent)
+{
+  for(unsigned i=0; i<indent.n; i++)
+    out << ' ' << ' ';
+  return out;
 }
 
 /*******************************************************************\
@@ -68,7 +82,7 @@ Function: dump_c
 \*******************************************************************/
 
 void dump_c(
-  unsigned indent,
+  unsigned indent_level,
   const goto_programt &goto_program,
   const goto_programt::const_targett t,
   const namespacet &ns,
@@ -118,8 +132,7 @@ void dump_c(
     break;
   
   case RETURN:
-    gen_indent(indent, out);
-    out << "return";
+    out << indent(indent_level) << "return";
     out << ";" << std::endl;
     break;
   
@@ -158,11 +171,11 @@ void dump_c(
   out << "/* " << symbol.location << " */" << std::endl;
   out << std::endl;
 
-  const code_typet &type=to_code_type(ns.follow(symbol.type));
+  const code_typet &type=
+    to_code_type(ns.follow(symbol.type));
   
   out << type2c(type.return_type(), ns);
-  out << " ";
-  out << convert_id(symbol.name);
+  out << " " << convert_id(symbol.name);
   
   const code_typet::argumentst &arguments=
     type.arguments();
@@ -180,8 +193,7 @@ void dump_c(
         a_it++)
     {
       if(a_it!=arguments.begin()) out << ", " << std::endl;
-      out << "  ";
-      out << type2c(a_it->type(), ns);
+      out << "  " << type2c(a_it->type(), ns);
       out << " " << convert_id(a_it->get_identifier());
     }
     out << ")" << std::endl;
@@ -198,84 +210,86 @@ void dump_c(
   out << std::endl;
 }
 
+#include <sstream>
+#if 0
 #include <map>
 #include <ostream>
-#include <sstream>
 #include <cctype>
 
-#include <namespace.h>
-
 #include <arith_tools.h>
-#include <config.h>
 #include <expr.h>
 #include <prefix.h>
-#include <std_expr.h>
+#endif
 #include <i2string.h>
 
 class goto2cppt
 {
 public:
   goto2cppt(
-    const namespacet& ns,
-    const goto_functionst& goto_functions,
-    std::ostream& os):
-      goto_functions(goto_functions), ns(ns){}
+    const namespacet &_ns,
+    const goto_functionst &_goto_functions,
+    std::ostream &_os):
+    goto_functions(_goto_functions),
+    ns(_ns)
+  {
+  }
 
-  void convert(std::ostream& os);
+  void convert(std::ostream &);
 
 protected:
 
-   std::string type_to_string(const typet&, bool keep_int = false);
-   std::string expr_to_string(const exprt&,
-                              const std::map<irep_idt,irep_idt>&, bool keep_int = false);
+   std::string type_to_string(const typet &);
 
-   std::string implicit_declarations(const exprt& expr,
-                      std::map<irep_idt,irep_idt>& local_renaming);
+   std::string expr_to_string(const exprt &,
+                              const std::map<irep_idt,irep_idt> &);
 
-   void convert_compound_declarations(std::ostream& os_decl,
-                                      std::ostream& os_body);
-   void convert_global_variables(std::ostream& os);
-   void convert_function_declarations(std::ostream& os_decl,
-                                      std::ostream& os_body);
+   std::string implicit_declarations(
+     const exprt &expr,
+     std::map<irep_idt,irep_idt> &local_renaming);
 
+   void convert_compound_declarations(std::ostream &os_decl,
+                                      std::ostream &os_body);
 
-   void convert_instructions(const goto_programt& goto_program,
-                             std::map<irep_idt, irep_idt>&, std::ostream& os);
+   void convert_global_variables(std::ostream &os);
 
-   void convert_compound_rec(const typet& struct_type,
-       std::ostream& os);
+   void convert_function_declarations(std::ostream &os_decl,
+                                      std::ostream &os_body);
 
-   const goto_functionst& goto_functions;
+   void convert_instructions(const goto_programt &goto_program,
+                             std::map<irep_idt, irep_idt> &, std::ostream& os);
 
-   irep_idt unique_name(irep_idt name);
+   void convert_compound_rec(
+     const typet& struct_type,
+     std::ostream& os);
 
+   const goto_functionst &goto_functions;
+   const namespacet &ns;
+
+   irep_idt unique_name(const irep_idt name);
 
    irep_idt get_global_constant(irep_idt cst, irep_idt type_id)
    {
-       irep_idt key = id2string(type_id)+"("+id2string(cst)+")";
+     irep_idt key = id2string(type_id)+"("+id2string(cst)+")";
 
-       std::map<irep_idt, irep_idt>::const_iterator it_find
-            = global_constants.find(key);
+     std::map<irep_idt, irep_idt>::const_iterator it_find
+          = global_constants.find(key);
 
-        if(it_find != global_constants.end())
-            return it_find->second;
+      if(it_find != global_constants.end())
+          return it_find->second;
 
-        irep_idt new_cst_id = unique_name( "__SCOOT_constant");
+      irep_idt new_cst_id = unique_name( "__SCOOT_constant");
 
-        global_constants[key] = new_cst_id;
-        global_constant_stream << "const " <<
-            id2string(type_id) <<" "<< new_cst_id
-            <<"(\"" << id2string(cst) << "\");" << std::endl;
+      global_constants[key] = new_cst_id;
+      global_constant_stream << "const " <<
+          id2string(type_id) <<" "<< new_cst_id
+          <<"(\"" << id2string(cst) << "\");" << std::endl;
 
-        return new_cst_id;
+      return new_cst_id;
    }
 
    std::map<typet, irep_idt> typedef_map;
-
    std::map<irep_idt, irep_idt> global_constants;
-
-   const namespacet& ns;
-   std::map<irep_idt,irep_idt> renaming;
+   std::map<irep_idt, irep_idt> renaming;
 
    std::stringstream typedef_stream;          // for types
    std::stringstream global_constant_stream;  // for numerical constants
@@ -322,11 +336,12 @@ void goto2cppt::convert(std::ostream &os)
   os << func_body_stream.str();
   func_body_stream.clear();
 
-  if(config.main!="c::main")
-    os << "int main(int argc, char* argv[]) {" << std::endl
-      << "  " << config.main << "()" << std::endl
-      << "  return 0;" << std::endl
-      << "}" << std::endl;
+  if(config.main!="c::main" && config.main!="")
+    os << "int main(int argc, const char *argv[])" << std::endl
+       << "{" << std::endl
+       << indent(1) << config.main << "();" << std::endl
+       << indent(1) << "return 0;" << std::endl
+       << "}" << std::endl;
 }
 
 /*******************************************************************\
@@ -458,15 +473,16 @@ void goto2cppt::convert_compound_rec(
     irep_idt renamed_compo_id = unique_name(compo.get(ID_base_name));
     renaming[compo.get(ID_name)] = renamed_compo_id;
 
-    gen_indent(1, struct_body);
-    struct_body << "// " << compo.get(ID_name) << std::endl;
+    struct_body << indent(1) << "// " << compo.get(ID_name) << std::endl;
 
-    if(compo.type().id() == ID_pointer && compo.type().subtype().id() == ID_code)
+    if(compo.type().id() == ID_pointer && 
+       compo.type().subtype().id() == ID_code)
     {
-      const code_typet& code_type = to_code_type(compo.type().subtype());
-      gen_indent(1, struct_body);
-      struct_body << type_to_string(code_type.return_type()) <<
-        " ( * " << renamed_compo_id << ") (";
+      const code_typet &code_type=to_code_type(compo.type().subtype());
+
+      struct_body << indent(1)
+                  << type_to_string(code_type.return_type())
+                  << " ( * " << renamed_compo_id << ") (";
 
       for(code_typet::argumentst::const_iterator
           it=code_type.arguments().begin();
@@ -479,9 +495,8 @@ void goto2cppt::convert_compound_rec(
     }
     else
     {
-      gen_indent(1, struct_body);
-      struct_body << type_to_string(compo.type()) <<
-        " " << renamed_compo_id <<  ";" << std::endl;
+      struct_body << indent(1) << type_to_string(compo.type())
+                  << " " << renamed_compo_id <<  ";" << std::endl;
     }
   }
 
@@ -608,9 +623,9 @@ void goto2cppt::convert_function_declarations(std::ostream& os_decl,
   {
     std::map<irep_idt,irep_idt> local_renaming;
 
-    const goto_functionst::goto_functiont& goto_function = it->second;
+    const goto_functionst::goto_functiont &goto_function = it->second;
 
-    const symbolt& symb = ns.lookup(it->first);
+    const symbolt &symb = ns.lookup(it->first);
 
     if(!goto_function.body_available)
       continue;
@@ -666,6 +681,7 @@ void goto2cppt::convert_function_declarations(std::ostream& os_decl,
            << renamed_arg_id << ", ";
       }
     }
+
     if(i < code_type.arguments().size())
     {
       const exprt& arg =  code_type.arguments()[i];
@@ -706,7 +722,7 @@ void goto2cppt::convert_function_declarations(std::ostream& os_decl,
          << "std::endl;" << std::endl;
     }
 
-    convert_instructions(goto_function.body, local_renaming,os_body);
+    convert_instructions(goto_function.body, local_renaming, os_body);
     os_body << "}" << std::endl << std::endl;
   }
 }
@@ -761,7 +777,7 @@ void goto2cppt::convert_instructions(
       inst_stream << indent;
       if(!target->guard.is_true())
       {
-        inst_stream << "if( " << expr_to_string(target->guard,local_renaming) << " ) ";
+        inst_stream << "if( " << expr_to_string(target->guard, local_renaming) << " ) ";
       }
       inst_stream << "goto ";
       assert(target->targets.size() == 1);
@@ -771,7 +787,7 @@ void goto2cppt::convert_instructions(
     case  RETURN:
       inst_stream << indent << "return ";
       if(target->code.operands().size() == 1)
-        inst_stream << expr_to_string(target->code.op0(),local_renaming);
+        inst_stream << expr_to_string(target->code.op0(), local_renaming);
       inst_stream << ";" << std::endl;
       break;
 
@@ -785,7 +801,7 @@ void goto2cppt::convert_instructions(
         }
         else if (target->code.op0().id() == ID_index)
         {
-          const index_exprt& index_expr = to_index_expr(target->code.op0());
+          const index_exprt &index_expr=to_index_expr(target->code.op0());
           if(index_expr.array().id() == ID_symbol)
           {
             const symbolt& symb = ns.lookup(index_expr.array().get(ID_identifier));
@@ -796,9 +812,9 @@ void goto2cppt::convert_instructions(
           }
         }
 
-        const codet& assign = target->code;
-        const exprt& lhs = assign.op0();
-        const exprt& rhs = assign.op1();
+        const codet &assign = target->code;
+        const exprt &lhs = assign.op0();
+        const exprt &rhs = assign.op1();
 
         //  assignment of the form `a =  (mask & a) |  ((typecast)b) << right' ?
         if(lhs.type().id() == ID_unsignedbv &&
@@ -851,8 +867,8 @@ void goto2cppt::convert_instructions(
                      b.op0().type().id() == ID_bool)
                   {
                     inst_stream << indent <<
-                      expr_to_string(a,local_renaming) <<
-                      ".set_bit(" << shl <<"," << expr_to_string(b.op0(),local_renaming) << ");\n" ;
+                      expr_to_string(a, local_renaming) <<
+                      ".set_bit(" << shl <<"," << expr_to_string(b.op0(), local_renaming) << ");\n" ;
                     break;
                   }
                   
@@ -898,15 +914,15 @@ void goto2cppt::convert_instructions(
             index_expr.index().set(ID_value, integer2string(i,2));
 
             inst_stream << indent;
-            inst_stream << expr_to_string(index_expr,local_renaming)<<  " =  "
-                    << expr_to_string(cst.at(i),local_renaming) <<";"<< std::endl;
+            inst_stream << expr_to_string(index_expr, local_renaming) << "="
+                        << expr_to_string(cst.at(i), local_renaming) << ";" << std::endl;
           }
           break;
         }
 
         inst_stream << indent;
-        inst_stream << expr_to_string(target->code.op0(),local_renaming)<<  " =  "
-                    << expr_to_string(target->code.op1(),local_renaming) <<";"<< std::endl;
+        inst_stream << expr_to_string(target->code.op0(), local_renaming) << "="
+                    << expr_to_string(target->code.op1(), local_renaming) << ";" << std::endl;
         break;
       }
       
@@ -928,31 +944,32 @@ void goto2cppt::convert_instructions(
           irep_idt renamed_func_id = renaming[original_id];
           assert(renamed_func_id != "");
           if(code_func.lhs().is_not_nil())
-            inst_stream << expr_to_string(code_func.lhs(),local_renaming) << " = ";
+            inst_stream << expr_to_string(code_func.lhs(), local_renaming) << " = ";
           inst_stream <<  renamed_func_id << "(";
         }
         else
         {
           assert(code_func.function().id() == ID_dereference);
           if(code_func.lhs().is_not_nil())
-            inst_stream << expr_to_string(code_func.lhs(),local_renaming) << " = ";
-          inst_stream <<  "( " <<  expr_to_string(code_func.function(),local_renaming) << " )(";
+            inst_stream << expr_to_string(code_func.lhs(), local_renaming) << " = ";
+          inst_stream <<  "( " <<  expr_to_string(code_func.function(), local_renaming) << " )(";
         }
         unsigned i = 0;
         for(; i+1 < code_func.arguments().size(); i++)
         {
-          inst_stream << expr_to_string(code_func.arguments()[i],local_renaming) <<", ";
+          inst_stream << expr_to_string(code_func.arguments()[i], local_renaming) << ", ";
         }
         if(i < code_func.arguments().size())
         {
-          inst_stream << expr_to_string(code_func.arguments()[i],local_renaming);
+          inst_stream << expr_to_string(code_func.arguments()[i], local_renaming);
         }
         inst_stream <<");" << std::endl;
         break;
       }
       
     case SKIP:
-      inst_stream << indent << ";" << std::endl;
+      if(target->is_target())
+        inst_stream << indent << "; // SKIP" << std::endl;
       break;
 
     case LOCATION:
@@ -961,7 +978,7 @@ void goto2cppt::convert_instructions(
     case ASSERT:
       inst_stream
         << indent 
-        << "assert( " << expr_to_string(target->guard, local_renaming) << ");"
+        << "assert(" << expr_to_string(target->guard, local_renaming) << ");"
         << std::endl;
       break;
 
@@ -969,16 +986,19 @@ void goto2cppt::convert_instructions(
       break;
 
     case END_FUNCTION:
-      inst_stream <<indent <<"; // END_FUNCTION" << std::endl;
+      if(target->is_target())
+        inst_stream <<indent << "; // END_FUNCTION" << std::endl;
       break;
 
     case OTHER:
       {
-        const codet& code = to_code(target->code);
+        const codet &code = to_code(target->code);
+
         if(code.get_statement() == ID_expression)
         {
           // expression has no sideeffect
-          inst_stream << indent << ";\n";
+          if(target->is_target())
+            inst_stream << indent << "; // OTHER/expression\n";
         }
         else if(has_prefix(id2string(code.get_statement()), "assign"))
         {
@@ -994,8 +1014,8 @@ void goto2cppt::convert_instructions(
           std::string statement = id2string(code.get_statement());
           std::string op_str = statement.substr(std::string("assign").size(), statement.size());
 
-          inst_stream << expr_to_string(target->code.op0(),local_renaming)<<" "<< op_str << "="
-                    << expr_to_string(target->code.op1(),local_renaming) <<";"<< std::endl;
+          inst_stream << expr_to_string(target->code.op0(), local_renaming)<<" "<< op_str << "="
+                    << expr_to_string(target->code.op1(), local_renaming) <<";"<< std::endl;
            break;
         }
         else if(code.get_statement() == ID_nondet)
@@ -1039,151 +1059,145 @@ Purpose:
 
 \*******************************************************************/
 
-std::string goto2cppt::type_to_string(const typet& type, bool keep_int)
+std::string goto2cppt::type_to_string(const typet &type)
 {
   std::string ret;
 
   if(type.id() == ID_bool)
-    ret = "bool ";
+    #if 0
+    ret="bool";
+    #else
+    ret="_Bool";
+    #endif
   else if(type.id() == ID_signedbv)
   {
-    if(keep_int)
-    {
-      unsigned width = atoi(type.get(ID_width).c_str());
-      if(width == config.ansi_c.int_width)
-        return "int ";
-      else if(width == config.ansi_c.char_width)
-        return "char ";
-      else if(width == config.ansi_c.long_int_width)
-        return "long int ";
-      else if(width == config.ansi_c.short_int_width)
-        return "short int ";
-      else if(width == config.ansi_c.long_long_int_width)
-        return "long long int";
-      else if(width == config.ansi_c.double_width)
-        return "double ";
-    }
-    return "__signedbv<" + id2string(type.get("width")) + "> ";
+    unsigned width=to_signedbv_type(type).get_width();
+
+    if(width==config.ansi_c.int_width)
+      return "int";
+    else if(width==config.ansi_c.char_width)
+      return "signed char";
+    else if(width==config.ansi_c.short_int_width)
+      return "short int";
+    else if(width==config.ansi_c.long_int_width)
+      return "long int";
+    else if(width==config.ansi_c.long_long_int_width)
+      return "long long int";
+    else
+      return "__signedbv<"+i2string(width)+">";
   }
-  else if(type.id() == ID_unsignedbv)
+  else if(type.id()==ID_unsignedbv)
   {
-    if(keep_int)
-    {
-      unsigned width = atoi(type.get(ID_width).c_str());
-      if(width == config.ansi_c.int_width)
-        return "unsigned int ";
-      else if(width == config.ansi_c.char_width)
-        return "unsigned char ";
-      else if(width == config.ansi_c.long_int_width)
-        return "unsigned long int ";
-      else if(width == config.ansi_c.short_int_width)
-        return "unsigned short int ";
-      else if(width == config.ansi_c.long_long_int_width)
-        return "unsigned long long int";
-    }
-    return "__unsignedbv<" + id2string(type.get(ID_width)) + "> ";
+    unsigned width=to_unsignedbv_type(type).get_width();
+
+    if(width==config.ansi_c.int_width)
+      return "unsigned int";
+    else if(width==config.ansi_c.char_width)
+      return "unsigned char";
+    else if(width==config.ansi_c.short_int_width)
+      return "unsigned short int";
+    else if(width==config.ansi_c.long_int_width)
+      return "unsigned long int";
+    else if(width==config.ansi_c.long_long_int_width)
+      return "unsigned long long int";
+    else
+      return "__unsignedbv<"+i2string(width)+">";
   }
-  else if(type.id() == ID_fixedbv)
+  else if(type.id()==ID_fixedbv)
   {
     return "double";
   }
-  else if(type.id() == ID_pointer)
+  else if(type.id()==ID_floatbv)
   {
-    if(type.subtype().id() == ID_code)
+    return "double";
+  }
+  else if(type.id()==ID_pointer)
+  {
+    const typet &sub=ns.follow(type.subtype());
+  
+    if(sub.id()==ID_code)
     {
-      std::map<typet,irep_idt>::const_iterator tdit =
-        typedef_map.find(type);
+      const code_typet &code_type=to_code_type(sub);
 
-      if(tdit != typedef_map.end())
-      {
-        ret = tdit->second.as_string()+" ";
-      }
+      irep_idt typedef_name=unique_name("typedef_func_ptr");
+
+      typedef_stream << "typedef "
+                     << type_to_string(code_type.return_type())
+                     << "(* "
+                     << typedef_name
+                     << ")(";
+
+      if(code_type.arguments().empty())
+        typedef_stream << "void";
       else
-      {
-        const code_typet& code_type = to_code_type(type.subtype());
-
-        irep_idt typedef_name = unique_name("typedef_func_ptr");
-
-        typedef_stream << "typedef "
-                      << type_to_string(code_type.return_type())
-                      << "(* "
-                      << typedef_name
-                      << ")(";
-
-        unsigned i = 0;
-        for(; i+1 < code_type.arguments().size(); i++)
+        for(unsigned i = 0; i<code_type.arguments().size(); i++)
         {
-          typedef_stream << type_to_string(code_type.arguments()[i].type())
-                         << ", ";
+          if(i!=0) typedef_stream << ", ";
+          typedef_stream << type_to_string(code_type.arguments()[i].type());
         }
 
-        if(i < code_type.arguments().size())
-          typedef_stream << type_to_string(code_type.arguments()[i].type());
-        typedef_stream << ")";
-
-        typedef_map[type] = typedef_name;
-        typedef_stream << ";" << std::endl;
-        ret = typedef_name.as_string()+" ";
-      }
+      typedef_stream << ");" << std::endl;
+      typedef_map[type]=typedef_name;
+      ret=typedef_name.as_string();
     }
     else
     {
-      ret += " " +type_to_string(type.subtype());
+      ret+=type_to_string(sub);
       /*if(type.get_bool("#constant"))
         ret += "const ";*/
-      ret += "* ";
+      ret+=" *";
     }
   }
-  else if(type.id() == ID_symbol)
+  else if(type.id()==ID_symbol)
   {
-    std::map<irep_idt,irep_idt>::const_iterator it_ren =
+    std::map<irep_idt, irep_idt>::const_iterator it_ren =
       renaming.find(type.get(ID_identifier));
-    if(it_ren == renaming.end())
+
+    if(it_ren==renaming.end())
     {
-      const symbolt& symb = ns.lookup(type.get(ID_identifier));
+      const symbolt &symb=ns.lookup(type.get(ID_identifier));
       assert(symb.is_type);
-      ret = type_to_string(symb.type);
+      ret=type_to_string(symb.type);
     }
     else
-      ret = id2string(it_ren->second) + " ";
+      ret=id2string(it_ren->second);
   }
-  else if(type.id() == ID_verilogbv)
+  else if(type.id()==ID_verilogbv)
   {
-    return "__verilogbv<" + id2string(type.get(ID_width)) + "> ";
+    return "__verilogbv<"+id2string(type.get(ID_width))+"> ";
   }
-  else if(type.id() == ID_c_enum)
+  else if(type.id()==ID_c_enum)
   {
-    ret = "__signedbv<"+i2string(config.ansi_c.int_width)+">";
+    ret="int";
   }
-  else if(type.id() == ID_empty)
+  else if(type.id()==ID_empty)
   {
-    ret = "void ";
+    ret="void";
   }
-  else if(type.id() == ID_constructor ||
-          type.id() == ID_destructor)
+  else if(type.id()==ID_constructor ||
+          type.id()==ID_destructor)
   {
-    ret = "void ";
+    ret="void";
   }
-  else if(type.id() == ID_array)
+  else if(type.id()==ID_array)
   {
-    const array_typet& array_type = to_array_type(type);
+    const array_typet &array_type=to_array_type(type);
 
-    std::string subtype = type_to_string(type.subtype());
+    std::string subtype=type_to_string(type.subtype());
 
-    std::map<irep_idt,irep_idt> dummy_renaming; 
-    std::string size =
-      expr_to_string(array_type.size(),dummy_renaming,true);
+    std::map<irep_idt, irep_idt> dummy_renaming; 
 
-    return "__array<" + subtype + " , " + size + " > ";
-    std::map<typet,irep_idt>::const_iterator tdit =
-        typedef_map.find(type);
+    std::string size=
+      expr_to_string(array_type.size(), dummy_renaming);
+
+    return "__array<"+subtype+", "+size+">";
   }
-  else if(type.id() == ID_struct)
+  else if(type.id()==ID_struct)
   {
     std::map<irep_idt,irep_idt>::const_iterator it_ren =
       renaming.find(type.get(ID_name));
-    assert(it_ren != renaming.end());
-    ret = id2string(it_ren->second) + " ";
+    assert(it_ren!=renaming.end());
+    ret=id2string(it_ren->second);
   }
   else
   {
@@ -1215,49 +1229,47 @@ Purpose:
 
 std::string goto2cppt::expr_to_string(
   const exprt &expr,
-  const std::map<irep_idt,irep_idt> &local_renaming,
-  bool keep_int)
+  const std::map<irep_idt, irep_idt> &local_renaming)
 {
-  if(expr.id() == ID_symbol)
+  if(expr.id()==ID_symbol)
   {
-    std::map<irep_idt,irep_idt>::const_iterator it_loc =
-      local_renaming.find(expr.get(ID_identifier));
+    std::map<irep_idt, irep_idt>::const_iterator it_loc =
+      local_renaming.find(to_symbol_expr(expr).get_identifier());
 
-    if(it_loc != local_renaming.end())
+    if(it_loc!=local_renaming.end())
       return id2string(it_loc->second);
 
-    std::map<irep_idt,irep_idt>::const_iterator it_glob =
-      renaming.find(expr.get(ID_identifier));
+    std::map<irep_idt, irep_idt>::const_iterator it_glob=
+      renaming.find(to_symbol_expr(expr).get_identifier());
 
-    if(it_glob != renaming.end())
+    if(it_glob!=renaming.end())
       return id2string(it_glob->second);
   }
-  else if(expr.id() == ID_member)
+  else if(expr.id()==ID_member)
   {
-    irep_idt renamed_id = renaming[expr.get(ID_component_name)];
-    assert(renamed_id != "");
-    return expr_to_string(expr.op0(),local_renaming) + "." + id2string(renamed_id) ;
+    irep_idt renamed_id=renaming[expr.get(ID_component_name)];
+    assert(renamed_id!="");
+    return expr_to_string(expr.op0(), local_renaming)+"."+id2string(renamed_id);
   }
-  else if(expr.id() == ID_dereference)
+  else if(expr.id()==ID_dereference)
   {
-    return "(* " + expr_to_string(expr.op0(),local_renaming) + ")";
+    return "(*"+expr_to_string(expr.op0(), local_renaming)+")";
   }
-  else if(expr.id() == "+" ||
-          expr.id() == "-" ||
-          expr.id() == "*")
+  else if(expr.id()==ID_plus ||
+          expr.id()==ID_minus ||
+          expr.id()==ID_mult)
   {
-    assert(expr.operands().size() >= 2 );
+    assert(expr.operands().size()>=2);
 
     std::string str;
 
-    if(
-        expr.op0().type().id() == ID_pointer ||
-        expr.op1().type().id() == ID_pointer ||
-        expr.op0().id() == ID_symbol ||
-        expr.op0().id() == ID_constant ||
-        expr.op0().id() == ID_member ||
-        expr.op0().id() == ID_index ||
-        expr.op0().id() == ID_dereference)
+    if(expr.op0().type().id() == ID_pointer ||
+       expr.op1().type().id() == ID_pointer ||
+       expr.op0().id() == ID_symbol ||
+       expr.op0().id() == ID_constant ||
+       expr.op0().id() == ID_member ||
+       expr.op0().id() == ID_index ||
+       expr.op0().id() == ID_dereference)
     {
       str = "("+ expr_to_string(expr.operands()[0],local_renaming) +
             expr.id().as_string() + expr_to_string(expr.operands()[1],local_renaming) +")";
@@ -1277,25 +1289,25 @@ std::string goto2cppt::expr_to_string(
        else
         str += expr.id().as_string() +"=" + expr_to_string(expr.operands()[i],local_renaming);
     }
+
     str = "(" + str + ")";
     return str;
   }
-  else if(expr.id() == "*"   || expr.id() == "/" ||
-          expr.id() == "<"   || expr.id() == ">" ||
-          expr.id() == "<="  ||
-          expr.id() == ">=")
+  else if(expr.id()==ID_div ||
+          expr.id()==ID_lt  || expr.id()==ID_gt ||
+          expr.id()==ID_le  || expr.id()==ID_ge)
   {
     assert(expr.operands().size() == 2);
     return "(" + expr_to_string(expr.op0(),local_renaming) + id2string(expr.id())
          + expr_to_string(expr.op1(),local_renaming) + ")";
   }
-  else if(expr.id() == ID_mod)
+  else if(expr.id()==ID_mod)
   {
     assert(expr.operands().size() == 2);
     return "(" + expr_to_string(expr.op0(),local_renaming) + "%"
          + expr_to_string(expr.op1(),local_renaming) + ")";
   }
-  else if(expr.id() == ID_equal)
+  else if(expr.id()== ID_equal)
   {
     assert(expr.operands().size() == 2);
     return "(" + expr_to_string(expr.op0(),local_renaming) +" == " + expr_to_string(expr.op1(),local_renaming) + ")";
@@ -1465,13 +1477,12 @@ std::string goto2cppt::expr_to_string(
       mp_integer width = string2integer(width_str,10);
       assert(width != 0);
 
-      if(keep_int)
-      {
-        mp_integer cst = string2integer(id2string(expr.get(ID_value)),2);
-        std::string str = integer2string(cst, 10);
-        assert(str != "");
-        return str;
-      }
+      mp_integer cst = string2integer(id2string(expr.get(ID_value)),2);
+      std::string str = integer2string(cst, 10);
+      assert(str != "");
+      return str;
+
+      #if 0
 
       if(width <= config.ansi_c.int_width)
       {
@@ -1485,6 +1496,7 @@ std::string goto2cppt::expr_to_string(
         std::string type_id = "__" + id2string(expr.type().id()) + "<" +width_str + ">";
         return id2string(get_global_constant(id2string(expr.get(ID_value)), type_id));
       }
+      #endif
     }
 
     if(expr.type().id() == ID_bool)
@@ -1633,8 +1645,8 @@ std::string goto2cppt::expr_to_string(
 
     return "__" + id2string(expr.type().id())+"<"+ id2string(expr.type().get(ID_width)) + "> ("
            + expr_to_string(expr.op0(),local_renaming) + ", "
-           + expr_to_string(expr.op1(),local_renaming,true) + ", "
-           + expr_to_string(expr.op2(),local_renaming,true) + " )";
+           + expr_to_string(expr.op1(),local_renaming) + ", "
+           + expr_to_string(expr.op2(),local_renaming) + " )";
   }
   else if(expr.id() == ID_extractbit)
   {
@@ -1652,8 +1664,8 @@ std::string goto2cppt::expr_to_string(
       return "((" + expr_to_string(expr.op0(),local_renaming) + ")[ "+ str + " ])";
     }
 
-    return "((" + expr_to_string(expr.op0(),local_renaming) + ")[ "
-           + expr_to_string(expr.op1(),local_renaming,true) + " ])";
+    return "((" + expr_to_string(expr.op0(), local_renaming) + ")[ "
+           + expr_to_string(expr.op1(), local_renaming) + " ])";
   }
   else if(expr.id() == ID_sideeffect)
   {
@@ -1717,7 +1729,7 @@ std::string goto2cppt::expr_to_string(
     {
       std::string T = type_to_string(expr.type().subtype());
       std::string W = expr_to_string(
-          to_array_type(expr.type()).size(),local_renaming,true);
+          to_array_type(expr.type()).size(), local_renaming);
 
       std::string src = expr_to_string(expr.op0(),local_renaming);
       std::string index = expr_to_string(expr.op1(),local_renaming);
@@ -1762,8 +1774,8 @@ std::string goto2cppt::expr_to_string(
     assert(expr.type().subtype() == expr.op0().type());
 
     std::string T = type_to_string(expr.type().subtype());
-    std::string W =  expr_to_string(
-      to_array_type(expr.type()).size(),local_renaming,true);
+    std::string W = expr_to_string(
+      to_array_type(expr.type()).size(), local_renaming);
     std::string arg = expr_to_string(expr.op0(),local_renaming);
     return "__array<" + T + ", " + W + " >("+ arg + ")";
   }
