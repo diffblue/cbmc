@@ -56,7 +56,7 @@ public:
  *
  * \ingroup gr_std_expr
 */
-extern inline const transt &to_trans(const exprt &expr)
+extern inline const transt &to_trans_expr(const exprt &expr)
 {
   assert(expr.id()==ID_trans && expr.operands().size()==3);
   return static_cast<const transt &>(expr);
@@ -65,7 +65,7 @@ extern inline const transt &to_trans(const exprt &expr)
 /*! \copydoc to_trans(const exprt &)
  * \ingroup gr_std_expr
 */
-extern inline transt &to_trans(exprt &expr)
+extern inline transt &to_trans_expr(exprt &expr)
 {
   assert(expr.id()==ID_trans && expr.operands().size()==3);
   return static_cast<transt &>(expr);
@@ -2129,6 +2129,12 @@ public:
     set(ID_statement, _statement);
   }
 };
+
+extern inline const sideeffect_exprt &to_sideeffect_expr(const exprt &expr)
+{
+  assert(expr.id()==ID_sideeffect);
+  return static_cast<const sideeffect_exprt &>(expr);
+}
 
 /*! \brief A side effect that returns a non-deterministically chosen value
     \remark Will be replaced by side_effect_nondet_exprt
