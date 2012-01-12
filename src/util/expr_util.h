@@ -30,9 +30,9 @@ exprt gen_one(const typet &type);
 /*! \copydoc gen_zero(const typet &) */
 exprt gen_not(const exprt &op);
 /*! \copydoc gen_zero(const typet &) */
-exprt gen_unary(const irep_idt &id, const typet &type, const exprt &op);
+//exprt gen_unary(const irep_idt &id, const typet &type, const exprt &op);
 /*! \copydoc gen_zero(const typet &) */
-exprt gen_binary(const irep_idt &id, const typet &type, const exprt &op1, const exprt &op2);
+//exprt gen_binary(const irep_idt &id, const typet &type, const exprt &op1, const exprt &op2);
 
 /*! \copydoc gen_zero(const typet &) */
 void gen_and(exprt &expr);
@@ -46,4 +46,4 @@ symbol_exprt symbol_expr(const symbolt &symbol);
 void make_next_state(exprt &expr);
 
 /*! \copydoc gen_zero(const typet &) */
-exprt make_binary(const exprt &src);
+//exprt make_binary(const exprt &src);

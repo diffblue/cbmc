@@ -139,6 +139,8 @@ Function: gen_not
 
 \*******************************************************************/
 
+exprt gen_unary(const irep_idt &id, const typet &type, const exprt &op);
+
 exprt gen_not(const exprt &op)
 {
   return gen_unary(ID_not, bool_typet(), op);
