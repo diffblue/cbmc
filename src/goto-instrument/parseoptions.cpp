@@ -219,7 +219,20 @@ int goto_instrument_parseoptionst::doit()
     if(cmdline.isset("dump-c"))
     {
       namespacet ns(context);
-      dump_c(goto_functions, ns, std::cout);
+      
+      if(cmdline.args.size()==2)
+      {
+        std::ofstream out(cmdline.args[1].c_str());
+        if(!out)
+        {
+          error("failed to write to "+cmdline.args[1]);
+          return 10;
+        }
+        dump_c(goto_functions, ns, out);
+      }
+      else
+        dump_c(goto_functions, ns, std::cout);
+        
       return 0;
     }
     
