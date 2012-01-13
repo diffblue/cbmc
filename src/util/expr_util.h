@@ -46,4 +46,4 @@ symbol_exprt symbol_expr(const symbolt &symbol);
 void make_next_state(exprt &expr);
 
 /*! \copydoc gen_zero(const typet &) */
-//exprt make_binary(const exprt &src);
+exprt make_binary(const exprt &src);
