@@ -848,6 +848,10 @@ void goto2cppt::convert_instructions(
       break;
 
     case ASSUME:
+      inst_stream
+        << indent(1) 
+        << "__CPROVER_assume(" << expr_to_string(target->guard) << ");"
+        << std::endl;
       break;
 
     case END_FUNCTION:
