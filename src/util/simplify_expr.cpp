@@ -2025,8 +2025,6 @@ bool simplify_exprt::simplify_if(exprt &expr)
   exprt::operandst &operands=expr.operands();
   if(operands.size()!=3) return true;
 
-  bool result = true;
-
   exprt &cond=operands[0];
   exprt &truevalue=operands[1];
   exprt &falsevalue=operands[2];
@@ -2038,6 +2036,8 @@ bool simplify_exprt::simplify_if(exprt &expr)
     expr.swap(tmp);
     return false;
   }
+
+  bool result=true;
 
   if(do_simplify_if)
   {
