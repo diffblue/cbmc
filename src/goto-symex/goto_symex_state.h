@@ -216,24 +216,6 @@ public:
   void get_original_name(exprt &expr) const;
   void get_original_name(typet &type) const;
   
-  // does all levels of renaming
-  irep_idt current_name(
-      const namespacet &ns,
-      const irep_idt &identifier)
-  {
-    return current_name(level2, ns, identifier);
-  }
-
-  irep_idt current_name(
-    const level2t &level2,
-    const namespacet &ns,
-    const irep_idt &identifier)
-  {
-    return level2.current_name(
-           top().level1.current_name(
-           level0(identifier, ns, source.thread_nr)));
-  }
-  
   // uses level 1 names, and is used to
   // do dereferencing
   value_sett value_set;
@@ -255,14 +237,6 @@ public:
     }
   };
 
-  irep_idt current_name(
-    const goto_statet &goto_state,
-    const namespacet &ns,
-    const irep_idt &identifier)
-  {
-    return current_name(goto_state.level2, ns, identifier);
-  }
-  
   // gotos
   typedef std::list<goto_statet> goto_state_listt;
   typedef std::map<goto_programt::const_targett, goto_state_listt> goto_state_mapt;
