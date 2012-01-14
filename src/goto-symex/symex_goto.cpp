@@ -296,33 +296,34 @@ void goto_symext::phi_function(
       it!=variables.end();
       it++)
   {
-    if(*it==guard_identifier)
+    const irep_idt l1_identifier=*it;
+  
+    if(l1_identifier==guard_identifier)
       continue; // just a guard, don't bother
       
-    if(goto_state.level2.current_count(*it)==
-       dest_state.level2.current_count(*it))
+    if(goto_state.level2.current_count(l1_identifier)==
+       dest_state.level2.current_count(l1_identifier))
       continue; // not at all changed
 
-    irep_idt original_identifier=
-      dest_state.get_original_name(*it);
-      
     // changed!
+
+    irep_idt original_identifier=
+      dest_state.get_original_name(l1_identifier);
+
+    // get type (may need renaming)      
     const symbolt &symbol=ns.lookup(original_identifier);
-
-    typet type(symbol.type);
-
-    // type may need renaming
+    typet type=symbol.type;
     dest_state.rename(type, ns);
     
     exprt rhs;
 
     if(dest_state.guard.is_false())
     {
-      rhs=symbol_exprt(dest_state.current_name(goto_state, ns, symbol.name), type);
+      rhs=symbol_exprt(goto_state.level2.current_name(l1_identifier), type);
     }
     else if(goto_state.guard.is_false())
     {
-      rhs=symbol_exprt(dest_state.current_name(ns, symbol.name), type);
+      rhs=symbol_exprt(dest_state.level2.current_name(l1_identifier), type);
     }
     else
     {      
@@ -334,14 +335,12 @@ void goto_symext::phi_function(
       rhs=if_exprt();
       rhs.type()=type;
       rhs.op0()=tmp_guard.as_expr();
-      rhs.op1()=symbol_exprt(dest_state.current_name(goto_state, ns, symbol.name), type);
-      rhs.op2()=symbol_exprt(dest_state.current_name(ns, symbol.name), type);
+      rhs.op1()=symbol_exprt(goto_state.level2.current_name(l1_identifier), type);
+      rhs.op2()=symbol_exprt(dest_state.level2.current_name(l1_identifier), type);
     }
 
     symbol_exprt lhs=symbol_expr(symbol);
-    symbol_exprt new_lhs=lhs;
-
-    dest_state.rename(new_lhs, ns, goto_symex_statet::L1);
+    symbol_exprt new_lhs=symbol_exprt(l1_identifier, type);
     dest_state.assignment(new_lhs, rhs, ns, false);
     
     guardt true_guard;
