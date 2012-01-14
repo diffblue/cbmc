@@ -285,8 +285,7 @@ public:
     typedef std::set<irep_idt> local_variablest;
     local_variablest local_variables;
     
-    framet():
-      return_value(static_cast<const exprt &>(get_nil_irep()))
+    framet():return_value(nil_exprt())
     {
     }
 
