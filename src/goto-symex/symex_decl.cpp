@@ -43,30 +43,21 @@ void goto_symext::symex_decl(statet &state)
   if(code.op0().id()!=ID_symbol)
     throw "decl expects symbol as first operand";
 
-  // just do the L1 renaming to preserve locality
+  // We increase the L2 renaming to make these non-deterministic.
+  // We also prevent propagation of old values.
+  
   const irep_idt &identifier=
     to_symbol_expr(code.op0()).get_identifier();
     
-  const irep_idt l0_identifier=
-    state.rename(identifier, ns, goto_symex_statet::L0);
+  const irep_idt l1_identifier=
+    state.rename(identifier, ns, goto_symex_statet::L1);
     
-  irep_idt l1_identifier;
-
-  do
-  {
-    unsigned index=state.top().level1.current_names[l0_identifier];
-    state.top().level1.rename(l0_identifier, index+1);
-    l1_identifier=state.top().level1(l0_identifier);
-  }
-  while(state.declaration_history.find(l1_identifier)!=
-        state.declaration_history.end());
-
-  // forget the old L2 renaming to avoid SSA for it
-  state.level2.remove(l1_identifier);
+  // prevent propagation
   state.propagation.remove(l1_identifier);
-  state.declaration_history.insert(l1_identifier); 
-  
-  state.top().local_variables.insert(l1_identifier);
+
+  // L2 renaming
+  unsigned new_count=state.level2.current_count(l1_identifier)+1;
+  state.level2.rename(l1_identifier, new_count);
     
   // in case of pointers, put something into the value set
   if(ns.follow(code.op0().type()).id()==ID_pointer)
