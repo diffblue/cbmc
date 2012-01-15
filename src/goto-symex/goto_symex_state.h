@@ -37,10 +37,10 @@ public:
   // we have a two-level renaming
 
   typedef std::map<irep_idt, irep_idt> original_identifierst;
-  typedef std::set<irep_idt> declaration_historyt;
 
-  // we remember all declarations
-  declaration_historyt declaration_history; 
+  // we remember all L1 renamings
+  typedef std::set<irep_idt> l1_historyt;
+  l1_historyt l1_history; 
   
   struct renaming_levelt
   {
@@ -58,7 +58,7 @@ public:
     void get_original_name(typet &type) const;
     void print(std::ostream &out) const;
     unsigned current_count(const irep_idt &identifier) const;
-
+    
     irep_idt operator()(const irep_idt &identifier)
     {
       // see if it's already renamed
@@ -172,7 +172,7 @@ public:
       // _always_ rename
       return name(identifier, current_count(identifier));
     }
-
+    
     level2t() { }
     virtual ~level2t() { }
   } level2;

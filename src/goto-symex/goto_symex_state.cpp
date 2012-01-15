@@ -286,13 +286,9 @@ void goto_symex_statet::assignment(
   #endif
 
   // do the l2 renaming 
-  unsigned &count=level2.current_names[l1_identifier];
-
-  count++;
-    
-  level2.rename(l1_identifier, count);
-  
-  lhs.set_identifier(level2.name(l1_identifier, count));
+  unsigned new_count=level2.current_count(l1_identifier)+1;
+  level2.rename(l1_identifier, new_count);
+  lhs.set_identifier(level2.name(l1_identifier, new_count));
 
   // for value propagation -- the RHS is L2
   

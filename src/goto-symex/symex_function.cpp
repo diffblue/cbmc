@@ -388,12 +388,24 @@ void goto_symext::locality(
     // get L0 name
     irep_idt l0_name=state.rename(*it, ns, goto_symex_statet::L0);
     
-    // do L1 renaming
-    frame.level1.rename(l0_name, frame_nr);
-
-    // store
-    irep_idt l1_name=frame.level1(l0_name);
+    // do L1 renaming -- these need not be unique, as
+    // identifiers may be shared among functions
+    // (e.g., due to inlining or other code restructuring)
+    
+    irep_idt l1_name;
+    unsigned offset=0;
+    
+    do
+    {
+      frame.level1.rename(l0_name, frame_nr+offset);
+      l1_name=frame.level1(l0_name);
+      offset++;
+    }
+    while(state.l1_history.find(l1_name)!=state.l1_history.end());
+    
+    // now unique -- store
     frame.local_variables.insert(l1_name);
+    state.l1_history.insert(l1_name);
   }
 }
 
