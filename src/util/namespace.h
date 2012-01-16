@@ -52,7 +52,7 @@ class namespacet:public namespace_baset
 {
 public:
   // constructors
-  namespacet(const contextt &_context)
+  explicit namespacet(const contextt &_context)
   { context1=&_context; context2=NULL; }
    
   namespacet(const contextt &_context1, const contextt &_context2)
