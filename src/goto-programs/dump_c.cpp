@@ -152,6 +152,7 @@ protected:
   std::map<irep_idt, irep_idt> global_renaming;
   std::map<irep_idt, irep_idt> local_renaming;
 
+  std::set<std::string> system_headers;
   std::stringstream typedef_stream;          // for types
   std::stringstream global_constant_stream;  // for numerical constants
 
@@ -186,6 +187,12 @@ void goto2cppt::operator()(std::ostream &os)
 
   convert_global_variables(global_var_stream);
   convert_function_declarations(os, func_body_stream);
+
+  for(std::set<std::string>::const_iterator
+      it=system_headers.begin();
+      it!=system_headers.end();
+      ++it)
+    os << "#include <" << *it << ">" << std::endl;
 
   os << typedef_stream.str();
   os << std::endl;
@@ -611,6 +618,7 @@ void goto2cppt::convert_instructions(
 {
   std::stringstream decl_stream; // for local declarations
   std::stringstream inst_stream; // for instructions
+  unsigned thread_vars=0;
 
   forall_goto_program_instructions(target, goto_program)
   {
@@ -841,6 +849,7 @@ void goto2cppt::convert_instructions(
       break;
 
     case ASSERT:
+      system_headers.insert("assert.h");
       inst_stream
         << indent(1) 
         << "assert(" << expr_to_string(target->guard) << ");"
@@ -893,8 +902,15 @@ void goto2cppt::convert_instructions(
           // todo: random input
           throw "Goto2cpp: 'nondet' is not yet implemented\n";
         }
+        else if(code.get_statement() == ID_user_specified_predicate)
+        {
+          //ps_irep("code",target->code);
+          // todo: random input
+          throw "Goto2cpp: 'user_specified_predicate' is not yet implemented\n";
+        }
         else
         {
+          std::cerr << target->code.pretty() << std::endl;
           //ps_irep("code",target->code);
           throw "Goto2cpp: instruction not yet supported\n";
         }
@@ -912,11 +928,56 @@ void goto2cppt::convert_instructions(
       assert(target->targets.size()==1);
       inst_stream << indent(1) << "// START_THREAD\n";
 
-      inst_stream << "__CPROVER_ASYNC_"
-                  << target->location_number << ":\n"
-                  << indent(1) << "goto L"
-                  << (*target->targets.begin())->target_number
-                  << ";" << std::endl;
+      {
+        // try to use pthreads
+        goto_programt::const_targett next=target, next2=target;
+        ++next;
+        ++next2; ++next2;
+        if(next!=goto_program.instructions.end() &&
+            next->is_function_call() &&
+            to_code_function_call(to_code(next->code)).arguments().size()==1 &&
+            next2!=goto_program.instructions.end() &&
+            next2->is_end_thread())
+        {
+          // skip the function call and END_THREAD
+          target=next2;
+          // copied from FUNCTION_CALL case above
+          const code_function_callt &code_func=
+            to_code_function_call(to_code(next->code));
+          assert(code_func.function().id()==ID_symbol);
+          assert(code_func.lhs().is_nil());
+          assert(code_func.arguments().size()==1);
+
+          irep_idt original_id=to_symbol_expr(code_func.function()).get_identifier();
+
+          if(global_renaming.find(original_id)==global_renaming.end())
+          {
+            inst_stream << "// ignoring call to `" << original_id <<"'" << std::endl;
+            break;
+          }
+
+          irep_idt renamed_func_id=global_renaming[original_id];
+          assert(renamed_func_id != "");
+
+          system_headers.insert("pthread.h");
+          decl_stream << indent(1)
+                      << "pthread_t __pt"
+                      << thread_vars++
+                      << ";" << std::endl;
+          inst_stream << indent(1)
+                      << "pthread_create(&__pt"
+                      << (thread_vars-1) << ", 0, "
+                      << renamed_func_id << ", "
+                      << expr_to_string(code_func.arguments()[0])
+                      << ");" << std::endl;
+        }
+        else
+          inst_stream << "__CPROVER_ASYNC_"
+                      << target->location_number << ":\n"
+                      << indent(1) << "goto L"
+                      << (*target->targets.begin())->target_number
+                      << ";" << std::endl;
+      }
       break;
 
     case END_THREAD:
@@ -924,7 +985,20 @@ void goto2cppt::convert_instructions(
       inst_stream << indent(1) << "assume(0);\n";
       break;
 
-    default:
+    case ATOMIC_BEGIN:
+      inst_stream << indent(1) << "// ATOMIC_BEGIN\n";
+      inst_stream << indent(1) << "__CPROVER_atomic_begin();\n";
+      break;
+
+    case ATOMIC_END:
+      inst_stream << indent(1) << "// ATOMIC_END\n";
+      inst_stream << indent(1) << "__CPROVER_atomic_end();\n";
+      break;
+
+    case DEAD:
+    case THROW:
+    case CATCH:
+    case NO_INSTRUCTION_TYPE:
       std::cerr << target->type << std::endl;
       //ps_irep("code",target->code);
       assert(0);
