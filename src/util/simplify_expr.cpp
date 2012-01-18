@@ -1444,13 +1444,30 @@ bool simplify_exprt::simplify_bitwise(exprt &expr)
         it!=expr.operands().end();
         ) // no it++
     {
-      if(it->is_zero())
+      if(it->is_zero() && expr.operands().size()>1)
       {
         it=expr.operands().erase(it);
         result=false;
       }
       else
         it++;
+    }
+  }
+  
+  // two operands that are syntactically the same
+
+  if(expr.operands().size()==2 &&
+     expr.op0()==expr.op1())
+  {
+    if(expr.id()==ID_bitand ||
+        expr.id()==ID_bitor)
+      return make_op0(expr);
+    else if(expr.id()==ID_bitxor)
+    {
+      constant_exprt new_op(expr.type());
+      new_op.set_value(integer2binary(0, width));
+      expr.swap(new_op);
+      return false;
     }
   }
   
@@ -2299,6 +2316,8 @@ bool simplify_exprt::simplify_boolean(exprt &expr)
     exprt::operandst::const_iterator last;
     bool last_set=false;
 
+    bool negate=false;
+
     for(exprt::operandst::iterator it=operands.begin();
         it!=operands.end();)
     {
@@ -2322,6 +2341,11 @@ bool simplify_exprt::simplify_boolean(exprt &expr)
 
       if(expr.id()==ID_and)
         erase=is_true;
+      else if(is_true && expr.id()==ID_xor)
+      {
+        erase=true;
+        negate=!negate;
+      }
       else
         erase=is_false;
 
@@ -2367,7 +2391,7 @@ bool simplify_exprt::simplify_boolean(exprt &expr)
 
     if(operands.size()==0)
     {
-      if(expr.id()==ID_and)
+      if(expr.id()==ID_and || negate)
         expr.make_true();
       else
         expr.make_false();
@@ -2376,6 +2400,8 @@ bool simplify_exprt::simplify_boolean(exprt &expr)
     }
     else if(operands.size()==1)
     {
+      if(negate)
+        expr.op0().make_not();
       exprt tmp(operands.front());
       expr.swap(tmp);
       return false;
