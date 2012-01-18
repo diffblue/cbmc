@@ -1459,9 +1459,13 @@ bool simplify_exprt::simplify_bitwise(exprt &expr)
   if(expr.operands().size()==2 &&
      expr.op0()==expr.op1())
   {
-    if(expr.id()==ID_bitand ||
-        expr.id()==ID_bitor)
-      return make_op0(expr);
+    if(expr.id()==ID_bitand || expr.id()==ID_bitor)
+    {
+      exprt tmp;
+      tmp.swap(expr.op0());
+      expr.swap(tmp);
+      return false;
+    }
     else if(expr.id()==ID_bitxor)
     {
       constant_exprt new_op(expr.type());
