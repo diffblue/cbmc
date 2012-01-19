@@ -3670,6 +3670,9 @@ std::string expr2ct::convert(
   else if(src.id()==ID_or)
     return convert_binary(src, "||", precedence=4, false);
 
+  else if(src.id()==ID_xor)
+    return convert_binary(src, "^", precedence=7, false);
+
   else if(src.id()==ID_implies)
     return convert_binary(src, "=>", precedence=3, true);
 
