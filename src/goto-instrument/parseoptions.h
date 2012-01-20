@@ -36,6 +36,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(show-uninitialized)(show-locations)" \
   "(full-slice)(reachability-slice)" \
   "(show-symbol-table)(show-claims)(show-points-to)" \
+  "(show-rw-set)" \
   "(error-label):(string-abstraction)" \
   "(verbosity):(version)(xml-ui)"
 
