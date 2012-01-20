@@ -13,9 +13,44 @@ Date: February 2006
 #include <std_code.h>
 #include <namespace.h>
 
+#include <langapi/language_util.h>
+
 #include <pointer-analysis/goto_program_dereference.h>
 
 #include "rw_set.h"
+
+/*******************************************************************\
+
+Function: rw_set_baset::output
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void rw_set_baset::output(std::ostream &out) const
+{
+  out << "READ:" << std::endl;
+  for(entriest::const_iterator it=r_entries.begin();
+      it!=r_entries.end();
+      it++)
+  {
+    out << it->second.object << " if "
+        << from_expr(ns, "", it->second.guard) << std::endl;
+  }
+
+  out << "WRITE:" << std::endl;
+  for(entriest::const_iterator it=r_entries.begin();
+      it!=r_entries.end();
+      it++)
+  {
+    out << it->second.object << " if "
+        << from_expr(ns, "", it->second.guard) << std::endl;
+  }
+}
 
 /*******************************************************************\
 

@@ -11,6 +11,8 @@ Date: February 2006
 #ifndef CPROVER_GOTO_PROGRAMS_RW_SET
 #define CPROVER_GOTO_PROGRAMS_RW_SET
 
+#include <iostream>
+
 #include <hash_cont.h>
 #include <guard.h>
 #include <std_code.h>
@@ -24,6 +26,10 @@ Date: February 2006
 class rw_set_baset
 {
 public:
+  rw_set_baset(const namespacet &_ns):ns(_ns)
+  {
+  }
+
   struct entryt
   {
     symbol_exprt symbol_expr;
@@ -65,7 +71,18 @@ public:
   {
     return r_entries.find(object)!=r_entries.end();
   }
+  
+  void output(std::ostream &out) const;
+  
+protected:
+  const namespacet &ns;
 };
+
+extern inline std::ostream & operator << (std::ostream &out, const rw_set_baset &rw_set)
+{
+  rw_set.output(out);
+  return out;
+}
 
 #define forall_rw_set_r_entries(it, rw_set) \
   for(rw_set_baset::entriest::const_iterator it=(rw_set).r_entries.begin(); \
@@ -83,7 +100,7 @@ public:
   inline rw_set_loct(const namespacet &_ns,
                      value_setst &_value_sets,
                      goto_programt::const_targett _target):
-    ns(_ns),
+    rw_set_baset(_ns),
     value_sets(_value_sets),
     target(_target)
   {
@@ -91,7 +108,6 @@ public:
   }
   
 protected:
-  const namespacet &ns;
   value_setst &value_sets;
   const goto_programt::const_targett target;
 
@@ -131,8 +147,9 @@ public:
     const contextt &_context,
     const goto_functionst &_goto_functions,
     const exprt &function):
+    rw_set_baset(tmp_ns),
     value_sets(_value_sets),
-    ns(_context),
+    tmp_ns(_context),
     goto_functions(_goto_functions)
   {
     compute_rec(function);
@@ -140,7 +157,7 @@ public:
   
 protected:
   value_setst &value_sets;
-  const namespacet ns;
+  const namespacet tmp_ns;
   const goto_functionst &goto_functions;
 
   void compute_rec(const exprt &function);
