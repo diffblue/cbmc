@@ -144,12 +144,11 @@ class rw_set_functiont:public rw_set_baset
 public:
   rw_set_functiont(
     value_setst &_value_sets,
-    const contextt &_context,
+    const namespacet &_ns,
     const goto_functionst &_goto_functions,
     const exprt &function):
-    rw_set_baset(tmp_ns),
+    rw_set_baset(_ns),
     value_sets(_value_sets),
-    tmp_ns(_context),
     goto_functions(_goto_functions)
   {
     compute_rec(function);
@@ -157,7 +156,6 @@ public:
   
 protected:
   value_setst &value_sets;
-  const namespacet tmp_ns;
   const goto_functionst &goto_functions;
 
   void compute_rec(const exprt &function);
