@@ -41,10 +41,12 @@ void rw_set_baset::output(std::ostream &out) const
     out << it->second.object << " if "
         << from_expr(ns, "", it->second.guard) << std::endl;
   }
+  
+  out << std::endl;
 
   out << "WRITE:" << std::endl;
-  for(entriest::const_iterator it=r_entries.begin();
-      it!=r_entries.end();
+  for(entriest::const_iterator it=w_entries.begin();
+      it!=w_entries.end();
       it++)
   {
     out << it->second.object << " if "
@@ -172,9 +174,9 @@ void rw_set_loct::read_write_rec(
     assert(expr.operands().size()==1);
     read(expr.op0(), guard);
 
-    exprt tmp=expr.op0();
+    exprt tmp=expr;
     dereference(target, tmp, ns, value_sets);
-
+    
     read_write_rec(tmp, r, w, suffix, guard);
   }
   else if(expr.id()==ID_address_of)

@@ -188,8 +188,9 @@ void interrupt(
   symbol_exprt isr=get_isr(context, interrupt_handler);
 
   // we first figure out which objects are read/written by the ISR
+  const namespacet ns(context);
   rw_set_functiont isr_rw_set(
-    value_sets, context, goto_functions, isr);
+    value_sets, ns, goto_functions, isr);
 
   // now instrument
 
