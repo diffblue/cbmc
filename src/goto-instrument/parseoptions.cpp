@@ -48,6 +48,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "mmio.h"
 #include "stack_depth.h"
 #include "nondet_static.h"
+#include "rw_set.h"
 
 /*******************************************************************\
 
@@ -146,6 +147,26 @@ int goto_instrument_parseoptionst::doit()
       points_tot points_to;
       points_to(goto_functions);
       points_to.output(std::cout);
+      return 0;
+    }
+
+    if(cmdline.isset("show-rw-set"))
+    {
+      namespacet ns(context);
+      status("Function Pointer Removal");
+      remove_function_pointers(ns, goto_functions, false);
+
+      status("Partial Inlining");
+      goto_partial_inline(goto_functions, ns, ui_message_handler);
+    
+      status("Pointer Analysis");
+      value_set_analysist value_set_analysis(ns);
+      value_set_analysis(goto_functions);
+      
+      const symbolt &symbol=ns.lookup("c::main");
+      symbol_exprt main(symbol.name, symbol.type);
+      
+      std::cout << rw_set_functiont(value_set_analysis, ns, goto_functions, main);
       return 0;
     }
 
