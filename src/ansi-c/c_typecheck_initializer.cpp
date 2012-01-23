@@ -383,7 +383,7 @@ void c_typecheck_baset::do_initializer(symbolt &symbol)
       {
         // zero initializer
         symbol.value=zero_initializer(symbol.type, symbol.location);
-        symbol.value.set("#zero_initializer", true);
+        symbol.value.set(ID_C_zero_initializer, true);
       }
     }
     else
