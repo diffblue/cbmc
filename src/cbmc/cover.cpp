@@ -129,7 +129,7 @@ void bmct::cover_assertions()
       // we just want reachability, i.e., the guard,
       // not the assertion itself
       literalt l=
-        prop_conv.prop.limplies(assumption_literal, it->guard_literal);
+        prop_conv.prop.land(assumption_literal, it->guard_literal);
 
       cover_goals.add(l, it->source.pc);
     }
