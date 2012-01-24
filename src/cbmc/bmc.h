@@ -101,6 +101,9 @@ protected:
 
   virtual void error_trace(
     const prop_convt &prop_conv);
+  
+  // vacuity checks
+  void cover_assertions();
 };
 
 #endif

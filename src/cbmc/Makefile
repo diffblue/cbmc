@@ -1,6 +1,6 @@
 SRC = main.cpp parseoptions.cpp bmc.cpp dimacs.cpp languages.cpp \
       bv_cbmc.cpp symex_bmc.cpp show_vcc.cpp cbmc_solvers.cpp \
-      xml_interface.cpp \
+      xml_interface.cpp cover.cpp \
       counterexample_beautification.cpp \
       counterexample_beautification_greedy.cpp \
       counterexample_beautification_pbs.cpp

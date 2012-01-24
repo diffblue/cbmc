@@ -411,6 +411,12 @@ bool bmct::run(const goto_functionst &goto_functions)
       show_vcc();
       return false;
     }
+    
+    if(options.get_bool_option("cover-assertions"))
+    {
+      cover_assertions();
+      return false;
+    }
 
     if(symex.remaining_claims==0)
     {
