@@ -134,6 +134,9 @@ void cbmc_parseoptionst::get_command_line_options(optionst &options)
   if(cmdline.isset("show-vcc"))
     options.set_option("show-vcc", true);
 
+  if(cmdline.isset("cover-assertions"))
+    options.set_option("cover-assertions", true);
+
   if(cmdline.isset("no-simplify"))
     options.set_option("simplify", false);
   else
