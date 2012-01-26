@@ -765,8 +765,29 @@ void smt2_convt::convert_expr(const exprt &expr)
 
       convert_expr(expr.op0());
       smt2_prop.out << " ";
-      convert_expr(expr.op1());
-      smt2_prop.out << ")";
+
+      // SMT2 requires the shift distance to have the same width as
+      // the value that is shifted -- odd!
+
+      unsigned width_op0=boolbv_width(expr.op0().type());
+      unsigned width_op1=boolbv_width(expr.op1().type());
+
+      if(width_op0==width_op1)
+        convert_expr(expr.op1());
+      else if(width_op0>width_op1)
+      {
+        smt2_prop.out << "((_ zero_extend " << width_op0-width_op1 << ") ";
+        convert_expr(expr.op1());
+        smt2_prop.out << ")"; // zero_extend
+      }
+      else // width_op0<width_op1
+      {
+        smt2_prop.out << "((_ extract " << width_op0-1 << " 0) ";
+        convert_expr(expr.op1());
+        smt2_prop.out << ")"; // extract
+      }
+
+      smt2_prop.out << ")"; // bv*sh
     }
     else
       throw "unsupported type for "+expr.id_string()+
