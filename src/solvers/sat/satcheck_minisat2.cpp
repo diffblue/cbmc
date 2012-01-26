@@ -381,3 +381,22 @@ void satcheck_minisat2_baset<T>::set_assumptions(const bvt &bv)
     assert(!it->is_constant());
 }
 
+/*******************************************************************\
+
+Function: satcheck_minisat_simplifiert::set_frozen
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void satcheck_minisat_simplifiert::set_frozen(literalt a)
+{
+  assert(!a.is_constant());
+
+  solver->setFrozen(a.var_no(), true);
+}
+
