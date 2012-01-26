@@ -847,8 +847,12 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
         convert_expr(expr.op1(), true);
         smt1_prop.out << ")"; // zero_extend
       }
-      else
-        throw "unsupported shift-operand widths";
+      else // width_op0<width_op1
+      {
+        smt1_prop.out << "(extract[" << width_op0-1 << ":0] ";
+        convert_expr(expr.op1(), true);
+        smt1_prop.out << ")"; // extract
+      }
                                                                                                                                                                 
       smt1_prop.out << ")";
     }
@@ -1209,11 +1213,15 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
   else if(expr.id()==ID_extractbits)
   {
     assert(expr.operands().size()==3);
+    
+    const typet &op_type=ns.follow(expr.op0().type());
 
-    if(expr.op0().type().id()==ID_unsignedbv ||
-       expr.op0().type().id()==ID_signedbv ||
-       expr.op0().type().id()==ID_bv ||
-       expr.op0().type().id()==ID_fixedbv)
+    if(op_type.id()==ID_unsignedbv ||
+       op_type.id()==ID_signedbv ||
+       op_type.id()==ID_bv ||
+       op_type.id()==ID_fixedbv ||
+       op_type.id()==ID_struct ||
+       op_type.id()==ID_union)
     {
       if(expr.op1().is_constant() &&
          expr.op2().is_constant())
@@ -1246,7 +1254,7 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
     }
     else
       throw "unsupported type for "+expr.id_string()+
-            ": "+expr.op0().type().id_string();
+            ": "+op_type.id_string();
   }
   else if(expr.id()==ID_array)
   {
