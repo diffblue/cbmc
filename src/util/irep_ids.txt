@@ -344,6 +344,7 @@ byte_update_little_endian
 replication
 dummy
 init
+atomic
 atomic_begin
 atomic_end
 start_thread
