@@ -136,12 +136,17 @@ extern char *yyansi_ctext;
 %token TOK_CLRCALL     "__clrcall"
 %token TOK_FORALL      "forall"
 %token TOK_EXISTS      "exists"
-%token TOK_THREAD_LOCAL "thread_local"
 %token TOK_ARRAY_OF    "array_of"
 %token TOK_CPROVER_BITVECTOR "__CPROVER_bitvector"
 %token TOK_REAL        "__real__"
 %token TOK_IMAG        "__imag__"
+%token TOK_ALIGNAS     "_Alignas"
+%token TOK_ATOMIC      "_Atomic"
+%token TOK_GENERIC     "_Generic"
+%token TOK_IMAGINARY   "_Imaginary"
+%token TOK_NORETURN    "_Noreturn"
 %token TOK_STATIC_ASSERT "_Static_assert"
+%token TOK_THREAD_LOCAL "_Thread_local"
 
 /*** special scanner reports ***/
 
@@ -893,6 +898,7 @@ declaration_qualifier:
 type_qualifier:
           TOK_CONST    { $$=$1; set($$, ID_const); }
         | TOK_VOLATILE { $$=$1; set($$, ID_volatile); }
+        | TOK_ATOMIC   { $$=$1; set($$, ID_atomic); }
         | TOK_PTR32    { $$=$1; set($$, ID_ptr32); }
         | TOK_PTR64    { $$=$1; set($$, ID_ptr64); }
         ;

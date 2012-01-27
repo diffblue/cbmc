@@ -804,7 +804,70 @@ wchar_t             { return cpp_keyword(TOK_WCHAR_T); } // already really ANSI-
                     return make_identifier();
                 }
 
-  /* This is a C1X keyword */
+  /* This is a C11 keyword */
+
+"_Alignas"      { if(PARSER.mode==ansi_c_parsert::GCC ||
+                     PARSER.mode==ansi_c_parsert::ARM)
+                    { loc(); return TOK_ALIGNAS; }
+                  else
+                    return make_identifier();
+                }
+
+  /* This is a C11 keyword */
+
+"_Alignof"      { if(PARSER.mode==ansi_c_parsert::GCC ||
+                     PARSER.mode==ansi_c_parsert::ARM)
+                    { loc(); return TOK_ALIGNOF; }
+                  else
+                    return make_identifier();
+                }
+
+  /* This is a C11 keyword */
+
+"_Atomic"       { if(PARSER.mode==ansi_c_parsert::GCC ||
+                     PARSER.mode==ansi_c_parsert::ARM)
+                    { loc(); return TOK_ATOMIC; }
+                  else
+                    return make_identifier();
+                }
+
+  /* This is a C11 keyword */
+
+"_Generic"      { if(PARSER.mode==ansi_c_parsert::GCC ||
+                     PARSER.mode==ansi_c_parsert::ARM)
+                    { loc(); return TOK_GENERIC; }
+                  else
+                    return make_identifier();
+                }
+
+  /* This is a C11 keyword */
+
+"_Imaginary"    { if(PARSER.mode==ansi_c_parsert::GCC ||
+                     PARSER.mode==ansi_c_parsert::ARM)
+                    { loc(); return TOK_IMAGINARY; }
+                  else
+                    return make_identifier();
+                }
+
+  /* This is a C11 keyword */
+
+"_Noreturn"     { if(PARSER.mode==ansi_c_parsert::GCC ||
+                     PARSER.mode==ansi_c_parsert::ARM)
+                    { loc(); return TOK_NORETURN; }
+                  else
+                    return make_identifier();
+                }
+
+  /* This is a C11 keyword */
+
+"_Static_assert" { if(PARSER.mode==ansi_c_parsert::GCC ||
+                      PARSER.mode==ansi_c_parsert::ARM)
+                    { loc(); return TOK_STATIC_ASSERT; }
+                  else
+                    return make_identifier();
+                }
+
+  /* This is a C11 keyword */
 
 "_Thread_local" { if(PARSER.mode==ansi_c_parsert::GCC ||
                      PARSER.mode==ansi_c_parsert::ARM)
@@ -813,14 +876,6 @@ wchar_t             { return cpp_keyword(TOK_WCHAR_T); } // already really ANSI-
                     return make_identifier();
                 }
 
-  /* This is a C1X keyword */
-
-"_Static_assert" { if(PARSER.mode==ansi_c_parsert::GCC ||
-                      PARSER.mode==ansi_c_parsert::ARM)
-                    { loc(); return TOK_STATIC_ASSERT; }
-                  else
-                    return make_identifier();
-                }
 }
 
   /* operators following */
