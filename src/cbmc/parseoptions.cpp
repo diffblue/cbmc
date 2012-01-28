@@ -802,6 +802,7 @@ void cbmc_parseoptionst::help()
     " --no-assertions              ignore user assertions\n"
     " --no-assumptions             ignore user assumptions\n"
     " --error-label label          check that label is unreachable\n"
+    " --cover-assertions           check which assertions are reachable\n"
     "\n"
     "BMC options:\n"
     " --function name              set main function name\n"
