@@ -11,6 +11,10 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 #include <limits>
 #include <cassert>
 
+#ifdef _WIN32
+#define strtoll _strtoi64
+#endif
+
 #include "string2int.h"
 
 /*******************************************************************\
