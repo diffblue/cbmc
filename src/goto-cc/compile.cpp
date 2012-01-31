@@ -76,7 +76,10 @@ unsigned compilet::subgraphscount;
 
 #ifdef _WIN32
 #include <direct.h>
+#include <windows.h>
 #define chdir _chdir
+#define popen _popen
+#define pclose _pclose
 #endif
 
 /*******************************************************************\
@@ -189,7 +192,7 @@ bool compilet::add_input_file(const std::string &file_name)
     if(ext=="a")
     {
       #ifdef _WIN32
-      char td[MAX_PATH];
+      char td[MAX_PATH+1];
       #else
       char td[] = "goto-cc.XXXXXX";
       #endif
