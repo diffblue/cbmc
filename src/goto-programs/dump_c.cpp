@@ -1915,7 +1915,7 @@ irep_idt goto2cppt::unique_name(irep_idt name)
    std::string::iterator it = str.begin();
    while(it != str.end())
    {
-           if(!std::isalnum(*it) && (*it) != '_')
+           if(!isalnum(*it) && (*it) != '_')
              it = str.erase(it);
            else it++;
    }
