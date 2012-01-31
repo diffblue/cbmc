@@ -101,8 +101,9 @@ public:
     }
 
     virtual irep_idt current_name(const irep_idt &identifier) const
-    {
+    { // never called
       assert(false);
+      return irep_idt();
     }
 
     irep_idt operator()(
