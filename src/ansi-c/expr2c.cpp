@@ -3513,6 +3513,11 @@ std::string expr2ct::convert(
     return convert_function(src, "gcc_builtin_va_arg", precedence=15);
   }
 
+  else if(src.id()==ID_gcc_builtin_va_arg_next)
+  {
+    return convert_function(src, "gcc_builtin_va_arg_next", precedence=15);
+  }
+
   else if(src.id()==ID_builtin_alignof)
   {
     return convert_function(src, "builtin_alignof", precedence=15);
