@@ -1321,39 +1321,12 @@ std::string goto2cppt::expr_to_string(const exprt &expr)
   {
     assert(expr.operands().size()>=2);
 
-    std::string str;
+    std::string str=expr_to_string(expr.operands()[0]);
 
-    if(expr.op0().type().id() == ID_pointer ||
-       expr.op1().type().id() == ID_pointer ||
-       expr.op0().id() == ID_symbol ||
-       expr.op0().id() == ID_constant ||
-       expr.op0().id() == ID_member ||
-       expr.op0().id() == ID_index ||
-       expr.op0().id() == ID_dereference)
-    {
-      str="("+expr_to_string(expr.operands()[0])+
-              expr.id().as_string()+
-              expr_to_string(expr.operands()[1])+")";
-    }
-    else
-      str=expr_to_string(expr.operands()[0])+
-          expr.id().as_string()+"="+
-          expr_to_string(expr.operands()[1]);
+    for(unsigned i = 1; i < expr.operands().size(); i++)
+      str+=expr.id().as_string()+expr_to_string(expr.operands()[i]);
 
-    for(unsigned i = 2; i < expr.operands().size(); i++ )
-    {
-       const exprt& opleft = expr.operands()[i-1];
-       const exprt& opright = expr.operands()[i];
-
-       if( opleft.type().id() == ID_pointer ||
-           opright.type().id() == ID_pointer)
-        str += expr.id().as_string() + expr_to_string(expr.operands()[i]);
-       else
-        str += expr.id().as_string() +"=" + expr_to_string(expr.operands()[i]);
-    }
-
-    str = "(" + str + ")";
-    return str;
+    return "(" + str + ")";
   }
   else if(expr.id()==ID_div ||
           expr.id()==ID_lt  || expr.id()==ID_gt ||
@@ -1403,148 +1376,68 @@ std::string goto2cppt::expr_to_string(const exprt &expr)
   }
   else if(expr.id()==ID_not)
   {
-    assert(expr.operands().size() == 1);
+    assert(expr.operands().size()==1);
     return "(!"+expr_to_string(expr.op0())+")";
   }
-  else if(expr.id() == ID_bitand)
+  else if(expr.id()==ID_bitand)
   {
     assert(expr.operands().size() >= 2);
 
-    std::string str;
-    if(expr.op0().id() == ID_symbol ||
-       expr.op0().id() == ID_constant ||
-       expr.op0().id() == ID_member ||
-       expr.op0().id() == ID_index ||
-       expr.op0().id() == ID_dereference)
-    {
-      str = "("+ expr_to_string(expr.operands()[0]) +
-            " & " + expr_to_string(expr.operands()[1]) +")";
-    }
-    else
-      str = expr_to_string(expr.operands()[0])
-            + " &= " + expr_to_string(expr.operands()[1]);
+    std::string str=expr_to_string(expr.operands()[0]);
 
-    for(unsigned i = 2; i < expr.operands().size(); i++ )
-      str += " &= " + expr_to_string(expr.operands()[i]);
+    for(unsigned i = 1; i < expr.operands().size(); i++ )
+      str+=" & " +expr_to_string(expr.operands()[i]);
 
-    str="("+str+")";
-
-    return str;
+    return "("+str+")";
   }
   else if(expr.id()==ID_bitor)
   {
     assert(expr.operands().size() >= 2);
 
-    std::string str;
+    std::string str=expr_to_string(expr.operands()[0]);
 
-    if(expr.op0().id() == ID_symbol ||
-       expr.op0().id() == ID_constant ||
-       expr.op0().id() == ID_member ||
-       expr.op0().id() == ID_index ||
-       expr.op0().id() == ID_dereference)
-    {
-      str = "("+ expr_to_string(expr.operands()[0]) +
-            " | " + expr_to_string(expr.operands()[1]) +")";
-    }
-    else
-      str = expr_to_string(expr.operands()[0])
-            + " |= " + expr_to_string(expr.operands()[1]);
-
-    for(unsigned i = 2; i < expr.operands().size(); i++ )
-      str += " |= " + expr_to_string(expr.operands()[i]);
-    str = "(" + str + ")";
-    return str;
-
+    for(unsigned i = 1; i < expr.operands().size(); i++ )
+      str += " | " + expr_to_string(expr.operands()[i]);
+    return "(" + str + ")";
   }
   else if(expr.id()==ID_bitxor)
   {
-    std::string str;
-    
-    if(expr.op0().id() == ID_symbol ||
-       expr.op0().id() == ID_constant ||
-       expr.op0().id() == ID_member ||
-       expr.op0().id() == ID_index ||
-       expr.op0().id() == ID_dereference)
-    {
-      str = "("+ expr_to_string(expr.operands()[0]) +
-            " ^ " + expr_to_string(expr.operands()[1]) +")";
-    }
-    else
-      str = expr_to_string(expr.operands()[0])
-            + " ^= " + expr_to_string(expr.operands()[1]);
-    for(unsigned i = 2; i < expr.operands().size(); i++ )
-      str += " ^= " + expr_to_string(expr.operands()[i]);
+    std::string str=expr_to_string(expr.operands()[0]);
 
-    str = "(" + str + ")";
+    for(unsigned i = 1; i < expr.operands().size(); i++ )
+      str += " ^ "+expr_to_string(expr.operands()[i]);
 
-    return str;
+    return "(" + str + ")";
   }
   else if(expr.id()==ID_bitnot)
   {
-    assert(expr.operands().size() == 1);
+    assert(expr.operands().size()==1);
     return "(~ " + expr_to_string(expr.op0()) + ")";
   }
   else if(expr.id()==ID_shl)
   {
     assert(expr.operands().size() == 2);
 
-    std::string shf_str;
-    if(expr.op1().id()==ID_constant)
-    {
-      assert(expr.op1().type().id() == ID_unsignedbv ||
-             expr.op1().type().id() == ID_signedbv);
-
-      std::string width_str = id2string(expr.op1().type().get(ID_width));
-      mp_integer width = string2integer(width_str,10);
-      assert(width != 0);
-      mp_integer cst = string2integer(id2string(expr.op1().get(ID_value)),2);
-      shf_str = integer2string(cst, 10);
-      assert(shf_str != "");
-    }
-    else
-      shf_str=expr_to_string(expr.op1());
-
-    if(expr.op0().id() == ID_symbol ||
-       expr.op0().id() == ID_constant ||
-       expr.op0().id() == ID_member ||
-       expr.op0().id() == ID_index ||
-       expr.op0().id() == ID_dereference)
-    {
-      return "(" + expr_to_string(expr.op0()) +" << " + shf_str + " )";
-    }
-    return "(" + expr_to_string(expr.op0()) +" <<= " + shf_str + " )";
+    return "("+expr_to_string(expr.op0())+" << "+
+           expr_to_string(expr.op1())+" )";
   }
-  else if(expr.id() == ID_lshr || expr.id() == ID_ashr)
+  else if(expr.id()==ID_lshr || expr.id()==ID_ashr)
   {
     assert(expr.operands().size() == 2);
-
-    if(expr.op1().id()==ID_constant)
-    {
-      assert(expr.op1().type().id() == ID_unsignedbv ||
-             expr.op1().type().id() == ID_signedbv);
-
-      std::string width_str = id2string(expr.op1().type().get(ID_width));
-      mp_integer width = string2integer(width_str,10);
-      assert(width != 0);
-      mp_integer cst = string2integer(id2string(expr.op1().get(ID_value)),2);
-      std::string str = integer2string(cst, 10);
-      assert(str != "");
-      return "(" + expr_to_string(expr.op0()) +" >> "+str + " )";
-    }
 
     return "("+expr_to_string(expr.op0())+" >> "+
                expr_to_string(expr.op1())+")";
   }
-  else if(expr.id() == ID_unary_minus)
+  else if(expr.id()==ID_unary_minus)
   {
     assert(expr.operands().size() == 1);
     return "(" + type_to_string(expr.op0().type())+"(0) - "+
            expr_to_string(expr.op0()) + " ) ";
   }
-  else if(expr.id() == ID_constant)
+  else if(expr.id()==ID_constant)
   {
-    if(expr.type().id() == ID_signedbv ||
-       expr.type().id() == ID_unsignedbv)
+    if(expr.type().id()==ID_signedbv ||
+       expr.type().id()==ID_unsignedbv)
     {
       std::string width_str = id2string(expr.type().get(ID_width));
       mp_integer width = string2integer(width_str,10);
@@ -1572,18 +1465,18 @@ std::string goto2cppt::expr_to_string(const exprt &expr)
       #endif
     }
 
-    if(expr.type().id() == ID_bool)
-      return expr.get_string(ID_value);
+    if(expr.type().id()==ID_bool)
+      return expr.is_true()?"1":"0";
 
-    if(expr.type().id() == ID_pointer)
+    if(expr.type().id()==ID_pointer)
     {
       assert(expr.get(ID_value)==ID_NULL);
       return "0";
     }
 
-    if(expr.type().id() == ID_verilogbv)
+    if(expr.type().id()==ID_verilogbv)
     {
-      if(expr.type().get(ID_width) == "1")
+      if(expr.type().get(ID_width)=="1")
       {
         irep_idt value = expr.get(ID_value);
         if(value == "0")
@@ -1605,12 +1498,14 @@ std::string goto2cppt::expr_to_string(const exprt &expr)
       }
     }
 
+    #if 0
     if(expr.type().id()==ID_c_enum)
     {
       std::string str = "__signedbv<" + id2string(expr.type().get(ID_width)) +
         "> (" + id2string(expr.get(ID_value)) + ")";
       return str;
     }
+    #endif
 
     if(expr.type().id()==ID_symbol)
     {
