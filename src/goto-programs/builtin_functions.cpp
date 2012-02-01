@@ -1058,6 +1058,98 @@ void goto_convertt::do_function_call_symbol(
   {
     // does nothing
   }
+  else if(identifier==ID_gcc_builtin_va_arg)
+  {
+    // This does two things.
+    // 1) Move list pointer to next argument.
+    //    Done by gcc_builtin_va_arg_next.
+    // 2) Return value of argument.
+    //    This is just dereferencing.
+
+    if(arguments.size()!=1)
+    {
+      err_location(function);
+      throw "`"+id2string(identifier)+"' expected to have one argument";
+    }
+    
+    {
+      exprt rhs(ID_gcc_builtin_va_arg_next, arguments[0].type());
+      goto_programt::targett t1=dest.add_instruction(ASSIGN);
+      t1->location=function.location();
+      t1->code=code_assignt(arguments[0], rhs);
+    }
+
+    if(lhs.is_not_nil())
+    {
+      typet t=pointer_typet();
+      t.subtype()=lhs.type();
+      dereference_exprt rhs(lhs.type());
+      rhs.copy_to_operands(typecast_exprt(arguments[0], t));
+      rhs.location()=function.location();
+
+      goto_programt::targett t2=dest.add_instruction(ASSIGN);
+      t2->location=function.location();
+      t2->code=code_assignt(lhs, rhs);
+    }
+  }
+  else if(identifier=="c::__builtin_va_copy")
+  {
+    if(arguments.size()!=2)
+    {
+      err_location(function);
+      throw "`"+id2string(identifier)+"' expected to have two arguments";
+    }
+    
+    exprt lhs=arguments[0];
+    exprt rhs=typecast_exprt(arguments[1], lhs.type());
+    
+    if(lhs.id()!=ID_symbol)
+    {
+      err_location(lhs);
+      throw "vs_copy argument expected to be symbol";
+    }    
+    
+    goto_programt::targett t=dest.add_instruction(ASSIGN);
+    t->location=function.location();
+    t->code=code_assignt(lhs, rhs);
+  }
+  else if(identifier=="c::__builtin_va_start")
+  {
+    // Set the list argument to be the address of the
+    // parameter argument.
+    if(arguments.size()!=2)
+    {
+      err_location(function);
+      throw "`"+id2string(identifier)+"' expected to have two arguments";
+    }
+    
+    exprt lhs=arguments[0];
+    exprt rhs=typecast_exprt(
+      address_of_exprt(arguments[1]), lhs.type());
+    
+    if(lhs.id()!=ID_symbol)
+    {
+      err_location(lhs);
+      throw "vs_start argument expected to be symbol";
+    }    
+    
+    goto_programt::targett t=dest.add_instruction(ASSIGN);
+    t->location=function.location();
+    t->code=code_assignt(lhs, rhs);
+  }
+  else if(identifier=="c::__builtin_va_end")
+  {
+    // Invalidates the argument. We do so by setting it to NULL.
+    if(arguments.size()!=1)
+    {
+      err_location(function);
+      throw "`"+id2string(identifier)+"' expected to have one argument";
+    }
+    
+    goto_programt::targett t=dest.add_instruction(ASSIGN);
+    t->location=function.location();
+    t->code=code_assignt(arguments[0], gen_zero(arguments[0].type()));
+  }
   else
   {
     do_function_call_symbol(*symbol);
