@@ -235,14 +235,37 @@ Function: c_typecheck_baset::typecheck_expr_builtin_va_arg
 
 void c_typecheck_baset::typecheck_expr_builtin_va_arg(exprt &expr)
 {
-  if(expr.operands().size()!=1)
-  {
-    err_location(expr);
-    str << "builtin_va_arg expects one operand";
-    throw 0;
-  }
+  // this comes with a type, which will need to be fixed
+  // and checked
+  typet type=expr.type();
+  typecheck_type(type);
+  
+  code_typet new_type;
+  new_type.return_type().swap(type);
+  new_type.arguments().resize(1);
+  new_type.arguments()[0].type()=pointer_typet(empty_typet());
 
-  typecheck_type(expr.type());
+  assert(expr.operands().size()==1);  
+  exprt arg=expr.op0();
+
+  // turn into function call
+  side_effect_expr_function_callt result;
+  result.location()=expr.location();
+  result.function()=symbol_exprt(ID_gcc_builtin_va_arg);
+  result.function().location()=expr.location();
+  result.function().type()=new_type;
+  result.arguments().push_back(arg);
+  result.type()=new_type.return_type();
+  
+  expr.swap(result);
+  
+  // make sure symbol exists
+  symbolt symbol;
+  symbol.base_name=ID_gcc_builtin_va_arg;
+  symbol.name=ID_gcc_builtin_va_arg;
+  symbol.type=new_type;
+  
+  context.move(symbol);
 }
 
 /*******************************************************************\
@@ -1696,12 +1719,12 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
   {
     replace_symbol(f_op);
 
-    if(context.symbols.find(f_op.get(ID_identifier))==context.symbols.end())
+    const irep_idt &identifier=f_op.get(ID_identifier);
+
+    if(context.symbols.find(identifier)==context.symbols.end())
     {
       // This is an undeclared function. Let's just add it.
-      const irep_idt &identifier=f_op.get(ID_identifier);
-
-      // We do a bit of return-type guessing, but just a bit
+      // We do a bit of return-type guessing, but just a bit.
       typet return_type=int_type();
       
       // The following isn't really right and sound, but there
