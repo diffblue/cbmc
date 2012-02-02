@@ -174,6 +174,8 @@ void basic_symext::symex_assign(
       symex_malloc(state, lhs, side_effect_expr);
     else if(statement==ID_printf)
       symex_printf(state, lhs, side_effect_expr);
+    else if(statement==ID_gcc_builtin_va_arg_next)
+      symex_gcc_builtin_va_arg_next(state, lhs, side_effect_expr);
     else
       throw "symex_assign: unexpected side effect: "+id2string(statement);
   }
