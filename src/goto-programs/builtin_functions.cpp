@@ -59,8 +59,7 @@ void goto_convertt::do_prob_uniform(
     throw "`"+id2string(identifier)+"' expected to have LHS";
   }
 
-  exprt rhs=exprt(ID_sideeffect, lhs.type());
-  rhs.set(ID_statement, "prob_uniform");
+  exprt rhs=sideeffect_exprt("prob_uniform", lhs.type());
   rhs.location()=function.location();
 
   if(lhs.type().id()!=ID_unsignedbv &&
@@ -139,8 +138,7 @@ void goto_convertt::do_prob_coin(
     throw "`"+id2string(identifier)+"' expected to have LHS";
   }
 
-  exprt rhs=exprt(ID_sideeffect, lhs.type());
-  rhs.set(ID_statement, "prob_coin");
+  exprt rhs=sideeffect_exprt("prob_coin", lhs.type());
   rhs.location()=function.location();
 
   if(lhs.type()!=bool_typet())
@@ -211,10 +209,8 @@ void goto_convertt::do_printf(
   if(f_id==CPROVER_PREFIX "printf" ||
      f_id=="c::printf")
   {
-    exprt printf_code(ID_sideeffect,
-      static_cast<const typet &>(function.type().find(ID_return_type)));
-
-    printf_code.set(ID_statement, ID_printf);
+    typet return_type=static_cast<const typet &>(function.type().find(ID_return_type));
+    sideeffect_exprt printf_code(ID_printf, return_type);
 
     printf_code.operands()=arguments;
     printf_code.location()=function.location();
@@ -1073,7 +1069,8 @@ void goto_convertt::do_function_call_symbol(
     }
     
     {
-      exprt rhs(ID_gcc_builtin_va_arg_next, arguments[0].type());
+      sideeffect_exprt rhs(ID_gcc_builtin_va_arg_next, arguments[0].type());
+      rhs.copy_to_operands(arguments[0]);
       goto_programt::targett t1=dest.add_instruction(ASSIGN);
       t1->location=function.location();
       t1->code=code_assignt(arguments[0], rhs);
