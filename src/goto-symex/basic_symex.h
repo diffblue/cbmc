@@ -72,6 +72,7 @@ protected:
   
   static exprt add_to_lhs(const exprt &lhs, const exprt &what);
   
+  virtual void symex_gcc_builtin_va_arg_next(statet &state, const exprt &lhs, const side_effect_exprt &code);
   virtual void symex_malloc        (statet &state, const exprt &lhs, const side_effect_exprt &code);
   virtual void symex_cpp_delete    (statet &state, const codet &code);
   virtual void symex_cpp_new       (statet &state, const exprt &lhs, const side_effect_exprt &code);

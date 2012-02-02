@@ -87,6 +87,7 @@ void goto_symext::argument_assignments(
 
     if(it1->is_nil())
     {
+      // 'nil' argument doesn't get assigned
     }
     else
     {
@@ -130,8 +131,21 @@ void goto_symext::argument_assignments(
 
   if(function_type.has_ellipsis())
   {
-    for(; it1!=arguments.end(); it1++)
+    // These are va_arg arguments.
+    for(unsigned va_count=0; it1!=arguments.end(); it1++, va_count++)
     {
+      irep_idt id="symex::va_arg"+i2string(va_count);
+      
+      // add to context
+      symbolt symbol;
+      symbol.name=id;
+      symbol.base_name="va_arg"+i2string(va_count);
+      
+      symbol_exprt lhs=symbol_exprt(id, it1->type());
+
+      guardt guard;
+      state.rename(lhs, ns, goto_symex_statet::L1);
+      symex_assign_symbol(state, lhs, nil_exprt(), *it1, guard, VISIBLE);
     }
   }
   else if(it1!=arguments.end())

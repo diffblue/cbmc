@@ -19,6 +19,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <std_expr.h>
 #include <std_code.h>
 #include <simplify_expr.h>
+#include <prefix.h>
+#include <string2int.h>
 
 #include <ansi-c/c_types.h>
 
@@ -153,6 +155,73 @@ void basic_symext::symex_malloc(
 
   state.rename(rhs, ns);
   
+  guardt guard;
+  symex_assign_rec(state, lhs, nil_exprt(), rhs, guard, VISIBLE);
+}
+
+/*******************************************************************\
+
+Function: basic_symext::symex_gcc_builtin_va_arg_next
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+irep_idt get_symbol(const exprt &src)
+{
+  if(src.id()==ID_typecast)
+    return get_symbol(to_typecast_expr(src).op());
+  else if(src.id()==ID_address_of)
+  {
+    exprt op=to_address_of_expr(src).object();
+    if(op.id()==ID_symbol)
+      return to_symbol_expr(op).get_identifier();
+    else
+      return irep_idt();
+  }
+  else
+    return irep_idt();
+}
+
+void basic_symext::symex_gcc_builtin_va_arg_next(
+  statet &state,
+  const exprt &lhs,
+  const side_effect_exprt &code)
+{
+  if(code.operands().size()!=1)
+    throw "va_arg_next expected to have one operand";
+    
+  if(lhs.is_nil())
+    return; // ignore
+
+  exprt tmp=code.op0();
+  state.rename(tmp, ns); // to allow constant propagation
+  irep_idt id=get_symbol(tmp);
+
+  exprt rhs=gen_zero(lhs.type());
+  
+  if(id!=irep_idt())
+  {
+    id=state.get_original_name(id);
+    
+    std::string base="symex::va_arg";
+
+    if(has_prefix(id2string(id), base))
+      id=base+i2string(
+        safe_string2unsigned(
+          std::string(id2string(id), base.size(), std::string::npos))+1);
+    else
+      id=base+"0";
+
+    const symbolt *symbol;
+    if(!ns.lookup(id, symbol))
+      rhs=symbol_exprt(symbol->name, symbol->type);
+  }
+
   guardt guard;
   symex_assign_rec(state, lhs, nil_exprt(), rhs, guard, VISIBLE);
 }
