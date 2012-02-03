@@ -29,7 +29,7 @@
   "int __builtin_fscanf(void *stream, const char *fmt, ...);\n" \
   "int __builtin_scanf(const char *str, const char *fmt, ...);\n" \
   "int __builtin_fputs(const char *s, void *stream);\n" \
-  "int __builtin_vsnprintf(char * restrict str, unsigned size, const char * restrict format, __bultin_va_list ap);\n"
+  "int __builtin_vsnprintf(char * restrict str, unsigned size, const char * restrict format, __bultin_va_list ap);\n" \
   "long __builtin_expect(long, long);\n" \
   "void *__builtin_memset(void *s, int c, unsigned n);\n" \
   "void *__builtin___memset_chk(void *s, int c, unsigned n, unsigned size);\n" \
