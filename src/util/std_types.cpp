@@ -363,3 +363,71 @@ constant_exprt signedbv_typet::largest_expr() const
   return to_constant_expr(from_integer(largest(), *this));
 }
 
+/*******************************************************************\
+
+Function: unsignedbv_typet::smallest
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+mp_integer unsignedbv_typet::smallest() const
+{
+  return 0;
+}
+
+/*******************************************************************\
+
+Function: unsignedbv_typet::largest
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+mp_integer unsignedbv_typet::largest() const
+{
+  return power(2, get_width())-1;
+}
+
+/*******************************************************************\
+
+Function: unsignedbv_typet::smallest_expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+constant_exprt unsignedbv_typet::smallest_expr() const
+{
+  return to_constant_expr(from_integer(smallest(), *this));
+}
+
+/*******************************************************************\
+
+Function: unsignedbv_typet::largest_expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+constant_exprt unsignedbv_typet::largest_expr() const
+{
+  return to_constant_expr(from_integer(largest(), *this));
+}
+
