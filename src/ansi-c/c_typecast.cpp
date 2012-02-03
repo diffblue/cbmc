@@ -7,7 +7,6 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <cassert>
-#include <cstdlib>
 
 #include <config.h>
 #include <expr_util.h>
@@ -299,7 +298,7 @@ Function: c_typecastt::get_c_type
 c_typecastt::c_typet c_typecastt::get_c_type(
   const typet &type)
 {
-  unsigned width=atoi(type.get(ID_width).c_str());
+  unsigned width=type.get_int(ID_width);
   
   if(type.id()==ID_signedbv)
   {

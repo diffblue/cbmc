@@ -6,13 +6,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <assert.h>
-#include <stdlib.h>
+#include <cassert>
 
 #include <arith_tools.h>
 #include <config.h>
 #include <ieee_float.h>
 #include <std_types.h>
+#include <string2int.h>
 
 #include "../c_types.h"
 #include "parse_float.h"
@@ -64,7 +64,7 @@ exprt convert_float_literal(const std::string &src)
     if(integer_bits==irep_idt())
       fraction_bits=width/2; // default
     else
-      fraction_bits=width-atoi(integer_bits.c_str());
+      fraction_bits=width-safe_string2int(id2string(integer_bits));
 
     mp_integer factor=mp_integer(1)<<fraction_bits;
     mp_integer value=significand*factor;
