@@ -434,6 +434,9 @@ void goto_instrument_parseoptionst::instrument_goto_program(
   if(cmdline.isset("pointer-check") ||
      cmdline.isset("race-check") ||
      cmdline.isset("tso") ||
+     cmdline.isset("pso") ||
+     cmdline.isset("rso") ||
+     cmdline.isset("power") ||
      cmdline.isset("isr"))
   {
     status("Function Pointer Removal");
@@ -472,22 +475,63 @@ void goto_instrument_parseoptionst::instrument_goto_program(
         goto_functions);
     }
 
+    const unsigned unwind_loops=
+      cmdline.isset("unwind")?options.get_int_option("unwind"):0;
+
     if(cmdline.isset("tso"))
     {
       status("Adding weak memory (TSO) Instrumentation");
-      weak_memory_tso(
+      weak_memory(
+        TSO,
         value_set_analysis,
         context,
-        goto_functions);
+        goto_functions,
+        cmdline.isset("one-partition"),
+        cmdline.isset("one-event-per-cycle"),
+        cmdline.isset("my-events"),
+        unwind_loops);
+    }
+
+    if(cmdline.isset("pso"))
+    {
+      status("Adding weak memory (PSO) Instrumentation");
+      weak_memory(
+        PSO,
+        value_set_analysis,
+        context,
+        goto_functions,
+        cmdline.isset("one-partition"),
+        cmdline.isset("one-event-per-cycle"),
+        cmdline.isset("my-events"),
+        unwind_loops);
     }
 
     if(cmdline.isset("rmo"))
     {
       status("Adding weak memory (RMO) Instrumentation");
-      weak_memory_rmo(
+      weak_memory(
+        RMO,
         value_set_analysis,
         context,
-        goto_functions);
+        goto_functions,
+        cmdline.isset("one-partition"),
+        cmdline.isset("one-event-per-cycle"),
+        cmdline.isset("my-events"),
+        unwind_loops);
+    }
+
+    if(cmdline.isset("power"))
+    {
+      status("Adding weak memory (Power) Instrumentation");
+      weak_memory(
+        POWER,
+        value_set_analysis,
+        context,
+        goto_functions,
+        cmdline.isset("one-partition"),
+        cmdline.isset("one-event-per-cycle"),
+        cmdline.isset("my-events"),
+        unwind_loops);
     }
 
     // Interrupt handler
