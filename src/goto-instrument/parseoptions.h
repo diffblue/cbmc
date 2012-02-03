@@ -27,7 +27,8 @@ Author: Daniel Kroening, kroening@kroening.com
   "(div-by-zero-check)(no-div-by-zero-check)" \
   "(no-assertions)(no-assumptions)(uninitialized-check)" \
   "(nan-check)(no-nan-check)" \
-  "(race-check)(tso)(rmo)" \
+  "(race-check)(one-partition)(one-event-per-cycle)" \
+  "(tso)(pso)(rmo)(power)(my-events)(unwind):" \
   "(nondet-volatile)(isr):" \
   "(stack-depth):(nondet-static)" \
   "(signed-overflow-check)(unsigned-overflow-check)" \
