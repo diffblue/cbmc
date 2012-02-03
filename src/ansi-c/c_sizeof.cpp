@@ -6,8 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <cstdlib>
-
 #include <config.h>
 #include <arith_tools.h>
 #include <simplify_expr.h>
@@ -42,7 +40,7 @@ exprt c_sizeoft::sizeof_rec(const typet &type)
   {
     // We round up to bytes.
     // See special treatment for bit-fields below.
-    unsigned bits=atoi(type.get(ID_width).c_str());
+    unsigned bits=type.get_int(ID_width);
     unsigned bytes=bits/8;
     if((bits%8)!=0) bytes++;
     dest=from_integer(bytes, size_type());
