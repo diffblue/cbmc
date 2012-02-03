@@ -272,19 +272,24 @@ bool c_main(
       if(arguments.size()==3)
       {        
         const symbolt &envp_size_symbol=ns.lookup("c::envp_size'");
-        // assume envp_size is at most MAX-1
+
+        // assume envp_size is INTMAX-1
         mp_integer max;
         
         if(envp_size_symbol.type.id()==ID_signedbv)
-          max=power(2, atoi(envp_size_symbol.type.get(ID_width).c_str())-1)-1;
+        {
+          max=to_signedbv_type(envp_size_symbol.type).largest();
+        }
         else if(envp_size_symbol.type.id()==ID_unsignedbv)
-          max=power(2, atoi(envp_size_symbol.type.get(ID_width).c_str()))-1;
+        {
+          max=to_unsignedbv_type(envp_size_symbol.type).largest();
+        }
         else
           assert(false);
         
         exprt max_minus_one=from_integer(max-1, envp_size_symbol.type);
         
-        exprt le(ID_le, typet(ID_bool));
+        exprt le(ID_le, bool_typet());
         le.copy_to_operands(symbol_expr(envp_size_symbol), max_minus_one);
         
         codet assumption;
