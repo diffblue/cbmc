@@ -171,6 +171,7 @@ protected:
     unsigned unwind);
 
   void argument_assignments(
+    const irep_idt function_identifier,
     const code_typet &function_type,
     statet &state,
     const exprt::operandst &arguments);

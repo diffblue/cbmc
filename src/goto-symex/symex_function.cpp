@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <arith_tools.h>
 #include <base_type.h>
 #include <std_expr.h>
+#include <context.h>
 
 #include <ansi-c/c_types.h>
 
@@ -52,6 +53,7 @@ Function: goto_symext::argument_assignments
 \*******************************************************************/
 
 void goto_symext::argument_assignments(
+  const irep_idt function_identifier,
   const code_typet &function_type,
   statet &state,
   const exprt::operandst &arguments)
@@ -134,12 +136,15 @@ void goto_symext::argument_assignments(
     // These are va_arg arguments.
     for(unsigned va_count=0; it1!=arguments.end(); it1++, va_count++)
     {
-      irep_idt id="symex::va_arg"+i2string(va_count);
+      irep_idt id=id2string(function_identifier)+"$va_arg"+i2string(va_count);
       
       // add to context
       symbolt symbol;
       symbol.name=id;
       symbol.base_name="va_arg"+i2string(va_count);
+      symbol.type=it1->type();
+      
+      new_context.move(symbol);
       
       symbol_exprt lhs=symbol_exprt(id, it1->type());
 
@@ -306,7 +311,7 @@ void goto_symext::symex_function_call_code(
   locality(frame_nr, state, goto_function);
 
   // assign arguments
-  argument_assignments(goto_function.type, state, arguments);
+  argument_assignments(identifier, goto_function.type, state, arguments);
 
   frame.end_of_function=--goto_function.body.instructions.end();
   frame.return_value=call.lhs();

@@ -207,8 +207,10 @@ void basic_symext::symex_gcc_builtin_va_arg_next(
   if(id!=irep_idt())
   {
     id=state.get_original_name(id);
+
+    irep_idt function_identifier=state.top().function_identifier;
     
-    std::string base="symex::va_arg";
+    std::string base=id2string(function_identifier)+"$va_arg";
 
     if(has_prefix(id2string(id), base))
       id=base+i2string(
@@ -219,7 +221,10 @@ void basic_symext::symex_gcc_builtin_va_arg_next(
 
     const symbolt *symbol;
     if(!ns.lookup(id, symbol))
-      rhs=symbol_exprt(symbol->name, symbol->type);
+    {
+      exprt symbol_expr=symbol_exprt(symbol->name, symbol->type);
+      rhs=address_of_exprt(symbol_expr);
+    }
   }
 
   guardt guard;
