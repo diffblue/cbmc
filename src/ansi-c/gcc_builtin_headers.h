@@ -133,4 +133,12 @@
   "long double __builtin_tanhl(long double);\n" \
   "long double __builtin_parityl(long double);\n" \
   "long double __builtin_parityll(long double);\n" \
+  "void __builtin_trap(void);\n" \
+  "void __builtin___clear_cache(char *begin, char *end)\n" \
+  "int __builtin_clz(unsigned int x);\n" \
+  "int __builtin_ctz(unsigned int x);\n" \
+  "int __builtin_parity(unsigned int x);\n" \
+  "int __builtin_ffsl(unsigned long);\n" \
+  "int __builtin_clzl(unsigned long);\n" \
+  "int __builtin_ctzl(unsigned long);\n" \
   "\n\n"
