@@ -423,7 +423,14 @@ void perror(const char *s)
 #define __CPROVER_STDIO_H_INCLUDED
 #endif
 
-int fscanf(FILE *restrict stream, const char *restrict format, ...);
+int fscanf(FILE *restrict stream, const char *restrict format, ...)
+{
+  __CPOVER_hide:;
+  __builtin_va_list list;
+  __builtin_va_start(list, format);
+  vsscanf(stream, format, list);
+  __builtin_va_end(list);
+}
 
 /* FUNCTION: scanf */
 
@@ -432,7 +439,14 @@ int fscanf(FILE *restrict stream, const char *restrict format, ...);
 #define __CPROVER_STDIO_H_INCLUDED
 #endif
 
-int scanf(const char *restrict format, ...);
+int scanf(const char *restrict format, ...)
+{
+  __CPOVER_hide:;
+  __builtin_va_list list;
+  __builtin_va_start(list, format);
+  vfscanf(stdin, format, list);
+  __builtin_va_end(list);
+}
 
 /* FUNCTION: sscanf */
 
@@ -441,7 +455,14 @@ int scanf(const char *restrict format, ...);
 #define __CPROVER_STDIO_H_INCLUDED
 #endif
 
-int sscanf(const char *restrict s, const char *restrict format, ...);
+int sscanf(const char *restrict s, const char *restrict format, ...)
+{
+  __CPOVER_hide:;
+  __builtin_va_list list;
+  __builtin_va_start(list, format);
+  vsscanf(s, format, list);
+  __builtin_va_end(list);
+}
 
 /* FUNCTION: vfscanf */
 
@@ -455,7 +476,12 @@ int sscanf(const char *restrict s, const char *restrict format, ...);
 #define __CPROVER_STDARG_H_INCLUDED
 #endif
 
-int vfscanf(FILE *restrict stream, const char *restrict format, va_list arg);
+int vfscanf(FILE *restrict stream, const char *restrict format, va_list arg)
+{
+  __CPROVER_hide:;
+  *stream;
+  
+}
 
 /* FUNCTION: vscanf */
 
@@ -469,7 +495,11 @@ int vfscanf(FILE *restrict stream, const char *restrict format, va_list arg);
 #define __CPROVER_STDARG_H_INCLUDED
 #endif
 
-int vscanf(const char *restrict format, va_list arg);
+int vscanf(const char *restrict format, va_list arg)
+{
+  __CPROVER_hide:;
+  vfscanf(stdin, format, arg);
+}
 
 /* FUNCTION: vsscanf */
 
