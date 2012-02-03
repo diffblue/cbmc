@@ -208,6 +208,8 @@ void basic_symext::symex_gcc_builtin_va_arg_next(
   {
     id=state.get_original_name(id);
 
+    // TODO: this doesn't work if a va_list is passed
+    // as argument to some other function
     irep_idt function_identifier=state.top().function_identifier;
     
     std::string base=id2string(function_identifier)+"$va_arg";
