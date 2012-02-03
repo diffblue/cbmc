@@ -416,3 +416,71 @@ void perror(const char *s)
   // TODO: print errno error
 }
 
+/* FUNCTION: fscanf */
+
+#ifndef __CPROVER_STDIO_H_INCLUDED
+#include <stdio.h>
+#define __CPROVER_STDIO_H_INCLUDED
+#endif
+
+int fscanf(FILE *restrict stream, const char *restrict format, ...);
+
+/* FUNCTION: scanf */
+
+#ifndef __CPROVER_STDIO_H_INCLUDED
+#include <stdio.h>
+#define __CPROVER_STDIO_H_INCLUDED
+#endif
+
+int scanf(const char *restrict format, ...);
+
+/* FUNCTION: sscanf */
+
+#ifndef __CPROVER_STDIO_H_INCLUDED
+#include <stdio.h>
+#define __CPROVER_STDIO_H_INCLUDED
+#endif
+
+int sscanf(const char *restrict s, const char *restrict format, ...);
+
+/* FUNCTION: vfscanf */
+
+#ifndef __CPROVER_STDIO_H_INCLUDED
+#include <stdio.h>
+#define __CPROVER_STDIO_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_STDARG_H_INCLUDED
+#include <stdarg.h>
+#define __CPROVER_STDARG_H_INCLUDED
+#endif
+
+int vfscanf(FILE *restrict stream, const char *restrict format, va_list arg);
+
+/* FUNCTION: vscanf */
+
+#ifndef __CPROVER_STDIO_H_INCLUDED
+#include <stdio.h>
+#define __CPROVER_STDIO_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_STDARG_H_INCLUDED
+#include <stdarg.h>
+#define __CPROVER_STDARG_H_INCLUDED
+#endif
+
+int vscanf(const char *restrict format, va_list arg);
+
+/* FUNCTION: vsscanf */
+
+#ifndef __CPROVER_STDIO_H_INCLUDED
+#include <stdio.h>
+#define __CPROVER_STDIO_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_STDARG_H_INCLUDED
+#include <stdarg.h>
+#define __CPROVER_STDARG_H_INCLUDED
+#endif
+
+int vsscanf(const char *restrict s, const char *restrict format, va_list arg);
