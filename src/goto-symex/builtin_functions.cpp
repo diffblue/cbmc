@@ -208,24 +208,26 @@ void basic_symext::symex_gcc_builtin_va_arg_next(
   {
     id=state.get_original_name(id);
 
-    // TODO: this doesn't work if a va_list is passed
-    // as argument to some other function
-    irep_idt function_identifier=state.top().function_identifier;
-    
-    std::string base=id2string(function_identifier)+"$va_arg";
-
-    if(has_prefix(id2string(id), base))
-      id=base+i2string(
-        safe_string2unsigned(
-          std::string(id2string(id), base.size(), std::string::npos))+1);
-    else
-      id=base+"0";
-
-    const symbolt *symbol;
-    if(!ns.lookup(id, symbol))
+    // strip last name off id to get function name
+    std::size_t pos=id2string(id).rfind("::");
+    if(pos!=std::string::npos)
     {
-      exprt symbol_expr=symbol_exprt(symbol->name, symbol->type);
-      rhs=address_of_exprt(symbol_expr);
+      irep_idt function_identifier=std::string(id2string(id), 0, pos);
+      std::string base=id2string(function_identifier)+"::va_arg";
+
+      if(has_prefix(id2string(id), base))
+        id=base+i2string(
+          safe_string2unsigned(
+            std::string(id2string(id), base.size(), std::string::npos))+1);
+      else
+        id=base+"0";
+
+      const symbolt *symbol;
+      if(!ns.lookup(id, symbol))
+      {
+        exprt symbol_expr=symbol_exprt(symbol->name, symbol->type);
+        rhs=address_of_exprt(symbol_expr);
+      }
     }
   }
 

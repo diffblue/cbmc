@@ -136,7 +136,7 @@ void goto_symext::argument_assignments(
     // These are va_arg arguments.
     for(unsigned va_count=0; it1!=arguments.end(); it1++, va_count++)
     {
-      irep_idt id=id2string(function_identifier)+"$va_arg"+i2string(va_count);
+      irep_idt id=id2string(function_identifier)+"::va_arg"+i2string(va_count);
       
       // add to context
       symbolt symbol;
