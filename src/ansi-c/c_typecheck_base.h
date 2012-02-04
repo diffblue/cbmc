@@ -259,6 +259,11 @@ protected:
   void typecheck_function_body(symbolt &symbol);
 
   virtual void do_initializer(symbolt &symbol);
+  
+  irep_idt add_language_prefix(const irep_idt id)
+  {
+    return "c::"+id2string(id);
+  }
 };
 
 #endif
