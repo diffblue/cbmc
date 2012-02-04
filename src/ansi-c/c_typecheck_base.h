@@ -31,7 +31,8 @@ public:
     namespacet(_context),
     context(_context),
     module(_module),
-    mode("C")
+    mode("C"),
+    language_prefix("c::")
   {
   }
 
@@ -44,7 +45,8 @@ public:
     namespacet(_context1, _context2),
     context(_context1),
     module(_module),
-    mode("C")
+    mode("C"),
+    language_prefix("c::")
   {
   }
 
@@ -57,6 +59,7 @@ protected:
   contextt &context;
   const irep_idt module;
   const irep_idt mode;
+  const std::string language_prefix;
   unsigned tmp_counter;
 
   typedef hash_map_cont<irep_idt, irep_idt, irep_id_hash> id_replace_mapt;
@@ -260,9 +263,9 @@ protected:
 
   virtual void do_initializer(symbolt &symbol);
   
-  irep_idt add_language_prefix(const irep_idt id)
+  inline irep_idt add_language_prefix(const irep_idt id) const
   {
-    return "c::"+id2string(id);
+    return language_prefix+id2string(id);
   }
 };
 
