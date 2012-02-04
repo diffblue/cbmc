@@ -281,8 +281,7 @@ void cpp_convert_typet::read_function_type(const typet &type)
         typet final_type=declarator.merge_type(declaration.type());
 
         // see if it's an array type
-        if(final_type.id()==ID_array ||
-           final_type.id()==ID_incomplete_array)
+        if(final_type.id()==ID_array)
         {
           final_type.id(ID_pointer);
           final_type.remove(ID_size);

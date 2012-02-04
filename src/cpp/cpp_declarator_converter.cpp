@@ -310,7 +310,8 @@ void cpp_declarator_convertert::combine_types(
   }
   else if(symbol.type==decl_type)
     return; // ok
-  else if(symbol.type.id()==ID_incomplete_array &&
+  else if(symbol.type.id()==ID_array &&
+          symbol.type.find(ID_size).is_nil() &&
           decl_type.id()==ID_array &&
           symbol.type.subtype()==decl_type.subtype())
   {

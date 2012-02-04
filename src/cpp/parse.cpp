@@ -2971,7 +2971,8 @@ bool Parser::rInitializeExpr(exprt &expr)
   exprt e;
 
   expr.id(ID_initializer_list);
-  expr.type().id(ID_incomplete_array);
+  expr.type().id(ID_array);
+  expr.type().set(ID_size, ID_nil);
   set_location(expr, tk);
 
   int t=lex->LookAhead(0);
