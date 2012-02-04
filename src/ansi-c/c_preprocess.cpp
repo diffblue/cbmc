@@ -891,8 +891,6 @@ bool c_preprocess_arm(
   command+=" > \""+tmpi+"\"";
   command+=" 2> \""+stderr_file+"\"";
 
-  //std::cout << "C: "<< command << std::endl;
-
   // _popen isn't very reliable on WIN32
   // that's why we use system() and a temporary file
   result=system(command.c_str());
