@@ -616,23 +616,6 @@ void c_typecheck_baset::typecheck_function_body(symbolt &symbol)
 {
   code_typet &code_type=to_code_type(symbol.type);
   
-  // adjust the function identifiers
-  for(code_typet::argumentst::iterator
-      a_it=code_type.arguments().begin();
-      a_it!=code_type.arguments().end();
-      a_it++)
-  {
-    irep_idt identifier=a_it->get_identifier();
-    if(identifier!=irep_idt())
-    {
-      id_replace_mapt::const_iterator
-        m_it=id_replace_map.find(identifier);
-
-      if(m_it!=id_replace_map.end())
-        a_it->set_identifier(m_it->second);      
-    }
-  }
-    
   assert(symbol.value.is_not_nil());
 
   // fix type
@@ -640,9 +623,11 @@ void c_typecheck_baset::typecheck_function_body(symbolt &symbol)
     
   // set return type
   return_type=code_type.return_type();
-  
+
+  // typecheck the body code  
   typecheck_code(to_code(symbol.value));
-  
+
+  // special case for main()  
   if(symbol.name=="c::main")
     add_argc_argv(symbol);
 }

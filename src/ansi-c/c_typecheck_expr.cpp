@@ -475,6 +475,12 @@ Function: c_typecheck_baset::typecheck_expr_symbol
 
 void c_typecheck_baset::typecheck_expr_symbol(exprt &expr)
 {
+  // first add prefix
+  {
+    symbol_exprt &symbol_expr=to_symbol_expr(expr);
+    symbol_expr.set_identifier(add_language_prefix(symbol_expr.get_identifier()));
+  }
+
   // adjust identifier, if needed
   replace_symbol(expr);
   
@@ -1717,9 +1723,8 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
 
   if(f_op.id()==ID_symbol)
   {
-    replace_symbol(f_op);
-
-    const irep_idt &identifier=f_op.get(ID_identifier);
+    const irep_idt &identifier=
+      add_language_prefix(to_symbol_expr(f_op).get_identifier());
 
     if(context.symbols.find(identifier)==context.symbols.end())
     {

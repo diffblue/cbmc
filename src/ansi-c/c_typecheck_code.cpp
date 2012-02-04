@@ -330,9 +330,10 @@ void c_typecheck_baset::typecheck_decl_type(codet &code)
   
   typet &type=static_cast<typet &>(code.add(ID_type_arg));
 
-  // replace if needed
-  replace_symbol(type);
-  
+  // typecheck
+  typecheck_type(type);
+
+  // clean
   clean_type(irep_idt(), type, clean_code);
   
   if(!clean_code.empty())
@@ -358,8 +359,35 @@ Function: c_typecheck_baset::typecheck_decl
 
 void c_typecheck_baset::typecheck_decl(codet &code)
 {
+  std::list<codet> clean_code;
+  typecheck_decl(code, clean_code);
+
+  if(!clean_code.empty())
+  {
+    // build a decl-block
+    codet decl_block(ID_decl_block);
+    decl_block.copy_to_operands(code_blockt(clean_code), code);
+    code.swap(decl_block);    
+  }
+}
+
+/*******************************************************************\
+
+Function: c_typecheck_baset::typecheck_decl
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void c_typecheck_baset::typecheck_decl(
+  codet &code,
+  std::list<codet> &clean_code)
+{
   // this may have 1 or 2 operands
-  
   if(code.operands().size()!=1 &&
      code.operands().size()!=2)
   {
@@ -374,40 +402,32 @@ void c_typecheck_baset::typecheck_decl(codet &code)
     throw "decl expected to have symbol as first operand";
   }
 
+  // add prefix
+  {
+    symbol_exprt &symbol_expr=to_symbol_expr(code.op0());
+    symbol_expr.set_identifier(add_language_prefix(symbol_expr.get_identifier()));
+  }
+
   // replace if needed
   replace_symbol(code.op0());
 
   // look it up
-  const irep_idt &identifier=code.op0().get(ID_identifier);
+  const irep_idt &identifier=to_symbol_expr(code.op0()).get_identifier();
 
   contextt::symbolst::iterator s_it=context.symbols.find(identifier);
 
   if(s_it==context.symbols.end())
   {
     err_location(code);
-    throw "failed to find decl symbol in context";
+    str << "failed to find decl symbol `" << identifier << "' in context";
+    throw 0;
   }
 
   symbolt &symbol=s_it->second;
   
   // There may be side-effects in the type.  
-  {
-    std::list<codet> clean_code;
-    clean_type(symbol.name, symbol.type, clean_code);
-    code.type()=symbol.type;
-  
-    if(!clean_code.empty())
-    {
-      // do again
-      typecheck_decl(code);
-
-      // build a decl-block
-      codet decl_block(ID_decl_block);
-      decl_block.copy_to_operands(code_blockt(clean_code), code);
-      code.swap(decl_block);
-      return;
-    }
-  }
+  clean_type(symbol.name, symbol.type, clean_code);
+  code.type()=symbol.type;
   
   // see if it's a typedef
   // or a function

@@ -66,9 +66,6 @@ void ansi_c_convertt::convert_declaration(ansi_c_declarationt &declaration)
   if(declaration.get_is_typedef())
     declaration.set_is_macro(true);
 
-  // add language prefix
-  declaration.set_name(language_prefix+id2string(declaration.get_name()));
-
   if(declaration.value().is_not_nil())
   {
     if(declaration.type().id()==ID_code)
@@ -110,7 +107,6 @@ void ansi_c_convertt::convert_expr(exprt &expr)
 
   if(expr.id()==ID_symbol)
   {
-    expr.set(ID_identifier, final_id(expr.get(ID_identifier)));
     expr.remove(ID_C_id_class);
     expr.remove(ID_C_base_name);
   }
@@ -374,8 +370,6 @@ void ansi_c_convertt::convert_type(
   }
   else if(type.id()==ID_symbol)
   {
-    irep_idt identifier=final_id(type.get(ID_identifier));
-    type.set(ID_identifier, identifier);
     type.remove(ID_C_id_class);
     type.remove(ID_C_base_name);
   }
@@ -422,9 +416,7 @@ void ansi_c_convertt::convert_type(
         argument.type().swap(declaration.type());
         argument.set_base_name(base_name);
         argument.location()=declaration.location();
-
-        argument.set_identifier(
-          language_prefix+id2string(declaration.get_name()));
+        argument.set_identifier(declaration.get_name());
 
         it->swap(argument);
       }

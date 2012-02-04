@@ -44,7 +44,7 @@ void ansi_c_declarationt::to_symbol(symbolt &symbol) const
   symbol.location=location();
   symbol.value=value();
   symbol.type=type();
-  symbol.name=get_name();
+  symbol.name="c::"+id2string(get_name());
   symbol.base_name=get_base_name();
   symbol.is_type=get_is_type();
   symbol.is_extern=get_is_extern();
