@@ -212,7 +212,7 @@ bool cpp_languaget::final(
   message_handlert &message_handler)
 {
   if(cpp_final(context, message_handler)) return true;
-  if(c_main(context, "c::", "c::main", message_handler)) return true;
+  if(c_main(context, "c::main", message_handler)) return true;
 
   return false;
 }
