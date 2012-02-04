@@ -129,7 +129,7 @@ void c_typecheck_baset::typecheck_symbol(symbolt &symbol)
   {    
     // we rename them to make collisions unproblematic
     std::string typestr = type2name(symbol.type);
-    new_name = prefix+"tag-#anon#" + typestr;
+    new_name=prefix+"tag-#anon#"+typestr;
     
     id_replace_map[symbol.name]=new_name;    
 
