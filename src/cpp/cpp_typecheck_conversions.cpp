@@ -55,7 +55,6 @@ bool cpp_typecheckt::standard_conversion_lvalue_to_rvalue(
   assert(expr.get_bool(ID_C_lvalue));
 
   if(expr.type().id()==ID_code ||
-     expr.type().id()==ID_incomplete_array || 
      expr.type().id()==ID_incomplete_struct ||
      expr.type().id()==ID_incomplete_union)
     return false;
@@ -87,8 +86,7 @@ bool cpp_typecheckt::standard_conversion_array_to_pointer(
   const exprt &expr,
   exprt &new_expr) const
 {
-  assert(expr.type().id()==ID_array ||
-         expr.type().id()==ID_incomplete_array);
+  assert(expr.type().id()==ID_array);
 
   exprt index(ID_index, expr.type().subtype());
   index.copy_to_operands(expr, from_integer(0, int_type()));
@@ -876,8 +874,7 @@ bool cpp_typecheckt::standard_conversion_sequence(
 
   exprt curr_expr=expr;
   
-  if(curr_expr.type().id()==ID_array ||
-     curr_expr.type().id()==ID_incomplete_array)
+  if(curr_expr.type().id()==ID_array)
   {
     if(type.id()==ID_pointer)
     {
@@ -1959,8 +1956,7 @@ bool cpp_typecheckt::const_typecast(
 
   exprt curr_expr = expr;
 
-  if(curr_expr.type().id()==ID_array ||
-     curr_expr.type().id()==ID_incomplete_array)
+  if(curr_expr.type().id()==ID_array)
   {
     if(type.id()==ID_pointer)
     {
@@ -2118,8 +2114,7 @@ bool cpp_typecheckt::reinterpret_typecast(
         return false;
     }
 
-    if(e.type().id()==ID_array ||
-       e.type().id()==ID_incomplete_array)
+    if(e.type().id()==ID_array)
     {
       if(standard_conversion_array_to_pointer(e,tmp))
         e.swap(tmp);

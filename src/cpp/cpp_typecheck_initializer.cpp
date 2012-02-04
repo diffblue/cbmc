@@ -146,7 +146,7 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
     {
       do_initializer(symbol.value, symbol.type, true);
       
-      if(symbol.type.id()==ID_incomplete_array)
+      if(symbol.type.find(ID_size).is_nil())
         symbol.type=symbol.value.type();
     }
     else
@@ -259,11 +259,6 @@ void cpp_typecheckt::zero_initializer(
         zero_initializer(index, array_type.subtype(), location, ops);
       }
     }
-  }
-  else if(final_type.id()==ID_incomplete_array)
-  {
-    // don't touch for now
-    // (the linker will look at these again)
   }
   else if(final_type.id()==ID_union)
   {
