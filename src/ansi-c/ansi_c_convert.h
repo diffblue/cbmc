@@ -33,9 +33,7 @@ public:
   ansi_c_convertt(    
     const std::string &_module,
     message_handlert &_message_handler):
-    message_streamt(_message_handler),
-    language_prefix("c::"),
-    module(_module)
+    message_streamt(_message_handler)
   {
   }
 
@@ -55,14 +53,6 @@ protected:
   virtual void convert_code(codet &code);
   
   virtual void convert_declaration(ansi_c_declarationt &declaration);
-  
-  std::string language_prefix;
-  const std::string &module;
-
-  irep_idt final_id(const irep_idt &id) const
-  {
-    return language_prefix+id2string(id);
-  }
 };
 
 #endif

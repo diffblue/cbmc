@@ -165,6 +165,7 @@ protected:
   virtual void typecheck_break(codet &code);
   virtual void typecheck_continue(codet &code);
   virtual void typecheck_decl(codet &code);
+  virtual void typecheck_decl(codet &code, std::list<codet> &clean_code);
   virtual void typecheck_decl_type(codet &code);
   virtual void typecheck_decl_block(codet &code);
   virtual void typecheck_expression(codet &code);

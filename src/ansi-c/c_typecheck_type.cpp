@@ -34,6 +34,8 @@ Function: c_typecheck_baset::typecheck_type
 
 void c_typecheck_baset::typecheck_type(typet &type)
 {
+  // we first convert, and then check
+  
   // do we have alignment?
   if(type.find(ID_C_alignment).is_not_nil())
   {
@@ -88,12 +90,6 @@ void c_typecheck_baset::typecheck_code_type(code_typet &type)
   {
     type.make_ellipsis();
   }
-  else if(arguments.size()==1 &&
-          follow(arguments[0].type()).id()==ID_empty)
-  {
-    // if we just have one argument of type void, remove it
-    arguments.clear();
-  }
   else
   {
     for(unsigned i=0; i<type.arguments().size(); i++)
@@ -105,6 +101,30 @@ void c_typecheck_baset::typecheck_code_type(code_typet &type)
 
       typecheck_type(type);
       adjust_function_argument(type);
+      
+      // adjust the identifier
+
+      irep_idt identifier=argument.get_identifier();
+
+      if(identifier!=irep_idt())
+      {
+        identifier=add_language_prefix(identifier);
+    
+        id_replace_mapt::const_iterator
+          m_it=id_replace_map.find(identifier);
+
+        if(m_it!=id_replace_map.end())
+          identifier=m_it->second;
+
+        argument.set_identifier(identifier);
+      }
+    }
+  
+    if(arguments.size()==1 &&
+       follow(arguments[0].type()).id()==ID_empty)
+    {
+      // if we just have one argument of type void, remove it
+      arguments.clear();
     }
   }
 
@@ -513,12 +533,20 @@ Function: c_typecheck_baset::typecheck_symbol_type
 
 void c_typecheck_baset::typecheck_symbol_type(typet &type)
 {
+  {
+    // add prefix
+    symbol_typet &symbol_type=to_symbol_type(type);
+    symbol_type.set_identifier(add_language_prefix(symbol_type.get_identifier()));
+  }
+
   // adjust identifier, if needed
   replace_symbol(type);
 
-  const irep_idt &identifier=type.get(ID_identifier);
+  const irep_idt &identifier=
+    to_symbol_type(type).get_identifier();
 
-  contextt::symbolst::const_iterator s_it=context.symbols.find(identifier);
+  contextt::symbolst::const_iterator s_it=
+    context.symbols.find(identifier);
 
   if(s_it==context.symbols.end())
   {
@@ -537,13 +565,14 @@ void c_typecheck_baset::typecheck_symbol_type(typet &type)
   
   if(symbol.is_macro)
   {
+    // overwrite, but preserve any qualifiers
     c_qualifierst c_qualifiers;
     c_qualifiers.read(type);
-    type=symbol.type; // overwrite
+    type=symbol.type;
     c_qualifiers.write(type);
   }
     
-  // an extension
+  // CPROVER extensions
   if(symbol.base_name=="__CPROVER_rational")
   {
     type=rational_typet();
@@ -622,8 +651,8 @@ void c_typecheck_baset::clean_type(
   
     clean_type(base_symbol_identifier, array_type.subtype(), code);
 
-    // the size need not be a constant!
-    // this was simplified already by typecheck_array_type
+    // The size need not be a constant!
+    // This was simplified already by typecheck_array_type.
     
     exprt &size=array_type.size();
     
