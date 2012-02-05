@@ -13,8 +13,8 @@
   "double __builtin_fabsf(double);\n" \
   "int __builtin_memcmp(const void *s1, const void *s2, unsigned n);\n" \
   "void *__builtin_memcpy(void *dest, const void *src, unsigned n);\n" \
-  "void *__builtin___memcpy_chk(void *dest, const void *src, unsigned n, unsigned size);\n" \
-  "char *__builtin___memmove_chk(void *dest, const void *src, unsigned n, unsigned size);\n" \
+  "void *__builtin___memcpy_chk(void *dest, const void *src, unsigned n, __CPROVER_size_t size);\n" \
+  "char *__builtin___memmove_chk(void *dest, const void *src, unsigned n, __CPROVER_size_t size);\n" \
   "double __builtin_sin(double);\n" \
   "float __builtin_sinf(float);\n" \
   "double __builtin_sqrt(double);\n" \
@@ -29,19 +29,20 @@
   "int __builtin_fscanf(void *stream, const char *fmt, ...);\n" \
   "int __builtin_scanf(const char *str, const char *fmt, ...);\n" \
   "int __builtin_fputs(const char *s, void *stream);\n" \
-  "int __builtin_vsnprintf(char * restrict str, unsigned size, const char * restrict format, __builtin_va_list ap);\n" \
+  "int __builtin_vsnprintf(char * restrict str, __CPROVER_size_t size, const char * restrict format, __builtin_va_list ap);\n" \
   "long __builtin_expect(long, long);\n" \
   "void *__builtin_memset(void *s, int c, unsigned n);\n" \
-  "void *__builtin___memset_chk(void *s, int c, unsigned n, unsigned size);\n" \
+  "void *__builtin___memset_chk(void *s, int c, unsigned n, __CPROVER_size_t size);\n" \
   "void *__builtin_memchr(const void *s, int c, __CPROVER_size_t n);\n" \
+  "void *__builtin_memmove(void *s1, const void *s2, __CPROVER_size_t n);\n" \
   "char *__builtin_strcat(char *dest, const char *src);\n" \
-  "char *__builtin___strcat_chk(char *dest, const char *src, unsigned size);\n" \
+  "char *__builtin___strcat_chk(char *dest, const char *src, __CPROVER_size_t size);\n" \
   "char *__builtin_strcpy(char *dest, const char *src);\n" \
-  "char *__builtin___strcpy_chk(char *dest, const char *src, unsigned size);\n" \
+  "char *__builtin___strcpy_chk(char *dest, const char *src, __CPROVER_size_t size);\n" \
   "char *__builtin_strncpy(char *dest, const char *src, unsigned n);\n" \
-  "char *__builtin___strncpy_chk(char *dest, const char *src, unsigned n, unsigned size);\n" \
+  "char *__builtin___strncpy_chk(char *dest, const char *src, unsigned n, __CPROVER_size_t size);\n" \
   "char *__builtin___stpcpy(char *s1, const char *s2);\n" \
-  "char *__builtin___stpncpy_chk(char *s1, const char *s2, unsigned n, unsigned size);\n" \
+  "char *__builtin___stpncpy_chk(char *s1, const char *s2, unsigned n, __CPROVER_size_t size);\n" \
   "void __builtin_exit(int status);\n" \
   "char *__builtin_strchr(const char *s, int c);\n" \
   "unsigned __builtin_strspn(const char *s, const char *accept);\n" \
@@ -50,8 +51,8 @@
   "char *__builtin_strpbrk(const char *s, const char *accept);\n" \
   "char *__builtin_strrchr(const char *s, int c);\n" \
   "char *__builtin_strncat(char *dest, const char *src, unsigned n);\n" \
-  "char *__builtin___strncat_chk(char *dest, const char *src, unsigned n, unsigned size);\n" \
-  "char *__builtin___stpcpy_chk(char *dest, const char *src, unsigned size);\n" \
+  "char *__builtin___strncat_chk(char *dest, const char *src, unsigned n, __CPROVER_size_t size);\n" \
+  "char *__builtin___stpcpy_chk(char *dest, const char *src, __CPROVER_size_t size);\n" \
   "void *__builtin_alloca(unsigned s);\n" \
   "int __builtin_ffs(int i);\n" \
   "char *__builtin_index(const char *s, int c);\n" \
