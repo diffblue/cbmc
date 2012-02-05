@@ -630,18 +630,18 @@ void cpp_typecheckt::typecheck_compound_declarator(
     static_symbol.base_name=component.get(ID_base_name);
     static_symbol.lvalue=true;
     static_symbol.static_lifetime=true;
-    static_symbol.location = cpp_name.location();
-    static_symbol.is_extern = true;
-
+    static_symbol.location=cpp_name.location();
+    static_symbol.is_extern=true;
+    
     dinis.push_back(static_symbol.name);
 
-    symbolt * new_symbol;
+    symbolt *new_symbol;
     if(context.move(static_symbol, new_symbol))
     {
       err_location(cpp_name.location());
 	str << "redeclaration of symbol `" 
 	    << static_symbol.base_name.as_string()
-	    <<"'";
+	    << "'";
       throw 0;
     }
 
@@ -651,6 +651,9 @@ void cpp_typecheckt::typecheck_compound_declarator(
       {
         new_symbol->value.swap(value);
         c_typecheck_baset::do_initializer(*new_symbol);
+
+        // these are macros if they are PODs and come with a value
+        new_symbol->is_macro=true;
       }
       else
       {
@@ -660,7 +663,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
         exprt::operandst ops;
         ops.push_back(value);
         codet defcode =
-        cpp_constructor(locationt(), symexpr, ops);
+          cpp_constructor(locationt(), symexpr, ops);
 
         new_symbol->value.swap(defcode);
       }
