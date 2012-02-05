@@ -667,7 +667,8 @@ void cpp_typecheckt::typecheck_compound_declarator(
     }
   }
 
-  check_array_types(component.type());
+  // array members must have fixed size
+  check_fixed_size_array(component.type());
 
   put_compound_into_scope(component);
 
@@ -676,23 +677,24 @@ void cpp_typecheckt::typecheck_compound_declarator(
 
 /*******************************************************************\
 
-Function: cpp_typecheckt::check_array_types
+Function: cpp_typecheckt::check_fixed_size_array
 
 Inputs:
 
 Outputs:
 
-Purpose:
+Purpose: check that an array has fixed size
 
 \*******************************************************************/
 
-void cpp_typecheckt::check_array_types(typet &type)
+void cpp_typecheckt::check_fixed_size_array(typet &type)
 {
   if(type.id()==ID_array)
   {
     array_typet &array_type=to_array_type(type);
     make_constant_index(array_type.size());
-    check_array_types(array_type.subtype());
+    // recursive call for multi-dimensional arrays
+    check_fixed_size_array(array_type.subtype());
   }
 }
 

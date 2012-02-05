@@ -346,7 +346,7 @@ protected:
     template_typet &type);
 
   void typecheck_compound_type(struct_union_typet &type);
-  void check_array_types(typet &type);
+  void check_fixed_size_array(typet &type);
   void typecheck_enum_type(typet &type);
 
   // determine the scope into which a tag goes
