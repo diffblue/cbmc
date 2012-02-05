@@ -142,4 +142,6 @@
   "int __builtin_ffsl(unsigned long);\n" \
   "int __builtin_clzl(unsigned long);\n" \
   "int __builtin_ctzl(unsigned long);\n" \
+  "long int __builtin_bswap32(long int x);\n" \
+  "long long int __builtin_bswap64(long long int x);\n" \
   "\n\n"
