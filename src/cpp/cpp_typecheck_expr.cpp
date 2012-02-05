@@ -1231,6 +1231,11 @@ void cpp_typecheckt::typecheck_expr_member(
   }
   #endif
   #endif
+  
+  // The notation for explicit calls to destructors can be used regardless
+  // of whether the type defines a destructor.  This allows you to make such
+  // explicit calls without knowing if a destructor is defined for the type. 
+  // An explicit call to a destructor where none is defined has no effect.
 
   if(op0.type().id()!=ID_symbol)
   {
