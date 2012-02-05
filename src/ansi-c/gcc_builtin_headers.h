@@ -33,6 +33,7 @@
   "long __builtin_expect(long, long);\n" \
   "void *__builtin_memset(void *s, int c, unsigned n);\n" \
   "void *__builtin___memset_chk(void *s, int c, unsigned n, unsigned size);\n" \
+  "void *__builtin_memchr(const void *s, int c, __CPROVER_size_t n);\n" \
   "char *__builtin_strcat(char *dest, const char *src);\n" \
   "char *__builtin___strcat_chk(char *dest, const char *src, unsigned size);\n" \
   "char *__builtin_strcpy(char *dest, const char *src);\n" \
