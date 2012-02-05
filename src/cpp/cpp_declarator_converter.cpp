@@ -75,6 +75,7 @@ symbolt &cpp_declarator_convertert::convert(
   
   cpp_template_args_non_tct template_args;
 
+  // run resolver on scope
   {
     cpp_save_scopet save_scope(cpp_typecheck.cpp_scopes);
 
@@ -85,12 +86,15 @@ symbolt &cpp_declarator_convertert::convert(
 
     scope=&cpp_typecheck.cpp_scopes.current_scope();
   }
-
+  
+  // check the type
   cpp_typecheck.typecheck_type(final_type);
+
   is_code=is_code_type(final_type);
 
+  // global-scope arrays must have fixed size
   if(scope->is_global_scope())
-    cpp_typecheck.check_array_types(final_type);
+    cpp_typecheck.check_fixed_size_array(final_type);
 
   get_final_identifier();
 
@@ -125,7 +129,7 @@ symbolt &cpp_declarator_convertert::convert(
       get_final_identifier();
 
       // try again
-      c_it = cpp_typecheck.context.symbols.find(final_identifier);
+      c_it=cpp_typecheck.context.symbols.find(final_identifier);
 
       if(c_it==cpp_typecheck.context.symbols.end())
       {
@@ -211,7 +215,7 @@ symbolt &cpp_declarator_convertert::convert(
       return convert_new_symbol(storage_spec, member_spec, declarator);
 
     symbolt &symbol=c_it->second;
-
+    
     if(!storage_spec.is_extern())
       symbol.is_extern = false;
 
@@ -384,7 +388,7 @@ void cpp_declarator_convertert::handle_initializer(
     // the symbol is really located here
     symbol.is_extern=false;
   }
-
+  
   if(symbol.value.is_nil())
   {
     // no initial value yet
