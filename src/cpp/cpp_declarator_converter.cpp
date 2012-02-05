@@ -348,22 +348,6 @@ Function: cpp_declarator_convertert::enforce_rules
 
 void cpp_declarator_convertert::enforce_rules(const symbolt &symbol)
 {
-  // constant?
-  if(symbol.type.get_bool(ID_C_constant))
-  {
-    // must have initializer
-    if(symbol.value.is_nil() &&
-       symbol.name!="c::__CPROVER::constant_infinity_uint" &&
-       !symbol.is_type)
-    {
-      cpp_typecheck.err_location(symbol.location);
-      cpp_typecheck.str << "constant symbol `"
-                        << symbol.base_name
-                        << "' without initializer";
-      throw 0;
-    }
-  }
-
   // enforce rules for operator overloading
   operator_overloading_rules(symbol);
 
@@ -503,7 +487,8 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
   symbol.mode=cpp_typecheck.current_mode;
   
   // Constant? These are propagated.
-  if(symbol.type.get_bool(ID_C_constant))
+  if(symbol.type.get_bool(ID_C_constant) &&
+     symbol.value.is_not_nil())
     symbol.is_macro=true;
   
   if(member_spec.is_inline())
