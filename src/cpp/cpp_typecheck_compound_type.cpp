@@ -695,7 +695,10 @@ void cpp_typecheckt::check_fixed_size_array(typet &type)
   if(type.id()==ID_array)
   {
     array_typet &array_type=to_array_type(type);
-    make_constant_index(array_type.size());
+    
+    if(array_type.size().is_not_nil())
+      make_constant_index(array_type.size());
+
     // recursive call for multi-dimensional arrays
     check_fixed_size_array(array_type.subtype());
   }
