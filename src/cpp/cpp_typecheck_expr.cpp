@@ -1220,6 +1220,7 @@ void cpp_typecheckt::typecheck_expr_member(
   add_implicit_dereference(op0);
 
   #ifdef CPP_SYSTEMC_EXTENSION
+  #if 0
   if(expr.op0().type().id()==ID_signedbv ||
      expr.op0().type().id()==ID_unsignedbv ||
      expr.op0().type().id()==ID_verilogbv)
@@ -1228,6 +1229,7 @@ void cpp_typecheckt::typecheck_expr_member(
     typecheck_expr_sc_member(expr, fargs);
     return;
   }
+  #endif
   #endif
 
   if(op0.type().id()!=ID_symbol)
