@@ -353,7 +353,8 @@ void cpp_declarator_convertert::enforce_rules(const symbolt &symbol)
   {
     // must have initializer
     if(symbol.value.is_nil() &&
-       symbol.name!="c::__CPROVER::constant_infinity_uint")
+       symbol.name!="c::__CPROVER::constant_infinity_uint" &&
+       !symbol.is_type)
     {
       cpp_typecheck.err_location(symbol.location);
       cpp_typecheck.str << "constant symbol `"
