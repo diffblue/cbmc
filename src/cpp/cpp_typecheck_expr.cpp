@@ -1768,8 +1768,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
 
     return;
   }
-
-  if(expr.function().id()=="cast_expression")
+  else if(expr.function().id()=="cast_expression")
   {
     // These are not really function calls,
     // but usually just type adjustments.
@@ -1777,6 +1776,15 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
     add_implicit_dereference(expr);
     return;
   }
+  else if(expr.function().id()=="cpp_dummy_destructor")
+  {
+    // these don't do anything, e.g., (char*)->~char()
+    expr.set(ID_statement, ID_skip);
+    expr.type()=empty_typet();
+    return;
+  }
+
+  // look at type of function
 
   follow_symbol(expr.function().type());
   
@@ -1914,9 +1922,9 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
   else
   {
     err_location(expr.function());
-    str << "function call expects function/function "
-    << "pointer as argument, but got `"
-    << to_string(expr.op0().type()) << "'";
+    str << "function call expects function or function "
+        << "pointer as argument, but got `"
+        << to_string(expr.op0().type()) << "'";
     throw 0;
   }
 
