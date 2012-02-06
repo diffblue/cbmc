@@ -238,11 +238,6 @@ void cpp_typecheckt::typecheck_type(typet &type)
     typecheck_expr(e);
     type=e.type();
   }
-  #ifdef CPP_SYSTEMC_EXTENSION
-  else if(type.id()==ID_verilogbv)
-  {
-  }
-  #endif
   else if(type.id()==ID_unassigned)
   {
     // ignore, for template argument guessing
