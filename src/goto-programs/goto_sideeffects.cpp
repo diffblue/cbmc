@@ -725,6 +725,10 @@ void goto_convertt::remove_side_effect(
   {
     // these are fine
   }
+  else if(statement==ID_skip)
+  {
+    expr.make_nil();
+  }
   else if(statement==ID_throw)
   {
     goto_programt::targett t=dest.add_instruction(THROW);
