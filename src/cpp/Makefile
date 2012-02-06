@@ -29,8 +29,6 @@ CLEANFILES = cpp$(LIBEXT) lex.yy.cpp y.tab.cpp.output
 
 all: cpp$(LIBEXT)
 
-CP_CXXFLAGS += -D CPP_SYSTEMC_EXTENSION
-
 ###############################################################################
 
 cpp$(LIBEXT): $(OBJ)
