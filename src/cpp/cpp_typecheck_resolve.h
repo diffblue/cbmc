@@ -128,24 +128,6 @@ protected:
   void filter_for_named_scopes(cpp_scopest::id_sett &id_set);
   void filter_for_namespaces(cpp_scopest::id_sett &id_set);
 
-  #ifdef CPP_SYSTEMC_EXTENSION
-  exprt do_builtin_sc_uint_extension(
-    const cpp_namet &cpp_name,
-    const cpp_template_args_non_tct &template_args);
-
-  exprt do_builtin_sc_int_extension(
-    const cpp_namet &cpp_name,
-    const cpp_template_args_non_tct &template_args);
-
-  exprt do_builtin_sc_logic_extension(
-    const cpp_namet &cpp_name,
-    const cpp_template_args_non_tct &template_args);
-
-  exprt do_builtin_sc_lv_extension(
-    const cpp_namet &cpp_name,
-    const cpp_template_args_non_tct &template_args);
-  #endif
-
   struct matcht
   {
     unsigned cost;

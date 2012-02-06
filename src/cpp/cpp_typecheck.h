@@ -471,13 +471,7 @@ protected:
 
   void typecheck_assign(codet &code);
 
-  #ifdef CPP_SYSTEMC_EXTENSION
-  void typecheck_expr_sc_index(exprt &expr);
-  void typecheck_expr_sc_member(exprt &expr,
-                                const cpp_typecheck_fargst &fargs);
-  #endif
-
-  public:
+public:
   //
   // Type Conversions
   //
@@ -517,11 +511,6 @@ protected:
 
   bool standard_conversion_boolean(
     const exprt &expr, exprt &new_expr) const;
-
-  #ifdef CPP_SYSTEMC_EXTENSION
-  bool standard_conversion_verilogbv(
-          const exprt &expr, const typet &type, exprt &new_expr) const;
-  #endif
 
   bool standard_conversion_sequence(
     const exprt &expr, const typet &type, exprt &new_expr, unsigned &rank);
