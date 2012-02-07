@@ -1176,56 +1176,84 @@ bool simplify_exprt::simplify_addition(exprt &expr)
   exprt::operandst &operands=expr.operands();
   
   assert(expr.id()==ID_plus);
-  
-  // count the constants
-  unsigned count=0;
-  forall_operands(it, expr)
-    if(is_number(it->type()) && it->is_constant())
-      count++;
-  
-  // merge constants?
-  if(count>=2)
-  {
-    exprt::operandst::iterator const_sum;
-    bool const_sum_set=false;
 
-    Forall_operands(it, expr)
+  // floating-point addition is _NOT_ associative; thus,
+  // there is special case for float
+  
+  if(ns.follow(expr.type()).id()==ID_floatbv)
+  {
+    // we only merge neighboring constants!
+    for(exprt::operandst::iterator
+        it=operands.begin();
+        it!=operands.end();
+        it++)
     {
-      if(is_number(it->type()) && it->is_constant())
+      exprt::operandst::iterator next=it;
+      next++;
+      
+      if(next!=operands.end())
       {
-        if(!const_sum_set)
+        if(it->type()==next->type() &&
+           it->is_constant() &&
+           next->is_constant())
         {
-          const_sum=it;
-          const_sum_set=true;
-        }
-        else
-        {
-          if(!const_sum->sum(*it))
-          {
-            *it=gen_zero(it->type());
-            result=false;
-          }
+          it->sum(*next);
+          operands.erase(next);
         }
       }
     }
   }
-  
-  // delete non-float zeros 
-  // (for floats the result of 0.0 + (-0.0) need not be -0.0 in std rounding)
-  for(exprt::operandst::iterator
-      it=operands.begin();
-      it!=operands.end();
-      /* no it++ */)
+  else
   {
-    if(is_number(it->type()) && 
-       it->is_zero() &&
-       it->type().id()!=ID_floatbv)
+    // count the constants
+    unsigned count=0;
+    forall_operands(it, expr)
+      if(is_number(it->type()) && it->is_constant())
+        count++;
+    
+    // merge constants?
+    if(count>=2)
     {
-      it=operands.erase(it);
-      result=false;
+      exprt::operandst::iterator const_sum;
+      bool const_sum_set=false;
+
+      Forall_operands(it, expr)
+      {
+        if(is_number(it->type()) && it->is_constant())
+        {
+          if(!const_sum_set)
+          {
+            const_sum=it;
+            const_sum_set=true;
+          }
+          else
+          {
+            if(!const_sum->sum(*it))
+            {
+              *it=gen_zero(it->type());
+              result=false;
+            }
+          }
+        }
+      }
     }
-    else
-      it++;
+    
+    // delete zeros
+    // (can't do for floats, as the result of 0.0 + (-0.0)
+    // need not be -0.0 in std rounding)
+    for(exprt::operandst::iterator
+        it=operands.begin();
+        it!=operands.end();
+        /* no it++ */)
+    {
+      if(is_number(it->type()) && it->is_zero())
+      {
+        it=operands.erase(it);
+        result=false;
+      }
+      else
+        it++;
+    }
   }
 
   if(operands.size()==0)
