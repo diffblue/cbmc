@@ -27,14 +27,9 @@ public:
   {
   }
 
-  inline void add(const literalt condition, const std::string &description)
-  {
-    goals.push_back(cover_goalt());
-    goals.back().condition=condition;
-    goals.back().description=description;    
-  }
-  
   void operator()();
+
+  // statistics
 
   inline unsigned number_covered() const
   {
@@ -50,7 +45,16 @@ public:
   {
     return goals.size();
   }
+  
+  // managing the goals
 
+  inline void add(const literalt condition, const std::string &description)
+  {
+    goals.push_back(cover_goalt());
+    goals.back().condition=condition;
+    goals.back().description=description;    
+  }
+  
   struct cover_goalt
   {
     literalt condition;
@@ -69,34 +73,61 @@ protected:
   prop_convt &prop_conv;
   propt &prop;
 
-  void mark()
-  {
-    for(std::list<cover_goalt>::iterator
-        g_it=goals.begin();
-        g_it!=goals.end();
-        g_it++)
-      if(!g_it->covered &&
-         prop.l_get(g_it->condition).is_true())
-      {
-        g_it->covered=true;
-        _number_covered++;
-      }
-  }
-  
-  void constraint()
-  {
-    bvt bv;
-  
-    for(std::list<cover_goalt>::const_iterator
-        g_it=goals.begin();
-        g_it!=goals.end();
-        g_it++)
-      if(!g_it->covered)
-        bv.push_back(g_it->condition);
-
-    prop.lcnf(bv);
-  }
+  void mark();
+  void constraint();
 };
+
+/*******************************************************************\
+
+Function: cover_goalst::operator()
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: Try to cover all goals
+
+\*******************************************************************/
+
+void cover_goalst::mark()
+{
+  for(std::list<cover_goalt>::iterator
+      g_it=goals.begin();
+      g_it!=goals.end();
+      g_it++)
+    if(!g_it->covered &&
+       prop.l_get(g_it->condition).is_true())
+    {
+      g_it->covered=true;
+      _number_covered++;
+    }
+}
+  
+/*******************************************************************\
+
+Function: cover_goalst::constaint
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: Try to cover all goals
+
+\*******************************************************************/
+
+void cover_goalst::constraint()
+{
+  bvt bv;
+
+  for(std::list<cover_goalt>::const_iterator
+      g_it=goals.begin();
+      g_it!=goals.end();
+      g_it++)
+    if(!g_it->covered)
+      bv.push_back(g_it->condition);
+
+  prop.lcnf(bv);
+}
 
 /*******************************************************************\
 
@@ -119,7 +150,7 @@ void cover_goalst::operator()()
 
   do
   {
-    // We want one of the remaining goals, please!
+    // We want (at least) one of the remaining goals, please!
     _iterations++;
     constraint();
     dec_result=prop_conv.dec_solve();
@@ -182,7 +213,7 @@ void bmct::cover_assertions()
   equation.convert_decls(prop_conv);
   equation.convert_assumptions(prop_conv);
 
-  // collect goals
+  // collect goals in `goal_map'
   literalt assumption_literal=const_literal(true);
   
   typedef std::map<goto_programt::const_targett, bvt> goal_mapt;
@@ -233,5 +264,6 @@ void bmct::cover_assertions()
 
   status("");
   status("** Covered "+i2string(cover_goals.number_covered())+
-         " in "+i2string(cover_goals.iterations())+" iterations");
+         " of "+i2string(cover_goals.size())+" in "+
+         i2string(cover_goals.iterations())+" iterations");
 }
