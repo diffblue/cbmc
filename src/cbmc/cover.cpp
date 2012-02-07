@@ -13,24 +13,49 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
-Function: bmct::cover_assertions
+   Class: cover_gooalst
 
-  Inputs:
-
- Outputs:
-
- Purpose: Try to reach all assertions
+ Purpose: Try to cover some given set of goals
 
 \*******************************************************************/
 
-class cover_goalst
+class cover_goalst:public messaget
 {
 public:
+  explicit inline cover_goalst(prop_convt &_prop_conv):
+    prop_conv(_prop_conv), prop(_prop_conv.prop)
+  {
+  }
+
+  inline void add(const literalt condition, const std::string &description)
+  {
+    goals.push_back(cover_goalt());
+    goals.back().condition=condition;
+    goals.back().description=description;    
+  }
+  
+  void operator()();
+
+  inline unsigned number_covered() const
+  {
+    return _number_covered;
+  }
+  
+  inline unsigned iterations() const
+  {
+    return _iterations;
+  }
+  
+  inline unsigned size() const
+  {
+    return goals.size();
+  }
+
   struct cover_goalt
   {
-    literalt l;
-    goto_programt::const_targett pc;
+    literalt condition;
     bool covered;
+    std::string description;
     
     cover_goalt():covered(false)
     {
@@ -38,35 +63,27 @@ public:
   };
 
   std::list<cover_goalt> goals;
-  unsigned number_covered;
-  
-  cover_goalst():number_covered(0)
-  {
-  }
 
-  void mark(const propt &prop)
+protected:
+  unsigned _number_covered, _iterations;
+  prop_convt &prop_conv;
+  propt &prop;
+
+  void mark()
   {
-    for(std::list<cover_goalt>::const_iterator
+    for(std::list<cover_goalt>::iterator
         g_it=goals.begin();
         g_it!=goals.end();
         g_it++)
       if(!g_it->covered &&
-         prop.l_get(g_it->l).is_true())
+         prop.l_get(g_it->condition).is_true())
       {
-        // mark all goals with the same location
-        for(std::list<cover_goalt>::iterator
-            g_it2=goals.begin();
-            g_it2!=goals.end();
-            g_it2++)
-          if(g_it2->pc==g_it->pc)
-          {
-            g_it2->covered=true;
-            number_covered++;
-          }
+        g_it->covered=true;
+        _number_covered++;
       }
   }
   
-  void constraint(propt &dest)
+  void constraint()
   {
     bvt bv;
   
@@ -75,18 +92,68 @@ public:
         g_it!=goals.end();
         g_it++)
       if(!g_it->covered)
-        bv.push_back(g_it->l);
+        bv.push_back(g_it->condition);
 
-    dest.lcnf(bv);
-  }
-
-  void add(const literalt l, goto_programt::const_targett pc)
-  {
-    goals.push_back(cover_goalt());
-    goals.back().l=l;
-    goals.back().pc=pc;
+    prop.lcnf(bv);
   }
 };
+
+/*******************************************************************\
+
+Function: cover_goalst::operator()
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: Try to cover all goals
+
+\*******************************************************************/
+
+void cover_goalst::operator()()
+{
+  _iterations=_number_covered=0;
+  decision_proceduret::resultt dec_result;
+
+  status("Total number of coverage goals: "+i2string(size()));
+
+  do
+  {
+    // We want one of the remaining goals, please!
+    _iterations++;
+    constraint();
+    dec_result=prop_conv.dec_solve();
+    
+    switch(dec_result)
+    {
+    case decision_proceduret::D_UNSATISFIABLE: // DONE
+      break;
+
+    case decision_proceduret::D_SATISFIABLE: // more assertions
+      // mark the ones we got
+      mark();
+      break;
+
+    default:
+      error("decision procedure failed");
+      return;
+    }
+  }
+  while(dec_result==decision_proceduret::D_SATISFIABLE &&
+        number_covered()<size());
+}
+
+/*******************************************************************\
+
+Function: bmct::cover_assertions
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: Try to cover all goals
+
+\*******************************************************************/
 
 void bmct::cover_assertions()
 {
@@ -116,9 +183,10 @@ void bmct::cover_assertions()
   equation.convert_assumptions(prop_conv);
 
   // collect goals
-  
   literalt assumption_literal=const_literal(true);
-  cover_goalst cover_goals;
+  
+  typedef std::map<goto_programt::const_targett, bvt> goal_mapt;
+  goal_mapt goal_map;
 
   for(symex_target_equationt::SSA_stepst::iterator
       it=equation.SSA_steps.begin();
@@ -131,53 +199,39 @@ void bmct::cover_assertions()
       literalt l=
         prop_conv.prop.land(assumption_literal, it->guard_literal);
 
-      cover_goals.add(l, it->source.pc);
+      goal_map[it->source.pc].push_back(l);
     }
     else if(it->is_assume())
       assumption_literal=
         prop_conv.prop.land(assumption_literal, it->cond_literal);
   
-  decision_proceduret::resultt dec_result;
+  // compute
+  cover_goalst cover_goals(prop_conv);
+  cover_goals.set_message_handler(get_message_handler());
+  cover_goals.set_verbosity(get_verbosity());
 
-  status("Total number of coverage goals: "+i2string(cover_goals.goals.size()));
-  
-  unsigned iterations=0;
-
-  do
+  for(goal_mapt::const_iterator
+      it=goal_map.begin();
+      it!=goal_map.end();
+      it++)
   {
-    // We want one of the remaining assertions, please!
-    iterations++;
-    cover_goals.constraint(prop_conv.prop);
-    dec_result=prop_conv.dec_solve();
-    
-    switch(dec_result)
-    {
-    case decision_proceduret::D_UNSATISFIABLE: // DONE
-      break;
-
-    case decision_proceduret::D_SATISFIABLE: // more assertions
-      // mark the ones we got
-      cover_goals.mark(prop_conv.prop);
-      break;
-
-    default:
-      error("decision procedure failed");
-      return;
-    }
+    literalt condition=prop_conv.prop.lor(it->second);
+    cover_goals.add(condition, it->first->location.as_string());
   }
-  while(dec_result==decision_proceduret::D_SATISFIABLE &&
-        cover_goals.number_covered<cover_goals.goals.size());
-  
+
+  cover_goals();
+
+  // report
   for(std::list<cover_goalst::cover_goalt>::const_iterator
       g_it=cover_goals.goals.begin();
       g_it!=cover_goals.goals.end();
       g_it++)
     if(!g_it->covered)
     {
-      warning("!! failed to cover "+g_it->pc->location.as_string());
+      warning("!! failed to cover "+g_it->description);
     }
 
   status("");
-  status("** Covered "+i2string(cover_goals.number_covered)+
-         " in "+i2string(iterations)+" iterations");
+  status("** Covered "+i2string(cover_goals.number_covered())+
+         " in "+i2string(cover_goals.iterations())+" iterations");
 }
