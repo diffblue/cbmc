@@ -160,9 +160,8 @@ void cover_goalst::operator()()
     case decision_proceduret::D_UNSATISFIABLE: // DONE
       break;
 
-    case decision_proceduret::D_SATISFIABLE: // more assertions
-      // mark the ones we got
-      mark();
+    case decision_proceduret::D_SATISFIABLE:
+      mark(); // mark the ones we got
       break;
 
     default:
