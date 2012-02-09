@@ -173,9 +173,11 @@ void cpp_typecheckt::convert_non_template_declaration(
 {
   assert(!declaration.is_template());
 
-  // do the first part, the type
+  // we first check if this is a typedef
   typet &type=declaration.type();
   bool is_typedef=convert_typedef(type);
+  
+  // typedefs are expanded late!
 
   typecheck_type(type);
   

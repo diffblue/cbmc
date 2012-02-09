@@ -1294,14 +1294,14 @@ void cpp_typecheckt::typecheck_expr_member(
       exprt tmp=symbol_expr.op0();
       symbol_expr.swap(tmp);
     }
-
+    
     assert(symbol_expr.id()==ID_symbol ||
            symbol_expr.id()==ID_member ||
            symbol_expr.id()==ID_constant);
 
     // If it is a symbol or a constant, just return it!
-    // note: the resolver returns a symbol if the member
-    // is static or if it is a constructor
+    // Note: the resolver returns a symbol if the member
+    // is static or if it is a constructor.
 
     if(symbol_expr.id()==ID_symbol)
     {
