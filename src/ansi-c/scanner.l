@@ -1095,6 +1095,18 @@ wchar_t             { return cpp_keyword(TOK_WCHAR_T); } // already really ANSI-
                   PARSER.set_location(stack(yyansi_clval));
                   return TOK_INTEGER;
                 }
+{hexinteger} |
+{hexinteger_l} |
+{hexinteger_ll} |
+{hexinteger_u} |
+{hexinteger_ul} |
+{hexinteger_ull} |
+{hexinteger_w} |
+{hexinteger_uw} { newstack(yyansi_clval);
+                  stack(yyansi_clval)=convert_integer_literal(yytext, 16);
+                  PARSER.set_location(stack(yyansi_clval));
+                  return TOK_INTEGER;
+                }
 {ws}            { /* ignore */ }
 {newline}       { /* ignore */ }
 {identifier}	{ return make_identifier(); }
