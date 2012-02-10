@@ -307,16 +307,21 @@ void cpp_typecheckt::typecheck_decl(codet &code)
   cpp_declarationt &declaration=
     to_cpp_declaration(code.op0());
     
-  bool is_typedef=
-    convert_typedef(declaration.type());
+  typet &type=declaration.type();
+    
+  bool is_typedef=convert_typedef(type);
 
-  typecheck_type(declaration.type());
-  assert(declaration.type().is_not_nil());
+  typecheck_type(type);
+  assert(type.is_not_nil());
+
+  // we expand template types unless we do a typedef
+  if(type.id()==ID_template_class_instance && !is_typedef)
+    type=instantiate_template(type);
   
   if(declaration.declarators().empty() &&
-     follow(declaration.type()).get_bool("#is_anonymous"))
+     follow(type).get_bool("#is_anonymous"))
   {
-    if(follow(declaration.type()).id()!=ID_union)
+    if(follow(type).id()!=ID_union)
     {
       err_location(code);
       throw "declaration statement does not declare anything";

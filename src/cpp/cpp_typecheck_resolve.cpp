@@ -159,7 +159,7 @@ void cpp_typecheck_resolvet::guess_function_template_args(
   {
     // instantiate that one
     exprt e=*identifiers.begin();
-    assert(e.id()=="function_template_instance");
+    assert(e.id()==ID_template_function_instance);
 
     const symbolt &template_symbol=
       cpp_typecheck.lookup(e.type().get(ID_C_template));
@@ -979,11 +979,14 @@ void cpp_typecheck_resolvet::resolve_scope(
 //        cpp_typecheck.cpp_scopes.current_scope().print(std::cout);
 //        std::cout << "X: " << id_set.size() <<std::endl;
           
-        const symbolt &symb_tmpl=
+        typet instance=
           disambiguate_template_classes(base_name, id_set, template_args);
+        
+        const symbol_typet &symb_tmpl=
+          cpp_typecheck.instantiate_template(instance);
 
         cpp_typecheck.cpp_scopes.go_to(
-          cpp_typecheck.cpp_scopes.get_scope(symb_tmpl.name));
+          cpp_typecheck.cpp_scopes.get_scope(symb_tmpl.get_identifier()));
 
         template_args.make_nil();
       }
@@ -1063,7 +1066,7 @@ Purpose: disambiguate partial specialization
 
 \*******************************************************************/
 
-const symbolt &cpp_typecheck_resolvet::disambiguate_template_classes(
+typet cpp_typecheck_resolvet::disambiguate_template_classes(
   const irep_idt &base_name,
   const cpp_scopest::id_sett &id_set,
   const cpp_template_args_non_tct &full_template_args)
@@ -1243,27 +1246,13 @@ const symbolt &cpp_typecheck_resolvet::disambiguate_template_classes(
   
   const matcht &match=*matches.begin();
 
-  const symbolt &choice=
-    cpp_typecheck.lookup(match.id);
-    
-  // build instance       
-  const symbolt &instance=
-    cpp_typecheck.instantiate_template(
-      location,
-      choice,
-      match.specialization_args,
-      match.full_args);
+  typet template_class_instance(ID_template_class_instance);
+  template_class_instance.location()=location;
+  template_class_instance.set(ID_identifier, match.id);
+  template_class_instance.set("specialization_template_args", match.specialization_args);  
+  template_class_instance.set("full_template_args", match.full_args);
 
-  if(instance.type.id()!=ID_struct &&
-     instance.type.id()!=ID_incomplete_struct)
-  {
-    cpp_typecheck.err_location(location);
-    cpp_typecheck.str << "template `" 
-                      << base_name << "' is not a class";
-    throw 0;
-  }
-
-  return instance;
+  return template_class_instance;
 }
 
 /*******************************************************************\
@@ -1370,7 +1359,7 @@ void cpp_typecheck_resolvet::show_identifiers(
         out << "constructor ";
         id="";
       }
-      else if(id_expr.id()=="function_template_instance")
+      else if(id_expr.id()==ID_template_function_instance)
       {
         out << "symbol ";
       }
@@ -1418,7 +1407,7 @@ void cpp_typecheck_resolvet::show_identifiers(
         const symbolt &symbol=cpp_typecheck.lookup(to_symbol_expr(id_expr));
         out << " (" << symbol.location << ")";
       }
-      else if(id_expr.id()=="function_template_instance")
+      else if(id_expr.id()==ID_template_function_instance)
       {
         const symbolt &symbol=cpp_typecheck.lookup(id_expr.type().get(ID_C_template));
         out << " (" << symbol.location << ")";
@@ -1585,10 +1574,9 @@ exprt cpp_typecheck_resolvet::resolve(
     
     if(want==TYPE || have_classes)
     {
-      const symbolt &s=
+      typet instance=
         disambiguate_template_classes(base_name, id_set, template_args);
-      
-      identifiers.push_back(exprt(ID_type, symbol_typet(s.name)));
+      identifiers.push_back(exprt(ID_type, instance));
     }
     else
     {
@@ -2109,10 +2097,10 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
   
   // Seems we got an instance for all parameters. Let's return that.
   
-  exprt function_template_instance(
-    "function_template_instance", function_type);
+  exprt template_function_instance(
+    ID_template_function_instance, function_type);
 
-  return function_template_instance;
+  return template_function_instance;
 }
 
 /*******************************************************************\
@@ -2185,10 +2173,8 @@ void cpp_typecheck_resolvet::apply_template_args(
         template_args_tc,
         template_args_tc);
 
-    exprt expr_type(ID_type);
-    expr_type.type().id(ID_symbol);
-    expr_type.type().set(ID_identifier, new_symbol.name);
-    expr.swap(expr_type);
+    expr=exprt(ID_type, symbol_typet(new_symbol.name));
+    expr.location()=location;
   }
   else
   {
@@ -2201,10 +2187,10 @@ void cpp_typecheck_resolvet::apply_template_args(
         template_args_tc);
 
     // check if it is a method
-    const code_typet &code_type = to_code_type(new_symbol.type);
+    const code_typet &code_type=to_code_type(new_symbol.type);
 
     if(!code_type.arguments().empty() && 
-        code_type.arguments()[0].get("#base_name")==ID_this)
+        code_type.arguments()[0].get(ID_C_base_name)==ID_this)
     {
       // do we have an object?
       if(fargs.has_object)
