@@ -210,18 +210,9 @@ protected:
     const cpp_template_args_tct &full_template_args,
     const typet &specialization=typet(ID_nil));
 
-  symbol_typet instantiate_template(
-    const typet &template_instance)
-  {
-    symbol_typet result(
-      instantiate_template(
-        template_instance.location(),
-        lookup(template_instance.get(ID_identifier)),
-        static_cast<const cpp_template_args_tct &>(template_instance.find("specialization_template_args")),
-        static_cast<const cpp_template_args_tct &>(template_instance.find("full_template_args"))).name);
-    result.location()=template_instance.location();
-    return result;
-  }
+  void elaborate_template_class(
+    const locationt &location,
+    const symbol_typet &type);
 
   unsigned template_counter;
   unsigned anon_counter;

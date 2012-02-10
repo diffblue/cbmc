@@ -979,14 +979,11 @@ void cpp_typecheck_resolvet::resolve_scope(
 //        cpp_typecheck.cpp_scopes.current_scope().print(std::cout);
 //        std::cout << "X: " << id_set.size() <<std::endl;
           
-        typet instance=
+        symbol_typet instance=
           disambiguate_template_classes(base_name, id_set, template_args);
         
-        const symbol_typet &symb_tmpl=
-          cpp_typecheck.instantiate_template(instance);
-
         cpp_typecheck.cpp_scopes.go_to(
-          cpp_typecheck.cpp_scopes.get_scope(symb_tmpl.get_identifier()));
+          cpp_typecheck.cpp_scopes.get_scope(instance.get_identifier()));
 
         template_args.make_nil();
       }
@@ -1066,7 +1063,7 @@ Purpose: disambiguate partial specialization
 
 \*******************************************************************/
 
-typet cpp_typecheck_resolvet::disambiguate_template_classes(
+symbol_typet cpp_typecheck_resolvet::disambiguate_template_classes(
   const irep_idt &base_name,
   const cpp_scopest::id_sett &id_set,
   const cpp_template_args_non_tct &full_template_args)
@@ -1246,13 +1243,30 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
   
   const matcht &match=*matches.begin();
 
-  typet template_class_instance(ID_template_class_instance);
-  template_class_instance.location()=location;
-  template_class_instance.set(ID_identifier, match.id);
-  template_class_instance.set("specialization_template_args", match.specialization_args);  
-  template_class_instance.set("full_template_args", match.full_args);
+  const symbolt &choice=
+    cpp_typecheck.lookup(match.id);
+    
+  // build instance       
+  const symbolt &instance=
+    cpp_typecheck.instantiate_template(
+      location,
+      choice,
+      match.specialization_args,
+      match.full_args);   
 
-  return template_class_instance;
+  if(instance.type.id()!=ID_struct &&
+     instance.type.id()!=ID_incomplete_struct)
+  {
+    cpp_typecheck.err_location(location);
+    cpp_typecheck.str << "template `"
+                      << base_name << "' is not a class";
+    throw 0;
+  }
+
+  symbol_typet result(instance.name);
+  result.location()=location;
+
+  return result;
 }
 
 /*******************************************************************\
