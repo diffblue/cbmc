@@ -210,6 +210,16 @@ protected:
     const cpp_template_args_tct &full_template_args,
     const typet &specialization=typet(ID_nil));
 
+  const symbolt &instantiate_template(
+    const irept &template_instance)
+  {
+    return instantiate_template(
+      static_cast<const locationt &>(template_instance.find(ID_C_location)),
+      lookup(template_instance.get(ID_identifier)),
+      static_cast<const cpp_template_args_tct &>(template_instance.find("specialization_template_args")),
+      static_cast<const cpp_template_args_tct &>(template_instance.find("full_template_args")));
+  }
+
   unsigned template_counter;
   unsigned anon_counter;
 
