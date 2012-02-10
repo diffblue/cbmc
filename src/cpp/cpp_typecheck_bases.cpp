@@ -43,8 +43,18 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
         cpp_typecheck_resolvet::TYPE,
         cpp_typecheck_fargst());
 
-    if(base_symbol_expr.id()!=ID_type ||
-       base_symbol_expr.type().id()!=ID_symbol)
+    if(base_symbol_expr.id()!=ID_type)
+    {
+      err_location(name.location());
+      str << "expected type as struct/class base";
+      throw 0;
+    }
+
+    if(base_symbol_expr.type().id()==ID_template_class_instance)
+      base_symbol_expr.type()=
+        instantiate_template(base_symbol_expr.type());
+        
+    if(base_symbol_expr.id()!=ID_type)
     {
       err_location(name.location());
       str << "expected type as struct/class base";
