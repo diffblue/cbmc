@@ -314,10 +314,6 @@ void cpp_typecheckt::typecheck_decl(codet &code)
   typecheck_type(type);
   assert(type.is_not_nil());
 
-  // we expand template types unless we do a typedef
-  if(type.id()==ID_template_class_instance && !is_typedef)
-    type=instantiate_template(type);
-  
   if(declaration.declarators().empty() &&
      follow(type).get_bool("#is_anonymous"))
   {

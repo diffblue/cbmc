@@ -179,10 +179,6 @@ void cpp_typecheckt::convert_non_template_declaration(
 
   typecheck_type(type);
   
-  // we expand template types unless we do a typedef
-  if(type.id()==ID_template_class_instance && !is_typedef)
-    type=instantiate_template(type);
-
   // special treatment for anonymous unions
   if(declaration.declarators().empty() &&
      follow(declaration.type()).get_bool("#is_anonymous"))
