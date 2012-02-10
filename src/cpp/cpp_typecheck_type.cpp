@@ -122,15 +122,15 @@ void cpp_typecheckt::typecheck_type(typet &type)
     }
 
     // now do qualifier
-    if(type.find("#qualifier").is_not_nil())
+    if(type.find(ID_C_qualifier).is_not_nil())
     {
-      typet &t=static_cast<typet &>(type.add("#qualifier"));
+      typet &t=static_cast<typet &>(type.add(ID_C_qualifier));
       cpp_convert_plain_type(t);
       c_qualifierst q(t);
       q.write(type);
     }
 
-    type.remove("#qualifier");
+    type.remove(ID_C_qualifier);
   }
   else if(type.id()==ID_array)
   {
@@ -241,6 +241,10 @@ void cpp_typecheckt::typecheck_type(typet &type)
   else if(type.id()==ID_unassigned)
   {
     // ignore, for template argument guessing
+  }
+  else if(type.id()==ID_template_class_instance)
+  {
+    // ok (internally generated)
   }
   else
   {
