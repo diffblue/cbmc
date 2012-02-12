@@ -242,10 +242,8 @@ void template_mapt::build(
     {
       const template_parametert &param=template_parameters[i];
 
-      exprt value=param.default_parameter();
-
-      if(value.is_not_nil())
-        instance.push_back(value);
+      if(param.has_default_parameter())
+        instance.push_back(param.default_parameter());
       else
         break;
     }

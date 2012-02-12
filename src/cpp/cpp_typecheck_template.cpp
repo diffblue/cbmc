@@ -20,6 +20,37 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 /*******************************************************************\
 
+Function: cpp_typecheckt::salvage_default_parameters
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void cpp_typecheckt::salvage_default_parameters(
+  const template_typet &old_type,
+  template_typet &new_type)
+{
+  const template_typet::parameterst &old_parameters=old_type.parameters();
+  template_typet::parameterst &new_parameters=new_type.parameters();
+
+  for(unsigned i=0; i<new_parameters.size(); i++)
+  {
+    if(i<old_parameters.size() &&
+       old_parameters[i].has_default_parameter() &&
+       !new_parameters[i].has_default_parameter())
+    {
+      // TODO! The default may depend on previous parameters!!
+      new_parameters[i].default_parameter()=old_parameters[i].default_parameter();
+    }
+  }
+}
+
+/*******************************************************************\
+
 Function: cpp_typecheckt::check_template_restrictions
 
   Inputs:
@@ -133,9 +164,11 @@ void cpp_typecheckt::typecheck_template_class(
   if(previous_symbol!=context.symbols.end())
   {
     // there already
+    const cpp_declarationt &previous_declaration=
+      to_cpp_declaration(previous_symbol->second.type);
   
     bool previous_has_body=
-      previous_symbol->second.type.find(ID_type).find(ID_body).is_not_nil();
+      previous_declaration.type().find(ID_body).is_not_nil();
 
     if(has_body && previous_has_body)
     {
@@ -149,10 +182,15 @@ void cpp_typecheckt::typecheck_template_class(
 
     if(has_body)
     {
-      // we replace the template!
+      // We replace the template!
+      // We have to retain any default parameters from the previous declaration.
+      salvage_default_parameters(
+        previous_declaration.template_type(),
+        declaration.template_type());
+      
       previous_symbol->second.type.swap(declaration);
 
-      // we also replace the template scope (the old one could be deleted)
+      // We also replace the template scope (the old one could be deleted).
       cpp_scopes.id_map[symbol_name]=&template_scope;
     }
 
@@ -915,7 +953,7 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
   // we will modify the template map
   template_mapt old_template_map;
   old_template_map=template_map;
-  
+
   // check for default parameters
   for(unsigned i=0; i<parameters.size(); i++)
   {
@@ -926,15 +964,15 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
     {
       // Check for default parameter.
       // These may depend on previous arguments.
-      exprt default_value=parameter.default_parameter();
-
-      if(default_value.is_nil())
+      if(!parameter.has_default_parameter())
       {
         err_location(location);
-        throw "not enough template arguments";
+        str << "not enough template arguments (expected "
+            << parameters.size() << ", but got " << args.size() << ")";
+        throw 0;
       }
-      
-      args.push_back(default_value);
+
+      args.push_back(parameter.default_parameter());
       
       // these need to be typechecked in the scope of the template,
       // not in the current scope!
