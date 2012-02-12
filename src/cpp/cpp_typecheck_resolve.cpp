@@ -981,6 +981,11 @@ void cpp_typecheck_resolvet::resolve_scope(
           
         symbol_typet instance=
           disambiguate_template_classes(base_name, id_set, template_args);
+          
+        instance.location()=location;
+          
+        // the "::" triggers template elaboration
+        cpp_typecheck.elaborate_template_class(instance);
         
         cpp_typecheck.cpp_scopes.go_to(
           cpp_typecheck.cpp_scopes.get_scope(instance.get_identifier()));
@@ -1246,6 +1251,7 @@ symbol_typet cpp_typecheck_resolvet::disambiguate_template_classes(
   const symbolt &choice=
     cpp_typecheck.lookup(match.id);
     
+  #if 0
   // build instance       
   const symbolt &instance=
     cpp_typecheck.instantiate_template(
@@ -1267,6 +1273,21 @@ symbol_typet cpp_typecheck_resolvet::disambiguate_template_classes(
   result.location()=location;
 
   return result;
+  #else
+
+  // build instance       
+  const symbolt &instance=
+    cpp_typecheck.template_class_symbol(
+      location,
+      choice,
+      match.specialization_args,
+      match.full_args);   
+
+  symbol_typet result(instance.name);
+  result.location()=location;
+
+  return result;  
+  #endif
 }
 
 /*******************************************************************\

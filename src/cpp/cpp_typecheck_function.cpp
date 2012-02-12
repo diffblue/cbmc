@@ -40,7 +40,7 @@ void cpp_typecheckt::convert_argument(
     argument.set_base_name(identifier);
   }
 
-  identifier=cpp_identifier_prefix(mode)+"::"+
+  identifier=language_prefix+
              cpp_scopes.current_scope().prefix+
              id2string(identifier);
 
@@ -123,7 +123,7 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
   // if it is a destructor, add the implicit code
   if(symbol.type.get(ID_return_type)==ID_destructor)
   {
-    const symbolt &msymb=lookup(symbol.type.get("#member_name"));
+    const symbolt &msymb=lookup(symbol.type.get(ID_C_member_name));
 
     assert(symbol.value.id()==ID_code);
     assert(symbol.value.get(ID_statement)==ID_block);

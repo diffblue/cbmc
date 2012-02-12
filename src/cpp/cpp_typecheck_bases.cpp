@@ -113,7 +113,7 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
     most_derived.type()=bool_typet();
     most_derived.set_access(ID_public);
     most_derived.set(ID_base_name, "@most_derived");
-    most_derived.set_name(cpp_identifier_prefix(current_mode)+"::"+
+    most_derived.set_name(language_prefix+
                      cpp_scopes.current_scope().prefix+"::"+"@most_derived");
     most_derived.set(ID_pretty_name, "@most_derived");
     most_derived.location()=type.location();

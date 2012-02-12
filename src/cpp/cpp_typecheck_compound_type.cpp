@@ -130,7 +130,7 @@ void cpp_typecheckt::typecheck_compound_type(
     tag_scope(identifier, base_name, has_body, tag_only_declaration);
   
   const irep_idt symbol_name=
-    cpp_identifier_prefix(current_mode)+"::"+
+    language_prefix+
     dest_scope.prefix+
     "tag."+identifier;
 
@@ -270,7 +270,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
   bool is_explicit=declaration.member_spec().is_explicit();
   bool is_inline=declaration.member_spec().is_inline();
 
-  final_type.set("#member_name", symbol.name);
+  final_type.set(ID_C_member_name, symbol.name);
 
   // first do some sanity checks
 
@@ -337,7 +337,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
   struct_typet::componentt component;
 
   irep_idt identifier=
-    cpp_identifier_prefix(current_mode)+"::"+
+    language_prefix+
     cpp_scopes.current_scope().prefix+
     base_name;
 
@@ -1474,7 +1474,7 @@ void cpp_typecheckt::convert_anon_struct_union_member(
   irep_idt base_name="#anon_member"+i2string(components.size());
 
   irep_idt identifier=
-    cpp_identifier_prefix(current_mode)+"::"+
+    language_prefix+
     cpp_scopes.current_scope().prefix+
     base_name.c_str();
 
