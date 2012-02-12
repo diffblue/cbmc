@@ -134,6 +134,9 @@ protected:
   //
   // Templates
   //
+  void salvage_default_parameters(
+    const template_typet &old_type,
+    template_typet &new_type);
 
   void check_template_restrictions(
     const irept &cpp_name,
