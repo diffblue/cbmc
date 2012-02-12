@@ -25,6 +25,11 @@ public:
   {
     return static_cast<const exprt &>(find(ID_C_default_value));
   }
+  
+  bool has_default_parameter() const
+  {
+    return find(ID_C_default_value).is_not_nil();
+  }
 };
 
 class template_typet:public typet
