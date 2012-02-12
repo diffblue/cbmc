@@ -18,12 +18,12 @@ class template_parametert:public exprt
 public:
   inline exprt &default_parameter()
   {
-    return static_cast<exprt &>(add("#default"));
+    return static_cast<exprt &>(add(ID_C_default_value));
   }
 
   inline const exprt &default_parameter() const
   {
-    return static_cast<const exprt &>(find("#default"));
+    return static_cast<const exprt &>(find(ID_C_default_value));
   }
 };
 

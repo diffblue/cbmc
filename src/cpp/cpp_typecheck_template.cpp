@@ -857,7 +857,7 @@ cpp_scopet &cpp_typecheckt::typecheck_template_parameters(
       
     // set (non-typechecked) default value
     if(default_value.is_not_nil())
-      parameter.add("#default")=default_value;
+      parameter.add(ID_C_default_value)=default_value;
 
     parameter.location()=declaration.find_location();
   }
