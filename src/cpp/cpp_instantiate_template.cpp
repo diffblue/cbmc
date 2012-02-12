@@ -221,8 +221,9 @@ void cpp_typecheckt::elaborate_template_class(
   if(type.id()!=ID_symbol) return;
   
   const symbolt &symbol=lookup(type);
-  
-  const typet &t_type=symbol.type;
+
+  // Make a copy, as instantiate will destry the symbol type!  
+  const typet t_type=symbol.type;
   
   if(t_type.id()==ID_incomplete_struct &&
      t_type.get_bool(ID_template_class_instance))
@@ -443,7 +444,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
     const exprt &template_methods=
       static_cast<const exprt &>(
         template_symbol.value.find("template_methods"));
-
+        
     for(unsigned i=0; i<template_methods.operands().size(); i++)
     {
       cpp_saved_scope.restore();
@@ -456,7 +457,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
       template_typet method_type=
         method_decl.template_type();
 
-      // do template arguments
+      // do template parameters
       // this also sets up the template scope of the method
       cpp_scopet &method_scope=
         typecheck_template_parameters(method_type);
