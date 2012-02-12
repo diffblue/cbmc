@@ -249,10 +249,6 @@ void cpp_typecheckt::typecheck_function_template(
   cpp_declaratort &declarator=declaration.declarators()[0];
   const cpp_namet &cpp_name=to_cpp_name(declarator.add(ID_name));
 
-  if(cpp_name.is_qualified() ||
-     cpp_name.has_template_args())
-    return typecheck_template_member_function(declaration);
-
   // do template arguments
   // this also sets up the template scope
   cpp_scopet &template_scope=
@@ -343,17 +339,18 @@ void cpp_typecheckt::typecheck_function_template(
 
 /*******************************************************************\
 
-Function: cpp_typecheckt::typecheck_template_member_function
+Function: cpp_typecheckt::typecheck_class_template_member
 
   Inputs:
 
  Outputs:
 
- Purpose: typecheck function member templates
+ Purpose: typecheck class tempalte members;
+          these can be methods or static members
 
 \*******************************************************************/
 
-void cpp_typecheckt::typecheck_template_member_function(
+void cpp_typecheckt::typecheck_class_template_member(
   cpp_declarationt &declaration)
 {
   assert(declaration.declarators().size()==1);
@@ -1122,7 +1119,20 @@ void cpp_typecheckt::convert_template_declaration(
       convert_template_function_or_member_specialization(declaration);
       return;
     }
-  
+
+    // Explicit qualification is forbidden for function templates,
+    // which we can use to distinguish them.
+
+    assert(declaration.declarators().size()>=1);
+
+    cpp_declaratort &declarator=declaration.declarators()[0];
+    const cpp_namet &cpp_name=to_cpp_name(declarator.add(ID_name));
+
+    if(cpp_name.is_qualified() ||
+       cpp_name.has_template_args())
+      return typecheck_class_template_member(declaration);
+
+    // must be function template  
     typecheck_function_template(declaration);
     return;
   }
