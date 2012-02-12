@@ -32,6 +32,7 @@ index_range
 ptrmember
 member
 member_name
+C_member_name #member_name
 equal =
 implies =>
 and
@@ -378,6 +379,7 @@ is_static
 is_template
 is_static_assert
 is_virtual
+C_is_virtual #is_virtual
 literal
 member_initializers
 member_initializer
