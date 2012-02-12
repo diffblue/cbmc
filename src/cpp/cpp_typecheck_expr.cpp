@@ -1235,7 +1235,7 @@ void cpp_typecheckt::typecheck_expr_member(
   }
 
   // The member operator will trigger template elaboration
-  elaborate_template_class(op0.type());
+  elaborate_class_template(op0.type());
 
   if(op0.type().id()!=ID_symbol)
   {

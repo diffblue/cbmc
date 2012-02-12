@@ -125,7 +125,7 @@ void cpp_typecheckt::show_instantiation_stack(std::ostream &out)
 
 /*******************************************************************\
 
-Function: cpp_typecheckt::template_class_symbol
+Function: cpp_typecheckt::class_template_symbol
 
   Inputs: 
 
@@ -135,7 +135,7 @@ Function: cpp_typecheckt::template_class_symbol
 
 \*******************************************************************/
 
-const symbolt &cpp_typecheckt::template_class_symbol(
+const symbolt &cpp_typecheckt::class_template_symbol(
   const locationt &location,
   const symbolt &template_symbol,
   const cpp_template_args_tct &specialization_template_args,
@@ -205,17 +205,17 @@ const symbolt &cpp_typecheckt::template_class_symbol(
 
 /*******************************************************************\
 
-Function: cpp_typecheckt::elaborate_template_class
+Function: cpp_typecheckt::elaborate_class_template
 
   Inputs: 
 
  Outputs:
 
- Purpose: elaborate template class instances
+ Purpose: elaborate class template instances
 
 \*******************************************************************/
 
-void cpp_typecheckt::elaborate_template_class(
+void cpp_typecheckt::elaborate_class_template(
   const typet &type)
 {
   if(type.id()!=ID_symbol) return;
@@ -533,8 +533,8 @@ const symbolt &cpp_typecheckt::instantiate_template(
     return lookup(to_struct_type(symb.type).components().back().get(ID_name));
   }
 
-  // not a template class, not a template method,
-  // it must be a template function!
+  // not a class template, not a class template method,
+  // it must be a function template!
   
   assert(new_decl.declarators().size()==1);
   

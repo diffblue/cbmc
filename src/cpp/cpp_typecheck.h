@@ -150,16 +150,16 @@ protected:
   void convert_template_function_or_member_specialization(
     cpp_declarationt &declaration);
 
-  void convert_template_class_specialization(
+  void convert_class_template_specialization(
     cpp_declarationt &declaration);
 
-  void typecheck_template_class(cpp_declarationt &declaration);
+  void typecheck_class_template(cpp_declarationt &declaration);
 
   void typecheck_function_template(cpp_declarationt &declaration);
 
   void typecheck_template_member_function(cpp_declarationt &declaration);
 
-  std::string template_class_identifier(
+  std::string class_template_identifier(
     const irep_idt &base_name,
     const template_typet &template_type,
     const cpp_template_args_non_tct &partial_specialization_args);
@@ -206,13 +206,13 @@ protected:
     instantiation_stackt &instantiation_stack;
   };
   
-  const symbolt &template_class_symbol(
+  const symbolt &class_template_symbol(
     const locationt &location,
     const symbolt &template_symbol,
     const cpp_template_args_tct &specialization_template_args,
     const cpp_template_args_tct &full_template_args);  
 
-  void elaborate_template_class(
+  void elaborate_class_template(
     const typet &type);
 
   const symbolt &instantiate_template(
@@ -222,7 +222,7 @@ protected:
     const cpp_template_args_tct &full_template_args,
     const typet &specialization=typet(ID_nil));
 
-  void elaborate_template_class(
+  void elaborate_class_template(
     const locationt &location,
     const symbol_typet &type);
 

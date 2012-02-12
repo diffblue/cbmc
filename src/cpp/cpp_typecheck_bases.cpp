@@ -50,8 +50,8 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
       throw 0;
     }
     
-    // elaborate any templates given as bases
-    elaborate_template_class(base_symbol_expr.type());
+    // elaborate any class template instances given as bases
+    elaborate_class_template(base_symbol_expr.type());
 
     if(base_symbol_expr.type().id()!=ID_symbol)
     {

@@ -985,7 +985,7 @@ void cpp_typecheck_resolvet::resolve_scope(
         instance.location()=location;
           
         // the "::" triggers template elaboration
-        cpp_typecheck.elaborate_template_class(instance);
+        cpp_typecheck.elaborate_class_template(instance);
         
         cpp_typecheck.cpp_scopes.go_to(
           cpp_typecheck.cpp_scopes.get_scope(instance.get_identifier()));
@@ -1093,7 +1093,7 @@ symbol_typet cpp_typecheck_resolvet::disambiguate_template_classes(
     const symbolt &s=cpp_typecheck.lookup(id);
     if(!s.type.get_bool(ID_is_template)) continue;
     const cpp_declarationt &cpp_declaration=to_cpp_declaration(s.type);
-    if(!cpp_declaration.is_template_class()) continue;
+    if(!cpp_declaration.is_class_template()) continue;
     irep_idt specialization_of=cpp_declaration.get_specialization_of();
     if(specialization_of!="")
       primary_templates.insert(specialization_of);
@@ -1183,7 +1183,7 @@ symbol_typet cpp_typecheck_resolvet::disambiguate_template_classes(
     {
       cpp_typecheck.err_location(location);
       cpp_typecheck.str << "template identifier: " << id << std::endl;
-      throw "template class instantiation error";
+      throw "class template instantiation error";
     }
 
     // enter the scope of the template
@@ -1277,7 +1277,7 @@ symbol_typet cpp_typecheck_resolvet::disambiguate_template_classes(
 
   // build instance       
   const symbolt &instance=
-    cpp_typecheck.template_class_symbol(
+    cpp_typecheck.class_template_symbol(
       location,
       choice,
       match.specialization_args,
@@ -1589,7 +1589,7 @@ exprt cpp_typecheck_resolvet::resolve(
       const irep_idt id=(*it)->identifier;
       const symbolt &s=cpp_typecheck.lookup(id);
       assert(s.type.get_bool(ID_is_template));
-      if(to_cpp_declaration(s.type).is_template_class())
+      if(to_cpp_declaration(s.type).is_class_template())
         have_classes=true;
       else
         have_methods=true;
@@ -2026,9 +2026,9 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
   const cpp_declarationt &cpp_declaration=
     to_cpp_declaration(tmp);
     
-  // Template classes require explicit template arguments,
+  // Class templates require explicit template arguments,
   // no guessing!
-  if(cpp_declaration.is_template_class())
+  if(cpp_declaration.is_class_template())
     return nil_exprt();
 
   // we need function arguments for guessing
@@ -2198,8 +2198,8 @@ void cpp_typecheck_resolvet::apply_template_args(
   const cpp_declarationt &cpp_declaration=
     to_cpp_declaration(template_symbol.type);
     
-  // is it a template class or function?
-  if(cpp_declaration.is_template_class())
+  // is it a class template or function template?
+  if(cpp_declaration.is_class_template())
   {
     const symbolt &new_symbol=
       cpp_typecheck.instantiate_template(
