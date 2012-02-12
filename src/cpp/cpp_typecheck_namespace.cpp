@@ -39,7 +39,7 @@ void cpp_typecheckt::convert(cpp_namespace_spect &namespace_spec)
   irep_idt final_name(name);
 
   std::string identifier=
-    cpp_identifier_prefix(current_mode)+"::"+
+    language_prefix+
     cpp_scopes.current_scope().prefix+id2string(final_name);
 
   contextt::symbolst::const_iterator it=

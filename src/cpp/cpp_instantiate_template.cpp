@@ -125,6 +125,118 @@ void cpp_typecheckt::show_instantiation_stack(std::ostream &out)
 
 /*******************************************************************\
 
+Function: cpp_typecheckt::template_class_symbol
+
+  Inputs: 
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+const symbolt &cpp_typecheckt::template_class_symbol(
+  const locationt &location,
+  const symbolt &template_symbol,
+  const cpp_template_args_tct &specialization_template_args,
+  const cpp_template_args_tct &full_template_args)
+{
+  // we should never get 'unassigned' here
+  assert(!full_template_args.has_unassigned());
+
+  // do we have args?
+  if(full_template_args.arguments().empty())
+  {
+    err_location(location);
+    str << "`" << template_symbol.base_name
+        << "' is a template; thus, expected template arguments";
+    throw 0;
+  }
+  
+  // produce new symbol name
+  std::string suffix=template_suffix(full_template_args);
+
+  cpp_scopet *template_scope=
+    static_cast<cpp_scopet *>(cpp_scopes.id_map[template_symbol.name]);
+
+  assert(template_scope!=NULL);
+  
+  irep_idt identifier=
+    language_prefix+
+    id2string(template_scope->prefix)+
+    id2string(suffix)+
+    "tag."+id2string(template_symbol.base_name);
+  
+  // already there?
+  contextt::symbolst::const_iterator s_it=context.symbols.find(identifier);
+  if(s_it!=context.symbols.end())
+    return s_it->second;
+
+  // create as incomplete_struct, but mark as
+  // "template_class_instance", to be elaborated later
+  symbolt new_symbol;
+  new_symbol.name=identifier;
+  new_symbol.location=template_symbol.location;
+  new_symbol.type=typet(ID_incomplete_struct);
+  new_symbol.type.set(ID_template_class_instance, true);
+  new_symbol.type.location()=template_symbol.location;
+  new_symbol.type.set("specialization_template_args", specialization_template_args);
+  new_symbol.type.set("full_template_args", full_template_args);
+  new_symbol.type.set(ID_identifier, template_symbol.name);
+  new_symbol.mode=template_symbol.mode;
+  new_symbol.base_name=template_symbol.base_name;
+  new_symbol.is_type=true;
+  
+  symbolt *s_ptr;
+  context.move(new_symbol, s_ptr);
+
+  // put into template scope
+  cpp_idt &id=cpp_scopes.put_into_scope(*s_ptr, *template_scope);
+
+  id.id_class=cpp_idt::CLASS;
+  id.is_scope=true;
+  id.prefix=template_scope->prefix+
+            id2string(s_ptr->base_name)+"::";
+  id.class_identifier=s_ptr->name;
+  id.id_class=cpp_idt::CLASS;
+  
+  return *s_ptr;
+}
+
+/*******************************************************************\
+
+Function: cpp_typecheckt::elaborate_template_class
+
+  Inputs: 
+
+ Outputs:
+
+ Purpose: elaborate template class instances
+
+\*******************************************************************/
+
+void cpp_typecheckt::elaborate_template_class(
+  const typet &type)
+{
+  if(type.id()!=ID_symbol) return;
+  
+  const symbolt &symbol=lookup(type);
+  
+  const typet &t_type=symbol.type;
+  
+  if(t_type.id()==ID_incomplete_struct &&
+     t_type.get_bool(ID_template_class_instance))
+  {
+    instantiate_template(
+      type.location(),
+      lookup(t_type.get(ID_identifier)),
+      static_cast<const cpp_template_args_tct &>(t_type.find("specialization_template_args")),
+      static_cast<const cpp_template_args_tct &>(t_type.find("full_template_args")));
+  }
+}
+
+/*******************************************************************\
+
 Function: cpp_typecheckt::instantiate_template
 
   Inputs: location of the instantiation,
@@ -264,8 +376,8 @@ const symbolt &cpp_typecheckt::instantiate_template(
       const symbolt &symb=lookup(cpp_id.identifier);
 
       // continue if the type is incomplete only
-      if(cpp_id.id_class == cpp_idt::CLASS &&
-         symb.type.id() == ID_struct)
+      if(cpp_id.id_class==cpp_idt::CLASS &&
+         symb.type.id()==ID_struct)
         return symb;
       else if(symb.value.is_not_nil())
         return symb;

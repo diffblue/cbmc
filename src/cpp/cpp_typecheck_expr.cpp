@@ -848,10 +848,10 @@ void cpp_typecheckt::typecheck_expr_address_of(exprt &expr)
     {
       // it's a pointer to member function
       typet symbol(ID_symbol);
-      symbol.set(ID_identifier, code_type.get("#member_name"));
+      symbol.set(ID_identifier, code_type.get(ID_C_member_name));
       expr.op0().type().add("to-member") = symbol;
 
-      if(code_type.get_bool("#is_virtual"))
+      if(code_type.get_bool(ID_C_is_virtual))
       {
         err_location(expr.location());
         str << "error: pointers to virtual methods"
@@ -1234,6 +1234,9 @@ void cpp_typecheckt::typecheck_expr_member(
     return;
   }
 
+  // The member operator will trigger template elaboration
+  elaborate_template_class(op0.type());
+
   if(op0.type().id()!=ID_symbol)
   {
     err_location(expr);
@@ -1242,7 +1245,7 @@ void cpp_typecheckt::typecheck_expr_member(
         << to_string(op0.type()) << "'";
     throw 0;
   }
-
+  
   const irep_idt &struct_identifier=
     to_symbol_type(op0.type()).get_identifier();
 

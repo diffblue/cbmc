@@ -202,6 +202,15 @@ protected:
   private:
     instantiation_stackt &instantiation_stack;
   };
+  
+  const symbolt &template_class_symbol(
+    const locationt &location,
+    const symbolt &template_symbol,
+    const cpp_template_args_tct &specialization_template_args,
+    const cpp_template_args_tct &full_template_args);  
+
+  void elaborate_template_class(
+    const typet &type);
 
   const symbolt &instantiate_template(
     const locationt &location,
@@ -586,7 +595,5 @@ private:
   std::list<irep_idt> dinis;        // Static Default-Initialization List
   bool disable_access_control;      // Disable protect and private
 };
-
-std::string cpp_identifier_prefix(const irep_idt &mode);
 
 #endif

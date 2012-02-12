@@ -47,33 +47,6 @@ const struct_typet &cpp_typecheckt::this_struct_type()
 
 /*******************************************************************\
 
-Function: cpp_identifier_prefix
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-std::string cpp_identifier_prefix(const irep_idt &mode)
-{
-  // we need to be able to link to c code
-  return "c";
-  
-  #if 0
-  if(mode==ID_cpp)
-    return "cpp";
-  else if(mode==ID_C)
-    return "c";
-  else
-    return id2string(mode);
-  #endif
-}
-
-/*******************************************************************\
-
 Function: cpp_typecheckt::to_string
 
   Inputs:
@@ -399,8 +372,8 @@ void cpp_typecheckt::do_not_typechecked()
     {
       symbolt &symbol=s_it->second;
 
-      if(symbol.value.id()=="cpp_not_typechecked"
-        && symbol.value.get_bool("is_used"))
+      if(symbol.value.id()=="cpp_not_typechecked" &&
+         symbol.value.get_bool("is_used"))
       {
         assert(symbol.type.id()==ID_code);
 
@@ -409,17 +382,17 @@ void cpp_typecheckt::do_not_typechecked()
           cpp_declaratort declarator;
           declarator.location() = symbol.location;
           default_assignop_value(
-            lookup(symbol.type.get("#member_name")),declarator);
+            lookup(symbol.type.get(ID_C_member_name)), declarator);
           symbol.value.swap(declarator.value());
           convert_function(symbol);
-          cont = true;
+          cont=true;
         }
         else if(symbol.value.operands().size() == 1)
         {
           exprt tmp = symbol.value.operands()[0];
           symbol.value.swap(tmp);
           convert_function(symbol);
-          cont = true;
+          cont=true;
         }
         else
           assert(0); // Don't know what to do!

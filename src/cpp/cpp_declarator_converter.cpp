@@ -448,7 +448,7 @@ void cpp_declarator_convertert::get_final_identifier()
     identifier+=id2string(cpp_typecheck.function_identifier(final_type));
 
   final_identifier=
-    cpp_identifier_prefix(mode)+"::"+
+    "c::"+
     scope->prefix+
     identifier;
 }
