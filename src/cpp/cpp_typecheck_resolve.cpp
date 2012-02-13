@@ -40,8 +40,7 @@ Purpose:
 \*******************************************************************/
 
 cpp_typecheck_resolvet::cpp_typecheck_resolvet(cpp_typecheckt &_cpp_typecheck):
-  cpp_typecheck(_cpp_typecheck),
-  this_expr(_cpp_typecheck.cpp_scopes.current_scope().this_expr)
+  cpp_typecheck(_cpp_typecheck)
 {
 }
 
@@ -352,6 +351,9 @@ exprt cpp_typecheck_resolvet::convert_identifier(
                 << " "
                 << cpp_typecheck.cpp_scopes.current_scope().this_class_identifier << std::endl;
       #endif
+      
+      const exprt &this_expr=
+        original_scope->this_expr;
       
       if(fargs.has_object)
       {
@@ -1474,9 +1476,6 @@ exprt cpp_typecheck_resolvet::resolve(
   std::string base_name;
   cpp_template_args_non_tct template_args;
   template_args.make_nil();
-
-  // save 'this_expr' before resolving the scopes
-  this_expr=cpp_typecheck.cpp_scopes.current_scope().this_expr;
 
   original_scope=&cpp_typecheck.cpp_scopes.current_scope();
   cpp_save_scopet save_scope(cpp_typecheck.cpp_scopes);
