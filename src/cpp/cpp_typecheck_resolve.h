@@ -29,7 +29,7 @@ public:
 
   // Returns the scope as a side-effect as 'current_scope'.
   // Should really return explicitly.
-  void resolve_scope(
+  cpp_scopet &resolve_scope(
     const cpp_namet &cpp_name,
     std::string &base_name,
     cpp_template_args_non_tct &template_args);
