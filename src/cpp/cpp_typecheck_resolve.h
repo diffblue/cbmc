@@ -38,7 +38,6 @@ public:
 
 protected:
   cpp_typecheckt &cpp_typecheck;
-  exprt this_expr;
   locationt location;
   cpp_scopet *original_scope;
   
