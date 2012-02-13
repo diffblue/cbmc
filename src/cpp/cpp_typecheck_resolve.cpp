@@ -933,7 +933,7 @@ Purpose:
 
 \*******************************************************************/
 
-void cpp_typecheck_resolvet::resolve_scope(
+cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
   const cpp_namet &cpp_name,
   std::string &base_name,
   cpp_template_args_non_tct &template_args)
@@ -1056,6 +1056,8 @@ void cpp_typecheck_resolvet::resolve_scope(
 
     pos++;
   }
+  
+  return cpp_typecheck.cpp_scopes.current_scope();
 }
 
 /*******************************************************************\
