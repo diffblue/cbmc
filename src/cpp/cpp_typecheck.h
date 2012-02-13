@@ -103,8 +103,6 @@ public:
     const exprt::operandst &operands);
 
 protected:
-  //cpp_typecheck_resolvet cpp_typecheck_resolve;
-
   cpp_scopest cpp_scopes;
 
   cpp_parse_treet &cpp_parse_tree;
