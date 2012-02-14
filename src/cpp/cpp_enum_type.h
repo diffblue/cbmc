@@ -17,21 +17,26 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 class cpp_enum_typet:public typet
 {
 public:
-  cpp_enum_typet():typet(ID_c_enum)
+  inline cpp_enum_typet():typet(ID_c_enum)
   {
     set(ID_width, config.ansi_c.int_width);
   }
   
-  const irep_idt &get_name() const
+  inline const cpp_namet &tag() const
   {
-    return get(ID_name);
+    return static_cast<const cpp_namet &>(find(ID_tag));
   }
   
-  void set_name(const irep_idt &name)
+  inline bool has_tag() const
   {
-    set(ID_name, name);
+    return find(ID_tag).is_not_nil();
   }
-
+  
+  inline cpp_namet &tag()
+  {
+    return static_cast<cpp_namet &>(add(ID_tag));
+  }
+  
   const irept &body() const
   {
     return find(ID_body);
