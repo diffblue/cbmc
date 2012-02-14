@@ -99,39 +99,43 @@ void cpp_typecheckt::typecheck_compound_type(
 
   // get the tag name
   bool anonymous=type.find(ID_tag).is_nil();
-  
-  std::string identifier, base_name;
+  std::string base_name;
+  cpp_scopet *dest_scope=NULL;
+  bool has_body=type.find(ID_body).is_not_nil();
+  bool tag_only_declaration=type.get_bool(ID_C_tag_only_declaration);
 
   if(anonymous)
   {
-    base_name=identifier=
-      "#anon_"+type.id_string()+i2string(anon_counter++);
+    base_name="#anon_"+type.id_string()+i2string(anon_counter++);
     type.set("#is_anonymous", true);
+    // anonymous structs always go into the current scope
+    dest_scope=&cpp_scopes.current_scope();
   }
   else
   {
     const cpp_namet &cpp_name=
       to_cpp_name(type.find(ID_tag));
 
-    cpp_name.convert(identifier, base_name);
-
-    if(identifier!=base_name)
+    // scope given?
+    if(cpp_name.is_qualified())
     {
-      err_location(cpp_name.location());
-      throw "no namespaces allowed in compound names";
+      cpp_save_scopet cpp_save_scope(cpp_scopes);
+      cpp_typecheck_resolvet cpp_typecheck_resolve(*this);
+      cpp_template_args_non_tct t_args;
+      dest_scope=&cpp_typecheck_resolve.resolve_scope(cpp_name, base_name, t_args);
+    }
+    else
+    {
+      std::string identifier;
+      cpp_name.convert(identifier, base_name);
+      dest_scope=&tag_scope(base_name, has_body, tag_only_declaration);
     }
   }
 
-  bool has_body=type.find(ID_body).is_not_nil();
-  bool tag_only_declaration=type.get_bool(ID_C_tag_only_declaration);
-  
-  cpp_scopet &dest_scope=
-    tag_scope(base_name, has_body, tag_only_declaration);
-  
   const irep_idt symbol_name=
     language_prefix+
-    dest_scope.prefix+
-    "tag."+identifier;
+    dest_scope->prefix+
+    "tag."+base_name;
 
   // check if we have it already
 
@@ -187,7 +191,7 @@ void cpp_typecheckt::typecheck_compound_type(
       throw "cpp_typecheckt::typecheck_compound_type: context.move() failed";
 
     // put into dest_scope
-    cpp_idt &id=cpp_scopes.put_into_scope(*new_symbol, dest_scope);
+    cpp_idt &id=cpp_scopes.put_into_scope(*new_symbol, *dest_scope);
 
     id.id_class=cpp_idt::CLASS;
     id.is_scope=true;
