@@ -1129,11 +1129,13 @@ void cpp_typecheckt::typecheck_expr_delete(exprt &expr)
 {
   if(expr.operands().size()!=1)
     throw "delete expects one operand";
+    
+  const irep_idt statement=expr.get(ID_statement);
 
-  if(expr.get(ID_statement)==ID_cpp_delete)
+  if(statement==ID_cpp_delete)
   {
   }
-  else if(expr.get(ID_statement)==ID_cpp_delete_array)
+  else if(statement==ID_cpp_delete_array)
   {
   }
   else
@@ -1148,8 +1150,12 @@ void cpp_typecheckt::typecheck_expr_delete(exprt &expr)
         << to_string(pointer_type) << "'";
     throw 0;
   }
+  
+  // remove any const-ness of the argument
+  // (which would impair the call to the destructor)
+  pointer_type.subtype().remove(ID_C_constant);
 
-  // these are always void
+  // delete expressions are always void
   expr.type()=typet(ID_empty);
   
   // we provide the right destructor, for the convenience
