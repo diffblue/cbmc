@@ -379,6 +379,7 @@ void cpp_typecheckt::typecheck_class_template_member(
   }
   else
   {
+    return; // TODO
     err_location(cpp_name);
     str << "bad template name";
     throw 0;
