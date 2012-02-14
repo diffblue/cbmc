@@ -101,14 +101,28 @@ void cpp_typecheckt::typecheck_enum_type(typet &type)
   // replace by type symbol
   
   cpp_enum_typet &enum_type=to_cpp_enum_type(type);
+  bool anonymous=!enum_type.has_tag();
+  std::string base_name;
+  
+  if(anonymous)
+  {
+    base_name="#anon"+i2string(anon_counter++);
+  }
+  else
+  {
+    const cpp_namet &tag=enum_type.tag();
+    std::string identifier;
+    tag.convert(identifier, base_name);
+  
+    if(identifier!=base_name)
+    {
+      err_location(type);
+      throw "enum tag with scope";
+    }
+  }
 
   bool has_body=enum_type.has_body();
-  std::string base_name=id2string(enum_type.get_name());
-  bool anonymous=base_name.empty();
   bool tag_only_declaration=enum_type.get_tag_only_declaration();
-
-  if(anonymous)
-    base_name="#anon"+i2string(anon_counter++);
 
   cpp_scopet &dest_scope=
     tag_scope(base_name, has_body, tag_only_declaration);

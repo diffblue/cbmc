@@ -3080,22 +3080,22 @@ bool Parser::rEnumSpec(typet &spec)
   spec=cpp_enum_typet();
   set_location(spec, tk);
 
-  int t=lex->GetToken(tk);
-
-  if(t==TOK_IDENTIFIER)
+  if(lex->LookAhead(0)!='{')
   {
-    spec.set(ID_name, tk.text);
+    // Visual Studio allows full names for the tag,
+    // not just an identifier
+    irept name;
 
-    if(lex->LookAhead(0)=='{')
-      t=lex->GetToken(tk);
-    else
-      return true;
+    if(!rName(name))
+      return false;
+
+    spec.add(ID_tag).swap(name);
   }
-  else
-    spec.set(ID_name, irep_idt());
 
-  if(t!='{')
-    return false;
+  if(lex->LookAhead(0)!='{')
+    return true; // ok, no body
+
+  lex->GetToken(tk);
 
   if(lex->LookAhead(0)=='}')
   {
@@ -3105,6 +3105,8 @@ bool Parser::rEnumSpec(typet &spec)
   else
     if(!rEnumBody(spec.add(ID_body)))
       return false;
+
+  // there must be closing '}'
 
   if(lex->GetToken(tk)!='}')
     return false;
