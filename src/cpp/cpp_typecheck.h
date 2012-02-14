@@ -366,7 +366,6 @@ protected:
   // determine the scope into which a tag goes
   // (enums, structs, union, classes)
   cpp_scopet &tag_scope(
-    const irep_idt &_elaborated_base_name, // includes template instance
     const irep_idt &_base_name,
     bool has_body,
     bool tag_only_declaration);

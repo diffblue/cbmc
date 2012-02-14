@@ -111,7 +111,7 @@ void cpp_typecheckt::typecheck_enum_type(typet &type)
     base_name="#anon"+i2string(anon_counter++);
 
   cpp_scopet &dest_scope=
-    tag_scope(base_name, base_name, has_body, tag_only_declaration);
+    tag_scope(base_name, has_body, tag_only_declaration);
 
   const irep_idt symbol_name=
     dest_scope.prefix+"tag."+base_name;

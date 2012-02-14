@@ -34,7 +34,6 @@ Purpose:
 \*******************************************************************/
 
 cpp_scopet &cpp_typecheckt::tag_scope(
-  const irep_idt &elaborated_base_name,
   const irep_idt &base_name,
   bool has_body,
   bool tag_only_declaration)
@@ -127,7 +126,7 @@ void cpp_typecheckt::typecheck_compound_type(
   bool tag_only_declaration=type.get_bool(ID_C_tag_only_declaration);
   
   cpp_scopet &dest_scope=
-    tag_scope(identifier, base_name, has_body, tag_only_declaration);
+    tag_scope(base_name, has_body, tag_only_declaration);
   
   const irep_idt symbol_name=
     language_prefix+
@@ -816,7 +815,8 @@ void cpp_typecheckt::typecheck_friend_declaration(
 
   if(declaration.is_template())
   {
-    err_location(declaration.location());
+    return; // TODO
+    err_location(declaration.type().location());
     str << "friend template not supported";
     throw 0;
   }
