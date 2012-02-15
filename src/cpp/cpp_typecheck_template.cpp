@@ -741,9 +741,9 @@ void cpp_typecheckt::convert_template_function_or_member_specialization(
   if(cpp_name.get_sub().back().id()==ID_template_args)
   {
     // proper specialization with arguments
-    if(cpp_name.get_sub().size() != 2 ||
-       cpp_name.get_sub()[0].id() != ID_name ||
-       cpp_name.get_sub()[1].id() != ID_template_args)
+    if(cpp_name.get_sub().size()!=2 ||
+       cpp_name.get_sub()[0].id()!=ID_name ||
+       cpp_name.get_sub()[1].id()!=ID_template_args)
     {
       // currently we are more restrictive
       // than the standard
