@@ -398,7 +398,7 @@ void cpp_typecheckt::typecheck_class_template_member(
   {
     str << cpp_scopes.current_scope();
     err_location(cpp_name);
-    str << "template function/member identifier `"
+    str << "class template `"
         << cpp_name.get_sub().front().get(ID_identifier)
         << "' not found";
     throw 0;
@@ -406,7 +406,7 @@ void cpp_typecheckt::typecheck_class_template_member(
   else if(id_set.size()>1)
   {
     err_location(cpp_name);
-    str << "template function/member identifier `"
+    str << "class template `"
         << cpp_name.get_sub().front().get(ID_identifier)
         << "' is ambiguous";
     throw 0;
@@ -415,7 +415,7 @@ void cpp_typecheckt::typecheck_class_template_member(
   {
     std::cerr << *(*id_set.begin()) << std::endl;
     err_location(cpp_name);
-    str << "template function/member identifier `"
+    str << "class template `"
         << cpp_name.get_sub().front().get(ID_identifier)
         << "' is not a template";
     throw 0;
