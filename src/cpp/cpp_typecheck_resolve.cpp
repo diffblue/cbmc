@@ -705,18 +705,33 @@ void cpp_typecheck_resolvet::make_constructors(
       // there are two pod constructors:
 
       // 1. no arguments, default initialization
-      code_typet t1;
-      t1.return_type()=it->type();
-      exprt pod_constructor1("pod_constructor", t1);
-      new_identifiers.push_back(pod_constructor1);
+      {
+        code_typet t1;
+        t1.return_type()=it->type();
+        exprt pod_constructor1("pod_constructor", t1);
+        new_identifiers.push_back(pod_constructor1);
+      }
 
       // 2. one argument, copy/conversion
-      code_typet t2;
-      t2.return_type()=it->type();
-      t2.arguments().resize(1);
-      t2.arguments()[0].type()=it->type();
-      exprt pod_constructor2("pod_constructor", t2);
-      new_identifiers.push_back(pod_constructor2);
+      {
+        code_typet t2;
+        t2.return_type()=it->type();
+        t2.arguments().resize(1);
+        t2.arguments()[0].type()=it->type();
+        exprt pod_constructor2("pod_constructor", t2);
+        new_identifiers.push_back(pod_constructor2);
+      }
+      
+      // enums, in addition, can also be constructed from int
+      if(symbol_type.id()==ID_c_enum)
+      {
+        code_typet t3;
+        t3.return_type()=it->type();
+        t3.arguments().resize(1);
+        t3.arguments()[0].type()=int_type();
+        exprt pod_constructor3("pod_constructor", t3);
+        new_identifiers.push_back(pod_constructor3);
+      }
     }
     else if(symbol_type.id()==ID_struct)
     {
