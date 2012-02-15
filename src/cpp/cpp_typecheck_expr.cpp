@@ -2241,6 +2241,10 @@ void cpp_typecheckt::typecheck_side_effect_assignment(exprt &expr)
       expr.op0().set(ID_C_lvalue, true);
 
     c_typecheck_baset::typecheck_side_effect_assignment(expr);
+    
+    // Note that in C++ (as opposed to C), the assignment yields
+    // an lvalue!
+    expr.set(ID_C_lvalue, true);
     return;
   }
 
