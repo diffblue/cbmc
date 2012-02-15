@@ -349,7 +349,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
   component.set(ID_access, access);
   component.set(ID_base_name, base_name);
   component.set(ID_pretty_name, base_name);
-  component.location() = cpp_name.location();
+  component.location()=cpp_name.location();
 
   if(cpp_name.is_operator())
   {
@@ -537,13 +537,13 @@ void cpp_typecheckt::typecheck_compound_declarator(
 
         // create symbols for the arguments
         code_typet::argumentst& args =  code_type.arguments();
-        for(unsigned i =0; i < args.size(); i++)
+        for(unsigned i=0; i<args.size(); i++)
         {
           code_typet::argumentt& arg = args[i];
           irep_idt base_name = arg.get_base_name();
 
           if(base_name==irep_idt())
-            base_name = "arg" + i2string(i);
+            base_name="arg"+i2string(i);
 
           symbolt arg_symb;
           arg_symb.name = func_symb.name.as_string() + "::"+ base_name.as_string();
@@ -643,7 +643,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
     if(context.move(static_symbol, new_symbol))
     {
       err_location(cpp_name.location());
-	str << "redeclaration of symbol `" 
+	str << "redeclaration of static member `" 
 	    << static_symbol.base_name.as_string()
 	    << "'";
       throw 0;
