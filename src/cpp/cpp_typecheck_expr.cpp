@@ -509,11 +509,11 @@ Purpose:
 
 bool cpp_typecheckt::overloadable(const exprt &expr)
 {
+  // at least one argument must have class or enumerated type
+  
   forall_operands(it, expr)
   {
-    typet t(it->type());
-
-    follow_symbol(t);
+    typet t=follow(it->type());
 
     if(is_reference(t))
       t=t.subtype();
@@ -2209,62 +2209,6 @@ void cpp_typecheckt::typecheck_method_application(
   {
     context.symbols[symbol.name].value.set("is_used", true);
   }
-}
-
-/*******************************************************************\
-
-Function: cpp_typecheckt::function_call_add_this
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
-
-void cpp_typecheckt::function_call_add_this(
-  side_effect_expr_function_callt &expr)
-{
-  /*  // add "this" to argument list
-  assert(expr.operands().size()==2);
-
-  typet this_type = to_code_type(lookup(expr.function().type())
-                                 .arguments().front().type();
-
-  // special case. make it reference
-  assert(this_type.id()=="pointer");
-  this_type.set("#refrence",true);
-  this_type.set("#this",true);
-
-  exprt new_expr
-  implicit_typecast()
-
-  // insert operand
-  expr.arguments().insert(expr.arguments().begin(), exprt());
-
-  exprt &member_expr=expr.function();
-  exprt &this_argument_expr=expr.arguments().front();
-
-  assert(member_expr.operands().size()==1);
-
-  exprt &struct_expr=member_expr.op0();
-
-  if(struct_expr.id()==ID_dereference &&
-     struct_expr.operands().size()==1 &&
-   struct_expr.op0().type().id()==ID_pointer)
-  {
-    this_argument_expr=struct_expr.op0();
-    if(this_argument_expr.type().get_bool("#reference"))
-      this_argument_expr.type().remove("#reference");
-  }
-  else
-  {
-    this_argument_expr=exprt(ID_address_of, typet(ID_pointer));
-    this_argument_expr.location()=expr.location();
-    this_argument_expr.type().subtype()=member_expr.op0().type();
-    this_argument_expr.copy_to_operands(member_expr.op0());
-  }*/
 }
 
 /*******************************************************************\

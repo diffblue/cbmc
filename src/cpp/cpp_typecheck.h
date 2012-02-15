@@ -479,8 +479,6 @@ protected:
 
   void typecheck_method_application(
                     side_effect_expr_function_callt &expr);
-  void function_call_add_this(
-                    side_effect_expr_function_callt &expr);
 
   void typecheck_assign(codet &code);
 
