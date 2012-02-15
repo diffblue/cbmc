@@ -1025,17 +1025,24 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
           cpp_typecheck.str << "scope `" << final_base_name << "' not found";
           throw 0;
         }
-        else if(id_set.size()==1)
-        {
-          cpp_typecheck.cpp_scopes.go_to(**id_set.begin());
-        }
-        else
+        else if(id_set.size()>=2)
         {
           cpp_typecheck.show_instantiation_stack(cpp_typecheck.str);
           cpp_typecheck.err_location(location);
           cpp_typecheck.str << "scope `" 
                             << final_base_name << "' is ambiguous";
           throw 0;
+        }
+        
+        assert(id_set.size()==1);
+
+        cpp_typecheck.cpp_scopes.go_to(**id_set.begin());
+        
+        // the "::" triggers template elaboration
+        if(cpp_typecheck.cpp_scopes.current_scope().class_identifier!=irep_idt())
+        {
+          symbol_typet instance(cpp_typecheck.cpp_scopes.current_scope().class_identifier);
+          cpp_typecheck.elaborate_class_template(instance);
         }
       }
 
