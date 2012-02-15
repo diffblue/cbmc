@@ -540,35 +540,35 @@ Purpose:
 
 struct operator_entryt
 {
-  const char *id_name;
+  const irep_idt id;
   const char *op_name;
 } const operators[] =
 {
-  { "+", "+" },
-  { "-", "-" },
-  { "*", "*" },
-  { "/", "/" },
-  { "bitnot", "~" },
-  { "bitand", "&" },
-  { "bitor", "|" },
-  { "bitxor", "^" },
-  { "not", "!" },
-  { "unary-", "-" },
-  { "and", "&&" },
-  { "or", "||" },
-  { "not", "!" },
-  { "index", "[]" },
-  { "=", "==" },
-  { "<", "<"},
-  { "<=", "<="},
-  { ">", ">"},
-  { ">=", ">="},
-  { "shl", "<<"},
-  { "shr", ">>"},
-  { "notequal", "!=" },
-  { "dereference", "*" },
-  { "ptrmember", "->" },
-  { NULL, NULL }
+  { ID_plus, "+" },
+  { ID_minus, "-" },
+  { ID_mult, "*" },
+  { ID_div, "/" },
+  { ID_bitnot, "~" },
+  { ID_bitand, "&" },
+  { ID_bitor, "|" },
+  { ID_bitxor, "^" },
+  { ID_not, "!" },
+  { ID_unary_minus, "-" },
+  { ID_and, "&&" },
+  { ID_or, "||" },
+  { ID_not, "!" },
+  { ID_index, "[]" },
+  { ID_equal, "==" },
+  { ID_lt, "<"},
+  { ID_le, "<="},
+  { ID_gt, ">"},
+  { ID_ge, ">="},
+  { ID_shl, "<<"},
+  { ID_shr, ">>"},
+  { ID_notequal, "!=" },
+  { ID_dereference, "*" },
+  { ID_ptrmember, "->" },
+  { irep_idt(), NULL }
 };
 
 bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
@@ -669,9 +669,9 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
   }
 
   for(const operator_entryt *e=operators;
-      e->id_name!=NULL;
+      e->id!=irep_idt();
       e++)
-    if(expr.id()==e->id_name)
+    if(expr.id()==e->id)
     {
       if(expr.id()==ID_dereference)
         assert(!expr.get_bool(ID_C_implicit));
