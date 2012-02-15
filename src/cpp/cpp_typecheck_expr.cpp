@@ -518,8 +518,9 @@ bool cpp_typecheckt::overloadable(const exprt &expr)
     if(is_reference(t))
       t=t.subtype();
 
-      if(t.id()==ID_struct ||
-         t.id()==ID_union)
+    if(t.id()==ID_struct ||
+       t.id()==ID_union ||
+       t.id()==ID_c_enum)
       return true;
   }
 
