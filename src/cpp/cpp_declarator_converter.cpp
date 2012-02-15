@@ -433,11 +433,11 @@ Function: cpp_declarator_convertert::get_final_identifier
 
 void cpp_declarator_convertert::get_final_identifier()
 {
-  std::string identifier=base_name;
+  std::string identifier=id2string(base_name);
 
   // main is always "C" linkage, as a matter of principle
   if(is_code &&
-     base_name=="main" &&
+     base_name==ID_main &&
      scope->prefix=="")
   {
     mode=ID_C;
@@ -611,7 +611,7 @@ irep_idt cpp_declarator_convertert::get_pretty_name()
     const irept::subt &arguments=
       final_type.find(ID_arguments).get_sub();
 
-    std::string result=scope->prefix+base_name+"(";
+    std::string result=scope->prefix+id2string(base_name)+"(";
 
     forall_irep(it, arguments)
     {
@@ -628,7 +628,7 @@ irep_idt cpp_declarator_convertert::get_pretty_name()
     return result;
   }
 
-  return scope->prefix+base_name;
+  return scope->prefix+id2string(base_name);
 }
 
 /*******************************************************************\

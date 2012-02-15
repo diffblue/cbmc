@@ -108,21 +108,20 @@ void cpp_typecheckt::typecheck_class_template(
   const cpp_namet &cpp_name=
     static_cast<const cpp_namet &>(type.find(ID_tag));
 
-  std::string identifier, base_name;
-  cpp_name.convert(identifier, base_name);
-
-  if(identifier!=base_name)
-  {
-    err_location(cpp_name.location());
-    throw "no namespaces allowed here";
-  }
-
-  if(base_name.empty())
+  if(cpp_name.is_nil())
   {
     err_location(type.location());
     throw "class templates must not be anonymous";
   }
-  
+
+  if(!cpp_name.is_simple_name())
+  {
+    err_location(cpp_name.location());
+    throw "simple name expected as class template tag";
+  }
+
+  irep_idt base_name=cpp_name.get_base_name();
+
   const cpp_template_args_non_tct &partial_specialization_args=
     declaration.partial_specialization_args();
   
@@ -254,14 +253,14 @@ void cpp_typecheckt::typecheck_function_template(
   cpp_scopet &template_scope=
     typecheck_template_parameters(declaration.template_type());
 
-  std::string identifier, base_name;
-  cpp_name.convert(identifier, base_name);
-  if(identifier!=base_name)
+  if(!cpp_name.is_simple_name())
   {
     err_location(declaration);
-    str << "namespaces not supported in template declaration";
+    str << "function template must have simple name";
     throw 0;
   }
+
+  irep_idt base_name=cpp_name.get_base_name();
 
   template_typet &template_type=declaration.template_type();
     

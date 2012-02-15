@@ -293,14 +293,17 @@ void cpp_convert_typet::read_function_type(const typet &type)
         {
           new_argument.location()=type_location;
         }
+        else if(cpp_name.is_simple_name())
+        {
+          irep_idt base_name=cpp_name.get_base_name();
+          assert(!base_name.empty());
+          new_argument.set_identifier(base_name);
+          new_argument.set_base_name(base_name);
+          new_argument.location()=cpp_name.location();
+        }
         else
         {
-          std::string identifier, base_name;
-          cpp_name.convert(identifier, base_name);
-          assert(!identifier.empty());
-          new_argument.set_identifier(identifier);
-          new_argument.set_base_name(identifier);
-          new_argument.location()=cpp_name.location();
+          throw "expected simple name as argument";
         }
 
         if(declarator.value().is_not_nil())
@@ -310,9 +313,11 @@ void cpp_convert_typet::read_function_type(const typet &type)
       }
     }
     else if(argument_expr.id()==ID_ellipsis)
+    {
       throw "ellipsis only allowed as last argument";
+    }
     else
-      assert(0);
+      assert(false);
   }
 
   // if we just have one argument of type void, remove it

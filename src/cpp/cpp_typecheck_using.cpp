@@ -31,7 +31,7 @@ void cpp_typecheckt::convert(cpp_usingt &cpp_using)
   cpp_typecheck_resolvet resolver(*this);
   cpp_save_scopet save_scope(this->cpp_scopes);
 
-  std::string base_name;
+  irep_idt base_name;
   cpp_template_args_non_tct template_args;
   resolver.resolve_scope(cpp_using.name(), base_name, template_args);
 

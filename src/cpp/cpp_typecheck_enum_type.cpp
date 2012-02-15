@@ -102,7 +102,7 @@ void cpp_typecheckt::typecheck_enum_type(typet &type)
   
   cpp_enum_typet &enum_type=to_cpp_enum_type(type);
   bool anonymous=!enum_type.has_tag();
-  std::string base_name;
+  irep_idt base_name;
   
   if(anonymous)
   {
@@ -111,13 +111,13 @@ void cpp_typecheckt::typecheck_enum_type(typet &type)
   else
   {
     const cpp_namet &tag=enum_type.tag();
-    std::string identifier;
-    tag.convert(identifier, base_name);
-  
-    if(identifier!=base_name)
+    
+    if(tag.is_simple_name())
+      base_name=tag.get_base_name();
+    else
     {
       err_location(type);
-      throw "enum tag with scope";
+      throw "enum tag is expected to be a simple name";
     }
   }
 
@@ -128,7 +128,7 @@ void cpp_typecheckt::typecheck_enum_type(typet &type)
     tag_scope(base_name, has_body, tag_only_declaration);
 
   const irep_idt symbol_name=
-    dest_scope.prefix+"tag."+base_name;
+    dest_scope.prefix+"tag."+id2string(base_name);
 
   // check if we have it
   
@@ -154,7 +154,7 @@ void cpp_typecheckt::typecheck_enum_type(typet &type)
   else if(has_body)
   {
     std::string pretty_name=
-      cpp_scopes.current_scope().prefix+base_name;
+      cpp_scopes.current_scope().prefix+id2string(base_name);
 
     symbolt symbol;
 
