@@ -261,18 +261,28 @@ void cpp_typecheckt::typecheck_compound_declarator(
   elaborate_class_template(final_type);
 
   typecheck_type(final_type);
-
+  
   cpp_namet cpp_name;
   cpp_name.swap(declarator.name());
-
-  if(!cpp_name.is_simple_name())
+  
+  irep_idt base_name;
+  
+  if(cpp_name.is_nil())
+  {
+    // Yes, there can be members without name.
+    base_name=irep_idt();
+  }
+  else if(cpp_name.is_simple_name())
+  {
+    base_name=cpp_name.get_base_name();
+  }
+  else
   {
     err_location(cpp_name.location());
     str << "declarator in compound needs to be simple name";
     throw 0;
   }
 
-  irep_idt base_name=cpp_name.get_base_name();
 
   bool is_method=!is_typedef && final_type.id()==ID_code;
   bool is_constructor=declaration.is_constructor();
