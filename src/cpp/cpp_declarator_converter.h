@@ -51,7 +51,7 @@ public:
   class cpp_typecheckt &cpp_typecheck;
 
 protected:
-  std::string base_name;
+  irep_idt base_name;
   typet final_type;
   cpp_scopet *scope;
   irep_idt final_identifier;

@@ -31,7 +31,7 @@ public:
   // Should really return explicitly.
   cpp_scopet &resolve_scope(
     const cpp_namet &cpp_name,
-    std::string &base_name,
+    irep_idt &base_name,
     cpp_template_args_non_tct &template_args);
 
   cpp_scopet &resolve_namespace(const cpp_namet &cpp_name);
@@ -115,13 +115,13 @@ protected:
     const cpp_template_args_non_tct &template_args);
 
   void show_identifiers(
-    const std::string &base_name,
+    const irep_idt &base_name,
     const resolve_identifierst &identifiers,
     std::ostream &out);
 
   void resolve_with_arguments(
     cpp_scopest::id_sett &id_set,
-    const std::string &base_name,
+    const irep_idt &base_name,
     const cpp_typecheck_fargst &fargs);
 
   void filter_for_named_scopes(cpp_scopest::id_sett &id_set);

@@ -26,7 +26,20 @@ public:
       return static_cast<const locationt &>(get_sub().front().find(ID_C_location));
   }
 
-  void convert(std::string &identifier, std::string &base_name) const;
+  //void convert(std::string &identifier, std::string &base_name) const;
+  irep_idt get_base_name() const;
+  
+  // one of three:
+  // 'string'
+  // 'operator X'
+  // '~string'
+  inline bool is_simple_name() const
+  {
+    const subt &sub=get_sub();
+    return (sub.size()==1 && sub.front().id()==ID_name) ||
+           (sub.size()==2 && sub.front().id()==ID_operator) ||
+           (sub.size()==2 && sub[0].id()=="~" && sub[1].id()==ID_name);
+  }
 
   bool is_operator() const
   {

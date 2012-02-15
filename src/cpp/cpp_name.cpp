@@ -14,6 +14,36 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 /*******************************************************************\
 
+Function: cpp_namet::get_base_name
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+irep_idt cpp_namet::get_base_name() const
+{
+  assert(is_simple_name());
+
+  const subt &sub=get_sub();
+
+  if(sub.size()==1 && sub.front().id()==ID_name)
+    return sub.front().get(ID_identifier);
+  else if(sub.size()==2 && sub.front().id()==ID_operator)
+    return "operator"+sub[1].id_string();
+  else if(sub.size()==2 && sub[0].id()=="~" && sub[1].id()==ID_name)
+    return sub[0].id_string()+sub[1].get_string(ID_identifier); 
+  else
+    assert(false);
+
+  return irep_idt();
+}
+
+/*******************************************************************\
+
 Function: cpp_namet::convert
 
   Inputs:
@@ -24,6 +54,7 @@ Function: cpp_namet::convert
 
 \*******************************************************************/
 
+#if 0
 void cpp_namet::convert(
   std::string &identifier,
   std::string &base_name) const
@@ -54,6 +85,7 @@ void cpp_namet::convert(
       base_name+=name_component;
   }
 }
+#endif
 
 /*******************************************************************\
 

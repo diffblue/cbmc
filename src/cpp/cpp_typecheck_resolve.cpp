@@ -950,7 +950,7 @@ Purpose:
 
 cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
   const cpp_namet &cpp_name,
-  std::string &base_name,
+  irep_idt &base_name,
   cpp_template_args_non_tct &template_args)
 {
   assert(cpp_name.id()==ID_cpp_name);
@@ -971,13 +971,13 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
     recursive=false;
   }
 
-  base_name="";
+  std::string final_base_name="";
   template_args.make_nil();
 
   while(pos!=cpp_name.get_sub().end())
   {
     if(pos->id()==ID_name)
-      base_name+=pos->get_string(ID_identifier);
+      final_base_name+=pos->get_string(ID_identifier);
     else if(pos->id()==ID_template_args)
       template_args=to_cpp_template_args_non_tc(*pos);
     else if(pos->id()=="::")
@@ -987,7 +987,7 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
       if(template_args.is_not_nil())
       {
         cpp_typecheck.cpp_scopes.current_scope().lookup(
-          base_name,
+          final_base_name,
           recursive?cpp_scopet::RECURSIVE:cpp_scopet::QUALIFIED,
           cpp_idt::TEMPLATE,
           id_set);
@@ -997,7 +997,7 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
 //        std::cout << "X: " << id_set.size() <<std::endl;
           
         symbol_typet instance=
-          disambiguate_template_classes(base_name, id_set, template_args);
+          disambiguate_template_classes(final_base_name, id_set, template_args);
           
         instance.location()=location;
           
@@ -1012,7 +1012,7 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
       else
       {
         cpp_typecheck.cpp_scopes.current_scope().lookup(
-          base_name,
+          final_base_name,
           recursive?cpp_scopet::RECURSIVE:cpp_scopet::QUALIFIED,
           id_set);
           
@@ -1022,7 +1022,7 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
         {
           cpp_typecheck.show_instantiation_stack(cpp_typecheck.str);
           cpp_typecheck.err_location(location);
-          cpp_typecheck.str << "scope `" << base_name << "' not found";
+          cpp_typecheck.str << "scope `" << final_base_name << "' not found";
           throw 0;
         }
         else if(id_set.size()==1)
@@ -1034,17 +1034,17 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
           cpp_typecheck.show_instantiation_stack(cpp_typecheck.str);
           cpp_typecheck.err_location(location);
           cpp_typecheck.str << "scope `" 
-                            << base_name << "' is ambiguous";
+                            << final_base_name << "' is ambiguous";
           throw 0;
         }
       }
 
       // we start from fresh
-      base_name.clear();
+      final_base_name.clear();
     }
     else if(pos->id()==ID_operator)
     {
-      base_name+="operator";
+      final_base_name+="operator";
 
       irept::subt::const_iterator next=pos+1;
       assert(next != cpp_name.get_sub().end());
@@ -1061,16 +1061,18 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
         typet op_name;
         op_name.swap(next_ir);
         cpp_typecheck.typecheck_type(op_name);
-        base_name+="("+cpp_type2name(op_name)+")";
+        final_base_name+="("+cpp_type2name(op_name)+")";
         pos++;
       }
 
     }
     else
-      base_name+=pos->id_string();
+      final_base_name+=pos->id_string();
 
     pos++;
   }
+  
+  base_name=final_base_name;
   
   return cpp_typecheck.cpp_scopes.current_scope();
 }
@@ -1324,7 +1326,7 @@ Purpose:
 cpp_scopet &cpp_typecheck_resolvet::resolve_namespace(
   const cpp_namet &cpp_name)
 {
-  std::string base_name;
+  irep_idt base_name;
   cpp_template_args_non_tct template_args;
   template_args.make_nil();
 
@@ -1379,7 +1381,7 @@ Purpose:
 \*******************************************************************/
 
 void cpp_typecheck_resolvet::show_identifiers(
-  const std::string &base_name,
+  const irep_idt &base_name,
   const resolve_identifierst &identifiers,
   std::ostream &out)
 {
@@ -1406,7 +1408,7 @@ void cpp_typecheck_resolvet::show_identifiers(
       if(id_expr.id()==ID_member)
       {
         out << "member ";
-        id="."+base_name;
+        id="."+id2string(base_name);
       }
       else if(id_expr.id()=="pod_constructor")
       {
@@ -1490,7 +1492,7 @@ exprt cpp_typecheck_resolvet::resolve(
   const cpp_typecheck_fargst &fargs,
   bool fail_with_exception)
 {
-  std::string base_name;
+  irep_idt base_name;
   cpp_template_args_non_tct template_args;
   template_args.make_nil();
 
@@ -1512,14 +1514,14 @@ exprt cpp_typecheck_resolvet::resolve(
   }
   else
   {
-    if(base_name=="true")
+    if(base_name==ID_true)
     {
       exprt result;
       result.make_true();
       result.location()=location;
       return result;
     }
-    else if(base_name=="false")
+    else if(base_name==ID_false)
     {
       exprt result;
       result.make_false();
@@ -1529,7 +1531,7 @@ exprt cpp_typecheck_resolvet::resolve(
     else if(base_name=="__nullptr") // this is c++0x
     {
       constant_exprt result;
-      result.set_value("NULL");
+      result.set_value(ID_NULL);
       result.type()=pointer_typet();
       result.type().subtype()=empty_typet();
       result.location()=location;
@@ -1834,7 +1836,7 @@ void cpp_typecheck_resolvet::guess_template_args(
       cpp_save_scopet save_scope(cpp_typecheck.cpp_scopes);
     
       cpp_template_args_non_tct template_args;
-      std::string base_name;
+      irep_idt base_name;
       resolve_scope(cpp_name, base_name, template_args);
 
       cpp_scopest::id_sett id_set;
@@ -1934,7 +1936,7 @@ void cpp_typecheck_resolvet::guess_template_args(
       // template parameters aren't qualified    
       if(!cpp_name.is_qualified())
       {
-        std::string base_name;
+        irep_idt base_name;
         cpp_template_args_non_tct template_args;
         resolve_scope(cpp_name, base_name, template_args);
 
@@ -2523,7 +2525,7 @@ Purpose:
 
 void cpp_typecheck_resolvet::resolve_with_arguments(
   cpp_scopest::id_sett &id_set,
-  const std::string &base_name,
+  const irep_idt &base_name,
   const cpp_typecheck_fargst &fargs)
 {
   // not clear what this is good for

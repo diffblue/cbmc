@@ -99,7 +99,7 @@ void cpp_typecheckt::typecheck_compound_type(
 
   // get the tag name
   bool anonymous=type.find(ID_tag).is_nil();
-  std::string base_name;
+  irep_idt base_name;
   cpp_scopet *dest_scope=NULL;
   bool has_body=type.find(ID_body).is_not_nil();
   bool tag_only_declaration=type.get_bool(ID_C_tag_only_declaration);
@@ -117,25 +117,24 @@ void cpp_typecheckt::typecheck_compound_type(
       to_cpp_name(type.find(ID_tag));
 
     // scope given?
-    if(cpp_name.is_qualified())
+    if(cpp_name.is_simple_name())
+    {
+      base_name=cpp_name.get_base_name();
+      dest_scope=&tag_scope(base_name, has_body, tag_only_declaration);
+    }
+    else
     {
       cpp_save_scopet cpp_save_scope(cpp_scopes);
       cpp_typecheck_resolvet cpp_typecheck_resolve(*this);
       cpp_template_args_non_tct t_args;
       dest_scope=&cpp_typecheck_resolve.resolve_scope(cpp_name, base_name, t_args);
     }
-    else
-    {
-      std::string identifier;
-      cpp_name.convert(identifier, base_name);
-      dest_scope=&tag_scope(base_name, has_body, tag_only_declaration);
-    }
   }
 
   const irep_idt symbol_name=
     language_prefix+
     dest_scope->prefix+
-    "tag."+base_name;
+    "tag."+id2string(base_name);
 
   // check if we have it already
 
@@ -261,13 +260,19 @@ void cpp_typecheckt::typecheck_compound_declarator(
   // this triggers template elaboration
   elaborate_class_template(final_type);
 
+  typecheck_type(final_type);
+
   cpp_namet cpp_name;
   cpp_name.swap(declarator.name());
 
-  typecheck_type(final_type);
+  if(!cpp_name.is_simple_name())
+  {
+    err_location(cpp_name.location());
+    str << "declarator in compound needs to be simple name";
+    throw 0;
+  }
 
-  std::string full_name, base_name;
-  cpp_name.convert(full_name, base_name);
+  irep_idt base_name=cpp_name.get_base_name();
 
   bool is_method=!is_typedef && final_type.id()==ID_code;
   bool is_constructor=declaration.is_constructor();
@@ -345,7 +350,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
   irep_idt identifier=
     language_prefix+
     cpp_scopes.current_scope().prefix+
-    base_name;
+    id2string(base_name);
 
   component.set(ID_name, identifier);
   component.type()=final_type;
@@ -1100,8 +1105,8 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
       {
         cpp_declaratort &declarator=*d_it;
 
-        std::string ctor_full_name, ctor_base_name;
-        declarator.name().convert(ctor_full_name, ctor_base_name);
+        irep_idt ctor_base_name=
+          declarator.name().get_base_name();
         
         if(declarator.value().is_not_nil())
         {

@@ -612,8 +612,6 @@ void cpp_typecheckt::check_member_initializers(
     const irept &initializer = *init_it;
     assert(initializer.is_not_nil());
 
-    std::string identifier, base_name;
-    
     assert(initializer.get("member") == ID_cpp_name);
 
     const cpp_namet &member_name=
@@ -650,8 +648,7 @@ void cpp_typecheckt::check_member_initializers(
       return;
     }
 
-    member_name.convert(identifier, base_name);
-
+    irep_idt base_name=member_name.get_base_name();
     bool ok = false;
 
     for(struct_typet::componentst::const_iterator
@@ -659,7 +656,7 @@ void cpp_typecheckt::check_member_initializers(
         c_it!=components.end();
         c_it++)
     {
-      if(c_it->get("base_name") != base_name ) continue;
+      if(c_it->get(ID_base_name)!=base_name ) continue;
 
       // Data member
       if(!c_it->get_bool("from_base") &&
@@ -824,8 +821,6 @@ void cpp_typecheckt::full_member_initialization(
     forall_irep(m_it, initializers.get_sub())
     {
       irept initializer = *m_it;
-      std::string identifier;
-      std::string base_name;
 
       assert(initializer.get("member") == ID_cpp_name);
 
@@ -836,7 +831,7 @@ void cpp_typecheckt::full_member_initialization(
 
       if(!has_template_args)
       {
-        member_name.convert(identifier, base_name);
+        irep_idt base_name=member_name.get_base_name();
 
         // check if the initializer is a data
         bool is_data = false;
@@ -844,9 +839,9 @@ void cpp_typecheckt::full_member_initialization(
         for(struct_typet::componentst::const_iterator c_it =
             components.begin(); c_it != components.end(); c_it++)
         {
-          if (c_it->get("base_name") == base_name
-              && c_it->get(ID_type) != "code"
-              && !c_it->get_bool("is_type"))
+          if(c_it->get(ID_base_name)==base_name && 
+             c_it->get(ID_type)!=ID_code &&
+             !c_it->get_bool("is_type"))
           {
             is_data = true;
             break;
@@ -858,7 +853,7 @@ void cpp_typecheckt::full_member_initialization(
       }
 
       typet member_type=
-        static_cast<const typet&>(initializer.find("member"));
+        static_cast<const typet&>(initializer.find(ID_member));
 
       typecheck_type(member_type);
 
@@ -961,8 +956,6 @@ void cpp_typecheckt::full_member_initialization(
     Forall_irep(m_it, initializers.get_sub())
     {
       irept &initializer = *m_it;
-      std::string identifier;
-      std::string base_name;
 
       if(initializer.get("member")!=ID_cpp_name) continue;
       cpp_namet &member_name=(cpp_namet&) initializer.add("member");
@@ -970,7 +963,7 @@ void cpp_typecheckt::full_member_initialization(
       if(member_name.has_template_args())
         continue; // base-type initializer
 
-      member_name.convert(identifier, base_name);
+      irep_idt base_name=member_name.get_base_name();
 
       if(mem_name==base_name)
       {
