@@ -258,6 +258,9 @@ void cpp_typecheckt::typecheck_compound_declarator(
   typet final_type=
     declarator.merge_type(declaration.type());
 
+  // this triggers template elaboration
+  elaborate_class_template(final_type);
+
   cpp_namet cpp_name;
   cpp_name.swap(declarator.name());
 
@@ -943,7 +946,7 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
   bool found_ctor=false;
   bool found_dtor=false;
 
-  // we first do everything but the constructors
+  // we first do everything _but_ the constructors
 
   Forall_operands(it, body)
   {
@@ -961,12 +964,12 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
       if(declaration.is_template())
       {
         // remember access mode
-        declaration.set("#access", access);
+        declaration.set(ID_C_access, access);
         convert_template_declaration(declaration);
         continue;
       }
 
-      if(declaration.type().id()=="") // empty?
+      if(declaration.type().id()==irep_idt()) // empty?
         continue;
 
       bool is_typedef=
