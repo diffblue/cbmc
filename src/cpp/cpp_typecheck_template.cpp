@@ -929,7 +929,7 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
   const template_typet &template_type=
     to_cpp_declaration(template_symbol.type).template_type();
 
-  // bad re-cast
+  // bad re-cast, but better than copying the args one by one
   cpp_template_args_tct result=
     (const cpp_template_args_tct &)(template_args);
 
