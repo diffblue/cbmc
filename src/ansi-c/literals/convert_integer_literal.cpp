@@ -67,11 +67,22 @@ exprt convert_integer_literal(
   if(width_suffix!=0)
   {
     // this is a Microsoft extension
+    irep_idt cpp_type;
+    
+    if(width_suffix<=config.ansi_c.int_width)
+      cpp_type=is_unsigned?ID_unsigned_int:ID_signed_int;
+    else if(width_suffix<=config.ansi_c.long_int_width)
+      cpp_type=is_unsigned?ID_unsigned_long_int:ID_signed_long_int;
+    else
+      cpp_type=is_unsigned?ID_unsigned_long_long_int:ID_signed_long_long_int;
+
     typet type=typet(is_unsigned?ID_unsignedbv:ID_signedbv);
     type.set(ID_width, width_suffix);
+    type.set(ID_C_cpp_type, cpp_type);
 
     exprt result=from_integer(value, type);
     result.set(ID_C_cformat, src);
+    
     return result;    
   }
     
@@ -96,46 +107,62 @@ exprt convert_integer_literal(
 
   unsigned width;
   bool is_signed=false;
+  irep_idt cpp_type;
 
   if(FITS(config.ansi_c.int_width, true)) // int
   {
     width=config.ansi_c.int_width;
     is_signed=true;
+    cpp_type=ID_signed_int;
   }
   else if(FITS(config.ansi_c.int_width, false)) // unsigned int
   {
     width=config.ansi_c.int_width;
     is_signed=false;
+    cpp_type=ID_unsigned_int;
   }
   else if(FITS(config.ansi_c.long_int_width, true)) // long int
   {
     width=config.ansi_c.long_int_width;
     is_signed=true;
+    cpp_type=ID_signed_long_int;
   }
   else if(FITS(config.ansi_c.long_int_width, false)) // unsigned long int
   {
     width=config.ansi_c.long_int_width;
     is_signed=false;
+    cpp_type=ID_unsigned_long_int;
   }
   else if(FITS(config.ansi_c.long_long_int_width, true)) // long long int
   {
     width=config.ansi_c.long_long_int_width;
     is_signed=true;
+    cpp_type=ID_signed_long_long_int;
   }
   else if(FITS(config.ansi_c.long_long_int_width, false)) // unsigned long long int
   {
     width=config.ansi_c.long_long_int_width;
     is_signed=false;
+    cpp_type=ID_unsigned_long_long_int;
   }
   else
   {
     // way too large
     width=config.ansi_c.long_long_int_width;
+
+    if(is_unsigned)
+    {
+      is_signed=false;
+      cpp_type=ID_unsigned_long_long_int;
+    }
+    else
+      cpp_type=ID_signed_long_long_int;
   }
   
   typet type=typet(is_signed?ID_signedbv:ID_unsignedbv);
 
   type.set(ID_width, width);  
+  type.set(ID_C_cpp_type, cpp_type);
 
   exprt result=from_integer(value, type);
   result.set(ID_C_cformat, src);
