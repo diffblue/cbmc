@@ -523,7 +523,7 @@ dereferencet::valuet dereferencet::build_reference_to(
       result.pointer_guard=exprt(ID_same_object, bool_typet());
       result.pointer_guard.copy_to_operands(pointer_expr, object_pointer);
     }
-
+    
     guardt tmp_guard(guard);
     tmp_guard.add(result.pointer_guard);
     
@@ -584,7 +584,7 @@ dereferencet::valuet dereferencet::build_reference_to(
       index_exprt index_expr=
         index_exprt(root_object, adjusted_offset, root_object_type.subtype());
 
-      bounds_check(index_expr, guard);
+      bounds_check(index_expr, tmp_guard);
       
       result.value=index_expr;
 
