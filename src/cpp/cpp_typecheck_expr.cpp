@@ -1005,13 +1005,12 @@ Purpose:
 
 void cpp_typecheckt::typecheck_expr_explicit_typecast(exprt &expr)
 {
-  typecheck_type(expr.type());
-    
   // these can have 0 or 1 arguments
 
   if(expr.operands().size()==0)
   {
-    // default value
+    // Default value, e.g., int()
+    typecheck_type(expr.type());
     exprt new_expr=gen_zero(expr.type());
     
     if(new_expr.is_nil())
@@ -1027,7 +1026,33 @@ void cpp_typecheckt::typecheck_expr_explicit_typecast(exprt &expr)
   }
   else if(expr.operands().size()==1)
   {
-    // explicitly given value
+    // Explicitly given value, e.g., int(1).
+    // There is an expr-vs-type ambiguity, as it is possible to write
+    // (f)(1), where 'f' is a function symbol and not a type.
+    
+    if(expr.type().id()==ID_cpp_name)
+    {
+      // try to resolve as type
+      cpp_typecheck_fargst fargs;
+
+      exprt symbol_expr=resolve(
+        to_cpp_name(static_cast<const irept &>(expr.type())),
+        cpp_typecheck_resolvet::TYPE,
+        fargs,
+        false); // fail silently
+
+      if(symbol_expr.id()==ID_type)
+        expr.type()=symbol_expr.type();
+      else
+      {
+        // It's really a function call. Note that multiple arguments
+        // become a comma expression, and that these are already typechecked.
+        std::cout << "E: " << expr.pretty() << std::endl;
+      }
+    }
+    else
+      typecheck_type(expr.type());
+    
     exprt new_expr;
 
     if(const_typecast(expr.op0(), expr.type(), new_expr) ||
