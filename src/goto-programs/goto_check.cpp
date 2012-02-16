@@ -476,8 +476,7 @@ void goto_checkt::bounds_check(
     }
     else
     {
-      exprt inequality(ID_lt, bool_typet());
-      inequality.copy_to_operands(index, size);
+      binary_relation_exprt inequality(index, ID_lt, size);
 
       // typecast size
       if(inequality.op1().type()!=inequality.op0().type())
