@@ -111,10 +111,11 @@ Function: smt1_convt::ce_value
 exprt smt1_convt::ce_value(
   const typet &type,
   const std::string &index,
-  const std::string &value) const
+  const std::string &value,
+  bool in_struct) const
 {
   if(type.id()==ID_symbol)
-    return ce_value(ns.follow(type), index, value);
+    return ce_value(ns.follow(type), index, value, in_struct);
 
   if(type.id()==ID_signedbv ||
      type.id()==ID_unsignedbv ||
@@ -159,18 +160,47 @@ exprt smt1_convt::ce_value(
   }
   else if(type.id()==ID_array)
   {
-    exprt value_expr=ce_value(type.subtype(), "", value);
+    // arrays in structs are flat, no index
+    if(in_struct)
+    {
+      // we can only do fixed-size
+      mp_integer size;
+        
+      if(!to_integer(to_array_type(type).size(), size))
+      {
+        unsigned size_int=integer2long(size);
+        unsigned sub_width=value.size()/size_int;
+        exprt array_list("array-list", type);
+        array_list.operands().resize(size_int);
+        
+        unsigned offset=value.size();
+        
+        for(unsigned i=0; i!=size_int; i++)
+        {
+          offset-=sub_width;
+          std::string sub_value=value.substr(offset, sub_width);
+          array_list.operands()[i]=
+            ce_value(type.subtype(), "", sub_value, true);
+        }
+        
+        return array_list;
+      }
+    }
+    else
+    {
+      exprt value_expr=ce_value(type.subtype(), "", value, in_struct);
   
-    // use index, recusive call
-    exprt index_expr=
-      ce_value(signedbv_typet(index.size()), "", index);
+      // use index, recusive call
+      exprt index_expr=
+        ce_value(signedbv_typet(index.size()), "", index, false);
       
-    if(index_expr.is_nil()) return nil_exprt();
+      if(index_expr.is_nil()) return nil_exprt();
     
-    exprt array_list("array-list", type);
-    array_list.copy_to_operands(index_expr, value_expr);
+      exprt array_list("array-list", type);
+      array_list.copy_to_operands(index_expr, value_expr);
     
-    return array_list;
+      return array_list;
+    }
   }
 
   return nil_exprt();
@@ -2500,7 +2530,8 @@ void smt1_convt::convert_index(const index_exprt &expr, bool bool_as_bv)
     convert_expr(expr.array(), true);
     smt1_prop.out << " (zero_extend[" << width-array_index_bits << "]";
     smt1_prop.out << " (bvmul ";
-    convert_expr(expr.index(), true);
+    typecast_exprt index_tc(expr.index(), array_index_type());
+    convert_expr(index_tc, true);
     smt1_prop.out << " bv" << elem_width << "[" << array_index_bits << "]";
     smt1_prop.out << "))))";
   }
@@ -3056,7 +3087,8 @@ exprt smt1_convt::binary2struct(
 
     index-=sub_size;
     std::string cval=binary.substr(index, sub_size);
-    e.operands()[i]=ce_value(sub_type, "", cval);
+    
+    e.operands()[i]=ce_value(sub_type, "", cval, true);
   }
   
   return e;
