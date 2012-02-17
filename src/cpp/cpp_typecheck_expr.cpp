@@ -1047,7 +1047,20 @@ void cpp_typecheckt::typecheck_expr_explicit_typecast(exprt &expr)
       {
         // It's really a function call. Note that multiple arguments
         // become a comma expression, and that these are already typechecked.
-        std::cout << "E: " << expr.pretty() << std::endl;
+        side_effect_expr_function_callt f_call;
+
+        f_call.location()=expr.location();
+        f_call.function().swap(expr.type());
+        
+        if(expr.op0().id()==ID_comma)
+          f_call.arguments().swap(expr.op0().operands());
+        else
+          f_call.arguments().push_back(expr.op0());
+        
+        typecheck_side_effect_function_call(f_call);
+        
+        expr.swap(f_call);
+        return;
       }
     }
     else
