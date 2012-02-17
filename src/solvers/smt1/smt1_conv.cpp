@@ -3110,17 +3110,31 @@ exprt smt1_convt::binary2union(
   const union_typet &type,
   const std::string &binary) const
 {
-  //const union_typet::componentst &components=type.components();
 
   unsigned total_width=boolbv_width(type);
 
   if(total_width==0)
     throw "failed to get union width";
 
-  exprt e(type.id(), type);
+  const union_typet::componentst &components=type.components();
 
-  // todo
-  return nil_exprt();  
+  // Taking the first component should work.
+  // Maybe a better idea is to take a largest component
+  unsigned component_nr=0;
+ 
+  // construct a union expr  
+  union_exprt e(type);
+  e.set_component_number(component_nr);
+  e.set_component_name(components[component_nr].get_name());
+
+  const typet &sub_type=ns.follow(components[component_nr].type());
+  unsigned comp_width=boolbv_width(sub_type);
+  assert(comp_width<=total_width);
+
+  std::string cval=binary.substr(0, comp_width);
+  e.op()=ce_value(sub_type, "", cval, true);
+
+  return e;
 }
 
 /*******************************************************************\
