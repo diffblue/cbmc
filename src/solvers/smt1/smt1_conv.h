@@ -136,7 +136,7 @@ protected:
     const std::string &index,
     const std::string &value)
   {
-    exprt tmp=ce_value(identifier.type, index, value);
+    exprt tmp=ce_value(identifier.type, index, value, false);
     if(tmp.id()=="array-list" && identifier.value.id()=="array-list")
     {
       forall_operands(it, tmp)
@@ -168,7 +168,8 @@ protected:
   exprt ce_value(
     const typet &type,
     const std::string &index,
-    const std::string &v) const;
+    const std::string &v,
+    bool in_struct) const;
   
   exprt binary2struct(
     const struct_typet &type, 
