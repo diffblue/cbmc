@@ -170,7 +170,7 @@ exprt smt1_convt::ce_value(
       {
         unsigned size_int=integer2long(size);
         unsigned sub_width=value.size()/size_int;
-        exprt array_list("array-list", type);
+        exprt array_list(ID_array, type);
         array_list.operands().resize(size_int);
         
         unsigned offset=value.size();
@@ -2320,6 +2320,7 @@ void smt1_convt::convert_with(const exprt &expr)
       assert(expr.operands().size()==3);
       const exprt &index=expr.operands()[1];
       const exprt &value=expr.operands()[2];
+      typecast_exprt index_tc (index, array_index_type());
 
       smt1_prop.out << "(bvor ";
       smt1_prop.out << "(bvand ";
@@ -2340,7 +2341,7 @@ void smt1_convt::convert_with(const exprt &expr)
       // shift it to the index
       smt1_prop.out << " (zero_extend[" << width-array_index_bits << "]";
       smt1_prop.out << " (bvmul ";
-      convert_expr(index, true);
+      convert_expr(index_tc, true);
       smt1_prop.out << " bv" << elem_width << "[" << array_index_bits << "]";
       smt1_prop.out << "))))"; // bvmul, bvshl, bvneg
 
@@ -2353,7 +2354,7 @@ void smt1_convt::convert_with(const exprt &expr)
       smt1_prop.out << ")";
       smt1_prop.out << " (zero_extend[" << width-array_index_bits << "]";
       smt1_prop.out << " (bvmul ";
-      convert_expr(index, true);
+      convert_expr(index_tc, true);
       smt1_prop.out << " bv" << elem_width << "[" << array_index_bits << "]";
       smt1_prop.out << ")))"; // bvmul, bvshl, ze
 
@@ -3131,7 +3132,7 @@ exprt smt1_convt::binary2union(
   unsigned comp_width=boolbv_width(sub_type);
   assert(comp_width<=total_width);
 
-  std::string cval=binary.substr(0, comp_width);
+  std::string cval=binary.substr(total_width-comp_width, comp_width);
   e.op()=ce_value(sub_type, "", cval, true);
 
   return e;
