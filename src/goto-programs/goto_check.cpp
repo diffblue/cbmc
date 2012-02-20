@@ -233,6 +233,11 @@ void goto_checkt::overflow_check(
     }
     return;
   }
+  else if(expr.id()==ID_mod)
+  {
+    // these can't overflow
+    return;
+  }
 
   exprt overflow("overflow-"+expr.id_string(), bool_typet());
   overflow.operands()=expr.operands();
