@@ -1374,6 +1374,18 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
         smt2_prop.out << ")";
       }
     }
+    else if(op_type.id()==ID_integer) // from integer to bit-vector
+    {
+      // must be constant
+      if(op.is_constant())
+      {
+        mp_integer i;
+        to_integer(op, i);
+        smt2_prop.out << "(_ bv" << i << " " << to_width << ")";
+      }
+      else
+        throw "can't convert non-constant integer to bitvector";
+    }
     else
     {
       throw "TODO typecast2 "+op_type.id_string()+
@@ -2362,7 +2374,28 @@ Function: smt2_convt::convert_with
 
 void smt2_convt::convert_with(const exprt &expr)
 {
+  // get rid of "with" that has more than three operands
+  
   assert(expr.operands().size()>=3);
+  
+  if(expr.operands().size()>3)
+  {
+    unsigned s=expr.operands().size();
+  
+    // strip of the trailing two operands
+    exprt tmp=expr;
+    tmp.operands().resize(s-2);
+  
+    with_exprt new_with_expr;
+    assert(new_with_expr.operands().size()==3);
+    new_with_expr.type()=expr.type();
+    new_with_expr.old()=tmp;
+    new_with_expr.where()=expr.operands()[s-2];
+    new_with_expr.new_value()=expr.operands()[s-1];
+    
+    // recursive call  
+    return convert_with(new_with_expr);
+  }
   
   const typet &expr_type=ns.follow(expr.type());
 
@@ -2372,23 +2405,16 @@ void smt2_convt::convert_with(const exprt &expr)
 
     convert_expr(expr.op0());
 
-    for(unsigned i=1; i<expr.operands().size(); i+=2)
-    {
-      assert((i+1)<expr.operands().size());
-      const exprt &index=expr.operands()[i];
-      const exprt &value=expr.operands()[i+1];
+    smt2_prop.out << " ";
 
-      smt2_prop.out << " ";
+    if(expr.op1().type()!=array_index_type())
+      convert_expr(typecast_exprt(expr.op1(), array_index_type()));
+    else
+      convert_expr(expr.op1());
 
-      if(index.type()!=array_index_type())
-        convert_expr(typecast_exprt(index, array_index_type()));
-      else
-        convert_expr(index);
+    smt2_prop.out << " ";
 
-      smt2_prop.out << " ";
-
-      convert_expr(value);
-    }
+    convert_expr(expr.op2());
 
     smt2_prop.out << ")";
   }
@@ -2396,80 +2422,115 @@ void smt2_convt::convert_with(const exprt &expr)
   {
     const struct_typet &struct_type=to_struct_type(expr_type);
 
-    if(expr.operands().size()==3)
-    {
-      const exprt &index=expr.op1();
-      const exprt &value=expr.op2();
+    const exprt &index=expr.op1();
+    const exprt &value=expr.op2();
 
-      const irep_idt &component_name=index.get(ID_component_name);
+    const irep_idt &component_name=index.get(ID_component_name);
 
-      if(!struct_type.has_component(component_name))
-        throw "with failed to find component in struct";
+    if(!struct_type.has_component(component_name))
+      throw "with failed to find component in struct";
 
-      unsigned update_number=struct_type.component_number(component_name);
-      unsigned total_number=struct_type.components().size();
+    unsigned update_number=struct_type.component_number(component_name);
+    unsigned total_number=struct_type.components().size();
 
-      smt2_prop.out << "((_ update "
-                    << total_number << " "
-                    << update_number << ") ";
+    smt2_prop.out << "((_ update "
+                  << total_number << " "
+                  << update_number << ") ";
 
-      convert_expr(expr.op0());
+    convert_expr(expr.op0());
 
-      smt2_prop.out << " ";
+    smt2_prop.out << " ";
 
-      convert_expr(value);
+    convert_expr(value);
 
-      smt2_prop.out << ")"; // update
-    }
-    else
-    {
-      assert(false);
-    }
+    smt2_prop.out << ")"; // update
   }
   else if(expr_type.id()==ID_union)
   {
     const union_typet &union_type=to_union_type(expr_type);
 
-    if(expr.operands().size()==3)
+    const exprt &value=expr.op2();
+    
+    boolbv_widtht boolbv_width(ns);
+
+    unsigned total_width=boolbv_width(union_type);
+
+    if(total_width==0)
+      throw "failed to get union width for with";
+
+    unsigned member_width=boolbv_width(value.type());
+
+    if(member_width==0)
+      throw "failed to get union member width for with";
+
+    if(total_width==member_width)
     {
-      //const exprt &index=expr.op1();
-      const exprt &value=expr.op2();
-      
-      boolbv_widtht boolbv_width(ns);
-
-      unsigned total_width=boolbv_width(union_type);
-
-      if(total_width==0)
-        throw "failed to get union width for with";
-
-      unsigned member_width=boolbv_width(value.type());
-
-      if(member_width==0)
-        throw "failed to get union member width for with";
-
-      if(total_width==member_width)
-      {
-        // TODO: need to deal with booleans
-        convert_expr(value);
-      }
-      else
-      {
-        assert(total_width>member_width);
-        smt2_prop.out << "(concat ";
-        smt2_prop.out << "((_ extract "
-                      << (total_width-1)
-                      << " " << member_width << ") ";
-        convert_expr(expr.op0());
-        smt2_prop.out << ") ";
-        // TODO: need to deal with booleans
-        convert_expr(value);
-        smt2_prop.out << ")";
-      }
+      // TODO: need to deal with booleans
+      convert_expr(value);
     }
     else
     {
-      assert(false);
+      assert(total_width>member_width);
+      smt2_prop.out << "(concat ";
+      smt2_prop.out << "((_ extract "
+                    << (total_width-1)
+                    << " " << member_width << ") ";
+      convert_expr(expr.op0());
+      smt2_prop.out << ") ";
+      // TODO: need to deal with booleans
+      convert_expr(value);
+      smt2_prop.out << ")";
     }
+  }
+  else if(expr_type.id()==ID_bv ||
+          expr_type.id()==ID_unsignedbv ||
+          expr_type.id()==ID_signedbv)
+  {
+    // Update bits in a bit-vector. We will use masking and shifts.
+
+    unsigned total_width=boolbv_width(expr_type);
+    
+    if(total_width==0)
+      throw "failed to get total width";
+
+    assert(expr.operands().size()==3);
+    const exprt &index=expr.operands()[1];
+    const exprt &value=expr.operands()[2];
+
+    unsigned value_width=boolbv_width(value.type());
+
+    if(value_width==0)
+      throw "failed to get value width";
+
+    typecast_exprt index_tc(index, expr_type);
+
+    // TODO: SMT2-ify
+    smt2_prop.out << "(bvor ";
+    smt2_prop.out << "(band ";
+
+    // the mask to get rid of the old bits
+    smt2_prop.out << " (bvnot (bvshl";
+
+    smt2_prop.out << " (concat";
+    smt2_prop.out << " (repeat[" << total_width-value_width << "] bv0[1])";
+    smt2_prop.out << " (repeat[" << value_width << "] bv1[1])";
+    smt2_prop.out << ")"; // concat
+
+    // shift it to the index
+    convert_expr(index_tc);
+    smt2_prop.out << "))"; // bvshl, bvot
+
+    smt2_prop.out << ")"; // bvand
+
+    // the new value
+    smt2_prop.out << " (bvshl ";
+    convert_expr(value);
+
+    // shift it to the index
+    convert_expr(index_tc);
+    smt2_prop.out << ")"; // bvshl
+
+    smt2_prop.out << ")"; // bvor
   }
   else
     throw "with expects struct, union, or array type, "
