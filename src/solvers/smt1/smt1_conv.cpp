@@ -1231,26 +1231,26 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
     const typet &op_type=expr.op0().type();
     unsigned width=boolbv_width(op_type);
 
-   if(op_type.id()==ID_signedbv)
-   {
-     smt1_prop.out << "(let (?prod (bvmul (sign_extend[" << width << "] ";
-     convert_expr(expr.op0(), true);
-     smt1_prop.out << ") (sign_extend[" << width << "] ";
-     convert_expr(expr.op1(), true);
-     smt1_prop.out << ")) ";
-     smt1_prop.out << "(or (bvsge ?sum " << power(2, width-1) << "[" << width*2 << "]))";
-     smt1_prop.out << " (bvslt ?sum (bvneg (bv" << power(2, width-1) << "[" << width*2 << "])))))";
-   }
-   else if(op_type.id()==ID_unsignedbv)
-   {
-     smt1_prop.out << "(bvuge (bvmul (zero_extend[" << width << "] ";
-     convert_expr(expr.op0(), true);
-     smt1_prop.out << ") (zero_extend[" << width << "] ";
-     convert_expr(expr.op1(), true);
-     smt1_prop.out << ")) bv" << power(2, width) << "[" << width*2 << "])";     
-   }
-   else
-     throw "overflow-* check on unknown type: "+op_type.id_string();
+    if(op_type.id()==ID_signedbv)
+    {
+      smt1_prop.out << "(let (?prod (bvmul (sign_extend[" << width << "] ";
+      convert_expr(expr.op0(), true);
+      smt1_prop.out << ") (sign_extend[" << width << "] ";
+      convert_expr(expr.op1(), true);
+      smt1_prop.out << ")) ";
+      smt1_prop.out << "(or (bvsge ?sum " << power(2, width-1) << "[" << width*2 << "]))";
+      smt1_prop.out << " (bvslt ?sum (bvneg (bv" << power(2, width-1) << "[" << width*2 << "])))))";
+    }
+    else if(op_type.id()==ID_unsignedbv)
+    {
+      smt1_prop.out << "(bvuge (bvmul (zero_extend[" << width << "] ";
+      convert_expr(expr.op0(), true);
+      smt1_prop.out << ") (zero_extend[" << width << "] ";
+      convert_expr(expr.op1(), true);
+      smt1_prop.out << ")) bv" << power(2, width) << "[" << width*2 << "])";     
+    }
+    else
+      throw "overflow-* check on unknown type: "+op_type.id_string();
   }
   else if(expr.id()==ID_forall || expr.id()==ID_exists)
   {
