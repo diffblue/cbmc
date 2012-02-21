@@ -2257,37 +2257,17 @@ void smt1_convt::convert_mult(const mult_exprt &expr)
   
   assert(expr.operands().size()==2);
 
-  if(expr.type().id()==ID_signedbv)
+  if(expr.type().id()==ID_unsignedbv || 
+     expr.type().id()==ID_signedbv)
   {
-    // Note that bvmul is really signed.
+    // Note that bvmul is really unsigned,
+    // but this is irrelevant as we chop-off any extra result
+    // bits.
     smt1_prop.out << "(bvmul ";
     convert_expr(expr.op0(), true);
     smt1_prop.out << " ";
     convert_expr(expr.op1(), true);
     smt1_prop.out << ")";
-  }
-  else if(expr.type().id()==ID_unsignedbv)
-  {
-    // Note that bvmul is really signed.
-    // We therefore zero-extend the operands
-    // and slice the extra bit off the result.
-    
-    unsigned width=boolbv_width(expr.op0().type());
-    
-    smt1_prop.out << "(extract[" << width-1 << ":0] ";
-  
-    smt1_prop.out << "(bvmul ";
-
-    smt1_prop.out << "(zero_extend[1] ";
-    convert_expr(expr.op0(), true);
-    smt1_prop.out << ")";
-
-    smt1_prop.out << " ";
-    smt1_prop.out << "(zero_extend[1] ";
-    convert_expr(expr.op1(), true);
-    smt1_prop.out << ")";
-    
-    smt1_prop.out << ")"; // extract
   }
   else if(expr.type().id()==ID_fixedbv)
   {
