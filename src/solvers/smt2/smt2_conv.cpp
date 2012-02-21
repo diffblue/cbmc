@@ -1212,7 +1212,33 @@ void smt2_convt::convert_expr(const exprt &expr)
   else if(expr.id()==ID_overflow_mult)
   {
     assert(expr.operands().size()==2);
-    throw "not yet implemented: overflow-*";
+
+    // No better idea than to multiply with double the bits and then compare
+    // with max value.
+    
+    const typet &op_type=expr.op0().type();
+    unsigned width=boolbv_width(op_type);
+
+    if(op_type.id()==ID_signedbv)
+    {
+      smt2_prop.out << "(let (prod (bvmul (sign_extend[" << width << "] ";
+      convert_expr(expr.op0());
+      smt2_prop.out << ") ((_ sign_extend " << width << ") ";
+      convert_expr(expr.op1());
+      smt2_prop.out << ")) ";
+      smt2_prop.out << "(or (bvsge prod (_ bv " << power(2, width-1) << " " << width*2 << ")))";
+      smt2_prop.out << " (bvslt prod (bvneg (_ bv" << power(2, width-1) << " " << width*2 << "))))))";
+    }
+    else if(op_type.id()==ID_unsignedbv)
+    {
+      smt2_prop.out << "(bvuge (bvmul ((_ zero_extend " << width << ") ";
+      convert_expr(expr.op0());
+      smt2_prop.out << ") ((_ zero_extend " << width << ") ";
+      convert_expr(expr.op1());
+      smt2_prop.out << ")) (_ bv" << power(2, width) << " " << width*2 << "))";     
+    }
+    else
+      throw "overflow-* check on unknown type: "+op_type.id_string();
   }
   else if(expr.id()==ID_array)
   {
@@ -2268,27 +2294,31 @@ Function: smt2_convt::convert_mult
 void smt2_convt::convert_mult(const mult_exprt &expr)
 {
   assert(expr.operands().size()>=2);
+  
+  // re-write to binary if needed
+  if(expr.operands().size()>2)
+  {
+    // strip last operand
+    exprt tmp=expr;
+    tmp.operands().pop_back();
+  
+    // recursive call
+    return convert_mult(mult_exprt(tmp, expr.operands().back()));
+  }
+  
+  assert(expr.operands().size()==2);
 
   if(expr.type().id()==ID_unsignedbv ||
      expr.type().id()==ID_signedbv)
   {
-    forall_operands(it, expr)
-      if(it!=expr.operands().begin()) smt2_prop.out << "(bvmul ";
-
-    exprt::operandst::const_iterator last;
-
-    forall_operands(it, expr)
-    {
-      if(it!=expr.operands().begin())
-      {
-        convert_expr(*last);
-        smt2_prop.out << " ";
-        convert_expr(*it);
-        smt2_prop.out << ")";
-      }
-
-      last=it;
-    }
+    // Note that bvmul is really unsigned,
+    // but this is irrelevant as we chop-off any extra result
+    // bits.
+    smt2_prop.out << "(bvmul ";
+    convert_expr(expr.op0());
+    smt2_prop.out << " ";
+    convert_expr(expr.op1());
+    smt2_prop.out << ")";
   }
   else if(expr.type().id()==ID_floatbv)
   {
@@ -2298,20 +2328,10 @@ void smt2_convt::convert_mult(const mult_exprt &expr)
         if(it!=expr.operands().begin())
           smt2_prop.out << "(* RNE ";
 
-      exprt::operandst::const_iterator last;
-
-      forall_operands(it, expr)
-      {
-        if(it!=expr.operands().begin())
-        {
-          convert_expr(*last);
-          smt2_prop.out << " ";
-          convert_expr(*it);
-          smt2_prop.out << ")";
-        }
-
-        last=it;
-      }
+      convert_expr(expr.op0());
+      smt2_prop.out << " ";
+      convert_expr(expr.op1());
+      smt2_prop.out << ")";
     }
     else
     {
@@ -2327,22 +2347,17 @@ void smt2_convt::convert_mult(const mult_exprt &expr)
                   << fbt.spec.width+fraction_bits-1 << " "
                   << fraction_bits << ") ";
 
-    forall_operands(it, expr)
-      if(it!=expr.operands().begin())
-        smt2_prop.out << "(bvmul ";
+    smt2_prop.out << "(bvmul ";
 
-    exprt::operandst::const_iterator last;
-    forall_operands(it, expr)
-    {
-      smt2_prop.out << "((_ sign_extend " << fraction_bits << ") ";
-      convert_expr(*it);
-      smt2_prop.out << ") ";
+    smt2_prop.out << "((_ sign_extend " << fraction_bits << ") ";
+    convert_expr(expr.op0());
+    smt2_prop.out << ") ";
 
-      if(it!=expr.operands().begin())
-        smt2_prop.out << ")";
-    }
-
+    smt2_prop.out << "((_ sign_extend " << fraction_bits << ") ";
+    convert_expr(expr.op1());
     smt2_prop.out << ")";
+
+    smt2_prop.out << "))"; // bvmul, extract
   }
   else if(expr.type().id()==ID_rational)
   {
