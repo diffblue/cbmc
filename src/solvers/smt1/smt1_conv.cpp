@@ -1238,7 +1238,7 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
       smt1_prop.out << ") (sign_extend[" << width << "] ";
       convert_expr(expr.op1(), true);
       smt1_prop.out << ")) ";
-      smt1_prop.out << "(or (bvsge ?sum " << power(2, width-1) << "[" << width*2 << "]))";
+      smt1_prop.out << "(or (bvsge ?sum (bv " << power(2, width-1) << "[" << width*2 << "]))";
       smt1_prop.out << " (bvslt ?sum (bvneg (bv" << power(2, width-1) << "[" << width*2 << "])))))";
     }
     else if(op_type.id()==ID_unsignedbv)
