@@ -638,6 +638,7 @@ bool exprt::mul(const exprt &expr)
   }
   else if(type_id==ID_unsignedbv || type_id==ID_signedbv)
   {
+    // the following works for signed and unsigned integers
     set(ID_value, integer2binary(
       binary2integer(get_string(ID_value), false)*
       binary2integer(expr.get_string(ID_value), false),
