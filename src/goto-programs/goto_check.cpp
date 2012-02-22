@@ -231,11 +231,32 @@ void goto_checkt::overflow_check(
         expr.find_location(),
         guard);
     }
+    
     return;
   }
   else if(expr.id()==ID_mod)
   {
     // these can't overflow
+    return;
+  }
+  else if(expr.id()==ID_unary_minus)
+  {
+    if(type.id()==ID_signedbv)
+    {
+      // overflow on unary- can only happen with the smallest
+      // representable number 100....0
+      
+      equal_exprt int_min_eq(
+        expr.op0(), to_signedbv_type(type).smallest_expr());
+
+      add_guarded_claim(
+        not_exprt(int_min_eq),
+        "arithmetic overflow on signed unary minus",
+        "overflow",
+        expr.find_location(),
+        guard);
+    }
+  
     return;
   }
 
