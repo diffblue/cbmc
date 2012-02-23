@@ -437,6 +437,8 @@ overflow_mult overflow-*
 overflow_unary_minus overflow-unary-
 object_descriptor
 dynamic_object
+dynamic_size
+valid_object
 integer_address
 integer_address_object
 static_object
