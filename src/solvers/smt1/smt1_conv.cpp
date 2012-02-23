@@ -849,7 +849,9 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
 
     if(expr.type().id()==ID_unsignedbv ||
        expr.type().id()==ID_signedbv ||
-       expr.type().id()==ID_bv)
+       expr.type().id()==ID_bv ||
+       expr.type().id()==ID_struct ||
+       expr.type().id()==ID_union)
     {
       if(expr.id()==ID_ashr)
         smt1_prop.out << "(bvashr ";
