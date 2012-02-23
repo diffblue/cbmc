@@ -49,72 +49,72 @@ public:
   #endif
 
   // constructors
-  exprt() { }
-  explicit exprt(const irep_idt &_id):irept(_id) { }
-  exprt(const irep_idt &_id, const typet &_type):irept(_id) { type()=_type; }
+  inline exprt() { }
+  inline explicit exprt(const irep_idt &_id):irept(_id) { }
+  inline exprt(const irep_idt &_id, const typet &_type):irept(_id) { type()=_type; }
  
   /// returns the type of the expression
-  typet &type() { return static_cast<typet &>(add(ID_type)); }
-  const typet &type() const { return static_cast<const typet &>(find(ID_type)); }
+  inline typet &type() { return static_cast<typet &>(add(ID_type)); }
+  inline const typet &type() const { return static_cast<const typet &>(find(ID_type)); }
 
-  bool has_operands() const
+  inline bool has_operands() const
   { return !find(ID_operands).is_nil(); }
 
-  operandst &operands()
+  inline operandst &operands()
   { return (operandst &)(add(ID_operands).get_sub()); }
   
-  const operandst &operands() const
+  inline const operandst &operands() const
   { return (const operandst &)(find(ID_operands).get_sub()); }
    
-  exprt &op0()
+  inline exprt &op0()
   { return operands().front(); }
 
-  exprt &op1()
+  inline exprt &op1()
   #ifdef USE_LIST
   { return *(++operands().begin()); }
   #else
   { return operands()[1]; }
   #endif
    
-  exprt &op2()
+  inline exprt &op2()
   #ifdef USE_LIST
   { return *(++ ++operands().begin()); }
   #else
   { return operands()[2]; }
   #endif
    
-  exprt &op3()
+  inline exprt &op3()
   #ifdef USE_LIST
   { return *(++ ++ ++operands().begin()); }
   #else
   { return operands()[3]; }
   #endif
    
-  const exprt &op0() const
+  inline const exprt &op0() const
   { return operands().front(); }
 
-  const exprt &op1() const
+  inline const exprt &op1() const
   #ifdef USE_LIST
   { return *(++operands().begin()); }
   #else
   { return operands()[1]; }
   #endif
   
-  const exprt &op2() const
+  inline const exprt &op2() const
   #ifdef USE_LIST
   { return *(++ ++operands().begin()); }
   #else
   { return operands()[2]; }
   #endif
   
-  const exprt &op3() const
+  inline const exprt &op3() const
   #ifdef USE_LIST
   { return *(++ ++ ++operands().begin()); }
   #else
   { return operands()[3]; }
   #endif
   
-  void reserve_operands(unsigned n)
+  inline void reserve_operands(unsigned n)
   #ifdef USE_LIST
   { }
   #else
@@ -152,22 +152,22 @@ public:
   
   const locationt &find_location() const;
 
-  const locationt &location() const
+  inline const locationt &location() const
   {
     return static_cast<const locationt &>(find(ID_C_location));
   }
 
-  locationt &location()
+  inline locationt &location()
   {
     return static_cast<locationt &>(add(ID_C_location));
   }
   
-  exprt &add_expr(const irep_idt &name)
+  inline exprt &add_expr(const irep_idt &name)
   {
     return static_cast<exprt &>(add(name));
   }
 
-  const exprt &find_expr(const irep_idt &name) const
+  inline const exprt &find_expr(const irep_idt &name) const
   {
     return static_cast<const exprt &>(find(name));
   }
