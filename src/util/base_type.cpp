@@ -42,29 +42,11 @@ void base_type_rec(
       return;
     }
   }
-  //else if(src.id()=="dependent")
-  //  dest=src.find("subtype");
   else if(type.id()==ID_subtype)
   {
     typet tmp;
     tmp.swap(type.subtype());
     type.swap(tmp);
-  }
-  else if(type.id()=="predicate")
-  {
-    exprt &predicate=static_cast<exprt &>(type.add("predicate"));
-    base_type_rec(predicate.type(), ns, symb);
-    assert(predicate.type().id()=="mapping");
-    typet tmp;
-    tmp.swap(predicate.type().subtypes()[0]);
-    type.swap(tmp);
-    base_type_rec(type, ns, symb); // recursive call
-  }
-  else if(type.id()=="mapping")
-  {
-    assert(type.subtypes().size()==2);
-    base_type_rec(type.subtypes()[0], ns, symb);
-    base_type_rec(type.subtypes()[1], ns, symb);
   }
   else if(type.id()==ID_array)
   {
