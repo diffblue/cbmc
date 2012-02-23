@@ -3799,7 +3799,8 @@ Function: sort_and_join
 
  Outputs:
 
- Purpose:
+ Purpose: produce canonical ordering for associative and commutative
+          binary operators
 
 \*******************************************************************/
 
@@ -3811,48 +3812,48 @@ Function: sort_and_join
 
 struct saj_tablet
 {
-  const char *id;
-  const char *type_id;
+  const irep_idt id;
+  const irep_idt type_id;
 } const saj_table[]=
 {
-  { "+",      "integer"    },
-  { "+",      "natural"    },
-  { "+",      "real"       },
-  { "+",      "complex"    },
-  { "+",      "rational"   },
-  { "+",      "unsignedbv" },
-  { "+",      "signedbv"   },
-  { "+",      "fixedbv"    },
-  { "+",      "pointer"    },
-  { "*",      "integer"    },
-  { "*",      "natural"    },
-  { "*",      "real"       },
-  { "*",      "complex"    },
-  { "*",      "rational"   },
-  { "*",      "unsignedbv" },
-  { "*",      "signedbv"   },
-  { "*",      "fixedbv"    },
-  { "and",    "bool"       },
-  { "or",     "bool"       },
-  { "xor",    "bool"       },
-  { "bitand", "unsignedbv" },
-  { "bitand", "signedbv"   },
-  { "bitand", "floatbv"    },
-  { "bitand", "fixedbv"    },
-  { "bitor",  "unsignedbv" },
-  { "bitor",  "signedbv"   },
-  { "bitor",  "floatbv"    },
-  { "bitor",  "fixedbv"    },
-  { "bitxor", "unsignedbv" },
-  { "bitxor", "signedbv"   },
-  { "bitxor", "floatbv"    },
-  { "bitxor", "fixedbv"    },
-  { NULL,     NULL         }
+  { ID_plus,   ID_integer    },
+  { ID_plus,   ID_natural    },
+  { ID_plus,   ID_real       },
+  { ID_plus,   ID_complex    },
+  { ID_plus,   ID_rational   },
+  { ID_plus,   ID_unsignedbv },
+  { ID_plus,   ID_signedbv   },
+  { ID_plus,   ID_fixedbv    },
+  { ID_plus,   ID_pointer    },
+  { ID_mult,   ID_integer    },
+  { ID_mult,   ID_natural    },
+  { ID_mult,   ID_real       },
+  { ID_mult,   ID_complex    },
+  { ID_mult,   ID_rational   },
+  { ID_mult,   ID_unsignedbv },
+  { ID_mult,   ID_signedbv   },
+  { ID_mult,   ID_fixedbv    },
+  { ID_and,    ID_bool       },
+  { ID_or,     ID_bool       },
+  { ID_xor,    ID_bool       },
+  { ID_bitand, ID_unsignedbv },
+  { ID_bitand, ID_signedbv   },
+  { ID_bitand, ID_floatbv    },
+  { ID_bitand, ID_fixedbv    },
+  { ID_bitor,  ID_unsignedbv },
+  { ID_bitor,  ID_signedbv   },
+  { ID_bitor,  ID_floatbv    },
+  { ID_bitor,  ID_fixedbv    },
+  { ID_bitxor, ID_unsignedbv },
+  { ID_bitxor, ID_signedbv   },
+  { ID_bitxor, ID_floatbv    },
+  { ID_bitxor, ID_fixedbv    },
+  { irep_idt(), irep_idt()   }
 };
 
 bool sort_and_join(const irep_idt &id, const irep_idt &type_id)
 {
-  for(unsigned i=0; saj_table[i].id!=NULL; i++)
+  for(unsigned i=0; saj_table[i].id!=irep_idt(); i++)
     if(id==saj_table[i].id &&
        type_id==saj_table[i].type_id)
       return true;
@@ -4112,9 +4113,9 @@ bool simplify_exprt::simplify_node(exprt &expr)
     result=simplify_same_object(expr) && result;
   else if(expr.id()==ID_dynamic_object)
     result=simplify_dynamic_object(expr) && result;
-  else if(expr.id()=="dynamic_size")
+  else if(expr.id()==ID_dynamic_size)
     result=simplify_dynamic_size(expr) && result;
-  else if(expr.id()=="valid_object")
+  else if(expr.id()==ID_valid_object)
     result=simplify_valid_object(expr) && result;
   else if(expr.id()==ID_switch)
     result=simplify_switch(expr) && result;
