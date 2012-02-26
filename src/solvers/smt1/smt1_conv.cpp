@@ -2400,11 +2400,14 @@ void smt1_convt::convert_with(const exprt &expr)
       smt1_prop.out << ")"; // concat
 
       // shift it to the index
-      smt1_prop.out << " (zero_extend[" << width-array_index_bits << "]";
+      if (width>=array_index_bits)
+        smt1_prop.out << " (zero_extend[" << width-array_index_bits << "]";
+      else
+        smt1_prop.out << " (extract[" << width-1 << ":0]";
       smt1_prop.out << " (bvmul ";
       convert_expr(index_tc, true);
       smt1_prop.out << " bv" << elem_width << "[" << array_index_bits << "]";
-      smt1_prop.out << "))))"; // bvmul, bvshl, bvneg
+      smt1_prop.out << "))))"; // bvmul, zero_extend, bvshl, bvneg
 
       smt1_prop.out << ")"; // bvand
 
@@ -2413,7 +2416,10 @@ void smt1_convt::convert_with(const exprt &expr)
       convert_expr(value, true);
       // shift it to the index
       smt1_prop.out << ")";
-      smt1_prop.out << " (zero_extend[" << width-array_index_bits << "]";
+      if (width>=array_index_bits)
+        smt1_prop.out << " (zero_extend[" << width-array_index_bits << "]";
+      else
+        smt1_prop.out << " (extract[" << width-1 << ":0]";
       smt1_prop.out << " (bvmul ";
       convert_expr(index_tc, true);
       smt1_prop.out << " bv" << elem_width << "[" << array_index_bits << "]";
@@ -2619,7 +2625,10 @@ void smt1_convt::convert_index(const index_exprt &expr, bool bool_as_bv)
     smt1_prop.out << "(extract[" << elem_width-1 <<  ":0] ";
     smt1_prop.out << "(bvlshr ";
     convert_expr(expr.array(), true);
-    smt1_prop.out << " (zero_extend[" << width-array_index_bits << "]";
+    if (width>=array_index_bits)
+      smt1_prop.out << " (zero_extend[" << width-array_index_bits << "]";
+    else
+      smt1_prop.out << " (extract[" << width-1 << ":0]";
     smt1_prop.out << " (bvmul ";
     typecast_exprt index_tc(expr.index(), array_index_type());
     convert_expr(index_tc, true);
