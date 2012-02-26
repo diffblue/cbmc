@@ -138,17 +138,33 @@ exprt dereferencet::dereference(
       it=points_to_set.begin();
       it!=points_to_set.end();
       it++)
-    values.push_back(build_reference_to(*it, mode, pointer, guard));
+  {
+    valuet value=build_reference_to(*it, mode, pointer, guard);
+    
+    #if 0
+    std::cout << "V: " << from_expr(ns, "", value.pointer_guard) << " --> ";
+    std::cout << from_expr(ns, "", value.value) << std::endl;
+    #endif
+
+    if(!value.pointer_guard.is_false())
+      values.push_back(value);
+  }
 
   // can this fail?
-  bool may_fail=values.empty();
+  bool may_fail;
   
-  for(std::list<valuet>::const_iterator
-      it=values.begin();
-      it!=values.end();
-      it++)
-    if(it->value.is_nil()) may_fail=true;
-
+  if(values.empty())
+    may_fail=true;
+  else
+  {
+    may_fail=false;
+    for(std::list<valuet>::const_iterator
+        it=values.begin();
+        it!=values.end();
+        it++)
+      if(it->value.is_nil()) may_fail=true;
+  }
+  
   if(may_fail)
   {
     // first see if we have a "failed object" for this pointer
