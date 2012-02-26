@@ -161,7 +161,7 @@ exprt dereferencet::dereference(
     {
       // yes!
       failure_value=symbol_expr(*failed_symbol);
-      failure_value.set("#invalid_object", true);
+      failure_value.set(ID_C_invalid_object, true);
     }
     else
     {
@@ -178,7 +178,7 @@ exprt dereferencet::dereference(
       get_new_name(symbol, ns);
 
       failure_value=symbol_expr(symbol);
-      failure_value.set("#invalid_object", true);
+      failure_value.set(ID_C_invalid_object, true);
       
       new_context.move(symbol);
     }
@@ -662,7 +662,7 @@ void dereferencet::valid_check(
     }
   }
   else if(symbol_expr.is_nil() ||
-          symbol_expr.get_bool("#invalid_object"))
+          symbol_expr.get_bool(ID_C_invalid_object))
   { 
     // always "valid", shut up
     return;
