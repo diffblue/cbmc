@@ -196,6 +196,7 @@ enum
 elements
 unknown
 invalid
+C_invalid_object #invalid_object
 pointer_offset
 pointer_object
 same_object same-object
