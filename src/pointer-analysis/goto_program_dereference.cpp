@@ -238,7 +238,7 @@ void goto_program_dereferencet::dereference_rec(
       expr.swap(tmp);      
     }
   }
-
+  
   Forall_operands(it, expr)
     dereference_rec(*it, guard, mode);
 
@@ -248,7 +248,7 @@ void goto_program_dereferencet::dereference_rec(
       throw "dereference expects one operand";
 
     dereference_location=expr.find_location();
-
+    
     exprt tmp=dereference.dereference(
       expr.op0(), guard, mode);
 
@@ -328,7 +328,7 @@ void goto_program_dereferencet::dereference_expr(
 
 /*******************************************************************\
 
-Function: goto_program_dereferencet::dereference
+Function: goto_program_dereferencet::dereference_program
 
   Inputs:
 
