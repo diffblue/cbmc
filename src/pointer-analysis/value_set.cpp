@@ -1557,8 +1557,12 @@ void value_sett::apply_code(
 
     if(lhs.id()!=ID_symbol)
       throw "decl expected to have symbol on lhs";
+      
+    const typet &lhs_type=ns.follow(lhs.type());
 
-    if(ns.follow(lhs.type()).id()==ID_pointer)
+    if(lhs_type.id()==ID_pointer ||
+       (lhs_type.id()==ID_array &&
+        ns.follow(lhs_type.subtype()).id()==ID_pointer))
     {
       // assign the address of the failed object
       exprt failed=get_failed_symbol(to_symbol_expr(lhs), ns);
