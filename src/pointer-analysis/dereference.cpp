@@ -115,8 +115,14 @@ exprt dereferencet::dereference(
   {
     const if_exprt &if_expr=to_if_expr(pointer);
     // push down the if
-    exprt true_case=dereference(if_expr.true_case(), guard, mode);
-    exprt false_case=dereference(if_expr.true_case(), guard, mode);
+    guardt true_guard=guard;
+    guardt false_guard=guard;
+    
+    true_guard.add(if_expr.cond());
+    false_guard.add(gen_not(if_expr.cond()));
+    
+    exprt true_case=dereference(if_expr.true_case(), true_guard, mode);
+    exprt false_case=dereference(if_expr.true_case(), false_guard, mode);
     
     return if_exprt(if_expr.cond(), true_case, false_case);
   }
