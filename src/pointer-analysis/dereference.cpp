@@ -109,6 +109,17 @@ exprt dereferencet::dereference(
   if(pointer.type().id()!=ID_pointer)
     throw "dereference expected pointer type, but got "+
           pointer.type().pretty();  
+
+  // we may get ifs due to recursive calls
+  if(pointer.id()==ID_if)
+  {
+    const if_exprt &if_expr=to_if_expr(pointer);
+    // push down the if
+    exprt true_case=dereference(if_expr.true_case(), guard, mode);
+    exprt false_case=dereference(if_expr.true_case(), guard, mode);
+    
+    return if_exprt(if_expr.cond(), true_case, false_case);
+  }
   
   // type of the object
   const typet &type=pointer.type().subtype();
@@ -146,15 +157,17 @@ exprt dereferencet::dereference(
     std::cout << from_expr(ns, "", value.value) << std::endl;
     #endif
 
-    if(!value.pointer_guard.is_false())
-      values.push_back(value);
+    values.push_back(value);
   }
 
   // can this fail?
   bool may_fail;
   
   if(values.empty())
+  {
+    invalid_pointer(pointer, guard);
     may_fail=true;
+  }
   else
   {
     may_fail=false;
@@ -227,9 +240,6 @@ exprt dereferencet::dereference(
   std::cout << "R: " << from_expr(ns, "", value) << std::endl
             << std::endl;
   #endif
-
-  if(values.size()==1 && may_fail)
-    invalid_pointer(pointer, guard);
 
   return value;
 }
