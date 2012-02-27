@@ -137,18 +137,22 @@ exprt smt1_convt::ce_value(
   else if(type.id()==ID_pointer)
   {
     assert(value.size()==boolbv_width(type));
-    
-    unsigned i=value.size()-BV_ADDR_BITS;
 
+    constant_exprt result(type);
+    result.set_value(value);
+
+    // add the elaborated expression as operand
+    
     pointer_logict::pointert p;
     p.object=integer2long(
       binary2integer(
-        std::string(value, i, std::string::npos), false));
+        value.substr(0, BV_ADDR_BITS), false));
+        
+    p.offset=binary2integer(value.substr(BV_ADDR_BITS, std::string::npos), true);
+    
+    result.copy_to_operands(pointer_logic.pointer_expr(p, type));
 
-    p.offset=binary2integer(
-      std::string(value, 0, i), true);
-
-    return pointer_logic.pointer_expr(p, type);
+    return result;
   }
   else if(type.id()==ID_struct)
   {

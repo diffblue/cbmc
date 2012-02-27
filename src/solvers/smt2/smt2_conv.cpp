@@ -119,12 +119,18 @@ void smt2_convt::set_value(
   {
     // TODO
     assert(v.size()==boolbv_width(type));
+    
+    constant_exprt result(type);
+    result.set_value(v);
 
+    // add elaborated expression as operand
     pointer_logict::pointert p;
     p.object=integer2long(binary2integer(std::string(v, 0, BV_ADDR_BITS), false));
     p.offset=binary2integer(std::string(v, BV_ADDR_BITS, std::string::npos), true);
+    
+    result.copy_to_operands(pointer_logic.pointer_expr(p, type));
 
-    identifier.value=pointer_logic.pointer_expr(p, type);
+    identifier.value=result;
   }
   else if(type.id()==ID_struct)
   {
