@@ -16,7 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 irept nil_rep_storage;
 
 #ifdef SHARING
-const irept::dt empty_d;
+irept::dt irept::empty_d;
 #endif
 
 /*******************************************************************\
@@ -57,7 +57,7 @@ void irept::detatch()
   std::cout << "DETATCH1: " << data << std::endl;
   #endif
 
-  if(data==NULL)
+  if(data==&empty_d)
   {
     data=new dt;
 
@@ -80,36 +80,9 @@ void irept::detatch()
   
   assert(data->ref_count==1);
 
-
   #ifdef IREP_DEBUG
   std::cout << "DETATCH2: " << data << std::endl;
   #endif
-}
-#endif
-
-/*******************************************************************\
-
-Function: irept::read
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-#ifdef SHARING
-const irept::dt &irept::read() const
-{
-  #ifdef IREP_DEBUG
-  std::cout << "READ: " << data << std::endl;
-  #endif
-  
-  if(data==NULL)
-    return empty_d;
-  
-  return *data;
 }
 #endif
 
@@ -130,7 +103,7 @@ Function: irept::remove_ref
 #ifdef SHARING
 void irept::remove_ref(dt *old_data)
 {
-  if(old_data==NULL) return;
+  if(old_data==&empty_d) return;
 
   assert(old_data->ref_count!=0);
 
@@ -174,7 +147,7 @@ void irept::clear()
 {
   #ifdef SHARING
   remove_ref(data);
-  data=NULL;
+  data=&empty_d;
   #else
   data.clear();
   #endif

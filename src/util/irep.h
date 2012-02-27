@@ -61,26 +61,24 @@ class irept
 {
 public:
   typedef std::vector<irept> subt;
-  //typedef std::list<irept> subt;
-  
   typedef std::map<irep_namet, irept> named_subt;
 
-  bool is_nil() const { return id()==ID_nil; }
-  bool is_not_nil() const { return id()!=ID_nil; }
+  inline bool is_nil() const { return id()==ID_nil; }
+  inline bool is_not_nil() const { return id()!=ID_nil; }
 
-  inline explicit irept(const irep_idt &_id):data(NULL)
+  inline explicit irept(const irep_idt &_id):data(&empty_d)
   {
     id(_id);
   }
 
   #ifdef SHARING
-  inline irept():data(NULL)
+  inline irept():data(&empty_d)
   {
   }
 
   inline irept(const irept &irep):data(irep.data)
   {
-    if(data!=NULL)
+    if(data!=&empty_d)
     {
       assert(data->ref_count!=0);
       data->ref_count++;
@@ -99,7 +97,7 @@ public:
     // Ordering is very important here!
     // Consider self-assignment, which may destroy 'irep'
     dt *irep_data=irep.data;
-    if(irep_data!=NULL) irep_data->ref_count++;
+    if(irep_data!=&empty_d) irep_data->ref_count++;
 
     remove_ref(data); // this may kill 'irep'
     data=irep_data;
@@ -107,13 +105,13 @@ public:
     return *this;
   }
 
-  ~irept()
+  inline ~irept()
   {
     remove_ref(data);
     data=NULL;
   }
   #else
-  irept()
+  inline irept()
   {
   }
   #endif
@@ -135,7 +133,7 @@ public:
   const irept &find(const irep_namet &name) const;
   irept &add(const irep_namet &name);
 
-  const std::string &get_string(const irep_namet &name) const
+  inline const std::string &get_string(const irep_namet &name) const
   {
     #ifdef USE_DSTRING
     return get(name).as_string();
@@ -166,7 +164,7 @@ public:
   
   std::string to_string() const;
   
-  void swap(irept &irep)
+  inline void swap(irept &irep)
   {
     std::swap(irep.data, data);
   }
@@ -178,14 +176,14 @@ public:
   
   void clear();
 
-  void make_nil() { clear(); id(ID_nil); }
+  inline void make_nil() { clear(); id(ID_nil); }
   
-  subt &get_sub() { return write().sub; } // DANGEROUS
-  const subt &get_sub() const { return read().sub; }
-  named_subt &get_named_sub() { return write().named_sub; } // DANGEROUS
-  const named_subt &get_named_sub() const { return read().named_sub; }
-  named_subt &get_comments() { return write().comments; } // DANGEROUS
-  const named_subt &get_comments() const { return read().comments; }
+  inline subt &get_sub() { return write().sub; } // DANGEROUS
+  inline const subt &get_sub() const { return read().sub; }
+  inline named_subt &get_named_sub() { return write().named_sub; } // DANGEROUS
+  inline const named_subt &get_named_sub() const { return read().named_sub; }
+  inline named_subt &get_comments() { return write().comments; } // DANGEROUS
+  inline const named_subt &get_comments() const { return read().comments; }
   
   size_t hash() const;
   size_t full_hash() const;
@@ -195,7 +193,7 @@ public:
   std::string pretty(unsigned indent=0, unsigned max_indent=0) const;
   
 protected:
-  static bool is_comment(const irep_namet &name)
+  inline static bool is_comment(const irep_namet &name)
   { return !name.empty() && name[0]=='#'; }
 
 public:
@@ -250,12 +248,16 @@ public:
 protected:
   #ifdef SHARING
   dt *data;
+  static dt empty_d;
   
   void remove_ref(dt *old_data);  
   void detatch();
 
 public:  
-  const dt &read() const;
+  inline const dt &read() const
+  {
+    return *data;
+  }
 
   inline dt &write()
   {
@@ -299,17 +301,17 @@ extern inline const std::string &name2string(const irep_namet &n)
 
 struct irep_hash
 {
-  size_t operator()(const irept &irep) const { return irep.hash(); }
+  inline size_t operator()(const irept &irep) const { return irep.hash(); }
 };
 
 struct irep_full_hash
 {
-  size_t operator()(const irept &irep) const { return irep.full_hash(); }
+  inline size_t operator()(const irept &irep) const { return irep.full_hash(); }
 };
 
 struct irep_full_eq
 {
-  bool operator()(const irept &i1, const irept &i2) const 
+  inline bool operator()(const irept &i1, const irept &i2) const 
   {
     return full_eq(i1, i2);
   }
