@@ -405,6 +405,13 @@ dereferencet::valuet dereferencet::build_reference_to(
     //const dynamic_object_exprt &dynamic_object=
     //  to_dynamic_object_expr(root_object);
 
+    // the object produced by malloc
+    exprt malloc_object=
+      symbol_expr(ns.lookup(CPROVER_PREFIX "malloc_object"));
+
+    exprt is_malloc_object=exprt(ID_same_object, bool_typet());
+    is_malloc_object.copy_to_operands(pointer_expr, malloc_object);
+
     // constraint that it actually is a dynamic object
     exprt dynamic_object_expr(ID_dynamic_object, bool_typet());
     dynamic_object_expr.copy_to_operands(pointer_expr);
@@ -421,11 +428,10 @@ dereferencet::valuet dereferencet::build_reference_to(
       {
         // check if it is still alive
         guardt tmp_guard(guard);
-        tmp_guard.add(dynamic_object_expr);
-        tmp_guard.add(gen_not(valid_object(ns, pointer_expr)));
+        tmp_guard.add(deallocated(ns, pointer_expr));
         dereference_callback.dereference_failure(
           "pointer dereference",
-          "invalidated dynamic object", 
+          "dynamic object deallocated", 
           tmp_guard);
       }
 
@@ -444,7 +450,7 @@ dereferencet::valuet dereferencet::build_reference_to(
             inequality(object_offset, ID_lt, zero);
 
           guardt tmp_guard(guard);
-          tmp_guard.add(dynamic_object_expr);
+          tmp_guard.add(is_malloc_object);
           tmp_guard.add(inequality);
           dereference_callback.dereference_failure(
             "pointer dereference",
@@ -454,19 +460,13 @@ dereferencet::valuet dereferencet::build_reference_to(
         {
           // check upper bound
           
-          // we check SAME_OBJECT(__CPROVER_bounds_check, p) &&
+          // we check SAME_OBJECT(__CPROVER_malloc_object, p) &&
           //          POINTER_OFFSET(p)+size>__CPROVER_malloc_size
-          
-          exprt malloc_object=
-            symbol_expr(ns.lookup(CPROVER_PREFIX "malloc_object"));
 
           exprt malloc_size=
             symbol_expr(ns.lookup(CPROVER_PREFIX "malloc_size"));
           
           assert(ns.follow(malloc_object.type()).id()==ID_pointer);
-          
-          result.pointer_guard=exprt(ID_same_object, bool_typet());
-          result.pointer_guard.copy_to_operands(pointer_expr, malloc_object);
           
           exprt object_offset=unary_exprt(
             ID_pointer_offset, pointer_expr, index_type());
@@ -489,7 +489,7 @@ dereferencet::valuet dereferencet::build_reference_to(
             inequality(sum, ID_gt, malloc_size);
 
           guardt tmp_guard(guard);
-          tmp_guard.add(result.pointer_guard);
+          tmp_guard.add(is_malloc_object);
           tmp_guard.add(inequality);
           dereference_callback.dereference_failure(
             "pointer dereference",
