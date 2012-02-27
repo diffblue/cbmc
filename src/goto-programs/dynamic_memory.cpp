@@ -16,7 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
-Function: valid_object
+Function: deallocated
 
   Inputs:
 
@@ -26,7 +26,7 @@ Function: valid_object
 
 \*******************************************************************/
 
-exprt valid_object(const namespacet &ns, const exprt &pointer)
+exprt deallocated(const namespacet &ns, const exprt &pointer)
 {
   // we check __CPROVER_deallocated!
   const symbolt &deallocated_symbol=ns.lookup(CPROVER_PREFIX "deallocated");
@@ -34,7 +34,7 @@ exprt valid_object(const namespacet &ns, const exprt &pointer)
   exprt same_object_expr(ID_same_object, bool_typet());
   same_object_expr.copy_to_operands(pointer, symbol_expr(deallocated_symbol));
   
-  return not_exprt(same_object_expr);
+  return same_object_expr;
 }
 
 /*******************************************************************\
