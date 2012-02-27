@@ -474,22 +474,23 @@ void goto_symex_statet::rename_address(
   const namespacet &ns,
   levelt level)
 {
-  // rename all the symbols with their last known value
-  
+  // do full renaming for type
+  rename(expr.type(), ns, level);
+
   if(expr.id()==ID_symbol)
   {
     // only do L1!
-    rename(expr, ns, L1);
+    irep_idt identifier=to_symbol_expr(expr).get_identifier();
+    identifier=rename(identifier, ns, L1);
+    to_symbol_expr(expr).set_identifier(identifier);
   }
   else
   {
-    rename(expr.type(), ns, level);
-  
     if(expr.id()==ID_index)
     {
       assert(expr.operands().size()==2);
       rename_address(expr.op0(), ns, level);
-    
+
       // the index is not an address
       rename(expr.op1(), ns, level);
     }
