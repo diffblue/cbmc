@@ -71,6 +71,13 @@ void bmct::show_vcc(std::ostream &out)
           std::string string_value;
           languages.from_expr(p_it->cond_expr, string_value);
           out << "{-" << count << "} " << string_value << std::endl;
+
+          #if 0
+          languages.from_expr(p_it->guard_expr, string_value);
+          out << "GUARD: " << string_value << std::endl;
+          out << std::endl;
+          #endif
+          
           count++;
         }
 

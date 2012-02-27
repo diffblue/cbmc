@@ -11,7 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <namespace.h>
 
-exprt valid_object(const namespacet &ns, const exprt &pointer);
+exprt deallocated(const namespacet &ns, const exprt &pointer);
 exprt dynamic_size(const namespacet &ns, const exprt &pointer);
 exprt pointer_object_has_type(const namespacet &ns, const exprt &pointer, const typet &type);
 exprt dynamic_object(const exprt &pointer);
