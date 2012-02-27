@@ -852,6 +852,15 @@ bool dereferencet::memory_model(
       return memory_model_conversion(value, to_type, guard, offset);
   }
 
+  // we are willing to do the same for pointers
+
+  if(from_type.id()==ID_pointer &&
+     to_type.id()==ID_pointer)
+  {
+    if(bv_width(from_type)==bv_width(to_type))
+      return memory_model_conversion(value, to_type, guard, offset);
+  }
+
   // otherwise, we will stich it together from bytes
   
   return memory_model_bytes(value, to_type, guard, offset);
