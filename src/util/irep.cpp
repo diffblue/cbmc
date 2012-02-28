@@ -569,8 +569,10 @@ int irept::compare(const irept &i) const
   r=id().compare(i.id());
   if(r!=0) return r;
 
-  if(get_sub().size()<i.get_sub().size()) return -1;
-  if(get_sub().size()>i.get_sub().size()) return 1;
+  const subt::size_type size=get_sub().size(),
+        i_size=i.get_sub().size();
+  if(size<i_size) return -1;
+  if(size>i_size) return 1;
 
   {
     irept::subt::const_iterator it1, it2;
@@ -588,8 +590,10 @@ int irept::compare(const irept &i) const
     assert(it1==get_sub().end() && it2==i.get_sub().end());
   }
 
-  if(get_named_sub().size()<i.get_named_sub().size()) return -1;
-  if(get_named_sub().size()>i.get_named_sub().size()) return 1;
+  const named_subt::size_type n_size=get_named_sub().size(),
+        i_n_size=i.get_named_sub().size();
+  if(n_size<i_n_size) return -1;
+  if(n_size>i_n_size) return 1;
 
   {
     irept::named_subt::const_iterator it1, it2;
