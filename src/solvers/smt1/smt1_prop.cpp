@@ -95,8 +95,8 @@ literalt smt1_propt::land(const bvt &bv)
   out << ":assumption ; land" << std::endl;
   out << " (iff " << smt1_literal(l) << " (and";
   
-  for(unsigned int i=0; i<bv.size(); i++)
-    out << " " << smt1_literal(bv[i]);
+  forall_literals(it, bv)
+    out << " " << smt1_literal(*it);
 
   out << "))" << std::endl;
 
@@ -124,8 +124,8 @@ literalt smt1_propt::lor(const bvt &bv)
   out << ":assumption ; lor" << std::endl;
   out << " (iff " << smt1_literal(l) << " (or";
 
-  for(unsigned int i=0; i<bv.size(); i++)
-    out << " " << smt1_literal(bv[i]);
+  forall_literals(it, bv)
+    out << " " << smt1_literal(*it);
 
   out << "))" << std::endl;
 
@@ -156,8 +156,8 @@ literalt smt1_propt::lxor(const bvt &bv)
   out << ":assumption ; lxor" << std::endl;
   out << " (iff " << smt1_literal(l) << " (xor";
 
-  for(unsigned int i=0; i<bv.size(); i++)
-    out << " " << smt1_literal(bv[i]);
+  forall_literals(it, bv)
+    out << " " << smt1_literal(*it);
 
   out << "))" << std::endl;
 

@@ -385,11 +385,9 @@ Function: qbf_bdd_coret::lor
 
 literalt qbf_bdd_coret::lor(const bvt &bv)
 {   
-  for(unsigned long i=0; i<bv.size(); i++)
-  {
-    if(bv[i]==const_literal(true))
+  forall_literals(it, bv)
+    if(*it==const_literal(true))
       return const_literal(true);
-  }
   
   literalt nl = new_variable();
   
@@ -397,9 +395,9 @@ literalt qbf_bdd_coret::lor(const bvt &bv)
   
   BDD &orbdd = *bdd_variable_map[nl.var_no()];
 
-  for(unsigned long i=0; i<bv.size(); i++)
+  forall_literals(it, bv)
   {
-    literalt l=bv[i];
+    literalt l=*it;
     
     if(l==const_literal(false))
       continue;

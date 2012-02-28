@@ -185,4 +185,13 @@ literalt pos(literalt a);
 
 typedef std::vector<literalt> bvt;
 
+#define forall_literals(it, bv) \
+  for(bvt::const_iterator it=(bv).begin(), it_end=(bv).end(); \
+      it!=it_end; ++it)
+
+#define Forall_literals(it, bv) \
+  for(bvt::iterator it=(bv).begin(); \
+      it!=(bv).end(); ++it)
+
+
 #endif

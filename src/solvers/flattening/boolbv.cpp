@@ -153,8 +153,8 @@ void boolbvt::convert_bv(const exprt &expr, bvt &bv)
   convert_bitvector(expr, bv);
   
   // check
-  for(unsigned i=0; i<bv.size(); i++)
-    if(bv[i].var_no()==literalt::unused_var_no())
+  forall_literals(it, bv)
+    if(it->var_no()==literalt::unused_var_no())
     {
       std::cout << "unused_var_no: " << expr.pretty() << std::endl;
       assert(false);
@@ -516,9 +516,9 @@ void boolbvt::convert_symbol(const exprt &expr, bvt &bv)
     for(unsigned i=0; i<width; i++)
       bv[i]=map.get_literal(identifier, i, expr.type());
 
-    for(unsigned i=0; i<width; i++)
-      if(bv[i].var_no()>=prop.no_variables() &&
-        !bv[i].is_constant()) { std::cout << identifier << std::endl; abort(); }
+    forall_literals(it, bv)
+      if(it->var_no()>=prop.no_variables() &&
+        !it->is_constant()) { std::cout << identifier << std::endl; abort(); }
   }
 }
    
@@ -841,8 +841,8 @@ void boolbvt::make_free_bv_expr(const typet &type, exprt &dest)
   bv.resize(width);
 
   // make result free variables
-  for(unsigned i=0; i<bv.size(); i++)
-    bv[i]=prop.new_variable();
+  Forall_literals(it, bv)
+    *it=prop.new_variable();
 
   make_bv_expr(type, bv, dest);
 }

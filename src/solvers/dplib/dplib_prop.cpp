@@ -190,10 +190,10 @@ literalt dplib_propt::land(const bvt &bv)
 
   literalt literal=def_dplib_literal();
 
-  for(unsigned int i=0; i<bv.size(); ++i)
+  forall_literals(it, bv)
   {
-    if(i!=0) out << " & ";
-    out << dplib_literal(bv[i]);
+    if(it!=bv.begin()) out << " & ";
+    out << dplib_literal(*it);
   }
   
   out << std::endl << std::endl;
@@ -219,10 +219,10 @@ literalt dplib_propt::lor(const bvt &bv)
 
   literalt literal=def_dplib_literal();
 
-  for(unsigned int i=0; i<bv.size(); ++i)
+  forall_literals(it, bv)
   {
-    if(i!=0) out << " | ";
-    out << dplib_literal(bv[i]);
+    if(it!=bv.begin()) out << " | ";
+    out << dplib_literal(*it);
   }
   
   out << std::endl << std::endl;
@@ -250,8 +250,8 @@ literalt dplib_propt::lxor(const bvt &bv)
 
   literalt literal=const_literal(false);
 
-  for(unsigned i=0; i<bv.size(); i++)
-    literal=lxor(bv[i], literal);
+  forall_literals(it, bv)
+    literal=lxor(*it, literal);
 
   return literal;
 }

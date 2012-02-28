@@ -318,8 +318,8 @@ void bv_pointerst::convert_pointer_type(const exprt &expr, bvt &bv)
   }
   else if(expr.id()==ID_nondet_symbol)
   {
-    for(unsigned i=0; i<bits; i++)
-      bv[i]=prop.new_variable();
+    Forall_literals(it, bv)
+      *it=prop.new_variable();
 
     return;
   }

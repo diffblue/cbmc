@@ -135,8 +135,8 @@ void boolbvt::convert_typecast(const exprt &expr, bvt &bv)
 
           assert(op_width==1);
           
-          for(unsigned i=0; i<bv.size(); i++)
-            bv[i]=prop.land(bv[i], op_bv[0]);
+          Forall_literals(it, bv)
+            *it=prop.land(*it, op_bv[0]);
             
           return;
         }

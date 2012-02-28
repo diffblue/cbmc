@@ -34,8 +34,8 @@ void boolbvt::convert_cond(const exprt &expr, bvt &bv)
   bv.resize(width);
 
   // make it free variables
-  for(unsigned i=0; i<bv.size(); i++)
-    bv[i]=prop.new_variable();
+  Forall_literals(it, bv)
+    *it=prop.new_variable();
 
   if(operands.size()<2)
     throw "cond takes at least two operands";

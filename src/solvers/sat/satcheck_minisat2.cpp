@@ -39,8 +39,8 @@ void convert(const bvt &bv, Minisat::vec<Minisat::Lit> &dest)
 {
   dest.growTo(bv.size());
   
-  for(unsigned i=0; i<bv.size(); i++)
-    dest[i]=Minisat::mkLit(bv[i].var_no(), bv[i].sign());
+  forall_literals(it, bv)
+    dest[it-bv.begin()]=Minisat::mkLit(it->var_no(), it->sign());
 }
 
 /*******************************************************************\
@@ -167,8 +167,8 @@ void satcheck_minisat2_baset<T>::lcnf(const bvt &bv)
   Minisat::vec<Minisat::Lit> c;
   convert(new_bv, c);
 
-  for(unsigned i=0; i<new_bv.size(); i++)
-    assert(new_bv[i].var_no()<(unsigned)solver->nVars());
+  forall_literals(it, new_bv)
+    assert(it->var_no()<(unsigned)solver->nVars());
 
   solver->addClause(c);
 
@@ -375,9 +375,7 @@ void satcheck_minisat2_baset<T>::set_assumptions(const bvt &bv)
 {
   assumptions=bv;
 
-  for(bvt::const_iterator it=assumptions.begin();
-      it!=assumptions.end();
-      it++)
+  forall_literals(it, assumptions)
     assert(!it->is_constant());
 }
 

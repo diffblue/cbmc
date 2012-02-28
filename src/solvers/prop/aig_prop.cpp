@@ -119,8 +119,8 @@ literalt aig_propt::land(const bvt &bv)
 {
   literalt literal=const_literal(true);
 
-  for(unsigned i=0; i<bv.size(); i++)
-    literal=land(bv[i], literal);
+  forall_literals(it, bv)
+    literal=land(*it, literal);
 
   return literal;
 }
@@ -141,8 +141,8 @@ literalt aig_propt::lor(const bvt &bv)
 {
   literalt literal=const_literal(false);
 
-  for(unsigned i=0; i<bv.size(); i++)
-    literal=lor(bv[i], literal);
+  forall_literals(it, bv)
+    literal=lor(*it, literal);
 
   return literal;
 }
@@ -163,8 +163,8 @@ literalt aig_propt::lxor(const bvt &bv)
 {
   literalt literal=const_literal(false);
 
-  for(unsigned i=0; i<bv.size(); i++)
-    literal=lxor(bv[i], literal);
+  forall_literals(it, bv)
+    literal=lxor(*it, literal);
 
   return literal;
 }

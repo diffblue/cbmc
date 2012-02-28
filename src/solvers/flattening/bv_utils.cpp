@@ -707,10 +707,10 @@ void bv_utilst::incrementer(
 {
   carry_out=carry_in;
 
-  for(unsigned i=0; i<bv.size(); i++)
+  Forall_literals(it, bv)
   {
-    literalt new_carry=prop.land(carry_out, bv[i]);
-    bv[i]=prop.lxor(bv[i], carry_out);
+    literalt new_carry=prop.land(carry_out, *it);
+    *it=prop.lxor(*it, carry_out);
     carry_out=new_carry;
   }
 }
@@ -750,8 +750,8 @@ Function: bv_utilst::invert
 bvt bv_utilst::inverted(const bvt &bv)
 {
   bvt result=bv;
-  for(unsigned i=0; i<bv.size(); i++)
-    result[i]=prop.lnot(result[i]);
+  Forall_literals(it, result)
+    *it=prop.lnot(*it);
   return result;
 }
 
@@ -1311,8 +1311,8 @@ Function: bv_utilst::is_constant
 
 bool bv_utilst::is_constant(const bvt &bv)
 {
-  for(unsigned i=0; i<bv.size(); i++)
-    if(bv[i]!=const_literal(false) && bv[i]!=const_literal(true))
+  forall_literals(it, bv)
+    if(!it->is_constant())
       return false;
 
   return true;
