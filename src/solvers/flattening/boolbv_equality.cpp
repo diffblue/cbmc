@@ -54,10 +54,8 @@ literalt boolbvt::convert_equality(const equal_exprt &expr)
     return record_array_equality(expr);
   }
 
-  bvt bv0, bv1;
-  
-  convert_bv(expr.lhs(), bv0);
-  convert_bv(expr.rhs(), bv1);
+  const bvt &bv0=convert_bv(expr.lhs());
+  const bvt &bv1=convert_bv(expr.rhs());
     
   if(bv0.size()!=bv1.size())
   {

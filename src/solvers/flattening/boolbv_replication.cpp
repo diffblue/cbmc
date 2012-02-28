@@ -36,9 +36,7 @@ void boolbvt::convert_replication(const exprt &expr, bvt &bv)
   if(to_integer(expr.op0(), times))
     throw "replication takes constant as first parameter";
 
-  bvt op;
-
-  convert_bv(expr.op1(), op);
+  const bvt &op=convert_bv(expr.op1());
 
   unsigned offset=0;
   bv.resize(width);

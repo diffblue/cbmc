@@ -36,11 +36,10 @@ void boolbvt::convert_constraint_select_one(const exprt &expr, bvt &bv)
   if(prop.has_set_to())
   {
     std::vector<bvt> op_bv;
-    op_bv.resize(expr.operands().size());
+    op_bv.reserve(expr.operands().size());
 
-    unsigned i=0;
     forall_operands(it, expr)
-      convert_bv(*it, op_bv[i++]);
+      op_bv.push_back(convert_bv(*it));
 
     bv=op_bv[0];
 
@@ -70,8 +69,7 @@ void boolbvt::convert_constraint_select_one(const exprt &expr, bvt &bv)
     unsigned op_nr=0;
     forall_operands(it, expr)
     {
-      bvt op_bv;
-      convert_bv(*it, op_bv);
+      const bvt &op_bv=convert_bv(*it);
 
       if(op_nr==0)
         bv=op_bv;

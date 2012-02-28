@@ -33,7 +33,7 @@ void boolbvt::convert_with(const exprt &expr, bvt &bv)
   if((expr.operands().size()%2)!=1)
     throw "with takes an odd number of operands";
 
-  convert_bv(expr.op0(), bv);
+  bv=convert_bv(expr.op0());
 
   unsigned width=boolbv_width(expr.type());
 
@@ -131,8 +131,7 @@ void boolbvt::convert_with_array(
   if(to_integer(array_size, size))
     throw "convert_with_array expects constant array size";
     
-  bvt op2_bv;
-  convert_bv(op2, op2_bv);
+  const bvt &op2_bv=convert_bv(op2);
 
   if(size*op2_bv.size()!=prev_bv.size())
     throw "convert_with_array: unexpected operand 2 width";
@@ -234,8 +233,7 @@ void boolbvt::convert_with_struct(
 {
   next_bv=prev_bv;
 
-  bvt op2_bv;
-  convert_bv(op2, op2_bv);
+  const bvt &op2_bv=convert_bv(op2);
 
   const irep_idt &component_name=op1.get(ID_component_name);
   const struct_typet::componentst &components=
@@ -295,8 +293,7 @@ void boolbvt::convert_with_union(
 {
   next_bv=prev_bv;
 
-  bvt op2_bv;
-  convert_bv(op2, op2_bv);
+  const bvt &op2_bv=convert_bv(op2);
 
   if(next_bv.size()<op2_bv.size())
     throw "convert_with_union: unexpected operand op2 width";

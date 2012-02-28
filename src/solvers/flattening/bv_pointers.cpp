@@ -42,8 +42,7 @@ literalt bv_pointerst::convert_rest(const exprt &expr)
     if(operands.size()==1 &&
        is_ptr(operands[0].type()))
     {
-      bvt bv;
-      convert_bv(operands[0], bv);
+      const bvt &bv=convert_bv(operands[0]);
       
       if(bv.size()!=0)
       {
@@ -75,8 +74,7 @@ literalt bv_pointerst::convert_rest(const exprt &expr)
     if(operands.size()==1 &&
        is_ptr(operands[0].type()))
     {
-      bvt bv;
-      convert_bv(operands[0], bv);
+      bvt bv=convert_bv(operands[0]);
       
       {
         bv.erase(bv.begin(), bv.begin()+offset_bits);
@@ -97,10 +95,8 @@ literalt bv_pointerst::convert_rest(const exprt &expr)
        is_ptr(operands[0].type()) &&
        is_ptr(operands[1].type()))
     {
-      bvt bv0, bv1;
-      
-      convert_bv(operands[0], bv0);
-      convert_bv(operands[1], bv1);
+      const bvt &bv0=convert_bv(operands[0]);
+      const bvt &bv1=convert_bv(operands[1]);
 
       {
         bvt equal_bv;
@@ -121,10 +117,8 @@ literalt bv_pointerst::convert_rest(const exprt &expr)
        is_ptr(operands[0].type()) &&
        is_ptr(operands[1].type()))
     {
-      bvt bv0, bv1;
-
-      convert_bv(operands[0], bv0);
-      convert_bv(operands[1], bv1);
+      const bvt &bv0=convert_bv(operands[0]);
+      const bvt &bv1=convert_bv(operands[1]);
 
       const irep_idt rel=expr.id();
 
@@ -342,8 +336,7 @@ void bv_pointerst::convert_pointer_type(const exprt &expr, bvt &bv)
       // We need to be able to convert the integer 0 to NULL.
       // We just do a zero extension.
       
-      bvt op_bv;
-      convert_bv(op, op_bv);
+      const bvt &op_bv=convert_bv(op);
       
       bv=bv_utils.zero_extension(op_bv, bits);
 
@@ -402,7 +395,7 @@ void bv_pointerst::convert_pointer_type(const exprt &expr, bvt &bv)
       if(it->type().id()==ID_pointer)
       {
         count++;
-        convert_bv(*it, bv);
+        bv=convert_bv(*it);
         assert(bv.size()==bits);
         size=pointer_offset_size(ns, it->type().subtype());
       }
@@ -417,8 +410,6 @@ void bv_pointerst::convert_pointer_type(const exprt &expr, bvt &bv)
 
     forall_operands(it, expr)
     {
-      bvt op;
-
       if(it->type().id()==ID_pointer) continue;
 
       if(it->type().id()!=ID_unsignedbv &&
@@ -429,7 +420,7 @@ void bv_pointerst::convert_pointer_type(const exprt &expr, bvt &bv)
         it->type().id()==ID_signedbv?bv_utilst::SIGNED:
                                      bv_utilst::UNSIGNED;
 
-      convert_bv(*it, op);
+      bvt op=convert_bv(*it);
 
       if(op.size()==0)
         throw "unexpected pointer arithmetic operand width";
@@ -463,7 +454,7 @@ void bv_pointerst::convert_pointer_type(const exprt &expr, bvt &bv)
     exprt neg_op1=unary_exprt(
       ID_unary_minus, expr.op1(), expr.op1().type());
 
-    convert_bv(expr.op0(), bv);
+    bv=convert_bv(expr.op0());
     
     mp_integer element_size=
       pointer_offset_size(ns, expr.op0().type().subtype());
@@ -510,10 +501,8 @@ void bv_pointerst::convert_bitvector(const exprt &expr, bvt &bv)
      expr.op1().type().id()==ID_pointer)
   {
     // pointer minus pointer
-    bvt op0, op1;
-
-    convert_bv(expr.op0(), op0);
-    convert_bv(expr.op1(), op1);
+    bvt op0=convert_bv(expr.op0());
+    bvt op1=convert_bv(expr.op1());
 
     unsigned width=boolbv_width(expr.type());
     
@@ -542,9 +531,7 @@ void bv_pointerst::convert_bitvector(const exprt &expr, bvt &bv)
           expr.operands().size()==1 &&
           is_ptr(expr.op0().type()))
   {
-    bvt op0;
-
-    convert_bv(expr.op0(), op0);
+    bvt op0=convert_bv(expr.op0());
 
     unsigned width=boolbv_width(expr.type());
 
@@ -563,9 +550,7 @@ void bv_pointerst::convert_bitvector(const exprt &expr, bvt &bv)
           expr.operands().size()==1 &&
           is_ptr(expr.op0().type()))
   {
-    bvt op0;
-
-    convert_bv(expr.op0(), op0);
+    bvt op0=convert_bv(expr.op0());
 
     unsigned width=boolbv_width(expr.type());
     
@@ -735,8 +720,7 @@ void bv_pointerst::offset_arithmetic(
   const mp_integer &factor,
   const exprt &index)
 {
-  bvt bv_index;
-  convert_bv(index, bv_index);
+  bvt bv_index=convert_bv(index);
 
   bv_utilst::representationt rep=
     index.type().id()==ID_signedbv?bv_utilst::SIGNED:

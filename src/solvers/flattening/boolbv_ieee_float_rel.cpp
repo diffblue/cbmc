@@ -38,12 +38,11 @@ literalt boolbvt::convert_ieee_float_rel(const exprt &expr)
     const exprt &op0=expr.op0();
     const exprt &op1=expr.op1();
 
-    bvt bv0, bv1;
     bvtypet bvtype0=get_bvtype(op0.type());
     bvtypet bvtype1=get_bvtype(op1.type());
 
-    convert_bv(op0, bv0);
-    convert_bv(op1, bv1);
+    const bvt &bv0=convert_bv(op0);
+    const bvt &bv1=convert_bv(op1);
     
     if(bv0.size()==bv1.size() && bv0.size()!=0 &&
        bvtype0==IS_FLOAT && bvtype1==IS_FLOAT)

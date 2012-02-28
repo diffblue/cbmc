@@ -41,8 +41,7 @@ void boolbvt::convert_abs(const exprt &expr, bvt &bv)
     
   const exprt &op0=expr.op0();
 
-  bvt op_bv;
-  convert_bv(op0, op_bv);
+  const bvt &op_bv=convert_bv(op0);
 
   if(op0.type()!=expr.type())
     return conversion_failed(expr, bv);

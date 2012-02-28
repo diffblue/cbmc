@@ -36,9 +36,7 @@ void boolbvt::convert_constant(const exprt &expr, bvt &bv)
 
     forall_operands(it, expr)
     {
-      bvt tmp;
-
-      convert_bv(*it, tmp);
+      const bvt &tmp=convert_bv(*it);
 
       if(tmp.size()!=op_width)
         throw "convert_constant: unexpected operand width";

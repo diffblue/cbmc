@@ -45,10 +45,9 @@ void boolbvt::convert_byte_update(const exprt &expr, bvt &bv)
   else
     assert(false);
 
-  convert_bv(op0, bv);
+  bv=convert_bv(op0);
   
-  bvt op2_bv;
-  convert_bv(op2, op2_bv);
+  const bvt &op2_bv=convert_bv(op2);
   unsigned update_width=op2_bv.size();
   unsigned byte_width=8;
   

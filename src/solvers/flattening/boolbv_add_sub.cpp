@@ -58,7 +58,7 @@ void boolbvt::convert_add_sub(const exprt &expr, bvt &bv)
     throw "add/sub with mixed types";
   }
 
-  convert_bv(op0, bv);
+  bv=convert_bv(op0);
 
   if(bv.size()!=width)
     throw "convert_add_sub: unexpected operand 0 width";
@@ -87,8 +87,7 @@ void boolbvt::convert_add_sub(const exprt &expr, bvt &bv)
       throw "add/sub with mixed types";
     }
 
-    bvt op;
-    convert_bv(*it, op);
+    const bvt &op=convert_bv(*it);
 
     if(op.size()!=width)
       throw "convert_add_sub: unexpected operand width";

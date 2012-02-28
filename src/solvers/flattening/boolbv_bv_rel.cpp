@@ -37,10 +37,8 @@ literalt boolbvt::convert_bv_rel(const exprt &expr)
     const exprt &op0=expr.op0();
     const exprt &op1=expr.op1();
 
-    bvt bv0, bv1;
-
-    convert_bv(op0, bv0);
-    convert_bv(op1, bv1);
+    const bvt &bv0=convert_bv(op0);
+    const bvt &bv1=convert_bv(op1);
 
     bvtypet bvtype0=get_bvtype(op0.type());
     bvtypet bvtype1=get_bvtype(op1.type());

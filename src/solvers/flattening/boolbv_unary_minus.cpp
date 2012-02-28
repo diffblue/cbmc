@@ -43,8 +43,7 @@ void boolbvt::convert_unary_minus(const exprt &expr, bvt &bv)
     
   const exprt &op0=expr.op0();
 
-  bvt op_bv;
-  convert_bv(op0, op_bv);
+  const bvt &op_bv=convert_bv(op0);
 
   bvtypet bvtype=get_bvtype(type);
   bvtypet op_bvtype=get_bvtype(op0.type());

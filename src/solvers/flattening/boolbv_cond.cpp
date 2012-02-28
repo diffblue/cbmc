@@ -60,9 +60,7 @@ void boolbvt::convert_cond(const exprt &expr, bvt &bv)
       }
       else
       {
-        bvt op;
-
-        convert_bv(*it, op);
+        const bvt &op=convert_bv(*it);
 
         if(bv.size()!=op.size())
         {
@@ -94,9 +92,7 @@ void boolbvt::convert_cond(const exprt &expr, bvt &bv)
 
       literalt cond_literal=convert(cond);
 
-      bvt op;
-
-      convert_bv(value, op);
+      const bvt &op=convert_bv(value);
 
       if(bv.size()!=op.size())
         throw "unexpected operand size in convert_cond";

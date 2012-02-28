@@ -36,8 +36,7 @@ void boolbvt::convert_typecast(const exprt &expr, bvt &bv)
 
   const exprt &op=expr.op0();
 
-  bvt op_bv;
-  convert_bv(op, op_bv);
+  const bvt &op_bv=convert_bv(op);
   
   const typet &expr_type=ns.follow(expr.type());
   const typet &op_type=ns.follow(op.type());
@@ -131,7 +130,7 @@ void boolbvt::convert_typecast(const exprt &expr, bvt &bv)
           f.spec=to_floatbv_type(expr_type);
           f.from_integer(1);
           
-          convert_bv(f.to_expr(), bv);
+          bv=convert_bv(f.to_expr());
 
           assert(op_width==1);
           
@@ -472,8 +471,7 @@ literalt boolbvt::convert_typecast(const exprt &expr)
         return const_literal(false);
     }
 
-    bvt bv;
-    convert_bv(expr.op0(), bv);
+    const bvt &bv=convert_bv(expr.op0());
     
     if(bv.size()!=0)
       return prop.lor(bv);

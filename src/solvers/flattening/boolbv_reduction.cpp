@@ -25,9 +25,7 @@ literalt boolbvt::convert_reduction(const exprt &expr)
   if(expr.operands().size()!=1)
     throw "reduction operators take one operand";
 
-  bvt bv0;
-
-  convert_bv(expr.op0(), bv0);
+  const bvt &bv0=convert_bv(expr.op0());
 
   if(bv0.size()<1)
     throw "reduction operators take one non-empty operand";

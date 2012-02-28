@@ -42,7 +42,7 @@ public:
   {
   }
  
-  virtual void convert_bv(const exprt &expr, bvt &bv); // check cache
+  virtual const bvt& convert_bv(const exprt &expr); // check cache
   virtual void convert_bitvector(const exprt &expr, bvt &bv); // no cache
 
   // overloading
