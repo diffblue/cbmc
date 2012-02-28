@@ -120,3 +120,37 @@ void set_claims(
   if(!claim_set.empty())
     throw "claim "+(*claim_set.begin())+" not found";
 }
+
+/*******************************************************************\
+
+Function: make_assertions_false
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void make_assertions_false(
+  goto_functionst &goto_functions)
+{
+  for(goto_functionst::function_mapt::iterator
+      f_it=goto_functions.function_map.begin();
+      f_it!=goto_functions.function_map.end();
+      f_it++)
+  {
+    goto_programt &goto_program=f_it->second.body;
+    
+    for(goto_programt::instructionst::iterator
+        i_it=goto_program.instructions.begin();
+        i_it!=goto_program.instructions.end();
+        i_it++)
+    {
+      if(!i_it->is_assert()) continue;
+      i_it->guard.make_false();
+    }
+  }
+}
+

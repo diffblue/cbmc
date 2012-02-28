@@ -18,5 +18,8 @@ void set_claims(
 void set_claims(
   goto_programt &goto_program,
   const std::list<std::string> &claims);
+  
+void make_assertions_false(
+  goto_functionst &goto_functions);
 
 #endif
