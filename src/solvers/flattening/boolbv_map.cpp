@@ -90,14 +90,15 @@ literalt boolbv_mapt::get_literal(
   map_entryt &map_entry=get_map_entry(identifier, type);
 
   assert(bit<map_entry.literal_map.size());
+  map_bitt &mb=map_entry.literal_map[bit];
 
-  if(map_entry.literal_map[bit].is_set)
-    return map_entry.literal_map[bit].l;
+  if(mb.is_set)
+    return mb.l;
 
   literalt l=prop.new_variable();
 
-  map_entry.literal_map[bit].is_set=true;
-  map_entry.literal_map[bit].l=l;
+  mb.is_set=true;
+  mb.l=l;
 
   #ifdef DEBUG
   std::cout << "NEW: " << identifier << ":" << bit
@@ -130,14 +131,15 @@ void boolbv_mapt::set_literal(
 
   map_entryt &map_entry=get_map_entry(identifier, type);
   assert(bit<map_entry.literal_map.size());
+  map_bitt &mb=map_entry.literal_map[bit];
 
-  if(map_entry.literal_map[bit].is_set)
+  if(mb.is_set)
   {
-    prop.set_equal(map_entry.literal_map[bit].l, literal);
+    prop.set_equal(mb.l, literal);
     return;
   }
 
-  map_entry.literal_map[bit].is_set=true;
-  map_entry.literal_map[bit].l=literal;
+  mb.is_set=true;
+  mb.l=literal;
 }
 
