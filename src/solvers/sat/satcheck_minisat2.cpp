@@ -38,9 +38,9 @@ Function: convert
 void convert(const bvt &bv, Minisat::vec<Minisat::Lit> &dest)
 {
   dest.growTo(bv.size());
-  
-  forall_literals(it, bv)
-    dest[it-bv.begin()]=Minisat::mkLit(it->var_no(), it->sign());
+
+  for(unsigned i=0; i<bv.size(); i++)
+    dest[i]=Minisat::mkLit(bv[i].var_no(), bv[i].sign());
 }
 
 /*******************************************************************\
