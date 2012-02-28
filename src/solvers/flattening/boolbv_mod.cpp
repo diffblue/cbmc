@@ -42,10 +42,8 @@ void boolbvt::convert_mod(const exprt &expr, bvt &bv)
     expr.type().id()==ID_signedbv?bv_utilst::SIGNED:
                                   bv_utilst::UNSIGNED;
 
-  bvt op0, op1;
-
-  convert_bv(expr.op0(), op0);
-  convert_bv(expr.op1(), op1);
+  const bvt &op0=convert_bv(expr.op0());
+  const bvt &op1=convert_bv(expr.op1());
 
   if(op0.size()!=width ||
      op1.size()!=width)

@@ -55,9 +55,7 @@ void boolbvt::convert_struct(const exprt &expr, bvt &bv)
 
     if(subtype_width!=0)
     {
-      bvt op_bv;
-      
-      convert_bv(op, op_bv);
+      const bvt &op_bv=convert_bv(op);
     
       assert(offset<width);
       assert(op_bv.size()==subtype_width);

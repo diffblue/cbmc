@@ -36,7 +36,7 @@ void boolbvt::convert_byte_extract(const exprt &expr, bvt &bv)
   if(is_unbounded_array(expr.op0().type()))
   {
     exprt tmp=flatten_byte_extract(expr, ns);
-    convert_bv(tmp, bv);
+    bv=convert_bv(tmp);
     return;
   }
 
@@ -59,8 +59,7 @@ void boolbvt::convert_byte_extract(const exprt &expr, bvt &bv)
 
   // first do op0
   
-  bvt op0_bv;  
-  convert_bv(op0, op0_bv);
+  const bvt &op0_bv=convert_bv(op0);
   
   // see if the byte number is constant
 

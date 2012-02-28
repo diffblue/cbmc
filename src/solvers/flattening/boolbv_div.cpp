@@ -46,10 +46,8 @@ void boolbvt::convert_div(const exprt &expr, bvt &bv)
      expr.op1().type().id()!=expr.type().id())
     return conversion_failed(expr, bv);
 
-  bvt op0, op1;
-
-  convert_bv(expr.op0(), op0);
-  convert_bv(expr.op1(), op1);
+  bvt op0=convert_bv(expr.op0());
+  bvt op1=convert_bv(expr.op1());
 
   if(op0.size()!=width ||
      op1.size()!=width)

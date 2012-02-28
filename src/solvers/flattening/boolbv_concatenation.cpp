@@ -37,9 +37,7 @@ void boolbvt::convert_concatenation(const exprt &expr, bvt &bv)
 
   forall_expr(it, operands)
   {
-    bvt op;
-
-    convert_bv(*it, op);
+    const bvt &op=convert_bv(*it);
 
     if(op.size()>offset)
       throw "concatenation operand width too big";

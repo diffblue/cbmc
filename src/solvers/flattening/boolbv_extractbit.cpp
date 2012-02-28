@@ -33,8 +33,7 @@ literalt boolbvt::convert_extractbit(const extractbit_exprt &expr)
   if(operands.size()!=2)
     throw "extractbit takes two operands";
     
-  bvt bv0;
-  convert_bv(operands[0], bv0);
+  const bvt &bv0=convert_bv(operands[0]);
 
   // constant?
   if(operands[1].is_constant())

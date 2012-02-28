@@ -136,32 +136,28 @@ Function: boolbvt::convert_bv
 
 \*******************************************************************/
 
-void boolbvt::convert_bv(const exprt &expr, bvt &bv)
+const bvt& boolbvt::convert_bv(const exprt &expr)
 {
   // check cache first
-  
+  std::pair<bv_cachet::iterator, bool> cache_result=
+    bv_cache.insert(std::make_pair(expr, bvt()));
+  if(!cache_result.second)
   {
-    bv_cachet::const_iterator cache_result=bv_cache.find(expr);
-    if(cache_result!=bv_cache.end())
-    {
-      //std::cerr << "Cache hit on " << expr << "\n";
-      bv=cache_result->second;
-      return;
-    }
+    //std::cerr << "Cache hit on " << expr << "\n";
+    return cache_result.first->second;
   }
   
-  convert_bitvector(expr, bv);
+  convert_bitvector(expr, cache_result.first->second);
   
   // check
-  forall_literals(it, bv)
+  forall_literals(it, cache_result.first->second)
     if(it->var_no()==literalt::unused_var_no())
     {
       std::cout << "unused_var_no: " << expr.pretty() << std::endl;
       assert(false);
     }
 
-  // insert into cache
-  bv_cache.insert(std::pair<const exprt, bvt>(expr, bv));
+  return cache_result.first->second;
 }
 
 /*******************************************************************\
@@ -370,26 +366,24 @@ void boolbvt::convert_array(const exprt &expr, bvt &bv)
   if(width==0)
     return conversion_failed(expr, bv);
     
-  bv.resize(width);
+  bv.reserve(width);
 
   if(expr.type().id()==ID_array)
   {
-    unsigned op_width=width/expr.operands().size();
-    unsigned offset=0;
+    assert(expr.has_operands());
+    const exprt::operandst &operands=expr.operands();
+    assert(!operands.empty());
+    unsigned op_width=width/operands.size();
     
-    forall_operands(it, expr)
+    forall_expr(it, operands)
     {
-      bvt tmp;
-
-      convert_bv(*it, tmp);
+      const bvt &tmp=convert_bv(*it);
 
       if(tmp.size()!=op_width)
         throw "convert_array: unexpected operand width";
 
-      for(unsigned j=0; j<op_width; j++)
-        bv[offset+j]=tmp[j];
-
-      offset+=op_width;
+      forall_literals(it2, tmp)
+        bv.push_back(*it2);
     }   
 
     return;
@@ -440,8 +434,7 @@ void boolbvt::convert_lambda(const exprt &expr, bvt &bv)
     exprt expr(expr.op1());
     replace_expr(expr.op0(), counter, expr);
 
-    bvt tmp;
-    convert_bv(expr, tmp);
+    const bvt &tmp=convert_bv(expr);
 
     unsigned offset=integer2long(i*tmp.size());
 
@@ -614,8 +607,7 @@ literalt boolbvt::convert_rest(const exprt &expr)
     if(expr.operands().size()!=1)
       throw "sign expects one operand";
 
-    bvt bv;
-    convert_bv(operands[0], bv);
+    const bvt &bv=convert_bv(operands[0]);
 
     if(bv.size()<1)
       throw "sign operator takes one non-empty operand";
@@ -640,8 +632,7 @@ literalt boolbvt::convert_rest(const exprt &expr)
     if(expr.operands().size()!=1)
       throw "isnan expects one operand";
 
-    bvt bv;
-    convert_bv(operands[0], bv);
+    const bvt &bv=convert_bv(operands[0]);
     
     if(expr.op0().type().id()==ID_floatbv)
     {
@@ -659,8 +650,7 @@ literalt boolbvt::convert_rest(const exprt &expr)
     if(expr.operands().size()!=1)
       throw "isfinite expects one operand";
 
-    bvt bv;
-    convert_bv(operands[0], bv);
+    const bvt &bv=convert_bv(operands[0]);
     
     if(expr.op0().type().id()==ID_floatbv)
     {
@@ -680,8 +670,7 @@ literalt boolbvt::convert_rest(const exprt &expr)
     if(expr.operands().size()!=1)
       throw "isinf expects one operand";
 
-    bvt bv;
-    convert_bv(operands[0], bv);
+    const bvt &bv=convert_bv(operands[0]);
     
     if(expr.op0().type().id()==ID_floatbv)
     {
@@ -699,8 +688,7 @@ literalt boolbvt::convert_rest(const exprt &expr)
     if(expr.operands().size()!=1)
       throw "isnormal expects one operand";
 
-    bvt bv;
-    convert_bv(operands[0], bv);
+    const bvt &bv=convert_bv(operands[0]);
     
     if(expr.op0().type().id()==ID_floatbv)
     {
@@ -747,11 +735,10 @@ bool boolbvt::boolbv_set_equality_to_true(const exprt &expr)
       if(is_unbounded_array(type))
         return true;
 
-      bvt bv1;
-      convert_bv(operands[1], bv1);
+      const bvt &bv1=convert_bv(operands[1]);
       
       const irep_idt &identifier=
-        operands[0].get(ID_identifier);
+        to_symbol_expr(operands[0]).get_identifier();
 
       for(unsigned i=0; i<bv1.size(); i++)
         map.set_literal(identifier, i, type, bv1[i]);

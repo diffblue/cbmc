@@ -35,10 +35,8 @@ literalt boolbvt::convert_overflow(const exprt &expr)
     if(operands.size()!=2)
       throw "operand "+expr.id_string()+" takes two operands";
 
-    bvt bv0, bv1;
-
-    convert_bv(operands[0], bv0);
-    convert_bv(operands[1], bv1);
+    const bvt &bv0=convert_bv(operands[0]);
+    const bvt &bv1=convert_bv(operands[1]);
 
     if(bv0.size()!=bv1.size())
       return SUB::convert_rest(expr);
@@ -60,10 +58,8 @@ literalt boolbvt::convert_overflow(const exprt &expr)
        operands[0].type().id()!=ID_signedbv)
       return SUB::convert_rest(expr);
 
-    bvt bv0, bv1;
-
-    convert_bv(operands[0], bv0);
-    convert_bv(operands[1], bv1);
+    bvt bv0=convert_bv(operands[0]);
+    bvt bv1=convert_bv(operands[1]);
 
     if(bv0.size()!=bv1.size())
       throw "operand size mismatch on overflow-*";
@@ -117,9 +113,7 @@ literalt boolbvt::convert_overflow(const exprt &expr)
     if(operands.size()!=1)
       throw "operand "+expr.id_string()+" takes one operand";
 
-    bvt bv;
-
-    convert_bv(operands[0], bv);
+    const bvt &bv=convert_bv(operands[0]);
       
     return bv_utils.overflow_negate(bv);
   }
@@ -134,9 +128,7 @@ literalt boolbvt::convert_overflow(const exprt &expr)
       
     const exprt &op=operands[0];
 
-    bvt bv;
-
-    convert_bv(op, bv);
+    const bvt &bv=convert_bv(op);
 
     if(bits>=bv.size() || bits==0)
       throw "overflow-typecast got wrong number of bits";

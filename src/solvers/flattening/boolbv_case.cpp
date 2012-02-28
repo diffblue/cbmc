@@ -50,9 +50,7 @@ void boolbvt::convert_case(const exprt &expr, bvt &bv)
 
   forall_operands(it, expr)
   {
-    bvt op;
-
-    convert_bv(*it, op);
+    bvt op=convert_bv(*it);
 
     switch(what)
     {

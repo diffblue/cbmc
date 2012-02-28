@@ -32,12 +32,10 @@ void boolbvt::convert_if(const exprt &expr, bvt &bv)
   if(operands.size()!=3)
     throw "if takes three operands";
 
-  bvt op1_bv, op2_bv;
-
   literalt op0=convert(operands[0]);
   
-  convert_bv(operands[1], op1_bv);
-  convert_bv(operands[2], op2_bv);
+  const bvt &op1_bv=convert_bv(operands[1]);
+  const bvt &op2_bv=convert_bv(operands[2]);
 
   if(op1_bv.size()!=width || op2_bv.size()!=width)
     throw "operand size mismatch for if";

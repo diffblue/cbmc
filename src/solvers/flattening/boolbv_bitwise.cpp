@@ -34,8 +34,7 @@ void boolbvt::convert_bitwise(const exprt &expr, bvt &bv)
 
     const exprt &op0=expr.op0();
     
-    bvt op_bv;
-    convert_bv(op0, op_bv);
+    const bvt &op_bv=convert_bv(op0);
 
     bv.resize(width);
     
@@ -57,9 +56,7 @@ void boolbvt::convert_bitwise(const exprt &expr, bvt &bv)
     
     forall_operands(it, expr)
     {
-      bvt op;
-
-      convert_bv(*it, op);
+      const bvt &op=convert_bv(*it);
 
       if(op.size()!=width)
         throw "convert_bitwise: unexpected operand width";

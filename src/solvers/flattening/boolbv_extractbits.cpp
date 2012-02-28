@@ -39,9 +39,7 @@ void boolbvt::convert_extractbits(const extractbits_exprt &expr, bvt &bv)
     throw "extractbits takes three operands";
 
   mp_integer o1, o2;
-  bvt bv0;
-
-  convert_bv(expr.op0(), bv0);
+  const bvt &bv0=convert_bv(expr.op0());
 
   // We only do constants for now.
   // Should implement a shift here.

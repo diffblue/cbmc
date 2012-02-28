@@ -37,10 +37,8 @@ void boolbvt::convert_shift(const exprt &expr, bvt &bv)
   if(expr.operands().size()!=2)
     throw "shifting takes two operands";
 
-  bvt op, dist;
-
-  convert_bv(expr.op0(), op);
-  convert_bv(expr.op1(), dist);
+  const bvt &op=convert_bv(expr.op0());
+  const bvt &dist=convert_bv(expr.op1());
 
   if(op.size()!=width)
     throw "convert_shift: unexpected operand width";

@@ -48,8 +48,7 @@ void boolbvt::convert_array_of(const exprt &expr, bvt &bv)
   if(to_integer(array_size, size))
     return conversion_failed(expr, bv);
     
-  bvt tmp;
-  convert_bv(expr.op0(), tmp);
+  const bvt &tmp=convert_bv(expr.op0());
     
   bv.resize(width);
 

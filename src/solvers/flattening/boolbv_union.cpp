@@ -32,8 +32,7 @@ void boolbvt::convert_union(const exprt &expr, bvt &bv)
   if(expr.operands().size()!=1)
     throw "union expects one argument";
 
-  bvt op_bv;
-  convert_bv(expr.op0(), op_bv);
+  const bvt &op_bv=convert_bv(expr.op0());
 
   if(width<op_bv.size())
     throw "union: unexpected operand op width";

@@ -24,11 +24,10 @@ Function: boolbvt::convert_member
 
 void boolbvt::convert_member(const member_exprt &expr, bvt &bv)
 {
-  bvt struct_bv;
   const exprt &struct_op=expr.struct_op();
   const typet &struct_op_type=ns.follow(struct_op.type());
 
-  convert_bv(struct_op, struct_bv);
+  const bvt &struct_bv=convert_bv(struct_op);
 
   if(struct_op_type.id()==ID_union)
   {

@@ -66,8 +66,7 @@ void boolbvt::convert_index(const index_exprt &expr, bvt &bv)
         to_symbol_expr(array).get_identifier(), array_type);
 
     // make sure we have the index in the cache
-    bvt index_bv;
-    convert_bv(index, index_bv);
+    convert_bv(index);
     
     return;
   }
@@ -92,9 +91,7 @@ void boolbvt::convert_index(const index_exprt &expr, bvt &bv)
 
   // get literals for the whole array
 
-  bvt array_bv;
-
-  convert_bv(array, array_bv);
+  const bvt &array_bv=convert_bv(array);
 
   if(array_size*width!=array_bv.size())
     throw "unexpected array size";
@@ -193,8 +190,7 @@ void boolbvt::convert_index(
 
   bv.resize(width);
   
-  bvt tmp;
-  convert_bv(array, tmp); // recursive call
+  const bvt &tmp=convert_bv(array); // recursive call
 
   mp_integer offset=index*width;
 
