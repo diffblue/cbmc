@@ -680,10 +680,8 @@ literalt bv_utilst::overflow_negate(const bvt &bv)
   // a overflow on unary- can only happen with the smallest
   // representable number 100....0
 
-  bvt zeros;
-
-  for(unsigned i=0; i<bv.size()-1; i++)
-    zeros.push_back(bv[i]);
+  bvt zeros(bv);
+  zeros.erase(--zeros.end());
 
   return prop.land(bv[bv.size()-1], prop.lnot(prop.lor(zeros)));
 }

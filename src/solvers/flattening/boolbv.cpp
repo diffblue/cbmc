@@ -490,7 +490,8 @@ Function: boolbvt::convert_symbol
 
 void boolbvt::convert_symbol(const exprt &expr, bvt &bv)
 {
-  unsigned width=boolbv_width(expr.type());
+  const typet &type=expr.type();
+  unsigned width=boolbv_width(type);
 
   bv.resize(width);
   
@@ -502,7 +503,7 @@ void boolbvt::convert_symbol(const exprt &expr, bvt &bv)
   if(width==0)
   {
     // just put in map
-    map.get_map_entry(identifier, expr.type());
+    map.get_map_entry(identifier, type);
   }
   else
   {
