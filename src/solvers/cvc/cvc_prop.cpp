@@ -205,10 +205,10 @@ literalt cvc_propt::land(const bvt &bv)
 
   literalt literal=def_cvc_literal();
 
-  for(unsigned int i=0; i<bv.size(); ++i)
+  forall_literals(it, bv)
   {
-    if(i!=0) out << " AND ";
-    out << cvc_literal(bv[i]);
+    if(it!=bv.begin()) out << " AND ";
+    out << cvc_literal(*it);
   }
   
   out << ";" << std::endl << std::endl;
@@ -234,10 +234,10 @@ literalt cvc_propt::lor(const bvt &bv)
 
   literalt literal=def_cvc_literal();
 
-  for(unsigned int i=0; i<bv.size(); ++i)
+  forall_literals(it, bv)
   {
-    if(i!=0) out << " OR ";
-    out << cvc_literal(bv[i]);
+    if(it!=bv.begin()) out << " OR ";
+    out << cvc_literal(*it);
   }
   
   out << ";" << std::endl << std::endl;
@@ -265,8 +265,8 @@ literalt cvc_propt::lxor(const bvt &bv)
 
   literalt literal=const_literal(false);
 
-  for(unsigned i=0; i<bv.size(); i++)
-    literal=lxor(bv[i], literal);
+  forall_literals(it, bv)
+    literal=lxor(*it, literal);
 
   return literal;
 }

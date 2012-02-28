@@ -105,8 +105,8 @@ literalt smt2_propt::land(const bvt &bv)
   out << "; land" << std::endl;
   out << " (and";
   
-  for(unsigned int i=0; i<bv.size(); i++)
-    out << " " << smt2_literal(bv[i]);
+  forall_literals(it, bv)
+    out << " " << smt2_literal(*it);
 
   out << "))" << std::endl;
 
@@ -134,8 +134,8 @@ literalt smt2_propt::lor(const bvt &bv)
   out << "; lor" << std::endl;
   out << " (or";
 
-  for(unsigned int i=0; i<bv.size(); i++)
-    out << " " << smt2_literal(bv[i]);
+  forall_literals(it, bv)
+    out << " " << smt2_literal(*it);
 
   out << "))" << std::endl;
 
@@ -166,8 +166,8 @@ literalt smt2_propt::lxor(const bvt &bv)
   out << "; lxor" << std::endl;
   out << " (xor";
 
-  for(unsigned int i=0; i<bv.size(); i++)
-    out << " " << smt2_literal(bv[i]);
+  forall_literals(it, bv)
+    out << " " << smt2_literal(*it);
 
   out << "))" << std::endl;
 

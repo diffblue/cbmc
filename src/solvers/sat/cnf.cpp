@@ -296,8 +296,8 @@ literalt cnft::land(const bvt &bv)
   if(bv.size()==1) return bv[0];
   if(bv.size()==2) return land(bv[0], bv[1]);
 
-  for(unsigned i=0; i<bv.size(); i++)
-    if(bv[i]==const_literal(false))
+  forall_literals(it, bv)
+    if(*it==const_literal(false))
       return const_literal(false);
 
   if(is_all(bv, const_literal(true)))
@@ -309,11 +309,11 @@ literalt cnft::land(const bvt &bv)
 
   literalt literal=new_variable();
 
-  for(unsigned int i=0; i<new_bv.size(); ++i)
+  forall_literals(it, new_bv)
   {
     bvt lits;
     lits.reserve(2);
-    lits.push_back(pos(new_bv[i]));
+    lits.push_back(pos(*it));
     lits.push_back(neg(literal));
     lcnf(lits);
   }
@@ -321,8 +321,8 @@ literalt cnft::land(const bvt &bv)
   bvt lits;
   lits.reserve(new_bv.size()+1);
 
-  for(unsigned int i=0; i<new_bv.size(); ++i)
-    lits.push_back(neg(new_bv[i]));
+  forall_literals(it, new_bv)
+    lits.push_back(neg(*it));
 
   lits.push_back(pos(literal));
   lcnf(lits);
@@ -348,8 +348,8 @@ literalt cnft::lor(const bvt &bv)
   if(bv.size()==1) return bv[0];
   if(bv.size()==2) return lor(bv[0], bv[1]);
 
-  for(unsigned i=0; i<bv.size(); i++)
-    if(bv[i]==const_literal(true))
+  forall_literals(it, bv)
+    if(*it==const_literal(true))
       return const_literal(true);
 
   if(is_all(bv, const_literal(false)))
@@ -361,11 +361,11 @@ literalt cnft::lor(const bvt &bv)
 
   literalt literal=new_variable();
 
-  for(unsigned int i=0; i<new_bv.size(); ++i)
+  forall_literals(it, new_bv)
   {
     bvt lits;
     lits.reserve(2);
-    lits.push_back(neg(new_bv[i]));
+    lits.push_back(neg(*it));
     lits.push_back(pos(literal));
     lcnf(lits);
   }
@@ -373,8 +373,8 @@ literalt cnft::lor(const bvt &bv)
   bvt lits;
   lits.reserve(new_bv.size()+1);
 
-  for(unsigned int i=0; i<new_bv.size(); ++i)
-    lits.push_back(pos(new_bv[i]));
+  forall_literals(it, new_bv)
+    lits.push_back(pos(*it));
 
   lits.push_back(neg(literal));
   lcnf(lits);
@@ -402,8 +402,8 @@ literalt cnft::lxor(const bvt &bv)
 
   literalt literal=const_literal(false);
 
-  for(unsigned i=0; i<bv.size(); i++)
-    literal=lxor(bv[i], literal);
+  forall_literals(it, bv)
+    literal=lxor(*it, literal);
 
   return literal;
 }
