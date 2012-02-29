@@ -221,8 +221,11 @@ void cbmc_parseoptionst::get_command_line_options(optionst &options)
     options.set_option("error-label", cmdline.getval("error-label"));
 
   // generate unwinding assertions
-  options.set_option("unwinding-assertions",
-   !cmdline.isset("no-unwinding-assertions"));
+  if(cmdline.isset("cover-assertions"))
+    options.set_option("unwinding-assertions", false);
+  else
+    options.set_option("unwinding-assertions",
+      !cmdline.isset("no-unwinding-assertions"));
 
   // generate unwinding assumptions otherwise
   options.set_option("partial-loops",
