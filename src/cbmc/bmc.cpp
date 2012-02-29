@@ -414,7 +414,7 @@ bool bmct::run(const goto_functionst &goto_functions)
     
     if(options.get_bool_option("cover-assertions"))
     {
-      cover_assertions();
+      cover_assertions(goto_functions);
       return false;
     }
 

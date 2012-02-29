@@ -651,6 +651,12 @@ bool cbmc_parseoptionst::process_goto_program(
 
     // add loop ids
     goto_functions.compute_loop_numbers();
+    
+    // if we aim to cover, replace
+    // all assertions by false to prevent simplification
+    
+    if(cmdline.isset("cover-assertions"))
+      make_assertions_false(goto_functions);
 
     // show it?
     if(cmdline.isset("show-loops"))
