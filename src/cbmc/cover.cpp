@@ -123,7 +123,7 @@ void cover_goalst::constraint()
       g_it=goals.begin();
       g_it!=goals.end();
       g_it++)
-    if(!g_it->covered)
+    if(!g_it->covered && !g_it->condition.is_false())
       bv.push_back(g_it->condition);
 
   prop.lcnf(bv);
@@ -185,7 +185,7 @@ Function: bmct::cover_assertions
 
 \*******************************************************************/
 
-void bmct::cover_assertions()
+void bmct::cover_assertions(const goto_functionst &goto_functions)
 {
   // with simplifier: need to freeze goal variables
   // to prevent them from being eliminated
@@ -212,19 +212,27 @@ void bmct::cover_assertions()
   equation.convert_decls(prop_conv);
   equation.convert_assumptions(prop_conv);
 
-  // collect goals in `goal_map'
-  literalt assumption_literal=const_literal(true);
-  
+  // collect _all_ goals in `goal_map'
   typedef std::map<goto_programt::const_targett, bvt> goal_mapt;
   goal_mapt goal_map;
+  
+  forall_goto_functions(f_it, goto_functions)
+    forall_goto_program_instructions(i_it, f_it->second.body)
+      if(i_it->is_assert())
+        goal_map[i_it]=bvt();
+
+  // get the conditions for these goals from formula
+
+  literalt assumption_literal=const_literal(true);
 
   for(symex_target_equationt::SSA_stepst::iterator
       it=equation.SSA_steps.begin();
       it!=equation.SSA_steps.end();
       it++)
+  {
     if(it->is_assert())
     {
-      // we just want reachability, i.e., the guard,
+      // we just want reachability, i.e., the guard of the instruction,
       // not the assertion itself
       literalt l=
         prop_conv.prop.land(assumption_literal, it->guard_literal);
@@ -234,8 +242,9 @@ void bmct::cover_assertions()
     else if(it->is_assume())
       assumption_literal=
         prop_conv.prop.land(assumption_literal, it->cond_literal);
+  }
   
-  // compute
+  // try to cover those
   cover_goalst cover_goals(prop_conv);
   cover_goals.set_message_handler(get_message_handler());
   cover_goals.set_verbosity(get_verbosity());
@@ -245,6 +254,7 @@ void bmct::cover_assertions()
       it!=goal_map.end();
       it++)
   {
+    // the following is FALSE if the bv is empty
     literalt condition=prop_conv.prop.lor(it->second);
     cover_goals.add(condition, it->first->location.as_string());
   }
