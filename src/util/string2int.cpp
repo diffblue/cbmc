@@ -11,7 +11,9 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 #include <limits>
 #include <cassert>
 
-#ifdef _WIN32
+// _strtoi64 is available in Visual Studio, but not yet in MINGW
+
+#ifdef _MSC_VER
 #define strtoll _strtoi64
 #endif
 
