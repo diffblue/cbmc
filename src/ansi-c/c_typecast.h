@@ -71,6 +71,7 @@ protected:
                  INT, UINT,
                  LONG, ULONG,
                  LONGLONG, ULONGLONG,
+                 LARGE_SIGNED_INT, LARGE_UNSIGNED_INT,
                  INTEGER, // these are unbounded integers
                  SINGLE, DOUBLE, LONGDOUBLE, // float
                  RATIONAL, REAL, // these are infinite precision

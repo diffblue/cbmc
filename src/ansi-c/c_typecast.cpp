@@ -312,6 +312,8 @@ c_typecastt::c_typet c_typecastt::get_c_type(
       return LONG;
     else if(width<=config.ansi_c.long_long_int_width)
       return LONGLONG;
+    else
+      return LARGE_SIGNED_INT;
   }
   else if(type.id()==ID_unsignedbv)
   {
@@ -325,6 +327,8 @@ c_typecastt::c_typet c_typecastt::get_c_type(
       return ULONG;
     else if(width<=config.ansi_c.long_long_int_width)
       return ULONGLONG;
+    else
+      return LARGE_UNSIGNED_INT;
   }
   else if(type.id()==ID_bool)
     return BOOL;
@@ -628,7 +632,34 @@ void c_typecastt::implicit_typecast_arithmetic(
     max_type=UINT;
   else
     max_type=std::max(max_type, INT);
-  
+
+  if(max_type==LARGE_SIGNED_INT || max_type==LARGE_UNSIGNED_INT)
+  {
+    // get the biggest width of both
+    unsigned width1=type1.get_int(ID_width);
+    unsigned width2=type2.get_int(ID_width);
+    
+    // produce type
+    typet result_type;
+
+    if(width1==width2)
+    {
+      if(max_type==LARGE_SIGNED_INT)
+        result_type=signedbv_typet(width1);
+      else
+        result_type=unsignedbv_typet(width1);
+    }
+    else if(width1>width2)
+      result_type=type1;
+    else // width1<width2
+      result_type=type2;
+
+    do_typecast(expr1, result_type);
+    do_typecast(expr2, result_type);
+    
+    return;
+  }
+    
   implicit_typecast_arithmetic(expr1, max_type);
   implicit_typecast_arithmetic(expr2, max_type);
   
