@@ -147,7 +147,7 @@ exprt convert_integer_literal(
   }
   else
   {
-    // way too large
+    // Way too large. Should consider issuing a warning.
     width=config.ansi_c.long_long_int_width;
 
     if(is_unsigned)
