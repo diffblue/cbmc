@@ -1,0 +1,167 @@
+.\" Process this file with
+.\" groff -man -Tascii cbmc.1
+.\"
+.TH CBMC 1 "MARCH 2012" "cbmc-4.1" "User Manual"
+.SH NAME
+cbmc \- Bounded Model Checker for C and C++ programs
+.SH SYNOPSIS
+.B cbmc [--claim
+.I claim-nr
+.B ]
+.I file.c
+.B ...
+
+.B goto-cc [-I
+.I include-path
+.B ] [-c] 
+.I file.c
+.B [-o
+.I outfile.o
+.B ]
+
+.B goto-instrument
+.I infile
+.I outfile
+.PP
+Only the most useful options are listed here; see below for the remainder.
+.SH DESCRIPTION
+.B cbmc
+generates traces that demonstrate how an assertion can be violated, or
+proves that the assertion cannot be violated within a given number of loop
+iterations. CBMC can read source-code directly, or a goto-binary generated
+by goto-cc.
+.B goto-cc
+reads source code, and generates a goto-binary. It's command-line interface
+is designed to mimic that of
+.BR gcc (1).
+.B goto-instrument
+reads a goto-binary, performs a given program transformation, and then
+writes the resulting program as goto-binary on disc.
+
+The usual flow is to (1) translate source into a goto-binary using
+goto-cc, then (2) perform instrumentation with goto-instrument, and
+finally (3) perform the analysis with cbmc.
+.SH OPTIONS
+.SS "FRONTEND OPTIONS (cbmc and goto-cc)"
+.IP "-I path"
+Set include path (C/C++)
+.IP "-D macro"
+Define preprocessor macro (C/C++)
+.IP --preprocess
+Stop after preprocessing
+.IP "--16, --32, --64"
+Set width of int
+.IP "--LP64, --ILP64, --LLP64, --ILP32, --LP32"
+Set width of int, long and pointers
+.IP --little-endian
+Allow little-endian word-byte conversions
+.IP --big-endian
+Allow big-endian word-byte conversions
+.IP --unsigned-char
+Make "char" unsigned by default
+.IP --show-symbol-table
+Show symbol table
+.IP --show-goto-functions
+Show goto program
+.IP --ppc-macos
+Set MACOS/PPC architecture
+.IP --i386-macos
+Set MACOS/I386 architecture
+.IP --i386-linux
+Set Linux/I386 architecture
+.IP --i386-win32
+Set Windows/I386 architecture
+.IP --winx64
+Set Windows/X64 architecture
+.IP --no-arch
+Don't set up an architecture
+.IP --no-library
+Disable built-in abstract C library
+.IP --round-to-nearest
+IEEE floating point rounding mode (default)
+.IP --round-to-plus-inf
+IEEE floating point rounding mode
+.IP --round-to-minus-inf
+IEEE floating point rounding mode
+.IP --round-to-zero
+IEEE floating point rounding mode
+.SS "PROGRAM INSTRUMENTATION OPTIONS (cbmc and goto-instrument)"
+.IP --bounds-check
+Enable array bounds checks
+.IP --div-by-zero-check
+Enable division by zero checks
+.IP --pointer-check
+Enable pointer checks
+.IP --signed-overflow-check
+Enable arithmetic over- and underflow checks for signed integer arithmetic
+.IP --unsigned-overflow-check
+Enable arithmetic over- and underflow checks for unsigned integer arithmetic
+.IP --nan-check
+Check floating-point computations for NaN
+.IP --all-claims
+Keep all claims, i.e., refrain from removing simple claims
+.IP --show-claims
+Only show claims
+.IP --show-loops
+Show the loops in the program
+.IP --no-assertions
+Ignore user-provided assertions
+.IP --no-assumptions
+Ignore user-provided assumptions
+.IP --error-label label
+Check that the given label is unreachable
+.IP --cover-assertions
+Check which assertions are reachable
+.SS "BMC OPTIONS (cbmc)"
+.IP --function name 
+Set main function name
+.IP --claim nr
+Only check specific claim
+.IP --program-only
+Only show program expression
+.IP --depth nr 
+Limit search depth
+.IP --unwind nr 
+Unwind nr times
+.IP "--unwindset L:B,..."
+Unwind loop L with a bound of B (use --show-loops to get the loop IDs)
+.IP --show-vcc
+Show the verification conditions
+.IP --slice-formula
+Remove assignments unrelated to property
+.IP --no-unwinding-assertions
+Do not generate unwinding assertions
+.IP --no-pretty-names
+Do not simplify identifiers
+.SS "BACKEND OPTIONS (cbmc)"
+.IP --dimacs
+Generate CNF in DIMACS format
+.IP --beautify-greedy
+Beautify the counterexample (greedy heuristic)
+.IP --smt1
+Output subgoals in SMT1 syntax (experimental)
+.IP --smt2
+Output subgoals in SMT2 syntax (experimental)
+.IP --boolector
+Use Boolector (experimental)
+.IP --mathsat
+Use MathSAT (experimental)
+.IP --cvc
+Use CVC3 (experimental)
+.IP --yices
+Use Yices (experimental)
+.IP --z3
+Use Z3 (experimental)
+.IP --refine
+Use refinement procedure (experimental)
+.IP "--outfile filename"
+Output formula to given file
+.IP --arrays-uf-never
+Never turn arrays into uninterpreted functions
+.IP --arrays-uf-always
+Always turn arrays into uninterpreted functions
+.SH ENVIRONMENT
+CBMC does not regognize any environment variables. Note, however, that
+the preprocessor used by CBMC will use environment variables to locate
+header files. GOTO-CC aims to accept all environment variables that GCC
+does.
