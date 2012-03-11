@@ -28,8 +28,12 @@ mkdir debian
 mkdir debian/DEBIAN
 mkdir debian/usr
 mkdir debian/usr/bin
+mkdir debian/usr/share
+mkdir debian/usr/share/man
+mkdir debian/usr/share/man/man1
 cp hw-cbmc cbmc goto-cc goto-instrument \
   debian/usr/bin/
+cp ../../doc/man/cbmc.1 debian/usr/share/man/man1
 
 cat > debian/DEBIAN/control << EOM
 Package: cbmc
