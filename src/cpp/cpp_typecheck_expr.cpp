@@ -1003,6 +1003,22 @@ Purpose:
 
 \*******************************************************************/
 
+exprt collect_comma_expression(const exprt &src)
+{
+  exprt result;
+
+  if(src.id()==ID_comma)
+  {
+    assert(src.operands().size()==2);
+    result=collect_comma_expression(src.op0());
+    result.copy_to_operands(src.op1());
+  }
+  else
+    result.copy_to_operands(src);
+    
+  return result;
+}
+
 void cpp_typecheckt::typecheck_expr_explicit_typecast(exprt &expr)
 {
   // these can have 0 or 1 arguments
@@ -1029,6 +1045,8 @@ void cpp_typecheckt::typecheck_expr_explicit_typecast(exprt &expr)
     // Explicitly given value, e.g., int(1).
     // There is an expr-vs-type ambiguity, as it is possible to write
     // (f)(1), where 'f' is a function symbol and not a type.
+    // This also exists with a "comma expression", e.g.,
+    // (f)(1, 2, 3)
     
     if(expr.type().id()==ID_cpp_name)
     {
@@ -1051,11 +1069,7 @@ void cpp_typecheckt::typecheck_expr_explicit_typecast(exprt &expr)
 
         f_call.location()=expr.location();
         f_call.function().swap(expr.type());
-        
-        if(expr.op0().id()==ID_comma)
-          f_call.arguments().swap(expr.op0().operands());
-        else
-          f_call.arguments().push_back(expr.op0());
+        f_call.arguments()=collect_comma_expression(expr.op0()).operands();
         
         typecheck_side_effect_function_call(f_call);
         
