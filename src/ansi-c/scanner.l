@@ -197,8 +197,6 @@ s_char [^"\\\n]|{escape_sequence}
 %x GCC_ATTRIBUTE5
 %x GCC_ASM
 %x GCC_ASM_VOLATILE
-%x GCC_ASM_BLOCK1
-%x GCC_ASM_BLOCK2
 %x GCC_ASM_PAREN
 
 %{
