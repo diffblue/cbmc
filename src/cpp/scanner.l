@@ -37,6 +37,7 @@ void set_line_no();
 %x COMMENT1
 %x COMMENT2
 %x GCC_ATTRIBUTE
+%x ASM_BLOCK
 %x MSC_ASM1
 %x MSC_ASM2
 %x MSC_DECLSPEC
