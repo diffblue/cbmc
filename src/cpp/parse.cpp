@@ -5388,10 +5388,33 @@ bool Parser::isTemplateArgs()
 
 /*
   function.body  : compound.statement
+                 | { asm }
 */
+#include <iostream>
+
 bool Parser::rFunctionBody(codet &body)
 {
-  return rCompoundStatement(body);
+  // the following is an extension in GCC,
+  // ARMCC, CodeWarrior...
+  
+  if(lex->LookAhead(0)=='{' &&
+     lex->LookAhead(1)==TOK_ASM_STRING)
+  {
+    Token ob, tk, cb;
+    lex->GetToken(ob);
+    
+    body=code_blockt();
+    set_location(body, ob);
+
+    lex->GetToken(tk);
+    // TODO: add to body
+
+    if(lex->GetToken(cb)!='}') return false;
+    
+    return true;
+  }
+  else  
+    return rCompoundStatement(body);
 }
 
 /*
@@ -5414,6 +5437,7 @@ bool Parser::rCompoundStatement(codet &statement)
   #endif
 
   statement=code_blockt();
+  set_location(statement, ob);
 
   while(lex->LookAhead(0)!='}')
   {
@@ -6150,8 +6174,12 @@ bool Parser::rMSCAsmStatement(codet &statement)
     #ifdef DEBUG
     std::cout << "Parser::rMSCAsmStatement 3\n";
     #endif // DEBUG
+    
+    if(lex->LookAhead(0)!=TOK_ASM_STRING)
+      return true;
+      
+    lex->GetToken(tk);
 
-    if(!rString(tk)) return false;
     statement.move_to_operands(tk.data);
     if(lex->GetToken(tk)!='}') return false;
 
@@ -6165,7 +6193,10 @@ bool Parser::rMSCAsmStatement(codet &statement)
     std::cout << "Parser::rMSCAsmStatement 5\n";
     #endif // DEBUG
 
-    if(!rString(tk)) return false;
+    if(lex->LookAhead(0)!=TOK_ASM_STRING)
+      return true;
+      
+    lex->GetToken(tk);
     statement.move_to_operands(tk.data);
 
     #ifdef DEBUG
