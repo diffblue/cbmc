@@ -38,8 +38,7 @@ void set_line_no();
 %x COMMENT2
 %x GCC_ATTRIBUTE
 %x ASM_BLOCK
-%x MSC_ASM1
-%x MSC_ASM2
+%x MSC_ASM
 %x MSC_DECLSPEC
 %x MSC_PRAGMA
 %x MSC_ANNOTATION
@@ -136,16 +135,17 @@ pragma          "#"{horizontal_white}*pragma{horizontal_white}.*"\n"
 <MSC_ANNOTATION>"]" { BEGIN(INITIAL); }
 <MSC_ANNOTATION>. { /* ignore */ }
 
-<MSC_ASM1>{ws}"{" { BEGIN(MSC_ASM2); loc(); return '{'; }
-<MSC_ASM1>[^{^}]* { loc();
+<MSC_ASM>{ws}"{" { BEGIN(ASM_BLOCK); loc(); return '{'; }
+<MSC_ASM>[^{^}^\n]* { loc();
                     PARSER.current_token().data=exprt(yytext);
                     BEGIN(INITIAL);
                     return TOK_STRING; }
 
-<MSC_ASM2>[^}]* { loc();
+<ASM_BLOCK>[^}]* { loc();
                   PARSER.current_token().data=exprt(yytext);
                   return TOK_STRING; }
-<MSC_ASM2>"}"   { BEGIN(INITIAL); loc(); return '}'; }
+<ASM_BLOCK>"}"  { PARSER.asm_block_following=false;
+                  BEGIN(INITIAL); loc(); return '}'; }
 
 <MSC_DECLSPEC>")"    { PARSER.parenthesis_counter--;
                         if(PARSER.parenthesis_counter==0)
@@ -165,18 +165,50 @@ pragma          "#"{horizontal_white}*pragma{horizontal_white}.*"\n"
 ({horizontal_white}|{v_tab}|{c_return}|{form_feed})*"\n"
 
 __alignof__         { loc(); return TOK_SIZEOF; }
-__asm__|asm|__asm   { if(PARSER.mode==cpp_parsert::MSC ||
-                         PARSER.mode==cpp_parsert::CW)
-                      {
-                        BEGIN(MSC_ASM1);
-                        return TOK_MSC_ASM;
-                      }
-                      else
-                      {
-                        loc();
-                        return TOK_GCC_ASM;
-                      }
-                    }
+
+"__asm"         { if(PARSER.mode==cpp_parsert::MSC)
+                  {
+                    loc();
+                    BEGIN(MSC_ASM);
+                    return TOK_MSC_ASM;
+                  }
+                  else
+                  {
+                    loc();
+                    PARSER.asm_block_following=true;
+                    return TOK_GCC_ASM;
+                  }
+                }
+
+"asm"           { if(PARSER.mode==cpp_parsert::GCC ||
+                     PARSER.mode==cpp_parsert::CW)
+                  {
+                    loc();
+                    PARSER.asm_block_following=true;
+                    return TOK_GCC_ASM;
+                  }
+                  else
+                  {
+                    loc();
+                    return TOK_IDENTIFIER;
+                  }
+                }
+
+"__asm__"       { if(PARSER.mode==cpp_parsert::GCC ||
+                     PARSER.mode==cpp_parsert::CW ||
+                     PARSER.mode==cpp_parsert::ARM)
+                  {
+                    loc();
+                    PARSER.asm_block_following=true;
+                    return TOK_GCC_ASM;
+                  }
+                  else
+                  {
+                    loc();
+                    return TOK_IDENTIFIER;
+                  }
+                }
+
 __attribute         { BEGIN(GCC_ATTRIBUTE); PARSER.parenthesis_counter=0; }
 __attribute__       { BEGIN(GCC_ATTRIBUTE); PARSER.parenthesis_counter=0; }
 _cdecl|__cdecl 	    { loc(); return MSC_Keyword(TOK_CDECL); }
@@ -371,7 +403,6 @@ __CPROVER_thread_local { loc(); return TOK_THREAD_LOCAL; }
 
 "##"                { }
 
-"{"                 { loc(); return '{'; }
 "}"                 { loc(); return '}'; }
 "["                 { loc(); return '['; }
 "]"                 { loc(); return ']'; }
@@ -390,8 +421,18 @@ __CPROVER_thread_local { loc(); return TOK_THREAD_LOCAL; }
 "|"                 { loc(); return '|'; }
 "?"                 { loc(); return '?'; }
 ":"                 { loc(); return ':'; }
-";"                 { loc(); return ';'; }
 "="                 { loc(); return '='; }
+
+"{"                 { 
+                      if(PARSER.asm_block_following) { BEGIN(ASM_BLOCK); }
+                      loc();
+                      return '{';
+                    }
+
+";"                 { PARSER.asm_block_following=false;
+                      loc();
+                      return ';';
+                    }
 
 ".*"                { loc(); return TOK_DOTPM; }
 "->*"               { loc(); return TOK_ARROWPM; }
