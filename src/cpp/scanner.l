@@ -222,7 +222,13 @@ __leave             { loc(); return MSC_Keyword(TOK_MSC_LEAVE); }
 __finally           { loc(); return MSC_Keyword(TOK_MSC_FINALLY); }
 __uuidof 	    { loc(); return MSC_Keyword(TOK_MSC_UUIDOF); }
 auto                { loc(); return TOK_AUTO; }
-bool                { loc(); return TOK_BOOL; }
+bool                { // CodeWarrior doesn't have bool built in!
+                      loc();
+                      if(PARSER.mode==cpp_parsert::CW)
+                        return TOK_IDENTIFIER;
+                      else
+                        return TOK_BOOL;
+                    }
 break               { loc(); return TOK_BREAK; }
 case                { loc(); return TOK_CASE; }
 catch               { loc(); return TOK_CATCH; }
