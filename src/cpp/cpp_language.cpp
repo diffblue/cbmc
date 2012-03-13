@@ -150,10 +150,31 @@ bool cpp_languaget::parse(
   cpp_parser.set_message_handler(message_handler);
   cpp_parser.grammar=cpp_parsert::LANGUAGE;
 
-  if(config.ansi_c.os==configt::ansi_ct::OS_WIN)
+  switch(config.ansi_c.mode)
+  {
+  case configt::ansi_ct::MODE_CODEWARRIOR:
+    cpp_parser.mode=cpp_parsert::CW;
+    break;
+   
+  case configt::ansi_ct::MODE_VISUAL_STUDIO:
     cpp_parser.mode=cpp_parsert::MSC;
-  else
+    break;
+    
+  case configt::ansi_ct::MODE_ANSI:
+    cpp_parser.mode=cpp_parsert::ANSI;
+    break;
+    
+  case configt::ansi_ct::MODE_GCC:
     cpp_parser.mode=cpp_parsert::GCC;
+    break;
+    
+  case configt::ansi_ct::MODE_ARM:
+    cpp_parser.mode=cpp_parsert::ARM;
+    break;
+    
+  default:
+    assert(false);
+  }
 
   cpp_scanner_init();
 

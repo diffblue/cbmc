@@ -37,7 +37,14 @@ public:
   // internal state
   
   enum { LANGUAGE, EXPRESSION } grammar;
-  enum { ANSI, GCC, MSC } mode;
+
+  enum { ANSI, GCC, MSC, ICC, CW, ARM } mode;
+  // ANSI is strict ANSI-C
+  // GCC is, well, gcc
+  // MSC is Microsoft Visual Studio
+  // ICC is Intel's C compiler
+  // CW is CodeWarrior (with GCC extensions enabled)
+  // ARM is ARM's RealView
 
   cpp_token_buffert token_buffer;
   
