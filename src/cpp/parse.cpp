@@ -1488,7 +1488,7 @@ bool Parser::optMemberSpec(cpp_member_spect &member_spec)
 }
 
 /*
-  storage.spec : STATIC | EXTERN | AUTO | REGISTER | MUTABLE
+  storage.spec : STATIC | EXTERN | AUTO | REGISTER | MUTABLE | ASM | THREAD_LOCAL
 */
 bool Parser::optStorageSpec(cpp_storage_spect &storage_spec)
 {
@@ -1498,7 +1498,9 @@ bool Parser::optStorageSpec(cpp_storage_spect &storage_spec)
      t==TOK_EXTERN ||
      t==TOK_AUTO ||
      t==TOK_REGISTER ||
-     t==TOK_MUTABLE)
+     t==TOK_MUTABLE ||
+     t==TOK_GCC_ASM ||
+     t==TOK_THREAD_LOCAL)
   {
     Token tk;
     lex->GetToken(tk);
@@ -1510,6 +1512,8 @@ bool Parser::optStorageSpec(cpp_storage_spect &storage_spec)
     case TOK_AUTO: storage_spec.set_auto(); break;
     case TOK_REGISTER: storage_spec.set_register(); break;
     case TOK_MUTABLE: storage_spec.set_mutable(); break;
+    case TOK_GCC_ASM: storage_spec.set_asm(); break;
+    case TOK_THREAD_LOCAL: storage_spec.set_thread_local(); break;
     default: assert(false);
     }
 
