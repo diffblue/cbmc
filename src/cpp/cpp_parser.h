@@ -31,6 +31,7 @@ public:
     parsert::clear();
     parse_tree.clear();
     token_buffer.clear();
+    asm_block_following=false;
   }
 
 public:
@@ -65,6 +66,7 @@ public:
   
   // scanner
   unsigned parenthesis_counter;
+  bool asm_block_following;
 };
 
 extern cpp_parsert cpp_parser;
