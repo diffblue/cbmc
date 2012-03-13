@@ -139,11 +139,11 @@ pragma          "#"{horizontal_white}*pragma{horizontal_white}.*"\n"
 <MSC_ASM>[^{^}^\n]* { loc();
                     PARSER.current_token().data=exprt(yytext);
                     BEGIN(INITIAL);
-                    return TOK_STRING; }
+                    return TOK_ASM_STRING; }
 
 <ASM_BLOCK>[^}]* { loc();
                   PARSER.current_token().data=exprt(yytext);
-                  return TOK_STRING; }
+                  return TOK_ASM_STRING; }
 <ASM_BLOCK>"}"  { PARSER.asm_block_following=false;
                   BEGIN(INITIAL); loc(); return '}'; }
 
