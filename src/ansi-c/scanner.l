@@ -460,7 +460,12 @@ typeid              { return cpp_keyword(TOK_TYPEID); }
 typename            { return cpp_keyword(TOK_TYPENAME); }
 using               { return cpp_keyword(TOK_USING); }
 virtual             { return cpp_keyword(TOK_VIRTUAL); }
-wchar_t             { return cpp_keyword(TOK_WCHAR_T); } // already really ANSI-C!
+wchar_t	            { // CodeWarrior doesn't have wchar_t built in
+                      if(PARSER.mode==ansi_c_parsert::CW)
+                        return make_identifier();
+                      else
+                        return cpp_keyword(TOK_WCHAR_T);
+                    }
 ".*"                { return cpp_operator(TOK_DOTPM); }
 "->*"               { return cpp_operator(TOK_ARROWPM); }
 "::"                { if(PARSER.cpp)
