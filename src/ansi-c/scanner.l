@@ -441,6 +441,7 @@ void ansi_c_scanner_init()
 bool                { return cpp_keyword(TOK_BOOL); }
 catch               { return cpp_keyword(TOK_CATCH); }
 class               { return cpp_keyword(TOK_CLASS); }
+constexpr           { return cpp_keyword(TOK_CONSTEXPR); }
 delete              { return cpp_keyword(TOK_DELETE); }
 decltype            { return cpp_keyword(TOK_DECLTYPE); }
 explicit            { return cpp_keyword(TOK_EXPLICIT); }
@@ -448,6 +449,7 @@ friend              { return cpp_keyword(TOK_FRIEND); }
 mutable             { return cpp_keyword(TOK_MUTABLE); }
 namespace           { return cpp_keyword(TOK_NAMESPACE); }
 new                 { return cpp_keyword(TOK_NEW); }
+nullptr             { return cpp_keyword(TOK_NULLPTR); }
 operator            { return cpp_keyword(TOK_OPERATOR); }
 private             { return cpp_keyword(TOK_PRIVATE); }
 protected           { return cpp_keyword(TOK_PROTECTED); }
@@ -455,6 +457,7 @@ public              { return cpp_keyword(TOK_PUBLIC); }
 static_assert       { return cpp_keyword(TOK_STATIC_ASSERT); }
 template            { return cpp_keyword(TOK_TEMPLATE); }
 this                { return cpp_keyword(TOK_THIS); }
+thread_local        { return cpp_keyword(TOK_THREAD_LOCAL); }
 throw               { return cpp_keyword(TOK_THROW); }
 typeid              { return cpp_keyword(TOK_TYPEID); }
 typename            { return cpp_keyword(TOK_TYPENAME); }

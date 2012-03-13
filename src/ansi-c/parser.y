@@ -147,6 +147,8 @@ extern char *yyansi_ctext;
 %token TOK_NORETURN    "_Noreturn"
 %token TOK_STATIC_ASSERT "_Static_assert"
 %token TOK_THREAD_LOCAL "_Thread_local"
+%token TOK_NULLPTR     "nullptr"
+%token TOK_CONSTEXPR   "constexpr"
 
 /*** special scanner reports ***/
 
