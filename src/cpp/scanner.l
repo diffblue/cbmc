@@ -264,7 +264,7 @@ const               { loc(); return TOK_CONST; }
 continue            { loc(); return TOK_CONTINUE; }
 default             { loc(); return TOK_DEFAULT; }
 delete              { loc(); return TOK_DELETE; }
-decltype            { loc(); return TOK_DECLTYPE; }
+decltype            { loc(); return TOK_DECLTYPE; } // C++11
 do                  { loc(); return TOK_DO; }
 double              { loc(); return TOK_DOUBLE; }
 else                { loc(); return TOK_ELSE; }
@@ -283,6 +283,7 @@ mutable             { loc(); return TOK_MUTABLE; }
 namespace           { loc(); return TOK_NAMESPACE; }
 new                 { loc(); return TOK_NEW; }
 noreturn            { /* ignore */ }
+nullptr             { loc(); return TOK_NULLPTR; } // C++11
 operator            { loc(); return TOK_OPERATOR; }
 private             { loc(); return TOK_PRIVATE; }
 protected           { loc(); return TOK_PROTECTED; }
@@ -293,11 +294,12 @@ short               { loc(); return TOK_SHORT; }
 signed              { loc(); return TOK_SIGNED; }
 sizeof              { loc(); return TOK_SIZEOF; }
 static              { loc(); return TOK_STATIC; }
-static_assert       { loc(); return TOK_STATIC_ASSERT; }
+static_assert       { loc(); return TOK_STATIC_ASSERT; } // C++11
 struct              { loc(); return TOK_STRUCT; }
 switch              { loc(); return TOK_SWITCH; }
 template            { loc(); return TOK_TEMPLATE; }
 this                { loc(); return TOK_THIS; }
+thread_local        { loc(); return TOK_THREAD_LOCAL; } // C++11
 throw               { loc(); return TOK_THROW; }
 try                 { loc(); return TOK_TRY; }
 typedef             { loc(); return TOK_TYPEDEF; }
