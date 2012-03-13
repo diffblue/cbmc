@@ -15,6 +15,10 @@
 
 //#define DEBUG
 
+#ifdef DEBUG
+#include <iostream>
+#endif
+
 class Parser
 {
 public:
@@ -966,7 +970,7 @@ bool Parser::rDeclaration(cpp_declarationt &declaration)
   #ifdef DEBUG
   std::cout << "Parser::rDeclaration 4\n";
   #endif
-
+  
   if(!optIntegralTypeOrClassSpec(integral))
     return false;
 
@@ -1383,6 +1387,13 @@ bool Parser::isConstructorDecl()
       return false;        // it's a declarator
     else if(isPtrToMember(1))
       return false;        // declarator (::*)
+    else if(t==TOK_IDENTIFIER)
+    {
+      // Ambiguous. Do some more look-ahead.
+      if(lex->LookAhead(2)==')' &&
+         lex->LookAhead(3)=='(')
+        return false; // must be declarator (decl)(...)
+    }
 
     // maybe constructor
     return true;
