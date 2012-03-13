@@ -165,7 +165,8 @@ pragma          "#"{horizontal_white}*pragma{horizontal_white}.*"\n"
 ({horizontal_white}|{v_tab}|{c_return}|{form_feed})*"\n"
 
 __alignof__         { loc(); return TOK_SIZEOF; }
-__asm__|asm|__asm   { if(PARSER.mode==cpp_parsert::MSC)
+__asm__|asm|__asm   { if(PARSER.mode==cpp_parsert::MSC ||
+                         PARSER.mode==cpp_parsert::CW)
                       {
                         BEGIN(MSC_ASM1);
                         return TOK_MSC_ASM;
@@ -276,7 +277,13 @@ using               { loc(); return TOK_USING; }
 virtual             { loc(); return TOK_VIRTUAL; }
 void                { loc(); return TOK_VOID; }
 volatile            { loc(); return TOK_VOLATILE; }
-wchar_t	            { loc(); return TOK_WCHAR_T; }
+wchar_t	            { // CodeWarrior doesn't have wchar_t built in
+                      loc();
+                      if(PARSER.mode==cpp_parsert::CW)
+                        return TOK_IDENTIFIER;
+                      else
+                        return TOK_WCHAR_T;
+                    }
 while               { loc(); return TOK_WHILE; }
 __CPROVER_thread_local { loc(); return TOK_THREAD_LOCAL; }
 
