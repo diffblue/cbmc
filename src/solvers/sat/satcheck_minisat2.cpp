@@ -37,10 +37,11 @@ Function: convert
 
 void convert(const bvt &bv, Minisat::vec<Minisat::Lit> &dest)
 {
-  dest.growTo(bv.size());
+  dest.capacity(bv.size());
 
   for(unsigned i=0; i<bv.size(); i++)
-    dest[i]=Minisat::mkLit(bv[i].var_no(), bv[i].sign());
+    if(!bv[i].is_false())
+      dest.push(Minisat::mkLit(bv[i].var_no(), bv[i].sign()));
 }
 
 /*******************************************************************\
@@ -150,27 +151,31 @@ Function: satcheck_minisat2_baset::lcnf
 template<typename T>
 void satcheck_minisat2_baset<T>::lcnf(const bvt &bv)
 {
-  bvt new_bv;
-  
-  if(process_clause(bv, new_bv))
-    return;
+  add_variables();
+
+  forall_literals(it, bv)
+  {
+    if(it->is_true())
+      return;
+    else if(!it->is_false())
+      assert(it->var_no()<(unsigned)solver->nVars());
+  }
     
+  Minisat::vec<Minisat::Lit> c;
+
+  convert(bv, c);
+
   // Minisat can't do empty clauses
-  if(new_bv.empty())
+  if(c.size()==0)
   {
     empty_clause_added=true;
     return;
   }
 
-  add_variables();
-
-  Minisat::vec<Minisat::Lit> c;
-  convert(new_bv, c);
-
-  forall_literals(it, new_bv)
-    assert(it->var_no()<(unsigned)solver->nVars());
-
-  solver->addClause(c);
+  // Note the underscore.
+  // Add a clause to the solver without making superflous internal copy.
+  
+  solver->addClause_(c);
 
   clause_counter++;
 }
