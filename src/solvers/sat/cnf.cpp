@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <algorithm>
 #include <cassert>
 #include <iostream>
 #include <set>
