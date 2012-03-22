@@ -659,10 +659,8 @@ bool cnft::process_clause(const bvt &bv, bvt &dest)
   // empty clause! this is UNSAT
   if(bv.empty()) return false;
 
-  std::set<literalt> s;
-
-  dest.reserve(bv.size());
-
+  // first check simple things
+  
   for(bvt::const_iterator it=bv.begin();
       it!=bv.end();
       it++)
@@ -679,18 +677,58 @@ bool cnft::process_clause(const bvt &bv, bvt &dest)
       return true; // clause satisfied
 
     if(l.is_false())
-      continue;
+      continue; // will remove later
 
     if(l.var_no()>=_no_variables)
       std::cout << "l.var_no()=" << l.var_no() << " _no_variables=" << _no_variables << std::endl;
+
     assert(l.var_no()<_no_variables);
+  }
+  
+  // now copy
+  dest.clear();
+  dest.reserve(bv.size());
+  
+  for(bvt::const_iterator it=bv.begin();
+      it!=bv.end();
+      it++)
+  {
+    literalt l=*it;
+    
+    if(l.is_false())
+      continue; // remove
 
-    // prevent duplicate literals
-    if(s.insert(l).second)
-      dest.push_back(l);
+    dest.push_back(l);
+  }
+  
+  // now sort
+  std::sort(dest.begin(), dest.end());
 
-    if(s.find(lnot(l))!=s.end())
-      return true; // clause satisfied
+  // eliminate duplicates and find occurrences of a variable
+  // and its negation
+  
+  if(dest.size()>=2)
+  {
+    bvt::iterator it=dest.begin();
+    literalt previous=*it;
+  
+    for(it++;
+        it!=dest.end();
+        ) // no it++
+    {
+      literalt l=*it;
+      
+      // prevent duplicate literals
+      if(l==previous)
+        it=dest.erase(it);
+      else if(previous==lnot(l))
+        return true; // clause satisfied trivially
+      else
+      {
+        previous=l;
+        it++;
+      }
+    }
   }
   
   return false;
