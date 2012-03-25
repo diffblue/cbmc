@@ -148,3 +148,52 @@ std::string i2string(unsigned long int i)
   #endif
 }
 
+/*******************************************************************\
+
+Function: i2string
+
+  Inputs: signed __int64
+
+ Outputs: string class
+
+ Purpose: convert signed integer to string class
+
+\*******************************************************************/
+
+#ifdef _MSC_VER
+std::string i2string(signed __int64 i)
+{
+  std::ostringstream strInt;
+
+  strInt << i;
+  std::string str;
+  strstream2string(strInt, str);
+
+  return str; 
+}
+#endif
+
+/*******************************************************************\
+
+Function: i2string
+
+  Inputs: unsigned __int64
+
+ Outputs: string class
+
+ Purpose: convert unsigned integer to string class
+
+\*******************************************************************/
+
+#ifdef _MSC_VER
+std::string i2string(unsigned __int64 i)
+{
+  std::ostringstream strInt;
+
+  strInt << i;
+  std::string str;
+  strstream2string(strInt, str);
+
+  return str; 
+}
+#endif
