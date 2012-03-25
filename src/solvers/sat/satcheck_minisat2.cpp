@@ -6,7 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#ifndef _MSC_VER
 #include <inttypes.h>
+#endif
 
 #include <cassert>
 #include <stack>
