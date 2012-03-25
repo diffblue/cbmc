@@ -163,6 +163,11 @@ Function: i2string
 #ifdef _MSC_VER
 std::string i2string(signed __int64 i)
 {
+  #ifdef USE_SPRINTF
+  char buffer[100];
+  sprintf(buffer, "%I64d", i);
+  return buffer;
+  #else
   std::ostringstream strInt;
 
   strInt << i;
@@ -170,6 +175,7 @@ std::string i2string(signed __int64 i)
   strstream2string(strInt, str);
 
   return str; 
+  #endif
 }
 #endif
 
@@ -188,6 +194,11 @@ Function: i2string
 #ifdef _MSC_VER
 std::string i2string(unsigned __int64 i)
 {
+  #ifdef USE_SPRINTF
+  char buffer[100];
+  sprintf(buffer, "%I64u", i);
+  return buffer;
+  #else
   std::ostringstream strInt;
 
   strInt << i;
@@ -195,5 +206,6 @@ std::string i2string(unsigned __int64 i)
   strstream2string(strInt, str);
 
   return str; 
+  #endif
 }
 #endif
