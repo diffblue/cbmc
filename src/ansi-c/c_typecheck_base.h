@@ -176,8 +176,9 @@ protected:
   virtual void typecheck_label(code_labelt &code);
   virtual void typecheck_gcc_local_label(codet &code);
   virtual void typecheck_return(codet &code);
-  virtual void typecheck_switch(codet &code);
-  virtual void typecheck_while(codet &code);
+  virtual void typecheck_switch(code_switcht &code);
+  virtual void typecheck_while(code_whilet &code);
+  virtual void typecheck_dowhile(code_dowhilet &code);
   virtual void typecheck_start_thread(codet &code);
   
   bool break_is_allowed;

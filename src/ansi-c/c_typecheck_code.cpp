@@ -57,13 +57,14 @@ void c_typecheck_baset::typecheck_code(codet &code)
     typecheck_block(code);
   else if(statement==ID_ifthenelse)
     typecheck_ifthenelse(to_code_ifthenelse(code));
-  else if(statement==ID_while ||
-          statement==ID_dowhile)
-    typecheck_while(code);
+  else if(statement==ID_while)
+    typecheck_while(to_code_while(code));
+  else if(statement==ID_dowhile)
+    typecheck_dowhile(to_code_dowhile(code));
   else if(statement==ID_for)
     typecheck_for(code);
   else if(statement==ID_switch)
-    typecheck_switch(code);
+    typecheck_switch(to_code_switch(code));
   else if(statement==ID_break)
     typecheck_break(code);
   else if(statement==ID_goto)
@@ -872,15 +873,15 @@ Function: c_typecheck_baset::typecheck_switch
 
 \*******************************************************************/
 
-void c_typecheck_baset::typecheck_switch(codet &code)
+void c_typecheck_baset::typecheck_switch(code_switcht &code)
 {
   if(code.operands().size()!=2)
     throw "switch expects two operands";
 
-  typecheck_expr(code.op0());
+  typecheck_expr(code.value());
 
   // this needs to be promoted
-  implicit_typecast_arithmetic(code.op0());
+  implicit_typecast_arithmetic(code.value());
 
   // save & set flags
 
@@ -888,10 +889,10 @@ void c_typecheck_baset::typecheck_switch(codet &code)
   bool old_break_is_allowed(break_is_allowed);
   typet old_switch_op_type(switch_op_type);
 
-  switch_op_type=code.op0().type();
+  switch_op_type=code.value().type();
   break_is_allowed=case_is_allowed=true;
 
-  typecheck_code(to_code(code.op1()));
+  typecheck_code(code.body());
 
   // restore flags
   case_is_allowed=old_case_is_allowed;
@@ -911,13 +912,13 @@ Function: c_typecheck_baset::typecheck_while
 
 \*******************************************************************/
 
-void c_typecheck_baset::typecheck_while(codet &code)
+void c_typecheck_baset::typecheck_while(code_whilet &code)
 {
   if(code.operands().size()!=2)
     throw "while expected to have two operands";
 
-  typecheck_expr(code.op0());
-  implicit_typecast_bool(code.op0());
+  typecheck_expr(code.cond());
+  implicit_typecast_bool(code.cond());
 
   // save & set flags
   bool old_break_is_allowed(break_is_allowed);
@@ -925,7 +926,40 @@ void c_typecheck_baset::typecheck_while(codet &code)
 
   break_is_allowed=continue_is_allowed=true;
 
-  typecheck_code(to_code(code.op1()));
+  typecheck_code(code.body());
+
+  // restore flags
+  break_is_allowed=old_break_is_allowed;
+  continue_is_allowed=old_continue_is_allowed;
+}
+
+/*******************************************************************\
+
+Function: c_typecheck_baset::typecheck_dowhile
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void c_typecheck_baset::typecheck_dowhile(code_dowhilet &code)
+{
+  if(code.operands().size()!=2)
+    throw "do while expected to have two operands";
+
+  typecheck_expr(code.cond());
+  implicit_typecast_bool(code.cond());
+
+  // save & set flags
+  bool old_break_is_allowed(break_is_allowed);
+  bool old_continue_is_allowed(continue_is_allowed);
+
+  break_is_allowed=continue_is_allowed=true;
+
+  typecheck_code(code.body());
 
   // restore flags
   break_is_allowed=old_break_is_allowed;
