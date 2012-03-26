@@ -331,6 +331,52 @@ extern inline code_ifthenelset &to_code_ifthenelse(codet &code)
   return static_cast<code_ifthenelset &>(code);
 }
 
+/*! \brief A `switch' instruction
+*/
+class code_switcht:public codet
+{
+public:
+  inline code_switcht():codet(ID_switch)
+  {
+    operands().resize(2);
+  }
+  
+  inline const exprt &value() const
+  {
+    return op0();
+  }
+  
+  inline exprt &value()
+  {
+    return op0();
+  }
+  
+  inline const codet &body() const
+  {
+    return to_code(op1());
+  }
+
+  inline codet &body()
+  {
+    return static_cast<codet &>(op1());
+  }
+};
+
+extern inline const code_switcht &to_code_switch(const codet &code)
+{
+  assert(code.get_statement()==ID_switch &&
+         code.operands().size()==2);
+  return static_cast<const code_switcht &>(code);
+}
+
+extern inline code_switcht &to_code_switch(codet &code)
+{
+  assert(code.get_statement()==ID_switch &&
+         code.operands().size()==2);
+  return static_cast<code_switcht &>(code);
+}
+
+
 /*! \brief A `while' instruction
 */
 class code_whilet:public codet
