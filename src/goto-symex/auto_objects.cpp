@@ -87,9 +87,16 @@ void goto_symext::initialize_auto_object(
           member_expr.set_component_name(it->get_name());
           member_expr.type()=it->type();
           
-          address_of_exprt rhs=
+          // could be NULL nondeterministically
+          
+          address_of_exprt address_of_expr=
             address_of_exprt(make_auto_object(t.subtype()));
 
+          if_exprt rhs(
+            nondet_exprt(bool_typet()),
+            null_pointer_exprt(to_pointer_type(t)),
+            address_of_expr);
+          
           code_assignt assignment(member_expr, rhs);
           symex_assign(state, assignment); /* TODO: needs clean */
         }
