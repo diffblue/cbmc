@@ -423,6 +423,9 @@ protected:
   virtual void typecheck_member_initializer(codet &code);
   virtual void typecheck_decl(codet &code);
   virtual void typecheck_block(codet &code);
+  virtual void typecheck_ifthenelse(code_ifthenelset &code);
+  virtual void typecheck_while(code_whilet &code);
+  virtual void typecheck_switch(code_switcht &code);
 
   const struct_typet &this_struct_type();
 
