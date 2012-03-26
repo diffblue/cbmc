@@ -376,6 +376,51 @@ extern inline code_whilet &to_code_while(codet &code)
   return static_cast<code_whilet &>(code);
 }
 
+/*! \brief A `do while' instruction
+*/
+class code_dowhilet:public codet
+{
+public:
+  inline code_dowhilet():codet(ID_dowhile)
+  {
+    operands().resize(2);
+  }
+  
+  inline const exprt &cond() const
+  {
+    return op0();
+  }
+  
+  inline exprt &cond()
+  {
+    return op0();
+  }
+  
+  inline const codet &body() const
+  {
+    return to_code(op1());
+  }
+
+  inline codet &body()
+  {
+    return static_cast<codet &>(op1());
+  }
+};
+
+extern inline const code_dowhilet &to_code_dowhile(const codet &code)
+{
+  assert(code.get_statement()==ID_dowhile &&
+         code.operands().size()==2);
+  return static_cast<const code_dowhilet &>(code);
+}
+
+extern inline code_dowhilet &to_code_dowhile(codet &code)
+{
+  assert(code.get_statement()==ID_dowhile &&
+         code.operands().size()==2);
+  return static_cast<code_dowhilet &>(code);
+}
+
 /*! \brief A `for' instruction
 */
 class code_fort:public codet
