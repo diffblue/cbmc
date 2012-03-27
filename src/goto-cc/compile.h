@@ -56,7 +56,7 @@ public:
   bool link();
 
   bool parse_source(const std::string &);
-  bool parse_object(const std::string &, goto_functionst &);
+  bool read_object(const std::string &, goto_functionst &);
 
   bool write_object_file( const std::string &, const contextt &, 
                           goto_functionst &);
