@@ -498,7 +498,7 @@ bool compilet::link()
     std::string file_name=object_files.front();
     object_files.pop_front();
 
-    if(parse_object(file_name, compiled_functions))
+    if(read_object(file_name, compiled_functions))
       return true;
   }
 
@@ -1315,21 +1315,22 @@ bool compilet::parse_source(const std::string &file_name)
 
 /*******************************************************************\
 
-Function: compilet::parse_object
+Function: compilet::read_object
 
   Inputs: a file_name
 
  Outputs: true on error, false otherwise
 
- Purpose: parses an object file
+ Purpose: reads an object file
 
 \*******************************************************************/
 
-bool compilet::parse_object(
+bool compilet::read_object(
   const std::string &file_name,
   goto_functionst &functions)
 {
   std::ifstream infile;
+
   if(cmdline.isset("xml"))
     infile.open(file_name.c_str());
   else
@@ -1346,7 +1347,6 @@ bool compilet::parse_object(
   // we parse to a temporary context
   contextt temp_context;
   goto_functionst temp_functions;
-  std::list<irep_idt> seen_modes;
 
   if(cmdline.isset("xml"))
   {
@@ -1360,39 +1360,28 @@ bool compilet::parse_object(
                              temp_functions, *message_handler))
       return true;
   }
+  
+  std::set<irep_idt> seen_modes;
 
   for(contextt::symbolst::const_iterator
       it=temp_context.symbols.begin();
       it!=temp_context.symbols.end();
       it++)
   {
-    if(  it->second.mode!="" &&
-          find(  seen_modes.begin(),
-                 seen_modes.end(),
-                 it->second.mode)
-          == seen_modes.end())
-     {
-        seen_modes.push_back(it->second.mode);
-     }
+    if(it->second.mode!="")
+      seen_modes.insert(it->second.mode);
   }
+  
+  seen_modes.erase(ID_cpp);
+  seen_modes.erase(ID_C);
 
-  std::list<irep_idt>::const_iterator cpp =
-    find(seen_modes.begin(), seen_modes.end(), "cpp");
-  std::list<irep_idt>::iterator c =
-    find(seen_modes.begin(), seen_modes.end(), "C");
-
-  if(c!=seen_modes.end() && cpp!=seen_modes.end())
+  if(seen_modes.size()!=0)
   {
-    seen_modes.erase(c);
-  }
-
-  if(seen_modes.size()!=1)
-  {
-    std::cerr << "Multilanguage linking not supported." << std::endl;
+    error("Multi-language linking not supported");
     return true;
   }
 
-  // hardwired to C linking
+  // hardwired to C-style linking
 
   c_linkt c_link(context, temp_context, ui_message_handler);
 
