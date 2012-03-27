@@ -1387,7 +1387,7 @@ bool compilet::read_object(
 
   if(c_link.typecheck_main())
     return true;
-  
+    
   if(link_functions(context, functions,
                     temp_context, temp_functions,
                     c_link.replace_symbol))
@@ -1544,16 +1544,27 @@ bool compilet::link_functions(
   // merge functions
   Forall_goto_functions(src_it, src_functions)
   {
+    // the function might have been renamed    
+    replace_symbolt::expr_mapt::const_iterator e_it=
+      replace_symbol.expr_map.find(src_it->first);
+    irep_idt final_id=src_it->first;
+    if(e_it!=replace_symbol.expr_map.end())
+    {
+      const exprt &rep_exp=e_it->second;
+      if(rep_exp.id()==ID_symbol)
+        final_id=rep_exp.get(ID_identifier);
+    }
+  
     // already there?
     goto_functionst::function_mapt::iterator dest_f_it=
-      dest_functions.function_map.find(src_it->first);
+      dest_functions.function_map.find(final_id);
 
     if(dest_f_it==dest_functions.function_map.end()) // not there yet
     {
       replace_symbols_in_function(src_it->second, replace_symbol);
 
       goto_functionst::goto_functiont &in_dest_context=
-          dest_functions.function_map[src_it->first];
+        dest_functions.function_map[final_id];
 
       in_dest_context.body.swap(src_it->second.body);
       in_dest_context.body_available=src_it->second.body_available;
@@ -1562,7 +1573,7 @@ bool compilet::link_functions(
     else // collision!
     {
       goto_functionst::goto_functiont &in_dest_context=
-        dest_functions.function_map[src_it->first];
+        dest_functions.function_map[final_id];
 
       goto_functionst::goto_functiont &src_func=src_it->second;
 
@@ -1587,7 +1598,7 @@ bool compilet::link_functions(
       {
         // keep the one in in_context -- libraries come last!
         std::stringstream str;
-        str << "warning: function `" << src_it->first << "' in module `"
+        str << "warning: function `" << final_id << "' in module `"
             << src_context.symbols.begin()->second.module
             << "' is shadowed by a definition in module `"
             << context.symbols.begin()->second.module << "'";
@@ -1597,7 +1608,7 @@ bool compilet::link_functions(
       {
         std::stringstream str;
         str << "error: duplicate definition of function `"
-            << src_it->first
+            << final_id
             << "'" << std::endl;
         str << "In module `" 
             << context.symbols.begin()->second.module
