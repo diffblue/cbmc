@@ -94,15 +94,15 @@ protected:
   void add_compiler_specific_defines(configt &config) const;
 
   bool link_functions(
-    contextt &context,
-    goto_functionst &functions,
-    contextt &temp_context,
-    goto_functionst &temp_functions,
-    replace_symbolt &replace_symbol);
+    contextt &dest_context,
+    goto_functionst &dest_functions,
+    contextt &src_context,
+    goto_functionst &src_functions,
+    const replace_symbolt &replace_symbol);
   
   void replace_symbols_in_function(
-    goto_functionst::function_mapt::iterator it,
-    replace_symbolt &replace_symbol) const;
+    goto_functionst::goto_functiont &function,
+    const replace_symbolt &replace_symbol) const;
 
   void convert_symbols(goto_functionst &dest);
 };

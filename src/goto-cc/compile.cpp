@@ -1510,11 +1510,12 @@ Function: compilet::function_body_count
 
 unsigned compilet::function_body_count(const goto_functionst &functions)
 {
-  int fbs = 0;
-  for ( goto_functionst::function_mapt::const_iterator it=
-          functions.function_map.begin();
-        it != functions.function_map.end();
-        it++)
+  int fbs=0;
+
+  for(goto_functionst::function_mapt::const_iterator it=
+      functions.function_map.begin();
+      it != functions.function_map.end();
+      it++)
     if(it->second.body_available)
       fbs++;
 
@@ -1534,57 +1535,60 @@ Function: compilet::link_functions
 \*******************************************************************/
 
 bool compilet::link_functions(
-  contextt &context,
-  goto_functionst &functions,
-  contextt &temp_context,
-  goto_functionst &temp_functions,
-  replace_symbolt &replace_symbol)
+  contextt &dest_context,
+  goto_functionst &dest_functions,
+  contextt &src_context,
+  goto_functionst &src_functions,
+  const replace_symbolt &replace_symbol)
 {
   // merge functions
-  Forall_goto_functions(it, temp_functions)
+  Forall_goto_functions(src_it, src_functions)
   {
-    goto_functionst::function_mapt::iterator fit=
-      functions.function_map.find(it->first);
+    // already there?
+    goto_functionst::function_mapt::iterator dest_f_it=
+      dest_functions.function_map.find(src_it->first);
 
-    if(fit==functions.function_map.end()) // fine
+    if(dest_f_it==dest_functions.function_map.end()) // not there yet
     {
-      replace_symbols_in_function(it, replace_symbol);
-      goto_functionst::goto_functiont &in_context=
-          functions.function_map[it->first];
+      replace_symbols_in_function(src_it->second, replace_symbol);
 
-      in_context.body.swap(it->second.body);
-      in_context.body_available=it->second.body_available;
-      in_context.type=it->second.type;
+      goto_functionst::goto_functiont &in_dest_context=
+          dest_functions.function_map[src_it->first];
+
+      in_dest_context.body.swap(src_it->second.body);
+      in_dest_context.body_available=src_it->second.body_available;
+      in_dest_context.type=src_it->second.type;
     }
     else // collision!
     {
-      goto_functionst::goto_functiont &in_context=
-        functions.function_map[it->first];
+      goto_functionst::goto_functiont &in_dest_context=
+        dest_functions.function_map[src_it->first];
 
-      goto_functionst::goto_functiont &new_func=it->second;
+      goto_functionst::goto_functiont &src_func=src_it->second;
 
-      if(in_context.body.instructions.size()==0)
+      if(in_dest_context.body.instructions.empty())
       {
         // the one with body wins!
-        replace_symbols_in_function(it, replace_symbol);
-        in_context.body.swap(new_func.body);
-        in_context.body_available=new_func.body_available;
-        in_context.type=new_func.type;
+        replace_symbols_in_function(src_func, replace_symbol);
+        
+        in_dest_context.body.swap(src_func.body);
+        in_dest_context.body_available=src_func.body_available;
+        in_dest_context.type=src_func.type;
       }
-      else if(new_func.body.instructions.size()==0)
+      else if(src_func.body.instructions.empty())
       {
-        // keep the old one
+        // just keep the old one in dest
       }
-      else if(in_context.type.get_bool(ID_C_inlined))
+      else if(in_dest_context.type.get_bool(ID_C_inlined))
       {
-        // ok
+        // ok, we silently ignore
       }
-      else if(base_type_eq(in_context.type, new_func.type, ns))
+      else if(base_type_eq(in_dest_context.type, src_func.type, ns))
       {
         // keep the one in in_context -- libraries come last!
         std::stringstream str;
-        str << "warning: function `" << it->first << "' in module `"
-            << temp_context.symbols.begin()->second.module
+        str << "warning: function `" << src_it->first << "' in module `"
+            << src_context.symbols.begin()->second.module
             << "' is shadowed by a definition in module `"
             << context.symbols.begin()->second.module << "'";
         warning(str.str());
@@ -1593,12 +1597,12 @@ bool compilet::link_functions(
       {
         std::stringstream str;
         str << "error: duplicate definition of function `"
-            << it->first
+            << src_it->first
             << "'" << std::endl;
         str << "In module `" 
             << context.symbols.begin()->second.module
             << "' and module `"
-            << temp_context.symbols.begin()->second.module << "'";
+            << src_context.symbols.begin()->second.module << "'";
         error(str.str());
         return true;
       }
@@ -1621,11 +1625,11 @@ Function: compilet::replace_symbols_in_function
 \*******************************************************************/
 
 void compilet::replace_symbols_in_function(
-  goto_functionst::function_mapt::iterator it,
-  replace_symbolt &replace_symbol) const
+  goto_functionst::goto_functiont &function,
+  const replace_symbolt &replace_symbol) const
 {
-  goto_programt &program = it->second.body;
-  replace_symbol.replace(it->second.type);
+  goto_programt &program=function.body;
+  replace_symbol.replace(function.type);
 
   Forall_goto_program_instructions(iit, program)
   {
