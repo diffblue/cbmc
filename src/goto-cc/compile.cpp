@@ -1555,7 +1555,7 @@ bool compilet::link_functions(
   Forall_goto_functions(it, temp_functions)
   {
     goto_functionst::function_mapt::iterator fit=
-        functions.function_map.find(it->first);
+      functions.function_map.find(it->first);
 
     if(fit==functions.function_map.end()) // fine
     {
@@ -1570,7 +1570,8 @@ bool compilet::link_functions(
     else // collision!
     {
       goto_functionst::goto_functiont &in_context=
-                                  functions.function_map[it->first];
+        functions.function_map[it->first];
+
       goto_functionst::goto_functiont &new_func=it->second;
 
       if(in_context.body.instructions.size()==0)
@@ -1585,7 +1586,7 @@ bool compilet::link_functions(
       {
         // keep the old one
       }
-      else if(in_context.type.get_bool("#inlined"))
+      else if(in_context.type.get_bool(ID_C_inlined))
       {
         // ok
       }
@@ -1593,10 +1594,10 @@ bool compilet::link_functions(
       {
         // keep the one in in_context -- libraries come last!
         std::stringstream str;
-        str << "warning: function `" << it->first << "' in module `" <<
-          temp_context.symbols.begin()->second.module <<
-          "' is shadowed by a definition in module `" <<
-          context.symbols.begin()->second.module << "'";
+        str << "warning: function `" << it->first << "' in module `"
+            << temp_context.symbols.begin()->second.module
+            << "' is shadowed by a definition in module `"
+            << context.symbols.begin()->second.module << "'";
         warning(str.str());
       }
       else
@@ -1605,10 +1606,10 @@ bool compilet::link_functions(
         str << "error: duplicate definition of function `"
             << it->first
             << "'" << std::endl;
-        str << "In module `" <<
-            context.symbols.begin()->second.module
-            << "' and module `" <<
-            temp_context.symbols.begin()->second.module << "'";
+        str << "In module `" 
+            << context.symbols.begin()->second.module
+            << "' and module `"
+            << temp_context.symbols.begin()->second.module << "'";
         error(str.str());
         return true;
       }
