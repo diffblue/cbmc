@@ -17,6 +17,8 @@ Date: December 2011
 #include <goto-programs/goto_program.h>
 #include <goto-programs/goto_functions.h>
 
+#include <context.h>
+
 #include <fstream>
 #include "rw_set.h"
 
@@ -24,7 +26,7 @@ Date: December 2011
 // an ugly mix of C and C++
 #ifndef SUBCYCLES
 #define SUBCYCLES
-//#include "subcycles.h"
+#include "subcycles.h"
 #endif
 
 typedef enum {TSO, RMO, PSO, Power} modelt;
@@ -32,6 +34,9 @@ typedef enum {TSO, RMO, PSO, Power} modelt;
 class event_grapht
 {
   public:
+    // context
+    contextt context;
+
     // from goto-program variable to location instrumented in cycle
     std::multimap<irep_idt,locationt> id_to_loc; 
 
@@ -42,7 +47,7 @@ class event_grapht
     std::set<irep_idt> var_to_instr;
 
     // constructor
-    event_grapht();
+    event_grapht(contextt &context);
 
     // destructor
     ~event_grapht();

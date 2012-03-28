@@ -16,6 +16,8 @@ Date: December 2011
 #include <prefix.h>
 #include <i2string.h>
 
+#include "fence.h"
+
 std::string tostr(const char a){
   std::stringstream ss;
   std::string s;
@@ -43,7 +45,7 @@ Function: event_grapht()
 
 \*******************************************************************/
 
-event_grapht::event_grapht()
+event_grapht::event_grapht(contextt& _context):context(_context)
 {
   graph=NULL;
   poList=NULL;
@@ -560,7 +562,7 @@ void event_grapht::convert_prg(
           }
         aliases.dp_merge();
       }
-      else if(instruction.is_fence()) 
+      else if(is_fence(instruction,context))//instruction.is_fence()) 
       {
         const vertex new_fence=create(
           'F',
@@ -582,7 +584,7 @@ void event_grapht::convert_prg(
 
         previous=new_fence;
       }
-      else if(model!=TSO && instruction.is_lwfence())
+      else if(model!=TSO && is_lwfence(instruction,context))//instruction.is_lwfence())
       {
         const vertex new_fence=create(
           'f',
@@ -612,8 +614,6 @@ void event_grapht::convert_prg(
 
     previous=NULL;//
   }  
-
-  //exit(0);
 }  
 
 /*******************************************************************\
@@ -674,13 +674,15 @@ Function: event_grapht::not_local
 
 bool event_grapht::not_local(const vertex v)
 {
+  namespacet ns(context);
+
   std::map<char,irep_idt>::const_iterator it=char_to_var.find(v->loc);
   if(it==char_to_var.end())
     return false;
   const irep_idt id=it->second;
   //std::cout<<id2string(id)<<std::endl;
   const std::string identifier=id2string(id);
-  return !(identifier=="c::__CPROVER_alloc" ||
+  if(identifier=="c::__CPROVER_alloc" ||
             identifier=="c::__CPROVER_alloc_size" ||
             identifier=="c::stdin" ||
             identifier=="c::stdout" ||
@@ -688,7 +690,18 @@ bool event_grapht::not_local(const vertex v)
             identifier=="c::sys_nerr" ||
             has_prefix(id2string(identifier), "__unbuffered_") ||
             has_prefix(id2string(identifier), "c::__unbuffered_")
-            || has_infix(id2string(identifier), "$tmp_guard"));
+            || has_infix(id2string(identifier), "$tmp_guard"))
+    return false;
+
+  const symbolt &symbol=ns.lookup(identifier);
+
+  if(!symbol.static_lifetime)
+    return false; // these are local
+
+  if(symbol.thread_local)
+    return false; // these are local
+
+  return true;
 }
 
 /*******************************************************************\
@@ -1248,11 +1261,11 @@ void event_grapht::remove_useless(list cycle)
     const std::string id = id2string( char_to_var[ this_vertex->loc ] );
     if(previous 
       && ( !not_local(this_vertex)
-         // hack 
-         || has_prefix(id,"c::P1") || has_prefix(id,"c::P2") 
-         || has_prefix(id,"c::__") || has_prefix(id,"c::worker")
-         || has_prefix(id,"c::1") || has_prefix(id,"c::owner") 
-         || has_prefix(id,"c::thief")) )
+         ))// previously: hack for local
+         //|| has_prefix(id,"c::P1") || has_prefix(id,"c::P2") 
+         //|| has_prefix(id,"c::__") || has_prefix(id,"c::worker")
+         //|| has_prefix(id,"c::1") || has_prefix(id,"c::owner") 
+         //|| has_prefix(id,"c::thief")) )
       previous->tl=cur->tl;
     else
       previous=cur;
