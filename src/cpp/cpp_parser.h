@@ -33,6 +33,13 @@ public:
     token_buffer.clear();
     asm_block_following=false;
   }
+  
+  cpp_parsert():
+    mode(ANSI),
+    recognize_wchar_t(true),
+    asm_block_following(false)    
+  {
+  }
 
 public:
   // internal state
@@ -46,6 +53,10 @@ public:
   // ICC is Intel's C compiler
   // CW is CodeWarrior (with GCC extensions enabled)
   // ARM is ARM's RealView
+  
+  // We can furthermore twiddle the recognition of various
+  // keywords. This is honored in particular modes.
+  bool recognize_wchar_t;
 
   cpp_token_buffert token_buffer;
   
@@ -58,10 +69,6 @@ public:
   {
     token_buffer.current_token().line_no=line_no-1;
     token_buffer.current_token().filename=filename;
-  }
-  
-  cpp_parsert():mode(ANSI)
-  {
   }
   
   // scanner
