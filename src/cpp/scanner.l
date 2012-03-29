@@ -311,9 +311,11 @@ using               { loc(); return TOK_USING; }
 virtual             { loc(); return TOK_VIRTUAL; }
 void                { loc(); return TOK_VOID; }
 volatile            { loc(); return TOK_VOLATILE; }
-wchar_t	            { // CodeWarrior doesn't have wchar_t built in
+wchar_t	            { // CodeWarrior has an option to
+                      // enable/disable wchar_t
                       loc();
-                      if(PARSER.mode==cpp_parsert::CW)
+                      if(PARSER.mode==cpp_parsert::CW &&
+                         !PARSER.recognize_wchar_t)
                         return TOK_IDENTIFIER;
                       else
                         return TOK_WCHAR_T;
