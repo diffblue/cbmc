@@ -18,7 +18,11 @@ ifeq ($(filter-out Unix MinGW OSX_Universal,$(BUILD_ENV_)),)
   # Linux etc.
   LIBEXT = .a
   OBJEXT = .o
+ifeq ($(BUILD_ENV_),MinGW)
+  EXEEXT = .exe
+else
   EXEEXT =
+endif
   CFLAGS ?= -Wall -O2
   CXXFLAGS ?= -Wall -O2
   CP_CFLAGS = -MMD
@@ -55,7 +59,7 @@ else ifeq ($(BUILD_ENV_),Cygwin)
   # use these for Cygwin:
   LIBEXT = .a
   OBJEXT = .o
-  EXEEXT =
+  EXEEXT = .exe
   CFLAGS ?= -Wall -O2
   CXXFLAGS ?= -Wall -O2
   CP_CFLAGS = -MMD -mno-cygwin
