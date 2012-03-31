@@ -156,6 +156,12 @@ protected:
 
   void round_fraction(unbiased_floatt &result);
   void round_exponent(unbiased_floatt &result);
+  
+  // rounding decision for fraction using sticky bit
+  literalt fraction_rounding_decision(
+    const unsigned dest_bits,
+    const literalt sign,
+    const bvt &fraction);
 
   // helpers for adder
 
