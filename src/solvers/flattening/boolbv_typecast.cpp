@@ -252,7 +252,7 @@ void boolbvt::convert_typecast(const exprt &expr, bvt &bv)
         // note that float to int conversion in ANSI-C is hardwired
         // to ROUND TO ZERO, also known as truncate.
         float_utilst float_utils(prop);
-        float_utils.rounding_mide=ieee_floatt::ROUND_TO_ZERO;
+        float_utils.rounding_mode=ieee_floatt::ROUND_TO_ZERO;
         float_utils.spec=to_floatbv_type(op_type);
         bv=float_utils.to_integer(op_bv, dest_width, dest_bvtype!=IS_UNSIGNED);
         return;
