@@ -13,8 +13,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #define forall_operands(it, expr) \
   if((expr).has_operands()) \
-    for(exprt::operandst::const_iterator it=(expr).operands().begin(); \
-        it!=(expr).operands().end(); it++)
+    for(exprt::operandst::const_iterator it=(expr).operands().begin(), \
+        it##_end=(expr).operands().end(); \
+        it!=it##_end; it++)
 
 #define Forall_operands(it, expr) \
   if((expr).has_operands()) \

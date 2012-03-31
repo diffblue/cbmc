@@ -601,18 +601,13 @@ void smt2_convt::convert_expr(const exprt &expr)
     assert(expr.type().id()==ID_bool);
     assert(expr.operands().size()>=2);
 
-    if(expr.operands().size()>=2)
+    smt2_prop.out << "(" << expr.id();
+    forall_operands(it, expr)
     {
-      smt2_prop.out << "(" << expr.id();
-      forall_operands(it, expr)
-      {
-        smt2_prop.out << " ";
-        convert_expr(*it);
-      }
-      smt2_prop.out << ")";
+      smt2_prop.out << " ";
+      convert_expr(*it);
     }
-    else
-      assert(false);
+    smt2_prop.out << ")";
   }
   else if(expr.id()==ID_implies)
   {
@@ -754,11 +749,13 @@ void smt2_convt::convert_expr(const exprt &expr)
           expr.id()==ID_lshr ||
           expr.id()==ID_shl)
   {
+    const typet &type=expr.type();
+
     assert(expr.operands().size()==2);
 
-    if(expr.type().id()==ID_unsignedbv ||
-       expr.type().id()==ID_signedbv ||
-       expr.type().id()==ID_bv)
+    if(type.id()==ID_unsignedbv ||
+       type.id()==ID_signedbv ||
+       type.id()==ID_bv)
     {
       if(expr.id()==ID_ashr)
         smt2_prop.out << "(bvashr ";
@@ -797,7 +794,7 @@ void smt2_convt::convert_expr(const exprt &expr)
     }
     else
       throw "unsupported type for "+expr.id_string()+
-            ": "+expr.type().id_string();
+            ": "+type.id_string();
   }
   else if(expr.id()==ID_with)
   {

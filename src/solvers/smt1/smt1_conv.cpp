@@ -590,27 +590,31 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
 {
   if(expr.id()==ID_symbol)
   {
+    const typet &type=expr.type();
+
     irep_idt id=to_symbol_expr(expr).get_identifier();
     assert(id!="");
 
     // boolean symbols may have to be converted
-    from_bool_begin(expr.type(), bool_as_bv);
+    from_bool_begin(type, bool_as_bv);
 
     smt1_prop.out << convert_identifier(id);
 
-    from_bool_end(expr.type(), bool_as_bv);
+    from_bool_end(type, bool_as_bv);
   }
   else if(expr.id()==ID_nondet_symbol)
   {
+    const typet &type=expr.type();
+
     irep_idt id=expr.get(ID_identifier);
     assert(id!="");
 
     // boolean symbols may have to be converted
-    from_bool_begin(expr.type(), bool_as_bv);
+    from_bool_begin(type, bool_as_bv);
 
     smt1_prop.out << "nondet_" << convert_identifier(id);
 
-    from_bool_end(expr.type(), bool_as_bv);
+    from_bool_end(type, bool_as_bv);
   }
   else if(expr.id()==ID_typecast)
   {
@@ -649,15 +653,17 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
   }
   else if(expr.id()==ID_unary_minus)
   {
+    const typet &type=expr.type();
+
     assert(expr.operands().size()==1);
 
-    if(expr.type().id()==ID_rational)
+    if(type.id()==ID_rational)
     {
       smt1_prop.out << "(- ";
       convert_expr(expr.op0(), true);
       smt1_prop.out << ")";
     }
-    else if(expr.type().id()==ID_integer)
+    else if(type.id()==ID_integer)
     {
       smt1_prop.out << "(~ ";
       convert_expr(expr.op0(), true);
@@ -691,35 +697,35 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
           expr.id()==ID_or ||
           expr.id()==ID_xor)
   {
-    assert(expr.type().id()==ID_bool);
-    assert(expr.operands().size()>=2);
+    const typet &type=expr.type();
+    const exprt::operandst &operands=expr.operands();
+
+    assert(type.id()==ID_bool);
+    assert(operands.size()>=2);
 
     // this may have to be converted
-    from_bool_begin(expr.type(), bool_as_bv);
+    from_bool_begin(type, bool_as_bv);
 
-    if(expr.operands().size()>=2)
+    smt1_prop.out << "(" << expr.id();
+    forall_expr(it, operands)
     {
-      smt1_prop.out << "(" << expr.id();
-      forall_operands(it, expr)
-      {
-        smt1_prop.out << " ";
-        convert_expr(*it, false);
-      }
-      smt1_prop.out << ")";
+      smt1_prop.out << " ";
+      convert_expr(*it, false);
     }
-    else
-      assert(false);
+    smt1_prop.out << ")";
 
     // this may have to be converted
-    from_bool_end(expr.type(), bool_as_bv);
+    from_bool_end(type, bool_as_bv);
   }
   else if(expr.id()==ID_implies)
   {
-    assert(expr.type().id()==ID_bool);
+    const typet &type=expr.type();
+
+    assert(type.id()==ID_bool);
     assert(expr.operands().size()==2);
 
     // this may have to be converted
-    from_bool_begin(expr.type(), bool_as_bv);
+    from_bool_begin(type, bool_as_bv);
 
     smt1_prop.out << "(implies ";
     convert_expr(expr.op0(), false);
@@ -728,30 +734,34 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
     smt1_prop.out << ")";
 
     // this may have to be converted
-    from_bool_end(expr.type(), bool_as_bv);
+    from_bool_end(type, bool_as_bv);
   }
   else if(expr.id()==ID_not)
   {
+    const typet &type=expr.type();
+
     assert(expr.operands().size()==1);
 
     // this may have to be converted
-    from_bool_begin(expr.type(), bool_as_bv);
+    from_bool_begin(type, bool_as_bv);
 
     smt1_prop.out << "(not ";
     convert_expr(expr.op0(), false);
     smt1_prop.out << ")";
 
     // this may have to be converted
-    from_bool_end(expr.type(), bool_as_bv);
+    from_bool_end(type, bool_as_bv);
   }
   else if(expr.id()==ID_equal ||
           expr.id()==ID_notequal)
   {
+    const typet &type=expr.type();
+
     assert(expr.operands().size()==2);
     assert(base_type_eq(expr.op0().type(), expr.op1().type(), ns));
 
     // this may have to be converted
-    from_bool_begin(expr.type(), bool_as_bv);
+    from_bool_begin(type, bool_as_bv);
 
     if(expr.op0().type().id()==ID_bool)
     {
@@ -786,7 +796,7 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
     }
 
     // this may have to be converted
-    from_bool_end(expr.type(), bool_as_bv);
+    from_bool_end(type, bool_as_bv);
   }
   else if(expr.id()==ID_le ||
           expr.id()==ID_lt ||
@@ -817,9 +827,11 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
   }
   else if(expr.id()==ID_address_of)
   {
+    const typet &type=expr.type();
+
     assert(expr.operands().size()==1);
-    assert(expr.type().id()==ID_pointer);
-    convert_address_of_rec(expr.op0(), to_pointer_type(expr.type()));
+    assert(type.id()==ID_pointer);
+    convert_address_of_rec(expr.op0(), to_pointer_type(type));
   }
   else if(expr.id()=="implicit_address_of" ||
           expr.id()=="reference_to")
@@ -849,13 +861,15 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
           expr.id()==ID_lshr ||
           expr.id()==ID_shl)
   {
+    const typet &type=expr.type();
+
     assert(expr.operands().size()==2);
 
-    if(expr.type().id()==ID_unsignedbv ||
-       expr.type().id()==ID_signedbv ||
-       expr.type().id()==ID_bv ||
-       expr.type().id()==ID_struct ||
-       expr.type().id()==ID_union)
+    if(type.id()==ID_unsignedbv ||
+       type.id()==ID_signedbv ||
+       type.id()==ID_bv ||
+       type.id()==ID_struct ||
+       type.id()==ID_union)
     {
       if(expr.id()==ID_ashr)
         smt1_prop.out << "(bvashr ";
@@ -894,7 +908,7 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
     }
     else
       throw "unsupported type for "+expr.id_string()+
-            ": "+expr.type().id_string();
+            ": "+type.id_string();
   }
   else if(expr.id()==ID_with)
   {
@@ -937,6 +951,8 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
   }
   else if(expr.id()==ID_same_object)
   {
+    const typet &type=expr.type();
+
     assert(expr.operands().size()==2);
     assert(expr.op0().type().id()==ID_pointer);
     assert(expr.op1().type().id()==ID_pointer);
@@ -945,7 +961,7 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
     unsigned op1_width=boolbv_width(expr.op1().type());
 
     // this may have to be converted
-    from_bool_begin(expr.type(), bool_as_bv);
+    from_bool_begin(type, bool_as_bv);
     
     smt1_prop.out << "(= (extract["
                   << (op0_width-1)
@@ -961,7 +977,7 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
     smt1_prop.out << "))";
 
     // this may have to be converted
-    from_bool_end(expr.type(), bool_as_bv);
+    from_bool_end(type, bool_as_bv);
   }
   else if(expr.id()=="is_dynamic_object")
   {
@@ -969,12 +985,14 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
   }
   else if(expr.id()=="invalid-pointer")
   {
+    const typet &type=expr.type();
+
     assert(expr.operands().size()==1);
     assert(expr.op0().type().id()==ID_pointer);
     unsigned op_width=boolbv_width(expr.op0().type());
 
     // this may have to be converted
-    from_bool_begin(expr.type(), bool_as_bv);
+    from_bool_begin(type, bool_as_bv);
 
     smt1_prop.out << "(= (extract["
                   << (op_width-1)
@@ -984,19 +1002,21 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
                   << "[" << BV_ADDR_BITS << "])";
 
     // this may have to be converted
-    from_bool_end(expr.type(), bool_as_bv);
+    from_bool_end(type, bool_as_bv);
   }
   else if(expr.id()=="pointer_object_has_type")
   {
+    const typet &type=expr.type();
+
     assert(expr.operands().size()==1);
 
     // this may have to be converted
-    from_bool_begin(expr.type(), bool_as_bv);
+    from_bool_begin(type, bool_as_bv);
 
     smt1_prop.out << "false"; // TODO
 
     // this may have to be converted
-    from_bool_end(expr.type(), bool_as_bv);
+    from_bool_end(type, bool_as_bv);
   }
   else if(expr.id()==ID_string_constant)
   {
@@ -1013,8 +1033,10 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
     if(expr.op0().type().id()==ID_unsignedbv ||
        expr.op0().type().id()==ID_signedbv)
     {
+      const typet &type=expr.type();
+
       // this may have to be converted
-      from_bv_begin(expr.type(), bool_as_bv);
+      from_bv_begin(type, bool_as_bv);
 
       if(expr.op1().is_constant())
       {
@@ -1039,7 +1061,7 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
       }
 
       // this may have to be converted
-      from_bv_end(expr.type(), bool_as_bv);
+      from_bv_end(type, bool_as_bv);
     }
     else
       throw "unsupported type for "+expr.id_string()+
@@ -1086,31 +1108,32 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
   }
   else if(expr.id()==ID_abs)
   {
-    assert(expr.operands().size()==1);
+    const typet &type=expr.type();
 
-    unsigned result_width=boolbv_width(expr.type());
+    assert(expr.operands().size()==1);
+    const exprt &op0=expr.op0();
+
+    unsigned result_width=boolbv_width(type);
     
     if(result_width==0)
       throw "conversion failed";
-
-    const typet &type=expr.type();
 
     if(type.id()==ID_signedbv ||
        type.id()==ID_fixedbv)
     {
       smt1_prop.out << "(ite (bvslt ";
-      convert_expr(expr.op0(), true);
+      convert_expr(op0, true);
       smt1_prop.out << " bv0[" << result_width << "]) ";
       smt1_prop.out << "(bvneg ";
-      convert_expr(expr.op0(), true);
+      convert_expr(op0, true);
       smt1_prop.out << ") ";
-      convert_expr(expr.op0(), true);
+      convert_expr(op0, true);
       smt1_prop.out << ")";
     }
     else if(type.id()==ID_floatbv)
     {
       smt1_prop.out << "(bvand ";
-      convert_expr(expr.op0(), true);
+      convert_expr(op0, true);
       smt1_prop.out << " bv"
                     << (power(2, result_width-1)-1)
                     << "[" << result_width << "])";
@@ -1120,21 +1143,25 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
   }
   else if(expr.id()==ID_isnan)
   {
+    const typet &type=expr.type();
+
     assert(expr.operands().size()==1);
 
     const typet &op_type=expr.op0().type();
 
     if(op_type.id()==ID_fixedbv)
     {
-      from_bool_begin(expr.type(), bool_as_bv);
+      from_bool_begin(type, bool_as_bv);
       smt1_prop.out << "false";
-      from_bool_end(expr.type(), bool_as_bv);
+      from_bool_end(type, bool_as_bv);
     }
     else
       throw "isnan with unsupported operand type";
   }
   else if(expr.id()==ID_isfinite)
   {
+    const typet &type=expr.type();
+
     if(expr.operands().size()!=1)
       throw "isfinite expects one operand";
 
@@ -1142,15 +1169,17 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
 
     if(op_type.id()==ID_fixedbv)
     {
-      from_bool_begin(expr.type(), bool_as_bv);
+      from_bool_begin(type, bool_as_bv);
       smt1_prop.out << "true";
-      from_bool_end(expr.type(), bool_as_bv);
+      from_bool_end(type, bool_as_bv);
     }
     else
       throw "isfinite with unsupported operand type";
   }
   else if(expr.id()==ID_isinf)
   {
+    const typet &type=expr.type();
+
     if(expr.operands().size()!=1)
       throw "isinf expects one operand";
 
@@ -1158,15 +1187,17 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
 
     if(op_type.id()==ID_fixedbv)
     {
-      from_bool_begin(expr.type(), bool_as_bv);
+      from_bool_begin(type, bool_as_bv);
       smt1_prop.out << "false";
-      from_bool_end(expr.type(), bool_as_bv);
+      from_bool_end(type, bool_as_bv);
     }
     else
       throw "isinf with unsupported operand type";
   }
   else if(expr.id()==ID_isnormal)
   {
+    const typet &type=expr.type();
+
     if(expr.operands().size()!=1)
       throw "isnormal expects one operand";
 
@@ -1174,9 +1205,9 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
 
     if(op_type.id()==ID_fixedbv)
     {
-      from_bool_begin(expr.type(), bool_as_bv);
+      from_bool_begin(type, bool_as_bv);
       smt1_prop.out << "true";
-      from_bool_end(expr.type(), bool_as_bv);
+      from_bool_end(type, bool_as_bv);
     }
     else
       throw "isnormal with unsupported operand type";
@@ -1184,6 +1215,8 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
   else if(expr.id()==ID_overflow_plus ||
           expr.id()==ID_overflow_minus)
   {
+    const typet &type=expr.type();
+
     assert(expr.operands().size()==2);
     bool subtract=expr.id()==ID_overflow_minus;
 
@@ -1195,7 +1228,7 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
     {
       // an overflow occurs if the top two bits of the extended sum differ
 
-      from_bool_begin(expr.type(), bool_as_bv);
+      from_bool_begin(type, bool_as_bv);
       smt1_prop.out << "(let (?sum (";
       smt1_prop.out << (subtract?"bvsub":"bvadd");
       smt1_prop.out << " (sign_extend[1] ";
@@ -1208,12 +1241,12 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
                       "(extract[" << width << ":" << width << "] ?sum) "
                       "(extract[" << (width-1) << ":" << (width-1) << "] ?sum)";
       smt1_prop.out << ")))"; // =, not, let
-      from_bool_end(expr.type(), bool_as_bv);
+      from_bool_end(type, bool_as_bv);
     }
     else if(op_type.id()==ID_unsignedbv)
     {
       // overflow is simply carry-out
-      from_bv_begin(expr.type(), bool_as_bv);
+      from_bv_begin(type, bool_as_bv);
       smt1_prop.out << "(extract[" << width << ":" << width << "] ";
       smt1_prop.out << "(" << (subtract?"bvsub":"bvadd");
       smt1_prop.out << " (zero_extend[1] ";
@@ -1222,7 +1255,7 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
       smt1_prop.out << " (zero_extend[1] ";
       convert_expr(expr.op1(), true);
       smt1_prop.out << ")))"; // zero_extend, bvsub/bvadd, extract
-      from_bv_end(expr.type(), bool_as_bv);
+      from_bv_end(type, bool_as_bv);
     }
     else
       throw "overflow check on unknown type: "+op_type.id_string();
@@ -1321,19 +1354,21 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
   }
   else if(expr.id()==ID_array)
   {
+    const exprt::operandst &operands=expr.operands();
+
     // array constructor
     array_expr_mapt::const_iterator it=array_expr_map.find(expr);
     assert(it!=array_expr_map.end());
 
-    assert(expr.operands().size()!=0);
+    assert(!operands.empty());
 
-    forall_operands(it, expr)
+    forall_expr(it, operands)
       smt1_prop.out << "(store ";
 
     smt1_prop.out << it->second;
 
     unsigned i=0;
-    forall_operands(it, expr)
+    forall_expr(it, operands)
     {
       exprt index=from_integer(i, unsignedbv_typet(array_index_bits));
       smt1_prop.out << " ";
