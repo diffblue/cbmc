@@ -71,22 +71,22 @@ typedef std::list<typet> type_listt;
 
 #define forall_type_list(it, type) \
   for(type_listt::const_iterator it=(type).begin(); \
-      it!=(type).end(); it++)
+      it!=(type).end(); ++it)
 
 #define Forall_type_list(it, type) \
   for(type_listt::iterator it=(type).begin(); \
-      it!=(type).end(); it++)
+      it!=(type).end(); ++it)
 
 #define forall_subtypes(it, type) \
   if((type).has_subtypes()) \
     for(typet::subtypest::const_iterator it=(type).subtypes().begin(), \
         it##_end=(type).subtypes().end(); \
-        it!=it##_end; it++)
+        it!=it##_end; ++it)
 
 #define Forall_subtypes(it, type) \
   if((type).has_subtypes()) \
     for(typet::subtypest::iterator it=(type).subtypes().begin(); \
-        it!=(type).subtypes().end(); it++)
+        it!=(type).subtypes().end(); ++it)
 
 /*
 

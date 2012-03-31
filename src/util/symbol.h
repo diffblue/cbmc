@@ -113,17 +113,17 @@ typedef std::list<symbolt> symbol_listt;
 
 #define forall_symbol_list(it, expr) \
   for(symbol_listt::const_iterator it=(expr).begin(); \
-      it!=(expr).end(); it++)
+      it!=(expr).end(); ++it)
 
 typedef std::list<const symbolt *> symbolptr_listt;
 
 #define forall_symbolptr_list(it, list) \
   for(symbolptr_listt::const_iterator it=(list).begin(); \
-      it!=(list).end(); it++)
+      it!=(list).end(); ++it)
 
 #define Forall_symbolptr_list(it, list) \
   for(symbolptr_listt::iterator it=(list).begin(); \
-      it!=(list).end(); it++)
+      it!=(list).end(); ++it)
 
 // the following should move elsewhere
 bool is_global(const symbolt& symbol);

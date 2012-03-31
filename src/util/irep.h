@@ -37,19 +37,19 @@ typedef string_hash irep_id_hash;
 
 #define forall_irep(it, irep) \
   for(irept::subt::const_iterator it=(irep).begin(); \
-      it!=(irep).end(); it++)
+      it!=(irep).end(); ++it)
 
 #define Forall_irep(it, irep) \
   for(irept::subt::iterator it=(irep).begin(); \
-      it!=(irep).end(); it++)
+      it!=(irep).end(); ++it)
 
 #define forall_named_irep(it, irep) \
   for(irept::named_subt::const_iterator it=(irep).begin(); \
-      it!=(irep).end(); it++)
+      it!=(irep).end(); ++it)
 
 #define Forall_named_irep(it, irep) \
   for(irept::named_subt::iterator it=(irep).begin(); \
-      it!=(irep).end(); it++)
+      it!=(irep).end(); ++it)
 
 #ifdef IREP_DEBUG
 #include <iostream>

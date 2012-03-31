@@ -535,7 +535,7 @@ std::string smt1_convt::convert_identifier(const irep_idt &identifier)
   for(std::string::const_iterator
       it=s.begin();
       it!=s.end();
-      it++)
+      ++it)
   {
     char ch=*it;
 
@@ -544,7 +544,7 @@ std::string smt1_convt::convert_identifier(const irep_idt &identifier)
     else if(ch==':')
     {
       std::string::const_iterator next_it(it);
-      next_it++;
+      ++next_it;
       if(next_it!=s.end() && *next_it==':')
       {
         dest.append(".S");
