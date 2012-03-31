@@ -84,10 +84,10 @@ protected:
 
 #define Forall_guard(it, guard_list) \
   for(guardt::guard_listt::iterator it=(guard_list).begin(); \
-      it!=(guard_list).end(); it++)
+      it!=(guard_list).end(); ++it)
 
 #define forall_guard(it, guard_list) \
   for(guardt::guard_listt::const_iterator it=(guard_list).begin(); \
-      it!=(guard_list).end(); it++)
+      it!=(guard_list).end(); ++it)
 
 #endif

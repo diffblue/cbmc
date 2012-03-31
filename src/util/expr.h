@@ -15,28 +15,28 @@ Author: Daniel Kroening, kroening@kroening.com
   if((expr).has_operands()) \
     for(exprt::operandst::const_iterator it=(expr).operands().begin(), \
         it##_end=(expr).operands().end(); \
-        it!=it##_end; it++)
+        it!=it##_end; ++it)
 
 #define Forall_operands(it, expr) \
   if((expr).has_operands()) \
     for(exprt::operandst::iterator it=(expr).operands().begin(); \
-        it!=(expr).operands().end(); it++)
+        it!=(expr).operands().end(); ++it)
 
 #define forall_expr(it, expr) \
   for(exprt::operandst::const_iterator it=(expr).begin(); \
-      it!=(expr).end(); it++)
+      it!=(expr).end(); ++it)
 
 #define Forall_expr(it, expr) \
   for(exprt::operandst::iterator it=(expr).begin(); \
-      it!=(expr).end(); it++)
+      it!=(expr).end(); ++it)
       
 #define forall_expr_list(it, expr) \
   for(expr_listt::const_iterator it=(expr).begin(); \
-      it!=(expr).end(); it++)
+      it!=(expr).end(); ++it)
 
 #define Forall_expr_list(it, expr) \
   for(expr_listt::iterator it=(expr).begin(); \
-      it!=(expr).end(); it++)
+      it!=(expr).end(); ++it)
 
 /*! \brief Base class for all expressions
 */
