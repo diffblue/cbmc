@@ -79,8 +79,9 @@ typedef std::list<typet> type_listt;
 
 #define forall_subtypes(it, type) \
   if((type).has_subtypes()) \
-    for(typet::subtypest::const_iterator it=(type).subtypes().begin(); \
-        it!=(type).subtypes().end(); it++)
+    for(typet::subtypest::const_iterator it=(type).subtypes().begin(), \
+        it##_end=(type).subtypes().end(); \
+        it!=it##_end; it++)
 
 #define Forall_subtypes(it, type) \
   if((type).has_subtypes()) \
