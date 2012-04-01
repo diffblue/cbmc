@@ -122,8 +122,8 @@ Function: cpp_typecheckt::typecheck
 
 void cpp_typecheckt::typecheck()
 {
-  // default linkage is C++
-  current_mode=ID_cpp;
+  // default linkage is "automatic"
+  current_linkage_spec=ID_auto;
   
   for(cpp_parse_treet::itemst::iterator
       it=cpp_parse_tree.items.begin();
@@ -243,7 +243,7 @@ void cpp_typecheckt::static_initialization()
   {
     const symbolt &symbol=s_it->second;
 
-    if(!symbol.static_lifetime || symbol.mode!=current_mode)
+    if(!symbol.static_lifetime)
       continue;
       
     // magic value
@@ -275,9 +275,6 @@ void cpp_typecheckt::static_initialization()
     dinis.pop_front();
 
     if(symbol.is_extern)
-      continue;
-
-    if(symbol.mode!=current_mode)
       continue;
 
     assert(symbol.static_lifetime);
@@ -334,7 +331,7 @@ void cpp_typecheckt::static_initialization()
   init_symbol.name="c::#ini#"+id2string(module);
   init_symbol.base_name="#ini#"+id2string(module);
   init_symbol.value.swap(block_sini);
-  init_symbol.mode=current_mode;
+  init_symbol.mode=ID_cpp;
   init_symbol.module=module;
   init_symbol.type=code_typet();
   init_symbol.type.add(ID_return_type)=typet(ID_empty);
