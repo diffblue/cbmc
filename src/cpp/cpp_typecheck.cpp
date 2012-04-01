@@ -246,6 +246,9 @@ void cpp_typecheckt::static_initialization()
     if(!symbol.static_lifetime)
       continue;
       
+    if(symbol.mode!=ID_cpp)
+      continue;
+      
     // magic value
     if(symbol.name=="c::__CPROVER::constant_infinity_uint")
       continue;
