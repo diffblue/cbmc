@@ -175,7 +175,7 @@ void cpp_typecheckt::typecheck_compound_type(
     symbol.base_name=base_name;
     symbol.value.make_nil();
     symbol.location=type.location();
-    symbol.mode=current_mode;
+    symbol.mode=ID_cpp;
     symbol.module=module;
     symbol.type.swap(type);
     symbol.is_type=true;
@@ -492,7 +492,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
         vt_symb_type.name= vt_name;
         vt_symb_type.base_name="virtual_table::"+symbol.base_name.as_string();
         vt_symb_type.pretty_name = vt_symb_type.base_name;
-        vt_symb_type.mode=current_mode;
+        vt_symb_type.mode=ID_cpp;
         vt_symb_type.module=module;
         vt_symb_type.location=symbol.location;
         vt_symb_type.type = struct_typet();
@@ -543,7 +543,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
         func_symb.name=component.get_name().as_string() + "::" +virtual_base.as_string();
         func_symb.base_name=component.get(ID_base_name);
         func_symb.pretty_name = component.get(ID_base_name);
-        func_symb.mode=current_mode;
+        func_symb.mode=ID_cpp;
         func_symb.module=module;
         func_symb.location=component.location();
         func_symb.type=component.type();
@@ -567,7 +567,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
           arg_symb.name = func_symb.name.as_string() + "::"+ base_name.as_string();
           arg_symb.base_name = base_name;
           arg_symb.pretty_name = base_name;
-          arg_symb.mode=current_mode;
+          arg_symb.mode=ID_cpp;
           arg_symb.location=func_symb.location;
           arg_symb.type = arg.type();
 
@@ -1318,7 +1318,7 @@ void cpp_typecheckt::typecheck_member_function(
   symbol.name=identifier;
   symbol.base_name=component.get(ID_base_name);
   symbol.value.swap(value);
-  symbol.mode=current_mode;
+  symbol.mode=ID_cpp;
   symbol.module=module;
   symbol.type=type;
   symbol.is_type=false;
