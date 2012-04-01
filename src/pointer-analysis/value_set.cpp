@@ -1102,7 +1102,7 @@ void value_sett::assign(
   #endif
 
   const typet &type=ns.follow(lhs.type());
-  
+
   if(type.id()==ID_struct ||
      type.id()==ID_union)
   {
@@ -1312,6 +1312,7 @@ void value_sett::assign_rec(
 {
   #if 0
   std::cout << "ASSIGN_REC LHS: " << from_expr(ns, "", lhs) << std::endl;
+  std::cout << "ASSIGN_REC LHS ID: " << lhs.id() << std::endl;
   std::cout << "ASSIGN_REC SUFFIX: " << suffix << std::endl;
 
   for(object_map_dt::const_iterator it=values_rhs.read().begin(); 
@@ -1321,7 +1322,7 @@ void value_sett::assign_rec(
       from_expr(ns, "", object_numbering[it->first]) << std::endl;
   std::cout << std::endl;
   #endif
-
+  
   if(lhs.id()==ID_symbol)
   {
     const irep_idt &identifier=lhs.get(ID_identifier);
@@ -1465,7 +1466,7 @@ void value_sett::do_function_call(
   {
     const std::string identifier="value_set::dummy_arg_"+i2string(i);
     exprt dummy_lhs=symbol_exprt(identifier, arguments[i].type());
-    assign(dummy_lhs, arguments[i], ns, true);
+    assign(dummy_lhs, arguments[i], ns, false);
   }
 
   // now assign to 'actual actuals'
@@ -1487,6 +1488,8 @@ void value_sett::do_function_call(
     assign(actual_lhs, v_expr, ns, true);
     i++;
   }
+
+  // we could delete the dummy_arg_* now.
 }
 
 /*******************************************************************\
