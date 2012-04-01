@@ -158,3 +158,32 @@ inline char *getenv(const char *name)
   buffer[buf_size-1]=0;
   return buffer;
 }
+
+/* FUNCTION: realloc */
+
+inline void *realloc(void *ptr, __CPROVER_size_t malloc_size)
+{
+  __CPROVER_HIDE:;
+
+  // if ptr is NULL, this behaves like malloc
+  if(ptr==0)
+    return malloc(malloc_size);
+
+  // if malloc-size is 0, allocate new minimum sized object
+  // and free original
+  if(malloc_size==0)
+  {
+    free(ptr);
+    return malloc(1);
+  }
+
+  __CPROVER_assert(__CPROVER_DYNAMIC_OBJECT(ptr),
+                   "realloc argument is dynamic object");
+
+  // this shouldn't move if the new size isn't bigger
+  res=malloc(malloc_size);
+  __CPROVER_array_copy(res, ptr);
+  free(ptr);
+
+  return res;
+}
