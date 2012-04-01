@@ -398,8 +398,7 @@ std::string expr2ct::convert_typecast(
 
   std::string tmp=convert(src.op0(), precedence);
 
-  if(src.op0().id()==ID_member ||
-     src.op0().id()==ID_constant ||
+  if(src.op0().id()==ID_constant ||
      src.op0().id()==ID_symbol) // better fix precedence
     dest+=tmp;
   else
