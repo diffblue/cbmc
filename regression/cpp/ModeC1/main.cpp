@@ -16,4 +16,7 @@ void g(int fkt_argument)
 
 int main()
 {
+  cpp_f(0);
+  f(0);
+  g(0);
 }
