@@ -10,6 +10,7 @@ extern "C" void f(int fkt_argument)
 
 extern "C" void g(int fkt_argument);
 
+// same as above!
 void g(int fkt_argument)
 {
 }
