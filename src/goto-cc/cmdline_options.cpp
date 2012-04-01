@@ -173,14 +173,20 @@ bool cmdline_optionst::doit()
   default:;
     assert(false);
   }
-
+  
   // get configuration
   config.set(cmdline);
-  
+
   if(cmdline.mode==goto_cc_cmdlinet::GCC ||
      cmdline.mode==goto_cc_cmdlinet::CODEWARRIOR)
   {
-    if(cmdline.mode==goto_cc_cmdlinet::GCC)
+    if(cmdline.isset("i386-win32") ||
+       cmdline.isset("winx64"))
+    {
+      config.ansi_c.mode=configt::ansi_ct::MODE_VISUAL_STUDIO;
+      debug("Enabling Visual Studio syntax");
+    }
+    else if(cmdline.mode==goto_cc_cmdlinet::GCC)
       config.ansi_c.mode=configt::ansi_ct::MODE_GCC;
     else if(cmdline.mode==goto_cc_cmdlinet::CODEWARRIOR)
       config.ansi_c.mode=configt::ansi_ct::MODE_CODEWARRIOR;

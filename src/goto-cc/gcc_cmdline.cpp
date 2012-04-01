@@ -89,6 +89,7 @@ bool gcc_cmdlinet::parse(int argc, const char **argv)
       strcmp(argv[i], "--i386-linux")==0 || // NON-GCC
       strcmp(argv[i], "--i386-win32")==0 || // NON-GCC
       strcmp(argv[i], "--i386-macos")==0 || // NON-GCC
+      strcmp(argv[i], "--winx64")==0 || // NON_GCC
       strcmp(argv[i], "--string-abstraction")==0 || // NON-GCC
       strcmp(argv[i], "--no-library")==0 || // NON-GCC
       strcmp(argv[i], "--16")==0 || // NON-GCC
