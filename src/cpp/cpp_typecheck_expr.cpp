@@ -1808,7 +1808,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
       exprt tmp_object_expr(ID_sideeffect, pod);
       tmp_object_expr.set(ID_statement, ID_temporary_object);
       tmp_object_expr.set(ID_C_lvalue, true);
-      tmp_object_expr.set(ID_mode, current_mode);
+      tmp_object_expr.set(ID_mode, ID_cpp);
       tmp_object_expr.location()=expr.location();
       expr.swap(tmp_object_expr);
     }
@@ -2011,7 +2011,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
     exprt tmp_object_expr(ID_sideeffect, this_type.subtype());
     tmp_object_expr.set(ID_statement, ID_temporary_object);
     tmp_object_expr.set(ID_C_lvalue, true);
-    tmp_object_expr.set(ID_mode, current_mode);
+    tmp_object_expr.set(ID_mode, ID_cpp);
     tmp_object_expr.location()=expr.location();
 
     exprt member;

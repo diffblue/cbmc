@@ -78,9 +78,9 @@ void cpp_typecheckt::convert(cpp_namespace_spect &namespace_spec)
     symbol.base_name=final_name;
     symbol.value.make_nil();
     symbol.location=namespace_spec.location();
-    symbol.mode=current_mode;
+    symbol.mode=ID_cpp;
     symbol.module=module;
-    symbol.type=typet("namespace");
+    symbol.type=typet(ID_namespace);
 
     if(context.move(symbol))
       throw "cpp_typecheckt::convert_namespace: context.move() failed";

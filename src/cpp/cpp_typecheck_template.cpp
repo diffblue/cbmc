@@ -204,7 +204,7 @@ void cpp_typecheckt::typecheck_class_template(
   symbol.name=symbol_name;
   symbol.base_name=base_name;
   symbol.location=cpp_name.location();
-  symbol.mode=current_mode;
+  symbol.mode=ID_cpp;
   symbol.module=module;
   symbol.type.swap(declaration);
   symbol.is_macro=false;
@@ -313,7 +313,7 @@ void cpp_typecheckt::typecheck_function_template(
   symbol.name=symbol_name;
   symbol.base_name=base_name;
   symbol.location=cpp_name.location();
-  symbol.mode=current_mode;
+  symbol.mode=ID_cpp;
   symbol.module=module;
   symbol.value.make_nil();
 
