@@ -29,7 +29,7 @@ public:
   bool is_template;
   bool is_template_argument;
   bool is_friend;
-  irep_idt mode;
+  irep_idt linkage_spec;
 
   symbolt &convert(
     const typet &type, // already typechecked

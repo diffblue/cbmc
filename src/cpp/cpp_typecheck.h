@@ -106,7 +106,7 @@ protected:
   cpp_scopest cpp_scopes;
 
   cpp_parse_treet &cpp_parse_tree;
-  irep_idt current_mode;
+  irep_idt current_linkage_spec;
 
   void convert(cpp_linkage_spect &);
   void convert(cpp_namespace_spect &);

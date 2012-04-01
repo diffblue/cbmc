@@ -32,7 +32,7 @@ cpp_declarator_convertert::cpp_declarator_convertert(
   is_template(false),
   is_template_argument(false),
   is_friend(false),
-  mode(_cpp_typecheck.current_mode),
+  linkage_spec(_cpp_typecheck.current_linkage_spec),
   cpp_typecheck(_cpp_typecheck)
 {
 }
@@ -440,12 +440,25 @@ void cpp_declarator_convertert::get_final_identifier()
      base_name==ID_main &&
      scope->prefix=="")
   {
-    mode=ID_C;
+    linkage_spec=ID_C;
   }
 
-  if(is_code &&
-     mode!=ID_C)
-    identifier+=id2string(cpp_typecheck.function_identifier(final_type));
+  if(is_code)
+  {
+    // is there already an `extern "C"' function with the same name?
+    
+    if(linkage_spec==ID_auto &&
+       scope->prefix=="" &&
+       cpp_typecheck.context.symbols.find("c::"+identifier)!=
+       cpp_typecheck.context.symbols.end())
+    {
+    }
+    else if(linkage_spec!=ID_C)
+    {
+      // add C++ decoration
+      identifier+=id2string(cpp_typecheck.function_identifier(final_type));
+    }
+  }
 
   final_identifier=
     "c::"+
@@ -478,13 +491,12 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
   symbol.base_name=base_name;
   symbol.value=declarator.value();
   symbol.location=declarator.name().location();
-  symbol.mode=mode;
+  symbol.mode=linkage_spec==ID_auto?ID_cpp:linkage_spec;
   symbol.module=cpp_typecheck.module;
   symbol.type=final_type;
   symbol.is_type=is_typedef;
   symbol.is_macro=is_typedef && !is_template_argument;
   symbol.pretty_name=pretty_name;
-  symbol.mode=cpp_typecheck.current_mode;
   
   // Constant? These are propagated.
   if(symbol.type.get_bool(ID_C_constant) &&
