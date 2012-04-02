@@ -187,3 +187,14 @@ inline void *realloc(void *ptr, __CPROVER_size_t malloc_size)
 
   return res;
 }
+
+/* FUNCTION: valloc */
+
+inline void *valloc(__CPROVER_size_t malloc_size)
+{
+  // The allocated memory is aligned on a page
+  // boundary, which we don't model.
+     
+  __CPROVER_HIDE:;
+  return malloc(malloc_size);
+}
