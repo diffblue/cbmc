@@ -421,6 +421,11 @@ public:
     return find(ID_arguments).get_bool(ID_ellipsis);
   }
 
+  inline bool is_KnR() const
+  {
+    return get_bool(ID_C_KnR);
+  }
+
   inline void make_ellipsis()
   {
     add(ID_arguments).set(ID_ellipsis, true);

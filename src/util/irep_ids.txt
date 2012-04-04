@@ -264,6 +264,7 @@ preincrement
 predecrement
 integer_bits
 KnR
+C_KnR #KnR
 constraint_select_one
 cond
 bv_literals
