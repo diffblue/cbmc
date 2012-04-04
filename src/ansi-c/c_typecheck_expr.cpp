@@ -2123,12 +2123,16 @@ void c_typecheck_baset::typecheck_function_call_arguments(
   exprt::operandst &arguments=expr.arguments();
   const code_typet::argumentst &argument_types=
     code_type.arguments();
-
+    
   // no. of arguments test
 
   if(code_type.get_bool("#incomplete"))
   {
     // can't check
+  }
+  else if(code_type.is_KnR())
+  {
+    // we are generous on KnR; any number is ok
   }
   else if(code_type.has_ellipsis())
   {
