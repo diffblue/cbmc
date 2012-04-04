@@ -2563,6 +2563,7 @@ postfixing_abstract_declarator:
             swap(stack($3).add(ID_subtypes).get_sub());
           PARSER.pop_scope();
           adjust_KnR_arguments(stack($$).add(ID_arguments), stack($5));
+          stack($$).set(ID_C_KnR, true);
         }
         ;
 
