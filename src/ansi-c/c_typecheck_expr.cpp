@@ -2132,7 +2132,11 @@ void c_typecheck_baset::typecheck_function_call_arguments(
   }
   else if(code_type.is_KnR())
   {
-    // we are generous on KnR; any number is ok
+    // We are generous on KnR; any number is ok.
+    // We will in missing ones with "NIL".
+
+    while(argument_types.size()>arguments.size())
+      arguments.push_back(nil_exprt());
   }
   else if(code_type.has_ellipsis())
   {
@@ -2155,7 +2159,11 @@ void c_typecheck_baset::typecheck_function_call_arguments(
   {
     exprt &op=arguments[i];
 
-    if(i<argument_types.size())
+    if(op.is_nil())
+    {
+      // ignore
+    }
+    else if(i<argument_types.size())
     {
       const code_typet::argumentt &argument_type=
         argument_types[i];
