@@ -91,43 +91,35 @@ exprt convert_integer_literal(
   if(value<0)
     value_abs.negate();
 
-  unsigned min_width=config.ansi_c.int_width;
-  
-  if(long_cnt==1)
-    min_width=config.ansi_c.long_int_width;
-  else if(long_cnt>=2)
-    min_width=config.ansi_c.long_long_int_width;
-
   bool is_hex_or_oct=(base==8) || (base==16);
   
   #define FITS(width, signed) \
     ((signed?!is_unsigned:(is_unsigned || is_hex_or_oct)) && \
-    (width>=min_width) && \
     (power(2, signed?width-1:width)>value_abs))
 
   unsigned width;
   bool is_signed=false;
   irep_idt cpp_type;
 
-  if(FITS(config.ansi_c.int_width, true)) // int
+  if(FITS(config.ansi_c.int_width, true) && long_cnt==0) // int
   {
     width=config.ansi_c.int_width;
     is_signed=true;
     cpp_type=ID_signed_int;
   }
-  else if(FITS(config.ansi_c.int_width, false)) // unsigned int
+  else if(FITS(config.ansi_c.int_width, false) && long_cnt==0) // unsigned int
   {
     width=config.ansi_c.int_width;
     is_signed=false;
     cpp_type=ID_unsigned_int;
   }
-  else if(FITS(config.ansi_c.long_int_width, true)) // long int
+  else if(FITS(config.ansi_c.long_int_width, true) && long_cnt==1) // long int
   {
     width=config.ansi_c.long_int_width;
     is_signed=true;
     cpp_type=ID_signed_long_int;
   }
-  else if(FITS(config.ansi_c.long_int_width, false)) // unsigned long int
+  else if(FITS(config.ansi_c.long_int_width, false) && long_cnt==1) // unsigned long int
   {
     width=config.ansi_c.long_int_width;
     is_signed=false;
@@ -166,6 +158,6 @@ exprt convert_integer_literal(
 
   exprt result=from_integer(value, type);
   result.set(ID_C_cformat, src);
-  
+
   return result;
 }
