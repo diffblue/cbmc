@@ -894,6 +894,18 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
     return;
 
   const typet op_type=follow(op.type());
+  
+  // vectors?
+  
+  if(expr_type.id()==ID_vector)
+  {
+    // we are generous -- any vector to vector is fine
+    if(op_type.id()==ID_vector)
+      return;
+    else if(op_type.id()==ID_signedbv ||
+            op_type.id()==ID_unsignedbv)
+      return;
+  }
 
   if(!is_number(expr_type) &&
      expr_type.id()!=ID_bool &&
