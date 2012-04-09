@@ -11,7 +11,7 @@ SRC = arith_tools.cpp base_type.cpp cmdline.cpp config.cpp context.cpp \
       time_stopping.cpp symbol.cpp irep_hash_container.cpp \
       type_eq.cpp guard.cpp array_name.cpp gcd.cpp message_stream.cpp \
       substitute.cpp decision_procedure.cpp union_find.cpp pretty_names.cpp \
-      xml.cpp xml_irep.cpp std_types.cpp std_code.cpp \
+      xml.cpp xml_irep.cpp xml_expr.cpp std_types.cpp std_code.cpp \
       format_constant.cpp find_macros.cpp ref_expr_set.cpp std_expr.cpp \
       irep_serialization.cpp symbol_serialization.cpp fixedbv.cpp \
       ieee_float.cpp signal_catcher.cpp pointer_offset_size.cpp \
@@ -26,9 +26,9 @@ include ../config.inc
 include ../common
 
 CLEANFILES = util$(LIBEXT) \
-						 irep_ids.h irep_ids.inc \
-						 ieee_float_test$(EXEEXT) ieee_float_test$(OBJEXT) ieee_float_test.d \
-						 irep_ids_convert$(EXEEXT) irep_ids_convert$(OBJEXT) irep_ids_convert.d
+             irep_ids.h irep_ids.inc \
+             ieee_float_test$(EXEEXT) ieee_float_test$(OBJEXT) ieee_float_test.d \
+             irep_ids_convert$(EXEEXT) irep_ids_convert$(OBJEXT) irep_ids_convert.d
 
 all: util$(LIBEXT) ieee_float_test$(EXEEXT)
 
