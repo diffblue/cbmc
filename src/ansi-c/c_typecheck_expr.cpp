@@ -893,6 +893,8 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
   if(expr_type.id()==ID_empty)
     return;
 
+  const typet op_type=follow(op.type());
+
   if(!is_number(expr_type) &&
      expr_type.id()!=ID_bool &&
      expr_type.id()!=ID_pointer &&
@@ -902,11 +904,10 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
   {
     err_location(expr);
     str << "type cast to `"
-        << to_string(expr.type()) << "' not permitted";
+        << to_string(expr_type) << "' from `"
+        << to_string(op_type) << "' not permitted";
     throw 0;
   }
-
-  const typet op_type=follow(op.type());
 
   if(is_number(op_type) ||
      op_type.id()==ID_c_enum ||
