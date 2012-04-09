@@ -234,6 +234,11 @@ bool check_c_implicit_typecast(
     if(dest_type.id()==ID_unsignedbv) return false;
     if(dest_type.id()==ID_signedbv) return false;
   }
+  else if(src_type_id==ID_vector)
+  {
+    if(dest_type.id()==ID_vector)
+      return false;
+  }
 
   return true;
 }
