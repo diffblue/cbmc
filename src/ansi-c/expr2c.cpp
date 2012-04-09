@@ -170,6 +170,39 @@ std::string expr2ct::convert_rec(
   else if(src.id()==ID_signedbv ||
           src.id()==ID_unsignedbv)
   {
+    // annotated?
+    
+    irep_idt cpp_type=src.get(ID_C_cpp_type);
+    
+    if(cpp_type==ID_unsigned_char)
+      return "unsigned char";
+    else if(cpp_type==ID_signed_char)
+      return "signed char";
+    else if(cpp_type==ID_unsigned_short_int)
+      return "unsigned short int";
+    else if(cpp_type==ID_signed_short_int)
+      return "signed short int";
+    else if(cpp_type==ID_unsigned_int)
+      return "unsigned int";
+    else if(cpp_type==ID_signed_int)
+      return "signed int";
+    else if(cpp_type==ID_unsigned_long_int)
+      return "unsigned long int";
+    else if(cpp_type==ID_signed_long_int)
+      return "signed long int";
+    else if(cpp_type==ID_unsigned_long_long_int)
+      return "unsigned long long int";
+    else if(cpp_type==ID_signed_long_long_int)
+      return "signed long long int";
+    else if(cpp_type==ID_double)
+      return "double";
+    else if(cpp_type==ID_long_double)
+      return "long double";
+    else if(cpp_type==ID_float)
+      return "float";
+      
+    // There is also wchar_t in the above, but this isn't a C type.
+
     mp_integer width=string2integer(src.get_string(ID_width));
 
     bool is_signed=src.id()==ID_signedbv;
