@@ -146,4 +146,67 @@
   "int __builtin_ctzl(unsigned long);\n" \
   "long int __builtin_bswap32(long int x);\n" \
   "long long int __builtin_bswap64(long long int x);\n" \
+  "typedef int   __gccxml_m64  __attribute__ ((__vector_size__ (8), __may_alias__));\n" \
+  "typedef int   __gccxml_v2si __attribute__ ((__vector_size__ (8)));\n" \
+  "typedef short __gccxml_v4hi __attribute__ ((__vector_size__ (8)));\n" \
+  "typedef char  __gccxml_v8qi __attribute__ ((__vector_size__ (8)));\n" \
+  "void          __builtin_ia32_emms(void);\n" \
+  "int           __builtin_ia32_vec_ext_v2si();\n" \
+  "__gccxml_v8qi __builtin_ia32_packsswb();\n" \
+  "__gccxml_v4hi __builtin_ia32_packssdw();\n" \
+  "__gccxml_v8qi __builtin_ia32_packuswb();\n" \
+  "__gccxml_v8qi __builtin_ia32_punpckhbw();\n" \
+  "__gccxml_v4hi __builtin_ia32_punpckhwd();\n" \
+  "__gccxml_v2si __builtin_ia32_punpckhdq();\n" \
+  "__gccxml_v8qi __builtin_ia32_punpcklbw();\n" \
+  "__gccxml_v4hi __builtin_ia32_punpcklwd();\n" \
+  "__gccxml_v2si __builtin_ia32_punpckldq();\n" \
+  "__gccxml_v8qi __builtin_ia32_paddb();\n" \
+  "__gccxml_v4hi __builtin_ia32_paddw();\n" \
+  "__gccxml_v2si __builtin_ia32_paddd();\n" \
+  "__gccxml_m64  __builtin_ia32_paddq();\n" \
+  "__gccxml_v8qi __builtin_ia32_paddsb();\n" \
+  "__gccxml_v4hi __builtin_ia32_paddsw();\n" \
+  "__gccxml_v8qi __builtin_ia32_paddusb();\n" \
+  "__gccxml_v4hi __builtin_ia32_paddusw();\n" \
+  "__gccxml_v8qi __builtin_ia32_psubb();\n" \
+  "__gccxml_v4hi __builtin_ia32_psubw();\n" \
+  "__gccxml_v2si __builtin_ia32_psubd();\n" \
+  "__gccxml_m64  __builtin_ia32_psubq();\n" \
+  "__gccxml_v8qi __builtin_ia32_psubsb();\n" \
+  "__gccxml_v4hi __builtin_ia32_psubsw();\n" \
+  "__gccxml_v8qi __builtin_ia32_psubusb();\n" \
+  "__gccxml_v4hi __builtin_ia32_psubusw();\n" \
+  "__gccxml_v2si __builtin_ia32_pmaddwd();\n" \
+  "__gccxml_v4hi __builtin_ia32_pmulhw();\n" \
+  "__gccxml_v4hi __builtin_ia32_pmullw();\n" \
+  "__gccxml_v4hi __builtin_ia32_psllw();\n" \
+  "__gccxml_v4hi __builtin_ia32_psllwi();\n" \
+  "__gccxml_v2si __builtin_ia32_pslld();\n" \
+  "__gccxml_v2si __builtin_ia32_pslldi();\n" \
+  "__gccxml_m64  __builtin_ia32_psllq();\n" \
+  "__gccxml_m64  __builtin_ia32_psllqi();\n" \
+  "__gccxml_v4hi __builtin_ia32_psraw();\n" \
+  "__gccxml_v4hi __builtin_ia32_psrawi();\n" \
+  "__gccxml_v2si __builtin_ia32_psrad();\n" \
+  "__gccxml_v2si __builtin_ia32_psradi();\n" \
+  "__gccxml_v4hi __builtin_ia32_psrlw();\n" \
+  "__gccxml_v4hi __builtin_ia32_psrlwi();\n" \
+  "__gccxml_v2si __builtin_ia32_psrld();\n" \
+  "__gccxml_v2si __builtin_ia32_psrldi();\n" \
+  "__gccxml_m64  __builtin_ia32_psrlq();\n" \
+  "__gccxml_m64  __builtin_ia32_psrlqi();\n" \
+  "__gccxml_v2si __builtin_ia32_pand();\n" \
+  "__gccxml_v2si __builtin_ia32_pandn();\n" \
+  "__gccxml_v2si __builtin_ia32_por();\n" \
+  "__gccxml_v2si __builtin_ia32_pxor();\n" \
+  "__gccxml_v8qi __builtin_ia32_pcmpeqb();\n" \
+  "__gccxml_v8qi __builtin_ia32_pcmpgtb();\n" \
+  "__gccxml_v4hi __builtin_ia32_pcmpeqw();\n" \
+  "__gccxml_v4hi __builtin_ia32_pcmpgtw();\n" \
+  "__gccxml_v2si __builtin_ia32_pcmpeqd();\n" \
+  "__gccxml_v2si __builtin_ia32_pcmpgtd();\n" \
+  "__gccxml_v2si __builtin_ia32_vec_init_v2si();\n" \
+  "__gccxml_v4hi __builtin_ia32_vec_init_v4hi();\n" \
+  "__gccxml_v8qi __builtin_ia32_vec_init_v8qi();\n" \
   "\n\n"
