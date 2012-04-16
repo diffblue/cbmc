@@ -946,6 +946,13 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
       throw 0;
     }
   }
+  else if(op_type.id()==ID_vector)
+  {
+    // we are generous -- any vector to integer is fine
+    if(expr_type.id()==ID_signedbv ||
+       expr_type.id()==ID_unsignedbv)
+      return;
+  }
   else
   {
     err_location(expr);
