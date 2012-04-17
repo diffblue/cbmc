@@ -94,6 +94,7 @@ protected:
   void do_conversion(prop_convt &solver);
 
   virtual void show_vcc();
+  virtual bool all_claims(const goto_functionst &goto_functions);
   virtual void show_vcc(std::ostream &out);
   virtual void show_program();
   virtual void report_success();
