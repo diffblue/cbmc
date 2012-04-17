@@ -54,13 +54,15 @@ void bmct::show_vcc(std::ostream &out)
       it!=equation.SSA_steps.end(); it++)
   {
     if(!it->is_assert()) continue;
-
+    
     if(it->source.pc->location.is_not_nil())
       out << it->source.pc->location << std::endl;
     
     if(it->comment!="")
       out << it->comment << std::endl;
       
+    out << "Priority " << it->priority << std::endl;
+
     symex_target_equationt::SSA_stepst::const_iterator
       p_it=equation.SSA_steps.begin();
       
