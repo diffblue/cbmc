@@ -491,6 +491,19 @@ struct goalt
 {
   bvt bv;
   std::string description;
+  
+  explicit goalt(const goto_programt::instructiont &instruction)
+  {
+    std::string text=instruction.location.as_string();
+    irep_idt comment=instruction.location.get_comment();
+    if(comment!="")
+      text+=", "+id2string(comment);
+    description=text;
+  }
+  
+  goalt()
+  {
+  }
 };
 
 bool bmct::all_claims(const goto_functionst &goto_functions)
@@ -525,7 +538,7 @@ bool bmct::all_claims(const goto_functionst &goto_functions)
   forall_goto_functions(f_it, goto_functions)
     forall_goto_program_instructions(i_it, f_it->second.body)
       if(i_it->is_assert())
-        goal_map[i_it]=goalt();
+        goal_map[i_it]=goalt(*i_it);
 
   // get the conditions for these goals from formula
 
