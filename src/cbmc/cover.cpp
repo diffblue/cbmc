@@ -7,171 +7,10 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <solvers/sat/satcheck_minisat2.h>
+#include <solvers/prop/cover_goals.h>
 
 #include "bmc.h"
 #include "bv_cbmc.h"
-
-/*******************************************************************\
-
-   Class: cover_gooalst
-
- Purpose: Try to cover some given set of goals
-
-\*******************************************************************/
-
-class cover_goalst:public messaget
-{
-public:
-  explicit inline cover_goalst(prop_convt &_prop_conv):
-    prop_conv(_prop_conv), prop(_prop_conv.prop)
-  {
-  }
-
-  void operator()();
-
-  // statistics
-
-  inline unsigned number_covered() const
-  {
-    return _number_covered;
-  }
-  
-  inline unsigned iterations() const
-  {
-    return _iterations;
-  }
-  
-  inline unsigned size() const
-  {
-    return goals.size();
-  }
-  
-  // managing the goals
-
-  inline void add(const literalt condition, const std::string &description)
-  {
-    goals.push_back(cover_goalt());
-    goals.back().condition=condition;
-    goals.back().description=description;    
-  }
-  
-  struct cover_goalt
-  {
-    literalt condition;
-    bool covered;
-    std::string description;
-    
-    cover_goalt():covered(false)
-    {
-    }
-  };
-
-  std::list<cover_goalt> goals;
-
-protected:
-  unsigned _number_covered, _iterations;
-  prop_convt &prop_conv;
-  propt &prop;
-
-  void mark();
-  void constraint();
-};
-
-/*******************************************************************\
-
-Function: cover_goalst::operator()
-
-  Inputs:
-
- Outputs:
-
- Purpose: Try to cover all goals
-
-\*******************************************************************/
-
-void cover_goalst::mark()
-{
-  for(std::list<cover_goalt>::iterator
-      g_it=goals.begin();
-      g_it!=goals.end();
-      g_it++)
-    if(!g_it->covered &&
-       prop.l_get(g_it->condition).is_true())
-    {
-      g_it->covered=true;
-      _number_covered++;
-    }
-}
-  
-/*******************************************************************\
-
-Function: cover_goalst::constaint
-
-  Inputs:
-
- Outputs:
-
- Purpose: Try to cover all goals
-
-\*******************************************************************/
-
-void cover_goalst::constraint()
-{
-  bvt bv;
-
-  for(std::list<cover_goalt>::const_iterator
-      g_it=goals.begin();
-      g_it!=goals.end();
-      g_it++)
-    if(!g_it->covered && !g_it->condition.is_false())
-      bv.push_back(g_it->condition);
-
-  prop.lcnf(bv);
-}
-
-/*******************************************************************\
-
-Function: cover_goalst::operator()
-
-  Inputs:
-
- Outputs:
-
- Purpose: Try to cover all goals
-
-\*******************************************************************/
-
-void cover_goalst::operator()()
-{
-  _iterations=_number_covered=0;
-  decision_proceduret::resultt dec_result;
-
-  status("Total number of coverage goals: "+i2string(size()));
-
-  do
-  {
-    // We want (at least) one of the remaining goals, please!
-    _iterations++;
-    constraint();
-    dec_result=prop_conv.dec_solve();
-    
-    switch(dec_result)
-    {
-    case decision_proceduret::D_UNSATISFIABLE: // DONE
-      break;
-
-    case decision_proceduret::D_SATISFIABLE:
-      mark(); // mark the ones we got
-      break;
-
-    default:
-      error("decision procedure failed");
-      return;
-    }
-  }
-  while(dec_result==decision_proceduret::D_SATISFIABLE &&
-        number_covered()<size());
-}
 
 /*******************************************************************\
 
@@ -258,6 +97,8 @@ void bmct::cover_assertions(const goto_functionst &goto_functions)
     literalt condition=prop_conv.prop.lor(it->second);
     cover_goals.add(condition, it->first->location.as_string());
   }
+
+  status("Total number of coverage goals: "+i2string(cover_goals.size()));
 
   cover_goals();
 
