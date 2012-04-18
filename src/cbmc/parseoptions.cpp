@@ -805,7 +805,7 @@ void cbmc_parseoptionst::help()
     " --signed-overflow-check      enable arithmetic over- and underflow checks\n"
     " --unsigned-overflow-check    enable arithmetic over- and underflow checks\n"
     " --nan-check                  check floating-point for NaN\n"
-    " --all-claims                 keep all claims\n"
+    " --all-claims                 report status of all claims\n"
     " --show-claims                only show claims\n"
     " --show-loops                 show the loops in the program\n"
     " --no-assertions              ignore user assertions\n"
