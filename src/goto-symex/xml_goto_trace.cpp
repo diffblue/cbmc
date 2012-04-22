@@ -54,6 +54,8 @@ void convert(
     {
       xml_location.new_element("file").data=id2string(location.get_file());
       xml_location.new_element("line").data=id2string(location.get_line());
+      xml_location.set_attribute("file", id2string(location.get_file()));
+      xml_location.set_attribute("line", id2string(location.get_line()));
       xml_location.name="location";
     }
     
