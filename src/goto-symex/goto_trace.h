@@ -33,16 +33,19 @@ class goto_trace_stept
 public:
   unsigned step_nr;
   
-  bool is_assignment() const { return type==ASSIGNMENT; }
-  bool is_assume() const     { return type==ASSUME; }
-  bool is_assert() const     { return type==ASSERT; }
-  bool is_location() const   { return type==LOCATION; }
-  bool is_output() const     { return type==OUTPUT; }
-  bool is_input() const      { return type==INPUT; }
-  bool is_decl() const       { return type==DECL; }
+  bool is_assignment() const      { return type==ASSIGNMENT; }
+  bool is_assume() const          { return type==ASSUME; }
+  bool is_assert() const          { return type==ASSERT; }
+  bool is_function_call() const   { return type==FUNCTION_CALL; }
+  bool is_function_return() const { return type==FUNCTION_RETURN; }
+  bool is_location() const        { return type==LOCATION; }
+  bool is_output() const          { return type==OUTPUT; }
+  bool is_input() const           { return type==INPUT; }
+  bool is_decl() const            { return type==DECL; }
 
   typedef enum { NONE, ASSIGNMENT, ASSUME, ASSERT,
-                 LOCATION, INPUT, OUTPUT, DECL } typet;
+                 LOCATION, INPUT, OUTPUT, DECL,
+                 FUNCTION_CALL, FUNCTION_RETURN } typet;
   typet type;
     
   goto_programt::const_targett pc;

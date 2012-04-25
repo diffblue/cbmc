@@ -121,6 +121,54 @@ void symex_target_equationt::location(
 
 /*******************************************************************\
 
+Function: symex_target_equationt::function_call
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: just record a location
+
+\*******************************************************************/
+
+void symex_target_equationt::function_call(
+  const guardt &guard,
+  const sourcet &source)
+{
+  SSA_steps.push_back(SSA_stept());
+  SSA_stept &SSA_step=SSA_steps.back();
+  
+  SSA_step.guard_expr=guard.as_expr();
+  SSA_step.type=goto_trace_stept::FUNCTION_CALL;
+  SSA_step.source=source;
+}
+
+/*******************************************************************\
+
+Function: symex_target_equationt::function_return
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: just record a location
+
+\*******************************************************************/
+
+void symex_target_equationt::function_return(
+  const guardt &guard,
+  const sourcet &source)
+{
+  SSA_steps.push_back(SSA_stept());
+  SSA_stept &SSA_step=SSA_steps.back();
+  
+  SSA_step.guard_expr=guard.as_expr();
+  SSA_step.type=goto_trace_stept::FUNCTION_RETURN;
+  SSA_step.source=source;
+}
+
+/*******************************************************************\
+
 Function: symex_target_equationt::output
 
   Inputs:

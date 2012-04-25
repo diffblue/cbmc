@@ -44,6 +44,16 @@ public:
     const symbol_exprt &original_lhs_object,
     const sourcet &source);
 
+  // record a function call
+  virtual void function_call(
+    const guardt &guard,
+    const sourcet &source);
+
+  // record return from a function
+  virtual void function_return(
+    const guardt &guard,
+    const sourcet &source);
+
   // just record a location
   virtual void location(
     const guardt &guard,
@@ -101,12 +111,14 @@ public:
     sourcet source;
     goto_trace_stept::typet type;
     
-    bool is_assert() const     { return type==goto_trace_stept::ASSERT; }
-    bool is_assume() const     { return type==goto_trace_stept::ASSUME; }
-    bool is_assignment() const { return type==goto_trace_stept::ASSIGNMENT; }
-    bool is_location() const   { return type==goto_trace_stept::LOCATION; }
-    bool is_output() const     { return type==goto_trace_stept::OUTPUT; }
-    bool is_decl() const       { return type==goto_trace_stept::DECL; }
+    bool is_assert() const          { return type==goto_trace_stept::ASSERT; }
+    bool is_assume() const          { return type==goto_trace_stept::ASSUME; }
+    bool is_assignment() const      { return type==goto_trace_stept::ASSIGNMENT; }
+    bool is_location() const        { return type==goto_trace_stept::LOCATION; }
+    bool is_output() const          { return type==goto_trace_stept::OUTPUT; }
+    bool is_decl() const            { return type==goto_trace_stept::DECL; }
+    bool is_function_call() const   { return type==goto_trace_stept::FUNCTION_CALL; }
+    bool is_function_return() const { return type==goto_trace_stept::FUNCTION_RETURN; }
     
     exprt guard_expr;
     literalt guard_literal;
