@@ -56,6 +56,16 @@ public:
     const symbol_exprt &original_lhs_object,
     const sourcet &source)=0;
 
+  // record a function call
+  virtual void function_call(
+    const guardt &guard,
+    const sourcet &source)=0;
+
+  // record return from a function
+  virtual void function_return(
+    const guardt &guard,
+    const sourcet &source)=0;
+
   // just record a location
   virtual void location(
     const guardt &guard,
