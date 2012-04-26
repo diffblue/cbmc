@@ -97,6 +97,27 @@ void symex_target_equationt::decl(
 
 /*******************************************************************\
 
+Function: symex_target_equationt::dead
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: declare a fresh variable
+
+\*******************************************************************/
+
+void symex_target_equationt::dead(
+  const guardt &guard,
+  const symbol_exprt &ssa_lhs,
+  const symbol_exprt &original_lhs_object,
+  const sourcet &source)
+{
+  // we currently don't record these
+}
+
+/*******************************************************************\
+
 Function: symex_target_equationt::location
 
   Inputs:
