@@ -44,6 +44,13 @@ public:
     const symbol_exprt &original_lhs_object,
     const sourcet &source);
 
+  // note the death of a variable - lhs must be symbol
+  virtual void dead(
+    const guardt &guard,
+    const symbol_exprt &ssa_lhs,
+    const symbol_exprt &original_lhs_object,
+    const sourcet &source);
+
   // record a function call
   virtual void function_call(
     const guardt &guard,
