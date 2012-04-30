@@ -148,6 +148,7 @@ components
 bv
 f
 ports
+port
 offset
 with
 trans
@@ -542,3 +543,5 @@ exception_list
 exception_id
 priority
 predicate_passive_symbol
+all
+when
