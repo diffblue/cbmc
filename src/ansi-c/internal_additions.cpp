@@ -150,6 +150,7 @@ Function: architecture_strings
 
 void ansi_c_architecture_strings(std::string &code)
 {
+  code+=architecture_string(config.ansi_c.bool_width, "bool_width");
   code+=architecture_string(config.ansi_c.int_width, "int_width");
   code+=architecture_string(config.ansi_c.long_int_width, "long_int_width");
   code+=architecture_string(config.ansi_c.char_width, "char_width");
