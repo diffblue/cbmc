@@ -27,6 +27,7 @@ public:
     // for ANSI-C
     unsigned int_width;
     unsigned long_int_width;
+    unsigned bool_width;
     unsigned char_width;
     unsigned short_int_width;
     unsigned long_long_int_width;
