@@ -19,6 +19,7 @@ typet long_int_type();
 typet long_long_int_type();
 typet long_uint_type();
 typet long_long_uint_type();
+typet c_bool_type();
 typet char_type();
 typet uchar_type();
 typet wchar_t_type();
