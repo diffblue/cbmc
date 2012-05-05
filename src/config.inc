@@ -11,3 +11,6 @@ BUILD_ENV = AUTO
 MINISAT2 = ../../../../minisat-2.2.0
 #SMVSAT =
 
+# Signing identity for MacOS Gatekeeper
+
+OSX_IDENTITY="3rd Party Mac Developer Application: Daniel Kroening"
