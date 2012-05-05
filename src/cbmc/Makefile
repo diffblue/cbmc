@@ -56,3 +56,6 @@ endif
 cbmc$(EXEEXT): $(OBJ)
 	$(LINKBIN)
 
+cbmc-mac-signed: cbmc$(EXEEXT)
+	codesign -v -s $(OSX_IDENTITY) cbmc$(EXEEXT)
+
