@@ -413,6 +413,11 @@ void c_typecheck_baset::do_initializer(symbolt &symbol)
         do_initializer(symbol.value, symbol.type, true);
         make_constant(symbol.value);
       }
+      else
+      {
+        if(symbol.value.is_not_nil())
+          typecheck_expr(symbol.value);
+      }
     }
     else if(symbol.value.is_not_nil())
     {
