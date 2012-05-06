@@ -80,6 +80,7 @@ Function: configt::ansi_ct::set_LP64
 
 void configt::ansi_ct::set_LP64()
 {
+  bool_width=1*8;
   int_width=4*8;
   long_int_width=8*8;
   char_width=1*8;
@@ -113,6 +114,7 @@ Function: configt::ansi_ct::set_ILP64
 
 void configt::ansi_ct::set_ILP64()
 {
+  bool_width=1*8;
   int_width=8*8;
   long_int_width=8*8;
   char_width=1*8;
@@ -142,6 +144,7 @@ Function: configt::ansi_ct::set_LLP64
 
 void configt::ansi_ct::set_LLP64()
 {
+  bool_width=1*8;
   int_width=4*8;
   long_int_width=4*8;
   char_width=1*8;
@@ -171,6 +174,7 @@ Function: configt::ansi_ct::set_ILP32
 
 void configt::ansi_ct::set_ILP32()
 {
+  bool_width=1*8;
   int_width=4*8;
   long_int_width=4*8;
   char_width=1*8;
@@ -200,6 +204,7 @@ Function: configt::ansi_ct::set_LP32
 
 void configt::ansi_ct::set_LP32()
 {
+  bool_width=1*8;
   int_width=2*8;
   long_int_width=4*8;
   char_width=1*8;
@@ -462,6 +467,7 @@ void configt::ansi_ct::set_from_context(const contextt &context)
 {
   namespacet ns(context);
 
+  bool_width=1*8;
   int_width=from_ns(ns, "int_width");
   long_int_width=from_ns(ns, "long_int_width");
   long_int_width=from_ns(ns, "long_int_width");
