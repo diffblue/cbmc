@@ -113,13 +113,13 @@ exprt convert_integer_literal(
     is_signed=false;
     cpp_type=ID_unsigned_int;
   }
-  else if(FITS(config.ansi_c.long_int_width, true) && long_cnt==1) // long int
+  else if(FITS(config.ansi_c.long_int_width, true) && long_cnt!=2) // long int
   {
     width=config.ansi_c.long_int_width;
     is_signed=true;
     cpp_type=ID_signed_long_int;
   }
-  else if(FITS(config.ansi_c.long_int_width, false) && long_cnt==1) // unsigned long int
+  else if(FITS(config.ansi_c.long_int_width, false) && long_cnt!=2) // unsigned long int
   {
     width=config.ansi_c.long_int_width;
     is_signed=false;

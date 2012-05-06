@@ -140,6 +140,7 @@ bool check_c_implicit_typecast(
   if(src_type_id==ID_natural)
   {
     if(dest_type.id()==ID_bool) return false;
+    if(dest_type.id()==ID_c_bool) return false;
     if(dest_type.id()==ID_integer) return false;
     if(dest_type.id()==ID_real) return false;
     if(dest_type.id()==ID_complex) return false;
@@ -150,6 +151,7 @@ bool check_c_implicit_typecast(
   else if(src_type_id==ID_integer)
   {
     if(dest_type.id()==ID_bool) return false;
+    if(dest_type.id()==ID_c_bool) return false;
     if(dest_type.id()==ID_real) return false;
     if(dest_type.id()==ID_complex) return false;
     if(dest_type.id()==ID_unsignedbv) return false;
@@ -161,6 +163,7 @@ bool check_c_implicit_typecast(
   else if(src_type_id==ID_real)
   {
     if(dest_type.id()==ID_bool) return false;
+    if(dest_type.id()==ID_c_bool) return false;
     if(dest_type.id()==ID_complex) return false;
     if(dest_type.id()==ID_floatbv) return false;
     if(dest_type.id()==ID_fixedbv) return false;
@@ -168,11 +171,13 @@ bool check_c_implicit_typecast(
   else if(src_type_id==ID_rational)
   {
     if(dest_type.id()==ID_bool) return false;
+    if(dest_type.id()==ID_c_bool) return false;
     if(dest_type.id()==ID_complex) return false;
     if(dest_type.id()==ID_floatbv) return false;
     if(dest_type.id()==ID_fixedbv) return false;
   }
-  else if(src_type_id==ID_bool)
+  else if(src_type_id==ID_bool ||
+          src_type_id==ID_c_bool)
   {
     if(dest_type.id()==ID_integer) return false;
     if(dest_type.id()==ID_real) return false;
@@ -190,6 +195,7 @@ bool check_c_implicit_typecast(
   {
     if(dest_type.id()==ID_unsignedbv) return false;
     if(dest_type.id()==ID_bool) return false;
+    if(dest_type.id()==ID_c_bool) return false;
     if(dest_type.id()==ID_integer) return false;
     if(dest_type.id()==ID_real) return false;
     if(dest_type.id()==ID_rational) return false;
@@ -204,6 +210,7 @@ bool check_c_implicit_typecast(
           src_type_id==ID_fixedbv)
   {
     if(dest_type.id()==ID_bool) return false;
+    if(dest_type.id()==ID_c_bool) return false;
     if(dest_type.id()==ID_integer) return false;
     if(dest_type.id()==ID_real) return false;
     if(dest_type.id()==ID_rational) return false;
@@ -231,6 +238,7 @@ bool check_c_implicit_typecast(
        src_type.subtype()==dest_type.subtype()) return false;
 
     if(dest_type.id()==ID_bool) return false;
+    if(dest_type.id()==ID_c_bool) return false;
     if(dest_type.id()==ID_unsignedbv) return false;
     if(dest_type.id()==ID_signedbv) return false;
   }
@@ -335,7 +343,8 @@ c_typecastt::c_typet c_typecastt::get_c_type(
     else
       return LARGE_UNSIGNED_INT;
   }
-  else if(type.id()==ID_bool)
+  else if(type.id()==ID_bool ||
+          type.id()==ID_c_bool)
     return BOOL;
   else if(type.id()==ID_floatbv ||
           type.id()==ID_fixedbv)
