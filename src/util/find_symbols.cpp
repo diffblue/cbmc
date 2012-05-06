@@ -198,11 +198,17 @@ void find_symbols(kindt kind, const typet &src, find_symbols_sett &dest)
     const code_typet &code_type=to_code_type(src);
     find_symbols(kind, code_type.return_type(), dest);
     const code_typet::argumentst &arguments=code_type.arguments();
+
     for(code_typet::argumentst::const_iterator
         it=arguments.begin();
         it!=arguments.end();
         it++)
+    {
       find_symbols(kind, *it, dest);
+      irep_idt identifier=it->get_identifier();
+      if(identifier!=irep_idt() && (kind==F_TYPE || kind==F_BOTH))
+        dest.insert(identifier);
+    }
   }
   else if(src.id()==ID_symbol)
     dest.insert(src.get(ID_identifier));
