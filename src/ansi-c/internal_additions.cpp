@@ -120,10 +120,12 @@ void ansi_c_internal_additions(std::string &code)
     "void __CPROVER_parameter_predicates();\n"
     "void __CPROVER_return_predicates();\n"
 
-    // GCC junk stuff
-    GCC_BUILTIN_HEADERS
-
     "\n";
+    
+  // GCC junk stuff, also for ARM
+  if(config.ansi_c.mode==configt::ansi_ct::MODE_GCC ||
+     config.ansi_c.mode==configt::ansi_ct::MODE_ARM)
+    code+=GCC_BUILTIN_HEADERS;
 
   if(config.ansi_c.os==configt::ansi_ct::OS_WIN)
     code+="int __noop();\n"; // this is Visual C/C++
