@@ -14,7 +14,8 @@ SRC = c_typecast.cpp y.tab.cpp lex.yy.cpp ansi_c_parser.cpp \
       literals/convert_float_literal.cpp \
       literals/convert_character_literal.cpp \
       literals/convert_integer_literal.cpp \
-      literals/convert_string_literal.cpp
+      literals/convert_string_literal.cpp \
+      remove_internal_symbols.cpp
 
 INCLUDES= -I .. -I ../util
 
