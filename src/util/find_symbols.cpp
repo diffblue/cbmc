@@ -205,9 +205,10 @@ void find_symbols(kindt kind, const typet &src, find_symbols_sett &dest)
         it++)
     {
       find_symbols(kind, *it, dest);
-      irep_idt identifier=it->get_identifier();
-      if(identifier!=irep_idt() && (kind==F_TYPE || kind==F_BOTH))
-        dest.insert(identifier);
+      
+      //irep_idt identifier=it->get_identifier();
+      //if(identifier!=irep_idt() && (kind==F_TYPE || kind==F_BOTH))
+      //  dest.insert(identifier);
     }
   }
   else if(src.id()==ID_symbol)
