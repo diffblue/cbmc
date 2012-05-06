@@ -207,7 +207,8 @@ bool c_main(
     contextt::symbolst::iterator init_it=
       context.symbols.find("c::__CPROVER_initialize");
 
-    assert(init_it!=context.symbols.end());
+    if(init_it==context.symbols.end())
+      throw "failed to find __CPROVER_initialize symbol";
   
     code_function_callt call_init;
     call_init.lhs().make_nil();
