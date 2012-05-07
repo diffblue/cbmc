@@ -805,7 +805,7 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
       str << "type cast to struct requires initializer_list argument";
       throw 0;
     }
-  
+    
     // just do a normal initialization    
     do_initializer(op, expr_type, false);
   
@@ -899,12 +899,31 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
   
   if(expr_type.id()==ID_vector)
   {
+    const vector_typet &vector_type=to_vector_type(expr_type);
+  
     // we are generous -- any vector to vector is fine
     if(op_type.id()==ID_vector)
       return;
     else if(op_type.id()==ID_signedbv ||
             op_type.id()==ID_unsignedbv)
       return;
+    else if(op.id()==ID_initializer_list)
+    {
+      // This is a GCC extension -- an initializer list
+      // can be converted into a vector, to form a vector
+      // constructor. We build a temporary array type
+      // for this.
+
+      array_typet array_type;
+      array_type.subtype()=vector_type.subtype();
+      array_type.size()=vector_type.size();
+      
+      do_initializer(op, array_type, false);
+      
+      // We just use the resulting array constructor
+      // expression with the type cast.
+      return;
+    }
   }
 
   if(!is_number(expr_type) &&
