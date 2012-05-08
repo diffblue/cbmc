@@ -1652,7 +1652,7 @@ std::string expr2ct::convert_constant(
   }
   else if(type.id()==ID_floatbv)
   {
-    dest=ieee_floatt(src).to_ansi_c_string();
+    dest=ieee_floatt(to_constant_expr(src)).to_ansi_c_string();
 
     if(dest!="" && isdigit(dest[dest.size()-1]))
     {
