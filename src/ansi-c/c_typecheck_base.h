@@ -190,6 +190,7 @@ protected:
   // expressions
   virtual void typecheck_expr_builtin_va_arg(exprt &expr);
   virtual void typecheck_expr_builtin_offsetof(exprt &expr);
+  virtual void typecheck_expr_cw_va_arg_typeof(exprt &expr);
   virtual void typecheck_expr_main(exprt &expr);
   virtual void typecheck_expr_operands(exprt &expr);
   virtual void typecheck_expr_comma(exprt &expr);

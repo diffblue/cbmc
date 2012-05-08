@@ -121,7 +121,6 @@ extern char *yyansi_ctext;
 %token TOK_GCC_ATTRIBUTE_END ")"
 %token TOK_GCC_LABEL   "__label__"
 %token TOK_MSC_ASM     "__asm"
-%token TOK_CW_VA_ARG   "__va_arg"
 %token TOK_CW_VAR_ARG_TYPEOF "_var_arg_typeof"
 %token TOK_BUILTIN_VA_ARG "__builtin_va_arg"
 %token TOK_GCC_BUILTIN_TYPES_COMPATIBLE_P "__builtin_types_compatible_p"
@@ -312,13 +311,11 @@ gcc_builtin_expressions:
         ;
 
 cw_builtin_expressions:
-          TOK_CW_VA_ARG '(' assignment_expression ','
-            TOK_CW_VAR_ARG_TYPEOF '(' type_name ')' ')'
+          TOK_CW_VAR_ARG_TYPEOF '(' type_name ')'
         {
           $$=$1;
-          stack($$).id(ID_gcc_builtin_va_arg);
-          mto($$, $3);
-          stack($$).type().swap(stack($7));
+          stack($$).id(ID_cw_va_arg_typeof);
+          stack($$).add(ID_type_arg).swap(stack($3));
         }
         ;
 

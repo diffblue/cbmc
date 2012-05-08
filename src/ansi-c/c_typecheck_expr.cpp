@@ -131,6 +131,8 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
   }
   else if(expr.id()==ID_gcc_builtin_va_arg)
     typecheck_expr_builtin_va_arg(expr);
+  else if(expr.id()==ID_cw_va_arg_typeof)
+    typecheck_expr_cw_va_arg_typeof(expr);
   else if(expr.id()==ID_gcc_builtin_types_compatible_p)
   {
     expr.type()=bool_typet();
@@ -266,6 +268,35 @@ void c_typecheck_baset::typecheck_expr_builtin_va_arg(exprt &expr)
   symbol.type=new_type;
   
   context.move(symbol);
+}
+
+/*******************************************************************\
+
+Function: c_typecheck_baset::typecheck_expr_cw_va_arg_typeof
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void c_typecheck_baset::typecheck_expr_cw_va_arg_typeof(exprt &expr)
+{
+  // used in Code Warrior via
+  //
+  // __va_arg( <Symbol>, _var_arg_typeof( <Typ> ) )
+  //
+  // where __va_arg is declared as
+  //
+  // extern void* __va_arg(void*, int);
+
+  typet &type=static_cast<typet &>(expr.add(ID_type_arg));
+  typecheck_type(type);
+
+  // these return an integer
+  expr.type()=int_type();
 }
 
 /*******************************************************************\
