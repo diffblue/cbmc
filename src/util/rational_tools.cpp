@@ -110,7 +110,7 @@ Function: from_rational
 
 \*******************************************************************/
 
-exprt from_rational(const rationalt &a)
+constant_exprt from_rational(const rationalt &a)
 {
   std::string d=integer2string(a.numerator);
   if(a.denominator!=1) d+="/"+integer2string(a.denominator);

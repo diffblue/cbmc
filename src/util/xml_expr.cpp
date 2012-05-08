@@ -54,7 +54,7 @@ xmlt convert(
     {
       result.name="fixed";
       result.set_attribute("binary", expr.get_string(ID_value));
-      result.data=fixedbvt(expr).to_ansi_c_string();
+      result.data=fixedbvt(to_constant_expr(expr)).to_ansi_c_string();
     }
     else if(type.id()==ID_floatbv)
     {

@@ -335,14 +335,14 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
          expr_type_id==ID_signedbv)
       {
         // cast from float to int
-        fixedbvt f(expr.op0());
+        fixedbvt f(to_constant_expr(expr.op0()));
         expr=from_integer(f.to_integer(), expr_type);
         return false;
       }
       else if(expr_type_id==ID_fixedbv)
       {
         // float to double or double to float
-        fixedbvt f(expr.op0());
+        fixedbvt f(to_constant_expr(expr.op0()));
         f.round(to_fixedbv_type(expr_type));
         expr=f.to_expr();
         return false;
@@ -1053,8 +1053,8 @@ bool simplify_exprt::simplify_division(exprt &expr)
     if(expr.op0().is_constant() &&
        expr.op1().is_constant())
     {
-      fixedbvt f0(expr.op0());
-      fixedbvt f1(expr.op1());
+      fixedbvt f0(to_constant_expr(expr.op0()));
+      fixedbvt f1(to_constant_expr(expr.op1()));
       if(!f1.is_zero())
       {
         f0/=f1;
@@ -2628,8 +2628,8 @@ bool simplify_exprt::simplify_inequality(exprt &expr)
     }
     else if(tmp0.type().id()==ID_fixedbv)
     {
-      fixedbvt f0(tmp0);
-      fixedbvt f1(tmp1);
+      fixedbvt f0(to_constant_expr(tmp0));
+      fixedbvt f1(to_constant_expr(tmp1));
 
       if(expr.id()==ID_notequal)
         expr.make_bool(f0!=f1);
@@ -4048,7 +4048,7 @@ bool simplify_exprt::simplify_unary_minus(exprt &expr)
     }
     else if(type_id==ID_fixedbv)
     {
-      fixedbvt f(expr.op0());
+      fixedbvt f(to_constant_expr(expr.op0()));
       f.negate();
       expr=f.to_expr();
       return false;
