@@ -365,6 +365,18 @@ void ansi_c_scanner_init()
 /*       because it is a 'typedef' in some standard header files   */
 %}
 
+"__va_arg"	{ if(PARSER.mode==ansi_c_parsert::CW)
+                    { loc(); return TOK_CW_VA_ARG; }
+                  else
+                    return make_identifier();
+                }
+
+"_var_arg_typeof" { if(PARSER.mode==ansi_c_parsert::CW)
+                    { loc(); return TOK_CW_VAR_ARG_TYPEOF; }
+                  else
+                    return make_identifier();
+                }
+
 "__builtin_va_arg" { if(PARSER.mode==ansi_c_parsert::GCC ||
                         PARSER.mode==ansi_c_parsert::ARM)
                     { loc(); return TOK_BUILTIN_VA_ARG; }
