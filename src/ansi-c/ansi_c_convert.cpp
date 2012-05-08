@@ -149,6 +149,11 @@ void ansi_c_convertt::convert_expr(exprt &expr)
     exprt &designator=static_cast<exprt &>(expr.add(ID_designator));
     convert_expr(designator);
   }
+  else if(expr.id()==ID_cw_va_arg_typeof)
+  {
+    typet &type=static_cast<typet &>(expr.add(ID_type_arg));
+    convert_type(type);
+  }
   else if(expr.id()==ID_typecast)
   {
     convert_type(expr.type());
