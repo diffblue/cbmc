@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "rational.h"
 #include "rational_tools.h"
 #include "arith_tools.h"
+#include "std_expr.h"
 
 /*******************************************************************\
 
@@ -387,7 +388,7 @@ void exprt::negate()
       }
       else if(type_id==ID_floatbv)
       {
-        ieee_floatt ieee_float_value=ieee_floatt(*this);
+        ieee_floatt ieee_float_value=ieee_floatt(to_constant_expr(*this));
         ieee_float_value.negate();
         *this=ieee_float_value.to_expr();
       }
@@ -474,7 +475,7 @@ bool exprt::is_zero() const
     }
     else if(type_id==ID_floatbv)
     {
-      if(ieee_floatt(*this)==0) return true;
+      if(ieee_floatt(to_constant_expr(*this))==0) return true;
     }
     else if(type_id==ID_pointer)
     {
@@ -529,7 +530,7 @@ bool exprt::is_one() const
     }
     else if(type_id==ID_floatbv)
     {
-      if(ieee_floatt(*this)==1)
+      if(ieee_floatt(to_constant_expr(*this))==1)
         return true;
     }
   }
@@ -591,8 +592,8 @@ bool exprt::sum(const exprt &expr)
   }
   else if(type_id==ID_floatbv)
   {
-    ieee_floatt f(*this);
-    f+=ieee_floatt(expr);
+    ieee_floatt f(to_constant_expr(*this));
+    f+=ieee_floatt(to_constant_expr(expr));
     *this=f.to_expr();
     return false;
   }
@@ -654,8 +655,8 @@ bool exprt::mul(const exprt &expr)
   }
   else if(type_id==ID_floatbv)
   {
-    ieee_floatt f(*this);
-    f*=ieee_floatt(expr);
+    ieee_floatt f(to_constant_expr(*this));
+    f*=ieee_floatt(to_constant_expr(expr));
     *this=f.to_expr();
     return false;
   }
