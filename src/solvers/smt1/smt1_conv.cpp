@@ -1492,10 +1492,10 @@ void smt1_convt::convert_typecast(const typecast_exprt &expr, bool bool_as_bv)
 
       if(expr_type.id()==ID_fixedbv)
       {
-        fixedbvt fbt(expr);
-        smt1_prop.out << " (concat bv1[" << fbt.spec.integer_bits << "] " <<
-                         "bv0[" << fbt.spec.get_fraction_bits() << "]) " <<
-                         "bv0[" << fbt.spec.width << "]";
+        fixedbv_spect spec(to_fixedbv_type(expr.type()));
+        smt1_prop.out << " (concat bv1[" << spec.integer_bits << "] " <<
+                         "bv0[" << spec.get_fraction_bits() << "]) " <<
+                         "bv0[" << spec.width << "]";
       }
       else
       {
@@ -2250,10 +2250,10 @@ void smt1_convt::convert_div(const div_exprt &expr)
   }
   else if(expr.type().id()==ID_fixedbv)
   {
-    fixedbvt fbt(expr);
-    unsigned fraction_bits=fbt.spec.get_fraction_bits();
+    fixedbv_spect spec(to_fixedbv_type(expr.type()));
+    unsigned fraction_bits=spec.get_fraction_bits();
 
-    smt1_prop.out << "(extract[" << fbt.spec.width-1 << ":0] ";
+    smt1_prop.out << "(extract[" << spec.width-1 << ":0] ";
     smt1_prop.out << "(bvsdiv ";
 
     smt1_prop.out << "(concat ";
@@ -2313,10 +2313,10 @@ void smt1_convt::convert_mult(const mult_exprt &expr)
   }
   else if(expr.type().id()==ID_fixedbv)
   {
-    fixedbvt fbt(expr);
-    unsigned fraction_bits=fbt.spec.get_fraction_bits();
+    fixedbv_spect spec(to_fixedbv_type(expr.type()));
+    unsigned fraction_bits=spec.get_fraction_bits();
 
-    smt1_prop.out << "(extract[" << fbt.spec.width+fraction_bits-1 << ":"
+    smt1_prop.out << "(extract[" << spec.width+fraction_bits-1 << ":"
                                  << fraction_bits << "] ";
 
     smt1_prop.out << "(bvmul ";
