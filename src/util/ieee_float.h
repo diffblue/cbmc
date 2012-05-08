@@ -14,7 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <mp_arith.h>
 #include <format_spec.h>
 
-class exprt;
+class constant_exprt;
 class floatbv_typet;
 
 class ieee_float_spect
@@ -61,8 +61,15 @@ public:
   inline static ieee_float_spect double_precision()
   {
     return ieee_float_spect(52, 11);
+  }  
+  
+  inline friend bool operator == (const ieee_float_spect &a, const ieee_float_spect &b)
+  {
+    return a.f==b.f && a.e==b.e;
   }
 };
+
+bool operator == (const ieee_float_spect &a, const ieee_float_spect &b);
 
 class ieee_floatt
 {
@@ -78,21 +85,21 @@ public:
 
   ieee_float_spect spec;
   
-  ieee_floatt(const ieee_float_spect &_spec):
+  explicit ieee_floatt(const ieee_float_spect &_spec):
     rounding_mode(ROUND_TO_EVEN),
-    spec(_spec), sign(false), exponent(0), fraction(0),
-    NaN(false), infinity(false)
+    spec(_spec), sign_flag(false), exponent(0), fraction(0),
+    NaN_flag(false), infinity_flag(false)
   {
   }
   
   ieee_floatt():
     rounding_mode(ROUND_TO_EVEN),
-    sign(false), exponent(0), fraction(0),
-    NaN(false), infinity(false)
+    sign_flag(false), exponent(0), fraction(0),
+    NaN_flag(false), infinity_flag(false)
   {
   }
   
-  ieee_floatt(const exprt &expr):
+  explicit ieee_floatt(const constant_exprt &expr):
     rounding_mode(ROUND_TO_EVEN)
   {
     from_expr(expr);
@@ -100,19 +107,19 @@ public:
   
   void negate()
   {
-    sign=!sign;
+    sign_flag=!sign_flag;
   }
 
   void set_sign(bool _sign)
-  { sign = _sign; }
+  { sign_flag = _sign; }
 
   void make_zero()
   {
-    sign=false;
+    sign_flag=false;
     exponent=0;
     fraction=0;
-    NaN=false;
-    infinity = false;
+    NaN_flag=false;
+    infinity_flag=false;
   }
   
   void make_NaN();
@@ -120,6 +127,21 @@ public:
   void make_minus_infinity();
   void make_fltmax();
   void make_fltmin();
+  
+  static ieee_floatt NaN(const ieee_float_spect &_spec)
+  { ieee_floatt c(_spec); c.make_NaN(); return c; }
+
+  static ieee_floatt plus_infinity(const ieee_float_spect &_spec)
+  { ieee_floatt c(_spec); c.make_plus_infinity(); return c; }
+
+  static ieee_floatt minus_infinity(const ieee_float_spect &_spec)
+  { ieee_floatt c(_spec); c.make_minus_infinity(); return c; }
+
+  static ieee_floatt fltmax(const ieee_float_spect &_spec)
+  { ieee_floatt c(_spec); c.make_fltmax(); return c; }
+
+  static ieee_floatt fltmin(const ieee_float_spect &_spec)
+  { ieee_floatt c(_spec); c.make_fltmin(); return c; }
 
   // set to next representable number towards plus or minus infinity
   void increment(bool distinguish_zero=false)
@@ -138,10 +160,10 @@ public:
       next_representable(false);
   }
 
-  bool is_zero() const { return !NaN && !infinity && fraction==0 && exponent==0; }
-  bool get_sign() const { return sign; }
-  bool is_NaN() const { return NaN; }
-  bool is_infinity() const { return !NaN && infinity; }
+  bool is_zero() const { return !NaN_flag && !infinity_flag && fraction==0 && exponent==0; }
+  bool get_sign() const { return sign_flag; }
+  bool is_NaN() const { return NaN_flag; }
+  bool is_infinity() const { return !NaN_flag && infinity_flag; }
 
   const mp_integer &get_exponent() const { return exponent; }
   const mp_integer &get_fraction() const { return fraction; }
@@ -183,8 +205,8 @@ public:
   }
 
   // expressions
-  exprt to_expr() const;
-  void from_expr(const exprt &expr);
+  constant_exprt to_expr() const;
+  void from_expr(const constant_exprt &expr);
 
   // the usual opertors  
   ieee_floatt &operator /= (const ieee_floatt &other);
@@ -213,10 +235,10 @@ protected:
   void next_representable(bool greater);
 
   // we store the number unpacked
-  bool sign;
+  bool sign_flag;
   mp_integer exponent; // this is unbiased
   mp_integer fraction; // this _does_ include the hidden bit
-  bool NaN, infinity;
+  bool NaN_flag, infinity_flag;
 };
 
 bool operator < (const ieee_floatt &a, const ieee_floatt &b);
