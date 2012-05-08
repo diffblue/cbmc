@@ -10,6 +10,18 @@ inline long double fabsl(long double d) { return __CPROVER_fabsl(d); }
 
 inline float fabsf(float f) { return __CPROVER_fabsf(f); }
 
+/* FUNCTION: __builtin_fabs */
+
+inline double __builtin_fabs(double d) { return __CPROVER_fabs(d); }
+
+/* FUNCTION: __builtin_fabsl */
+
+inline long double __builtin_fabsl(long double d) { return __CPROVER_fabsl(d); }
+
+/* FUNCTION: __builtin_fabsf */
+
+inline float __builtin_fabsf(float f) { return __CPROVER_fabsf(f); }
+
 /* FUNCTION: isfinite */
 
 int isfinite(double d) { return __CPROVER_isfinite(d); }
@@ -25,6 +37,14 @@ inline int isnan(double d) { return __CPROVER_isnan(d); }
 /* FUNCTION: isnormal */
 
 int isnormal(double d) { return __CPROVER_isnormal(d); }
+
+/* FUNCTION: __builtin_inff */
+
+float __builtin_inff(void) { return __CPROVER_inff(); }
+
+/* FUNCTION: __builtin_inf */
+
+double __builtin_inf(void) { return __CPROVER_inf(); }
 
 /* FUNCTION: signbit */
 

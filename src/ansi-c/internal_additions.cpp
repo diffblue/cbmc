@@ -97,6 +97,8 @@ void ansi_c_internal_additions(std::string &code)
     "_Bool __CPROVER_isinf(double f);\n"
     "_Bool __CPROVER_isnormal(double f);\n"
     "_Bool __CPROVER_sign(double f);\n"
+    "double __CPROVER_inf(void);\n"
+    "float __CPROVER_inff(void);\n"
     "extern int __CPROVER_rounding_mode;\n"
 
     // absolute value

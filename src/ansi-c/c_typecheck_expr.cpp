@@ -2004,6 +2004,20 @@ void c_typecheck_baset::do_special_functions(
       isfinite_expr.location()=location;
       expr.swap(isfinite_expr);
     }
+    else if(identifier==CPROVER_PREFIX "inf")
+    {
+      constant_exprt inf_expr=
+        ieee_floatt::plus_infinity(ieee_float_spect::double_precision()).to_expr();
+      inf_expr.location()=location;
+      expr.swap(inf_expr);
+    }
+    else if(identifier==CPROVER_PREFIX "inff")
+    {
+      constant_exprt inff_expr=
+        ieee_floatt::plus_infinity(ieee_float_spect::single_precision()).to_expr();
+      inff_expr.location()=location;
+      expr.swap(inff_expr);
+    }
     else if(identifier==CPROVER_PREFIX "abs" ||
             identifier==CPROVER_PREFIX "labs" ||
             identifier==CPROVER_PREFIX "fabs" ||

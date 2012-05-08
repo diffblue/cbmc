@@ -8,9 +8,9 @@
   "int __builtin_abs(int);\n" \
   "long int __builtin_labs(long);\n" \
   "double __builtin_cos(double);\n" \
-  "double __builtin_cosf(double);\n" \
+  "float __builtin_cosf(float);\n" \
   "double __builtin_fabs(double);\n" \
-  "double __builtin_fabsf(double);\n" \
+  "float __builtin_fabsf(float);\n" \
   "int __builtin_memcmp(const void *s1, const void *s2, unsigned n);\n" \
   "void *__builtin_memcpy(void *dest, const void *src, unsigned n);\n" \
   "void *__builtin___memcpy_chk(void *dest, const void *src, unsigned n, __CPROVER_size_t size);\n" \
