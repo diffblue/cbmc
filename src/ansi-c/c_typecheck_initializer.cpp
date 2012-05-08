@@ -115,6 +115,34 @@ exprt c_typecheck_baset::zero_initializer(
       return value;
     }
   }
+  else if(type_id==ID_vector)
+  {
+    const vector_typet &vector_type=to_vector_type(type);
+    
+    exprt tmpval=zero_initializer(vector_type.subtype(), location);
+
+    mp_integer vector_size;
+
+    if(to_integer(vector_type.size(), vector_size))
+    {
+      err_location(location);
+      str << "failed to zero-initialize vector of non-fixed size `"
+          << to_string(vector_type.size()) << "'";
+      throw 0;
+    }
+      
+    if(vector_size<0)
+    {
+      err_location(location);
+      throw "failed to zero-initialize vector of with negative size";
+    }
+
+    vector_exprt value(vector_type);
+    value.operands().resize(integer2long(vector_size), tmpval);
+    value.location()=location;
+
+    return value;
+  }
   else if(type_id==ID_struct)
   {
     const struct_typet::componentst &components=
@@ -424,7 +452,7 @@ void c_typecheck_baset::do_initializer(symbolt &symbol)
       typecheck_expr(symbol.value);
       do_initializer(symbol.value, symbol.type, true);
       
-      // need to adjust sie?
+      // need to adjust size?
       if(follow(symbol.type).id()==ID_array &&
          to_array_type(follow(symbol.type)).size().is_nil())
         symbol.type=symbol.value.type();
@@ -498,6 +526,21 @@ void c_typecheck_baset::designator_enter(
       entry.subtype=entry.type.subtype();
     }
   }
+  else if(entry.type.id()==ID_vector)
+  {
+    mp_integer vector_size;
+
+    if(to_integer(to_vector_type(entry.type).size(), vector_size))
+    {
+      err_location(to_vector_type(entry.type).size());
+      str << "vector has non-constant size `"
+          << to_string(to_vector_type(entry.type).size()) << "'";
+      throw 0;
+    }
+
+    entry.size=integer2long(vector_size);
+    entry.subtype=entry.type.subtype();
+  }
   else
     assert(false);
 
@@ -551,6 +594,7 @@ void c_typecheck_baset::do_designated_initializer(
     assert(type.id()!=ID_symbol);
 
     if(type.id()==ID_array ||
+       type.id()==ID_vector ||
        type.id()==ID_struct)
     {
       if(index>=dest->operands().size())
@@ -609,7 +653,8 @@ void c_typecheck_baset::do_designated_initializer(
     // do we initialize a scalar?
     if(type.id()!=ID_struct &&
        type.id()!=ID_union &&
-       type.id()!=ID_array)
+       type.id()!=ID_array &&
+       type.id()!=ID_vector)
     {
       // The initializer for a scalar shall be a single expression,
       // * optionally enclosed in braces. *
@@ -916,6 +961,11 @@ exprt c_typecheck_baset::do_initializer_list(
       result=zero_initializer(type, value.location());
     }
   }
+  else if(type.id()==ID_vector)
+  {
+    // start with zero everywhere
+    result=zero_initializer(type, value.location());
+  }
   else
   {
     // The initializer for a scalar shall be a single expression,
@@ -925,8 +975,8 @@ exprt c_typecheck_baset::do_initializer_list(
       return do_initializer_rec(value.op0(), type, force_constant);
     
     err_location(value);
-    str << "cannot initialize `" << to_string(type) << "' with "
-           "an initializer list";
+    str << "cannot initialize `" << to_string(type)
+        << "' with an initializer list";
     throw 0;
   }
 
