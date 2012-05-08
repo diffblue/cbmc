@@ -930,8 +930,6 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
   
   if(expr_type.id()==ID_vector)
   {
-    const vector_typet &vector_type=to_vector_type(expr_type);
-  
     // we are generous -- any vector to vector is fine
     if(op_type.id()==ID_vector)
       return;
@@ -942,17 +940,13 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
     {
       // This is a GCC extension -- an initializer list
       // can be converted into a vector, to form a vector
-      // constructor. We build a temporary array type
-      // for this.
+      // constructor.
 
-      array_typet array_type;
-      array_type.subtype()=vector_type.subtype();
-      array_type.size()=vector_type.size();
+      do_initializer(op, expr_type, false);
       
-      do_initializer(op, array_type, false);
-      
-      // We just use the resulting array constructor
-      // expression with the type cast.
+      // We remove the type cast
+      exprt tmp=op;
+      expr=tmp;
       return;
     }
   }
