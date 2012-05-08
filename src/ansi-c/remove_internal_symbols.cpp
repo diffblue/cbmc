@@ -149,7 +149,12 @@ void remove_internal_symbols(
       ) // no it++
   {
     if(exported.find(it->first)==exported.end())
-      it=context.symbols.erase(it);
+    {
+      contextt::symbolst::iterator next=it;
+      ++next;
+      context.symbols.erase(it);
+      it=next;
+    }
     else
       it++;
   }
