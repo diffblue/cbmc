@@ -14,7 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <mp_arith.h>
 
-class exprt;
+class constant_exprt;
 
 class rationalt
 {
@@ -121,7 +121,7 @@ public:
   }
 
   friend std::ostream& operator<< (std::ostream& out, const rationalt &a);
-  friend exprt from_rational(const rationalt &n);
+  friend constant_exprt from_rational(const rationalt &n);
 };
  
 rationalt inverse(const rationalt &n);

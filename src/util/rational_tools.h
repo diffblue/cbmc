@@ -12,6 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "rational.h"
 
 bool to_rational(const exprt &expr, rationalt &rational_value);
-exprt from_rational(const rationalt &rational_value);
+constant_exprt from_rational(const rationalt &rational_value);
 
 #endif

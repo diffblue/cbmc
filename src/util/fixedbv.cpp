@@ -7,6 +7,7 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include "std_types.h"
+#include "std_expr.h"
 #include "fixedbv.h"
 #include "arith_tools.h"
 
@@ -40,7 +41,7 @@ Function: fixedbvt::fixedbvt
 
 \*******************************************************************/
 
-fixedbvt::fixedbvt(const exprt &expr)
+fixedbvt::fixedbvt(const constant_exprt &expr)
 {
   from_expr(expr);
 }
@@ -57,10 +58,10 @@ Function: fixedbvt::from_expr
 
 \*******************************************************************/
 
-void fixedbvt::from_expr(const exprt &expr)
+void fixedbvt::from_expr(const constant_exprt &expr)
 {
   spec=to_fixedbv_type(expr.type());
-  v=binary2integer(id2string(expr.get(ID_value)), true);
+  v=binary2integer(id2string(expr.get_value()), true);
 }
 
 /*******************************************************************\
@@ -110,14 +111,14 @@ Function: fixedbvt::to_expr
 
 \*******************************************************************/
 
-exprt fixedbvt::to_expr() const
+constant_exprt fixedbvt::to_expr() const
 {
   fixedbv_typet type;
   type.set_width(spec.width);
   type.set_integer_bits(spec.integer_bits);
-  exprt expr=exprt(ID_constant, type);
+  constant_exprt expr(type);
   assert(spec.width!=0);
-  expr.set(ID_value, integer2binary(v, spec.width));
+  expr.set_value(integer2binary(v, spec.width));
   return expr;
 }
 
