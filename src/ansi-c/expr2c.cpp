@@ -1666,7 +1666,7 @@ std::string expr2ct::convert_constant(
   }
   else if(type.id()==ID_fixedbv)
   {
-    dest=fixedbvt(src).to_ansi_c_string();
+    dest=fixedbvt(to_constant_expr(src)).to_ansi_c_string();
 
     if(dest!="" && isdigit(dest[dest.size()-1]))
     {
