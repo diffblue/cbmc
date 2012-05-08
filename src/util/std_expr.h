@@ -745,6 +745,49 @@ const array_exprt &to_array_expr(const exprt &expr);
 */
 array_exprt &to_array_expr(exprt &expr);
 
+/*! \brief array constructor from list of elements
+*/
+class vector_exprt:public exprt
+{
+public:
+  inline vector_exprt():exprt(ID_vector)
+  {
+  }
+ 
+  explicit inline vector_exprt(const typet &_type):
+    exprt(ID_array, _type)
+  {
+  }
+ 
+  friend inline const vector_exprt &to_vector_expr(const exprt &expr)
+  {
+    assert(expr.id()==ID_vector);
+    return static_cast<const vector_exprt &>(expr);
+  }
+
+  friend inline vector_exprt &to_vector_expr(exprt &expr)
+  {
+    assert(expr.id()==ID_vector);
+    return static_cast<vector_exprt &>(expr);
+  }
+};
+
+/*! \brief Cast a generic exprt to an \ref vector_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * vector_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref vector_exprt
+ *
+ * \ingroup gr_std_expr
+*/
+const vector_exprt &to_vector_expr(const exprt &expr);
+/*! \copydoc to_vector_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
+vector_exprt &to_vector_expr(exprt &expr);
+
 /*! \brief union constructor from single element
 */
 class union_exprt:public exprt
