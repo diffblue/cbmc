@@ -14,6 +14,7 @@ Author: Daniel Kroening
 #include "arith_tools.h"
 #include "ieee_float.h"
 #include "fixedbv.h"
+#include "std_expr.h"
 
 #include "xml_expr.h"
 
@@ -59,7 +60,7 @@ xmlt convert(
     {
       result.name="float";
       result.set_attribute("binary", expr.get_string(ID_value));
-      result.data=ieee_floatt(expr).to_ansi_c_string();
+      result.data=ieee_floatt(to_constant_expr(expr)).to_ansi_c_string();
     }
     else if(type.id()==ID_pointer)
     {

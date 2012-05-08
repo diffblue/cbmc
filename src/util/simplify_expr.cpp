@@ -354,14 +354,14 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
          expr_type_id==ID_signedbv)
       {
         // cast from float to int
-        ieee_floatt f(expr.op0());
+        ieee_floatt f(to_constant_expr(expr.op0()));
         expr=from_integer(f.to_integer(), expr_type);
         return false;
       }
       else if(expr_type_id==ID_floatbv)
       {
         // float to double or double to float
-        ieee_floatt f(expr.op0());
+        ieee_floatt f(to_constant_expr(expr.op0()));
         f.change_spec(to_floatbv_type(expr_type));
         expr=f.to_expr();
         return false;
@@ -1078,8 +1078,8 @@ bool simplify_exprt::simplify_division(exprt &expr)
     if(expr.op0().is_constant() &&
        expr.op1().is_constant())
     {
-      ieee_floatt f0(expr.op0());
-      ieee_floatt f1(expr.op1());
+      ieee_floatt f0(to_constant_expr(expr.op0()));
+      ieee_floatt f1(to_constant_expr(expr.op1()));
       if(!f1.is_zero())
       {
         f0/=f1;
@@ -2650,8 +2650,8 @@ bool simplify_exprt::simplify_inequality(exprt &expr)
     }
     else if(tmp0.type().id()==ID_floatbv)
     {
-      ieee_floatt f0(tmp0);
-      ieee_floatt f1(tmp1);
+      ieee_floatt f0(to_constant_expr(tmp0));
+      ieee_floatt f1(to_constant_expr(tmp1));
 
       if(expr.id()==ID_notequal)
         expr.make_bool(f0!=f1);
@@ -3156,8 +3156,8 @@ bool simplify_exprt::simplify_ieee_float_relation(exprt &expr)
   if(expr.op0().is_constant() &&
      expr.op1().is_constant())
   {
-    ieee_floatt f0(expr.op0());
-    ieee_floatt f1(expr.op1());
+    ieee_floatt f0(to_constant_expr(expr.op0()));
+    ieee_floatt f1(to_constant_expr(expr.op1()));
 
     if(expr.id()==ID_ieee_float_notequal)
       expr.make_bool(ieee_not_equal(f0, f1));
@@ -4055,7 +4055,7 @@ bool simplify_exprt::simplify_unary_minus(exprt &expr)
     }
     else if(type_id==ID_floatbv)
     {
-      ieee_floatt f(expr.op0());
+      ieee_floatt f(to_constant_expr(expr.op0()));
       f.negate();
       expr=f.to_expr();
       return false;
