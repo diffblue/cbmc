@@ -148,8 +148,10 @@
   "long long int __builtin_bswap64(long long int x);\n" \
   "typedef int   __gccxml_m64  __attribute__ ((__vector_size__ (8), __may_alias__));\n" \
   "typedef int   __gccxml_v2si __attribute__ ((__vector_size__ (8)));\n" \
+  "typedef int   __gccxml_v4si __attribute__ ((__vector_size__ (16)));\n" \
   "typedef short __gccxml_v4hi __attribute__ ((__vector_size__ (8)));\n" \
   "typedef char  __gccxml_v8qi __attribute__ ((__vector_size__ (8)));\n" \
+  "typedef float __gccxml_v4sf __attribute__ ((__vector_size__ (16)));\n" \
   "void          __builtin_ia32_emms(void);\n" \
   "int           __builtin_ia32_vec_ext_v2si();\n" \
   "__gccxml_v8qi __builtin_ia32_packsswb();\n" \
@@ -266,11 +268,11 @@
   "__gccxml_v4sf __builtin_ia32_movlhps (__gccxml_v4sf, __gccxml_v4sf);\n" \
   "__gccxml_v4sf __builtin_ia32_unpckhps (__gccxml_v4sf, __gccxml_v4sf);\n" \
   "__gccxml_v4sf __builtin_ia32_unpcklps (__gccxml_v4sf, __gccxml_v4sf);\n" \
-  "__gccxml_v4sf __builtin_ia32_cvtpi2ps (__gccxml_v4sf, v2si);\n" \
+  "__gccxml_v4sf __builtin_ia32_cvtpi2ps (__gccxml_v4sf, __gccxml_v2si);\n" \
   "__gccxml_v4sf __builtin_ia32_cvtsi2ss (__gccxml_v4sf, int);\n" \
-  "v2si __builtin_ia32_cvtps2pi (__gccxml_v4sf);\n" \
+  "__gccxml_v2si __builtin_ia32_cvtps2pi (__gccxml_v4sf);\n" \
   "int __builtin_ia32_cvtss2si (__gccxml_v4sf);\n" \
-  "v2si __builtin_ia32_cvttps2pi (__gccxml_v4sf);\n" \
+  "__gccxml_v2si __builtin_ia32_cvttps2pi (__gccxml_v4sf);\n" \
   "int __builtin_ia32_cvttss2si (__gccxml_v4sf);\n" \
   "__gccxml_v4sf __builtin_ia32_rcpps (__gccxml_v4sf);\n" \
   "__gccxml_v4sf __builtin_ia32_rsqrtps (__gccxml_v4sf);\n" \
