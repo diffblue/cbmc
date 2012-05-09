@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "internal_additions.h"
 
 const char gcc_builtin_headers[]=
+"# 1 \"gcc_builtin_headers.h\"\n"
 #include "gcc_builtin_headers.inc"
 ;
 
@@ -53,6 +54,7 @@ Function: ansi_c_internal_additions
 void ansi_c_internal_additions(std::string &code)
 {
   code+=
+    "# 1 \"<built-in-additions>\"\n"
     "typedef __typeof__(sizeof(int)) __CPROVER_size_t;\n"
     "void __CPROVER_assume(_Bool assumption);\n"
     "void __VERIFIER_assume(_Bool assumption);\n"
