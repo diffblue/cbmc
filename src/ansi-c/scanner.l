@@ -317,6 +317,12 @@ void ansi_c_scanner_init()
 "volatile"	{ loc(); return TOK_VOLATILE; }
 "while"		{ loc(); return TOK_WHILE; }
 
+"__float128"	{ if(PARSER.mode==ansi_c_parsert::GCC)
+                    { loc(); return TOK_GCC_FLOAT128; }
+                  else
+                    return make_identifier();
+                }
+
 "__int8"        { return MSC_Keyword(TOK_INT8); }
 "__int16"       { return MSC_Keyword(TOK_INT16); }
 "__int32"       { return MSC_Keyword(TOK_INT32); }
