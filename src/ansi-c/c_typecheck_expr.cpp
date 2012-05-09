@@ -2196,7 +2196,7 @@ Function: c_typecheck_baset::typecheck_function_call_arguments
 void c_typecheck_baset::typecheck_function_call_arguments(
   side_effect_expr_function_callt &expr)
 {
-  exprt &f_op=expr.function();
+  const exprt &f_op=expr.function();
   const code_typet &code_type=to_code_type(f_op.type());
   exprt::operandst &arguments=expr.arguments();
   const code_typet::argumentst &argument_types=
@@ -2232,7 +2232,7 @@ void c_typecheck_baset::typecheck_function_call_arguments(
         << ", but got " << arguments.size();
     throw 0;
   }
-
+  
   for(unsigned i=0; i<arguments.size(); i++)
   {
     exprt &op=arguments[i];
@@ -2246,8 +2246,7 @@ void c_typecheck_baset::typecheck_function_call_arguments(
       const code_typet::argumentt &argument_type=
         argument_types[i];
 
-      const typet &op_type=
-        static_cast<const typet &>(argument_type.find(ID_type));
+      const typet &op_type=argument_type.type();
 
       if(op_type.id()==ID_bool &&
          op.id()==ID_sideeffect &&
