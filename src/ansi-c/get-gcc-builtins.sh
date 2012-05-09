@@ -7,12 +7,20 @@ if [ -e gcc-builtins.h ] ; then
   exit 1
 fi
 
+echo Downloading http://gcc.gnu.org/svn/gcc/trunk/gcc/builtin-types.def
 svn export http://gcc.gnu.org/svn/gcc/trunk/gcc/builtin-types.def > /dev/null
-svn export http://gcc.gnu.org/svn/gcc/trunk/gcc/builtins.def > /dev/null
-svn export http://gcc.gnu.org/svn/gcc/trunk/gcc/sync-builtins.def > /dev/null
-svn export http://gcc.gnu.org/svn/gcc/trunk/gcc/omp-builtins.def > /dev/null
-svn export http://gcc.gnu.org/svn/gcc/trunk/gcc/gtm-builtins.def > /dev/null
 
+echo Downloading http://gcc.gnu.org/svn/gcc/trunk/gcc/builtins.def
+svn export http://gcc.gnu.org/svn/gcc/trunk/gcc/builtins.def > /dev/null
+
+echo Downloading http://gcc.gnu.org/svn/gcc/trunk/gcc/sync-builtins.def
+svn export http://gcc.gnu.org/svn/gcc/trunk/gcc/sync-builtins.def > /dev/null
+
+echo Downloading http://gcc.gnu.org/svn/gcc/trunk/gcc/omp-builtins.def
+svn export http://gcc.gnu.org/svn/gcc/trunk/gcc/omp-builtins.def > /dev/null
+
+echo Downloading http://gcc.gnu.org/svn/gcc/trunk/gcc/gtm-builtins.def
+svn export http://gcc.gnu.org/svn/gcc/trunk/gcc/gtm-builtins.def > /dev/null
 
 cat > gcc-builtins.h <<EOF
 #include <inttypes.h>
@@ -127,5 +135,6 @@ sed -i '/__float/d' gcc-builtins.h
 cat gcc-builtins.h | sed 's/__builtin/XX__builtin/' | \
   gcc -c -fno-builtin -x c - -o gcc-builtins.o
 rm gcc-builtins.o
+
 echo "Successfully built gcc-builtins.h"
 
