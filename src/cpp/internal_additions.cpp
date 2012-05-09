@@ -9,7 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <config.h>
 
 #include <ansi-c/internal_additions.h>
-#include <ansi-c/gcc_builtin_headers.h>
 
 #include "internal_additions.h"
 
@@ -122,7 +121,7 @@ void cpp_internal_additions(std::ostream &out)
             
   // GCC stuff
   out << "extern \"C\" {" << std::endl;
-  out << c2cpp(GCC_BUILTIN_HEADERS);
+  out << c2cpp(gcc_builtin_headers);
   out << "}" << std::endl;
   
   if(config.ansi_c.os==configt::ansi_ct::OS_WIN)
