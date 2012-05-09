@@ -56,7 +56,7 @@ public:
     long_cnt=double_cnt=float_cnt=bool_cnt=complex_cnt=
     int8_cnt=int16_cnt=int32_cnt=int64_cnt=
     ptr32_cnt=ptr64_cnt=
-    bv_cnt=0;
+    gcc_float128_cnt=bv_cnt=0;
     vector_size.make_nil();
     alignment.make_nil();
     bv_width=0;
