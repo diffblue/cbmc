@@ -67,9 +67,15 @@ public:
   {
     return a.f==b.f && a.e==b.e;
   }
+
+  inline friend bool operator != (const ieee_float_spect &a, const ieee_float_spect &b)
+  {
+    return !(a==b);
+  }
 };
 
 bool operator == (const ieee_float_spect &a, const ieee_float_spect &b);
+bool operator != (const ieee_float_spect &a, const ieee_float_spect &b);
 
 class ieee_floatt
 {
