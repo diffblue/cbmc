@@ -209,4 +209,76 @@
   "__gccxml_v2si __builtin_ia32_vec_init_v2si();\n" \
   "__gccxml_v4hi __builtin_ia32_vec_init_v4hi();\n" \
   "__gccxml_v8qi __builtin_ia32_vec_init_v8qi();\n" \
+  "int __builtin_ia32_comieq (__gccxml_v4sf, __gccxml_v4sf);\n" \
+  "int __builtin_ia32_comineq (__gccxml_v4sf, __gccxml_v4sf);\n" \
+  "int __builtin_ia32_comilt (__gccxml_v4sf, __gccxml_v4sf);\n" \
+  "int __builtin_ia32_comile (__gccxml_v4sf, __gccxml_v4sf);\n" \
+  "int __builtin_ia32_comigt (__gccxml_v4sf, __gccxml_v4sf);\n" \
+  "int __builtin_ia32_comige (__gccxml_v4sf, __gccxml_v4sf);\n" \
+  "int __builtin_ia32_ucomieq (__gccxml_v4sf, __gccxml_v4sf);\n" \
+  "int __builtin_ia32_ucomineq (__gccxml_v4sf, __gccxml_v4sf);\n" \
+  "int __builtin_ia32_ucomilt (__gccxml_v4sf, __gccxml_v4sf);\n" \
+  "int __builtin_ia32_ucomile (__gccxml_v4sf, __gccxml_v4sf);\n" \
+  "int __builtin_ia32_ucomigt (__gccxml_v4sf, __gccxml_v4sf);\n" \
+  "int __builtin_ia32_ucomige (__gccxml_v4sf, __gccxml_v4sf);\n" \
+  "__gccxml_v4sf __builtin_ia32_addps (__gccxml_v4sf, __gccxml_v4sf);\n" \
+  "__gccxml_v4sf __builtin_ia32_subps (__gccxml_v4sf, __gccxml_v4sf);\n" \
+  "__gccxml_v4sf __builtin_ia32_mulps (__gccxml_v4sf, __gccxml_v4sf);\n" \
+  "__gccxml_v4sf __builtin_ia32_divps (__gccxml_v4sf, __gccxml_v4sf);\n" \
+  "__gccxml_v4sf __builtin_ia32_addss (__gccxml_v4sf, __gccxml_v4sf);\n" \
+  "__gccxml_v4sf __builtin_ia32_subss (__gccxml_v4sf, __gccxml_v4sf);\n" \
+  "__gccxml_v4sf __builtin_ia32_mulss (__gccxml_v4sf, __gccxml_v4sf);\n" \
+  "__gccxml_v4sf __builtin_ia32_divss (__gccxml_v4sf, __gccxml_v4sf);\n" \
+  "__gccxml_v4si __builtin_ia32_cmpeqps (__gccxml_v4sf, __gccxml_v4sf);\n" \
+  "__gccxml_v4si __builtin_ia32_cmpltps (__gccxml_v4sf, __gccxml_v4sf);\n" \
+  "__gccxml_v4si __builtin_ia32_cmpleps (__gccxml_v4sf, __gccxml_v4sf);\n" \
+  "__gccxml_v4si __builtin_ia32_cmpgtps (__gccxml_v4sf, __gccxml_v4sf);\n" \
+  "__gccxml_v4si __builtin_ia32_cmpgeps (__gccxml_v4sf, __gccxml_v4sf);\n" \
+  "__gccxml_v4si __builtin_ia32_cmpunordps (__gccxml_v4sf, __gccxml_v4sf);\n" \
+  "__gccxml_v4si __builtin_ia32_cmpneqps (__gccxml_v4sf, __gccxml_v4sf);\n" \
+  "__gccxml_v4si __builtin_ia32_cmpnltps (__gccxml_v4sf, __gccxml_v4sf);\n" \
+  "__gccxml_v4si __builtin_ia32_cmpnleps (__gccxml_v4sf, __gccxml_v4sf);\n" \
+  "__gccxml_v4si __builtin_ia32_cmpngtps (__gccxml_v4sf, __gccxml_v4sf);\n" \
+  "__gccxml_v4si __builtin_ia32_cmpngeps (__gccxml_v4sf, __gccxml_v4sf);\n" \
+  "__gccxml_v4si __builtin_ia32_cmpordps (__gccxml_v4sf, __gccxml_v4sf);\n" \
+  "__gccxml_v4si __builtin_ia32_cmpeqss (__gccxml_v4sf, __gccxml_v4sf);\n" \
+  "__gccxml_v4si __builtin_ia32_cmpltss (__gccxml_v4sf, __gccxml_v4sf);\n" \
+  "__gccxml_v4si __builtin_ia32_cmpless (__gccxml_v4sf, __gccxml_v4sf);\n" \
+  "__gccxml_v4si __builtin_ia32_cmpgtss (__gccxml_v4sf, __gccxml_v4sf);\n" \
+  "__gccxml_v4si __builtin_ia32_cmpgess (__gccxml_v4sf, __gccxml_v4sf);\n" \
+  "__gccxml_v4si __builtin_ia32_cmpunordss (__gccxml_v4sf, __gccxml_v4sf);\n" \
+  "__gccxml_v4si __builtin_ia32_cmpneqss (__gccxml_v4sf, __gccxml_v4sf);\n" \
+  "__gccxml_v4si __builtin_ia32_cmpnlts (__gccxml_v4sf, __gccxml_v4sf);\n" \
+  "__gccxml_v4si __builtin_ia32_cmpnless (__gccxml_v4sf, __gccxml_v4sf);\n" \
+  "__gccxml_v4si __builtin_ia32_cmpngtss (__gccxml_v4sf, __gccxml_v4sf);\n" \
+  "__gccxml_v4si __builtin_ia32_cmpngess (__gccxml_v4sf, __gccxml_v4sf);\n" \
+  "__gccxml_v4si __builtin_ia32_cmpordss (__gccxml_v4sf, __gccxml_v4sf);\n" \
+  "__gccxml_v4sf __builtin_ia32_maxps (__gccxml_v4sf, __gccxml_v4sf);\n" \
+  "__gccxml_v4sf __builtin_ia32_maxss (__gccxml_v4sf, __gccxml_v4sf);\n" \
+  "__gccxml_v4sf __builtin_ia32_minps (__gccxml_v4sf, __gccxml_v4sf);\n" \
+  "__gccxml_v4sf __builtin_ia32_minss (__gccxml_v4sf, __gccxml_v4sf);\n" \
+  "__gccxml_v4sf __builtin_ia32_andps (__gccxml_v4sf, __gccxml_v4sf);\n" \
+  "__gccxml_v4sf __builtin_ia32_andnps (__gccxml_v4sf, __gccxml_v4sf);\n" \
+  "__gccxml_v4sf __builtin_ia32_orps (__gccxml_v4sf, __gccxml_v4sf);\n" \
+  "__gccxml_v4sf __builtin_ia32_xorps (__gccxml_v4sf, __gccxml_v4sf);\n" \
+  "__gccxml_v4sf __builtin_ia32_movss (__gccxml_v4sf, __gccxml_v4sf);\n" \
+  "__gccxml_v4sf __builtin_ia32_movhlps (__gccxml_v4sf, __gccxml_v4sf);\n" \
+  "__gccxml_v4sf __builtin_ia32_movlhps (__gccxml_v4sf, __gccxml_v4sf);\n" \
+  "__gccxml_v4sf __builtin_ia32_unpckhps (__gccxml_v4sf, __gccxml_v4sf);\n" \
+  "__gccxml_v4sf __builtin_ia32_unpcklps (__gccxml_v4sf, __gccxml_v4sf);\n" \
+  "__gccxml_v4sf __builtin_ia32_cvtpi2ps (__gccxml_v4sf, v2si);\n" \
+  "__gccxml_v4sf __builtin_ia32_cvtsi2ss (__gccxml_v4sf, int);\n" \
+  "v2si __builtin_ia32_cvtps2pi (__gccxml_v4sf);\n" \
+  "int __builtin_ia32_cvtss2si (__gccxml_v4sf);\n" \
+  "v2si __builtin_ia32_cvttps2pi (__gccxml_v4sf);\n" \
+  "int __builtin_ia32_cvttss2si (__gccxml_v4sf);\n" \
+  "__gccxml_v4sf __builtin_ia32_rcpps (__gccxml_v4sf);\n" \
+  "__gccxml_v4sf __builtin_ia32_rsqrtps (__gccxml_v4sf);\n" \
+  "__gccxml_v4sf __builtin_ia32_sqrtps (__gccxml_v4sf);\n" \
+  "__gccxml_v4sf __builtin_ia32_rcpss (__gccxml_v4sf);\n" \
+  "__gccxml_v4sf __builtin_ia32_rsqrtss (__gccxml_v4sf);\n" \
+  "__gccxml_v4sf __builtin_ia32_sqrtss (__gccxml_v4sf);\n" \
+  "__gccxml_v4sf __builtin_ia32_shufps (__gccxml_v4sf, __gccxml_v4sf, int);\n" \
+  "void __builtin_ia32_movntps (float *, __gccxml_v4sf);\n" \
+  "int __builtin_ia32_movmskps (__gccxml_v4sf);\n" \
   "\n\n"
