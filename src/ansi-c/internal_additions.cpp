@@ -9,9 +9,15 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <i2string.h>
 #include <config.h>
 
-#include "gcc_builtin_headers.h"
-#include "arm_builtin_headers.h"
 #include "internal_additions.h"
+
+const char gcc_builtin_headers[]=
+#include "gcc_builtin_headers.inc"
+;
+
+const char arm_builtin_headers[]=
+#include "arm_builtin_headers.inc"
+;
 
 /*******************************************************************\
 
@@ -127,14 +133,14 @@ void ansi_c_internal_additions(std::string &code)
   // GCC junk stuff, also for ARM
   if(config.ansi_c.mode==configt::ansi_ct::MODE_GCC ||
      config.ansi_c.mode==configt::ansi_ct::MODE_ARM)
-    code+=GCC_BUILTIN_HEADERS;
+    code+=gcc_builtin_headers;
 
   if(config.ansi_c.os==configt::ansi_ct::OS_WIN)
     code+="int __noop();\n"; // this is Visual C/C++
     
   // ARM stuff
   if(config.ansi_c.mode==configt::ansi_ct::MODE_ARM)
-    code+=ARM_BUILTIN_HEADERS;
+    code+=arm_builtin_headers;
     
   // Architecture strings
   ansi_c_architecture_strings(code);

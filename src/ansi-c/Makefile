@@ -49,11 +49,22 @@ cprover_library$(OBJEXT): cprover_library.inc
 
 library/converter$(EXEEXT): library/converter.cpp
 	$(LINKBIN)
+
+file_converter$(EXEEXT): file_converter.cpp
+	$(LINKBIN)
 	
 cprover_library.inc: library/converter$(EXEEXT) library/*.c
 	cat library/*.c | library/converter > $@
 
+gcc_builtin_headers.inc: gcc_builtin_headers.h file_converter$(EXEEXT)
+	./file_converter < gcc_builtin_headers.h > $@
+
+arm_builtin_headers.inc: arm_builtin_headers.h file_converter$(EXEEXT)
+	./file_converter < arm_builtin_headers.h > $@
+
 cprover_library.cpp: cprover_library.inc
+
+internal_additions.cpp: gcc_builtin_headers.inc arm_builtin_headers.inc
 
 ###############################################################################
 
