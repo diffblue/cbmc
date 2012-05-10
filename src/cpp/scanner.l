@@ -320,6 +320,12 @@ wchar_t	            { // CodeWarrior has an option to
                       else
                         return TOK_WCHAR_T;
                     }
+__float128	    { loc();
+                      if(PARSER.mode==cpp_parsert::GCC)
+                        return TOK_GCC_FLOAT128;
+                      else
+                        return TOK_IDENTIFIER;
+                    }
 while               { loc(); return TOK_WHILE; }
 __CPROVER_thread_local { loc(); return TOK_THREAD_LOCAL; }
 
