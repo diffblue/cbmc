@@ -156,7 +156,7 @@ typedef int    __gcc_v8si  __attribute__ ((__vector_size__ (32)));
 typedef short  __gcc_v4hi  __attribute__ ((__vector_size__ (8)));
 typedef short  __gcc_v8hi  __attribute__ ((__vector_size__ (16)));
 typedef short  __gcc_v16hi __attribute__ ((__vector_size__ (32)));
-typedef short  __gcc_v32hi __attribute__ ((__vector_size__ (64));
+typedef short  __gcc_v32hi __attribute__ ((__vector_size__ (64)));
 typedef float  __gcc_v2sf  __attribute__ ((__vector_size__ (8)));
 typedef float  __gcc_v4sf  __attribute__ ((__vector_size__ (16)));
 typedef float  __gcc_v8sf  __attribute__ ((__vector_size__ (32)));
