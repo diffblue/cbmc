@@ -17,7 +17,13 @@ const char gcc_builtin_headers[]=
 ;
 
 const char arm_builtin_headers[]=
+"# 1 \"arm_builtin_headers.h\"\n"
 #include "arm_builtin_headers.inc"
+;
+
+const char cw_builtin_headers[]=
+"# 1 \"cw_builtin_headers.h\"\n"
+#include "cw_builtin_headers.inc"
 ;
 
 /*******************************************************************\
@@ -143,6 +149,10 @@ void ansi_c_internal_additions(std::string &code)
   // ARM stuff
   if(config.ansi_c.mode==configt::ansi_ct::MODE_ARM)
     code+=arm_builtin_headers;
+    
+  // CW stuff
+  if(config.ansi_c.mode==configt::ansi_ct::MODE_CODEWARRIOR)
+    code+=cw_builtin_headers;
     
   // Architecture strings
   ansi_c_architecture_strings(code);
