@@ -119,14 +119,20 @@ void cpp_internal_additions(std::ostream &out)
   out << "void __CPROVER::array_copy(const void dest[], const void src[]);" << std::endl;
   out << "void __CPROVER::array_set(const void dest[], ...);" << std::endl;
             
-  // GCC stuff
-  out << "extern \"C\" {" << std::endl;
-  out << c2cpp(gcc_builtin_headers);
-  out << "}" << std::endl;
+  // GCC stuff, but also for ARM
+  if(config.ansi_c.mode==configt::ansi_ct::GCC ||
+     config.ansi_c.mode==configt::ansi_ct::ARM)
+  {
+    out << "extern \"C\" {" << std::endl;
+    out << c2cpp(gcc_builtin_headers);
+    out << "}" << std::endl;
+  }
   
+  // extensions for Visual C/C++
   if(config.ansi_c.os==configt::ansi_ct::OS_WIN)
-    out << "extern \"C\" int __noop(...);\n"; // this is Visual C/C++    
+    out << "extern \"C\" int __noop(...);\n";
 
+  // string symbols to identify the architecture we have compiled for
   std::string architecture_strings;
   ansi_c_architecture_strings(architecture_strings);
   
@@ -135,7 +141,6 @@ void cpp_internal_additions(std::ostream &out)
   out << "}" << std::endl;
   
   // Microsoft stuff
-
   if(config.ansi_c.mode==configt::ansi_ct::MODE_VISUAL_STUDIO)
   {
     // type_info infrastructure -- the standard wants this to be in the
@@ -145,11 +150,8 @@ void cpp_internal_additions(std::ostream &out)
     // this is the return type of __uuidof(...),
     // in the root namespace
     out << "struct _GUID;" << std::endl;
-  }
-    
-  // MS ATL-related stuff
-  if(config.ansi_c.mode==configt::ansi_ct::MODE_VISUAL_STUDIO)
-  {
+
+    // MS ATL-related stuff
     out << "namespace ATL; " << std::endl;
     out << "void ATL::AtlThrowImpl(long);" << std::endl;  
     out << "void __stdcall ATL::AtlThrowLastWin32();" << std::endl;  
