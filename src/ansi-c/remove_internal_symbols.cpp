@@ -136,8 +136,9 @@ void remove_internal_symbols(
     }
     else
     {
-      // export only if there is an initializer
-      if(has_initializer)
+      // export only if there is an initializer and
+      // the symbol is not file-local
+      if(has_initializer && !is_file_local)
         get_symbols_rec(ns, symbol, exported);
     }
   }
