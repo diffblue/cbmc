@@ -62,9 +62,14 @@ gcc_builtin_headers.inc: gcc_builtin_headers.h file_converter$(EXEEXT)
 arm_builtin_headers.inc: arm_builtin_headers.h file_converter$(EXEEXT)
 	./file_converter < arm_builtin_headers.h > $@
 
+cw_builtin_headers.inc: cw_builtin_headers.h file_converter$(EXEEXT)
+	./file_converter < cw_builtin_headers.h > $@
+
 cprover_library.cpp: cprover_library.inc
 
-internal_additions.cpp: gcc_builtin_headers.inc arm_builtin_headers.inc
+internal_additions$(OBJEXT): gcc_builtin_headers.inc
+internal_additions$(OBJEXT): arm_builtin_headers.inc
+internal_additions$(OBJEXT): cw_builtin_headers.inc
 
 ###############################################################################
 
