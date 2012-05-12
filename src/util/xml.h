@@ -106,12 +106,12 @@ public:
   static void escape(const std::string &s, std::ostream &out);
   static std::string unescape(const std::string &s);
 
+  static void escape_attribute(const std::string &s, std::ostream &out);
+
 protected:
   static void do_indent(
     std::ostream &out,
     unsigned indent);
-
-  static void escape_attribute(const std::string &s, std::ostream &out);
 };
 
 extern inline std::ostream& operator <<(
