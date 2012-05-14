@@ -204,7 +204,7 @@ bool ansi_c_languaget::typecheck(
   if(ansi_c_typecheck(parse_tree, new_context, module, message_handler))
     return true;
 
-  //remove_internal_symbols(new_context);
+  remove_internal_symbols(new_context);
   
   if(c_link(context, new_context, message_handler))
     return true;
