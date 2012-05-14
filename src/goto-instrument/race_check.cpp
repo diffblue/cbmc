@@ -13,6 +13,7 @@ Date: February 2006
 #include <expr_util.h>
 #include <guard.h>
 #include <context.h>
+#include <prefix.h>
 
 #include <pointer-analysis/value_sets.h>
 #include <goto-programs/remove_skip.h>
@@ -168,18 +169,13 @@ bool is_shared(
      identifier=="c::stdin" ||
      identifier=="c::stdout" ||
      identifier=="c::stderr" ||
-     identifier=="c::sys_nerr")
+     identifier=="c::sys_nerr" ||
+     has_prefix(identifier.as_string(), "symex::invalid_object") ||
+     has_prefix(identifier.as_string(), "symex_dynamic::dynamic_object"))
     return false; // no race check
 
   const symbolt &symbol=ns.lookup(identifier);
-
-  if(!symbol.static_lifetime)
-    return false; // these are local
-    
-  if(symbol.thread_local)
-    return false; // these are local
-    
-  return true;
+  return is_global(symbol);
 }
 
 /*******************************************************************\
