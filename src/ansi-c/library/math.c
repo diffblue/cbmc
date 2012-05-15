@@ -34,6 +34,10 @@ inline int isinf(double d) { return __CPROVER_isinf(d); }
 
 inline int isnan(double d) { return __CPROVER_isnan(d); }
 
+/* FUNCTION: __isnanf */
+
+inline int __isnanf(float f) { return __CPROVER_isnan(f); }
+
 /* FUNCTION: isnormal */
 
 int isnormal(double d) { return __CPROVER_isnormal(d); }
