@@ -191,8 +191,41 @@ exprt c_sizeoft::sizeof_rec(const typet &type)
     // gcc says that sizeof(void)==1, ISO C doesn't
     dest=from_integer(1, size_type());
   }
+  else if(type.id()==ID_vector)
+  {
+    // simply multiply
+    const exprt &size_expr=
+      to_vector_type(type).size();
+      
+    exprt tmp_dest=sizeof_rec(type.subtype());
+
+    if(tmp_dest.is_nil())
+      return tmp_dest;
+
+    mp_integer a, b;
+
+    if(!to_integer(tmp_dest, a) &&
+       !to_integer(size_expr, b))
+    {
+      dest=from_integer(a*b, size_type());
+    }
+    else
+    {
+      dest.id(ID_mult);
+      dest.type()=size_type();
+      dest.copy_to_operands(size_expr);
+      dest.move_to_operands(tmp_dest);
+      c_implicit_typecast(dest.op0(), dest.type(), ns);
+      c_implicit_typecast(dest.op1(), dest.type(), ns);
+    }
+  }
   else
+  {
+    // We give up; this shouldn't really happen on 'proper' C types,
+    // but we do have some artificial ones that simply have no
+    // meaningful size.
     dest.make_nil();
+  }
 
   return dest;
 }
