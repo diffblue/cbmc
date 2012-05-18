@@ -98,6 +98,21 @@ mp_integer pointer_offset_size(
     
     return sub*i;
   }
+  else if(type.id()==ID_vector)
+  {
+    mp_integer sub=pointer_offset_size(ns, type.subtype());
+  
+    // get size
+    const exprt &size=to_vector_type(type).size();
+
+    // constant?
+    mp_integer i;
+    
+    if(to_integer(size, i))
+      return -1; // we cannot distinguish the elements
+    
+    return sub*i;
+  }
   else if(type.id()==ID_struct)
   {
     const struct_typet &struct_type=to_struct_type(type);
