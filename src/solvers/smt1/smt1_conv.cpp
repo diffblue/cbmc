@@ -3017,7 +3017,8 @@ void smt1_convt::convert_type(const typet &type)
           type.id()==ID_fixedbv ||
           type.id()==ID_unsignedbv ||
           type.id()==ID_signedbv ||
-          type.id()==ID_c_enum)
+          type.id()==ID_c_enum ||
+          type.id()==ID_vector)
   {
     smt1_prop.out << "BitVec[" << type.get(ID_width) << "]";
   }

@@ -2919,6 +2919,21 @@ void smt2_convt::convert_type(const typet &type)
 
     smt2_prop.out << ")";
   }
+  else if(type.id()==ID_vector)
+  {
+    const vector_typet &vector_type=to_vector_type(type);
+    
+    mp_integer size;
+    if(to_integer(vector_type.size(), size))
+      throw "failed to convert vector size to constant";
+
+    smt2_prop.out << "((_ Tuple " << size << ") ";
+
+    for(mp_integer i=0; i!=size; ++i)
+      convert_type(vector_type.subtype());
+
+    smt2_prop.out << ")";
+  }
   else if(type.id()==ID_code)
   {
     // These may appear in structs.
