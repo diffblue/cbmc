@@ -1379,6 +1379,12 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
       i++;
     }
   }
+  else if(expr.id()==ID_vector)
+  {
+    // Vector constructor. 
+    // We flatten the vector by concatenating its elements.
+    convert_nary(expr, "concat", bool_as_bv);
+  }
   else
     throw "smt1_convt::convert_expr: `"+
           expr.id_string()+"' is unsupported";
