@@ -369,27 +369,22 @@ alignof: TOK_ALIGNOF '(' unary_expression ')'
         ;
   
 quantifier_expression:
-          TOK_FORALL compound_scope '{' type_name identifier ';' comma_expression '}'
+          TOK_FORALL compound_scope '{' declaration comma_expression '}'
         {
-          //unsigned prefix=PARSER.current_scope().compound_counter;
           init($$);
-          exprt s=stack($5); // save
-          PARSER.new_declaration(stack($4), stack($5), stack($$));
           stack($$).id(ID_forall);
           stack($$).location()=stack($1).location();
-          stack($$).move_to_operands(s);
-          mto($$, $7);
-          exprt blah=stack($$);
+          mto($$, $4);
+          mto($$, $5);
           PARSER.pop_scope();
         }
-        | TOK_EXISTS compound_scope '{' type_name identifier ';' comma_expression '}'
+        | TOK_EXISTS compound_scope '{' declaration comma_expression '}'
         {
-          $$=$1;
-          stack($$).id(ID_exists);     
+          init($$);
+          stack($$).id(ID_exists);
           stack($$).location()=stack($1).location();
           mto($$, $4);
-          stack($$).operands()[0].type() = stack($3).type();
-          mto($$, $6); 
+          mto($$, $5);
           PARSER.pop_scope();
         }
         ;
