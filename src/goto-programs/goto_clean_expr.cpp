@@ -70,6 +70,23 @@ bool goto_convertt::needs_cleaning(const exprt &expr)
      expr.id()==ID_union ||
      expr.id()==ID_comma)
     return true;
+
+  // We can't flatten quantified expressions by introducing new literals for
+  // conditional expressions.  This is because the body of the quantified
+  // may refer to bound variables, which are not visible outside the scope
+  // of the quantifier.
+  //
+  // For example, the following transformation would not be valid:
+  //
+  // forall (i : int) (i == 0 || i > 10)
+  //
+  //   transforming to
+  //
+  // g1 = (i == 0)
+  // g2 = (i > 10)
+  // forall (i : int) (g1 || g2)
+  if(expr.id()==ID_forall || expr.id()==ID_exists)
+    return false;
   
   forall_operands(it, expr)
     if(needs_cleaning(*it))
