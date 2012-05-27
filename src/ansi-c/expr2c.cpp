@@ -536,40 +536,19 @@ std::string expr2ct::convert_quantifier(
   const std::string &symbol,
   unsigned precedence)
 {
-  if(src.operands().size()!=3)
+  if(src.operands().size()!=2)
     return convert_norep(src, precedence);
 
-  unsigned p0, p2;
+  unsigned p0, p1;
 
   std::string op0=convert(src.op0(), p0);
-  std::string op2=convert(src.op2(), p2);
+  std::string op1=convert(src.op1(), p1);
 
-  std::string dest=symbol+" ";
-
-  if(precedence>p0) dest+='(';
-  dest+=op0;
-  if(precedence>p0) dest+=')';
-
-  const exprt &instantiations=src.op1();
-  if(instantiations.is_not_nil())
-  {
-    dest+=" (";
-    forall_operands(it, instantiations)
-    {
-      unsigned p;
-      std::string inst=convert(*it, p);
-      if(it!=instantiations.operands().begin()) dest+=", ";
-      dest+=inst;
-    }
-    dest+=")";
-  }
-
-  dest+=':';
-  dest+=' ';
-
-  if(precedence>p2) dest+='(';
-  dest+=op2;
-  if(precedence>p2) dest+=')';
+  std::string dest=symbol+" { ";
+  dest+=convert(src.op0().type());  
+  dest+=" "+op0+"; ";
+  dest+=op1;
+  dest+=" }";
 
   return dest;
 }

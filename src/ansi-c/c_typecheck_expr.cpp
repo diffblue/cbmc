@@ -173,11 +173,24 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
     // already fine, just set some type
     expr.type()=empty_typet();
   }
-  else if(expr.id()==ID_forall || expr.id()==ID_exists)
+  else if(expr.id()==ID_forall ||
+          expr.id()==ID_exists)
   {
+    // op0 is a declaration,
+    // op1 the bound expression
     assert(expr.operands().size()==2);
-    typecheck_expr_main(expr.op1());
     expr.type()=bool_typet();
+    
+    if(expr.op0().operands().size()!=1 ||
+       expr.op0().op0().get(ID_statement)!=ID_decl)
+    {
+      err_location(expr);
+      throw "expected declaration as operand of quantifier";
+    }
+
+    // replace declaration by symbol expression
+    symbol_exprt bound=to_symbol_expr(expr.op0().op0().op0());
+    expr.op0().swap(bound);
   }
   else if(expr.id()==ID_label)
   {
@@ -484,6 +497,11 @@ void c_typecheck_baset::typecheck_expr_operands(exprt &expr)
           expr.get(ID_statement)==ID_statement_expression)
   {
     typecheck_code(to_code(expr.op0()));
+  }
+  else if(expr.id()==ID_forall || expr.id()==ID_exists)
+  {
+    typecheck_decl(to_code(expr.op0().op0()));
+    typecheck_expr(expr.op1());
   }
   else
   {
