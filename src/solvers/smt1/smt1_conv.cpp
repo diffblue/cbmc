@@ -1294,17 +1294,24 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
   }
   else if(expr.id()==ID_forall || expr.id()==ID_exists)
   {
+    from_bv_begin(expr.type(), bool_as_bv);
+
     assert(expr.operands().size()==2);
     smt1_prop.out << "(" << expr.id() << " (";
-    convert_expr(expr.op0(), bool_as_bv);
+    exprt bound=expr.op0();
+    convert_expr(bound, false);
     smt1_prop.out << " ";
-    if(expr.op0().type().id()==ID_bool)
+
+    if(bound.type().id()==ID_bool)
       smt1_prop.out << "Bool";
     else
-      convert_type(expr.op0().type());
+      convert_type(bound.type());
+
     smt1_prop.out << ") ";
-    convert_expr(expr.op1(), bool_as_bv);
+    convert_expr(expr.op1(), false);
     smt1_prop.out << ")";
+
+    from_bv_end(expr.type(), bool_as_bv);
   }
   else if(expr.id()==ID_extractbits)
   {
@@ -3026,7 +3033,7 @@ void smt1_convt::convert_type(const typet &type)
           type.id()==ID_c_enum ||
           type.id()==ID_vector)
   {
-    smt1_prop.out << "BitVec[" << type.get(ID_width) << "]";
+    smt1_prop.out << "BitVec[" << boolbv_width(type) << "]";
   }
   else if(type.id()==ID_rational)
     smt1_prop.out << "Real";
