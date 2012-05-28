@@ -24,6 +24,7 @@ Author: CM Wintersteiger
 #endif
 
 #include "tempdir.h"
+#include "file_util.h"
 
 /*******************************************************************\
 
@@ -73,3 +74,41 @@ std::string get_temporary_directory(const std::string &name_template)
     
   return result;
 }
+
+/*******************************************************************\
+
+Function: temp_working_dirt::temp_working_dirt
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+temp_working_dirt::temp_working_dirt(const std::string &name_template)
+{
+  old_working_directory=get_current_working_directory();
+  path=get_temporary_directory(name_template);
+  chdir(path.c_str());
+}
+
+/*******************************************************************\
+
+Function: get_temporary_directory
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+temp_working_dirt::~temp_working_dirt()
+{
+  chdir(old_working_directory.c_str());
+  delete_directory(path);
+}
+
