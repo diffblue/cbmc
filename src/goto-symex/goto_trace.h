@@ -42,9 +42,10 @@ public:
   bool is_output() const          { return type==OUTPUT; }
   bool is_input() const           { return type==INPUT; }
   bool is_decl() const            { return type==DECL; }
+  bool is_dead() const            { return type==DEAD; }
 
   typedef enum { NONE, ASSIGNMENT, ASSUME, ASSERT,
-                 LOCATION, INPUT, OUTPUT, DECL,
+                 LOCATION, INPUT, OUTPUT, DECL, DEAD,
                  FUNCTION_CALL, FUNCTION_RETURN } typet;
   typet type;
     
