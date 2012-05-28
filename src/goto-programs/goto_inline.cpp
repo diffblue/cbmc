@@ -377,12 +377,13 @@ void goto_inlinet::expand_function_call(
       if(new_location.is_not_nil())
       {
         Forall_goto_program_instructions(it, tmp)
-        {
-          replace_location(it->location, new_location);
-          replace_location(it->guard, new_location);
-          replace_location(it->code, new_location);
-          it->function=target->function;
-        }
+          if(it->function==identifier)
+          {
+            replace_location(it->location, new_location);
+            replace_location(it->guard, new_location);
+            replace_location(it->code, new_location);
+            it->function=target->function;
+          }
       }
     }
 
