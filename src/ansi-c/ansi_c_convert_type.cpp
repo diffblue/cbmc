@@ -234,7 +234,7 @@ void ansi_c_convert_typet::write(typet &type)
       throw 0;
     }
 
-    if(long_cnt || double_cnt && float_cnt)
+    if(long_cnt || double_cnt || float_cnt)
     {
       err_location(location);
       error("conflicting type modifiers");
