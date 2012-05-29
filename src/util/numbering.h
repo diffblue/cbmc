@@ -24,7 +24,7 @@ public:
     std::pair<typename numberst::const_iterator, bool> result=
       numbers.insert(
       std::pair<T, unsigned>
-      (a, numbers.size()));
+      (a, unsigned(numbers.size())));
 
     if(result.second) // inserted?
     {
@@ -60,7 +60,7 @@ public:
     std::pair<typename numberst::const_iterator, bool> result=
       numbers.insert(
       std::pair<T, unsigned>
-      (a, numbers.size()));
+      (a, unsigned(numbers.size())));
 
     if(result.second) // inserted?
     {
