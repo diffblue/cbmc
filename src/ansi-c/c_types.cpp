@@ -234,6 +234,9 @@ Function: c_bool_type
 
 typet c_bool_type()
 {
+  typet c_bool(ID_c_bool);
+  c_bool.set(ID_width, config.ansi_c.bool_width);
+  return c_bool;
 }
 
 /*******************************************************************\
