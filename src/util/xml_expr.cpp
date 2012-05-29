@@ -40,8 +40,7 @@ xmlt convert(
   if(expr.id()==ID_constant)
   {
     if(type.id()==ID_unsignedbv ||
-       type.id()==ID_signedbv ||
-       type.id()==ID_bv)
+       type.id()==ID_signedbv)
     {
       result.name="integer";
       result.set_attribute("binary", expr.get_string(ID_value));
@@ -49,6 +48,12 @@ xmlt convert(
       mp_integer i;
       if(!to_integer(expr, i))
         result.data=integer2string(i);
+    }
+    else if(type.id()==ID_bv)
+    {
+      result.name="bitvector";
+      result.set_attribute("binary", expr.get_string(ID_value));
+      result.data=expr.get_string(ID_value);
     }
     else if(type.id()==ID_fixedbv)
     {
@@ -72,7 +77,12 @@ xmlt convert(
     else if(type.id()==ID_bool)
     {
       result.name="boolean";
+      result.set_attribute("binary", expr.is_true()?"1":"0");
       result.data=expr.is_true()?"TRUE":"FALSE";
+    }
+    else
+    {
+      result.name="unknown";
     }
   }
   else if(expr.id()==ID_array)
