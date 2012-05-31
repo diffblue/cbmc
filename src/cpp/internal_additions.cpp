@@ -124,7 +124,8 @@ void cpp_internal_additions(std::ostream &out)
      config.ansi_c.mode==configt::ansi_ct::MODE_ARM)
   {
     out << "extern \"C\" {" << std::endl;
-    out << c2cpp(gcc_builtin_headers);
+    out << c2cpp(gcc_builtin_headers_generic);
+    out << c2cpp(gcc_builtin_headers_ia32);
     out << "}" << std::endl;
   }
   
