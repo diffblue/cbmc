@@ -11,8 +11,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "internal_additions.h"
 
-const char gcc_builtin_headers[]=
-"# 1 \"gcc_builtin_headers.h\"\n"
+const char gcc_builtin_headers_generic[]=
+"# 1 \"gcc_builtin_headers_generic.h\"\n"
+#include "gcc_builtin_headers_generic.inc"
+;
+
+const char gcc_builtin_headers_ia32[]=
+"# 1 \"gcc_builtin_headers_ia32.h\"\n"
 #include "gcc_builtin_headers.inc"
 ;
 
@@ -141,7 +146,12 @@ void ansi_c_internal_additions(std::string &code)
   // GCC junk stuff, also for ARM
   if(config.ansi_c.mode==configt::ansi_ct::MODE_GCC ||
      config.ansi_c.mode==configt::ansi_ct::MODE_ARM)
-    code+=gcc_builtin_headers;
+  {
+    code+=gcc_builtin_headers_generic;
+    
+    // should likely not add these for non-Intel architectures
+    code+=gcc_builtin_headers_ia32;
+  }
 
   if(config.ansi_c.os==configt::ansi_ct::OS_WIN)
     code+="int __noop();\n"; // this is Visual C/C++

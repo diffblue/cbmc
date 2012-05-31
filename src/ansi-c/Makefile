@@ -56,8 +56,11 @@ file_converter$(EXEEXT): file_converter.cpp
 cprover_library.inc: library/converter$(EXEEXT) library/*.c
 	cat library/*.c | library/converter > $@
 
-gcc_builtin_headers.inc: gcc_builtin_headers.h file_converter$(EXEEXT)
-	./file_converter < gcc_builtin_headers.h > $@
+gcc_builtin_headers_ia32.inc: gcc_builtin_headers_ia32.h file_converter$(EXEEXT)
+	./file_converter < gcc_builtin_headers_ia32.h > $@
+
+gcc_builtin_headers_generic.inc: gcc_builtin_headers_generic.h file_converter$(EXEEXT)
+	./file_converter < gcc_builtin_headers_generic.h > $@
 
 arm_builtin_headers.inc: arm_builtin_headers.h file_converter$(EXEEXT)
 	./file_converter < arm_builtin_headers.h > $@
@@ -67,7 +70,8 @@ cw_builtin_headers.inc: cw_builtin_headers.h file_converter$(EXEEXT)
 
 cprover_library.cpp: cprover_library.inc
 
-internal_additions$(OBJEXT): gcc_builtin_headers.inc
+internal_additions$(OBJEXT): gcc_builtin_headers_generic.inc
+internal_additions$(OBJEXT): gcc_builtin_headers_ia32.inc
 internal_additions$(OBJEXT): arm_builtin_headers.inc
 internal_additions$(OBJEXT): cw_builtin_headers.inc
 
