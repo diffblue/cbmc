@@ -18,7 +18,7 @@ const char gcc_builtin_headers_generic[]=
 
 const char gcc_builtin_headers_ia32[]=
 "# 1 \"gcc_builtin_headers_ia32.h\"\n"
-#include "gcc_builtin_headers.inc"
+#include "gcc_builtin_headers_ia32.inc"
 ;
 
 const char arm_builtin_headers[]=
