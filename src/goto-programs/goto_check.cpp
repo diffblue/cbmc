@@ -26,23 +26,35 @@ public:
   goto_checkt(
     const namespacet &_ns,
     const optionst &_options):
-    ns(_ns),
-    options(_options) { }
+    ns(_ns)
+  {
+    enable_bounds_check=_options.get_bool_option("bounds-check");
+    enable_pointer_check=_options.get_bool_option("pointer-check");
+    enable_div_by_zero_check=_options.get_bool_option("div-by-zero-check");
+    enable_signed_overflow_check=_options.get_bool_option("signed-overflow-check");
+    enable_unsigned_overflow_check=_options.get_bool_option("signed_overflow_check");
+    enable_float_overflow_check=_options.get_bool_option("float-overflow-check");
+    enable_simplify=_options.get_bool_option("simplify");
+    enable_nan_check=_options.get_bool_option("nan-check");
+    generate_all_claims=_options.get_bool_option("all-claims");
+    enable_assert_to_assume=_options.get_bool_option("assert-to-assume");
+  }
 
   void goto_check(goto_programt &goto_program);
     
 protected:
   const namespacet &ns;
-  const optionst &options;
 
   void check_rec(const exprt &expr, guardt &guard, bool address);
   void check(const exprt &expr);
 
   void bounds_check(const exprt &expr, const guardt &guard);
-  void div_by_zero_check(const exprt &expr, const guardt &guard);
+  void div_by_zero_check(const div_exprt &expr, const guardt &guard);
+  void mod_by_zero_check(const mod_exprt &expr, const guardt &guard);
   void pointer_rel_check(const exprt &expr, const guardt &guard);
-  //void array_size_check(const exprt &expr);
-  void overflow_check(const exprt &expr, const guardt &guard);
+  void pointer_validity_check(const exprt &expr, const guardt &guard);
+  void integer_overflow_check(const exprt &expr, const guardt &guard);
+  void float_overflow_check(const exprt &expr, const guardt &guard);
   void nan_check(const exprt &expr, const guardt &guard);
   std::string array_name(const exprt &expr);
 
@@ -55,6 +67,17 @@ protected:
   
   goto_programt new_code;
   std::set<exprt> assertions;
+
+  bool enable_bounds_check;
+  bool enable_pointer_check;  
+  bool enable_div_by_zero_check;
+  bool enable_signed_overflow_check;
+  bool enable_unsigned_overflow_check;
+  bool enable_float_overflow_check;
+  bool enable_simplify;
+  bool enable_nan_check;
+  bool generate_all_claims;
+  bool enable_assert_to_assume;
 };
 
 /*******************************************************************\
@@ -70,14 +93,11 @@ Function: goto_checkt::div_by_zero_check
 \*******************************************************************/
 
 void goto_checkt::div_by_zero_check(
-  const exprt &expr,
+  const div_exprt &expr,
   const guardt &guard)
 {
-  if(!options.get_bool_option("div-by-zero-check"))
+  if(!enable_div_by_zero_check)
     return;
-
-  if(expr.operands().size()!=2)
-    throw expr.id_string()+" takes two arguments";
 
   // add divison by zero subgoal
 
@@ -99,7 +119,7 @@ void goto_checkt::div_by_zero_check(
 
 /*******************************************************************\
 
-Function: goto_checkt::overflow_check
+Function: goto_checkt::mod_by_zero_check
 
   Inputs:
 
@@ -109,23 +129,58 @@ Function: goto_checkt::overflow_check
 
 \*******************************************************************/
 
-void goto_checkt::overflow_check(
+void goto_checkt::mod_by_zero_check(
+  const mod_exprt &expr,
+  const guardt &guard)
+{
+  if(!enable_div_by_zero_check)
+    return;
+
+  // add divison by zero subgoal
+
+  exprt zero=gen_zero(expr.op1().type());
+
+  if(zero.is_nil())
+    throw "no zero of argument type of operator "+expr.id_string();
+
+  exprt inequality(ID_notequal, bool_typet());
+  inequality.copy_to_operands(expr.op1(), zero);
+
+  add_guarded_claim(
+    inequality,
+    "division by zero",
+    "division-by-zero",
+    expr.find_location(),
+    guard);
+}
+
+/*******************************************************************\
+
+Function: goto_checkt::integer_overflow_check
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void goto_checkt::integer_overflow_check(
   const exprt &expr,
   const guardt &guard)
 {
-  bool signed_overflow_check=options.get_bool_option("signed-overflow-check");
-  bool unsigned_overflow_check=options.get_bool_option("unsigned-overflow-check");
-
-  if(!signed_overflow_check && !unsigned_overflow_check)
+  if(!enable_signed_overflow_check &&
+     !enable_unsigned_overflow_check)
     return;
 
   // First, check type.
   const typet &type=ns.follow(expr.type());
   
-  if(type.id()==ID_signedbv && !signed_overflow_check)
+  if(type.id()==ID_signedbv && !enable_signed_overflow_check)
     return;
 
-  if(type.id()==ID_unsignedbv && !unsigned_overflow_check)
+  if(type.id()==ID_unsignedbv && !enable_unsigned_overflow_check)
     return;
     
   // add overflow subgoal
@@ -305,6 +360,208 @@ void goto_checkt::overflow_check(
 
 /*******************************************************************\
 
+Function: goto_checkt::float_overflow_check
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void goto_checkt::float_overflow_check(
+  const exprt &expr,
+  const guardt &guard)
+{
+  if(!enable_float_overflow_check)
+    return;
+
+  // First, check type.
+  const typet &type=ns.follow(expr.type());
+  
+  if(type.id()==ID_floatbv)
+    return;
+
+  #if 0
+  // add overflow subgoal
+
+  if(expr.id()==ID_typecast)
+  {
+    // conversion to signed int may overflow
+  
+    if(expr.operands().size()!=1)
+      throw "typecast takes one operand";
+
+    const typet &old_type=ns.follow(expr.op0().type());
+    
+    if(type.id()==ID_signedbv)
+    {
+      if(old_type.id()==ID_signedbv)
+      {
+        unsigned new_width=expr.type().get_int(ID_width);
+        unsigned old_width=old_type.get_int(ID_width);
+        if(new_width>=old_width) return; // always ok
+
+        binary_relation_exprt no_overflow_upper(ID_le);
+        no_overflow_upper.lhs()=expr.op0();
+        no_overflow_upper.rhs()=from_integer(power(2, new_width-1)-1, old_type);
+
+        binary_relation_exprt no_overflow_lower(ID_ge);
+        no_overflow_lower.lhs()=expr.op0();
+        no_overflow_lower.rhs()=from_integer(-power(2, new_width-1), old_type);
+
+        add_guarded_claim(
+          and_exprt(no_overflow_lower, no_overflow_upper),
+          "arithmetic overflow on signed type conversion",
+          "overflow",
+          expr.find_location(),
+          guard);
+      }
+      else if(old_type.id()==ID_unsignedbv)
+      {
+        unsigned new_width=expr.type().get_int(ID_width);
+        unsigned old_width=old_type.get_int(ID_width);
+        if(new_width>=old_width+1) return; // always ok
+
+        binary_relation_exprt no_overflow_upper(ID_le);
+        no_overflow_upper.lhs()=expr.op0();
+        no_overflow_upper.rhs()=from_integer(power(2, new_width-1)-1, old_type);
+
+        add_guarded_claim(
+          no_overflow_upper,
+          "arithmetic overflow on unsigned to signed type conversion",
+          "overflow",
+          expr.find_location(),
+          guard);
+      }
+      else if(old_type.id()==ID_floatbv)
+      {
+        unsigned new_width=expr.type().get_int(ID_width);
+
+        // Note that the fractional part is truncated!
+        ieee_floatt upper(to_floatbv_type(old_type));
+        upper.from_integer(power(2, new_width-1));
+        binary_relation_exprt no_overflow_upper(ID_lt);
+        no_overflow_upper.lhs()=expr.op0();
+        no_overflow_upper.rhs()=upper.to_expr();
+
+        ieee_floatt lower(to_floatbv_type(old_type));
+        lower.from_integer(-power(2, new_width-1)-1);
+        binary_relation_exprt no_overflow_lower(ID_gt);
+        no_overflow_lower.lhs()=expr.op0();
+        no_overflow_lower.rhs()=lower.to_expr();
+
+        add_guarded_claim(
+          and_exprt(no_overflow_lower, no_overflow_upper),
+          "arithmetic overflow on float to signed integer type conversion",
+          "overflow",
+          expr.find_location(),
+          guard);
+      }
+    }
+    else if(type.id()==ID_unsignedbv)
+    {
+      // todo
+    }
+
+    return;
+  }
+  else if(expr.id()==ID_div)
+  {
+    assert(expr.operands().size()==2);
+
+    // undefined for signed division INT_MIN/-1
+    if(type.id()==ID_signedbv)
+    {
+      equal_exprt int_min_eq(
+        expr.op0(), to_signedbv_type(type).smallest_expr());
+
+      equal_exprt minus_one_eq(
+        expr.op1(), from_integer(-1, type));
+
+      add_guarded_claim(
+        not_exprt(and_exprt(int_min_eq, minus_one_eq)),
+        "arithmetic overflow on signed division",
+        "overflow",
+        expr.find_location(),
+        guard);
+    }
+    
+    return;
+  }
+  else if(expr.id()==ID_mod)
+  {
+    // these can't overflow
+    return;
+  }
+  else if(expr.id()==ID_unary_minus)
+  {
+    if(type.id()==ID_signedbv)
+    {
+      // overflow on unary- can only happen with the smallest
+      // representable number 100....0
+      
+      equal_exprt int_min_eq(
+        expr.op0(), to_signedbv_type(type).smallest_expr());
+
+      add_guarded_claim(
+        not_exprt(int_min_eq),
+        "arithmetic overflow on signed unary minus",
+        "overflow",
+        expr.find_location(),
+        guard);
+    }
+  
+    return;
+  }
+
+  exprt overflow("overflow-"+expr.id_string(), bool_typet());
+  overflow.operands()=expr.operands();
+
+  if(expr.operands().size()>=3)
+  {
+    // The overflow checks are binary!
+    // We break these up.
+  
+    for(unsigned i=1; i<expr.operands().size(); i++)
+    {
+      exprt tmp;
+      
+      if(i==1)
+        tmp=expr.op0();
+      else
+      {
+        tmp=expr;
+        tmp.operands().resize(i);
+      }
+      
+      overflow.operands().resize(2);
+      overflow.op0()=tmp;
+      overflow.op1()=expr.operands()[i];
+    
+      add_guarded_claim(
+        not_exprt(overflow),
+        "arithmetic overflow on "+expr.id_string(),
+        "overflow",
+        expr.find_location(),
+        guard);
+    }
+  }
+  else
+  {
+    add_guarded_claim(
+      not_exprt(overflow),
+      "arithmetic overflow on "+expr.id_string(),
+      "overflow",
+      expr.find_location(),
+      guard);
+  }
+  #endif
+}
+
+/*******************************************************************\
+
 Function: goto_checkt::nan_check
 
   Inputs:
@@ -319,7 +576,7 @@ void goto_checkt::nan_check(
   const exprt &expr,
   const guardt &guard)
 {
-  if(!options.get_bool_option("nan-check"))
+  if(!enable_nan_check)
     return;
 
   // first, check type
@@ -371,7 +628,7 @@ void goto_checkt::pointer_rel_check(
   {
     // add same-object subgoal
 
-    if(options.get_bool_option("pointer-check"))
+    if(enable_pointer_check)
     {
       exprt same_object("same-object", bool_typet());
       same_object.copy_to_operands(expr.op0(), expr.op1());
@@ -419,7 +676,7 @@ void goto_checkt::bounds_check(
   const exprt &expr,
   const guardt &guard)
 {
-  if(!options.get_bool_option("bounds-check"))
+  if(!enable_bounds_check)
     return;
 
   if(expr.id()!=ID_index)
@@ -582,14 +839,13 @@ void goto_checkt::add_guarded_claim(
   const locationt &location,
   const guardt &guard)
 {
-  bool all_claims=options.get_bool_option("all-claims");
   exprt expr(_expr);
 
   // first try simplifier on it
-  if(options.get_bool_option("simplify"))
+  if(enable_simplify)
     simplify(expr, ns);
 
-  if(!all_claims && expr.is_true())
+  if(!generate_all_claims && expr.is_true())
     return;
 
   // add the guard
@@ -608,7 +864,7 @@ void goto_checkt::add_guarded_claim(
   if(assertions.insert(new_expr).second)
   {
     goto_program_instruction_typet type=
-      options.get_bool_option("assert-to-assume")?ASSUME:ASSERT;
+      enable_assert_to_assume?ASSUME:ASSERT;
 
     goto_programt::targett t=new_code.add_instruction(type);
 
@@ -731,13 +987,21 @@ void goto_checkt::check_rec(
   {
     bounds_check(expr, guard);
   }
-  else if(expr.id()==ID_div || expr.id()==ID_mod)
+  else if(expr.id()==ID_div)
   {
-    div_by_zero_check(expr, guard);
-    nan_check(expr, guard);
+    div_by_zero_check(to_div_expr(expr), guard);
     
     if(expr.type().id()==ID_signedbv)
-      overflow_check(expr, guard);
+      integer_overflow_check(expr, guard);
+    else if(expr.type().id()==ID_floatbv)
+    {
+      nan_check(expr, guard);
+      float_overflow_check(expr, guard);
+    }
+  }
+  else if(expr.id()==ID_mod)
+  {
+    mod_by_zero_check(to_mod_expr(expr), guard);
   }
   else if(expr.id()==ID_plus || expr.id()==ID_minus ||
           expr.id()==ID_mult ||
@@ -746,9 +1010,12 @@ void goto_checkt::check_rec(
   {
     if(expr.type().id()==ID_signedbv ||
        expr.type().id()==ID_unsignedbv)
-      overflow_check(expr, guard);
+      integer_overflow_check(expr, guard);
     else if(expr.type().id()==ID_floatbv)
+    {
       nan_check(expr, guard);
+      float_overflow_check(expr, guard);
+    }
   }
   else if(expr.id()==ID_le || expr.id()==ID_lt ||
           expr.id()==ID_ge || expr.id()==ID_gt)
