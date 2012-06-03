@@ -584,71 +584,6 @@ inline const bitvector_typet &to_bitvector_type(const typet &type)
   return static_cast<const bitvector_typet &>(type);
 }
 
-/*! \brief The pointer type
-*/
-class pointer_typet:public bitvector_typet
-{
-public:
-  inline pointer_typet():bitvector_typet(ID_pointer)
-  {
-  }
-
-  inline explicit pointer_typet(const typet &_subtype):bitvector_typet(ID_pointer)
-  {
-    subtype()=_subtype;
-  }
-
-  inline explicit pointer_typet(const typet &_subtype, unsigned width):
-    bitvector_typet(ID_pointer)
-  {
-    subtype()=_subtype;
-    set_width(width);
-  }
-};
-
-/*! \brief Cast a generic typet to a \ref pointer_typet
- *
- * This is an unchecked conversion. \a type must be known to be \ref
- * pointer_typet.
- *
- * \param type Source type
- * \return Object of type \ref pointer_typet
- *
- * \ingroup gr_std_types
-*/
-extern inline const pointer_typet &to_pointer_type(const typet &type)
-{
-  assert(type.id()==ID_pointer);
-  return static_cast<const pointer_typet &>(type);
-}
-
-/*! \copydoc to_pointer_type(const typet &)
- * \ingroup gr_std_types
-*/
-extern inline pointer_typet &to_pointer_type(typet &type)
-{
-  assert(type.id()==ID_pointer);
-  return static_cast<pointer_typet &>(type);
-}
-
-/*! \brief The reference type
-*/
-class reference_typet:public pointer_typet
-{
-public:
-  reference_typet()
-  {
-    set(ID_C_reference, true);
-  }
-};
-
-/*! \brief TO_BE_DOCUMENTED
-*/
-bool is_reference(const typet &type);
-/*! \brief TO_BE_DOCUMENTED
-*/
-bool is_rvalue_reference(const typet &type);
-
 /*! \brief fixed-width bit-vector without numerical interpretation
 */
 class bv_typet:public bitvector_typet
@@ -859,6 +794,76 @@ public:
  * \ingroup gr_std_types
 */
 const floatbv_typet &to_floatbv_type(const typet &type);
+
+/*! \brief The pointer type
+*/
+class pointer_typet:public bitvector_typet
+{
+public:
+  inline pointer_typet():bitvector_typet(ID_pointer)
+  {
+  }
+
+  inline explicit pointer_typet(const typet &_subtype):bitvector_typet(ID_pointer)
+  {
+    subtype()=_subtype;
+  }
+
+  inline explicit pointer_typet(const typet &_subtype, unsigned width):
+    bitvector_typet(ID_pointer)
+  {
+    subtype()=_subtype;
+    set_width(width);
+  }
+  
+  inline signedbv_typet difference_type() const
+  {
+    return signedbv_typet(get_width());
+  }
+};
+
+/*! \brief Cast a generic typet to a \ref pointer_typet
+ *
+ * This is an unchecked conversion. \a type must be known to be \ref
+ * pointer_typet.
+ *
+ * \param type Source type
+ * \return Object of type \ref pointer_typet
+ *
+ * \ingroup gr_std_types
+*/
+extern inline const pointer_typet &to_pointer_type(const typet &type)
+{
+  assert(type.id()==ID_pointer);
+  return static_cast<const pointer_typet &>(type);
+}
+
+/*! \copydoc to_pointer_type(const typet &)
+ * \ingroup gr_std_types
+*/
+extern inline pointer_typet &to_pointer_type(typet &type)
+{
+  assert(type.id()==ID_pointer);
+  return static_cast<pointer_typet &>(type);
+}
+
+/*! \brief The reference type
+*/
+class reference_typet:public pointer_typet
+{
+public:
+  reference_typet()
+  {
+    set(ID_C_reference, true);
+  }
+};
+
+/*! \brief TO_BE_DOCUMENTED
+*/
+bool is_reference(const typet &type);
+/*! \brief TO_BE_DOCUMENTED
+*/
+bool is_rvalue_reference(const typet &type);
 
 /*! \brief TO_BE_DOCUMENTED
 */
