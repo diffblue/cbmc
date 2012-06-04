@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <base_type.h>
 #include <ieee_float.h>
 #include <std_expr.h>
+#include <find_symbols.h>
 
 #include "goto_check.h"
 
@@ -66,7 +67,10 @@ protected:
     const guardt &guard);
   
   goto_programt new_code;
-  std::set<exprt> assertions;
+  typedef std::set<exprt> assertionst;
+  assertionst assertions;
+  
+  void invalidate(const exprt &lhs);
 
   bool enable_bounds_check;
   bool enable_pointer_check;  
@@ -79,6 +83,51 @@ protected:
   bool generate_all_claims;
   bool enable_assert_to_assume;
 };
+
+/*******************************************************************\
+
+Function: goto_checkt::invalidate
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void goto_checkt::invalidate(const exprt &lhs)
+{
+  if(lhs.id()==ID_index)
+    invalidate(to_index_expr(lhs).array());
+  else if(lhs.id()==ID_member)
+    invalidate(to_member_expr(lhs).struct_op());
+  else if(lhs.id()==ID_symbol)
+  {
+    // clear all assertions about 'symbol'
+    find_symbols_sett find_symbols_set;
+    find_symbols_set.insert(to_symbol_expr(lhs).get_identifier());
+    
+    for(assertionst::iterator
+        it=assertions.begin();
+        it!=assertions.end();
+        ) // no it++
+    {
+      assertionst::iterator next=it;
+      next++;
+      
+      if(has_symbol(*it, find_symbols_set))
+        assertions.erase(it);
+        
+      it=next;
+    }
+  }
+  else
+  {
+    // give up, clear all
+    assertions.clear();
+  }
+}
 
 /*******************************************************************\
 
@@ -1054,6 +1103,8 @@ Function: goto_checkt::goto_check
 
 void goto_checkt::goto_check(goto_programt &goto_program)
 {
+  assertions.clear();
+
   for(goto_programt::instructionst::iterator
       it=goto_program.instructions.begin();
       it!=goto_program.instructions.end();
@@ -1062,7 +1113,7 @@ void goto_checkt::goto_check(goto_programt &goto_program)
     goto_programt::instructiont &i=*it;
     
     new_code.clear();
-    assertions.clear();
+    if(generate_all_claims) assertions.clear();
     
     check(i.guard);
 
@@ -1082,16 +1133,25 @@ void goto_checkt::goto_check(goto_programt &goto_program)
     }
     else if(i.is_assign())
     {
-      if(i.code.operands().size()!=2)
-        throw "assignment expects two operands";
-
-      check(i.code.op0());
-      check(i.code.op1());
+      const code_assignt &code_assign=to_code_assign(i.code);
+    
+      check(code_assign.lhs());
+      check(code_assign.rhs());
+      
+      // the LHS might invalidate any assertion
+      invalidate(code_assign.lhs());
     }
     else if(i.is_function_call())
     {
-      forall_operands(it, i.code)
+      const code_function_callt &code_function_call=
+        to_code_function_call(i.code);
+    
+      forall_operands(it, code_function_call)
         check(*it);
+
+      // the LHS might invalidate any assertion
+      if(code_function_call.lhs().is_not_nil())
+        invalidate(code_function_call.lhs());
     }
     else if(i.is_return())
     {
