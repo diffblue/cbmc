@@ -35,7 +35,7 @@ void find_symbols(
   
 bool has_symbol(
   const exprt &src,
-  find_symbols_sett &symbols);  
+  const find_symbols_sett &symbols);  
 
 void find_type_symbols(
   const typet &src,
