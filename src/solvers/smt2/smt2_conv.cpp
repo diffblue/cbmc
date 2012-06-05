@@ -930,7 +930,8 @@ void smt2_convt::convert_expr(const exprt &expr)
     if(expr.op0().type().id()==ID_unsignedbv ||
        expr.op0().type().id()==ID_signedbv ||
        expr.op0().type().id()==ID_bv ||
-       expr.op0().type().id()==ID_fixedbv)
+       expr.op0().type().id()==ID_fixedbv ||
+       expr.op0().type().id()==ID_vector)
     {
       if(expr.op1().is_constant() &&
          expr.op2().is_constant())
