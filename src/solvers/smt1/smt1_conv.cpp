@@ -1324,7 +1324,8 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
        op_type.id()==ID_bv ||
        op_type.id()==ID_fixedbv ||
        op_type.id()==ID_struct ||
-       op_type.id()==ID_union)
+       op_type.id()==ID_union ||
+       op_type.id()==ID_vector)
     {
       if(expr.op1().is_constant() &&
          expr.op2().is_constant())
