@@ -71,6 +71,19 @@ protected:
   assertionst assertions;
   
   void invalidate(const exprt &lhs);
+  
+  static bool has_dereference(const exprt &src)
+  {
+    if(src.id()==ID_dereference)
+      return true;
+    else
+    {
+      forall_operands(it, src)
+        if(has_dereference(*it)) return true;
+
+      return false;
+    }
+  }
 
   bool enable_bounds_check;
   bool enable_pointer_check;  
@@ -116,7 +129,8 @@ void goto_checkt::invalidate(const exprt &lhs)
       assertionst::iterator next=it;
       next++;
       
-      if(has_symbol(*it, find_symbols_set))
+      if(has_symbol(*it, find_symbols_set) ||
+         has_dereference(*it))
         assertions.erase(it);
         
       it=next;
@@ -1113,7 +1127,13 @@ void goto_checkt::goto_check(goto_programt &goto_program)
     goto_programt::instructiont &i=*it;
     
     new_code.clear();
-    if(generate_all_claims) assertions.clear();
+
+    // we clear all recorded assertions if
+    // 1) we want to generate all assertions or
+    // 2) the instruction is a branch target
+    if(generate_all_claims ||
+       i.is_target())
+      assertions.clear();
     
     check(i.guard);
 
