@@ -1617,6 +1617,35 @@ bool simplify_exprt::simplify_concatenation(exprt &expr)
         i++;
     }
   }
+  else if(expr.type().id()==ID_verilogbv)
+  {
+    // search for neighboring constants to merge
+    unsigned i=0;
+    
+    while(i<expr.operands().size()-1)
+    {
+      exprt &opi=expr.operands()[i];
+      exprt &opn=expr.operands()[i+1];
+    
+      if(opi.is_constant() &&
+         opn.is_constant() &&
+         (opi.type().id()==ID_verilogbv || is_bitvector_type(opi.type())) &&
+         (opn.type().id()==ID_verilogbv || is_bitvector_type(opn.type())))
+      {
+        // merge!
+        const std::string new_value=
+          opi.get_string(ID_value)+opn.get_string(ID_value);
+        opi.set(ID_value, new_value);
+        opi.type().set(ID_width, new_value.size());
+        opi.type().id(ID_verilogbv);
+        // erase opn
+        expr.operands().erase(expr.operands().begin()+i+1);
+        result=true;
+      }
+      else
+        i++;
+    }
+  }
 
   // { x } = x
   if(expr.operands().size()==1)
