@@ -49,14 +49,15 @@ protected:
   void check_rec(const exprt &expr, guardt &guard, bool address);
   void check(const exprt &expr);
 
-  void bounds_check(const exprt &expr, const guardt &guard);
+  void bounds_check(const index_exprt &expr, const guardt &guard);
   void div_by_zero_check(const div_exprt &expr, const guardt &guard);
   void mod_by_zero_check(const mod_exprt &expr, const guardt &guard);
   void pointer_rel_check(const exprt &expr, const guardt &guard);
-  void pointer_validity_check(const exprt &expr, const guardt &guard);
+  void pointer_validity_check(const dereference_exprt &expr, const guardt &guard);
   void integer_overflow_check(const exprt &expr, const guardt &guard);
   void float_overflow_check(const exprt &expr, const guardt &guard);
   void nan_check(const exprt &expr, const guardt &guard);
+
   std::string array_name(const exprt &expr);
 
   void add_guarded_claim(
@@ -708,6 +709,80 @@ void goto_checkt::pointer_rel_check(
 
 /*******************************************************************\
 
+Function: goto_checkt::pointer_validity_check
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void goto_checkt::pointer_validity_check(
+  const dereference_exprt &expr,
+  const guardt &guard)
+{
+  if(!enable_pointer_check)
+    return;
+
+  const exprt &pointer_expr=expr.op0();
+  const typet &pointer_expr_type=ns.follow(pointer_expr.type());
+
+  assert(pointer_expr_type.id()==ID_pointer);
+
+  const pointer_typet &pointer_type=to_pointer_type(pointer_expr_type);
+
+  // NULL?
+  {
+    null_pointer_exprt null_pointer(pointer_type);
+
+    predicate_exprt same_object(ID_same_object);
+    same_object.copy_to_operands(pointer_expr, null_pointer);
+
+    add_guarded_claim(
+      same_object,
+      "NULL pointer",
+      "pointer dereference",
+      expr.find_location(),
+      guard);
+  }
+  
+  // Invalid?
+  {
+    predicate_exprt invalid_pointer("invalid-pointer");
+    invalid_pointer.copy_to_operands(pointer_expr);
+
+    add_guarded_claim(
+      invalid_pointer,
+      "invalid pointer",
+      "pointer dereference",
+      expr.find_location(),
+      guard);
+  }
+  
+  exprt offset=unary_exprt(
+    ID_pointer_offset, pointer_expr,
+    pointer_type.difference_type());
+
+  // lower bound is easy
+  {
+    binary_relation_exprt
+      offset_lower_bound(offset, ID_lt,
+                         gen_zero(offset.type()));
+
+    add_guarded_claim(
+      offset_lower_bound,
+      "object lower bound",
+      "pointer dereference",
+      expr.find_location(),
+      guard);
+  }
+
+}
+
+/*******************************************************************\
+
 Function: goto_checkt::array_name
 
   Inputs:
@@ -736,23 +811,17 @@ Function: goto_checkt::bounds_check
 \*******************************************************************/
 
 void goto_checkt::bounds_check(
-  const exprt &expr,
+  const index_exprt &expr,
   const guardt &guard)
 {
   if(!enable_bounds_check)
     return;
 
-  if(expr.id()!=ID_index)
-    return;
-    
   if(expr.find("bounds_check").is_not_nil() &&
      !expr.get_bool("bounds_check"))
     return;
 
-  if(expr.operands().size()!=2)
-    throw "index takes two operands";
-
-  typet array_type=ns.follow(expr.op0().type());
+  typet array_type=ns.follow(expr.array().type());
 
   if(array_type.id()==ID_pointer)
     return; // done by the pointer code
@@ -764,9 +833,9 @@ void goto_checkt::bounds_check(
   else if(array_type.id()!=ID_array)
     throw "bounds check expected array type, got "+array_type.id_string();
 
-  std::string name=array_name(expr.op0());
+  std::string name=array_name(expr.array());
   
-  const exprt &index=expr.op1();
+  const exprt &index=expr.index();
 
   if(index.type().id()!=ID_unsignedbv)
   {
@@ -816,7 +885,7 @@ void goto_checkt::bounds_check(
     {
     }
     else if(size.is_zero() &&
-            expr.op0().id()==ID_member)
+            expr.array().id()==ID_member)
     {
       // a variable sized struct member
     }
@@ -1048,7 +1117,7 @@ void goto_checkt::check_rec(
 
   if(expr.id()==ID_index)
   {
-    bounds_check(expr, guard);
+    bounds_check(to_index_expr(expr), guard);
   }
   else if(expr.id()==ID_div)
   {
@@ -1083,6 +1152,8 @@ void goto_checkt::check_rec(
   else if(expr.id()==ID_le || expr.id()==ID_lt ||
           expr.id()==ID_ge || expr.id()==ID_gt)
     pointer_rel_check(expr, guard);
+  else if(expr.id()==ID_dereference)
+    pointer_validity_check(to_dereference_expr(expr), guard);
 }
 
 /*******************************************************************\
@@ -1169,14 +1240,21 @@ void goto_checkt::goto_check(goto_programt &goto_program)
       forall_operands(it, code_function_call)
         check(*it);
 
-      // the LHS might invalidate any assertion
-      if(code_function_call.lhs().is_not_nil())
-        invalidate(code_function_call.lhs());
+      // the call might invalidate any assertion
+      assertions.clear();
     }
     else if(i.is_return())
     {
       if(i.code.operands().size()==1)
         check(i.code.op0());
+        
+      // this has no successor
+      assertions.clear();
+    }
+    else if(i.is_throw())
+    {
+      // this has no successor
+      assertions.clear();
     }
     
     for(goto_programt::instructionst::iterator
