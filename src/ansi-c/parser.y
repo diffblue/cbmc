@@ -2044,10 +2044,9 @@ gcc_local_label_statement:
         { 
           $$=$1;
           statement($$, ID_gcc_local_label);
-          stack($$).operands().swap(stack($2).operands());
           
           // put these into the scope
-          forall_operands(it, stack($$))
+          forall_operands(it, stack($2))
           {
             // labels have a separate name space
             irep_idt base_name=it->get(ID_identifier);
@@ -2056,6 +2055,8 @@ gcc_local_label_statement:
             i.id_class=ANSI_C_LOCAL_LABEL;
             i.base_name=base_name;
           }
+
+          stack($$).add(ID_label).get_sub().swap(stack($2).add(ID_operands).get_sub());
         }
         ;
 
