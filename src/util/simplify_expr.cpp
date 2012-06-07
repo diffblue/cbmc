@@ -2640,7 +2640,7 @@ bool simplify_exprt::simplify_inequality(exprt &expr)
   // are _both_ constant?  
   if(op0_is_const && op1_is_const)
   {
-    if(tmp0.id()==ID_bool)
+    if(tmp0.type().id()==ID_bool)
     {
       bool v0=tmp0.is_true();
       bool v1=tmp1.is_true();
