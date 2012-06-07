@@ -136,7 +136,9 @@ void ansi_c_convert_typet::read_rec(const typet &type)
   else if(type.id()==ID_float)
     float_cnt++;
   else if(type.id()==ID_bool)
-    bool_cnt++;
+    c_bool_cnt++;
+  else if(type.id()==ID_proper_bool)
+    proper_bool_cnt++;
   else if(type.id()==ID_complex)
     complex_cnt++;
   else if(type.id()==ID_static)
@@ -203,7 +205,7 @@ void ansi_c_convert_typet::write(typet &type)
   if(!other.empty())
   {
     if(double_cnt || float_cnt || signed_cnt ||
-       unsigned_cnt || int_cnt || bool_cnt ||
+       unsigned_cnt || int_cnt || c_bool_cnt || proper_bool_cnt ||
        short_cnt || char_cnt || complex_cnt || long_cnt ||
        int8_cnt || int16_cnt || int32_cnt || int64_cnt ||
        gcc_float128_cnt || bv_cnt)
@@ -224,7 +226,7 @@ void ansi_c_convert_typet::write(typet &type)
   }
   else if(gcc_float128_cnt)
   {
-    if(signed_cnt || unsigned_cnt || int_cnt || bool_cnt ||
+    if(signed_cnt || unsigned_cnt || int_cnt || c_bool_cnt || proper_bool_cnt ||
        int8_cnt || int16_cnt || int32_cnt || int64_cnt ||
        bv_cnt ||
        short_cnt || char_cnt)
@@ -245,7 +247,7 @@ void ansi_c_convert_typet::write(typet &type)
   }
   else if(double_cnt || float_cnt || complex_cnt)
   {
-    if(signed_cnt || unsigned_cnt || int_cnt || bool_cnt ||
+    if(signed_cnt || unsigned_cnt || int_cnt || c_bool_cnt || proper_bool_cnt ||
        int8_cnt || int16_cnt || int32_cnt || int64_cnt ||
        bv_cnt ||
        short_cnt || char_cnt)
@@ -287,7 +289,23 @@ void ansi_c_convert_typet::write(typet &type)
       throw 0;
     }
   }
-  else if(bool_cnt)
+  else if(c_bool_cnt)
+  {
+    if(signed_cnt || unsigned_cnt || int_cnt || short_cnt ||
+       int8_cnt || int16_cnt || int32_cnt || int64_cnt ||
+       gcc_float128_cnt || bv_cnt || proper_bool_cnt ||
+       char_cnt || long_cnt)
+    {
+      err_location(location);
+      error("illegal type modifier for C boolean type");
+      throw 0;
+    }
+
+    type.id(ID_unsignedbv);
+    type.set(ID_width, config.ansi_c.bool_width);
+    type.set(ID_C_c_type, ID_bool);
+  }
+  else if(proper_bool_cnt)
   {
     if(signed_cnt || unsigned_cnt || int_cnt || short_cnt ||
        int8_cnt || int16_cnt || int32_cnt || int64_cnt ||
@@ -295,7 +313,7 @@ void ansi_c_convert_typet::write(typet &type)
        char_cnt || long_cnt)
     {
       err_location(location);
-      error("illegal type modifier for boolean type");
+      error("illegal type modifier for proper boolean type");
       throw 0;
     }
 

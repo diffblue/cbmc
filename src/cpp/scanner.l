@@ -328,6 +328,7 @@ __float128	    { loc();
                     }
 while               { loc(); return TOK_WHILE; }
 __CPROVER_thread_local { loc(); return TOK_THREAD_LOCAL; }
+__CPROVER_bool      { loc(); return TOK_CPROVER_BOOL; }
 
 %{
 /* a huge batch of MS extensions

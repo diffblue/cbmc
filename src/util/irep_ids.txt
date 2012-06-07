@@ -2,6 +2,7 @@ nil
 type
 operands
 bool
+proper_bool
 signedbv
 unsignedbv
 verilogbv

@@ -25,7 +25,7 @@ class cpp_convert_typet
 public:
   unsigned unsigned_cnt, signed_cnt, char_cnt, int_cnt, short_cnt,
            long_cnt, const_cnt, typedef_cnt, volatile_cnt,
-           double_cnt, float_cnt, complex_cnt, bool_cnt,
+           double_cnt, float_cnt, complex_cnt, cpp_bool_cnt, proper_bool_cnt,
            extern_cnt, wchar_t_cnt,
            int8_cnt, int16_cnt, int32_cnt, int64_cnt, ptr32_cnt, ptr64_cnt,
            float128_cnt;
@@ -60,8 +60,8 @@ void cpp_convert_typet::read(const typet &type)
 {
   unsigned_cnt=signed_cnt=char_cnt=int_cnt=short_cnt=
   long_cnt=const_cnt=typedef_cnt=volatile_cnt=
-  double_cnt=float_cnt=complex_cnt=bool_cnt=extern_cnt=
-  wchar_t_cnt=int8_cnt=int16_cnt=int32_cnt=
+  double_cnt=float_cnt=complex_cnt=cpp_bool_cnt=proper_bool_cnt=
+  extern_cnt=wchar_t_cnt=int8_cnt=int16_cnt=int32_cnt=
   int64_cnt=ptr32_cnt=ptr64_cnt=float128_cnt=0;
 
   other.clear();
@@ -120,7 +120,9 @@ void cpp_convert_typet::read_rec(const typet &type)
   else if(type.id()=="__complex__" || type.id()=="_Complex")
     complex_cnt++;
   else if(type.id()==ID_bool)
-    bool_cnt++;
+    cpp_bool_cnt++;
+  else if(type.id()=="__CPROVER_bool")
+    proper_bool_cnt++;
   else if(type.id()==ID_wchar_t)
     wchar_t_cnt++;
   else if(type.id()=="__int8")
@@ -350,7 +352,7 @@ void cpp_convert_typet::write(typet &type)
   if(!other.empty())
   {
     if(double_cnt || float_cnt || signed_cnt ||
-       unsigned_cnt || int_cnt || bool_cnt ||
+       unsigned_cnt || int_cnt || cpp_bool_cnt || proper_bool_cnt ||
        short_cnt || char_cnt || wchar_t_cnt ||
        int8_cnt || int16_cnt || int32_cnt ||
        int64_cnt || float128_cnt)
@@ -363,7 +365,8 @@ void cpp_convert_typet::write(typet &type)
   }
   else if(double_cnt)
   {
-    if(signed_cnt || unsigned_cnt || int_cnt || bool_cnt ||
+    if(signed_cnt || unsigned_cnt || int_cnt ||
+       cpp_bool_cnt || proper_bool_cnt ||
        short_cnt || char_cnt || wchar_t_cnt || float_cnt ||
        int8_cnt || int16_cnt || int32_cnt ||
        int64_cnt || ptr32_cnt || ptr64_cnt ||
@@ -383,7 +386,8 @@ void cpp_convert_typet::write(typet &type)
   }
   else if(float_cnt)
   {
-    if(signed_cnt || unsigned_cnt || int_cnt || bool_cnt ||
+    if(signed_cnt || unsigned_cnt || int_cnt ||
+       cpp_bool_cnt || proper_bool_cnt ||
        short_cnt || char_cnt || wchar_t_cnt || double_cnt ||
        int8_cnt || int16_cnt || int32_cnt ||
        int64_cnt || ptr32_cnt || ptr64_cnt || float128_cnt)
@@ -397,7 +401,8 @@ void cpp_convert_typet::write(typet &type)
   }
   else if(float128_cnt)
   {
-    if(signed_cnt || unsigned_cnt || int_cnt || bool_cnt ||
+    if(signed_cnt || unsigned_cnt || int_cnt ||
+       cpp_bool_cnt || proper_bool_cnt ||
        short_cnt || char_cnt || wchar_t_cnt || double_cnt ||
        int8_cnt || int16_cnt || int32_cnt ||
        int64_cnt || ptr32_cnt || ptr64_cnt)
@@ -409,13 +414,23 @@ void cpp_convert_typet::write(typet &type)
     type=long_double_type();
     type.set(ID_C_c_type, ID_long_double);      
   }
-  else if(bool_cnt)
+  else if(cpp_bool_cnt)
+  {
+    if(signed_cnt || unsigned_cnt || int_cnt || short_cnt ||
+       char_cnt || wchar_t_cnt || proper_bool_cnt ||
+       int8_cnt || int16_cnt || int32_cnt ||
+       int64_cnt || ptr32_cnt || ptr64_cnt)
+      throw "illegal type modifier for C++ bool";
+
+    type.id(ID_bool);
+  }
+  else if(proper_bool_cnt)
   {
     if(signed_cnt || unsigned_cnt || int_cnt || short_cnt ||
        char_cnt || wchar_t_cnt ||
        int8_cnt || int16_cnt || int32_cnt ||
        int64_cnt || ptr32_cnt || ptr64_cnt)
-      throw "illegal type modifier for bool";
+      throw "illegal type modifier for __CPROVER_bool";
 
     type.id(ID_bool);
   }

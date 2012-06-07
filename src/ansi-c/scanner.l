@@ -814,6 +814,7 @@ wchar_t	            { // CodeWarrior doesn't have wchar_t built in
 "__CPROVER_array_of" { loc(); return TOK_ARRAY_OF; }
 "__CPROVER_thread_local" { loc(); return TOK_THREAD_LOCAL; }
 "__CPROVER_bitvector" { loc(); return TOK_CPROVER_BITVECTOR; }
+"__CPROVER_bool" { loc(); return TOK_CPROVER_BOOL; }
 
 "__thread"      { if(PARSER.mode==ansi_c_parsert::GCC ||
                      PARSER.mode==ansi_c_parsert::ARM)

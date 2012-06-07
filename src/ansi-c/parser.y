@@ -140,6 +140,7 @@ extern char *yyansi_ctext;
 %token TOK_EXISTS      "exists"
 %token TOK_ARRAY_OF    "array_of"
 %token TOK_CPROVER_BITVECTOR "__CPROVER_bitvector"
+%token TOK_CPROVER_BOOL "__CPROVER_bool"
 %token TOK_REAL        "__real__"
 %token TOK_IMAG        "__imag__"
 %token TOK_ALIGNAS     "_Alignas"
@@ -1149,6 +1150,7 @@ basic_type_name:
           set($$, ID_bv);
           stack($$).add(ID_size).swap(stack($3));
         }
+        | TOK_CPROVER_BOOL { $$=$1; set($$, ID_proper_bool); }
         ;
 
 elaborated_type_name:
