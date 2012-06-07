@@ -723,6 +723,7 @@ void goto_checkt::pointer_validity_check(
   const dereference_exprt &expr,
   const guardt &guard)
 {
+  #if 0
   if(!enable_pointer_check)
     return;
 
@@ -778,7 +779,7 @@ void goto_checkt::pointer_validity_check(
       expr.find_location(),
       guard);
   }
-
+  #endif
 }
 
 /*******************************************************************\
