@@ -489,6 +489,7 @@ cpp_using
 cpp_declaration
 cpp_member_spec
 C_cpp_type #cpp_type
+C_c_type #c_type
 namespace
 linkage
 decltype
