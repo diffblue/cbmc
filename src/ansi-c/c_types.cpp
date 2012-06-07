@@ -227,7 +227,7 @@ Function: long_long_uint_type
 
 typet long_long_uint_type()
 {
-  typet result=unsignedbv_typet(config.ansi_c.long_long_int_width);  
+  typet result=unsignedbv_typet(config.ansi_c.long_long_int_width);
   result.set(ID_C_c_type, ID_unsigned_long_long_int);
   return result;
 }
@@ -246,8 +246,8 @@ Function: c_bool_type
 
 typet c_bool_type()
 {
-  typet result(ID_c_bool);
-  result.set(ID_width, config.ansi_c.bool_width);
+  typet result=unsignedbv_typet(config.ansi_c.bool_width);
+  result.set(ID_C_c_type, ID_bool);
   return result;
 }
 

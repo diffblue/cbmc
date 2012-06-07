@@ -93,7 +93,7 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
 
     // we need to adjust the subtype to 'char'
     assert(expr.type().id()==ID_array);
-    expr.type().subtype().set(ID_C_cpp_type, ID_char);
+    expr.type().subtype().set(ID_C_c_type, ID_char);
   }
   else if(expr.is_nil())
   {

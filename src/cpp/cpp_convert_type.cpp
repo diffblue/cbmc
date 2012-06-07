@@ -373,12 +373,12 @@ void cpp_convert_typet::write(typet &type)
     if(long_cnt)
     {
       type=long_double_type();
-      type.set(ID_C_cpp_type, ID_long_double);
+      type.set(ID_C_c_type, ID_long_double);
     }
     else
     {
       type=double_type();
-      type.set(ID_C_cpp_type, ID_double);
+      type.set(ID_C_c_type, ID_double);
     }
   }
   else if(float_cnt)
@@ -393,7 +393,7 @@ void cpp_convert_typet::write(typet &type)
       throw "float can't be long";
 
     type=float_type();
-    type.set(ID_C_cpp_type, ID_float);      
+    type.set(ID_C_c_type, ID_float);      
   }
   else if(float128_cnt)
   {
@@ -407,7 +407,7 @@ void cpp_convert_typet::write(typet &type)
       throw "__float128 can't be long";
 
     type=long_double_type();
-    type.set(ID_C_cpp_type, ID_long_double);      
+    type.set(ID_C_c_type, ID_long_double);      
   }
   else if(bool_cnt)
   {
@@ -431,18 +431,18 @@ void cpp_convert_typet::write(typet &type)
     {
       type.id(ID_unsignedbv);
       type.set(ID_width, config.ansi_c.char_width);
-      type.set(ID_C_cpp_type, ID_unsigned_char);
+      type.set(ID_C_c_type, ID_unsigned_char);
     }
     else if(signed_cnt)
     {
       type.id(ID_signedbv);
       type.set(ID_width, config.ansi_c.char_width);
-      type.set(ID_C_cpp_type, ID_signed_char);
+      type.set(ID_C_c_type, ID_signed_char);
     }
     else
     {
       type.id(config.ansi_c.char_is_unsigned?ID_unsignedbv:ID_signedbv);
-      type.set(ID_C_cpp_type, ID_char);
+      type.set(ID_C_c_type, ID_char);
       type.set(ID_width, config.ansi_c.char_width);
     }
   }
@@ -458,7 +458,7 @@ void cpp_convert_typet::write(typet &type)
 
     type.id(ID_signedbv);
     type.set(ID_width, config.ansi_c.wchar_t_width);
-    type.set(ID_C_cpp_type, ID_wchar_t);
+    type.set(ID_C_c_type, ID_wchar_t);
   }
   else
   {
@@ -475,12 +475,12 @@ void cpp_convert_typet::write(typet &type)
       if(unsigned_cnt)
       {
         type.id(ID_unsignedbv);
-        type.set(ID_C_cpp_type, ID_unsigned_short_int);
+        type.set(ID_C_c_type, ID_unsigned_short_int);
       }
       else
       {
         type.id(ID_signedbv);
-        type.set(ID_C_cpp_type, ID_signed_short_int);
+        type.set(ID_C_c_type, ID_signed_short_int);
       }
 
       type.set(ID_width, config.ansi_c.short_int_width);
@@ -494,17 +494,17 @@ void cpp_convert_typet::write(typet &type)
       if(unsigned_cnt)
       {
         type.id(ID_unsignedbv);
-        type.set(ID_C_cpp_type, ID_unsigned_char);
+        type.set(ID_C_c_type, ID_unsigned_char);
       }
       else if(signed_cnt)
       {
         type.id(ID_signedbv);
-        type.set(ID_C_cpp_type, ID_signed_char);
+        type.set(ID_C_c_type, ID_signed_char);
       }
       else
       {
         type.id(ID_signedbv);
-        type.set(ID_C_cpp_type, ID_char);
+        type.set(ID_C_c_type, ID_char);
       }
 
       type.set(ID_width, 8);
@@ -518,12 +518,12 @@ void cpp_convert_typet::write(typet &type)
       if(unsigned_cnt)
       {
         type.id(ID_unsignedbv);
-        type.set(ID_C_cpp_type, ID_unsigned_short_int);
+        type.set(ID_C_c_type, ID_unsigned_short_int);
       }
       else
       {
         type.id(ID_signedbv);
-        type.set(ID_C_cpp_type, ID_signed_short_int);
+        type.set(ID_C_c_type, ID_signed_short_int);
       }
 
       type.set(ID_width, 16);
@@ -537,12 +537,12 @@ void cpp_convert_typet::write(typet &type)
       if(unsigned_cnt)
       {
         type.id(ID_unsignedbv);
-        type.set(ID_C_cpp_type, ID_unsigned_int);
+        type.set(ID_C_c_type, ID_unsigned_int);
       }
       else
       {
         type.id(ID_signedbv);
-        type.set(ID_C_cpp_type, ID_signed_int);
+        type.set(ID_C_c_type, ID_signed_int);
       }
 
       type.set(ID_width, 32);
@@ -556,12 +556,12 @@ void cpp_convert_typet::write(typet &type)
       if(unsigned_cnt)
       {
         type.id(ID_unsignedbv);
-        type.set(ID_C_cpp_type, ID_unsigned_long_long_int);
+        type.set(ID_C_c_type, ID_unsigned_long_long_int);
       }
       else
       {
         type.id(ID_signedbv);
-        type.set(ID_C_cpp_type, ID_signed_long_long_int);
+        type.set(ID_C_c_type, ID_signed_long_long_int);
       }
 
       type.set(ID_width, 64);
@@ -570,12 +570,12 @@ void cpp_convert_typet::write(typet &type)
     {
       if(unsigned_cnt)
       {
-        type.set(ID_C_cpp_type, ID_unsigned_int);
+        type.set(ID_C_c_type, ID_unsigned_int);
         type.id(ID_unsignedbv);
       }
       else
       {
-        type.set(ID_C_cpp_type, ID_signed_int);
+        type.set(ID_C_c_type, ID_signed_int);
         type.id(ID_signedbv);
       }
 
@@ -585,12 +585,12 @@ void cpp_convert_typet::write(typet &type)
     {
       if(unsigned_cnt)
       {
-        type.set(ID_C_cpp_type, ID_unsigned_long_int);
+        type.set(ID_C_c_type, ID_unsigned_long_int);
         type.id(ID_unsignedbv);
       }
       else
       {
-        type.set(ID_C_cpp_type, ID_signed_long_int);
+        type.set(ID_C_c_type, ID_signed_long_int);
         type.id(ID_signedbv);
       }
       
@@ -600,12 +600,12 @@ void cpp_convert_typet::write(typet &type)
     {
       if(unsigned_cnt)
       {
-        type.set(ID_C_cpp_type, ID_unsigned_long_long_int);
+        type.set(ID_C_c_type, ID_unsigned_long_long_int);
         type.id(ID_unsignedbv);
       }
       else
       {
-        type.set(ID_C_cpp_type, ID_signed_long_long_int);
+        type.set(ID_C_c_type, ID_signed_long_long_int);
         type.id(ID_signedbv);
       }
       

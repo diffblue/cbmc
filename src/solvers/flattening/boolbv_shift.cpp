@@ -22,11 +22,13 @@ Function: boolbvt::convert_shift
 
 void boolbvt::convert_shift(const exprt &expr, bvt &bv)
 {
-  if(expr.type().id()!=ID_unsignedbv &&
-     expr.type().id()!=ID_signedbv &&
-     expr.type().id()!=ID_floatbv &&
-     expr.type().id()!=ID_pointer &&
-     expr.type().id()!=ID_bv)
+  const irep_idt &type_id=expr.type().id();
+
+  if(type_id!=ID_unsignedbv &&
+     type_id!=ID_signedbv &&
+     type_id!=ID_floatbv &&
+     type_id!=ID_pointer &&
+     type_id!=ID_bv)
     return conversion_failed(expr, bv);
 
   unsigned width=boolbv_width(expr.type());

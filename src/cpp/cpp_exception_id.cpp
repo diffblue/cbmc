@@ -44,12 +44,12 @@ void cpp_exception_list_rec(
     }
   }
 
-  // grab C++ type
-  irep_idt cpp_type=src.get(ID_C_cpp_type);
+  // grab C/C++ type
+  irep_idt c_type=src.get(ID_C_c_type);
   
-  if(cpp_type!=irep_idt())
+  if(c_type!=irep_idt())
   {
-    dest.push_back(id2string(cpp_type)+suffix);
+    dest.push_back(id2string(c_type)+suffix);
     return;
   }
 

@@ -826,9 +826,9 @@ bool cpp_typecheckt::standard_conversion_sequence(
 
   curr_expr.swap(new_expr);
 
-  // need to consider #cpp_type
+  // need to consider #c_type
   if(follow(curr_expr.type())!=follow(type) ||
-     curr_expr.type().get(ID_C_cpp_type)!=type.get(ID_C_cpp_type))
+     curr_expr.type().get(ID_C_c_type)!=type.get(ID_C_c_type))
   {
     if(type.id()==ID_signedbv ||
        type.id()==ID_unsignedbv ||
@@ -1264,8 +1264,8 @@ bool cpp_typecheckt::reference_related(
   typet from = follow(expr.type());
   typet to = follow(type.subtype());
 
-  // need to check #cpp_type
-  if(from.get(ID_C_cpp_type)!=to.get(ID_C_cpp_type))
+  // need to check #c_type
+  if(from.get(ID_C_c_type)!=to.get(ID_C_c_type))
     return false;
 
   if(from==to)

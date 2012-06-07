@@ -180,40 +180,42 @@ std::string expr2cppt::convert_rec(
   {
     return new_qualifiers.as_string()+convert(src.subtype())+" &&";
   }
-  else if(src.get(ID_C_cpp_type)!=irep_idt())
+  else if(src.get(ID_C_c_type)!=irep_idt())
   {
-    const irep_idt cpp_type=src.get(ID_C_cpp_type);
+    const irep_idt c_type=src.get(ID_C_c_type);
 
-    if(cpp_type==ID_signed_char)
+    if(c_type==ID_signed_char)
       return new_qualifiers.as_string()+"signed char";
-    else if(cpp_type==ID_unsigned_char)
+    else if(c_type==ID_unsigned_char)
       return new_qualifiers.as_string()+"unsigned char";
-    else if(cpp_type==ID_char)
+    else if(c_type==ID_char)
       return new_qualifiers.as_string()+"char";
-    else if(cpp_type==ID_signed_short_int)
+    else if(c_type==ID_signed_short_int)
       return new_qualifiers.as_string()+"short";
-    else if(cpp_type==ID_unsigned_short_int)
+    else if(c_type==ID_unsigned_short_int)
       return new_qualifiers.as_string()+"unsigned short";
-    else if(cpp_type==ID_signed_int)
+    else if(c_type==ID_signed_int)
       return new_qualifiers.as_string()+"int";
-    else if(cpp_type==ID_unsigned_int)
+    else if(c_type==ID_unsigned_int)
       return new_qualifiers.as_string()+"unsigned";
-    else if(cpp_type==ID_signed_long_int)
+    else if(c_type==ID_signed_long_int)
       return new_qualifiers.as_string()+"long";
-    else if(cpp_type==ID_unsigned_long_int)
+    else if(c_type==ID_unsigned_long_int)
       return new_qualifiers.as_string()+"unsigned long";
-    else if(cpp_type==ID_signed_long_long_int)
+    else if(c_type==ID_signed_long_long_int)
       return new_qualifiers.as_string()+"long long";
-    else if(cpp_type==ID_unsigned_long_long_int)
+    else if(c_type==ID_unsigned_long_long_int)
       return new_qualifiers.as_string()+"unsigned long long";
-    else if(cpp_type==ID_wchar_t)
+    else if(c_type==ID_wchar_t)
       return new_qualifiers.as_string()+"wchar_t";
-    else if(cpp_type==ID_float)
+    else if(c_type==ID_float)
       return new_qualifiers.as_string()+"float";
-    else if(cpp_type==ID_double)
+    else if(c_type==ID_double)
       return new_qualifiers.as_string()+"double";
-    else if(cpp_type==ID_long_double)
+    else if(c_type==ID_long_double)
       return new_qualifiers.as_string()+"long double";
+    else if(c_type==ID_bool)
+      return new_qualifiers.as_string()+"bool";
     else
       return expr2ct::convert_rec(src, qualifiers);
   }
