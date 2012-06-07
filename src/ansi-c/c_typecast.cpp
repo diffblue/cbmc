@@ -693,39 +693,46 @@ Function: c_typecastt::do_typecast
 
 \*******************************************************************/
 
-void c_typecastt::do_typecast(exprt &dest, const typet &type)
+void c_typecastt::do_typecast(exprt &expr, const typet &type)
 {
   // special case: array -> pointer is actually
   // something like address_of
   
-  const typet &dest_type=ns.follow(dest.type());
+  const typet &expr_type=ns.follow(expr.type());
 
-  if(dest_type.id()==ID_array)
+  if(expr_type.id()==ID_array)
   {
     index_exprt index;
-    index.array()=dest;
+    index.array()=expr;
     index.index()=gen_zero(index_type());
-    index.type()=dest_type.subtype();
-    dest=address_of_exprt(index);
-    if(ns.follow(dest.type())!=ns.follow(type))
-      dest.make_typecast(type);
+    index.type()=expr_type.subtype();
+    expr=address_of_exprt(index);
+    if(ns.follow(expr.type())!=ns.follow(type))
+      expr.make_typecast(type);
     return;
   }
 
-  if(dest_type!=type)
+  if(expr_type!=type)
   {
     // C booleans are special: we compile to ?0:1
     
     if(type.get(ID_C_c_type)==ID_bool)
     {
-      // -> _Bool
-      equal_exprt equal_zero(dest, gen_zero(dest_type));
-      exprt result=if_exprt(equal_zero, gen_zero(type), gen_one(type));
-      dest.swap(result);
+      if(expr_type.id()==ID_bool) // bool -> _Bool
+      {
+        exprt result=if_exprt(expr, gen_one(type), gen_zero(type));
+        expr.swap(result);
+      }
+      else // * -> _Bool
+      {
+        equal_exprt equal_zero(expr, gen_zero(expr_type));
+        exprt result=if_exprt(equal_zero, gen_zero(type), gen_one(type));
+        expr.swap(result);
+      }
     }
     else
     {    
-      dest.make_typecast(type);
+      expr.make_typecast(type);
     }
   }
 }
