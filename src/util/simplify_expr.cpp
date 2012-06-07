@@ -34,6 +34,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #ifdef DEBUGX
 #include <langapi/language_util.h>
+#include <iostream>
 #endif
 
 //#define USE_CACHE
