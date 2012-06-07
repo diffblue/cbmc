@@ -36,7 +36,6 @@ exprt c_sizeoft::sizeof_rec(const typet &type)
      type.id()==ID_floatbv ||
      type.id()==ID_fixedbv ||
      type.id()==ID_c_enum ||
-     type.id()==ID_c_bool ||
      type.id()==ID_incomplete_c_enum)
   {
     // We round up to bytes.

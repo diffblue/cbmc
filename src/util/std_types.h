@@ -714,53 +714,6 @@ inline signedbv_typet &to_signedbv_type(typet &type)
   return static_cast<signedbv_typet &>(type);
 }
 
-/*! \brief Fixed-width bit-vector with true/false interpretation
-*/
-class c_bool_typet:public bitvector_typet
-{
-public:
-  c_bool_typet():bitvector_typet(ID_c_bool)
-  {
-  }
-
-  explicit c_bool_typet(unsigned width):bitvector_typet(ID_c_bool)
-  {
-    set_width(width);
-  }
-  
-  mp_integer smallest() const;
-  mp_integer largest() const;
-  constant_exprt smallest_expr() const;
-  constant_exprt largest_expr() const;
-  constant_exprt constant_true() const;
-  constant_exprt constant_false() const;
-};
-
-/*! \brief Cast a generic typet to an \ref c_bool_typet
- *
- * This is an unchecked conversion. \a type must be known to be \ref
- * c_bool_typet.
- *
- * \param type Source type
- * \return Object of type \ref c_bool_typet
- *
- * \ingroup gr_std_types
-*/
-inline const c_bool_typet &to_c_bool_type(const typet &type)
-{
-  assert(type.id()==ID_c_bool);
-  return static_cast<const c_bool_typet &>(type);
-}
-
-/*! \copydoc to_c_bool_type(const typet &)
- * \ingroup gr_std_types
-*/
-inline c_bool_typet &to_c_bool_type(typet &type)
-{
-  assert(type.id()==ID_c_bool);
-  return static_cast<c_bool_typet &>(type);
-}
-
 /*! \brief Fixed-width bit-vector with signed fixed-point interpretation
 */
 class fixedbv_typet:public bitvector_typet

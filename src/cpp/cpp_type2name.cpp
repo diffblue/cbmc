@@ -139,11 +139,11 @@ std::string cpp_type2name(const typet &type)
   }
   else if(type.id()==ID_signedbv || type.id()==ID_unsignedbv)
   {
-    // we try to use #cpp_type
-    const irep_idt cpp_type=type.get(ID_C_cpp_type);
+    // we try to use #c_type
+    const irep_idt c_type=type.get(ID_C_c_type);
     
-    if(cpp_type!=irep_idt())
-      result+=id2string(cpp_type);
+    if(c_type!=irep_idt())
+      result+=id2string(c_type);
     else if(type.id()==ID_unsignedbv)
       result+="unsigned_int";
     else
@@ -151,11 +151,11 @@ std::string cpp_type2name(const typet &type)
   }
   else if(type.id()==ID_fixedbv || type.id()==ID_floatbv)
   {
-    // we try to use #cpp_type
-    const irep_idt cpp_type=type.get(ID_C_cpp_type);
+    // we try to use #c_type
+    const irep_idt c_type=type.get(ID_C_c_type);
 
-    if(cpp_type!=irep_idt())
-      result+=id2string(cpp_type);
+    if(c_type!=irep_idt())
+      result+=id2string(c_type);
     else
       result+="double";
   }

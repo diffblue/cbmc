@@ -315,7 +315,7 @@ void boolbvt::convert_typecast(const exprt &expr, bvt &bv)
 
         return;
       }
-
+      
     default:
       if(op_type.id()==ID_bool)
       {

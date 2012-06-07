@@ -153,7 +153,7 @@ std::string expr2ct::convert_rec(
 
   std::string q=new_qualifiers.as_string();
 
-  if(src.id()==ID_bool || src.id()==ID_c_bool)
+  if(src.id()==ID_bool)
   {
     return q+"_Bool";
   }
@@ -172,34 +172,36 @@ std::string expr2ct::convert_rec(
   {
     // annotated?
     
-    irep_idt cpp_type=src.get(ID_C_cpp_type);
-    
-    if(cpp_type==ID_unsigned_char)
+    irep_idt c_type=src.get(ID_C_c_type);
+
+    if(c_type==ID_unsigned_char)
       return "unsigned char";
-    else if(cpp_type==ID_signed_char)
+    else if(c_type==ID_signed_char)
       return "signed char";
-    else if(cpp_type==ID_unsigned_short_int)
+    else if(c_type==ID_unsigned_short_int)
       return "unsigned short int";
-    else if(cpp_type==ID_signed_short_int)
+    else if(c_type==ID_signed_short_int)
       return "signed short int";
-    else if(cpp_type==ID_unsigned_int)
+    else if(c_type==ID_unsigned_int)
       return "unsigned int";
-    else if(cpp_type==ID_signed_int)
+    else if(c_type==ID_signed_int)
       return "signed int";
-    else if(cpp_type==ID_unsigned_long_int)
+    else if(c_type==ID_unsigned_long_int)
       return "unsigned long int";
-    else if(cpp_type==ID_signed_long_int)
+    else if(c_type==ID_signed_long_int)
       return "signed long int";
-    else if(cpp_type==ID_unsigned_long_long_int)
+    else if(c_type==ID_unsigned_long_long_int)
       return "unsigned long long int";
-    else if(cpp_type==ID_signed_long_long_int)
+    else if(c_type==ID_signed_long_long_int)
       return "signed long long int";
-    else if(cpp_type==ID_double)
+    else if(c_type==ID_double)
       return "double";
-    else if(cpp_type==ID_long_double)
+    else if(c_type==ID_long_double)
       return "long double";
-    else if(cpp_type==ID_float)
+    else if(c_type==ID_float)
       return "float";
+    else if(c_type==ID_bool)
+      return "_Bool";
       
     // There is also wchar_t in the above, but this isn't a C type.
 
@@ -1620,22 +1622,25 @@ std::string expr2ct::convert_constant(
     else
       dest="FALSE";
   }
-  else if(type.id()==ID_c_bool)
-  {
-    mp_integer int_value=binary2integer(id2string(value), false);
-    if(int_value!=0)
-      dest="TRUE";
-    else
-      dest="FALSE";
-  }
   else if(type.id()==ID_unsignedbv ||
           type.id()==ID_signedbv)
   {
     mp_integer int_value=binary2integer(id2string(value), type.id()==ID_signedbv);
-    dest=integer2string(int_value);
+
+    if(type.get(ID_C_c_type)==ID_bool)
+    {
+      if(int_value!=0)
+        dest="TRUE";
+      else
+        dest="FALSE";
+    }
+    else
+    {
+      dest=integer2string(int_value);
     
-    if(src.find(ID_C_c_sizeof_type).is_not_nil())
-      dest+=" [["+convert(static_cast<const typet &>(src.find(ID_C_c_sizeof_type)))+"]]";
+      if(src.find(ID_C_c_sizeof_type).is_not_nil())
+        dest+=" [["+convert(static_cast<const typet &>(src.find(ID_C_c_sizeof_type)))+"]]";
+    }
   }
   else if(type.id()==ID_floatbv)
   {
