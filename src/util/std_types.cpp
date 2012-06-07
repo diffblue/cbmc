@@ -431,3 +431,105 @@ constant_exprt unsignedbv_typet::largest_expr() const
   return to_constant_expr(from_integer(largest(), *this));
 }
 
+/*******************************************************************\
+
+Function: c_bool_typet::smallest
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+mp_integer c_bool_typet::smallest() const
+{
+  return 0;
+}
+
+/*******************************************************************\
+
+Function: c_bool_typet::largest
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+mp_integer c_bool_typet::largest() const
+{
+  return 1;
+}
+
+/*******************************************************************\
+
+Function: c_bool_typet::constant_false
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+constant_exprt c_bool_typet::constant_false() const
+{
+  return to_constant_expr(from_integer(0, *this));
+}
+
+/*******************************************************************\
+
+Function: c_bool_typet::constant_true
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+constant_exprt c_bool_typet::constant_true() const
+{
+  return to_constant_expr(from_integer(1, *this));
+}
+
+/*******************************************************************\
+
+Function: c_bool_typet::smallest_expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+constant_exprt c_bool_typet::smallest_expr() const
+{
+  return to_constant_expr(from_integer(0, *this));
+}
+
+/*******************************************************************\
+
+Function: c_bool_typet::largest_expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+constant_exprt c_bool_typet::largest_expr() const
+{
+  return to_constant_expr(from_integer(1, *this));
+}
+

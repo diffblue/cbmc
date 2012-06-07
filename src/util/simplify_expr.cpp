@@ -222,6 +222,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
     {
       if(expr_type_id==ID_unsignedbv ||
          expr_type_id==ID_signedbv ||
+         expr_type_id==ID_c_bool ||
          expr_type_id==ID_c_enum ||
          expr_type_id==ID_integer ||
          expr_type_id==ID_natural ||

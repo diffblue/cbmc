@@ -119,6 +119,17 @@ exprt from_integer(
       return expr;
     }
   }
+  else if(type_id==ID_c_bool)
+  {
+    unsigned width=to_c_bool_type(type).get_width();
+
+    if(int_value==0)
+      expr.set(ID_value, integer2binary(0, width));
+    else
+      expr.set(ID_value, integer2binary(1, width));
+
+    return expr;
+  }
 
   expr.make_nil();
   return expr;

@@ -54,7 +54,8 @@ void endianness_mapt::build_rec(const typet &src, bool little_endian)
           src.id()==ID_signedbv ||
           src.id()==ID_fixedbv ||
           src.id()==ID_floatbv ||
-          src.id()==ID_c_enum)
+          src.id()==ID_c_enum ||
+          src.id()==ID_c_bool)
   {
     mp_integer s=pointer_offset_size(ns, src); // error is -1
     unsigned s_int=integer2long(s), base=map.size();
