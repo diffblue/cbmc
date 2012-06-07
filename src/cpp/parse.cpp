@@ -426,7 +426,7 @@ bool Parser::isTypeSpecifier()
        || t==TOK_SIGNED || t==TOK_UNSIGNED || t==TOK_FLOAT || t==TOK_DOUBLE
        || t==TOK_INT8 || t==TOK_INT16 || t==TOK_INT32 || t==TOK_INT64 || t==TOK_PTR32 || t==TOK_PTR64
        || t==TOK_GCC_FLOAT128
-       || t==TOK_VOID || t==TOK_BOOL
+       || t==TOK_VOID || t==TOK_BOOL || t==TOK_CPROVER_BOOL
        || t==TOK_CLASS || t==TOK_STRUCT || t==TOK_UNION || t==TOK_ENUM || t==TOK_INTERFACE
        || t==TOK_TYPENAME
        || t==TOK_TYPEOF
@@ -1641,7 +1641,7 @@ bool Parser::optIntegralTypeOrClassSpec(typet &p)
        || t==TOK_WCHAR_T || t==TOK_COMPLEX // new !!!
        || t==TOK_UNSIGNED || t==TOK_FLOAT || t==TOK_DOUBLE || t==TOK_VOID
        || t==TOK_INT8 || t==TOK_INT16 || t==TOK_INT32 || t==TOK_INT64
-       || t==TOK_GCC_FLOAT128 || t==TOK_BOOL
+       || t==TOK_GCC_FLOAT128 || t==TOK_BOOL || t==TOK_CPROVER_BOOL
        )
     {
       Token tk;

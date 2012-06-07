@@ -713,5 +713,19 @@ void c_typecastt::do_typecast(exprt &dest, const typet &type)
   }
 
   if(dest_type!=type)
-    dest.make_typecast(type);
+  {
+    // C booleans are special: we compile to ?0:1
+    
+    if(type.get(ID_C_c_type)==ID_bool)
+    {
+      // -> _Bool
+      equal_exprt equal_zero(dest, gen_zero(dest_type));
+      exprt result=if_exprt(equal_zero, gen_zero(type), gen_one(type));
+      dest.swap(result);
+    }
+    else
+    {    
+      dest.make_typecast(type);
+    }
+  }
 }
