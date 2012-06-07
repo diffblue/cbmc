@@ -98,7 +98,9 @@ Function: int_type
 
 typet int_type()
 {
-  return signedbv_typet(config.ansi_c.int_width);  
+  typet result=signedbv_typet(config.ansi_c.int_width);  
+  result.set(ID_C_c_type, ID_int);
+  return result;
 }
 
 /*******************************************************************\
@@ -115,7 +117,9 @@ Function: uint_type
 
 typet uint_type()
 {
-  return unsignedbv_typet(config.ansi_c.int_width);  
+  typet result=unsignedbv_typet(config.ansi_c.int_width);  
+  result.set(ID_C_c_type, ID_unsigned_int);
+  return result;
 }
 
 /*******************************************************************\
@@ -166,7 +170,9 @@ Function: long_int_type
 
 typet long_int_type()
 {
-  return signedbv_typet(config.ansi_c.long_int_width);  
+  typet result=signedbv_typet(config.ansi_c.long_int_width);
+  result.set(ID_C_c_type, ID_signed_long_int);
+  return result;
 }
 
 /*******************************************************************\
@@ -183,7 +189,9 @@ Function: long_long_int_type
 
 typet long_long_int_type()
 {
-  return signedbv_typet(config.ansi_c.long_long_int_width);  
+  typet result=signedbv_typet(config.ansi_c.long_long_int_width);
+  result.set(ID_C_c_type, ID_signed_long_long_int);
+  return result;
 }
 
 /*******************************************************************\
@@ -200,7 +208,9 @@ Function: long_uint_type
 
 typet long_uint_type()
 {
-  return unsignedbv_typet(config.ansi_c.long_int_width);  
+  typet result=unsignedbv_typet(config.ansi_c.long_int_width);  
+  result.set(ID_C_c_type, ID_unsigned_long_int);
+  return result;
 }
 
 /*******************************************************************\
@@ -217,7 +227,9 @@ Function: long_long_uint_type
 
 typet long_long_uint_type()
 {
-  return unsignedbv_typet(config.ansi_c.long_long_int_width);  
+  typet result=unsignedbv_typet(config.ansi_c.long_long_int_width);  
+  result.set(ID_C_c_type, ID_unsigned_long_long_int);
+  return result;
 }
 
 /*******************************************************************\
@@ -234,9 +246,9 @@ Function: c_bool_type
 
 typet c_bool_type()
 {
-  typet c_bool(ID_c_bool);
-  c_bool.set(ID_width, config.ansi_c.bool_width);
-  return c_bool;
+  typet result(ID_c_bool);
+  result.set(ID_width, config.ansi_c.bool_width);
+  return result;
 }
 
 /*******************************************************************\
@@ -253,10 +265,16 @@ Function: char_type
 
 typet char_type()
 {
+  typet result;
+
   if(config.ansi_c.char_is_unsigned)
-    return unsignedbv_typet(config.ansi_c.char_width);
+    result=unsignedbv_typet(config.ansi_c.char_width);
   else
-    return signedbv_typet(config.ansi_c.char_width);
+    result=signedbv_typet(config.ansi_c.char_width);
+    
+  result.set(ID_C_c_type, ID_char);
+    
+  return result;
 }
 
 /*******************************************************************\
@@ -290,7 +308,9 @@ Function: wchar_t_type
 
 typet wchar_t_type()
 {
-  return signedbv_typet(config.ansi_c.wchar_t_width);
+  typet result=signedbv_typet(config.ansi_c.wchar_t_width);
+  result.set(ID_C_c_type, ID_wchar_t);
+  return result;
 }
 
 /*******************************************************************\
@@ -307,7 +327,9 @@ Function: float_type
 
 typet float_type()
 {
-  return build_float_type(config.ansi_c.single_width);
+  typet result=build_float_type(config.ansi_c.single_width);
+  result.set(ID_C_c_type, ID_float);
+  return result;
 }
 
 /*******************************************************************\
@@ -324,7 +346,9 @@ Function: double_type
 
 typet double_type()
 {
-  return build_float_type(config.ansi_c.double_width);
+  typet result=build_float_type(config.ansi_c.double_width);
+  result.set(ID_C_c_type, ID_double);
+  return result;
 }
 
 /*******************************************************************\
@@ -341,7 +365,9 @@ Function: long_double_type
 
 typet long_double_type()
 {
-  return build_float_type(config.ansi_c.long_double_width);
+  typet result=build_float_type(config.ansi_c.long_double_width);
+  result.set(ID_C_c_type, ID_long_double);
+  return result;
 }
 
 /*******************************************************************\
