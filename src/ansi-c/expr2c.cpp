@@ -153,7 +153,7 @@ std::string expr2ct::convert_rec(
 
   std::string q=new_qualifiers.as_string();
 
-  if(src.id()==ID_bool)
+  if(src.id()==ID_bool || src.id()==ID_c_bool)
   {
     return q+"_Bool";
   }
@@ -1620,14 +1620,22 @@ std::string expr2ct::convert_constant(
     else
       dest="FALSE";
   }
+  else if(type.id()==ID_c_bool)
+  {
+    mp_integer int_value=binary2integer(id2string(value), false);
+    if(int_value!=0)
+      dest="TRUE";
+    else
+      dest="FALSE";
+  }
   else if(type.id()==ID_unsignedbv ||
           type.id()==ID_signedbv)
   {
     mp_integer int_value=binary2integer(id2string(value), type.id()==ID_signedbv);
     dest=integer2string(int_value);
     
-    if(src.find("#c_sizeof_type").is_not_nil())
-      dest+=" [["+convert(static_cast<const typet &>(src.find("#c_sizeof_type")))+"]]";
+    if(src.find(ID_C_c_sizeof_type).is_not_nil())
+      dest+=" [["+convert(static_cast<const typet &>(src.find(ID_C_c_sizeof_type)))+"]]";
   }
   else if(type.id()==ID_floatbv)
   {
