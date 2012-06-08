@@ -42,6 +42,7 @@ void get_symbols_rec(
   {
     const code_typet &code_type=to_code_type(symbol.type);
     const code_typet::argumentst &arguments=code_type.arguments();
+
     for(code_typet::argumentst::const_iterator
         it=arguments.begin();
         it!=arguments.end();
@@ -49,6 +50,7 @@ void get_symbols_rec(
     {
       irep_idt id=it->get_identifier();
       const symbolt *s;
+      // identifiers for prototypes need not exist
       if(!ns.lookup(id, s)) new_symbols.insert(id);
     }
   }
