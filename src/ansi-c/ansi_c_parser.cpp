@@ -193,16 +193,28 @@ void ansi_c_parsert::new_declaration(
 
   if(base_name!="")
   {
+    bool force_root_scope=false;
+  
     if(mode==MSC && is_tag)
-      name=scope_name;
-    else
-      name=current_scope().prefix+scope_name;
+    {
+      // MSC always puts tags into global scope
+      force_root_scope=true;
+    }
+    else if(final_type.id()==ID_code)
+    {
+      // functions always go into global scope
+      force_root_scope=true;
+    }
+
+    name=force_root_scope?
+         scope_name:
+         current_scope().prefix+scope_name;
 
     if(put_into_scope)
     {
       // the following is bad!
       scopet &scope=
-        (mode==MSC && is_tag)?root_scope():current_scope();
+        force_root_scope?root_scope():current_scope();
 
       // see if already in scope
       scopet::name_mapt::const_iterator n_it=
