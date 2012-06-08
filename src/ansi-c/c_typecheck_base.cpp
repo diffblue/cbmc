@@ -152,20 +152,12 @@ void c_typecheck_baset::typecheck_symbol(symbolt &symbol)
     new_name=root_name;
     symbol.static_lifetime=true;
   }
-  else if(is_function && !symbol.is_actual)
-  {
-    // functions always go into the global namespace
-    // (code doesn't have lifetime),
-    // unless it's a function argument
-    new_name=root_name;
-    symbol.static_lifetime=false;
-  }
   else if(!is_function && symbol.value.id()==ID_code)
   {
     err_location(symbol.value);
     throw "only functions can have a function body";
   }
-
+  
   if(symbol.name!=new_name)
   {
     id_replace_map[symbol.name]=new_name;
