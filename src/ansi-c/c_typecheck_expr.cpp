@@ -2148,8 +2148,9 @@ void c_typecheck_baset::do_special_functions(
         throw "__builtin_choose_expr expects three arguments";
       }
       
+      expr.arguments()[0].make_typecast(bool_typet());
       make_constant(expr.arguments()[0]);
-
+      
       if(expr.arguments()[0].is_true())
       {
         exprt tmp=expr.arguments()[1];
