@@ -565,9 +565,11 @@ void c_typecastt::implicit_typecast_followed(
       {
         // ok
       }
-      else if(is_number(src_sub) && is_number(dest_sub))
+      else if((is_number(src_sub) || src_sub.id()==ID_c_enum) &&
+              (is_number(dest_sub) || dest_sub.id()==ID_c_enum))
       {
-        // also generous: between any to scalar types it's ok
+        // Also generous: between any to scalar types it's ok.
+        // We should probably check the size.
       }
       else
         warnings.push_back("incompatible pointer types");
