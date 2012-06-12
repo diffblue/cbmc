@@ -104,11 +104,20 @@ void goto_symext::symex_other(
     process_array_expr(clean_code.op1());
     
     if(ns.follow(clean_code.op0().type()).id()!=ID_array)
-      throw "array_copy expects array operand";
+      throw "array_copy expects array-typed operand";
     
+    if(ns.follow(clean_code.op1().type()).id()!=ID_array)
+      throw "array_copy expects array-typed operand";
+    
+    if(!base_type_eq(clean_code.op0().type().subtype(),
+                     clean_code.op1().type().subtype(), ns))
+      throw "array_copy expects array types with matching subtypes";
+
     if(!base_type_eq(clean_code.op0().type(),
                      clean_code.op1().type(), ns))
-      throw "array_copy expects matching array types";
+    {
+      clean_code.op1().make_typecast(clean_code.op0().type());
+    }
     
     code_assignt assignment;
     assignment.lhs()=clean_code.op0();
