@@ -185,6 +185,19 @@ void arrayst::collect_arrays(const exprt &a)
   {
     assert(0);
   }
+  else if(a.id()==ID_typecast)
+  {
+    // cast between array types?
+    assert(a.operands().size()==1);
+
+    if(a.op0().type().id()==ID_array)
+    {
+      arrays.make_union(a, a.op0());
+      collect_arrays(a.op0());
+    }
+    else
+      throw "unexpected array type cast from "+a.op0().type().id_string();
+  }
   else
     throw "unexpected array expression (collect_arrays): `"+a.id_string()+"'";
 }
@@ -412,6 +425,33 @@ void arrayst::add_array_constraints(
           expr.id()==ID_byte_update_big_endian)
   {
     assert(0);
+  }
+  else if(expr.id()==ID_typecast)
+  {
+    // we got a=(type[])b
+    assert(expr.operands().size()==1);
+
+    // add a[i]=b[i]
+    for(index_sett::const_iterator
+        it=index_set.begin();
+        it!=index_set.end();
+        it++)
+    {
+      index_exprt index_expr1;
+      index_expr1.type()=ns.follow(expr.type()).subtype();
+      index_expr1.array()=expr;
+      index_expr1.index()=*it;
+
+      index_exprt index_expr2;
+      index_expr2.type()=ns.follow(expr.type()).subtype();
+      index_expr2.array()=expr.op0();
+      index_expr2.index()=*it;
+
+      assert(index_expr1.type()==index_expr2.type());
+
+      // add constraint
+      set_to(equal_exprt(index_expr1, index_expr2), true);
+    }
   }
   else
     throw "unexpected array expression (add_array_constraints): `"+expr.id_string()+"'";
