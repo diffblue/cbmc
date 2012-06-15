@@ -171,6 +171,7 @@ Function: c_preprocess
 \*******************************************************************/
 
 bool c_preprocess(
+  preprocess_modet mode,
   std::istream &instream,
   std::ostream &outstream,
   message_handlert &message_handler)
@@ -184,7 +185,7 @@ bool c_preprocess(
 
   fclose(tmp);
 
-  bool result=c_preprocess(file, outstream, message_handler);
+  bool result=c_preprocess(mode, file, outstream, message_handler);
   
   unlink(file.c_str());
   
@@ -221,13 +222,14 @@ Function: c_preprocess
 
 \*******************************************************************/
 
-bool c_preprocess_codewarrior(const std::string &, std::ostream &, message_handlert &);
-bool c_preprocess_arm(const std::string &, std::ostream &, message_handlert &);
-bool c_preprocess_gcc(const std::string &, std::ostream &, message_handlert &);
-bool c_preprocess_none(const std::string &, std::ostream &, message_handlert &);
-bool c_preprocess_visual_studio(const std::string &, std::ostream &, message_handlert &);
+bool c_preprocess_codewarrior(preprocess_modet, const std::string &, std::ostream &, message_handlert &);
+bool c_preprocess_arm(preprocess_modet, const std::string &, std::ostream &, message_handlert &);
+bool c_preprocess_gcc(preprocess_modet, const std::string &, std::ostream &, message_handlert &);
+bool c_preprocess_none(preprocess_modet, const std::string &, std::ostream &, message_handlert &);
+bool c_preprocess_visual_studio(preprocess_modet, const std::string &, std::ostream &, message_handlert &);
 
 bool c_preprocess(
+  preprocess_modet mode,
   const std::string &path,
   std::ostream &outstream,
   message_handlert &message_handler)
@@ -235,16 +237,16 @@ bool c_preprocess(
   switch(config.ansi_c.mode)
   {
   case configt::ansi_ct::MODE_CODEWARRIOR:
-    return c_preprocess_codewarrior(path, outstream, message_handler);
+    return c_preprocess_codewarrior(mode, path, outstream, message_handler);
   
   case configt::ansi_ct::MODE_GCC:
-    return c_preprocess_gcc(path, outstream, message_handler);
+    return c_preprocess_gcc(mode, path, outstream, message_handler);
   
   case configt::ansi_ct::MODE_VISUAL_STUDIO:
-    return c_preprocess_visual_studio(path, outstream, message_handler);
+    return c_preprocess_visual_studio(mode, path, outstream, message_handler);
   
   case configt::ansi_ct::MODE_ARM:
-    return c_preprocess_arm(path, outstream, message_handler);
+    return c_preprocess_arm(mode, path, outstream, message_handler);
   
   default:
     assert(false);
@@ -267,17 +269,18 @@ Function: c_preprocess_visual_studio
 \*******************************************************************/
 
 bool c_preprocess_visual_studio(
+  preprocess_modet mode,
   const std::string &file,
   std::ostream &outstream,
   message_handlert &message_handler)
 {
   // check extension
   if(is_dot_i_file(file))
-    return c_preprocess_none(file, outstream, message_handler);
+    return c_preprocess_none(mode, file, outstream, message_handler);
 
   #ifndef _WIN32
   // we fall back to gcc
-  return c_preprocess_gcc(file, outstream, message_handler);
+  return c_preprocess_gcc(mode, file, outstream, message_handler);
   #endif
 
   message_streamt message_stream(message_handler);
@@ -437,13 +440,14 @@ Function: c_preprocess_codewarrior
 \*******************************************************************/
 
 bool c_preprocess_codewarrior(
+  preprocess_modet mode,
   const std::string &file,
   std::ostream &outstream,
   message_handlert &message_handler)
 {
   // check extension
   if(is_dot_i_file(file))
-    return c_preprocess_none(file, outstream, message_handler);
+    return c_preprocess_none(mode, file, outstream, message_handler);
 
   // preprocessing
   message_streamt message_stream(message_handler);
@@ -544,13 +548,14 @@ Function: c_preprocess_gcc
 \*******************************************************************/
 
 bool c_preprocess_gcc(
+  preprocess_modet mode,
   const std::string &file,
   std::ostream &outstream,
   message_handlert &message_handler)
 {
   // check extension
   if(is_dot_i_file(file))
-    return c_preprocess_none(file, outstream, message_handler);
+    return c_preprocess_none(mode, file, outstream, message_handler);
 
   // preprocessing
   message_streamt message_stream(message_handler);
@@ -736,11 +741,19 @@ bool c_preprocess_gcc(
     command+=" "+*it;
     
   int result;
+  
+  // the following forces the mode
+  switch(mode)
+  {
+  case PREPROCESS_C: command+=" -x c"; break;
+  case PREPROCESS_CPP: command+=" -x c++"; break;
+  default:;
+  }
 
   #ifdef _WIN32
-  std::string tmpi=get_temporary_file("tmp.cl", "");
+  std::string tmpi=get_temporary_file("tmp.gcc", "");
   command+=" \""+file+"\"";
-  command+=" > \""+tmpi+"\"";
+  command+=" -o \""+tmpi+"\"";
   command+=" 2> \""+stderr_file+"\"";
 
   // _popen isn't very reliable on WIN32
@@ -822,13 +835,14 @@ Function: c_preprocess_arm
 \*******************************************************************/
 
 bool c_preprocess_arm(
+  preprocess_modet mode,
   const std::string &file,
   std::ostream &outstream,
   message_handlert &message_handler)
 {
   // check extension
   if(is_dot_i_file(file))
-    return c_preprocess_none(file, outstream, message_handler);
+    return c_preprocess_none(mode, file, outstream, message_handler);
 
   // preprocessing using armcc
   message_streamt message_stream(message_handler);
@@ -970,6 +984,7 @@ Function: c_preprocess_none
 \*******************************************************************/
 
 bool c_preprocess_none(
+  preprocess_modet mode,
   const std::string &file,
   std::ostream &outstream,
   message_handlert &message_handler)

@@ -84,9 +84,9 @@ bool ansi_c_languaget::preprocess(
 {
   // stdin?
   if(path=="")
-    return c_preprocess(instream, outstream, message_handler);
+    return c_preprocess(PREPROCESS_C, instream, outstream, message_handler);
 
-  return c_preprocess(path, outstream, message_handler);  
+  return c_preprocess(PREPROCESS_C, path, outstream, message_handler);  
 }
              
 /*******************************************************************\
