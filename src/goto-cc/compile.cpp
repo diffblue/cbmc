@@ -687,7 +687,21 @@ bool compilet::parse(const std::string &file_name)
     return true;
   }
 
-  languaget *languagep=get_language_from_filename(file_name);
+  languaget *languagep;
+  
+  // Using '-x', the type of a file can be overridden;
+  // otherwise, it's guessed from the extension.
+
+  if(cmdline.isset('x'))
+  {
+    const std::string language=cmdline.getval('x');
+    if(language=="c++" || language=="c++-header")
+      languagep=get_language_from_mode("C");
+    else
+      languagep=get_language_from_mode("cpp");
+  }
+  else
+    languagep=get_language_from_filename(file_name);
 
   if(languagep==NULL)
   {
@@ -706,10 +720,10 @@ bool compilet::parse(const std::string &file_name)
   lf.filename=file_name;
   lf.language=languagep;
 
-  print(8, "Parsing: "+file_name);
-
   if(only_preprocess)
   {
+    print(8, "Preprocessing: "+file_name);
+
     std::ostream *os = &std::cout;
     std::ofstream ofs;
 
@@ -730,6 +744,8 @@ bool compilet::parse(const std::string &file_name)
   }
   else
   {
+    print(8, "Parsing: "+file_name);
+
     if(language.parse(infile, file_name, get_message_handler()))
     {
       if(get_ui()==ui_message_handlert::PLAIN)
