@@ -122,6 +122,7 @@ protected:
   virtual void convert_if(const exprt &expr, bvt &bv);
   virtual void convert_struct(const exprt &expr, bvt &bv);
   virtual void convert_array(const exprt &expr, bvt &bv);
+  virtual void convert_vector(const exprt &expr, bvt &bv);
   virtual void convert_lambda(const exprt &expr, bvt &bv);
   virtual void convert_array_of(const exprt &expr, bvt &bv);
   virtual void convert_union(const exprt &expr, bvt &bv);
