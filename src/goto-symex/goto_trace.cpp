@@ -480,6 +480,10 @@ void show_goto_trace(
       out << std::endl;
       break;
       
+    case goto_trace_stept::FUNCTION_CALL:
+    case goto_trace_stept::FUNCTION_RETURN:
+      break;
+      
     default:
       assert(false);
     }

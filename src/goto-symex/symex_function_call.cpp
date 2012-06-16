@@ -216,7 +216,7 @@ void goto_symext::symex_function_call_symbol(
   {
     symex_trace(state, code);
   }
-  if(has_prefix(id2string(identifier), CPROVER_FKT_PREFIX))
+  else if(has_prefix(id2string(identifier), CPROVER_FKT_PREFIX))
   {
     symex_fkt(state, code);
   }
@@ -270,10 +270,16 @@ void goto_symext::symex_function_call_code(
     state.source.pc++;
     return;
   }
+  
+  // record the call
+  target.function_call(state.guard, identifier, state.source);
 
   if(!goto_function.body_available)
   {
     no_body(identifier);
+    
+    // record the return
+    target.function_return(state.guard, identifier, state.source);
   
     if(call.lhs().is_not_nil())
     {
@@ -371,7 +377,11 @@ Function: goto_symext::symex_end_of_function
 
 void goto_symext::symex_end_of_function(statet &state)
 {
-  pop_frame(state);
+  // first record the return
+  target.function_return(state.guard, state.source.pc->function, state.source);
+
+  // then get rid of the frame
+  pop_frame(state);  
 }
 
 /*******************************************************************\
@@ -452,9 +462,9 @@ void goto_symext::return_assignment(statet &state)
 
   if(code.operands().size()==1)
   {
-    exprt value(code.op0());
-    
-    dereference(value, state, false); /* TODO: clean_expr? */
+    exprt value=code.op0();
+
+    clean_expr(value, state, false);
   
     if(frame.return_value.is_not_nil())
     {

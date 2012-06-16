@@ -132,6 +132,7 @@ void build_goto_trace(
     goto_trace_step.format_string=SSA_step.format_string;
     goto_trace_step.io_id=SSA_step.io_id;
     goto_trace_step.formatted=SSA_step.formatted;
+    goto_trace_step.identifier=SSA_step.identifier;
 
     if(SSA_step.original_full_lhs.is_not_nil())
       goto_trace_step.full_lhs=

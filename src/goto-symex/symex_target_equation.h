@@ -54,11 +54,13 @@ public:
   // record a function call
   virtual void function_call(
     const guardt &guard,
+    const irep_idt &identifier,
     const sourcet &source);
 
   // record return from a function
   virtual void function_return(
     const guardt &guard,
+    const irep_idt &identifier,
     const sourcet &source);
 
   // just record a location
@@ -149,6 +151,9 @@ public:
     bool formatted;
     std::list<exprt> io_args;
     std::list<exprt> converted_io_args;
+    
+    // for function call/return
+    irep_idt identifier;
     
     // for slicing
     bool ignore;
