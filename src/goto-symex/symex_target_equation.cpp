@@ -154,6 +154,7 @@ Function: symex_target_equationt::function_call
 
 void symex_target_equationt::function_call(
   const guardt &guard,
+  const irep_idt &identifier,
   const sourcet &source)
 {
   SSA_steps.push_back(SSA_stept());
@@ -162,6 +163,7 @@ void symex_target_equationt::function_call(
   SSA_step.guard_expr=guard.as_expr();
   SSA_step.type=goto_trace_stept::FUNCTION_CALL;
   SSA_step.source=source;
+  SSA_step.identifier=identifier;
 }
 
 /*******************************************************************\
@@ -178,6 +180,7 @@ Function: symex_target_equationt::function_return
 
 void symex_target_equationt::function_return(
   const guardt &guard,
+  const irep_idt &identifier,
   const sourcet &source)
 {
   SSA_steps.push_back(SSA_stept());
@@ -186,6 +189,7 @@ void symex_target_equationt::function_return(
   SSA_step.guard_expr=guard.as_expr();
   SSA_step.type=goto_trace_stept::FUNCTION_RETURN;
   SSA_step.source=source;
+  SSA_step.identifier=identifier;
 }
 
 /*******************************************************************\

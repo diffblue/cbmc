@@ -48,7 +48,7 @@ void convert(
       it++)
   {
     const locationt &location=it->pc->location;
-    
+
     xmlt xml_location;
     if(location.is_not_nil() && location.get_file()!="")
     {
@@ -126,7 +126,9 @@ void convert(
         xml_output.new_element("step_nr").data=i2string(it->step_nr);
         xml_output.new_element("thread").data=i2string(it->thread_nr);
         xml_output.new_element("text").data=text;
-        xml_output.new_element().swap(xml_location);
+
+        if(xml_location.name!="")
+          xml_output.new_element().swap(xml_location);
 
         for(std::list<exprt>::const_iterator
             l_it=it->io_args.begin();
@@ -157,7 +159,23 @@ void convert(
             new_element(convert(*l_it, ns));
         }
             
-        xml_output.new_element().swap(xml_location);
+        if(xml_location.name!="")
+          xml_output.new_element().swap(xml_location);
+      }
+      break;
+      
+    case goto_trace_stept::FUNCTION_CALL:
+    case goto_trace_stept::FUNCTION_RETURN:
+      {
+        std::string tag=
+          (it->type==goto_trace_stept::FUNCTION_CALL)?"function_call":"function_return";
+        xmlt &xml_function=xml.new_element(tag);
+        xml_function.new_element("step_nr").data=i2string(it->step_nr);
+        xml_function.set_attribute("identifier", id2string(it->identifier));
+        xml_function.new_element("thread").data=i2string(it->thread_nr);
+
+        if(xml_location.name!="")
+          xml_function.new_element().swap(xml_location);
       }
       break;
       

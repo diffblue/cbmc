@@ -78,6 +78,9 @@ public:
   typedef std::list<exprt> io_argst;
   io_argst io_args;
   bool formatted;
+  
+  // for function call/return
+  irep_idt identifier;
 
   /*! \brief outputs the trace step in ASCII to a given stream
   */
