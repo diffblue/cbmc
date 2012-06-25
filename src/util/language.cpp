@@ -1,6 +1,6 @@
 /*******************************************************************\
 
-Module:
+Module: Abstract interface to support a programming language
 
 Author: Daniel Kroening, kroening@kroening.com
 
