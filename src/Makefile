@@ -10,6 +10,9 @@ util.dir: big-int.dir
 # everything depends on util
 $(patsubst %, %.dir, $(filter-out big-int util, $(DIRS))): util.dir
 
+.PHONY: languages
+.PHONY: clean
+
 languages: util.dir langapi.dir \
            cpp.dir ansi-c.dir xmllang.dir
 
