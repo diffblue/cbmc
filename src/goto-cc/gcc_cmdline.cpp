@@ -129,6 +129,7 @@ bool gcc_cmdlinet::parse(int argc, const char **argv)
       strcmp(argv[i], "-print-multi-directory")==0 ||
       strcmp(argv[i], "-print-multi-lib")==0 ||
       strcmp(argv[i], "-print-search-dirs")==0 || strcmp(argv[i], "-Q")==0 ||
+      strcmp(argv[i], "-pthread")==0 ||
       strcmp(argv[i], "-save-temps")==0 || strcmp(argv[i], "-time")==0 ||
       strcmp(argv[i], "-O")==0 || strcmp(argv[i], "-O0")==0 ||        
       strcmp(argv[i], "-O1")==0 || strcmp(argv[i], "-O2")==0 ||
