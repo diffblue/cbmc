@@ -8,8 +8,9 @@ struct S2
 
 typedef union my_union
 {
-  struct S1 s1;
-  struct S2 s2;
+  int *ip;
+  struct S1 *s1;
+  struct S2 *s2;
 } U;
 
 typedef U U2 __attribute__ ((__transparent_union__));
@@ -23,5 +24,7 @@ int main()
   struct S1 s1;
   struct S2 s2;
   
-  f(s1);
+  f(&s1);
+  f(&s2);
+  f(0);
 }
