@@ -28,6 +28,17 @@ Function: type2name
 std::string type2name(const typet &type)
 {
   std::string result;
+  
+  // qualifiers first
+  if(type.get_bool(ID_C_constant))
+    result+="c";
+
+  if(type.get_bool(ID_C_restricted))
+    result+="r";
+
+  if(type.get_bool(ID_C_volatile))
+    result+="v";
+
   if(type.id()==irep_idt())
     throw "Empty type encountered.";
   else if(type.id()==ID_empty)
@@ -56,12 +67,13 @@ std::string type2name(const typet &type)
     result+="&";
   else if(type.id()==ID_code)
   {
-    const code_typet &t = to_code_type(type);
-    const code_typet::argumentst arguments = t.arguments();
+    const code_typet &t=to_code_type(type);
+    const code_typet::argumentst arguments=t.arguments();
     result+="P(";
-    for (code_typet::argumentst::const_iterator it = arguments.begin();
-         it!=arguments.end();
-         it++)
+
+    for(code_typet::argumentst::const_iterator it=arguments.begin();
+        it!=arguments.end();
+        it++)
     {      
       result+=type2name(it->type());
       result+="'" + it->get_identifier().as_string() + "'|";
@@ -75,17 +87,17 @@ std::string type2name(const typet &type)
     if(t.size().is_nil())
       result+="ARR?";
     else
-      result+="ARR" + t.size().get(ID_value).as_string();
+      result+="ARR"+t.size().get(ID_value).as_string();
   }
   else if(type.id()==ID_symbol)
   {
-    result+="SYM#" + type.get(ID_identifier).as_string() + "#";
+    result+="SYM#"+type.get(ID_identifier).as_string()+"#";
   }
   else if(type.id()==ID_struct || 
           type.id()==ID_union)
   {
-    if(type.id()==ID_struct) result +="ST";
-    if(type.id()==ID_union) result +="UN";
+    if(type.id()==ID_struct) result+="ST";
+    if(type.id()==ID_union) result+="UN";
     const struct_typet &t = to_struct_type(type);
     const struct_typet::componentst &components = t.components();
     result+="[";
@@ -94,7 +106,7 @@ std::string type2name(const typet &type)
         it++)
     {            
       result+=type2name(it->type());
-      result+="'" + it->get(ID_name).as_string() + "'|";
+      result+="'"+it->get(ID_name).as_string() + "'|";
     }
     result.resize(result.size()-1);
     result+="]";
