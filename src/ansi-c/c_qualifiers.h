@@ -33,6 +33,7 @@ public:
     is_volatile=false;
     is_restricted=false;
     is_ptr32=is_ptr64=false;
+    is_transparent_union=false;
   }
 
   // standard ones
@@ -40,6 +41,11 @@ public:
   
   // MS Visual Studio extension
   bool is_ptr32, is_ptr64;
+  
+  // gcc extension
+  bool is_transparent_union;
+  
+  // will likely add alignment here as well
   
   std::string as_string() const;
   void read(const typet &src);
@@ -54,6 +60,8 @@ public:
            (!is_restricted || q.is_restricted) &&
            (!is_ptr32 || q.is_ptr32) &&
            (!is_ptr64 || q.is_ptr64);
+
+    // is_transparent_union isn't checked
   }
   
   friend bool operator == (
@@ -64,7 +72,8 @@ public:
            a.is_volatile==b.is_volatile &&
            a.is_restricted==b.is_restricted &&
            a.is_ptr32==b.is_ptr32 &&
-           a.is_ptr64==b.is_ptr64;
+           a.is_ptr64==b.is_ptr64 &&
+           a.is_transparent_union==b.is_transparent_union;
   }
 
   friend bool operator != (
@@ -82,6 +91,7 @@ public:
     is_restricted|=b.is_restricted;
     is_ptr32|=b.is_ptr32;
     is_ptr64|=b.is_ptr64;
+    is_transparent_union|=b.is_transparent_union;
     return *this;
   }
   
@@ -89,12 +99,6 @@ public:
   {
     return q.is_constant+q.is_volatile+q.is_restricted+
            q.is_ptr32+q.is_ptr64;
-  }
-  
-  bool is_empty() const
-  {
-    return !is_constant && !is_volatile && !is_restricted &&
-           !is_ptr32 && !is_ptr64;
   }
 };
 

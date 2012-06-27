@@ -100,6 +100,7 @@ void c_typecheck_baset::typecheck_code_type(code_typet &type)
       typet &type=argument.type();
 
       typecheck_type(type);
+      
       adjust_function_argument(type);
       
       // adjust the identifier
@@ -566,8 +567,8 @@ void c_typecheck_baset::typecheck_symbol_type(typet &type)
   if(symbol.is_macro)
   {
     // overwrite, but preserve any qualifiers
-    c_qualifierst c_qualifiers;
-    c_qualifiers.read(type);
+    c_qualifierst c_qualifiers(type);
+    c_qualifiers+=c_qualifierst(symbol.type);
     type=symbol.type;
     c_qualifiers.write(type);
   }
