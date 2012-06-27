@@ -108,6 +108,11 @@ signed
 unsigned
 asm
 incomplete_array
+incomplete_struct
+incomplete_union
+incomplete_class
+incomplete_c_enum
+C_incomplete #incomplete
 identifier
 name
 cpp_name
@@ -115,10 +120,6 @@ C_id_class #id_class
 declaration
 declaration_list
 struct
-incomplete_struct
-incomplete_union
-incomplete_class
-incomplete_c_enum
 c_bitfield
 union
 class
@@ -461,6 +462,7 @@ gcc_attribute
 packed
 C_packed #packed
 transparent_union
+C_transparent_union #transparent_union
 aligned
 C_alignment #alignment
 vector

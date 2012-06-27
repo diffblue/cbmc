@@ -1829,7 +1829,7 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
       new_symbol.base_name=std::string(id2string(identifier), 3, std::string::npos);
       new_symbol.location=expr.location();
       new_symbol.type=code_typet();
-      new_symbol.type.set("#incomplete", true);
+      new_symbol.type.set(ID_C_incomplete, true);
       new_symbol.type.add(ID_return_type)=return_type;
 
       // TODO: should also guess some argument types
@@ -2223,7 +2223,7 @@ void c_typecheck_baset::typecheck_function_call_arguments(
     
   // no. of arguments test
 
-  if(code_type.get_bool("#incomplete"))
+  if(code_type.get_bool(ID_C_incomplete))
   {
     // can't check
   }
