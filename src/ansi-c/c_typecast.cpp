@@ -498,18 +498,21 @@ void c_typecastt::implicit_typecast_followed(
      dest_type.get_bool(ID_C_transparent_union) &&
      src_type.id()!=ID_union)
   {
+    // the argument corresponding to a transparent union type can be of any
+    // type in the union; no cast is required
+    
     // check union members
-    const union_typet &union_type=to_union_type(dest_type);
+    const union_typet &dest_union_type=to_union_type(dest_type);
 
     for(union_typet::componentst::const_iterator
-        it=union_type.components().begin();
-        it!=union_type.components().end();
+        it=dest_union_type.components().begin();
+        it!=dest_union_type.components().end();
         it++)
     {
       if(!check_c_implicit_typecast(src_type, it->type()))
       {
         // build union constructor
-        exprt union_expr(ID_union, union_type);
+        exprt union_expr(ID_union, dest_union_type);
         union_expr.move_to_operands(expr);
         union_expr.set(ID_component_name, it->get_name());
         expr=union_expr;
