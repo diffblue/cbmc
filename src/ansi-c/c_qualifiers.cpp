@@ -70,6 +70,9 @@ void c_qualifierst::read(const typet &src)
 
   if(src.get_bool(ID_C_ptr64))
     is_ptr64=true;
+
+  if(src.get_bool(ID_C_transparent_union))
+    is_transparent_union=true;
 }
 
 /*******************************************************************\
@@ -110,6 +113,11 @@ void c_qualifierst::write(typet &dest) const
     dest.set(ID_C_ptr64, true);
   else
     dest.remove(ID_C_ptr64);
+
+  if(is_transparent_union)
+    dest.set(ID_C_transparent_union, true);
+  else
+    dest.remove(ID_C_transparent_union);
 }
 
 /*******************************************************************\
@@ -131,6 +139,7 @@ void c_qualifierst::clear(typet &dest)
   dest.remove(ID_C_restricted);
   dest.remove(ID_C_ptr32);
   dest.remove(ID_C_ptr64);
+  dest.remove(ID_C_transparent_union);
 }
 
 /*******************************************************************\

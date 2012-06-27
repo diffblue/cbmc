@@ -258,34 +258,25 @@ Function: c_typecastt::follow_with_qualifiers
 typet c_typecastt::follow_with_qualifiers(const typet &src_type)
 {
   if(src_type.id()!=ID_symbol) return src_type;
-
-  typet dest_type=src_type;
+  
+  typet result_type=src_type;
   
   // collect qualifiers
   c_qualifierst qualifiers;
   
-  // hack for something that isn't a proper type qualifier
-  bool transparent_union=false;
-  
-  while(dest_type.id()==ID_symbol)
+  while(result_type.id()==ID_symbol)
   {
-    qualifiers+=c_qualifierst(dest_type);
+    qualifiers+=c_qualifierst(result_type);
 
-    if(dest_type.get_bool(ID_transparent_union))
-      transparent_union=true;
-  
     const symbolt &followed_type_symbol=
-      ns.lookup(dest_type.get(ID_identifier));
+      ns.lookup(result_type.get(ID_identifier));
 
-    dest_type=followed_type_symbol.type;
+    result_type=followed_type_symbol.type;
   }
 
-  qualifiers.write(dest_type);
+  qualifiers.write(result_type);
 
-  if(transparent_union)
-    dest_type.set(ID_transparent_union, true);
-  
-  return dest_type;
+  return result_type;
 }
 
 /*******************************************************************\
@@ -504,7 +495,7 @@ void c_typecastt::implicit_typecast_followed(
 {
   // do transparent union
   if(dest_type.id()==ID_union &&
-     dest_type.get_bool(ID_transparent_union) &&
+     dest_type.get_bool(ID_C_transparent_union) &&
      src_type.id()!=ID_union)
   {
     // check union members

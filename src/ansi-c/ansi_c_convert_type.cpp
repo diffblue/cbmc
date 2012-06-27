@@ -436,7 +436,7 @@ void ansi_c_convert_typet::write(typet &type)
   c_qualifiers.write(type);
 
   if(transparent_union)
-    type.set(ID_transparent_union, true);
+    type.set(ID_C_transparent_union, true);
 
   if(packed)
     type.set(ID_C_packed, true);
