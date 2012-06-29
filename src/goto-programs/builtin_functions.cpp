@@ -1122,13 +1122,7 @@ void goto_convertt::do_function_call_symbol(
     exprt lhs=arguments[0];
     exprt rhs=typecast_exprt(
       address_of_exprt(arguments[1]), lhs.type());
-    
-    if(lhs.id()!=ID_symbol)
-    {
-      err_location(lhs);
-      throw "vs_start argument expected to be symbol";
-    }    
-    
+
     goto_programt::targett t=dest.add_instruction(ASSIGN);
     t->location=function.location();
     t->code=code_assignt(lhs, rhs);
