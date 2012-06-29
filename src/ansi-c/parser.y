@@ -2310,11 +2310,13 @@ KnR_parameter_declaration:
           KnR_parameter_declaring_list ';'
         ;
 
+        /* The following is stripped down because of conflicts due to gcc type attributes! */
+KnR_declaration_specifier:
+          storage_class
+        ;
+
 KnR_parameter_declaring_list:
-/*
- The following conflicts due to gcc type attributes!
- 
-          declaration_specifier declarator
+          KnR_declaration_specifier declarator
         {
           init($$);
           stack($$).add(ID_type)=stack($1); // save for later
@@ -2322,9 +2324,7 @@ KnR_parameter_declaring_list:
           PARSER.new_declaration(stack($1), stack($2), tmp);
           stack($$).move_to_sub(tmp);
         }
-        | 
-*/        
-          type_specifier declarator
+        | type_specifier declarator
         {
           init($$);
           stack($$).add(ID_type)=stack($1); // save for later
