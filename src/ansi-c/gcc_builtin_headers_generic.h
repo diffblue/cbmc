@@ -39,6 +39,7 @@ char *__builtin_strcpy(char *dest, const char *src);
 char *__builtin___strcpy_chk(char *dest, const char *src, __CPROVER_size_t size);
 char *__builtin_strncpy(char *dest, const char *src, unsigned n);
 char *__builtin___strncpy_chk(char *dest, const char *src, unsigned n, __CPROVER_size_t size);
+char *__builtin_stpcpy(char *dest, const char *src);
 char *__builtin___stpcpy(char *s1, const char *s2);
 char *__builtin___stpncpy_chk(char *s1, const char *s2, unsigned n, __CPROVER_size_t size);
 void __builtin_exit(int status);
