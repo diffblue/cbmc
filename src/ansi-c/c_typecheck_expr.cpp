@@ -2197,6 +2197,42 @@ void c_typecheck_baset::do_special_functions(
       float_debug_expr.location()=location;
       expr.swap(float_debug_expr);
     }
+    else if(identifier=="c::__sync_fetch_and_add" ||
+            identifier=="c::__sync_fetch_and_sub" ||
+            identifier=="c::__sync_fetch_and_or" ||
+            identifier=="c::__sync_fetch_and_and" ||
+            identifier=="c::__sync_fetch_and_xor" ||
+            identifier=="c::__sync_fetch_and_nand" ||
+            identifier=="c::__sync_add_and_fetch" ||
+            identifier=="c::__sync_sub_and_fetch" ||
+            identifier=="c::__sync_or_and_fetch" ||
+            identifier=="c::__sync_and_and_fetch" ||
+            identifier=="c::__sync_xor_and_fetch" ||
+            identifier=="c::__sync_nand_and_fetch" ||
+            identifier=="c::__sync_val_compare_and_swap" ||
+            identifier=="c::__sync_lock_test_and_set" ||
+            identifier=="c::__sync_lock_release")
+    {
+      // These are polymorphic, see
+      // http://gcc.gnu.org/onlinedocs/gcc-4.1.1/gcc/Atomic-Builtins.html
+      
+      // adjust return type of function to match pointer subtype
+      if(expr.arguments().size()<1)
+      {
+        err_location(f_op);
+        throw "__sync_* primitives take as least one argument";
+      }
+      
+      exprt &ptr_arg=expr.arguments().front();
+
+      if(ptr_arg.type().id()!=ID_pointer)
+      {
+        err_location(f_op);
+        throw "__sync_* primitives take pointer as first argument";
+      }
+      
+      expr.type()=expr.arguments().front().type().subtype();
+    }
   }
 }
 
