@@ -1140,6 +1140,151 @@ void goto_convertt::do_function_call_symbol(
     t->location=function.location();
     t->code=code_assignt(arguments[0], gen_zero(arguments[0].type()));
   }
+  else if(identifier=="c::__sync_fetch_and_add" ||
+          identifier=="c::__sync_fetch_and_sub" ||
+          identifier=="c::__sync_fetch_and_or" ||
+          identifier=="c::__sync_fetch_and_and" ||
+          identifier=="c::__sync_fetch_and_xor" ||
+          identifier=="c::__sync_fetch_and_nand")
+  {
+    // type __sync_fetch_and_OP(type *ptr, type value, ...)
+    // { tmp = *ptr; *ptr OP= value; return tmp; }
+  }
+  else if(identifier=="c::__sync_add_and_fetch" ||
+          identifier=="c::__sync_sub_and_fetch" ||
+          identifier=="c::__sync_or_and_fetch" ||
+          identifier=="c::__sync_and_and_fetch" ||
+          identifier=="c::__sync_xor_and_fetch" ||
+          identifier=="c::__sync_nand_and_fetch")
+  {
+    // type __sync_OP_and_fetch (type *ptr, type value, ...)
+    // { *ptr OP= value; return *ptr; }
+  }
+  else if(identifier=="c::__sync_bool_compare_and_swap")
+  {
+    // These builtins perform an atomic compare and swap. That is, if the
+    // current value of *ptr is oldval, then write newval into *ptr.  The
+    // “bool” version returns true if the comparison is successful and
+    // newval was written.  The “val” version returns the contents of *ptr
+    // before the operation.
+
+    // bool __sync_bool_compare_and_swap (type *ptr, type oldval, type newval, ...)
+    if(arguments.size()<3)
+    {
+      err_location(function);
+      throw "`"+id2string(identifier)+"' expected to have at least three arguments";
+    }
+
+    if(arguments[0].type().id()!=ID_pointer)
+    {
+      err_location(function);
+      throw "`"+id2string(identifier)+"' expected to have pointer argument";
+    }
+
+    // build *ptr
+    dereference_exprt deref_ptr(arguments[0], arguments[0].type().subtype());
+
+    goto_programt::targett t1=dest.add_instruction(ATOMIC_BEGIN);
+    t1->location=function.location();
+
+    // build *ptr==oldval    
+    equal_exprt equal(deref_ptr, arguments[1]);
+    if(equal.op1().type()!=equal.op0().type())
+      equal.op1().make_typecast(equal.op0().type());
+      
+    if(lhs.is_not_nil())
+    {
+      // return *ptr==oldval
+      goto_programt::targett t2=dest.add_instruction(ASSIGN);
+      t2->location=function.location();
+      t2->code=code_assignt(lhs, equal);
+      if(t2->code.op0().type()!=t2->code.op1().type())
+        t2->code.op1().make_typecast(t2->code.op0().type());
+    }
+    
+    // build (*ptr==oldval)?newval:*ptr    
+    if_exprt if_expr(equal, arguments[2], deref_ptr, deref_ptr.type());
+    if(if_expr.op1().type()!=if_expr.type())
+      if_expr.op1().make_typecast(if_expr.type());
+
+    goto_programt::targett t3=dest.add_instruction(ASSIGN);
+    t3->location=function.location();
+    t3->code=code_assignt(deref_ptr, if_expr);
+    
+    goto_programt::targett t4=dest.add_instruction(ATOMIC_END);
+    t4->location=function.location();
+  }
+  else if(identifier=="c::__sync_val_compare_and_swap")
+  {
+    // type __sync_val_compare_and_swap (type *ptr, type oldval, type newval, ...)
+    if(arguments.size()<3)
+    {
+      err_location(function);
+      throw "`"+id2string(identifier)+"' expected to have at least three arguments";
+    }
+
+    if(arguments[0].type().id()!=ID_pointer)
+    {
+      err_location(function);
+      throw "`"+id2string(identifier)+"' expected to have pointer argument";
+    }
+
+    // build *ptr
+    dereference_exprt deref_ptr(arguments[0], arguments[0].type().subtype());
+
+    goto_programt::targett t1=dest.add_instruction(ATOMIC_BEGIN);
+    t1->location=function.location();
+
+    if(lhs.is_not_nil())
+    {
+      // return *ptr
+      goto_programt::targett t2=dest.add_instruction(ASSIGN);
+      t2->location=function.location();
+      t2->code=code_assignt(lhs, deref_ptr);
+      if(t2->code.op0().type()!=t2->code.op1().type())
+        t2->code.op1().make_typecast(t2->code.op0().type());
+    }
+    
+    // build *ptr==oldval    
+    equal_exprt equal(deref_ptr, arguments[1]);
+    if(equal.op1().type()!=equal.op0().type())
+      equal.op1().make_typecast(equal.op0().type());
+      
+    // build (*ptr==oldval)?newval:*ptr    
+    if_exprt if_expr(equal, arguments[2], deref_ptr, deref_ptr.type());
+    if(if_expr.op1().type()!=if_expr.type())
+      if_expr.op1().make_typecast(if_expr.type());
+
+    goto_programt::targett t3=dest.add_instruction(ASSIGN);
+    t3->location=function.location();
+    t3->code=code_assignt(deref_ptr, if_expr);
+    
+    goto_programt::targett t4=dest.add_instruction(ATOMIC_END);
+    t4->location=function.location();
+  }
+  else if(identifier=="c::__sync_lock_test_and_set")
+  {
+    // type __sync_lock_test_and_set (type *ptr, type value, ...)
+    
+    // This builtin, as described by Intel, is not a traditional
+    // test-and-set operation, but rather an atomic exchange operation. 
+    // It writes value into *ptr, and returns the previous contents of
+    // *ptr.  Many targets have only minimal support for such locks, and
+    // do not support a full exchange operation.  In this case, a target
+    // may support reduced functionality here by which the only valid
+    // value to store is the immediate constant 1.  The exact value
+    // actually stored in *ptr is implementation defined.
+  }
+  else if(identifier=="c::__sync_lock_release")
+  {
+    // This builtin is not a full barrier, but rather an acquire barrier.
+    // This means that references after the builtin cannot move to (or be
+    // speculated to) before the builtin, but previous memory stores may
+    // not be globally visible yet, and previous memory loads may not yet
+    // be satisfied.
+
+    // void __sync_lock_release (type *ptr, ...)
+  }
   else
   {
     do_function_call_symbol(*symbol);
