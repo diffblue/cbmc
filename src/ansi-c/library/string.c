@@ -489,6 +489,16 @@ inline void *memset(void *s, int c, size_t n)
   return s;
 }
 
+/* FUNCTION: __builtin___memset_chk */
+
+void *__builtin___memset_chk(void *s, int c, unsigned n, __CPROVER_size_t size)
+{
+  __CPROVER_HIDE:
+  char *sp=s;
+  for(__CPROVER_size_t i=0; i<n ; i++) sp[i]=c;
+  return s;
+}
+
 /* FUNCTION: memmove */
 
 #ifndef __CPROVER_STRING_H_INCLUDED
