@@ -455,6 +455,15 @@ inline void *memcpy(void *dst, const void *src, size_t n)
   return dst;
 }
 
+/* FUNCTION: __builtin___memcpy_chk */
+
+void *__builtin___memcpy_chk(void *dst, const void *src, unsigned n, __CPROVER_size_t size)
+{
+  __CPROVER_HIDE:
+  for(__CPROVER_size_t i=0; i<n ; i++) ((char *)dst)[i]=((const char *)src)[i];
+  return dst;
+}
+
 /* FUNCTION: memset */
 
 #ifndef __CPROVER_STRING_H_INCLUDED
