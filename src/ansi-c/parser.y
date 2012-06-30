@@ -2694,6 +2694,14 @@ unary_abstract_declarator:
           merge_types($2, $3);
           do_pointer($1, $2);
         }
+        | '^'
+        {
+          // This is an Apple extension to C/C++/Objective C.
+          // http://en.wikipedia.org/wiki/Blocks_(C_language_extension)
+          $$=$1;
+          set($$, ID_block_pointer);
+          stack($$).add(ID_subtype)=irept(ID_abstract);
+        }
         ;
 
 parameter_unary_abstract_declarator:
@@ -2724,6 +2732,14 @@ parameter_unary_abstract_declarator:
           $$=$2;
           merge_types($2, $3);
           do_pointer($1, $2);
+        }
+        | '^'
+        {
+          // This is an Apple extension to C/C++/Objective C.
+          // http://en.wikipedia.org/wiki/Blocks_(C_language_extension)
+          $$=$1;
+          set($$, ID_block_pointer);
+          stack($$).add(ID_subtype)=irept(ID_abstract);
         }
         ;
 
