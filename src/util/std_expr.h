@@ -1583,8 +1583,14 @@ extern inline dereference_exprt &to_dereference_expr(exprt &expr)
 class if_exprt:public exprt
 {
 public:
-  if_exprt(const exprt &cond, const exprt &t, const exprt &f):
+  inline if_exprt(const exprt &cond, const exprt &t, const exprt &f):
     exprt(ID_if, t.type())
+  {
+    copy_to_operands(cond, t, f);
+  }
+
+  inline if_exprt(const exprt &cond, const exprt &t, const exprt &f, const typet &type):
+    exprt(ID_if, type)
   {
     copy_to_operands(cond, t, f);
   }
