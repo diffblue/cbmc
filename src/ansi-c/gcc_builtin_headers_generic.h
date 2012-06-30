@@ -42,6 +42,10 @@ char *__builtin___strncpy_chk(char *dest, const char *src, unsigned n, __CPROVER
 char *__builtin_stpcpy(char *dest, const char *src);
 char *__builtin___stpcpy(char *s1, const char *s2);
 char *__builtin___stpncpy_chk(char *s1, const char *s2, unsigned n, __CPROVER_size_t size);
+int __builtin___sprintf_chk(char *s, int flag, __CPROVER_size_t os, const char *fmt, ...);
+int __builtin___snprintf_chk(char *s, __CPROVER_size_t maxlen, int flag, size_t os, const char *fmt, ...);
+int __builtin___vsprintf_chk(char *s, int flag, __CPROVER_size_t os, const char *fmt, __builtin_va_list ap);
+int __builtin___vsnprintf_chk (char *s, __CPROVER_size_t maxlen, int flag, __CPROVER_size_t os, const char *fmt, __builtin_va_list ap);                                                                                                                              
 void __builtin_exit(int status);
 char *__builtin_strchr(const char *s, int c);
 unsigned __builtin_strspn(const char *s, const char *accept);
