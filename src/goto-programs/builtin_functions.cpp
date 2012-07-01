@@ -1149,6 +1149,55 @@ void goto_convertt::do_function_call_symbol(
   {
     // type __sync_fetch_and_OP(type *ptr, type value, ...)
     // { tmp = *ptr; *ptr OP= value; return tmp; }
+
+    if(arguments.size()<2)
+    {
+      err_location(function);
+      throw "`"+id2string(identifier)+"' expected to have at least two arguments";
+    }
+
+    if(arguments[0].type().id()!=ID_pointer)
+    {
+      err_location(function);
+      throw "`"+id2string(identifier)+"' expected to have pointer argument";
+    }
+    
+    // build *ptr
+    dereference_exprt deref_ptr(arguments[0], arguments[0].type().subtype());
+
+    goto_programt::targett t1=dest.add_instruction(ATOMIC_BEGIN);
+    t1->location=function.location();
+
+    if(lhs.is_not_nil())
+    {
+      // return *ptr
+      goto_programt::targett t2=dest.add_instruction(ASSIGN);
+      t2->location=function.location();
+      t2->code=code_assignt(lhs, deref_ptr);
+      if(t2->code.op0().type()!=t2->code.op1().type())
+        t2->code.op1().make_typecast(t2->code.op0().type());
+    }
+    
+    irep_idt op_id=
+      identifier=="c::__sync_fetch_and_add"?ID_plus:
+      identifier=="c::__sync_fetch_and_sub"?ID_minus:
+      identifier=="c::__sync_fetch_and_or"?ID_bitor:
+      identifier=="c::__sync_fetch_and_and"?ID_bitand:
+      identifier=="c::__sync_fetch_and_xor"?ID_bitxor:
+      identifier=="c::__sync_fetch_and_nand"?ID_bitnand:
+      ID_nil;
+    
+    // build *ptr=*ptr OP arguments[1];
+    binary_exprt op_expr(deref_ptr, op_id, arguments[1], deref_ptr.type());
+    if(op_expr.op1().type()!=op_expr.type())
+      op_expr.op1().make_typecast(op_expr.type());
+
+    goto_programt::targett t3=dest.add_instruction(ASSIGN);
+    t3->location=function.location();
+    t3->code=code_assignt(deref_ptr, op_expr);
+    
+    goto_programt::targett t4=dest.add_instruction(ATOMIC_END);
+    t4->location=function.location();
   }
   else if(identifier=="c::__sync_add_and_fetch" ||
           identifier=="c::__sync_sub_and_fetch" ||
@@ -1159,6 +1208,55 @@ void goto_convertt::do_function_call_symbol(
   {
     // type __sync_OP_and_fetch (type *ptr, type value, ...)
     // { *ptr OP= value; return *ptr; }
+
+    if(arguments.size()<2)
+    {
+      err_location(function);
+      throw "`"+id2string(identifier)+"' expected to have at least two arguments";
+    }
+
+    if(arguments[0].type().id()!=ID_pointer)
+    {
+      err_location(function);
+      throw "`"+id2string(identifier)+"' expected to have pointer argument";
+    }
+    
+    // build *ptr
+    dereference_exprt deref_ptr(arguments[0], arguments[0].type().subtype());
+
+    goto_programt::targett t1=dest.add_instruction(ATOMIC_BEGIN);
+    t1->location=function.location();
+
+    irep_idt op_id=
+      identifier=="c::__sync_add_and_fetch"?ID_plus:
+      identifier=="c::__sync_sub_and_fetch"?ID_minus:
+      identifier=="c::__sync_or_and_fetch"?ID_bitor:
+      identifier=="c::__sync_and_and_fetch"?ID_bitand:
+      identifier=="c::__sync_xor_and_fetch"?ID_bitxor:
+      identifier=="c::__sync_nand_and_fetch"?ID_bitnand:
+      ID_nil;
+    
+    // build *ptr=*ptr OP arguments[1];
+    binary_exprt op_expr(deref_ptr, op_id, arguments[1], deref_ptr.type());
+    if(op_expr.op1().type()!=op_expr.type())
+      op_expr.op1().make_typecast(op_expr.type());
+
+    goto_programt::targett t3=dest.add_instruction(ASSIGN);
+    t3->location=function.location();
+    t3->code=code_assignt(deref_ptr, op_expr);
+    
+    if(lhs.is_not_nil())
+    {
+      // return *ptr
+      goto_programt::targett t2=dest.add_instruction(ASSIGN);
+      t2->location=function.location();
+      t2->code=code_assignt(lhs, deref_ptr);
+      if(t2->code.op0().type()!=t2->code.op1().type())
+        t2->code.op1().make_typecast(t2->code.op0().type());
+    }
+    
+    goto_programt::targett t4=dest.add_instruction(ATOMIC_END);
+    t4->location=function.location();
   }
   else if(identifier=="c::__sync_bool_compare_and_swap")
   {
