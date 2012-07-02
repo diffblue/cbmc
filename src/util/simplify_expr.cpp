@@ -93,7 +93,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
     expr.swap(tmp);
     return false;
   }
-  
+
   // eliminate redundant typecasts
   if(base_type_eq(expr.type(), expr.op0().type(), ns))
   {
@@ -130,6 +130,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
   }
 
   // eliminate duplicate pointer typecasts
+  // (T1 *)(T2 *)x -> (T1 *)x
   if(expr_type.id()==ID_pointer &&
      expr.op0().id()==ID_typecast &&
      op_type.id()==ID_pointer &&
