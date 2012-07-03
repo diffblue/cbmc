@@ -1722,13 +1722,10 @@ bool simplify_exprt::simplify_shifts(exprt &expr)
     }
     else if(expr.id()==ID_ashr)
     {
-      // this is to simulate an arithmetic right shift
       if(distance>=0)
       {
-        mp_integer new_value=(distance>=width)?0:value/power(2, distance);
-
-        if(value<0 && new_value==0) new_value=-1;
-  
+        // this is to simulate an arithmetic right shift
+        mp_integer new_value=value >> distance;
         expr=from_integer(new_value, expr.type());
         return false;
       }
