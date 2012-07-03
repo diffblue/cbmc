@@ -824,6 +824,7 @@ void cbmc_parseoptionst::help()
     " --show-vcc                   show the verification conditions\n"
     " --slice-formula              remove assignments unrelated to property\n"
     " --no-unwinding-assertions    do not generate unwinding assertions\n"
+    " --partial-loops              permit paths with partial loops\n"
     " --no-pretty-names            do not simplify identifiers\n"
     "\n"
     "Backend options:\n"
