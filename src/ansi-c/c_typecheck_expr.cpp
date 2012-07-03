@@ -2139,6 +2139,43 @@ void c_typecheck_baset::do_special_functions(
       exprt tmp=expr.arguments()[0];
       expr.swap(tmp);
     }
+    else if(identifier=="c::__builtin_object_size")
+    {
+      // this is a gcc extension to provide information about
+      // object sizes at compile time
+      // http://gcc.gnu.org/onlinedocs/gcc/Object-Size-Checking.html
+      
+      if(expr.arguments().size()!=2)
+      {
+        err_location(f_op);
+        throw "__builtin_object_size expects two arguments";
+      }
+
+      make_constant(expr.arguments()[1]);
+      
+      mp_integer arg1;
+      if(!to_integer(expr.arguments()[1], arg1))
+      {
+        err_location(f_op);
+        throw "__builtin_object_size expects constant as second argument";
+      }
+
+      exprt tmp;
+
+      // the followin means "don't know"      
+      if(arg1==0 || arg1==1)
+      {
+        tmp=from_integer(-1, size_type());
+        tmp.location()=f_op.location();
+      }
+      else
+      {
+        tmp=from_integer(0, size_type());
+        tmp.location()=f_op.location();
+      }
+      
+      tmp.swap(expr);
+    }
     else if(identifier=="c::__builtin_choose_expr")
     {
       // this is a gcc extension similar to ?:

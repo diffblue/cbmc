@@ -77,7 +77,7 @@ double __builtin_nan(const char *);
 float __builtin_nansf(const char *);
 double __builtin_nans(const char *);
 long double __builtin_infl();
-unsigned __builtin_object_size();
+__CPROVER_size_t __builtin_object_size();
 void *__builtin_return_address(unsigned level);
 void *__builtin_extract_return_addr(void *);
 int __builtin_choose_expr(_Bool, ...);
