@@ -5,4 +5,10 @@
 
 static_assert((-70)/16==-4);
 static_assert((-70)>>4==-5);
+static_assert((-16)>>1==-8);
+static_assert((-1)>>1==-1);
 static_assert(70>>4==4);
+
+int main()
+{
+}
