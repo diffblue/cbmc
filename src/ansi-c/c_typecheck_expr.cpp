@@ -2154,10 +2154,17 @@ void c_typecheck_baset::do_special_functions(
       make_constant(expr.arguments()[1]);
       
       mp_integer arg1;
-      if(!to_integer(expr.arguments()[1], arg1))
+      
+      if(expr.arguments()[1].is_true())
+        arg1=1;
+      else if(expr.arguments()[1].is_false())
+        arg1=0;
+      else if(to_integer(expr.arguments()[1], arg1))
       {
         err_location(f_op);
-        throw "__builtin_object_size expects constant as second argument";
+        str << "__builtin_object_size expects constant as second argument, but got "
+            << to_string(expr.arguments()[1]);
+        throw 0;
       }
 
       exprt tmp;
