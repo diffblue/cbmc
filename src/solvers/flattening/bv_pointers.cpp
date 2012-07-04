@@ -441,6 +441,8 @@ void bv_pointerst::convert_pointer_type(const exprt &expr, bvt &bv)
   }
   else if(expr.id()==ID_minus)
   {
+    // this is pointer-integer
+
     if(expr.operands().size()!=2)
       throw "operator "+expr.id_string()+" takes two operands";
 
@@ -496,7 +498,8 @@ void bv_pointerst::convert_bitvector(const exprt &expr, bvt &bv)
   if(is_ptr(expr.type()))
     return convert_pointer_type(expr, bv);
 
-  if(expr.id()==ID_minus && expr.operands().size()==2 &&
+  if(expr.id()==ID_minus &&
+     expr.operands().size()==2 &&
      expr.op0().type().id()==ID_pointer &&
      expr.op1().type().id()==ID_pointer)
   {
