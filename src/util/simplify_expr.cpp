@@ -399,11 +399,14 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
   }
 
   // propagate type casts into arithmetic operators
-
+  // over integers (e.g., doesn't apply to pointer difference)
+  
   if((op_type_id==ID_unsignedbv || op_type_id==ID_signedbv) &&
      (expr_type_id==ID_unsignedbv || expr_type_id==ID_signedbv) &&
      (operand.id()==ID_plus || operand.id()==ID_minus ||
       operand.id()==ID_unary_minus || operand.id()==ID_mult) &&
+     operand.operands().size()>=1 &&
+     operand.op0().type()==operand.type() &&
      expr_width<=op_width)
   {
     exprt new_expr;
