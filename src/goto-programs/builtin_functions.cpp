@@ -895,23 +895,28 @@ void goto_convertt::do_function_call_symbol(
   {
     do_printf(lhs, function, arguments, dest);
   }
-  else if(identifier==CPROVER_PREFIX "input")
+  else if(identifier==CPROVER_PREFIX "input" ||
+          identifier=="c::__CPROVER::input")
   {
     do_input(lhs, function, arguments, dest);
   }
-  else if(identifier==CPROVER_PREFIX "cover")
+  else if(identifier==CPROVER_PREFIX "cover" ||
+          identifier=="c::__CPROVER::cover")
   {
     do_cover(lhs, function, arguments, dest);
   }
-  else if(identifier==CPROVER_PREFIX "output")
+  else if(identifier==CPROVER_PREFIX "output" ||
+          identifier=="c::__CPROVER::output")
   {
     do_output(lhs, function, arguments, dest);
   }
-  else if(identifier==CPROVER_PREFIX "atomic_begin")
+  else if(identifier==CPROVER_PREFIX "atomic_begin" ||
+          identifier=="c::__CPROVER::atomic_begin")
   {
     do_atomic_begin(lhs, function, arguments, dest);
   }
-  else if(identifier==CPROVER_PREFIX "atomic_end")
+  else if(identifier==CPROVER_PREFIX "atomic_end" ||
+          identifier=="c::__CPROVER::atomic_end")
   {
     do_atomic_end(lhs, function, arguments, dest);
   }
@@ -955,11 +960,13 @@ void goto_convertt::do_function_call_symbol(
   {
     do_array_set(lhs, function, arguments, dest);
   }
-  else if(identifier==CPROVER_PREFIX "array_equal")
+  else if(identifier==CPROVER_PREFIX "array_equal" ||
+          identifier=="c::__CPROVER::array_equal")
   {
     do_array_equal(lhs, function, arguments, dest);
   }
-  else if(identifier==CPROVER_PREFIX "array_copy")
+  else if(identifier==CPROVER_PREFIX "array_copy" ||
+          identifier=="c::__CPROVER::array_equal")
   {
     do_array_copy(lhs, function, arguments, dest);
   }
