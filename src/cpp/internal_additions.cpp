@@ -98,6 +98,8 @@ void cpp_internal_additions(std::ostream &out)
   out << "extern \"C\" void __CPROVER::input(const char *id, ...);" << std::endl;
   out << "extern \"C\" void __CPROVER::output(const char *id, ...);" << std::endl;
   out << "extern \"C\" void __CPROVER::cover(bool condition);" << std::endl;
+  out << "extern \"C\" void __CPROVER::atomic_begin();" << std::endl;
+  out << "extern \"C\" void __CPROVER::atomic_end();" << std::endl;
 
   // pointers
   out << "extern \"C\" unsigned __CPROVER_POINTER_OBJECT(const void *p);" << std::endl;
