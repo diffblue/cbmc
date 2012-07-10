@@ -446,7 +446,7 @@ int configt::ansi_ct::from_ns(const namespacet &ns, const std::string &what)
   mp_integer int_value;
   
   if(to_integer(tmp, int_value))
-    throw "failed to convert "+id2string(id);
+    throw "failed to convert context configuration entry `"+id2string(id)+"'";
     
   return integer2long(int_value);
 }
