@@ -543,7 +543,7 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
   }
 
   if(symbol.static_lifetime)
-    cpp_typecheck.dinis.push_back(symbol.name);
+    cpp_typecheck.dynamic_initializations.push_back(symbol.name);
 
   // move early, it must be visible before doing any value
   symbolt *new_symbol;

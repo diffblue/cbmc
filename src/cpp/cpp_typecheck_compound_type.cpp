@@ -655,7 +655,8 @@ void cpp_typecheckt::typecheck_compound_declarator(
     static_symbol.location=cpp_name.location();
     static_symbol.is_extern=true;
     
-    dinis.push_back(static_symbol.name);
+    // TODO: not sure about this: should be defined separately!
+    dynamic_initializations.push_back(static_symbol.name);
 
     symbolt *new_symbol;
     if(context.move(static_symbol, new_symbol))
