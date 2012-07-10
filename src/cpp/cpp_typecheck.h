@@ -304,7 +304,7 @@ protected:
                      const exprt &op,
                      exprt &temporary);
 
-  void static_initialization();
+  void static_and_dynamic_initialization();
   void do_not_typechecked();
   void clean_up();
 
@@ -593,8 +593,9 @@ public:
     bool check_constantness=true);
 
 private:
-  std::list<irep_idt> dinis;        // Static Default-Initialization List
-  bool disable_access_control;      // Disable protect and private
+  typedef std::list<irep_idt> dynamic_initializationst;
+  dynamic_initializationst dynamic_initializations;
+  bool disable_access_control;           // Disable protect and private
 };
 
 #endif
