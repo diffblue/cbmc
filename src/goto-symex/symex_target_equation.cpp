@@ -637,6 +637,10 @@ void symex_target_equationt::SSA_stept::output(
 
     out << ")" << std::endl;
     break;
+    
+  case goto_trace_stept::DEAD: out << "DEAD" << std::endl; break;
+  case goto_trace_stept::FUNCTION_CALL: out << "FUNCTION_CALL" << std::endl; break;
+  case goto_trace_stept::FUNCTION_RETURN: out << "FUNCTION_RETURN" << std::endl; break;
 
   default: assert(false);
   }

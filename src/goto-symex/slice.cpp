@@ -135,9 +135,15 @@ void symex_slicet::slice(symex_target_equationt::SSA_stept &SSA_step)
     break;
     
   case goto_trace_stept::DECL:
+  case goto_trace_stept::DEAD:
     // ignore for now
     break;
-
+    
+  case goto_trace_stept::FUNCTION_CALL:
+  case goto_trace_stept::FUNCTION_RETURN:
+    // ignore for now
+    break;
+    
   default:
     assert(false);  
   }
