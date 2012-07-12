@@ -39,10 +39,10 @@ endif
 ###############################################################################
 
 irep_ids.h: irep_ids_convert$(EXEEXT) irep_ids.txt
-	./irep_ids_convert header < irep_ids.txt > $@
+	./irep_ids_convert$(EXEEXT) header < irep_ids.txt > $@
 
 irep_ids.inc: irep_ids_convert$(EXEEXT) irep_ids.txt
-	./irep_ids_convert table < irep_ids.txt > $@
+	./irep_ids_convert$(EXEEXT) table < irep_ids.txt > $@
 
 irep_ids.cpp: irep_ids.inc irep_ids.h
 
