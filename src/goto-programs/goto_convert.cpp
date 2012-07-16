@@ -430,6 +430,8 @@ void goto_convertt::convert(
     convert_msc_leave(code, dest);
   else if(statement==ID_catch) // C++ try/catch
     convert_catch(code, dest);
+  else if(statement==ID_asm)
+    convert_asm(code, dest);
   else
     copy(code, OTHER, dest);
 
