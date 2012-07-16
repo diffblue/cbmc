@@ -358,7 +358,6 @@ atomic_begin
 atomic_end
 start_thread
 end_thread
-sync
 specc_notify
 specc_par
 specc_wait
@@ -550,3 +549,14 @@ predicate_passive_symbol
 all
 when
 cw_va_arg_typeof
+fence
+kind
+sync
+WRfence
+RRfence
+RWfence
+WWfence
+RRcumul
+RWcumul
+WWcumul
+WRcumul

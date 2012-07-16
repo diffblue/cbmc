@@ -2754,6 +2754,9 @@ std::string expr2ct::convert_code(
   if(statement==ID_printf)
     return convert_code_printf(src, indent);
 
+  if(statement==ID_fence)
+    return convert_code_fence(src, indent);
+
   if(statement==ID_input)
     return convert_code_input(src, indent);
 
@@ -3015,6 +3018,28 @@ std::string expr2ct::convert_code_printf(
 
   dest+=");";
 
+  return dest;
+}
+
+/*******************************************************************\
+
+Function: expr2ct::convert_code_fence
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+std::string expr2ct::convert_code_fence(
+  const codet &src,
+  unsigned indent)
+{
+  std::string dest=indent_str(indent)+"FENCE(";
+  dest+=id2string(src.get(ID_kind));
+  dest+=");";
   return dest;
 }
 
