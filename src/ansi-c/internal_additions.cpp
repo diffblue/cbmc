@@ -84,8 +84,11 @@ void ansi_c_internal_additions(std::string &code)
     "void __CPROVER_input(const char *id, ...);\n"
     "void __CPROVER_output(const char *id, ...);\n"
     "void __CPROVER_cover(__CPROVER_bool condition);\n"
+    
+    // concurrency-related
     "void __CPROVER_atomic_begin();\n"
     "void __CPROVER_atomic_end();\n"
+    "void __CPROVER_fence(const char *kind);\n"
 
     // traces
     "void CBMC_trace(int lvl, const char *event, ...);\n"

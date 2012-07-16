@@ -769,28 +769,30 @@ void goto_convertt::do_function_call_symbol(
     throw "error: function `"+id2string(identifier)+"' type mismatch: expected code";
   }
   
-  if(identifier==CPROVER_PREFIX "parameter_predicates" || identifier==CPROVER_PREFIX "return_predicates")
+  if(identifier==CPROVER_PREFIX "parameter_predicates" || 
+     identifier==CPROVER_PREFIX "return_predicates")
   {
-        if(arguments.size() != 0)
-        {
-            err_location(function);
-            throw "`"+id2string(identifier)+"' expected to have no arguments";
-        }
-        goto_programt::targett t = dest.add_instruction(OTHER);
-        t->location = function.location();
-        t->location.set("user-provided", true);
-        if(identifier==CPROVER_PREFIX "parameter_predicates")
-        {
-                t->code = codet(ID_user_specified_parameter_predicates);
-                t->code.set_statement(ID_user_specified_parameter_predicates);
-        } else {
-                t->code = codet(ID_user_specified_return_predicates);
-                t->code.set_statement(ID_user_specified_return_predicates);
-        }
-        return;
-  }
+    if(arguments.size() != 0)
+    {
+      err_location(function);
+      throw "`"+id2string(identifier)+"' expected to have no arguments";
+    }
 
-  if(identifier==CPROVER_PREFIX "predicate")
+    goto_programt::targett t = dest.add_instruction(OTHER);
+    t->location = function.location();
+    t->location.set("user-provided", true);
+    if(identifier==CPROVER_PREFIX "parameter_predicates")
+    {
+      t->code = codet(ID_user_specified_parameter_predicates);
+      t->code.set_statement(ID_user_specified_parameter_predicates);
+    }
+    else
+    {
+      t->code = codet(ID_user_specified_return_predicates);
+      t->code.set_statement(ID_user_specified_return_predicates);
+    }
+  }
+  else if(identifier==CPROVER_PREFIX "predicate")
   {
     if(arguments.size()!=1)
     {
@@ -1055,6 +1057,23 @@ void goto_convertt::do_function_call_symbol(
     t->location.set_property(ID_assertion);
     t->location.set_priority(10); // high
     t->location.set_comment(description);
+    // we ignore any LHS
+  }
+  else if(identifier==CPROVER_PREFIX "fence")
+  {
+    if(arguments.size()!=1)
+    {
+      err_location(function);
+      throw "`"+id2string(identifier)+"' expected to have one argument";
+    }
+    
+    const irep_idt kind=
+      get_string_constant(arguments[0]);
+
+    goto_programt::targett t=dest.add_instruction(OTHER);
+    t->location=function.location();
+    t->code.set(ID_statement, ID_fence);
+    t->code.set(ID_kind, kind);
     // we ignore any LHS
   }
   else if(identifier=="c::__builtin_prefetch")
