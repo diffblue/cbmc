@@ -1222,8 +1222,14 @@ void goto_convertt::do_function_call_symbol(
     t3->location=function.location();
     t3->code=code_assignt(deref_ptr, op_expr);
     
-    goto_programt::targett t4=dest.add_instruction(ATOMIC_END);
+    // this instruction implies an mfence, i.e., WRfence
+    goto_programt::targett t4=dest.add_instruction(OTHER);
     t4->location=function.location();
+    t4->code=codet(ID_fence);
+    t4->code.set(ID_kind, ID_WRfence);
+
+    goto_programt::targett t5=dest.add_instruction(ATOMIC_END);
+    t5->location=function.location();
   }
   else if(identifier=="c::__sync_add_and_fetch" ||
           identifier=="c::__sync_sub_and_fetch" ||
@@ -1280,19 +1286,29 @@ void goto_convertt::do_function_call_symbol(
       if(t2->code.op0().type()!=t2->code.op1().type())
         t2->code.op1().make_typecast(t2->code.op0().type());
     }
-    
-    goto_programt::targett t4=dest.add_instruction(ATOMIC_END);
+
+    // this instruction implies an mfence, i.e., WRfence
+    goto_programt::targett t4=dest.add_instruction(OTHER);
     t4->location=function.location();
+    t4->code=codet(ID_fence);
+    t4->code.set(ID_kind, ID_WRfence);
+    
+    goto_programt::targett t5=dest.add_instruction(ATOMIC_END);
+    t5->location=function.location();
   }
   else if(identifier=="c::__sync_bool_compare_and_swap")
   {
     // These builtins perform an atomic compare and swap. That is, if the
     // current value of *ptr is oldval, then write newval into *ptr.  The
-    // “bool” version returns true if the comparison is successful and
-    // newval was written.  The “val” version returns the contents of *ptr
+    // "bool" version returns true if the comparison is successful and
+    // newval was written.  The "val" version returns the contents of *ptr
     // before the operation.
 
+    // These are type-polymorphic, which makes it hard to put
+    // them into ansi-c/library.
+
     // bool __sync_bool_compare_and_swap (type *ptr, type oldval, type newval, ...)
+    
     if(arguments.size()<3)
     {
       err_location(function);
@@ -1335,8 +1351,14 @@ void goto_convertt::do_function_call_symbol(
     t3->location=function.location();
     t3->code=code_assignt(deref_ptr, if_expr);
     
-    goto_programt::targett t4=dest.add_instruction(ATOMIC_END);
+    // this instruction implies an mfence, i.e., WRfence
+    goto_programt::targett t4=dest.add_instruction(OTHER);
     t4->location=function.location();
+    t4->code=codet(ID_fence);
+    t4->code.set(ID_kind, ID_WRfence);
+    
+    goto_programt::targett t5=dest.add_instruction(ATOMIC_END);
+    t5->location=function.location();
   }
   else if(identifier=="c::__sync_val_compare_and_swap")
   {
@@ -1383,8 +1405,14 @@ void goto_convertt::do_function_call_symbol(
     t3->location=function.location();
     t3->code=code_assignt(deref_ptr, if_expr);
     
-    goto_programt::targett t4=dest.add_instruction(ATOMIC_END);
+    // this instruction implies an mfence, i.e., WRfence
+    goto_programt::targett t4=dest.add_instruction(OTHER);
     t4->location=function.location();
+    t4->code=codet(ID_fence);
+    t4->code.set(ID_kind, ID_WRfence);
+    
+    goto_programt::targett t5=dest.add_instruction(ATOMIC_END);
+    t5->location=function.location();
   }
   else if(identifier=="c::__sync_lock_test_and_set")
   {
