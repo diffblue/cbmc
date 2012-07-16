@@ -88,7 +88,8 @@ bool symex_bmct::get_unwind(
   {
     std::string msg=
       "Unwinding loop "+id2string(id)+" iteration "+i2string(unwind)+
-      " "+source.pc->location.as_string();
+      " "+source.pc->location.as_string()+
+      " thread "+i2string(source.thread_nr);      
     print(8, msg);
   }
   #endif
