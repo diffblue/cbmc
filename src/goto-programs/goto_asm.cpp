@@ -57,7 +57,7 @@ void goto_convertt::convert_asm(const codet &code, goto_programt &dest)
         t->location=code.location();
         t->code=codet(ID_fence);
         t->code.location()=code.location();
-        t->code.set(ID_kind, ID_WRfence);
+        t->code.set(ID_WRfence, true);
       }
       else if(line=="sync") // Power
       {
@@ -65,7 +65,7 @@ void goto_convertt::convert_asm(const codet &code, goto_programt &dest)
         t->location=code.location();
         t->code=codet(ID_fence);
         t->code.location()=code.location();
-        t->code.set(ID_kind, ID_WRfence);
+        t->code.set(ID_WRfence, true);
       }
       else if(line=="lwsync") // Power
       {
@@ -73,7 +73,10 @@ void goto_convertt::convert_asm(const codet &code, goto_programt &dest)
         t->location=code.location();
         t->code=codet(ID_fence);
         t->code.location()=code.location();
-        t->code.set(ID_kind, ID_WWfence);
+        t->code.set(ID_WWfence, true);
+        t->code.set(ID_RRfence, true);
+        t->code.set(ID_RWfence, true);
+        t->code.set(ID_RWcumul, true);
       }
       else if(line=="isync") // Power
       {
@@ -81,7 +84,7 @@ void goto_convertt::convert_asm(const codet &code, goto_programt &dest)
         t->location=code.location();
         t->code=codet(ID_fence);
         t->code.location()=code.location();
-        t->code.set(ID_kind, ID_RRfence);
+        t->code.set(ID_RRfence, true);
       }
       else
         unknown=true; // give up

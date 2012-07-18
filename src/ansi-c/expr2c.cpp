@@ -3038,7 +3038,27 @@ std::string expr2ct::convert_code_fence(
   unsigned indent)
 {
   std::string dest=indent_str(indent)+"FENCE(";
-  dest+=id2string(src.get(ID_kind));
+  
+  irep_idt att[]=
+    { ID_WRfence, ID_RRfence, ID_RWfence, ID_WWfence,
+      ID_RRcumul, ID_RWcumul, ID_WWcumul, ID_WRcumul,
+      irep_idt() };
+
+  bool first=true;
+      
+  for(unsigned i=0; !att[i].empty(); i++)
+  {
+    if(src.get_bool(att[i]))
+    {
+      if(first)
+        first=false;
+      else
+        dest+="+";
+
+      dest+=id2string(att[i]);
+    }
+  }
+  
   dest+=");";
   return dest;
 }

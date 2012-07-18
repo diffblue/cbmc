@@ -550,7 +550,6 @@ all
 when
 cw_va_arg_typeof
 fence
-kind
 sync
 WRfence
 RRfence
