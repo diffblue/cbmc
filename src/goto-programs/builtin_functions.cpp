@@ -1073,7 +1073,7 @@ void goto_convertt::do_function_call_symbol(
     goto_programt::targett t=dest.add_instruction(OTHER);
     t->location=function.location();
     t->code.set(ID_statement, ID_fence);
-    t->code.set(ID_kind, kind);
+    //t->code.set(ID_kind, kind);
     // we ignore any LHS
   }
   else if(identifier=="c::__builtin_prefetch")
@@ -1226,7 +1226,7 @@ void goto_convertt::do_function_call_symbol(
     goto_programt::targett t4=dest.add_instruction(OTHER);
     t4->location=function.location();
     t4->code=codet(ID_fence);
-    t4->code.set(ID_kind, ID_WRfence);
+    t4->code.set(ID_WRfence, true);
 
     goto_programt::targett t5=dest.add_instruction(ATOMIC_END);
     t5->location=function.location();
@@ -1291,7 +1291,7 @@ void goto_convertt::do_function_call_symbol(
     goto_programt::targett t4=dest.add_instruction(OTHER);
     t4->location=function.location();
     t4->code=codet(ID_fence);
-    t4->code.set(ID_kind, ID_WRfence);
+    t4->code.set(ID_WRfence, true);
     
     goto_programt::targett t5=dest.add_instruction(ATOMIC_END);
     t5->location=function.location();
@@ -1355,7 +1355,7 @@ void goto_convertt::do_function_call_symbol(
     goto_programt::targett t4=dest.add_instruction(OTHER);
     t4->location=function.location();
     t4->code=codet(ID_fence);
-    t4->code.set(ID_kind, ID_WRfence);
+    t4->code.set(ID_WRfence, true);
     
     goto_programt::targett t5=dest.add_instruction(ATOMIC_END);
     t5->location=function.location();
@@ -1409,7 +1409,7 @@ void goto_convertt::do_function_call_symbol(
     goto_programt::targett t4=dest.add_instruction(OTHER);
     t4->location=function.location();
     t4->code=codet(ID_fence);
-    t4->code.set(ID_kind, ID_WRfence);
+    t4->code.set(ID_WRfence, true);
     
     goto_programt::targett t5=dest.add_instruction(ATOMIC_END);
     t5->location=function.location();
