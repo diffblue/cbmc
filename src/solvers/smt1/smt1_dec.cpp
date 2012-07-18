@@ -8,6 +8,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <stdlib.h>
 
+#ifdef __linux__
+#include <unistd.h>
+#endif
+
+#ifdef __APPLE__
+#include <unistd.h>
+#endif
+
 #include <str_getline.h>
 #include <std_expr.h>
 #include <std_types.h>
