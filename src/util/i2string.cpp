@@ -165,7 +165,11 @@ std::string i2string(signed __int64 i)
 {
   #ifdef USE_SPRINTF
   char buffer[100];
+  #ifdef MSC_VER
   sprintf(buffer, "%I64d", i);
+  #else
+  sprintf(buffer, "%lld", i);
+  #endif   
   return buffer;
   #else
   std::ostringstream strInt;
@@ -196,7 +200,11 @@ std::string i2string(unsigned __int64 i)
 {
   #ifdef USE_SPRINTF
   char buffer[100];
+  #ifdef MSC_VER
   sprintf(buffer, "%I64u", i);
+  #else
+  sprintf(buffer, "%llu", i);
+  #endif   
   return buffer;
   #else
   std::ostringstream strInt;
