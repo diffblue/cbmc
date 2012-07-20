@@ -15,7 +15,7 @@ std::string i2string(unsigned long int i);
 
 // 64 bit integers
 
-#ifdef _MSC_VER
+#ifdef _WIN32
 std::string i2string(signed __int64 i);
 std::string i2string(unsigned __int64 i);
 #endif

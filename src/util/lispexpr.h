@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_LISPEXPR_H
 #define CPROVER_LISPEXPR_H
 
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(__MINGW32__)
 #include <cstring>
 #define strcasecmp _strcmpi
 #else

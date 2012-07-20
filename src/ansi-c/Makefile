@@ -24,7 +24,10 @@ include ../common
 
 CLEANFILES = ansi-c$(LIBEXT) \
   y.tab.h y.tab.cpp lex.yy.cpp y.tab.cpp.output y.output \
-  library/converter$(EXEEXT) cprover_library.inc
+  library/converter$(EXEEXT) cprover_library.inc \
+  file_converter$(EXEEXT) \
+  gcc_builtin_headers_generic.inc gcc_builtin_headers_ia32.inc \
+  arm_builtin_headers.inc cw_builtin_headers.inc
 
 all: ansi-c$(LIBEXT)
 
@@ -54,19 +57,19 @@ file_converter$(EXEEXT): file_converter.cpp
 	$(LINKBIN)
 	
 cprover_library.inc: library/converter$(EXEEXT) library/*.c
-	cat library/*.c | library/converter > $@
+	cat library/*.c | library/converter$(EXEEXT) > $@
 
 gcc_builtin_headers_ia32.inc: gcc_builtin_headers_ia32.h file_converter$(EXEEXT)
-	./file_converter < gcc_builtin_headers_ia32.h > $@
+	./file_converter$(EXEEXT) < gcc_builtin_headers_ia32.h > $@
 
 gcc_builtin_headers_generic.inc: gcc_builtin_headers_generic.h file_converter$(EXEEXT)
-	./file_converter < gcc_builtin_headers_generic.h > $@
+	./file_converter$(EXEEXT) < gcc_builtin_headers_generic.h > $@
 
 arm_builtin_headers.inc: arm_builtin_headers.h file_converter$(EXEEXT)
-	./file_converter < arm_builtin_headers.h > $@
+	./file_converter$(EXEEXT) < arm_builtin_headers.h > $@
 
 cw_builtin_headers.inc: cw_builtin_headers.h file_converter$(EXEEXT)
-	./file_converter < cw_builtin_headers.h > $@
+	./file_converter$(EXEEXT) < cw_builtin_headers.h > $@
 
 cprover_library.cpp: cprover_library.inc
 
