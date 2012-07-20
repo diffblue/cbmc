@@ -46,9 +46,9 @@ public:
     return get(ID_comment);
   }
   
-  inline unsigned get_priority() const
+  inline const irep_idt &get_claim() const
   {
-    return get_int(ID_priority);
+    return get(ID_claim);
   }
 
   inline void set_file(const irep_idt &file)
@@ -91,9 +91,9 @@ public:
     set(ID_comment, comment);
   }
   
-  inline void set_priority(unsigned priority)
+  inline void set_claim(const irep_idt &claim)
   {
-    set(ID_priority, priority);
+    set(ID_claim, claim);
   }
 
 };
