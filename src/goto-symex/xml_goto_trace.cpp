@@ -34,11 +34,11 @@ Function: convert
 void convert(
   const namespacet &ns,
   const goto_tracet &goto_trace,
-  xmlt &xml)
+  xmlt &dest)
 {
-  xml=xmlt("goto_trace");
+  dest=xmlt("goto_trace");
   
-  xml.new_element("mode").data=id2string(goto_trace.mode);
+  dest.new_element("mode").data=id2string(goto_trace.mode);
 
   locationt previous_location;
 
@@ -51,20 +51,14 @@ void convert(
 
     xmlt xml_location;
     if(location.is_not_nil() && location.get_file()!="")
-    {
-      xml_location.new_element("file").data=id2string(location.get_file());
-      xml_location.new_element("line").data=id2string(location.get_line());
-      xml_location.set_attribute("file", id2string(location.get_file()));
-      xml_location.set_attribute("line", id2string(location.get_line()));
-      xml_location.name="location";
-    }
+      xml_location=xml(location);
     
     switch(it->type)
     {
     case goto_trace_stept::ASSERT:
       if(!it->cond_value)
       {
-        xmlt &xml_failure=xml.new_element("failure");
+        xmlt &xml_failure=dest.new_element("failure");
         xml_failure.new_element("reason").data=id2string(it->comment);
         
         xml_failure.new_element("thread").data=i2string(it->thread_nr);
@@ -78,7 +72,7 @@ void convert(
     case goto_trace_stept::DECL:
       {
         irep_idt identifier=it->lhs_object.get_identifier();
-        xmlt &xml_assignment=xml.new_element("assignment");
+        xmlt &xml_assignment=dest.new_element("assignment");
 
         if(xml_location.name!="")
           xml_assignment.new_element().swap(xml_location);
@@ -113,7 +107,7 @@ void convert(
         xml_assignment.new_element("step_nr").data=i2string(it->step_nr);
 
         if(it->lhs_object_value.is_not_nil())
-          xml_assignment.new_element("value_expression").new_element(convert(it->lhs_object_value, ns));
+          xml_assignment.new_element("value_expression").new_element(xml(it->lhs_object_value, ns));
       }
       break;
       
@@ -122,7 +116,7 @@ void convert(
         printf_formattert printf_formatter(ns);
         printf_formatter(id2string(it->format_string), it->io_args);
         std::string text=printf_formatter.as_string();
-        xmlt &xml_output=xml.new_element("output");
+        xmlt &xml_output=dest.new_element("output");
         xml_output.new_element("step_nr").data=i2string(it->step_nr);
         xml_output.new_element("thread").data=i2string(it->thread_nr);
         xml_output.new_element("text").data=text;
@@ -137,14 +131,14 @@ void convert(
         {
           xml_output.new_element("value").data=from_expr(ns, "", *l_it);
           xml_output.new_element("value_expression").
-            new_element(convert(*l_it, ns));
+            new_element(xml(*l_it, ns));
         }
       }
       break;
       
     case goto_trace_stept::INPUT:
       {
-        xmlt &xml_output=xml.new_element("input");
+        xmlt &xml_output=dest.new_element("input");
         xml_output.new_element("input_id").data=id2string(it->io_id);
         xml_output.new_element("step_nr").data=i2string(it->step_nr);
         xml_output.new_element("thread").data=i2string(it->thread_nr);
@@ -156,7 +150,7 @@ void convert(
         {
           xml_output.new_element("value").data=from_expr(ns, "", *l_it);
           xml_output.new_element("value_expression").
-            new_element(convert(*l_it, ns));
+            new_element(xml(*l_it, ns));
         }
             
         if(xml_location.name!="")
@@ -169,7 +163,7 @@ void convert(
       {
         std::string tag=
           (it->type==goto_trace_stept::FUNCTION_CALL)?"function_call":"function_return";
-        xmlt &xml_function=xml.new_element(tag);
+        xmlt &xml_function=dest.new_element(tag);
         xml_function.new_element("step_nr").data=i2string(it->step_nr);
         xml_function.set_attribute("identifier", id2string(it->identifier));
         xml_function.new_element("thread").data=i2string(it->thread_nr);
@@ -185,7 +179,7 @@ void convert(
         // just the location
         if(xml_location.name!="")
         {
-          xmlt &xml_location_only=xml.new_element("location-only");
+          xmlt &xml_location_only=dest.new_element("location-only");
           xml_location_only.new_element("step_nr").data=i2string(it->step_nr);
           xml_location_only.new_element("thread").data=i2string(it->thread_nr);
           xml_location_only.new_element().swap(xml_location);
