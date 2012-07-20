@@ -61,8 +61,6 @@ void bmct::show_vcc(std::ostream &out)
     if(it->comment!="")
       out << it->comment << std::endl;
       
-    out << "Priority " << it->priority << std::endl;
-
     symex_target_equationt::SSA_stepst::const_iterator
       p_it=equation.SSA_steps.begin();
       
