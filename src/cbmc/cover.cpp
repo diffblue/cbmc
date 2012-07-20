@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <xml.h>
+
 #include <solvers/sat/satcheck_minisat2.h>
 #include <solvers/prop/cover_goals.h>
 
@@ -103,16 +105,39 @@ void bmct::cover_assertions(const goto_functionst &goto_functions)
   cover_goals();
 
   // report
-  for(std::list<cover_goalst::cover_goalt>::const_iterator
-      g_it=cover_goals.goals.begin();
-      g_it!=cover_goals.goals.end();
-      g_it++)
-    if(!g_it->covered)
+  if(ui==ui_message_handlert::XML_UI)
+  {
+    std::list<cover_goalst::cover_goalt>::const_iterator g_it=
+      cover_goals.goals.begin();
+      
+    for(goal_mapt::const_iterator
+        it=goal_map.begin();
+        it!=goal_map.end();
+        it++, g_it++)
     {
-      warning("!! failed to cover "+g_it->description);
-    }
+      xmlt xml_result("result");
+      xml_result.set_attribute("claim", id2string(it->first->location.get_claim()));
 
-  status("");
+      xml_result.set_attribute("status",
+        g_it->covered?"COVERED":"NOT_COVERED");
+      
+      std::cout << xml_result << std::endl;
+    }
+  }
+  else
+  {
+    for(std::list<cover_goalst::cover_goalt>::const_iterator
+        g_it=cover_goals.goals.begin();
+        g_it!=cover_goals.goals.end();
+        g_it++)
+      if(!g_it->covered)
+      {
+        warning("!! failed to cover "+g_it->description);
+      }
+
+    status("");
+  }
+
   status("** Covered "+i2string(cover_goals.number_covered())+
          " of "+i2string(cover_goals.size())+" in "+
          i2string(cover_goals.iterations())+" iterations");
