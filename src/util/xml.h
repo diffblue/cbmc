@@ -22,11 +22,11 @@ Author: Daniel Kroening, kroening@kroening.com
 class xmlt
 {
 public:
-  xmlt()
-  {}
+  inline xmlt()
+  { }
 
-  xmlt(const std::string &_name):name(_name)
-  {}
+  inline explicit xmlt(const std::string &_name):name(_name)
+  { }
 
   typedef std::list<xmlt> elementst;
   typedef std::map<std::string, std::string> attributest;
@@ -56,7 +56,7 @@ public:
     return "";
   }
 
-  void set_attribute_bool(
+  inline void set_attribute_bool(
     const std::string &attribute,
     bool value)
   {
@@ -70,27 +70,27 @@ public:
     return false;
   }
 
-  std::string get_element(const std::string &element) const
+  inline std::string get_element(const std::string &element) const
   {
     elementst::const_iterator i=find(element);
     if(i!=elements.end()) return i->data;
     return "";
   }
 
-  xmlt &new_element(const std::string &name)
+  inline xmlt &new_element(const std::string &name)
   {
     elements.push_back(xmlt());
     elements.back().name=name;
     return elements.back();
   }
 
-  xmlt &new_element(const xmlt &xml)
+  inline xmlt &new_element(const xmlt &xml)
   {
     elements.push_back(xml);
     return elements.back();
   }
 
-  xmlt &new_element()
+  inline xmlt &new_element()
   {
     elements.push_back(xmlt());
     return elements.back();
