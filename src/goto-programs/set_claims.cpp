@@ -25,8 +25,42 @@ Function: set_claims
 
 void set_claims(
   goto_programt &goto_program,
-  std::map<irep_idt, unsigned> &claim_counters,
-  hash_set_cont<std::string, string_hash> &claim_set)
+  hash_set_cont<irep_idt, irep_id_hash> &claim_set)
+{
+  for(goto_programt::instructionst::iterator
+      it=goto_program.instructions.begin();
+      it!=goto_program.instructions.end();
+      it++)
+  {
+    if(!it->is_assert()) continue;
+    
+    irep_idt claim_name=it->location.get_claim();
+
+    hash_set_cont<irep_idt, irep_id_hash>::iterator
+      c_it=claim_set.find(claim_name);
+      
+    if(c_it==claim_set.end())
+      it->type=SKIP;
+    else
+      claim_set.erase(c_it);
+  }
+}
+
+/*******************************************************************\
+
+Function: label_claims
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void label_claims(
+  goto_programt &goto_program,
+  std::map<irep_idt, unsigned> &claim_counters)
 {
   for(goto_programt::instructionst::iterator
       it=goto_program.instructions.begin();
@@ -44,45 +78,8 @@ void set_claims(
       function==""?i2string(count):
       id2string(function)+"."+i2string(count);
     
-    hash_set_cont<std::string, string_hash>::iterator
-      c_it=claim_set.find(claim_name);
-      
-    if(c_it==claim_set.end())
-      it->type=SKIP;
-    else
-      claim_set.erase(c_it);
+    it->location.set_claim(claim_name);
   }
-}
-
-/*******************************************************************\
-
-Function: set_claims
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void set_claims(
-  goto_programt &goto_program,
-  const std::list<std::string> &claims)
-{
-  hash_set_cont<std::string, string_hash> claim_set;
-  std::map<irep_idt, unsigned> claim_counters;
-  
-  for(std::list<std::string>::const_iterator
-      it=claims.begin();
-      it!=claims.end();
-      it++)
-    claim_set.insert(*it);
-
-  set_claims(goto_program, claim_counters, claim_set);
-  
-  if(!claim_set.empty())
-    throw "claim "+(*claim_set.begin())+" not found";
 }
 
 /*******************************************************************\
@@ -101,8 +98,7 @@ void set_claims(
   goto_functionst &goto_functions,
   const std::list<std::string> &claims)
 {
-  hash_set_cont<std::string, string_hash> claim_set;
-  std::map<irep_idt, unsigned> claim_counters;
+  hash_set_cont<irep_idt, irep_id_hash> claim_set;
 
   for(std::list<std::string>::const_iterator
       it=claims.begin();
@@ -115,10 +111,34 @@ void set_claims(
       it!=goto_functions.function_map.end();
       it++)
     if(!it->second.is_inlined())
-      set_claims(it->second.body, claim_counters, claim_set);
+      set_claims(it->second.body, claim_set);
 
   if(!claim_set.empty())
-    throw "claim "+(*claim_set.begin())+" not found";
+    throw "claim "+id2string(*claim_set.begin())+" not found";
+}
+
+/*******************************************************************\
+
+Function: label_claims
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void label_claims(goto_functionst &goto_functions)
+{
+  std::map<irep_idt, unsigned> claim_counters;
+
+  for(goto_functionst::function_mapt::iterator
+      it=goto_functions.function_map.begin();
+      it!=goto_functions.function_map.end();
+      it++)
+    if(!it->second.is_inlined())
+      label_claims(it->second.body, claim_counters);
 }
 
 /*******************************************************************\

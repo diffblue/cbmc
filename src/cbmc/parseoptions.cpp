@@ -347,6 +347,8 @@ int cbmc_parseoptionst::doit()
 
   if(get_goto_program(options, bmc, goto_functions))
     return 6;
+    
+  label_claims(goto_functions);
 
   if(cmdline.isset("show-claims"))
   {

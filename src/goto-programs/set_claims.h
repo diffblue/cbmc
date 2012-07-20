@@ -15,11 +15,8 @@ void set_claims(
   goto_functionst &goto_functions,
   const std::list<std::string> &claims);
 
-void set_claims(
-  goto_programt &goto_program,
-  const std::list<std::string> &claims);
+void make_assertions_false(goto_functionst &goto_functions);
   
-void make_assertions_false(
-  goto_functionst &goto_functions);
+void label_claims(goto_functionst &goto_functions);
 
 #endif
