@@ -1005,7 +1005,6 @@ void goto_checkt::add_guarded_claim(
     t->location=location;
     t->location.set_comment(comment);
     t->location.set_property(property);
-    t->location.set_priority(2); // relatively low
   }
 }
 

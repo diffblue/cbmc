@@ -848,7 +848,6 @@ void goto_convertt::do_function_call_symbol(
     t->guard=arguments.front();
     t->location=function.location();
     t->location.set("user-provided", true);
-    t->location.set_priority(10); // high
     t->location.set_property(ID_assertion);
     
     // let's double-check the type of the argument
@@ -880,7 +879,6 @@ void goto_convertt::do_function_call_symbol(
     t->location=function.location();
     t->location.set("user-provided", true);
     t->location.set_property(ID_assertion);
-    t->location.set_priority(10); // high
     t->location.set_comment(description);
     
     // let's double-check the type of the argument
@@ -1002,7 +1000,6 @@ void goto_convertt::do_function_call_symbol(
     t->location=function.location();
     t->location.set("user-provided", true);
     t->location.set_property(ID_assertion);
-    t->location.set_priority(10); // high
     t->location.set_comment(description);
     // we ignore any LHS
   }
@@ -1029,7 +1026,6 @@ void goto_convertt::do_function_call_symbol(
     t->location=function.location();
     t->location.set("user-provided", true);
     t->location.set_property(ID_assertion);
-    t->location.set_priority(10); // high
     t->location.set_comment(description);
     // we ignore any LHS
   }
@@ -1055,7 +1051,6 @@ void goto_convertt::do_function_call_symbol(
     t->location=function.location();
     t->location.set("user-provided", true);
     t->location.set_property(ID_assertion);
-    t->location.set_priority(10); // high
     t->location.set_comment(description);
     // we ignore any LHS
   }
