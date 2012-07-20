@@ -586,15 +586,38 @@ bool bmct::all_claims(const goto_functionst &goto_functions)
   }
   
   // report
-  status("");
-  status("** Results:");
-  for(std::list<cover_goalst::cover_goalt>::const_iterator
-      g_it=cover_goals.goals.begin();
-      g_it!=cover_goals.goals.end();
-      g_it++)
-    status(g_it->description+": "+(g_it->covered?"FAILED":"OK"));
+  if(ui==ui_message_handlert::XML_UI)
+  {
+    std::list<cover_goalst::cover_goalt>::const_iterator g_it=
+      cover_goals.goals.begin();
+      
+    for(goal_mapt::const_iterator
+        it=goal_map.begin();
+        it!=goal_map.end();
+        it++, g_it++)
+    {
+      xmlt xml_result("result");
+      xml_result.set_attribute("claim", id2string(it->first->location.get_claim()));
 
-  status("");
+      xml_result.set_attribute("status",
+        g_it->covered?"FAILURE":"SUCCESS");
+      
+      std::cout << xml_result << std::endl;
+    }
+  }
+  else
+  {
+    status("");
+    status("** Results:");
+    for(std::list<cover_goalst::cover_goalt>::const_iterator
+        g_it=cover_goals.goals.begin();
+        g_it!=cover_goals.goals.end();
+        g_it++)
+      status(g_it->description+": "+(g_it->covered?"FAILED":"OK"));
+
+    status("");
+  }
+  
   status("** "+i2string(cover_goals.number_covered())+
          " of "+i2string(cover_goals.size())+" failed ("+
          i2string(cover_goals.iterations())+" iterations)");
