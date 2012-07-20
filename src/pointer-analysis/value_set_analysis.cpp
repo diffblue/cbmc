@@ -10,7 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <prefix.h>
 #include <cprover_prefix.h>
-#include <xml_irep.h>
+#include <xml_expr.h>
 #include <context.h>
 #include <xml.h>
 
@@ -86,9 +86,7 @@ void value_set_analysist::convert(
     const value_sett &value_set=(*this)[i_it].value_set;
 
     xmlt &i=dest.new_element("instruction");
-    xmlt &xml_location=i.new_element("location");
-    ::convert(location, xml_location);
-    xml_location.name="location";
+    i.new_element()=::xml(location);
     
     for(value_sett::valuest::const_iterator
         v_it=value_set.values.begin();

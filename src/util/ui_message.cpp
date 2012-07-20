@@ -11,7 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <i2string.h>
 #include <xml.h>
-#include <xml_irep.h>
+#include <xml_expr.h>
 
 #include "ui_message.h"
 
@@ -232,20 +232,16 @@ void ui_message_handlert::xml_ui_msg(
   const std::string &msg2,
   const locationt &location)
 {
-  xmlt xml;
-  xml.name="message";
+  xmlt result;
+  result.name="message";
 
   if(location.is_not_nil() && location.get_file()!="")
-  {
-    xmlt &l=xml.new_element();
-    convert(location, l);
-    l.name="location";
-  }
+    result.new_element(xml(location));
 
-  xml.new_element("text").data=msg1;
-  xml.set_attribute("type", type);
+  result.new_element("text").data=msg1;
+  result.set_attribute("type", type);
   
-  std::cout << xml;
+  std::cout << result;
   std::cout << std::endl;
 }
 

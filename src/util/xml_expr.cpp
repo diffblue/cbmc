@@ -20,7 +20,7 @@ Author: Daniel Kroening
 
 /*******************************************************************\
 
-Function: convert
+Function: xml
 
   Inputs:
 
@@ -30,7 +30,38 @@ Function: convert
 
 \*******************************************************************/
 
-xmlt convert(
+xmlt xml(const locationt &location)
+{
+  xmlt result;
+
+  result.name="location";
+  
+  // these will go away
+  result.new_element("file").data=id2string(location.get_file());
+  result.new_element("line").data=id2string(location.get_line());
+  result.new_element("function").data=id2string(location.get_function());
+  
+  // these are to stay
+  result.set_attribute("file", id2string(location.get_file()));
+  result.set_attribute("line", id2string(location.get_line()));
+  result.set_attribute("function", id2string(location.get_function()));
+  
+  return result;
+}
+
+/*******************************************************************\
+
+Function: xml
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+xmlt xml(
   const exprt &expr,
   const namespacet &ns)
 {
@@ -95,7 +126,7 @@ xmlt convert(
     {
       xmlt &e=result.new_element("element");
       e.set_attribute("index", index);
-      e.new_element(convert(*it, ns));
+      e.new_element(xml(*it, ns));
       index++;
     }
   }
@@ -106,7 +137,7 @@ xmlt convert(
     forall_operands(it, expr)
     {
       xmlt &e=result.new_element("member");
-      e.new_element(convert(*it, ns));
+      e.new_element(xml(*it, ns));
     }
   }
   else if(expr.id()==ID_union)
@@ -116,7 +147,7 @@ xmlt convert(
     assert(expr.operands().size()==1);
     
     xmlt &e=result.new_element("member");
-    e.new_element(convert(expr.op0(), ns));
+    e.new_element(xml(expr.op0(), ns));
   }
   else
     result.name="unknown";

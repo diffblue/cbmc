@@ -10,7 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <xml.h>
 #include <i2string.h>
-#include <xml_irep.h>
+#include <xml_expr.h>
 
 #include <langapi/language_util.h>
 
@@ -66,24 +66,19 @@ void show_claims(
     {
     case ui_message_handlert::XML_UI:
       {
-        xmlt xml("claim");
-        xml.new_element("number").data=claim_name;
-        xml.new_element("name").data=claim_name;
+        xmlt xml_claim("claim");
+        xml_claim.new_element("number").data=claim_name;
+        xml_claim.new_element("name").data=claim_name;
         
-        xmlt &l=xml.new_element();
-        convert(it->location, l);
-        l.name="location";
+        xmlt &l=xml_claim.new_element();
+        l=xml(it->location);
         
-        l.new_element("line").data=id2string(location.get_line());
-        l.new_element("file").data=id2string(location.get_file());
-        l.new_element("function").data=id2string(location.get_function());
-        
-        xml.new_element("description").data=id2string(description);        
-        xml.new_element("property").data=id2string(property);        
-        xml.new_element("expression").data=from_expr(ns, identifier, it->guard);
-        xml.new_element("priority").data=i2string(priority);
+        xml_claim.new_element("description").data=id2string(description);        
+        xml_claim.new_element("property").data=id2string(property);        
+        xml_claim.new_element("expression").data=from_expr(ns, identifier, it->guard);
+        xml_claim.new_element("priority").data=i2string(priority);
           
-        std::cout << xml << std::endl;
+        std::cout << xml_claim << std::endl;
       }
       break;
       

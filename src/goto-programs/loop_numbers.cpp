@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 
 #include <xml.h>
-#include <xml_irep.h>
+#include <xml_expr.h>
 #include <i2string.h>
 
 #include "loop_numbers.h"
@@ -41,14 +41,10 @@ void show_loop_numbers(
 
       if(ui==ui_message_handlert::XML_UI)
       {
-        xmlt xml("loop");
-        xml.new_element("loop-id").data=id2string(it->function)+"."+i2string(loop_id);
-        
-        xmlt &l=xml.new_element();
-        convert(it->location, l);
-        l.name="location";
-        
-        std::cout << xml << std::endl;
+        xmlt xml_loop("loop");
+        xml_loop.new_element("loop-id").data=id2string(it->function)+"."+i2string(loop_id);
+        xml_loop.new_element()=xml(it->location);
+        std::cout << xml_loop << std::endl;
       }
       else if(ui==ui_message_handlert::PLAIN)
       {
