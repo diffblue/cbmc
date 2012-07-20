@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ui_message.h>
 
-class goto_programt;
 class goto_functionst;
 class namespacet;
 
@@ -19,10 +18,5 @@ void show_claims(
   const namespacet &ns,
   ui_message_handlert::uit ui,
   const goto_functionst &goto_functions);
-
-void show_claims(
-  const namespacet &ns,
-  ui_message_handlert::uit ui,
-  const goto_programt &goto_program);
 
 #endif

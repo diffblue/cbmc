@@ -585,6 +585,9 @@ void goto_instrument_parseoptionst::instrument_goto_program(
     status("Performing a full slice");
     full_slicer(goto_functions);
   }
+  
+  // label the assertions
+  label_claims(goto_functions);
 }
 
 /*******************************************************************\
