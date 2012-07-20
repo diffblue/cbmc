@@ -101,7 +101,6 @@ public:
     const guardt &guard,
     const exprt &cond,
     const std::string &msg,
-    const unsigned priority,
     const sourcet &source);
 
   void convert(prop_convt &prop_conv);
@@ -143,9 +142,6 @@ public:
     literalt cond_literal;
     std::string comment;
     
-    // Priority of assertions. Higher values mean higher importance.
-    unsigned priority;
-
     // for INPUT/OUTPUT
     irep_idt format_string, io_id;
     bool formatted;
@@ -166,7 +162,6 @@ public:
       original_full_lhs(static_cast<const exprt &>(get_nil_irep())),
       ssa_rhs(static_cast<const exprt &>(get_nil_irep())),
       cond_expr(static_cast<const exprt &>(get_nil_irep())),
-      priority(0),
       formatted(false),
       ignore(false)
     {

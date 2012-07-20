@@ -113,7 +113,6 @@ public:
     const guardt &guard,
     const exprt &cond,
     const std::string &msg,
-    const unsigned priority,
     const sourcet &source)=0;
 };
 
