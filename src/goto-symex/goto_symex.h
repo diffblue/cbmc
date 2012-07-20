@@ -120,7 +120,6 @@ protected:
   virtual void claim(
     const exprt &expr,
     const std::string &msg,
-    unsigned priority,
     statet &state);
     
   // gotos
