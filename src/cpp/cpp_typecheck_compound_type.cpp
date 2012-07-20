@@ -1116,8 +1116,10 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
       {
         cpp_declaratort &declarator=*d_it;
 
+        #if 0
         irep_idt ctor_base_name=
           declarator.name().get_base_name();
+        #endif
         
         if(declarator.value().is_not_nil())
         {
