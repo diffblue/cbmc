@@ -42,9 +42,14 @@ xmlt xml(const locationt &location)
   result.new_element("function").data=id2string(location.get_function());
   
   // these are to stay
-  result.set_attribute("file", id2string(location.get_file()));
-  result.set_attribute("line", id2string(location.get_line()));
-  result.set_attribute("function", id2string(location.get_function()));
+  if(location.get_file()!="")
+    result.set_attribute("file", id2string(location.get_file()));
+
+  if(location.get_line()!="")
+    result.set_attribute("line", id2string(location.get_line()));
+
+  if(location.get_function()!="")
+    result.set_attribute("function", id2string(location.get_function()));
   
   return result;
 }
