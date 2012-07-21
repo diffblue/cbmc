@@ -17,7 +17,6 @@ Date: June 2006
 #include <tempdir.h>
 #include <replace_symbol.h>
 #include <base_type.h>
-#include <xml.h>
 #include <i2string.h>
 #include <cmdline.h>
 #include <file_util.h>
@@ -37,11 +36,6 @@ Date: June 2006
 
 #include <irep_serialization.h>
 #include <symbol_serialization.h>
-
-#include "xml_binaries/xml_irep_hashing.h"
-#include "xml_binaries/xml_symbol_hashing.h"
-#include "xml_binaries/xml_goto_function_hashing.h"
-#include "xml_binaries/read_goto_object.h"
 
 #include "get_base_name.h"
 #include "compile.h"
@@ -284,16 +278,8 @@ bool compilet::add_input_file(const std::string &file_name)
     }
     else if(ext=="so")
     {
-      if(cmdline.isset("xml"))
-      {
-        if(is_xml_file(file_name))
-          object_files.push_back(file_name);
-      }
-      else
-      {
-        if(is_binary_file(file_name))
-          object_files.push_back(file_name);
-      }
+      if(is_binary_file(file_name))
+        object_files.push_back(file_name);
     }
     else if(ext==object_file_extension ||
             ext=="la" || ext=="lo") // Object file recognized
@@ -350,55 +336,14 @@ bool compilet::find_library(const std::string &name)
           std::cout << "Warning: Cannot read ELF library " << libname << "."
                     << std::endl;
 
-      if(cmdline.isset("xml"))
-      {
-        if(is_xml_file(libname))
-          add_input_file(libname);
-        else
-          return false;
-      }
+      if(is_binary_file(libname))
+        add_input_file(libname);
       else
-      {
-        if(is_binary_file(libname))
-          add_input_file(libname);
-        else
-          return false;
-      }
+        return false;
     }
   }
   
   return true;
-}
-
-/*******************************************************************\
-
-Function: compilet::is_xml_file
-
-  Inputs: file name
-
- Outputs: true if the given file name exists and is an xml file,
-          false otherwise
-
- Purpose: checking if we can load an object file
-
-\*******************************************************************/
-
-bool compilet::is_xml_file(const std::string &file_name)
-{
-  std::fstream in;
-  in.open(file_name.c_str(), std::ios::in);
-
-  if(in.is_open())
-  {
-    char buf[5];
-    for (unsigned i=0; i<5; i++)
-      buf[i] = in.get();
-    if(buf[0]=='<' && buf[1]=='?' &&
-        buf[2]=='x' && buf[3]=='m' && buf[4]=='l')
-      return true;
-  }
-
-  return false;
 }
 
 /*******************************************************************\
@@ -827,10 +772,7 @@ bool compilet::write_object_file(
   const contextt &lcontext,
   goto_functionst &functions)
 {
-  if(cmdline.isset("xml"))
-    return write_xml_object_file(file_name, lcontext, functions);
-  else
-    return write_bin_object_file(file_name, lcontext, functions);
+  return write_bin_object_file(file_name, lcontext, functions);
 }
 
 /*******************************************************************\
@@ -894,92 +836,6 @@ bool compilet::write_bin_object_file(
     dgf.close();
   }
 
-  return false;
-}
-
-/*******************************************************************\
-
-Function: compilet::write_xml_object_file
-
-  Inputs: file_name, functions table
-
- Outputs: true on error, false otherwise
-
- Purpose: writes the goto functions in the function table to an xml
-          object file
-
-\*******************************************************************/
-
-bool compilet::write_xml_object_file(
-  const std::string &file_name,
-  const contextt &lcontext,
-  goto_functionst &functions)
-{
-  print(8, "Writing xml format object " + file_name);
-
-  std::ofstream f(file_name.c_str());
-  if(!f.is_open())
-  {
-    error("Error opening file " + file_name);
-    return true;
-  }
-
-  f << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << std::endl;
-  f << "<goto-object version=\"" << XML_VERSION << "\">" << std::endl;
-  f << " <irep_hash_map>" << std::endl;
-
-  xml_irep_convertt::ireps_containert irepc;
-  xml_irep_convertt irepconverter(irepc);
-  xml_symbol_convertt symbolconverter(irepc);
-  xml_goto_function_convertt gfconverter(irepc);
-
-  xmlt syms("symbols");
-  print(8, "Symbols in table: " + i2string((unsigned long) lcontext.symbols.size()));
-  forall_symbols(it, lcontext.symbols)
-  {
-    const symbolt &sym = it->second;
-    symbolconverter.convert(sym, syms);
-  }
-
-  xmlt funs("functions");
-  if(verbosity>=9)
-  {
-    std::cout << "Functions: " << functions.function_map.size() << "; ";
-    std::cout << function_body_count(functions) << " have a body." << std::endl;
-  }
-
-  std::ofstream dgf;
-
-  if(cmdline.isset("dot"))
-    write_dot_header(file_name, dgf);
-
-  for(goto_functionst::function_mapt::iterator it=functions.function_map.begin();
-      it != functions.function_map.end();
-      it++)
-  {
-    if(it->second.body_available)
-    {
-      xmlt &fun = funs.new_element("function");
-      fun.set_attribute("name", id2string(it->first));
-      gfconverter.convert(it->second, fun);
-      if(dgf.is_open())
-        write_dot_subgraph(dgf, id2string(it->first), it->second.body);
-    }
-  }
-
-  if(dgf.is_open())
-  {
-    do_dot_function_calls(dgf);
-    dgf << "}" << std::endl;
-    dgf.close();
-  }
-
-  irepconverter.output_map(f, 2);
-  f << " </irep_hash_map>" << std::endl;
-  syms.output(f, 1);
-  funs.output(f, 1);
-  f << "</goto-object>";
-  f.close();
   return false;
 }
 
@@ -1347,10 +1203,7 @@ bool compilet::read_object(
 {
   std::ifstream infile;
 
-  if(cmdline.isset("xml"))
-    infile.open(file_name.c_str());
-  else
-    infile.open(file_name.c_str(), std::ios::binary);
+  infile.open(file_name.c_str(), std::ios::binary);
 
   if(!infile)
   {
@@ -1364,18 +1217,9 @@ bool compilet::read_object(
   contextt temp_context;
   goto_functionst temp_functions;
 
-  if(cmdline.isset("xml"))
-  {
-    if(read_goto_object(infile, file_name, temp_context,
-                         temp_functions, *message_handler))
-      return true;
-  }
-  else
-  {
-    if(read_bin_goto_object(infile, file_name, temp_context,
-                             temp_functions, *message_handler))
-      return true;
-  }
+  if(read_bin_goto_object(infile, file_name, temp_context,
+                           temp_functions, *message_handler))
+    return true;
   
   std::set<irep_idt> seen_modes;
 

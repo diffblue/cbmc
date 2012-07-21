@@ -12,7 +12,6 @@ Date: June 2006
 #define GOTO_CC_COMPILE_H
 
 #include <symbol.h>
-#include <xml.h>
 #include <replace_symbol.h>
 #include <options.h>
 
@@ -45,7 +44,6 @@ public:
   
   bool add_input_file(const std::string &);
   bool find_library(const std::string &);
-  bool is_xml_file(const std::string &);
   bool is_binary_file(const std::string &);
   bool is_elf_file(const std::string &);
 
@@ -60,8 +58,6 @@ public:
 
   bool write_object_file( const std::string &, const contextt &, 
                           goto_functionst &);
-  bool write_xml_object_file( const std::string&, const contextt &, 
-                              goto_functionst& );
   bool write_bin_object_file( const std::string&, const contextt &, 
                               goto_functionst& );    
 
