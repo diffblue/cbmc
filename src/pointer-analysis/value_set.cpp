@@ -101,33 +101,23 @@ bool value_sett::insert(
   unsigned n,
   const objectt &object) const
 {
-  if(dest.read().find(n)==dest.read().end())
+  object_map_dt::const_iterator entry=dest.read().find(n);
+
+  if(entry==dest.read().end())
   {
     // new
     dest.write()[n]=object;
     return true;
   }
+  else if(!entry->second.offset_is_set)
+    return false; // no change
+  else if(object.offset_is_set &&
+          entry->second.offset==object.offset)
+    return false; // no change
   else
   {
-    objectt &old=dest.write()[n];
-    
-    if(old.offset_is_set && object.offset_is_set)
-    {
-      if(old.offset==object.offset)
-        return false;
-      else
-      {
-        old.offset_is_set=false;
-        return true;
-      }
-    }
-    else if(!old.offset_is_set)
-      return false;
-    else
-    {
-      old.offset_is_set=false;
-      return true;
-    }
+    dest.write()[n].offset_is_set=false;
+    return true;
   }
 }
 
@@ -280,25 +270,36 @@ bool value_sett::make_union(const value_sett::valuest &new_values)
 {
   bool result=false;
   
+  valuest::iterator v_it=values.begin();
+
   for(valuest::const_iterator
       it=new_values.begin();
       it!=new_values.end();
-      it++)
+      ) // no it++
   {
-    valuest::iterator it2=values.find(it->first);
-
-    if(it2==values.end())
+    if(v_it==values.end() || it->first<v_it->first)
     {
-      values.insert(*it);
+      values.insert(v_it, *it);
       result=true;
+      it++;
       continue;
     }
+    else if(v_it->first<it->first)
+    {
+      v_it++;
+      continue;
+    }
+    
+    assert(v_it->first==it->first);
       
-    entryt &e=it2->second;
+    entryt &e=v_it->second;
     const entryt &new_e=it->second;
     
     if(make_union(e.object_map, new_e.object_map))
       result=true;
+
+    v_it++;
+    it++;
   }
   
   return result;
