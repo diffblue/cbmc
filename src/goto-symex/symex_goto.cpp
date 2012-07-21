@@ -130,9 +130,8 @@ void goto_symext::symex_goto(statet &state)
     {
       symbol_exprt guard_symbol_expr=
         symbol_exprt(guard_identifier, bool_typet());
-      exprt new_rhs=new_guard, rhs=old_guard;
+      exprt new_rhs=new_guard;
       new_rhs.make_not();
-      rhs.make_not();
       
       symbol_exprt new_lhs=guard_symbol_expr;
       state.rename(new_lhs, ns, goto_symex_statet::L1);
