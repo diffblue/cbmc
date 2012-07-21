@@ -2,15 +2,7 @@ SRC = goto-cc.cpp \
       cmdline_options.cpp get_base_name.cpp \
       gcc_cmdline.cpp ms_cl_cmdline.cpp \
       compile.cpp armcc_cmdline.cpp \
-      languages.cpp goto_cc_cmdline.cpp \
-      xml_binaries/xml_irep_hashing.cpp \
-      xml_binaries/xml_symbol_hashing.cpp \
-      xml_binaries/xml_symbol.cpp \
-      xml_binaries/xml_goto_function.cpp \
-      xml_binaries/xml_goto_function_hashing.cpp \
-      xml_binaries/xml_goto_program.cpp \
-      xml_binaries/xml_goto_program_hashing.cpp \
-      xml_binaries/read_goto_object.cpp
+      languages.cpp goto_cc_cmdline.cpp
 
 OBJ += ../big-int/bigint$(OBJEXT) \
       ../goto-programs/goto-programs$(LIBEXT) \
