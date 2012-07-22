@@ -97,10 +97,9 @@ void static_lifetime_init(
       if(has_prefix(id2string(identifier), CPROVER_PREFIX "architecture_"))
         continue;
       
-      if(value.is_not_nil())
+      if(value.is_not_nil() &&
+         it->second.type.id()!=ID_code)
       {
-        assert(value.type().id()!=ID_code);
-        
         exprt symbol(ID_symbol, it->second.type);
         symbol.set(ID_identifier, it->second.name);
  
