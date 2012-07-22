@@ -636,14 +636,14 @@ bool compilet::parse(const std::string &file_name)
   
   // Using '-x', the type of a file can be overridden;
   // otherwise, it's guessed from the extension.
-
+  
   if(cmdline.isset('x'))
   {
     const std::string language=cmdline.getval('x');
     if(language=="c++" || language=="c++-header")
-      languagep=get_language_from_mode("C");
-    else
       languagep=get_language_from_mode("cpp");
+    else
+      languagep=get_language_from_mode("C");
   }
   else
     languagep=get_language_from_filename(file_name);
