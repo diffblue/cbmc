@@ -262,16 +262,15 @@ typet c_typecastt::follow_with_qualifiers(const typet &src_type)
   typet result_type=src_type;
   
   // collect qualifiers
-  c_qualifierst qualifiers;
+  c_qualifierst qualifiers(src_type);
   
   while(result_type.id()==ID_symbol)
   {
-    qualifiers+=c_qualifierst(result_type);
-
     const symbolt &followed_type_symbol=
       ns.lookup(result_type.get(ID_identifier));
 
     result_type=followed_type_symbol.type;
+    qualifiers+=c_qualifierst(followed_type_symbol.type);
   }
 
   qualifiers.write(result_type);
@@ -493,15 +492,17 @@ void c_typecastt::implicit_typecast_followed(
   const typet &src_type,
   const typet &dest_type)
 {
+  if(dest_type.id()==ID_union)
+
   // do transparent union
   if(dest_type.id()==ID_union &&
      dest_type.get_bool(ID_C_transparent_union) &&
      src_type.id()!=ID_union)
   {
-    // the argument corresponding to a transparent union type can be of any
-    // type in the union; no cast is required
+    // The argument corresponding to a transparent union type can be of any
+    // type in the union; no explicit cast is required.
     
-    // check union members
+    // Check union members.
     const union_typet &dest_union_type=to_union_type(dest_type);
 
     for(union_typet::componentst::const_iterator

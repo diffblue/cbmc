@@ -566,7 +566,7 @@ void c_typecheck_baset::typecheck_symbol_type(typet &type)
   
   if(symbol.is_macro)
   {
-    // overwrite, but preserve any qualifiers
+    // overwrite, but preserve (add) any qualifiers
     c_qualifierst c_qualifiers(type);
     c_qualifiers+=c_qualifierst(symbol.type);
     type=symbol.type;

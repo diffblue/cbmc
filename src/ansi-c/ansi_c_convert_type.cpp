@@ -170,7 +170,9 @@ void ansi_c_convert_typet::read_rec(const typet &type)
       alignment=static_cast<const exprt &>(type.find(ID_size));
   }
   else if(type.id()==ID_transparent_union)
-    transparent_union=true;
+  {
+    c_qualifiers.is_transparent_union=true;
+  }
   else if(type.id()==ID_vector)
     vector_size=to_vector_type(type).size();
   else if(type.id()==ID_void)
@@ -434,9 +436,6 @@ void ansi_c_convert_typet::write(typet &type)
   }
 
   c_qualifiers.write(type);
-
-  if(transparent_union)
-    type.set(ID_C_transparent_union, true);
 
   if(packed)
     type.set(ID_C_packed, true);
