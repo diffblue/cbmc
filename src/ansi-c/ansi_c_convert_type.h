@@ -29,7 +29,7 @@ public:
            gcc_float128_cnt, bv_cnt, bv_width;
   bool gcc_mode_QI, gcc_mode_HI, gcc_mode_SI, gcc_mode_DI;
            
-  bool transparent_union, packed, aligned;
+  bool packed, aligned;
   exprt vector_size, alignment;
 
   // storage spec
@@ -62,7 +62,7 @@ public:
     bv_width=0;
     gcc_mode_QI=gcc_mode_HI=gcc_mode_SI=gcc_mode_DI=false;
     
-    packed=aligned=transparent_union=false;
+    packed=aligned=false;
 
     other.clear();
     c_storage_spec.clear();
