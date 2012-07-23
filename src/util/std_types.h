@@ -376,7 +376,7 @@ public:
     {
     }
     
-    inline argumentt(const typet &type):exprt(ID_argument, type)
+    explicit inline argumentt(const typet &type):exprt(ID_argument, type)
     {
     }
     
@@ -900,6 +900,12 @@ class range_typet:public typet
 public:
   range_typet():typet(ID_range)
   {
+  }
+  
+  range_typet(const mp_integer &_from, const mp_integer &_to)
+  {
+    set_from(_from);
+    set_to(_to);
   }
 
   friend const range_typet &to_range_type(const typet &type)
