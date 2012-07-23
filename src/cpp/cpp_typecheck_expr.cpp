@@ -462,9 +462,9 @@ void cpp_typecheckt::typecheck_function_expr(
       std::string op_name="operator->";
 
       // turn this into a function call
-      side_effect_expr_function_callt functioncall;
-      functioncall.arguments().reserve(expr.operands().size());
-      functioncall.location()=expr.location();
+      side_effect_expr_function_callt function_call;
+      function_call.arguments().reserve(expr.operands().size());
+      function_call.location()=expr.location();
 
       // first do function/operator
       cpp_namet cpp_name;
@@ -472,19 +472,19 @@ void cpp_typecheckt::typecheck_function_expr(
       cpp_name.get_sub().back().set(ID_identifier, op_name);
       cpp_name.get_sub().back().add(ID_C_location)=expr.location();
 
-      functioncall.function()=
+      function_call.function()=
         static_cast<const exprt &>(
           static_cast<const irept &>(cpp_name));
 
       // now do the argument
-      functioncall.arguments().push_back(expr.op0());
-      typecheck_side_effect_function_call(functioncall);
+      function_call.arguments().push_back(expr.op0());
+      typecheck_side_effect_function_call(function_call);
 
       exprt tmp("already_typechecked");
-      tmp.copy_to_operands(functioncall);
-      functioncall.swap(tmp);
+      tmp.copy_to_operands(function_call);
+      function_call.swap(tmp);
       
-      expr.op0().swap(functioncall);
+      expr.op0().swap(function_call);
       typecheck_function_expr(expr, fargs);
       return;
     }
@@ -594,9 +594,9 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
     std::string op_name=std::string("operator")+"("+cpp_type2name(t)+")";
 
     // turn this into a function call
-    side_effect_expr_function_callt functioncall;
-    functioncall.arguments().reserve(expr.operands().size());
-    functioncall.location()=expr.location();
+    side_effect_expr_function_callt function_call;
+    function_call.arguments().reserve(expr.operands().size());
+    function_call.location()=expr.location();
 
     cpp_namet cpp_name;
     cpp_name.get_sub().push_back(irept(ID_name));
@@ -641,7 +641,7 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
       tmp.copy_to_operands(expr.op0());
       member.copy_to_operands(tmp);
 
-      functioncall.function()=member;
+      function_call.function()=member;
     }
 
     if(expr.operands().size()>1)
@@ -650,22 +650,22 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
           it=(expr.operands().begin()+1);
           it!=(expr).operands().end();
           it++)
-        functioncall.arguments().push_back(*it);
+        function_call.arguments().push_back(*it);
     }
 
-    typecheck_side_effect_function_call(functioncall);
+    typecheck_side_effect_function_call(function_call);
 
     if(expr.id()==ID_ptrmember)
     {
-      add_implicit_dereference(functioncall);
+      add_implicit_dereference(function_call);
       exprt tmp("already_typechecked");
-      tmp.move_to_operands(functioncall);
+      tmp.move_to_operands(function_call);
       expr.op0().swap(tmp);
       typecheck_expr(expr);
       return true;
     }
 
-    expr.swap(functioncall);
+    expr.swap(function_call);
     return true;
   }
 
@@ -686,9 +686,9 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
       cpp_name.get_sub().back().add(ID_C_location)=expr.location();
 
       // turn this into a function call
-      side_effect_expr_function_callt functioncall;
-      functioncall.arguments().reserve(expr.operands().size());
-      functioncall.location()=expr.location();
+      side_effect_expr_function_callt function_call;
+      function_call.arguments().reserve(expr.operands().size());
+      function_call.location()=expr.location();
 
       // There are two options to overload an operator:
       //
@@ -732,7 +732,7 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
             tmp.copy_to_operands(expr.op0());
             member.copy_to_operands(tmp);
 
-            functioncall.function()=member;
+            function_call.function()=member;
           }
 
           if(expr.operands().size()>1)
@@ -742,12 +742,12 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
                 it=expr.operands().begin()+1;
                 it!=expr.operands().end();
                 it++)
-              functioncall.arguments().push_back(*it);
+              function_call.arguments().push_back(*it);
           }
           
-          typecheck_side_effect_function_call(functioncall);
+          typecheck_side_effect_function_call(function_call);
           
-          expr=functioncall;
+          expr=function_call;
 
           return true;        
         }
@@ -766,27 +766,27 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
         if(resolve_result.is_not_nil())
         {
           // found!
-          functioncall.function()=
+          function_call.function()=
             static_cast<const exprt &>(
               static_cast<const irept &>(cpp_name));
 
           // now do arguments
           forall_operands(it, expr)
-            functioncall.arguments().push_back(*it);
+            function_call.arguments().push_back(*it);
 
-          typecheck_side_effect_function_call(functioncall);
+          typecheck_side_effect_function_call(function_call);
 
           if(expr.id()==ID_ptrmember)
           {
-            add_implicit_dereference(functioncall);
+            add_implicit_dereference(function_call);
             exprt tmp("already_typechecked");
-            tmp.move_to_operands(functioncall);
+            tmp.move_to_operands(function_call);
             expr.op0()=tmp;
             typecheck_expr(expr);
             return true;
           }
           
-          expr=functioncall;
+          expr=function_call;
 
           return true;
         }
@@ -1638,6 +1638,58 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
 {
   locationt location=
     to_cpp_name(expr).location();
+
+  if(expr.get_sub().size()==1 &&
+     expr.get_sub()[0].id()==ID_name)
+  {
+    const irep_idt identifier=expr.get_sub()[0].get(ID_identifier);
+
+    if(identifier=="__sync_fetch_and_add" ||
+       identifier=="__sync_fetch_and_sub" ||
+       identifier=="__sync_fetch_and_or" ||
+       identifier=="__sync_fetch_and_and" ||
+       identifier=="__sync_fetch_and_xor" ||
+       identifier=="__sync_fetch_and_nand" ||
+       identifier=="__sync_add_and_fetch" ||
+       identifier=="__sync_sub_and_fetch" ||
+       identifier=="__sync_or_and_fetch" ||
+       identifier=="__sync_and_and_fetch" ||
+       identifier=="__sync_xor_and_fetch" ||
+       identifier=="__sync_nand_and_fetch" ||
+       identifier=="__sync_val_compare_and_swap" ||
+       identifier=="__sync_lock_test_and_set" ||
+       identifier=="__sync_lock_release")
+    {
+      // These are polymorphic, see
+      // http://gcc.gnu.org/onlinedocs/gcc-4.1.1/gcc/Atomic-Builtins.html
+      
+      // adjust return type of function to match pointer subtype
+      if(fargs.operands.size()<1)
+      {
+        err_location(location);
+        throw "__sync_* primitives take as least one argument";
+      }
+
+      const exprt &ptr_arg=fargs.operands.front();
+
+      if(ptr_arg.type().id()!=ID_pointer)
+      {
+        err_location(location);
+        throw "__sync_* primitives take pointer as first argument";
+      }
+
+      symbol_exprt result;
+      result.location()=location;
+      result.set_identifier(language_prefix+id2string(identifier));
+      code_typet t;
+      t.arguments().push_back(code_typet::argumentt(ptr_arg.type()));
+      t.make_ellipsis();
+      t.return_type()=ptr_arg.type().subtype();
+      result.type()=t;
+      expr.swap(result);
+      return;
+    }
+  }
 
   for(unsigned i=0; i<expr.get_sub().size(); i++)
   {
