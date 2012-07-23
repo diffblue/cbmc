@@ -92,6 +92,19 @@ void goto_convertt::convert_asm(const codet &code, goto_programt &dest)
         // doesn't do anything by itself,
         // needs to be combined with branch
       }
+      else if(line=="dmb" || line=="dsb") // ARM
+      {
+        goto_programt::targett t=tmp_dest.add_instruction(OTHER);
+        t->location=code.location();
+        t->code=codet(ID_fence);
+        t->code.location()=code.location();
+        t->code.set(ID_WWfence, true);
+        t->code.set(ID_RRfence, true);
+        t->code.set(ID_RWfence, true);
+        t->code.set(ID_WWcumul, true);
+        t->code.set(ID_RWcumul, true);
+        t->code.set(ID_RRcumul, true);
+      }
       else
         unknown=true; // give up
     }
