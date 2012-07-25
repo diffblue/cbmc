@@ -622,7 +622,11 @@ void symex_target_equationt::SSA_stept::output(
   case goto_trace_stept::ASSUME: out << "ASSUME" << std::endl; break;
   case goto_trace_stept::LOCATION: out << "LOCATION" << std::endl; break;
   case goto_trace_stept::OUTPUT: out << "OUTPUT" << std::endl; break;
-  case goto_trace_stept::DECL: out << "DECL" << std::endl; break;
+
+  case goto_trace_stept::DECL:
+    out << "DECL" << std::endl;
+    out << from_expr(ns, "", ssa_lhs) << std::endl;
+    break;
 
   case goto_trace_stept::ASSIGNMENT:
     out << "ASSIGNMENT (";
