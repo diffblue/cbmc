@@ -160,7 +160,7 @@ Function: i2string
 
 \*******************************************************************/
 
-#ifdef MSC_VER
+#ifdef _MSC_VER
 std::string i2string(signed __int64 i)
 {
   #ifdef USE_SPRINTF
@@ -191,7 +191,7 @@ Function: i2string
 
 \*******************************************************************/
 
-#ifdef MSC_VER
+#ifdef _MSC_VER
 std::string i2string(unsigned __int64 i)
 {
   #ifdef USE_SPRINTF
