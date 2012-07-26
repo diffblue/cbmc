@@ -1056,20 +1056,21 @@ void goto_convertt::do_function_call_symbol(
   }
   else if(identifier==CPROVER_PREFIX "fence")
   {
-    if(arguments.size()!=1)
+    if(arguments.size()<1)
     {
       err_location(function);
-      throw "`"+id2string(identifier)+"' expected to have one argument";
+      throw "`"+id2string(identifier)+"' expected to have at least one argument";
     }
-    
-    const irep_idt kind=
-      get_string_constant(arguments[0]);
 
     goto_programt::targett t=dest.add_instruction(OTHER);
     t->location=function.location();
     t->code.set(ID_statement, ID_fence);
-    //t->code.set(ID_kind, kind);
-    // we ignore any LHS
+
+    forall_expr(it, arguments)
+    {
+      const irep_idt kind=get_string_constant(*it);
+      t->code.set(kind, true);
+    }
   }
   else if(identifier=="c::__builtin_prefetch")
   {
