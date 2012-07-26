@@ -152,7 +152,7 @@ std::string i2string(unsigned long int i)
 
 Function: i2string
 
-  Inputs: signed __int64
+  Inputs: signed long long
 
  Outputs: string class
 
@@ -160,12 +160,11 @@ Function: i2string
 
 \*******************************************************************/
 
-#ifdef _MSC_VER
-std::string i2string(signed __int64 i)
+std::string i2string(signed long long i)
 {
   #ifdef USE_SPRINTF
   char buffer[100];
-  sprintf(buffer, "%I64d", i);
+  sprintf(buffer, "%lld", i);
   return buffer;
   #else
   std::ostringstream strInt;
@@ -177,13 +176,12 @@ std::string i2string(signed __int64 i)
   return str; 
   #endif
 }
-#endif
 
 /*******************************************************************\
 
 Function: i2string
 
-  Inputs: unsigned __int64
+  Inputs: unsigned long long
 
  Outputs: string class
 
@@ -191,12 +189,11 @@ Function: i2string
 
 \*******************************************************************/
 
-#ifdef _MSC_VER
-std::string i2string(unsigned __int64 i)
+std::string i2string(unsigned long long i)
 {
   #ifdef USE_SPRINTF
   char buffer[100];
-  sprintf(buffer, "%I64u", i);
+  sprintf(buffer, "%llu", i);
   return buffer;
   #else
   std::ostringstream strInt;
@@ -208,4 +205,3 @@ std::string i2string(unsigned __int64 i)
   return str; 
   #endif
 }
-#endif
