@@ -13,9 +13,10 @@ std::string i2string(signed long int i);
 std::string i2string(unsigned i);
 std::string i2string(unsigned long int i);
 
-// 64 bit integers
+// 64 bit integers, these only exist in Visual Studio,
+// and not in MingW
 
-#ifdef _WIN32
+#ifdef MSC_VER
 std::string i2string(signed __int64 i);
 std::string i2string(unsigned __int64 i);
 #endif
