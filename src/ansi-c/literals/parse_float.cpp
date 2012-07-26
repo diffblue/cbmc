@@ -88,16 +88,20 @@ void parse_float(
 
     std::string str_number=str_whole_number+
                            str_fraction_part;
+                           
+    // The significand part is interpreted as a (decimal or hexadecimal)
+    // rational number; the digit sequence in the exponent part is
+    // interpreted as a decimal integer.
 
     if(str_number.empty())
       significand=0;
     else
-      significand=string2integer(str_number, 16);
+      significand=string2integer(str_number, 16); // hex
 
     if(str_exponent.empty())
       exponent=0;
     else
-      exponent=string2integer(str_exponent, 16);
+      exponent=string2integer(str_exponent, 10); // decimal
 
     // adjust exponent
     exponent-=str_fraction_part.size()*4; // each digit has 4 bits
