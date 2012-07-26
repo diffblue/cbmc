@@ -19,7 +19,7 @@ ifneq ($(MINISAT2),)
   MINISAT2_INCLUDE=-I $(MINISAT2)
   MINISAT2_LIB=$(MINISAT2)/simp/SimpSolver$(OBJEXT) $(MINISAT2)/core/Solver$(OBJEXT)
   CP_CXXFLAGS += -DHAVE_MINISAT2 -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS
-  CXXFLAGS := $(filter-out -pedantic, $(CXXFLAGS))
+  override CXXFLAGS := $(filter-out -pedantic, $(CXXFLAGS))
 endif
 
 ifneq ($(SMVSAT),)
