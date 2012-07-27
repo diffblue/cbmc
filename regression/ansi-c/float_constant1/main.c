@@ -3,3 +3,6 @@
 
 STATIC_ASSERT(0x1.0p-95f == 2.524355e-29f);
 
+int main()
+{
+}
