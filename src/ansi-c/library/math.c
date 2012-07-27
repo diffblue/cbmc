@@ -70,11 +70,12 @@ inline double __signbit(double d) { return __CPROVER_sign(d); }
 #endif
 
 inline int __fpclassifyd(double d) {
-  if(__CPROVER_isnan(d)) return FP_NAN;
-  if(__CPROVER_isinf(d)) return FP_INFINITE;
-  if(d==0) return FP_ZERO;
-  if(__CPROVER_isnormal(d)) return FP_NORMAL;
-  return FP_SUBNORMAL;
+  __CPROVER_HIDE:
+  return __CPROVER_isnan(d)?FP_NAN:
+         __CPROVER_isinf(d)?FP_INFINITE:
+         d==0?FP_ZERO:
+         __CPROVER_isnormal(d)?FP_NORMAL:
+         FP_SUBNORMAL;
 }
 
 /* FUNCTION: __fpclassifyf */
