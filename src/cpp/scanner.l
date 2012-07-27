@@ -53,9 +53,26 @@ void cpp_scanner_init()
 
 identifier [a-zA-Z_$][0-9a-zA-Z_$]*
 
-exponent_part [eE][-+]?[0-9]+
-fractional_constant ([0-9]*"."[0-9]+)|([0-9]+".")
-floating_constant (({fractional_constant}{exponent_part}?)|([0-9]+{exponent_part}))[FfLl]?
+
+digit		[0-9]
+bindigit	[01]
+octdigit	[0-7]
+hexdigit	[0-9a-fA-F]
+integer		{digit}+
+exponent	[eE][+-]?{integer}
+fraction	{integer}
+
+float1		{integer}"."{fraction}?({exponent})?
+float2		"."{fraction}({exponent})?
+float3		{integer}{exponent}
+hexfloat1       "0"[xX]{hexdigit}+"."{hexdigit}+[pP][+-]?{integer}
+hexfloat2       "0"[xX]{hexdigit}+"."[pP][+-]?{integer}
+hexfloat3       "0"[xX]{hexdigit}+[pP][+-]?{integer}
+float		{float1}|{float2}|{float3}|{hexfloat1}|{hexfloat2}|{hexfloat3}
+float_f		{float}[fF]|{integer}[fF]
+float_l		{float}[lL]
+
+floating_constant {float}|{float_f}|{float_l}
 
 integer_suffix [uUlL]
 iw_suffix       ("i8"|"i16"|"i32"|"i64"|"i128")
@@ -80,7 +97,6 @@ c_return [\015]
 horizontal_white [ ]|{h_tab}
 ws {horizontal_white}*
 
-integer         [0-9]+
 cppfile         "\""[ !#-~]*"\""
 cpplineno       "#"{horizontal_white}*"line"*{horizontal_white}*{integer}.*"\n"
 pragma          "#"{horizontal_white}*pragma{horizontal_white}.*"\n"
