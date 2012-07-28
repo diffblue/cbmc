@@ -405,9 +405,26 @@ void c_typecheck_baset::do_initializer(symbolt &symbol)
     {
       const typet &final_type=follow(symbol.type);
       
-      if(final_type.id()!=ID_incomplete_struct &&
-         !(final_type.id()==ID_array && to_array_type(final_type).is_incomplete()) &&
-         final_type.id()!=ID_empty)
+      if(final_type.id()==ID_incomplete_struct)
+      {
+        err_location(symbol.location);
+        str << "type `"
+            << to_string(final_type) << "' is still incomplete -- cannot initialize";
+        throw 0;
+      }
+      else if(final_type.id()==ID_empty)
+      {
+        err_location(symbol.location);
+        str << "cannot initialize type `"
+            << to_string(final_type) << "'";
+        throw 0;
+      }
+      else if(final_type.id()==ID_array &&
+              to_array_type(final_type).is_incomplete())
+      {
+        // ignore
+      }
+      else
       {
         // zero initializer
         symbol.value=zero_initializer(symbol.type, symbol.location);
