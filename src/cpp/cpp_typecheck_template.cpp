@@ -163,12 +163,13 @@ void cpp_typecheckt::typecheck_class_template(
   if(previous_symbol!=context.symbols.end())
   {
     // there already
-    const cpp_declarationt &previous_declaration=
+    cpp_declarationt &previous_declaration=
       to_cpp_declaration(previous_symbol->second.type);
   
     bool previous_has_body=
       previous_declaration.type().find(ID_body).is_not_nil();
 
+    // check if we have 2 bodies
     if(has_body && previous_has_body)
     {
       err_location(cpp_name.location());
@@ -178,7 +179,7 @@ void cpp_typecheckt::typecheck_class_template(
           << previous_symbol->second.location;
       throw 0;
     }
-
+    
     if(has_body)
     {
       // We replace the template!
@@ -188,15 +189,32 @@ void cpp_typecheckt::typecheck_class_template(
         declaration.template_type());
       
       previous_symbol->second.type.swap(declaration);
+      
+      #if 0
+      std::cout << "*****\n";
+      std::cout << *cpp_scopes.id_map[symbol_name];
+      std::cout << "*****\n";
+      std::cout << "II: " << symbol_name << std::endl;
+      #endif
 
       // We also replace the template scope (the old one could be deleted).
       cpp_scopes.id_map[symbol_name]=&template_scope;
+      
+      // We also fix the parent scope in order to see the new
+      // template arguments
     }
-
+    else
+    {
+      // just update any default parameters
+      salvage_default_parameters(
+        declaration.template_type(),
+        previous_declaration.template_type());
+    }
+    
     assert(cpp_scopes.id_map[symbol_name]->id_class == cpp_idt::TEMPLATE_SCOPE);
     return;
   }
-  
+
   // it's not there yet
 
   symbolt symbol;
