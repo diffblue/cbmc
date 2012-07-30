@@ -407,10 +407,9 @@ void c_typecheck_baset::do_initializer(symbolt &symbol)
       
       if(final_type.id()==ID_incomplete_struct)
       {
-        err_location(symbol.location);
-        str << "type `"
-            << to_string(final_type) << "' is still incomplete -- cannot initialize";
-        throw 0;
+        // silently ignore due to 
+        // extern struct _IO_FILE_plus _IO_2_1_stdin_;
+        // in #include <stdio.h>
       }
       else if(final_type.id()==ID_empty)
       {
