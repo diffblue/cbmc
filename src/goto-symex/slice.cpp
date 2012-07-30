@@ -226,9 +226,14 @@ void symex_slicet::collect_open_variables(
       break;
 
     case goto_trace_stept::OUTPUT:
+    case goto_trace_stept::INPUT:
+    case goto_trace_stept::DEAD:
+    case goto_trace_stept::NONE:
       break;
 
     case goto_trace_stept::DECL:
+    case goto_trace_stept::FUNCTION_CALL:
+    case goto_trace_stept::FUNCTION_RETURN:
       // ignore for now
       break;
 
