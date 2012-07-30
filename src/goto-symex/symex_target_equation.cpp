@@ -621,6 +621,7 @@ void symex_target_equationt::SSA_stept::output(
   case goto_trace_stept::ASSERT: out << "ASSERT" << std::endl; break;
   case goto_trace_stept::ASSUME: out << "ASSUME" << std::endl; break;
   case goto_trace_stept::LOCATION: out << "LOCATION" << std::endl; break;
+  case goto_trace_stept::INPUT: out << "INPUT" << std::endl; break;
   case goto_trace_stept::OUTPUT: out << "OUTPUT" << std::endl; break;
 
   case goto_trace_stept::DECL:
