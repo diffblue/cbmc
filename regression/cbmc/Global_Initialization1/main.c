@@ -8,6 +8,9 @@ uchar b[] = "abc";
 // addresses are constants
 int *p=&y;
 
+// we need to allow incomplete structs for #include <stdio.h>
+extern struct _IO_FILE_plus _IO_2_1_stdin_;
+
 int some_func()
 {
   static int some_static; // zero initialized
