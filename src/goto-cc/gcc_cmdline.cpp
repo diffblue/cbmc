@@ -136,9 +136,8 @@ bool gcc_cmdlinet::parse(int argc, const char **argv)
       strcmp(argv[i], "-O3")==0 || strcmp(argv[i], "-Os")==0 ||
       strcmp(argv[i], "-C")==0 || strcmp(argv[i], "-E")==0 ||
       strcmp(argv[i], "-H")==0 || strcmp(argv[i], "-M")==0 ||
-      strcmp(argv[i], "-MM")==0 || strcmp(argv[i], "-MF")==0 ||
+      strcmp(argv[i], "-MM")==0 || 
       strcmp(argv[i], "-MG")==0 || strcmp(argv[i], "-MP")==0 ||
-      strcmp(argv[i], "-MQ")==0 || strcmp(argv[i], "-MT")==0 ||
       strcmp(argv[i], "-MD")==0 || strcmp(argv[i], "-MMD")==0 ||
       strcmp(argv[i], "-nostdinc")==0 || strcmp(argv[i], "-P")==0 ||
       strcmp(argv[i], "-remap")==0 || strcmp(argv[i], "-undef")==0 ||
@@ -188,6 +187,8 @@ bool gcc_cmdlinet::parse(int argc, const char **argv)
         strncmp(argv[i], "-V", 2)==0 ||
         strncmp(argv[i], "-D", 2)==0 ||
         strncmp(argv[i], "-L", 2)==0 ||
+        strncmp(argv[i], "-MT", 3)==0 ||
+        strncmp(argv[i], "-MQ", 3)==0 ||
         strncmp(argv[i], "-MF", 3)==0
     )
     {
