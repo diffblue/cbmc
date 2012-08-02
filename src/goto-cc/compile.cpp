@@ -206,7 +206,32 @@ bool compilet::add_input_file(const std::string &file_name)
         error("Cannot switch to temporary directory");
         return true;
       }
+
+      // unpack now
+      #ifdef _WIN32
+      if(file_name[0]!='/' && file_name[1]!=':')
+      #else
+      if(file_name[0]!='/')
+      #endif
+      {
+        cmd << "ar x " <<
+        #ifdef _WIN32
+          working_directory << "\\" << file_name;
+        #else
+          working_directory << "/" << file_name;
+        #endif
+      }
+      else
+      {
+        cmd << "ar x " << file_name;
+      }
       
+      FILE *stream;
+
+      stream=popen(cmd.str().c_str(), "r");
+      pclose(stream);
+      
+      // add the files from "ar t"
       #ifdef _WIN32
       if(file_name[0]!='/' && file_name[1]!=':')
       #else
@@ -225,7 +250,7 @@ bool compilet::add_input_file(const std::string &file_name)
         cmd << "ar t " << file_name;
       }
 
-      FILE *stream = popen(cmd.str().c_str(), "r");
+      stream=popen(cmd.str().c_str(), "r");
       if(stream!=NULL)
       {
         std::string line;
@@ -244,34 +269,15 @@ bool compilet::add_input_file(const std::string &file_name)
             #else
             t = tmp_dirs.back() + '/' + line;
             #endif
-            object_files.push_back(t);
+
+            if(is_binary_file(t))
+              object_files.push_back(t);
             line = "";
           }
         }
       }
       pclose(stream);
       cmd.str("");
-
-      #ifdef _WIN32
-      if(file_name[0]!='/' && file_name[1]!=':')
-      #else
-      if(file_name[0]!='/')
-      #endif
-      {
-        cmd << "ar x " <<
-        #ifdef _WIN32
-          working_directory << "\\" << file_name;
-        #else
-          working_directory << "/" << file_name;
-        #endif
-      }
-      else
-      {
-        cmd << "ar x " << file_name;
-      }
-
-      stream=popen(cmd.str().c_str(), "r");
-      pclose(stream);
 
       if(chdir(working_directory.c_str())!=0)
         error("Could not change back to working directory.");
