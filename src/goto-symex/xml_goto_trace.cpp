@@ -77,10 +77,17 @@ void convert(
         if(xml_location.name!="")
           xml_assignment.new_element().swap(xml_location);
 
-        std::string value_string, binary_string, type_string;
+        std::string value_string, binary_string, type_string,
+                    full_lhs_string, full_lhs_value_string;
         
         if(it->lhs_object_value.is_not_nil())
           value_string=from_expr(ns, identifier, it->lhs_object_value);
+
+        if(it->full_lhs.is_not_nil())
+          full_lhs_string=from_expr(ns, identifier, it->full_lhs);
+
+        if(it->full_lhs_value.is_not_nil())
+          full_lhs_value_string=from_expr(ns, identifier, it->full_lhs_value);
 
         if(it->lhs_object_value.type().is_not_nil())
           type_string=from_type(ns, identifier, it->lhs_object_value.type());
@@ -102,8 +109,10 @@ void convert(
         xml_assignment.new_element("identifier").data=id2string(identifier);
         xml_assignment.new_element("base_name").data=id2string(base_name);
         xml_assignment.new_element("display_name").data=id2string(display_name);
-        xml_assignment.new_element("value").data=id2string(value_string);
-        xml_assignment.new_element("type").data=id2string(type_string);
+        xml_assignment.new_element("value").data=value_string;
+        xml_assignment.new_element("full_lhs").data=full_lhs_string;
+        xml_assignment.new_element("full_lhs_value").data=full_lhs_value_string;
+        xml_assignment.new_element("type").data=type_string;
         xml_assignment.new_element("step_nr").data=i2string(it->step_nr);
 
         if(it->lhs_object_value.is_not_nil())
