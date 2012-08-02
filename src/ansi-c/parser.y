@@ -140,10 +140,12 @@ extern char *yyansi_ctext;
 %token TOK_EXISTS      "exists"
 %token TOK_ARRAY_OF    "array_of"
 %token TOK_CPROVER_BITVECTOR "__CPROVER_bitvector"
+%token TOK_CPROVER_ATOMIC "__CPROVER_atomic"
 %token TOK_CPROVER_BOOL "__CPROVER_bool"
 %token TOK_REAL        "__real__"
 %token TOK_IMAG        "__imag__"
 %token TOK_ALIGNAS     "_Alignas"
+%token TOK_ATOMIC      "_Atomic"
 %token TOK_ATOMIC      "_Atomic"
 %token TOK_GENERIC     "_Generic"
 %token TOK_IMAGINARY   "_Imaginary"
@@ -909,6 +911,7 @@ type_qualifier:
           TOK_CONST    { $$=$1; set($$, ID_const); }
         | TOK_VOLATILE { $$=$1; set($$, ID_volatile); }
         | TOK_ATOMIC   { $$=$1; set($$, ID_atomic); }
+        | TOK_CPROVER_ATOMIC { $$=$1; set($$, ID_cprover_atomic); }
         | TOK_PTR32    { $$=$1; set($$, ID_ptr32); }
         | TOK_PTR64    { $$=$1; set($$, ID_ptr64); }
         ;

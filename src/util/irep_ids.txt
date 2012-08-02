@@ -344,6 +344,7 @@ C_implicit #implicit
 C_qualifier #qualifier
 C_ptr32 #ptr32
 C_ptr64 #ptr64
+C_atomic #atomic
 restricted
 restrict
 byte_extract_big_endian
@@ -353,6 +354,7 @@ byte_update_little_endian
 replication
 dummy
 init
+cprover_atomic
 atomic
 atomic_begin
 atomic_end

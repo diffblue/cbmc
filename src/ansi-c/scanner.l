@@ -809,6 +809,7 @@ wchar_t	            { // CodeWarrior doesn't have wchar_t built in
                     return make_identifier();
                 }
 
+"__CPROVER_atomic" { loc(); return TOK_CPROVER_ATOMIC; }
 "__CPROVER_forall" { loc(); return TOK_FORALL; }
 "__CPROVER_exists" { loc(); return TOK_EXISTS; }
 "__CPROVER_array_of" { loc(); return TOK_ARRAY_OF; }
