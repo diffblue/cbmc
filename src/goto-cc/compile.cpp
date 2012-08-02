@@ -335,8 +335,7 @@ bool compilet::find_library(const std::string &name)
       if(is_elf_file(libname))
           std::cout << "Warning: Cannot read ELF library " << libname << "."
                     << std::endl;
-
-      if(is_binary_file(libname))
+      else if(is_binary_file(libname))
         add_input_file(libname);
       else
         return false;
