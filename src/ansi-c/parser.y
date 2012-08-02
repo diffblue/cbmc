@@ -146,7 +146,6 @@ extern char *yyansi_ctext;
 %token TOK_IMAG        "__imag__"
 %token TOK_ALIGNAS     "_Alignas"
 %token TOK_ATOMIC      "_Atomic"
-%token TOK_ATOMIC      "_Atomic"
 %token TOK_GENERIC     "_Generic"
 %token TOK_IMAGINARY   "_Imaginary"
 %token TOK_NORETURN    "_Noreturn"
