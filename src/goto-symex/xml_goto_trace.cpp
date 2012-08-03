@@ -60,7 +60,7 @@ void convert(
       {
         xmlt &xml_failure=dest.new_element("failure");
         xml_failure.new_element("reason").data=id2string(it->comment);
-        
+        xml_failure.new_element("step_nr").data=i2string(it->step_nr);        
         xml_failure.new_element("thread").data=i2string(it->thread_nr);
 
         if(xml_location.name!="")
