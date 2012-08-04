@@ -168,8 +168,7 @@ Function: my_wgetline
  
 \*******************************************************************/
 
-#if 0
-static std::istream &my_wgetline(std::istream &in, std::string &dest)
+static std::istream &my_wgetline(std::istream &in, std::wstring &dest)
 {
   // We should support this properly,
   // but will just strip right now.
@@ -189,22 +188,19 @@ static std::istream &my_wgetline(std::istream &in, std::string &dest)
 
     if(ch1=='\r')
     {
+      // ignore
     }
     else if(ch1=='\n')
     {
       in.clear();
-      break;
-    }
-    else if(ch1==0)
-    {
+      break; // line end
     }
     else
-      dest+=ch1;
+      dest+=wchar_t(ch1+(ch2<<8));
   }
         
   return in;
 }
-#endif
 
 /*******************************************************************\
  
@@ -236,13 +232,15 @@ void ms_cl_cmdlinet::process_response_file(const std::string &file)
   {
     // Unicode!
     
-    #if 0
-    // re-open -- should be using wifstream
+    #if 1
+    // re-open -- should be using wifstream,
+    // but this isn't available everywhere
     std::ifstream infile2(file.c_str());
     infile2.seekg(2);
+    std::wstring wline;
     
-    while(my_wgetline(infile2, line))
-      process_response_file_line(line);
+    while(my_wgetline(infile2, wline))
+      process_response_file_line(wline);
     #else
     
     std::wifstream infile2(file.c_str());
@@ -346,8 +344,8 @@ void ms_cl_cmdlinet::process_non_cl_option(
       return;
 
   // unrecognized option
-  std::wcout << L"Warning: uninterpreted non-CL option `" 
-             << s << L"'" << std::endl;
+  std::cout << "Warning: uninterpreted non-CL option `" 
+            << w2s(s) << "'" << std::endl;
 }
 
 /*******************************************************************\
@@ -566,6 +564,6 @@ void ms_cl_cmdlinet::process_cl_option(const std::wstring &s)
   }
 
   // unrecognized option
-  std::wcout << L"Warning: uninterpreted CL option `" 
-             << s << L"'" << std::endl;
+  std::cout << "Warning: uninterpreted CL option `" 
+            << w2s(s) << "'" << std::endl;
 }
