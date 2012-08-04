@@ -14,6 +14,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 */
 
+#include <unicode.h>
+
 #include "parseoptions.h"
 
 /*******************************************************************\
@@ -30,6 +32,9 @@ Function: main
 
 int main(int argc, const char **argv)
 {
+  #ifdef _WIN32
+  argv=narrow_argv();
+  #endif
   cbmc_parseoptionst parseoptions(argc, argv);
   return parseoptions.main();
 }

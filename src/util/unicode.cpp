@@ -158,15 +158,15 @@ Function: narrow_argv
 const char **narrow_argv()
 {
   int argc;
-  const wchar_t argvw=
+  const wchar_t argv_wide=
     CommandLineToArgvW(GetCommandLineW(), &argc);
 
   // the following never gets deleted
-  char **argv=new char *[argc];
+  char **argv_narrow=new char *[argc];
     
   for(int i=0; i<argc; i++)
-  {
-    
-  }
+    argv_narrow[i]=strdup(narrow(argv_wide[i]).c_str());
+  
+  return argv_narrow;
 }
 #endif
