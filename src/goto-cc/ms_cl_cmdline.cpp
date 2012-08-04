@@ -121,7 +121,7 @@ void ms_cl_cmdlinet::parse_env()
   const wchar_t *CL_env=_wgetenv(L"CL");
 
   if(CL_env!=NULL)
-    process_response_file_line(std::wstring(CL_env));
+    process_response_file_line(narrow(CL_env));
 
   #else
 
