@@ -25,6 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <i2string.h>
 #include <message_stream.h>
 #include <tempfile.h>
+#include <unicode.h>
 
 #include "c_preprocess.h"
 
@@ -290,13 +291,50 @@ bool c_preprocess_visual_studio(
   std::string stderr_file=get_temporary_file("tmp.stderr", "");
   std::string command_file_name=get_temporary_file("tmp.cl-cmd", "");
 
-  {  
+  {
+    #ifdef MSC_VER
+    std::ofwstream command_file(command_file_name.c_str());
+  
+    command_file << L"/nologo" << std::endl;
+    command_file << L"/E" << std::endl;
+    command_file << L"/D__CPROVER__" << std::endl;
+    command_file << L"/D__WORDSIZE=" << config.ansi_c.pointer_width << std::endl;
+
+    if(config.ansi_c.pointer_width==64)
+    {
+      command_file << L"\"/D__PTRDIFF_TYPE__=long long int\""  << std::endl;
+      // yes, both _WIN32 and _WIN64 get defined
+      command_file << L"/D_WIN64" << std::endl;
+    }
+    else
+      command_file << L"/D__PTRDIFF_TYPE__=int" << std::endl;
+
+    // Standard Defines, ANSI9899 6.10.8
+    command_file << L"/D__STDC_VERSION__=199901L" << std::endl;
+    command_file << L"/D__STDC_IEC_559__=1" << std::endl;
+    command_file << L"/D__STDC_IEC_559_COMPLEX__=1" << std::endl;
+    command_file << L"/D__STDC_ISO_10646__=1" << std::endl;
+  
+    for(std::list<std::string>::const_iterator
+        it=config.ansi_c.defines.begin();
+        it!=config.ansi_c.defines.end();
+        it++)
+      command_file << "/D" << widen(shell_quote(*it))) << std::endl;
+
+    for(std::list<std::string>::const_iterator
+        it=config.ansi_c.include_paths.begin();
+        it!=config.ansi_c.include_paths.end();
+        it++)
+      command_file << L"/I" << widen(shell_quote(*it)) << std::endl;
+
+    command_file << widen(shell_quote(file)) << std::endl;
+    #else
     std::ofstream command_file(command_file_name.c_str());
   
     command_file << "/nologo" << std::endl;
     command_file << "/E" << std::endl;
     command_file << "/D__CPROVER__" << std::endl;
-    command_file << "/D__WORDSIZE="+i2string(config.ansi_c.pointer_width) << std::endl;
+    command_file << "/D__WORDSIZE=" << config.ansi_c.pointer_width << std::endl;
 
     if(config.ansi_c.pointer_width==64)
     {
@@ -317,15 +355,16 @@ bool c_preprocess_visual_studio(
         it=config.ansi_c.defines.begin();
         it!=config.ansi_c.defines.end();
         it++)
-      command_file << "/D"+shell_quote(*it) << std::endl;
+      command_file << "/D" << shell_quote(*it) << std::endl;
 
     for(std::list<std::string>::const_iterator
         it=config.ansi_c.include_paths.begin();
         it!=config.ansi_c.include_paths.end();
         it++)
-      command_file << "/I"+shell_quote(*it) << std::endl;
+      command_file << "/I" << shell_quote(*it) << std::endl;
 
-    command_file << "\"" << file << "\"" << std::endl;
+    command_file << shell_quote(file) << std::endl;
+    #endif
   }
   
   std::string tmpi=get_temporary_file("tmp.cl", "");
@@ -989,7 +1028,11 @@ bool c_preprocess_none(
   std::ostream &outstream,
   message_handlert &message_handler)
 {
+  #ifdef MSC_VER
+  std::ifstream infile(widen(file).c_str());
+  #else
   std::ifstream infile(file.c_str());
+  #endif
   
   if(!infile)
   {
