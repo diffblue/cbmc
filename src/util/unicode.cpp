@@ -8,6 +8,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "unicode.h"
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 /*******************************************************************\
 
 Function: narrow
