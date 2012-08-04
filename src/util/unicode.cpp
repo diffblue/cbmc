@@ -141,3 +141,32 @@ std::wstring widen(const std::string &s)
   return std::wstring(s.begin(), s.end());
   #endif
 }
+
+/*******************************************************************\
+
+Function: narrow_argv
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+#ifdef _WIN32
+const char **narrow_argv()
+{
+  int argc;
+  const wchar_t argvw=
+    CommandLineToArgvW(GetCommandLineW(), &argc);
+
+  // the following never gets deleted
+  char **argv=new char *[argc];
+    
+  for(int i=0; i<argc; i++)
+  {
+    
+  }
+}
+#endif
