@@ -11,6 +11,8 @@ Date: May 2006
 #include <algorithm>
 #include <iostream>
 
+#include <unicode.h>
+
 #include "cmdline_options.h"
 #include "get_base_name.h"
 #include "gcc_cmdline.h"
@@ -19,7 +21,7 @@ Date: May 2006
 
 /*******************************************************************\
  
-Function: main
+Function: to_lower_string
  
   Inputs:
  
@@ -55,6 +57,10 @@ int main(int argc, const char **argv)
     std::cerr << "failed to determine base name" << std::endl;
     return 1;
   }
+  
+  #ifdef _WIN32
+  argv=narrow_argv();
+  #endif
 
   // we do 'to_lower_string' because of Windows
   std::string base_name=
