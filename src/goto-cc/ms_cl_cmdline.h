@@ -26,25 +26,11 @@ public:
   void parse_env();
   
 protected:
-  void process_non_cl_option(const std::wstring &s);
-  void process_cl_option(const std::wstring &s);
+  void process_non_cl_option(const std::string &s);
+  void process_cl_option(const std::string &s);
   void process_response_file(const std::string &file);
-  void process_response_file_line(const std::wstring &line);
-  bool parse(const std::vector<std::wstring> &);
-  
-  static std::string w2s(const std::wstring &ws)
-  {
-    std::string simple_string;
-    simple_string.assign(ws.begin(), ws.end());
-    return simple_string;
-  }
-
-  static std::wstring s2w(const std::string &s)
-  {
-    std::wstring wide_string;
-    wide_string.assign(s.begin(), s.end());
-    return wide_string;
-  }
+  void process_response_file_line(const std::string &line);
+  bool parse(const std::vector<std::string> &);
 };
 
 #endif /*MS_CL_CMDLINE_H_*/
