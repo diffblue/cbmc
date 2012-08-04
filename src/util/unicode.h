@@ -19,8 +19,6 @@ std::wstring widen(const char *s);
 std::string narrow(const std::wstring &s);
 std::wstring widen(const std::string &s);
 
-#ifdef _WIN32
-const char **narrow_argv();
-#endif
+const char **narrow_argv(int argc, const wchar_t **argv_wide);
 
 #endif
