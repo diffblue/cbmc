@@ -154,19 +154,16 @@ Function: narrow_argv
 
 \*******************************************************************/
 
-#ifdef _WIN32
-const char **narrow_argv()
+const char **narrow_argv(int argc, const wchar_t **argv_wide)
 {
-  int argc;
-  wchar_t **argv_wide=
-    CommandLineToArgvW(GetCommandLineW(), &argc);
+  if(argv_wide==NULL) return NULL;
 
   // the following never gets deleted
-  const char **argv_narrow=new const char *[argc];
+  const char **argv_narrow=new const char *[argc+1];
+  argv_narrow[argc]=0;
     
   for(int i=0; i<argc; i++)
     argv_narrow[i]=strdup(narrow(argv_wide[i]).c_str());
   
   return argv_narrow;
 }
-#endif

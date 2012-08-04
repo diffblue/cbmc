@@ -30,11 +30,17 @@ Function: main
 
 \*******************************************************************/
 
-int main(int argc, const char **argv)
+#ifdef MSC_VER
+int wmain(int argc, const wchar_t **argv_wide)
 {
-  #ifdef _WIN32
-  argv=narrow_argv();
-  #endif
+  const char **argv=narrow_argv(argv_wide);
   cbmc_parseoptionst parseoptions(argc, argv);
   return parseoptions.main();
 }
+#else
+int main(int argc, const char **argv)
+{
+  cbmc_parseoptionst parseoptions(argc, argv);
+  return parseoptions.main();
+}
+#endif
