@@ -50,14 +50,14 @@ Function: main
  
 \*******************************************************************/
 
-#ifdef MSC_VER
+#ifdef _MSC_VER
 int wmain(int argc, const wchar_t **argv_wide)
 #else
 int main(int argc, const char **argv)
 #endif
 {  
-  #ifdef MSC_VER
-  argv=narrow_argv(argv_wide);
+  #ifdef _MSC_VER
+  argv=narrow_argv(argc, argv_wide);
   #endif
 
   if(argv==NULL || argc<1)
