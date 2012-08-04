@@ -630,7 +630,7 @@ bool compilet::parse(const std::string &file_name)
 {
   if(file_name=="-") return parse_stdin();
 
-  #ifdef _WIN32
+  #ifdef _MSC_VER
   std::ifstream infile(widen(file_name).c_str());
   #else
   std::ifstream infile(file_name.c_str());
@@ -1213,7 +1213,7 @@ bool compilet::read_object(
 {
   std::ifstream infile;
 
-  #ifdef _WIN32
+  #ifdef _MSC_VER
   infile.open(widen(file_name).c_str(), std::ios::binary);
   #else
   infile.open(file_name.c_str(), std::ios::binary);

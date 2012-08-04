@@ -30,7 +30,7 @@ Function: main
 
 \*******************************************************************/
 
-#ifdef MSC_VER
+#ifdef _MSC_VER
 int wmain(int argc, const wchar_t **argv_wide)
 {
   const char **argv=narrow_argv(argv_wide);

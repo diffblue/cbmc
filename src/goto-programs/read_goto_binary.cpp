@@ -32,7 +32,7 @@ bool read_goto_binary(
   goto_functionst &dest,
   message_handlert &message_handler)
 {
-  #ifdef _WIN32
+  #ifdef _MSC_VER
   std::ifstream in(widen(filename).c_str(), std::ios::binary);
   #else
   std::ifstream in(filename.c_str(), std::ios::binary);
@@ -63,7 +63,7 @@ Function: is_goto_binary
 
 bool is_goto_binary(const std::string &filename)
 {
-  #ifdef _WIN32
+  #ifdef _MSC_VER
   std::ifstream in(widen(filename).c_str(), std::ios::binary);
   #else
   std::ifstream in(filename.c_str(), std::ios::binary);
