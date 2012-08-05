@@ -114,7 +114,7 @@ Function: language_uit::parse()
 
 bool language_uit::parse(const std::string &filename)
 {
-  #ifdef _WIN32
+  #ifdef _MSC_VER
   std::ifstream infile(widen(filename).c_str());
   #else
   std::ifstream infile(filename.c_str());
