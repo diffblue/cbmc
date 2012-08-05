@@ -36,12 +36,12 @@ void console_message_handlert::print(
   #ifdef _WIN32
 
   HANDLE out_handle=
-    GetStdHandle((level>1)?STD_OUTPUT_HANDLE:ERR_OUTPUT_HANDLE);
+    GetStdHandle((level>1)?STD_OUTPUT_HANDLE:STD_ERROR_HANDLE);
 
   DWORD number_written;
   std::wstring wide_message=widen(message);
   WriteConsoleW(
-    out_handle, wide_messsage.c_str(),
+    out_handle, wide_message.c_str(),
     wide_message.size(), &number_written, NULL);
   
   #else
