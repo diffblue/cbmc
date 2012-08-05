@@ -37,6 +37,7 @@ ui_message_handlert::ui_message_handlert(
     break;
     
   case XML_UI:
+    std::cout << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << std::endl;
     std::cout << "<cprover>" << std::endl;
     
     {
