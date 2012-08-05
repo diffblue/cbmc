@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <namespace.h>
 #include <language.h>
 #include <cmdline.h>
+#include <unicode.h>
 
 #include "language_ui.h"
 #include "mode.h"

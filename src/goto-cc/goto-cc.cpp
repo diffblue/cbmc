@@ -57,7 +57,7 @@ int main(int argc, const char **argv)
 #endif
 {  
   #ifdef _MSC_VER
-  argv=narrow_argv(argc, argv_wide);
+  const char **argv=narrow_argv(argc, argv_wide);
   #endif
 
   if(argv==NULL || argc<1)
