@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <i2string.h>
 #include <xml.h>
 #include <xml_expr.h>
+#include <cout_message.h>
 
 #include "ui_message.h"
 
@@ -118,10 +119,8 @@ void ui_message_handlert::print(
   }
   else
   {
-    if(level==1)
-      std::cerr << message << std::endl;
-    else
-      std::cout << message << std::endl;
+    console_message_handlert console_message_handler;
+    console_message_handler.print(level, message);
   }
 }
 
