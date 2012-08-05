@@ -19,11 +19,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #endif
 
 #include <fstream>
-#include <locale>
-
-#ifdef _WIN32
-#include <codecvt>
-#endif
 
 #include <str_getline.h>
 #include <config.h>
