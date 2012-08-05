@@ -19,6 +19,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #endif
 
 #include <fstream>
+#include <locale>
+
+#ifdef _WIN32
+#include <codecvt>
+#endif
 
 #include <str_getline.h>
 #include <config.h>
@@ -292,8 +297,13 @@ bool c_preprocess_visual_studio(
   std::string command_file_name=get_temporary_file("tmp.cl-cmd", "");
 
   {
-    #ifdef MSC_VER
-    std::ofwstream command_file(command_file_name.c_str());
+    #ifdef _MSC_VER
+    std::wofstream command_file(command_file_name.c_str());
+
+    // make this file UTF-16    
+    command_file.imbue(std::locale(
+      command_file.getloc(),
+      new std::codecvt_utf16<wchar_t, 0x10ffff, std::consume_header>));           
   
     command_file << L"/nologo" << std::endl;
     command_file << L"/E" << std::endl;
@@ -1028,7 +1038,7 @@ bool c_preprocess_none(
   std::ostream &outstream,
   message_handlert &message_handler)
 {
-  #ifdef MSC_VER
+  #ifdef _MSC_VER
   std::ifstream infile(widen(file).c_str());
   #else
   std::ifstream infile(file.c_str());
