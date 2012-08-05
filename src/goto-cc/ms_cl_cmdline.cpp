@@ -242,7 +242,7 @@ void ms_cl_cmdlinet::process_response_file(const std::string &file)
     #if 1
     // re-open -- should be using wifstream,
     // but this isn't available everywhere
-    std::ifstream infile2(file.c_str());
+    std::ifstream infile2(file.c_str(), std::ios::binary);
     infile2.seekg(2);
     std::wstring wline;
     
@@ -251,7 +251,7 @@ void ms_cl_cmdlinet::process_response_file(const std::string &file)
 
     #else
     
-    std::wifstream infile2(file.c_str());
+    std::wifstream infile2(file.c_str(), std::ios::binary);
     std::wstring wline;
     
     while(std::getline(infile2, wline))
