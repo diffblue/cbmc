@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <cstring>
+
 #include "unicode.h"
 
 #ifdef _WIN32
