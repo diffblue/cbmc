@@ -10,6 +10,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #ifdef _WIN32
 #include <windows.h>
+#include <fcntl.h>
+#include <io.h>
+#include <stdio.h>
 #endif 
 
 #include "unicode.h"
@@ -34,20 +37,34 @@ void console_message_handlert::print(
   const std::string &message)
 { 
   #ifdef _WIN32
-
-  std::wstring wide_message=widen(message);
-
   HANDLE out_handle=
     GetStdHandle((level>1)?STD_OUTPUT_HANDLE:STD_ERROR_HANDLE);
 
-  DWORD number_written;
+  // We write UTF16 when we write to the console,
+  // but we write UTF8 otherwise.
 
-  WriteConsoleW(
-    out_handle, wide_message.c_str(),
-    wide_message.size(), &number_written, NULL);
+  DWORD consoleMode;    
+  if(GetConsoleMode(out_handle, &consoleMode))
+  {
+    // writing to the console
+    std::wstring wide_message=widen(message);
 
-  WriteConsoleW(out_handle, L"\r\n", 2, &number_written, NULL);
-  
+    DWORD number_written;
+
+    WriteConsoleW(
+      out_handle, wide_message.c_str(),
+      wide_message.size(), &number_written, NULL);
+
+    WriteConsoleW(out_handle, L"\r\n", 2, &number_written, NULL);
+  }
+  else
+  {
+    // writing to a file
+    if(level>1)
+      std::cout << message << std::endl;
+    else
+      std::cerr << message << std::endl;
+  }
   #else
   if(level>1)
     std::cout << message << std::endl;
