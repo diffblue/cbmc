@@ -140,7 +140,7 @@ void xmlt::escape(const std::string &s, std::ostream &out)
       break;
 
     default:
-      if(ch<' ' || ch>=127)
+      if((ch>=0 && ch<' ') || ch==127)
         out << "&#"+i2string((unsigned char)ch)+";";
       else
         out << ch;
