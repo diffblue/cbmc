@@ -230,13 +230,15 @@ void ms_cl_cmdlinet::process_response_file(const std::string &file)
   // these may be Unicode -- which is indicated by 0xff 0xfe
   std::string line;
   getline(infile, line);
-  if(line[0]==char(0xff) && line[1]==char(0xfe))
+  if(line.size()>=2 &&
+     line[0]==char(0xff) &&
+     line[1]==char(0xfe))
   {
-    // Unicode!
+    // Unicode, UTF-16 little endian
     
     #if 1
-    // re-open -- should be using wifstream,
-    // but this isn't available everywhere
+    // Re-open -- should be using wifstream,
+    // but this isn't available everywhere.
     std::ifstream infile2(file.c_str(), std::ios::binary);
     infile2.seekg(2);
     std::wstring wline;
@@ -254,9 +256,22 @@ void ms_cl_cmdlinet::process_response_file(const std::string &file)
     
     #endif
   }
+  else if(line.size()>=3 &&
+          line[0]==char(0xef) &&
+          line[1]==char(0xbb) &&
+          line[2]==char(0xbf))
+  {
+    // This is the UTF-8 BOM. We can proceed as usual, since
+    // we use UTF-8 internally.
+    infile.seekg(3);
+    
+    while(getline(infile, line))
+      process_response_file_line(line);
+  }
   else
   {
     // normal ASCII
+    infile.seekg(0);
     while(getline(infile, line))
       process_response_file_line(line);
   }
