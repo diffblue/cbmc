@@ -30,6 +30,14 @@ int isfinite(double d) { return __CPROVER_isfinite(d); }
 
 inline int isinf(double d) { return __CPROVER_isinf(d); }
 
+/* FUNCTION: isinff */
+
+inline int isinff(float f) { return __CPROVER_isinf(f); }
+
+/* FUNCTION: isinfl */
+
+inline int isinfl(long double d) { return __CPROVER_isinf(d); }
+
 /* FUNCTION: isnan */
 
 inline int isnan(double d) { return __CPROVER_isnan(d); }
@@ -37,6 +45,14 @@ inline int isnan(double d) { return __CPROVER_isnan(d); }
 /* FUNCTION: __isnanf */
 
 inline int __isnanf(float f) { return __CPROVER_isnan(f); }
+
+/* FUNCTION: isnanf */
+
+inline int isnanf(float f) { return __CPROVER_isnan(f); }
+
+/* FUNCTION: isnanl */
+
+inline int isnanl(long double d) { return __CPROVER_isnan(d); }
 
 /* FUNCTION: isnormal */
 
