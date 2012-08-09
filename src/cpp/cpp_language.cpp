@@ -43,8 +43,11 @@ std::set<std::string> cpp_languaget::extensions() const
   std::set<std::string> s;
   
   s.insert("cpp");
+  s.insert("CPP");
   s.insert("cc");
+  s.insert("c++");
   s.insert("ipp");
+  s.insert("ii");
   s.insert("cxx");
   
   #ifndef _WIN32
