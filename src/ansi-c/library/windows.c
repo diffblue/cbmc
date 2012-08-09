@@ -17,7 +17,7 @@ BOOL QueryPerformanceFrequency(LARGE_INTEGER *lpFrequency)
 
 #include <windows.h>
 
-VOID ExitThread(DWORD dwExitCode)
+inline VOID ExitThread(DWORD dwExitCode)
 {
   // never returns
   __CPROVER_assume(0);
@@ -27,7 +27,7 @@ VOID ExitThread(DWORD dwExitCode)
 
 #include <windows.h>
 
-HANDLE CreateThread(
+inline HANDLE CreateThread(
   LPSECURITY_ATTRIBUTES lpThreadAttributes,
   SIZE_T dwStackSize,
   LPTHREAD_START_ROUTINE lpStartAddress,
