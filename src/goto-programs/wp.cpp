@@ -358,6 +358,8 @@ exprt wp(
     return post; // ignored
   else if(statement==ID_asm)
     return post; // ignored
+  else if(statement==ID_fence)
+    return post; // ignored
   else
     throw "sorry, wp("+id2string(statement)+"...) not implemented";
 }
