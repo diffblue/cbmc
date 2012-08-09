@@ -208,7 +208,10 @@ Function: is_dot_i_file
 static bool is_dot_i_file(const std::string &path)
 {
   const char *ext=strrchr(path.c_str(), '.');
-  return ext!=NULL && std::string(ext)==".i";
+  if(ext==NULL) return false;
+  if(std::string(ext)==".i" ||
+     std::string(ext)==".ii") return true;
+  return false;
 }
 
 /*******************************************************************\
