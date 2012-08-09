@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <prefix.h>
 #include <std_expr.h>
 #include <context.h>
+#include <simplify_expr.h>
 
 #include <ansi-c/c_types.h>
 
@@ -2321,24 +2322,67 @@ const irep_idt goto_convertt::get_string_constant(
      expr.op0().id()==ID_index &&
      expr.op0().operands().size()==2)
   {
-    const exprt &index_op=expr.op0().op0();
-  
+    exprt index_op=get_constant(expr.op0().op0());
+    simplify(index_op, ns);
+    
     if(index_op.id()==ID_string_constant)
       return index_op.get(ID_value);
-    else if(index_op.id()==ID_symbol)
+    else if(index_op.id()==ID_array)
     {
-//      const symbolt &symbol=
-//        ns.lookup(to_symbol_expr(index_op));
-        
-      return "";
+      std::string result;
+      forall_operands(it, index_op)
+        if(it->is_constant())
+          result+=char(integer2long(
+            binary2integer(id2string(to_constant_expr(*it).get_value()), true)));
+          
+      return result;
     }
   }
 
   err_location(expr);
   str << "expected string constant, but got: "
-      << expr.pretty() << std::endl;
+      << expr.pretty();
+  error();
 
   throw 0;
+}
+
+/*******************************************************************\
+
+Function: goto_convertt::get_constant
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+exprt goto_convertt::get_constant(const exprt &expr)
+{
+  if(expr.id()==ID_symbol)
+  {
+    const symbolt &symbol=
+      ns.lookup(to_symbol_expr(expr));
+
+    return symbol.value;
+  }
+  else if(expr.id()==ID_member)
+  {
+    exprt tmp=expr;
+    tmp.op0()=get_constant(expr.op0());
+    return tmp;
+  }
+  else if(expr.id()==ID_index)
+  {
+    exprt tmp=expr;
+    tmp.op0()=get_constant(expr.op0());
+    tmp.op1()=get_constant(expr.op1());
+    return tmp;
+  }
+  else
+    return expr;
 }
 
 /*******************************************************************\

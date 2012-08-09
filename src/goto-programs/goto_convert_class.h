@@ -339,6 +339,7 @@ protected:
   // misc
   //
   const irep_idt get_string_constant(const exprt &expr);
+  exprt get_constant(const exprt &expr);
 
   // some built-in functions    
   void do_atomic_begin  (const exprt &lhs, const exprt &rhs, const exprt::operandst &arguments, goto_programt &dest);
