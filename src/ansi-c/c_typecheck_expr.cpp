@@ -923,7 +923,7 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
     if(op.id()!=ID_initializer_list)
     {
       err_location(expr);
-      str << "type cast to array requires initializer_list "
+      str << "type cast to array requires initializer list "
              "argument";
       throw 0;
     }
@@ -936,6 +936,26 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
     expr=tmp;
 
     return;
+  }
+  else
+  {
+    // We allow (TYPE){ expression } and
+    // rewrite that to (TYPE)expression
+    
+    if(op.id()==ID_initializer_list)
+    {
+      if(op.operands().size()!=1)
+      {
+        err_location(expr);
+        str << "type cast to " << to_string(expr_type)
+            << " requires initializer list of size 1";
+        throw 0;
+      }
+      
+      // just remove the initializer list
+      exprt tmp=op.op0();
+      expr.op0().swap(tmp);
+    }
   }
   
   // a cast to void is always fine
