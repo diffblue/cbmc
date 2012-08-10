@@ -218,6 +218,22 @@ exprt c_sizeoft::sizeof_rec(const typet &type)
       c_implicit_typecast(dest.op1(), dest.type(), ns);
     }
   }
+  else if(type.id()==ID_complex)
+  {
+    // this is a pair
+
+    exprt tmp_dest=sizeof_rec(type.subtype());
+
+    if(tmp_dest.is_nil())
+      return tmp_dest;
+
+    mp_integer a;
+
+    if(!to_integer(tmp_dest, a))
+      dest=from_integer(a*2, size_type());
+    else
+      return nil_exprt();
+  }
   else
   {
     // We give up; this shouldn't really happen on 'proper' C types,

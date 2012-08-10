@@ -200,6 +200,24 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
   {
     // these pop up as string constants, and are already typed
   }
+  else if(expr.id()==ID_complex)
+  {
+    // these should only exist as constants,
+    // and should already be typed
+  }
+  else if(expr.id()==ID_complex_real ||
+          expr.id()==ID_complex_imag)
+  {
+    // get the subtype
+    assert(expr.operands().size()==1);
+    const typet &op_type=follow(expr.op0().type());
+    if(op_type.id()!=ID_complex)
+    {
+      err_location(expr);
+      throw "expected complex typed operand";
+    }
+    expr.type()=op_type.subtype();
+  }
   else
   {
     err_location(expr);

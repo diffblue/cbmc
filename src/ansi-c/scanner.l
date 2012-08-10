@@ -129,31 +129,12 @@ hexdigit	[0-9a-fA-F]
 identifier	(({letter}|"_"|"$")({letter}|{digit}|"_"|"$")*)
 integer		{digit}+
 binary		{bindigit}+
-iw_suffix       ("i8"|"i16"|"i32"|"i64"|"i128")
-decinteger	[1-9]{digit}*
-decinteger_w    {decinteger}{iw_suffix}
-octinteger	"0"{octdigit}*
-octinteger_w    {octinteger}{iw_suffix}
-hexinteger	"0"[xX]{hexdigit}+
-hexinteger_w    {hexinteger}{iw_suffix}
-decinteger_u	{decinteger}[uU]
-decinteger_uw   {decinteger_u}{iw_suffix}
-octinteger_u	{octinteger}[uU]
-octinteger_uw   {octinteger_u}{iw_suffix}
-hexinteger_u	{hexinteger}[uU]
-hexinteger_uw   {hexinteger_u}{iw_suffix}
-decinteger_l	{decinteger}[lL]
-octinteger_l	{octinteger}[lL]
-hexinteger_l	{hexinteger}[lL]
-decinteger_ul	{decinteger}([uU][lL]|[lL][uU])
-octinteger_ul	{octinteger}([uU][lL]|[lL][uU])
-hexinteger_ul	{hexinteger}([uU][lL]|[lL][uU])
-decinteger_ll	{decinteger}[lL][lL]
-octinteger_ll	{octinteger}[lL][lL]
-hexinteger_ll	{hexinteger}[lL][lL]
-decinteger_ull	{decinteger}([uU][lL][lL]|[lL][lL][uU])
-octinteger_ull	{octinteger}([uU][lL][lL]|[lL][lL][uU])
-hexinteger_ull	{hexinteger}([uU][lL][lL]|[lL][lL][uU])
+msiw_suffix     ("i8"|"i16"|"i32"|"i64"|"i128")
+int_suffix      [uUlLiIjJ]*|{msiw_suffix}
+decinteger	[1-9]{digit}*{int_suffix}
+octinteger	"0"{octdigit}*{int_suffix}
+hexinteger	"0"[xX]{hexdigit}+{int_suffix}
+integer_s       {decinteger}|{octinteger}|{hexinteger}
 octchar		"\\"{octdigit}{1,3}
 hexchar		"\\x"{hexdigit}+
 exponent	[eE][+-]?{integer}
@@ -164,9 +145,9 @@ float3		{integer}{exponent}
 hexfloat1       "0"[xX]{hexdigit}+"."{hexdigit}+[pP][+-]?{integer}
 hexfloat2       "0"[xX]{hexdigit}+"."[pP][+-]?{integer}
 hexfloat3       "0"[xX]{hexdigit}+[pP][+-]?{integer}
-float_suffix    [fFlLiIjJ]
+float_suffix    [fFlLiIjJ]*
 float		{float1}|{float2}|{float3}|{hexfloat1}|{hexfloat2}|{hexfloat3}
-float_s         {float}{float_suffix}*|{integer}[fF]
+float_s         {float}{float_suffix}|{integer}[fF]
 bitvector	{binary}[bB]
 bitvector_u	{binary}([uU][bB]|[bB][uU])
 cppstart	{ws}"#"{ws}
@@ -931,41 +912,8 @@ wchar_t	            { // CodeWarrior doesn't have wchar_t built in
 
 {identifier}	{ return make_identifier(); }
 
-{decinteger} |
-{decinteger_l} |
-{decinteger_ll} |
-{decinteger_u} |
-{decinteger_ul} |
-{decinteger_ull} |
-{decinteger_w} |
-{decinteger_uw} { newstack(yyansi_clval);
-                  stack(yyansi_clval)=convert_integer_literal(yytext, 10);
-                  PARSER.set_location(stack(yyansi_clval));
-                  return TOK_INTEGER;
-                }
-
-{octinteger} |
-{octinteger_l} |
-{octinteger_ll} |
-{octinteger_u} |
-{octinteger_ul} |
-{octinteger_ull} |
-{octinteger_w} |
-{octinteger_uw} { newstack(yyansi_clval);
-                  stack(yyansi_clval)=convert_integer_literal(yytext, 8);
-                  PARSER.set_location(stack(yyansi_clval));
-                  return TOK_INTEGER;
-                }
-
-{hexinteger} |
-{hexinteger_l} |
-{hexinteger_ll} |
-{hexinteger_u} |
-{hexinteger_ul} |
-{hexinteger_ull} |
-{hexinteger_w} |
-{hexinteger_uw} { newstack(yyansi_clval);
-                  stack(yyansi_clval)=convert_integer_literal(yytext, 16);
+{integer_s}     { newstack(yyansi_clval);
+                  stack(yyansi_clval)=convert_integer_literal(yytext);
                   PARSER.set_location(stack(yyansi_clval));
                   return TOK_INTEGER;
                 }
@@ -1094,27 +1042,8 @@ wchar_t	            { // CodeWarrior doesn't have wchar_t built in
                     return ',';
                   }
                 }
-{decinteger} |
-{decinteger_l} |
-{decinteger_ll} |
-{decinteger_u} |
-{decinteger_ul} |
-{decinteger_ull} |
-{decinteger_w} |
-{decinteger_uw} { newstack(yyansi_clval);
-                  stack(yyansi_clval)=convert_integer_literal(yytext, 10);
-                  PARSER.set_location(stack(yyansi_clval));
-                  return TOK_INTEGER;
-                }
-{hexinteger} |
-{hexinteger_l} |
-{hexinteger_ll} |
-{hexinteger_u} |
-{hexinteger_ul} |
-{hexinteger_ull} |
-{hexinteger_w} |
-{hexinteger_uw} { newstack(yyansi_clval);
-                  stack(yyansi_clval)=convert_integer_literal(yytext, 16);
+{integer_s}     { newstack(yyansi_clval);
+                  stack(yyansi_clval)=convert_integer_literal(yytext);
                   PARSER.set_location(stack(yyansi_clval));
                   return TOK_INTEGER;
                 }

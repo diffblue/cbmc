@@ -167,6 +167,11 @@ std::string expr2ct::convert_rec(
   {
     return q+"void";
   }
+  else if(src.id()==ID_complex)
+  {
+    // these take more or less arbitrary subtypes
+    return q+"_Complex "+convert(src.subtype());
+  }
   else if(src.id()==ID_signedbv ||
           src.id()==ID_unsignedbv)
   {
@@ -194,6 +199,8 @@ std::string expr2ct::convert_rec(
       return "unsigned long long int";
     else if(c_type==ID_signed_long_long_int)
       return "signed long long int";
+    
+    #if 0
     else if(c_type==ID_double)
       return "double";
     else if(c_type==ID_long_double)
@@ -202,6 +209,7 @@ std::string expr2ct::convert_rec(
       return "float";
     else if(c_type==ID_bool)
       return "_Bool";
+    #endif
       
     // There is also wchar_t in the above, but this isn't a C type.
 

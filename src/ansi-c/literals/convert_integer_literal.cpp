@@ -26,13 +26,12 @@ Function: convert_integer_literal
 
 \*******************************************************************/
 
-exprt convert_integer_literal(
-  const std::string &src,
-  unsigned base)
+exprt convert_integer_literal(const std::string &src)
 {
-  bool is_unsigned=false;
+  bool is_unsigned=false, is_imaginary=false;
   unsigned long_cnt=0;
   unsigned width_suffix=0;
+  unsigned base=10;
   
   for(unsigned i=0; i<src.size(); i++)
   {
@@ -43,26 +42,36 @@ exprt convert_integer_literal(
     else if(ch=='l' || ch=='L')
       long_cnt++;
     else if(ch=='i' || ch=='I')
-      width_suffix=atoi(src.c_str()+i+1);
+    {
+      // This can be "i128" in MS mode,
+      // and "10i" (imaginary) for GCC
+      if(config.ansi_c.mode==configt::ansi_ct::MODE_VISUAL_STUDIO)
+        width_suffix=atoi(src.c_str()+i+1);
+      else
+        is_imaginary=true;
+    }
+    else if(ch=='j' || ch=='J')
+      is_imaginary=true;
   }
 
   mp_integer value;
-  
-  if(base==10)
+
+  if(src.size()>=2 && src[0]=='0')
   {
-    value=string2integer(src, 10);
-  }
-  else if(base==8)
-  {
+    base=8;
     value=string2integer(src, 8);
   }
-  else if(base==16)
+  else if(src.size()>=2 && src[0]=='0' && src[1]=='1')
   {
+    base=16;
     std::string without_prefix(src, 2, std::string::npos);
     value=string2integer(without_prefix, 16);
   }
   else
-    assert(false);
+  {
+    // The default is base 10.
+    value=string2integer(src, 10);
+  }
 
   if(width_suffix!=0)
   {

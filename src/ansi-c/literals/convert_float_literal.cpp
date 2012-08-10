@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ieee_float.h>
 #include <std_types.h>
 #include <string2int.h>
+#include <expr_util.h>
 
 #include "../c_types.h"
 #include "parse_float.h"
@@ -63,7 +64,7 @@ exprt convert_float_literal(const std::string &src)
     result.type()=double_type(); // default
     result.type().set(ID_C_c_type, ID_double);
   }
-
+  
   if(config.ansi_c.use_fixed_for_float)
   {
     unsigned width=result.type().get_int(ID_width);
@@ -118,6 +119,17 @@ exprt convert_float_literal(const std::string &src)
 
     result.set(ID_value,
       integer2binary(a.pack(), a.spec.width()));  
+  }
+
+  if(is_imaginary)
+  {
+    complex_typet complex_type;
+    complex_type.subtype()=result.type();
+    exprt complex_expr(ID_complex, complex_type);
+    complex_expr.operands().resize(2);
+    complex_expr.op0()=result;
+    complex_expr.op1()=gen_zero(result.type());
+    return complex_expr;
   }
   
   return result;
