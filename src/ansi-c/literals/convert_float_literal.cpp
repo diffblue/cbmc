@@ -127,8 +127,8 @@ exprt convert_float_literal(const std::string &src)
     complex_type.subtype()=result.type();
     exprt complex_expr(ID_complex, complex_type);
     complex_expr.operands().resize(2);
-    complex_expr.op0()=result;
-    complex_expr.op1()=gen_zero(result.type());
+    complex_expr.op0()=gen_zero(result.type());
+    complex_expr.op1()=result;
     return complex_expr;
   }
   
