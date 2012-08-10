@@ -149,8 +149,6 @@ bool gcc_cmdlinet::parse(int argc, const char **argv)
       strcmp(argv[i], "-static")==0 || 
       strcmp(argv[i], "-static-libgcc")==0 || strcmp(argv[i], "-shared")==0 ||
       strcmp(argv[i], "-symbolic")==0 ||
-      strcmp(argv[i], "-Bprefix")==0 ||
-      strcmp(argv[i], "-iquotedir")==0 ||
       strcmp(argv[i], "-EB")==0 ||
       strcmp(argv[i], "-EL")==0
     )
@@ -183,6 +181,8 @@ bool gcc_cmdlinet::parse(int argc, const char **argv)
     else if( // options that have a separated _or_ concatenated argument
         strncmp(argv[i], "-o", 2)==0 ||
         strncmp(argv[i], "-x", 2)==0 ||
+        strncmp(argv[i], "-B", 2)==0 ||
+        strncmp(argv[i], "-iquote", 7)==0 ||
         strncmp(argv[i], "-I", 2)==0 ||
         strncmp(argv[i], "-V", 2)==0 ||
         strncmp(argv[i], "-D", 2)==0 ||
