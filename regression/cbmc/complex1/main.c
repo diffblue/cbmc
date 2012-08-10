@@ -10,7 +10,7 @@ int main()
   
   _Complex char char_complex, char_complex2;
   
-  char_complex=3i-2;
+  char_complex=0x3i-2;
   
   assert(sizeof(d)==sizeof(c));
   assert(sizeof(char_complex)==sizeof(char)*2);
