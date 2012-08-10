@@ -733,6 +733,32 @@ void goto_convertt::do_array_equal(
 
 /*******************************************************************\
 
+Function: is_lvalue
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool is_lvalue(const exprt &expr)
+{
+  if(expr.id()==ID_index)
+    return is_lvalue(to_index_expr(expr).op0());
+  else if(expr.id()==ID_member)
+    return is_lvalue(to_member_expr(expr).op0());
+  else if(expr.id()==ID_dereference)
+    return true;
+  else if(expr.id()==ID_symbol)
+    return true;
+  else
+    return false;
+}
+
+/*******************************************************************\
+
 Function: goto_convertt::do_function_call_symbol
 
   Inputs:
@@ -1120,11 +1146,11 @@ void goto_convertt::do_function_call_symbol(
     
     exprt lhs=arguments[0];
     exprt rhs=typecast_exprt(arguments[1], lhs.type());
-    
-    if(lhs.id()!=ID_symbol)
+
+    if(!is_lvalue(lhs))
     {
       err_location(lhs);
-      throw "vs_copy argument expected to be symbol";
+      throw "va_copy argument expected to be lvalue";
     }    
     
     goto_programt::targett t=dest.add_instruction(ASSIGN);
@@ -1145,6 +1171,12 @@ void goto_convertt::do_function_call_symbol(
     exprt rhs=typecast_exprt(
       address_of_exprt(arguments[1]), lhs.type());
 
+    if(!is_lvalue(lhs))
+    {
+      err_location(lhs);
+      throw "va_start argument expected to be lvalue";
+    }    
+    
     goto_programt::targett t=dest.add_instruction(ASSIGN);
     t->location=function.location();
     t->code=code_assignt(lhs, rhs);
@@ -1157,6 +1189,12 @@ void goto_convertt::do_function_call_symbol(
       err_location(function);
       throw "`"+id2string(identifier)+"' expected to have one argument";
     }
+    
+    if(!is_lvalue(arguments[0]))
+    {
+      err_location(lhs);
+      throw "va_end argument expected to be lvalue";
+    }    
     
     goto_programt::targett t=dest.add_instruction(ASSIGN);
     t->location=function.location();
