@@ -6,8 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <assert.h>
-#include <stdlib.h>
+#include <cassert>
+#include <cstdlib>
+#include <cctype>
 
 #include <arith_tools.h>
 #include <config.h>
@@ -58,7 +59,7 @@ exprt convert_integer_literal(const std::string &src)
 
   mp_integer value;
 
-  if(src.size()>=2 && src[0]=='0' && src[1]=='x')
+  if(src.size()>=2 && src[0]=='0' && tolower(src[1])=='x')
   {
     base=16;
     // strip "0x"
