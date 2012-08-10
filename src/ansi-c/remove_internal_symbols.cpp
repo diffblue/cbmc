@@ -97,6 +97,8 @@ void remove_internal_symbols(
   find_symbols_sett special;
   special.insert("c::argc'");  
   special.insert("c::argv'");  
+  special.insert("c::envp'");  
+  special.insert("c::envp_size'");  
   special.insert("c::__CPROVER_memory");  
   special.insert("c::__CPROVER_initialize");
   
