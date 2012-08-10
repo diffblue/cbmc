@@ -79,17 +79,16 @@ Function: goto_symext::operator()
 \*******************************************************************/
 
 void goto_symext::operator()(
-  statet& state,
+  statet &state,
   const goto_functionst &goto_functions,
   const goto_programt &goto_program)
 {
-  state.source.is_set=true;
-  state.source.pc=goto_program.instructions.begin();
-  state.source.thread_nr=0;
+  state.source=symex_targett::sourcet(goto_program);
   state.top().end_of_function=--goto_program.instructions.end();
-  state.top().calling_location=state.top().end_of_function;
+  state.top().calling_location.pc=state.top().end_of_function;
+  state.top().calling_location.goto_program=&goto_program;
 
-  while(state.source.pc!=goto_program.instructions.end())
+  while(state.source.pc!=state.source.goto_program->instructions.end())
   {
     #if 0
     goto_program.output_instruction(ns, "", std::cout, state.source.pc);
