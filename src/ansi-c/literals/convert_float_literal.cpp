@@ -34,10 +34,11 @@ exprt convert_float_literal(const std::string &src)
 {
   mp_integer significand;
   mp_integer exponent;
-  bool is_float, is_long;
+  bool is_float, is_long, is_imaginary;
   unsigned base;
   
-  parse_float(src, significand, exponent, base, is_float, is_long);
+  parse_float(src, significand, exponent, base,
+              is_float, is_long, is_imaginary);
 
   exprt result=exprt(ID_constant);
   
@@ -45,6 +46,7 @@ exprt convert_float_literal(const std::string &src)
   
   // In ANSI-C, float literals are double by default
   // unless marked with 'f'.
+  // All of these can be complex as well.
 
   if(is_float)
   {

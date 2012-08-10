@@ -25,7 +25,7 @@ void parse_float(
   mp_integer &significand,
   mp_integer &exponent,
   unsigned &exponent_base,
-  bool &is_float, bool &is_long)
+  bool &is_float, bool &is_long, bool &is_imaginary)
 {
   // {digits}{dot}{digits}{exponent}?{floatsuffix}?
   // {digits}{dot}{exponent}?{floatsuffix}?
@@ -110,7 +110,8 @@ void parse_float(
   {
     // get whole number part
     while(*p!='.' && *p!=0 && *p!='e' && *p!='E' &&
-          *p!='f' && *p!='F' && *p!='l' && *p!='L')
+          *p!='f' && *p!='F' && *p!='l' && *p!='L' &&
+          *p!='i' && *p!='I' && *p!='j' && *p!='J')
     {
       str_whole_number+=*p;
       p++;
@@ -122,7 +123,8 @@ void parse_float(
 
     // get fraction part
     while(*p!=0 && *p!='e' && *p!='E' &&
-           *p!='f' && *p!='F' && *p!='l' && *p!='L')
+          *p!='f' && *p!='F' && *p!='l' && *p!='L' &&
+          *p!='i' && *p!='I' && *p!='j' && *p!='J')
     {
       str_fraction_part+=*p;
       p++;
@@ -137,7 +139,8 @@ void parse_float(
       p++;
 
     // get exponent
-    while(*p!=0 && *p!='f' && *p!='F' && *p!='l' && *p!='L')
+    while(*p!=0 && *p!='f' && *p!='F' && *p!='l' && *p!='L' &&
+          *p!='i' && *p!='I' && *p!='j' && *p!='J')
     {
       str_exponent+=*p;
       p++;
@@ -161,7 +164,7 @@ void parse_float(
   }
 
   // get flags
-  is_float=is_long=false;
+  is_float=is_long=is_imaginary=false;
 
   while(*p!=0)
   {
@@ -169,6 +172,8 @@ void parse_float(
       is_float=true;
     else if(*p=='l' || *p=='L')
       is_long=true;
+    else if(*p=='i' || *p=='I' || *p=='j' || *p=='J')
+      is_imaginary=true;
 
     p++;
   }

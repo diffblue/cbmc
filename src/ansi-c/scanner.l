@@ -164,9 +164,9 @@ float3		{integer}{exponent}
 hexfloat1       "0"[xX]{hexdigit}+"."{hexdigit}+[pP][+-]?{integer}
 hexfloat2       "0"[xX]{hexdigit}+"."[pP][+-]?{integer}
 hexfloat3       "0"[xX]{hexdigit}+[pP][+-]?{integer}
+float_suffix    [fFlLiIjJ]
 float		{float1}|{float2}|{float3}|{hexfloat1}|{hexfloat2}|{hexfloat3}
-float_f		{float}[fF]|{integer}[fF]
-float_l		{float}[lL]
+float_s         {float}{float_suffix}*|{integer}[fF]
 bitvector	{binary}[bB]
 bitvector_u	{binary}([uU][bB]|[bB][uU])
 cppstart	{ws}"#"{ws}
@@ -970,17 +970,7 @@ wchar_t	            { // CodeWarrior doesn't have wchar_t built in
                   return TOK_INTEGER;
                 }
 
-{float}		{ newstack(yyansi_clval); 
-                  stack(yyansi_clval)=convert_float_literal(yytext);
-                  PARSER.set_location(stack(yyansi_clval));
-		  return TOK_FLOATING;
-		}
-{float_f}	{ newstack(yyansi_clval); 
-                  stack(yyansi_clval)=convert_float_literal(yytext);
-                  PARSER.set_location(stack(yyansi_clval));
-		  return TOK_FLOATING;
-		}
-{float_l}	{ newstack(yyansi_clval); 
+{float_s}	{ newstack(yyansi_clval); 
                   stack(yyansi_clval)=convert_float_literal(yytext);
                   PARSER.set_location(stack(yyansi_clval));
 		  return TOK_FLOATING;
