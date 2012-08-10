@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <set>
 
 #include <namespace.h>
+#include <context.h>
 #include <location.h>
 
 typedef enum { NO_INSTRUCTION_TYPE=0,
