@@ -11,6 +11,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <arith_tools.h>
 #include <config.h>
+#include <std_types.h>
+#include <expr_util.h>
 
 #include "convert_integer_literal.h"
 
@@ -166,8 +168,22 @@ exprt convert_integer_literal(const std::string &src)
   type.set(ID_width, width);  
   type.set(ID_C_c_type, c_type);
 
-  exprt result=from_integer(value, type);
-  result.set(ID_C_cformat, src);
+  exprt result;
+
+  if(is_imaginary)
+  {
+    complex_typet complex_type;
+    complex_type.subtype()=type;
+    result=exprt(ID_complex, complex_type);
+    result.operands().resize(2);
+    result.op0()=gen_zero(type);
+    result.op1()=from_integer(value, type);
+  }
+  else
+  {
+    result=from_integer(value, type);
+    result.set(ID_C_cformat, src);
+  }
 
   return result;
 }
