@@ -986,4 +986,44 @@ extern inline vector_typet &to_vector_type(typet &type)
   return static_cast<vector_typet &>(type);
 }
 
+/*! \brief TO_BE_DOCUMENTED
+*/
+class complex_typet:public typet
+{
+public:
+  complex_typet():typet(ID_complex)
+  {
+  }
+  
+  complex_typet(const typet &_subtype):typet(ID_complex)
+  {
+    subtype()=_subtype;
+  }
+};
+
+/*! \brief Cast a generic typet to a \ref complex_typet
+ *
+ * This is an unchecked conversion. \a type must be known to be \ref
+ * complex_typet.
+ *
+ * \param type Source type
+ * \return Object of type \ref complex_typet
+ *
+ * \ingroup gr_std_types
+*/
+extern inline const complex_typet &to_complex_type(const typet &type)
+{
+  assert(type.id()==ID_complex);
+  return static_cast<const complex_typet &>(type);
+}
+
+/*! \copydoc to_complex_type(const typet &)
+ * \ingroup gr_std_types
+*/
+extern inline complex_typet &to_complex_type(typet &type)
+{
+  assert(type.id()==ID_complex);
+  return static_cast<complex_typet &>(type);
+}
+
 #endif

@@ -385,17 +385,17 @@ __CPROVER_bool      { loc(); return TOK_CPROVER_BOOL; }
                     }
 
 {decimal_constant}  { loc();
-                      PARSER.current_token().data=convert_integer_literal(yytext, 10);
+                      PARSER.current_token().data=convert_integer_literal(yytext);
                       return TOK_INTEGER;
                     }
 
 {octal_constant}    { loc();
-                      PARSER.current_token().data=convert_integer_literal(yytext, 8);
+                      PARSER.current_token().data=convert_integer_literal(yytext);
                       return TOK_INTEGER;
                     }
 
 {hex_constant}      { loc();
-                      PARSER.current_token().data=convert_integer_literal(yytext, 16);
+                      PARSER.current_token().data=convert_integer_literal(yytext);
                       return TOK_INTEGER;
                     }
 

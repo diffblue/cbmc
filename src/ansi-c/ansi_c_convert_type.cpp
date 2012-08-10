@@ -247,7 +247,7 @@ void ansi_c_convert_typet::write(typet &type)
     
     type=long_double_type();
   }
-  else if(double_cnt || float_cnt || complex_cnt)
+  else if(double_cnt || float_cnt)
   {
     if(signed_cnt || unsigned_cnt || int_cnt || c_bool_cnt || proper_bool_cnt ||
        int8_cnt || int16_cnt || int32_cnt || int64_cnt ||
@@ -255,7 +255,7 @@ void ansi_c_convert_typet::write(typet &type)
        short_cnt || char_cnt)
     {
       err_location(location);
-      error("cannot combine integer type with float or complex");
+      error("cannot combine integer type with float");
       throw 0;
     }
 
@@ -287,7 +287,7 @@ void ansi_c_convert_typet::write(typet &type)
     else
     {
       err_location(location);
-      error("illegal type modifier for float or complex");
+      error("illegal type modifier for float");
       throw 0;
     }
   }
@@ -320,6 +320,11 @@ void ansi_c_convert_typet::write(typet &type)
     }
 
     type.id(ID_bool);
+  }
+  else if(complex_cnt)
+  {
+    // the "default" for complex is double
+    type=double_type();
   }
   else
   {
@@ -433,6 +438,15 @@ void ansi_c_convert_typet::write(typet &type)
     new_type.location()=vector_size.location();
     new_type.subtype().swap(type);
     type=new_type;
+  }
+  
+  if(complex_cnt)
+  {
+    // These take more or less arbitrary subtypes.
+    complex_typet new_type;
+    new_type.location()=location;
+    new_type.subtype()=type;
+    type.swap(new_type);
   }
 
   c_qualifiers.write(type);
