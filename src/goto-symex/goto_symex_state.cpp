@@ -54,10 +54,10 @@ void goto_symex_statet::initialize(const goto_functionst &goto_functions)
 
   const goto_programt &body=it->second.body;
 
-  source.is_set=true;
-  source.pc=body.instructions.begin();
+  source=symex_targett::sourcet(body);
   top().end_of_function=--body.instructions.end();
-  top().calling_location=top().end_of_function;
+  top().calling_location.pc=top().end_of_function;
+  top().calling_location.goto_program=&body;
 }
 
 /*******************************************************************\
