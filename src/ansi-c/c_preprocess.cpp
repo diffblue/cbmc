@@ -40,7 +40,7 @@ Author: Daniel Kroening, kroening@kroening.com
   " -D__SIZE_TYPE__=\"unsigned int\""\
   " -D__PTRDIFF_TYPE__=int"\
   " -D__WCHAR_TYPE__=int"\
-  " -D__WINT_TYPE__=int"\
+  " -D__WINT_TYPE__=\"unsigned int\""\
   " -D__INTMAX_TYPE__=\"long long int\""\
   " -D__UINTMAX_TYPE__=\"long long unsigned int\""
 
@@ -55,7 +55,7 @@ Author: Daniel Kroening, kroening@kroening.com
   " -D__SIZE_TYPE__=\"long unsigned int\""\
   " -D__PTRDIFF_TYPE__=int"\
   " -D__WCHAR_TYPE__=int"\
-  " -D__WINT_TYPE__=int"\
+  " -D__WINT_TYPE__=\"unsigned int\""\
   " -D__INTMAX_TYPE__=\"long long int\""\
   " -D__UINTMAX_TYPE__=\"long long unsigned int\""
                         
@@ -68,11 +68,11 @@ Author: Daniel Kroening, kroening@kroening.com
   " -D__LONG_LONG_MAX__=9223372036854775807LL"\
   " -D__LONG_MAX__=9223372036854775807L"\
   " -D__SIZE_TYPE__=\"long unsigned int\""\
-  " -D__PTRDIFF_TYPE__=int"\
+  " -D__PTRDIFF_TYPE__=long"\
   " -D__WCHAR_TYPE__=int"\
-  " -D__WINT_TYPE__=int"\
-  " -D__INTMAX_TYPE__=\"long long int\""\
-  " -D__UINTMAX_TYPE__=\"long long unsigned int\""
+  " -D__WINT_TYPE__=\"unsigned int\""\
+  " -D__INTMAX_TYPE__=\"long int\""\
+  " -D__UINTMAX_TYPE__=\"long unsigned int\""
 
 /*******************************************************************\
 
@@ -589,7 +589,7 @@ bool c_preprocess_gcc(
 
     command+=" -D__DBL_MIN_EXP__=\"(-1021)\"";
     command+=" -D__FLT_MIN__=1.17549435e-38F";
-    command+=" -D__DEC64_DEN__=0.000000000000001E-383DD";
+    command+=" -D__DEC64_SUBNORMAL_MIN__=0.000000000000001E-383DD";
     command+=" -D__CHAR_BIT__=8";
     command+=" -D__DBL_DENORM_MIN__=4.9406564584124654e-324";
     command+=" -D__FLT_EVAL_METHOD__=0";
@@ -631,7 +631,7 @@ bool c_preprocess_gcc(
     command+=" -D__FLT_MANT_DIG__=24";
     command+=" -D__DEC64_EPSILON__=1E-15DD";
     command+=" -D__DEC128_MIN_EXP__=\"(-6143)\"";
-    command+=" -D__DEC32_DEN__=0.000001E-95DF";
+    command+=" -D__DEC32_SUBNORMAL_MIN__=0.000001E-95DF";
     command+=" -D__FLT_RADIX__=2";
     command+=" -D__LDBL_EPSILON__=1.08420217248550443401e-19L";
     command+=" -D__k8=1";
@@ -642,7 +642,7 @@ bool c_preprocess_gcc(
     command+=" -D__DEC64_MAX__=9.999999999999999E384DD";
     command+=" -D__DEC64_MANT_DIG__=16";
     command+=" -D__DEC32_MAX_EXP__=96";
-    command+=" -D__DEC128_DEN__=0.000000000000000000000000000000001E-6143DL";
+    command+=" -D__DEC128_SUBNORMAL_MIN__=0.000000000000000000000000000000001E-6143DL";
     command+=" -D__LDBL_MANT_DIG__=64";
     command+=" -D__CONSTANT_CFSTRINGS__=1";
     command+=" -D__DEC32_MANT_DIG__=7";
@@ -674,9 +674,12 @@ bool c_preprocess_gcc(
     if(config.ansi_c.int_width==16)
       command+=GCC_DEFINES_16;
     else if(config.ansi_c.int_width==32)
+    {
+      if(config.ansi_c.pointer_width==64)
+        command+=GCC_DEFINES_LP64;
+      else
       command+=GCC_DEFINES_32;
-    else if(config.ansi_c.int_width==64)
-      command+=GCC_DEFINES_LP64;
+    }
   }
       
   switch(config.ansi_c.os)
