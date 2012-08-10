@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <cctype>
+
 #include "parse_float.h"
 
 /*******************************************************************\
@@ -46,7 +48,7 @@ void parse_float(
   
   // is this hex?
   
-  if(src.size()>=2 && src[0]=='0' && src[1]=='x')
+  if(src.size()>=2 && src[0]=='0' && tolower(src[1])=='x')
   {
     // skip the 0x
     p+=2;
