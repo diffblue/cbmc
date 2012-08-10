@@ -4,6 +4,9 @@
 // hex-based constants
 STATIC_ASSERT(0x1.0p-95f == 2.524355e-29f);
 
+// also with upper case X, P, F
+STATIC_ASSERT(0X1.0P-95F == 2.524355e-29f);
+
 _Complex c;
 
 int main()
