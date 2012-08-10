@@ -49,7 +49,8 @@ exprt c_typecheck_baset::zero_initializer(
           type_id==ID_signedbv ||
           type_id==ID_floatbv ||
           type_id==ID_fixedbv ||
-          type_id==ID_pointer)
+          type_id==ID_pointer ||
+          type_id==ID_complex)
   {
     exprt result=gen_zero(type);
     result.location()=location;
@@ -184,7 +185,7 @@ exprt c_typecheck_baset::zero_initializer(
   else
   {
     err_location(location);
-    str << "Failed to zero-initialize `" << to_string(type)
+    str << "failed to zero-initialize `" << to_string(type)
         << "'";
     throw 0;
   }
