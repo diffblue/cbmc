@@ -56,16 +56,17 @@ exprt convert_integer_literal(const std::string &src)
 
   mp_integer value;
 
-  if(src.size()>=2 && src[0]=='0')
+  if(src.size()>=2 && src[0]=='0' && src[1]=='x')
+  {
+    base=16;
+    // strip "0x"
+    std::string without_prefix(src, 2, std::string::npos);
+    value=string2integer(without_prefix, 16);
+  }
+  else if(src.size()>=2 && src[0]=='0')
   {
     base=8;
     value=string2integer(src, 8);
-  }
-  else if(src.size()>=2 && src[0]=='0' && src[1]=='1')
-  {
-    base=16;
-    std::string without_prefix(src, 2, std::string::npos);
-    value=string2integer(without_prefix, 16);
   }
   else
   {
