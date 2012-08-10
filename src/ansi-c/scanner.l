@@ -270,6 +270,7 @@ void ansi_c_scanner_init()
 		  TmpString = "";
                   #endif
 		 }
+<GRAMMAR>{cppstart}"ident"{ws}.* { /* ignore */ }
 <GRAMMAR>{cppdirective}	{
 		  yyansi_cerror("Preprocessor directive found");
 		  return TOK_SCANNER_ERROR;
