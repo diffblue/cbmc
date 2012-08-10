@@ -56,6 +56,12 @@ exprt gen_zero(const typet &type)
 
     result.set(ID_value, value);
   }
+  else if(type_id==ID_complex)
+  {
+    result=exprt(ID_complex, type);
+    exprt sub_zero=gen_zero(type.subtype());
+    result.operands().resize(2, sub_zero);
+  }
   else if(type_id==ID_bool)
   {
     result.make_false();
