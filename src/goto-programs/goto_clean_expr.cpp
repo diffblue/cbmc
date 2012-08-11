@@ -49,7 +49,7 @@ exprt goto_convertt::make_static_symbol(
     new_symbol.type=expr.type();
   } while(context.move(new_symbol, symbol_ptr));    
 
-  return symbol_expr(new_symbol);  
+  return symbol_expr(*symbol_ptr);
 }
 
 /*******************************************************************\
