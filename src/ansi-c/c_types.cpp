@@ -13,44 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
-Function: build_float_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-typet build_float_type(unsigned width)
-{
-  if(config.ansi_c.use_fixed_for_float)
-  {
-    fixedbv_typet result;
-    result.set_width(width);
-    result.set_integer_bits(width/2);
-    return result;
-  }
-  else
-  {
-    floatbv_typet result;
-
-    switch(width)
-    {
-    case 32: result=ieee_float_spect::single_precision().to_type(); break;
-    case 64: result=ieee_float_spect::double_precision().to_type(); break;
-    default: assert(false);
-    }
-    
-    assert(width==result.get_width());
-
-    return result;
-  }
-}
-
-/*******************************************************************\
-
 Function: index_type
 
   Inputs:
@@ -327,7 +289,18 @@ Function: float_type
 
 typet float_type()
 {
-  typet result=build_float_type(config.ansi_c.single_width);
+  typet result;
+  
+  if(config.ansi_c.use_fixed_for_float)
+  {
+    fixedbv_typet tmp;
+    tmp.set_width(config.ansi_c.single_width);
+    tmp.set_integer_bits(config.ansi_c.single_width/2);
+    result=tmp;
+  }
+  else
+    result=ieee_float_spect::single_precision().to_type();
+
   result.set(ID_C_c_type, ID_float);
   return result;
 }
@@ -346,7 +319,18 @@ Function: double_type
 
 typet double_type()
 {
-  typet result=build_float_type(config.ansi_c.double_width);
+  typet result;
+  
+  if(config.ansi_c.use_fixed_for_float)
+  {
+    fixedbv_typet tmp;
+    tmp.set_width(config.ansi_c.double_width);
+    tmp.set_integer_bits(config.ansi_c.double_width/2);
+    result=tmp;
+  }
+  else
+    result=ieee_float_spect::double_precision().to_type();
+  
   result.set(ID_C_c_type, ID_double);
   return result;
 }
@@ -365,7 +349,23 @@ Function: long_double_type
 
 typet long_double_type()
 {
-  typet result=build_float_type(config.ansi_c.long_double_width);
+  typet result;
+  
+  if(config.ansi_c.use_fixed_for_float)
+  {
+    fixedbv_typet tmp;
+    tmp.set_width(config.ansi_c.long_double_width);
+    tmp.set_integer_bits(config.ansi_c.long_double_width/2);
+    result=tmp;
+  }
+  else
+  {
+    if(config.ansi_c.long_double_width==128)
+      result=ieee_float_spect::quadruple_precision().to_type();
+    else
+      assert(false);
+  }
+  
   result.set(ID_C_c_type, ID_long_double);
   return result;
 }
