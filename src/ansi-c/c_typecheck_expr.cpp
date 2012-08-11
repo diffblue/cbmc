@@ -1006,7 +1006,7 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
       return;
     }
   }
-
+  
   if(!is_number(expr_type) &&
      expr_type.id()!=ID_bool &&
      expr_type.id()!=ID_pointer &&
@@ -1019,6 +1019,20 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
         << to_string(expr_type) << "' from `"
         << to_string(op_type) << "' not permitted";
     throw 0;
+  }
+
+  // Casts to booleans have particular meaning
+  if(expr_type.get(ID_C_c_type)==ID_bool)
+  {
+    // we replace (_Bool)x by x!=0; use ieee_float_notequal for floats
+    irep_idt id=
+      op_type.id()==ID_floatbv?ID_ieee_float_notequal:ID_notequal;
+
+    binary_exprt comparison(expr.op0(), id, gen_zero(expr.op0().type()), bool_typet());
+
+    comparison.location()=expr.location();
+    expr.swap(comparison);
+    return;
   }
 
   if(is_number(op_type) ||
