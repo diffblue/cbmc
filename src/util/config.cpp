@@ -323,6 +323,9 @@ bool configt::set(const cmdlinet &cmdline)
     ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
     ansi_c.lib=configt::ansi_ct::LIB_FULL;
     ansi_c.set_32();
+    
+    // On Windows, wchar_t is 16 bit, and
+    // long double is the same as double.
     ansi_c.wchar_t_width=2*8;
     ansi_c.long_double_width=8*8;
   }
@@ -336,6 +339,9 @@ bool configt::set(const cmdlinet &cmdline)
     ansi_c.lib=configt::ansi_ct::LIB_FULL;
     // note that sizeof(void *)==8, but sizeof(long)==4!
     ansi_c.set_LLP64();
+
+    // On Windows, wchar_t is 16 bit, and
+    // long double is the same as double.
     ansi_c.wchar_t_width=2*8;
     ansi_c.long_double_width=8*8;
   }
