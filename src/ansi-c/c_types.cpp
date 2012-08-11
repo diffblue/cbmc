@@ -362,6 +362,8 @@ typet long_double_type()
   {
     if(config.ansi_c.long_double_width==128)
       result=ieee_float_spect::quadruple_precision().to_type();
+    else if(config.ansi_c.long_double_width==64)
+      result=ieee_float_spect::double_precision().to_type();
     else
       assert(false);
   }
