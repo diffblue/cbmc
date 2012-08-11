@@ -28,26 +28,6 @@ Function: convert_string_literal
 
 \*******************************************************************/
 
-void convert_string_literal(
-  const std::string &src,
-  std::string &dest)
-{
-  dest="";
-
-}
-
-/*******************************************************************\
-
-Function: convert_string_literal
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 exprt convert_string_literal(const std::string &src)
 {
   assert(src.size()>=2);
