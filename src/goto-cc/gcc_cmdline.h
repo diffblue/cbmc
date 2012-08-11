@@ -22,6 +22,21 @@ public:
   {
     mode=GCC;
   }
+
+protected:  
+  int option_nr(const std::string &opt);
+  
+  void set(const std::string &opt, const std::string &value)
+  {
+    int nr=option_nr(opt);
+    options[nr].isset=true;
+    options[nr].values.push_back(value);
+  }
+  
+  void set(const std::string &opt)
+  {
+    options[option_nr(opt)].isset=true;
+  }
 };
 
 #endif /* GOTO_CC_GCC_CMDLINE_H */

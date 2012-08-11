@@ -6,11 +6,73 @@ Author: CM Wintersteiger, 2006
 
 \*******************************************************************/
 
-#include <string.h>
-
+#include <cassert>
+#include <cstring>
 #include <iostream>
 
 #include "gcc_cmdline.h"
+
+/*******************************************************************\
+ 
+Function: gcc_cmdlinet::option_nr
+ 
+  Inputs: option name
+ 
+ Outputs: option number
+ 
+ Purpose: 
+ 
+\*******************************************************************/
+
+int gcc_cmdlinet::option_nr(const std::string &opt)
+{
+  assert(opt.size()>=2);
+  if(std::string(opt, 0, 2)=="--") // something like --option
+  {
+    std::string opt_str=std::string(opt, 2, std::string::npos);
+    int opt_nr=getoptnr(opt_str);
+    if(opt_nr==-1)
+    {
+      optiont option;
+      option.islong=true;
+      option.optstring=opt_str;
+      option.optchar=0;
+      options.push_back(option);
+      opt_nr=options.size()-1;
+    }
+    return opt_nr;
+  }
+  else if(opt.size()==2) // something like -o
+  {
+    char opt_char=opt[1];
+    int opt_nr=getoptnr(opt_char);
+    if(opt_nr==-1)
+    {
+      optiont option;
+      option.islong=false;
+      option.optstring="";
+      option.optchar=opt_char;
+      options.push_back(option);
+      opt_nr=options.size()-1;
+    }
+    return opt_nr;
+  }
+  else // something like -option
+  {
+    std::string opt_str=std::string(opt, 1, std::string::npos);
+    int opt_nr=getoptnr(opt_str);
+    if(opt_nr==-1)
+    {
+      optiont option;
+      option.islong=true;
+      option.optstring=opt_str;
+      option.optchar=0;
+      options.push_back(option);
+      opt_nr=options.size()-1;
+    }
+    return opt_nr;
+  }
+}
 
 /*******************************************************************\
  
@@ -21,17 +83,167 @@ Function: gcc_cmdlinet::parse
  Outputs: none
  
  Purpose: parses the commandline options into a cmdlinet
- 
+
 \*******************************************************************/
+
+// separated or concatenated
+const char *gcc_options_with_argument[]=
+{
+  "-o",
+  "-x",
+  "-B",
+  "-iquote",
+  "-I",
+  "-V",
+  "-D",
+  "-L",
+  "-MT",
+  "-MQ",
+  "-MF",
+  NULL
+};
+
+const char *gcc_options_with_separated_argument[]=
+{
+  "--verbosity", // non-gcc
+  "--function",  // non-gcc
+  "-aux-info",
+  "--param",
+  "-idirafter",
+  "-include",
+  "-imacros",
+  "-iprefix",
+  "-iwithprefix",
+  "-iwithprefixbefore",
+  "-isystem",
+  "-isysroot",
+  "-Xpreprocessor",
+  "-Xassembler",
+  "-Xlinker",
+  "-u",
+  "-V",
+  "-b",
+  NULL
+};
+
+const char *gcc_options_with_concatenated_argument[]=
+{
+  "-d",
+  "-g",
+  "-A",
+  "-U",
+  "-l",
+  NULL
+};
+
+const char *gcc_options_without_argument[]=
+{
+  "--dot", // NON-GCC
+  "--show-symbol-table", // NON-GCC
+  "--show-function-table", // NON-GCC
+  "--ppc-macos", // NON-GCC
+  "--i386-linux", // NON-GCC
+  "--i386-win32", // NON-GCC
+  "--i386-macos", // NON-GCC
+  "--winx64", // NON_GCC
+  "--string-abstraction", // NON-GCC
+  "--no-library", // NON-GCC
+  "--16", // NON-GCC
+  "--32", // NON-GCC
+  "--64", // NON-GCC
+  "--little-endian", // NON-GCC
+  "--big-endian", // NON-GCC
+  "--unsigned-char", // NON-GCC
+  "--no-arch", // NON-GCC            
+  "--xml", // NON-GCC
+  "--partial-inlining", // NON-GCC
+  "-h", 
+  "--help", // NON-GCC
+  "-?", // NON-GCC
+  "-r", // for ld mimicking
+  "-c", 
+  "-S",
+  "-E", 
+  "-combine",
+  "-pipe", 
+  "-pass-exit-codes",
+  "-v", 
+  "-###",
+  "-help", 
+  "-target-help",
+  "--version", 
+  "-ansi",
+  "-trigraphs",
+  "-no-integrated-cpp",
+  "-traditional",
+  "-traditional-cpp",
+  "-nostdinc++", 
+  "-gen-decls",
+  "-pedantic",
+  "-pedantic-errors",
+  "-w", 
+  "-dumpspecs",
+  "-dumpmachine",
+  "-dumpversion", 
+  "-g",
+  "-gcoff", 
+  "-gdwarf-2",
+  "-ggdb", 
+  "-gstabs",
+  "-gstabs+", 
+  "-gvms",
+  "-gxcoff", 
+  "-gxcoff+",
+  "-p", 
+  "-pg",
+  "-print-libgcc-file-name",
+  "-print-multi-directory",
+  "-print-multi-lib",
+  "-print-search-dirs", 
+  "-Q",
+  "-pthread",
+  "-save-temps", 
+  "-time",
+  "-O", 
+  "-O0",        
+  "-O1", 
+  "-O2",
+  "-O3", 
+  "-Os",
+  "-C", 
+  "-E",
+  "-H", 
+  "-M",
+  "-MM", 
+  "-MG", 
+  "-MP",
+  "-MD", 
+  "-MMD",
+  "-nostdinc", 
+  "-P",
+  "-remap", 
+  "-undef",
+  "-nostdinc", 
+  "-nostartfiles",
+  "-nodefaultlibs",
+  "-nostdlib", 
+  "-pie",
+  "-rdynamic", 
+  "-s",
+  "-static", 
+  "-static-libgcc", 
+  "-shared",
+  "-symbolic",
+  "-EB",
+  "-EL",
+  NULL
+};
 
 bool gcc_cmdlinet::parse(int argc, const char **argv)
 {
   for(int i=1; i<argc; i++)
   {
-    int optnr;
-    cmdlinet::optiont option;
-    option.isset=true;
-
+    // file?
     if(strcmp(argv[i], "-")==0 ||
        argv[i][0]!='-')
     {
@@ -39,242 +251,25 @@ bool gcc_cmdlinet::parse(int argc, const char **argv)
       continue;
     }    
 
-    if(strncmp(argv[i], "--", 2)==0)
+    if(strncmp(argv[i], "-f", 2)==0) // f-options
     {
-      if(strlen(argv[i])==3)
-      {
-        option.islong=false;
-        option.optchar=argv[i][2];
-        optnr=getoptnr(option.optchar);
-      }
-      else
-      {
-        option.islong=true;
-        option.optstring=argv[i]+2;
-        option.optchar=0;
-        optnr=getoptnr(option.optstring);
-      }
-    }
-    else
-    {
-      if(strlen(argv[i])==2)
-      {
-        option.islong=false;
-        option.optchar=argv[i][1];
-        optnr=getoptnr(option.optchar);
-      }
-      else
-      {
-        option.islong=true;
-        option.optstring=argv[i]+1;
-        option.optchar=0;
-        optnr=getoptnr(option.optstring);
-      }
-    }
-    
-    // new?
-    if(optnr==-1)
-    {
-      options.push_back(option);
-      optnr=options.size()-1;
-    }
-
-    options[optnr].isset=true;
-    
-    if( // options that don't have any arguments
-      strcmp(argv[i], "--dot")==0 || // NON-GCC
-      strcmp(argv[i], "--show-symbol-table")==0 || // NON-GCC
-      strcmp(argv[i], "--show-function-table")==0 || // NON-GCC
-      strcmp(argv[i], "--ppc-macos")==0 || // NON-GCC
-      strcmp(argv[i], "--i386-linux")==0 || // NON-GCC
-      strcmp(argv[i], "--i386-win32")==0 || // NON-GCC
-      strcmp(argv[i], "--i386-macos")==0 || // NON-GCC
-      strcmp(argv[i], "--winx64")==0 || // NON_GCC
-      strcmp(argv[i], "--string-abstraction")==0 || // NON-GCC
-      strcmp(argv[i], "--no-library")==0 || // NON-GCC
-      strcmp(argv[i], "--16")==0 || // NON-GCC
-      strcmp(argv[i], "--32")==0 || // NON-GCC
-      strcmp(argv[i], "--64")==0 || // NON-GCC
-      strcmp(argv[i], "--little-endian")==0 || // NON-GCC
-      strcmp(argv[i], "--big-endian")==0 || // NON-GCC
-      strcmp(argv[i], "--unsigned-char")==0 || // NON-GCC
-      strcmp(argv[i], "--no-arch")==0 || // NON-GCC            
-      strcmp(argv[i], "--xml")==0 || // NON-GCC
-      strcmp(argv[i], "--partial-inlining")==0 || // NON-GCC
-      strcmp(argv[i], "-h")==0 || strcmp(argv[i], "--help")==0 || // NON-GCC
-      strcmp(argv[i], "-?")==0 || // NON-GCC
-      strcmp(argv[i], "-r")==0 || // for ld mimicking
-      strcmp(argv[i], "-c")==0 || strcmp(argv[i], "-S")==0 ||
-      strcmp(argv[i], "-E")==0 || strcmp(argv[i], "-combine")==0 ||
-      strcmp(argv[i], "-pipe")==0 || strcmp(argv[i], "-pass-exit-codes")==0 ||
-      strcmp(argv[i], "-v")==0 || strcmp(argv[i], "-###")==0 ||
-      strcmp(argv[i], "-help")==0 || strcmp(argv[i], "-target-help")==0 ||
-      strcmp(argv[i], "--version")==0 || strcmp(argv[i], "-ansi")==0 ||
-      strcmp(argv[i], "-trigraphs")==0 ||
-      strcmp(argv[i], "-no-integrated-cpp")==0 ||
-      strcmp(argv[i], "-traditional")==0 ||
-      strcmp(argv[i], "-traditional-cpp")==0 ||
-      strcmp(argv[i], "-nostdinc++")==0 || strcmp(argv[i], "-gen-decls")==0 ||
-      strcmp(argv[i], "-pedantic")==0 ||
-      strcmp(argv[i], "-pedantic-errors")==0 ||
-      strcmp(argv[i], "-w")==0 || strcmp(argv[i], "-dumpspecs")==0 ||
-      strcmp(argv[i], "-dumpmachine")==0 ||
-      strcmp(argv[i], "-dumpversion")==0 || strcmp(argv[i], "-g")==0 ||
-      strcmp(argv[i], "-gcoff")==0 || strcmp(argv[i], "-gdwarf-2")==0 ||
-      strcmp(argv[i], "-ggdb")==0 || strcmp(argv[i], "-gstabs")==0 ||
-      strcmp(argv[i], "-gstabs+")==0 || strcmp(argv[i], "-gvms")==0 ||
-      strcmp(argv[i], "-gxcoff")==0 || strcmp(argv[i], "-gxcoff+")==0 ||
-      strcmp(argv[i], "-p")==0 || strcmp(argv[i], "-pg")==0 ||
-      strcmp(argv[i], "-print-libgcc-file-name")==0 ||
-      strcmp(argv[i], "-print-multi-directory")==0 ||
-      strcmp(argv[i], "-print-multi-lib")==0 ||
-      strcmp(argv[i], "-print-search-dirs")==0 || strcmp(argv[i], "-Q")==0 ||
-      strcmp(argv[i], "-pthread")==0 ||
-      strcmp(argv[i], "-save-temps")==0 || strcmp(argv[i], "-time")==0 ||
-      strcmp(argv[i], "-O")==0 || strcmp(argv[i], "-O0")==0 ||        
-      strcmp(argv[i], "-O1")==0 || strcmp(argv[i], "-O2")==0 ||
-      strcmp(argv[i], "-O3")==0 || strcmp(argv[i], "-Os")==0 ||
-      strcmp(argv[i], "-C")==0 || strcmp(argv[i], "-E")==0 ||
-      strcmp(argv[i], "-H")==0 || strcmp(argv[i], "-M")==0 ||
-      strcmp(argv[i], "-MM")==0 || 
-      strcmp(argv[i], "-MG")==0 || strcmp(argv[i], "-MP")==0 ||
-      strcmp(argv[i], "-MD")==0 || strcmp(argv[i], "-MMD")==0 ||
-      strcmp(argv[i], "-nostdinc")==0 || strcmp(argv[i], "-P")==0 ||
-      strcmp(argv[i], "-remap")==0 || strcmp(argv[i], "-undef")==0 ||
-      strcmp(argv[i], "-nostdinc")==0 || 
-      strcmp(argv[i], "-nostartfiles")==0 ||
-      strcmp(argv[i], "-nodefaultlibs")==0 ||
-      strcmp(argv[i], "-nostdlib")==0 || strcmp(argv[i], "-pie")==0 ||
-      strcmp(argv[i], "-rdynamic")==0 || strcmp(argv[i], "-s")==0 ||
-      strcmp(argv[i], "-static")==0 || 
-      strcmp(argv[i], "-static-libgcc")==0 || strcmp(argv[i], "-shared")==0 ||
-      strcmp(argv[i], "-symbolic")==0 ||
-      strcmp(argv[i], "-EB")==0 ||
-      strcmp(argv[i], "-EL")==0
-    )
-    {
-      // nothing; is added and recognized.
-    }
-    else if(strncmp(argv[i], "-f", 2)==0) // f-options
-    {
+      set(argv[i]);
     }
     else if(strncmp(argv[i], "-W", 2)==0) // W-options
     {
-      // "Wp,..." is s special case
+      // "Wp,..." is s special case. These are to pass stuff
+      // to the preprocessor.
       if(strncmp(argv[i], "-Wp,", 4)==0)
       {
-        option.optstring="Wp,";
-        option.optchar=0;
-        optnr=getoptnr(option.optstring);
-        if(optnr==-1)
-        {
-          options.push_back(option);
-          optnr=options.size()-1;
-        }
-        options[optnr].isset=true;
-        options[optnr].values.push_back(argv[i]+4);
+        std::string value=std::string(argv[i]+4);
+        set("-WP,", value);
       }
+      else
+        set(argv[i]);
     }
     else if(strncmp(argv[i], "-m", 2)==0) // m-options
     {
-    }
-    else if( // options that have a separated _or_ concatenated argument
-        strncmp(argv[i], "-o", 2)==0 ||
-        strncmp(argv[i], "-x", 2)==0 ||
-        strncmp(argv[i], "-B", 2)==0 ||
-        strncmp(argv[i], "-iquote", 7)==0 ||
-        strncmp(argv[i], "-I", 2)==0 ||
-        strncmp(argv[i], "-V", 2)==0 ||
-        strncmp(argv[i], "-D", 2)==0 ||
-        strncmp(argv[i], "-L", 2)==0 ||
-        strncmp(argv[i], "-MT", 3)==0 ||
-        strncmp(argv[i], "-MQ", 3)==0 ||
-        strncmp(argv[i], "-MF", 3)==0
-    )
-    {
-      options[optnr].hasval=true;
-      if(strlen(argv[i])==2)
-      {
-        options[optnr].optstring="";
-        options[optnr].optchar=argv[i][1];
-        if(i!=argc-1)
-        {
-          options[optnr].values.push_back(argv[i+1]);
-          i++;
-        }
-        else
-          options[optnr].values.push_back("");
-      }
-      else
-      {
-        option=options[optnr];
-        option.optstring="";
-        option.optchar=argv[i][1];
-        optnr=getoptnr(option.optchar);
-        if(optnr==-1)
-        {
-          options.push_back(option);
-          optnr = options.size()-1;
-        }
-        options[optnr].isset=true;
-        
-        options[optnr].values.push_back(argv[i]+2);
-      }
-    } 
-    else if( // options that have a separated argument
-        strcmp(argv[i], "--verbosity")==0 || // NON-GCC
-        strcmp(argv[i], "--function")==0 || // NON-GCC
-        strcmp(argv[i], "-aux-info")==0 ||
-        strcmp(argv[i], "--param")==0 ||
-        strcmp(argv[i], "-idirafter")==0 ||
-        strcmp(argv[i], "-include")==0 ||
-        strcmp(argv[i], "-imacros")==0 ||
-        strcmp(argv[i], "-iprefix")==0 ||
-        strcmp(argv[i], "-iwithprefix")==0 ||
-        strcmp(argv[i], "-iwithprefixbefore")==0 ||
-        strcmp(argv[i], "-isystem")==0 ||
-        strcmp(argv[i], "-isysroot")==0 ||
-        strcmp(argv[i], "-Xpreprocessor")==0 ||
-        strcmp(argv[i], "-Xassembler")==0 ||
-        strcmp(argv[i], "-Xlinker")==0 ||
-        strcmp(argv[i], "-u")==0 ||
-        strcmp(argv[i], "-V")==0 ||
-        strcmp(argv[i], "-b")==0
-    )
-    {
-      options[optnr].hasval=true;
-
-      if(i!=argc-1)
-      {
-        options[optnr].values.push_back(argv[i+1]);
-        i++;
-      }
-      else
-        options[optnr].values.push_back("");
-    }
-    else if( // options that have a concatonated argument
-      strncmp(argv[i], "-d", 2)==0 ||
-      strncmp(argv[i], "-g", 2)==0 ||
-      strncmp(argv[i], "-A", 2)==0 ||
-      strncmp(argv[i], "-U", 2)==0 ||
-      strncmp(argv[i], "-l", 2)==0
-    )
-    {
-      option = options[optnr];
-      option.optstring = "";  
-      option.optchar = argv[i][1];
-      optnr=getoptnr(option.optchar);
-      if(optnr==-1)
-      {
-        options.push_back(option);
-        optnr = options.size()-1;
-      }
-      options[optnr].isset=true;
-      if(strlen(argv[i])>2)
-      {
-        options[optnr].hasval = true;
-        options[optnr].values.push_back(argv[i]+2);
-      }
+      set(argv[i]);
     }
     else if( // options that have an = argument
       strncmp(argv[i], "-std", 4)==0 ||
@@ -284,27 +279,79 @@ bool gcc_cmdlinet::parse(int argc, const char **argv)
       strncmp(argv[i], "--sysroot", 9)==0
     )
     {
-      const char *inx=strchr(argv[i], '=');
-      if(inx!=NULL)
+      std::string opt_str=argv[i];
+      std::size_t p=opt_str.find('=');
+      if(p!=std::string::npos)
       {
-        option = options[optnr];
-        option.optstring = 
-          option.optstring.substr(0, option.optstring.find("=",0)-1);
-        optnr=getoptnr(option.optstring);
-        if(optnr==-1)
-        {
-          options.push_back(option);
-          optnr = options.size()-1;
-        }
-        options[optnr].isset=true;
-                  
-        options[optnr].hasval = true;
-        options[optnr].values.push_back(inx+1);
+        std::string opt=opt_str.substr(0, p-1);
+        set(opt, std::string(opt_str, p+1, std::string::npos));
       }
     }
     else
-    { // unrecognized option
-      std::cout << "Warning: uninterpreted gcc option '" << argv[i] << "'" << std::endl;
+    {
+      bool found=false;
+
+      // without argument
+      for(const char **o=gcc_options_without_argument; *o!=NULL && !found; o++)
+      {
+        if(strcmp(argv[i], *o)==0)
+        {
+          found=true;
+          set(argv[i]);
+        }
+      }
+      
+      // concatenated _or_ separated
+      for(const char **o=gcc_options_with_argument; *o!=NULL && !found; o++)
+      {
+        if(strcmp(argv[i], *o)==0) // separated
+        {
+          found=true;
+          if(i!=argc-1)
+          {
+            set(argv[i], argv[i+1]);
+            i++;
+          }
+          else
+            set(argv[i], "");
+        }
+        else if(strncmp(argv[i], *o, strlen(*o))==0) // concatenated
+        {
+          found=true;
+        }
+      }
+
+      // separated only    
+      for(const char **o=gcc_options_with_separated_argument; *o!=NULL && !found; o++)
+      {
+        if(strcmp(argv[i], *o)==0) // separated
+        {
+          found=true;
+          if(i!=argc-1)
+          {
+            set(argv[i], argv[i+1]);
+            i++;
+          }
+          else
+            set(argv[i], "");
+        }
+      }
+
+      // concatenated only
+      for(const char **o=gcc_options_with_concatenated_argument; *o!=NULL && !found; o++)
+      {
+        if(strncmp(argv[i], *o, strlen(*o))==0) // concatenated
+        {
+          found=true;
+          set(*o, argv[i]+strlen(*o));
+        }
+      }
+
+      if(!found)
+      {    
+        // unrecognized option
+        std::cout << "Warning: uninterpreted gcc option '" << argv[i] << "'" << std::endl;
+      }
     }
   }
 
