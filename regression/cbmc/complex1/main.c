@@ -3,6 +3,7 @@
 
 int main()
 {
+  #ifdef __GNUC__
   _Complex c;
   c=1.0i+2;
 
@@ -23,4 +24,9 @@ int main()
   
   // complex conjugate
   char_complex2 = ~ char_complex;
+  #else
+  
+  // Visual studio doesn't have it  
+
+  #endif
 }
