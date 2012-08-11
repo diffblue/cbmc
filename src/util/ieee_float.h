@@ -55,12 +55,20 @@ public:
   // the well-know standard formats  
   inline static ieee_float_spect single_precision()
   {
+    // 32 bits in total
     return ieee_float_spect(23, 8);
   }
 
   inline static ieee_float_spect double_precision()
   {
+    // 64 bits in total
     return ieee_float_spect(52, 11);
+  }  
+  
+  inline static ieee_float_spect quadruple_precision()
+  {
+    // IEEE 754 binary128
+    return ieee_float_spect(112, 15);
   }  
   
   inline friend bool operator == (const ieee_float_spect &a, const ieee_float_spect &b)
