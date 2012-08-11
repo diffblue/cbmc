@@ -301,7 +301,7 @@ bool gcc_cmdlinet::parse(int argc, const char **argv)
         }
       }
       
-      // concatenated _or_ separated
+      // concatenated _or_ separated, e.g., -I
       for(const char **o=gcc_options_with_argument; *o!=NULL && !found; o++)
       {
         if(strcmp(argv[i], *o)==0) // separated
@@ -318,6 +318,7 @@ bool gcc_cmdlinet::parse(int argc, const char **argv)
         else if(strncmp(argv[i], *o, strlen(*o))==0) // concatenated
         {
           found=true;
+          set(*o, argv[i]+strlen(*o));
         }
       }
 
