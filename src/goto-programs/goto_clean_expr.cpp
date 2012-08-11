@@ -18,7 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
-Function: goto_convertt::make_temp_symbol
+Function: goto_convertt::make_static_symbol
 
   Inputs:
 
@@ -28,24 +28,28 @@ Function: goto_convertt::make_temp_symbol
 
 \*******************************************************************/
 
-void goto_convertt::make_temp_symbol(
-  exprt &expr,
-  const std::string &suffix,
-  goto_programt &dest)
+exprt goto_convertt::make_static_symbol(
+  const exprt &expr,
+  const std::string &suffix)
 {
   const locationt location=expr.find_location();
   
-  symbolt &new_symbol=
-    new_tmp_symbol(expr.type(), suffix, dest, location);
+  symbolt new_symbol;
+  symbolt *symbol_ptr;
+  
+  do
+  {
+    new_symbol.base_name="static_"+suffix+"$"+i2string(++temporary_counter);
+    new_symbol.name=tmp_symbol_prefix+id2string(new_symbol.base_name);
+    new_symbol.lvalue=true;
+    new_symbol.thread_local=false;
+    new_symbol.static_lifetime=true;
+    new_symbol.file_local=true;
+    new_symbol.value=expr;
+    new_symbol.type=expr.type();
+  } while(context.move(new_symbol, symbol_ptr));    
 
-  code_assignt assignment;
-  assignment.lhs()=symbol_expr(new_symbol);
-  assignment.rhs()=expr;
-  assignment.location()=location;
-
-  convert(assignment, dest);
-
-  expr=symbol_expr(new_symbol);  
+  return symbol_expr(new_symbol);  
 }
 
 /*******************************************************************\
@@ -296,13 +300,14 @@ void goto_convertt::address_of_replace_objects(
   goto_programt &dest)
 {
   if(expr.id()==ID_struct)
-    make_temp_symbol(expr, "struct", dest);
+    expr=make_static_symbol(expr, "struct");
   else if(expr.id()==ID_union)
-    make_temp_symbol(expr, "union", dest);
+    expr=make_static_symbol(expr, "union");
   else if(expr.id()==ID_array)
-    make_temp_symbol(expr, "array", dest);
+    expr=make_static_symbol(expr, "array");
   else if(expr.id()==ID_string_constant)
   {
+    // leave for now, but long-term these might become static symbols
   }
   else
     Forall_operands(it, expr)
