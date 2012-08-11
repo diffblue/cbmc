@@ -1,3 +1,5 @@
+// transparent union is GCC only
+#ifdef __GNUC__
 struct S1
 {
 };
@@ -28,3 +30,10 @@ int main()
   f(&s2);
   f(0);
 }
+#else
+
+int main()
+{
+}
+
+#endif
