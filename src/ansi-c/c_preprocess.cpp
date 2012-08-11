@@ -313,7 +313,10 @@ bool c_preprocess_visual_studio(
       command_file << "/D_WIN64" << std::endl;
     }
     else
+    {
       command_file << "/D__PTRDIFF_TYPE__=int" << std::endl;
+      command_file << "/U_WIN64" << std::endl;
+    }
 
     // Standard Defines, ANSI9899 6.10.8
     command_file << "/D__STDC_VERSION__=199901L" << std::endl;
