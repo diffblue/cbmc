@@ -2425,3 +2425,35 @@ symbolt &goto_convertt::new_tmp_symbol(
   return *symbol_ptr;  
 }
 
+/*******************************************************************\
+
+Function: goto_convertt::make_temp_symbol
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void goto_convertt::make_temp_symbol(
+  exprt &expr,
+  const std::string &suffix,
+  goto_programt &dest)
+{
+  const locationt location=expr.find_location();
+  
+  symbolt &new_symbol=
+    new_tmp_symbol(expr.type(), suffix, dest, location);
+
+  code_assignt assignment;
+  assignment.lhs()=symbol_expr(new_symbol);
+  assignment.rhs()=expr;
+  assignment.location()=location;
+
+  convert(assignment, dest);
+
+  expr=symbol_expr(new_symbol);  
+}
+

@@ -63,6 +63,10 @@ protected:
     goto_programt &dest,
     const locationt &location);
   
+  exprt make_static_symbol(
+    const exprt &dest,
+    const std::string &suffix);
+  
   typedef std::list<irep_idt> tmp_symbolst;
   tmp_symbolst tmp_symbols;
 
