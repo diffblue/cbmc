@@ -50,20 +50,11 @@ exprt convert_float_literal(const std::string &src)
   // All of these can be complex as well.
 
   if(is_float)
-  {
     result.type()=float_type();
-    result.type().set(ID_C_c_type, ID_float);
-  }
   else if(is_long)
-  {
     result.type()=long_double_type();
-    result.type().set(ID_C_c_type, ID_long_double);
-  }
   else
-  {
     result.type()=double_type(); // default
-    result.type().set(ID_C_c_type, ID_double);
-  }
   
   if(config.ansi_c.use_fixed_for_float)
   {
