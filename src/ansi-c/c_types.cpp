@@ -364,6 +364,9 @@ typet long_double_type()
       result=ieee_float_spect::quadruple_precision().to_type();
     else if(config.ansi_c.long_double_width==64)
       result=ieee_float_spect::double_precision().to_type();
+    else if(config.ansi_c.long_double_width==96)
+      result=ieee_float_spect(80, 15).to_type();
+      // not quite right. Intel's extended precision isn't IEEE.
     else
       assert(false);
   }
