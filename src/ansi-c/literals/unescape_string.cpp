@@ -6,8 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <ctype.h>
-#include <stdio.h>
+#include <cassert>
+#include <cctype>
+#include <cstdio>
 
 #include "unescape_string.h"
 
@@ -34,9 +35,11 @@ void unescape_string(
   {
     char ch=src[i];
 
-    if(ch=='\\')
+    if(ch=='\\') // escape?
     {
       i++;
+      assert(i<src.size()); // backslash can't be last character
+      
       ch=src[i];
       switch(ch)
       {
@@ -48,6 +51,8 @@ void unescape_string(
       case 'r': dest+='\r'; break; /* CR (0x0d) */
       case 'f': dest+='\f'; break; /* FF (0x0c) */
       case 'a': dest+='\a'; break; /* BEL (0x07) */
+      case '"': dest+='"'; break;
+      case '\'': dest+='\''; break;
       
       case 'x': // hex
         i++;
@@ -120,9 +125,11 @@ void unescape_wide_string(
   {
     unsigned int ch=(unsigned char)src[i];
 
-    if(ch=='\\')
+    if(ch=='\\') // escape?
     {
       i++;
+      assert(i<src.size()); // backslash can't be last character
+
       ch=(unsigned char)src[i];
       switch(ch)
       {
@@ -134,6 +141,8 @@ void unescape_wide_string(
       case 'r': dest.push_back('\r'); break; /* CR (0x0d) */
       case 'f': dest.push_back('\f'); break; /* FF (0x0c) */
       case 'a': dest.push_back('\a'); break; /* BEL (0x07) */
+      case '"': dest.push_back('"'); break;
+      case '\'': dest.push_back('\''); break;
       
       case 'x': // hex
         i++;
@@ -151,8 +160,7 @@ void unescape_wide_string(
           ch=result;
         }
         
-        dest.push_back(ch);
-      
+        dest.push_back(ch);      
         break;
       
       default:
