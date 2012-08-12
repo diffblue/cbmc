@@ -93,6 +93,8 @@ const char *gcc_options_with_argument[]=
   "-x",
   "-B",
   "-iquote",
+  "-idirafter",
+  "-include",
   "-I",
   "-V",
   "-D",
@@ -100,6 +102,8 @@ const char *gcc_options_with_argument[]=
   "-MT",
   "-MQ",
   "-MF",
+  "-u", // goes to linker
+  "-T", // goes to linker
   NULL
 };
 
@@ -109,8 +113,6 @@ const char *gcc_options_with_separated_argument[]=
   "--function",  // non-gcc
   "-aux-info",
   "--param",
-  "-idirafter",
-  "-include",
   "-imacros",
   "-iprefix",
   "-iwithprefix",
@@ -120,8 +122,6 @@ const char *gcc_options_with_separated_argument[]=
   "-Xpreprocessor",
   "-Xassembler",
   "-Xlinker",
-  "-u",
-  "-V",
   "-b",
   NULL
 };
@@ -301,6 +301,22 @@ bool gcc_cmdlinet::parse(int argc, const char **argv)
         }
       }
       
+      // separated only    
+      for(const char **o=gcc_options_with_separated_argument; *o!=NULL && !found; o++)
+      {
+        if(strcmp(argv[i], *o)==0) // separated
+        {
+          found=true;
+          if(i!=argc-1)
+          {
+            set(argv[i], argv[i+1]);
+            i++;
+          }
+          else
+            set(argv[i], "");
+        }
+      }
+
       // concatenated _or_ separated, e.g., -I
       for(const char **o=gcc_options_with_argument; *o!=NULL && !found; o++)
       {
@@ -319,22 +335,6 @@ bool gcc_cmdlinet::parse(int argc, const char **argv)
         {
           found=true;
           set(*o, argv[i]+strlen(*o));
-        }
-      }
-
-      // separated only    
-      for(const char **o=gcc_options_with_separated_argument; *o!=NULL && !found; o++)
-      {
-        if(strcmp(argv[i], *o)==0) // separated
-        {
-          found=true;
-          if(i!=argc-1)
-          {
-            set(argv[i], argv[i+1]);
-            i++;
-          }
-          else
-            set(argv[i], "");
         }
       }
 
