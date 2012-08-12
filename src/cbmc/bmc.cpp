@@ -31,7 +31,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <solvers/prop/cover_goals.h>
 
 #include "bmc.h"
-#include "counterexample_beautification_greedy.h"
+#include "bv_cbmc.h"
 
 /*******************************************************************\
 
