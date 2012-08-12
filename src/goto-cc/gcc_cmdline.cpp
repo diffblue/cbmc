@@ -307,7 +307,7 @@ bool gcc_cmdlinet::parse(int argc, const char **argv)
         }
       }
       
-      // separated only    
+      // separated only, and also allow concatenation with "="
       for(const char **o=gcc_options_with_separated_argument; *o!=NULL && !found; o++)
       {
         if(argv_i==*o) // separated
