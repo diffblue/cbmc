@@ -278,11 +278,8 @@ void cbmc_parseoptionst::get_command_line_options(optionst &options)
   if(cmdline.isset("z3"))
     options.set_option("z3", true);
 
-  if(cmdline.isset("beautify-pbs"))
-    options.set_option("beautify-pbs", true);
-
-  if(cmdline.isset("beautify-greedy"))
-    options.set_option("beautify-greedy", true);
+  if(cmdline.isset("beautify"))
+    options.set_option("beautify", true);
 
   options.set_option("pretty-names", 
                      !cmdline.isset("no-pretty-names"));
@@ -831,7 +828,7 @@ void cbmc_parseoptionst::help()
     "\n"
     "Backend options:\n"
     " --dimacs                     generate CNF in DIMACS format\n"
-    " --beautify-greedy            beautify the counterexample (greedy heuristic)\n"
+    " --beautify                   beautify the counterexample (greedy heuristic)\n"
     " --smt1                       output subgoals in SMT1 syntax (experimental)\n"
     " --smt2                       output subgoals in SMT2 syntax (experimental)\n"
     " --boolector                  use Boolector (experimental)\n"

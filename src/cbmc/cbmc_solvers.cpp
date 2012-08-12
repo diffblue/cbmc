@@ -18,7 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "bmc.h"
 #include "bv_cbmc.h"
-#include "counterexample_beautification_greedy.h"
+#include "counterexample_beautification.h"
 #include "version.h"
 
 /*******************************************************************\
@@ -35,73 +35,70 @@ Function: bmct::decide_default
 
 bool bmct::decide_default()
 {
-  #if 1
-  sat_minimizert satcheck;
-  satcheck.set_message_handler(get_message_handler());
-  satcheck.set_verbosity(get_verbosity());
-  
-  bv_cbmct bv_cbmc(ns, satcheck);
-  
-  if(options.get_option("arrays-uf")=="never")
-    bv_cbmc.unbounded_array=bv_cbmct::U_NONE;
-  else if(options.get_option("arrays-uf")=="always")
-    bv_cbmc.unbounded_array=bv_cbmct::U_ALL;
-    
   bool result=true;
 
-  switch(run_decision_procedure(bv_cbmc))
+  if(options.get_bool_option("beautify"))
   {
-  case decision_proceduret::D_UNSATISFIABLE:
-    result=false;
-    report_success();
-    break;
-
-  case decision_proceduret::D_SATISFIABLE:
-    if(options.get_bool_option("beautify-pbs"))
-      throw "beautify-pbs is no longer supported";
-    else if(options.get_bool_option("beautify-greedy"))
-      counterexample_beautification_greedyt()(
-        satcheck, bv_cbmc, equation, ns);
-
-    error_trace(bv_cbmc);
-    report_failure();
-    break;
-
-  default:
-    error("decision procedure failed");
-  }
-  #else
-  
-  satcheck_minisat_simpt satcheck;
-  satcheck.set_message_handler(get_message_handler());
-  satcheck.set_verbosity(get_verbosity());
-  
-  bv_cbmct bv_cbmc(satcheck);
-  
-  if(options.get_option("arrays-uf")=="never")
-    bv_cbmc.unbounded_array=bv_cbmct::U_NONE;
-  else if(options.get_option("arrays-uf")=="always")
-    bv_cbmc.unbounded_array=bv_cbmct::U_ALL;
+    // simplifier won't work with beautification
+    satcheck_minisat_no_simplifiert satcheck;
+    satcheck.set_message_handler(get_message_handler());
+    satcheck.set_verbosity(get_verbosity());
     
-  bool result=true;
+    bv_cbmct bv_cbmc(ns, satcheck);
+    
+    if(options.get_option("arrays-uf")=="never")
+      bv_cbmc.unbounded_array=bv_cbmct::U_NONE;
+    else if(options.get_option("arrays-uf")=="always")
+      bv_cbmc.unbounded_array=bv_cbmct::U_ALL;
+      
+    switch(run_decision_procedure(bv_cbmc))
+    {
+    case decision_proceduret::D_UNSATISFIABLE:
+      result=false;
+      report_success();
+      break;
 
-  switch(run_decision_procedure(bv_cbmc))
-  {
-  case decision_proceduret::D_UNSATISFIABLE:
-    result=false;
-    report_success();
-    break;
+    case decision_proceduret::D_SATISFIABLE:
+      counterexample_beautificationt()(
+        bv_cbmc, equation, ns);
 
-  case decision_proceduret::D_SATISFIABLE:
-    error_trace(bv_cbmc);
-    report_failure();
-    break;
+      error_trace(bv_cbmc);
+      report_failure();
+      break;
 
-  default:
-    error("decision procedure failed");
+    default:
+      error("decision procedure failed");
+    }
   }
-  
-  #endif
+  else
+  {
+    satcheckt satcheck;
+    satcheck.set_message_handler(get_message_handler());
+    satcheck.set_verbosity(get_verbosity());
+    
+    bv_cbmct bv_cbmc(ns, satcheck);
+    
+    if(options.get_option("arrays-uf")=="never")
+      bv_cbmc.unbounded_array=bv_cbmct::U_NONE;
+    else if(options.get_option("arrays-uf")=="always")
+      bv_cbmc.unbounded_array=bv_cbmct::U_ALL;
+      
+    switch(run_decision_procedure(bv_cbmc))
+    {
+    case decision_proceduret::D_UNSATISFIABLE:
+      result=false;
+      report_success();
+      break;
+
+    case decision_proceduret::D_SATISFIABLE:
+      error_trace(bv_cbmc);
+      report_failure();
+      break;
+
+    default:
+      error("decision procedure failed");
+    }
+  }
 
   return result;
 }

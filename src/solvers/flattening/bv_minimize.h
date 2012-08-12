@@ -11,15 +11,34 @@ Purpose: Find a satisfying assignment that minimizes a given set
 
 \*******************************************************************/
 
-#ifndef CPROVER_CEGAR_SAT_OPTIMIZER_H
-#define CPROVER_CEGAR_SAT_OPTIMIZER_H
+#ifndef CPROVER_BV_MINIMIZER_H
+#define CPROVER_BV_MINIMIZER_H
 
 #include <solvers/flattening/bv_pointers.h>
 #include <solvers/sat/satcheck.h>
 
 typedef std::set<exprt> minimization_listt;
 
-typedef satcheckt sat_minimizert;
+class bv_minimizet:public messaget
+{
+public:
+  explicit bv_minimizet(boolbvt &_boolbv):
+    absolute_value(false),
+    boolbv(_boolbv)
+  {
+  }
+  
+  void operator()(const minimization_listt &objectives);
+  
+  bool absolute_value;
+
+protected:
+  boolbvt &boolbv;
+  
+  void add_objective(
+    class prop_minimizet &prop_minimize,
+    const exprt &objective);
+};
 
 class bv_minimizing_dect:public bv_pointerst
 {
@@ -34,9 +53,14 @@ public:
   {
   }
 
-  bool minimize(const minimization_listt &symbols);
+  void minimize(const minimization_listt &objectives)
+  {
+    bv_minimizet bv_minimize(*this);
+    bv_minimize.set_message_handler(get_message_handler());
+    bv_minimize(objectives);
+  }
 
-  sat_minimizert satcheck;
+  satcheckt satcheck;
 };
 
 #endif
