@@ -113,11 +113,13 @@ bool cmdline_optionst::doit()
   {
     if(cmdline.isset('v'))
     {
+      // This a) prints the version and b) increases verbosity.
+      // Compilation continues.
+      
       if(compiler.act_as_ld)
         print("GNU ld version 2.16.91 20050610 (goto-cc " GOTOCC_VERSION ")");
       else
         print("gcc version 3.4.4 (goto-cc " GOTOCC_VERSION ")");
-      return false;
     }
 
     if(cmdline.isset("version"))
@@ -131,7 +133,7 @@ bool cmdline_optionst::doit()
         print("gcc (GCC) 3.4.4 (goto-cc " GOTOCC_VERSION ")\n");
       }
 
-      print("Copyright (C) 2006-2010 Daniel Kroening, Christoph Wintersteiger\n");
+      print("Copyright (C) 2006-2012 Daniel Kroening, Christoph Wintersteiger\n");
 
       return false;
     }
