@@ -19,7 +19,12 @@ STATIC_ASSERT(sizeof(1l)==sizeof(long int));
 STATIC_ASSERT(sizeof(1ll)==sizeof(long long int));
 STATIC_ASSERT(sizeof(0xaaaabbbbcccc)==sizeof(long long int));
 STATIC_ASSERT(sizeof('x')==sizeof(int)); // int in C, char in C++
+
+#ifdef _WIN32
+STATIC_ASSERT(sizeof(L'x')==2);
+#else
 STATIC_ASSERT(sizeof(L'x')==sizeof(int));
+#endif
 
 int main()
 {
