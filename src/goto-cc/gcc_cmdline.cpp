@@ -10,6 +10,8 @@ Author: CM Wintersteiger, 2006
 #include <cstring>
 #include <iostream>
 
+#include <prefix.h>
+
 #include "gcc_cmdline.h"
 
 /*******************************************************************\
@@ -243,48 +245,61 @@ bool gcc_cmdlinet::parse(int argc, const char **argv)
 {
   for(int i=1; i<argc; i++)
   {
-    // file?
-    if(strcmp(argv[i], "-")==0 ||
-       argv[i][0]!='-')
+    std::string argv_i=argv[i];
+
+    // command file?
+    if(has_prefix(argv_i, "@"))
     {
-      args.push_back(argv[i]);
+      // TODO
+      continue;
+    }
+  
+    // file?
+    if(argv_i=="-" || !has_prefix(argv_i, "-"))
+    {
+      args.push_back(argv_i);
+      add_arg(argv_i);
+      new_argv.back().is_infile_name=true;
       continue;
     }    
 
-    if(strncmp(argv[i], "-f", 2)==0) // f-options
+    // add to new_argv    
+    add_arg(argv_i);
+
+    // also store in cmdlinet
+
+    if(has_prefix(argv_i, "-f")) // f-options
     {
-      set(argv[i]);
+      set(argv_i);
     }
-    else if(strncmp(argv[i], "-W", 2)==0) // W-options
+    else if(has_prefix(argv_i, "-W")) // W-options
     {
       // "Wp,..." is s special case. These are to pass stuff
       // to the preprocessor.
-      if(strncmp(argv[i], "-Wp,", 4)==0)
+      if(has_prefix(argv_i, "-Wp,"))
       {
         std::string value=std::string(argv[i]+4);
         set("-WP,", value);
       }
       else
-        set(argv[i]);
+        set(argv_i);
     }
-    else if(strncmp(argv[i], "-m", 2)==0) // m-options
+    else if(has_prefix(argv_i, "-m")) // m-options
     {
-      set(argv[i]);
+      set(argv_i);
     }
     else if( // options that have an = argument
-      strncmp(argv[i], "-std", 4)==0 ||
-      strncmp(argv[i], "-print-file-name", 16)==0 ||
-      strncmp(argv[i], "-print-prog-name", 16)==0 ||
-      strncmp(argv[i], "-specs", 6)==0 ||
-      strncmp(argv[i], "--sysroot", 9)==0
-    )
+            has_prefix(argv_i, "-std") ||
+            has_prefix(argv_i, "-print-file-name") ||
+            has_prefix(argv_i, "-print-prog-name") ||
+            has_prefix(argv_i, "-specs") ||
+            has_prefix(argv_i, "--sysroot"))
     {
-      std::string opt_str=argv[i];
-      std::size_t p=opt_str.find('=');
+      std::size_t p=argv_i.find('=');
       if(p!=std::string::npos)
       {
-        std::string opt=opt_str.substr(0, p-1);
-        set(opt, std::string(opt_str, p+1, std::string::npos));
+        std::string opt=argv_i.substr(0, p-1);
+        set(opt, std::string(argv_i, p+1, std::string::npos));
       }
     }
     else
@@ -294,44 +309,46 @@ bool gcc_cmdlinet::parse(int argc, const char **argv)
       // without argument
       for(const char **o=gcc_options_without_argument; *o!=NULL && !found; o++)
       {
-        if(strcmp(argv[i], *o)==0)
+        if(argv_i==*o)
         {
           found=true;
-          set(argv[i]);
+          set(argv_i);
         }
       }
       
       // separated only    
       for(const char **o=gcc_options_with_separated_argument; *o!=NULL && !found; o++)
       {
-        if(strcmp(argv[i], *o)==0) // separated
+        if(argv_i==*o) // separated
         {
           found=true;
           if(i!=argc-1)
           {
-            set(argv[i], argv[i+1]);
+            set(argv_i, argv[i+1]);
+            add_arg(argv[i+1]);
             i++;
           }
           else
-            set(argv[i], "");
+            set(argv_i, "");
         }
       }
 
       // concatenated _or_ separated, e.g., -I
       for(const char **o=gcc_options_with_argument; *o!=NULL && !found; o++)
       {
-        if(strcmp(argv[i], *o)==0) // separated
+        if(argv_i==*o) // separated
         {
           found=true;
           if(i!=argc-1)
           {
-            set(argv[i], argv[i+1]);
+            set(argv_i, argv[i+1]);
+            add_arg(argv[i+1]);
             i++;
           }
           else
-            set(argv[i], "");
+            set(argv_i, "");
         }
-        else if(strncmp(argv[i], *o, strlen(*o))==0) // concatenated
+        else if(has_prefix(argv_i, *o)==0) // concatenated
         {
           found=true;
           set(*o, argv[i]+strlen(*o));
@@ -341,7 +358,7 @@ bool gcc_cmdlinet::parse(int argc, const char **argv)
       // concatenated only
       for(const char **o=gcc_options_with_concatenated_argument; *o!=NULL && !found; o++)
       {
-        if(strncmp(argv[i], *o, strlen(*o))==0) // concatenated
+        if(has_prefix(argv_i, *o)) // concatenated
         {
           found=true;
           set(*o, argv[i]+strlen(*o));
