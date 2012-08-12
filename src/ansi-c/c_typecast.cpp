@@ -146,6 +146,7 @@ bool check_c_implicit_typecast(
     if(dest_type.id()==ID_unsignedbv) return false;
     if(dest_type.id()==ID_signedbv) return false;
     if(dest_type.id()==ID_floatbv) return false;
+    if(dest_type.id()==ID_complex) return false;
   }
   else if(src_type_id==ID_integer)
   {
@@ -157,6 +158,7 @@ bool check_c_implicit_typecast(
     if(dest_type.id()==ID_floatbv) return false;
     if(dest_type.id()==ID_fixedbv) return false;
     if(dest_type.id()==ID_pointer) return false;
+    if(dest_type.id()==ID_complex) return false;
   }
   else if(src_type_id==ID_real)
   {
@@ -164,6 +166,7 @@ bool check_c_implicit_typecast(
     if(dest_type.id()==ID_complex) return false;
     if(dest_type.id()==ID_floatbv) return false;
     if(dest_type.id()==ID_fixedbv) return false;
+    if(dest_type.id()==ID_complex) return false;
   }
   else if(src_type_id==ID_rational)
   {
@@ -171,6 +174,7 @@ bool check_c_implicit_typecast(
     if(dest_type.id()==ID_complex) return false;
     if(dest_type.id()==ID_floatbv) return false;
     if(dest_type.id()==ID_fixedbv) return false;
+    if(dest_type.id()==ID_complex) return false;
   }
   else if(src_type_id==ID_bool)
   {
@@ -182,6 +186,7 @@ bool check_c_implicit_typecast(
     if(dest_type.id()==ID_floatbv) return false;
     if(dest_type.id()==ID_fixedbv) return false;
     if(dest_type.id()==ID_c_enum) return false;
+    if(dest_type.id()==ID_complex) return false;
   }
   else if(src_type_id==ID_unsignedbv ||
           src_type_id==ID_signedbv ||
@@ -199,6 +204,7 @@ bool check_c_implicit_typecast(
     if(dest_type.id()==ID_pointer) return false;
     if(dest_type.id()==ID_c_enum) return false;
     if(dest_type.id()==ID_incomplete_c_enum) return false;
+    if(dest_type.id()==ID_complex) return false;
   }
   else if(src_type_id==ID_floatbv ||
           src_type_id==ID_fixedbv)
@@ -211,6 +217,7 @@ bool check_c_implicit_typecast(
     if(dest_type.id()==ID_unsignedbv) return false;
     if(dest_type.id()==ID_floatbv) return false;
     if(dest_type.id()==ID_fixedbv) return false;
+    if(dest_type.id()==ID_complex) return false;
   }
   else if(src_type_id==ID_array ||
           src_type_id==ID_pointer)
@@ -238,6 +245,16 @@ bool check_c_implicit_typecast(
   {
     if(dest_type.id()==ID_vector)
       return false;
+  }
+  else if(src_type_id==ID_complex)
+  {
+    if(dest_type.id()==ID_complex)
+    {
+      // We convert between complex types if we convert between
+      // their component types.
+      if(!check_c_implicit_typecast(src_type.subtype(), dest_type.subtype()))
+        return false;
+    }
   }
 
   return true;
