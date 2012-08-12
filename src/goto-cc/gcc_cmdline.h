@@ -37,6 +37,20 @@ protected:
   {
     options[option_nr(opt)].isset=true;
   }
+
+  // for calling the preprocessor
+  struct argt
+  {
+  public:
+    argt():is_infile_name(false) { }
+    explicit argt(const std::string &_arg):is_infile_name(false), arg(_arg) { }
+    bool is_infile_name;
+    std::string arg;
+  };
+  
+  std::list<argt> new_argv;
+  
+  void add_arg(const std::string &arg) { new_argv.push_back(argt(arg)); }
 };
 
 #endif /* GOTO_CC_GCC_CMDLINE_H */
