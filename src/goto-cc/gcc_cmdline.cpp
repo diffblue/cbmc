@@ -125,6 +125,11 @@ const char *gcc_options_with_separated_argument[]=
   "-Xassembler",
   "-Xlinker",
   "-b",
+  "-std",
+  "-print-file-name",
+  "-print-prog-name",
+  "-specs",
+  "--sysroot",
   NULL
 };
 
@@ -262,7 +267,7 @@ bool gcc_cmdlinet::parse(int argc, const char **argv)
       new_argv.back().is_infile_name=true;
       continue;
     }    
-
+    
     // add to new_argv    
     add_arg(argv_i);
 
@@ -287,20 +292,6 @@ bool gcc_cmdlinet::parse(int argc, const char **argv)
     else if(has_prefix(argv_i, "-m")) // m-options
     {
       set(argv_i);
-    }
-    else if( // options that have an = argument
-            has_prefix(argv_i, "-std") ||
-            has_prefix(argv_i, "-print-file-name") ||
-            has_prefix(argv_i, "-print-prog-name") ||
-            has_prefix(argv_i, "-specs") ||
-            has_prefix(argv_i, "--sysroot"))
-    {
-      std::size_t p=argv_i.find('=');
-      if(p!=std::string::npos)
-      {
-        std::string opt=argv_i.substr(0, p-1);
-        set(opt, std::string(argv_i, p+1, std::string::npos));
-      }
     }
     else
     {
@@ -331,6 +322,11 @@ bool gcc_cmdlinet::parse(int argc, const char **argv)
           else
             set(argv_i, "");
         }
+        else if(has_prefix(argv_i, std::string(*o)+"=")) // concatenated with "="
+        {
+          found=true;
+          set(*o, argv[i]+strlen(*o)+1);
+        }
       }
 
       // concatenated _or_ separated, e.g., -I
@@ -348,7 +344,7 @@ bool gcc_cmdlinet::parse(int argc, const char **argv)
           else
             set(argv_i, "");
         }
-        else if(has_prefix(argv_i, *o)==0) // concatenated
+        else if(has_prefix(argv_i, *o)) // concatenated
         {
           found=true;
           set(*o, argv[i]+strlen(*o));
