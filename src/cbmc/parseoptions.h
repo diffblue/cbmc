@@ -31,7 +31,7 @@ class optionst;
   "(partial-loops)" \
   "(xml-ui)(xml-interface)(vcd):" \
   "(cvc)(smt1)(smt2)(boolector)(yices)(z3)(opensmt)(mathsat)(fpa)" \
-  "(no-pretty-names)(beautify-greedy)(beautify-pbs)" \
+  "(no-pretty-names)(beautify)" \
   "(floatbv)(fixedbv)(no-assertions)(no-assumptions)(nan-check)" \
   "(dimacs)(refine)" \
   "(16)(32)(64)(LP64)(ILP64)(LLP64)(ILP32)(LP32)" \

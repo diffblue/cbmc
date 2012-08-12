@@ -6,11 +6,19 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <threeval.h>
+#include <bitvector.h>
+#include <expr_util.h>
+#include <arith_tools.h>
+#include <symbol.h>
+
+#include <solvers/prop/minimize.h>
+
 #include "counterexample_beautification.h"
 
 /*******************************************************************\
 
-Function: counterexample_beautificationt::get_minimization_symbols
+Function: counterexample_beautificationt::get_minimization_list
 
   Inputs:
 
@@ -20,13 +28,12 @@ Function: counterexample_beautificationt::get_minimization_symbols
 
 \*******************************************************************/
 
-void counterexample_beautificationt::get_minimization_symbols(
+void counterexample_beautificationt::get_minimization_list(
   const bv_cbmct &bv_cbmc,
   const symex_target_equationt &equation,
-  const symex_target_equationt::SSA_stepst::const_iterator failed,
-  minimization_symbolst &minimization_symbols)
+  minimization_listt &minimization_list)
 {
-  // remove the ones that are assigned under false guards
+  // ignore the ones that are assigned under false guards
 
   for(symex_target_equationt::SSA_stepst::const_iterator
       it=equation.SSA_steps.begin();
@@ -37,7 +44,7 @@ void counterexample_beautificationt::get_minimization_symbols(
     {
       if(!bv_cbmc.prop.l_get(it->guard_literal).is_false())
         if(it->original_lhs_object.type()!=bool_typet())
-          minimization_symbols.insert(it->ssa_lhs);
+          minimization_list.insert(it->ssa_lhs);
     }
 
     // reached failed assertion?
@@ -75,4 +82,81 @@ counterexample_beautificationt::get_failed_claim(
   
   assert(false);
   return equation.SSA_steps.end();
+}
+
+/*******************************************************************\
+
+Function: counterexample_beautificationt::operator()
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void counterexample_beautificationt::operator()(
+  bv_cbmct &bv_cbmc,
+  const symex_target_equationt &equation,
+  const namespacet &ns)
+{
+  // find failed claim
+
+  failed=get_failed_claim(bv_cbmc, equation);
+  
+  // lock the failed assertion
+  bv_cbmc.prop.l_set_to(failed->cond_literal, false);
+
+  {
+    bv_cbmc.status("Beautifying counterexample (guards)");
+
+    // compute weights for guards
+    typedef std::map<literalt, unsigned> guard_countt;
+    guard_countt guard_count;
+
+    for(symex_target_equationt::SSA_stepst::const_iterator
+        it=equation.SSA_steps.begin();
+        it!=equation.SSA_steps.end(); it++)
+    {
+      if(it->is_assignment() &&
+         it->assignment_type!=symex_targett::HIDDEN)
+      {
+        if(!it->guard_literal.is_constant())
+          guard_count[it->guard_literal]++;
+      }
+
+      // reached failed assertion?
+      if(it==failed)
+        break;
+    }
+
+    // give to propositional minimizer
+    prop_minimizet prop_minimize(bv_cbmc);
+    prop_minimize.set_message_handler(bv_cbmc.get_message_handler());
+    
+    for(guard_countt::const_iterator
+        it=guard_count.begin();
+        it!=guard_count.end();
+        it++)
+      prop_minimize.objective(it->first, it->second);
+
+    // minimize
+    prop_minimize();
+  }
+
+  {
+    bv_cbmc.status("Beautifying counterexample (values)");
+
+    // get symbols we care about
+    minimization_listt minimization_list;
+  
+    get_minimization_list(bv_cbmc, equation, minimization_list);
+  
+    // minimize
+    bv_minimizet bv_minimize(bv_cbmc);
+    bv_minimize.absolute_value=true;
+    bv_minimize.set_message_handler(bv_cbmc.get_message_handler());
+    bv_minimize(minimization_list);
+  }
 }

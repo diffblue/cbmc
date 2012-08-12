@@ -35,8 +35,8 @@ public:
     propt &_prop):
     arrayst(_ns, _prop),
     unbounded_array(U_NONE),
-    bv_utils(_prop),
     boolbv_width(_ns),
+    bv_utils(_prop),
     functions(*this),
     map(_prop, _ns, boolbv_width)
   {
@@ -84,9 +84,10 @@ public:
     return map;
   }
 
+  boolbv_widtht boolbv_width;
+
 protected:
   bv_utilst bv_utils;
-  boolbv_widtht boolbv_width;
   
   // uninterpreted functions
   functionst functions;
