@@ -34,7 +34,9 @@ STATIC_ASSERT(sizeof(int)==4);
 STATIC_ASSERT(sizeof(long int)==4 || sizeof(long int)==8);
 STATIC_ASSERT(sizeof(long long int)==8);
 STATIC_ASSERT(sizeof(wchar_t)==4);
-STATIC_ASSERT(sizeof(long double)==sizeof(void *)*2);
+STATIC_ASSERT(sizeof(float)==4);
+STATIC_ASSERT(sizeof(double)==8);
+STATIC_ASSERT(sizeof(long double)>=sizeof(double));
 
 #endif
 
