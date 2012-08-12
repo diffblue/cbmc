@@ -30,11 +30,13 @@ void prop_minimizet::objective(
 {
   if(weight>0)
   {
-    objectives[weight].conditions.push_back(condition);
+    objectives[weight].push_back(objectivet(condition));
+    _number_objectives++;
   }
   else if(weight<0)
   {
-    objectives[-weight].conditions.push_back(prop.lnot(condition));
+    objectives[-weight].push_back(objectivet(prop.lnot(condition)));
+    _number_objectives++;
   }
 }
 
@@ -52,19 +54,21 @@ Function: prop_minimizet::block
 
 void prop_minimizet::block()
 {
-  entryt &entry=current->second;
+  std::vector<objectivet> &entry=current->second;
   bool found=false;
   
-  for(bvt::iterator
-      c_it=entry.conditions.begin();
-      c_it!=entry.conditions.end();
-      ++c_it)
+  for(std::vector<objectivet>::iterator
+      o_it=entry.begin();
+      o_it!=entry.end();
+      ++o_it)
   {
-    if(prop.l_get(*c_it).is_false())
+    if(!o_it->fixed &&
+       prop.l_get(o_it->condition).is_false())
     {
       _number_satisfied++;
       _value+=current->first;
-      prop.l_set_to(*c_it, false); // fix it
+      prop.l_set_to(o_it->condition, false); // fix it
+      o_it->fixed=true;
       found=true;
     }
   }
@@ -85,14 +89,22 @@ Function: prop_minimizet::constaint
 
 \*******************************************************************/
 
-void prop_minimizet::constraint()
+literalt prop_minimizet::constraint()
 {
+  std::vector<objectivet> &entry=current->second;
   bvt or_clause;
-  entryt &entry=current->second;
   
-  bvt assumptions;
-  assumptions.push_back(prop.lnot(prop.land(entry.conditions)));
-  prop.set_assumptions(assumptions);
+  for(std::vector<objectivet>::iterator
+      o_it=entry.begin();
+      o_it!=entry.end();
+      ++o_it)
+  {
+    if(!o_it->fixed)
+      or_clause.push_back(prop.lnot(o_it->condition));
+  }
+
+  // this returns false if the clause is empty
+  return prop.lor(or_clause);
 }
 
 /*******************************************************************\
@@ -114,7 +126,6 @@ void prop_minimizet::operator()()
 
   _iterations=_number_satisfied=0;
   _value=0;
-  decision_proceduret::resultt dec_result;
   
   save_assignment();
 
@@ -124,27 +135,42 @@ void prop_minimizet::operator()()
       current++)
   {
     status("weight "+i2string(current->first));
-  
-    // We want to improve on one of the objectives, please!
-    _iterations++;
-    constraint();
-    dec_result=prop_conv.dec_solve();
+
+    decision_proceduret::resultt dec_result;
+    do
+    {  
+      // We want to improve on one of the objectives, please!
+      literalt c=constraint();
     
-    switch(dec_result)
-    {
-    case decision_proceduret::D_UNSATISFIABLE:
-      restore_assignment();
-      break;
+      if(c.is_false())
+        dec_result=decision_proceduret::D_UNSATISFIABLE;
+      else
+      {
+        _iterations++;
 
-    case decision_proceduret::D_SATISFIABLE:
-      block(); // block the ones we got
-      save_assignment();
-      break;
+        bvt assumptions;
+        assumptions.push_back(c);
+        prop_conv.prop.set_assumptions(assumptions);
+        dec_result=prop_conv.dec_solve();
+    
+        switch(dec_result)
+        {
+        case decision_proceduret::D_UNSATISFIABLE:
+          restore_assignment();
+          break;
 
-    default:
-      error("decision procedure failed");
-      return;
+        case decision_proceduret::D_SATISFIABLE:
+          block(); // block the ones we got
+          save_assignment();
+          break;
+
+        default:
+          error("decision procedure failed");
+          return;
+        }
+      }
     }
+    while(dec_result!=decision_proceduret::D_UNSATISFIABLE);
   }
 }
 

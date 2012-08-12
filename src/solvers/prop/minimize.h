@@ -27,7 +27,9 @@ class prop_minimizet:public messaget
 {
 public:
   explicit inline prop_minimizet(prop_convt &_prop_conv):
-    prop_conv(_prop_conv), prop(_prop_conv.prop)
+    _number_objectives(0),
+    prop_conv(_prop_conv),
+    prop(_prop_conv.prop)
   {
   }
 
@@ -47,7 +49,7 @@ public:
   
   inline unsigned size() const
   {
-    return objectives.size();
+    return _number_objectives;
   }
   
   // managing the objectives
@@ -57,22 +59,28 @@ public:
   void objective(
     const literalt condition,
     const weightt weight=1);
-  
-  struct entryt
+
+  struct objectivet
   {
-    bvt conditions;
+    literalt condition;
+    bool fixed;
+    
+    explicit objectivet(const literalt _condition):
+      condition(_condition), fixed(false)
+    {
+    }
   };
 
-  typedef std::map<weightt, entryt> objectivest;
+  typedef std::map<weightt, std::vector<objectivet> > objectivest;
   objectivest objectives;
 
 protected:
-  unsigned _iterations, _number_satisfied;
+  unsigned _iterations, _number_satisfied, _number_objectives;
   weightt _value;
   prop_convt &prop_conv;
   propt &prop;
 
-  void constraint();
+  literalt constraint();
   void block();
   
   std::vector<bool> assignment;
