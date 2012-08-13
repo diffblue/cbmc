@@ -18,7 +18,7 @@ Author: CM Wintersteiger
 #include <specc/specc_language.h>
 #endif
 
-#include "cmdline_options.h"
+#include "goto_cc_mode.h"
 
 /*******************************************************************\
 
