@@ -10,13 +10,6 @@ Author: CM Wintersteiger, 2006
 #include <iostream>
 
 #if 0
-#include <list>
-#include <algorithm>
-#include <cctype>
-
-#include <message.h>
-#include <i2string.h>
-
 #ifdef _WIN32
 #define EX_OK 0
 #define EX_USAGE 64
@@ -24,8 +17,6 @@ Author: CM Wintersteiger, 2006
 #else
 #include <sysexits.h>
 #endif
-
-#include "cmdline_options.h"
 #endif
 
 #include <tempfile.h>
