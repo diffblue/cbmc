@@ -186,6 +186,9 @@ const char *gcc_options_without_argument[]=
 
 bool gcc_cmdlinet::parse(int argc, const char **argv)
 {
+  assert(argc>0);
+  add_arg(argv[0]);
+
   for(int i=1; i<argc; i++)
   {
     std::string argv_i=argv[i];
@@ -202,7 +205,7 @@ bool gcc_cmdlinet::parse(int argc, const char **argv)
     {
       args.push_back(argv_i);
       add_arg(argv_i);
-      new_argv.back().is_infile_name=true;
+      parsed_argv.back().is_infile_name=true;
       continue;
     }    
     

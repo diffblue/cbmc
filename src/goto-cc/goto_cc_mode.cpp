@@ -6,6 +6,7 @@ Author: CM Wintersteiger, 2006
 
 \*******************************************************************/
 
+#include <cstdio>
 #include <iostream>
 
 #ifdef _WIN32
@@ -36,6 +37,29 @@ goto_cc_modet::goto_cc_modet(goto_cc_cmdlinet &_cmdline):
   cmdline(_cmdline)
 {
   register_languages();
+}
+
+/*******************************************************************\
+
+Function: goto_cc_modet::~goto_cc_modet
+
+  Inputs: 
+
+ Outputs: 
+
+ Purpose: constructor
+
+\*******************************************************************/
+
+goto_cc_modet::~goto_cc_modet()
+{
+  for(std::list<std::string>::const_iterator
+      it=temporary_files.begin();
+      it!=temporary_files.end();
+      it++)
+  {
+    remove(it->c_str());
+  }
 }
 
 /*******************************************************************\
