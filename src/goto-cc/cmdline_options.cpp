@@ -50,35 +50,6 @@ cmdline_optionst::cmdline_optionst(
 
 /*******************************************************************\
 
-Function: tokenize
-
-  Inputs: a string, a vector of tokens and a string of delimiters
-
- Outputs: nothing
-
- Purpose: fills the token vector with tokens separated by delimiters
-          from the string
-
-\*******************************************************************/
-
-void tokenize(
-  const std::string& str,
-  std::vector<std::string>& tokens,
-  const std::string& delimiters = " ")
-{
-  std::string::size_type lastPos = str.find_first_not_of(delimiters, 0);
-  std::string::size_type pos     = str.find_first_of(delimiters, lastPos);
-
-  while (std::string::npos != pos || std::string::npos != lastPos)
-  {
-    tokens.push_back(str.substr(lastPos, pos - lastPos));
-    lastPos = str.find_first_not_of(delimiters, pos);
-    pos = str.find_first_of(delimiters, lastPos);
-  }
-}
-
-/*******************************************************************\
-
 Function: cmdline_optionst::doit
 
   Inputs:
