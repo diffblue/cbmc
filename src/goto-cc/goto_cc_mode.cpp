@@ -17,7 +17,7 @@ Author: CM Wintersteiger, 2006
 #include <sysexits.h>
 #endif
 
-#include "cmdline_options.h"
+#include "goto_cc_mode.h"
 #include "version.h"
 
 /*******************************************************************\
