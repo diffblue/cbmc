@@ -93,8 +93,9 @@ void unescape_string(
         }
         else
         {
-          dest+='\\';
-          dest+=ch;
+          // Unknown escape sequence.
+          // Both GCC and CL turn \% into %.
+          dest.push_back(ch);
         }
       }
     }
@@ -181,7 +182,8 @@ void unescape_wide_string(
         }
         else
         {
-          dest.push_back('\\');
+          // Unknown escape sequence.
+          // Both GCC and CL turn \% into %.
           dest.push_back(ch);
         }
       }
