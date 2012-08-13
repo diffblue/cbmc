@@ -155,11 +155,7 @@ cpplineno	{cppstart}"line"*{ws}{integer}{ws}.*{newline}
 cpppragma	{cppstart}"pragma"{ws}.*
 cppdirective	{cppstart}.*
 
-simple_escape [abfnrtve'"?\\]
-octal_escape  [0-7]{1,3}
-hex_escape "x"[0-9a-fA-F]+
-
-escape_sequence [\\]({simple_escape}|{octal_escape}|{hex_escape})
+escape_sequence [\\][^\n]
 c_char [^'\\\n]|{escape_sequence}
 s_char [^"\\\n]|{escape_sequence}
 
