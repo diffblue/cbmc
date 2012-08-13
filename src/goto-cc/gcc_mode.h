@@ -1,6 +1,6 @@
 /*******************************************************************\
 
-Module: Command line interpretation for goto-cc.
+Module: Base class for command line interpretation
 
 Author: CM Wintersteiger
 
@@ -8,29 +8,26 @@ Date: June 2006
 
 \*******************************************************************/
 
-#ifndef GOTO_CC_CMDLINE_OPTIONS_H
-#define GOTO_CC_CMDLINE_OPTIONS_H
+#ifndef GOTO_CC_GCC_MODE_H
+#define GOTO_CC_GCC_MODE_H
 
-#include <config.h>
-#include <langapi/language_ui.h>
+#include "goto_cc_mode.h"
+#include "gcc_cmdline.h"
 
-#include "goto_cc_cmdline.h"
-
-class cmdline_optionst:public language_uit
+class gcc_modet:public goto_cc_modet
 {
 public:
-  gcc_cmdlinet cmdline;
-  std::string base_name;
-
-  virtual int main(int argc, const char **argv);
   virtual bool doit();
-  virtual void help();
-  virtual void usage_error();
+  virtual void help_mode();
 
-  cmdline_optionst(goto_cc_cmdlinet &_cmdline);
+  explicit gcc_modet(gcc_cmdlinet &_gcc_cmdline):
+    goto_cc_modet(_gcc_cmdline),
+    cmdline(_gcc_cmdline)
+  {
+  }
   
-private:
-  void register_languages();
+protected:
+  gcc_cmdlinet &cmdline;
 };
 
-#endif /*CMDLINE_H_*/
+#endif /* GOTO_CC_GCC_MODE_H */
