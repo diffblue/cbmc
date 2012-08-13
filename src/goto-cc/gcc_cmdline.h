@@ -16,6 +16,7 @@ Date: June 2006
 class gcc_cmdlinet:public goto_cc_cmdlinet
 {
 public:
+  // overload
   virtual bool parse(int, const char**);
 
   gcc_cmdlinet()
@@ -24,18 +25,16 @@ public:
   }
 
 protected:  
-  int option_nr(const std::string &opt);
-  
   void set(const std::string &opt, const std::string &value)
   {
-    int nr=option_nr(opt);
+    int nr=get_optnr(opt);
     options[nr].isset=true;
     options[nr].values.push_back(value);
   }
   
   void set(const std::string &opt)
   {
-    options[option_nr(opt)].isset=true;
+    options[get_optnr(opt)].isset=true;
   }
 
   // for calling the preprocessor

@@ -16,68 +16,6 @@ Author: CM Wintersteiger, 2006
 
 /*******************************************************************\
  
-Function: gcc_cmdlinet::option_nr
- 
-  Inputs: option name
- 
- Outputs: option number
- 
- Purpose: 
- 
-\*******************************************************************/
-
-int gcc_cmdlinet::option_nr(const std::string &opt)
-{
-  assert(opt.size()>=2);
-  if(std::string(opt, 0, 2)=="--") // something like --option
-  {
-    std::string opt_str=std::string(opt, 2, std::string::npos);
-    int opt_nr=getoptnr(opt_str);
-    if(opt_nr==-1)
-    {
-      optiont option;
-      option.islong=true;
-      option.optstring=opt_str;
-      option.optchar=0;
-      options.push_back(option);
-      opt_nr=options.size()-1;
-    }
-    return opt_nr;
-  }
-  else if(opt.size()==2) // something like -o
-  {
-    char opt_char=opt[1];
-    int opt_nr=getoptnr(opt_char);
-    if(opt_nr==-1)
-    {
-      optiont option;
-      option.islong=false;
-      option.optstring="";
-      option.optchar=opt_char;
-      options.push_back(option);
-      opt_nr=options.size()-1;
-    }
-    return opt_nr;
-  }
-  else // something like -option
-  {
-    std::string opt_str=std::string(opt, 1, std::string::npos);
-    int opt_nr=getoptnr(opt_str);
-    if(opt_nr==-1)
-    {
-      optiont option;
-      option.islong=true;
-      option.optstring=opt_str;
-      option.optchar=0;
-      options.push_back(option);
-      opt_nr=options.size()-1;
-    }
-    return opt_nr;
-  }
-}
-
-/*******************************************************************\
- 
 Function: gcc_cmdlinet::parse
  
   Inputs: argument count, argument strings
@@ -293,20 +231,14 @@ bool gcc_cmdlinet::parse(int argc, const char **argv)
     {
       set(argv_i);
     }
+    else if(in_list(argv[i], gcc_options_without_argument)) // without argument
+    {
+      set(argv_i);
+    }
     else
     {
       bool found=false;
 
-      // without argument
-      for(const char **o=gcc_options_without_argument; *o!=NULL && !found; o++)
-      {
-        if(argv_i==*o)
-        {
-          found=true;
-          set(argv_i);
-        }
-      }
-      
       // separated only, and also allow concatenation with "="
       for(const char **o=gcc_options_with_separated_argument; *o!=NULL && !found; o++)
       {
