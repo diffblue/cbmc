@@ -12,7 +12,7 @@ Date: June 2006
 #define GOTO_CC_CW_MODE_H
 
 #include "goto_cc_mode.h"
-#include "cw_cmdline.h"
+#include "gcc_cmdline.h"
 
 class cw_modet:public goto_cc_modet
 {
@@ -20,14 +20,14 @@ public:
   virtual bool doit();
   virtual void help_mode();
 
-  explicit cw_modet(cw_cmdlinet &_cw_cmdline):
-    goto_cc_modet(_cw_cmdline),
-    cmdline(_cw_cmdline)
+  explicit cw_modet(gcc_cmdlinet &_gcc_cmdline):
+    goto_cc_modet(_gcc_cmdline),
+    cmdline(_gcc_cmdline)
   {
   }
   
 protected:
-  cw_cmdlinet &cmdline;
+  gcc_cmdlinet &cmdline;
 };
 
 #endif /* GOTO_CC_CW_MODE_H */

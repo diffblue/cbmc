@@ -1,6 +1,6 @@
 /*******************************************************************\
 
-Module: Base class for command line interpretation for CL
+Module: Visual Studio CL Mode
 
 Author: CM Wintersteiger
 
