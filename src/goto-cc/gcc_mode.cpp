@@ -28,11 +28,14 @@ Author: CM Wintersteiger, 2006
 #include "cmdline_options.h"
 #endif
 
+#include <tempfile.h>
 #include <config.h>
 #include <prefix.h>
+#include <suffix.h>
 
 #include "compile.h"
 #include "version.h"
+#include "run.h"
 
 #include "gcc_mode.h"
 
@@ -149,32 +152,109 @@ bool gcc_modet::doit()
     compiler.output_file_executable="a.out";
   }
     
-  if(cmdline.isset("Wp,"))
-  {
-    const std::list<std::string> &values=
-      cmdline.get_values("Wp,");
+  // Iterate over file arguments, and do any preprocessing needed
 
-    for(std::list<std::string>::const_iterator
-        it=values.begin();
-        it!=values.end();
-        it++)
-      config.ansi_c.preprocessor_options.push_back("-Wp,"+*it);
+  for(cmdlinet::argst::iterator
+      a_it=cmdline.args.begin();
+      a_it!=cmdline.args.end();
+      a_it++)
+  {
+    if(has_suffix(*a_it, ".c") ||
+       has_suffix(*a_it, ".cc") ||
+       has_suffix(*a_it, ".cp") ||
+       has_suffix(*a_it, ".cpp") ||
+       has_suffix(*a_it, ".CPP") ||
+       has_suffix(*a_it, ".c++") ||
+       has_suffix(*a_it, ".C"))
+    {
+      std::string suffix=has_suffix(*a_it, ".c")?".i":".ii";
+      std::string dest=get_temporary_file("goto-cc", suffix);
+      temporary_files.push_back(dest);
+      int exit_code=preprocess(*a_it, dest);
+      if(exit_code!=0) return true;
+      *a_it=dest;
+    }
   }
 
-  if(cmdline.isset("isystem"))
-  {
-    const std::list<std::string> &values=
-      cmdline.get_values("isystem");
+  // do all the rest
+  bool result=compiler.doit();
+  
+  return result;
+}
 
-    for(std::list<std::string>::const_iterator
-        it=values.begin();
-        it!=values.end();
-        it++)
-      config.ansi_c.preprocessor_options.push_back("-isystem "+*it);
+/*******************************************************************\
+
+Function: gcc_modet::preprocess
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: display command line help
+
+\*******************************************************************/
+
+int gcc_modet::preprocess(const std::string &src, const std::string &dest)
+{
+  // build new argv
+  std::vector<std::string> new_argv;
+  
+  new_argv.reserve(cmdline.parsed_argv.size());
+
+  bool skip_next=false;
+  
+  for(gcc_cmdlinet::parsed_argvt::const_iterator
+      it=cmdline.parsed_argv.begin();
+      it!=cmdline.parsed_argv.end();
+      it++)
+  {
+    if(skip_next)
+    {
+      // skip
+      skip_next=false;
+    }
+    else if(it->is_infile_name)
+    {
+      // skip
+    }
+    else if(it->arg=="-c" || it->arg=="-E" || it->arg=="-S")
+    {
+      // skip
+    }
+    else if(it->arg=="-o")
+    {
+      skip_next=true;
+    }
+    else if(has_prefix(it->arg, "-o"))
+    {
+      // ignore
+    }
+    else
+      new_argv.push_back(it->arg);
   }
 
-  // Parse input program, convert to goto program, write output
-  return compiler.doit();
+  // We just want to preprocess.
+  new_argv.push_back("-E");
+
+  // destination file
+  new_argv.push_back("-o");
+  new_argv.push_back(dest);
+  
+  // source file  
+  new_argv.push_back(src);
+  
+  // overwrite argv[0]
+  assert(new_argv.size()>=1);
+  new_argv[0]="gcc";
+  
+  #if 0
+  std::cout << "RUN:";
+  for(unsigned i=0; i<new_argv.size(); i++)
+    std::cout << " " << new_argv[i];
+  std::cout << std::endl;
+  #endif
+  
+  return run("gcc", new_argv);
 }
 
 /*******************************************************************\

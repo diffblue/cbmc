@@ -27,10 +27,13 @@ public:
   virtual void usage_error();
 
   explicit goto_cc_modet(goto_cc_cmdlinet &_cmdline);
+  ~goto_cc_modet();
   
-private:
+protected:
   void register_languages();
   goto_cc_cmdlinet &cmdline;
+  
+  std::list<std::string> temporary_files;
 };
 
 #endif /* GOTO_CC_MODE_H */

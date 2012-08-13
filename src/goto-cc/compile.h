@@ -44,7 +44,6 @@ public:
   
   bool add_input_file(const std::string &);
   bool find_library(const std::string &);
-  bool is_binary_file(const std::string &);
   bool is_elf_file(const std::string &);
 
   bool parse(const std::string &filename);

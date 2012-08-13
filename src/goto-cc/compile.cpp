@@ -31,6 +31,7 @@ Date: June 2006
 #include <goto-programs/goto_check.h>
 #include <goto-programs/goto_function_serialization.h>
 #include <goto-programs/read_bin_goto_object.h>
+#include <goto-programs/read_goto_binary.h>
 #include <goto-programs/write_goto_binary.h>
 
 #include <langapi/mode.h>
@@ -271,7 +272,7 @@ bool compilet::add_input_file(const std::string &file_name)
             t = tmp_dirs.back() + '/' + line;
             #endif
 
-            if(is_binary_file(t))
+            if(is_goto_binary(t))
               object_files.push_back(t);
             line = "";
           }
@@ -285,7 +286,7 @@ bool compilet::add_input_file(const std::string &file_name)
     }
     else if(ext=="so")
     {
-      if(is_binary_file(file_name))
+      if(is_goto_binary(file_name))
         object_files.push_back(file_name);
     }
     else if(ext==object_file_extension ||
@@ -342,7 +343,7 @@ bool compilet::find_library(const std::string &name)
       if(is_elf_file(libname))
           std::cout << "Warning: Cannot read ELF library " << libname << "."
                     << std::endl;
-      else if(is_binary_file(libname))
+      else if(is_goto_binary(libname))
         add_input_file(libname);
       else
         return false;
@@ -350,36 +351,6 @@ bool compilet::find_library(const std::string &name)
   }
   
   return true;
-}
-
-/*******************************************************************\
-
-Function: compilet::is_binary_file
-
-  Inputs: file name
-
- Outputs: true if the given file name exists and is a (goto-)binary file,
-          false otherwise
-
- Purpose: checking if we can load an object file
-
-\*******************************************************************/
-
-bool compilet::is_binary_file(const std::string &file_name)
-{
-  std::fstream in;
-  in.open(file_name.c_str(), std::ios::in);
-
-  if(in.is_open())
-  {
-    char buf[3];
-    for (unsigned i=0; i<3; i++)
-      buf[i] = in.get();
-    if(buf[0]=='G' && buf[1]=='B' && buf[2]=='F')
-      return true;
-  }
-  
-  return false;
 }
 
 /*******************************************************************\

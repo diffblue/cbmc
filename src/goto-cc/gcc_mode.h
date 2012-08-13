@@ -28,6 +28,8 @@ public:
   
 protected:
   gcc_cmdlinet &cmdline;
+  
+  int preprocess(const std::string &src, const std::string &dest);
 };
 
 #endif /* GOTO_CC_GCC_MODE_H */

@@ -24,8 +24,11 @@ public:
     mode=GCC;
   }
 
-protected:  
-  // for calling the preprocessor
+  // For calling the preprocessor.
+  // This lets you distinguish input file name arguments
+  // from others, but is otherwise identical to the
+  // original command line.
+  
   struct argt
   {
   public:
@@ -35,9 +38,11 @@ protected:
     std::string arg;
   };
   
-  std::list<argt> new_argv;
-  
-  void add_arg(const std::string &arg) { new_argv.push_back(argt(arg)); }
+  typedef std::list<argt> parsed_argvt;
+  parsed_argvt parsed_argv;
+
+protected:  
+  void add_arg(const std::string &arg) { parsed_argv.push_back(argt(arg)); }
 };
 
 #endif /* GOTO_CC_GCC_CMDLINE_H */
