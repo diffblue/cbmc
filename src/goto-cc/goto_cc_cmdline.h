@@ -16,9 +16,6 @@ Date:   April 2010
 class goto_cc_cmdlinet:public cmdlinet
 {
 public:
-  typedef enum { VISUAL_STUDIO, GCC, CODEWARRIOR, ARM } modet;
-  modet mode;
-
   virtual bool parse(int argc, const char **argv)=0;
   
   static bool in_list(const char *option, const char **list);
@@ -43,4 +40,4 @@ public:
   }
 };
 
-#endif /*CMDLINE_H_*/
+#endif /* GOTO_CC_CMDLINE_H */

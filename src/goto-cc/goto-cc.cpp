@@ -13,12 +13,12 @@ Date: May 2006
 
 #include <unicode.h>
 
-#include "cmdline_options.h"
 #include "get_base_name.h"
 #include "gcc_cmdline.h"
 #include "armcc_cmdline.h"
 #include "ms_cl_cmdline.h"
 #include "gcc_mode.h"
+#include "cw_mode.h"
 #include "ms_cl_mode.h"
 #include "armcc_mode.h"
 
@@ -89,10 +89,9 @@ int main(int argc, const char **argv)
     // this is the CodeWarrior personality,
     // but we use the gcc command line interface
     gcc_cmdlinet cmdline;
-    cmdline.mode=goto_cc_cmdlinet::CODEWARRIOR;
-    cmdline_optionst cmdline_options(cmdline);
-    cmdline_options.base_name=base_name;
-    return cmdline_options.main(argc, argv);
+    cw_modet cw_mode(cmdline);
+    cw_mode.base_name=base_name;
+    return cw_mode.main(argc, argv);
   }
   else if(base_name=="goto-armcc" ||
           base_name=="goto-armlink")

@@ -21,7 +21,6 @@ public:
 
   gcc_cmdlinet()
   {
-    mode=GCC;
   }
 
   // For calling the preprocessor.
