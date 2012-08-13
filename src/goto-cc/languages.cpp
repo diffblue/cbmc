@@ -22,7 +22,7 @@ Author: CM Wintersteiger
 
 /*******************************************************************\
 
-Function: cmdline_optionst::register_languages
+Function: goto_cc_modet::register_languages
 
   Inputs:
 
@@ -32,7 +32,7 @@ Function: cmdline_optionst::register_languages
 
 \*******************************************************************/
 
-void cmdline_optionst::register_languages()
+void goto_cc_modet::register_languages()
 {
   register_language(new_ansi_c_language);
 

@@ -1,4 +1,4 @@
-SRC = goto-cc.cpp \
+SRC = goto-cc.cpp goto_cc_mode.cpp \
       cmdline_options.cpp get_base_name.cpp \
       gcc_cmdline.cpp ms_cl_cmdline.cpp \
       compile.cpp armcc_cmdline.cpp \
