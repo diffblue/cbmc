@@ -10,20 +10,11 @@ Author: CM Wintersteiger, 2006
 #include <list>
 #include <algorithm>
 #include <cctype>
+#include <cstdlib>
 
 #include <message.h>
-#include <stdlib.h>
-#include <i2string.h>
 #include <prefix.h>
 #include <config.h>
-
-#ifdef _WIN32
-#define EX_OK 0
-#define EX_USAGE 64
-#define EX_SOFTWARE 70
-#else
-#include <sysexits.h>
-#endif
 
 #include "cmdline_options.h"
 #include "compile.h"
