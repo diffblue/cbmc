@@ -77,7 +77,7 @@ int main(int argc, const char **argv)
     ms_cl_cmdlinet cmdline;
     cmdline.parse_env();
     cmdline_optionst cmdline_options(cmdline);
-    cmdline_options.my_name=base_name;
+    cmdline_options.base_name=base_name;
     return cmdline_options.main(argc, argv);
   }
   else if(base_name=="goto-cw" ||
@@ -88,7 +88,7 @@ int main(int argc, const char **argv)
     gcc_cmdlinet cmdline;
     cmdline.mode=goto_cc_cmdlinet::CODEWARRIOR;
     cmdline_optionst cmdline_options(cmdline);
-    cmdline_options.my_name=base_name;
+    cmdline_options.base_name=base_name;
     return cmdline_options.main(argc, argv);
   }
   else if(base_name=="goto-armcc" ||
@@ -97,7 +97,7 @@ int main(int argc, const char **argv)
     // this is the armcc personality
     armcc_cmdlinet cmdline;
     cmdline_optionst cmdline_options(cmdline);
-    cmdline_options.my_name=base_name;
+    cmdline_options.base_name=base_name;
     return cmdline_options.main(argc, argv);
   }
   else
@@ -105,7 +105,7 @@ int main(int argc, const char **argv)
     // the default personality is GCC  
     gcc_cmdlinet cmdline;
     cmdline_optionst cmdline_options(cmdline);
-    cmdline_options.my_name=base_name;
+    cmdline_options.base_name=base_name;
     return cmdline_options.main(argc, argv);
   }
 }

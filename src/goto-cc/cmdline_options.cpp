@@ -15,6 +15,7 @@ Author: CM Wintersteiger, 2006
 #include <stdlib.h>
 #include <i2string.h>
 #include <prefix.h>
+#include <config.h>
 
 #ifdef _WIN32
 #define EX_OK 0
@@ -40,12 +41,10 @@ Function: cmdline_optionst::cmdline_optionst
 
 \*******************************************************************/
 
-cmdline_optionst::cmdline_optionst(
-  goto_cc_cmdlinet &_cmdline):
-  language_uit("goto-cc " GOTOCC_VERSION, _cmdline),
+cmdline_optionst::cmdline_optionst(goto_cc_cmdlinet &_cmdline):
+  goto_cc_modet(_cmdline),
   cmdline(_cmdline)
 {
-  register_languages();
 }
 
 /*******************************************************************\
@@ -74,10 +73,10 @@ bool cmdline_optionst::doit()
 
   compilet compiler(cmdline);
 
-  if(has_prefix(my_name, "ld") ||
-     has_prefix(my_name, "goto-ld") ||
-     has_prefix(my_name, "link") ||
-     has_prefix(my_name, "goto-link"))
+  if(has_prefix(base_name, "ld") ||
+     has_prefix(base_name, "goto-ld") ||
+     has_prefix(base_name, "link") ||
+     has_prefix(base_name, "goto-link"))
     compiler.act_as_ld=true;
 
   if(cmdline.mode==goto_cc_cmdlinet::GCC)
@@ -396,7 +395,7 @@ bool cmdline_optionst::doit()
 
 /*******************************************************************\
 
-Function: cmdline_optionst::help
+Function: cmdline_optionst::help_mode
 
   Inputs:
 
@@ -406,17 +405,8 @@ Function: cmdline_optionst::help
 
 \*******************************************************************/
 
-void cmdline_optionst::help()
+void cmdline_optionst::help_mode()
 {
-  std::cout <<
-  "\n"
-  "* *         goto-cc "
-  GOTOCC_VERSION
-  "  - Copyright (C) 2006-2011          * *\n"
-  "* *        Daniel Kroening, Christoph Wintersteiger         * *\n"
-  "* *                 kroening@kroening.com                   * *\n"
-  "\n";
-
   switch(cmdline.mode)
   {
   case goto_cc_cmdlinet::VISUAL_STUDIO:
@@ -438,116 +428,5 @@ void cmdline_optionst::help()
   default:
     assert(false);
   }
-
-  std::cout <<
-  "Usage:                       Purpose:\n"
-  "\n"
-  " --dot                       outputs a dot graph for every output file\n"
-  " --verbosity #               verbosity level\n"
-  " --xml                       use the old XML binary format\n"
-  " --show-symbol-table         outputs the symbol table after linking\n"
-  " --show-function-table       outputs the function table after linking\n"
-  "\nArchitecture options:\n" 
-  " --16, --32, --64            set width of machine word\n"
-  " --little-endian             allow little-endian word-byte conversions\n"
-  " --big-endian                allow big-endian word-byte conversions\n"
-  " --unsigned-char             make \"char\" unsigned by default\n"
-  " --ppc-macos                 set MACOS/PPC architecture\n"
-  #ifdef _WIN32
-  " --i386-macos                set MACOS/I386 architecture\n"
-  " --i386-linux                set Linux/I386 architecture\n"
-  " --i386-win32                set Windows/I386 architecture (default)\n"
-  #else
-  #ifdef __APPLE__
-  " --i386-macos                set MACOS/I386 architecture (default)\n"
-  " --i386-linux                set Linux/I386 architecture\n"
-  " --i386-win32                set Windows/I386 architecture\n"
-  #else
-  " --i386-macos                set MACOS/I386 architecture\n"
-  " --i386-linux                set Linux/I386 architecture (default)\n"
-  " --i386-win32                set Windows/I386 architecture\n"
-  #endif
-  #endif
-  " --no-arch                   don't set up an architecture\n"  
-  "\nLinker options:\n"
-  " --no-library                do not add definitions for library functions\n"
-  " --string-abstraction        abstract strings in library functions\n"
-  "\n";
 }
 
-/*******************************************************************\
-
-Function: cmdline_optionst::main
-
-  Inputs: none
-
- Outputs: true on error, false otherwise
-
- Purpose: starts the compiler
-
-\*******************************************************************/
-
-int cmdline_optionst::main(int argc, const char **argv)
-{
-  if(cmdline.parse(argc, argv))
-  {
-    usage_error();
-    return EX_USAGE;
-  }
-
-  if(cmdline.isset('?') || cmdline.isset('h') || cmdline.isset("help"))
-  {
-    help();
-    return EX_OK;
-  }
-
-  try
-  {
-    if(doit())
-      return EX_USAGE; // error
-    else
-      return EX_OK;
-  }
-
-  catch(const char *e)
-  {
-    error(e);
-    return EX_SOFTWARE;
-  }
-
-  catch(const std::string e)
-  {
-    error(e);
-    return EX_SOFTWARE;
-  }
-
-  catch(int e)
-  {
-    error("Exception: " + i2string(e));
-    return EX_SOFTWARE;
-  }
-  
-  catch(std::bad_alloc)
-  {
-    error("Out of memory");
-    return EX_SOFTWARE;
-  }
-}
-
-/*******************************************************************\
-
-Function: cmdline_optionst::usage_error
-
-  Inputs: none
-
- Outputs: none
-
- Purpose: prints a message informing the user about incorrect options
-
-\*******************************************************************/
-
-void cmdline_optionst::usage_error()
-{
-  std::cerr << "Usage error!\n\n";
-  help();
-}

@@ -87,7 +87,7 @@ protected:
   void do_dot_function_calls( std::ostream & );
   unsigned function_body_count( const goto_functionst &functions );
   
-  void add_compiler_specific_defines(configt &config) const;
+  void add_compiler_specific_defines(class configt &config) const;
 
   bool link_functions(
     contextt &dest_context,

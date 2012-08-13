@@ -8,29 +8,29 @@ Date: June 2006
 
 \*******************************************************************/
 
-#ifndef GOTO_CC_CMDLINE_OPTIONS_H
-#define GOTO_CC_CMDLINE_OPTIONS_H
+#ifndef GOTO_CC_MODE_H
+#define GOTO_CC_MODE_H
 
-#include <config.h>
 #include <langapi/language_ui.h>
 
 #include "goto_cc_cmdline.h"
 
-class cmdline_optionst:public language_uit
+class goto_cc_modet:public language_uit
 {
 public:
-  goto_cc_cmdlinet &cmdline;
-  std::string my_name;
+  std::string base_name;
 
   virtual int main(int argc, const char **argv);
-  virtual bool doit();
+  virtual bool doit()=0;
+  virtual void help_mode()=0;
   virtual void help();
   virtual void usage_error();
 
-  cmdline_optionst(goto_cc_cmdlinet &_cmdline);
+  explicit goto_cc_modet(goto_cc_cmdlinet &_cmdline);
   
 private:
   void register_languages();
+  goto_cc_cmdlinet &cmdline;
 };
 
-#endif /*CMDLINE_H_*/
+#endif /* GOTO_CC_MODE_H */
