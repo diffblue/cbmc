@@ -18,6 +18,7 @@ Date: May 2006
 #include "gcc_cmdline.h"
 #include "armcc_cmdline.h"
 #include "ms_cl_cmdline.h"
+#include "gcc_mode.h"
 
 /*******************************************************************\
  
@@ -104,8 +105,8 @@ int main(int argc, const char **argv)
   {
     // the default personality is GCC  
     gcc_cmdlinet cmdline;
-    cmdline_optionst cmdline_options(cmdline);
-    cmdline_options.base_name=base_name;
-    return cmdline_options.main(argc, argv);
+    gcc_modet gcc_mode(cmdline);
+    gcc_mode.base_name=base_name;
+    return gcc_mode.main(argc, argv);
   }
 }

@@ -7,14 +7,6 @@ Author: CM Wintersteiger, 2006
 \*******************************************************************/
 
 #include <iostream>
-#include <list>
-#include <algorithm>
-#include <cctype>
-
-#include <message.h>
-#include <stdlib.h>
-#include <i2string.h>
-#include <prefix.h>
 
 #ifdef _WIN32
 #define EX_OK 0
@@ -25,7 +17,6 @@ Author: CM Wintersteiger, 2006
 #endif
 
 #include "cmdline_options.h"
-#include "compile.h"
 #include "version.h"
 
 /*******************************************************************\
@@ -155,7 +146,7 @@ int goto_cc_modet::main(int argc, const char **argv)
 
   catch(int e)
   {
-    error("Exception: " + i2string(e));
+    error("Integer Exception");
     return EX_SOFTWARE;
   }
   
