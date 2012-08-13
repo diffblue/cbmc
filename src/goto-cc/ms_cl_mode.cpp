@@ -7,9 +7,6 @@ Author: CM Wintersteiger, 2006
 \*******************************************************************/
 
 #include <iostream>
-#include <list>
-#include <algorithm>
-#include <cctype>
 #include <cstdlib>
 
 #include <message.h>

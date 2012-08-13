@@ -7,6 +7,7 @@ Author: CM Wintersteiger, 2006
 \*******************************************************************/
 
 #include <iostream>
+#include <cstdlib>
 
 #include <message.h>
 #include <prefix.h>
