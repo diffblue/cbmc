@@ -188,27 +188,7 @@ Function: armcc_modet::help_mode
 
 void armcc_modet::help_mode()
 {
-  switch(cmdline.mode)
-  {
-  case goto_cc_cmdlinet::VISUAL_STUDIO:
-    std::cout << "goto-cl understands the options of CL plus the following.\n\n";
-    break;
-    
-  case goto_cc_cmdlinet::GCC:
-    std::cout << "goto-cc understands the options of gcc plus the following.\n\n";
-    break;
-    
-  case goto_cc_cmdlinet::CODEWARRIOR:
-    std::cout << "goto-cw understands the options of gcc (mwcc mode) plus the following.\n\n";
-    break;
-    
-  case goto_cc_cmdlinet::ARM:
-    std::cout << "goto-armcc understands the options of armcc plus the following.\n\n";
-    break;
-    
-  default:
-    assert(false);
-  }
+  std::cout << "goto-armcc understands the options of armcc plus the following.\n\n";
 }
 
 

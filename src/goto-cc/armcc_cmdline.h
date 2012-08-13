@@ -20,7 +20,6 @@ public:
 
   armcc_cmdlinet()
   {
-    mode=ARM;
   }
 };
 

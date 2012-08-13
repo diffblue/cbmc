@@ -111,10 +111,8 @@ bool gcc_modet::doit()
     config.ansi_c.mode=configt::ansi_ct::MODE_VISUAL_STUDIO;
     debug("Enabling Visual Studio syntax");
   }
-  else if(cmdline.mode==goto_cc_cmdlinet::GCC)
+  else
     config.ansi_c.mode=configt::ansi_ct::MODE_GCC;
-  else if(cmdline.mode==goto_cc_cmdlinet::CODEWARRIOR)
-    config.ansi_c.mode=configt::ansi_ct::MODE_CODEWARRIOR;
 
   compiler.object_file_extension="o";
 
