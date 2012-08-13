@@ -6,6 +6,7 @@ Author: CM Wintersteiger, 2006
 
 \*******************************************************************/
 
+#include <cstdlib>
 #include <iostream>
 
 #if 0
@@ -14,7 +15,6 @@ Author: CM Wintersteiger, 2006
 #include <cctype>
 
 #include <message.h>
-#include <stdlib.h>
 #include <i2string.h>
 
 #ifdef _WIN32
