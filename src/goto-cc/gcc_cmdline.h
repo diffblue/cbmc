@@ -25,18 +25,6 @@ public:
   }
 
 protected:  
-  void set(const std::string &opt, const std::string &value)
-  {
-    int nr=get_optnr(opt);
-    options[nr].isset=true;
-    options[nr].values.push_back(value);
-  }
-  
-  void set(const std::string &opt)
-  {
-    options[get_optnr(opt)].isset=true;
-  }
-
   // for calling the preprocessor
   struct argt
   {

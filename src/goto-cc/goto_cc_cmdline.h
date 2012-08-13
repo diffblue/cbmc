@@ -29,6 +29,18 @@ public:
     std::string &prefix);
 
   int get_optnr(const std::string &option);
+
+  void set(const std::string &opt, const std::string &value)
+  {
+    int nr=get_optnr(opt);
+    options[nr].isset=true;
+    options[nr].values.push_back(value);
+  }
+  
+  void set(const std::string &opt)
+  {
+    options[get_optnr(opt)].isset=true;
+  }
 };
 
 #endif /*CMDLINE_H_*/
