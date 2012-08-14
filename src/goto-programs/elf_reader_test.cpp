@@ -18,9 +18,9 @@ int main(int argc, char **argv)
     elf_readert elf_reader(in);
   
     // iterate over sections
-    for(unsigned i=0; i<elf_reader.section_header_table.size(); i++)
+    for(unsigned i=0; i<elf_reader.number_of_sections; i++)
     {
-      std::cout << "S" << i << ": " << elf_reader.section_name(i) << std::endl;
+      std::cout << "Section " << i << ": " << elf_reader.section_name(i) << std::endl;
     }  
   }
   
