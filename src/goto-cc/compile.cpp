@@ -185,7 +185,19 @@ bool compilet::add_input_file(const std::string &file_name)
   {
     std::string ext = file_name.substr(r+1, file_name.length());
 
-    if(ext=="a")
+    if(ext==".c" ||
+       ext==".cc" ||
+       ext==".cp" ||
+       ext==".cpp" ||
+       ext==".CPP" ||
+       ext==".c++" ||
+       ext==".C" ||
+       ext==".i" ||
+       ext==".ii")
+    {
+      source_files.push_back(file_name);
+    }
+    else if(ext=="a")
     {
       #ifdef _WIN32
       char td[MAX_PATH+1];
@@ -287,16 +299,12 @@ bool compilet::add_input_file(const std::string &file_name)
       if(chdir(working_directory.c_str())!=0)
         error("Could not change back to working directory.");
     }
-    else if(ext=="so")
-    {
-      if(is_goto_binary(file_name))
-        object_files.push_back(file_name);
-    }
-    else if(ext==object_file_extension ||
-            ext=="la" || ext=="lo") // Object file recognized
+    else if(is_goto_binary(file_name))
       object_files.push_back(file_name);
-    else // assume source file
-      source_files.push_back(file_name);
+    else
+    {
+      // unknown extension, not a goto binary, will ignore
+    }
   }
   else
   {
