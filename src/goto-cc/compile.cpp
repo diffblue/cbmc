@@ -309,7 +309,6 @@ bool compilet::add_input_file(const std::string &file_name)
   else
   {
     // don't care about no extensions
-    source_files.push_back(file_name);
   }
 
   return false;
