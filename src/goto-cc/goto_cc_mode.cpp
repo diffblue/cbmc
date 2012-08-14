@@ -53,13 +53,6 @@ Function: goto_cc_modet::~goto_cc_modet
 
 goto_cc_modet::~goto_cc_modet()
 {
-  for(std::list<std::string>::const_iterator
-      it=temporary_files.begin();
-      it!=temporary_files.end();
-      it++)
-  {
-    remove(it->c_str());
-  }
 }
 
 /*******************************************************************\
