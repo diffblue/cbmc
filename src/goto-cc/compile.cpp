@@ -233,6 +233,9 @@ bool compilet::add_input_file(const std::string &file_name)
       stream=popen(cmd.str().c_str(), "r");
       pclose(stream);
       
+      cmd.clear();
+      cmd.str("");
+      
       // add the files from "ar t"
       #ifdef _WIN32
       if(file_name[0]!='/' && file_name[1]!=':')
