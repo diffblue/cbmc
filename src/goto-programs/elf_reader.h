@@ -117,33 +117,35 @@ public:
 
   // string table
   std::streampos string_table_offset;
-  std::string get_string(std::streampos index);
+  std::string get_string(std::streampos index) const;
 
-  std::string elf32_section_name(unsigned index)
+  std::string elf32_section_name(unsigned index) const
   {
     return get_string(elf32_section_header_table[index].sh_name);
   }
 
-  std::string elf64_section_name(unsigned index)
+  std::string elf64_section_name(unsigned index) const
   {
     return get_string(elf64_section_header_table[index].sh_name);
   }
   
   unsigned number_of_sections;
 
-  std::string section_name(unsigned index)
+  std::string section_name(unsigned index) const
   {
     return 
       elf_class==ELF32?elf32_section_name(index):
                        elf64_section_name(index);
   }
   
-  std::streampos section_offset(unsigned index)
+  std::streampos section_offset(unsigned index) const
   {
     return
       elf_class==ELF32?elf32_section_header_table[index].sh_offset:
                        elf64_section_header_table[index].sh_offset;
   }
+  
+  bool has_section(const std::string &name) const;
 
 protected:
   std::istream &in;
