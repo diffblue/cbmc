@@ -132,7 +132,7 @@ Function: elf_readert::get_string
 
 \*******************************************************************/
 
-std::string elf_readert::get_string(std::streampos index)
+std::string elf_readert::get_string(std::streampos index) const
 {
   in.seekg(string_table_offset+index);
 
@@ -147,4 +147,24 @@ std::string elf_readert::get_string(std::streampos index)
   }
   
   return result;
+}
+
+/*******************************************************************\
+
+Function: elf_readert::has_section
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool elf_readert::has_section(const std::string &name) const
+{
+  for(unsigned i=0; i<number_of_sections; i++)
+    if(section_name(i)==name) return true;
+  
+  return false;
 }
