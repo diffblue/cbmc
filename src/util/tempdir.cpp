@@ -66,13 +66,47 @@ std::string get_temporary_directory(const std::string &name_template)
 
   #else
     char t[1000];
-    strncpy(t, name_template.c_str(), 1000);
+    strncpy(t, ("/tmp/"+name_template).c_str(), 1000);
     const char *td = mkdtemp(t);
     if(!td) throw "mkdtemp failed";
     result=td;
   #endif
     
   return result;
+}
+
+/*******************************************************************\
+
+Function: temp_dirt::temp_dirt
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+temp_dirt::temp_dirt(const std::string &name_template)
+{
+  path=get_temporary_directory(name_template);
+}
+
+/*******************************************************************\
+
+Function: temp_dirt::~temp_dirt
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+temp_dirt::~temp_dirt()
+{
+  delete_directory(path);
 }
 
 /*******************************************************************\
@@ -87,16 +121,16 @@ Function: temp_working_dirt::temp_working_dirt
 
 \*******************************************************************/
 
-temp_working_dirt::temp_working_dirt(const std::string &name_template)
+temp_working_dirt::temp_working_dirt(const std::string &name_template):
+  temp_dirt(name_template)
 {
   old_working_directory=get_current_working_directory();
-  path=get_temporary_directory(name_template);
   chdir(path.c_str());
 }
 
 /*******************************************************************\
 
-Function: get_temporary_directory
+Function: temp_working_dirt::~temp_working_dirt
 
   Inputs:
 
@@ -109,6 +143,5 @@ Function: get_temporary_directory
 temp_working_dirt::~temp_working_dirt()
 {
   chdir(old_working_directory.c_str());
-  delete_directory(path);
 }
 
