@@ -19,7 +19,7 @@ Author: CM Wintersteiger, 2006
 #endif
 #endif
 
-#include <tempfile.h>
+#include <tempdir.h>
 #include <config.h>
 #include <prefix.h>
 #include <suffix.h>
@@ -107,6 +107,18 @@ bool gcc_modet::doit()
 
   compiler.object_file_extension="o";
 
+  // gcc's default is 32 bits for wchar_t
+  if(cmdline.isset("short-wchar"))
+    config.ansi_c.wchar_t_width=16;
+
+  // gcc's default is 64 bits for double
+  if(cmdline.isset("short-double"))
+    config.ansi_c.double_width=32;
+    
+  // gcc's default is signed chars
+  if(cmdline.isset("funsigned-char"))
+    config.ansi_c.char_is_unsigned=true;
+
   if(cmdline.isset('E'))
     compiler.only_preprocess=true;
 
@@ -143,6 +155,8 @@ bool gcc_modet::doit()
     
   // Iterate over file arguments, and do any preprocessing needed
 
+  temp_dirt temp_dir("goto-cc-XXXXXX");
+
   for(cmdlinet::argst::iterator
       a_it=cmdline.args.begin();
       a_it!=cmdline.args.end();
@@ -156,9 +170,9 @@ bool gcc_modet::doit()
        has_suffix(*a_it, ".c++") ||
        has_suffix(*a_it, ".C"))
     {
-      std::string suffix=has_suffix(*a_it, ".c")?".i":".ii";
-      std::string dest=get_temporary_file("goto-cc", suffix);
-      temporary_files.push_back(dest);
+      std::string new_suffix=has_suffix(*a_it, ".c")?".i":".ii";
+      std::string new_name=get_base_name(*a_it)+new_suffix;
+      std::string dest=temp_dir(new_name);
       int exit_code=preprocess(*a_it, dest);
       if(exit_code!=0) return true;
       *a_it=dest;

@@ -32,8 +32,6 @@ public:
 protected:
   void register_languages();
   goto_cc_cmdlinet &cmdline;
-  
-  std::list<std::string> temporary_files;
 };
 
 #endif /* GOTO_CC_MODE_H */

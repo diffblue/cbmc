@@ -193,7 +193,7 @@ bool gcc_cmdlinet::parse(int argc, const char **argv)
   {
     std::string argv_i=argv[i];
 
-    // command file?
+    // options file?
     if(has_prefix(argv_i, "@"))
     {
       // TODO
