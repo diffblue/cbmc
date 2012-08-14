@@ -232,7 +232,7 @@ int gcc_modet::preprocess(const std::string &src, const std::string &dest)
     {
       // ignore
     }
-    else if(it->arg=="--function")
+    else if(it->arg=="--function" || it->arg=="--verbosity")
     {
       // ignore here
       skip_next=true;
