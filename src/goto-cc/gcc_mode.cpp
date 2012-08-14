@@ -232,6 +232,11 @@ int gcc_modet::preprocess(const std::string &src, const std::string &dest)
     {
       // ignore
     }
+    else if(it->arg=="--function")
+    {
+      // ignore here
+      skip_next=true;
+    }
     else
       new_argv.push_back(it->arg);
   }

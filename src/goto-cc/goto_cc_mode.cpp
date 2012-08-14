@@ -83,14 +83,11 @@ void goto_cc_modet::help()
   "\n"
   " --dot                       outputs a dot graph for every output file\n"
   " --verbosity #               verbosity level\n"
-  " --show-symbol-table         outputs the symbol table after linking\n"
-  " --show-function-table       outputs the function table after linking\n"
   "\n"
   "Architecture options:\n" 
   " --16, --32, --64            set width of machine word\n"
   " --little-endian             allow little-endian word-byte conversions\n"
   " --big-endian                allow big-endian word-byte conversions\n"
-  " --unsigned-char             make \"char\" unsigned by default\n"
   " --ppc-macos                 set MACOS/PPC architecture\n"
   #ifdef _WIN32
   " --i386-macos                set MACOS/I386 architecture\n"
@@ -108,10 +105,6 @@ void goto_cc_modet::help()
   #endif
   #endif
   " --no-arch                   don't set up an architecture\n"  
-  "\n"
-  "Linker options:\n"
-  " --no-library                do not add definitions for library functions\n"
-  " --string-abstraction        abstract strings in library functions\n"
   "\n";
 }
 

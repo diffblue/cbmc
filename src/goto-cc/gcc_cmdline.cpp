@@ -98,9 +98,7 @@ const char *gcc_options_without_argument[]=
   "--64", // NON-GCC
   "--little-endian", // NON-GCC
   "--big-endian", // NON-GCC
-  "--unsigned-char", // NON-GCC
   "--no-arch", // NON-GCC            
-  "--xml", // NON-GCC
   "--partial-inlining", // NON-GCC
   "-h", 
   "--help", // NON-GCC
