@@ -185,15 +185,15 @@ bool compilet::add_input_file(const std::string &file_name)
   {
     std::string ext = file_name.substr(r+1, file_name.length());
 
-    if(ext==".c" ||
-       ext==".cc" ||
-       ext==".cp" ||
-       ext==".cpp" ||
-       ext==".CPP" ||
-       ext==".c++" ||
-       ext==".C" ||
-       ext==".i" ||
-       ext==".ii")
+    if(ext=="c" ||
+       ext=="cc" ||
+       ext=="cp" ||
+       ext=="cpp" ||
+       ext=="CPP" ||
+       ext=="c++" ||
+       ext=="C" ||
+       ext=="i" ||
+       ext=="ii")
     {
       source_files.push_back(file_name);
     }
