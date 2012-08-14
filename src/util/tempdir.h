@@ -19,6 +19,8 @@ class temp_dirt
 {
 public:
   std::string path;
+
+  std::string operator()(const std::string &file);
   
   explicit temp_dirt(const std::string &name_template);
   ~temp_dirt();

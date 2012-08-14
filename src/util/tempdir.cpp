@@ -62,14 +62,14 @@ std::string get_temporary_directory(const std::string &name_template)
     if(_mkdir(t)!=0)
       throw "_mkdir failed";
 
-    result=t;
+    result=std::string(t);
 
   #else
     char t[1000];
     strncpy(t, ("/tmp/"+name_template).c_str(), 1000);
     const char *td = mkdtemp(t);
     if(!td) throw "mkdtemp failed";
-    result=td;
+    result=std::string(td);
   #endif
     
   return result;
@@ -90,6 +90,27 @@ Function: temp_dirt::temp_dirt
 temp_dirt::temp_dirt(const std::string &name_template)
 {
   path=get_temporary_directory(name_template);
+}
+
+/*******************************************************************\
+
+Function: temp_dirt::operator()
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+std::string temp_dirt::operator()(const std::string &file)
+{
+  #ifdef _WIN32
+  return path+"\\"+file;
+  #else
+  return path+"/"+file;
+  #endif
 }
 
 /*******************************************************************\
