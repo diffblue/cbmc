@@ -341,13 +341,13 @@ bool compilet::find_library(const std::string &name)
       add_input_file(tmp+name+".a");
     else
     {
-      std::string libname = tmp+name+".so";
+      std::string libname=tmp+name+".so";
 
-      if(is_elf_file(libname))
-          std::cout << "Warning: Cannot read ELF library " << libname << "."
-                    << std::endl;
-      else if(is_goto_binary(libname))
+      if(is_goto_binary(libname))
         add_input_file(libname);
+      else if(is_elf_file(libname))
+        std::cout << "Warning: Cannot read ELF library " << libname
+                  << std::endl;
       else
         return false;
     }
