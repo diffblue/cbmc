@@ -30,7 +30,6 @@ Date: June 2006
 #include <goto-programs/goto_inline.h>
 #include <goto-programs/goto_check.h>
 #include <goto-programs/goto_function_serialization.h>
-#include <goto-programs/read_bin_goto_object.h>
 #include <goto-programs/read_goto_binary.h>
 #include <goto-programs/write_goto_binary.h>
 
@@ -1192,28 +1191,13 @@ bool compilet::read_object(
   const std::string &file_name,
   goto_functionst &functions)
 {
-  std::ifstream infile;
+  print(8, "Reading: " + file_name);
 
-  #ifdef _MSC_VER
-  infile.open(widen(file_name).c_str(), std::ios::binary);
-  #else
-  infile.open(file_name.c_str(), std::ios::binary);
-  #endif
-
-  if(!infile)
-  {
-    error("failed to open input file", file_name);
-    return true;
-  }
-
-  print(8, "Parsing: " + file_name);
-
-  // we parse to a temporary context
+  // we read into a temporary context
   contextt temp_context;
   goto_functionst temp_functions;
 
-  if(read_bin_goto_object(infile, file_name, temp_context,
-                           temp_functions, *message_handler))
+  if(read_goto_binary(file_name, temp_context, temp_functions, *message_handler))
     return true;
   
   std::set<irep_idt> seen_modes;
