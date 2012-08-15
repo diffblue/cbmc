@@ -67,7 +67,7 @@ bool bmct::write_dimacs(std::ostream &out)
 
   dimacs_cnf.write_dimacs_cnf(out);
 
-  // we dump the propositionals
+  // we dump the mapping variable<->literals
   for(prop_convt::symbolst::const_iterator
       s_it=bv_cbmc.get_symbols().begin();
       s_it!=bv_cbmc.get_symbols().end();
@@ -79,6 +79,32 @@ bool bmct::write_dimacs(std::ostream &out)
     else
       out << "c " << s_it->second.dimacs() << " "
           << s_it->first << std::endl;
+  }
+
+  // dump mapping for selected bit-vectors
+  const boolbv_mapt &boolbv_map=bv_cbmc.get_map();
+
+  for(boolbv_mapt::mappingt::const_iterator
+      m_it=boolbv_map.mapping.begin();
+      m_it!=boolbv_map.mapping.end();
+      m_it++)
+  {
+    if(m_it->second.bvtype==IS_SIGNED ||
+       m_it->second.bvtype==IS_UNSIGNED)
+    {
+      const boolbv_mapt::literal_mapt &literal_map=m_it->second.literal_map;
+      out << "c " << m_it->first;
+
+      for(unsigned i=0; i<literal_map.size(); i++)
+        if(!literal_map[i].is_set)
+          out << " " << "?";
+        else if(literal_map[i].l.is_constant())
+          out << " " << (literal_map[i].l.is_true()?"TRUE":"FALSE");
+        else
+          out << " " << literal_map[i].l.dimacs();
+
+      out << std::endl;
+    }
   }
   
   return false;
