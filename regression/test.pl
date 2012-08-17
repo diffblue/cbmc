@@ -54,7 +54,7 @@ sub test($$$$$) {
   $options =~ s/$ign//g if(defined($ign));
 
   my $output = $input;
-  $output =~ s/\.(c|i|cpp|ipp|xml)$/.out/;
+  $output =~ s/\.(c|i|cpp|ii|xml)$/.out/;
 
   if($output eq $input) {
     print("Error in test file -- $test\n");
@@ -169,7 +169,7 @@ follows the format specified below. Any line starting with // will be ignored.
 
 where
   <level>                is one of CORE, THOROUGH, FUTURE or KNOWNBUG
-  <main source>          is a file with extension .c/.i/.cpp/.ipp/.xml
+  <main source>          is a file with extension .c/.i/.cpp/.ii/.xml
   <options>              additional options to be passed to CMD
   <required patterns>    one or more lines of regualar expressions that must occur in the output
   <disallowed patterns>  one or more lines of expressions that must not occur in output
