@@ -437,6 +437,7 @@ void goto_convertt::convert(
   {
     assert(code.operands().size()==2);
     exprt assertion=code.op0();
+    assertion.make_typecast(bool_typet());
     simplify(assertion, ns);
     if(assertion.is_false())
     {
