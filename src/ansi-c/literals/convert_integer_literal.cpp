@@ -46,11 +46,12 @@ exprt convert_integer_literal(const std::string &src)
       long_cnt++;
     else if(ch=='i' || ch=='I')
     {
-      // This can be "i128" in MS mode,
-      // and "10i" (imaginary) for GCC
-      if(config.ansi_c.mode==configt::ansi_ct::MODE_VISUAL_STUDIO)
+      // This can be "1i128" in MS mode,
+      // and "10i" (imaginary) for GCC.
+      // If it's followed by a number, we do MS mode.
+      if((i+1)<src.size() && isdigit(src[i+1]))
         width_suffix=atoi(src.c_str()+i+1);
-      else
+      else 
         is_imaginary=true;
     }
     else if(ch=='j' || ch=='J')
@@ -61,13 +62,14 @@ exprt convert_integer_literal(const std::string &src)
 
   if(src.size()>=2 && src[0]=='0' && tolower(src[1])=='x')
   {
+    // hex; strip "0x"
     base=16;
-    // strip "0x"
     std::string without_prefix(src, 2, std::string::npos);
     value=string2integer(without_prefix, 16);
   }
   else if(src.size()>=2 && src[0]=='0')
   {
+    // octal
     base=8;
     value=string2integer(src, 8);
   }
