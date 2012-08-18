@@ -742,7 +742,7 @@ declaration:
         ;
         
 static_assert_declaration:
-          TOK_STATIC_ASSERT '(' unary_expression ',' unary_expression ')'
+          TOK_STATIC_ASSERT '(' assignment_expression ',' assignment_expression ')'
         {
           mto($1, $3);
           mto($1, $5);
