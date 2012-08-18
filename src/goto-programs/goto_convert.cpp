@@ -449,6 +449,10 @@ void goto_convertt::convert(
     else if(assertion.is_true())
     {
     }
+    else
+    {
+      // we may wish to complain
+    }
   }
   else
     copy(code, OTHER, dest);
