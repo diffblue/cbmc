@@ -436,10 +436,15 @@ void goto_convertt::convert(
   else if(statement==ID_static_assert)
   {
     assert(code.operands().size()==2);
-    err_location(code.op0());
-    str << "static assertion "
-        << get_string_constant(code.op1());
-    throw 0;
+    exprt assertion=code.op0();
+    simplify(assertion, ns);
+    if(assertion.is_false())
+    {
+      err_location(code.op0());
+      str << "static assertion "
+          << get_string_constant(code.op1());
+      throw 0;
+    }
   }
   else
     copy(code, OTHER, dest);
