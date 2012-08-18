@@ -433,6 +433,14 @@ void goto_convertt::convert(
     convert_catch(code, dest);
   else if(statement==ID_asm)
     convert_asm(code, dest);
+  else if(statement==ID_static_assert)
+  {
+    assert(code.operands().size()==2);
+    err_location(code.op0());
+    str << "static assertion "
+        << get_string_constant(code.op1());
+    throw 0;
+  }
   else
     copy(code, OTHER, dest);
 
@@ -2338,6 +2346,9 @@ const irep_idt goto_convertt::get_string_constant(
       return result;
     }
   }
+
+  if(expr.id()==ID_string_constant)
+    return expr.get(ID_value);
 
   err_location(expr);
   str << "expected string constant, but got: "

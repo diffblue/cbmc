@@ -288,6 +288,12 @@ void ansi_c_convertt::convert_code(codet &code)
     if(code.operands().size()==1)
       convert_expr(code.op0());
   }
+  else if(statement==ID_static_assert)
+  {
+    assert(code.operands().size()==2);
+    convert_expr(code.op0());
+    convert_expr(code.op1());
+  }
   else if(statement==ID_decl)
   {
     assert(code.operands().size()==1 ||

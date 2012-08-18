@@ -110,6 +110,12 @@ void c_typecheck_baset::typecheck_code(codet &code)
     // fine as is, but should check that we
     // are in a 'try' block
   }
+  else if(statement==ID_static_assert)
+  {
+    assert(code.operands().size()==2);
+    typecheck_expr(code.op0());
+    typecheck_expr(code.op1());
+  }
   else
   {
     err_location(code);
