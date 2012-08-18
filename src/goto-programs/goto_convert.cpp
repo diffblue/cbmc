@@ -446,6 +446,9 @@ void goto_convertt::convert(
           << get_string_constant(code.op1());
       throw 0;
     }
+    else if(assertion.is_true())
+    {
+    }
   }
   else
     copy(code, OTHER, dest);
