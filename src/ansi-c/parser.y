@@ -738,16 +738,18 @@ declaration:
         }
         | declaring_list ';'
         | default_declaring_list ';'
-        | static_assert_declaration
+        | static_assert_declaration ';'
         ;
         
 static_assert_declaration:
-          TOK_STATIC_ASSERT '(' unary_expression ',' unary_expression ')' ';'
+          TOK_STATIC_ASSERT '(' unary_expression ',' unary_expression ')'
         {
-          init($$, ID_declaration);
-          stack($$).set(ID_is_static_assert, true);
-          stack($$).set(ID_value, stack($3));
-          stack($$).set(ID_comment, stack($5));
+          mto($1, $3);
+          mto($1, $5);
+          stack($1).id(ID_code);
+          stack($1).set(ID_statement, ID_static_assert);
+          init($$);
+          mto($$, $1);
         }
         ;
 
@@ -1304,7 +1306,7 @@ member_declaration:
         {
           init($$, ID_declaration_list);
         }
-        | static_assert_declaration
+        | static_assert_declaration ';'
         {
           init($$, ID_declaration_list);
           mto($$, $1);

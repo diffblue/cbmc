@@ -29,8 +29,11 @@ void ansi_c_typecheckt::typecheck()
   {
     if(it->id()==ID_declaration)
     {
+      ansi_c_declarationt &declaration=
+        to_ansi_c_declaration(*it);
+
       symbolt symbol;
-      to_ansi_c_declaration(*it).to_symbol(symbol);
+      declaration.to_symbol(symbol);
       typecheck_symbol(symbol);
     }
     else if(it->id()==ID_initializer)
