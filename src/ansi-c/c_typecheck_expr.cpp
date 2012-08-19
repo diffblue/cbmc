@@ -218,6 +218,58 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
     }
     expr.type()=op_type.subtype();
   }
+  else if(expr.id()==ID_generic_selection)
+  {
+    // This is C11.
+    // The operand is already typechecked. Depending
+    // on it's type, we return one of the generic associatios.
+    
+    if(expr.operands().size()!=1)
+    {
+      err_location(expr);
+      throw "_Generic expects one operand";
+    }
+
+    irept::subt &generic_associations=
+      expr.add(ID_generic_associations).get_sub();
+      
+    // first typecheck all types
+    Forall_irep(it, generic_associations)
+      if(it->get(ID_type_arg)!=ID_default)
+      {
+        typet &type=static_cast<typet &>(it->add(ID_type_arg));
+        typecheck_type(type);
+      }
+
+    // first try non-default match
+    exprt default_match=nil_exprt();
+    exprt assoc_match=nil_exprt();
+    
+    const typet &op_type=follow(expr.op0().type());
+    
+    forall_irep(it, generic_associations)
+    {
+      if(it->get(ID_type_arg)==ID_default)
+        default_match=static_cast<const exprt &>(it->find(ID_value));
+      else if(op_type==follow(static_cast<const typet &>(it->find(ID_type_arg))))
+        assoc_match=static_cast<const exprt &>(it->find(ID_value));
+    }
+    
+    if(assoc_match.is_nil())
+    {
+      if(default_match.is_not_nil())
+        expr.swap(default_match);
+      else
+      {
+        err_location(expr);
+        str << "unmatched generic selection: "
+            << to_string(expr.op0().type());
+        throw 0;
+      }
+    }
+    else
+      expr.swap(assoc_match);
+  }
   else
   {
     err_location(expr);

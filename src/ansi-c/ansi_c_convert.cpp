@@ -135,6 +135,19 @@ void ansi_c_convertt::convert_expr(exprt &expr)
   {
     convert_type(expr.type());
   }
+  else if(expr.id()==ID_generic_selection)
+  {
+    assert(expr.operands().size()==1);
+
+    irept::subt &generic_associations=
+      expr.add(ID_generic_associations).get_sub();
+
+    Forall_irep(it, generic_associations)
+    {
+      convert_expr(static_cast<exprt &>(it->add(ID_value)));
+      convert_type(static_cast<typet &>(it->add(ID_type_arg)));
+    }
+  }
   else if(expr.id()==ID_gcc_builtin_types_compatible_p)
   {
     typet &type=(typet &)expr;
