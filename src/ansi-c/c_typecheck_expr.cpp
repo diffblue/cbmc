@@ -269,6 +269,9 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
     }
     else
       expr.swap(assoc_match);
+
+    // still need to typecheck the result
+    typecheck_expr(expr);
   }
   else
   {
