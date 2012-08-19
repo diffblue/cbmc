@@ -291,6 +291,44 @@ primary_expression:
         | offsetof
         | alignof
         | quantifier_expression
+        | generic_selection
+        ;
+
+generic_selection:
+          TOK_GENERIC '(' assignment_expression ',' generic_assoc_list ')'
+        {
+          init($$, ID_generic_selection);
+          mto($$, $3);
+          stack($$).add(ID_generic_associations).get_sub().swap(stack($5).add(ID_operands).get_sub());
+        }
+        ;
+
+generic_assoc_list:
+          generic_association
+        {
+          init($$); mto($$, $1);
+        }
+        | generic_assoc_list ',' generic_association
+        {
+          $$=$1; mto($$, $3);
+        }
+        ;
+
+generic_association:
+          type_name ':' assignment_expression
+        {
+          $$=$2;
+          stack($$).id(ID_generic_association);
+          stack($$).set(ID_type_arg, stack($1));
+          stack($$).set(ID_value, stack($3));
+        }
+        | TOK_DEFAULT ':' assignment_expression
+        {
+          $$=$2;
+          stack($$).id(ID_generic_association);
+          stack($$).set(ID_type_arg, irept(ID_default));
+          stack($$).set(ID_value, stack($3));
+        }
         ;
 
 gcc_builtin_expressions:
