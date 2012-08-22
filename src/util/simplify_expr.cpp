@@ -3345,25 +3345,25 @@ bool simplify_exprt::simplify_index(index_exprt &expr)
   bool result=true;
 
   // extra arithmetic optimizations
-  const exprt &offset=expr.index();
+  const exprt &index=expr.index();
   const exprt &array=expr.array();
 
-  if(offset.id()==ID_div &&
-     offset.operands().size()==2)
+  if(index.id()==ID_div &&
+     index.operands().size()==2)
   {
-    if(offset.op0().id()==ID_mult &&
-       offset.op0().operands().size()==2 &&
-       offset.op0().op1()==offset.op1())
+    if(index.op0().id()==ID_mult &&
+       index.op0().operands().size()==2 &&
+       index.op0().op1()==index.op1())
     {
-      exprt tmp=offset.op0().op0();
+      exprt tmp=index.op0().op0();
       expr.op1()=tmp;
       result=false;
     }
-    else if(offset.op0().id()==ID_mult &&
-            offset.op0().operands().size()==2 &&
-            offset.op0().op0()==offset.op1())
+    else if(index.op0().id()==ID_mult &&
+            index.op0().operands().size()==2 &&
+            index.op0().op0()==index.op1())
     {
-      exprt tmp=offset.op0().op1();
+      exprt tmp=index.op0().op1();
       expr.op1()=tmp;
       result=false;
     }
@@ -3478,6 +3478,22 @@ bool simplify_exprt::simplify_index(index_exprt &expr)
       exprt tmp=array.op0();
       expr.swap(tmp);
       return false;
+    }
+  }
+  else if(array.id()=="array-list")
+  {
+    // These are index/value pairs, alternating.
+    for(unsigned i=0; i<array.operands().size()/2; i++)
+    {
+      exprt tmp_index=array.operands()[i*2];
+      tmp_index.make_typecast(index.type());
+      simplify(tmp_index);
+      if(tmp_index==index)
+      {
+        exprt tmp=array.operands()[i*2+1];
+        expr.swap(tmp);
+        return false;
+      }
     }
   }
 
