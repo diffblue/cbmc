@@ -1010,6 +1010,21 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
 
     return;
   }
+  else if(expr_type.id()==ID_vector)
+  {
+    // vectors are a GCC extension
+    if(op.id()==ID_initializer_list)
+    {
+      // just do a normal initialization    
+      do_initializer(op, expr_type, false);
+    
+      // just remove typecast
+      exprt tmp=op;
+      expr=tmp;
+
+      return;
+    }
+  }
   else
   {
     // We allow (TYPE){ expression } and
@@ -1047,19 +1062,6 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
     else if(op_type.id()==ID_signedbv ||
             op_type.id()==ID_unsignedbv)
       return;
-    else if(op.id()==ID_initializer_list)
-    {
-      // This is a GCC extension -- an initializer list
-      // can be converted into a vector, to form a vector
-      // constructor.
-
-      do_initializer(op, expr_type, false);
-      
-      // We remove the type cast
-      exprt tmp=op;
-      expr=tmp;
-      return;
-    }
   }
   
   if(!is_number(expr_type) &&
