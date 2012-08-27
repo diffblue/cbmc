@@ -38,6 +38,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(full-slice)(reachability-slice)" \
   "(show-symbol-table)(show-claims)(show-points-to)" \
   "(show-rw-set)" \
+  "(show-natural-loops)" \
   "(error-label):(string-abstraction)" \
   "(verbosity):(version)(xml-ui)"
 
