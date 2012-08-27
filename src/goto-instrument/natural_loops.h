@@ -11,7 +11,7 @@ Author: Georg Weissenbacher, georg@weissenbacher.name
 
 #include <set>
 
-#include <goto_program.h>
+#include <goto-programs/goto_program.h>
 
 #include "cfg_dominators.h"
 
