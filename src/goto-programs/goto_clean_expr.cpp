@@ -28,9 +28,10 @@ Function: goto_convertt::make_static_symbol
 
 \*******************************************************************/
 
-exprt goto_convertt::make_static_symbol(
+symbol_exprt goto_convertt::make_static_symbol(
   const exprt &expr,
-  const std::string &suffix)
+  const std::string &suffix,
+  goto_programt &dest)
 {
   const locationt location=expr.find_location();
   
@@ -47,9 +48,19 @@ exprt goto_convertt::make_static_symbol(
     new_symbol.file_local=true;
     new_symbol.value=expr;
     new_symbol.type=expr.type();
-  } while(context.move(new_symbol, symbol_ptr));    
+  }
+  while(context.move(new_symbol, symbol_ptr));    
 
-  return symbol_expr(*symbol_ptr);
+  // The value might depend on a variable, thus
+  // generate code for this.
+
+  symbol_exprt result=symbol_expr(*symbol_ptr);
+  
+  code_assignt code_assign(result, expr);
+  code_assign.location()=expr.find_location();
+  convert(code_assign, dest);
+
+  return result;
 }
 
 /*******************************************************************\
@@ -300,14 +311,15 @@ void goto_convertt::address_of_replace_objects(
   goto_programt &dest)
 {
   if(expr.id()==ID_struct)
-    expr=make_static_symbol(expr, "struct");
+    expr=make_static_symbol(expr, "struct", dest);
   else if(expr.id()==ID_union)
-    expr=make_static_symbol(expr, "union");
+    expr=make_static_symbol(expr, "union", dest);
   else if(expr.id()==ID_array)
-    expr=make_static_symbol(expr, "array");
+    expr=make_static_symbol(expr, "array", dest);
   else if(expr.id()==ID_string_constant)
   {
-    // leave for now, but long-term these might become static symbols
+    // Leave for now, but long-term these might become static symbols.
+    // LLVM appears to do precisely that.
   }
   else
     Forall_operands(it, expr)
