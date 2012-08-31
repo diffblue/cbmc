@@ -64,7 +64,7 @@ protected:
     const locationt &location);
   
   symbol_exprt make_static_symbol(
-    const exprt &dest,
+    const exprt &expr,
     const std::string &suffix,
     goto_programt &dest);
   
