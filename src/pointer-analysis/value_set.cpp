@@ -575,13 +575,22 @@ void value_sett::get_value_set_rec(
                 
         get_value_set_rec(expr.op0(), tmp, suffix, original_type, ns);
 
-        // if not, throw in integer
-        if(tmp.read().size()!=0)
+        if(tmp.read().size()==0)
         {
-          dest.write().insert(tmp.read().begin(), tmp.read().end());
+          // if not, throw in integer
+          insert(dest, exprt(ID_integer_address, uchar_type()));        
+        }
+        else if(tmp.read().size()==1 &&
+                object_numbering[tmp.read().begin()->first].id()==ID_unknown)
+        {
+          // if not, throw in integer
+          insert(dest, exprt(ID_integer_address, uchar_type()));        
         }
         else
-          insert(dest, exprt(ID_integer_address, uchar_type()));        
+        {
+          // use as is
+          dest.write().insert(tmp.read().begin(), tmp.read().end());
+        }
       }
     }
     else
