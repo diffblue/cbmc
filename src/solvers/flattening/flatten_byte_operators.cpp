@@ -137,8 +137,11 @@ exprt flatten_byte_extract(
     const typet &offset_type=ns.follow(offset.type());
 
     mult_exprt times_eight(offset, from_integer(8, offset_type));
-        
-    lshr_exprt left_shift(src.op0(), times_eight);
+
+    // cast to generic bit-vector
+    unsigned op0_width=integer2long(pointer_offset_size(ns, src.op0().type()))*8;
+    typecast_exprt src_op0_tc(src.op0(), bv_typet(op0_width));
+    lshr_exprt left_shift(src_op0_tc, times_eight);
 
     extractbits_exprt extractbits;
     
