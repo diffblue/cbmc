@@ -37,7 +37,7 @@ public:
     unsigned long_double_width;
     unsigned wchar_t_width;
     
-    bool char_is_unsigned;
+    bool char_is_unsigned, wchar_t_is_unsigned;
     bool use_fixed_for_float;
     
     ieee_floatt::rounding_modet rounding_mode;
