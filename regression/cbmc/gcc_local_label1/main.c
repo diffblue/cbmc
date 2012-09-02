@@ -20,7 +20,7 @@ void other_f()
   }
   #else
   // I don't know a Visual Studio equivalent
-  assert(1);
+  assert(0);
   #endif
 }
 
