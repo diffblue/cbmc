@@ -48,7 +48,7 @@ exprt convert_character_literal(
       throw "empty wide character literal";
     else if(value.size()==1)
     {
-      typet type=force_integer_type?int_type():wchar_t_type();
+      typet type=wchar_t_type();
       result=from_integer(value[0], type);
     }
     else if(value.size()>=2 && value.size()<=4)
