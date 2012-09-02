@@ -25,6 +25,7 @@ STATIC_ASSERT(sizeof(L'x')==2);
 #else
 STATIC_ASSERT(sizeof(L'x')==sizeof(int));
 STATIC_ASSERT(L'\xabcdabcd'==0xabcdabcd);
+STATIC_ASSERT(L'\xfbcdabcd'==0xfbcdabcd);
 #endif
 
 int main()
