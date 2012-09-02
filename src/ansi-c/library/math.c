@@ -102,11 +102,28 @@ inline int __fpclassifyd(double d) {
 #endif
 
 inline int __fpclassifyf(float f) {
-  if(__CPROVER_isnan(f)) return FP_NAN;
-  if(__CPROVER_isinf(f)) return FP_INFINITE;
-  if(f==0) return FP_ZERO;
-  if(__CPROVER_isnormal(f)) return FP_NORMAL;
-  return FP_SUBNORMAL;
+  __CPROVER_HIDE:
+  return __CPROVER_isnan(f)?FP_NAN:
+         __CPROVER_isinf(f)?FP_INFINITE:
+         f==0?FP_ZERO:
+         __CPROVER_isnormal(f)?FP_NORMAL:
+         FP_SUBNORMAL;
+}
+
+/* FUNCTION: __fpclassifyl */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+inline int __fpclassifyl(long double f) {
+  __CPROVER_HIDE:
+  return __CPROVER_isnan(f)?FP_NAN:
+         __CPROVER_isinf(f)?FP_INFINITE:
+         f==0?FP_ZERO:
+         __CPROVER_isnormal(f)?FP_NORMAL:
+         FP_SUBNORMAL;
 }
 
 /* FUNCTION: __fpclassify */
@@ -116,10 +133,11 @@ inline int __fpclassifyf(float f) {
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
-inline int __fpclassify(long double d) {
-  if(__CPROVER_isnan(d)) return FP_NAN;
-  if(__CPROVER_isinf(d)) return FP_INFINITE;
-  if(d==0) return FP_ZERO;
-  if(__CPROVER_isnormal(d)) return FP_NORMAL;
-  return FP_SUBNORMAL;
+inline int __fpclassify(double d) {
+  __CPROVER_HIDE:
+  return __CPROVER_isnan(d)?FP_NAN:
+         __CPROVER_isinf(d)?FP_INFINITE:
+         d==0?FP_ZERO:
+         __CPROVER_isnormal(d)?FP_NORMAL:
+         FP_SUBNORMAL;
 }
