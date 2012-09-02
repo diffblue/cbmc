@@ -24,6 +24,7 @@ STATIC_ASSERT(sizeof('x')==sizeof(int)); // int in C, char in C++
 STATIC_ASSERT(sizeof(L'x')==2);
 #else
 STATIC_ASSERT(sizeof(L'x')==sizeof(int));
+STATIC_ASSERT(L'\xabcdabcd'==0xabcdabcd);
 #endif
 
 int main()
