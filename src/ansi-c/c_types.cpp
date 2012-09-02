@@ -270,7 +270,13 @@ Function: wchar_t_type
 
 typet wchar_t_type()
 {
-  typet result=signedbv_typet(config.ansi_c.wchar_t_width);
+  typet result;
+  
+  if(config.ansi_c.wchar_t_is_unsigned)
+    result=unsignedbv_typet(config.ansi_c.wchar_t_width);
+  else
+    result=signedbv_typet(config.ansi_c.wchar_t_width);
+
   result.set(ID_C_c_type, ID_wchar_t);
   return result;
 }
