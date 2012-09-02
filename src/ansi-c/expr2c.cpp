@@ -172,6 +172,46 @@ std::string expr2ct::convert_rec(
     // these take more or less arbitrary subtypes
     return q+"_Complex "+convert(src.subtype());
   }
+  else if(src.id()==ID_floatbv)
+  {
+    // annotated?
+    
+    irep_idt c_type=src.get(ID_C_c_type);
+
+    if(c_type==ID_double)
+      return "double";
+    else if(c_type==ID_long_double)
+      return "long double";
+    else if(c_type==ID_float)
+      return "float";
+
+    mp_integer width=string2integer(src.get_string(ID_width));
+
+    if(width==config.ansi_c.single_width)
+      return q+"float";
+    else if(width==config.ansi_c.double_width)
+      return q+"double";
+  }
+  else if(src.id()==ID_fixedbv)
+  {
+    // annotated?
+    
+    irep_idt c_type=src.get(ID_C_c_type);
+
+    if(c_type==ID_double)
+      return "double";
+    else if(c_type==ID_long_double)
+      return "long double";
+    else if(c_type==ID_float)
+      return "float";
+
+    mp_integer width=string2integer(src.get_string(ID_width));
+
+    if(width==config.ansi_c.single_width)
+      return q+"float";
+    else if(width==config.ansi_c.double_width)
+      return q+"double";
+  }
   else if(src.id()==ID_signedbv ||
           src.id()==ID_unsignedbv)
   {
@@ -247,16 +287,6 @@ std::string expr2ct::convert_rec(
     {
       return q+sign_str+"__CPROVER_bitvector["+integer2string(width)+"]";
     }
-  }
-  else if(src.id()==ID_floatbv ||
-          src.id()==ID_fixedbv)
-  {
-    mp_integer width=string2integer(src.get_string(ID_width));
-
-    if(width==config.ansi_c.single_width)
-      return q+"float";
-    else if(width==config.ansi_c.double_width)
-      return q+"double";
   }
   else if(src.id()==ID_struct ||
           src.id()==ID_incomplete_struct)
