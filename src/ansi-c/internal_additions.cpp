@@ -195,6 +195,7 @@ void ansi_c_architecture_strings(std::string &code)
   code+=architecture_string(config.ansi_c.long_long_int_width, "long_long_int_width");
   code+=architecture_string(config.ansi_c.pointer_width, "pointer_width");
   code+=architecture_string(config.ansi_c.char_is_unsigned, "char_is_unsigned");
+  code+=architecture_string(config.ansi_c.wchar_t_is_unsigned, "wchar_t_is_unsigned");
   code+=architecture_string(config.ansi_c.int_width, "word_size"); // old 
   code+=architecture_string(config.ansi_c.use_fixed_for_float, "fixed_for_float");
   code+=architecture_string(config.ansi_c.alignment, "alignment");

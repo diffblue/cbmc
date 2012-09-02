@@ -95,6 +95,7 @@ void configt::ansi_ct::set_LP64()
   double_width=8*8;
   long_double_width=16*8;
   char_is_unsigned=false;
+  wchar_t_is_unsigned=false;
   wchar_t_width=4*8;
   alignment=1;
   memory_operand_size=int_width/8;
@@ -129,6 +130,7 @@ void configt::ansi_ct::set_ILP64()
   double_width=8*8;
   long_double_width=8*8;
   char_is_unsigned=false;
+  wchar_t_is_unsigned=false;
   wchar_t_width=4*8;
   alignment=1;
   memory_operand_size=int_width/8;
@@ -159,6 +161,7 @@ void configt::ansi_ct::set_LLP64()
   double_width=8*8;
   long_double_width=8*8;
   char_is_unsigned=false;
+  wchar_t_is_unsigned=false;
   wchar_t_width=4*8;
   alignment=1;
   memory_operand_size=int_width/8;
@@ -189,6 +192,7 @@ void configt::ansi_ct::set_ILP32()
   double_width=8*8;
   long_double_width=12*8; // really 96 bits on GCC
   char_is_unsigned=false;
+  wchar_t_is_unsigned=false;
   wchar_t_width=4*8;
   alignment=1;
   memory_operand_size=int_width/8;
@@ -219,6 +223,7 @@ void configt::ansi_ct::set_LP32()
   double_width=8*8;
   long_double_width=8*8;
   char_is_unsigned=false;
+  wchar_t_is_unsigned=false;
   wchar_t_width=4*8;
   alignment=1;
   memory_operand_size=int_width/8;
@@ -324,9 +329,10 @@ bool configt::set(const cmdlinet &cmdline)
     ansi_c.lib=configt::ansi_ct::LIB_FULL;
     ansi_c.set_32();
     
-    // On Windows, wchar_t is 16 bit, and
+    // On Windows, wchar_t is unsigned 16 bit, and
     // long double is the same as double.
     ansi_c.wchar_t_width=2*8;
+    ansi_c.wchar_t_is_unsigned=true;
     ansi_c.long_double_width=8*8;
   }
 
@@ -340,9 +346,10 @@ bool configt::set(const cmdlinet &cmdline)
     // note that sizeof(void *)==8, but sizeof(long)==4!
     ansi_c.set_LLP64();
 
-    // On Windows, wchar_t is 16 bit, and
+    // On Windows, wchar_t is unsigned 16 bit, and
     // long double is the same as double.
     ansi_c.wchar_t_width=2*8;
+    ansi_c.wchar_t_is_unsigned=true;
     ansi_c.long_double_width=8*8;
   }
 
@@ -381,6 +388,7 @@ bool configt::set(const cmdlinet &cmdline)
     #ifdef _WIN32
     ansi_c.os=configt::ansi_ct::OS_WIN;
     ansi_c.wchar_t_width=2*8;
+    ansi_c.wchar_t_is_unsigned=true;
     ansi_c.long_double_width=8*8;
     #elif __APPLE__
     ansi_c.os=configt::ansi_ct::OS_MACOS;
