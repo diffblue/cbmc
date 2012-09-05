@@ -1191,10 +1191,10 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
                                            .get_sub()
                                            .front()
                                            .find(ID_type));
-      this_type.set("#reference", true);
+      this_type.set(ID_C_reference, true);
 
       exprt this_expr(expr);
-      this_type.set("#this", true);
+      this_type.set(ID_C_this, true);
 
       unsigned tmp_rank = 0;
       exprt tmp_expr;
@@ -1277,7 +1277,7 @@ bool cpp_typecheckt::reference_related(
                             to_struct_type(to));
 
   if(from.id()==ID_struct &&
-     type.get_bool("#this") &&
+     type.get_bool(ID_C_this) &&
      type.subtype().id()==ID_empty)
   {
     // virtual-call case
@@ -1385,7 +1385,7 @@ bool cpp_typecheckt::reference_binding(
 
   unsigned backup_rank = rank;
 
-  if(type.get_bool("#this") &&
+  if(type.get_bool(ID_C_this) &&
      !expr.get_bool(ID_C_lvalue))
   {
     // `this' has to be an lvalue
@@ -1462,11 +1462,11 @@ bool cpp_typecheckt::reference_binding(
 
       typet this_type =
         component_type.arguments().front().type();
-      this_type.set("#reference", true);
+      this_type.set(ID_C_reference, true);
 
       exprt this_expr(expr);
 
-      this_type.set("#this", true);
+      this_type.set(ID_C_this, true);
 
       unsigned tmp_rank = 0;
 
@@ -1520,11 +1520,11 @@ bool cpp_typecheckt::reference_binding(
   }
 
   // No temporary allowed for `this'
-  if(type.get_bool("#this"))
+  if(type.get_bool(ID_C_this))
     return false;
 
   if(!type.subtype().get_bool(ID_C_constant) ||
-     type.subtype().get_bool("#volatile"))
+     type.subtype().get_bool(ID_C_volatile))
     return false;
 
   // TODO: hanlde the case for implicit parameters
@@ -2144,7 +2144,7 @@ bool cpp_typecheckt::static_typecast(
 
   add_implicit_dereference(e);
 
-  if(type.get_bool("#reference"))
+  if(type.get_bool(ID_C_reference))
   {
     unsigned rank=0;
     if(reference_binding(e,type,new_expr,rank))
