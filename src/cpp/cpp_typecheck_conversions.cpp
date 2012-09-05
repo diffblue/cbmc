@@ -1244,8 +1244,8 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
 
 Function: reference_related
 
-  Inputs: A typechecked expression 'expr', a
-          reference 'type'.
+  Inputs: A typechecked expression 'expr',
+          a reference 'type'.
 
   Outputs: True iff an the reference 'type' is reference-related
            to 'expr'.
@@ -1496,8 +1496,8 @@ bool cpp_typecheckt::reference_binding(
         exprt returned_value = func_expr;
         add_implicit_dereference(returned_value);
 
-        if(returned_value.get_bool(ID_C_lvalue)
-           && reference_compatible(returned_value,type, rank))
+        if(returned_value.get_bool(ID_C_lvalue) &&
+           reference_compatible(returned_value,type, rank))
         {
           // returned values are lvalues in case of references only
           assert(returned_value.id()==ID_dereference &&
