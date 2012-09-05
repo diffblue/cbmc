@@ -429,6 +429,7 @@ always
 initial
 mode
 this
+C_this #this
 reduction_and
 reduction_or
 reduction_nand
