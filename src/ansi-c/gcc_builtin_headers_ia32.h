@@ -94,8 +94,16 @@ int __builtin_ia32_pextrw (__gcc_v4hi, int);
 __gcc_v4hi __builtin_ia32_pinsrw (__gcc_v4hi, int, int);
 int __builtin_ia32_pmovmskb (__gcc_v8qi);
 void __builtin_ia32_maskmovq (__gcc_v8qi, __gcc_v8qi, char *);
-//void __builtin_ia32_movntq (__gcc_v1di *, __gcc_v1di);
-void __builtin_ia32_movntq (__gcc_di *, __gcc_di);
+
+// clang uses the following:
+// void __builtin_ia32_movntq (__gcc_v1di *, __gcc_v1di);
+//
+// GCC uses this:
+// void __builtin_ia32_movntq (__gcc_di *, __gcc_di);
+//
+// So, we use:
+void __builtin_ia32_movntq (void *, ...);
+
 void __builtin_ia32_sfence (void);
 int __builtin_ia32_comieq (__gcc_v4sf, __gcc_v4sf);
 int __builtin_ia32_comineq (__gcc_v4sf, __gcc_v4sf);
@@ -171,10 +179,29 @@ __gcc_v4sf __builtin_ia32_loadups (float *);
 void __builtin_ia32_storeups (float *, __gcc_v4sf);
 __gcc_v4sf __builtin_ia32_loadsss (float *);
 void __builtin_ia32_storess (float *, __gcc_v4sf);
-__gcc_v4sf __builtin_ia32_loadhps (__gcc_v4sf, const __gcc_v2sf *);
-__gcc_v4sf __builtin_ia32_loadlps (__gcc_v4sf, const __gcc_v2sf *);
-void __builtin_ia32_storehps (__gcc_v2sf *, __gcc_v4sf);
-void __builtin_ia32_storelps (__gcc_v2sf *, __gcc_v4sf);
+
+// clang uses these:
+// __gcc_v4sf __builtin_ia32_loadhps (__gcc_v4sf, const __gcc_v2si *);
+// __gcc_v4sf __builtin_ia32_loadlps (__gcc_v4sf, const __gcc_v2si *);
+// void __builtin_ia32_storehps (__gcc_v2si *, __gcc_v4sf);
+// void __builtin_ia32_storelps (__gcc_v2si *, __gcc_v4sf);
+//
+// but GCC uses:
+// __gcc_v4sf __builtin_ia32_loadhps (__gcc_v4sf, const __gcc_v2sf *);
+// __gcc_v4sf __builtin_ia32_loadlps (__gcc_v4sf, const __gcc_v2sf *);
+// void __builtin_ia32_storehps (__gcc_v2sf *, __gcc_v4sf);
+// void __builtin_ia32_storelps (__gcc_v2sf *, __gcc_v4sf);
+//
+// So we use:
+__gcc_v4sf __builtin_ia32_loadhps (__gcc_v4sf, const void *);
+__gcc_v4sf __builtin_ia32_loadlps (__gcc_v4sf, const void *);
+void __builtin_ia32_storehps (void *, __gcc_v4sf);
+void __builtin_ia32_storelps (void *, __gcc_v4sf);
+
+__gcc_v4si __builtin_ia32_loadlv4si (const __gcc_v2si *);
+void __builtin_ia32_storelv4si (__gcc_v2si *, __gcc_v4si);
+__gcc_v4si __builtin_ia32_movqv4si (__gcc_v4si);
+
 int __builtin_ia32_comisdeq (__gcc_v2df, __gcc_v2df);
 int __builtin_ia32_comisdlt (__gcc_v2df, __gcc_v2df);
 int __builtin_ia32_comisdle (__gcc_v2df, __gcc_v2df);
