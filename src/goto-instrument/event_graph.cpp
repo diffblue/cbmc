@@ -43,7 +43,8 @@ bool abstract_eventt::unsafe_pair_lwfence_param(const abstract_eventt& next,
 {
   /* pairs with fences are not properly pairs */
   if(operation==Fence || next.operation==Fence
-    || operation==Lwfence || next.operation==Lwfence)
+    || operation==Lwfence || next.operation==Lwfence
+    || operation==ASMfence || next.operation==ASMfence)
     return false;
 
   /* pairs of shared variables */
@@ -55,7 +56,7 @@ bool abstract_eventt::unsafe_pair_lwfence_param(const abstract_eventt& next,
   else if(model==PSO)
     return (thread==next.thread && operation==Write
       /* lwsyncWW -> mfenceWW */
-      && !(operation==Write  && next.operation==Write && lwsync_met));
+      && !(operation==Write && next.operation==Write && lwsync_met));
   else if(model==RMO)
     return (thread==next.thread
       /* lwsyncWW -> mfenceWW */
@@ -85,6 +86,59 @@ bool abstract_eventt::unsafe_pair_lwfence_param(const abstract_eventt& next,
     /* unknown memory model */
     return true;
 }
+
+/*******************************************************************\
+
+Function: abstract_eventt::unsafe_pair_asm
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool abstract_eventt::unsafe_pair_asm(const abstract_eventt& next,
+  weak_memory_modelt model,
+  unsigned char met) const
+{
+  /* pairs with fences are not properly pairs */
+  if(operation==Fence || next.operation==Fence
+    || operation==Lwfence || next.operation==Lwfence
+    || operation==ASMfence || next.operation==ASMfence)
+    return false;
+
+  /* pairs of shared variables */
+  if(local || next.local)
+    return false;
+
+  if(model==TSO)
+    return (thread==next.thread && operation==Write && next.operation==Read 
+      && (met&1)==0);
+  else if(model==PSO)
+    return (thread==next.thread && operation==Write
+      && (met&3)==0);
+  else if(model==RMO)
+    return (thread==next.thread
+      && (met&15)==0
+      /* if posWW, wsi maintained by the processor */
+      && !(variable==next.variable && operation==Write && next.operation==Write)
+      /* if posRW, fri maintained by the processor */
+      && !(variable==next.variable && operation==Read && next.operation==Write));
+  else if(model==Power)
+    return ((thread==next.thread
+      && (met&15)==0
+      /* if posWW, wsi maintained by the processor */
+      && (variable!=next.variable || operation!=Write || next.operation!=Write))
+      /* rfe */
+      || (thread!=next.thread && operation==Write && next.operation==Read
+        && variable==next.variable));
+  else
+    /* unknown memory model */
+    return true;
+}
+
 
 /*******************************************************************\
 
@@ -396,6 +450,332 @@ bool event_grapht::critical_cyclet::is_unsafe(weak_memory_modelt model, bool fas
 
 /*******************************************************************\
 
+Function: event_grapht::critical_cyclet::is_unsafe
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool event_grapht::critical_cyclet::is_unsafe_asm(weak_memory_modelt model, 
+  bool fast)
+{
+  DEBUG_MESSAGE("cycle is safe?");
+  bool unsafe_met = false;
+  unsigned char fences_met = 0;
+
+  /* critical cycles contain at least 4 events */
+  if(size()<4)
+    return false;
+
+  /* selects the first element of the pair */
+  for(const_iterator it=begin(); it!=end() && ++it!=end(); it++)
+  {
+    --it;
+    fences_met = 0;
+
+    /* fence -- this pair is safe */
+    if(egraph[*it].operation==abstract_eventt::ASMfence)
+      continue;
+
+    if(egraph[*(++it)].operation==abstract_eventt::ASMfence)
+    {
+      --it;
+      continue;
+    }
+
+    --it;
+
+    /* selects the next event which is not a weak fence */
+    const_iterator s_it = ++it;
+    --it;
+
+    for(; 
+      s_it!=end() && egraph[*s_it].operation==abstract_eventt::ASMfence; 
+      s_it++)
+      fences_met |= egraph[*s_it].fence_value();
+
+    if(s_it==end())
+      continue;
+
+    if(egraph[*s_it].operation==abstract_eventt::ASMfence)
+      continue;
+
+    /* if the whole cycle has been explored */
+    if(it==s_it)
+      continue;
+
+    const abstract_eventt& first = egraph[*it];
+    const abstract_eventt& second = egraph[*s_it];
+
+    const data_dpt& data_dp = egraph.map_data_dp[first.thread];
+
+    /* if data dp between linking the pair, safe */
+    if(first.thread==second.thread && data_dp.dp(first,second))
+      continue;
+
+    /* AC and BC conditions */
+    if(first.thread!=second.thread && model==Power)
+    {
+      bool AC = false;
+      bool BC = false;
+
+      /* no fence after the second element? (AC) */
+      const_iterator AC_it = ++s_it;
+      --s_it;
+      for(;
+        AC_it!=end() && egraph[*AC_it].thread==second.thread;
+        AC_it++)
+        if(egraph[*AC_it].operation==abstract_eventt::ASMfence
+          && egraph[*AC_it].is_cumul() 
+          && egraph[*AC_it].is_corresponding_fence(egraph[*it],egraph[*s_it]))
+        {
+          AC = true;
+          break;
+        }
+
+      if(AC)
+        continue;
+
+      if(AC_it==end() && egraph[front()].thread==second.thread)
+        for(AC_it=begin();
+          !(egraph[*AC_it]==first) && egraph[*AC_it].thread==second.thread;
+          AC_it++)
+          if(egraph[*AC_it].operation==abstract_eventt::ASMfence
+            && egraph[*AC_it].is_cumul()
+            && egraph[*AC_it].is_corresponding_fence(egraph[*it],egraph[*s_it]))
+          {
+            AC = true;
+            break;
+          }
+
+      if(AC)
+        continue;
+
+      /* no fence before the first element? (BC) */
+      const_iterator BC_it;
+      if(it==begin())
+      {
+        BC_it = end();
+        BC_it--;
+      }
+      else
+      {
+        BC_it = --it;
+        ++it;
+      }
+      for(;
+        BC_it!=begin() && egraph[*BC_it].thread==first.thread;
+        BC_it--)
+        if(egraph[*BC_it].operation==abstract_eventt::ASMfence
+          && egraph[*BC_it].is_cumul()
+          && egraph[*BC_it].is_corresponding_fence(egraph[*it],egraph[*s_it]))
+
+        {
+          BC = true;
+          break;
+        }
+
+      if(BC)
+        continue;
+
+      if(BC_it==begin() && egraph[back()].thread==first.thread)
+        for(BC_it=end();
+          !(egraph[*BC_it]==second) && egraph[*BC_it].thread==first.thread;
+          BC_it--)
+          if(egraph[*BC_it].operation==abstract_eventt::ASMfence
+          && egraph[*BC_it].is_cumul()
+          && egraph[*BC_it].is_corresponding_fence(egraph[*it],egraph[*s_it]))
+
+          {
+            BC = true;
+            break;
+          }
+
+      if(BC)
+        continue;
+    }
+
+    if(s_it==++it)
+    {
+      --it;
+
+      /* no lwfence between the pair */
+      if(first.unsafe_pair(second,model) 
+        && (first.thread!=second.thread || egraph.are_po_ordered(*it,*s_it)))
+      {
+        if(fast)
+          return true;
+        else
+        {
+          const delayt delay(*it,*s_it,(first.thread==second.thread));
+          unsafe_pairs.insert(delay);
+          unsafe_met = true;
+        }
+      }
+    }
+    else
+    {
+      --it;
+
+      /* one (or more) lwfence between the pair */
+      if(first.unsafe_pair_asm(second, model, fences_met)
+        && (first.thread!=second.thread || egraph.are_po_ordered(*it,*s_it)))
+      {
+        if(fast)
+          return true;
+        else
+        {
+          const delayt delay(*it,*s_it,(first.thread==second.thread));
+          unsafe_pairs.insert(delay);
+          unsafe_met = true;
+        }
+      }
+    }
+  }
+
+  /* strong fence -- this pair is safe */
+  if(egraph[back()].operation==abstract_eventt::ASMfence
+    || egraph[front()].operation==abstract_eventt::ASMfence)
+    return unsafe_met;
+
+  fences_met = 0;
+
+  /* selects the next event which is not a weak fence */
+  const_iterator s_it;
+  for(s_it=begin(); 
+    s_it!=end() && egraph[*s_it].operation==abstract_eventt::ASMfence; s_it++)
+    fences_met |= egraph[*s_it].fence_value();
+
+  /* if the whole cycle has been explored */
+  if(s_it==end())
+    return unsafe_met;
+
+  if(egraph[*s_it].operation==abstract_eventt::ASMfence)
+    return unsafe_met;
+
+  const abstract_eventt& first = egraph[back()];
+  const abstract_eventt& second = egraph[*s_it];
+
+  const data_dpt& data_dp = egraph.map_data_dp[first.thread];
+
+  /* if data dp between linking the pair, safe */
+  if(first.thread==second.thread && data_dp.dp(first,second))
+    return unsafe_met;
+
+  /* AC and BC conditions */
+  if(first.thread!=second.thread && model==Power)
+  {
+    bool AC = false;
+    bool BC = false;
+
+    /* no fence after the second element? (AC) */
+    const_iterator AC_it = ++s_it;
+    --s_it;
+    for(;
+      AC_it!=end() && egraph[*AC_it].thread==second.thread;
+      AC_it++)
+      if(egraph[*AC_it].operation==abstract_eventt::ASMfence
+        && egraph[*AC_it].is_cumul()
+        && egraph[*AC_it].is_corresponding_fence(first, second))
+      {
+        AC = true;
+        break;
+      }
+
+    if(AC)
+      return unsafe_met;
+
+    if(AC_it==end() && egraph[front()].thread==second.thread)
+      for(AC_it=begin();
+        !(egraph[*AC_it]==first) && egraph[*AC_it].thread==second.thread;
+        AC_it++)
+        if(egraph[*AC_it].operation==abstract_eventt::ASMfence
+          && egraph[*AC_it].is_cumul()
+          && egraph[*AC_it].is_corresponding_fence(first, second))
+        {
+          AC = true;
+          break;
+        }
+
+    if(AC)
+      return unsafe_met;
+
+    /* no fence before the first element? (BC) */
+    const_iterator BC_it = end();
+    --BC_it;
+    
+    for(;
+      BC_it!=begin() && egraph[*BC_it].thread==first.thread;
+      BC_it--)
+      if(egraph[*BC_it].operation==abstract_eventt::ASMfence
+        && egraph[*BC_it].is_cumul()
+        && egraph[*BC_it].is_corresponding_fence(first, second))
+      {
+        BC = true;
+        break;
+      }
+
+    if(BC)
+      return unsafe_met;
+
+    if(BC_it==begin() && egraph[back()].thread==first.thread)
+    {
+      BC_it = end();
+      BC_it--;
+      for(;
+        !(egraph[*BC_it]==second) && egraph[*BC_it].thread==first.thread;
+        BC_it--)
+        if(egraph[*BC_it].operation==abstract_eventt::ASMfence
+          && egraph[*BC_it].is_cumul()
+          && egraph[*BC_it].is_corresponding_fence(first, second))
+        {
+          BC = true;
+          break;
+        }
+    }
+
+    if(BC)
+      return unsafe_met;
+  }
+
+  if(s_it==begin())
+  {
+    /* no lwfence between the pair */
+    if(first.unsafe_pair(second,model) 
+      && (first.thread!=second.thread || egraph.are_po_ordered(back(),*s_it)))
+    {
+      if(!fast)
+      {
+        const delayt delay(back(),*s_it,(first.thread==second.thread));
+        unsafe_pairs.insert(delay);
+      }
+      return true;
+    }
+  }
+  else
+  {
+    /* one (or more) lwfence between the pair */
+    if(first.unsafe_pair_asm(second,model,fences_met)
+      && (first.thread!=second.thread || egraph.are_po_ordered(back(),*s_it)))
+    {
+      if(!fast)
+      {
+        const delayt delay(back(),*s_it,(first.thread==second.thread));
+        unsafe_pairs.insert(delay);
+      }
+      return true;
+    }
+  }
+
+  return unsafe_met;
+}
+
+/*******************************************************************\
+
 Function: event_grapht::critical_cyclet::is_not_uniproc
 
   Inputs:
@@ -413,7 +793,8 @@ bool event_grapht::critical_cyclet::is_not_uniproc() const
   /* find the first non-fence event */
   for(;
     it!=end() && (egraph[*it].operation==abstract_eventt::Fence
-    || egraph[*it].operation==abstract_eventt::Lwfence); 
+    || egraph[*it].operation==abstract_eventt::Lwfence
+    || egraph[*it].operation==abstract_eventt::ASMfence); 
     it++);
 
   /* if only fences, uniproc */
@@ -424,7 +805,8 @@ bool event_grapht::critical_cyclet::is_not_uniproc() const
   for(;
     it!=end() && (egraph[*it].variable==var 
     || egraph[*it].operation==abstract_eventt::Fence
-    || egraph[*it].operation==abstract_eventt::Lwfence);
+    || egraph[*it].operation==abstract_eventt::Lwfence
+    || egraph[*it].operation==abstract_eventt::ASMfence);
     it++);
 
   return (it!=end());
@@ -1370,7 +1752,7 @@ bool event_grapht::graph_explorert::backtrack(
           critical_cyclet new_cycle = extract_cycle(vertex, source, cycle_nb++);
           not_thin_air = new_cycle.is_not_thin_air();
           if(new_cycle.is_not_uniproc() && not_thin_air
-            && new_cycle.is_unsafe(model))
+            && (new_cycle.is_unsafe(model)||new_cycle.is_unsafe_asm(model)))
           {
             DEBUG_MESSAGE(new_cycle.print_name(model));
             set_of_cycles.insert(new_cycle);
@@ -1398,7 +1780,7 @@ bool event_grapht::graph_explorert::backtrack(
         critical_cyclet new_cycle = extract_cycle(vertex, source, cycle_nb++);
         not_thin_air = new_cycle.is_not_thin_air();
         if(new_cycle.is_not_uniproc() && not_thin_air 
-          && new_cycle.is_unsafe(model))
+          && (new_cycle.is_unsafe(model)||new_cycle.is_unsafe_asm(model)))
         {
           DEBUG_MESSAGE(new_cycle.print_name(model));
           set_of_cycles.insert(new_cycle);

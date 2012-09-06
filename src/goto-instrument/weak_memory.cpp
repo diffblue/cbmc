@@ -255,7 +255,6 @@ const shared_bufferst::varst &shared_bufferst::operator()(const irep_idt &object
   varst &vars=var_map[object];
   
   namespacet ns(context);
-
   const symbolt &symbol=ns.lookup(object);
 
   vars.type=symbol.type;
@@ -271,7 +270,6 @@ const shared_bufferst::varst &shared_bufferst::operator()(const irep_idt &object
 
   vars.read_delayed=add(object, "$read_delayed", bool_typet());
   vars.read_delayed_var=add(object, "$read_delayed_var", pointer_typet(symbol.type));
-//  vars.read_new_var=add(object, "$read_new_var", symbol.type);
 
   unsigned cnt;
   for(cnt=0;cnt<nb_threads;cnt++)
@@ -308,9 +306,6 @@ irep_idt shared_bufferst::add(
 {
   const irep_idt identifier=id2string(object)+suffix;
 
-  //const contextt::symbolst::const_iterator it=
-    //context.symbols.find(identifier);
-
   symbolt new_symbol;
   new_symbol.name=identifier;
   new_symbol.base_name=identifier;
@@ -331,9 +326,6 @@ irep_idt shared_bufferst::add_fresh_var(
   const typet &type)
 {
   const irep_idt identifier=id2string(object)+suffix;
-
-  //const contextt::symbolst::const_iterator it=
-    //context.symbols.find(identifier);
 
   symbolt new_symbol;
   new_symbol.name=identifier;
@@ -932,12 +924,6 @@ void shared_bufferst::nondet_flush(
         )
       )
     ));
-
-    /*exprt::operandst op;
-    optionst options;
-    null_message_handlert mess;
-    goto_convertt convert(context, options, mess);
-    convert.do_output( convert_string_literal("\"IT WORKS\""), convert_string_literal("\"IT WORKS\""), op, goto_program);*/
   }
   // POWER
   else
@@ -1630,10 +1616,8 @@ void shared_bufferst::weak_memory(
       // add all the written values (which are not instrumentations)
       // in a set
       forall_rw_set_w_entries(w_it, rw_set)
-        if(is_buffered(ns, w_it->second.symbol_expr,false))//true))
-        //{ std::cout<<"+++ thread"<<instruction.thread<<": "
-        //<<id2string(w_it->second.symbol_expr.get_identifier())<<" is inserted for fences"<<std::endl;
-          past_writes.insert(w_it->second.object);//}
+        if(is_buffered(ns, w_it->second.symbol_expr,false))
+          past_writes.insert(w_it->second.object);
       
       goto_programt::instructiont original_instruction;
       original_instruction.swap(instruction);
@@ -1644,12 +1628,11 @@ void shared_bufferst::weak_memory(
       instruction.location=location;
       i_it++;
 
-      //
 #ifdef WITHFENCE
       if(skip)
       { 
         for(std::set<irep_idt>::iterator pw_it=past_writes.begin(); pw_it!=past_writes.end(); pw_it++)
-          det_flush(//
+          det_flush(
             goto_program, i_it, location, *pw_it,
             original_instruction.thread);
 
@@ -1695,12 +1678,10 @@ void shared_bufferst::weak_memory(
           {
             delay_read(
               goto_program, i_it, location, r_it->second.object, e_it->second.object);
-            //break;
           }
 
         if(is_buffered(ns, e_it->second.symbol_expr,true))
         {
-          //if(!skip)
           write(
             goto_program, i_it, location, 
             e_it->second.object,original_instruction,
@@ -1751,31 +1732,11 @@ void shared_bufferst::weak_memory(
           assignment(
             goto_program, i_it, location, 
             e_it->second.object, original_instruction.code.op1());
-        
-          // TO FIX: do we really want to constrain this way?
-          // if this variable is buffered somewhere else, makes sure the buffer is emptied before
-          /*const varst &vars=(*this)(e_it->second.object);
-          assignment(
-            goto_program, i_it, location,
-            vars.w_buff0_used, false_exprt());
-          assignment(
-            goto_program, i_it, location,
-            vars.w_buff1_used, false_exprt());
-          for(unsigned cnt=0; cnt<nb_threads; cnt++)
-          {
-            assignment(
-              goto_program, i_it, location,
-              vars.r_buff0_thds[cnt], false_exprt());
-           assignment(
-              goto_program, i_it, location,
-              vars.r_buff1_thds[cnt], false_exprt());
-          }*/ //////
         }
       }
 
       // if last writes was flushed to make the lhs reads the buffer but without affecting the memory,
       // restore the previous memory value (buffer flush delay)
-      //if(!skip)
       forall_rw_set_r_entries(e_it, rw_set)
         if(is_buffered(ns, e_it->second.symbol_expr,false))
         {
@@ -1801,7 +1762,7 @@ void shared_bufferst::weak_memory(
         
       i_it--; // the for loop already counts us up
     }
-    else if(is_fence(instruction,context)) //instruction.is_fence())// || (instruction.is_lwfence() && model==POWER))
+    else if(is_fence(instruction,context))
     {
       goto_programt::instructiont original_instruction;
       original_instruction.swap(instruction);
@@ -1816,7 +1777,7 @@ void shared_bufferst::weak_memory(
       for(std::set<irep_idt>::iterator s_it=past_writes.begin(); 
         s_it!=past_writes.end(); s_it++)
       {
-        if(is_lwfence(instruction, context))//instruction.is_lwfence())
+        if(is_lwfence(instruction, context))
           if(lw_sync_fence(value_sets, context, *this,
             goto_functions, 
             goto_program, i_it, s_it, original_instruction))
@@ -1835,7 +1796,7 @@ void shared_bufferst::weak_memory(
       
       i_it--; // the for loop already counts us up
     }    
-    else if(is_lwfence(instruction, context))//instruction.is_lwfence())
+    else if(is_lwfence(instruction, context))
     {
       // po -- remove the lwfence
       i_it->make_skip();
@@ -2074,13 +2035,10 @@ void weak_memory(
       std::cout<<((*it)==""?"fence":*it)<<", "<<ran_it->second<<std::endl;
   }
 
-  std::cout<< "Goto-program instrumented" << std::endl;
-
   Forall_goto_functions(f_it, goto_functions)
     if(f_it->first!=CPROVER_PREFIX "initialize" &&
        f_it->first!=ID_main)
       shared_buffers.weak_memory(value_sets, context, f_it->second.body, 
-        //shared_buffers, 
         model, goto_functions
       );
 
@@ -2089,6 +2047,8 @@ void weak_memory(
   
   // update counters etc.
   goto_functions.update();
+
+  std::cout<< "Goto-program instrumented" << std::endl;
 }
 
 #endif

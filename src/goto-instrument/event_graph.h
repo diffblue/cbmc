@@ -33,7 +33,8 @@ protected:
     weak_memory_modelt model, bool lwsync_met) const;
 
 public:
-  typedef enum {Write, Read, Fence, Lwfence} operationt;
+  /* for now, both fence functions and asm fences accepted */
+  typedef enum {Write, Read, Fence, Lwfence, ASMfence} operationt;
 
   operationt operation;
   unsigned thread;
@@ -42,13 +43,33 @@ public:
   locationt location;
   bool local;
 
+  // for ASMfence
+  bool WRfence;
+  bool WWfence;
+  bool RRfence;
+  bool RWfence;
+  bool WWcumul;
+  bool RWcumul;
+  bool RRcumul;
+
   abstract_eventt()
   {
   }
 
-  abstract_eventt(operationt _op, unsigned _th, irep_idt _var, 
+  abstract_eventt(
+    operationt _op, unsigned _th, irep_idt _var, 
     unsigned _id, locationt _loc, bool _local)
-    :operation(_op),thread(_th),variable(_var),id(_id),location(_loc),local(_local)
+    :operation(_op), thread(_th), variable(_var), id(_id),
+      location(_loc), local(_local)
+  {
+  }
+
+  abstract_eventt(operationt _op, unsigned _th, irep_idt _var,
+    unsigned _id, locationt _loc, bool _local, 
+    bool WRf, bool WWf, bool RRf, bool RWf, bool WWc, bool RWc, bool RRc)
+    :operation(_op), thread(_th), variable(_var), id(_id),
+      location(_loc), local(_local), WRfence(RWf), WWfence(WWf), RRfence(RRf),
+      RWfence(WRf), WWcumul(WWc), RWcumul(RWc), RRcumul(RRc)
   {
   }
 
@@ -85,6 +106,9 @@ public:
     return unsafe_pair_lwfence_param(next,model,true);
   }
 
+  bool unsafe_pair_asm(const abstract_eventt& next, weak_memory_modelt model, 
+    unsigned char met) const;
+
   std::string get_operation() const
   {
     switch(operation)
@@ -93,8 +117,28 @@ public:
       case Read: return "R";
       case Fence: return "F";
       case Lwfence: return "f";
+      case ASMfence: return "asm:";
       default: return "?";
     }
+  }
+
+  bool is_corresponding_fence(const abstract_eventt& first, 
+    const abstract_eventt& second) const
+  {
+    return (WRfence && first.operation==Write && second.operation==Read)
+      || ((WWfence||WWcumul) && first.operation==Write && second.operation==Write)
+      || ((RWfence||RWcumul) && first.operation==Read && second.operation==Write)
+      || ((RRfence||RRcumul) && first.operation==Read && second.operation==Read);
+  }
+
+  bool is_direct() const { return WWfence || WRfence || RRfence || RWfence; }
+  bool is_cumul() const { return WWcumul || RWcumul || RRcumul; }
+
+  unsigned char fence_value() const
+  {
+    unsigned char value = WRfence + 2*WWfence + 4*RRfence + 8*RWfence
+      + 16*WWcumul + 32*RWcumul + 64*RRcumul;
+    return value;
   }
 };
 
@@ -187,6 +231,8 @@ public:
     {
       is_unsafe(model);
     }
+
+    bool is_unsafe_asm(weak_memory_modelt model, bool fast=false);
 
     bool is_not_uniproc() const;
     bool is_not_thin_air() const;
