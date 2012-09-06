@@ -480,6 +480,7 @@ void goto_instrument_parseoptionst::instrument_goto_program(
 
     if(cmdline.isset("tso"))
     {
+      #if 0
       status("Adding weak memory (TSO) Instrumentation");
       weak_memory(
         TSO,
@@ -490,10 +491,12 @@ void goto_instrument_parseoptionst::instrument_goto_program(
         cmdline.isset("one-event-per-cycle"),
         cmdline.isset("my-events"),
         unwind_loops);
+      #endif
     }
 
     if(cmdline.isset("pso"))
     {
+      #if 0
       status("Adding weak memory (PSO) Instrumentation");
       weak_memory(
         PSO,
@@ -504,10 +507,12 @@ void goto_instrument_parseoptionst::instrument_goto_program(
         cmdline.isset("one-event-per-cycle"),
         cmdline.isset("my-events"),
         unwind_loops);
+      #endif
     }
 
     if(cmdline.isset("rmo"))
     {
+      #if 0
       status("Adding weak memory (RMO) Instrumentation");
       weak_memory(
         RMO,
@@ -518,10 +523,12 @@ void goto_instrument_parseoptionst::instrument_goto_program(
         cmdline.isset("one-event-per-cycle"),
         cmdline.isset("my-events"),
         unwind_loops);
+      #endif
     }
 
     if(cmdline.isset("power"))
     {
+      #if 0
       status("Adding weak memory (Power) Instrumentation");
       weak_memory(
         POWER,
@@ -532,6 +539,7 @@ void goto_instrument_parseoptionst::instrument_goto_program(
         cmdline.isset("one-event-per-cycle"),
         cmdline.isset("my-events"),
         unwind_loops);
+      #endif
     }
 
     // Interrupt handler
