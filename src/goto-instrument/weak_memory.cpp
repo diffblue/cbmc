@@ -20,6 +20,8 @@ Date: September 2011
 #include <i2string.h>
 #include <context.h>
 
+#if 0
+
 #include <config.h>
 
 #include <pointer-analysis/value_sets.h>
@@ -29,19 +31,14 @@ Date: September 2011
 #include <goto-programs/goto_convert_class.h>
 #include <ansi-c/literals/convert_string_literal.h>
 
-#if 0
-#include <natural-loops/control_flow_graph.h>
-#include <natural-loops/loops.h>
-#endif
+#include "debug_message.h"
 
 #include "weak_memory.h"
 #include "rw_set.h"
 
-#if 0
-#include "cycle_detection.h"
-#endif
+#include "goto2graph.h"
+#include "fence.h"
 
-#if 0
 class shared_bufferst
 {
 public:
@@ -150,6 +147,7 @@ public:
   bool track(const irep_idt &id) const
   {
     namespacet ns(context);
+
     const symbolt &symbol=ns.lookup(id);
     if(symbol.thread_local) return false;
     if(has_prefix(id2string(id), CPROVER_PREFIX))
@@ -183,6 +181,8 @@ public:
     class contextt &context,
     value_setst &value_sets,
     goto_functionst &goto_functions);
+
+
  
 protected:
   contextt &context;
@@ -196,8 +196,8 @@ protected:
   // variables (non necessarily shared) affected by reads delay
 public:
   std::set<irep_idt> affected_by_delay_set;
-
 protected:
+
   // for fresh variables
   unsigned uniq;
 
@@ -219,7 +219,7 @@ protected:
 
 /*******************************************************************\
 
-Function: int2str
+Function: shared_buffert::unique
 
   Inputs:
  
@@ -229,17 +229,10 @@ Function: int2str
 
 \*******************************************************************/
 
-const std::string int2str(const int n)
-{
-  std::ostringstream s;
-  s<<n;
-  return s.str();
-}
-
 std::string shared_bufferst::unique (void)
 {
-  std::cout<<"$fresh#"+int2str(uniq)<<std::endl;
-  return "$fresh#"+int2str(uniq++);
+  DEBUG_MESSAGE(std::cout<<"$fresh#"+i2string(uniq)<<std::endl);
+  return "$fresh#"+i2string(uniq++);
 }
 
 /*******************************************************************\
@@ -262,6 +255,7 @@ const shared_bufferst::varst &shared_bufferst::operator()(const irep_idt &object
   varst &vars=var_map[object];
   
   namespacet ns(context);
+
   const symbolt &symbol=ns.lookup(object);
 
   vars.type=symbol.type;
@@ -285,10 +279,10 @@ const shared_bufferst::varst &shared_bufferst::operator()(const irep_idt &object
     vars.r_buff0_thds.push_back(
       shared_bufferst::add(
         object, 
-        "$r_buff0_thd"+int2str(cnt), bool_typet()));
+        "$r_buff0_thd"+i2string(cnt), bool_typet()));
     vars.r_buff1_thds.push_back(
       shared_bufferst::add(
-        object, "$r_buff1_thd"+int2str(cnt), 
+        object, "$r_buff1_thd"+i2string(cnt), 
         bool_typet()));
   }
 
@@ -314,8 +308,8 @@ irep_idt shared_bufferst::add(
 {
   const irep_idt identifier=id2string(object)+suffix;
 
-  const contextt::symbolst::const_iterator it=
-    context.symbols.find(identifier);
+  //const contextt::symbolst::const_iterator it=
+    //context.symbols.find(identifier);
 
   symbolt new_symbol;
   new_symbol.name=identifier;
@@ -338,8 +332,8 @@ irep_idt shared_bufferst::add_fresh_var(
 {
   const irep_idt identifier=id2string(object)+suffix;
 
-  const contextt::symbolst::const_iterator it=
-    context.symbols.find(identifier);
+  //const contextt::symbolst::const_iterator it=
+    //context.symbols.find(identifier);
 
   symbolt new_symbol;
   new_symbol.name=identifier;
@@ -448,8 +442,16 @@ void shared_bufferst::assignment(
   const exprt &value)
 {
   const namespacet ns(context);
+  std::string identifier = id2string(id_lhs);
+  const size_t pos = identifier.find("[]");
 
-  exprt symbol=symbol_expr(ns.lookup(id_lhs));
+  if(pos!=std::string::npos)
+  {
+    /* we don't distinguish the members of an array for the moment */
+    identifier.erase(pos);
+  }
+
+  exprt symbol=symbol_expr(ns.lookup(identifier));
 
   t=goto_program.insert_before(t);
   t->type=ASSIGN;
@@ -470,7 +472,7 @@ Function: shared_bufferst::delay_read
 
  Outputs:
 
- Purpose: delays a read (Power)
+ Purpose: delays a read (POWER)
 
 \*******************************************************************/
 
@@ -510,7 +512,7 @@ Function: shared_bufferst::flush_read
 
  Outputs:
 
-Purpose: flushes read (Power)
+Purpose: flushes read (POWER)
  
 \*******************************************************************/
 
@@ -750,7 +752,7 @@ void shared_bufferst::nondet_flush(
   assignment(goto_program, target, location, vars.flush_delayed, delay_expr);
   assignment(goto_program, target, location, vars.mem_tmp, lhs);
 
-  // for Power, only instrumented reads can read from the buffers of other threads
+  // for POWER, only instrumented reads can read from the buffers of other threads
   bool instrumented=false;
 
   if(!tso_pso_rmo)
@@ -937,7 +939,7 @@ void shared_bufferst::nondet_flush(
     goto_convertt convert(context, options, mess);
     convert.do_output( convert_string_literal("\"IT WORKS\""), convert_string_literal("\"IT WORKS\""), op, goto_program);*/
   }
-  // Power
+  // POWER
   else
   {
     // a thread can read the other threads' buffers
@@ -1416,7 +1418,8 @@ void shared_bufferst::affected_by_delay(
       forall_rw_set_w_entries(w_it, rw_set)
         forall_rw_set_r_entries(r_it, rw_set)
         {
-          std::cout<<"debug: "<<id2string(w_it->second.object)<<" reads from "<<id2string(r_it->second.object)<<std::endl;
+          DEBUG_MESSAGE(std::cout<<"debug: "<<id2string(w_it->second.object)
+            <<" reads from "<<id2string(r_it->second.object)<<std::endl);
           if(is_buffered_in_general(ns, r_it->second.symbol_expr,true)) //shouldn't it be true? false => overapprox
             affected_by_delay_set.insert(w_it->second.object);
         }
@@ -1443,47 +1446,13 @@ void unwind(
     const unsigned count,
     goto_programt &dest)
 {
-  CFGt cfg(context);
-  cfg.initialize(body);
-
-  // from Leo's ai_parseoptions.cpp:
-  //
-  //in order to get around certain difficulties with loop_info types
-  //we apply the strategy of unrolling loops from the deepest most loops down
-  //wards
-
-  unsigned max_depth=0;
-
-  {
-    loop_infot loop_info(cfg);
-
-    //first get the maximum depth of any loop
-    for(std::list<loop_infot::loopt>::const_iterator
-        it=loop_info.loops.begin();
-        it!=loop_info.loops.end();
-        ++it)
-      max_depth=std::max(max_depth, it->depth()+1);
-  }
-
-  //now count depth up from maxdepth to zero, and unroll loops at that depth
-  for( ; max_depth>0; --max_depth)
-  {
-    loop_infot loop_info(cfg);
-    //we can safely unroll sibling without inner loops with the same loop info
-    for(std::list<loop_infot::loopt>::const_iterator
-        it=loop_info.loops.begin();
-        it!=loop_info.loops.end();
-        ++it)
-      if(it->depth()+1==max_depth)
-        cfg.unwind_loop(it->header, loop_info, count);
-  }
-
-  cfg.to_goto_program(dest);
+  //TODO:
+  //use the new API for natural loops
 }
 
 /*******************************************************************\
 
-Function: lw_sync_fence (Power)
+Function: lw_sync_fence (POWER)
 
   Inputs:
 
@@ -1513,7 +1482,7 @@ inline bool lw_sync_fence(
 
   for(; !next_it->is_end_thread()
     && next_it!=(goto_program).instructions.end()
-    && !next_it->is_fence()
+    && !is_fence(*next_it,context)//!next_it->is_fence()
     && !leave_early 
     && !skip_this_var;
     next_it++)
@@ -1540,7 +1509,7 @@ inline bool lw_sync_fence(
 
           for(; !prev_it->is_start_thread()
             && prev_it!=(goto_program).instructions.begin()
-            && !prev_it->is_fence()
+            && !is_fence(*prev_it,context)//!prev_it->is_fence()
             && !skip_this_var;
             prev_it--)
           {
@@ -1623,7 +1592,7 @@ void shared_bufferst::weak_memory(
   value_setst &value_sets,
   contextt &context,
   goto_programt &goto_program,
-  modelt model,
+  weak_memory_modelt model,
   goto_functionst &goto_functions
 )
 {
@@ -1634,7 +1603,7 @@ void shared_bufferst::weak_memory(
   Forall_goto_program_instructions(i_it, goto_program)
   {
     goto_programt::instructiont &instruction=*i_it;
-    
+ 
     if(instruction.is_assign())
     {
       rw_set_loct rw_set(ns, value_sets, i_it);
@@ -1741,13 +1710,14 @@ void shared_bufferst::weak_memory(
         {
           // unbuffered
 
-          if(model==RMO || model==Power)
+          if(model==RMO || model==POWER)
             forall_rw_set_r_entries(r_it, rw_set)
               if(affected_by_delay_set.find(r_it->second.object)!=affected_by_delay_set.end() )
               {      
                 const varst &vars=(*this)(r_it->second.object);  
 
-                std::cout<<"writer "<<e_it->second.object<<" reads "<<r_it->second.object<<std::endl;
+                DEBUG_MESSAGE(std::cout<<"writer "<<e_it->second.object
+                  <<" reads "<<r_it->second.object<<std::endl);
 
                 // TO FIX: how to deal with rhs including calls?
                 // if a read is delayed, use its alias instead of itself -- or not
@@ -1831,7 +1801,7 @@ void shared_bufferst::weak_memory(
         
       i_it--; // the for loop already counts us up
     }
-    else if(instruction.is_fence())// || (instruction.is_lwfence() && model==Power))
+    else if(is_fence(instruction,context)) //instruction.is_fence())// || (instruction.is_lwfence() && model==POWER))
     {
       goto_programt::instructiont original_instruction;
       original_instruction.swap(instruction);
@@ -1846,7 +1816,7 @@ void shared_bufferst::weak_memory(
       for(std::set<irep_idt>::iterator s_it=past_writes.begin(); 
         s_it!=past_writes.end(); s_it++)
       {
-        if(instruction.is_lwfence())
+        if(is_lwfence(instruction, context))//instruction.is_lwfence())
           if(lw_sync_fence(value_sets, context, *this,
             goto_functions, 
             goto_program, i_it, s_it, original_instruction))
@@ -1865,7 +1835,7 @@ void shared_bufferst::weak_memory(
       
       i_it--; // the for loop already counts us up
     }    
-    else if(instruction.is_lwfence())
+    else if(is_lwfence(instruction, context))//instruction.is_lwfence())
     {
       // po -- remove the lwfence
       i_it->make_skip();
@@ -1900,7 +1870,7 @@ void introduce_temporaries(
   {
     goto_programt::instructiont &instruction=*i_it;
 
-    std::cout<<instruction.location<<std::endl;
+    DEBUG_MESSAGE(std::cout<<instruction.location<<std::endl);
 
     if(instruction.is_goto() ||
        instruction.is_assert() ||
@@ -1953,16 +1923,16 @@ Function: extract_my_events
 
 \*******************************************************************/
 
-std::set<int> extract_my_events()
+std::set<unsigned> extract_my_events()
 {
   std::ifstream file;
   file.open("inst.evt");
-  std::set<int> this_set;
+  std::set<unsigned> this_set;
 
-  int size;
+  unsigned size;
   file >> size;
   
-  int tmp;
+  unsigned tmp;
 
   for(unsigned i=0; i<size; i++)
   {
@@ -1988,23 +1958,32 @@ Function: weak_memory
 \*******************************************************************/
 
 void weak_memory(
-  value_setst &value_sets,
-  class contextt &context,
+  weak_memory_modelt model,
+  value_setst& value_sets,
+  contextt& context,
   goto_functionst &goto_functions,
-  modelt model,
-  const bool one_partition,
-  const bool one_event_per_cycle,
-  const bool my_events,
-  const unsigned unwinding_bound)
+  bool SCC,
+  bool one_event_per_cycle,
+  bool my_events,
+  unsigned unwinding_bound,
+  bool no_cfg_kill,
+  bool no_dependencies,
+  unsigned input_max_var,
+  unsigned input_max_po_trans,
+  bool render_po,
+  bool render_file,
+  bool render_function)
 {
   // get rid of pointers
   remove_pointers(goto_functions, context, value_sets);
+  std::cout<<"pointers removed"<<std::endl;
 
   // all access to shared variables is pushed into assignments
   Forall_goto_functions(f_it, goto_functions)
     if(f_it->first!=CPROVER_PREFIX "initialize" &&
-       f_it->first!=ID_main)
-    introduce_temporaries(value_sets, context, f_it->first, f_it->second.body);
+      f_it->first!=ID_main)
+      introduce_temporaries(value_sets, context, f_it->first, f_it->second.body);
+  std::cout<<"temp added"<<std::endl;
 
   // unwind the loops k times
   if(0!=unwinding_bound)
@@ -2017,53 +1996,64 @@ void weak_memory(
 
         f_it->second.body.swap(prog);
       }
+  std::cout<<"loop unwinded"<<std::endl;
 
-  unsigned max_thds=thread_mark(context,goto_functions);
+  const unsigned max_thds=thread_mark(context,goto_functions);
+  std::cout<<"nb of static threads detected: "<<max_thds+1<<std::endl;
 
-  // EXPERIMENTAL: cycle detection using ugly C toy tool -- yeurk
-  event_grapht graph;
-  graph.convert_prg(value_sets,context,goto_functions, model);
+  instrumentert instrumenter(context, goto_functions);
+  instrumenter.goto2graph(value_sets, model, no_dependencies);
+  std::cout<<"abstraction completed"<<std::endl;
 
-  // collects cycles and the instructions to instrument
-  if(model==TSO)
+  // collects cycles, directly or by SCCs
+  if(input_max_var!=0 || input_max_po_trans!=0)
+    instrumenter.set_parameters_collection(input_max_var,input_max_po_trans);
+  else
+    instrumenter.set_parameters_collection(max_thds);
+  
+  if(SCC)
   {
-    graph.collect_cycles_tso(one_partition);
-    graph.to_instrument_tso();
-  }
-  else if(model==PSO)
-  {
-    graph.collect_cycles_pso(one_partition);
-    graph.to_instrument_pso();
-  }
-  else if(model==RMO)
-  {
-    graph.collect_cycles_rmo(one_partition);
-    graph.to_instrument_rmo();
+    instrumenter.collect_cycles_by_SCCs(model);
+    std::cout<<"cycles collected: "<<std::endl;
+    unsigned interesting_scc = 0;
+    for(unsigned i=0; i<instrumenter.num_sccs; i++)
+      if(instrumenter.egraph_SCCs[i].size()>=4)
+        std::cout<<"SCC #"<<i<<": "
+          <<instrumenter.set_of_cycles_per_SCC[interesting_scc++].size()
+          <<" cycles found"<<std::endl;
   }
   else
   {
-    graph.collect_cycles_power(one_partition);
-    graph.to_instrument_power();
+    instrumenter.collect_cycles(model);
+    std::cout<<"cycles collected: "<<instrumenter.set_of_cycles.size()
+      <<" cycles found"<<std::endl;
   }
 
-  // all the events per cycle, only one, or my events?
+  if(!no_cfg_kill)
+    instrumenter.cfg_cycles_filter();
+
+  // collects instructions to instrument, depending on the strategy selected
   if(my_events)
   {
-    std::set<int> events_set = extract_my_events();
-    graph.instrument_my_events(events_set);
+    const std::set<unsigned> events_set = extract_my_events();
+    instrumenter.instrument_my_events(events_set);
   }  
   else if(one_event_per_cycle)
-    graph.instrument_one_event_per_cycle();
+    instrumenter.instrument_one_event_per_cycle();
   else
-    graph.instrument_all();
+    instrumenter.instrument_all();
+
+  // prints outputs
+  instrumenter.set_rendering_options(render_po,render_file,render_function);
+  instrumenter.print_outputs(model);
 
   // now adds buffers
   shared_bufferst shared_buffers(context,max_thds);
 
   // stores the events to instrument
-  shared_buffers.cycles=graph.var_to_instr; // var in the cycles
-  shared_buffers.cycles_loc=graph.id_to_loc; // instrumented places
-  shared_buffers.cycles_r_loc=graph.id_to_cyc_loc; // places in the cycles
+  shared_buffers.cycles = instrumenter.var_to_instr; // var in the cycles
+  shared_buffers.cycles_loc = instrumenter.id2loc; // instrumented places
+  shared_buffers.cycles_r_loc = instrumenter.id2cycloc; // places in the cycles
 
   // for reads delays
   shared_buffers.affected_by_delay(context,value_sets,goto_functions);
@@ -2071,9 +2061,9 @@ void weak_memory(
   for(std::set<irep_idt>::iterator it=shared_buffers.affected_by_delay_set.begin(); 
     it!=shared_buffers.affected_by_delay_set.end();
     it++)
-    std::cout<<id2string(*it)<<std::endl;
+    DEBUG_MESSAGE(std::cout<<id2string(*it)<<std::endl);
 
-  std::cout<<std::endl<<"I instrument:"<<std::endl;
+  std::cout<<"I instrument:"<<std::endl;
   for(std::set<irep_idt>::iterator it=shared_buffers.cycles.begin(); 
     it!=shared_buffers.cycles.end(); it++)
   {
@@ -2084,7 +2074,7 @@ void weak_memory(
       std::cout<<((*it)==""?"fence":*it)<<", "<<ran_it->second<<std::endl;
   }
 
-  std::cout<<"shared buffer created"<<std::endl;
+  std::cout<< "Goto-program instrumented" << std::endl;
 
   Forall_goto_functions(f_it, goto_functions)
     if(f_it->first!=CPROVER_PREFIX "initialize" &&
@@ -2100,30 +2090,5 @@ void weak_memory(
   // update counters etc.
   goto_functions.update();
 }
+
 #endif
-
-/*******************************************************************\
-
-Function: weak_memory
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void weak_memory(
-  weak_memory_modelt model,
-  value_setst &value_sets,
-  class contextt &context,
-  goto_functionst &goto_functions,
-  bool one_partition,
-  bool one_event_per_cycle,
-  bool my_events,
-  unsigned unwinding_bound)
-{
-//  weak_memory(value_sets, context, goto_functions, model, 
-//    one_partition, one_event_per_cycle, my_events, unwinding_bound);
-}
