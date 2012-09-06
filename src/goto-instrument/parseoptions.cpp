@@ -475,8 +475,8 @@ void goto_instrument_parseoptionst::instrument_goto_program(
         goto_functions);
     }
 
-    const unsigned unwind_loops=
-      cmdline.isset("unwind")?options.get_int_option("unwind"):0;
+    //const unsigned unwind_loops=
+    //  cmdline.isset("unwind")?options.get_int_option("unwind"):0;
 
     if(cmdline.isset("tso"))
     {
