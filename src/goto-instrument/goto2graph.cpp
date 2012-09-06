@@ -169,7 +169,7 @@ void instrumentert::goto2graph(
              read is the irep_id of the read in the code;
              new_read_event is the corresponding abstract event;
              new_read_node is the node in the graph */
-          const irep_idt& read = r_it->second.object;
+         const irep_idt& read = r_it->second.object;
 
          // EXPERIMENTAL -- why wasn't I doing this before??
          /* skip local variables */
@@ -344,6 +344,36 @@ void instrumentert::goto2graph(
         const abstract_eventt new_fence_event(abstract_eventt::Lwfence,
           instruction.thread, "f", unique_id++, instruction.location,
           false);
+        const unsigned new_fence_node = egraph.add_node();
+        egraph[new_fence_node](new_fence_event);
+        const unsigned new_fence_gnode = egraph_alt.add_node();
+        egraph_alt[new_fence_gnode] = new_fence_event;
+        map_vertex_gnode.insert(std::make_pair(new_fence_node, new_fence_gnode));
+
+        if(previous != (unsigned)-1)
+        {
+          egraph.add_po_edge(previous,new_fence_node);
+          egraph_alt.add_edge(previous_gnode,new_fence_gnode);
+        }
+
+        previous = new_fence_node;
+        previous_gnode = new_fence_gnode;
+      }
+      else if(instruction.is_other() 
+        && instruction.code.get_statement()==ID_fence)
+      {
+        bool WRfence = instruction.code.get_bool(ID_WRfence);
+        bool WWfence = instruction.code.get_bool(ID_WWfence);
+        bool RRfence = instruction.code.get_bool(ID_RRfence);
+        bool RWfence = instruction.code.get_bool(ID_RWfence);
+        bool WWcumul = instruction.code.get_bool(ID_WWcumul);
+        bool RRcumul = instruction.code.get_bool(ID_RRcumul);
+        bool RWcumul = instruction.code.get_bool(ID_RWcumul);
+        const abstract_eventt new_fence_event(abstract_eventt::ASMfence,
+          instruction.thread, "asm", unique_id++, instruction.location,
+          false, WRfence, WWfence, RRfence, RWfence, WWcumul, RWcumul,
+          RRcumul
+          );
         const unsigned new_fence_node = egraph.add_node();
         egraph[new_fence_node](new_fence_event);
         const unsigned new_fence_gnode = egraph_alt.add_node();
