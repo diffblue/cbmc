@@ -2372,7 +2372,7 @@ void cpp_typecheck_resolvet::filter_for_named_scopes(
 {
   cpp_scopest::id_sett new_set;
   
-  std::cout << "FILTER\n";
+  // std::cout << "FILTER\n";
 
   // We only want scopes!
   for(cpp_scopest::id_sett::const_iterator
@@ -2384,13 +2384,13 @@ void cpp_typecheck_resolvet::filter_for_named_scopes(
 
     if(id.is_class() || id.is_enum() || id.is_namespace())
     {
-      std::cout << "X1\n";
+      // std::cout << "X1\n";
       assert(id.is_scope);
       new_set.insert(&id);
     }
     else if(id.is_typedef())
     {
-      std::cout << "X2\n";
+      // std::cout << "X2\n";
       irep_idt identifier=id.identifier;
 
       if(id.is_member)
@@ -2432,7 +2432,7 @@ void cpp_typecheck_resolvet::filter_for_named_scopes(
     }
     else if(id.id_class==cpp_scopet::TEMPLATE)
     {
-      std::cout << "X3\n";
+      //std::cout << "X3\n";
       #if 0
       const symbolt &symbol=
         cpp_typecheck.lookup(id.identifier);
@@ -2448,16 +2448,18 @@ void cpp_typecheck_resolvet::filter_for_named_scopes(
     }
     else if(id.id_class==cpp_scopet::TEMPLATE_ARGUMENT)
     {
-      std::cout << "X4\n";
+      // std::cout << "X4\n";
       // a template argument may be a scope: it could
       // be instantiated with a class/struct/union/enum
       exprt e=cpp_typecheck.template_map.lookup(id.identifier);
 
+      #if 0
       cpp_typecheck.template_map.print(std::cout);      
       std::cout << "S: " << cpp_typecheck.cpp_scopes.current_scope().identifier << std::endl;
       std::cout << "P: " << cpp_typecheck.cpp_scopes.current_scope().get_parent() << std::endl;
       std::cout << "I: " << id.identifier << std::endl;
       std::cout << "E: " << e.pretty() << std::endl;
+      #endif
       
       if(e.id()!=ID_type)
         continue; // expressions are definitively not a scope
