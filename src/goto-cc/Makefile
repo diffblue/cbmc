@@ -34,3 +34,8 @@ endif
 goto-cc$(EXEEXT): $(OBJ)
 	$(LINKBIN)
 
+.PHONY: goto-cc-mac-signed
+
+goto-cc-mac-signed: cbmc$(EXEEXT)
+	codesign -v -s $(OSX_IDENTITY) goto-cc$(EXEEXT)
+

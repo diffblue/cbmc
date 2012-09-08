@@ -50,3 +50,8 @@ endif
 goto-instrument$(EXEEXT): $(OBJ)
 	$(LINKBIN)
 
+.PHONY: goto-instrument-mac-signed
+
+goto-instrument-mac-signed: cbmc$(EXEEXT)
+	codesign -v -s $(OSX_IDENTITY) goto-instrument$(EXEEXT)
+
