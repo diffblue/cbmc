@@ -7,6 +7,23 @@ The MacOS binaries are now signed.
 The C/C++ front-end has been tested and fixed for the Visual Studio 2012
 header files.
 
+The man-page has been elaborated.
+
+Support for gcc's complex type has been added.
+
+Support for various C11 features has been added.
+
+Support for various built-in primitives has been added, in particular for
+the __sync_* commands.
+
+New feature: --all-claims now reports the status of all claims; the
+verification continues even if a counterexample is found. This feature uses
+incremental SAT.
+
+The counterexample beautification (--beautify) now uses incremental SAT.
+
+Numerous improvements to SMT1 and SMT2 interfaces.
+
 4.1
 
 The support for low-level accesses to dynamically allocated data structures
