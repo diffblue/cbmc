@@ -1,0 +1,26 @@
+4.2
+
+goto-cc now passes all command line options to the gcc preprocessor.
+  
+The MacOS binaries are now signed.
+
+The C/C++ front-end has been tested and fixed for the Visual Studio 2012
+header files.
+
+4.1
+
+The support for low-level accesses to dynamically allocated data structures
+and "integer addressed memory" (usually memory-mapped I/O) has been further
+improved.
+
+Numerous improvements to the SMT back-ends.  Specifically, support through
+the SMT1 path for Boolector and Z3 has been improved; support for MathSAT
+has been added.  In combination with the very latest version of MathSAT,
+CBMC now also supports an SMT2 flow (use --mathsat --smt2 to activate this).
+
+4.0
+
+Better support for low-level accesses to dynamically allocated data
+structures.
+
+Numerous front-end improvements.
