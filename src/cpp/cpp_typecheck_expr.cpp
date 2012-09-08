@@ -1087,6 +1087,7 @@ void cpp_typecheckt::typecheck_expr_explicit_typecast(exprt &expr)
        reinterpret_typecast(expr.op0(), expr.type(), new_expr, false))
     {
       expr=new_expr;
+      add_implicit_dereference(expr);
     }
     else
     {
