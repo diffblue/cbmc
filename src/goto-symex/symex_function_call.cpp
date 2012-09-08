@@ -306,9 +306,6 @@ void goto_symext::symex_function_call_code(
   assert(!state.call_stack.empty());
   goto_symex_statet::framet &frame=state.new_frame();
   
-  // copy L1 renaming from previous frame
-  frame.level1=state.previous_frame().level1;
-  
   unsigned &frame_nr=function_frame[identifier];
   frame_nr++;
   
@@ -345,10 +342,13 @@ void goto_symext::pop_frame(statet &state)
 
   statet::framet &frame=state.top();
 
-  // restore state
+  // restore program counter
   state.source.pc=frame.calling_location.pc;
   
-  // clear locals from L2 renaming
+  // restore L1 renaming
+  state.level1.restore_from(frame.old_level1);
+  
+  // clear function-locals from L2 renaming
   for(statet::framet::local_variablest::const_iterator
       it=frame.local_variables.begin();
       it!=frame.local_variables.end();
@@ -415,6 +415,13 @@ void goto_symext::locality(
   {
     // get L0 name
     irep_idt l0_name=state.rename(*it, ns, goto_symex_statet::L0);
+
+    // save old L1 name for popping the frame
+    statet::level1t::current_namest::const_iterator c_it=
+      state.level1.current_names.find(l0_name);
+
+    if(c_it!=state.level1.current_names.end())
+      frame.old_level1[l0_name]=c_it->second;
     
     // do L1 renaming -- these need not be unique, as
     // identifiers may be shared among functions
@@ -425,8 +432,8 @@ void goto_symext::locality(
     
     do
     {
-      frame.level1.rename(l0_name, frame_nr+offset);
-      l1_name=frame.level1(l0_name);
+      state.level1.rename(l0_name, frame_nr+offset);
+      l1_name=state.level1(l0_name);
       offset++;
     }
     while(state.l1_history.find(l1_name)!=state.l1_history.end());

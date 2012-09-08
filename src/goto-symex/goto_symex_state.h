@@ -85,6 +85,18 @@ public:
     {
       return original_identifiers.find(identifier)!=original_identifiers.end();
     }
+    
+    void restore_from(const current_namest &other)
+    {
+      for(current_namest::const_iterator
+          it=other.begin();
+          it!=other.end();
+          it++)
+      {
+        // could be done faster exploing ordering
+        current_names[it->first]=it->second;
+      }
+    }
 
   protected:
     original_identifierst original_identifiers;
@@ -144,7 +156,7 @@ public:
 
     level1t() { }
     virtual ~level1t() { }
-  };
+  } level1;
   
   // level 2 -- SSA
 
@@ -247,15 +259,15 @@ public:
   class framet
   {
   public:
-    // function calls
-  
+    // function calls  
     irep_idt function_identifier;
     goto_state_mapt goto_state_map;
-    level1t level1;
     symex_targett::sourcet calling_location;
 
     goto_programt::const_targett end_of_function;
     exprt return_value;
+
+    renaming_levelt::current_namest old_level1;
     
     typedef std::set<irep_idt> local_variablest;
     local_variablest local_variables;
