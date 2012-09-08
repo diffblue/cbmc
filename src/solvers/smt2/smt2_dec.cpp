@@ -158,7 +158,7 @@ decision_proceduret::resultt smt2_dect::dec_solve()
     assert(false);
   }
 
-  #if defined(__LINUX__) || defined(__APPLE__)
+  #if defined(__linux__) || defined(__APPLE__)
   command+=" 2>&1";
   #endif
 
