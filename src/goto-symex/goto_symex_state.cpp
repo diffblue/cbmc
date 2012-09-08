@@ -275,7 +275,7 @@ void goto_symex_statet::assignment(
   irep_idt identifier=lhs.get_identifier();
     
   // identifier should be l0 or l1, make sure it's l1
-  irep_idt l1_identifier=top().level1(identifier);
+  irep_idt l1_identifier=level1(identifier);
 
   #if 0  
   assert(l1_identifier != get_original_name(l1_identifier)
@@ -374,16 +374,16 @@ irep_idt goto_symex_statet::rename(
   case L1:
     {
       if(level2.is_renamed(identifier)) return identifier;
-      if(top().level1.is_renamed(identifier)) return identifier;
+      if(level1.is_renamed(identifier)) return identifier;
       irep_idt l0_identifier=level0(identifier, ns, source.thread_nr);
-      return top().level1(l0_identifier);
+      return level1(l0_identifier);
     }
   
   case L2:
     {
       if(level2.is_renamed(identifier)) return identifier;
       irep_idt l0_identifier=level0(identifier, ns, source.thread_nr);
-      irep_idt l1_identifier=top().level1(l0_identifier);
+      irep_idt l1_identifier=level1(l0_identifier);
       return level2(l1_identifier); // L2
     }
     
@@ -605,7 +605,7 @@ void goto_symex_statet::get_original_name(exprt &expr) const
   if(expr.id()==ID_symbol)
   {
     level2.get_original_name(expr);
-    top().level1.get_original_name(expr);
+    level1.get_original_name(expr);
     level0.get_original_name(expr);
   }
 }
@@ -741,6 +741,6 @@ Function: goto_symex_statet::get_original_name
 const irep_idt &goto_symex_statet::get_original_name(
   const irep_idt &identifier) const
 {
-  return level0.get_original_name(top().level1.get_original_name(
+  return level0.get_original_name(level1.get_original_name(
         level2.get_original_name(identifier)));
 }

@@ -190,7 +190,7 @@ void cpp_typecheckt::typecheck_class_template(
       
       previous_symbol->second.type.swap(declaration);
       
-      #if 0
+      #if 1
       std::cout << "*****\n";
       std::cout << *cpp_scopes.id_map[symbol_name];
       std::cout << "*****\n";

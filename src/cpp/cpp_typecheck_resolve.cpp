@@ -1596,7 +1596,7 @@ exprt cpp_typecheck_resolvet::resolve(
     }
 
     //cpp_typecheck.cpp_scopes.get_root_scope().print(std::cout);
-    //cpp_typecheck.cpp_scopes.current_scope().print(std::cout);
+    cpp_typecheck.cpp_scopes.current_scope().print(std::cout);
     throw 0;
   }
   
@@ -2371,6 +2371,8 @@ void cpp_typecheck_resolvet::filter_for_named_scopes(
   cpp_scopest::id_sett &id_set)
 {
   cpp_scopest::id_sett new_set;
+  
+  std::cout << "FILTER\n";
 
   // We only want scopes!
   for(cpp_scopest::id_sett::const_iterator
@@ -2382,24 +2384,26 @@ void cpp_typecheck_resolvet::filter_for_named_scopes(
 
     if(id.is_class() || id.is_enum() || id.is_namespace())
     {
+      std::cout << "X1\n";
       assert(id.is_scope);
       new_set.insert(&id);
     }
     else if(id.is_typedef())
     {
+      std::cout << "X2\n";
       irep_idt identifier=id.identifier;
 
       if(id.is_member)
       {
         struct_typet struct_type =
-        static_cast<const struct_typet&>(cpp_typecheck.lookup(id.class_identifier).type);
+          static_cast<const struct_typet &>(cpp_typecheck.lookup(id.class_identifier).type);
         const exprt pcomp=struct_type.get_component(identifier);
         assert(pcomp.is_not_nil());
         assert(pcomp.get_bool(ID_is_type));
         const typet &type=pcomp.type();
         assert(type.id()!=ID_struct);
         if(type.id()==ID_symbol)
-          identifier = type.get(ID_identifier);
+          identifier=type.get(ID_identifier);
         else 
           continue;
       }
@@ -2428,6 +2432,7 @@ void cpp_typecheck_resolvet::filter_for_named_scopes(
     }
     else if(id.id_class==cpp_scopet::TEMPLATE)
     {
+      std::cout << "X3\n";
       #if 0
       const symbolt &symbol=
         cpp_typecheck.lookup(id.identifier);
@@ -2443,9 +2448,16 @@ void cpp_typecheck_resolvet::filter_for_named_scopes(
     }
     else if(id.id_class==cpp_scopet::TEMPLATE_ARGUMENT)
     {
+      std::cout << "X4\n";
       // a template argument may be a scope: it could
-      // be instantiated with a class/struct
+      // be instantiated with a class/struct/union/enum
       exprt e=cpp_typecheck.template_map.lookup(id.identifier);
+
+      cpp_typecheck.template_map.print(std::cout);      
+      std::cout << "S: " << cpp_typecheck.cpp_scopes.current_scope().identifier << std::endl;
+      std::cout << "P: " << cpp_typecheck.cpp_scopes.current_scope().get_parent() << std::endl;
+      std::cout << "I: " << id.identifier << std::endl;
+      std::cout << "E: " << e.pretty() << std::endl;
       
       if(e.id()!=ID_type)
         continue; // expressions are definitively not a scope
@@ -2466,7 +2478,8 @@ void cpp_typecheck_resolvet::filter_for_named_scopes(
           else if(symbol.type.id()==ID_struct ||
                   symbol.type.id()==ID_incomplete_struct ||
                   symbol.type.id()==ID_union ||
-                  symbol.type.id()==ID_incomplete_union)
+                  symbol.type.id()==ID_incomplete_union ||
+                  symbol.type.id()==ID_c_enum)
           {
             // this is a scope, too!
             cpp_idt &class_id=
