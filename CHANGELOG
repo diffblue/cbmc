@@ -9,7 +9,8 @@ header files.
 
 The man-page has been elaborated.
 
-Support for gcc's complex type has been added.
+Support for gcc's complex type and vector type has been added. Various
+built-ins for x86 MMX and SSE instructions have been added.
 
 Support for various C11 features has been added.
 
