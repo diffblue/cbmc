@@ -1733,7 +1733,7 @@ extern inline with_exprt &to_with_expr(exprt &expr)
   return static_cast<with_exprt &>(expr);
 }
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief update of one element of an array
 */
 class array_update_exprt:public exprt
 {
@@ -2033,7 +2033,7 @@ public:
   }
 };
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief application of (mathematical) function
 */
 class function_application_exprt:public exprt
 {
