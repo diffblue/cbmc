@@ -893,7 +893,7 @@ public:
 */
 const string_typet &to_string_type(const typet &type);
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief A type for subranges of integers
 */
 class range_typet:public typet
 {
@@ -933,7 +933,7 @@ public:
 */
 const range_typet &to_range_type(const typet &type);
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief A constant-size array type
 */
 class vector_typet:public typet
 {
@@ -986,7 +986,7 @@ extern inline vector_typet &to_vector_type(typet &type)
   return static_cast<vector_typet &>(type);
 }
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief Complex numbers made of pair of given subtype
 */
 class complex_typet:public typet
 {

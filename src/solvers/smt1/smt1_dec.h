@@ -26,7 +26,7 @@ protected:
   std::string temp_out_filename, temp_result_filename;
 };
 
-/*! \brief TO_BE_DOCUMENTED
+/*! \brief Decision procedure interface for various SMT 1.x solvers
     \ingroup gr_smt1
 */
 class smt1_dect:protected smt1_temp_filet, public smt1_convt
