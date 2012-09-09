@@ -30,7 +30,7 @@ Function: goto_symext::symex_start_thread
 
 void goto_symext::symex_start_thread(statet &state)
 {
-  const goto_programt::instructiont &instruction=*state.source.pc;
+  // const goto_programt::instructiont &instruction=*state.source.pc;
   
   target.location(state.guard, state.source);
 
