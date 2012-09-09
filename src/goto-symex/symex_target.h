@@ -26,20 +26,27 @@ public:
     const goto_programt *goto_program;
     bool is_set;
   
-    sourcet():thread_nr(0), goto_program(NULL), is_set(false)
+    sourcet():
+      thread_nr(0),
+      goto_program(NULL),
+      is_set(false)
     {
     }
 
     sourcet(goto_programt::const_targett _pc, const goto_programt &_goto_program):
-      thread_nr(0), pc(_pc), goto_program(&_goto_program), is_set(true)
+      thread_nr(0),
+      pc(_pc),
+      goto_program(&_goto_program),
+      is_set(true)
     {
-      is_set=true;
     }
 
     explicit sourcet(const goto_programt &_goto_program):
-      thread_nr(0), pc(_goto_program.instructions.begin()), goto_program(&_goto_program), is_set(true)
+      thread_nr(0),
+      pc(_goto_program.instructions.begin()),
+      goto_program(&_goto_program),
+      is_set(true)
     {
-      is_set=true;
     }
   };
   
