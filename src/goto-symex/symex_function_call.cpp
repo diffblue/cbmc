@@ -340,24 +340,26 @@ void goto_symext::pop_frame(statet &state)
 {
   assert(!state.call_stack.empty());
 
-  statet::framet &frame=state.top();
+  {
+    statet::framet &frame=state.top();
 
-  // restore program counter
-  state.source.pc=frame.calling_location.pc;
+    // restore program counter
+    state.source.pc=frame.calling_location.pc;
   
-  // restore L1 renaming
-  state.level1.restore_from(frame.old_level1);
+    // restore L1 renaming
+    state.level1.restore_from(frame.old_level1);
   
-  // clear function-locals from L2 renaming
-  for(statet::framet::local_variablest::const_iterator
-      it=frame.local_variables.begin();
-      it!=frame.local_variables.end();
-      it++)
-    state.level2.remove(*it);
+    // clear function-locals from L2 renaming
+    for(statet::framet::local_variablest::const_iterator
+        it=frame.local_variables.begin();
+        it!=frame.local_variables.end();
+        it++)
+      state.level2.remove(*it);
 
-  // decrease recursion unwinding counter
-  if(frame.function_identifier!="")
-    function_unwind[frame.function_identifier]--;
+    // decrease recursion unwinding counter
+    if(frame.function_identifier!="")
+      function_unwind[frame.function_identifier]--;
+  }
   
   state.pop_frame();
 }
@@ -380,7 +382,7 @@ void goto_symext::symex_end_of_function(statet &state)
   target.function_return(state.guard, state.source.pc->function, state.source);
 
   // then get rid of the frame
-  pop_frame(state);  
+  pop_frame(state);
 }
 
 /*******************************************************************\
