@@ -20,6 +20,7 @@ class goto_symex_statet;
 class guardt;
 class if_exprt;
 class index_exprt;
+class symbol_exprt;
 class member_exprt;
 class namespacet;
 class side_effect_exprt;
@@ -89,16 +90,5 @@ protected:
   void read(exprt &expr);
   void replace_nondet(exprt &expr);
 };
-
-void basic_symex(
-  const codet &code,
-  const namespacet &ns,
-  symex_targett &target,
-  goto_symex_statet &state);
-
-void basic_symex(
-  const codet &code,
-  const namespacet &ns,
-  symex_targett &target);
 
 #endif
