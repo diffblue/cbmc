@@ -299,6 +299,9 @@ public:
   inline framet &new_frame() { call_stack.push_back(framet()); return call_stack.back(); }
   inline void pop_frame() { call_stack.pop_back(); }
   inline const framet &previous_frame() { return *(--(--call_stack.end())); }
+
+  // threads
+  unsigned atomic_section_count;
 };
 
 #endif

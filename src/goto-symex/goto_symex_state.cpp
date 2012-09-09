@@ -26,9 +26,10 @@ Function: goto_symex_statet::goto_symex_statet
 
 \*******************************************************************/
 
-goto_symex_statet::goto_symex_statet()
+goto_symex_statet::goto_symex_statet():
+  depth(0),
+  atomic_section_count(0)
 {
-  depth=0;
   new_frame();
 }
 
