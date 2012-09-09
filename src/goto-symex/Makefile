@@ -5,7 +5,7 @@ SRC = symex_target.cpp symex_target_equation.cpp basic_symex.cpp \
       slice_by_trace.cpp xml_goto_trace.cpp symex_decl.cpp \
       precondition.cpp postcondition.cpp symex_clean_expr.cpp \
       symex_dereference_state.cpp vcd_goto_trace.cpp auto_objects.cpp \
-      symex_catch.cpp
+      symex_catch.cpp symex_start_thread.cpp symex_assign.cpp
 
 INCLUDES= -I .. -I ../util
 

@@ -304,7 +304,8 @@ void goto_symext::symex_step(
     break;
 
   case START_THREAD:
-    throw "START_THREAD not yet implemented";
+    symex_start_thread(state);
+    break;
   
   case END_THREAD:
     {
