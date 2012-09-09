@@ -23,20 +23,18 @@ public:
   {
     unsigned thread_nr;
     goto_programt::const_targett pc;
-    const goto_programt *goto_program;
     bool is_set;
   
     sourcet():
       thread_nr(0),
-      goto_program(NULL),
       is_set(false)
     {
     }
 
-    sourcet(goto_programt::const_targett _pc, const goto_programt &_goto_program):
+    explicit sourcet(
+      goto_programt::const_targett _pc):
       thread_nr(0),
       pc(_pc),
-      goto_program(&_goto_program),
       is_set(true)
     {
     }
@@ -44,7 +42,6 @@ public:
     explicit sourcet(const goto_programt &_goto_program):
       thread_nr(0),
       pc(_goto_program.instructions.begin()),
-      goto_program(&_goto_program),
       is_set(true)
     {
     }

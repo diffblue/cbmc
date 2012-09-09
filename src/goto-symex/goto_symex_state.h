@@ -302,6 +302,9 @@ public:
 
   // threads
   unsigned atomic_section_count;
+
+  typedef std::list<goto_symex_statet> threadst;
+  threadst threads;
 };
 
 #endif
