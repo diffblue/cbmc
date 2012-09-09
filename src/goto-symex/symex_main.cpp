@@ -317,8 +317,14 @@ void goto_symext::symex_step(
     break;
   
   case ATOMIC_BEGIN:
+    state.atomic_section_count++;
+    state.source.pc++;
+    break;
+    
   case ATOMIC_END:
-    // these don't have path semantics
+    if(stat.atomic_section_count==0)
+      throw "ATOMIC_END unmatched";
+    state.atomic_section_count--;
     state.source.pc++;
     break;
     
