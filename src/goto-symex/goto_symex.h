@@ -20,6 +20,8 @@ Author: Daniel Kroening, kroening@kroening.com
 class typet;
 class code_typet;
 
+/*! \brief The main class for the forward symbolic simulator
+*/
 class goto_symext:
   public basic_symext
 {
@@ -36,21 +38,22 @@ public:
     options.set_option("assertions", true);
   }
 
-  // all at once
+  /** symex all at once, starting from entry point */
   virtual void operator()(
     const goto_functionst &goto_functions);
 
+  /** symex starting from given goto program */
   virtual void operator()(
     const goto_functionst &goto_functions,
     const goto_programt &goto_program);
 
-  // start in a given state
+  /** start symex in a given state */
   virtual void operator()(
     statet &state,
     const goto_functionst &goto_functions,
     const goto_programt &goto_program);	   
 
-  // execute one step
+  /** execute just one step */
   virtual void symex_step(
     const goto_functionst &goto_functions,
     statet &state);
