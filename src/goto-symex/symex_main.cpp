@@ -74,7 +74,7 @@ Function: goto_symext::operator()
 
  Outputs:
 
- Purpose:
+ Purpose: symex from given state
 
 \*******************************************************************/
 
@@ -126,11 +126,15 @@ Function: goto_symext::operator()
 
 void goto_symext::operator()(const goto_functionst &goto_functions)
 {
-  statet state;
-  state.initialize(goto_functions);
+  goto_functionst::function_mapt::const_iterator it=
+    goto_functions.function_map.find(ID_main);
 
-  while(!state.call_stack.empty())
-    symex_step(goto_functions, state);
+  if(it==goto_functions.function_map.end())
+    throw "main symbol not found; please set an entry point";
+
+  const goto_programt &body=it->second.body;
+
+  operator()(goto_functions, body);
 }
 
 /*******************************************************************\
