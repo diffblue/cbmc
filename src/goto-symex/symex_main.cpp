@@ -322,7 +322,7 @@ void goto_symext::symex_step(
     break;
     
   case ATOMIC_END:
-    if(stat.atomic_section_count==0)
+    if(state.atomic_section_count==0)
       throw "ATOMIC_END unmatched";
     state.atomic_section_count--;
     state.source.pc++;
