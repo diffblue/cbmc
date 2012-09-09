@@ -1673,13 +1673,23 @@ void goto_convertt::convert_start_thread(
   }
   else
   {
-    convert(to_code(code.op0()), dest);
+    // start_thread label;
+    // goto tmp;
+    // label: op0-code
+    // end_thread
+    // tmp: skip
+    
+    goto_programt::targett goto_instruction=dest.add_instruction(GOTO);
+    goto_instruction->guard=true_exprt();
 
-    dest.add_instruction(END_THREAD);
-
-    goto_programt tmp2;
-    start_thread->targets.push_back(tmp2.add_instruction(SKIP));
-    dest.destructive_append(tmp2);
+    goto_programt tmp;
+    convert(to_code(code.op0()), tmp);
+    goto_programt::targett end_thread=tmp.add_instruction(END_THREAD);
+    end_thread->location=code.location();
+    
+    start_thread->targets.push_back(tmp.instructions.begin());
+    dest.destructive_append(tmp);
+    goto_instruction->targets.push_back(dest.add_instruction(SKIP));
   }
 }
 
