@@ -84,18 +84,12 @@ void goto_symext::operator()(
   const goto_programt &goto_program)
 {
   state.source=symex_targett::sourcet(goto_program);
+  assert(!state.call_stack.empty());
   state.top().end_of_function=--goto_program.instructions.end();
   state.top().calling_location.pc=state.top().end_of_function;
-  state.top().calling_location.goto_program=&goto_program;
 
-  while(state.source.pc!=state.source.goto_program->instructions.end())
-  {
-    #if 0
-    goto_program.output_instruction(ns, "", std::cout, state.source.pc);
-    #endif
-
+  while(!state.call_stack.empty())
     symex_step(goto_functions, state);
-  }
 }
 
 /*******************************************************************\
@@ -106,7 +100,7 @@ Function: goto_symext::operator()
 
  Outputs:
 
- Purpose:
+ Purpose: symex starting from given program
 
 \*******************************************************************/
 
@@ -126,24 +120,16 @@ Function: goto_symext::operator()
 
  Outputs:
 
- Purpose:
+ Purpose: symex from entry point
 
 \*******************************************************************/
 
 void goto_symext::operator()(const goto_functionst &goto_functions)
 {
-  goto_functionst::function_mapt::const_iterator it=
-    goto_functions.function_map.find(ID_main);
-
-  if(it==goto_functions.function_map.end())
-    throw "main symbol not found; please set an entry point";
-
-  const goto_programt &body=it->second.body;
-
   statet state;
   state.initialize(goto_functions);
 
-  while(state.source.pc!=body.instructions.end())
+  while(!state.call_stack.empty())
     symex_step(goto_functions, state);
 }
 
@@ -155,7 +141,7 @@ Function: goto_symext::symex_step
 
  Outputs:
 
- Purpose:
+ Purpose: do just one step
 
 \*******************************************************************/
 
@@ -305,6 +291,7 @@ void goto_symext::symex_step(
 
   case START_THREAD:
     symex_start_thread(state);
+    state.source.pc++;
     break;
   
   case END_THREAD:
