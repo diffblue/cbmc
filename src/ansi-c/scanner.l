@@ -832,8 +832,7 @@ wchar_t	            { // CodeWarrior doesn't have wchar_t built in
   /* This is a C11 keyword */
 
 "_Generic"      { if(PARSER.mode==ansi_c_parsert::GCC ||
-                     PARSER.mode==ansi_c_parsert::ARM ||
-                     PARSER.mode==ansi_c_parsert::MSC)
+                     PARSER.mode==ansi_c_parsert::ARM)
                     { loc(); return TOK_GENERIC; }
                   else
                     return make_identifier();
