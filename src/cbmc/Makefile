@@ -57,5 +57,5 @@ cbmc$(EXEEXT): $(OBJ)
 .PHONY: cbmc-mac-signed
 
 cbmc-mac-signed: cbmc$(EXEEXT)
-	codesign -v -s $(OSX_IDENTITY) cbmc$(EXEEXT)
+	strip cbmc$(EXEEXT) ; codesign -v -s $(OSX_IDENTITY) cbmc$(EXEEXT)
 
