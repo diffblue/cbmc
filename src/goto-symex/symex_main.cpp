@@ -95,10 +95,10 @@ void goto_symext::operator()(
     
     // is there another thread to execute?
     if(state.call_stack().empty() &&
-       state.source.thread_nr<state.threads.size())
+       state.source.thread_nr+1<state.threads.size())
     {
       unsigned t=state.source.thread_nr+1;
-      std::cout << "********* Now executing thread " << t << std::endl;
+      //std::cout << "********* Now executing thread " << t << std::endl;
       state.switch_to_thread(t);
     }
   }
@@ -314,13 +314,9 @@ void goto_symext::symex_step(
     break;
   
   case END_THREAD:
+    // behaves like assume(0);
     if(!state.guard.is_false())
-    {
-      // behaves like assume(0);
       state.guard.add(false_exprt());
-      exprt tmp=state.guard.as_expr();
-      target.assumption(state.guard, tmp, state.source);
-    }
     state.source.pc++;
     break;
   

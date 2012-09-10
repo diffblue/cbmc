@@ -180,7 +180,7 @@ protected:
     const exprt::operandst &arguments);
 
   void locality(
-    unsigned frame_counter,
+    const irep_idt function_identifier,
     statet &state,
     const goto_functionst::goto_functiont &goto_function);
 
@@ -189,7 +189,6 @@ protected:
     const irep_idt &identifier);
                            
   std::map<irep_idt, unsigned> function_unwind;
-  std::map<irep_idt, unsigned> function_frame;
   std::map<symex_targett::sourcet, unsigned> unwind_map;
   
   // exceptions
