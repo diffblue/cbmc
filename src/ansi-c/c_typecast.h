@@ -75,6 +75,7 @@ protected:
                  INTEGER, // these are unbounded integers
                  SINGLE, DOUBLE, LONGDOUBLE, // float
                  RATIONAL, REAL, // these are infinite precision
+                 COMPLEX,
                  VOIDPTR, PTR, OTHER };
 
   c_typet get_c_type(const typet &type);
