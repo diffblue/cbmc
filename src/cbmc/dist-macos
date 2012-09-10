@@ -3,8 +3,7 @@ umask u=rwx,g=rx,o=rx
 
 # http://s.sudre.free.fr/Stuff/PackageMaker_Howto.html
 
-make
-strip cbmc
+make cbmc-mac-signed
 
 VERSION=`./cbmc --version`
 VERSION_FILE=`echo $VERSION | sed "y/./-/"`
