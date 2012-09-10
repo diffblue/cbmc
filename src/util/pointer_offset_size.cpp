@@ -113,6 +113,11 @@ mp_integer pointer_offset_size(
     
     return sub*i;
   }
+  else if(type.id()==ID_complex)
+  {
+    mp_integer sub=pointer_offset_size(ns, type.subtype());
+    return sub*2;
+  }
   else if(type.id()==ID_struct)
   {
     const struct_typet &struct_type=to_struct_type(type);

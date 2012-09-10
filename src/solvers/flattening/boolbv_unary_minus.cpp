@@ -55,7 +55,7 @@ void boolbvt::convert_unary_minus(const exprt &expr, bvt &bv)
     return conversion_failed(expr, bv);
 
   if(bvtype==IS_UNKNOWN &&
-     type.id()==ID_vector)
+     (type.id()==ID_vector || type.id()==ID_complex))
   {
     const typet &subtype=ns.follow(type.subtype());
   

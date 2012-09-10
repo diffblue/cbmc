@@ -31,12 +31,13 @@ Function: boolbvt::convert_add_sub
 void boolbvt::convert_add_sub(const exprt &expr, bvt &bv)
 {
   const typet &type=ns.follow(expr.type());
-
+  
   if(type.id()!=ID_unsignedbv &&
      type.id()!=ID_signedbv &&
      type.id()!=ID_fixedbv &&
      type.id()!=ID_floatbv &&
      type.id()!=ID_range &&
+     type.id()!=ID_complex &&
      type.id()!=ID_vector)
     return conversion_failed(expr, bv);
 
@@ -70,7 +71,8 @@ void boolbvt::convert_add_sub(const exprt &expr, bvt &bv)
                     expr.id()=="no-overflow-minus");
 
   typet arithmetic_type=
-    (type.id()==ID_vector)?ns.follow(type.subtype()):type;
+    (type.id()==ID_vector || type.id()==ID_complex)?
+      ns.follow(type.subtype()):type;
 
   bv_utilst::representationt rep=
     (arithmetic_type.id()==ID_signedbv ||
@@ -92,7 +94,7 @@ void boolbvt::convert_add_sub(const exprt &expr, bvt &bv)
     if(op.size()!=width)
       throw "convert_add_sub: unexpected operand width";
 
-    if(type.id()==ID_vector)
+    if(type.id()==ID_vector || type.id()==ID_complex)
     {
       const typet &subtype=ns.follow(type.subtype());
     

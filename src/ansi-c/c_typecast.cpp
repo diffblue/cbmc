@@ -686,23 +686,26 @@ void c_typecastt::implicit_typecast_arithmetic(
   }
   else if(max_type==COMPLEX)
   {
-    typet result_type;
-  
     if(c_type1==COMPLEX && c_type2==COMPLEX)
     {
       // promote to the one with bigger subtype
       if(get_c_type(type1.subtype())>get_c_type(type2.subtype()))
-        result_type=type1;
+        do_typecast(expr2, type1);
       else
-        result_type=type2;
+        do_typecast(expr1, type2);
     }
     else if(c_type1==COMPLEX)
-      result_type=type1;
+    {
+      assert(c_type1==COMPLEX && c_type2!=COMPLEX);
+      do_typecast(expr2, type1.subtype());
+      do_typecast(expr2, type1);
+    }
     else
-      result_type=type2;
-    
-    do_typecast(expr1, result_type);
-    do_typecast(expr2, result_type);    
+    {
+      assert(c_type1!=COMPLEX && c_type2==COMPLEX);
+      do_typecast(expr1, type2.subtype());
+      do_typecast(expr1, type2);
+    }
 
     return;
   }

@@ -105,6 +105,10 @@ protected:
 
   typedef hash_map_cont<const exprt, bvt, irep_hash> bv_cachet;
   bv_cachet bv_cache;
+
+  bool type_conversion(
+    const typet &src_type, const bvt &src,
+    const typet &dest_type, bvt &dest);
   
   virtual literalt convert_bv_rel(const exprt &expr);
   virtual literalt convert_typecast(const exprt &expr);
@@ -124,6 +128,9 @@ protected:
   virtual void convert_struct(const exprt &expr, bvt &bv);
   virtual void convert_array(const exprt &expr, bvt &bv);
   virtual void convert_vector(const exprt &expr, bvt &bv);
+  virtual void convert_complex(const exprt &expr, bvt &bv);
+  virtual void convert_complex_real(const exprt &expr, bvt &bv);
+  virtual void convert_complex_imag(const exprt &expr, bvt &bv);
   virtual void convert_lambda(const exprt &expr, bvt &bv);
   virtual void convert_array_of(const exprt &expr, bvt &bv);
   virtual void convert_union(const exprt &expr, bvt &bv);
