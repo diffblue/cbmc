@@ -146,7 +146,10 @@ struct dst_entry {
 
 // GCC specific
 #ifdef __GNUC__
-STATIC_ASSERT((__builtin_offsetof(struct dst_entry,__refcnt) & 63)==0);
+STATIC_ASSERT(
+  sizeof(void *)==8?
+    (__builtin_offsetof(struct dst_entry,__refcnt) & 63)==0:
+    1);
 #endif
 
 int main()
