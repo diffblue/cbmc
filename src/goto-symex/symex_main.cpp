@@ -84,12 +84,29 @@ void goto_symext::operator()(
   const goto_programt &goto_program)
 {
   state.source=symex_targett::sourcet(goto_program);
-  assert(!state.call_stack.empty());
+  assert(!state.threads.empty());
+  assert(!state.call_stack().empty());
   state.top().end_of_function=--goto_program.instructions.end();
   state.top().calling_location.pc=state.top().end_of_function;
 
-  while(!state.call_stack.empty())
+  while(!state.call_stack().empty())
+  {
     symex_step(goto_functions, state);
+    
+    // is there another thread to execute?
+    #if 0
+    if(state.call_stack.empty() &&
+       !state.threads.empty())
+    {
+      #if 0
+      unsigned t=state.threads.front().source.thread_nr;
+      std::cout << "********* Now executing thread " << t << std::endl;
+      #endif
+      state.switch_to(state.threads.front());
+      state.threads.pop_front();
+    }
+    #endif
+  }
 }
 
 /*******************************************************************\
@@ -155,10 +172,13 @@ void goto_symext::symex_step(
 {
   #if 0
   std::cout << "\ninstruction type is " << state.source.pc->type << std::endl;
-  std::cout << state.source.pc->code.pretty(0, 100) << std::endl;
+  std::cout << "Location: " << state.source.pc->location << std::endl;
+  std::cout << "Guard: " << from_expr(state.guard.as_expr()) << std::endl;
+  // std::cout << state.source.pc->code.pretty(0, 100) << std::endl;
   #endif
 
-  assert(!state.call_stack.empty());
+  assert(!state.threads.empty());
+  assert(!state.call_stack().empty());
 
   const goto_programt::instructiont &instruction=*state.source.pc;
 
@@ -299,6 +319,7 @@ void goto_symext::symex_step(
     break;
   
   case END_THREAD:
+    if(!state.guard.is_false())
     {
       // behaves like assume(0);
       state.guard.add(false_exprt());

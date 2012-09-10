@@ -31,7 +31,7 @@ public:
 
   guardt guard;
   symex_targett::sourcet source;
-  
+
   void initialize(const goto_functionst &goto_functions);
 
   // we have a two-level renaming
@@ -280,30 +280,47 @@ public:
     typedef std::map<irep_idt, goto_programt::targett> catch_mapt;
     catch_mapt catch_map;
   };
-  
+
   typedef std::vector<framet> call_stackt;
-  call_stackt call_stack;
+
+  inline call_stackt &call_stack()
+  {
+    assert(source.thread_nr<threads.size());
+    return threads[source.thread_nr].call_stack;
+  }
+  
+  inline const call_stackt &call_stack() const
+  {
+    assert(source.thread_nr<threads.size());
+    return threads[source.thread_nr].call_stack;
+  }
   
   inline framet &top()
   {
-    assert(!call_stack.empty());
-    return call_stack.back();
+    assert(!call_stack().empty());
+    return call_stack().back();
   }
 
   inline const framet &top() const
   {
-    assert(!call_stack.empty());
-    return call_stack.back();
+    assert(!call_stack().empty());
+    return call_stack().back();
   }
   
-  inline framet &new_frame() { call_stack.push_back(framet()); return call_stack.back(); }
-  inline void pop_frame() { call_stack.pop_back(); }
-  inline const framet &previous_frame() { return *(--(--call_stack.end())); }
+  inline framet &new_frame() { call_stack().push_back(framet()); return top(); }
+  inline void pop_frame() { call_stack().pop_back(); }
+  inline const framet &previous_frame() { return *(--(--call_stack().end())); }
 
   // threads
   unsigned atomic_section_count;
+  
+  class threadt
+  {
+  public:
+    call_stackt call_stack;
+  };
 
-  typedef std::list<goto_symex_statet> threadst;
+  typedef std::vector<threadt> threadst;
   threadst threads;
 };
 
