@@ -1,5 +1,7 @@
 #include <assert.h>
 
+#ifdef __GNUC__
+
 int my_f(int x, ...)
 {
   __builtin_va_list list;
@@ -39,3 +41,13 @@ int main()
   assert(my_f(1, 10)==10);
   assert(my_g(11, 22, 33)==33);
 }
+
+#else
+
+// don't know how this works on Visual Studio
+
+int main()
+{
+}
+
+#endif
