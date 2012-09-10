@@ -19,11 +19,17 @@ char ch;
 long double ld;
 short sh;
 
+#ifdef __GNUC__
 STATIC_ASSERT(G(i)==3);
 STATIC_ASSERT(G(sh)==10);
 STATIC_ASSERT(G(ld)==1);
 STATIC_ASSERT(G(ch)==4);
 STATIC_ASSERT(G(s)==5);
+#else
+
+// Visual Studio doesn't have it.
+
+#endif
 
 int main()
 {
