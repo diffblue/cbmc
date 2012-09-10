@@ -379,6 +379,8 @@ c_typecastt::c_typet c_typecastt::get_c_type(
     return RATIONAL;
   else if(type.id()==ID_real)
     return REAL;
+  else if(type.id()==ID_complex)
+    return COMPLEX;
     
   return OTHER;  
 }
@@ -431,6 +433,7 @@ void c_typecastt::implicit_typecast_arithmetic(
   case RATIONAL:   new_type=rational_typet(); break;
   case REAL:       new_type=real_typet(); break;
   case INTEGER:    new_type=integer_typet(); break;
+  case COMPLEX: return; // do nothing
   default: return;
   }
 
@@ -679,6 +682,28 @@ void c_typecastt::implicit_typecast_arithmetic(
     do_typecast(expr1, result_type);
     do_typecast(expr2, result_type);
     
+    return;
+  }
+  else if(max_type==COMPLEX)
+  {
+    typet result_type;
+  
+    if(c_type1==COMPLEX && c_type2==COMPLEX)
+    {
+      // promote to the one with bigger subtype
+      if(get_c_type(type1.subtype())>get_c_type(type2.subtype()))
+        result_type=type1;
+      else
+        result_type=type2;
+    }
+    else if(c_type1==COMPLEX)
+      result_type=type1;
+    else
+      result_type=type2;
+    
+    do_typecast(expr1, result_type);
+    do_typecast(expr2, result_type);    
+
     return;
   }
     
