@@ -920,7 +920,8 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
       return;
     }
 
-    // typecast to struct: this is a GCC extension
+    // typecast to struct: this is a GCC extension,
+    // and also exists in C99 as "compound literal"
     if(op.id()!=ID_initializer_list)
     {
       err_location(expr);
@@ -991,8 +992,9 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
   }
   else if(expr_type.id()==ID_array)
   {
-    // this is a GCC extension called 'array constructor'
-    // the argument is expected to be an 'initializer_list'
+    // This is a GCC extension called 'array constructor';
+    // the argument is expected to be an 'initializer_list'.
+    // It also exists in C99 as "compound literal".
     if(op.id()!=ID_initializer_list)
     {
       err_location(expr);
