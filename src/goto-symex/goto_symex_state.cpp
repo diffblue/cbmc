@@ -745,3 +745,28 @@ const irep_idt &goto_symex_statet::get_original_name(
   return level0.get_original_name(level1.get_original_name(
         level2.get_original_name(identifier)));
 }
+
+/*******************************************************************\
+
+Function: goto_symex_statet::switch_to_thread
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void goto_symex_statet::switch_to_thread(unsigned t)
+{
+  assert(source.thread_nr<threads.size());
+  assert(t<threads.size());
+  
+  // save PC
+  threads[source.thread_nr].pc=source.pc;
+
+  // get new PC
+  source.thread_nr=t;
+  source.pc=threads[t].pc;
+}
