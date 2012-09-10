@@ -306,11 +306,8 @@ void goto_symext::symex_function_call_code(
   assert(!state.call_stack().empty());
   goto_symex_statet::framet &frame=state.new_frame();
   
-  unsigned &frame_nr=function_frame[identifier];
-  frame_nr++;
-  
   // preserve locality of local variables
-  locality(frame_nr, state, goto_function);
+  locality(identifier, state, goto_function);
 
   // assign arguments
   argument_assignments(identifier, goto_function.type, state, arguments);
@@ -400,10 +397,14 @@ Function: goto_symext::locality
 \*******************************************************************/
 
 void goto_symext::locality(
-  unsigned frame_nr,
+  const irep_idt function_identifier,
   statet &state,
   const goto_functionst::goto_functiont &goto_function)
 {
+  unsigned &frame_nr=
+    state.threads[state.source.thread_nr].function_frame[function_identifier];
+  frame_nr++;
+
   std::set<irep_idt> local_identifiers;
   
   get_local_identifiers(goto_function, local_identifiers);

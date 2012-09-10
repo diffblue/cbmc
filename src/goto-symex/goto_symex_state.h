@@ -320,6 +320,7 @@ public:
     goto_programt::const_targett pc;
     guardt guard;
     call_stackt call_stack;
+    std::map<irep_idt, unsigned> function_frame;
   };
 
   typedef std::vector<threadt> threadst;

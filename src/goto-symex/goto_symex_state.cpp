@@ -769,4 +769,6 @@ void goto_symex_statet::switch_to_thread(unsigned t)
   // get new PC
   source.thread_nr=t;
   source.pc=threads[t].pc;
+  
+  guard=threads[t].guard;
 }
