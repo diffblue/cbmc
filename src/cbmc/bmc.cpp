@@ -491,11 +491,12 @@ struct goalt
 {
   bvt bv;
   std::string description;
-  
+
   explicit goalt(const goto_programt::instructiont &instruction)
   {
-    std::string text=instruction.location.as_string();
+    irep_idt claim_id=instruction.location.get_claim();
     irep_idt comment=instruction.location.get_comment();
+    std::string text=id2string(claim_id);
     if(comment!="")
       text+=", "+id2string(comment);
     description=text;
@@ -532,13 +533,13 @@ bool bmct::all_claims(const goto_functionst &goto_functions)
   do_conversion(prop_conv);  
   
   // collect _all_ goals in `goal_map'
-  typedef std::map<goto_programt::const_targett, goalt> goal_mapt;
+  typedef std::map<irep_idt, goalt> goal_mapt;
   goal_mapt goal_map;
   
   forall_goto_functions(f_it, goto_functions)
     forall_goto_program_instructions(i_it, f_it->second.body)
       if(i_it->is_assert())
-        goal_map[i_it]=goalt(*i_it);
+        goal_map[i_it->location.get_claim()]=goalt(*i_it);
 
   // get the conditions for these goals from formula
 
@@ -549,11 +550,8 @@ bool bmct::all_claims(const goto_functionst &goto_functions)
   {
     if(it->is_assert())
     {
-      std::string text=it->source.pc->location.as_string();
-      if(it->comment!="")
-        text+=", "+id2string(it->comment);
-      goal_map[it->source.pc].bv.push_back(it->cond_literal);
-      goal_map[it->source.pc].description=text;
+      irep_idt claim_id=it->source.pc->location.get_claim();
+      goal_map[claim_id].bv.push_back(it->cond_literal);
     }
   }
   
@@ -597,7 +595,7 @@ bool bmct::all_claims(const goto_functionst &goto_functions)
         it++, g_it++)
     {
       xmlt xml_result("result");
-      xml_result.set_attribute("claim", id2string(it->first->location.get_claim()));
+      xml_result.set_attribute("claim", id2string(it->first));
 
       xml_result.set_attribute("status",
         g_it->covered?"FAILURE":"SUCCESS");
