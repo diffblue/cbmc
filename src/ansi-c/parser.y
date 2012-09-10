@@ -2381,8 +2381,31 @@ KnR_basic_declaration_specifier:
         ;
 
         /* The following is stripped down because of conflicts due to gcc type attributes! */
+KnR_typedef_declaration_specifier:
+          typedef_type_specifier storage_class gcc_type_attribute_opt
+        {
+          $$=$1;
+          merge_types($$, $2);
+          merge_types($$, $3); // type attribute
+        }
+        | storage_class typedef_name gcc_type_attribute_opt
+        {
+          $$=$1;
+          merge_types($$, $2);
+          merge_types($$, $3); // type attribute
+        }
+        | KnR_typedef_declaration_specifier declaration_qualifier gcc_type_attribute_opt
+        {
+          $$=$1;
+          merge_types($$, $2);
+          merge_types($$, $3); // type attribute
+        }
+        ;
+
+        /* The following is stripped down because of conflicts due to gcc type attributes! */
 KnR_declaration_specifier:
           KnR_basic_declaration_specifier
+        | KnR_typedef_declaration_specifier
         ;
 
 KnR_parameter_declaring_list:
