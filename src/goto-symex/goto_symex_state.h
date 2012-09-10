@@ -98,6 +98,14 @@ public:
       }
     }
 
+    void get_variables(std::set<irep_idt> &vars) const
+    {
+      for(current_namest::const_iterator it=current_names.begin();
+          it!=current_names.end();
+          it++)
+        vars.insert(it->first);
+    }
+
   protected:
     original_identifierst original_identifiers;
   };
@@ -166,14 +174,6 @@ public:
     virtual irep_idt name(const irep_idt &identifier, unsigned count) const
     {
       return id2string(identifier)+"#"+i2string(count);
-    }
-
-    void get_variables(std::set<irep_idt> &vars) const
-    {
-      for(current_namest::const_iterator it=current_names.begin();
-          it!=current_names.end();
-          it++)
-        vars.insert(it->first);
     }
 
     virtual irep_idt current_name(const irep_idt &identifier) const

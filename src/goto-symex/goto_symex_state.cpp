@@ -82,6 +82,7 @@ irep_idt goto_symex_statet::level0t::operator()(
   if(original_identifiers.find(identifier)!=original_identifiers.end())
     return identifier;
 
+  // guards are not L0-renamed
   if(identifier=="goto_symex::\\guard")
   {
     original_identifiers[identifier]=identifier;
