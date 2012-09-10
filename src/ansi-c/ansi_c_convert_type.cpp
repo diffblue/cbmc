@@ -321,7 +321,7 @@ void ansi_c_convert_typet::write(typet &type)
 
     type.id(ID_bool);
   }
-  else if(complex_cnt)
+  else if(complex_cnt && !char_cnt && !signed_cnt && !unsigned_cnt && !short_cnt)
   {
     // the "default" for complex is double
     type=double_type();
