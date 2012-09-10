@@ -94,18 +94,13 @@ void goto_symext::operator()(
     symex_step(goto_functions, state);
     
     // is there another thread to execute?
-    #if 0
-    if(state.call_stack.empty() &&
-       !state.threads.empty())
+    if(state.call_stack().empty() &&
+       state.source.thread_nr<state.threads.size())
     {
-      #if 0
-      unsigned t=state.threads.front().source.thread_nr;
+      unsigned t=state.source.thread_nr+1;
       std::cout << "********* Now executing thread " << t << std::endl;
-      #endif
-      state.switch_to(state.threads.front());
-      state.threads.pop_front();
+      state.switch_to_thread(t);
     }
-    #endif
   }
 }
 

@@ -317,11 +317,15 @@ public:
   class threadt
   {
   public:
+    goto_programt::const_targett pc;
+    guardt guard;
     call_stackt call_stack;
   };
 
   typedef std::vector<threadt> threadst;
   threadst threads;
+  
+  void switch_to_thread(unsigned t);
 };
 
 #endif
