@@ -1,7 +1,9 @@
 #define STATIC_ASSERT(condition) \
   int some_array##__LINE__[(condition) ? 1 : -1]
 
-#ifdef __GNUC__
+#ifndef __GNUC__
+#define __builtin_offsetof(a, b) ((unsigned long long)&(((a *)0)->b))
+#endif
 
 struct my_struct1a {
   char ch1;
@@ -69,12 +71,6 @@ STATIC_ASSERT(__builtin_offsetof(struct my_struct3, ch2)==1);
 STATIC_ASSERT(__builtin_offsetof(struct my_struct3, i1)==4);
 STATIC_ASSERT(__builtin_offsetof(struct my_struct3, ch3)==8);
 STATIC_ASSERT(__builtin_offsetof(struct my_struct3, i2)==16);
-
-#else
-
-#error TODO
-
-#endif
 
 int main()
 {
