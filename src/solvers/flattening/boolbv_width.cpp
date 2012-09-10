@@ -187,6 +187,11 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
     else
       entry.total_width=integer2long(vector_size*sub_width);
   }
+  else if(type_id==ID_complex)
+  {
+    unsigned sub_width=operator()(type.subtype());
+    entry.total_width=integer2long(2*sub_width);
+  }
   else if(type_id==ID_code)
   {
   }

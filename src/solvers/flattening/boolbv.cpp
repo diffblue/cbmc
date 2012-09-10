@@ -315,6 +315,12 @@ void boolbvt::convert_bitvector(const exprt &expr, bvt &bv)
     return convert_array(expr, bv);
   else if(expr.id()==ID_vector)
     return convert_vector(expr, bv);
+  else if(expr.id()==ID_complex)
+    return convert_complex(expr, bv);
+  else if(expr.id()==ID_complex_real)
+    return convert_complex_real(expr, bv);
+  else if(expr.id()==ID_complex_imag)
+    return convert_complex_imag(expr, bv);
   else if(expr.id()==ID_lambda)
     return convert_lambda(expr, bv);
   else if(expr.id()==ID_array_of)
