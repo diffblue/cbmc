@@ -2883,7 +2883,7 @@ void c_typecheck_baset::typecheck_side_effect_assignment(exprt &expr)
         << "' expects two operands";
     throw 0;
   }
-
+  
   const irep_idt &statement=expr.get(ID_statement);
 
   exprt &op0=expr.op0();
