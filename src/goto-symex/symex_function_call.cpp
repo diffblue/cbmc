@@ -303,7 +303,7 @@ void goto_symext::symex_function_call_code(
   unwinding_counter++;
   
   // produce a new frame
-  assert(!state.call_stack.empty());
+  assert(!state.call_stack().empty());
   goto_symex_statet::framet &frame=state.new_frame();
   
   unsigned &frame_nr=function_frame[identifier];
@@ -338,7 +338,7 @@ Function: goto_symext::pop_frame
 
 void goto_symext::pop_frame(statet &state)
 {
-  assert(!state.call_stack.empty());
+  assert(!state.call_stack().empty());
 
   {
     statet::framet &frame=state.top();
