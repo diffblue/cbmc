@@ -25,8 +25,8 @@ else
 endif
   CFLAGS ?= -Wall -O2
   CXXFLAGS ?= -Wall -O2
-  CP_CFLAGS = -MMD
-  CP_CXXFLAGS = -MMD -DSTL_HASH_TR1
+  CP_CFLAGS = -MMD -MP
+  CP_CXXFLAGS = -MMD -MP -DSTL_HASH_TR1
   #LINKFLAGS = -static
 ifeq ($(BUILD_ENV_),OSX_Universal)
   # MacOS Fat Binaries
@@ -62,8 +62,8 @@ else ifeq ($(BUILD_ENV_),Cygwin)
   EXEEXT = .exe
   CFLAGS ?= -Wall -O2
   CXXFLAGS ?= -Wall -O2
-  CP_CFLAGS = -MMD -mno-cygwin
-  CP_CXXFLAGS = -MMD -DSTL_HASH_GNU -mno-cygwin
+  CP_CFLAGS = -MMD -MP -mno-cygwin
+  CP_CXXFLAGS = -MMD -MP -DSTL_HASH_GNU -mno-cygwin
   LINKFLAGS = -static -mno-cygwin
   LINKLIB = ld -r -o $@ $^
   LINKBIN = $(CXX) $(LINKFLAGS) -o $@ $^ $(LIBS)
