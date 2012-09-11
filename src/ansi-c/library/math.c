@@ -72,11 +72,11 @@ inline int signbit(double d) { return __CPROVER_sign(d); }
 
 /* FUNCTION: __signbitf */
 
-inline float __signbitf(float f) { return __CPROVER_sign(f); }
+inline int __signbitf(float f) { return __CPROVER_sign(f); }
 
 /* FUNCTION: __signbit */
 
-inline double __signbit(double d) { return __CPROVER_sign(d); }
+inline int __signbit(double d) { return __CPROVER_sign(d); }
 
 /* FUNCTION: __fpclassifyd */
 
