@@ -133,7 +133,8 @@ inline int __fpclassifyl(long double f) {
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
-// the below is needed for older Macs only
+// The variant with long double below is needed for older Macs
+// only; newer ones use __fpclassifyd.
 
 inline int __fpclassify(
 #ifdef __APPLE__
