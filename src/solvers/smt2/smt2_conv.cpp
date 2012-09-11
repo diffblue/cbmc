@@ -456,6 +456,7 @@ std::string smt2_convt::convert_identifier(const irep_idt &identifier)
     case '|':
     case '\\':
     case '&':
+    case '$':
       result+="&";
       result+=i2string(ch);
       result+=';';
@@ -614,7 +615,7 @@ void smt2_convt::convert_expr(const exprt &expr)
     assert(expr.type().id()==ID_bool);
     assert(expr.operands().size()==2);
 
-    smt2_prop.out << "(implies ";
+    smt2_prop.out << "(=> ";
     convert_expr(expr.op0());
     smt2_prop.out << " ";
     convert_expr(expr.op1());
