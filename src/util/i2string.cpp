@@ -20,7 +20,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <sstream>
 
 #include "i2string.h"
-#include "strstream2string.h"
 
 #endif
 
@@ -44,12 +43,8 @@ std::string i2string(int i)
   return buffer;
   #else
   std::ostringstream strInt;
-
   strInt << i;
-  std::string str;
-  strstream2string(strInt, str);
-
-  return str;
+  return strInt.str();
   #endif
 }
 
@@ -81,12 +76,8 @@ std::string i2string(signed long int i)
   return buffer;
   #else
   std::ostringstream strInt;
-
   strInt << i;
-  std::string str;
-  strstream2string(strInt, str);
-
-  return str; 
+  return strInt.str();
   #endif
 }
 
@@ -110,12 +101,8 @@ std::string i2string(unsigned i)
   return buffer;
   #else
   std::ostringstream strInt;
-
   strInt << i;
-  std::string str;
-  strstream2string(strInt, str);
-
-  return str; 
+  return strInt.str();
   #endif
 }
 
@@ -139,12 +126,8 @@ std::string i2string(unsigned long int i)
   return buffer;
   #else
   std::ostringstream strInt;
-
   strInt << i;
-  std::string str;
-  strstream2string(strInt, str);
-
-  return str; 
+  return strInt.str();
   #endif
 }
 
