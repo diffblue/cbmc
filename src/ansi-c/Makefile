@@ -55,6 +55,19 @@ library/converter$(EXEEXT): library/converter.cpp
 
 file_converter$(EXEEXT): file_converter.cpp
 	$(LINKBIN)
+
+.PHONY: library_check
+
+library_check:
+	for f in library/*.c ; do \
+		[ $$f = "library/windows.c" ] && [ "x$(EXEEXT)" = "x" ] && continue ; \
+		[ $$f = "library/threads.c" ] && continue ; \
+		$(CC) -S -Wall -pedantic -std=gnu99 -fno-builtin $$f -o __libcheck.s \
+			-Wno-unused-label -Wno-implicit-function-declaration -Wno-uninitialized ; \
+		ec=$$? ; \
+		$(RM) __libcheck.s ; \
+		[ $$ec -eq 0 ] || exit $$ec ; \
+	done
 	
 cprover_library.inc: library/converter$(EXEEXT) library/*.c
 	cat library/*.c | library/converter$(EXEEXT) > $@
