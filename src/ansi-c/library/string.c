@@ -215,9 +215,9 @@ inline char *strncat(char *dst, const char *src, size_t n)
 inline int strcmp(const char *s1, const char *s2)
 {
   __CPROVER_HIDE:;
-  int retval;
   if(s1!=0 && s1==s2) return 0;
   #ifdef __CPROVER_STRING_ABSTRACTION
+  int retval;
   __CPROVER_assert(__CPROVER_is_zero_string(s1), "strcmp zero-termination of 1st argument");
   __CPROVER_assert(__CPROVER_is_zero_string(s2), "strcmp zero-termination of 2nd argument");
   if(__CPROVER_zero_string_length(s1) != __CPROVER_zero_string_length(s2)) __CPROVER_assume(retval!=0);
@@ -475,7 +475,7 @@ void *__builtin___memcpy_chk(void *dst, const void *src, unsigned n, __CPROVER_s
 
 inline void *memset(void *s, int c, size_t n)
 {
-  __CPROVER_HIDE:
+  __CPROVER_HIDE:;
   #ifdef __CPROVER_STRING_ABSTRACTION
   __CPROVER_assert(__CPROVER_buffer_size(s)>=n, "memset buffer overflow");
   //  for(size_t i=0; i<n ; i++) s[i]=c;
@@ -502,7 +502,7 @@ inline void *memset(void *s, int c, size_t n)
 
 void *__builtin___memset_chk(void *s, int c, unsigned n, __CPROVER_size_t size)
 {
-  __CPROVER_HIDE:
+  __CPROVER_HIDE:;
   char *sp=s;
   for(__CPROVER_size_t i=0; i<n ; i++) sp[i]=c;
   return s;
@@ -519,7 +519,7 @@ void *__builtin___memset_chk(void *s, int c, unsigned n, __CPROVER_size_t size)
 
 inline void *memmove(void *dest, const void *src, size_t n)
 {
-  __CPROVER_HIDE:
+  __CPROVER_HIDE:;
   #ifdef __CPROVER_STRING_ABSTRACTION
   __CPROVER_assert(__CPROVER_buffer_size(src)>=n, "memmove buffer overflow");
   // dst = src (with overlap allowed)
@@ -532,7 +532,7 @@ inline void *memmove(void *dest, const void *src, size_t n)
   else
     __CPROVER_is_zero_string(dest)=0;
   #else
-  if(dest-src>=n)
+  if(((const char *)dest-(const char *)src)>=n)
   {
     for(__CPROVER_size_t i=0; i<n; i++) ((char *)dest)[i]=((const char *)src)[i];
   }
@@ -564,7 +564,7 @@ inline int memcmp(const void *s1, const void *s2, size_t n)
   const unsigned char *sc1=s1, *sc2=s2;
   for(; n!=0; n--)
   {
-    res = (s1++) - (s2++);
+    res = (*sc1++) - (*sc2++);
     if (res != 0)
       return res;
   }
