@@ -2850,7 +2850,8 @@ Function: smt1_convt::find_symbols
 
 void smt1_convt::find_symbols(const exprt &expr)
 {
-  find_symbols(expr.type());
+  const typet &type=expr.type();
+  find_symbols(type);
 
   if(expr.id()==ID_forall || expr.id()==ID_exists)
   {
@@ -2870,7 +2871,7 @@ void smt1_convt::find_symbols(const exprt &expr)
      expr.id()==ID_nondet_symbol)
   {
     // we don't track function-typed symbols
-    if(expr.type().id()==ID_code)
+    if(type.id()==ID_code)
       return;
 
     irep_idt identifier;
@@ -2887,7 +2888,7 @@ void smt1_convt::find_symbols(const exprt &expr)
 
     if(id.type.is_nil())
     {
-      id.type=expr.type();
+      id.type=type;
 
       if(id.type.id()==ID_bool)
       {
@@ -2900,7 +2901,7 @@ void smt1_convt::find_symbols(const exprt &expr)
         smt1_prop.out << ":extrafuns(("
                       << convert_identifier(identifier)
                       << " ";
-        convert_type(expr.type());
+        convert_type(type);
         smt1_prop.out << "))" << std::endl;
       }
     }
@@ -2914,15 +2915,15 @@ void smt1_convt::find_symbols(const exprt &expr)
       smt1_prop.out << ":extrafuns(("
                     << id
                     << " ";
-      convert_type(expr.type());
+      convert_type(type);
       smt1_prop.out << "))" << std::endl;
 
       // we can initialize array_ofs if they have
       // a constant size and a constant element
-      if(expr.type().find(ID_size)!=get_nil_irep() &&
+      if(type.find(ID_size)!=get_nil_irep() &&
          expr.op0().id()==ID_constant)
       {
-        const array_typet &array_type=to_array_type(expr.type());
+        const array_typet &array_type=to_array_type(type);
         mp_integer size;
 
         if(!to_integer(array_type.size(), size))
@@ -2950,7 +2951,7 @@ void smt1_convt::find_symbols(const exprt &expr)
       smt1_prop.out << ":extrafuns(("
                     << id
                     << " ";
-      convert_type(expr.type());
+      convert_type(type);
       smt1_prop.out << "))" << std::endl;
       array_expr_map[expr]=id;
     }
