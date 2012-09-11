@@ -134,10 +134,10 @@ inline int __fpclassifyl(long double f) {
 #endif
 
 inline int __fpclassify(
-#ifdef __x86_64__
-    double d
-#else
+#ifdef __APPLE__
     long double d
+#else
+    double d
 #endif
     ) {
   __CPROVER_HIDE:
