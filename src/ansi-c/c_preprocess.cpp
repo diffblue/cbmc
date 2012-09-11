@@ -20,7 +20,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <fstream>
 
-#include <str_getline.h>
 #include <config.h>
 #include <i2string.h>
 #include <message_stream.h>
@@ -424,7 +423,7 @@ void postprocess_codewarrior(
   
   while(instream)
   {
-    str_getline(instream, line);
+    std::getline(instream, line);
     
     if(line.size()>=2 &&
        line[0]=='#' && (line[1]=='#' || line[1]==' ' || line[1]=='\t'))
@@ -542,11 +541,6 @@ bool c_preprocess_codewarrior(
     message_stream.error_parse(2);
 
   return false;
-
-  #if 0
-  message_streamt message_stream(message_handler);
-
-  #endif
 }
 
 /*******************************************************************\

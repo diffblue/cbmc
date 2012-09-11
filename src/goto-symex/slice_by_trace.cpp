@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <simplify_expr.h>
 #include <i2string.h>
-#include <str_getline.h>
 #include <arith_tools.h>
 #include <std_expr.h>
 #include <guard.h>
@@ -151,7 +150,7 @@ void symex_slice_by_tracet::read_trace(std::string filename)
   alphabet_parity = true;
   
   while (!done && !file.eof ()) {
-    str_getline(file, read_line);
+    std::getline(file, read_line);
     if (begin && (read_line == "!"))
       alphabet_parity = false;
     else
@@ -159,7 +158,7 @@ void symex_slice_by_tracet::read_trace(std::string filename)
   }
   
   while (!file.eof ()) {
-    str_getline(file,read_line);
+    std::getline(file,read_line);
     parse_events(read_line);
   }
   

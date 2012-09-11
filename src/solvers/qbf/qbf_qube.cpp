@@ -12,7 +12,6 @@ Author: CM Wintersteiger
 #include <fstream>
 
 #include <i2string.h>
-#include <str_getline.h>
 
 #include "qbf_qube.h"
 
@@ -140,7 +139,7 @@ propt::resultt qbf_qubet::prop_solve()
     {
       std::string line;
 
-      str_getline(in, line);
+      std::getline(in, line);
 
       if(line!="" && line[line.size()-1]=='\r')
         line.resize(line.size()-1);

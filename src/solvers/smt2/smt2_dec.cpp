@@ -16,7 +16,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <unistd.h>
 #endif
 
-#include <str_getline.h>
 #include <std_expr.h>
 #include <std_types.h>
 #include <tempfile.h>
@@ -204,7 +203,7 @@ decision_proceduret::resultt smt2_dect::read_result_boolector(std::istream &in)
 {
   std::string line;
 
-  str_getline(in, line);
+  std::getline(in, line);
 
   if(line=="sat")
   {
@@ -213,7 +212,7 @@ decision_proceduret::resultt smt2_dect::read_result_boolector(std::istream &in)
     typedef hash_map_cont<std::string, std::string, string_hash> valuest;
     valuest values;
 
-    while(str_getline(in, line))
+    while(std::getline(in, line))
     {
       std::size_t pos=line.find(' ');
       if(pos!=std::string::npos)
@@ -270,7 +269,7 @@ decision_proceduret::resultt smt2_dect::read_result_yices(std::istream &in)
 {
   std::string line;
 
-  while(str_getline(in, line))
+  while(std::getline(in, line))
   {
   }
 
@@ -301,7 +300,7 @@ decision_proceduret::resultt smt2_dect::read_result_mathsat(std::istream &in)
   typedef hash_map_cont<std::string, std::string, string_hash> valuest;
   valuest values;
 
-  while(str_getline(in, line))
+  while(std::getline(in, line))
   {
     if(line=="sat")
       res=D_SATISFIABLE;
@@ -379,7 +378,7 @@ decision_proceduret::resultt smt2_dect::read_result_z3(std::istream &in)
   typedef hash_map_cont<std::string, std::string, string_hash> valuest;
   valuest values;
 
-  while(str_getline(in, line))
+  while(std::getline(in, line))
   {
     if(line=="sat")
       res = D_SATISFIABLE;
@@ -575,7 +574,7 @@ decision_proceduret::resultt smt2_dect::read_result_cvc3(std::istream &in)
   typedef hash_map_cont<std::string, std::string, string_hash> valuest;
   valuest values;
 
-  while(str_getline(in, line))
+  while(std::getline(in, line))
   {
     if(line=="sat")
       res = D_SATISFIABLE;

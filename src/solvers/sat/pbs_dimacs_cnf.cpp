@@ -12,7 +12,6 @@ Author: Alex Groce
 #include <fstream>
 #include <iostream>
 
-#include <str_getline.h>
 #include <i2string.h>
 
 #include "pbs_dimacs_cnf.h"
@@ -143,7 +142,7 @@ bool pbs_dimacs_cnft::pbs_solve()
 
   while(file && !file.eof ())
     {
-      str_getline(file,line);
+      std::getline(file,line);
       if(strstr(line.c_str(),
 		"Variable Assignments Satisfying CNF Formula:")!=NULL)
 	{

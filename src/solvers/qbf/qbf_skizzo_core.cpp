@@ -11,7 +11,6 @@ Author: CM Wintersteiger
 #include <fstream>
 
 #include <util/i2string.h>
-#include <util/str_getline.h>
 
 #include <cuddObj.hh> // CUDD Library
 
@@ -136,7 +135,7 @@ propt::resultt qbf_skizzo_coret::prop_solve()
     {
       std::string line;
 
-      str_getline(in, line);
+      std::getline(in, line);
 
       if(line!="" && line[line.size()-1]=='\r')
         line.resize(line.size()-1);
@@ -246,7 +245,7 @@ bool qbf_skizzo_coret::get_certificate(void)
     {
       std::string line;
 
-      str_getline(in, line);
+      std::getline(in, line);
 
       if(line!="" && line[line.size()-1]=='\r')
         line.resize(line.size()-1);
@@ -281,13 +280,13 @@ bool qbf_skizzo_coret::get_certificate(void)
     std::string key="# existentials[";
 
     std::string line;
-    str_getline(in, line);
+    std::getline(in, line);
 
     assert(line=="# QBM file, 1.3");
 
     while(in)
     {
-      str_getline(in, line);
+      std::getline(in, line);
 
       if(line!="" && line[line.size()-1]=='\r')
         line.resize(line.size()-1);
