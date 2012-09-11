@@ -7,7 +7,6 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <cassert>
-#include <cstdlib>
 
 #include <std_expr.h>
 #include <rename.h>
@@ -181,7 +180,7 @@ void goto_symext::symex_step(
 
   // depth exceeded?
   {
-    unsigned max_depth=atoi(options.get_option("depth").c_str());
+    unsigned max_depth=options.get_int_option("depth");
     if(max_depth!=0 && state.depth>max_depth)
       state.guard.add(false_exprt());
     state.depth++;
