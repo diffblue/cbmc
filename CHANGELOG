@@ -9,8 +9,8 @@ header files.
 
 The man-page has been elaborated.
 
-Support for gcc's complex type and vector type has been added. Various
-built-ins for x86 MMX and SSE instructions have been added.
+Support for the C99 complex type and gcc's vector type has been added.
+Various built-ins for x86 MMX and SSE instructions have been added.
 
 Support for various C11 features has been added.
 
@@ -24,6 +24,8 @@ incremental SAT.
 The counterexample beautification (--beautify) now uses incremental SAT.
 
 Numerous improvements to SMT1 and SMT2 interfaces.
+
+Support for further SAT solvers (PRECOSAT, PICOSAT, LINGELING)
 
 4.1
 
