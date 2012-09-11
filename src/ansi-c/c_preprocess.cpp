@@ -779,6 +779,16 @@ bool c_preprocess_gcc(
 
   FILE *stream=fopen(tmpi.c_str(), "r");
 
+  // errors/warnings
+  {
+    std::ifstream stderr_stream(stderr_file.c_str());
+    char ch;
+    while((stderr_stream.read(&ch, 1))!=NULL)
+      message_stream.str << ch;
+  }
+
+  unlink(stderr_file.c_str());
+
   if(stream!=NULL)
   {
     char ch;
@@ -791,15 +801,24 @@ bool c_preprocess_gcc(
   else
   {
     unlink(tmpi.c_str());
-    unlink(stderr_file.c_str());
-    message_stream.error("GCC preprocessing failed (fopen failed)");
-    return true;
+    message_stream.str << "GCC preprocessing failed (fopen failed)" << std::endl;
+    result=1;
   }
   #else
   command+=" \""+file+"\"";
   command+=" 2> \""+stderr_file+"\"";
 
   FILE *stream=popen(command.c_str(), "r");
+
+  // errors/warnings
+  {
+    std::ifstream stderr_stream(stderr_file.c_str());
+    char ch;
+    while((stderr_stream.read(&ch, 1))!=NULL)
+      message_stream.str << ch;
+  }
+
+  unlink(stderr_file.c_str());
 
   if(stream!=NULL)
   {
@@ -811,21 +830,10 @@ bool c_preprocess_gcc(
   }
   else
   {
-    unlink(stderr_file.c_str());
-    message_stream.error("GCC preprocessing failed (popen failed)");
-    return true;
+    message_stream.str << "GCC preprocessing failed (popen failed)" << std::endl;
+    result=1;
   }
   #endif
-
-  // errors/warnings
-  {
-    std::ifstream stderr_stream(stderr_file.c_str());
-    char ch;
-    while((stderr_stream.read(&ch, 1))!=NULL)
-      message_stream.str << ch;
-  }
-
-  unlink(stderr_file.c_str());
 
   if(result!=0)
   {
