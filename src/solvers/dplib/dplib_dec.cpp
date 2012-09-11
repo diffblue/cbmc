@@ -20,7 +20,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #endif
 
 #include <i2string.h>
-#include <str_getline.h>
 #include <prefix.h>
 
 #include "dplib_dec.h"
@@ -131,7 +130,7 @@ void dplib_dect::read_assert(std::istream &in, std::string &line)
     std::string identifier=std::string(line, 1, pos-1);
     
     // get value
-    if(!str_getline(in, line)) return;
+    if(!std::getline(in, line)) return;
 
     // skip spaces    
     pos=0;
@@ -187,13 +186,13 @@ decision_proceduret::resultt dplib_dect::read_dplib_result()
   
   std::string line;
   
-  while(str_getline(in, line))
+  while(std::getline(in, line))
   {
     if(has_prefix(line, "Invalid."))
     {
       dplib_prop.reset_assignment();
     
-      while(str_getline(in, line))
+      while(std::getline(in, line))
       {
         if(has_prefix(line, "ASSERT "))
           read_assert(in, line);
