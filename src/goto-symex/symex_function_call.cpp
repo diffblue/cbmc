@@ -479,9 +479,8 @@ void goto_symext::return_assignment(statet &state)
     {
       code_assignt assignment(frame.return_value, value);
 
-      assert(
-        ns.follow(assignment.lhs().type())==
-        ns.follow(assignment.rhs().type()));
+      assert(base_type_eq(assignment.lhs().type(),
+            assignment.rhs().type(), ns));
       basic_symext::symex_assign(state, assignment);
     }
   }
