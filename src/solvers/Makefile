@@ -42,8 +42,15 @@ ifneq ($(CUDD),)
            -L $(CUDD)/epd -lobj -lcudd -lmtr -lst -lutil -lepd -ldddmp
 endif
 
+ifneq ($(PRECOSAT),)
+  PRECOSAT_SRC=sat/satcheck_precosat.cpp
+  PRECOSAT_INCLUDE=-I $(PRECOSAT)
+  PRECOSAT_LIB=$(PRECOSAT)/precosat$(OBJEXT)
+  CP_CXXFLAGS += -DHAVE_PRECOSAT
+endif
+
 SRC = $(CHAFF_SRC) $(BOOLEFORCE_SRC) $(MINISAT_SRC) $(MINISAT2_SRC) \
-      $(SMVSAT_SRC) $(SQUOLEM2_SRC) $(CUDD_SRC) \
+      $(SMVSAT_SRC) $(SQUOLEM2_SRC) $(CUDD_SRC) $(PRECOSAT_SRC) \
       sat/cnf.cpp sat/dimacs_cnf.cpp sat/cnf_clause_list.cpp \
       sat/pbs_dimacs_cnf.cpp sat/read_dimacs_cnf.cpp \
       sat/resolution_proof.cpp sat/satcheck.cpp \
@@ -85,7 +92,7 @@ SRC = $(CHAFF_SRC) $(BOOLEFORCE_SRC) $(MINISAT_SRC) $(MINISAT2_SRC) \
 
 INCLUDES= -I .. \
   $(CHAFF_INCLUDE) $(BOOLEFORCE_INCLUDE) $(MINISAT_INCLUDE) $(MINISAT2_INCLUDE) \
-  $(SMVSAT_INCLUDE) $(SQUOLEM2_INC) $(CUDD_INCLUDE) -I ../util
+  $(SMVSAT_INCLUDE) $(SQUOLEM2_INC) $(CUDD_INCLUDE) $(PRECOSAT_INCLUDE) -I ../util
 
 CLEANFILES = solvers$(LIBEXT)
 
@@ -111,6 +118,6 @@ endif
 ###############################################################################
 
 solvers$(LIBEXT): $(OBJ) $(CHAFF_LIB) $(BOOLEFORCE_LIB) $(MINISAT_LIB) \
-        $(MINISAT2_LIB) $(SMVSAT_LIB) $(SQUOLEM2_LIB) $(CUDD_LIB)
+        $(MINISAT2_LIB) $(SMVSAT_LIB) $(SQUOLEM2_LIB) $(CUDD_LIB) $(PRECOSAT_LIB)
 	$(LINKLIB)
 
