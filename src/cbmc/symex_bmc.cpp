@@ -77,7 +77,8 @@ bool symex_bmct::get_unwind(
   const symex_targett::sourcet &source,
   unsigned unwind)
 {
-  irep_idt id=id2string(source.pc->function)+"."+
+  irep_idt id=(source.thread_nr!=0?(i2string(source.thread_nr)+":"):"")+
+              id2string(source.pc->function)+"."+
               i2string(source.pc->loop_number);
   unsigned long this_loop_max_unwind=max_unwind;
 
