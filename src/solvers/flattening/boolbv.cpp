@@ -470,8 +470,7 @@ void boolbvt::convert_symbol(const exprt &expr, bvt &bv)
   }
   else
   {
-    for(unsigned i=0; i<width; i++)
-      bv[i]=map.get_literal(identifier, i, expr.type());
+    map.get_literals(identifier, type, width, bv);
 
     forall_literals(it, bv)
       if(it->var_no()>=prop.no_variables() &&
@@ -704,8 +703,7 @@ bool boolbvt::boolbv_set_equality_to_true(const exprt &expr)
       const irep_idt &identifier=
         to_symbol_expr(operands[0]).get_identifier();
 
-      for(unsigned i=0; i<bv1.size(); i++)
-        map.set_literal(identifier, i, type, bv1[i]);
+      map.set_literals(identifier, type, bv1);
 
       return false;
     }

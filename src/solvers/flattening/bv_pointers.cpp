@@ -305,8 +305,7 @@ void bv_pointerst::convert_pointer_type(const exprt &expr, bvt &bv)
     const irep_idt &identifier=to_symbol_expr(expr).get_identifier();
     const typet &type=expr.type();
 
-    for(unsigned i=0; i<bits; i++)
-      bv[i]=map.get_literal(identifier, i, type);
+    map.get_literals(identifier, type, bits, bv);
 
     return;
   }

@@ -62,16 +62,16 @@ public:
     const irep_idt &identifier,
     const typet &type);
 
-  literalt get_literal(
+  void get_literals(
     const irep_idt &identifier,
-    const unsigned bit,
-    const typet &type);
-
-  void set_literal(
-    const irep_idt &identifier,
-    const unsigned bit,
     const typet &type,
-    literalt literal);
+    const unsigned width,
+    bvt &literals);
+
+  void set_literals(
+    const irep_idt &identifier,
+    const typet &type,
+    const bvt &literals);
     
 protected:
   propt &prop;

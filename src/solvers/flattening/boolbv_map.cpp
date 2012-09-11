@@ -82,30 +82,39 @@ Function: boolbv_mapt::get_literal
 
 \*******************************************************************/
 
-literalt boolbv_mapt::get_literal(
+void boolbv_mapt::get_literals(
   const irep_idt &identifier,
-  const unsigned bit,
-  const typet &type)
+  const typet &type,
+  const unsigned width,
+  bvt &literals)
 {
   map_entryt &map_entry=get_map_entry(identifier, type);
 
-  assert(bit<map_entry.literal_map.size());
-  map_bitt &mb=map_entry.literal_map[bit];
+  assert(literals.size()==width);
+  Forall_literals(it, literals)
+  {
+    literalt &l=*it;
+    const unsigned bit=it-literals.begin();
 
-  if(mb.is_set)
-    return mb.l;
+    assert(bit<map_entry.literal_map.size());
+    map_bitt &mb=map_entry.literal_map[bit];
 
-  literalt l=prop.new_variable();
+    if(mb.is_set)
+    {
+      l=mb.l;
+      continue;
+    }
 
-  mb.is_set=true;
-  mb.l=l;
+    l=prop.new_variable();
 
-  #ifdef DEBUG
-  std::cout << "NEW: " << identifier << ":" << bit
-            << "=" << l << std::endl;
-  #endif
+    mb.is_set=true;
+    mb.l=l;
 
-  return l;
+    #ifdef DEBUG
+    std::cout << "NEW: " << identifier << ":" << bit
+              << "=" << l << std::endl;
+    #endif
+  }
 }
 
 /*******************************************************************\
@@ -120,26 +129,32 @@ Function: boolbv_mapt::set_literal
 
 \*******************************************************************/
 
-void boolbv_mapt::set_literal(
+void boolbv_mapt::set_literals(
   const irep_idt &identifier,
-  const unsigned bit,
   const typet &type,
-  literalt literal)
+  const bvt &literals)
 {
-  assert(literal.is_constant() ||
-         literal.var_no()<prop.no_variables());
-
   map_entryt &map_entry=get_map_entry(identifier, type);
-  assert(bit<map_entry.literal_map.size());
-  map_bitt &mb=map_entry.literal_map[bit];
 
-  if(mb.is_set)
+  forall_literals(it, literals)
   {
-    prop.set_equal(mb.l, literal);
-    return;
-  }
+    const literalt &literal=*it;
+    const unsigned bit=it-literals.begin();
 
-  mb.is_set=true;
-  mb.l=literal;
+    assert(literal.is_constant() ||
+           literal.var_no()<prop.no_variables());
+
+    assert(bit<map_entry.literal_map.size());
+    map_bitt &mb=map_entry.literal_map[bit];
+
+    if(mb.is_set)
+    {
+      prop.set_equal(mb.l, literal);
+      continue;
+    }
+
+    mb.is_set=true;
+    mb.l=literal;
+  }
 }
 
