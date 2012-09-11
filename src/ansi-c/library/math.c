@@ -133,7 +133,13 @@ inline int __fpclassifyl(long double f) {
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
-inline int __fpclassify(double d) {
+inline int __fpclassify(
+#ifdef __x86_64__
+    double d
+#else
+    long double d
+#endif
+    ) {
   __CPROVER_HIDE:
   return __CPROVER_isnan(d)?FP_NAN:
          __CPROVER_isinf(d)?FP_INFINITE:
