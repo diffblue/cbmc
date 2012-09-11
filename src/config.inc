@@ -6,6 +6,7 @@ BUILD_ENV = AUTO
 
 # SAT-solvers we have
 #PRECOSAT = ../../precosat-576-7e5e66f-120112
+#PICOSAT = ../../picosat-936
 #CHAFF = ../../zChaff
 #BOOLEFORCE = ../../booleforce-0.4
 #MINISAT = ../../MiniSat-p_v1.14
