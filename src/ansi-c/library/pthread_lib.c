@@ -182,3 +182,70 @@ inline int pthread_create(
   return 0;
 }
 
+/* FUNCTION: pthread_cond_init */
+
+#ifndef __CPROVER_PTHREAD_H_INCLUDED
+#include <pthread.h>
+#define __CPROVER_PTHREAD_H_INCLUDED
+#endif
+
+inline int pthread_cond_init(
+    pthread_cond_t *cond,
+    const pthread_condattr_t *attr)
+{ __CPROVER_HIDE:
+  *((unsigned *)cond)=0;
+  return 0;
+}
+
+/* FUNCTION: pthread_cond_signal */
+
+#ifndef __CPROVER_PTHREAD_H_INCLUDED
+#include <pthread.h>
+#define __CPROVER_PTHREAD_H_INCLUDED
+#endif
+
+inline int pthread_cond_signal(
+    pthread_cond_t *cond)
+{ __CPROVER_HIDE:
+  __CPROVER_atomic_begin();
+  *((unsigned *)cond)++;
+  __CPROVER_atomic_end();
+  return 0;
+}
+
+/* FUNCTION: pthread_cond_broadcast */
+
+#ifndef __CPROVER_PTHREAD_H_INCLUDED
+#include <pthread.h>
+#define __CPROVER_PTHREAD_H_INCLUDED
+#endif
+
+inline int pthread_cond_broadcast(
+    pthread_cond_t *cond)
+{ __CPROVER_HIDE:
+  __CPROVER_atomic_begin();
+  *((unsigned *)cond)=(unsigned)-1;
+  __CPROVER_atomic_end();
+  return 0;
+}
+
+/* FUNCTION: pthread_cond_wait */
+
+#ifndef __CPROVER_PTHREAD_H_INCLUDED
+#include <pthread.h>
+#define __CPROVER_PTHREAD_H_INCLUDED
+#endif
+
+inline int pthread_cond_wait(
+    pthread_cond_t *cond,
+    pthread_mutex_t *mutex)
+{ __CPROVER_HIDE:
+  pthread_mutex_unlock(mutex);
+  __CPROVER_atomic_begin();
+  __CPROVER_assume(*((unsigned *)cond));
+  *((unsigned *)cond)--;
+  __CPROVER_atomic_end();
+  pthread_mutex_lock(mutex);
+  return 0; // we never fail
+}
+
