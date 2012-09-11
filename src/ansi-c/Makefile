@@ -63,6 +63,7 @@ library_check:
 		[ $$f = "library/windows.c" ] && [ "x$(EXEEXT)" = "x" ] && continue ; \
 		[ $$f = "library/threads.c" ] && continue ; \
 		$(CC) -S -Wall -pedantic -std=gnu99 -fno-builtin $$f -o __libcheck.s \
+			-include library/cprover.h \
 			-Wno-unused-label -Wno-implicit-function-declaration -Wno-uninitialized ; \
 		ec=$$? ; \
 		$(RM) __libcheck.s ; \
