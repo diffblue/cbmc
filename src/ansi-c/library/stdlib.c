@@ -31,6 +31,9 @@ inline void abort(void)
 /* FUNCTION: calloc */
 
 #undef calloc
+#undef malloc
+
+inline void *malloc(__CPROVER_size_t malloc_size);
 
 inline void *calloc(__CPROVER_size_t nmemb, __CPROVER_size_t size)
 {
@@ -51,6 +54,8 @@ inline void *calloc(__CPROVER_size_t nmemb, __CPROVER_size_t size)
 }
 
 /* FUNCTION: malloc */
+
+#undef malloc
 
 inline void *malloc(__CPROVER_size_t malloc_size)
 {
@@ -181,6 +186,7 @@ inline void *realloc(void *ptr, __CPROVER_size_t malloc_size)
                    "realloc argument is dynamic object");
 
   // this shouldn't move if the new size isn't bigger
+  void *res;
   res=malloc(malloc_size);
   __CPROVER_array_copy(res, ptr);
   free(ptr);
