@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 //#define SATCHECK_BOOLEFORCE
 //#define SATCHECK_PRECOSAT
 //#define SATCHECK_PICOSAT
+//#define SATCHECK_LINGELING
 
 #ifdef SATCHECK_ZCHAFF
 
@@ -61,7 +62,15 @@ typedef satcheck_precosatt satcheckt;
 typedef satcheck_picosatt satcheckt;
 
 #else
+#ifdef SATCHECK_LINGELING
+
+#include "satcheck_lingeling.h"
+
+typedef satcheck_lingelingt satcheckt;
+
+#else
 #error NO SAT CHECKER
+#endif
 #endif
 #endif
 #endif
