@@ -5,6 +5,7 @@ BUILD_ENV = AUTO
 #CXXFLAGS = -Wall -O0 -g -Werror -Wno-long-long -Wno-sign-compare -Wno-parentheses -Wno-strict-aliasing -pedantic
 
 # SAT-solvers we have
+#PRECOSAT = ../../precosat-576-7e5e66f-120112
 #CHAFF = ../../zChaff
 #BOOLEFORCE = ../../booleforce-0.4
 #MINISAT = ../../MiniSat-p_v1.14

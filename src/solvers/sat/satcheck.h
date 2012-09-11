@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 //#define SATCHECK_MINISAT1
 #define SATCHECK_MINISAT2
 //#define SATCHECK_BOOLEFORCE
+//#define SATCHECK_PRECOSAT
 
 #ifdef SATCHECK_ZCHAFF
 
@@ -45,7 +46,15 @@ typedef satcheck_minisat1t satcheckt;
 typedef satcheck_minisat_simplifiert satcheckt;
 
 #else
+#ifdef SATCHECK_PRECOSAT
+
+#include "satcheck_precosat.h"
+
+typedef satcheck_precosatt satcheckt;
+
+#else
 #error NO SAT CHECKER
+#endif
 #endif
 #endif
 #endif
