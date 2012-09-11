@@ -75,7 +75,7 @@ inline int pthread_mutex_destroy(pthread_mutex_t *mutex)
 #endif
 
 inline void pthread_exit(void *value_ptr)
-{ __CPROVER_hide:; __CPROVER_assume(0); }
+{ __CPROVER_HIDE:; __CPROVER_assume(0); }
 
 /* FUNCTION: pthread_rwlock_destroy */
 
@@ -169,7 +169,7 @@ inline int pthread_rwlock_wrlock(pthread_rwlock_t *lock)
 
 inline int pthread_create(
   pthread_t *thread,
-  pthread_attr_t *attr,
+  const pthread_attr_t *attr,
   void * (*start_routine)(void *),
   void *arg)
 {

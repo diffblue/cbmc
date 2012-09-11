@@ -402,7 +402,7 @@ size_t fwrite(
 
 void perror(const char *s)
 {
-  __CPROVER_hide:;
+  __CPROVER_HIDE:;
   if(s!=0)
   {
     #ifdef __CPROVER_STRING_ABSTRACTION
@@ -425,7 +425,7 @@ void perror(const char *s)
 
 int fscanf(FILE *restrict stream, const char *restrict format, ...)
 {
-  __CPOVER_hide:;
+  __CPOVER_HIDE:;
   __builtin_va_list list;
   __builtin_va_start(list, format);
   vsscanf(stream, format, list);
@@ -441,7 +441,7 @@ int fscanf(FILE *restrict stream, const char *restrict format, ...)
 
 int scanf(const char *restrict format, ...)
 {
-  __CPOVER_hide:;
+  __CPOVER_HIDE:;
   __builtin_va_list list;
   __builtin_va_start(list, format);
   vfscanf(stdin, format, list);
@@ -457,7 +457,7 @@ int scanf(const char *restrict format, ...)
 
 int sscanf(const char *restrict s, const char *restrict format, ...)
 {
-  __CPOVER_hide:;
+  __CPOVER_HIDE:;
   __builtin_va_list list;
   __builtin_va_start(list, format);
   vsscanf(s, format, list);
@@ -478,7 +478,7 @@ int sscanf(const char *restrict s, const char *restrict format, ...)
 
 int vfscanf(FILE *restrict stream, const char *restrict format, va_list arg)
 {
-  __CPROVER_hide:;
+  __CPROVER_HIDE:;
   *stream;
   
 }
@@ -497,7 +497,7 @@ int vfscanf(FILE *restrict stream, const char *restrict format, va_list arg)
 
 int vscanf(const char *restrict format, va_list arg)
 {
-  __CPROVER_hide:;
+  __CPROVER_HIDE:;
   vfscanf(stdin, format, arg);
 }
 
