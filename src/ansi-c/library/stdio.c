@@ -428,8 +428,9 @@ int fscanf(FILE *restrict stream, const char *restrict format, ...)
   __CPOVER_HIDE:;
   __builtin_va_list list;
   __builtin_va_start(list, format);
-  vsscanf(stream, format, list);
+  int result=vsfcanf(stream, format, list);
   __builtin_va_end(list);
+  return result;
 }
 
 /* FUNCTION: scanf */
@@ -444,8 +445,9 @@ int scanf(const char *restrict format, ...)
   __CPOVER_HIDE:;
   __builtin_va_list list;
   __builtin_va_start(list, format);
-  vfscanf(stdin, format, list);
+  int result=vfscanf(stdin, format, list);
   __builtin_va_end(list);
+  return result;
 }
 
 /* FUNCTION: sscanf */
@@ -460,8 +462,9 @@ int sscanf(const char *restrict s, const char *restrict format, ...)
   __CPOVER_HIDE:;
   __builtin_va_list list;
   __builtin_va_start(list, format);
-  vsscanf(s, format, list);
+  int result=vsscanf(s, format, list);
   __builtin_va_end(list);
+  return result;
 }
 
 /* FUNCTION: vfscanf */
@@ -498,7 +501,7 @@ int vfscanf(FILE *restrict stream, const char *restrict format, va_list arg)
 int vscanf(const char *restrict format, va_list arg)
 {
   __CPROVER_HIDE:;
-  vfscanf(stdin, format, arg);
+  return vfscanf(stdin, format, arg);
 }
 
 /* FUNCTION: vsscanf */
