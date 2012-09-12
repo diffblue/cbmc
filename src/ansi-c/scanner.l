@@ -567,6 +567,7 @@ wchar_t	            { // CodeWarrior doesn't have wchar_t built in
 "__extension__" { /* ignore */ }
 
 "__restrict"    { /* ignore */ }
+"__restrict__"  { /* ignore */ }
 
 "_cdecl"        { /* ignore */ }
 "__cdecl"       { /* ignore */ }
