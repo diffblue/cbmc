@@ -106,6 +106,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
   // elminiate casts to bool
   if(expr_type==bool_typet())
   {
+    // rewrite (_Bool)x to x!=0
     equal_exprt equality;
     equality.location()=expr.location();
     equality.lhs()=expr.op0();
