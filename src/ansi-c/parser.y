@@ -2182,6 +2182,8 @@ volatile_or_goto_opt:
           /* nothing */
         | TOK_VOLATILE
         | TOK_GOTO
+        | TOK_GOTO TOK_VOLATILE
+        | TOK_VOLATILE TOK_GOTO
         ;
 
 /* asm ( assembler template
