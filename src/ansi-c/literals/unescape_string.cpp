@@ -37,8 +37,8 @@ void unescape_string(
 
     if(ch=='\\') // escape?
     {
-      i++;
       assert(i<src.size()); // backslash can't be last character
+      i++;
       
       ch=src[i];
       switch(ch)
