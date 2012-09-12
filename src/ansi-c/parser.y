@@ -2739,8 +2739,8 @@ unary_abstract_declarator:
         }
         | '*' type_qualifier_list
         {
-          // tye type_qualifier_list belongs to the pointer,
-          // not to the (missing) abstract declarator
+          // The type_qualifier_list belongs to the pointer,
+          // not to the (missing) abstract declarator.
           $$=$2;
           exprt declarator=exprt(ID_abstract);
           merge_types(stack($2), declarator);
@@ -2753,8 +2753,8 @@ unary_abstract_declarator:
         }
         | '*' type_qualifier_list abstract_declarator
         {
-          // tye type_qualifier_list belongs to the pointer,
-          // not to the abstract declarator
+          // The type_qualifier_list belongs to the pointer,
+          // not to the abstract declarator.
           $$=$2;
           merge_types($2, $3);
           do_pointer($1, $2);
@@ -2778,8 +2778,8 @@ parameter_unary_abstract_declarator:
         }
         | '*' type_qualifier_list
         {
-          // tye type_qualifier_list belongs to the pointer,
-          // not to the (missing) abstract declarator
+          // The type_qualifier_list belongs to the pointer,
+          // not to the (missing) abstract declarator.
           $$=$2;
           exprt declarator=exprt(ID_abstract);
           merge_types(stack($2), declarator);
@@ -2792,8 +2792,8 @@ parameter_unary_abstract_declarator:
         }
         | '*' type_qualifier_list parameter_abstract_declarator
         {
-          // tye type_qualifier_list belongs to the pointer,
-          // not to the (missing) abstract declarator
+          // The type_qualifier_list belongs to the pointer,
+          // not to the (missing) abstract declarator.
           $$=$2;
           merge_types($2, $3);
           do_pointer($1, $2);
