@@ -37,8 +37,9 @@ void unescape_string(
 
     if(ch=='\\') // escape?
     {
-      assert(i<src.size()); // backslash can't be last character
+      // go to next character
       i++;
+      assert(i<src.size()); // backslash can't be last character
       
       ch=src[i];
       switch(ch)
@@ -65,6 +66,9 @@ void unescape_string(
             hex+=src[i];
             i++;
           }
+
+          // go back
+          i--;
         
           unsigned int result;
           sscanf(hex.c_str(), "%x", &result);
@@ -85,6 +89,9 @@ void unescape_string(
             octal+=src[i];
             i++;
           }
+          
+          // go back
+          i--;
           
           unsigned int result;
           sscanf(octal.c_str(), "%o", &result);
