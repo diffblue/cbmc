@@ -181,7 +181,9 @@ exprt c_typecheck_baset::zero_initializer(
     return value;
   }
   else if(type_id==ID_symbol)
+  {
     return zero_initializer(follow(type), location);
+  }
   else
   {
     err_location(location);
@@ -406,7 +408,8 @@ void c_typecheck_baset::do_initializer(symbolt &symbol)
     {
       const typet &final_type=follow(symbol.type);
       
-      if(final_type.id()==ID_incomplete_struct)
+      if(final_type.id()==ID_incomplete_struct ||
+         final_type.id()==ID_incomplete_union)
       {
         // silently ignore due to 
         // extern struct _IO_FILE_plus _IO_2_1_stdin_;
