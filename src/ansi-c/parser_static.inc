@@ -293,6 +293,24 @@ static void make_subtype(YYSTYPE dest, YYSTYPE src)
     
 /*******************************************************************\
 
+Function: make_pointer
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+static void make_pointer(const YYSTYPE dest)
+{
+  set(dest, ID_pointer);
+  stack(dest).add(ID_subtype)=irept(ID_abstract);
+}
+
+/*******************************************************************\
+
 Function: do_pointer
 
   Inputs:
@@ -305,8 +323,7 @@ Function: do_pointer
 
 static void do_pointer(const YYSTYPE ptr, const YYSTYPE dest)
 {
-  set(ptr, ID_pointer);
-  stack(ptr).add(ID_subtype)=irept(ID_abstract);
+  make_pointer(ptr);
   make_subtype(dest, ptr);
 }
 
