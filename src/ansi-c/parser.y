@@ -49,6 +49,7 @@ extern char *yyansi_ctext;
 %token TOK_INT       "int"
 %token TOK_LONG      "long"
 %token TOK_REGISTER  "register"
+%token TOK_RESTRICT  "restrict"
 %token TOK_RETURN    "return"
 %token TOK_SHORT     "short"
 %token TOK_SIGNED    "signed"
@@ -947,9 +948,10 @@ declaration_qualifier:
         ;
 
 type_qualifier:
-          TOK_CONST    { $$=$1; set($$, ID_const); }
+          TOK_ATOMIC   { $$=$1; set($$, ID_atomic); }
+        | TOK_CONST    { $$=$1; set($$, ID_const); }
+        | TOK_RESTRICT { $$=$1; set($$, ID_restrict); }
         | TOK_VOLATILE { $$=$1; set($$, ID_volatile); }
-        | TOK_ATOMIC   { $$=$1; set($$, ID_atomic); }
         | TOK_CPROVER_ATOMIC { $$=$1; set($$, ID_cprover_atomic); }
         | TOK_PTR32    { $$=$1; set($$, ID_ptr32); }
         | TOK_PTR64    { $$=$1; set($$, ID_ptr64); }
