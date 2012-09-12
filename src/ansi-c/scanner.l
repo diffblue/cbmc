@@ -281,7 +281,7 @@ void ansi_c_scanner_init()
 "int"		{ loc(); return TOK_INT; }
 "long"		{ loc(); return TOK_LONG; }
 "register"	{ loc(); return TOK_REGISTER; }
-"restrict"      { /* ignore */ }
+"restrict"      { /* C99, ignore for now */ }
 "return"	{ loc(); return TOK_RETURN; }
 "short" 	{ loc(); return TOK_SHORT; }
 "signed"	{ loc(); return TOK_SIGNED; }
@@ -566,8 +566,8 @@ wchar_t	            { // CodeWarrior doesn't have wchar_t built in
 
 "__extension__" { /* ignore */ }
 
-"__restrict"    { /* ignore */ }
-"__restrict__"  { /* ignore */ }
+"__restrict"    { /* gcc, ignore */ }
+"__restrict__"  { /* gcc, ignore */ }
 
 "_cdecl"        { /* ignore */ }
 "__cdecl"       { /* ignore */ }
