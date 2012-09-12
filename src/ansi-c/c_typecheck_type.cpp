@@ -375,6 +375,37 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
 
   if(type.id()==ID_struct)
     add_padding(to_struct_type(type), *this);
+
+  // finally, check _Static_assert inside the compound
+  for(struct_union_typet::componentst::iterator
+      it=components.begin();
+      it!=components.end();
+      ) // no it++
+  {
+    if(it->id()==ID_code && it->get(ID_statement)==ID_static_assert)
+    {
+      assert(it->operands().size()==2);
+      exprt &assertion=it->op0();
+      typecheck_expr(assertion);
+      typecheck_expr(it->op1());
+      assertion.make_typecast(bool_typet());
+      make_constant(assertion);
+      
+      if(assertion.is_false())
+      {
+        err_location(*it);
+        throw "failed _Static_assert";
+      }
+      else if(!assertion.is_true())
+      {
+        // should warn/complain
+      }
+      
+      it=components.erase(it);
+    }
+    else
+      it++;
+  }  
 }
 
 /*******************************************************************\

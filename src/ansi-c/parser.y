@@ -1349,7 +1349,8 @@ member_declaration:
         | static_assert_declaration ';'
         {
           init($$, ID_declaration_list);
-          mto($$, $1);
+          assert(stack($1).operands().size()==1);
+          stack($$).move_to_operands(stack($1).op0());
         }
         ;
 
