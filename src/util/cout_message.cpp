@@ -40,7 +40,7 @@ void console_message_handlert::print(
   HANDLE out_handle=
     GetStdHandle((level>1)?STD_OUTPUT_HANDLE:STD_ERROR_HANDLE);
 
-  // We write UTF16 when we write to the console,
+  // We use UTF16 when we write to the console,
   // but we write UTF8 otherwise.
 
   DWORD consoleMode;    
@@ -60,13 +60,13 @@ void console_message_handlert::print(
   else
   {
     // writing to a file
-    if(level>1)
+    if(level>=4)
       std::cout << message << std::endl;
     else
       std::cerr << message << std::endl;
   }
   #else
-  if(level>1)
+  if(level>=4)
     std::cout << message << std::endl;
   else
     std::cerr << message << std::endl;

@@ -29,7 +29,7 @@ public:
 class console_message_handlert:public message_handlert
 {
 public:
-  // level 2 and upwards go to cout, level 1 to cerr
+  // level 4 and upwards go to cout, level 1-3 to cerr
   virtual void print(unsigned level, const std::string &message);
 };
  
