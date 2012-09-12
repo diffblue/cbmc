@@ -11,9 +11,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <config.h>
 #include <replace_symbol.h>
 
+#include <linking/linking.h>
+
 #include "cprover_library.h"
 #include "ansi_c_language.h"
-#include "c_link.h"
 
 /*******************************************************************\
 
@@ -83,7 +84,7 @@ void add_cprover_library(
     ansi_c_language.typecheck(
       new_context, "<built-in-library>", message_handler);
 
-    c_link(context, new_context, message_handler);
+    linking(context, new_context, message_handler);
   }
 }
 

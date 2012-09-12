@@ -15,17 +15,18 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <replace_symbol.h>
 #include <config.h>
 
+#include <linking/linking.h>
+#include <linking/remove_internal_symbols.h>
+#include <linking/entry_point.h>
+
 #include "ansi_c_language.h"
 #include "ansi_c_convert.h"
 #include "ansi_c_typecheck.h"
 #include "ansi_c_parser.h"
 #include "expr2c.h"
 #include "trans_unit.h"
-#include "c_link.h"
 #include "c_preprocess.h"
-#include "c_main.h"
 #include "internal_additions.h"
-#include "remove_internal_symbols.h"
 
 /*******************************************************************\
 
@@ -206,7 +207,7 @@ bool ansi_c_languaget::typecheck(
 
   remove_internal_symbols(new_context);
   
-  if(c_link(context, new_context, message_handler))
+  if(linking(context, new_context, message_handler))
     return true;
     
   return false;
@@ -228,7 +229,7 @@ bool ansi_c_languaget::final(
   contextt &context,
   message_handlert &message_handler)
 {
-  if(c_main(context, "c::main", message_handler)) return true;
+  if(entry_point(context, "c::main", message_handler)) return true;
   
   return false;
 }

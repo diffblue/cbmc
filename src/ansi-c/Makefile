@@ -1,7 +1,7 @@
 SRC = c_typecast.cpp y.tab.cpp lex.yy.cpp ansi_c_parser.cpp \
-      expr2c.cpp ansi_c_language.cpp c_sizeof.cpp c_main.cpp \
+      expr2c.cpp ansi_c_language.cpp c_sizeof.cpp \
       c_types.cpp trans_unit.cpp ansi_c_typecheck.cpp \
-      c_link.cpp c_preprocess.cpp c_link_type_eq.cpp \
+      c_preprocess.cpp \
       c_typecheck_base.cpp c_typecheck_initializer.cpp \
       c_typecheck_typecast.cpp c_typecheck_code.cpp \
       c_typecheck_expr.cpp c_typecheck_type.cpp string_constant.cpp \
@@ -14,8 +14,7 @@ SRC = c_typecast.cpp y.tab.cpp lex.yy.cpp ansi_c_parser.cpp \
       literals/convert_float_literal.cpp \
       literals/convert_character_literal.cpp \
       literals/convert_integer_literal.cpp \
-      literals/convert_string_literal.cpp \
-      remove_internal_symbols.cpp
+      literals/convert_string_literal.cpp
 
 INCLUDES= -I .. -I ../util
 

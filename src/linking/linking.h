@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_C_LINK_H
-#define CPROVER_C_LINK_H
+#ifndef CPROVER_LINKING_H
+#define CPROVER_LINKING_H
 
 #include <message.h>
 #include <context.h>
@@ -16,7 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 // applying appropriate renamings to symbols in "new_context"
 // when necessary
 
-bool c_link(
+bool linking(
   contextt &dest_context,
   contextt &new_context,
   message_handlert &message_handler);

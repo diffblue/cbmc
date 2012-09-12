@@ -18,8 +18,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cprover_prefix.h>
 #include <prefix.h>
 
-#include "c_types.h"
-#include "c_main.h"
+#include <ansi-c/c_types.h>
+
+#include "entry_point.h"
+#include "zero_initializer.h"
 
 /*******************************************************************\
 
@@ -59,14 +61,15 @@ Function: static_lifetime_init
 
 \*******************************************************************/
 
-void static_lifetime_init(
+bool static_lifetime_init(
   contextt &context,
-  const locationt &location)
+  const locationt &location,
+  message_handlert &message_handler)
 {
   contextt::symbolst::iterator s_it=
     context.symbols.find("c::__CPROVER_initialize");
 
-  if(s_it==context.symbols.end()) return;
+  if(s_it==context.symbols.end()) return false;
 
   symbolt &init_symbol=s_it->second;
   
@@ -81,34 +84,55 @@ void static_lifetime_init(
   {
     const irep_idt &identifier=it->first;
   
-    if(it->second.static_lifetime)
-    {
-      const exprt &value=it->second.value;
-      
-      // special values
-      if(identifier==CPROVER_PREFIX "constant_infinity_uint" ||
-         identifier==CPROVER_PREFIX "memory" ||
-         identifier=="c::__func__" ||
-         identifier=="c::__FUNCTION__" ||
-         identifier=="c::__PRETTY_FUNCTION__")
-        continue;
-      
-      // just for linking
-      if(has_prefix(id2string(identifier), CPROVER_PREFIX "architecture_"))
-        continue;
-      
-      if(value.is_not_nil() &&
-         it->second.type.id()!=ID_code)
-      {
-        exprt symbol(ID_symbol, it->second.type);
-        symbol.set(ID_identifier, it->second.name);
- 
-        code_assignt code(symbol, it->second.value);
-        code.location()=it->second.location;
+    if(!it->second.static_lifetime) continue;
 
-        dest.move_to_operands(code);
+    if(it->second.is_type) continue;
+
+    // special values
+    if(identifier==CPROVER_PREFIX "constant_infinity_uint" ||
+       identifier==CPROVER_PREFIX "memory" ||
+       identifier=="c::__func__" ||
+       identifier=="c::__FUNCTION__" ||
+       identifier=="c::__PRETTY_FUNCTION__" ||
+       identifier=="c::argc'" ||
+       identifier=="c::argv'" ||
+       identifier=="c::envp'" ||
+       identifier=="c::envp_size'")
+      continue;
+      
+    // just for linking
+    if(has_prefix(id2string(identifier), CPROVER_PREFIX "architecture_"))
+      continue;
+      
+    // just code
+    if(it->second.type.id()==ID_code)
+      continue;
+      
+    exprt rhs;
+      
+    if(it->second.value.is_nil())
+    {
+      try
+      {
+        namespacet ns(context);
+        rhs=zero_initializer(it->second.type, it->second.location, ns, message_handler);
+        assert(rhs.is_not_nil());
+      }
+      
+      catch(...)
+      {
+        return true;
       }
     }
+    else
+      rhs=it->second.value;
+    
+    symbol_exprt symbol(it->second.name, it->second.type);
+ 
+    code_assignt code(symbol, rhs);
+    code.location()=it->second.location;
+
+    dest.move_to_operands(code);
   }
 
   // call designated "initialization" functions
@@ -124,11 +148,13 @@ void static_lifetime_init(
       dest.move_to_operands(function_call);
     }
   }
+
+  return false;
 }
 
 /*******************************************************************\
 
-Function: c_main
+Function: entry_point
 
   Inputs:
 
@@ -138,7 +164,7 @@ Function: c_main
 
 \*******************************************************************/
 
-bool c_main(
+bool entry_point(
   contextt &context,
   const std::string &standard_main,
   message_handlert &message_handler)
@@ -188,15 +214,24 @@ bool c_main(
   contextt::symbolst::const_iterator s_it=context.symbols.find(main_symbol);
   
   if(s_it==context.symbols.end())
-    return false; // give up, no main
+  {
+    messaget message(message_handler);
+    message.error("main symbol `"+id2string(main_symbol)+"' not in context");
+    return true; // give up, no main
+  }
     
   const symbolt &symbol=s_it->second;
   
   // check if it has a body
   if(symbol.value.is_nil())
+  {
+    messaget message(message_handler);
+    message.error("main symbol `"+id2string(main_symbol)+"' has no body");
     return false; // give up
+  }
 
-  static_lifetime_init(context, symbol.location);
+  if(static_lifetime_init(context, symbol.location, message_handler))
+    return true;
   
   code_blockt init_code;
   

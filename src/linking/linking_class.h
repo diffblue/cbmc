@@ -14,10 +14,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <hash_cont.h>
 #include <typecheck.h>
 
-class c_linkt:public typecheckt
+class linkingt:public typecheckt
 {
 public:
-  c_linkt(
+  linkingt(
     contextt &_main_context,
     contextt &_src_context,
     message_handlert &_message_handler):

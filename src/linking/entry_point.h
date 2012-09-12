@@ -13,13 +13,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <message.h>
 #include <std_code.h>
 
-bool c_main(
+bool entry_point(
   contextt &context,
   const std::string &standard_main,
   message_handlert &message_handler);
 
-void static_lifetime_init(
+bool static_lifetime_init(
   contextt &context,
-  const locationt &location);
+  const locationt &location,
+  message_handlert &message_handler);
 
 #endif

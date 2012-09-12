@@ -115,10 +115,6 @@ protected:
     }
   };
   
-  virtual exprt zero_initializer(
-    const typet &type,
-    const locationt &location);
-
   virtual void do_initializer(
     exprt &initializer,
     const typet &type,

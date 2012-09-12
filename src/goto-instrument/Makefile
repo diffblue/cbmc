@@ -7,6 +7,7 @@ SRC = main.cpp parseoptions.cpp document_claims.cpp languages.cpp \
       cfg_dominators.cpp natural_loops.cpp
 
 OBJ += ../ansi-c/ansi-c$(LIBEXT) \
+      ../linking/linking$(LIBEXT) \
       ../big-int/bigint$(OBJEXT) \
       ../goto-programs/goto-programs$(LIBEXT) \
       ../goto-symex/goto-symex$(LIBEXT) \

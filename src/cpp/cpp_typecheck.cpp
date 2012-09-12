@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <location.h>
 #include <symbol.h>
 
+#include <linking/zero_initializer.h>
 #include <ansi-c/c_typecast.h>
 
 #include "cpp_typecheck.h"
@@ -266,7 +267,7 @@ void cpp_typecheckt::static_and_dynamic_initialization()
       continue;
 
     if(cpp_is_pod(symbol.type))
-      symbol.value=c_typecheck_baset::zero_initializer(symbol.type, symbol.location);
+      symbol.value=::zero_initializer(symbol.type, symbol.location, *this, get_message_handler());
     else
     {
       // _always_ zero initialize,
