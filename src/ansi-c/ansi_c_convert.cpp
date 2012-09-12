@@ -474,20 +474,32 @@ void ansi_c_convertt::convert_type(
 
     Forall_irep(it, components)
     {
-      // the arguments are now declarations
-      ansi_c_declarationt &component=
-        to_ansi_c_declaration(static_cast<exprt &>(*it));
+      // the arguments are declarations or static assertions
+      if(it->id()==ID_declaration)
+      {
+        ansi_c_declarationt &component=
+          to_ansi_c_declaration(static_cast<exprt &>(*it));
+  
+        exprt new_component(ID_component);
 
-      exprt new_component(ID_component);
+        new_component.location()=component.location();
+        new_component.set(ID_name, component.get_base_name());
+        new_component.set(ID_pretty_name, component.get_base_name());
+        new_component.type().swap(component.type());
 
-      new_component.location()=component.location();
-      new_component.set(ID_name, component.get_base_name());
-      new_component.set(ID_pretty_name, component.get_base_name());
-      new_component.type().swap(component.type());
+        convert_type(new_component.type());
 
-      convert_type(new_component.type());
-
-      component.swap(new_component);
+        it->swap(new_component);
+      }
+      else if(it->id()==ID_code && it->get(ID_statement)==ID_static_assert)
+      {
+        codet &assertion=static_cast<codet &>(*it);
+        assert(assertion.operands().size()==2);
+        convert_expr(assertion.op0());
+        convert_expr(assertion.op1());
+      }
+      else
+        assert(0);
     }
   }
   else if(type.id()==ID_typeof)
