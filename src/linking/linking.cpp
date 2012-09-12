@@ -14,15 +14,16 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <std_types.h>
 #include <simplify_expr.h>
 
-#include "c_link_type_eq.h"
-#include "expr2c.h"
+#include <ansi-c/expr2c.h>
 
-#include "c_link.h"
-#include "c_link_class.h"
+#include "linking_type_eq.h"
+
+#include "linking.h"
+#include "linking_class.h"
 
 /*******************************************************************\
 
-Function: c_linkt::to_string
+Function: linkingt::to_string
 
   Inputs:
 
@@ -32,14 +33,14 @@ Function: c_linkt::to_string
 
 \*******************************************************************/
 
-std::string c_linkt::to_string(const exprt &expr)
+std::string linkingt::to_string(const exprt &expr)
 { 
   return expr2c(expr, ns);
 }
 
 /*******************************************************************\
 
-Function: c_linkt::to_string
+Function: linkingt::to_string
 
   Inputs:
 
@@ -49,14 +50,14 @@ Function: c_linkt::to_string
 
 \*******************************************************************/
 
-std::string c_linkt::to_string(const typet &type)
+std::string linkingt::to_string(const typet &type)
 { 
   return type2c(type, ns);
 }
 
 /*******************************************************************\
 
-Function: c_linkt::duplicate
+Function: linkingt::duplicate
 
   Inputs:
 
@@ -66,7 +67,7 @@ Function: c_linkt::duplicate
 
 \*******************************************************************/
 
-void c_linkt::duplicate(
+void linkingt::duplicate(
   symbolt &old_symbol,
   symbolt &new_symbol)
 {
@@ -85,7 +86,7 @@ void c_linkt::duplicate(
 
 /*******************************************************************\
 
-Function: c_linkt::rename
+Function: linkingt::rename
 
   Inputs:
 
@@ -95,7 +96,7 @@ Function: c_linkt::rename
 
 \*******************************************************************/
 
-irep_idt c_linkt::rename(const irep_idt &old_identifier)
+irep_idt linkingt::rename(const irep_idt &old_identifier)
 {
   irep_idt new_identifier;
     
@@ -112,7 +113,7 @@ irep_idt c_linkt::rename(const irep_idt &old_identifier)
 
 /*******************************************************************\
 
-Function: c_linkt::duplicate_type
+Function: linkingt::duplicate_type
 
   Inputs:
 
@@ -122,12 +123,12 @@ Function: c_linkt::duplicate_type
 
 \*******************************************************************/
 
-void c_linkt::duplicate_type(
+void linkingt::duplicate_type(
   symbolt &old_symbol,
   symbolt &new_symbol)
 {
   // check if it is really the same
-  // -- use base_type_eq, not c_link_type_eq
+  // -- use base_type_eq, not linking_type_eq
   if(base_type_eq(old_symbol.type, new_symbol.type, ns))
     return;
 
@@ -170,7 +171,7 @@ void c_linkt::duplicate_type(
 
 /*******************************************************************\
 
-Function: c_linkt::duplicate_non_type
+Function: linkingt::duplicate_non_type
 
   Inputs:
 
@@ -180,7 +181,7 @@ Function: c_linkt::duplicate_non_type
 
 \*******************************************************************/
 
-void c_linkt::duplicate_non_type(
+void linkingt::duplicate_non_type(
   symbolt &old_symbol,
   symbolt &new_symbol)
 {
@@ -352,7 +353,7 @@ void c_linkt::duplicate_non_type(
 
 /*******************************************************************\
 
-Function: c_linkt::typecheck
+Function: linkingt::typecheck
 
   Inputs:
 
@@ -362,7 +363,7 @@ Function: c_linkt::typecheck
 
 \*******************************************************************/
 
-void c_linkt::typecheck()
+void linkingt::typecheck()
 {
   // We first take care of file-local non-type symbols.
   // These are static functions, or static variables
@@ -396,7 +397,7 @@ void c_linkt::typecheck()
 
 /*******************************************************************\
 
-Function: c_linkt::inspect_src_symbol
+Function: linkingt::inspect_src_symbol
 
   Inputs:
 
@@ -406,7 +407,7 @@ Function: c_linkt::inspect_src_symbol
 
 \*******************************************************************/
 
-void c_linkt::inspect_src_symbol(const irep_idt &identifier)
+void linkingt::inspect_src_symbol(const irep_idt &identifier)
 {
   // are we doing it already?
   if(!processing.insert(identifier).second)
@@ -458,13 +459,13 @@ Function: convert_c
 
 \*******************************************************************/
 
-bool c_link(
+bool linking(
   contextt &dest_context,
   contextt &new_context,
   message_handlert &message_handler)
 {
-  c_linkt c_link(
+  linkingt linking(
     dest_context, new_context, message_handler);
   
-  return c_link.typecheck_main();
+  return linking.typecheck_main();
 }

@@ -4,6 +4,7 @@ SRC = main.cpp parseoptions.cpp bmc.cpp dimacs.cpp languages.cpp \
       counterexample_beautification.cpp
 
 OBJ += ../ansi-c/ansi-c$(LIBEXT) \
+      ../linking/linking$(LIBEXT) \
       ../big-int/bigint$(OBJEXT) \
       ../goto-programs/goto-programs$(LIBEXT) \
       ../goto-symex/goto-symex$(LIBEXT) \

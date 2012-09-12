@@ -1,5 +1,5 @@
 DIRS = ansi-c big-int cbmc cpp goto-cc goto-instrument goto-programs floatbv \
-       goto-symex langapi pointer-analysis solvers util xmllang
+       goto-symex langapi pointer-analysis solvers util linking xmllang
 
 all: cbmc.dir goto-cc.dir goto-instrument.dir
 
@@ -16,14 +16,15 @@ $(patsubst %, %.dir, $(filter-out big-int util, $(DIRS))): util.dir
 languages: util.dir langapi.dir \
            cpp.dir ansi-c.dir xmllang.dir
 
-goto-instrument.dir: languages goto-programs.dir pointer-analysis.dir goto-symex.dir
+goto-instrument.dir: languages goto-programs.dir pointer-analysis.dir \
+                     goto-symex.dir linking.dir
 
 cbmc.dir: languages solvers.dir goto-symex.dir \
-          pointer-analysis.dir goto-programs.dir
+          pointer-analysis.dir goto-programs.dir linking.dir
 
 solvers.dir: floatbv.dir
 
-goto-cc.dir: languages pointer-analysis.dir goto-programs.dir
+goto-cc.dir: languages pointer-analysis.dir goto-programs.dir linking.dir
 
 $(patsubst %, %.dir, $(DIRS)):
 	## Entering $(basename $@)

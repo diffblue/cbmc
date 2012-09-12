@@ -16,182 +16,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <prefix.h>
 #include <std_types.h>
 
+#include <linking/zero_initializer.h>
+
 #include "c_types.h"
 #include "c_typecheck_base.h"
 #include "string_constant.h"
 #include "anonymous_member.h"
-
-/*******************************************************************\
-
-Function: c_typecheck_baset::zero_initializer
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-exprt c_typecheck_baset::zero_initializer(
-  const typet &type,
-  const locationt &location)
-{
-  const irep_idt &type_id=type.id();
-  
-  if(type_id==ID_bool)
-  {
-    exprt result=false_exprt();
-    result.location()=location;
-    return result;
-  }
-  else if(type_id==ID_unsignedbv ||
-          type_id==ID_signedbv ||
-          type_id==ID_floatbv ||
-          type_id==ID_fixedbv ||
-          type_id==ID_pointer ||
-          type_id==ID_complex)
-  {
-    exprt result=gen_zero(type);
-    result.location()=location;
-    return result;
-  }
-  else if(type_id==ID_code)
-  {
-    err_location(location);
-    throw "cannot zero-initialize code-type";
-  }
-  else if(type_id==ID_c_enum ||
-          type_id==ID_incomplete_c_enum)
-  {
-    constant_exprt value(type);
-    value.set_value(ID_0);
-    value.location()=location;
-    return value;
-  }
-  else if(type_id==ID_array)
-  {
-    const array_typet &array_type=to_array_type(type);
-    
-    if(array_type.size().is_nil())
-    {
-      // we initialize this with an empty array
-
-      array_exprt value(type);
-      value.type().id(ID_array);
-      value.type().set(ID_size, gen_zero(size_type()));
-      value.location()=location;
-      return value;
-    }
-    else
-    {
-      exprt tmpval=zero_initializer(array_type.subtype(), location);
-
-      mp_integer array_size;
-
-      if(array_type.size().id()==ID_infinity)
-      {
-        exprt value(ID_array_of, type);
-        value.copy_to_operands(tmpval);
-        value.location()=location;
-        return value;
-      }
-      else if(to_integer(array_type.size(), array_size))
-      {
-        err_location(location);
-        str << "failed to zero-initialize array of non-fixed size `"
-            << to_string(array_type.size()) << "'";
-        throw 0;
-      }
-        
-      if(array_size<0)
-      {
-        err_location(location);
-        throw "failed to zero-initialize array of with negative size";
-      }
-
-      array_exprt value(type);
-      value.operands().resize(integer2long(array_size), tmpval);
-      value.location()=location;
-      return value;
-    }
-  }
-  else if(type_id==ID_vector)
-  {
-    const vector_typet &vector_type=to_vector_type(type);
-    
-    exprt tmpval=zero_initializer(vector_type.subtype(), location);
-
-    mp_integer vector_size;
-
-    if(to_integer(vector_type.size(), vector_size))
-    {
-      err_location(location);
-      str << "failed to zero-initialize vector of non-fixed size `"
-          << to_string(vector_type.size()) << "'";
-      throw 0;
-    }
-      
-    if(vector_size<0)
-    {
-      err_location(location);
-      throw "failed to zero-initialize vector of with negative size";
-    }
-
-    vector_exprt value(vector_type);
-    value.operands().resize(integer2long(vector_size), tmpval);
-    value.location()=location;
-
-    return value;
-  }
-  else if(type_id==ID_struct)
-  {
-    const struct_typet::componentst &components=
-      to_struct_type(type).components();
-
-    exprt value(ID_struct, type);
-    
-    value.operands().reserve(components.size());
-
-    for(struct_typet::componentst::const_iterator
-        it=components.begin();
-        it!=components.end();
-        it++)
-      value.copy_to_operands(zero_initializer(it->type(), location));
-
-    value.location()=location;
-
-    return value;
-  }
-  else if(type_id==ID_union)
-  {
-    const union_typet::componentst &components=
-      to_union_type(type).components();
-
-    exprt value(ID_union, type);
-
-    if(components.empty())
-      return value; // stupid empty union
-
-    value.set(ID_component_name, components.front().get(ID_name));
-    value.copy_to_operands(
-      zero_initializer(components.front().type(), location));
-    value.location()=location;
-
-    return value;
-  }
-  else if(type_id==ID_symbol)
-  {
-    return zero_initializer(follow(type), location);
-  }
-  else
-  {
-    err_location(location);
-    str << "failed to zero-initialize `" << to_string(type)
-        << "'";
-    throw 0;
-  }
-}
 
 /*******************************************************************\
 
@@ -408,30 +238,15 @@ void c_typecheck_baset::do_initializer(symbolt &symbol)
     {
       const typet &final_type=follow(symbol.type);
       
-      if(final_type.id()==ID_incomplete_struct ||
-         final_type.id()==ID_incomplete_union)
-      {
-        // silently ignore due to 
-        // extern struct _IO_FILE_plus _IO_2_1_stdin_;
-        // in #include <stdio.h>
-      }
-      else if(final_type.id()==ID_empty)
+      // We do some checks, but this is otherwise left
+      // to __CPROVER_initialize to do.
+      
+      if(final_type.id()==ID_empty)
       {
         err_location(symbol.location);
         str << "cannot initialize type `"
             << to_string(final_type) << "'";
         throw 0;
-      }
-      else if(final_type.id()==ID_array &&
-              to_array_type(final_type).is_incomplete())
-      {
-        // ignore
-      }
-      else
-      {
-        // zero initializer
-        symbol.value=zero_initializer(symbol.type, symbol.location);
-        symbol.value.set(ID_C_zero_initializer, true);
       }
     }
     else
@@ -624,7 +439,7 @@ void c_typecheck_baset::do_designated_initializer(
             to_array_type(type).size().is_nil()))
         {
           // we are willing to grow an incomplete or zero-sized array
-          exprt zero=zero_initializer(type.subtype(), value.location());
+          exprt zero=zero_initializer(type.subtype(), value.location(), *this, get_message_handler());
           dest->operands().resize(integer2long(index)+1, zero);
           
           // todo: adjust type!
@@ -649,7 +464,7 @@ void c_typecheck_baset::do_designated_initializer(
       // build a union expression from the argument
       exprt union_expr(ID_union, type);
       union_expr.operands().resize(1);
-      union_expr.op0()=zero_initializer(component.type(), value.location());
+      union_expr.op0()=zero_initializer(component.type(), value.location(), *this, get_message_handler());
       union_expr.location()=value.location();
       union_expr.set(ID_component_name, component.get_name());
 
@@ -965,7 +780,7 @@ exprt c_typecheck_baset::do_initializer_list(
      type.id()==ID_union)
   {
     // start with zero everywhere
-    result=zero_initializer(type, value.location());
+    result=zero_initializer(type, value.location(), *this, get_message_handler());
   }
   else if(type.id()==ID_array)
   {
@@ -978,13 +793,13 @@ exprt c_typecheck_baset::do_initializer_list(
     else
     {
       // start with zero everywhere
-      result=zero_initializer(type, value.location());
+      result=zero_initializer(type, value.location(), *this, get_message_handler());
     }
   }
   else if(type.id()==ID_vector)
   {
     // start with zero everywhere
-    result=zero_initializer(type, value.location());
+    result=zero_initializer(type, value.location(), *this, get_message_handler());
   }
   else
   {

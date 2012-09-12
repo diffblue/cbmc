@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <i2string.h>
 #include <expr_util.h>
 
+#include <linking/zero_initializer.h>
+
 #include "c_typecheck_base.h"
 
 /*******************************************************************\
@@ -842,8 +844,8 @@ void c_typecheck_baset::typecheck_return(codet &code)
     if(follow(return_type).id()!=ID_empty)
     {
       // gcc doesn't actually complain, it just warns!
-      // We'll put a zero here.
-      exprt zero=zero_initializer(return_type, code.location());
+      // We'll put a zero here, which is dubious.
+      exprt zero=zero_initializer(return_type, code.location(), *this, get_message_handler());
       code.copy_to_operands(zero);
     }
   }

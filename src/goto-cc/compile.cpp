@@ -23,7 +23,7 @@ Date: June 2006
 #include <unicode.h>
 
 #include <ansi-c/ansi_c_language.h>
-#include <ansi-c/c_link_class.h>
+#include <linking/linking_class.h>
 
 #include <goto-programs/goto_convert.h>
 #include <goto-programs/goto_convert_functions.h>
@@ -1222,14 +1222,14 @@ bool compilet::read_object(
 
   // hardwired to C-style linking
 
-  c_linkt c_link(context, temp_context, ui_message_handler);
+  linkingt linking(context, temp_context, ui_message_handler);
 
-  if(c_link.typecheck_main())
+  if(linking.typecheck_main())
     return true;
     
   if(link_functions(context, functions,
                     temp_context, temp_functions,
-                    c_link.replace_symbol))
+                    linking.replace_symbol))
     return true;
 
   return false;

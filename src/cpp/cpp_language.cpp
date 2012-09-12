@@ -14,9 +14,10 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <config.h>
 #include <replace_symbol.h>
 
+#include <linking/linking.h>
+#include <linking/entry_point.h>
+
 #include <ansi-c/c_preprocess.h>
-#include <ansi-c/c_link.h>
-#include <ansi-c/c_main.h>
 #include <ansi-c/trans_unit.h>
 
 #include "internal_additions.h"
@@ -216,7 +217,7 @@ bool cpp_languaget::typecheck(
   if(cpp_typecheck(cpp_parse_tree, new_context, module, message_handler))
     return true;
 
-  return c_link(context, new_context, message_handler);
+  return linking(context, new_context, message_handler);
 }
 
 /*******************************************************************\
@@ -236,7 +237,7 @@ bool cpp_languaget::final(
   message_handlert &message_handler)
 {
   if(cpp_final(context, message_handler)) return true;
-  if(c_main(context, "c::main", message_handler)) return true;
+  if(entry_point(context, "c::main", message_handler)) return true;
 
   return false;
 }
