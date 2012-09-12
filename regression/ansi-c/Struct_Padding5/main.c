@@ -4,7 +4,7 @@
 #ifdef _MSC_VER
 
 // Visual Studio
-__declspec(align(64/8)) struct flowi
+__declspec(align(8)) struct flowi
 {
   char ch;
   char flexible[];
