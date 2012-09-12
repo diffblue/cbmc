@@ -179,11 +179,11 @@ std::string expr2ct::convert_rec(
     irep_idt c_type=src.get(ID_C_c_type);
 
     if(c_type==ID_double)
-      return "double";
+      return q+"double";
     else if(c_type==ID_long_double)
-      return "long double";
+      return q+"long double";
     else if(c_type==ID_float)
-      return "float";
+      return q+"float";
 
     mp_integer width=string2integer(src.get_string(ID_width));
 
@@ -199,11 +199,11 @@ std::string expr2ct::convert_rec(
     irep_idt c_type=src.get(ID_C_c_type);
 
     if(c_type==ID_double)
-      return "double";
+      return q+"double";
     else if(c_type==ID_long_double)
-      return "long double";
+      return q+"long double";
     else if(c_type==ID_float)
-      return "float";
+      return q+"float";
 
     mp_integer width=string2integer(src.get_string(ID_width));
 
@@ -220,38 +220,29 @@ std::string expr2ct::convert_rec(
     irep_idt c_type=src.get(ID_C_c_type);
 
     if(c_type==ID_unsigned_char)
-      return "unsigned char";
+      return q+"unsigned char";
     else if(c_type==ID_signed_char)
-      return "signed char";
+      return q+"signed char";
     else if(c_type==ID_unsigned_short_int)
-      return "unsigned short int";
+      return q+"unsigned short int";
     else if(c_type==ID_signed_short_int)
-      return "signed short int";
+      return q+"signed short int";
     else if(c_type==ID_unsigned_int)
-      return "unsigned int";
+      return q+"unsigned int";
     else if(c_type==ID_signed_int)
-      return "signed int";
+      return q+"signed int";
     else if(c_type==ID_unsigned_long_int)
-      return "unsigned long int";
+      return q+"unsigned long int";
     else if(c_type==ID_signed_long_int)
-      return "signed long int";
+      return q+"signed long int";
     else if(c_type==ID_unsigned_long_long_int)
-      return "unsigned long long int";
+      return q+"unsigned long long int";
     else if(c_type==ID_signed_long_long_int)
-      return "signed long long int";
-    
-    #if 0
-    else if(c_type==ID_double)
-      return "double";
-    else if(c_type==ID_long_double)
-      return "long double";
-    else if(c_type==ID_float)
-      return "float";
+      return q+"signed long long int";
     else if(c_type==ID_bool)
-      return "_Bool";
-    #endif
+      return q+"_Bool";
       
-    // There is also wchar_t in the above, but this isn't a C type.
+    // There is also wchar_t among the above, but this isn't a C type.
 
     mp_integer width=string2integer(src.get_string(ID_width));
 
@@ -367,11 +358,15 @@ std::string expr2ct::convert_rec(
     else
     {
       std::string tmp=convert(src.subtype());
-
-      if(q=="")
-        return tmp+" *";
-      else
-        return q+" ("+tmp+" *)";
+      tmp+=" *";
+      if(q!="")
+      {
+        tmp+=" "+q;
+        // strip training space off q
+        if(tmp[tmp.size()-1]==' ')
+          tmp.resize(tmp.size()-1);
+      }
+      return tmp;
     }
   }
   else if(src.id()==ID_array)
@@ -423,7 +418,7 @@ std::string expr2ct::convert_rec(
     dest+=", ";
     dest+=convert(vector_type.subtype());
     dest+=")";
-    return dest;
+    return q+dest;
   }
 
   {
