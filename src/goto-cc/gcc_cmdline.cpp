@@ -68,6 +68,7 @@ const char *gcc_options_with_separated_argument[]=
   "-print-prog-name",
   "-specs",
   "--sysroot",
+  "--include", // undocumented
   NULL
 };
 
