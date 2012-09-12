@@ -1,3 +1,6 @@
+typedef int * const ptr_constant;
+typedef int const * const const_ptr_constant;
+
 int f(const int farg[const 5])
 {
 }
@@ -16,4 +19,8 @@ int main()
   
   f(&a);
   g(&a);
+
+  // now with typedef  
+  ptr_constant pp1;
+  const_ptr_constant pp2=pp1;
 }
