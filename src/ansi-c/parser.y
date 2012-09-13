@@ -933,8 +933,9 @@ type_qualifier_list:
           $$=$1;
           merge_types($$, $2);
         }
-        /* the following is to allow mixing of type attributes with
-           type qualifiers */
+        /* The following is to allow mixing of type attributes with
+           type qualifiers, but the list has to start with a
+           proper type qualifier. */
         | type_qualifier_list gcc_type_attribute
         {
           $$=$1;
