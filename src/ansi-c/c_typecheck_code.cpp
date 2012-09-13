@@ -549,6 +549,7 @@ void c_typecheck_baset::typecheck_expression(codet &code)
       operands.swap(op.operands());
       code.set_statement(ID_assign);
       code.operands().swap(operands);
+      code.location()=op.location();
       
       if(code.op1().id()==ID_sideeffect &&
          code.op1().get(ID_statement)==ID_function_call)
