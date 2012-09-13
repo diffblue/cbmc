@@ -36,7 +36,7 @@ exprt convert_character_literal(
   
   exprt result;
 
-  if(src[0]=='L')
+  if(src[0]=='L' || src[0]=='u' || src[0]=='U')
   {
     assert(src[1]=='\'');
     assert(src[src.size()-1]=='\'');
@@ -44,11 +44,13 @@ exprt convert_character_literal(
     std::vector<unsigned int> value;
     unescape_wide_string(std::string(src, 2, src.size()-3), value);
     
+    // L is wchar_t, u is char16_t, U is char32_t
+    typet type=wchar_t_type();
+    
     if(value.size()==0)
       throw "empty wide character literal";
     else if(value.size()==1)
     {
-      typet type=wchar_t_type();
       result=from_integer(value[0], type);
     }
     else if(value.size()>=2 && value.size()<=4)
@@ -65,7 +67,7 @@ exprt convert_character_literal(
       }
 
       // always wchar_t
-      result=from_integer(x, wchar_t_type());
+      result=from_integer(x, type);
     }
     else
       throw "wide literals with "+i2string(value.size())+

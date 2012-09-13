@@ -32,16 +32,38 @@ exprt convert_string_literal(const std::string &src)
 {
   assert(src.size()>=2);
   
-  if(src[0]=='L')
+  if(src[0]=='u' && src[1]=='8')
   {
-    assert(src[1]=='"');
     assert(src[src.size()-1]=='"');
+    assert(src[2]=='"');
 
+    std::vector<unsigned int> value;
+    unescape_wide_string(std::string(src, 3, src.size()-4), value);
+    
+    // add trailing zero
+    value.push_back(0);
+    
+    // turn into utf-8
+    std::string utf8_value=""; // TODO
+    
+    string_constantt result;
+    result.set_value(utf8_value);
+
+    return result;
+  }
+  else if(src[0]=='L' || src[0]=='u' || src[0]=='U')
+  {
+    assert(src[src.size()-1]=='"');
+    assert(src[1]=='"');
+    
     std::vector<unsigned int> value;
     unescape_wide_string(std::string(src, 2, src.size()-3), value);
     
     // add trailing zero
     value.push_back(0);
+    
+    // L is wchar_t, u is char16_t, U is char32_t,
+    // this is TODO
 
     exprt result=exprt(ID_array);
     result.set(ID_C_string_constant, true);
