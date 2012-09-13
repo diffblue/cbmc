@@ -366,7 +366,7 @@ bool configt::set(const cmdlinet &cmdline)
   {
     ansi_c.mode=ansi_ct::MODE_GCC;
     ansi_c.os=configt::ansi_ct::OS_MACOS;
-    ansi_c.arch=configt::ansi_ct::ARCH_PPC;
+    ansi_c.arch=configt::ansi_ct::ARCH_POWER;
     ansi_c.endianness=configt::ansi_ct::IS_BIG_ENDIAN;
     ansi_c.lib=configt::ansi_ct::LIB_FULL;
   }

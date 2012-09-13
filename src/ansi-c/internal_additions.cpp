@@ -21,6 +21,26 @@ const char gcc_builtin_headers_ia32[]=
 #include "gcc_builtin_headers_ia32.inc"
 ;
 
+const char gcc_builtin_headers_alpha[]=
+"# 1 \"gcc_builtin_headers_alpha.h\"\n"
+#include "gcc_builtin_headers_alpha.inc"
+;
+
+const char gcc_builtin_headers_arm[]=
+"# 1 \"gcc_builtin_headers_arm.h\"\n"
+#include "gcc_builtin_headers_arm.inc"
+;
+
+const char gcc_builtin_headers_mips[]=
+"# 1 \"gcc_builtin_headers_mips.h\"\n"
+#include "gcc_builtin_headers_mips.inc"
+;
+
+const char gcc_builtin_headers_power[]=
+"# 1 \"gcc_builtin_headers_power.h\"\n"
+#include "gcc_builtin_headers_power.inc"
+;
+
 const char arm_builtin_headers[]=
 "# 1 \"arm_builtin_headers.h\"\n"
 #include "arm_builtin_headers.inc"
@@ -151,13 +171,39 @@ void ansi_c_internal_additions(std::string &code)
      config.ansi_c.mode==configt::ansi_ct::MODE_ARM)
   {
     code+=gcc_builtin_headers_generic;
-    
-    // should likely not add these for non-Intel architectures
-    code+=gcc_builtin_headers_ia32;
+
+    // there are many more, e.g., look at
+    // https://developer.apple.com/library/mac/#documentation/developertools/gcc-4.0.1/gcc/Target-Builtins.html
+
+    switch(config.ansi_c.arch)
+    {
+    case configt::ansi_ct::ARCH_I386:
+    case configt::ansi_ct::ARCH_X86_64:
+      code+=gcc_builtin_headers_ia32;
+      break;
+      
+    case configt::ansi_ct::ARCH_ARM:
+      code+=gcc_builtin_headers_arm;
+      break;
+
+    case configt::ansi_ct::ARCH_ALPHA:
+      code+=gcc_builtin_headers_alpha;
+      break;
+     
+    case configt::ansi_ct::ARCH_MIPS:
+      code+=gcc_builtin_headers_mips;
+      break;
+     
+    case configt::ansi_ct::ARCH_POWER:
+      code+=gcc_builtin_headers_power;
+      break;
+     
+    default:;
+    }
   }
 
   if(config.ansi_c.os==configt::ansi_ct::OS_WIN)
-    code+="int __noop();\n"; // this is Visual C/C++
+    code+="int __noop();\n"; // this is Visual C/C++ only
     
   // ARM stuff
   if(config.ansi_c.mode==configt::ansi_ct::MODE_ARM)
@@ -185,6 +231,10 @@ Function: architecture_strings
 
 void ansi_c_architecture_strings(std::string &code)
 {
+  // The following are CPROVER-specific.
+  // They allow identifying the architectural settings used
+  // at compile time from a goto-binary.
+
   code+="# 1 \"<builtin-architecture-strings>\"\n";
 
   code+=architecture_string(config.ansi_c.bool_width, "bool_width");

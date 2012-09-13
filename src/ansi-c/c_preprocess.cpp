@@ -694,7 +694,7 @@ bool c_preprocess_gcc(
   case configt::ansi_ct::OS_MACOS:
     if(config.ansi_c.arch==configt::ansi_ct::ARCH_I386)
       command+=" -Di386 -D__i386 -D__i386__ -D__LITTLE_ENDIAN__";
-    else if(config.ansi_c.arch==configt::ansi_ct::ARCH_PPC)
+    else if(config.ansi_c.arch==configt::ansi_ct::ARCH_POWER)
       command+=" -D__BIG_ENDIAN__";
     command+=" -D__APPLE__ -D__MACH__";
     // needs to be __APPLE_CPP__ for C++
