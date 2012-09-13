@@ -2,6 +2,8 @@ typedef void* __builtin_va_list;
 void __builtin_va_start(void *ap, ...);
 void __builtin_va_end(void *ap);
 void __builtin_va_copy(__builtin_va_list dest, __builtin_va_list src);
+void *__builtin_va_arg_pack();
+int __builtin_va_arg_pack_len();
 int __builtin_constant_p(int);
 int __builtin_abs(int);
 long int __builtin_labs(long);
@@ -33,6 +35,8 @@ void *__builtin_memset(void *s, int c, unsigned n);
 void *__builtin___memset_chk(void *s, int c, unsigned n, __CPROVER_size_t size);
 void *__builtin_memchr(const void *s, int c, __CPROVER_size_t n);
 void *__builtin_memmove(void *s1, const void *s2, __CPROVER_size_t n);
+void *__builtin_mempcpy(void *, const void *, __CPROVER_size_t);
+void *__builtin___mempcpy_chk(void *dest, const void *src, unsigned n, __CPROVER_size_t size);
 char *__builtin_strcat(char *dest, const char *src);
 char *__builtin___strcat_chk(char *dest, const char *src, __CPROVER_size_t size);
 char *__builtin_strcpy(char *dest, const char *src);
@@ -151,6 +155,12 @@ int __builtin_clzl(unsigned long);
 int __builtin_ctzl(unsigned long);
 long int __builtin_bswap32(long int x);
 long long int __builtin_bswap64(long long int x);
+int __builtin_classify_type();
+int __builtin_isnan(double);
+int __builtin_isnanf(float);
+int __builtin_signbit(double);
+int __builtin_signbitf(float);
+int __builtin_signbitl(long double);
 
 typedef int    __gcc_m64   __attribute__ ((__vector_size__ (8), __may_alias__));
 
@@ -173,3 +183,4 @@ typedef long long __gcc_v1di __attribute__ ((__vector_size__ (8)));
 typedef long long __gcc_v2di __attribute__ ((__vector_size__ (16)));
 typedef long long __gcc_v4di __attribute__ ((__vector_size__ (32)));
 typedef unsigned long long __gcc_di;
+

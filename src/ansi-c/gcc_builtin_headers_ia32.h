@@ -23,6 +23,12 @@ __gcc_di __builtin_ia32_cvtss2si64(__gcc_v4sf);
 __gcc_di __builtin_ia32_cvttss2si64(__gcc_v4sf);
 __gcc_v4sf __builtin_ia32_cvtsi642ss(__gcc_v4sf, __gcc_di);
 
+__gcc_v4hi __builtin_ia32_pshufw(__gcc_v4hi, int);
+int __builtin_ia32_vec_ext_v4hi(__gcc_v4hi, int);
+unsigned int __builtin_ia32_vec_ext_v8hi(__gcc_v8hi, int);
+__gcc_v4hi __builtin_ia32_vec_set_v4hi(__gcc_v4hi, int, int);
+__gcc_v8hi __builtin_ia32_vec_set_v8hi(__gcc_v8hi, int, int);
+
 // from
 // http://gcc.gnu.org/onlinedocs/gcc-4.7.0/gcc/X86-Built_002din-Functions.html
 

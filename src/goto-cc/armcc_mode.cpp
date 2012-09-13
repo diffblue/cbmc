@@ -53,6 +53,7 @@ bool armcc_modet::doit()
   config.set(cmdline);
 
   config.ansi_c.mode=configt::ansi_ct::MODE_ARM;
+  config.ansi_c.arch=configt::ansi_ct::ARCH_ARM;
 
   if(cmdline.isset('E'))
     compiler.only_preprocess=true;
