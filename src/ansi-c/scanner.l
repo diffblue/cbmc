@@ -215,14 +215,14 @@ void ansi_c_scanner_init()
    .*		{ } /* all characters within comments are ignored */
 	}
 
-<GRAMMAR>"L"?[']{c_char}+['] {
+<GRAMMAR>("L"|"u"|"U")?[']{c_char}+['] {
                   newstack(yyansi_clval);
                   stack(yyansi_clval)=convert_character_literal(yytext, true);
                   PARSER.set_location(stack(yyansi_clval));
                   return TOK_CHARACTER;
                 }
 
-<GRAMMAR>"L"?["]{s_char}*["] {
+<GRAMMAR>("L"|"u"|"U"|"u8")?["]{s_char}*["] {
                   newstack(yyansi_clval);
                   stack(yyansi_clval)=convert_string_literal(yytext);
                   PARSER.set_location(stack(yyansi_clval));
