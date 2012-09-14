@@ -1962,10 +1962,14 @@ std::string expr2ct::convert_array(
     
     forall_operands(it, src)
     {
+      // these have a trailing zero
+      if(it==--src.operands().end())
+        break;
+    
       assert(it->is_constant());
       mp_integer i;
       to_integer(*it, i);
-      int ch=integer2long(i);
+      unsigned int ch=integer2long(i);
 
       switch(ch)
       {
@@ -1980,15 +1984,13 @@ std::string expr2ct::convert_array(
       case '"': dest+="\\\""; break;
       
       default:
-        unsigned char u_ch=ch;
-        if(ch>=' ' && ch!=127)
-          dest+=(char)u_ch;
+        if(ch>=' ' && ch!=127 && ch<0xff)
+          dest+=(char)ch;
         else
         {
-          dest+='\\';
-          dest+='x';
-          dest+=((u_ch>>4)&0xf)+'a';
-          dest+=(u_ch&0xf)+'a';
+          char hexbuf[10];
+          sprintf(hexbuf, "\\x%x", ch);
+          dest+=hexbuf;
         }
       }
     }
