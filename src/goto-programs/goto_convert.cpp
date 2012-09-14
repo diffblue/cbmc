@@ -2363,8 +2363,13 @@ const irep_idt goto_convertt::get_string_constant(
       std::string result;
       forall_operands(it, index_op)
         if(it->is_constant())
-          result+=char(integer2long(
-            binary2integer(id2string(to_constant_expr(*it).get_value()), true)));
+        {
+          unsigned i=integer2long(
+            binary2integer(id2string(to_constant_expr(*it).get_value()), true));
+
+          if(i!=0) // to skip terminating 0
+            result+=char(i);
+        }
           
       return result;
     }
