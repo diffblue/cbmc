@@ -1980,11 +1980,15 @@ std::string expr2ct::convert_array(
       case '"': dest+="\\\""; break;
       
       default:
-        if(isalnum(ch))
-          dest+=(char)ch;
+        unsigned char u_ch=ch;
+        if(ch>=' ' && ch!=127)
+          dest+=(char)u_ch;
         else
         {
-          // TODO, hexify
+          dest+='\\';
+          dest+='x';
+          dest+=((u_ch>>4)&0xf)+'a';
+          dest+=(u_ch&0xf)+'a';
         }
       }
     }
