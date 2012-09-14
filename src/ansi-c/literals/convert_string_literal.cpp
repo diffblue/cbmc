@@ -41,11 +41,8 @@ exprt convert_string_literal(const std::string &src)
     std::basic_string<unsigned int> value;
     unescape_wide_string(std::string(src, 3, src.size()-4), value);
     
-    // add trailing zero
-    value.push_back(0);
-    
     // turn into utf-8
-    std::string utf8_value=utf32_to_utf8(value); // TODO
+    std::string utf8_value=utf32_to_utf8(value);
     
     string_constantt result;
     result.set_value(utf8_value);
