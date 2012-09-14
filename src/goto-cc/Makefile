@@ -37,6 +37,6 @@ goto-cc$(EXEEXT): $(OBJ)
 
 .PHONY: goto-cc-mac-signed
 
-goto-cc-mac-signed: cbmc$(EXEEXT)
+goto-cc-mac-signed: goto-cc$(EXEEXT)
 	codesign -v -s $(OSX_IDENTITY) goto-cc$(EXEEXT)
 
