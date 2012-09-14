@@ -23,6 +23,8 @@ typet c_bool_type();
 typet char_type();
 typet uchar_type();
 typet wchar_t_type();
+typet char16_t_type();
+typet char32_t_type();
 typet float_type();
 typet double_type();
 typet long_double_type();

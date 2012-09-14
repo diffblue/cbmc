@@ -125,9 +125,9 @@ Function: unescape_wide_string
 
 void unescape_wide_string(
   const std::string &src,
-  std::vector<unsigned int> &dest)
+  std::basic_string<unsigned int> &dest)
 {
-  dest.reserve(src.size());
+  dest.reserve(src.size()); // about that long, but may be shorter
 
   for(unsigned i=0; i<src.size(); i++)
   {

@@ -41,7 +41,7 @@ exprt convert_character_literal(
     assert(src[1]=='\'');
     assert(src[src.size()-1]=='\'');
   
-    std::vector<unsigned int> value;
+    std::basic_string<unsigned int> value;
     unescape_wide_string(std::string(src, 2, src.size()-3), value);
     
     // L is wchar_t, u is char16_t, U is char32_t
