@@ -661,6 +661,7 @@ void c_typecheck_baset::typecheck_expr_symbol(exprt &expr)
     string_constantt s;
     s.set_value(location.get_function());
     s.location()=location;
+    s.set(ID_C_lvalue, true);
     expr.swap(s);
   }
   else
@@ -917,65 +918,18 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
   }
 
   const typet expr_type=follow(expr.type());
-  
-  if(expr_type.id()==ID_struct)
-  {
-    // Already the same? Just remove.
-    if(base_type_eq(expr_type, op.type(), *this))
-    {
-      exprt tmp=op;
-      expr=tmp;
-      return;
-    }
 
-    // typecast to struct: this is a GCC extension,
-    // and also exists in C99 as "compound literal"
-    if(op.id()!=ID_initializer_list)
-    {
-      err_location(expr);
-      str << "type cast to struct requires initializer_list argument";
-      throw 0;
-    }
-    
-    // just do a normal initialization    
-    do_initializer(op, expr_type, false);
-  
-    // just remove typecast
-    exprt tmp=op;
-    expr=tmp;
-    
-    return;
-  }
-  else if(expr_type.id()==ID_union)
+  if(expr_type.id()==ID_union &&
+     !base_type_eq(expr_type, op.type(), *this) &&
+     op.id()!=ID_initializer_list)
   {
-    // Already the same? Just remove.
-    if(base_type_eq(expr_type, op.type(), *this))
-    {
-      exprt tmp=op;
-      expr=tmp;
-      return;
-    }
-
     // This is a GCC extension. It's either a 'temporary union',
-    // where the argument is expected to be a 'initializer_list',
-    // or a cast from one of the member types.
+    // where the argument is one of the member types.
 
-    if(op.id()==ID_initializer_list)
-    {
-      // just do a normal initialization    
-      do_initializer(op, expr_type, false);
-      
-      // just remove typecast
-      exprt tmp=op;
-      expr=tmp;
-      
-      return;
-    }
-    
     // we need to find a member with the right type
     const union_typet &union_type=to_union_type(expr_type);
     const union_typet::componentst &components=union_type.components();
-    
+  
     for(union_typet::componentst::const_iterator
         it=components.begin();
         it!=components.end();
@@ -989,71 +943,22 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
         union_expr.op()=op;
         union_expr.set_component_name(it->get_name());
         expr=union_expr;
+        expr.set(ID_C_lvalue, true);
         return;
       }
     }
-    
-    err_location(expr);
-    str << "type cast to union either requires initializer list "
-           "argument or an expression with a member type";
-    throw 0;
   }
-  else if(expr_type.id()==ID_array)
+
+  // We allow (TYPE){ expression }
+  if(op.id()==ID_initializer_list)
   {
-    // This is a GCC extension called 'array constructor';
-    // the argument is expected to be an 'initializer_list'.
-    // It also exists in C99 as "compound literal".
-    if(op.id()!=ID_initializer_list)
-    {
-      err_location(expr);
-      str << "type cast to array requires initializer list "
-             "argument";
-      throw 0;
-    }
-    
-    // just do a normal initialization    
+    // just do a normal initialization
     do_initializer(op, expr_type, false);
-    
-    // just remove typecast
+
     exprt tmp=op;
     expr=tmp;
-
+    expr.set(ID_C_lvalue, true);
     return;
-  }
-  else if(expr_type.id()==ID_vector)
-  {
-    // vectors are a GCC extension
-    if(op.id()==ID_initializer_list)
-    {
-      // just do a normal initialization    
-      do_initializer(op, expr_type, false);
-    
-      // just remove typecast
-      exprt tmp=op;
-      expr=tmp;
-
-      return;
-    }
-  }
-  else
-  {
-    // We allow (TYPE){ expression } and
-    // rewrite that to (TYPE)expression
-    
-    if(op.id()==ID_initializer_list)
-    {
-      if(op.operands().size()!=1)
-      {
-        err_location(expr);
-        str << "type cast to " << to_string(expr_type)
-            << " requires initializer list of size 1";
-        throw 0;
-      }
-      
-      // just remove the initializer list
-      exprt tmp=op.op0();
-      expr.op0().swap(tmp);
-    }
   }
   
   // a cast to void is always fine
@@ -1222,7 +1127,7 @@ void c_typecheck_baset::typecheck_expr_index(exprt &expr)
   make_index_type(index_expr);
 
   const typet &final_array_type=follow(array_expr.type());
-
+  
   if(final_array_type.id()==ID_array)
   {
     if(array_expr.get_bool(ID_C_lvalue))
@@ -1693,7 +1598,6 @@ void c_typecheck_baset::typecheck_expr_address_of(exprt &expr)
   if(op.id()==ID_address_of &&
      op.get_bool(ID_C_implicit) &&
      op.operands().size()==1 &&
-     op.op0().id()==ID_symbol &&
      op.op0().type().id()==ID_code)
   {
     // make the implicit address_of an explicit address_of
