@@ -5,6 +5,9 @@ umask u=rwx,g=rx,o=rx
 
 make cbmc-mac-signed
 
+(cd ../goto-cc; make goto-cc-mac-signed)
+(cd ~/progr/hw-cbmc/trunk/src/hw-cbmc; make hw-cbmc-mac-signed)
+
 VERSION=`./cbmc --version`
 VERSION_FILE=`echo $VERSION | sed "y/./-/"`
 BITS=`getconf LONG_BIT`
