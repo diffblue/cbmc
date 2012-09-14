@@ -23,6 +23,7 @@ int main()
   assert((unsigned char)euro_sign[1]==0x82);
   assert((unsigned char)euro_sign[2]==0xac);
   assert(euro_sign[3]==0);
+  assert(sizeof(euro_sign)==4);
   
   // C11 unicode string literals
   assert(sizeof(u8""[0])==sizeof(char));
