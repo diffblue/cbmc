@@ -29,6 +29,22 @@ int main()
   
   // complex conjugate
   char_complex2 = ~ char_complex;
+  
+  // __real__ something is an lvalue!
+  __real__ char_complex = 100;  
+  assert(__real__ char_complex == 100);
+  assert(__imag__ char_complex == 3);
+
+  // can be incremented  
+  char_complex++;
+  assert(__real__ char_complex == 101);
+  assert(__imag__ char_complex == 3);
+  
+  // also separately
+  (__real__ char_complex)++;
+  assert(__real__ char_complex == 102);  
+  assert(__imag__ char_complex == 3);
+  
   #else
   
   // Visual studio doesn't have it  
