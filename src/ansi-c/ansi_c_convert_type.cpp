@@ -86,6 +86,8 @@ void ansi_c_convert_typet::read_rec(const typet &type)
     int64_cnt++;
   else if(type.id()==ID_gcc_float128)
     gcc_float128_cnt++;
+  else if(type.id()==ID_gcc_int128)
+    gcc_int128_cnt++;
   else if(type.id()==ID_gcc_attribute_mode)
   {
     const exprt &size_expr=
@@ -210,7 +212,7 @@ void ansi_c_convert_typet::write(typet &type)
        unsigned_cnt || int_cnt || c_bool_cnt || proper_bool_cnt ||
        short_cnt || char_cnt || complex_cnt || long_cnt ||
        int8_cnt || int16_cnt || int32_cnt || int64_cnt ||
-       gcc_float128_cnt || bv_cnt)
+       gcc_float128_cnt || gcc_int128_cnt || bv_cnt)
     {
       err_location(location);
       error("illegal type modifier for defined type");
@@ -230,7 +232,7 @@ void ansi_c_convert_typet::write(typet &type)
   {
     if(signed_cnt || unsigned_cnt || int_cnt || c_bool_cnt || proper_bool_cnt ||
        int8_cnt || int16_cnt || int32_cnt || int64_cnt ||
-       bv_cnt ||
+       gcc_int128_cnt || bv_cnt ||
        short_cnt || char_cnt)
     {
       err_location(location);
@@ -251,7 +253,7 @@ void ansi_c_convert_typet::write(typet &type)
   {
     if(signed_cnt || unsigned_cnt || int_cnt || c_bool_cnt || proper_bool_cnt ||
        int8_cnt || int16_cnt || int32_cnt || int64_cnt ||
-       bv_cnt ||
+       gcc_int128_cnt|| bv_cnt ||
        short_cnt || char_cnt)
     {
       err_location(location);
@@ -321,7 +323,7 @@ void ansi_c_convert_typet::write(typet &type)
 
     type.id(ID_bool);
   }
-  else if(complex_cnt && !char_cnt && !signed_cnt && !unsigned_cnt && !short_cnt)
+  else if(complex_cnt && !char_cnt && !signed_cnt && !unsigned_cnt && !short_cnt && !gcc_int128_cnt)
   {
     // the "default" for complex is double
     type=double_type();
@@ -365,7 +367,7 @@ void ansi_c_convert_typet::write(typet &type)
       else
         assert(false);
     }
-    else if(int8_cnt || int16_cnt || int32_cnt || int64_cnt || bv_cnt)
+    else if(int8_cnt || int16_cnt || int32_cnt || int64_cnt || gcc_int128_cnt || bv_cnt)
     {
       if(long_cnt || char_cnt || short_cnt)
       {
@@ -384,6 +386,8 @@ void ansi_c_convert_typet::write(typet &type)
         width=8*8;
       else if(bv_cnt)
         width=bv_width;
+      else if(gcc_int128_cnt)
+        width=128;
       else
         assert(false);
     }

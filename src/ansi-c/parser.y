@@ -113,6 +113,10 @@ extern char *yyansi_ctext;
 %token TOK_PTR64       "__ptr64"
 %token TOK_TYPEOF      "typeof"
 %token TOK_GCC_FLOAT128 "__float128"
+%token TOK_GCC_INT128 "__int128"
+%token TOK_GCC_DECIMAL32 "_Decimal32"
+%token TOK_GCC_DECIMAL64 "_Decimal64"
+%token TOK_GCC_DECIMAL128 "_Decimal128"
 %token TOK_GCC_ASM     "__asm__"
 %token TOK_GCC_ASM_PAREN "__asm__ (with parentheses)"
 %token TOK_GCC_ATTRIBUTE_ALIGNED "aligned"
@@ -1183,6 +1187,10 @@ basic_type_name:
         | TOK_LONG     { $$=$1; set($$, ID_long); }
         | TOK_FLOAT    { $$=$1; set($$, ID_float); }
         | TOK_GCC_FLOAT128 { $$=$1; set($$, ID_gcc_float128); }
+        | TOK_GCC_INT128 { $$=$1; set($$, ID_gcc_int128); }
+        | TOK_GCC_DECIMAL32 { $$=$1; set($$, ID_gcc_decimal32); }
+        | TOK_GCC_DECIMAL64 { $$=$1; set($$, ID_gcc_decimal64); }
+        | TOK_GCC_DECIMAL128 { $$=$1; set($$, ID_gcc_decimal128); }
         | TOK_DOUBLE   { $$=$1; set($$, ID_double); }
         | TOK_SIGNED   { $$=$1; set($$, ID_signed); }
         | TOK_UNSIGNED { $$=$1; set($$, ID_unsigned); }

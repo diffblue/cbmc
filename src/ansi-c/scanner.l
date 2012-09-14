@@ -303,6 +303,30 @@ void ansi_c_scanner_init()
                     return make_identifier();
                 }
 
+"__int128"	{ if(PARSER.mode==ansi_c_parsert::GCC)
+                    { loc(); return TOK_GCC_INT128; }
+                  else
+                    return make_identifier();
+                }
+
+"_Decimal32"    { if(PARSER.mode==ansi_c_parsert::GCC)
+                    { loc(); return TOK_GCC_DECIMAL32; }
+                  else
+                    return make_identifier();
+                }
+
+"_Decimal64"    { if(PARSER.mode==ansi_c_parsert::GCC)
+                    { loc(); return TOK_GCC_DECIMAL64; }
+                  else
+                    return make_identifier();
+                }
+
+"_Decimal128"   { if(PARSER.mode==ansi_c_parsert::GCC)
+                    { loc(); return TOK_GCC_DECIMAL128; }
+                  else
+                    return make_identifier();
+                }
+
 "__int8"        { return MSC_Keyword(TOK_INT8); }
 "__int16"       { return MSC_Keyword(TOK_INT16); }
 "__int32"       { return MSC_Keyword(TOK_INT32); }

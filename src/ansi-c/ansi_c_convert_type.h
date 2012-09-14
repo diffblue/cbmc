@@ -26,7 +26,7 @@ public:
   // extensions
   unsigned int8_cnt, int16_cnt, int32_cnt, int64_cnt,
            ptr32_cnt, ptr64_cnt,
-           gcc_float128_cnt, bv_cnt, bv_width;
+           gcc_float128_cnt, gcc_int128_cnt, bv_cnt, bv_width;
   bool gcc_mode_QI, gcc_mode_HI, gcc_mode_SI, gcc_mode_DI;
            
   bool packed, aligned;
@@ -56,7 +56,7 @@ public:
     long_cnt=double_cnt=float_cnt=c_bool_cnt=proper_bool_cnt=complex_cnt=
     int8_cnt=int16_cnt=int32_cnt=int64_cnt=
     ptr32_cnt=ptr64_cnt=
-    gcc_float128_cnt=bv_cnt=0;
+    gcc_float128_cnt=gcc_int128_cnt=bv_cnt=0;
     vector_size.make_nil();
     alignment.make_nil();
     bv_width=0;
