@@ -146,6 +146,56 @@ std::wstring widen(const std::string &s)
 
 /*******************************************************************\
 
+Function: 
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+std::string utf32_to_utf8(const std::basic_string<unsigned int> &s)
+{
+  std::string result;
+  
+  result.reserve(s.size()); // at least that long
+
+  for(std::basic_string<unsigned int>::const_iterator
+      it=s.begin();
+      it!=s.end();
+      it++)
+  {  
+    register unsigned int c=*it;
+  
+    if(c<=0x7f)           
+      result+=char(c);
+    else if(c<=0x7ff)
+    {
+      result+=char((c >> 6)   | 0xc0);
+      result+=char((c & 0x3f) | 0x80);
+    }
+    else if(c<=0xffff)
+    {
+      result+=char((c >> 12)         | 0xe0);
+      result+=char(((c >> 6) & 0x3f) | 0x80);
+      result+=char((c & 0x3f)        | 0x80);
+    }
+    else
+    {         
+      result+=char((c >> 18)         | 0xf0);
+      result+=char(((c >> 12) & 0x3f)| 0x80);
+      result+=char(((c >> 6) & 0x3f) | 0x80);
+      result+=char((c & 0x3f)        | 0x80);
+    }
+  }
+
+  return result;
+}                                                                                                                                                                                                                                                                                        
+
+/*******************************************************************\
+
 Function: narrow_argv
 
   Inputs:

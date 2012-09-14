@@ -283,6 +283,64 @@ typet wchar_t_type()
 
 /*******************************************************************\
 
+Function: char16_t_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+typet char16_t_type()
+{
+  typet result;
+
+  /*  
+  if(config.ansi_c.wchar_t_is_unsigned)
+    result=unsignedbv_typet(config.ansi_c.wchar_t_width);
+  else
+    result=signedbv_typet(config.ansi_c.wchar_t_width);
+  */
+
+  result=unsignedbv_typet(16);
+
+  //result.set(ID_C_c_type, ID_wchar_t);
+  return result;
+}
+
+/*******************************************************************\
+
+Function: char32_t_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+typet char32_t_type()
+{
+  typet result;
+  
+  /*
+  if(config.ansi_c.wchar_t_is_unsigned)
+    result=unsignedbv_typet(config.ansi_c.wchar_t_width);
+  else
+    result=signedbv_typet(config.ansi_c.wchar_t_width);
+  */
+
+  result=unsignedbv_typet(32);
+
+  //result.set(ID_C_c_type, ID_wchar_t);
+  return result;
+}
+
+/*******************************************************************\
+
 Function: float_type
 
   Inputs:
