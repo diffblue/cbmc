@@ -107,6 +107,9 @@ bool static_lifetime_init(
     // just code
     if(it->second.type.id()==ID_code)
       continue;
+    
+    if(it->second.value.id()==ID_nondet)
+      continue; // do not initialize
       
     exprt rhs;
       
