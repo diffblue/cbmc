@@ -97,8 +97,7 @@ exprt gen_one(const typet &type)
      type_id==ID_rational ||
      type_id==ID_real ||
      type_id==ID_integer ||
-     type_id==ID_natural ||
-     type_id==ID_complex)
+     type_id==ID_natural)
   {
     result.set(ID_value, ID_1);
   }
@@ -126,6 +125,13 @@ exprt gen_one(const typet &type)
     ieee_float.spec=to_floatbv_type(type);
     ieee_float.from_integer(1);
     result=ieee_float.to_expr();
+  }
+  else if(type_id==ID_complex)
+  {
+    result=exprt(ID_complex, type);
+    result.operands().resize(2);
+    result.op0()=gen_one(type.subtype());
+    result.op1()=gen_zero(type.subtype());
   }
   else
     result.make_nil();

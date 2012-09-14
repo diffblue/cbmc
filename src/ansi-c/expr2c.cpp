@@ -3764,6 +3764,12 @@ std::string expr2ct::convert(
   else if(src.id()==ID_abs)
     return convert_function(src, "abs", precedence=15);
 
+  else if(src.id()==ID_complex_real)
+    return convert_function(src, "__real__", precedence=15);
+
+  else if(src.id()==ID_complex_imag)
+    return convert_function(src, "__imag__", precedence=15);
+
   else if(src.id()==ID_bitand)
     return convert_binary(src, "&", precedence=8, false);
 
