@@ -804,16 +804,6 @@ bool c_preprocess_gcc(
 
   FILE *stream=popen(command.c_str(), "r");
 
-  // errors/warnings
-  {
-    std::ifstream stderr_stream(stderr_file.c_str());
-    char ch;
-    while((stderr_stream.read(&ch, 1))!=NULL)
-      message_stream.str << ch;
-  }
-
-  unlink(stderr_file.c_str());
-
   if(stream!=NULL)
   {
     char ch;
@@ -827,6 +817,16 @@ bool c_preprocess_gcc(
     message_stream.str << "GCC preprocessing failed (popen failed)" << std::endl;
     result=1;
   }
+
+  // errors/warnings
+  {
+    std::ifstream stderr_stream(stderr_file.c_str());
+    if(stderr_stream)
+      message_stream.str << stderr_stream.rdbuf();
+  }
+
+  unlink(stderr_file.c_str());
+
   #endif
 
   if(result!=0)
