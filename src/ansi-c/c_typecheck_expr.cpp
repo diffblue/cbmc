@@ -214,9 +214,14 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
     if(op_type.id()!=ID_complex)
     {
       err_location(expr);
-      throw "expected complex typed operand";
+      throw "expected complex-typed operand";
     }
+
     expr.type()=op_type.subtype();
+    
+    // these are lvalues if the operand is one
+    if(expr.op0().get_bool(ID_C_lvalue))
+      expr.set(ID_C_lvalue, true);
   }
   else if(expr.id()==ID_generic_selection)
   {
