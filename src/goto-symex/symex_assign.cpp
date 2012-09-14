@@ -153,6 +153,27 @@ void basic_symext::symex_assign_rec(
   else if(lhs.id()==ID_byte_extract_little_endian ||
           lhs.id()==ID_byte_extract_big_endian)
     symex_assign_byte_extract(state, lhs, full_lhs, rhs, guard, visibility);
+  else if(lhs.id()==ID_complex_real || lhs.id()==ID_complex_imag)
+  {
+    // this is stuff like __real__ x = 1;
+    assert(lhs.operands().size()==1);
+    
+    exprt new_rhs=exprt(ID_complex, lhs.op0().type());
+    new_rhs.operands().resize(2);
+    
+    if(lhs.id()==ID_complex_real)
+    {
+      new_rhs.op0()=rhs;
+      new_rhs.op1()=unary_exprt(ID_complex_imag, lhs.op0(), lhs.type());
+    }
+    else
+    {
+      new_rhs.op0()=unary_exprt(ID_complex_real, lhs.op0(), lhs.type());
+      new_rhs.op1()=rhs;
+    }
+    
+    symex_assign_rec(state, lhs.op0(), full_lhs, new_rhs, guard, visibility);
+  }
   else
     throw "assignment to `"+lhs.id_string()+"' not handled";
 }

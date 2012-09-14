@@ -222,6 +222,9 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
     // these are lvalues if the operand is one
     if(expr.op0().get_bool(ID_C_lvalue))
       expr.set(ID_C_lvalue, true);
+      
+    if(expr.op0().get_bool(ID_C_constant))
+      expr.set(ID_C_constant, true);
   }
   else if(expr.id()==ID_generic_selection)
   {
