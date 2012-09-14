@@ -13,13 +13,14 @@ DEB_ARCH=`dpkg --print-architecture`
 echo $VERSION_FILE
 
 (cd ../goto-cc; make; strip goto-cc)
-(cd ../hw-cbmc; make; strip hw-cbmc)
+(cd ~/progr/hw-cbmc/trunk/src/hw-cbmc; make; strip hw-cbmc)
 (cd ../goto-instrument; make; strip goto-instrument)
 
 mkdir /tmp/cbmc-dist
-cp ../hw-cbmc/hw-cbmc ../cbmc/cbmc ../goto-cc/goto-cc \
+cp ~/progr/hw-cbmc/trunk/src/hw-cbmc/hw-cbmc ../cbmc/cbmc ../goto-cc/goto-cc \
   ../goto-instrument/goto-instrument /tmp/cbmc-dist/
 cp ../../LICENSE /tmp/cbmc-dist/
+cp ../../doc/man/cbmc.1 /tmp/cbmc-dist/
 cd /tmp/cbmc-dist
 tar cfz cbmc-${VERSION_FILE}-linux-${BITS}.tgz hw-cbmc cbmc \
   goto-cc goto-instrument LICENSE
@@ -33,7 +34,7 @@ mkdir debian/usr/share/man
 mkdir debian/usr/share/man/man1
 cp hw-cbmc cbmc goto-cc goto-instrument \
   debian/usr/bin/
-cp ../../doc/man/cbmc.1 debian/usr/share/man/man1
+cp cbmc.1 debian/usr/share/man/man1
 
 cat > debian/DEBIAN/control << EOM
 Package: cbmc
