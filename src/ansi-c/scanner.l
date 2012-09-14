@@ -325,21 +325,24 @@ void ansi_c_scanner_init()
 */
 %}
 
-"__complex__"	{ if(PARSER.mode==ansi_c_parsert::GCC ||
+"__complex__" |
+"__complex"     { if(PARSER.mode==ansi_c_parsert::GCC ||
                      PARSER.mode==ansi_c_parsert::ARM)
                     { loc(); return TOK_COMPLEX; }
                   else
                     return make_identifier();
                 }
 
-"__real__"	{ if(PARSER.mode==ansi_c_parsert::GCC ||
+"__real__" |
+"__real"	{ if(PARSER.mode==ansi_c_parsert::GCC ||
                      PARSER.mode==ansi_c_parsert::ARM)
                     { loc(); return TOK_REAL; }
                   else
                     return make_identifier();
                 }
 
-"__imag__"	{ if(PARSER.mode==ansi_c_parsert::GCC ||
+"__imag__" |
+"__imag"	{ if(PARSER.mode==ansi_c_parsert::GCC ||
                      PARSER.mode==ansi_c_parsert::ARM)
                     { loc(); return TOK_IMAG; }
                   else
@@ -381,7 +384,8 @@ void ansi_c_scanner_init()
                     return make_identifier();
                 }
 
-"__alignof__"   { if(PARSER.mode==ansi_c_parsert::GCC ||
+"__alignof__" |
+"__alignof"     { if(PARSER.mode==ansi_c_parsert::GCC ||
                      PARSER.mode==ansi_c_parsert::ARM)
                     { loc(); return TOK_ALIGNOF; }
                   else
