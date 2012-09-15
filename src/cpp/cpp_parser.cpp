@@ -29,22 +29,3 @@ bool cpp_parsert::parse()
   return cpp_parse();
 }
 
-/*******************************************************************\
-
-Function: yycpperror
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-extern char *yycpptext;
-
-int yycpperror(const std::string &error)
-{
-  cpp_parser.parse_error(error, yycpptext);
-  return error.size()+1;
-}

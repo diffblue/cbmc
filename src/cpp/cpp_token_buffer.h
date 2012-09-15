@@ -27,10 +27,6 @@ public:
 
   post Save();
   void Restore(post pos);
-  //void GetOnlyClosingBracket(Token&);
-
-  //void GetComments(irept &p);
-  //void GetComments2(irept &p);
   
   void clear()
   {
