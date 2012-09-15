@@ -2843,6 +2843,15 @@ void c_typecheck_baset::typecheck_side_effect_assignment(exprt &expr)
         << "' is constant";
     throw 0;
   }
+  
+  // refuse to assign arrays
+  if(final_type0.id()==ID_array ||
+     final_type0.id()==ID_incomplete_array)
+  {
+    err_location(expr);
+    str << "error: direct assignments to arrays not permitted";
+    throw 0;
+  }
 
   if(statement==ID_assign)
   {
