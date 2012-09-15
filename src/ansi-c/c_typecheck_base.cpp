@@ -462,14 +462,25 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
     // do body
     
     if(new_symbol.value.is_not_nil())
-    {      
+    {  
       if(old_symbol.value.is_not_nil())
       {
-        err_location(new_symbol.location);
-        str << "function `" << new_symbol.display_name()
-            << "' defined twice";
-        error();
-        throw 0;
+        // gcc allows re-definition if the first
+        // definition is marked as "extern inline"
+        
+        if(old_symbol.type.get_bool(ID_C_inlined) &&
+           (config.ansi_c.mode==configt::ansi_ct::MODE_GCC ||
+            config.ansi_c.mode==configt::ansi_ct::MODE_ARM))
+        {
+        }
+        else
+        {
+          err_location(new_symbol.location);
+          str << "function body `" << new_symbol.display_name()
+              << "' defined twice";
+          error();
+          throw 0;
+        }
       }
 
       typecheck_function_body(new_symbol);
