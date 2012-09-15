@@ -77,7 +77,6 @@ public:
 };
 
 extern cpp_parsert cpp_parser;
-int yycpperror(const std::string &error);
 void cpp_scanner_init();
 
 #endif
