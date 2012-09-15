@@ -10,7 +10,7 @@ CPROVER compiles in the following environments:
 - Cygwin
   (We recommend g++-3. Don't use the i686-pc-mingw32-g++ cross compiler.)
 
-- Microsoft's Visual Studio 2010 (older versions won't work)
+- Microsoft's Visual Studio 2010 or 2012 (older versions won't work)
 
 You need to adjust config.inc to reflect the environment. The default is
 set up for a recent version of Linux. 
@@ -22,23 +22,30 @@ How to compile?
 Follow these instructions:
 
 0) You need a C/C++ compiler, Flex and Bison, and GNU make.
-   The GNU Make needs to be version 3.81 or higher.
-   If you have Windows, and don't have these, we recommend you
-   install Cygwin.
+   The GNU Make needs to be version 3.81 or higher. Do
+   "apt-get install g++ gcc flex bison make subversion"
+   on a Debian/Ubuntu OS.
 
-1) You need a SAT solver (in source). We recommend MiniSat2. Many
-   Linux distributions now have a package for MiniSat2; e.g.,
-   try "apt-get install minisat2" on Debian-like distributions.
+   On a Mac, install the XCode Command Line Utilities.
 
-   Windows and Mac users can download the source of MiniSat2 at
-   the following address:
+   If you have Windows, and you don't already have GNU make, Flex and Bison,
+   we recommend you install Cygwin.
 
-   http://minisat.se/downloads/minisat-2.2.0.tar.gz
+1) You need a SAT solver (in source). We recommend MiniSat2. On
+   a UNIX machine or Mac, do
+
+   lwp-download http://minisat.se/downloads/minisat-2.2.0.tar.gz
+   tar xfz minisat-2.2.0.tar.gz
+   mv minisat minisat-2.2.0
 
    MiniSat2 relies on zlib, which you have to obtain for your environment.
+   On Debian, do "apt-get install libz-dev".
 
    Alternatively, you may use zchaff, Booleforce, or
-   SMV-SAT (if you work for Cadence).
+   SMV-SAT (if you happen to work for Cadence).
+
+   Windows users can download the source of MiniSat2 from the address
+   above using a browser.
 
 2) Adjust src/config.inc for the paths to item 1).
 
