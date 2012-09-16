@@ -343,6 +343,12 @@ __float128	    { loc();
                       else
                         return TOK_IDENTIFIER;
                     }
+__int128	    { loc();
+                      if(PARSER.mode==cpp_parsert::GCC)
+                        return TOK_GCC_INT128;
+                      else
+                        return TOK_IDENTIFIER;
+                    }
 while               { loc(); return TOK_WHILE; }
 __CPROVER_thread_local { loc(); return TOK_THREAD_LOCAL; }
 __CPROVER_bool      { loc(); return TOK_CPROVER_BOOL; }
