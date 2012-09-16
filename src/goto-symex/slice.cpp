@@ -186,8 +186,8 @@ Function: symex_slice_classt::collect_open_variables
 
  Outputs: None. But open_variables is modified as a side-effect.
 
- Purpose: Collect the open variables, i.e. variables that are used in RHS
-          but never written in LHS
+ Purpose: Collect the open variables, i.e., variables that are used
+          in RHS but never written in LHS
 
 \*******************************************************************/
 
@@ -275,8 +275,8 @@ Function: collect_open_variables
 
  Outputs: None. But open_variables is modified as a side-effect.
 
- Purpose: Collect the open variables, i.e. variables that are used in RHS
-          but never written in LHS
+ Purpose: Collect the open variables, i.e. variables that are used
+          in RHS but never written in LHS
 
 \*******************************************************************/
 
