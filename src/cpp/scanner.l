@@ -387,6 +387,18 @@ __CPROVER_bool      { loc(); return TOK_CPROVER_BOOL; }
 "__is_union"        { loc(); return MSC_Keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
 "__is_value_class"  { loc(); return MSC_Keyword(TOK_MSC_UNARY_TYPE_PREDICATE); }
 
+"and"               { loc(); return TOK_ANDAND; }
+"bitand"            { loc(); return '&'; }
+"and_eq"            { loc(); return TOK_ANDASSIGN; }
+"or"                { loc(); return TOK_OROR; }
+"bitor"             { loc(); return '|'; }
+"or_eq"             { loc(); return TOK_ORASSIGN; }
+"xor"               { loc(); return '^'; }
+"xor_eq"            { loc(); return TOK_XORASSIGN; }
+"not"               { loc(); return '!'; }
+"not_eq"            { loc(); return TOK_NE; }
+"compl"             { loc(); return '~'; }
+
 {identifier}        { loc();
                       return TOK_IDENTIFIER; // or TYPDEFname
                     }
