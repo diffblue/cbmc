@@ -166,27 +166,27 @@ extern char *yyansi_ctext;
 
 /*** these exist only for the benefit of the C++ frontend */
 
-%token TOK_CATCH
-%token TOK_CLASS
-%token TOK_DELETE
-%token TOK_DECLTYPE
-%token TOK_EXPLICIT
-%token TOK_FRIEND
-%token TOK_MUTABLE
-%token TOK_NAMESPACE
-%token TOK_NEW
-%token TOK_OPERATOR
-%token TOK_PRIVATE
-%token TOK_PROTECTED
-%token TOK_PUBLIC
-%token TOK_TEMPLATE
-%token TOK_THIS
-%token TOK_THROW
-%token TOK_TYPEID
-%token TOK_TYPENAME
-%token TOK_USING
-%token TOK_VIRTUAL
-%token TOK_TRY
+%token TOK_CATCH       "catch"
+%token TOK_CLASS       "class"
+%token TOK_DELETE      "delete"
+%token TOK_DECLTYPE    "decltype"
+%token TOK_EXPLICIT    "explicit"
+%token TOK_FRIEND      "friend"
+%token TOK_MUTABLE     "mutable"
+%token TOK_NAMESPACE   "namespace"
+%token TOK_NEW         "new"
+%token TOK_OPERATOR    "operator"
+%token TOK_PRIVATE     "private"
+%token TOK_PROTECTED   "protected"
+%token TOK_PUBLIC      "public"
+%token TOK_TEMPLATE    "template"
+%token TOK_THIS        "this"
+%token TOK_THROW       "throw"
+%token TOK_TYPEID      "typeid"
+%token TOK_TYPENAME    "typename"
+%token TOK_USING       "using"
+%token TOK_VIRTUAL     "virtual"
+%token TOK_TRY         "try"
 %token TOK_SCOPE       "::"
 %token TOK_DOTPM       ".*"
 %token TOK_ARROWPM     "->*"
