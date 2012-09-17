@@ -538,8 +538,6 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
         }
       }
     }
-    else
-      symbol.theorem=true;
   }
 
   if(symbol.static_lifetime)

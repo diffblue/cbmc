@@ -1326,7 +1326,6 @@ void cpp_typecheckt::typecheck_member_function(
   symbol.type=type;
   symbol.is_type=false;
   symbol.is_macro=false;
-  symbol.theorem=true;
   symbol.location=component.location();
 
   // move early, it must be visible before doing any value

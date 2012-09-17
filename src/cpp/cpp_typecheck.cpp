@@ -343,7 +343,6 @@ void cpp_typecheckt::static_and_dynamic_initialization()
   init_symbol.type.set("initialization", true);
   init_symbol.is_type=false;
   init_symbol.is_macro=false;
-  init_symbol.theorem=true;
 
   context.move(init_symbol);
 

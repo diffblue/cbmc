@@ -57,18 +57,18 @@ bool write_goto_binary_v2(
     irepconverter.write_string_ref(out, sym.mode);
     irepconverter.write_string_ref(out, sym.pretty_name);
     
-    write_long(out, sym.ordering);
+    write_long(out, 0); // old: sym.ordering
 
     unsigned flags=0;    
     flags = (flags << 1) | (int)sym.is_type; 
-    flags = (flags << 1) | (int)sym.theorem;
+    flags = (flags << 1) | (int)false; // sym.theorem;
     flags = (flags << 1) | (int)sym.is_macro;
     flags = (flags << 1) | (int)sym.is_exported;
     flags = (flags << 1) | (int)sym.is_input;
     flags = (flags << 1) | (int)sym.is_output;
     flags = (flags << 1) | (int)sym.is_statevar;
     flags = (flags << 1) | (int)sym.is_actual;
-    flags = (flags << 1) | (int)sym.free_var;
+    flags = (flags << 1) | (int)false; // sym.free_var;
     flags = (flags << 1) | (int)sym.binding;
     flags = (flags << 1) | (int)sym.lvalue;
     flags = (flags << 1) | (int)sym.static_lifetime;

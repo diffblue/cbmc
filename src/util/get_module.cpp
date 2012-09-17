@@ -39,7 +39,7 @@ const symbolt &get_module_by_name(
 
     const symbolt &s=it2->second;
 
-    if(s.is_type || s.free_var || s.type.id()!="module")
+    if(s.is_type || s.type.id()!=ID_module)
       continue;
     
     symbolptr_list.push_back(&s);

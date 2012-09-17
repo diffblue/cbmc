@@ -35,7 +35,6 @@ void symbolt::show(std::ostream &out) const
   if(static_lifetime) out << " static_lifetime";
   if(thread_local)    out << " thread_local";
   if(file_local)      out << " file_local";
-  if(theorem)         out << " theorem";
   if(is_type)         out << " type";
   if(is_extern)       out << " extern";
   if(is_input)        out << " input";
@@ -43,7 +42,6 @@ void symbolt::show(std::ostream &out) const
   if(is_macro)        out << " macro";
   if(is_actual)       out << " actual";
   if(binding)         out << " binding";
-  if(free_var)        out << " free_var";
   if(is_statevar)     out << " statevar";
   if(mode!="")        out << " mode=" << mode;
   if(base_name!="")   out << " base_name=" << base_name;
@@ -105,17 +103,14 @@ void symbolt::to_irep(irept &dest) const
   dest.set(ID_base_name, base_name);
   dest.set(ID_mode, mode);
   dest.set(ID_pretty_name, pretty_name);
-  dest.set("ordering", ordering);
 
   if(is_type) dest.set("is_type", true);
-  if(theorem) dest.set("theorem", true);
   if(is_macro) dest.set("is_macro", true);
   if(is_exported) dest.set("is_exported", true);
   if(is_input) dest.set("is_input", true);
   if(is_output) dest.set("is_output", true);
   if(is_statevar) dest.set("is_statevar", true);
   if(is_actual) dest.set("is_actual", true);
-  if(free_var) dest.set("free_var", true);
   if(binding) dest.set("binding", true);
   if(lvalue) dest.set("lvalue", true);
   if(static_lifetime) dest.set("static_lifetime", true);
@@ -148,17 +143,14 @@ void symbolt::from_irep(const irept &src)
   base_name=src.get(ID_base_name);
   mode=src.get(ID_mode);
   pretty_name=src.get(ID_pretty_name);
-  ordering=atoi(src.get("ordering").c_str());
 
   is_type=src.get_bool("is_type");
-  theorem=src.get_bool("theorem");
   is_macro=src.get_bool("is_macro");
   is_exported=src.get_bool("is_exported");
   is_input=src.get_bool("is_input");
   is_output=src.get_bool("is_output");
   is_statevar=src.get_bool("is_statevar");
   is_actual=src.get_bool("is_actual");
-  free_var=src.get_bool("free_var");
   binding=src.get_bool("binding");
   lvalue=src.get_bool("lvalue");
   static_lifetime=src.get_bool("static_lifetime");
@@ -195,8 +187,6 @@ void symbolt::swap(symbolt &b)
 
   #define SYM_SWAP2(x) std::swap(x, b.x)
   
-  SYM_SWAP2(ordering);
-  SYM_SWAP2(theorem);
   SYM_SWAP2(is_type);
   SYM_SWAP2(is_macro);
   SYM_SWAP2(is_exported);
@@ -204,7 +194,6 @@ void symbolt::swap(symbolt &b)
   SYM_SWAP2(is_output);
   SYM_SWAP2(is_statevar);
   SYM_SWAP2(is_actual);
-  SYM_SWAP2(free_var);
   SYM_SWAP2(lvalue);
   SYM_SWAP2(static_lifetime);
   SYM_SWAP2(thread_local);
