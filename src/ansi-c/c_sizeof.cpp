@@ -30,7 +30,7 @@ Function: c_sizeoft::sizeof_rec
 exprt c_sizeoft::sizeof_rec(const typet &type)
 {
   exprt dest;
-
+  
   if(type.id()==ID_signedbv ||
      type.id()==ID_unsignedbv ||
      type.id()==ID_floatbv ||
@@ -146,40 +146,39 @@ exprt c_sizeoft::sizeof_rec(const typet &type)
   }
   else if(type.id()==ID_union)
   {
-    const irept::subt &components=
-      type.find(ID_components).get_sub();
+    exprt max_size=nil_exprt();
 
-    mp_integer max_size=0;
+    const union_typet::componentst &components=
+      to_union_type(type).components();
 
-    forall_irep(it, components)
+    for(union_typet::componentst::const_iterator
+        it=components.begin();
+        it!=components.end();
+        it++)
     {
-      if(it->get_bool(ID_is_type))
+      if(it->get_bool(ID_is_type) || it->type().id()==ID_code)
         continue;
 
       const typet &sub_type=static_cast<const typet &>(it->find(ID_type));
 
-      if(sub_type.id()==ID_code)
-      {
-      }
-      else
       {
         exprt tmp=sizeof_rec(sub_type);
 
         if(tmp.is_nil())
-          return tmp;
+          return nil_exprt();
           
-        simplify(tmp, ns);
+        if(max_size.is_nil())
+          max_size=tmp;
+        else
+          max_size=if_exprt(
+            binary_relation_exprt(max_size, ID_lt, tmp),
+            tmp, max_size);
 
-        mp_integer tmp_int;
-
-        if(to_integer(tmp, tmp_int))
-          return static_cast<const exprt &>(get_nil_irep());
-
-        if(tmp_int>max_size) max_size=tmp_int;
+        simplify(max_size, ns);
       }
     }
 
-    dest=from_integer(max_size, size_type());
+    dest=max_size;
   }
   else if(type.id()==ID_symbol)
   {
@@ -241,7 +240,7 @@ exprt c_sizeoft::sizeof_rec(const typet &type)
     // meaningful size.
     dest.make_nil();
   }
-
+  
   return dest;
 }
 
