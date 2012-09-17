@@ -784,7 +784,7 @@ wchar_t	            { // CodeWarrior doesn't have wchar_t built in
                 }
 
 "__try"         { if(PARSER.mode==ansi_c_parsert::MSC)
-                    { loc(); return TOK_MSC_TRY; }
+                    { loc(); return TOK_TRY; }
                   else
                     return make_identifier();
                 }
@@ -792,7 +792,7 @@ wchar_t	            { // CodeWarrior doesn't have wchar_t built in
 "try"           { if(PARSER.cpp) // C++?
                     { loc(); return TOK_TRY; }
                   else if(PARSER.mode==ansi_c_parsert::MSC)
-                    { loc(); return TOK_MSC_TRY; }                    
+                    { loc(); return TOK_TRY; }                    
                   else
                     return make_identifier();
                 }

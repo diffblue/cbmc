@@ -132,7 +132,6 @@ extern char *yyansi_ctext;
 %token TOK_GCC_BUILTIN_TYPES_COMPATIBLE_P "__builtin_types_compatible_p"
 %token TOK_OFFSETOF    "__offsetof"
 %token TOK_ALIGNOF     "__alignof__"
-%token TOK_MSC_TRY     "try"
 %token TOK_MSC_FINALLY "finally"
 %token TOK_MSC_EXCEPT  "except"
 %token TOK_MSC_LEAVE   "leave"
@@ -494,6 +493,28 @@ postfix_expression:
           stack($$).set(ID_statement, ID_postdecrement);
           stack($$).location()=location;
         }
+        /* The following is a) GCC and b) ISO C 11 compliant */
+        | '(' type_name ')' '{' initializer_list_opt '}'
+        {
+          exprt tmp(ID_initializer_list);
+          tmp.location()=stack($4).location();
+          tmp.operands().swap(stack($5).operands());
+          $$=$1;
+          set($$, ID_typecast);
+          stack($$).move_to_operands(tmp);
+          stack($$).type().swap(stack($2));
+        }
+        | '(' type_name ')' '{' initializer_list ',' '}'
+        {
+          // same as above
+          exprt tmp(ID_initializer_list);
+          tmp.location()=stack($4).location();
+          tmp.operands().swap(stack($5).operands());
+          $$=$1;
+          set($$, ID_typecast);
+          stack($$).move_to_operands(tmp);
+          stack($$).type().swap(stack($2));
+        }
         ;
 
 member_name:
@@ -596,30 +617,6 @@ cast_expression:
           $$=$1;
           set($$, ID_typecast);
           mto($$, $4);
-          stack($$).type().swap(stack($2));
-        }
-        /* The following is a GCC extension
-           to allow a 'temporary union' or struct constructor 
-           or array constructor */
-        | '(' type_name ')' '{' initializer_list_opt '}'
-        {
-          exprt tmp(ID_initializer_list);
-          tmp.location()=stack($4).location();
-          tmp.operands().swap(stack($5).operands());
-          $$=$1;
-          set($$, ID_typecast);
-          stack($$).move_to_operands(tmp);
-          stack($$).type().swap(stack($2));
-        }
-        | '(' type_name ')' '{' initializer_list ',' '}'
-        {
-          // same as above
-          exprt tmp(ID_initializer_list);
-          tmp.location()=stack($4).location();
-          tmp.operands().swap(stack($5).operands());
-          $$=$1;
-          set($$, ID_typecast);
-          stack($$).move_to_operands(tmp);
           stack($$).type().swap(stack($2));
         }
         ;
@@ -2164,7 +2161,7 @@ msc_asm_statement:
         ;
 
 msc_seh_statement:
-          TOK_MSC_TRY compound_statement
+          TOK_TRY compound_statement
           TOK_MSC_EXCEPT '(' comma_expression ')' compound_statement
         {
           $$=$1;
@@ -2173,7 +2170,7 @@ msc_seh_statement:
           mto($$, $5);
           mto($$, $7);
         }
-        | TOK_MSC_TRY compound_statement
+        | TOK_TRY compound_statement
           TOK_MSC_FINALLY compound_statement
         {
           $$=$1;
