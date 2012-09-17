@@ -200,6 +200,14 @@ void ansi_c_internal_additions(std::string &code)
      
     default:;
     }
+
+    // On 64-bit systems, gcc has typedefs
+    // __int128_t und __uint128_t -- but not on 32 bit!
+    if(config.ansi_c.long_int_width>=64)
+    {
+      code+="typedef signed __int128 __int128_t;\n"
+            "typedef signed __int128 __uint128_t;\n";
+    }
   }
 
   if(config.ansi_c.os==configt::ansi_ct::OS_WIN)
