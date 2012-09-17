@@ -111,7 +111,7 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
     typecheck_expr_typecast(expr);
   else if(expr.id()==ID_sizeof)
     typecheck_expr_sizeof(expr);
-  else if(expr.id()==ID_builtin_alignof)
+  else if(expr.id()==ID_alignof)
     typecheck_expr_alignof(expr);
   else if(expr.id()==ID_plus || expr.id()==ID_minus ||
           expr.id()==ID_mult || expr.id()==ID_div ||

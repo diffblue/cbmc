@@ -290,7 +290,7 @@ X
 continuous_assign
 blocking_assign
 non_blocking_assign
-builtin_alignof
+alignof
 gcc_builtin_va_arg
 gcc_builtin_types_compatible_p
 gcc_builtin_va_arg_next

@@ -124,6 +124,7 @@ protected:
   bool rThrowExpr(exprt &);
   bool rSizeofExpr(exprt &);
   bool rTypeidExpr(exprt &);
+  bool rAlignofExpr(exprt &);
   bool isAllocateExpr(int);
   bool rAllocateExpr(exprt &);
   bool rAllocateType(exprt &, typet &, exprt &);
@@ -4245,6 +4246,8 @@ bool Parser::rUnaryExpr(exprt &exp)
   }
   else if(t==TOK_SIZEOF)
     return rSizeofExpr(exp);
+  else if(t==TOK_ALIGNOF)
+    return rAlignofExpr(exp);
   else if(t==TOK_THROW)
     return rThrowExpr(exp);
   else if(t==TOK_REAL || t==TOK_IMAG)
@@ -4409,6 +4412,35 @@ bool Parser::rSizeofExpr(exprt &exp)
 
   exp=exprt(ID_sizeof);
   exp.move_to_operands(unary);
+  set_location(exp, tk);
+  return true;
+}
+
+/*
+  alignof.expr
+  | ALIGNOF '(' type.name ')'
+*/
+
+bool Parser::rAlignofExpr(exprt &exp)
+{
+  Token tk;
+
+  if(lex->GetToken(tk)!=TOK_ALIGNOF)
+    return false;
+
+  typet tname;
+  Token op, cp;
+
+  lex->GetToken(op);
+
+  if(!rTypeName(tname))
+    return false;
+  
+  if(lex->GetToken(cp)!=')')
+    return false;
+
+  exp=exprt(ID_alignof);
+  exp.add(ID_type_arg).swap(tname);
   set_location(exp, tk);
   return true;
 }

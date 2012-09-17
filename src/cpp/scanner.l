@@ -181,7 +181,7 @@ pragma          "#"{horizontal_white}*pragma{horizontal_white}.*"\n"
 ({v_tab}|{c_return}|{form_feed})+
 ({horizontal_white}|{v_tab}|{c_return}|{form_feed})*"\n"
 
-__alignof__         { loc(); return TOK_SIZEOF; }
+__alignof__         { loc(); return TOK_ALIGNOF; }
 
 "__asm"         { if(PARSER.mode==cpp_parsert::MSC)
                   {
@@ -250,6 +250,7 @@ __signed            { loc(); return TOK_SIGNED; }
 __signed__          { loc(); return TOK_SIGNED; }
 __vector            { /* ignore */ }
 __volatile__        { loc(); return TOK_VOLATILE; }
+alignof             { loc(); return TOK_ALIGNOF; }
 typeof              { loc(); return TOK_TYPEOF; }
 __typeof            { loc(); return TOK_TYPEOF; }
 __typeof__          { loc(); return TOK_TYPEOF; }

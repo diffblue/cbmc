@@ -3622,9 +3622,10 @@ std::string expr2ct::convert(
     return convert_function(src, "gcc_builtin_va_arg", precedence=15);
   }
 
-  else if(src.id()==ID_builtin_alignof)
+  else if(src.id()==ID_alignof)
   {
-    return convert_function(src, "builtin_alignof", precedence=15);
+    // C uses "_Alignof", C++ uses "alignof"
+    return convert_function(src, "alignof", precedence=15);
   }
 
   else if(has_prefix(src.id_string(), "byte_extract"))
