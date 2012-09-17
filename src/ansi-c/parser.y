@@ -944,6 +944,15 @@ type_qualifier_list:
         }
         ;
 
+attribute_type_qualifier_list:
+          attribute_or_type_qualifier
+        | type_qualifier_list attribute_or_type_qualifier
+        {
+          $$=$1;
+          merge_types($$, $2);
+        }
+        ;
+
 declaration_qualifier:
           storage_class
         | type_qualifier
@@ -957,6 +966,11 @@ type_qualifier:
         | TOK_CPROVER_ATOMIC { $$=$1; set($$, ID_cprover_atomic); }
         | TOK_PTR32    { $$=$1; set($$, ID_ptr32); }
         | TOK_PTR64    { $$=$1; set($$, ID_ptr64); }
+        ;
+
+attribute_or_type_qualifier:
+          type_qualifier
+        | gcc_type_attribute
         ;
 
 basic_declaration_specifier:
