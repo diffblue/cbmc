@@ -35,6 +35,11 @@ struct my_struct2
   // there may be end-padding!
 } xx2;
 
+struct my_struct3 {
+   unsigned int bit_field : 1;
+   int i;
+} xx3= { 1, 2 };
+
 STATIC_ASSERT(sizeof(xx1)==4+1+3+4+4);
 STATIC_ASSERT(sizeof(xx2)==4+4+4+4);
 
@@ -50,4 +55,7 @@ int main()
   assert(p[1]==0);
   assert(p[2]==0);
   assert(p[3]==0);
+
+  assert(xx3.bit_field==1);
+  assert(xx3.i==2);
 }
