@@ -401,13 +401,13 @@ offsetof_member_designator:
           
 alignof: TOK_ALIGNOF '(' unary_expression ')'
         { $$=$1;
-          set($$, ID_builtin_alignof);
+          set($$, ID_alignof);
           mto($$, $3);
         }
         | TOK_ALIGNOF '(' type_name ')'
         {
           $$=$1;
-          stack($$).id(ID_builtin_alignof);
+          stack($$).id(ID_alignof);
           stack($$).add(ID_type_arg).swap(stack($3));
         }
         ;

@@ -123,7 +123,7 @@ void ansi_c_convertt::convert_expr(exprt &expr)
     exprt &designator=static_cast<exprt &>(expr.add(ID_designator));
     convert_expr(designator);
   }
-  else if(expr.id()==ID_builtin_alignof)
+  else if(expr.id()==ID_alignof)
   {
     if(expr.operands().size()==0)
     {
