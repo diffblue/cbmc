@@ -117,19 +117,20 @@ bool read_bin_goto_object_v2(
     sym.mode = irepconverter.read_string_ref(in);
     sym.pretty_name = irepconverter.read_string_ref(in);
     
-    sym.ordering = irepconverter.read_long(in);
+    // obsolete: symordering
+    irepconverter.read_long(in);
 
     unsigned flags=irepconverter.read_long(in);
     
     sym.is_type = flags & (1 << 15);
-    sym.theorem = flags & (1 << 14); 
+    //sym.theorem = flags & (1 << 14); 
     sym.is_macro = flags & (1 << 13);
     sym.is_exported = flags & (1 << 12);
     sym.is_input = flags & (1 << 11);
     sym.is_output = flags & (1 << 10);
     sym.is_statevar = flags & (1 << 9);
     sym.is_actual = flags & (1 << 8);
-    sym.free_var = flags & (1 << 7);
+    //sym.free_var = flags & (1 << 7);
     sym.binding = flags & (1 << 6);
     sym.lvalue = flags & (1 << 5);
     sym.static_lifetime = flags & (1 << 4);

@@ -316,7 +316,6 @@ void language_uit::show_symbol_table_plain(std::ostream &out)
     if(symbol.static_lifetime) out << " static_lifetime";
     if(symbol.thread_local)    out << " thread_local";
     if(symbol.file_local)      out << " file_local";
-    if(symbol.theorem)         out << " theorem";
     if(symbol.is_type)         out << " type";
     if(symbol.is_extern)       out << " extern";
     if(symbol.is_input)        out << " input";
@@ -324,7 +323,6 @@ void language_uit::show_symbol_table_plain(std::ostream &out)
     if(symbol.is_macro)        out << " macro";
     if(symbol.is_actual)       out << " actual";
     if(symbol.binding)         out << " binding";
-    if(symbol.free_var)        out << " free_var";
     if(symbol.is_statevar)     out << " statevar";
 
     out << std::endl;

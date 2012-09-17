@@ -64,14 +64,12 @@ public:
   typedef std::list<irep_idt> hierarchyt;
   hierarchyt hierarchy;
   
-  unsigned ordering;
-  
   // global use
-  bool theorem, is_type, is_macro, is_exported,
+  bool is_type, is_macro, is_exported,
        is_input, is_output, is_statevar;
        
   // PVS
-  bool is_actual, free_var, binding;
+  bool is_actual, binding;
   
   // ANSI-C
   bool static_lifetime, thread_local;
@@ -87,11 +85,9 @@ public:
     value.make_nil();
     location.make_nil();
     lvalue=thread_local=static_lifetime=file_local=is_extern=
-    free_var=theorem=
     is_type=is_actual=is_macro=is_exported=binding=
     is_volatile=is_input=is_output=is_statevar=false;
-    ordering=0;
-    name=module=base_name=mode=pretty_name="";
+    name=module=base_name=mode=pretty_name=irep_idt();
   }
      
   void swap(symbolt &b);
