@@ -582,8 +582,9 @@ void c_typecheck_baset::increment_designator(designatort &designator)
         struct_type.components();
       assert(components.size()==entry.size);
       
-      // we skip over padding
-      if(components[entry.index].get_is_padding())
+      // we skip over any padding
+      while(entry.index<entry.size &&
+            components[entry.index].get_is_padding())
         entry.index++;
 
       if(entry.index<entry.size)
