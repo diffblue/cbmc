@@ -13,8 +13,11 @@
 // constant.  When applied to an array type, the result is the alignment
 // requirement of the element type.
 
+int f();
+
 STATIC_ASSERT(_Alignof(char)==1);
 STATIC_ASSERT(_Alignof(char[10])==1);
+STATIC_ASSERT(_Alignof(char[f()])==1);
 
 int main()
 {
