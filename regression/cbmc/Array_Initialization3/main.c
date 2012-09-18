@@ -10,6 +10,10 @@ int array2[]={ [1]=10, [2]=20, [3]=30, [10]=100 };
 extern int array3[8];
 int array3[]={ 1, 2, 3, 4, 5, 6, 7, 8 };
 
+int array4[2] = { [1] 42 };
+int array5[2][2] = { { 42, 42 }, {[1] 42 } };
+int array6[2][2] = { [1] {[1] 42 } };
+
 int main(void)
 {
   assert(array1[0][1] ==2);

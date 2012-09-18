@@ -1774,7 +1774,6 @@ initializer_opt:
 
 initializer:
           constant_expression        /* was: assignment_expression */
-        | designated_initializer
         | '{' initializer_list_opt '}'
         {
           $$=$1;
@@ -1790,7 +1789,7 @@ initializer:
         ;
 
 initializer_list:
-          initializer
+          designated_initializer
         {
           $$=$1;
           exprt tmp;
@@ -1798,7 +1797,7 @@ initializer_list:
           stack($$).clear();
           stack($$).move_to_operands(tmp);
         }
-        | initializer_list ',' initializer
+        | initializer_list ',' designated_initializer
         {
           $$=$1;
           mto($$, $3);
@@ -1815,9 +1814,9 @@ initializer_list_opt:
         }
         ;
 
-/* GCC extension: designated initializer */
 designated_initializer:
-          designated_initializer_designator '=' initializer
+          initializer
+        | designator '=' initializer
         {
           $$=$2;
           stack($$).id(ID_designated_initializer);
@@ -1825,7 +1824,7 @@ designated_initializer:
           mto($$, $3);
         }
         /* the following two are obsolete GCC extensions */
-        | designated_initializer_designator constant_expression
+        | designator initializer
         {
           init($$, ID_designated_initializer);
           stack($$).add(ID_designator).swap(stack($1));
@@ -1845,7 +1844,7 @@ designated_initializer:
         }
         ;
 
-designated_initializer_designator:
+designator:
           '.' member_name
         {
           init($$);
@@ -1868,14 +1867,14 @@ designated_initializer_designator:
           mto($1, $2);
           mto($$, $1);
         }
-        | designated_initializer_designator '[' comma_expression ']'
+        | designator '[' comma_expression ']'
         {
           $$=$1;
           stack($2).id(ID_index);
           mto($2, $3);
           mto($$, $2);
         }
-        | designated_initializer_designator '[' comma_expression TOK_ELLIPSIS comma_expression ']'
+        | designator '[' comma_expression TOK_ELLIPSIS comma_expression ']'
         {
           // TODO
           $$=$1;
@@ -1883,7 +1882,7 @@ designated_initializer_designator:
           mto($2, $3);
           mto($$, $2);
         }
-        | designated_initializer_designator '.' member_name
+        | designator '.' member_name
         {
           $$=$1;
           stack($2).id(ID_member);
