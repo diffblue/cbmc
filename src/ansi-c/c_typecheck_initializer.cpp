@@ -234,22 +234,7 @@ void c_typecheck_baset::do_initializer(symbolt &symbol)
 
   if(symbol.static_lifetime)
   {
-    if(symbol.value.is_nil())
-    {
-      const typet &final_type=follow(symbol.type);
-      
-      // We do some checks, but this is otherwise left
-      // to __CPROVER_initialize to do.
-      
-      if(final_type.id()==ID_empty)
-      {
-        err_location(symbol.location);
-        str << "cannot initialize type `"
-            << to_string(final_type) << "'";
-        throw 0;
-      }
-    }
-    else
+    if(symbol.value.is_not_nil())
     {
       typecheck_expr(symbol.value);
       do_initializer(symbol.value, symbol.type, true);
