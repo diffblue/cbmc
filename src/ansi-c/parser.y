@@ -1589,8 +1589,10 @@ enumerator_list:
 enumerator_declaration:
           identifier_or_typedef_name enumerator_value_opt
         {
+          // enum constants in C have signed int type,
+          // not the enum type!
           init($$);
-          irept type(ID_c_enum);
+          irept type(ID_int);
           PARSER.new_declaration(type, stack($1), stack($$));
           stack($$).set(ID_is_macro, true);
           stack($$).add(ID_value).swap(stack($2));
