@@ -6,18 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#if 0
-#include <config.h>
-#include <type_eq.h>
-#include <simplify_expr.h>
-#include <cprover_prefix.h>
-#include <prefix.h>
-
-#include "c_typecheck_base.h"
-#include "string_constant.h"
-#include "anonymous_member.h"
-#endif
-
 #include <message_stream.h>
 #include <arith_tools.h>
 #include <expr_util.h>
