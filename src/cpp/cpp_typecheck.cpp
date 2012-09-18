@@ -452,7 +452,7 @@ void cpp_typecheckt::clean_up()
 
       struct_union_typet::componentst &function_members=
         (struct_union_typet::componentst &)
-        (struct_union_type.add("methods").get_sub());
+        (struct_union_type.add(ID_methods).get_sub());
         
       function_members.reserve(components.size());
 
