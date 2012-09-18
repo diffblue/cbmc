@@ -104,8 +104,9 @@ bool static_lifetime_init(
     if(has_prefix(id2string(identifier), CPROVER_PREFIX "architecture_"))
       continue;
       
-    // just code
-    if(it->second.type.id()==ID_code)
+    // check type
+    if(it->second.type.id()==ID_code ||
+       it->second.type.id()==ID_empty)
       continue;
     
     if(it->second.value.id()==ID_nondet)
