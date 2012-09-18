@@ -222,6 +222,8 @@ protected:
   virtual void make_constant_index(exprt &expr);
   virtual void make_constant_rec(exprt &expr);
   
+  virtual bool gcc_types_compatible_p(const typet &type1, const typet &type2);
+  
   // types
   virtual void typecheck_type(typet &type);
   virtual void typecheck_compound_type(struct_union_typet &type);
