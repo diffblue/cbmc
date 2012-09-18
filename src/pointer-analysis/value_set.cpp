@@ -1722,13 +1722,13 @@ exprt value_sett::make_member(
   const irep_idt &component_name,
   const namespacet &ns)
 {
-  const struct_union_typet &struct_type=
-    to_struct_type(ns.follow(src.type()));
+  const struct_union_typet &struct_union_type=
+    to_struct_union_type(ns.follow(src.type()));
 
   if(src.id()==ID_struct ||
      src.id()==ID_constant)
   {
-    unsigned no=struct_type.component_number(component_name);
+    unsigned no=struct_union_type.component_number(component_name);
     assert(no<src.operands().size());
     return src.operands()[no];
   }
@@ -1754,7 +1754,7 @@ exprt value_sett::make_member(
   }
 
   // give up
-  typet subtype=struct_type.component_type(component_name);
+  typet subtype=struct_union_type.component_type(component_name);
   member_exprt member_expr(subtype);
   member_expr.op0()=src;
   member_expr.set_component_name(component_name);
