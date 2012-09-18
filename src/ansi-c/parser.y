@@ -2745,7 +2745,7 @@ array_abstract_declarator:
           stack($$).add(ID_size).swap(stack($2));
           stack($$).add(ID_subtype)=irept(ID_abstract);
         }
-        | '[' type_qualifier_list constant_expression ']'
+        | '[' attribute_type_qualifier_list constant_expression ']'
         {
           // The type qualifier belongs to the array, not the
           // contents of the array, nor the size.
