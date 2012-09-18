@@ -24,7 +24,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_type2name.h"
 #include "cpp_typecheck.h"
 #include "cpp_convert_type.h"
-#include "cpp_class_type.h"
 #include "cpp_exception_id.h"
 #include "expr2cpp.h"
 
