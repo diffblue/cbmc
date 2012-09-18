@@ -35,6 +35,7 @@ STATIC_ASSERT(!__builtin_types_compatible_p(typeof (_dingos), typeof (_cranberry
 STATIC_ASSERT(!__builtin_types_compatible_p(char, int));
 STATIC_ASSERT(!__builtin_types_compatible_p(char *, char **));
 STATIC_ASSERT(!__builtin_types_compatible_p(typeof (hot), unsigned int));
+STATIC_ASSERT(!__builtin_types_compatible_p(int[], int *));
 
 #endif
 

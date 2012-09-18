@@ -99,9 +99,10 @@ bool c_typecheck_baset::gcc_types_compatible_p(const typet &type1, const typet &
     else if(type1==type2) // compares the tag
       return true;
   }
-  else if((type1.id()==ID_pointer || type1.id()==ID_array) &&
-          (type2.id()==ID_pointer || type2.id()==ID_array))
+  else if(type1.id()==ID_pointer && type2.id()==ID_pointer)
     return gcc_types_compatible_p(type1.subtype(), type2.subtype());
+  else if(type1.id()==ID_array && type2.id()==ID_array)
+    return gcc_types_compatible_p(type1.subtype(), type2.subtype()); // ignore size
   else if(type1==type2)
     return true;
   
