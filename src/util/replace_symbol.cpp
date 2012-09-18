@@ -211,10 +211,13 @@ bool replace_symbolt::have_to_replace(const typet &dest) const
   if(dest.id()==ID_struct ||
      dest.id()==ID_union)
   {
-    const struct_typet &struct_type = to_struct_type(dest);    
-    const struct_typet::componentst &components = struct_type.components();
+    const struct_union_typet &struct_union_type=
+      to_struct_union_type(dest);    
 
-    for(struct_typet::componentst::const_iterator
+    const struct_union_typet::componentst &components=
+      struct_union_type.components();
+
+    for(struct_union_typet::componentst::const_iterator
         it=components.begin();
         it!=components.end();
         it++)
