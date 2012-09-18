@@ -829,9 +829,10 @@ exprt c_typecheck_baset::do_initializer_list(
     increment_designator(current_designator);
   }
   
-  if(type.id()==ID_array && to_array_type(type).size().is_nil())
+  if(type.id()==ID_array &&
+     to_array_type(type).size().is_nil())
   {
-    // make complete
+    // make complete by setting array size
     unsigned size=result.operands().size();
     result.type().id(ID_array);
     result.type().set(ID_size, from_integer(size, index_type()));
