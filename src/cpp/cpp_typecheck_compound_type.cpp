@@ -1082,7 +1082,8 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
   }
 
   // setup virtual tables before doing the constructors
-  do_virtual_table(symbol);
+  if(symbol.type.id()==ID_struct)
+    do_virtual_table(symbol);
 
   if(!found_ctor && !cpp_is_pod(symbol.type))
   {
