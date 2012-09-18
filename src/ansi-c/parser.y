@@ -2523,7 +2523,7 @@ clean_typedef_declarator:
           $$=$2;
           do_pointer($1, $2);
         }
-        | '*' type_qualifier_list parameter_typedef_declarator
+        | '*' attribute_type_qualifier_list parameter_typedef_declarator
         {
           merge_types($2, $3);
           $$=$2;
@@ -2550,7 +2550,7 @@ paren_typedef_declarator:
           $$=$3;
           do_pointer($1, $3);
         }
-        | '*' type_qualifier_list '(' simple_paren_typedef_declarator ')'
+        | '*' attribute_type_qualifier_list '(' simple_paren_typedef_declarator ')'
         {
           // not sure where the type qualifiers belong
           merge_types($2, $4);
@@ -2562,7 +2562,7 @@ paren_typedef_declarator:
           $$=$2;
           do_pointer($1, $2);
         }
-        | '*' type_qualifier_list paren_typedef_declarator
+        | '*' attribute_type_qualifier_list paren_typedef_declarator
         {
           merge_types($2, $3);
           $$=$2;
@@ -2605,7 +2605,7 @@ unary_identifier_declarator:
           $$=$2;
           do_pointer($1, $2);
         }
-        | '*' type_qualifier_list identifier_declarator
+        | '*' attribute_type_qualifier_list identifier_declarator
         {
           // the type_qualifier_list is for the pointer,
           // and not the identifier_declarator
@@ -2772,7 +2772,7 @@ unary_abstract_declarator:
           set($$, ID_pointer);
           stack($$).add(ID_subtype)=irept(ID_abstract);
         }
-        | '*' type_qualifier_list
+        | '*' attribute_type_qualifier_list
         {
           // The type_qualifier_list belongs to the pointer,
           // not to the (missing) abstract declarator.
@@ -2786,7 +2786,7 @@ unary_abstract_declarator:
           $$=$2;
           do_pointer($1, $2);
         }
-        | '*' type_qualifier_list abstract_declarator
+        | '*' attribute_type_qualifier_list abstract_declarator
         {
           // The type_qualifier_list belongs to the pointer,
           // not to the abstract declarator.
@@ -2811,7 +2811,7 @@ parameter_unary_abstract_declarator:
           set($$, ID_pointer);
           stack($$).add(ID_subtype)=irept(ID_abstract);
         }
-        | '*' type_qualifier_list
+        | '*' attribute_type_qualifier_list
         {
           // The type_qualifier_list belongs to the pointer,
           // not to the (missing) abstract declarator.
@@ -2825,7 +2825,7 @@ parameter_unary_abstract_declarator:
           $$=$2;
           do_pointer($1, $2);
         }
-        | '*' type_qualifier_list parameter_abstract_declarator
+        | '*' attribute_type_qualifier_list parameter_abstract_declarator
         {
           // The type_qualifier_list belongs to the pointer,
           // not to the (missing) abstract declarator.
