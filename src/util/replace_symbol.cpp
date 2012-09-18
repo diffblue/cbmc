@@ -149,10 +149,12 @@ bool replace_symbolt::replace(typet &dest) const
   if(dest.id()==ID_struct ||
      dest.id()==ID_union)
   {
-    struct_typet &struct_type = to_struct_type(dest);    
-    struct_typet::componentst &components = struct_type.components();
+    struct_union_typet &struct_union_type=to_struct_union_type(dest);    
+    struct_union_typet::componentst &components=
+      struct_union_type.components();
 
-    for(struct_typet::componentst::iterator it = components.begin();
+    for(struct_union_typet::componentst::iterator
+        it=components.begin();
         it!=components.end();
         it++)
       if(!replace(*it))
@@ -169,8 +171,7 @@ bool replace_symbolt::replace(typet &dest) const
       if(!replace(*it))
         result=false;
   }
-  
-  if(dest.id()==ID_symbol)
+  else if(dest.id()==ID_symbol)
   {
     type_mapt::const_iterator it=
       type_map.find(dest.get(ID_identifier));
