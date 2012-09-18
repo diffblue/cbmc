@@ -345,7 +345,9 @@ static void do_enum_members(
 {  
   exprt value;
 
-  // start with 0  
+  // This assigns increasing values to enum constants
+  // that do not have an explicit value. We start with 0.
+  // In C, enum constants always have type "int".
   value=gen_zero(int_type());
 
   Forall_operands(it, members)
@@ -353,8 +355,6 @@ static void do_enum_members(
     ansi_c_declarationt &ansi_c_declaration=
       to_ansi_c_declaration(*it);
 
-    ansi_c_declaration.type()=enum_type;
-    
     exprt &v=ansi_c_declaration.value();
     if(v.is_nil())
       v=value;
