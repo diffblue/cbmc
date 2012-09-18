@@ -20,8 +20,8 @@ var_a array8 = { 1, 2, 3 };
 
 int main(void)
 {
-  assert(array1[0][1] ==2);
-  assert(array1[1][0] ==3);    // returned false in this case
+  assert(array1[0][1]==2);
+  assert(array1[1][0]==3);    // returned false in this case
   
   assert(array2[0]==0);
   assert(array2[1]==10);
