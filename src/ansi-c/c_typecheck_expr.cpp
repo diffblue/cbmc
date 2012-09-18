@@ -24,6 +24,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "c_typecast.h"
 #include "c_typecheck_base.h"
 #include "c_sizeof.h"
+#include "c_qualifiers.h"
 #include "string_constant.h"
 #include "anonymous_member.h"
 #include "padding.h"
@@ -56,6 +57,55 @@ void c_typecheck_baset::typecheck_expr(exprt &expr)
 
   // now do case-split
   typecheck_expr_main(expr);
+}
+
+/*******************************************************************\
+
+Function: c_typecheck_baset::typecheck_expr_main
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool c_typecheck_baset::gcc_types_compatible_p(const typet &type1, const typet &type2)
+{
+  // read
+  // http://gcc.gnu.org/onlinedocs/gcc-3.3.6/gcc/Other-Builtins.html
+  
+  if(type1.id()==ID_symbol)
+    return gcc_types_compatible_p(follow(type1), type2);
+  else if(type2.id()==ID_symbol)
+    return gcc_types_compatible_p(type1, follow(type2));
+
+  // check qualifiers first
+  if(c_qualifierst(type1)!=c_qualifierst(type2))
+    return false;
+
+  if(type1.id()==ID_c_enum)
+  {
+    if(type2==int_type())
+      return true;
+    else if(type2==type1) // compares the tag
+      return true;
+  }
+  else if(type2.id()==ID_c_enum)
+  {
+    if(type1==int_type())
+      return true;
+    else if(type1==type2) // compares the tag
+      return true;
+  }
+  else if((type1.id()==ID_pointer || type1.id()==ID_array) &&
+          (type2.id()==ID_pointer || type2.id()==ID_array))
+    return gcc_types_compatible_p(type1.subtype(), type2.subtype());
+  else if(type1==type2)
+    return true;
+  
+  return false;
 }
 
 /*******************************************************************\
@@ -141,7 +191,16 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
     typecheck_type(subtypes[0]);
     typecheck_type(subtypes[1]);
     locationt location=expr.location();
-    expr.make_bool(follow(subtypes[0])==follow(subtypes[1]));
+    
+    // ignores top level qualifiers
+    subtypes[0].remove(ID_C_constant);
+    subtypes[0].remove(ID_C_volatile);
+    subtypes[0].remove(ID_C_restricted);
+    subtypes[1].remove(ID_C_constant);
+    subtypes[1].remove(ID_C_volatile);
+    subtypes[1].remove(ID_C_restricted);
+    
+    expr.make_bool(gcc_types_compatible_p(subtypes[0], subtypes[1]));
     expr.location()=location;
   }
   else if(expr.id()==ID_builtin_offsetof)
