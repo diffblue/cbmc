@@ -269,7 +269,9 @@ void c_typecheck_baset::typecheck_new_symbol(symbolt &symbol)
   }
   else
   {
-    if(symbol.type.id()==ID_array && !symbol.is_type)
+    if(symbol.type.id()==ID_array &&
+       to_array_type(symbol.type).size().is_nil() &&
+       !symbol.is_type)
     {
       // Insert a new type symbol for the array.
       // We do this because we want a convenient way
