@@ -12,12 +12,18 @@ int main()
   assert("\%"[0]=='%');
   assert("\n"[0]==10);
   
+  // spliced to avoid hex ambiguity
+  assert("\x5" "five"[0]==0x5);
+
   // wide strings
   assert(L"abc"[0]=='a');
   assert(L"abc"[1]=='b');
   assert(L"abc"[3]==0);
   assert(L"\x1234"[0]==0x1234);
-  
+
+  // spliced wide strings
+  assert(sizeof(L"1" "2")==sizeof(wchar_t)*3);
+
   // the following is a C11 UTF-8 string literal
   const char euro_sign[]=u8"\x20ac";
   assert((unsigned char)euro_sign[0]==0xe2);
