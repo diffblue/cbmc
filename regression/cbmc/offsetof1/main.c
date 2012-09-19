@@ -16,6 +16,8 @@ struct S s;
 
 int main(void)
 {
+  unsigned char ch;
+
   // this is a GCC extension
   #ifdef __GNUC__
   assert(__builtin_offsetof(struct S, i)==0);
@@ -26,6 +28,7 @@ int main(void)
   assert(__builtin_offsetof(struct S, array)==16+4);
   assert(__builtin_offsetof(struct S, array[1])==16+12);
   assert(__builtin_offsetof(struct S, array[1].y)==16+12+4);
+  assert(__builtin_offsetof(struct S, array[ch].y)==16+4+4+ch*sizeof(struct Ssub));
   #endif
 
   // The following is the 'official' Microsoft way
