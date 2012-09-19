@@ -588,7 +588,7 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
     else if(m_it->id()==ID_index)
     {
       assert(m_it->operands().size()==1);
-
+      
       if(type.id()!=ID_array)
       {
         err_location(expr);
@@ -596,6 +596,10 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
       }
 
       exprt index=m_it->op0();
+
+      // still need to typecheck index
+      typecheck_expr(index);
+
       exprt sub_size=c_sizeof(type.subtype(), *this);
       if(index.type()!=size_type()) index.make_typecast(size_type());
       result=plus_exprt(result, mult_exprt(sub_size, index));
@@ -605,7 +609,8 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
     }
   }
 
-  // we make an effort to produce a constant
+  // We make an effort to produce a constant,
+  // but this may depend on variables
   simplify(result, *this);
   result.location()=expr.location();
 
