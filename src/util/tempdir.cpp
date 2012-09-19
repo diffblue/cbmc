@@ -19,7 +19,7 @@ Author: CM Wintersteiger
 #include <unistd.h>
 #endif
 
-#ifdef __linux__
+#if defined(__linux__) || defined(__FreeBSD_kernel__) || defined(__CYGWIN__)
 #include <unistd.h>
 #endif
 
