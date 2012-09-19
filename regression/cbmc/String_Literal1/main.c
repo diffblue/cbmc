@@ -1,3 +1,4 @@
+#include <wchar.h>
 #include <assert.h>
 
 int main()
@@ -24,6 +25,11 @@ int main()
   assert((unsigned char)euro_sign[2]==0xac);
   assert(euro_sign[3]==0);
   assert(sizeof(euro_sign)==4);
+
+  // the following is C++ and C99  
+  const wchar_t wide_amount[]=L"\u20AC123,00"; //€123,00
+  assert(wide_amount[0]==0x20ac);
+  assert(wide_amount[1]=='1');
   
   // C11 unicode string literals
   assert(sizeof(u8""[0])==sizeof(char));

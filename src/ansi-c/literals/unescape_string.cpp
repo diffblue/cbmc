@@ -54,6 +54,33 @@ void unescape_string(
       case 'a': dest+='\a'; break; /* BEL (0x07) */
       case '"': dest+='"'; break;
       case '\'': dest+='\''; break;
+
+      case 'u': // universal character
+      case 'U': // universal character
+        i++;
+
+        {
+          std::string hex;
+          
+          unsigned count=(ch=='u')?4:8;
+          hex.reserve(count);
+
+          for(; count!=0 && i<src.size(); i++, count--)
+            hex+=src[i];
+
+          // go back
+          i--;
+        
+          unsigned int result;
+          sscanf(hex.c_str(), "%x", &result);
+
+          // Universal characters in non-wide strings don't
+          // really work; gcc just issues a warning.
+          ch=result;
+        }
+
+        dest+=ch;
+        break;
       
       case 'x': // hex
         i++;
@@ -75,8 +102,7 @@ void unescape_string(
           ch=result;
         }
         
-        dest+=ch;
-      
+        dest+=ch;      
         break;
       
       default:
@@ -152,6 +178,30 @@ void unescape_wide_string(
       case '"': dest.push_back('"'); break;
       case '\'': dest.push_back('\''); break;
       
+      case 'u': // universal character
+      case 'U': // universal character
+        i++;
+
+        {
+          std::string hex;
+          
+          unsigned count=(ch=='u')?4:8;
+          hex.reserve(count);
+
+          for(; count!=0 && i<src.size(); i++, count--)
+            hex+=src[i];
+
+          // go back
+          i--;
+        
+          unsigned int result;
+          sscanf(hex.c_str(), "%x", &result);
+          ch=result;
+        }
+        
+        dest.push_back(ch);
+        break;
+
       case 'x': // hex
         i++;
 
