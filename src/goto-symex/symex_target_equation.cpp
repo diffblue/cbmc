@@ -676,3 +676,27 @@ std::ostream &operator<<(
   equation.output(out);
   return out;
 }
+
+/*******************************************************************\
+
+Function: operator <<
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+std::ostream &operator<<(
+  std::ostream &out,
+  const symex_target_equationt::SSA_stept &step)
+{
+  // may cause lookup failures, since it's blank
+  contextt context;
+  namespacet ns(context);
+  step.output(ns, out);
+  return out;
+}
+
