@@ -1961,17 +1961,28 @@ std::string expr2ct::convert_array(
     
     dest.reserve(dest.size()+1+src.operands().size());
     
+    bool last_was_hex=false;
+    
     forall_operands(it, src)
     {
       // these have a trailing zero
       if(it==--src.operands().end())
         break;
-    
+        
       assert(it->is_constant());
       mp_integer i;
       to_integer(*it, i);
       unsigned int ch=integer2long(i);
 
+      if(last_was_hex)
+      {
+        // we use "string splicing" to avoid ambiguity
+        if(isxdigit(ch))
+          dest+="\" \"";
+        
+        last_was_hex=false;
+      }
+        
       switch(ch)
       {
       case '\n': dest+="\\n"; break; /* NL (0x0a) */
@@ -1992,6 +2003,7 @@ std::string expr2ct::convert_array(
           char hexbuf[10];
           sprintf(hexbuf, "\\x%x", ch);
           dest+=hexbuf;
+          last_was_hex=true;
         }
       }
     }
