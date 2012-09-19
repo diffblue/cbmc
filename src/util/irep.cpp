@@ -88,6 +88,43 @@ void irept::detatch()
 
 /*******************************************************************\
 
+Function: irept::recursive_detatch
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+#ifdef SHARING
+void irept::recursive_detatch()
+{
+  detatch();
+  
+  for(named_subt::iterator
+      it=data->named_sub.begin();
+      it!=data->named_sub.end();
+      it++)
+    it->second.recursive_detatch();
+    
+  for(named_subt::iterator
+      it=data->comments.begin();
+      it!=data->comments.end();
+      it++)
+    it->second.recursive_detatch();
+    
+  for(subt::iterator
+      it=data->sub.begin();
+      it!=data->sub.end();
+      it++)
+    it->recursive_detatch();
+}
+#endif
+
+/*******************************************************************\
+
 Function: irept::remove_ref
 
   Inputs:

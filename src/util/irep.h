@@ -265,6 +265,8 @@ public:
     return *data;
   }
   
+  void recursive_detatch();
+  
   #else
   dt data;
 
