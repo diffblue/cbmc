@@ -17,6 +17,8 @@ Author: CM Wintersteiger, 2006
 #include <sysexits.h>
 #endif
 
+#include <cbmc/version.h>
+
 #include "goto_cc_mode.h"
 #include "version.h"
 
@@ -72,6 +74,7 @@ void goto_cc_modet::help()
   std::cout <<
   "\n"
   "* *         goto-cc " GOTOCC_VERSION "  - Copyright (C) 2006-2012          * *\n"
+  "* *                   based on CBMC " CBMC_VERSION "                     * *\n"
   "* *        Daniel Kroening, Christoph Wintersteiger         * *\n"
   "* *                 kroening@kroening.com                   * *\n"
   "\n";
