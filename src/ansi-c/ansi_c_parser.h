@@ -44,7 +44,6 @@ public:
     parse_tree.clear();
     
     // scanner
-    string_literal.clear();
     tag_following=false;
     asm_block_following=false;
     parenthesis_counter=0;
@@ -57,7 +56,6 @@ public:
   }
 
   // internal state of the scanner
-  std::string string_literal;
   bool tag_following;
   bool asm_block_following;
   unsigned parenthesis_counter;
