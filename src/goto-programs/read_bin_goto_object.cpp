@@ -159,6 +159,8 @@ bool read_bin_goto_object_v2(
     
     typedef std::map<goto_programt::targett, std::list<unsigned> > target_mapt;
     target_mapt target_map;
+    typedef std::map<unsigned, goto_programt::targett> rev_target_mapt;
+    rev_target_mapt rev_target_map;
     
     unsigned ins_count = irepconverter.read_long(in); // # of instructions
     for (unsigned i=0; i<ins_count; i++)
@@ -175,6 +177,9 @@ bool read_bin_goto_object_v2(
       irepconverter.reference_convert(in, instruction.guard);
       irepconverter.read_string_ref(in); // former event
       instruction.target_number = irepconverter.read_long(in);
+      if(rev_target_map.insert(rev_target_map.end(),
+            std::make_pair(instruction.target_number, itarget))->second!=itarget)
+          assert(false);
       
       unsigned t_count = irepconverter.read_long(in); // # of targets
       for (unsigned i=0; i<t_count; i++)
@@ -198,15 +203,9 @@ bool read_bin_goto_object_v2(
           nit++)
       {
         unsigned n=*nit;
-        
-        Forall_goto_program_instructions(iit, f.body)
-        {
-          if(iit->target_number==n) 
-          {
-            ins->targets.push_back(iit);
-            break;
-          }
-        }
+        rev_target_mapt::const_iterator entry=rev_target_map.find(n);
+        assert(entry!=rev_target_map.end());
+        ins->targets.push_back(entry->second);
       }
     }
     
