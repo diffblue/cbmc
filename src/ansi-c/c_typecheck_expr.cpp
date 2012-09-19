@@ -1044,6 +1044,10 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
       return;
   }
   
+  // cast to same type?
+  if(base_type_eq(expr_type, op_type, *this))
+    return; // it's ok
+  
   if(!is_number(expr_type) &&
      expr_type.id()!=ID_bool &&
      expr_type.id()!=ID_pointer &&
@@ -1124,9 +1128,14 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
     return;
   }
 
-  // the new thing is an lvalue if the previous one is
-  // an lvalue, and it's just a pointer type cast
-  // this isn't really standard conformant!
+  // The new thing is an lvalue if the previous one is
+  // an lvalue, and it's just a pointer type cast.
+  // This isn't really standard conformant!
+
+  // Note that gcc says "warning: target of assignment not really an lvalue;
+  // this will be a hard error in the future", i.e., we
+  // can hope that the below will one day go away.
+  
   if(expr.op0().get_bool(ID_C_lvalue))
   {
     if(expr_type.id()==ID_pointer)
