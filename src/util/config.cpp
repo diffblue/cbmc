@@ -382,28 +382,53 @@ bool configt::set(const cmdlinet &cmdline)
   {
     // this is the default
     ansi_c.lib=configt::ansi_ct::LIB_FULL;
+    
+    // following http://wiki.debian.org/ArchitectureSpecificsMemo
 
     #ifdef __alpha__
     ansi_c.arch=configt::ansi_ct::ARCH_ALPHA;
     ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
+    ansi_c.long_double_width=16*8;
+    ansi_c.long_width=8*8;
+    ansi_c.pointer_width=8*8;
     #elif __arm__
     ansi_c.arch=configt::ansi_ct::ARCH_ARM;
     ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
+    ansi_c.long_double_width=8*8;
     #elif __mips__
     ansi_c.arch=configt::ansi_ct::ARCH_MIPS;
     ansi_c.endianness=configt::ansi_ct::IS_BIG_ENDIAN;
+    ansi_c.long_double_width=8*8;
     #elif __powerpc__
     ansi_c.arch=configt::ansi_ct::ARCH_POWER;
     ansi_c.endianness=configt::ansi_ct::IS_BIG_ENDIAN;
+    ansi_c.long_double_width=16*8;
     #elif __sparc__
-    aansi_c.arch=configt::ansi_ct::ARCH_SPARC;
+    ansi_c.arch=configt::ansi_ct::ARCH_SPARC;
     ansi_c.endianness=configt::ansi_ct::IS_BIG_ENDIAN;
+    ansi_c.long_double_width=16*8;
+    #elif __ia64__
+    ansi_c.arch=configt::ansi_ct::ARCH_IA64;
+    ansi_c.long_width=8*8;
+    ansi_c.pointer_width=8*8;
+    ansi_c.long_double_width=16*8;
+    ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
     #elif __s390__
-    aansi_c.arch=configt::ansi_ct::ARCH_S390;
+    #ifdef __s390x__
+    ansi_c.arch=configt::ansi_ct::ARCH_S390;
+    ansi_c.long_width=8*8;
+    ansi_c.pointer_width=8*8;
     ansi_c.endianness=configt::ansi_ct::IS_BIG_ENDIAN;
+    #else
+    ansi_c.arch=configt::ansi_ct::ARCH_S390;
+    ansi_c.endianness=configt::ansi_ct::IS_BIG_ENDIAN;
+    ansi_c.long_double_width=16*8;
+    #endif
     #elif __x86_64__
     ansi_c.arch=configt::ansi_ct::ARCH_X86_64;
     ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
+    ansi_c.long_double_width=16*8;
+    ansi_c.pointer_width=8*8;
     #else
     ansi_c.arch=configt::ansi_ct::ARCH_I386;
     ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
