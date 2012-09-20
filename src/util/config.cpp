@@ -382,9 +382,31 @@ bool configt::set(const cmdlinet &cmdline)
   {
     // this is the default
     ansi_c.os=configt::ansi_ct::OS_LINUX;
+    ansi_c.lib=configt::ansi_ct::LIB_FULL;
+
+    #ifdef __alpha__
+    ansi_c.arch=configt::ansi_ct::ARCH_ALPHA;
+    ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
+    #elif __arm__
+    ansi_c.arch=configt::ansi_ct::ARCH_ARM;
+    ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
+    #elif __mips__
+    ansi_c.arch=configt::ansi_ct::ARCH_MIPS;
+    ansi_c.endianness=configt::ansi_ct::IS_BIG_ENDIAN;
+    #elif __powerpc__
+    ansi_c.arch=configt::ansi_ct::ARCH_POWER;
+    ansi_c.endianness=configt::ansi_ct::IS_BIG_ENDIAN;
+    #elif __sparc__
+    aansi_c.arch=configt::ansi_ct::ARCH_SPARC;
+    ansi_c.endianness=configt::ansi_ct::IS_BIG_ENDIAN;
+    #elif __s390__
+    aansi_c.arch=configt::ansi_ct::ARCH_S390;
+    ansi_c.endianness=configt::ansi_ct::IS_BIG_ENDIAN;
+    #else
     ansi_c.arch=configt::ansi_ct::ARCH_I386;
     ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
-    ansi_c.lib=configt::ansi_ct::LIB_FULL;
+    #endif
+
     #ifdef _WIN32
     ansi_c.os=configt::ansi_ct::OS_WIN;
     ansi_c.wchar_t_width=2*8;

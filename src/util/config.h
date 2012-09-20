@@ -69,7 +69,7 @@ public:
     ost os;
 
     typedef enum { NO_ARCH, ARCH_I386, ARCH_X86_64, ARCH_POWER, ARCH_ARM,
-                   ARCH_ALPHA, ARCH_MIPS } archt;
+                   ARCH_ALPHA, ARCH_MIPS, ARCH_S390 } archt;
     archt arch;
     
     typedef enum { NO_MODE, MODE_ANSI, MODE_GCC, MODE_VISUAL_STUDIO,
