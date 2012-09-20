@@ -1,6 +1,6 @@
 CORE
 main.c
--D __MMX__ -D __SSE__ -D __SSE2__
+
 ^EXIT=0$
 ^SIGNAL=0$
 --
