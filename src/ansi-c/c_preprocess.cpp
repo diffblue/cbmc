@@ -370,9 +370,9 @@ bool c_preprocess_visual_studio(
   }
 
   {
-    char ch;
+    int ch;
     while((ch=fgetc(stream))!=EOF)
-      outstream << ch;
+      outstream << (unsigned char)ch;
   }
 
   fclose(stream);
@@ -691,9 +691,12 @@ bool c_preprocess_gcc(
   {
   case configt::ansi_ct::OS_LINUX:
     if(config.ansi_c.arch==configt::ansi_ct::ARCH_I386)
-       command+=" -Di386 -D__i386 -D__i386__";
+      command+=" -Di386 -D__i386 -D__i386__";
     else if(config.ansi_c.arch==configt::ansi_ct::ARCH_X86_64)
-       command+=" -D__LP64__ -D__x86_64 -D__x86_64__ -D_LP64";
+      command+=" -D__LP64__ -D__x86_64 -D__x86_64__ -D_LP64";
+    else if(config.ansi_c.arch==configt::ansi_ct::ARCH_MIPS)
+      command+=" -D_MIPS_SZPTR="+i2string(config.ansi_c.pointer_width);
+    
     command+=" -Dlinux -D__linux -D__linux__ -D__gnu_linux__";
     command+=" -Dunix -D__unix -D__unix__";
     command+=" -D__USE_UNIX98";
@@ -793,9 +796,9 @@ bool c_preprocess_gcc(
 
   if(stream!=NULL)
   {
-    char ch;
+    int ch;
     while((ch=fgetc(stream))!=EOF)
-      outstream << ch;
+      outstream << (unsigned char)ch;
 
     fclose(stream);
     unlink(tmpi.c_str());
@@ -814,9 +817,9 @@ bool c_preprocess_gcc(
 
   if(stream!=NULL)
   {
-    char ch;
+    int ch;
     while((ch=fgetc(stream))!=EOF)
-      outstream << ch;
+      outstream << (unsigned char)ch;
 
     result=pclose(stream);
   }
@@ -940,9 +943,9 @@ bool c_preprocess_arm(
 
   if(stream!=NULL)
   {
-    char ch;
+    int ch;
     while((ch=fgetc(stream))!=EOF)
-      outstream << ch;
+      outstream << (unsigned char)ch;
 
     fclose(stream);
     unlink(tmpi.c_str());
@@ -962,9 +965,9 @@ bool c_preprocess_arm(
 
   if(stream!=NULL)
   {
-    char ch;
+    int ch;
     while((ch=fgetc(stream))!=EOF)
-      outstream << ch;
+      outstream << (unsigned char)ch;
 
     result=pclose(stream);
   }
