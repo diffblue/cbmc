@@ -6,7 +6,7 @@ STATIC_ASSERT(L'\''==39);
 
 STATIC_ASSERT('\0'==0);
 STATIC_ASSERT('\10'==8); // octal!
-STATIC_ASSERT('\xab'==(signed char)0xab); // negative!
+STATIC_ASSERT((signed char)'\xab'==(signed char)0xab); // negative!
 STATIC_ASSERT(L'\xab'==0xab);
 STATIC_ASSERT(L'\xabcd'==0xabcd);
 
