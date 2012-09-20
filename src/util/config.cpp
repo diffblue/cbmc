@@ -391,45 +391,55 @@ bool configt::set(const cmdlinet &cmdline)
     ansi_c.long_double_width=16*8;
     ansi_c.long_width=8*8;
     ansi_c.pointer_width=8*8;
+    ansi_c.char_is_unsigned=false;
     #elif __arm__
     ansi_c.arch=configt::ansi_ct::ARCH_ARM;
     ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
     ansi_c.long_double_width=8*8;
+    ansi_c.char_is_unsigned=true;
     #elif __mips__
     ansi_c.arch=configt::ansi_ct::ARCH_MIPS;
     ansi_c.endianness=configt::ansi_ct::IS_BIG_ENDIAN;
     ansi_c.long_double_width=8*8;
+    ansi_c.char_is_unsigned=false;
     #elif __powerpc__
     ansi_c.arch=configt::ansi_ct::ARCH_POWER;
     ansi_c.endianness=configt::ansi_ct::IS_BIG_ENDIAN;
     ansi_c.long_double_width=16*8;
+    ansi_c.char_is_unsigned=true;
     #elif __sparc__
     ansi_c.arch=configt::ansi_ct::ARCH_SPARC;
     ansi_c.endianness=configt::ansi_ct::IS_BIG_ENDIAN;
     ansi_c.long_double_width=16*8;
+    ansi_c.char_is_unsigned=false;
     #elif __ia64__
     ansi_c.arch=configt::ansi_ct::ARCH_IA64;
     ansi_c.long_width=8*8;
     ansi_c.pointer_width=8*8;
     ansi_c.long_double_width=16*8;
     ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
+    ansi_c.char_is_unsigned=false;
     #elif __s390x__
     ansi_c.arch=configt::ansi_ct::ARCH_S390X;
     ansi_c.long_width=8*8;
     ansi_c.pointer_width=8*8;
     ansi_c.endianness=configt::ansi_ct::IS_BIG_ENDIAN;
+    ansi_c.char_is_unsigned=true;
     #elif __s390__
     ansi_c.arch=configt::ansi_ct::ARCH_S390;
     ansi_c.endianness=configt::ansi_ct::IS_BIG_ENDIAN;
     ansi_c.long_double_width=16*8;
+    ansi_c.char_is_unsigned=true;
     #elif __x86_64__
     ansi_c.arch=configt::ansi_ct::ARCH_X86_64;
     ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
     ansi_c.long_double_width=16*8;
     ansi_c.pointer_width=8*8;
+    ansi_c.char_is_unsigned=false;
     #else
     ansi_c.arch=configt::ansi_ct::ARCH_I386;
     ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
+    ansi_c.char_is_unsigned=false;
     #endif
 
     #ifdef _WIN32
