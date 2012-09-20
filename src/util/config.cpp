@@ -381,7 +381,6 @@ bool configt::set(const cmdlinet &cmdline)
   else if(ansi_c.os==configt::ansi_ct::NO_OS)
   {
     // this is the default
-    ansi_c.os=configt::ansi_ct::OS_LINUX;
     ansi_c.lib=configt::ansi_ct::LIB_FULL;
 
     #ifdef __alpha__
@@ -402,6 +401,9 @@ bool configt::set(const cmdlinet &cmdline)
     #elif __s390__
     aansi_c.arch=configt::ansi_ct::ARCH_S390;
     ansi_c.endianness=configt::ansi_ct::IS_BIG_ENDIAN;
+    #elif __x86_64__
+    ansi_c.arch=configt::ansi_ct::ARCH_X86_64;
+    ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
     #else
     ansi_c.arch=configt::ansi_ct::ARCH_I386;
     ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
@@ -414,8 +416,8 @@ bool configt::set(const cmdlinet &cmdline)
     ansi_c.long_double_width=8*8;
     #elif __APPLE__
     ansi_c.os=configt::ansi_ct::OS_MACOS;
-    #elif __x86_64__
-    ansi_c.arch=configt::ansi_ct::ARCH_X86_64;
+    #else
+    ansi_c.os=configt::ansi_ct::OS_LINUX;
     #endif
   }
   
