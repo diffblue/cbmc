@@ -14,71 +14,8 @@ Date: June 2006
 
 #include "read_bin_goto_object.h"
 #include "goto_function_serialization.h"
-//#include "symbol_serialization.h"
 #include "irep_serialization.h"
 #include "goto_program_irep.h"
-
-/*******************************************************************\
- 
-Function: read_goto_object_v1
- 
-  Inputs: input stream, context, functions
- 
- Outputs: true on error, false otherwise
- 
- Purpose: read goto binary format v1
- 
-\*******************************************************************/
-
-#if 0
-OBSOLETE
-bool read_bin_goto_object_v1(
-  std::istream &in,
-  const std::string &filename,
-  contextt &context,
-  goto_functionst &functions,
-  message_handlert &message_handler,
-  irep_serializationt &irepconverter,
-  symbol_serializationt &symbolconverter,
-  goto_function_serializationt &gfconverter)
-{ 
-  unsigned count = irepconverter.read_long(in);
-
-  for (unsigned i=0; i<count; i++)
-  {
-    irept t;
-    symbolconverter.convert(in, t);
-    symbolt symbol;
-    symbol.from_irep(t);
-    
-    if(!symbol.is_type &&
-       symbol.type.id()==ID_code)
-    {
-      // makes sure there is an empty function
-      // for every function symbol and fixes
-      // the function types. 
-      functions.function_map[symbol.name].type=
-        to_code_type(symbol.type);      
-    }
-    // std::cout << "Adding Symbol: " << symbol.name << std::endl;
-    context.add(symbol);
-  }
-  
-  count = irepconverter.read_long(in); 
-  for (unsigned i=0; i<count; i++)
-  {
-    irept t;
-    dstring fname=irepconverter.read_string(in);    
-    gfconverter.convert(in, t);
-    // std::cout << "Adding function body: " << fname << std::endl;        
-    goto_functionst::goto_functiont &f = functions.function_map[fname];
-    convert(t, f.body);
-    f.body_available = f.body.instructions.size()>0;    
-  }
-  
-  return false;
-}
-#endif
 
 /*******************************************************************\
  
