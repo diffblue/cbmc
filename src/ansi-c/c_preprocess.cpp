@@ -705,6 +705,8 @@ bool c_preprocess_gcc(
   case configt::ansi_ct::OS_MACOS:
     if(config.ansi_c.arch==configt::ansi_ct::ARCH_I386)
       command+=" -Di386 -D__i386 -D__i386__ -D__LITTLE_ENDIAN__";
+    else if(config.ansi_c.arch==configt::ansi_ct::ARCH_X86_64)
+      command+=" -D__LP64__ -D__x86_64 -D__x86_64__ -D_LP64 -D__LITTLE_ENDIAN__";
     else if(config.ansi_c.arch==configt::ansi_ct::ARCH_POWER)
       command+=" -D__BIG_ENDIAN__";
     command+=" -D__APPLE__ -D__MACH__";
