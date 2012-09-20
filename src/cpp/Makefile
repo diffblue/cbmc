@@ -3,7 +3,7 @@ SRC = cpp_id.cpp cpp_language.cpp expr2cpp.cpp cpp_parser.cpp \
       cpp_typecheck_expr.cpp cpp_typecheck_code.cpp \
       cpp_typecheck_type.cpp parse.cpp cpp_parse_tree.cpp \
       cpp_token_buffer.cpp cpp_typecheck_fargs.cpp \
-      cpp_typecheck_resolve.cpp cpp_util.cpp \
+      cpp_typecheck_resolve.cpp cpp_util.cpp cpp_enum_type.cpp \
       cpp_typecheck_function.cpp cpp_typecheck_namespace.cpp \
       cpp_name.cpp cpp_is_pod.cpp cpp_scope.cpp \
       cpp_typecheck_find_constructor.cpp template_map.cpp \

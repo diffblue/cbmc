@@ -9,18 +9,16 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #ifndef CPROVER_CPP_ENUM_TYPE_H
 #define CPROVER_CPP_ENUM_TYPE_H
 
-#include <assert.h>
+#include <cassert>
 
-#include <config.h>
 #include <type.h>
+
+#include "cpp_name.h"
 
 class cpp_enum_typet:public typet
 {
 public:
-  inline cpp_enum_typet():typet(ID_c_enum)
-  {
-    set(ID_width, config.ansi_c.int_width);
-  }
+  cpp_enum_typet();
   
   inline const cpp_namet &tag() const
   {
