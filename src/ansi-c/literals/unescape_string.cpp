@@ -213,6 +213,9 @@ void unescape_wide_string(
             i++;
           }
         
+          // go back
+          i--;
+
           unsigned int result;
           sscanf(hex.c_str(), "%x", &result);
           ch=result;
