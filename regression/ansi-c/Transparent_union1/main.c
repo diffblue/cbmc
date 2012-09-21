@@ -17,7 +17,17 @@ typedef union my_union
 
 typedef U U2 __attribute__ ((__transparent_union__));
 
-void f(U2 some)
+union my_union2
+{
+  int i;
+  const struct S1 s1;
+} __attribute__ ((__transparent_union__));
+
+void f1(U2 some)
+{
+}
+
+void f2(union my_union2 some)
 {
 }
 
@@ -26,9 +36,12 @@ int main()
   struct S1 s1;
   struct S2 s2;
   
-  f(&s1);
-  f(&s2);
-  f(0);
+  f1(&s1);
+  f1(&s2);
+  f1(0);
+  
+  f2(0);
+  f2(1>2); // these are int
 }
 #else
 
