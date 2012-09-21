@@ -131,6 +131,7 @@ bool ansi_c_languaget::parse(
   ansi_c_parser.in=&codestr;
   ansi_c_parser.set_message_handler(message_handler);
   ansi_c_parser.grammar=ansi_c_parsert::LANGUAGE;
+  ansi_c_parser.for_has_scope=config.ansi_c.for_has_scope;
 
   switch(config.ansi_c.mode)
   {

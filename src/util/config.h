@@ -39,6 +39,7 @@ public:
     
     bool char_is_unsigned, wchar_t_is_unsigned;
     bool use_fixed_for_float;
+    bool for_has_scope;
     
     ieee_floatt::rounding_modet rounding_mode;
 
