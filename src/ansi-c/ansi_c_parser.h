@@ -29,7 +29,9 @@ class ansi_c_parsert:public parsert
 public:
   ansi_c_parse_treet parse_tree;
   
-  ansi_c_parsert():cpp(false)
+  ansi_c_parsert():
+    cpp(false),
+    for_has_scope(false)
   {
   }
   
@@ -72,6 +74,9 @@ public:
 
   // recognize C++ keywords  
   bool cpp;
+  
+  // in C99 and upwards, for(;;) has a scope
+  bool for_has_scope;
 
   class identifiert
   {
