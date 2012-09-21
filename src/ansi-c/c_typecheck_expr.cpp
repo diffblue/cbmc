@@ -298,6 +298,12 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
       throw "_Generic expects one operand";
     }
 
+    // This is one of the few places where it's detectable
+    // that we are using "bool" for boolean operators instead
+    // of "int". We convert for this reason.
+    if(follow(expr.op0().type()).id()==ID_bool)
+      expr.op0().make_typecast(int_type());
+
     irept::subt &generic_associations=
       expr.add(ID_generic_associations).get_sub();
       
@@ -990,6 +996,12 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
   {
     // This is a GCC extension. It's either a 'temporary union',
     // where the argument is one of the member types.
+    
+    // This is one of the few places where it's detectable
+    // that we are using "bool" for boolean operators instead
+    // of "int". We convert for this reason.
+    if(follow(op.type()).id()==ID_bool)
+      op.make_typecast(int_type());
 
     // we need to find a member with the right type
     const union_typet &union_type=to_union_type(expr_type);
@@ -1012,6 +1024,12 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
         return;
       }
     }
+    
+    // not found, complain
+    err_location(expr);
+    str << "type cast to union: type `"
+        << to_string(op.type()) << "' not found in union";
+    throw 0;
   }
 
   // We allow (TYPE){ expression }
