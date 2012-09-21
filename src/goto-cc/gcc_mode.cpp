@@ -106,6 +106,16 @@ bool gcc_modet::doit()
     config.ansi_c.mode=configt::ansi_ct::MODE_GCC;
 
   compiler.object_file_extension="o";
+  
+  if(cmdline.isset("std"))
+  {
+    std::string std_string=cmdline.getval("std");
+    if(std_string=="gnu99" || std_string=="c99" ||
+       std_string=="gnu9x" || std_string=="c9x" ||
+       std_string=="gnu11" || std_string=="c11" ||
+       std_string=="gnu1x" || std_string=="c1x")
+      config.ansi_c.for_has_scope=true;
+  }
 
   // gcc's default is 32 bits for wchar_t
   if(cmdline.isset("short-wchar"))

@@ -245,6 +245,9 @@ bool configt::set(const cmdlinet &cmdline)
 {
   // defaults -- we match the architecture we have ourselves
 
+  // ealier than C99
+  ansi_c.for_has_scope=false;
+
   if(sizeof(long int)==8)
     ansi_c.set_64();
   else
