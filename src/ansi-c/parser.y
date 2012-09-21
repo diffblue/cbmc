@@ -2066,16 +2066,30 @@ iteration_statement:
           mto($$, $5);
           mto($$, $2);
         }
-        | TOK_FOR '(' declaration_or_expression_statement
-                comma_expression_opt ';' comma_expression_opt ')' statement
+        | TOK_FOR
+          {
+            // In C99 and upwards, for(;;) has a scope
+            if(PARSER.for_has_scope)
+            {
+              unsigned prefix=++PARSER.current_scope().compound_counter;
+              PARSER.new_scope(i2string(prefix)+"::");
+            }
+          }
+          '(' declaration_or_expression_statement
+              comma_expression_opt ';'
+              comma_expression_opt ')'
+          statement
         {
           $$=$1;
           statement($$, ID_for);
           stack($$).operands().reserve(4);
-          mto($$, $3);
           mto($$, $4);
-          mto($$, $6);
-          mto($$, $8);
+          mto($$, $5);
+          mto($$, $7);
+          mto($$, $9);
+
+          if(PARSER.for_has_scope)
+            PARSER.pop_scope(); // remove the C99 for-scope
         }
         ;
 
