@@ -45,6 +45,9 @@ int main()
   assert(__real__ char_complex == 102);  
   assert(__imag__ char_complex == 3);
   
+  // casts to reals produce the real part
+  assert((int) char_complex == 102);  
+  
   #else
   
   // Visual studio doesn't have it  
