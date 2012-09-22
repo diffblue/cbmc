@@ -37,7 +37,6 @@ exprt gen_zero(const typet &type)
      type_id==ID_real ||
      type_id==ID_integer ||
      type_id==ID_natural ||
-     type_id==ID_complex ||
      type_id==ID_c_enum)
   {
     result.set(ID_value, ID_0);
