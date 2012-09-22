@@ -219,6 +219,22 @@ bool check_c_implicit_typecast(
     if(dest_type.id()==ID_fixedbv) return false;
     if(dest_type.id()==ID_complex) return false;
   }
+  else if(src_type_id==ID_complex)
+  {
+    if(dest_type.id()==ID_complex)
+      return check_c_implicit_typecast(src_type.subtype(), dest_type.subtype());
+    else
+    {
+      // 6.3.1.7, par 2:
+
+      // When a value of complex type is converted to a real type, the
+      // imaginary part of the complex value is discarded and the value of the
+      // real part is converted according to the conversion rules for the
+      // corresponding real type.
+      
+      return check_c_implicit_typecast(src_type.subtype(), dest_type);
+    }
+  }
   else if(src_type_id==ID_array ||
           src_type_id==ID_pointer)
   {
