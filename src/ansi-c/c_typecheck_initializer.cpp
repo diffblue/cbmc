@@ -511,10 +511,10 @@ void c_typecheck_baset::do_designated_initializer(
     }
     else if(follow(value.type())==type)
     {
-      // a struct/union can be initialized directly with
+      // a struct/union/vector can be initialized directly with
       // an expression of the right type. This doesn't
       // work with arrays, unfortunately.
-      if(type.id()==ID_struct || type.id()==ID_union)
+      if(type.id()==ID_struct || type.id()==ID_union || type.id()==ID_vector)
       {
         *dest=value;
         return; // done
@@ -804,7 +804,7 @@ exprt c_typecheck_baset::do_initializer_list(
   designatort current_designator;
   
   designator_enter(type, current_designator);
-    
+
   forall_operands(it, value)
   {
     do_designated_initializer(

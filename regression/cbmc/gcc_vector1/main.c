@@ -58,6 +58,9 @@ int main()
   // same from one
   v4si other_vector={ 0 };
   z.v=other_vector;
+
+  // an array of vectors
+  v4si image[] = { other_vector };
   
   assert(z.members[1]==0);
 }
