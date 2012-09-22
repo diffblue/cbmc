@@ -98,7 +98,25 @@ bool boolbvt::type_conversion(
       return false;
     }
   }
-
+  
+  if(src_type.id()==ID_complex)
+  {
+    assert(dest_type.id()!=ID_complex);
+    if(dest_type.id()==ID_signedbv ||
+       dest_type.id()==ID_unsignedbv ||
+       dest_type.id()==ID_floatbv ||
+       dest_type.id()==ID_fixedbv ||
+       dest_type.id()==ID_c_enum ||
+       dest_type.id()==ID_bool)
+    {
+      // A cast from complex x to real T
+      // is (T) __real__ x.
+      bvt tmp_src(src);
+      tmp_src.resize(src.size()/2); // cut off imag part
+      return type_conversion(src_type.subtype(), tmp_src, dest_type, dest);
+    }
+  }
+  
   switch(dest_bvtype)
   {
   case IS_RANGE:
