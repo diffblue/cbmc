@@ -213,6 +213,22 @@ exprt boolbvt::bv_get_rec(
         return value;
       }
     }
+    else if(type.id()==ID_complex)
+    {
+      const typet &subtype=ns.follow(type.subtype());
+      unsigned sub_width=boolbv_width(subtype);
+
+      if(sub_width!=0 && width==sub_width*2)
+      {
+        exprt value(ID_complex, type);
+        value.operands().resize(2);
+
+        value.op0()=bv_get_rec(bv, unknown, 0*sub_width, subtype);
+        value.op1()=bv_get_rec(bv, unknown, 1*sub_width, subtype);
+            
+        return value;
+      }
+    }
   }
 
   std::string value;
