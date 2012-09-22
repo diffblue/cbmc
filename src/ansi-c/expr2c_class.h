@@ -124,6 +124,10 @@ protected:
     const exprt &src, const std::string &symbol,
     unsigned precedence);
 
+  std::string convert_complex(
+    const exprt &src, 
+    unsigned precedence);
+
   std::string convert_Hoare(const exprt &src);
 
   std::string convert_code(const codet &src);

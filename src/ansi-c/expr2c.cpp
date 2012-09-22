@@ -992,6 +992,59 @@ std::string expr2ct::convert_function(
 
 /*******************************************************************\
 
+Function: expr2ct::convert_complex
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+std::string expr2ct::convert_complex(
+  const exprt &src,
+  unsigned precedence)
+{
+  // ISO C11 offers:
+  // double complex CMPLX(double x, double y);
+  // float complex CMPLXF(float x, float y);
+  // long double complex CMPLXL(long double x, long double y);
+  
+  const typet &subtype=
+    ns.follow(ns.follow(src.type()).subtype());
+
+  std::string name;
+  
+  if(subtype==double_type())
+    name="CMPLX";
+  else if(subtype==float_type())
+    name="CMPLXF";
+  else if(subtype==long_double_type())
+    name="CMPLXL";
+  else
+    name="CMPLX"; // default, possibly wrong
+
+  std::string dest=name;
+  dest+='(';
+
+  forall_operands(it, src)
+  {
+    unsigned p;
+    std::string op=convert(*it, p);
+
+    if(it!=src.operands().begin()) dest+=", ";
+
+    dest+=op;
+  }
+
+  dest+=')';
+
+  return dest;
+}
+
+/*******************************************************************\
+
 Function: expr2ct::convert_array_of
 
   Inputs:
@@ -3789,6 +3842,9 @@ std::string expr2ct::convert(
 
   else if(src.id()==ID_complex_imag)
     return convert_function(src, "__imag__", precedence=15);
+
+  else if(src.id()==ID_complex)
+    return convert_complex(src, precedence=15);
 
   else if(src.id()==ID_bitand)
     return convert_binary(src, "&", precedence=8, false);
