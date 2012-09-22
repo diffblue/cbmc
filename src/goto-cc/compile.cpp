@@ -449,8 +449,7 @@ bool compilet::link()
   contextt::symbolst::iterator it_main=
     context.symbols.find(config.main.empty()?"c::main":"c::"+config.main);
 
-  if((!act_as_ld || it_main!=context.symbols.end()) &&
-     !cmdline.isset("static") && !cmdline.isset("shared"))
+  if((!act_as_ld || it_main!=context.symbols.end()))
   {
     print(8, "Finalizing");
 

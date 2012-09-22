@@ -95,6 +95,12 @@ bool gcc_modet::doit()
   // get configuration
   config.set(cmdline);
 
+  // these options cause linking
+  if(cmdline.isset("static") ||
+     cmdline.isset("shared") ||
+     cmdline.isset('r'))
+    compiler.act_as_ld=true;
+
   if(cmdline.isset("i386-win32") ||
      cmdline.isset("winx64"))
   {
