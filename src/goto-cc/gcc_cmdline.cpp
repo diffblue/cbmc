@@ -52,7 +52,7 @@ const char *gcc_options_with_separated_argument[]=
   "--verbosity", // non-gcc
   "--function",  // non-gcc
   "-aux-info",
-  "--param",
+  "--param", // Apple only
   "-imacros",
   "-iprefix",
   "-iwithprefix",
@@ -155,6 +155,7 @@ const char *gcc_options_without_argument[]=
   "-O2",
   "-O3", 
   "-Os",
+  "-Oz", // Apple only
   "-C", 
   "-E",
   "-H", 
@@ -183,6 +184,7 @@ const char *gcc_options_without_argument[]=
   "-symbolic",
   "-EB",
   "-EL",
+  "-fast", // Apple only
   NULL
 };
 
