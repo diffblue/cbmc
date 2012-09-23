@@ -94,6 +94,11 @@ bool gcc_modet::doit()
   
   // get configuration
   config.set(cmdline);
+  
+  if(cmdline.isset("m32"))
+    config.ansi_c.set_32();
+  else if(cmdline.isset("m64"))
+    config.ansi_c.set_64();
 
   // determine actions to be undertaken
   
