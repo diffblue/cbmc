@@ -13,7 +13,7 @@ SRC = cpp_id.cpp cpp_language.cpp expr2cpp.cpp cpp_parser.cpp \
       cpp_typecheck_template.cpp cpp_typecheck_function_bodies.cpp \
       cpp_typecheck_initializer.cpp cpp_typecheck_compound_type.cpp \
       cpp_constructor.cpp cpp_destructor.cpp \
-      cpp_final.cpp cpp_typecheck_conversions.cpp\
+      cpp_typecheck_conversions.cpp\
       cpp_typecheck_declaration.cpp cpp_declarator_converter.cpp \
       cpp_declaration.cpp cpp_namespace_spec.cpp \
       cpp_typecheck_using.cpp cpp_exception_id.cpp \

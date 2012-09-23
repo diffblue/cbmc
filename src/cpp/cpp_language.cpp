@@ -25,7 +25,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "expr2cpp.h"
 #include "cpp_parser.h"
 #include "cpp_typecheck.h"
-#include "cpp_final.h"
 
 /*******************************************************************\
 
@@ -236,7 +235,6 @@ bool cpp_languaget::final(
   contextt &context,
   message_handlert &message_handler)
 {
-  if(cpp_final(context, message_handler)) return true;
   if(entry_point(context, "c::main", message_handler)) return true;
 
   return false;
