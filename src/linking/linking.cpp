@@ -374,11 +374,12 @@ void linkingt::typecheck()
     {
       const contextt::symbolst::const_iterator
         main_symbol=main_context.symbols.find(src_it->first);
-        
+
+      // collision with main_context?
       if(main_symbol==main_context.symbols.end())
         continue;
 
-      // file-local?
+      // is one of them file-local?
       if(src_it->second.file_local ||
          main_symbol->second.file_local)
       {
@@ -449,7 +450,7 @@ void linkingt::inspect_src_symbol(const irep_idt &identifier)
 
 /*******************************************************************\
 
-Function: convert_c
+Function: linking
 
   Inputs:
 
