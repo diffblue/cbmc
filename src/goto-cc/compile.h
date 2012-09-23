@@ -24,8 +24,13 @@ public:
   optionst options;
   namespacet ns;
   goto_functionst compiled_functions;
-  bool act_as_ld, only_preprocess, echo_file_name;
+  bool echo_file_name;
   std::string working_directory;
+  
+  enum { PREPROCESS_ONLY, // -E
+         COMPILE_ONLY, // -c
+         LINK_LIBRARY, // ld -r
+         COMPILE_LINK_EXECUTABLE } mode;
 
   std::list<std::string> library_paths;
   std::list<std::string> source_files;
@@ -36,7 +41,6 @@ public:
 
   std::string object_file_extension;
   std::string output_file_object, output_file_executable;
-  bool doLink;
 
   compilet(cmdlinet &_cmdline);
   

@@ -35,11 +35,13 @@ bool cw_modet::doit()
 
   compilet compiler(cmdline);
 
-  if(has_prefix(base_name, "ld") ||
-     has_prefix(base_name, "goto-ld") ||
-     has_prefix(base_name, "link") ||
-     has_prefix(base_name, "goto-link"))
-    compiler.act_as_ld=true;
+  #if 0
+  bool act_as_ld=
+    has_prefix(base_name, "ld") ||
+    has_prefix(base_name, "goto-ld") ||
+    has_prefix(base_name, "link") ||
+    has_prefix(base_name, "goto-link");
+  #endif
 
   if(cmdline.isset("verbosity"))
     verbosity=atoi(cmdline.getval("verbosity"));
@@ -56,8 +58,13 @@ bool cw_modet::doit()
 
   compiler.object_file_extension="o";
 
+  // determine actions to be taken
   if(cmdline.isset('E'))
-    compiler.only_preprocess=true;
+    compiler.mode=compilet::PREPROCESS_ONLY;
+  else if(cmdline.isset('c') || cmdline.isset('S'))
+    compiler.mode=compilet::COMPILE_ONLY;
+  else
+    compiler.mode=compilet::COMPILE_LINK_EXECUTABLE;
 
   if(cmdline.isset('U'))
     config.ansi_c.undefines=cmdline.get_values('U');
@@ -74,8 +81,6 @@ bool cw_modet::doit()
 
   if(cmdline.isset('l'))
     compiler.libraries=cmdline.get_values('l');
-
-  compiler.doLink=!(cmdline.isset('c') || cmdline.isset('S'));
 
   if(cmdline.isset('o'))
   {

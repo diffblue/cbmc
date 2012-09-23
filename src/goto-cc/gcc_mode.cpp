@@ -47,17 +47,17 @@ bool gcc_modet::doit()
   int verbosity=1;
 
   compilet compiler(cmdline);
-
-  if(has_prefix(base_name, "ld") ||
-     has_prefix(base_name, "goto-ld"))
-    compiler.act_as_ld=true;
+  
+  bool act_as_ld=
+    has_prefix(base_name, "ld") ||
+    has_prefix(base_name, "goto-ld");
 
   if(cmdline.isset('v'))
   {
     // This a) prints the version and b) increases verbosity.
-    // Compilation continues!
+    // Compilation continues, don't exit!
     
-    if(compiler.act_as_ld)
+    if(act_as_ld)
       print("GNU ld version 2.16.91 20050610 (goto-cc " GOTOCC_VERSION ")");
     else
       print("gcc version 3.4.4 (goto-cc " GOTOCC_VERSION ")");
@@ -65,7 +65,7 @@ bool gcc_modet::doit()
 
   if(cmdline.isset("version"))
   {
-    if(compiler.act_as_ld)
+    if(act_as_ld)
       print("GNU ld version 2.16.91 20050610 (goto-cc " GOTOCC_VERSION ")");
     else
       print("gcc (GCC) 3.4.4 (goto-cc " GOTOCC_VERSION ")\n");
@@ -95,11 +95,16 @@ bool gcc_modet::doit()
   // get configuration
   config.set(cmdline);
 
-  // these options cause linking
-  if(cmdline.isset("static") ||
-     cmdline.isset("shared") ||
-     cmdline.isset('r'))
-    compiler.act_as_ld=true;
+  // determine actions to be undertaken
+  
+  if(act_as_ld)
+    compiler.mode=compilet::LINK_LIBRARY;
+  else if(cmdline.isset('c') || cmdline.isset('S'))
+    compiler.mode=compilet::COMPILE_ONLY;
+  else if(cmdline.isset('E'))
+    compiler.mode=compilet::PREPROCESS_ONLY;
+  else
+    compiler.mode=compilet::COMPILE_LINK_EXECUTABLE;
 
   if(cmdline.isset("i386-win32") ||
      cmdline.isset("winx64"))
@@ -135,9 +140,6 @@ bool gcc_modet::doit()
   if(cmdline.isset("funsigned-char"))
     config.ansi_c.char_is_unsigned=true;
 
-  if(cmdline.isset('E'))
-    compiler.only_preprocess=true;
-
   if(cmdline.isset('U'))
     config.ansi_c.undefines=cmdline.get_values('U');
 
@@ -153,8 +155,6 @@ bool gcc_modet::doit()
 
   if(cmdline.isset('l'))
     compiler.libraries=cmdline.get_values('l');
-
-  compiler.doLink=!(cmdline.isset('c') || cmdline.isset('S'));
 
   if(cmdline.isset('o'))
   {

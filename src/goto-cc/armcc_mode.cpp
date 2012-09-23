@@ -35,11 +35,13 @@ bool armcc_modet::doit()
 
   compilet compiler(cmdline);
 
-  if(has_prefix(base_name, "ld") ||
-     has_prefix(base_name, "goto-ld") ||
-     has_prefix(base_name, "link") ||
-     has_prefix(base_name, "goto-link"))
-    compiler.act_as_ld=true;
+  #if 0
+  bool act_as_ld=
+    has_prefix(base_name, "ld") ||
+    has_prefix(base_name, "goto-ld") ||
+    has_prefix(base_name, "link") ||
+    has_prefix(base_name, "goto-link");
+  #endif
 
   if(cmdline.isset("verbosity"))
     verbosity=atoi(cmdline.getval("verbosity"));
@@ -54,9 +56,15 @@ bool armcc_modet::doit()
 
   config.ansi_c.mode=configt::ansi_ct::MODE_ARM;
   config.ansi_c.arch=configt::ansi_ct::ARCH_ARM;
-
+  
+  // determine actions to be taken
+  
   if(cmdline.isset('E'))
-    compiler.only_preprocess=true;
+    compiler.mode=compilet::PREPROCESS_ONLY;
+  else if(cmdline.isset('c') || cmdline.isset('S'))
+    compiler.mode=compilet::COMPILE_ONLY;
+  else
+    compiler.mode=compilet::COMPILE_LINK_EXECUTABLE;
 
   if(cmdline.isset('U'))
     config.ansi_c.undefines=cmdline.get_values('U');
@@ -64,8 +72,6 @@ bool armcc_modet::doit()
   if(cmdline.isset('L'))
     compiler.library_paths=cmdline.get_values('L');
     // Don't add the system paths!
-
-  compiler.doLink=!(cmdline.isset('c') || cmdline.isset('S'));
 
   // these take precedence over -I
   if(cmdline.isset('J'))
