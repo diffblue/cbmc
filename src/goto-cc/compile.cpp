@@ -158,6 +158,7 @@ bool compilet::doit()
     return false; // we are done
 
   if(mode==LINK_LIBRARY ||
+     mode==COMPILE_LINK ||
      mode==COMPILE_LINK_EXECUTABLE)
   {
     if(link()) return true;

@@ -108,6 +108,8 @@ bool gcc_modet::doit()
     compiler.mode=compilet::COMPILE_ONLY;
   else if(cmdline.isset('E'))
     compiler.mode=compilet::PREPROCESS_ONLY;
+  else if(cmdline.isset("shared"))
+    compiler.mode=compilet::COMPILE_LINK;
   else
     compiler.mode=compilet::COMPILE_LINK_EXECUTABLE;
 
