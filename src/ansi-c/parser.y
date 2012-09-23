@@ -1667,7 +1667,7 @@ parameter_declaration:
           init($$);
           PARSER.new_declaration(stack($1), stack($2), stack($$));
         }
-        | declaration_specifier identifier_declarator
+        | declaration_specifier identifier_declarator gcc_type_attribute_opt
         {
           init($$);
           PARSER.new_declaration(stack($1), stack($2), stack($$));
@@ -1690,7 +1690,7 @@ parameter_declaration:
           init($$);
           PARSER.new_declaration(stack($1), stack($2), stack($$));
         }
-        | declaration_qualifier_list identifier_declarator
+        | declaration_qualifier_list identifier_declarator gcc_type_attribute_opt
         {
           init($$);
           PARSER.new_declaration(stack($1), stack($2), stack($$));
@@ -1706,7 +1706,7 @@ parameter_declaration:
           init($$);
           PARSER.new_declaration(stack($1), stack($2), stack($$));
         }
-        | type_specifier identifier_declarator
+        | type_specifier identifier_declarator gcc_type_attribute_opt
         {
           init($$);
           stack($1), stack($2), stack($$);
@@ -1730,7 +1730,7 @@ parameter_declaration:
           init($$);
           PARSER.new_declaration(stack($1), stack($2), stack($$));
         }
-        | type_qualifier_list identifier_declarator
+        | type_qualifier_list identifier_declarator gcc_type_attribute_opt
         {
           init($$);
           PARSER.new_declaration(stack($1), stack($2), stack($$));
