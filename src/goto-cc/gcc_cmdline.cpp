@@ -105,6 +105,7 @@ const char *gcc_options_without_argument[]=
   "--help", // NON-GCC
   "-?", // NON-GCC
   "-r", // for ld mimicking
+  "-dylib", // for ld mimicking on MacOS
   "-c", 
   "-S",
   "-E", 

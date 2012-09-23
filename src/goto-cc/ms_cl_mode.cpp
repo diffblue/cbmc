@@ -43,9 +43,11 @@ bool ms_cl_modet::doit()
 
   compilet compiler(cmdline);
 
-  if(has_prefix(base_name, "link") ||
-     has_prefix(base_name, "goto-link"))
-    compiler.act_as_ld=true;
+  #if 0  
+  bool act_as_ld=
+    has_prefix(base_name, "link") ||
+    has_prefix(base_name, "goto-link");
+  #endif
 
   if(cmdline.isset("verbosity"))
     verbosity=atoi(cmdline.getval("verbosity"));
@@ -60,12 +62,15 @@ bool ms_cl_modet::doit()
 
   config.ansi_c.mode=configt::ansi_ct::MODE_VISUAL_STUDIO;
   compiler.object_file_extension="obj";
+  
+  // determine actions to be undertaken
 
   if(cmdline.isset('E') || cmdline.isset('P'))
-    compiler.only_preprocess=true;
-
-  compiler.doLink=!( cmdline.isset('E') || cmdline.isset('P') ||
-                     cmdline.isset('c') );
+    compiler.mode=compilet::PREPROCESS_ONLY;
+  else if(cmdline.isset('c'))
+    compiler.mode=compilet::COMPILE_ONLY;
+  else
+    compiler.mode=compilet::COMPILE_LINK_EXECUTABLE;
                      
   compiler.echo_file_name=true;
 

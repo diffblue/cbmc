@@ -24,6 +24,7 @@ Date: June 2006
 
 #include <ansi-c/ansi_c_language.h>
 #include <linking/linking_class.h>
+#include <linking/entry_point.h>
 
 #include <goto-programs/goto_convert.h>
 #include <goto-programs/goto_convert_functions.h>
@@ -138,13 +139,13 @@ bool compilet::doit()
     return true;
   }
 
-  if(act_as_ld && source_files.size()>0)
+  if(mode==LINK_LIBRARY && source_files.size()>0)
   {
-    error("ld cannot link source files");
+    error("cannot link source files");
     return true;
   }
 
-  if(only_preprocess && object_files.size()>0)
+  if(mode==PREPROCESS_ONLY && object_files.size()>0)
   {
     error("cannot preprocess object files");
     return true;
@@ -153,9 +154,11 @@ bool compilet::doit()
   if(source_files.size()>0)
     if(compile()) return true;
 
-  if(only_preprocess) return false;
+  if(mode==PREPROCESS_ONLY)
+    return false; // we are done
 
-  if(doLink)
+  if(mode==LINK_LIBRARY ||
+     mode==COMPILE_LINK_EXECUTABLE)
   {
     if(link()) return true;
   }
@@ -444,74 +447,15 @@ bool compilet::link()
     show_function_table();
     return true;
   }
-
-  // finalize
-  contextt::symbolst::iterator it_main=
-    context.symbols.find(config.main.empty()?"c::main":"c::"+config.main);
-
-  if((!act_as_ld || it_main!=context.symbols.end()))
+  
+  // produce entry point?
+  
+  if(mode==COMPILE_LINK_EXECUTABLE)
   {
-    print(8, "Finalizing");
-
-    forall_symbols(it, context.symbols)
-    {
-      const symbolt &symbol = it->second;
-      if(symbol.mode!="" &&
-            find(seen_modes.begin(), seen_modes.end(), symbol.mode)
-            == seen_modes.end())
-      {
-        seen_modes.push_back(symbol.mode);
-      }
-    }
-    
-    if(seen_modes.empty())
-    {
-      if(!source_files.empty())
-      {
-        error("no modes found!");
-        return true;
-      }
-    }
-    else
-    {
-      // Hackfix for C++
-      std::list<irep_idt>::iterator cpp =
-        find(seen_modes.begin(), seen_modes.end(), "cpp");
-
-      std::list<irep_idt>::iterator c =
-        find(seen_modes.begin(), seen_modes.end(), "C");
-
-      if(c!=seen_modes.end() && cpp!=seen_modes.end())
-        seen_modes.erase(c);
-
-      std::list<irep_idt>::iterator it = seen_modes.begin();
-      for(; it!=seen_modes.end(); it++)
-      {
-        languaget *language=get_language_from_mode(*it);
-        if(language)
-        {
-          if(language->final(context, ui_message_handler))
-            return true;
-        }
-        else
-        {
-          error("unknown language mode '" +id2string(*it)+ "'");
-          return true;
-        }
-      }
-    }
-
-    // check for main
-    contextt::symbolst::iterator i=
-      context.symbols.find("main");
-
-    if(i==context.symbols.end())
-    {
-      error("'main' symbol not found");
+    if(entry_point(context, "c::main", ui_message_handler))
       return true;
-    }
 
-    // final may add some more functions.
+    // entry_point may (should) add some more functions.
     convert_symbols(compiled_functions);
   }
 
@@ -547,7 +491,9 @@ bool compilet::compile()
 
     bool r=parse_source(file_name); // don't break the program!
 
-    if(!r && !doLink && !only_preprocess)
+    if(r) return true; // parser/typecheck error
+
+    if(mode==COMPILE_ONLY)
     {
       // output an object file for every source file
 
@@ -586,8 +532,6 @@ bool compilet::compile()
       context.clear(); // clean symbol table for next source file.
       compiled_functions.clear();
     }
-    
-    if(r) return true; // parser/typecheck error
   }
   
   return false;
@@ -654,7 +598,7 @@ bool compilet::parse(const std::string &file_name)
   lf.filename=file_name;
   lf.language=languagep;
 
-  if(only_preprocess)
+  if(mode==PREPROCESS_ONLY)
   {
     print(8, "Preprocessing: "+file_name);
 
@@ -710,7 +654,7 @@ bool compilet::parse_stdin()
 
   print(8, "Parsing: (stdin)");
 
-  if(only_preprocess)
+  if(mode==PREPROCESS_ONLY)
   {
     std::ostream *os = &std::cout;
     std::ofstream ofs;
@@ -1274,9 +1218,7 @@ compilet::compilet(cmdlinet &_cmdline):
   ns(context),
   cmdline(_cmdline)
 {
-  doLink=false;
-  act_as_ld=false;
-  only_preprocess=false;
+  mode=COMPILE_LINK_EXECUTABLE;
   echo_file_name=false;
   subgraphscount=0;
   working_directory=get_current_working_directory();
