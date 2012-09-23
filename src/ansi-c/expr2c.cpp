@@ -329,9 +329,11 @@ std::string expr2ct::convert_rec(
   }
   else if(src.id()==ID_pointer)
   {
-    if(src.subtype().id()==ID_code)
+    const typet &subtype=ns.follow(src.subtype());
+  
+    if(subtype.id()==ID_code)
     {
-      const typet &return_type=(typet &)src.subtype().find(ID_return_type);
+      const typet &return_type=to_code_type(subtype).return_type();
 
       std::string dest=q+convert(return_type);
 
@@ -340,7 +342,7 @@ std::string expr2ct::convert_rec(
 
       // arguments
       dest+="(";
-      const irept &arguments=src.subtype().find(ID_arguments);
+      const irept &arguments=subtype.find(ID_arguments);
 
       forall_irep(it, arguments.get_sub())
       {
@@ -352,13 +354,19 @@ std::string expr2ct::convert_rec(
         dest+=convert(argument_type);
       }
 
+      if(to_code_type(subtype).has_ellipsis())
+      {
+        if(!arguments.get_sub().empty()) dest+=", ";
+        dest+="...";
+      }
+
       dest+=")";
 
       return dest;
     }
     else
     {
-      std::string tmp=convert(src.subtype());
+      std::string tmp=convert(subtype);
       tmp+=" *";
       if(q!="")
       {
@@ -406,6 +414,12 @@ std::string expr2ct::convert_rec(
         dest+=", ";
 
       dest+=convert(it->type());
+    }
+    
+    if(code_type.has_ellipsis())
+    {
+      if(!arguments.empty()) dest+=", ";
+      dest+="...";
     }
 
     dest+=")";
