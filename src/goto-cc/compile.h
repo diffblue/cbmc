@@ -27,10 +27,12 @@ public:
   bool echo_file_name;
   std::string working_directory;
   
-  enum { PREPROCESS_ONLY, // -E
-         COMPILE_ONLY, // -c
+  enum { PREPROCESS_ONLY, // gcc -E
+         COMPILE_ONLY, // gcc -c, gcc -S
          LINK_LIBRARY, // ld -r
-         COMPILE_LINK_EXECUTABLE } mode;
+         COMPILE_LINK, // gcc -shared
+         COMPILE_LINK_EXECUTABLE // gcc
+       } mode;
 
   std::list<std::string> library_paths;
   std::list<std::string> source_files;
