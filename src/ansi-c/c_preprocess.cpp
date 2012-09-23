@@ -325,6 +325,43 @@ bool c_preprocess_visual_studio(
       command_file << "/U_WIN64" << std::endl;
     }
 
+    switch(config.ansi_c.arch)
+    {
+    case configt::ansi_ct::ARCH_I386:
+      command_file << "/D_M_IX86" << std::endl;
+      break;
+
+    case configt::ansi_ct::ARCH_X86_64:
+      command_file << "/D_M_X64" << std::endl
+                   << "/D_M_AMD64" << std::endl;
+      break;
+
+    case configt::ansi_ct::ARCH_IA64:
+      command_file << "/D_M_IA64" << std::endl;
+      break;
+
+    case configt::ansi_ct::ARCH_POWER:
+      command_file << "/D_M_PPC" << std::endl;
+      break;
+
+    case configt::ansi_ct::ARCH_ARM:
+      command_file << "/D_M_ARM" << std::endl;
+      break;
+
+    case configt::ansi_ct::ARCH_ALPHA:
+      command_file << "/D_M_ALPHA" << std::endl;
+      break;
+
+    case configt::ansi_ct::ARCH_MIPS:
+    case configt::ansi_ct::ARCH_SPARC:
+    case configt::ansi_ct::ARCH_S390:
+    case configt::ansi_ct::ARCH_S390X:
+      assert(false); // not supported by Visual Studio
+      break;
+
+    case configt::ansi_ct::NO_ARCH: break;
+    }
+
     // Standard Defines, ANSI9899 6.10.8
     command_file << "/D__STDC_VERSION__=199901L" << std::endl;
     command_file << "/D__STDC_IEC_559__=1" << std::endl;
@@ -686,29 +723,68 @@ bool c_preprocess_gcc(
       command+=GCC_DEFINES_32;
     }
   }
+  
+  switch(config.ansi_c.arch)
+  {
+  case configt::ansi_ct::ARCH_I386:
+    command+=" -Di386 -D__i386 -D__i386__";
+    break;
+
+  case configt::ansi_ct::ARCH_X86_64:
+    command+=" -D__LP64__ -D__x86_64 -D__x86_64__ -D_LP64 -D__amd64__ -D__amd64";
+    break;
+
+  case configt::ansi_ct::ARCH_IA64:
+    command+=" -D__ia64__ -D_IA64 -D__IA64__";
+    break;
+
+  case configt::ansi_ct::ARCH_POWER:
+    command+=" -D__powerpc -D__powerpc__ -D__POWERPC__ -D__ppc__";
+    break;
+
+  case configt::ansi_ct::ARCH_ARM:
+    command+=" -D__arm__";
+    break;
+
+  case configt::ansi_ct::ARCH_ALPHA:
+    command+=" -D__alpha__";
+    break;
+
+  case configt::ansi_ct::ARCH_MIPS:
+    command+=" -D__mips__ -Dmips";
+    command+=" -D_MIPS_SZPTR="+i2string(config.ansi_c.pointer_width);
+    break;
+
+  case configt::ansi_ct::ARCH_SPARC:
+    command+=" -D__sparc__";
+    break;
+
+  case configt::ansi_ct::ARCH_S390:
+    command+=" -D__s390__";
+    break;
+
+  case configt::ansi_ct::ARCH_S390X:
+    command+=" -D__s390x__";
+    break;
+
+  case configt::ansi_ct::NO_ARCH: break;
+  }
       
   switch(config.ansi_c.os)
   {
   case configt::ansi_ct::OS_LINUX:
-    if(config.ansi_c.arch==configt::ansi_ct::ARCH_I386)
-      command+=" -Di386 -D__i386 -D__i386__";
-    else if(config.ansi_c.arch==configt::ansi_ct::ARCH_X86_64)
-      command+=" -D__LP64__ -D__x86_64 -D__x86_64__ -D_LP64";
-    else if(config.ansi_c.arch==configt::ansi_ct::ARCH_MIPS)
-      command+=" -D_MIPS_SZPTR="+i2string(config.ansi_c.pointer_width);
-    
     command+=" -Dlinux -D__linux -D__linux__ -D__gnu_linux__";
     command+=" -Dunix -D__unix -D__unix__";
     command+=" -D__USE_UNIX98";
     break;
 
   case configt::ansi_ct::OS_MACOS:
-    if(config.ansi_c.arch==configt::ansi_ct::ARCH_I386)
-      command+=" -Di386 -D__i386 -D__i386__ -D__LITTLE_ENDIAN__";
-    else if(config.ansi_c.arch==configt::ansi_ct::ARCH_X86_64)
-      command+=" -D__LP64__ -D__x86_64 -D__x86_64__ -D_LP64 -D__LITTLE_ENDIAN__";
+    if(config.ansi_c.arch==configt::ansi_ct::ARCH_I386 ||
+       config.ansi_c.arch==configt::ansi_ct::ARCH_X86_64)
+      command+=" -D__LITTLE_ENDIAN__";
     else if(config.ansi_c.arch==configt::ansi_ct::ARCH_POWER)
       command+=" -D__BIG_ENDIAN__";
+
     command+=" -D__APPLE__ -D__MACH__";
     // needs to be __APPLE_CPP__ for C++
     command+=" -D__APPLE_CC__";
