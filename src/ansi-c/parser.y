@@ -832,20 +832,34 @@ default_declaring_list:
         }
         ;
 
-post_declarator_attributes:
+post_declarator_attribute:
           TOK_GCC_ASM_PAREN volatile_or_goto_opt '(' gcc_asm_commands ')'
         {
+          $$=$1;
+          stack($$).id(ID_asm);
         }
+        | gcc_type_attribute
+        ;
+
+post_declarator_attributes:
+          post_declarator_attributes post_declarator_attribute
+        {
+          $$=$1;
+          merge_types($1, $2);
+        }
+        | post_declarator_attribute
         ;
 
 post_declarator_attributes_opt:
           /* nothing */
+        {
+          init($$);
+        }
         | post_declarator_attributes
         ;
 
 declaring_list:
           declaration_specifier declarator
-          gcc_type_attribute_opt
           post_declarator_attributes_opt
           {
             // the symbol has to be visible during initialization
@@ -858,10 +872,9 @@ declaring_list:
         {
           init($$);
           stack($$).add(ID_type)=stack($1); // save for later
-          decl_statement($$, $5, $6);
+          decl_statement($$, $4, $5);
         }
         | type_specifier declarator
-          gcc_type_attribute_opt
           post_declarator_attributes_opt
           {
             // the symbol has to be visible during initialization
@@ -874,10 +887,9 @@ declaring_list:
         {
           init($$);
           stack($$).add(ID_type)=stack($1); // save for later
-          decl_statement($$, $5, $6);
+          decl_statement($$, $4, $5);
         }
         | declaring_list ',' declarator
-          gcc_type_attribute_opt
           post_declarator_attributes_opt
           {
             init($$);
@@ -889,7 +901,7 @@ declaring_list:
           initializer_opt
         {
           $$=$1;
-          decl_statement($$, $6, $7);
+          decl_statement($$, $5, $6);
         }
         ;
 
