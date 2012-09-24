@@ -64,6 +64,7 @@ const char *gcc_options_with_separated_argument[]=
   "-Xlinker",
   "-b",
   "-std",
+  "--std",
   "-print-file-name",
   "-print-prog-name",
   "-specs",
