@@ -176,6 +176,10 @@ void cpp_typecheckt::typecheck_type(typet &type)
   {
     typecheck_enum_type(type);
   }
+  else if(type.id()==ID_c_bitfield)
+  {
+    typecheck_c_bit_field_type(type);
+  }
   else if(type.id()==ID_unsignedbv ||
           type.id()==ID_signedbv ||
           type.id()==ID_bool ||

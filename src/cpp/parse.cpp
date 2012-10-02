@@ -1967,15 +1967,20 @@ bool Parser::rDeclaratorWithInit(
     else if(t==':')
     {
       // bit field
-      exprt e;
-
       Token tk;
-      lex->GetToken(tk);
+      lex->GetToken(tk); // get :
+
+      exprt e;
       if(!rExpression(e))
         return false;
-
-      //dw=Ptree::Nconc(d, Ptree::List(new Leaf(tk), e));
-      // TODO
+        
+      typet bit_field_type(ID_c_bitfield);
+      bit_field_type.set(ID_size, e);
+      bit_field_type.subtype().make_nil();
+      set_location(bit_field_type, tk);
+      
+      merge_types(bit_field_type, declarator.type());
+        
       dw.swap(declarator);
       return true;
     }
