@@ -67,6 +67,14 @@ exprt convert_integer_literal(const std::string &src)
     std::string without_prefix(src, 2, std::string::npos);
     value=string2integer(without_prefix, 16);
   }
+  else if(src.size()>=2 && src[0]=='0' && tolower(src[1])=='b')
+  {
+    // binary; strip "0x"
+    // see http://gcc.gnu.org/onlinedocs/gcc/Binary-constants.html
+    base=2;
+    std::string without_prefix(src, 2, std::string::npos);
+    value=string2integer(without_prefix, 2);
+  }
   else if(src.size()>=2 && src[0]=='0')
   {
     // octal
@@ -106,10 +114,10 @@ exprt convert_integer_literal(const std::string &src)
   if(value<0)
     value_abs.negate();
 
-  bool is_hex_or_oct=(base==8) || (base==16);
+  bool is_hex_or_oct_or_bin=(base==8) || (base==16) || (base==2);
   
   #define FITS(width, signed) \
-    ((signed?!is_unsigned:(is_unsigned || is_hex_or_oct)) && \
+    ((signed?!is_unsigned:(is_unsigned || is_hex_or_oct_or_bin)) && \
     (power(2, signed?width-1:width)>value_abs))
 
   unsigned width;

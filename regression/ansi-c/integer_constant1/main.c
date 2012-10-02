@@ -20,6 +20,17 @@ STATIC_ASSERT(sizeof(1ll)==sizeof(long long int));
 STATIC_ASSERT(sizeof(0xaaaabbbbcccc)==sizeof(long long int));
 STATIC_ASSERT(sizeof('x')==sizeof(int)); // int in C, char in C++
 
+// binary, which is newer versions of gcc only
+#ifdef __GNUC__
+STATIC_ASSERT(0b101010==42);
+STATIC_ASSERT(0B101010==42);
+STATIC_ASSERT(sizeof(0B101010)==sizeof(int));
+STATIC_ASSERT(sizeof(0B101010LL)==sizeof(long long));
+STATIC_ASSERT(sizeof(0B101010)==sizeof(int));
+STATIC_ASSERT(0b10000000000000000000000000000000==2147483648);
+STATIC_ASSERT(sizeof(0b10000000000000000000000000000000)==sizeof(int));
+#endif
+
 #ifdef _WIN32
 STATIC_ASSERT(sizeof(L'x')==2);
 #else
