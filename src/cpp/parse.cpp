@@ -1919,7 +1919,7 @@ bool Parser::rDeclaratorWithInit(
   bool should_be_declarator,
   bool is_statement)
 {
-  if(lex->LookAhead(0)==':')        // bit field
+  if(lex->LookAhead(0)==':') // anonymous bit field
   {
     Token tk;
     lex->GetToken(tk);
@@ -3365,8 +3365,6 @@ bool Parser::rClassBody(exprt &body)
   if(lex->GetToken(tk)!='{')
     return false;
 
-  //Ptree ob=new Leaf(tk);
-
   exprt members=exprt("cpp-class-body");
 
   set_location(members, tk);
@@ -3385,9 +3383,6 @@ bool Parser::rClassBody(exprt &body)
       //body=Ptree::List(ob, nil, new Leaf(tk));
       return true;        // error recovery
     }
-
-    //lex->GetComments();
-    //mems=Ptree::Snoc(mems, m);
 
     #ifdef DEBUG
     std::cout << "Parser::rClassBody " << member << std::endl;
