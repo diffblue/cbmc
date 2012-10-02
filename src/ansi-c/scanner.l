@@ -131,10 +131,11 @@ integer		{digit}+
 binary		{bindigit}+
 msiw_suffix     ("i8"|"i16"|"i32"|"i64"|"i128")
 int_suffix      [uUlLiIjJ]*|{msiw_suffix}
+bininteger	"0"[bB]{bindigit}+{int_suffix}
 decinteger	[1-9]{digit}*{int_suffix}
 octinteger	"0"{octdigit}*{int_suffix}
 hexinteger	"0"[xX]{hexdigit}+{int_suffix}
-integer_s       {decinteger}|{octinteger}|{hexinteger}
+integer_s       {decinteger}|{bininteger}|{octinteger}|{hexinteger}
 octchar		"\\"{octdigit}{1,3}
 hexchar		"\\x"{hexdigit}+
 exponent	[eE][+-]?{integer}
