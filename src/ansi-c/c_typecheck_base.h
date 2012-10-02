@@ -60,7 +60,7 @@ protected:
   const irep_idt module;
   const irep_idt mode;
   const std::string language_prefix;
-  unsigned tmp_counter;
+  irep_idt current_symbol_id;
 
   typedef hash_map_cont<irep_idt, irep_idt, irep_id_hash> id_replace_mapt;
   id_replace_mapt id_replace_map;

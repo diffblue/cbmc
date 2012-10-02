@@ -695,7 +695,13 @@ void c_typecheck_baset::clean_type(
        !size.is_constant() &&
        size.id()!=ID_infinity)
     {
-      const symbolt &base_symbol=lookup(base_symbol_identifier);
+      assert(current_symbol_id!=irep_idt());
+        
+      const symbolt &base_symbol=
+        lookup(
+          base_symbol_identifier!=irep_idt()?
+          base_symbol_identifier:
+          current_symbol_id);
       
       // Need to pull out! We insert new symbol.
       locationt location=size.find_location();

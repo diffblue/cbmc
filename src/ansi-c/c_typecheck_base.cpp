@@ -109,6 +109,8 @@ Function: c_typecheck_baset::typecheck_symbol
 
 void c_typecheck_baset::typecheck_symbol(symbolt &symbol)
 {
+  current_symbol_id=symbol.name;
+
   // first of all, we typecheck the type
   typecheck_type(symbol.type);
 
