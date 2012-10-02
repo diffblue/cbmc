@@ -647,11 +647,11 @@ std::string expr2ct::convert_with(
 
       const typet &full_type=ns.follow(src.op0().type());
 
-      const struct_typet &struct_type=
-        to_struct_type(full_type);
+      const struct_union_typet &struct_union_type=
+        to_struct_union_type(full_type);
 
       const exprt comp_expr=
-        struct_type.get_component(component_name);
+        struct_union_type.get_component(component_name);
         
       assert(comp_expr.is_not_nil());
         
