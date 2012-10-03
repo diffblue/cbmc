@@ -84,30 +84,7 @@ void goto_cc_modet::help()
   std::cout <<
   "Usage:                       Purpose:\n"
   "\n"
-  " --dot                       outputs a dot graph for every output file\n"
   " --verbosity #               verbosity level\n"
-  "\n"
-  "Architecture options:\n" 
-  " --16, --32, --64            set width of machine word\n"
-  " --little-endian             allow little-endian word-byte conversions\n"
-  " --big-endian                allow big-endian word-byte conversions\n"
-  " --ppc-macos                 set MACOS/PPC architecture\n"
-  #ifdef _WIN32
-  " --i386-macos                set MACOS/I386 architecture\n"
-  " --i386-linux                set Linux/I386 architecture\n"
-  " --i386-win32                set Windows/I386 architecture (default)\n"
-  #else
-  #ifdef __APPLE__
-  " --i386-macos                set MACOS/I386 architecture (default)\n"
-  " --i386-linux                set Linux/I386 architecture\n"
-  " --i386-win32                set Windows/I386 architecture\n"
-  #else
-  " --i386-macos                set MACOS/I386 architecture\n"
-  " --i386-linux                set Linux/I386 architecture (default)\n"
-  " --i386-win32                set Windows/I386 architecture\n"
-  #endif
-  #endif
-  " --no-arch                   don't set up an architecture\n"  
   "\n";
 }
 
