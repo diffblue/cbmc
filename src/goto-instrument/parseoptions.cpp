@@ -49,6 +49,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "stack_depth.h"
 #include "nondet_static.h"
 #include "rw_set.h"
+#include "concurrency.h"
 
 /*******************************************************************\
 
@@ -437,7 +438,8 @@ void goto_instrument_parseoptionst::instrument_goto_program(
      cmdline.isset("pso") ||
      cmdline.isset("rso") ||
      cmdline.isset("power") ||
-     cmdline.isset("isr"))
+     cmdline.isset("isr") ||
+     cmdline.isset("concurrency"))
   {
     status("Function Pointer Removal");
     remove_function_pointers(ns, goto_functions, cmdline.isset("pointer-check"));
@@ -562,6 +564,16 @@ void goto_instrument_parseoptionst::instrument_goto_program(
         context,
         goto_functions);
     }
+
+    if(cmdline.isset("concurrency"))
+    {
+      status("Sequentializing concurrency");
+      concurrency(
+        value_set_analysis,
+        context,
+        goto_functions);
+    }
+
   }  
 
   // add failed symbols
