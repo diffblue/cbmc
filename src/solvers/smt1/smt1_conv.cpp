@@ -2654,13 +2654,13 @@ void smt1_convt::convert_index(const index_exprt &expr, bool bool_as_bv)
     const typet &elem_type=array_type.subtype();
 
     const member_exprt &member_expr=to_member_expr(expr.array());
-    const exprt &struct_op=member_expr.struct_op();
+    //const exprt &struct_op=member_expr.struct_op();
     //const irep_idt &name=member_expr.get_component_name();
 
-    unsigned total_width=boolbv_width(struct_op.type());
+    //unsigned total_width=boolbv_width(struct_op.type());
     
-    if(total_width==0)
-      throw "failed to get struct width";
+    //if(total_width==0)
+    //  throw "failed to get struct width";
 
     //unsigned offset=boolbv_width.get_member(
     //     to_struct_type(struct_op.type()), name).offset;
