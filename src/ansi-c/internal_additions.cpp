@@ -141,7 +141,7 @@ void ansi_c_internal_additions(std::string &code)
     "__CPROVER_bool __CPROVER_sign(double f);\n"
     "double __CPROVER_inf(void);\n"
     "float __CPROVER_inff(void);\n"
-    "extern int __CPROVER_rounding_mode;\n"
+    "extern int __CPROVER_thread_local __CPROVER_rounding_mode;\n"
 
     // absolute value
     "int __CPROVER_abs(int x);\n"
