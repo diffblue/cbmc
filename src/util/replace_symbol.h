@@ -23,20 +23,30 @@ public:
   typedef hash_map_cont<irep_idt, exprt, irep_id_hash> expr_mapt;
   typedef hash_map_cont<irep_idt, typet, irep_id_hash> type_mapt;
   
-  void insert(const irep_idt &identifier,
-              const exprt &expr)
+  inline void insert(const irep_idt &identifier,
+                     const exprt &expr)
   {
     expr_map.insert(std::pair<irep_idt, exprt>(identifier, expr));
   }
   
-  void insert(const irep_idt &identifier,
-              const typet &type)
+  inline void insert(const irep_idt &identifier,
+                     const typet &type)
   {
     type_map.insert(std::pair<irep_idt, typet>(identifier, type));
   }
   
   virtual bool replace(exprt &dest) const;
   virtual bool replace(typet &dest) const;
+  
+  inline void operator()(exprt &dest) const
+  {
+    replace(dest);
+  }
+
+  inline void operator()(typet &dest) const
+  {
+    replace(dest);
+  }
 
   replace_symbolt();
   virtual ~replace_symbolt();
