@@ -7,6 +7,7 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <std_types.h>
+#include <std_expr.h>
 
 #include "replace_symbol.h"
 
@@ -40,6 +41,26 @@ Function: replace_symbolt::~replace_symbolt
 
 replace_symbolt::~replace_symbolt()
 {
+}
+
+/*******************************************************************\
+
+Function: replace_symbolt::insert
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void replace_symbolt::insert(
+  const symbol_exprt &old_expr,
+  const exprt &new_expr)
+{
+  expr_map.insert(std::pair<irep_idt, exprt>(
+    old_expr.get_identifier(), new_expr));
 }
 
 /*******************************************************************\
