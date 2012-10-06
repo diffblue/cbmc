@@ -29,13 +29,9 @@ public:
     expr_map.insert(std::pair<irep_idt, exprt>(identifier, expr));
   }
   
-  inline void insert(const symbol_exprt &old_expr,
-                     const exprt &new_expr)
-  {
-    expr_map.insert(std::pair<irep_idt, exprt>(
-      old_expr.get_identifier(), new_expr));
-  }
-  
+  void insert(const class symbol_exprt &old_expr,
+              const exprt &new_expr);
+
   inline void insert(const irep_idt &identifier,
                      const typet &type)
   {
