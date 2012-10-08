@@ -8,12 +8,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <expr_util.h>
 
-#include "basic_symex.h"
+#include "goto_symex.h"
 #include "goto_symex_state.h"
 
 /*******************************************************************\
 
-Function: basic_symext::symex_assign
+Function: goto_symext::symex_assign
 
   Inputs:
 
@@ -23,16 +23,13 @@ Function: basic_symext::symex_assign
 
 \*******************************************************************/
 
-void basic_symext::symex_assign(
+void goto_symext::symex_assign(
   statet &state,
   const code_assignt &code)
 {
   exprt lhs=code.lhs();
   exprt rhs=code.rhs();
 
-  read(lhs);
-  read(rhs);
-  
   replace_nondet(lhs);
   replace_nondet(rhs);
   
@@ -74,7 +71,7 @@ void basic_symext::symex_assign(
 
 /*******************************************************************\
 
-Function: basic_symext::add_to_lhs
+Function: goto_symext::add_to_lhs
 
   Inputs:
 
@@ -84,7 +81,7 @@ Function: basic_symext::add_to_lhs
 
 \*******************************************************************/
 
-exprt basic_symext::add_to_lhs(
+exprt goto_symext::add_to_lhs(
   const exprt &lhs,
   const exprt &what)
 {
@@ -114,7 +111,7 @@ exprt basic_symext::add_to_lhs(
 
 /*******************************************************************\
 
-Function: basic_symext::symex_assign_rec
+Function: goto_symext::symex_assign_rec
 
   Inputs:
 
@@ -124,7 +121,7 @@ Function: basic_symext::symex_assign_rec
 
 \*******************************************************************/
 
-void basic_symext::symex_assign_rec(
+void goto_symext::symex_assign_rec(
   statet &state,
   const exprt &lhs,
   const exprt &full_lhs,
@@ -180,7 +177,7 @@ void basic_symext::symex_assign_rec(
 
 /*******************************************************************\
 
-Function: basic_symext::symex_assign_symbol
+Function: goto_symext::symex_assign_symbol
 
   Inputs:
 
@@ -190,7 +187,7 @@ Function: basic_symext::symex_assign_symbol
 
 \*******************************************************************/
 
-void basic_symext::symex_assign_symbol(
+void goto_symext::symex_assign_symbol(
   statet &state,
   const symbol_exprt &lhs,
   const exprt &full_lhs,
@@ -241,7 +238,7 @@ void basic_symext::symex_assign_symbol(
 
 /*******************************************************************\
 
-Function: basic_symext::symex_assign_typecast
+Function: goto_symext::symex_assign_typecast
 
   Inputs:
 
@@ -251,7 +248,7 @@ Function: basic_symext::symex_assign_typecast
 
 \*******************************************************************/
 
-void basic_symext::symex_assign_typecast(
+void goto_symext::symex_assign_typecast(
   statet &state,
   const typecast_exprt &lhs,
   const exprt &full_lhs,
@@ -274,7 +271,7 @@ void basic_symext::symex_assign_typecast(
 
 /*******************************************************************\
 
-Function: basic_symext::symex_assign_array
+Function: goto_symext::symex_assign_array
 
   Inputs:
 
@@ -284,7 +281,7 @@ Function: basic_symext::symex_assign_array
 
 \*******************************************************************/
 
-void basic_symext::symex_assign_array(
+void goto_symext::symex_assign_array(
   statet &state,
   const index_exprt &lhs,
   const exprt &full_lhs,
@@ -323,7 +320,7 @@ void basic_symext::symex_assign_array(
 
 /*******************************************************************\
 
-Function: basic_symext::symex_assign_member
+Function: goto_symext::symex_assign_member
 
   Inputs:
 
@@ -333,7 +330,7 @@ Function: basic_symext::symex_assign_member
 
 \*******************************************************************/
 
-void basic_symext::symex_assign_member(
+void goto_symext::symex_assign_member(
   statet &state,
   const member_exprt &lhs,
   const exprt &full_lhs,
@@ -397,7 +394,7 @@ void basic_symext::symex_assign_member(
 
 /*******************************************************************\
 
-Function: basic_symext::symex_assign_if
+Function: goto_symext::symex_assign_if
 
   Inputs:
 
@@ -407,7 +404,7 @@ Function: basic_symext::symex_assign_if
 
 \*******************************************************************/
 
-void basic_symext::symex_assign_if(
+void goto_symext::symex_assign_if(
   statet &state,
   const if_exprt &lhs,
   const exprt &full_lhs,
@@ -440,7 +437,7 @@ void basic_symext::symex_assign_if(
 
 /*******************************************************************\
 
-Function: basic_symext::symex_assign_byte_extract
+Function: goto_symext::symex_assign_byte_extract
 
   Inputs:
 
@@ -450,7 +447,7 @@ Function: basic_symext::symex_assign_byte_extract
 
 \*******************************************************************/
 
-void basic_symext::symex_assign_byte_extract(
+void goto_symext::symex_assign_byte_extract(
   statet &state,
   const exprt &lhs,
   const exprt &full_lhs,

@@ -287,7 +287,7 @@ void goto_symext::symex_function_call_code(
       rhs.location()=call.location();
       state.rename(rhs, ns, goto_symex_statet::L1);
       code_assignt code(call.lhs(), rhs);
-      basic_symext::symex_assign(state, to_code_assign(code)); /* TODO: clean_expr? */
+      symex_assign(state, to_code_assign(code)); /* TODO: clean_expr? */
     }
 
     state.source.pc++;
@@ -481,7 +481,7 @@ void goto_symext::return_assignment(statet &state)
 
       assert(base_type_eq(assignment.lhs().type(),
             assignment.rhs().type(), ns));
-      basic_symext::symex_assign(state, assignment);
+      symex_assign(state, assignment);
     }
   }
   else

@@ -1,4 +1,4 @@
-SRC = symex_target.cpp symex_target_equation.cpp basic_symex.cpp \
+SRC = symex_target.cpp symex_target_equation.cpp goto_symex.cpp \
       symex_main.cpp goto_trace.cpp build_goto_trace.cpp \
       symex_function_call.cpp goto_symex_state.cpp symex_dereference.cpp \
       symex_goto.cpp builtin_functions.cpp slice.cpp symex_other.cpp \
