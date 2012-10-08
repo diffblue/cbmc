@@ -96,6 +96,16 @@ public:
   void from_irep(const irept &src);
   
   class symbol_exprt symbol_expr() const;
+  
+  bool is_shared() const
+  {
+    return is_static_lifetime && !is_thread_local;
+  }
+  
+  bool is_procedure_local() const
+  {
+    return !is_static_lifetime;
+  }
 };
 
 std::ostream &operator<<(std::ostream &out,
