@@ -74,11 +74,18 @@ public:
     {
       expr.set_identifier(operator()(expr.get_identifier()));
     }
-
-    void rename(const irep_idt &identifier, unsigned count)
+    
+    irep_idt rename(const irep_idt &identifier, unsigned count)
     {
       current_names[identifier]=count;
-      original_identifiers[name(identifier, count)]=identifier;
+      irep_idt new_name=name(identifier, count);
+      original_identifiers[new_name]=identifier;
+      return new_name;
+    }
+    
+    irep_idt increase_counter(const irep_idt &identifier)
+    {
+      return rename(identifier, current_names[identifier]+1);
     }
     
     inline bool is_renamed(const irep_idt &identifier) const

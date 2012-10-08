@@ -96,8 +96,9 @@ irep_idt goto_symex_statet::level0t::operator()(
     abort();
   }
   
-  // don't rename globals or code
-  if(s->type.id()==ID_code || is_global(*s))
+  // don't rename shared variables or functions
+  if(s->type.id()==ID_code ||
+     s->is_shared())
   {
     original_identifiers[identifier]=identifier;
     return identifier;
@@ -288,9 +289,8 @@ void goto_symex_statet::assignment(
   #endif
 
   // do the l2 renaming 
-  unsigned new_count=level2.current_count(l1_identifier)+1;
-  level2.rename(l1_identifier, new_count);
-  lhs.set_identifier(level2.name(l1_identifier, new_count));
+  irep_idt new_l2_name=level2.increase_counter(l1_identifier);
+  lhs.set_identifier(new_l2_name);
 
   // for value propagation -- the RHS is L2
   
