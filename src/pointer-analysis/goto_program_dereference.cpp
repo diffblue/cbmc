@@ -69,7 +69,7 @@ bool goto_program_dereferencet::is_valid_object(
   if(symbol.type.id()==ID_code)
     return true;
 
-  if(symbol.static_lifetime)
+  if(symbol.is_static_lifetime)
     return true; // global/static
 
   #if 0

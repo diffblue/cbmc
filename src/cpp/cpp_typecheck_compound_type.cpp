@@ -650,8 +650,8 @@ void cpp_typecheckt::typecheck_compound_declarator(
     static_symbol.name=identifier;
     static_symbol.type=component.type();
     static_symbol.base_name=component.get(ID_base_name);
-    static_symbol.lvalue=true;
-    static_symbol.static_lifetime=true;
+    static_symbol.is_lvalue=true;
+    static_symbol.is_static_lifetime=true;
     static_symbol.location=cpp_name.location();
     static_symbol.is_extern=true;
     

@@ -440,7 +440,7 @@ void goto2cppt::convert_global_variables(std::ostream &os)
   {
     const symbolt &symbol=it->second;
     
-    if(!symbol.static_lifetime)
+    if(!symbol.is_static_lifetime)
       continue;
       
     irep_idt renamed_id=unique_name(symbol.base_name);

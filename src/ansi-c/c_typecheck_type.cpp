@@ -722,7 +722,7 @@ void c_typecheck_baset::clean_type(
       new_symbol.pretty_name=id2string(base_symbol.pretty_name)+suffix;
       new_symbol.base_name=id2string(base_symbol.base_name)+suffix;
       new_symbol.type=size.type();
-      new_symbol.file_local=true;
+      new_symbol.is_file_local=true;
       new_symbol.is_type=false;
       new_symbol.value.make_nil();
       new_symbol.location=location;

@@ -350,10 +350,10 @@ void goto_convertt::remove_function_call(
   symbolt new_symbol;
 
   new_symbol.base_name="return_value";
-  new_symbol.lvalue=true;
-  new_symbol.is_statevar=true;
-  new_symbol.file_local=true;
-  new_symbol.thread_local=true;
+  new_symbol.is_lvalue=true;
+  new_symbol.is_state_var=true;
+  new_symbol.is_file_local=true;
+  new_symbol.is_thread_local=true;
   new_symbol.type=expr.type();
   new_symbol.location=expr.find_location();
 
@@ -452,9 +452,9 @@ void goto_convertt::remove_cpp_new(
   symbolt new_symbol;
 
   new_symbol.base_name="new_ptr$"+i2string(++temporary_counter);
-  new_symbol.lvalue=true;
+  new_symbol.is_lvalue=true;
   new_symbol.type=expr.type();
-  new_symbol.file_local=true;
+  new_symbol.is_file_local=true;
   new_symbol.name=tmp_symbol_prefix+id2string(new_symbol.base_name);
 
   new_name(new_symbol);
@@ -525,8 +525,8 @@ void goto_convertt::remove_malloc(
     symbolt new_symbol;
 
     new_symbol.base_name="new_value$"+i2string(++temporary_counter);
-    new_symbol.lvalue=true;
-    new_symbol.file_local=true;
+    new_symbol.is_lvalue=true;
+    new_symbol.is_file_local=true;
     new_symbol.type=expr.type();
     new_symbol.name=tmp_symbol_prefix+id2string(new_symbol.base_name);
 

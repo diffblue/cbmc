@@ -35,7 +35,7 @@ exprt goto_symext::make_auto_object(const typet &type)
 
   symbol.base_name="auto_object"+i2string(dynamic_counter);
   symbol.name="symex::"+id2string(symbol.base_name);
-  symbol.lvalue=true;
+  symbol.is_lvalue=true;
   symbol.type=type;
   symbol.mode=ID_C;
 

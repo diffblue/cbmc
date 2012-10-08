@@ -208,7 +208,7 @@ exprt dereferencet::dereference(
       symbol.type=type;
 
       // make it a lvalue, so we can assign to it
-      symbol.lvalue=true;
+      symbol.is_lvalue=true;
       
       get_new_name(symbol, ns);
 

@@ -232,7 +232,7 @@ void c_typecheck_baset::do_initializer(symbolt &symbol)
   if(has_prefix(id2string(symbol.name), CPROVER_PREFIX "constant_infinity"))
     return;
 
-  if(symbol.static_lifetime)
+  if(symbol.is_static_lifetime)
   {
     if(symbol.value.is_not_nil())
     {

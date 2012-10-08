@@ -84,7 +84,7 @@ bool static_lifetime_init(
   {
     const irep_idt &identifier=it->first;
   
-    if(!it->second.static_lifetime) continue;
+    if(!it->second.is_static_lifetime) continue;
 
     if(it->second.is_type) continue;
 

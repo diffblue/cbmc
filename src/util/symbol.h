@@ -66,14 +66,12 @@ public:
   
   // global use
   bool is_type, is_macro, is_exported,
-       is_input, is_output, is_statevar;
+       is_input, is_output, is_state_var, is_property;
        
-  // PVS
-  bool is_actual, binding;
-  
   // ANSI-C
-  bool static_lifetime, thread_local;
-  bool lvalue, file_local, is_extern, is_volatile;
+  bool is_static_lifetime, is_thread_local;
+  bool is_lvalue, is_file_local, is_extern, is_volatile,
+       is_argument;
 
   symbolt()
   {
@@ -84,9 +82,9 @@ public:
   {
     value.make_nil();
     location.make_nil();
-    lvalue=thread_local=static_lifetime=file_local=is_extern=
-    is_type=is_actual=is_macro=is_exported=binding=
-    is_volatile=is_input=is_output=is_statevar=false;
+    is_lvalue=is_thread_local=is_static_lifetime=is_file_local=is_extern=
+    is_type=is_macro=is_exported=is_argument=
+    is_volatile=is_input=is_output=is_state_var=is_property=false;
     name=module=base_name=mode=pretty_name=irep_idt();
   }
      

@@ -742,7 +742,7 @@ void c_typecheck_baset::typecheck_expr_symbol(exprt &expr)
     // put it back
     expr.location()=location;
 
-    if(symbol.lvalue)
+    if(symbol.is_lvalue)
       expr.set(ID_C_lvalue, true);
 
     if(expr.type().id()==ID_code) // function designator

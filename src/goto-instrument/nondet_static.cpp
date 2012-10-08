@@ -49,7 +49,7 @@ void nondet_static(
       const symbol_exprt &sym=to_symbol_expr(
           to_code_assign(instruction.code).lhs());
       if(has_prefix(sym.get_identifier().as_string(), CPROVER_PREFIX) ||
-          !ns.lookup(sym.get_identifier()).static_lifetime)
+          !ns.lookup(sym.get_identifier()).is_static_lifetime)
         continue;
 
       i_it=init.insert_before(++i_it);

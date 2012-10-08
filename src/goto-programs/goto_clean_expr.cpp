@@ -42,10 +42,10 @@ symbol_exprt goto_convertt::make_static_symbol(
   {
     new_symbol.base_name="static_"+suffix+"$"+i2string(++temporary_counter);
     new_symbol.name=tmp_symbol_prefix+id2string(new_symbol.base_name);
-    new_symbol.lvalue=true;
-    new_symbol.thread_local=false;
-    new_symbol.static_lifetime=true;
-    new_symbol.file_local=true;
+    new_symbol.is_lvalue=true;
+    new_symbol.is_thread_local=false;
+    new_symbol.is_static_lifetime=true;
+    new_symbol.is_file_local=true;
     new_symbol.value=expr;
     new_symbol.type=expr.type();
   }

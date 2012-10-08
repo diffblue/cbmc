@@ -511,15 +511,15 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
     if(!is_code)
     {
       // it is a variable
-      symbol.is_statevar=true;
-      symbol.lvalue = !is_reference(symbol.type) &&
-                      !(symbol.type.get_bool(ID_C_constant) &&
-                        is_number(symbol.type) &&
-                        symbol.value.id() == ID_constant);
+      symbol.is_state_var=true;
+      symbol.is_lvalue = !is_reference(symbol.type) &&
+                         !(symbol.type.get_bool(ID_C_constant) &&
+                         is_number(symbol.type) &&
+                         symbol.value.id() == ID_constant);
 
       if(cpp_typecheck.cpp_scopes.current_scope().is_global_scope())
       {
-        symbol.static_lifetime=true;
+        symbol.is_static_lifetime=true;
 
         if(storage_spec.is_extern())
           symbol.is_extern=true;
@@ -528,8 +528,8 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
       {
         if(storage_spec.is_static())
         {
-          symbol.static_lifetime=true;
-          symbol.file_local=true;
+          symbol.is_static_lifetime=true;
+          symbol.is_file_local=true;
         }
         else if(storage_spec.is_extern())
         {
@@ -540,7 +540,7 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
     }
   }
 
-  if(symbol.static_lifetime)
+  if(symbol.is_static_lifetime)
     cpp_typecheck.dynamic_initializations.push_back(symbol.name);
 
   // move early, it must be visible before doing any value

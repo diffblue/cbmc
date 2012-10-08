@@ -496,7 +496,7 @@ void goto_convertt::convert_block(
       const irep_idt &identifier=op0.get(ID_identifier);
       const symbolt &symbol=lookup(identifier);
       
-      if(!symbol.static_lifetime &&
+      if(!symbol.is_static_lifetime &&
          symbol.type.id()!=ID_code)
         locals.push_back(identifier);
     }
@@ -615,7 +615,7 @@ void goto_convertt::convert_decl(
   
   const symbolt &symbol=lookup(identifier);
   
-  if(symbol.static_lifetime ||
+  if(symbol.is_static_lifetime ||
      symbol.type.id()==ID_code)
     return; // this is a SKIP!
 
@@ -2449,9 +2449,9 @@ symbolt &goto_convertt::new_tmp_symbol(
   {
     new_symbol.base_name="tmp_"+suffix+"$"+i2string(++temporary_counter);
     new_symbol.name=tmp_symbol_prefix+id2string(new_symbol.base_name);
-    new_symbol.lvalue=true;
-    new_symbol.thread_local=true;
-    new_symbol.file_local=true;
+    new_symbol.is_lvalue=true;
+    new_symbol.is_thread_local=true;
+    new_symbol.is_file_local=true;
     new_symbol.type=type;    
   } while(context.move(new_symbol, symbol_ptr));    
   

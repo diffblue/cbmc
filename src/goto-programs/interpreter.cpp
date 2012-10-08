@@ -552,7 +552,7 @@ void interpretert::build_memory_map(const symbolt &symbol)
   {
     size=1;
   }
-  else if(symbol.static_lifetime)
+  else if(symbol.is_static_lifetime)
   {
     size=get_size(symbol.type);
   }

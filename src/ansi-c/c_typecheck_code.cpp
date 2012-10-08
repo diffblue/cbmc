@@ -443,7 +443,7 @@ void c_typecheck_baset::typecheck_decl(
   // or static
   if(symbol.is_type ||
      symbol.type.id()==ID_code ||
-     symbol.static_lifetime)
+     symbol.is_static_lifetime)
   {
     locationt location=code.location();
     code=code_skipt();

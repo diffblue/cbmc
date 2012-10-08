@@ -186,8 +186,8 @@ void linkingt::duplicate_non_type(
   symbolt &new_symbol)
 {
   // first check if file-local
-  if(new_symbol.file_local ||
-     old_symbol.file_local)
+  if(new_symbol.is_file_local ||
+     old_symbol.is_file_local)
   {
     // we just always rename these
     irep_idt old_identifier=new_symbol.name;
@@ -380,8 +380,8 @@ void linkingt::typecheck()
         continue;
 
       // is one of them file-local?
-      if(src_it->second.file_local ||
-         main_symbol->second.file_local)
+      if(src_it->second.is_file_local ||
+         main_symbol->second.is_file_local)
       {
         // collision!
         irep_idt new_identifier=rename(src_it->first);

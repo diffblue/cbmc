@@ -49,8 +49,8 @@ void c_typecheck_baset::add_argc_argv(const symbolt &main_symbol)
     argc_symbol.base_name="argc";
     argc_symbol.name="c::argc'";
     argc_symbol.type=op0.type();
-    argc_symbol.static_lifetime=true;
-    argc_symbol.lvalue=true;
+    argc_symbol.is_static_lifetime=true;
+    argc_symbol.is_lvalue=true;
 
     if(argc_symbol.type.id()!=ID_signedbv &&
        argc_symbol.type.id()!=ID_unsignedbv)
@@ -92,8 +92,8 @@ void c_typecheck_baset::add_argc_argv(const symbolt &main_symbol)
     argv_symbol.base_name="argv";
     argv_symbol.name="c::argv'";
     argv_symbol.type=argv_type;
-    argv_symbol.static_lifetime=true;
-    argv_symbol.lvalue=true;
+    argv_symbol.is_static_lifetime=true;
+    argv_symbol.is_lvalue=true;
 
     symbolt *argv_new_symbol;
     move_symbol(argv_symbol, argv_new_symbol);
@@ -105,13 +105,13 @@ void c_typecheck_baset::add_argc_argv(const symbolt &main_symbol)
     envp_symbol.base_name="envp";
     envp_symbol.name="c::envp'";
     envp_symbol.type=(static_cast<const exprt&>(arguments.get_sub()[2])).type();
-    envp_symbol.static_lifetime=true;
+    envp_symbol.is_static_lifetime=true;
     
     symbolt envp_size_symbol, *envp_new_size_symbol;
     envp_size_symbol.base_name="envp_size";
     envp_size_symbol.name="c::envp_size'";
     envp_size_symbol.type=op0.type(); // same type as argc!
-    envp_size_symbol.static_lifetime=true;    
+    envp_size_symbol.is_static_lifetime=true;    
     move_symbol(envp_size_symbol, envp_new_size_symbol);        
 
     if(envp_symbol.type.id()!=ID_pointer)

@@ -116,10 +116,10 @@ void uninitializedt::add_assertions(goto_programt &goto_program)
     new_symbol.location=symbol.location;
     new_symbol.mode=symbol.mode;
     new_symbol.module=symbol.module;
-    new_symbol.thread_local=true;
-    new_symbol.static_lifetime=false;
-    new_symbol.file_local=true;
-    new_symbol.lvalue=true;
+    new_symbol.is_thread_local=true;
+    new_symbol.is_static_lifetime=false;
+    new_symbol.is_file_local=true;
+    new_symbol.is_lvalue=true;
     
     context.move(new_symbol);
   }

@@ -119,7 +119,7 @@ void c_typecheck_baset::typecheck_symbol(symbolt &symbol)
   const typet &final_type=follow(symbol.type);
   
   // set a few flags
-  symbol.lvalue=!symbol.is_type && !symbol.is_macro;
+  symbol.is_lvalue=!symbol.is_type && !symbol.is_macro;
   
   std::string prefix="c::";
   std::string root_name=prefix+id2string(symbol.base_name);
@@ -142,7 +142,7 @@ void c_typecheck_baset::typecheck_symbol(symbolt &symbol)
     irep_idt newtag=std::string("#anon#")+typestr;
     symbol.type.set(ID_tag, newtag);
   }
-  else if(symbol.file_local)
+  else if(symbol.is_file_local)
   {
     // file-local stuff -- stays as is
     // collisions are resolved during linking
@@ -152,7 +152,7 @@ void c_typecheck_baset::typecheck_symbol(symbolt &symbol)
     // variables mared as "extern" go into the global namespace
     // and have static lifetime
     new_name=root_name;
-    symbol.static_lifetime=true;
+    symbol.is_static_lifetime=true;
   }
   else if(!is_function && symbol.value.id()==ID_code)
   {
@@ -249,7 +249,7 @@ Function: c_typecheck_baset::typecheck_new_symbol
 
 void c_typecheck_baset::typecheck_new_symbol(symbolt &symbol)
 {
-  if(symbol.is_actual)
+  if(symbol.is_argument)
     adjust_function_argument(symbol.type);
 
   // check initializer, if needed

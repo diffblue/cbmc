@@ -61,19 +61,19 @@ bool write_goto_binary_v2(
 
     unsigned flags=0;    
     flags = (flags << 1) | (int)sym.is_type; 
-    flags = (flags << 1) | (int)false; // sym.theorem;
+    flags = (flags << 1) | (int)sym.is_property;
     flags = (flags << 1) | (int)sym.is_macro;
     flags = (flags << 1) | (int)sym.is_exported;
     flags = (flags << 1) | (int)sym.is_input;
     flags = (flags << 1) | (int)sym.is_output;
-    flags = (flags << 1) | (int)sym.is_statevar;
-    flags = (flags << 1) | (int)sym.is_actual;
+    flags = (flags << 1) | (int)sym.is_state_var;
+    flags = (flags << 1) | (int)sym.is_argument;
     flags = (flags << 1) | (int)false; // sym.free_var;
-    flags = (flags << 1) | (int)sym.binding;
-    flags = (flags << 1) | (int)sym.lvalue;
-    flags = (flags << 1) | (int)sym.static_lifetime;
-    flags = (flags << 1) | (int)sym.thread_local;
-    flags = (flags << 1) | (int)sym.file_local;
+    flags = (flags << 1) | (int)false; // sym.binding;
+    flags = (flags << 1) | (int)sym.is_lvalue;
+    flags = (flags << 1) | (int)sym.is_static_lifetime;
+    flags = (flags << 1) | (int)sym.is_thread_local;
+    flags = (flags << 1) | (int)sym.is_file_local;
     flags = (flags << 1) | (int)sym.is_extern;
     flags = (flags << 1) | (int)sym.is_volatile;
     
