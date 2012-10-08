@@ -290,14 +290,14 @@ exprt wp_assign(
   exprt lhs=code.lhs(),
         rhs=code.rhs();
         
+  // take care of non-determinism in the RHS
+  approximate_nondet(rhs);
+
   rewrite_assignment(lhs, rhs);
 
   // replace lhs by rhs in pre
   substitute_rec(pre, lhs, rhs, ns);
   
-  // take care of non-determinism in the RHS
-  approximate_nondet(pre);
-
   return pre;
 }
 
@@ -319,6 +319,31 @@ exprt wp_assume(
   const namespacet &ns)
 {
   return implies_exprt(code.assumption(), post);
+}
+
+/*******************************************************************\
+
+Function: wp_decl
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+exprt wp_decl(
+  const code_declt &code,
+  const exprt &post,
+  const namespacet &ns)
+{
+  // Model decl(var) as var = nondet()
+  const exprt &var = code.symbol();
+  side_effect_expr_nondett nondet(var.type());
+  code_assignt assignment(var, nondet);
+
+  return wp_assign(assignment, post, ns);
 }
 
 /*******************************************************************\
@@ -347,7 +372,7 @@ exprt wp(
   else if(statement==ID_skip)
     return post;
   else if(statement==ID_decl)
-    return post; // ignored
+    return wp_decl(to_code_decl(code), post, ns);
   else if(statement==ID_assert)
     return post;   
   else if(statement==ID_expression)
