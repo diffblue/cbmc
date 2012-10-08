@@ -262,7 +262,7 @@ void goto_symext::symex_step(
       clean_expr(deref_code.lhs(), state, true);
       clean_expr(deref_code.rhs(), state, false);
 
-      basic_symext::symex_assign(state, deref_code);
+      symex_assign(state, deref_code);
     }
 
     state.source.pc++;
