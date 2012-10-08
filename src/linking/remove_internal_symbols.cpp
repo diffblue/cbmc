@@ -121,7 +121,7 @@ void remove_internal_symbols(
     }
     
     bool is_function=symbol.type.id()==ID_code;
-    bool is_file_local=symbol.file_local;
+    bool is_file_local=symbol.is_file_local;
     bool is_type=symbol.is_type;
     bool has_body=symbol.value.is_not_nil();
     bool has_initializer=

@@ -344,11 +344,11 @@ void string_abstractiont::add_argument(
   new_symbol.base_name=str_args.back().get_base_name();
   new_symbol.mode=fct_symbol.mode;
   new_symbol.pretty_name=str_args.back().get_base_name();
-  new_symbol.is_statevar=true;
-  new_symbol.static_lifetime=false;
-  new_symbol.thread_local=true;
-  new_symbol.lvalue=true;
-  new_symbol.file_local=true;
+  new_symbol.is_state_var=true;
+  new_symbol.is_static_lifetime=false;
+  new_symbol.is_thread_local=true;
+  new_symbol.is_lvalue=true;
+  new_symbol.is_file_local=true;
 
   context.move(new_symbol);
 }
@@ -592,11 +592,11 @@ symbol_exprt string_abstractiont::add_dummy_symbol_and_value(
   new_symbol.mode=symbol.mode;
   new_symbol.pretty_name=id2string(
       symbol.pretty_name.empty()?symbol.base_name:symbol.pretty_name)+suffix;
-  new_symbol.is_statevar=true;
-  new_symbol.static_lifetime=false;
-  new_symbol.thread_local=true;
-  new_symbol.lvalue=true;
-  new_symbol.file_local=true;
+  new_symbol.is_state_var=true;
+  new_symbol.is_static_lifetime=false;
+  new_symbol.is_thread_local=true;
+  new_symbol.is_lvalue=true;
+  new_symbol.is_file_local=true;
 
   symbol_exprt sym_expr=symbol_expr(new_symbol);
 
@@ -1384,11 +1384,11 @@ exprt string_abstractiont::build_unknown(const typet &type, bool write)
   new_symbol.base_name=identifier;
   new_symbol.mode=ID_C;
   new_symbol.pretty_name=identifier;
-  new_symbol.is_statevar=true;
-  new_symbol.static_lifetime=false;
-  new_symbol.thread_local=true;
-  new_symbol.lvalue=true;
-  new_symbol.file_local=true;
+  new_symbol.is_state_var=true;
+  new_symbol.is_static_lifetime=false;
+  new_symbol.is_thread_local=true;
+  new_symbol.is_lvalue=true;
+  new_symbol.is_file_local=true;
 
   context.move(new_symbol);
 
@@ -1449,7 +1449,7 @@ Function: string_abstractiont::build_new_symbol
 void string_abstractiont::build_new_symbol(const symbolt &symbol,
     const irep_idt &identifier, const typet &type)
 {
-  if(!symbol.static_lifetime)
+  if(!symbol.is_static_lifetime)
     locals[symbol.name]=identifier;
 
   symbolt new_symbol;
@@ -1462,15 +1462,16 @@ void string_abstractiont::build_new_symbol(const symbolt &symbol,
   new_symbol.mode=symbol.mode;
   new_symbol.pretty_name=id2string(
       symbol.pretty_name.empty()?symbol.base_name:symbol.pretty_name)+sym_suffix;
-  new_symbol.is_statevar=true;
-  new_symbol.static_lifetime=symbol.static_lifetime;
-  new_symbol.thread_local=symbol.thread_local;
-  new_symbol.lvalue=true;
-  new_symbol.file_local=true;
+  new_symbol.is_state_var=true;
+  new_symbol.is_static_lifetime=symbol.is_static_lifetime;
+  new_symbol.is_thread_local=symbol.is_thread_local;
+  new_symbol.is_lvalue=true;
+  new_symbol.is_file_local=true;
 
   context.move(new_symbol);
 
-  if(symbol.static_lifetime) {
+  if(symbol.is_static_lifetime)
+  {
     goto_programt::targett dummy_loc=initialization.add_instruction();
     dummy_loc->location=symbol.location;
     make_decl_and_def(initialization, dummy_loc, identifier, symbol.name);
@@ -1507,11 +1508,11 @@ bool string_abstractiont::build_symbol_constant(const mp_integer &zero_length,
     new_symbol.base_name=base;
     new_symbol.mode=ID_C;
     new_symbol.pretty_name=base;
-    new_symbol.is_statevar=true;
-    new_symbol.static_lifetime=true;
-    new_symbol.thread_local=false;
-    new_symbol.lvalue=true;
-    new_symbol.file_local=false;
+    new_symbol.is_state_var=true;
+    new_symbol.is_static_lifetime=true;
+    new_symbol.is_thread_local=false;
+    new_symbol.is_lvalue=true;
+    new_symbol.is_file_local=false;
 
     {
       struct_exprt value(string_struct);

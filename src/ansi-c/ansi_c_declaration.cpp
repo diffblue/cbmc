@@ -49,23 +49,23 @@ void ansi_c_declarationt::to_symbol(symbolt &symbol) const
   symbol.is_type=get_is_type();
   symbol.is_extern=get_is_extern();
   symbol.is_macro=get_is_macro();
-  symbol.is_actual=get_is_argument();
+  symbol.is_argument=get_is_argument();
 
   bool is_code=symbol.type.id()==ID_code;
 
-  symbol.static_lifetime=
+  symbol.is_static_lifetime=
     !symbol.is_macro &&
     !symbol.is_type &&
     (get_is_global() || get_is_static()) &&
     !is_code;
     
-  symbol.thread_local=
+  symbol.is_thread_local=
     (!get_is_global() && !is_code &&
      !get_is_static() && !symbol.is_type &&
      !symbol.is_macro) ||
     (get_is_global() && !is_code && get_is_thread_local());
      
-  symbol.file_local=
+  symbol.is_file_local=
     get_is_static() || symbol.is_macro || 
     (!get_is_global() && !get_is_extern() && !is_code);
   

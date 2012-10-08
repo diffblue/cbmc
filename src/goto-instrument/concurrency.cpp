@@ -188,10 +188,10 @@ void concurrency_instrumentationt::collect(const exprt &expr)
       namespacet ns(context);
       const symbolt &symbol=ns.lookup(identifier);
       
-      if(!symbol.is_statevar)
+      if(!symbol.is_state_var)
         continue;
       
-      if(symbol.thread_local)
+      if(symbol.is_thread_local)
       {
         if(thread_local_vars.find(identifier)!=thread_local_vars.end())
           continue;

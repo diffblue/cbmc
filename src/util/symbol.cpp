@@ -31,22 +31,22 @@ void symbolt::show(std::ostream &out) const
       << "    value: " << value.pretty(4) << std::endl;
 
   out << "  flags:";
-  if(lvalue)          out << " lvalue";
-  if(static_lifetime) out << " static_lifetime";
-  if(thread_local)    out << " thread_local";
-  if(file_local)      out << " file_local";
-  if(is_type)         out << " type";
-  if(is_extern)       out << " extern";
-  if(is_input)        out << " input";
-  if(is_output)       out << " output";
-  if(is_macro)        out << " macro";
-  if(is_actual)       out << " actual";
-  if(binding)         out << " binding";
-  if(is_statevar)     out << " statevar";
-  if(mode!="")        out << " mode=" << mode;
-  if(base_name!="")   out << " base_name=" << base_name;
-  if(module!="")      out << " module=" << module;
-  if(pretty_name!="") out << " pretty_name=" << pretty_name;
+  if(is_lvalue)          out << " lvalue";
+  if(is_static_lifetime) out << " static_lifetime";
+  if(is_thread_local)    out << " thread_local";
+  if(is_file_local)      out << " file_local";
+  if(is_type)            out << " type";
+  if(is_extern)          out << " extern";
+  if(is_input)           out << " input";
+  if(is_output)          out << " output";
+  if(is_macro)           out << " macro";
+  if(is_argument)        out << " argument";
+  if(is_property)        out << " property";
+  if(is_state_var)       out << " state_var";
+  if(mode!="")           out << " mode=" << mode;
+  if(base_name!="")      out << " base_name=" << base_name;
+  if(module!="")         out << " module=" << module;
+  if(pretty_name!="")    out << " pretty_name=" << pretty_name;
   out << std::endl;
   out << "  location: " << location << std::endl;
 
@@ -109,13 +109,13 @@ void symbolt::to_irep(irept &dest) const
   if(is_exported) dest.set("is_exported", true);
   if(is_input) dest.set("is_input", true);
   if(is_output) dest.set("is_output", true);
-  if(is_statevar) dest.set("is_statevar", true);
-  if(is_actual) dest.set("is_actual", true);
-  if(binding) dest.set("binding", true);
-  if(lvalue) dest.set("lvalue", true);
-  if(static_lifetime) dest.set("static_lifetime", true);
-  if(thread_local) dest.set("thread_local", true);
-  if(file_local) dest.set("file_local", true);
+  if(is_state_var) dest.set("is_statevar", true);
+  if(is_argument) dest.set("is_argument", true);
+  if(is_property) dest.set("is_property", true);
+  if(is_lvalue) dest.set("is_lvalue", true);
+  if(is_static_lifetime) dest.set("is_static_lifetime", true);
+  if(is_thread_local) dest.set("is_thread_local", true);
+  if(is_file_local) dest.set("is_file_local", true);
   if(is_extern) dest.set("is_extern", true);
   if(is_volatile) dest.set("is_volatile", true);       
 }
@@ -149,13 +149,13 @@ void symbolt::from_irep(const irept &src)
   is_exported=src.get_bool("is_exported");
   is_input=src.get_bool("is_input");
   is_output=src.get_bool("is_output");
-  is_statevar=src.get_bool("is_statevar");
-  is_actual=src.get_bool("is_actual");
-  binding=src.get_bool("binding");
-  lvalue=src.get_bool("lvalue");
-  static_lifetime=src.get_bool("static_lifetime");
-  thread_local=src.get_bool("thread_local");
-  file_local=src.get_bool("file_local");
+  is_state_var=src.get_bool("is_state_var");
+  is_argument=src.get_bool("is_argument");
+  is_property=src.get_bool("property");
+  is_lvalue=src.get_bool("lvalue");
+  is_static_lifetime=src.get_bool("static_lifetime");
+  is_thread_local=src.get_bool("thread_local");
+  is_file_local=src.get_bool("file_local");
   is_extern=src.get_bool("is_extern");
   is_volatile=src.get_bool("is_volatile");
 }
@@ -192,12 +192,12 @@ void symbolt::swap(symbolt &b)
   SYM_SWAP2(is_exported);
   SYM_SWAP2(is_input);
   SYM_SWAP2(is_output);
-  SYM_SWAP2(is_statevar);
-  SYM_SWAP2(is_actual);
-  SYM_SWAP2(lvalue);
-  SYM_SWAP2(static_lifetime);
-  SYM_SWAP2(thread_local);
-  SYM_SWAP2(file_local);
+  SYM_SWAP2(is_state_var);
+  SYM_SWAP2(is_argument);
+  SYM_SWAP2(is_lvalue);
+  SYM_SWAP2(is_static_lifetime);
+  SYM_SWAP2(is_thread_local);
+  SYM_SWAP2(is_file_local);
   SYM_SWAP2(is_extern);
   SYM_SWAP2(is_volatile);
 }
@@ -216,7 +216,7 @@ Function: is_global
 
 bool is_global(const symbolt &symbol)
 {
-  return symbol.static_lifetime && !symbol.thread_local;
+  return symbol.is_static_lifetime && !symbol.is_thread_local;
 }
 
 /*******************************************************************\
@@ -233,7 +233,7 @@ Function: is_thread_local
 
 bool is_thread_local(const symbolt &symbol)
 {
-  return symbol.static_lifetime && symbol.thread_local;
+  return symbol.is_static_lifetime && symbol.is_thread_local;
 }
 
 /*******************************************************************\
@@ -250,7 +250,7 @@ Function: is_procedure_local
 
 bool is_procedure_local(const symbolt &symbol)
 {
-  return !symbol.static_lifetime;
+  return !symbol.is_static_lifetime;
 }
 
 /*******************************************************************\

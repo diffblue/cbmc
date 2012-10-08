@@ -38,7 +38,7 @@ void uninitialized_domaint::transform(
         to_code_decl(from->code).get_identifier();
       const symbolt &symbol=ns.lookup(identifier);
 
-      if(!symbol.static_lifetime)
+      if(!symbol.is_static_lifetime)
         uninitialized.insert(identifier);
     }
     break;
@@ -81,7 +81,7 @@ void uninitialized_domaint::find_dirty(
       const irep_idt &identifier=
         to_symbol_expr(address_of_expr.object()).get_identifier();
       const symbolt &symbol=ns.lookup(identifier);
-      if(!symbol.static_lifetime) dirty.insert(identifier);
+      if(!symbol.is_static_lifetime) dirty.insert(identifier);
     }
   }
   

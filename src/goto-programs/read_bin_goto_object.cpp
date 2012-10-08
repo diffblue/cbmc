@@ -60,19 +60,19 @@ bool read_bin_goto_object_v2(
     unsigned flags=irepconverter.read_long(in);
     
     sym.is_type = flags & (1 << 15);
-    //sym.theorem = flags & (1 << 14); 
+    sym.is_property = flags & (1 << 14); 
     sym.is_macro = flags & (1 << 13);
     sym.is_exported = flags & (1 << 12);
     sym.is_input = flags & (1 << 11);
     sym.is_output = flags & (1 << 10);
-    sym.is_statevar = flags & (1 << 9);
-    sym.is_actual = flags & (1 << 8);
+    sym.is_state_var = flags & (1 << 9);
+    sym.is_argument = flags & (1 << 8);
     //sym.free_var = flags & (1 << 7);
-    sym.binding = flags & (1 << 6);
-    sym.lvalue = flags & (1 << 5);
-    sym.static_lifetime = flags & (1 << 4);
-    sym.thread_local = flags & (1 << 3);
-    sym.file_local = flags & (1 << 2);
+    //sym.binding = flags & (1 << 6);
+    sym.is_lvalue = flags & (1 << 5);
+    sym.is_static_lifetime = flags & (1 << 4);
+    sym.is_thread_local = flags & (1 << 3);
+    sym.is_file_local = flags & (1 << 2);
     sym.is_extern = flags & (1 << 1);
     sym.is_volatile = flags & 1;
     

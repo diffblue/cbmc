@@ -41,11 +41,11 @@ symbol_exprt add_stack_depth_symbol(contextt &context)
   new_symbol.base_name=identifier;
   new_symbol.pretty_name=identifier;
   new_symbol.type=type;
-  new_symbol.static_lifetime=true;
+  new_symbol.is_static_lifetime=true;
   new_symbol.value=from_integer(0, type);
   new_symbol.mode=ID_C;
-  new_symbol.thread_local=true;
-  new_symbol.lvalue=true;
+  new_symbol.is_thread_local=true;
+  new_symbol.is_lvalue=true;
 
   context.move(new_symbol);
 

@@ -54,8 +54,8 @@ void cpp_typecheckt::convert_argument(
   symbol.mode=mode;
   symbol.module=module;
   symbol.type=argument.type();
-  symbol.is_statevar=true;
-  symbol.lvalue=!is_reference(symbol.type);
+  symbol.is_state_var=true;
+  symbol.is_lvalue=!is_reference(symbol.type);
 
   assert(!symbol.base_name.empty());
 

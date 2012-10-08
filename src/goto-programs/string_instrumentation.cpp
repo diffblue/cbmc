@@ -943,9 +943,9 @@ void string_instrumentationt::do_strerror(
     new_symbol_size.name=identifier_size;
     new_symbol_size.mode=ID_C;
     new_symbol_size.type=uint_type();
-    new_symbol_size.is_statevar=true;
-    new_symbol_size.lvalue=true;
-    new_symbol_size.static_lifetime=true;
+    new_symbol_size.is_state_var=true;
+    new_symbol_size.is_lvalue=true;
+    new_symbol_size.is_static_lifetime=true;
 
     array_typet type;
     type.subtype()=char_type();
@@ -953,9 +953,9 @@ void string_instrumentationt::do_strerror(
     symbolt new_symbol_buf;
     new_symbol_buf.mode=ID_C;
     new_symbol_buf.type=type;
-    new_symbol_buf.is_statevar=true;
-    new_symbol_buf.lvalue=true;
-    new_symbol_buf.static_lifetime=true;
+    new_symbol_buf.is_state_var=true;
+    new_symbol_buf.is_lvalue=true;
+    new_symbol_buf.is_static_lifetime=true;
     new_symbol_buf.base_name="__strerror_buffer";
     new_symbol_buf.pretty_name=new_symbol_buf.base_name;
     new_symbol_buf.name="c::"+id2string(new_symbol_buf.base_name);
@@ -1042,9 +1042,9 @@ void string_instrumentationt::invalidate_buffer(
     new_symbol.name=cntr_id;
     new_symbol.mode=ID_C;
     new_symbol.type=uint_type();
-    new_symbol.is_statevar=true;
-    new_symbol.lvalue=true;
-    new_symbol.static_lifetime=true;
+    new_symbol.is_state_var=true;
+    new_symbol.is_lvalue=true;
+    new_symbol.is_static_lifetime=true;
     
     context.move(new_symbol);
   }

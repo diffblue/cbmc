@@ -312,18 +312,17 @@ void language_uit::show_symbol_table_plain(std::ostream &out)
     out << "Value.......: " << value_str << std::endl;
     out << "Flags.......:";
 
-    if(symbol.lvalue)          out << " lvalue";
-    if(symbol.static_lifetime) out << " static_lifetime";
-    if(symbol.thread_local)    out << " thread_local";
-    if(symbol.file_local)      out << " file_local";
-    if(symbol.is_type)         out << " type";
-    if(symbol.is_extern)       out << " extern";
-    if(symbol.is_input)        out << " input";
-    if(symbol.is_output)       out << " output";
-    if(symbol.is_macro)        out << " macro";
-    if(symbol.is_actual)       out << " actual";
-    if(symbol.binding)         out << " binding";
-    if(symbol.is_statevar)     out << " statevar";
+    if(symbol.is_lvalue)          out << " lvalue";
+    if(symbol.is_static_lifetime) out << " static_lifetime";
+    if(symbol.is_thread_local)    out << " thread_local";
+    if(symbol.is_file_local)      out << " file_local";
+    if(symbol.is_type)            out << " type";
+    if(symbol.is_extern)          out << " extern";
+    if(symbol.is_input)           out << " input";
+    if(symbol.is_output)          out << " output";
+    if(symbol.is_macro)           out << " macro";
+    if(symbol.is_property)        out << " property";
+    if(symbol.is_state_var)       out << " state_var";
 
     out << std::endl;
     out << "Location....: " << symbol.location << std::endl;

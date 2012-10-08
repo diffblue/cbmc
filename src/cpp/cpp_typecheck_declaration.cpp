@@ -224,7 +224,7 @@ void cpp_typecheckt::convert_non_template_declaration(
     it->swap(tmp);
 
     // is there a constructor to be called for the declarator?
-    if(symbol.lvalue &&
+    if(symbol.is_lvalue &&
        declarator.init_args().has_operands())
     {
       symbol.value=

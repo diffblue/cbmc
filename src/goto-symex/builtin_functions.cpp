@@ -130,7 +130,7 @@ void basic_symext::symex_malloc(
 
       size_symbol.base_name="dynamic_object_size"+i2string(dynamic_counter);
       size_symbol.name="symex_dynamic::"+id2string(size_symbol.base_name);
-      size_symbol.lvalue=true;
+      size_symbol.is_lvalue=true;
       size_symbol.type=tmp_size.type();
       size_symbol.mode=ID_C;
 
@@ -148,7 +148,7 @@ void basic_symext::symex_malloc(
 
   value_symbol.base_name="dynamic_object"+i2string(dynamic_counter);
   value_symbol.name="symex_dynamic::"+id2string(value_symbol.base_name);
-  value_symbol.lvalue=true;
+  value_symbol.is_lvalue=true;
   value_symbol.type=object_type;
   value_symbol.type.set("#dynamic", true);
   value_symbol.mode=ID_C;
@@ -455,7 +455,7 @@ void basic_symext::symex_cpp_new(
     do_array?"dynamic_"+count_string+"_array":
              "dynamic_"+count_string+"_value";
   symbol.name="symex_dynamic::"+id2string(symbol.base_name);
-  symbol.lvalue=true;
+  symbol.is_lvalue=true;
   symbol.mode="cpp";
   
   if(do_array)

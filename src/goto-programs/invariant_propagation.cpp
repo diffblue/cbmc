@@ -284,8 +284,8 @@ void invariant_propagationt::get_globals(
 {
   // static ones
   forall_symbols(it, ns.get_context().symbols)
-    if(it->second.lvalue &&
-       it->second.static_lifetime)
+    if(it->second.is_lvalue &&
+       it->second.is_static_lifetime)
       get_objects(it->second, dest);
 }    
 

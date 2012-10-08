@@ -244,7 +244,7 @@ void cpp_typecheckt::static_and_dynamic_initialization()
   {
     symbolt &symbol=s_it->second;
 
-    if(!symbol.static_lifetime)
+    if(!symbol.is_static_lifetime)
       continue;
       
     if(symbol.mode!=ID_cpp)
@@ -263,7 +263,7 @@ void cpp_typecheckt::static_and_dynamic_initialization()
     if(symbol.is_extern)
       continue;
 
-    if(!symbol.lvalue)
+    if(!symbol.is_lvalue)
       continue;
 
     if(cpp_is_pod(symbol.type))
@@ -294,7 +294,7 @@ void cpp_typecheckt::static_and_dynamic_initialization()
     if(cpp_is_pod(symbol.type))
       continue;
 
-    assert(symbol.static_lifetime);
+    assert(symbol.is_static_lifetime);
     assert(!symbol.is_type);
     assert(symbol.type.id()!=ID_code);
 

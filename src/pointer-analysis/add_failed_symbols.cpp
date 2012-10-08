@@ -43,7 +43,7 @@ Function: add_failed_symbol
 
 void add_failed_symbol(symbolt &symbol, contextt &context)
 {
-  if(!symbol.lvalue) return;
+  if(!symbol.is_lvalue) return;
   
   if(symbol.type.get("#failed_symbol")!="")
     return;
@@ -51,7 +51,7 @@ void add_failed_symbol(symbolt &symbol, contextt &context)
   if(symbol.type.id()==ID_pointer)
   {
     symbolt new_symbol;
-    new_symbol.lvalue=true;
+    new_symbol.is_lvalue=true;
     new_symbol.module=symbol.module;
     new_symbol.mode=symbol.mode;
     new_symbol.base_name=id2string(symbol.base_name)+"$object";
