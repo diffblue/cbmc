@@ -55,6 +55,10 @@ public:
     options.set_option("simplify", true);
     options.set_option("assertions", true);
   }
+  
+  virtual ~goto_symext()
+  {
+  }
 
   typedef goto_symex_statet statet;
 
