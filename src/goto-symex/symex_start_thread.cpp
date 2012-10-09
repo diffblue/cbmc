@@ -42,6 +42,7 @@ void goto_symext::symex_start_thread(statet &state)
   new_thread.pc=thread_target;
   new_thread.guard=state.guard;
   new_thread.call_stack.push_back(state.top());
+  new_thread.parent_thread=state.source.thread_nr;
 
   // create a copy of the local variables for the new thread
   statet::framet &frame=state.top();

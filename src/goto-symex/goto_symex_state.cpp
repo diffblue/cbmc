@@ -428,19 +428,26 @@ void goto_symex_statet::rename(
     {
       if(!level2.is_renamed(identifier))
       {
-        identifier=rename(identifier, ns, L1);
-
-        // We also consider propagation if we go up to L2.
-        // L1 identifiers are used for propagation!
-        propagationt::valuest::const_iterator p_it=
-          propagation.values.find(identifier);
-
-        if(p_it!=propagation.values.end())
-          expr=p_it->second; // already L2
+        if(l2_thread_encoding(expr, ns))
+        {
+          // done
+        }
         else
         {
-          identifier=level2(identifier); // L2
-          to_symbol_expr(expr).set_identifier(identifier);
+          irep_idt l1_identifier=rename(identifier, ns, L1);
+
+          // We also consider propagation if we go up to L2.
+          // L1 identifiers are used for propagation!
+          propagationt::valuest::const_iterator p_it=
+            propagation.values.find(l1_identifier);
+
+          if(p_it!=propagation.values.end())
+            expr=p_it->second; // already L2
+          else
+          {
+            identifier=level2(l1_identifier); // L2
+            to_symbol_expr(expr).set_identifier(identifier);
+          }
         }
       }
     }
@@ -457,6 +464,40 @@ void goto_symex_statet::rename(
     Forall_operands(it, expr)
       rename(*it, ns, level);
   }
+}
+
+/*******************************************************************\
+
+Function: goto_symex_statet::l2_thread_encoding
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: thread encoding
+
+\*******************************************************************/
+
+bool goto_symex_statet::l2_thread_encoding(
+  exprt &expr,
+  const namespacet &ns)
+{
+  #if 0
+  // do we have threads at all?
+  if(threads.size()<=1) return false;
+
+  irep_idt original_identifier=get_original_name(identifier);
+  if(ns.lookup(original_identifier).is_shared() &&
+     threads.size()>1)
+  {
+    // take a fresh l2 name
+    const irep_idt new_name=level2.increase_counter(l1_identifier);
+    to_symbol_expr(expr).set_identifier(new_name);
+    return true;
+  }
+  #else
+  return false;
+  #endif
 }
 
 /*******************************************************************\
