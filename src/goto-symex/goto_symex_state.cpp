@@ -750,7 +750,7 @@ Function: goto_symex_statet::renaming_levelt::get_original_name
 
 void goto_symex_statet::renaming_levelt::get_original_name(typet &type) const
 {
-  // rename all the symbols with their last known value
+  // rename all the symbols back to their original name
 
   if(type.id()==ID_array)
   {
@@ -784,8 +784,9 @@ Function: goto_symex_statet::get_original_name
 const irep_idt &goto_symex_statet::get_original_name(
   const irep_idt &identifier) const
 {
-  return level0.get_original_name(level1.get_original_name(
-        level2.get_original_name(identifier)));
+  return level0.get_original_name(
+         level1.get_original_name(
+         level2.get_original_name(identifier)));
 }
 
 /*******************************************************************\
