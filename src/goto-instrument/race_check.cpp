@@ -175,7 +175,7 @@ bool is_shared(
     return false; // no race check
 
   const symbolt &symbol=ns.lookup(identifier);
-  return is_global(symbol);
+  return symbol.is_shared();
 }
 
 /*******************************************************************\
