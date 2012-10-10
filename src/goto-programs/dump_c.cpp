@@ -871,14 +871,15 @@ void goto2cppt::convert_instructions(
     case OTHER:
       {
         const codet &code=to_code(target->code);
+        irep_idt statement=code.get_statement();
 
-        if(code.get_statement() == ID_expression)
+        if(statement==ID_expression)
         {
           // expression has no sideeffect
           if(target->is_target())
             inst_stream << indent(1) << "; // OTHER/expression\n";
         }
-        else if(has_prefix(id2string(code.get_statement()), "assign"))
+        else if(has_prefix(id2string(statement), "assign"))
         {
           if(code.op0().id() == "dynamic_size" ||
              code.op0().id() == "valid_object")
@@ -896,17 +897,38 @@ void goto2cppt::convert_instructions(
                       << expr_to_string(target->code.op1()) << ";" << std::endl;
           break;
         }
-        else if(code.get_statement() == ID_nondet)
+        else if(statement==ID_nondet)
         {
           //ps_irep("code",target->code);
           // todo: random input
           throw "Goto2cpp: 'nondet' is not yet implemented\n";
         }
-        else if(code.get_statement() == ID_user_specified_predicate)
+        else if(statement==ID_user_specified_predicate)
         {
           //ps_irep("code",target->code);
           // todo: random input
           throw "Goto2cpp: 'user_specified_predicate' is not yet implemented\n";
+        }
+        else if(statement==ID_fence)
+        {
+          irep_idt att[]=
+            { ID_WRfence, ID_RRfence, ID_RWfence, ID_WWfence,
+              ID_RRcumul, ID_RWcumul, ID_WWcumul, ID_WRcumul,
+              irep_idt() };
+        
+          inst_stream << indent(1);
+          inst_stream << "__CPROVER_fence(";
+
+          bool first=true;
+          
+          for(unsigned i=0; att[i]!=irep_idt(); i++)
+            if(code.get_bool(att[i]))
+            {
+              if(first) first=false; else inst_stream << ", ";
+              inst_stream << "\"" << att[i] << "\"";
+            }
+
+          inst_stream << ");" << std::endl;
         }
         else
         {
@@ -1025,13 +1047,13 @@ std::string goto2cppt::type_to_string(const typet &type)
 {
   std::string ret;
 
-  if(type.id() == ID_bool)
+  if(type.id()==ID_bool)
     #if 0
     ret="bool";
     #else
     ret="_Bool";
     #endif
-  else if(type.id() == ID_signedbv)
+  else if(type.id()==ID_signedbv)
   {
     unsigned width=to_signedbv_type(type).get_width();
 
@@ -1147,7 +1169,9 @@ std::string goto2cppt::type_to_string(const typet &type)
   {
     const array_typet &array_type=to_array_type(type);
 
-    return "__array<"+type_to_string(type.subtype())+", "+expr_to_string(array_type.size())+">";
+    return "__array<"+
+      type_to_string(type.subtype())+", "+
+      expr_to_string(array_type.size())+">";
   }
   else if(type.id()==ID_struct)
   {
@@ -1614,7 +1638,8 @@ std::string goto2cppt::expr_to_string(const exprt &expr)
   {
     assert(expr.operands().size()==3);
 
-    return "__" + id2string(expr.type().id())+"<"+ id2string(expr.type().get(ID_width)) + "> ("
+    return "__" + id2string(expr.type().id())
+           + "<"+ id2string(expr.type().get(ID_width)) + "> ("
            + expr_to_string(expr.op0()) + ", "
            + expr_to_string(expr.op1()) + ", "
            + expr_to_string(expr.op2()) + " )";
@@ -1810,13 +1835,14 @@ irep_idt goto2cppt::unique_name(irep_idt name)
    std::string::iterator it = str.begin();
    while(it != str.end())
    {
-           if(!isalnum(*it) && (*it) != '_')
-             it = str.erase(it);
-           else it++;
+     if(!isalnum(*it) && (*it) != '_')
+       it = str.erase(it);
+     else
+       it++;
    }
 
    if(isdigit(*(str.begin())))
-       str.insert(str.begin(),'_');
+     str.insert(str.begin(),'_');
 
    if(str == "this" || str == "operator" || str == "main")
      str = "_"+ str;
@@ -1826,14 +1852,14 @@ irep_idt goto2cppt::unique_name(irep_idt name)
 
    do
    {
-       int c = count[str]++;
+     int c = count[str]++;
 
-       if( c == 0)
-           break;
+     if( c == 0)
+         break;
 
-       std::stringstream stream;
-       stream << c;
-       str += stream.str();
+     std::stringstream stream;
+     stream << c;
+     str += stream.str();
    }
    while(true);
 
