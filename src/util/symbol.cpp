@@ -204,64 +204,13 @@ void symbolt::swap(symbolt &b)
 
 /*******************************************************************\
 
-Function: is_global
-
-  Inputs: symbol
-
- Outputs: boolean
-
- Purpose: decides whether the symbol is a global variable
-
-\*******************************************************************/
-
-bool is_global(const symbolt &symbol)
-{
-  return symbol.is_static_lifetime && !symbol.is_thread_local;
-}
-
-/*******************************************************************\
-
-Function: is_thread_local
-
-  Inputs: symbol
-
- Outputs: boolean
-
- Purpose: decides whether the symbol is a thread local variable
-
-\*******************************************************************/
-
-bool is_thread_local(const symbolt &symbol)
-{
-  return symbol.is_static_lifetime && symbol.is_thread_local;
-}
-
-/*******************************************************************\
-
-Function: is_procedure_local
-
-  Inputs: symbol
-
- Outputs: boolean
-
- Purpose: decides whether the symbol is a procedure local variable
-
-\*******************************************************************/
-
-bool is_procedure_local(const symbolt &symbol)
-{
-  return !symbol.is_static_lifetime;
-}
-
-/*******************************************************************\
-
 Function: symbolt::symbol_expr
 
   Inputs: symbol
 
- Outputs: boolean
+ Outputs: symbol_exprt
 
- Purpose: decides whether the symbol is a procedure local variable
+ Purpose: produces a symbol_exprt for a symbol
 
 \*******************************************************************/
 

@@ -129,11 +129,4 @@ typedef std::list<const symbolt *> symbolptr_listt;
   for(symbolptr_listt::iterator it=(list).begin(); \
       it!=(list).end(); ++it)
 
-// the following should move elsewhere
-bool is_global(const symbolt& symbol);
-
-bool is_thread_local(const symbolt& symbol);
-
-bool is_procedure_local(const symbolt& symbol);
-
 #endif
