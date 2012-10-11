@@ -208,7 +208,7 @@ inline int pthread_cond_signal(
     pthread_cond_t *cond)
 { __CPROVER_HIDE:
   __CPROVER_atomic_begin();
-  *((unsigned *)cond)++;
+  (*((unsigned *)cond))++;
   __CPROVER_atomic_end();
   return 0;
 }
@@ -243,7 +243,7 @@ inline int pthread_cond_wait(
   pthread_mutex_unlock(mutex);
   __CPROVER_atomic_begin();
   __CPROVER_assume(*((unsigned *)cond));
-  *((unsigned *)cond)--;
+  (*((unsigned *)cond))--;
   __CPROVER_atomic_end();
   pthread_mutex_lock(mutex);
   return 0; // we never fail
