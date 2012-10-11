@@ -1154,6 +1154,8 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
   // this will be a hard error in the future", i.e., we
   // can hope that the below will one day go away.
   
+  // Current versions of gcc in fact do not do this! Yay!
+  
   if(expr.op0().get_bool(ID_C_lvalue))
   {
     if(expr_type.id()==ID_pointer)
