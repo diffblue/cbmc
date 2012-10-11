@@ -159,6 +159,11 @@ void find_symbols(kindt kind, const exprt &src, find_symbols_sett &dest)
     if(src.id()==ID_symbol ||
        src.id()==ID_next_symbol)
       dest.insert(src.get(ID_identifier));
+
+  const irept &c_sizeof_type=src.find(ID_C_c_sizeof_type);
+
+  if(c_sizeof_type.is_not_nil())
+    find_symbols(kind, static_cast<const typet &>(c_sizeof_type), dest);
 }
 
 /*******************************************************************\
