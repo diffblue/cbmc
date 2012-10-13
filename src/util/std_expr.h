@@ -1124,6 +1124,31 @@ public:
   }
 };
 
+/*! \brief Cast a generic exprt to a \ref typecast_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * and_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref and_exprt
+ *
+ * \ingroup gr_std_expr
+*/
+extern inline const and_exprt &to_and_expr(const exprt &expr)
+{
+  assert(expr.id()==ID_and);
+  return static_cast<const and_exprt &>(expr);
+}
+
+/*! \copydoc to_and_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
+extern inline and_exprt &to_and_expr(exprt &expr)
+{
+  assert(expr.id()==ID_and);
+  return static_cast<and_exprt &>(expr);
+}
+
 /*! \brief boolean implication
 */
 class implies_exprt:public binary_exprt
@@ -1138,6 +1163,31 @@ public:
   {
   }
 };
+
+/*! \brief Cast a generic exprt to a \ref implies_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * implies_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref implies_exprt
+ *
+ * \ingroup gr_std_expr
+*/
+extern inline const implies_exprt &to_implies_expr(const exprt &expr)
+{
+  assert(expr.id()==ID_implies && expr.operands().size()==2);
+  return static_cast<const implies_exprt &>(expr);
+}
+
+/*! \copydoc to_implies_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
+extern inline implies_exprt &to_implies_expr(exprt &expr)
+{
+  assert(expr.id()==ID_implies && expr.operands().size()==2);
+  return static_cast<implies_exprt &>(expr);
+}
 
 /*! \brief boolean OR
 */
@@ -1163,6 +1213,31 @@ public:
       operands()=op;
   }
 };
+
+/*! \brief Cast a generic exprt to a \ref or_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * or_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref or_exprt
+ *
+ * \ingroup gr_std_expr
+*/
+extern inline const or_exprt &to_or_expr(const exprt &expr)
+{
+  assert(expr.id()==ID_or);
+  return static_cast<const or_exprt &>(expr);
+}
+
+/*! \copydoc to_or_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
+extern inline or_exprt &to_or_expr(exprt &expr)
+{
+  assert(expr.id()==ID_or);
+  return static_cast<or_exprt &>(expr);
+}
 
 /*! \brief Bit-wise negation of bit-vectors
 */
@@ -1195,6 +1270,31 @@ public:
   }
 };
 
+/*! \brief Cast a generic exprt to a \ref bitor_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * bitor_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref bitor_exprt
+ *
+ * \ingroup gr_std_expr
+*/
+extern inline const bitor_exprt &to_bitor_expr(const exprt &expr)
+{
+  assert(expr.id()==ID_bitor);
+  return static_cast<const bitor_exprt &>(expr);
+}
+
+/*! \copydoc to_bitor_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
+extern inline bitor_exprt &to_bitor_expr(exprt &expr)
+{
+  assert(expr.id()==ID_bitor);
+  return static_cast<bitor_exprt &>(expr);
+}
+
 /*! \brief Bit-wise XOR
 */
 class bitxor_exprt:public exprt
@@ -1211,6 +1311,31 @@ public:
   }
 };
 
+/*! \brief Cast a generic exprt to a \ref bitxor_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * bitxor_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref bitxor_exprt
+ *
+ * \ingroup gr_std_expr
+*/
+extern inline const bitxor_exprt &to_bitxor_expr(const exprt &expr)
+{
+  assert(expr.id()==ID_bitxor);
+  return static_cast<const bitxor_exprt &>(expr);
+}
+
+/*! \copydoc to_bitxor_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
+extern inline bitxor_exprt &to_bitxor_expr(exprt &expr)
+{
+  assert(expr.id()==ID_bitxor);
+  return static_cast<bitxor_exprt &>(expr);
+}
+
 /*! \brief Bit-wise AND
 */
 class bitand_exprt:public exprt
@@ -1226,6 +1351,31 @@ public:
     copy_to_operands(_op0, _op1);
   }
 };
+
+/*! \brief Cast a generic exprt to a \ref bitand_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * bitand_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref bitand_exprt
+ *
+ * \ingroup gr_std_expr
+*/
+extern inline const bitand_exprt &to_bitand_expr(const exprt &expr)
+{
+  assert(expr.id()==ID_bitand);
+  return static_cast<const bitand_exprt &>(expr);
+}
+
+/*! \copydoc to_bitand_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
+extern inline bitand_exprt &to_bitand_expr(exprt &expr)
+{
+  assert(expr.id()==ID_bitand);
+  return static_cast<bitand_exprt &>(expr);
+}
 
 /*! \brief A base class for shift operators
 */
@@ -1265,6 +1415,31 @@ public:
     return op1();
   }
 };
+
+/*! \brief Cast a generic exprt to a \ref shift_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * shift_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref shift_exprt
+ *
+ * \ingroup gr_std_expr
+*/
+extern inline const shift_exprt &to_shift_expr(const exprt &expr)
+{
+  assert(expr.operands().size()==2);
+  return static_cast<const shift_exprt &>(expr);
+}
+
+/*! \copydoc to_shift_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
+extern inline shift_exprt &to_shift_expr(exprt &expr)
+{
+  assert(expr.operands().size()==2);
+  return static_cast<shift_exprt &>(expr);
+}
 
 /*! \brief Left shift
 */
