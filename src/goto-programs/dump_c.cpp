@@ -852,8 +852,12 @@ void goto2cppt::convert_instructions(
       system_headers.insert("assert.h");
       inst_stream
         << indent(1) 
-        << "assert(" << expr_to_string(target->guard) << ");"
-        << std::endl;
+        << "assert(" << expr_to_string(target->guard) << ");";
+      
+      if(target->location.get_comment()!="")
+        inst_stream << " // " << target->location.get_comment();
+      
+      inst_stream << std::endl;
       break;
 
     case ASSUME:
