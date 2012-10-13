@@ -33,7 +33,8 @@ public:
     enable_pointer_check=_options.get_bool_option("pointer-check");
     enable_div_by_zero_check=_options.get_bool_option("div-by-zero-check");
     enable_signed_overflow_check=_options.get_bool_option("signed-overflow-check");
-    enable_unsigned_overflow_check=_options.get_bool_option("signed_overflow_check");
+    enable_unsigned_overflow_check=_options.get_bool_option("unsigned-overflow-check");
+    enable_undefined_shift_check=_options.get_bool_option("undefined-shift-check");
     enable_float_overflow_check=_options.get_bool_option("float-overflow-check");
     enable_simplify=_options.get_bool_option("simplify");
     enable_nan_check=_options.get_bool_option("nan-check");
@@ -52,6 +53,7 @@ protected:
   void bounds_check(const index_exprt &expr, const guardt &guard);
   void div_by_zero_check(const div_exprt &expr, const guardt &guard);
   void mod_by_zero_check(const mod_exprt &expr, const guardt &guard);
+  void undefined_shift_check(const shift_exprt &expr, const guardt &guard);
   void pointer_rel_check(const exprt &expr, const guardt &guard);
   void pointer_validity_check(const dereference_exprt &expr, const guardt &guard);
   void integer_overflow_check(const exprt &expr, const guardt &guard);
@@ -91,6 +93,7 @@ protected:
   bool enable_div_by_zero_check;
   bool enable_signed_overflow_check;
   bool enable_unsigned_overflow_check;
+  bool enable_undefined_shift_check;
   bool enable_float_overflow_check;
   bool enable_simplify;
   bool enable_nan_check;
@@ -179,6 +182,67 @@ void goto_checkt::div_by_zero_check(
     "division-by-zero",
     expr.find_location(),
     guard);
+}
+
+/*******************************************************************\
+
+Function: goto_checkt::undefined_shift_check
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void goto_checkt::undefined_shift_check(
+  const shift_exprt &expr,
+  const guardt &guard)
+{
+  if(!enable_undefined_shift_check)
+    return;
+
+  // Undefined for all types and shifts if distance exceeds width,
+  // and also undefined for negative distances.
+  
+  const typet &distance_type=
+    ns.follow(expr.distance().type());
+  
+  if(distance_type.id()==ID_signedbv)
+  {
+    binary_relation_exprt inequality(
+      expr.distance(), ID_ge, gen_zero(distance_type));
+
+    add_guarded_claim(
+      inequality,
+      "shift distance is negative",
+      "undefined-shift",
+      expr.find_location(),
+      guard);
+  }
+
+  const typet &op_type=
+    ns.follow(expr.op().type());
+  
+  if(op_type.id()==ID_unsignedbv || op_type.id()==ID_signedbv)
+  {  
+    exprt width_expr=
+      from_integer(to_bitvector_type(op_type).get_width(), distance_type);
+
+    if(width_expr.is_nil())
+      throw "no number for width for operator "+expr.id_string();
+      
+    binary_relation_exprt inequality(
+      expr.distance(), ID_lt, width_expr);
+
+    add_guarded_claim(
+      inequality,
+      "shift distance too large",
+      "undefined-shift",
+      expr.find_location(),
+      guard);
+  }
 }
 
 /*******************************************************************\
@@ -1130,6 +1194,10 @@ void goto_checkt::check_rec(
       nan_check(expr, guard);
       float_overflow_check(expr, guard);
     }
+  }
+  else if(expr.id()==ID_shl || expr.id()==ID_ashr || expr.id()==ID_lshr)
+  {
+    undefined_shift_check(to_shift_expr(expr), guard);
   }
   else if(expr.id()==ID_mod)
   {
