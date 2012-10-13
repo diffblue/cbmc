@@ -25,6 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(leak-check)" \
   "(assert-to-assume)" \
   "(div-by-zero-check)(no-div-by-zero-check)" \
+  "(undefined-shift-check)" \
   "(no-assertions)(no-assumptions)(uninitialized-check)" \
   "(nan-check)(no-nan-check)" \
   "(race-check)(one-partition)(one-event-per-cycle)" \

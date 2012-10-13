@@ -357,6 +357,12 @@ void goto_instrument_parseoptionst::instrument_goto_program(
   else
     options.set_option("div-by-zero-check", false);
 
+  // check undefined shifts
+  if(cmdline.isset("undefined-shift-check"))
+    options.set_option("undefined-shift-check", true);
+  else
+    options.set_option("undefined-shift-check", false);
+
   // check overflow/underflow
   if(cmdline.isset("signed-overflow-check"))
     options.set_option("signed-overflow-check", true);
@@ -653,6 +659,7 @@ void goto_instrument_parseoptionst::help()
     " --pointer-check              add pointer checks\n"
     " --signed-overflow-check      add arithmetic over- and underflow checks\n"
     " --unsigned-overflow-check    add arithmetic over- and underflow checks\n"
+    " --undefined-shift-check      add range checks for shift distances\n"
     " --nan-check                  add floating-point NaN checks\n"
     " --uninitialized-check        add checks for uninitialized locals (experimental)\n"
     " --error-label label          check that label is unreachable\n"
