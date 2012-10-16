@@ -1143,12 +1143,14 @@ void goto_convertt::do_function_call_symbol(
       throw "`"+id2string(identifier)+"' expected to have one argument";
     }
     
+    exprt list_arg=make_va_list(arguments[0]);
+    
     {
-      sideeffect_exprt rhs(ID_gcc_builtin_va_arg_next, arguments[0].type());
-      rhs.copy_to_operands(arguments[0]);
+      sideeffect_exprt rhs(ID_gcc_builtin_va_arg_next, list_arg.type());
+      rhs.copy_to_operands(list_arg);
       goto_programt::targett t1=dest.add_instruction(ASSIGN);
       t1->location=function.location();
-      t1->code=code_assignt(arguments[0], rhs);
+      t1->code=code_assignt(list_arg, rhs);
     }
 
     if(lhs.is_not_nil())
@@ -1156,7 +1158,7 @@ void goto_convertt::do_function_call_symbol(
       typet t=pointer_typet();
       t.subtype()=lhs.type();
       dereference_exprt rhs(lhs.type());
-      rhs.op0()=typecast_exprt(arguments[0], t);
+      rhs.op0()=typecast_exprt(list_arg, t);
       rhs.location()=function.location();
       goto_programt::targett t2=dest.add_instruction(ASSIGN);
       t2->location=function.location();
