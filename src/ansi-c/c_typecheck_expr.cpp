@@ -410,6 +410,8 @@ void c_typecheck_baset::typecheck_expr_builtin_va_arg(exprt &expr)
   assert(expr.operands().size()==1);  
   exprt arg=expr.op0();
 
+  implicit_typecast(arg, pointer_typet(empty_typet()));
+
   // turn into function call
   side_effect_expr_function_callt result;
   result.location()=expr.location();
