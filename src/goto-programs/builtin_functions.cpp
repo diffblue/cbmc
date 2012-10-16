@@ -759,6 +759,33 @@ bool is_lvalue(const exprt &expr)
 
 /*******************************************************************\
 
+Function: make_va_list
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+exprt make_va_list(const exprt &expr)
+{
+  // we first strip any typecast
+  if(expr.id()==ID_typecast)
+    return make_va_list(to_typecast_expr(expr).op());
+
+  // if it's an address of an lvalue, we take that
+  if(expr.id()==ID_address_of &&
+     expr.operands().size()==1 &&
+     is_lvalue(expr.op0()))
+    return expr.op0();
+
+  return expr;
+}
+
+/*******************************************************************\
+
 Function: goto_convertt::do_function_call_symbol
 
   Inputs:
@@ -1144,18 +1171,18 @@ void goto_convertt::do_function_call_symbol(
       throw "`"+id2string(identifier)+"' expected to have two arguments";
     }
     
-    exprt lhs=arguments[0];
-    exprt rhs=typecast_exprt(arguments[1], lhs.type());
+    exprt dest_expr=make_va_list(arguments[0]);
+    exprt src_expr=typecast_exprt(arguments[1], dest_expr.type());
 
-    if(!is_lvalue(lhs))
+    if(!is_lvalue(dest_expr))
     {
-      err_location(lhs);
+      err_location(dest_expr);
       throw "va_copy argument expected to be lvalue";
     }    
     
     goto_programt::targett t=dest.add_instruction(ASSIGN);
     t->location=function.location();
-    t->code=code_assignt(lhs, rhs);
+    t->code=code_assignt(dest_expr, src_expr);
   }
   else if(identifier=="c::__builtin_va_start")
   {
@@ -1167,19 +1194,20 @@ void goto_convertt::do_function_call_symbol(
       throw "`"+id2string(identifier)+"' expected to have two arguments";
     }
     
-    exprt lhs=arguments[0];
-    exprt rhs=typecast_exprt(
-      address_of_exprt(arguments[1]), lhs.type());
+    exprt dest_expr=make_va_list(arguments[0]);
+    exprt src_expr=typecast_exprt(
+      address_of_exprt(arguments[1]), dest_expr.type());
 
-    if(!is_lvalue(lhs))
+    if(!is_lvalue(dest_expr))
     {
-      err_location(lhs);
+      err_location(dest_expr);
+      std::cout << "X: " << dest_expr.pretty() << std::endl;
       throw "va_start argument expected to be lvalue";
     }    
     
     goto_programt::targett t=dest.add_instruction(ASSIGN);
     t->location=function.location();
-    t->code=code_assignt(lhs, rhs);
+    t->code=code_assignt(dest_expr, src_expr);
   }
   else if(identifier=="c::__builtin_va_end")
   {
@@ -1190,15 +1218,17 @@ void goto_convertt::do_function_call_symbol(
       throw "`"+id2string(identifier)+"' expected to have one argument";
     }
     
-    if(!is_lvalue(arguments[0]))
+    exprt dest_expr=make_va_list(arguments[0]);
+    
+    if(!is_lvalue(dest_expr))
     {
-      err_location(lhs);
+      err_location(dest_expr);
       throw "va_end argument expected to be lvalue";
     }    
     
     goto_programt::targett t=dest.add_instruction(ASSIGN);
     t->location=function.location();
-    t->code=code_assignt(arguments[0], gen_zero(arguments[0].type()));
+    t->code=code_assignt(dest_expr, gen_zero(dest_expr.type()));
   }
   else if(identifier=="c::__sync_fetch_and_add" ||
           identifier=="c::__sync_fetch_and_sub" ||
