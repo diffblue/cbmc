@@ -11,7 +11,7 @@ SRC = goto_convert.cpp goto_function.cpp goto_main.cpp goto_sideeffects.cpp \
       interpreter_evaluate.cpp flow_insensitive_analysis.cpp \
       format_strings.cpp loop_numbers.cpp pointer_arithmetic.cpp \
       goto_program_template.cpp write_goto_binary.cpp remove_unreachable.cpp \
-      remove_unused_functions.cpp dynamic_memory.cpp dump_c.cpp \
+      remove_unused_functions.cpp dynamic_memory.cpp \
       wp.cpp goto_rw.cpp goto_clean_expr.cpp safety_checker.cpp \
       compute_called_functions.cpp link_to_library.cpp \
       remove_return_values.cpp
