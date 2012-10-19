@@ -989,6 +989,7 @@ void goto_convertt::do_function_call_symbol(
 
     exprt rhs=side_effect_expr_nondett(lhs.type());
     rhs.location()=function.location();
+    rhs.set(ID_C_identifier, identifier);
 
     code_assignt assignment(lhs, rhs);
     assignment.location()=function.location();
