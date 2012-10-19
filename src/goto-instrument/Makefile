@@ -5,7 +5,7 @@ SRC = main.cpp parseoptions.cpp document_claims.cpp languages.cpp \
       weak_memory.cpp nondet_volatile.cpp interrupt.cpp \
       mmio.cpp stack_depth.cpp nondet_static.cpp \
       cfg_dominators.cpp natural_loops.cpp concurrency.cpp \
-      is_threaded.cpp
+      is_threaded.cpp dump_c.cpp
 
 OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../linking/linking$(LIBEXT) \
