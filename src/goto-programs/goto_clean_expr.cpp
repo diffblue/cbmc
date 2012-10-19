@@ -256,6 +256,9 @@ void goto_convertt::clean_expr(
     // preserve 'result_is_used'
     clean_expr(expr.op0(), dest, result_is_used);
     
+    if(expr.op0().is_nil())
+      expr.make_nil();
+    
     return;
   }
   else if(expr.id()==ID_sideeffect)
