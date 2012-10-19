@@ -177,27 +177,31 @@ public:
   {
     return op0();
   }
-  
+
+  #if 0  
   inline exprt &initializer()
   {
-    return op0();
+    return op1();
   }
 
   inline const exprt &initializer() const
   {
-    return op0();
+    return op1();
   }
+  #endif
   
   const irep_idt &get_identifier() const;
 
   friend inline const code_declt &to_code_decl(const codet &code)
   {
+    // will be size()==1 in the future
     assert(code.get_statement()==ID_decl && code.operands().size()>=1);
     return static_cast<const code_declt &>(code);
   }
 
   friend inline code_declt &to_code_decl(codet &code)
   {
+    // will be size()==1 in the future
     assert(code.get_statement()==ID_decl && code.operands().size()>=1);
     return static_cast<code_declt &>(code);
   }
@@ -214,6 +218,7 @@ class code_assumet:public codet
 public:
   inline code_assumet():codet(ID_assume)
   {
+    // will change to resize(1) in the future
     operands().reserve(1);
   }
 
@@ -222,12 +227,12 @@ public:
     copy_to_operands(expr);
   }
 
-  inline const exprt assumption() const
+  inline const exprt &assumption() const
   {
     return op0();
   }
 
-  inline exprt assumption()
+  inline exprt &assumption()
   {
     return op0();
   }
@@ -252,15 +257,21 @@ class code_assertt:public codet
 public:
   inline code_assertt():codet(ID_assert)
   {
+    // will change to resize(1) in the future
     operands().reserve(1);
   }
   
-  inline const exprt assertion() const
+  inline explicit code_assertt(const exprt &expr):codet(ID_assert)
+  {
+    copy_to_operands(expr);
+  }
+
+  inline const exprt &assertion() const
   {
     return op0();
   }
 
-  inline exprt assertion()
+  inline exprt &assertion()
   {
     return op0();
   }
