@@ -21,7 +21,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/set_claims.h>
 #include <goto-programs/read_goto_binary.h>
 #include <goto-programs/write_goto_binary.h>
-#include <goto-programs/dump_c.h>
 #include <goto-programs/interpreter.h>
 #include <goto-programs/string_abstraction.h>
 #include <goto-programs/string_instrumentation.h>
@@ -50,6 +49,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "nondet_static.h"
 #include "rw_set.h"
 #include "concurrency.h"
+#include "dump_c.h"
 
 /*******************************************************************\
 
