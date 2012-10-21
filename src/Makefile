@@ -36,3 +36,12 @@ $(patsubst %, %_clean, $(DIRS)):
 	if [ -e $(patsubst %_clean, %, $@)/. ] ; then \
 		$(MAKE) $(MAKEARGS) -C $(patsubst %_clean, %, $@) clean ; \
 	fi
+
+minisat2-download:
+	@echo "Downloading Minisat 2.2.0"
+	@lwp-download http://minisat.se/downloads/minisat-2.2.0.tar.gz
+	@tar xfz minisat-2.2.0.tar.gz
+	@rm -Rf ../minisat-2.2.0
+	@mv minisat ../minisat-2.2.0
+	@rm minisat-2.2.0.tar.gz
+
