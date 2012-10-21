@@ -12,56 +12,98 @@ CPROVER compiles in the following environments:
 
 - Microsoft's Visual Studio 2010 or 2012 (older versions won't work)
 
-You need to adjust config.inc to reflect the environment. The default is
-set up for a recent version of Linux. 
+The rest of this document is split up into three parts: compilation on
+Linux, MacOS, Windows.  Please read the section appropriate for your
+machine.
 
 
-How to compile?
----------------
+COMPILATION ON LINUX
+--------------------
 
-Follow these instructions:
+We assume that you have a Debian/Ubuntu-like distribution.
 
 0) You need a C/C++ compiler, Flex and Bison, and GNU make.
    The GNU Make needs to be version 3.81 or higher. Do
-   "apt-get install g++ gcc flex bison make subversion"
-   on a Debian/Ubuntu OS.
 
-   On a Mac, install the XCode Command Line Utilities.
+   apt-get install g++ gcc flex bison make subversion libz-dev libwww-perl
 
-   If you have Windows, and you don't already have GNU make, Flex and Bison,
-   we recommend you install Cygwin.
+1) You need a SAT solver (in source). We recommend MiniSat2. Do
 
-1) You need a SAT solver (in source). We recommend MiniSat2. On
-   a UNIX machine or Mac, do
-
-   lwp-download http://minisat.se/downloads/minisat-2.2.0.tar.gz
-   tar xfz minisat-2.2.0.tar.gz
-   mv minisat minisat-2.2.0
-
-   MiniSat2 relies on zlib, which you have to obtain for your environment.
-   On Debian, do "apt-get install libz-dev".
+   cd src
+   make minisat2-download
 
    Alternatively, you may use zchaff, Booleforce, or
    SMV-SAT (if you happen to work for Cadence).
 
-   Windows users can download the source of MiniSat2 from the address
-   above using a browser.
+2) If desired, adjust src/solvers/sat/satcheck.h to select which SAT
+   solver to use (MiniSat2 with simplifier is the default).
+
+3) Type cd src; make - that should do it.
+
+
+COMPILATION ON MACOS X
+----------------------
+
+Follow these instructions:
+
+0) You need a C/C++ compiler, Flex and Bison, and GNU make. To this
+   end, install the XCode command line utilities (installing XCode is
+   not enough). These are available at
+
+   https://developer.apple.com/downloads/
+
+1) You need a SAT solver (in source). We recommend MiniSat2. Do
+
+   cd src
+   make minisat2-download
+
+   Alternatively, you may use zchaff, Booleforce, or
+   SMV-SAT (if you happen to work for Cadence).
+
+2) If desired, adjust src/solvers/sat/satcheck.h to select which SAT
+   solver to use (MiniSat2 with simplifier is the default).
+
+3) Type cd src; make - that should do it.
+
+
+COMPILATION ON WINDOWS
+----------------------
+
+Follow these instructions:
+
+0) You need a C/C++ compiler, Flex and Bison, GNU tar, gzip2,
+   zlib, and GNU make. The GNU Make needs to be version 3.81 or higher. If
+   you don't already have the above, we recommend you install Cygwin.
+
+1) You need a SAT solver (in source). We recommend MiniSat2. Using a
+   browser, download from
+
+   http://minisat.se/downloads/minisat-2.2.0.tar.gz
+
+   and then unpack with
+
+   tar xfz minisat-2.2.0.tar.gz
+   mv minisat minisat-2.2.0
+
+   MiniSat2 relies on zlib, which you have to obtain for your environment.
+   SMV-SAT (if you happen to work for Cadence).
 
 2) Adjust src/config.inc for the paths to item 1).
 
 3) If desired, adjust src/solvers/sat/satcheck.h to select which SAT
    solver to use (MiniSat2 with simplifier is the default).
 
-4) Depending on the version of your STL, you may need to adjust a preprocessor
-   command in the file src/common:
+4A) To compile with Cygwin, install the mingw compilers, and adjust
+   the second line of config.inc to say
 
-   a) Recent versions of Linux run with "STL_HASH_TR1".
-   b) Recent versions of Cygwin/MingW work with "STL_HASH_TR1";
-      for g++-3, use "STL_HASH_GNU".
-   c) Visual Studio: please get Visual Studio 10 and use "STL_HASH_TR1".
+   BUILD_ENV = MinGW
 
-   Older Linux or MingW systems may require "STL_HASH_GNU". The
-   file src/common tries to guess a reasonable default based on
-   your environment.
+4B) To compile with Visual Studio, make sure you have at least Visual
+   Studio 10, and adjust the second line of config.inc to say
+
+   BUILD_ENV = MSVC
+
+   Open the Visual Studio Command prompt, and then run the bash.exe
+   from Cygwin from in there.
 
 5) Type cd src; make - that should do it.
