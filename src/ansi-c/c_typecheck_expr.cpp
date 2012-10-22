@@ -2703,7 +2703,9 @@ void c_typecheck_baset::typecheck_expr_binary_arithmetic(exprt &expr)
         }
       }
     }
-    else if(expr.id()==ID_bitand || expr.id()==ID_bitxor || expr.id()==ID_bitor)
+    else if(expr.id()==ID_bitand || 
+            expr.id()==ID_bitxor ||
+            expr.id()==ID_bitor)
     {
       if(type0==type1)
       {
