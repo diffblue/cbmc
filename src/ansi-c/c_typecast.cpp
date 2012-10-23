@@ -778,14 +778,13 @@ void c_typecastt::do_typecast(exprt &expr, const typet &type)
     {
       if(expr_type.id()==ID_bool) // bool -> _Bool
       {
-        exprt result=if_exprt(expr, gen_one(type), gen_zero(type));
-        expr.swap(result);
+        expr.make_typecast(type);
       }
       else // * -> _Bool
       {
-        equal_exprt equal_zero(expr, gen_zero(expr_type));
-        exprt result=if_exprt(equal_zero, gen_zero(type), gen_one(type));
-        expr.swap(result);
+        notequal_exprt notequal_zero(expr, gen_zero(expr_type));
+        expr=notequal_zero;
+        expr.make_typecast(type);
       }
     }
     else

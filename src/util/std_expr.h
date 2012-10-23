@@ -566,6 +566,46 @@ extern inline equal_exprt &to_equal_expr(exprt &expr)
   return static_cast<equal_exprt &>(expr);
 }
 
+/*! \brief inequality
+*/
+class notequal_exprt:public binary_relation_exprt
+{
+public:
+  inline notequal_exprt():binary_relation_exprt(ID_notequal)
+  {
+  }
+
+  inline notequal_exprt(const exprt &_lhs, const exprt &_rhs):
+    binary_relation_exprt(_lhs, ID_notequal, _rhs)
+  {
+  }
+};
+
+/*! \brief Cast a generic exprt to an \ref notequal_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * notequal_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref notequal_exprt
+ *
+ * \ingroup gr_std_expr
+*/
+extern inline const notequal_exprt &to_notequal_expr(const exprt &expr)
+{
+  assert(expr.id()==ID_notequal && expr.operands().size()==2);
+  return static_cast<const notequal_exprt &>(expr);
+}
+
+/*! \copydoc to_notequal_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
+extern inline notequal_exprt &to_notequal_expr(exprt &expr)
+{
+  assert(expr.id()==ID_notequal && expr.operands().size()==2);
+  return static_cast<notequal_exprt &>(expr);
+}
+
 /*! \brief array index operator
 */
 class index_exprt:public exprt
