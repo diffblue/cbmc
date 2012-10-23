@@ -52,10 +52,10 @@ cprover_library$(OBJEXT): cprover_library.inc
 ###############################################################################
 
 library/converter$(EXEEXT): library/converter.cpp
-	$(LINKBIN)
+	$(LINKNATIVE)
 
 file_converter$(EXEEXT): file_converter.cpp
-	$(LINKBIN)
+	$(LINKNATIVE)
 
 .PHONY: library_check
 
