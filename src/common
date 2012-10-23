@@ -38,6 +38,7 @@ else
   LINKLIB = ld -r -o $@ $^
 endif
   LINKBIN = $(CXX) $(LINKFLAGS) -o $@ $^ $(LIBS)
+  LINKNATIVE = $(HOSTCXX) -o $@ $^
 ifeq ($(origin CC),default)
   CC     = gcc
   #CC     = icc
@@ -67,6 +68,7 @@ else ifeq ($(BUILD_ENV_),Cygwin)
   LINKFLAGS = -static -mno-cygwin
   LINKLIB = ld -r -o $@ $^
   LINKBIN = $(CXX) $(LINKFLAGS) -o $@ $^ $(LIBS)
+  LINKNATIVE = $(HOSTCXX) -o $@ $^
 ifeq ($(origin CC),default)
   CC     = gcc
   #GCC 4.5.3 is broken
@@ -97,6 +99,7 @@ else ifeq ($(BUILD_ENV_),MSVC)
   CP_CXXFLAGS = -DSTL_HASH_TR1
   LINKLIB = lib /NOLOGO /OUT:$@ $^
   LINKBIN = $(CXX) $(LINKFLAGS) /Fe$@ $^ $(LIBS)
+  LINKNATIVE = $(HOSTCXX) /Fe$@ $^
 ifeq ($(origin CC),default)
   CC = cl
 endif
@@ -118,6 +121,8 @@ endif
 
 
 first_target: all
+
+HOSTCXX ?= $(CXX)
 
 CP_CFLAGS += $(CFLAGS) $(INCLUDES)
 CP_CXXFLAGS += $(CXXFLAGS) $(INCLUDES)

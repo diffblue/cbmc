@@ -46,8 +46,8 @@ irep_ids.inc: irep_ids_convert$(EXEEXT) irep_ids.txt
 
 irep_ids.cpp: irep_ids.inc irep_ids.h
 
-irep_ids_convert$(EXEEXT): irep_ids_convert$(OBJEXT)
-	$(LINKBIN)
+irep_ids_convert$(EXEEXT): irep_ids_convert.cpp
+	$(LINKNATIVE)
 
 # Most of the others will need irep_ids.h,
 # which we first need to generate.
