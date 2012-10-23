@@ -751,45 +751,45 @@ Function: c_typecastt::do_typecast
 
 \*******************************************************************/
 
-void c_typecastt::do_typecast(exprt &expr, const typet &type)
+void c_typecastt::do_typecast(exprt &expr, const typet &dest_type)
 {
   // special case: array -> pointer is actually
   // something like address_of
   
-  const typet &expr_type=ns.follow(expr.type());
+  const typet &src_type=ns.follow(expr.type());
 
-  if(expr_type.id()==ID_array)
+  if(src_type.id()==ID_array)
   {
     index_exprt index;
     index.array()=expr;
     index.index()=gen_zero(index_type());
-    index.type()=expr_type.subtype();
+    index.type()=src_type.subtype();
     expr=address_of_exprt(index);
-    if(ns.follow(expr.type())!=ns.follow(type))
-      expr.make_typecast(type);
+    if(ns.follow(expr.type())!=ns.follow(dest_type))
+      expr.make_typecast(dest_type);
     return;
   }
 
-  if(expr_type!=type)
+  if(src_type!=dest_type)
   {
     // C booleans are special: we compile to ?0:1
     
-    if(type.get(ID_C_c_type)==ID_bool)
+    if(dest_type.get(ID_C_c_type)==ID_bool)
     {
-      if(expr_type.id()==ID_bool) // bool -> _Bool
+      if(src_type.id()==ID_bool) // bool proper -> _Bool
       {
-        expr.make_typecast(type);
+        expr.make_typecast(dest_type);
       }
       else // * -> _Bool
       {
-        notequal_exprt notequal_zero(expr, gen_zero(expr_type));
+        notequal_exprt notequal_zero(expr, gen_zero(src_type));
         expr=notequal_zero;
-        expr.make_typecast(type);
+        expr.make_typecast(dest_type);
       }
     }
     else
     {    
-      expr.make_typecast(type);
+      expr.make_typecast(dest_type);
     }
   }
 }
