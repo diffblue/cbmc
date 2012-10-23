@@ -47,7 +47,7 @@ protected:
   std::string id_shorthand(const exprt &expr) const;
 
   std::string convert_typecast(
-    const exprt &src, unsigned &precedence);
+    const typecast_exprt &src, unsigned &precedence);
 
   std::string convert_pointer_arithmetic(const exprt &src,
     unsigned &precedence);
