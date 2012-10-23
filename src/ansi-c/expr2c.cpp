@@ -460,7 +460,7 @@ Function: expr2ct::convert_typecast
 \*******************************************************************/
 
 std::string expr2ct::convert_typecast(
-  const exprt &src,
+  const typecast_exprt &src,
   unsigned &precedence)
 {
   precedence=14;
@@ -470,19 +470,30 @@ std::string expr2ct::convert_typecast(
 
   // some special cases
 
-  const typet &type=ns.follow(src.type());
+  const typet &to_type=ns.follow(src.type());
+  const typet &from_type=ns.follow(src.op().type());
+  
+  if(to_type.id()==ID_unsignedbv &&
+     to_type.get(ID_C_c_type)==ID_bool &&
+     from_type.id()==ID_bool)
+    return convert(src.op(), precedence);
+     
+  if(to_type.id()==ID_bool &&
+     from_type.get(ID_C_c_type)==ID_bool &&
+     from_type.id()==ID_unsignedbv)
+    return convert(src.op(), precedence);
 
-  if(type.id()==ID_pointer &&
-     ns.follow(type.subtype()).id()==ID_empty && // to (void *)?
+  if(to_type.id()==ID_pointer &&
+     ns.follow(to_type.subtype()).id()==ID_empty && // to (void *)?
      src.op0().is_zero())
     return "NULL";
 
-  std::string dest="("+convert(type)+")";
+  std::string dest="("+convert(to_type)+")";
 
-  std::string tmp=convert(src.op0(), precedence);
+  std::string tmp=convert(src.op(), precedence);
 
-  if(src.op0().id()==ID_constant ||
-     src.op0().id()==ID_symbol) // better fix precedence
+  if(src.op().id()==ID_constant ||
+     src.op().id()==ID_symbol) // better fix precedence
     dest+=tmp;
   else
     dest+='('+tmp+')';
@@ -3951,7 +3962,7 @@ std::string expr2ct::convert(
     return convert_array_list(src, precedence);
 
   else if(src.id()==ID_typecast)
-    return convert_typecast(src, precedence);
+    return convert_typecast(to_typecast_expr(src), precedence);
 
   else if(src.id()=="implicit_address_of")
     return convert_implicit_address_of(src, precedence);
