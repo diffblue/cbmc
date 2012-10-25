@@ -50,6 +50,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "rw_set.h"
 #include "concurrency.h"
 #include "dump_c.h"
+#include "dot.h"
 
 /*******************************************************************\
 
@@ -254,6 +255,27 @@ int goto_instrument_parseoptionst::doit()
       }
       else
         dump_c(goto_functions, ns, std::cout);
+        
+      return 0;
+    }
+    
+    if(cmdline.isset("dot"))
+    {
+      namespacet ns(context);
+      
+      if(cmdline.args.size()==2)
+      {
+        std::ofstream out(cmdline.args[1].c_str());
+        if(!out)
+        {
+          error("failed to write to "+cmdline.args[1]);
+          return 10;
+        }
+
+        dot(goto_functions, ns, out);
+      }
+      else
+        dot(goto_functions, ns, std::cout);
         
       return 0;
     }
@@ -650,6 +672,7 @@ void goto_instrument_parseoptionst::help()
     " --show-goto-functions        show goto program\n"
     " --show-struct-alignment      show struct members that might be concurrently accessed\n"
     " --dump-c                     generate C source\n"
+    " --dot                        generate CFG graph in DOT format"
     " --interpreter                do concrete execution\n"
     "\n"
     "Safety checks:\n"

@@ -18,7 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define GOTO_INSTRUMENT_OPTIONS \
   "(all)" \
   "(document-claims-latex)(document-claims-html)" \
-  "(dump-c)" \
+  "(dump-c)(dot)" \
   "(bounds-check)(no-bounds-check)" \
   "(pointer-check)(no-pointer-check)" \
   "(remove-pointers)" \

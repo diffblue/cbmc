@@ -31,7 +31,6 @@ Function: ms_cl_cmdlinet::parse
 
 const char *non_ms_cl_options[]=
 {
-  "--dot",
   "--show-symbol-table",
   "--show-function-table",
   "--ppc-macos",
