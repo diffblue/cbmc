@@ -203,27 +203,26 @@ void goto_convertt::clean_expr(
   }
   else if(expr.id()==ID_if)
   {
-    if(expr.operands().size()!=3)
-      throw "if takes three arguments";
+    if_exprt &if_expr=to_if_expr(expr);
 
-    if(!expr.op0().is_boolean())
+    if(!if_expr.cond().is_boolean())
       throw "first argument of `if' must be boolean, but got "
-        +expr.op0().to_string();
+        +if_expr.cond().to_string();
 
     // first pull out condition -- we need to prevent
     // this getting destroyed by the side-effects in the other
     // operands
-    make_temp_symbol(expr.op0(), "condition", dest);
+    make_temp_symbol(if_expr.cond(), "condition", dest);
 
     // now clean arguments    
     goto_programt tmp_true, tmp_false;
-    clean_expr(expr.op1(), tmp_true, result_is_used);
-    clean_expr(expr.op2(), tmp_false, result_is_used);
+    clean_expr(if_expr.true_case(), tmp_true, result_is_used);
+    clean_expr(if_expr.false_case(), tmp_false, result_is_used);
 
     // generate guard for argument side-effects    
     generate_ifthenelse(
-      expr.op0(), tmp_true, tmp_false,
-      expr.location(), dest);
+      if_expr.cond(), tmp_true, tmp_false,
+      if_expr.location(), dest);
 
     return;
   }
