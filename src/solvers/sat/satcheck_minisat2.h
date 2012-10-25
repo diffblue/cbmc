@@ -65,6 +65,7 @@ public:
   satcheck_minisat_simplifiert();
   virtual const std::string solver_text();
   void set_frozen(literalt a);
+  bool is_eliminated(literalt a) const;
 };
 
 #endif

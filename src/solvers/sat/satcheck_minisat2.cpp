@@ -405,3 +405,22 @@ void satcheck_minisat_simplifiert::set_frozen(literalt a)
   solver->setFrozen(a.var_no(), true);
 }
 
+/*******************************************************************\
+
+Function: satcheck_minisat_simplifiert::is_eliminated
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool satcheck_minisat_simplifiert::is_eliminated(literalt a) const
+{
+  assert(!a.is_constant());
+
+  return solver->isEliminated(a.var_no());
+}
+
