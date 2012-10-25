@@ -30,8 +30,6 @@ Function: armcc_cmdlinet::parse
 static const char *options_no_arg[]=
 {
   // goto-cc-specific
-  "--dot",
-  "--xml",
   "--show-symbol-table",
   "--show-function-table",
   "--16",

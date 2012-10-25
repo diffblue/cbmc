@@ -85,7 +85,6 @@ const char *gcc_options_with_concatenated_argument[]=
 
 const char *gcc_options_without_argument[]=
 {
-  "--dot", // NON-GCC
   "--show-symbol-table", // NON-GCC
   "--show-function-table", // NON-GCC
   "--ppc-macos", // NON-GCC
