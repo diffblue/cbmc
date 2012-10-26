@@ -66,6 +66,8 @@ bool static_lifetime_init(
   const locationt &location,
   message_handlert &message_handler)
 {
+  namespacet ns(context);
+      
   contextt::symbolst::iterator s_it=
     context.symbols.find("c::__CPROVER_initialize");
 
@@ -103,12 +105,18 @@ bool static_lifetime_init(
     // just for linking
     if(has_prefix(id2string(identifier), CPROVER_PREFIX "architecture_"))
       continue;
+  
+    const typet &type=ns.follow(it->second.type);
       
     // check type
-    if(it->second.type.id()==ID_code ||
-       it->second.type.id()==ID_empty)
+    if(type.id()==ID_code ||
+       type.id()==ID_empty)
       continue;
     
+    if(type.id()==ID_array &&
+       to_array_type(type).size().is_nil())
+      continue; // do not initialize
+      
     if(it->second.value.id()==ID_nondet)
       continue; // do not initialize
       
