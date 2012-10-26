@@ -1,4 +1,6 @@
-#include "../propsolve/satcheck.h"
+#include <iostream>
+
+#include <solvers/sat/satcheck.h>
 #include "float_utils.h"
 
 float random_float()
@@ -42,9 +44,9 @@ int main()
   bvt b1, b2, b3, res;
   float f1, f2, f3;
 
-  for(unsigned i=0; i<1000000; i++)
+  for(unsigned i=0; i<200; i++)
   {
-    //if(i%10000==0)
+    if(i%20==0)
       std::cout << "*********** " << i << std::endl;
 
     satcheckt satcheck;

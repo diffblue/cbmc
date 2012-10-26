@@ -3,6 +3,7 @@
 #include <cout_message.h>
 #include <config.h>
 #include <simplify_expr.h>
+#include <cmdline.h>
 
 #include <langapi/mode.h>
 #include <ansi-c/ansi_c_language.h>
@@ -15,7 +16,8 @@ int main(int argc, const char **argv)
 {
   try
   {
-    config.ansi_c.set_32();
+    cmdlinet cmdline;
+    config.set(cmdline);
 
     register_language(new_ansi_c_language);
     
