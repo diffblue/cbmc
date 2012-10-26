@@ -6,124 +6,1191 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <cstdlib>
-#include <iostream>
+#include <sstream>
+#include <set>
+#include <map>
+#include <list>
 
-#include <prefix.h>
-#include <context.h>
-#include <std_expr.h>
 #include <config.h>
-#include <namespace.h>
+#include <hash_cont.h>
+#include <language.h>
+#include <std_expr.h>
+#include <std_code.h>
+#include <std_types.h>
+#include <prefix.h>
+#include <simplify_expr.h>
+#include <replace_symbol.h>
+#include <find_symbols.h>
+#include <arith_tools.h>
 
-#include <ansi-c/expr2c.h>
+#include <langapi/mode.h>
+#include <ansi-c/ansi_c_language.h>
+#include <cpp/cpp_language.h>
+#include <goto-instrument/natural_loops.h>
 
 #include "dump_c.h"
 
-/*******************************************************************\
-
-Function: convert_id
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-std::string convert_id(const irep_idt &id)
+class goto_program2codet
 {
-  std::string result=id2string(id);
-  
-  if(has_prefix(result, "c::"))
-    result=std::string(result, 3, std::string::npos);
-  
-  return result;
-}
+  typedef std::list<irep_idt> type_namest;
+  typedef hash_set_cont<irep_idt,irep_id_hash> labelst;
+  typedef std::map<goto_programt::const_targett, goto_programt::const_targett> loopt;
 
-/*******************************************************************\
-
-Function: indent
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-struct indent
-{
-  inline explicit indent(unsigned _n):n(_n)
+public:
+  goto_program2codet(
+      const goto_programt &_goto_program,
+      contextt &_context,
+      code_blockt &_dest,
+      const type_namest &_type_names,
+      std::set<std::string> &_system_headers) :
+    goto_program(_goto_program),
+    context(_context),
+    ns(_context),
+    toplevel_block(_dest),
+    type_names(_type_names),
+    system_headers(_system_headers)
   {
   }
 
-  unsigned n;
+  void operator()();
+
+protected:
+  const goto_programt &goto_program;
+  contextt &context;
+  const namespacet ns;
+  code_blockt &toplevel_block;
+  const type_namest &type_names;
+  std::set<std::string> system_headers;
+
+  loopt loop_map;
+  labelst labels_in_use;
+  replace_symbolt replace_symbols;
+
+  void build_loop_map();
+
+  void cleanup_code(codet &code, const bool is_top);
+  void cleanup_code_block(
+      codet &code,
+      const bool is_top);
+  void cleanup_code_ifthenelse(codet &code);
+
+  goto_programt::const_targett convert_instruction(
+      goto_programt::const_targett target,
+      goto_programt::const_targett upper_bound,
+      codet &dest);
+
+  void convert_labels(
+      goto_programt::const_targett target,
+      codet &dest);
+
+  goto_programt::const_targett convert_assign(
+      goto_programt::const_targett target,
+      codet &dest);
+  void convert_assign_rec(
+      const code_assignt &assign,
+      codet &dest);
+
+  goto_programt::const_targett convert_return(
+      goto_programt::const_targett target,
+      codet &dest);
+
+  goto_programt::const_targett convert_decl(
+      goto_programt::const_targett target,
+      goto_programt::const_targett upper_bound,
+      codet &dest);
+
+  goto_programt::const_targett convert_goto(
+      goto_programt::const_targett target,
+      goto_programt::const_targett upper_bound,
+      codet &dest);
+  goto_programt::const_targett convert_goto_while(
+      goto_programt::const_targett target,
+      goto_programt::const_targett loop_end,
+      codet &dest);
+  goto_programt::const_targett convert_goto_if(
+      goto_programt::const_targett target,
+      goto_programt::const_targett upper_bound,
+      codet &dest);
+  goto_programt::const_targett convert_goto_goto(
+      goto_programt::const_targett target,
+      codet &dest);
+
+  goto_programt::const_targett convert_start_thread(
+      goto_programt::const_targett target,
+      goto_programt::const_targett upper_bound,
+      codet &dest);
 };
 
-std::ostream &operator << (std::ostream &out, const indent &indent)
+/*******************************************************************\
+
+Function: goto_program2codet::operator()
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
+void goto_program2codet::operator()()
 {
-  for(unsigned i=0; i<indent.n; i++)
-    out << ' ' << ' ';
-  return out;
+  // labels stored for cleanup
+  labels_in_use.clear();
+
+  // just an estimate
+  toplevel_block.reserve_operands(goto_program.instructions.size());
+
+  // find loops first
+  build_loop_map();
+
+  // convert
+  forall_goto_program_instructions(target, goto_program)
+    target=convert_instruction(
+        target,
+        goto_program.instructions.end(),
+        toplevel_block);
+
+  replace_symbols.replace(toplevel_block);
+  for(type_namest::const_iterator
+      it=type_names.begin();
+      it!=type_names.end();
+      ++it)
+  {
+    symbolt &symbol=context.lookup(*it);
+    replace_symbols.replace(symbol.type);
+  }
+
+  cleanup_code(toplevel_block, true);
 }
 
-#include <sstream>
+/*******************************************************************\
+
+Function: goto_program2codet::build_loop_map
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
+void goto_program2codet::build_loop_map()
+{
+  loop_map.clear();
+
+  natural_loopst loops;
+  loops(goto_program);
+
+  for(natural_loopst::loop_mapt::const_iterator
+      l_it=loops.loop_map.begin();
+      l_it!=loops.loop_map.end();
+      ++l_it)
+  {
+    assert(!l_it->second.empty());
+
+    goto_programt::const_targett loop_start=l_it->first;
+    goto_programt::const_targett loop_end=l_it->first;
+    for(natural_loopst::natural_loopt::const_iterator
+        it=l_it->second.begin();
+        it!=l_it->second.end();
+        ++it)
+      if((*it)->location_number<loop_start->location_number)
+        loop_start=*it;
+      else if((*it)->location_number>loop_end->location_number)
+        loop_end=*it;
+    assert(loop_start==l_it->first);
+
+    if(!loop_map.insert(std::make_pair(loop_start, loop_end)).second)
+      assert(false);
+  }
+}
+
+/*******************************************************************\
+
+Function: goto_program2codet::convert_instruction
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
+goto_programt::const_targett goto_program2codet::convert_instruction(
+    goto_programt::const_targett target,
+    goto_programt::const_targett upper_bound,
+    codet &dest)
+{
+  assert(target!=goto_program.instructions.end());
+
+  convert_labels(target, dest);
+
+  switch(target->type)
+  {
+    case SKIP:
+    case LOCATION:
+    case END_FUNCTION:
+      dest.copy_to_operands(code_skipt());
+      return target;
+
+    case FUNCTION_CALL:
+    case OTHER:
+      dest.copy_to_operands(target->code);
+      return target;
+
+    case ASSIGN:
+      return convert_assign(target, dest);
+
+    case RETURN:
+      return convert_return(target, dest);
+
+    case DECL:
+      return convert_decl(target, upper_bound, dest);
+
+    case ASSERT:
+      system_headers.insert("assert.h");
+      /*
+         if(!target->location.get_comment().empty())
+         inst_stream
+         << indent(1)
+         << "// "
+         << target->location.get_comment();
+         */
+      dest.copy_to_operands(code_assertt(target->guard));
+      return target;
+
+    case ASSUME:
+      dest.copy_to_operands(code_assumet(target->guard));
+      return target;
+
+    case GOTO:
+      return convert_goto(target, upper_bound, dest);
+
+    case START_THREAD:
+      return convert_start_thread(target, upper_bound, dest);
+
+    case END_THREAD:
+      // inst_stream << indent(1) << "// END_THREAD" << std::endl;
+      dest.copy_to_operands(code_assumet(false_exprt()));
+      return target;
+
+    case ATOMIC_BEGIN:
+    case ATOMIC_END:
+      {
+        code_function_callt f;
+        code_typet void_t;
+        void_t.return_type()=empty_typet();
+        f.function()=symbol_exprt(
+            target->is_atomic_begin() ?
+            "__CPROVER_atomic_begin" :
+            "__CPROVER_atomic_end",
+            void_t);
+        dest.move_to_operands(f);
+        return target;
+      }
+
+    case DEAD:
+    case THROW:
+    case CATCH:
+    case NO_INSTRUCTION_TYPE:
+      assert(false);
+
+
 #if 0
-#include <map>
-#include <ostream>
-#include <cctype>
+    case OTHER:
+      {
+        const codet &code=to_code(target->code);
+        irep_idt statement=code.get_statement();
 
-#include <arith_tools.h>
-#include <expr.h>
-#include <prefix.h>
+        if(statement==ID_expression)
+        {
+          // expression has no sideeffect
+          if(target->is_target())
+            inst_stream << indent(1) << "; // OTHER/expression\n";
+        }
+        else if(has_prefix(id2string(statement), "assign"))
+        {
+          if(code.op0().id() == "dynamic_size" ||
+              code.op0().id() == "valid_object")
+          {
+            // shall we do something else?
+            break;
+          }
+
+          inst_stream << indent(1);
+
+          std::string statement = id2string(code.get_statement());
+          std::string op_str = statement.substr(std::string("assign").size(), statement.size());
+
+          inst_stream << expr_to_string(target->code.op0()) << " " << op_str << "="
+            << expr_to_string(target->code.op1()) << ";" << std::endl;
+          break;
+        }
+        break;
+      }
 #endif
-#include <i2string.h>
+  }
 
-class goto2cppt
+  // not reached
+  assert(false);
+  return target;
+}
+
+/*******************************************************************\
+
+Function: goto_program2codet::convert_labels
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
+void goto_program2codet::convert_labels(
+    goto_programt::const_targett target,
+    codet &dest)
+{
+  codet *latest_block=&dest;
+
+  irep_idt target_label;
+  if(target->is_target())
+  {
+    std::stringstream label;
+    label << "L" << target->target_number;
+    code_labelt l;
+    l.set_label(label.str());
+    target_label=l.get_label();
+    l.code()=code_blockt();
+    latest_block->move_to_operands(l);
+    latest_block=&to_code_label(
+        to_code(latest_block->operands().back())).code();
+  }
+
+  for(goto_programt::instructiont::labelst::const_iterator
+      it=target->labels.begin();
+      it!=target->labels.end();
+      ++it)
+  {
+    if(has_prefix(it->as_string(), "__CPROVER_ASYNC_"))
+      continue;
+    if(!target_label.empty() && *it==target_label)
+      continue;
+
+    // keep all original labels
+    labels_in_use.insert(*it);
+
+    code_labelt l;
+    l.set_label(*it);
+    l.code()=code_blockt();
+    latest_block->move_to_operands(l);
+    latest_block=&to_code_label(
+        to_code(latest_block->operands().back())).code();
+  }
+
+  if(latest_block!=&dest)
+    latest_block->copy_to_operands(code_skipt());
+}
+
+/*******************************************************************\
+
+Function: goto_program2codet::convert_assign
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
+goto_programt::const_targett goto_program2codet::convert_assign(
+    goto_programt::const_targett target,
+    codet &dest)
+{
+  const code_assignt &a=to_code_assign(target->code);
+
+  if(a.lhs().id()==ID_symbol &&
+      to_symbol_expr(a.lhs()).get_identifier().as_string().
+      rfind("#array_size")!=std::string::npos)
+  {
+    replace_symbols.insert(
+        to_symbol_expr(a.lhs()).get_identifier(),
+        a.rhs());
+
+    dest.copy_to_operands(code_skipt());
+  }
+  else
+    convert_assign_rec(a, dest);
+
+  return target;
+#if 0
+    case ASSIGN:
+      {
+        if(target->code.op0().id() == "dynamic_size" ||
+            target->code.op0().id() == "valid_object")
+        {
+          // shall we do something else?
+          break;
+        }
+        else if(target->code.op0().id()==ID_index)
+        {
+          const index_exprt &index_expr=to_index_expr(target->code.op0());
+          if(index_expr.array().id()==ID_symbol)
+            if(supress(index_expr.array().get(ID_identifier)))
+              continue;
+        }
+        else if(target->code.op0().id()==ID_symbol)
+        {
+          if(supress(target->code.op0().get(ID_identifier)))
+            continue;
+        }
+
+        const codet &assign = target->code;
+        const exprt &lhs = assign.op0();
+        const exprt &rhs = assign.op1();
+
+        //  assignment of the form `a =  (mask & a) |  ((typecast)b) << right' ?
+        if(lhs.type().id() == ID_unsignedbv &&
+            rhs.id() == ID_bitor &&
+            rhs.operands().size() == 2 &&
+            rhs.op0().id() == ID_bitand &&
+            rhs.op0().operands().size() == 2 &&
+            rhs.op1().id() == ID_shl &&
+            rhs.op1().operands().size() == 2)
+        {
+          const exprt& mask = rhs.op0().op0();
+          const exprt& a = rhs.op0().op1();
+          exprt b = rhs.op1().op0();
+          const exprt& right = rhs.op1().op1();
+
+          if(mask.id() == ID_constant && a == lhs && right.id() == ID_constant)
+          {
+            const std::string& mask_value = mask.get(ID_value).as_string();
+
+            unsigned l = 0;
+            for(; l <  mask_value.size() ; l++)
+              if(mask_value[l] == '0')
+                break;
+
+            unsigned r = l;
+            for(; r <  mask_value.size() ; r++)
+              if(mask_value[r] == '1')
+                break;
+
+
+            unsigned trail = r;
+            for(; trail <  mask_value.size();trail++)
+              if(mask_value[trail] == '0')
+                break;
+
+            // because of endidaness...
+            l = mask_value.size() - 1 - l;
+            r = mask_value.size() - r;
+
+            if(trail == mask_value.size())
+            {
+              unsigned shl = atoi(right.get(ID_C_cformat).c_str());
+
+              if(r == shl)
+              {
+                unsigned width = l-r+1;
+
+                if(width == 1 &&
+                    b.id() == ID_typecast &&
+                    b.op0().type().id() == ID_bool)
+                {
+                  inst_stream << indent(1) << expr_to_string(a) <<
+                    ".set_bit(" << shl <<"," <<
+                    expr_to_string(b.op0()) << ");\n" ;
+                  break;
+                }
+
+                typet new_type(ID_unsignedbv);
+                new_type.set(ID_width, width);
+
+                if(b.type() != new_type)
+                {
+                  if(b.id() == ID_typecast)
+                    b.type() = new_type;
+                  else
+                    b.make_typecast(new_type);
+                }
+
+                inst_stream << indent(1) <<
+                  expr_to_string(a) <<
+                  ".set_range<" << width  <<  ", " << r <<
+                  ">( " <<  expr_to_string(b) << ");\n" ;
+                break;
+              }
+            }
+          }
+        }
+      }
+#endif
+}
+
+/*******************************************************************\
+
+Function: goto_program2codet::convert_assign_rec
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
+void goto_program2codet::convert_assign_rec(
+    const code_assignt &assign,
+    codet &dest)
+{
+  if(assign.rhs().id()==ID_struct)
+  {
+    const struct_typet &type=
+      to_struct_type(ns.follow(assign.rhs().type()));
+
+    const struct_union_typet::componentst &components=
+      type.components();
+
+    assert(components.size()==assign.rhs().operands().size());
+    exprt::operandst::const_iterator o_it=assign.rhs().operands().begin();
+    for(struct_union_typet::componentst::const_iterator
+        it=components.begin();
+        it!=components.end();
+        ++it)
+    {
+      if(!it->get_is_padding())
+      {
+        member_exprt member(assign.lhs(), it->get_name(), it->type());
+        convert_assign_rec(code_assignt(member, *o_it), dest);
+      }
+      ++o_it;
+    }
+  }
+  else if(assign.rhs().id()==ID_array)
+  {
+    const array_typet &type=
+      to_array_type(ns.follow(assign.rhs().type()));
+
+    unsigned i=0;
+    forall_operands(it, assign.rhs())
+    {
+      index_exprt index(
+          assign.lhs(),
+          from_integer(i++, signedbv_typet(config.ansi_c.pointer_width)),
+          type.subtype());
+      convert_assign_rec(code_assignt(index, *it), dest);
+    }
+  }
+  else
+    dest.copy_to_operands(assign);
+}
+
+/*******************************************************************\
+
+Function: goto_program2codet::convert_return
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
+goto_programt::const_targett goto_program2codet::convert_return(
+    goto_programt::const_targett target,
+    codet &dest)
+{
+  const code_returnt &ret=to_code_return(target->code);
+
+  goto_programt::const_targett next=target;
+  ++next;
+  assert(next!=goto_program.instructions.end());
+
+  // catch the specific case where the original code was missing a return
+  // statement to avoid NONDET() in output
+  if(ret.has_return_value() &&
+      ret.return_value().id()==ID_sideeffect &&
+      to_sideeffect_expr(ret.return_value()).get_statement()==ID_nondet &&
+      next->is_end_function())
+  {
+    if(target->is_target())
+      dest.copy_to_operands(code_skipt());
+  }
+  else
+    dest.copy_to_operands(target->code);
+
+  return target;
+}
+
+/*******************************************************************\
+
+Function: goto_program2codet::convert_decl
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
+goto_programt::const_targett goto_program2codet::convert_decl(
+    goto_programt::const_targett target,
+    goto_programt::const_targett upper_bound,
+    codet &dest)
+{
+  code_declt d=to_code_decl(target->code);
+
+  goto_programt::const_targett next=target;
+  ++next;
+  assert(next!=goto_program.instructions.end());
+
+  // move back initialising assignments into the decl, unless crossing the
+  // current boundary
+  if(next->is_assign() &&
+      next!=upper_bound &&
+      &toplevel_block==&dest)
+  {
+    const code_assignt &a=to_code_assign(next->code);
+    if(a.lhs()==d.symbol())
+    {
+      d.copy_to_operands(a.rhs());
+      ++target;
+      convert_labels(target, dest);
+    }
+  }
+  // if we have a constant but can't initialize them right away, we need to
+  // remove the const marker
+  else if(d.symbol().type().get_bool(ID_C_constant))
+    d.symbol().type().remove(ID_C_constant);
+
+  toplevel_block.move_to_operands(d);
+  return target;
+}
+
+/*******************************************************************\
+
+Function: goto_program2codet::convert_goto
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
+goto_programt::const_targett goto_program2codet::convert_goto(
+    goto_programt::const_targett target,
+    goto_programt::const_targett upper_bound,
+    codet &dest)
+{
+  assert(target->is_goto());
+  // we only do one target for now
+  assert(target->targets.size()==1);
+
+  loopt::const_iterator loop_entry=loop_map.find(target);
+
+  if(loop_entry!=loop_map.end() &&
+      (upper_bound==goto_program.instructions.end() ||
+       upper_bound->location_number > loop_entry->second->location_number))
+    return convert_goto_while(target, loop_entry->second, dest);
+  else if(!target->guard.is_true())
+    return convert_goto_if(target, upper_bound, dest);
+  else
+    return convert_goto_goto(target, dest);
+}
+
+/*******************************************************************\
+
+Function: goto_program2codet::convert_goto_while
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
+goto_programt::const_targett goto_program2codet::convert_goto_while(
+    goto_programt::const_targett target,
+    goto_programt::const_targett loop_end,
+    codet &dest)
+{
+  assert(loop_end->is_goto());
+
+  if(target==loop_end) // 1: GOTO 1
+    return convert_goto_goto(target, dest);
+
+  code_whilet w;
+  w.cond()=not_exprt(target->guard);
+  simplify(w.cond(), ns);
+  w.body()=code_blockt();
+
+  for(++target; target!=loop_end; ++target)
+    target=convert_instruction(target, loop_end, w.body());
+
+  convert_labels(loop_end, w.body());
+
+  dest.move_to_operands(w);
+  return target;
+}
+
+/*******************************************************************\
+
+Function: goto_program2codet::convert_goto_if
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
+goto_programt::const_targett goto_program2codet::convert_goto_if(
+    goto_programt::const_targett target,
+    goto_programt::const_targett upper_bound,
+    codet &dest)
+{
+  goto_programt::const_targett else_case=target->targets.front();
+  goto_programt::const_targett before_else=else_case;
+  goto_programt::const_targett end_if=target->targets.front();
+  assert(end_if!=goto_program.instructions.end());
+  bool has_else=false;
+
+  if(!target->is_backwards_goto())
+  {
+    assert(else_case!=goto_program.instructions.begin());
+    --before_else;
+
+    // goto 1
+    // 1: ...
+    if(before_else==target)
+    {
+      dest.copy_to_operands(code_skipt());
+      return target;
+    }
+
+    has_else=before_else->is_goto() &&
+      !before_else->is_backwards_goto() &&
+      before_else->guard.is_true();
+    if(has_else)
+    {
+      assert(before_else->targets.size()==1);
+      end_if=before_else->targets.front();
+    }
+  }
+
+  code_ifthenelset i;
+  i.operands().resize(2);
+  i.then_case()=code_blockt();
+
+  // some nesting of loops and branches we might not be able to deal with
+  if(target->is_backwards_goto() ||
+      (upper_bound!=goto_program.instructions.end() &&
+       upper_bound->location_number < end_if->location_number))
+    return convert_goto_goto(target, dest);
+
+  i.cond()=not_exprt(target->guard);
+  simplify(i.cond(), ns);
+  if(has_else)
+  {
+    i.operands().resize(3);
+    i.else_case()=code_blockt();
+  }
+
+  if(has_else)
+  {
+    for(++target; target!=before_else; ++target)
+      target=convert_instruction(target, before_else, i.then_case());
+    convert_labels(before_else, i.then_case());
+    for(++target; target!=end_if; ++target)
+      target=convert_instruction(target, end_if, i.else_case());
+  }
+  else
+    for(++target; target!=end_if; ++target)
+      target=convert_instruction(target, end_if, i.then_case());
+
+  dest.move_to_operands(i);
+  return --target;
+}
+
+/*******************************************************************\
+
+Function: goto_program2codet::convert_goto_goto
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
+goto_programt::const_targett goto_program2codet::convert_goto_goto(
+    goto_programt::const_targett target,
+    codet &dest)
+{
+  std::stringstream label;
+  label <<"L" << target->targets.front()->target_number;
+  codet goto_code(ID_goto);
+  goto_code.set(ID_destination, label.str());
+
+  labels_in_use.insert(label.str());
+
+  if(!target->guard.is_true())
+  {
+    code_ifthenelset i;
+    i.operands().resize(2);
+
+    i.cond()=target->guard;
+    i.then_case().swap(goto_code);
+
+    dest.move_to_operands(i);
+  }
+  else
+    dest.move_to_operands(goto_code);
+
+  return target;
+}
+
+/*******************************************************************\
+
+Function: goto_program2codet::convert_start_thread
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
+goto_programt::const_targett goto_program2codet::convert_start_thread(
+    goto_programt::const_targett target,
+    goto_programt::const_targett upper_bound,
+    codet &dest)
+{
+  assert(target->is_start_thread());
+  // we only do one target now
+  assert(target->targets.size()==1);
+
+  // code is supposed to look like this:
+  // __CPROVER_ASYNC_0: START THREAD 1
+  // GOTO 2
+  // 1: code in new thread
+  // END THREAD
+  // 2: code in existing thread
+  /* check the structure and compute the iterators */
+  goto_programt::const_targett next=target;
+  ++next;
+  assert(next!=goto_program.instructions.end());
+  assert(next->is_goto() && next->guard.is_true());
+  assert(next->targets.size()==1 && !next->is_backwards_goto());
+
+  goto_programt::const_targett thread_start=target->targets.front();
+  assert(thread_start->location_number > target->location_number);
+  assert(thread_start->location_number < next->targets.front()->location_number);
+  goto_programt::const_targett after_thread_start=thread_start;
+  ++after_thread_start;
+
+  goto_programt::const_targett thread_end=next->targets.front();
+  --thread_end;
+  assert(thread_start->location_number < thread_end->location_number);
+  assert(thread_end->is_end_thread());
+
+  assert(upper_bound==goto_program.instructions.end() ||
+      thread_end->location_number < upper_bound->location_number);
+  /* end structure check */
+
+  // use pthreads if "code in new thread" is a function call to a function with
+  // suitable signature
+  if(thread_start->is_function_call() &&
+      to_code_function_call(to_code(thread_start->code)).arguments().size()==1 &&
+      after_thread_start==thread_end)
+  {
+    const code_function_callt &cf=
+      to_code_function_call(to_code(thread_start->code));
+
+    system_headers.insert("pthread.h");
+
+    code_function_callt f;
+    // we don't bother setting the type
+    f.lhs()=cf.lhs();
+    f.function()=symbol_exprt("pthread_create", code_typet());
+    exprt n=null_pointer_exprt(pointer_typet(empty_typet()));
+    f.arguments().push_back(n);
+    f.arguments().push_back(n);
+    f.arguments().push_back(cf.function());
+    f.arguments().push_back(cf.arguments().front());
+
+    dest.move_to_operands(f);
+    return thread_end;
+  }
+
+  codet b=code_blockt();
+  for( ; thread_start!=thread_end; ++thread_start)
+    thread_start=convert_instruction(thread_start, upper_bound, b);
+
+  for(goto_programt::instructiont::labelst::const_iterator
+      it=target->labels.begin();
+      it!=target->labels.end();
+      ++it)
+    if(has_prefix(it->as_string(), "__CPROVER_ASYNC_"))
+    {
+      labels_in_use.insert(*it);
+
+      code_labelt l;
+      l.set_label(*it);
+      l.code().swap(b);
+      b.swap(l);
+    }
+
+  assert(b.get_statement()==ID_label);
+  dest.move_to_operands(b);
+  return thread_end;
+}
+
+/*******************************************************************\
+
+Function: goto_program2codet::cleanup_code
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
+void goto_program2codet::cleanup_code(
+    codet &code,
+    const bool is_top)
+{
+  Forall_operands(it, code)
+    if(it->id()==ID_code)
+      cleanup_code(to_code(*it), false);
+
+  const irep_idt &statement=code.get_statement();
+  if(statement==ID_label)
+  {
+    const irep_idt &label=to_code_label(code).get_label();
+    if(labels_in_use.find(label)==labels_in_use.end())
+    {
+      codet tmp;
+      tmp.swap(to_code_label(code).code());
+      code.swap(tmp);
+    }
+  }
+  else if(statement==ID_block)
+    cleanup_code_block(code, is_top);
+  else if(statement==ID_ifthenelse)
+    cleanup_code_ifthenelse(code);
+}
+
+/*******************************************************************\
+
+Function: goto_program2codet::cleanup_code_block
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
+void goto_program2codet::cleanup_code_block(
+    codet &code,
+    const bool is_top)
+{
+  assert(code.get_statement()==ID_block);
+
+  exprt::operandst &operands=code.operands();
+  for(exprt::operandst::size_type i=0;
+      operands.size()>1 && i<operands.size();
+     ) // no ++i
+  {
+    exprt::operandst::iterator it=operands.begin()+i;
+    if(to_code(*it).get_statement()==ID_skip)
+      operands.erase(it);
+    else
+      ++i;
+  }
+
+  if(operands.empty() && !is_top)
+    code=code_skipt();
+  else if(operands.size()==1 && !is_top)
+  {
+    codet tmp;
+    tmp.swap(code.op0());
+    code.swap(tmp);
+  }
+}
+
+/*******************************************************************\
+
+Function: has_labels
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
+static bool has_labels(const codet &code)
+{
+  if(code.get_statement()==ID_label)
+    return true;
+
+  forall_operands(it, code)
+    if(it->id()==ID_code && has_labels(to_code(*it)))
+      return true;
+
+  return false;
+}
+
+/*******************************************************************\
+
+Function: goto_program2codet::cleanup_code_ifthenelse
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
+void goto_program2codet::cleanup_code_ifthenelse(codet &code)
+{
+  code_ifthenelset &i_t_e=to_code_ifthenelse(code);
+
+  // assert(false) expands to if(true) assert(false), simplify again (and also
+  // simplify other cases)
+  if(i_t_e.cond().is_true() &&
+      (code.operands().size()==2 || !has_labels(i_t_e.else_case())))
+  {
+    codet tmp;
+    tmp.swap(i_t_e.then_case());
+    code.swap(tmp);
+  }
+  else if(i_t_e.cond().is_false() && !has_labels(i_t_e.then_case()))
+  {
+    if(code.operands().size()==2)
+      code=code_skipt();
+    else
+    {
+      codet tmp;
+      tmp.swap(i_t_e.else_case());
+      code.swap(tmp);
+    }
+  }
+  else if(i_t_e.then_case().get_statement()==ID_ifthenelse)
+  {
+    // we re-introduce 1-code blocks with if-then-else to avoid dangling-else
+    // ambiguity
+    code_blockt b;
+    b.move_to_operands(i_t_e.then_case());
+    i_t_e.then_case().swap(b);
+  }
+}
+
+
+
+class goto2sourcet
 {
 public:
-  goto2cppt(
+  goto2sourcet(
     const goto_functionst &_goto_functions,
-    const namespacet &_ns):
+    const namespacet &_ns,
+    language_factoryt factory):
     goto_functions(_goto_functions),
-    ns(_ns)
+    copied_context(_ns.get_context()),
+    ns(copied_context),
+    language(factory())
   {
+  }
+
+  virtual ~goto2sourcet()
+  {
+    delete language;
   }
 
   void operator()(std::ostream &out);
 
 protected:
-  std::string type_to_string(const typet &);
-  std::string expr_to_string(const exprt &);
+  const goto_functionst &goto_functions;
+  contextt copied_context;
+  const namespacet ns;
+  languaget *language;
 
+  typedef hash_set_cont<irep_idt, irep_id_hash> convertedt;
+  convertedt converted;
+
+  std::set<std::string> system_headers;
+
+  std::string type_to_string(const typet &type);
+  std::string expr_to_string(const exprt &expr);
+  static bool ignore(const irep_idt &identifier);
+
+  static std::string indent(const unsigned n)
+  {
+    return std::string(2*n, ' ');
+  }
+
+  std::ostream& print_function_declaration(
+    const irep_idt& identifier,
+    const code_typet &type,
+    const unsigned ptr_level,
+    std::ostream &os);
+
+  void convert_compound_declaration(
+      const symbolt &symbol,
+      std::ostream &os_decl,
+      std::ostream &os_body,
+      hash_map_cont<irep_idt, std::list<irep_idt>, irep_id_hash> &local_type_decls);
+  void convert_compound_rec(
+      const typet &type,
+      std::ostream &os);
+  void convert_compound_rec(
+      const struct_union_typet &type,
+      std::ostream &os);
+
+  void convert_global_variable(
+      const symbolt &symbol,
+      std::ostream &os,
+      hash_map_cont<irep_idt, code_blockt, irep_id_hash> &local_static_decls);
+
+  void convert_function_declaration(
+      const symbolt &symbol,
+      std::ostream &os_decl,
+      std::ostream &os_body,
+      const std::list<irep_idt> &local_type_decls,
+      const code_blockt &local_static_decls);
+
+  void cleanup_expr(exprt &expr);
+  typedef hash_map_cont<typet, unsigned, irep_hash> anon_mapt;
+  anon_mapt anon_renaming;
+  irep_idt get_anon_name(const typet& type);
+  void cleanup_type(typet &type);
+
+#if 0
   std::string implicit_declarations(const exprt &expr);
   
   std::string nondet_suffix(const typet &type);
-
-  void convert_compound_declarations(
-    std::ostream &os_decl,
-    std::ostream &os_body);
-
-  bool supress(const irep_idt &identifier);
- 
-  void convert_global_variables(std::ostream &os);
-
-  void convert_function_declarations(
-    std::ostream &os_decl,
-    std::ostream &os_body);
-
-  void convert_instructions(
-    const goto_programt &goto_program,
-    std::ostream &os);
-
-  void convert_compound_rec(
-    const typet &struct_type,
-    std::ostream &os);
-
-  const goto_functionst &goto_functions;
-  const namespacet &ns;
 
   irep_idt unique_name(const irep_idt name);
 
@@ -152,14 +1219,25 @@ protected:
   std::map<irep_idt, irep_idt> global_renaming;
   std::map<irep_idt, irep_idt> local_renaming;
 
-  std::set<std::string> system_headers;
   std::stringstream typedef_stream;          // for types
   std::stringstream global_constant_stream;  // for numerical constants
 
-  std::set<irep_idt> converted;
+#endif
 };
 
-inline std::ostream &operator << (std::ostream &out, goto2cppt &src)
+/*******************************************************************\
+
+Function: operator<<
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
+inline std::ostream &operator << (std::ostream &out, goto2sourcet &src)
 {
   src(out);
   return out;
@@ -167,7 +1245,7 @@ inline std::ostream &operator << (std::ostream &out, goto2cppt &src)
 
 /*******************************************************************\
 
-Function: goto2cppt::operator()
+Function: goto2sourcet::operator()
 
 Inputs:
 
@@ -177,50 +1255,119 @@ Purpose:
 
 \*******************************************************************/
 
-void goto2cppt::operator()(std::ostream &os)
+void goto2sourcet::operator()(std::ostream &os)
 {
+  std::stringstream func_decl_stream;
   std::stringstream compound_body_stream;
   std::stringstream global_var_stream;
   std::stringstream func_body_stream;
+  hash_map_cont<irep_idt, std::list<irep_idt>, irep_id_hash> local_type_decls;
+  hash_map_cont<irep_idt, code_blockt, irep_id_hash> local_static_decls;
 
-  convert_compound_declarations(os, compound_body_stream);
+  // replace all #anon and prepare lexicographic order
+  std::set<std::string> symbols_sorted;
+  Forall_symbols(it, copied_context.symbols)
+  {
+    cleanup_type(it->second.type);
+    if(!symbols_sorted.insert(it->first.as_string()).second)
+      assert(false);
+  }
 
-  convert_global_variables(global_var_stream);
-  convert_function_declarations(os, func_body_stream);
+  // collect all declarations we might need, include local static variables
+  for(std::set<std::string>::const_iterator
+      it=symbols_sorted.begin();
+      it!=symbols_sorted.end();
+      ++it)
+  {
+    const symbolt &symbol=ns.lookup(*it);
 
+    if(symbol.is_type &&
+        (symbol.type.id()==ID_struct ||
+         symbol.type.id()==ID_incomplete_struct ||
+         symbol.type.id()==ID_union ||
+         symbol.type.id()==ID_incomplete_union))
+      convert_compound_declaration(
+          symbol,
+          os,
+          compound_body_stream,
+          local_type_decls);
+    else if(symbol.is_static_lifetime && symbol.type.id()!=ID_code)
+      convert_global_variable(
+          symbol,
+          global_var_stream,
+          local_static_decls);
+  }
+
+  // function declarations and definitions
+  for(std::set<std::string>::const_iterator
+      it=symbols_sorted.begin();
+      it!=symbols_sorted.end();
+      ++it)
+  {
+    const symbolt &symbol=ns.lookup(*it);
+
+    if(symbol.type.id()==ID_code)
+      convert_function_declaration(
+          symbol,
+          func_decl_stream,
+          func_body_stream,
+          local_type_decls[symbol.base_name],
+          local_static_decls[symbol.base_name]);
+  }
+
+  os << std::endl;
   for(std::set<std::string>::const_iterator
       it=system_headers.begin();
       it!=system_headers.end();
       ++it)
     os << "#include <" << *it << ">" << std::endl;
+  os << "#ifndef TRUE" << std::endl
+     << "#define TRUE 1" << std::endl
+     << "#endif" << std::endl;
+  os << "#ifndef FALSE" << std::endl
+     << "#define FALSE 0" << std::endl
+     << "#endif" << std::endl;
+  os << "#ifndef NULL" << std::endl
+     << "#define NULL ((void*)0)" << std::endl
+     << "#endif" << std::endl;
+  os << "#ifndef FENCE" << std::endl
+     << "#define FENCE(x) ((void)0)" << std::endl
+     << "#endif" << std::endl;
+  os << std::endl;
 
+#if 0
   os << typedef_stream.str();
   os << std::endl;
   typedef_stream.clear();
+#endif
 
+  os << func_decl_stream.str();
+  os << std::endl;
   os << compound_body_stream.str();
-  compound_body_stream.clear();
+  os << std::endl;
 
+#if 0
   os << global_constant_stream.str();
   global_constant_stream.clear();
+#endif
 
   os << global_var_stream.str();
-  global_var_stream.clear();
-
+  os << std::endl;
   os << func_body_stream.str();
-  func_body_stream.clear();
 
+#if 0
   if(config.main!="c::main" && config.main!="")
     os << "int main(int argc, const char *argv[])" << std::endl
        << "{" << std::endl
        << indent(1) << config.main << "();" << std::endl
        << indent(1) << "return 0;" << std::endl
        << "}" << std::endl;
+#endif
 }
 
 /*******************************************************************\
 
-Function: goto2cppt::convert_compound_declarations
+Function: goto2sourcet::print_function_declaration
 
 Inputs:
 
@@ -230,38 +1377,136 @@ Purpose:
 
 \*******************************************************************/
 
-void goto2cppt::convert_compound_declarations(
-  std::ostream &os_decl,
-  std::ostream &os_body)
+std::ostream& goto2sourcet::print_function_declaration(
+    const irep_idt& identifier,
+    const code_typet &type,
+    const unsigned ptr_level,
+    std::ostream &os)
 {
-  // declare compound types
-  forall_symbols(it, ns.get_context().symbols)
+  std::string rett=type_to_string(type.return_type());
+  if(type.return_type().id()==ID_pointer &&
+      type.return_type().subtype().id()==ID_code)
   {
-    const symbolt &symbol = it->second;
+    static unsigned func_ptr_cnt=0;
+    std::stringstream typedef_str;
+    typedef_str << "typedef_func_ptr$" << func_ptr_cnt++;
+    std::string::size_type name_pos=rett.find("(*)(");
+    rett.insert(name_pos+2, typedef_str.str());
 
-    if(!symbol.is_type ||
-        (symbol.type.id()!=ID_struct &&
-         symbol.type.id()!=ID_union &&
-         symbol.type.id()!=ID_class))
-      continue;
+    os << "typedef " << rett << ";" << std::endl;
+    rett=typedef_str.str();
+  }
+  os << rett << " ";
 
-    irep_idt name=unique_name(symbol.base_name);
-    global_renaming[symbol.name]=name;
+  std::string short_name=id2string(identifier);
+  std::string::size_type pos=short_name.rfind("::");
+  if(pos!=std::string::npos)
+    short_name.erase(0, pos+2);
+  if(ptr_level>0)
+    os << "(" << std::string(ptr_level, '*') << short_name << ")";
+  else
+    os << short_name;
 
-    os_decl << "// " << id2string(symbol.name) << std::endl;
-    os_decl << "// " << symbol.location.as_string() << std::endl;
-    os_decl << "struct " << name << ";\n" << std::endl;
+  os << "(";
+  for(code_typet::argumentst::const_iterator
+      it=type.arguments().begin();
+      it!=type.arguments().end();
+      ++it)
+  {
+    if(it!=type.arguments().begin())
+      os << ", ";
 
-    // do compound type body
-    convert_compound_rec(symbol.type,os_body);
+    const code_typet::argumentt &arg=*it;
+    const symbolt *arg_symb=0;
+    ns.lookup(arg.get_identifier(), arg_symb);
+
+    const typet * t_p=&(arg.type());
+    unsigned n_ptr=0;
+    while(t_p->id()==ID_pointer)
+    {
+      ++n_ptr;
+      t_p=&(t_p->subtype());
+    }
+
+    if(t_p->id()==ID_code && n_ptr>0)
+    {
+      print_function_declaration(
+          arg_symb ? arg_symb->base_name : "",
+          to_code_type(*t_p),
+          n_ptr,
+          os);
+    }
+    else
+    {
+      if(arg_symb)
+      {
+        symbol_exprt s(arg_symb->name, arg.type());
+        if(has_prefix(arg_symb->base_name.as_string(), "#anon"))
+        {
+          std::string new_name=id2string(arg_symb->name);
+          std::string::size_type pos=new_name.find("#anon");
+          assert(pos!=std::string::npos);
+          new_name[pos]='$';
+          s.set_identifier(new_name);
+        }
+
+        std::string d_str=expr_to_string(code_declt(s));
+        assert(!d_str.empty());
+        os << d_str.substr(0, d_str.size()-1);
+      }
+      else
+      {
+        os << type_to_string(arg.type());
+      }
+    }
+  }
+  if(type.has_ellipsis() && !type.arguments().empty())
+    os << ", ...";
+  os << ")";
+
+  return os;
+}
+
+/*******************************************************************\
+
+Function: goto2sourcet::convert_compound_declarations
+
+Inputs:
+
+Outputs:
+
+Purpose: declare compound types
+
+\*******************************************************************/
+
+void goto2sourcet::convert_compound_declaration(
+    const symbolt &symbol,
+    std::ostream &os_decl,
+    std::ostream &os_body,
+    hash_map_cont<irep_idt, std::list<irep_idt>, irep_id_hash> &local_type_decls)
+{
+  if(!symbol.type.location().get_function().empty())
+  {
+    local_type_decls[symbol.type.location().get_function()].push_back(symbol.name);
+    return;
   }
 
-  os_decl << std::endl << std::endl;
+  // do compound type body
+  if(symbol.type.id()!=ID_incomplete_struct &&
+      symbol.type.id()!=ID_incomplete_union)
+    convert_compound_rec(
+        to_struct_union_type(symbol.type),
+        os_body);
+
+  os_decl << "// " << symbol.name << std::endl;
+  os_decl << "// " << symbol.type.location() << std::endl;
+  os_decl << type_to_string(symbol.type) << ";" << std::endl;
+  os_decl << std::endl;
 }
 
 /*******************************************************************\
 
-Function: goto2cppt::convert_compound_rec
+Function: goto2sourcet::convert_compound_rec
 
 Inputs:
 
@@ -271,34 +1516,46 @@ Purpose:
 
 \*******************************************************************/
 
-void goto2cppt::convert_compound_rec(
+void goto2sourcet::convert_compound_rec(
   const typet &type,
   std::ostream &os)
 {
-  typet final_type = ns.follow(type);
+  if(type.id()==ID_symbol)
+    convert_compound_rec(ns.follow(type), os);
+  else if(type.id()==ID_array || type.id()==ID_pointer)
+    convert_compound_rec(type.subtype(), os);
+  else if(type.id()==ID_struct || type.id()==ID_union)
+    convert_compound_rec(to_struct_union_type(type), os);
+}
 
-  if(final_type.id() == ID_array)
-  {
-    convert_compound_rec(final_type.subtype(), os);
-    return;
-  }
-  else if(final_type.id() != ID_struct &&
-          final_type.id() != ID_union &&
-          final_type.id() != ID_class)
-    return;
+/*******************************************************************\
 
-  struct_union_typet struct_type=to_struct_union_type(final_type);
-  irep_idt name=global_renaming[struct_type.get(ID_name)];
-  assert(!name.empty());
+Function: goto2sourcet::convert_compound_rec
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
+void goto2sourcet::convert_compound_rec(
+  const struct_union_typet &type,
+  std::ostream &os)
+{
+  const irep_idt &name=type.get(ID_tag);
 
   if(!converted.insert(name).second)
     return;
 
-  const irept& bases = struct_type.find(ID_bases);
-  std::string base_decls;
+  const irept &bases = type.find(ID_bases);
+  std::stringstream base_decls;
   forall_irep(parent_it, bases.get_sub())
   {
-    assert(parent_it->id() == "base");
+    assert(false);
+    /*
+    assert(parent_it->id() == ID_base);
     assert(parent_it->get(ID_type) == ID_symbol);
 
     const irep_idt &base_id=
@@ -306,10 +1563,11 @@ void goto2cppt::convert_compound_rec(
     const irep_idt &renamed_base_id=global_renaming[base_id];
     const symbolt &parsymb=ns.lookup(renamed_base_id);
 
-    convert_compound_rec(parsymb.type,os);
+    convert_compound_rec(parsymb.type, os);
 
-    base_decls += renamed_base_id.as_string() +
+    base_decls << renamed_base_id.as_string() +
       (parent_it+1==bases.get_sub().end()?"":", ");
+      */
   }
 
   /*
@@ -331,76 +1589,103 @@ void goto2cppt::convert_compound_rec(
   */
 
   std::stringstream struct_body;
-
   for(struct_union_typet::componentst::const_iterator
-      it=struct_type.components().begin();
-      it!=struct_type.components().end();
+      it=type.components().begin();
+      it!=type.components().end();
       it++)
   {
-    const struct_typet::componentt& compo = *it;
+    const struct_typet::componentt& comp=*it;
+    typet comp_type=ns.follow(comp.type());
 
-    if(compo.type().id() == ID_code ||
-        compo.get_bool("from_base"))
+    if(comp_type.id()==ID_code ||
+        comp.get_bool(ID_from_base) ||
+        comp.get_is_padding())
       continue;
 
-    convert_compound_rec(compo.type(), os);
+    convert_compound_rec(comp_type, os);
 
-    irep_idt renamed_compo_id = unique_name(compo.get(ID_base_name));
-    global_renaming[compo.get(ID_name)] = renamed_compo_id;
+    const irep_idt &comp_name=comp.get_name();
+    struct_body << indent(1) << "// " << comp_name << std::endl;
+    struct_body << indent(1);
 
-    struct_body << indent(1) << "// " << compo.get(ID_name) << std::endl;
-
-    if(compo.type().id() == ID_pointer && 
-       compo.type().subtype().id() == ID_code)
+    const typet * t_p=&comp_type;
+    unsigned n_ptr=0;
+    while(t_p->id()==ID_pointer)
     {
-      const code_typet &code_type=to_code_type(compo.type().subtype());
-
-      struct_body << indent(1)
-                  << type_to_string(code_type.return_type())
-                  << " ( * " << renamed_compo_id << ") (";
-
-      for(code_typet::argumentst::const_iterator
-          it=code_type.arguments().begin();
-          it!=code_type.arguments().end();
-          ++it)
-        struct_body << type_to_string(it->type()) <<
-          (it+1==code_type.arguments().end()?"":", ");
-
-      struct_body << ");" << std::endl;
+      ++n_ptr;
+      t_p=&(t_p->subtype());
     }
+
+    if(t_p->id()==ID_code && n_ptr>0)
+      print_function_declaration(
+          comp_name,
+          to_code_type(*t_p),
+          n_ptr,
+          struct_body) << ";";
     else
     {
-      struct_body << indent(1) << type_to_string(compo.type())
-                  << " " << renamed_compo_id <<  ";" << std::endl;
+      symbol_exprt sym(comp_name, comp_type);
+      code_declt d(sym);
+      std::string s=expr_to_string(d);
+      if(s.find("__CPROVER_bitvector")==std::string::npos)
+        struct_body << s;
+      else if(comp_type.id()==ID_signedbv)
+      {
+        const signedbv_typet &t=to_signedbv_type(comp_type);
+        if(t.get_width()<=config.ansi_c.long_long_int_width)
+          struct_body << "long long int " << expr_to_string(sym)
+            << " : " << t.get_width() << ";";
+        else
+          assert(false);
+      }
+      else if(comp_type.id()==ID_unsignedbv)
+      {
+        const unsignedbv_typet &t=to_unsignedbv_type(comp_type);
+        if(t.get_width()<=config.ansi_c.long_long_int_width)
+          struct_body << "unsigned long long " << expr_to_string(sym)
+            << " : " << t.get_width() << ";";
+        else
+          assert(false);
+      }
+      else
+        assert(false);
     }
+    struct_body << std::endl;
   }
 
-  os << "struct " << name ;
-  if(!base_decls.empty())
-    os << ": " << base_decls;
+  os << type_to_string(type);
+  if(!base_decls.str().empty())
+  {
+    assert(language->id()=="cpp");
+    os << ": " << base_decls.str();
+  }
   os << std::endl;
   os << "{" << std::endl;
   os << struct_body.str();
 
   /*
-  if(!struct_type.components().empty())
-  {
-    os << indent << name << "(){}\n";
-    os << indent << "explicit " << name
-       << "(" + constructor_args + ")\n";
-    os << indent << "{\n";
-    os << constructor_body;
-    os << indent << "}\n";
-  }
-  */
+     if(!struct_type.components().empty())
+     {
+     os << indent << name << "(){}\n";
+     os << indent << "explicit " << name
+     << "(" + constructor_args + ")\n";
+     os << indent << "{\n";
+     os << constructor_body;
+     os << indent << "}\n";
+     }
+     */
 
-  os << "};" << std::endl;
+  os << "}";
+  if(ns.follow(type).get_bool(ID_C_transparent_union))
+    os << " __attribute__ ((__transparent_union__))";
+  os << ";";
+  os << std::endl;
   os << std::endl;
 }
 
 /*******************************************************************\
 
-Function: goto2cppt::supress
+Function: goto2sourcet::supress
 
 Inputs:
 
@@ -410,21 +1695,21 @@ Purpose:
 
 \*******************************************************************/
 
-bool goto2cppt::supress(const irep_idt &identifier)
+bool goto2sourcet::ignore(const irep_idt &identifier)
 {
-  // we supress some
-  if(has_prefix(id2string(identifier), "c::__CPROVER_") ||
+  return (has_prefix(id2string(identifier), "c::__CPROVER_") ||
      identifier=="c::__func__" ||
      identifier=="c::__FUNCTION__" ||
-     identifier=="c::__PRETTY_FUNCTION__")
-    return true;
-    
-  return false;
+     identifier=="c::__PRETTY_FUNCTION__" ||
+     identifier=="c::argc'" ||
+     identifier=="c::argv'" ||
+     identifier=="c::envp'" ||
+     identifier=="c::envp_size'");
 }
 
 /*******************************************************************\
 
-Function: goto2cppt::convert_global_variables
+Function: goto2sourcet::convert_global_variables
 
 Inputs:
 
@@ -434,34 +1719,50 @@ Purpose:
 
 \*******************************************************************/
 
-void goto2cppt::convert_global_variables(std::ostream &os)
+void goto2sourcet::convert_global_variable(
+    const symbolt &symbol,
+    std::ostream &os,
+    hash_map_cont<irep_idt, code_blockt, irep_id_hash> &local_static_decls)
 {
-  forall_symbols(it, ns.get_context().symbols)
+  // we suppress some declarations
+  if(ignore(symbol.name))
+    return;
+
+  if(symbol.location.get_function().empty() &&
+      !converted.insert(symbol.name).second)
+    return;
+
+  code_declt d(symbol.symbol_expr());
+  if(!symbol.value.is_nil())
   {
-    const symbolt &symbol=it->second;
-    
-    if(!symbol.is_static_lifetime)
-      continue;
-      
-    irep_idt renamed_id=unique_name(symbol.base_name);
-    global_renaming[symbol.name]=renamed_id;
+    d.copy_to_operands(symbol.value);
 
-    // we supress some declarations
-    if(supress(symbol.name))
-      continue;
+    find_symbols_sett syms;
+    find_symbols(symbol.value, syms);
+    for(find_symbols_sett::const_iterator
+        it=syms.begin();
+        it!=syms.end();
+        ++it)
+    {
+      const symbolt &sym=ns.lookup(*it);
+      if(!sym.is_type && sym.is_static_lifetime && sym.type.id()!=ID_code)
+        convert_global_variable(sym, os, local_static_decls);
+    }
+  }
 
+  if(!symbol.location.get_function().empty())
+    local_static_decls[symbol.location.get_function()].move_to_operands(d);
+  else
+  {
     os << "// " << symbol.name << std::endl;
-    os << "// " << symbol.location.as_string() << std::endl;
-
-    os << type_to_string(symbol.type) << " "
-       << renamed_id << ";" << std::endl;
-    os << std::endl;
+    os << "// " << symbol.location << std::endl;
+    os << expr_to_string(d) << std::endl;
   }
 }
 
 /*******************************************************************\
 
-Function: goto2cppt::convert_function_declarations
+Function: goto2sourcet::convert_function_declarations
 
 Inputs:
 
@@ -471,138 +1772,84 @@ Purpose:
 
 \*******************************************************************/
 
-void goto2cppt::convert_function_declarations(
-  std::ostream &os_decl,
-  std::ostream &os_body)
+void goto2sourcet::convert_function_declaration(
+    const symbolt& symbol,
+    std::ostream &os_decl,
+    std::ostream &os_body,
+    const std::list<irep_idt> &local_type_decls,
+    const code_blockt &local_static_decls)
 {
-  // declare all functions
-  for(goto_functionst::function_mapt::const_iterator
-      it=goto_functions.function_map.begin();
-      it!=goto_functions.function_map.end();
-      it++)
+  const code_typet &code_type=to_code_type(symbol.type);
+
+  if(symbol.name!="main" &&
+      symbol.name!="c::main" &&
+      symbol.name!="c::__CPROVER_initialize" &&
+      symbol.name!="c::assert" &&
+      symbol.name!="c::__assert_rtn" &&
+      symbol.name!="c::__CPROVER_assert" &&
+      symbol.name!="c::__CPROVER_assume")
   {
-    const symbolt &symb=ns.lookup(it->first);
+    os_decl << "// " << symbol.name << std::endl;
+    os_decl << "// " << symbol.location << std::endl;
 
-    const goto_functionst::goto_functiont &goto_function=it->second;
-
-    if(!goto_function.body_available)
-      continue;
-
-    irep_idt renamed_function_id=unique_name(symb.base_name);
-    global_renaming[symb.name]=renamed_function_id;
-   
-    if(it->first=="main")
-      continue;
-  
-    const code_typet &code_type=to_code_type(symb.type);
-    os_decl << "// " << symb.name << std::endl;
-    os_decl << "// " << symb.location.as_string() << std::endl;
-
-    //symb.type.get_bool(ID_C_inlined);
-    //os_decl << "inline ";
-    os_decl << type_to_string(code_type.return_type()) << " "
-            << renamed_function_id;
-
-    os_decl << "(";
-    
-    if(code_type.arguments().empty())
-      os_decl << "void";
-    else
-    {
-      for(unsigned i=0; i<code_type.arguments().size(); i++)
-      {
-        if(i!=0) os_decl << ", ";
-        os_decl << type_to_string(code_type.arguments()[i].type());
-      }
-    }
-    
-    os_decl << ");" << std::endl << std::endl;
+    print_function_declaration(
+        symbol.name,
+        code_type,
+        0,
+        os_decl) << ";" << std::endl;
   }
 
-  // do function bodies
-  for(goto_functionst::function_mapt::const_iterator
-      it=goto_functions.function_map.begin();
-      it!=goto_functions.function_map.end();
-      it++)
+  goto_functionst::function_mapt::const_iterator func_entry=
+    goto_functions.function_map.find(symbol.name);
+  if(func_entry==goto_functions.function_map.end() ||
+      !func_entry->second.body_available)
+    return;
+
+  // don't dump artificial main
+  if(symbol.name=="main" &&
+      (config.main=="c::main" || config.main==""))
+    return;
+
+  // don't dump __CPROVER_initialize
+  if(symbol.name=="c::__CPROVER_initialize")
+    return;
+
+  code_blockt b(local_static_decls);
+  goto_program2codet p2s(
+      func_entry->second.body,
+      copied_context,
+      b,
+      local_type_decls,
+      system_headers);
+  p2s();
+
+  os_body << "// " << symbol.name << std::endl;
+  os_body << "// " << symbol.location << std::endl;
+  print_function_declaration(
+      symbol.name,
+      code_type,
+      0,
+      os_body) << std::endl;
+  os_body << "{";
+
+  convertedt converted_bak(converted);
+  for(std::list<irep_idt>::const_iterator
+      it=local_type_decls.begin();
+      it!=local_type_decls.end();
+      ++it)
   {
-    // reset local renaming
-    local_renaming.clear();
-
-    const goto_functionst::goto_functiont &goto_function=it->second;
-
-    const symbolt &symb=ns.lookup(it->first);
-
-    if(!goto_function.body_available)
-      continue;
-
-    std::map<irep_idt,irep_idt>::const_iterator renaming_it=
-      global_renaming.find(symb.name);
-
-    assert(renaming_it!=global_renaming.end());
-
-    irep_idt renamed_function_id=renaming_it->second;
-    const code_typet &code_type=to_code_type(symb.type);
-
-    os_body << "// " << symb.name << std::endl;
-    os_body << "// " << symb.location.as_string() << std::endl;
-
-    if(symb.name=="main")
-    {
-      os_body << "int main";
-    }
-    else
-    {
-      os_body << type_to_string(code_type.return_type())
-              << " " << renamed_function_id;
-    }
-
-    os_body << "(";
-    
-    if(code_type.arguments().empty())
-      os_body << "void";
-    else
-    {
-      for(unsigned i=0; i<code_type.arguments().size(); i++)
-      {
-        if(i!=0) os_body << ", ";
-      
-        const exprt &arg=code_type.arguments()[i];
-        const symbolt &arg_symb=ns.lookup(arg.get(ID_C_identifier));
-        irep_idt renamed_arg_id=unique_name(arg_symb.base_name);
-        local_renaming[arg_symb.name] = renamed_arg_id;
-
-        if(arg.type().id()==ID_pointer &&
-           arg.type().subtype().id()==ID_code)
-        {
-          const code_typet &code_type=to_code_type(arg.type());
-          std::string ret=type_to_string(code_type.return_type())+
-                          "( "+id2string(renamed_arg_id) + " *)(";
-          for(unsigned i=0; i<code_type.arguments().size(); i++)
-          {
-            if(i!=0) ret+=", ";
-            ret += type_to_string(code_type.arguments()[i].type());
-          }
-          ret += ")";
-        }
-        else
-        {
-          os_body << type_to_string(code_type.arguments()[i].type())
-                  << " " << renamed_arg_id;
-        }
-      }
-    }
-    
-    os_body << ")" << std::endl;
-
-    os_body << "{" << std::endl;
-    convert_instructions(goto_function.body, os_body);
-    os_body << "}" << std::endl << std::endl;
+    os_body << std::endl;
+    convert_compound_rec(ns.lookup(*it).type, os_body);
   }
+  converted.swap(converted_bak);
+
+  os_body << expr_to_string(b).substr(1);
+  os_body << std::endl << std::endl;
 }
 
 /*******************************************************************\
 
-Function: goto2cppt::convert_instructions
+Function: goto2sourcet::cleanup_expr
 
 Inputs:
 
@@ -612,432 +1859,58 @@ Purpose:
 
 \*******************************************************************/
 
-void goto2cppt::convert_instructions(
-  const goto_programt &goto_program,
-  std::ostream &os)
+void goto2sourcet::cleanup_expr(exprt &expr)
 {
-  std::stringstream decl_stream; // for local declarations
-  std::stringstream inst_stream; // for instructions
-  unsigned thread_vars=0;
+  Forall_operands(it, expr)
+    cleanup_expr(*it);
 
-  forall_goto_program_instructions(target, goto_program)
+  cleanup_type(expr.type());
+
+  if(expr.id()==ID_struct)
   {
-    #ifdef DEBUG
-    goto_program.output_instruction(ns, "", std::cout, target);
-    #endif
+    struct_typet type=
+      to_struct_type(ns.follow(expr.type()));
 
-    std::string location_string=target->location.as_string();
+    struct_union_typet::componentst old_components;
+    old_components.swap(type.components());
 
-    if(target->location.get_line()!="" &&
-       target->location.get_file()!="" )
+    exprt::operandst old_ops;
+    old_ops.swap(expr.operands());
+
+    assert(old_components.size()==old_ops.size());
+    exprt::operandst::iterator o_it=old_ops.begin();
+    for(struct_union_typet::componentst::const_iterator
+        it=old_components.begin();
+        it!=old_components.end();
+        ++it)
     {
-      inst_stream << indent(1) 
-                  << "// " << target->location.as_string() << std::endl;
-      //inst_stream << "#line " 
-      //  << target->location.get_line().as_string() << " \"" << target->location.get_file().as_string() << "\"\n";
+      if(!it->get_is_padding())
+      {
+        type.components().push_back(*it);
+        expr.move_to_operands(*o_it);
+      }
+      ++o_it;
     }
-
-    if(target->is_target())
-      inst_stream << "L" << target->target_number << ":" << std::endl;
-
-    decl_stream << implicit_declarations(target->code);
-
-    switch(target->type)
-    {
-    case GOTO:
-      inst_stream << indent(1);
-
-      if(!target->guard.is_true())
-        inst_stream << "if( " << expr_to_string(target->guard) << " ) ";
-
-      inst_stream << "goto ";
-      assert(target->targets.size() == 1);
-      inst_stream <<"L" << (*target->targets.begin())->target_number <<";" << std::endl;
-      break;
-
-    case RETURN:
-      inst_stream << indent(1) << "return ";
-      if(target->code.operands().size() == 1)
-        inst_stream << expr_to_string(target->code.op0());
-      inst_stream << ";" << std::endl;
-      break;
-
-    case ASSIGN:
-      {
-        if(target->code.op0().id() == "dynamic_size" ||
-           target->code.op0().id() == "valid_object")
-        {
-          // shall we do something else?
-          break;
-        }
-        else if(target->code.op0().id()==ID_index)
-        {
-          const index_exprt &index_expr=to_index_expr(target->code.op0());
-          if(index_expr.array().id()==ID_symbol)
-            if(supress(index_expr.array().get(ID_identifier)))
-              continue;
-        }
-        else if(target->code.op0().id()==ID_symbol)
-        {
-          if(supress(target->code.op0().get(ID_identifier)))
-            continue;
-        }
-
-        const codet &assign = target->code;
-        const exprt &lhs = assign.op0();
-        const exprt &rhs = assign.op1();
-
-        //  assignment of the form `a =  (mask & a) |  ((typecast)b) << right' ?
-        if(lhs.type().id() == ID_unsignedbv &&
-           rhs.id() == ID_bitor &&
-           rhs.operands().size() == 2 &&
-           rhs.op0().id() == ID_bitand &&
-           rhs.op0().operands().size() == 2 &&
-           rhs.op1().id() == ID_shl &&
-           rhs.op1().operands().size() == 2)
-        {
-          const exprt& mask = rhs.op0().op0();
-          const exprt& a = rhs.op0().op1();
-          exprt b = rhs.op1().op0();
-          const exprt& right = rhs.op1().op1();
-
-          if(mask.id() == ID_constant && a == lhs && right.id() == ID_constant)
-          {
-            const std::string& mask_value = mask.get(ID_value).as_string();
-            
-            unsigned l = 0;
-            for(; l <  mask_value.size() ; l++)
-              if(mask_value[l] == '0')
-                break;
-
-            unsigned r = l;
-            for(; r <  mask_value.size() ; r++)
-              if(mask_value[r] == '1')
-                break;
-
-
-            unsigned trail = r;
-            for(; trail <  mask_value.size();trail++)
-              if(mask_value[trail] == '0')
-                break;
-
-            // because of endidaness...
-            l = mask_value.size() - 1 - l;
-            r = mask_value.size() - r;
-
-            if(trail == mask_value.size())
-            {
-              unsigned shl = atoi(right.get(ID_C_cformat).c_str());
-
-              if(r == shl)
-              {
-                  unsigned width = l-r+1;
-
-                  if(width == 1 &&
-                     b.id() == ID_typecast &&
-                     b.op0().type().id() == ID_bool)
-                  {
-                    inst_stream << indent(1) << expr_to_string(a) <<
-                      ".set_bit(" << shl <<"," <<
-                      expr_to_string(b.op0()) << ");\n" ;
-                    break;
-                  }
-                  
-                  typet new_type(ID_unsignedbv);
-                  new_type.set(ID_width, width);
-
-                  if(b.type() != new_type)
-                  {
-                    if(b.id() == ID_typecast)
-                      b.type() = new_type;
-                    else
-                      b.make_typecast(new_type);
-                  }
-               
-                  inst_stream << indent(1) <<
-                    expr_to_string(a) <<
-                      ".set_range<" << width  <<  ", " << r <<
-                      ">( " <<  expr_to_string(b) << ");\n" ;
-                  break;
-              }
-            }
-          }
-        }
-        
-        if(lhs.type().id() == ID_array && rhs.id() == ID_array)
-        {
-          // array initialization: x = { a, b, c , ... )
-          const array_typet& array_type = to_array_type(lhs.type());
-          mp_integer width = string2integer(array_type.size().get(ID_value).as_string(),2);
-
-          unsigned size = integer2long(width);
-
-          index_exprt index_expr;
-          index_expr.type() = array_type.subtype();
-          index_expr.array() = lhs;
-          index_expr.index() = array_type.size();
-
-          const exprt::operandst&  cst = rhs.operands();
-          assert(cst.size() == size);
-
-          for(unsigned i = 0; i < size; ++i)
-          {
-            index_expr.index().set(ID_value, integer2string(i,2));
-
-            inst_stream << indent(1);
-            inst_stream << expr_to_string(index_expr) << "="
-                        << expr_to_string(cst.at(i)) << ";" << std::endl;
-          }
-          break;
-        }
-
-        inst_stream << indent(1);
-        inst_stream << expr_to_string(target->code.op0()) << "="
-                    << expr_to_string(target->code.op1()) << ";" << std::endl;
-        break;
-      }
-      
-    case FUNCTION_CALL:
-      {
-        inst_stream << indent(1);
-
-        const code_function_callt &code_func=
-          to_code_function_call(to_code(target->code));
-
-        if(code_func.function().id()==ID_symbol)
-        {
-          irep_idt original_id=to_symbol_expr(code_func.function()).get_identifier();
-
-          if(global_renaming.find(original_id)==global_renaming.end())
-          {
-            inst_stream << "// ignoring call to `" << original_id <<"'" << std::endl;
-            break;
-          }
-
-          irep_idt renamed_func_id=global_renaming[original_id];
-          assert(renamed_func_id != "");
-          if(code_func.lhs().is_not_nil())
-            inst_stream << expr_to_string(code_func.lhs()) << " = ";
-          inst_stream <<  renamed_func_id << "(";
-        }
-        else
-        {
-          assert(code_func.function().id() == ID_dereference);
-          if(code_func.lhs().is_not_nil())
-            inst_stream << expr_to_string(code_func.lhs()) << " = ";
-          inst_stream <<  "( " <<  expr_to_string(code_func.function()) << " )(";
-        }
-
-        for(unsigned i=0; i<code_func.arguments().size(); i++)
-        {
-          if(i!=0) inst_stream << ", ";
-          inst_stream << expr_to_string(code_func.arguments()[i]);
-        }
-
-        inst_stream <<");" << std::endl;
-        break;
-      }
-      
-    case SKIP:
-      if(target->is_target())
-        inst_stream << indent(1) << "; // SKIP" << std::endl;
-      break;
-
-    case LOCATION:
-      if(target->is_target())
-        inst_stream << indent(1) << "; // LOCATION" << std::endl;
-      break;
-
-    case ASSERT:
-      system_headers.insert("assert.h");
-      inst_stream
-        << indent(1) 
-        << "assert(" << expr_to_string(target->guard) << ");";
-      
-      if(target->location.get_comment()!="")
-        inst_stream << " // " << target->location.get_comment();
-      
-      inst_stream << std::endl;
-      break;
-
-    case ASSUME:
-      inst_stream
-        << indent(1) 
-        << "__CPROVER_assume(" << expr_to_string(target->guard) << ");"
-        << std::endl;
-      break;
-
-    case END_FUNCTION:
-      if(target->is_target())
-        inst_stream << indent(1) << "; // END_FUNCTION" << std::endl;
-      break;
-
-    case OTHER:
-      {
-        const codet &code=to_code(target->code);
-        irep_idt statement=code.get_statement();
-
-        if(statement==ID_expression)
-        {
-          // expression has no sideeffect
-          if(target->is_target())
-            inst_stream << indent(1) << "; // OTHER/expression\n";
-        }
-        else if(has_prefix(id2string(statement), "assign"))
-        {
-          if(code.op0().id() == "dynamic_size" ||
-             code.op0().id() == "valid_object")
-          {
-            // shall we do something else?
-            break;
-          }
-
-          inst_stream << indent(1);
-
-          std::string statement = id2string(code.get_statement());
-          std::string op_str = statement.substr(std::string("assign").size(), statement.size());
-
-          inst_stream << expr_to_string(target->code.op0()) << " " << op_str << "="
-                      << expr_to_string(target->code.op1()) << ";" << std::endl;
-          break;
-        }
-        else if(statement==ID_nondet)
-        {
-          //ps_irep("code",target->code);
-          // todo: random input
-          throw "Goto2cpp: 'nondet' is not yet implemented\n";
-        }
-        else if(statement==ID_user_specified_predicate)
-        {
-          //ps_irep("code",target->code);
-          // todo: random input
-          throw "Goto2cpp: 'user_specified_predicate' is not yet implemented\n";
-        }
-        else if(statement==ID_fence)
-        {
-          irep_idt att[]=
-            { ID_WRfence, ID_RRfence, ID_RWfence, ID_WWfence,
-              ID_RRcumul, ID_RWcumul, ID_WWcumul, ID_WRcumul,
-              irep_idt() };
-        
-          inst_stream << indent(1);
-          inst_stream << "__CPROVER_fence(";
-
-          bool first=true;
-          
-          for(unsigned i=0; att[i]!=irep_idt(); i++)
-            if(code.get_bool(att[i]))
-            {
-              if(first) first=false; else inst_stream << ", ";
-              inst_stream << "\"" << att[i] << "\"";
-            }
-
-          inst_stream << ");" << std::endl;
-        }
-        else
-        {
-          std::cerr << target->code.pretty() << std::endl;
-          //ps_irep("code",target->code);
-          throw "Goto2cpp: instruction not yet supported\n";
-        }
-        break;
-      }
-
-    case DECL:
-      /* Ignore; implicit_decls finds it */
-      if(target->is_target())
-        inst_stream << indent(1) << "; // DECL\n";
-      break;
-      
-    case START_THREAD:
-      // we only do one target now
-      assert(target->targets.size()==1);
-      inst_stream << indent(1) << "// START_THREAD\n";
-
-      {
-        // try to use pthreads
-        goto_programt::const_targett next=target, next2=target;
-        ++next;
-        ++next2; ++next2;
-        if(next!=goto_program.instructions.end() &&
-            next->is_function_call() &&
-            to_code_function_call(to_code(next->code)).arguments().size()==1 &&
-            next2!=goto_program.instructions.end() &&
-            next2->is_end_thread())
-        {
-          // skip the function call and END_THREAD
-          target=next2;
-          // copied from FUNCTION_CALL case above
-          const code_function_callt &code_func=
-            to_code_function_call(to_code(next->code));
-          assert(code_func.function().id()==ID_symbol);
-          assert(code_func.lhs().is_nil());
-          assert(code_func.arguments().size()==1);
-
-          irep_idt original_id=to_symbol_expr(code_func.function()).get_identifier();
-
-          if(global_renaming.find(original_id)==global_renaming.end())
-          {
-            inst_stream << "// ignoring call to `" << original_id <<"'" << std::endl;
-            break;
-          }
-
-          irep_idt renamed_func_id=global_renaming[original_id];
-          assert(renamed_func_id != "");
-
-          system_headers.insert("pthread.h");
-          decl_stream << indent(1)
-                      << "pthread_t __pt"
-                      << thread_vars++
-                      << ";" << std::endl;
-          inst_stream << indent(1)
-                      << "pthread_create(&__pt"
-                      << (thread_vars-1) << ", 0, "
-                      << renamed_func_id << ", "
-                      << expr_to_string(code_func.arguments()[0])
-                      << ");" << std::endl;
-        }
-        else
-          inst_stream << "__CPROVER_ASYNC_"
-                      << target->location_number << ":\n"
-                      << indent(1) << "goto L"
-                      << (*target->targets.begin())->target_number
-                      << ";" << std::endl;
-      }
-      break;
-
-    case END_THREAD:
-      inst_stream << indent(1) << "// END_THREAD\n";
-      inst_stream << indent(1) << "assume(0);\n";
-      break;
-
-    case ATOMIC_BEGIN:
-      inst_stream << indent(1) << "// ATOMIC_BEGIN\n";
-      inst_stream << indent(1) << "__CPROVER_atomic_begin();\n";
-      break;
-
-    case ATOMIC_END:
-      inst_stream << indent(1) << "// ATOMIC_END\n";
-      inst_stream << indent(1) << "__CPROVER_atomic_end();\n";
-      break;
-
-    case DEAD:
-    case THROW:
-    case CATCH:
-    case NO_INSTRUCTION_TYPE:
-      std::cerr << target->type << std::endl;
-      //ps_irep("code",target->code);
-      assert(0);
-    }
+    expr.type().swap(type);
+  }
+  else if(expr.id()==ID_union &&
+      ns.follow(expr.type()).get_bool(ID_C_transparent_union))
+  {
+    assert(expr.operands().size()==1);
+    exprt tmp;
+    tmp.swap(expr.op0());
+    expr.swap(tmp);
   }
 
-  os << decl_stream.str();
-  os << inst_stream.str();
+  /* this is extremly slow
+  else if(expr.id()==ID_constant &&
+      expr.find(ID_C_c_sizeof_type).is_not_nil())
+    expr.remove(ID_C_c_sizeof_type);*/
 }
 
 /*******************************************************************\
 
-Function: goto2cppt::type_to_string
+Function: goto2sourcet::get_anon_name
 
 Inputs:
 
@@ -1047,10 +1920,71 @@ Purpose:
 
 \*******************************************************************/
 
-std::string goto2cppt::type_to_string(const typet &type)
+irep_idt goto2sourcet::get_anon_name(const typet& type)
+{
+  anon_mapt::const_iterator entry=
+    anon_renaming.find(type);
+  if(entry==anon_renaming.end())
+    entry=anon_renaming.insert(
+        std::make_pair(
+          type,
+          anon_renaming.size())).first;
+
+  std::stringstream new_name;
+  new_name << "anon$" << entry->second;
+  return new_name.str();
+}
+
+/*******************************************************************\
+
+Function: goto2sourcet::cleanup_type
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
+void goto2sourcet::cleanup_type(typet &type)
+{
+  Forall_subtypes(it, type)
+    cleanup_type(*it);
+
+  if(type.id()==ID_array)
+    cleanup_expr(to_array_type(type).size());
+
+  if(!type.get(ID_tag).empty() &&
+      has_prefix(type.get(ID_tag).as_string(), "#anon"))
+  {
+    typet tmp=type;
+    tmp.set(ID_tag, get_anon_name(type));
+    type.swap(tmp);
+  }
+}
+
+/*******************************************************************\
+
+Function: goto2sourcet::type_to_string
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
+std::string goto2sourcet::type_to_string(const typet &type)
 {
   std::string ret;
+  typet t=type;
+  cleanup_type(t);
+  language->from_type(t, ret, ns);
+  return ret;
 
+#if 0
   if(type.id()==ID_bool)
     #if 0
     ret="bool";
@@ -1091,118 +2025,16 @@ std::string goto2cppt::type_to_string(const typet &type)
     else
       return "__unsignedbv<"+i2string(width)+">";
   }
-  else if(type.id()==ID_fixedbv)
-  {
-    return "double";
-  }
-  else if(type.id()==ID_floatbv)
-  {
-    return "double";
-  }
-  else if(type.id()==ID_pointer)
-  {
-    const typet &sub=ns.follow(type.subtype());
-  
-    if(sub.id()==ID_code)
-    {
-      const code_typet &code_type=to_code_type(sub);
-
-      irep_idt typedef_name=unique_name("typedef_func_ptr");
-
-      typedef_stream << "typedef "
-                     << type_to_string(code_type.return_type())
-                     << "(* "
-                     << typedef_name
-                     << ")(";
-
-      if(code_type.arguments().empty())
-        typedef_stream << "void";
-      else
-        for(unsigned i = 0; i<code_type.arguments().size(); i++)
-        {
-          if(i!=0) typedef_stream << ", ";
-          typedef_stream << type_to_string(code_type.arguments()[i].type());
-        }
-
-      typedef_stream << ");" << std::endl;
-      typedef_map[type]=typedef_name;
-      ret=typedef_name.as_string();
-    }
-    else
-    {
-      ret+=type_to_string(sub);
-      /*if(type.get_bool("#constant"))
-        ret += "const ";*/
-      ret+=" *";
-    }
-  }
-  else if(type.id()==ID_symbol)
-  {
-    const irep_idt identifier=to_symbol_type(type).get_identifier();
-  
-    std::map<irep_idt, irep_idt>::const_iterator it_ren =
-      global_renaming.find(identifier);
-
-    if(it_ren==global_renaming.end())
-    {
-      const symbolt &symb=ns.lookup(identifier);
-      assert(symb.is_type);
-      ret=type_to_string(symb.type);
-    }
-    else
-      ret=id2string(it_ren->second);
-  }
   else if(type.id()==ID_verilogbv)
   {
     return "__verilogbv<"+id2string(type.get(ID_width))+"> ";
   }
-  else if(type.id()==ID_c_enum)
-  {
-    ret="int";
-  }
-  else if(type.id()==ID_empty)
-  {
-    ret="void";
-  }
-  else if(type.id()==ID_constructor ||
-          type.id()==ID_destructor)
-  {
-    ret="void";
-  }
-  else if(type.id()==ID_array)
-  {
-    const array_typet &array_type=to_array_type(type);
-
-    return "__array<"+
-      type_to_string(type.subtype())+", "+
-      expr_to_string(array_type.size())+">";
-  }
-  else if(type.id()==ID_struct)
-  {
-    std::map<irep_idt,irep_idt>::const_iterator it_ren =
-      global_renaming.find(type.get(ID_name));
-    assert(it_ren!=global_renaming.end());
-    ret=id2string(it_ren->second);
-  }
-  else
-  {
-    std::cerr << id2string(type.id()) << std::endl;
-    //ps_irep("type",type);
-    assert(0);
-  }
-
-  assert(ret != "");
-
-  /*if(type.id() != "pointer" &&
-     type.get_bool("#constant"))
-    ret = "const " + ret;*/
-
-  return ret;
+#endif
 }
 
 /*******************************************************************\
 
-Function: goto2cppt::nondet_suffix
+Function: goto2sourcet::expr_to_string
 
 Inputs:
 
@@ -1212,256 +2044,15 @@ Purpose:
 
 \*******************************************************************/
 
-std::string goto2cppt::nondet_suffix(const typet &type)
+std::string goto2sourcet::expr_to_string(const exprt &expr)
 {
   std::string ret;
-
-  if(type.id() == ID_bool)
-    ret="bool";
-  else if(type.id()==ID_signedbv)
-  {
-    unsigned width=to_signedbv_type(type).get_width();
-
-    if(width==config.ansi_c.int_width)
-      return "int";
-    else if(width==config.ansi_c.char_width)
-      return "signed_char";
-    else if(width==config.ansi_c.short_int_width)
-      return "short_int";
-    else if(width==config.ansi_c.long_int_width)
-      return "long_int";
-    else if(width==config.ansi_c.long_long_int_width)
-      return "long_long_int";
-    else
-      return "signedbv_"+i2string(width);
-  }
-  else if(type.id()==ID_unsignedbv)
-  {
-    unsigned width=to_unsignedbv_type(type).get_width();
-
-    if(width==config.ansi_c.int_width)
-      return "unsigned_int";
-    else if(width==config.ansi_c.char_width)
-      return "unsigned_char";
-    else if(width==config.ansi_c.short_int_width)
-      return "unsigned_short_int";
-    else if(width==config.ansi_c.long_int_width)
-      return "unsigned_long_int";
-    else if(width==config.ansi_c.long_long_int_width)
-      return "unsigned_long_long_int";
-    else
-      return "unsignedbv_"+i2string(width);
-  }
-  else if(type.id()==ID_fixedbv)
-  {
-    return "double";
-  }
-  else if(type.id()==ID_floatbv)
-  {
-    return "double";
-  }
-  else if(type.id()==ID_pointer)
-  {
-    return "ptr";
-  }
-  else if(type.id()==ID_symbol)
-  {
-    const irep_idt identifier=to_symbol_type(type).get_identifier();
-  
-    std::map<irep_idt, irep_idt>::const_iterator it_ren =
-      global_renaming.find(identifier);
-
-    if(it_ren==global_renaming.end())
-    {
-      const symbolt &symb=ns.lookup(identifier);
-      assert(symb.is_type);
-      ret=nondet_suffix(symb.type);
-    }
-    else
-      ret=id2string(it_ren->second);
-  }
-  else if(type.id()==ID_c_enum)
-  {
-    ret="int";
-  }
-  else if(type.id()==ID_struct)
-  {
-    std::map<irep_idt,irep_idt>::const_iterator it_ren =
-      global_renaming.find(type.get(ID_name));
-    assert(it_ren!=global_renaming.end());
-    ret=id2string(it_ren->second);
-  }
-  else
-  {
-    std::cerr << "nondet of type " << type.id() << std::endl;
-    //ps_irep("type",type);
-    assert(0);
-  }
-
-  assert(ret != "");
-
+  exprt e=expr;
+  cleanup_expr(e);
+  language->from_expr(e, ret, ns);
   return ret;
-}
 
-/*******************************************************************\
-
-Function: goto2cppt::expr_to_string
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
-
-std::string goto2cppt::expr_to_string(const exprt &expr)
-{
-  if(expr.id()==ID_symbol)
-  {
-    const irep_idt identifier=to_symbol_expr(expr).get_identifier();
-  
-    std::map<irep_idt, irep_idt>::const_iterator it_loc =
-      local_renaming.find(identifier);
-
-    if(it_loc!=local_renaming.end())
-      return id2string(it_loc->second);
-
-    std::map<irep_idt, irep_idt>::const_iterator it_glob=
-      global_renaming.find(identifier);
-
-    if(it_glob!=global_renaming.end())
-      return id2string(it_glob->second);
-  }
-  else if(expr.id()==ID_member)
-  {
-    irep_idt renamed_id=global_renaming[expr.get(ID_component_name)];
-    assert(renamed_id!="");
-    return expr_to_string(expr.op0())+"."+id2string(renamed_id);
-  }
-  else if(expr.id()==ID_dereference)
-  {
-    return "(*"+expr_to_string(expr.op0())+")";
-  }
-  else if(expr.id()==ID_plus ||
-          expr.id()==ID_minus ||
-          expr.id()==ID_mult)
-  {
-    assert(expr.operands().size()>=2);
-
-    std::string str=expr_to_string(expr.operands()[0]);
-
-    for(unsigned i = 1; i < expr.operands().size(); i++)
-      str+=expr.id().as_string()+expr_to_string(expr.operands()[i]);
-
-    return "(" + str + ")";
-  }
-  else if(expr.id()==ID_div ||
-          expr.id()==ID_lt  || expr.id()==ID_gt ||
-          expr.id()==ID_le  || expr.id()==ID_ge)
-  {
-    assert(expr.operands().size() == 2);
-    return "("+expr_to_string(expr.op0())+id2string(expr.id())
-              +expr_to_string(expr.op1())+")";
-  }
-  else if(expr.id()==ID_mod)
-  {
-    assert(expr.operands().size() == 2);
-    return "("+expr_to_string(expr.op0())+"%"
-              +expr_to_string(expr.op1())+")";
-  }
-  else if(expr.id()==ID_equal)
-  {
-    assert(expr.operands().size() == 2);
-    return "("+expr_to_string(expr.op0())+"=="
-              +expr_to_string(expr.op1())+")";
-  }
-  else if(expr.id()==ID_notequal)
-  {
-    assert(expr.operands().size() == 2);
-    return "("+expr_to_string(expr.op0())+"!="
-              +expr_to_string(expr.op1())+")";
-  }
-  else if(expr.id()==ID_and)
-  {
-    assert(expr.operands().size() >= 2);
-    std::string str="(";
-    str+=expr_to_string(expr.operands()[0]);
-    for(unsigned i=1; i<expr.operands().size(); i++)
-      str+=" && "+expr_to_string(expr.operands()[i]);
-    str+=")";
-    return str;
-  }
-  else if(expr.id() == ID_or)
-  {
-    assert(expr.operands().size() >= 1);
-    std::string str="(";
-    str+=expr_to_string(expr.operands()[0]);
-    for(unsigned i = 1; i < expr.operands().size(); i++ )
-      str += " || "+expr_to_string(expr.operands()[i]);
-    str+=")";
-    return str;
-  }
-  else if(expr.id()==ID_not)
-  {
-    assert(expr.operands().size()==1);
-    return "(!"+expr_to_string(expr.op0())+")";
-  }
-  else if(expr.id()==ID_bitand)
-  {
-    assert(expr.operands().size() >= 2);
-
-    std::string str=expr_to_string(expr.operands()[0]);
-
-    for(unsigned i = 1; i < expr.operands().size(); i++ )
-      str+=" & " +expr_to_string(expr.operands()[i]);
-
-    return "("+str+")";
-  }
-  else if(expr.id()==ID_bitor)
-  {
-    assert(expr.operands().size() >= 2);
-
-    std::string str=expr_to_string(expr.operands()[0]);
-
-    for(unsigned i = 1; i < expr.operands().size(); i++ )
-      str += " | " + expr_to_string(expr.operands()[i]);
-    return "(" + str + ")";
-  }
-  else if(expr.id()==ID_bitxor)
-  {
-    std::string str=expr_to_string(expr.operands()[0]);
-
-    for(unsigned i = 1; i < expr.operands().size(); i++ )
-      str += " ^ "+expr_to_string(expr.operands()[i]);
-
-    return "(" + str + ")";
-  }
-  else if(expr.id()==ID_bitnot)
-  {
-    assert(expr.operands().size()==1);
-    return "(~ " + expr_to_string(expr.op0()) + ")";
-  }
-  else if(expr.id()==ID_shl)
-  {
-    assert(expr.operands().size() == 2);
-
-    return "("+expr_to_string(expr.op0())+" << "+
-           expr_to_string(expr.op1())+" )";
-  }
-  else if(expr.id()==ID_lshr || expr.id()==ID_ashr)
-  {
-    assert(expr.operands().size() == 2);
-
-    return "("+expr_to_string(expr.op0())+" >> "+
-               expr_to_string(expr.op1())+")";
-  }
-  else if(expr.id()==ID_unary_minus)
-  {
-    assert(expr.operands().size() == 1);
-    return "(" + type_to_string(expr.op0().type())+"(0) - "+
-           expr_to_string(expr.op0()) + " ) ";
-  }
+#if 0
   else if(expr.id()==ID_constant)
   {
     if(expr.type().id()==ID_signedbv ||
@@ -1817,107 +2408,7 @@ std::string goto2cppt::expr_to_string(const exprt &expr)
   //ps_irep("expr",expr);
   std::cout << expr << std::endl;
   assert(0);
-}
-
-/*******************************************************************\
-
-Function: goto2cppt::unique_name
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
-
-irep_idt goto2cppt::unique_name(irep_idt name)
-{
-   static std::map<irep_idt,int> count;
-   std::string str(id2string(name));
-
-   std::string::iterator it = str.begin();
-   while(it != str.end())
-   {
-     if(!isalnum(*it) && (*it) != '_')
-       it = str.erase(it);
-     else
-       it++;
-   }
-
-   if(isdigit(*(str.begin())))
-     str.insert(str.begin(),'_');
-
-   if(str == "this" || str == "operator" || str == "main")
-     str = "_"+ str;
-
-   if(str == "")
-     str = "func";
-
-   do
-   {
-     int c = count[str]++;
-
-     if( c == 0)
-         break;
-
-     std::stringstream stream;
-     stream << c;
-     str += stream.str();
-   }
-   while(true);
-
-   return str;
-}
-
-/*******************************************************************\
-
-Function: goto2cppt::implicit_declarations
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
-
-std::string goto2cppt::implicit_declarations(const exprt &expr)
-{
-  std::string ret;
-
-  if(expr.id()==ID_symbol)
-  {
-    const irep_idt identifier=to_symbol_expr(expr).get_identifier();
-  
-    std::map<irep_idt,irep_idt>::const_iterator it_glob =
-      global_renaming.find(identifier);
-    
-    if(it_glob==global_renaming.end())
-    {
-      std::map<irep_idt, irep_idt>::const_iterator it_loc =
-        local_renaming.find(identifier);
-
-      if(it_loc==local_renaming.end())
-      {
-        const symbolt &symb=ns.lookup(identifier);
-
-        if(symb.type.id()!=ID_code)
-        {
-          // not yet declared
-          irep_idt renamed_id=unique_name(symb.base_name);
-          local_renaming[symb.name]=renamed_id;
-          ret += "  " + type_to_string(symb.type)
-                      + " " + renamed_id.as_string()  + ";\n";
-        }
-      }
-    }
-  }
-  else
-    forall_operands(it, expr)
-      ret+=implicit_declarations(*it);
-
-  return ret;
+#endif
 }
 
 /*******************************************************************\
@@ -1937,7 +2428,28 @@ void dump_c(
   const namespacet &ns,
   std::ostream &out)
 {
-  goto2cppt goto2cpp(src, ns);
+  goto2sourcet goto2c(src, ns, new_ansi_c_language);
+  out << goto2c;
+}
+
+/*******************************************************************\
+
+Function: dump_cpp
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void dump_cpp(
+  const goto_functionst &src,
+  const namespacet &ns,
+  std::ostream &out)
+{
+  goto2sourcet goto2cpp(src, ns, new_cpp_language);
   out << goto2cpp;
 }
 

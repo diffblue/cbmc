@@ -16,4 +16,9 @@ void dump_c(
   const namespacet &ns,
   std::ostream &out);
 
+void dump_cpp(
+  const goto_functionst &src,
+  const namespacet &ns,
+  std::ostream &out);
+
 #endif
