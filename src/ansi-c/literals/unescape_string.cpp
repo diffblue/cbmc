@@ -154,11 +154,11 @@ void unescape_wide_string(
   std::basic_string<unsigned int> &dest)
 {
   dest.reserve(src.size()); // about that long, but may be shorter
-
+  
   for(unsigned i=0; i<src.size(); i++)
   {
     unsigned int ch=(unsigned char)src[i];
-
+    
     if(ch=='\\') // escape?
     {
       i++;
@@ -234,6 +234,9 @@ void unescape_wide_string(
             octal+=src[i];
             i++;
           }
+          
+          // go back
+          i--;
           
           unsigned int result;
           sscanf(octal.c_str(), "%o", &result);

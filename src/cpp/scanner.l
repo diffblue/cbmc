@@ -90,6 +90,9 @@ escape_sequence [\\]({simple_escape}|{octal_escape}|{hex_escape})
 c_char [^'\\\n]|{escape_sequence}
 s_char [^"\\\n]|{escape_sequence}
 
+char_lit    "L"?[']{c_char}+[']
+string_lit  "L"?["]{s_char}*["]
+
 h_tab [\011]
 form_feed [\014]
 v_tab [\013]
@@ -97,6 +100,8 @@ c_return [\015]
 
 horizontal_white [ ]|{h_tab}
 ws {horizontal_white}*
+newline         [\n\f\v]|"\\\n"
+ws_or_newline ({horizontal_white}|{newline})*
 
 cppfile         "\""[ !#-~]*"\""
 cpplineno       "#"{horizontal_white}*"line"*{horizontal_white}*{integer}.*"\n"
@@ -425,13 +430,13 @@ __CPROVER_bool      { loc(); return TOK_CPROVER_BOOL; }
                       return TOK_FLOATING;
                     }
 
-"L"?[']{c_char}+['] { 
+{char_lit} { 
                       loc();
                       PARSER.current_token().data=convert_character_literal(yytext, false);
                       return TOK_CHARACTER;
                     }
 
-"L"?["]{s_char}*["] {
+({string_lit}{ws_or_newline})+ {
                       loc();
                       PARSER.current_token().data=convert_string_literal(yytext);
                       return TOK_STRING;
