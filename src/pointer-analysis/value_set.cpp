@@ -1165,6 +1165,8 @@ void value_sett::assign(
     }
     else
     {
+      std::cout << "RHS: " << rhs.type().pretty() << std::endl;
+      std::cout << "TTT: " << type.pretty() << std::endl;
       assert(base_type_eq(rhs.type(), type, ns));
         
       if(rhs.id()==ID_array_of)
