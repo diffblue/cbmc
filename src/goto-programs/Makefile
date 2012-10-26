@@ -21,7 +21,10 @@ INCLUDES= -I .. -I ../util
 include ../config.inc
 include ../common
 
-LIBS = ../ansi-c/ansi-c$(LIBEXT)  ../util/util$(LIBEXT) \
+LIBS = ../ansi-c/ansi-c$(LIBEXT) \
+       ../cpp/cpp$(LIBEXT) \
+       ../linking/linking$(LIBEXT) \
+       ../util/util$(LIBEXT) \
 	../big-int/bigint$(OBJEXT) goto-programs$(LIBEXT) \
 	../pointer-analysis/pointer-analysis$(LIBEXT) \
 	../langapi/langapi$(LIBEXT)
