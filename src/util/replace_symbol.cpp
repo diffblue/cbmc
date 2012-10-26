@@ -203,6 +203,12 @@ bool replace_symbolt::replace(typet &dest) const
       result=false;
     }
   }
+  else if(dest.id()==ID_array)
+  {
+    array_typet &array_type=to_array_type(dest);
+    if(!replace(array_type.size()))
+      result=false;
+  }
 
   return result;
 }
@@ -260,9 +266,10 @@ bool replace_symbolt::have_to_replace(const typet &dest) const
       if(have_to_replace(*it))
         return true;
   }
-  
-  if(dest.id()==ID_symbol)
+  else if(dest.id()==ID_symbol)
     return type_map.find(dest.get(ID_identifier))!=type_map.end();
+  else if(dest.id()==ID_array)
+    return have_to_replace(to_array_type(dest).size());
 
   return false;
 }
