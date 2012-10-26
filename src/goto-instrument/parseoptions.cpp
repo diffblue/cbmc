@@ -239,8 +239,9 @@ int goto_instrument_parseoptionst::doit()
       return 0;
     }
 
-    if(cmdline.isset("dump-c"))
+    if(cmdline.isset("dump-c") || cmdline.isset("dump-cpp"))
     {
+      const bool is_cpp=cmdline.isset("dump-cpp");
       namespacet ns(context);
       
       if(cmdline.args.size()==2)
@@ -251,10 +252,10 @@ int goto_instrument_parseoptionst::doit()
           error("failed to write to "+cmdline.args[1]);
           return 10;
         }
-        dump_c(goto_functions, ns, out);
+        (is_cpp ? dump_cpp : dump_c)(goto_functions, ns, out);
       }
       else
-        dump_c(goto_functions, ns, std::cout);
+        (is_cpp ? dump_cpp : dump_c)(goto_functions, ns, std::cout);
         
       return 0;
     }
