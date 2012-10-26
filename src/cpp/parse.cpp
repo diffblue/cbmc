@@ -5,8 +5,6 @@
 #include <std_types.h>
 #include <i2string.h>
 
-#include <ansi-c/concatenate_strings.h>
-
 #include "tokens.h"
 #include "cpp_token_buffer.h"
 #include "cpp_parser.h"
@@ -191,19 +189,6 @@ bool Parser::rString(Token &tk)
 {
   if(lex->GetToken(tk)!=TOK_STRING)
     return false;
-
-  // merge with following string literals
-  if(lex->LookAhead(0)==TOK_STRING)
-  {
-    exprt &dest=tk.data;
-
-    while(lex->LookAhead(0)==TOK_STRING)
-    {
-      Token tk2;
-      lex->GetToken(tk2);
-      concatenate_strings(dest, tk2.data);
-    }
-  }
 
   return true;
 }

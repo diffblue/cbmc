@@ -13,7 +13,6 @@
 #define PARSER ansi_c_parser
 
 #include "ansi_c_parser.h"
-#include "concatenate_strings.h"
 
 int yyansi_clex();
 extern char *yyansi_ctext;
@@ -264,22 +263,10 @@ string:
 
 /*** Constants **********************************************************/
 
-/* note: the following has been changed from the ANSI-C grammar:        */
-/* - constant includes string_literal_list (cleaner)                    */
-
 constant: integer
         | floating
         | character
-        | string_literal_list
-        ;
-
-string_literal_list:
-          string
-        | string_literal_list string
-        { $$ = $1;
-          // do concatenation
-          concatenate_strings(stack($1), stack($2));
-        }
+        | string
         ;
 
 /*** Expressions ********************************************************/
@@ -2270,7 +2257,7 @@ gcc_asm_commands:
           }
         ;
 
-gcc_asm_assembler_template: string_literal_list
+gcc_asm_assembler_template: string
         ;
 
 gcc_asm_outputs:
@@ -2279,9 +2266,9 @@ gcc_asm_outputs:
         ;
 
 gcc_asm_output:
-          string_literal_list '(' comma_expression ')'
+          string '(' comma_expression ')'
         | '[' identifier_or_typedef_name ']'
-          string_literal_list '(' comma_expression ')'
+          string '(' comma_expression ')'
         ;
 
 gcc_asm_output_list:
@@ -2295,9 +2282,9 @@ gcc_asm_inputs:
         ;
 
 gcc_asm_input:
-          string_literal_list '(' comma_expression ')'
+          string '(' comma_expression ')'
         | '[' identifier_or_typedef_name ']'
-          string_literal_list '(' comma_expression ')'
+          string '(' comma_expression ')'
         ;
 
 gcc_asm_input_list:
@@ -2310,7 +2297,7 @@ gcc_asm_clobbered_registers:
         ;
 
 gcc_asm_clobbered_register:
-          string_literal_list
+          string
         ;
 
 gcc_asm_clobbered_registers_list:
@@ -2352,7 +2339,7 @@ external_definition:
         ;
 
 asm_definition:
-          TOK_GCC_ASM_PAREN '(' string_literal_list ')' ';'
+          TOK_GCC_ASM_PAREN '(' string ')' ';'
         ;
 
 function_definition:

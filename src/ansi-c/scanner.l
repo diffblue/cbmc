@@ -119,6 +119,7 @@ delimiter       [ \t\b\r]
 newline         [\n\f\v]|"\\\n"
 whitespace      {delimiter}+
 ws              {delimiter}*
+ws_or_newline   ({delimiter}|{newline})*
 ucletter	[A-Z]
 lcletter	[a-z]
 letter		({ucletter}|{lcletter})
@@ -159,6 +160,9 @@ cppdirective	{cppstart}.*
 escape_sequence [\\][^\n]
 c_char [^'\\\n]|{escape_sequence}
 s_char [^"\\\n]|{escape_sequence}
+
+char_lit        ("L"|"u"|"U")?[']{c_char}+[']
+string_lit      ("L"|"u"|"U"|"u8")?["]{s_char}*["]
 
 %x GRAMMAR
 %x COMMENT1
@@ -216,14 +220,14 @@ void ansi_c_scanner_init()
    .*		{ } /* all characters within comments are ignored */
 	}
 
-<GRAMMAR>("L"|"u"|"U")?[']{c_char}+['] {
+<GRAMMAR>{char_lit} {
                   newstack(yyansi_clval);
                   stack(yyansi_clval)=convert_character_literal(yytext, true);
                   PARSER.set_location(stack(yyansi_clval));
                   return TOK_CHARACTER;
                 }
 
-<GRAMMAR>("L"|"u"|"U"|"u8")?["]{s_char}*["] {
+<GRAMMAR>({string_lit}{ws_or_newline})+ {
                   newstack(yyansi_clval);
                   stack(yyansi_clval)=convert_string_literal(yytext);
                   PARSER.set_location(stack(yyansi_clval));
