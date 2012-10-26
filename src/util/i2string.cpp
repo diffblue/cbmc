@@ -65,7 +65,7 @@ std::string i2string(signed long int i)
   #ifdef USE_SPRINTF
   char buffer[100];
   #ifdef _WIN32
-  #ifdef __MINGW32_VERSION
+  #ifdef __MINGW32__
   snprintf(buffer, sizeof(buffer), "%ld", i);
   #else
   sprintf_s(buffer, sizeof(buffer), "%ld", i);
