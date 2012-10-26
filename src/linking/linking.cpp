@@ -103,7 +103,7 @@ irep_idt linkingt::rename(const irep_idt &old_identifier)
   do
   {
     new_identifier=
-      id2string(old_identifier)+"#link"+i2string(renaming_counter++);        
+      id2string(old_identifier)+"$link"+i2string(renaming_counter++);        
   }
   while(main_context.symbols.find(new_identifier)!=
         main_context.symbols.end());
