@@ -203,26 +203,52 @@ void goto_convertt::clean_expr(
   }
   else if(expr.id()==ID_if)
   {
-    if_exprt &if_expr=to_if_expr(expr);
+    // first clean condition
+    clean_expr(to_if_expr(expr).cond(), dest, true);
+
+    // possibly done now
+    if(!needs_cleaning(expr)) return;
+
+    // copy expression
+    if_exprt if_expr=to_if_expr(expr);
 
     if(!if_expr.cond().is_boolean())
       throw "first argument of `if' must be boolean, but got "
         +if_expr.cond().to_string();
 
-    // first pull out condition -- we need to prevent
-    // this getting destroyed by the side-effects in the other
-    // operands
-    make_temp_symbol(if_expr.cond(), "condition", dest);
-
-    // now clean arguments    
-    goto_programt tmp_true, tmp_false;
+    const locationt location=expr.find_location();
+  
+    goto_programt tmp_true;
     clean_expr(if_expr.true_case(), tmp_true, result_is_used);
+
+    goto_programt tmp_false;
     clean_expr(if_expr.false_case(), tmp_false, result_is_used);
+    
+    if(result_is_used)
+    {
+      symbolt &new_symbol=
+        new_tmp_symbol(expr.type(), "if_expr", dest, location);
+
+      code_assignt assignment_true;
+      assignment_true.lhs()=symbol_expr(new_symbol);
+      assignment_true.rhs()=if_expr.true_case();
+      assignment_true.location()=location;
+      convert(assignment_true, tmp_true);
+
+      code_assignt assignment_false;
+      assignment_false.lhs()=symbol_expr(new_symbol);
+      assignment_false.rhs()=if_expr.false_case();
+      assignment_false.location()=location;
+      convert(assignment_false, tmp_false);
+
+      // overwrites expr
+      expr=symbol_expr(new_symbol);  
+    }
 
     // generate guard for argument side-effects    
     generate_ifthenelse(
       if_expr.cond(), tmp_true, tmp_false,
-      if_expr.location(), dest);
+      location, dest);
 
     return;
   }
