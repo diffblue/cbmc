@@ -5,7 +5,10 @@ SRC = main.cpp parseoptions.cpp document_claims.cpp languages.cpp \
       weak_memory.cpp nondet_volatile.cpp interrupt.cpp \
       mmio.cpp stack_depth.cpp nondet_static.cpp \
       cfg_dominators.cpp natural_loops.cpp concurrency.cpp \
-      is_threaded.cpp dump_c.cpp dot.cpp
+      dump_c.cpp dot.cpp \
+      fence.cpp weak_memory.cpp\
+      event_graph.cpp goto2graph.cpp \
+      is_threaded.cpp
 
 OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../linking/linking$(LIBEXT) \
@@ -18,7 +21,7 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
 
 INCLUDES= -I .. -I ../util
 
-LIBS =
+LIBS = 
 
 CLEANFILES = goto-instrument$(EXEEXT)
 

@@ -920,11 +920,15 @@ bool instrumentert::is_cfg_spurious(const event_grapht::critical_cyclet& cyc)
   this_interleaving.function_map = map;
   optionst no_option;
   null_message_handlert no_message;
+  
+  #if 0
   bmct bmc(no_option, context, no_message);
 
   bool is_spurious = bmc.run(this_interleaving);
+  
   DEBUG_MESSAGE("CFG:"<<is_spurious);
   return is_spurious;
+  #endif
 }
 
 /*******************************************************************\

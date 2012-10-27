@@ -27,8 +27,7 @@ void weak_memory(
   contextt& context,
   goto_functionst& goto_functions,
   bool SCC,
-  bool one_event_per_cycle,
-  bool my_events,
+  unsigned event_stategy,
   unsigned unwinding_bound,
   bool no_cfg_kill,
   bool no_dependencies,
@@ -36,6 +35,7 @@ void weak_memory(
   unsigned max_po_trans,
   bool render_po,
   bool render_file,
-  bool render_function);
+  bool render_function,
+  bool cav11_option);
 
 #endif

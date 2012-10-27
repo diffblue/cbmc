@@ -186,7 +186,7 @@ int goto_instrument_parseoptionst::doit()
 
     if(cmdline.isset("interpreter"))
     {
-      status("Starting interpeter");
+      status("Starting interpreter");
       interpreter(context, goto_functions);
       return 0;
     }
@@ -225,13 +225,11 @@ int goto_instrument_parseoptionst::doit()
       return 0;
     }
 
-    // experimental: print structs
     if(cmdline.isset("show-struct-alignment"))
     {
       print_struct_alignment_problems(context, std::cout);
       return 0;
     }
-    // end of experiment
 
     if(cmdline.isset("show-locations"))
     {
@@ -426,6 +424,32 @@ void goto_instrument_parseoptionst::instrument_goto_program(
   if(cmdline.isset("error-label"))
     options.set_option("error-label", cmdline.getval("error-label"));
 
+  // unwind loops 
+  if(cmdline.isset("unwind"))
+  {
+    status("Unwinding loops");
+    options.set_option("unwind", cmdline.getval("unwind"));
+  }
+
+  // max number of variables in a cycle (default 0: no max)
+  if(cmdline.isset("max-var"))
+    options.set_option("max-var", cmdline.getval("max-var"));
+
+  // max number of transition by po (default 0: no limit)
+  if(cmdline.isset("max-po-trans"))
+    options.set_option("max-po-trans", cmdline.getval("max-po-trans"));
+
+  // strategy of instrumentation
+  if(cmdline.isset("one-event-per-cycle"))
+    options.set_option("event-strategy", 1);
+  else if(cmdline.isset("minimum-interference"))
+    options.set_option("event-strategy", 2);
+  else if(cmdline.isset("my-events"))
+    options.set_option("event-strategy", 3);
+  else
+    options.set_option("event-strategy", 0);
+
+ 
   namespacet ns(context);
 
   // add generic checks, if needed
@@ -465,7 +489,7 @@ void goto_instrument_parseoptionst::instrument_goto_program(
      cmdline.isset("race-check") ||
      cmdline.isset("tso") ||
      cmdline.isset("pso") ||
-     cmdline.isset("rso") ||
+     cmdline.isset("rmo") ||
      cmdline.isset("power") ||
      cmdline.isset("isr") ||
      cmdline.isset("concurrency"))
@@ -506,71 +530,95 @@ void goto_instrument_parseoptionst::instrument_goto_program(
         goto_functions);
     }
 
-    //const unsigned unwind_loops=
-    //  cmdline.isset("unwind")?options.get_int_option("unwind"):0;
+    const unsigned unwind_loops = 
+      ( cmdline.isset("unwind")?options.get_int_option("unwind"):0 );
+    const unsigned max_var =
+      ( cmdline.isset("max-var")?options.get_int_option("max-var"):0 );
+    const unsigned max_po_trans =
+      ( cmdline.isset("max-po-trans")?options.get_int_option("max-po-trans"):0 );
 
     if(cmdline.isset("tso"))
     {
-      #if 0
       status("Adding weak memory (TSO) Instrumentation");
       weak_memory(
         TSO,
         value_set_analysis,
         context,
         goto_functions,
-        cmdline.isset("one-partition"),
-        cmdline.isset("one-event-per-cycle"),
-        cmdline.isset("my-events"),
-        unwind_loops);
-      #endif
+        cmdline.isset("scc"),
+        options.get_int_option("event-strategy"),
+        unwind_loops,
+        !cmdline.isset("cfg-kill"),
+        cmdline.isset("no-dependencies"),
+        max_var,
+        max_po_trans,
+        !cmdline.isset("no-po-rendering"),
+        cmdline.isset("render-cluster-file"),
+        cmdline.isset("render-cluster-function"),
+        cmdline.isset("cav11"));
     }
 
     if(cmdline.isset("pso"))
     {
-      #if 0
       status("Adding weak memory (PSO) Instrumentation");
       weak_memory(
         PSO,
         value_set_analysis,
         context,
         goto_functions,
-        cmdline.isset("one-partition"),
-        cmdline.isset("one-event-per-cycle"),
-        cmdline.isset("my-events"),
-        unwind_loops);
-      #endif
+        cmdline.isset("scc"),
+        options.get_int_option("event-strategy"),
+        unwind_loops,
+        !cmdline.isset("cfg-kill"),
+        cmdline.isset("no-dependencies"),
+        max_var,
+        max_po_trans,
+        !cmdline.isset("no-po-rendering"),
+        cmdline.isset("render-cluster-file"),
+        cmdline.isset("render-cluster-function"),
+        cmdline.isset("cav11"));
     }
 
     if(cmdline.isset("rmo"))
     {
-      #if 0
       status("Adding weak memory (RMO) Instrumentation");
       weak_memory(
         RMO,
         value_set_analysis,
         context,
         goto_functions,
-        cmdline.isset("one-partition"),
-        cmdline.isset("one-event-per-cycle"),
-        cmdline.isset("my-events"),
-        unwind_loops);
-      #endif
+        cmdline.isset("scc"),
+        options.get_int_option("event-strategy"),
+        unwind_loops,
+        !cmdline.isset("cfg-kill"),
+        cmdline.isset("no-dependencies"),
+        max_var,
+        max_po_trans,
+        !cmdline.isset("no-po-rendering"),
+        cmdline.isset("render-cluster-file"),
+        cmdline.isset("render-cluster-function"),
+        cmdline.isset("cav11"));
     }
 
     if(cmdline.isset("power"))
     {
-      #if 0
       status("Adding weak memory (Power) Instrumentation");
       weak_memory(
         POWER,
         value_set_analysis,
         context,
         goto_functions,
-        cmdline.isset("one-partition"),
-        cmdline.isset("one-event-per-cycle"),
-        cmdline.isset("my-events"),
-        unwind_loops);
-      #endif
+        cmdline.isset("scc"),
+        options.get_int_option("event-strategy"),
+        unwind_loops,
+        !cmdline.isset("cfg-kill"),
+        cmdline.isset("no-dependencies"),
+        max_var,
+        max_po_trans,
+        !cmdline.isset("no-po-rendering"),
+        cmdline.isset("render-cluster-file"),
+        cmdline.isset("render-cluster-function"),
+        cmdline.isset("cav11"));
     }
 
     // Interrupt handler
@@ -602,7 +650,6 @@ void goto_instrument_parseoptionst::instrument_goto_program(
         context,
         goto_functions);
     }
-
   }  
 
   // add failed symbols
@@ -691,9 +738,26 @@ void goto_instrument_parseoptionst::help()
     "\n"
     "Semantic transformations:\n"
     " --nondet-volatile            makes reads from volatile variables non-deterministic\n"
+    " --unwind <n>                 unwinds the loops <n> times\n"
     " --isr function               instruments an interrupt service routine\n"
     " --mmio                       instruments memory-mapped I/O\n"
     " --nondet-static              add nondeterministic initialization of variables with static lifetime\n"
+    " --check-invariant function   instruments invariant checking function\n"
+    "\n"
+    "Memory model instrumentations:\n"
+    " --tso                        instruments weak memory models with buffers (TSO)\n"
+    " --pso                        instruments weak memory models with buffers (PSO)\n"
+    " --rmo                        instruments weak memory models with buffers (RMO)\n"
+    " --power                      instruments weak memory models with buffers and cache (Power)\n"
+    " --scc                        detects critical cycles per SCC (one thread per SCC)\n"
+    " --one-event-per-cycle        only instruments one event per cycle\n"
+    " --minimum-interference       instruments an optimal number of events\n"
+    " --my-events                  only instruments the events whose ids appear in inst.evt\n"
+    " --cfg-kill                   enables symbolic execution used to reduce spurious cycles\n"
+    " --no-dependencies            no dependency analysis\n"
+    " --no-po-rendering            no representation of the threads in the dot\n"
+    "  --render-cluster-file       clusterises the dot into files of the program"
+    "  --render-cluster-function   clusterises the dot into functions of the program" 
     "\n"
     "Slicing:\n"
     " --reachability-slicer        slice away instructions that can't reach assertions\n"
