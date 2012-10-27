@@ -1651,9 +1651,14 @@ void value_sett::apply_code(
   {
     guard(to_code_assume(code).op0(), ns);
   }
-  else if(statement==ID_user_specified_predicate || statement==ID_user_specified_parameter_predicates || statement == ID_user_specified_return_predicates)
+  else if(statement==ID_user_specified_predicate ||
+          statement==ID_user_specified_parameter_predicates ||
+          statement==ID_user_specified_return_predicates)
   {
     // doesn't do anything
+  }
+  else if(statement==ID_fence)
+  {
   }
   else
   {
