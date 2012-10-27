@@ -179,6 +179,11 @@ void rw_set_loct::read_write_rec(
     
     read_write_rec(tmp, r, w, suffix, guard);
   }
+  else if(expr.id()==ID_typecast)
+  {
+    assert(expr.operands().size()==1);
+    read_write_rec(expr.op0(), r, w, suffix, guard);
+  }
   else if(expr.id()==ID_address_of)
   {
     assert(expr.operands().size()==1);
