@@ -28,8 +28,12 @@ Author: Daniel Kroening, kroening@kroening.com
   "(undefined-shift-check)" \
   "(no-assertions)(no-assumptions)(uninitialized-check)" \
   "(nan-check)(no-nan-check)" \
-  "(race-check)(one-partition)(one-event-per-cycle)" \
+  "(race-check)(scc)(one-event-per-cycle)" \
+  "(minimum-interference)" \
   "(tso)(pso)(rmo)(power)(my-events)(unwind):" \
+  "(max-var):(max-po-trans):" \
+  "(cfg-kill)(no-dependencies)" \
+  "(no-po-rendering)(render-cluster-file)(render-cluster-function)" \
   "(nondet-volatile)(isr):" \
   "(stack-depth):(nondet-static)" \
   "(signed-overflow-check)(unsigned-overflow-check)" \
@@ -38,7 +42,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(show-uninitialized)(show-locations)" \
   "(full-slice)(reachability-slice)" \
   "(show-symbol-table)(show-claims)(show-points-to)" \
-  "(show-rw-set)" \
+  "(show-rw-set)(cav11)" \
   "(show-natural-loops)" \
   "(error-label):(string-abstraction)" \
   "(verbosity):(version)(xml-ui)"
