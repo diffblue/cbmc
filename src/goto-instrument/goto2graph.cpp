@@ -11,7 +11,12 @@ Date: 2012
 #include <vector>
 #include <string>
 
+//#define USE_GLPK
+
+#ifdef USE_GLPK
 #include <glpk.h>
+#endif
+
 #include <string.h>
 
 #include "goto2graph.h"
@@ -31,6 +36,12 @@ Date: 2012
 #include <cstdlib>
 #include <pthread.h>
 #endif
+
+// the use of this is bogus
+static inline bool has_infix(const std::string &s, const std::string &infix)
+{
+  return s.find(infix)!=std::string::npos;
+}
 
 /*******************************************************************\
 
@@ -1245,6 +1256,7 @@ void inline instrumentert::instrument_minimum_interference_inserter(
       ++e_i)
       edges.insert(*e_i);
 
+  #ifdef USE_GLPK
   glp_prob* lp;
   glp_iocp parm;
   glp_init_iocp(&parm);
@@ -1358,6 +1370,7 @@ void inline instrumentert::instrument_minimum_interference_inserter(
   free(imat);
   free(jmat);
   free(vmat);
+  #endif
 }
 
 void instrumentert::instrument_minimum_interference()
