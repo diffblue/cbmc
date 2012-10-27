@@ -93,6 +93,11 @@ public:
     local = other.local;
   }
 
+  friend std::ostream& operator<<(std::ostream& s, const abstract_eventt& e)
+  {
+    return s << e.get_operation() << e.variable;
+  } 
+
   /* checks the safety of the pair locally (i.e., w/o taking fences
      or dependencies into account -- use is_unsafe on the whole
      critical cycle for this) */
@@ -126,9 +131,12 @@ public:
     const abstract_eventt& second) const
   {
     return (WRfence && first.operation==Write && second.operation==Read)
-      || ((WWfence||WWcumul) && first.operation==Write && second.operation==Write)
-      || ((RWfence||RWcumul) && first.operation==Read && second.operation==Write)
-      || ((RRfence||RRcumul) && first.operation==Read && second.operation==Read);
+      || ((WWfence||WWcumul) && first.operation==Write 
+         && second.operation==Write)
+      || ((RWfence||RWcumul) && first.operation==Read 
+         && second.operation==Write)
+      || ((RRfence||RRcumul) && first.operation==Read 
+         && second.operation==Read);
   }
 
   bool is_direct() const { return WWfence || WRfence || RRfence || RWfence; }
@@ -183,6 +191,9 @@ public:
   protected:
     event_grapht& egraph;
 
+    bool is_not_uniproc() const;
+    bool is_not_weak_uniproc() const;
+
   public:
     unsigned id;
 
@@ -232,9 +243,16 @@ public:
       is_unsafe(model);
     }
 
-    bool is_unsafe_asm(weak_memory_modelt model, bool fast=false);
+    bool is_unsafe_asm(weak_memory_modelt model, bool fast = false);
 
-    bool is_not_uniproc() const;
+    bool is_not_uniproc(weak_memory_modelt model) const
+    {
+      if(model==RMO)
+        return is_not_weak_uniproc();
+      else
+        return is_not_uniproc();
+    }
+
     bool is_not_thin_air() const;
 
     /* pair of events in a cycle */
@@ -281,6 +299,7 @@ public:
 
     /* print outputs */
     std::string print_name(weak_memory_modelt model) const;
+    std::string print_unsafes() const;
     std::string print_output() const;
     void print_dot(std::ofstream& str, 
       unsigned colour, weak_memory_modelt model) const;
@@ -330,6 +349,39 @@ protected:
     /* number of cycles met so far */
     unsigned cycle_nb;
 
+    /* events in thin-air executions met so far */
+    /* any execution blocked by thin-air is guaranteed 
+       to have all its events in this set */
+    std::set<unsigned> thin_air_events;
+
+    /* after the collection, eliminates the executions forbidden by an
+       indirect thin-air */
+    void filter_thin_air(std::set<critical_cyclet>& set_of_cycles)
+    {
+      for(std::set<critical_cyclet>::iterator it=set_of_cycles.begin();
+        it!=set_of_cycles.end();
+      )
+      {
+        std::set<critical_cyclet>::iterator next = it;
+        ++next;
+        critical_cyclet::const_iterator e_it=it->begin();
+        /* is there an event in the cycle not in thin-air events? */
+        for(; e_it!=it->end(); ++e_it)
+          if(thin_air_events.find(*e_it)==thin_air_events.end())
+            break;
+
+        if(e_it==it->end())
+          set_of_cycles.erase(*it);
+
+        it = next;
+      }
+      for(std::set<unsigned>::const_iterator it=thin_air_events.begin();
+        it!=thin_air_events.end();
+        ++it)
+        std::cout<<egraph[*it]<<";";
+      std::cout<<std::endl;
+    }
+
   public:
     graph_explorert(event_grapht& _egraph, unsigned _max_var, 
       unsigned _max_po_trans)
@@ -343,6 +395,8 @@ protected:
     std::stack<unsigned> marked_stack;
     std::stack<unsigned> point_stack;
 
+    std::set<unsigned> skip_tracked;
+
     critical_cyclet extract_cycle(unsigned vertex, 
       unsigned source, unsigned number_of_cycles);
 
@@ -353,6 +407,8 @@ protected:
       unsigned po_trans,
       bool same_var_pair,
       bool lwsync_met,
+      bool has_to_be_unsafe,
+      irep_idt var_to_avoid,
       weak_memory_modelt model);
 
     /* Tarjan 1972 adapted and modified for events + po-transitivity */
@@ -399,6 +455,8 @@ public:
   /* orders */
   std::list<unsigned> po_order;
   std::list<unsigned> poUrfe_order;
+
+  std::set<std::pair<unsigned,unsigned> > loops;
 
   unsigned add_node()
   {
@@ -455,6 +513,15 @@ public:
     poUrfe_order.push_back(a);
   }
 
+  void add_po_back_edge(unsigned a, unsigned b)
+  {
+    po_graph.add_edge(a,b);
+    po_order.push_back(a);
+    poUrfe_order.push_back(a);
+    loops.insert(std::pair<unsigned,unsigned>(a,b));
+    loops.insert(std::pair<unsigned,unsigned>(b,a));
+  }
+
   void add_com_edge(unsigned a, unsigned b)
   {
     com_graph.add_edge(a,b);
@@ -494,6 +561,11 @@ public:
     if(operator[](a).thread!=operator[](b).thread)
       return false;
 
+    /* if back-edge, a-po->b \/ b-po->a */
+    if( loops.find(std::pair<unsigned,unsigned>(a,b))!=loops.end() )
+      return true;
+
+    // would be true if no cycle in po
     for(std::list<unsigned>::iterator it=po_order.begin();
       it!=po_order.end();it++)
       if(*it==a)
