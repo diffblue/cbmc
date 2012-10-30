@@ -134,6 +134,9 @@ void cfg_dominatorst::fixedpoint(const goto_programt &program)
         ++p_it)
     {   
       const const_target_sett &other=node_map[*p_it].dominators;
+      if(other.empty())
+        continue;
+
       const_target_sett::const_iterator n_it=node.dominators.begin();
       const_target_sett::const_iterator o_it=other.begin();
 
@@ -145,6 +148,14 @@ void cfg_dominatorst::fixedpoint(const goto_programt &program)
         else if(*o_it<*n_it) ++o_it;
         else { ++n_it; ++o_it; }
       }
+      while(n_it!=node.dominators.end())
+        if(*n_it==current)
+          ++n_it;
+        else
+        {
+          changed=true;
+          node.dominators.erase(n_it++);
+        }
     }
 
     if(changed) // fixed point for node reached?
