@@ -928,6 +928,9 @@ bool instrumentert::is_cfg_spurious(const event_grapht::critical_cyclet& cyc)
   
   DEBUG_MESSAGE("CFG:"<<is_spurious);
   return is_spurious;
+  #else
+  
+  return false; // conservative for now
   #endif
 }
 
