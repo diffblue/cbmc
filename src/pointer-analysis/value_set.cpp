@@ -460,6 +460,21 @@ void value_sett::get_value_set_rec(
       valuest::const_iterator v_it=
         values.find(expr.get_string(ID_identifier)+suffix);
 
+      // try first component name as suffix if not yet found
+      if(v_it==values.end() &&
+          (expr_type.id()==ID_struct ||
+           expr_type.id()==ID_union))
+      {
+        const struct_union_typet &struct_union_type=
+          to_struct_union_type(expr_type);
+
+        const std::string first_component_name=
+          struct_union_type.components().front().get(ID_name).as_string();
+
+        v_it=values.find(
+            expr.get_string(ID_identifier)+"."+first_component_name+suffix);
+      }
+
       // not found? try without suffix
       if(v_it==values.end())
         v_it=values.find(expr.get_string(ID_identifier));
