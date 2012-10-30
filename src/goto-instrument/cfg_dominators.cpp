@@ -30,11 +30,6 @@ void cfg_dominatorst::initialise(const goto_programt& program)
   for(node_mapt::const_iterator e_it=node_map.begin();
       e_it!=node_map.end(); ++e_it)
     top.insert(e_it->first);
-  
-  // initialise all entries to top
-  for(node_mapt::iterator e_it=node_map.begin();
-      e_it!=node_map.end(); ++e_it)
-    e_it->second.dominators.insert(top.begin(), top.end()); 
 }
 
 /*******************************************************************\
@@ -104,50 +99,56 @@ void cfg_dominatorst::fixedpoint(const goto_programt &program)
   goto_programt::const_targetst worklist;
 
   entry_node = program.instructions.begin();
-  worklist.push_back(entry_node);
+  nodet &n=node_map[entry_node];
+  n.dominators.insert(entry_node);
+  for(goto_programt::const_targetst::const_iterator 
+      s_it=n.successors.begin();
+      s_it!=n.successors.end();
+      ++s_it)
+    worklist.push_back(*s_it);
 
-  while(worklist.size())
+  while(!worklist.empty())
   {
     // get node from worklist
     goto_programt::const_targett current=worklist.front();
     worklist.pop_front();
 
+    bool changed=false;
     nodet &node=node_map[current];
+    if(node.dominators.empty())
+      for(goto_programt::const_targetst::const_iterator 
+          p_it=node.predecessors.begin();
+          !changed && p_it!=node.predecessors.end();
+          ++p_it)
+        if(!node_map[*p_it].dominators.empty())
+        {
+          node.dominators=node_map[*p_it].dominators;
+          node.dominators.insert(current);
+          changed=true;
+        }
 
     // compute intersection of predecessors
-    const_target_sett result;
-    
     for(goto_programt::const_targetst::const_iterator 
           p_it=node.predecessors.begin();
         p_it!=node.predecessors.end();
         ++p_it)
     {   
-      if(p_it==node.predecessors.begin())
-      {
-        result=node_map[*p_it].dominators;
-        continue;
-      }
-      else
-      {
-        const const_target_sett &other=node_map[*p_it].dominators;
-        const_target_sett::const_iterator r_it=result.begin();
-        const_target_sett::const_iterator o_it=other.begin();
+      const const_target_sett &other=node_map[*p_it].dominators;
+      const_target_sett::const_iterator n_it=node.dominators.begin();
+      const_target_sett::const_iterator o_it=other.begin();
 
-        // in-place intersection. not safe to use set_intersect
-        while(r_it!=result.end() && o_it!=other.end())
-        {
-          if(*r_it<*o_it) result.erase(r_it++);
-          else if(*o_it<*r_it) ++o_it;
-          else { ++r_it; ++o_it; }
-        }
+      // in-place intersection. not safe to use set_intersect
+      while(n_it!=node.dominators.end() && o_it!=other.end())
+      {
+        if(*n_it==current) ++n_it;
+        else if(*n_it<*o_it) { changed=true; node.dominators.erase(n_it++); }
+        else if(*o_it<*n_it) ++o_it;
+        else { ++n_it; ++o_it; }
       }
     }
 
-    result.insert(current);
-
-    if(node.dominators!=result) // fixed point for node reached?
+    if(changed) // fixed point for node reached?
     {
-      node.dominators=result;
       for(goto_programt::const_targetst::const_iterator 
             s_it=node.successors.begin();
           s_it!=node.successors.end();
