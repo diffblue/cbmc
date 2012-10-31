@@ -536,6 +536,9 @@ void c_typecheck_baset::typecheck_expression(codet &code)
   exprt &op=code.op0();
   typecheck_expr(op);
 
+  #if 0
+  // Goes away since stuff like x=({y=1;});
+  // needs the inner side-effect.
   if(op.id()==ID_sideeffect)
   {
     const irep_idt &statement=op.get(ID_statement);
@@ -576,6 +579,7 @@ void c_typecheck_baset::typecheck_expression(codet &code)
       code.swap(function_call);
     }
   }
+  #endif
 }
 
 /*******************************************************************\
