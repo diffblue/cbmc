@@ -98,7 +98,7 @@ protected:
   static bool has_function_call(const exprt &expr);
   
   void remove_side_effect(side_effect_exprt &expr, goto_programt &dest, bool result_is_used);
-  void remove_assignment(side_effect_exprt &expr, goto_programt &dest);
+  void remove_assignment(side_effect_exprt &expr, goto_programt &dest, bool result_is_used);
   void remove_pre(side_effect_exprt &expr, goto_programt &dest);
   void remove_post(side_effect_exprt &expr, goto_programt &dest, bool result_is_used);
   void remove_function_call(side_effect_exprt &expr, goto_programt &dest, bool result_is_used);

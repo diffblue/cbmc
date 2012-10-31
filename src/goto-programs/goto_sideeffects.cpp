@@ -56,7 +56,8 @@ Function: goto_convertt::remove_assignment
 
 void goto_convertt::remove_assignment(
   side_effect_exprt &expr,
-  goto_programt &dest)
+  goto_programt &dest,
+  bool result_is_used)
 {
   const irep_idt statement=expr.get_statement();
 
@@ -139,9 +140,14 @@ void goto_convertt::remove_assignment(
     assert(false);
 
   // revert assignment in the expression to its LHS
-  exprt lhs;
-  lhs.swap(expr.op0());
-  expr.swap(lhs);
+  if(result_is_used)
+  {
+    exprt lhs;
+    lhs.swap(expr.op0());
+    expr.swap(lhs);
+  }
+  else
+    expr.make_nil();
 }
 
 /*******************************************************************\
@@ -705,7 +711,7 @@ void goto_convertt::remove_side_effect(
           statement==ID_assign_ashr ||
           statement==ID_assign_shl ||
           statement==ID_assign_mod)
-    remove_assignment(expr, dest);
+    remove_assignment(expr, dest, result_is_used);
   else if(statement==ID_postincrement ||
           statement==ID_postdecrement)
     remove_post(expr, dest, result_is_used);
