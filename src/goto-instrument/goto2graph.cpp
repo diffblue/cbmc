@@ -10,15 +10,28 @@ Date: 2012
 
 #include <vector>
 #include <string>
+#include <fstream>
 
 //#define USE_GLPK
+//#define DISTRIBUTED
+
+#ifdef DISTRIBUTED
+#include <cstdlib>
+#include <pthread.h>
+#endif
 
 #ifdef USE_GLPK
 #include <glpk.h>
 #endif
 
-#include <string.h>
+#include <prefix.h>
+#include <cprover_prefix.h>
+#include <options.h>
+#include <message.h>
+#include <i2string.h>
 
+#include "fence.h"
+#include "rw_set.h"
 #include "goto2graph.h"
 
 //#define DEBUG
@@ -28,13 +41,6 @@ Date: 2012
 #define DEBUG_MESSAGE(a) std::cout<<a<<std::endl
 #else
 #define DEBUG_MESSAGE(a)
-#endif
-
-//#define DISTRIBUTED
-
-#ifdef DISTRIBUTED
-#include <cstdlib>
-#include <pthread.h>
 #endif
 
 // the use of this is bogus

@@ -9,7 +9,9 @@ Date: 2012
 \*******************************************************************/
 
 #include "event_graph.h"
+
 #include <util/i2string.h>
+#include <fstream>
 
 //#define DEBUG
 //#define ASMFENCE

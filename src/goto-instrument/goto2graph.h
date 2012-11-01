@@ -8,34 +8,20 @@ Date: 2012
 
 \*******************************************************************/
 
-#include <expr.h>
-#include <hash_cont.h>
-#include <std_expr.h>
-#include <std_code.h>
-#include <expr_util.h>
+#include <map>
+
 #include <graph.h>
 
-#include <goto-programs/goto_program.h>
 #include <goto-programs/goto_functions.h>
 
-#include <context.h>
-#include "rw_set.h"
-
-#include <cprover_prefix.h>
-#include <prefix.h>
-#include <i2string.h>
-
-#include <cbmc/bmc.h>
-
 #include "event_graph.h"
-#include "fence.h"
 
 class instrumentert
 {
 protected:
   /* reference to goto-functions and context */
-  contextt& context;
-  goto_functionst& goto_functions; 
+  class contextt &context;
+  goto_functionst &goto_functions; 
 
   /* alternative representation of graph (SCC) */
   std::map<unsigned,unsigned> map_vertex_gnode;
@@ -159,7 +145,7 @@ protected:
     }
 
     void inline visit_cfg(
-      value_setst& value_sets,
+      class value_setst &value_sets,
       weak_memory_modelt model,
       bool no_dependencies,
       const irep_idt& function)

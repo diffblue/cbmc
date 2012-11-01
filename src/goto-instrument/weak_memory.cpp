@@ -16,38 +16,20 @@ Date: September 2011
  * in the program.
  */
 
-#include <sstream>
+#include <fstream>
 
-#include <hash_cont.h>
-#include <std_expr.h>
-#include <std_code.h>
 #include <expr_util.h>
-#include <guard.h>
 #include <cprover_prefix.h>
 #include <prefix.h>
 #include <i2string.h>
-#include <context.h>
 
-#include <config.h>
-
-#include <pointer-analysis/value_sets.h>
-#include <pointer-analysis/goto_program_dereference.h>
-#include <pointer-analysis/add_failed_symbols.h>
 #include <goto-programs/remove_skip.h>
-
-#include <goto-programs/goto_convert_class.h>
-#include <ansi-c/literals/convert_string_literal.h>
-
 #include "weak_memory.h"
 #include "rw_set.h"
-
 #include "goto2graph.h"
 #include "fence.h"
 
-#include "natural_loops.h"
-
 #define INVALID_OBJECT "invalid_object"
-
 //#define DEBUG
 
 #ifdef DEBUG
@@ -65,7 +47,7 @@ static inline bool has_infix(const std::string &s, const std::string &infix)
 class shared_bufferst
 {
 public:
-  shared_bufferst(contextt &_context, unsigned _nb_threads):
+  shared_bufferst(class contextt &_context, unsigned _nb_threads):
     context(_context),
     nb_threads(_nb_threads+1),
     uniq(0),
@@ -207,7 +189,7 @@ public:
 
   void weak_memory(
     value_setst &value_sets,
-    contextt &context,
+    class contextt &context,
     goto_programt &goto_program,
     weak_memory_modelt model,
     goto_functionst &goto_functions
@@ -222,7 +204,7 @@ public:
   {
   protected:
     shared_bufferst& shared_buffers;
-    contextt& context;
+    class contextt& context;
     goto_functionst& goto_functions;
 
     /* for thread marking (dynamic) */
@@ -234,7 +216,7 @@ public:
     std::set<irep_idt> past_writes;
 
   public:
-    cfg_visitort(shared_bufferst& _shared, contextt& _context, 
+    cfg_visitort(shared_bufferst& _shared, class contextt& _context, 
       goto_functionst& _goto_functions)
       :shared_buffers(_shared), context(_context), 
         goto_functions(_goto_functions)
@@ -251,7 +233,7 @@ public:
   };
  
 protected:
-  contextt &context;
+  class contextt &context;
   
   // number of threads interferring
   unsigned nb_threads;
@@ -1508,7 +1490,7 @@ Function: lw_sync_fence (POWER)
 
 inline bool lw_sync_fence(
   value_setst &value_sets,
-  contextt &context,
+  class contextt &context,
   shared_bufferst &shared_buffers,
   goto_functionst &goto_functions,
   goto_programt &goto_program,
@@ -1880,7 +1862,7 @@ Function: introduce_temporaries
 
 void introduce_temporaries(
   value_setst &value_sets,
-  contextt &context,
+  class contextt &context,
   const irep_idt &function,
   goto_programt &goto_program)
 {
@@ -1981,7 +1963,7 @@ Function: weak_memory
 void weak_memory(
   weak_memory_modelt model,
   value_setst& value_sets,
-  contextt& context,
+  class contextt& context,
   goto_functionst &goto_functions,
   bool SCC,
   unsigned event_strategy,
