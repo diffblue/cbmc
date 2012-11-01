@@ -30,7 +30,7 @@ Date: 2012
 #define DEBUG_MESSAGE(a)
 #endif
 
-#define DISTRIBUTED
+//#define DISTRIBUTED
 
 #ifdef DISTRIBUTED
 #include <cstdlib>
