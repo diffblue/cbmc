@@ -11,11 +11,6 @@ Date: September 2011
 #ifndef CPROVER_WEAK_MEMORY_H
 #define CPROVER_WEAK_MEMORY_H
 
-#include <pointer-analysis/value_sets.h>
-
-#include <goto-programs/goto_program.h>
-#include <goto-programs/goto_functions.h>
-
 #ifndef MEMORY_MODEL
 #define MEMORY_MODEL
 typedef enum { TSO, PSO, RMO, POWER } weak_memory_modelt;
@@ -23,9 +18,9 @@ typedef enum { TSO, PSO, RMO, POWER } weak_memory_modelt;
 
 void weak_memory(
   weak_memory_modelt model,
-  value_setst& value_sets,
+  class value_setst& value_sets,
   contextt& context,
-  goto_functionst& goto_functions,
+  class goto_functionst& goto_functions,
   bool SCC,
   unsigned event_stategy,
   unsigned unwinding_bound,

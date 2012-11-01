@@ -13,12 +13,11 @@ Date: 2012
 
 #include <list>
 #include <set>
-
-#include <util/location.h>
-#include <util/graph.h>
-
+#include <map>
 #include <iostream>
-#include <fstream>
+
+#include <location.h>
+#include <graph.h>
 
 #ifndef MEMORY_MODEL
 #define MEMORY_MODEL

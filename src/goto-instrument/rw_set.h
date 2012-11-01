@@ -19,6 +19,7 @@ Date: February 2006
 #include <namespace.h>
 #include <std_expr.h>
 
+#include <goto-programs/goto_functions.h>
 #include <pointer-analysis/value_sets.h>
 
 // a container for read/write sets
