@@ -46,7 +46,6 @@ std::set<std::string> cpp_languaget::extensions() const
   s.insert("CPP");
   s.insert("cc");
   s.insert("c++");
-  s.insert("ipp");
   s.insert("ii");
   s.insert("cxx");
   
