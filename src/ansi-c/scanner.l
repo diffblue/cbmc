@@ -778,6 +778,14 @@ wchar_t	            { // CodeWarrior doesn't have wchar_t built in
                   else
                     return make_identifier();
                 }
+
+"_inline"       { // http://msdn.microsoft.com/en-us/library/z8y1yy88.aspx
+                  if(PARSER.mode==ansi_c_parsert::MSC)
+                    { loc(); return TOK_INLINE; }
+                  else
+                    return make_identifier();
+                }
+
 "__inline"	{ loc(); return TOK_INLINE; }
 "__inline__"	{ loc(); return TOK_INLINE; }
 
