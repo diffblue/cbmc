@@ -103,7 +103,8 @@ SRC = $(CHAFF_SRC) $(BOOLEFORCE_SRC) $(MINISAT_SRC) $(MINISAT2_SRC) \
       flattening/boolbv_map.cpp flattening/boolbv_type.cpp \
       flattening/boolbv_array.cpp flattening/boolbv_vector.cpp \
       flattening/boolbv_complex.cpp \
-      flattening/boolbv_union.cpp flattening/flatten_byte_operators.cpp
+      flattening/boolbv_union.cpp flattening/flatten_byte_operators.cpp \
+      floatbv/float_utils.cpp
 
 INCLUDES= -I .. -I ../util \
   $(CHAFF_INCLUDE) $(BOOLEFORCE_INCLUDE) $(MINISAT_INCLUDE) $(MINISAT2_INCLUDE) \
@@ -120,11 +121,6 @@ else
 ifneq ($(CUDD),)
   CP_CXXFLAGS += -DHAVE_QBF_CORE
 endif
-endif
-
-ifneq ($(wildcard ../floatbv/Makefile),)
-  CP_CXXFLAGS += -DHAVE_FLOATBV
-  OBJ += ../floatbv/floatbv$(LIBEXT)
 endif
 
 # extra dependencies

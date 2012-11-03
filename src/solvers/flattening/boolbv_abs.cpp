@@ -11,9 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "boolbv.h"
 #include "boolbv_type.h"
 
-#ifdef HAVE_FLOATBV
 #include "../floatbv/float_utils.h"
-#endif
 
 /*******************************************************************\
 
@@ -57,12 +55,10 @@ void boolbvt::convert_abs(const exprt &expr, bvt &bv)
   }
   else if(bvtype==IS_FLOAT)
   {
-    #ifdef HAVE_FLOATBV
     float_utilst float_utils(prop);
     float_utils.spec=to_floatbv_type(expr.type());
     bv=float_utils.abs(op_bv);
     return;
-    #endif
   }
   
   conversion_failed(expr, bv);

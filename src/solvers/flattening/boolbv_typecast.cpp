@@ -13,9 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "boolbv.h"
 #include "boolbv_type.h"
 
-#ifdef HAVE_FLOATBV
 #include "../floatbv/float_utils.h"
-#endif
 
 /*******************************************************************\
 
@@ -157,7 +155,6 @@ bool boolbvt::type_conversion(
     
   case IS_FLOAT: // to float
     {
-      #ifdef HAVE_FLOATBV
       float_utilst float_utils(prop);
       
       switch(src_bvtype)
@@ -203,7 +200,6 @@ bool boolbvt::type_conversion(
           return false;
         }
       }
-      #endif
     }
     break;
 
@@ -311,7 +307,6 @@ bool boolbvt::type_conversion(
     {
     case IS_FLOAT: // float to integer
       {
-        #ifdef HAVE_FLOATBV
         // note that float to int conversion in ANSI-C is hardwired
         // to ROUND TO ZERO, also known as truncate.
         float_utilst float_utils(prop);
@@ -319,9 +314,6 @@ bool boolbvt::type_conversion(
         float_utils.spec=to_floatbv_type(src_type);
         dest=float_utils.to_integer(src, dest_width, dest_bvtype!=IS_UNSIGNED);
         return false;
-        #else
-        return true;
-        #endif
       }
      
     case IS_FIXED: // fixed to integer
