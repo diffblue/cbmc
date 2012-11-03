@@ -1,0 +1,260 @@
+<!--#include virtual="header.inc" -->
+
+<p><a href="./">CPROVER Manual TOC</a></p>
+
+<h2>The CPROVER API Reference</h2>
+
+<p class="justified">
+The following sections summarize the functions available to programs
+that are passed to the CPROVER tools.
+</p>
+
+<h3>Functions</h3>
+
+<h4>__CPROVER_assume, __CPROVER_assert, assert</h4>
+
+<hr>
+<code>
+void __CPROVER_assume(_Bool assumption);<br>
+void __CPROVER_assert(_Bool assertion, const char *description);<br>
+void assert(_Bool assertion);
+</code>
+<hr>
+
+<p class="justified">
+The function <b>__CPROVER_assume</b> adds an expression as a constraint
+to the program. If the expression evaluates to false, the execution
+aborts without failure. More detail on the use of assumptions is
+in the section on <a href="modeling-assertions.shtml">Assumptions
+and Assertions</a>.
+</p>
+
+<h4>__CPROVER_same_object, __CPROVER_POINTER_OBJECT,
+__CPROVER_POINTER_OFFSET,
+__CPROVER_DYNAMIC_OBJECT</h4>
+
+<hr>
+<code>
+_Bool __CPROVER_same_object(const void *, const void *);<br>
+unsigned __CPROVER_POINTER_OBJECT(const void *p);<br>
+signed __CPROVER_POINTER_OFFSET(const void *p);<br>
+_Bool __CPROVER_DYNAMIC_OBJECT(const void *p);
+</code>
+<hr>
+
+<p class="justified">
+The function <b>__CPROVER_same_object</b> returns true
+if the two pointers given as arguments point to the same
+object.
+The function <b>__CPROVER_POINTER_OFFSET</b> returns
+the offset of the given pointer relative to the base
+address of the object.
+The function <b>__CPROVER_DYNAMIC_OBJECT</b>
+returns true if the pointer passed
+as arguments points to a dynamically allocated object.
+</p>
+
+<h4>__CPROVER_is_zero_string,
+__CPROVER_zero_string_length,
+__CPROVER_buffer_size</h4>
+
+<hr>
+<code>
+_Bool __CPROVER_is_zero_string(const void *);<br>
+__CPROVER_size_t __CPROVER_zero_string_length(const void *);<br>
+__CPROVER_size_t __CPROVER_buffer_size(const void *);
+</code>
+<hr>
+
+<p class="justified">
+</p>
+
+<h4>__CPROVER_initialize</h4>
+
+<hr>
+<code>
+void __CPROVER_initialize(void);
+</code>
+<hr>
+
+<p class="justified">
+The function <b>__CPROVER_initialize</b> computes the initial
+state of the program. It is called prior to calling the
+main procedure of the program.
+</p>
+
+<h4>__CPROVER_input, __CPROVER_output</h4>
+
+<hr>
+<code>
+void __CPROVER_input(const char *id, ...);<br>
+void __CPROVER_output(const char *id, ...);
+</code>
+<hr>
+
+<p class="justified">
+The functions <b>__CPROVER_input</b> and <b>__CPROVER_output</b>
+are used to report an input or output value. Note that they do not generate
+input or output values. The first argument is a string constant
+to distinguish multiple inputs and outputs (inputs are typically
+generated using nondeterminism, as described
+<a href="modeling-nondet.shtml">here</a>).
+The string constant is followed by an arbitrary number of values of
+arbitrary types.
+</p>
+
+<h4>__CPROVER_cover</h4>
+
+<hr>
+<code>
+void __CPROVER_cover(_Bool condition);
+</code>
+<hr>
+
+<p class="justified">
+</p>
+
+<h4>__CPROVER_isnan, __CPROVER_isfinite, __CPROVER_isfinite,
+__CPROVER_isfinite, __CPROVER_sign</h4>
+
+<hr>
+<code>
+_Bool __CPROVER_isnan(double f);<br>
+_Bool __CPROVER_isfinite(double f);<br>
+_Bool __CPROVER_isinf(double f);<br>
+_Bool __CPROVER_isnormal(double f);<br>
+_Bool __CPROVER_sign(double f);
+</code>
+<hr>
+
+<p class="justified">
+The function <b>__CPROVER_isnan</b> returns true if the double-precision
+floating-point number passed as argument is a
+<a href="http://en.wikipedia.org/wiki/NaN">NaN</a>.
+</p>
+
+<p class="justified">
+The function <b>__CPROVER_isfinite</b> returns true if the double-precision
+floating-point number passed as argument is a
+finite number.
+</p>
+
+<p class="justified">
+This function <b>__CPROVER_isinf</b> returns true if the double-precision
+floating-point number passed as argument is plus
+or minus infinity.
+</p>
+
+<p class="justified">
+The function <b>__CPROVER_isnormal</b> returns true if the double-precision
+floating-point number passed as argument is a
+normal number.
+</p>
+
+<p class="justified">
+This function <b>__CPROVER_sign</b> returns true if the double-precision
+floating-point number passed as argument is
+negative.
+</p>
+
+<h4>__CPROVER_abs, __CPROVER_labs, __CPROVER_fabs, __CPROVER_fabsl, __CPROVER_fabsf</h4>
+
+<hr>
+<code>
+int __CPROVER_abs(int x);<br>
+long int __CPROVER_labs(long int x);<br>
+double __CPROVER_fabs(double x);<br>
+long double __CPROVER_fabsl(long double x);<br>
+float __CPROVER_fabsf(float x);
+</code>
+<hr>
+
+<p class="justified">
+These functions return the absolute value of the given
+argument.
+</p>
+
+<h4>__CPROVER_array_equal, __CPROVER_array_copy, __CPROVER_array_copy</h4>
+
+<hr>
+<code>
+_Bool __CPROVER_array_equal(const void array1[], const void array2[]);<br>
+void __CPROVER_array_copy(const void dest[], const void src[]);<br>
+void __CPROVER_array_set(const void dest[], value);
+</code>
+<hr>
+
+<p class="justified">
+The function <b>__CPROVER_array_equal</b> returns true if the values
+stored in the given arrays are equal.
+The function <b>__CPROVER_array_copy</b> copies the contents of
+the array <b>src</b> to the array <b>dest</b>.
+The function <b>__CPROVER_array_set</b> initializes the array <b>dest</b> with
+the given value.
+</p>
+
+<h3>Predefined Types and Symbols</h3>
+
+<h4>__CPROVER_bitvector</h4>
+
+<hr>
+<code>
+__CPROVER_bitvector [ <i>expression</i> ]
+</code>
+<hr>
+
+<p class="justified">
+This type is only available in the C frontend. It is used
+to specify a bit vector with arbitrary but fixed size. The
+usual integer type modifiers <b>signed</b> and <b>unsigned</b>
+can be applied. The usual arithmetic promotions will be
+applied to operands of this type.
+</p>
+
+<h4>__CPROVER_size_t</h4>
+
+<p class="justified">
+The type of sizeof expressions.
+</p>
+
+<h4>__CPROVER_rounding_mode</h4>
+
+<hr>
+<code>
+extern int __CPROVER_rounding_mode;
+</code>
+<hr>
+
+<p class="justified">
+This variable contains the IEEE floating-point
+arithmetic rounding mode.
+</p>
+
+<h4>__CPROVER_constant_infinity_uint</h4>
+
+<p class="justified">
+This is a constant that models a large unsigned
+integer.
+</p>
+
+<h4>__CPROVER_integer, __CPROVER_rational</h4>
+
+<p class="justified">
+<b>__CPROVER_integer</b> is an unbounded, signed integer type.
+<b>__CPROVER_rational</b> is an unbounded, signed rational
+number type.
+</p>
+
+<h4>__CPROVER_memory</h4>
+
+<hr>
+<code>
+extern unsigned char __CPROVER_memory[];
+</code>
+<hr>
+
+<p class="justified">
+This array models the contents of integer-addressed memory.
+</p>
+
+<!--#include virtual="footer.inc" -->

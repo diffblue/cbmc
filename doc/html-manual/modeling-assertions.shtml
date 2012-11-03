@@ -1,0 +1,156 @@
+<!--#include virtual="header.inc" -->
+
+<p><a href="./">CPROVER Manual TOC</a></p>
+
+<h2>Modeling with Assertions and Assumptions</h2>
+
+<h3>Assertions</h3>
+
+<p class="justified"><a
+href="http://en.wikipedia.org/wiki/Assertion_%28computing%29">Assertions</a>
+are statements within the program that attempt to capture the programmer's
+intent.  The ANSI-C standard defines a header file <a
+href="http://en.wikipedia.org/wiki/Assert.h">assert.h</a>, which offers a
+macro <code>assert(cond)</code>. When executing a statement such
+as</p>
+
+<code>
+&nbsp;&nbsp;assert(p!=NULL);
+</code>
+
+<p class="justified">the execution is aborted with an error message if the
+condition evaluates to <i>false</i>, i.e., if <code>p</code> is NULL in the
+example above.  The CPROVER tools can check the validity of the
+programmer-annotated assertions statically.  Specifically, the CPROVER tools
+will check that the assertions hold for <i>any</i> nondeterministic choice
+that the program can make.  The static assertion checks can be disabled
+using the <code>--no-assertions</code> command line option.</p>
+
+<p class="justified">In addition, there is a CPROVER-specific way
+to specify assertions, using the built-in function __CPROVER_assert:</p>
+
+<code>
+&nbsp;&nbsp;__CPROVER_assert(p!=NULL, "p is not NULL");
+</code>
+
+<p class="justified">The (mandatory) string that is passed as the
+second argument provides an informal description of the assertion.
+It is shown in the list of claims together with the condition.</p>
+
+<p class="justified">The assertion language of the CPROVER tools is
+identical to the language used for expressions.  Note that <a
+href="modeling-nondet.shtml">nondeterminism</a> can be exploited in order
+to check a range of choices.  As an example, the following code fragment
+asserts that <b>all</b> elements of the array are zero:
+</p>
+
+<code>
+&nbsp;&nbsp;int a[100], i;<br>
+<br>
+&nbsp;&nbsp;...<br>
+<br>
+&nbsp;&nbsp;i=nondet_uint();<br>
+&nbsp;&nbsp;if(i>=0 && i<100)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;assert(a[i]==0);
+</code>
+
+<p class="justified">The nondeterministic choice will guess the
+element of the array that is nonzero. The code fragment above
+is therefore equivalent to
+</p>
+
+<code>
+&nbsp;&nbsp;int a[100], i;<br>
+<br>
+&nbsp;&nbsp;...<br>
+<br>
+&nbsp;&nbsp;for(i=0; i<100; i++)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;assert(a[i]==0);
+</code>
+
+<p class="justified">Future CPROVER releases will
+support explicit quantifiers with a syntax that resembles Spec#:
+</p>
+
+<code>
+<center>
+__CPROVER_forall { <i>type identifier</i> ; <i>expression</i> }<br>
+__CPROVER_exists { <i>type identifier</i> ; <i>expression</i> }
+</center>
+</code>
+
+<h3>Assumptions</h3>
+
+<p class="justified">Assumptions are used to restrict nondeterministic
+choices made by the program. As an example, suppose we wish to model
+a nondeterministic choice that returns a number from 1 to 100. There
+is no integer type with this range. We therefore use __CPROVER_assume
+to restrict the range of a nondeterministically chosen integer:</p>
+
+<code>
+unsigned int nondet_uint();<br>
+<br>
+unsigned int one_to_hundred()<br>
+{<br>
+&nbsp;&nbsp;unsigned int result=nondet_uint();<br>
+&nbsp;&nbsp;__CPROVER_assume(result>=1 && result<=100);<br>
+&nbsp;&nbsp;return result;<br>
+}</code>
+
+<p class="justified">The function above returns the desired integer from 1
+to 100.  <font color="#ef2020">You must ensure that the condition given as an assumption is
+actually satisfiable by some nondeterministic choice, or otherwise
+the model checking step will pass vacuously.</font></p>
+
+<p class="justified">Also note that assumptions are never retroactive: They
+only affect assertions (or other properties) that follow them in program
+order. This is best illustrated with an example. In the following fragment,
+the assumption has no effect on the assertion, which means that
+the assertion will fail:
+</p>
+
+<code>
+&nbsp;&nbsp;x=nondet_uint();<br>
+&nbsp;&nbsp;assert(x==100);<br>
+&nbsp;&nbsp;__CPROVER_assume(x==100);<br>
+</code>
+
+<p class="justified">
+Assumptions do restrict the search space, but only for assertions that follow.
+As an example, the following program will pass:</p>
+
+<code>
+int main() {<br>
+&nbsp;&nbsp;int x;<br>
+<br>
+&nbsp;&nbsp;__CPROVER_assume(x>=1 && x<=100000);<br>
+<br>
+&nbsp;&nbsp;x*=-1;<br>
+<br>
+&nbsp;&nbsp;__CPROVER_assert(x<0, "x is negative");<br>
+}
+</code>
+
+<p class="justified">Beware that nondeterminism cannot be used to obtain
+the effect of universal quantification in assumptions. As an example,
+</p>
+
+<code>
+int main() {<br>
+&nbsp;&nbsp;int a[10], x, y;<br>
+<br>
+&nbsp;&nbsp;x=nondet_int();<br>
+&nbsp;&nbsp;y=nondet_int();<br>
+&nbsp;&nbsp;__CPROVER_assume(x>=0 && x<10 && y>=0 && y<10);<br>
+<br>
+&nbsp;&nbsp;__CPROVER_assume(a[x]>=0);<br>
+<br>
+&nbsp;&nbsp;assert(a[y]>=0);<br>
+}
+</code>
+
+<p class="justified">fails, as there is a choice of x and y which
+results in a counterexample (any choice in which x and y are different).
+</p>
+
+<!--#include virtual="footer.inc" -->

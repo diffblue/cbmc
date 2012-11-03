@@ -1,0 +1,164 @@
+<!--#include virtual="header.inc" -->
+
+<p><a href="./">CPROVER Manual TOC</a></p>
+
+<h2>Introduction</h2>
+
+<h3>Motivation</h3>
+
+<p class=justified>
+Numerous tools to hunt down functional design flaws in silicon have
+been available for many years, mainly due to the enormous cost of hardware
+bugs. The use of such tools is wide-spread. In contrast, the market
+for tools that address the need for quality software is still in its
+infancy.</p>
+
+<p class=justified>
+Research in software quality has an enormous breadth.
+We focus the presentation using two criteria:</p>
+
+<ol>
+
+<li>
+We believe that any form of quality requires a specific
+<i>guarantee</i>, in theory and practice.</li>
+
+<li>The sheer size of software designs requires techniques that
+are highly <i>automated</i>.</li>
+
+</ol>
+
+<p class=justified>
+In practice, quality guarantees usually do not refer to "total
+correctness" of a design, as ensuring the absence of all bugs is too
+expensive for most applications. In contrast, a guarantee of the
+absence of specific flaws is achievable, and is a good metric of
+quality.</p>
+
+<p class=justified>
+We document two programs that try to achieve formal guarantees of
+the absence of specific problems: CBMC and SATABS. The algorithms
+implemented by CBMC and SATABS are complementary, and often, one tool
+is able to solve a problem that the other cannot solve.</p>
+
+<p class=justified>
+Both CBMC and SATABS are verification tools for ANSI-C/C++ programs. They
+verify array bounds (buffer overflows), pointer safety, exceptions and
+user-specified assertions. Both tools model integer arithmetic accurately,
+and are able to reason about machine-level artifacts such as integer
+overflow. CBMC and SATABS are therefore able to detect a class of bugs that
+has so far gone unnoticed by many other verification tools. This manual
+also covers some variants of CBMC, which includes HW-CBMC
+for <a href="hwsw.shtml">hardware/software co-verification</a>.</p>
+
+<h3>Bounded Model Checking with CBMC</h3>
+
+<p class=justified>
+CBMC implements a technique called <i>Bounded Model Checking</i> (BMC). In
+BMC, the transition relation for a complex state machine and its
+specification are jointly unwound to obtain a Boolean formula, which is then
+checked for satisfiability by using an efficient SAT procedure. If the
+formula is satisfiable, a counterexample is extracted from the output of the
+SAT procedure. If the formula is not satisfiable, the program can be unwound
+more to determine if a longer counterexample exists.</p>
+
+<p class=justified>
+In many engineering domains, real-time guarantees are a strict requirement.
+An example is software embedded in automotive controllers. As a consequence,
+the loop constructs in these types of programs often have a strict bound
+on the number of iterations. CBMC is able to formally verify such bounds
+by means of <i>unwinding assertions</i>. Once this bound is established,
+CBMC is able to prove the absence of errors.</p>
+
+<p class=justified>
+A more detailed description of how to apply CBMC verify programs is
+<a href="cbmc.shtml">here</a>.</p>
+
+<h3>Automatic Program Verification with SATABS</h3>
+
+<p class=justified>
+In many cases, lightweight properties such as array bounds do not rely on
+the entire program. A large fraction of the program is <i>irrelevant</i> to
+the property. SATABS exploits this observation and computes an
+<i>abstraction</i> of the program in order to handle large amounts of code.
+</p>
+
+<p class=justified>
+In order to use SATABS it is not necessary to understand the abstraction
+refinement process. For the interested reader, a high-level introduction
+to abstraction refinement is provided
+<a href="satabs-background.shtml">here</a>. We also provide
+<a href="satabs-tutorials.shtml">tutorials on how to use SATABS</a>.
+</p>
+
+<p class=justified>
+Just as CBMC, SATABS attempts to build counterexamples that refute the
+property. If such a counterexample is found, it is presented to the engineer
+to facilitate localization and repair of the program.
+</p>
+
+<div class="box2">
+<div class="caption">Example: Buffer Overflows</div>
+
+<p class=justified>
+In order to give a brief overview of the capabilities of CBMC and SATABS we
+start with a small example.
+The issue of <i><a href="http://en.wikipedia.org/wiki/Buffer_overflow">buffer
+overflows</a></i> has obtained wide public attention.  A
+buffer is a contiguously-allocated chunk of memory, represented by an array or
+a pointer in C.  Programs written in C do not provide automatic bounds
+checking on the buffer, which means a program can &ndash; accidentally or
+maliciously &ndash; write past a buffer.  The following example is a perfectly
+valid C program (in the sense that a compiler compiles it without any
+errors):</p>
+
+<code>
+int main() {<br>
+&nbsp;&nbsp;int buffer[10];<br>
+&nbsp;&nbsp;buffer[20] = 10;<br>
+}</code>
+
+<p class=justified>
+However, the write access to an address outside the allocated memory
+region can lead to unexpected behavior.  In particular, such bugs can be
+exploited to overwrite the return address of a function, thus enabling the
+execution of arbitrary user-induced code.  CBMC and SATABS are able to
+detect this problem and reports that the "upper bound property" of the
+buffer is violated.  CBMC and SATABS are capable of checking these lower and
+upper bounds, even for arrays with dynamic size. A detailed discussion
+of the properties that CBMC and SATABS can check automatically
+is <a href="properties.shtml">here</a>.</p>
+</div>
+
+<h3>Hardware/Software Co-Verification</h3>
+
+<p class=justified>
+Software programs often interact with hardware in a non-trivial manner, and
+many properties of the overall design only arise from the interplay of both
+components. CBMC and SATABS therefore support <i>Co-Verification</i>,
+i.e., are able to reason about a C/C++ program together with a circuit
+description given in Verilog.</p>
+
+<p class=justified>
+These co-verification capabilities can also be applied to perform refinement
+proofs. Software programs are often used as high-level descriptions of
+circuitry. While both describe the same functionality, the hardware
+implementation usually contains more detail. It is highly desirable to
+establish some form for equivalence between the two descriptions.
+Hardware/Software co-verification and equivalence checking with CBMC and
+SATABS are described <a href="hwsw.shtml">here</a>.
+</p>
+
+<div class="box1">
+<div class="caption">Further Reading</div>
+<p>
+<ul>
+<li><a href="cbmc.shtml">Bounded Model Checking with CBMC</a></li>
+<li><a href="satabs.shtml">Predicate Abstraction with SATABS</a></li>
+<li><a href="hwsw.shtml">Hardware/Software Co-Verification</a></li>
+</ul>
+</p>
+</div>
+
+<!--#include virtual="footer.inc" -->
+

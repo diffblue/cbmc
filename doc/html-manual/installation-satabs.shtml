@@ -1,0 +1,139 @@
+<!--#include virtual="header.inc" -->
+
+<p><a href="./">CPROVER Manual TOC</a></p>
+
+<h2>Installing SATABS</h2>
+
+<h3>Requirements</h3>
+
+<p class="justified">
+SATABS is available for Windows, i86 Linux, and MacOS X. 
+SATABS requires a code pre-processing environment comprising of a
+suitable preprocessor and an a set of header files.</p>
+
+<ol>
+
+<li><b>Linux:</b> the preprocessor and the header files typically come with a
+package called <i>gcc</i>, which must be installed prior to the installation
+of SATABS.</li>
+
+<li><b>Windows:</b> The Windows version of SATABS requires the preprocessor 
+<code>cl.exe</code>, which is part of Visual Studio (including
+the free <a href="http://msdn.microsoft.com/vstudio/express/visualc/">Visual
+Studio Express</a>).</li>
+
+<li><b>MacOS:</b> Install <a href="http://developer.apple.com/technologies/xcode.html">XCode</a>
+prior to installing SATABS.</li>
+
+</ol>
+
+<p class="justified">
+<u>Important note for Windows users</u>: Visual Studio's
+<code>cl.exe</code> relies on a
+complex set of environment variables to identify the target architecture and
+the directories that contain the header files.
+<font color=red>You must run SATABS
+from within the <i>Visual Studio Command Prompt</i>.</font>
+</p>
+
+<p class="justified">
+Note that the distribution files for the
+<a href="installation-plugin.shtml">Eclipse plugin</a> include the
+command-line tools.  Therefore, if you intend to run SATABS
+exclusively within Eclipse, you can skip the installation of the
+command-line tools.  However, you still have to install the compiler
+environment as described above.</p>
+
+<h3>Choosing and Installing a Model Checker</h3>
+
+You need to install a Model Checker in order to be able
+to run SATABS. You can choose between following alternatives:
+<ul>
+<li><p class="justified">
+<b>Cadence SMV</b>.
+Available from <a href="http://www.kenmcmil.com/smv.html">
+http://www.kenmcmil.com/smv.html</a>.
+Cadence SMV is a commercial model checker. The free version
+that is available on the homepage above must not be used for
+commercial purposes (read the license agreement thoroughly
+before you download the tool).
+The documentation for SMV can be found in the directory where 
+you unzip/untar SMV under ./smv/doc/smv/. Read the installation
+instructions carefully. The Linux/MacOS versions require
+setting environment variables. You must add
+add the directory containing the <code>smv</code> binary
+(located in ./smv/bin/, relative to the path where you
+unpacked it) to your <code>PATH</code> environment variable.
+SATABS uses Cadence SMV by default.</p>
+</li>
+
+<li><p class="justified">
+<b>NuSMV</b>. Available from
+<a href="http://nusmv.irst.itc.it/">http://nusmv.irst.itc.it/</a>.
+NuSMV is the open source alternative to Cadence SMV. Installation
+instructions and documentation can be found on the NuSMV homepage.
+The directory containing the NuSMV binary should be added
+to your <code>PATH</code> environment variable.
+Use the option</p>
+
+<center>
+<code>--modelchecker nusmv</code>
+</center>
+
+<p class="justified">
+to instruct SATABS to use NuSMV.</p>
+</li>
+
+<li><p class="justified">
+<b>BOPPO</b>. Available from <a href="http://www.cprover.org/boppo/">
+http://www.cprover.org/boppo/</a>.
+BOPPO is a model checker that uses SAT-solving algorithms.
+BOPPO relies on a built-in SAT solver and Quantor, a solver
+for quantified boolean formulas that is currently bundled
+with BOPPO, but also available separately from
+<a href="http://fmv.jku.at/quantor/">http://fmv.jku.at/quantor/</a>.
+We recommend to add the directories containing both tools to your
+<code>PATH</code> environment variable.
+Use the option</p>
+
+<center>
+<code>--modelchecker boppo</code>
+</center>
+
+<p class="justified">
+when you call SATABS and want it to use BOPPO instead of SMV.
+</p>
+</li>
+
+<li><p class="justified">
+<b>BOOM</b>. Available from <a href="http://www.cprover.org/boom/">
+http://www.cprover.org/boom/</a>. Boom has a number of unique features,
+including the verification of programs with unbounded thread creation.
+</p>
+</li>
+
+</ul>
+
+<h3>Installing SATABS</h3>
+
+<ol>
+<li>Download SATABS for your operating system.
+The binaries are available from <a href="http://www.cprover.org/satabs/">
+http://www.cprover.org/satabs/</a>.
+</li>
+
+<li>Unzip/untar the archive into a directory of your choice. 
+We recommend to add this directory to your <code>PATH</code> environment
+variable.</li>
+
+</ol>
+
+<p class="justified">
+Now you can execute SATABS. Try running SATABS
+on the small examples presented in the <a href="satabs-tutorials.shtml">
+tutorial section</a>. If you use the Cadence SMV model checker, the only
+command line arguments you have to specify are the names
+of the files that contain your program.
+</p>
+
+<!--#include virtual="footer.inc" -->

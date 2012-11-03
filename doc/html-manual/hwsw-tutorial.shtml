@@ -1,0 +1,226 @@
+<!--#include virtual="header.inc" -->
+
+<p><a href="./">CPROVER Manual TOC</a></p>
+
+<h2>Hardware and Software Equivalence and Co-Verification</h2>
+
+<h3>A Small Tutorial</h3>
+
+<h4>Verilog vs. ANSI-C</h4>
+
+<p class="justified">
+We assume that CBMC is installed on your system. If not so, follow
+<a href="installation-cbmc.shtml">these instructions</a>.</p>
+
+<p class="justified">
+The following Verilog module implements a 4-bit counter
+(<a href="counter.v">counter.v</a>):
+</p>
+
+<hr>
+<code>
+module top(input clk);<br>
+<br>
+&nbsp;&nbsp;reg [3:0] counter;<br>
+<br>
+&nbsp;&nbsp;initial counter=0;<br>
+<br>
+&nbsp;&nbsp;always @(posedge clk)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;counter=counter+1;<br>
+<br>
+endmodule<br>
+</code>
+<hr>
+
+<p class="justified">
+HW-CBMC can take Verilog modules as the one above as additional input. Similar
+as in co-simulation, the data in the Verilog modules is available to the C
+program by means of global variables. For the example above, the following C
+fragment shows the definition of the variable that holds the value
+of the <code>counter</code> register:
+</p>
+
+<code>
+struct module_top {<br>
+&nbsp;&nbsp;unsigned int counter;<br>
+};<br>
+<br>
+extern struct module_top top;
+</code>
+
+<p class="justified">
+Using this definition, the value of the <code>counter</code> register in the
+Verilog fragment above can be accessed as <code>top.counter</code>. Please note
+that the name of the variable <b>must</b> match the name of the top module.
+The C program only has a view of one state of the Verilog model. The Verilog
+model makes a transition once the function <code>next_timeframe()</code> is
+called.
+</p>
+
+<p class="justified">
+As CBMC performs Bounded Model Checking, the number of timeframes available
+for analysis must be bounded (<a href="satabs.shtml">SATABS</a>
+has no such restriction). As it is
+desirable to change the bound to adjust it to the available computing
+capacity, the bound is given on the command line and not as part of the C
+program. This makes it easy to use only one C program for arbitrary bounds.
+The actual bound is available in the C program using the following
+declaration:
+</p>
+
+<code>
+extern const unsigned int bound;
+</code>
+
+<p class="justified">
+Also note that the fragment above declares a constant variable of struct
+type. Thus, the C program can only read the trace values and is not able to
+modify them. We will later on describe how to drive inputs of the Verilog
+module from within the C program.
+</p>
+
+<p class="justified">
+As described in previous chapters, assertions can be used to verify
+properties of the Verilog trace. As an example, the following program checks
+two values of the trace of the counter module
+(<a href="counter.c">counter.c</a>):
+</p>
+
+<hr>
+<code>
+void next_timeframe();<br>
+<br>
+struct module_top {<br>
+&nbsp;&nbsp;unsigned int counter;<br>
+};<br>
+<br>
+extern struct module_top top;<br>
+<br>
+int main() {<br>
+&nbsp;&nbsp;next_timeframe();<br>
+&nbsp;&nbsp;next_timeframe();<br>
+&nbsp;&nbsp;assert(top.counter==2);<br>
+&nbsp;&nbsp;next_timeframe();<br>
+&nbsp;&nbsp;assert(top.counter==3);<br>
+}
+</code>
+<hr>
+
+<p class="justified">
+The following CBMC command line checks these assertions with a bound of
+20:
+</p>
+
+<center>
+<code>
+hw-cbmc counter.c counter.v --module top --bound 20
+</code>
+</center>
+
+<p class="justified">
+Note that a specific version of CBMC is used, called <code>hw-cbmc</code>.
+The module name given must match the name of the module in the Verilog
+file. Multiple Verilog files can be given on the command line.
+</p>
+
+<p class="justified">
+The <code>--bound</code> parameter is not to be confused with the <code>--unwind</code>
+parameter. While the <code>--unwind</code> parameter specifies the maximum
+unwinding depth for loops within the C program, the <code>--bound</code> parameter
+specifies the number of times the transition relation of the Verilog module
+is to be unwound.
+</p>
+
+<h4>Counterexamples</h4>
+
+<p class="justified">
+For the given example, the verification is successful. If the first
+assertion is changed to
+</p>
+
+<code>
+&nbsp;&nbsp;assert(top.counter==10);
+</code>
+
+<p class="justified">
+and the bound on the command line is changed to 6, CBMC will produce a
+counterexample. CBMC produces two traces: One for the C program, which
+matches the traces described earlier, and a separate trace for the Verilog
+module. The values of the registers in the Verilog module are also shown in
+the C trace as part of the initial state.
+</p>
+
+<code>
+Initial State<br>
+----------------------------------------------------<br>
+&nbsp;&nbsp;bound=6 (00000000000000000000000000000110)<br>
+&nbsp;&nbsp;counter={ 0, 1, 2, 3, 4, 5, 6 }<br>
+<br>
+Failed assertion: assertion line 6 function main<br>
+<br>
+Transition system state 0<br>
+----------------------------------------------------<br>
+&nbsp;&nbsp;counter=0 (0000)<br>
+<br>
+Transition system state 1<br>
+----------------------------------------------------<br>
+&nbsp;&nbsp;counter=1 (0001)<br>
+<br>
+Transition system state 2<br>
+----------------------------------------------------<br>
+&nbsp;&nbsp;counter=2 (0010)<br>
+<br>
+Transition system state 3<br>
+----------------------------------------------------<br>
+&nbsp;&nbsp;counter=3 (0011)<br>
+<br>
+Transition system state 4<br>
+----------------------------------------------------<br>
+&nbsp;&nbsp;counter=4 (0100)<br>
+<br>
+Transition system state 5<br>
+----------------------------------------------------<br>
+&nbsp;&nbsp;counter=5 (0101)<br>
+<br>
+Transition system state 6<br>
+----------------------------------------------------<br>
+&nbsp;&nbsp;counter=6 (0110)
+</code>
+
+<h4>Using the Bound</h4>
+
+<p class="justified">
+The following program is using the bound variable to check the counter value
+in all cycles:
+</p>
+
+<hr>
+<code>
+void next_timeframe();<br>
+extern const unsigned int bound;<br>
+<br>
+struct module_top {<br>
+&nbsp;&nbsp;unsigned int counter;<br>
+};<br>
+<br>
+extern struct module_top top;<br>
+<br>
+int main() {<br>
+&nbsp;&nbsp;unsigned cycle;<br>
+<br>
+&nbsp;&nbsp;for(cycle=0; cycle&lt;bound; cycle++) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;assert(top.counter==(cycle & 15));<br>
+&nbsp;&nbsp;&nbsp;&nbsp;next_timeframe();<br>
+&nbsp;&nbsp;}<br>
+}
+</code>
+<hr>
+
+<p class="justified">
+CBMC performs bounds checking, and restricts the number of times that
+<code>next_timeframe()</code> can be called. SATABS does not re&shy;quire a bound,
+and thus, <code>next_timeframe()</code> can be called arbitrarily many times.
+</p>
+
+<!--#include virtual="footer.inc" -->
+

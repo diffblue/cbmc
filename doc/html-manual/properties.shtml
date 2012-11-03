@@ -1,0 +1,213 @@
+<!--#include virtual="header.inc" -->
+
+<p><a href="./">CPROVER Manual TOC</a></p>
+
+<h2>Property Instrumentation</h2>
+
+<h3>Properties</h3>
+
+<p class="justified">
+We have mentioned <i>properties</i> several times so far, but we never
+explained <i>what</i> kind of properties <a href="cbmc.shtml">CBMC</a>
+and <a href="satabs.shtml">SATABS</a> can verify.  We
+cover this topic in more detail in this section.</p>
+
+<p class="justified">
+Both CBMC and SATABS use <i><a href="http://en.wikipedia.org/wiki/Assertion_(computing)">
+assertions</a></i> to specify program properties. Assertions are claims about
+the state of the program when the program reaches a particular program
+location. Assertions are often written by the programmer by means of the
+<code>assert</code> macro.</p>
+
+<p class="justified">
+In addition to the assertions written by the programmer, assertions
+for specific properties can also be generated automatically
+by CBMC and SATABS, often relieving the programmer from writing
+"obvious" assertions.</p>
+
+<p class="justified">
+CBMC and SATABS come with an assertion generator called
+<code>goto-instrument</code>, which performs a conservative
+<a href="http://en.wikipedia.org/wiki/Static_code_analysis">static analysis</a>
+to determine program locations that potentially
+contain a bug. Due to the imprecision of the static
+analysis, it is important to emphasize that these
+generated assertions are only <i>potential</i> bugs, and
+that the Model Checker first needs to confirm that
+they are indeed genuine bugs.</p>
+
+<p class="justified">
+The assertion generator can generate assertions for
+the verification of the following properties:</p>
+
+<ul>
+<li>
+<p class="justified">
+<b>Buffer overflows.</b>
+For each array access, check whether the upper and lower bounds
+are violated.
+</li>
+
+<li><p class="justified">
+<b>Pointer safety.</b> Search for <code>NULL</code>-pointer
+dereferences or dereferences of other invalid pointers.
+</p>
+</li>
+
+<li><p class="justified">
+<b>Division by zero.</b>
+Check whether there is a division by zero in the program.
+</p>
+</li>
+
+<li><p class="justified">
+<b>Not-a-Number.</b>
+Check whether floating-point computation may result in
+<a href="http://en.wikipedia.org/wiki/NaN">NaNs</a>.
+</p>
+</li>
+
+<li><p class="justified">
+<b>Unitialized local.</b>
+Check whether the program uses an uninitialized local variable.
+</p>
+</li>
+
+<li><p class="justified">
+<b>Data race.</b>
+Check whether a concurrent program accesses a shared variable
+at the same time in two threads.
+</p>
+</li>
+
+</ul>
+
+<p class="justified">We refrain from explaining the properties above in
+detail.  Most of them relate to behaviors that are left undefined by the
+respective language semantics.  For a discussion on why these behaviors are
+usually very undesirable, read <a
+href="http://blog.regehr.org/archives/213">this</a> blog post by John
+Regehr.</p>
+
+<p class="justified">
+All the properties described above are <i>reachability</i> properties.
+They are always of the form
+</p>
+
+<p class="centered">
+"<i>Is there a path through the program such that property ...
+is violated?</i>"
+</p>
+
+<p class="justified">
+The counterexamples to such properties are always
+program paths. Users of the Eclipse plugin can step through 
+these  counterexamples in a way that is similar to debugging programs.
+The installation of this plugin is explained 
+<a href="installation-plugin.shtml">here</a>.
+</p>
+
+<h3>Using goto-instrument</h3>
+
+<p class="justified">
+The goto-instrument static analyzer operates on goto-binaries, which
+is a binary representation of control-flow graphs. The goto-binary
+is extracted from program source code using goto-cc, which
+is explained <a href="goto-cc.shtml">here</a>.
+Given a goto-program, goto-instrument operates as follows:
+</p>
+
+<p>
+<ol>
+<li>A goto-binary is read in.</li>
+<li>The specified static analyses are performed.</li>
+<li>Any potential bugs found are transformed into corresponding
+assertions, and are added into the program.</li>
+<li>A new goto-binary (with assertions) is written to disc.</li>
+</ol>
+</p>
+
+<div class="box2">
+<p class="justified">
+As an example, we begin with small C program we call
+<code><a href="expr.c">expr.c</a></code>
+(taken from <a href="http://www.spinroot.com/uno/">here</a>):
+</p>
+
+<hr>
+<code>
+int *ptr;<br>
+<br>
+int main(void) {<br>
+&nbsp;&nbsp;if (ptr)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*ptr = 0;<br>
+&nbsp;&nbsp;if (!ptr)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;*ptr = 1;<br>
+}</code>
+<hr>
+
+<p class="justified">
+The program contains an obvious NULL-pointer dereference.
+We first compile the example program with goto-cc and
+then instrument the resulting goto-binary with
+pointer checks.
+</p>
+
+<p>
+<code>
+&nbsp;&nbsp;goto-cc expr.c -o in.gb<br>
+&nbsp;&nbsp;goto-instrument in.gb out.gb --pointer-check
+</code>
+</p>
+
+<p class="justified">
+We can now get a list of the assertions that have been generated
+as follows:
+</p>
+
+<p>
+<code>
+&nbsp;&nbsp;goto-instrument out.gb --show-claims
+</code>
+</p>
+
+<p class="justified">Using either CBMC or SATABS on <code>out.gb</code>,
+we can obtain a counterexample trace for the NULL-pointer dereference:
+</p>
+
+<p>
+<code>
+&nbsp;&nbsp;cbmc out.gb
+</code>
+</p>
+</div>
+
+<p class="justified">The goto-instrument program supports the following
+checks:
+</p>
+
+<p>
+<table>
+<tr><td><code>--no-assertions</code></td>           <td>ignore user assertions</td>
+<tr><td><code>--bounds-check</code></td>            <td>add array bounds checks</td></tr>
+<tr><td><code>--div-by-zero-check</code></td>       <td>add division by zero checks</td></tr>
+<tr><td><code>--pointer-check</code></td>           <td>add pointer checks</td></tr>
+<tr><td><code>--signed-overflow-check</code></td>   <td>add arithmetic over- and underflow checks</td></tr>
+<tr><td><code>--unsigned-overflow-check</code></td> <td>add arithmetic over- and underflow checks</td></tr>
+<tr><td><code>--undefined-shift-check</code></td>   <td>add range checks for shift distances</td></tr>
+<tr><td><code>--nan-check</code></td>               <td>add floating-point NaN checks</td></tr>
+<tr><td><code>--uninitialized-check</code></td>     <td>add checks for uninitialized locals (experimental)</td></tr>
+<tr><td><code>--error-label <i>label</i></code></td><td>check that given label is unreachable</td></tr>
+</table>
+</p>
+
+<div class="box1">
+<div class="caption">Further Reading</div>
+<p>
+<ul>
+<li><a href="goto-cc.shtml">Integration into Build Systems with goto-cc</li>
+</ul>
+</p>
+</div>
+
+<!--#include virtual="footer.inc" -->

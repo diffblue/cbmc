@@ -1,0 +1,350 @@
+<!--#include virtual="header.inc" -->
+
+<p><a href="./">CPROVER Manual TOC</a></p>
+
+<h2>CBMC: Bounded Model Checking for C/C++</h2>
+
+<h3>A Short Tutorial</h3>
+
+<h4>First Steps</h4>
+
+<p class="justified">
+We assume you have already installed CBMC and the necessary support files
+on your system. If not so, please follow <a href="installation-cbmc.shtml">
+these instructions</a>.
+</p>
+
+<p class="justified">
+Like a compiler, CBMC takes the names of .c files as command line
+arguments. CBMC then translates the program and merges the function
+definitions from the various .c files, just like a linker. But instead
+of producing a binary for execution, CBMC performs symbolic simulation on
+the program.
+</p>
+
+<p class="justified">
+As an example, consider the following simple program, named
+<a href="file1.c">file1.c</a>:
+<p/>
+
+<hr>
+<code>
+int puts(const char *s) { }<br><br>
+int main(int argc, char **argv) {<br>
+&nbsp;&nbsp;int i;<br>
+&nbsp;&nbsp;if(argc&gt;=1)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;puts(argv[2]);<br>
+}
+</code>
+<hr>
+
+<p class="justified">
+Of course, this program is faulty, as the <code>argv</code> array might have only
+one element, and then the array access <code>argv[2]</code> is out of bounds.
+Now, run CBMC as follows:
+</p>
+
+<code>
+&nbsp;&nbsp;cbmc file1.c --show-claims --bounds-check --pointer-check
+</code>
+
+<p class="justified">The two options <code>--bounds-check</code> and <code>--pointer-check</code>
+instruct CBMC to look for errors related to pointers and array bounds.
+CBMC will print the list of properties it checks. Note that it prints a
+claim labeled with "array argv upper bound" together with the
+location of the faulty array access. As you can see, CBMC largely
+determines the property it needs to check itself. This is realized
+by means of a preliminary static analysis, which relies on computing a fixed
+point on various <a href="http://en.wikipedia.org/wiki/Abstract_interpretation">abstract
+domains</a>. More detail on automatically generated properties
+is provided <a href="properties.shtml">here</a>.</p>
+
+<p class="justified">
+Note that automatically generated claims
+need not necessarily correspond to bugs &ndash; these are just <i>potential</i>
+flaws. Whether one of these claims corresponds to a bug needs to be
+determined by further analysis.
+</p>
+
+<p class="justified">
+One option for this analysis is <i>symbolic simulation</i>, which corresponds to
+a translation of the program into a formula. The formula is then combined with
+the property. Let's run the symbolic simulation:</p>
+
+<code>
+&nbsp;&nbsp;cbmc file1.c --show-vcc --bounds-check --pointer-check
+</code>
+
+<p class="justified">
+With this option, CBMC performs the symbolic simulation and prints the
+verification conditions on the screen. A verification condition needs
+to be proven to be valid by a <i><a href="http://en.wikipedia.org/wiki/Decision_problem">
+decision procedure</a></i> in order to assert that the corresponding property
+holds. Let's run the decision procedure:</p>
+
+<code>
+&nbsp;&nbsp;cbmc file1.c --bounds-check --pointer-check
+</code>
+
+<p class="justified">
+CBMC transforms the equation you have seen before into CNF and passes it
+to a SAT solver (more background on this step is in the book
+on <a href="http://www.decision-procedures.org/">Decision Procedures</a>).
+CBMC can now detect that the equation is actually not valid,
+and thus, there is a bug in the program. It prints a counterexample trace,
+i.e., a program trace that ends in a state which violates the property. In
+our example, the program trace ends in the faulty array access. It also
+shows the values the input variables must have for the bug to occur. In this
+example, <code>argc</code> must be one to trigger the out-of-bounds array access.
+If you change the branch condition in the example to <code>argc&gt;=2</code>, the bug
+is fixed and CBMC will report a successful verification run.</p>
+
+<h3>Verifying Modules</h3>
+
+<p class="justified">
+In the example above, we used a program that starts with a <code>main</code>
+function. However, CBMC is aimed at embedded software, and these
+kinds of programs usually have different entry points. Furthermore, CBMC
+is also useful for verifying program modules. Consider the following example,
+called <a href="file2.c">file2.c</a>:
+</p>
+
+<hr>
+<code>
+int array[10];<br><br>
+int sum() {<br>
+&nbsp;&nbsp;unsigned i, sum;<br><br>
+&nbsp;&nbsp;sum=0;<br>
+&nbsp;&nbsp;for(i=0; i&lt;10; i++)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;sum+=array[i];<br>
+}
+</code>
+<hr>
+
+<p class="justified">
+In order to set the entry point to the <code>sum</code> function, run
+</p>
+
+<code>
+&nbsp;&nbsp;cbmc file2.c --function sum
+</code>
+
+<h3>Loop Unwinding</h3>
+
+<p class="justified">
+You will note that CBMC unwinds the <code>for</code> loop in the program.
+As CBMC performs Bounded Model Checking, all loops have to have a finite
+upper run-time bound in order to guarantee that all bugs are found.  CBMC
+actually checks that enough unwinding is performed.  As an example, consider
+the program <a href="binsearch.c">binsearch.c</a>:</p>
+
+<hr>
+<code>
+int binsearch(int x) {<br>
+&nbsp;&nbsp;int a[16];<br>
+&nbsp;&nbsp;signed low=0, high=16;<br><br>
+&nbsp;&nbsp;while(low&lt;high) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;signed middle=low+((high-low)>>1);<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;if(a[middle]&lt;x)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;high=middle;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;else if(a[middle]&gt;x)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;low=middle+1;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;else // a[middle]=x !<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return middle;<br>
+&nbsp;&nbsp;}<br><br>   
+&nbsp;&nbsp;return -1;<br>
+}
+</code>
+<hr>
+
+<p class="justified">
+If you run CBMC on this function, you will notice that the unwinding
+does not stop on its own.  The built-in simplifier is not able to determine
+a run time bound for this loop.  The unwinding bound has to be given as a
+command line argument:</p>
+
+<code>
+&nbsp;&nbsp;cbmc binsearch.c --function binsearch --unwind 6 --bounds-check
+</code>
+
+<p class="justified">
+CBMC not only verifies the array bounds (note that this actually depends
+on the result of the right shift), but also checks that enough unwinding is
+done, i.e., it proves a run-time bound. For any lower unwinding bound, there
+are traces that require more loop iterations. Thus, CBMC will produce an
+appropriate counterexample.</p>
+
+<h3>Unbounded Loops</h3>
+
+<p class="justified">
+CBMC can also be used for programs with unbounded loops. In this
+case, CBMC is used for bug hunting only; CBMC does not attempt to find
+all bugs. The following program
+(<a href="lock-example.c">lock-example.c</a>) is an example
+of a program with a user-specified property:</p>
+
+<hr>
+<code>
+_Bool nondet_bool();<br>
+_Bool LOCK = 0;<br>
+<br>
+_Bool lock() {<br>
+&nbsp;&nbsp;if(nondet_bool()) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;assert(!LOCK);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;LOCK=1;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return 1; }<br>
+<br>
+&nbsp;&nbsp;return 0;<br>
+}<br>
+<br>
+void unlock() {<br>
+&nbsp;&nbsp;assert(LOCK);<br>
+&nbsp;&nbsp;LOCK=0;<br>
+}<br>
+<br>
+int main() {<br>
+&nbsp;&nbsp;unsigned got_lock = 0;<br>
+&nbsp;&nbsp;int times;<br>
+<br>
+&nbsp;&nbsp;while(times > 0) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;if(lock()) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;got_lock++;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/* critical section */<br>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;if(got_lock!=0)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unlock();<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;got_lock--;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;times--;<br>
+} }
+</code>
+<hr>
+
+<p class="justified">
+The <code>while</code> loop in the <code>main</code> function has no (useful) run-time
+bound. Thus, a bound has to be set on the amount of unwinding that
+CBMC performs. There are two ways to do so:
+</p>
+
+<ol>
+
+<li>The <code>--unwind</code> command-line parameter can to be used to limit
+the number of times loops are unwound.</li>
+
+<li>The <code>--depth</code> command-line parameter can be used to limit
+the number of program steps to be processed.</li>
+
+</ol>
+
+<p class="justified">
+CBMC can assert whether the arugment to <code>--unwind</code> is large enough to
+cover all program paths. If the argument is too small, CBMC will detect
+that not enough unwinding is done and aborts with an unwinding assertion
+violation. In order to disable this test, run CBMC with the parameter
+</p>
+
+<code>
+&nbsp;&nbsp;--no-unwinding-assertions
+</code>
+
+<p class="justified">
+Reconsider the example. For a loop unwinding bound of one, no bug is found.
+But already for a bound of two, CBMC detects a trace that violates an
+assertion. Without unwinding assertions, or when using the <code>--depth</code>
+command line switch, CBMC does not prove the program correct, but it can be
+helpful to find program bugs. The various command line options that CBMC
+offers for loop unwinding are described in the section on
+<a href="cbmc-loops.shtml">understanding loop unwinding</a>.</p>
+
+<h3>A Note About Compilers and the ANSI-C Library</h3>
+
+<p class="justified">
+Most C programs make use of functions provided by a library; instances are
+functions from the standard ANSI-C library such as <code>malloc</code> or
+<code>printf</code>. The verification of programs that use such functions
+has two requirements:</p>
+
+<ol>
+
+<li>Appropriate header files have to be provided. These header files
+contain <i>declarations</i> of the functions that are to be used.
+</li>
+
+<li>Appropriate <i>definitions</i> have to be provided.</li>
+
+</ol>
+
+<p class="justified">
+Most C compilers come with header files for the ANSI-C library functions. 
+We briefly discuss how to obtain/install these library files.
+</p>
+
+<h4>Linux</h4>
+
+<p class="justified">
+Linux systems that are able to compile software are usually equipped with
+the appropriate header files. Consult the documentation of your distribution
+on how to install the compiler and the header files. First try to compile
+some significant program before attempting to verify it.
+</p>
+
+<h4>Windows</h4>
+
+<p class="justified">
+On Microsoft Windows, CBMC is pre-configured to use the compiler
+shipped with Microsoft's Visual Studio. Visual Studio Express is sufficient,
+and is available for download for free from the Microsoft webpage.
+Visual Studio installs the usual set of header files together with the
+compiler. However, Visual Studio requires a large set of environment
+variables for the compiler to function correctly. It is therefore
+required to run CBMC from the <i>Visual Studio Command Prompt</i>,
+which can be found in the menu <i>Visual Studio Tools</i>.
+</p>
+
+<p class="justified">
+Note that in both cases, only header files are available. CBMC only
+comes with a small set of definitions, which includes functions such as
+<code>malloc</code>. Detailed information about the built-in definitions is
+<a href="libraries.shtml">here</a>.</p>
+
+<h3>Command Line Interface</h3>
+
+<p class="justified">
+This section describes the command line interface of CBMC. Like a C
+compiler, CBMC takes the names of the .c source files as arguments.
+Additional options allow to customize the behavior of CBMC. Use
+<code>cbmc --help</code> to get a full list of the available options.
+</p>
+
+<p class="justified">
+Structured output can be obtained from CBMC using the option <code>--xml-ui</code>.
+Any output from CBMC (e.g., counterexamples) will then use an XML
+representation.
+</p>
+
+<div class="box1">
+<div class="caption">Further Reading</div>
+
+<p>
+<ul>
+<li><a href="cbmc-loops.shtml">Understanding Loop Unwinding</a></li>
+<li><a target=_top href="http://www-2.cs.cmu.edu/~svc/papers/view-publications-ck03.html">
+    Hardware Verification using ANSI-C Programs as a Reference</a></li>
+<li><a target=_top href="http://www-2.cs.cmu.edu/~svc/papers/view-publications-cky03.html">
+    Behavioral Consistency of C and Verilog Programs Using Bounded Model
+    Checking</a></li>
+<li><a target=_top href="http://www-2.cs.cmu.edu/~svc/papers/view-publications-ckl2004.html">A
+    Tool for Checking ANSI-C Programs</a></li>
+</ul>
+</p>
+
+<p class="justified">
+We also have a <a href="http://www.cprover.org/cbmc/applications.shtml">list of
+interesting applications of CBMC</a>.</p>
+
+</div>
+
+<!--#include virtual="footer.inc" -->
+

@@ -1,0 +1,40 @@
+<!--#include virtual="header.inc" -->
+
+<p><a href="./">CPROVER Manual TOC</a></p>
+
+<h2>Build Systems and Libraries</h2>
+
+<h3>Variants of goto-cc</h3>
+
+<p class="justified">
+The goto-cc utility comes in several variants, summarised in the following table.
+</p>
+
+<center>
+<table cellpadding=5 cellspacing=0>
+<tr bgcolor=#e0e0e0>
+<th>Executable</th><th>Environment</th><th>Preprocessor</th></tr>
+<tr bgcolor=#e0f0f0><td>goto-cc</td>
+  <td><a href="http://gcc.gnu.org/">gcc</a></td>
+  <td>gcc -E</td></tr>
+<tr bgcolor=#f0f0f0><td>goto-armcc</td>
+  <td><a href="http://arm.com/products/tools/software-tools/rvds/index.php">ARM RVDS</a></td>
+  <td>armcc -E</td></tr>
+<tr bgcolor=#e0f0f0><td>goto-cl</td>
+  <td><a href="http://www.microsoft.com/visualstudio/">Visual Studio</a></td>
+  <td>cl /E</td></tr>
+<tr bgcolor=#f0f0f0><td>goto-cw</td>
+  <td><a href="http://www.freescale.com/webapp/sps/site/homepage.jsp?code=CW_HOME">Freescale CodeWarrior</a></td>
+  <td>mwcceppc</td></tr>
+</tr>
+</table>
+</center>
+
+<p class="justified">
+The primary difference between the variants is the preprocessor called.
+Furthermore, the language recognized varies slightly.  The variants can be
+obtained by simply renaming the goto-cc executable.  On Linux/MacOS, the
+variants can be obtained by creating a symbolic link.
+</p>
+
+<!--#include virtual="footer.inc" -->

@@ -1,0 +1,69 @@
+<!--#include virtual="header.inc" -->
+
+<p><a href="./">CPROVER Manual TOC</a></p>
+
+<h2>Build Systems and Libraries</h2>
+
+<h3>Example: Extracting Models from the Apache HTTPD</h3>
+
+<p class="justified">
+The <a href="http://httpd.apache.org/">Apache HTTPD</a> is still the most
+frequently used web server.  Together with the relevant libraries, it
+consists of around 0.4 million lines of C code.  In the following, we show
+how to extract models from Apache HTTPD 2.4.2.
+</p>
+
+<ol>
+
+<li><p class="justified">
+First of all, we download the sources of Apache HTTPD and two supporting
+libraries and uncompress them:</p>
+
+<p>
+&nbsp;&nbsp;<code>lwp-download http://www.mirrorservice.org/sites/ftp.apache.org/apr/apr-1.4.6.tar.bz2</code><br>
+&nbsp;&nbsp;<code>lwp-download http://www.mirrorservice.org/sites/ftp.apache.org/apr/apr-util-1.4.1.tar.bz2</code><br>
+&nbsp;&nbsp;<code>lwp-download http://mirror.catn.com/pub/apache/httpd/httpd-2.4.2.tar.bz2</code><br>
+<br>
+&nbsp;&nbsp;<code>bunzip2 &lt; apr-1.4.6.tar.bz2 | tar x</code><br>
+&nbsp;&nbsp;<code>bunzip2 &lt; apr-util-1.4.1.tar.bz2 | tar x</code><br>
+&nbsp;&nbsp;<code>bunzip2 &lt; httpd-2.4.2.tar.bz2 | tar x</code>
+</p></li>
+
+<li><p class="justified">Now compile
+<a href="gcc-wrap.c">gcc-wrap.c</a> and put the resulting binary
+into a directory that is in your PATH variable:</p>
+<p>
+&nbsp;&nbsp;<code>lwp-download http://www.cprover.org/cprover-manual/gcc-wrap.c</code><br>
+&nbsp;&nbsp;<code>gcc gcc-wrap.c -o gcc-wrap</code><br>
+&nbsp;&nbsp;<code>cp gcc-wrap ~/bin/</code><br>
+</p>
+<p class="justified">This assumes that the directory <code>~/bin</code>
+exists and is in your PATH variable.</p>
+</li>
+
+<li><p>We now build the sources with gcc:</p>
+
+<p>
+&nbsp;&nbsp;<code>(cd apr-1.4.6; ./configure; make CC=gcc-wrap)</code><br>
+&nbsp;&nbsp;<code>(cd apr-util-1.4.1; ./configure --with-apr=../apr-1.4.6 ; make CC=gcc-wrap)</code><br>
+&nbsp;&nbsp;<code>(cd httpd-2.4.2; ./configure --with-apr=../apr-1.4.6 --with-apr-util=../apr-util-1.4.1 ; make CC=gcc-wrap)</code>
+</p>
+
+<li><p class="justified">You can now compile the preprocessed
+source files with goto-cc as follows:</p>
+<p>
+&nbsp;&nbsp;<code>find ./ -name *.i > source-file-list</code><br>
+&nbsp;&nbsp;<code>for a in `cat source-file-list` ; do</code><br>
+&nbsp;&nbsp;<code>&nbsp;&nbsp;goto-cc -c $a -o $a.gb</code><br>
+&nbsp;&nbsp;<code>done</code></p>
+</li>
+
+</ol>
+
+<p class="justified">
+The resulting <code>.gb</code> files can be passed to any
+of the CPROVER tools.
+</p>
+
+<!--#include virtual="footer.inc" -->
+

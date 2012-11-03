@@ -1,0 +1,179 @@
+<!--#include virtual="header.inc" -->
+
+<p><a href="./">CPROVER Manual TOC</a></p>
+
+<h2>SATABS &ndash; Predicate Abstraction with SAT</h2>
+
+<h3>Overview</h3>
+
+<p class="justified">
+This section describes SATABS from the point of view of the user. To learn
+about the technology implemented in SATABS, read <a href="satabs-background.shtml">this
+section</a>.
+</p>
+
+<p class="justified">
+We assume you have already installed SATABS and the necessary support files
+on your system. If not so, please follow <a href="installation-satabs.shtml">
+these instructions</a>.
+</p>
+
+<p class="justified">
+While users of SATABS
+almost never have to be concerned about the underlying refinement
+abstraction algorithms, understanding the classes of properties that 
+can be verified is crucial. Predicate abstraction is most effective
+when applied to <i>control-flow dominated properties</i>. As
+an example, reconsider the following program
+(<a href="lock-example-fixed.c">lock-example-fixed.c</a>):
+</p>
+
+<hr>
+<code>
+_Bool nondet_bool();<br>
+_Bool LOCK = 0;<br>
+<br>
+_Bool lock() {<br>
+&nbsp;&nbsp;if(nondet_bool()) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;assert(!LOCK);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;LOCK=1;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return 1; }<br>
+<br>
+&nbsp;&nbsp;return 0;<br>
+}<br>
+<br>
+void unlock() {<br>
+&nbsp;&nbsp;assert(LOCK);<br>
+&nbsp;&nbsp;LOCK=0;<br>
+}<br>
+<br>
+int main() {<br>
+&nbsp;&nbsp;unsigned got_lock = 0;<br>
+&nbsp;&nbsp;int times;<br>
+<br>
+&nbsp;&nbsp;while(times > 0) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;if(lock()) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;got_lock++;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/* critical section */<br>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;if(got_lock!=0) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unlock();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;got_lock--;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;times--;<br>
+} }
+</code>
+<hr>
+
+<p class="justified">
+The two assertions in the program model that the functions <code>lock()</code>
+and <code>unlock()</code> are called in the right order. Note that the value
+of <code>times</code> is chosen non-deterministically and is not bounded. The program has
+no run-time bound, and thus, unwinding the code with <a href="cbmc.shtml">
+CBMC</a> will never terminate.</p>
+
+<h3>Working with Claims</h3>
+
+<p class="justified">
+The two assertions will give rise to two <i>claims</i>.
+Each claim is associated to a specific line of code, i.e., a claim is violated when the
+some condition can become false at the corresponding program location.
+SATABS will generate a list of all claims for the programs as follows:
+</p>
+
+<center>
+<code>
+satabs lock-example-fixed.c --show-claims
+</code>
+</center>
+
+<p>SATABS will list two claims; each claim corresponds to one of the
+two assertions. We can use SATABS to verify both claims
+as follows:
+</p>
+
+<center>
+<code>
+satabs lock-example-fixed.c
+</code>
+</center>
+
+<p class="justified">
+SATABS will conclude the verification successfully, that is, both
+assertions hold for execution traces of any length.
+</p>
+
+<p class="justified">
+By default, SATABS attempts to verify all claims at once.
+A single claim can be verified (or refuted) by using the
+<code>--claim <i>id</i></code> option of SATABS,
+where <code><i>id</i></code> denotes the identifier of the claim in the list
+obtained by calling SATABS with the <code>--show-claims</code> flag. Whenever
+a claim is violated, SATABS reports a feasible path that leads to a state
+in which the condition that corresponds to the violated claim evaluates to
+false.
+</p>
+
+<h3>Programs that use Libraries</h3>
+
+<p class="justified">
+SATABS cannot check programs that use functions that are
+only available in binary (compiled) form (this restriction
+is not imposed by the verification algorithms that are used by SATABS &ndash;
+they also work on assembly code). The reason is simply that so far
+no assembly language frontend is available for SATABS. At the moment,
+(library) functions for which no C source code is available have to be
+replaced by stubs. The usage of stubs and harnesses (as known from unit 
+testing) also allows to check more complicated properties (like, for 
+example, whether function <code>fopen</code> is always called before
+<code>fclose</code>). This technique is explained in detail 
+in the <a href="satabs-tutorials.shtml">SATABS tutorials</a>.
+</p>
+
+<h3>Unit Testing with SATABS</h3>
+
+<p class="justified">
+The example presented <a href="satabs-driver.shtml">here</a> is obviously a
+toy example and can hardly be used to convince your project manager to use
+static verification in your next project.  Even though we recommend to use
+formal verification and specification already in the early phases of your
+project, the sad truth is that in most projects verification (of any kind)
+is still pushed to the very end of the development cycle.  Therefore, this
+section is dedicated to the verification of legacy code.  However, the
+techniques presented here can also be used for <i>unit testing</i>.
+</p>
+
+<p class="justified">
+Unit testing is used in most software development projects, and static
+verification with SATABS can be very well combined with this technique. 
+Unit testing relies on a number test cases that yield the desired code
+coverage.  Such test cases are implemented by a software testing engineer in
+terms of a test harness (aka test driver) and a set of function stubs. 
+Typically, a slight modification to the test harness allows it to be used
+with SATABS.  Replacing the explicit input values with non-deterministic
+inputs (as explained in <a href="satabs-aeon.shtml">here</a> and
+<a href="satabs-driver.shtml">here</a>) guarantees that SATABS will try to
+achieve <b>full</b> path and state coverage (due to the fact that
+predicate abstraction implicitly detects equivalence classes).
+However, it is not guaranteed that SATABS terminates in all cases.
+Keep in mind that you must not make any assumptions about the
+validity of the claims if SATABS did not run to completion!
+</p>
+
+<div class="box1">
+<div class="caption">Further Reading</div>
+
+<p>
+<ul>
+<li><a href="http://www.kroening.com/publications/view-publications-wbwk2007.html">
+Model Checking Concurrent Linux Device Drivers</a></li>
+<li><a href="http://www-2.cs.cmu.edu/~svc/papers/view-publications-cksy2005.html">
+    SATABS: SAT-based Predicate Abstraction for ANSI-C</a></li>
+<li><a href="http://www-2.cs.cmu.edu/~svc/papers/view-publications-cksy2004.html">
+    Predicate Abstraction of ANSI-C Programs using SAT</a></li>
+</ul>
+</p>
+
+<!--#include virtual="footer.inc" -->

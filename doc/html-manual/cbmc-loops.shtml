@@ -1,0 +1,238 @@
+<!--#include virtual="header.inc" -->
+
+<p><a href="./">CPROVER Manual TOC</a></p>
+
+<h2>CBMC: Bounded Model Checking for C/C++</h2>
+
+<h3>Understanding Loop Unwinding</h3>
+
+<h4>Iteration-based Unwinding</h4>
+
+<p class="justified">
+The basic idea of CBMC is to model the computation of the programs up to a
+particular depth.  Technically, this is achieved by a process that
+essentially amounts to <i>unwinding loops</i>.  This concept is best
+illustrated with a generic example:
+</p>
+
+<hr>
+<code>
+int main(int argc, char **argv) {<br>
+&nbsp;&nbsp;while(cond) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<font color="#3030f0">BODY CODE</font><br>
+&nbsp;&nbsp;}<br>
+}
+</code>
+<hr>
+
+<p class="justified">
+A BMC instance that will find bugs with up to 5 iterations of the loop would
+contain 5 copies of the loop body, and essentially corresponds to checking
+the following loop-free program:
+</p>
+
+<hr>
+<code>
+int main(int argc, char **argv) {<br>
+&nbsp;&nbsp;if(cond) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<font color="#3030f0">BODY CODE COPY 1</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;if(cond) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#3030f0">BODY CODE COPY 2</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(cond) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#3030f0">BODY CODE COPY 3</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(cond) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#3030f0">BODY CODE COPY 4</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(cond) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#3030f0">BODY CODE COPY 5</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;}<br>
+}
+</code>
+<hr>
+
+<p class="justified">
+Note the use of the <code>if</code> statement to prevent the execution of
+the loop body in the case that the loop ends before 5 iterations are executed.
+The construction above is meant to produce a program that is trace equivalent
+with the original programs for those traces that contain up to 5 iterations
+of the loop.
+</p>
+
+<p class="justified">
+In many cases, CBMC is able to automatically determine an upper bound on the
+
+number of loop iterations. This may even work when the number of loop
+unwindings is not constant. Consider the following example:
+</p>
+
+<hr>
+<code>
+_Bool f();<br>
+<br>
+int main() {<br>
+&nbsp;&nbsp;for(int i=0; i<100; i++) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;if(f()) break;<br>
+&nbsp;&nbsp;}<br>
+<br>  
+&nbsp;&nbsp;assert(0);<br>
+}
+</code>
+<hr>
+
+<p class="justified">
+One hundred iterations are obviously sufficient for the program above,
+but note that the loop may abort prematurely depending on the value
+that is returned by <code>f()</code>. CBMC is nevertheless able to automatically
+unwind the loop to completion.</p>
+
+<p class="justified">
+This automatic detection of the unwinding
+bound may fail if the number of loop iterations is highly data-dependent.
+Furthermore, the number of iterations that are executed by any given
+loop may be too large or may simply be unbounded. For this case,
+CBMC offers the command-line option <code>--unwind B</code>, where
+<code>B</code> denotes a number that corresponds to the maximal number
+of loop unwindings CBMC performs on any loop.
+</p>
+
+<h4>Setting Separate Unwinding Limits</h4>
+
+<p class="justified">
+The setting given with <code>--unwind</code> is used globally,
+that is, for all loops in the program. In order to set individual
+limits for the loops, first use
+</p>
+
+<code>
+&nbsp;&nbsp;--show-loops
+</code>
+
+<p class="justified">
+to obtain a list of all loops in the program. Then identify the loops
+you need to set a separate bound for, and note their loop ID. Then
+use
+</p>
+
+<code>
+&nbsp;&nbsp;--unwindset L:B,L:B,...
+</code>
+
+<p class="justified">
+As an example, consider a program with two loops in the function
+main:
+</p>
+
+<code>
+&nbsp;&nbsp;--unwindset c::main.0:10,c::main.1:20
+</code>
+
+<p class="justified">
+This sets a bound of 10 for the first loop, and a bound of 20 for
+the second loop.
+</p>
+
+<p class="justified">
+What if the number of unwindings specified is too small? In this case,
+bugs that require paths that are deeper may be missed. In order to address
+this problem, CBMC by default inserts checks that the given unwinding
+bound is actually sufficiently large. These checks are called <i>unwinding
+assertions</i>. Continuing the generic example above, this unwinding
+assertion for a bound of 5 corresponds to checking the following
+loop-free program:
+</p>
+
+<hr>
+<code>
+int main(int argc, char **argv) {<br>
+&nbsp;&nbsp;if(cond) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<font color="#3030f0">BODY CODE COPY 1</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;if(cond) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#3030f0">BODY CODE COPY 2</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(cond) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#3030f0">BODY CODE COPY 3</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(cond) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#3030f0">BODY CODE COPY 4</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(cond) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#3030f0">BODY CODE COPY 5</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color=#ff3030">assert(!cond);</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;}<br>
+}
+</code>
+<hr>
+
+<p class="justified">
+The unwinding assertions can be verified just like any other generated
+assertion.  If all of them are proven to hold, the given loop bounds are
+sufficient for the program.  This establishes a <a
+href="http://en.wikipedia.org/wiki/Worst-case_execution_time"><i>high-level
+worst-case execution time</i></a> (WCET).  In order to disable the
+generation of unwinding assertions, run CBMC with the parameter
+</p>
+
+<code>
+&nbsp;&nbsp;--no-unwinding-assertions
+</code>
+
+<p class="justified">
+In some cases, it is desirable to cut off very deep loops in favor
+of code that follows the loop. As an example, consider the
+following program:
+</p>
+
+<hr>
+<code>
+int main() {<br>
+&nbsp;&nbsp;for(int i=0; i<10000; i++) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<font color="#3030f0">BODY CODE</font><br>
+&nbsp;&nbsp;}<br>
+<br>  
+&nbsp;&nbsp;assert(0);<br>
+}
+</code>
+<hr>
+
+<p class="justified">
+In the example above, small values of <code>--unwind</code> will
+prevent that the assertion is reached. If the code in the loop
+is considered irrelevant to the later assertion, use the option
+</p>
+
+<code>
+&nbsp;&nbsp;--partial-loops
+</code>
+
+<p class="justified">
+This option will allow paths that execute loops only partially,
+enabling a counterexample for the assertion above even for
+small unwinding bounds. The disadvantage of using this option
+is that the resulting path may be spurious, i.e., may not
+exist in the original program.
+</p>
+
+<h4>Depth-based Unwinding</h4>
+
+<p class="justified">
+The loop-based unwinding bound is not always appropriate. In particular,
+it is often difficult to control the size of the generated formula
+when using the <code>--unwind</code> option. The option
+</p>
+
+<code>
+&nbsp;&nbsp;--depth <i>nr</i>
+</code>
+
+<p class="justified">
+specifies an unwinding bound in terms of the number of instructions that are
+executed on a given path, irrespectively of the number of loop iterations.
+Note that CBMC uses the number of instructions in the control-flow graph
+as the criterion, not the number of instructions in the source code.
+</p>
+
+<!--#include virtual="footer.inc" -->
