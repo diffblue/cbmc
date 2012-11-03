@@ -18,7 +18,8 @@ SRC = cpp_id.cpp cpp_language.cpp expr2cpp.cpp cpp_parser.cpp \
       cpp_declaration.cpp cpp_namespace_spec.cpp \
       cpp_typecheck_using.cpp cpp_exception_id.cpp \
       cpp_typecheck_enum_type.cpp cpp_typecheck_bases.cpp \
-      cpp_typecheck_constructor.cpp cpp_typecheck_virtual_table.cpp
+      cpp_typecheck_constructor.cpp cpp_typecheck_virtual_table.cpp \
+      cpp_typecheck_static_assert.cpp
 
 INCLUDES= -I .. -I ../util
 
