@@ -13,17 +13,24 @@ suitable preprocessor and an a set of header files.</p>
 
 <ol>
 
-<li><b>Linux:</b> the preprocessor and the header files typically come with a
+<li><p class="justified">
+<b>Linux:</b> the preprocessor and the header files typically come with a
 package called <i>gcc</i>, which must be installed prior to the installation
-of CBMC.</li>
+of CBMC.
+</p></li>
 
-<li><b>Windows:</b> The Windows version of CBMC requires the preprocessor 
+<li><p class="justified">
+<b>Windows:</b> The Windows version of CBMC requires the preprocessor 
 <code>cl.exe</code>, which is part of Visual Studio (including
 the free <a href="http://msdn.microsoft.com/vstudio/express/visualc/">Visual
-Studio Express</a>).</li>
+Studio Express</a>).
+</p></li>
 
-<li><b>MacOS:</b> Install <a href="http://developer.apple.com/technologies/xcode.html">XCode</a>
-prior to installing CBMC.</li>
+<li><p class="justified">
+<b>MacOS:</b> Install the
+<a href="http://developer.apple.com/technologies/xcode.html">XCode Command Line Utilities</a>
+prior to installing CBMC. Just installing XCode alone is not enough.
+</p></li>
 
 </ol>
 
@@ -39,9 +46,9 @@ from within the <i>Visual Studio Command Prompt</i>.</font>
 <p class="justified">
 Note that the distribution files for the
 <a href="installation-plugin.shtml">Eclipse plugin</a> include the
-command-line tools.  Therefore, if you intend to run CBMC
+CBMC executable.  Therefore, if you intend to run CBMC
 exclusively within Eclipse, you can skip the installation of the
-command-line tools.  However, you still have to install the compiler
+CBMC executable.  However, you still have to install the compiler
 environment as described above.</p>
 
 <h3>Installing CBMC</h3>
