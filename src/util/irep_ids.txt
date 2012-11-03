@@ -497,6 +497,7 @@ cpp_namespace_spec
 cpp_storage_spec
 cpp_using
 cpp_declaration
+cpp_static_assert
 cpp_member_spec
 C_c_type #c_type
 namespace
