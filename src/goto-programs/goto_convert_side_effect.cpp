@@ -60,13 +60,13 @@ void goto_convertt::remove_assignment(
   bool result_is_used)
 {
   const irep_idt statement=expr.get_statement();
-
+  
   if(statement==ID_assign)
   {
     exprt tmp=expr;
     tmp.id(ID_code);
     // just interpret as code
-    convert(to_code(tmp), dest);
+    convert_assign(to_code_assign(to_code(tmp)), dest);
   }
   else if(statement==ID_assign_plus ||
           statement==ID_assign_minus ||
