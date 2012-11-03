@@ -11,9 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "boolbv.h"
 #include "boolbv_type.h"
 
-#ifdef HAVE_FLOATBV
 #include "../floatbv/float_utils.h"
-#endif
 
 /*******************************************************************\
 
@@ -82,13 +80,9 @@ void boolbvt::convert_unary_minus(const exprt &expr, bvt &bv)
       
       if(type.subtype().id()==ID_floatbv)
       {
-        #ifdef HAVE_FLOATBV
         float_utilst float_utils(prop);
         float_utils.spec=to_floatbv_type(subtype);
         tmp_result=float_utils.negate(tmp_op);
-        #else
-        return conversion_failed(expr, bv);
-        #endif
       }
       else
         tmp_result=bv_utils.negate(tmp_op);
@@ -115,13 +109,11 @@ void boolbvt::convert_unary_minus(const exprt &expr, bvt &bv)
   }
   else if(bvtype==IS_FLOAT && op_bvtype==IS_FLOAT)
   {
-    #ifdef HAVE_FLOATBV
     assert(!no_overflow);
     float_utilst float_utils(prop);
     float_utils.spec=to_floatbv_type(expr.type());
     bv=float_utils.negate(op_bv);
     return;
-    #endif
   }
   else if((op_bvtype==IS_SIGNED || op_bvtype==IS_UNSIGNED) &&
           (bvtype==IS_SIGNED || bvtype==IS_UNSIGNED))

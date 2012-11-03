@@ -10,9 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "boolbv.h"
 
-#ifdef HAVE_FLOATBV
 #include "../floatbv/float_utils.h"
-#endif
 
 /*******************************************************************\
 
@@ -74,13 +72,9 @@ void boolbvt::convert_div(const exprt &expr, bvt &bv)
   }
   else if(expr.type().id()==ID_floatbv)
   {
-    #ifdef HAVE_FLOATBV
     float_utilst float_utils(prop);
     float_utils.spec=to_floatbv_type(expr.type());
     res=float_utils.div(op0, op1);
-    #else
-    return conversion_failed(expr, bv);
-    #endif
   }
   else
   {

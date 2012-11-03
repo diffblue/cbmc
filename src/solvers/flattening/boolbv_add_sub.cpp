@@ -12,9 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "boolbv.h"
 
-#ifdef HAVE_FLOATBV
 #include "../floatbv/float_utils.h"
-#endif
 
 /*******************************************************************\
 
@@ -128,13 +126,9 @@ void boolbvt::convert_add_sub(const exprt &expr, bvt &bv)
         
         if(type.subtype().id()==ID_floatbv)
         {
-          #ifdef HAVE_FLOATBV
           float_utilst float_utils(prop);
           float_utils.spec=to_floatbv_type(subtype);
           tmp_result=float_utils.add_sub(tmp_result, tmp_op, subtract);
-          #else
-          return conversion_failed(expr, bv);
-          #endif
         }
         else
           tmp_result=bv_utils.add_sub(tmp_result, tmp_op, subtract);
@@ -150,13 +144,9 @@ void boolbvt::convert_add_sub(const exprt &expr, bvt &bv)
     }
     else if(type.id()==ID_floatbv)
     {
-      #ifdef HAVE_FLOATBV
       float_utilst float_utils(prop);
       float_utils.spec=to_floatbv_type(arithmetic_type);
       bv=float_utils.add_sub(bv, op, subtract);
-      #else
-      return conversion_failed(expr, bv);
-      #endif
     }
     else if(no_overflow)
       bv=bv_utils.add_sub_no_overflow(bv, op, subtract, rep);

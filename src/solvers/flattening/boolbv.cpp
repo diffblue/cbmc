@@ -27,9 +27,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "boolbv.h"
 #include "boolbv_type.h"
 
-#ifdef HAVE_FLOATBV
 #include "../floatbv/float_utils.h"
-#endif
 
 //#define DEBUG
 
@@ -335,7 +333,6 @@ void boolbvt::convert_bitvector(const exprt &expr, bvt &bv)
     
     return;
   }
-  #ifdef HAVE_FLOATBV
   else if(expr.id()==ID_float_debug1 ||
           expr.id()==ID_float_debug2)
   {
@@ -350,7 +347,6 @@ void boolbvt::convert_bitvector(const exprt &expr, bvt &bv)
       float_utils.debug2(bv0, bv1);
     return;
   }
-  #endif
 
   return conversion_failed(expr, bv);
 }
@@ -599,11 +595,9 @@ literalt boolbvt::convert_rest(const exprt &expr)
     
     if(expr.op0().type().id()==ID_floatbv)
     {
-      #ifdef HAVE_FLOATBV
       float_utilst float_utils(prop);
       float_utils.spec=to_floatbv_type(expr.op0().type());
       return float_utils.is_NaN(bv);
-      #endif
     }
     else if(expr.op0().type().id()==ID_fixedbv)
       return const_literal(false);
@@ -617,13 +611,11 @@ literalt boolbvt::convert_rest(const exprt &expr)
     
     if(expr.op0().type().id()==ID_floatbv)
     {
-      #ifdef HAVE_FLOATBV
       float_utilst float_utils(prop);
       float_utils.spec=to_floatbv_type(expr.op0().type());
       return prop.land(
         prop.lnot(float_utils.is_infinity(bv)),
         prop.lnot(float_utils.is_NaN(bv)));
-      #endif
     }
     else if(expr.op0().type().id()==ID_fixedbv)
       return const_literal(true);
@@ -637,11 +629,9 @@ literalt boolbvt::convert_rest(const exprt &expr)
     
     if(expr.op0().type().id()==ID_floatbv)
     {
-      #ifdef HAVE_FLOATBV
       float_utilst float_utils(prop);
       float_utils.spec=to_floatbv_type(expr.op0().type());
       return float_utils.is_infinity(bv);
-      #endif
     }
     else if(expr.op0().type().id()==ID_fixedbv)
       return const_literal(false);
@@ -655,11 +645,9 @@ literalt boolbvt::convert_rest(const exprt &expr)
     
     if(expr.op0().type().id()==ID_floatbv)
     {
-      #ifdef HAVE_FLOATBV
       float_utilst float_utils(prop);
       float_utils.spec=to_floatbv_type(expr.op0().type());
       return float_utils.is_normal(bv);
-      #endif
     }
     else if(expr.op0().type().id()==ID_fixedbv)
       return const_literal(true);

@@ -11,9 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "boolbv.h"
 #include "boolbv_type.h"
 
-#ifdef HAVE_FLOATBV
 #include "../floatbv/float_utils.h"
-#endif
 
 /*******************************************************************\
 
@@ -29,7 +27,6 @@ Function: boolbvt::convert_ieee_float_rel
 
 literalt boolbvt::convert_ieee_float_rel(const exprt &expr)
 {
-  #ifdef HAVE_FLOATBV
   const exprt::operandst &operands=expr.operands();
   const irep_idt &rel=expr.id();
 
@@ -58,7 +55,6 @@ literalt boolbvt::convert_ieee_float_rel(const exprt &expr)
         return SUB::convert_rest(expr);
     }
   }
-  #endif
 
   return SUB::convert_rest(expr);
 }
