@@ -289,7 +289,7 @@ void goto_convertt::clean_expr(
   else if(expr.id()==ID_sideeffect)
   {
     // some of the side-effects need special treatment!
-    const irep_idt statement=expr.get(ID_statement);
+    const irep_idt statement=to_side_effect_expr(expr).get_statement();
     
     if(statement==ID_gcc_conditional_expression)
     {
@@ -303,6 +303,30 @@ void goto_convertt::clean_expr(
       // the operands of expr get 'cleaned'
       remove_statement_expression(to_side_effect_expr(expr), dest, result_is_used);
       return;
+    }
+    else if(statement==ID_assign)
+    {
+      // we do a special treatment for x=f(...)
+      assert(expr.operands().size()==2);
+      if(expr.op1().id()==ID_sideeffect &&
+         to_side_effect_expr(expr.op1()).get_statement()==ID_function_call)
+      {
+        clean_expr(expr.op0(), dest);
+        exprt lhs=expr.op0();
+
+        // turn into code
+        code_assignt assignment;
+        assignment.lhs()=lhs;
+        assignment.rhs()=expr.op1();
+        assignment.location()=expr.location();
+        convert_assign(assignment, dest);
+
+        if(result_is_used)
+          expr.swap(lhs);
+        else
+          expr.make_nil();
+        return;
+      }
     }
   }
 
