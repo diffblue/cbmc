@@ -367,8 +367,8 @@ void cpp_typecheckt::typecheck_expr_sizeof(exprt &expr)
       
     if(type.id()==ID_cpp_name)
     {
-      // this may be ambiguous -- it can be either a type or
-      // an expression
+      // sizeof(X) may be ambiguous -- X can be either a type or
+      // an expression.
 
       cpp_typecheck_fargst fargs;
 
@@ -2660,8 +2660,8 @@ void cpp_typecheckt::typecheck_expr(exprt &expr)
   bool override_constantness=
     expr.get_bool("#override_constantness");
     
-  // we take care of an ambiguity in the C++ grammar
-  // needs to be done before the operands!
+  // We take care of an ambiguity in the C++ grammar.
+  // Needs to be done before the operands!
   explicit_typecast_ambiguity(expr);
   
   c_typecheck_baset::typecheck_expr(expr);
