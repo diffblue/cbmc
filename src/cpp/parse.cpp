@@ -4097,7 +4097,13 @@ bool Parser::rCastExpr(exprt &exp)
     return rUnaryExpr(exp);
   else
   {
+    // There is an ambiguity in the C++ grammar as follows:
+    // (TYPENAME) + expr   (typecast of unary plus)  vs.
+    // (expr) + expr       (sum of two expressions)
+    // Same issue with the operators & and - and *
+  
     Token tk1, tk2;
+    typet tname;
 
     #ifdef DEBUG
     std::cout << "Parser::rCastExpr 1\n";
@@ -4106,11 +4112,17 @@ bool Parser::rCastExpr(exprt &exp)
     cpp_token_buffert::post pos=lex->Save();
     lex->GetToken(tk1);
 
-    typet tname;
-
     if(rTypeName(tname))
+    {
       if(lex->GetToken(tk2)==')')
-        if(rCastExpr(exp))
+      {
+        if(lex->LookAhead(0)=='&' &&
+           lex->LookAhead(1)==TOK_INTEGER)
+        {
+          // we have (x) & 123
+          // This is likely a binary bit-wise 'and'
+        }
+        else if(rCastExpr(exp))
         {
           exprt op;
           op.swap(exp);
@@ -4121,6 +4133,8 @@ bool Parser::rCastExpr(exprt &exp)
           set_location(exp, tk1);
           return true;
         }
+      }
+    }
 
     lex->Restore(pos);
     return rUnaryExpr(exp);
