@@ -1,4 +1,5 @@
-SRC = goto_convert.cpp goto_function.cpp goto_main.cpp goto_sideeffects.cpp \
+SRC = goto_convert.cpp goto_convert_function_call.cpp \
+      goto_convert_side_effect.cpp \
       goto_program.cpp basic_blocks.cpp goto_check.cpp \
       remove_function_pointers.cpp goto_functions.cpp goto_inline.cpp \
       remove_skip.cpp goto_convert_functions.cpp string_instrumentation.cpp \
