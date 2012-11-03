@@ -194,7 +194,14 @@ exprt zero_initializert::zero_initializer_rec(
         it=components.begin();
         it!=components.end();
         it++)
-      value.copy_to_operands(zero_initializer_rec(it->type(), location));
+    {
+      // skip methods
+      if(it->type().id()==ID_code)
+      {
+      }
+      else
+        value.copy_to_operands(zero_initializer_rec(it->type(), location));
+    }
 
     value.location()=location;
 
@@ -207,12 +214,31 @@ exprt zero_initializert::zero_initializer_rec(
 
     exprt value(ID_union, type);
 
-    if(components.empty())
+    union_typet::componentt component;
+    bool found=false;
+
+    for(struct_typet::componentst::const_iterator
+        it=components.begin();
+        it!=components.end();
+        it++)
+    {
+      // skip methods
+      if(it->type().id()==ID_code)
+      {
+      }
+      else
+      {
+        component=*it;
+        found=true;
+      }
+    }
+
+    if(!found)
       return value; // stupid empty union
 
-    value.set(ID_component_name, components.front().get(ID_name));
+    value.set(ID_component_name, component.get_name());
     value.copy_to_operands(
-      zero_initializer_rec(components.front().type(), location));
+      zero_initializer_rec(component.type(), location));
     value.location()=location;
 
     return value;
