@@ -104,6 +104,8 @@ exprt goto_symext::add_to_lhs(
     assert(p->operands().size()>=1);
     p=&p->op0();
   }
+  
+  assert(p->is_nil());
 
   *p=tmp_what;
   return new_lhs;
