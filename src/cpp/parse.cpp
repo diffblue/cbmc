@@ -5764,7 +5764,9 @@ bool Parser::rStatement(codet &statement)
       if(!rStaticAssert(cpp_static_assert))
         return false;
         
-      // TODO
+      statement.set_statement(ID_static_assert);
+      statement.location()=cpp_static_assert.location();
+      statement.operands().swap(cpp_static_assert.operands());
       
       return true;
     }
