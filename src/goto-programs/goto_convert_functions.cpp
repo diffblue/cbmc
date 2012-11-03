@@ -215,8 +215,8 @@ void goto_convert_functionst::convert_function(const irep_idt &identifier)
     end_location.make_nil();
 
   targets=targetst();
-  targets.return_set=true;
-  targets.return_value=
+  targets.return_is_set=true;
+  targets.has_return_value=
     f.type.return_type().id()!=ID_empty &&
     f.type.return_type().id()!=ID_constructor &&
     f.type.return_type().id()!=ID_destructor;
@@ -224,7 +224,7 @@ void goto_convert_functionst::convert_function(const irep_idt &identifier)
   goto_convert_rec(code, f.body);
   
   // add non-det return value, if needed
-  if(targets.return_value)
+  if(targets.has_return_value)
     add_return(f, end_location);
       
   // add "end of function"

@@ -1368,7 +1368,7 @@ void goto_convertt::convert_return(
   const code_returnt &code,
   goto_programt &dest)
 {
-  if(!targets.return_set)
+  if(!targets.return_is_set)
   {
     err_location(code);
     throw "return without target";
@@ -1385,12 +1385,19 @@ void goto_convertt::convert_return(
   
   if(new_code.has_return_value())
   {
+    bool result_is_used=
+      new_code.return_value().type().id()!=ID_empty;
+  
     goto_programt sideeffects;
-    clean_expr(new_code.return_value(), sideeffects);
+    clean_expr(new_code.return_value(), sideeffects, result_is_used);
     dest.destructive_append(sideeffects);
+
+    // remove void-typed return value
+    if(!result_is_used)
+      new_code.operands().resize(0);    
   }
 
-  if(targets.return_value)
+  if(targets.has_return_value)
   {
     if(!new_code.has_return_value())
     {

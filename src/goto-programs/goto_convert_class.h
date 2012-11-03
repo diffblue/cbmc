@@ -273,15 +273,16 @@ protected:
 
   struct targetst:public break_continue_switch_targetst
   {
-    bool return_set;
-    bool return_value;
+    bool return_is_set;
+    bool has_return_value;
 
     labelst labels;
     gotost gotos;
     computed_gotost computed_gotos;
 
     targetst():
-      return_set(false)
+      return_is_set(false),
+      has_return_value(false)
     {
     }
     
@@ -293,8 +294,8 @@ protected:
       std::swap(targets.continue_target, continue_target);
       std::swap(targets.continue_set, continue_set);
 
-      std::swap(targets.return_value, return_value);
-      std::swap(targets.return_set, return_set);   
+      std::swap(targets.has_return_value, has_return_value);
+      std::swap(targets.return_is_set, return_is_set);   
       
       std::swap(targets.default_target, default_target);
       std::swap(targets.default_set, default_set);
