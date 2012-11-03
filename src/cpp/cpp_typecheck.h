@@ -114,6 +114,7 @@ protected:
   void convert(cpp_itemt &);
   void convert(cpp_declarationt &);
   void convert(cpp_declaratort &);
+  void convert(cpp_static_assertt &);
 
   void convert_initializer(symbolt &symbol);
   void convert_function(symbolt &symbol);

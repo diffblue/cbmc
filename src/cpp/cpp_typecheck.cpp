@@ -102,6 +102,8 @@ void cpp_typecheckt::convert(cpp_itemt &item)
     convert(item.get_namespace_spec());
   else if(item.is_using())
     convert(item.get_using());
+  else if(item.is_static_assert())
+    convert(item.get_static_assert());
   else
   {
     err_location(item);

@@ -48,6 +48,7 @@ protected:
   bool rLinkageSpec(cpp_linkage_spect &);
   bool rNamespaceSpec(cpp_namespace_spect &);
   bool rUsing(cpp_usingt &);
+  bool rStaticAssert(cpp_static_assertt &);
   bool rLinkageBody(cpp_linkage_spect::itemst &);
   bool rTemplateDecl(cpp_declarationt &);
   bool rTemplateDecl2(typet &, TemplateDeclKind &kind);
@@ -294,6 +295,8 @@ bool Parser::rDefinition(cpp_itemt &item)
     res=rNamespaceSpec(item.make_namespace_spec());
   else if(t==TOK_USING)
     res=rUsing(item.make_using());
+  else if(t==TOK_STATIC_ASSERT)
+    res=rStaticAssert(item.make_static_assert());
   else
     res=rDeclaration(item.make_declaration());
 
@@ -529,6 +532,40 @@ bool Parser::rUsing(cpp_usingt &cpp_using)
   }
 
   if(!rName(cpp_using.name()))
+    return false;
+
+  if(lex->GetToken(tk)!=';')
+    return false;
+
+  return true;
+}
+
+/*
+  static_assert.declaration : STATIC_ASSERT ( expression , expression ) ';'
+*/
+bool Parser::rStaticAssert(cpp_static_assertt &cpp_static_assert)
+{
+  Token tk;
+
+  if(lex->GetToken(tk)!=TOK_STATIC_ASSERT)
+    return false;
+
+  cpp_static_assert=cpp_static_assertt();
+  set_location(cpp_static_assert, tk);
+
+  if(lex->GetToken(tk)!='(')
+    return false;
+
+  if(!rExpression(cpp_static_assert.cond()))
+    return false;
+
+  if(lex->GetToken(tk)!=',')
+    return false;
+
+  if(!rExpression(cpp_static_assert.description()))
+    return false;
+
+  if(lex->GetToken(tk)!=')')
     return false;
 
   if(lex->GetToken(tk)!=';')
@@ -3397,6 +3434,7 @@ bool Parser::rClassBody(exprt &body)
   | metaclass.decl
   | declaration
   | access.decl
+  | static_assert
 
   Note: if you modify this function, see ClassWalker::TranslateClassSpec()
   as well.
@@ -3446,6 +3484,8 @@ bool Parser::rClassMember(cpp_itemt &member)
     return rTemplateDecl(member.make_declaration());
   else if(t==TOK_USING)
     return rUsing(member.make_using());
+  else if(t==TOK_STATIC_ASSERT)
+    return rStaticAssert(member.make_static_assert());
   else
   {
     cpp_token_buffert::post pos=lex->Save();
@@ -5512,6 +5552,7 @@ bool Parser::rCompoundStatement(codet &statement)
   | Identifier ':' statement
   | expr.statement
   | USING { NAMESPACE } identifier ';'
+  | STATIC_ASSERT ( expression ',' expression ) ';'
 */
 bool Parser::rStatement(codet &statement)
 {
@@ -5714,6 +5755,18 @@ bool Parser::rStatement(codet &statement)
       // TODO
         
       return true;      
+    }
+    
+  case TOK_STATIC_ASSERT:
+    {
+      cpp_static_assertt cpp_static_assert;
+      
+      if(!rStaticAssert(cpp_static_assert))
+        return false;
+        
+      // TODO
+      
+      return true;
     }
 
   default:

@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_linkage_spec.h"
 #include "cpp_namespace_spec.h"
 #include "cpp_using.h"
+#include "cpp_static_assert.h"
 
 class cpp_itemt:public irept
 {
@@ -104,7 +105,7 @@ public:
 
   cpp_usingt &get_using()
   {
-    assert(is_using());
+     assert(is_using());
     return (cpp_usingt &)*this;
   }
 
@@ -118,6 +119,26 @@ public:
   {
     return id()==ID_cpp_using;
   }
+  
+  // static assertion
+
+  cpp_static_assertt &make_static_assert()
+  {
+    id(ID_cpp_static_assert);
+    return (cpp_static_assertt &)*this;
+  }
+
+  cpp_static_assertt &get_static_assert()
+  {
+    assert(is_static_assert());
+    return (cpp_static_assertt &)*this;
+  }
+
+  bool is_static_assert() const
+  {
+    return id()==ID_cpp_static_assert;
+  }
+  
 };
 
 #endif
