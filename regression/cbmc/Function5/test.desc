@@ -1,0 +1,10 @@
+CORE
+main.c
+--pointer-check
+^SIGNAL=0$
+^EXIT=10$
+^Counterexample:$
+^VERIFICATION FAILED$
+^  dereference failure: offset not zero$
+--
+^warning: ignoring
