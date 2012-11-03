@@ -32,10 +32,6 @@ CLEANFILES = util$(LIBEXT) \
 
 all: util$(LIBEXT) ieee_float_test$(EXEEXT)
 
-ifneq ($(wildcard ../floatbv/Makefile),)
-  CP_CXXFLAGS += -DHAVE_FLOATBV
-endif
-
 ###############################################################################
 
 irep_ids.h: irep_ids_convert$(EXEEXT) irep_ids.txt
