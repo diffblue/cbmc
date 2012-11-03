@@ -61,5 +61,13 @@ variable.</li>
 <p class="justified">
 You are now ready to <a href="cbmc.shtml">use CBMC</a>!</p>
 
+<h3>Building CBMC from Source</h3>
+
+<p class="justified">
+The CBMC source code is available <a href="http://www.cprover.org/svn/cbmc/">via SVN</a>.
+To compile the source code, follow
+<a href="http://www.cprover.org/svn/cbmc/trunk/COMPILING">these instructions</a>.
+</p>
+
 <!--#include virtual="footer.inc" -->
 
