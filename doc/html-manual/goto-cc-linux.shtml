@@ -1,0 +1,97 @@
+<!--#include virtual="header.inc" -->
+
+<p><a href="./">CPROVER Manual TOC</a></p>
+
+<h2>Build Systems and Libraries</h2>
+
+<h3>Example: Extracting Models from the Linux Kernel</h3>
+
+<p class="justified">
+
+The Linux kernel code consists of more than 11 million lines of low-level C
+and is frequently used to evaluate static analysis techniques.  In the
+following, we show how to extract models from Linux 2.6.39.
+</p>
+
+<ol>
+<li><p class="justified">
+First of all, you will need to make sure you have around 100 GB
+of free disc space available.</p></li>
+
+<li><p class="justified">Download the Kernel sources at
+<a href="http://www.kernel.org/pub/linux/kernel/v2.6/linux-2.6.39.tar.bz2">
+http://www.kernel.org/pub/linux/kernel/v2.6/linux-2.6.39.tar.bz2
+</a>.
+</p></li>
+
+<li><p class="justified">Now do</p>
+<p>
+&nbsp;&nbsp;<code>bunzip2 linux-2.6.39.tar.bz2</code><br>
+&nbsp;&nbsp;<code>tar xvf linux-2.6.39.tar</code><br>
+&nbsp;&nbsp;<code>cd linux-2.6.39</code>
+</p></li>
+
+<li><p class="justified">Now ensure that you can actually
+compile a kernel by doing</p>
+<p>
+&nbsp;&nbsp;<code>make xconfig</code><br>
+&nbsp;&nbsp;<code>make</code></p>
+<p class="justified">
+These steps need to succeed before you can try to extract
+models from the kernel.
+</p></li>
+
+<li><p class="justified">Now compile
+<a href="gcc-wrap.c">gcc-wrap.c</a> and put the resulting binary
+into a directory that is in your PATH variable:</p>
+<p>
+&nbsp;&nbsp;<code>lwp-download http://www.cprover.org/cprover-manual/gcc-wrap.c</code><br>
+&nbsp;&nbsp;<code>gcc gcc-wrap.c -o gcc-wrap</code><br>
+&nbsp;&nbsp;<code>cp gcc-wrap ~/bin/</code><br>
+</p>
+<p class="justified">This assumes that the directory <code>~/bin</code>
+exists and is in your PATH variable.</p>
+</li>
+
+<li><p class="justified">Now change the variable CC in the kernel
+Makefile as follows:</p>
+<p>
+<code>&nbsp;&nbsp;CC = ~/bin/gcc-wrap</code>
+</p>
+</li>
+
+<li><p class="justified">Now do</p>
+<p>
+&nbsp;&nbsp;<code>make clean</code><br>
+&nbsp;&nbsp;<code>make</code></p>
+<p class="justified">
+This will re-compile the kernel, but this time retaining the
+preprocessed source files.
+</p></li>
+
+<li><p class="justified">You can now compile the preprocessed
+source files with goto-cc as follows:</p>
+<p>
+&nbsp;&nbsp;<code>find ./ -name .tmp_*.i > source-file-list</code><br>
+&nbsp;&nbsp;<code>for a in `cat source-file-list` ; do</code><br>
+&nbsp;&nbsp;<code>&nbsp;&nbsp;goto-cc -c $a -o $a.gb</code><br>
+&nbsp;&nbsp;<code>done</code></p>
+
+<p class="justified">Note that it is important that the
+word-size of the kernel configuration matches that of goto-cc.
+Otherwise, compile-time assertions will fail, generating
+the error message "bit field size is negative". For a kernel
+configured for a 64-bit word-width, pass the option
+<nobr>--64</nobr> to goto-cc.</p>
+
+</li>
+
+</ol>
+
+<p class="justified">
+The resulting <code>.gb</code> files can be passed to any
+of the CPROVER tools.
+</p>
+
+<!--#include virtual="footer.inc" -->
+

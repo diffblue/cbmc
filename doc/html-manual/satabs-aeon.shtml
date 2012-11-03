@@ -1,0 +1,263 @@
+<!--#include virtual="header.inc" -->
+
+<p><a href="./">CPROVER Manual TOC</a></p>
+
+<h2>SATABS &ndash; Predicate Abstraction with SAT</h2>
+
+<h3>Tutorials</h3>
+
+<h4>Example: Buffer Overflow in a Mail Transfer Agent</h4>
+
+<p class="justified">
+
+We explain how to model check Aeon version 0.2a, a small
+mail transfer agent written by Piotr Benetkiewicz. The description
+advertises Aeon as a "<i>good choice for <b>hardened</b> or
+minimalistic boxes</i>". The sources are available
+<a href="http://www.cprover.org/satabs/examples/loop_detection/aeon-0.2a.tar.gz">
+here</a>.</p>
+
+<p class="justified">
+Our first naive attempt to verify Aeon using 
+</p>
+
+<p>
+<code>satabs *.c</code>
+</p>
+
+<p class="justified">
+produces a positive result, but also warns us that the property holds
+trivially.  It also reveals that a large number library functions are
+missing: SATABS is unable to find the source code for library functions like
+<code>send</code>, <code>write</code> and <code>close</code>.
+</p>
+
+<p class="justified">
+Now, do you have to provide a body for all missing library functions?
+There is no easy answer to this question, but a viable answer would
+be "most likely not". It is necessary to understand how SATABS 
+handles functions without bodies: It simply assumes that such a function
+returns an arbitrary value, but that no other
+locations than the one on the left hand side of the assignment are
+changed. Obviously, there are cases in which this assumption is
+un&shy;sound, since the function potentially modifies all memory locations
+that it can somehow address.
+</p>
+
+<p class="justified">
+We now use static analysis to generate array bounds checks for
+Aeon:
+</p>
+
+<p>
+<code>satabs *.c --pointer-check --bounds-check --show-claims</code>
+</p>
+
+<p class="justified">
+SATABS will show about 300 claims in various functions
+(read <a href="properties.shtml">this</a> for more information
+on the property instrumentation).
+Now consider the first few lines of the <code>main</code> function 
+of Aeon:
+</p>
+
+<code>
+int main(int argc, char **argv)}<br>
+{<br>
+&nbsp;&nbsp;char settings[MAX_SETTINGS][MAX_LEN];}<br>
+&nbsp;&nbsp;...<br>
+&nbsp;&nbsp;numSet = getConfig(settings);<br>
+&nbsp;&nbsp;if (numSet == -1) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;logEntry("Missing config file!");<br>
+&nbsp;&nbsp;&nbsp;&nbsp;exit(1);<br>
+&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;...
+</code>
+
+<p class="justified">
+and the function <code>getConfig</code> in <code>lib_aeon.c</code>:
+</p>
+
+<code>
+<table>
+<tr><td colspan=3>int getConfig(char settings[MAX_SETTINGS][MAX_LEN])</td></tr>
+<tr><td>{</td></tr>
+<tr><td>&nbsp;&nbsp;</td><td>char home[MAX_LEN];</td></tr>
+<tr><td></td><td>FILE *fp;                    </td><td>/* .rc file handler */</td></tr>
+<tr><td></td><td>int numSet = 0;              </td><td>/* number of settings */</td></tr>
+<tr><td>&nbsp;</td></tr>
+<tr><td></td><td>strcpy(home, getenv("HOME"));&nbsp;&nbsp;</td><td>/* get home path */</td></tr>
+<tr><td></td><td>strcat(home, "/.aeonrc");    </td><td>/* full path to rc file */</td></tr>
+<tr><td></td><td>fp = fopen(home, "r");</td></tr>
+<tr><td></td><td>if (fp == NULL) return -1;   </td><td>/* no cfg - ERROR */<br>
+<tr><td></td><td colspan=2>&nbsp;&nbsp;while (fgets(settings[numSet], MAX_LEN-1, fp)</td></tr>
+<tr><td></td><td colspan=2>&nbsp;&nbsp;&nbsp;&nbsp;&& (numSet < MAX_SETTINGS)) numSet++;</td></tr>
+<tr><td></td><td>fclose(fp);</td></tr>
+<tr><td>&nbsp;</td></tr>
+<tr><td></td><td>return numSet;</td></tr>
+<tr><td>}</td></tr>
+</table>
+</code>
+
+<p class="justified">
+The function <code>getConfig</code> makes calls to 
+<code>strcpy</code>, <code>strcat</code>, <code>getenv</code>, <code>fopen</code>,
+<code>fgets</code>, and <code>fclose</code>. 
+It is very easy to provide an implementation for the functions from
+the string library (string.h), and SATABS comes with meaningful definitions
+for most of them.
+The definition of <code>getenv</code> is not so straight-forward.
+The man-page of <code>getenv</code> (which we obtain by entering
+<code>man 3 getenv</code> in a Unix or cygwin command prompt) tells us:
+</p>
+
+<blockquote>
+<i>
+<code>`getenv'</code>  searches  the  list  of en&shy;vi&shy;ron&shy;ment 
+variable names and values
+(using the global pointer <code>char **environ</code>) 
+for a variable whose name
+matches  the  string  at <code>NAME</code>. If a variable name matches, 
+<code>getenv</code> returns a pointer to the associated value.
+</i>
+</blockquote>
+
+<p class="justified">
+SATABS has no information whatsoever about the content of
+<code>environ</code>. Even if SATABS could access the
+en&shy;vi&shy;ron&shy;ment variables on your computer, a successful verification
+of <code>Aeon</code> would then only guarantee that the claims for
+this program hold on your computer with a specific set of
+en&shy;vi&shy;ron&shy;ment variables. We have to assume that <code>environ</code>
+contains en&shy;vi&shy;ron&shy;ment variables that have an arbitrary content
+of arbitrary length. The content of en&shy;vi&shy;ron&shy;ment
+variables is not only arbitrary but could be malefic, since it
+can be modified by the user.  The approximation of the behavior of
+<code>getenv</code> that is shipped with SATABS completely ignores the
+content of the string.</p>
+
+<p class="justified">
+Now let us have another look at the claims that SATABS generates for the
+models of the the string library and for <code>getenv</code>.  Most of these
+claims require that we verify that the upper and lower bounds of buffers or
+arrays are not violated.  Let us look at one of the claims that SATABS
+generates for the code in function <code>getConfig</code>:
+</p>
+
+<p>
+<code>
+Claim getConfig.3:<br>
+&nbsp;&nbsp;file lib_aeon.c line 19 function getConfig<br>
+&nbsp;&nbsp;dereference failure: NULL plus offset pointer<br>
+&nbsp;&nbsp;!(SAME-OBJECT(src, NULL))
+</code>
+</p>
+
+<p class="justified">The model of the function <code>strcpy</code>
+dereferences the pointer returned by <code>getenv</code>, which may
+return a NULL pointer. This possibility is detected by the static
+analysis, and thus a corresponding claim is generated. Let us 
+check this specific claim:
+</p>
+
+<p>
+<code>satabs *.c --pointer-check --bounds-check --claim getConfig.3</code>
+</p>
+
+<p class="justified">SATABS immediately returns a counterexample path
+that demonstrates how <code>getenv</code> returns a NULL, which
+is subsequently dereferenced. We have identified the first
+bug in this program: it requires that the environment variable
+HOME is set, and crashes otherwise.
+</p>
+
+<p class="justified">Let us examine one more claim in the
+same function:</p>
+
+<p><code>
+Claim getConfig.7:<br>
+&nbsp;&nbsp;file lib_aeon.c line 19 function getConfig<br>
+&nbsp;&nbsp;dereference failure: array `home' upper bound<br>
+&nbsp;&nbsp;!(POINTER_OFFSET(dst) + (int)i >= 512) || !(SAME-OBJECT(dst, &home[0]))<br>
+</code></p>
+
+<p class="justified">
+This claim asserts that the upper bound of the array <code>home</code>
+is not violated. The variable <code>home</code>
+looks familiar: We encountered it in the function <code>getConfig</code>
+given above. The function <code>getenv</code> in combination with functions
+<code>strcpy</code>, <code>strcat</code> or <code>sprintf</code> is indeed
+often the source for buffer overflows. Therefore, we try to use SATABS
+to check the upper bound of the array <code>home</code>:
+</p>
+
+<p>
+<code>satabs *.c --pointer-check --bounds-check --claim getConfig.7</code>
+</p>
+
+<p class="justified">
+SATABS runs for quite a while and will eventually give up,
+telling us that its upper bound for abstraction refinement iterations
+has been exceeded. This is not exactly the result we were hoping for,
+and we could now increase the bound for iterations with help of the
+<code>--iterations</code> command line switch of SATABS.
+</p>
+
+<p class="justified">
+Before we do this, let us investigate why SATABS has failed to provide
+a useful result. The function <code>strcpy</code> contains a loop
+that counts from 1 to the length of the input string. Predicate
+abstraction, the mechanism SATABS is based on, is unable to detect
+such loops and will therefore unroll the loop body as often as necessary.
+The array <code>home</code> has <code>MAX_LEN</code> elements, and 
+<code>MAX_LEN</code> is defined to be 512 in <code>aeon.h</code>. 
+Therefore, SATABS would have to run through at least 512 iterations, only to
+verify (or reject) one of the more than 300 claims! Does this fact
+defeat the purpose of static verification?
+</p>
+
+<p class="justified">
+We can make the job easier: after reducing the value of <code>MAX_LEN</code>
+in <code>aeon.h</code> to a small value, say to 10, SATABS provides a
+counterexample trace that demonstrates how the buffer overflow be
+reproduced.  If you use the Eclipse plugin (as described <a
+href="installation-plugin.shtml">here</a>), you can step through this
+counterexample. The trace contains the string that is returned
+by <code>getenv</code>.
+</p>
+
+<!--
+<p class="justified">
+SATABS provides a mechanism to bypass this problem by
+providing a detection for deep loops. For this purpose, SATABS
+has to rely on a close cooperation with the abstract model checker.
+Currently, the only model checker that provides loop detection 
+is BOPPO.
+</p>
+
+<p class="justified">
+The switch <code>--loop-detection</code> tells SATABS to activate
+the detection of deep loops. Furthermore, we tell SATABS to
+use BOPPO instead of the default model checker SMV:
+</p>
+
+<p>
+<code>satabs --claim 5 --modelchecker boppo --loop-detection \</code><br>
+<code>&nbsp;&nbsp;aeon.c base64.c lib_aeon.c</code>
+</p>
+
+<p class="justified">
+This time, SATABS will tell us that it found a potential buffer
+overflow:
+</p>
+
+<code>
+Violated property:<br>
+&nbsp;&nbsp;file stubs.c line 8 column 10 function c::strcpy<br>
+&nbsp;&nbsp;dereference failure: array `home' upper bound<br>
+&nbsp;&nbsp;!(dest == \&home[0]) $\vert\vert$ !(i $>$= 512)}
+</code>
+-->
+
+<!--#include virtual="footer.inc" -->
+

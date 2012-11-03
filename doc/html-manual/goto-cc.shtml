@@ -1,0 +1,144 @@
+<!--#include virtual="header.inc" -->
+
+<p><a href="./">CPROVER Manual TOC</a></p>
+
+<h2>Build Systems and Libraries</h2>
+
+<h3>Integration into Build Systems with goto-cc</h3>
+
+<p class="justified">
+Existing software projects usually do not come in a single source file that
+may simply be passed to a model checker.  They rather come in a multitude of
+source files in different directories and refer to external libraries and
+system-wide options.  A <i>build system</i> then collects the configuration options
+from the system and compiles the software according to build rules.
+</p>
+
+<p class="justified">
+The most prevalent build tool on Unix (-based) systems surely is the
+<code>make</code> utility. This tool uses build rules given in a
+<i>Makefile</i> that comes with the software sources. Running software
+verification tools on projects like these is greatly simplified by a
+compiler that first collects all the necessary models into a single
+model file. <a href="http://www.cprover.org/goto-cc/">goto-cc</a>
+is such a model file extractor, which can seamlessly replace <code>gcc</code>
+and <code>cl.exe</code> in Makefiles. The normal build system for the
+project may be used to build the software, but the outcome will be a
+model file with suitable detail for verification, as opposed to a
+flat executable program. Note that goto-cc comes in different variants
+depending on the compilation environment. These variants
+are described <a href="goto-cc-variants.shtml">here</a>.
+</p>
+
+<h4>Example: Building wu-ftpd</h4>
+
+<p class="justified">This example assumes a Unix-like machine.</p>
+
+<ol>
+
+<li><p class="justified"> Download the sources of wu-ftpd from
+  <a href="ftp://ftp.wu-ftpd.org/pub/wu-ftpd/wu-ftpd-current.tar.gz">
+  here</a>.
+</p></li>
+
+<li><p class="justified"> Unpack the sources by running
+  <code> tar xfz wu-ftpd-current.tar.gz</code>
+</p></li>
+
+<li><p class="justified"> Change to the source directory, by entering, e.g.,
+  <code> cd wu-ftpd-2.6.2</code>
+</p></li>
+
+<li><p class="justified"> Configure the project for verification by running
+</p>
+<center>
+  <code>./configure YACC=byacc CC=goto-cc --host=none-none-none</code>
+</center>
+</li>
+
+<li><p class="justified"> Build the project by running
+  <code>make</code>.
+  This creates multiple model files in the <code>src</code> directory. Among
+  them is a model for the main executable <code>ftpd</code>.
+</p></li>
+
+<li><p class="justified"> Run a model-checker, e.g., <a href="cbmc.shtml">CBMC</a>,
+  on the model file:
+</p>
+<center>
+  <code>cbmc src/ftpd</code>
+</center>
+<p class="justified">CBMC automatically recognizes that the file
+is a goto binary.
+</p>
+</li>
+
+</ol>
+
+<h4>Important Notes</h4>
+
+<p class="justified">
+More elaborate build or configuration scripts often make use of
+features of the compiler or the system library to detect configuration
+options automatically, e.g., in a <code>configure</code> script. 
+Replacing <code>gcc</code> by goto-cc at this stage may confuse the script,
+or detect wrong options. For example, missing library functions do not
+cause goto-cc to throw an error (only to issue a warning). Because of
+this, configuration scripts sometimes falsely assume the availability
+of a system function or library.
+</p>
+
+<p class="justified">
+In the case of this or similar problems, it is more advisable to
+configure the project using the normal routine, and replacing the
+compiler setting manually in the generated Makefiles, e.g., by
+replacing lines like <code>CC=gcc</code> by <code>CC=goto-cc</code>.
+</p>
+
+<p class="justified">
+A helpful command that accomplishes this task successfully for many
+projects is the following: 
+</p>
+
+<code>
+for i in `find . -name Makefile`; do<br>
+&nbsp;&nbsp;sed -e 's/^\(\s*CC[ \t]*=\)\(.*$\)/\1goto-cc/g' -i $i<br>
+done
+</code>
+
+<p class="justified">Here are additional examples on how to use goto-cc:</p>
+
+<ul>
+<li><a href="goto-cc-linux.shtml">Linux Kernel</a></li>
+<li><a href="goto-cc-apache.shtml">Apache HTTPD</a></li>
+</ul>
+
+<p class="justified">A description
+of how to integrate goto-cc into Microsoft's Visual Studio
+is <a href="goto-cc-visual-studio.shtml">here</a>.</p>
+
+<h4>Linking Libraries</h4>
+
+<p class="justified">
+Some software projects come with their own libraries; also, the goal may be
+to analyze a library by itself. For this purpose it is possible to use
+goto-cc to link multiple model files into a library of model files. An
+object file can then be linked against this model library. For this purpose,
+goto-cc also features a linker mode.
+</p>
+
+<p class="justified">
+To enable this linker mode, create a link to the goto-cc binary by the
+name of goto-ld (Linux and Mac) or copy the goto-cc binary to goto-link.exe
+(Windows). The goto-ld tool can now be used as a seamless replacement
+for the <code>ld</code> tool present on most Unix (-based) systems and
+for the <code>link</code> tool on Windows.
+</p>
+
+<p class="justified">
+The default linker may need to be replaced by <code>goto-ld</code> or
+<code>goto-link.exe</code> in the build
+script, which can be achieved in much the same way as replacing the compiler.
+</p>
+
+<!--#include virtual="footer.inc" -->

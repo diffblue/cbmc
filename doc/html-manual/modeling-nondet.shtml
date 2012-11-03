@@ -1,0 +1,37 @@
+<!--#include virtual="header.inc" -->
+
+<p><a href="./">CPROVER Manual TOC</a></p>
+
+<h2>Nondeterminism</h2>
+
+<p class="justified">Programs typically read inputs from an environment. 
+These inputs can take the form of data read from a file, keyboard or network
+socket, or arguments passed on the command line.  It is usually desirable to
+analyze the program for any choice of these inputs.  In Model Checking,
+inputs are therefore modeled by means of <i>nondeterminism</i>, which means
+that the value of the input is not specified. The program may follow any
+computation that results from any choice of inputs. Other sources of
+nondeterminism in programs include the program schedule in the case
+of concurrent programs.</p>
+
+<p class="justified">The CPROVER tools are shipped with a number of stubs
+for the most commonly used library functions. When executing a statement
+such as <code>getchar()</code>, a nondeterministic value is chosen instead
+of reading a character from the keyboard.
+
+<p class="justified">When desired, nondeterminism can be introduced
+explicitly into the program by means of functions that begin with the
+prefix <code>nondet_</code>. As an example, the following function
+returns a nondeterministically chosen unsigned short int:
+</p>
+
+<code>
+unsigned short int nondet_ushortint();
+</code>
+
+<p class="justified">Note that the body of the function is not defined.  The
+name of the function itself is irrelevant (safe for the prefix), but must be
+unique.  Also note that a nondeterministic choice is not to be confused with
+a probabilistic (or random) choice.</p>
+
+<!--#include virtual="footer.inc" -->

@@ -1,0 +1,54 @@
+<!--#include virtual="header.inc" -->
+
+<p><a href="./">CPROVER Manual TOC</a></p>
+
+<h2>Build Systems and Libraries</h2>
+
+<h3>The Problem</h3>
+
+<p class="justified">
+Similar to unit testing, the model checking approach requires 
+the user to clearly define what parts of the program should
+be tested and what the behavior of these parts is.
+This requirement has following reasons:
+</p>
+
+<ul>
+  
+<li><p class="justified"> Despite recent advances, the size of the programs that
+    model checkers can cope with is still restricted.
+</p></li>
+  
+<li><p class="justified"> Typically, you want to verify <i>your</i> program and
+    not the libraries or the operating that it uses (the correctness of these
+    libraries and the OS us usually addressed separately).
+</p></li>
+  
+<li><p class="justified"> CBMC and SATABS cannot verify binary libraries. 
+</p></li>
+  
+<li><p class="justified"> CBMC and SATABS does not provide a
+    model for the hardware
+    (e.g., hard disk, input/output devices) the tested program
+    runs on. Since CBMC and SATABS are supposed to examine the
+    behavior of the tested program for <b>all</b> possible inputs
+    and outputs, it is reasonable to model input and output
+    by means of non-deterministic choice.
+</p></li>
+
+</ul>
+
+<h3>Further Reading</h3>
+
+<p class="justified">
+Existing software projects usually do not come in a single source file that
+may simply be passed to a model checker, but is a collection of files held
+together by a build system. The ex&shy;trac&shy;tion of models from such
+a build system using goto-cc is described <a href="goto-cc.shtml">here</a>.
+The ap&shy;pli&shy;ca&shy;tion of goto-cc to the entire Linux kernel is described
+<a href="goto-cc-linux.shtml">here</a>. The problem of architectural
+pa&shy;ram&shy;e&shy;ters (word with, endianness) is explained
+<a href="architecture.shtml">here</a>.
+</p>
+
+<!--#include virtual="footer.inc" -->

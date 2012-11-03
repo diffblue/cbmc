@@ -1,0 +1,93 @@
+<!--#include virtual="header.inc" -->
+
+<p><a href="./">CPROVER Manual TOC</a></p>
+
+<h2>Build Systems and Libraries</h2>
+
+<h3>Architectural Settings</h3>
+
+<p class="justified"> The behavior of a C/C++ program depends on a number of
+parameters that are specific to the architecture the program was compiled
+for. The three most important architectural parameters are:</p>
+
+<ul>
+<li>The width of the various scalar types; e.g., compare the value
+of <code>sizeof(long int)</code> on various machines.</li>
+
+<li>The width of pointers; e.g., compare the value
+of <code>sizeof(int *)</code> on various machines.</li>
+
+<li>The <a href="http://en.wikipedia.org/wiki/Endianness">endianness</a>
+of the architecture.</li>
+</ul>
+
+<p class="justified">
+In general, the CPROVER tools attempt to adopt the settings of the
+particular architecture the tool itself was compiled for. For example,
+when running a 64 bit binary of CBMC, the program will be processed
+assuming that <code>sizeof(long int)==8</code>.</p>
+
+<p class="justified">
+As a consequence of these architectural parameters,
+you may observe different verification results for an identical
+program when running CBMC on different machines. In order to get
+consistent results, or when aiming at validating a program written
+for a different platform, the following command-line arguments can
+be passed to the CPROVER tools:</p>
+
+<ul>
+<li>The word-width can be set with <code>--16</code>,
+<code>--32</code>, <code>--64</code>.</li>
+<li>The endianness can be defined with
+<code>--little-endian</code> and <code>--big-endian</code>.</li>
+</ul>
+
+<p class="justified">
+When using a goto binary, CBMC and the other tools read the configuration
+from the binary, i.e., the setting when running goto-cc is the one that
+matters; the option given to the model checker is ignored in this case.
+</p>
+
+<p class="justified">
+In order to see the effect of the options <code>--16</code>,
+<code>--32</code> and <code>--64</code>, pass
+the following program to CBMC:</p>
+
+<hr>
+<code>
+#include &lt;stdio.h&gt;<br>
+#include &lt;assert.h&gt;<br>
+<br>
+int main() {<br>
+&nbsp;&nbsp;printf("sizeof(long int): %d\n", (int)sizeof(long int));<br>
+&nbsp;&nbsp;printf("sizeof(int *): %d\n", (int)sizeof(int *));<br>
+&nbsp;&nbsp;assert(0);<br>
+}
+</code>
+<hr>
+
+<p class="justified">
+The counterexample trace contains the strings printed by the
+<code>printf</code> command.</p>
+
+<p class="justified">
+The effects of endianness are
+more subtle. Try the following program with <code>--big-endian</code>
+and <code>--little-endian</code>:</p>
+
+<hr>
+<code>
+#include &lt;stdio.h&gt;<br>
+#include &lt;assert.h&gt;<br>
+<br>
+int main() {<br>
+&nbsp;&nbsp;int i=0x01020304;<br>
+&nbsp;&nbsp;char *p=(char *)&i;<br>
+&nbsp;&nbsp;printf("Bytes of i: %d, %d, %d, %d\n",<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;p[0], p[1], p[2], p[3]);<br>
+&nbsp;&nbsp;assert(0);<br>
+}
+</code>
+<hr>
+
+<!--#include virtual="footer.inc" -->

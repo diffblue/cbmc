@@ -1,0 +1,57 @@
+<!--#include virtual="header.inc" -->
+
+<p><a href="./">CPROVER Manual TOC</a></p>
+
+<h2>Build Systems and Libraries</h2>
+
+<h3>Integration into Visual Studio 2008 to 2012</h3>
+
+<p class="justified">
+Visual Studio version 2008 onwards comes with a new XML-based
+build system called <a href="http://msdn.microsoft.com/en-us/library/ms171452(v=vs.90).aspx">MSBuild</a>.
+The MSBuild system is also activated when triggering a build from the Visual Studio GUI.
+The project files created by the Visual Studio GUI are used as input by the MSBuild tool.
+</p>
+
+<p class="justified">
+The MSBuild system can be used to generate goto-binaries from your Visual Studio project
+as follows:
+</p>
+
+<ol>
+
+<li><p>
+Install the <code>goto-cl.exe</code> and <code>goto-link.exe</code> binaries
+in some directory that is contained in the PATH environment
+variable.</p></li>
+
+<li><p>Add a configuration for the goto-cc build for your project
+in the configuration manager, named "goto-cc".</p></li>
+
+<li><p>Open the Visual Studio Command Prompt (in the Tools menu).</p></li>
+
+<li><p>Locate the directory that contains the project. Change into this
+directory using "CD".</p></li>
+
+<li><p>Type</p>
+<p>
+<code>
+msbuild /p:CLToolExe=goto-cl.exe /p:LinkToolExe=goto-link.exe<br>
+&nbsp;&nbsp; /p:Flavor=goto-cc /p:Platform=x86
+</code>
+</p>
+
+<p>
+The platform can be adjusted as required; the "Flavor" given should match
+the configuration that was created earlier.
+</p></li>
+
+</ol>
+
+<p class="justified">
+Note that the recent versions of goto-cc also support file names with
+non-ASCII (Unicode) characters on Windows platforms.
+</p>
+
+<!--#include virtual="footer.inc" -->
+

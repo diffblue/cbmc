@@ -1,0 +1,83 @@
+<!--#include virtual="header.inc" -->
+
+<p><a href="./">CPROVER Manual TOC</a></p>
+
+<h2>Build Systems and Libraries</h2>
+
+<h3>Example: Extracting Models from the Rockbox</h3>
+
+<p class="justified">
+The <a href="http://www.rockbox.org/">Rockbox</a> is an open-source software
+package for common MP3 players, with about 1 million lines of code in total.
+</p>
+
+<ol>
+<li><p class="justified">
+First of all, you will need to install one of the cross-compilers. Follow
+the instructions <a href="http://www.rockbox.org/wiki/CrossCompiler">here</a>.
+</p></li>
+
+<li><p>
+You will then need to check out the Rockbox sources with GIT, and
+configure and compile the code. Follow <a href="http://www.rockbox.org/wiki/HowToCompile">
+these instructions</a>. The build must succeed.
+We will assume that one of the ARM-based targets
+is used, and that the ARM cross-compiler is installed
+at /usr/local/bin/arm-elf-eabi-gcc.
+</p></li>
+
+<li><p class="justified">Now download
+<a href="gcc-wrap.c">gcc-wrap.c</a>:</p>
+<p>
+&nbsp;&nbsp;<code>lwp-download http://www.cprover.org/cprover-manual/gcc-wrap.c</code><br>
+</p>
+</li>
+
+<li><p class="justified">Open gcc-wrap.c in your favorite editor,
+and adjust the path to gcc (in the first line) to
+/usr/local/bin/arm-elf-eabi-gcc (it is important that the
+full path is given).
+</p></li>
+
+<li><p class="justified">Now compile gcc-wrap:</p>
+<p>
+&nbsp;&nbsp;<code>gcc gcc-wrap.c -o gcc-wrap-arm-elf-eabi-gcc</code><br>
+&nbsp;&nbsp;<code>cp gcc-wrap-arm-elf-eabi-gcc ~/bin/</code><br>
+</p>
+<p class="justified">This assumes that the directory <code>~/bin</code>
+exists and is in your PATH variable.</p>
+</li>
+
+<li><p class="justified">Now re-compile the Rockbox code as follows:</p>
+<p>
+&nbsp;&nbsp;<code>make clean</code><br>
+&nbsp;&nbsp;<code>make CC=gcc-wrap-arm-elf-eabi-gcc</code></p>
+<p class="justified">
+This will re-compile the Rockbox, but this time retaining the
+preprocessed source files.
+</p></li>
+
+<li><p class="justified">You can now compile the preprocessed
+source files with goto-cc as follows:</p>
+<p>
+&nbsp;&nbsp;<code>find ./ -name \*.i > source-file-list</code><br>
+&nbsp;&nbsp;<code>for a in `cat source-file-list` ; do</code><br>
+&nbsp;&nbsp;<code>&nbsp;&nbsp;goto-cc -std=gnu99 -m32 -c $a -o $a.gb</code><br>
+&nbsp;&nbsp;<code>done</code></p>
+
+<p class="justified">Note that it is important that the
+word-size of the target platform matches that of goto-cc.
+For a 32-bit target, pass the option
+<nobr>-m32</nobr> to goto-cc.</p>
+
+</li>
+
+</ol>
+
+<p class="justified">
+The resulting <code>.gb</code> files can be passed to any
+of the CPROVER tools.
+</p>
+
+<!--#include virtual="footer.inc" -->
+

@@ -1,0 +1,42 @@
+<!--#include virtual="header.inc" -->
+
+<p><a href="./">CPROVER Manual TOC</a></p>
+
+<h2>Installing the Eclipse Plugin</h2>
+
+<h3>Requirements</h3>
+
+<p class="justified">
+We provide a graphical user interface to CBMC and SATABS, which is
+realized as a plugin to the Eclipse framework.  Eclipse is available at <a
+href="http://www.eclipse.org">http://www.eclipse.org</a>.  We do not provide
+installation instructions for Eclipse (basically, you only have to download
+the current version and extract the files to your hard-disk) and assume that
+you have already installed the current version.</p>
+
+<p class="justified">
+CBMC and SATABS have their own requirements.  As an example, both CBMC
+and SATABS require a suitable preprocessor and a set of header files.  As
+first step, you should therefore follow the installation instructions for <a
+href="installation-cbmc.shtml">CBMC</a> and <a
+href="installation-satabs.shtml">SATABS</a>.
+
+<p class="justified">
+<u>Important note for Windows users</u>: Visual Studio's
+<code>cl.exe</code> relies on a
+complex set of environment variables to identify the target architecture and
+the directories that contain the header files.
+<font color=red>You must run Eclipse from within the
+<i>Visual Studio Command Prompt</i>.</font>
+</p>
+
+<h3>Installing the Eclipse Plugin</h3>
+
+<p class="justified">
+The installation instructions for the Eclipse Plugin, including the
+link to the download site, are available <a href="http://www.cprover.org/eclipse-plugin/">
+here</a>. This includes a small tutorial on how to use the Eclipse plugin.
+</p>
+
+<!--#include virtual="footer.inc" -->
+

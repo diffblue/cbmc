@@ -1,0 +1,280 @@
+<!--#include virtual="header.inc" -->
+
+<p><a href="./">CPROVER Manual TOC</a></p>
+
+<h2>SATABS &ndash; Predicate Abstraction with SAT</h2>
+
+<h3>Tutorials</h3>
+
+<h4>Example: Reference Counting in Linux Device Drivers</h4>
+
+<p class="justified">
+Microsoft's <a href="http://research.microsoft.com/SLAM">SLAM</a> toolkit
+has been successfully used to find bugs in Windows device drivers.  SLAM
+automatically verifies device driver whether a device driver adheres to a
+set of specifications.  SLAM provides a test harness for device drivers that
+calls the device driver dispatch routines in a non-deterministic order. 
+Therefore, the Model Checker examines all combinations of calls.  Motivated
+by the success this approach, we provide a toy example based on Linux device
+drivers. For a more complete approach to the verification of Linux
+device drivers, consider <a href="http://www.cprover.org/ddverify/">DDVerify</a>.
+</p>
+
+<p class="justified">
+Dynamically loadable modules enable the Linux Kernel to load device drivers
+on demand and to release them when they are not needed anymore.  When a
+device driver is registered, the kernel provides a major number that is used
+to uniquely identify the device driver.  The corresponding device can be
+accessed through special files in the filesystem; by convention, they are
+located in the <code>/dev</code> directory.  If a process accesses a device file
+the kernel calls the corresponding <code>open</code>, <code>read</code> and
+<code>write</code> functions of the device driver.  Since a driver must not be
+released by the kernel as long as it is used by at least one process, the
+device driver must maintain a usage counter (in more recent Linux kernels, this
+is done automatically, however, drivers that must maintain backward
+compatibility have to adjust this counter).
+</p>
+
+<p class="justified">
+We provide a skeleton of such a driver. Download the
+files
+<a href="boop-example/spec.c">spec.c</a>,
+<a href="boop-example/driver.c">driver.c</a>,
+<a href="boop-example/driver.h">driver.h</a>,
+<a href="boop-example/kdev_t.h">kdev_t.h</a>, and
+<a href="boop-example/modules.h">modules.h</a>.
+</p>
+
+<p class="justified">
+The driver contains following functions:</p>
+
+<ol>
+
+  <li><p class="justified"> <code>register_chrdev</code>:
+    (in <a href="boop-example/spec.c">spec.c</a>) 
+    Registers a character device. In
+    our implementation, the function sets the variable <code>usecount</code>
+    to zero and returns a major number for this device (a constant, if
+    the user provides 0 as argument for the major number, and the value
+    specified by the user otherwise).
+  </p>
+
+<hr>
+<code>
+int usecount;<br>
+<br>
+int register_chrdev (unsigned int major, const char* name)<br>
+{<br>
+&nbsp;&nbsp;usecount = 0;<br>
+&nbsp;&nbsp;if (major == 0)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return MAJOR_NUMBER;<br>
+&nbsp;&nbsp;return major;<br>
+}</code>
+<hr>
+</li>
+
+  <li><p class="justified"> <code>unregister_chrdev</code>: (in spec.c)
+    Unregisters a character device.
+    This function asserts that the device is not used by any process
+    anymore (we use the macro <code>MOD_IN_USE</code> to check this).
+  </p>
+
+<hr>
+<code>
+int unregister_chrdev (unsigned int major, const char* name)<br>
+{<br>
+&nbsp;&nbsp;if (MOD_IN_USE)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ERROR: assert (0);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;else<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return 0;<br>
+}</code>
+<hr></li>
+
+  <li><p class="justified"> <code>dummy_open</code>: (in
+    <a href="boop-example/driver.c">driver.c</a>) This function
+    increases the <code>usecount</code>. If the device is locked by
+    some other process <code>dummy_open</code> returns -1. Otherwise
+    it locks the device for the caller.     
+  </p>
+
+
+</li>
+
+
+
+  <li><p class="justified"> <code>dummy_read</code>: (in driver.c) This function
+    "simulates" a read access to the device. In fact it does 
+    nothing, since we are currently not interested in the potential buffer
+    overflow that may result from a call to this function.
+    Note the usage of
+    the function <code>nondet_int</code>: 
+    This is an internal SATABS-function that non&shy;determi&shy;nistically
+    returns an arbitrary integer
+    value. The function <code>__CPROVER_assume</code>
+    tells SATABS to ignore
+    all traces that do not adhere to the given assumption. Therefore,
+    whenever the lock is held, <code>dummy_read</code> will 
+    return a value between 0 and  <code>max</code>. If the lock is not held,
+    then <code>dummy_read</code> returns -1.
+  </p>
+
+</li>
+
+  <li><p class="justified"> <code>dummy_release</code>: (in driver.c) If the lock
+    is held, then <code>dummy_release</code> decreases
+    the <code>usecount</code>, releases the lock, and returns 0. Otherwise,
+    the function returns -1.
+  </p>
+
+
+</li>
+
+</ol>
+
+<p class="justified">
+We now want to check if any <i>valid</i> sequence of calls of the 
+dispatch functions (in driver.c) can lead to the violation 
+of the assertion (in spec.c).
+Obviously, a call to <code>dummy_open</code> that is immediately followed
+by a call to <code>unregister_chrdev</code> violates the assertion.
+</p>
+
+<p class="justified">
+The function <code>main</code> in spec.c gives an example of
+how these functions are called. First, a character device
+"<code>dummy</code>" is registered. The major number is stored
+in the <code>inode</code> structure of the device. The values
+for the file structure are assigned non-deterministically.
+We rule out invalid sequences of calls by ensuring
+that no device is unregistered while it is still locked.
+We use the following model checking harness for calling the
+dispatching functions:
+</p>
+
+<hr>
+<code>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;random = nondet_uchar ();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;__CPROVER_assume (0 &lt;= random && random &lt;= 3);<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;switch (random)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;case 1: <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;rval = dummy_open (&amp;inode, &amp;my_file);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (rval == 0)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;lock_held = TRUE;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;break;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;case 2:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;__CPROVER_assume (lock_held);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;count = dummy_read (&amp;my_file, buffer, BUF_SIZE); <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;break;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;case 3:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;dummy_release (&amp;inode, &amp;my_file);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;lock_held = FALSE;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;break;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;break;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+</code>
+<hr>
+
+<p class="justified">
+The variable <code>random</code> is assigned non-deterministically.
+Subsequently, the value of <code>random</code>
+is restricted to be 0 &le <code>random</code> &le; 3 by a call to
+<code>__CPROVER_assume</code>. Whenever the value of <code>random</code> is
+not in this interval, the corresponding execution trace is simply 
+discarded by SATABS. Depending on the value of <code>random</code>, the
+harness calls either <code>dummy_open</code>, <code>dummy_read</code> or
+<code>dummy_close</code>. Therefore, 
+if there is a sequence of calls to these three
+functions that leads to a violation of the assertion in 
+<code>unregister_chrdev</code>, then SATABS
+will eventually consider it.
+</p>
+
+<p>
+If we ask SATABS to show us the verification claims with
+</p>
+
+<center>
+<code>satabs driver.c spec.c --show-claims</code>
+</center>
+
+<p>
+for our example, we obtain 
+</p>
+
+<ol>
+
+<li><p>
+Claim unregister_chrdev.1:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;file spec.c line 18 function unregister_chrdev<br>
+&nbsp;&nbsp;&nbsp;&nbsp;MOD_IN_USE in unregister_chrdev<br>
+&nbsp;&nbsp;&nbsp;&nbsp;FALSE
+</p>
+</li>
+
+<li><p>
+Claim dummy_open.1:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;file driver.c line 15 function dummy_open<br>
+&nbsp;&nbsp;&nbsp;&nbsp;i_rdev mismatch<br>
+&nbsp;&nbsp;&nbsp;&nbsp;(unsigned int)inode->i_rdev >> 8 == (unsigned int)dummy_major
+</p>
+</li>
+
+</ol>
+
+<p class="justified">
+It seems obvious that the claim dummy_open.1
+can never be violated. SATABS confirms
+this assumption: We call
+</p>
+
+<center>
+<code>satabs driver.c spec.c --claim dummy_open.1</code>
+</center>
+
+<p class="justified">
+and SATABS reports <code>VERIFICATION SUCCESSFUL</code> after a few iterations.
+</p>
+
+<p class="justified"> If we try to verify claim unregister_chrdev.1, SATABS
+reports that the property in line 18 in file spec.c is violated (i.e., the
+assertion does not hold, therefore the <code>VERIFICATION FAILED</code>). 
+Furthermore, SATABS provides a detailed description of the problem in the
+form of a counterexample (i.e., an execution trace that violates the
+property).  On this trace, <code>dummy_open</code> is called <b>twice</b>,
+leading to a <code>usecount</code> of 2. The second call of course fails
+with <code>rval=-1</code>, but the counter is increased nevertheless:
+</p>
+
+<p>
+<hr>
+<code>
+int dummy_open (struct inode *inode, struct file *filp)<br>
+{<br>
+&nbsp;&nbsp;__CPROVER_assert(MAJOR (inode-&gt;i_rdev) == dummy_major,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"i_rdev mismatch");<br>
+&nbsp;&nbsp;MOD_INC_USE_COUNT;<br>
+<br>
+&nbsp;&nbsp;if (locked)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return -1;<br>
+&nbsp;&nbsp;locked = TRUE;<br>
+<br>
+&nbsp;&nbsp;return 0; /* success */<br>
+}<br>
+</code>
+<hr>
+</p>
+
+<p class="justified">
+Then, <code>dummy_release</code> is called to release the lock on the
+device.  Finally, the loop is left and the call to
+<code>unregister_chrdev</code> results in a violation of the assertion
+(since <code>usecount</code> is still 1, even though <code>locked=0</code>). 
+</p>
+
+<!--#include virtual="footer.inc" -->
+
