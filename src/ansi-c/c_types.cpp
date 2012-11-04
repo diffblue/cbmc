@@ -61,7 +61,7 @@ Function: int_type
 typet int_type()
 {
   typet result=signedbv_typet(config.ansi_c.int_width);  
-  result.set(ID_C_c_type, ID_int);
+  result.set(ID_C_c_type, ID_signed_int);
   return result;
 }
 
