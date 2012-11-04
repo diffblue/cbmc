@@ -116,7 +116,7 @@ void goto_symext::symex_malloc(
     }
     
     if(object_type.is_nil())
-      object_type=array_typet(uchar_type(), tmp_size);
+      object_type=array_typet(unsigned_char_type(), tmp_size);
 
     // we introduce a fresh symbol for the size
     // to prevent any issues of the size getting ever changed
