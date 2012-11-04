@@ -557,7 +557,7 @@ void value_sett::get_value_set_rec(
             expr_type.id()==ID_signedbv)
     {
       // an integer constant got turned into a pointer
-      insert(dest, exprt(ID_integer_address, uchar_type()));
+      insert(dest, exprt(ID_integer_address, unsigned_char_type()));
     }
     else
       insert(dest, exprt(ID_unknown, original_type));
@@ -593,13 +593,13 @@ void value_sett::get_value_set_rec(
         if(tmp.read().size()==0)
         {
           // if not, throw in integer
-          insert(dest, exprt(ID_integer_address, uchar_type()));        
+          insert(dest, exprt(ID_integer_address, unsigned_char_type()));        
         }
         else if(tmp.read().size()==1 &&
                 object_numbering[tmp.read().begin()->first].id()==ID_unknown)
         {
           // if not, throw in integer
-          insert(dest, exprt(ID_integer_address, uchar_type()));        
+          insert(dest, exprt(ID_integer_address, unsigned_char_type()));        
         }
         else
         {
@@ -1714,7 +1714,7 @@ void value_sett::guard(
   {
     assert(expr.operands().size()==1);
 
-    dynamic_object_exprt dynamic_object(uchar_type());
+    dynamic_object_exprt dynamic_object(unsigned_char_type());
     //dynamic_object.instance()=from_integer(location_number, typet(ID_natural));
     dynamic_object.valid()=true_exprt();
 

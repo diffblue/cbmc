@@ -241,7 +241,7 @@ typet char_type()
 
 /*******************************************************************\
 
-Function: uchar_type
+Function: unsigned_char_type
 
   Inputs:
 
@@ -251,9 +251,34 @@ Function: uchar_type
 
 \*******************************************************************/
 
-typet uchar_type()
+typet unsigned_char_type()
 {
-  return unsignedbv_typet(config.ansi_c.char_width);
+  typet result=unsignedbv_typet(config.ansi_c.char_width);
+
+  result.set(ID_C_c_type, ID_unsigned_char);
+  
+  return result;
+}
+
+/*******************************************************************\
+
+Function: signed_char_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+typet signed_char_type()
+{
+  typet result=signedbv_typet(config.ansi_c.char_width);
+
+  result.set(ID_C_c_type, ID_signed_char);
+  
+  return result;
 }
 
 /*******************************************************************\
