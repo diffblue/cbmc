@@ -98,7 +98,9 @@ Function: size_type
 
 typet size_type()
 {
-  return unsignedbv_typet(config.ansi_c.pointer_width);  
+  typet result=unsignedbv_typet(config.ansi_c.pointer_width);  
+  // result.set(ID_C_c_type, ID_unsigned_long_int);
+  return result;
 }
 
 /*******************************************************************\
@@ -478,6 +480,10 @@ Function: pointer_diff_type
 
 typet pointer_diff_type()
 {
-  return signedbv_typet(config.ansi_c.pointer_width);
+  typet result=signedbv_typet(config.ansi_c.pointer_width);
+
+  // result.set(ID_C_c_type, ID_signed_long_int);
+  
+  return result;
 }
 
