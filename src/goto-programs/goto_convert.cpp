@@ -636,14 +636,10 @@ void goto_convertt::convert_decl(
     // Decl must be visible before initializer.
     copy(tmp, DECL, dest);
 
-    goto_programt sideeffects;
-    clean_expr(initializer, sideeffects);
-    dest.destructive_append(sideeffects);
-    
     code_assignt assign(code.op0(), initializer);
     assign.location()=tmp.location();
-    
-    copy(assign, ASSIGN, dest);
+
+    convert_assign(assign, dest);
   }
 }
 
