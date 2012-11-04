@@ -179,10 +179,11 @@ void cpp_typecheckt::convert_non_template_declaration(
 
   typecheck_type(type);
   
-  // elaborate any class template instance _unless_ we do a typedef
+  // Elaborate any class template instance _unless_ we do a typedef.
+  // These are only elaborated on usage!
   if(!is_typedef) elaborate_class_template(type);
   
-  // special treatment for anonymous unions
+  // Special treatment for anonymous unions
   if(declaration.declarators().empty() &&
      follow(declaration.type()).get_bool("#is_anonymous"))
   {
