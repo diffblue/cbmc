@@ -2729,6 +2729,19 @@ void c_typecheck_baset::typecheck_expr_shifts(shift_exprt &expr)
   const typet o_type0=follow(op0.type());
   const typet o_type1=follow(op1.type());
 
+  if(o_type0.id()==ID_vector &&
+     o_type1.id()==ID_vector)
+  {
+    if(follow(o_type0.subtype())==follow(o_type1.subtype()) &&
+       is_number(follow(o_type0.subtype())))
+    {
+      // {a0, a1, ..., an} >> {b0, b1, ..., bn} == {a0 >> b0, a1 >> b1, ..., an >> bn}
+      // Fairly strict typing rules, no promotion
+      expr.type()=op0.type();
+      return;
+    }
+  }
+
   // must do the promotions _separately_!
   implicit_typecast_arithmetic(op0);
   implicit_typecast_arithmetic(op1);
