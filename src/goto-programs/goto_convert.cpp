@@ -632,13 +632,14 @@ void goto_convertt::convert_decl(
     initializer=code.op1();
     tmp.operands().resize(1);
     
+    // Break up into decl and assignment.
+    // Decl must be visible before initializer.
+    copy(tmp, DECL, dest);
+
     goto_programt sideeffects;
     clean_expr(initializer, sideeffects);
     dest.destructive_append(sideeffects);
     
-    // break up into decl and assignment
-    copy(tmp, DECL, dest);
-
     code_assignt assign(code.op0(), initializer);
     assign.location()=tmp.location();
     
