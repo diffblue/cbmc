@@ -167,9 +167,10 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
   else if(expr.id()==ID_plus || expr.id()==ID_minus ||
           expr.id()==ID_mult || expr.id()==ID_div ||
           expr.id()==ID_mod ||
-          expr.id()==ID_shl || expr.id()==ID_shr ||
           expr.id()==ID_bitand || expr.id()==ID_bitxor || expr.id()==ID_bitor)
     typecheck_expr_binary_arithmetic(expr);
+  else if(expr.id()==ID_shl || expr.id()==ID_shr)
+    typecheck_expr_shifts(to_shift_expr(expr));
   else if(expr.id()==ID_comma)
     typecheck_expr_comma(expr);
   else if(expr.id()==ID_if)
@@ -2636,99 +2637,124 @@ void c_typecheck_baset::typecheck_expr_binary_arithmetic(exprt &expr)
     }
   }
 
-  if(expr.id()==ID_shl || expr.id()==ID_shr)
+  // promote!
+  
+  implicit_typecast_arithmetic(op0, op1);
+
+  const typet &type0=follow(op0.type());
+  const typet &type1=follow(op1.type());
+
+  if(expr.id()==ID_plus || expr.id()==ID_minus ||
+     expr.id()==ID_mult || expr.id()==ID_div)
   {
-    // must do the promotions _separately_!
-    implicit_typecast_arithmetic(op0);
-    implicit_typecast_arithmetic(op1);
-
-    if(is_number(op0.type()) &&
-       is_number(op1.type()))
+    if(type0.id()==ID_pointer || type1.id()==ID_pointer)
     {
-      expr.type()=op0.type();
-
-      if(expr.id()==ID_shr) // shifting operation depends on types
-      {
-        const typet &op0_type=follow(op0.type());
-
-        if(op0_type.id()==ID_unsignedbv)
-        {
-          expr.id(ID_lshr);
-          return;
-        }
-        else if(op0_type.id()==ID_signedbv)
-        {
-          expr.id(ID_ashr);
-          return;
-        }
-      }
-
+      typecheck_expr_pointer_arithmetic(expr);
       return;
     }
-  }
-  else
-  {
-    // promote!
-    
-    implicit_typecast_arithmetic(op0, op1);
-
-    const typet &type0=follow(op0.type());
-    const typet &type1=follow(op1.type());
-
-    if(expr.id()==ID_plus || expr.id()==ID_minus ||
-       expr.id()==ID_mult || expr.id()==ID_div)
+    else if(type0==type1)
     {
-      if(type0.id()==ID_pointer || type1.id()==ID_pointer)
+      if(is_number(type0))
       {
-        typecheck_expr_pointer_arithmetic(expr);
+        expr.type()=type0;
         return;
       }
-      else if(type0==type1)
-      {
-        if(is_number(type0))
-        {
-          expr.type()=type0;
-          return;
-        }
-      }
     }
-    else if(expr.id()==ID_mod)
+  }
+  else if(expr.id()==ID_mod)
+  {
+    if(type0==type1)
     {
-      if(type0==type1)
+      if(type0.id()==ID_signedbv || type0.id()==ID_unsignedbv)
       {
-        if(type0.id()==ID_signedbv || type0.id()==ID_unsignedbv)
-        {
-          expr.type()=type0;
-          return;
-        }
+        expr.type()=type0;
+        return;
       }
     }
-    else if(expr.id()==ID_bitand || 
-            expr.id()==ID_bitxor ||
-            expr.id()==ID_bitor)
+  }
+  else if(expr.id()==ID_bitand || 
+          expr.id()==ID_bitxor ||
+          expr.id()==ID_bitor)
+  {
+    if(type0==type1)
     {
-      if(type0==type1)
+      if(is_number(type0))
       {
-        if(is_number(type0))
-        {
-          expr.type()=type0;
-          return;
-        }
-        else if(type0.id()==ID_bool)
-        {
-          if(expr.id()==ID_bitand)
-            expr.id(ID_and);
-          else if(expr.id()==ID_bitor)
-            expr.id(ID_or);
-          else if(expr.id()==ID_bitxor)
-            expr.id(ID_xor);
-          else
-            assert(false);
-          expr.type()=type0;
-          return;
-        }
+        expr.type()=type0;
+        return;
+      }
+      else if(type0.id()==ID_bool)
+      {
+        if(expr.id()==ID_bitand)
+          expr.id(ID_and);
+        else if(expr.id()==ID_bitor)
+          expr.id(ID_or);
+        else if(expr.id()==ID_bitxor)
+          expr.id(ID_xor);
+        else
+          assert(false);
+        expr.type()=type0;
+        return;
       }
     }
+  }
+
+  err_location(expr);
+  str << "operator `" << expr.id()
+      << "' not defined for types `"
+      << to_string(o_type0) << "' and `"
+      << to_string(o_type1) << "'";
+  throw 0;
+}
+
+/*******************************************************************\
+
+Function: c_typecheck_baset::typecheck_expr_shifts
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void c_typecheck_baset::typecheck_expr_shifts(shift_exprt &expr)
+{
+  assert(expr.id()==ID_shl || expr.id()==ID_shr);
+  
+  exprt &op0=expr.op0();
+  exprt &op1=expr.op1();
+
+  const typet o_type0=follow(op0.type());
+  const typet o_type1=follow(op1.type());
+
+  // must do the promotions _separately_!
+  implicit_typecast_arithmetic(op0);
+  implicit_typecast_arithmetic(op1);
+
+  if(is_number(op0.type()) &&
+     is_number(op1.type()))
+  {
+    expr.type()=op0.type();
+
+    if(expr.id()==ID_shr) // shifting operation depends on types
+    {
+      const typet &op0_type=follow(op0.type());
+
+      if(op0_type.id()==ID_unsignedbv)
+      {
+        expr.id(ID_lshr);
+        return;
+      }
+      else if(op0_type.id()==ID_signedbv)
+      {
+        expr.id(ID_ashr);
+        return;
+      }
+    }
+
+    return;
   }
 
   err_location(expr);
