@@ -445,18 +445,29 @@ void cpp_declarator_convertert::get_final_identifier()
 
   if(is_code)
   {
-    // is there already an `extern "C"' function with the same name?
-    
-    if(linkage_spec==ID_auto &&
-       scope->prefix=="" &&
-       cpp_typecheck.context.symbols.find("c::"+identifier)!=
-       cpp_typecheck.context.symbols.end())
+    if(linkage_spec==ID_C)
     {
+      // fine as is
     }
-    else if(linkage_spec!=ID_C)
+    else if(linkage_spec==ID_auto ||
+            linkage_spec==ID_cpp)
     {
-      // add C++ decoration
-      identifier+=id2string(cpp_typecheck.function_identifier(final_type));
+      // Is there already an `extern "C"' function with the same name
+      // and the same signature?
+      contextt::symbolst::const_iterator
+        c_it=cpp_typecheck.context.symbols.find("c::"+identifier);
+        
+      if(c_it!=cpp_typecheck.context.symbols.end() &&
+         cpp_typecheck.function_identifier(final_type)==
+         cpp_typecheck.function_identifier(c_it->second.type))
+      {
+        // leave as is, no decoration
+      }
+      else
+      {
+        // add C++ decoration
+        identifier+=id2string(cpp_typecheck.function_identifier(final_type));
+      }
     }
   }
 
