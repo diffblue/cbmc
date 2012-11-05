@@ -228,6 +228,8 @@ void goto_convertt::do_printf(
       copy(to_code(printf_code), OTHER, dest);
     }
   }
+  else
+    assert(false);
 }
 
 /*******************************************************************\
@@ -1024,10 +1026,12 @@ void goto_convertt::do_function_call_symbol(
   {
     do_array_copy(lhs, function, arguments, dest);
   }
-  else if(identifier=="c::printf" ||
+  else if(identifier=="c::printf")
+  /*
           identifier=="c::fprintf" ||
           identifier=="c::sprintf" ||
           identifier=="c::snprintf")
+  */
   {
     do_printf(lhs, function, arguments, dest);
   }
