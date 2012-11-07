@@ -1134,6 +1134,10 @@ void goto_convertt::do_function_call_symbol(
   {
     // does nothing
   }
+  else if(identifier=="c::__builtin_unreachable")
+  {
+    // says something like assert(false);
+  }
   else if(identifier==ID_gcc_builtin_va_arg)
   {
     // This does two things.
