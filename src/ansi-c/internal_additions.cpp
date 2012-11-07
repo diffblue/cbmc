@@ -151,9 +151,9 @@ void ansi_c_internal_additions(std::string &code)
     "float __CPROVER_fabsf(float x);\n"
     
     // arrays
-    "__CPROVER_bool __CPROVER_array_equal(const void array1[], const void array2[]);\n"
-    "void __CPROVER_array_copy(const void dest[], const void src[]);\n"
-    "void __CPROVER_array_set(const void dest[], ...);\n"
+    "__CPROVER_bool __CPROVER_array_equal(const void *array1, const void *array2);\n"
+    "void __CPROVER_array_copy(const void *dest, const void *src);\n"
+    "void __CPROVER_array_set(const void *dest, ...);\n"
 
     // k-induction
     "void __CPROVER_k_induction_hint(unsigned min, unsigned max, "
