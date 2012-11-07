@@ -151,6 +151,14 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
 
   // check subtype
   typecheck_type(type.subtype());
+  
+  // we don't allow void as subtype
+  if(follow(type.subtype()).id()==ID_empty)
+  {
+    err_location(type);
+    str << "array of voids";
+    throw 0;
+  }
 
   // check size, if any
   
