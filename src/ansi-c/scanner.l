@@ -413,8 +413,17 @@ void ansi_c_scanner_init()
                     return make_identifier();
                 }
 
-"__alignof__" |
-"__alignof"     { if(PARSER.mode==ansi_c_parsert::GCC ||
+"__alignof__"   { if(PARSER.mode==ansi_c_parsert::GCC ||
+                     PARSER.mode==ansi_c_parsert::ARM)
+                    { loc(); return TOK_ALIGNOF; }
+                  else
+                    return make_identifier();
+                }
+
+"__alignof"     { // MS supports __alignof:
+                  // http://msdn.microsoft.com/en-us/library/45t0s5f4%28v=vs.71%29.aspx
+                  if(PARSER.mode==ansi_c_parsert::MSC ||
+                     PARSER.mode==ansi_c_parsert::GCC ||
                      PARSER.mode==ansi_c_parsert::ARM)
                     { loc(); return TOK_ALIGNOF; }
                   else
