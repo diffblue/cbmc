@@ -162,6 +162,8 @@ int __builtin_signbit(double);
 int __builtin_signbitf(float);
 int __builtin_signbitl(long double);
 
+void __builtin_unreachable(void);
+
 typedef int    __gcc_m64   __attribute__ ((__vector_size__ (8), __may_alias__));
 
 typedef char   __gcc_v8qi  __attribute__ ((__vector_size__ (8)));
