@@ -23,7 +23,10 @@ int f();
 
 STATIC_ASSERT(_Alignof(char)==1);
 STATIC_ASSERT(_Alignof(char[10])==1);
+
+#ifndef _WIN32
 STATIC_ASSERT(_Alignof(char[f()])==1);
+#endif
 
 int main()
 {
