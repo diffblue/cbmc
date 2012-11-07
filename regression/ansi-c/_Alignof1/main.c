@@ -13,6 +13,12 @@
 // constant.  When applied to an array type, the result is the alignment
 // requirement of the element type.
 
+// Visual Studio has __alignof
+
+#ifdef _WIN32
+#define _Alignof __alignof
+#endif
+
 int f();
 
 STATIC_ASSERT(_Alignof(char)==1);
