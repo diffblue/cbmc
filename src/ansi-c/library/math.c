@@ -26,21 +26,49 @@ inline float __builtin_fabsf(float f) { return __CPROVER_fabsf(f); }
 
 int isfinite(double d) { return __CPROVER_isfinite(d); }
 
+/* FUNCTION: __finite */
+
+int __finite(double d) { return __CPROVER_isfinite(d); }
+
+/* FUNCTION: __finitef */
+
+int __finitef(float f) { return __CPROVER_isfinite(f); }
+
+/* FUNCTION: __finitel */
+
+int __finitel(long double d) { return __CPROVER_isfinite(d); }
+
 /* FUNCTION: isinf */
 
 inline int isinf(double d) { return __CPROVER_isinf(d); }
+
+/* FUNCTION: __isinf */
+
+inline int __isinf(double d) { return __CPROVER_isinf(d); }
 
 /* FUNCTION: isinff */
 
 inline int isinff(float f) { return __CPROVER_isinf(f); }
 
+/* FUNCTION: __isinff */
+
+inline int __isinff(float f) { return __CPROVER_isinf(f); }
+
 /* FUNCTION: isinfl */
 
 inline int isinfl(long double d) { return __CPROVER_isinf(d); }
 
+/* FUNCTION: __isinfl */
+
+inline int __isinfl(long double d) { return __CPROVER_isinf(d); }
+
 /* FUNCTION: isnan */
 
 inline int isnan(double d) { return __CPROVER_isnan(d); }
+
+/* FUNCTION: isnan */
+
+inline int __isnan(double d) { return __CPROVER_isnan(d); }
 
 /* FUNCTION: __isnanf */
 
@@ -53,6 +81,10 @@ inline int isnanf(float f) { return __CPROVER_isnan(f); }
 /* FUNCTION: isnanl */
 
 inline int isnanl(long double d) { return __CPROVER_isnan(d); }
+
+/* FUNCTION: __isnanl */
+
+inline int __isnanl(long double d) { return __CPROVER_isnan(d); }
 
 /* FUNCTION: isnormal */
 
