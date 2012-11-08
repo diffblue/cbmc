@@ -43,11 +43,13 @@ int run(
 {
   #ifdef _WIN32
 
-  char **_argv=new char * [argv.size()+1];
+  const char **_argv=new const char * [argv.size()+1];
 
   for(unsigned i=0; i<argv.size(); i++)
     _argv[i]=argv[i].c_str();
   
+  _argv[argv.size()]=NULL;
+
   int status=_spawn(_P_WAIT, what.c_str(), _argv);
 
   delete[] _argv;  
