@@ -23,6 +23,8 @@ Date: August 2012
 
 #endif
 
+#include <unicode.h>
+
 #include "run.h"
   
 /*******************************************************************\
@@ -42,15 +44,26 @@ int run(
   const std::vector<std::string> &argv)
 {
   #ifdef _WIN32
-
-  const char **_argv=new const char * [argv.size()+1];
-
+  // unicode version of the arguments
+  std::vector<std::wstring> wargv;
+  
+  wargv.resize(argv.size());
+  
   for(unsigned i=0; i<argv.size(); i++)
-    _argv[i]=argv[i].c_str();
+    wargv[i]=widen(argv[i]);
+
+  const wchar_t **_argv=new const wchar_t * [argv.size()+1];
+
+  for(unsigned i=0; i<wargv.size(); i++)
+    _argv[i]=wargv[i].c_str();
   
   _argv[argv.size()]=NULL;
 
-  int status=_spawnvp(_P_WAIT, what.c_str(), _argv);
+  // warning: the arguments may still need escaping
+
+  std::wstring wide_what=widen(what);
+
+  int status=_wspawnvp(_P_WAIT, wide_what.c_str(), _argv);
 
   delete[] _argv;  
 
