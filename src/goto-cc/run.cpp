@@ -9,7 +9,7 @@ Date: August 2012
 \*******************************************************************/
 
 #ifdef _WIN32
-
+#include <process.h>
 #else
 
 #include <string.h>
@@ -42,7 +42,17 @@ int run(
   const std::vector<std::string> &argv)
 {
   #ifdef _WIN32
-  return 1;
+
+  char **_argv=new char * [argv.size()+1];
+
+  for(unsigned i=0; i<argv.size(); i++)
+    _argv[i]=argv[i].c_str();
+  
+  int status=_spawn(_P_WAIT, what.c_str(), _argv);
+
+  delete[] _argv;  
+
+  return status;
   
   #else
   pid_t childpid; /* variable to store the child's pid */
