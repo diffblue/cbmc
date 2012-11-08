@@ -113,6 +113,16 @@ bool gcc_modet::doit()
     compiler.mode=compilet::COMPILE_LINK;
   else
     compiler.mode=compilet::COMPILE_LINK_EXECUTABLE;
+    
+  switch(compiler.mode)
+  {
+  case compilet::LINK_LIBRARY: debug("Linking a library only"); break;
+  case compilet::COMPILE_ONLY: debug("Compiling only"); break;
+  case compilet::PREPROCESS_ONLY: debug("Preprocessing only"); break;
+  case compilet::COMPILE_LINK: debug("Compiling and linking a library"); break;
+  case compilet::COMPILE_LINK_EXECUTABLE: debug("Compiling and linking an executable"); break;
+  default: assert(false);
+  }
 
   if(cmdline.isset("i386-win32") ||
      cmdline.isset("winx64"))
