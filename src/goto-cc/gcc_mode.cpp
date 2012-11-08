@@ -208,7 +208,12 @@ bool gcc_modet::doit()
       std::string new_name=get_base_name(*a_it)+new_suffix;
       std::string dest=temp_dir(new_name);
       int exit_code=preprocess(*a_it, dest);
-      if(exit_code!=0) return true;
+      if(exit_code!=0)
+      {
+        debug("preprocessing has failed");
+        return true;
+      }
+      
       *a_it=dest;
     }
   }
