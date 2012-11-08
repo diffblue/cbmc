@@ -50,7 +50,7 @@ int run(
   
   _argv[argv.size()]=NULL;
 
-  int status=_spawn(_P_WAIT, what.c_str(), _argv);
+  int status=_spawnvp(_P_WAIT, what.c_str(), _argv);
 
   delete[] _argv;  
 
