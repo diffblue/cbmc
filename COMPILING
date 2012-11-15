@@ -69,6 +69,10 @@ Follow these instructions:
 COMPILATION ON WINDOWS
 ----------------------
 
+There are two options: compilation using g++ from Cygwin, or using
+Visual Studio's compiler. As Cygwin has significant overhead during
+process creation, we advise you use Visual Studio.
+
 Follow these instructions:
 
 0) You need a C/C++ compiler, Flex and Bison, GNU tar, gzip2,
