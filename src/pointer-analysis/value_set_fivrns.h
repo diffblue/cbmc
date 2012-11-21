@@ -42,15 +42,6 @@ public:
 
   typedef irep_idt idt;
   
-  static const std::string &id2string(const idt &id)
-  {
-    #ifdef USE_DSTRING
-    return id.as_string();
-    #else
-    return id;
-    #endif
-  }
-
   class objectt
   {
   public:

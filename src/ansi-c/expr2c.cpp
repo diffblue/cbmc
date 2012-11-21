@@ -1498,7 +1498,7 @@ std::string expr2ct::convert_symbol(
     dest=id_shorthand(src);
   else if(src.operands().size()==1 &&
         src.op0().id()==ID_predicate_passive_symbol)
-    dest=src.op0().get(ID_identifier).as_string();
+    dest=src.op0().get_string(ID_identifier);
   else
     dest=id2string(id);
 
