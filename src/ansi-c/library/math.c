@@ -182,3 +182,118 @@ inline int __fpclassify(
          __CPROVER_isnormal(d)?FP_NORMAL:
          FP_SUBNORMAL;
 }
+
+/* FUNCTION: sin */
+
+double sin(double x)
+{
+  // gross over-approximation
+  double ret;
+
+  if(__CPROVER_isinf(x) || __CPROVER_isnan(x))
+    __CPROVER_assume(__CPROVER_isnan(ret));
+  else
+  {
+    __CPROVER_assume(ret<=1);
+    __CPROVER_assume(ret>=-1);
+    __CPROVER_assume(x!=0 || ret==0);
+  }
+
+  return ret;
+}
+
+/* FUNCTION: sinl */
+
+long double sinl(long double x)
+{
+  // gross over-approximation
+  long double ret;
+
+  if(__CPROVER_isinf(x) || __CPROVER_isnan(x))
+    __CPROVER_assume(__CPROVER_isnan(ret));
+  else
+  {
+    __CPROVER_assume(ret<=1);
+    __CPROVER_assume(ret>=-1);
+    __CPROVER_assume(x!=0 || ret==0);
+  }
+
+  return ret;
+}
+
+/* FUNCTION: sinf */
+
+float sinf(float x)
+{
+  // gross over-approximation
+  float ret;
+
+  if(__CPROVER_isinf(x) || __CPROVER_isnan(x))
+    __CPROVER_assume(__CPROVER_isnan(ret));
+  else
+  {
+    __CPROVER_assume(ret<=1);
+    __CPROVER_assume(ret>=-1);
+    __CPROVER_assume(x!=0 || ret==0);
+  }
+
+  return ret;
+}
+
+/* FUNCTION: cos */
+
+double cos(double x)
+{
+  // gross over-approximation
+  double ret;
+
+  if(__CPROVER_isinf(x) || __CPROVER_isnan(x))
+    __CPROVER_assume(__CPROVER_isnan(ret));
+  else
+  {
+    __CPROVER_assume(ret<=1);
+    __CPROVER_assume(ret>=-1);
+    __CPROVER_assume(x!=0 || ret==0);
+  }
+
+  return ret;
+}
+
+/* FUNCTION: cosl */
+
+long double cosl(long double x)
+{
+  // gross over-approximation
+  long double ret;
+
+  if(__CPROVER_isinf(x) || __CPROVER_isnan(x))
+    __CPROVER_assume(__CPROVER_isnan(ret));
+  else
+  {
+    __CPROVER_assume(ret<=1);
+    __CPROVER_assume(ret>=-1);
+    __CPROVER_assume(x!=0 || ret==0);
+  }
+
+  return ret;
+}
+
+/* FUNCTION: cosf */
+
+float cosf(float x)
+{
+  // gross over-approximation
+  float ret;
+
+  if(__CPROVER_isinf(x) || __CPROVER_isnan(x))
+    __CPROVER_assume(__CPROVER_isnan(ret));
+  else
+  {
+    __CPROVER_assume(ret<=1);
+    __CPROVER_assume(ret>=-1);
+    __CPROVER_assume(x!=0 || ret==0);
+  }
+
+  return ret;
+}
+
