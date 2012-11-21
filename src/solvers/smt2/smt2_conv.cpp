@@ -1831,7 +1831,7 @@ void smt2_convt::convert_constant(const constant_exprt &expr)
   }
   else if(expr.type().id()==ID_rational)
   {
-    std::string value=expr.get(ID_value).as_string();
+    std::string value=id2string(expr.get(ID_value));
     size_t pos=value.find("/");
 
     if(pos==std::string::npos)

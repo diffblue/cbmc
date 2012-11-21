@@ -44,9 +44,9 @@ std::string type2name(const typet &type)
   else if(type.id()==ID_empty)
     result+="V";   
   else if(type.id()==ID_signedbv)
-    result+="S" + type.get(ID_width).as_string(); 
+    result+="S" + type.get_string(ID_width);
   else if(type.id()==ID_unsignedbv)
-    result+="U" + type.get(ID_width).as_string(); 
+    result+="U" + type.get_string(ID_width);
   else if(type.id()==ID_bool) 
     result+="B";
   else if(type.id()==ID_integer) 
@@ -56,9 +56,9 @@ std::string type2name(const typet &type)
   else if(type.id()==ID_complex) 
     result+="C";
   else if(type.id()==ID_floatbv) 
-    result+="F" + type.get(ID_width).as_string();
+    result+="F" + type.get_string(ID_width);
   else if(type.id()==ID_fixedbv) 
-    result+="X" + type.get(ID_width).as_string(); 
+    result+="X" + type.get_string(ID_width);
   else if(type.id()==ID_natural)
     result+="N";
   else if(type.id()==ID_pointer)
@@ -76,7 +76,7 @@ std::string type2name(const typet &type)
         it++)
     {      
       result+=type2name(it->type());
-      result+="'" + it->get_identifier().as_string() + "'|";
+      result+="'" + id2string(it->get_identifier()) + "'|";
     }
     result.resize(result.size()-1);
     result+=")";
@@ -87,11 +87,11 @@ std::string type2name(const typet &type)
     if(t.size().is_nil())
       result+="ARR?";
     else
-      result+="ARR"+t.size().get(ID_value).as_string();
+      result+="ARR"+t.size().get_string(ID_value);
   }
   else if(type.id()==ID_symbol)
   {
-    result+="SYM#"+type.get(ID_identifier).as_string()+"#";
+    result+="SYM#"+type.get_string(ID_identifier)+"#";
   }
   else if(type.id()==ID_struct || 
           type.id()==ID_union)
@@ -107,7 +107,7 @@ std::string type2name(const typet &type)
         it++)
     {            
       result+=type2name(it->type());
-      result+="'"+it->get(ID_name).as_string() + "'|";
+      result+="'"+it->get_string(ID_name)+"'|";
     }
     result.resize(result.size()-1);
     result+="]";
@@ -117,16 +117,16 @@ std::string type2name(const typet &type)
   else if(type.id()==ID_incomplete_union)
     result +="UN?";
   else if(type.id()==ID_c_enum)
-    result +="EN" + type.get(ID_width).as_string();
+    result +="EN"+type.get_string(ID_width);
   else if(type.id()==ID_incomplete_c_enum)
     result +="EN?";
   else if(type.id()==ID_c_bitfield)
-    result+="BF"+type.get(ID_size).as_string(); 
+    result+="BF"+type.get_string(ID_size);
   else if(type.id()==ID_vector)
-    result+="VEC"+type.get(ID_size).as_string(); 
+    result+="VEC"+type.get_string(ID_size);
   else
     throw (std::string("Unknown type '") + 
-           type.id().as_string() + 
+           type.id_string() + 
            "' encountered."); 
     
   if(type.has_subtype())

@@ -1544,7 +1544,7 @@ void inline instrumentert::print_outputs_local(
       same_file.begin();
       it!=same_file.end(); it++)
     {
-      dot << "subgraph cluster_" << it->first.hash() << "{" << std::endl;
+      dot << "subgraph cluster_" << irep_id_hash()(it->first) << "{" << std::endl;
       dot << "  label=\"" << it->first << "\";" << std::endl;
       for(std::set<unsigned>::const_iterator ev_it=it->second.begin();
         ev_it!=it->second.end(); ev_it++)

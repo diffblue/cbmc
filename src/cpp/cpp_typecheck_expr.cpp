@@ -1968,7 +1968,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
 
       // get the virtual table
       typet this_type =  to_code_type(expr.function().type()).arguments().front().type();
-      irep_idt vtable_name = this_type.subtype().get(ID_identifier).as_string() +"::@vtable_pointer";
+      irep_idt vtable_name = this_type.subtype().get_string(ID_identifier) +"::@vtable_pointer";
 
       const struct_typet &vt_struct=
         to_struct_type(follow(this_type.subtype()));
@@ -1981,8 +1981,8 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
       vtptr_member.set(ID_component_name, vtable_name);
 
       // look for the right entry
-      irep_idt vtentry_component_name = vt_compo.type().subtype().get(ID_identifier).as_string()
-        + "::" + expr.function().type().get("#virtual_name").as_string();
+      irep_idt vtentry_component_name = vt_compo.type().subtype().get_string(ID_identifier)
+        + "::" + expr.function().type().get_string("#virtual_name");
 
       exprt vtentry_member(ID_ptrmember);
       vtentry_member.copy_to_operands(vtptr_member);
@@ -2081,7 +2081,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
     // special case for the initialization of parents
     if(member.get_bool("#not_accessible"))
     {
-      assert(id2string(member.get(ID_C_access))!="");
+      assert(member.get(ID_C_access)!="");
       tmp_object_expr.set("#not_accessible", true);
       tmp_object_expr.set(ID_C_access, member.get(ID_C_access));
     }

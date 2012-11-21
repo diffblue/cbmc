@@ -1846,7 +1846,7 @@ void smt1_convt::convert_constant(
   {
     fixedbv_spect spec(to_fixedbv_type(expr.type()));
 
-    std::string v_str=id2string(expr.get(ID_value));
+    std::string v_str=expr.get_string(ID_value);
     mp_integer v=binary2integer(v_str, false);
 
     smt1_prop.out << "bv" << v << "[" << spec.width << "]";
@@ -1855,7 +1855,7 @@ void smt1_convt::convert_constant(
   {
     ieee_float_spect spec(to_floatbv_type(expr.type()));
 
-    std::string v_str=id2string(expr.get(ID_value));
+    std::string v_str=expr.get_string(ID_value);
     mp_integer v=binary2integer(v_str, false);
 
     smt1_prop.out << "bv" << v << "[" << spec.width() << "]";
@@ -1893,7 +1893,7 @@ void smt1_convt::convert_constant(
   }
   else if(expr.type().id()==ID_rational)
   {
-    std::string value=expr.get(ID_value).as_string();
+    std::string value=expr.get_string(ID_value);
     size_t pos=value.find("/");
 
     if(pos==std::string::npos)
@@ -1907,7 +1907,7 @@ void smt1_convt::convert_constant(
   else if(expr.type().id()==ID_integer ||
           expr.type().id()==ID_natural)
   {
-    std::string value=expr.get(ID_value).as_string();
+    std::string value=expr.get_string(ID_value);
     
     if(value[0]=='-') 
       smt1_prop.out << "(~ " << value.substr(1) << ")";
@@ -2879,7 +2879,7 @@ void smt1_convt::find_symbols(const exprt &expr)
     if(expr.id()==ID_symbol)
       identifier=to_symbol_expr(expr).get_identifier();
     else
-      identifier="nondet_"+id2string(expr.get(ID_identifier));
+      identifier="nondet_"+expr.get_string(ID_identifier);
 
     if(quantified_symbols.find(identifier)!=quantified_symbols.end())
       return; // Symbol is quantified, i.e., it doesn't require declaration.

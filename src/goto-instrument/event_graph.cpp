@@ -1130,7 +1130,7 @@ std::string event_grapht::critical_cyclet::print_output() const
   std::string cycle;
   for(const_iterator it=begin(); it!=end(); it++)
   {
-    cycle += egraph[*it].variable.as_string() + " ("; 
+    cycle += id2string(egraph[*it].variable) + " ("; 
     cycle += egraph[*it].location.as_string() + ") ";
   }
   return cycle;

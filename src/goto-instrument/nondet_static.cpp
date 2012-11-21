@@ -48,7 +48,7 @@ void nondet_static(
     {
       const symbol_exprt &sym=to_symbol_expr(
           to_code_assign(instruction.code).lhs());
-      if(has_prefix(sym.get_identifier().as_string(), CPROVER_PREFIX) ||
+      if(has_prefix(id2string(sym.get_identifier()), CPROVER_PREFIX) ||
           !ns.lookup(sym.get_identifier()).is_static_lifetime)
         continue;
 
@@ -63,7 +63,7 @@ void nondet_static(
       const code_function_callt &fct=to_code_function_call(instruction.code);
       const symbol_exprt &fsym=to_symbol_expr(fct.function());
 
-      if(has_prefix(fsym.get_identifier().as_string(), "c::#ini#"))
+      if(has_prefix(id2string(fsym.get_identifier()), "c::#ini#"))
         nondet_static(ns, goto_functions, fsym.get_identifier());
     }
   }

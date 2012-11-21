@@ -35,6 +35,24 @@ typedef std::string irep_namet;
 typedef string_hash irep_id_hash;
 #endif
 
+extern inline const std::string &id2string(const irep_idt &d)
+{
+  #ifdef USE_DSTRING
+  return d.as_string();
+  #else
+  return d;
+  #endif
+}
+
+extern inline const std::string &name2string(const irep_namet &n)
+{
+  #ifdef USE_DSTRING
+  return n.as_string();
+  #else
+  return n;
+  #endif
+}
+
 #define forall_irep(it, irep) \
   for(irept::subt::const_iterator it=(irep).begin(); \
       it!=(irep).end(); ++it)
@@ -119,13 +137,8 @@ public:
   inline const irep_idt &id() const
   { return read().data; }
   
-  #ifdef USE_DSTRING
   inline const std::string &id_string() const
-  { return read().data.as_string(); }
-  #else
-  inline const std::string &id_string() const
-  { return read().data; }
-  #endif
+  { return id2string(read().data); }
 
   inline void id(const irep_idt &_data)
   { write().data=_data; }
@@ -135,11 +148,7 @@ public:
 
   inline const std::string &get_string(const irep_namet &name) const
   {
-    #ifdef USE_DSTRING
-    return get(name).as_string();
-    #else
-    return get(name);
-    #endif
+    return id2string(get(name));
   }
   
   const irep_idt &get(const irep_namet &name) const;
@@ -282,24 +291,6 @@ public:
   }
   #endif
 };
-
-extern inline const std::string &id2string(const irep_idt &d)
-{
-  #ifdef USE_DSTRING
-  return d.as_string();
-  #else
-  return d;
-  #endif
-}
-
-extern inline const std::string &name2string(const irep_namet &n)
-{
-  #ifdef USE_DSTRING
-  return n.as_string();
-  #else
-  return n;
-  #endif
-}
 
 struct irep_hash
 {

@@ -99,7 +99,7 @@ bool write_goto_binary_v2(
       // In version 2, goto functions are not converted to ireps,
       // instead they are saved in a custom binary format      
       
-      write_string(out, it->first.as_string()); // name      
+      write_string(out, id2string(it->first)); // name      
       write_long(out, it->second.body.instructions.size()); // # instructions
       
       forall_goto_program_instructions(i_it, it->second.body)

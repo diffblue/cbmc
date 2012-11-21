@@ -65,11 +65,11 @@ void cpp_typecheckt::do_virtual_table(const symbolt &symbol)
     const std::map<irep_idt,exprt>& value_map = cit->second;
 
     const symbolt& late_cast_symb = namespacet(context).lookup(cit->first); 
-    const symbolt& vt_symb_type = namespacet(context).lookup("virtual_table::"+late_cast_symb.name.as_string());
+    const symbolt& vt_symb_type = namespacet(context).lookup("virtual_table::"+id2string(late_cast_symb.name));
 
     symbolt vt_symb_var;
-    vt_symb_var.name=  vt_symb_type.name.as_string() + "@"+ symbol.name.as_string();
-    vt_symb_var.base_name= vt_symb_type.base_name.as_string() + "@" + symbol.base_name.as_string();
+    vt_symb_var.name=  id2string(vt_symb_type.name) + "@"+ id2string(symbol.name);
+    vt_symb_var.base_name= id2string(vt_symb_type.base_name) + "@" + id2string(symbol.base_name);
     vt_symb_var.mode=ID_cpp;
     vt_symb_var.module=module;
     vt_symb_var.location=vt_symb_type.location;
