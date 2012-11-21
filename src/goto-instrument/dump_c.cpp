@@ -376,7 +376,7 @@ void goto_program2codet::convert_labels(
       it!=target->labels.end();
       ++it)
   {
-    if(has_prefix(it->as_string(), "__CPROVER_ASYNC_"))
+    if(has_prefix(id2string(*it), "__CPROVER_ASYNC_"))
       continue;
     if(!target_label.empty() && *it==target_label)
       continue;
@@ -415,7 +415,7 @@ goto_programt::const_targett goto_program2codet::convert_assign(
   const code_assignt &a=to_code_assign(target->code);
 
   if(a.lhs().id()==ID_symbol &&
-      to_symbol_expr(a.lhs()).get_identifier().as_string().
+      id2string(to_symbol_expr(a.lhs()).get_identifier()).
       rfind("#array_size")!=std::string::npos)
   {
     replace_symbols.insert(
@@ -470,7 +470,7 @@ goto_programt::const_targett goto_program2codet::convert_assign(
 
           if(mask.id() == ID_constant && a == lhs && right.id() == ID_constant)
           {
-            const std::string& mask_value = mask.get(ID_value).as_string();
+            const std::string& mask_value = mask.get_string(ID_value);
 
             unsigned l = 0;
             for(; l <  mask_value.size() ; l++)
@@ -946,7 +946,7 @@ goto_programt::const_targett goto_program2codet::convert_start_thread(
       it=target->labels.begin();
       it!=target->labels.end();
       ++it)
-    if(has_prefix(it->as_string(), "__CPROVER_ASYNC_"))
+    if(has_prefix(id2string(*it), "__CPROVER_ASYNC_"))
     {
       labels_in_use.insert(*it);
 
@@ -1269,7 +1269,7 @@ void goto2sourcet::operator()(std::ostream &os)
   Forall_symbols(it, copied_context.symbols)
   {
     cleanup_type(it->second.type);
-    if(!symbols_sorted.insert(it->first.as_string()).second)
+    if(!symbols_sorted.insert(id2string(it->first)).second)
       assert(false);
   }
 
@@ -1441,7 +1441,7 @@ std::ostream& goto2sourcet::print_function_declaration(
       if(arg_symb)
       {
         symbol_exprt s(arg_symb->name, arg.type());
-        if(has_prefix(arg_symb->base_name.as_string(), "#anon"))
+        if(has_prefix(id2string(arg_symb->base_name), "#anon"))
         {
           std::string new_name=id2string(arg_symb->name);
           std::string::size_type pos=new_name.find("#anon");
@@ -1956,7 +1956,7 @@ void goto2sourcet::cleanup_type(typet &type)
     cleanup_expr(to_array_type(type).size());
 
   if(!type.get(ID_tag).empty() &&
-      has_prefix(type.get(ID_tag).as_string(), "#anon"))
+      has_prefix(type.get_string(ID_tag), "#anon"))
   {
     typet tmp=type;
     tmp.set(ID_tag, get_anon_name(type));
@@ -2280,7 +2280,7 @@ std::string goto2sourcet::expr_to_string(const exprt &expr)
   }
   else if(expr.id() == ID_string_constant)
   {
-    std::string get_value = expr.get(ID_value).as_string();
+    std::string get_value = expr.get_string(ID_value);
     std::string filtered_value;
     for(unsigned i=0; i < get_value.length(); i++)
     {
@@ -2355,10 +2355,10 @@ std::string goto2sourcet::expr_to_string(const exprt &expr)
       std::string value = expr_to_string(expr.op2());
 
       std::string member =
-        global_renaming[expr.get(ID_component_name)].as_string();
+        id2string(global_renaming[expr.get(ID_component_name)]);
 
       std::string type =
-        global_renaming[t.get(ID_name)].as_string();
+        id2string(global_renaming[t.get(ID_name)]);
 
       return "__with("+ src+ ", &" + type + "::" + member + ", " +
         value + ")";
@@ -2383,7 +2383,7 @@ std::string goto2sourcet::expr_to_string(const exprt &expr)
     const struct_typet::componentst& components = struct_type.components();
     const exprt::operandst& operands = expr.operands();
 
-    std::string ret=global_renaming[struct_type.get(ID_name)].as_string()+"(";
+    std::string ret=id2string(global_renaming[struct_type.get(ID_name)])+"(";
     
     assert(operands.size() == components.size());
     if( 0 < operands.size())

@@ -95,10 +95,6 @@ public:
     return a.no<b.no;
   }
 
-  // warning! the reference returned is not stable
-  inline const std::string &as_string() const
-  { return string_container.get_string(no); }
-   
   // modifying
   
   inline void clear()
@@ -110,6 +106,8 @@ public:
   inline dstring &operator=(const dstring &b)
   { no=b.no; return *this; }
   
+  // friends
+  
   inline friend std::ostream &operator<<(std::ostream &out, const dstring &a)
   {
     return out << a.as_string();
@@ -119,12 +117,9 @@ public:
   {
     return s.hash();
   }
-
-  inline size_t hash() const
-  {
-    return no;
-  }
   
+  // non-standard
+
   inline unsigned get_no() const
   {
     return no;
@@ -132,11 +127,24 @@ public:
   
 protected:
   unsigned no;
+
+  // warning! the reference returned is not stable
+  inline const std::string &as_string() const
+  { return string_container.get_string(no); }
+
+  inline size_t hash() const
+  {
+    return no;
+  }
 };
+
+// warning! the reference returned is not stable
+inline const std::string &as_string(const dstring &s)
+{ return string_container.get_string(s.get_no()); }
 
 struct dstring_hash
 {
-  size_t operator()(const dstring &s) const { return s.hash(); }
+  size_t operator()(const dstring &s) const { return hash_string(s); }
 };
 
 size_t hash_string(const dstring &s);
