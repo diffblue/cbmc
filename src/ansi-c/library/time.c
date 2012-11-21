@@ -27,7 +27,7 @@ struct tm *gmtime(const time_t *clock)
 {
   // not very general, may be too restrictive
   // need to set the fields to something meaningful
-  *clock;
+  (void)*clock;
   static struct tm return_value;
   return &return_value;
 }
@@ -44,7 +44,7 @@ struct tm *gmtime(const time_t *clock)
 struct tm *gmtime_r(const time_t *clock, struct tm *result)
 {
   // need to set the fields to something meaningful
-  *clock;
+  (void)*clock;
   return result;
 }
 
@@ -61,7 +61,7 @@ struct tm *localtime(const time_t *clock)
 {
   // not very general, may be too restrictive
   // need to set the fields to something meaningful
-  *clock;
+  (void)*clock;
   static struct tm return_value;
   return &return_value;
 }
@@ -78,7 +78,7 @@ struct tm *localtime(const time_t *clock)
 struct tm *localtime_r(const time_t *clock, struct tm *result)
 {
   // need to set the fields to something meaningful
-  *clock;
+  (void)*clock;
   return result;
 }
 
@@ -93,7 +93,7 @@ struct tm *localtime_r(const time_t *clock, struct tm *result)
 
 time_t mktime(struct tm *timeptr)
 {
-  *timeptr;
+  (void)*timeptr;
   time_t result;
   return result;
 }
@@ -109,7 +109,7 @@ time_t mktime(struct tm *timeptr)
 
 time_t timegm(struct tm *timeptr)
 {
-  *timeptr;
+  (void)*timeptr;
   time_t result;
   return result;
 }

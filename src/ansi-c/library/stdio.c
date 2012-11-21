@@ -159,7 +159,7 @@ inline int feof(FILE *stream)
 {
   // just return nondet
   int return_value;
-  *stream;
+  (void)*stream;
   return return_value;
 }
 
@@ -174,7 +174,7 @@ inline int ferror(FILE *stream)
 {
   // just return nondet
   int return_value;
-  *stream;
+  (void)*stream;
   return return_value;
 }
 
@@ -189,7 +189,7 @@ inline int fileno(FILE *stream)
 {
   // just return nondet
   int return_value;
-  *stream;
+  (void)*stream;
   return return_value;
 }
 
@@ -207,7 +207,7 @@ int fputs(const char *s, FILE *stream)
   #ifdef __CPROVER_STRING_ABSTRACTION
   __CPROVER_assert(__CPROVER_is_zero_string(s), "fputs zero-termination of 1st argument");
   #endif
-  *stream;
+  (void)*stream;
   return return_value;
 }
 
@@ -222,7 +222,7 @@ int fflush(FILE *stream)
 {
   // just return nondet
   int return_value;
-  *stream;
+  (void)*stream;
   return return_value;
 }
 
@@ -237,7 +237,7 @@ int fpurge(FILE *stream)
 {
   // just return nondet
   int return_value;
-  *stream;
+  (void)*stream;
   return return_value;
 }
 
@@ -275,7 +275,7 @@ inline int fgetc(FILE *stream)
 {
   __CPROVER_HIDE:;
   int return_value;
-  *stream;
+  (void)*stream;
   // it's a byte or EOF (-1)
   __CPROVER_assume(return_value>=-1 && return_value<=255);
   return return_value;
@@ -292,7 +292,7 @@ inline int getc(FILE *stream)
 {
   __CPROVER_HIDE:;
   int return_value;
-  *stream;
+  (void)*stream;
   // it's a byte or EOF
   __CPROVER_assume(return_value>=-1 && return_value<=255);
   return return_value;
@@ -325,7 +325,7 @@ inline int getw(FILE *stream)
 {
   __CPROVER_HIDE:;
   int return_value;
-  *stream;
+  (void)*stream;
   // it's any int, no restriction
   return return_value;
 }
@@ -341,7 +341,7 @@ inline int fseek(FILE *stream, long offset, int whence)
 {
   __CPROVER_HIDE:;
   int return_value;
-  *stream;
+  (void)*stream;
   return return_value;
 }
 
@@ -356,7 +356,7 @@ long ftell(FILE *stream)
 {
   __CPROVER_HIDE:;
   int return_value;
-  *stream;
+  (void)*stream;
   return return_value;
 }
 
@@ -370,7 +370,7 @@ long ftell(FILE *stream)
 void rewind(FILE *stream)
 {
   __CPROVER_HIDE:
-  *stream;
+  (void)*stream;
 }
 
 /* FUNCTION: fwrite */
@@ -387,7 +387,7 @@ size_t fwrite(
   FILE *stream)
 {
   __CPROVER_HIDE:;
-  *stream;
+  (void)*stream;
   size_t nwrite;
   __CPROVER_assume(nwrite<=nitems);
   return nwrite;
@@ -482,7 +482,7 @@ int sscanf(const char *restrict s, const char *restrict format, ...)
 int vfscanf(FILE *restrict stream, const char *restrict format, va_list arg)
 {
   __CPROVER_HIDE:;
-  *stream;
+  (void)*stream;
   
 }
 
