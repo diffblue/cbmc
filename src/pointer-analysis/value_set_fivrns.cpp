@@ -1355,7 +1355,7 @@ void value_set_fivrnst::do_function_call(
   
   for(unsigned i=0; i<arguments.size(); i++)
   {
-    const std::string identifier="value_set::" + function.as_string() + "::" +  
+    const std::string identifier="value_set::" + id2string(function) + "::" +  
                                  "argument$"+i2string(i);
     add_var(identifier, "");
     exprt dummy_lhs=symbol_exprt(identifier, arguments[i].type());
@@ -1388,7 +1388,7 @@ void value_set_fivrnst::do_function_call(
     add_var(identifier, "");
   
     const exprt v_expr=
-      symbol_exprt("value_set::" + function.as_string() + "::" + 
+      symbol_exprt("value_set::" + id2string(function) + "::" + 
                    "argument$"+i2string(i), it->type());
     
     exprt actual_lhs=symbol_exprt(identifier, it->type());    

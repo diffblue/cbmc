@@ -480,7 +480,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
         value);
 
       // get the virtual-table symbol type
-      irep_idt vt_name = "virtual_table::"+symbol.name.as_string();
+      irep_idt vt_name = "virtual_table::"+id2string(symbol.name);
 
       contextt::symbolst::iterator vtit =
         context.symbols.find(vt_name);
@@ -490,7 +490,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
         // first time: create a virtual-table symbol type 
         symbolt vt_symb_type;
         vt_symb_type.name= vt_name;
-        vt_symb_type.base_name="virtual_table::"+symbol.base_name.as_string();
+        vt_symb_type.base_name="virtual_table::"+id2string(symbol.base_name);
         vt_symb_type.pretty_name = vt_symb_type.base_name;
         vt_symb_type.mode=ID_cpp;
         vt_symb_type.module=module;
@@ -506,9 +506,9 @@ void cpp_typecheckt::typecheck_compound_declarator(
         // add a virtual-table pointer 
         struct_typet::componentt compo;
         compo.type() = pointer_typet(symbol_typet(vt_name));
-        compo.set_name(symbol.name.as_string() +"::@vtable_pointer");
+        compo.set_name(id2string(symbol.name) +"::@vtable_pointer");
         compo.set(ID_base_name, "@vtable_pointer");
-        compo.set(ID_pretty_name, symbol.base_name.as_string() +"@vtable_pointer");
+        compo.set(ID_pretty_name, id2string(symbol.base_name) +"@vtable_pointer");
         compo.set("is_vtptr", true);
         compo.set(ID_access, ID_public);
         components.push_back(compo);
@@ -526,7 +526,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
       // add an entry to the virtual table
       struct_typet::componentt vt_entry;
       vt_entry.type() = pointer_typet(component.type());
-      vt_entry.set_name(vtit->first.as_string()+"::"+virtual_name);
+      vt_entry.set_name(id2string(vtit->first)+"::"+virtual_name);
       vt_entry.set(ID_base_name, virtual_name);
       vt_entry.set(ID_pretty_name, virtual_name);
       vt_entry.set(ID_access, ID_public);
@@ -540,7 +540,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
 
         // a new function that does 'late casting' of the 'this' parameter
         symbolt func_symb;
-        func_symb.name=component.get_name().as_string() + "::" +virtual_base.as_string();
+        func_symb.name=id2string(component.get_name()) + "::" +id2string(virtual_base);
         func_symb.base_name=component.get(ID_base_name);
         func_symb.pretty_name = component.get(ID_base_name);
         func_symb.mode=ID_cpp;
@@ -564,7 +564,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
             base_name="arg"+i2string(i);
 
           symbolt arg_symb;
-          arg_symb.name = func_symb.name.as_string() + "::"+ base_name.as_string();
+          arg_symb.name = id2string(func_symb.name) + "::"+ id2string(base_name);
           arg_symb.base_name = base_name;
           arg_symb.pretty_name = base_name;
           arg_symb.mode=ID_cpp;
@@ -663,7 +663,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
     {
       err_location(cpp_name.location());
 	str << "redeclaration of static member `" 
-	    << static_symbol.base_name.as_string()
+	    << static_symbol.base_name
 	    << "'";
       throw 0;
     }

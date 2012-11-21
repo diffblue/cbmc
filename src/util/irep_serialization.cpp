@@ -300,7 +300,7 @@ Function: irep_serializationt::read_string
  
 \*******************************************************************/
 
-dstring irep_serializationt::read_string(std::istream &in)
+irep_idt irep_serializationt::read_string(std::istream &in)
 {  
   char c;
   unsigned i=0;
@@ -323,7 +323,7 @@ dstring irep_serializationt::read_string(std::istream &in)
 
   read_buffer[i] = 0;
 
-  return dstring(&(read_buffer[0]));
+  return irep_idt(&(read_buffer[0]));
 }
 
 /*******************************************************************\
@@ -340,9 +340,9 @@ Function: irep_serializationt::write_string_ref
 
 void irep_serializationt::write_string_ref( 
   std::ostream &out, 
-  const dstring &s)
+  const irep_idt &s)
 {
-  unsigned id=s.get_no();
+  unsigned id=irep_id_hash()(s);
   if(id>=ireps_container.string_map.size()) 
     ireps_container.string_map.resize(id+1, false);
      
@@ -352,7 +352,7 @@ void irep_serializationt::write_string_ref(
   {
     ireps_container.string_map[id]=true;
     write_long(out, id);
-    write_string(out, s.as_string());
+    write_string(out, id2string(s));
   }
 }
 
@@ -374,7 +374,7 @@ irep_idt irep_serializationt::read_string_ref(std::istream &in)
   
   if(id>=ireps_container.string_rev_map.size()) 
     ireps_container.string_rev_map.resize(1+id*2, 
-      std::pair<bool,dstring>( false, dstring() ));
+      std::pair<bool,irep_idt>( false, irep_idt() ));
 
   if(ireps_container.string_rev_map[id].first)
   {
@@ -382,9 +382,9 @@ irep_idt irep_serializationt::read_string_ref(std::istream &in)
   }
   else
   {
-    dstring s=read_string(in);
+    irep_idt s=read_string(in);
     ireps_container.string_rev_map[id] = 
-      std::pair<bool,dstring>(true, s);
+      std::pair<bool,irep_idt>(true, s);
     return ireps_container.string_rev_map[id].second; 
   }
 }

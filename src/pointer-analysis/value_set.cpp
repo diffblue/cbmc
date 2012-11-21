@@ -469,7 +469,7 @@ void value_sett::get_value_set_rec(
           to_struct_union_type(expr_type);
 
         const std::string first_component_name=
-          struct_union_type.components().front().get(ID_name).as_string();
+          struct_union_type.components().front().get_string(ID_name);
 
         v_it=values.find(
             expr.get_string(ID_identifier)+"."+first_component_name+suffix);

@@ -170,8 +170,8 @@ bool is_shared(
      identifier=="c::stdout" ||
      identifier=="c::stderr" ||
      identifier=="c::sys_nerr" ||
-     has_prefix(identifier.as_string(), "symex::invalid_object") ||
-     has_prefix(identifier.as_string(), "symex_dynamic::dynamic_object"))
+     has_prefix(id2string(identifier), "symex::invalid_object") ||
+     has_prefix(id2string(identifier), "symex_dynamic::dynamic_object"))
     return false; // no race check
 
   const symbolt &symbol=ns.lookup(identifier);

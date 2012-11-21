@@ -29,7 +29,7 @@ void goto_convertt::convert_asm(const codet &code, goto_programt &dest)
     const irep_idt &i_str=
       to_string_constant(code.op0()).get_value();
 
-    std::istringstream str(i_str.as_string());
+    std::istringstream str(id2string(i_str));
     
     goto_programt tmp_dest;
     bool unknown=false;
