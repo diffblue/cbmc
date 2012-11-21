@@ -789,11 +789,7 @@ std::string irept::pretty(unsigned indent, unsigned max_indent) const
     indent_str(result, indent);
 
     result+="* ";
-    #ifdef USE_DSTRING
-    result+=it->first.as_string();
-    #else
-    result+=it->first;
-    #endif
+    result+=id2string(it->first);
     result+=": ";
 
     result+=it->second.pretty(indent+2, max_indent);
@@ -805,11 +801,7 @@ std::string irept::pretty(unsigned indent, unsigned max_indent) const
     indent_str(result, indent);
 
     result+="* ";
-    #ifdef USE_DSTRING
-    result+=it->first.as_string();
-    #else
-    result+=it->first;
-    #endif
+    result+=id2string(it->first);
     result+=": ";
 
     result+=it->second.pretty(indent+2, max_indent);
