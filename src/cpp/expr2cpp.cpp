@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "expr2cpp.h"
 
 #include <symbol.h>
+#include <hash_cont.h>
 
 class expr2cppt:public expr2ct
 {
