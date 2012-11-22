@@ -89,6 +89,8 @@ void goto_symext::operator()(
   assert(!state.call_stack().empty());
   state.top().end_of_function=--goto_program.instructions.end();
   state.top().calling_location.pc=state.top().end_of_function;
+  
+  assert(state.top().end_of_function->is_end_function());
 
   while(!state.call_stack().empty())
   {
@@ -342,8 +344,11 @@ void goto_symext::symex_step(
     symex_throw(state);
     state.source.pc++;
     break;
+    
+  case NO_INSTRUCTION_TYPE:
+    throw "symex got NO_INSTRUCTION";
   
   default:
-    assert(false);
+    throw "symex got unexpected instruction";
   }
 }
