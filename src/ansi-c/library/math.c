@@ -253,7 +253,7 @@ double cos(double x)
   {
     __CPROVER_assume(ret<=1);
     __CPROVER_assume(ret>=-1);
-    __CPROVER_assume(x!=0 || ret==0);
+    __CPROVER_assume(x!=0 || ret==1);
   }
 
   return ret;
@@ -272,7 +272,7 @@ long double cosl(long double x)
   {
     __CPROVER_assume(ret<=1);
     __CPROVER_assume(ret>=-1);
-    __CPROVER_assume(x!=0 || ret==0);
+    __CPROVER_assume(x!=0 || ret==1);
   }
 
   return ret;
@@ -291,7 +291,7 @@ float cosf(float x)
   {
     __CPROVER_assume(ret<=1);
     __CPROVER_assume(ret>=-1);
-    __CPROVER_assume(x!=0 || ret==0);
+    __CPROVER_assume(x!=0 || ret==1);
   }
 
   return ret;
