@@ -82,6 +82,8 @@ void goto_symext::operator()(
   const goto_functionst &goto_functions,
   const goto_programt &goto_program)
 {
+  assert(!goto_program.instructions.empty());
+
   state.source=symex_targett::sourcet(goto_program);
   assert(!state.threads.empty());
   assert(!state.call_stack().empty());
