@@ -22,14 +22,23 @@ public:
 
   explicit gcc_modet(gcc_cmdlinet &_gcc_cmdline):
     goto_cc_modet(_gcc_cmdline),
-    cmdline(_gcc_cmdline)
+    produce_hybrid_binary(false),
+    cmdline(_gcc_cmdline),
+    act_as_ld(false)
   {
   }
+
+  bool produce_hybrid_binary;
   
 protected:
   gcc_cmdlinet &cmdline;
   
+  bool act_as_ld;
+  
   int preprocess(const std::string &src, const std::string &dest);
+  
+  int gcc_hybrid_binary();
+  void get_output_files(std::list<std::string> &);
 };
 
 #endif /* GOTO_CC_GCC_MODE_H */

@@ -9,16 +9,6 @@ Author: CM Wintersteiger, 2006
 #include <cstdlib>
 #include <iostream>
 
-#if 0
-#ifdef _WIN32
-#define EX_OK 0
-#define EX_USAGE 64
-#define EX_SOFTWARE 70
-#else
-#include <sysexits.h>
-#endif
-#endif
-
 #include <tempdir.h>
 #include <config.h>
 #include <prefix.h>
@@ -48,7 +38,7 @@ bool gcc_modet::doit()
 
   compilet compiler(cmdline);
   
-  bool act_as_ld=
+  act_as_ld=
     has_prefix(base_name, "ld") ||
     has_prefix(base_name, "goto-ld");
 
@@ -113,7 +103,7 @@ bool gcc_modet::doit()
     compiler.mode=compilet::COMPILE_LINK;
   else
     compiler.mode=compilet::COMPILE_LINK_EXECUTABLE;
-    
+
   switch(compiler.mode)
   {
   case compilet::LINK_LIBRARY: debug("Linking a library only"); break;
@@ -220,6 +210,14 @@ bool gcc_modet::doit()
 
   // do all the rest
   bool result=compiler.doit();
+
+  // We can generate hybrid ELF and Mach-O binaries
+  // containing both executable machine code and the goto-binary.
+  if(produce_hybrid_binary)
+  {
+    if(gcc_hybrid_binary())
+      result=true;
+  }
   
   return result;
 }
@@ -232,7 +230,7 @@ Function: gcc_modet::preprocess
 
  Outputs:
 
- Purpose: display command line help
+ Purpose: call gcc for preprocessing
 
 \*******************************************************************/
 
@@ -302,6 +300,106 @@ int gcc_modet::preprocess(const std::string &src, const std::string &dest)
   #endif
   
   return run("gcc", new_argv);
+}
+
+/*******************************************************************\
+
+Function: gcc_modet::gcc_hybrid_binary
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+int gcc_modet::gcc_hybrid_binary()
+{
+  std::list<std::string> output_files;
+  get_output_files(output_files);
+
+  if(output_files.empty()) return 0;
+
+  debug("Running gcc to generate hybrid binary");
+  
+  // save the goto-cc output files
+  for(std::list<std::string>::const_iterator
+      it=output_files.begin();
+      it!=output_files.end();
+      it++)
+  {
+    rename(it->c_str(), (*it+".goto-cc-saved").c_str());
+  }
+
+  // build new argv
+  std::vector<std::string> new_argv;
+  
+  new_argv.reserve(cmdline.parsed_argv.size());
+
+  for(gcc_cmdlinet::parsed_argvt::const_iterator
+      it=cmdline.parsed_argv.begin();
+      it!=cmdline.parsed_argv.end();
+      it++)
+  {
+    new_argv.push_back(it->arg);
+  }
+
+  // overwrite argv[0]
+  assert(new_argv.size()>=1);
+  new_argv[0]="gcc";
+  
+  #if 0
+  std::cout << "RUN:";
+  for(unsigned i=0; i<new_argv.size(); i++)
+    std::cout << " " << new_argv[i];
+  std::cout << std::endl;
+  #endif
+  
+  int result=run("gcc", new_argv);
+  
+  // merge output from gcc with goto-binaries
+  // using objcopy
+  for(std::list<std::string>::const_iterator
+      it=output_files.begin();
+      it!=output_files.end();
+      it++)
+  {
+    std::string saved=*it+".goto-cc-saved";
+
+    std::vector<std::string> objcopy_argv;
+  
+    objcopy_argv.push_back("objcopy");
+    objcopy_argv.push_back("-I");
+    objcopy_argv.push_back("binary");
+    objcopy_argv.push_back("--add-section");
+    objcopy_argv.push_back("goto-cc="+saved);
+
+    objcopy_argv.push_back("goto-cc="+*it);
+    
+    run(objcopy_argv[0], objcopy_argv);
+
+    remove(saved.c_str());    
+  }
+  
+  return result!=0;
+}
+
+/*******************************************************************\
+
+Function: gcc_modet::get_output_files
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: get names of output files that gcc would produce
+
+\*******************************************************************/
+
+void gcc_modet::get_output_files(std::list<std::string> &output_files)
+{
+
 }
 
 /*******************************************************************\
