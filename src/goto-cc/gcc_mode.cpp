@@ -7,6 +7,7 @@ Author: CM Wintersteiger, 2006
 \*******************************************************************/
 
 #include <cstdlib>
+#include <cstdio>
 #include <iostream>
 
 #include <tempdir.h>
@@ -341,8 +342,8 @@ Function: gcc_modet::gcc_hybrid_binary
 
 int gcc_modet::gcc_hybrid_binary(const cmdlinet::argst &input_files)
 {
-  #ifdef __LINUX__
-
+  #ifdef __linux__
+  
   std::list<std::string> output_files;
   
   for(cmdlinet::argst::const_iterator
@@ -434,8 +435,7 @@ int gcc_modet::gcc_hybrid_binary(const cmdlinet::argst &input_files)
     objcopy_argv.push_back("binary");
     objcopy_argv.push_back("--add-section");
     objcopy_argv.push_back("goto-cc="+saved);
-
-    objcopy_argv.push_back("goto-cc="+*it);
+    objcopy_argv.push_back(*it);
     
     run(objcopy_argv[0], objcopy_argv);
 
