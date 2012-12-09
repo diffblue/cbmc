@@ -102,9 +102,20 @@ int main(int argc, const char **argv)
     armcc_mode.base_name=base_name;
     return armcc_mode.main(argc, argv);
   }
+  else if(base_name=="goto-gcc")
+  {
+    // this produces ELF/Mach-O "hybrid binaries",
+    // with a GCC-style command-line interface,
+    // but also disables CPROVER language extensions
+    gcc_cmdlinet cmdline;
+    gcc_modet gcc_mode(cmdline);
+    gcc_mode.base_name=base_name;
+    gcc_mode.produce_hybrid_binary=true;
+    return gcc_mode.main(argc, argv);
+  }
   else
   {
-    // the default personality is GCC  
+    // the default personality is GCC-style
     gcc_cmdlinet cmdline;
     gcc_modet gcc_mode(cmdline);
     gcc_mode.base_name=base_name;
