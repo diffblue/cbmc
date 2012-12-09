@@ -142,11 +142,11 @@ decision_proceduret::resultt smt1_dect::dec_solve()
     break;
 
   case BOOLECTOR:
-    // –rwl0 disables rewriting, which makes things slower,
+    // -rwl0 disables rewriting, which makes things slower,
     // but in return values for arrays appear
     command = "boolector -rwl0 --smt "
             + temp_out_filename
-            + " -fm --output "
+            + " -m --output "
             + temp_result_filename;
     break;
 
