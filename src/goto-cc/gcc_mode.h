@@ -37,8 +37,9 @@ protected:
   
   int preprocess(const std::string &src, const std::string &dest);
   
-  int gcc_hybrid_binary();
-  void get_output_files(std::list<std::string> &);
+  int gcc_hybrid_binary(const cmdlinet::argst &input_files);
+  
+  static bool is_supported_source_file(const std::string &);
 };
 
 #endif /* GOTO_CC_GCC_MODE_H */
