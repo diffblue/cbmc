@@ -2412,4 +2412,15 @@ public:
   }
 };
 
+/*! \brief An expression denoting infinity
+*/
+class infinity_exprt:public exprt
+{
+public:
+  inline explicit infinity_exprt(const typet &_type):
+    exprt(ID_infinity, _type)
+  {
+  }
+};
+
 #endif

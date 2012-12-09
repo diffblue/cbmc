@@ -721,7 +721,7 @@ void c_typecheck_baset::typecheck_expr_symbol(exprt &expr)
   }
   else if(has_prefix(id2string(identifier), CPROVER_PREFIX "constant_infinity"))
   {
-    expr=exprt(ID_infinity, symbol.type);
+    expr=infinity_exprt(symbol.type);
 
     // put it back
     expr.location()=location;
