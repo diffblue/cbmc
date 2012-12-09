@@ -22,6 +22,32 @@ Author: CM Wintersteiger, 2006
 
 /*******************************************************************\
 
+Function: gcc_modet::is_supported_source_file
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool gcc_modet::is_supported_source_file(const std::string &file)
+{
+  if(has_suffix(file, ".c") ||
+     has_suffix(file, ".cc") ||
+     has_suffix(file, ".cp") ||
+     has_suffix(file, ".cpp") ||
+     has_suffix(file, ".CPP") ||
+     has_suffix(file, ".c++") ||
+     has_suffix(file, ".C"))
+    return true;
+  else
+    return false;
+}
+
+/*******************************************************************\
+
 Function: gcc_modet::doit
 
   Inputs:
@@ -80,7 +106,10 @@ bool gcc_modet::doit()
   compiler.set_verbosity(verbosity);
   set_verbosity(verbosity);
 
-  debug("GCC mode");
+  if(produce_hybrid_binary)
+    debug("GCC mode (hybrid)");
+  else
+    debug("GCC mode");
   
   // get configuration
   config.set(cmdline);
@@ -180,19 +209,15 @@ bool gcc_modet::doit()
   // Iterate over file arguments, and do any preprocessing needed
 
   temp_dirt temp_dir("goto-cc-XXXXXX");
+  
+  cmdlinet::argst original_args=cmdline.args;
 
   for(cmdlinet::argst::iterator
       a_it=cmdline.args.begin();
       a_it!=cmdline.args.end();
       a_it++)
   {
-    if(has_suffix(*a_it, ".c") ||
-       has_suffix(*a_it, ".cc") ||
-       has_suffix(*a_it, ".cp") ||
-       has_suffix(*a_it, ".cpp") ||
-       has_suffix(*a_it, ".CPP") ||
-       has_suffix(*a_it, ".c++") ||
-       has_suffix(*a_it, ".C"))
+    if(is_supported_source_file(*a_it))
     {
       std::string new_suffix=has_suffix(*a_it, ".c")?".i":".ii";
       std::string new_name=get_base_name(*a_it)+new_suffix;
@@ -215,7 +240,7 @@ bool gcc_modet::doit()
   // containing both executable machine code and the goto-binary.
   if(produce_hybrid_binary)
   {
-    if(gcc_hybrid_binary())
+    if(gcc_hybrid_binary(original_args))
       result=true;
   }
   
@@ -314,10 +339,30 @@ Function: gcc_modet::gcc_hybrid_binary
 
 \*******************************************************************/
 
-int gcc_modet::gcc_hybrid_binary()
+int gcc_modet::gcc_hybrid_binary(const cmdlinet::argst &input_files)
 {
+  #ifdef __LINUX__
+
   std::list<std::string> output_files;
-  get_output_files(output_files);
+  
+  for(cmdlinet::argst::const_iterator
+      i_it=input_files.begin();
+      i_it!=input_files.end();
+      i_it++)
+  {
+    if(is_supported_source_file(*i_it) && cmdline.isset('c'))
+    {
+      output_files.push_back(get_base_name(*i_it)+".o");
+    }
+  }
+  
+  if(!cmdline.isset('c'))
+  {
+    if(cmdline.isset('o'))
+      output_files.push_back(cmdline.getval('o'));
+    else
+      output_files.push_back("a.out");
+  }
 
   if(output_files.empty()) return 0;
 
@@ -336,13 +381,26 @@ int gcc_modet::gcc_hybrid_binary()
   std::vector<std::string> new_argv;
   
   new_argv.reserve(cmdline.parsed_argv.size());
+  
+  bool skip_next=false;
 
   for(gcc_cmdlinet::parsed_argvt::const_iterator
       it=cmdline.parsed_argv.begin();
       it!=cmdline.parsed_argv.end();
       it++)
   {
-    new_argv.push_back(it->arg);
+    if(skip_next)
+    {
+      // skip
+      skip_next=false;
+    }
+    else if(it->arg=="--verbosity")
+    {
+      // ignore here
+      skip_next=true;
+    }
+    else
+      new_argv.push_back(it->arg);
   }
 
   // overwrite argv[0]
@@ -365,6 +423,8 @@ int gcc_modet::gcc_hybrid_binary()
       it!=output_files.end();
       it++)
   {
+    debug("merging "+*it);
+  
     std::string saved=*it+".goto-cc-saved";
 
     std::vector<std::string> objcopy_argv;
@@ -383,23 +443,26 @@ int gcc_modet::gcc_hybrid_binary()
   }
   
   return result!=0;
-}
+  
+  #else
 
-/*******************************************************************\
+  #if 0
+    std::vector<std::string> ld_argv;
+  
+    ld_argv.push_back("ld");
+    ld_argv.push_back("-sectcreate");
+    ld_argv.push_back("__TEXT");
+    ld_argv.push_back("goto-cc");
+    ld_argv.push_back(saved);
+    ld_argv.push_back("-o");
+    ld_argv.push_back(*it);
+    
+    run(ld_argv[0], ld_argv);
+  #endif
+  
+  return 0;
 
-Function: gcc_modet::get_output_files
-
-  Inputs:
-
- Outputs:
-
- Purpose: get names of output files that gcc would produce
-
-\*******************************************************************/
-
-void gcc_modet::get_output_files(std::list<std::string> &output_files)
-{
-
+  #endif
 }
 
 /*******************************************************************\
