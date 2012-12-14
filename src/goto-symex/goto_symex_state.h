@@ -247,12 +247,14 @@ public:
     level2t level2;
     value_sett value_set;
     guardt guard;
+    propagationt propagation;
     
     explicit goto_statet(const goto_symex_statet &s):
       depth(s.depth),
       level2(s.level2),
       value_set(s.value_set),
-      guard(s.guard)
+      guard(s.guard),
+      propagation(s.propagation)
     {
     }
   };

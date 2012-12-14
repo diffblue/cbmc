@@ -314,16 +314,34 @@ void goto_symext::phi_function(
     typet type=symbol.type;
     dest_state.rename(type, ns);
     
-    exprt rhs;
+    exprt goto_state_rhs, dest_state_rhs;
 
+    {
+      goto_symex_statet::propagationt::valuest::const_iterator p_it=
+        goto_state.propagation.values.find(l1_identifier);
+
+      if(p_it!=goto_state.propagation.values.end())
+        goto_state_rhs=p_it->second;
+      else
+        goto_state_rhs=symbol_exprt(goto_state.level2.current_name(l1_identifier), type);
+    }
+    
+    {
+      goto_symex_statet::propagationt::valuest::const_iterator p_it=
+        dest_state.propagation.values.find(l1_identifier);
+
+      if(p_it!=dest_state.propagation.values.end())
+        dest_state_rhs=p_it->second;
+      else
+        dest_state_rhs=symbol_exprt(dest_state.level2.current_name(l1_identifier), type);
+    }
+    
+    exprt rhs;
+    
     if(dest_state.guard.is_false())
-    {
-      rhs=symbol_exprt(goto_state.level2.current_name(l1_identifier), type);
-    }
+      rhs=goto_state_rhs;
     else if(goto_state.guard.is_false())
-    {
-      rhs=symbol_exprt(dest_state.level2.current_name(l1_identifier), type);
-    }
+      rhs=dest_state_rhs;
     else
     {      
       guardt tmp_guard(goto_state.guard);
@@ -331,16 +349,12 @@ void goto_symext::phi_function(
       // this gets the diff between the guards
       tmp_guard-=dest_state.guard;
       
-      rhs=if_exprt();
-      rhs.type()=type;
-      rhs.op0()=tmp_guard.as_expr();
-      rhs.op1()=symbol_exprt(goto_state.level2.current_name(l1_identifier), type);
-      rhs.op2()=symbol_exprt(dest_state.level2.current_name(l1_identifier), type);
+      rhs=if_exprt(tmp_guard.as_expr(), goto_state_rhs, dest_state_rhs, type);
     }
 
     symbol_exprt lhs=symbol_expr(symbol);
     symbol_exprt new_lhs=symbol_exprt(l1_identifier, type);
-    dest_state.assignment(new_lhs, rhs, ns, false);
+    dest_state.assignment(new_lhs, rhs, ns, true);
     
     guardt true_guard;
 
