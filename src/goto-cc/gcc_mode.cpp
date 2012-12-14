@@ -425,14 +425,25 @@ int gcc_modet::gcc_hybrid_binary(const cmdlinet::argst &input_files)
       it++)
   {
     debug("merging "+*it);
-  
+
+    if(!cmdline.isset('c'))
+    {
+      // remove any existing goto-cc section
+      std::vector<std::string> objcopy_argv;
+    
+      objcopy_argv.push_back("objcopy");
+      objcopy_argv.push_back("--remove-section=goto-cc");
+      objcopy_argv.push_back(*it);
+      
+      run(objcopy_argv[0], objcopy_argv);
+    }
+
+    // now add goto-binary as goto-cc section  
     std::string saved=*it+".goto-cc-saved";
 
     std::vector<std::string> objcopy_argv;
   
     objcopy_argv.push_back("objcopy");
-    objcopy_argv.push_back("-I");
-    objcopy_argv.push_back("binary");
     objcopy_argv.push_back("--add-section");
     objcopy_argv.push_back("goto-cc="+saved);
     objcopy_argv.push_back(*it);
@@ -446,6 +457,7 @@ int gcc_modet::gcc_hybrid_binary(const cmdlinet::argst &input_files)
   
   #else
 
+  // Mac
   #if 0
     std::vector<std::string> ld_argv;
   
