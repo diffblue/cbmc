@@ -777,6 +777,7 @@ void cbmc_parseoptionst::help()
     " --i386-linux                 set Linux/I386 architecture\n"
     " --i386-win32                 set Windows/I386 architecture (default)\n"
     " --winx64                     set Windows/X64 architecture\n"
+    " --gcc                        use GCC as preprocessor\n"
     #else
     #ifdef __APPLE__
     " --i386-macos                 set MACOS/I386 architecture (default)\n"

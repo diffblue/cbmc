@@ -261,7 +261,12 @@ bool configt::set(const cmdlinet &cmdline)
   ansi_c.rounding_mode=ieee_floatt::ROUND_TO_EVEN;
 
   #ifdef _WIN32
-  ansi_c.mode=ansi_ct::MODE_VISUAL_STUDIO;
+
+  if(cmdline.isset("gcc"))
+    ansi_c.mode=ansi_ct::MODE_GCC;
+  else
+    ansi_c.mode=ansi_ct::MODE_VISUAL_STUDIO;
+
   #else
   ansi_c.mode=ansi_ct::MODE_GCC;
   #endif
