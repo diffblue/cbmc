@@ -344,6 +344,9 @@ int gcc_modet::gcc_hybrid_binary(const cmdlinet::argst &input_files)
 {
   #ifdef __linux__
   
+  if(input_files.empty())
+    return 0;
+
   std::list<std::string> output_files;
   
   for(cmdlinet::argst::const_iterator
@@ -362,7 +365,7 @@ int gcc_modet::gcc_hybrid_binary(const cmdlinet::argst &input_files)
     if(cmdline.isset('o'))
       output_files.push_back(cmdline.getval('o'));
     else
-      output_files.push_back("a.out");
+      output_files.push_back("a.out");      
   }
 
   if(output_files.empty()) return 0;
