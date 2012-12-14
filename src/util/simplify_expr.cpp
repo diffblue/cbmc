@@ -4275,27 +4275,32 @@ bool simplify_exprt::simplify_rec(exprt &expr)
   }
   #endif
 
+  exprt tmp=expr;
   bool result=true;
   
-  if(expr.id()==ID_address_of)
+  if(tmp.id()==ID_address_of)
   {
     // the argument of this expression needs special treatment
   }
   else
   {
-    if(expr.has_operands())
-      Forall_operands(it, expr)
+    if(tmp.has_operands())
+      Forall_operands(it, tmp)
         if(!simplify_rec(*it)) // recursive call
           result=false;
   }
 
-  if(!simplify_node(expr)) result=false;
-  
-  #ifdef USE_CACHE
-  // save in cache
+  if(!simplify_node(tmp)) result=false;
+
   if(!result)
+  {
+    expr.swap(tmp);
+  
+    #ifdef USE_CACHE
+    // save in cache
     cache_result.first->second=expr;
-  #endif
+    #endif
+  }
 
   return result;
 }
