@@ -155,7 +155,7 @@ decision_proceduret::resultt smt2_dect::dec_solve()
     break;
 
   case Z3:
-    command = "z3 -m "
+    command = "z3 -smt2 "
             + temp_out_filename
             + " > "
             + temp_result_filename;
@@ -394,10 +394,22 @@ decision_proceduret::resultt smt2_dect::read_result_z3(std::istream &in)
       res = D_UNSATISFIABLE;
     else
     {
-      std::size_t pos=line.find(" -> ");
-      if(pos!=std::string::npos)
-        values[std::string(line, 0, pos)]=
-          std::string(line, pos+4, std::string::npos);
+      // Values look like:
+      //
+      // ((identifer value))
+      size_t start, mid, end;
+
+      for (start = 0; start < line.size() && line[start] == '('; start++);
+      for (mid = start; mid < line.size() && line[mid] != ' '; mid++);
+      for (end = mid; end < line.size() && line[end] != ')'; end++);
+
+      if (start < line.size() && mid < line.size() && end < line.size())
+      {
+        std::string identifier = line.substr(start, mid-start);
+        std::string value = line.substr(mid+1, end-(mid+1));
+
+        values[identifier] = value;
+      }
     }
   }
 

@@ -102,6 +102,9 @@ protected:
   void find_symbols(const exprt &expr);
   void find_symbols(const typet &type);
   void find_symbols_rec(const typet &type, std::set<irep_idt> &recstack);
+
+  constant_exprt parse_constant(const std::string &s, bool is_signed);
+  exprt parse_struct(const std::string &s, const typet &type);
   
   // arrays
   typet array_index_type() const;
@@ -133,6 +136,9 @@ protected:
     identifier_mapt;
 
   identifier_mapt identifier_map;
+
+  typedef std::map<typet, std::string> type_mapt;
+  type_mapt type_map;
   
   unsigned array_index_bits;
   
