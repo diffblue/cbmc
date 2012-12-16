@@ -92,7 +92,7 @@ Function: smt2_convt::parse_constant
 
 constant_exprt smt2_convt::parse_constant(
   const std::string &s,
-  bool is_signed)
+  const typet &type)
 {
   // See http://www.grammatech.com/resources/smt/SMTLIBTutorial.pdf for the
   // syntax of SMTlib2 literals.
@@ -111,37 +111,38 @@ constant_exprt smt2_convt::parse_constant(
   // Right now I'm not parsing decimals.  It'd be nice if we had a real YACC
   // parser here, but whatever.
 
-  if (s[0] == '#' && s[1] == 'b') {
+  if(s[0] == '#' && s[1] == 'b')
+  {
     // Binary
-    int width = s.size() - 2;
-    typet type;
-
-    if (is_signed)
-    {
-      type = signedbv_typet(width);
-    }
-    else
-    {
-      type = unsignedbv_typet(width);
-    }
-
+    unsigned int width=s.size()-2;
+    
+    if(type.id()==ID_signedbv)
+      assert(width==to_signedbv_type(type).get_width());
+    else if(type.id()==ID_unsignedbv)
+      assert(width==to_unsignedbv_type(type).get_width());
+    else if(type.id()==ID_fixedbv)
+      assert(width==to_fixedbv_type(type).get_width());
+    else if(type.id()==ID_pointer)
+      assert(width==to_pointer_type(type).get_width());
+    
     constant_exprt constant(type);
     constant.set_value(s.substr(2));
 
     return constant;
-  } else if (s[0] == '#' && s[1] == 'x') { 
+  }
+  else if (s[0] == '#' && s[1] == 'x')
+  {
     // Hex
-    int width = (s.size() - 2) * 4;
-    typet type;
+    unsigned int width = (s.size() - 2) * 4;
 
-    if (is_signed)
-    {
-      type = signedbv_typet(width);
-    }
-    else
-    {
-      type = unsignedbv_typet(width);
-    }
+    if(type.id()==ID_signedbv)
+      assert(width==to_signedbv_type(type).get_width());
+    else if(type.id()==ID_unsignedbv)
+      assert(width==to_unsignedbv_type(type).get_width());
+    else if(type.id()==ID_fixedbv)
+      assert(width==to_fixedbv_type(type).get_width());
+    else if(type.id()==ID_pointer)
+      assert(width==to_pointer_type(type).get_width());
 
     mp_integer value = string2integer(s.substr(2), 16);
     constant_exprt constant(type);
@@ -152,7 +153,8 @@ constant_exprt smt2_convt::parse_constant(
   else
   {
     // Numeral
-    typet type = integer_typet();
+    assert(type.id()==ID_integer);
+    
     constant_exprt constant(type);
     constant.set_value(s);
 
@@ -194,7 +196,7 @@ exprt smt2_convt::parse_struct(
   assert(s.find(constructor) == 0);
   p = constructor.length();
 
-  for (unsigned i = 0; i < components.size(); i++)
+  for(unsigned i = 0; i < components.size(); i++)
   {
     const struct_typet::componentt &c = components[i];
     const typet &sub_type = ns.follow(c.type());
@@ -215,9 +217,8 @@ exprt smt2_convt::parse_struct(
 
       assert(end != std::string::npos);
 
-      bool is_signed = (sub_type.id() == ID_signedbv);
       std::string val = s.substr(p, (p-end));
-      ret.operands()[i] = parse_constant(val, is_signed);
+      ret.operands()[i]=parse_constant(val, sub_type);
 
       p = end;
     }
@@ -255,9 +256,7 @@ void smt2_convt::set_value(
      type.id()==ID_bv ||
      type.id()==ID_fixedbv)
   {
-    bool is_signed = (type.id() == ID_signed);
-
-    constant_exprt c = parse_constant(v, is_signed);
+    constant_exprt c = parse_constant(v, type);
     identifier.value=c;
 
     assert(boolbv_width(type) == boolbv_width(c.type()));
@@ -272,7 +271,7 @@ void smt2_convt::set_value(
   else if(type.id()==ID_pointer)
   {
     // TODO
-    constant_exprt result = parse_constant(v, false);
+    constant_exprt result = parse_constant(v, type);
     assert(boolbv_width(type) == boolbv_width(result.type()));
 
     // add elaborated expression as operand

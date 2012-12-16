@@ -103,7 +103,7 @@ protected:
   void find_symbols(const typet &type);
   void find_symbols_rec(const typet &type, std::set<irep_idt> &recstack);
 
-  constant_exprt parse_constant(const std::string &s, bool is_signed);
+  constant_exprt parse_constant(const std::string &s, const typet &type);
   exprt parse_struct(const std::string &s, const typet &type);
   
   // arrays
