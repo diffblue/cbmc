@@ -463,7 +463,7 @@ exprt cpp_typecheck_resolvet::convert_identifier(
 
 /*******************************************************************\
 
-Function: cpp_typecheck_resolvet::disambiguate
+Function: cpp_typecheck_resolvet::filter
 
 Inputs:
 
@@ -507,6 +507,42 @@ void cpp_typecheck_resolvet::filter(
 
     if(match)
       identifiers.push_back(*it);
+  }
+}
+
+/*******************************************************************\
+
+Function: cpp_typecheck_resolvet::exact_match_functions
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
+void cpp_typecheck_resolvet::exact_match_functions(
+  resolve_identifierst &identifiers,
+  const cpp_typecheck_fargst &fargs)
+{
+  if(!fargs.in_use) return;
+
+  resolve_identifierst old_identifiers;
+  old_identifiers.swap(identifiers);
+  
+  identifiers.clear();
+
+  // put in the ones that match precisely
+  for(resolve_identifierst::const_iterator
+      it=old_identifiers.begin();
+      it!=old_identifiers.end();
+      it++)
+  {
+    unsigned distance;
+    if(disambiguate_functions(*it, distance, fargs))
+      if(distance<=0)
+        identifiers.push_back(*it);
   }
 }
 
@@ -570,14 +606,14 @@ void cpp_typecheck_resolvet::disambiguate_functions(
         it++)
       identifiers.push_back(it->second);
   }
-
+  
   if(identifiers.size()>1 && fargs.in_use)
   {
     // try to further disambiguate functions
 
     for(resolve_identifierst::iterator
-        it1 = identifiers.begin();
-        it1 != identifiers.end();
+        it1=identifiers.begin();
+        it1!=identifiers.end();
         it1++)
     {
       if(it1->type().id()!=ID_code) continue;
@@ -1670,9 +1706,9 @@ exprt cpp_typecheck_resolvet::resolve(
   
   exprt result;
 
-  // We may need to disambiguate functions,
-  // but don't want templates yet
+  // We disambiguate functions
   resolve_identifierst new_identifiers=identifiers;
+
   remove_templates(new_identifiers);
 
   #if 0
@@ -1681,16 +1717,32 @@ exprt cpp_typecheck_resolvet::resolve(
   std::cout << "\n";
   #endif
 
-  disambiguate_functions(new_identifiers, fargs);
+  // we only want _exact_ matches, without templates!
+  exact_match_functions(new_identifiers, fargs);
   
-  // no matches? Try again with function template guessing.
-  if(new_identifiers.empty() && template_args.is_nil())
+  #if 0
+  std::cout << "P2 " << base_name << " " << new_identifiers.size() << "\n";
+  show_identifiers(base_name, new_identifiers, std::cout);
+  std::cout << "\n";
+  #endif
+
+  // no exact matches? Try again with function template guessing.
+  if(new_identifiers.empty())
   {
     new_identifiers=identifiers;
-    guess_function_template_args(new_identifiers, fargs);
+    
+    if(template_args.is_nil())
+    {
+      guess_function_template_args(new_identifiers, fargs);
+      
+      if(new_identifiers.empty())
+        new_identifiers=identifiers;
+    }
+
+    disambiguate_functions(new_identifiers, fargs);
 
     #if 0
-    std::cout << "P2 " << base_name << " " << new_identifiers.size() << "\n";
+    std::cout << "P3 " << base_name << " " << new_identifiers.size() << "\n";
     show_identifiers(base_name, new_identifiers, std::cout);
     std::cout << "\n";
     #endif
@@ -1699,7 +1751,7 @@ exprt cpp_typecheck_resolvet::resolve(
   remove_duplicates(new_identifiers);
 
   #if 0
-  std::cout << "P3 " << base_name << " " << new_identifiers.size() << "\n";
+  std::cout << "P4 " << base_name << " " << new_identifiers.size() << "\n";
   show_identifiers(base_name, new_identifiers, std::cout);
   std::cout << "\n";
   #endif
@@ -2315,7 +2367,7 @@ bool cpp_typecheck_resolvet::disambiguate_functions(
       const code_typet::argumentst &arguments=type.arguments();
       const code_typet::argumentt &argument = arguments.front();
 
-      assert(argument.get("#base_name")==ID_this);
+      assert(argument.get(ID_C_base_name)==ID_this);
 
       if(type.return_type().id() == ID_constructor)
       {
@@ -2326,7 +2378,7 @@ bool cpp_typecheck_resolvet::disambiguate_functions(
 
         cpp_typecheck_fargst new_fargs(fargs);
         new_fargs.add_object(object);
-        return new_fargs.match(type, args_distance, cpp_typecheck);          
+        return new_fargs.match(type, args_distance, cpp_typecheck);
       }
       else
       {
