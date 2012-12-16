@@ -694,7 +694,7 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
       // 1. In the scope of a as a.operator(b, ...)
       // 2. Anywhere in scope as operator(a, b, ...)
       //
-      // Both are not allowed.
+      // Using both is not allowed.
       //
       // We try and fail silently, maybe conversions will work
       // instead.
