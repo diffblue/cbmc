@@ -288,6 +288,7 @@ continue            { loc(); return TOK_CONTINUE; }
 default             { loc(); return TOK_DEFAULT; }
 delete              { loc(); return TOK_DELETE; }
 decltype            { loc(); return TOK_DECLTYPE; } // C++11
+__decltype          { loc(); return TOK_DECLTYPE; } // gcc
 do                  { loc(); return TOK_DO; }
 double              { loc(); return TOK_DOUBLE; }
 else                { loc(); return TOK_ELSE; }
