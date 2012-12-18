@@ -99,7 +99,7 @@ Function: size_type
 typet size_type()
 {
   // The size type varies. This is unsigned int on some systems,
-  // and unsigned long int on others.
+  // and signed long int on others, and signed long long on say Windows.
 
   typet result=unsignedbv_typet(config.ansi_c.pointer_width);
   
@@ -107,6 +107,8 @@ typet size_type()
     result.set(ID_C_c_type, ID_signed_int);
   else if(config.ansi_c.pointer_width==config.ansi_c.long_int_width)
     result.set(ID_C_c_type, ID_signed_long_int);
+  else if(config.ansi_c.pointer_width==config.ansi_c.long_long_int_width)
+    result.set(ID_C_c_type, ID_signed_long_long_int);
   else
     assert(false); // aaah!
   
@@ -492,7 +494,7 @@ Function: pointer_diff_type
 typet pointer_diff_type()
 {
   // The pointer-diff type varies. This is signed int on some systems,
-  // and signed long int on others.
+  // and signed long int on others, and signed long long on say Windows.
 
   typet result=signedbv_typet(config.ansi_c.pointer_width);
   
@@ -500,6 +502,8 @@ typet pointer_diff_type()
     result.set(ID_C_c_type, ID_signed_int);
   else if(config.ansi_c.pointer_width==config.ansi_c.long_int_width)
     result.set(ID_C_c_type, ID_signed_long_int);
+  else if(config.ansi_c.pointer_width==config.ansi_c.long_long_int_width)
+    result.set(ID_C_c_type, ID_signed_long_long_int);
   else
     assert(false); // aaah!
   
