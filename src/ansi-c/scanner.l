@@ -516,6 +516,12 @@ wchar_t	            { // CodeWarrior doesn't have wchar_t built in
                       }
                     }
 
+__decltype          { if(PARSER.cpp && PARSER.mode==ansi_c_parsert::GCC)
+                        return cpp_keyword(TOK_DECLTYPE);
+                      else
+                        return make_identifier();
+                    }
+
 %{
 /* a huge batch of MS C++ extensions
    http://msdn.microsoft.com/en-us/library/ms177194(v=vs.80).aspx */
