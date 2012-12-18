@@ -2098,7 +2098,7 @@ bool Parser::rDeclarator(
 
     Token op;
     lex->GetToken(op);
-
+    
     cpp_declaratort declarator2;
     if(!rDeclarator(declarator2, kind, true, true, false))
       return false;
@@ -2109,7 +2109,7 @@ bool Parser::rDeclarator(
       return false;
 
     if(!should_be_declarator)
-      if(kind==kDeclarator && d_outer.is_nil())
+      if((kind==kDeclarator || kind==kCastDeclarator) && d_outer.is_nil())
       {
         t=lex->LookAhead(0);
         if(t!='[' && t!='(')
@@ -4171,6 +4171,7 @@ bool Parser::rCastExpr(exprt &exp)
           exp.type().swap(tname);
           exp.move_to_operands(op);
           set_location(exp, tk1);
+          
           return true;
         }
       }
@@ -4188,7 +4189,7 @@ bool Parser::rCastExpr(exprt &exp)
 bool Parser::rTypeName(typet &tname)
 {
   typet type_name;
-
+  
   if(!rTypeSpecifier(type_name, true))
     return false;
 
