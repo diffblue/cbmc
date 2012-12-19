@@ -119,6 +119,7 @@ int main(int argc, const char **argv)
     gcc_cmdlinet cmdline;
     gcc_modet gcc_mode(cmdline);
     gcc_mode.base_name=base_name;
+    gcc_mode.produce_hybrid_binary=false;
     return gcc_mode.main(argc, argv);
   }
 }
