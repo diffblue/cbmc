@@ -826,6 +826,22 @@ bool cpp_typecheckt::standard_conversion_sequence(
 
   curr_expr.swap(new_expr);
 
+  // two enums are the same if the tag is the same,
+  // even if the width differs (enum bit-fields!)
+  if(follow(type).id()==ID_c_enum &&
+     follow(curr_expr.type()).id()==ID_c_enum)
+  {
+    if(follow(type).find(ID_tag)==
+       follow(curr_expr.type()).find(ID_tag))
+      return true;
+    else
+    {
+      // In contrast to C, we simply don't allow implicit conversions
+      // between enums.
+      return false;
+    }
+  }
+
   // need to consider #c_type
   if(follow(curr_expr.type())!=follow(type) ||
      curr_expr.type().get(ID_C_c_type)!=type.get(ID_C_c_type))
@@ -842,6 +858,7 @@ bool cpp_typecheckt::standard_conversion_sequence(
           if(!standard_conversion_floating_integral_conversion(curr_expr, type, new_expr))
             return false;
         }
+
         rank+=3;
       }
       else
