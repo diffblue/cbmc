@@ -694,13 +694,14 @@ void cpp_declarator_convertert::main_function_rules(
     }
 
     const typet &return_type=
-      static_cast<const typet &>(
-        symbol.type.find(ID_return_type));
+      to_code_type(symbol.type).return_type();
 
     if(return_type!=int_type())
     {
-      cpp_typecheck.err_location(symbol.location);
-      throw "main must return int";
+      // Too many embedded compilers ignore this rule.
+      //
+      //cpp_typecheck.err_location(symbol.location);
+      //throw "main must return int";
     }
   }
 }
