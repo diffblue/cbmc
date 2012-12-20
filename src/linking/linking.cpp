@@ -104,6 +104,10 @@ std::string linkingt::to_string_verbose(const typet &type)
     
     return result;
   }
+  else if(followed.id()==ID_pointer)
+  {
+    return to_string_verbose(followed.subtype())+" *";
+  }
 
   return to_string(type);
 }
