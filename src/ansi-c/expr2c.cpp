@@ -287,16 +287,6 @@ std::string expr2ct::convert_rec(
 
     const std::string &tag=src.get_string(ID_tag);
     if(tag!="") dest+=" "+tag;
-    
-    /*
-    const irept &components=type.find(ID_components);
-
-    forall_irep(it, components.get_sub())
-    {
-      typet &subtype=(typet &)it->find(ID_type);
-      base_type(subtype, ns);
-    }
-    */
 
     return dest;
   }

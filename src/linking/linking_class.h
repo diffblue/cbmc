@@ -54,6 +54,8 @@ protected:
   virtual std::string to_string(const exprt &expr);
   virtual std::string to_string(const typet &type);
 
+  virtual std::string to_string_verbose(const typet &type);
+
   contextt &main_context;
   contextt &src_context;
   namespacet ns;
