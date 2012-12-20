@@ -1,0 +1,8 @@
+CORE
+tcas_v23_523.c
+--bounds-check
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+upper bound$
+--
