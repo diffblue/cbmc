@@ -1,0 +1,9 @@
+CORE
+main.cpp
+-I ../../libs/stl --unwind 1 --no-pointer-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^Unwinding: ignoring
