@@ -333,6 +333,22 @@ void linkingt::duplicate_non_type(
            to_array_type(ns.follow(new_symbol.type)).size().is_not_nil())
           old_symbol.type=new_symbol.type; // store new type
       }
+      else if(ns.follow(old_symbol.type).id()==ID_pointer &&
+              ns.follow(new_symbol.type).id()==ID_array)
+      {
+        // store new type
+        old_symbol.type=new_symbol.type;
+      }
+      else if(ns.follow(old_symbol.type).id()==ID_array &&
+              ns.follow(new_symbol.type).id()==ID_pointer)
+      {
+        // ignore
+      }
+      else if(ns.follow(old_symbol.type).id()==ID_pointer &&
+              ns.follow(new_symbol.type).id()==ID_pointer)
+      {
+        // ignore, generally ok
+      }
       else if(old_symbol.type.id()==ID_incomplete_struct &&
               new_symbol.type.id()==ID_struct)
       {
@@ -343,11 +359,6 @@ void linkingt::duplicate_non_type(
               new_symbol.type.id()==ID_incomplete_struct)
       {
         // ignore
-      }
-      else if(ns.follow(old_symbol.type).id()==ID_pointer &&
-              ns.follow(new_symbol.type).id()==ID_array)
-      {
-        // ignore, but could be trouble
       }
       else
       {
