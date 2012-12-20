@@ -57,6 +57,59 @@ std::string linkingt::to_string(const typet &type)
 
 /*******************************************************************\
 
+Function: linkingt::to_string_verbose
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+std::string linkingt::to_string_verbose(const typet &type)
+{ 
+  const typet &followed=ns.follow(type);
+
+  if(followed.id()==ID_struct || followed.id()==ID_union)
+  {
+    std::string result=followed.id_string();
+
+    const std::string &tag=followed.get_string(ID_tag);
+    if(tag!="") result+=" "+tag;
+    result+=" {\n";
+    
+    const struct_union_typet::componentst &components=
+      to_struct_union_type(followed).components();
+
+    for(struct_union_typet::componentst::const_iterator
+        it=components.begin();
+        it!=components.end();
+        it++)
+    {
+      const typet &subtype=it->type();
+      result+="  ";
+      result+=to_string(subtype);
+      result+=" ";
+
+      if(it->get_base_name()!="")
+        result+=id2string(it->get_base_name());
+      else
+        result+=id2string(it->get_name());
+
+      result+=";\n";
+    }
+    
+    result+="}";
+    
+    return result;
+  }
+
+  return to_string(type);
+}
+
+/*******************************************************************\
+
 Function: linkingt::duplicate
 
   Inputs:
@@ -298,10 +351,10 @@ void linkingt::duplicate_non_type(
         str << "error: conflicting definition for variable `"
             << old_symbol.name
             << "'" << std::endl;
-        str << "old definition: " << to_string(old_symbol.type)
+        str << "old definition: " << to_string_verbose(old_symbol.type)
             << std::endl;
         str << "Module: " << old_symbol.module << std::endl;
-        str << "new definition: " << to_string(new_symbol.type)
+        str << "new definition: " << to_string_verbose(new_symbol.type)
             << std::endl;
         str << "Module: " << new_symbol.module;
         throw 0;
