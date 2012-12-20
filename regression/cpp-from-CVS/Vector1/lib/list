@@ -1,0 +1,383 @@
+/* C++ */
+
+/**********************************************************
+*
+* Purpose:
+*
+*              Operational model of STL list
+*
+*     A list is a kind of sequence that supports
+*     bidirectional iterators.
+*
+* Remark:
+*
+* Currently objects are inserted into the list using the
+* copy operator and not the copy constructor.
+* Thus, we additionaly require T to be
+* assignable. Furthermore, this version does
+* not call the destructor of erased objects.
+*
+* Authors:
+*
+*      Nicolas Blanc,
+*      Alex Groce,
+*      Daniel Kroening
+*
+**********************************************************/
+
+
+#ifndef __STL_LIST
+#define __STL_LIST
+
+#include <assert.h>
+#include <iterator>
+#include <container>
+
+#ifndef NULL
+#define NULL 0
+#endif
+
+#define NO_DATA
+
+namespace std {
+
+  template<typename T>
+  class list: public container<T>
+  {
+  public:
+
+  typedef T  value_type;
+  typedef T& reference;
+  typedef const T& const_reference;
+
+  typedef _iterator<T> iterator;
+  typedef _const_iterator<T> const_iterator;
+  typedef _reverse_iterator<T> reverse_iterator;
+  typedef _const_reverse_iterator<T> const_reverse_iterator;
+
+  /************************************
+  *
+  *      Container requirements
+  *
+  ************************************/
+
+  list():_size(0)
+  #ifdef VERS1
+  , _version(0)
+  #endif
+  {
+  }
+
+  list(const list& lst):_size(0)
+  #ifdef VERS1
+  , _version(0)
+  #endif
+  {
+    resize(lst.size());
+    for(int i=0;i<size();i++)
+      data(i) = lst.data(i);
+  }
+
+  list& operator=(const list& cp)
+  {
+    resize(cp.size());
+    for(int i=0;i<size();i++)
+      data(i) = cp.data(i);
+    return *this;
+  }
+
+  friend bool operator==(const list& l1, const list& l2)
+  {
+    if(l1.size() != l2.size())return false;
+    for(int i=0; i < l1.size();i++)
+      if(l1.data(i)!= l2.data(i)) return false;
+    return true;
+  }
+
+  friend bool operator!=(const list& l1, const list& l2)
+  {
+    return !(l1==l2);
+  }
+
+  unsigned size() const
+  {
+    __CPROVER_HIDE:
+    return _size;
+  }
+
+  iterator begin()
+  {
+    __CPROVER_HIDE:
+    return iterator(this, 0);
+  }
+
+  iterator end()
+  {
+    __CPROVER_HIDE:
+    return iterator(this, size());
+  }
+
+  const_iterator const_begin() const
+  {
+    __CPROVER_HIDE:
+    return const_iterator(this, 0);
+  }
+
+  const_iterator const_end() const
+  {
+    __CPROVER_HIDE:
+    return const_iterator(this, size());
+  }
+
+    reverse_iterator rend()
+  {
+    __CPROVER_HIDE:
+    return reverse_iterator(this,0);
+  }
+
+  reverse_iterator rbegin()
+  {
+    __CPROVER_HIDE:
+    return reverse_iterator(this, size());
+  }
+
+  const_reverse_iterator const_rend() const
+  {
+    __CPROVER_HIDE:
+    return const_reverse_iterator(this, 0);
+  }
+
+  const_reverse_iterator const_rbegin() const
+  {
+    __CPROVER_HIDE:
+    return const_reverse_iterator(this, size());
+  }
+
+  bool empty() const
+  {
+    __CPROVER_HIDE:
+    return size()==0;
+  }
+
+  /************************************
+  *
+  *      Sequence requirements
+  *
+  ************************************/
+
+  iterator insert(iterator& it, const reference x)
+  {
+    __CPROVER_HIDE:
+    it.assert_valid();
+    __CPROVER_assert(it.c == this, "insert() with iterator not pointing to container");
+
+    resize(size()+1);
+
+    #ifndef NO_DATA
+    for(int i = size()-1 ; i < it.offset; i--)
+      data(i) = data(i)-1;
+    data(it.offset) = x;
+    #endif
+
+    #ifdef VERS1
+    _version++;
+    #elif defined VERS1
+    for(int i = it.offset; i <= size(); i++)
+    _version[i]++;
+    #else
+    __CPROVER_assert(0, "VERS not defined");
+    #endif
+
+    return iterator(this, it.offset);
+  }
+
+  iterator erase(iterator& it)
+  {
+    __CPROVER_HIDE:
+    __CPROVER_assert(it.c == this,
+      "erase() with iterator not pointing to container");
+    it.assert_dereferenceable();
+
+    #ifndef NO_DATA
+    for(int i = it.offset; i < size()-1; i++)
+      data(i) = data(i+1);
+    #endif
+
+    resize(size()-1);
+
+    #ifdef VERS1
+    _version++;
+    #elif defined VERS1
+    for(int i = it.offset; i <= size(); i++)
+    _version[i]++;
+    #else
+    __CPROVER_assert(0, "VERS not defined");
+    #endif
+
+    return iterator(this, it.offset);
+  }
+
+  void clear()
+  {
+    __CPROVER_HIDE:
+    resize(0);
+  }
+
+
+  /************************************
+  *
+  *  Optional sequence requirements
+  *
+  ************************************/
+
+
+  void push_back(const T &x)
+  {
+    __CPROVER_HIDE:
+    resize(size()+1,x);
+  }
+
+  void push_front(const T &x)
+  {
+    __CPROVER_HIDE:
+    insert(begin(),x);
+  }
+
+  void pop_back()
+  {
+    __CPROVER_HIDE:
+    __CPROVER_assert(_size!=0, "pop_back() on empty list");
+    resize(size()-1));
+  }
+
+  void pop_front()
+  {
+    __CPROVER_HIDE:
+    __CPROVER_assert(_size!=0, "pop_front() on empty list");
+    erase(begin());
+  }
+
+  const T &const_front() const
+  {
+    __CPROVER_HIDE:
+    __CPROVER_assert(_size!=0, "front() on empty list");
+    return data(0);
+  }
+
+  const T &const_back() const
+  {
+    __CPROVER_HIDE:
+    __CPROVER_assert(size() !=0, "back() on empty list");
+    return data(size()-1);
+  }
+
+  T &front()
+  {
+    __CPROVER_HIDE:
+    __CPROVER_assert(size() !=0, "front() on empty list");
+    return data(0);
+  }
+
+  T &back()
+  {
+    __CPROVER_HIDE:
+    __CPROVER_assert(size() !=0, "back() on empty list");
+    return data(size()-1);
+  }
+
+
+   /************************************
+  *
+  *      Misc of Vector
+  *
+  ************************************/
+
+  void resize(unsigned s)
+  {
+    __CPROVER_HIDE:
+    unsigned old_size = size();
+    _size=s;
+
+    #ifdef VERS1
+    if(old_size < size()) _version++;
+    #elif defined VERS2
+    if(old_size < size())
+      for(i=old_size; i<=size(); i++) _version[i]++;
+    #else
+    __CPROVER_assert(0, "VERS not defined");
+    #endif
+  }
+
+  void resize(unsigned s, const T &x)
+  {
+    __CPROVER_HIDE:
+    unsigned old_size = size();
+    _size=s;
+
+    if(old_size < size())
+    {
+      #ifdef VERS1
+      _version++;
+      #elif defined VERS2
+      for(int i= old_size; i <= size(); i++)
+          _version[i]++;
+      #else
+      __CPROVER_assert(0, "VERS not defined");
+      #endif
+
+      #ifndef NO_DATA
+      for(unsigned i= old_size; i < size(); i++) data(i) = x;
+      #endif
+    }
+  }
+
+
+  /************************************
+  *
+  *  Misc for modelisation only
+  *
+  ************************************/
+
+  T& data(unsigned i) const
+  {
+    __CPROVER_HIDE:
+    __CPROVER_assert(i< size(), "list-index upper bound");
+    return _data[i];
+  }
+
+  const T& const_data(unsigned i) const
+  {
+    __CPROVER_HIDE:
+    __CPROVER_assert(i< size(), "list-index upper bound");
+    return _data[i];
+  }
+
+  unsigned version(unsigned i) const
+  {
+    __CPROVER_HIDE:
+    __CPROVER_assert(i<= size(), "list-index upper bound");
+
+    #ifdef VERS1
+    return _version;
+    #elif defined VERS2
+    return _version[i];
+    #else
+    __CPROVER_assert(0, "VERS not defined");
+    #endif
+  }
+
+  protected:
+  unsigned _size;
+
+  #ifdef VERS1
+  unsigned _version;
+  #elif defined VERS2
+  unsigned _version[__CPROVER::constant_infinity_uint];
+  #endif
+
+  T _data[__CPROVER::constant_infinity_uint];
+  };
+
+}
+
+#endif

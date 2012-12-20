@@ -1,0 +1,884 @@
+/* C++ */
+
+#ifndef __STL_ITERATOR
+#define __STL_ITERATOR
+
+#include <assert.h>
+#include <container>
+
+#ifndef NULL
+#define NULL 0
+#endif
+
+namespace std {
+
+  /**********************************************************
+  *
+  *
+  * Class: iterator
+  *
+  * Purpose:
+  *
+  *   Operational Model for STL iterator
+  *
+  *   Iterators are a generalization of pointers that allow
+  *   a C + + program to work with different data structures
+  *   (containers) in a uniform manner. The standard defines
+  *   the following five categories of iterators:
+  *      - input iterators,
+  *      - output iterators,
+  *      - forward iterators,
+  *      - bidirectional iterators
+  *      - random-access iterators.
+  *
+  *   All the requirements of inputs, ouptus, forward,
+  *   bidirectional iterators are also requirements of
+  *   random-access iterators.
+  *
+  *   An iterator has three fields called 'c', 'offset',
+  *   'version', which correspond to the container, the offset
+  *   inside of the container, and the version of the pointed
+  *   element, respectively.
+  *
+  *   Note that the overapproximation of version is hidden
+  *   by the container interface.
+  *
+  * Template Parameter:  - T:  type of *it
+  *
+  * Authors:
+  *
+  *      Nicolas Blanc,
+  *      Alex Groce,
+  *      Daniel Kroening
+  *
+  **********************************************************/
+
+
+  template <class T>
+  class _iterator
+  {
+  public:
+  _iterator(container<T> *_c, unsigned _offset):
+  c(_c), offset(_offset)
+  {
+    __CPROVER_HIDE:
+    __CPROVER_assert(c!=NULL, "invalid container");
+    __CPROVER_assert(offset <= c->size(), "iterator out of bounds");
+
+    version = c ->version(offset);
+  }
+
+  _iterator(const _iterator& it): c(it.c), offset(it.offset),
+    version(it.version)
+  {
+  }
+
+  _iterator():
+  c(NULL), offset(0), version(0)
+  {
+  }
+
+  T &operator * () const
+  {
+    __CPROVER_HIDE:
+    assert_dereferenceable();
+    return c->data(offset);
+  }
+
+  _iterator &operator ++()
+  {
+    __CPROVER_HIDE:
+    assert_dereferenceable();
+
+    offset++;
+
+    version = c->version(offset);
+
+    return *this;
+  }
+
+
+  _iterator operator ++(int _zero)
+  {
+    __CPROVER_HIDE:
+    assert_dereferenceable();
+
+    _iterator it(*this);
+    offset++;
+
+    version = c->version(offset);
+    return it;
+  }
+
+
+  _iterator& operator +=(int i)
+  {
+    __CPROVER_HIDE:
+    assert_valid();
+    __CPROVER_assert(i>=0 || -i<=offset, "iterator out of bounds");
+    __CPROVER_assert(offset + i <= c->size(), "iterator out of bounds");
+    offset += i;
+    return *this;
+  }
+
+
+  _iterator operator +(int i)
+  {
+    _iterator it(*this);
+    it += i;
+    return it;
+  }
+
+
+  _iterator &operator --()
+  {
+    __CPROVER_HIDE:
+    assert_valid();
+    __CPROVER_assert(offset != 0, "iterator out of bounds");
+    offset--;
+    return *this;
+  }
+
+  _iterator  operator --(int _zero)
+  {
+    __CPROVER_HIDE:
+    assert_valid();
+    __CPROVER_assert(offset != 0, "iterator out of bounds");
+    _iterator it(*this);
+    offset--;
+    return it;
+  }
+
+  _iterator& operator -=(int i)
+  {
+    __CPROVER_HIDE:
+    assert_valid();
+    __CPROVER_assert(i<=0 || i<=offset, "iterator out of bounds");
+    __CPROVER_assert(offset - i <= c->size(), "iterator out of bounds");
+    offset -= i;
+    return *this;
+  }
+
+  _iterator operator -(int i)
+  {
+    _iterator it(*this);
+    it -= i;
+    return it;
+  }
+
+  T& operator[] (int i)
+  {
+    _iterator it(*this);
+    return *(it+i);
+  }
+
+  friend bool operator==(_iterator i1, _iterator i2)
+  {
+    __CPROVER_HIDE:
+    i1.assert_reachable(i2);
+    return i1.offset==i2.offset;
+  }
+
+  friend bool operator!=(_iterator i1, _iterator i2)
+  {
+    __CPROVER_HIDE:
+    return !(i1==i2);
+  }
+
+  friend bool operator < (_iterator i1, _iterator i2)
+  {
+    __CPROVER_HIDE:
+    i1.assert_reachable(i2);
+    return i1.offset < i2.offset;
+  }
+
+  friend bool operator > (_iterator i1, _iterator i2)
+  {
+    __CPROVER_HIDE:
+    i1.assert_reachable(i2);
+    return i1.offset > i2.offset;
+  }
+
+  friend bool operator <= (_iterator i1, _iterator i2)
+  {
+    __CPROVER_HIDE:
+    return !(i1 > i2);
+  }
+
+  friend bool operator >= (_iterator i1, _iterator i2)
+  {
+    __CPROVER_HIDE:
+    return !(i1 < i2);
+  }
+
+  protected:
+  container<T> *c;
+  unsigned offset;
+  unsigned version;
+
+  void assert_valid() const
+  {
+    __CPROVER_HIDE:
+    __CPROVER_assert(c != NULL, "dereferencing of invalid iterator");
+    __CPROVER_assert(offset <= c->size(), "iterator out of bounds");
+    __CPROVER_assert(c->version(offset) == version,
+    "dereferencing of invalidated iterator");
+  }
+
+  void assert_dereferenceable() const
+  {
+    __CPROVER_HIDE:
+    assert_valid();
+    __CPROVER_assert(offset < c->size(), "iterator out of bounds");
+  }
+
+  void assert_reachable(const _iterator& it) const
+  {
+    __CPROVER_HIDE:
+    assert_valid();
+    it.assert_valid();
+    __CPROVER_assert(c == it.c, "iterators not reachable");
+  }
+
+  };
+
+
+  /**********************************************************
+  *
+  *
+  * Class: const_iterator
+  *
+  * Purpose:
+  *
+  *   Operational Model for STL constant_iterator
+  *
+  *   This modelisation of iterator is random-access compliant
+  *
+  * Template Parameter:  - T:  type of *it
+  *
+  * Authors:
+  *
+  *      Nicolas Blanc,
+  *      Alex Groce,
+  *      Daniel Kroening
+  *
+  **********************************************************/
+
+  template <class T>
+  class _const_iterator
+  {
+  public:
+  _const_iterator(const container<T> *_c, unsigned _offset):
+  c(_c), offset(_offset)
+  {
+    __CPROVER_HIDE:
+    __CPROVER_assert(c!=NULL, "invalid container const_iterator");
+    __CPROVER_assert(offset<=_c->size(), "const_iterator out of bounds");
+    version = c->version(offset);
+  }
+
+  _const_iterator():
+  c(NULL)
+  {
+  }
+
+  const T &operator * () const
+  {
+    __CPROVER_HIDE:
+    assert_dereferenceable();
+    return c->const_data(offset);
+  }
+
+  _const_iterator &operator ++()
+  {
+    __CPROVER_HIDE:
+    assert_dereferenceable();
+    offset++;
+    version = c->version(offset);
+    return *this;
+  }
+
+
+  _const_iterator operator ++(int _zero)
+  {
+    __CPROVER_HIDE:
+    assert_dereferenceable();
+    _const_iterator it(*this);
+    offset++;
+    version = c->version(offset);
+    return it;
+  }
+
+
+  _const_iterator& operator +=(int i)
+  {
+    __CPROVER_HIDE:
+    assert_valid();
+    __CPROVER_assert(i>=0 || -i<=offset, "const_iterator out of bounds");
+    __CPROVER_assert(offset + i <= c->size(), "const_iterator out of bounds");
+    offset += i;
+    return *this;
+  }
+
+
+  _const_iterator operator +(int i) const
+  {
+    _const_iterator it(*this);
+    it += i;
+    return it;
+  }
+
+
+  _const_iterator &operator --()
+  {
+    __CPROVER_HIDE:
+    assert_valid();
+    __CPROVER_assert(offset != 0, "const_iterator out of bounds");
+    offset--;
+    return *this;
+  }
+
+  _const_iterator  operator --(int _zero)
+  {
+    __CPROVER_HIDE:
+    assert_valid();
+    __CPROVER_assert(offset != 0, "const_iterator out of bounds");
+    _const_iterator it(*this);
+    offset--;
+    return it;
+  }
+
+  _const_iterator& operator -=(int i)
+  {
+    __CPROVER_HIDE:
+    assert_valid();
+    __CPROVER_assert(i<=0 || i<=offset, "const_iterator out of bounds");
+    __CPROVER_assert(offset - i <= c->size(), "const_iterator out of bounds");
+    offset -= i;
+    return *this;
+  }
+
+  _const_iterator operator -(int i) const
+  {
+    _const_iterator it(*this);
+    it -= i;
+    return it;
+  }
+
+  const T& operator[] (int i) const
+  {
+    return *(*this + i);
+  }
+
+  friend bool operator==(const _const_iterator& i1,
+    const _const_iterator& i2)
+  {
+    __CPROVER_HIDE:
+    i1.assert_reachable(i2);
+    return i1.offset==i2.offset;
+  }
+
+  friend bool operator!=(const _const_iterator& i1,
+    const _const_iterator& i2)
+  {
+    __CPROVER_HIDE:
+    return !(i1==i2);
+  }
+
+  friend bool operator < (const _const_iterator& i1,
+    const _const_iterator& i2)
+  {
+    __CPROVER_HIDE:
+    i1.assert_reachable(i2);
+    return i1.offset < i2.offset;
+  }
+
+  friend bool operator > (const _const_iterator& i1,
+    const _const_iterator& i2)
+  {
+    __CPROVER_HIDE:
+    i1.assert_reachable(i2);
+    return i1.offset > i2.offset;
+  }
+
+  friend bool operator <= (const _const_iterator& i1,
+    const _const_iterator& i2)
+  {
+    __CPROVER_HIDE:
+    return !(i1 > i2);
+  }
+
+  friend bool operator >= (const _const_iterator& i1,
+    const _const_iterator& i2)
+  {
+    __CPROVER_HIDE:
+    return !(i1 < i2);
+  }
+
+  protected:
+  const container<T> *c;
+  unsigned offset;
+  unsigned version;
+
+  void assert_valid() const
+  {
+    __CPROVER_HIDE:
+    __CPROVER_assert(c != NULL, "dereferencing of invalid const_iterator");
+    __CPROVER_assert(offset <= c->size(), "const_iterator out of bounds");
+    __CPROVER_assert(c->version(offset) == version,
+    "dereferencing of invalidated _const_iterator");
+  }
+
+  void assert_dereferenceable() const
+  {
+    __CPROVER_HIDE:
+    assert_valid();
+    __CPROVER_assert(offset < c->size(), "const_iterator out of bounds");
+  }
+
+  void assert_reachable(const _const_iterator& it) const
+  {
+    __CPROVER_HIDE:
+    assert_valid();
+    it.assert_valid();
+    __CPROVER_assert(c == it.c, "const_iterators not reachable");
+  }
+
+  };
+
+
+  /**********************************************************
+  *
+  *
+  * Class: reverse_iterator
+  *
+  * Purpose:
+  *
+  *   Operational Model for STL reverse_iterator
+  *
+  *
+  *   This modelisation of const_iterator is
+  *   random-access compliant
+  *
+  * Template Parameter:  - T:  type of *it
+  *
+  * Authors:
+  *
+  *      Nicolas Blanc,
+  *      Alex Groce,
+  *      Daniel Kroening
+  *
+  **********************************************************/
+
+
+  template <class T>
+  class _reverse_iterator
+  {
+  public:
+  _reverse_iterator(_iterator<T> it):
+   c(it.c), offset(it.offset)
+  {
+    __CPROVER_HIDE:
+    it.assert_valid();
+    version = c ->version(offset);
+  }
+
+  _reverse_iterator(container<T> *_c, unsigned _offset):
+  c(_c), offset(_offset)
+  {
+    __CPROVER_HIDE:
+    __CPROVER_assert(c!=NULL, "invalid container");
+    __CPROVER_assert(offset <= c->size(), "iterator out of bounds");
+    version = c ->version(offset);
+  }
+
+  _reverse_iterator():
+  c(NULL)
+  {
+  }
+
+  _iterator<T> base() const
+  {
+    __CPROVER_HIDE:
+    __CPROVER_assert(offset > 0, "iterator out of bounds");
+    return _iterator<T>(c, offset);
+  }
+
+  T &operator * () const
+  {
+    __CPROVER_HIDE:
+    assert_dereferenceable();
+    return c->data(offset-1);
+  }
+
+  _reverse_iterator &operator --()
+  {
+    __CPROVER_HIDE:
+    assert_dereferenceable();
+    offset++;
+    version = c->version(offset);
+    return *this;
+  }
+
+
+  _reverse_iterator operator --(int _zero)
+  {
+    __CPROVER_HIDE:
+    assert_dereferenceable();
+    _reverse_iterator it(*this);
+    offset++;
+    version = c->version(offset);
+    return it;
+  }
+
+
+  _reverse_iterator& operator -=(int i)
+  {
+    __CPROVER_HIDE:
+    assert_valid();
+    __CPROVER_assert(i>=0 || -i<=offset, "iterator out of bounds");
+    __CPROVER_assert(offset + i <= c->size(), "iterator out of bounds");
+    offset += i;
+    return *this;
+  }
+
+
+  _reverse_iterator operator -(int i)
+  {
+    _reverse_iterator it(*this);
+    it += i;
+    return it;
+  }
+
+
+  _reverse_iterator &operator ++()
+  {
+    __CPROVER_HIDE:
+    assert_valid();
+    __CPROVER_assert(offset != 0, "iterator out of bounds");
+    offset--;
+    return *this;
+  }
+
+  _reverse_iterator  operator ++(int _zero)
+  {
+    __CPROVER_HIDE:
+    assert_valid();
+    __CPROVER_assert(offset != 0, "iterator out of bounds");
+    _reverse_iterator it(*this);
+    offset--;
+    return it;
+  }
+
+  _reverse_iterator& operator +=(int i)
+  {
+    __CPROVER_HIDE:
+    assert_valid();
+    __CPROVER_assert(i<=0 || i<=offset, "iterator out of bounds");
+    __CPROVER_assert(offset - i <= c->size(), "iterator out of bounds");
+    offset -= i;
+    return *this;
+  }
+
+  _reverse_iterator operator +(int i)
+  {
+    _reverse_iterator it(*this);
+    it -= i;
+    return it;
+  }
+
+  T& operator[] (int i)
+  {
+    _reverse_iterator it(*this);
+    return *(it+i);
+  }
+
+  friend bool operator==(_reverse_iterator i1, _reverse_iterator i2)
+  {
+    __CPROVER_HIDE:
+    i1.assert_reachable(i2);
+    return i1.offset==i2.offset;
+  }
+
+  friend bool operator!=(_reverse_iterator i1, _reverse_iterator i2)
+  {
+    __CPROVER_HIDE:
+    return !(i1==i2);
+  }
+
+  friend bool operator > (_reverse_iterator i1, _reverse_iterator i2)
+  {
+    __CPROVER_HIDE:
+    i1.assert_reachable(i2);
+    return i1.offset < i2.offset;
+  }
+
+  friend bool operator < (_reverse_iterator i1, _reverse_iterator i2)
+  {
+    __CPROVER_HIDE:
+    i1.assert_reachable(i2);
+    return i1.offset > i2.offset;
+  }
+
+  friend bool operator <= (_reverse_iterator i1, _reverse_iterator i2)
+  {
+    __CPROVER_HIDE:
+    return !(i1 > i2);
+  }
+
+  friend bool operator >= (_reverse_iterator i1, _reverse_iterator i2)
+  {
+    __CPROVER_HIDE:
+    return !(i1 < i2);
+  }
+
+  protected:
+  container<T> *c;
+  unsigned offset;
+  unsigned version;
+
+  void assert_valid() const
+  {
+    __CPROVER_HIDE:
+    __CPROVER_assert(c != NULL, "dereferencing of invalid iterator");
+    __CPROVER_assert(offset <= c->size(), "iterator out of bounds");
+    __CPROVER_assert(c->version(offset) == version,
+    "dereferencing of invalidated iterator");
+  }
+
+  void assert_dereferenceable() const
+  {
+    __CPROVER_HIDE:
+    assert_valid();
+    __CPROVER_assert(offset > 0, "iterator out of bounds");
+  }
+
+  void assert_reachable(const _reverse_iterator& it) const
+  {
+    __CPROVER_HIDE:
+    assert_valid();
+    it.assert_valid();
+    __CPROVER_assert(c == it.c, "iterators not reachable");
+  }
+
+  };
+
+
+  /**********************************************************
+  *
+  *
+  * Class: reverse_iterator
+  *
+  * Purpose:
+  *
+  *   Operational Model for STL const_reverse_iterator
+  *
+  *
+  *   This modelisation of const_reverse_iterator
+  *   is random-access compliant
+  *
+  * Template Parameter:  - T:  type of *it
+  *
+  * Authors:
+  *
+  *      Nicolas Blanc,
+  *      Alex Groce,
+  *      Daniel Kroening
+  *
+  **********************************************************/
+
+
+  template <class T>
+  class _const_reverse_iterator
+  {
+  public:
+  _const_reverse_iterator(_iterator<T> it):
+   c(it.c), offset(it.offset)
+  {
+    __CPROVER_HIDE:
+    it.assert_valid();
+    version = c ->version(offset);
+  }
+
+  _const_reverse_iterator(const container<T> *_c, unsigned _offset):
+  c(_c), offset(_offset)
+  {
+    __CPROVER_HIDE:
+    __CPROVER_assert(c!=NULL, "invalid container");
+    __CPROVER_assert(offset <= c->size(), "iterator out of bounds");
+    version = c ->version(offset);
+  }
+
+  _const_reverse_iterator():
+  c(NULL)
+  {
+  }
+
+  _const_iterator<T> base() const
+  {
+    __CPROVER_HIDE:
+    __CPROVER_assert(offset > 0, "iterator out of bounds");
+    return _const_iterator<T>(c, offset);
+  }
+
+  T &operator * () const
+  {
+    __CPROVER_HIDE:
+    assert_dereferenceable();
+    return c->data(offset-1);
+  }
+
+  _const_reverse_iterator &operator --()
+  {
+    __CPROVER_HIDE:
+    assert_dereferenceable();
+    offset++;
+    version = c->version(offset);
+    return *this;
+  }
+
+
+  _const_reverse_iterator operator --(int _zero)
+  {
+    __CPROVER_HIDE:
+    assert_dereferenceable();
+    _const_reverse_iterator it(*this);
+    offset++;
+    version = c->version(offset);
+    return it;
+  }
+
+
+  _const_reverse_iterator& operator -=(int i)
+  {
+    __CPROVER_HIDE:
+    assert_valid();
+    __CPROVER_assert(i>=0 || -i<=offset, "iterator out of bounds");
+    __CPROVER_assert(offset + i <= c->size(), "iterator out of bounds");
+    offset += i;
+    return *this;
+  }
+
+
+  _const_reverse_iterator operator -(int i)
+  {
+    _const_reverse_iterator it(*this);
+    it += i;
+    return it;
+  }
+
+
+  _const_reverse_iterator &operator ++()
+  {
+    __CPROVER_HIDE:
+    assert_valid();
+    __CPROVER_assert(offset != 0, "iterator out of bounds");
+    offset--;
+    return *this;
+  }
+
+  _const_reverse_iterator  operator ++(int _zero)
+  {
+    __CPROVER_HIDE:
+    assert_valid();
+    __CPROVER_assert(offset != 0, "iterator out of bounds");
+    _const_reverse_iterator it(*this);
+    offset--;
+    return it;
+  }
+
+  _const_reverse_iterator& operator +=(int i)
+  {
+    __CPROVER_HIDE:
+    assert_valid();
+    __CPROVER_assert(i<=0 || i<=offset, "iterator out of bounds");
+    __CPROVER_assert(offset - i <= c->size(), "iterator out of bounds");
+    offset -= i;
+    return *this;
+  }
+
+  _const_reverse_iterator operator +(int i)
+  {
+    _const_reverse_iterator it(*this);
+    it -= i;
+    return it;
+  }
+
+  T& operator[] (int i)
+  {
+    _const_reverse_iterator it(*this);
+    return *(it+i);
+  }
+
+  friend bool operator==(_const_reverse_iterator i1, _const_reverse_iterator i2)
+  {
+    __CPROVER_HIDE:
+    i1.assert_reachable(i2);
+    return i1.offset==i2.offset;
+  }
+
+  friend bool operator!=(_const_reverse_iterator i1, _const_reverse_iterator i2)
+  {
+    __CPROVER_HIDE:
+    return !(i1==i2);
+  }
+
+  friend bool operator > (_const_reverse_iterator i1, _const_reverse_iterator i2)
+  {
+    __CPROVER_HIDE:
+    i1.assert_reachable(i2);
+    return i1.offset < i2.offset;
+  }
+
+  friend bool operator < (_const_reverse_iterator i1, _const_reverse_iterator i2)
+  {
+    __CPROVER_HIDE:
+    i1.assert_reachable(i2);
+    return i1.offset > i2.offset;
+  }
+
+  friend bool operator <= (_const_reverse_iterator i1, _const_reverse_iterator i2)
+  {
+    __CPROVER_HIDE:
+    return !(i1 > i2);
+  }
+
+  friend bool operator >= (_const_reverse_iterator i1, _const_reverse_iterator i2)
+  {
+    __CPROVER_HIDE:
+    return !(i1 < i2);
+  }
+
+  protected:
+  const container<T> *c;
+  unsigned offset;
+  unsigned version;
+
+  void assert_valid() const
+  {
+    __CPROVER_HIDE:
+    __CPROVER_assert(c != NULL, "dereferencing of invalid iterator");
+    __CPROVER_assert(offset <= c->size(), "iterator out of bounds");
+    __CPROVER_assert(c->version(offset) == version,
+    "dereferencing of invalidated iterator");
+  }
+
+  void assert_dereferenceable() const
+  {
+    __CPROVER_HIDE:
+    assert_valid();
+    __CPROVER_assert(offset > 0, "iterator out of bounds");
+  }
+
+  void assert_reachable(const _const_reverse_iterator& it) const
+  {
+    __CPROVER_HIDE:
+    assert_valid();
+    it.assert_valid();
+    __CPROVER_assert(c == it.c, "iterators not reachable");
+  }
+
+  };
+
+}
+#endif
