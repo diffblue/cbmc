@@ -22,6 +22,12 @@ Function: is_skip
 
 static bool is_skip(goto_programt::instructionst::iterator it)
 {
+  // we won't remove labelled statements
+  // (think about error labels or the like)
+  
+  if(!it->labels.empty())
+    return false;
+
   if(it->is_skip())
     return !it->code.get_bool(ID_explicit);
  
