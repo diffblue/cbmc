@@ -101,6 +101,8 @@ void remove_internal_symbols(
   special.insert("c::envp_size'");  
   special.insert("c::__CPROVER_memory");  
   special.insert("c::__CPROVER_initialize");
+  special.insert("c::__CPROVER_malloc_size");
+  special.insert("c::__CPROVER_deallocated");
   
   for(contextt::symbolst::const_iterator
       it=context.symbols.begin();
