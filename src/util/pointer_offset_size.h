@@ -18,6 +18,8 @@ class struct_typet;
 class typet;
 
 // these return -1 on failure
+// these need to be changed to return expressions in the future
+
 mp_integer member_offset(
   const namespacet &ns,
   const struct_typet &type,
