@@ -203,6 +203,7 @@ C_invalid_object #invalid_object
 pointer_offset
 pointer_object
 same_object same-object
+invalid_pointer invalid-pointer
 ieee_float_equal
 ieee_float_notequal
 isnan
@@ -451,7 +452,9 @@ overflow_unary_minus overflow-unary-
 object_descriptor
 dynamic_object
 dynamic_size
+object_size
 valid_object
+good_pointer
 integer_address
 integer_address_object
 static_object

@@ -24,7 +24,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ansi-c/c_types.h>
 
 #include "goto_convert_class.h"
-#include "dynamic_memory.h"
+#include "pointer_predicates.h"
 
 /*******************************************************************\
 
