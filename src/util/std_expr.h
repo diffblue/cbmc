@@ -1153,6 +1153,21 @@ public:
     copy_to_operands(op0, op1);
   }
 
+  inline and_exprt(const exprt &op0, const exprt &op1, const exprt &op2):exprt(ID_and, typet(ID_bool))
+  {
+    copy_to_operands(op0, op1, op2);
+  }
+
+  inline and_exprt(const exprt &op0, const exprt &op1, const exprt &op2, const exprt &op3):exprt(ID_and, typet(ID_bool))
+  {
+    exprt::operandst &op=operands();
+    op.resize(4);
+    op[0]=op0;
+    op[1]=op1;
+    op[2]=op2;
+    op[3]=op3;
+  }
+
   and_exprt(const exprt::operandst &op):exprt(ID_and, bool_typet())
   {
     if(op.empty())
@@ -1241,6 +1256,21 @@ public:
   inline or_exprt(const exprt &op0, const exprt &op1):exprt(ID_or, bool_typet())
   {
     copy_to_operands(op0, op1);
+  }
+
+  inline or_exprt(const exprt &op0, const exprt &op1, const exprt &op2):exprt(ID_or, typet(ID_bool))
+  {
+    copy_to_operands(op0, op1, op2);
+  }
+
+  inline or_exprt(const exprt &op0, const exprt &op1, const exprt &op2, const exprt &op3):exprt(ID_or, typet(ID_bool))
+  {
+    exprt::operandst &op=operands();
+    op.resize(4);
+    op[0]=op0;
+    op[1]=op1;
+    op[2]=op2;
+    op[3]=op3;
   }
 
   or_exprt(const exprt::operandst &op):exprt(ID_or, bool_typet())
