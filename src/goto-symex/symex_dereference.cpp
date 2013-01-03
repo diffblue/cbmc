@@ -6,7 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <simplify_expr.h>
 #include <expr_util.h>
 #include <pointer_offset_size.h>
 #include <arith_tools.h>
