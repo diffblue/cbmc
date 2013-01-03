@@ -40,6 +40,9 @@ public:
 
   bool do_simplify_if;
 
+  // These below all return 'true' if the simplification wasn't applicable.
+  // If false is returned, the expression has changed.
+
   bool simplify_typecast(exprt &expr);
   bool simplify_extractbit(exprt &expr);
   bool simplify_extractbits(exprt &expr);
@@ -72,10 +75,12 @@ public:
   bool simplify_index(index_exprt &expr);
   bool simplify_member(member_exprt &expr);
   bool simplify_pointer_object(exprt &expr);
+  bool simplify_object_size(exprt &expr);
   bool simplify_dynamic_size(exprt &expr);
   bool simplify_dynamic_object(exprt &expr);
+  bool simplify_invalid_pointer(exprt &expr);
   bool simplify_same_object(exprt &expr);
-  bool simplify_valid_object(exprt &expr);
+  bool simplify_good_pointer(exprt &expr);
   bool simplify_object(exprt &expr);
   static tvt objects_equal(const exprt &a, const exprt &b);
   static tvt objects_equal_address_of(const exprt &a, const exprt &b);

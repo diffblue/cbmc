@@ -11,11 +11,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <expr.h>
 #include <arith_tools.h>
 #include <std_types.h>
+#include <std_expr.h>
+#include <expr_util.h>
 #include <config.h>
+#include <simplify_expr.h>
+#include <namespace.h>
+#include <symbol.h>
 
 #include "pointer_offset_size.h"
-#include "namespace.h"
-#include "symbol.h"
 
 /*******************************************************************\
 
@@ -202,6 +205,218 @@ mp_integer pointer_offset_size(
     return 0;
   else
     return mp_integer(-1);
+}
+
+/*******************************************************************\
+
+Function: member_offset_expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+exprt member_offset_expr(
+  const struct_typet &type,
+  const irep_idt &member,
+  const namespacet &ns)
+{
+  const struct_typet::componentst &components=type.components();
+  
+  exprt result=gen_zero(signedbv_typet(config.ansi_c.pointer_width));
+  unsigned bit_field_bits=0;
+  
+  for(struct_typet::componentst::const_iterator
+      it=components.begin();
+      it!=components.end();
+      it++)
+  {
+    if(it->get_name()==member) break;
+    if(it->get_is_bit_field())
+    {
+      bit_field_bits+=it->type().get_int(ID_width);
+    }
+    else
+    {
+      if(bit_field_bits!=0)
+      {
+        result=plus_exprt(result, from_integer(bit_field_bits/8, result.type()));
+        bit_field_bits=0;
+      }
+      
+      const typet &subtype=it->type();
+      exprt sub_size=size_of_expr(subtype, ns);
+      if(sub_size.is_nil()) return nil_exprt(); // give up
+      result=plus_exprt(result, sub_size);
+    }
+  }
+
+  simplify(result, ns);
+  
+  return result;
+}
+
+/*******************************************************************\
+
+Function: size_of_expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+exprt size_of_expr(
+  const typet &type,
+  const namespacet &ns)
+{
+  if(type.id()==ID_array)
+  {
+    exprt sub=size_of_expr(type.subtype(), ns);
+    if(sub.is_nil()) return nil_exprt();
+  
+    // get size
+    exprt size=to_array_type(type).size();
+    
+    if(size.is_nil()) return nil_exprt();
+    
+    if(size.type()!=sub.type())
+      size.make_typecast(sub.type());
+    
+    exprt result=mult_exprt(size, sub);
+
+    simplify(result, ns);
+
+    return result;
+  }
+  else if(type.id()==ID_vector)
+  {
+    exprt sub=size_of_expr(type.subtype(), ns);
+    if(sub.is_nil()) return nil_exprt();
+  
+    // get size
+    exprt size=to_vector_type(type).size();
+    
+    if(size.is_nil()) return nil_exprt();
+    
+    if(size.type()!=sub.type())
+      size.make_typecast(sub.type());
+    
+    exprt result=mult_exprt(size, sub);
+    simplify(result, ns);
+
+    return result;
+  }
+  else if(type.id()==ID_complex)
+  {
+    exprt sub=size_of_expr(type.subtype(), ns);
+    if(sub.is_nil()) return nil_exprt();
+  
+    const exprt size=from_integer(2, sub.type());
+    
+    exprt result=mult_exprt(size, sub);
+    simplify(result, ns);
+
+    return result;
+  }
+  else if(type.id()==ID_struct)
+  {
+    const struct_typet &struct_type=to_struct_type(type);
+    const struct_typet::componentst &components=
+      struct_type.components();
+      
+    exprt result=gen_zero(signedbv_typet(config.ansi_c.pointer_width));
+    unsigned bit_field_bits=0;
+    
+    for(struct_typet::componentst::const_iterator
+        it=components.begin();
+        it!=components.end();
+        it++)
+    {
+      if(it->get_is_bit_field())
+      {
+        bit_field_bits+=it->type().get_int(ID_width);
+      }
+      else
+      {
+        if(bit_field_bits!=0)
+        {
+          result=plus_exprt(result, from_integer(bit_field_bits/8, result.type()));
+          bit_field_bits=0;
+        }
+        
+        const typet &subtype=it->type();
+        exprt sub_size=size_of_expr(subtype, ns);
+        if(sub_size.is_nil()) return nil_exprt();
+
+        result=plus_exprt(result, sub_size);
+      }
+    }
+
+    simplify(result, ns);
+    
+    return result;
+  }
+  else if(type.id()==ID_union)
+  {
+    const union_typet &union_type=to_union_type(type);
+    const union_typet::componentst &components=
+      union_type.components();
+      
+    mp_integer result=0;
+
+    // compute max
+    
+    for(union_typet::componentst::const_iterator
+        it=components.begin();
+        it!=components.end();
+        it++)
+    {
+      const typet &subtype=it->type();
+      mp_integer sub_size=pointer_offset_size(ns, subtype);
+      if(sub_size>result) result=sub_size;
+    }
+    
+    return from_integer(result, signedbv_typet(config.ansi_c.pointer_width));
+  }
+  else if(type.id()==ID_signedbv ||
+          type.id()==ID_unsignedbv ||
+          type.id()==ID_fixedbv ||
+          type.id()==ID_floatbv ||
+          type.id()==ID_bv ||
+          type.id()==ID_c_enum)
+  {
+    unsigned width=to_bitvector_type(type).get_width();
+    unsigned bytes=width/8;
+    if(bytes*8!=width) bytes++;
+    return from_integer(bytes, signedbv_typet(config.ansi_c.pointer_width));
+  }
+  else if(type.id()==ID_bool)
+  {
+    return gen_one(signedbv_typet(config.ansi_c.pointer_width));
+  }
+  else if(type.id()==ID_pointer)
+  {
+    unsigned width=config.ansi_c.pointer_width;
+    unsigned bytes=width/8;
+    if(bytes*8!=width) bytes++;
+    return from_integer(bytes, signedbv_typet(config.ansi_c.pointer_width));
+  }
+  else if(type.id()==ID_symbol)
+  {
+    return size_of_expr(ns.follow(type), ns);
+  }
+  else if(type.id()==ID_code)
+  {
+    return gen_zero(signedbv_typet(config.ansi_c.pointer_width));
+  }
+  else
+    return nil_exprt();
 }
 
 /*******************************************************************\

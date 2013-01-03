@@ -30,6 +30,17 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "c_types.h"
 #include "expr2c_class.h"
 
+/*
+
+Precedences are as follows. Higher values mean higher precedence.
+
+16 function call ()
+   ++ -- [] . ->
+
+1  comma
+
+*/
+
 /*******************************************************************\
 
 Function: expr2ct::id_shorthand
@@ -1461,7 +1472,7 @@ std::string expr2ct::convert_norep(
   std::string dest="irep(\"";
   MetaString(dest, lisp.expr2string());
   dest+="\")";
-  precedence=15;
+  precedence=16;
   return dest;
 }
 
@@ -3565,19 +3576,29 @@ std::string expr2ct::convert(
       return convert_unary(src, "+", precedence=15);
   }
 
-  else if(src.id()=="invalid-pointer")
+  else if(src.id()==ID_invalid_pointer)
   {
-    return convert_function(src, "INVALID-POINTER", precedence=15);
+    return convert_function(src, "INVALID-POINTER", precedence=16);
+  }
+
+  else if(src.id()==ID_good_pointer)
+  {
+    return convert_function(src, "GOOD_POINTER", precedence=16);
+  }
+
+  else if(src.id()==ID_object_size)
+  {
+    return convert_function(src, "OBJECT_SIZE", precedence=16);
   }
 
   else if(src.id()=="pointer_arithmetic")
   {
-    return convert_pointer_arithmetic(src, precedence=15);
+    return convert_pointer_arithmetic(src, precedence=16);
   }
 
   else if(src.id()=="pointer_difference")
   {
-    return convert_pointer_difference(src, precedence=15);
+    return convert_pointer_difference(src, precedence=16);
   }
 
   else if(src.id()=="NULL-object")
@@ -3594,7 +3615,7 @@ std::string expr2ct::convert(
   
   else if(src.id()==ID_infinity)
   {
-    return convert_function(src, "INFINITY", precedence=15);
+    return convert_function(src, "INFINITY", precedence=16);
   }
 
   else if(src.id()=="builtin-function")
@@ -3604,118 +3625,118 @@ std::string expr2ct::convert(
 
   else if(src.id()==ID_pointer_object)
   {
-    return convert_function(src, "POINTER_OBJECT", precedence=15);
+    return convert_function(src, "POINTER_OBJECT", precedence=16);
   }
 
   else if(src.id()=="object_value")
   {
-    return convert_function(src, "OBJECT_VALUE", precedence=15);
+    return convert_function(src, "OBJECT_VALUE", precedence=16);
   }
 
   else if(src.id()=="pointer_object_has_type")
   {
-    return convert_pointer_object_has_type(src, precedence=15);
+    return convert_pointer_object_has_type(src, precedence=16);
   }
 
   else if(src.id()==ID_array_of)
   {
-    return convert_array_of(src, precedence=15);
+    return convert_array_of(src, precedence=16);
   }
 
   else if(src.id()==ID_pointer_offset)
   {
-    return convert_function(src, "POINTER_OFFSET", precedence=15);
+    return convert_function(src, "POINTER_OFFSET", precedence=16);
   }
 
   else if(src.id()=="pointer_base")
   {
-    return convert_function(src, "POINTER_BASE", precedence=15);
+    return convert_function(src, "POINTER_BASE", precedence=16);
   }
 
   else if(src.id()=="pointer_cons")
   {
-    return convert_function(src, "POINTER_CONS", precedence=15);
+    return convert_function(src, "POINTER_CONS", precedence=16);
   }
 
   else if(src.id()==ID_same_object)
   {
-    return convert_function(src, "SAME-OBJECT", precedence=15);
+    return convert_function(src, "SAME-OBJECT", precedence=16);
   }
 
   else if(src.id()==ID_dynamic_object)
   {
-    return convert_function(src, "DYNAMIC_OBJECT", precedence=15);
+    return convert_function(src, "DYNAMIC_OBJECT", precedence=16);
   }
 
   else if(src.id()=="is_zero_string")
   {
-    return convert_function(src, "IS_ZERO_STRING", precedence=15);
+    return convert_function(src, "IS_ZERO_STRING", precedence=16);
   }
 
   else if(src.id()=="zero_string")
   {
-    return convert_function(src, "ZERO_STRING", precedence=15);
+    return convert_function(src, "ZERO_STRING", precedence=16);
   }
 
   else if(src.id()=="zero_string_length")
   {
-    return convert_function(src, "ZERO_STRING_LENGTH", precedence=15);
+    return convert_function(src, "ZERO_STRING_LENGTH", precedence=16);
   }
 
   else if(src.id()=="buffer_size")
   {
-    return convert_function(src, "BUFFER_SIZE", precedence=15);
+    return convert_function(src, "BUFFER_SIZE", precedence=16);
   }
 
   else if(src.id()==ID_pointer_offset)
   {
-    return convert_function(src, "POINTER_OFFSET", precedence=15);
+    return convert_function(src, "POINTER_OFFSET", precedence=16);
   }
 
   else if(src.id()==ID_isnan)
   {
-    return convert_function(src, "isnan", precedence=15);
+    return convert_function(src, "isnan", precedence=16);
   }
 
   else if(src.id()==ID_isfinite)
   {
-    return convert_function(src, "isfinite", precedence=15);
+    return convert_function(src, "isfinite", precedence=16);
   }
 
   else if(src.id()==ID_isinf)
   {
-    return convert_function(src, "isinf", precedence=15);
+    return convert_function(src, "isinf", precedence=16);
   }
 
   else if(src.id()==ID_isnormal)
   {
-    return convert_function(src, "isnormal", precedence=15);
+    return convert_function(src, "isnormal", precedence=16);
   }
 
   else if(src.id()==ID_builtin_offsetof)
   {
-    return convert_function(src, "builtin_offsetof", precedence=15);
+    return convert_function(src, "builtin_offsetof", precedence=16);
   }
 
   else if(src.id()==ID_gcc_builtin_va_arg)
   {
-    return convert_function(src, "gcc_builtin_va_arg", precedence=15);
+    return convert_function(src, "gcc_builtin_va_arg", precedence=16);
   }
 
   else if(src.id()==ID_alignof)
   {
     // C uses "_Alignof", C++ uses "alignof"
-    return convert_function(src, "alignof", precedence=15);
+    return convert_function(src, "alignof", precedence=16);
   }
 
   else if(has_prefix(src.id_string(), "byte_extract"))
   {
-    return convert_byte_extract(src, precedence=15);
+    return convert_byte_extract(src, precedence=16);
   }
 
   else if(has_prefix(src.id_string(), "byte_update"))
   {
-    return convert_byte_update(src, precedence=15);
+    return convert_byte_update(src, precedence=16);
   }
 
   else if(src.id()==ID_address_of)
@@ -3789,19 +3810,19 @@ std::string expr2ct::convert(
     else if(statement==ID_malloc)
       return convert_malloc(src, precedence=15);
     else if(statement==ID_printf)
-      return convert_function(src, "PRINTF", precedence=15);
+      return convert_function(src, "PRINTF", precedence=16);
     else if(statement==ID_nondet)
-      return convert_nondet(src, precedence=15);
+      return convert_nondet(src, precedence=16);
     else if(statement=="prob_coin")
-      return convert_prob_coin(src, precedence=15);
+      return convert_prob_coin(src, precedence=16);
     else if(statement=="prob_unif")
-      return convert_prob_uniform(src, precedence=15);
+      return convert_prob_uniform(src, precedence=16);
     else if(statement==ID_literal)
-      return convert_literal(src, precedence=15);
+      return convert_literal(src, precedence=16);
     else if(statement==ID_statement_expression)
       return convert_statement_expression(src, precedence=15);
     else if(statement==ID_gcc_builtin_va_arg_next)
-      return convert_function(src, "gcc_builtin_va_arg_next", precedence=15);
+      return convert_function(src, "gcc_builtin_va_arg_next", precedence=16);
     else
       return convert_norep(src, precedence);
   }
@@ -3838,28 +3859,28 @@ std::string expr2ct::convert(
     return convert_binary(src, "==", precedence=9, true);
 
   else if(src.id()==ID_ieee_float_equal)
-    return convert_function(src, "IEEE_FLOAT_EQUAL", precedence=15);
+    return convert_function(src, "IEEE_FLOAT_EQUAL", precedence=16);
 
   else if(src.id()==ID_width)
-    return convert_function(src, "WIDTH", precedence=15);
+    return convert_function(src, "WIDTH", precedence=16);
 
   else if(src.id()==ID_concatenation)
-    return convert_function(src, "CONCATENATION", precedence=15);
+    return convert_function(src, "CONCATENATION", precedence=16);
 
   else if(src.id()==ID_ieee_float_notequal)
-    return convert_function(src, "IEEE_FLOAT_NOTEQUAL", precedence=15);
+    return convert_function(src, "IEEE_FLOAT_NOTEQUAL", precedence=16);
 
   else if(src.id()==ID_abs)
-    return convert_function(src, "abs", precedence=15);
+    return convert_function(src, "abs", precedence=16);
 
   else if(src.id()==ID_complex_real)
-    return convert_function(src, "__real__", precedence=15);
+    return convert_function(src, "__real__", precedence=16);
 
   else if(src.id()==ID_complex_imag)
-    return convert_function(src, "__imag__", precedence=15);
+    return convert_function(src, "__imag__", precedence=16);
 
   else if(src.id()==ID_complex)
-    return convert_complex(src, precedence=15);
+    return convert_complex(src, precedence=16);
 
   else if(src.id()==ID_bitand)
     return convert_binary(src, "&", precedence=8, false);
@@ -3895,7 +3916,7 @@ std::string expr2ct::convert(
     return convert_quantifier(src, "LAMBDA", precedence=2);
 
   else if(src.id()==ID_with)
-    return convert_with(src, precedence=15);
+    return convert_with(src, precedence=16);
 
   else if(src.id()==ID_symbol)
     return convert_symbol(src, precedence);
@@ -3958,7 +3979,7 @@ std::string expr2ct::convert(
     return convert_implicit_address_of(src, precedence);
 
   else if(src.id()=="implicit_dereference")
-    return convert_function(src, "IMPLICIT_DEREFERENCE", precedence=15);
+    return convert_function(src, "IMPLICIT_DEREFERENCE", precedence=16);
 
   else if(src.id()==ID_comma)
     return convert_binary(src, ", ", precedence=1, false);

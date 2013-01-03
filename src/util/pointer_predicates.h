@@ -14,11 +14,12 @@ Author: Daniel Kroening, kroening@kroening.com
 exprt same_object(const exprt &p1, const exprt &p2);
 exprt deallocated(const exprt &pointer, const namespacet &ns);
 exprt dynamic_size(const namespacet &ns);
+exprt malloc_object(const exprt &pointer, const namespacet &ns);
 exprt object_size(const exprt &pointer);
 exprt pointer_object_has_type(const exprt &pointer, const typet &type, const namespacet &ns);
 exprt dynamic_object(const exprt &pointer);
-exprt good_pointer(const exprt &pointer, const typet &dereference_type);
-exprt good_pointer_def(const exprt &pointer, const typet &dereference_type, const namespacet &ns);
+exprt good_pointer(const exprt &pointer);
+exprt good_pointer_def(const exprt &pointer, const namespacet &ns);
 exprt null_object(const exprt &pointer);
 exprt null_pointer(const exprt &pointer);
 exprt invalid_pointer(const exprt &pointer);
