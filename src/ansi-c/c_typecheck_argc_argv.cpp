@@ -89,7 +89,7 @@ void c_typecheck_baset::add_argc_argv(const symbolt &main_symbol)
 
     symbolt argv_symbol;
 
-    argv_symbol.base_name="argv";
+    argv_symbol.base_name="argv'";
     argv_symbol.name="c::argv'";
     argv_symbol.type=argv_type;
     argv_symbol.is_static_lifetime=true;
@@ -102,7 +102,7 @@ void c_typecheck_baset::add_argc_argv(const symbolt &main_symbol)
   if(arguments.get_sub().size()==3)
   {    
     symbolt envp_symbol;    
-    envp_symbol.base_name="envp";
+    envp_symbol.base_name="envp'";
     envp_symbol.name="c::envp'";
     envp_symbol.type=(static_cast<const exprt&>(arguments.get_sub()[2])).type();
     envp_symbol.is_static_lifetime=true;

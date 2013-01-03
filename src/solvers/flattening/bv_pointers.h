@@ -52,17 +52,17 @@ protected:
   void offset_arithmetic(bvt &bv, const mp_integer &x);
   void offset_arithmetic(bvt &bv, const mp_integer &factor, const exprt &index);
   void offset_arithmetic(bvt &bv, const mp_integer &factor, const bvt &index_bv);
-  
-  struct is_dynamic_objectt
+
+  struct postponedt
   {
-    bvt bv;
-    literalt l;
+    bvt bv, op;
+    exprt expr;
   };
   
-  typedef std::list<is_dynamic_objectt> is_dynamic_object_listt;
-  is_dynamic_object_listt is_dynamic_object_list;  
+  typedef std::list<postponedt> postponed_listt;
+  postponed_listt postponed_list;  
   
-  void do_is_dynamic_object(const is_dynamic_objectt &is_dynamic_object);
+  void do_postponed(const postponedt &postponed);
   
   static bool is_ptr(const typet &type)
   {

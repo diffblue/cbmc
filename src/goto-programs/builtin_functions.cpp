@@ -20,11 +20,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <std_code.h>
 #include <std_expr.h>
 #include <symbol.h>
+#include <pointer_predicates.h>
 
 #include <ansi-c/c_types.h>
 
 #include "goto_convert_class.h"
-#include "pointer_predicates.h"
 
 /*******************************************************************\
 

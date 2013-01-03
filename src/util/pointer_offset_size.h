@@ -18,7 +18,6 @@ class struct_typet;
 class typet;
 
 // these return -1 on failure
-// these need to be changed to return expressions in the future
 
 mp_integer member_offset(
   const namespacet &ns,
@@ -32,5 +31,16 @@ mp_integer pointer_offset_size(
 mp_integer compute_pointer_offset(
   const namespacet &ns,
   const exprt &expr);
+
+// these return 'nil' on failure
+
+exprt member_offset_expr(
+  const struct_typet &type,
+  const irep_idt &member,
+  const namespacet &ns);
+
+exprt size_of_expr(
+  const typet &type,
+  const namespacet &ns);
 
 #endif

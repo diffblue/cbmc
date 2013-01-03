@@ -58,6 +58,10 @@ void goto_symext::claim(
   do_simplify(expr);
 
   if(expr.is_true()) return;
+
+  // the simplifier might have produced new symbols,
+  // rename again
+  state.rename(expr, ns);
     
   state.guard.guard_expr(expr);
   

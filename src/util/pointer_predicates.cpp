@@ -11,8 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <expr_util.h>
 #include <arith_tools.h>
 #include <pointer_offset_size.h>
-
-#include <ansi-c/c_types.h>
+#include <config.h>
 
 #include "pointer_predicates.h"
 
@@ -47,7 +46,8 @@ Function: object_size
 
 exprt object_size(const exprt &pointer)
 {
-  return unary_exprt(ID_object_size, pointer, index_type());
+  typet type=signedbv_typet(config.ansi_c.pointer_width);
+  return unary_exprt(ID_object_size, pointer, type);
 }
 
 /*******************************************************************\
@@ -64,7 +64,28 @@ Function: pointer_offset
 
 exprt pointer_offset(const exprt &pointer)
 {
-  return unary_exprt(ID_pointer_offset, pointer, index_type());
+  typet type=signedbv_typet(config.ansi_c.pointer_width);
+  return unary_exprt(ID_pointer_offset, pointer, type);
+}
+
+/*******************************************************************\
+
+Function: malloc_object
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+exprt malloc_object(const exprt &pointer, const namespacet &ns)
+{
+  // we check __CPROVER_malloc_object!
+  const symbolt &malloc_object_symbol=ns.lookup(CPROVER_PREFIX "malloc_object");
+
+  return same_object(pointer, symbol_expr(malloc_object_symbol));
 }
 
 /*******************************************************************\
@@ -171,17 +192,24 @@ Function: good_pointer_def
 
 exprt good_pointer_def(
   const exprt &pointer,
-  const typet &dereference_type,
   const namespacet &ns)
 {
-  exprt bad_dynamic=
-    or_exprt(deallocated(pointer, ns),
-             dynamic_object_lower_bound(pointer),
-             dynamic_object_upper_bound(pointer, dereference_type, ns));
+  const pointer_typet &pointer_type=to_pointer_type(ns.follow(pointer.type()));
+  const typet &dereference_type=pointer_type.subtype();
+
+  exprt good_dynamic_tmp1=
+    or_exprt(
+      not_exprt(malloc_object(pointer, ns)),
+      and_exprt(not_exprt(dynamic_object_lower_bound(pointer)),
+                not_exprt(dynamic_object_upper_bound(pointer, dereference_type, ns))));
+
+  exprt good_dynamic_tmp2=
+    and_exprt(not_exprt(deallocated(pointer, ns)),
+              good_dynamic_tmp1);
 
   exprt good_dynamic=
     or_exprt(not_exprt(dynamic_object(pointer)), 
-             not_exprt(bad_dynamic));
+             good_dynamic_tmp2);
 
   exprt not_null=
     not_exprt(null_object(pointer));
@@ -197,7 +225,11 @@ exprt good_pointer_def(
     or_exprt(dynamic_object(pointer),
              not_exprt(bad_other));
 
-  return and_exprt(not_null, not_invalid, good_dynamic, good_other);
+  return and_exprt(
+    not_null,
+    not_invalid,
+    good_dynamic,
+    good_other);
 }
 
 /*******************************************************************\
@@ -294,12 +326,7 @@ exprt dynamic_object_upper_bound(
 
   exprt object_offset=pointer_offset(pointer);
 
-  mp_integer element_size=
-    pointer_offset_size(ns, dereference_type);
-
-  if(element_size<0) element_size=0;
-
-  exprt size=from_integer(element_size, object_offset.type());
+  exprt size=size_of_expr(dereference_type, ns);
 
   // need to add size
   exprt sum=plus_exprt(object_offset, size);
@@ -323,6 +350,8 @@ Function: object_upper_bound
 
 \*******************************************************************/
 
+#include <iostream>
+
 exprt object_upper_bound(
   const exprt &pointer,
   const typet &dereference_type,
@@ -335,12 +364,7 @@ exprt object_upper_bound(
 
   exprt object_offset=pointer_offset(pointer);
 
-  mp_integer element_size=
-    pointer_offset_size(ns, dereference_type);
-
-  if(element_size<0) element_size=0;
-
-  exprt size=from_integer(element_size, object_offset.type());
+  exprt size=size_of_expr(dereference_type, ns);
 
   // need to add size
   exprt sum=plus_exprt(object_offset, size);
@@ -366,9 +390,10 @@ Function: object_lower_bound
 
 exprt object_lower_bound(const exprt &pointer)
 {
-  exprt zero=gen_zero(index_type());
+  exprt offset=pointer_offset(pointer);
+
+  exprt zero=gen_zero(offset.type());
   assert(zero.is_not_nil());
 
-  return binary_relation_exprt(
-    pointer_offset(pointer), ID_lt, zero);
+  return binary_relation_exprt(offset, ID_lt, zero);
 }

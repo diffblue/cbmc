@@ -27,10 +27,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/loop_numbers.h>
 #include <goto-programs/link_to_library.h>
 
-#include <pointer-analysis/value_set_analysis.h>
 #include <pointer-analysis/goto_program_dereference.h>
 #include <pointer-analysis/add_failed_symbols.h>
-#include <pointer-analysis/show_value_sets.h>
 
 #include <langapi/mode.h>
 
@@ -627,27 +625,6 @@ bool cbmc_parseoptionst::process_goto_program(
     // needs to be done before pointer analysis
     add_failed_symbols(context);
     
-    if(cmdline.isset("pointer-check") ||
-       cmdline.isset("show-value-sets"))
-    {
-      status("Pointer Analysis");
-      value_set_analysist value_set_analysis(ns);
-      value_set_analysis(goto_functions);
-
-      // show it?
-      if(cmdline.isset("show-value-sets"))
-      {
-        show_value_sets(get_ui(), goto_functions, value_set_analysis);
-        return true;
-      }
-
-      status("Adding Pointer Checks");
-
-      // add pointer checks
-      pointer_checks(
-        goto_functions, context, options, value_set_analysis);
-    }
-
     // recalculate numbers, etc.
     goto_functions.update();
 

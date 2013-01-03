@@ -29,6 +29,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "base_type.h"
 #include "namespace.h"
 #include "threeval.h"
+#include "pointer_predicates.h"
+#include "prefix.h"
 
 //#define DEBUGX
 
@@ -3572,6 +3574,28 @@ bool simplify_exprt::simplify_object(exprt &expr)
       }
     }
   }
+  else if(expr.id()==ID_address_of)
+  {
+    if(expr.operands().size()==1)
+    {
+      if(expr.op0().id()==ID_index && expr.op0().operands().size()==2)
+      {
+        // &some[i] -> &some
+        address_of_exprt new_expr(expr.op0().op0());
+        expr.swap(new_expr);
+        simplify_object(expr); // recursion
+        return false;
+      }
+      else if(expr.op0().id()==ID_member && expr.op0().operands().size()==1)
+      {
+        // &some.f -> &some
+        address_of_exprt new_expr(expr.op0().op0());
+        expr.swap(new_expr);
+        simplify_object(expr); // recursion
+        return false;
+      }
+    }
+  }
 
   return true;
 }
@@ -3615,7 +3639,80 @@ bool simplify_exprt::simplify_dynamic_object(exprt &expr)
   
   exprt &op=expr.op0();
   
-  return simplify_object(op);
+  bool result=true;
+  
+  if(!simplify_object(op)) result=false;
+
+  // NULL is not dynamic
+  if(op.id()==ID_constant && op.get(ID_value)==ID_NULL)
+  {
+    expr.make_false();
+    return false;
+  }  
+
+  // &something depends on the something
+  if(op.id()==ID_address_of && op.operands().size()==1)
+  {
+    if(op.op0().id()==ID_symbol)
+    {
+      const irep_idt identifier=to_symbol_expr(op.op0()).get_identifier();
+
+      // this is for the benefit of symex
+      expr.make_bool(has_prefix(id2string(identifier), "symex_dynamic::"));
+      return false;
+    }
+    else if(op.op0().id()==ID_string_constant)
+    {
+      expr.make_false();
+      return false;
+    }
+    else if(op.op0().id()==ID_array)
+    {
+      expr.make_false();
+      return false;
+    }
+  }
+  
+  return result;
+}
+
+/*******************************************************************\
+
+Function: simplify_exprt::simplify_invalid_pointer
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool simplify_exprt::simplify_invalid_pointer(exprt &expr)
+{
+  if(expr.operands().size()!=1) return true;
+  
+  exprt &op=expr.op0();
+  
+  bool result=true;
+  
+  if(!simplify_object(op)) result=false;
+
+  // NULL is not invalid
+  if(op.id()==ID_constant && op.get(ID_value)==ID_NULL)
+  {
+    expr.make_false();
+    return false;
+  }  
+  
+  // &anything is not invalid
+  if(op.id()==ID_address_of)
+  {
+    expr.make_false();
+    return false;
+  }  
+  
+  return result;
 }
 
 /*******************************************************************\
@@ -3641,6 +3738,14 @@ tvt simplify_exprt::objects_equal(const exprt &a, const exprt &b)
   if(a.id()==ID_constant && b.id()==ID_constant &&
      a.get(ID_value)==ID_NULL && b.get(ID_value)==ID_NULL)
     return tvt(true);
+
+  if(a.id()==ID_constant && b.id()==ID_address_of &&
+     a.get(ID_value)==ID_NULL)
+    return tvt(false);
+
+  if(b.id()==ID_constant && a.id()==ID_address_of &&
+     b.get(ID_value)==ID_NULL)
+    return tvt(false);
 
   return tvt(tvt::TV_UNKNOWN);
 }
@@ -3695,13 +3800,23 @@ Function: simplify_exprt::simplify_same_object
 bool simplify_exprt::simplify_same_object(exprt &expr)
 {
   if(expr.operands().size()!=2) return true;
+  
+  exprt &op0=expr.op0();
+  exprt &op1=expr.op1();
 
   bool result=true;
 
-  if(!simplify_object(expr.op0())) result=false;
-  if(!simplify_object(expr.op1())) result=false;
+  if(!simplify_object(op0)) result=false;
+  if(!simplify_object(op1)) result=false;
   
-  tvt res=objects_equal(expr.op0(), expr.op1());
+  // same_object is symmetric, i.e., we order the operands
+  if(!(op0<op1))
+  {
+    op0.swap(op1);
+    result=false;
+  }
+  
+  tvt res=objects_equal(op0, op1);
 
   if(res.is_true())
   {
@@ -3714,6 +3829,62 @@ bool simplify_exprt::simplify_same_object(exprt &expr)
     return false;
   }
 
+  return result;
+}
+
+/*******************************************************************\
+
+Function: simplify_exprt::simplify_object_size
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool simplify_exprt::simplify_object_size(exprt &expr)
+{
+  if(expr.operands().size()!=1) return true;
+  
+  exprt &op=expr.op0();
+  
+  bool result=true;
+  
+  if(!simplify_object(op)) result=false;
+  
+  if(op.id()==ID_address_of && op.operands().size()==1)
+  {
+    if(op.op0().id()==ID_symbol)
+    {
+      // just get the type
+      const typet &type=ns.follow(op.op0().type());
+
+      exprt size=size_of_expr(type, ns);
+
+      if(size.is_not_nil())
+      {
+        typet type=expr.type();
+
+        if(size.type()!=type)
+        {
+          size.make_typecast(type);
+          simplify_node(size);
+        }
+
+        expr=size;
+        return false;
+      }
+    }
+    else if(op.op0().id()==ID_string_constant)
+    {
+      typet type=expr.type();
+      expr=from_integer(op.op0().get(ID_value).size()+1, type);
+      return false;
+    }
+  }
+  
   return result;
 }
 
@@ -3740,7 +3911,7 @@ bool simplify_exprt::simplify_dynamic_size(exprt &expr)
 
 /*******************************************************************\
 
-Function: simplify_exprt::simplify_valid_object
+Function: simplify_exprt::simplify_good_pointer
 
   Inputs:
 
@@ -3750,13 +3921,19 @@ Function: simplify_exprt::simplify_valid_object
 
 \*******************************************************************/
 
-bool simplify_exprt::simplify_valid_object(exprt &expr)
+bool simplify_exprt::simplify_good_pointer(exprt &expr)
 {
   if(expr.operands().size()!=1) return true;
   
-  exprt &op=expr.op0();
+  // we expand the definition
+  exprt def=good_pointer_def(expr.op0(), ns);
+
+  // recursive call
+  simplify_node(def);  
   
-  return simplify_object(op);
+  expr.swap(def);
+
+  return false;
 }
 
 /*******************************************************************\
@@ -4161,10 +4338,14 @@ bool simplify_exprt::simplify_node(exprt &expr)
     result=simplify_same_object(expr) && result;
   else if(expr.id()==ID_dynamic_object)
     result=simplify_dynamic_object(expr) && result;
+  else if(expr.id()==ID_invalid_pointer)
+    result=simplify_invalid_pointer(expr) && result;
+  else if(expr.id()==ID_object_size)
+    result=simplify_object_size(expr) && result;
   else if(expr.id()==ID_dynamic_size)
     result=simplify_dynamic_size(expr) && result;
-  else if(expr.id()==ID_valid_object)
-    result=simplify_valid_object(expr) && result;
+  else if(expr.id()==ID_good_pointer)
+    result=simplify_good_pointer(expr) && result;
   else if(expr.id()==ID_switch)
     result=simplify_switch(expr) && result;
   else if(expr.id()==ID_div)

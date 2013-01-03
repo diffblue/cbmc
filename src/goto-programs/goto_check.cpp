@@ -6,18 +6,17 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <location.h>
-#include <i2string.h>
-#include <expr_util.h>
-#include <std_types.h>
-#include <guard.h>
 #include <simplify_expr.h>
 #include <array_name.h>
-#include <arith_tools.h>
-#include <base_type.h>
 #include <ieee_float.h>
-#include <std_expr.h>
+#include <arith_tools.h>
+#include <expr_util.h>
 #include <find_symbols.h>
+#include <std_expr.h>
+#include <std_types.h>
+#include <guard.h>
+#include <base_type.h>
+#include <pointer_predicates.h>
 
 #include "goto_check.h"
 
@@ -787,62 +786,70 @@ void goto_checkt::pointer_validity_check(
   const dereference_exprt &expr,
   const guardt &guard)
 {
-  #if 0
   if(!enable_pointer_check)
     return;
 
-  const exprt &pointer_expr=expr.op0();
-  const typet &pointer_expr_type=ns.follow(pointer_expr.type());
+  const exprt &pointer=expr.op0();
+  const typet &pointer_type=to_pointer_type(ns.follow(pointer.type()));
 
-  assert(pointer_expr_type.id()==ID_pointer);
+  assert(base_type_eq(pointer_type.subtype(), expr.type(), ns));
 
-  const pointer_typet &pointer_type=to_pointer_type(pointer_expr_type);
+  #if 0
+  add_guarded_claim(
+    good_pointer(expr.pointer()),
+    "dereference failure: pointer not valid",
+    "pointer dereference",
+    expr.find_location(),
+    guard);    
+  #else
 
-  // NULL?
-  {
-    null_pointer_exprt null_pointer(pointer_type);
+  const typet &dereference_type=pointer_type.subtype();
 
-    predicate_exprt same_object(ID_same_object);
-    same_object.copy_to_operands(pointer_expr, null_pointer);
+  exprt dynamic_bounds=
+    or_exprt(dynamic_object_lower_bound(pointer),
+             dynamic_object_upper_bound(pointer, dereference_type, ns));
 
+  exprt object_bounds=
+    or_exprt(object_lower_bound(pointer),
+             object_upper_bound(pointer, dereference_type, ns));
+
+  add_guarded_claim(
+    not_exprt(null_object(pointer)),
+    "dereference failure: pointer NULL",
+    "pointer dereference",
+    expr.find_location(),
+    guard);
+
+  add_guarded_claim(
+    not_exprt(invalid_pointer(pointer)),
+    "dereference failure: pointer invalid",
+    "pointer dereference",
+    expr.find_location(),
+    guard);
+
+  add_guarded_claim(
+    or_exprt(not_exprt(dynamic_object(pointer)), not_exprt(deallocated(pointer, ns))),
+    "dereference failure: deallocated dynamic object",
+    "pointer dereference",
+    expr.find_location(),
+    guard);
+
+  if(enable_bounds_check)
     add_guarded_claim(
-      same_object,
-      "NULL pointer",
+      or_exprt(not_exprt(dynamic_object(pointer)), not_exprt(malloc_object(pointer, ns)), not_exprt(dynamic_bounds)),
+      "dereference failure: dynamic object bounds",
       "pointer dereference",
       expr.find_location(),
       guard);
-  }
-  
-  // Invalid?
-  {
-    predicate_exprt invalid_pointer("invalid-pointer");
-    invalid_pointer.copy_to_operands(pointer_expr);
 
+  if(enable_bounds_check)
     add_guarded_claim(
-      invalid_pointer,
-      "invalid pointer",
+      or_exprt(dynamic_object(pointer), not_exprt(object_bounds)),
+      "dereference failure: object bounds",
       "pointer dereference",
       expr.find_location(),
       guard);
-  }
-  
-  exprt offset=unary_exprt(
-    ID_pointer_offset, pointer_expr,
-    pointer_type.difference_type());
 
-  // lower bound is easy
-  {
-    binary_relation_exprt
-      offset_lower_bound(offset, ID_lt,
-                         gen_zero(offset.type()));
-
-    add_guarded_claim(
-      offset_lower_bound,
-      "object lower bound",
-      "pointer dereference",
-      expr.find_location(),
-      guard);
-  }
   #endif
 }
 
