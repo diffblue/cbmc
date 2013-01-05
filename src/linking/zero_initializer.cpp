@@ -216,6 +216,8 @@ exprt zero_initializert::zero_initializer_rec(
 
     union_typet::componentt component;
     bool found=false;
+    
+    // get the first non-method member
 
     for(struct_typet::componentst::const_iterator
         it=components.begin();
@@ -230,6 +232,7 @@ exprt zero_initializert::zero_initializer_rec(
       {
         component=*it;
         found=true;
+        break;
       }
     }
 
