@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <algorithm>
+
 #include <simplify_expr.h>
 #include <array_name.h>
 #include <ieee_float.h>
