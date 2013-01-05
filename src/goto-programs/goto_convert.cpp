@@ -19,6 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ansi-c/c_types.h>
 
+#include "goto_convert.h"
 #include "goto_convert_class.h"
 #include "destructor.h"
 
@@ -261,30 +262,9 @@ void goto_convertt::convert_label(
   }
   else
     convert(to_code(code.op0()), tmp);
-
-  // magic ERROR label?
-
-  const std::string &error_label=options.get_option("error-label");
-
-  goto_programt::targett target;
-
-  if(error_label!="" && label==error_label)
-  {
-    goto_programt::targett t=dest.add_instruction(ASSERT);
-    t->guard.make_false();
-    t->location=code.location();
-    t->location.set(ID_property, "error label");
-    t->location.set(ID_comment, "error label");
-    t->location.set("user-provided", true);
-
-    target=t;
-    dest.destructive_append(tmp);
-  }
-  else
-  {
-    target=tmp.instructions.begin();
-    dest.destructive_append(tmp);
-  }
+  
+  goto_programt::targett target=tmp.instructions.begin();
+  dest.destructive_append(tmp);
 
   if(!label.empty())
   {
@@ -870,9 +850,6 @@ void goto_convertt::convert_assert(
 
   clean_expr(cond, dest);
   
-  if(!options.get_bool_option("assertions"))
-    return;
-
   goto_programt::targett t=dest.add_instruction(ASSERT);
   t->guard.swap(cond);
   t->location=code.location();
@@ -2557,11 +2534,10 @@ Function: goto_convert
 void goto_convert(
   const codet &code,
   contextt &context,
-  const optionst &options,
   goto_programt &dest,
   message_handlert &message_handler)
 {
-  goto_convertt goto_convert(context, options, message_handler);
+  goto_convertt goto_convert(context, message_handler);
 
   try
   {
@@ -2601,7 +2577,6 @@ Function: goto_convert
 
 void goto_convert(
   contextt &context,
-  const optionst &options,
   goto_programt &dest,
   message_handlert &message_handler)
 {
@@ -2614,5 +2589,5 @@ void goto_convert(
   
   const symbolt &symbol=s_it->second;
   
-  ::goto_convert(to_code(symbol.value), context, options, dest, message_handler);
+  ::goto_convert(to_code(symbol.value), context, dest, message_handler);
 }

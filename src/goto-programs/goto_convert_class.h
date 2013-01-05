@@ -15,7 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <replace_expr.h>
 #include <guard.h>
 #include <std_code.h>
-#include <options.h>
 #include <message_stream.h>
 
 #include "goto_program.h"
@@ -27,11 +26,9 @@ public:
 
   goto_convertt(
     contextt &_context,
-    const optionst &_options,
     message_handlert &_message_handler):
     message_streamt(_message_handler),
     context(_context),
-    options(_options),
     ns(_context),
     temporary_counter(0),
     tmp_symbol_prefix("goto_convertt::")
@@ -44,7 +41,6 @@ public:
   
 protected:
   contextt &context;
-  const optionst &options;
   namespacet ns;
   unsigned temporary_counter;
   std::string tmp_symbol_prefix;

@@ -32,10 +32,9 @@ Function: goto_convert_functionst::goto_convert_functionst
 
 goto_convert_functionst::goto_convert_functionst(
   contextt &_context,
-  const optionst &_options,
   goto_functionst &_functions,
   message_handlert &_message_handler):
-  goto_convertt(_context, _options, _message_handler),
+  goto_convertt(_context, _message_handler),
   functions(_functions)
 {
 }
@@ -262,12 +261,11 @@ Function: goto_convert
 
 void goto_convert(
   contextt &context,
-  const optionst &options,
   goto_functionst &functions,
   message_handlert &message_handler)
 {
   goto_convert_functionst goto_convert_functions(
-    context, options, functions, message_handler);
+    context, functions, message_handler);
   
   try
   {  
@@ -308,12 +306,11 @@ Function: goto_convert
 void goto_convert(
   const irep_idt &identifier,
   contextt &context,
-  const optionst &options,
   goto_functionst &functions,
   message_handlert &message_handler)
 {
   goto_convert_functionst goto_convert_functions(
-    context, options, functions, message_handler);
+    context, functions, message_handler);
   
   try
   {  

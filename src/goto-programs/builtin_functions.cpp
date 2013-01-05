@@ -870,9 +870,6 @@ void goto_convertt::do_function_call_symbol(
       throw "`"+id2string(identifier)+"' expected to have one argument";
     }
 
-    if(!options.get_bool_option("assumptions"))
-      return;
-
     goto_programt::targett t=dest.add_instruction(ASSUME);
     t->guard=arguments.front();
     t->location=function.location();
@@ -895,9 +892,6 @@ void goto_convertt::do_function_call_symbol(
       err_location(function);
       throw "`"+id2string(identifier)+"' expected to have one argument";
     }
-
-    if(!options.get_bool_option("assertions"))
-      return;
 
     goto_programt::targett t=dest.add_instruction(ASSERT);
     t->guard=arguments.front();
@@ -925,9 +919,6 @@ void goto_convertt::do_function_call_symbol(
     
     const irep_idt description=
       get_string_constant(arguments[1]);
-
-    if(!options.get_bool_option("assertions"))
-      return;
 
     goto_programt::targett t=dest.add_instruction(ASSERT);
     t->guard=arguments[0];
@@ -1050,9 +1041,6 @@ void goto_convertt::do_function_call_symbol(
     const irep_idt description=
       "assertion "+id2string(get_string_constant(arguments[0]));
 
-    if(!options.get_bool_option("assertions"))
-      return;
-
     goto_programt::targett t=dest.add_instruction(ASSERT);
     t->guard=false_exprt();
     t->location=function.location();
@@ -1076,9 +1064,6 @@ void goto_convertt::do_function_call_symbol(
     const irep_idt description=
       "assertion "+id2string(get_string_constant(arguments[3]));
 
-    if(!options.get_bool_option("assertions"))
-      return;
-
     goto_programt::targett t=dest.add_instruction(ASSERT);
     t->guard=false_exprt();
     t->location=function.location();
@@ -1100,9 +1085,6 @@ void goto_convertt::do_function_call_symbol(
 
     const irep_idt description=
       "assertion "+id2string(get_string_constant(arguments[0]));
-
-    if(!options.get_bool_option("assertions"))
-      return;
 
     goto_programt::targett t=dest.add_instruction(ASSERT);
     t->guard=false_exprt();

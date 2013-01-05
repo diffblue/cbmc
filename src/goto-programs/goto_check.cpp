@@ -1,4 +1,4 @@
-/*******************************************************************\
+ /*******************************************************************\
 
 Module: GOTO Programs
 
@@ -39,6 +39,9 @@ public:
     enable_nan_check=_options.get_bool_option("nan-check");
     generate_all_claims=_options.get_bool_option("all-claims");
     enable_assert_to_assume=_options.get_bool_option("assert-to-assume");
+    enable_assertions=_options.get_bool_option("assertions");
+    enable_assumptions=_options.get_bool_option("assumptions");    
+    error_label=_options.get_option("error-label");
   }
 
   void goto_check(goto_programt &goto_program);
@@ -98,6 +101,9 @@ protected:
   bool enable_nan_check;
   bool generate_all_claims;
   bool enable_assert_to_assume;
+  bool enable_assertions;
+  bool enable_assumptions;
+  irep_idt error_label;
 };
 
 /*******************************************************************\
@@ -716,10 +722,76 @@ void goto_checkt::nan_check(
      expr.id()!=ID_minus)
     return;
 
-  // add nan subgoal
+  // add NaN subgoal
+  
+  exprt isnan;
+  
+  if(expr.id()==ID_div)
+  {
+    assert(expr.operands().size()==2);
 
-  exprt isnan(ID_isnan, bool_typet());
-  isnan.copy_to_operands(expr);
+    // there a two ways to get a new NaN on division:
+    // 0/0 = NaN and x/inf = NaN
+    // (note that x/0 = +-inf for x!=0 and x!=inf)
+    exprt zero_div_zero=and_exprt(
+      ieee_float_equal_exprt(expr.op0(), gen_zero(expr.op0().type())),
+      ieee_float_equal_exprt(expr.op1(), gen_zero(expr.op1().type())));
+
+    exprt div_inf=unary_exprt(ID_isinf, expr.op1(), bool_typet());
+    
+    isnan=or_exprt(zero_div_zero, div_inf);
+  }
+  else if(expr.id()==ID_mult)
+  {
+    if(expr.operands().size()>=3)
+      return nan_check(make_binary(expr), guard);
+
+    assert(expr.operands().size()==2);
+
+    // Inf * 0 is NaN
+    exprt inf_times_zero=and_exprt(
+      unary_exprt(ID_isinf, expr.op0(), bool_typet()),
+      ieee_float_equal_exprt(expr.op1(), gen_zero(expr.op1().type())));
+
+    exprt zero_times_inf=and_exprt(
+      ieee_float_equal_exprt(expr.op1(), gen_zero(expr.op1().type())),
+      unary_exprt(ID_isinf, expr.op0(), bool_typet()));
+
+    isnan=or_exprt(inf_times_zero, zero_times_inf);
+  }
+  else if(expr.id()==ID_plus)
+  {
+    if(expr.operands().size()>=3)
+      return nan_check(make_binary(expr), guard);
+
+    assert(expr.operands().size()==2);
+
+    // -inf + +inf = NaN and +inf + -inf = NaN,
+    // i.e., signs differ
+    ieee_float_spect spec=ieee_float_spect(to_floatbv_type(expr.type()));
+    exprt plus_inf=ieee_floatt::plus_infinity(spec).to_expr();
+    exprt minus_inf=ieee_floatt::minus_infinity(spec).to_expr();
+
+    isnan=or_exprt(
+      and_exprt(equal_exprt(expr.op0(), minus_inf), equal_exprt(expr.op1(), plus_inf)),
+      and_exprt(equal_exprt(expr.op0(), plus_inf), equal_exprt(expr.op1(), minus_inf)));
+  }
+  else if(expr.id()==ID_minus)
+  {
+    assert(expr.operands().size()==2);
+    // +inf - +inf = NaN and -inf - -inf = NaN,
+    // i.e., signs match
+
+    ieee_float_spect spec=ieee_float_spect(to_floatbv_type(expr.type()));
+    exprt plus_inf=ieee_floatt::plus_infinity(spec).to_expr();
+    exprt minus_inf=ieee_floatt::minus_infinity(spec).to_expr();
+
+    isnan=or_exprt(
+      and_exprt(equal_exprt(expr.op0(), plus_inf), equal_exprt(expr.op1(), plus_inf)),
+      and_exprt(equal_exprt(expr.op0(), minus_inf), equal_exprt(expr.op1(), minus_inf)));
+  }
+  else
+    assert(false);
 
   isnan.make_not();
 
@@ -1257,7 +1329,7 @@ Function: goto_checkt::goto_check
 
  Outputs:
 
- Purpose:
+ Purpose:[B
 
 \*******************************************************************/
 
@@ -1283,6 +1355,22 @@ void goto_checkt::goto_check(goto_programt &goto_program)
     
     check(i.guard);
 
+    // magic ERROR label?
+    if(error_label!=irep_idt() &&
+       std::find(i.labels.begin(), i.labels.end(), error_label)!=i.labels.end())
+    {
+      goto_program_instruction_typet type=
+        enable_assert_to_assume?ASSUME:ASSERT;
+
+      goto_programt::targett t=new_code.add_instruction(type);
+
+      t->guard=false_exprt();
+      t->location=i.location;
+      t->location.set(ID_property, "error label");
+      t->location.set(ID_comment, "error label");
+      t->location.set("user-provided", true);
+    }
+    
     if(i.is_other())
     {
       const irep_idt &statement=i.code.get(ID_statement);
@@ -1331,7 +1419,18 @@ void goto_checkt::goto_check(goto_programt &goto_program)
       // this has no successor
       assertions.clear();
     }
-    
+    else if(i.is_assert())
+    {
+      if(i.location.get_bool("user-provided") &&
+         !enable_assertions)
+        i.type=SKIP;
+    }
+    else if(i.is_assume())
+    {
+      if(!enable_assumptions)
+        i.type=SKIP;
+    }
+
     for(goto_programt::instructionst::iterator
         i_it=new_code.instructions.begin();
         i_it!=new_code.instructions.end();
