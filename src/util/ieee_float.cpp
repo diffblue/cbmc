@@ -656,7 +656,7 @@ ieee_floatt &ieee_floatt::operator /= (const ieee_floatt &other)
   // NaN/x = NaN
   if(NaN_flag) return *this;
   
-  // x/Nan = NaN
+  // x/NaN = NaN
   if(other.NaN_flag) { make_NaN(); return *this; }
   
   // 0/0 = NaN
