@@ -342,8 +342,6 @@ Function: gcc_modet::gcc_hybrid_binary
 
 int gcc_modet::gcc_hybrid_binary(const cmdlinet::argst &input_files)
 {
-  #ifdef __linux__
-  
   if(input_files.empty())
     return 0;
 
@@ -427,6 +425,7 @@ int gcc_modet::gcc_hybrid_binary(const cmdlinet::argst &input_files)
       it!=output_files.end();
       it++)
   {
+    #ifdef __linux__
     debug("merging "+*it);
 
     if(!cmdline.isset('c'))
@@ -454,30 +453,47 @@ int gcc_modet::gcc_hybrid_binary(const cmdlinet::argst &input_files)
     run(objcopy_argv[0], objcopy_argv);
 
     remove(saved.c_str());    
+
+    #elif defined(__APPLE__)
+    // Mac
+
+    for(std::list<std::string>::const_iterator
+        it=output_files.begin();
+        it!=output_files.end();
+        it++)
+    {
+      debug("merging "+*it);
+
+      std::vector<std::string> lipo_argv;
+    
+      // now add goto-binary as hppa7100LC section  
+      std::string saved=*it+".goto-cc-saved";
+
+      lipo_argv.push_back("lipo");
+      lipo_argv.push_back(*it);
+      lipo_argv.push_back("-create");
+      lipo_argv.push_back("-arch");
+      lipo_argv.push_back("hppa7100LC");
+      lipo_argv.push_back(saved);
+      lipo_argv.push_back("-output");
+      lipo_argv.push_back(*it);
+      
+      run(lipo_argv[0], lipo_argv);
+
+      remove(saved.c_str());    
+    }
+    
+    return 0;
+    
+    #else
+    
+    error("binary merging not implemented for this architecture");
+    return 1;
+
+    #endif
   }
   
   return result!=0;
-  
-  #else
-
-  // Mac
-  #if 0
-    std::vector<std::string> ld_argv;
-  
-    ld_argv.push_back("ld");
-    ld_argv.push_back("-sectcreate");
-    ld_argv.push_back("__TEXT");
-    ld_argv.push_back("goto-cc");
-    ld_argv.push_back(saved);
-    ld_argv.push_back("-o");
-    ld_argv.push_back(*it);
-    
-    run(ld_argv[0], ld_argv);
-  #endif
-  
-  return 0;
-
-  #endif
 }
 
 /*******************************************************************\
