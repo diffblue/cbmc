@@ -520,6 +520,11 @@ void c_typecheck_baset::do_designated_initializer(
         return; // done
       }
     }
+
+    assert(type.id()==ID_struct ||
+           type.id()==ID_union ||
+           type.id()==ID_array ||
+           type.id()==ID_vector);
     
     // we are initializing a compound type, and enter it!
     designator_enter(type, designator);
