@@ -1716,7 +1716,11 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
     err_location(e);
     str << "invalid implicit conversion from `"
         << to_string(e.type()) << "' to `"
-        << to_string(type) << "' ";
+        << to_string(type) << "'";
+    #if 0
+    str << "\n " << follow(e.type()).pretty() << std::endl;
+    str << "\n " << type.pretty() << std::endl;
+    #endif
     throw 0;
   }
 }
@@ -2214,16 +2218,16 @@ bool cpp_typecheckt::static_typecast(
     return true;
   }
 
-  if (follow(type).id()==ID_c_enum
-         && (e.type().id()==ID_signedbv
+  if(follow(type).id()==ID_c_enum && (
+                e.type().id()==ID_signedbv
              || e.type().id()==ID_unsignedbv
              || follow(e.type()).id()==ID_c_enum))
   {
-     new_expr = e;
-     new_expr.make_typecast(type);
-     if(new_expr.get_bool(ID_C_lvalue))
-       new_expr.remove(ID_C_lvalue);
-     return true;
+    new_expr = e;
+    new_expr.make_typecast(type);
+    if(new_expr.get_bool(ID_C_lvalue))
+      new_expr.remove(ID_C_lvalue);
+    return true;
   }
 
   if(implicit_conversion_sequence(e, type, new_expr))
