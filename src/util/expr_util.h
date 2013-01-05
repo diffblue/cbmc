@@ -29,10 +29,6 @@ exprt gen_zero(const typet &type);
 exprt gen_one(const typet &type);
 /*! \copydoc gen_zero(const typet &) */
 exprt gen_not(const exprt &op);
-/*! \copydoc gen_zero(const typet &) */
-//exprt gen_unary(const irep_idt &id, const typet &type, const exprt &op);
-/*! \copydoc gen_zero(const typet &) */
-//exprt gen_binary(const irep_idt &id, const typet &type, const exprt &op1, const exprt &op2);
 
 /*! \copydoc gen_zero(const typet &) */
 void gen_and(exprt &expr);
@@ -45,5 +41,5 @@ symbol_exprt symbol_expr(const symbolt &symbol);
 /*! \copydoc gen_zero(const typet &) */
 void make_next_state(exprt &expr);
 
-/*! \copydoc gen_zero(const typet &) */
+/*! \copydoc splits an expression with >=3 operands into nested binary expressions */
 exprt make_binary(const exprt &src);
