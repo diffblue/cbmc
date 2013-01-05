@@ -1088,8 +1088,7 @@ Function: compilet::convert_symbols
 
 void compilet::convert_symbols(goto_functionst &dest)
 {
-  goto_convert_functionst converter(context, options, dest,
-                                    ui_message_handler);
+  goto_convert_functionst converter(context, dest, ui_message_handler);
 
   // the compilation may add symbols!
 

@@ -471,15 +471,12 @@ bool cbmc_parseoptionst::get_goto_program(
 
       status("Generating GOTO Program");
 
-      goto_convert(
-        context, options, goto_functions,
-        ui_message_handler);
+      goto_convert(context, goto_functions, ui_message_handler);
     }
 
     // finally add the library
     status("Adding CPROVER library");      
-    link_to_library(
-      context, goto_functions, options, ui_message_handler);
+    link_to_library(context, goto_functions, ui_message_handler);
 
     if(process_goto_program(options, goto_functions))
       return true;

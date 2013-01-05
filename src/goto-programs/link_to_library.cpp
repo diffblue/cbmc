@@ -27,7 +27,6 @@ Function: link_to_library
 void link_to_library(
   contextt &context,
   goto_functionst &goto_functions,
-  const optionst &options,
   message_handlert &message_handler)
 {
   // this needs a fixedpoint, as library functions
@@ -77,7 +76,7 @@ void link_to_library(
         it++)
     {
       if(context.symbols.find(*it)!=context.symbols.end())
-        goto_convert(*it, context, options, goto_functions, message_handler);
+        goto_convert(*it, context, goto_functions, message_handler);
         
       added_functions.insert(*it);
     }
