@@ -145,6 +145,7 @@ extern char *yyansi_ctext;
 %token TOK_CPROVER_BITVECTOR "__CPROVER_bitvector"
 %token TOK_CPROVER_ATOMIC "__CPROVER_atomic"
 %token TOK_CPROVER_BOOL "__CPROVER_bool"
+%token TOK_IMPLIES     "==>"
 %token TOK_REAL        "__real__"
 %token TOK_IMAG        "__imag__"
 %token TOK_ALIGNAS     "_Alignas"
@@ -684,16 +685,25 @@ logical_or_expression:
         { binary($$, $1, $2, ID_or, $3); }
         ;
 
-conditional_expression:
+/* This is obviously non-standard, but inspired by Spec#. */
+/* Implication is generally considered to be right-associative,
+   and binds weaker than 'OR', and stronger than bi-implication. */
+logical_implication_expression:
           logical_or_expression
-        | logical_or_expression '?' comma_expression ':' conditional_expression
+        | logical_or_expression TOK_IMPLIES logical_implication_expression
+        { binary($$, $1, $2, ID_implies, $3); }
+        ;
+
+conditional_expression:
+          logical_implication_expression
+        | logical_implication_expression '?' comma_expression ':' conditional_expression
         { $$=$2;
           stack($$).id(ID_if);
           mto($$, $1);
           mto($$, $3);
           mto($$, $5);
         }
-        | logical_or_expression '?' ':' conditional_expression
+        | logical_implication_expression '?' ':' conditional_expression
         { $$=$2;
           stack($$).id(ID_sideeffect);
           stack($$).set(ID_statement, ID_gcc_conditional_expression);

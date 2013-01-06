@@ -139,7 +139,7 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
     typecheck_expr_unary_arithmetic(expr);
   else if(expr.id()==ID_not)
     typecheck_expr_unary_boolean(expr);
-  else if(expr.id()==ID_and || expr.id()==ID_or)
+  else if(expr.id()==ID_and || expr.id()==ID_or || expr.id()==ID_implies)
     typecheck_expr_binary_boolean(expr);
   else if(expr.id()==ID_address_of)
     typecheck_expr_address_of(expr);
