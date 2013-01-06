@@ -853,6 +853,9 @@ __decltype          { if(PARSER.cpp && PARSER.mode==ansi_c_parsert::GCC)
 "__CPROVER_thread_local" { loc(); return TOK_THREAD_LOCAL; }
 "__CPROVER_bitvector" { loc(); return TOK_CPROVER_BITVECTOR; }
 "__CPROVER_bool" { loc(); return TOK_CPROVER_BOOL; }
+"==>"           { /* Non-standard, obviously. Found in Spec# syntax. */
+                  loc(); return TOK_IMPLIES;
+                }
 
 "__thread"      { if(PARSER.mode==ansi_c_parsert::GCC ||
                      PARSER.mode==ansi_c_parsert::ARM)

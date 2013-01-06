@@ -3901,7 +3901,7 @@ std::string expr2ct::convert(
     return convert_binary(src, "^", precedence=7, false);
 
   else if(src.id()==ID_implies)
-    return convert_binary(src, "=>", precedence=3, true);
+    return convert_binary(src, "==>", precedence=3, true);
 
   else if(src.id()==ID_if)
     return convert_trinary(src, "?", ":", precedence=3);
