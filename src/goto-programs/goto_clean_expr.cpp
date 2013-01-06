@@ -329,6 +329,16 @@ void goto_convertt::clean_expr(
       }
     }
   }
+  else if(expr.id()==ID_forall || expr.id()==ID_exists)
+  {
+    assert(expr.operands().size()==2);
+    // check if there are side-effects
+    goto_programt tmp;
+    clean_expr(expr.op1(), tmp, true);
+    if(tmp.instructions.empty())
+      throw "no side-effects in quantified expressions allowed";
+    return;
+  }
 
   // TODO: evaluation order
 
