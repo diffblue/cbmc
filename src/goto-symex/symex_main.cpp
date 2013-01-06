@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <std_expr.h>
 #include <rename.h>
 #include <context.h>
+#include <replace_symbol.h>
 
 #include "goto_symex.h"
 
@@ -52,21 +53,53 @@ void goto_symext::claim(
   total_claims++;
 
   exprt expr=claim_expr;
+
+  // we are willing to re-write some quantified expressions
+  rewrite_quantifiers(expr, state);
+
+  // now rename, enables propagation    
   state.rename(expr, ns);
   
-  // first try simplifier on it
+  // now try simplifier on it
   do_simplify(expr);
 
   if(expr.is_true()) return;
 
   // the simplifier might have produced new symbols,
-  // rename again
+  // rename again.
   state.rename(expr, ns);
-    
+  
   state.guard.guard_expr(expr);
   
   remaining_claims++;
   target.assertion(state.guard, expr, msg, state.source);
+}
+
+/*******************************************************************\
+
+Function: goto_symext::rewrite_quantifiers
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void goto_symext::rewrite_quantifiers(exprt &expr, statet &state)
+{
+  if(expr.id()==ID_forall)
+  {
+    // forall X. P -> P
+    // we keep the quantified variable unique by means of L2 renaming
+    assert(expr.operands().size()==2);
+    assert(expr.op0().id()==ID_symbol);
+    irep_idt identifier=to_symbol_expr(expr.op0()).get_identifier();
+    state.level2.increase_counter(state.level1(identifier));
+    exprt tmp=expr.op1();
+    expr.swap(tmp);
+  }
 }
 
 /*******************************************************************\
