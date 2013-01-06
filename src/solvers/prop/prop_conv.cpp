@@ -419,6 +419,8 @@ Function: prop_convt::set_to
 
 \*******************************************************************/
 
+#include <iostream>
+
 void prop_convt::set_to(const exprt &expr, bool value)
 {
   if(expr.type().id()!=ID_bool)
@@ -428,7 +430,7 @@ void prop_convt::set_to(const exprt &expr, bool value)
     msg+=expr.to_string();
     throw msg;
   }
-
+  
   bool boolean=true;
 
   forall_operands(it, expr)
@@ -498,16 +500,16 @@ void prop_convt::set_to(const exprt &expr, bool value)
         // set_to_false
         if(expr.id()==ID_implies) // !(a=>b)  ==  (a && !b)
         {
-          if(expr.operands().size()==2)
-          {
-            set_to_true(expr.op0());
-            set_to_false(expr.op1());
-          }
+          assert(expr.operands().size()==2);
+          set_to_true(expr.op0());
+          set_to_false(expr.op1());
+          return;
         }
         else if(expr.id()==ID_or) // !(a || b)  ==  (!a && !b)
         {
           forall_operands(it, expr)
             set_to_false(*it);
+          return;
         }
       }
     }
