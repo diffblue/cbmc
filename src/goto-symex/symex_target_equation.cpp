@@ -481,7 +481,7 @@ void symex_target_equationt::convert_assertions(
 
   if(number_of_assertions==0)
     return;
-  
+    
   if(number_of_assertions==1)
   {
     for(SSA_stepst::iterator it=SSA_steps.begin();
@@ -489,7 +489,7 @@ void symex_target_equationt::convert_assertions(
       if(it->is_assert())
       {
         prop_conv.set_to_false(it->cond_expr);
-        it->cond_literal=prop_conv.convert(it->cond_expr);
+        it->cond_literal=const_literal(false);
         return; // prevent further assumptions!
       }
       else if(it->is_assume())
