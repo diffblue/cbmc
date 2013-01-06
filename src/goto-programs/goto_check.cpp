@@ -1170,6 +1170,10 @@ void goto_checkt::check_rec(
   guardt &guard,
   bool address)
 {
+  // we don't look into quantifiers
+  if(expr.id()==ID_exists || expr.id()==ID_forall)
+    return;
+
   if(address)
   {
     if(expr.id()==ID_dereference)
