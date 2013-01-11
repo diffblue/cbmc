@@ -1,0 +1,91 @@
+<!--#include virtual="header.inc" -->
+
+<p><a href="./">CPROVER Manual TOC</a></p>
+
+<h2>Floating Point</h2>
+
+<p class="justified">CPROVER supports bit-accurate reasoning about
+  IEEE-754 floating point and fixed point arithmetic.  The C standard
+  contains a number of areas of implementation defined behaviour with
+  regard to floating point:</p>
+
+<p class="justified">
+<ul>
+<li>CPROVER supports C99 Appendix F and
+  so <code>__STD_IEC_559__</code> macro is defined.  This means that
+  the C <code>float</code> data type maps to IEEE
+  754 <code>binary32</code> and <code>double</code> maps
+  to <code>binary64</code> and operations on them are as specified in
+  IEEE 754.</li>
+<li><code>long double</code> can be configured to
+  be <code>binary64</code>, <code>binary128</code> (quad precision) or
+  a 96 bit type with 15 exponent bits and 80 significant bits.  The
+  last is an approximation of x87 extended precision double data
+  type.  The default value is matched to the build architecture.</li>
+<li>In CPROVER, floating point expressions are evaluated at the
+  'natural precision' (the greatest of the arguments) and not at a
+  higher precision.  This corresponds to <code>FLT_EVAL_METHOD</code>
+  set to <code>0</code>.  Note that this is a different policy to
+  some platforms (see below).</li>
+<li>Expression contraction (for example, converting <code>x * y +
+    c</code> to <code>fma(x,y,c)</code>) is not performed.  In effect
+    the <code>FP_CONTRACT</code> pragma is always off.</li>
+<li>Constant expressions are only evaluated at `run' time and so will
+  respect changes in the rounding mode.  In effect
+  the <code>FENV_ACCESS</code> pragma is always off.</li>
+</ul>
+</p>
+
+<h3>x86 and Other Platform Specific Issues</h3>
+
+<p class="justified">Not all platforms have the same implementation
+  defined behaviour as CPROVER.  This can cause mismatches between
+  the verification environment and the real environment.  If this
+  occurs, check the compiler manual for the choices listed above.
+  There are two common cases that can cause these problems: 32 bit
+  x86 code and the use of unsafe optimisations.</p>
+
+<p class="justified">Many compilers that target 32 bit x86 platforms
+  employ a different evaluation method.  The extended precision
+  format of the x87 unit is used for all computations regardless of
+  their native precision.  Most of the time this results in more
+  accurate results and avoiding edge cases.  However it can result in
+  some obscure and difficult to debug behaviour.  Checking
+  if the <code>FLT_EVAL_METHOD</code> macro is non-zero (for these
+  platforms it will typically be 2) should warn of these problem.
+  Changing the compiler flags to use the SSE registers will resolve
+  many of them, give a more standards compliant platform and will
+  likely perform better.  Thus it is <em>highly</em> recommended.
+  <code>-msse2 -mfpmath=sse</code> enable this option for GCC.</p>
+
+<p class="justified">The other common cause of discrepancy between
+  CPROVER results and the actual platform are the use of unsafe
+  optimisations.  Some higher optimisation levels enable
+  transformations that are unsound with respect to the IEEE-754
+  standard.  Consult the compiler manual and disable any
+  optimisations that are described as unsafe (for
+  example the GCC option <code>-ffast-math</code>).
+  <code>-mno-fused-madd</code>, <code>-frounding-math</code>
+  and <code>-fsignaling-nans</code> are needed for GCC to be strictly
+  compliant with IEEE-754.</p>
+
+<h3>Math Library</h3>
+
+<p class="justified">CPROVER implements some of <code>math.h</code>,
+  including <code>fabs</code>, <code>fpclassify</code>
+  and <code>signbit</code>.  It has very limited support for
+  elementary functions.  Care must be taken when verifying properties
+  that are dependent on these functions as the accuracy of
+  implementations can vary considerably.  The C compilers can (and
+  many do) say that the accuracy of these functions are unknown.</p>
+
+<h3>Fixed Point</h3>
+
+<p class="justified">CPROVER also has support for fixed point types.
+  The <code>--fixedbv</code> flag
+  switches <code>float</code>, <code>double</code> and <code>long
+  double</code> to fixed point types.  The length of these types is
+  platform specific.  The upper half of each type is the integer
+  component and the lower half is the fractional part.</p>
+
+<!--#include virtual="footer.inc" -->
