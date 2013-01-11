@@ -571,17 +571,31 @@ bvt float_utilst::div(const bvt &src1, const bvt &src2)
   // new sign
   result.sign=prop.lxor(unpacked1.sign, unpacked2.sign);
 
-  // infinity?
-  // in particular, inf/0=inf
-  result.infinity=prop.land(prop.lnot(unpacked1.zero),
-                  prop.land(prop.lnot(unpacked1.NaN),
-             	            unpacked2.zero));
+  // Infinity? This happens when
+  // 1) dividing a non-nan/non-zero by zero, or
+  // 2) first operand is inf and second is non-nan and non-zero
+  // In particular, inf/0=inf.
+  result.infinity=
+    prop.lor(
+      prop.land(prop.lnot(unpacked1.zero),
+      prop.land(prop.lnot(unpacked1.NaN),
+                unpacked2.zero)),
+      prop.land(unpacked1.infinity,
+      prop.land(prop.lnot(unpacked2.NaN),
+                prop.lnot(unpacked2.zero))));
 
   // NaN?
   result.NaN=prop.lor(unpacked1.NaN,
              prop.lor(unpacked2.NaN,
              prop.lor(prop.land(unpacked1.zero, unpacked2.zero),
                       prop.land(unpacked1.infinity, unpacked2.infinity))));
+
+  // Division by infinity produces zero, unless we have NaN
+  literalt force_zero=
+    prop.land(prop.lnot(unpacked1.NaN), unpacked2.infinity);
+  
+  result.fraction=bv_utils.select(force_zero,
+    bv_utils.zeros(result.fraction.size()), result.fraction);
 
   return rounder(result);
 }
