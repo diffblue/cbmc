@@ -3907,10 +3907,10 @@ std::string expr2ct::convert(
     return convert_trinary(src, "?", ":", precedence=3);
 
   else if(src.id()==ID_forall)
-    return convert_quantifier(src, "FORALL", precedence=2);
+    return convert_quantifier(src, "forall", precedence=2);
 
   else if(src.id()==ID_exists)
-    return convert_quantifier(src, "EXISTS", precedence=2);
+    return convert_quantifier(src, "exists", precedence=2);
 
   else if(src.id()=="lambda")
     return convert_quantifier(src, "LAMBDA", precedence=2);
