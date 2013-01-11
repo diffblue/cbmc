@@ -1,13 +1,13 @@
 #include <math.h>
+#include <float.h>
 #include <assert.h>
-#include <values.h>
 
 int main()
 {
   double d;
 
   // first check constants
-  assert(isnormal(MAXFLOAT));
+  assert(isnormal(FLT_MAX));
   assert(isinf(HUGE_VAL));
   assert(isinf(HUGE_VALF));
 //  assert(isinf(HUGE_VALL));
