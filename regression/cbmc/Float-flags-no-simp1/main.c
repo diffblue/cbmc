@@ -1,6 +1,6 @@
 #include <math.h>
 #include <assert.h>
-#include <vales.h>
+#include <values.h>
 
 int main()
 {
