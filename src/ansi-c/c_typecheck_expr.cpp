@@ -2156,6 +2156,14 @@ void c_typecheck_baset::do_special_functions(
       inff_expr.location()=location;
       expr.swap(inff_expr);
     }
+    else if(identifier==CPROVER_PREFIX "infl")
+    {
+      floatbv_typet type=to_floatbv_type(long_double_type());
+      constant_exprt infl_expr=
+        ieee_floatt::plus_infinity(ieee_float_spect(type)).to_expr();
+      infl_expr.location()=location;
+      expr.swap(infl_expr);
+    }
     else if(identifier==CPROVER_PREFIX "abs" ||
             identifier==CPROVER_PREFIX "labs" ||
             identifier==CPROVER_PREFIX "fabs" ||
