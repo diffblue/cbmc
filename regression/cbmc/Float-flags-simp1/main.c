@@ -35,6 +35,8 @@ int main()
   assert(isnan(NAN*d));
   assert(isnan(NAN*INFINITY));
   assert(isnan(INFINITY*0));
+  assert(signbit(1.0*-0.0));
+  assert(!signbit(1.0*0.0));
 
   // check /
   assert(isnan(INFINITY/INFINITY));
@@ -42,10 +44,13 @@ int main()
   assert(isinf(INFINITY/0));
   assert(0.0/INFINITY==0);
   assert(1.0/INFINITY==0);
+  assert(signbit(-1.0/INFINITY));
+  assert(signbit(1.0/-INFINITY));
   assert(isinf(INFINITY/2));
   assert(INFINITY/-2<0);
   assert(isinf(1.0/0.0));
   assert(isnan(0.0/0.0));
   assert(isnan(NAN/d));
   assert(isnan(NAN/INFINITY));
+  assert(signbit(-0.0/1));
 }
