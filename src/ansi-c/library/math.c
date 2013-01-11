@@ -98,6 +98,22 @@ float __builtin_inff(void) { return __CPROVER_inff(); }
 
 double __builtin_inf(void) { return __CPROVER_inf(); }
 
+/* FUNCTION: __builtin_infl */
+
+long double __builtin_infl(void) { return __CPROVER_infl(); }
+
+/* FUNCTION: __builtin_huge_valf */
+
+float __builtin_huge_valf(void) { return __CPROVER_inff(); }
+
+/* FUNCTION: __builtin_huge_val */
+
+double __builtin_huge_val(void) { return __CPROVER_inf(); }
+
+/* FUNCTION: __builtin_huge_vall */
+
+long double __builtin_huge_vall(void) { return __CPROVER_infl(); }
+
 /* FUNCTION: signbit */
 
 inline int signbit(double d) { return __CPROVER_sign(d); }
@@ -282,6 +298,7 @@ long double cosl(long double x)
 
 float cosf(float x)
 {
+__CPROVER_hide:;
   // gross over-approximation
   float ret;
 
@@ -297,3 +314,24 @@ float cosf(float x)
   return ret;
 }
 
+/* FUNCTION: __builtin_nan */
+
+double __builtin_nan(const char *str)
+{
+  // the 'str' argument is not yet used
+__CPROVER_hide:;
+  double result;
+  __CPROVER_assume(__CPROVER_isnan(result));
+  return result;
+}
+
+/* FUNCTION: __builtin_nanf */
+
+float __builtin_nanf(const char *str)
+{
+  // the 'str' argument is not yet used
+__CPROVER_hide:;
+  float result;
+  __CPROVER_assume(__CPROVER_isnan(result));
+  return result;
+}
