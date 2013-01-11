@@ -27,6 +27,9 @@ We assume that you have a Debian/Ubuntu-like distribution.
 
    apt-get install g++ gcc flex bison make subversion libz-dev libwww-perl
 
+   WARNING: g++ 4.5.x has been observed to mis-optimize code in
+   MiniSat with -O3. Use a different version (or -O1).
+
 1) You need a SAT solver (in source). We recommend MiniSat2. Do
 
    cd src
@@ -78,6 +81,9 @@ Follow these instructions:
 0) You need a C/C++ compiler, Flex and Bison, GNU tar, gzip2,
    zlib, and GNU make. The GNU Make needs to be version 3.81 or higher. If
    you don't already have the above, we recommend you install Cygwin.
+
+   WARNING: g++ 4.5.x has been observed to mis-optimize code in
+   MiniSat with -O3. Use a different version (or -O1).
 
 1) You need a SAT solver (in source). We recommend MiniSat2. Using a
    browser, download from
