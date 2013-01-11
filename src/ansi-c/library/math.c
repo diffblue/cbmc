@@ -66,7 +66,7 @@ inline int __isinfl(long double d) { return __CPROVER_isinf(d); }
 
 inline int isnan(double d) { return __CPROVER_isnan(d); }
 
-/* FUNCTION: isnan */
+/* FUNCTION: __isnan */
 
 inline int __isnan(double d) { return __CPROVER_isnan(d); }
 
