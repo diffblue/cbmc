@@ -1088,12 +1088,9 @@ bool simplify_exprt::simplify_division(exprt &expr)
     {
       ieee_floatt f0(to_constant_expr(expr.op0()));
       ieee_floatt f1(to_constant_expr(expr.op1()));
-      if(!f1.is_zero())
-      {
-        f0/=f1;
-        expr=f0.to_expr();
-        return false;
-      }
+      f0/=f1;
+      expr=f0.to_expr();
+      return false;
     }
   }
 
