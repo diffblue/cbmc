@@ -39,6 +39,9 @@ int main()
   // check /
   assert(isnan(INFINITY/INFINITY));
   assert(isnan(-INFINITY/INFINITY));
+  assert(isinf(INFINITY/0));
+  assert(0.0/INFINITY==0);
+  assert(1.0/INFINITY==0);
   assert(isinf(INFINITY/2));
   assert(INFINITY/-2<0);
   assert(isinf(1.0/0.0));
