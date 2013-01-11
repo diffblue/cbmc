@@ -92,27 +92,27 @@ int isnormal(double d) { return __CPROVER_isnormal(d); }
 
 /* FUNCTION: __builtin_inff */
 
-float __builtin_inff(void) { return __CPROVER_inff(); }
+float __builtin_inff(void) { return 1.0f/0.0f; }
 
 /* FUNCTION: __builtin_inf */
 
-double __builtin_inf(void) { return __CPROVER_inf(); }
+double __builtin_inf(void) { return 1.0/0.0; }
 
 /* FUNCTION: __builtin_infl */
 
-long double __builtin_infl(void) { return __CPROVER_infl(); }
+long double __builtin_infl(void) { return 1.0l/0.0l; }
 
 /* FUNCTION: __builtin_huge_valf */
 
-float __builtin_huge_valf(void) { return __CPROVER_inff(); }
+float __builtin_huge_valf(void) { return 1.0f/0.0f; }
 
 /* FUNCTION: __builtin_huge_val */
 
-double __builtin_huge_val(void) { return __CPROVER_inf(); }
+double __builtin_huge_val(void) { return 1.0/0.0; }
 
 /* FUNCTION: __builtin_huge_vall */
 
-long double __builtin_huge_vall(void) { return __CPROVER_infl(); }
+long double __builtin_huge_vall(void) { return 1.0l/0.0l; }
 
 /* FUNCTION: signbit */
 
@@ -320,9 +320,7 @@ double __builtin_nan(const char *str)
 {
   // the 'str' argument is not yet used
 __CPROVER_hide:;
-  double result;
-  __CPROVER_assume(__CPROVER_isnan(result));
-  return result;
+  return 0.0/0.0;
 }
 
 /* FUNCTION: __builtin_nanf */
@@ -331,7 +329,5 @@ float __builtin_nanf(const char *str)
 {
   // the 'str' argument is not yet used
 __CPROVER_hide:;
-  float result;
-  __CPROVER_assume(__CPROVER_isnan(result));
-  return result;
+  return 0.0/0.0;
 }
