@@ -97,7 +97,7 @@ void bmct::cover_assertions(const goto_functionst &goto_functions)
   {
     // the following is FALSE if the bv is empty
     literalt condition=prop_conv.prop.lor(it->second);
-    cover_goals.add(condition, it->first->location.as_string());
+    cover_goals.add(condition);
   }
 
   status("Total number of coverage goals: "+i2string(cover_goals.size()));
@@ -105,15 +105,15 @@ void bmct::cover_assertions(const goto_functionst &goto_functions)
   cover_goals();
 
   // report
-  if(ui==ui_message_handlert::XML_UI)
-  {
-    std::list<cover_goalst::cover_goalt>::const_iterator g_it=
-      cover_goals.goals.begin();
+  std::list<cover_goalst::cover_goalt>::const_iterator g_it=
+    cover_goals.goals.begin();
       
-    for(goal_mapt::const_iterator
-        it=goal_map.begin();
-        it!=goal_map.end();
-        it++, g_it++)
+  for(goal_mapt::const_iterator
+      it=goal_map.begin();
+      it!=goal_map.end();
+      it++, g_it++)
+  {
+    if(ui==ui_message_handlert::XML_UI)
     {
       xmlt xml_result("result");
       xml_result.set_attribute("claim", id2string(it->first->location.get_claim()));
@@ -123,20 +123,16 @@ void bmct::cover_assertions(const goto_functionst &goto_functions)
       
       std::cout << xml_result << std::endl;
     }
-  }
-  else
-  {
-    for(std::list<cover_goalst::cover_goalt>::const_iterator
-        g_it=cover_goals.goals.begin();
-        g_it!=cover_goals.goals.end();
-        g_it++)
+    else
+    {
       if(!g_it->covered)
       {
-        warning("!! failed to cover "+g_it->description);
+        warning("!! failed to cover "+it->first->location.as_string());
       }
-
-    status("");
+    }
   }
+
+  status("");
 
   status("** Covered "+i2string(cover_goals.number_covered())+
          " of "+i2string(cover_goals.size())+" in "+

@@ -50,20 +50,16 @@ public:
   
   // managing the goals
 
-  inline void add(
-    const literalt condition,
-    const std::string &description)
+  inline void add(const literalt condition)
   {
     goals.push_back(cover_goalt());
     goals.back().condition=condition;
-    goals.back().description=description;    
   }
   
   struct cover_goalt
   {
     literalt condition;
     bool covered;
-    std::string description;
     
     cover_goalt():covered(false)
     {
