@@ -33,7 +33,7 @@ literalt boolbvt::convert_overflow(const exprt &expr)
      expr.id()==ID_overflow_minus)
   {
     if(operands.size()!=2)
-      throw "operand "+expr.id_string()+" takes two operands";
+      throw "operator "+expr.id_string()+" takes two operands";
 
     const bvt &bv0=convert_bv(operands[0]);
     const bvt &bv1=convert_bv(operands[1]);
@@ -52,7 +52,7 @@ literalt boolbvt::convert_overflow(const exprt &expr)
   else if(expr.id()==ID_overflow_mult)
   {
     if(operands.size()!=2)
-      throw "operand "+expr.id_string()+" takes two operands";
+      throw "operator "+expr.id_string()+" takes two operands";
 
     if(operands[0].type().id()!=ID_unsignedbv &&
        operands[0].type().id()!=ID_signedbv)
@@ -111,7 +111,7 @@ literalt boolbvt::convert_overflow(const exprt &expr)
   else if(expr.id()==ID_overflow_unary_minus)
   {
     if(operands.size()!=1)
-      throw "operand "+expr.id_string()+" takes one operand";
+      throw "operator "+expr.id_string()+" takes one operand";
 
     const bvt &bv=convert_bv(operands[0]);
       
@@ -124,7 +124,7 @@ literalt boolbvt::convert_overflow(const exprt &expr)
     const exprt::operandst &operands=expr.operands();
 
     if(operands.size()!=1)
-      throw "operand "+expr.id_string()+" takes one operand";
+      throw "operator "+expr.id_string()+" takes one operand";
       
     const exprt &op=operands[0];
 
