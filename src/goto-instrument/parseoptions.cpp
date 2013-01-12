@@ -24,7 +24,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/interpreter.h>
 #include <goto-programs/string_abstraction.h>
 #include <goto-programs/string_instrumentation.h>
-#include <goto-programs/loop_numbers.h>
+#include <goto-programs/loop_ids.h>
 #include <goto-programs/reachability_slicer.h>
 
 #include <pointer-analysis/value_set_analysis.h>
@@ -214,7 +214,7 @@ int goto_instrument_parseoptionst::doit()
 
     if(cmdline.isset("show-loops"))
     {
-      show_loop_numbers(get_ui(), goto_functions);
+      show_loop_ids(get_ui(), goto_functions);
       return 0;
     }
 

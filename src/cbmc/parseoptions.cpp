@@ -24,7 +24,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/interpreter.h>
 #include <goto-programs/string_abstraction.h>
 #include <goto-programs/string_instrumentation.h>
-#include <goto-programs/loop_numbers.h>
+#include <goto-programs/loop_ids.h>
 #include <goto-programs/link_to_library.h>
 
 #include <pointer-analysis/goto_program_dereference.h>
@@ -637,7 +637,7 @@ bool cbmc_parseoptionst::process_goto_program(
     // show it?
     if(cmdline.isset("show-loops"))
     {
-      show_loop_numbers(get_ui(), goto_functions);
+      show_loop_ids(get_ui(), goto_functions);
       return true;
     }
 
