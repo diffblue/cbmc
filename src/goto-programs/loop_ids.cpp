@@ -12,11 +12,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <xml_expr.h>
 #include <i2string.h>
 
-#include "loop_numbers.h"
+#include "loop_ids.h"
 
 /*******************************************************************\
 
-Function: show_loop_numbers
+Function: show_loop_ids
 
   Inputs:
 
@@ -26,7 +26,7 @@ Function: show_loop_numbers
 
 \*******************************************************************/
 
-void show_loop_numbers(
+void show_loop_ids(
   ui_message_handlert::uit ui,
   const goto_programt &goto_program)
 {
@@ -62,7 +62,7 @@ void show_loop_numbers(
 
 /*******************************************************************\
 
-Function: show_loop_numbers
+Function: show_loop_ids
 
   Inputs:
 
@@ -72,7 +72,7 @@ Function: show_loop_numbers
 
 \*******************************************************************/
 
-void show_loop_numbers(
+void show_loop_ids(
   ui_message_handlert::uit ui,
   const goto_functionst &goto_functions)
 {
@@ -80,5 +80,5 @@ void show_loop_numbers(
       it=goto_functions.function_map.begin();
       it!=goto_functions.function_map.end();
       it++)
-    show_loop_numbers(ui, it->second.body);
+    show_loop_ids(ui, it->second.body);
 }
