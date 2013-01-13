@@ -141,11 +141,16 @@ extern char *yyansi_ctext;
 %token TOK_CLRCALL     "__clrcall"
 %token TOK_FORALL      "forall"
 %token TOK_EXISTS      "exists"
+%token TOK_ACSL_FORALL "\\forall"
+%token TOK_ACSL_EXISTS "\\exists"
 %token TOK_ARRAY_OF    "array_of"
 %token TOK_CPROVER_BITVECTOR "__CPROVER_bitvector"
 %token TOK_CPROVER_ATOMIC "__CPROVER_atomic"
 %token TOK_CPROVER_BOOL "__CPROVER_bool"
 %token TOK_IMPLIES     "==>"
+%token TOK_EQUIVALENT  "<==>"
+%token TOK_TRUE        "TRUE"
+%token TOK_FALSE       "FALSE"
 %token TOK_REAL        "__real__"
 %token TOK_IMAG        "__imag__"
 %token TOK_ALIGNAS     "_Alignas"
@@ -410,6 +415,15 @@ quantifier_expression:
           mto($$, $5);
           PARSER.pop_scope();
         }
+        | TOK_ACSL_FORALL compound_scope declaration primary_expression
+        {
+          init($$);
+          stack($$).id(ID_forall);
+          stack($$).location()=stack($1).location();
+          mto($$, $3);
+          mto($$, $4);
+          PARSER.pop_scope();
+        }
         | TOK_EXISTS compound_scope '{' declaration comma_expression '}'
         {
           init($$);
@@ -417,6 +431,15 @@ quantifier_expression:
           stack($$).location()=stack($1).location();
           mto($$, $4);
           mto($$, $5);
+          PARSER.pop_scope();
+        }
+        | TOK_ACSL_EXISTS compound_scope declaration primary_expression
+        {
+          init($$);
+          stack($$).id(ID_exists);
+          stack($$).location()=stack($1).location();
+          mto($$, $3);
+          mto($$, $4);
           PARSER.pop_scope();
         }
         ;
@@ -694,16 +717,25 @@ logical_implication_expression:
         { binary($$, $1, $2, ID_implies, $3); }
         ;
 
-conditional_expression:
+/* This is obviously non-standard, but inspired by Spec#. */
+/* Bi-Implication is generally considered to be left-associative,
+   and binds weaker than '==>', and stronger than quantifiers. */
+logical_equivalence_expression:
           logical_implication_expression
-        | logical_implication_expression '?' comma_expression ':' conditional_expression
+        | logical_equivalence_expression TOK_EQUIVALENT logical_implication_expression
+        { binary($$, $1, $2, ID_equal, $3); }
+        ;
+
+conditional_expression:
+          logical_equivalence_expression
+        | logical_equivalence_expression '?' comma_expression ':' conditional_expression
         { $$=$2;
           stack($$).id(ID_if);
           mto($$, $1);
           mto($$, $3);
           mto($$, $5);
         }
-        | logical_implication_expression '?' ':' conditional_expression
+        | logical_equivalence_expression '?' ':' conditional_expression
         { $$=$2;
           stack($$).id(ID_sideeffect);
           stack($$).set(ID_statement, ID_gcc_conditional_expression);
