@@ -853,8 +853,48 @@ __decltype          { if(PARSER.cpp && PARSER.mode==ansi_c_parsert::GCC)
 "__CPROVER_thread_local" { loc(); return TOK_THREAD_LOCAL; }
 "__CPROVER_bitvector" { loc(); return TOK_CPROVER_BITVECTOR; }
 "__CPROVER_bool" { loc(); return TOK_CPROVER_BOOL; }
-"==>"           { /* Non-standard, obviously. Found in Spec# syntax. */
+
+"\x22\x00" |
+"\\forall"      { /* Non-standard, obviously. Found in ACSL syntax. */
+                  loc(); return TOK_ACSL_FORALL;
+                }
+
+"\x22\x03" |
+"\\exists"      { /* Non-standard, obviously. Found in ACSL syntax. */
+                  loc(); return TOK_ACSL_EXISTS;
+                }
+"\x21\xD2" |
+"==>"           { /* Non-standard, obviously. Found in Spec# and ACSL syntax. */
                   loc(); return TOK_IMPLIES;
+                }
+
+"\x21\xD4" |
+"<==>"          { /* Non-standard, obviously. Found in Spec# and ACSL syntax. */
+                  loc(); return TOK_EQUIVALENT;
+                }
+
+"\x22\x65"      { /* Non-standard, obviously. Found in ACSL syntax. */
+                  loc(); return TOK_GE;
+                }
+
+"\x22\x64"      { /* Non-standard, obviously. Found in ACSL syntax. */
+                  loc(); return TOK_LE;
+                }
+
+"\x22\x27"      { /* Non-standard, obviously. Found in ACSL syntax. */
+                  loc(); return TOK_ANDAND;
+                }
+
+"\x22\x28"      { /* Non-standard, obviously. Found in ACSL syntax. */
+                  loc(); return TOK_OROR;
+                }
+
+"\\true"        { /* Non-standard, obviously. Found in ACSL syntax. */
+                  loc(); return TOK_TRUE;
+                }
+
+"\\false"       { /* Non-standard, obviously. Found in ACSL syntax. */
+                  loc(); return TOK_FALSE;
                 }
 
 "__thread"      { if(PARSER.mode==ansi_c_parsert::GCC ||
