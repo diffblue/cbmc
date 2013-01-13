@@ -110,6 +110,7 @@ protected:
     exprt &expr, statet &state, bool write);
     
   void replace_array_equal(exprt &expr);
+  void adjust_float_expressions(exprt &expr);
   void trigger_auto_object(const exprt &expr, statet &state);
   void initialize_auto_object(const exprt &expr, statet &state);
   void process_array_expr(exprt &expr);
