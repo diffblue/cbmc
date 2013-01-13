@@ -52,6 +52,7 @@ public:
   bool simplify_modulo(exprt &expr);
   bool simplify_addition(exprt &expr);
   bool simplify_subtraction(exprt &expr);
+  bool simplify_floatbv_op(exprt &expr);
   bool simplify_shifts(exprt &expr);
   bool simplify_bitwise(exprt &expr);
   bool simplify_if_implies(exprt &expr, const exprt &cond, bool truth, bool &new_truth);

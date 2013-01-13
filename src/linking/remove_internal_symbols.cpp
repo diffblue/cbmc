@@ -103,6 +103,7 @@ void remove_internal_symbols(
   special.insert("c::__CPROVER_initialize");
   special.insert("c::__CPROVER_malloc_size");
   special.insert("c::__CPROVER_deallocated");
+  special.insert("c::__CPROVER_rounding_mode");
   
   for(contextt::symbolst::const_iterator
       it=context.symbols.begin();

@@ -274,6 +274,9 @@ void boolbvt::convert_bitvector(const exprt &expr, bvt &bv)
     return convert_mod(expr, bv);
   else if(expr.id()==ID_shl || expr.id()==ID_ashr || expr.id()==ID_lshr)
     return convert_shift(expr, bv);
+  else if(expr.id()==ID_floatbv_plus || expr.id()==ID_floatbv_minus ||
+          expr.id()==ID_floatbv_mult || expr.id()==ID_floatbv_div)
+    return convert_floatbv_op(expr, bv);
   else if(expr.id()==ID_concatenation)
     return convert_concatenation(expr, bv);
   else if(expr.id()==ID_replication)

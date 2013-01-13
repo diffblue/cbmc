@@ -3576,6 +3576,26 @@ std::string expr2ct::convert(
       return convert_unary(src, "+", precedence=15);
   }
 
+  else if(src.id()==ID_floatbv_plus)
+  {
+    return convert_function(src, "FLOAT+", precedence=16);
+  }  
+
+  else if(src.id()==ID_floatbv_minus)
+  {
+    return convert_function(src, "FLOAT-", precedence=16);
+  }  
+
+  else if(src.id()==ID_floatbv_mult)
+  {
+    return convert_function(src, "FLOAT*", precedence=16);
+  }  
+
+  else if(src.id()==ID_floatbv_div)
+  {
+    return convert_function(src, "FLOAT/", precedence=16);
+  }  
+
   else if(src.id()==ID_invalid_pointer)
   {
     return convert_function(src, "INVALID-POINTER", precedence=16);

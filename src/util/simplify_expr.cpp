@@ -1341,6 +1341,70 @@ bool simplify_exprt::simplify_subtraction(exprt &expr)
 
 /*******************************************************************\
 
+Function: simplify_exprt::simplify_floatbv_op
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool simplify_exprt::simplify_floatbv_op(exprt &expr)
+{
+  const typet &type=ns.follow(expr.type());
+  
+  if(type.id()!=ID_floatbv)
+    return true;
+
+  assert(expr.operands().size()==3);
+  
+  exprt op0=expr.op0();
+  exprt op1=expr.op1();
+  exprt op2=expr.op2();
+
+  assert(ns.follow(op0.type())==type);
+  assert(ns.follow(op1.type())==type);
+
+  // Remember that floating-point addition is _NOT_ associative.
+  // Thus, we don't re-sort the operands.  
+  // We only merge constants!
+  
+  if(op0.is_constant() && op1.is_constant() && op2.is_constant())
+  {
+    ieee_floatt v0(to_constant_expr(op0));
+    ieee_floatt v1(to_constant_expr(op1));
+
+    mp_integer rounding_mode;
+    if(!to_integer(op2, rounding_mode))
+    {
+      v0.rounding_mode=(ieee_floatt::rounding_modet)integer2long(rounding_mode);
+      v1.rounding_mode=v0.rounding_mode;
+      
+      ieee_floatt result=v0;
+      
+      if(expr.id()==ID_floatbv_plus)
+        result+=v1;
+      else if(expr.id()==ID_floatbv_minus)
+        result-=v1;
+      else if(expr.id()==ID_floatbv_mult)
+        result*=v1;
+      else if(expr.id()==ID_floatbv_div)
+        result/=v1;
+      else
+        assert(false);
+
+      expr=result.to_expr();
+      return false;
+    }
+  }
+
+  return true;
+}
+
+/*******************************************************************\
+
 Function: simplify_exprt::simplify_bitwise
 
   Inputs:
@@ -4364,6 +4428,11 @@ bool simplify_exprt::simplify_node(exprt &expr)
     result=simplify_subtraction(expr) && result;
   else if(expr.id()==ID_mult)
     result=simplify_multiplication(expr) && result;
+  else if(expr.id()==ID_floatbv_plus ||
+          expr.id()==ID_floatbv_minus ||
+          expr.id()==ID_floatbv_mult ||
+          expr.id()==ID_floatbv_div)
+    result=simplify_floatbv_op(expr) && result;
   else if(expr.id()==ID_unary_minus)
     result=simplify_unary_minus(expr) && result;
   else if(expr.id()==ID_unary_plus)
