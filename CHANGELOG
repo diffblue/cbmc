@@ -1,4 +1,21 @@
+4.3
+===
+
+Floating-point arithmetic now takes the rounding mode into account,
+which can be changed dynamically.
+
+goto-gcc generates hybrid executables on Linux, containing both machine
+code and the CFG.
+
+Limited support for Spec#-style quantifiers added.
+
+Pointer-checks no longer use a heavy-weight alias analysis.
+
+Limited support for some x86 and ARM inline assembly constructs.
+
+
 4.2
+===
 
 goto-cc now passes all command line options to the gcc preprocessor.
   
@@ -27,7 +44,9 @@ Numerous improvements to SMT1 and SMT2 interfaces.
 
 Support for further SAT solvers (PRECOSAT, PICOSAT, LINGELING)
 
+
 4.1
+===
 
 The support for low-level accesses to dynamically allocated data structures
 and "integer addressed memory" (usually memory-mapped I/O) has been further
@@ -38,7 +57,9 @@ the SMT1 path for Boolector and Z3 has been improved; support for MathSAT
 has been added.  In combination with the very latest version of MathSAT,
 CBMC now also supports an SMT2 flow (use --mathsat --smt2 to activate this).
 
+
 4.0
+===
 
 Better support for low-level accesses to dynamically allocated data
 structures.
