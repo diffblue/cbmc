@@ -1663,6 +1663,7 @@ void goto_convertt::convert_start_thread(
     
     goto_programt::targett goto_instruction=dest.add_instruction(GOTO);
     goto_instruction->guard=true_exprt();
+    goto_instruction->location=code.location();
 
     goto_programt tmp;
     convert(to_code(code.op0()), tmp);
