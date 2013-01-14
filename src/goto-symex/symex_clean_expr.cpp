@@ -104,15 +104,21 @@ Function: goto_symext::adjust_float_expressions
 
  Outputs:
 
- Purpose:
+ Purpose: This adds the rounding mode to floating-point operations,
+          including those in vectors and complex numbers.
 
 \*******************************************************************/
 
 void goto_symext::adjust_float_expressions(exprt &expr)
 {
-  // TODO: do same with complex and vector
+  Forall_operands(it, expr)
+    adjust_float_expressions(*it);
 
-  if(expr.type().id()==ID_floatbv)
+  const typet &type=ns.follow(expr.type());
+
+  if(type.id()==ID_floatbv ||
+     (type.id()==ID_complex &&
+      ns.follow(type.subtype()).id()==ID_floatbv))
   {
     symbol_exprt rounding_mode=
       symbol_expr(ns.lookup(CPROVER_PREFIX "rounding_mode"));
