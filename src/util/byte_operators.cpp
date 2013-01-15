@@ -48,6 +48,17 @@ Function: endianness_mapt::build_rec
 
 void endianness_mapt::build_rec(const typet &src, bool little_endian)
 {
+  if(little_endian)
+  {
+    mp_integer s=pointer_offset_size(ns, src); // error is -1
+    while(s>0)
+    {
+      map.push_back(map.size());
+      --s;
+    }
+    return;
+  }  
+
   if(src.id()==ID_symbol)
     build_rec(ns.follow(src), little_endian);
   else if(src.id()==ID_unsignedbv ||
@@ -76,7 +87,11 @@ void endianness_mapt::build_rec(const typet &src, bool little_endian)
         it=struct_type.components().begin();
         it!=struct_type.components().end();
         it++)
+    {
+      // todo: worry about non-byte granularity bitfields
+    
       build_rec(it->type(), little_endian);
+    }
   }
   else if(src.id()==ID_array)
   {
