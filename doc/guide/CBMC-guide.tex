@@ -1,0 +1,714 @@
+\documentclass{article}
+
+\newcommand{\dir}[1]{\texttt{#1}}
+\newcommand{\file}[1]{\texttt{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\prog}[1]{\texttt{#1}}
+
+\title{Begineer's Guide to CPROVER}
+\author{Martin Brain\thanks{But most of the content is from Michael Tautschnig}}
+
+\begin{document}
+
+\maketitle
+
+\section{Background Information}
+
+First off; read the CPROVER manual.  It describes how to get, build
+and use CBMC and SATABS.  This document covers the internals of the
+system and how to get started on development.
+
+
+\subsection{Documentation}
+
+Apart from the (user-orientated) CPROVER manual and this document,
+most of the rest of the documentation is inline in the code
+as \texttt{doxygen} and some comments.  A man page for CBMC, goto-cc
+and goto-instrument is contained in the \dir{doc/} directory and gives
+some options for these tools.  All of these could be improved
+and patches are very welcome.  In some cases the algorithms used are
+described in the relevant papers.
+
+\subsection{Architecture}
+
+CPROVER is structured in a similar fashion to a compiler.  It has
+language specific front-ends which perform limited syntactic analysis
+and then convert to an intermediate format.  The intermediate format
+can be output to files (this is what \texttt{goto-cc} does) and are
+(informally) referred to as ``goto binaries'' or ``goto programs''.
+The back-end are tools process this format, either directly from the
+front-end or from it's saved output.  These include a wide range of
+analysis and transformation tools (see Section \ref{section:other-apps}).
+
+\subsection{Coding Standards}
+
+CPROVER is written in a fairly minimalist subset of C++; templates and
+meta-programming are avoided except where necessary.  The standard
+library is used but in many cases there are alternatives provided in
+\dir{util/} (see Section \ref{section:util}) which are preferred.
+Boost is not used.
+
+Patches should be formatted so that code is indented with two space
+characters, not tab and wrapped to 75 or 72 columns.  Headers for
+doxygen should be given (and preferably filled!) and the author will
+be the person who first created the file.
+
+Identifiers should be lower case with underscores to separate words.
+Types (classes, structures and typedefs) names must\footnote{There are
+a couple of exceptions, including the graph classes} end with a
+\code{t}.  Types that model types (i.e. C types in the program that is
+being interpretted) are named with \code{\_typet}.
+For example \code{ui\_message\_handlert} rather than
+\code{UI\_message\_handlert} or \code{UIMessageHandler} and
+\code{union\_typet}.
+
+
+
+\subsection{How to Contribute}
+
+Fixes, changes and enhancements to the CPROVER code base should be
+developed against the \texttt{trunk} version and submitted to Daniel
+as patches produced by \texttt{diff -Naur} or \texttt{svn diff}.
+Entire applications are best developed independently (\texttt{git svn}
+is a popular choice for tracking the main trunk but also having local
+development) until it is clear what their utility, future and
+maintenance is likely to be.
+
+
+\subsection{Other Useful Code}
+\label{section:other-apps}
+
+The CPROVER subversion archive contains a number of separate
+programs.  Others are developed separately as patches or separate
+branches.%  New applications are initially developed in their version
+%control system and may be merged into the main subversion system
+%depending on their utility, popularity and maintenance.
+Interfaces are have been and are continuing to stablise but older code
+may require work to compile and function correctly.
+
+In the main archive:
+
+\begin{description}
+  \item[\prog{CBMC}]{A bounded model checking tool for C and C++. See
+    Section \ref{section:CBMC}.}
+  \item[\prog{goto-cc}]{A drop-in, flag compatable replacement for GCC
+    and other compilers that produces goto-programs rather than
+    executable binaries.  See Section \ref{section:goto-cc}.}
+  \item[\prog{goto-instrument}]{A collection of functions for
+    instrumenting and modifying goto-programs.  See Section
+    \ref{section:goto-instrument}.}
+\end{description}
+
+Model checkers and similar tools:
+
+\begin{description}
+  \item[\prog{SatABS}]{A CEGAR model checker using predicate
+    abstraction.  Is roughly 10,000 lines of code (on top of the CPROVER
+    code base) and is developed in its own subversion archive.  It
+    uses an external model cheker to find potentially feasible paths.
+    Key limitations are related to code with pointers and there is
+    scope for significant improvement.}
+
+  \item[\prog{Scratch}]{Alistair Donaldson's k-induction based tool.
+    The front-end is in the old project CVS and some of the
+    functionality is in \prog{goto-instrument}.}
+
+  \item[\prog{Wolverine}]{An implementation of Ken MacMillian's IMPACT
+    algorithm for sequential programs.  In the old project CVS.}
+
+  \item[\prog{C-Impact}]{An implementation of Ken MacMillian's IMPACT
+    algorithm for parallel programs.  In the old project CVS.}
+
+  \item[\prog{LoopFrog}]{A loop summarisation tool.}
+
+  \item[\prog{???}]{Christoph's termination analysiser.}
+
+\end{description}
+
+
+Test case generation:
+
+\begin{description}
+  \item[\prog{cover}]{A basic test-input generation tool.  In the old
+    project CVS.}
+
+  \item[\prog{FShell}]{A test-input generation tool that allows the
+      user to specify the desired coverage using a custom language
+      (which includes regular experessions over paths).  It uses
+      incremental SAT and is thus faster than the na\"ive ``add
+      assertions one at a time and use the counter-examples''
+      approach.  Is developed in its own subversion.}
+\end{description}
+
+
+
+Alternative front-ends and input translators:
+
+\begin{description}
+  \item[\prog{Scoot}]{A System-C to C translator.  Probably in the old
+    project CVS.}
+  
+  \item[\prog{???}]{A Simulink to C translator.  In the old project CVS.}
+
+  \item[\prog{???}]{A Verilog front-end.  In the old project CVS.}
+
+  \item[\prog{???}]{A converter from Codewarrior project files to
+    Makefiles.  In the old project CVS.}
+\end{description}
+
+
+Other tools:
+
+\begin{description}
+  \item[\prog{ai}]{Leo's hybrid abstract intepretation / CEGAR tool.}
+
+  \item[\prog{DeltaCheck?}]{Ajitha's slicing tool, aimed at locating
+    changes and differential verification.  In the old project CVS.}
+\end{description}
+
+
+There are tools based on the CPROVER framework from other research
+groups which are not listed here.
+
+
+
+
+
+
+\section{Source Walkthrough}
+
+This section walks through the code bases in a rough order of interest
+/ comprehensibility to the new developer.
+
+
+
+\subsection{\dir{doc}}
+
+At the moment just contains the CBMC man page.
+
+\subsection{\dir{regression/}}
+
+The regression tests are currently being moved from CVS.  The
+\dir{regression/} directory contains all of those that have been
+moved.  They are grouped into directories for each of the tools.  Each
+of these contains a directory per test case, containing a C or C++
+file that triggers the bug and a \file{.dsc} file that describes the
+tests, expected output and so on.  There is a Perl script,
+\file{test.pl} that is used to invoke the tests as:
+
+\begin{center}
+  \code{../test.pl -c PATH\_TO\_CBMC}
+\end{center}
+
+The \code{--help} option gives instructions for use and the format of
+the description files.
+
+
+
+\subsection{\dir{src/}}
+
+The source code is divided into a number of sub-directories, each
+containing the code for a different part of the system.  In the top
+level files there are only a few files:
+
+\begin{description}
+  \item[\file{config.inc}]{The user-editable configuration parameters
+    for the build process.  The main use of this file is setting the
+    paths for the various external SAT solvers that are used.  As
+    such, anyone building from source will likely need to edit this.}
+  \item[\file{Makefile}]{The main systems Make file.  Parallel builds
+    are supported and encouraged; please don't break them!}
+  \item[\file{common}]{System specific magic required to get the
+    system to build.  This should only need to be editted if porting
+    CBMC to a new platform / build environment.}
+  \item[\file{doxygen.cfg}]{The config file for doxygen.cfg}
+\end{description}
+
+
+
+\subsubsection{\dir{util/}}
+\label{section:util}
+
+\dir{util/} contains the low-level data structures and manipulation
+functions that are used through-out the CPROVER code-base.  For almost
+any low-level task, the code required is probably in \dir{util/}.  Key
+files include:
+
+\begin{description}
+  \item[\file{irep.h}]{This contains the definition of \code{irept},
+    the basis of many of the data structures in the project.  They
+    should not be used directly; one of the derived classes should be
+    used.  For more information see Section \ref{section:irept}.}
+  \item[\file{expr.h}]{The parent class for all of the expressions.
+    Provides a number of generic functions, \code{exprt} can be used
+    with these but when creating data, subclasses of \code{exprt}
+    should be used.}
+  \item[\file{std\_expr.h}]{Provides subclasses of \code{exprt} for
+    common kinds of expression for example \code{plus\_exprt},
+    \code{minus\_exprt}, \code{dereference\_exprt}.  These are the
+    intended interface for creating expressions.}
+  \item[\file{std\_types.h}]{Provides subclasses of \code{typet} (a
+    subclass of \code{irept}) to model C and C++ types.  This is one
+    of the prefered interfaces to \code{irept}.  The front-ends handle
+    type promotion and most coercision so the type system and checking
+    goto-programs is simplier than C.}
+  \item[\file{dstring.h}]{The CPROVER string class.  This enables
+    sharing between strings which significantly reduces the amount of
+    memory required and speeds comparison.  \code{dstring} should not
+    be used directly, \code{irep\_idt} should be used instead, which
+    (dependent on build options) is an alias for \code{dstring}.}
+  \item[\file{mp\_arith.h}]{The wrapper class for multi-precision
+    arithmetic within CPROVER.  Also see \file{arith\_tools.h}.}
+  \item[\file{ieee\_float.h}]{The arbitrary precision float model used
+    within CPROVER.  Based on \code{mp\_integer}s.}
+  \item[\file{context.h}]{A generic container for symbol table like
+    constructs such as namespaces.  Lookup gives type, location of
+    declaration, name, `pretty name', whether it is static or not.}
+  \item[\file{namespace.h}]{The preferred interface for the context
+    class.  The key function is \code{lookup} which converts a string
+    (\code{irep\_idt}) to a symbol which gives the scope of
+    declaration, type and so on.  This works for functions as well as variables.}
+\end{description}
+
+
+
+
+\subsubsection{\dir{langapi/}}
+
+This contains the basic interfaces and support classes for programming
+language front ends.  Developers only really need look at this if they
+are adding support for a new language.  It's main users are the two
+(in trunk) language front-ends; \dir{ansi-c/} and \dir{cpp/}.
+
+
+\subsubsection{\dir{ansi-c/}}
+
+Contains the front-end for ANSI C, plus a variety of common
+extensions.  This parses the file, performs some basic sanity checks
+(this is one area in which the UI could be improved; patches most
+welcome) and then produces a goto-program (see below).  The parser is
+a traditional Flex / Bison system.  
+
+\file{internal\_addition.c} contains the implementation of various
+`magic' functions that are that allow control of the analysis from the
+source code level.  These include assertions, assumptions, atomic
+blocks, memory fences and rounding modes.
+
+The \dir{library/} subdirectory contains versions of some of the C
+standard header files that make use of the CPROVER built-in
+functions.  This allows CPROVER programs to be `aware' of the
+functionality and model it correctly.  Examples include
+\file{stdio.c}, \file{string.c}, \file{setjmp.c} and various threading
+interfaces.
+
+
+\subsubsection{\dir{cpp/}}
+
+This directory contains the C++ front-end.  It supports the subset of
+C++ commonly found in embedded and system applications.
+Consequentally it doesn't have full support for templates and many of
+the more advanced and obscure C++ features.  The subset of the
+langugae that can be handled is being extended over time so bug
+reports of programs that cannot be parsed are useful.
+
+The functionality is very similar to the ANSI C front end; parsing the
+code and converting to goto-programs.  It makes use of code from
+\dir{langapi} and \dir{ansi-c}.
+
+
+
+
+\subsubsection{\dir{goto-programs/}}
+
+Goto programs are the intermediate representation of the CPROVER tool
+chain.  They are language independent and similar to many of the
+compiler intermediate languages.  Section \ref{section:goto-programs}
+describes the \code{goto\_programt} and \code{goto\_functionst} data
+structures in detail.  However it useful to understand some of the
+basic concepts.  Each function is a list of instructions, each of
+which has a type (one of 18 kinds of instruction), a code expression,
+a guard expression and potentially some targets for the next
+instruction.  They are not natively in static single-assign (SSA)
+form.  Transitions are nondeterministic (although in practise the
+guards on the transitions normally cover form a disjoint cover of all
+possibilities).  Local variables have non-deterministic values if they
+are not initialised.  Variables and data within the program is
+commonly one of three types (parameterised by width):
+\code{unsignedbv\_typet}, \code{signedbv\_typet} and
+\code{floatbv\_typet}, see \file{util/std\_types.h} for more
+information. Goto programs can be serialised in a binary (wrapped in
+ELF headers) format or in XML (see the various \code{\_serialization}
+files).
+
+
+The \prog{cbmc} option \code{--show-goto-programs} is often a
+good starting point as it outputs goto-programs in a human
+readable form.  However there are a few things to be aware of.
+Functions have an internal name (for example \code{c::f00}) and a
+`pretty name' (for example \code{f00}) and which is used depends on
+whether it is internal or being presented to the user.  The
+\code{main} method is the `logical' main which is not necessarily the
+main method from the code.  In the output \code{NONDET} is use to
+represent a nondeterministic assignment to a variable.  Likewise
+\code{IF} as a beautified \code{GOTO} instruction where the guard
+expression is used as the condition.  \code{RETURN} instructions may
+be dropped if they preceed an \code{END\_FUNCTION} instruction.  The
+comment lines are generated from the \code{locationt} field of the
+\code{instructiont} structure.
+
+\dir{goto-programs/} is one of the few places in the CPROVER codebase
+that templates are used.  The intention is to allow the general
+architecture of program and functions to be used for other
+formalisms.  At the moment most of the templates have a single
+instantiation; for example \code{goto\_functionst} and
+\code{goto\_function\_templatet} and \code{goto\_programt} and \code{goto\_program\_templatet}.
+
+
+
+\subsubsection{\dir{goto-symex/}}
+
+This directory contains a symbolic evaluation system for
+goto-programs.  This takes a goto-program and translates it to an
+equation system by traversing the program, branching and merging and
+unwinding loops as needed.  Each reverse goto has a separate counter
+(the actual counting is handled by \prog{cbmc}, see the \code{--unwind}
+and \code{--unwind-set} options).  When a counter limit
+is reach, an assertion can be added to explicitly show when analysis
+is incomplete.  The symbolic execution includes constant folding so
+loops that have a constant number of iterations will be handled
+completely (assuming the unwinding limit is sufficient).
+
+The output of the symbolic execution is a system of equations; an
+object containing a list of \code{symex\_target\_elements}, each of
+which are equalities between \prog{expr} expressions.  See
+\file{symex\_target\_equation.h}.  The output is in static, single
+assignment (SSA) form, which is \emph{not} the case for goto-programs.
+
+
+
+\subsubsection{\dir{pointer-analysis/}}
+
+To perform symbolic excution on programs with dereferencing of
+arbitrary pointers, some alias analysis is needed.
+\dir{pointer-analysis} contains the three levels of analysis; flow and
+context insensitive, context sensitive and flow and context
+sensitive.  The code needed is subtle and sophisticated and thus there
+may be bugs.
+
+
+
+
+\subsubsection{\dir{solvers/}}
+
+The \dir{solvers/} directory contains interfaces to a number of
+different decision procedures, roughly one per directory.  
+
+\begin{description}
+
+  \item[prop/]{The basic and common functionality.  The key file is
+    \file{prop\_conv.h} which defines \code{prop\_convt}.  This is the
+     base class that is used to interface to the decision procedures.
+     The key functions are \code{convert} which takes an \code{exprt}
+     and converts it to the appropriate, solver specific, data
+     structures and \code{dec\_solve} (inherited from
+     \code{decision\_proceduret}) which invokes the actual decisiion
+     procedures.  Individual decision procedures (named
+     \code{*\_dect}) objects can be created but \code{prop\_convt} is
+     the preferred interface for code that uses them.}  
+
+  \item[flattening/]{A library that converts operations to
+    bit-vectors, including calling the conversions in \dir{floatbv} as
+    necessary.  Is implemented as a simple conversion (with caching)
+    and then a post-processing function that adds extra constraints.
+    This is not used by the SMT or CVC back-ends.}  
+
+  %%%%
+
+  \item[dplib/]{Provides the \code{dplib\_dect} object which used the
+    decision procedure library from ``Decision Procedures : An
+    Algorithmic Point of View''.}  
+
+  \item[cvc/]{Provides the \code{cvc\_dect} type which interfaces to
+    the old (pre SMTLib) input format for the CVC family of solvers.
+    This format is still supported by depreciated in favour of SMTLib 2.}  
+
+  \item[smt1/]{Provides the \code{smt1\_dect} type which converts the
+    formulae to SMTLib version 1 and then invokes one of Boolector,
+    CVC3, OpenSMT, Yices, MathSAT or Z3.  Again, note that this format
+    is depreciated.}  
+
+  \item[smt2/]{Provides the \code{smt2\_dect} type which functions in
+    a similar way to \code{smt1\_dect}, calling Boolector, CVC3,
+    MathSAT, Yices or Z3.  Note that the interaction with the solver
+    is batched and uses temporary files rather than using the
+    interactive command supported by SMTLib 2.  With the \code{--fpa}
+    option, this output mode will not flatten the floating point
+    arithmetic and instead output the proposed SMTLib floating point
+    standard.}
+  
+  \item[qbf/]{Back-ends for a variety of QBF solvers.  Appears to be
+    no longer used or maintained.}
+  
+  \item[sat/]{Back-ends for a variety of SAT solvers and DIMACS
+    output.}  
+\end{description}
+
+
+
+
+
+\subsubsection{\dir{cbmc/}}
+\label{section:CBMC}
+
+This contains the first full application.  CBMC is a bounded model
+checker that uses the front ends (\dir{ansi-c}, \dir{cpp}, goto-program or others)
+to create a goto-program, \dir{goto-symex} to unwind the loops the given
+number of times and to produce and equation system and finally
+\dir{solvers} to find a counter-example (technically, \dir{goto-symex}
+is then used to construct the counter-example trace).
+
+
+
+\subsubsection{\dir{goto-cc/}}
+\label{section:goto-cc}
+
+\dir{goto-cc} is a compiler replacement that just performs the first
+step of the process; converting C or C++ programs to goto-binaries.
+It is intended to be dropped in to an existing build procedure in
+place of the compiler, thus it emulates flags that would affect the
+semantics of the code produced.  Which set of flags are emulated
+depends on the naming of the \dir{goto-cc/} binary.  If it is called
+\prog{goto-cc} then it emulates GCC flags, \prog{goto-armcc} emulates
+the ARM compiler, \prog{goto-cl} emulates VCC and \prog{goto-cw}
+emulates the Code Warrior compiler.  The output of this tool can then
+be used with \prog{cbmc} or \prog{goto-instrument}.
+
+
+
+
+\subsubsection{\dir{goto-instrument/}}
+\label{section:goto-instrument}
+
+The \dir{goto-instrument/} directory contains a number of tools, one
+per file, that are built into the \prog{goto-instrument} program.  All
+of them take in a goto-program (produced by \prog{goto-cc}) and either
+modify it or perform some analysis.  Examples include
+\file{nondet\_static.cpp} which initialises static variables to a
+non-deterministic value, \file{nondet\_volatile.cpp} which assigns
+a non-deterministic value to any volatile variable before it is read
+and \file{weak\_memory.h} which performs the necessary transformations
+to reason about weak memory models.  The exception to the ``one file
+for each piece of functionality'' rule are the program instrumentation
+options (mostly those given as ``Safety checks'' in the
+\prog{goto-instrument} help text) which are included in the
+\prog{goto-program/} directory.  An example of this is
+\file{goto-program/stack\_depth.h} and the general rule seems to be
+that transformations and instrumentation that \prog{cbmc} uses should
+be in \dir{goto-program/}, others should be in \dir{goto-instrument}.
+
+\prog{goto-instrument} is a very good template for new analysis
+tools.  New developers are advised to copy the directory, remove all
+files apart from \file{main.*}, \file{parseoptions.*} and the
+\file{Makefile} and use these as the skeleton of their application.
+The \code{doit()} method in \file{parseoptions.cpp} is the preferred
+location for the top level control for the program.
+
+
+
+\subsubsection{\dir{linking/}}
+
+Probably the code to emulate a linker.  This allows multiple `object
+files' (goto-programs) to be linked into one `executable' (another
+goto-program), thus allowing existing build systems to be used to
+build complete goto-program binaries.
+
+
+\subsubsection{\dir{big-int/}}
+
+CPROVER is distributed with its own multi-precision arithmetic
+library; mainly for historical and portability reasons.  The library is externally
+developed and thus \dir{big-int} contains the source as it is
+distributed.  This should not be used directly, see
+\file{util/mp\_arith.h} for the CPROVER interface.
+
+
+
+\subsubsection{\dir{xmllang/}}
+
+CPROVER has optional XML output for results and there is an XML format
+for goto-programs.  It is used to interface to various IDEs.  The
+\dir{xmllang/} directory contains the parser and helper functions for
+handling this format.
+
+
+
+\subsubsection{\dir{floatbv/}}
+
+This library contains the code that is used to convert floating point
+variables (\code{floatbv}) to bit vectors (\code{bv}).  This is
+referred to as `bit-blasting' and is called in the \dir{solver} code
+during conversion to SAT or SMT.  It also contains the abstraction
+code described in the FMCAD09 paper.
+
+
+
+
+
+
+
+
+\section{Data Structures}
+
+This section discusses some of the key data-structures used in the
+CPROVER codebase.
+
+\subsection{\code{irept}}
+\label{section:irept}
+
+There are a large number of kind of tree structured or tree-like data
+in CPROVER.  \code{irept} provides a single, unified representation for
+all of these, allowing structure sharing and reference counting of
+data.  As such \code{irept} is the basic unit of data in CPROVER.
+Each \code{irept} contains\footnote{Or references, if reference
+  counted data sharing is enabled.  It is enabled by default; see the
+  \code{SHARING} macro.} a basic unit of data (of type \code{dt})
+which contains four things:
+
+\begin{description}
+\item[\code{data}]{A string\footnote{When \code{USE\_DSTRING} is enabled (it
+    is by default), this is actually a \code{dstring} and thus an
+    integer which is a reference into a string table}, which is
+    returned when the \code{id()} function is used.}
+\item[\code{named\_sub}]{A map from \code{irep\_namet} (a string) to
+    an \code{irept}.  This is used for named children,
+    i.e. subexpressions, parameters, etc.}
+\item[\code{comments}]{Another map from \code{irep\_namet} to
+  \code{irept} which is used for annotations and other `non-semantic' information}
+\item[\code{sub}]{A vector of \code{irept} which is used to store
+  ordered but unnamed children.}
+\end{description}
+
+The \code{irept::pretty} function outputs the contents of an
+\code{irept} directly and can be used to understand an debug problems
+with \code{irept}s.
+
+
+On their own \code{irept}s do not ``mean'' anything; they are
+effectively generic tree nodes.  Their interpretation depends on the
+contents of result of the \code{id} function (the \code{data}) field.
+\file{util/irep\_ids.txt} contains the complete list of \code{id}
+values.  During the build process it is used to generate
+\file{util/irep\_ids.h} which gives constants for each id (named
+\code{ID\_*}).  These can then be used to identify what kind of data
+\code{irept} stores and thus what can be done with it.
+
+To simplify this process, there are a variety of classes that inherit
+from \code{irept}, roughly corresponding to the ids listed
+(i.e. \code{ID\_or} (the string \code{"or''}) corresponds to the class
+\code{or\_exprt}).  These give semantically relevant accessor
+functions for the data; effectively different APIs for the same
+underlying data structure.  None of these classes add fields (only
+methods) and so static casting can be used.  The inheritance graph of
+the subclasses of \code{irept} is a useful starting point for working
+out how to manipulate data.
+
+There are three main groups of classes (or APIs); those derived from
+\code{typet}, \code{codet} and \code{exprt} respectively.  Although
+all of these inherit from \code{irept}, these are the most abstract
+level that code should handle data.  If code is manipulating plain
+\code{irept}s then something is wrong with the architecture of the
+code.
+
+Many of the key descendent of \code{exprt} are declared in
+\file{std\_expr.h}.  All expressions have a named subfield /
+annotation which gives the type of the expression (slightly
+simplified from C/C++ as \code{unsignedbv\_typet},
+\code{signedbv\_typet}, \code{floatbv\_typet}, etc.).  All type
+conversions are explicit with an expression with \code{id() ==
+  ID\_typecast} and an `interface class' named
+\code{typecast\_exprt}.  One key descendent of \code{exprt} is
+\code{symbol\_exprt} which creates \code{irept} instances with the id
+of ``symbol''.  These are used to represent variables; the name of
+which can be found using the \code{get\_identifier} accessor function.
+
+
+\code{codet} inherits from \code{exprt} and is defined in
+\file{std\_code.h}.  They represent executable code; statements in C
+rather than expressions.  In the front-end there are versions of these
+that hold whole code blocks, but in goto-programs these have been
+flattened so that each \code{irept} represents one sequence point
+(almost one line of code / one semi-colon).  The most common
+descendents of \code{codet} are \code{code\_assignt} so a common
+pattern is to cast the \code{codet} to an assignment and then recurse
+on the expression on either side.
+
+
+
+
+
+
+\subsection{\code{goto-programs}}
+\label{section:goto-programs}
+
+The common starting point for working with goto-programs is the
+\code{read\_goto\_binary} function which populates an object of
+\code{goto\_functionst} type.  This is defined in
+\file{goto\_functions.h} and is an instantiation of the template
+\code{goto\_functions\_templatet} which is contained in
+\file{goto\_functions\_template.h}.  They are wrappers around a map from
+strings to \code{goto\_programt}'s and iteration macros are provided.
+Note that \code{goto\_function\_templatet} (no \code{s}) is defined in
+the same header as \code{goto\_functions\_templatet} and is gives the
+C type for the function and boolean which indicates whether the body
+is available (before linking this might not always be true).  Also
+note the slightly counter-intuitive naming; \code{goto\_functionst}
+instances are the top level structure representing the program and
+contain \code{goto\_programt} instances which represent the individual
+functions.  At the time of writing \code{goto\_functionst} is the only
+instantiation of the template \code{goto\_functions\_templatet} but
+other could be produced if a different data-structures / kinds of models
+were needed for functions.
+
+\code{goto\_programt} is also an instantiation of a template.  In a
+similar fashion it is \code{goto\_program\_templatet} and allows the
+types of the guard and expression used in instructions to be
+parameterised.  Again, this is currently the only use of the template.
+As such there are only really helper functions in
+\file{goto\_program.h} and thus \code{goto\_program\_template.h} is
+probably the key file that describes the representation of (C)
+functions in the goto-program format.  It is reasonably stable and
+reasonably documented and thus is a good place to start looking at the code.
+
+An instance of \code{goto\_program\_templatet} is effectively a list
+of instructions (and inner template called \code{instructiont}).  It
+is important to use the copy and insertion functions that are provided
+as iterators are used to link instructions to their predecessors and
+targets and careless manipulation of the list could break these.
+Likewise there are helper macros for iterating over the instructions
+in an instance of \code{goto\_program\_templatet} and the use of these
+is good style and strongly encouraged.
+
+Individual instructions are instances of type \code{instructiont}.
+They represent one step in the function.  Each has a type, an instance
+of \code{goto\_program\_instruction\_typet} which denotes what kind of
+instruction it is.  They can be computational (such as \code{ASSIGN}
+or \code{FUNCTION\_CALL}), logical (such as \code{ASSUME} and
+\code{ASSERT}) or informational (such as \code{LOCATION} and
+\code{DEAD}).  At the time of writing there are 18 possible values for
+\code{goto\_program\_instruction\_typet} / kinds of instruction.
+Instructions also have a guard field (the condition under which it is
+executed) and a code field (what the instruction does).  These may be
+empty depending on the kind of instruction.  In the default
+instantiations these are of type \code{exprt} and \code{codet}
+respectively and thus covered by the previous discussion of
+\code{irept} and its descendents.  The next instructions (remembering
+that transitions are guarded by non-deterministic) are given by the
+list \code{targets} (with the corresponding list of labels
+\code{labels}) and the corresponding set of previous instructions is
+get by \code{incoming\_edges}.  Finally \code{instructiont} have
+informational \code{function} and \code{location} fields that indicate
+where they are in the code.
+
+
+
+\end{document}
