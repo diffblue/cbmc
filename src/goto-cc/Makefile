@@ -12,6 +12,7 @@ OBJ += ../big-int/bigint$(OBJEXT) \
       ../linking/linking$(LIBEXT) \
       ../ansi-c/ansi-c$(LIBEXT) \
       ../xmllang/xmllang$(LIBEXT) \
+      ../assembler/assembler$(LIBEXT) \
       ../langapi/langapi$(LIBEXT)
 
 INCLUDES= -I .. -I ../util
