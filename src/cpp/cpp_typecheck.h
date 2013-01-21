@@ -397,17 +397,20 @@ protected:
     const typet &type,
     exprt &value);
 
+  static bool has_const(const typet &type);
+  static bool has_volatile(const typet &type);
+
   void typecheck_member_function(
     const irep_idt &compound_symbol,
     struct_typet::componentt  &component,
     irept &initializers,
-    typet &method_qualifier,
+    const typet &method_qualifier,
     exprt &value);
 
   void adjust_method_type(
     const irep_idt &compound_symbol,
     typet &method_type,
-    typet &type);
+    const typet &method_qualifier);
 
   // for function overloading
   irep_idt function_identifier(const typet &type);
