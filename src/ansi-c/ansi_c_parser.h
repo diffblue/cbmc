@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_SPECC_PARSER_H
-#define CPROVER_SPECC_PARSER_H
+#ifndef CPROVER_ANSI_C_PARSER_H
+#define CPROVER_ANSI_C_PARSER_H
 
 #include <assert.h>
 
