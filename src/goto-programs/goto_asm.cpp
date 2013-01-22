@@ -117,6 +117,18 @@ void goto_convertt::convert_asm(
         else
           unknown=true;
       }
+      else if(command=="xchg") // x86
+      {
+        // hack for now to recognize barrier in xchg
+        goto_programt::targett t=tmp_dest.add_instruction(OTHER);
+        t->location=code.location();
+        t->code=codet(ID_fence);
+        t->code.location()=code.location();
+        t->code.set(ID_WWfence, true);
+        t->code.set(ID_RRfence, true);
+        t->code.set(ID_RWfence, true);
+        t->code.set(ID_WRfence, true);
+      }
       else if(command=="sync") // Power
       {
         goto_programt::targett t=tmp_dest.add_instruction(OTHER);
