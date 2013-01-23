@@ -41,7 +41,7 @@ void goto_convertt::convert_asm(
     
     goto_programt tmp_dest;
     bool unknown=false;
-    bool lock_prefix=false;
+    bool x86_32_locked_atomic=false;
 
     for(std::list<assembler_parsert::instructiont>::const_iterator
         it=assembler_parser.instructions.begin();
@@ -68,11 +68,10 @@ void goto_convertt::convert_asm(
       irep_idt command;
       unsigned pos=0;
       
-      if(pos<instruction.size() &&
-         instruction[pos].id()==ID_symbol &&
-         instruction[pos].get(ID_identifier)=="lock")
+      if(instruction.front().id()==ID_symbol &&
+         instruction.front().get(ID_identifier)=="lock")
       {
-        lock_prefix=true;
+        x86_32_locked_atomic=true;
         pos++;
       }
       
@@ -80,17 +79,20 @@ void goto_convertt::convert_asm(
       if(pos==instruction.size())
         continue;
       
-      if(pos<instruction.size() &&
-         instruction[pos].id()==ID_symbol)
+      if(instruction[pos].id()==ID_symbol)
       {
         command=instruction[pos].get(ID_identifier);
         pos++;
       }
-        
-      if(command=="mfence" ||
-         command=="lfence" ||
-         command=="sfence") // x86
+
+      if(command=="xchg")
+        x86_32_locked_atomic=true;
+
+      if(x86_32_locked_atomic)
       {
+        goto_programt::targett ab=tmp_dest.add_instruction(ATOMIC_BEGIN);
+        ab->location=code.location();
+
         goto_programt::targett t=tmp_dest.add_instruction(OTHER);
         t->location=code.location();
         t->code=codet(ID_fence);
@@ -100,26 +102,11 @@ void goto_convertt::convert_asm(
         t->code.set(ID_RWfence, true);
         t->code.set(ID_WRfence, true);
       }
-      else if(command=="addl") // x86
+        
+      if(command=="mfence" ||
+         command=="lfence" ||
+         command=="sfence") // x86
       {
-        // hack for now to do lock addl as barrier
-        if(lock_prefix)
-        {
-          goto_programt::targett t=tmp_dest.add_instruction(OTHER);
-          t->location=code.location();
-          t->code=codet(ID_fence);
-          t->code.location()=code.location();
-          t->code.set(ID_WWfence, true);
-          t->code.set(ID_RRfence, true);
-          t->code.set(ID_RWfence, true);
-          t->code.set(ID_WRfence, true);
-        }
-        else
-          unknown=true;
-      }
-      else if(command=="xchg") // x86
-      {
-        // hack for now to recognize barrier in xchg
         goto_programt::targett t=tmp_dest.add_instruction(OTHER);
         t->location=code.location();
         t->code=codet(ID_fence);
@@ -193,8 +180,13 @@ void goto_convertt::convert_asm(
       else
         unknown=true; // give up
 
-      // clean up prefixes
-      lock_prefix=false;
+      if(x86_32_locked_atomic)
+      {
+        goto_programt::targett ae=tmp_dest.add_instruction(ATOMIC_END);
+        ae->location=code.location();
+
+        x86_32_locked_atomic=false;
+      }
     }
     
     if(unknown)
