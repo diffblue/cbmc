@@ -307,7 +307,6 @@ mutable             { loc(); return TOK_MUTABLE; }
 namespace           { loc(); return TOK_NAMESPACE; }
 new                 { loc(); return TOK_NEW; }
 noreturn            { /* ignore */ }
-nullptr             { loc(); return TOK_NULLPTR; } // C++11
 operator            { loc(); return TOK_OPERATOR; }
 private             { loc(); return TOK_PRIVATE; }
 protected           { loc(); return TOK_PROTECTED; }

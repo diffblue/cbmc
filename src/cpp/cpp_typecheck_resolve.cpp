@@ -1571,7 +1571,8 @@ exprt cpp_typecheck_resolvet::resolve(
       result.location()=location;
       return result;
     }
-    else if(base_name=="__nullptr") // this is c++0x
+    else if(base_name=="__nullptr" ||
+            base_name=="nullptr") // this is c++0x
     {
       constant_exprt result;
       result.set_value(ID_NULL);
