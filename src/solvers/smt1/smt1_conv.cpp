@@ -2403,21 +2403,30 @@ void smt1_convt::convert_with(const exprt &expr)
 
     if(array.id()==ID_member)
     {
-      // arrays in structs are flattened!
+      // arrays in structs and unions are flattened!
       const typet &array_type=to_array_type(expr.type());
       const typet &elem_type=array_type.subtype();
 
       const member_exprt &member_expr=to_member_expr(array);
       const exprt &struct_op=member_expr.struct_op();
       const irep_idt &name=member_expr.get_component_name();
+      
+      const typet &struct_op_type=ns.follow(struct_op.type());
 
-      unsigned total_width=boolbv_width(struct_op.type());
+      unsigned total_width=boolbv_width(struct_op_type);
       
       if(total_width==0)
         throw "failed to get struct width";
 
-      unsigned offset=boolbv_width.get_member(
-        to_struct_type(struct_op.type()), name).offset;
+      unsigned offset;
+      
+      if(struct_op_type.id()==ID_struct)
+        offset=boolbv_width.get_member(
+          to_struct_type(struct_op_type), name).offset;
+      else if(struct_op_type.id()==ID_union)
+        offset=0;
+      else
+        assert(false);
 
       unsigned width=boolbv_width(expr.type());
 
@@ -2467,6 +2476,7 @@ void smt1_convt::convert_with(const exprt &expr)
       // the new value
       smt1_prop.out << " (bvshl (zero_extend[" << array_bits-elem_width << "] ";
       convert_expr(value, true);
+
       // shift it to the index
       smt1_prop.out << ")";
       if (width>=array_index_bits)
