@@ -380,6 +380,12 @@ bool c_preprocess_visual_studio(
         it++)
       command_file << "/I" << shell_quote(*it) << std::endl;
 
+       for(std::list<std::string>::const_iterator
+               it=config.ansi_c.include_files.begin();
+               it!=config.ansi_c.include_files.end();
+               it++)
+         command_file << "/FI" << shell_quote(*it) << std::endl;
+
     // Finally, the file to be preprocessed
     // (this is already in UTF-8).
     command_file << shell_quote(file) << std::endl;
