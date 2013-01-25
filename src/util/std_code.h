@@ -487,15 +487,16 @@ public:
   {
     operands().resize(4);
   }
-  
-  inline const codet &init() const
+
+  // nil or a statement  
+  inline const exprt &init() const
   {
-    return to_code(op0());
+    return op0();
   }
 
-  inline codet &init()
+  inline exprt &init()
   {
-    return static_cast<codet &>(op0());
+    return op0();
   }
 
   inline const exprt &cond() const
