@@ -360,13 +360,13 @@ void goto_convertt::convert(
   else if(statement==ID_gcc_local_label)
     convert_gcc_local_label(code, dest);
   else if(statement==ID_for)
-    convert_for(code, dest);
+    convert_for(to_code_for(code), dest);
   else if(statement==ID_while)
-    convert_while(code, dest);
+    convert_while(to_code_while(code), dest);
   else if(statement==ID_dowhile)
     convert_dowhile(code, dest);
   else if(statement==ID_switch)
-    convert_switch(code, dest);
+    convert_switch(to_code_switch(code), dest);
   else if(statement==ID_break)
     convert_break(to_code_break(code), dest);
   else if(statement==ID_return)
@@ -382,7 +382,7 @@ void goto_convertt::convert(
   else if(statement=="non-deterministic-goto")
     convert_non_deterministic_goto(code, dest);
   else if(statement==ID_ifthenelse)
-    convert_ifthenelse(code, dest);
+    convert_ifthenelse(to_code_ifthenelse(code), dest);
   else if(statement==ID_specc_notify)
     convert_specc_notify(code, dest);
   else if(statement==ID_specc_wait)
@@ -916,15 +916,9 @@ Function: goto_convertt::convert_for
 \*******************************************************************/
 
 void goto_convertt::convert_for(
-  const codet &code,
+  const code_fort &code,
   goto_programt &dest)
 {
-  if(code.operands().size()!=4)
-  {
-    err_location(code);
-    throw "for takes four operands";
-  }
-  
   // turn for(A; c; B) { P } into
   //  A; while(c) { P; B; }
   //-----------------------------
@@ -938,13 +932,13 @@ void goto_convertt::convert_for(
 
   // A;
   code_blockt block;  
-  if(code.op0().is_not_nil())
+  if(code.init().is_not_nil())
   {
-    block.copy_to_operands(code.op0());
+    block.copy_to_operands(code.init());
     convert(block, dest);
   }
     
-  exprt cond=code.op1();
+  exprt cond=code.cond();
 
   goto_programt sideeffects;
   clean_expr(cond, sideeffects);
@@ -970,7 +964,7 @@ void goto_convertt::convert_for(
     tmp_x.add_instruction(SKIP);
   else
   {
-    exprt tmp_B=code.op2();
+    exprt tmp_B=code.iter();
 
     clean_expr(tmp_B, tmp_x, false);
 
@@ -994,7 +988,7 @@ void goto_convertt::convert_for(
 
   // do the w label
   goto_programt tmp_w;
-  convert(to_code(code.op3()), tmp_w);
+  convert(code.body(), tmp_w);
   
   // y: goto u;
   goto_programt tmp_y;
@@ -1027,16 +1021,10 @@ Function: goto_convertt::convert_while
 \*******************************************************************/
 
 void goto_convertt::convert_while(
-  const codet &code,
+  const code_whilet &code,
   goto_programt &dest)
 {
-  if(code.operands().size()!=2)
-  {
-    err_location(code);
-    throw "while takes two operands";
-  }
-
-  const exprt &cond=code.op0();
+  const exprt &cond=code.cond();
   const locationt &location=code.location();
 
   //    while(c) P;
@@ -1071,7 +1059,7 @@ void goto_convertt::convert_while(
 
   // do the x label
   goto_programt tmp_x;
-  convert(to_code(code.op1()), tmp_x);
+  convert(code.body(), tmp_x);
 
   // y: if(c) goto v;
   y->make_goto(v);
@@ -1217,7 +1205,7 @@ Function: goto_convertt::convert_switch
 \*******************************************************************/
 
 void goto_convertt::convert_switch(
-  const codet &code,
+  const code_switcht &code,
   goto_programt &dest)
 {
   // switch(v) {
@@ -1241,7 +1229,7 @@ void goto_convertt::convert_switch(
     throw "switch takes at least two operands";
   }
   
-  exprt argument=code.op0();
+  exprt argument=code.value();
 
   goto_programt sideeffects;
   clean_expr(argument, sideeffects);
@@ -2007,7 +1995,7 @@ Function: goto_convertt::convert_ifthenelse
 \*******************************************************************/
 
 void goto_convertt::convert_ifthenelse(
-  const codet &code,
+  const code_ifthenelset &code,
   goto_programt &dest)
 {
   if(code.operands().size()!=2 &&
@@ -2024,18 +2012,18 @@ void goto_convertt::convert_ifthenelse(
   const locationt &location=code.location();
 
   // convert 'then'-branch
-  goto_programt tmp_op1;
-  convert(to_code(code.op1()), tmp_op1);
+  goto_programt tmp_then;
+  convert(to_code(code.then_case()), tmp_then);
 
-  goto_programt tmp_op2;  
+  goto_programt tmp_else;
 
   if(has_else)
-    convert(to_code(code.op2()), tmp_op2);
+    convert(to_code(code.else_case()), tmp_else);
 
-  exprt tmp_guard=code.op0();
+  exprt tmp_guard=code.cond();
   clean_expr(tmp_guard, dest);
 
-  generate_ifthenelse(tmp_guard, tmp_op1, tmp_op2, location, dest);
+  generate_ifthenelse(tmp_guard, tmp_then, tmp_else, location, dest);
 }
 
 /*******************************************************************\
