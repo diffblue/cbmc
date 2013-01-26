@@ -545,7 +545,6 @@ void goto_convertt::convert_expression(
     // we do a special treatment for ?: 
     const if_exprt &if_expr=to_if_expr(expr);
     code_ifthenelset tmp_code;
-    tmp_code.operands().resize(3);
     tmp_code.location()=expr.location();
     tmp_code.cond()=if_expr.cond();
     tmp_code.then_case()=code_expressiont(if_expr.true_case());
@@ -1998,18 +1997,36 @@ void goto_convertt::convert_ifthenelse(
   const code_ifthenelset &code,
   goto_programt &dest)
 {
-  if(code.operands().size()!=2 &&
-     code.operands().size()!=3)
+  if(code.operands().size()!=3)
   {
     err_location(code);
-    throw "ifthenelse takes two or three operands";
+    throw "ifthenelse takes three operands";
   }
   
+  assert(code.then_case().is_not_nil());
+  
   bool has_else=
-    code.operands().size()==3 &&
-    !code.op2().is_nil();
+    !code.else_case().is_nil();
 
   const locationt &location=code.location();
+
+  // we do a bit of special treatment for && in the condition
+  // in case cleaning would be needed otherwise
+  if(code.cond().id()==ID_and &&
+     code.cond().operands().size()==2 &&
+     (needs_cleaning(code.cond().op0()) || needs_cleaning(code.cond().op1())) &&
+     !has_else)
+  {
+    // if(a && b) XX --> if(a) if(b) XX
+    code_ifthenelset new_if0, new_if1;
+    new_if0.cond()=code.cond().op0();
+    new_if1.cond()=code.cond().op1();
+    new_if0.location()=location;
+    new_if1.location()=location;
+    new_if1.then_case()=code.then_case();
+    new_if0.then_case()=new_if1;
+    return convert_ifthenelse(new_if0, dest);
+  }
 
   // convert 'then'-branch
   goto_programt tmp_then;

@@ -792,7 +792,6 @@ goto_programt::const_targett goto_program2codet::convert_goto_if(
   }
 
   code_ifthenelset i;
-  i.operands().resize(2);
   i.then_case()=code_blockt();
 
   // some nesting of loops and branches we might not be able to deal with
@@ -803,23 +802,22 @@ goto_programt::const_targett goto_program2codet::convert_goto_if(
 
   i.cond()=not_exprt(target->guard);
   simplify(i.cond(), ns);
+
   if(has_else)
-  {
-    i.operands().resize(3);
     i.else_case()=code_blockt();
-  }
 
   if(has_else)
   {
     for(++target; target!=before_else; ++target)
-      target=convert_instruction(target, before_else, i.then_case());
-    convert_labels(before_else, i.then_case());
+      target=convert_instruction(target, before_else, to_code(i.then_case()));
+    convert_labels(before_else, to_code(i.then_case()));
+    
     for(++target; target!=end_if; ++target)
-      target=convert_instruction(target, end_if, i.else_case());
+      target=convert_instruction(target, end_if, to_code(i.else_case()));
   }
   else
     for(++target; target!=end_if; ++target)
-      target=convert_instruction(target, end_if, i.then_case());
+      target=convert_instruction(target, end_if, to_code(i.then_case()));
 
   dest.move_to_operands(i);
   return --target;
@@ -851,8 +849,6 @@ goto_programt::const_targett goto_program2codet::convert_goto_goto(
   if(!target->guard.is_true())
   {
     code_ifthenelset i;
-    i.operands().resize(2);
-
     i.cond()=target->guard;
     i.then_case().swap(goto_code);
 
@@ -1081,13 +1077,13 @@ void goto_program2codet::cleanup_code_ifthenelse(codet &code)
   // assert(false) expands to if(true) assert(false), simplify again (and also
   // simplify other cases)
   if(i_t_e.cond().is_true() &&
-      (code.operands().size()==2 || !has_labels(i_t_e.else_case())))
+      (code.operands().size()==2 || !has_labels(to_code(i_t_e.else_case()))))
   {
     codet tmp;
     tmp.swap(i_t_e.then_case());
     code.swap(tmp);
   }
-  else if(i_t_e.cond().is_false() && !has_labels(i_t_e.then_case()))
+  else if(i_t_e.cond().is_false() && !has_labels(to_code(i_t_e.then_case())))
   {
     if(code.operands().size()==2)
       code=code_skipt();
@@ -1098,7 +1094,7 @@ void goto_program2codet::cleanup_code_ifthenelse(codet &code)
       code.swap(tmp);
     }
   }
-  else if(i_t_e.then_case().get_statement()==ID_ifthenelse)
+  else if(to_code(i_t_e.then_case()).get_statement()==ID_ifthenelse)
   {
     // we re-introduce 1-code blocks with if-then-else to avoid dangling-else
     // ambiguity

@@ -229,13 +229,12 @@ void ansi_c_convertt::convert_code(codet &code)
   }
   else if(statement==ID_ifthenelse)
   {
-    assert(code.operands().size()==2 ||
-           code.operands().size()==3);
+    assert(code.operands().size()==3);
 
     convert_expr(code.op0());
     convert_code(to_code(code.op1()));
 
-    if(code.operands().size()==3)
+    if(code.op2().is_not_nil())
       convert_code(to_code(code.op2()));
   }
   else if(statement==ID_while ||

@@ -784,9 +784,8 @@ Function: c_typecheck_baset::typecheck_ifthenelse
 
 void c_typecheck_baset::typecheck_ifthenelse(code_ifthenelset &code)
 {
-  if(code.operands().size()!=2 &&
-     code.operands().size()!=3)
-    throw "ifthenelse expected to have two or three operands";
+  if(code.operands().size()!=3)
+    throw "ifthenelse expected to have three operands";
 
   exprt &cond=code.cond();
 
@@ -805,8 +804,7 @@ void c_typecheck_baset::typecheck_ifthenelse(code_ifthenelset &code)
 
   typecheck_code(to_code(code.then_case()));
 
-  if(code.operands().size()==3 &&
-     !code.else_case().is_nil())
+  if(!code.else_case().is_nil())
     typecheck_code(to_code(code.else_case()));
 }
 

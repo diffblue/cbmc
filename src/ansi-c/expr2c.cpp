@@ -2493,8 +2493,7 @@ std::string expr2ct::convert_code_ifthenelse(
   const code_ifthenelset &src,
   unsigned indent)
 {
-  if(src.operands().size()!=3 &&
-     src.operands().size()!=2)
+  if(src.operands().size()!=3)
   {
     unsigned precedence;
     return convert_norep(src, precedence);
@@ -2509,13 +2508,13 @@ std::string expr2ct::convert_code_ifthenelse(
     dest+=";\n";
   }
   else
-    dest+=convert_code(src.then_case(), indent+2);
+    dest+=convert_code(to_code(src.then_case()), indent+2);
 
-  if(src.operands().size()==3 && !src.else_case().is_nil())
+  if(!src.else_case().is_nil())
   {
     dest+=indent_str(indent);
     dest+="else\n";
-    dest+=convert_code(src.else_case(), indent+2);
+    dest+=convert_code(to_code(src.else_case()), indent+2);
   }
 
   return dest;

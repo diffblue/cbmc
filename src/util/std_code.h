@@ -296,7 +296,9 @@ class code_ifthenelset:public codet
 public:
   inline code_ifthenelset():codet(ID_ifthenelse)
   {
-    operands().reserve(3);
+    operands().resize(3);
+    op1().make_nil();
+    op2().make_nil();
   }
   
   inline const exprt &cond() const
@@ -309,36 +311,38 @@ public:
     return op0();
   }
   
-  inline const codet &then_case() const
+  inline const exprt &then_case() const
   {
-    return to_code(op1());
+    return op1();
   }
 
-  inline const codet &else_case() const
+  inline const exprt &else_case() const
   {
-    return to_code(op2());
+    return op2();
   }
 
-  inline codet &then_case()
+  inline exprt &then_case()
   {
-    return static_cast<codet &>(op1());
+    return op1();
   }
 
-  inline codet &else_case()
+  inline exprt &else_case()
   {
-    return static_cast<codet &>(op2());
+    return op2();
   }
 };
 
 extern inline const code_ifthenelset &to_code_ifthenelse(const codet &code)
 {
-  assert(code.get_statement()==ID_ifthenelse);
+  assert(code.get_statement()==ID_ifthenelse &&
+         code.operands().size()==3);
   return static_cast<const code_ifthenelset &>(code);
 }
 
 extern inline code_ifthenelset &to_code_ifthenelse(codet &code)
 {
-  assert(code.get_statement()==ID_ifthenelse);
+  assert(code.get_statement()==ID_ifthenelse &&
+         code.operands().size()==3);
   return static_cast<code_ifthenelset &>(code);
 }
 
