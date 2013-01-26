@@ -293,6 +293,8 @@ bool Parser::rDefinition(cpp_itemt &item)
     res=rExternTemplateDecl(item.make_declaration());
   else if(t==TOK_NAMESPACE)
     res=rNamespaceSpec(item.make_namespace_spec());
+  else if(t==TOK_INLINE && lex->LookAhead(1)==TOK_NAMESPACE)
+    res=rNamespaceSpec(item.make_namespace_spec());
   else if(t==TOK_USING)
     res=rUsing(item.make_using());
   else if(t==TOK_STATIC_ASSERT)
@@ -466,14 +468,21 @@ bool Parser::rLinkageSpec(cpp_linkage_spect &linkage_spec)
 
 /*
   namespace.spec
-  : NAMESPACE Identifier definition
-  | NAMESPACE Identifier = name
-  | NAMESPACE { Identifier } linkage.body
+  : { INLINE } NAMESPACE Identifier definition
+  | { INLINE } NAMESPACE Identifier = name
+  | { INLINE } NAMESPACE { Identifier } linkage.body
 */
 
 bool Parser::rNamespaceSpec(cpp_namespace_spect &namespace_spec)
 {
   Token tk1, tk2;
+  bool is_inline=false;
+
+  if(lex->LookAhead(0)==TOK_INLINE)
+  {
+    lex->GetToken(tk1);
+    is_inline=true;
+  }
 
   if(lex->GetToken(tk1)!=TOK_NAMESPACE)
     return false;
@@ -493,6 +502,7 @@ bool Parser::rNamespaceSpec(cpp_namespace_spect &namespace_spec)
   namespace_spec=cpp_namespace_spect();
   set_location(namespace_spec, tk1);
   namespace_spec.set_namespace(name);
+  namespace_spec.set_is_inline(is_inline);
 
   switch(lex->LookAhead(0))
   {
@@ -1829,16 +1839,39 @@ bool Parser::rConstructorDecl(
 
   if(lex->LookAhead(0)=='=')
   {
-    Token eq, zero;
+    Token eq, value;
     lex->GetToken(eq);
-
-    if(lex->GetToken(zero)!=TOK_INTEGER)
+    
+    switch(lex->GetToken(value))
+    {
+    case TOK_INTEGER:
+      {
+        exprt pure_virtual(ID_code);
+        pure_virtual.set(ID_statement, "cpp-pure-virtual");
+        constructor.add(ID_value).swap(pure_virtual);
+      }
+      break;
+      
+    case TOK_DEFAULT: // C++0x
+      {
+        exprt pure_virtual(ID_code);
+        pure_virtual.set(ID_statement, ID_default);
+        constructor.add(ID_value).swap(pure_virtual);
+      }
+      break;
+    
+    case TOK_DELETE: // C++0x
+      {
+        exprt pure_virtual(ID_code);
+        pure_virtual.set(ID_statement, ID_cpp_delete);
+        constructor.add(ID_value).swap(pure_virtual);
+      }
+      break;
+    
+    default:
       return false;
+    }
 
-    exprt pure_virtual(ID_code);
-    pure_virtual.set(ID_statement, "cpp-pure-virtual");
-
-    constructor.add(ID_value).swap(pure_virtual);
   }
   else
     constructor.add(ID_value).make_nil();
@@ -5805,9 +5838,9 @@ bool Parser::rIfStatement(codet &statement)
   if(!rStatement(then))
     return false;
 
-  statement.reserve_operands(3);
-  statement.move_to_operands(exp);
-  statement.move_to_operands(then);
+  statement.operands().resize(3);
+  statement.op0().swap(exp);
+  statement.op1().swap(then);
 
   if(lex->LookAhead(0)==TOK_ELSE)
   {
@@ -5817,8 +5850,10 @@ bool Parser::rIfStatement(codet &statement)
     if(!rStatement(otherwise))
       return false;
 
-    statement.move_to_operands(otherwise);
+    statement.op2().swap(otherwise);
   }
+  else
+    statement.op2().make_nil();
 
   return true;
 }
