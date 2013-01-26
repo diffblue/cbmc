@@ -2062,9 +2062,10 @@ selection_statement:
         {
           $$=$1;
           statement($$, ID_ifthenelse);
-          stack($$).operands().reserve(2);
+          stack($$).operands().reserve(3);
           mto($$, $3);
           mto($$, $5);
+          stack($$).copy_to_operands(nil_exprt());
         }
         | TOK_IF '(' comma_expression ')' statement TOK_ELSE statement
         {
