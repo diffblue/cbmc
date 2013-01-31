@@ -41,6 +41,11 @@ public:
     return get(ID_property);
   }
 
+  inline const irep_idt &get_source() const
+  {
+    return get(ID_source);
+  }
+
   inline const irep_idt &get_comment() const
   {
     return get(ID_comment);
@@ -84,6 +89,11 @@ public:
   inline void set_property(const irep_idt &property)
   {
     set(ID_property, property);
+  }
+
+  inline void set_source(const irep_idt &source)
+  {
+    set(ID_source, source);
   }
 
   inline void set_comment(const irep_idt &comment)
