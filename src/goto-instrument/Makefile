@@ -1,14 +1,13 @@
 SRC = main.cpp parseoptions.cpp document_claims.cpp languages.cpp \
-      uninitialized.cpp uninitialized_domain.cpp full_slicer.cpp \
+      uninitialized.cpp full_slicer.cpp \
       object_id.cpp show_locations.cpp points_to.cpp \
       alignment_checks.cpp race_check.cpp rw_set.cpp \
       weak_memory.cpp nondet_volatile.cpp interrupt.cpp \
       mmio.cpp stack_depth.cpp nondet_static.cpp \
-      cfg_dominators.cpp natural_loops.cpp concurrency.cpp \
+      concurrency.cpp \
       dump_c.cpp dot.cpp \
       fence.cpp weak_memory.cpp\
-      event_graph.cpp goto2graph.cpp \
-      is_threaded.cpp
+      event_graph.cpp goto2graph.cpp
 
 OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../linking/linking$(LIBEXT) \
@@ -17,6 +16,7 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../goto-symex/goto-symex$(LIBEXT) \
       ../assembler/assembler$(LIBEXT) \
       ../pointer-analysis/pointer-analysis$(LIBEXT) \
+      ../analyses/analyses$(LIBEXT) \
       ../langapi/langapi$(LIBEXT) \
       ../util/util$(LIBEXT)
 

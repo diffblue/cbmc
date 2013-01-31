@@ -8,8 +8,7 @@ Date: October 2012
 
 \*******************************************************************/
 
-#include <goto-programs/static_analysis.h>
-
+#include "static_analysis.h"
 #include "is_threaded.h"
 
 class is_threaded_domaint:public domain_baset

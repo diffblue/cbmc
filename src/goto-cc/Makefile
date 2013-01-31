@@ -7,7 +7,6 @@ SRC = goto-cc.cpp goto_cc_mode.cpp gcc_mode.cpp \
 
 OBJ += ../big-int/bigint$(OBJEXT) \
       ../goto-programs/goto-programs$(LIBEXT) \
-      ../pointer-analysis/pointer-analysis$(LIBEXT) \
       ../util/util$(LIBEXT) \
       ../linking/linking$(LIBEXT) \
       ../ansi-c/ansi-c$(LIBEXT) \

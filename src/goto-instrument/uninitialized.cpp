@@ -12,7 +12,7 @@ Date: January 2010
 #include <std_expr.h>
 #include <context.h>
 
-#include "uninitialized_domain.h"
+#include <analyses/uninitialized_domain.h>
 
 /*******************************************************************\
 
