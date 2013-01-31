@@ -71,6 +71,7 @@ protected:
     const std::string &comment,
     const std::string &property,
     const locationt &location,
+    const exprt &src_expr,
     const guardt &guard);
   
   goto_programt new_code;
@@ -188,6 +189,7 @@ void goto_checkt::div_by_zero_check(
     "division by zero",
     "division-by-zero",
     expr.find_location(),
+    expr,
     guard);
 }
 
@@ -226,6 +228,7 @@ void goto_checkt::undefined_shift_check(
       "shift distance is negative",
       "undefined-shift",
       expr.find_location(),
+      expr,
       guard);
   }
 
@@ -248,6 +251,7 @@ void goto_checkt::undefined_shift_check(
       "shift distance too large",
       "undefined-shift",
       expr.find_location(),
+      expr,
       guard);
   }
 }
@@ -286,6 +290,7 @@ void goto_checkt::mod_by_zero_check(
     "division by zero",
     "division-by-zero",
     expr.find_location(),
+    expr,
     guard);
 }
 
@@ -350,6 +355,7 @@ void goto_checkt::integer_overflow_check(
           "arithmetic overflow on signed type conversion",
           "overflow",
           expr.find_location(),
+          expr,
           guard);
       }
       else if(old_type.id()==ID_unsignedbv)
@@ -367,6 +373,7 @@ void goto_checkt::integer_overflow_check(
           "arithmetic overflow on unsigned to signed type conversion",
           "overflow",
           expr.find_location(),
+          expr,
           guard);
       }
       else if(old_type.id()==ID_floatbv)
@@ -391,6 +398,7 @@ void goto_checkt::integer_overflow_check(
           "arithmetic overflow on float to signed integer type conversion",
           "overflow",
           expr.find_location(),
+          expr,
           guard);
       }
     }
@@ -419,6 +427,7 @@ void goto_checkt::integer_overflow_check(
         "arithmetic overflow on signed division",
         "overflow",
         expr.find_location(),
+        expr,
         guard);
     }
     
@@ -444,6 +453,7 @@ void goto_checkt::integer_overflow_check(
         "arithmetic overflow on signed unary minus",
         "overflow",
         expr.find_location(),
+        expr,
         guard);
     }
   
@@ -479,6 +489,7 @@ void goto_checkt::integer_overflow_check(
         "arithmetic overflow on "+expr.id_string(),
         "overflow",
         expr.find_location(),
+        expr,
         guard);
     }
   }
@@ -489,6 +500,7 @@ void goto_checkt::integer_overflow_check(
       "arithmetic overflow on "+expr.id_string(),
       "overflow",
       expr.find_location(),
+      expr,
       guard);
   }
 }
@@ -551,6 +563,7 @@ void goto_checkt::float_overflow_check(
           "arithmetic overflow on signed type conversion",
           "overflow",
           expr.find_location(),
+          expr,
           guard);
       }
       else if(old_type.id()==ID_unsignedbv)
@@ -568,6 +581,7 @@ void goto_checkt::float_overflow_check(
           "arithmetic overflow on unsigned to signed type conversion",
           "overflow",
           expr.find_location(),
+          expr,
           guard);
       }
       else if(old_type.id()==ID_floatbv)
@@ -592,6 +606,7 @@ void goto_checkt::float_overflow_check(
           "arithmetic overflow on float to signed integer type conversion",
           "overflow",
           expr.find_location(),
+          expr,
           guard);
       }
     }
@@ -620,6 +635,7 @@ void goto_checkt::float_overflow_check(
         "arithmetic overflow on signed division",
         "overflow",
         expr.find_location(),
+        expr,
         guard);
     }
     
@@ -645,6 +661,7 @@ void goto_checkt::float_overflow_check(
         "arithmetic overflow on signed unary minus",
         "overflow",
         expr.find_location(),
+        expr,
         guard);
     }
   
@@ -680,6 +697,7 @@ void goto_checkt::float_overflow_check(
         "arithmetic overflow on "+expr.id_string(),
         "overflow",
         expr.find_location(),
+        expr,
         guard);
     }
   }
@@ -690,6 +708,7 @@ void goto_checkt::float_overflow_check(
       "arithmetic overflow on "+expr.id_string(),
       "overflow",
       expr.find_location(),
+      expr,
       guard);
   }
   #endif
@@ -802,6 +821,7 @@ void goto_checkt::nan_check(
     "NaN on "+expr.id_string(),
     "NaN",
     expr.find_location(),
+    expr,
     guard);
 }
 
@@ -839,6 +859,7 @@ void goto_checkt::pointer_rel_check(
         "same object violation",
         "pointer",
         expr.find_location(),
+        expr,
         guard);
     }
   }
@@ -874,6 +895,7 @@ void goto_checkt::pointer_validity_check(
     "dereference failure: pointer not valid",
     "pointer dereference",
     expr.find_location(),
+    expr,
     guard);    
   #else
 
@@ -892,6 +914,7 @@ void goto_checkt::pointer_validity_check(
     "dereference failure: pointer NULL",
     "pointer dereference",
     expr.find_location(),
+    expr,
     guard);
 
   add_guarded_claim(
@@ -899,6 +922,7 @@ void goto_checkt::pointer_validity_check(
     "dereference failure: pointer invalid",
     "pointer dereference",
     expr.find_location(),
+    expr,
     guard);
 
   add_guarded_claim(
@@ -906,6 +930,7 @@ void goto_checkt::pointer_validity_check(
     "dereference failure: deallocated dynamic object",
     "pointer dereference",
     expr.find_location(),
+    expr,
     guard);
 
   if(enable_bounds_check)
@@ -914,6 +939,7 @@ void goto_checkt::pointer_validity_check(
       "dereference failure: dynamic object bounds",
       "pointer dereference",
       expr.find_location(),
+      expr,
       guard);
 
   if(enable_bounds_check)
@@ -922,6 +948,7 @@ void goto_checkt::pointer_validity_check(
       "dereference failure: object bounds",
       "pointer dereference",
       expr.find_location(),
+      expr,
       guard);
 
   #endif
@@ -1016,6 +1043,7 @@ void goto_checkt::bounds_check(
           name+" lower bound",
           "array bounds",
           expr.find_location(),
+          expr,
           guard);
       }
     }
@@ -1048,6 +1076,7 @@ void goto_checkt::bounds_check(
         name+" upper bound",
         "array bounds",
         expr.find_location(),
+        expr,
         guard);
     }
   }
@@ -1115,6 +1144,7 @@ void goto_checkt::add_guarded_claim(
   const std::string &comment,
   const std::string &property,
   const locationt &location,
+  const exprt &src_expr,
   const guardt &guard)
 {
   exprt expr(_expr);
@@ -1145,11 +1175,14 @@ void goto_checkt::add_guarded_claim(
       enable_assert_to_assume?ASSUME:ASSERT;
 
     goto_programt::targett t=new_code.add_instruction(type);
+    
+    std::string source_string=from_expr(ns, "", src_expr);
 
     t->guard.swap(new_expr);
     t->location=location;
     t->location.set_comment(comment);
     t->location.set_property(property);
+    t->location.set_source(source_string);
   }
 }
 

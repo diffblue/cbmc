@@ -48,6 +48,7 @@ void show_claims(
     const irep_idt &comment=location.get_comment();
     //const irep_idt &function=location.get_function();
     const irep_idt &property=location.get_property();
+    const irep_idt &source=location.get_source();
     const irep_idt description=
       (comment==""?"assertion":comment);
       
@@ -59,7 +60,8 @@ void show_claims(
       {
         xmlt xml_claim("claim");
         xml_claim.new_element("number").data=id2string(claim_name); // will go away
-        xml_claim.new_element("name").data=id2string(claim_name);
+        xml_claim.new_element("name").data=id2string(claim_name); // will go away
+        xml_claim.set_attribute("name", id2string(claim_name));
         
         xmlt &l=xml_claim.new_element();
         l=xml(it->location);
@@ -67,7 +69,8 @@ void show_claims(
         xml_claim.new_element("description").data=id2string(description);        
         xml_claim.new_element("property").data=id2string(property);        
         xml_claim.new_element("expression").data=from_expr(ns, identifier, it->guard);
-          
+        xml_claim.new_element("source").data=id2string(source);
+
         std::cout << xml_claim << std::endl;
       }
       break;
@@ -77,8 +80,12 @@ void show_claims(
 
       std::cout << "  " << it->location << std::endl
                 << "  " << description << std::endl
-                << "  " << from_expr(ns, identifier, it->guard) << std::endl
-                << std::endl;
+                << "  " << from_expr(ns, identifier, it->guard) << std::endl;
+
+      if(source!="")
+        std::cout << "  in \"" << source << "\"" << std::endl;
+
+      std::cout << std::endl;
       break;
 
     default:
