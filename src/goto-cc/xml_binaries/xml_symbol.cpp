@@ -39,20 +39,20 @@ void convert(const symbolt& sym, xmlt &root)
 
   xmlt &flags = xmlsym.new_element("flags");
 
-  flags.set_attribute_bool("lvalue", sym.lvalue);
-  flags.set_attribute_bool("static_lifetime", sym.static_lifetime);
-  flags.set_attribute_bool("file_local", sym.file_local);
-  flags.set_attribute_bool("theorem", sym.theorem);
-  flags.set_attribute_bool("thread_local", sym.thread_local);
+  flags.set_attribute_bool("lvalue", sym.is_lvalue);
+  flags.set_attribute_bool("static_lifetime", sym.is_static_lifetime);
+  flags.set_attribute_bool("file_local", sym.is_file_local);
+  flags.set_attribute_bool("theorem", sym.is_property);
+  flags.set_attribute_bool("thread_local", sym.is_thread_local);
   flags.set_attribute_bool("type", sym.is_type);
   flags.set_attribute_bool("extern", sym.is_extern);
   flags.set_attribute_bool("input", sym.is_input);
   flags.set_attribute_bool("output", sym.is_output);
   flags.set_attribute_bool("macro", sym.is_macro);
-  flags.set_attribute_bool("actual", sym.is_actual);
-  flags.set_attribute_bool("binding", sym.binding);
-  flags.set_attribute_bool("free_var", sym.free_var);
-  flags.set_attribute_bool("statevar", sym.is_statevar);
+  //flags.set_attribute_bool("actual", sym.is_actual);
+  //flags.set_attribute_bool("binding", sym.binding);
+  //flags.set_attribute_bool("free_var", sym.free_var);
+  flags.set_attribute_bool("statevar", sym.is_state_var);
 
   xmlt &mode = flags.new_element("mode");
   mode.data = id2string(sym.mode);
@@ -106,20 +106,20 @@ void convert(const xmlt &xmlsym, symbolt& symbol)
     }
     else if (it->name=="flags")
     {
-      symbol.lvalue = it->get_attribute_bool("lvalue");
-      symbol.static_lifetime = it->get_attribute_bool("static_lifetime");
-      symbol.file_local = it->get_attribute_bool("file_local");
-      symbol.theorem = it->get_attribute_bool("theorem");
-      symbol.thread_local = it->get_attribute_bool("thread_local");
+      symbol.is_lvalue = it->get_attribute_bool("lvalue");
+      symbol.is_static_lifetime = it->get_attribute_bool("static_lifetime");
+      symbol.is_file_local = it->get_attribute_bool("file_local");
+      symbol.is_property = it->get_attribute_bool("theorem");
+      symbol.is_thread_local = it->get_attribute_bool("thread_local");
       symbol.is_type = it->get_attribute_bool("type");
       symbol.is_extern = it->get_attribute_bool("extern");
       symbol.is_input = it->get_attribute_bool("input");
       symbol.is_output = it->get_attribute_bool("output");
       symbol.is_macro = it->get_attribute_bool("macro");
-      symbol.is_actual = it->get_attribute_bool("actual");
-      symbol.binding = it->get_attribute_bool("binding");
-      symbol.free_var = it->get_attribute_bool("free_var");
-      symbol.is_statevar = it->get_attribute_bool("statevar");
+      //symbol.is_actual = it->get_attribute_bool("actual");
+      //symbol.binding = it->get_attribute_bool("binding");
+      //symbol.free_var = it->get_attribute_bool("free_var");
+      symbol.is_state_var = it->get_attribute_bool("statevar");
       
       for(xmlt::elementst::const_iterator
           fit=it->elements.begin();
