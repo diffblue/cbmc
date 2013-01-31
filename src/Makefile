@@ -1,6 +1,6 @@
 DIRS = ansi-c big-int cbmc cpp goto-cc goto-instrument goto-programs \
        goto-symex langapi pointer-analysis solvers util linking xmllang \
-       assembler
+       assembler analyses
 
 all: cbmc.dir goto-cc.dir goto-instrument.dir
 
@@ -18,9 +18,9 @@ languages: util.dir langapi.dir \
            cpp.dir ansi-c.dir xmllang.dir assembler.dir
 
 goto-instrument.dir: languages goto-programs.dir pointer-analysis.dir \
-                     goto-symex.dir linking.dir
+                     goto-symex.dir linking.dir analyses.dir
 
-cbmc.dir: languages solvers.dir goto-symex.dir \
+cbmc.dir: languages solvers.dir goto-symex.dir analyses.dir \
           pointer-analysis.dir goto-programs.dir linking.dir
 
 goto-cc.dir: languages pointer-analysis.dir goto-programs.dir linking.dir

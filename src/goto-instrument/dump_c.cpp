@@ -26,7 +26,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <langapi/mode.h>
 #include <ansi-c/ansi_c_language.h>
 #include <cpp/cpp_language.h>
-#include <goto-instrument/natural_loops.h>
+#include <analyses/natural_loops.h>
 
 #include "dump_c.h"
 

@@ -8,7 +8,7 @@ Date: January 2010
 
 \*******************************************************************/
 
-#include <goto-programs/static_analysis.h>
+#include "static_analysis.h"
 
 class uninitialized_domaint:public domain_baset
 {

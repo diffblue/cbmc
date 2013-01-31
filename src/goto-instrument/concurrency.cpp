@@ -12,8 +12,9 @@ Date: October 2012
 #include <find_symbols.h>
 #include <replace_symbol.h>
 
+#include <analyses/is_threaded.h>
+
 #include "concurrency.h"
-#include "is_threaded.h"
 
 class concurrency_instrumentationt
 {

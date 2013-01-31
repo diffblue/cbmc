@@ -12,7 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <map>
 #include <ostream>
 
-#include "goto_functions.h"
+#include <goto-programs/goto_functions.h>
 
 // don't use me -- I am just a base class
 // please derive from me

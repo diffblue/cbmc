@@ -8,7 +8,11 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../big-int/bigint$(OBJEXT) \
       ../goto-programs/goto-programs$(LIBEXT) \
       ../goto-symex/goto-symex$(LIBEXT) \
-      ../pointer-analysis/pointer-analysis$(LIBEXT) \
+      ../pointer-analysis/value_set$(OBJEXT) \
+      ../pointer-analysis/dereference$(OBJEXT) \
+      ../pointer-analysis/add_failed_symbols$(OBJEXT) \
+      ../pointer-analysis/rewrite_index$(OBJEXT) \
+      ../pointer-analysis/goto_program_dereference$(OBJEXT) \
       ../langapi/langapi$(LIBEXT) \
       ../xmllang/xmllang$(LIBEXT) \
       ../assembler/assembler$(LIBEXT) \

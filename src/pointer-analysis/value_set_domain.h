@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_POINTER_ANALYSIS_VALUE_SET_DOMAIN_H
 #define CPROVER_POINTER_ANALYSIS_VALUE_SET_DOMAIN_H
 
-#include <goto-programs/static_analysis.h>
+#include <analyses/static_analysis.h>
 
 #include "value_set.h"
 
