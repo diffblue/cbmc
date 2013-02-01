@@ -1,4 +1,4 @@
-SRC = arith_tools.cpp base_type.cpp cmdline.cpp config.cpp context.cpp \
+SRC = arith_tools.cpp base_type.cpp cmdline.cpp config.cpp symbol_table.cpp \
       expr.cpp expr_util.cpp i2string.cpp irep.cpp language.cpp \
       lispexpr.cpp lispirep.cpp location.cpp message.cpp language_file.cpp \
       mp_arith.cpp namespace.cpp parseoptions.cpp rename.cpp \
