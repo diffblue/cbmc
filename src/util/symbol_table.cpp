@@ -6,11 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include "context.h"
+#include "symbol_table.h"
 
 /*******************************************************************\
 
-Function: contextt::value
+Function: symbol_tablet::value
 
   Inputs:
 
@@ -20,7 +20,7 @@ Function: contextt::value
 
 \*******************************************************************/
 
-const irept &contextt::value(const irep_idt &name) const
+const irept &symbol_tablet::value(const irep_idt &name) const
 {
   symbolst::const_iterator it=symbols.find(name);
   if(it==symbols.end()) return get_nil_irep();
@@ -29,7 +29,7 @@ const irept &contextt::value(const irep_idt &name) const
 
 /*******************************************************************\
 
-Function: contextt::add
+Function: symbol_tablet::add
 
   Inputs:
 
@@ -39,7 +39,7 @@ Function: contextt::add
 
 \*******************************************************************/
 
-bool contextt::add(const symbolt &symbol)
+bool symbol_tablet::add(const symbolt &symbol)
 {
   if(!symbols.insert(std::pair<irep_idt, symbolt>(symbol.name, symbol)).second)
     return true;
@@ -52,7 +52,7 @@ bool contextt::add(const symbolt &symbol)
 
 /*******************************************************************\
 
-Function: contextt::move
+Function: symbol_tablet::move
 
   Inputs:
 
@@ -62,7 +62,7 @@ Function: contextt::move
 
 \*******************************************************************/
 
-bool contextt::move(symbolt &symbol, symbolt *&new_symbol)
+bool symbol_tablet::move(symbolt &symbol, symbolt *&new_symbol)
 {
   symbolt tmp;
 
@@ -86,7 +86,7 @@ bool contextt::move(symbolt &symbol, symbolt *&new_symbol)
 
 /*******************************************************************\
 
-Function: contextt::remove
+Function: symbol_tablet::remove
 
   Inputs:
 
@@ -96,7 +96,7 @@ Function: contextt::remove
 
 \*******************************************************************/
 
-bool contextt::remove(const irep_idt &name)
+bool symbol_tablet::remove(const irep_idt &name)
 {
   symbolst::iterator entry=symbols.find(name);
   
@@ -132,7 +132,7 @@ bool contextt::remove(const irep_idt &name)
 
 /*******************************************************************\
 
-Function: contextt::show
+Function: symbol_tablet::show
 
   Inputs:
 
@@ -142,7 +142,7 @@ Function: contextt::show
 
 \*******************************************************************/
 
-void contextt::show(std::ostream &out) const
+void symbol_tablet::show(std::ostream &out) const
 {
   out << std::endl << "Symbols:" << std::endl;
 
@@ -152,7 +152,7 @@ void contextt::show(std::ostream &out) const
 
 /*******************************************************************\
 
-Function: contextt::lookup
+Function: symbol_tablet::lookup
 
   Inputs:
 
@@ -162,7 +162,7 @@ Function: contextt::lookup
 
 \*******************************************************************/
 
-const symbolt &contextt::lookup(const irep_idt &identifier) const
+const symbolt &symbol_tablet::lookup(const irep_idt &identifier) const
 {
   symbolst::const_iterator it=symbols.find(identifier);
       
@@ -174,7 +174,7 @@ const symbolt &contextt::lookup(const irep_idt &identifier) const
 
 /*******************************************************************\
 
-Function: contextt::lookup
+Function: symbol_tablet::lookup
 
   Inputs:
 
@@ -184,7 +184,7 @@ Function: contextt::lookup
 
 \*******************************************************************/
 
-symbolt &contextt::lookup(const irep_idt &identifier)
+symbolt &symbol_tablet::lookup(const irep_idt &identifier)
 {
   symbolst::iterator it=symbols.find(identifier);
       
@@ -206,8 +206,8 @@ Function: operator <<
 
 \*******************************************************************/
 
-std::ostream &operator << (std::ostream &out, const contextt &context)
+std::ostream &operator << (std::ostream &out, const symbol_tablet &symbol_table)
 {
-  context.show(out);
+  symbol_table.show(out);
   return out;
 }
