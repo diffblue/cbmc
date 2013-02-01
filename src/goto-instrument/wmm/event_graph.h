@@ -16,171 +16,16 @@ Date: 2012
 #include <map>
 #include <iostream>
 
-#include <location.h>
 #include <graph.h>
 
-#ifndef MEMORY_MODEL
-#define MEMORY_MODEL
-typedef enum {TSO, PSO, RMO, Power} weak_memory_modelt;
-#endif 
+#include "abstract_event.h"
+#include "data_dp.h"
+#include "wmm.h"
 
-/* abstract event */
-class abstract_eventt:public graph_nodet<empty_nodet>
-{
-protected:
-  bool unsafe_pair_lwfence_param(const abstract_eventt& next,
-    weak_memory_modelt model, bool lwsync_met) const;
+/*******************************************************************\
+                     graph of abstract events
+\*******************************************************************/
 
-public:
-  /* for now, both fence functions and asm fences accepted */
-  typedef enum {Write, Read, Fence, Lwfence, ASMfence} operationt;
-
-  operationt operation;
-  unsigned thread;
-  irep_idt variable;
-  unsigned id;
-  locationt location;
-  bool local;
-
-  // for ASMfence
-  bool WRfence;
-  bool WWfence;
-  bool RRfence;
-  bool RWfence;
-  bool WWcumul;
-  bool RWcumul;
-  bool RRcumul;
-
-  abstract_eventt()
-  {
-  }
-
-  abstract_eventt(
-    operationt _op, unsigned _th, irep_idt _var, 
-    unsigned _id, locationt _loc, bool _local)
-    :operation(_op), thread(_th), variable(_var), id(_id),
-      location(_loc), local(_local)
-  {
-  }
-
-  abstract_eventt(operationt _op, unsigned _th, irep_idt _var,
-    unsigned _id, locationt _loc, bool _local, 
-    bool WRf, bool WWf, bool RRf, bool RWf, bool WWc, bool RWc, bool RRc)
-    :operation(_op), thread(_th), variable(_var), id(_id),
-      location(_loc), local(_local), WRfence(RWf), WWfence(WWf), RRfence(RRf),
-      RWfence(WRf), WWcumul(WWc), RWcumul(RWc), RRcumul(RRc)
-  {
-  }
-
-  inline bool operator==(const abstract_eventt& other)
-  {
-    return (id == other.id);
-  }
-
-  inline bool operator<(const abstract_eventt& other) const
-  {
-    return (id < other.id);
-  }
-
-  inline void operator()(const abstract_eventt& other)
-  {
-    operation = other.operation;
-    thread = other.thread;
-    variable = other.variable;
-    id = other.id;
-    location = other.location;
-    local = other.local;
-  }
-
-  friend std::ostream& operator<<(std::ostream& s, const abstract_eventt& e)
-  {
-    return s << e.get_operation() << e.variable;
-  } 
-
-  /* checks the safety of the pair locally (i.e., w/o taking fences
-     or dependencies into account -- use is_unsafe on the whole
-     critical cycle for this) */
-  bool unsafe_pair(const abstract_eventt& next, weak_memory_modelt model) const
-  {
-    return unsafe_pair_lwfence_param(next,model,false);
-  }
-
-  bool unsafe_pair_lwfence(const abstract_eventt& next, weak_memory_modelt model) const
-  {
-    return unsafe_pair_lwfence_param(next,model,true);
-  }
-
-  bool unsafe_pair_asm(const abstract_eventt& next, weak_memory_modelt model, 
-    unsigned char met) const;
-
-  std::string get_operation() const
-  {
-    switch(operation)
-    {
-      case Write: return "W";
-      case Read: return "R";
-      case Fence: return "F";
-      case Lwfence: return "f";
-      case ASMfence: return "asm:";
-      default: return "?";
-    }
-  }
-
-  bool is_corresponding_fence(const abstract_eventt& first, 
-    const abstract_eventt& second) const
-  {
-    return (WRfence && first.operation==Write && second.operation==Read)
-      || ((WWfence||WWcumul) && first.operation==Write 
-         && second.operation==Write)
-      || ((RWfence||RWcumul) && first.operation==Read 
-         && second.operation==Write)
-      || ((RRfence||RRcumul) && first.operation==Read 
-         && second.operation==Read);
-  }
-
-  bool is_direct() const { return WWfence || WRfence || RRfence || RWfence; }
-  bool is_cumul() const { return WWcumul || RWcumul || RRcumul; }
-
-  unsigned char fence_value() const
-  {
-    unsigned char value = WRfence + 2*WWfence + 4*RRfence + 8*RWfence
-      + 16*WWcumul + 32*RWcumul + 64*RRcumul;
-    return value;
-  }
-};
-
-
-/* data dependencies */
-class data_dpt
-{
-public:
-  typedef std::pair<irep_idt, locationt> datat;
-
-  /* class of data equivalence */
-  class data_classt:public std::set<datat>
-  {
-  public:
-    inline void operator()(const data_classt& other)
-    {
-      for(iterator it=other.begin(); it!=other.end(); it++)
-        insert(*it);
-    }
-  };
-
-  std::set<data_classt> dependencies;
-
-public:
-  /* add this dependency in the structure */
-  void dp_analysis(const abstract_eventt& read, const abstract_eventt& write);
-  void dp_analysis(const datat& read, bool local_read, const datat& write, bool local_write);
-  /* are these two events with a data dependency ? */
-  bool dp(const abstract_eventt& e1, const abstract_eventt& e2) const;
-  void dp_merge();
-  void print();
-};
-
-
-/* graph of abstract events */
 class event_grapht
 {
 public:
@@ -192,6 +37,18 @@ public:
 
     bool is_not_uniproc() const;
     bool is_not_weak_uniproc() const;
+
+    std::string print_detail(const critical_cyclet& reduced, 
+      std::map<std::string,std::string>& map_id2var,
+      std::map<std::string,std::string>& map_var2id,
+      weak_memory_modelt model) const;
+    std::string print_name(const critical_cyclet& redyced, 
+      weak_memory_modelt model) const;
+
+    bool check_AC(const_iterator s_it, const abstract_eventt& first, 
+      const abstract_eventt& second) const;
+    bool check_BC(const_iterator it, const abstract_eventt& first, 
+      const abstract_eventt& second) const;
 
   public:
     unsigned id;
@@ -210,26 +67,32 @@ public:
     
     bool is_cycle()
     {
+      /* size check */
       if(size()<4)
         return false;
 
-      for(iterator it=begin(); it!=end() && ++it!=end(); it++)
+      /* po order check */
+      const_iterator it=begin();
+      const_iterator n_it=it;
+      ++n_it;
+      for(; it!=end() && n_it!=end(); ++it, ++n_it)
       {
-        iterator s_it = it;
-        --it;
-        if(egraph[*it].thread==egraph[*s_it].thread 
-          && !egraph.are_po_ordered(*it,*s_it))
+        if(egraph[*it].thread==egraph[*n_it].thread 
+          && !egraph.are_po_ordered(*it,*n_it))
           return false;
       }
 
-      return !(egraph[back()].thread==egraph[front()].thread
-        && !egraph.are_po_ordered(back(),front()));
+      return true;
     }
+
+    /* removes internal events (e.g. podWW Rfi gives podWR) 
+       from.hide_internals(&target) */
+    void hide_internals(critical_cyclet& reduced) const;
 
     /* checks whether there is at leat one pair which is unsafe 
        (takes fences and dependencies into account), and adds
        the unsafe pairs in the set */
-    bool is_unsafe(weak_memory_modelt model, bool fast = false);
+    bool is_unsafe(weak_memory_modelt model, bool fast=false);
 
     /* do not update the unsafe pairs set */
     bool is_unsafe_fast(weak_memory_modelt model)
@@ -242,7 +105,7 @@ public:
       is_unsafe(model);
     }
 
-    bool is_unsafe_asm(weak_memory_modelt model, bool fast = false);
+    bool is_unsafe_asm(weak_memory_modelt model, bool fast=false);
 
     bool is_not_uniproc(weak_memory_modelt model) const
     {
@@ -255,9 +118,8 @@ public:
     bool is_not_thin_air() const;
 
     /* pair of events in a cycle */
-    class delayt
+    struct delayt
     {
-    public:
       unsigned first;
       unsigned second;
       bool is_po;
@@ -297,9 +159,29 @@ public:
     std::string print_events() const;
 
     /* print outputs */
-    std::string print_name(weak_memory_modelt model) const;
+    std::string print_name(weak_memory_modelt model) const
+    {
+      return print_name(*this, model);
+    }
+    std::string print_name(weak_memory_modelt model, bool hide_internals) const
+    {
+      if(hide_internals)
+      {
+        critical_cyclet reduced(egraph, id);
+        this->hide_internals(reduced);
+        assert(reduced.size()>0);
+        return print_name(reduced, model);
+      }
+      else
+        return print_name(*this, model);
+    }
+
     std::string print_unsafes() const;
     std::string print_output() const;
+    std::string print_all(weak_memory_modelt model, 
+      std::map<std::string,std::string>& map_id2var,
+      std::map<std::string,std::string>& map_var2id,
+      bool hide_internals) const;
     void print_dot(std::ofstream& str, 
       unsigned colour, weak_memory_modelt model) const;
 
@@ -321,6 +203,11 @@ protected:
   /* graph explorer (for each cycles collection) */
   class graph_explorert
   {
+  public:
+    ~graph_explorert()
+    {
+    }
+
   protected:
     event_grapht& egraph;
 
@@ -355,37 +242,12 @@ protected:
 
     /* after the collection, eliminates the executions forbidden by an
        indirect thin-air */
-    void filter_thin_air(std::set<critical_cyclet>& set_of_cycles)
-    {
-      for(std::set<critical_cyclet>::iterator it=set_of_cycles.begin();
-        it!=set_of_cycles.end();
-      )
-      {
-        std::set<critical_cyclet>::iterator next = it;
-        ++next;
-        critical_cyclet::const_iterator e_it=it->begin();
-        /* is there an event in the cycle not in thin-air events? */
-        for(; e_it!=it->end(); ++e_it)
-          if(thin_air_events.find(*e_it)==thin_air_events.end())
-            break;
-
-        if(e_it==it->end())
-          set_of_cycles.erase(*it);
-
-        it = next;
-      }
-      for(std::set<unsigned>::const_iterator it=thin_air_events.begin();
-        it!=thin_air_events.end();
-        ++it)
-        std::cout<<egraph[*it]<<";";
-      std::cout<<std::endl;
-    }
+    void filter_thin_air(std::set<critical_cyclet>& set_of_cycles);
 
   public:
     graph_explorert(event_grapht& _egraph, unsigned _max_var, 
       unsigned _max_po_trans)
-      :egraph(_egraph),max_var(_max_var),
-        max_po_trans(_max_po_trans),cycle_nb(0)
+      :egraph(_egraph), max_var(_max_var), max_po_trans(_max_po_trans), cycle_nb(0)
     {
     }
 
@@ -549,6 +411,10 @@ public:
     remove_com_edge(a,b);
   }
 
+  /* copies the sub-graph G between begin and end into G', connects
+     G.end with G'.begin, and returns G'.end */
+  unsigned copy_segment(unsigned begin, unsigned end);
+
   bool is_local(unsigned a)
   {
     return operator[](a).local;
@@ -598,15 +464,12 @@ public:
     exploration.collect_cycles(set_of_cycles,model);
   }
 
-  void set_parameters_collection(unsigned _max_var = 0, 
-    unsigned _max_po_trans = 0)
+  void set_parameters_collection(unsigned _max_var=0, 
+    unsigned _max_po_trans=0)
   {
     max_var = _max_var;
     max_po_trans = _max_po_trans;
   }
 };
-
-
-void test();
 
 #endif

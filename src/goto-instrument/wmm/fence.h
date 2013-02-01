@@ -16,10 +16,10 @@ Date: February 2012
 
 bool is_fence(
   goto_programt::instructiont instruction,
-  contextt &context);
+  namespacet &ns);
 
 bool is_lwfence(
   goto_programt::instructiont instruction,
-  contextt &context);
+  namespacet &ns);
 
 #endif
