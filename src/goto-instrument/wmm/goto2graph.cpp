@@ -1303,7 +1303,8 @@ Function: instrumentert::collect_cycles_by_SCCs
   
 \*******************************************************************/
 
-#ifdef _WIN32
+#if 1
+//#ifdef _WIN32
 void instrumentert::collect_cycles_by_SCCs(weak_memory_modelt model)
 {
   unsigned scc = 0;
