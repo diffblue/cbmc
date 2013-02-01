@@ -8,19 +8,27 @@ Date: 2012
 
 \*******************************************************************/
 
+#ifndef INSTRUMENTER_H
+#define INSTRUMENTER_H
+
 #include <map>
 
 #include <graph.h>
-
-#include <goto-programs/goto_functions.h>
+#include <namespace.h>
+#include <goto-programs/goto_program.h>
 
 #include "event_graph.h"
+#include "wmm.h"
+
+class contextt;
+class goto_functionst;
+class value_setst;
 
 class instrumentert
 {
 protected:
   /* reference to goto-functions and context */
-  class contextt &context;
+  namespacet ns;
   goto_functionst &goto_functions; 
 
   /* alternative representation of graph (SCC) */
@@ -42,9 +50,11 @@ protected:
   void inline add_instr_to_interleaving (
     goto_programt::instructionst::iterator it,
     goto_programt& interleaving);
+
+  /* deprecated */
   bool is_cfg_spurious(const event_grapht::critical_cyclet& cyc);
 
-  unsigned d(const event_grapht::critical_cyclet::delayt& e);
+  unsigned cost(const event_grapht::critical_cyclet::delayt& e);
 
   typedef std::set<event_grapht::critical_cyclet> set_of_cyclest;
   void inline instrument_all_inserter(
@@ -65,7 +75,10 @@ protected:
     std::ofstream& dot,
     std::ofstream& ref,
     std::ofstream& output,
-    weak_memory_modelt model);
+    std::ofstream& all,
+    std::ofstream& table,
+    weak_memory_modelt model,
+    bool hide_internals);
 
   typedef std::set<goto_programt::instructiont::targett> target_sett;
 
@@ -74,6 +87,8 @@ protected:
   protected: 
     namespacet& ns;
     instrumentert& instrumenter;
+
+    /* pointer to the egraph(s) that we construct */
     event_grapht& egraph;
     std::vector<std::set<unsigned> >& egraph_SCCs;    
     graph<abstract_eventt>& egraph_alt;  
@@ -82,7 +97,26 @@ protected:
     unsigned current_thread;
     unsigned coming_from;
 
-  public:
+    /* transformers */
+    void visit_cfg_thread() const;
+    void visit_cfg_propagate(goto_programt::instructionst::iterator i_it);
+    void visit_cfg_assign(value_setst& value_sets, namespacet& ns,
+      goto_programt::instructionst::iterator& i_it, bool no_dependencies);
+    void visit_cfg_fence(goto_programt::instructionst::iterator i_it);
+    void visit_cfg_skip(goto_programt::instructionst::iterator i_it);
+    void visit_cfg_lwfence(goto_programt::instructionst::iterator i_it);
+    void visit_cfg_asm_fence(goto_programt::instructionst::iterator i_it);
+    void visit_cfg_function_call(value_setst& value_sets, 
+      goto_programt::instructionst::iterator i_it, 
+      weak_memory_modelt model,
+      bool no_dependencies);
+    void visit_cfg_goto(goto_programt::instructionst::iterator i_it);
+
+ public:
+    ~cfg_visitort()
+    {
+    }
+
     unsigned max_thread;
 
     /* relations between irep and Reads/Writes */
@@ -132,7 +166,7 @@ protected:
       coming_from = 0;
     }
 
-    void inline visit_function(const irep_idt& function)
+    void inline enter_function(const irep_idt& function)
     {
       if(functions_met.find(function)!=functions_met.end())
         throw ("Sorry, doesn't handle recursive function for the moment");
@@ -145,24 +179,32 @@ protected:
     }
 
     void inline visit_cfg(
-      class value_setst &value_sets,
+      value_setst &value_sets,
       weak_memory_modelt model,
       bool no_dependencies,
       const irep_idt& function)
     {
-      visit_function(function);
-      visit_cfg_impl(value_sets, model, no_dependencies, function,
-        std::set<nodet>());
+      /* forbids recursive function */
+      enter_function(function);
+      const std::set<nodet> empty_in;
+      std::set<nodet> end_out;
+      visit_cfg_function(value_sets, model, no_dependencies, function,
+        empty_in, end_out);
       leave_function(function);
     }
 
     // TODO: move the visitor outside, and inherit
-    virtual const std::set<nodet>& visit_cfg_impl(
+    virtual void visit_cfg_function(
+      /* value_sets and options */
       value_setst& value_sets,
       weak_memory_modelt model,
       bool no_dependencies,
+      /* functino to analyse */
       const irep_idt& function,
-      const std::set<nodet>& initial_vertex);
+      /* incoming edges */
+      const std::set<nodet>& initial_vertex,
+      /* outcoming edges */
+      std::set<nodet>& ending_vertex);
 
     bool inline local(const irep_idt& i);
   };
@@ -190,8 +232,8 @@ public:
   std::multimap<irep_idt,locationt> id2cycloc;
 
   instrumentert(contextt& _context, goto_functionst& _goto_f)
-    :context(_context),goto_functions(_goto_f),render_po_aligned(true),
-      render_by_file(false),render_by_function(false)
+    :ns(_context), goto_functions(_goto_f), render_po_aligned(true), 
+      render_by_file(false), render_by_function(false)
   {
   }
 
@@ -224,13 +266,9 @@ public:
 
   /* builds the relations between unsafe pairs in the critical cycles and
      instructions to instrument in the code */
-  void instrument_all();
 
-  /* strategies for partial instrumentation */
-  void instrument_one_event_per_cycle();
-  void instrument_one_read_per_cycle();
-  void instrument_one_write_per_cycle();
-  void instrument_minimum_interference();
+  /* strategies for instrumentation */
+  void instrument_with_strategy(instrumentation_strategyt strategy);
   void instrument_my_events(const std::set<unsigned>& events);
 
   /* sets rendering options */
@@ -245,6 +283,9 @@ public:
   /* prints outputs:
      - cycles.dot: graph of the instrumented cycles  
      - ref.txt: names of the instrumented cycles
-     - output.txt: names of the instructions in the code */
-  void print_outputs(weak_memory_modelt model);
+     - output.txt: names of the instructions in the code 
+     - all.txt: all */
+  void print_outputs(weak_memory_modelt model, bool hide_internals);
 };
+
+#endif

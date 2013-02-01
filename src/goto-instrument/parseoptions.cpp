@@ -40,7 +40,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "show_locations.h"
 #include "points_to.h"
 #include "alignment_checks.h"
-#include "weak_memory.h"
 #include "race_check.h"
 #include "nondet_volatile.h"
 #include "interrupt.h"
@@ -51,6 +50,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "concurrency.h"
 #include "dump_c.h"
 #include "dot.h"
+#include "wmm/weak_memory.h"
 
 /*******************************************************************\
 
@@ -440,16 +440,21 @@ void goto_instrument_parseoptionst::instrument_goto_program(
     options.set_option("max-po-trans", cmdline.getval("max-po-trans"));
 
   // strategy of instrumentation
+  instrumentation_strategyt inst_strategy;
   if(cmdline.isset("one-event-per-cycle"))
-    options.set_option("event-strategy", 1);
+    inst_strategy=one_event_per_cycle;
   else if(cmdline.isset("minimum-interference"))
-    options.set_option("event-strategy", 2);
+    inst_strategy=min_interference;
+  else if(cmdline.isset("read-first"))
+    inst_strategy=read_first;
+  else if(cmdline.isset("write-first"))
+    inst_strategy=write_first;
   else if(cmdline.isset("my-events"))
-    options.set_option("event-strategy", 3);
+    inst_strategy=my_events;
   else
-    options.set_option("event-strategy", 0);
+    /* default: instruments all unsafe pairs */
+    inst_strategy=all;
 
- 
   namespacet ns(context);
 
   // add generic checks, if needed
@@ -487,10 +492,7 @@ void goto_instrument_parseoptionst::instrument_goto_program(
 
   if(cmdline.isset("pointer-check") ||
      cmdline.isset("race-check") ||
-     cmdline.isset("tso") ||
-     cmdline.isset("pso") ||
-     cmdline.isset("rmo") ||
-     cmdline.isset("power") ||
+     cmdline.isset("wmm") ||
      cmdline.isset("isr") ||
      cmdline.isset("concurrency"))
   {
@@ -530,95 +532,62 @@ void goto_instrument_parseoptionst::instrument_goto_program(
         goto_functions);
     }
 
-    const unsigned unwind_loops = 
-      ( cmdline.isset("unwind")?options.get_int_option("unwind"):0 );
-    const unsigned max_var =
-      ( cmdline.isset("max-var")?options.get_int_option("max-var"):0 );
-    const unsigned max_po_trans =
-      ( cmdline.isset("max-po-trans")?options.get_int_option("max-po-trans"):0 );
-
-    if(cmdline.isset("tso"))
+    if(cmdline.isset("wmm"))
     {
-      status("Adding weak memory (TSO) Instrumentation");
-      weak_memory(
-        TSO,
-        value_set_analysis,
-        context,
-        goto_functions,
-        cmdline.isset("scc"),
-        options.get_int_option("event-strategy"),
-        unwind_loops,
-        !cmdline.isset("cfg-kill"),
-        cmdline.isset("no-dependencies"),
-        max_var,
-        max_po_trans,
-        !cmdline.isset("no-po-rendering"),
-        cmdline.isset("render-cluster-file"),
-        cmdline.isset("render-cluster-function"),
-        cmdline.isset("cav11"));
-    }
+      std::string wmm=cmdline.getval("wmm");
+      weak_memory_modelt model;
+      
+      const unsigned unwind_loops = 
+        ( cmdline.isset("unwind")?options.get_int_option("unwind"):0 );
+      const unsigned max_var =
+        ( cmdline.isset("max-var")?options.get_int_option("max-var"):0 );
+      const unsigned max_po_trans =
+        ( cmdline.isset("max-po-trans")?options.get_int_option("max-po-trans"):0 );
 
-    if(cmdline.isset("pso"))
-    {
-      status("Adding weak memory (PSO) Instrumentation");
-      weak_memory(
-        PSO,
-        value_set_analysis,
-        context,
-        goto_functions,
-        cmdline.isset("scc"),
-        options.get_int_option("event-strategy"),
-        unwind_loops,
-        !cmdline.isset("cfg-kill"),
-        cmdline.isset("no-dependencies"),
-        max_var,
-        max_po_trans,
-        !cmdline.isset("no-po-rendering"),
-        cmdline.isset("render-cluster-file"),
-        cmdline.isset("render-cluster-function"),
-        cmdline.isset("cav11"));
-    }
+      if(wmm=="tso")
+      {
+        status("Adding weak memory (TSO) Instrumentation");
+        model=TSO;
+      }
+      else if(wmm=="pso")
+      {
+        status("Adding weak memory (PSO) Instrumentation");
+        model=PSO;
+      }
+      else if(wmm=="rmo")
+      {
+        status("Adding weak memory (RMO) Instrumentation");
+        model=RMO;
+      }
+      else if(wmm=="power")
+      {
+        status("Adding weak memory (Power) Instrumentation");
+        model=Power;
+      }
+      else
+      {
+        error("Unknown weak memory model");
+        model=Unknown;
+      }
 
-    if(cmdline.isset("rmo"))
-    {
-      status("Adding weak memory (RMO) Instrumentation");
-      weak_memory(
-        RMO,
-        value_set_analysis,
-        context,
-        goto_functions,
-        cmdline.isset("scc"),
-        options.get_int_option("event-strategy"),
-        unwind_loops,
-        !cmdline.isset("cfg-kill"),
-        cmdline.isset("no-dependencies"),
-        max_var,
-        max_po_trans,
-        !cmdline.isset("no-po-rendering"),
-        cmdline.isset("render-cluster-file"),
-        cmdline.isset("render-cluster-function"),
-        cmdline.isset("cav11"));
-    }
-
-    if(cmdline.isset("power"))
-    {
-      status("Adding weak memory (Power) Instrumentation");
-      weak_memory(
-        POWER,
-        value_set_analysis,
-        context,
-        goto_functions,
-        cmdline.isset("scc"),
-        options.get_int_option("event-strategy"),
-        unwind_loops,
-        !cmdline.isset("cfg-kill"),
-        cmdline.isset("no-dependencies"),
-        max_var,
-        max_po_trans,
-        !cmdline.isset("no-po-rendering"),
-        cmdline.isset("render-cluster-file"),
-        cmdline.isset("render-cluster-function"),
-        cmdline.isset("cav11"));
+      if(model!=Unknown)
+        weak_memory(
+          model,
+          value_set_analysis,
+          context,
+          goto_functions,
+          cmdline.isset("scc"),
+          inst_strategy,
+          unwind_loops,
+          !cmdline.isset("cfg-kill"),
+          cmdline.isset("no-dependencies"),
+          max_var,
+          max_po_trans,
+          !cmdline.isset("no-po-rendering"),
+          cmdline.isset("render-cluster-file"),
+          cmdline.isset("render-cluster-function"),
+          cmdline.isset("cav11"),
+          cmdline.isset("hide-internals"));
     }
 
     // Interrupt handler
@@ -745,19 +714,19 @@ void goto_instrument_parseoptionst::help()
     " --check-invariant function   instruments invariant checking function\n"
     "\n"
     "Memory model instrumentations:\n"
-    " --tso                        instruments weak memory models with buffers (TSO)\n"
-    " --pso                        instruments weak memory models with buffers (PSO)\n"
-    " --rmo                        instruments weak memory models with buffers (RMO)\n"
-    " --power                      instruments weak memory models with buffers and cache (Power)\n"
-    " --scc                        detects critical cycles per SCC (one thread per SCC)\n"
+    " --wmm tso                    instruments weak memory models with buffers (TSO)\n"
+    " --wmm pso                    instruments weak memory models with buffers (PSO)\n"
+    " --wmm rmo                    instruments weak memory models with buffers (RMO)\n"
+    " --wmm power                  instruments weak memory models with buffers and queues (Power)\n"
+    " --wmm-scc                    detects critical cycles per SCC (one thread per SCC)\n"
     " --one-event-per-cycle        only instruments one event per cycle\n"
     " --minimum-interference       instruments an optimal number of events\n"
-    " --my-events                  only instruments the events whose ids appear in inst.evt\n"
+    " --my-events                  only instruments events whose ids appear in inst.evt\n"
     " --cfg-kill                   enables symbolic execution used to reduce spurious cycles\n"
     " --no-dependencies            no dependency analysis\n"
     " --no-po-rendering            no representation of the threads in the dot\n"
-    "  --render-cluster-file       clusterises the dot into files of the program"
-    "  --render-cluster-function   clusterises the dot into functions of the program" 
+    " --render-cluster-file        clusterises the dot by files\n"
+    " --render-cluster-function    clusterises the dot by functions\n"
     "\n"
     "Slicing:\n"
     " --reachability-slicer        slice away instructions that can't reach assertions\n"

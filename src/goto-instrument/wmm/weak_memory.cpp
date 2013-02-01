@@ -24,10 +24,12 @@ Date: September 2011
 #include <i2string.h>
 
 #include <goto-programs/remove_skip.h>
+
+#include "../rw_set.h"
 #include "weak_memory.h"
-#include "rw_set.h"
 #include "goto2graph.h"
 #include "fence.h"
+#include "has_infix.h"
 
 #define INVALID_OBJECT "invalid_object"
 //#define DEBUG
@@ -38,16 +40,12 @@ Date: September 2011
 #define DEBUG_MESSAGE(a)
 #endif
 
-// the use of this is bogus
-static inline bool has_infix(const std::string &s, const std::string &infix)
-{
-  return s.find(infix)!=std::string::npos;
-}
+class contextt;
 
 class shared_bufferst
 {
 public:
-  shared_bufferst(class contextt &_context, unsigned _nb_threads):
+  shared_bufferst(contextt &_context, unsigned _nb_threads):
     context(_context),
     nb_threads(_nb_threads+1),
     uniq(0),
@@ -189,14 +187,14 @@ public:
 
   void weak_memory(
     value_setst &value_sets,
-    class contextt &context,
+    contextt &context,
     goto_programt &goto_program,
     weak_memory_modelt model,
     goto_functionst &goto_functions
   );
 
   void affected_by_delay(
-    class contextt &context,
+    contextt &context,
     value_setst &value_sets,
     goto_functionst &goto_functions);
 
@@ -204,7 +202,7 @@ public:
   {
   protected:
     shared_bufferst& shared_buffers;
-    class contextt& context;
+    contextt& context;
     goto_functionst& goto_functions;
 
     /* for thread marking (dynamic) */
@@ -216,7 +214,7 @@ public:
     std::set<irep_idt> past_writes;
 
   public:
-    cfg_visitort(shared_bufferst& _shared, class contextt& _context, 
+    cfg_visitort(shared_bufferst& _shared, contextt& _context, 
       goto_functionst& _goto_functions)
       :shared_buffers(_shared), context(_context), 
         goto_functions(_goto_functions)
@@ -305,7 +303,6 @@ const shared_bufferst::varst &shared_bufferst::operator()(const irep_idt &object
   varst &vars=var_map[object];
   
   namespacet ns(context);
-
   const symbolt &symbol=ns.lookup(object);
 
   vars.type=symbol.type;
@@ -499,7 +496,7 @@ void shared_bufferst::assignment(
   if(has_infix(identifier,INVALID_OBJECT))
     return;
 
-#if 0
+//#if 0
   const size_t pos = identifier.find("[]");
 
   if(pos!=std::string::npos)
@@ -507,7 +504,7 @@ void shared_bufferst::assignment(
     /* we don't distinguish the members of an array for the moment */
     identifier.erase(pos);
   }
-#endif
+//#endif
 
   try {
   const exprt symbol=symbol_expr(ns.lookup(identifier));
@@ -1454,7 +1451,7 @@ Function: affected_by_delay
 \*******************************************************************/
 
 void shared_bufferst::affected_by_delay(
-  class contextt &context,
+  contextt &context,
   value_setst &value_sets,
   goto_functionst &goto_functions)
 {
@@ -1691,7 +1688,7 @@ void shared_bufferst::cfg_visitort::weak_memory(
           forall_rw_set_w_entries(e_it, rw_set)
           {
             // if one of the previous read was to buffer, then delays the read
-            if(model==RMO || model==POWER)
+            if(model==RMO || model==Power)
             forall_rw_set_r_entries(r_it, rw_set)
               if(shared_buffers.is_buffered(ns, r_it->second.symbol_expr,true))
               {
@@ -1710,7 +1707,7 @@ void shared_bufferst::cfg_visitort::weak_memory(
             else
             {
               // unbuffered
-              if(model==RMO || model==POWER)
+              if(model==RMO || model==Power)
                 forall_rw_set_r_entries(r_it, rw_set)
                   if(shared_buffers.affected_by_delay_set.find(r_it->second.object)
                     !=shared_buffers.affected_by_delay_set.end() 
@@ -1802,7 +1799,7 @@ void shared_bufferst::cfg_visitort::weak_memory(
             std::cout << "Identifier not found" << std::endl;
           }
     }
-    else if(is_fence(instruction,context) || (instruction.is_other() 
+    else if(is_fence(instruction, ns) || (instruction.is_other() 
        && instruction.code.get_statement()==ID_fence
        && (instruction.code.get_bool("WRfence")
          || instruction.code.get_bool("WWfence")
@@ -1835,7 +1832,7 @@ void shared_bufferst::cfg_visitort::weak_memory(
       
       i_it--; // the for loop already counts us up
     }    
-    else if(is_lwfence(instruction, context))
+    else if(is_lwfence(instruction, ns))
     {
       // po -- remove the lwfence
       i_it->make_skip();
@@ -1862,7 +1859,7 @@ Function: introduce_temporaries
 
 void introduce_temporaries(
   value_setst &value_sets,
-  class contextt &context,
+  contextt &context,
   const irep_idt &function,
   goto_programt &goto_program)
 {
@@ -1963,10 +1960,10 @@ Function: weak_memory
 void weak_memory(
   weak_memory_modelt model,
   value_setst& value_sets,
-  class contextt& context,
+  contextt& context,
   goto_functionst &goto_functions,
   bool SCC,
-  unsigned event_strategy,
+  instrumentation_strategyt event_strategy,
   unsigned unwinding_bound,
   bool no_cfg_kill,
   bool no_dependencies,
@@ -1975,13 +1972,16 @@ void weak_memory(
   bool render_po,
   bool render_file,
   bool render_function,
-  bool cav11_option)
+  bool cav11_option,
+  bool hide_internals)
 {
   // no more used -- dereferences performed in rw_set
   // get rid of pointers
   // remove_pointers(goto_functions, context, value_sets);
   // add_failed_symbols(context);
   // std::cout<<"pointers removed"<<std::endl;
+
+  std::cout << "--------" << std::endl;
 
   // all access to shared variables is pushed into assignments
   Forall_goto_functions(f_it, goto_functions)
@@ -2043,21 +2043,17 @@ void weak_memory(
     instrumenter.cfg_cycles_filter();
 
   // collects instructions to instrument, depending on the strategy selected
-  if(event_strategy == 3)
+  if(event_strategy == my_events)
   {
     const std::set<unsigned> events_set = extract_my_events();
     instrumenter.instrument_my_events(events_set);
   }  
-  else if(event_strategy == 2)
-    instrumenter.instrument_minimum_interference();
-  else if(event_strategy == 1)
-    instrumenter.instrument_one_event_per_cycle();
   else
-    instrumenter.instrument_all();
+    instrumenter.instrument_with_strategy(event_strategy);
 
   // prints outputs
-  instrumenter.set_rendering_options(render_po,render_file,render_function);
-  instrumenter.print_outputs(model);
+  instrumenter.set_rendering_options(render_po, render_file, render_function);
+  instrumenter.print_outputs(model, hide_internals);
 
   // now adds buffers
   shared_bufferst shared_buffers(context,max_thds);
