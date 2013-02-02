@@ -2830,6 +2830,7 @@ Function: c_typecheck_baset::typecheck_expr_pointer_arithmetic
 void c_typecheck_baset::typecheck_expr_pointer_arithmetic(exprt &expr)
 {
   assert(expr.operands().size()==2);
+
   exprt &op0=expr.op0();
   exprt &op1=expr.op1();
 
@@ -2842,13 +2843,19 @@ void c_typecheck_baset::typecheck_expr_pointer_arithmetic(exprt &expr)
     if(type0.id()==ID_pointer &&
        type1.id()==ID_pointer)
     {
+      // We should check the subtypes, and complain if
+      // they are really different.
       expr.type()=pointer_diff_type();
       typecheck_arithmetic_pointer(op0);
       typecheck_arithmetic_pointer(op1);
       return;
     }
 
-    if(type0.id()==ID_pointer)
+    if(type0.id()==ID_pointer &&
+       (type1.id()==ID_bool ||
+        type1.id()==ID_unsignedbv ||
+        type1.id()==ID_signedbv ||
+        type1.id()==ID_c_enum))
     {
       typecheck_arithmetic_pointer(op0);
       make_index_type(op1);
@@ -2874,10 +2881,16 @@ void c_typecheck_baset::typecheck_expr_pointer_arithmetic(exprt &expr)
     else
       assert(false);
 
-    typecheck_arithmetic_pointer(*p_op);
-    make_index_type(*int_op);
-    expr.type()=p_op->type();
-    return;
+    if(int_op->type().id()==ID_bool ||
+       int_op->type().id()==ID_unsignedbv ||
+       int_op->type().id()==ID_signedbv ||
+       int_op->type().id()==ID_c_enum)
+    {
+      typecheck_arithmetic_pointer(*p_op);
+      make_index_type(*int_op);
+      expr.type()=p_op->type();
+      return;
+    }
   }
 
   err_location(expr);
