@@ -39,6 +39,18 @@ public:
   inline const exprt &offset() const { return op1(); }
 };
 
+extern inline const byte_extract_exprt &to_byte_extract_expr(const exprt &expr)
+{
+  assert(expr.operands().size()==2);
+  return static_cast<const byte_extract_exprt &>(expr);
+}
+
+extern inline byte_extract_exprt &to_byte_extract_expr(exprt &expr)
+{
+  assert(expr.operands().size()==2);
+  return static_cast<byte_extract_exprt &>(expr);
+}
+
 /*! \brief TO_BE_DOCUMENTED
 */
 class byte_extract_little_endian_exprt:public byte_extract_exprt
