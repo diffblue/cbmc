@@ -671,8 +671,8 @@ void goto_instrument_parseoptionst::help()
 {
   std::cout <<
     "\n"
-    "* *       Goto-Instrument " GOTO_INSTRUMENT_VERSION " - Copyright (C) 2008-2009           * *\n"
-    "* *                     Daniel Kroening                     * *\n"
+    "* *     Goto-Instrument " GOTO_INSTRUMENT_VERSION " - Copyright (C) 2008-2013       * *\n"
+    "* *                    Daniel Kroening                      * *\n"
     "* *                 kroening@kroening.com                   * *\n"
     "\n"
     "Usage:                       Purpose:\n"
