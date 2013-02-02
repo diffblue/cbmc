@@ -190,6 +190,11 @@ exprt smt1_convt::ce_value(
         return array_list;
       }
     }
+    else if(ns.follow(type.subtype()).id()==ID_array) 
+    {
+      // a 2 dimensional array - second dimension is flattened
+      return ce_value(type.subtype(), "", value, true);
+    }
     else
     {
       exprt value_expr=ce_value(type.subtype(), "", value, in_struct);
@@ -420,16 +425,17 @@ void smt1_convt::convert_byte_update(
 
   mp_integer upper, lower; // of the byte
   mp_integer max=w-1;
+  unsigned op_w = boolbv_width(expr.op2().type());
 
   if(expr.id()==ID_byte_update_little_endian)
   {
-    upper = ((i+1)*8)-1;
     lower = i*8;
+    upper = lower+op_w-1;
   }
   else
   {
     upper = max-(i*8);
-    lower = max-((i+1)*8-1);
+    lower = max-(i*8+op_w-1);
   }
 
   if(upper==max)
@@ -1735,7 +1741,14 @@ void smt1_convt::convert_struct(const exprt &expr)
   assert(!components.empty());
 
   if(components.size()==1)
-    convert_expr(expr.op0(), true);
+  {
+    const exprt &op=expr.op0();
+
+    if(op.type().id()==ID_array)
+      flatten_array(op);
+    else
+      convert_expr(op, true);
+  }
   else
   {
     unsigned nr_ops=0;
@@ -2404,6 +2417,7 @@ void smt1_convt::convert_with(const exprt &expr)
     if(array.id()==ID_member)
     {
       // arrays in structs and unions are flattened!
+
       const typet &array_type=to_array_type(expr.type());
       const typet &elem_type=array_type.subtype();
 
@@ -2477,6 +2491,72 @@ void smt1_convt::convert_with(const exprt &expr)
       smt1_prop.out << " (bvshl (zero_extend[" << array_bits-elem_width << "] ";
       convert_expr(value, true);
 
+      // shift it to the index
+      smt1_prop.out << ")";
+      if (width>=array_index_bits)
+        smt1_prop.out << " (zero_extend[" << width-array_index_bits << "]";
+      else
+        smt1_prop.out << " (extract[" << width-1 << ":0]";
+      smt1_prop.out << " (bvmul ";
+      convert_expr(index_tc, true);
+      smt1_prop.out << " bv" << elem_width << "[" << array_index_bits << "]";
+      smt1_prop.out << ")))"; // bvmul, bvshl, ze
+
+      smt1_prop.out << ")"; // bvor
+    }
+    else if(array.id()==ID_index)
+    {
+      // arrays in structs are flattened!
+
+      const typet &array_type=to_array_type(expr.type());
+      const typet &elem_type=array_type.subtype();
+
+      const index_exprt &index_expr=to_index_expr(array);
+
+      unsigned width=boolbv_width(expr.type());
+
+      if(width==0)
+        throw "failed to get width of 2nd dimension array";
+
+      unsigned elem_width=boolbv_width(elem_type);
+
+      if(elem_width==0)
+        throw "failed to get array element width";
+
+      assert(expr.operands().size()==3);
+      const exprt &index_2nd=expr.operands()[1];
+      const exprt &value=expr.operands()[2];
+      typecast_exprt index_tc(index_2nd, array_index_type());
+
+      smt1_prop.out << "(bvor ";
+      smt1_prop.out << "(bvand ";
+
+      // this gets us the array
+      convert_expr(index_expr, true);
+
+      // the mask
+      smt1_prop.out << " (bvnot (bvshl";
+
+      smt1_prop.out << " (concat";
+      smt1_prop.out << " (repeat[" << width-elem_width << "] bv0[1])";
+      smt1_prop.out << " (repeat[" << elem_width << "] bv1[1])";
+      smt1_prop.out << ")"; // concat
+
+      // shift it to the index
+      if (width>=array_index_bits)
+        smt1_prop.out << " (zero_extend[" << width-array_index_bits << "]";
+      else
+        smt1_prop.out << " (extract[" << width-1 << ":0]";
+      smt1_prop.out << " (bvmul ";
+      convert_expr(index_tc, true);
+      smt1_prop.out << " bv" << elem_width << "[" << array_index_bits << "]";
+      smt1_prop.out << "))))"; // bvmul, zero_extend, bvshl, bvneg
+
+      smt1_prop.out << ")"; // bvand
+
+      // the new value
+      smt1_prop.out << " (bvshl (zero_extend[" << width-elem_width << "] ";
+      convert_expr(value, true);
       // shift it to the index
       smt1_prop.out << ")";
       if (width>=array_index_bits)
@@ -2657,28 +2737,18 @@ void smt1_convt::convert_index(const index_exprt &expr, bool bool_as_bv)
 {
   assert(expr.operands().size()==2);
 
-  if(expr.array().id()==ID_member)
+  if(expr.array().id()==ID_member ||
+     expr.array().id()==ID_index)
   {
+    // arrays inside structs and 2-dimensional arrays
     // these were flattened
+
     const typet &array_type=to_array_type(expr.array().type());
     const typet &elem_type=array_type.subtype();
 
-    const member_exprt &member_expr=to_member_expr(expr.array());
-    //const exprt &struct_op=member_expr.struct_op();
-    //const irep_idt &name=member_expr.get_component_name();
-
-    //unsigned total_width=boolbv_width(struct_op.type());
-    
-    //if(total_width==0)
-    //  throw "failed to get struct width";
-
-    //unsigned offset=boolbv_width.get_member(
-    //     to_struct_type(struct_op.type()), name).offset;
-
-    unsigned width=boolbv_width(member_expr.type());
-    
+    unsigned width=boolbv_width(expr.array().type());
     if(width==0)
-      throw "failed to get struct member width";
+      throw "failed to get array width";
 
     unsigned elem_width=boolbv_width(elem_type);
 
