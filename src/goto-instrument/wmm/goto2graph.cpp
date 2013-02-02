@@ -26,7 +26,6 @@ Date: 2012
 #include "../rw_set.h"
 #include "fence.h"
 #include "goto2graph.h"
-#include "has_infix.h"
 
 //#define DEBUG
 //#define PRINT_UNSAFES
@@ -53,10 +52,10 @@ bool inline instrumentert::local(const irep_idt& id)
 {
   std::string identifier = id2string(id);
 
-  if(has_prefix(identifier, "symex_invalid"))
+  if(has_prefix(identifier, "symex_invalid") || has_prefix(identifier, "symex::invalid"))
   {
-    /* should however be false to be sound, but symex_invalid
-       are errors in the input code */
+    /* symex_invalid and symex::invalid_object generated when pointer analysis
+       fails */
     return true;
   }
 
@@ -67,8 +66,7 @@ bool inline instrumentert::local(const irep_idt& id)
     identifier=="c::stderr" ||
     identifier=="c::sys_nerr" ||
     has_prefix(identifier, "__unbuffered_") ||
-    has_prefix(identifier, "c::__unbuffered_") ||
-    has_infix(identifier, "$tmp_guard"))
+    has_prefix(identifier, "c::__unbuffered_") )
     return true;
  
   const size_t pos = identifier.find("[]");
@@ -604,7 +602,7 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
     const irep_idt& read=r_it->second.object;
 
     /* skip local variables */
-    if(local(read) || has_infix(id2string(read),"invalid_object"))
+    if(local(read))
       continue;
 
     read_counter++;
@@ -670,7 +668,7 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
        new_write_node is the node in the graph */
     const irep_idt& write = w_it->second.object;
     /* skip local variables */
-    if(local(write) || has_infix(id2string(write),"invalid_object"))
+    if(local(write))
       continue;
 
     ++write_counter;

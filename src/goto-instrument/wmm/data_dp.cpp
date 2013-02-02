@@ -16,6 +16,7 @@ Date: 2012
 
 #ifdef DEBUG
 #include <iostream>
+#include <map>
 #define DEBUG_MESSAGE(a) std::cout<<a<<std::endl
 #else
 #define DEBUG_MESSAGE(a)
@@ -129,10 +130,14 @@ bool data_dpt::dp(const abstract_eventt& e1, const abstract_eventt& e2) const
           continue;
       }
       /* or else, same class */
-      return true;
+      if(it1->eq_class==it2->eq_class)
+      {
+        DEBUG_MESSAGE(e1<<"-dp->"<<e2);
+        return true;
+      }
     }
   }
-
+  DEBUG_MESSAGE(e1<<"-x->"<<e2);
   return false;
 }
 
@@ -184,7 +189,7 @@ void data_dpt::dp_merge()
     if(it3->eq_class==from)
       it3->eq_class=to;
 
-  /* converges */
+  /* strictly monotonous => converges */
   assert(initial_size>size());
 
   /* repeat until classes are disjunct */
@@ -205,6 +210,30 @@ Function: data_dpt::print
 
 void data_dpt::print()
 {
-  /* TODO */
+#ifdef DEBUG
+  const_iterator it;
+  std::map<unsigned,std::set<locationt> > classed;
+
+  for(it=begin(); it!=end(); ++it)
+  {
+    if(classed.find(it->eq_class)==classed.end())
+    {
+      std::set<locationt> s;
+      s.insert(it->loc);
+      classed[it->eq_class]=s;
+    }
+    else
+      classed[it->eq_class].insert(it->loc);
+  }
+
+  for(std::map<unsigned,std::set<locationt> >::const_iterator m_it=classed.begin();
+    m_it!=classed.end(); ++m_it)
+  {
+    DEBUG_MESSAGE("class #"<<m_it->first);
+    std::set<locationt>::const_iterator l_it;
+    for(l_it=m_it->second.begin(); l_it!=m_it->second.end(); ++l_it)
+      DEBUG_MESSAGE("loc: "<<*l_it);
+  }
+#endif
 }
 
