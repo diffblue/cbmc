@@ -4073,6 +4073,150 @@ bool simplify_exprt::simplify_member(member_exprt &expr)
       }
     }
   }
+  else if(op.id()==ID_byte_extract_little_endian ||
+          op.id()==ID_byte_extract_big_endian)
+  {
+    if(op_type.id()==ID_struct)
+    {
+      // This rewrites byte_extract(s, o, struct_type).member
+      // to byte_extract(s, o+member_offset, member_type)
+    
+      const struct_typet &struct_type=to_struct_type(op_type);
+      const struct_typet::componentt &component=
+        struct_type.get_component(component_name);
+
+      if(component.is_nil() || component.get_is_bit_field())
+        return true;
+
+      // add member offset to index
+      mp_integer offset_int=member_offset(ns, struct_type, component_name);
+      if(offset_int==-1) return true;
+ 
+      const exprt &struct_offset=op.op1();
+      exprt member_offset=from_integer(offset_int, struct_offset.type());
+      plus_exprt final_offset(struct_offset, member_offset);
+      simplify_node(final_offset);
+
+      exprt result(op.id(), expr.type());
+      result.copy_to_operands(op.op0(), final_offset);
+      expr.swap(result);
+
+      return false;
+    }
+  }
+
+  return true;
+}
+
+/*******************************************************************\
+
+Function: simplify_exprt::simplify_byte_extract
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool simplify_exprt::simplify_byte_extract(exprt &expr)
+{
+  // yet to be written
+  return true;
+}
+
+/*******************************************************************\
+
+Function: simplify_exprt::simplify_byte_update
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool simplify_exprt::simplify_byte_update(exprt &expr)
+{
+  /*
+   * byte_update(root, offset, 
+   *             extract(root, offset) WITH component:=value)
+   * =>
+   * byte_update(root, offset + component offset, 
+   *             value)
+   */
+
+  if(expr.operands().size()!=3) return true;
+  if(expr.id()!=ID_byte_update_little_endian) return true;
+
+  exprt &root=expr.op0();
+  exprt &offset=expr.op1();
+
+  if(expr.op2().id()==ID_with) 
+  {
+    exprt &with=expr.op2();
+
+    if(with.operands().size()!=3) return true;
+
+    if(with.op0().id()==ID_byte_extract_little_endian)
+    {
+      exprt &extract=with.op0();
+
+      /* the simplification can be used only if 
+         root and offset of update and extract
+         are the same */
+      if(extract.operands().size() != 2) return true;
+      if(!(root == extract.op0())) return true;
+      if(!(offset == extract.op1())) return true;
+
+      const typet& tp = ns.follow(with.type());
+      if(tp.id()==ID_struct) 
+      {
+        // new offset = offset + component offset
+        mp_integer i = member_offset(ns, to_struct_type(tp), 
+                                     with.op1().get(ID_component_name));
+        if(i != -1) 
+        {
+          exprt compo_offset = from_integer(i, offset.type());
+          plus_exprt new_offset (offset, compo_offset);
+          simplify_node (new_offset);
+          exprt new_value(with.op2());
+          expr.op1().swap(new_offset);
+          expr.op2().swap(new_value);
+          simplify_byte_update(expr); // do this recursively
+          return false;
+        }
+      }
+      else if(tp.id()==ID_array)
+      {
+        mp_integer i = pointer_offset_size(ns, tp.subtype());
+        if(i != -1)
+        {
+          exprt& index = with.op1();
+          mult_exprt index_offset(index, from_integer(i, index.type()));
+          simplify_node (index_offset);
+
+          // index_offset may need a typecast
+          if(!base_type_eq(offset.type(), index.type(), ns)) 
+          {
+            typecast_exprt tmp(index_offset, offset.type());
+            simplify_node(tmp);
+            index_offset.swap(tmp);
+          }
+
+          plus_exprt new_offset (offset, index_offset);
+          simplify_node(new_offset);
+          exprt new_value(with.op2());
+          expr.op1().swap(new_offset);
+          expr.op2().swap(new_value);
+          simplify_byte_update(expr); // do this recursively
+          return false;
+        }
+      }
+    }
+  }
 
   return true;
 }
@@ -4393,6 +4537,12 @@ bool simplify_exprt::simplify_node(exprt &expr)
     result=simplify_index(to_index_expr(expr)) && result;
   else if(expr.id()==ID_member)
     result=simplify_member(to_member_expr(expr)) && result;
+  else if(expr.id()==ID_byte_update_little_endian ||
+          expr.id()==ID_byte_update_big_endian)
+    result=simplify_byte_update(expr) && result;
+  else if(expr.id()==ID_byte_extract_little_endian ||
+          expr.id()==ID_byte_extract_big_endian)
+    result=simplify_byte_extract(expr) && result;
   else if(expr.id()==ID_pointer_object)
     result=simplify_pointer_object(expr) && result;
   else if(expr.id()==ID_same_object)
