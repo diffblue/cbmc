@@ -75,6 +75,8 @@ public:
   bool simplify_with(exprt &expr);
   bool simplify_index(index_exprt &expr);
   bool simplify_member(member_exprt &expr);
+  bool simplify_byte_update(exprt &expr);
+  bool simplify_byte_extract(exprt &expr);
   bool simplify_pointer_object(exprt &expr);
   bool simplify_object_size(exprt &expr);
   bool simplify_dynamic_size(exprt &expr);
