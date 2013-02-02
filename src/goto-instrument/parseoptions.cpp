@@ -718,7 +718,7 @@ void goto_instrument_parseoptionst::help()
     " --wmm pso                    instruments weak memory models with buffers (PSO)\n"
     " --wmm rmo                    instruments weak memory models with buffers (RMO)\n"
     " --wmm power                  instruments weak memory models with buffers and queues (Power)\n"
-    " --wmm-scc                    detects critical cycles per SCC (one thread per SCC)\n"
+    " --scc                        detects critical cycles per SCC (one thread per SCC)\n"
     " --one-event-per-cycle        only instruments one event per cycle\n"
     " --minimum-interference       instruments an optimal number of events\n"
     " --my-events                  only instruments events whose ids appear in inst.evt\n"
