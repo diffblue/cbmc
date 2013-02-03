@@ -15,6 +15,11 @@ int main()
   // spliced to avoid hex ambiguity
   assert("\x5" "five"[0]==0x5);
 
+  // spliced accoss multiple lines
+  assert("\x5" 
+#pragma none
+         "five"[0]==0x5);
+
   // wide strings
   assert(L"abc"[0]=='a');
   assert(L"abc"[1]=='b');
