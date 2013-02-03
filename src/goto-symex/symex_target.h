@@ -17,6 +17,10 @@ class symbol_exprt;
 class symex_targett
 {
 public:
+  symex_targett()
+  {
+  }
+
   virtual ~symex_targett() { }
   
   struct sourcet
