@@ -24,7 +24,7 @@ public:
     typecheckt(_message_handler),
     main_context(_main_context),
     src_context(_src_context),
-    ns(_main_context, _src_context), // order matters
+    ns(_main_context),
     renaming_counter(0)
   {
   }
@@ -50,6 +50,8 @@ protected:
   
   irep_idt rename(const irep_idt &old_identifier);
 
+  void rename_type(symbolt &new_symbol);
+
   // overload to use language specific syntax
   virtual std::string to_string(const exprt &expr);
   virtual std::string to_string(const typet &type);
@@ -63,7 +65,7 @@ protected:
   unsigned renaming_counter;
   
   typedef hash_set_cont<irep_idt, irep_id_hash> processingt;
-  processingt processing;
+  processingt processing, completed;
 };
 
 #endif
