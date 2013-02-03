@@ -393,7 +393,7 @@ void cpp_typecheckt::typecheck_decl(codet &code)
   assert(type.is_not_nil());
 
   if(declaration.declarators().empty() &&
-     follow(type).get_bool("#is_anonymous"))
+     follow(type).get_bool(ID_C_is_anonymous))
   {
     if(follow(type).id()!=ID_union)
     {
