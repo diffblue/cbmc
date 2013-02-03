@@ -45,10 +45,11 @@ public:
     parsert::clear();
     parse_tree.clear();
     
-    // scanner
+    // scanner state
     tag_following=false;
     asm_block_following=false;
     parenthesis_counter=0;
+    string_literal.clear();
     
     // setup global scope
     scopes.clear();
@@ -61,6 +62,7 @@ public:
   bool tag_following;
   bool asm_block_following;
   unsigned parenthesis_counter;
+  std::string string_literal;
   
   enum { LANGUAGE, EXPRESSION } grammar;
 
