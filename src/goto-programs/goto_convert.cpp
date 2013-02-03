@@ -2099,8 +2099,11 @@ void goto_convertt::generate_ifthenelse(
   if(false_case.instructions.empty() &&
      true_case.instructions.size()==1 &&
      true_case.instructions.back().is_goto() &&
-     true_case.instructions.back().guard.is_true())
+     true_case.instructions.back().guard.is_true() &&
+     true_case.instructions.back().labels.empty())
   {
+    // The above conjunction deliberately excludes the instance
+    // if(some) { label: goto somewhere; }
     true_case.instructions.back().guard=guard;
     dest.destructive_append(true_case);
     return;
