@@ -54,7 +54,8 @@ void goto_inlinet::parameter_assignments(
     if(it1==arguments.end())
     {
       err_location(location);
-      throw "function call: not enough arguments";
+      str << "call to `" << function_name << "': not enough arguments";
+      throw 0;
     }
 
     const code_typet::argumentt &argument=*it2;

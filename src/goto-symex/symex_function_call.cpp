@@ -72,7 +72,12 @@ void goto_symext::argument_assignments(
   {
     // if you run out of actual arguments there was a mismatch
     if(it1==arguments.end())
-      throw "function call: not enough arguments";
+    {
+      std::string error=
+        "call to `"+id2string(function_identifier)+"': "
+        "not enough arguments";
+      throw error;
+    }
 
     const code_typet::argumentt &argument=*it2;
 
