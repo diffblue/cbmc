@@ -1967,15 +1967,18 @@ bool Parser::rDeclarators(
 /*
   declarator.with.init
   : ':' expression
-  | declarator {'=' initialize.expr | ':' expression}
+  | declarator 
+    {'=' initialize.expr | 
+     ':' expression}
 */
 bool Parser::rDeclaratorWithInit(
   cpp_declaratort &dw,
   bool should_be_declarator,
   bool is_statement)
 {
-  if(lex->LookAhead(0)==':') // anonymous bit field
+  if(lex->LookAhead(0)==':')
   {
+    // This is an anonymous bit field.
     Token tk;
     lex->GetToken(tk);
 
@@ -2013,6 +2016,7 @@ bool Parser::rDeclaratorWithInit(
       // initializer
       Token tk;
       lex->GetToken(tk);
+      
       if(!rInitializeExpr(declarator.value()))
         return false;
 
