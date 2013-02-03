@@ -1,5 +1,4 @@
 #include <assert.h>
-#include <complex.h>
 #include <errno.h>
 #include <float.h>
 #include <limits.h>
@@ -7,7 +6,6 @@
 #include <math.h>
 #include <signal.h>
 #include <stdarg.h>
-#include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdint.h>
@@ -17,6 +15,8 @@
 
 #ifndef _WIN32
 #include <alloca.h>
+#include <complex.h>
+#include <stdbool.h>
 #include <unistd.h>
 #include <pthread.h>
 #endif
