@@ -1,3 +1,8 @@
+
+// Not yet available in Visual Studio
+
+#ifndef _WIN32
+
 struct S
 {
   _Static_assert(1, "in struct");
@@ -10,3 +15,5 @@ int main()
 {
   _Static_assert(1, "in function");
 }
+
+#endif
