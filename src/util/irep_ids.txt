@@ -379,6 +379,7 @@ instance
 cover
 initializer
 anonymous
+C_is_anonymous #is_anonymous
 is_macro
 is_inline
 is_extern

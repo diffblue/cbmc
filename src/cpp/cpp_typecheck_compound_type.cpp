@@ -161,7 +161,7 @@ void cpp_typecheckt::typecheck_compound_type(
   if(anonymous)
   {
     base_name="#anon_"+type.id_string()+i2string(anon_counter++);
-    type.set("#is_anonymous", true);
+    type.set(ID_C_is_anonymous, true);
     // anonymous structs always go into the current scope
     dest_scope=&cpp_scopes.current_scope();
   }
@@ -1074,7 +1074,7 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
 
       // anonymous member?
       if(declaration.declarators().empty() &&
-         final_type.get_bool("#is_anonymous"))
+         final_type.get_bool(ID_C_is_anonymous))
       {
         // we only allow this on struct/union types
         if(final_type.id()!=ID_union &&
