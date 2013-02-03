@@ -4611,7 +4611,7 @@ bool simplify_exprt::simplify_node(exprt &expr)
 
   result=sort_and_join(expr) && result;
 
-  #if 1
+  #if 1 // use jump table?
   if(expr.id()==ID_typecast)
     result=simplify_typecast(expr) && result;
   else if(expr.id()==ID_equal || expr.id()==ID_notequal ||
@@ -4705,7 +4705,7 @@ bool simplify_exprt::simplify_node(exprt &expr)
   {
     jump_table_entryt entry=simplify_jump_table[no];
     if(entry!=NULL)
-      result=entry(expr) && result;
+      result=(this->*entry)(expr) && result;
   }
   
   #endif
