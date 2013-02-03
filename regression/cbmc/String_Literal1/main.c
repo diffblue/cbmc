@@ -16,9 +16,12 @@ int main()
   assert("\x5" "five"[0]==0x5);
 
   // spliced accoss multiple lines
-  assert("\x5" 
-#pragma none
-         "five"[0]==0x5);
+  const char some_string[]=
+    "\x5" 
+#pragma whatnot
+    "five";
+  
+  assert(some_string[0]==0x5);
 
   // wide strings
   assert(L"abc"[0]=='a');
