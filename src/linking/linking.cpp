@@ -128,17 +128,19 @@ void linkingt::duplicate(
   symbolt &old_symbol,
   symbolt &new_symbol)
 {
-  if(new_symbol.is_type!=old_symbol.is_type)
+  if(new_symbol.is_file_local ||
+      (!new_symbol.is_type && !old_symbol.is_type))
+    duplicate_non_type(old_symbol, new_symbol);
+  else if(new_symbol.is_type && old_symbol.is_type)
+    duplicate_type(old_symbol, new_symbol);
+  else if(new_symbol.is_type && old_symbol.is_file_local)
+    rename_type(new_symbol);
+  else
   {
     str << "symbol category conflict on symbol `"
-        << old_symbol.name << "'";
+      << old_symbol.name << "'";
     throw 0;
   }
-
-  if(new_symbol.is_type)
-    duplicate_type(old_symbol, new_symbol);
-  else
-    duplicate_non_type(old_symbol, new_symbol);
 }
 
 /*******************************************************************\
@@ -163,9 +165,50 @@ irep_idt linkingt::rename(const irep_idt &old_identifier)
       id2string(old_identifier)+"$link"+i2string(renaming_counter++);        
   }
   while(main_context.symbols.find(new_identifier)!=
-        main_context.symbols.end());
+        main_context.symbols.end() ||
+        src_context.symbols.find(new_identifier)!=
+        src_context.symbols.end());
         
   return new_identifier;
+}
+
+/*******************************************************************\
+
+Function: linkingt::rename_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void linkingt::rename_type(symbolt &new_symbol)
+{
+  replace_symbolt::type_mapt::const_iterator replace_entry=
+    replace_symbol.type_map.find(new_symbol.name);
+  if(replace_entry!=replace_symbol.type_map.end())
+  {
+    new_symbol.name=to_symbol_type(replace_entry->second).get_identifier();
+  }
+  else
+  {
+    // rename!
+    irep_idt old_identifier=new_symbol.name;
+    irep_idt new_identifier=rename(old_identifier);
+
+    replace_symbol.insert(old_identifier, symbol_typet(new_identifier));
+
+    new_symbol.name=new_identifier;
+  }
+
+  // need to replace again
+  replace_symbol.replace(new_symbol.type);
+
+  // move over!
+  bool result=main_context.move(new_symbol);
+  assert(!result);
 }
 
 /*******************************************************************\
@@ -186,7 +229,16 @@ void linkingt::duplicate_type(
 {
   // check if it is really the same
   // -- use base_type_eq, not linking_type_eq
-  if(base_type_eq(old_symbol.type, new_symbol.type, ns))
+  // first make sure that base_type_eq can soundly use ns/main_context only
+  find_symbols_sett symbols;
+  find_type_and_expr_symbols(new_symbol.type, symbols);
+  bool ok=true;
+  for(find_symbols_sett::const_iterator
+      s_it=symbols.begin();
+      ok && s_it!=symbols.end();
+      s_it++)
+    ok&=completed.find(*s_it)!=completed.end();
+  if(ok && base_type_eq(old_symbol.type, new_symbol.type, ns))
     return;
 
   // they are different
@@ -208,22 +260,7 @@ void linkingt::duplicate_type(
       old_symbol.type=new_symbol.type; // store new type
   }
   else
-  {
-    // rename!
-    irep_idt old_identifier=new_symbol.name;
-    irep_idt new_identifier=rename(old_identifier);
-              
-    replace_symbol.insert(old_identifier, symbol_typet(new_identifier));
-
-    new_symbol.name=new_identifier;
-    
-    // need to replace again
-    replace_symbol.replace(new_symbol.type);
-    
-    // move over!
-    bool result=main_context.move(new_symbol);
-    assert(!result);
-  }
+    rename_type(new_symbol);
 }
 
 /*******************************************************************\
@@ -242,18 +279,20 @@ void linkingt::duplicate_non_type(
   symbolt &old_symbol,
   symbolt &new_symbol)
 {
-  // first check if file-local
+  // We first take care of file-local non-type symbols.
+  // These are static functions, or static variables
+  // inside function bodies.
   if(new_symbol.is_file_local ||
      old_symbol.is_file_local)
   {
     // we just always rename these
     irep_idt old_identifier=new_symbol.name;
-    replace_symbolt::expr_mapt::const_iterator r_it=
-      replace_symbol.expr_map.find(old_identifier);
-    assert(r_it!=replace_symbol.expr_map.end());
-    assert(r_it->second.id()==ID_symbol);
+    irep_idt new_identifier=rename(old_identifier);
+    replace_symbol.insert(
+        old_identifier,
+        symbol_exprt(new_identifier, new_symbol.type));
 
-    new_symbol.name=r_it->second.get(ID_identifier);
+    new_symbol.name=new_identifier;
     
     // move over!
     bool result=main_context.move(new_symbol);
@@ -433,31 +472,6 @@ Function: linkingt::typecheck
 
 void linkingt::typecheck()
 {
-  // We first take care of file-local non-type symbols.
-  // These are static functions, or static variables
-  // inside function bodies.
-  
-  forall_symbols(src_it, src_context.symbols)
-    if(!src_it->second.is_type)
-    {
-      const contextt::symbolst::const_iterator
-        main_symbol=main_context.symbols.find(src_it->first);
-
-      // collision with main_context?
-      if(main_symbol==main_context.symbols.end())
-        continue;
-
-      // is one of them file-local?
-      if(src_it->second.is_file_local ||
-         main_symbol->second.is_file_local)
-      {
-        // collision!
-        irep_idt new_identifier=rename(src_it->first);
-        replace_symbol.insert(
-          src_it->first, symbol_exprt(new_identifier, src_it->second.type));
-      }
-    }
-
   // we inspect all the symbols in src_context
   
   forall_symbols(it, src_context.symbols)
@@ -478,16 +492,47 @@ Function: linkingt::inspect_src_symbol
 
 void linkingt::inspect_src_symbol(const irep_idt &identifier)
 {
-  // are we doing it already?
-  if(!processing.insert(identifier).second)
+  // is it done already?
+  if(completed.find(identifier)!=completed.end())
     return;
 
   // look it up, it must be there
   symbolt &new_symbol=src_context.lookup(identifier);
-  
+
+  // resolve recursion on types; we shouldn't need specific care
+  // for non-types even though recursion may occur via initializers
+  if(!processing.insert(identifier).second)
+  {
+    if(new_symbol.is_type && main_context.has_symbol(identifier))
+    {
+      irep_idt old_identifier=new_symbol.name;
+      irep_idt new_identifier=rename(old_identifier);
+
+      replace_symbol.insert(old_identifier, symbol_typet(new_identifier));
+    }
+
+    return;
+  }
+
   // first find out what symbols this uses
   find_symbols_sett symbols;
+  find_type_and_expr_symbols(new_symbol.value, symbols);
   find_type_and_expr_symbols(new_symbol.type, symbols);
+  // also add function arguments
+  if(new_symbol.type.id()==ID_code)
+  {
+    const code_typet &code_type=to_code_type(new_symbol.type);
+    const code_typet::argumentst &arguments=code_type.arguments();
+
+    for(code_typet::argumentst::const_iterator
+        it=arguments.begin();
+        it!=arguments.end();
+        it++)
+      // identifiers for prototypes need not exist
+      if(!it->get_identifier().empty() &&
+          src_context.has_symbol(it->get_identifier()))
+        symbols.insert(it->get_identifier());
+  }
 
   // make sure we inspect those first!
   for(find_symbols_sett::const_iterator
@@ -499,7 +544,29 @@ void linkingt::inspect_src_symbol(const irep_idt &identifier)
   // first order of business is to apply renaming
   replace_symbol.replace(new_symbol.value);
   replace_symbol.replace(new_symbol.type);        
+  // also rename function arguments, if necessary
+  if(new_symbol.type.id()==ID_code)
+  {
+    code_typet &code_type=to_code_type(new_symbol.type);
+    code_typet::argumentst &arguments=code_type.arguments();
+
+    for(code_typet::argumentst::iterator
+        it=arguments.begin();
+        it!=arguments.end();
+        it++)
+    {
+      replace_symbolt::expr_mapt::const_iterator r=
+        replace_symbol.expr_map.find(it->get_identifier());
+      if(r!=replace_symbol.expr_map.end())
+        it->set_identifier(to_symbol_expr(r->second).get_identifier());
+    }
+  }
     
+  // any symbols contained in new_symbol are now renamed within src_context and
+  // the (possibly renamed) contained symbols are in main_context
+  // any checks for duplicates are now safe to exclusively use lookups on
+  // main_context (via ns)
+
   // ok, now check if we are to expect a collision
   const contextt::symbolst::iterator main_s_it=
     main_context.symbols.find(identifier);
@@ -514,6 +581,10 @@ void linkingt::inspect_src_symbol(const irep_idt &identifier)
     bool result=main_context.move(new_symbol);
     assert(!result);    
   }
+
+  // symbol is really done and can now be used within main_context
+  completed.insert(identifier);
+  processing.erase(identifier);
 }
 
 /*******************************************************************\
