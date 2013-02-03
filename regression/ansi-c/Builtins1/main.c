@@ -1,4 +1,3 @@
-#include <alloca.h>
 #include <assert.h>
 #include <complex.h>
 #include <errno.h>
@@ -17,6 +16,7 @@
 #include <time.h>
 
 #ifndef _WIN32
+#include <alloca.h>
 #include <unistd.h>
 #include <pthread.h>
 #endif
