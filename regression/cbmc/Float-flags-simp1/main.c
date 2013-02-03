@@ -14,8 +14,8 @@ int main()
   assert(isinf(HUGE_VALF));
 //  assert(isinf(HUGE_VALL));
   assert(isinf(INFINITY));
-  #endif
   assert(isnan(NAN));
+  #endif
 
   // check +
   #ifndef _MSC_VER
@@ -23,8 +23,10 @@ int main()
   #endif
   assert(isnan(-INFINITY+INFINITY));
   assert(INFINITY+INFINITY>0);
+  #ifndef _MSC_VER
   assert(isnan(NAN+d));
   assert(isnan(NAN+INFINITY));
+  #endif
 
   // check -
   assert(isnan(INFINITY-INFINITY));
@@ -32,8 +34,10 @@ int main()
   assert(isinf(-INFINITY-INFINITY));
   #endif
   assert(-INFINITY-INFINITY<0);
+  #ifndef _MSC_VER
   assert(isnan(NAN-d));
   assert(isnan(NAN-INFINITY));
+  #endif
 
   // check *
   #ifndef _MSC_VER
@@ -42,8 +46,10 @@ int main()
   #endif
   assert(INFINITY*INFINITY>0);
   assert(-INFINITY*INFINITY<0);
+  #ifndef _MSC_VER
   assert(isnan(NAN*d));
   assert(isnan(NAN*INFINITY));
+  #endif
   assert(isnan(INFINITY*0));
   assert(signbit(1.0*-0.0));
   assert(!signbit(1.0*0.0));
@@ -64,7 +70,9 @@ int main()
   assert(isinf(INFINITY/2));
   #endif
   assert(isnan(0.0/0.0));
+  #ifndef _MSC_VER
   assert(isnan(NAN/d));
   assert(isnan(NAN/INFINITY));
+  #endif
   assert(signbit(-0.0/1));
 }
