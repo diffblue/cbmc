@@ -114,7 +114,7 @@ std::string linkingt::to_string_verbose(const typet &type)
 
 /*******************************************************************\
 
-Function: linkingt::duplicate
+Function: linkingt::duplicate_symbol
 
   Inputs:
 
@@ -124,17 +124,17 @@ Function: linkingt::duplicate
 
 \*******************************************************************/
 
-void linkingt::duplicate(
+void linkingt::duplicate_symbol(
   symbolt &old_symbol,
   symbolt &new_symbol)
 {
   if(new_symbol.is_file_local ||
       (!new_symbol.is_type && !old_symbol.is_type))
-    duplicate_non_type(old_symbol, new_symbol);
+    duplicate_non_type_symbol(old_symbol, new_symbol);
   else if(new_symbol.is_type && old_symbol.is_type)
-    duplicate_type(old_symbol, new_symbol);
+    duplicate_type_symbol(old_symbol, new_symbol);
   else if(new_symbol.is_type && old_symbol.is_file_local)
-    rename_type(new_symbol);
+    rename_type_symbol(new_symbol);
   else
   {
     str << "symbol category conflict on symbol `"
@@ -174,7 +174,7 @@ irep_idt linkingt::rename(const irep_idt &old_identifier)
 
 /*******************************************************************\
 
-Function: linkingt::rename_type
+Function: linkingt::rename_type_symbol
 
   Inputs:
 
@@ -184,10 +184,11 @@ Function: linkingt::rename_type
 
 \*******************************************************************/
 
-void linkingt::rename_type(symbolt &new_symbol)
+void linkingt::rename_type_symbol(symbolt &new_symbol)
 {
   replace_symbolt::type_mapt::const_iterator replace_entry=
     replace_symbol.type_map.find(new_symbol.name);
+
   if(replace_entry!=replace_symbol.type_map.end())
   {
     new_symbol.name=to_symbol_type(replace_entry->second).get_identifier();
@@ -213,7 +214,7 @@ void linkingt::rename_type(symbolt &new_symbol)
 
 /*******************************************************************\
 
-Function: linkingt::duplicate_type
+Function: linkingt::duplicate_type_symbol
 
   Inputs:
 
@@ -223,7 +224,7 @@ Function: linkingt::duplicate_type
 
 \*******************************************************************/
 
-void linkingt::duplicate_type(
+void linkingt::duplicate_type_symbol(
   symbolt &old_symbol,
   symbolt &new_symbol)
 {
@@ -260,12 +261,12 @@ void linkingt::duplicate_type(
       old_symbol.type=new_symbol.type; // store new type
   }
   else
-    rename_type(new_symbol);
+    rename_type_symbol(new_symbol);
 }
 
 /*******************************************************************\
 
-Function: linkingt::duplicate_non_type
+Function: linkingt::duplicate_non_type_symbol
 
   Inputs:
 
@@ -275,7 +276,7 @@ Function: linkingt::duplicate_non_type
 
 \*******************************************************************/
 
-void linkingt::duplicate_non_type(
+void linkingt::duplicate_non_type_symbol(
   symbolt &old_symbol,
   symbolt &new_symbol)
 {
@@ -572,7 +573,7 @@ void linkingt::inspect_src_symbol(const irep_idt &identifier)
     main_context.symbols.find(identifier);
     
   if(main_s_it!=main_context.symbols.end())
-    duplicate(main_s_it->second, new_symbol); // handle the collision
+    duplicate_symbol(main_s_it->second, new_symbol); // handle the collision
   else
   {
     // add into destination context -- should never fail,
