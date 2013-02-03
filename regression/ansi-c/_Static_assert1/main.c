@@ -1,7 +1,7 @@
 
 // Not yet available in Visual Studio
 
-#ifndef _WIN32
+#ifndef _MSC_VER
 
 struct S
 {
