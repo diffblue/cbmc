@@ -1,7 +1,13 @@
 
 // Not yet available in Visual Studio
 
-#ifndef _MSC_VER
+#ifdef _MSC_VER
+
+int main()
+{
+}
+
+#else
 
 struct S
 {
