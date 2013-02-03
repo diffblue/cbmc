@@ -34,23 +34,23 @@ public:
   replace_symbolt replace_symbol;
  
 protected:
-  void duplicate(
+  void duplicate_symbol(
     symbolt &old_symbol,
     symbolt &new_symbol);
 
-  void duplicate_type(
+  void duplicate_type_symbol(
     symbolt &old_symbol, 
     symbolt &new_symbol);
 
-  void duplicate_non_type(
+  void duplicate_non_type_symbol(
     symbolt &old_symbol,
     symbolt &new_symbol);
+
+  void rename_type_symbol(symbolt &new_symbol);
 
   void inspect_src_symbol(const irep_idt &identifier);
   
   irep_idt rename(const irep_idt &old_identifier);
-
-  void rename_type(symbolt &new_symbol);
 
   // overload to use language specific syntax
   virtual std::string to_string(const exprt &expr);
@@ -64,8 +64,8 @@ protected:
   
   unsigned renaming_counter;
   
-  typedef hash_set_cont<irep_idt, irep_id_hash> processingt;
-  processingt processing, completed;
+  typedef hash_set_cont<irep_idt, irep_id_hash> id_sett;
+  id_sett processing, completed;
 };
 
 #endif
