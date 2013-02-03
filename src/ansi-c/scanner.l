@@ -167,6 +167,7 @@ string_lit      ("L"|"u"|"U"|"u8")?["]{s_char}*["]
 %x GRAMMAR
 %x COMMENT1
 %x COMMENT2
+%x STRING_LITERAL
 %x ASM_BLOCK
 %x MSC_ASM
 %x MSC_DECLSPEC
@@ -227,10 +228,28 @@ void ansi_c_scanner_init()
                   return TOK_CHARACTER;
                 }
 
-<GRAMMAR>({string_lit}{ws_or_newline})+ {
+<GRAMMAR>{string_lit} {
+                  PARSER.string_literal.clear();
+                  PARSER.string_literal.append(yytext);
                   newstack(yyansi_clval);
-                  stack(yyansi_clval)=convert_string_literal(yytext);
                   PARSER.set_location(stack(yyansi_clval));
+                  // String literals can be continued in
+                  // the next line
+                  BEGIN(STRING_LITERAL);
+                }
+
+<STRING_LITERAL>{string_lit} { PARSER.string_literal.append(yytext); }
+<STRING_LITERAL>{newline} { /* ignore */ }
+<STRING_LITERAL>{whitespace} { /* ignore */ }
+<STRING_LITERAL>{cpplineno} {
+                  preprocessor_line(yytext, PARSER.line_no, PARSER.filename);
+                  PARSER.line_no--;
+		 }
+<STRING_LITERAL>{cppdirective} { /* ignore */ }
+<STRING_LITERAL>. { 
+                  stack(yyansi_clval)=convert_string_literal(PARSER.string_literal);
+                  BEGIN(GRAMMAR); // back to normal
+                  yyless(0); // put back
                   return TOK_STRING;
                 }
 
