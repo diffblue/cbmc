@@ -510,7 +510,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
     }
     else // virtual
     {
-      component.type().set("#is_virtual", true);
+      component.type().set(ID_C_is_virtual, true);
       component.type().set("#virtual_name",virtual_name);
 
       // Check if it is a pure virtual method
@@ -1628,7 +1628,7 @@ bool cpp_typecheckt::get_component(
         if(disable_access_control)
         {
           member.set("#not_accessible", true);
-          member.set("#access", component.get(ID_access));
+          member.set(ID_C_access, component.get(ID_access));
         }
         else
         {
@@ -1636,7 +1636,8 @@ bool cpp_typecheckt::get_component(
           err_location(location);
           str << "error: member `" << component_name
               << "' is not accessible (" << component.get(ID_access) << ")";
-          str << "\nstruct name: " << final_type.get(ID_name);
+          str << std::endl
+              << "struct name: " << final_type.get(ID_name);
           throw 0;
           #endif
         }
