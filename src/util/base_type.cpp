@@ -165,7 +165,7 @@ bool base_type_eqt::base_type_eq_rec(
       ns.lookup(to_symbol_type(type1).get_identifier());
 
     if(!symbol.is_type)
-      throw "symbol "+id2string(symbol.name)+" is not a type";
+      return false;
     
     return base_type_eq_rec(symbol.type, type2);
   }
@@ -176,7 +176,7 @@ bool base_type_eqt::base_type_eq_rec(
       ns.lookup(to_symbol_type(type2).get_identifier());
 
     if(!symbol.is_type)
-      throw "symbol "+id2string(symbol.name)+" is not a type";
+      return false;
 
     return base_type_eq_rec(type1, symbol.type);
   }
@@ -255,6 +255,7 @@ bool base_type_eqt::base_type_eq_rec(
     return base_type_eq_rec(type1.subtype(), type2.subtype());
   }
 
+  // the below will go away
   typet tmp1(type1), tmp2(type2);
 
   base_type(tmp1, ns);
