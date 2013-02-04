@@ -292,6 +292,15 @@ void goto_symex_statet::assignment(
   irep_idt new_l2_name=level2.increase_counter(l1_identifier);
   lhs.set_identifier(new_l2_name);
 
+  // in case we happen to be multi-threaded, record the memory access
+  {
+    irep_idt orig_identifier=get_original_name(l1_identifier);
+    if(orig_identifier!="goto_symex::\\guard" &&
+       ns.lookup(orig_identifier).is_shared())
+    {
+    }
+  }
+
   // for value propagation -- the RHS is L2
   
   if(record_value && constant_propagation(rhs))
