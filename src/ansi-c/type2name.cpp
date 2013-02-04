@@ -106,10 +106,10 @@ std::string type2name(const typet &type)
         it!=components.end();
         it++)
     {            
+      if(it!=components.begin()) result+="|";
       result+=type2name(it->type());
       result+="'"+it->get_string(ID_name)+"'|";
     }
-    result.resize(result.size()-1);
     result+="]";
   }
   else if(type.id()==ID_incomplete_struct)
