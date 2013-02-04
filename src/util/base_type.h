@@ -16,10 +16,6 @@ class exprt;
 class typet;
 class namespacet;
 
-// these go away
-void __old_base_type(typet &type, const namespacet &ns);
-void __old_base_type(exprt &expr, const namespacet &ns);
-
 bool base_type_eq(
   const typet &type1,
   const typet &type2,
