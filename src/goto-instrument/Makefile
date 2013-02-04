@@ -58,6 +58,6 @@ goto-instrument$(EXEEXT): $(OBJ)
 
 .PHONY: goto-instrument-mac-signed
 
-goto-instrument-mac-signed: cbmc$(EXEEXT)
+goto-instrument-mac-signed: goto-instrument$(EXEEXT)
 	codesign -v -s $(OSX_IDENTITY) goto-instrument$(EXEEXT)
 
