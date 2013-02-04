@@ -1745,7 +1745,10 @@ bool cpp_typecheckt::check_component_access(
   }
 
   // check friendship
-  forall_irep(f_it, struct_union_type.find("#friends").get_sub())
+  const irept::subt &friends=
+    struct_union_type.find("#friends").get_sub();
+  
+  forall_irep(f_it, friends)
   {
     const irept& friend_symb = *f_it;
 
