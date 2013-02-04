@@ -132,7 +132,10 @@ void linkingt::duplicate_symbol(
       (!new_symbol.is_type && !old_symbol.is_type))
     duplicate_non_type_symbol(old_symbol, new_symbol);
   else if(new_symbol.is_type && old_symbol.is_type)
-    duplicate_type_symbol(old_symbol, new_symbol);
+  {
+    bool move=true;
+    duplicate_type_symbol(old_symbol, new_symbol, move);
+  }
   else if(new_symbol.is_type && old_symbol.is_file_local)
     rename_type_symbol(new_symbol);
   else
@@ -226,7 +229,8 @@ Function: linkingt::duplicate_type_symbol
 
 void linkingt::duplicate_type_symbol(
   symbolt &old_symbol,
-  symbolt &new_symbol)
+  symbolt &new_symbol,
+  bool &move)
 {
   // check if it is really the same
   // -- use base_type_eq, not linking_type_eq
@@ -240,28 +244,40 @@ void linkingt::duplicate_type_symbol(
       s_it++)
     ok&=completed.find(*s_it)!=completed.end();
   if(ok && base_type_eq(old_symbol.type, new_symbol.type, ns))
+  {
+    move=false;
     return;
+  }
 
   // they are different
   if(old_symbol.type.id()==ID_incomplete_struct &&
      new_symbol.type.id()==ID_struct)
   {
-    old_symbol.type=new_symbol.type; // store new type
+    if(move)
+      old_symbol.type=new_symbol.type; // store new type
+    move=false;
   }
   else if(old_symbol.type.id()==ID_struct &&
           new_symbol.type.id()==ID_incomplete_struct)
   {
     // ignore
+    move=false;
   }
   else if(ns.follow(old_symbol.type).id()==ID_array &&
           ns.follow(new_symbol.type).id()==ID_array)
   {
-    if(to_array_type(ns.follow(old_symbol.type)).size().is_nil() &&
+    if(move &&
+       to_array_type(ns.follow(old_symbol.type)).size().is_nil() &&
        to_array_type(ns.follow(new_symbol.type)).size().is_not_nil())
       old_symbol.type=new_symbol.type; // store new type
+    move=false;
   }
   else
-    rename_type_symbol(new_symbol);
+  {
+    if(move)
+      rename_type_symbol(new_symbol);
+    move=true;
+  }
 }
 
 /*******************************************************************\
@@ -504,7 +520,15 @@ void linkingt::inspect_src_symbol(const irep_idt &identifier)
   // for non-types even though recursion may occur via initializers
   if(!processing.insert(identifier).second)
   {
-    if(new_symbol.is_type && main_context.has_symbol(identifier))
+    if(!main_context.has_symbol(identifier))
+      return;
+
+    symbolt &old_symbol=main_context.lookup(identifier);
+    bool move=false;
+    if(new_symbol.is_type && old_symbol.is_type)
+      duplicate_type_symbol(old_symbol, new_symbol, move);
+
+    if(move)
     {
       irep_idt old_identifier=new_symbol.name;
       irep_idt new_identifier=rename(old_identifier);

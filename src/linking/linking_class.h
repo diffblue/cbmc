@@ -40,7 +40,8 @@ protected:
 
   void duplicate_type_symbol(
     symbolt &old_symbol, 
-    symbolt &new_symbol);
+    symbolt &new_symbol,
+    bool &move);
 
   void duplicate_non_type_symbol(
     symbolt &old_symbol,
