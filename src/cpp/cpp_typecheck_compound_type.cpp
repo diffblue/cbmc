@@ -1008,7 +1008,7 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
     typecheck_compound_bases(to_struct_type(type));
   }
 
-  exprt &body=(exprt &)type.add(ID_body);
+  exprt &body=static_cast<exprt &>(type.add(ID_body));
   struct_union_typet::componentst &components=type.components();
 
   symbol.type.set(ID_name, symbol.name);
@@ -1311,7 +1311,7 @@ void cpp_typecheckt::move_member_initializers(
     exprt::operandst::iterator o_it=value.operands().begin();
     forall_irep(it, initializers.get_sub())
     {
-      o_it=value.operands().insert(o_it,(exprt&)*it);
+      o_it=value.operands().insert(o_it, static_cast<const exprt &>(*it));
       o_it++;
     }
   }
@@ -1433,7 +1433,7 @@ void cpp_typecheckt::adjust_method_type(
 
   arguments.get_sub().insert(arguments.get_sub().begin(), irept(ID_argument));
 
-  exprt &argument=(exprt &)arguments.get_sub().front();
+  exprt &argument=static_cast<exprt &>(arguments.get_sub().front());
   argument.type()=typet(ID_pointer);
 
   argument.type().subtype()=typet(ID_symbol);
