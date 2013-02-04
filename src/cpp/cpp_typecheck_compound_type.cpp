@@ -337,7 +337,6 @@ void cpp_typecheckt::typecheck_compound_declarator(
     throw 0;
   }
 
-
   bool is_method=!is_typedef && final_type.id()==ID_code;
   bool is_constructor=declaration.is_constructor();
   bool is_destructor=declaration.is_destructor();
@@ -410,11 +409,22 @@ void cpp_typecheckt::typecheck_compound_declarator(
   // now do actual work
 
   struct_typet::componentt component;
+  irep_idt identifier;
 
-  irep_idt identifier=
-    language_prefix+
-    cpp_scopes.current_scope().prefix+
-    id2string(base_name);
+  //if(is_method || is_static)
+  {
+    // Identifiers for methods include the scope prefix.
+    // Identifiers for static members include the scope prefix.
+    identifier=
+      language_prefix+
+      cpp_scopes.current_scope().prefix+
+      id2string(base_name);
+  }
+  //else
+  //{
+    // otherwise, we keep them simple
+    //identifier=base_name;
+  //}
 
   component.set(ID_name, identifier);
   component.type()=final_type;
@@ -1750,12 +1760,12 @@ bool cpp_typecheckt::check_component_access(
   
   forall_irep(f_it, friends)
   {
-    const irept& friend_symb = *f_it;
+    const irept &friend_symb = *f_it;
 
-    const cpp_scopet& friend_scope =
+    const cpp_scopet &friend_scope =
       cpp_scopes.get_scope(friend_symb.get(ID_identifier));
 
-    cpp_scopet* pscope = &(cpp_scopes.current_scope());
+    cpp_scopet *pscope = &(cpp_scopes.current_scope());
 
     while(!(pscope->is_root_scope()))
     {
