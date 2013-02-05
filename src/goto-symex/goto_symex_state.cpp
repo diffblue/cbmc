@@ -426,12 +426,12 @@ void goto_symex_statet::rename(
 
   if(expr.id()==ID_symbol)
   {
-    irep_idt identifier=to_symbol_expr(expr).get_identifier();
+    const irep_idt identifier=to_symbol_expr(expr).get_identifier();
 
     if(level==L0 || level==L1)
     {
-      identifier=rename(identifier, ns, level);
-      to_symbol_expr(expr).set_identifier(identifier);
+      const irep_idt new_name=rename(identifier, ns, level);
+      to_symbol_expr(expr).set_identifier(new_name);
     }  
     else if(level==L2)
     {
@@ -454,8 +454,8 @@ void goto_symex_statet::rename(
             expr=p_it->second; // already L2
           else
           {
-            identifier=level2(l1_identifier); // L2
-            to_symbol_expr(expr).set_identifier(identifier);
+            const irep_idt new_name=level2(l1_identifier); // L2
+            to_symbol_expr(expr).set_identifier(new_name);
           }
         }
       }
