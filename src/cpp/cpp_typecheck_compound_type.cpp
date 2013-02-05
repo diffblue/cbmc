@@ -410,8 +410,12 @@ void cpp_typecheckt::typecheck_compound_declarator(
 
   struct_typet::componentt component;
   irep_idt identifier;
-
-  //if(is_method || is_static)
+  
+  // the below is a temporary hack
+  //if(is_method || is_static)d
+  if(id2string(cpp_scopes.current_scope().prefix).find("#anon")==
+     std::string::npos ||
+     is_method || is_static)
   {
     // Identifiers for methods include the scope prefix.
     // Identifiers for static members include the scope prefix.
@@ -420,12 +424,12 @@ void cpp_typecheckt::typecheck_compound_declarator(
       cpp_scopes.current_scope().prefix+
       id2string(base_name);
   }
-  //else
-  //{
+  else
+  {
     // otherwise, we keep them simple
-    //identifier=base_name;
-  //}
-
+    identifier=base_name;
+  }
+  
   component.set(ID_name, identifier);
   component.type()=final_type;
   component.set(ID_access, access);
