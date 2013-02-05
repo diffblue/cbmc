@@ -750,6 +750,7 @@ void c_typecheck_baset::clean_type(
       new_symbol.type=size.type();
       new_symbol.is_file_local=true;
       new_symbol.is_type=false;
+      new_symbol.is_thread_local=true;
       new_symbol.value.make_nil();
       new_symbol.location=location;
       context.add(new_symbol);
