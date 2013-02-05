@@ -147,7 +147,13 @@ public:
     
     return n;
   }
-  
+
+  void clear()
+  {
+    subt::clear();
+    uuf.clear();
+  }  
+
 protected:
   unsigned_union_find uuf;
   typedef numbering<T> subt;
