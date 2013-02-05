@@ -147,6 +147,8 @@ protected:
 
   virtual void symex_goto(statet &state);
   virtual void symex_start_thread(statet &state);
+  virtual void symex_atomic_begin(statet &state);
+  virtual void symex_atomic_end(statet &state);  
   virtual void symex_decl(statet &state);
   virtual void symex_return(statet &state);
 
