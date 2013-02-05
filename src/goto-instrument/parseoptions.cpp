@@ -26,6 +26,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/string_instrumentation.h>
 #include <goto-programs/loop_ids.h>
 #include <goto-programs/reachability_slicer.h>
+#include <goto-programs/link_to_library.h>
 
 #include <pointer-analysis/value_set_analysis.h>
 #include <pointer-analysis/goto_program_dereference.h>
@@ -431,29 +432,15 @@ void goto_instrument_parseoptionst::instrument_goto_program(
     options.set_option("unwind", cmdline.getval("unwind"));
   }
 
-  // max number of variables in a cycle (default 0: no max)
-  if(cmdline.isset("max-var"))
-    options.set_option("max-var", cmdline.getval("max-var"));
-
-  // max number of transition by po (default 0: no limit)
-  if(cmdline.isset("max-po-trans"))
-    options.set_option("max-po-trans", cmdline.getval("max-po-trans"));
-
-  // strategy of instrumentation
-  instrumentation_strategyt inst_strategy;
-  if(cmdline.isset("one-event-per-cycle"))
-    inst_strategy=one_event_per_cycle;
-  else if(cmdline.isset("minimum-interference"))
-    inst_strategy=min_interference;
-  else if(cmdline.isset("read-first"))
-    inst_strategy=read_first;
-  else if(cmdline.isset("write-first"))
-    inst_strategy=write_first;
-  else if(cmdline.isset("my-events"))
-    inst_strategy=my_events;
-  else
-    /* default: instruments all unsafe pairs */
-    inst_strategy=all;
+  // we add the library in some cases, for extra confusion
+  
+  if(cmdline.isset("wmm") ||
+     cmdline.isset("race-check") ||
+     cmdline.isset("concurrency"))
+  {
+    status("Adding CPROVER library");      
+    link_to_library(context, goto_functions, ui_message_handler);
+  }
 
   namespacet ns(context);
 
@@ -536,13 +523,29 @@ void goto_instrument_parseoptionst::instrument_goto_program(
     {
       std::string wmm=cmdline.getval("wmm");
       weak_memory_modelt model;
+
+      // strategy of instrumentation
+      instrumentation_strategyt inst_strategy;
+      if(cmdline.isset("one-event-per-cycle"))
+        inst_strategy=one_event_per_cycle;
+      else if(cmdline.isset("minimum-interference"))
+        inst_strategy=min_interference;
+      else if(cmdline.isset("read-first"))
+        inst_strategy=read_first;
+      else if(cmdline.isset("write-first"))
+        inst_strategy=write_first;
+      else if(cmdline.isset("my-events"))
+        inst_strategy=my_events;
+      else
+        /* default: instruments all unsafe pairs */
+        inst_strategy=all;
       
       const unsigned unwind_loops = 
-        ( cmdline.isset("unwind")?options.get_int_option("unwind"):0 );
+        ( cmdline.isset("unwind")?atoi(cmdline.getval("unwind")):0 );
       const unsigned max_var =
-        ( cmdline.isset("max-var")?options.get_int_option("max-var"):0 );
+        ( cmdline.isset("max-var")?atoi(cmdline.getval("max-var")):0 );
       const unsigned max_po_trans =
-        ( cmdline.isset("max-po-trans")?options.get_int_option("max-po-trans"):0 );
+        ( cmdline.isset("max-po-trans")?atoi(cmdline.getval("max-po-trans")):0 );
 
       if(wmm=="tso")
       {
