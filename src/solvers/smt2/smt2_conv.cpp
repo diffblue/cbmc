@@ -1602,6 +1602,8 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
        op_type.id()==ID_signedbv ||
        op_type.id()==ID_c_enum)
     {
+      // integer to fixedbv
+      
       unsigned from_width=to_bitvector_type(op_type).get_width();
       smt2_prop.out << "(concat ";
 
@@ -1609,13 +1611,14 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
         convert_expr(op);
       else if(from_width>to_integer_bits)
       {
-        smt2_prop.out << "((_ extract " << (to_integer_bits-1) << " "
-                      << to_fraction_bits << ") ";
+        // too many integer bits
+        smt2_prop.out << "((_ extract " << (to_integer_bits-1) << " 0) ";
         convert_expr(op);
         smt2_prop.out << ")";
       }
       else
       {
+        // too few integer bits
         assert(from_width<to_integer_bits);
         if(expr_type.id()==ID_unsignedbv)
         {
