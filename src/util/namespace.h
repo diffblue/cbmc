@@ -33,9 +33,7 @@ public:
     return lookup(irep.get(ID_identifier));
   }
   
-  virtual ~namespace_baset()
-  {
-  }
+  virtual ~namespace_baset();
    
   void follow_symbol(irept &irep) const;
   void follow_macros(exprt &expr) const;

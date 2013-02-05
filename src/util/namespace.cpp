@@ -42,6 +42,22 @@ unsigned get_max(
 
 /*******************************************************************\
 
+Function: namespace_baset::~namespace_baset
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+namespace_baset::~namespace_baset()
+{
+}
+
+/*******************************************************************\
+
 Function: namespace_baset::follow_symbol
 
   Inputs:
