@@ -1416,7 +1416,9 @@ Function: smt1_convt::convert_typecast
 
 \*******************************************************************/
 
-void smt1_convt::convert_typecast(const typecast_exprt &expr, bool bool_as_bv)
+void smt1_convt::convert_typecast(
+  const typecast_exprt &expr,
+  bool bool_as_bv)
 {
   assert(expr.operands().size()==1);
   const exprt &op=expr.op0();
@@ -1481,13 +1483,13 @@ void smt1_convt::convert_typecast(const typecast_exprt &expr, bool bool_as_bv)
         smt1_prop.out << ")";
       }
     }
-    else if(op_type.id()==ID_fixedbv) // from fixedbv
+    else if(op_type.id()==ID_fixedbv) // from fixedbv to integer
     {
-      const fixedbv_typet &fixedbv_type=to_fixedbv_type(op_type);
+      const fixedbv_typet &fixedbv_op_type=to_fixedbv_type(op_type);
 
-      unsigned from_width=fixedbv_type.get_width();
-      unsigned from_integer_bits=fixedbv_type.get_integer_bits();
-      unsigned from_fraction_bits=fixedbv_type.get_fraction_bits();
+      unsigned from_width=fixedbv_op_type.get_width();
+      unsigned from_integer_bits=fixedbv_op_type.get_integer_bits();
+      unsigned from_fraction_bits=fixedbv_op_type.get_fraction_bits();
 
       if(to_width>from_integer_bits)
       {
@@ -1572,20 +1574,24 @@ void smt1_convt::convert_typecast(const typecast_exprt &expr, bool bool_as_bv)
        op_type.id()==ID_signedbv ||
        op_type.id()==ID_c_enum)
     {
+      // integer to fixedbv
       unsigned from_width=to_bitvector_type(op_type).get_width();
+      
+      // we just concatenate a zero-valued fractional part
       smt1_prop.out << "(concat";
 
       if(from_width==to_integer_bits)
         convert_expr(op, true);
       else if(from_width>to_integer_bits)
       {
-        smt1_prop.out << " (extract[" << (to_integer_bits-1) << ":"
-                      << to_fraction_bits << "] ";
+        // too many integer bits, chop some off
+        smt1_prop.out << " (extract[" << (to_integer_bits-1) << ":0] ";
         convert_expr(op, true);
         smt1_prop.out << ")";
       }
       else
       {
+        // too few integer bits
         assert(from_width<to_integer_bits);
         if(expr_type.id()==ID_unsignedbv)
         {
@@ -1603,10 +1609,12 @@ void smt1_convt::convert_typecast(const typecast_exprt &expr, bool bool_as_bv)
         }
       }
 
-      smt1_prop.out << " bv0[" << to_fraction_bits << "])";
+      smt1_prop.out << " bv0[" << to_fraction_bits << "]";
+      smt1_prop.out << ")"; // concat
     }
     else if(op_type.id()==ID_bool)
     {
+      // bool to fixedbv
       smt1_prop.out << "(concat (concat bv0[" << (to_integer_bits-1) << "]"
                     << " ";
       convert_expr(op, true); // this returns a 1-bit bit-vector
@@ -1616,6 +1624,7 @@ void smt1_convt::convert_typecast(const typecast_exprt &expr, bool bool_as_bv)
     }
     else if(op_type.id()==ID_fixedbv)
     {
+      // fixedbv to fixedbv
       const fixedbv_typet &from_fixedbv_type=to_fixedbv_type(op_type);
       unsigned from_fraction_bits=from_fixedbv_type.get_fraction_bits();
       unsigned from_integer_bits=from_fixedbv_type.get_integer_bits();
@@ -2343,6 +2352,7 @@ void smt1_convt::convert_mult(const mult_exprt &expr)
     fixedbv_spect spec(to_fixedbv_type(expr.type()));
     unsigned fraction_bits=spec.get_fraction_bits();
 
+    // strip away faction_bits off the result
     smt1_prop.out << "(extract[" << spec.width+fraction_bits-1 << ":"
                                  << fraction_bits << "] ";
 
@@ -2356,8 +2366,8 @@ void smt1_convt::convert_mult(const mult_exprt &expr)
     convert_expr(expr.op1(), true);
     smt1_prop.out << ") ";
 
-    smt1_prop.out << ")"; // bvmul
-    smt1_prop.out << ")"; // extract
+    smt1_prop.out << ")"; // bvmul, fraction_bits+width wide
+    smt1_prop.out << ")"; // extract, width bits wide
   }
   else if(expr.type().id()==ID_rational)
   {
