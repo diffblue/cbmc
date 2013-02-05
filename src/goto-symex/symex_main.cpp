@@ -361,14 +361,12 @@ void goto_symext::symex_step(
     break;
   
   case ATOMIC_BEGIN:
-    state.atomic_section_count++;
+    symex_atomic_begin(state);
     state.source.pc++;
     break;
     
   case ATOMIC_END:
-    if(state.atomic_section_count==0)
-      throw "ATOMIC_END unmatched";
-    state.atomic_section_count--;
+    symex_atomic_end(state);
     state.source.pc++;
     break;
     
