@@ -347,19 +347,28 @@ int gcc_modet::gcc_hybrid_binary(const cmdlinet::argst &input_files)
 
   std::list<std::string> output_files;
   
-  for(cmdlinet::argst::const_iterator
-      i_it=input_files.begin();
-      i_it!=input_files.end();
-      i_it++)
+  if(cmdline.isset('c'))
   {
-    if(is_supported_source_file(*i_it) && cmdline.isset('c'))
+    if(cmdline.isset('o'))
     {
-      output_files.push_back(get_base_name(*i_it)+".o");
+      // there should be only one input file
+      output_files.push_back(cmdline.getval('o'));
+    }
+    else
+    {
+      for(cmdlinet::argst::const_iterator
+          i_it=input_files.begin();
+          i_it!=input_files.end();
+          i_it++)
+      {
+        if(is_supported_source_file(*i_it) && cmdline.isset('c'))
+          output_files.push_back(get_base_name(*i_it)+".o");
+      }
     }
   }
-  
-  if(!cmdline.isset('c'))
+  else
   {
+    // -c is not given
     if(cmdline.isset('o'))
       output_files.push_back(cmdline.getval('o'));
     else
