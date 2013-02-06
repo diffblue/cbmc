@@ -64,9 +64,7 @@ protected:
 class message_clientt
 {
 public:
-  virtual ~message_clientt()
-  {
-  }
+  virtual ~message_clientt();
 
   virtual void set_message_handler(message_handlert &_message_handler);
 
