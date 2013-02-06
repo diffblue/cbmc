@@ -88,6 +88,22 @@ void messaget::print(
   
 /*******************************************************************\
 
+Function: message_clientt::~message_clientt
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void message_clientt::~message_client()
+{
+}
+
+/*******************************************************************\
+
 Function: message_clientt::set_message_handler
 
   Inputs:
