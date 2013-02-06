@@ -98,7 +98,7 @@ Function: message_clientt::~message_clientt
 
 \*******************************************************************/
 
-void message_clientt::~message_client()
+message_clientt::~message_clientt()
 {
 }
 
