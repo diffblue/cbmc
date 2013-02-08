@@ -392,7 +392,7 @@ bool configt::set(const cmdlinet &cmdline)
     ansi_c.arch=configt::ansi_ct::ARCH_ALPHA;
     ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
     ansi_c.long_double_width=16*8;
-    ansi_c.long_width=8*8;
+    ansi_c.long_int_width=8*8;
     ansi_c.pointer_width=8*8;
     ansi_c.char_is_unsigned=false;
     #elif __arm__
@@ -417,14 +417,14 @@ bool configt::set(const cmdlinet &cmdline)
     ansi_c.char_is_unsigned=false;
     #elif __ia64__
     ansi_c.arch=configt::ansi_ct::ARCH_IA64;
-    ansi_c.long_width=8*8;
+    ansi_c.long_int_width=8*8;
     ansi_c.pointer_width=8*8;
     ansi_c.long_double_width=16*8;
     ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
     ansi_c.char_is_unsigned=false;
     #elif __s390x__
     ansi_c.arch=configt::ansi_ct::ARCH_S390X;
-    ansi_c.long_width=8*8;
+    ansi_c.long_int_width=8*8;
     ansi_c.pointer_width=8*8;
     ansi_c.endianness=configt::ansi_ct::IS_BIG_ENDIAN;
     ansi_c.char_is_unsigned=true;
@@ -439,7 +439,12 @@ bool configt::set(const cmdlinet &cmdline)
     ansi_c.long_double_width=16*8;
     ansi_c.pointer_width=8*8;
     ansi_c.char_is_unsigned=false;
+    #elif __i386__
+    ansi_c.arch=configt::ansi_ct::ARCH_I386;
+    ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
+    ansi_c.char_is_unsigned=false;
     #else
+    // something new and unknown!
     ansi_c.arch=configt::ansi_ct::ARCH_I386;
     ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
     ansi_c.char_is_unsigned=false;
