@@ -108,12 +108,6 @@ int goto_cc_modet::main(int argc, const char **argv)
     return EX_USAGE;
   }
 
-  if(cmdline.isset('?') || cmdline.isset('h') || cmdline.isset("help"))
-  {
-    help();
-    return EX_OK;
-  }
-
   try
   {
     if(doit())

@@ -61,6 +61,13 @@ Function: gcc_modet::doit
 
 bool gcc_modet::doit()
 {
+  if(cmdline.isset('?') ||
+     cmdline.isset("help"))
+  {
+    help();
+    return false;
+  }
+
   int verbosity=1;
 
   compilet compiler(cmdline);

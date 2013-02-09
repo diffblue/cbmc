@@ -39,6 +39,13 @@ static bool is_directory(const std::string &s)
 
 bool ms_cl_modet::doit()
 {
+  if(cmdline.isset('?') || 
+     cmdline.isset("help"))
+  {
+    help();
+    return false;
+  }
+
   int verbosity=1;
 
   compilet compiler(cmdline);
