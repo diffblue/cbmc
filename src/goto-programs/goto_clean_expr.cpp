@@ -244,6 +244,8 @@ void goto_convertt::clean_expr(
       // overwrites expr
       expr=symbol_expr(new_symbol);  
     }
+    else
+      expr=if_expr;
 
     // generate guard for argument side-effects    
     generate_ifthenelse(
