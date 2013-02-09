@@ -624,6 +624,39 @@ typet long_double_type()
 
 /*******************************************************************\
 
+Function: gcc_float128_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+typet gcc_float128_type()
+{
+  typet result;
+  
+  if(config.ansi_c.use_fixed_for_float)
+  {
+    fixedbv_typet tmp;
+    tmp.set_width(128);
+    tmp.set_integer_bits(128/2);
+    result=tmp;
+  }
+  else
+  {
+    result=ieee_float_spect::quadruple_precision().to_type();
+  }
+
+  // not same as long double!  
+  result.set(ID_C_c_type, ID_gcc_float128);
+  return result;
+}
+
+/*******************************************************************\
+
 Function: pointer_diff_type
 
   Inputs:
