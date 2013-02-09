@@ -62,7 +62,7 @@ public:
     const exprt &what,
     bool write=false)
   {
-    exprt result("zero_string_length", uint_type());
+    exprt result("zero_string_length", size_type());
     result.copy_to_operands(what);
     result.set("lhs", write);
     return result;
@@ -70,7 +70,7 @@ public:
 
   exprt buffer_size(const exprt &what)
   {
-    exprt result("buffer_size", uint_type());
+    exprt result("buffer_size", size_type());
     result.copy_to_operands(what);
     return result;
   }
@@ -511,7 +511,7 @@ void string_instrumentationt::do_format_string_read(
           {
             index_exprt index;
             index.array()=temp;
-            index.index()=gen_zero(uint_type());
+            index.index()=gen_zero(index_type());
             index.type()=arg_type.subtype();            
             temp=address_of_exprt(index);            
           }
@@ -559,7 +559,7 @@ void string_instrumentationt::do_format_string_read(
         {
           index_exprt index;
           index.array()=temp;
-          index.index()=gen_zero(uint_type());
+          index.index()=gen_zero(index_type());
           index.type()=arg_type.subtype();            
           temp=address_of_exprt(index);            
         }
@@ -626,9 +626,9 @@ void string_instrumentationt::do_format_string_write(
           
           if(it->field_width!=0)
           {
-            exprt fwidth = from_integer(it->field_width, uint_type());
-            exprt fw_1(ID_plus, uint_type());
-            exprt one = gen_one(uint_type());
+            exprt fwidth = from_integer(it->field_width, unsigned_int_type());
+            exprt fw_1(ID_plus, unsigned_int_type());
+            exprt one = gen_one(unsigned_int_type());
             fw_1.move_to_operands(fwidth);
             fw_1.move_to_operands(one); // +1 for 0-char
             
@@ -640,7 +640,7 @@ void string_instrumentationt::do_format_string_write(
             {
               index_exprt index;
               index.array()=argument;
-              index.index()=gen_zero(uint_type());
+              index.index()=gen_zero(unsigned_int_type());
               address_of_exprt aof(index);
               fw_lt_bs=binary_relation_exprt(fw_1, ID_le, buffer_size(aof));
             }
@@ -942,7 +942,7 @@ void string_instrumentationt::do_strerror(
     new_symbol_size.pretty_name=new_symbol_size.base_name;
     new_symbol_size.name=identifier_size;
     new_symbol_size.mode=ID_C;
-    new_symbol_size.type=uint_type();
+    new_symbol_size.type=size_type();
     new_symbol_size.is_state_var=true;
     new_symbol_size.is_lvalue=true;
     new_symbol_size.is_static_lifetime=true;
@@ -971,7 +971,7 @@ void string_instrumentationt::do_strerror(
 
   {  
     goto_programt::targett assignment1=tmp.add_instruction(ASSIGN);
-    exprt nondet_size=side_effect_expr_nondett(uint_type());
+    exprt nondet_size=side_effect_expr_nondett(size_type());
 
     assignment1->code=code_assignt(symbol_expr(symbol_size), nondet_size);
     assignment1->location=it->location;
@@ -987,7 +987,7 @@ void string_instrumentationt::do_strerror(
 
   // return a pointer to some magic buffer
   exprt index=exprt(ID_index, char_type());
-  index.copy_to_operands(symbol_expr(symbol_buf), gen_zero(uint_type()));
+  index.copy_to_operands(symbol_expr(symbol_buf), gen_zero(index_type()));
 
   exprt ptr=exprt(ID_address_of, pointer_typet());
   ptr.type().subtype()=char_type();
@@ -1041,7 +1041,7 @@ void string_instrumentationt::invalidate_buffer(
     new_symbol.pretty_name=new_symbol.base_name;
     new_symbol.name=cntr_id;
     new_symbol.mode=ID_C;
-    new_symbol.type=uint_type();
+    new_symbol.type=size_type();
     new_symbol.is_state_var=true;
     new_symbol.is_lvalue=true;
     new_symbol.is_static_lifetime=true;
@@ -1067,9 +1067,9 @@ void string_instrumentationt::invalidate_buffer(
   goto_programt::targett increment=dest.add_instruction(ASSIGN);
   increment->location=target->location;  
   
-  exprt plus(ID_plus, uint_type());
+  exprt plus(ID_plus, unsigned_int_type());
   plus.copy_to_operands(symbol_expr(cntr_sym));
-  plus.copy_to_operands(gen_one(uint_type()));
+  plus.copy_to_operands(gen_one(unsigned_int_type()));
   
   increment->code=code_assignt(symbol_expr(cntr_sym), plus);
   
@@ -1090,7 +1090,7 @@ void string_instrumentationt::invalidate_buffer(
   {
     index_exprt index;
     index.array()=buffer;
-    index.index()=gen_zero(uint_type());
+    index.index()=gen_zero(index_type());
     index.type()=buf_type.subtype();
     bufp = address_of_exprt(index);
   }
@@ -1110,7 +1110,7 @@ void string_instrumentationt::invalidate_buffer(
   else
     check->guard=
           binary_relation_exprt(symbol_expr(cntr_sym), ID_gt, 
-                                from_integer(limit, uint_type()));
+                                from_integer(limit, unsigned_int_type()));
   
   exprt nondet=side_effect_expr_nondett(buf_type.subtype());
   invalidate->code=code_assignt(deref, nondet);

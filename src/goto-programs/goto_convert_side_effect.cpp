@@ -121,11 +121,13 @@ void goto_convertt::remove_assignment(
     rhs.copy_to_operands(expr.op0(), expr.op1());
     rhs.type()=expr.op0().type();
     
+    // bool doesn't really exist as a type,
+    // fake promotion!
     if(rhs.op0().type().id()==ID_bool)
     {
-      rhs.op0().make_typecast(int_type());
-      rhs.op1().make_typecast(int_type());
-      rhs.type()=int_type();
+      rhs.op0().make_typecast(signed_int_type());
+      rhs.op1().make_typecast(signed_int_type());
+      rhs.type()=signed_int_type();
       rhs.make_typecast(typet(ID_bool));
     }
     
@@ -185,17 +187,17 @@ void goto_convertt::remove_pre(
       
   if(op_type.id()==ID_bool)
   {
-    rhs.copy_to_operands(expr.op0(), gen_one(int_type()));
-    rhs.op0().make_typecast(int_type());
-    rhs.type()=int_type();
+    rhs.copy_to_operands(expr.op0(), gen_one(signed_int_type()));
+    rhs.op0().make_typecast(signed_int_type());
+    rhs.type()=signed_int_type();
     rhs.make_typecast(typet(ID_bool));
   }
   else if(op_type.id()==ID_c_enum ||
           op_type.id()==ID_incomplete_c_enum)
   {
-    rhs.copy_to_operands(expr.op0(), gen_one(int_type()));
-    rhs.op0().make_typecast(int_type());
-    rhs.type()=int_type();
+    rhs.copy_to_operands(expr.op0(), gen_one(signed_int_type()));
+    rhs.op0().make_typecast(signed_int_type());
+    rhs.type()=signed_int_type();
     rhs.make_typecast(op_type);
   }
   else
@@ -269,17 +271,17 @@ void goto_convertt::remove_post(
     
   if(op_type.id()==ID_bool)
   {
-    rhs.copy_to_operands(expr.op0(), gen_one(int_type()));
-    rhs.op0().make_typecast(int_type());
-    rhs.type()=int_type();
+    rhs.copy_to_operands(expr.op0(), gen_one(signed_int_type()));
+    rhs.op0().make_typecast(signed_int_type());
+    rhs.type()=signed_int_type();
     rhs.make_typecast(typet(ID_bool));
   }
   else if(op_type.id()==ID_c_enum ||
           op_type.id()==ID_incomplete_c_enum)
   {
-    rhs.copy_to_operands(expr.op0(), gen_one(int_type()));
-    rhs.op0().make_typecast(int_type());
-    rhs.type()=int_type();
+    rhs.copy_to_operands(expr.op0(), gen_one(signed_int_type()));
+    rhs.op0().make_typecast(signed_int_type());
+    rhs.type()=signed_int_type();
     rhs.make_typecast(op_type);
   }
   else
