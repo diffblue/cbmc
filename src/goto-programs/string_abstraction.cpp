@@ -184,8 +184,8 @@ typet string_abstractiont::build_type(whatt what)
   switch(what)
   {
   case IS_ZERO: type=bool_typet(); break;
-  case LENGTH:  type=uint_type(); break;
-  case SIZE:    type=uint_type(); break;
+  case LENGTH:  type=size_type(); break;
+  case SIZE:    type=size_type(); break;
   }
 
   return type;
@@ -1007,7 +1007,7 @@ exprt string_abstractiont::build(
   if(what==LENGTH || what==SIZE)
   {
     // adjust for offset
-    exprt pointer_offset(ID_pointer_offset, uint_type());
+    exprt pointer_offset(ID_pointer_offset, size_type());
     pointer_offset.copy_to_operands(pointer);
     if(pointer_offset.is_not_nil() &&
         !pointer_offset.is_zero())
