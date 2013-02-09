@@ -31,6 +31,12 @@ Function: cw_modet::doit
 
 bool cw_modet::doit()
 {
+  if(cmdline.isset('?') || cmdline.isset("help"))
+  {
+    help();
+    return false;
+  }
+
   int verbosity=1;
 
   compilet compiler(cmdline);
