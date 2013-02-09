@@ -256,7 +256,7 @@ void cpp_typecheckt::zero_initializer(
       for(mp_integer i=0; i<size; ++i)
       {
         exprt index(ID_index);
-        index.copy_to_operands(object, from_integer(i, int_type()));
+        index.copy_to_operands(object, from_integer(i, index_type()));
         zero_initializer(index, array_type.subtype(), location, ops);
       }
     }

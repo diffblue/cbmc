@@ -696,7 +696,7 @@ void cpp_declarator_convertert::main_function_rules(
     const typet &return_type=
       to_code_type(symbol.type).return_type();
 
-    if(return_type!=int_type())
+    if(return_type!=signed_int_type())
     {
       // Too many embedded compilers ignore this rule.
       //

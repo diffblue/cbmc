@@ -764,7 +764,7 @@ void cpp_typecheck_resolvet::make_constructors(
         code_typet t3;
         t3.return_type()=it->type();
         t3.arguments().resize(1);
-        t3.arguments()[0].type()=int_type();
+        t3.arguments()[0].type()=signed_int_type();
         exprt pod_constructor3("pod_constructor", t3);
         new_identifiers.push_back(pod_constructor3);
       }

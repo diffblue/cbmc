@@ -89,7 +89,7 @@ bool cpp_typecheckt::standard_conversion_array_to_pointer(
   assert(expr.type().id()==ID_array);
 
   exprt index(ID_index, expr.type().subtype());
-  index.copy_to_operands(expr, from_integer(0, int_type()));
+  index.copy_to_operands(expr, from_integer(0, index_type()));
   index.set(ID_C_lvalue, true);
 
   pointer_typet pointer;

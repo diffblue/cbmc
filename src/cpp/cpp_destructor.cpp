@@ -72,7 +72,7 @@ codet cpp_typecheckt::cpp_destructor(
     // for each element of the array, call the destructor
     for(mp_integer i = 0; i < s; ++i)
     {
-      exprt constant=from_integer(i, int_type());
+      exprt constant=from_integer(i, index_type());
       constant.location()=location;
 
       exprt index(ID_index);
