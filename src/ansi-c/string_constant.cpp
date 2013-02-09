@@ -46,7 +46,7 @@ Function: string_constantt::set_value
 
 void string_constantt::set_value(const irep_idt &value)
 {
-  exprt size_expr=from_integer(value.size()+1, int_type());
+  exprt size_expr=from_integer(value.size()+1, index_type());
   type().add(ID_size).swap(size_expr);
   set(ID_value, value);
 }

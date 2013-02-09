@@ -348,7 +348,7 @@ static void do_enum_members(
   // This assigns increasing values to enum constants
   // that do not have an explicit value. We start with 0.
   // In C, enum constants always have type "int".
-  value=gen_zero(int_type());
+  value=gen_zero(::enum_type());
 
   Forall_operands(it, members)
   {
@@ -363,7 +363,7 @@ static void do_enum_members(
     symbol_expr.set(ID_identifier, ansi_c_declaration.get_name());
     
     value=exprt(ID_plus);
-    value.copy_to_operands(symbol_expr, gen_one(int_type()));    
+    value.copy_to_operands(symbol_expr, gen_one(::enum_type()));
     
     PARSER.copy_item(ansi_c_declaration);
   }

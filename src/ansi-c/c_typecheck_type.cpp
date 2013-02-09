@@ -674,7 +674,7 @@ void c_typecheck_baset::adjust_function_argument(typet &type) const
   else if(type.id()==ID_KnR)
   {
     // any KnR args without type yet?
-    type=int_type(); // the default is integer!
+    type=signed_int_type(); // the default is integer!
   }
 }
 

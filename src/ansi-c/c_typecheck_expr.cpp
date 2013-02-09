@@ -89,14 +89,14 @@ bool c_typecheck_baset::gcc_types_compatible_p(
 
   if(type1.id()==ID_c_enum)
   {
-    if(type2==int_type())
+    if(type2==signed_int_type())
       return true;
     else if(type2==type1) // compares the tag
       return true;
   }
   else if(type2.id()==ID_c_enum)
   {
-    if(type1==int_type())
+    if(type1==signed_int_type())
       return true;
     else if(type1==type2) // compares the tag
       return true;
@@ -315,7 +315,7 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
     // that we are using "bool" for boolean operators instead
     // of "int". We convert for this reason.
     if(follow(expr.op0().type()).id()==ID_bool)
-      expr.op0().make_typecast(int_type());
+      expr.op0().make_typecast(signed_int_type());
 
     irept::subt &generic_associations=
       expr.add(ID_generic_associations).get_sub();
@@ -471,7 +471,7 @@ void c_typecheck_baset::typecheck_expr_cw_va_arg_typeof(exprt &expr)
   typecheck_type(type);
 
   // these return an integer
-  expr.type()=int_type();
+  expr.type()=signed_int_type();
 }
 
 /*******************************************************************\
@@ -1016,7 +1016,7 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
     // that we are using "bool" for boolean operators instead
     // of "int". We convert for this reason.
     if(follow(op.type()).id()==ID_bool)
-      op.make_typecast(int_type());
+      op.make_typecast(signed_int_type());
 
     // we need to find a member with the right type
     const union_typet &union_type=to_union_type(expr_type);
@@ -1944,7 +1944,7 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
     {
       // This is an undeclared function. Let's just add it.
       // We do a bit of return-type guessing, but just a bit.
-      typet return_type=int_type();
+      typet return_type=signed_int_type();
       
       // The following isn't really right and sound, but there
       // are too many idiots out there who use malloc and the like
@@ -2065,7 +2065,7 @@ void c_typecheck_baset::do_special_functions(
         throw "buffer_size expects one operand";
       }
 
-      exprt buffer_size_expr("buffer_size", uint_type());
+      exprt buffer_size_expr("buffer_size", size_type());
       buffer_size_expr.operands()=expr.arguments();
       buffer_size_expr.location()=location;
       expr.swap(buffer_size_expr);
@@ -2092,7 +2092,7 @@ void c_typecheck_baset::do_special_functions(
         throw "zero_string_length expects one operand";
       }
 
-      exprt zero_string_length_expr("zero_string_length", uint_type());
+      exprt zero_string_length_expr("zero_string_length", size_type());
       zero_string_length_expr.operands()=expr.arguments();
       zero_string_length_expr.set(ID_C_lvalue, true); // make it an lvalue
       zero_string_length_expr.location()=location;

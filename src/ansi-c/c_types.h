@@ -13,12 +13,20 @@ Author: Daniel Kroening, kroening@kroening.com
 
 typet index_type();
 typet enum_type();
-typet int_type();
-typet uint_type();
-typet long_int_type();
-typet long_long_int_type();
-typet long_uint_type();
-typet long_long_uint_type();
+typet int_type(); // will go away
+typet uint_type(); // will go away
+typet signed_int_type();
+typet unsigned_int_type();
+typet long_int_type(); // will go away
+typet signed_long_int_type();
+typet signed_short_int_type();
+typet unsigned_short_int_type();
+typet long_long_int_type(); // will go away
+typet signed_long_long_int_type();
+typet long_uint_type(); // will go away
+typet long_long_uint_type(); // will go away
+typet unsigned_long_int_type();
+typet unsigned_long_long_int_type();
 typet c_bool_type();
 typet char_type();
 typet unsigned_char_type();

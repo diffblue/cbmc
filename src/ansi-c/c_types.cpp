@@ -26,7 +26,7 @@ Function: index_type
 typet index_type()
 {
   // same as signed size type
-  return signedbv_typet(config.ansi_c.pointer_width);
+  return signed_size_type();
 }
 
 /*******************************************************************\
@@ -43,7 +43,8 @@ Function: enum_type
 
 typet enum_type()
 {
-  return signedbv_typet(config.ansi_c.int_width);  
+  // same as 'int', but might be unsigned
+  return signed_int_type();
 }
 
 /*******************************************************************\
@@ -60,8 +61,44 @@ Function: int_type
 
 typet int_type()
 {
+  return signed_int_type();
+}
+
+/*******************************************************************\
+
+Function: signed_int_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+typet signed_int_type()
+{
   typet result=signedbv_typet(config.ansi_c.int_width);  
   result.set(ID_C_c_type, ID_signed_int);
+  return result;
+}
+
+/*******************************************************************\
+
+Function: signed_short_int_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+typet signed_short_int_type()
+{
+  typet result=signedbv_typet(config.ansi_c.short_int_width);
+  result.set(ID_C_c_type, ID_signed_short_int);
   return result;
 }
 
@@ -79,8 +116,44 @@ Function: uint_type
 
 typet uint_type()
 {
+  return unsigned_int_type();
+}
+
+/*******************************************************************\
+
+Function: unsigned_int_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+typet unsigned_int_type()
+{
   typet result=unsignedbv_typet(config.ansi_c.int_width);  
   result.set(ID_C_c_type, ID_unsigned_int);
+  return result;
+}
+
+/*******************************************************************\
+
+Function: unsigned_short_int_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+typet unsigned_short_int_type()
+{
+  typet result=unsignedbv_typet(config.ansi_c.short_int_width);  
+  result.set(ID_C_c_type, ID_unsigned_short_int);
   return result;
 }
 
@@ -99,20 +172,16 @@ Function: size_type
 typet size_type()
 {
   // The size type varies. This is unsigned int on some systems,
-  // and signed long int on others, and signed long long on say Windows.
+  // and unsigned long int on others, and unsigned long long on say Windows.
 
-  typet result=unsignedbv_typet(config.ansi_c.pointer_width);
-  
   if(config.ansi_c.pointer_width==config.ansi_c.int_width)
-    result.set(ID_C_c_type, ID_signed_int);
+    return unsigned_int_type();
   else if(config.ansi_c.pointer_width==config.ansi_c.long_int_width)
-    result.set(ID_C_c_type, ID_signed_long_int);
+    return unsigned_long_int_type();
   else if(config.ansi_c.pointer_width==config.ansi_c.long_long_int_width)
-    result.set(ID_C_c_type, ID_signed_long_long_int);
+    return unsigned_long_long_int_type();
   else
     assert(false); // aaah!
-  
-  return result;
 }
 
 /*******************************************************************\
@@ -147,6 +216,23 @@ Function: long_int_type
 
 typet long_int_type()
 {
+  return signed_long_int_type();
+}
+
+/*******************************************************************\
+
+Function: signed_long_int_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+typet signed_long_int_type()
+{
   typet result=signedbv_typet(config.ansi_c.long_int_width);
   result.set(ID_C_c_type, ID_signed_long_int);
   return result;
@@ -165,6 +251,23 @@ Function: long_long_int_type
 \*******************************************************************/
 
 typet long_long_int_type()
+{
+  return signed_long_long_int_type();
+}
+
+/*******************************************************************\
+
+Function: signed_long_long_int_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+typet signed_long_long_int_type()
 {
   typet result=signedbv_typet(config.ansi_c.long_long_int_width);
   result.set(ID_C_c_type, ID_signed_long_long_int);
@@ -185,6 +288,23 @@ Function: long_uint_type
 
 typet long_uint_type()
 {
+  return unsigned_long_int_type();
+}
+
+/*******************************************************************\
+
+Function: unsigned_long_int_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+typet unsigned_long_int_type()
+{
   typet result=unsignedbv_typet(config.ansi_c.long_int_width);  
   result.set(ID_C_c_type, ID_unsigned_long_int);
   return result;
@@ -203,6 +323,23 @@ Function: long_long_uint_type
 \*******************************************************************/
 
 typet long_long_uint_type()
+{
+  return unsigned_long_long_int_type();
+}
+
+/*******************************************************************\
+
+Function: unsigned_long_long_int_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+typet unsigned_long_long_int_type()
 {
   typet result=unsignedbv_typet(config.ansi_c.long_long_int_width);
   result.set(ID_C_c_type, ID_unsigned_long_long_int);
@@ -223,6 +360,7 @@ Function: c_bool_type
 
 typet c_bool_type()
 {
+  // we model it as unsigned, but this doesn't matter
   typet result=unsignedbv_typet(config.ansi_c.bool_width);
   result.set(ID_C_c_type, ID_bool);
   return result;
@@ -244,10 +382,15 @@ typet char_type()
 {
   typet result;
 
+  // this can be signed or unsigned, depending on the architecture
+
   if(config.ansi_c.char_is_unsigned)
     result=unsignedbv_typet(config.ansi_c.char_width);
   else
     result=signedbv_typet(config.ansi_c.char_width);
+
+  // There are 3 char types, i.e., this one is
+  // different from either signed char or unsigned char!
     
   result.set(ID_C_c_type, ID_char);
     
@@ -496,17 +639,13 @@ typet pointer_diff_type()
   // The pointer-diff type varies. This is signed int on some systems,
   // and signed long int on others, and signed long long on say Windows.
 
-  typet result=signedbv_typet(config.ansi_c.pointer_width);
-  
   if(config.ansi_c.pointer_width==config.ansi_c.int_width)
-    result.set(ID_C_c_type, ID_signed_int);
+    return signed_int_type();
   else if(config.ansi_c.pointer_width==config.ansi_c.long_int_width)
-    result.set(ID_C_c_type, ID_signed_long_int);
+    return signed_long_int_type();
   else if(config.ansi_c.pointer_width==config.ansi_c.long_long_int_width)
-    result.set(ID_C_c_type, ID_signed_long_long_int);
+    return signed_long_long_int_type();
   else
     assert(false); // aaah!
-  
-  return result;
 }
 
