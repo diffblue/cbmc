@@ -305,9 +305,7 @@ void ansi_c_convert_typet::write(typet &type)
       throw 0;
     }
 
-    type.id(ID_unsignedbv);
-    type.set(ID_width, config.ansi_c.bool_width);
-    type.set(ID_C_c_type, ID_bool);
+    type=c_bool_type();
   }
   else if(proper_bool_cnt)
   {
@@ -328,9 +326,16 @@ void ansi_c_convert_typet::write(typet &type)
     // the "default" for complex is double
     type=double_type();
   }
-  else
+  else if(char_cnt)
   {
-    // it is integer -- signed or unsigned?
+    if(int_cnt || short_cnt || long_cnt ||
+       int8_cnt || int16_cnt || int32_cnt || int64_cnt ||
+       gcc_float128_cnt || bv_cnt || proper_bool_cnt)
+    {
+      err_location(location);
+      error("illegal type modifier for char type");
+      throw 0;
+    }
 
     if(signed_cnt && unsigned_cnt)
     {
@@ -339,37 +344,47 @@ void ansi_c_convert_typet::write(typet &type)
       throw 0;
     }
     else if(unsigned_cnt)
-      type.id(ID_unsignedbv);
+      type=unsigned_char_type();
     else if(signed_cnt)
-      type.id(ID_signedbv);
+      type=signed_char_type();
     else
+      type=char_type();
+  }
+  else
+  {
+    // it is integer -- signed or unsigned?
+    
+    bool is_signed=true; // default
+
+    if(signed_cnt && unsigned_cnt)
     {
-      if(char_cnt)
-        type.id(config.ansi_c.char_is_unsigned?ID_unsignedbv:ID_signedbv);
-      else
-        type.id(ID_signedbv);
+      err_location(location);
+      error("conflicting type modifiers");
+      throw 0;
     }
+    else if(unsigned_cnt)
+      is_signed=false;
+    else if(signed_cnt)
+      is_signed=true;
 
     // get width
 
-    unsigned width;
-    
     if(gcc_mode_QI || gcc_mode_HI || gcc_mode_SI || gcc_mode_DI)
     {
       if(gcc_mode_QI)
-        width=1*8;
+        type=is_signed?signed_char_type():unsigned_char_type();
       else if(gcc_mode_HI)
-        width=2*8;
+        type=is_signed?signed_short_int_type():unsigned_short_int_type();
       else if(gcc_mode_SI)
-        width=4*8;
+        type=is_signed?signed_int_type():unsigned_int_type();
       else if(gcc_mode_DI)
-        width=8*8;
+        type=is_signed?signed_long_int_type():unsigned_long_int_type();
       else
         assert(false);
     }
-    else if(int8_cnt || int16_cnt || int32_cnt || int64_cnt || gcc_int128_cnt || bv_cnt)
+    else if(int8_cnt || int16_cnt || int32_cnt || int64_cnt)
     {
-      if(long_cnt || char_cnt || short_cnt)
+      if(long_cnt || char_cnt || short_cnt || gcc_int128_cnt || bv_cnt)
       {
         err_location(location);
         error("conflicting type modifiers");
@@ -377,19 +392,29 @@ void ansi_c_convert_typet::write(typet &type)
       }
       
       if(int8_cnt)
-        width=1*8;
+        type=is_signed?signed_char_type():unsigned_char_type();
       else if(int16_cnt)
-        width=2*8;
+        type=is_signed?signed_short_int_type():unsigned_short_int_type();
       else if(int32_cnt)
-        width=4*8;
-      else if(int64_cnt)
-        width=8*8;
-      else if(bv_cnt)
-        width=bv_width;
-      else if(gcc_int128_cnt)
-        width=128;
+        type=is_signed?signed_int_type():unsigned_int_type();
+      else if(int64_cnt) // Visual Studio: equivalent to long long int
+        type=is_signed?signed_long_long_int_type():unsigned_long_long_int_type();
       else
         assert(false);
+    }
+    else if(gcc_int128_cnt)
+    {
+      type.id(is_signed?ID_signedbv:ID_unsignedbv);
+      type.set(ID_width, 128);
+      type.set(ID_C_c_type, ID_gcc_int128); // not the same as any other
+    }
+    else if(bv_cnt)
+    {
+      // explicitly given width
+      type.id(is_signed?ID_signedbv:ID_unsignedbv);
+      type.set(ID_width, bv_width);
+      
+      // need to decide on ID_C_c_type to set
     }
     else if(short_cnt)
     {
@@ -400,30 +425,19 @@ void ansi_c_convert_typet::write(typet &type)
         throw 0;
       }
 
-      width=config.ansi_c.short_int_width;
-    }
-    else if(char_cnt)
-    {
-      if(long_cnt)
-      {
-        err_location(location);
-        error("illegal type modifier for char type");
-        throw 0;
-      }
-
-      width=config.ansi_c.char_width;
+      type=is_signed?signed_short_int_type():unsigned_short_int_type();
     }
     else if(long_cnt==0)
     {
-      width=config.ansi_c.int_width;
+      type=is_signed?signed_int_type():unsigned_int_type();
     }
     else if(long_cnt==1)
     {
-      width=config.ansi_c.long_int_width;
+      type=is_signed?signed_long_int_type():unsigned_long_int_type();
     }
     else if(long_cnt==2)
     {
-      width=config.ansi_c.long_long_int_width;
+      type=is_signed?signed_long_long_int_type():unsigned_long_long_int_type();
     }
     else
     {
@@ -431,8 +445,6 @@ void ansi_c_convert_typet::write(typet &type)
       error("illegal type modifier for integer type");
       throw 0;
     }
-
-    type.set(ID_width, width);
   }
 
   if(vector_size.is_not_nil())
