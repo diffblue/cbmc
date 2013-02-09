@@ -437,12 +437,12 @@ void c_typecastt::implicit_typecast_arithmetic(
   case UCHAR:      assert(false); // should always be promoted to int
   case SHORT:      assert(false); // should always be promoted to int
   case USHORT:     assert(false); // should always be promoted to int
-  case INT:        new_type=int_type(); break;
-  case UINT:       new_type=uint_type(); break;
-  case LONG:       new_type=long_int_type(); break;
-  case ULONG:      new_type=long_uint_type(); break;
-  case LONGLONG:   new_type=long_long_int_type(); break;
-  case ULONGLONG:  new_type=long_long_uint_type(); break;
+  case INT:        new_type=signed_int_type(); break;
+  case UINT:       new_type=unsigned_int_type(); break;
+  case LONG:       new_type=signed_long_int_type(); break;
+  case ULONG:      new_type=unsigned_long_int_type(); break;
+  case LONGLONG:   new_type=signed_long_long_int_type(); break;
+  case ULONGLONG:  new_type=unsigned_long_long_int_type(); break;
   case SINGLE:     new_type=float_type(); break;
   case DOUBLE:     new_type=double_type(); break;
   case LONGDOUBLE: new_type=long_double_type(); break;

@@ -85,7 +85,7 @@ exprt convert_character_literal(
       throw "empty character literal";
     else if(value.size()==1)
     {
-      typet type=force_integer_type?int_type():char_type();
+      typet type=force_integer_type?signed_int_type():char_type();
       result=from_integer(value[0], type);
     }
     else if(value.size()>=2 && value.size()<=4)
@@ -100,7 +100,7 @@ exprt convert_character_literal(
       }
 
       // always integer, never char!
-      result=from_integer(x, int_type());
+      result=from_integer(x, signed_int_type());
     }
     else
       throw "literals with "+i2string(value.size())+

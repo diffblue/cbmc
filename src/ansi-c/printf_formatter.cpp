@@ -191,25 +191,25 @@ void printf_formattert::process_format(std::ostream &out)
   case 'd':
     if(next_operand==operands.end()) break;
     out << format_constant(
-      make_type(*(next_operand++), int_type()));
+      make_type(*(next_operand++), signed_int_type()));
     break;
 
   case 'D':
     if(next_operand==operands.end()) break;
     out << format_constant(
-      make_type(*(next_operand++), long_int_type()));
+      make_type(*(next_operand++), signed_long_int_type()));
     break;
 
   case 'u':
     if(next_operand==operands.end()) break;
     out << format_constant(
-      make_type(*(next_operand++), uint_type()));
+      make_type(*(next_operand++), unsigned_int_type()));
     break;
 
   case 'U':
     if(next_operand==operands.end()) break;
     out << format_constant(
-      make_type(*(next_operand++), long_uint_type()));
+      make_type(*(next_operand++), unsigned_long_int_type()));
     break;
 
   default:
