@@ -253,6 +253,12 @@ std::string expr2ct::convert_rec(
       return q+"signed long long int";
     else if(c_type==ID_bool)
       return q+"_Bool";
+    else if(c_type==ID_signed_int128)
+      return q+"signed __int128";
+    else if(c_type==ID_unsigned_int128)
+      return q+"unsigned __int128";
+    else if(c_type==ID_gcc_float128)
+      return q+"__float128";
       
     // There is also wchar_t among the above, but this isn't a C type.
 
