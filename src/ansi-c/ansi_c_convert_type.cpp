@@ -246,8 +246,9 @@ void ansi_c_convert_typet::write(typet &type)
       error("conflicting type modifiers");
       throw 0;
     }
-    
-    type=long_double_type();
+
+    // _not_ the same as long double
+    type=gcc_float128_type();
   }
   else if(double_cnt || float_cnt)
   {
