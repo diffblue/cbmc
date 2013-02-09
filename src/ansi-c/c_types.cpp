@@ -682,3 +682,41 @@ typet pointer_diff_type()
     assert(false); // aaah!
 }
 
+/*******************************************************************\
+
+Function: gcc_unsigned_int128_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+typet gcc_unsigned_int128_type()
+{
+  typet result=signedbv_typet(128);
+  result.set(ID_C_c_type, ID_unsigned_int128);
+  return result;
+}
+
+/*******************************************************************\
+
+Function: gcc_signed_int128_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+typet gcc_signed_int128_type()
+{
+  typet result=signedbv_typet(128);
+  result.set(ID_C_c_type, ID_signed_int128);
+  return result;
+}
+

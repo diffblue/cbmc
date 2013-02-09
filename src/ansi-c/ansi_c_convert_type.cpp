@@ -405,9 +405,10 @@ void ansi_c_convert_typet::write(typet &type)
     }
     else if(gcc_int128_cnt)
     {
-      type.id(is_signed?ID_signedbv:ID_unsignedbv);
-      type.set(ID_width, 128);
-      type.set(ID_C_c_type, ID_gcc_int128); // not the same as any other
+      if(is_signed)
+        type=gcc_signed_int128_type();
+      else
+        type=gcc_unsigned_int128_type();
     }
     else if(bv_cnt)
     {
