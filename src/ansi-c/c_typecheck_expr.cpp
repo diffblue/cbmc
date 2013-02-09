@@ -71,11 +71,13 @@ Function: c_typecheck_baset::typecheck_expr_main
 
 \*******************************************************************/
 
-bool c_typecheck_baset::gcc_types_compatible_p(const typet &type1, const typet &type2)
+bool c_typecheck_baset::gcc_types_compatible_p(
+  const typet &type1,
+  const typet &type2)
 {
   // read
   // http://gcc.gnu.org/onlinedocs/gcc-3.3.6/gcc/Other-Builtins.html
-  
+
   if(type1.id()==ID_symbol)
     return gcc_types_compatible_p(follow(type1), type2);
   else if(type2.id()==ID_symbol)
@@ -103,8 +105,18 @@ bool c_typecheck_baset::gcc_types_compatible_p(const typet &type1, const typet &
     return gcc_types_compatible_p(type1.subtype(), type2.subtype());
   else if(type1.id()==ID_array && type2.id()==ID_array)
     return gcc_types_compatible_p(type1.subtype(), type2.subtype()); // ignore size
-  else if(type1==type2)
-    return true;
+  else
+  {
+    if(type1==type2)
+    {
+      // Need to distinguish e.g. long int from int or
+      // long long int from long int.
+      // The rules appear to match those of C++.
+      
+      if(type1.get(ID_C_c_type)==type2.get(ID_C_c_type))
+        return true;
+    }
+  }
   
   return false;
 }
