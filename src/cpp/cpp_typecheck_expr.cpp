@@ -290,12 +290,12 @@ void cpp_typecheckt::typecheck_expr_trinary(if_exprt &expr)
       
       index_exprt index1;
       index1.array() = expr.op1();
-      index1.index() = from_integer(0,int_type());
+      index1.index() = from_integer(0, index_type());
       index1.type() = expr.op1().type().subtype();
 
       index_exprt index2;
       index2.array() = expr.op2();
-      index2.index() = from_integer(0,int_type());
+      index2.index() = from_integer(0, index_type());
       index2.type() = expr.op2().type().subtype();
 
       address_of_exprt addr1(index1);
@@ -2488,7 +2488,7 @@ void cpp_typecheckt::typecheck_side_effect_inc_dec(
   // the odd C++ way to denote the post-inc/dec operator
   if(post)
     new_expr.arguments().push_back(
-      from_integer(mp_integer(0), int_type()));
+      from_integer(mp_integer(0), signed_int_type()));
       
   typecheck_side_effect_function_call(new_expr);
   expr.swap(new_expr);

@@ -153,7 +153,7 @@ static void copy_array(
   exprt &block)
 {
   // Build the index expression
-  exprt constant=from_integer(i, int_type());
+  exprt constant=from_integer(i, index_type());
 
   block.operands().push_back(exprt(ID_code));
   exprt& code = block.operands().back();

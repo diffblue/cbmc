@@ -109,7 +109,7 @@ codet cpp_typecheckt::cpp_constructor(
       {
         exprt::operandst tmp_operands;
 
-        exprt constant=from_integer(i, int_type());
+        exprt constant=from_integer(i, index_type());
         constant.location()=location;
 
         exprt index(ID_index);
