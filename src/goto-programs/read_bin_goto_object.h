@@ -8,21 +8,21 @@ Date: May 2007
  
 \*******************************************************************/
 
-#ifndef READ_BIN_GOTO_OBJECT_H_
-#define READ_BIN_GOTO_OBJECT_H_
+#ifndef CPROVER_READ_BIN_GOTO_OBJECT_H
+#define CPROVER_READ_BIN_GOTO_OBJECT_H
 
 #include <istream>
 #include <string>
 
-class contextt;
+class symbol_tablet;
 class goto_functionst;
 class message_handlert;
 
 bool read_bin_goto_object(
   std::istream &in,
   const std::string &filename,
-  contextt &context,
-  goto_functionst &functions,
+  symbol_tablet &symbol_table,
+  goto_functionst &goto_functions,
   message_handlert &message_handler);
 
 #endif /*READ_BIN_GOTO_OBJECT_H_*/
