@@ -32,9 +32,7 @@ Function: get_ui_cmdline
 
 static ui_message_handlert::uit get_ui_cmdline(const cmdlinet &cmdline)
 {
-  if(cmdline.isset("gui"))
-    return ui_message_handlert::OLD_GUI;
-  else if(cmdline.isset("xml-ui"))
+  if(cmdline.isset("xml-ui"))
     return ui_message_handlert::XML_UI;
 
   return ui_message_handlert::PLAIN;

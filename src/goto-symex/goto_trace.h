@@ -138,11 +138,6 @@ public:
   }
 };
 
-void show_goto_trace_gui(
-  std::ostream &out,
-  const namespacet &ns,
-  const goto_tracet &goto_trace);
-
 void show_goto_trace(
   std::ostream &out,
   const namespacet &ns,
