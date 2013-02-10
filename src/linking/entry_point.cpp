@@ -113,17 +113,25 @@ bool static_lifetime_init(
        type.id()==ID_empty)
       continue;
     
+    // We won't try to initialize any symbols that have 
+    // remained incomplete.
+
     if(type.id()==ID_array &&
        to_array_type(type).size().is_nil())
       continue; // do not initialize
       
-    if(it->second.value.id()==ID_nondet)
+    if(type.id()==ID_incomplete_struct ||
+       type.id()==ID_incomplete_union)
       continue; // do not initialize
       
+    if(it->second.value.id()==ID_nondet)
+      continue; // do not initialize
+
     exprt rhs;
       
     if(it->second.value.is_nil())
     {
+    
       try
       {
         namespacet ns(symbol_table);
