@@ -32,7 +32,7 @@ Function: read_goto_object_v2
 bool read_bin_goto_object_v2(
   std::istream &in,
   const std::string &filename,
-  contextt &context,
+  symbol_tablet &symbol_table,
   goto_functionst &functions,
   message_handlert &message_handler,
   irep_serializationt &irepconverter,
@@ -84,7 +84,7 @@ bool read_bin_goto_object_v2(
       functions.function_map[sym.name].type=to_code_type(sym.type);      
     }
     
-    context.add(sym);
+    symbol_table.add(sym);
   }
   
   count=irepconverter.read_long(in); // # of functions
@@ -158,7 +158,7 @@ bool read_bin_goto_object_v2(
  
 Function: read_goto_object
  
-  Inputs: input stream, context, functions
+  Inputs: input stream, symbol table, functions
  
  Outputs: true on error, false otherwise
  
@@ -169,7 +169,7 @@ Function: read_goto_object
 bool read_bin_goto_object(
   std::istream &in,
   const std::string &filename,
-  contextt &context,
+  symbol_tablet &symbol_table,
   goto_functionst &functions,
   message_handlert &message_handler)
 { 
@@ -228,7 +228,7 @@ bool read_bin_goto_object(
 
     case 2:
       return read_bin_goto_object_v2(in, filename, 
-                                     context, functions, 
+                                     symbol_table, functions, 
                                      message_handler,
                                      irepconverter,
                                      gfconverter); 

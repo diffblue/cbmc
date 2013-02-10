@@ -11,6 +11,7 @@ Author:
 #include <message.h>
 #include <unicode.h>
 
+#include "goto_model.h"
 #include "read_goto_binary.h"
 #include "read_bin_goto_object.h"
 #include "elf_reader.h"
@@ -29,8 +30,29 @@ Function: read_goto_binary
 
 bool read_goto_binary(
   const std::string &filename,
-  contextt &context,
-  goto_functionst &dest,
+  goto_modelt &dest,
+  message_handlert &message_handler)
+{
+  return read_goto_binary(
+    filename, dest.symbol_table, dest.goto_functions, message_handler);
+}
+
+/*******************************************************************\
+
+Function: read_goto_binary
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool read_goto_binary(
+  const std::string &filename,
+  symbol_tablet &symbol_table,
+  goto_functionst &goto_functions,
   message_handlert &message_handler)
 {
   #ifdef _MSC_VER
@@ -56,11 +78,13 @@ bool read_goto_binary(
 
   if(hdr[0]==0x7f && hdr[1]=='G' && hdr[2]=='B' && hdr[3]=='F')
   {
-    return read_bin_goto_object(in, filename, context, dest, message_handler);
+    return read_bin_goto_object(
+      in, filename, symbol_table, goto_functions, message_handler);
   }
   else if(hdr[0]==0x7f && hdr[1]=='E' && hdr[2]=='L' && hdr[3]=='F')
   {
-    // this _may_ have a goto-cc section
+    // ELF binary.
+    // This _may_ have a goto-cc section.
     try
     {
       elf_readert elf_reader(in);
@@ -69,7 +93,8 @@ bool read_goto_binary(
         if(elf_reader.section_name(i)=="goto-cc")
         {
           in.seekg(elf_reader.section_offset(i));
-          return read_bin_goto_object(in, filename, context, dest, message_handler);
+          return read_bin_goto_object(
+            in, filename, symbol_table, goto_functions, message_handler);
         }
         
       // section not found
