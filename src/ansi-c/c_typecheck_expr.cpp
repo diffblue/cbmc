@@ -442,7 +442,7 @@ void c_typecheck_baset::typecheck_expr_builtin_va_arg(exprt &expr)
   symbol.name=ID_gcc_builtin_va_arg;
   symbol.type=new_type;
   
-  context.move(symbol);
+  symbol_table.move(symbol);
 }
 
 /*******************************************************************\
@@ -1940,7 +1940,7 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
     const irep_idt &identifier=
       add_language_prefix(to_symbol_expr(f_op).get_identifier());
 
-    if(context.symbols.find(identifier)==context.symbols.end())
+    if(symbol_table.symbols.find(identifier)==symbol_table.symbols.end())
     {
       // This is an undeclared function. Let's just add it.
       // We do a bit of return-type guessing, but just a bit.

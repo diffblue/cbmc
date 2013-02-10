@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <simplify_expr.h>
 #include <base_type.h>
 #include <std_code.h>
-#include <context.h>
+#include <symbol_table.h>
 #include <guard.h>
 #include <options.h>
 
@@ -525,15 +525,15 @@ Function: remove_pointers
 
 void remove_pointers(
   goto_programt &goto_program,
-  contextt &context,
+  symbol_tablet &symbol_table,
   value_setst &value_sets)
 {
-  namespacet ns(context);
+  namespacet ns(symbol_table);
   
   optionst options;
 
   goto_program_dereferencet
-    goto_program_dereference(ns, context, options, value_sets);
+    goto_program_dereference(ns, symbol_table, options, value_sets);
 
   goto_program_dereference.dereference_program(goto_program);
 }                    
@@ -552,15 +552,15 @@ Function: remove_pointers
 
 void remove_pointers(
   goto_functionst &goto_functions,
-  contextt &context,
+  symbol_tablet &symbol_table,
   value_setst &value_sets)
 {
-  namespacet ns(context);
+  namespacet ns(symbol_table);
   
   optionst options;
 
   goto_program_dereferencet
-    goto_program_dereference(ns, context, options, value_sets);
+    goto_program_dereference(ns, symbol_table, options, value_sets);
 
   Forall_goto_functions(it, goto_functions)
     goto_program_dereference.dereference_program(it->second.body);
@@ -580,13 +580,13 @@ Function: pointer_checks
 
 void pointer_checks(
   goto_programt &goto_program,
-  contextt &context,
+  symbol_tablet &symbol_table,
   const optionst &options,
   value_setst &value_sets)
 {
-  namespacet ns(context);
+  namespacet ns(symbol_table);
   goto_program_dereferencet
-    goto_program_dereference(ns, context, options, value_sets);
+    goto_program_dereference(ns, symbol_table, options, value_sets);
   goto_program_dereference.pointer_checks(goto_program);
 }                    
 
@@ -604,13 +604,13 @@ Function: pointer_checks
 
 void pointer_checks(
   goto_functionst &goto_functions,
-  contextt &context,
+  symbol_tablet &symbol_table,
   const optionst &options,
   value_setst &value_sets)
 {
-  namespacet ns(context);
+  namespacet ns(symbol_table);
   goto_program_dereferencet
-    goto_program_dereference(ns, context, options, value_sets);
+    goto_program_dereference(ns, symbol_table, options, value_sets);
   goto_program_dereference.pointer_checks(goto_functions);
 }                    
 
@@ -633,8 +633,8 @@ void dereference(
   value_setst &value_sets)
 {
   optionst options;
-  contextt new_context;
+  symbol_tablet new_symbol_table;
   goto_program_dereferencet
-    goto_program_dereference(ns, new_context, options, value_sets);
+    goto_program_dereference(ns, new_symbol_table, options, value_sets);
   goto_program_dereference.dereference_expression(target, expr);
 }

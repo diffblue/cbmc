@@ -10,15 +10,15 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_LINKING_H
 
 #include <message.h>
-#include <context.h>
+#include <symbol_table.h>
 
-// this merges the context "new_context" into "dest_context",
-// applying appropriate renamings to symbols in "new_context"
-// when necessary
+// This merges the symbol table "new_symbol_table" into "dest_symbol_table",
+// applying appropriate renamings to symbols in "new_symbol_table"
+// when necessary.
 
 bool linking(
-  contextt &dest_context,
-  contextt &new_context,
+  symbol_tablet &dest_symbol_table,
+  symbol_tablet &new_symbol_table,
   message_handlert &message_handler);
 
 #endif

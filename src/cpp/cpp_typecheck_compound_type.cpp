@@ -192,10 +192,10 @@ void cpp_typecheckt::typecheck_compound_type(
 
   // check if we have it already
 
-  contextt::symbolst::iterator previous_symbol=
-    context.symbols.find(symbol_name);
+  symbol_tablet::symbolst::iterator previous_symbol=
+    symbol_table.symbols.find(symbol_name);
 
-  if(previous_symbol!=context.symbols.end())
+  if(previous_symbol!=symbol_table.symbols.end())
   {
     // we do!
 
@@ -240,8 +240,8 @@ void cpp_typecheckt::typecheck_compound_type(
     // move early, must be visible before doing body
     symbolt *new_symbol;
  
-    if(context.move(symbol, new_symbol))
-      throw "cpp_typecheckt::typecheck_compound_type: context.move() failed";
+    if(symbol_table.move(symbol, new_symbol))
+      throw "cpp_typecheckt::typecheck_compound_type: symbol_table.move() failed";
 
     // put into dest_scope
     cpp_idt &id=cpp_scopes.put_into_scope(*new_symbol, *dest_scope);
@@ -554,10 +554,10 @@ void cpp_typecheckt::typecheck_compound_declarator(
       // get the virtual-table symbol type
       irep_idt vt_name = "virtual_table::"+id2string(symbol.name);
 
-      contextt::symbolst::iterator vtit =
-        context.symbols.find(vt_name);
+      symbol_tablet::symbolst::iterator vtit =
+        symbol_table.symbols.find(vt_name);
 
-      if(vtit == context.symbols.end())
+      if(vtit == symbol_table.symbols.end())
       {
         // first time: create a virtual-table symbol type 
         symbolt vt_symb_type;
@@ -571,9 +571,9 @@ void cpp_typecheckt::typecheck_compound_declarator(
         vt_symb_type.type.set(ID_name, vt_symb_type.name);
         vt_symb_type.is_type = true;
 
-        bool failed = context.move(vt_symb_type);
+        bool failed = symbol_table.move(vt_symb_type);
         assert(!failed);
-        vtit = context.symbols.find(vt_name);
+        vtit = symbol_table.symbols.find(vt_name);
 
         // add a virtual-table pointer 
         struct_typet::componentt compo;
@@ -646,7 +646,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
           arg.set(ID_C_identifier, arg_symb.name);
 
           // add the argument to the symbol table
-          bool failed = context.move(arg_symb);
+          bool failed = symbol_table.move(arg_symb);
           assert(!failed);
         }
 
@@ -654,7 +654,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
         typecast_exprt late_cast(to_code_type(component.type()).arguments()[0].type());
 
         late_cast.op0()=
-          symbol_expr(namespacet(context).lookup(
+          symbol_expr(namespacet(symbol_table).lookup(
             args[0].get(ID_C_identifier)));
         
         if(code_type.return_type().id()!=ID_empty &&
@@ -669,7 +669,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
           for(unsigned i=1; i < args.size(); i++)
           {
             expr_call.arguments().push_back(
-              symbol_expr(namespacet(context).lookup(
+              symbol_expr(namespacet(symbol_table).lookup(
                 args[i].get(ID_C_identifier))));
           }
 
@@ -688,7 +688,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
           for(unsigned i=1; i < args.size(); i++)
           {
             code_func.arguments().push_back(
-              symbol_expr(namespacet(context).lookup(
+              symbol_expr(namespacet(symbol_table).lookup(
                 args[i].get(ID_C_identifier))));
           }
 
@@ -704,7 +704,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
 
         // add the function to the symbol table
         {
-          bool failed = context.move(func_symb);
+          bool failed = symbol_table.move(func_symb);
           assert(!failed);
         }
 
@@ -716,7 +716,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
   
   if(is_static && !is_method) // static non-method member
   {
-    // add as global variable to context
+    // add as global variable to symbol_table
     symbolt static_symbol;
     static_symbol.mode=symbol.mode;
     static_symbol.name=identifier;
@@ -731,7 +731,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
     dynamic_initializations.push_back(static_symbol.name);
 
     symbolt *new_symbol;
-    if(context.move(static_symbol, new_symbol))
+    if(symbol_table.move(static_symbol, new_symbol))
     {
       err_location(cpp_name.location());
 	str << "redeclaration of static member `" 
@@ -1404,15 +1404,15 @@ void cpp_typecheckt::typecheck_member_function(
   // move early, it must be visible before doing any value
   symbolt *new_symbol;
 
-  if(context.move(symbol, new_symbol))
+  if(symbol_table.move(symbol, new_symbol))
   {
     err_location(symbol.location);
     str << "failed to insert new symbol: " << symbol.name.c_str() << std::endl;
 
-    contextt::symbolst::iterator symb_it =
-      context.symbols.find(symbol.name);
+    symbol_tablet::symbolst::iterator symb_it =
+      symbol_table.symbols.find(symbol.name);
 
-    if(symb_it != context.symbols.end())
+    if(symb_it != symbol_table.symbols.end())
     {
       str << "name of previous symbol: " << symb_it->second.name << std::endl;
       str << "location of previous symbol: ";
@@ -1546,7 +1546,7 @@ void cpp_typecheckt::convert_anon_struct_union_member(
   struct_typet::componentst &components)
 {
   symbolt &struct_union_symbol=
-    context.symbols[follow(declaration.type()).get(ID_name)];
+    symbol_table.symbols[follow(declaration.type()).get(ID_name)];
 
   if(declaration.storage_spec().is_static() ||
      declaration.storage_spec().is_mutable())

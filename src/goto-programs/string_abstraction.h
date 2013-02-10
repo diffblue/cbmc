@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_PROGRAMS_STRING_ABSTRACTION_H
 #define CPROVER_GOTO_PROGRAMS_STRING_ABSTRACTION_H
 
-#include <context.h>
+#include <symbol_table.h>
 #include <message_stream.h>
 #include <config.h>
 #include <std_expr.h>
@@ -28,7 +28,7 @@ class string_abstractiont:public message_streamt
 {
 public:
   string_abstractiont(
-    contextt &_context,
+    symbol_tablet &_symbol_table,
     message_handlert &_message_handler);
 
   void operator()(goto_programt &dest);
@@ -37,7 +37,7 @@ public:
 protected:
   const std::string arg_suffix;
   std::string sym_suffix;
-  contextt &context;
+  symbol_tablet &symbol_table;
   namespacet ns;
   unsigned temporary_counter;
 
@@ -175,12 +175,12 @@ protected:
 // keep track of length of strings
 
 void string_abstraction(
-  contextt &context,
+  symbol_tablet &symbol_table,
   message_handlert &message_handler,
   goto_programt &dest);
 
 void string_abstraction(
-  contextt &context,
+  symbol_tablet &symbol_table,
   message_handlert &message_handler,
   goto_functionst &dest);
 

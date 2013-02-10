@@ -33,19 +33,19 @@ public:
     message_handlert &message_handler);
 
   virtual bool typecheck(
-    contextt &context,
+    symbol_tablet &symbol_table,
     const std::string &module,
     message_handlert &message_handler);
 
-  bool merge_context(
-    contextt &dest,
-    contextt &src,
+  bool merge_symbol_table(
+    symbol_tablet &dest,
+    symbol_tablet &src,
     message_handlert &message_handler,
     const std::string &module,
     class replace_symbolt &replace_symbol) const; 
 
   virtual bool final(
-    contextt &context,
+    symbol_tablet &symbol_table,
     message_handlert &message_handler);
 
   virtual void show_parse(std::ostream &out);

@@ -62,16 +62,16 @@ Function: static_lifetime_init
 \*******************************************************************/
 
 bool static_lifetime_init(
-  contextt &context,
+  symbol_tablet &symbol_table,
   const locationt &location,
   message_handlert &message_handler)
 {
-  namespacet ns(context);
+  namespacet ns(symbol_table);
       
-  contextt::symbolst::iterator s_it=
-    context.symbols.find("c::__CPROVER_initialize");
+  symbol_tablet::symbolst::iterator s_it=
+    symbol_table.symbols.find("c::__CPROVER_initialize");
 
-  if(s_it==context.symbols.end()) return false;
+  if(s_it==symbol_table.symbols.end()) return false;
 
   symbolt &init_symbol=s_it->second;
   
@@ -82,7 +82,7 @@ bool static_lifetime_init(
   
   // do assignments based on "value"
 
-  forall_symbols(it, context.symbols)
+  forall_symbols(it, symbol_table.symbols)
   {
     const irep_idt &identifier=it->first;
   
@@ -126,7 +126,7 @@ bool static_lifetime_init(
     {
       try
       {
-        namespacet ns(context);
+        namespacet ns(symbol_table);
         rhs=zero_initializer(it->second.type, it->second.location, ns, message_handler);
         assert(rhs.is_not_nil());
       }
@@ -149,7 +149,7 @@ bool static_lifetime_init(
 
   // call designated "initialization" functions
 
-  forall_symbols(it, context.symbols)
+  forall_symbols(it, symbol_table.symbols)
   {
     if(it->second.type.get_bool("initialization") &&
        it->second.type.id()==ID_code)
@@ -177,12 +177,12 @@ Function: entry_point
 \*******************************************************************/
 
 bool entry_point(
-  contextt &context,
+  symbol_tablet &symbol_table,
   const std::string &standard_main,
   message_handlert &message_handler)
 {
   // check if main is already there
-  if(context.symbols.find(ID_main)!=context.symbols.end())
+  if(symbol_table.symbols.find(ID_main)!=symbol_table.symbols.end())
     return false; // silently ignore
 
   irep_idt main_symbol;
@@ -192,12 +192,12 @@ bool entry_point(
   {
     std::list<irep_idt> matches;
   
-    forall_symbol_base_map(it, context.symbol_base_map, config.main)
+    forall_symbol_base_map(it, symbol_table.symbol_base_map, config.main)
     {
       // look it up
-      contextt::symbolst::const_iterator s_it=context.symbols.find(it->second);
+      symbol_tablet::symbolst::const_iterator s_it=symbol_table.symbols.find(it->second);
       
-      if(s_it==context.symbols.end()) continue;
+      if(s_it==symbol_table.symbols.end()) continue;
     
       if(s_it->second.type.id()==ID_code)
         matches.push_back(it->second);
@@ -223,12 +223,12 @@ bool entry_point(
     main_symbol=standard_main;
     
   // look it up
-  contextt::symbolst::const_iterator s_it=context.symbols.find(main_symbol);
+  symbol_tablet::symbolst::const_iterator s_it=symbol_table.symbols.find(main_symbol);
   
-  if(s_it==context.symbols.end())
+  if(s_it==symbol_table.symbols.end())
   {
     messaget message(message_handler);
-    message.error("main symbol `"+id2string(main_symbol)+"' not in context");
+    message.error("main symbol `"+id2string(main_symbol)+"' not in symbol_table");
     return true; // give up, no main
   }
     
@@ -242,7 +242,7 @@ bool entry_point(
     return false; // give up
   }
 
-  if(static_lifetime_init(context, symbol.location, message_handler))
+  if(static_lifetime_init(symbol_table, symbol.location, message_handler))
     return true;
   
   code_blockt init_code;
@@ -250,10 +250,10 @@ bool entry_point(
   // build call to initialization function
 
   {
-    contextt::symbolst::iterator init_it=
-      context.symbols.find("c::__CPROVER_initialize");
+    symbol_tablet::symbolst::iterator init_it=
+      symbol_table.symbols.find("c::__CPROVER_initialize");
 
-    if(init_it==context.symbols.end())
+    if(init_it==symbol_table.symbols.end())
       throw "failed to find __CPROVER_initialize symbol";
   
     code_function_callt call_init;
@@ -281,7 +281,7 @@ bool entry_point(
     }
     else if(arguments.size()==2 || arguments.size()==3)
     {
-      namespacet ns(context);
+      namespacet ns(symbol_table);
 
       const symbolt &argc_symbol=ns.lookup("c::argc'");
       const symbolt &argv_symbol=ns.lookup("c::argv'");
@@ -475,7 +475,7 @@ bool entry_point(
   new_symbol.type.swap(main_type);
   new_symbol.value.swap(init_code);
   
-  if(context.move(new_symbol))
+  if(symbol_table.move(new_symbol))
   {
     messaget message;
     message.set_message_handler(message_handler);

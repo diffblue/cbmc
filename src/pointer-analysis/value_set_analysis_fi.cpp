@@ -12,7 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <prefix.h>
 #include <cprover_prefix.h>
 #include <xml_irep.h>
-#include <context.h>
+#include <symbol_table.h>
 
 #include <langapi/language_util.h>
 
@@ -249,7 +249,7 @@ void value_set_analysis_fit::get_globals(
   std::list<value_set_fit::entryt> &dest)
 {
   // static ones
-  forall_symbols(it, ns.get_context().symbols)
+  forall_symbols(it, ns.get_symbol_table().symbols)
     if(it->second.is_lvalue &&
        it->second.is_static_lifetime)
       get_entries(it->second, dest);

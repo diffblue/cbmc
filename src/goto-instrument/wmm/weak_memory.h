@@ -19,7 +19,7 @@ class goto_functionst;
 void weak_memory(
   weak_memory_modelt model,
   value_setst& value_sets,
-  contextt& context,
+  symbol_tablet& symbol_table,
   goto_functionst& goto_functions,
   bool SCC,
   instrumentation_strategyt event_stategy,

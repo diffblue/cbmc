@@ -451,14 +451,14 @@ bool compilet::link()
   
   if(mode==COMPILE_LINK_EXECUTABLE)
   {
-    if(entry_point(context, "c::main", ui_message_handler))
+    if(entry_point(symbol_table, "c::main", ui_message_handler))
       return true;
 
     // entry_point may (should) add some more functions.
     convert_symbols(compiled_functions);
   }
 
-  if(write_object_file(output_file_executable, context, compiled_functions))
+  if(write_object_file(output_file_executable, symbol_table, compiled_functions))
     return true;
 
   return false;
@@ -473,7 +473,7 @@ Function: compilet::compile
  Outputs: true on error, false otherwise
 
  Purpose: parses source files and writes object files, or keeps the
-          symbols in the context depending on the doLink flag.
+          symbols in the symbol_table depending on the doLink flag.
 
 \*******************************************************************/
 
@@ -525,10 +525,10 @@ bool compilet::compile()
         cfn=output_file_object;
       }
 
-      if(write_object_file(cfn, context, compiled_functions))
+      if(write_object_file(cfn, symbol_table, compiled_functions))
         return true;
 
-      context.clear(); // clean symbol table for next source file.
+      symbol_table.clear(); // clean symbol table for next source file.
       compiled_functions.clear();
     }
   }
@@ -701,10 +701,10 @@ Function: compilet::write_object_file
 
 bool compilet::write_object_file(
   const std::string &file_name,
-  const contextt &lcontext,
+  const symbol_tablet &lsymbol_table,
   goto_functionst &functions)
 {
-  return write_bin_object_file(file_name, lcontext, functions);
+  return write_bin_object_file(file_name, lsymbol_table, functions);
 }
 
 /*******************************************************************\
@@ -722,14 +722,14 @@ Function: compilet::write_bin_object_file
 
 bool compilet::write_bin_object_file(
   const std::string &file_name,
-  const contextt &lcontext,
+  const symbol_tablet &lsymbol_table,
   goto_functionst &functions)
 {
   print(8, "Writing binary format object `" + file_name + "'");
 
   // symbols
   print(8, "Symbols in table: "+
-           i2string((unsigned long)lcontext.symbols.size()));
+           i2string((unsigned long)lsymbol_table.symbols.size()));
 
   std::ofstream outfile(file_name.c_str(), std::ios::binary);
 
@@ -739,7 +739,7 @@ bool compilet::write_bin_object_file(
     return true;
   }
 
-  if(write_goto_binary(outfile, lcontext, functions))
+  if(write_goto_binary(outfile, lsymbol_table, functions))
     return true;
 
   unsigned cnt=function_body_count(functions);
@@ -795,18 +795,18 @@ bool compilet::read_object(
 {
   print(8, "Reading: " + file_name);
 
-  // we read into a temporary context
-  contextt temp_context;
+  // we read into a temporary symbol_table
+  symbol_tablet temp_symbol_table;
   goto_functionst temp_functions;
 
-  if(read_goto_binary(file_name, temp_context, temp_functions, *message_handler))
+  if(read_goto_binary(file_name, temp_symbol_table, temp_functions, *message_handler))
     return true;
   
   std::set<irep_idt> seen_modes;
 
-  for(contextt::symbolst::const_iterator
-      it=temp_context.symbols.begin();
-      it!=temp_context.symbols.end();
+  for(symbol_tablet::symbolst::const_iterator
+      it=temp_symbol_table.symbols.begin();
+      it!=temp_symbol_table.symbols.end();
       it++)
   {
     if(it->second.mode!="")
@@ -824,13 +824,13 @@ bool compilet::read_object(
 
   // hardwired to C-style linking
 
-  linkingt linking(context, temp_context, ui_message_handler);
+  linkingt linking(symbol_table, temp_symbol_table, ui_message_handler);
 
   if(linking.typecheck_main())
     return true;
     
-  if(link_functions(context, functions,
-                    temp_context, temp_functions,
+  if(link_functions(symbol_table, functions,
+                    temp_symbol_table, temp_functions,
                     linking.replace_symbol))
     return true;
 
@@ -874,7 +874,7 @@ Function: compilet::compilet
 
 compilet::compilet(cmdlinet &_cmdline):
   language_uit("goto-cc " GOTOCC_VERSION, _cmdline),
-  ns(context),
+  ns(symbol_table),
   cmdline(_cmdline)
 {
   mode=COMPILE_LINK_EXECUTABLE;
@@ -943,9 +943,9 @@ Function: compilet::link_functions
 \*******************************************************************/
 
 bool compilet::link_functions(
-  contextt &dest_context,
+  symbol_tablet &dest_symbol_table,
   goto_functionst &dest_functions,
-  contextt &src_context,
+  symbol_tablet &src_symbol_table,
   goto_functionst &src_functions,
   const replace_symbolt &replace_symbol)
 {
@@ -971,45 +971,45 @@ bool compilet::link_functions(
     {
       replace_symbols_in_function(src_it->second, replace_symbol);
 
-      goto_functionst::goto_functiont &in_dest_context=
+      goto_functionst::goto_functiont &in_dest_symbol_table=
         dest_functions.function_map[final_id];
 
-      in_dest_context.body.swap(src_it->second.body);
-      in_dest_context.body_available=src_it->second.body_available;
-      in_dest_context.type=src_it->second.type;
+      in_dest_symbol_table.body.swap(src_it->second.body);
+      in_dest_symbol_table.body_available=src_it->second.body_available;
+      in_dest_symbol_table.type=src_it->second.type;
     }
     else // collision!
     {
-      goto_functionst::goto_functiont &in_dest_context=
+      goto_functionst::goto_functiont &in_dest_symbol_table=
         dest_functions.function_map[final_id];
 
       goto_functionst::goto_functiont &src_func=src_it->second;
 
-      if(in_dest_context.body.instructions.empty())
+      if(in_dest_symbol_table.body.instructions.empty())
       {
         // the one with body wins!
         replace_symbols_in_function(src_func, replace_symbol);
         
-        in_dest_context.body.swap(src_func.body);
-        in_dest_context.body_available=src_func.body_available;
-        in_dest_context.type=src_func.type;
+        in_dest_symbol_table.body.swap(src_func.body);
+        in_dest_symbol_table.body_available=src_func.body_available;
+        in_dest_symbol_table.type=src_func.type;
       }
       else if(src_func.body.instructions.empty())
       {
         // just keep the old one in dest
       }
-      else if(in_dest_context.type.get_bool(ID_C_inlined))
+      else if(in_dest_symbol_table.type.get_bool(ID_C_inlined))
       {
         // ok, we silently ignore
       }
-      else if(base_type_eq(in_dest_context.type, src_func.type, ns))
+      else if(base_type_eq(in_dest_symbol_table.type, src_func.type, ns))
       {
-        // keep the one in in_context -- libraries come last!
+        // keep the one in in_symbol_table -- libraries come last!
         std::stringstream str;
         str << "warning: function `" << final_id << "' in module `"
-            << src_context.symbols.begin()->second.module
+            << src_symbol_table.symbols.begin()->second.module
             << "' is shadowed by a definition in module `"
-            << context.symbols.begin()->second.module << "'";
+            << symbol_table.symbols.begin()->second.module << "'";
         warning(str.str());
       }
       else
@@ -1019,9 +1019,9 @@ bool compilet::link_functions(
             << final_id
             << "'" << std::endl;
         str << "In module `" 
-            << context.symbols.begin()->second.module
+            << symbol_table.symbols.begin()->second.module
             << "' and module `"
-            << src_context.symbols.begin()->second.module << "'";
+            << src_symbol_table.symbols.begin()->second.module << "'";
         error(str.str());
         return true;
       }
@@ -1088,20 +1088,20 @@ Function: compilet::convert_symbols
 
 void compilet::convert_symbols(goto_functionst &dest)
 {
-  goto_convert_functionst converter(context, dest, ui_message_handler);
+  goto_convert_functionst converter(symbol_table, dest, ui_message_handler);
 
   // the compilation may add symbols!
 
-  contextt::symbolst::size_type before=0;
+  symbol_tablet::symbolst::size_type before=0;
   
-  while(before!=context.symbols.size())
+  while(before!=symbol_table.symbols.size())
   {
-    before=context.symbols.size();
+    before=symbol_table.symbols.size();
 
     typedef std::set<irep_idt> symbols_sett;
     symbols_sett symbols;
   
-    Forall_symbols(it, context.symbols)
+    Forall_symbols(it, symbol_table.symbols)
       symbols.insert(it->first);
 
     // the symbol table itertors aren't stable
@@ -1110,8 +1110,8 @@ void compilet::convert_symbols(goto_functionst &dest)
         it!=symbols.end();
         ++it)
     {
-      contextt::symbolst::iterator s_it=context.symbols.find(*it);
-      assert(s_it!=context.symbols.end());
+      symbol_tablet::symbolst::iterator s_it=symbol_table.symbols.find(*it);
+      assert(s_it!=symbol_table.symbols.end());
 
       if(s_it->second.type.id()==ID_code &&
           s_it->second.value.id()!="compiled" &&

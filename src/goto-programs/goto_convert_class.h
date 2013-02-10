@@ -25,11 +25,11 @@ public:
   void goto_convert(const codet &code, goto_programt &dest);
 
   goto_convertt(
-    contextt &_context,
+    symbol_tablet &_symbol_table,
     message_handlert &_message_handler):
     message_streamt(_message_handler),
-    context(_context),
-    ns(_context),
+    symbol_table(_symbol_table),
+    ns(_symbol_table),
     temporary_counter(0),
     tmp_symbol_prefix("goto_convertt::")
   {
@@ -40,7 +40,7 @@ public:
   }
   
 protected:
-  contextt &context;
+  symbol_tablet &symbol_table;
   namespacet ns;
   unsigned temporary_counter;
   std::string tmp_symbol_prefix;

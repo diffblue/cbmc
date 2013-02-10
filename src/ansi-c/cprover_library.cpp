@@ -37,7 +37,7 @@ struct cprover_library_entryt
 
 void add_cprover_library(
   const std::set<irep_idt> &functions,
-  contextt &context,
+  symbol_tablet &symbol_table,
   message_handlert &message_handler)
 {
   if(config.ansi_c.lib==configt::ansi_ct::LIB_NONE)
@@ -62,10 +62,10 @@ void add_cprover_library(
     
     if(functions.find(id)!=functions.end())
     {
-      contextt::symbolst::const_iterator old=
-        context.symbols.find(id);
+      symbol_tablet::symbolst::const_iterator old=
+        symbol_table.symbols.find(id);
 
-      if(old!=context.symbols.end() &&
+      if(old!=symbol_table.symbols.end() &&
          old->second.value.is_nil())
       {
         count++;
@@ -80,11 +80,11 @@ void add_cprover_library(
     ansi_c_languaget ansi_c_language;
     ansi_c_language.parse(in, "", message_handler);
 
-    contextt new_context;
+    symbol_tablet new_symbol_table;
     ansi_c_language.typecheck(
-      new_context, "<built-in-library>", message_handler);
+      new_symbol_table, "<built-in-library>", message_handler);
 
-    linking(context, new_context, message_handler);
+    linking(symbol_table, new_symbol_table, message_handler);
   }
 }
 

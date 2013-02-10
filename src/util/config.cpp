@@ -8,7 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "namespace.h"
 #include "config.h"
-#include "context.h"
+#include "symbol_table.h"
 #include "arith_tools.h"
 #include "cmdline.h"
 #include "simplify_expr.h"
@@ -501,7 +501,7 @@ bool configt::set(const cmdlinet &cmdline)
 
 /*******************************************************************\
 
-Function: configt::ansi_ct::set_from_context
+Function: configt::ansi_ct::set_from_symbol_table
 
   Inputs:
 
@@ -525,14 +525,14 @@ int configt::ansi_ct::from_ns(const namespacet &ns, const std::string &what)
   mp_integer int_value;
   
   if(to_integer(tmp, int_value))
-    throw "failed to convert context configuration entry `"+id2string(id)+"'";
+    throw "failed to convert symbol table configuration entry `"+id2string(id)+"'";
     
   return integer2long(int_value);
 }
 
 /*******************************************************************\
 
-Function: configt::ansi_ct::set_from_context
+Function: configt::ansi_ct::set_from_symbol_table
 
   Inputs:
 
@@ -542,9 +542,9 @@ Function: configt::ansi_ct::set_from_context
 
 \*******************************************************************/
 
-void configt::ansi_ct::set_from_context(const contextt &context)
+void configt::ansi_ct::set_from_symbol_table(const symbol_tablet &symbol_table)
 {
-  namespacet ns(context);
+  namespacet ns(symbol_table);
 
   bool_width=1*8;
   int_width=from_ns(ns, "int_width");

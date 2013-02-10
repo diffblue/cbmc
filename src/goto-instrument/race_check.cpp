@@ -12,7 +12,7 @@ Date: February 2006
 #include <std_expr.h>
 #include <expr_util.h>
 #include <guard.h>
-#include <context.h>
+#include <symbol_table.h>
 #include <prefix.h>
 
 #include <pointer-analysis/value_sets.h>
@@ -24,7 +24,7 @@ Date: February 2006
 class w_guardst
 {
 public:
-  w_guardst(contextt &_context):context(_context)
+  w_guardst(symbol_tablet &_symbol_table):symbol_table(_symbol_table)
   {
   }
   
@@ -50,7 +50,7 @@ public:
   void add_initialization(goto_programt &goto_program) const;
   
 protected:
-  contextt &context;
+  symbol_tablet &symbol_table;
 };
 
 /*******************************************************************\
@@ -69,10 +69,10 @@ const symbolt &w_guardst::get_guard_symbol(const irep_idt &object)
 {
   const irep_idt identifier=id2string(object)+"$w_guard";
 
-  const contextt::symbolst::const_iterator it=
-    context.symbols.find(identifier);
+  const symbol_tablet::symbolst::const_iterator it=
+    symbol_table.symbols.find(identifier);
 
-  if(it!=context.symbols.end())
+  if(it!=symbol_table.symbols.end())
     return it->second;
     
   w_guards.push_back(identifier);
@@ -85,7 +85,7 @@ const symbolt &w_guardst::get_guard_symbol(const irep_idt &object)
   new_symbol.value.make_false();
   
   symbolt *symbol_ptr;
-  context.move(new_symbol, symbol_ptr);
+  symbol_table.move(new_symbol, symbol_ptr);
   return *symbol_ptr;
 }
 
@@ -104,7 +104,7 @@ Function: w_guardst::add_initialization
 void w_guardst::add_initialization(goto_programt &goto_program) const
 {
   goto_programt::targett t=goto_program.instructions.begin();
-  const namespacet ns(context);
+  const namespacet ns(symbol_table);
 
   for(std::list<irep_idt>::const_iterator
       it=w_guards.begin();
@@ -225,11 +225,11 @@ Function: race_check
 
 void race_check(
   value_setst &value_sets,
-  contextt &context,
+  symbol_tablet &symbol_table,
   goto_programt &goto_program,
   w_guardst &w_guards)
 {
-  namespacet ns(context);
+  namespacet ns(symbol_table);
 
   Forall_goto_program_instructions(i_it, goto_program)
   {
@@ -333,12 +333,12 @@ Function: race_check
 
 void race_check(
   value_setst &value_sets,
-  contextt &context,
+  symbol_tablet &symbol_table,
   goto_programt &goto_program)
 {
-  w_guardst w_guards(context);
+  w_guardst w_guards(symbol_table);
 
-  race_check(value_sets, context, goto_program, w_guards);
+  race_check(value_sets, symbol_table, goto_program, w_guards);
 
   w_guards.add_initialization(goto_program);
   goto_program.update();
@@ -358,15 +358,15 @@ Function: race_check
 
 void race_check(
   value_setst &value_sets,
-  contextt &context,
+  symbol_tablet &symbol_table,
   goto_functionst &goto_functions)
 {
-  w_guardst w_guards(context);
+  w_guardst w_guards(symbol_table);
 
   Forall_goto_functions(f_it, goto_functions)
     if(f_it->first!=ID_main &&
        f_it->first!="c::__CPROVER_initialize")
-      race_check(value_sets, context, f_it->second.body, w_guards);
+      race_check(value_sets, symbol_table, f_it->second.body, w_guards);
 
   // get "main"
   goto_functionst::function_mapt::iterator

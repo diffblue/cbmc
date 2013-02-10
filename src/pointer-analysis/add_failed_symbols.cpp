@@ -6,7 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <context.h>
+#include <symbol_table.h>
 #include <namespace.h>
 #include <std_expr.h>
 
@@ -41,7 +41,7 @@ Function: add_failed_symbol
 
 \*******************************************************************/
 
-void add_failed_symbol(symbolt &symbol, contextt &context)
+void add_failed_symbol(symbolt &symbol, symbol_tablet &symbol_table)
 {
   if(!symbol.is_lvalue) return;
   
@@ -63,9 +63,9 @@ void add_failed_symbol(symbolt &symbol, contextt &context)
     symbol.type.set(ID_C_failed_symbol, new_symbol.name);
     
     if(new_symbol.type.id()==ID_pointer)
-      add_failed_symbol(new_symbol, context); // recursive call
+      add_failed_symbol(new_symbol, symbol_table); // recursive call
         
-    context.move(new_symbol);
+    symbol_table.move(new_symbol);
   }
 }
 
@@ -81,7 +81,7 @@ Function: add_failed_symbols
 
 \*******************************************************************/
 
-void add_failed_symbols(contextt &context)
+void add_failed_symbols(symbol_tablet &symbol_table)
 {
   // the symbol table iterators are not stable, and
   // we are adding new symbols, this
@@ -89,7 +89,7 @@ void add_failed_symbols(contextt &context)
   typedef std::list< ::symbolt *> symbol_listt;
   symbol_listt symbol_list;
 
-  Forall_symbols(it, context.symbols)
+  Forall_symbols(it, symbol_table.symbols)
     symbol_list.push_back(&(it->second));
   
   for(symbol_listt::const_iterator
@@ -97,7 +97,7 @@ void add_failed_symbols(contextt &context)
       it!=symbol_list.end();
       it++)
   {
-    add_failed_symbol(**it, context);
+    add_failed_symbol(**it, symbol_table);
   }
 }
 

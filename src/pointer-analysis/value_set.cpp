@@ -8,7 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <assert.h>
 
-#include <context.h>
+#include <symbol_table.h>
 #include <simplify_expr.h>
 #include <expr_util.h>
 #include <base_type.h>

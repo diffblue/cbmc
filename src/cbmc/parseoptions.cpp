@@ -328,7 +328,7 @@ int cbmc_parseoptionst::doit()
   optionst options;
   get_command_line_options(options);
 
-  bmct bmc(options, context, ui_message_handler);
+  bmct bmc(options, symbol_table, ui_message_handler);
   set_verbosity(bmc);
   set_verbosity(*this);
   
@@ -347,7 +347,7 @@ int cbmc_parseoptionst::doit()
 
   if(cmdline.isset("show-claims"))
   {
-    const namespacet ns(context);
+    const namespacet ns(symbol_table);
     show_claims(ns, get_ui(), goto_functions);
     return 0;
   }
@@ -430,10 +430,10 @@ bool cbmc_parseoptionst::get_goto_program(
       status("Reading GOTO program from file");
 
       if(read_goto_binary(cmdline.args[0],
-           context, goto_functions, get_message_handler()))
+           symbol_table, goto_functions, get_message_handler()))
         return true;
         
-      config.ansi_c.set_from_context(context);
+      config.ansi_c.set_from_symbol_table(symbol_table);
 
       if(cmdline.isset("show-symbol-table"))
       {
@@ -441,7 +441,7 @@ bool cbmc_parseoptionst::get_goto_program(
         return true;
       }
       
-      if(context.symbols.find(ID_main)==context.symbols.end())
+      if(symbol_table.symbols.find(ID_main)==symbol_table.symbols.end())
       {
         error("The goto binary has no entry point; please complete linking");
         return true;
@@ -463,7 +463,7 @@ bool cbmc_parseoptionst::get_goto_program(
         return true;
       }
 
-      if(context.symbols.find(ID_main)==context.symbols.end())
+      if(symbol_table.symbols.find(ID_main)==symbol_table.symbols.end())
       {
         error("No entry point; please provide a main function");
         return true;
@@ -471,12 +471,12 @@ bool cbmc_parseoptionst::get_goto_program(
 
       status("Generating GOTO Program");
 
-      goto_convert(context, goto_functions, ui_message_handler);
+      goto_convert(symbol_table, goto_functions, ui_message_handler);
     }
 
     // finally add the library
     status("Adding CPROVER library");      
-    link_to_library(context, goto_functions, ui_message_handler);
+    link_to_library(symbol_table, goto_functions, ui_message_handler);
 
     if(process_goto_program(options, goto_functions))
       return true;
@@ -593,11 +593,11 @@ bool cbmc_parseoptionst::process_goto_program(
 {
   try
   {
-    namespacet ns(context);
+    namespacet ns(symbol_table);
 
     if(cmdline.isset("string-abstraction"))
       string_instrumentation(
-        context, get_message_handler(), goto_functions);
+        symbol_table, get_message_handler(), goto_functions);
 
     status("Function Pointer Removal");
     remove_function_pointers(ns, goto_functions,
@@ -614,13 +614,13 @@ bool cbmc_parseoptionst::process_goto_program(
     if(cmdline.isset("string-abstraction"))
     {
       status("String Abstraction");
-      string_abstraction(context,
+      string_abstraction(symbol_table,
         get_message_handler(), goto_functions);
     }
 
     // add failed symbols
     // needs to be done before pointer analysis
-    add_failed_symbols(context);
+    add_failed_symbols(symbol_table);
     
     // recalculate numbers, etc.
     goto_functions.update();

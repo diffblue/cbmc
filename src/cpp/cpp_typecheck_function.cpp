@@ -61,10 +61,10 @@ void cpp_typecheckt::convert_argument(
 
   symbolt *new_symbol;
 
-  if(context.move(symbol, new_symbol))
+  if(symbol_table.move(symbol, new_symbol))
   {
     err_location(symbol.location);
-    str << "cpp_typecheckt::convert_argument: context.move("
+    str << "cpp_typecheckt::convert_argument: symbol_table.move("
         << symbol.name << ") failed";
     throw 0;
   }

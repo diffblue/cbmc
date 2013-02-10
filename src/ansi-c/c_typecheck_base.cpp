@@ -87,11 +87,11 @@ void c_typecheck_baset::move_symbol(symbolt &symbol, symbolt *&new_symbol)
   symbol.mode=mode;
   symbol.module=module;
 
-  if(context.move(symbol, new_symbol))
+  if(symbol_table.move(symbol, new_symbol))
   {
     err_location(symbol.location);
     throw "failed to move symbol `"+id2string(symbol.name)+
-          "' into context";
+          "' into symbol table";
   }
 }
 
@@ -135,8 +135,8 @@ void c_typecheck_baset::typecheck_symbol(symbolt &symbol)
     
     id_replace_map[symbol.name]=new_name;    
 
-    contextt::symbolst::const_iterator it=context.symbols.find(new_name);
-    if(it!=context.symbols.end())
+    symbol_tablet::symbolst::const_iterator it=symbol_table.symbols.find(new_name);
+    if(it!=symbol_table.symbols.end())
       return; // bail out, we have an appropriate symbol already.
 
     irep_idt newtag=std::string("#anon#")+typestr;
@@ -208,11 +208,11 @@ void c_typecheck_baset::typecheck_symbol(symbolt &symbol)
   }
   
   // see if we have it already
-  contextt::symbolst::iterator old_it=context.symbols.find(symbol.name);
+  symbol_tablet::symbolst::iterator old_it=symbol_table.symbols.find(symbol.name);
   
-  if(old_it==context.symbols.end())
+  if(old_it==symbol_table.symbols.end())
   {
-    // just put into context
+    // just put into symbol_table
     symbolt *new_symbol;
     move_symbol(symbol, new_symbol);
     
@@ -292,7 +292,7 @@ void c_typecheck_baset::typecheck_new_symbol(symbolt &symbol)
       symbol.type=symbol_typet(new_symbol.name);
     
       symbolt *new_sp;
-      context.move(new_symbol, new_sp);
+      symbol_table.move(new_symbol, new_sp);
     }
 
     // check the initializer
@@ -526,9 +526,9 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
         const irep_idt identifier=
           to_symbol_type(old_symbol.type).get_identifier();
 
-        contextt::symbolst::iterator s_it=context.symbols.find(identifier);
+        symbol_tablet::symbolst::iterator s_it=symbol_table.symbols.find(identifier);
   
-        if(s_it==context.symbols.end())
+        if(s_it==symbol_table.symbols.end())
         {
           err_location(old_symbol.location);
           str << "typecheck_redefinition_non_type: "

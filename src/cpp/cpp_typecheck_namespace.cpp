@@ -42,10 +42,10 @@ void cpp_typecheckt::convert(cpp_namespace_spect &namespace_spec)
     language_prefix+
     cpp_scopes.current_scope().prefix+id2string(final_name);
 
-  contextt::symbolst::const_iterator it=
-    context.symbols.find(identifier);
+  symbol_tablet::symbolst::const_iterator it=
+    symbol_table.symbols.find(identifier);
 
-  if(it!=context.symbols.end())
+  if(it!=symbol_table.symbols.end())
   {
     if(namespace_spec.alias().is_not_nil())
     {
@@ -82,8 +82,8 @@ void cpp_typecheckt::convert(cpp_namespace_spect &namespace_spec)
     symbol.module=module;
     symbol.type=typet(ID_namespace);
 
-    if(context.move(symbol))
-      throw "cpp_typecheckt::convert_namespace: context.move() failed";
+    if(symbol_table.move(symbol))
+      throw "cpp_typecheckt::convert_namespace: symbol_table.move() failed";
 
     cpp_scopes.new_namespace(final_name);
   }

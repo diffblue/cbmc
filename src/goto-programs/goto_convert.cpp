@@ -13,7 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <expr_util.h>
 #include <prefix.h>
 #include <std_expr.h>
-#include <context.h>
+#include <symbol_table.h>
 #include <simplify_expr.h>
 #include <rename.h>
 
@@ -2444,7 +2444,7 @@ symbolt &goto_convertt::new_tmp_symbol(
     new_symbol.is_thread_local=true;
     new_symbol.is_file_local=true;
     new_symbol.type=type;    
-  } while(context.move(new_symbol, symbol_ptr));    
+  } while(symbol_table.move(new_symbol, symbol_ptr));    
   
   tmp_symbols.push_back(symbol_ptr->name);
   
@@ -2504,8 +2504,8 @@ void goto_convertt::new_name(symbolt &symbol)
   // rename it
   get_new_name(symbol, ns);
 
-  // store in context
-  context.add(symbol);
+  // store in symbol_table
+  symbol_table.add(symbol);
 }
 
 /*******************************************************************\
@@ -2542,11 +2542,11 @@ Function: goto_convert
 
 void goto_convert(
   const codet &code,
-  contextt &context,
+  symbol_tablet &symbol_table,
   goto_programt &dest,
   message_handlert &message_handler)
 {
-  goto_convertt goto_convert(context, message_handler);
+  goto_convertt goto_convert(symbol_table, message_handler);
 
   try
   {
@@ -2585,18 +2585,18 @@ Function: goto_convert
 \*******************************************************************/
 
 void goto_convert(
-  contextt &context,
+  symbol_tablet &symbol_table,
   goto_programt &dest,
   message_handlert &message_handler)
 {
   // find main symbol
-  const contextt::symbolst::const_iterator s_it=
-    context.symbols.find("main");
+  const symbol_tablet::symbolst::const_iterator s_it=
+    symbol_table.symbols.find("main");
   
-  if(s_it==context.symbols.end())
+  if(s_it==symbol_table.symbols.end())
     throw "failed to find main symbol";
   
   const symbolt &symbol=s_it->second;
   
-  ::goto_convert(to_code(symbol.value), context, dest, message_handler);
+  ::goto_convert(to_code(symbol.value), symbol_table, dest, message_handler);
 }

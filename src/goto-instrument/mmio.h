@@ -18,7 +18,7 @@ Date: September 2011
 
 void mmio(
   value_setst &value_sets,
-  class contextt &context,
+  class symbol_tablet &symbol_table,
   goto_functionst &goto_functions);
 
 #endif

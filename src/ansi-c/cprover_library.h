@@ -11,12 +11,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <set>
 
-#include <context.h>
+#include <symbol_table.h>
 #include <message.h>
 
 void add_cprover_library(
   const std::set<irep_idt> &functions,
-  contextt &context,
+  symbol_tablet &symbol_table,
   message_handlert &message_handler);
 
 #endif

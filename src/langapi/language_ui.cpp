@@ -175,7 +175,7 @@ bool language_uit::typecheck()
   language_files.set_message_handler(*message_handler);
   language_files.set_verbosity(get_verbosity());
 
-  if(language_files.typecheck(context))
+  if(language_files.typecheck(symbol_table))
   {
     if(get_ui()==ui_message_handlert::PLAIN)
       std::cerr << "CONVERSION ERROR" << std::endl;
@@ -203,7 +203,7 @@ bool language_uit::final()
   language_files.set_message_handler(*message_handler);
   language_files.set_verbosity(get_verbosity());
 
-  if(language_files.final(context))
+  if(language_files.final(symbol_table))
   {
     if(get_ui()==ui_message_handlert::PLAIN)
       std::cerr << "CONVERSION ERROR" << std::endl;
@@ -276,9 +276,9 @@ void language_uit::show_symbol_table_plain(std::ostream &out)
 {
   out << std::endl << "Symbols:" << std::endl << std::endl;
   
-  const namespacet ns(context);
+  const namespacet ns(symbol_table);
 
-  forall_symbols(it, context.symbols)
+  forall_symbols(it, symbol_table.symbols)
   {
     const symbolt &symbol=it->second;
     

@@ -606,10 +606,10 @@ void c_typecheck_baset::typecheck_symbol_type(typet &type)
   const irep_idt &identifier=
     to_symbol_type(type).get_identifier();
 
-  contextt::symbolst::const_iterator s_it=
-    context.symbols.find(identifier);
+  symbol_tablet::symbolst::const_iterator s_it=
+    symbol_table.symbols.find(identifier);
 
-  if(s_it==context.symbols.end())
+  if(s_it==symbol_table.symbols.end())
   {
     err_location(type);
     str << "type symbol `" << identifier << "' not found";
@@ -701,8 +701,8 @@ void c_typecheck_baset::clean_type(
     irep_idt identifier=to_symbol_type(type).get_identifier();
     if(already_cleaned.insert(identifier).second)
     {
-      contextt::symbolst::iterator s_it=context.symbols.find(identifier);
-      assert(s_it!=context.symbols.end());
+      symbol_tablet::symbolst::iterator s_it=symbol_table.symbols.find(identifier);
+      assert(s_it!=symbol_table.symbols.end());
       clean_type(identifier, s_it->second.type, code);
     }
   }
@@ -740,9 +740,9 @@ void c_typecheck_baset::clean_type(
         temp_identifier=id2string(base_symbol.name)+suffix;
         count++;
       }
-      while(context.symbols.find(temp_identifier)!=context.symbols.end());
+      while(symbol_table.symbols.find(temp_identifier)!=symbol_table.symbols.end());
 
-      // add the symbol to context
+      // add the symbol to symbol table
       symbolt new_symbol;
       new_symbol.name=temp_identifier;
       new_symbol.pretty_name=id2string(base_symbol.pretty_name)+suffix;
@@ -753,7 +753,7 @@ void c_typecheck_baset::clean_type(
       new_symbol.is_thread_local=true;
       new_symbol.value.make_nil();
       new_symbol.location=location;
-      context.add(new_symbol);
+      symbol_table.add(new_symbol);
 
       // produce the code that initializes the symbol      
       symbol_exprt symbol_expr;

@@ -49,7 +49,7 @@ symbol_exprt goto_convertt::make_static_symbol(
     new_symbol.value=expr;
     new_symbol.type=expr.type();
   }
-  while(context.move(new_symbol, symbol_ptr));    
+  while(symbol_table.move(new_symbol, symbol_ptr));    
 
   // The value might depend on a variable, thus
   // generate code for this.

@@ -694,8 +694,8 @@ std::ostream &operator<<(
   const symex_target_equationt::SSA_stept &step)
 {
   // may cause lookup failures, since it's blank
-  contextt context;
-  namespacet ns(context);
+  symbol_tablet symbol_table;
+  namespacet ns(symbol_table);
   step.output(ns, out);
   return out;
 }

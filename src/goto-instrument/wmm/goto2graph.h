@@ -20,14 +20,14 @@ Date: 2012
 #include "event_graph.h"
 #include "wmm.h"
 
-class contextt;
+class symbol_tablet;
 class goto_functionst;
 class value_setst;
 
 class instrumentert
 {
 protected:
-  /* reference to goto-functions and context */
+  /* reference to goto-functions and symbol_table */
   namespacet ns;
   goto_functionst &goto_functions; 
 
@@ -231,8 +231,8 @@ public:
   std::multimap<irep_idt,locationt> id2loc;
   std::multimap<irep_idt,locationt> id2cycloc;
 
-  instrumentert(contextt& _context, goto_functionst& _goto_f)
-    :ns(_context), goto_functions(_goto_f), render_po_aligned(true), 
+  instrumentert(symbol_tablet& _symbol_table, goto_functionst& _goto_f)
+    :ns(_symbol_table), goto_functions(_goto_f), render_po_aligned(true), 
       render_by_file(false), render_by_function(false)
   {
   }

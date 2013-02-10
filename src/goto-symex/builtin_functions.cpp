@@ -15,7 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cprover_prefix.h>
 #include <std_types.h>
 #include <pointer_offset_size.h>
-#include <context.h>
+#include <symbol_table.h>
 #include <std_expr.h>
 #include <std_code.h>
 #include <simplify_expr.h>
@@ -134,7 +134,7 @@ void goto_symext::symex_malloc(
       size_symbol.type=tmp_size.type();
       size_symbol.mode=ID_C;
 
-      new_context.add(size_symbol);
+      new_symbol_table.add(size_symbol);
 
       guardt guard;
       symex_assign_rec(state, symbol_expr(size_symbol), nil_exprt(), size, guard, VISIBLE);
@@ -153,7 +153,7 @@ void goto_symext::symex_malloc(
   value_symbol.type.set("#dynamic", true);
   value_symbol.mode=ID_C;
 
-  new_context.add(value_symbol);
+  new_symbol_table.add(value_symbol);
   
   address_of_exprt rhs;
   
@@ -470,7 +470,7 @@ void goto_symext::symex_cpp_new(
   //symbol.type.set("#active", symbol_expr(active_symbol));
   symbol.type.set("#dynamic", true);
   
-  new_context.add(symbol);
+  new_symbol_table.add(symbol);
 
   // make symbol expression
 

@@ -10,7 +10,7 @@ Date: June 2006
 
 #include <namespace.h>
 #include <message_stream.h>
-#include <context.h>
+#include <symbol_table.h>
 
 #include "read_bin_goto_object.h"
 #include "goto_function_serialization.h"
@@ -21,7 +21,7 @@ Date: June 2006
  
 Function: read_goto_object_v2
  
-  Inputs: input stream, context, functions
+  Inputs: input stream, symbol_table, functions
  
  Outputs: true on error, false otherwise
  

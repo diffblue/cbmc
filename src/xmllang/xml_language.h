@@ -28,12 +28,12 @@ public:
     message_handlert &message_handler);
              
   virtual bool typecheck(
-    contextt &context,
+    symbol_tablet &symbol_table,
     const std::string &module,
     message_handlert &message_handler);
 
   virtual bool final(
-    contextt &context,
+    symbol_tablet &symbol_table,
     message_handlert &message_handler);
 
   virtual void show_parse(std::ostream &out);

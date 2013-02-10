@@ -155,11 +155,11 @@ Function: cpp_typecheck
 
 bool cpp_typecheck(
   cpp_parse_treet &cpp_parse_tree,
-  contextt &context,
+  symbol_tablet &symbol_table,
   const std::string &module,
   message_handlert &message_handler)
 {
-  cpp_typecheckt cpp_typecheck(cpp_parse_tree, context, module, message_handler);
+  cpp_typecheckt cpp_typecheck(cpp_parse_tree, symbol_table, module, message_handler);
   return cpp_typecheck.typecheck_main();
 }
 
@@ -180,11 +180,11 @@ bool cpp_typecheck(
   message_handlert &message_handler,
   const namespacet &ns)
 {
-  contextt context;
+  symbol_tablet symbol_table;
   cpp_parse_treet cpp_parse_tree;
 
-  cpp_typecheckt cpp_typecheck(cpp_parse_tree, context,
-                               ns.get_context(), "", message_handler);
+  cpp_typecheckt cpp_typecheck(cpp_parse_tree, symbol_table,
+                               ns.get_symbol_table(), "", message_handler);
 
   try
   {
@@ -242,7 +242,7 @@ void cpp_typecheckt::static_and_dynamic_initialization()
 
   // fill in any missing zero initializers
   // for static initialization
-  Forall_symbols(s_it, context.symbols)
+  Forall_symbols(s_it, symbol_table.symbols)
   {
     symbolt &symbol=s_it->second;
 
@@ -287,7 +287,7 @@ void cpp_typecheckt::static_and_dynamic_initialization()
       d_it!=dynamic_initializations.end();
       d_it++)
   {
-    symbolt &symbol=context.symbols.find(*d_it)->second;
+    symbolt &symbol=symbol_table.symbols.find(*d_it)->second;
 
     if(symbol.is_extern)
       continue;
@@ -346,7 +346,7 @@ void cpp_typecheckt::static_and_dynamic_initialization()
   init_symbol.is_type=false;
   init_symbol.is_macro=false;
 
-  context.move(init_symbol);
+  symbol_table.move(init_symbol);
 
   disable_access_control=false;
 }
@@ -371,7 +371,7 @@ void cpp_typecheckt::do_not_typechecked()
   {
     cont = false;
 
-    Forall_symbols(s_it, context.symbols)
+    Forall_symbols(s_it, symbol_table.symbols)
     {
       symbolt &symbol=s_it->second;
 
@@ -404,7 +404,7 @@ void cpp_typecheckt::do_not_typechecked()
   }
   while(cont);
 
-  Forall_symbols(s_it, context.symbols)
+  Forall_symbols(s_it, symbol_table.symbols)
   {
     symbolt &symbol=s_it->second;
     if(symbol.value.id()=="cpp_not_typechecked")
@@ -426,18 +426,18 @@ Function: cpp_typecheckt::clean_up
 
 void cpp_typecheckt::clean_up()
 {
-  contextt::symbolst::iterator it=context.symbols.begin();
+  symbol_tablet::symbolst::iterator it=symbol_table.symbols.begin();
   
-  while(it!=context.symbols.end())
+  while(it!=symbol_table.symbols.end())
   {
-    contextt::symbolst::iterator cur_it = it;
+    symbol_tablet::symbolst::iterator cur_it = it;
     it++;
 
     symbolt &symbol = cur_it->second;
 
     if(symbol.type.get_bool(ID_is_template))
     {
-      context.symbols.erase(cur_it);
+      symbol_table.symbols.erase(cur_it);
       continue;
     }
     else if(symbol.type.id()==ID_struct ||

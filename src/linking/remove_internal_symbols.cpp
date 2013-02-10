@@ -6,7 +6,7 @@ Author: Daniel Kroening
 
 \*******************************************************************/
 
-#include <context.h>
+#include <symbol_table.h>
 #include <namespace.h>
 #include <find_symbols.h>
 
@@ -88,9 +88,9 @@ Function: remove_internal_symbols
 \*******************************************************************/
 
 void remove_internal_symbols(
-  contextt &context)
+  symbol_tablet &symbol_table)
 {
-  namespacet ns(context);
+  namespacet ns(symbol_table);
   find_symbols_sett exported;
 
   // we retain certain special ones
@@ -105,9 +105,9 @@ void remove_internal_symbols(
   special.insert("c::__CPROVER_deallocated");
   special.insert("c::__CPROVER_rounding_mode");
   
-  for(contextt::symbolst::const_iterator
-      it=context.symbols.begin();
-      it!=context.symbols.end();
+  for(symbol_tablet::symbolst::const_iterator
+      it=symbol_table.symbols.begin();
+      it!=symbol_table.symbols.end();
       it++)
   {
     // already marked?
@@ -151,16 +151,16 @@ void remove_internal_symbols(
   }
 
   // remove all that are _not_ exported!
-  for(contextt::symbolst::iterator
-      it=context.symbols.begin();
-      it!=context.symbols.end();
+  for(symbol_tablet::symbolst::iterator
+      it=symbol_table.symbols.begin();
+      it!=symbol_table.symbols.end();
       ) // no it++
   {
     if(exported.find(it->first)==exported.end())
     {
-      contextt::symbolst::iterator next=it;
+      symbol_tablet::symbolst::iterator next=it;
       ++next;
-      context.symbols.erase(it);
+      symbol_table.symbols.erase(it);
       it=next;
     }
     else

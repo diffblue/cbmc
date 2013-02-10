@@ -10,7 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <std_expr.h>
 #include <rename.h>
-#include <context.h>
+#include <symbol_table.h>
 #include <replace_symbol.h>
 
 #include "goto_symex.h"
@@ -30,7 +30,7 @@ Function: goto_symext::new_name
 void goto_symext::new_name(symbolt &symbol)
 {
   get_new_name(symbol, ns);
-  new_context.add(symbol);
+  new_symbol_table.add(symbol);
 }
 
 /*******************************************************************\
