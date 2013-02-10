@@ -11,12 +11,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <irep.h>
 
-class contextt;
+class symbol_tablet;
 class exprt;
 class namespacet;
 class symbol_exprt;
 
-void add_failed_symbols(contextt &context);
+void add_failed_symbols(symbol_tablet &symbol_table);
 
 irep_idt failed_symbol_id(const irep_idt &identifier);
 

@@ -61,9 +61,9 @@ public:
   bool parse_source(const std::string &);
   bool read_object(const std::string &, goto_functionst &);
 
-  bool write_object_file( const std::string &, const contextt &, 
+  bool write_object_file( const std::string &, const symbol_tablet &, 
                           goto_functionst &);
-  bool write_bin_object_file( const std::string&, const contextt &, 
+  bool write_bin_object_file( const std::string&, const symbol_tablet &, 
                               goto_functionst& );    
 
 protected:
@@ -101,9 +101,9 @@ protected:
   void add_compiler_specific_defines(class configt &config) const;
 
   bool link_functions(
-    contextt &dest_context,
+    symbol_tablet &dest_symbol_table,
     goto_functionst &dest_functions,
-    contextt &src_context,
+    symbol_tablet &src_symbol_table,
     goto_functionst &src_functions,
     const replace_symbolt &replace_symbol);
   

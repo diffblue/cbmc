@@ -16,14 +16,14 @@ Date: June 2003
 
 // convert it all!
 void goto_convert(
-  contextt &context,
+  symbol_tablet &symbol_table,
   goto_functionst &functions,
   message_handlert &message_handler);
   
 // just convert a specific function
 void goto_convert(
   const irep_idt &identifier,
-  contextt &context,
+  symbol_tablet &symbol_table,
   goto_functionst &functions,
   message_handlert &message_handler);
   
@@ -34,7 +34,7 @@ public:
   void convert_function(const irep_idt &identifier);
 
   goto_convert_functionst(
-    contextt &_context,
+    symbol_tablet &_symbol_table,
     goto_functionst &_functions,
     message_handlert &_message_handler);
   

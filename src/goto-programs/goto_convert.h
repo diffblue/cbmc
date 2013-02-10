@@ -17,13 +17,13 @@ Author: Daniel Kroening, kroening@kroening.com
 // start from given code
 void goto_convert(
   const codet &code,
-  contextt &context,
+  symbol_tablet &symbol_table,
   goto_programt &dest,
   message_handlert &message_handler);
 
 // start from "main"
 void goto_convert(
-  contextt &context,
+  symbol_tablet &symbol_table,
   goto_programt &dest,
   message_handlert &message_handler);
 

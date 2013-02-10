@@ -229,7 +229,7 @@ void goto_symext::dereference_rec(
 
     dereferencet dereference(
       renaming_ns,
-      new_context,
+      new_symbol_table,
       options,
       symex_dereference_state);      
     

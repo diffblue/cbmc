@@ -8,7 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "get_module.h"
 #include "message_stream.h"
-#include "context.h"
+#include "symbol_table.h"
 
 /*******************************************************************\
 
@@ -23,18 +23,18 @@ Function: get_module_by_name
 \*******************************************************************/
 
 const symbolt &get_module_by_name(
-  const contextt &context,
+  const symbol_tablet &symbol_table,
   const std::string &module,
   message_handlert &message_handler)
 {
   symbolptr_listt symbolptr_list;
   message_streamt message_stream(message_handler);
 
-  forall_symbol_base_map(it, context.symbol_base_map, module)
+  forall_symbol_base_map(it, symbol_table.symbol_base_map, module)
   {
-    contextt::symbolst::const_iterator it2=context.symbols.find(it->second);
+    symbol_tablet::symbolst::const_iterator it2=symbol_table.symbols.find(it->second);
 
-    if(it2==context.symbols.end())
+    if(it2==symbol_table.symbols.end())
       continue;
 
     const symbolt &s=it2->second;
@@ -80,17 +80,17 @@ Function: get_module
 \*******************************************************************/
 
 const symbolt &get_module(
-  const contextt &context,
+  const symbol_tablet &symbol_table,
   const std::string &module,
   message_handlert &message_handler)
 {
   if(module!="")
-    return get_module_by_name(context, module, message_handler);
+    return get_module_by_name(symbol_table, module, message_handler);
 
   symbolptr_listt symbolptr_list, main_symbolptr_list;
   message_streamt message_stream(message_handler);
 
-  forall_symbols(it, context.symbols)
+  forall_symbols(it, symbol_table.symbols)
   {
     const symbolt &s=it->second;
     
@@ -99,7 +99,7 @@ const symbolt &get_module(
 
     // this is our default    
     if(s.base_name=="main")
-      return get_module_by_name(context, "main", message_handler);
+      return get_module_by_name(symbol_table, "main", message_handler);
     
     symbolptr_list.push_back(&s);
   }

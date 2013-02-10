@@ -11,7 +11,7 @@ Author: CM Wintersteiger
 #include <message.h>
 #include <irep_serialization.h>
 #include <symbol_serialization.h>
-#include <context.h>
+#include <symbol_table.h>
 
 #include <goto-programs/goto_function_serialization.h>
 
@@ -31,16 +31,16 @@ Function: goto_programt::write_goto_binary_v2
 
 bool write_goto_binary_v2(
   std::ostream &out,
-  const contextt &lcontext,
+  const symbol_tablet &lsymbol_table,
   const goto_functionst &functions,
   irep_serializationt &irepconverter,  
   goto_function_serializationt &gfconverter)
 {
   // first write symbol table
 
-  write_long(out, lcontext.symbols.size());
+  write_long(out, lsymbol_table.symbols.size());
 
-  forall_symbols(it, lcontext.symbols)
+  forall_symbols(it, lsymbol_table.symbols)
   {
     // In version 2, symbols are not converted to ireps,
     // instead they are saved in a custom binary format
@@ -153,7 +153,7 @@ Function: goto_programt::write_goto_binary
 
 bool write_goto_binary(
   std::ostream &out,
-  const contextt &lcontext,
+  const symbol_tablet &lsymbol_table,
   const goto_functionst &functions,
   int version)
 {
@@ -172,7 +172,7 @@ bool write_goto_binary(
 
   case 2:
     return write_goto_binary_v2(
-      out, lcontext, functions,
+      out, lsymbol_table, functions,
       irepconverter,
       gfconverter); 
 
@@ -197,7 +197,7 @@ Function: goto_programt::write_goto_binary
 
 bool write_goto_binary(
   const std::string &filename,
-  const contextt &context,
+  const symbol_tablet &symbol_table,
   const goto_functionst &goto_functions,
   message_handlert &message_handler)
 {
@@ -211,6 +211,6 @@ bool write_goto_binary(
     return true;
   }
 
-  return write_goto_binary(out, context, goto_functions);
+  return write_goto_binary(out, symbol_table, goto_functions);
 }
 

@@ -120,7 +120,7 @@ int goto_instrument_parseoptionst::doit()
 
     if(cmdline.isset("show-value-sets"))
     {
-      namespacet ns(context);
+      namespacet ns(symbol_table);
 
       status("Function Pointer Removal");
       remove_function_pointers(ns, goto_functions, false);
@@ -138,7 +138,7 @@ int goto_instrument_parseoptionst::doit()
 
     if(cmdline.isset("show-points-to"))
     {
-      namespacet ns(context);
+      namespacet ns(symbol_table);
 
       status("Function Pointer Removal");
       remove_function_pointers(ns, goto_functions, false);
@@ -155,7 +155,7 @@ int goto_instrument_parseoptionst::doit()
 
     if(cmdline.isset("show-rw-set"))
     {
-      namespacet ns(context);
+      namespacet ns(symbol_table);
       status("Function Pointer Removal");
       remove_function_pointers(ns, goto_functions, false);
 
@@ -181,34 +181,34 @@ int goto_instrument_parseoptionst::doit()
 
     if(cmdline.isset("show-uninitialized"))
     {
-      show_uninitialized(context, goto_functions, std::cout);
+      show_uninitialized(symbol_table, goto_functions, std::cout);
       return 0;
     }
 
     if(cmdline.isset("interpreter"))
     {
       status("Starting interpreter");
-      interpreter(context, goto_functions);
+      interpreter(symbol_table, goto_functions);
       return 0;
     }
 
     if(cmdline.isset("show-claims"))
     {
-      const namespacet ns(context);
+      const namespacet ns(symbol_table);
       show_claims(ns, get_ui(), goto_functions);
       return 0;
     }
 
     if(cmdline.isset("document-claims-html"))
     {
-      const namespacet ns(context);
+      const namespacet ns(symbol_table);
       document_claims_html(ns, goto_functions, std::cout);
       return 0;
     }
 
     if(cmdline.isset("document-claims-latex"))
     {
-      const namespacet ns(context);
+      const namespacet ns(symbol_table);
       document_claims_latex(ns, goto_functions, std::cout);
       return 0;
     }
@@ -221,14 +221,14 @@ int goto_instrument_parseoptionst::doit()
 
     if(cmdline.isset("show-goto-functions"))
     {
-      namespacet ns(context);
+      namespacet ns(symbol_table);
       goto_functions.output(ns, std::cout);
       return 0;
     }
 
     if(cmdline.isset("show-struct-alignment"))
     {
-      print_struct_alignment_problems(context, std::cout);
+      print_struct_alignment_problems(symbol_table, std::cout);
       return 0;
     }
 
@@ -241,7 +241,7 @@ int goto_instrument_parseoptionst::doit()
     if(cmdline.isset("dump-c") || cmdline.isset("dump-cpp"))
     {
       const bool is_cpp=cmdline.isset("dump-cpp");
-      namespacet ns(context);
+      namespacet ns(symbol_table);
       
       if(cmdline.args.size()==2)
       {
@@ -261,7 +261,7 @@ int goto_instrument_parseoptionst::doit()
     
     if(cmdline.isset("dot"))
     {
-      namespacet ns(context);
+      namespacet ns(symbol_table);
       
       if(cmdline.args.size()==2)
       {
@@ -286,7 +286,7 @@ int goto_instrument_parseoptionst::doit()
       status("Writing GOTO program to "+cmdline.args[1]);
       
       if(write_goto_binary(
-        cmdline.args[1], context, goto_functions, get_message_handler()))
+        cmdline.args[1], symbol_table, goto_functions, get_message_handler()))
         return 1;
       else
         return 0;
@@ -338,10 +338,10 @@ void goto_instrument_parseoptionst::get_goto_program(
   status("Reading GOTO program from "+cmdline.args[0]);
 
   if(read_goto_binary(cmdline.args[0],
-    context, goto_functions, get_message_handler()))
+    symbol_table, goto_functions, get_message_handler()))
     throw 0;
 
-  config.ansi_c.set_from_context(context);
+  config.ansi_c.set_from_symbol_table(symbol_table);
 }
 
 /*******************************************************************\
@@ -439,10 +439,10 @@ void goto_instrument_parseoptionst::instrument_goto_program(
      cmdline.isset("concurrency"))
   {
     status("Adding CPROVER library");      
-    link_to_library(context, goto_functions, ui_message_handler);
+    link_to_library(symbol_table, goto_functions, ui_message_handler);
   }
 
-  namespacet ns(context);
+  namespacet ns(symbol_table);
 
   // add generic checks, if needed
   goto_check(ns, options, goto_functions);
@@ -451,14 +451,14 @@ void goto_instrument_parseoptionst::instrument_goto_program(
   if(cmdline.isset("uninitialized-check"))
   {
     status("Adding checks for uninitialized local variables");
-    add_uninitialized_locals_assertions(context, goto_functions);
+    add_uninitialized_locals_assertions(symbol_table, goto_functions);
   }
   
   // check for maximum call stack size
   if(cmdline.isset("stack-depth"))
   {
     status("Adding check for maximum call stack size");
-    stack_depth(context, goto_functions,
+    stack_depth(symbol_table, goto_functions,
         atoi(cmdline.getval("stack-depth")));
   }
 
@@ -473,7 +473,7 @@ void goto_instrument_parseoptionst::instrument_goto_program(
   if(cmdline.isset("string-abstraction"))
   {
     status("String Abstraction");
-    string_abstraction(context,
+    string_abstraction(symbol_table,
       get_message_handler(), goto_functions);
   }
 
@@ -499,7 +499,7 @@ void goto_instrument_parseoptionst::instrument_goto_program(
       // add pointer checks
       status("Adding Pointer Checks");
       pointer_checks(
-        goto_functions, context, options, value_set_analysis);
+        goto_functions, symbol_table, options, value_set_analysis);
     }
 
     if(cmdline.isset("remove-pointers"))
@@ -507,7 +507,7 @@ void goto_instrument_parseoptionst::instrument_goto_program(
       // removing pointers
       status("Removing Pointers");
       remove_pointers(
-        goto_functions, context, value_set_analysis);
+        goto_functions, symbol_table, value_set_analysis);
     }
 
     if(cmdline.isset("race-check"))
@@ -515,7 +515,7 @@ void goto_instrument_parseoptionst::instrument_goto_program(
       status("Adding Race Checks");
       race_check(
         value_set_analysis,
-        context,
+        symbol_table,
         goto_functions);
     }
 
@@ -577,7 +577,7 @@ void goto_instrument_parseoptionst::instrument_goto_program(
         weak_memory(
           model,
           value_set_analysis,
-          context,
+          symbol_table,
           goto_functions,
           cmdline.isset("scc"),
           inst_strategy,
@@ -599,7 +599,7 @@ void goto_instrument_parseoptionst::instrument_goto_program(
       status("Instrumenting interrupt handler");
       interrupt(
         value_set_analysis,
-        context,
+        symbol_table,
         goto_functions,
         cmdline.getval("isr"));
     }
@@ -610,7 +610,7 @@ void goto_instrument_parseoptionst::instrument_goto_program(
       status("Instrumenting memory-mapped I/O");
       mmio(
         value_set_analysis,
-        context,
+        symbol_table,
         goto_functions);
     }
 
@@ -619,13 +619,13 @@ void goto_instrument_parseoptionst::instrument_goto_program(
       status("Sequentializing concurrency");
       concurrency(
         value_set_analysis,
-        context,
+        symbol_table,
         goto_functions);
     }
   }  
 
   // add failed symbols
-  add_failed_symbols(context);
+  add_failed_symbols(symbol_table);
   
   // recalculate numbers, etc.
   goto_functions.update();
@@ -637,7 +637,7 @@ void goto_instrument_parseoptionst::instrument_goto_program(
   if(cmdline.isset("nondet-volatile"))
   {
     status("Making volatile variables non-deterministic");
-    nondet_volatile(context, goto_functions);
+    nondet_volatile(symbol_table, goto_functions);
   }
 
   // reachability slice?

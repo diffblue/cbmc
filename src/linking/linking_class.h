@@ -18,13 +18,13 @@ class linkingt:public typecheckt
 {
 public:
   linkingt(
-    contextt &_main_context,
-    contextt &_src_context,
+    symbol_tablet &_main_symbol_table,
+    symbol_tablet &_src_symbol_table,
     message_handlert &_message_handler):
     typecheckt(_message_handler),
-    main_context(_main_context),
-    src_context(_src_context),
-    ns(_main_context),
+    main_symbol_table(_main_symbol_table),
+    src_symbol_table(_src_symbol_table),
+    ns(_main_symbol_table),
     renaming_counter(0)
   {
   }
@@ -59,8 +59,8 @@ protected:
 
   virtual std::string to_string_verbose(const typet &type);
 
-  contextt &main_context;
-  contextt &src_context;
+  symbol_tablet &main_symbol_table;
+  symbol_tablet &src_symbol_table;
   namespacet ns;
   
   unsigned renaming_counter;

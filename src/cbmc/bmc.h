@@ -31,13 +31,13 @@ class bmct:public messaget
 public:
   bmct(
     const optionst &_options,
-    const contextt &_context,
+    const symbol_tablet &_symbol_table,
     message_handlert &_message_handler):
     messaget(_message_handler),
     options(_options),
-    ns(_context, new_context),
+    ns(_symbol_table, new_symbol_table),
     equation(ns),
-    symex(ns, new_context, equation),
+    symex(ns, new_symbol_table, equation),
     ui(ui_message_handlert::PLAIN)
   {
     symex.constant_propagation=options.get_bool_option("propagation");
@@ -57,7 +57,7 @@ public:
   
 protected:
   const optionst &options;  
-  contextt new_context;
+  symbol_tablet new_symbol_table;
   namespacet ns;
   symex_target_equationt equation;
   symex_bmct symex;

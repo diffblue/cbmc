@@ -12,12 +12,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "goto_functions.h"
 
 void string_instrumentation(
-  contextt &context,
+  symbol_tablet &symbol_table,
   message_handlert &message_handler,
   goto_programt &dest);
 
 void string_instrumentation(
-  contextt &context,
+  symbol_tablet &symbol_table,
   message_handlert &message_handler,
   goto_functionst &dest);
 

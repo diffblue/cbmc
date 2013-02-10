@@ -21,9 +21,9 @@ class concurrency_instrumentationt
 public:
   concurrency_instrumentationt(
     value_setst &_value_sets, 
-    contextt &_context):
+    symbol_tablet &_symbol_table):
     value_sets(_value_sets),
-    context(_context)
+    symbol_table(_symbol_table)
   {
   }
   
@@ -34,7 +34,7 @@ public:
 
 protected:
   value_setst &value_sets;
-  contextt &context;
+  symbol_tablet &symbol_table;
 
   void instrument(goto_functionst &goto_functions);
 
@@ -186,7 +186,7 @@ void concurrency_instrumentationt::collect(const exprt &expr)
       const irep_idt identifier=
         to_symbol_expr(*s_it).get_identifier();
 
-      namespacet ns(context);
+      namespacet ns(symbol_table);
       const symbolt &symbol=ns.lookup(identifier);
       
       if(!symbol.is_state_var)
@@ -275,7 +275,7 @@ Function: concurrency_instrumentationt::instrument
 void concurrency_instrumentationt::instrument(
   goto_functionst &goto_functions)
 {
-  namespacet ns(context);
+  namespacet ns(symbol_table);
   is_threadedt is_threaded(ns, goto_functions);
   
   // this first collects all shared and thread-local variables
@@ -304,9 +304,9 @@ Function: concurrency
 
 void concurrency(
   value_setst &value_sets,
-  class contextt &context,
+  class symbol_tablet &symbol_table,
   goto_functionst &goto_functions)
 {
-  concurrency_instrumentationt concurrency_instrumentation(value_sets, context);
+  concurrency_instrumentationt concurrency_instrumentation(value_sets, symbol_table);
   concurrency_instrumentation(goto_functions);
 }

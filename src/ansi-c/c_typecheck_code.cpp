@@ -423,12 +423,12 @@ void c_typecheck_baset::typecheck_decl(
   // look it up
   const irep_idt &identifier=to_symbol_expr(code.op0()).get_identifier();
 
-  contextt::symbolst::iterator s_it=context.symbols.find(identifier);
+  symbol_tablet::symbolst::iterator s_it=symbol_table.symbols.find(identifier);
 
-  if(s_it==context.symbols.end())
+  if(s_it==symbol_table.symbols.end())
   {
     err_location(code);
-    str << "failed to find decl symbol `" << identifier << "' in context";
+    str << "failed to find decl symbol `" << identifier << "' in symbol table";
     throw 0;
   }
 

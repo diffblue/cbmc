@@ -13,7 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 #include <string>
 
-class contextt;
+class symbol_tablet;
 class exprt;
 class message_handlert;
 class namespacet;
@@ -50,21 +50,21 @@ public:
   // final adjustments, e.g., initialization and call to main()
 
   virtual bool final(
-    contextt &context,
+    symbol_tablet &symbol_table,
     message_handlert &message_handler)
   { return false; }
 
   // type check interfaces of currently parsed file
 
   virtual bool interfaces(
-    contextt &context,
+    symbol_tablet &symbol_table,
     message_handlert &message_handler)
   { return false; }
 
   // type check a module in the currently parsed file
 
   virtual bool typecheck(
-    contextt &context,
+    symbol_tablet &symbol_table,
     const std::string &module,
     message_handlert &message_handler)=0;
   

@@ -14,7 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "ieee_float.h"
 
 class cmdlinet;
-class contextt;
+class symbol_tablet;
 class namespacet;
 
 /*! \brief Globally accessible architectural configuration
@@ -54,7 +54,7 @@ public:
     void set_ILP32(); // int=32, long=32, pointer=32
     void set_LP32();  // int=16, long=32, pointer=32
 
-    void set_from_context(const contextt &context);
+    void set_from_symbol_table(const symbol_tablet &symbol_table);
     
     // minimum alignment (in structs) measured in bytes
     unsigned alignment;

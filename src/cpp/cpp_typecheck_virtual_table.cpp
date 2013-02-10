@@ -64,8 +64,8 @@ void cpp_typecheckt::do_virtual_table(const symbolt &symbol)
   {
     const std::map<irep_idt,exprt>& value_map = cit->second;
 
-    const symbolt& late_cast_symb = namespacet(context).lookup(cit->first); 
-    const symbolt& vt_symb_type = namespacet(context).lookup("virtual_table::"+id2string(late_cast_symb.name));
+    const symbolt& late_cast_symb = namespacet(symbol_table).lookup(cit->first); 
+    const symbolt& vt_symb_type = namespacet(symbol_table).lookup("virtual_table::"+id2string(late_cast_symb.name));
 
     symbolt vt_symb_var;
     vt_symb_var.name=  id2string(vt_symb_type.name) + "@"+ id2string(symbol.name);
@@ -94,7 +94,7 @@ void cpp_typecheckt::do_virtual_table(const symbolt &symbol)
     }
     vt_symb_var.value = values;
 
-    bool failed = context.move(vt_symb_var);
+    bool failed = symbol_table.move(vt_symb_var);
     assert(!failed);
   }
 }

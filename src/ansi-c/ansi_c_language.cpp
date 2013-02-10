@@ -194,21 +194,21 @@ Function: ansi_c_languaget::typecheck
 \*******************************************************************/
 
 bool ansi_c_languaget::typecheck(
-  contextt &context,
+  symbol_tablet &symbol_table,
   const std::string &module,
   message_handlert &message_handler)
 {
   if(ansi_c_convert(parse_tree, module, message_handler))
     return true;
 
-  contextt new_context;
+  symbol_tablet new_symbol_table;
 
-  if(ansi_c_typecheck(parse_tree, new_context, module, message_handler))
+  if(ansi_c_typecheck(parse_tree, new_symbol_table, module, message_handler))
     return true;
 
-  remove_internal_symbols(new_context);
+  remove_internal_symbols(new_symbol_table);
   
-  if(linking(context, new_context, message_handler))
+  if(linking(symbol_table, new_symbol_table, message_handler))
     return true;
     
   return false;
@@ -227,10 +227,10 @@ Function: ansi_c_languaget::final
 \*******************************************************************/
 
 bool ansi_c_languaget::final(
-  contextt &context,
+  symbol_tablet &symbol_table,
   message_handlert &message_handler)
 {
-  if(entry_point(context, "c::main", message_handler)) return true;
+  if(entry_point(symbol_table, "c::main", message_handler)) return true;
   
   return false;
 }

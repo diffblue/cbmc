@@ -12,7 +12,7 @@ Date: September 2011
 #include <std_expr.h>
 #include <std_code.h>
 #include <prefix.h>
-#include <context.h>
+#include <symbol_table.h>
 
 #include "interrupt.h"
 #include "rw_set.h"
@@ -86,12 +86,12 @@ Function: interrupt
 
 void interrupt(
   value_setst &value_sets,
-  const contextt &context,
+  const symbol_tablet &symbol_table,
   goto_programt &goto_program,
   const symbol_exprt &interrupt_handler,
   const rw_set_baset &isr_rw_set)
 {
-  namespacet ns(context);
+  namespacet ns(symbol_table);
   
   Forall_goto_program_instructions(i_it, goto_program)
   {
@@ -181,18 +181,18 @@ Function: get_isr
 \*******************************************************************/
 
 symbol_exprt get_isr(
-  const contextt &context,
+  const symbol_tablet &symbol_table,
   const irep_idt &interrupt_handler)
 {
   std::list<symbol_exprt> matches;
 
-  forall_symbol_base_map(m_it, context.symbol_base_map, interrupt_handler)
+  forall_symbol_base_map(m_it, symbol_table.symbol_base_map, interrupt_handler)
   {
     // look it up
-    contextt::symbolst::const_iterator s_it=
-      context.symbols.find(m_it->second);
+    symbol_tablet::symbolst::const_iterator s_it=
+      symbol_table.symbols.find(m_it->second);
     
-    if(s_it==context.symbols.end()) continue;
+    if(s_it==symbol_table.symbols.end()) continue;
   
     if(s_it->second.type.id()==ID_code)
       matches.push_back(s_it->second.symbol_expr());
@@ -227,15 +227,15 @@ Function: interrupt
 
 void interrupt(
   value_setst &value_sets,
-  const contextt &context,
+  const symbol_tablet &symbol_table,
   goto_functionst &goto_functions,
   const irep_idt &interrupt_handler)
 {
   // look up the ISR
-  symbol_exprt isr=get_isr(context, interrupt_handler);
+  symbol_exprt isr=get_isr(symbol_table, interrupt_handler);
 
   // we first figure out which objects are read/written by the ISR
-  const namespacet ns(context);
+  const namespacet ns(symbol_table);
   rw_set_functiont isr_rw_set(
     value_sets, ns, goto_functions, isr);
 
@@ -246,7 +246,7 @@ void interrupt(
        f_it->first!=ID_main &&
        f_it->first!=interrupt_handler)
       interrupt(
-        value_sets, context, f_it->second.body, isr, isr_rw_set);
+        value_sets, symbol_table, f_it->second.body, isr, isr_rw_set);
 
   goto_functions.update();
 }

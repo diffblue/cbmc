@@ -12,7 +12,7 @@ Date: June 2003
 
 #include <base_type.h>
 #include <std_code.h>
-#include <context.h>
+#include <symbol_table.h>
 
 #include "goto_convert_functions.h"
 #include "goto_inline.h"
@@ -31,10 +31,10 @@ Function: goto_convert_functionst::goto_convert_functionst
 \*******************************************************************/
 
 goto_convert_functionst::goto_convert_functionst(
-  contextt &_context,
+  symbol_tablet &_symbol_table,
   goto_functionst &_functions,
   message_handlert &_message_handler):
-  goto_convertt(_context, _message_handler),
+  goto_convertt(_symbol_table, _message_handler),
   functions(_functions)
 {
 }
@@ -74,7 +74,7 @@ void goto_convert_functionst::goto_convert()
   typedef std::list<irep_idt> symbol_listt;
   symbol_listt symbol_list;
 
-  forall_symbols(it, context.symbols)
+  forall_symbols(it, symbol_table.symbols)
   {
     if(!it->second.is_type &&
        it->second.type.id()==ID_code)
@@ -93,7 +93,7 @@ void goto_convert_functionst::goto_convert()
 
   // this removes the parse tree of the bodies from memory
   #if 0
-  Forall_symbols(it, context.symbols)
+  Forall_symbols(it, symbol_table.symbols)
   {
     if(!it->second.is_type &&
        it->second.type.id()==ID_code &&
@@ -260,12 +260,12 @@ Function: goto_convert
 \*******************************************************************/
 
 void goto_convert(
-  contextt &context,
+  symbol_tablet &symbol_table,
   goto_functionst &functions,
   message_handlert &message_handler)
 {
   goto_convert_functionst goto_convert_functions(
-    context, functions, message_handler);
+    symbol_table, functions, message_handler);
   
   try
   {  
@@ -305,12 +305,12 @@ Function: goto_convert
 
 void goto_convert(
   const irep_idt &identifier,
-  contextt &context,
+  symbol_tablet &symbol_table,
   goto_functionst &functions,
   message_handlert &message_handler)
 {
   goto_convert_functionst goto_convert_functions(
-    context, functions, message_handler);
+    symbol_table, functions, message_handler);
   
   try
   {  

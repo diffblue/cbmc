@@ -167,10 +167,10 @@ irep_idt linkingt::rename(const irep_idt &old_identifier)
     new_identifier=
       id2string(old_identifier)+"$link"+i2string(renaming_counter++);        
   }
-  while(main_context.symbols.find(new_identifier)!=
-        main_context.symbols.end() ||
-        src_context.symbols.find(new_identifier)!=
-        src_context.symbols.end());
+  while(main_symbol_table.symbols.find(new_identifier)!=
+        main_symbol_table.symbols.end() ||
+        src_symbol_table.symbols.find(new_identifier)!=
+        src_symbol_table.symbols.end());
         
   return new_identifier;
 }
@@ -211,7 +211,7 @@ void linkingt::rename_type_symbol(symbolt &new_symbol)
   replace_symbol.replace(new_symbol.type);
 
   // move over!
-  bool result=main_context.move(new_symbol);
+  bool result=main_symbol_table.move(new_symbol);
   assert(!result);
 }
 
@@ -234,7 +234,7 @@ void linkingt::duplicate_type_symbol(
 {
   // check if it is really the same
   // -- use base_type_eq, not linking_type_eq
-  // first make sure that base_type_eq can soundly use ns/main_context only
+  // first make sure that base_type_eq can soundly use ns/main_symbol_table only
   find_symbols_sett symbols;
   find_type_and_expr_symbols(new_symbol.type, symbols);
   bool ok=true;
@@ -312,7 +312,7 @@ void linkingt::duplicate_non_type_symbol(
     new_symbol.name=new_identifier;
     
     // move over!
-    bool result=main_context.move(new_symbol);
+    bool result=main_symbol_table.move(new_symbol);
     assert(!result);
     
     return;
@@ -489,9 +489,9 @@ Function: linkingt::typecheck
 
 void linkingt::typecheck()
 {
-  // we inspect all the symbols in src_context
+  // we inspect all the symbols in src_symbol_table
   
-  forall_symbols(it, src_context.symbols)
+  forall_symbols(it, src_symbol_table.symbols)
     inspect_src_symbol(it->first);
 }
 
@@ -514,16 +514,16 @@ void linkingt::inspect_src_symbol(const irep_idt &identifier)
     return;
 
   // look it up, it must be there
-  symbolt &new_symbol=src_context.lookup(identifier);
+  symbolt &new_symbol=src_symbol_table.lookup(identifier);
 
   // resolve recursion on types; we shouldn't need specific care
   // for non-types even though recursion may occur via initializers
   if(!processing.insert(identifier).second)
   {
-    if(!main_context.has_symbol(identifier))
+    if(!main_symbol_table.has_symbol(identifier))
       return;
 
-    symbolt &old_symbol=main_context.lookup(identifier);
+    symbolt &old_symbol=main_symbol_table.lookup(identifier);
     bool move=false;
     if(new_symbol.is_type && old_symbol.is_type)
       duplicate_type_symbol(old_symbol, new_symbol, move);
@@ -555,7 +555,7 @@ void linkingt::inspect_src_symbol(const irep_idt &identifier)
         it++)
       // identifiers for prototypes need not exist
       if(!it->get_identifier().empty() &&
-          src_context.has_symbol(it->get_identifier()))
+          src_symbol_table.has_symbol(it->get_identifier()))
         symbols.insert(it->get_identifier());
   }
 
@@ -587,27 +587,27 @@ void linkingt::inspect_src_symbol(const irep_idt &identifier)
     }
   }
     
-  // any symbols contained in new_symbol are now renamed within src_context and
-  // the (possibly renamed) contained symbols are in main_context
+  // any symbols contained in new_symbol are now renamed within src_symbol_table and
+  // the (possibly renamed) contained symbols are in main_symbol_table
   // any checks for duplicates are now safe to exclusively use lookups on
-  // main_context (via ns)
+  // main_symbol_table (via ns)
 
   // ok, now check if we are to expect a collision
-  const contextt::symbolst::iterator main_s_it=
-    main_context.symbols.find(identifier);
+  const symbol_tablet::symbolst::iterator main_s_it=
+    main_symbol_table.symbols.find(identifier);
     
-  if(main_s_it!=main_context.symbols.end())
+  if(main_s_it!=main_symbol_table.symbols.end())
     duplicate_symbol(main_s_it->second, new_symbol); // handle the collision
   else
   {
-    // add into destination context -- should never fail,
+    // add into destination symbol_table -- should never fail,
     // as there is no collision
     
-    bool result=main_context.move(new_symbol);
+    bool result=main_symbol_table.move(new_symbol);
     assert(!result);    
   }
 
-  // symbol is really done and can now be used within main_context
+  // symbol is really done and can now be used within main_symbol_table
   completed.insert(identifier);
   processing.erase(identifier);
 }
@@ -625,12 +625,12 @@ Function: linking
 \*******************************************************************/
 
 bool linking(
-  contextt &dest_context,
-  contextt &new_context,
+  symbol_tablet &dest_symbol_table,
+  symbol_tablet &new_symbol_table,
   message_handlert &message_handler)
 {
   linkingt linking(
-    dest_context, new_context, message_handler);
+    dest_symbol_table, new_symbol_table, message_handler);
   
   return linking.typecheck_main();
 }

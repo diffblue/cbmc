@@ -20,7 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <std_expr.h>
 #include <cprover_prefix.h>
 #include <pointer_offset_size.h>
-#include <context.h>
+#include <symbol_table.h>
 #include <guard.h>
 #include <options.h>
 #include <pointer_predicates.h>
@@ -215,7 +215,7 @@ exprt dereferencet::dereference(
       failure_value=symbol_expr(symbol);
       failure_value.set(ID_C_invalid_object, true);
       
-      new_context.move(symbol);
+      new_symbol_table.move(symbol);
     }
 
     valuet value;

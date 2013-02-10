@@ -146,9 +146,9 @@ void xml_typecheckt::convert_xmi_class(const xmlt &xml)
       throw "unexpected XMI: "+n_it->name;
   }
 
-  if(context.move(symbol))
+  if(symbol_table.move(symbol))
   {
-    str << "class already in context: " << symbol.name;
+    str << "class already in symbol table: " << symbol.name;
     throw 0;
   }
 }
@@ -177,9 +177,9 @@ void xml_typecheckt::convert_xmi_DataType(const xmlt &xml)
   symbol.is_type=true;
   symbol.type.make_nil();
 
-  if(context.move(symbol))
+  if(symbol_table.move(symbol))
   {
-    str << "type already in context: "
+    str << "type already in symbol table: "
         << symbol.name;
     throw 0;
   }
@@ -254,12 +254,12 @@ Function: xml_typecheck
 
 bool xml_typecheck(
   xml_parse_treet &xml_parse_tree,
-  contextt &context,
+  symbol_tablet &symbol_table,
   const std::string &module,
   message_handlert &message_handler)
 {
   xml_typecheckt xml_typecheck(
-    xml_parse_tree, context, module, message_handler);
+    xml_parse_tree, symbol_table, module, message_handler);
   return xml_typecheck.typecheck_main();
 }
 
@@ -279,14 +279,14 @@ bool xml_typecheck(exprt &expr,
                    std::ostream &err,
                    const namespacet &ns)
 {
-  contextt context;
+  symbol_tablet symbol_table;
   xml_parse_treet xml_parse_tree;
 
   #if 0
   bool result=false;
 
-  xml_typecheckt xml_typecheck(xml_parse, context,
-                                   ns.get_context(), "", err);
+  xml_typecheckt xml_typecheck(xml_parse, symbol_table,
+                                   ns.get_symbol_table(), "", err);
 
   try
   {

@@ -13,10 +13,10 @@ Date:   September 2009
 
 #include <goto-programs/goto_functions.h>
 
-class contextt;
+class symbol_tablet;
 
 void remove_return_values(
-  contextt &context,
+  symbol_tablet &symbol_table,
   goto_functionst &goto_functions);
 
 #endif

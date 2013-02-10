@@ -1442,10 +1442,10 @@ void cpp_typecheckt::typecheck_expr_member(
   if(expr.type().id()==ID_code)
   {
     // Check if the function body has to be typechecked
-    contextt::symbolst::iterator it=
-      context.symbols.find(component_name);
+    symbol_tablet::symbolst::iterator it=
+      symbol_table.symbols.find(component_name);
 
-    assert(it!=context.symbols.end());
+    assert(it!=symbol_table.symbols.end());
 
     symbolt &func_symb=it->second;
 
@@ -2311,7 +2311,7 @@ void cpp_typecheckt::typecheck_method_application(
   if(symbol.value.id()=="cpp_not_typechecked" &&
       !symbol.value.get_bool("is_used"))
   {
-    context.symbols[symbol.name].value.set("is_used", true);
+    symbol_table.symbols[symbol.name].value.set("is_used", true);
   }
 }
 
@@ -2629,10 +2629,10 @@ void cpp_typecheckt::typecheck_expr_function_identifier(exprt &expr)
   if(expr.id()==ID_symbol)
   {
     // Check if the function body has to be typechecked
-    contextt::symbolst::iterator it=
-      context.symbols.find(expr.get(ID_identifier));
+    symbol_tablet::symbolst::iterator it=
+      symbol_table.symbols.find(expr.get(ID_identifier));
 
-    assert(it != context.symbols.end());
+    assert(it != symbol_table.symbols.end());
 
     symbolt &func_symb = it->second;
 

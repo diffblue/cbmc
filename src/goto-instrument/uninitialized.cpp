@@ -10,7 +10,7 @@ Date: January 2010
 
 #include <std_code.h>
 #include <std_expr.h>
-#include <context.h>
+#include <symbol_table.h>
 
 #include <analyses/uninitialized_domain.h>
 
@@ -25,9 +25,9 @@ Date: January 2010
 class uninitializedt
 {
 public:
-  uninitializedt(contextt &_context):
-    context(_context),
-    ns(_context),
+  uninitializedt(symbol_tablet &_symbol_table):
+    symbol_table(_symbol_table),
+    ns(_symbol_table),
     uninitialized_analysis(ns)
   {
   }
@@ -35,7 +35,7 @@ public:
   void add_assertions(goto_programt &goto_program);
 
 protected:
-  contextt &context;
+  symbol_tablet &symbol_table;
   namespacet ns;
   uninitialized_analysist uninitialized_analysis;
 
@@ -121,7 +121,7 @@ void uninitializedt::add_assertions(goto_programt &goto_program)
     new_symbol.is_file_local=true;
     new_symbol.is_lvalue=true;
     
-    context.move(new_symbol);
+    symbol_table.move(new_symbol);
   }
 
   Forall_goto_program_instructions(i_it, goto_program)
@@ -233,12 +233,12 @@ Function: add_uninitialized_locals_assertions
 \*******************************************************************/
 
 void add_uninitialized_locals_assertions(
-  contextt &context,
+  symbol_tablet &symbol_table,
   goto_functionst &goto_functions)
 {
   Forall_goto_functions(f_it, goto_functions)
   {
-    uninitializedt uninitialized(context);
+    uninitializedt uninitialized(symbol_table);
 
     uninitialized.add_assertions(f_it->second.body);
   }
@@ -257,11 +257,11 @@ Function: show_uninitialized
 \*******************************************************************/
 
 void show_uninitialized(
-  const class contextt &context,
+  const class symbol_tablet &symbol_table,
   const goto_functionst &goto_functions,
   std::ostream &out)
 {
-  const namespacet ns(context);
+  const namespacet ns(symbol_table);
 
   forall_goto_functions(f_it, goto_functions)
   {

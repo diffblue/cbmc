@@ -10,14 +10,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_XML_TYPECHECK_H
 
 #include <typecheck.h>
-#include <context.h>
+#include <symbol_table.h>
 #include <namespace.h>
 
 #include "xml_parse_tree.h"
 
 bool xml_typecheck(
   xml_parse_treet &xml_parse_tree,
-  contextt &context,
+  symbol_tablet &symbol_table,
   const std::string &module,
   message_handlert &message_handler);
 
@@ -31,12 +31,12 @@ class xml_typecheckt:public typecheckt
 public:
   xml_typecheckt(
     xml_parse_treet &_xml_parse_tree,
-    contextt &_context,
+    symbol_tablet &_symbol_table,
     const std::string &_module,
     message_handlert &_message_handler):
     typecheckt(_message_handler),
     xml_parse_tree(_xml_parse_tree),
-    context(_context)
+    symbol_table(_symbol_table)
   {
   }
 
@@ -54,7 +54,7 @@ public:
   
 protected:
   xml_parse_treet &xml_parse_tree;
-  contextt &context;
+  symbol_tablet &symbol_table;
   
   void convert_xmi(const xmlt &xml);
   void convert_xmi_Model(const xmlt &xml);

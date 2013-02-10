@@ -8,7 +8,7 @@ Date: November 2011
 
 \*******************************************************************/
 
-#include <context.h>
+#include <symbol_table.h>
 #include <std_expr.h>
 #include <std_types.h>
 #include <arith_tools.h>
@@ -31,7 +31,7 @@ Function: add_stack_depth_symbol
 
 \*******************************************************************/
 
-symbol_exprt add_stack_depth_symbol(contextt &context)
+symbol_exprt add_stack_depth_symbol(symbol_tablet &symbol_table)
 {
   const irep_idt identifier="$stack_depth";
   signedbv_typet type(sizeof(int)*8);
@@ -47,7 +47,7 @@ symbol_exprt add_stack_depth_symbol(contextt &context)
   new_symbol.is_thread_local=true;
   new_symbol.is_lvalue=true;
 
-  context.move(new_symbol);
+  symbol_table.move(new_symbol);
 
   return symbol_exprt(identifier, type);
 }
@@ -116,11 +116,11 @@ Function: stack_depth
 \*******************************************************************/
 
 void stack_depth(
-  contextt &context,
+  symbol_tablet &symbol_table,
   goto_functionst &goto_functions,
   const int depth)
 {
-  const symbol_exprt sym=add_stack_depth_symbol(context);
+  const symbol_exprt sym=add_stack_depth_symbol(symbol_table);
   const exprt depth_expr(from_integer(depth, sym.type()));
 
   Forall_goto_functions(f_it, goto_functions)

@@ -15,7 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <arith_tools.h>
 #include <base_type.h>
 #include <std_expr.h>
-#include <context.h>
+#include <symbol_table.h>
 
 #include <ansi-c/c_types.h>
 
@@ -143,13 +143,13 @@ void goto_symext::argument_assignments(
     {
       irep_idt id=id2string(function_identifier)+"::va_arg"+i2string(va_count);
       
-      // add to context
+      // add to symbol table
       symbolt symbol;
       symbol.name=id;
       symbol.base_name="va_arg"+i2string(va_count);
       symbol.type=it1->type();
       
-      new_context.move(symbol);
+      new_symbol_table.move(symbol);
       
       symbol_exprt lhs=symbol_exprt(id, it1->type());
 

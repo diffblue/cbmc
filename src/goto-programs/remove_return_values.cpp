@@ -9,14 +9,14 @@ Date:   September 2009
 \*******************************************************************/
 
 #include <std_expr.h>
-#include <context.h>
+#include <symbol_table.h>
 
 #include "remove_return_values.h"
 
 class remove_return_valuest
 {
 public:
-  remove_return_valuest(contextt &_context):context(_context)
+  remove_return_valuest(symbol_tablet &_symbol_table):symbol_table(_symbol_table)
   {
   }
 
@@ -24,7 +24,7 @@ public:
     goto_functionst &goto_functions);
 
 protected:
-  contextt &context;
+  symbol_tablet &symbol_table;
 
   void do_return_value(
     goto_functionst::function_mapt::iterator f_it);
@@ -59,17 +59,17 @@ void remove_return_valuest::do_return_value(
   // look up the function symbol
   const irep_idt function_id=f_it->first;
 
-  contextt::symbolst::iterator s_it=
-    context.symbols.find(function_id);
+  symbol_tablet::symbolst::iterator s_it=
+    symbol_table.symbols.find(function_id);
 
-  assert(s_it!=context.symbols.end());
+  assert(s_it!=symbol_table.symbols.end());
   symbolt &function_symbol=s_it->second;
 
   // make the return type 'void'
   f_it->second.type.return_type()==empty_typet();
   function_symbol.type=f_it->second.type;
 
-  // add symbol to context
+  // add symbol to symbol_table
   symbolt new_symbol;
   new_symbol.is_lvalue=true;
   new_symbol.is_state_var=true;
@@ -83,7 +83,7 @@ void remove_return_valuest::do_return_value(
   new_symbol.mode=function_symbol.mode;
   new_symbol.type=return_type;
 
-  context.add(new_symbol);
+  symbol_table.add(new_symbol);
 
   goto_programt &goto_program=f_it->second.body;
 
@@ -255,10 +255,10 @@ Purpose: removes returns
 \*******************************************************************/
 
 void remove_return_values(
-  contextt &context,
+  symbol_tablet &symbol_table,
   goto_functionst &goto_functions)
 {
-  remove_return_valuest rrv(context);
+  remove_return_valuest rrv(symbol_table);
   rrv(goto_functions);
 }
 

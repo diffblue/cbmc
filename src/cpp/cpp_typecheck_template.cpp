@@ -157,10 +157,10 @@ void cpp_typecheckt::typecheck_class_template(
 
   // check if we have it already
   
-  contextt::symbolst::iterator previous_symbol=
-    context.symbols.find(symbol_name);
+  symbol_tablet::symbolst::iterator previous_symbol=
+    symbol_table.symbols.find(symbol_name);
 
-  if(previous_symbol!=context.symbols.end())
+  if(previous_symbol!=symbol_table.symbols.end())
   {
     // there already
     cpp_declarationt &previous_declaration=
@@ -232,8 +232,8 @@ void cpp_typecheckt::typecheck_class_template(
     cpp_scopes.current_scope().prefix+id2string(symbol.base_name);
 
   symbolt *new_symbol;
-  if(context.move(symbol, new_symbol))
-    throw "cpp_typecheckt::typecheck_compound_type: context.move() failed";
+  if(symbol_table.move(symbol, new_symbol))
+    throw "cpp_typecheckt::typecheck_compound_type: symbol_table.move() failed";
 
   // put into current scope
   cpp_idt &id=cpp_scopes.put_into_scope(*new_symbol);
@@ -297,10 +297,10 @@ void cpp_typecheckt::typecheck_function_template(
 
   // check if we have it already
 
-  contextt::symbolst::iterator previous_symbol=
-    context.symbols.find(symbol_name);
+  symbol_tablet::symbolst::iterator previous_symbol=
+    symbol_table.symbols.find(symbol_name);
 
-  if(previous_symbol!=context.symbols.end())
+  if(previous_symbol!=symbol_table.symbols.end())
   {
     bool previous_has_value =
      to_cpp_declaration(previous_symbol->second.type).
@@ -340,8 +340,8 @@ void cpp_typecheckt::typecheck_function_template(
     cpp_scopes.current_scope().prefix+id2string(symbol.base_name);
 
   symbolt *new_symbol;
-  if(context.move(symbol, new_symbol))
-    throw "cpp_typecheckt::typecheck_compound_type: context.move() failed";
+  if(symbol_table.move(symbol, new_symbol))
+    throw "cpp_typecheckt::typecheck_compound_type: symbol_table.move() failed";
 
   // put into scope
   cpp_idt &id=cpp_scopes.put_into_scope(*new_symbol);
@@ -440,7 +440,7 @@ void cpp_typecheckt::typecheck_class_template_member(
 
   const cpp_idt &cpp_id=**(id_set.begin());
   symbolt &template_symbol=
-    context.symbols.find(cpp_id.identifier)->second;
+    symbol_table.symbols.find(cpp_id.identifier)->second;
 
   exprt &template_methods=static_cast<exprt &>(
     template_symbol.value.add("template_methods"));
@@ -662,10 +662,10 @@ void cpp_typecheckt::convert_class_template_specialization(
     throw 0;
   }
   
-  contextt::symbolst::iterator s_it=
-    context.symbols.find((*id_set.begin())->identifier);
+  symbol_tablet::symbolst::iterator s_it=
+    symbol_table.symbols.find((*id_set.begin())->identifier);
     
-  assert(s_it!=context.symbols.end());
+  assert(s_it!=symbol_table.symbols.end());
   
   symbolt &template_symbol=s_it->second;
     

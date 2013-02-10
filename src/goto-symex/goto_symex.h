@@ -20,7 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 class typet;
 class code_typet;
-class contextt;
+class symbol_tablet;
 class code_assignt;
 class code_function_callt;
 class exprt;
@@ -42,12 +42,12 @@ class goto_symext
 public:
   goto_symext(
     const namespacet &_ns,
-    contextt &_new_context,
+    symbol_tablet &_new_symbol_table,
     symex_targett &_target):
     total_claims(0),
     remaining_claims(0),
     constant_propagation(true),
-    new_context(_new_context),
+    new_symbol_table(_new_symbol_table),
     ns(_ns),
     target(_target),
     guard_identifier("goto_symex::\\guard")
@@ -92,7 +92,7 @@ public:
   bool constant_propagation;
 
   optionst options;
-  contextt &new_context;
+  symbol_tablet &new_symbol_table;
 
 protected:
   const namespacet &ns;

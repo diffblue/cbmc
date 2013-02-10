@@ -354,10 +354,10 @@ void cpp_typecheckt::default_cpctor(
       cppname.move_to_sub(name);
 
       const symbolt &virtual_table_symbol_type = 
-        namespacet(context).lookup(mem_it->type().subtype().get(ID_identifier));
+        namespacet(symbol_table).lookup(mem_it->type().subtype().get(ID_identifier));
 
       const symbolt &virtual_table_symbol_var  =
-        namespacet(context).lookup(id2string(virtual_table_symbol_type.name) + "@" +
+        namespacet(symbol_table).lookup(id2string(virtual_table_symbol_type.name) + "@" +
         id2string(symbol.name));
 
       exprt var = symbol_expr(virtual_table_symbol_var);
@@ -1240,11 +1240,11 @@ codet cpp_typecheckt::dtor(const symbolt &symb)
       cppname.move_to_sub(name);
 
       const symbolt &virtual_table_symbol_type = 
-        namespacet(context).lookup(
+        namespacet(symbol_table).lookup(
           cit->type().subtype().get(ID_identifier));
 
       const symbolt &virtual_table_symbol_var  =
-        namespacet(context).lookup(
+        namespacet(symbol_table).lookup(
           id2string(virtual_table_symbol_type.name) + "@" + id2string(symb.name));
 
       exprt var=symbol_expr(virtual_table_symbol_var);

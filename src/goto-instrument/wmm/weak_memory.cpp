@@ -38,13 +38,13 @@ Date: September 2011
 #define DEBUG_MESSAGE(a)
 #endif
 
-class contextt;
+class symbol_tablet;
 
 class shared_bufferst
 {
 public:
-  shared_bufferst(contextt &_context, unsigned _nb_threads):
-    context(_context),
+  shared_bufferst(symbol_tablet &_symbol_table, unsigned _nb_threads):
+    symbol_table(_symbol_table),
     nb_threads(_nb_threads+1),
     uniq(0),
     cav11(false)
@@ -153,14 +153,14 @@ public:
     const irep_idt &id_lhs,
     const irep_idt &id_rhs)
   {
-    namespacet ns(context);
+    namespacet ns(symbol_table);
     assignment(goto_program, t, location, id_lhs, 
       symbol_expr(ns.lookup(id_rhs)));
   }
 
   bool track(const irep_idt &id) const
   {
-    namespacet ns(context);
+    namespacet ns(symbol_table);
 
     const symbolt &symbol=ns.lookup(id);
     if(symbol.is_thread_local) return false;
@@ -185,14 +185,14 @@ public:
 
   void weak_memory(
     value_setst &value_sets,
-    contextt &context,
+    symbol_tablet &symbol_table,
     goto_programt &goto_program,
     weak_memory_modelt model,
     goto_functionst &goto_functions
   );
 
   void affected_by_delay(
-    contextt &context,
+    symbol_tablet &symbol_table,
     value_setst &value_sets,
     goto_functionst &goto_functions);
 
@@ -200,7 +200,7 @@ public:
   {
   protected:
     shared_bufferst& shared_buffers;
-    contextt& context;
+    symbol_tablet& symbol_table;
     goto_functionst& goto_functions;
 
     /* for thread marking (dynamic) */
@@ -212,9 +212,9 @@ public:
     std::set<irep_idt> past_writes;
 
   public:
-    cfg_visitort(shared_bufferst& _shared, contextt& _context, 
+    cfg_visitort(shared_bufferst& _shared, symbol_tablet& _symbol_table, 
       goto_functionst& _goto_functions)
-      :shared_buffers(_shared), context(_context), 
+      :shared_buffers(_shared), symbol_table(_symbol_table), 
         goto_functions(_goto_functions)
     {
       current_thread = 0;
@@ -229,7 +229,7 @@ public:
   };
  
 protected:
-  class contextt &context;
+  class symbol_tablet &symbol_table;
   
   // number of threads interferring
   unsigned nb_threads;
@@ -300,7 +300,7 @@ const shared_bufferst::varst &shared_bufferst::operator()(const irep_idt &object
  
   varst &vars=var_map[object];
   
-  namespacet ns(context);
+  namespacet ns(symbol_table);
   const symbolt &symbol=ns.lookup(object);
 
   vars.type=symbol.type;
@@ -363,7 +363,7 @@ irep_idt shared_bufferst::add(
   instrumentations.insert(identifier);
 
   symbolt *symbol_ptr;
-  context.move(new_symbol, symbol_ptr);
+  symbol_table.move(new_symbol, symbol_ptr);
   return identifier;
 }
 
@@ -382,7 +382,7 @@ irep_idt shared_bufferst::add_fresh_var(
   new_symbol.value.make_nil();
 
   symbolt *symbol_ptr;
-  context.move(new_symbol, symbol_ptr);
+  symbol_table.move(new_symbol, symbol_ptr);
   return identifier;
 }
 
@@ -402,7 +402,7 @@ Function: shared_bufferst::add_initialization
 void shared_bufferst::add_initialization(goto_programt &goto_program)
 {
   goto_programt::targett t=goto_program.instructions.begin();
-  const namespacet ns(context);
+  const namespacet ns(symbol_table);
 
   for(var_mapt::const_iterator
       it=var_map.begin();
@@ -487,7 +487,7 @@ void shared_bufferst::assignment(
   const irep_idt &id_lhs,
   const exprt &value)
 {
-  const namespacet ns(context);
+  const namespacet ns(symbol_table);
   std::string identifier = id2string(id_lhs);
 
 //#if 0
@@ -1427,11 +1427,11 @@ Function: affected_by_delay
 \*******************************************************************/
 
 void shared_bufferst::affected_by_delay(
-  contextt &context,
+  symbol_tablet &symbol_table,
   value_setst &value_sets,
   goto_functionst &goto_functions)
 {
-  namespacet ns(context);
+  namespacet ns(symbol_table);
 
   Forall_goto_functions(f_it, goto_functions)
     Forall_goto_program_instructions(i_it, f_it->second.body)
@@ -1463,7 +1463,7 @@ Function: lw_sync_fence (POWER)
 
 inline bool lw_sync_fence(
   value_setst &value_sets,
-  class contextt &context,
+  class symbol_tablet &symbol_table,
   shared_bufferst &shared_buffers,
   goto_functionst &goto_functions,
   goto_programt &goto_program,
@@ -1476,7 +1476,7 @@ inline bool lw_sync_fence(
   return false;
 
 #if 0
-  namespacet ns(context);
+  namespacet ns(symbol_table);
 
   // spaghetti
   bool leave_early=false;
@@ -1485,7 +1485,7 @@ inline bool lw_sync_fence(
 
   for(; !next_it->is_end_thread()
     && next_it!=(goto_program).instructions.end()
-    && !is_fence(*next_it,context)//!next_it->is_fence()
+    && !is_fence(*next_it,symbol_table)//!next_it->is_fence()
     && !leave_early 
     && !skip_this_var;
     next_it++)
@@ -1512,7 +1512,7 @@ inline bool lw_sync_fence(
 
           for(; !prev_it->is_start_thread()
             && prev_it!=(goto_program).instructions.begin()
-            && !is_fence(*prev_it,context)//!prev_it->is_fence()
+            && !is_fence(*prev_it,symbol_table)//!prev_it->is_fence()
             && !skip_this_var;
             prev_it--)
           {
@@ -1603,7 +1603,7 @@ void shared_bufferst::cfg_visitort::weak_memory(
   if(function==CPROVER_PREFIX "initialize")
     return;
 
-  namespacet ns(context);
+  namespacet ns(symbol_table);
   goto_programt& goto_program = goto_functions.function_map[function].body;
 
   Forall_goto_program_instructions(i_it, goto_program)
@@ -1833,11 +1833,11 @@ Function: introduce_temporaries
 
 void introduce_temporaries(
   value_setst &value_sets,
-  contextt &context,
+  symbol_tablet &symbol_table,
   const irep_idt &function,
   goto_programt &goto_program)
 {
-  namespacet ns(context);
+  namespacet ns(symbol_table);
   unsigned tmp_counter=0;
 
   Forall_goto_program_instructions(i_it, goto_program)
@@ -1864,7 +1864,7 @@ void introduce_temporaries(
       symbol_exprt symbol_expr=::symbol_expr(new_symbol);
       
       symbolt *symbol_ptr;
-      context.move(new_symbol, symbol_ptr);
+      symbol_table.move(new_symbol, symbol_ptr);
       
       goto_programt::instructiont new_i;
       new_i.make_assignment();
@@ -1934,7 +1934,7 @@ Function: weak_memory
 void weak_memory(
   weak_memory_modelt model,
   value_setst& value_sets,
-  contextt& context,
+  symbol_tablet& symbol_table,
   goto_functionst &goto_functions,
   bool SCC,
   instrumentation_strategyt event_strategy,
@@ -1951,8 +1951,8 @@ void weak_memory(
 {
   // no more used -- dereferences performed in rw_set
   // get rid of pointers
-  // remove_pointers(goto_functions, context, value_sets);
-  // add_failed_symbols(context);
+  // remove_pointers(goto_functions, symbol_table, value_sets);
+  // add_failed_symbols(symbol_table);
   // std::cout<<"pointers removed"<<std::endl;
 
   std::cout << "--------" << std::endl;
@@ -1961,12 +1961,12 @@ void weak_memory(
   Forall_goto_functions(f_it, goto_functions)
     if(f_it->first!=CPROVER_PREFIX "initialize" &&
       f_it->first!=ID_main)
-      introduce_temporaries(value_sets, context, f_it->first, 
+      introduce_temporaries(value_sets, symbol_table, f_it->first, 
         f_it->second.body);
   std::cout<<"Temp added"<<std::endl;
 
   unsigned max_thds = 0;
-  instrumentert instrumenter(context, goto_functions);
+  instrumentert instrumenter(symbol_table, goto_functions);
   max_thds=instrumenter.goto2graph_cfg(value_sets, model, no_dependencies);
   std::cout<<"abstraction completed"<<std::endl;
 
@@ -2030,7 +2030,7 @@ void weak_memory(
   instrumenter.print_outputs(model, hide_internals);
 
   // now adds buffers
-  shared_bufferst shared_buffers(context,max_thds);
+  shared_bufferst shared_buffers(symbol_table,max_thds);
 
   if(cav11_option)
     shared_buffers.set_cav11(model);
@@ -2041,7 +2041,7 @@ void weak_memory(
   shared_buffers.cycles_r_loc = instrumenter.id2cycloc; // places in the cycles
 
   // for reads delays
-  shared_buffers.affected_by_delay(context,value_sets,goto_functions);
+  shared_buffers.affected_by_delay(symbol_table,value_sets,goto_functions);
 
   for(std::set<irep_idt>::iterator it=
     shared_buffers.affected_by_delay_set.begin(); 
@@ -2060,7 +2060,7 @@ void weak_memory(
       std::cout<<((*it)==""?"fence":*it)<<", "<<ran_it->second<<std::endl;
   }
 
-  shared_bufferst::cfg_visitort visitor(shared_buffers, context, 
+  shared_bufferst::cfg_visitort visitor(shared_buffers, symbol_table, 
     goto_functions);
   visitor.weak_memory(value_sets, goto_functions.main_id(), model);
 

@@ -14,7 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "goto_functions.h"
 
 void link_to_library(
-  contextt &context,
+  symbol_tablet &symbol_table,
   goto_functionst &goto_functions,
   message_handlert &message_handler);
 

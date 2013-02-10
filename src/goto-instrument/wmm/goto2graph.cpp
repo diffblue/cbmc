@@ -1053,7 +1053,7 @@ bool instrumentert::is_cfg_spurious(const event_grapht::critical_cyclet& cyc)
   null_message_handlert no_message;
   
   #if 0
-  bmct bmc(no_option, context, no_message);
+  bmct bmc(no_option, symbol_table, no_message);
 
   bool is_spurious = bmc.run(this_interleaving);
   

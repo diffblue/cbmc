@@ -20,7 +20,7 @@ class symex_bmct:
 public:
   symex_bmct(
     const namespacet &_ns,
-    contextt &_new_context,
+    symbol_tablet &_new_symbol_table,
     symex_targett &_target);
 
   // To show progress

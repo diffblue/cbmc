@@ -116,10 +116,10 @@ symbolt &cpp_declarator_convertert::convert(
     }
 
     // try static first
-    contextt::symbolst::iterator c_it=
-      cpp_typecheck.context.symbols.find(final_identifier);
+    symbol_tablet::symbolst::iterator c_it=
+      cpp_typecheck.symbol_table.symbols.find(final_identifier);
 
-    if(c_it==cpp_typecheck.context.symbols.end())
+    if(c_it==cpp_typecheck.symbol_table.symbols.end())
     {
       // adjust type if it's a non-static member function
       if(final_type.id()==ID_code)
@@ -129,9 +129,9 @@ symbolt &cpp_declarator_convertert::convert(
       get_final_identifier();
 
       // try again
-      c_it=cpp_typecheck.context.symbols.find(final_identifier);
+      c_it=cpp_typecheck.symbol_table.symbols.find(final_identifier);
 
-      if(c_it==cpp_typecheck.context.symbols.end())
+      if(c_it==cpp_typecheck.symbol_table.symbols.end())
       {
         cpp_typecheck.err_location(declarator.name());
         cpp_typecheck.str << "member `" << base_name
@@ -141,7 +141,7 @@ symbolt &cpp_declarator_convertert::convert(
       }
     }
 
-    assert(c_it!=cpp_typecheck.context.symbols.end());
+    assert(c_it!=cpp_typecheck.symbol_table.symbols.end());
 
     symbolt &symbol=c_it->second;
 
@@ -208,10 +208,10 @@ symbolt &cpp_declarator_convertert::convert(
     }
 
     // already there?
-    contextt::symbolst::iterator c_it=
-      cpp_typecheck.context.symbols.find(final_identifier);
+    symbol_tablet::symbolst::iterator c_it=
+      cpp_typecheck.symbol_table.symbols.find(final_identifier);
 
-    if(c_it==cpp_typecheck.context.symbols.end())
+    if(c_it==cpp_typecheck.symbol_table.symbols.end())
       return convert_new_symbol(storage_spec, member_spec, declarator);
 
     symbolt &symbol=c_it->second;
@@ -454,10 +454,10 @@ void cpp_declarator_convertert::get_final_identifier()
     {
       // Is there already an `extern "C"' function with the same name
       // and the same signature?
-      contextt::symbolst::const_iterator
-        c_it=cpp_typecheck.context.symbols.find("c::"+identifier);
+      symbol_tablet::symbolst::const_iterator
+        c_it=cpp_typecheck.symbol_table.symbols.find("c::"+identifier);
         
-      if(c_it!=cpp_typecheck.context.symbols.end() &&
+      if(c_it!=cpp_typecheck.symbol_table.symbols.end() &&
          cpp_typecheck.function_identifier(final_type)==
          cpp_typecheck.function_identifier(c_it->second.type))
       {
@@ -557,8 +557,8 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
   // move early, it must be visible before doing any value
   symbolt *new_symbol;
 
-  if(cpp_typecheck.context.move(symbol, new_symbol))
-    throw "cpp_typecheckt::convert_declarator: context.move() failed";
+  if(cpp_typecheck.symbol_table.move(symbol, new_symbol))
+    throw "cpp_typecheckt::convert_declarator: symbol_table.move() failed";
 
   if(!is_code)
   {

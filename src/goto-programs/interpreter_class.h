@@ -16,10 +16,10 @@ class interpretert
 {
 public:
   interpretert(
-    const contextt &_context,
+    const symbol_tablet &_symbol_table,
     const goto_functionst &_goto_functions):
-    context(_context),
-    ns(_context),
+    symbol_table(_symbol_table),
+    ns(_symbol_table),
     goto_functions(_goto_functions)
   {
   }
@@ -29,7 +29,7 @@ public:
   friend class simplify_evaluatet;
 
 protected:
-  const contextt &context;
+  const symbol_tablet &symbol_table;
   const namespacet ns;
   const goto_functionst &goto_functions;
 

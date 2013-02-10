@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_C_TYPECHECK_BASE_H
 #define CPROVER_C_TYPECHECK_BASE_H
 
-#include <context.h>
+#include <symbol_table.h>
 #include <typecheck.h>
 #include <namespace.h>
 #include <std_code.h>
@@ -24,12 +24,12 @@ class c_typecheck_baset:
 {
 public:
   c_typecheck_baset(
-    contextt &_context,
+    symbol_tablet &_symbol_table,
     const std::string &_module,
     message_handlert &_message_handler):
     typecheckt(_message_handler),
-    namespacet(_context),
-    context(_context),
+    namespacet(_symbol_table),
+    symbol_table(_symbol_table),
     module(_module),
     mode("C"),
     language_prefix("c::")
@@ -37,13 +37,13 @@ public:
   }
 
   c_typecheck_baset(
-    contextt &_context1,
-    const contextt &_context2,
+    symbol_tablet &_symbol_table1,
+    const symbol_tablet &_symbol_table2,
     const std::string &_module,
     message_handlert &_message_handler):
     typecheckt(_message_handler),
-    namespacet(_context1, _context2),
-    context(_context1),
+    namespacet(_symbol_table1, _symbol_table2),
+    symbol_table(_symbol_table1),
     module(_module),
     mode("C"),
     language_prefix("c::")
@@ -56,7 +56,7 @@ public:
   virtual void typecheck_expr(exprt &expr);
 
 protected:
-  contextt &context;
+  symbol_tablet &symbol_table;
   const irep_idt module;
   const irep_idt mode;
   const std::string language_prefix;
@@ -251,7 +251,7 @@ protected:
   // environment
   void add_argc_argv(const symbolt &main_symbol);
 
-  // context management
+  // symbol table management
   void move_symbol(symbolt &symbol, symbolt *&new_symbol);
   void move_symbol(symbolt &symbol)
   { symbolt *new_symbol; move_symbol(symbol, new_symbol); }

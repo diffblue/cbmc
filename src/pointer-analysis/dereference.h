@@ -17,7 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "value_sets.h"
 
-class contextt;
+class symbol_tablet;
 class guardt;
 class optionst;
 class modet;
@@ -55,18 +55,18 @@ class dereferencet
 public:
   /*! \brief Constructor 
    * \param _ns Namespace
-   * \param _new_context A context to store new symbols in
+   * \param _new_symbol_table A symbol_table to store new symbols in
    * \param _options Options, in particular whether pointer checks are
             to be performed
    * \param _dereference_callback Callback object for error reporting
   */
   dereferencet(
     const namespacet &_ns,
-    contextt &_new_context,
+    symbol_tablet &_new_symbol_table,
     const optionst &_options,
     dereference_callbackt &_dereference_callback):
     ns(_ns),
-    new_context(_new_context),
+    new_symbol_table(_new_symbol_table),
     options(_options),
     dereference_callback(_dereference_callback)
   { }
@@ -102,7 +102,7 @@ public:
 
 private:
   const namespacet &ns;
-  contextt &new_context;
+  symbol_tablet &new_symbol_table;
   const optionst &options;
   dereference_callbackt &dereference_callback;
   static unsigned invalid_counter;

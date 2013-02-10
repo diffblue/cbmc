@@ -67,8 +67,8 @@ void cpp_typecheckt::typecheck_enum_body(symbolt &enum_symbol)
     symbol.is_macro=true;
     
     symbolt *new_symbol;
-    if(context.move(symbol, new_symbol))
-      throw "cpp_typecheckt::typecheck_enum_body: context.move() failed";
+    if(symbol_table.move(symbol, new_symbol))
+      throw "cpp_typecheckt::typecheck_enum_body: symbol_table.move() failed";
 
     cpp_idt &scope_identifier=
       cpp_scopes.put_into_scope(*new_symbol);
@@ -132,10 +132,10 @@ void cpp_typecheckt::typecheck_enum_type(typet &type)
 
   // check if we have it
   
-  contextt::symbolst::iterator previous_symbol=
-    context.symbols.find(symbol_name);
+  symbol_tablet::symbolst::iterator previous_symbol=
+    symbol_table.symbols.find(symbol_name);
     
-  if(previous_symbol!=context.symbols.end())
+  if(previous_symbol!=symbol_table.symbols.end())
   {
     // we do!
 
@@ -171,8 +171,8 @@ void cpp_typecheckt::typecheck_enum_type(typet &type)
     
     // move early, must be visible before doing body
     symbolt *new_symbol;
-    if(context.move(symbol, new_symbol))
-      throw "cpp_typecheckt::typecheck_enum_type: context.move() failed";    
+    if(symbol_table.move(symbol, new_symbol))
+      throw "cpp_typecheckt::typecheck_enum_type: symbol_table.move() failed";    
 
     // put into scope
     cpp_idt &scope_identifier=

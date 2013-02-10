@@ -11,7 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cstdlib>
 
 #include "namespace.h"
-#include "context.h"
+#include "symbol_table.h"
 
 /*******************************************************************\
 
@@ -27,7 +27,7 @@ Function: get_max
 
 unsigned get_max(
   const std::string &prefix,
-  const contextt::symbolst &symbols)
+  const symbol_tablet::symbolst &symbols)
 {
   unsigned max_nr=0;
 
@@ -165,11 +165,11 @@ unsigned namespacet::get_max(const std::string &prefix) const
 {
   unsigned m=0;
 
-  if(context1!=NULL)
-    m=std::max(m, ::get_max(prefix, context1->symbols));
+  if(symbol_table1!=NULL)
+    m=std::max(m, ::get_max(prefix, symbol_table1->symbols));
 
-  if(context2!=NULL)
-    m=std::max(m, ::get_max(prefix, context2->symbols));
+  if(symbol_table2!=NULL)
+    m=std::max(m, ::get_max(prefix, symbol_table2->symbols));
 
   return m;
 }
@@ -190,24 +190,24 @@ bool namespacet::lookup(
   const irep_idt &name,
   const symbolt *&symbol) const  
 {
-  contextt::symbolst::const_iterator it;
+  symbol_tablet::symbolst::const_iterator it;
 
-  if(context1!=NULL)
+  if(symbol_table1!=NULL)
   {
-    it=context1->symbols.find(name);
+    it=symbol_table1->symbols.find(name);
 
-    if(it!=context1->symbols.end())
+    if(it!=symbol_table1->symbols.end())
     {
       symbol=&(it->second);
       return false;
     }
   }
 
-  if(context2!=NULL)
+  if(symbol_table2!=NULL)
   {
-    it=context2->symbols.find(name);
+    it=symbol_table2->symbols.find(name);
 
-    if(it!=context2->symbols.end())
+    if(it!=symbol_table2->symbols.end())
     {
       symbol=&(it->second);
       return false;
@@ -233,9 +233,9 @@ unsigned multi_namespacet::get_max(const std::string &prefix) const
 {
   unsigned m=0;
 
-  for(context_listt::const_iterator
-      it=context_list.begin();
-      it!=context_list.end();
+  for(symbol_table_listt::const_iterator
+      it=symbol_table_list.begin();
+      it!=symbol_table_list.end();
       it++)
     m=std::max(m, ::get_max(prefix, (*it)->symbols));
 
@@ -258,11 +258,11 @@ bool multi_namespacet::lookup(
   const irep_idt &name,
   const symbolt *&symbol) const  
 {
-  contextt::symbolst::const_iterator s_it;
+  symbol_tablet::symbolst::const_iterator s_it;
 
-  for(context_listt::const_iterator
-      c_it=context_list.begin();
-      c_it!=context_list.end();
+  for(symbol_table_listt::const_iterator
+      c_it=symbol_table_list.begin();
+      c_it!=symbol_table_list.end();
       c_it++)
   {
     s_it=(*c_it)->symbols.find(name);

@@ -87,7 +87,7 @@ void cpp_typecheckt::convert_anonymous_union(
   new_code.move_to_operands(decl_statement);
 
   // do scoping
-  symbolt union_symbol=context.symbols[follow(symbol.type).get(ID_name)];
+  symbolt union_symbol=symbol_table.symbols[follow(symbol.type).get(ID_name)];
   const irept::subt &components=union_symbol.type.add(ID_components).get_sub();
 
   forall_irep(it, components)
@@ -116,7 +116,7 @@ void cpp_typecheckt::convert_anonymous_union(
     id.is_member=true;
   }
 
-  context.symbols[union_symbol.name].type.set(
+  symbol_table.symbols[union_symbol.name].type.set(
     "#unnamed_object", symbol.base_name);
 
   code.swap(new_code);

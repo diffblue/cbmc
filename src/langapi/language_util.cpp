@@ -11,7 +11,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "language_util.h"
 #include "mode.h"
 
-#include <context.h>
+#include <symbol_table.h>
 #include <namespace.h>
 #include <language.h>
 
@@ -123,8 +123,8 @@ Function: from_expr
 
 std::string from_expr(const exprt &expr)
 {
-  contextt context;
-  return from_expr(namespacet(context), "", expr);
+  symbol_tablet symbol_table;
+  return from_expr(namespacet(symbol_table), "", expr);
 }
 
 /*******************************************************************\
@@ -141,7 +141,7 @@ Function: from_type
 
 std::string from_type(const typet &type)
 {
-  contextt context;
-  return from_type(namespacet(context), "", type);
+  symbol_tablet symbol_table;
+  return from_type(namespacet(symbol_table), "", type);
 }
 

@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_SYMBOL_TABLE_H
 #define CPROVER_SYMBOL_TABLE_H
 
-/*! \file util/context.h
+/*! \file util/symbol_table.h
  * \brief Symbol table
  *
  * \author Daniel Kroening <kroening@kroening.com>

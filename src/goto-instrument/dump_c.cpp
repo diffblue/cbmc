@@ -39,13 +39,13 @@ class goto_program2codet
 public:
   goto_program2codet(
       const goto_programt &_goto_program,
-      contextt &_context,
+      symbol_tablet &_symbol_table,
       code_blockt &_dest,
       const type_namest &_type_names,
       std::set<std::string> &_system_headers) :
     goto_program(_goto_program),
-    context(_context),
-    ns(_context),
+    symbol_table(_symbol_table),
+    ns(_symbol_table),
     toplevel_block(_dest),
     type_names(_type_names),
     system_headers(_system_headers)
@@ -56,7 +56,7 @@ public:
 
 protected:
   const goto_programt &goto_program;
-  contextt &context;
+  symbol_tablet &symbol_table;
   const namespacet ns;
   code_blockt &toplevel_block;
   const type_namest &type_names;
@@ -157,7 +157,7 @@ void goto_program2codet::operator()()
       it!=type_names.end();
       ++it)
   {
-    symbolt &symbol=context.lookup(*it);
+    symbolt &symbol=symbol_table.lookup(*it);
     replace_symbols.replace(symbol.type);
   }
 
@@ -1114,8 +1114,8 @@ public:
     const namespacet &_ns,
     language_factoryt factory):
     goto_functions(_goto_functions),
-    copied_context(_ns.get_context()),
-    ns(copied_context),
+    copied_symbol_table(_ns.get_symbol_table()),
+    ns(copied_symbol_table),
     language(factory())
   {
   }
@@ -1129,7 +1129,7 @@ public:
 
 protected:
   const goto_functionst &goto_functions;
-  contextt copied_context;
+  symbol_tablet copied_symbol_table;
   const namespacet ns;
   languaget *language;
 
@@ -1262,7 +1262,7 @@ void goto2sourcet::operator()(std::ostream &os)
 
   // replace all #anon and prepare lexicographic order
   std::set<std::string> symbols_sorted;
-  Forall_symbols(it, copied_context.symbols)
+  Forall_symbols(it, copied_symbol_table.symbols)
   {
     cleanup_type(it->second.type);
     if(!symbols_sorted.insert(id2string(it->first)).second)
@@ -1813,7 +1813,7 @@ void goto2sourcet::convert_function_declaration(
   code_blockt b(local_static_decls);
   goto_program2codet p2s(
       func_entry->second.body,
-      copied_context,
+      copied_symbol_table,
       b,
       local_type_decls,
       system_headers);

@@ -27,7 +27,7 @@ Author: Daniel Kroening, kroening@kroening.com
     \ingroup gr_symbol_table
 
     This is a symbol in the symbol table, stored in an
-    object of type contextt.
+    object of type symbol_tablet.
 */
 class symbolt
 {

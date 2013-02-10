@@ -102,12 +102,12 @@ Function: xml_languaget::typecheck
 \*******************************************************************/
 
 bool xml_languaget::typecheck(
-  contextt &context,
+  symbol_tablet &symbol_table,
   const std::string &module,
   message_handlert &message_handler)
 {
   return xml_typecheck(
-    xml_parse_tree, context, module, message_handler);
+    xml_parse_tree, symbol_table, module, message_handler);
 }
 
 /*******************************************************************\
@@ -123,7 +123,7 @@ Function: xml_languaget::final
 \*******************************************************************/
 
 bool xml_languaget::final(
-  contextt &context,
+  symbol_tablet &symbol_table,
   message_handlert &message_handler)
 {
   return false;

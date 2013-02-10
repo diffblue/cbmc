@@ -14,7 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <message_stream.h>
 #include <arith_tools.h>
 #include <config.h>
-#include <context.h>
+#include <symbol_table.h>
 
 #include <goto-programs/format_strings.h>
 #include <ansi-c/c_types.h>
@@ -37,11 +37,11 @@ class string_instrumentationt:public message_streamt
 {
 public:
   string_instrumentationt(
-    contextt &_context,
+    symbol_tablet &_symbol_table,
     message_handlert &_message_handler):
     message_streamt(_message_handler),
-    context(_context),
-    ns(_context)
+    symbol_table(_symbol_table),
+    ns(_symbol_table)
   {
   }
   
@@ -76,7 +76,7 @@ public:
   }
 
 protected:
-  contextt &context;
+  symbol_tablet &symbol_table;
   namespacet ns;
 
   void make_type(exprt &dest, const typet &type)
@@ -144,11 +144,11 @@ Function: string_instrumentation
 \*******************************************************************/
 
 void string_instrumentation(
-  contextt &context,
+  symbol_tablet &symbol_table,
   message_handlert &message_handler,
   goto_programt &dest)
 {
-  string_instrumentationt string_instrumentation(context, message_handler);
+  string_instrumentationt string_instrumentation(symbol_table, message_handler);
   string_instrumentation(dest);
 }
 
@@ -165,11 +165,11 @@ Function: string_instrumentation
 \*******************************************************************/
 
 void string_instrumentation(
-  contextt &context,
+  symbol_tablet &symbol_table,
   message_handlert &message_handler,
   goto_functionst &dest)
 {
-  string_instrumentationt string_instrumentation(context, message_handler);
+  string_instrumentationt string_instrumentation(symbol_table, message_handler);
   string_instrumentation(dest);
 }
 
@@ -935,7 +935,7 @@ void string_instrumentationt::do_strerror(
   irep_idt identifier_buf="c::__strerror_buffer";
   irep_idt identifier_size="c::__strerror_buffer_size";
 
-  if(context.symbols.find(identifier_buf)==context.symbols.end())
+  if(symbol_table.symbols.find(identifier_buf)==symbol_table.symbols.end())
   {
     symbolt new_symbol_size;
     new_symbol_size.base_name="__strerror_buffer_size";
@@ -960,8 +960,8 @@ void string_instrumentationt::do_strerror(
     new_symbol_buf.pretty_name=new_symbol_buf.base_name;
     new_symbol_buf.name="c::"+id2string(new_symbol_buf.base_name);
 
-    context.move(new_symbol_buf);
-    context.move(new_symbol_size);
+    symbol_table.move(new_symbol_buf);
+    symbol_table.move(new_symbol_size);
   }
 
   const symbolt &symbol_size=ns.lookup(identifier_size);
@@ -1034,7 +1034,7 @@ void string_instrumentationt::invalidate_buffer(
 {
   irep_idt cntr_id="string_instrumentation::$counter";
   
-  if(context.symbols.find(cntr_id)==context.symbols.end())
+  if(symbol_table.symbols.find(cntr_id)==symbol_table.symbols.end())
   {
     symbolt new_symbol;
     new_symbol.base_name="$counter";
@@ -1046,7 +1046,7 @@ void string_instrumentationt::invalidate_buffer(
     new_symbol.is_lvalue=true;
     new_symbol.is_static_lifetime=true;
     
-    context.move(new_symbol);
+    symbol_table.move(new_symbol);
   }
   
   const symbolt &cntr_sym=ns.lookup(cntr_id);
