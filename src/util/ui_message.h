@@ -14,7 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class ui_message_handlert:public message_handlert
 {
 public:
-  typedef enum { PLAIN, OLD_GUI, XML_UI } uit;
+  typedef enum { PLAIN, XML_UI } uit;
   
   ui_message_handlert(uit __ui, const std::string &program);   
   virtual ~ui_message_handlert();

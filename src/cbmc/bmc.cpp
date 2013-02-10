@@ -89,10 +89,6 @@ void bmct::error_trace(const prop_convt &prop_conv)
     show_goto_trace(std::cout, ns, goto_trace);
     break;
   
-  case ui_message_handlert::OLD_GUI:
-    show_goto_trace_gui(std::cout, ns, goto_trace);
-    break;
-  
   case ui_message_handlert::XML_UI:
     {
       xmlt xml;
@@ -192,15 +188,6 @@ void bmct::report_success()
 
   switch(ui)
   {
-  case ui_message_handlert::OLD_GUI:
-    std::cout << "SUCCESS" << std::endl
-              << "Verification successful" << std::endl
-              << ""     << std::endl
-              << ""     << std::endl
-              << ""     << std::endl
-              << ""     << std::endl;
-    break;
-    
   case ui_message_handlert::PLAIN:
     break;
     
@@ -236,9 +223,6 @@ void bmct::report_failure()
 
   switch(ui)
   {
-  case ui_message_handlert::OLD_GUI:
-    break;
-    
   case ui_message_handlert::PLAIN:
     break;
     

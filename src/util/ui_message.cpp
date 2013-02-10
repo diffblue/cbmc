@@ -33,9 +33,6 @@ ui_message_handlert::ui_message_handlert(
 {
   switch(__ui)
   {
-  case OLD_GUI:
-    break;
-    
   case XML_UI:
     std::cout << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << std::endl;
     std::cout << "<cprover>" << std::endl;
@@ -112,7 +109,7 @@ void ui_message_handlert::print(
   unsigned level,
   const std::string &message)
 {
-  if(get_ui()==OLD_GUI || get_ui()==XML_UI)
+  if(get_ui()==XML_UI)
   {
     locationt location;
     location.make_nil();
@@ -143,7 +140,7 @@ void ui_message_handlert::print(
   int sequence_number,
   const locationt &location)
 {
-  if(get_ui()==OLD_GUI || get_ui()==XML_UI)
+  if(get_ui()==XML_UI)
   {
     std::string tmp_message(message);
 
@@ -208,10 +205,7 @@ void ui_message_handlert::ui_msg(
   const std::string &msg2,
   const locationt &location)
 {
-  if(get_ui()==OLD_GUI)
-    old_gui_msg(type, msg1, msg2, location);
-  else
-    xml_ui_msg(type, msg1, msg2, location);
+  xml_ui_msg(type, msg1, msg2, location);
 }
 
 /*******************************************************************\
