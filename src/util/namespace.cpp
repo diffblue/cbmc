@@ -6,12 +6,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <cstring>
 #include <cassert>
 #include <cstdlib>
 
 #include "namespace.h"
 #include "symbol_table.h"
+#include "prefix.h"
 
 /*******************************************************************\
 
@@ -32,7 +32,7 @@ unsigned get_max(
   unsigned max_nr=0;
 
   forall_symbols(it, symbols)
-    if(strncmp(it->first.c_str(), prefix.c_str(), prefix.size())==0)
+    if(has_prefix(id2string(it->first), prefix))
       max_nr=
         std::max(unsigned(atoi(it->first.c_str()+prefix.size())),
                  max_nr);
