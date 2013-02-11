@@ -20,9 +20,12 @@ int main()
   assert(sizeof(d)==sizeof(c));
   assert(sizeof(char_complex)==sizeof(char)*2);
 
-  // the real part is stored first in memory  
+  // The real part is stored first in memory on i386.
+  // Need to find out about other architectures.
+  #if defined(__i386__) || defined(__amd64__)
   assert(((char *)&char_complex)[0]==-2);
   assert(((char *)&char_complex)[1]==3);
+  #endif
 
   assert(__real__ char_complex == -2);
   assert(__imag__ char_complex == 3);
