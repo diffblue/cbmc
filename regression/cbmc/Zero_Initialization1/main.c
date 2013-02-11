@@ -1,3 +1,5 @@
+#include <assert.h>
+
 // gcc allows the following
 
 union U my_u;
