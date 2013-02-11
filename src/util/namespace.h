@@ -74,25 +74,6 @@ protected:
   const symbol_tablet *symbol_table1, *symbol_table2;
 };
 
-class dual_namespacet:public namespacet
-{
-  // constructors
-  dual_namespacet(const symbol_tablet &_symbol_table):namespacet(_symbol_table)
-  {
-  }
-   
-  dual_namespacet(const symbol_tablet &_symbol_table1, const symbol_tablet &_symbol_table2):
-    namespacet(_symbol_table1, _symbol_table2)
-  {
-  }
-  
-  dual_namespacet(const symbol_tablet *_symbol_table1, const symbol_tablet *_symbol_table2):
-    namespacet(_symbol_table1, _symbol_table2)
-  {
-  }
- 
-};
-
 class multi_namespacet:public namespacet
 {
 public:
