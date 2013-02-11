@@ -2846,8 +2846,8 @@ void c_typecheck_baset::typecheck_expr_pointer_arithmetic(exprt &expr)
   exprt &op0=expr.op0();
   exprt &op1=expr.op1();
 
-  const typet &type0=op0.type();
-  const typet &type1=op1.type();
+  const typet &type0=follow(op0.type());
+  const typet &type1=follow(op1.type());
 
   if(expr.id()==ID_minus ||
      (expr.id()==ID_sideeffect && expr.get(ID_statement)==ID_assign_minus))
@@ -2893,10 +2893,12 @@ void c_typecheck_baset::typecheck_expr_pointer_arithmetic(exprt &expr)
     else
       assert(false);
 
-    if(int_op->type().id()==ID_bool ||
-       int_op->type().id()==ID_unsignedbv ||
-       int_op->type().id()==ID_signedbv ||
-       int_op->type().id()==ID_c_enum)
+    const typet &int_op_type=follow(int_op->type());
+
+    if(int_op_type.id()==ID_bool ||
+       int_op_type.id()==ID_unsignedbv ||
+       int_op_type.id()==ID_signedbv ||
+       int_op_type.id()==ID_c_enum)
     {
       typecheck_arithmetic_pointer(*p_op);
       make_index_type(*int_op);
