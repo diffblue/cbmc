@@ -180,6 +180,21 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
     return false;
   }
 
+  // casts from pointer to integer
+  // where width of integer >= width of pointer
+  // (void*)(intX)expr -> (void*)expr
+  if(expr_type.id()==ID_pointer &&
+     expr.op0().id()==ID_typecast &&
+     expr.op0().operands().size()==1 &&
+     (op_type.id()==ID_signedbv || op_type.id()==ID_unsignedbv) &&
+     to_bitvector_type(op_type).get_width() >= config.ansi_c.pointer_width)
+  {
+    exprt tmp=expr.op0().op0();
+    expr.op0().swap(tmp);
+    simplify_typecast(expr); // rec. call
+    return false;
+  }
+
   // eliminate redundant typecasts
   if(base_type_eq(expr.type(), expr.op0().type(), ns))
   {
