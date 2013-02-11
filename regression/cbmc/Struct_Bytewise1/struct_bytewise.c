@@ -1,7 +1,19 @@
+// Determine endianness.
+// Follows http://wiki.debian.org/ArchitectureSpecificsMemo
+
+#if defined(__avr32__) || defined(__hppa__)    || defined(__mk68k__) || \
+    defined(__mips__)  || defined(__powerpc__) || defined(__s390__) || \
+    defined(__s390x__) || defined(__sparc__)
+
+#define BIG_ENDIAN
+
+#endif
+
 typedef struct my_struct
 {
-  unsigned long a;
-  unsigned long b;
+  // we hope these are 32 bit each on all architecture
+  unsigned a;
+  unsigned b;
 } t_logAppl;
 
 static t_logAppl logAppl;
@@ -20,6 +32,16 @@ int main()
   logAppl.b=0x01000002;
   CopyBuffer((unsigned char *)&logAppl);
 
+  #ifdef BIG_ENDIAN
+  assert(arrayTmp[7]==1);
+  assert(arrayTmp[6]==0);
+  assert(arrayTmp[5]==0);
+  assert(arrayTmp[5]==0);
+  assert(arrayTmp[3]==2);
+  assert(arrayTmp[2]==0);
+  assert(arrayTmp[1]==0);
+  assert(arrayTmp[0]==1);
+  #else
   // this is little endian
   assert(arrayTmp[0]==1);
   assert(arrayTmp[1]==0);
@@ -29,5 +51,6 @@ int main()
   assert(arrayTmp[5]==0);
   assert(arrayTmp[6]==0);
   assert(arrayTmp[7]==1);
+  #endif
 }
  
