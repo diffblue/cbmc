@@ -25,8 +25,10 @@ inline void __sync_synchronize(void)
 {
   // WARNING: this was a NOP before gcc 4.3.1,
   // but is now believed to be the strongest possible barrier.
-          
+
+  #if (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__) >= 40301
   __CPROVER_HIDE:;
   __CPROVER_fence("WWfence", "RRfence", "RWfence", "WRfence",
                   "WWcumul", "RRcumul", "RWcumul", "WRcumul");
+  #endif
 }
