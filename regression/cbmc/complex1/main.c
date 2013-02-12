@@ -13,18 +13,18 @@ int main()
   _Complex double d;
   assert(sizeof(c)==sizeof(d));
   
-  _Complex char char_complex, char_complex2;
+  _Complex signed char char_complex, char_complex2;
   
   char_complex=0x3i-2;
   
   assert(sizeof(d)==sizeof(c));
-  assert(sizeof(char_complex)==sizeof(char)*2);
+  assert(sizeof(char_complex)==sizeof(signed char)*2);
 
   // The real part is stored first in memory on i386.
   // Need to find out about other architectures.
   #if defined(__i386__) || defined(__amd64__)
-  assert(((char *)&char_complex)[0]==-2);
-  assert(((char *)&char_complex)[1]==3);
+  assert(((signed char *)&char_complex)[0]==-2);
+  assert(((signed char *)&char_complex)[1]==3);
   #endif
 
   assert(__real__ char_complex == -2);
