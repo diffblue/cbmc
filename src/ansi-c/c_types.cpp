@@ -172,7 +172,8 @@ Function: size_type
 typet size_type()
 {
   // The size type varies. This is unsigned int on some systems,
-  // and unsigned long int on others, and unsigned long long on say Windows.
+  // and unsigned long int on others,
+  // and unsigned long long on say Windows 64.
 
   if(config.ansi_c.pointer_width==config.ansi_c.int_width)
     return unsigned_int_type();
