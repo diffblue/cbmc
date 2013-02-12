@@ -11,7 +11,7 @@
 
 typedef struct my_struct
 {
-  // we hope these are 32 bit each on all architecture
+  // we hope these are 32 bit each on all architectures
   unsigned a;
   unsigned b;
 } t_logAppl;
@@ -33,24 +33,28 @@ int main()
   CopyBuffer((unsigned char *)&logAppl);
 
   #ifdef BIG_ENDIAN
-  assert(arrayTmp[7]==1);
-  assert(arrayTmp[6]==0);
-  assert(arrayTmp[5]==0);
-  assert(arrayTmp[5]==0);
-  assert(arrayTmp[3]==2);
-  assert(arrayTmp[2]==0);
+  assert(arrayTmp[0]==0);
   assert(arrayTmp[1]==0);
-  assert(arrayTmp[0]==1);
+  assert(arrayTmp[2]==0);
+  assert(arrayTmp[3]==1);
+
+  assert(arrayTmp[4]==1);
+  assert(arrayTmp[5]==0);
+  assert(arrayTmp[6]==0);
+  assert(arrayTmp[7]==2);
   #else
   // this is little endian
   assert(arrayTmp[0]==1);
   assert(arrayTmp[1]==0);
   assert(arrayTmp[2]==0);
   assert(arrayTmp[3]==0);
+
   assert(arrayTmp[4]==2);
   assert(arrayTmp[5]==0);
   assert(arrayTmp[6]==0);
   assert(arrayTmp[7]==1);
   #endif
+
+  assert(0);
 }
  
