@@ -28,8 +28,9 @@ __intN_t (64, __DI__);
 
 // the size type varies according to architecture
 STATIC_ASSERT(
-     __builtin_types_compatible_p(typeof(sizeof(int)), unsigned long int)
-  || __builtin_types_compatible_p(typeof(sizeof(int)), unsigned int));
+     __builtin_types_compatible_p(typeof(sizeof(int)), unsigned int)
+  || __builtin_types_compatible_p(typeof(sizeof(int)), unsigned long int)
+  || __builtin_types_compatible_p(typeof(sizeof(int)), unsigned long long int));
 
 STATIC_ASSERT(__builtin_types_compatible_p(int8_t, signed char));
 STATIC_ASSERT(__builtin_types_compatible_p(int16_t, signed short));
