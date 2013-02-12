@@ -395,11 +395,28 @@ bool configt::set(const cmdlinet &cmdline)
     ansi_c.long_int_width=8*8;
     ansi_c.pointer_width=8*8;
     ansi_c.char_is_unsigned=false;
+    #elif __armel__
+    ansi_c.arch=configt::ansi_ct::ARCH_ARM;
+    ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
+    ansi_c.long_double_width=8*8;
+    ansi_c.char_is_unsigned=true;
+    #elif __arm64__
+    ansi_c.arch=configt::ansi_ct::ARCH_ARM;
+    ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
+    ansi_c.long_int_width=8*8;
+    ansi_c.pointer_width=8*8;
+    ansi_c.long_double_width=16*8;
+    ansi_c.char_is_unsigned=true;
     #elif __arm__
     ansi_c.arch=configt::ansi_ct::ARCH_ARM;
     ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
     ansi_c.long_double_width=8*8;
     ansi_c.char_is_unsigned=true;
+    #elif __mipsel__
+    ansi_c.arch=configt::ansi_ct::ARCH_MIPS;
+    ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
+    ansi_c.long_double_width=8*8;
+    ansi_c.char_is_unsigned=false;
     #elif __mips__
     ansi_c.arch=configt::ansi_ct::ARCH_MIPS;
     ansi_c.endianness=configt::ansi_ct::IS_BIG_ENDIAN;
