@@ -26,6 +26,7 @@ __intN_t (64, __DI__);
 
 /* Compatible types */
 
+// the size type varies according to architecture
 STATIC_ASSERT(
      __builtin_types_compatible_p(typeof(sizeof(int)), unsigned long int)
   || __builtin_types_compatible_p(typeof(sizeof(int)), unsigned int));
