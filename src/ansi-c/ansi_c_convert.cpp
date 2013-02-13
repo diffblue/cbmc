@@ -273,6 +273,10 @@ void ansi_c_convertt::convert_code(codet &code)
     convert_code(to_code(code.op0()));
     convert_code(to_code(code.op1()));
   }
+  else if(statement==ID_msc_leave)
+  {
+    assert(code.operands().size()==0);
+  }
   else if(statement==ID_switch)
   {
     assert(code.operands().size()==2);
