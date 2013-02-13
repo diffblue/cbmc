@@ -547,6 +547,7 @@ void ms_cl_cmdlinet::process_cl_option(const std::string &s)
   for(unsigned j=0; ms_cl_prefixes[j]!=NULL; j++)
   {
     std::string ms_cl_prefix=ms_cl_prefixes[j];
+
     if(std::string(s, 1, ms_cl_prefix.size())==ms_cl_prefix)
     {
       cmdlinet::optiont option;
@@ -557,13 +558,13 @@ void ms_cl_cmdlinet::process_cl_option(const std::string &s)
       {
         option.islong=false;
         option.optstring="";
-        option.optchar=ms_cl_prefixes[j][0];
+        option.optchar=ms_cl_prefix[0];
         optnr=getoptnr(option.optchar);
       }
       else
       {
         option.islong=true;
-        option.optstring=std::string(s, 1, ms_cl_prefix.size());
+        option.optstring=ms_cl_prefix;
         option.optchar=0;
         optnr=getoptnr(option.optstring);
       }
@@ -577,6 +578,7 @@ void ms_cl_cmdlinet::process_cl_option(const std::string &s)
       options[optnr].isset=true;
       options[optnr].values.push_back(
         std::string(s, ms_cl_prefix.size()+1, std::string::npos));
+
       return;
     }
   }
