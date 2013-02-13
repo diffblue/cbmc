@@ -54,7 +54,5 @@ int main()
   assert(arrayTmp[6]==0);
   assert(arrayTmp[7]==1);
   #endif
-
-  assert(0);
 }
  
