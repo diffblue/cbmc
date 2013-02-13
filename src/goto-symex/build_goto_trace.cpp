@@ -33,55 +33,99 @@ Function: build_full_lhs_rec
 exprt build_full_lhs_rec(
   const prop_convt &prop_conv,
   const namespacet &ns,
-  const exprt &src)
+  const exprt &src_original, // original identifiers
+  const exprt &src_ssa)      // renamed identifiers
 {
-  if(src.id()==ID_index)
+  if(src_ssa.id()!=src_original.id())
+    return src_original;
+    
+  const irep_idt id=src_original.id();
+
+  if(id==ID_index)
   {
-    index_exprt tmp1=to_index_expr(src);
-    exprt tmp2=prop_conv.get(tmp1.index());
-    if(tmp2.is_not_nil()) tmp1.index()=tmp2;
-    simplify(tmp1.index(), ns);
-    tmp1.array()=build_full_lhs_rec(prop_conv, ns, tmp1.array());
-    return tmp1;
-  }
-  else if(src.id()==ID_member)
-  {
-    member_exprt tmp=to_member_expr(src);
-    tmp.struct_op()=build_full_lhs_rec(prop_conv, ns, tmp.struct_op());
-  }
-  else if(src.id()==ID_if)
-  {
-    exprt tmp=prop_conv.get(to_if_expr(src).cond());
-    if(tmp.is_true())
-      return build_full_lhs_rec(prop_conv, ns, to_if_expr(src).true_case());
-    else if(tmp.is_false())
-      return build_full_lhs_rec(prop_conv, ns, to_if_expr(src).false_case());
-    else
+    // get index value from src_ssa
+    exprt index_value=prop_conv.get(to_index_expr(src_ssa).index());
+    
+    if(index_value.is_not_nil())
     {
-      if_exprt tmp2=to_if_expr(src);
-      tmp2.false_case()=build_full_lhs_rec(prop_conv, ns, tmp2.false_case());
-      tmp2.true_case()=build_full_lhs_rec(prop_conv, ns, tmp2.true_case());
-      return tmp2;
+      simplify(index_value, ns);
+      index_exprt tmp=to_index_expr(src_original);
+      tmp.index()=index_value;
+      tmp.array()=
+        build_full_lhs_rec(prop_conv, ns, 
+          to_index_expr(src_original).array(),
+          to_index_expr(src_ssa).array());
+      return tmp;
     }
+
+    return src_original;
   }
-  else if(src.id()==ID_typecast)
+  else if(id==ID_member)
   {
-    typecast_exprt tmp=to_typecast_expr(src);
-    tmp.op()=build_full_lhs_rec(prop_conv, ns, tmp.op());
+    member_exprt tmp=to_member_expr(src_original);
+    tmp.struct_op()=build_full_lhs_rec(
+      prop_conv, ns,
+      to_member_expr(src_original).struct_op(),
+      to_member_expr(src_ssa).struct_op());
+  }
+  else if(id==ID_if)
+  {
+    if_exprt tmp2=to_if_expr(src_original);
+    
+    tmp2.false_case()=build_full_lhs_rec(prop_conv, ns, 
+      tmp2.false_case(), to_if_expr(src_ssa).false_case());
+
+    tmp2.true_case()=build_full_lhs_rec(prop_conv, ns,
+      tmp2.true_case(), to_if_expr(src_ssa).true_case());
+
+    exprt tmp=prop_conv.get(to_if_expr(src_ssa).cond());
+
+    if(tmp.is_true())
+      return tmp2.true_case();
+    else if(tmp.is_false())
+      return tmp2.false_case();
+    else
+      return tmp2;
+  }
+  else if(id==ID_typecast)
+  {
+    typecast_exprt tmp=to_typecast_expr(src_original);
+    tmp.op()=build_full_lhs_rec(prop_conv, ns,
+      to_typecast_expr(src_original).op(), to_typecast_expr(src_ssa).op());
     return tmp;
   }
-  else if(src.id()==ID_byte_extract_little_endian ||
-          src.id()==ID_byte_extract_big_endian)
+  else if(id==ID_byte_extract_little_endian ||
+          id==ID_byte_extract_big_endian)
   {
-    exprt tmp=src;
+    exprt tmp=src_original;
     assert(tmp.operands().size()==2);
-    tmp.op0()=build_full_lhs_rec(prop_conv, ns, tmp.op0());
+    tmp.op0()=build_full_lhs_rec(prop_conv, ns, tmp.op0(), src_ssa.op0());
 
     // re-write into big case-split
     
   }
   
-  return src;
+  return src_original;
+}
+
+/*******************************************************************\
+
+Function: adjust_lhs_object
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+exprt adjust_lhs_object(
+  const prop_convt &prop_conv,
+  const namespacet &ns,
+  const exprt &src)
+{
+  return nil_exprt();
 }
 
 /*******************************************************************\
@@ -133,10 +177,11 @@ void build_goto_trace(
     goto_trace_step.io_id=SSA_step.io_id;
     goto_trace_step.formatted=SSA_step.formatted;
     goto_trace_step.identifier=SSA_step.identifier;
-
+    
     if(SSA_step.original_full_lhs.is_not_nil())
       goto_trace_step.full_lhs=
-        build_full_lhs_rec(prop_conv, ns, SSA_step.original_full_lhs);
+        build_full_lhs_rec(
+          prop_conv, ns, SSA_step.original_full_lhs, SSA_step.ssa_full_lhs);
     
     if(SSA_step.ssa_lhs.is_not_nil())
       goto_trace_step.lhs_object_value=prop_conv.get(SSA_step.ssa_lhs);
