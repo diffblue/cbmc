@@ -773,10 +773,22 @@ std::string expr2ct::convert_binary(
 
     unsigned p;
     std::string op=convert(*it, p);
-
-    if(precedence>p || (precedence==p && full_parentheses)) dest+='(';
+    
+    // In pointer arithmetic, x+(y-z) is unfortunately
+    // not the same as (x+y)-z, even though + and -
+    // have the same precedence. We thus add parentheses
+    // for the case x+(y-z). Similarly, (x*y)/z is not
+    // the same as x*(y/z), but * and / have the same
+    // precedence.
+    
+    bool use_parentheses=
+      precedence>p || 
+      (precedence==p && full_parentheses) ||
+      (precedence==p && src.id()!=it->id());
+    
+    if(use_parentheses) dest+='(';
     dest+=op;
-    if(precedence>p || (precedence==p && full_parentheses)) dest+=')';
+    if(use_parentheses) dest+=')';
   }
 
   return dest;
