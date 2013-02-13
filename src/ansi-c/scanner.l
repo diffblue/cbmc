@@ -455,8 +455,11 @@ void ansi_c_scanner_init()
                     return make_identifier();
                 }
 
-"__builtin_alignof" { if(PARSER.mode==ansi_c_parsert::GCC ||
-                         PARSER.mode==ansi_c_parsert::ARM)
+"__builtin_alignof" {
+                  // interestingly, gcc doesn't support this,
+                  // but Visual Studio does!
+                  if(PARSER.mode==ansi_c_parsert::MSC ||
+                     PARSER.mode==ansi_c_parsert::ARM)
                     { loc(); return TOK_ALIGNOF; }
                   else
                     return make_identifier();
