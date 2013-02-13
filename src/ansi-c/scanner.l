@@ -130,8 +130,8 @@ hexdigit	[0-9a-fA-F]
 identifier	(({letter}|"_"|"$")({letter}|{digit}|"_"|"$")*)
 integer		{digit}+
 binary		{bindigit}+
-msiw_suffix     ("i8"|"i16"|"i32"|"i64"|"i128")
-int_suffix      [uUlLiIjJ]*|{msiw_suffix}
+msiw_suffix     ([iI]("8"|"16"|"32"|"64"|"128"))
+int_suffix      [uUlLiIjJ]*|[uU]?{msiw_suffix}
 bininteger	"0"[bB]{bindigit}+{int_suffix}
 decinteger	[1-9]{digit}*{int_suffix}
 octinteger	"0"{octdigit}*{int_suffix}
