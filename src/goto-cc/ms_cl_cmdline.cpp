@@ -67,7 +67,7 @@ bool ms_cl_cmdlinet::parse(const std::vector<std::string> &options)
          options[i]=="--function")
         if(i<options.size()-1)
         {
-          set(options[i].substr(2), options[i+1]);
+          set(options[i], options[i+1]);
           i++; // skip ahead
         }
     }
@@ -346,7 +346,7 @@ void ms_cl_cmdlinet::process_non_cl_option(
   option.optstring=std::string(s, 2, std::string::npos);
   option.optchar=0;
 
-  int optnr=getoptnr(option.optstring);
+  int optnr=getoptnr(s);
 
   if(optnr==-1)
   {
@@ -516,21 +516,22 @@ void ms_cl_cmdlinet::process_cl_option(const std::string &s)
     if(std::string(s, 1, std::string::npos)==ms_cl_flags[j])
     {
       cmdlinet::optiont option;
+      int optnr;
 
       if(s.size()==2)
       {
         option.islong=false;
         option.optstring="";
         option.optchar=s[1];
+        optnr=getoptnr(option.optchar);
       }
       else
       {
         option.islong=true;
         option.optstring=std::string(s, 1, std::string::npos);
         option.optchar=0;
+        optnr=getoptnr(option.optstring);
       }
-
-      int optnr=getoptnr(option.optstring);
 
       if(optnr==-1)
       {
