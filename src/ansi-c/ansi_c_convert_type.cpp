@@ -101,6 +101,8 @@ void ansi_c_convert_typet::read_rec(const typet &type)
       gcc_mode_SI=true;
     else if(size_expr.id()=="__DI__")
       gcc_mode_DI=true;
+    else if(size_expr.id()=="__TI__")
+      gcc_mode_TI=true;
     else
     {
       // we ignore without whining
@@ -370,7 +372,7 @@ void ansi_c_convert_typet::write(typet &type)
 
     // get width
 
-    if(gcc_mode_QI || gcc_mode_HI || gcc_mode_SI || gcc_mode_DI)
+    if(gcc_mode_QI || gcc_mode_HI || gcc_mode_SI || gcc_mode_DI || gcc_mode_TI)
     {
       if(gcc_mode_QI) // 8 bits
         type=is_signed?signed_char_type():unsigned_char_type();
@@ -388,6 +390,8 @@ void ansi_c_convert_typet::write(typet &type)
           type=is_signed?signed_long_long_int_type():unsigned_long_long_int_type();
         }
       }
+      else if(gcc_mode_TI) // 128 bits
+        type=is_signed?gcc_signed_int128_type():gcc_unsigned_int128_type();
       else
         assert(false);
     }
