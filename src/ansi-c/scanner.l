@@ -490,6 +490,12 @@ void ansi_c_scanner_init()
                     return make_identifier();
                 }
 
+"__based"       { if(PARSER.mode==ansi_c_parsert::MSC)
+                    { loc(); return TOK_MSC_BASED; }
+                  else
+                    return make_identifier();
+                }
+
 %{
 /* C++ Keywords and Operators */
 %}
