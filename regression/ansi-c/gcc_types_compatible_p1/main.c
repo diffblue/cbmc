@@ -40,10 +40,10 @@ STATIC_ASSERT(__builtin_types_compatible_p(uint16_t, unsigned short));
 STATIC_ASSERT(__builtin_types_compatible_p(uint32_t, unsigned int));
 
 // the 64-bit types may vary
-STATIC_ASSERT(!sizeof(long)==8 || __builtin_types_compatible_p(int64_t, signed long));
-STATIC_ASSERT(!sizeof(long)==8 || __builtin_types_compatible_p(uint64_t, unsigned long));
-STATIC_ASSERT(!sizeof(long)==4 || __builtin_types_compatible_p(int64_t, signed long long));
-STATIC_ASSERT(!sizeof(long)==4 || __builtin_types_compatible_p(uint64_t, unsigned long long));
+STATIC_ASSERT(sizeof(long)!=8 || __builtin_types_compatible_p(int64_t, signed long));
+STATIC_ASSERT(sizeof(long)!=8 || __builtin_types_compatible_p(uint64_t, unsigned long));
+STATIC_ASSERT(sizeof(long)!=4 || __builtin_types_compatible_p(int64_t, signed long long));
+STATIC_ASSERT(sizeof(long)!=4 || __builtin_types_compatible_p(uint64_t, unsigned long long));
 
 STATIC_ASSERT(__builtin_types_compatible_p(int, const int));
 STATIC_ASSERT(__builtin_types_compatible_p(int, signed));
