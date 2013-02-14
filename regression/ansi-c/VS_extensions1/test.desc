@@ -1,0 +1,9 @@
+CORE
+main.c
+--i386-win32
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
