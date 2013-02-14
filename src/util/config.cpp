@@ -299,7 +299,7 @@ bool configt::set(const cmdlinet &cmdline)
   #elif __s390__
   arch="s390";
   #elif __x86_64__
-  arch="x86";
+  arch="x86_64";
   #elif __i386__
   arch="i386";
   #else
