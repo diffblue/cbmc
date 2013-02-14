@@ -126,6 +126,7 @@ extern char *yyansi_ctext;
 %token TOK_GCC_ATTRIBUTE_END ")"
 %token TOK_GCC_LABEL   "__label__"
 %token TOK_MSC_ASM     "__asm"
+%token TOK_MSC_BASED   "__based"
 %token TOK_CW_VAR_ARG_TYPEOF "_var_arg_typeof"
 %token TOK_BUILTIN_VA_ARG "__builtin_va_arg"
 %token TOK_GCC_BUILTIN_TYPES_COMPATIBLE_P "__builtin_types_compatible_p"
@@ -1007,6 +1008,7 @@ type_qualifier:
         | TOK_CPROVER_ATOMIC { $$=$1; set($$, ID_cprover_atomic); }
         | TOK_PTR32    { $$=$1; set($$, ID_ptr32); }
         | TOK_PTR64    { $$=$1; set($$, ID_ptr64); }
+        | TOK_MSC_BASED '(' comma_expression ')' { $$=$1; set($$, ID_msc_based); }
         ;
 
 attribute_or_type_qualifier:
