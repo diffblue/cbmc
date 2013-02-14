@@ -372,14 +372,22 @@ void ansi_c_convert_typet::write(typet &type)
 
     if(gcc_mode_QI || gcc_mode_HI || gcc_mode_SI || gcc_mode_DI)
     {
-      if(gcc_mode_QI)
+      if(gcc_mode_QI) // 8 bits
         type=is_signed?signed_char_type():unsigned_char_type();
-      else if(gcc_mode_HI)
+      else if(gcc_mode_HI) // 16 bits
         type=is_signed?signed_short_int_type():unsigned_short_int_type();
-      else if(gcc_mode_SI)
+      else if(gcc_mode_SI) // 32 bits
         type=is_signed?signed_int_type():unsigned_int_type();
-      else if(gcc_mode_DI)
-        type=is_signed?signed_long_int_type():unsigned_long_int_type();
+      else if(gcc_mode_DI) // 64 bits
+      {
+        if(config.ansi_c.long_int_width==64)
+          type=is_signed?signed_long_int_type():unsigned_long_int_type();
+        else
+        {
+          assert(config.ansi_c.long_long_int_width==64);
+          type=is_signed?signed_long_long_int_type():unsigned_long_long_int_type();
+        }
+      }
       else
         assert(false);
     }
