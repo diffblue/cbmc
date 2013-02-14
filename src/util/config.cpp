@@ -271,44 +271,45 @@ bool configt::set(const cmdlinet &cmdline)
   if(cmdline.isset("fixedbv"))
     ansi_c.use_fixed_for_float=true;
 
-  irep_idt arch;
+  irep_idt this_arch;
   
-  // the default architecture is the one we run on
-   // following http://wiki.debian.org/ArchitectureSpecificsMemo
+  // following http://wiki.debian.org/ArchitectureSpecificsMemo
 
   #ifdef __alpha__
-  arch="alpha";
+  this_arch="alpha";
   #elif __armel__
-  arch="armel";
+  this_arch="armel";
   #elif __arm64__
-  arch="arm64";
+  this_arch="arm64";
   #elif __arm__
-  arch="arm";
+  this_arch="arm";
   #elif __mipsel__
-  arch="mipsel";
+  this_arch="mipsel";
   #elif __mips__
-  arch="mips";
+  this_arch="mips";
   #elif __powerpc__
-  arch="powerpc";
+  this_arch="powerpc";
   #elif __sparc__
-  arch="sparc";
+  this_arch="sparc";
   #elif __ia64__
-  arch="ia64";
+  this_arch="ia64";
   #elif __s390x__
-  arch="s390x";
+  this_arch="s390x";
   #elif __s390__
-  arch="s390";
+  this_arch="s390";
   #elif __x86_64__
-  arch="x86_64";
+  this_arch="x86_64";
   #elif __i386__
-  arch="i386";
+  this_arch="i386";
   #else
   // something new and unknown!
-  arch="unknown";
+  this_arch="unknown";
   #endif
+  
+  // the default architecture is the one we run on
+  irep_idt arch=this_arch;
 
   // let's pick an OS now
-  
   irep_idt os;
   
   #ifdef _WIN32
@@ -477,6 +478,22 @@ bool configt::set(const cmdlinet &cmdline)
     ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
     ansi_c.char_is_unsigned=false;
   }
+
+  // let's check some of these
+  if(arch==this_arch)
+  {
+    assert(ansi_c.int_width==sizeof(int)*8);
+    assert(ansi_c.long_int_width==sizeof(long)*8);
+    assert(ansi_c.bool_width==sizeof(bool)*8);
+    assert(ansi_c.char_width==sizeof(char)*8);
+    assert(ansi_c.short_int_width==sizeof(short)*8);
+    assert(ansi_c.long_long_int_width==sizeof(long long)*8);
+    assert(ansi_c.pointer_width==sizeof(void *)*8);
+    assert(ansi_c.single_width==sizeof(float)*8);
+    assert(ansi_c.double_width==sizeof(double)*8);
+    assert(ansi_c.long_double_width==sizeof(long double)*8);
+    assert(ansi_c.char_is_unsigned==(char(255)==255));
+  }  
   
   if(os=="windows")
   {
