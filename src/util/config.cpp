@@ -244,15 +244,8 @@ Function: configt::ansi_ct::set
 bool configt::set(const cmdlinet &cmdline)
 {
   // defaults -- we match the architecture we have ourselves
-
-  // ealier than C99
-  ansi_c.for_has_scope=false;
-
-  if(sizeof(long int)==8)
-    ansi_c.set_64();
-  else
-    ansi_c.set_32();
-    
+  
+  ansi_c.for_has_scope=false; // ealier than C99
   ansi_c.use_fixed_for_float=false;
   ansi_c.endianness=ansi_ct::NO_ENDIANNESS;
   ansi_c.os=ansi_ct::NO_OS;
@@ -260,17 +253,273 @@ bool configt::set(const cmdlinet &cmdline)
   ansi_c.lib=configt::ansi_ct::LIB_NONE;
   ansi_c.rounding_mode=ieee_floatt::ROUND_TO_EVEN;
 
-  #ifdef _WIN32
+  if(cmdline.isset("function"))
+    main=cmdline.getval("function");
+    
+  if(cmdline.isset('D'))
+    ansi_c.defines=cmdline.get_values('D');
 
-  if(cmdline.isset("gcc"))
-    ansi_c.mode=ansi_ct::MODE_GCC;
-  else
-    ansi_c.mode=ansi_ct::MODE_VISUAL_STUDIO;
+  if(cmdline.isset('I'))
+    ansi_c.include_paths=cmdline.get_values('I');
 
+  if(cmdline.isset("include"))
+    ansi_c.include_files=cmdline.get_values("include");
+
+  if(cmdline.isset("floatbv"))
+    ansi_c.use_fixed_for_float=false;
+
+  if(cmdline.isset("fixedbv"))
+    ansi_c.use_fixed_for_float=true;
+
+  irep_idt arch;
+  
+  // the default architecture is the one we run on
+   // following http://wiki.debian.org/ArchitectureSpecificsMemo
+
+  #ifdef __alpha__
+  arch="alpha";
+  #elif __armel__
+  arch="armel";
+  #elif __arm64__
+  arch="arm64";
+  #elif __arm__
+  arch="arm";
+  #elif __mipsel__
+  arch="mipsel";
+  #elif __mips__
+  arch="mips";
+  #elif __powerpc__
+  arch="powerpc";
+  #elif __sparc__
+  arch="sparc";
+  #elif __ia64__
+  arch="ia64";
+  #elif __s390x__
+  arch="s390x";
+  #elif __s390__
+  arch="s390";
+  #elif __x86_64__
+  arch="x86";
+  #elif __i386__
+  arch="i386";
   #else
-  ansi_c.mode=ansi_ct::MODE_GCC;
+  // something new and unknown!
+  arch="unknown";
   #endif
 
+  // let's pick an OS now
+  
+  irep_idt os;
+  
+  #ifdef _WIN32
+  os="windows";
+  #elif __APPLE__
+  os="macos";
+  #else
+  os="linux";
+  #endif
+
+  if(cmdline.isset("i386-linux"))
+  {
+    os="linux";
+    arch="i386";
+  }
+  else if(cmdline.isset("i386-win32") ||
+          cmdline.isset("win32"))
+  {
+    os="windows";
+    arch="i386";
+  }
+  else if(cmdline.isset("winx64"))
+  {
+    os="windows";
+    arch="x86_64";
+  }
+  else if(cmdline.isset("i386-macos"))
+  {
+    os="macos";
+    arch="i386";
+  }
+  else if(cmdline.isset("ppc-macos"))
+  {
+    arch="powerpc";
+    os="macos";
+  }
+
+  if(arch=="none")
+  {
+    // the architecture for people who can't commit
+    ansi_c.arch=configt::ansi_ct::NO_ARCH;
+    ansi_c.endianness=configt::ansi_ct::NO_ENDIANNESS;
+    ansi_c.lib=configt::ansi_ct::LIB_NONE;
+
+    if(sizeof(long int)==8)
+      ansi_c.set_64();
+    else
+      ansi_c.set_32();
+  }
+  else if(arch=="alpha")
+  {
+    ansi_c.set_LP64();
+    ansi_c.arch=configt::ansi_ct::ARCH_ALPHA;
+    ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
+    ansi_c.long_double_width=16*8;
+    ansi_c.long_int_width=8*8;
+    ansi_c.pointer_width=8*8;
+    ansi_c.char_is_unsigned=false;
+  }
+  else if(arch=="armel")
+  {
+    ansi_c.set_ILP32();
+    ansi_c.arch=configt::ansi_ct::ARCH_ARM;
+    ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
+    ansi_c.long_double_width=8*8;
+    ansi_c.char_is_unsigned=true;
+  }
+  else if(arch=="arm64")
+  {
+    ansi_c.set_LP64();
+    ansi_c.arch=configt::ansi_ct::ARCH_ARM;
+    ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
+    ansi_c.long_int_width=8*8;
+    ansi_c.pointer_width=8*8;
+    ansi_c.long_double_width=16*8;
+    ansi_c.char_is_unsigned=true;
+  }
+  else if(arch=="arm")
+  {
+    ansi_c.set_ILP32();
+    ansi_c.arch=configt::ansi_ct::ARCH_ARM;
+    ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
+    ansi_c.long_double_width=8*8;
+    ansi_c.char_is_unsigned=true;
+  }
+  else if(arch=="mipsel")
+  {
+    ansi_c.set_ILP32();
+    ansi_c.arch=configt::ansi_ct::ARCH_MIPS;
+    ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
+    ansi_c.long_double_width=8*8;
+    ansi_c.char_is_unsigned=false;
+  }
+  else if(arch=="mips")
+  {
+    ansi_c.set_ILP32();
+    ansi_c.arch=configt::ansi_ct::ARCH_MIPS;
+    ansi_c.endianness=configt::ansi_ct::IS_BIG_ENDIAN;
+    ansi_c.long_double_width=8*8;
+    ansi_c.char_is_unsigned=false;
+  }
+  else if(arch=="powerpc")
+  {
+    ansi_c.set_ILP32();
+    ansi_c.arch=configt::ansi_ct::ARCH_POWER;
+    ansi_c.endianness=configt::ansi_ct::IS_BIG_ENDIAN;
+    ansi_c.long_double_width=16*8;
+    ansi_c.char_is_unsigned=true;
+  }
+  else if(arch=="sparc")
+  {
+    ansi_c.set_ILP32();
+    ansi_c.arch=configt::ansi_ct::ARCH_SPARC;
+    ansi_c.endianness=configt::ansi_ct::IS_BIG_ENDIAN;
+    ansi_c.long_double_width=16*8;
+    ansi_c.char_is_unsigned=false;
+  }
+  else if(arch=="ia64")
+  {
+    ansi_c.set_LP64();
+    ansi_c.arch=configt::ansi_ct::ARCH_IA64;
+    ansi_c.long_int_width=8*8;
+    ansi_c.pointer_width=8*8;
+    ansi_c.long_double_width=16*8;
+    ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
+    ansi_c.char_is_unsigned=false;
+  }
+  else if(arch=="s390x")
+  {
+    ansi_c.set_LP64();
+    ansi_c.arch=configt::ansi_ct::ARCH_S390X;
+    ansi_c.long_int_width=8*8;
+    ansi_c.pointer_width=8*8;
+    ansi_c.endianness=configt::ansi_ct::IS_BIG_ENDIAN;
+    ansi_c.char_is_unsigned=true;
+  }
+  else if(arch=="s390")
+  {
+    ansi_c.set_ILP32();
+    ansi_c.arch=configt::ansi_ct::ARCH_S390;
+    ansi_c.endianness=configt::ansi_ct::IS_BIG_ENDIAN;
+    ansi_c.long_double_width=16*8;
+    ansi_c.char_is_unsigned=true;
+  }
+  else if(arch=="x86_64")
+  {
+    ansi_c.set_LP64();
+    ansi_c.arch=configt::ansi_ct::ARCH_X86_64;
+    ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
+    ansi_c.long_double_width=16*8;
+    ansi_c.pointer_width=8*8;
+    ansi_c.char_is_unsigned=false;
+  }
+  else if(arch=="i386")
+  {
+    ansi_c.set_ILP32();
+    ansi_c.arch=configt::ansi_ct::ARCH_I386;
+    ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
+    ansi_c.char_is_unsigned=false;
+  }
+  else
+  {
+    // something new and unknown!
+    ansi_c.set_ILP32();
+    ansi_c.arch=configt::ansi_ct::ARCH_I386;
+    ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
+    ansi_c.char_is_unsigned=false;
+  }
+  
+  if(os=="windows")
+  {
+    ansi_c.lib=configt::ansi_ct::LIB_FULL;
+    ansi_c.os=configt::ansi_ct::OS_WIN;
+
+    // note that sizeof(void *)==8, but sizeof(long)==4!
+    if(arch=="x86_64")
+      ansi_c.set_LLP64();
+    
+    // On Windows, wchar_t is unsigned 16 bit, and
+    // long double is the same as double.
+    ansi_c.wchar_t_width=2*8;
+    ansi_c.wchar_t_is_unsigned=true;
+    ansi_c.long_double_width=8*8;
+
+    // there are gcc versions that target Windows
+    if(cmdline.isset("gcc"))
+      ansi_c.mode=ansi_ct::MODE_GCC;
+    else
+      ansi_c.mode=ansi_ct::MODE_VISUAL_STUDIO;
+  }
+  else if(os=="macos")
+  {
+    ansi_c.lib=configt::ansi_ct::LIB_FULL;
+    ansi_c.os=configt::ansi_ct::OS_MACOS;
+    ansi_c.mode=ansi_ct::MODE_GCC;
+  }
+  else if(os=="linux")
+  {
+    ansi_c.lib=configt::ansi_ct::LIB_FULL;
+    ansi_c.os=configt::ansi_ct::OS_LINUX;
+    ansi_c.mode=ansi_ct::MODE_GCC;
+  }
+  else
+  {
+    ansi_c.lib=configt::ansi_ct::LIB_NONE;
+    ansi_c.os=configt::ansi_ct::NO_OS;
+    ansi_c.mode=ansi_ct::MODE_GCC;
+  }
+  
+  // the following allows overriding the defaults
+  
   if(cmdline.isset("16"))
     ansi_c.set_16();
 
@@ -295,190 +544,6 @@ bool configt::set(const cmdlinet &cmdline)
   if(cmdline.isset("LP32"))
     ansi_c.set_LP32();  // int=16, long=32, pointer=32
     
-  if(cmdline.isset("function"))
-    main=cmdline.getval("function");
-    
-  if(cmdline.isset('D'))
-    ansi_c.defines=cmdline.get_values('D');
-
-  if(cmdline.isset('I'))
-    ansi_c.include_paths=cmdline.get_values('I');
-
-  if(cmdline.isset("include"))
-    ansi_c.include_files=cmdline.get_values("include");
-
-  if(cmdline.isset("floatbv"))
-    ansi_c.use_fixed_for_float=false;
-
-  if(cmdline.isset("fixedbv"))
-    ansi_c.use_fixed_for_float=true;
-
-  if(cmdline.isset("i386-linux"))
-  {
-    ansi_c.mode=ansi_ct::MODE_GCC;
-    ansi_c.os=configt::ansi_ct::OS_LINUX;
-    ansi_c.arch=configt::ansi_ct::ARCH_I386;
-    ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
-    ansi_c.lib=configt::ansi_ct::LIB_FULL;
-  }
-
-  if(cmdline.isset("i386-win32") ||
-     cmdline.isset("win32"))
-  {
-    ansi_c.mode=ansi_ct::MODE_VISUAL_STUDIO;
-    ansi_c.os=configt::ansi_ct::OS_WIN;
-    ansi_c.arch=configt::ansi_ct::ARCH_I386;
-    ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
-    ansi_c.lib=configt::ansi_ct::LIB_FULL;
-    ansi_c.set_32();
-    
-    // On Windows, wchar_t is unsigned 16 bit, and
-    // long double is the same as double.
-    ansi_c.wchar_t_width=2*8;
-    ansi_c.wchar_t_is_unsigned=true;
-    ansi_c.long_double_width=8*8;
-  }
-
-  if(cmdline.isset("winx64"))
-  {
-    ansi_c.mode=ansi_ct::MODE_VISUAL_STUDIO;
-    ansi_c.os=configt::ansi_ct::OS_WIN;
-    ansi_c.arch=configt::ansi_ct::ARCH_X86_64;
-    ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
-    ansi_c.lib=configt::ansi_ct::LIB_FULL;
-    // note that sizeof(void *)==8, but sizeof(long)==4!
-    ansi_c.set_LLP64();
-
-    // On Windows, wchar_t is unsigned 16 bit, and
-    // long double is the same as double.
-    ansi_c.wchar_t_width=2*8;
-    ansi_c.wchar_t_is_unsigned=true;
-    ansi_c.long_double_width=8*8;
-  }
-
-  if(cmdline.isset("i386-macos"))
-  {
-    ansi_c.mode=ansi_ct::MODE_GCC;
-    ansi_c.os=configt::ansi_ct::OS_MACOS;
-    ansi_c.arch=configt::ansi_ct::ARCH_I386;
-    ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
-    ansi_c.lib=configt::ansi_ct::LIB_FULL;
-  }
-
-  if(cmdline.isset("ppc-macos"))
-  {
-    ansi_c.mode=ansi_ct::MODE_GCC;
-    ansi_c.os=configt::ansi_ct::OS_MACOS;
-    ansi_c.arch=configt::ansi_ct::ARCH_POWER;
-    ansi_c.endianness=configt::ansi_ct::IS_BIG_ENDIAN;
-    ansi_c.lib=configt::ansi_ct::LIB_FULL;
-  }
-  
-  if(cmdline.isset("no-arch"))
-  {
-    ansi_c.os=configt::ansi_ct::NO_OS;
-    ansi_c.arch=configt::ansi_ct::NO_ARCH;
-    ansi_c.endianness=configt::ansi_ct::NO_ENDIANNESS;
-    ansi_c.lib=configt::ansi_ct::LIB_NONE;
-  }
-  else if(ansi_c.os==configt::ansi_ct::NO_OS)
-  {
-    // this is the default
-    ansi_c.lib=configt::ansi_ct::LIB_FULL;
-    
-    // following http://wiki.debian.org/ArchitectureSpecificsMemo
-
-    #ifdef __alpha__
-    ansi_c.arch=configt::ansi_ct::ARCH_ALPHA;
-    ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
-    ansi_c.long_double_width=16*8;
-    ansi_c.long_int_width=8*8;
-    ansi_c.pointer_width=8*8;
-    ansi_c.char_is_unsigned=false;
-    #elif __armel__
-    ansi_c.arch=configt::ansi_ct::ARCH_ARM;
-    ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
-    ansi_c.long_double_width=8*8;
-    ansi_c.char_is_unsigned=true;
-    #elif __arm64__
-    ansi_c.arch=configt::ansi_ct::ARCH_ARM;
-    ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
-    ansi_c.long_int_width=8*8;
-    ansi_c.pointer_width=8*8;
-    ansi_c.long_double_width=16*8;
-    ansi_c.char_is_unsigned=true;
-    #elif __arm__
-    ansi_c.arch=configt::ansi_ct::ARCH_ARM;
-    ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
-    ansi_c.long_double_width=8*8;
-    ansi_c.char_is_unsigned=true;
-    #elif __mipsel__
-    ansi_c.arch=configt::ansi_ct::ARCH_MIPS;
-    ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
-    ansi_c.long_double_width=8*8;
-    ansi_c.char_is_unsigned=false;
-    #elif __mips__
-    ansi_c.arch=configt::ansi_ct::ARCH_MIPS;
-    ansi_c.endianness=configt::ansi_ct::IS_BIG_ENDIAN;
-    ansi_c.long_double_width=8*8;
-    ansi_c.char_is_unsigned=false;
-    #elif __powerpc__
-    ansi_c.arch=configt::ansi_ct::ARCH_POWER;
-    ansi_c.endianness=configt::ansi_ct::IS_BIG_ENDIAN;
-    ansi_c.long_double_width=16*8;
-    ansi_c.char_is_unsigned=true;
-    #elif __sparc__
-    ansi_c.arch=configt::ansi_ct::ARCH_SPARC;
-    ansi_c.endianness=configt::ansi_ct::IS_BIG_ENDIAN;
-    ansi_c.long_double_width=16*8;
-    ansi_c.char_is_unsigned=false;
-    #elif __ia64__
-    ansi_c.arch=configt::ansi_ct::ARCH_IA64;
-    ansi_c.long_int_width=8*8;
-    ansi_c.pointer_width=8*8;
-    ansi_c.long_double_width=16*8;
-    ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
-    ansi_c.char_is_unsigned=false;
-    #elif __s390x__
-    ansi_c.arch=configt::ansi_ct::ARCH_S390X;
-    ansi_c.long_int_width=8*8;
-    ansi_c.pointer_width=8*8;
-    ansi_c.endianness=configt::ansi_ct::IS_BIG_ENDIAN;
-    ansi_c.char_is_unsigned=true;
-    #elif __s390__
-    ansi_c.arch=configt::ansi_ct::ARCH_S390;
-    ansi_c.endianness=configt::ansi_ct::IS_BIG_ENDIAN;
-    ansi_c.long_double_width=16*8;
-    ansi_c.char_is_unsigned=true;
-    #elif __x86_64__
-    ansi_c.arch=configt::ansi_ct::ARCH_X86_64;
-    ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
-    ansi_c.long_double_width=16*8;
-    ansi_c.pointer_width=8*8;
-    ansi_c.char_is_unsigned=false;
-    #elif __i386__
-    ansi_c.arch=configt::ansi_ct::ARCH_I386;
-    ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
-    ansi_c.char_is_unsigned=false;
-    #else
-    // something new and unknown!
-    ansi_c.arch=configt::ansi_ct::ARCH_I386;
-    ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
-    ansi_c.char_is_unsigned=false;
-    #endif
-
-    #ifdef _WIN32
-    ansi_c.os=configt::ansi_ct::OS_WIN;
-    ansi_c.wchar_t_width=2*8;
-    ansi_c.wchar_t_is_unsigned=true;
-    ansi_c.long_double_width=8*8;
-    #elif __APPLE__
-    ansi_c.os=configt::ansi_ct::OS_MACOS;
-    #else
-    ansi_c.os=configt::ansi_ct::OS_LINUX;
-    #endif
-  }
-  
   if(cmdline.isset("string-abstraction"))
     ansi_c.string_abstraction=true;
   else
