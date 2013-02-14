@@ -211,8 +211,10 @@ void ansi_c_internal_additions(std::string &code)
     }
   }
 
+  // this is Visual C/C++ only
   if(config.ansi_c.os==configt::ansi_ct::OS_WIN)
-    code+="int __noop();\n"; // this is Visual C/C++ only
+    code+="int __noop();\n"
+          "int __assume(int);\n";
     
   // ARM stuff
   if(config.ansi_c.mode==configt::ansi_ct::MODE_ARM)
