@@ -14,11 +14,11 @@ typedef int __based(pBased) * pBasedPtr;
 
 // __box
 
-__cdecl void f3();
+void __cdecl f3();
 
 __declspec(thread) int thread_local;
 
-__delegate int GetDayOfWeek();
+//__delegate int GetDayOfWeek();
 
 // __event 
 
@@ -27,24 +27,20 @@ void f4()
   __try { } __except(1) { }
 }
 
-__fastcall void f5()
-{
-}
+void __fastcall f5();
 
 void f6()
 {
   __try { } __finally { }
 }
 
-__forceinline void f7()
-{
-}
+void __forceinline f7();
 
 // __gc
 
 // __hook
 
-void __identifier(void);
+//void __identifier(void);
 
 __if_exists(asd) { };
 
@@ -67,13 +63,13 @@ void f9()
   __try { __leave; } __finally { }
 }
 
-__m128 var_m128;
+//__m128 var_m128;
 
-__m128d var_m128d;
+//__m128d var_m128d;
 
-__m128i var_m128i;
+//__m128i var_m128i;
 
-__m64 var_m64;
+//__m64 var_m64;
 
 // __multiple_inheritance
 
@@ -91,7 +87,7 @@ __m64 var_m64;
 
 // __single_inheritance
 
-__stdcall void f10();
+void __stdcall f10();
 
 // __super
 
@@ -101,18 +97,11 @@ __stdcall void f10();
 
 // __try_cast
 
-int __unaligned *unaligned_int_ptr;
+//int __unaligned *unaligned_int_ptr;
 
 // __unhook
 
-[emitidl];
-[module(name="MyLib")];
-[export]
-
-void f11()
-{
-  __uuidof(MyLib);
-}
+// __uuidof
 
 // __value
 
@@ -120,8 +109,12 @@ void f11()
 
 // __w64
 
-__wchar_t some_wchar;
+// __wchar_t some_wchar;
 
-wchar_t some_other_wchar;
+// wchar_t some_other_wchar;
 
 #endif
+
+int main()
+{
+}
