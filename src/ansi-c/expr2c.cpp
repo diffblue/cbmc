@@ -3949,7 +3949,7 @@ std::string expr2ct::convert(
   else if(src.id()==ID_exists)
     return convert_quantifier(src, "exists", precedence=2);
 
-  else if(src.id()=="lambda")
+  else if(src.id()==ID_lambda)
     return convert_quantifier(src, "LAMBDA", precedence=2);
 
   else if(src.id()==ID_with)
