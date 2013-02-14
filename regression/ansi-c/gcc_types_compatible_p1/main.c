@@ -15,7 +15,7 @@ cranberry _cranberry;
 
 #ifdef __GNUC__
 
-# define __intN_t(N, MODE) \
+#define __intN_t(N, MODE) \
   typedef int int##N##_t __attribute__ ((__mode__ (MODE))); \
   typedef unsigned int uint##N##_t __attribute__ ((__mode__ (MODE)))
   
@@ -35,11 +35,16 @@ STATIC_ASSERT(
 STATIC_ASSERT(__builtin_types_compatible_p(int8_t, signed char));
 STATIC_ASSERT(__builtin_types_compatible_p(int16_t, signed short));
 STATIC_ASSERT(__builtin_types_compatible_p(int32_t, signed int));
-STATIC_ASSERT(__builtin_types_compatible_p(int64_t, signed long));
 STATIC_ASSERT(__builtin_types_compatible_p(uint8_t, unsigned char));
 STATIC_ASSERT(__builtin_types_compatible_p(uint16_t, unsigned short));
 STATIC_ASSERT(__builtin_types_compatible_p(uint32_t, unsigned int));
-STATIC_ASSERT(__builtin_types_compatible_p(uint64_t, unsigned long));
+
+// the 64-bit types may vary
+STATIC_ASSERT(!sizeof(long)==8 || __builtin_types_compatible_p(int64_t, signed long));
+STATIC_ASSERT(!sizeof(long)==8 || __builtin_types_compatible_p(uint64_t, unsigned long));
+STATIC_ASSERT(!sizeof(long)==4 || __builtin_types_compatible_p(int64_t, signed long long));
+STATIC_ASSERT(!sizeof(long)==4 || __builtin_types_compatible_p(uint64_t, unsigned long long));
+
 STATIC_ASSERT(__builtin_types_compatible_p(int, const int));
 STATIC_ASSERT(__builtin_types_compatible_p(int, signed));
 STATIC_ASSERT(__builtin_types_compatible_p(typeof (hot), int));
@@ -75,7 +80,6 @@ STATIC_ASSERT(!__builtin_types_compatible_p(__int128, unsigned __int128));
 
 #endif
 
-int main (void)
+int main(void)
 {
 }
-
