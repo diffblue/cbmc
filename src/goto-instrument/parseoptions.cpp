@@ -123,7 +123,7 @@ int goto_instrument_parseoptionst::doit()
       namespacet ns(symbol_table);
 
       status("Function Pointer Removal");
-      remove_function_pointers(ns, goto_functions, false);
+      remove_function_pointers(symbol_table, goto_functions, false);
 
       status("Partial Inlining");
       goto_partial_inline(goto_functions, ns, ui_message_handler);
@@ -141,7 +141,7 @@ int goto_instrument_parseoptionst::doit()
       namespacet ns(symbol_table);
 
       status("Function Pointer Removal");
-      remove_function_pointers(ns, goto_functions, false);
+      remove_function_pointers(symbol_table, goto_functions, false);
 
       status("Partial Inlining");
       goto_partial_inline(goto_functions, ns, ui_message_handler);
@@ -157,7 +157,7 @@ int goto_instrument_parseoptionst::doit()
     {
       namespacet ns(symbol_table);
       status("Function Pointer Removal");
-      remove_function_pointers(ns, goto_functions, false);
+      remove_function_pointers(symbol_table, goto_functions, false);
 
       status("Partial Inlining");
       goto_partial_inline(goto_functions, ns, ui_message_handler);
@@ -484,7 +484,7 @@ void goto_instrument_parseoptionst::instrument_goto_program(
      cmdline.isset("concurrency"))
   {
     status("Function Pointer Removal");
-    remove_function_pointers(ns, goto_functions, cmdline.isset("pointer-check"));
+    remove_function_pointers(symbol_table, goto_functions, cmdline.isset("pointer-check"));
 
     // do partial inlining
     status("Partial Inlining");
