@@ -230,10 +230,13 @@ void remove_function_pointerst::fix_argument_types(
     
   for(unsigned i=0; i<function_arguments.size(); i++)
   {
-    if(!type_eq(call_arguments[i].type(),
-                function_arguments[i].type(), ns))
+    if(i<call_arguments.size())
     {
-      call_arguments[i].make_typecast(function_arguments[i].type());
+      if(!type_eq(call_arguments[i].type(),
+                  function_arguments[i].type(), ns))
+      {
+        call_arguments[i].make_typecast(function_arguments[i].type());
+      }
     }
   }
 }
