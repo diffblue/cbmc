@@ -34,16 +34,19 @@ Author: Daniel Kroening, kroening@kroening.com
 class remove_function_pointerst
 {
 public:
-  explicit remove_function_pointerst(const namespacet &_ns):ns(_ns)
+  explicit remove_function_pointerst(symbol_tablet &_symbol_table):
+    ns(_symbol_table),
+    symbol_table(_symbol_table)
   {
   }
 
-  void operator()(goto_functionst &functions);
+  void operator()(goto_functionst &goto_functions);
   
   bool add_safety_assertion;
 
 protected:
-  const namespacet &ns;
+  const namespacet ns;
+  symbol_tablet &symbol_table;
 
   void remove_function_pointer(
     goto_programt &goto_program,
@@ -63,7 +66,44 @@ protected:
   bool arg_is_type_compatible(
     const typet &call_type,
     const typet &function_type);
+
+  void fix_argument_types(code_function_callt &function_call);
+  void fix_return_type(code_function_callt &function_call,
+                       goto_programt &dest);
+
+  symbolt &new_tmp_symbol();
 };
+
+/*******************************************************************\
+
+Function: remove_function_pointerst::new_tmp_symbol
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+symbolt &remove_function_pointerst::new_tmp_symbol()
+{
+  static int temporary_counter;
+
+  symbolt new_symbol;
+  symbolt *symbol_ptr;
+  
+  do
+  {
+    new_symbol.base_name="tmp_return_val$"+i2string(++temporary_counter);
+    new_symbol.name="remove_function_pointers::"+id2string(new_symbol.base_name);
+    new_symbol.is_lvalue=true;
+    new_symbol.is_thread_local=true;
+    new_symbol.is_file_local=true;
+  } while(symbol_table.move(new_symbol, symbol_ptr));    
+  
+  return *symbol_ptr;  
+}
 
 /*******************************************************************\
 
@@ -166,6 +206,85 @@ bool remove_function_pointerst::is_type_compatible(
 
 /*******************************************************************\
 
+Function: remove_function_pointerst::fix_argument_types
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void remove_function_pointerst::fix_argument_types(
+  code_function_callt &function_call)
+{
+  const code_typet &code_type=
+    to_code_type(ns.follow(function_call.function().type()));
+
+  const code_typet::argumentst &function_arguments=
+    code_type.arguments();
+  
+  code_function_callt::argumentst &call_arguments=
+    function_call.arguments();
+    
+  for(unsigned i=0; i<function_arguments.size(); i++)
+  {
+    if(!type_eq(call_arguments[i].type(),
+                function_arguments[i].type(), ns))
+    {
+      call_arguments[i].make_typecast(function_arguments[i].type());
+    }
+  }
+}
+
+/*******************************************************************\
+
+Function: remove_function_pointerst::fix_return_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void remove_function_pointerst::fix_return_type(
+  code_function_callt &function_call,
+  goto_programt &dest)
+{  
+  // are we returning anything at all?
+  if(function_call.lhs().is_nil()) return;
+  
+  const code_typet &code_type=
+    to_code_type(ns.follow(function_call.function().type()));
+  
+  // type already ok?
+  if(type_eq(
+       function_call.lhs().type(),
+       code_type.return_type(), ns))
+    return;
+
+  symbolt &tmp_symbol=new_tmp_symbol();
+  tmp_symbol.type=code_type.return_type();
+  tmp_symbol.location=function_call.location();
+
+  symbol_exprt tmp_symbol_expr;
+  tmp_symbol_expr.type()=tmp_symbol.type;
+  tmp_symbol_expr.set_identifier(tmp_symbol.name);
+  
+  exprt old_lhs=function_call.lhs();
+  function_call.lhs()=tmp_symbol_expr;
+
+  goto_programt::targett t_assign=dest.add_instruction();
+  t_assign->make_assignment();
+  t_assign->code=code_assignt(
+    old_lhs, typecast_exprt(tmp_symbol_expr, old_lhs.type()));
+}  
+
+/*******************************************************************\
+
 Function: remove_function_pointerst::remove_function_pointer
 
   Inputs:
@@ -238,9 +357,13 @@ void remove_function_pointerst::remove_function_pointer(
     t1->make_function_call(code);
     to_code_function_call(t1->code).function()=*it;
     
+    // the signature of the function might not match precisely
+    fix_argument_types(to_code_function_call(t1->code));
+    
+    fix_return_type(to_code_function_call(t1->code), new_code_calls);
     // goto final
-    goto_programt::targett t2=new_code_calls.add_instruction();
-    t2->make_goto(t_final, true_exprt());
+    goto_programt::targett t3=new_code_calls.add_instruction();
+    t3->make_goto(t_final, true_exprt());
   
     // goto to call
     address_of_exprt address_of;
@@ -251,8 +374,8 @@ void remove_function_pointerst::remove_function_pointer(
     if(address_of.type()!=pointer.type())
       address_of.make_typecast(pointer.type());
     
-    goto_programt::targett t3=new_code_gotos.add_instruction();
-    t3->make_goto(t1, equal_exprt(pointer, address_of));
+    goto_programt::targett t4=new_code_gotos.add_instruction();
+    t4->make_goto(t1, equal_exprt(pointer, address_of));
   }
 
   // fall-through
@@ -388,11 +511,32 @@ Function: remove_function_pointers
 \*******************************************************************/
 
 void remove_function_pointers(
-  const namespacet &ns,
-  goto_functionst &functions,
+  symbol_tablet &symbol_table,
+  goto_functionst &goto_functions,
   bool add_safety_assertion)
 {
-  remove_function_pointerst rfp(ns);
+  remove_function_pointerst rfp(symbol_table);
   rfp.add_safety_assertion=add_safety_assertion;
-  rfp(functions);
+  rfp(goto_functions);
+}
+
+/*******************************************************************\
+
+Function: remove_function_pointers
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void remove_function_pointers(
+  goto_modelt &goto_model,
+  bool add_safety_assertion)
+{
+  remove_function_pointers(
+    goto_model.symbol_table, goto_model.goto_functions,
+    add_safety_assertion);
 }
