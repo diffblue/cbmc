@@ -290,7 +290,7 @@ void c_typecheck_baset::typecheck_vector_type(vector_typet &type)
   if(s%sub_size!=0)
   {
     err_location(size_location);
-    str << "vector size (<< " << s
+    str << "vector size (" << s
         << ") expected to be multiple of base type size (" << sub_size
         << ")";
     throw 0;

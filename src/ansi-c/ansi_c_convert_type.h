@@ -60,7 +60,7 @@ public:
     vector_size.make_nil();
     alignment.make_nil();
     bv_width=0;
-    gcc_mode_QI=gcc_mode_HI=gcc_mode_SI=gcc_mode_DI=false;
+    gcc_mode_QI=gcc_mode_HI=gcc_mode_SI=gcc_mode_DI=gcc_mode_TI=false;
     
     packed=aligned=false;
 
