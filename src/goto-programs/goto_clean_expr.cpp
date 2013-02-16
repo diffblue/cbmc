@@ -207,7 +207,9 @@ void goto_convertt::clean_expr(
     clean_expr(to_if_expr(expr).cond(), dest, true);
 
     // possibly done now
-    if(!needs_cleaning(expr)) return;
+    if(!needs_cleaning(to_if_expr(expr).true_case()) &&
+       !needs_cleaning(to_if_expr(expr).false_case()))
+      return;
 
     // copy expression
     if_exprt if_expr=to_if_expr(expr);
@@ -245,7 +247,22 @@ void goto_convertt::clean_expr(
       expr=symbol_expr(new_symbol);  
     }
     else
-      expr=if_expr;
+    {
+      // preserve the expressions for possible later checks
+      if(if_expr.true_case().is_not_nil())
+      {
+        code_expressiont code_expression(if_expr.true_case());
+        convert(code_expression, tmp_true);
+      }
+      
+      if(if_expr.false_case().is_not_nil())
+      {
+        code_expressiont code_expression(if_expr.false_case());
+        convert(code_expression, tmp_false);
+      }
+      
+      expr=nil_exprt();
+    }
 
     // generate guard for argument side-effects    
     generate_ifthenelse(
@@ -256,22 +273,45 @@ void goto_convertt::clean_expr(
   }
   else if(expr.id()==ID_comma)
   {
-    exprt result;
-  
-    Forall_operands(it, expr)
+    if(result_is_used)
     {
-      bool last=(it==--expr.operands().end());
-      
-      if(last)
-      {
-        result.swap(*it);
-        clean_expr(result, dest, result_is_used);
-      }
-      else
-        clean_expr(*it, dest, false);
-    }
+      exprt result;
     
-    expr.swap(result);
+      Forall_operands(it, expr)
+      {
+        bool last=(it==--expr.operands().end());
+        
+        // special treatment for last one
+        if(last)
+        {
+          result.swap(*it);
+          clean_expr(result, dest, true);
+        }
+        else
+        {
+          clean_expr(*it, dest, false);
+
+          // remember these for later checks
+          if(it->is_not_nil())
+            convert(code_expressiont(*it), dest);
+        }
+      }
+
+      expr.swap(result);
+    }
+    else // result not used
+    {
+      Forall_operands(it, expr)
+      {
+        clean_expr(*it, dest, false);
+
+        // remember as expression statement for later checks
+        if(it->is_not_nil())
+          convert(code_expressiont(*it), dest);
+      }
+      
+      expr=nil_exprt();
+    }
     
     return;
   }
