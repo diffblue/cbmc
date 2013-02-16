@@ -4,3 +4,7 @@ extern const void *__CPROVER_deallocated;
 extern const void *__CPROVER_malloc_object;
 extern __CPROVER_size_t __CPROVER_malloc_size;
 extern _Bool __CPROVER_malloc_is_new_array;
+
+// C11 upwards
+#define _Thread_local
+
