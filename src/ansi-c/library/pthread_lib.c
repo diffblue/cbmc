@@ -9,7 +9,7 @@ inline int pthread_mutex_init(
   pthread_mutex_t *mutex, const pthread_mutexattr_t *mutexattr)
 {
   __CPROVER_HIDE:;
-  *((char *)mutex)=0;
+  *((signed char *)mutex)=0;
   if(mutexattr!=0) (void)*mutexattr;
   return 0;
 }
@@ -25,10 +25,10 @@ inline int pthread_mutex_lock(pthread_mutex_t *mutex)
 {
   __CPROVER_HIDE:;
   __CPROVER_atomic_begin();
-  __CPROVER_assert(*((char *)mutex)!=-1,
+  __CPROVER_assert(*((signed char *)mutex)!=-1,
     "mutex not initialised or destroyed");
-  __CPROVER_assume(!*((char *)mutex));
-  *((char *)mutex)=1;
+  __CPROVER_assume(!*((signed char *)mutex));
+  *((signed char *)mutex)=1;
   __CPROVER_atomic_end();
   return 0; // we never fail
 }
@@ -44,10 +44,10 @@ inline int pthread_mutex_trylock(pthread_mutex_t *mutex)
 {
   __CPROVER_HIDE:;
   __CPROVER_atomic_begin();
-  __CPROVER_assert(*((char *)mutex)!=-1,
+  __CPROVER_assert(*((signed char *)mutex)!=-1,
     "mutex not initialised or destroyed");
-  if(*((char *)mutex)==1) { __CPROVER_atomic_end(); return 1; }
-  *((char *)mutex)=1;
+  if(*((signed char *)mutex)==1) { __CPROVER_atomic_end(); return 1; }
+  *((signed char *)mutex)=1;
   __CPROVER_atomic_end();
   return 0;
 }
@@ -62,9 +62,9 @@ inline int pthread_mutex_trylock(pthread_mutex_t *mutex)
 inline int pthread_mutex_unlock(pthread_mutex_t *mutex)
 {
   __CPROVER_HIDE:;
-  __CPROVER_assert(*((char *)mutex)==1,
+  __CPROVER_assert(*((signed char *)mutex)==1,
     "must hold lock upon unlock");
-  *((char *)mutex)=0;
+  *((signed char *)mutex)=0;
   return 0; // we never fail
 }
 
@@ -78,9 +78,9 @@ inline int pthread_mutex_unlock(pthread_mutex_t *mutex)
 inline int pthread_mutex_destroy(pthread_mutex_t *mutex)
 {
   __CPROVER_HIDE:;
-  __CPROVER_assert(*((char *)mutex)==0,
+  __CPROVER_assert(*((signed char *)mutex)==0,
     "lock held upon destroy");
-  *((char *)mutex)=-1;
+  *((signed char *)mutex)=-1;
   return 0;
 }
 
@@ -135,9 +135,9 @@ inline int pthread_join(pthread_t thread, void **value_ptr)
 inline int pthread_rwlock_destroy(pthread_rwlock_t *lock)
 {
   __CPROVER_HIDE:;
-  __CPROVER_assert(*((char *)lock)==0,
+  __CPROVER_assert(*((signed char *)lock)==0,
     "lock held upon destroy");
-  *((char *)lock)=-1;
+  *((signed char *)lock)=-1;
   return 0;
 }
 
@@ -152,7 +152,7 @@ inline int pthread_rwlock_init(pthread_rwlock_t *lock,
   const pthread_rwlockattr_t *attr)
 {
   __CPROVER_HIDE:;
-  (*(char *)lock)=0;
+  (*(signed char *)lock)=0;
   if(attr!=0) (void)*attr;
   return 0;
 }
@@ -168,10 +168,10 @@ inline int pthread_rwlock_rdlock(pthread_rwlock_t *lock)
 {
   __CPROVER_HIDE:;
   __CPROVER_atomic_begin();
-  __CPROVER_assert(*((char *)lock)!=-1,
+  __CPROVER_assert(*((signed char *)lock)!=-1,
     "lock not initialised or destroyed");
-  __CPROVER_assume(!*((char *)lock));
-  *((char *)lock)=1;
+  __CPROVER_assume(!*((signed char *)lock));
+  *((signed char *)lock)=1;
   __CPROVER_atomic_end();
   return 0; // we never fail
 }
@@ -187,8 +187,8 @@ inline int pthread_rwlock_tryrdlock(pthread_rwlock_t *lock)
 {
   __CPROVER_HIDE:;
   __CPROVER_atomic_begin();
-  if((*(char *)lock & 2)!=0) { __CPROVER_atomic_end(); return 1; }
-  (*(char *)lock)|=1;
+  if((*(signed char *)lock & 2)!=0) { __CPROVER_atomic_end(); return 1; }
+  (*(signed char *)lock)|=1;
   __CPROVER_atomic_end();
   return 0;
 }
@@ -204,8 +204,8 @@ inline int pthread_rwlock_trywrlock(pthread_rwlock_t *lock)
 {
   __CPROVER_HIDE:;
   __CPROVER_atomic_begin();
-  if(*(char *)lock) { __CPROVER_atomic_end(); return 1; }
-  (*(char *)lock)=2;
+  if(*(signed char *)lock) { __CPROVER_atomic_end(); return 1; }
+  (*(signed char *)lock)=2;
   __CPROVER_atomic_end();
   return 0;
 }
@@ -220,10 +220,10 @@ inline int pthread_rwlock_trywrlock(pthread_rwlock_t *lock)
 inline int pthread_rwlock_unlock(pthread_rwlock_t *lock)
 {
   __CPROVER_HIDE:;
-  __CPROVER_assert(*((char *)lock)==1,
+  __CPROVER_assert(*((signed char *)lock)==1,
     "must hold lock upon unlock");
   // TODO: unlocks all held locks at once
-  *((char *)lock)=0;
+  *((signed char *)lock)=0;
   return 0; // we never fail
 }
 
@@ -238,10 +238,10 @@ inline int pthread_rwlock_wrlock(pthread_rwlock_t *lock)
 {
   __CPROVER_HIDE:;
   __CPROVER_atomic_begin();
-  __CPROVER_assert(*((char *)lock)!=-1,
+  __CPROVER_assert(*((signed char *)lock)!=-1,
     "lock not initialised or destroyed");
-  __CPROVER_assume(!*((char *)lock));
-  *((char *)lock)=2;
+  __CPROVER_assume(!*((signed char *)lock));
+  *((signed char *)lock)=2;
   __CPROVER_atomic_end();
   return 0; // we never fail
 }
