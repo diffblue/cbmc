@@ -59,7 +59,6 @@ public:
     boolbv_width(_ns),
     pointer_logic(_ns),
     array_index_bits(32),
-    core_enabled(false),
     num_core_constraints(0)
   { }
 
@@ -76,7 +75,6 @@ public:
     boolbv_width(_ns),
     pointer_logic(_ns),
     array_index_bits(32),
-    core_enabled(_core_enabled),
     num_core_constraints(0)
   { }
 
@@ -172,7 +170,6 @@ protected:
   typedef std::map<exprt, irep_idt> defined_expressionst;
   defined_expressionst defined_expressions;
 
-  bool core_enabled;
   int num_core_constraints;
   std::map<std::string, exprt> core_map;
   std::set<exprt> unsat_core;
