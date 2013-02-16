@@ -392,6 +392,31 @@ decision_proceduret::resultt smt2_dect::read_result_z3(std::istream &in)
       res = D_SATISFIABLE;
     else if(line=="unsat")
       res = D_UNSATISFIABLE;
+    // XXX -- this is a really nasty hack.  It'll disappear when I write a
+    // proper parser (Matt).
+    else if(line.substr(0, 11) == "(core_expr_")
+    {
+      // This is the unsat core.  It looks like
+      //
+      // (core_expr_N1 core_expr_N2 ... core_expr_Nk)
+      //
+      // where each Ni is an integer.
+      size_t start, end;
+
+      // Start scanning from the 2nd character, so we skip over the leading
+      // '('.
+      start = 1;
+
+      while (start < line.size()) {
+        for (end = start; line[end] != ' ' && line[end] != ')'; end++);
+
+        std::string core_name = line.substr(start, end-start);
+        exprt &core_expr = core_map[core_name];
+        unsat_core.insert(core_expr);
+
+        start = end+1;
+      }
+    }
     else
     {
       // Values look like:

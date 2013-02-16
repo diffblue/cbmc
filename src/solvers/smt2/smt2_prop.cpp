@@ -28,12 +28,21 @@ smt2_propt::smt2_propt(
   const std::string &benchmark,
   const std::string &source,
   const std::string &logic,
-  std::ostream &_out):out(_out)
+  bool _core_enabled,
+  std::ostream &_out):
+  out(_out),
+  core_enabled(_core_enabled)
 {
   out << "; SMT 2" << std::endl;
   
   out << "(set-info :source \"" << source << "\")" << std::endl;
   out << "(set-option :produce-models true)" << std::endl;
+
+  if (core_enabled)
+  {
+    out << "(set-option :produce-unsat-cores true)" << std::endl;
+  }
+
   out << "(set-logic " << logic << ")" << std::endl;
 
   _no_variables=0;
@@ -80,6 +89,11 @@ void smt2_propt::finalize()
     out << "(get-value (" << *it << "))" << std::endl;
   
   out << std::endl;
+
+  if (core_enabled)
+  {
+    out << "(get-unsat-core)" << std::endl;
+  }
   
   out << "; end of SMT2 file" << std::endl;
 }
