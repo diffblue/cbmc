@@ -2848,21 +2848,49 @@ Function: smt2_convt::set_to
 
 void smt2_convt::set_to(const exprt &expr, bool value)
 {
-  if(expr.id()==ID_and && value && !core_enabled)
+  if(smt2_prop.core_enabled)
+  {
+    // we refrain from various optimizations
+    // in case cores are enabled
+    
+    smt2_prop.out << "(! ";
+
+    if(!value)
+    {
+      smt2_prop.out << "(not ";
+      convert_expr(expr);
+      smt2_prop.out << ")";
+    }
+    else
+      convert_expr(expr);
+
+    std::string core_name = "core_expr_" + i2string(num_core_constraints);
+    num_core_constraints++;
+
+    smt2_prop.out << " :named " << core_name << ")";
+
+    core_map[core_name] = expr;
+
+    smt2_prop.out << ")" << std::endl;
+
+    return;    
+  }
+
+  if(expr.id()==ID_and && value)
   {
     forall_operands(it, expr)
       set_to(*it, true);
     return;
   }
 
-  if(expr.id()==ID_or && !value && !core_enabled)
+  if(expr.id()==ID_or && !value)
   {
     forall_operands(it, expr)
       set_to(*it, false);
     return;
   }
 
-  if(expr.id()==ID_not && !core_enabled)
+  if(expr.id()==ID_not)
   {
     assert(expr.operands().size()==1);
     return set_to(expr.op0(), !value);
@@ -2875,7 +2903,7 @@ void smt2_convt::set_to(const exprt &expr, bool value)
   // special treatment for "set_to(a=b, true)" where
   // a is a new symbol
 
-  if(expr.id()==ID_equal && value==true && !core_enabled)
+  if(expr.id()==ID_equal && value==true)
   {
     const equal_exprt &equal_expr=to_equal_expr(expr);
 
@@ -2921,11 +2949,6 @@ void smt2_convt::set_to(const exprt &expr, bool value)
                 << (value?"true":"false") << std::endl
                 << " ";
 
-  if(core_enabled)
-  {
-    smt2_prop.out << "(! ";
-  }
-
   if(!value)
   {
     smt2_prop.out << "(not ";
@@ -2934,16 +2957,6 @@ void smt2_convt::set_to(const exprt &expr, bool value)
   }
   else
     convert_expr(expr);
-
-  if(core_enabled)
-  {
-    std::string core_name = "core_expr_" + i2string(num_core_constraints);
-    num_core_constraints++;
-
-    smt2_prop.out << " :named " << core_name << ")";
-
-    core_map[core_name] = expr;
-  }
 
   smt2_prop.out << ")" << std::endl;
 
@@ -3337,11 +3350,24 @@ void smt2_convt::find_symbols_rec(
    }
 }
 
-bool smt2_convt::in_core(const exprt &expr) {
-  if (core_enabled)
+/*******************************************************************\
+
+Function: smt2_convt::in_core
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool smt2_convt::in_core(const exprt &expr)
+{
+  if(smt2_prop.core_enabled)
   {
     return (unsat_core.find(expr) != unsat_core.end());
-  } else {
-    return true;
   }
+  else
+    return true;
 }
