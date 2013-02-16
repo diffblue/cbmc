@@ -477,7 +477,7 @@ void goto_instrument_parseoptionst::instrument_goto_program(
       get_message_handler(), goto_functions);
   }
 
-  if(cmdline.isset("pointer-check") ||
+  if(cmdline.isset("remove-pointers") ||
      cmdline.isset("race-check") ||
      cmdline.isset("wmm") ||
      cmdline.isset("isr") ||
@@ -493,14 +493,6 @@ void goto_instrument_parseoptionst::instrument_goto_program(
     status("Pointer Analysis");
     value_set_analysist value_set_analysis(ns);
     value_set_analysis(goto_functions);
-
-    if(cmdline.isset("pointer-check"))
-    {
-      // add pointer checks
-      status("Adding Pointer Checks");
-      pointer_checks(
-        goto_functions, symbol_table, options, value_set_analysis);
-    }
 
     if(cmdline.isset("remove-pointers"))
     {
