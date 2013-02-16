@@ -41,7 +41,21 @@ public:
     const std::string &_logic,
     solvert _solver):
     smt2_temp_filet(),
-    smt2_convt(_ns, _benchmark, _notes, _logic, temp_out),
+    smt2_convt(_ns, _benchmark, _notes, _logic, false, temp_out),
+    logic(_logic),
+    solver(_solver)
+  {
+  }
+
+  smt2_dect(
+    const namespacet &_ns,
+    const std::string &_benchmark,
+    const std::string &_notes,
+    const std::string &_logic,
+    solvert _solver,
+    bool _core_enabled):
+    smt2_temp_filet(),
+    smt2_convt(_ns, _benchmark, _notes, _logic, _core_enabled, temp_out),
     logic(_logic),
     solver(_solver)
   {

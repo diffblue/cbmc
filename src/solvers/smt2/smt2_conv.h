@@ -28,8 +28,9 @@ public:
     const std::string &_benchmark,
     const std::string &_notes,
     const std::string &_logic,
+    bool _core_enabled,
     std::ostream &_out):
-    smt2_prop(_benchmark, _notes, _logic, _out) 
+    smt2_prop(_benchmark, _notes, _logic, _core_enabled, _out) 
   { }
 
 protected:
@@ -50,14 +51,33 @@ public:
     const namespacet &_ns,
     const std::string &_benchmark,
     const std::string &_notes,
-    const std::string &_logic,    
+    const std::string &_logic,
     std::ostream &_out):
-    smt2_prop_wrappert(_benchmark, _notes, _logic, _out),
+    smt2_prop_wrappert(_benchmark, _notes, _logic, false, _out),
     prop_convt(_ns, smt2_prop),
     use_FPA_theory(false),
     boolbv_width(_ns),
     pointer_logic(_ns),
-    array_index_bits(32)
+    array_index_bits(32),
+    core_enabled(false),
+    num_core_constraints(0)
+  { }
+
+  smt2_convt(
+    const namespacet &_ns,
+    const std::string &_benchmark,
+    const std::string &_notes,
+    const std::string &_logic,
+    bool _core_enabled,
+    std::ostream &_out):
+    smt2_prop_wrappert(_benchmark, _notes, _logic, _core_enabled, _out),
+    prop_convt(_ns, smt2_prop),
+    use_FPA_theory(false),
+    boolbv_width(_ns),
+    pointer_logic(_ns),
+    array_index_bits(32),
+    core_enabled(_core_enabled),
+    num_core_constraints(0)
   { }
 
   virtual ~smt2_convt() { }
@@ -72,6 +92,7 @@ protected:
   virtual literalt convert(const exprt &expr);
   virtual void set_to(const exprt &expr, bool value);
   virtual exprt get(const exprt &expr) const;
+  virtual bool in_core(const exprt &expr);
 
   // new stuff
   void convert_expr(const exprt &expr);
@@ -150,6 +171,11 @@ protected:
 
   typedef std::map<exprt, irep_idt> defined_expressionst;
   defined_expressionst defined_expressions;
+
+  bool core_enabled;
+  int num_core_constraints;
+  std::map<std::string, exprt> core_map;
+  std::set<exprt> unsat_core;
 };
 
 #endif

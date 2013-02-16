@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ieee_float.h>
 
 #include <ansi-c/string_constant.h>
+#include <ansi-c/expr2c.h>
 
 #include <langapi/language_util.h>
 
@@ -215,12 +216,10 @@ exprt smt2_convt::parse_struct(
         end = s.find(')', p);
       }
 
-      assert(end != std::string::npos);
-
-      std::string val = s.substr(p, (p-end));
+      std::string val = s.substr(p, (end-p));
       ret.operands()[i]=parse_constant(val, sub_type);
 
-      p = end;
+      p = end+1;
     }
     else
     {
@@ -1377,13 +1376,13 @@ void smt2_convt::convert_expr(const exprt &expr)
 
     if(op_type.id()==ID_signedbv)
     {
-      smt2_prop.out << "(let (prod (bvmul (sign_extend[" << width << "] ";
+      smt2_prop.out << "(let ( (prod (bvmul ((_ sign_extend " << width << ") ";
       convert_expr(expr.op0());
       smt2_prop.out << ") ((_ sign_extend " << width << ") ";
       convert_expr(expr.op1());
-      smt2_prop.out << ")) ";
-      smt2_prop.out << "(or (bvsge prod (_ bv " << power(2, width-1) << " " << width*2 << ")))";
-      smt2_prop.out << " (bvslt prod (bvneg (_ bv" << power(2, width-1) << " " << width*2 << "))))))";
+      smt2_prop.out << ")) )) ";
+      smt2_prop.out << "(or (bvsge prod (_ bv" << power(2, width-1) << " " << width*2 << "))";
+      smt2_prop.out << " (bvslt prod (bvneg (_ bv" << power(2, width-1) << " " << width*2 << ")))))";
     }
     else if(op_type.id()==ID_unsignedbv)
     {
@@ -1482,7 +1481,7 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
         if(op_type.id()==ID_signedbv)
           smt2_prop.out << "((_ sign_extend ";
         else
-          smt2_prop.out << "((_ zero_extend";
+          smt2_prop.out << "((_ zero_extend ";
 
         smt2_prop.out << (to_width-from_width)
                       << ") "; // ind
@@ -1589,7 +1588,7 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
     else
     {
       throw "TODO typecast2 "+op_type.id_string()+
-            " -> "+expr_type.id_string();
+            " -> "+expr_type.id_string() + " op == " + expr2c(op, ns);
     }
   }
   else if(expr_type.id()==ID_fixedbv) // to fixedbv
@@ -2849,14 +2848,21 @@ Function: smt2_convt::set_to
 
 void smt2_convt::set_to(const exprt &expr, bool value)
 {
-  if(expr.id()==ID_and && value)
+  if(expr.id()==ID_and && value && !core_enabled)
   {
     forall_operands(it, expr)
       set_to(*it, true);
     return;
   }
-  
-  if(expr.id()==ID_not)
+
+  if(expr.id()==ID_or && !value && !core_enabled)
+  {
+    forall_operands(it, expr)
+      set_to(*it, false);
+    return;
+  }
+
+  if(expr.id()==ID_not && !core_enabled)
   {
     assert(expr.operands().size()==1);
     return set_to(expr.op0(), !value);
@@ -2869,7 +2875,7 @@ void smt2_convt::set_to(const exprt &expr, bool value)
   // special treatment for "set_to(a=b, true)" where
   // a is a new symbol
 
-  if(expr.id()==ID_equal && value==true)
+  if(expr.id()==ID_equal && value==true && !core_enabled)
   {
     const equal_exprt &equal_expr=to_equal_expr(expr);
 
@@ -2915,6 +2921,11 @@ void smt2_convt::set_to(const exprt &expr, bool value)
                 << (value?"true":"false") << std::endl
                 << " ";
 
+  if(core_enabled)
+  {
+    smt2_prop.out << "(! ";
+  }
+
   if(!value)
   {
     smt2_prop.out << "(not ";
@@ -2924,7 +2935,19 @@ void smt2_convt::set_to(const exprt &expr, bool value)
   else
     convert_expr(expr);
 
+  if(core_enabled)
+  {
+    std::string core_name = "core_expr_" + i2string(num_core_constraints);
+    num_core_constraints++;
+
+    smt2_prop.out << " :named " << core_name << ")";
+
+    core_map[core_name] = expr;
+  }
+
   smt2_prop.out << ")" << std::endl;
+
+  return;
 }
 
 /*******************************************************************\
@@ -3036,7 +3059,7 @@ void smt2_convt::find_symbols(const exprt &expr)
       for(unsigned i=0; i<tmp.operands().size(); i++)
       {
         smt2_prop.out << "(assert (= (select " << id 
-                      << " (_ bv" << i << " " << array_index_bits << ")_ ";
+                      << " (_ bv" << i << " " << array_index_bits << ")) ";
         convert_expr(tmp.operands()[i]);
         smt2_prop.out << "))" << std::endl;
       }
@@ -3147,8 +3170,10 @@ void smt2_convt::convert_type(const typet &type)
     smt2_prop.out << "Int";
   else if(type.id()==ID_symbol)
     convert_type(ns.follow(type));
-  else
+  else {
     throw "unsupported type: "+type.id_string();
+  }
+
 }
 
 /*******************************************************************\
@@ -3289,8 +3314,7 @@ void smt2_convt::find_symbols_rec(
    else if(type.id()==ID_code)
    {
      const code_typet::argumentst &arguments=
-       to_code_type(type).arguments();
-
+         to_code_type(type).arguments();
      for(unsigned i=0; i<arguments.size(); i++)
        find_symbols_rec(arguments[i].type(), recstack);
 
@@ -3311,4 +3335,13 @@ void smt2_convt::find_symbols_rec(
        find_symbols_rec(ns.follow(type), recstack);
      }
    }
+}
+
+bool smt2_convt::in_core(const exprt &expr) {
+  if (core_enabled)
+  {
+    return (unsat_core.find(expr) != unsat_core.end());
+  } else {
+    return true;
+  }
 }

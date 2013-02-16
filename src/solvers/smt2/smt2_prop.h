@@ -23,6 +23,7 @@ public:
     const std::string &_benchmark,
     const std::string &_source,
     const std::string &_logic,
+    bool _core_enabled,
     std::ostream &_out);
   virtual ~smt2_propt();
 
@@ -82,6 +83,8 @@ protected:
   
   typedef std::set<std::string> smt2_identifierst;
   smt2_identifierst smt2_identifiers;
+
+  bool core_enabled;
 };
 
 #endif
