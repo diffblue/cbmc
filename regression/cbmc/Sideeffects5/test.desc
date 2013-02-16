@@ -1,0 +1,7 @@
+CORE
+main.c
+--div-by-zero-check
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
