@@ -692,7 +692,7 @@ void goto_instrument_parseoptionst::help()
     " --show-goto-functions        show goto program\n"
     " --show-struct-alignment      show struct members that might be concurrently accessed\n"
     " --dump-c                     generate C source\n"
-    " --dot                        generate CFG graph in DOT format"
+    " --dot                        generate CFG graph in DOT format\n"
     " --interpreter                do concrete execution\n"
     "\n"
     "Safety checks:\n"
