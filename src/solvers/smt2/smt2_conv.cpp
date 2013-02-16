@@ -18,7 +18,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ieee_float.h>
 
 #include <ansi-c/string_constant.h>
-#include <ansi-c/expr2c.h>
 
 #include <langapi/language_util.h>
 
@@ -1588,7 +1587,7 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
     else
     {
       throw "TODO typecast2 "+op_type.id_string()+
-            " -> "+expr_type.id_string() + " op == " + expr2c(op, ns);
+            " -> "+expr_type.id_string() + " op == " + from_expr(ns, "", op);
     }
   }
   else if(expr_type.id()==ID_fixedbv) // to fixedbv
