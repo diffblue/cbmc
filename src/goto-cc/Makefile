@@ -1,9 +1,9 @@
-SRC = goto-cc.cpp goto_cc_mode.cpp gcc_mode.cpp \
+SRC = main.cpp goto_cc_mode.cpp gcc_mode.cpp \
       get_base_name.cpp \
-      gcc_cmdline.cpp ms_cl_cmdline.cpp \
+      gcc_cmdline.cpp ms_cl_cmdline.cpp ld_cmdline.cpp \
       compile.cpp armcc_cmdline.cpp run.cpp \
       languages.cpp goto_cc_cmdline.cpp \
-      ms_cl_mode.cpp armcc_mode.cpp cw_mode.cpp
+      ms_cl_mode.cpp armcc_mode.cpp cw_mode.cpp ld_mode.cpp
 
 OBJ += ../big-int/bigint$(OBJEXT) \
       ../goto-programs/goto-programs$(LIBEXT) \

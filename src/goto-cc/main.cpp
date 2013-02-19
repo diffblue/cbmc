@@ -17,10 +17,13 @@ Date: May 2006
 #include "gcc_cmdline.h"
 #include "armcc_cmdline.h"
 #include "ms_cl_cmdline.h"
+#include "ld_cmdline.h"
+
 #include "gcc_mode.h"
 #include "cw_mode.h"
 #include "ms_cl_mode.h"
 #include "armcc_mode.h"
+#include "ld_mode.h"
 
 /*******************************************************************\
  
@@ -113,6 +116,17 @@ int main(int argc, const char **argv)
     gcc_mode.produce_hybrid_binary=true;
     return gcc_mode.main(argc, argv);
   }
+  #if 0
+  else if(base_name=="goto-ld")
+  {
+    // this simulates "ld" for linking
+    ld_cmdlinet cmdline;
+    ld_modet ld_mode(cmdline);
+    ld_mode.base_name=base_name;
+    //ld_mode.produce_hybrid_binary=true;
+    return ld_mode.main(argc, argv);
+  }
+  #endif
   else
   {
     // the default personality is GCC-style
