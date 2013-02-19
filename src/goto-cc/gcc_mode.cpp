@@ -1,6 +1,6 @@
 /*******************************************************************\
 
-Module: Command line option container
+Module: GCC Mode
 
 Author: CM Wintersteiger, 2006
 
