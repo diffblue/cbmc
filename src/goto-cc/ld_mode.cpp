@@ -232,6 +232,8 @@ bool ld_modet::doit()
   return result;
   
   #endif
+  
+  return false;
 }
 
 /*******************************************************************\
