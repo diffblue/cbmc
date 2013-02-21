@@ -479,22 +479,6 @@ bool configt::set(const cmdlinet &cmdline)
     ansi_c.char_is_unsigned=false;
   }
 
-  // let's check some of these
-  if(arch==this_arch)
-  {
-    assert(ansi_c.int_width==sizeof(int)*8);
-    assert(ansi_c.long_int_width==sizeof(long)*8);
-    assert(ansi_c.bool_width==sizeof(bool)*8);
-    assert(ansi_c.char_width==sizeof(char)*8);
-    assert(ansi_c.short_int_width==sizeof(short)*8);
-    assert(ansi_c.long_long_int_width==sizeof(long long)*8);
-    assert(ansi_c.pointer_width==sizeof(void *)*8);
-    assert(ansi_c.single_width==sizeof(float)*8);
-    assert(ansi_c.double_width==sizeof(double)*8);
-    assert(ansi_c.long_double_width==sizeof(long double)*8);
-    assert(ansi_c.char_is_unsigned==(char(255)==255));
-  }  
-  
   if(os=="windows")
   {
     ansi_c.lib=configt::ansi_ct::LIB_FULL;
@@ -534,6 +518,22 @@ bool configt::set(const cmdlinet &cmdline)
     ansi_c.os=configt::ansi_ct::NO_OS;
     ansi_c.mode=ansi_ct::MODE_GCC;
   }
+  
+  // let's check some of the type widths
+  if(arch==this_arch)
+  {
+    assert(ansi_c.int_width==sizeof(int)*8);
+    assert(ansi_c.long_int_width==sizeof(long)*8);
+    assert(ansi_c.bool_width==sizeof(bool)*8);
+    assert(ansi_c.char_width==sizeof(char)*8);
+    assert(ansi_c.short_int_width==sizeof(short)*8);
+    assert(ansi_c.long_long_int_width==sizeof(long long)*8);
+    assert(ansi_c.pointer_width==sizeof(void *)*8);
+    assert(ansi_c.single_width==sizeof(float)*8);
+    assert(ansi_c.double_width==sizeof(double)*8);
+    assert(ansi_c.long_double_width==sizeof(long double)*8);
+    assert(ansi_c.char_is_unsigned==(char(255)==255));
+  }  
   
   // the following allows overriding the defaults
   
