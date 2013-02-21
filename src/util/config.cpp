@@ -310,15 +310,18 @@ bool configt::set(const cmdlinet &cmdline)
   irep_idt arch=this_arch;
 
   // let's pick an OS now
-  irep_idt os;
+  irep_idt this_os;
   
   #ifdef _WIN32
-  os="windows";
+  this_os="windows";
   #elif __APPLE__
-  os="macos";
+  this_os="macos";
   #else
-  os="linux";
+  this_os="linux";
   #endif
+
+  // the default is the one we run on  
+  irep_idt os=this_os;
 
   if(cmdline.isset("i386-linux"))
   {
@@ -520,7 +523,7 @@ bool configt::set(const cmdlinet &cmdline)
   }
   
   // let's check some of the type widths
-  if(arch==this_arch)
+  if(arch==this_arch && os==this_os)
   {
     assert(ansi_c.int_width==sizeof(int)*8);
     assert(ansi_c.long_int_width==sizeof(long)*8);
