@@ -124,8 +124,9 @@ inline char *strncpy(char *dst, const char *src, size_t n)
   // Note that strncpy _always_ writes 'n' characters into 'dst'.
   for(end=0; i<n; i++)
   {
-    dst[i]=end?0:(ch=src[i]);
-    end=end?1:ch==0;
+    ch=end?0:src[i];
+    dst[i]=ch;
+    end=end || ch==(char)0;
   }
   #endif
   return dst;
@@ -155,8 +156,9 @@ inline char *__builtin___strncpy_chk(char *dst, const char *src, size_t n, size_
   // Note that strncpy _always_ writes 'n' characters into 'dst'.
   for(end=0; i<n; i++)
   {
-    dst[i]=end?0:(ch=src[i]);
-    end=end?1:ch==0;
+    ch=end?0:src[i];
+    dst[i]=ch;
+    end=end || ch==(char)0;
   }
   #endif
   return dst;
