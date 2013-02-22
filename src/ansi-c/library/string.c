@@ -118,12 +118,46 @@ inline char *strncpy(char *dst, const char *src, size_t n)
   #else
   __CPROVER_size_t i=0;
   char ch;
+  _Bool end;
 
-  for( ; i<n && (ch=src[i])!=(char)0; i++)
-    dst[i]=ch;
+  // We use a single loop to make bounds checking etc easier.
+  // Note that strncpy _always_ writes 'n' characters into 'dst'.
+  for(end=0; i<n; i++)
+  {
+    dst[i]=end?0:(ch=src[i]);
+    end=end?1:ch==0;
+  }
+  #endif
+  return dst;
+}
 
-  for( ; i<n ; i++)
-    dst[i]=0;
+/* FUNCTION: __builtin___strncpy_chk */
+
+#ifndef __CPROVER_STRING_H_INCLUDED
+#include <string.h>
+#define __CPROVER_STRING_H_INCLUDED
+#endif
+
+inline char *__builtin___strncpy_chk(char *dst, const char *src, size_t n, size_t object_size)
+{
+  __CPROVER_HIDE:;
+  #ifdef __CPROVER_STRING_ABSTRACTION
+  __CPROVER_assert(__CPROVER_is_zero_string(src), "strncpy zero-termination of 2nd argument");
+  __CPROVER_assert(__CPROVER_buffer_size(dst)>=n, "strncpy buffer overflow");
+  __CPROVER_is_zero_string(dst)=__CPROVER_zero_string_length(src)<n;
+  __CPROVER_zero_string_length(dst)=__CPROVER_zero_string_length(src);  
+  #else
+  __CPROVER_size_t i=0;
+  char ch;
+  _Bool end;
+
+  // We use a single loop to make bounds checking etc easier.
+  // Note that strncpy _always_ writes 'n' characters into 'dst'.
+  for(end=0; i<n; i++)
+  {
+    dst[i]=end?0:(ch=src[i]);
+    end=end?1:ch==0;
+  }
   #endif
   return dst;
 }
