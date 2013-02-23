@@ -6,11 +6,10 @@ Author: Daniel Kroening, 2013
 
 \*******************************************************************/
 
-//#include <cassert>
-//#include <cstring>
-//#include <iostream>
+#include <cassert>
+#include <iostream>
 
-//#include <prefix.h>
+#include <prefix.h>
 
 #include "ld_cmdline.h"
 
@@ -26,173 +25,213 @@ Function: ld_cmdlinet::parse
 
 \*******************************************************************/
 
-#if 0
-// separated or concatenated
 const char *ld_options_with_argument[]=
 {
-  "-o",
-  "-x",
-  "-B",
-  "-iquote",
-  "-idirafter",
-  "-include",
-  "-I",
-  "-V",
-  "-D",
-  "-L",
-  "-MT",
-  "-MQ",
-  "-MF",
-  "-u", // goes to linker
-  "-T", // goes to linker
-  NULL
-};
-
-const char *ld_options_with_separated_argument[]=
-{
-  "--verbosity", // non-ld
-  "--function",  // non-ld
-  "-aux-info",
-  "--param", // Apple only
-  "-imacros",
-  "-iprefix",
-  "-iwithprefix",
-  "-iwithprefixbefore",
-  "-isystem",
-  "-isysroot",
-  "-Xpreprocessor",
-  "-Xassembler",
-  "-Xlinker",
-  "-b",
-  "-std",
-  "--std",
-  "-print-file-name",
-  "-print-prog-name",
-  "-specs",
-  "--sysroot",
-  "--include", // undocumented
-  NULL
-};
-
-const char *ld_options_with_concatenated_argument[]=
-{
-  "-d",
-  "-g",
+  "-a",
+  "--architecture",
   "-A",
-  "-U",
+  "--format",
+  "-b",
+  "--mri-script",
+  "-c",
+  "--entry",
+  "-e",
+  "--auxiliary",
+  "-f",
+  "--filter",
+  "-F",
+  "--gpsize",
+  "-G",
+  "--soname",
+  "-h",
+  "--dynamic-linker",
+  "-I",
+  "--library",
   "-l",
+  "--library-path",
+  "-L",
+  "--sysroot",
+  "-m",
+  "--output",
+  "-o",
+  "-O",
+  "--plugin",
+  "--plugin-opt",
+  "--flto-partition",
+  "--just-symbols",
+  "-R",
+  "--script",
+  "-T",
+  "--default-script",
+  "--dT",
+  "--undefined",
+  "-u",
+  "--trace-symbol",
+  "-y",
+  "-Y",
+  "--assert",
+  "--defsym",
+  "--fini",
+  "--hash-size",
+  "--init",
+  "--Map",
+  "--oformat",
+  "--retain-symbols-file",
+  "--rpath",
+  "--rpath-link",
+  "--sort-section",
+  "--spare-dynamic-tags",
+  "--task-link",
+  "--section-start",
+  "--Tbss",
+  "--Tdata",
+  "--Ttext",
+  "--Ttext-segment",
+  "--unresolved-symbols",
+  "--version-exports-section",
+  "--dynamic-list",
+  "--wrap",
+  "--verbosity", // non-ld
+  "--arch", // Apple only
+  "--ios_version_min", // Apple only
+  "--macosx_version_min", // Apple only
+  "--install_name", // Apple only
   NULL
 };
 
 const char *ld_options_without_argument[]=
 {
-  "--show-symbol-table", // NON-GCC
-  "--show-function-table", // NON-GCC
-  "--ppc-macos", // NON-GCC
-  "--i386-linux", // NON-GCC
-  "--i386-win32", // NON-GCC
-  "--i386-macos", // NON-GCC
-  "--winx64", // NON_GCC
-  "--string-abstraction", // NON-GCC
-  "--no-library", // NON-GCC
-  "--16", // NON-GCC
-  "--32", // NON-GCC
-  "--64", // NON-GCC
-  "--little-endian", // NON-GCC
-  "--big-endian", // NON-GCC
-  "--no-arch", // NON-GCC            
-  "--partial-inlining", // NON-GCC
-  "-h", 
-  "--help", // NON-GCC
-  "-?", // NON-GCC
-  "-r", // for ld mimicking
-  "-dylib", // for ld mimicking on MacOS
-  "-c", 
-  "-S",
-  "-E", 
-  "-combine",
-  "-pipe", 
-  "-pass-exit-codes",
-  "-v", 
-  "-###",
-  "-help", 
-  "-target-help",
-  "--version", 
-  "-ansi",
-  "-trigraphs",
-  "-no-integrated-cpp",
-  "-traditional",
-  "-traditional-cpp",
-  "-nostdinc++", 
-  "-gen-decls",
-  "-pedantic",
-  "-pedantic-errors",
-  "-w", 
-  "-dumpspecs",
-  "-dumpmachine",
-  "-dumpversion", 
-  "-g",
-  "-gcoff", 
-  "-gdwarf-2",
-  "-ggdb", 
-  "-gstabs",
-  "-gstabs+", 
-  "-gvms",
-  "-gxcoff", 
-  "-gxcoff+",
-  "-p", 
-  "-pg",
-  "-print-libgcc-file-name",
-  "-print-multi-directory",
-  "-print-multi-lib",
-  "-print-search-dirs", 
-  "-Q",
-  "-pthread",
-  "-save-temps", 
-  "-time",
-  "-O", 
-  "-O0",        
-  "-O1", 
-  "-O2",
-  "-O3", 
-  "-Os",
-  "-Oz", // Apple only
-  "-C", 
+  "--dc",
+  "-d",
+  "--dp",
+  "--export-dynamic",
   "-E",
-  "-H", 
+  "--no-export-dynamic",
+  "--EB",
+  "--EL",
+  "-g",
+  "--print-map",
   "-M",
-  "-MM", 
-  "-MG", 
-  "-MP",
-  "-MD", 
-  "-MMD",
-  "-nostdinc", 
-  "-P",
-  "-remap", 
-  "-undef",
-  "-nostdinc", 
-  "-nostartfiles",
-  "-nodefaultlibs",
-  "-nostdlib", 
-  "-pie",
-  "-rdynamic", 
+  "--nmagic",
+  "-n",
+  "--omagic",
+  "-N",
+  "--no-omagic",
+  "--flto",
+  "--Qy",
+  "--emit-relocs",
+  "-q",
+  "--relocatable",
+  "-r",
+  "-i",
+  "--strip-all",
   "-s",
-  "-static", 
-  "-static-libgcc", 
-  "--static", 
-  "-shared",
+  "--strip-debug",
+  "-S",
+  "--strip-discarded",
+  "--no-strip-discarded",
+  "--trace",
+  "-t",
+  "--unique",
+  "--Ur",
+  "--version",
+  "-v",
+  "-V",
+  "--discard-all",
+  "-x",
+  "--discard-locals",
+  "-X",
+  "--discard-none",
+  "--start-group",
+  "-(",
+  "--end-group",
+  "-)",
+  "--accept-unknown-input-arch",
+  "--no-accept-unknown-input-arch",
+  "--add-needed",
+  "--no-add-needed",
+  "--as-needed",
+  "--no-as-needed",
+  "--Bdynamic",
+  "--dy",
+  "--call_shared",
+  "--Bstatic",
+  "--dn",
+  "--non_shared",
+  "--static",
+  "--Bsymbolic",
+  "--Bsymbolic-functions",
+  "--check-sections",
+  "--no-check-sections",
+  "--copy-dt-needed-entries",
+  "--no-copy-dt-needed-entries",
+  "--cref",
+  "--demangle",
+  "--embedded-relocs",
+  "--fatal-warnings",
+  "--no-fatal-warnings",
+  "--force-exe-suffix",
+  "--gc-sections",
+  "--no-gc-sections",
+  "--print-gc-sections",
+  "--no-print-gc-sections",
+  "--help",
+  "--no-define-common",
+  "--no-demangle",
+  "--no-keep-memory",
+  "--no-undefined",
+  "--allow-shlib-undefined",
+  "--no-allow-shlib-undefined",
+  "--allow-multiple-definition",
+  "--no-undefined-version",
+  "--default-symver",
+  "--default-imported-symver",
+  "--no-warn-mismatch",
+  "--no-warn-search-mismatch",
+  "--no-whole-archive",
+  "--noinhibit-exec",
+  "--noinhibit_exec",
+  "--nostdlib",
+  "--print-output-format",
+  "--qmagic",
+  "--reduce-memory-overheads",
+  "--relax",
+  "--no-relax",
   "--shared",
-  "-symbolic",
-  "-EB",
-  "-EL",
-  "-fast", // Apple only
+  "--Bshareable",
+  "--pie",
+  "--pic-executable",
+  "--sort-common",
+  "--sort_common",
+  "--split-by-file",
+  "--split-by-reloc",
+  "--stats",
+  "--target-help",
+  "--traditional-format",
+  "--verbose",
+  "--dll-verbose",
+  "--version-script",
+  "--dynamic-list-data",
+  "--dynamic-list-cpp-new",
+  "--dynamic-list-cpp-typeinfo",
+  "--warn-common",
+  "--warn-constructors",
+  "--warn-multiple-gp",
+  "--warn-once",
+  "--warn-section-align",
+  "--warn-shared-textrel",
+  "--warn-alternate-em",
+  "--warn-unresolved-symbols",
+  "--error-unresolved-symbols",
+  "--whole-archive",
+  "--dylib", // Apple only
+  "--dylinker", // Apple only
+  "--bundle", // Apple only
   NULL
 };
-#endif
 
 bool ld_cmdlinet::parse(int argc, const char **argv)
 {
-  #if 0
   assert(argc>0);
   add_arg(argv[0]);
 
@@ -211,8 +250,7 @@ bool ld_cmdlinet::parse(int argc, const char **argv)
     if(argv_i=="-" || !has_prefix(argv_i, "-"))
     {
       args.push_back(argv_i);
-      add_arg(argv_i);
-      parsed_argv.back().is_infile_name=true;
+      add_infile_arg(argv_i);
       continue;
     }    
     
@@ -221,96 +259,69 @@ bool ld_cmdlinet::parse(int argc, const char **argv)
 
     // also store in cmdlinet
 
-    if(has_prefix(argv_i, "-f")) // f-options
-    {
-      set(argv_i);
-    }
-    else if(has_prefix(argv_i, "-W")) // W-options
-    {
-      // "Wp,..." is s special case. These are to pass stuff
-      // to the preprocessor.
-      if(has_prefix(argv_i, "-Wp,"))
-      {
-        std::string value=std::string(argv[i]+4);
-        set("-WP,", value);
-      }
-      else
-        set(argv_i);
-    }
-    else if(has_prefix(argv_i, "-m")) // m-options
-    {
-      set(argv_i);
-    }
-    else if(in_list(argv[i], ld_options_without_argument)) // without argument
-    {
-      set(argv_i);
-    }
-    else
-    {
-      bool found=false;
+    bool found=false;
 
-      // separated only, and also allow concatenation with "="
-      for(const char **o=ld_options_with_separated_argument; *o!=NULL && !found; o++)
+    for(const char **o=ld_options_without_argument; *o!=NULL && !found; o++)
+    {
+      std::string os(*o);
+      // ld accepts all long options also as short option
+      if(argv_i==os ||
+         (os.size()>=3 && os[0]=='-' && os[1]=='-' && "-"+argv_i==os))
       {
-        if(argv_i==*o) // separated
-        {
-          found=true;
-          if(i!=argc-1)
-          {
-            set(argv_i, argv[i+1]);
-            add_arg(argv[i+1]);
-            i++;
-          }
-          else
-            set(argv_i, "");
-        }
-        else if(has_prefix(argv_i, std::string(*o)+"=")) // concatenated with "="
-        {
-          found=true;
-          set(*o, argv[i]+strlen(*o)+1);
-        }
+        found=true;
+        set(os); // record as long
       }
+    }
+    
+    // arguments to options can be given as follows:
+    // 1) concatenated for short options
+    // 2) concatenated with '=' for long options
+    // 3) separate
 
-      // concatenated _or_ separated, e.g., -I
-      for(const char **o=ld_options_with_argument; *o!=NULL && !found; o++)
+    for(const char **o=ld_options_with_argument; *o!=NULL && !found; o++)
+    {
+      std::string os(*o);
+    
+      // separated?
+      if(argv_i==os ||
+         (os.size()>=3 && os[0]=='-' && os[1]=='-' && "-"+argv_i==os))
       {
-        if(argv_i==*o) // separated
+        found=true;
+        if(i!=argc-1)
         {
-          found=true;
-          if(i!=argc-1)
-          {
-            set(argv_i, argv[i+1]);
-            add_arg(argv[i+1]);
-            i++;
-          }
-          else
-            set(argv_i, "");
+          set(os, argv[i+1]);
+          add_arg(argv[i+1]);
+          i++;
         }
-        else if(has_prefix(argv_i, *o)) // concatenated
+        else
         {
-          found=true;
-          set(*o, argv[i]+strlen(*o));
+          std::cout << "Warning: missing argument for " << argv_i << std::endl;
+          set(os, ""); // end of command line
         }
       }
-
-      // concatenated only
-      for(const char **o=ld_options_with_concatenated_argument; *o!=NULL && !found; o++)
+      else if(os.size()==2 && has_prefix(argv_i, os)) // concatenated, short
       {
-        if(has_prefix(argv_i, *o)) // concatenated
-        {
-          found=true;
-          set(*o, argv[i]+strlen(*o));
-        }
+        found=true;
+        set(os, argv[i]+os.size());
       }
+      else if(os.size()>2 && has_prefix(argv_i, os+"=")) // concatenated, long
+      {
+        found=true;
+        set(os, argv[i]+os.size()+1);
+      }
+      else if(os.size()>2 && has_prefix("-"+argv_i, os+"=")) // concatenated, long as short
+      {
+        found=true;
+        set(os, argv[i]+os.size()+1-1);
+      }
+    }
 
-      if(!found)
-      {    
-        // unrecognized option
-        std::cout << "Warning: uninterpreted ld option '" << argv[i] << "'" << std::endl;
-      }
+    if(!found)
+    {    
+      // unrecognized option
+      std::cout << "Warning: uninterpreted ld option '" << argv_i << "'" << std::endl;
     }
   }
-  #endif
 
   return false;
 }

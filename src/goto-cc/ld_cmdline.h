@@ -22,12 +22,6 @@ public:
   ld_cmdlinet()
   {
   }
-
-  //typedef std::list<argt> parsed_argvt;
-  //parsed_argvt parsed_argv;
-
-//protected:  
-  //void add_arg(const std::string &arg) { parsed_argv.push_back(argt(arg)); }
 };
 
 #endif /* GOTO_CC_LD_CMDLINE_H */

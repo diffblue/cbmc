@@ -116,17 +116,15 @@ int main(int argc, const char **argv)
     gcc_mode.produce_hybrid_binary=true;
     return gcc_mode.main(argc, argv);
   }
-  #if 0
   else if(base_name=="goto-ld")
   {
     // this simulates "ld" for linking
     ld_cmdlinet cmdline;
-    ld_modet ld_mode(cmdline);
-    ld_mode.base_name=base_name;
-    //ld_mode.produce_hybrid_binary=true;
-    return ld_mode.main(argc, argv);
+    gcc_modet gcc_mode(cmdline);
+    gcc_mode.base_name=base_name;
+    gcc_mode.produce_hybrid_binary=true;
+    return gcc_mode.main(argc, argv);
   }
-  #endif
   else
   {
     // the default personality is GCC-style
