@@ -20,10 +20,9 @@ public:
   virtual bool doit();
   virtual void help_mode();
 
-  explicit gcc_modet(gcc_cmdlinet &_gcc_cmdline):
-    goto_cc_modet(_gcc_cmdline),
+  explicit gcc_modet(goto_cc_cmdlinet &_cmdline):
+    goto_cc_modet(_cmdline),
     produce_hybrid_binary(false),
-    cmdline(_gcc_cmdline),
     act_as_ld(false)
   {
   }
@@ -31,8 +30,6 @@ public:
   bool produce_hybrid_binary;
   
 protected:
-  gcc_cmdlinet &cmdline;
-  
   bool act_as_ld;
   
   int preprocess(const std::string &src, const std::string &dest);
