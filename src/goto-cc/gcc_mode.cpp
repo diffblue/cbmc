@@ -61,6 +61,10 @@ Function: gcc_modet::doit
 
 bool gcc_modet::doit()
 {
+  act_as_ld=
+    has_prefix(base_name, "ld") ||
+    has_prefix(base_name, "goto-ld");
+
   if(cmdline.isset('?') ||
      cmdline.isset("help"))
   {
@@ -72,10 +76,6 @@ bool gcc_modet::doit()
 
   compilet compiler(cmdline);
   
-  act_as_ld=
-    has_prefix(base_name, "ld") ||
-    has_prefix(base_name, "goto-ld");
-
   if(cmdline.isset('v'))
   {
     // This a) prints the version and b) increases verbosity.
@@ -114,10 +114,20 @@ bool gcc_modet::doit()
   compiler.set_verbosity(verbosity);
   set_verbosity(verbosity);
 
-  if(produce_hybrid_binary)
-    debug("GCC mode (hybrid)");
+  if(act_as_ld)
+  {
+    if(produce_hybrid_binary)
+      debug("LD mode (hybrid)");
+    else
+      debug("LD mode");
+  }
   else
-    debug("GCC mode");
+  {
+    if(produce_hybrid_binary)
+      debug("GCC mode (hybrid)");
+    else
+      debug("GCC mode");
+  }
   
   // get configuration
   config.set(cmdline);
@@ -399,7 +409,10 @@ int gcc_modet::gcc_hybrid_binary(const cmdlinet::argst &input_files)
 
   if(output_files.empty()) return 0;
 
-  debug("Running gcc to generate hybrid binary");
+  if(act_as_ld)
+    debug("Running ld to generate hybrid binary");
+  else
+    debug("Running gcc to generate hybrid binary");
   
   // save the goto-cc output files
   for(std::list<std::string>::const_iterator
@@ -438,7 +451,11 @@ int gcc_modet::gcc_hybrid_binary(const cmdlinet::argst &input_files)
 
   // overwrite argv[0]
   assert(new_argv.size()>=1);
-  new_argv[0]="gcc";
+  
+  if(act_as_ld)
+    new_argv[0]="ld";
+  else
+    new_argv[0]="gcc";
   
   #if 0
   std::cout << "RUN:";
@@ -447,7 +464,7 @@ int gcc_modet::gcc_hybrid_binary(const cmdlinet::argst &input_files)
   std::cout << std::endl;
   #endif
   
-  int result=run("gcc", new_argv);
+  int result=run(new_argv[0], new_argv);
   
   // merge output from gcc with goto-binaries
   // using objcopy
@@ -541,6 +558,9 @@ Function: gcc_modet::help_mode
 
 void gcc_modet::help_mode()
 {
-  std::cout << "goto-cc understands the options of gcc plus the following.\n\n";
+  if(act_as_ld)
+    std::cout << "goto-ld understands the options of ld plus the following.\n\n";
+  else
+    std::cout << "goto-cc understands the options of gcc plus the following.\n\n";
 }
 
