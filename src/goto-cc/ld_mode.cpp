@@ -6,10 +6,10 @@ Author: Daniel Kroening, 2013
 
 \*******************************************************************/
 
+#include <cstdlib>
 #include <iostream>
 
 #if 0
-#include <cstdlib>
 #include <cstdio>
 
 #include <tempdir.h>

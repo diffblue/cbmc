@@ -131,8 +131,10 @@ bool gcc_modet::doit()
   
   if(act_as_ld)
     compiler.mode=compilet::LINK_LIBRARY;
-  else if(cmdline.isset('c') || cmdline.isset('S'))
+  else if(cmdline.isset('c'))
     compiler.mode=compilet::COMPILE_ONLY;
+  else if(cmdline.isset('S'))
+    compiler.mode=compilet::ASSEMBLE_ONLY;
   else if(cmdline.isset('E'))
     compiler.mode=compilet::PREPROCESS_ONLY;
   else if(cmdline.isset("shared") ||
@@ -145,6 +147,7 @@ bool gcc_modet::doit()
   {
   case compilet::LINK_LIBRARY: debug("Linking a library only"); break;
   case compilet::COMPILE_ONLY: debug("Compiling only"); break;
+  case compilet::ASSEMBLE_ONLY: debug("Assembling only"); break;
   case compilet::PREPROCESS_ONLY: debug("Preprocessing only"); break;
   case compilet::COMPILE_LINK: debug("Compiling and linking a library"); break;
   case compilet::COMPILE_LINK_EXECUTABLE: debug("Compiling and linking an executable"); break;
@@ -161,7 +164,10 @@ bool gcc_modet::doit()
   else
     config.ansi_c.mode=configt::ansi_ct::MODE_GCC;
 
-  compiler.object_file_extension="o";
+  if(compiler.mode==compilet::ASSEMBLE_ONLY)
+    compiler.object_file_extension="s";
+  else
+    compiler.object_file_extension="o";
   
   if(cmdline.isset("std"))
   {
@@ -212,6 +218,15 @@ bool gcc_modet::doit()
   {
     compiler.output_file_object="";
     compiler.output_file_executable="a.out";
+  }
+
+  // Using '-x', the type of a file can be overridden;
+  // otherwise, it's guessed from the extension.
+  
+  if(cmdline.isset('x'))
+  {
+    const std::string language=cmdline.getval('x');
+    compiler.override_language=language;
   }
     
   // Iterate over file arguments, and do any preprocessing needed
