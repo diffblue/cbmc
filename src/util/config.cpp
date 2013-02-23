@@ -613,7 +613,9 @@ Function: configt::ansi_ct::set_from_symbol_table
 
 \*******************************************************************/
 
-int configt::ansi_ct::from_ns(const namespacet &ns, const std::string &what)
+int configt::ansi_ct::from_ns(
+  const namespacet &ns,
+  const std::string &what)
 {
   const irep_idt id="c::__CPROVER_architecture_"+what;
   const symbolt *symbol;
