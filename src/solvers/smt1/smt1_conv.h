@@ -63,13 +63,13 @@ public:
   virtual ~smt1_convt() { }
   virtual resultt dec_solve();
 
-protected:
-  boolbv_widtht boolbv_width;
-
-  // overloading
+  // overloading interfaces
   virtual literalt convert(const exprt &expr);
   virtual void set_to(const exprt &expr, bool value);
   virtual exprt get(const exprt &expr) const;
+
+protected:
+  boolbv_widtht boolbv_width;
 
   // new stuff
   void convert_expr(const exprt &expr, bool bool_as_bv);

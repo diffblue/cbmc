@@ -83,14 +83,14 @@ public:
 
   bool use_FPA_theory;
 
-protected:
-  boolbv_widtht boolbv_width;
-
-  // overloading
+  // overloading interfaces
   virtual literalt convert(const exprt &expr);
   virtual void set_to(const exprt &expr, bool value);
   virtual exprt get(const exprt &expr) const;
   virtual bool in_core(const exprt &expr);
+
+protected:
+  boolbv_widtht boolbv_width;
 
   // new stuff
   void convert_expr(const exprt &expr);
