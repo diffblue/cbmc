@@ -91,22 +91,6 @@ Function: compilet::doit
 
 bool compilet::doit()
 {
-  std::string error_label;
-
-  options.set_option("bounds-check", !cmdline.isset("no-bounds-check"));
-  options.set_option("div-by-zero-check", !cmdline.isset("no-div-by-zero-check"));
-  options.set_option("pointer-check", !cmdline.isset("no-pointer-check"));
-  options.set_option("assertions", !cmdline.isset("no-assertions"));
-  options.set_option("assumptions", !cmdline.isset("no-assumptions"));
-  options.set_option("simplify", !cmdline.isset("no-simplify"));
-  options.set_option("overflow-check", cmdline.isset("overflow-check"));
-
-  // we do want the assertions
-  optionst options;
-  options.set_option("assertions", true);
-  options.set_option("assumptions", true);
-  options.set_option("error-label", error_label);
-
   compiled_functions.clear();
 
   add_compiler_specific_defines(config);
@@ -413,18 +397,6 @@ bool compilet::link()
   print(8, "Compiling functions");
   convert_symbols(compiled_functions);
 
-  if(cmdline.isset("partial-inlining"))
-  {
-    // inline those functions marked as "inlined"
-    // we no longer do partial inlining by default -- can just as
-    // well be done in the backend
-    print(8, "Partial inlining");
-    goto_partial_inline(
-      compiled_functions,
-      ns,
-      get_message_handler());
-  }
-
   // parse object files
   while(object_files.size()>0)
   {
@@ -435,18 +407,6 @@ bool compilet::link()
       return true;
   }
 
-  if(cmdline.isset("show-symbol-table"))
-  {
-    show_symbol_table();
-    return true;
-  }
-
-  if(cmdline.isset("show-function-table"))
-  {
-    show_function_table();
-    return true;
-  }
-  
   // produce entry point?
   
   if(mode==COMPILE_LINK_EXECUTABLE)
@@ -492,38 +452,19 @@ bool compilet::compile()
 
     if(r) return true; // parser/typecheck error
 
-    if(mode==COMPILE_ONLY)
+    if(mode==COMPILE_ONLY || mode==ASSEMBLE_ONLY)
     {
       // output an object file for every source file
 
       // "compile" functions
       convert_symbols(compiled_functions);
 
-      if(cmdline.isset("show-symbol-table"))
-      {
-        show_symbol_table();
-        return true;
-      }
-
-      if(cmdline.isset("show-function-table"))
-      {
-        show_function_table();
-        return true;
-      }
-
       std::string cfn;
       
       if(output_file_object=="")
-      {
-        if(cmdline.isset('S')) // compile, but don't assemble
-          cfn=get_base_name(file_name) + ".s";
-        else
-          cfn=get_base_name(file_name) + "." + object_file_extension;
-      }
+        cfn=get_base_name(file_name) + "." + object_file_extension;
       else
-      {
         cfn=output_file_object;
-      }
 
       if(write_object_file(cfn, symbol_table, compiled_functions))
         return true;
@@ -569,10 +510,9 @@ bool compilet::parse(const std::string &file_name)
   // Using '-x', the type of a file can be overridden;
   // otherwise, it's guessed from the extension.
   
-  if(cmdline.isset('x'))
+  if(override_language!="")
   {
-    const std::string language=cmdline.getval('x');
-    if(language=="c++" || language=="c++-header")
+    if(override_language=="c++" || override_language=="c++-header")
       languagep=get_language_from_mode("cpp");
     else
       languagep=get_language_from_mode("C");
@@ -835,29 +775,6 @@ bool compilet::read_object(
     return true;
 
   return false;
-}
-
-/*******************************************************************\
-
-Function: compilet::show_function_table
-
-  Inputs: none
-
- Outputs: nothing
-
- Purpose: prints the function table to stdout
-
-\*******************************************************************/
-
-void compilet::show_function_table()
-{
-  for(goto_functionst::function_mapt::const_iterator
-      i=compiled_functions.function_map.begin();
-      i!=compiled_functions.function_map.end();
-      i++)
-  {
-    std::cout << i->first << std::endl;
-  }
 }
 
 /*******************************************************************\

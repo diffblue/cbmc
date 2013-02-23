@@ -13,7 +13,6 @@ Date: June 2006
 
 #include <symbol.h>
 #include <replace_symbol.h>
-#include <options.h>
 
 #include <langapi/language_ui.h>
 #include <goto-programs/goto_functions.h>
@@ -21,14 +20,15 @@ Date: June 2006
 class compilet:public language_uit
 {
 public:
-  optionst options;
   namespacet ns;
   goto_functionst compiled_functions;
   bool echo_file_name;
   std::string working_directory;
+  std::string override_language;
   
   enum { PREPROCESS_ONLY, // gcc -E
-         COMPILE_ONLY, // gcc -c, gcc -S
+         COMPILE_ONLY, // gcc -c
+         ASSEMBLE_ONLY, // gcc -S
          LINK_LIBRARY, // ld -r
          COMPILE_LINK, // gcc -shared
          COMPILE_LINK_EXECUTABLE // gcc
@@ -68,33 +68,6 @@ public:
 
 protected:
   cmdlinet &cmdline;
-  
-  #if 0
-  std::string &escape(std::string &);
-  static unsigned subgraphscount;
-
-  void write_edge( std::ostream&,
-                   const goto_programt::instructiont&,
-                   const goto_programt::instructiont&,
-                   const std::string&);
-
-  void find_next( const goto_programt::instructionst&,
-                  const goto_programt::const_targett&,
-                  std::set<goto_programt::const_targett>&,
-                  std::set<goto_programt::const_targett>&);
-  #endif
-                  
-  void show_function_table();
-  
-  #if 0
-  std::list<exprt> function_calls;
-  std::list<exprt> clusters;
-  bool write_dot_header( const std::string&, std::ofstream& );
-  void write_dot_subgraph( std::ostream&, 
-                           const std::string&, 
-                           goto_programt&);
-  void do_dot_function_calls( std::ostream & );
-  #endif
   
   unsigned function_body_count( const goto_functionst &functions );
   
