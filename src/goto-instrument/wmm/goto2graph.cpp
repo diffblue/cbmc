@@ -932,7 +932,7 @@ bool instrumentert::is_cfg_spurious(const event_grapht::critical_cyclet& cyc)
     const locationt& current_location = current_event.location;
 
     /* select relevant thread (po) -- or function contained in this thread */
-    goto_programt* current_po;
+    goto_programt* current_po=0;
     bool thread_found = false;
 
     Forall_goto_functions(f_it, goto_functions)
@@ -948,6 +948,7 @@ bool instrumentert::is_cfg_spurious(const event_grapht::critical_cyclet& cyc)
       if(thread_found)
         break;
     }
+    assert(current_po);
 
     const graph<abstract_eventt>::edgest& pos_cur = egraph.po_out(*e_it);
     const graph<abstract_eventt>::edgest& pos_next = egraph.po_out(*(++e_it));
