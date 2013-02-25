@@ -21,4 +21,8 @@ void string_instrumentation(
   message_handlert &message_handler,
   goto_functionst &dest);
 
+exprt is_zero_string(const exprt &what, bool write=false);
+exprt zero_string_length(const exprt &what, bool write=false);
+exprt buffer_size(const exprt &what);
+
 #endif
