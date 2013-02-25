@@ -11,6 +11,24 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
+Function: languaget::dependencies
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void languaget::dependencies(
+  const std::string &module,
+  std::set<std::string> &modules)
+{
+}
+
+/*******************************************************************\
+
 Function: languaget::from_expr
 
   Inputs:

@@ -39,8 +39,7 @@ public:
   
   virtual void dependencies(
     const std::string &module,
-    std::set<std::string> &modules)
-  { }
+    std::set<std::string> &modules);
 
   // add modules provided by currently parsed file to set
 
