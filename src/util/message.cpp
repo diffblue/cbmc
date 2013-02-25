@@ -119,3 +119,21 @@ void message_clientt::set_message_handler(
 {
   message_handler=&_message_handler;
 }
+
+/*******************************************************************\
+
+Function: message_clientt::set_verbosity
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void message_clientt::set_verbosity(unsigned _verbosity)
+{
+  verbosity=_verbosity;
+}
+

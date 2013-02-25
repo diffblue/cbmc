@@ -68,6 +68,7 @@ public:
 
   virtual void set_message_handler(message_handlert &_message_handler);
 
+/*
   virtual void set_verbosity(int cmdline_val, unsigned default_v)
   {
     if(cmdline_val<0 || cmdline_val>10)
@@ -75,9 +76,9 @@ public:
     else
       set_verbosity(cmdline_val);
   }
+*/
 
-  virtual void set_verbosity(unsigned _verbosity)
-  { verbosity=_verbosity; }
+  virtual void set_verbosity(unsigned _verbosity);
   
   // Levels:
   //
