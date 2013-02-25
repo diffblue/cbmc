@@ -109,6 +109,8 @@ void ansi_c_internal_additions(std::string &code)
     "void __CPROVER_atomic_begin();\n"
     "void __CPROVER_atomic_end();\n"
     "void __CPROVER_fence(const char *kind, ...);\n"
+    "unsigned long long __CPROVER_threads_exited=0;\n"
+    "unsigned long __CPROVER_next_thread_id=0;\n"
 
     // traces
     "void CBMC_trace(int lvl, const char *event, ...);\n"
