@@ -23,6 +23,69 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
+Function: is_zero_string
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+exprt is_zero_string(
+  const exprt &what,
+  bool write)
+{
+  exprt result=predicate_exprt("is_zero_string");
+  result.copy_to_operands(what);
+  result.set("lhs", write);
+  return result;
+}
+
+/*******************************************************************\
+
+Function: zero_string_length
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+exprt zero_string_length(
+  const exprt &what,
+  bool write)
+{
+  exprt result("zero_string_length", size_type());
+  result.copy_to_operands(what);
+  result.set("lhs", write);
+  return result;
+}
+
+/*******************************************************************\
+
+Function: buffer_size
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+exprt buffer_size(const exprt &what)
+{
+  exprt result("buffer_size", size_type());
+  result.copy_to_operands(what);
+  return result;
+}
+
+/*******************************************************************\
+
    Class: string_instrumentationt
 
   Inputs:
@@ -47,33 +110,6 @@ public:
   
   void operator()(goto_programt &dest);
   void operator()(goto_functionst &dest);
-
-  exprt is_zero_string(
-    const exprt &what,
-    bool write=false)
-  {
-    exprt result=predicate_exprt("is_zero_string");
-    result.copy_to_operands(what);
-    result.set("lhs", write);
-    return result;
-  }
-
-  exprt zero_string_length(
-    const exprt &what,
-    bool write=false)
-  {
-    exprt result("zero_string_length", size_type());
-    result.copy_to_operands(what);
-    result.set("lhs", write);
-    return result;
-  }
-
-  exprt buffer_size(const exprt &what)
-  {
-    exprt result("buffer_size", size_type());
-    result.copy_to_operands(what);
-    return result;
-  }
 
 protected:
   symbol_tablet &symbol_table;
