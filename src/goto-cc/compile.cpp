@@ -765,6 +765,8 @@ bool compilet::read_object(
   // hardwired to C-style linking
 
   linkingt linking(symbol_table, temp_symbol_table, ui_message_handler);
+  
+  linking.set_verbosity(verbosity);
 
   if(linking.typecheck_main())
     return true;
