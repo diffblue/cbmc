@@ -491,11 +491,16 @@ bool configt::set(const cmdlinet &cmdline)
     if(arch=="x86_64")
       ansi_c.set_LLP64();
     
-    // On Windows, wchar_t is unsigned 16 bit, and
-    // long double is the same as double.
+    // On Windows, wchar_t is unsigned 16 bit.
     ansi_c.wchar_t_width=2*8;
     ansi_c.wchar_t_is_unsigned=true;
-    ansi_c.long_double_width=8*8;
+
+    // In 32-bit mode, long double is the same as double in Visual Studio,
+    // but it's 16 bytes with GCC with the 64-bit target.
+    if(arch=="x64_64" && cmdline.isset("gcc"))
+      ansi_c.long_double_width=16*8;
+    else
+      ansi_c.long_double_width=8*8;
 
     // there are gcc versions that target Windows
     if(cmdline.isset("gcc"))
@@ -534,8 +539,12 @@ bool configt::set(const cmdlinet &cmdline)
     assert(ansi_c.pointer_width==sizeof(void *)*8);
     assert(ansi_c.single_width==sizeof(float)*8);
     assert(ansi_c.double_width==sizeof(double)*8);
-    assert(ansi_c.long_double_width==sizeof(long double)*8);
     assert(ansi_c.char_is_unsigned==(char(255)==255));
+
+    #ifndef _WIN32
+    // On Windows, long double width varies by compiler
+    assert(ansi_c.long_double_width==sizeof(long double)*8);
+    #endif
   }  
   
   // the following allows overriding the defaults
