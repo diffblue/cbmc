@@ -11,6 +11,44 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
+Function: languaget::final
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool languaget::final(
+  symbol_tablet &symbol_table,
+  message_handlert &message_handler)
+{
+  return false;
+}
+
+/*******************************************************************\
+
+Function: languaget::interfaces
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool languaget::interfaces(
+  symbol_tablet &symbol_table,
+  message_handlert &message_handler)
+{
+  return false;
+}
+
+/*******************************************************************\
+
 Function: languaget::dependencies
 
   Inputs:

@@ -78,8 +78,6 @@ public:
   }
 */
 
-  virtual void set_verbosity(unsigned _verbosity);
-  
   // Levels:
   //
   //  0 none
@@ -91,10 +89,8 @@ public:
   //  9 + progress information
   // 10 + debug info
   
-  virtual unsigned get_verbosity() const
-  {
-    return verbosity;
-  }
+  virtual void set_verbosity(unsigned _verbosity);
+  virtual unsigned get_verbosity() const;
   
   message_clientt()
   {

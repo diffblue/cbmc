@@ -50,15 +50,13 @@ public:
 
   virtual bool final(
     symbol_tablet &symbol_table,
-    message_handlert &message_handler)
-  { return false; }
+    message_handlert &message_handler);
 
   // type check interfaces of currently parsed file
 
   virtual bool interfaces(
     symbol_tablet &symbol_table,
-    message_handlert &message_handler)
-  { return false; }
+    message_handlert &message_handler);
 
   // type check a module in the currently parsed file
 
