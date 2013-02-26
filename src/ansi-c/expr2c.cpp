@@ -407,7 +407,10 @@ std::string expr2ct::convert_rec(
   
     const typet &return_type=code_type.return_type();
 
-    std::string dest=convert(return_type)+" ";
+    // C doesn't really have syntax for function types,
+    // i.e., the following won't parse
+  
+    std::string dest=convert(return_type)+" ()";
 
     dest+="(";
     const code_typet::argumentst &arguments=code_type.arguments();
