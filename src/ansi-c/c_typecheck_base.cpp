@@ -550,6 +550,27 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
     {
       // this is ok for now
     }
+    else if(final_old.id()==ID_pointer &&
+            follow(final_old).subtype().id()==ID_code &&
+            to_code_type(follow(final_old).subtype()).has_ellipsis() &&
+            final_new.id()==ID_pointer &&
+            follow(final_new).subtype().id()==ID_code)
+    {
+      // to allow 
+      // int (*f) ();
+      // int (*f) (int)=0;
+      old_symbol.type=new_symbol.type;
+    }
+    else if(final_old.id()==ID_pointer &&
+            follow(final_old).subtype().id()==ID_code &&
+            final_new.id()==ID_pointer &&
+            follow(final_new).subtype().id()==ID_code &&
+            to_code_type(follow(final_new).subtype()).has_ellipsis())
+    {
+      // to allow 
+      // int (*f) (int)=0;
+      // int (*f) ();
+    }
     else
     {
       err_location(new_symbol.location);
