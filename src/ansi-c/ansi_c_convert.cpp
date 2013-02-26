@@ -68,7 +68,7 @@ void ansi_c_convertt::convert_declaration(ansi_c_declarationt &declaration)
 
   if(declaration.value().is_not_nil())
   {
-    if(declaration.type().id()==ID_code)
+    if(declaration.value().type().id()==ID_code)
       convert_code(to_code(declaration.value()));
     else
       convert_expr(declaration.value());
