@@ -90,10 +90,8 @@ void smt2_propt::finalize()
   
   out << std::endl;
 
-  if (core_enabled)
-  {
+  if(core_enabled)
     out << "(get-unsat-core)" << std::endl;
-  }
   
   out << "; end of SMT2 file" << std::endl;
 }
