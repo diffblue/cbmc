@@ -137,3 +137,20 @@ void message_clientt::set_verbosity(unsigned _verbosity)
   verbosity=_verbosity;
 }
 
+/*******************************************************************\
+
+Function: message_clientt::get_verbosity
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+unsigned message_clientt::get_verbosity() const
+{
+  return verbosity;
+}
+
