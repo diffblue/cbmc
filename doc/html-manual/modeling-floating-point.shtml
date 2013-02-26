@@ -24,7 +24,10 @@
   be <code>binary64</code>, <code>binary128</code> (quad precision) or
   a 96 bit type with 15 exponent bits and 80 significant bits.  The
   last is an approximation of Intel's x87 extended precision double data
-  type.  The default is matched to the build architecture.
+  type.  As the C standard allows a implementations a fairly wide set
+  of options for <code>long double</code>, it is best avoided for both
+  portable code and bit-precise analysis.  The default is to match the
+  build architecture as closely as possible.
   </p></li>
 
 <li><p class="justified">
@@ -42,8 +45,8 @@
   </p></li>
 
 <li><p class="justified">
-  Constant expressions are only evaluated at `run' time and so will
-  respect changes in the rounding mode.  In effect
+  Constant expressions are evaluated at `run' time wherever possible
+  and so will respect changes in the rounding mode.  In effect
   the <code>FENV_ACCESS</code> pragma is always off.
   </p></li>
 </ul>
@@ -68,7 +71,12 @@
   Changing the compiler flags to use the SSE registers will resolve
   many of them, give a more standards-compliant platform and will
   likely perform better.  Thus it is <em>highly</em> recommended.
-  Use <code>-msse2 -mfpmath=sse</code> to enable this option for GCC.</p>
+  Use <code>-msse2 -mfpmath=sse</code> to enable this option for
+  GCC.  Visual C++ does not have an option to force the exclusive use
+  of SSE instructions but <code>/arch:SSE2</code> will pick SSE
+  instructions "when it [the compiler] determines that it is faster to
+  use the SSE/SSE2 instructions" and is thus better
+  than <code>/arch:IA32</code> which exclusively uses the x87 unit.</p>
 
 <p class="justified">The other common cause of discrepancy between
   CPROVER results and the actual platform are the use of unsafe
