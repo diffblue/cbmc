@@ -71,15 +71,23 @@ std::string type2name(const typet &type)
     const code_typet::argumentst arguments=t.arguments();
     result+="P(";
 
-    for(code_typet::argumentst::const_iterator it=arguments.begin();
+    for(code_typet::argumentst::const_iterator
+        it=arguments.begin();
         it!=arguments.end();
         it++)
     {      
+      if(it!=arguments.begin()) result+="|";
       result+=type2name(it->type());
-      result+="'" + id2string(it->get_identifier()) + "'|";
     }
-    result.resize(result.size()-1);
-    result+=")";
+
+    if(t.has_ellipsis())
+    {
+      if(!arguments.empty()) result+="|";
+      result+="...";
+    }
+
+    result+=")->";
+    result+=type2name(t.return_type());
   }
   else if(type.id()==ID_array)
   {
