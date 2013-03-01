@@ -72,7 +72,7 @@ Function: from_integer
 
 \*******************************************************************/
 
-exprt from_integer(
+constant_exprt from_integer(
   const mp_integer &int_value,
   const typet &type)
 {
@@ -86,7 +86,7 @@ exprt from_integer(
   }
   else if(type_id==ID_natural)
   {
-    if(int_value<0) { return nil_exprt(); }
+    if(int_value<0) { constant_exprt r; r.make_nil(); return r; }
     constant_exprt result(type);
     result.set_value(integer2string(int_value));
     return result;
@@ -122,7 +122,11 @@ exprt from_integer(
     }
   }
 
-  return nil_exprt();
+  {
+    constant_exprt r;
+    r.make_nil();
+    return r;
+  }
 }
 
 /*******************************************************************\

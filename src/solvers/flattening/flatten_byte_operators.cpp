@@ -118,9 +118,12 @@ exprt flatten_byte_extract(
       }
 
       // the new offset is width%offset
-      exprt new_offset=
-        (element_width==1)?from_integer(0, offset_type):
-        mod_exprt(offset, from_integer(element_width, offset_type));
+      exprt new_offset;
+      
+      if(element_width==1)
+        new_offset=from_integer(0, offset_type);
+      else
+        new_offset=mod_exprt(offset, from_integer(element_width, offset_type));
 
       // build new byte-extract expression
       exprt tmp(src.id(), src.type());

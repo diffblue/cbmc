@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <arith_tools.h>
 #include <i2string.h>
+#include <std_expr.h>
 
 #include <ansi-c/c_types.h>
 
