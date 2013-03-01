@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <arith_tools.h>
 #include <config.h>
 #include <std_types.h>
+#include <std_expr.h>
 #include <expr_util.h>
 
 #include "convert_integer_literal.h"
