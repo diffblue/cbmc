@@ -117,3 +117,6 @@ Follow these instructions:
    from Cygwin from in there.
 
 5) Type cd src; make - that should do it.
+   Note that "nmake" is not expected to work. Use "make".
+
+
