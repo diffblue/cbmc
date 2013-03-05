@@ -136,9 +136,6 @@ bool compilet::doit()
   if(source_files.size()>0)
     if(compile()) return true;
 
-  if(mode==PREPROCESS_ONLY)
-    return false; // we are done
-
   if(mode==LINK_LIBRARY ||
      mode==COMPILE_LINK ||
      mode==COMPILE_LINK_EXECUTABLE)
