@@ -57,7 +57,8 @@ void goto_convertt::finish_gotos()
         if(l_it==targets.labels.end())
         {
           err_location(i.code);
-          str << "goto label " << it->id_string() << " not found";
+          str << "goto label `" << it->id_string() << "' not found";
+          error();
           throw 0;
         }
           
@@ -74,7 +75,8 @@ void goto_convertt::finish_gotos()
       if(l_it==targets.labels.end())
       {
         err_location(i.code);
-        str << "goto label " << goto_label << " not found";
+        str << "goto label `" << goto_label << "' not found";
+        error();
         throw 0;
       }
 
@@ -89,7 +91,8 @@ void goto_convertt::finish_gotos()
       if(l_it==targets.labels.end())
       {
         err_location(i.code);
-        str << "goto label " << goto_label << " not found";
+        str << "goto label `" << goto_label << "' not found";
+        error();
         throw 0;
       }
 
@@ -425,6 +428,7 @@ void goto_convertt::convert(
       err_location(code.op0());
       str << "static assertion "
           << get_string_constant(code.op1());
+      error();
       throw 0;
     }
     else if(assertion.is_true())
