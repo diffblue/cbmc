@@ -2789,6 +2789,17 @@ array_abstract_declarator:
           stack($$).add(ID_subtype)=irept(ID_abstract);
           stack($$).add(ID_size).make_nil();
         }
+        | '[' attribute_type_qualifier_list ']'
+        {
+          // this is C99: e.g., restrict, const, etc
+          // The type qualifier belongs to the array, not the
+          // contents of the array, nor the size.
+          set($1, ID_array);
+          stack($1).add(ID_subtype)=irept(ID_abstract);
+          stack($1).add(ID_size).make_nil();
+          merge_types($2, $1); // dest=$2
+          $$=$2;
+        }
         | '[' '*' ']'
         {
           $$=$1;
@@ -2803,14 +2814,23 @@ array_abstract_declarator:
           stack($$).add(ID_size).swap(stack($2));
           stack($$).add(ID_subtype)=irept(ID_abstract);
         }
+        | '[' TOK_STATIC constant_expression ']'
+        {
+          // this is C99 and the constant_expression is a minimum size
+          $$=$1;
+          set($$, ID_array);
+          stack($$).add(ID_size).swap(stack($2));
+          stack($$).add(ID_subtype)=irept(ID_abstract);
+        }
         | '[' attribute_type_qualifier_list constant_expression ']'
         {
           // The type qualifier belongs to the array, not the
           // contents of the array, nor the size.
-          $$=$1;
-          set($$, ID_array);
-          stack($$).add(ID_size).swap(stack($3));
-          stack($$).add(ID_subtype)=irept(ID_abstract);
+          set($1, ID_array);
+          stack($1).add(ID_size).swap(stack($3));
+          stack($1).add(ID_subtype)=irept(ID_abstract);
+          merge_types($2, $1); // dest=$2
+          $$=$2;
         }
         | array_abstract_declarator '[' constant_expression ']'
         {

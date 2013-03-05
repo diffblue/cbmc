@@ -67,6 +67,18 @@ void c_typecheck_baset::typecheck_type(typet &type)
     typecheck_symbol_type(type);
   else if(type.id()==ID_vector)
     typecheck_vector_type(to_vector_type(type));
+
+  // do a bit of rule checking
+
+  if(type.get_bool(ID_C_restricted) &&
+     type.id()!=ID_pointer &&
+     type.id()!=ID_array)
+  {
+    err_location(type);
+    error("only a pointer can be 'restrict'");
+    throw 0;
+  }
+  
 }
 
 /*******************************************************************\
@@ -84,7 +96,7 @@ Function: c_typecheck_baset::typecheck_code_type
 void c_typecheck_baset::typecheck_code_type(code_typet &type)
 {
   code_typet::argumentst &arguments=type.arguments();
-
+  
   // if we don't have any arguments, we assume it's (...)
   if(arguments.empty())
   {

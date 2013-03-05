@@ -70,7 +70,7 @@ void ansi_c_convert_typet::read_rec(const typet &type)
   }
   else if(type.id()==ID_const)
     c_qualifiers.is_constant=true;
-  else if(type.id()==ID_restricted)
+  else if(type.id()==ID_restrict)
     c_qualifiers.is_restricted=true;
   else if(type.id()==ID_char)
     char_cnt++;

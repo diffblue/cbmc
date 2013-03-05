@@ -31,7 +31,7 @@ std::string c_qualifierst::as_string() const
     qualifiers+="volatile ";
 
   if(is_restricted)
-    qualifiers+="restricted ";
+    qualifiers+="restrict ";
     
   if(is_ptr32)
     qualifiers+="__ptr32 ";
