@@ -354,7 +354,6 @@ C_qualifier #qualifier
 C_ptr32 #ptr32
 C_ptr64 #ptr64
 C_atomic #atomic
-restricted
 restrict
 byte_extract_big_endian
 byte_extract_little_endian

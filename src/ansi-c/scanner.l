@@ -306,7 +306,7 @@ void ansi_c_scanner_init()
 "int"		{ loc(); return TOK_INT; }
 "long"		{ loc(); return TOK_LONG; }
 "register"	{ loc(); return TOK_REGISTER; }
-"restrict"      { /* C99, ignore for now */ }
+"restrict"      { loc(); return TOK_RESTRICT; }
 "return"	{ loc(); return TOK_RETURN; }
 "short" 	{ loc(); return TOK_SHORT; }
 "signed"	{ loc(); return TOK_SIGNED; }
@@ -643,8 +643,8 @@ __decltype          { if(PARSER.cpp && PARSER.mode==ansi_c_parsert::GCC)
 
 "__extension__" { /* ignore */ }
 
-"__restrict"    { /* gcc, ignore */ }
-"__restrict__"  { /* gcc, ignore */ }
+"__restrict"    { loc(); return TOK_RESTRICT; }
+"__restrict__"  { loc(); return TOK_RESTRICT; }
 
 "_cdecl"        { /* ignore */ }
 "__cdecl"       { /* ignore */ }
