@@ -10,7 +10,7 @@ class acceleratet {
  public:
   acceleratet(goto_programt &_program,
               goto_functionst &_goto_functions,
-              namespacet &_ns) :
+              const namespacet &_ns) :
       program(_program),
       goto_functions(_goto_functions),
       ns(_ns)
@@ -40,10 +40,12 @@ class acceleratet {
 
   goto_programt &program;
   goto_functionst &goto_functions;
-  namespacet &ns;
+  const namespacet &ns;
   natural_loopst natural_loops;
 
   typedef map<patht, goto_programt> accelerator_mapt;
 };
 
-void accelerate_functions(goto_functionst &functions, namespacet &ns);
+void accelerate_functions(
+  goto_functionst &functions,
+  const namespacet &ns);
