@@ -3134,7 +3134,7 @@ std::string expr2ct::convert_code_function_call(
     i++;
   }
 
-  dest+=")";
+  dest+=");";
 
   return dest;
 }
