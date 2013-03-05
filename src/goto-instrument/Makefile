@@ -4,7 +4,7 @@ SRC = main.cpp parseoptions.cpp document_claims.cpp languages.cpp \
       alignment_checks.cpp race_check.cpp rw_set.cpp \
       nondet_volatile.cpp interrupt.cpp \
       mmio.cpp stack_depth.cpp nondet_static.cpp \
-      concurrency.cpp dump_c.cpp dot.cpp \
+      concurrency.cpp dump_c.cpp dot.cpp havoc_loops.cpp \
       wmm/weak_memory.cpp wmm/fence.cpp wmm/event_graph.cpp \
       wmm/goto2graph.cpp wmm/data_dp.cpp wmm/abstract_event.cpp \
       wmm/instrumenter_strategies.cpp wmm/cycle_collection.cpp

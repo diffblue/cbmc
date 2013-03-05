@@ -53,6 +53,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "concurrency.h"
 #include "dump_c.h"
 #include "dot.h"
+#include "havoc_loops.h"
 #include "wmm/weak_memory.h"
 
 /*******************************************************************\
@@ -624,6 +625,12 @@ void goto_instrument_parseoptionst::instrument_goto_program(
         goto_functions);
     }
   }  
+
+  if(cmdline.isset("havoc-loops"))
+  {
+    status("Havocing loops");
+    havoc_loops(goto_functions);
+  }
 
   // add failed symbols
   add_failed_symbols(symbol_table);
