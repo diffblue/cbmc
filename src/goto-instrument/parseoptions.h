@@ -43,7 +43,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(full-slice)(reachability-slice)" \
   "(show-symbol-table)(show-claims)(show-points-to)" \
   "(show-rw-set)(cav11)" \
-  "(show-natural-loops)" \
+  "(show-natural-loops)(accelerate)(havoc-loops)" \
   "(error-label):(string-abstraction)" \
   "(verbosity):(version)(xml-ui)"
 
