@@ -15,7 +15,7 @@ Author: Georg Weissenbacher, georg@weissenbacher.name
 
 /*******************************************************************\
 
-Function: natural_loopst::operator()
+Function: natural_loopst::compute
 
   Inputs:
 
@@ -25,7 +25,7 @@ Function: natural_loopst::operator()
 
 \*******************************************************************/
 
-void natural_loopst::operator()(const goto_programt& program)
+void natural_loopst::compute(const goto_programt &program)
 {
   cfg_dominators(program);
 #ifdef DEBUG
@@ -138,5 +138,33 @@ void natural_loopst::output(std::ostream &out) const
         out << ", ";
     }
     out << " } " << std::endl;
+  }
+}
+
+/*******************************************************************\
+
+Function: show_natural_loops
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void show_natural_loops(const goto_functionst &goto_functions)
+{
+  for(goto_functionst::function_mapt::const_iterator
+      it=goto_functions.function_map.begin();
+      it!=goto_functions.function_map.end();
+      it++)
+  {
+    std::cout << "*** " << it->first << std::endl;
+
+    natural_loopst natural_loops(it->second.body);
+    natural_loops.output(std::cout);
+    
+    std::cout << std::endl;
   }
 }
