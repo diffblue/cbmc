@@ -155,10 +155,7 @@ Function: show_natural_loops
 
 void show_natural_loops(const goto_functionst &goto_functions)
 {
-  for(goto_functionst::function_mapt::const_iterator
-      it=goto_functions.function_map.begin();
-      it!=goto_functions.function_map.end();
-      it++)
+  forall_goto_functions(it, goto_functions)
   {
     std::cout << "*** " << it->first << std::endl;
 

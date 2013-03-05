@@ -76,9 +76,6 @@ void show_loop_ids(
   ui_message_handlert::uit ui,
   const goto_functionst &goto_functions)
 {
-  for(goto_functionst::function_mapt::const_iterator
-      it=goto_functions.function_map.begin();
-      it!=goto_functions.function_map.end();
-      it++)
+  forall_goto_functions(it, goto_functions)
     show_loop_ids(ui, it->second.body);
 }
