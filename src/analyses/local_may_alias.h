@@ -24,7 +24,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class local_may_aliast
 {
 public:
-  local_may_aliast(goto_programt &goto_program)
+  local_may_aliast(const goto_programt &goto_program)
   {
     build(goto_program);
   }
@@ -46,7 +46,7 @@ public:
   }
           
 protected:
-  void build(goto_programt &goto_program);
+  void build(const goto_programt &goto_program);
   
   bool may_alias(const exprt &e1, const exprt &e2);
 };

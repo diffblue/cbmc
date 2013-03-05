@@ -10,7 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
-Function: 
+Function: local_may_aliast::build
 
   Inputs:
 
@@ -20,3 +20,6 @@ Function:
 
 \*******************************************************************/
 
+void local_may_aliast::build(const goto_programt &goto_program)
+{
+}
