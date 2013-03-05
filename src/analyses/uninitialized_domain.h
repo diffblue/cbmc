@@ -17,10 +17,6 @@ public:
   typedef std::set<irep_idt> uninitializedt;
   uninitializedt uninitialized;
 
-  // locals that might be accessed via a pointer
-  typedef std::set<irep_idt> dirtyt;
-  dirtyt dirty;
-  
   virtual void transform(
     const namespacet &ns,
     locationt from,
@@ -34,10 +30,6 @@ public:
   bool merge(const uninitialized_domaint &other);
   
 protected:
-  void find_dirty(
-    const namespacet &ns,
-    const exprt &expr);
-    
   void assign(const exprt &lhs);
 };
 

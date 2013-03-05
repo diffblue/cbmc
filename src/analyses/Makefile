@@ -1,4 +1,4 @@
-SRC = cfg_dominators.cpp natural_loops.cpp is_threaded.cpp \
+SRC = cfg_dominators.cpp natural_loops.cpp is_threaded.cpp dirty_locals.cpp \
       invariant_set.cpp invariant_set_domain.cpp invariant_propagation.cpp \
       static_analysis.cpp uninitialized_domain.cpp local_may_alias.cpp
 

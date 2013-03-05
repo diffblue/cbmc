@@ -48,45 +48,12 @@ void uninitialized_domaint::transform(
       std::list<exprt> read=expressions_read(*from);
       std::list<exprt> written=expressions_written(*from);
 
-      forall_expr_list(it, read) find_dirty(ns, *it);
       forall_expr_list(it, written) assign(*it);
       
       // we only care about the *first* uninitalized use
       forall_expr_list(it, read) assign(*it);
     }
   }
-}
-
-/*******************************************************************\
-
-Function: uninitialized_domaint::find_dirty
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void uninitialized_domaint::find_dirty(
-  const namespacet &ns,
-  const exprt &expr)
-{
-  if(expr.id()==ID_address_of)
-  {
-    const address_of_exprt &address_of_expr=to_address_of_expr(expr);
-    if(address_of_expr.object().id()==ID_symbol)
-    {
-      const irep_idt &identifier=
-        to_symbol_expr(address_of_expr.object()).get_identifier();
-      const symbolt &symbol=ns.lookup(identifier);
-      if(!symbol.is_static_lifetime) dirty.insert(identifier);
-    }
-  }
-  
-  forall_operands(it, expr)
-    find_dirty(ns, *it);
 }
 
 /*******************************************************************\
@@ -127,19 +94,11 @@ void uninitialized_domaint::output(
   const namespacet &ns,
   std::ostream &out) const
 {
-  out << "Uninitialized:" << std::endl;
   for(uninitializedt::const_iterator
       it=uninitialized.begin();
       it!=uninitialized.end();
       it++)
-    out << "  " << *it << std::endl;
-
-  out << "Dirty:" << std::endl;
-  for(dirtyt::const_iterator
-      it=dirty.begin();
-      it!=dirty.end();
-      it++)
-    out << "  " << *it << std::endl;
+    out << *it << std::endl;
 }
 
 /*******************************************************************\
@@ -157,14 +116,10 @@ Function: uninitialized_domaint::merge
 bool uninitialized_domaint::merge(const uninitialized_domaint &other)
 {
   unsigned old_uninitialized=uninitialized.size();
-  unsigned old_dirty=dirty.size();
   
   uninitialized.insert(
     other.uninitialized.begin(),
     other.uninitialized.end());
 
-  dirty.insert(other.dirty.begin(), other.dirty.end());
-    
-  return old_uninitialized!=uninitialized.size() ||
-         old_dirty!=dirty.size();
+  return old_uninitialized!=uninitialized.size();
 }
