@@ -151,7 +151,8 @@ void acceleratet::add_accelerator(goto_programt::targett &loop_header,
   jump->targets.push_back(loop_header);
 }
 
-int acceleratet::accelerate_loops() {
+int acceleratet::accelerate_loops()
+{
   int num_accelerated = 0;
 
   for (natural_loopst::loop_mapt::iterator it = natural_loops.loop_map.begin();
@@ -189,8 +190,12 @@ bool acceleratet::accelerate(patht &path, goto_programt &accelerator) {
   }
 }
 
-void accelerate_functions(goto_functionst &functions, namespacet &ns) {
-  Forall_goto_functions (it, functions) {
+void accelerate_functions(
+  goto_functionst &functions,
+  const namespacet &ns)
+{
+  Forall_goto_functions (it, functions)
+  {
     cout << "Accelerating function " << it->first << endl;
     acceleratet accelerate(it->second.body, functions, ns);
 
@@ -201,4 +206,3 @@ void accelerate_functions(goto_functionst &functions, namespacet &ns) {
     }
   }
 }
-
