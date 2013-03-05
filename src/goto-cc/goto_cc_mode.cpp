@@ -130,7 +130,6 @@ int goto_cc_modet::main(int argc, const char **argv)
 
   catch(int e)
   {
-    error("Integer Exception");
     return EX_SOFTWARE;
   }
   
