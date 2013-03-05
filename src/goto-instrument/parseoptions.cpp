@@ -33,6 +33,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <pointer-analysis/add_failed_symbols.h>
 #include <pointer-analysis/show_value_sets.h>
 
+#include <analyses/natural_loops.h>
+
 #include "parseoptions.h"
 #include "version.h"
 #include "document_claims.h"
@@ -216,6 +218,13 @@ int goto_instrument_parseoptionst::doit()
     if(cmdline.isset("show-loops"))
     {
       show_loop_ids(get_ui(), goto_functions);
+      return 0;
+    }
+
+    if(cmdline.isset("show-natural-loops"))
+    {
+      const namespacet ns(symbol_table);
+      show_natural_loops(goto_functions);
       return 0;
     }
 
@@ -676,16 +685,19 @@ void goto_instrument_parseoptionst::help()
     " goto-instrument in out              perform instrumentation\n"
     "\n"
     "Main options:\n"
-    " --show-loops                 show the loops in the program\n"
-    " --show-claims                show claims\n"
     " --document-claims-html       generate HTML claim documentation\n"
     " --document-claims-latex      generate Latex claim documentation\n"
-    " --show-symbol-table          show symbol table\n"
-    " --show-goto-functions        show goto program\n"
-    " --show-struct-alignment      show struct members that might be concurrently accessed\n"
     " --dump-c                     generate C source\n"
     " --dot                        generate CFG graph in DOT format\n"
     " --interpreter                do concrete execution\n"
+    "\n"
+    "Diagnosis:\n"
+    " --show-loops                 show the loops in the program\n"
+    " --show-claims                show claims\n"
+    " --show-symbol-table          show symbol table\n"
+    " --show-goto-functions        show goto program\n"
+    " --show-struct-alignment      show struct members that might be concurrently accessed\n"
+    " --show-natural-loops         show natural loop heads\n"
     "\n"
     "Safety checks:\n"
     " --no-assertions              ignore user assertions\n"
@@ -702,17 +714,19 @@ void goto_instrument_parseoptionst::help()
     "\n"
     "Semantic transformations:\n"
     " --nondet-volatile            makes reads from volatile variables non-deterministic\n"
-    " --unwind <n>                 unwinds the loops <n> times\n"
-    " --isr function               instruments an interrupt service routine\n"
+    " --unwind <n>                 unwinds the loopds <n> times\n"
+    " --isr <function>             instruments an interrupt service routine\n"
     " --mmio                       instruments memory-mapped I/O\n"
     " --nondet-static              add nondeterministic initialization of variables with static lifetime\n"
     " --check-invariant function   instruments invariant checking function\n"
     "\n"
+    "Loop transformations:\n"
+    " --k-induction <k>            check loops with k-induction\n"
+    " --havoc-loops                over-approximate all loops\n"
+    " --accelerate                 add loop accelerators\n"
+    "\n"
     "Memory model instrumentations:\n"
-    " --wmm tso                    instruments weak memory models with buffers (TSO)\n"
-    " --wmm pso                    instruments weak memory models with buffers (PSO)\n"
-    " --wmm rmo                    instruments weak memory models with buffers (RMO)\n"
-    " --wmm power                  instruments weak memory models with buffers and queues (Power)\n"
+    " --wmm <tso,pso,rmo,power>    instruments a weak memory model\n"
     " --scc                        detects critical cycles per SCC (one thread per SCC)\n"
     " --one-event-per-cycle        only instruments one event per cycle\n"
     " --minimum-interference       instruments an optimal number of events\n"
