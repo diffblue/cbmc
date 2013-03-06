@@ -1182,6 +1182,17 @@ typeof_type_specifier:
           $$=$1;
           merge_types($$, $2);
         }
+        | type_qualifier_list typeof_specifier type_qualifier_list
+        {
+          $$=$1;
+          merge_types($$, $3);
+          merge_types($$, $2);
+        }
+        | typeof_specifier type_qualifier_list
+        {
+          $$=$2;
+          merge_types($$, $1);
+        }
         ;
 
 /*
