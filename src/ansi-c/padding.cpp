@@ -28,6 +28,18 @@ Function: alignment
 
 unsigned alignment(const typet &type, const namespacet &ns)
 {
+  // is the alignment given?
+  const exprt &given_alignment=
+    static_cast<const exprt &>(type.find(ID_C_alignment));
+
+  if(given_alignment.is_not_nil())
+  {
+    mp_integer a_int;
+    if(!to_integer(given_alignment, a_int))
+      return integer2long(a_int);
+      // we trust it blindly, no matter how nonsensical
+  }
+
   // compute default
 
   if(type.id()==ID_array)
