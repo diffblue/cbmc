@@ -19,10 +19,17 @@
 #define _Alignof __alignof
 #endif
 
+#define _Alignof __alignof__
+
 int f();
+int some_var;
 
 STATIC_ASSERT(_Alignof(char)==1);
 STATIC_ASSERT(_Alignof(char[10])==1);
+
+// also works without parentheses if it's an expression
+STATIC_ASSERT(_Alignof some_var);
+STATIC_ASSERT(_Alignof f);
 
 #ifndef _WIN32
 STATIC_ASSERT(_Alignof(char[f()])==1);

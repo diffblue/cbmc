@@ -287,7 +287,6 @@ primary_expression:
         | gcc_builtin_expressions
         | cw_builtin_expressions
         | offsetof
-        | alignof
         | quantifier_expression
         | generic_selection
         ;
@@ -393,19 +392,6 @@ offsetof_member_designator:
         }
         ;
           
-alignof: TOK_ALIGNOF '(' unary_expression ')'
-        { $$=$1;
-          set($$, ID_alignof);
-          mto($$, $3);
-        }
-        | TOK_ALIGNOF '(' type_name ')'
-        {
-          $$=$1;
-          stack($$).id(ID_alignof);
-          stack($$).add(ID_type_arg).swap(stack($3));
-        }
-        ;
-  
 quantifier_expression:
           TOK_FORALL compound_scope '{' declaration comma_expression '}'
         {
@@ -608,6 +594,18 @@ unary_expression:
         | TOK_SIZEOF '(' type_name ')'
         { $$=$1;
           set($$, ID_sizeof);
+          stack($$).add(ID_type_arg).swap(stack($3));
+        }
+        | TOK_ALIGNOF unary_expression
+        { // note no parentheses for expressions, just like sizeof
+          $$=$1;
+          set($$, ID_alignof);
+          mto($$, $2);
+        }
+        | TOK_ALIGNOF '(' type_name ')'
+        {
+          $$=$1;
+          stack($$).id(ID_alignof);
           stack($$).add(ID_type_arg).swap(stack($3));
         }
         | TOK_REAL unary_expression
