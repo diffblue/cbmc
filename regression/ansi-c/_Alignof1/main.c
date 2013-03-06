@@ -32,8 +32,18 @@ STATIC_ASSERT(_Alignof some_var);
 STATIC_ASSERT(_Alignof f);
 
 #ifndef _WIN32
+// newer versions of gcc and clang eat this
 STATIC_ASSERT(_Alignof(char[f()])==1);
 #endif
+
+#ifndef _WIN32
+// gcc-specific
+struct foo {
+  int x;
+} __attribute__((aligned(128+0)));
+
+STATIC_ASSERT(_Alignof(struct foo)==128);
+#endif    
 
 int main()
 {
