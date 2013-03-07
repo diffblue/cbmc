@@ -1795,17 +1795,27 @@ identifier_or_typedef_name:
         ;
 
 type_name:
-          type_specifier
-        | type_specifier abstract_declarator
+          gcc_type_attribute_opt type_specifier
         {
-          $$=$1;
-          make_subtype($$, $2);
+          $$=$2;
+          merge_types($$, $1);
         }
-        | type_qualifier_list
-        | type_qualifier_list abstract_declarator
+        | gcc_type_attribute_opt type_specifier abstract_declarator
         {
-          $$=$1;
-          make_subtype($$, $2);
+          $$=$2;
+          merge_types($$, $1);
+          make_subtype($$, $3);
+        }
+        | gcc_type_attribute_opt type_qualifier_list
+        {
+          $$=$2;
+          merge_types($$, $1);
+        }
+        | gcc_type_attribute_opt type_qualifier_list abstract_declarator
+        {
+          $$=$2;
+          merge_types($$, $1);
+          make_subtype($$, $3);
         }
         ;
 
