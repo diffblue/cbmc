@@ -33,7 +33,7 @@ STATIC_ASSERT(_Alignof f);
 
 #ifndef _WIN32
 // newer versions of gcc and clang eat this
-STATIC_ASSERT(_Alignof(char[f()])==1);
+//STATIC_ASSERT(_Alignof(char[f()])==1);
 #endif
 
 #ifndef _WIN32
@@ -43,6 +43,9 @@ struct foo {
 } __attribute__((aligned(128+0)));
 
 STATIC_ASSERT(_Alignof(struct foo)==128);
+
+// gcc takes the following, but clang doesn't
+STATIC_ASSERT(_Alignof(int __attribute__((aligned(128))))==128);
 #endif    
 
 int main()
