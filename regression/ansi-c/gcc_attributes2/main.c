@@ -17,5 +17,10 @@ int main()
   static_assert(sizeof(int16_t)==2, "width of int16_t");
   static_assert(sizeof(int32_t)==4, "width of int32_t");
   static_assert(sizeof(int64_t)==8, "width of int64_t");
+  
+  // also directly in the sizeof
+  static_assert(sizeof(int __attribute__((__mode__(__DI__))))==8, "width of int64_t");
+  static_assert(sizeof(__attribute__((__mode__(__DI__))) int)==8, "width of int64_t");
+  
 }
 
