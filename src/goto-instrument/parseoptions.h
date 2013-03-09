@@ -37,7 +37,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(nondet-volatile)(isr):" \
   "(stack-depth):(nondet-static)" \
   "(signed-overflow-check)(unsigned-overflow-check)" \
-  "(show-goto-functions)(show-value-sets)" \
+  "(show-goto-functions)(show-value-sets)(show-local-may-alias)" \
   "(show-struct-alignment)" \
   "(show-uninitialized)(show-locations)" \
   "(full-slice)(reachability-slice)" \
