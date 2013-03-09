@@ -29,7 +29,6 @@ Date: June 2006
 #include <goto-programs/goto_convert.h>
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/goto_inline.h>
-#include <goto-programs/goto_check.h>
 #include <goto-programs/goto_function_serialization.h>
 #include <goto-programs/read_goto_binary.h>
 #include <goto-programs/write_goto_binary.h>

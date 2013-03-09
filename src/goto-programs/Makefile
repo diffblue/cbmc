@@ -1,11 +1,9 @@
 SRC = goto_convert.cpp goto_convert_function_call.cpp \
-      goto_convert_side_effect.cpp \
-      goto_program.cpp basic_blocks.cpp goto_check.cpp \
+      goto_convert_side_effect.cpp goto_program.cpp basic_blocks.cpp \
       remove_function_pointers.cpp goto_functions.cpp goto_inline.cpp \
       remove_skip.cpp goto_convert_functions.cpp string_instrumentation.cpp \
       builtin_functions.cpp show_claims.cpp destructor.cpp set_claims.cpp \
-      reachability_slicer.cpp \
-      read_goto_binary.cpp goto_asm.cpp elf_reader.cpp \
+      reachability_slicer.cpp read_goto_binary.cpp goto_asm.cpp elf_reader.cpp \
       string_abstraction.cpp \
       goto_program_serialization.cpp goto_function_serialization.cpp \
       read_bin_goto_object.cpp goto_program_irep.cpp interpreter.cpp \

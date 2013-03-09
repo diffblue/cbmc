@@ -259,6 +259,44 @@ std::set<exprt> local_may_aliast::get(
 
 /*******************************************************************\
 
+Function: local_may_aliast::aliases
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: 
+
+\*******************************************************************/
+
+bool local_may_aliast::aliases(
+  const goto_programt::const_targett t,
+  const exprt &src1, const exprt &src2)
+{
+  cfgt::loc_mapt::const_iterator loc_it=cfg.loc_map.find(t);
+  
+  assert(loc_it!=cfg.loc_map.end());
+  
+  const loc_infot &loc_info_src=loc_infos[loc_it->second];
+  
+  std::set<unsigned> tmp1, tmp2;
+  get_rec(tmp1, src1, loc_info_src);
+  get_rec(tmp2, src2, loc_info_src);
+
+  if(tmp1.find(unknown_object)!=tmp1.end() ||
+     tmp2.find(unknown_object)!=tmp2.end())
+    return true;
+
+  std::list<unsigned> result;
+  
+  std::set_intersection(
+    tmp1.begin(), tmp1.end(), tmp2.begin(), tmp2.end(), result.begin());
+  
+  return !result.empty();
+}
+
+/*******************************************************************\
+
 Function: local_may_aliast::get_rec
 
   Inputs:

@@ -80,6 +80,10 @@ public:
   std::set<exprt> get(
     const goto_programt::const_targett t,
     const exprt &src);
+
+  bool aliases(
+    const goto_programt::const_targett t,
+    const exprt &src1, const exprt &src2);
   
 protected:
   void build(const goto_functiont &goto_function);
