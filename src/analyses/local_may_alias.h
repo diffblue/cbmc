@@ -68,7 +68,10 @@ public:
     build(_goto_function);
   }
 
-  void output(std::ostream &out, const namespacet &ns) const;
+  void output(
+    std::ostream &out,
+    const goto_functiont &goto_function,
+    const namespacet &ns) const;
   
   dirtyt dirty;
   localst locals;
