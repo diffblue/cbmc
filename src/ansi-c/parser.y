@@ -2860,6 +2860,15 @@ array_abstract_declarator:
           stack($2).add(ID_subtype)=irept(ID_abstract);
           make_subtype($1, $2);
         }
+        | array_abstract_declarator '[' '*' ']'
+        {
+          // we need to push this down
+          $$=$1;
+          set($2, ID_array);
+          stack($2).add(ID_size).make_nil();
+          stack($2).add(ID_subtype)=irept(ID_abstract);
+          make_subtype($1, $2);
+        }
         ;
 
 unary_abstract_declarator:
