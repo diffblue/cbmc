@@ -496,14 +496,17 @@ Function: local_may_aliast::output
 
 void local_may_aliast::output(
   std::ostream &out,
+  const goto_functiont &goto_function,
   const namespacet &ns) const
 {
-  for(unsigned l=0; l<cfg.locs.size(); l++)
+  unsigned l=0;
+
+  forall_goto_program_instructions(i_it, goto_function.body)
   {
+    out << "**** " << i_it->location << std::endl;
+
     const loc_infot &loc_info=loc_infos[l];
-    
-    out << "Loc " << cfg.locs[l].t->location_number << std::endl;
-    
+
     for(points_tot::const_iterator
         p_it=loc_info.points_to.begin();
         p_it!=loc_info.points_to.end();
@@ -522,6 +525,12 @@ void local_may_aliast::output(
         
       out << " }" << std::endl;
     }
+
+    out << std::endl;
+    goto_function.body.output_instruction(ns, "", out, i_it);
+    out << std::endl;
+    
+    l++;
   }
 }
 

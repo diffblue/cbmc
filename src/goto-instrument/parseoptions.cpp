@@ -153,8 +153,10 @@ int goto_instrument_parseoptionst::doit()
       forall_goto_functions(it, goto_functions)
       {
         local_may_aliast local_may_alias(it->second);
-        std::cout << "**** " << it->first << std::endl;
-        local_may_alias.output(std::cout, ns);
+        std::cout << ">>>>" << std::endl;
+        std::cout << ">>>> " << it->first << std::endl;
+        std::cout << ">>>>" << std::endl;
+        local_may_alias.output(std::cout, it->second, ns);
         std::cout << std::endl;
       }
 
