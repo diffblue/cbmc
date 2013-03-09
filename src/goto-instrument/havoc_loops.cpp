@@ -23,10 +23,10 @@ Function: havoc_loops
 
 \*******************************************************************/
 
-void havoc_loops(goto_programt &goto_program)
+void havoc_loops(goto_functionst::goto_functiont &goto_function)
 {
-  natural_loopst natural_loops(goto_program);
-  local_may_aliast local_may_alias(goto_program);
+  natural_loopst natural_loops(goto_function.body);
+  local_may_aliast local_may_alias(goto_function);
 }
 
 /*******************************************************************\
@@ -44,5 +44,5 @@ Function: havoc_loops
 void havoc_loops(goto_functionst &goto_functions)
 {
   Forall_goto_functions(it, goto_functions)
-    havoc_loops(it->second.body);
+    havoc_loops(it->second);
 }

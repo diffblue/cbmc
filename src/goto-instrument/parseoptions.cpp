@@ -34,6 +34,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <pointer-analysis/show_value_sets.h>
 
 #include <analyses/natural_loops.h>
+#include <analyses/local_may_alias.h>
 
 #include "parseoptions.h"
 #include "version.h"
@@ -136,6 +137,27 @@ int goto_instrument_parseoptionst::doit()
       value_set_analysis(goto_functions);
 
       show_value_sets(get_ui(), goto_functions, value_set_analysis);
+      return 0;
+    }
+
+    if(cmdline.isset("show-local-may-alias"))
+    {
+      namespacet ns(symbol_table);
+
+      status("Function Pointer Removal");
+      remove_function_pointers(symbol_table, goto_functions, false);
+
+      status("Partial Inlining");
+      goto_partial_inline(goto_functions, ns, ui_message_handler);
+    
+      forall_goto_functions(it, goto_functions)
+      {
+        local_may_aliast local_may_alias(it->second);
+        std::cout << "**** " << it->first << std::endl;
+        local_may_alias.output(std::cout, ns);
+        std::cout << std::endl;
+      }
+
       return 0;
     }
 
@@ -442,15 +464,10 @@ void goto_instrument_parseoptionst::instrument_goto_program(
     options.set_option("unwind", cmdline.getval("unwind"));
   }
 
-  // we add the library in some cases, for extra confusion
+  // we add the library, as some analyses benefit
   
-  if(cmdline.isset("wmm") ||
-     cmdline.isset("race-check") ||
-     cmdline.isset("concurrency"))
-  {
-    status("Adding CPROVER library");      
-    link_to_library(symbol_table, goto_functions, ui_message_handler);
-  }
+  status("Adding CPROVER library");      
+  link_to_library(symbol_table, goto_functions, ui_message_handler);
 
   namespacet ns(symbol_table);
 
