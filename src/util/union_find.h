@@ -25,46 +25,46 @@ public:
   // remove from any sets
   void isolate(unsigned a);
 
-  void swap(unsigned_union_find &other)
+  inline void swap(unsigned_union_find &other)
   {
     other.nodes.swap(nodes);
   }
 
-  void resize(unsigned size)
+  inline void resize(unsigned size)
   {
     // only enlarge
     assert(nodes.size()<=size);
     nodes.resize(size);
   }
   
-  void clear()
+  inline void clear()
   {
     nodes.clear();
   }
   
-  bool is_root(unsigned a) const
+  inline bool is_root(unsigned a) const
   {
     if(a>=size()) return true;
     return nodes[a].root;
   }
   
-  bool same_set(unsigned a, unsigned b) const
+  inline bool same_set(unsigned a, unsigned b) const
   {
     return find(a)==find(b);
   }
   
-  unsigned size() const
+  inline unsigned size() const
   {
     return nodes.size();
   }
   
-  unsigned count(unsigned a) const
+  inline unsigned count(unsigned a) const
   {
     if(a>=size()) return 1;
     return nodes[find(a)].count;
   }
   
-  void check_index(unsigned a)
+  inline void check_index(unsigned a)
   {
     if(a>=size()) resize(a+1);
   }
@@ -78,7 +78,8 @@ public:
   }
   
   void re_root(unsigned old, unsigned new_root);
-  
+
+  // find a different member of the same set
   unsigned get_other(unsigned a);
   
 protected:  
@@ -111,32 +112,32 @@ public:
     return is_union;
   }
   
-  const T &find(const T &a)
+  inline const T &find(const T &a)
   {
     return find(number(a));
   }
   
-  unsigned find_number(unsigned a) const
+  inline unsigned find_number(unsigned a) const
   {
     return uuf.find(a);
   }
 
-  unsigned find_number(const T &a)
+  inline unsigned find_number(const T &a)
   {
     return uuf.find(number(a));
   }
   
-  bool is_root_number(unsigned a) const
+  inline bool is_root_number(unsigned a) const
   {
     return uuf.is_root(a);
   }
 
-  bool is_root(const T &a)
+  inline bool is_root(const T &a)
   {
     return is_root(number(a));
   }
 
-  unsigned number(const T &a)
+  inline unsigned number(const T &a)
   {
     unsigned n=subt::number(a);
   
@@ -148,7 +149,7 @@ public:
     return n;
   }
 
-  void clear()
+  inline void clear()
   {
     subt::clear();
     uuf.clear();
