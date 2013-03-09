@@ -20,6 +20,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <base_type.h>
 #include <pointer_predicates.h>
 
+#include <analyses/local_may_alias.h>
+
 #include "goto_check.h"
 
 class goto_checkt
@@ -28,7 +30,8 @@ public:
   goto_checkt(
     const namespacet &_ns,
     const optionst &_options):
-    ns(_ns)
+    ns(_ns),
+    local_may_alias(0)
   {
     enable_bounds_check=_options.get_bool_option("bounds-check");
     enable_pointer_check=_options.get_bool_option("pointer-check");
@@ -46,10 +49,14 @@ public:
     error_label=_options.get_option("error-label");
   }
 
-  void goto_check(goto_programt &goto_program);
+  typedef goto_functionst::goto_functiont goto_functiont;
+
+  void goto_check(goto_functiont &goto_function);
     
 protected:
   const namespacet &ns;
+  local_may_aliast *local_may_alias;
+  goto_programt::const_targett t;
 
   void check_rec(const exprt &expr, guardt &guard, bool address);
   void check(const exprt &expr);
@@ -898,58 +905,86 @@ void goto_checkt::pointer_validity_check(
     expr,
     guard);    
   #else
+  
+  std::set<exprt> alias_set=local_may_alias->get(t, pointer);
+  bool aliases_unknown=alias_set.find(exprt(ID_unknown))!=alias_set.end();
+  bool aliases_dynamic_object=alias_set.find(exprt(ID_dynamic_object))!=alias_set.end();
+  bool aliases_null_object=alias_set.find(exprt(ID_null_object))!=alias_set.end();
+  
+  bool aliases_other_object=false;
+  
+  for(std::set<exprt>::const_iterator it=alias_set.begin();
+      it!=alias_set.end();
+      it++)
+    if(it->id()!=ID_unknown && it->id()!=ID_dynamic_object && it->id()!=ID_null_object)
+      aliases_other_object=true;
 
   const typet &dereference_type=pointer_type.subtype();
 
-  exprt dynamic_bounds=
-    or_exprt(dynamic_object_lower_bound(pointer),
-             dynamic_object_upper_bound(pointer, dereference_type, ns));
-
-  exprt object_bounds=
-    or_exprt(object_lower_bound(pointer),
-             object_upper_bound(pointer, dereference_type, ns));
-
-  add_guarded_claim(
-    not_exprt(null_object(pointer)),
-    "dereference failure: pointer NULL",
-    "pointer dereference",
-    expr.find_location(),
-    expr,
-    guard);
-
-  add_guarded_claim(
-    not_exprt(invalid_pointer(pointer)),
-    "dereference failure: pointer invalid",
-    "pointer dereference",
-    expr.find_location(),
-    expr,
-    guard);
-
-  add_guarded_claim(
-    or_exprt(not_exprt(dynamic_object(pointer)), not_exprt(deallocated(pointer, ns))),
-    "dereference failure: deallocated dynamic object",
-    "pointer dereference",
-    expr.find_location(),
-    expr,
-    guard);
-
-  if(enable_bounds_check)
+  if(aliases_unknown || aliases_null_object)
+  {
     add_guarded_claim(
-      or_exprt(not_exprt(dynamic_object(pointer)), not_exprt(malloc_object(pointer, ns)), not_exprt(dynamic_bounds)),
-      "dereference failure: dynamic object bounds",
+      not_exprt(null_object(pointer)),
+      "dereference failure: pointer NULL",
+      "pointer dereference",
+      expr.find_location(),
+      expr,
+      guard);
+  }
+
+  if(aliases_unknown)
+    add_guarded_claim(
+      not_exprt(invalid_pointer(pointer)),
+      "dereference failure: pointer invalid",
+      "pointer dereference",
+      expr.find_location(),
+      expr,
+      guard);
+
+  if(aliases_unknown || aliases_dynamic_object)
+    add_guarded_claim(
+      or_exprt(not_exprt(dynamic_object(pointer)), not_exprt(deallocated(pointer, ns))),
+      "dereference failure: deallocated dynamic object",
       "pointer dereference",
       expr.find_location(),
       expr,
       guard);
 
   if(enable_bounds_check)
-    add_guarded_claim(
-      or_exprt(dynamic_object(pointer), not_exprt(object_bounds)),
-      "dereference failure: object bounds",
-      "pointer dereference",
-      expr.find_location(),
-      expr,
-      guard);
+  {
+    if(aliases_unknown || aliases_dynamic_object)
+    {
+      exprt dynamic_bounds=
+        or_exprt(dynamic_object_lower_bound(pointer),
+                 dynamic_object_upper_bound(pointer, dereference_type, ns));
+
+      add_guarded_claim(
+        or_exprt(not_exprt(dynamic_object(pointer)), not_exprt(malloc_object(pointer, ns)), not_exprt(dynamic_bounds)),
+        "dereference failure: dynamic object bounds",
+        "pointer dereference",
+        expr.find_location(),
+        expr,
+        guard);
+    }
+  }
+
+  if(enable_bounds_check)
+  {
+    if(aliases_unknown || aliases_other_object)
+    {
+      exprt object_bounds=
+        or_exprt(object_lower_bound(pointer),
+                 object_upper_bound(pointer, dereference_type, ns));
+
+      add_guarded_claim(
+        or_exprt(dynamic_object(pointer), not_exprt(object_bounds)),
+        "dereference failure: object bounds",
+        "pointer dereference",
+        expr.find_location(),
+        expr,
+        guard);
+    }
+  }
 
   #endif
 }
@@ -1081,51 +1116,6 @@ void goto_checkt::bounds_check(
     }
   }
 }
-
-/*******************************************************************\
-
-Function: goto_checkt::array_size_check
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-#if 0
-void goto_checkt::array_size_check(
-  const exprt &expr,
-  const irept &location)
-{
-  if(expr.type().id()==ID_array)
-  {
-    const exprt &size=(exprt &)expr.type().find(ID_size);
-
-    if(size.type().id()==ID_unsignedbv)
-    {
-      // nothing to do
-    }
-    else
-    {
-      exprt zero=gen_zero(size.type());
-
-      if(zero.is_nil())
-        throw "no zero constant of index type "+
-          size.type().to_string();
-
-      exprt inequality(ID_ge, bool_typet());
-      inequality.copy_to_operands(size, zero);
-
-      std::string name=array_name(expr);
-
-      guardt guard;
-      add_guarded_claim(inequality, name+" size", location, guard);
-    }
-  }
-}
-#endif
 
 /*******************************************************************\
 
@@ -1372,15 +1362,18 @@ Function: goto_checkt::goto_check
 
 \*******************************************************************/
 
-void goto_checkt::goto_check(goto_programt &goto_program)
+void goto_checkt::goto_check(goto_functiont &goto_function)
 {
   assertions.clear();
+  
+  local_may_aliast local_may_alias_obj(goto_function);
+  local_may_alias=&local_may_alias_obj;
 
-  for(goto_programt::instructionst::iterator
-      it=goto_program.instructions.begin();
-      it!=goto_program.instructions.end();
-      it++)
+  goto_programt &goto_program=goto_function.body;
+
+  Forall_goto_program_instructions(it, goto_program)
   {
+    t=it;
     goto_programt::instructiont &i=*it;
     
     new_code.clear();
@@ -1506,10 +1499,10 @@ Function: goto_check
 void goto_check(
   const namespacet &ns,
   const optionst &options,
-  goto_programt &goto_program)
+  goto_functionst::goto_functiont &goto_function)
 {
   goto_checkt goto_check(ns, options);
-  goto_check.goto_check(goto_program);
+  goto_check.goto_check(goto_function);
 }                    
 
 /*******************************************************************\
@@ -1536,6 +1529,6 @@ void goto_check(
       it!=goto_functions.function_map.end();
       it++)
   {
-    goto_check.goto_check(it->second.body);
+    goto_check.goto_check(it->second);
   }
 }                    

@@ -1,7 +1,7 @@
 SRC = cfg_dominators.cpp natural_loops.cpp is_threaded.cpp dirty.cpp \
       invariant_set.cpp invariant_set_domain.cpp invariant_propagation.cpp \
       static_analysis.cpp uninitialized_domain.cpp local_may_alias.cpp \
-      locals.cpp
+      locals.cpp goto_check.cpp
 
 INCLUDES= -I .. -I ../util
 
