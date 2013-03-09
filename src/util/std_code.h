@@ -211,6 +211,50 @@ public:
 const code_declt &to_code_decl(const codet &code);
 code_declt &to_code_decl(codet &code);
 
+/*! \brief A removal of a local variable
+*/
+class code_deadt:public codet
+{
+public:
+  inline code_deadt():codet(ID_dead)
+  {
+    operands().resize(1);
+  }
+  
+  inline explicit code_deadt(const exprt &symbol):codet(ID_dead)
+  {
+    copy_to_operands(symbol);
+  }
+  
+  inline exprt &symbol()
+  {
+    return op0();
+  }
+
+  inline const exprt &symbol() const
+  {
+    return op0();
+  }
+
+  const irep_idt &get_identifier() const;
+
+  friend inline const code_deadt &to_code_dead(const codet &code)
+  {
+    assert(code.get_statement()==ID_dead && code.operands().size()==1);
+    return static_cast<const code_deadt &>(code);
+  }
+
+  friend inline code_deadt &to_code_dead(codet &code)
+  {
+    assert(code.get_statement()==ID_dead && code.operands().size()==1);
+    return static_cast<code_deadt &>(code);
+  }
+
+};
+
+const code_deadt &to_code_dead(const codet &code);
+code_deadt &to_code_dead(codet &code);
+
 /*! \brief An assumption
 */
 class code_assumet:public codet
