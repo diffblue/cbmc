@@ -20,7 +20,7 @@ struct string_ptrt
   const char *s;
   unsigned len;
   
-  const char *c_str() const
+  inline const char *c_str() const
   {
     return s;
   }
@@ -45,12 +45,12 @@ public:
 class string_containert
 {
 public:
-  unsigned operator[](const char *s)
+  inline unsigned operator[](const char *s)
   {
     return get(s);
   }
   
-  unsigned operator[](const std::string &s)
+  inline unsigned operator[](const std::string &s)
   {
     return get(s);
   }
@@ -59,12 +59,12 @@ public:
   string_containert();  
   ~string_containert();
   
-  const char *c_str(unsigned no) const
+  inline const char *c_str(unsigned no) const
   {
     return string_vector[no]->c_str();
   }
   
-  const std::string &get_string(unsigned no) const
+  inline const std::string &get_string(unsigned no) const
   {
     return *string_vector[no];
   }

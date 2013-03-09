@@ -286,7 +286,7 @@ extern inline struct_union_typet &to_struct_union_type(typet &type)
 class struct_typet:public struct_union_typet
 {
 public:
-  struct_typet():struct_union_typet(ID_struct)
+  inline struct_typet():struct_union_typet(ID_struct)
   {
   }
 
@@ -324,7 +324,7 @@ extern inline struct_typet &to_struct_type(typet &type)
 class class_typet:public struct_typet
 {
 public:
-  class_typet():struct_typet()
+  inline class_typet():struct_typet()
   {
   }
 
@@ -399,7 +399,7 @@ extern inline class_typet &to_class_type(typet &type)
 class union_typet:public struct_union_typet
 {
 public:
-  union_typet():struct_union_typet(ID_union)
+  inline union_typet():struct_union_typet(ID_union)
   {
   }
 };
@@ -658,11 +658,11 @@ inline const bitvector_typet &to_bitvector_type(const typet &type)
 class bv_typet:public bitvector_typet
 {
 public:
-  bv_typet():bitvector_typet(ID_bv)
+  inline bv_typet():bitvector_typet(ID_bv)
   {
   }
 
-  explicit bv_typet(unsigned width):bitvector_typet(ID_bv)
+  inline explicit bv_typet(unsigned width):bitvector_typet(ID_bv)
   {
     set_width(width);
   }
@@ -698,11 +698,11 @@ inline bv_typet &to_bv_type(typet &type)
 class unsignedbv_typet:public bitvector_typet
 {
 public:
-  unsignedbv_typet():bitvector_typet(ID_unsignedbv)
+  inline unsignedbv_typet():bitvector_typet(ID_unsignedbv)
   {
   }
 
-  explicit unsignedbv_typet(unsigned width):bitvector_typet(ID_unsignedbv)
+  inline explicit unsignedbv_typet(unsigned width):bitvector_typet(ID_unsignedbv)
   {
     set_width(width);
   }
@@ -743,11 +743,11 @@ inline unsignedbv_typet &to_unsignedbv_type(typet &type)
 class signedbv_typet:public bitvector_typet
 {
 public:
-  signedbv_typet():bitvector_typet(ID_signedbv)
+  inline signedbv_typet():bitvector_typet(ID_signedbv)
   {
   }
 
-  explicit signedbv_typet(unsigned width):bitvector_typet(ID_signedbv)
+  inline explicit signedbv_typet(unsigned width):bitvector_typet(ID_signedbv)
   {
     set_width(width);
   }
@@ -788,23 +788,23 @@ inline signedbv_typet &to_signedbv_type(typet &type)
 class fixedbv_typet:public bitvector_typet
 {
 public:
-  fixedbv_typet():bitvector_typet(ID_fixedbv)
+  inline fixedbv_typet():bitvector_typet(ID_fixedbv)
   {
   }
 
-  unsigned get_fraction_bits() const
+  inline unsigned get_fraction_bits() const
   {
     return get_width()-get_integer_bits();
   }
 
   unsigned get_integer_bits() const;
 
-  void set_integer_bits(unsigned b)
+  inline void set_integer_bits(unsigned b)
   {
     set(ID_integer_bits, b);
   }
 
-  friend const fixedbv_typet &to_fixedbv_type(const typet &type)
+  inline friend const fixedbv_typet &to_fixedbv_type(const typet &type)
   {
     assert(type.id()==ID_fixedbv);
     return static_cast<const fixedbv_typet &>(type);
@@ -828,11 +828,11 @@ const fixedbv_typet &to_fixedbv_type(const typet &type);
 class floatbv_typet:public bitvector_typet
 {
 public:
-  floatbv_typet():bitvector_typet(ID_floatbv)
+  inline floatbv_typet():bitvector_typet(ID_floatbv)
   {
   }
 
-  unsigned get_e() const
+  inline unsigned get_e() const
   {
     // subtract one for sign bit
     return get_width()-get_f()-1;
@@ -840,12 +840,12 @@ public:
 
   unsigned get_f() const;
 
-  void set_f(unsigned b)
+  inline void set_f(unsigned b)
   {
     set(ID_f, b);
   }
 
-  friend const floatbv_typet &to_floatbv_type(const typet &type)
+  inline friend const floatbv_typet &to_floatbv_type(const typet &type)
   {
     assert(type.id()==ID_floatbv);
     return static_cast<const floatbv_typet &>(type);
@@ -921,7 +921,7 @@ extern inline pointer_typet &to_pointer_type(typet &type)
 class reference_typet:public pointer_typet
 {
 public:
-  reference_typet()
+  inline reference_typet()
   {
     set(ID_C_reference, true);
   }
@@ -939,11 +939,11 @@ bool is_rvalue_reference(const typet &type);
 class string_typet:public typet
 {
 public:
-  string_typet():typet(ID_string)
+  inline string_typet():typet(ID_string)
   {
   }
 
-  friend const string_typet &to_string_type(const typet &type)
+  inline friend const string_typet &to_string_type(const typet &type)
   {
     assert(type.id()==ID_string);
     return static_cast<const string_typet &>(type);
@@ -967,17 +967,17 @@ const string_typet &to_string_type(const typet &type);
 class range_typet:public typet
 {
 public:
-  range_typet():typet(ID_range)
+  inline range_typet():typet(ID_range)
   {
   }
   
-  range_typet(const mp_integer &_from, const mp_integer &_to)
+  inline range_typet(const mp_integer &_from, const mp_integer &_to)
   {
     set_from(_from);
     set_to(_to);
   }
 
-  friend const range_typet &to_range_type(const typet &type)
+  inline friend const range_typet &to_range_type(const typet &type)
   {
     assert(type.id()==ID_range);
     return static_cast<const range_typet &>(type);
@@ -1007,23 +1007,23 @@ const range_typet &to_range_type(const typet &type);
 class vector_typet:public typet
 {
 public:
-  vector_typet():typet(ID_vector)
+  inline vector_typet():typet(ID_vector)
   {
   }
   
-  vector_typet(const typet &_subtype,
-               const exprt &_size):typet(ID_vector)
+  inline vector_typet(const typet &_subtype,
+                      const exprt &_size):typet(ID_vector)
   {
     size()=_size;
     subtype()=_subtype;
   }
   
-  const exprt &size() const
+  inline const exprt &size() const
   {
     return static_cast<const exprt &>(find(ID_size));
   }
   
-  exprt &size()
+  inline exprt &size()
   {
     return static_cast<exprt &>(add(ID_size));
   }
@@ -1060,11 +1060,11 @@ extern inline vector_typet &to_vector_type(typet &type)
 class complex_typet:public typet
 {
 public:
-  complex_typet():typet(ID_complex)
+  inline complex_typet():typet(ID_complex)
   {
   }
   
-  complex_typet(const typet &_subtype):typet(ID_complex)
+  inline complex_typet(const typet &_subtype):typet(ID_complex)
   {
     subtype()=_subtype;
   }
