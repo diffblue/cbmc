@@ -3646,6 +3646,11 @@ std::string expr2ct::convert(
     return "NULL-object";
   }
 
+  else if(src.id()==ID_null_object)
+  {
+    return "NULL-object";
+  }
+
   else if(src.id()==ID_integer_address ||
           src.id()==ID_stack_object ||
           src.id()==ID_static_object)

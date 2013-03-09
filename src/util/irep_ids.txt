@@ -461,6 +461,7 @@ object_size
 good_pointer
 integer_address
 integer_address_object
+null_object
 static_object
 stack_object
 C_is_failed_symbol #is_failed_symbol
