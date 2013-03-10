@@ -74,7 +74,7 @@ void irep_serializationt::reference_convert(
   unsigned id = read_long(in);
   
   if(id < ireps_container.ireps_on_read.size() && 
-      ireps_container.ireps_on_read[id].first)
+     ireps_container.ireps_on_read[id].first)
   {
     irep = ireps_container.ireps_on_read[id].second;
   }
@@ -127,7 +127,7 @@ void irep_serializationt::read_irep(
   
   if(in.get()!=0)
   {
-    std::cerr << "irep not terminated. " << std::endl;
+    std::cerr << "irep not terminated" << std::endl;
     throw 0;
   }
 }
@@ -231,7 +231,8 @@ Function: write_long
  
  Outputs: nothing
  
- Purpose: outputs 4 characters for a long.
+ Purpose: outputs 4 characters for a long,
+          most-significand byte first
  
 \*******************************************************************/
 
@@ -279,7 +280,7 @@ Function: write_string
 
 void write_string(std::ostream &out, const std::string &s)
 {
-  for (unsigned i=0; i<s.size(); i++)
+  for(unsigned i=0; i<s.size(); i++)
   {
     if(s[i]==0 || s[i]=='\\') out.put('\\'); // escape specials 
     out << s[i];
