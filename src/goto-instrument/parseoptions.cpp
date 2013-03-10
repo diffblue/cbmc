@@ -15,7 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/remove_function_pointers.h>
-#include <goto-programs/goto_check.h>
 #include <goto-programs/goto_inline.h>
 #include <goto-programs/show_claims.h>
 #include <goto-programs/set_claims.h>
@@ -35,6 +34,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <analyses/natural_loops.h>
 #include <analyses/local_may_alias.h>
+#include <analyses/goto_check.h>
 
 #include "parseoptions.h"
 #include "version.h"
