@@ -8,8 +8,8 @@ Date: May 2007
  
 \*******************************************************************/
 
-#ifndef IREP_SERIALIZATION_H_
-#define IREP_SERIALIZATION_H_
+#ifndef CPROVER_IREP_SERIALIZATION_H
+#define CPROVER_IREP_SERIALIZATION_H
 
 #include <map>
 #include <ostream>
@@ -29,7 +29,7 @@ private:
   {
     unsigned short operator()(const unsigned long l) const 
     { 
-      return (l & 0xFFFF); 
+      return l & 0xFFFF;
     }
   };
 
@@ -37,7 +37,7 @@ private:
   {
     bool operator()(const unsigned long l, const unsigned long r) const 
     {
-      return (l==r);
+      return l==r;
     }
   };
 
@@ -53,7 +53,7 @@ private:
   {
     bool operator()(const irept &l, const irept &r) const 
     {
-      return full_eq(l,r);
+      return full_eq(l, r);
     }
   };
   
@@ -84,7 +84,7 @@ public:
     }        
   };
   
-  irep_serializationt(ireps_containert& ic): 
+  explicit irep_serializationt(ireps_containert &ic):
     ireps_container(ic) 
   { 
     read_buffer.resize(1, 0);
@@ -92,25 +92,25 @@ public:
   };
   
   unsigned long insert_on_write(unsigned h);
-  unsigned long insert_on_read(unsigned id, const irept&);
+  unsigned long insert_on_read(unsigned id, const irept &);
   
-  void reference_convert(std::istream&, irept &irep);
-  void reference_convert(const irept &irep, std::ostream&);
+  void reference_convert(std::istream &, irept &irep);
+  void reference_convert(const irept &irep, std::ostream &);
 
-  irep_idt read_string_ref( std::istream& );
-  void write_string_ref( std::ostream&, const irep_idt& );
+  irep_idt read_string_ref(std::istream &);
+  void write_string_ref(std::ostream &, const irep_idt &);
 
   void clear() { ireps_container.clear(); }
 
-  static unsigned read_long( std::istream& );
-  irep_idt read_string( std::istream& );
+  static unsigned read_long(std::istream &);
+  irep_idt read_string(std::istream &);
 
 private:
-  ireps_containert& ireps_container;
+  ireps_containert &ireps_container;
   std::vector<char> read_buffer;
 
-  void write_irep(std::ostream&, const irept &irep);      
-  void read_irep(std::istream&, irept &irep);
+  void write_irep(std::ostream &, const irept &irep);      
+  void read_irep(std::istream &, irept &irep);
 };
 
 #endif /*IREP_SERIALIZATION_H_*/
