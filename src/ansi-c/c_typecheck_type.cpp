@@ -328,7 +328,7 @@ Function: c_typecheck_baset::typecheck_compound_type
 void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
 {
   struct_union_typet::componentst &components=type.components();
-  
+
   // mark bit-fields
   for(struct_union_typet::componentst::iterator
       it=components.begin();
@@ -640,11 +640,18 @@ void c_typecheck_baset::typecheck_symbol_type(typet &type)
   
   if(symbol.is_macro)
   {
-    // overwrite, but preserve (add) any qualifiers
+    // overwrite, but preserve (add) any qualifiers and other flags
+
     c_qualifierst c_qualifiers(type);
+    bool is_packed=type.get_bool(ID_C_packed);
+    irept alignment=type.find(ID_C_alignment);
+    
     c_qualifiers+=c_qualifierst(symbol.type);
     type=symbol.type;
     c_qualifiers.write(type);
+    
+    if(is_packed) type.set(ID_C_packed, true);
+    if(alignment.is_not_nil()) type.set(ID_C_alignment, alignment);
   }
     
   // CPROVER extensions
