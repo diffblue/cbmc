@@ -1426,12 +1426,15 @@ member_declaration:
         }
         ;
 
+// This rule is for member declarations _without_ type, which
+// is assumed to be 'int'. Clang issues a warning about these.
+
 member_default_declaring_list:
           gcc_type_attribute_opt
           type_qualifier_list
           member_identifier_declarator
         {
-          merge_types($2, $1); // type attribute
+          merge_types($2, $1); // dest=$2, type attribute
 
           init($$, ID_declaration_list);
 
@@ -1455,7 +1458,7 @@ member_declaring_list:
           type_specifier
           member_declarator
         {
-          // TODO merge_types($2, $1); // type attribute
+          merge_types($2, $1); // dest=$2, type attribute
 
           init($$, ID_declaration_list);
 
