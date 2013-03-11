@@ -182,6 +182,7 @@ void add_padding(struct_typet &type, const namespacet &ns)
       unsigned a=alignment(it->get_bit_field_type(), ns);
       if(max_alignment<a) 
         max_alignment=a;
+
       continue;
     }
     else if(bit_field_bits!=0)
@@ -190,8 +191,9 @@ void add_padding(struct_typet &type, const namespacet &ns)
       offset+=bit_field_bits/8;
       bit_field_bits=0;
     }
-    else if(it->type().get_bool(ID_C_packed) ||
-            ns.follow(it->type()).get_bool(ID_C_packed))
+
+    if(it->type().get_bool(ID_C_packed) ||
+       ns.follow(it->type()).get_bool(ID_C_packed))
     {
       // the field or type is "packed"
     }
@@ -230,9 +232,9 @@ void add_padding(struct_typet &type, const namespacet &ns)
         }
       }
     }
-      
+
     mp_integer size=pointer_offset_size(ns, it_type);
-    
+
     if(size!=-1)
       offset+=size;
   }
