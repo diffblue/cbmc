@@ -63,6 +63,26 @@ struct __attribute__((packed)) my_struct2 {
 STATIC_ASSERT(__builtin_offsetof(struct my_struct2, i)==1);
 STATIC_ASSERT(__builtin_offsetof(struct my_struct2, ch2)==5);
 
+typedef unsigned int uint32_t;
+typedef unsigned long long int uint64_t;
+
+typedef struct __attribute__((__packed__))
+{
+ uint32_t version;
+} ipc_msg_hdr;
+
+typedef struct
+{
+  ipc_msg_hdr hdr;
+  uint32_t data_bytes;
+  uint64_t terminate;
+} request_state;
+
+STATIC_ASSERT(sizeof(ipc_msg_hdr)==4);
+STATIC_ASSERT(__builtin_offsetof(request_state, data_bytes)==4);
+STATIC_ASSERT(__builtin_offsetof(request_state, terminate)==8);
+STATIC_ASSERT(sizeof(request_state)==16);
+
 #endif
 
 struct my_struct3 {
