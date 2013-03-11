@@ -170,6 +170,8 @@ void add_padding(struct_typet &type, const namespacet &ns)
       it!=components.end();
       it++)
   {
+    const typet &it_type=it->type();
+
     // ANSI-C says that bit-fields do not get padded!
     if(it->get_is_bit_field())
     {
@@ -190,42 +192,45 @@ void add_padding(struct_typet &type, const namespacet &ns)
     }
     else if(it->type().get_bool(ID_C_packed) ||
             ns.follow(it->type()).get_bool(ID_C_packed))
-      continue; // the field or type is "packed"
-    
-    const typet &it_type=it->type();
-    unsigned a=alignment(it_type, ns);
-    
-    // check minimum alignment
-    if(a<config.ansi_c.alignment)
-      a=config.ansi_c.alignment;
-      
-    if(max_alignment<a) 
-      max_alignment=a;
-      
-    if(a!=1)
     {
-      // we may need to align it
-      unsigned displacement=integer2long(offset%a);
-
-      if(displacement!=0)
-      {
-        unsigned pad=a-displacement;
+      // the field or type is "packed"
+    }
+    else
+    {
+      unsigned a=alignment(it_type, ns);
       
-        unsignedbv_typet padding_type;
-        padding_type.set_width(pad*8);
+      // check minimum alignment
+      if(a<config.ansi_c.alignment)
+        a=config.ansi_c.alignment;
         
-        struct_typet::componentt component;
-        component.type()=padding_type;
-        component.set_name("$pad"+i2string(padding_counter++));
-        component.set_is_padding(true);
+      if(max_alignment<a) 
+        max_alignment=a;
         
-        it=components.insert(it, component);
-        it++; // skip over
+      if(a!=1)
+      {
+        // we may need to align it
+        unsigned displacement=integer2long(offset%a);
+
+        if(displacement!=0)
+        {
+          unsigned pad=a-displacement;
         
-        offset+=pad;
+          unsignedbv_typet padding_type;
+          padding_type.set_width(pad*8);
+          
+          struct_typet::componentt component;
+          component.type()=padding_type;
+          component.set_name("$pad"+i2string(padding_counter++));
+          component.set_is_padding(true);
+          
+          it=components.insert(it, component);
+          it++; // skip over
+          
+          offset+=pad;
+        }
       }
     }
-    
+      
     mp_integer size=pointer_offset_size(ns, it_type);
     
     if(size!=-1)
