@@ -91,6 +91,10 @@ struct my_struct3 {
   int i1; // this should be padded for 4-byte alignment
   char ch3;
   long long i2; // this should be padded for 8-byte alignment
+  char ch4;
+  int bf1:1;  // this should not be padded
+  int bf2:1;  // this should not be padded
+  int i3;    // this should be padded for 4-byte alignment
 };
 
 STATIC_ASSERT(__builtin_offsetof(struct my_struct3, ch1)==0);
@@ -98,6 +102,8 @@ STATIC_ASSERT(__builtin_offsetof(struct my_struct3, ch2)==1);
 STATIC_ASSERT(__builtin_offsetof(struct my_struct3, i1)==4);
 STATIC_ASSERT(__builtin_offsetof(struct my_struct3, ch3)==8);
 STATIC_ASSERT(__builtin_offsetof(struct my_struct3, i2)==16);
+STATIC_ASSERT(__builtin_offsetof(struct my_struct3, ch4)==24);
+STATIC_ASSERT(__builtin_offsetof(struct my_struct3, i3)==28);
 
 int main()
 {
