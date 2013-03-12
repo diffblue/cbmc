@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <hash_cont.h>
 #include <string_hash.h>
 #include <i2string.h>
+#include <mp_arith.h>
 
 #include "ansi_c_parse_tree.h"
 
@@ -50,6 +51,7 @@ public:
     asm_block_following=false;
     parenthesis_counter=0;
     string_literal.clear();
+    pragma_pack=0;
     
     // setup global scope
     scopes.clear();
@@ -63,6 +65,7 @@ public:
   bool asm_block_following;
   unsigned parenthesis_counter;
   std::string string_literal;
+  mp_integer pragma_pack;
   
   enum { LANGUAGE, EXPRESSION } grammar;
 

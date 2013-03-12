@@ -154,7 +154,6 @@ bitvector	{binary}[bB]
 bitvector_u	{binary}([uU][bB]|[bB][uU])
 cppstart	{ws}"#"{ws}
 cpplineno	{cppstart}"line"*{ws}{integer}{ws}.*{newline}
-cpppragma	{cppstart}"pragma"{ws}.*
 cppdirective	{cppstart}.*
 
 escape_sequence [\\][^\n]
@@ -260,20 +259,26 @@ void ansi_c_scanner_init()
                   preprocessor_line(yytext, PARSER.line_no, PARSER.filename);
                   PARSER.line_no--;
 		 }
-<GRAMMAR>{cpppragma}	{
-                  #if 0
-		  TmpString.form(
-			"'pragma' directive found:" GL_WARN_MSG_NEWLINE
-			"%s" GL_WARN_MSG_NEWLINE
-			"Directive ignored",
-			&PRS_text[0]);
-		  PRS_PrintWarning(GL_WARN_INFORMATIVE, TmpString.chars());
-		  TmpString = "";
-                  #endif
+
+<GRAMMAR>{cppstart}"pragma"{ws}"pack"{ws}"("{integer_s}")"{ws}{newline} {
+                   // Done by Visual Studio and gcc
+                   std::string tmp(yytext);
+                   std::size_t p=tmp.find('(')+1;
+                   std::string value=std::string(tmp, p, p-tmp.rfind(')'));
+                   exprt l=convert_integer_literal(value);
+                   to_integer(l, PARSER.pragma_pack);
+                   // needs push, pop
+                   // http://msdn.microsoft.com/en-us/library/2e70t5y1%28v=vs.80%29.aspx
 		 }
+
+<GRAMMAR>{cppstart}"pragma"{ws}.* {
+                   // silently ignore other pragmas
+		 }
+
 <GRAMMAR>{cppstart}"ident"{ws}.* { /* ignore */ }
 <GRAMMAR>{cppstart}"define"{ws}.* { /* ignore */ }
 <GRAMMAR>{cppstart}"undef"{ws}.* { /* ignore */ }
+
 <GRAMMAR>{cppdirective}	{
 		  yyansi_cerror("Preprocessor directive found");
 		  return TOK_SCANNER_ERROR;
