@@ -29,6 +29,8 @@ Function: c_sizeoft::sizeof_rec
 
 exprt c_sizeoft::sizeof_rec(const typet &type)
 {
+  // this implementation will eventually be replaced
+  // by size_of_expr in util/pointer_offset_size.h
   exprt dest;
   
   if(type.id()==ID_signedbv ||
@@ -146,8 +148,9 @@ exprt c_sizeoft::sizeof_rec(const typet &type)
   }
   else if(type.id()==ID_union)
   {
-    exprt max_size=nil_exprt();
-
+    // the empty union will have size 0
+    exprt max_size=from_integer(0, size_type());
+    
     const union_typet::componentst &components=
       to_union_type(type).components();
 
@@ -159,7 +162,7 @@ exprt c_sizeoft::sizeof_rec(const typet &type)
       if(it->get_bool(ID_is_type) || it->type().id()==ID_code)
         continue;
 
-      const typet &sub_type=static_cast<const typet &>(it->find(ID_type));
+      const typet &sub_type=it->type();
 
       {
         exprt tmp=sizeof_rec(sub_type);
