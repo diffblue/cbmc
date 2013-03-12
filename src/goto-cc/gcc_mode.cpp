@@ -136,6 +136,17 @@ bool gcc_modet::doit()
     config.ansi_c.set_32();
   else if(cmdline.isset("m64"))
     config.ansi_c.set_64();
+    
+  // -fshort-wchar makes wchar_t "short unsigned int"
+  if(cmdline.isset("fshort-wchar"))
+  {
+    config.ansi_c.wchar_t_width=config.ansi_c.short_int_width;
+    config.ansi_c.wchar_t_is_unsigned=true;
+  }
+  
+  // -fshort-double makes double the same as float
+  if(cmdline.isset("fshort-double"))
+    config.ansi_c.double_width=config.ansi_c.single_width;
 
   // determine actions to be undertaken
   
