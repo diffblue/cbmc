@@ -302,7 +302,7 @@ bool gcc_cmdlinet::parse(int argc, const char **argv)
       if(!found)
       {    
         // unrecognized option
-        warning("Warning: uninterpreted gcc option '"+std::string(argv[i])+"'");
+        std::cerr << "Warning: uninterpreted gcc option '" << argv[i] << "'" << std::endl;
       }
     }
   }
