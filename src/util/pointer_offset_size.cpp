@@ -47,26 +47,25 @@ mp_integer member_offset(
       it!=components.end();
       it++)
   {
-    if(it->get_name()==member) break;
+    if(it->get_name()==member)
+      break;
+
     if(it->get_is_bit_field())
     {
-      bit_field_bits+=it->type().get_int(ID_width);
+      // take the extra bytes needed
+      unsigned w=it->type().get_int(ID_width);
+      for(; w>bit_field_bits; ++result, bit_field_bits+=8);
+      bit_field_bits-=w;
     }
     else
     {
-      if(bit_field_bits!=0)
-      {
-        result+=bit_field_bits/8;
-        bit_field_bits=0;
-      }
-      
       const typet &subtype=it->type();
       mp_integer sub_size=pointer_offset_size(ns, subtype);
       if(sub_size==-1) return -1; // give up
       result+=sub_size;
     }
   }
-  
+
   return result;
 }
 
@@ -137,23 +136,19 @@ mp_integer pointer_offset_size(
     {
       if(it->get_is_bit_field())
       {
-        bit_field_bits+=it->type().get_int(ID_width);
+        unsigned w=it->type().get_int(ID_width);
+        for(; w>bit_field_bits; ++result, bit_field_bits+=8);
+        bit_field_bits-=w;
       }
       else
       {
-        if(bit_field_bits!=0)
-        {
-          result+=bit_field_bits/8;
-          bit_field_bits=0;
-        }
-        
         const typet &subtype=it->type();
         mp_integer sub_size=pointer_offset_size(ns, subtype);
         if(sub_size==-1) return -1;
         result+=sub_size;
       }
     }
-    
+
     return result;
   }
   else if(type.id()==ID_union)
@@ -235,18 +230,17 @@ exprt member_offset_expr(
       it++)
   {
     if(it->get_name()==member) break;
+
     if(it->get_is_bit_field())
     {
-      bit_field_bits+=it->type().get_int(ID_width);
+      unsigned w=it->type().get_int(ID_width);
+      unsigned bytes;
+      for(bytes=0; w>bit_field_bits; ++bytes, bit_field_bits+=8);
+      bit_field_bits-=w;
+      result=plus_exprt(result, from_integer(bytes, result.type()));
     }
     else
     {
-      if(bit_field_bits!=0)
-      {
-        result=plus_exprt(result, from_integer(bit_field_bits/8, result.type()));
-        bit_field_bits=0;
-      }
-      
       const typet &subtype=it->type();
       exprt sub_size=size_of_expr(subtype, ns);
       if(sub_size.is_nil()) return nil_exprt(); // give up
@@ -340,16 +334,14 @@ exprt size_of_expr(
     {
       if(it->get_is_bit_field())
       {
-        bit_field_bits+=it->type().get_int(ID_width);
+        unsigned w=it->type().get_int(ID_width);
+        unsigned bytes;
+        for(bytes=0; w>bit_field_bits; ++bytes, bit_field_bits+=8);
+        bit_field_bits-=w;
+        result=plus_exprt(result, from_integer(bytes, result.type()));
       }
       else
       {
-        if(bit_field_bits!=0)
-        {
-          result=plus_exprt(result, from_integer(bit_field_bits/8, result.type()));
-          bit_field_bits=0;
-        }
-        
         const typet &subtype=it->type();
         exprt sub_size=size_of_expr(subtype, ns);
         if(sub_size.is_nil()) return nil_exprt();

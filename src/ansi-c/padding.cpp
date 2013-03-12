@@ -171,25 +171,21 @@ void add_padding(struct_typet &type, const namespacet &ns)
       it++)
   {
     const typet &it_type=it->type();
-
+    
     // ANSI-C says that bit-fields do not get padded!
     if(it->get_is_bit_field())
     {
-      // count the bits
-      bit_field_bits+=it->type().get_int(ID_width);
-    
       // we consider the type for max_alignment, however
       unsigned a=alignment(it->get_bit_field_type(), ns);
       if(max_alignment<a) 
         max_alignment=a;
 
+      unsigned w=it->type().get_int(ID_width);
+      unsigned bytes;
+      for(bytes=0; w>bit_field_bits; ++bytes, bit_field_bits+=8);
+      bit_field_bits-=w;
+      offset+=bytes;
       continue;
-    }
-    else if(bit_field_bits!=0)
-    {
-      // these are now assumed to be multiples of 8
-      offset+=bit_field_bits/8;
-      bit_field_bits=0;
     }
 
     if(it->type().get_bool(ID_C_packed) ||
