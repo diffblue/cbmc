@@ -2539,18 +2539,19 @@ std::string expr2ct::convert_code_ifthenelse(
   if(src.then_case().is_nil())
   {
     dest+=indent_str(indent+2);
-    dest+=";\n";
+    dest+=";";
   }
   else
     dest+=convert_code(to_code(src.then_case()), indent+2);
 
   if(!src.else_case().is_nil())
   {
+    dest+="\n";
     dest+=indent_str(indent);
     dest+="else\n";
     dest+=convert_code(to_code(src.else_case()), indent+2);
   }
-
+  
   return dest;
 }
 
