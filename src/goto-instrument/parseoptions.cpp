@@ -656,19 +656,28 @@ void goto_instrument_parseoptionst::instrument_goto_program(
   if(cmdline.isset("function-enter"))
   {
     status("Function enter instrumentation");
-    function_enter(goto_functions);
+    function_enter(
+      symbol_table,
+      goto_functions,
+      cmdline.getval("function-enter"));
   }
 
   if(cmdline.isset("function-exit"))
   {
     status("Function exit instrumentation");
-    function_exit(goto_functions);
+    function_exit(
+      symbol_table,
+      goto_functions,
+      cmdline.getval("function-exit"));
   }
 
   if(cmdline.isset("branch"))
   {
     status("Branch instrumentation");
-    branch(goto_functions);
+    branch(
+      symbol_table,
+      goto_functions,
+      cmdline.getval("branch"));
   }
 
   // add failed symbols
