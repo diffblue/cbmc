@@ -14,7 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
-Function: string_constantt::set_value
+Function: string_constantt::string_constantt
 
   Inputs:
 
@@ -28,6 +28,26 @@ string_constantt::string_constantt():
   exprt(ID_string_constant)
 {
   set_value(irep_idt());
+  type()=typet(ID_array);
+  type().subtype()=char_type();
+}
+
+/*******************************************************************\
+
+Function: string_constantt::string_constantt
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+string_constantt::string_constantt(const irep_idt &_value):
+  exprt(ID_string_constant)
+{
+  set_value(_value);
   type()=typet(ID_array);
   type().subtype()=char_type();
 }

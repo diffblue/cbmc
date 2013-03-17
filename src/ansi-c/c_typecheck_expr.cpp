@@ -744,8 +744,7 @@ void c_typecheck_baset::typecheck_expr_symbol(exprt &expr)
   {
     // __func__ is an ANSI-C standard compliant hack to get the function name
     // __FUNCTION__ and __PRETTY_FUNCTION__ are GCC-specific
-    string_constantt s;
-    s.set_value(location.get_function());
+    string_constantt s(location.get_function());
     s.location()=location;
     s.set(ID_C_lvalue, true);
     expr.swap(s);
