@@ -235,6 +235,19 @@ std::string expr2ct::convert_rec(
       return q+"unsigned char";
     else if(c_type==ID_signed_char)
       return q+"signed char";
+    else if(c_type==ID_char)
+    {
+      if(config.ansi_c.char_is_unsigned==
+         (src.id()==ID_unsignedbv))
+        return q+"char";
+      else
+      {
+        if(src.id()==ID_signedbv)
+          return q+"signed char";
+        else
+          return q+"unsigned char";
+      }
+    }
     else if(c_type==ID_unsigned_short_int)
       return q+"unsigned short int";
     else if(c_type==ID_signed_short_int)
