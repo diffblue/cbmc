@@ -35,6 +35,11 @@ void branch(
     if(has_prefix(id2string(f_it->first), CPROVER_PREFIX))
       continue;
     
+    // don't instrument the function to be called,
+    // or otherwise this will be recursive
+    if(f_it->first=="c::"+id2string(id))
+      continue;
+    
     // patch in a call to `id' at the branch points
     goto_programt &body=f_it->second.body;
     
