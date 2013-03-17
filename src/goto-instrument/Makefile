@@ -2,7 +2,7 @@ SRC = main.cpp parseoptions.cpp document_claims.cpp languages.cpp \
       uninitialized.cpp full_slicer.cpp \
       object_id.cpp show_locations.cpp points_to.cpp \
       alignment_checks.cpp race_check.cpp rw_set.cpp \
-      nondet_volatile.cpp interrupt.cpp \
+      nondet_volatile.cpp interrupt.cpp function.cpp branch.cpp \
       mmio.cpp stack_depth.cpp nondet_static.cpp \
       concurrency.cpp dump_c.cpp dot.cpp havoc_loops.cpp \
       wmm/weak_memory.cpp wmm/fence.cpp wmm/event_graph.cpp \

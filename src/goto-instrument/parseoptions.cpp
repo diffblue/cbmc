@@ -55,6 +55,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "dump_c.h"
 #include "dot.h"
 #include "havoc_loops.h"
+#include "function.h"
+#include "branch.h"
 #include "wmm/weak_memory.h"
 
 /*******************************************************************\
@@ -649,6 +651,24 @@ void goto_instrument_parseoptionst::instrument_goto_program(
   {
     status("Havocing loops");
     havoc_loops(goto_functions);
+  }
+
+  if(cmdline.isset("function-enter"))
+  {
+    status("Function enter instrumentation");
+    function_enter(goto_functions);
+  }
+
+  if(cmdline.isset("function-exit"))
+  {
+    status("Function exit instrumentation");
+    function_exit(goto_functions);
+  }
+
+  if(cmdline.isset("branch"))
+  {
+    status("Branch instrumentation");
+    branch(goto_functions);
   }
 
   // add failed symbols
