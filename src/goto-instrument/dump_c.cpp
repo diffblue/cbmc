@@ -784,6 +784,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_if(
     has_else=before_else->is_goto() &&
       !before_else->is_backwards_goto() &&
       before_else->guard.is_true();
+
     if(has_else)
     {
       assert(before_else->targets.size()==1);
@@ -810,6 +811,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_if(
   {
     for(++target; target!=before_else; ++target)
       target=convert_instruction(target, before_else, to_code(i.then_case()));
+
     convert_labels(before_else, to_code(i.then_case()));
     
     for(++target; target!=end_if; ++target)
