@@ -16,6 +16,7 @@ class string_constantt:public exprt
 {
 public:
   string_constantt();
+  explicit string_constantt(const irep_idt &value);
 
   friend inline const string_constantt &to_string_constant(const exprt &expr)
   {
