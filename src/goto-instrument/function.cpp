@@ -43,10 +43,13 @@ code_function_callt function_to_call(
   if(s_it==symbol_table.symbols.end())
   {
     // not there
+    pointer_typet p(char_type());
+    p.subtype().set(ID_C_constant, true);
+    
     code_typet function_type;
     function_type.return_type()=empty_typet();
     function_type.arguments().push_back(
-      code_typet::argumentt(pointer_typet(char_type())));
+      code_typet::argumentt(p));
 
     symbolt new_symbol;
     new_symbol.name=full_id;
@@ -108,6 +111,11 @@ void function_enter(
     if(has_prefix(id2string(f_it->first), CPROVER_PREFIX))
       continue;
     
+    // don't instrument the function to be called,
+    // or otherwise this will be recursive
+    if(f_it->first=="c::"+id2string(id))
+      continue;
+    
     // patch in a call to `id' at the entry point
     goto_programt &body=f_it->second.body;
     
@@ -142,6 +150,11 @@ void function_exit(
     if(has_prefix(id2string(f_it->first), CPROVER_PREFIX))
       continue;
     
+    // don't instrument the function to be called,
+    // or otherwise this will be recursive
+    if(f_it->first=="c::"+id2string(id))
+      continue;
+    
     // patch in a call to `id' at the exit points
     goto_programt &body=f_it->second.body;
     
@@ -156,8 +169,12 @@ void function_exit(
       {
         goto_programt::instructiont call;
         call.function=f_it->first;
-        call.code=function_to_call(symbol_table, id, f_it->first);
+        call.make_function_call(
+          function_to_call(symbol_table, id, f_it->first));
         body.insert_before_swap(i_it, call);
+
+        // move on
+        i_it++;
       }    
     }
       
@@ -165,11 +182,26 @@ void function_exit(
     goto_programt::targett last=body.instructions.end();
     last--;
     assert(last->is_end_function());
+
+    // is there already a return?
+    bool has_return=false;
     
-    goto_programt::instructiont call;
-    call.function=f_it->first;
-    call.code=function_to_call(symbol_table, id, f_it->first);
-    body.insert_before_swap(last, call);
+    if(last!=body.instructions.begin())
+    {
+      goto_programt::targett before_last=last;
+      --before_last;
+      if(before_last->is_return())
+        has_return=true;
+    }
+    
+    if(!has_return)
+    {
+      goto_programt::instructiont call;
+      call.make_function_call(
+        function_to_call(symbol_table, id, f_it->first));
+      call.function=f_it->first;
+      body.insert_before_swap(last, call);
+    }
   }
 }
 
