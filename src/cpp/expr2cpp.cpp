@@ -343,6 +343,42 @@ std::string expr2cppt::convert_rec(
     return "sc_lv["+id2string(src.get(ID_width))+"]";
   else if(src.id()==ID_unassigned)
     return "?";
+  else if(src.id()==ID_code)
+  {
+    const code_typet &code_type=to_code_type(src);
+
+    // C doesn't really have syntax for function types,
+    // so we use C++11 trailing return types!
+  
+    std::string dest="auto ";
+
+    dest+="(";
+    const code_typet::argumentst &arguments=code_type.arguments();
+
+    for(code_typet::argumentst::const_iterator
+        it=arguments.begin();
+        it!=arguments.end();
+        it++)
+    {
+      if(it!=arguments.begin())
+        dest+=", ";
+
+      dest+=convert(it->type());
+    }
+    
+    if(code_type.has_ellipsis())
+    {
+      if(!arguments.empty()) dest+=", ";
+      dest+="...";
+    }
+
+    dest+=")";
+    
+    const typet &return_type=code_type.return_type();
+    dest+=" -> "+convert(return_type);
+
+    return dest;
+  }
   else
     return expr2ct::convert_rec(src, qualifiers);
 }

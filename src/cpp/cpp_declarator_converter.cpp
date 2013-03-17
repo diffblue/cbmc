@@ -325,11 +325,11 @@ void cpp_declarator_convertert::combine_types(
 
   cpp_typecheck.err_location(location);
   cpp_typecheck.str << "symbol `" << symbol.display_name()
-                    << "' already declared with different type"
+                    << "' already declared with different type:"
                     << std::endl;
-  cpp_typecheck.str << "previous type: "
+  cpp_typecheck.str << "original: "
                     << cpp_typecheck.to_string(symbol.type) << std::endl;
-  cpp_typecheck.str << "new type: "
+  cpp_typecheck.str << "     new: "
                     << cpp_typecheck.to_string(final_type);
   throw 0;
 }
@@ -458,6 +458,7 @@ void cpp_declarator_convertert::get_final_identifier()
         c_it=cpp_typecheck.symbol_table.symbols.find("c::"+identifier);
         
       if(c_it!=cpp_typecheck.symbol_table.symbols.end() &&
+         c_it->second.type.id()==ID_code &&
          cpp_typecheck.function_identifier(final_type)==
          cpp_typecheck.function_identifier(c_it->second.type))
       {
