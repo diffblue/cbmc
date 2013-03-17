@@ -11,6 +11,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/goto_functions.h>
 
-void branch(goto_functionst &goto_functions);
+void branch(
+  symbol_tablet &symbol_table,
+  goto_functionst &goto_functions,
+  const irep_idt &id);
 
 #endif

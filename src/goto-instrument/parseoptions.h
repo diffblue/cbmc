@@ -36,7 +36,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(no-po-rendering)(render-cluster-file)(render-cluster-function)" \
   "(nondet-volatile)(isr):" \
   "(stack-depth):(nondet-static)" \
-  "(function-enter)(function-exit)(branch)" \
+  "(function-enter):(function-exit):(branch):" \
   "(signed-overflow-check)(unsigned-overflow-check)" \
   "(show-goto-functions)(show-value-sets)(show-local-may-alias)" \
   "(show-struct-alignment)" \
