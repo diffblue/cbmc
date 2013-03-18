@@ -41,6 +41,7 @@ static bool is_skip(goto_programt::instructionst::iterator it)
     goto_programt::instructionst::iterator next_it=it;
     next_it++;
 
+    // a branch to the next instruction is a skip
     return it->targets.front()==next_it;
   }
   
