@@ -22,7 +22,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class expr2ct
 {
 public:
-  expr2ct(const namespacet &_ns):ns(_ns) { }
+  expr2ct(const namespacet &_ns):ns(_ns), sizeof_nesting(0) { }
   virtual ~expr2ct() { }
 
   virtual std::string convert(const typet &src);
@@ -43,6 +43,8 @@ protected:
   std::set<exprt> symbols;
   std::map<irep_idt, exprt> shorthands;
   std::set<irep_idt> ns_collision;
+  std::string decl_symbol;
+  unsigned sizeof_nesting;
 
   void get_symbols(const exprt &expr);
   std::string id_shorthand(const exprt &expr) const;
@@ -129,6 +131,10 @@ protected:
     const exprt &src, 
     unsigned precedence);
 
+  std::string convert_comma(
+    const exprt &src,
+    unsigned precedence);
+
   std::string convert_Hoare(const exprt &src);
 
   std::string convert_code(const codet &src);
@@ -141,7 +147,7 @@ protected:
   std::string convert_code_ifthenelse(const code_ifthenelset &src, unsigned indent);
   std::string convert_code_for(const code_fort &src, unsigned indent);
   std::string convert_code_while(const code_whilet &src, unsigned indent);
-  std::string convert_code_dowhile(const codet &src, unsigned indent);
+  std::string convert_code_dowhile(const code_dowhilet &src, unsigned indent);
   std::string convert_code_block(const code_blockt &src, unsigned indent);
   std::string convert_code_expression(const codet &src, unsigned indent);
   std::string convert_code_return(const codet &src, unsigned indent);
