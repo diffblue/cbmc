@@ -266,10 +266,12 @@ bool gcc_modet::doit()
       std::string new_suffix=has_suffix(*a_it, ".c")?".i":".ii";
       std::string new_name=get_base_name(*a_it)+new_suffix;
       std::string dest=temp_dir(new_name);
+
       int exit_code=preprocess(*a_it, dest);
+
       if(exit_code!=0)
       {
-        debug("preprocessing has failed");
+        error("preprocessing has failed");
         return true;
       }
       
