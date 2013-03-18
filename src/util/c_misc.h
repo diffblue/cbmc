@@ -12,6 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <string>
 
 std::string MetaChar(char c);
-void MetaString(std::string &out, const std::string &in);
+std::string MetaString(const std::string &in);
 
 #endif

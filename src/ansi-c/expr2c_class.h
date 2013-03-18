@@ -43,7 +43,6 @@ protected:
   std::set<exprt> symbols;
   std::map<irep_idt, exprt> shorthands;
   std::set<irep_idt> ns_collision;
-  std::string decl_symbol;
   unsigned sizeof_nesting;
 
   void get_symbols(const exprt &expr);
