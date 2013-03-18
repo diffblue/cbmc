@@ -42,6 +42,11 @@ public:
     compute(program);
   }
 
+  const cfg_dominatorst& get_dominator_info() const
+  {
+    return cfg_dominators;
+  }
+
 protected:
   cfg_dominatorst cfg_dominators;
 
