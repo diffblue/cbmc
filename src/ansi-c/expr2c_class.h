@@ -35,7 +35,8 @@ protected:
 
   virtual std::string convert_rec(
     const typet &src,
-    const c_qualifierst &qualifiers);
+    const c_qualifierst &qualifiers,
+    const std::string &declarator);
 
   static std::string indent_str(unsigned indent);
 

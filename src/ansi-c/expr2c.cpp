@@ -141,7 +141,7 @@ Function: expr2ct::convert
 
 std::string expr2ct::convert(const typet &src)
 {
-  return convert_rec(src, c_qualifierst());
+  return convert_rec(src, c_qualifierst(), "");
 }
 
 /*******************************************************************\
@@ -158,31 +158,35 @@ Function: expr2ct::convert_rec
 
 std::string expr2ct::convert_rec(
   const typet &src,
-  const c_qualifierst &qualifiers)
+  const c_qualifierst &qualifiers,
+  const std::string &declarator)
 {
   c_qualifierst new_qualifiers(qualifiers);
   new_qualifiers.read(src);
 
   std::string q=new_qualifiers.as_string();
-
+  
+  std::string d=
+    declarator==""?declarator:" "+declarator;
+  
   if(src.id()==ID_bool)
   {
-    return q+"_Bool";
+    return q+"_Bool"+d;
   }
   else if(src.id()==ID_natural ||
           src.id()==ID_integer ||
           src.id()==ID_rational)
   {
-    return q+src.id_string();
+    return q+src.id_string()+d;
   }
   else if(src.id()==ID_empty)
   {
-    return q+"void";
+    return q+"void"+d;
   }
   else if(src.id()==ID_complex)
   {
     // these take more or less arbitrary subtypes
-    return q+"_Complex "+convert(src.subtype());
+    return q+"_Complex "+convert(src.subtype())+d;
   }
   else if(src.id()==ID_floatbv)
   {
@@ -191,18 +195,18 @@ std::string expr2ct::convert_rec(
     irep_idt c_type=src.get(ID_C_c_type);
 
     if(c_type==ID_double)
-      return q+"double";
+      return q+"double"+d;
     else if(c_type==ID_long_double)
-      return q+"long double";
+      return q+"long double"+d;
     else if(c_type==ID_float)
-      return q+"float";
+      return q+"float"+d;
 
     mp_integer width=string2integer(src.get_string(ID_width));
 
     if(width==config.ansi_c.single_width)
-      return q+"float";
+      return q+"float"+d;
     else if(width==config.ansi_c.double_width)
-      return q+"double";
+      return q+"double"+d;
   }
   else if(src.id()==ID_fixedbv)
   {
@@ -211,18 +215,18 @@ std::string expr2ct::convert_rec(
     irep_idt c_type=src.get(ID_C_c_type);
 
     if(c_type==ID_double)
-      return q+"double";
+      return q+"double"+d;
     else if(c_type==ID_long_double)
-      return q+"long double";
+      return q+"long double"+d;
     else if(c_type==ID_float)
-      return q+"float";
+      return q+"float"+d;
 
     mp_integer width=string2integer(src.get_string(ID_width));
 
     if(width==config.ansi_c.single_width)
-      return q+"float";
+      return q+"float"+d;
     else if(width==config.ansi_c.double_width)
-      return q+"double";
+      return q+"double"+d;
   }
   else if(src.id()==ID_signedbv ||
           src.id()==ID_unsignedbv)
@@ -232,46 +236,46 @@ std::string expr2ct::convert_rec(
     irep_idt c_type=src.get(ID_C_c_type);
 
     if(c_type==ID_unsigned_char)
-      return q+"unsigned char";
+      return q+"unsigned char"+d;
     else if(c_type==ID_signed_char)
-      return q+"signed char";
+      return q+"signed char"+d;
     else if(c_type==ID_char)
     {
       if(config.ansi_c.char_is_unsigned==
          (src.id()==ID_unsignedbv))
-        return q+"char";
+        return q+"char"+d;
       else
       {
         if(src.id()==ID_signedbv)
-          return q+"signed char";
+          return q+"signed char"+d;
         else
-          return q+"unsigned char";
+          return q+"unsigned char"+d;
       }
     }
     else if(c_type==ID_unsigned_short_int)
-      return q+"unsigned short int";
+      return q+"unsigned short int"+d;
     else if(c_type==ID_signed_short_int)
-      return q+"signed short int";
+      return q+"signed short int"+d;
     else if(c_type==ID_unsigned_int)
-      return q+"unsigned int";
+      return q+"unsigned int"+d;
     else if(c_type==ID_signed_int)
-      return q+"signed int";
+      return q+"signed int"+d;
     else if(c_type==ID_unsigned_long_int)
-      return q+"unsigned long int";
+      return q+"unsigned long int"+d;
     else if(c_type==ID_signed_long_int)
-      return q+"signed long int";
+      return q+"signed long int"+d;
     else if(c_type==ID_unsigned_long_long_int)
-      return q+"unsigned long long int";
+      return q+"unsigned long long int"+d;
     else if(c_type==ID_signed_long_long_int)
-      return q+"signed long long int";
+      return q+"signed long long int"+d;
     else if(c_type==ID_bool)
-      return q+"_Bool";
+      return q+"_Bool"+d;
     else if(c_type==ID_signed_int128)
-      return q+"signed __int128";
+      return q+"signed __int128"+d;
     else if(c_type==ID_unsigned_int128)
-      return q+"unsigned __int128";
+      return q+"unsigned __int128"+d;
     else if(c_type==ID_gcc_float128)
-      return q+"__float128";
+      return q+"__float128"+d;
       
     // There is also wchar_t among the above, but this isn't a C type.
 
@@ -283,31 +287,32 @@ std::string expr2ct::convert_rec(
     if(width==config.ansi_c.int_width)
     {
       if(is_signed) sign_str="";
-      return q+sign_str+"int";
+      return q+sign_str+"int"+d;
     }
     else if(width==config.ansi_c.long_int_width)
     {
       if(is_signed) sign_str="";
-      return q+sign_str+"long int";
+      return q+sign_str+"long int"+d;
     }
     else if(width==config.ansi_c.char_width)
     {
       // always include sign
-      return q+sign_str+"char";
+      return q+sign_str+"char"+d;
     }
     else if(width==config.ansi_c.short_int_width)
     {
       if(is_signed) sign_str="";
-      return q+sign_str+"short int";
+      return q+sign_str+"short int"+d;
     }
     else if(width==config.ansi_c.long_long_int_width)
     {
       if(is_signed) sign_str="";
-      return q+sign_str+"long long int";
+      return q+sign_str+"long long int"+d;
     }
     else
     {
-      return q+sign_str+"__CPROVER_bitvector["+integer2string(width)+"]";
+      return q+sign_str+
+             "__CPROVER_bitvector["+integer2string(width)+"]"+d;
     }
   }
   else if(src.id()==ID_struct ||
@@ -317,6 +322,7 @@ std::string expr2ct::convert_rec(
 
     const std::string &tag=src.get_string(ID_tag);
     if(tag!="") dest+=" "+tag;
+    dest+=d;
 
     return dest;
   }
@@ -327,6 +333,7 @@ std::string expr2ct::convert_rec(
 
     const std::string &tag=src.get_string(ID_tag);
     if(tag!="") dest+=" "+tag;
+    dest+=d;
 
     /*
     const irept &components=type.find(ID_components);
@@ -345,104 +352,93 @@ std::string expr2ct::convert_rec(
   {
     std::string result=q+"enum";
     if(src.get(ID_name)!="") result+=" "+src.get_string(ID_tag);
+    result+=d;
     return result;
   }
   else if(src.id()==ID_pointer)
   {
     const typet &subtype=ns.follow(src.subtype());
   
-    if(subtype.id()==ID_code)
-    {
-      const typet &return_type=to_code_type(subtype).return_type();
+    // The star gets attached to the declarator.
+    std::string new_declarator="*";
 
-      std::string dest=q+convert(return_type);
+    if(q!="")
+      new_declarator+=" "+q;
+    
+    new_declarator+=declarator;
 
-      // function "name"
-      dest+=" (*)";
-
-      // arguments
-      dest+="(";
-      const irept &arguments=subtype.find(ID_arguments);
-
-      forall_irep(it, arguments.get_sub())
-      {
-        const typet &argument_type=((exprt &)*it).type();
-
-        if(it!=arguments.get_sub().begin())
-          dest+=", ";
-
-        dest+=convert(argument_type);
-      }
-
-      if(to_code_type(subtype).has_ellipsis())
-      {
-        if(!arguments.get_sub().empty()) dest+=", ";
-        dest+="...";
-      }
-
-      dest+=")";
-
-      return dest;
-    }
-    else
-    {
-      std::string tmp=convert(subtype);
-      tmp+=" *";
-      if(q!="")
-      {
-        tmp+=" "+q;
-        // strip training space off q
-        if(tmp[tmp.size()-1]==' ')
-          tmp.resize(tmp.size()-1);
-      }
-      return tmp;
-    }
+    // Depending on precedences, we may add parentheses.
+    if(subtype.id()==ID_array ||
+       subtype.id()==ID_incomplete_array)
+      new_declarator="("+new_declarator+")";
+    
+    return convert_rec(subtype, c_qualifierst(), new_declarator);
   }
   else if(src.id()==ID_array)
   {
+    // The [...] gets attached to the declarator.
+    std::string array_suffix;
+    
     if(to_array_type(src).size().is_nil())
-      return convert(src.subtype())+" []";
+      array_suffix="[]";
+    else
+      array_suffix="["+convert(to_array_type(src).size())+"]";
 
-    std::string size_string=convert(to_array_type(src).size());
-    return convert(src.subtype())+" ["+size_string+"]";
+    // This won't really parse without declarator.
+    return convert_rec(
+      src.subtype(), c_qualifierst(), declarator+array_suffix);
   }
   else if(src.id()==ID_incomplete_array)
   {
-    return convert(src.subtype())+" []";
+    // The [] gets attached to the declarator.
+    // This won't parse without declarator.
+    return convert_rec(
+      src.subtype(), c_qualifierst(), declarator+"[]");
   }
   else if(src.id()==ID_symbol)
   {
-    return convert_rec(ns.follow(src), new_qualifiers);
+    return convert_rec(ns.follow(src), new_qualifiers, declarator);
   }
   else if(src.id()==ID_code)
   {
     const code_typet &code_type=to_code_type(src);
-  
     const typet &return_type=code_type.return_type();
 
+    std::string dest=convert(return_type);
+    
     // C doesn't really have syntax for function types,
-    // i.e., the following won't parse
-  
-    std::string dest=convert(return_type)+" ()";
+    // i.e., the following won't parse without declarator
+    if(declarator=="")
+      dest+=" ()";
+    else
+      dest+=d;
 
+    // arguments
     dest+="(";
     const code_typet::argumentst &arguments=code_type.arguments();
-
-    for(code_typet::argumentst::const_iterator
-        it=arguments.begin();
-        it!=arguments.end();
-        it++)
-    {
-      if(it!=arguments.begin())
-        dest+=", ";
-
-      dest+=convert(it->type());
-    }
     
-    if(code_type.has_ellipsis())
+    if(arguments.empty())
     {
-      if(!arguments.empty()) dest+=", ";
-      dest+="...";
+      if(code_type.has_ellipsis())
+        dest+=""; // empty!
+      else
+        dest+="void"; // means 'no arguments'
+    }
+    else
+    {
+      for(code_typet::argumentst::const_iterator
+          it=arguments.begin();
+          it!=arguments.end();
+          it++)
+      {
+        if(it!=arguments.begin())
+          dest+=", ";
+
+        dest+=convert(it->type());
+      }
+      
+      if(code_type.has_ellipsis())
+        dest+=", ...";
     }
 
     dest+=")";
@@ -456,7 +452,7 @@ std::string expr2ct::convert_rec(
     dest+=", ";
     dest+=convert(vector_type.subtype());
     dest+=")";
-    return q+dest;
+    return q+dest+d;
   }
 
   {
@@ -465,6 +461,7 @@ std::string expr2ct::convert_rec(
     std::string dest="irep(\"";
     MetaString(dest, lisp.expr2string());
     dest+="\")";
+    dest+=d;
 
     return dest;
   }
@@ -1886,11 +1883,14 @@ std::string expr2ct::convert_struct(
 
   if(full_type.id()!=ID_struct)
     return convert_norep(src, precedence);
+    
+  const struct_typet &struct_type=
+    to_struct_type(full_type);
 
   std::string dest="{ ";
 
-  const irept::subt &components=
-    full_type.find(ID_components).get_sub();
+  const struct_typet::componentst &components=
+    struct_type.components();
 
   assert(components.size()==src.operands().size());
 
@@ -1900,7 +1900,10 @@ std::string expr2ct::convert_struct(
   bool newline=false;
   unsigned last_size=0;
 
-  forall_irep(c_it, components)
+  for(struct_typet::componentst::const_iterator
+      c_it=components.begin();
+      c_it!=components.end();
+      c_it++)
   {
     if(o_it->type().id()==ID_code)
       continue;
@@ -2727,20 +2730,19 @@ std::string expr2ct::convert_code_decl(
   const codet &src,
   unsigned indent)
 {
-  if(src.operands().size()!=1 && src.operands().size()!=2)
+  // initializer to go away
+  if(src.operands().size()!=1 &&
+     src.operands().size()!=2)
   {
     unsigned precedence;
     return convert_norep(src, precedence);
   }
+  
+  std::string declarator=convert(src.op0());
 
   std::string dest=indent_str(indent);
 
-  {
-    dest+=convert(src.op0().type());
-    dest+=" ";
-  }
-
-  dest+=convert(src.op0());
+  dest+=convert_rec(src.op0().type(), c_qualifierst(), declarator);
 
   if(src.operands().size()==2)
     dest+=" = "+convert(src.op1());
