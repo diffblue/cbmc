@@ -1587,26 +1587,28 @@ void goto2sourcet::convert_compound_rec(
   */
 
   std::stringstream struct_body;
+
   for(struct_union_typet::componentst::const_iterator
       it=type.components().begin();
       it!=type.components().end();
       it++)
   {
-    const struct_typet::componentt& comp=*it;
+    const struct_typet::componentt &comp=*it;
     typet comp_type=ns.follow(comp.type());
 
     if(comp_type.id()==ID_code ||
-        comp.get_bool(ID_from_base) ||
-        comp.get_is_padding())
+       comp.get_bool(ID_from_base) ||
+       comp.get_is_padding())
       continue;
 
     convert_compound_rec(comp_type, os);
 
     const irep_idt &comp_name=comp.get_name();
+
     struct_body << indent(1) << "// " << comp_name << std::endl;
     struct_body << indent(1);
 
-    const typet * t_p=&comp_type;
+    const typet *t_p=&comp_type;
     unsigned n_ptr=0;
     while(t_p->id()==ID_pointer)
     {
@@ -1648,6 +1650,7 @@ void goto2sourcet::convert_compound_rec(
       else
         assert(false);
     }
+
     struct_body << std::endl;
   }
 
