@@ -126,8 +126,12 @@ Function: MetaString
 
 \*******************************************************************/
 
-void MetaString(std::string &out, const std::string &in)
+std::string MetaString(const std::string &in)
 {
+  std::string result;
+  
   for(unsigned i=0; i<in.size(); i++)
-    MetaChar(out, in[i], true);
+    MetaChar(result, in[i], true);
+  
+  return result;
 }

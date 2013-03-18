@@ -203,7 +203,7 @@ std::string expr2ct::convert_rec(
     else if(c_type==ID_float)
       return q+"float"+d;
     else if(c_type==ID_gcc_float128)
-      return q+"__float128"+d;
+      return q+"__float128"+d; // gcc 4.3 or later
 
     mp_integer width=string2integer(src.get_string(ID_width));
 
@@ -227,7 +227,7 @@ std::string expr2ct::convert_rec(
     else if(c_type==ID_float)
       return q+"float"+d;
     else if(c_type==ID_gcc_float128)
-      return q+"__float128"+d;
+      return q+"__float128"+d; // gcc 4.3 or later
 
     mp_integer width=string2integer(src.get_string(ID_width));
 
@@ -284,8 +284,6 @@ std::string expr2ct::convert_rec(
       return q+"signed __int128"+d;
     else if(c_type==ID_unsigned_int128)
       return q+"unsigned __int128"+d;
-    else if(c_type==ID_gcc_float128)
-      return q+"__float128"+d;
       
     // There is also wchar_t among the above, but this isn't a C type.
 
@@ -405,16 +403,10 @@ std::string expr2ct::convert_rec(
     else
       array_suffix="["+convert(to_array_type(src).size())+"]";
     
-    const typet &subtype=ns.follow(src.subtype());
-  
     // This won't really parse without declarator.
-    if(subtype.id()==ID_pointer &&
-        (subtype.subtype().id()==ID_code || subtype.subtype().id()==ID_array))
-      return convert_rec(
-          src.subtype(), c_qualifierst(), declarator+array_suffix);
-    else
-      return convert_rec(
-          src.subtype(), c_qualifierst(), "")+" "+declarator+array_suffix;
+    // Note that qualifiers are passed down.
+    return convert_rec(
+      src.subtype(), qualifiers, declarator+array_suffix);
   }
   else if(src.id()==ID_incomplete_array)
   {
@@ -454,15 +446,13 @@ std::string expr2ct::convert_rec(
         if(it!=arguments.begin())
           dest+=", ";
 
-
         if(it->get_identifier().empty())
           dest+=convert(it->type());
         else
         {
-          code_declt d(symbol_exprt(it->get_identifier(), it->type()));
-          dest+=convert(d);
-          if(*dest.rbegin()==';')
-            dest.resize(dest.size()-1);
+          std::string arg_declarator=
+            convert(symbol_exprt(it->get_identifier(), it->type()));
+          dest+=convert_rec(it->type(), c_qualifierst(), arg_declarator);
         }
       }
 
@@ -473,15 +463,7 @@ std::string expr2ct::convert_rec(
     dest+=")";
 
     const typet &return_type=code_type.return_type();
-    /*
-    dest.swap(decl_symbol);
-    dest=convert(return_type);
-    if(!decl_symbol.empty())
-    {
-      dest+=" "+decl_symbol;
-      decl_symbol.clear();
-    }
-    */
+
     dest=convert(return_type)+" "+dest;
 
     if(!q.empty())
@@ -500,7 +482,9 @@ std::string expr2ct::convert_rec(
 
     std::string dest="__gcc_v";
     dest+=convert(vector_type.size());
+
     std::string tmp=convert(vector_type.subtype());
+
     if(tmp=="signed char" || tmp=="char")
       dest+="qi";
     else if(tmp=="signed short int")
@@ -528,9 +512,7 @@ std::string expr2ct::convert_rec(
   {
     lispexprt lisp;
     irep2lisp(src, lisp);
-    std::string dest="irep(\"";
-    MetaString(dest, lisp.expr2string());
-    dest+="\")";
+    std::string dest="irep(\""+MetaString(lisp.expr2string())+"\")";
     dest+=d;
 
     return dest;
@@ -1606,9 +1588,7 @@ std::string expr2ct::convert_norep(
 {
   lispexprt lisp;
   irep2lisp(src, lisp);
-  std::string dest="irep(\"";
-  MetaString(dest, lisp.expr2string());
-  dest+="\")";
+  std::string dest="irep(\""+MetaString(lisp.expr2string())+"\")";
   precedence=16;
   return dest;
 }
@@ -1837,14 +1817,14 @@ std::string expr2ct::convert_constant(
 
   if(src.id()==ID_string_constant)
   {
-    dest='"';
-    MetaString(dest, id2string(value));
-    dest+='"';
+    dest='"'+MetaString(id2string(value))+'"';
   }
   else if(type.id()==ID_integer ||
           type.id()==ID_natural ||
           type.id()==ID_rational)
+  {
     dest=id2string(value);
+  }
   else if(type.id()==ID_c_enum ||
           type.id()==ID_incomplete_c_enum)
   {
@@ -1878,9 +1858,13 @@ std::string expr2ct::convert_constant(
   else if(type.id()==ID_rational)
     return convert_norep(src, precedence);
   else if(type.id()==ID_bv)
+  {
+    // not C
     dest=id2string(value);
+  }
   else if(type.id()==ID_bool)
   {
+    // C doesn't really have these
     if(src.is_true())
       dest="TRUE";
     else
@@ -1893,6 +1877,7 @@ std::string expr2ct::convert_constant(
 
     if(type.get(ID_C_c_type)==ID_bool)
     {
+      // C doesn't really have these
       if(int_value!=0)
         dest="TRUE";
       else
@@ -1946,7 +1931,7 @@ std::string expr2ct::convert_constant(
     {
       if(src.type()==float_type())
         dest+="f";
-      else if(src.type()==double_type())
+      else if(src.type()==long_double_type())
         dest+="l";
     }
   }
@@ -3961,7 +3946,7 @@ std::string expr2ct::convert(
     else if(src.op0().id()==ID_label)
       return "&&"+src.op0().get_string(ID_identifier);
     else if(src.op0().id()==ID_index &&
-        to_index_expr(src.op0()).index().is_zero())
+            to_index_expr(src.op0()).index().is_zero())
       return convert(to_index_expr(src.op0()).array());
     else if(src.type().subtype().id()==ID_code)
       return convert_unary(src, "", precedence=15);
