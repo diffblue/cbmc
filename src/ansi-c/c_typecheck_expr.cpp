@@ -19,6 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <base_type.h>
 #include <std_expr.h>
 #include <i2string.h>
+#include <pointer_offset_size.h>
 
 #include "c_types.h"
 #include "c_typecast.h"
@@ -1094,20 +1095,6 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
     throw 0;
   }
 
-  // Casts to booleans have particular meaning
-  if(expr_type.get(ID_C_c_type)==ID_bool)
-  {
-    // we replace (_Bool)x by x!=0; use ieee_float_notequal for floats
-    irep_idt id=
-      op_type.id()==ID_floatbv?ID_ieee_float_notequal:ID_notequal;
-
-    binary_exprt comparison(expr.op0(), id, gen_zero(expr.op0().type()), bool_typet());
-
-    comparison.location()=expr.location();
-    expr.swap(comparison);
-    return;
-  }
-
   if(is_number(op_type) ||
      op_type.id()==ID_c_enum ||
      op_type.id()==ID_incomplete_c_enum ||
@@ -1135,10 +1122,24 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
   }
   else if(op_type.id()==ID_vector)
   {
-    // we are generous -- any vector to integer is fine
-    if(expr_type.id()==ID_signedbv ||
-       expr_type.id()==ID_unsignedbv)
-      return;
+    const vector_typet &op_vector_type=
+      to_vector_type(op_type);
+      
+    // gcc allows conversion of a vector of size 1 to
+    // an integer/float of the same size
+    if((expr_type.id()==ID_signedbv ||
+        expr_type.id()==ID_unsignedbv) &&
+       pointer_offset_size(*this, expr_type)==
+       pointer_offset_size(*this, op_vector_type))
+    {
+    }
+    else
+    {
+      err_location(expr);
+      str << "type cast from vector to `"
+          << to_string(expr.type()) << "' not permitted";
+      throw 0;
+    }
   }
   else
   {
@@ -1148,8 +1149,24 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
     throw 0;
   }
 
-  // special case: NULL
+  // Casts to C/C++ booleans have particular meaning
+  if(expr_type.get(ID_C_c_type)==ID_bool)
+  {
+    // we replace (_Bool)x by x!=0; use ieee_float_notequal for floats
+    irep_idt id=
+      op_type.id()==ID_floatbv?ID_ieee_float_notequal:ID_notequal;
+      
+    exprt zero=gen_zero(expr.op0().type());
+    assert(zero.is_not_nil());
 
+    binary_exprt comparison(expr.op0(), id, zero, bool_typet());
+
+    comparison.location()=expr.location();
+    expr.swap(comparison);
+    return;
+  }
+
+  // special case: NULL
   if(expr_type.id()==ID_pointer &&
      op.is_zero())
   {
