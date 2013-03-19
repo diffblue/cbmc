@@ -14,6 +14,14 @@ STATIC_ASSERT(!(_Bool)(int)0.1);
 STATIC_ASSERT(!(_Bool)0.0);
 STATIC_ASSERT(!(_Bool)-0.0);
 
+// array to _Bool
+char my_array[10];
+STATIC_ASSERT((_Bool)my_array);
+
+// pointer to _Bool
+char my_array[10];
+STATIC_ASSERT((_Bool)(int *)1);
+
 int main()
 {
 }
