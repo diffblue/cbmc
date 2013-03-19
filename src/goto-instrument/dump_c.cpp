@@ -24,6 +24,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <arith_tools.h>
 #include <suffix.h>
 #include <base_type.h>
+#include <type_eq.h>
+#include <i2string.h>
 
 #include <langapi/mode.h>
 #include <ansi-c/ansi_c_language.h>
@@ -46,7 +48,7 @@ public:
       const tag_mapt &_tag_map,
       code_blockt &_dest,
       type_namest &_type_names,
-      std::set<std::string> &_system_headers) :
+      std::set<std::string> &_system_headers):
     goto_program(_goto_program),
     symbol_table(_symbol_table),
     tag_map(_tag_map),
@@ -75,13 +77,14 @@ protected:
   tag_mapt reverse_tag_map;
   id_sett expanded_symbols;
 
-
   void build_loop_map();
 
   void cleanup_code(codet &code, const bool is_top);
+
   void cleanup_code_block(
       codet &code,
       const bool is_top);
+
   void cleanup_code_ifthenelse(codet &code);
 
   void expand_reverse_tag_map(const irep_idt identifier);
@@ -101,6 +104,7 @@ protected:
   goto_programt::const_targett convert_assign(
       goto_programt::const_targett target,
       codet &dest);
+
   void convert_assign_rec(
       const code_assignt &assign,
       codet &dest);
@@ -123,18 +127,22 @@ protected:
       goto_programt::const_targett target,
       goto_programt::const_targett upper_bound,
       codet &dest);
+
   goto_programt::const_targett convert_goto_while(
       goto_programt::const_targett target,
       goto_programt::const_targett loop_end,
       codet &dest);
+
   goto_programt::const_targett convert_goto_switch(
       goto_programt::const_targett target,
       goto_programt::const_targett upper_bound,
       codet &dest);
+
   goto_programt::const_targett convert_goto_if(
       goto_programt::const_targett target,
       goto_programt::const_targett upper_bound,
       codet &dest);
+
   goto_programt::const_targett convert_goto_goto(
       goto_programt::const_targett target,
       codet &dest);
@@ -1665,7 +1673,7 @@ void goto_program2codet::cleanup_expr(exprt &expr)
     cleanup_expr(*it);
 
   if(expr.id()==ID_union ||
-      expr.id()==ID_struct)
+     expr.id()==ID_struct)
   {
     const typet &t=expr.type();
 
@@ -1717,9 +1725,84 @@ void goto_program2codet::cleanup_expr(exprt &expr)
     typecast_exprt tc(expr, t);
     expr.swap(tc);
   }
+  else if(expr.id()==ID_sideeffect)
+  {
+    const irep_idt &statement=to_side_effect_expr(expr).get_statement();
+
+    if(statement==ID_nondet)
+    {
+      // Replace by a function call to nondet_...
+      // We first search for a suitable one in the symbol table.
+      
+      irep_idt id="";
+      
+      for(symbol_tablet::symbolst::const_iterator
+          it=symbol_table.symbols.begin();
+          it!=symbol_table.symbols.end();
+          it++)
+      {
+        if(it->second.type.id()!=ID_code) continue;
+        if(!has_prefix(id2string(it->second.base_name), "nondet_")) continue;
+        const code_typet &code_type=to_code_type(it->second.type);
+        if(!type_eq(code_type.return_type(), expr.type(), ns)) continue;
+        if(!code_type.arguments().empty()) continue;
+        id=it->second.name;
+        break;
+      }
+      
+      // none found? make one
+      
+      if(id=="")
+      {
+        irep_idt base_name="";
+      
+        if(expr.type().get(ID_C_c_type)!="")
+        {
+          irep_idt suffix;
+          suffix=expr.type().get(ID_C_c_type);
+
+          if(symbol_table.symbols.find("c::nondet_"+id2string(suffix))==
+             symbol_table.symbols.end())
+            base_name="nondet_"+id2string(suffix);
+        }
+        
+        if(base_name=="")
+        {
+          unsigned count;
+          for(count=0;
+              symbol_table.symbols.find("c::nondet_"+i2string(count))!=
+              symbol_table.symbols.end();
+              count++);
+          base_name="nondet_"+i2string(count);
+        }
+        
+        code_typet code_type;
+        code_type.return_type()=expr.type();
+        
+        symbolt symbol;
+        symbol.base_name=base_name;
+        symbol.name="c::"+id2string(base_name);
+        symbol.type=code_type;
+        id=symbol.name;
+        
+        symbol_table.move(symbol);
+      }
+      
+      const symbolt &symbol=ns.lookup(id);
+      
+      symbol_exprt symbol_expr(symbol.name, symbol.type);
+      symbol_expr.location()=expr.location();
+      
+      side_effect_exprt call(ID_function_call);
+      call.location()=expr.location();
+      call.operands().resize(2);
+      call.op0()=symbol_expr;
+      call.type()=expr.type();
+      
+      expr.swap(call);
+    }
+  }
 }
-
-
 
 class goto2sourcet
 {
