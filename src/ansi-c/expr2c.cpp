@@ -3524,7 +3524,7 @@ std::string expr2ct::convert_code_assume(
     return convert_norep(src, precedence);
   }
 
-  return indent_str(indent)+"assume("+convert(src.op0())+");";
+  return indent_str(indent)+"__CPROVER_assume("+convert(src.op0())+");";
 }
 
 /*******************************************************************\
