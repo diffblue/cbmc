@@ -48,6 +48,7 @@ symbol_exprt goto_convertt::make_static_symbol(
     new_symbol.is_file_local=true;
     new_symbol.value=expr;
     new_symbol.type=expr.type();
+    new_symbol.location=location;
   }
   while(symbol_table.move(new_symbol, symbol_ptr));    
 
@@ -55,9 +56,10 @@ symbol_exprt goto_convertt::make_static_symbol(
   // generate code for this.
 
   symbol_exprt result=symbol_expr(*symbol_ptr);
+  result.location()=location;
   
   code_assignt code_assign(result, expr);
-  code_assign.location()=expr.find_location();
+  code_assign.location()=location;
   convert(code_assign, dest);
 
   return result;
