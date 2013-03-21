@@ -18,7 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define GOTO_INSTRUMENT_OPTIONS \
   "(all)" \
   "(document-claims-latex)(document-claims-html)" \
-  "(dump-c)(dump-cpp)(dot)" \
+  "(dump-c)(dump-cpp)(dot)(xml)" \
   "(bounds-check)(no-bounds-check)" \
   "(pointer-check)(no-pointer-check)" \
   "(remove-pointers)" \
@@ -33,6 +33,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(wmm):(my-events)(unwind):" \
   "(max-var):(max-po-trans):" \
   "(cfg-kill)(no-dependencies)" \
+  "(call-graph)" \
   "(no-po-rendering)(render-cluster-file)(render-cluster-function)" \
   "(nondet-volatile)(isr):" \
   "(stack-depth):(nondet-static)" \
