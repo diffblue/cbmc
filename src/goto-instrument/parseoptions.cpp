@@ -35,6 +35,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/natural_loops.h>
 #include <analyses/local_may_alias.h>
 #include <analyses/goto_check.h>
+#include <analyses/call_graph.h>
 
 #include "parseoptions.h"
 #include "version.h"
@@ -292,6 +293,20 @@ int goto_instrument_parseoptionst::doit()
       else
         (is_cpp ? dump_cpp : dump_c)(goto_functions, ns, std::cout);
         
+      return 0;
+    }
+    
+    if(cmdline.isset("call-graph"))
+    {
+      call_grapht call_graph(goto_functions);
+      
+      if(cmdline.isset("xml"))
+        call_graph.output_xml(std::cout);
+      else if(cmdline.isset("dot"))
+        call_graph.output_dot(std::cout);
+      else
+        call_graph.output(std::cout);
+
       return 0;
     }
     
