@@ -755,6 +755,58 @@ std::string expr2ct::convert_with(
 
 /*******************************************************************\
 
+Function: expr2ct::convert_update
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+std::string expr2ct::convert_update(
+  const exprt &src,
+  unsigned precedence)
+{
+  // needs exactly 3 operands
+  if(src.operands().size()!=3)
+    return convert_norep(src, precedence);
+
+  std::string dest;
+
+  dest+="UPDATE(";
+
+  std::string op0, op1, op2;
+  unsigned p0, p2;
+  
+  op0=convert(src.op0(), p0);
+  op2=convert(src.op2(), p2);
+
+  if(precedence>p0) dest+='(';
+  dest+=op0;
+  if(precedence>p0) dest+=')';
+  
+  dest+=", ";
+  
+  const exprt &designator=src.op1();
+
+  forall_operands(it, designator)
+    dest+=convert(*it);
+  
+  dest+=", ";
+
+  if(precedence>p2) dest+='(';
+  dest+=op2;
+  if(precedence>p2) dest+=')';
+
+  dest+=")";
+
+  return dest;
+}
+
+/*******************************************************************\
+
 Function: expr2ct::convert_cond
 
   Inputs:
@@ -1440,6 +1492,50 @@ std::string expr2ct::convert_pointer_difference(
   dest+=')';
 
   return dest;
+}
+
+/*******************************************************************\
+
+Function: expr2ct::convert_member_designator
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+std::string expr2ct::convert_member_designator(const exprt &src)
+{
+  unsigned precedence;
+
+  if(src.operands().size()!=0)
+    return convert_norep(src, precedence);
+    
+  return "."+src.get_string(ID_component_name);
+}
+
+/*******************************************************************\
+
+Function: expr2ct::convert_index_designator
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+std::string expr2ct::convert_index_designator(const exprt &src)
+{
+  unsigned precedence;
+
+  if(src.operands().size()!=1)
+    return convert_norep(src, precedence);
+    
+  return "["+convert(src.op0())+"]";
 }
 
 /*******************************************************************\
@@ -4126,6 +4222,15 @@ std::string expr2ct::convert(
 
   else if(src.id()==ID_with)
     return convert_with(src, precedence=16);
+
+  else if(src.id()==ID_update)
+    return convert_update(src, precedence=16);
+
+  else if(src.id()==ID_member_designator)
+    return precedence=16, convert_member_designator(src);
+
+  else if(src.id()==ID_index_designator)
+    return precedence=16, convert_index_designator(src);
 
   else if(src.id()==ID_symbol)
     return convert_symbol(src, precedence);

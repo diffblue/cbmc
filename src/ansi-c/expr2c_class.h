@@ -95,6 +95,15 @@ protected:
   std::string convert_with(
     const exprt &src, unsigned precedence);
 
+  std::string convert_update(
+    const exprt &src, unsigned precedence);
+
+  std::string convert_member_designator(
+    const exprt &src);
+
+  std::string convert_index_designator(
+    const exprt &src);
+
   std::string convert_index(
     const exprt &src, unsigned precedence);
 
