@@ -346,6 +346,9 @@ event
 guard
 designated_initializer
 designator
+member_designator
+index_designator
+offset_designator
 C_constant #constant
 C_volatile #volatile
 C_restricted #restricted

@@ -1978,6 +1978,81 @@ extern inline with_exprt &to_with_expr(exprt &expr)
   return static_cast<with_exprt &>(expr);
 }
 
+/*! \brief Operator to update elements in structs and arrays
+*/
+class update_exprt:public exprt
+{
+public:
+  update_exprt(
+    const exprt &_old,
+    const exprt &_designator,
+    const exprt &_new_value):
+    exprt(ID_update, _old.type())
+  {
+    copy_to_operands(_old, _designator, _new_value);
+  }
+
+  inline update_exprt():exprt(ID_update)
+  {
+    operands().resize(3);
+  }
+  
+  inline exprt &old()
+  {
+    return op0();
+  }
+
+  inline const exprt &old() const
+  {
+    return op0();
+  }
+
+  inline exprt &designator()
+  {
+    return op1();
+  }
+
+  inline const exprt &designator() const
+  {
+    return op1();
+  }
+
+  inline exprt &new_value()
+  {
+    return op2();
+  }
+
+  inline const exprt &new_value() const
+  {
+    return op2();
+  }
+};
+
+/*! \brief Cast a generic exprt to an \ref update_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * update_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref with_exprt
+ *
+ * \ingroup gr_std_expr
+*/
+extern inline const update_exprt &to_update_expr(const exprt &expr)
+{
+  assert(expr.id()==ID_update && expr.operands().size()==3);
+  return static_cast<const update_exprt &>(expr);
+}
+
+/*! \copydoc to_update_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
+extern inline update_exprt &to_update_expr(exprt &expr)
+{
+  assert(expr.id()==ID_update && expr.operands().size()==3);
+  return static_cast<update_exprt &>(expr);
+}
+
 /*! \brief update of one element of an array
 */
 class array_update_exprt:public exprt
