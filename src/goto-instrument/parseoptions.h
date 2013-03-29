@@ -43,6 +43,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(show-struct-alignment)" \
   "(show-uninitialized)(show-locations)" \
   "(full-slice)(reachability-slice)" \
+  "(inline)" \
   "(show-symbol-table)(show-claims)(show-points-to)" \
   "(show-rw-set)(cav11)" \
   "(show-natural-loops)(accelerate)(havoc-loops)" \
