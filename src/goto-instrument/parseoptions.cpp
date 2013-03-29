@@ -129,11 +129,14 @@ int goto_instrument_parseoptionst::doit()
     {
       namespacet ns(symbol_table);
 
-      status("Function Pointer Removal");
-      remove_function_pointers(symbol_table, goto_functions, false);
+      if(!cmdline.isset("inline"))
+      {
+        status("Function Pointer Removal");
+        remove_function_pointers(symbol_table, goto_functions, false);
 
-      status("Partial Inlining");
-      goto_partial_inline(goto_functions, ns, ui_message_handler);
+        status("Partial Inlining");
+        goto_partial_inline(goto_functions, ns, ui_message_handler);
+      }
     
       status("Pointer Analysis");
       value_set_analysist value_set_analysis(ns);
@@ -147,11 +150,14 @@ int goto_instrument_parseoptionst::doit()
     {
       namespacet ns(symbol_table);
 
-      status("Function Pointer Removal");
-      remove_function_pointers(symbol_table, goto_functions, false);
+      if(!cmdline.isset("inline"))
+      {
+        status("Function Pointer Removal");
+        remove_function_pointers(symbol_table, goto_functions, false);
 
-      status("Partial Inlining");
-      goto_partial_inline(goto_functions, ns, ui_message_handler);
+        status("Partial Inlining");
+        goto_partial_inline(goto_functions, ns, ui_message_handler);
+      }
     
       forall_goto_functions(it, goto_functions)
       {
@@ -170,11 +176,14 @@ int goto_instrument_parseoptionst::doit()
     {
       namespacet ns(symbol_table);
 
-      status("Function Pointer Removal");
-      remove_function_pointers(symbol_table, goto_functions, false);
+      if(!cmdline.isset("inline"))
+      {
+        status("Function Pointer Removal");
+        remove_function_pointers(symbol_table, goto_functions, false);
 
-      status("Partial Inlining");
-      goto_partial_inline(goto_functions, ns, ui_message_handler);
+        status("Partial Inlining");
+        goto_partial_inline(goto_functions, ns, ui_message_handler);
+      }
     
       status("Pointer Analysis");
       points_tot points_to;
@@ -186,11 +195,15 @@ int goto_instrument_parseoptionst::doit()
     if(cmdline.isset("show-rw-set"))
     {
       namespacet ns(symbol_table);
-      status("Function Pointer Removal");
-      remove_function_pointers(symbol_table, goto_functions, false);
 
-      status("Partial Inlining");
-      goto_partial_inline(goto_functions, ns, ui_message_handler);
+      if(!cmdline.isset("inline"))
+      {
+        status("Function Pointer Removal");
+        remove_function_pointers(symbol_table, goto_functions, false);
+
+        status("Partial Inlining");
+        goto_partial_inline(goto_functions, ns, ui_message_handler);
+      }
     
       status("Pointer Analysis");
       value_set_analysist value_set_analysis(ns);
@@ -490,6 +503,17 @@ void goto_instrument_parseoptionst::instrument_goto_program(
 
   namespacet ns(symbol_table);
 
+  // now do full inlining, if requested
+  if(cmdline.isset("inline"))
+  {
+    status("Function Pointer Removal");
+    remove_function_pointers(
+      symbol_table, goto_functions, cmdline.isset("pointer-check"));
+
+    status("Performing full inlining");
+    goto_inline(goto_functions, ns, ui_message_handler);
+  }
+
   // add generic checks, if needed
   goto_check(ns, options, goto_functions);
   
@@ -529,12 +553,15 @@ void goto_instrument_parseoptionst::instrument_goto_program(
      cmdline.isset("isr") ||
      cmdline.isset("concurrency"))
   {
-    status("Function Pointer Removal");
-    remove_function_pointers(symbol_table, goto_functions, cmdline.isset("pointer-check"));
+    if(!cmdline.isset("inline"))
+    {
+      status("Function Pointer Removal");
+      remove_function_pointers(symbol_table, goto_functions, cmdline.isset("pointer-check"));
 
-    // do partial inlining
-    status("Partial Inlining");
-    goto_partial_inline(goto_functions, ns, ui_message_handler);
+      // do partial inlining
+      status("Partial Inlining");
+      goto_partial_inline(goto_functions, ns, ui_message_handler);
+    }
     
     status("Pointer Analysis");
     value_set_analysist value_set_analysis(ns);
