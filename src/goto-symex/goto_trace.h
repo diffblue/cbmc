@@ -46,7 +46,8 @@ public:
 
   typedef enum { NONE, ASSIGNMENT, ASSUME, ASSERT,
                  LOCATION, INPUT, OUTPUT, DECL, DEAD,
-                 FUNCTION_CALL, FUNCTION_RETURN } typet;
+                 FUNCTION_CALL, FUNCTION_RETURN,
+                 CONSTRAINT } typet;
   typet type;
     
   goto_programt::const_targett pc;
