@@ -29,7 +29,11 @@ STATIC_ASSERT(sizeof(long double)==8);
 
 // the following does both 32 and 64 bit architectures
 
-STATIC_ASSERT(sizeof(void *)==sizeof(long int));
+// Note that there are architectures (e.g., x32) with
+// 64-bit long int and 32-bit pointers. However,
+// a long int should always be able to hold a pointer.
+STATIC_ASSERT(sizeof(void *)<=sizeof(long int));
+
 STATIC_ASSERT(sizeof(int)==4);
 STATIC_ASSERT(sizeof(long int)==4 || sizeof(long int)==8);
 STATIC_ASSERT(sizeof(long long int)==8);
