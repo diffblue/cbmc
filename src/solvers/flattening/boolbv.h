@@ -142,6 +142,7 @@ protected:
   virtual void convert_floatbv_op(const exprt &expr, bvt &bv);
   virtual void convert_member(const member_exprt &expr, bvt &bv);
   virtual void convert_with(const exprt &expr, bvt &bv);
+  virtual void convert_update(const exprt &expr, bvt &bv);
   virtual void convert_case(const exprt &expr, bvt &bv);
   virtual void convert_cond(const exprt &expr, bvt &bv);
   virtual void convert_shift(const exprt &expr, bvt &bv);
@@ -192,6 +193,14 @@ protected:
     const exprt &op2,
     const bvt &prev_bv,
     bvt &next_bv);
+
+  void convert_update_rec(
+    const exprt::operandst &designator,
+    unsigned d,
+    const typet &type,
+    unsigned offset,
+    const exprt &new_value,
+    bvt &bv);
 
   virtual exprt bv_get_unbounded_array(
     const irep_idt &identifier,

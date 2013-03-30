@@ -216,6 +216,8 @@ void boolbvt::convert_bitvector(const exprt &expr, bvt &bv)
     return convert_member(to_member_expr(expr), bv);
   else if(expr.id()==ID_with)
     return convert_with(expr, bv);
+  else if(expr.id()==ID_update)
+    return convert_update(expr, bv);
   else if(expr.id()==ID_width)
   {
     unsigned result_width=boolbv_width(expr.type());

@@ -93,6 +93,7 @@ protected:
   void convert_member(const member_exprt &expr, bool bool_as_bv);
   void convert_overflow(const exprt &expr);
   void convert_with(const exprt &expr);
+  void convert_update(const exprt &expr);
   
   std::string convert_identifier(const irep_idt &identifier);
   
