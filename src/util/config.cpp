@@ -300,7 +300,11 @@ bool configt::set(const cmdlinet &cmdline)
   #elif __s390__
   this_arch="s390";
   #elif __x86_64__
-  this_arch="x86_64";
+    #ifdef __ILP32__
+    this_arch="x32"; // variant of x86_64 with 32-bit pointers
+    #else
+    this_arch="x86_64";
+    #endif
   #elif __i386__
   this_arch="i386";
   #else
@@ -466,6 +470,18 @@ bool configt::set(const cmdlinet &cmdline)
     ansi_c.endianness=configt::ansi_ct::IS_BIG_ENDIAN;
     ansi_c.long_double_width=16*8;
     ansi_c.char_is_unsigned=true;
+  }
+  else if(arch=="x32")
+  {
+    // This is a variant of x86_64 that has
+    // 64-bit long int but 32-bit pointers.
+    ansi_c.set_LP64();
+    ansi_c.arch=configt::ansi_ct::ARCH_X32;
+    ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
+    ansi_c.long_int_width=8*8;
+    ansi_c.pointer_width=4*8;
+    ansi_c.long_double_width=16*8;
+    ansi_c.char_is_unsigned=false;
   }
   else if(arch=="x86_64")
   {
