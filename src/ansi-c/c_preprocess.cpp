@@ -356,6 +356,7 @@ bool c_preprocess_visual_studio(
     case configt::ansi_ct::ARCH_SPARC:
     case configt::ansi_ct::ARCH_S390:
     case configt::ansi_ct::ARCH_S390X:
+    case configt::ansi_ct::ARCH_X32:
       assert(false); // not supported by Visual Studio
       break;
 
@@ -738,6 +739,10 @@ bool c_preprocess_gcc(
 
   case configt::ansi_ct::ARCH_X86_64:
     command+=" -D__LP64__ -D__x86_64 -D__x86_64__ -D_LP64 -D__amd64__ -D__amd64";
+    break;
+
+  case configt::ansi_ct::ARCH_X32:
+    command+=" -D__ILP32__ -D__x86_64 -D__x86_64__ -D__amd64__ -D__amd64";
     break;
 
   case configt::ansi_ct::ARCH_IA64:
