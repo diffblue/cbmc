@@ -370,7 +370,7 @@ std::string expr2ct::convert_rec(
     result+=d;
     return result;
     */
-    return q+"int";
+    return q+"int"+d;
   }
   else if(src.id()==ID_pointer)
   {
@@ -379,7 +379,7 @@ std::string expr2ct::convert_rec(
     // The star gets attached to the declarator.
     std::string new_declarator="*";
 
-    if(q!="")
+    if(q!="" && !declarator.empty())
       new_declarator+=" "+q;
     
     new_declarator+=declarator;
@@ -413,7 +413,7 @@ std::string expr2ct::convert_rec(
     // The [] gets attached to the declarator.
     // This won't parse without declarator.
     return convert_rec(
-      src.subtype(), c_qualifierst(), declarator+"[]");
+      src.subtype(), qualifiers, declarator+"[]");
   }
   else if(src.id()==ID_symbol)
   {
@@ -464,7 +464,12 @@ std::string expr2ct::convert_rec(
 
     const typet &return_type=code_type.return_type();
 
-    dest=convert(return_type)+" "+dest;
+    // return type may be a function pointer!
+    if(return_type.id()==ID_pointer &&
+        return_type.subtype().id()==ID_code)
+      dest=convert_rec(return_type, c_qualifierst(), dest);
+    else
+      dest=convert(return_type)+" "+dest;
 
     if(!q.empty())
     {
@@ -1983,7 +1988,7 @@ std::string expr2ct::convert_constant(
     {
       dest=integer2string(int_value);
 
-      irep_idt c_type=src.get(ID_C_c_type);
+      irep_idt c_type=type.get(ID_C_c_type);
 
       if(c_type==ID_unsigned_int)
         dest+="u";
@@ -2974,6 +2979,12 @@ std::string expr2ct::convert_code_decl(
   std::string declarator=convert(src.op0());
 
   std::string dest=indent_str(indent);
+
+  const symbolt *symbol=0;
+  if(!ns.lookup(to_symbol_expr(src.op0()).get_identifier(), symbol) &&
+      symbol->is_file_local &&
+      (src.op0().type().id()==ID_code || symbol->is_static_lifetime))
+    dest+="static ";
 
   dest+=convert_rec(src.op0().type(), c_qualifierst(), declarator);
 
