@@ -289,6 +289,8 @@ bool configt::set(const cmdlinet &cmdline)
   this_arch="mips";
   #elif __powerpc__
   this_arch="powerpc";
+  #elif __ppc64__
+  this_arch="ppc64";
   #elif __sparc__
   this_arch="sparc";
   #elif __ia64__
@@ -417,6 +419,14 @@ bool configt::set(const cmdlinet &cmdline)
   else if(arch=="powerpc")
   {
     ansi_c.set_ILP32();
+    ansi_c.arch=configt::ansi_ct::ARCH_POWER;
+    ansi_c.endianness=configt::ansi_ct::IS_BIG_ENDIAN;
+    ansi_c.long_double_width=16*8;
+    ansi_c.char_is_unsigned=true;
+  }
+  else if(arch=="ppc64")
+  {
+    ansi_c.set_LP64();
     ansi_c.arch=configt::ansi_ct::ARCH_POWER;
     ansi_c.endianness=configt::ansi_ct::IS_BIG_ENDIAN;
     ansi_c.long_double_width=16*8;
