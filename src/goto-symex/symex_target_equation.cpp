@@ -335,6 +335,33 @@ void symex_target_equationt::assertion(
 
 /*******************************************************************\
 
+Function: symex_target_equationt::constraint
+
+  Inputs: 
+
+ Outputs:
+
+ Purpose: record a constraint
+
+\*******************************************************************/
+
+void symex_target_equationt::constraint(
+  const guardt &guard,
+  const exprt &cond,
+  const sourcet &source)
+{
+  // like assumption, but with global effect
+  SSA_steps.push_back(SSA_stept());
+  SSA_stept &SSA_step=SSA_steps.back();
+  
+  SSA_step.guard_expr=guard.as_expr();
+  SSA_step.cond_expr=cond;
+  SSA_step.type=goto_trace_stept::ASSUME;
+  SSA_step.source=source;
+}
+
+/*******************************************************************\
+
 Function: symex_target_equationt::convert
 
   Inputs:
@@ -354,6 +381,7 @@ void symex_target_equationt::convert(
   convert_assumptions(prop_conv);
   convert_assertions(prop_conv);
   convert_io(prop_conv);
+  convert_constraints(prop_conv);
 }
 
 /*******************************************************************\
@@ -455,6 +483,35 @@ void symex_target_equationt::convert_assumptions(
         it->cond_literal=const_literal(true);
       else
         it->cond_literal=prop_conv.convert(it->cond_expr);
+    }
+  }
+}
+
+/*******************************************************************\
+
+Function: symex_target_equationt::convert_constraints
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void symex_target_equationt::convert_constraints(
+  decision_proceduret &decision_procedure) const
+{
+  for(SSA_stepst::const_iterator it=SSA_steps.begin();
+      it!=SSA_steps.end();
+      it++)
+  {
+    if(it->is_constraint())
+    {
+      if(it->ignore)
+        continue;
+
+      decision_procedure.set_to_true(it->cond_expr);
     }
   }
 }

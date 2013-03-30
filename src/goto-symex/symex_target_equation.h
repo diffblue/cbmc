@@ -106,11 +106,18 @@ public:
     const std::string &msg,
     const sourcet &source);
 
+  // record a (global) constraint
+  virtual void constraint(
+    const guardt &guard,
+    const exprt &cond,
+    const sourcet &source);
+
   void convert(prop_convt &prop_conv);
   void convert_assignments(decision_proceduret &decision_procedure) const;
   void convert_decls(prop_convt &prop_conv) const;
   void convert_assumptions(prop_convt &prop_conv);
   void convert_assertions(prop_convt &prop_conv);
+  void convert_constraints(decision_proceduret &decision_procedure) const;
   void convert_guards(prop_convt &prop_conv);
   void convert_io(decision_proceduret &decision_procedure);
 
@@ -125,6 +132,7 @@ public:
     bool is_assert() const          { return type==goto_trace_stept::ASSERT; }
     bool is_assume() const          { return type==goto_trace_stept::ASSUME; }
     bool is_assignment() const      { return type==goto_trace_stept::ASSIGNMENT; }
+    bool is_constraint() const      { return type==goto_trace_stept::CONSTRAINT; }
     bool is_location() const        { return type==goto_trace_stept::LOCATION; }
     bool is_output() const          { return type==goto_trace_stept::OUTPUT; }
     bool is_decl() const            { return type==goto_trace_stept::DECL; }
@@ -140,7 +148,7 @@ public:
     exprt ssa_rhs;
     assignment_typet assignment_type;
     
-    // for ASSUME/ASSERT
+    // for ASSUME/ASSERT/CONSTRAINT
     exprt cond_expr; 
     literalt cond_literal;
     std::string comment;
