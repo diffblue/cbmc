@@ -2233,7 +2233,8 @@ void goto2sourcet::convert_compound_rec(
        comp.get_is_padding())
       continue;
 
-    convert_compound_rec(comp_type, os);
+    if(comp_type.id()!=ID_pointer)
+      convert_compound_rec(comp_type, os);
 
     const irep_idt &comp_name=comp.get_name();
 
@@ -2364,8 +2365,6 @@ void goto2sourcet::convert_global_variable(
   {
     os << "// " << symbol.name << std::endl;
     os << "// " << symbol.location << std::endl;
-    if(symbol.is_file_local)
-      os << "static ";
     os << expr_to_string(d) << std::endl;
   }
 
@@ -2401,8 +2400,6 @@ void goto2sourcet::convert_global_variable(
   {
     os << "// " << symbol.name << std::endl;
     os << "// " << symbol.location << std::endl;
-    if(symbol.is_file_local)
-      os << "static ";
     os << expr_to_string(d) << std::endl;
   }
 }
@@ -2438,9 +2435,6 @@ void goto2sourcet::convert_function_declaration(
   {
     os_decl << "// " << symbol.name << std::endl;
     os_decl << "// " << symbol.location << std::endl;
-
-    if(symbol.is_file_local)
-      os_decl << "static ";
     os_decl << make_decl(symbol.name, code_type) << ";" << std::endl;
   }
 
@@ -2467,8 +2461,6 @@ void goto2sourcet::convert_function_declaration(
 
   os_body << "// " << symbol.name << std::endl;
   os_body << "// " << symbol.location << std::endl;
-  if(symbol.is_file_local)
-    os_body << "static ";
   os_body << make_decl(symbol.name, code_type) << std::endl;
   os_body << "{";
 
