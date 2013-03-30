@@ -104,6 +104,7 @@ SRC = $(CHAFF_SRC) $(BOOLEFORCE_SRC) $(MINISAT_SRC) $(MINISAT2_SRC) \
       flattening/boolbv_array.cpp flattening/boolbv_vector.cpp \
       flattening/boolbv_complex.cpp flattening/boolbv_floatbv_op.cpp \
       flattening/boolbv_union.cpp flattening/flatten_byte_operators.cpp \
+      flattening/boolbv_update.cpp \
       floatbv/float_utils.cpp
 
 INCLUDES= -I .. -I ../util \

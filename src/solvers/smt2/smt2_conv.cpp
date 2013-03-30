@@ -950,6 +950,10 @@ void smt2_convt::convert_expr(const exprt &expr)
   {
     convert_with(expr);
   }
+  else if(expr.id()==ID_update)
+  {
+    convert_update(expr);
+  }
   else if(expr.id()==ID_member)
   {
     convert_member(to_member_expr(expr));
@@ -2719,6 +2723,25 @@ void smt2_convt::convert_with(const exprt &expr)
   else
     throw "with expects struct, union, or array type, "
           "but got "+expr.type().id_string();
+}
+
+/*******************************************************************\
+
+Function: smt2_convt::convert_update
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void smt2_convt::convert_update(const exprt &expr)
+{
+  assert(expr.operands().size()==3);
+
+  throw "smt2_convt::convert_update to be implemented";  
 }
 
 /*******************************************************************\
