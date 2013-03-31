@@ -573,6 +573,8 @@ when
 cw_va_arg_typeof
 fence
 sync
+lwsync
+isync
 WRfence
 RRfence
 RWfence
@@ -591,3 +593,5 @@ floatbv_mult
 floatbv_div
 floatbv_sin
 floatbv_cos
+read
+write
