@@ -138,6 +138,7 @@ public:
     bool is_assume() const          { return type==goto_trace_stept::ASSUME; }
     bool is_assignment() const      { return type==goto_trace_stept::ASSIGNMENT; }
     bool is_constraint() const      { return type==goto_trace_stept::CONSTRAINT; }
+    bool is_read() const            { return type==goto_trace_stept::READ; }
     bool is_location() const        { return type==goto_trace_stept::LOCATION; }
     bool is_output() const          { return type==goto_trace_stept::OUTPUT; }
     bool is_decl() const            { return type==goto_trace_stept::DECL; }
