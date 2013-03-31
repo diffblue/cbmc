@@ -407,6 +407,7 @@ Function: symex_target_equationt::constraint
 void symex_target_equationt::constraint(
   const guardt &guard,
   const exprt &cond,
+  const std::string &msg,
   const sourcet &source)
 {
   // like assumption, but with global effect
@@ -417,6 +418,7 @@ void symex_target_equationt::constraint(
   SSA_step.cond_expr=cond;
   SSA_step.type=goto_trace_stept::ASSUME;
   SSA_step.source=source;
+  SSA_step.comment=msg;
 }
 
 /*******************************************************************\
