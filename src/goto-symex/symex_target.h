@@ -52,8 +52,14 @@ public:
   };
   
   typedef enum { STATE, HIDDEN } assignment_typet;
+  
+  // read event
+  virtual void read(
+    const guardt &guard,
+    const symbol_exprt &ssa,
+    const sourcet &source)=0;
 
-  // write to a variable - lhs must be symbol
+  // write event - lhs must be symbol
   virtual void assignment(
     const guardt &guard,
     const symbol_exprt &ssa_lhs,

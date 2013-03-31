@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <prefix.h>
 
 #include "goto_symex_state.h"
+//#include "abstract_event_structure.h"
 
 /*******************************************************************\
 
@@ -293,13 +294,7 @@ void goto_symex_statet::assignment(
   lhs.set_identifier(new_l2_name);
 
   // in case we happen to be multi-threaded, record the memory access
-  {
-    irep_idt orig_identifier=get_original_name(l1_identifier);
-    if(orig_identifier!="goto_symex::\\guard" &&
-       ns.lookup(orig_identifier).is_shared())
-    {
-    }
-  }
+  bool is_shared=l2_thread_write_encoding(lhs, ns);
 
   // for value propagation -- the RHS is L2
   
@@ -317,7 +312,7 @@ void goto_symex_statet::assignment(
     symbol_exprt l1_lhs(l1_identifier, lhs.type());
     level2.get_original_name(l1_lhs.type());
 
-    value_set.assign(l1_lhs, l1_rhs, ns);  
+    value_set.assign(l1_lhs, l1_rhs, ns, is_shared);  
   }
   
   #if 0
@@ -435,28 +430,29 @@ void goto_symex_statet::rename(
     }  
     else if(level==L2)
     {
-      if(!level2.is_renamed(identifier))
+      if(l2_thread_read_encoding(to_symbol_expr(expr), ns))
       {
-        if(l2_thread_encoding(expr, ns))
-        {
-          // done
-        }
+        // renaming taken care of by l2_thread_encoding
+      }
+      else if(level2.is_renamed(identifier))
+      {
+        // already at L2
+      }
+      else
+      {
+        irep_idt l1_identifier=rename(identifier, ns, L1);
+
+        // We also consider propagation if we go up to L2.
+        // L1 identifiers are used for propagation!
+        propagationt::valuest::const_iterator p_it=
+          propagation.values.find(l1_identifier);
+
+        if(p_it!=propagation.values.end())
+          expr=p_it->second; // already L2
         else
         {
-          irep_idt l1_identifier=rename(identifier, ns, L1);
-
-          // We also consider propagation if we go up to L2.
-          // L1 identifiers are used for propagation!
-          propagationt::valuest::const_iterator p_it=
-            propagation.values.find(l1_identifier);
-
-          if(p_it!=propagation.values.end())
-            expr=p_it->second; // already L2
-          else
-          {
-            const irep_idt new_name=level2(l1_identifier); // L2
-            to_symbol_expr(expr).set_identifier(new_name);
-          }
+          irep_idt new_name=level2(l1_identifier); // L2
+          to_symbol_expr(expr).set_identifier(new_name);
         }
       }
     }
@@ -477,7 +473,7 @@ void goto_symex_statet::rename(
 
 /*******************************************************************\
 
-Function: goto_symex_statet::l2_thread_encoding
+Function: goto_symex_statet::l2_thread_read_encoding
 
   Inputs:
 
@@ -487,26 +483,91 @@ Function: goto_symex_statet::l2_thread_encoding
 
 \*******************************************************************/
 
-bool goto_symex_statet::l2_thread_encoding(
-  exprt &expr,
+bool goto_symex_statet::l2_thread_read_encoding(
+  symbol_exprt &expr,
   const namespacet &ns)
 {
-  #if 0
-  // do we have threads at all?
-  if(threads.size()<=1) return false;
+  // do we have threads?
+  if(threads.size()<=1)
+    return false;
 
-  irep_idt original_identifier=get_original_name(identifier);
-  if(ns.lookup(original_identifier).is_shared() &&
-     threads.size()>1)
+  const irep_idt &identifier=expr.get_identifier();
+  const irep_idt &orig_identifier=get_original_name(identifier);
+
+  // is it a shared object?
+  if(orig_identifier=="goto_symex::\\guard" ||
+     !ns.lookup(orig_identifier).is_shared())
+    return false;
+
+  // see whether we are within an atomic section
+  if(atomic_section_count>0)
   {
-    // take a fresh l2 name
-    const irep_idt new_name=level2.increase_counter(l1_identifier);
-    to_symbol_expr(expr).set_identifier(new_name);
-    return true;
+    #if 0
+    if(is_write)
+      written_in_atomic_section.insert(orig_identifier);
+    else
+    {
+      const irep_idt l1_identifier=rename(orig_identifier, ns, L1);
+      if(level2.current_count(l1_identifier)==
+        level2_at_atomic_section_entry.current_count(l1_identifier))
+      {
+        propagation.remove(l1_identifier);
+        irep_idt new_l2_name=level2.increase_counter(l1_identifier);
+        read_in_atomic_section.insert(
+            std::make_pair(orig_identifier, new_l2_name));
+      }
+    }
+    return false;
+    #endif
   }
-  #else
-  return false;
+
+  irep_idt new_l2_name=identifier;
+
+  // produce a fresh L2 name
+  const irep_idt l1_identifier=rename(orig_identifier, ns, L1);
+  new_l2_name=level2.increase_counter(l1_identifier);
+  expr.set_identifier(new_l2_name);
+
+  // record as event into the symex target
+  #if 0
+  event_log.push_back(goto_eventt());
+  event_log.back().event_type=ID_read;
+  event_log.back().source=source;
+  event_log.back().guard=guard;
+  event_log.back().value=symbol_exprt(new_l2_name, expr.type());
   #endif
+
+  return true;
+}
+
+/*******************************************************************\
+
+Function: goto_symex_statet::l2_thread_write_encoding
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: thread encoding
+
+\*******************************************************************/
+
+bool goto_symex_statet::l2_thread_write_encoding(
+  const symbol_exprt &expr,
+  const namespacet &ns)
+{
+  const irep_idt &identifier=expr.get_identifier();
+  const irep_idt &orig_identifier=get_original_name(identifier);
+
+  // is it a shared object?
+  if(orig_identifier=="goto_symex::\\guard" ||
+     !ns.lookup(orig_identifier).is_shared())
+    return false;
+    
+  if(threads.size()<=1)
+    return false;
+
+  return true;
 }
 
 /*******************************************************************\
