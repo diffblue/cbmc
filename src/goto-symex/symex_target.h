@@ -140,6 +140,7 @@ public:
   virtual void constraint(
     const guardt &guard,
     const exprt &cond,
+    const std::string &msg,
     const sourcet &source)=0;
 };
 
