@@ -24,10 +24,14 @@ class prop_convt;
 class symex_target_equationt:public symex_targett
 {
 public:
-  explicit symex_target_equationt(
-    const namespacet &_ns):ns(_ns)
-  {
-  }
+  explicit symex_target_equationt(const namespacet &_ns);
+  virtual ~symex_target_equationt();
+
+  // read event
+  virtual void read(
+    const guardt &guard,
+    const symbol_exprt &ssa,
+    const sourcet &source);
 
   // assignment to a variable - lhs must be symbol
   virtual void assignment(

@@ -26,6 +26,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-symex/slice.h>
 #include <goto-symex/slice_by_trace.h>
 #include <goto-symex/xml_goto_trace.h>
+#include <goto-symex/memory_model.h>
 
 #include <solvers/sat/satcheck_minisat2.h>
 #include <solvers/prop/cover_goals.h>
@@ -326,7 +327,13 @@ bool bmct::run(const goto_functionst &goto_functions)
     // get unwinding info
     setup_unwind();
 
+    // perform symbolic execution
     symex(goto_functions);
+
+    // add a partial ordering, if required    
+    memory_model_sct memory_model_sc;
+    memory_model_sc.set_message_handler(get_message_handler());
+    memory_model_sc(equation);
   }
 
   catch(std::string &error_str)
@@ -354,7 +361,7 @@ bool bmct::run(const goto_functionst &goto_functions)
 
   print(8, "size of program expression: "+
            i2string(equation.SSA_steps.size())+
-           " assignments");
+           " steps");
 
   try
   {

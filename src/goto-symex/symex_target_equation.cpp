@@ -21,6 +21,65 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
+Function: symex_target_equationt::symex_target_equationt
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+symex_target_equationt::symex_target_equationt(
+  const namespacet &_ns):ns(_ns)
+{
+}
+
+/*******************************************************************\
+
+Function: symex_target_equationt::~symex_target_equationt
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+symex_target_equationt::~symex_target_equationt()
+{
+}
+
+/*******************************************************************\
+
+Function: symex_target_equationt::read
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: read from a variable
+
+\*******************************************************************/
+
+void symex_target_equationt::read(
+  const guardt &guard,
+  const symbol_exprt &ssa,
+  const sourcet &source)
+{
+  SSA_steps.push_back(SSA_stept());
+  SSA_stept &SSA_step=SSA_steps.back();
+  
+  SSA_step.guard_expr=guard.as_expr();
+  SSA_step.ssa_rhs=ssa;
+  SSA_step.type=goto_trace_stept::READ;
+  SSA_step.source=source;
+}
+
+/*******************************************************************\
+
 Function: symex_target_equationt::assignment
 
   Inputs:

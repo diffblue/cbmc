@@ -36,6 +36,8 @@ public:
   bool is_assignment() const      { return type==ASSIGNMENT; }
   bool is_assume() const          { return type==ASSUME; }
   bool is_assert() const          { return type==ASSERT; }
+  bool is_constraint() const      { return type==CONSTRAINT; }
+  bool is_read() const            { return type==READ; }
   bool is_function_call() const   { return type==FUNCTION_CALL; }
   bool is_function_return() const { return type==FUNCTION_RETURN; }
   bool is_location() const        { return type==LOCATION; }
@@ -47,7 +49,7 @@ public:
   typedef enum { NONE, ASSIGNMENT, ASSUME, ASSERT,
                  LOCATION, INPUT, OUTPUT, DECL, DEAD,
                  FUNCTION_CALL, FUNCTION_RETURN,
-                 CONSTRAINT } typet;
+                 CONSTRAINT, READ } typet;
   typet type;
     
   goto_programt::const_targett pc;

@@ -330,13 +330,14 @@ public:
     guardt guard;
     call_stackt call_stack;
     std::map<irep_idt, unsigned> function_frame;
-    unsigned parent_thread;
   };
 
   typedef std::vector<threadt> threadst;
   threadst threads;
   
-  bool l2_thread_encoding(exprt &expr, const namespacet &ns);
+  bool l2_thread_read_encoding(symbol_exprt &expr, const namespacet &ns);
+  bool l2_thread_write_encoding(const symbol_exprt &expr, const namespacet &ns);
+
   void switch_to_thread(unsigned t);
 };
 
