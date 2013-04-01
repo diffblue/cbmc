@@ -37,7 +37,7 @@ void goto_symext::symex_goto(statet &state)
   state.rename(new_guard, ns);
   do_simplify(new_guard);
   
-  target.location(state.guard, state.source);
+  target.location(state.guard.as_expr(), state.source);
   
   if(new_guard.is_false() ||
      state.guard.is_false())
@@ -140,7 +140,7 @@ void goto_symext::symex_goto(statet &state)
       guardt guard;
 
       target.assignment(
-        guard,
+        guard.as_expr(),
         new_lhs, guard_symbol_expr, new_lhs, guard_symbol_expr,
         new_rhs,
         state.source,
@@ -191,7 +191,7 @@ void goto_symext::symex_step_goto(statet &state, bool taken)
   state.guard.guard_expr(guard);
   do_simplify(guard);
 
-  target.assumption(state.guard, guard, state.source);  
+  target.assumption(state.guard.as_expr(), guard, state.source);  
 }
 
 /*******************************************************************\
@@ -356,10 +356,8 @@ void goto_symext::phi_function(
     symbol_exprt new_lhs=symbol_exprt(l1_identifier, type);
     dest_state.assignment(new_lhs, rhs, ns, true);
     
-    guardt true_guard;
-
     target.assignment(
-      true_guard,
+      true_exprt(),
       new_lhs, lhs, new_lhs, lhs,
       rhs,
       dest_state.source,
@@ -412,7 +410,7 @@ void goto_symext::loop_bound_exceeded(
       // generate unwinding assumption, unless we permit partial loops
       exprt guarded_expr=negated_cond;
       state.guard.guard_expr(guarded_expr);
-      target.assumption(state.guard, guarded_expr, state.source);
+      target.assumption(state.guard.as_expr(), guarded_expr, state.source);
     }
 
     // add to state guard to prevent further assignments

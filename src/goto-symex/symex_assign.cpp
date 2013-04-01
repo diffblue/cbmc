@@ -230,7 +230,7 @@ void goto_symext::symex_assign_symbol(
   
   // do the assignment
   target.assignment(
-    tmp_guard,
+    tmp_guard.as_expr(),
     ssa_lhs, original_lhs,
     ssa_full_lhs, add_to_lhs(full_lhs, original_lhs),
     ssa_rhs, 

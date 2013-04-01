@@ -65,14 +65,14 @@ Function: symex_target_equationt::read
 \*******************************************************************/
 
 void symex_target_equationt::read(
-  const guardt &guard,
+  const exprt &guard,
   const symbol_exprt &ssa,
   const sourcet &source)
 {
   SSA_steps.push_back(SSA_stept());
   SSA_stept &SSA_step=SSA_steps.back();
   
-  SSA_step.guard_expr=guard.as_expr();
+  SSA_step.guard=guard;
   SSA_step.ssa_rhs=ssa;
   SSA_step.type=goto_trace_stept::READ;
   SSA_step.source=source;
@@ -91,7 +91,7 @@ Function: symex_target_equationt::assignment
 \*******************************************************************/
 
 void symex_target_equationt::assignment(
-  const guardt &guard,
+  const exprt &guard,
   const symbol_exprt &ssa_lhs,
   const symbol_exprt &original_lhs_object,
   const exprt &ssa_full_lhs,
@@ -105,7 +105,7 @@ void symex_target_equationt::assignment(
   SSA_steps.push_back(SSA_stept());
   SSA_stept &SSA_step=SSA_steps.back();
   
-  SSA_step.guard_expr=guard.as_expr();
+  SSA_step.guard=guard;
   SSA_step.ssa_lhs=ssa_lhs;
   SSA_step.original_lhs_object=original_lhs_object;
   SSA_step.ssa_full_lhs=ssa_full_lhs;
@@ -131,7 +131,7 @@ Function: symex_target_equationt::decl
 \*******************************************************************/
 
 void symex_target_equationt::decl(
-  const guardt &guard,
+  const exprt &guard,
   const symbol_exprt &ssa_lhs,
   const symbol_exprt &original_lhs_object,
   const sourcet &source)
@@ -141,7 +141,7 @@ void symex_target_equationt::decl(
   SSA_steps.push_back(SSA_stept());
   SSA_stept &SSA_step=SSA_steps.back();
   
-  SSA_step.guard_expr=guard.as_expr();
+  SSA_step.guard=guard;
   SSA_step.ssa_lhs=ssa_lhs;
   SSA_step.ssa_full_lhs=ssa_lhs;
   SSA_step.original_lhs_object=original_lhs_object;
@@ -167,7 +167,7 @@ Function: symex_target_equationt::dead
 \*******************************************************************/
 
 void symex_target_equationt::dead(
-  const guardt &guard,
+  const exprt &guard,
   const symbol_exprt &ssa_lhs,
   const symbol_exprt &original_lhs_object,
   const sourcet &source)
@@ -188,13 +188,13 @@ Function: symex_target_equationt::location
 \*******************************************************************/
 
 void symex_target_equationt::location(
-  const guardt &guard,
+  const exprt &guard,
   const sourcet &source)
 {
   SSA_steps.push_back(SSA_stept());
   SSA_stept &SSA_step=SSA_steps.back();
   
-  SSA_step.guard_expr=guard.as_expr();
+  SSA_step.guard=guard;
   SSA_step.type=goto_trace_stept::LOCATION;
   SSA_step.source=source;
 }
@@ -212,14 +212,14 @@ Function: symex_target_equationt::function_call
 \*******************************************************************/
 
 void symex_target_equationt::function_call(
-  const guardt &guard,
+  const exprt &guard,
   const irep_idt &identifier,
   const sourcet &source)
 {
   SSA_steps.push_back(SSA_stept());
   SSA_stept &SSA_step=SSA_steps.back();
   
-  SSA_step.guard_expr=guard.as_expr();
+  SSA_step.guard=guard;
   SSA_step.type=goto_trace_stept::FUNCTION_CALL;
   SSA_step.source=source;
   SSA_step.identifier=identifier;
@@ -238,14 +238,14 @@ Function: symex_target_equationt::function_return
 \*******************************************************************/
 
 void symex_target_equationt::function_return(
-  const guardt &guard,
+  const exprt &guard,
   const irep_idt &identifier,
   const sourcet &source)
 {
   SSA_steps.push_back(SSA_stept());
   SSA_stept &SSA_step=SSA_steps.back();
   
-  SSA_step.guard_expr=guard.as_expr();
+  SSA_step.guard=guard;
   SSA_step.type=goto_trace_stept::FUNCTION_RETURN;
   SSA_step.source=source;
   SSA_step.identifier=identifier;
@@ -264,7 +264,7 @@ Function: symex_target_equationt::output
 \*******************************************************************/
 
 void symex_target_equationt::output(
-  const guardt &guard,
+  const exprt &guard,
   const sourcet &source,
   const irep_idt &output_id,
   const std::list<exprt> &args)
@@ -272,7 +272,7 @@ void symex_target_equationt::output(
   SSA_steps.push_back(SSA_stept());
   SSA_stept &SSA_step=SSA_steps.back();
   
-  SSA_step.guard_expr=guard.as_expr();
+  SSA_step.guard=guard;
   SSA_step.type=goto_trace_stept::OUTPUT;
   SSA_step.source=source;
   SSA_step.io_args=args;
@@ -292,7 +292,7 @@ Function: symex_target_equationt::output_fmt
 \*******************************************************************/
 
 void symex_target_equationt::output_fmt(
-  const guardt &guard,
+  const exprt &guard,
   const sourcet &source,
   const irep_idt &output_id,
   const irep_idt &fmt,
@@ -301,7 +301,7 @@ void symex_target_equationt::output_fmt(
   SSA_steps.push_back(SSA_stept());
   SSA_stept &SSA_step=SSA_steps.back();
   
-  SSA_step.guard_expr=guard.as_expr();
+  SSA_step.guard=guard;
   SSA_step.type=goto_trace_stept::OUTPUT;
   SSA_step.source=source;
   SSA_step.io_args=args;
@@ -323,7 +323,7 @@ Function: symex_target_equationt::input
 \*******************************************************************/
 
 void symex_target_equationt::input(
-  const guardt &guard,
+  const exprt &guard,
   const sourcet &source,
   const irep_idt &input_id,
   const std::list<exprt> &args)
@@ -331,7 +331,7 @@ void symex_target_equationt::input(
   SSA_steps.push_back(SSA_stept());
   SSA_stept &SSA_step=SSA_steps.back();
   
-  SSA_step.guard_expr=guard.as_expr();
+  SSA_step.guard=guard;
   SSA_step.type=goto_trace_stept::INPUT;
   SSA_step.source=source;
   SSA_step.io_args=args;
@@ -351,14 +351,14 @@ Function: symex_target_equationt::assumption
 \*******************************************************************/
 
 void symex_target_equationt::assumption(
-  const guardt &guard,
+  const exprt &guard,
   const exprt &cond,
   const sourcet &source)
 {
   SSA_steps.push_back(SSA_stept());
   SSA_stept &SSA_step=SSA_steps.back();
   
-  SSA_step.guard_expr=guard.as_expr();
+  SSA_step.guard=guard;
   SSA_step.cond_expr=cond;
   SSA_step.type=goto_trace_stept::ASSUME;
   SSA_step.source=source;
@@ -377,7 +377,7 @@ Function: symex_target_equationt::assertion
 \*******************************************************************/
 
 void symex_target_equationt::assertion(
-  const guardt &guard,
+  const exprt &guard,
   const exprt &cond,
   const std::string &msg,
   const sourcet &source)
@@ -385,7 +385,7 @@ void symex_target_equationt::assertion(
   SSA_steps.push_back(SSA_stept());
   SSA_stept &SSA_step=SSA_steps.back();
   
-  SSA_step.guard_expr=guard.as_expr();
+  SSA_step.guard=guard;
   SSA_step.cond_expr=cond;
   SSA_step.type=goto_trace_stept::ASSERT;
   SSA_step.source=source;
@@ -405,7 +405,7 @@ Function: symex_target_equationt::constraint
 \*******************************************************************/
 
 void symex_target_equationt::constraint(
-  const guardt &guard,
+  const exprt &guard,
   const exprt &cond,
   const std::string &msg,
   const sourcet &source)
@@ -414,7 +414,7 @@ void symex_target_equationt::constraint(
   SSA_steps.push_back(SSA_stept());
   SSA_stept &SSA_step=SSA_steps.back();
   
-  SSA_step.guard_expr=guard.as_expr();
+  SSA_step.guard=guard;
   SSA_step.cond_expr=cond;
   SSA_step.type=goto_trace_stept::ASSUME;
   SSA_step.source=source;
@@ -516,7 +516,7 @@ void symex_target_equationt::convert_guards(
     if(it->ignore)
       it->guard_literal=const_literal(false);
     else
-      it->guard_literal=prop_conv.convert(it->guard_expr);
+      it->guard_literal=prop_conv.convert(it->guard);
   }
 }
 
@@ -772,7 +772,7 @@ void symex_target_equationt::SSA_stept::output(
   if(is_assert())
     out << comment << std::endl;
 
-  out << "Guard: " << from_expr(ns, "", guard_expr) << std::endl;
+  out << "Guard: " << from_expr(ns, "", guard) << std::endl;
 }
 
 /*******************************************************************\

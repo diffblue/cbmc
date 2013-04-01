@@ -271,9 +271,9 @@ void bmct::show_program()
       languages.from_expr(it->cond_expr, string_value);
       std::cout << "(" << count << ") " << string_value << std::endl;
 
-      if(!it->guard_expr.is_true())
+      if(!it->guard.is_true())
       {
-        languages.from_expr(it->guard_expr, string_value);
+        languages.from_expr(it->guard, string_value);
         std::cout << std::string(i2string(count).size()+3, ' ');
         std::cout << "guard: " << string_value << std::endl;
       }
@@ -287,9 +287,9 @@ void bmct::show_program()
       std::cout << "(" << count << ") ASSERT("
                 << string_value <<") " << std::endl;
 
-      if(!it->guard_expr.is_true())
+      if(!it->guard.is_true())
       {
-        languages.from_expr(it->guard_expr, string_value);
+        languages.from_expr(it->guard, string_value);
         std::cout << std::string(i2string(count).size()+3, ' ');
         std::cout << "guard: " << string_value << std::endl;
       }

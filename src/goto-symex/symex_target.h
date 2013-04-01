@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/goto_program.h>
 
-class guardt;
 class symbol_exprt;
 
 class symex_targett
@@ -55,13 +54,13 @@ public:
   
   // read event
   virtual void read(
-    const guardt &guard,
+    const exprt &guard,
     const symbol_exprt &ssa,
     const sourcet &source)=0;
 
   // write event - lhs must be symbol
   virtual void assignment(
-    const guardt &guard,
+    const exprt &guard,
     const symbol_exprt &ssa_lhs,
     const symbol_exprt &original_lhs_object,
     const exprt &ssa_full_lhs,
@@ -72,45 +71,45 @@ public:
 
   // declare fresh variable - lhs must be symbol
   virtual void decl(
-    const guardt &guard,
+    const exprt &guard,
     const symbol_exprt &ssa_lhs,
     const symbol_exprt &original_lhs_object,
     const sourcet &source)=0;
 
   // note the death of a variable - lhs must be symbol
   virtual void dead(
-    const guardt &guard,
+    const exprt &guard,
     const symbol_exprt &ssa_lhs,
     const symbol_exprt &original_lhs_object,
     const sourcet &source)=0;
 
   // record a function call
   virtual void function_call(
-    const guardt &guard,
+    const exprt &guard,
     const irep_idt &identifier,
     const sourcet &source)=0;
 
   // record return from a function
   virtual void function_return(
-    const guardt &guard,
+    const exprt &guard,
     const irep_idt &identifier,
     const sourcet &source)=0;
 
   // just record a location
   virtual void location(
-    const guardt &guard,
+    const exprt &guard,
     const sourcet &source)=0;
 
   // record output
   virtual void output(
-    const guardt &guard,
+    const exprt &guard,
     const sourcet &source,
     const irep_idt &output_id,
     const std::list<exprt> &args)=0;
   
   // record formatted output
   virtual void output_fmt(
-    const guardt &guard,
+    const exprt &guard,
     const sourcet &source,
     const irep_idt &output_id,
     const irep_idt &fmt,
@@ -118,27 +117,27 @@ public:
   
   // record input
   virtual void input(
-    const guardt &guard,
+    const exprt &guard,
     const sourcet &source,
     const irep_idt &input_id,
     const std::list<exprt> &args)=0;
   
   // record an assumption
   virtual void assumption(
-    const guardt &guard,
+    const exprt &guard,
     const exprt &cond,
     const sourcet &source)=0;
 
   // record an assertion
   virtual void assertion(
-    const guardt &guard,
+    const exprt &guard,
     const exprt &cond,
     const std::string &msg,
     const sourcet &source)=0;
 
   // record a constraint
   virtual void constraint(
-    const guardt &guard,
+    const exprt &guard,
     const exprt &cond,
     const std::string &msg,
     const sourcet &source)=0;
