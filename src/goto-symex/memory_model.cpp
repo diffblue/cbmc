@@ -7,9 +7,25 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 \*******************************************************************/
 
 #include <std_expr.h>
+#include <i2string.h>
 
-#define ENABLE_MM_MACROS
 #include "memory_model.h"
+
+/*******************************************************************\
+
+Function: memory_model_baset::~memory_model_baset
+
+  Inputs: 
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+memory_model_baset::memory_model_baset():var_cnt(0)
+{
+}
 
 /*******************************************************************\
 
@@ -29,6 +45,26 @@ memory_model_baset::~memory_model_baset()
 
 /*******************************************************************\
 
+Function: memory_model_baset::nondet_bool_symbol
+
+  Inputs: 
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+symbol_exprt memory_model_baset::nondet_bool_symbol(
+  const std::string &prefix)
+{
+  return symbol_exprt(
+    "memory_model::choice_"+prefix+i2string(var_cnt++),
+    bool_typet());
+}
+
+/*******************************************************************\
+
 Function: memory_model_baset::build_event_lists
 
   Inputs: 
@@ -39,17 +75,27 @@ Function: memory_model_baset::build_event_lists
 
 \*******************************************************************/
 
-void memory_model_baset::build_event_lists(symex_target_equationt &equation)
+void memory_model_baset::build_event_lists(
+  symex_target_equationt &equation)
 {
+  // a per-thread counter
+  std::map<unsigned, unsigned> counter;
+
   for(eventst::const_iterator
       e_it=equation.SSA_steps.begin();
       e_it!=equation.SSA_steps.end();
       e_it++)
   {
-    if(e_it->is_read())
-      reads.push_back(&*e_it);
-    else if(e_it->is_assignment())
-      writes.push_back(&*e_it);
+    const eventt &event=*e_it;
+    unsigned thread_nr=event.source.thread_nr;    
+
+    if(event.is_read())
+      reads.push_back(&event);
+    else if(event.is_assignment())
+      writes.push_back(&event);
+
+    unsigned cnt=counter[thread_nr]++;
+    numbering[&event]=cnt;
   }
 }
 
@@ -67,6 +113,7 @@ Function: memory_model_sct::read_from
 
 void memory_model_sct::operator()(symex_target_equationt &equation)
 {
+  build_event_lists(equation);
   read_from(equation);
 }
 
@@ -103,19 +150,20 @@ void memory_model_sct::read_from(symex_target_equationt &equation)
         w_it!=writes.end();
         ++w_it)
     {
-      const eventt &w_evt=**w_it;
-
-      #if 0
+      const eventt &write_event=**w_it;
+      
       // rf cannot contradict program order
-      const evtt* f_e=poc.first_of(r_evt, w_evt);
-      bool is_rfi=f_e!=0;
-      if(is_rfi && f_e==&r_evt)
+      if(po(read_event, write_event))
         continue; // contradicts po
+
+      bool is_rfi=
+        write_event.source.thread_nr==read_event.source.thread_nr;
 
       // only read from the most recent write, extra wsi constraints ensure
       // that even a write with guard false will have the proper value
       if(is_rfi)
       {
+        #if 0
         numbered_evtst::const_iterator w_entry=
           poc.get_thread(r_evt).find(w_evt);
         assert(w_entry!=poc.get_thread(r_evt).end());
@@ -130,17 +178,21 @@ void memory_model_sct::read_from(symex_target_equationt &equation)
             (*w_entry)->address!=r_evt.address;
         if(!is_most_recent)
           continue;
+        #endif
       }
 
-      symbol_exprt s=poc.fresh_nondet_bool();
+      symbol_exprt s=nondet_bool_symbol("rf");
+
       implies_exprt read_from(s,
-          and_exprt((is_rfi ? true_exprt() : w_evt.guard.as_expr()),
-            equal_exprt(r_evt.value, write_symbol_primed(w_evt))));
-      poc.add_constraint(read_from, guardt(), r_evt.source, is_rfi?"rfi":"rf");
+          and_exprt((is_rfi ? true_exprt() : write_event.guard),
+            equal_exprt(read_event.ssa_rhs, write_event.ssa_lhs)));
+
+      equation.constraint(
+        read_from, true_exprt(), is_rfi?"rfi":"rf", read_event.source);
 
       rf_some_operands.push_back(s);
 
-
+      #if 0
       // uniproc, thinair and ghb orders are in sync via s
       if(uses_check(AC_UNIPROC))
       {
@@ -165,51 +217,25 @@ void memory_model_sct::read_from(symex_target_equationt &equation)
     or_exprt rf_some;
     rf_some.operands().swap(rf_some_operands);
 
-    #if 0
     equation.constraint(
-      rf_some, read_event.guard, read_event.source, "rf-at-least-one");
-    #endif
+      rf_some, read_event.guard, "rf-some", read_event.source);
   }
 }
+
+/*******************************************************************\
+
+Function: memory_model_baset::program_order
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 #if 0
-/*******************************************************************\
-
-Function: memory_model_baset::add_atomic_sections
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void memory_model_baset::add_atomic_sections(
-    partial_order_concurrencyt &poc) const
-{
-  for(int i=0; i<partial_order_concurrencyt::AC_N_AXIOMS; ++i)
-  {
-    partial_order_concurrencyt::acyclict c=
-      static_cast<partial_order_concurrencyt::acyclict>(i);
-    if(uses_check(c))
-      poc.add_atomic_sections(c);
-  }
-}
-
-/*******************************************************************\
-
-Function: memory_model_baset::add_program_order
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void memory_model_baset::add_program_order(
+void memory_model_baset::program_order(
     partial_order_concurrencyt &poc,
     const numbered_evtst &thread,
     adj_matricest &po)
@@ -329,101 +355,6 @@ static exprt write_symbol_primed(
     id2string(to_symbol_expr(evt.value).get_identifier()) + "$val";
 
   return symbol_exprt(name, evt.value.type());
-}
-
-/*******************************************************************\
-
-Function: memory_model_baset::add_read_from
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void memory_model_baset::add_read_from(
-    partial_order_concurrencyt &poc,
-    const partial_order_concurrencyt::per_valuet &reads,
-    const partial_order_concurrencyt::per_valuet &writes,
-    adj_matricest &rf)
-{
-  for(partial_order_concurrencyt::per_valuet::const_iterator
-      it=reads.begin();
-      it!=reads.end();
-      ++it)
-  {
-    const evtt &r_evt=**it;
-    exprt::operandst rf_some_operands;
-    rf_some_operands.reserve(writes.size());
-
-    for(partial_order_concurrencyt::per_valuet::const_iterator
-        it2=writes.begin();
-        it2!=writes.end();
-        ++it2)
-    {
-      const evtt &w_evt=**it2;
-
-      // rf cannot contradict program order
-      const evtt* f_e=poc.first_of(r_evt, w_evt);
-      bool is_rfi=f_e!=0;
-      if(is_rfi && f_e==&r_evt)
-        continue; // contradicts po
-
-      // only read from the most recent write, extra wsi constraints ensure
-      // that even a write with guard false will have the proper value
-      if(is_rfi)
-      {
-        numbered_evtst::const_iterator w_entry=
-          poc.get_thread(r_evt).find(w_evt);
-        assert(w_entry!=poc.get_thread(r_evt).end());
-        numbered_evtst::const_iterator r_entry=
-          poc.get_thread(r_evt).find(r_evt);
-        assert(r_entry!=poc.get_thread(r_evt).end());
-
-        assert(w_entry<r_entry);
-        bool is_most_recent=true;
-        for(++w_entry; w_entry!=r_entry && is_most_recent; ++w_entry)
-          is_most_recent&=(*w_entry)->direction!=evtt::D_WRITE ||
-            (*w_entry)->address!=r_evt.address;
-        if(!is_most_recent)
-          continue;
-      }
-
-      symbol_exprt s=poc.fresh_nondet_bool();
-      implies_exprt read_from(s,
-          and_exprt((is_rfi ? true_exprt() : w_evt.guard.as_expr()),
-            equal_exprt(r_evt.value, write_symbol_primed(w_evt))));
-      poc.add_constraint(read_from, guardt(), r_evt.source, is_rfi?"rfi":"rf");
-
-      rf_some_operands.push_back(s);
-
-
-      // uniproc, thinair and ghb orders are in sync via s
-      if(uses_check(AC_UNIPROC))
-      {
-        poc.add_partial_order_constraint(AC_UNIPROC, "rf", w_evt, r_evt, s);
-        // write-to-read edge
-        rf[AC_UNIPROC][&w_evt].insert(std::make_pair(&r_evt, s));
-      }
-      if(uses_check(AC_THINAIR))
-      {
-        poc.add_partial_order_constraint(AC_THINAIR, "rf", w_evt, r_evt, s);
-        // write-to-read edge
-        rf[AC_THINAIR][&w_evt].insert(std::make_pair(&r_evt, s));
-      }
-      if(!rf_is_relaxed(w_evt, r_evt, is_rfi))
-        poc.add_partial_order_constraint(AC_GHB, "rf", w_evt, r_evt, s);
-      // write-to-read edge
-      rf[AC_GHB][&w_evt].insert(std::make_pair(&r_evt, s));
-    }
-
-    // value equals one of some write
-    or_exprt rf_some;
-    rf_some.operands().swap(rf_some_operands);
-    poc.add_constraint(rf_some, r_evt.guard, r_evt.source, "rf-at-least-one");
-  }
 }
 
 /*******************************************************************\
@@ -689,73 +620,6 @@ void memory_model_baset::add_from_read(
   if(uses_check(AC_UNIPROC))
     add_from_read(poc, AC_UNIPROC,
         rf[AC_UNIPROC], ws[AC_UNIPROC], fr[AC_UNIPROC]);
-}
-
-/*******************************************************************\
-
-Function: memory_model_baset::add_barriers
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void memory_model_baset::add_barriers(
-    partial_order_concurrencyt &poc,
-    const numbered_evtst &thread,
-    const adj_matricest &rf,
-    const adj_matricest &ws,
-    const adj_matricest &fr,
-    adj_matricest &ab)
-{
-  // e1 -[lw]sync-> e2 --> e1 -ab-> e2
-  const std::list<numbered_evtst::const_iterator> barriers=
-    thread.barriers_after(**(thread.begin()));
-  if(barriers.empty())
-    return;
-
-  for(numbered_evtst::const_iterator e_it=thread.begin();
-      e_it!=thread.end();
-      ++e_it)
-  {
-    if((*e_it)->direction!=evtt::D_READ &&
-        (*e_it)->direction!=evtt::D_WRITE)
-      continue;
-
-    for(std::list<numbered_evtst::const_iterator>::const_iterator
-        b_it=barriers.begin();
-        b_it!=barriers.end();
-        ++b_it)
-    {
-      const bool before_barrier=e_it<*b_it;
-      assert(before_barrier || e_it>*b_it);
-      const evtt * first_e=before_barrier ? *e_it : **b_it;
-      const evtt * second_e=before_barrier ? **b_it : *e_it;
-      const exprt guard=(**b_it)->guard.as_expr();
-
-      if((**b_it)->direction==evtt::D_SYNC)
-        poc.add_partial_order_constraint(
-            AC_GHB, "ab", *first_e, *second_e, guard);
-      else
-      {
-        assert((**b_it)->direction==evtt::D_LWSYNC);
-
-        if((*e_it)->direction==evtt::D_WRITE && !before_barrier)
-          poc.add_partial_order_constraint(
-              AC_GHB, "ab", *first_e, S_COMMIT, evtt::D_WRITE,
-              *second_e, S_COMMIT, evtt::D_WRITE, guard);
-
-        poc.add_partial_order_constraint(
-            AC_GHB, "ab", *first_e, S_COMMIT, evtt::D_READ,
-            *second_e, S_COMMIT, first_e->direction, guard);
-      }
-
-      ab[AC_GHB][first_e].insert(std::make_pair(second_e, guard));
-    }
-  }
 }
 
 #endif

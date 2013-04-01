@@ -16,17 +16,36 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 class memory_model_baset:public messaget
 {
 public:
-  virtual void operator()(symex_target_equationt &)=0;
+  memory_model_baset();
   virtual ~memory_model_baset();
 
+  virtual void operator()(symex_target_equationt &)=0;
+  
   typedef symex_target_equationt::SSA_stept eventt;
   typedef symex_target_equationt::SSA_stepst eventst;
   
 protected:
   typedef std::vector<const eventt *> event_listt;
+  
+  // global
   event_listt reads, writes;
+
+  // a per-thread numbering of the events
+  typedef std::map<const eventt *, unsigned> numberingt;
+  numberingt numbering;
   
   void build_event_lists(symex_target_equationt &);
+  
+  // program order
+  bool po(const eventt &e1, const eventt &e2)
+  {
+    return e1.source.thread_nr==e2.source.thread_nr &&
+           numbering[&e1]<numbering[&e2];
+  }
+
+  // produce fresh symbols  
+  unsigned var_cnt;
+  symbol_exprt nondet_bool_symbol(const std::string &prefix);
 };
 
 class memory_model_sct:public memory_model_baset
