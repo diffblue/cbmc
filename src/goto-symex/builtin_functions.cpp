@@ -346,7 +346,9 @@ void goto_symext::symex_printf(
     get_string_argument(operands[0], ns);
 
   if(format_string!="")
-    target.output_fmt(state.guard, state.source, "printf", format_string, args);
+    target.output_fmt(
+      state.guard.as_expr(),
+      state.source, "printf", format_string, args);
 }
 
 /*******************************************************************\
@@ -382,7 +384,7 @@ void goto_symext::symex_input(
 
   const irep_idt input_id=get_string_argument(id_arg, ns);
 
-  target.input(state.guard, state.source, input_id, args);
+  target.input(state.guard.as_expr(), state.source, input_id, args);
 }
 
 /*******************************************************************\
@@ -418,7 +420,7 @@ void goto_symext::symex_output(
 
   const irep_idt output_id=get_string_argument(id_arg, ns);
 
-  target.output(state.guard, state.source, output_id, args);
+  target.output(state.guard.as_expr(), state.source, output_id, args);
 }
 
 /*******************************************************************\
@@ -555,7 +557,7 @@ void goto_symext::symex_trace(
       vars.push_back(var);
     }
 
-    target.output(state.guard, state.source, event, vars);
+    target.output(state.guard.as_expr(), state.source, event, vars);
   }
 }
 

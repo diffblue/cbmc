@@ -72,7 +72,7 @@ void goto_symext::claim(
   state.guard.guard_expr(expr);
   
   remaining_claims++;
-  target.assertion(state.guard, expr, msg, state.source);
+  target.assertion(state.guard.as_expr(), expr, msg, state.source);
 }
 
 /*******************************************************************\
@@ -241,7 +241,7 @@ void goto_symext::symex_step(
     break;
   
   case LOCATION:
-    target.location(state.guard, state.source);
+    target.location(state.guard.as_expr(), state.source);
     state.source.pc++;
     break;
   
@@ -261,7 +261,7 @@ void goto_symext::symex_step(
       {
         exprt tmp2=tmp;
         state.guard.guard_expr(tmp2);
-        target.assumption(state.guard, tmp2, state.source);
+        target.assumption(state.guard.as_expr(), tmp2, state.source);
 
         #if 0      
         // we also add it to the state guard

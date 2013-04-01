@@ -108,7 +108,7 @@ void symex_slice_by_tracet::slice_by_trace(std::string trace_files,
   equation.SSA_steps.push_front(symex_target_equationt::SSA_stept());
   symex_target_equationt::SSA_stept &SSA_step = equation.SSA_steps.front(); 
 
-  SSA_step.guard_expr=t_guard.as_expr();
+  SSA_step.guard=t_guard.as_expr();
   SSA_step.ssa_lhs.make_nil();
   SSA_step.cond_expr.swap(trace_condition);
   SSA_step.type=goto_trace_stept::ASSUME;
@@ -290,7 +290,7 @@ void symex_slice_by_tracet::compute_ts_back(
 	  continue;
       }
       
-      exprt guard = i->guard_expr;
+      exprt guard = i->guard;
 
 #if 0
       std::cout << "EVENT:  " << event << std::endl;
@@ -444,7 +444,7 @@ void symex_slice_by_tracet::slice_SSA_steps(
     if (it->is_location())
       location_SSA_steps++;
     bool sliced_SSA_step = false;
-    exprt guard=it->guard_expr;
+    exprt guard=it->guard;
 
     simplify(guard, ns);
 
@@ -461,7 +461,7 @@ void symex_slice_by_tracet::slice_SSA_steps(
       if (implications.count(guard) != 0) {
 	it->cond_expr.make_true();
 	it->ssa_rhs.make_true();
-	it->guard_expr.make_false();
+	it->guard.make_false();
 	sliced_SSA_steps++;
 	if (it->is_output() || it->is_location())
 	  trace_loc_sliced++;
@@ -479,7 +479,7 @@ void symex_slice_by_tracet::slice_SSA_steps(
 	if (implications.count(neg_expr) != 0) {
 	  it->cond_expr.make_true();
 	  it->ssa_rhs.make_true();
-	  it->guard_expr.make_false();
+	  it->guard.make_false();
 	  sliced_SSA_steps++;
 	  if (it->is_output() || it->is_location())
 	    trace_loc_sliced++;
@@ -582,7 +582,7 @@ void symex_slice_by_tracet::assign_merges(
     equation.SSA_steps.push_front(symex_target_equationt::SSA_stept());
     symex_target_equationt::SSA_stept &SSA_step = equation.SSA_steps.front();  
     
-    SSA_step.guard_expr=t_guard.as_expr();
+    SSA_step.guard=t_guard.as_expr();
     SSA_step.ssa_lhs=merge_sym;
     SSA_step.original_lhs_object=merge_symbol;
     SSA_step.ssa_rhs.swap(merge_copy);

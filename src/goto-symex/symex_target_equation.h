@@ -29,13 +29,13 @@ public:
 
   // read event
   virtual void read(
-    const guardt &guard,
+    const exprt &guard,
     const symbol_exprt &ssa,
     const sourcet &source);
 
   // assignment to a variable - lhs must be symbol
   virtual void assignment(
-    const guardt &guard,
+    const exprt &guard,
     const symbol_exprt &ssa_lhs,
     const symbol_exprt &original_lhs,
     const exprt &ssa_full_lhs,
@@ -46,45 +46,45 @@ public:
     
   // declare fresh variable - lhs must be symbol
   virtual void decl(
-    const guardt &guard,
+    const exprt &guard,
     const symbol_exprt &ssa_lhs,
     const symbol_exprt &original_lhs_object,
     const sourcet &source);
 
   // note the death of a variable - lhs must be symbol
   virtual void dead(
-    const guardt &guard,
+    const exprt &guard,
     const symbol_exprt &ssa_lhs,
     const symbol_exprt &original_lhs_object,
     const sourcet &source);
 
   // record a function call
   virtual void function_call(
-    const guardt &guard,
+    const exprt &guard,
     const irep_idt &identifier,
     const sourcet &source);
 
   // record return from a function
   virtual void function_return(
-    const guardt &guard,
+    const exprt &guard,
     const irep_idt &identifier,
     const sourcet &source);
 
   // just record a location
   virtual void location(
-    const guardt &guard,
+    const exprt &guard,
     const sourcet &source);
   
   // output
   virtual void output(
-    const guardt &guard,
+    const exprt &guard,
     const sourcet &source,
     const irep_idt &fmt,
     const std::list<exprt> &args);
   
   // output, formatted
   virtual void output_fmt(
-    const guardt &guard,
+    const exprt &guard,
     const sourcet &source,
     const irep_idt &output_id,
     const irep_idt &fmt,
@@ -92,27 +92,27 @@ public:
   
   // input
   virtual void input(
-    const guardt &guard,
+    const exprt &guard,
     const sourcet &source,
     const irep_idt &input_id,
     const std::list<exprt> &args);
   
   // record an assumption
   virtual void assumption(
-    const guardt &guard,
+    const exprt &guard,
     const exprt &cond,
     const sourcet &source);
 
   // record an assertion
   virtual void assertion(
-    const guardt &guard,
+    const exprt &guard,
     const exprt &cond,
     const std::string &msg,
     const sourcet &source);
 
   // record a (global) constraint
   virtual void constraint(
-    const guardt &guard,
+    const exprt &guard,
     const exprt &cond,
     const std::string &msg,
     const sourcet &source);
@@ -145,7 +145,7 @@ public:
     bool is_function_call() const   { return type==goto_trace_stept::FUNCTION_CALL; }
     bool is_function_return() const { return type==goto_trace_stept::FUNCTION_RETURN; }
     
-    exprt guard_expr;
+    exprt guard;
     literalt guard_literal;
 
     // for ASSIGNMENT and DECL
@@ -172,7 +172,7 @@ public:
     bool ignore;
     
     SSA_stept():
-      guard_expr(static_cast<const exprt &>(get_nil_irep())),
+      guard(static_cast<const exprt &>(get_nil_irep())),
       ssa_lhs(static_cast<const symbol_exprt &>(get_nil_irep())),
       original_lhs_object(static_cast<const symbol_exprt &>(get_nil_irep())),
       ssa_full_lhs(static_cast<const exprt &>(get_nil_irep())),

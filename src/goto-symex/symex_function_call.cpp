@@ -210,7 +210,7 @@ void goto_symext::symex_function_call_symbol(
   statet &state,
   const code_function_callt &code)
 {
-  target.location(state.guard, state.source);
+  target.location(state.guard.as_expr(), state.source);
 
   assert(code.function().id()==ID_symbol);
 
@@ -276,14 +276,14 @@ void goto_symext::symex_function_call_code(
   }
   
   // record the call
-  target.function_call(state.guard, identifier, state.source);
+  target.function_call(state.guard.as_expr(), identifier, state.source);
 
   if(!goto_function.body_available)
   {
     no_body(identifier);
     
     // record the return
-    target.function_return(state.guard, identifier, state.source);
+    target.function_return(state.guard.as_expr(), identifier, state.source);
   
     if(call.lhs().is_not_nil())
     {
@@ -381,7 +381,8 @@ Function: goto_symext::symex_end_of_function
 void goto_symext::symex_end_of_function(statet &state)
 {
   // first record the return
-  target.function_return(state.guard, state.source.pc->function, state.source);
+  target.function_return(
+    state.guard.as_expr(), state.source.pc->function, state.source);
 
   // then get rid of the frame
   pop_frame(state);
@@ -472,7 +473,7 @@ void goto_symext::return_assignment(statet &state)
   assert(instruction.is_return());
   const code_returnt &code=to_code_return(instruction.code);
 
-  target.location(state.guard, state.source);
+  target.location(state.guard.as_expr(), state.source);
 
   if(code.operands().size()==1)
   {

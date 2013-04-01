@@ -90,7 +90,7 @@ void goto_symext::symex_decl(statet &state)
   state.rename(ssa_lhs, ns);
   
   target.decl(
-    state.guard,
+    state.guard.as_expr(),
     ssa_lhs, original_lhs,
     state.source);
 }

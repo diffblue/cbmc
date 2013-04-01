@@ -111,7 +111,7 @@ Function: symex_slicet::slice
 
 void symex_slicet::slice(symex_target_equationt::SSA_stept &SSA_step)
 {
-  get_symbols(SSA_step.guard_expr);
+  get_symbols(SSA_step.guard);
 
   switch(SSA_step.type)
   {
@@ -204,7 +204,7 @@ void symex_slicet::collect_open_variables(
   {
     const symex_target_equationt::SSA_stept &SSA_step=*it;
 
-    get_symbols(SSA_step.guard_expr);
+    get_symbols(SSA_step.guard);
 
     switch(SSA_step.type)
     {
