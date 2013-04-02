@@ -66,14 +66,16 @@ Function: symex_target_equationt::read
 
 void symex_target_equationt::read(
   const exprt &guard,
-  const symbol_exprt &ssa,
+  const symbol_exprt &ssa_object,
+  const symbol_exprt &original_object,
   const sourcet &source)
 {
   SSA_steps.push_back(SSA_stept());
   SSA_stept &SSA_step=SSA_steps.back();
   
   SSA_step.guard=guard;
-  SSA_step.ssa_rhs=ssa;
+  SSA_step.ssa_lhs=ssa_object;
+  SSA_step.original_lhs_object=original_object;
   SSA_step.type=goto_trace_stept::READ;
   SSA_step.source=source;
 }

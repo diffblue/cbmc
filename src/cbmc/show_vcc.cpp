@@ -47,23 +47,30 @@ void bmct::show_vcc(std::ostream &out)
   out << std::endl << "VERIFICATION CONDITIONS:" << std::endl << std::endl;
 
   languagest languages(ns, new_ansi_c_language());
+  
+  bool has_threads=equation.has_threads();
 
   for(symex_target_equationt::SSA_stepst::iterator
-      it=equation.SSA_steps.begin();
-      it!=equation.SSA_steps.end(); it++)
+      s_it=equation.SSA_steps.begin();
+      s_it!=equation.SSA_steps.end();
+      s_it++)
   {
-    if(!it->is_assert()) continue;
+    if(!s_it->is_assert()) continue;
     
-    if(it->source.pc->location.is_not_nil())
-      out << it->source.pc->location << std::endl;
+    if(s_it->source.pc->location.is_not_nil())
+      out << s_it->source.pc->location << std::endl;
     
-    if(it->comment!="")
-      out << it->comment << std::endl;
+    if(s_it->comment!="")
+      out << s_it->comment << std::endl;
       
     symex_target_equationt::SSA_stepst::const_iterator
       p_it=equation.SSA_steps.begin();
+
+    // we show everything in case there are threads
+    symex_target_equationt::SSA_stepst::const_iterator
+      last_it=has_threads?equation.SSA_steps.end():s_it;
       
-    for(unsigned count=1; p_it!=it; p_it++)
+    for(unsigned count=1; p_it!=last_it; p_it++)
       if(p_it->is_assume() || p_it->is_assignment())
         if(!p_it->ignore)
         {
@@ -83,7 +90,7 @@ void bmct::show_vcc(std::ostream &out)
     out << "|--------------------------" << std::endl;
 
     std::string string_value;
-    languages.from_expr(it->cond_expr, string_value);
+    languages.from_expr(s_it->cond_expr, string_value);
     out << "{" << 1 << "} " << string_value << std::endl;
     
     out << std::endl;

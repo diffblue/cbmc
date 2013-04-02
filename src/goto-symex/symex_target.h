@@ -55,7 +55,8 @@ public:
   // read event
   virtual void read(
     const exprt &guard,
-    const symbol_exprt &ssa,
+    const symbol_exprt &ssa_rhs,
+    const symbol_exprt &original_rhs,
     const sourcet &source)=0;
 
   // write event - lhs must be symbol

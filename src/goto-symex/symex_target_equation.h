@@ -30,7 +30,8 @@ public:
   // read event
   virtual void read(
     const exprt &guard,
-    const symbol_exprt &ssa,
+    const symbol_exprt &ssa_object,
+    const symbol_exprt &original_object,
     const sourcet &source);
 
   // assignment to a variable - lhs must be symbol
@@ -228,6 +229,17 @@ public:
   void clear()
   {
     SSA_steps.clear();
+  }
+  
+  bool has_threads() const
+  {
+    for(SSA_stepst::const_iterator it=SSA_steps.begin();
+        it!=SSA_steps.end();
+        it++)
+      if(it->source.thread_nr!=0)
+        return true;
+
+    return false;
   }
   
 protected:

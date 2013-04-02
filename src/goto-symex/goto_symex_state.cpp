@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <prefix.h>
 
 #include "goto_symex_state.h"
-//#include "abstract_event_structure.h"
 
 /*******************************************************************\
 
@@ -29,6 +28,7 @@ Function: goto_symex_statet::goto_symex_statet
 
 goto_symex_statet::goto_symex_statet():
   depth(0),
+  symex_target(NULL),
   atomic_section_count(0)
 {
   threads.resize(1);
@@ -528,14 +528,10 @@ bool goto_symex_statet::l2_thread_read_encoding(
   new_l2_name=level2.increase_counter(l1_identifier);
   expr.set_identifier(new_l2_name);
 
-  // record as event into the symex target
-  #if 0
-  event_log.push_back(goto_eventt());
-  event_log.back().event_type=ID_read;
-  event_log.back().source=source;
-  event_log.back().guard=guard;
-  event_log.back().value=symbol_exprt(new_l2_name, expr.type());
-  #endif
+  // and record that
+  assert(symex_target!=NULL);
+  symbol_exprt original_symbol(orig_identifier, expr.type());
+  symex_target->read(guard.as_expr(), expr, original_symbol, source);
 
   return true;
 }
