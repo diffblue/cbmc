@@ -22,8 +22,15 @@ public:
 protected:
   typedef std::vector<const eventt *> event_listt;
   
-  // global lists
-  event_listt reads, writes;
+  // lists of reads and writes per address
+  struct a_rect
+  {
+    event_listt reads, writes;
+  };
+  
+  typedef std::map<irep_idt, a_rect> address_mapt;
+  address_mapt address_map;
+  
   void build_event_lists(symex_target_equationt &);
   
   // a per-thread numbering of the events
@@ -48,6 +55,8 @@ protected:
   choice_symbolst choice_symbols;
 
   void read_from(symex_target_equationt &equation);
+  
+  typedef std::map<unsigned, event_listt> per_thread_mapt;
 };
 
 class memory_model_sct:public memory_model_baset

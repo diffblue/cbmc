@@ -26,9 +26,15 @@ protected:
   typedef std::vector<const eventt *> event_listt;
   
   // produces the symbol ID for an event
-  inline irep_idt id(const eventt &event)
+  inline irep_idt id(const eventt &event) const
   {
     return event.ssa_lhs.get_identifier();
+  }
+  
+  // produces an address ID for an event
+  inline irep_idt address(const eventt &event) const
+  {
+    return event.original_lhs_object.get_identifier();
   }
 
   // produce a clock symbol for some event

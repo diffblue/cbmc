@@ -142,6 +142,11 @@ public:
     const exprt &cond,
     const std::string &msg,
     const sourcet &source)=0;
+
+  // record thread spawn
+  virtual void spawn(
+    const exprt &guard,
+    const sourcet &source)=0;
 };
 
 bool operator < (

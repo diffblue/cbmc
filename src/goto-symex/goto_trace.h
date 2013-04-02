@@ -45,11 +45,12 @@ public:
   bool is_input() const           { return type==INPUT; }
   bool is_decl() const            { return type==DECL; }
   bool is_dead() const            { return type==DEAD; }
+  bool is_spawn() const           { return type==SPAWN; }
 
   typedef enum { NONE, ASSIGNMENT, ASSUME, ASSERT,
                  LOCATION, INPUT, OUTPUT, DECL, DEAD,
                  FUNCTION_CALL, FUNCTION_RETURN,
-                 CONSTRAINT, READ } typet;
+                 CONSTRAINT, READ, SPAWN } typet;
   typet type;
     
   goto_programt::const_targett pc;

@@ -158,7 +158,7 @@ void build_goto_trace(
     if(prop_conv.prop.l_get(SSA_step.guard_literal)!=tvt(true))
       continue;
 
-    if(it->is_constraint() || it->is_read())
+    if(it->is_constraint() || it->is_read() || it->is_spawn())
       continue;
 
     if(it->is_assignment() &&
