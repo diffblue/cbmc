@@ -373,17 +373,25 @@ bool bmct::run(const goto_functionst &goto_functions)
 	(options.get_option("slice-by-trace"), equation);
     }
 
-    if(options.get_bool_option("slice-formula"))
+    if(equation.has_threads())
     {
-      slice(equation);
-      print(8, "slicing removed "+
-        i2string(equation.count_ignored_SSA_steps())+" assignments");
+      // we should build a thread-aware SSA slicer
+      print(8, "no slicing due to threads");
     }
     else
     {
-      simple_slice(equation);
-      print(8, "simple slicing removed "+
-        i2string(equation.count_ignored_SSA_steps())+" assignments");
+      if(options.get_bool_option("slice-formula"))
+      {
+        slice(equation);
+        print(8, "slicing removed "+
+          i2string(equation.count_ignored_SSA_steps())+" assignments");
+      }
+      else
+      {
+        simple_slice(equation);
+        print(8, "simple slicing removed "+
+          i2string(equation.count_ignored_SSA_steps())+" assignments");
+      }
     }
 
     if(options.get_bool_option("program-only"))

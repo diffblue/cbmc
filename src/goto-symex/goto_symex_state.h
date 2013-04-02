@@ -31,6 +31,7 @@ public:
 
   guardt guard;
   symex_targett::sourcet source;
+  symex_targett *symex_target;
 
   void initialize(const goto_functionst &goto_functions);
 

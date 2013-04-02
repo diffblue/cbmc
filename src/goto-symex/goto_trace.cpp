@@ -261,7 +261,7 @@ void show_state_header(
 
 /*******************************************************************\
 
-Function: show_goto_trace
+Function: is_index_member_symbol
 
   Inputs:
 
@@ -282,6 +282,18 @@ bool is_index_member_symbol(const exprt &src)
   else
     return false;
 }
+
+/*******************************************************************\
+
+Function: show_goto_trace
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void show_goto_trace(
   std::ostream &out,
@@ -402,6 +414,10 @@ void show_goto_trace(
       
     case goto_trace_stept::FUNCTION_CALL:
     case goto_trace_stept::FUNCTION_RETURN:
+      break;
+    
+    case goto_trace_stept::CONSTRAINT:
+      assert(false);
       break;
       
     default:

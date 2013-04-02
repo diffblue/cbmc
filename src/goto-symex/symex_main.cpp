@@ -126,6 +126,7 @@ void goto_symext::operator()(
   assert(!state.call_stack().empty());
   state.top().end_of_function=--goto_program.instructions.end();
   state.top().calling_location.pc=state.top().end_of_function;
+  state.symex_target=&target;
   
   assert(state.top().end_of_function->is_end_function());
 
