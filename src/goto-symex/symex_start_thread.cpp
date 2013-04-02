@@ -24,8 +24,8 @@ void goto_symext::symex_start_thread(statet &state)
 {
   if(state.guard.is_false()) return;
 
-  // record the location
-  target.location(state.guard.as_expr(), state.source);
+  // record this
+  target.spawn(state.guard.as_expr(), state.source);
 
   const goto_programt::instructiont &instruction=*state.source.pc;
   

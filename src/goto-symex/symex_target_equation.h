@@ -118,6 +118,11 @@ public:
     const std::string &msg,
     const sourcet &source);
 
+  // record thread spawn
+  virtual void spawn(
+    const exprt &guard,
+    const sourcet &source);
+
   void convert(prop_convt &prop_conv);
   void convert_assignments(decision_proceduret &decision_procedure) const;
   void convert_decls(prop_convt &prop_conv) const;
@@ -145,6 +150,7 @@ public:
     bool is_decl() const            { return type==goto_trace_stept::DECL; }
     bool is_function_call() const   { return type==goto_trace_stept::FUNCTION_CALL; }
     bool is_function_return() const { return type==goto_trace_stept::FUNCTION_RETURN; }
+    bool is_spawn() const           { return type==goto_trace_stept::SPAWN; }
     
     exprt guard;
     literalt guard_literal;

@@ -88,14 +88,20 @@ void memory_model_baset::build_event_lists(
   {
     const eventt &event=*e_it;
     unsigned thread_nr=event.source.thread_nr;    
+    
+    if(event.is_read() || event.is_assignment())
+    {
+      a_rect &a_rec=address_map[address(event)];
+    
+      if(event.is_read())
+        a_rec.reads.push_back(&event);
+      else if(event.is_assignment())
+        a_rec.writes.push_back(&event);
 
-    if(event.is_read())
-      reads.push_back(&event);
-    else if(event.is_assignment())
-      writes.push_back(&event);
-
-    unsigned cnt=counter[thread_nr]++;
-    numbering[id(event)]=cnt;
+      // maps an event id to a per-thread counter
+      unsigned cnt=counter[thread_nr]++;
+      numbering[id(event)]=cnt;
+    }
   }
 }
 
@@ -116,85 +122,89 @@ void memory_model_baset::read_from(symex_target_equationt &equation)
   // We iterate over all the reads, and
   // make them match at least one
   // (internal or external) write.
-  
-  for(event_listt::const_iterator
-      r_it=reads.begin();
-      r_it!=reads.end();
-      r_it++)
+
+  for(address_mapt::const_iterator
+      a_it=address_map.begin();
+      a_it!=address_map.end();
+      a_it++)
   {
-    const eventt &read_event=**r_it;
-    
-    exprt::operandst rf_some_operands;
-    rf_some_operands.reserve(writes.size());
-
-    // this is quadratic
+    const a_rect &a_rec=a_it->second;
+  
     for(event_listt::const_iterator
-        w_it=writes.begin();
-        w_it!=writes.end();
-        ++w_it)
+        r_it=a_rec.reads.begin();
+        r_it!=a_rec.reads.end();
+        r_it++)
     {
-      const eventt &write_event=**w_it;
+      const eventt &read_event=**r_it;
       
-      // check that this is the same address
-      if(id(read_event)!=id(write_event))
-        continue; // different address
-      
-      // rf cannot contradict program order
-      if(po(read_event, write_event))
-        continue; // contradicts po
+      exprt::operandst rf_some_operands;
+      rf_some_operands.reserve(a_rec.writes.size());
 
-      bool is_rfi=
-        write_event.source.thread_nr==read_event.source.thread_nr;
-
-      if(is_rfi)
+      // this is quadratic in #events per address
+      for(event_listt::const_iterator
+          w_it=a_rec.writes.begin();
+          w_it!=a_rec.writes.end();
+          ++w_it)
       {
-        // only read from the most recent write, extra wsi constraints ensure
-        // that even a write with guard false will have the proper value
-        #if 0
-        numbered_evtst::const_iterator w_entry=
-          poc.get_thread(r_evt).find(w_evt);
-        assert(w_entry!=poc.get_thread(r_evt).end());
-        numbered_evtst::const_iterator r_entry=
-          poc.get_thread(r_evt).find(r_evt);
-        assert(r_entry!=poc.get_thread(r_evt).end());
+        const eventt &write_event=**w_it;
+        
+        // rf cannot contradict program order
+        if(po(read_event, write_event))
+          continue; // contradicts po
 
-        assert(w_entry<r_entry);
-        bool is_most_recent=true;
-        for(++w_entry; w_entry!=r_entry && is_most_recent; ++w_entry)
-          is_most_recent&=(*w_entry)->direction!=evtt::D_WRITE ||
-            (*w_entry)->address!=r_evt.address;
-        if(!is_most_recent)
-          continue;
-        #endif
+        bool is_rfi=
+          write_event.source.thread_nr==read_event.source.thread_nr;
+
+        if(is_rfi)
+        {
+          // only read from the most recent write, extra wsi constraints ensure
+          // that even a write with guard false will have the proper value
+          #if 0
+          numbered_evtst::const_iterator w_entry=
+            poc.get_thread(r_evt).find(w_evt);
+          assert(w_entry!=poc.get_thread(r_evt).end());
+          numbered_evtst::const_iterator r_entry=
+            poc.get_thread(r_evt).find(r_evt);
+          assert(r_entry!=poc.get_thread(r_evt).end());
+
+          assert(w_entry<r_entry);
+          bool is_most_recent=true;
+          for(++w_entry; w_entry!=r_entry && is_most_recent; ++w_entry)
+            is_most_recent&=(*w_entry)->direction!=evtt::D_WRITE ||
+              (*w_entry)->address!=r_evt.address;
+          if(!is_most_recent)
+            continue;
+          #endif
+        }
+
+        symbol_exprt s=nondet_bool_symbol("rf");
+        
+        // record the symbol
+        choice_symbols[
+          std::pair<irep_idt, irep_idt>(id(read_event), id(write_event))]=s;
+
+        // We rely on the fact that there is at least
+        // one write event that has guard 'true'.
+        implies_exprt read_from(s,
+            and_exprt((is_rfi ? true_exprt() : write_event.guard),
+              equal_exprt(read_event.ssa_lhs, write_event.ssa_lhs)));
+
+        equation.constraint(
+          true_exprt(), read_from, is_rfi?"rfi":"rf", read_event.source);
+
+        rf_some_operands.push_back(s);
       }
-
-      symbol_exprt s=nondet_bool_symbol("rf");
       
-      // record the symbol
-      choice_symbols[
-        std::pair<irep_idt, irep_idt>(id(read_event), id(write_event))]=s;
+      if(rf_some_operands.empty())
+        continue; // don't add blank constraints
 
-      // We rely on the fact that there is at least
-      // one write event that has guard 'true'.
-      implies_exprt read_from(s,
-          and_exprt((is_rfi ? true_exprt() : write_event.guard),
-            equal_exprt(read_event.ssa_lhs, write_event.ssa_lhs)));
+      // value equals the one of some write
+      or_exprt rf_some;
+      rf_some.operands().swap(rf_some_operands);
 
       equation.constraint(
-        true_exprt(), read_from, is_rfi?"rfi":"rf", read_event.source);
-
-      rf_some_operands.push_back(s);
+        read_event.guard, rf_some, "rf-some", read_event.source);
     }
-    
-    if(rf_some_operands.empty())
-      continue; // don't add blank constraints
-
-    // value equals the one of some write
-    or_exprt rf_some;
-    rf_some.operands().swap(rf_some_operands);
-
-    equation.constraint(
-      read_event.guard, rf_some, "rf-some", read_event.source);
   }
 }
 
@@ -220,6 +230,7 @@ void memory_model_sct::operator()(symex_target_equationt &equation)
   read_from(equation);
   write_serialization_internal(equation);
   write_serialization_external(equation);
+  program_order(equation);
 }
 
 /*******************************************************************\
@@ -237,127 +248,71 @@ Function: memory_model_sct::program_order
 void memory_model_sct::program_order(
   symex_target_equationt &equation)
 {
-  #if 0
-  assert(thread.begin()!=thread.end());
+  // this orders the events within a thread
 
-  partial_order_concurrencyt::per_address_mapt most_recent_evt;
-  typedef std::list<numbered_evtst::const_iterator> chaint;
-  typedef std::list<chaint> root_chainst;
-
-  numbered_evtst::const_iterator pred=thread.begin();
-  assert((*pred)->direction==evtt::D_READ ||
-         (*pred)->direction==evtt::D_WRITE);
-  most_recent_evt[(*pred)->address].push_back(*pred);
-  root_chainst root_chains(1, chaint(1, pred));
-
-  for(numbered_evtst::const_iterator e_it=++(thread.begin());
-      e_it!=thread.end();
-      ++e_it)
+  per_thread_mapt per_thread_map;
+  
+  for(eventst::const_iterator
+      e_it=equation.SSA_steps.begin();
+      e_it!=equation.SSA_steps.end();
+      e_it++)
   {
-    const evtt &e=**e_it;
+    const eventt &event=*e_it;
+    per_thread_map[event.source.thread_nr].push_back(&event);
+  }
+  
+  // iterate over threads
 
-    // check e for non-barrier event; pred updated below, hence pred is always
-    // a non-barrier
-    if(e.direction!=evtt::D_READ && e.direction!=evtt::D_WRITE)
-      continue;
-
-    // check for thread spawn -- in po with last event before spawn
-    if(e.source.thread_nr!=(*pred)->source.thread_nr)
+  for(per_thread_mapt::const_iterator
+      t_it=per_thread_map.begin();
+      t_it!=per_thread_map.end();
+      t_it++)
+  {
+    const event_listt &events=t_it->second;
+    
+    // iterate over events in the thread
+    
+    const eventt *previous=NULL;
+    
+    for(event_listt::const_iterator
+        e_it=events.begin();
+        e_it!=events.end();
+        e_it++)
     {
-      assert(e.source.thread_nr>(*pred)->source.thread_nr);
+      const eventt &event=**e_it;
 
-      poc.add_partial_order_constraint(
-          AC_GHB, "thread-spawn", **pred, e, true_exprt());
-      po[AC_GHB][*pred][&e].make_true();
-    }
+      if(!event.is_read() &&
+         !event.is_assignment()) continue;
 
-    // uniproc -- program order per address
-    if(uses_check(AC_UNIPROC))
-    {
-      partial_order_concurrencyt::per_valuet &mr=most_recent_evt[e.address];
-      if(!mr.empty())
+      if(previous==NULL)
       {
+        // first one?
+        previous=&event;
+        continue;
+      }
+
+      equation.constraint(
+        true_exprt(),
+        po_constraint(*previous, event),
+        "po",
+        event.source);
+
+      #if 0
+      // check for thread spawn -- in po with last event before spawn
+      if(e.source.thread_nr!=(*pred)->source.thread_nr)
+      {
+        assert(e.source.thread_nr>(*pred)->source.thread_nr);
+
         poc.add_partial_order_constraint(
-            AC_UNIPROC, "uniproc", *mr.back(), e, true_exprt());
-        po[AC_UNIPROC][mr.back()][&e].make_true();
+            AC_GHB, "thread-spawn", **pred, e, true_exprt());
+        po[AC_GHB][*pred][&e].make_true();
       }
-      mr.push_back(&e);
+      #endif
+
+      previous=&event;
     }
-
-    // program order
-    bool extended_chain=false;
-    for(root_chainst::iterator r_it=root_chains.begin();
-        r_it!=root_chains.end();
-        ++r_it)
-    {
-      // should be const_reverse_iterator, but some STLs are buggy
-      for(chaint::reverse_iterator cand=r_it->rbegin();
-          cand!=r_it->rend();
-          ++cand)
-      {
-        const evtt &c_e=***cand;
-        // dependencies
-        if(!po_is_relaxed(poc, c_e, e))
-        {
-          if(uses_check(AC_THINAIR))
-          {
-            poc.add_partial_order_constraint(
-                AC_THINAIR, "thin-air", c_e, e, true_exprt());
-            po[AC_THINAIR][&c_e][&e].make_true();
-          }
-
-          poc.add_partial_order_constraint(
-              AC_GHB, "po", c_e, e, true_exprt());
-          po[AC_GHB][&c_e][&e].make_true();
-
-          if(cand==r_it->rbegin())
-          {
-            r_it->push_back(e_it);
-            extended_chain=true;
-          }
-          break;
-        }
-      }
-    }
-    if(!extended_chain)
-      root_chains.push_back(chaint(1, e_it));
-
-    pred=e_it;
   }
-  #endif
 }
-
-/*******************************************************************\
-
-Function: write_symbol_primed
-
-  Inputs: 
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-#if 0
-static exprt write_symbol_primed(
-    const partial_order_concurrencyt::evtt &evt)
-{
-  assert(evt.direction==partial_order_concurrencyt::evtt::D_WRITE);
-
-  if(evt.value.id()!=ID_symbol)
-  {
-    // initialisation
-    assert(evt.guard.is_true());
-    return evt.value;
-  }
-
-  const std::string name=
-    id2string(to_symbol_expr(evt.value).get_identifier()) + "$val";
-
-  return symbol_exprt(name, evt.value.type());
-}
-#endif
 
 /*******************************************************************\
 
@@ -374,28 +329,37 @@ Function: memory_model_sct::write_serialization_internal
 void memory_model_sct::write_serialization_internal(
   symex_target_equationt &equation)
 {
-  for(event_listt::const_iterator w_it=writes.begin();
-      w_it!=writes.end();
-      ++w_it)
+  for(address_mapt::const_iterator
+      a_it=address_map.begin();
+      a_it!=address_map.end();
+      a_it++)
   {
-    //const eventt &write_event=**w_it;
-
-    #if 0
-    if(reads.find(w_evt2.address)!=reads.end())
+    const a_rect &a_rec=a_it->second;
+    
+    for(event_listt::const_iterator
+        w_it=a_rec.writes.begin();
+        w_it!=a_rec.writes.end();
+        ++w_it)
     {
-      assert(!mr.empty() || w_evt2.guard.is_true());
-      equal_exprt eq(write_symbol_primed(w_evt2),
-          w_evt2.guard.is_true() ?
-          // value' equals value
-          w_evt2.value :
-          // value' equals preceding write if guard is false
-          if_exprt(w_evt2.guard.as_expr(),
-            w_evt2.value,
-            write_symbol_primed(*mr.back())));
+      //const eventt &write_event=**w_it;
 
-      poc.add_constraint(eq, guardt(), w_evt2.source, "ws-preceding");
+      #if 0
+      if(reads.find(w_evt2.address)!=reads.end())
+      {
+        assert(!mr.empty() || w_evt2.guard.is_true());
+        equal_exprt eq(write_symbol_primed(w_evt2),
+            w_evt2.guard.is_true() ?
+            // value' equals value
+            w_evt2.value :
+            // value' equals preceding write if guard is false
+            if_exprt(w_evt2.guard.as_expr(),
+              w_evt2.value,
+              write_symbol_primed(*mr.back())));
+
+        poc.add_constraint(eq, guardt(), w_evt2.source, "ws-preceding");
+      }
+      #endif
     }
-    #endif
   }
 }
 
@@ -414,51 +378,55 @@ Function: memory_model_sct::write_serialization_external
 void memory_model_sct::write_serialization_external(
   symex_target_equationt &equation)
 {
-  for(event_listt::const_iterator
-      w_it1=writes.begin();
-      w_it1!=writes.end();
-      ++w_it1)
+  for(address_mapt::const_iterator
+      a_it=address_map.begin();
+      a_it!=address_map.end();
+      a_it++)
   {
-    const eventt &write_event1=**w_it1;
+    const a_rect &a_rec=a_it->second;
 
-    event_listt::const_iterator next=w_it1;
-    ++next;
-
-    for(event_listt::const_iterator w_it2=next;
-        w_it2!=writes.end();
-        ++w_it2)
+    // This is quadratic in the number of writes
+    // per address. Perhaps some better encoding
+    // based on 'places'?    
+    for(event_listt::const_iterator
+        w_it1=a_rec.writes.begin();
+        w_it1!=a_rec.writes.end();
+        ++w_it1)
     {
-      const eventt &write_event2=**w_it2;
+      const eventt &write_event1=**w_it1;
 
-      // ws is a total order, no two elements have the same rank
-      // s -> w_evt1 before w_evt2; !s -> w_evt2 before w_evt1
+      event_listt::const_iterator next=w_it1;
+      ++next;
 
-      #if 0
-      //const evtt* f_e=poc.first_of(w_evt1, w_evt2);
-      exprt s;
-      if(!f_e)
-        s=poc.fresh_nondet_bool();
-      else
-        s.make_bool(f_e==&w_evt1);
-
-      // write-to-write edge
-      //ws[AC_GHB][&w_evt1].insert(std::make_pair(&w_evt2, s));
-      //ws[AC_GHB][&w_evt2].insert(std::make_pair(&w_evt1, not_exprt(s)));
-
-      poc.add_partial_order_constraint(AC_GHB, "ws", w_evt1, w_evt2, s);
-      poc.add_partial_order_constraint(AC_GHB, "ws", w_evt2, w_evt1,
-          not_exprt(s));
-
-      if(uses_check(AC_UNIPROC))
+      for(event_listt::const_iterator w_it2=next;
+          w_it2!=a_rec.writes.end();
+          ++w_it2)
       {
-        poc.add_partial_order_constraint(AC_UNIPROC, "ws", w_evt1, w_evt2, s);
-        poc.add_partial_order_constraint(AC_UNIPROC, "ws", w_evt2, w_evt1,
-            not_exprt(s));
+        const eventt &write_event2=**w_it2;
+        
+        // external?
+        if(write_event1.source.thread_nr==
+           write_event2.source.thread_nr)
+          continue;
+
+        // ws is a total order, no two elements have the same rank
+        // s -> w_evt1 before w_evt2; !s -> w_evt2 before w_evt1
+
+        symbol_exprt s=nondet_bool_symbol("ws-ext");
+
         // write-to-write edge
-        ws[AC_UNIPROC][&w_evt1].insert(std::make_pair(&w_evt2, s));
-        ws[AC_UNIPROC][&w_evt2].insert(std::make_pair(&w_evt1, not_exprt(s)));
+        equation.constraint(
+          true_exprt(),
+          implies_exprt(s, po_constraint(write_event1, write_event2)),
+          "ws-ext",
+          write_event1.source);
+
+        equation.constraint(
+          true_exprt(),
+          implies_exprt(not_exprt(s), po_constraint(write_event2, write_event1)),
+          "ws-ext",
+          write_event1.source);
       }
-      #endif
     }
   }
 }

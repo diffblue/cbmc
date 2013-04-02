@@ -82,6 +82,29 @@ void symex_target_equationt::read(
 
 /*******************************************************************\
 
+Function: symex_target_equationt::spawn
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: spawn a new thread
+
+\*******************************************************************/
+
+void symex_target_equationt::spawn(
+  const exprt &guard,
+  const sourcet &source)
+{
+  SSA_steps.push_back(SSA_stept());
+  SSA_stept &SSA_step=SSA_steps.back();
+  SSA_step.guard=guard;
+  SSA_step.type=goto_trace_stept::SPAWN;
+  SSA_step.source=source;
+}
+
+/*******************************************************************\
+
 Function: symex_target_equationt::assignment
 
   Inputs:

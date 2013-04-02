@@ -414,9 +414,14 @@ void show_goto_trace(
       
     case goto_trace_stept::FUNCTION_CALL:
     case goto_trace_stept::FUNCTION_RETURN:
+    case goto_trace_stept::SPAWN:
       break;
     
     case goto_trace_stept::CONSTRAINT:
+      assert(false);
+      break;
+      
+    case goto_trace_stept::READ:
       assert(false);
       break;
       
