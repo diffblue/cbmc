@@ -34,15 +34,11 @@ protected:
   void build_event_lists(symex_target_equationt &);
   
   // a per-thread numbering of the events
-  typedef std::map<irep_idt, unsigned> numberingt;
+  typedef std::map<const eventt *, unsigned> numberingt;
   numberingt numbering;
   
   // program order
-  bool po(const eventt &e1, const eventt &e2)
-  {
-    return e1.source.thread_nr==e2.source.thread_nr &&
-           numbering[id(e1)]<numbering[id(e2)];
-  }
+  bool po(const eventt &e1, const eventt &e2);
 
   // produce fresh symbols  
   unsigned var_cnt;
@@ -66,6 +62,7 @@ public:
   
 protected:
   void program_order(symex_target_equationt &equation);
+  void from_read(symex_target_equationt &equation);
   void write_serialization_internal(symex_target_equationt &equation);
   void write_serialization_external(symex_target_equationt &equation);
 };

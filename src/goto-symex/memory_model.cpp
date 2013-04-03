@@ -100,8 +100,32 @@ void memory_model_baset::build_event_lists(
 
       // maps an event id to a per-thread counter
       unsigned cnt=counter[thread_nr]++;
-      numbering[id(event)]=cnt;
+      numbering[&event]=cnt;
     }
+  }
+}
+
+/*******************************************************************\
+
+Function: memory_model_baset::po
+
+  Inputs: 
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool memory_model_baset::po(const eventt &e1, const eventt &e2)
+{
+  // within same thread
+  if(e1.source.thread_nr==e2.source.thread_nr)
+    return numbering[&e1]<numbering[&e2];
+  else
+  {
+    // in general un-ordered, with exception of thread-spawning
+    return false;
   }
 }
 
@@ -157,24 +181,26 @@ void memory_model_baset::read_from(symex_target_equationt &equation)
 
         if(is_rfi)
         {
-          // only read from the most recent write, extra wsi constraints ensure
-          // that even a write with guard false will have the proper value
-          #if 0
-          numbered_evtst::const_iterator w_entry=
-            poc.get_thread(r_evt).find(w_evt);
-          assert(w_entry!=poc.get_thread(r_evt).end());
-          numbered_evtst::const_iterator r_entry=
-            poc.get_thread(r_evt).find(r_evt);
-          assert(r_entry!=poc.get_thread(r_evt).end());
+          // We only read from the most recent write of the same thread.
+          // Extra wsi constraints ensure that even a
+          // write with guard false will have the proper value.
 
-          assert(w_entry<r_entry);
+          numberingt::const_iterator w_entry=
+            numbering.find(&write_event);
+          assert(w_entry!=numbering.end());
+
+          numberingt::const_iterator r_entry=
+            numbering.find(&read_event);
+          assert(r_entry!=numbering.end());
+
+          assert(w_entry->second<r_entry->second); // otherwise contradicts po
+
           bool is_most_recent=true;
           for(++w_entry; w_entry!=r_entry && is_most_recent; ++w_entry)
-            is_most_recent&=(*w_entry)->direction!=evtt::D_WRITE ||
-              (*w_entry)->address!=r_evt.address;
+            is_most_recent&=w_entry->first->is_assignment() ||
+                            address(*w_entry->first)!=address(read_event);
           if(!is_most_recent)
             continue;
-          #endif
         }
 
         symbol_exprt s=nondet_bool_symbol("rf");
@@ -282,7 +308,8 @@ void memory_model_sct::program_order(
       const eventt &event=**e_it;
 
       if(!event.is_read() &&
-         !event.is_assignment()) continue;
+         !event.is_assignment() &&
+         !event.is_spawn()) continue;
 
       if(previous==NULL)
       {
@@ -433,7 +460,7 @@ void memory_model_sct::write_serialization_external(
 
 /*******************************************************************\
 
-Function: memory_model_baset::add_from_read
+Function: memory_model_sct::from_read
 
   Inputs:
 
@@ -443,19 +470,13 @@ Function: memory_model_baset::add_from_read
 
 \*******************************************************************/
 
-#if 0
-void memory_model_baset::add_from_read(
-    partial_order_concurrencyt &poc,
-    const partial_order_concurrencyt::acyclict check,
-    const partial_order_concurrencyt::adj_matrixt &rf,
-    const partial_order_concurrencyt::adj_matrixt &ws,
-    partial_order_concurrencyt::adj_matrixt &fr) const
+void memory_model_sct::from_read(symex_target_equationt &equation)
 {
-  assert(check==AC_GHB || check==AC_UNIPROC);
-
   // from-read: (w', w) in ws and (w', r) in rf -> (r, w) in fr
   // uniproc and ghb orders are guaranteed to be in sync via the
   // underlying orders rf and ws
+
+  #if 0
   for(partial_order_concurrencyt::adj_matrixt::const_iterator
       w_prime=ws.begin();
       w_prime!=ws.end();
@@ -522,6 +543,6 @@ void memory_model_baset::add_from_read(
       }
     }
   }
+  #endif
 }
 
-#endif
