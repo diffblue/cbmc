@@ -94,13 +94,13 @@ void memory_model_baset::build_event_lists(
       a_rect &a_rec=address_map[address(event)];
     
       if(event.is_read())
-        a_rec.reads.push_back(&event);
+        a_rec.reads.push_back(e_it);
       else if(event.is_assignment())
-        a_rec.writes.push_back(&event);
+        a_rec.writes.push_back(e_it);
 
       // maps an event id to a per-thread counter
       unsigned cnt=counter[thread_nr]++;
-      numbering[&event]=cnt;
+      numbering[e_it]=cnt;
     }
   }
 }
@@ -117,11 +117,11 @@ Function: memory_model_baset::po
 
 \*******************************************************************/
 
-bool memory_model_baset::po(const eventt &e1, const eventt &e2)
+bool memory_model_baset::po(event_it e1, event_it e2)
 {
   // within same thread
-  if(e1.source.thread_nr==e2.source.thread_nr)
-    return numbering[&e1]<numbering[&e2];
+  if(e1->source.thread_nr==e2->source.thread_nr)
+    return numbering[e1]<numbering[e2];
   else
   {
     // in general un-ordered, with exception of thread-spawning
@@ -173,7 +173,7 @@ void memory_model_baset::read_from(symex_target_equationt &equation)
         const eventt &write_event=**w_it;
         
         // rf cannot contradict program order
-        if(po(read_event, write_event))
+        if(po(*r_it, *w_it))
           continue; // contradicts po
 
         bool is_rfi=
@@ -184,21 +184,13 @@ void memory_model_baset::read_from(symex_target_equationt &equation)
           // We only read from the most recent write of the same thread.
           // Extra wsi constraints ensure that even a
           // write with guard false will have the proper value.
-
-          numberingt::const_iterator w_entry=
-            numbering.find(&write_event);
-          assert(w_entry!=numbering.end());
-
-          numberingt::const_iterator r_entry=
-            numbering.find(&read_event);
-          assert(r_entry!=numbering.end());
-
-          assert(w_entry->second<r_entry->second); // otherwise contradicts po
-
+          
+          event_it e_it=*w_it;
           bool is_most_recent=true;
-          for(++w_entry; w_entry!=r_entry && is_most_recent; ++w_entry)
-            is_most_recent&=w_entry->first->is_assignment() ||
-                            address(*w_entry->first)!=address(read_event);
+          for(++e_it; e_it!=*r_it && is_most_recent; ++e_it)
+            is_most_recent&=!e_it->is_assignment() ||
+                            address(*e_it)!=address(read_event);
+
           if(!is_most_recent)
             continue;
         }
@@ -283,8 +275,7 @@ void memory_model_sct::program_order(
       e_it!=equation.SSA_steps.end();
       e_it++)
   {
-    const eventt &event=*e_it;
-    per_thread_map[event.source.thread_nr].push_back(&event);
+    per_thread_map[e_it->source.thread_nr].push_back(e_it);
   }
   
   // iterate over threads
