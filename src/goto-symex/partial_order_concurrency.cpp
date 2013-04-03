@@ -63,6 +63,8 @@ symbol_exprt partial_order_concurrencyt::clock(
     identifier=id2string(id(event))+"$wclk";
   else if(event.is_read())
     identifier=id2string(id(event))+"$rclk";
+  else if(event.is_spawn())
+    identifier=id2string(id(event))+"$spwnclk";
   else
     assert(false);
 
