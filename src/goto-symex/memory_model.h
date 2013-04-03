@@ -20,7 +20,7 @@ public:
   virtual void operator()(symex_target_equationt &)=0;
   
 protected:
-  typedef std::vector<const eventt *> event_listt;
+  typedef std::vector<event_it> event_listt;
   
   // lists of reads and writes per address
   struct a_rect
@@ -34,11 +34,11 @@ protected:
   void build_event_lists(symex_target_equationt &);
   
   // a per-thread numbering of the events
-  typedef std::map<const eventt *, unsigned> numberingt;
+  typedef std::map<event_it, unsigned> numberingt;
   numberingt numbering;
   
   // program order
-  bool po(const eventt &e1, const eventt &e2);
+  bool po(event_it e1, event_it e2);
 
   // produce fresh symbols  
   unsigned var_cnt;
@@ -52,6 +52,7 @@ protected:
 
   void read_from(symex_target_equationt &equation);
   
+  // maps thread numbers to an event list
   typedef std::map<unsigned, event_listt> per_thread_mapt;
 };
 
