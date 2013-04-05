@@ -91,7 +91,7 @@ void memory_model_baset::build_event_lists(
     
     if(event.is_read() || event.is_assignment())
     {
-      a_rect &a_rec=address_map[address(event)];
+      a_rect &a_rec=address_map[address(e_it)];
     
       if(event.is_read())
         a_rec.reads.push_back(e_it);
@@ -189,7 +189,7 @@ void memory_model_baset::read_from(symex_target_equationt &equation)
           bool is_most_recent=true;
           for(++e_it; e_it!=*r_it && is_most_recent; ++e_it)
             is_most_recent&=!e_it->is_assignment() ||
-                            address(*e_it)!=address(read_event);
+                            address(e_it)!=address(*r_it);
 
           if(!is_most_recent)
             continue;
@@ -199,7 +199,7 @@ void memory_model_baset::read_from(symex_target_equationt &equation)
         
         // record the symbol
         choice_symbols[
-          std::pair<irep_idt, irep_idt>(id(read_event), id(write_event))]=s;
+          std::pair<event_it, event_it>(*r_it, *w_it)]=s;
 
         // We rely on the fact that there is at least
         // one write event that has guard 'true'.
@@ -255,6 +255,7 @@ void memory_model_sct::operator()(symex_target_equationt &equation)
   write_serialization_internal(equation);
   write_serialization_external(equation);
   program_order(equation);
+  from_read(equation);
 }
 
 /*******************************************************************\
@@ -281,6 +282,10 @@ void memory_model_sct::program_order(
       e_it!=equation.SSA_steps.end();
       e_it++)
   {
+    if(!e_it->is_read() &&
+       !e_it->is_assignment() &&
+       !e_it->is_spawn()) continue;
+
     per_thread_map[e_it->source.thread_nr].push_back(e_it);
   }
   
@@ -295,46 +300,61 @@ void memory_model_sct::program_order(
     
     // iterate over events in the thread
     
-    const eventt *previous=NULL;
+    event_it previous=equation.SSA_steps.end();
     
     for(event_listt::const_iterator
         e_it=events.begin();
         e_it!=events.end();
         e_it++)
     {
-      const eventt &event=**e_it;
-
-      if(!event.is_read() &&
-         !event.is_assignment() &&
-         !event.is_spawn()) continue;
-
-      if(previous==NULL)
+      if(previous==equation.SSA_steps.end())
       {
         // first one?
-        previous=&event;
+        previous=*e_it;
         continue;
       }
 
       equation.constraint(
         true_exprt(),
-        po_constraint(*previous, event),
+        po_constraint(previous, *e_it),
         "po",
-        event.source);
+        (*e_it)->source);
 
-      #if 0
-      // check for thread spawn -- in po with last event before spawn
-      if(e.source.thread_nr!=(*pred)->source.thread_nr)
-      {
-        assert(e.source.thread_nr>(*pred)->source.thread_nr);
-
-        poc.add_partial_order_constraint(
-            AC_GHB, "thread-spawn", **pred, e, true_exprt());
-        po[AC_GHB][*pred][&e].make_true();
-      }
-      #endif
-
-      previous=&event;
+      previous=*e_it;
     }
+  }
+
+  // thread spawn: the spawn precedes the first
+  // instruction of the new thread in program order
+  
+  for(per_thread_mapt::const_iterator
+      t_it=per_thread_map.begin();
+      t_it!=per_thread_map.end();
+      t_it++)
+  {
+    per_thread_mapt::const_iterator next_thread=t_it;
+    next_thread++;
+    if(next_thread==per_thread_map.end()) continue;
+    if(next_thread->second.empty()) continue;
+
+    const event_listt &events=t_it->second;
+    
+    // iterate over events in the thread
+    
+    for(event_listt::const_iterator
+        e_it=events.begin();
+        e_it!=events.end();
+        e_it++)
+    {
+      if((*e_it)->is_spawn())
+      {
+        equation.constraint(
+          true_exprt(),
+          po_constraint(*e_it, next_thread->second.front()),
+          "thread-spawn",
+          (*e_it)->source);
+      }
+    }    
   }
 }
 
@@ -417,8 +437,6 @@ void memory_model_sct::write_serialization_external(
         w_it1!=a_rec.writes.end();
         ++w_it1)
     {
-      const eventt &write_event1=**w_it1;
-
       event_listt::const_iterator next=w_it1;
       ++next;
 
@@ -426,11 +444,9 @@ void memory_model_sct::write_serialization_external(
           w_it2!=a_rec.writes.end();
           ++w_it2)
       {
-        const eventt &write_event2=**w_it2;
-        
         // external?
-        if(write_event1.source.thread_nr==
-           write_event2.source.thread_nr)
+        if((*w_it1)->source.thread_nr==
+           (*w_it2)->source.thread_nr)
           continue;
 
         // ws is a total order, no two elements have the same rank
@@ -441,15 +457,15 @@ void memory_model_sct::write_serialization_external(
         // write-to-write edge
         equation.constraint(
           true_exprt(),
-          implies_exprt(s, po_constraint(write_event1, write_event2)),
+          implies_exprt(s, po_constraint(*w_it1, *w_it2)),
           "ws-ext",
-          write_event1.source);
+          (*w_it1)->source);
 
         equation.constraint(
           true_exprt(),
-          implies_exprt(not_exprt(s), po_constraint(write_event2, write_event1)),
+          implies_exprt(not_exprt(s), po_constraint(*w_it2, *w_it1)),
           "ws-ext",
-          write_event1.source);
+          (*w_it1)->source);
       }
     }
   }
@@ -470,10 +486,89 @@ Function: memory_model_sct::from_read
 void memory_model_sct::from_read(symex_target_equationt &equation)
 {
   // from-read: (w', w) in ws and (w', r) in rf -> (r, w) in fr
+  
+  for(address_mapt::const_iterator
+      a_it=address_map.begin();
+      a_it!=address_map.end();
+      a_it++)
+  {
+    const a_rect &a_rec=a_it->second;
+
+    // This is quadratic in the number of writes per address.
+    for(event_listt::const_iterator
+        w_prime=a_rec.writes.begin();
+        w_prime!=a_rec.writes.end();
+        ++w_prime)
+    {
+      event_listt::const_iterator next=w_prime;
+      ++next;
+
+      for(event_listt::const_iterator w=next;
+          w!=a_rec.writes.end();
+          ++w)
+      {
+        exprt ws;
+        
+        if(po(*w_prime, *w))
+          ws=true_exprt(); // true on SC only!
+        else
+          ws=po_constraint(*w_prime, *w);
+
+        // smells like cubic
+        for(choice_symbolst::const_iterator
+            c_it=choice_symbols.begin();
+            c_it!=choice_symbols.end();
+            c_it++)
+        {
+          event_it r=c_it->first.first;
+        
+          if(c_it->first.second!=*w_prime)
+            continue;
+
+          exprt rf=c_it->second;
+          exprt fr=po_constraint(r, *w);
+          
+          exprt cond=
+            implies_exprt(
+              and_exprt(r->guard, (*w_prime)->guard, ws, rf),
+              fr);
+          
+          equation.constraint(
+            true_exprt(), cond, "fr", r->source);
+        }
+        
+      }
+    }
+  }
+
+  // Not sure where this belongs. It appears to be needed.
+
+  for(choice_symbolst::const_iterator
+      c_it=choice_symbols.begin();
+      c_it!=choice_symbols.end();
+      c_it++)
+  {
+    event_it r=c_it->first.first;
+    event_it w=c_it->first.second;
+    exprt rf=c_it->second;
+    
+    if(po(w, r)) // uniproc guarantees this
+      continue;
+    
+    // if r reads from w, then w has to happen before r
+    
+    exprt cond=
+      implies_exprt(rf, po_constraint(w, r));
+    
+    equation.constraint(
+      true_exprt(), cond, "fr", r->source);
+  }
+
+  #if 0
+  // from-read: (w', w) in ws and (w', r) in rf -> (r, w) in fr
   // uniproc and ghb orders are guaranteed to be in sync via the
   // underlying orders rf and ws
 
-  #if 0
   for(partial_order_concurrencyt::adj_matrixt::const_iterator
       w_prime=ws.begin();
       w_prime!=ws.end();

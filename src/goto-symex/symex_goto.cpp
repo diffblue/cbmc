@@ -311,6 +311,11 @@ void goto_symext::phi_function(
 
     // get type (may need renaming)      
     const symbolt &symbol=ns.lookup(original_identifier);
+    
+    // shared?
+    if(dest_state.threads.size()>=2 && symbol.is_shared())
+      continue; // no phi nodes for shared stuff
+    
     typet type=symbol.type;
     dest_state.rename(type, ns);
     

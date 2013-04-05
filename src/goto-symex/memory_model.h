@@ -47,7 +47,7 @@ protected:
   // This gives us the choice symbol for a R-W pair;
   // built by the method below.
   typedef std::map<
-    std::pair<irep_idt, irep_idt>, symbol_exprt> choice_symbolst;
+    std::pair<event_it, event_it>, symbol_exprt> choice_symbolst;
   choice_symbolst choice_symbols;
 
   void read_from(symex_target_equationt &equation);

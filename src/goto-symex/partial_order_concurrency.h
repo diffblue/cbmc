@@ -27,26 +27,24 @@ protected:
   typedef std::vector<const eventt *> event_listt;
   
   // produces the symbol ID for an event
-  inline irep_idt id(const eventt &event) const
+  inline irep_idt id(event_it event) const
   {
-    return event.ssa_lhs.get_identifier();
+    return event->ssa_lhs.get_identifier();
   }
   
   // produces an address ID for an event
-  inline irep_idt address(const eventt &event) const
+  inline irep_idt address(event_it event) const
   {
-    return event.original_lhs_object.get_identifier();
+    return event->original_lhs_object.get_identifier();
   }
 
   // produce a clock symbol for some event
   typet clock_type;
-  symbol_exprt clock(const eventt &e);
+  symbol_exprt clock(event_it e);
   void build_clock_type(const symex_target_equationt &);
   
   // the partial order constraint for two events
-  exprt po_constraint(
-    const eventt &e1,
-    const eventt &e2);
+  exprt po_constraint(event_it e1, event_it e2);
 };
 
 #if 0
