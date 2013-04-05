@@ -97,12 +97,12 @@ public:
   
   class symbol_exprt symbol_expr() const;
   
-  bool is_shared() const
+  inline bool is_shared() const
   {
-    return is_static_lifetime && !is_thread_local;
+    return !is_thread_local;
   }
   
-  bool is_procedure_local() const
+  inline bool is_procedure_local() const
   {
     return !is_static_lifetime;
   }
