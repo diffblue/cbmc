@@ -182,6 +182,7 @@ void ansi_c_internal_additions(std::string &code)
     {
     case configt::ansi_ct::ARCH_I386:
     case configt::ansi_ct::ARCH_X86_64:
+    case configt::ansi_ct::ARCH_X32:
       code+=gcc_builtin_headers_ia32;
       break;
       
