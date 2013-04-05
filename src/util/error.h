@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <exception>
 #include <sstream>
-#include <iostream>
 
 #include "location.h"
 

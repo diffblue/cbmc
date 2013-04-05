@@ -11,7 +11,8 @@ Date: May 2007
 #ifndef SYMBOL_SERIALIZATION_H_
 #define SYMBOL_SERIALIZATION_H_
 
-#include <iostream>
+#include <istream>
+#include <ostream>
 #include <list>
 
 #include "irep_serialization.h"

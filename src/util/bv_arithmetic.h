@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_BV_ARITHMETIC_H
 #define CPROVER_BV_ARITHMETIC_H
 
-#include <iostream>
+#include <ostream>
 
 #include <mp_arith.h>
 #include "format_spec.h"

@@ -7,7 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com,
 
 \*******************************************************************/
 
-#include <assert.h>
+#include <cassert>
+#include <iostream>
 
 #include <symbol_table.h>
 #include <simplify_expr.h>

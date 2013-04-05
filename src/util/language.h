@@ -10,7 +10,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_LANGUAGE_H
 
 #include <set>
-#include <iostream>
+#include <istream>
+#include <ostream>
 #include <string>
 
 class symbol_tablet;
