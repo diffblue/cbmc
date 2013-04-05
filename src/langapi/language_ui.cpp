@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <fstream>
 #include <memory>
+#include <iostream>
 
 #include <i2string.h>
 #include <namespace.h>

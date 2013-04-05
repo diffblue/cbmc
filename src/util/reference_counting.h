@@ -10,7 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #define __REFERENCE_COUNTING_H
 
 #include <cassert>
-#include <iostream>
 
 template<typename T>
 class reference_counting

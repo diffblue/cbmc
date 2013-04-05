@@ -10,6 +10,7 @@ Date: June 2006
 
 #include <fstream>
 #include <sstream>
+#include <iostream>
 #include <cstdlib>
 #include <algorithm>
 

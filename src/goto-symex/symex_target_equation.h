@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_BASIC_SYMEX_EQUATION_H
 
 #include <list>
+#include <ostream>
 
 #include <goto-programs/goto_program.h>
 #include <solvers/prop/literal.h>
