@@ -347,7 +347,7 @@ void goto_symext::symex_step(
     break;
 
   case DEAD:
-    // ignore for now
+    symex_decl(state);
     state.source.pc++;
     break;
 
