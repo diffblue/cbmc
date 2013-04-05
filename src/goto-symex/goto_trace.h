@@ -37,7 +37,6 @@ public:
   bool is_assume() const          { return type==ASSUME; }
   bool is_assert() const          { return type==ASSERT; }
   bool is_constraint() const      { return type==CONSTRAINT; }
-  bool is_read() const            { return type==READ; }
   bool is_function_call() const   { return type==FUNCTION_CALL; }
   bool is_function_return() const { return type==FUNCTION_RETURN; }
   bool is_location() const        { return type==LOCATION; }
@@ -45,12 +44,18 @@ public:
   bool is_input() const           { return type==INPUT; }
   bool is_decl() const            { return type==DECL; }
   bool is_dead() const            { return type==DEAD; }
+  bool is_shared_read() const     { return type==SHARED_READ; }
+  bool is_shared_write() const    { return type==SHARED_WRITE; }
   bool is_spawn() const           { return type==SPAWN; }
+  bool is_atomic_begin() const    { return type==ATOMIC_BEGIN; }
+  bool is_atomic_end() const      { return type==ATOMIC_END; }
 
   typedef enum { NONE, ASSIGNMENT, ASSUME, ASSERT,
                  LOCATION, INPUT, OUTPUT, DECL, DEAD,
                  FUNCTION_CALL, FUNCTION_RETURN,
-                 CONSTRAINT, READ, SPAWN } typet;
+                 CONSTRAINT,
+                 SHARED_READ, SHARED_WRITE,
+                 SPAWN, ATOMIC_BEGIN, ATOMIC_END } typet;
   typet type;
     
   goto_programt::const_targett pc;

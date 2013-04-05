@@ -532,7 +532,7 @@ bool goto_symex_statet::l2_thread_read_encoding(
   // and record that
   assert(symex_target!=NULL);
   symbol_exprt original_symbol(orig_identifier, expr.type());
-  symex_target->read(guard.as_expr(), expr, original_symbol, source);
+  symex_target->shared_read(guard.as_expr(), expr, original_symbol, source);
 
   return true;
 }

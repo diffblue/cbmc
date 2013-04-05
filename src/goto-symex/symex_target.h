@@ -50,10 +50,17 @@ public:
     }
   };
   
-  typedef enum { STATE, HIDDEN } assignment_typet;
+  typedef enum { STATE, HIDDEN, PHI, GUARD } assignment_typet;
   
   // read event
-  virtual void read(
+  virtual void shared_read(
+    const exprt &guard,
+    const symbol_exprt &ssa_rhs,
+    const symbol_exprt &original_rhs,
+    const sourcet &source)=0;
+
+  // write event
+  virtual void shared_write(
     const exprt &guard,
     const symbol_exprt &ssa_rhs,
     const symbol_exprt &original_rhs,

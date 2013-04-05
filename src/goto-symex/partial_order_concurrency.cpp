@@ -61,7 +61,7 @@ symbol_exprt partial_order_concurrencyt::clock(event_it event)
 
   if(event->is_assignment())
     identifier=id2string(id(event))+"$wclk";
-  else if(event->is_read())
+  else if(event->is_shared_read())
     identifier=id2string(id(event))+"$rclk";
   else if(event->is_spawn())
     identifier=i2string(event->source.thread_nr+1)+"$spwnclk";

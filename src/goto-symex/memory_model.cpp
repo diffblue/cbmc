@@ -89,11 +89,11 @@ void memory_model_baset::build_event_lists(
     const eventt &event=*e_it;
     unsigned thread_nr=event.source.thread_nr;    
     
-    if(event.is_read() || event.is_assignment())
+    if(event.is_shared_read() || event.is_assignment())
     {
       a_rect &a_rec=address_map[address(e_it)];
     
-      if(event.is_read())
+      if(event.is_shared_read())
         a_rec.reads.push_back(e_it);
       else if(event.is_assignment())
         a_rec.writes.push_back(e_it);
@@ -290,7 +290,7 @@ void memory_model_sct::program_order(
       e_it!=equation.SSA_steps.end();
       e_it++)
   {
-    if(!e_it->is_read() &&
+    if(!e_it->is_shared_read() &&
        !e_it->is_assignment() &&
        !e_it->is_spawn()) continue;
 

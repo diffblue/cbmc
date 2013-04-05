@@ -29,7 +29,14 @@ public:
   virtual ~symex_target_equationt();
 
   // read event
-  virtual void read(
+  virtual void shared_read(
+    const exprt &guard,
+    const symbol_exprt &ssa_object,
+    const symbol_exprt &original_object,
+    const sourcet &source);
+
+  // write event
+  virtual void shared_write(
     const exprt &guard,
     const symbol_exprt &ssa_object,
     const symbol_exprt &original_object,
@@ -145,13 +152,16 @@ public:
     bool is_assume() const          { return type==goto_trace_stept::ASSUME; }
     bool is_assignment() const      { return type==goto_trace_stept::ASSIGNMENT; }
     bool is_constraint() const      { return type==goto_trace_stept::CONSTRAINT; }
-    bool is_read() const            { return type==goto_trace_stept::READ; }
     bool is_location() const        { return type==goto_trace_stept::LOCATION; }
     bool is_output() const          { return type==goto_trace_stept::OUTPUT; }
     bool is_decl() const            { return type==goto_trace_stept::DECL; }
     bool is_function_call() const   { return type==goto_trace_stept::FUNCTION_CALL; }
     bool is_function_return() const { return type==goto_trace_stept::FUNCTION_RETURN; }
+    bool is_shared_read() const     { return type==goto_trace_stept::SHARED_READ; }
+    bool is_shared_write() const    { return type==goto_trace_stept::SHARED_WRITE; }
     bool is_spawn() const           { return type==goto_trace_stept::SPAWN; }
+    bool is_atomic_begin() const    { return type==goto_trace_stept::ATOMIC_BEGIN; }
+    bool is_atomic_end() const      { return type==goto_trace_stept::ATOMIC_END; }
     
     exprt guard;
     literalt guard_literal;

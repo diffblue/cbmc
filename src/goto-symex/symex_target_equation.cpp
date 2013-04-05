@@ -54,17 +54,17 @@ symex_target_equationt::~symex_target_equationt()
 
 /*******************************************************************\
 
-Function: symex_target_equationt::read
+Function: symex_target_equationt::shared_read
 
   Inputs:
 
  Outputs:
 
- Purpose: read from a variable
+ Purpose: read from a shared variable
 
 \*******************************************************************/
 
-void symex_target_equationt::read(
+void symex_target_equationt::shared_read(
   const exprt &guard,
   const symbol_exprt &ssa_object,
   const symbol_exprt &original_object,
@@ -76,7 +76,35 @@ void symex_target_equationt::read(
   SSA_step.guard=guard;
   SSA_step.ssa_lhs=ssa_object;
   SSA_step.original_lhs_object=original_object;
-  SSA_step.type=goto_trace_stept::READ;
+  SSA_step.type=goto_trace_stept::SHARED_READ;
+  SSA_step.source=source;
+}
+
+/*******************************************************************\
+
+Function: symex_target_equationt::shared_write
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: write to a sharedvariable
+
+\*******************************************************************/
+
+void symex_target_equationt::shared_write(
+  const exprt &guard,
+  const symbol_exprt &ssa_object,
+  const symbol_exprt &original_object,
+  const sourcet &source)
+{
+  SSA_steps.push_back(SSA_stept());
+  SSA_stept &SSA_step=SSA_steps.back();
+  
+  SSA_step.guard=guard;
+  SSA_step.ssa_lhs=ssa_object;
+  SSA_step.original_lhs_object=original_object;
+  SSA_step.type=goto_trace_stept::SHARED_WRITE;
   SSA_step.source=source;
 }
 

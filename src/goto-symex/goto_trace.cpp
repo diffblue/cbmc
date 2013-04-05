@@ -415,13 +415,16 @@ void show_goto_trace(
     case goto_trace_stept::FUNCTION_CALL:
     case goto_trace_stept::FUNCTION_RETURN:
     case goto_trace_stept::SPAWN:
+    case goto_trace_stept::ATOMIC_BEGIN:
+    case goto_trace_stept::ATOMIC_END:
       break;
     
     case goto_trace_stept::CONSTRAINT:
       assert(false);
       break;
       
-    case goto_trace_stept::READ:
+    case goto_trace_stept::SHARED_READ:
+    case goto_trace_stept::SHARED_WRITE:
       assert(false);
       break;
       
