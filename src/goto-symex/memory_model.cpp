@@ -159,7 +159,7 @@ void memory_model_baset::read_from(symex_target_equationt &equation)
         r_it!=a_rec.reads.end();
         r_it++)
     {
-      const eventt &read_event=**r_it;
+      event_it r=*r_it;
       
       exprt::operandst rf_some_operands;
       rf_some_operands.reserve(a_rec.writes.size());
@@ -170,14 +170,14 @@ void memory_model_baset::read_from(symex_target_equationt &equation)
           w_it!=a_rec.writes.end();
           ++w_it)
       {
-        const eventt &write_event=**w_it;
+        event_it w=*w_it;
         
         // rf cannot contradict program order
         if(po(*r_it, *w_it))
           continue; // contradicts po
 
         bool is_rfi=
-          write_event.source.thread_nr==read_event.source.thread_nr;
+          w->source.thread_nr==r->source.thread_nr;
 
         if(is_rfi)
         {
@@ -204,11 +204,19 @@ void memory_model_baset::read_from(symex_target_equationt &equation)
         // We rely on the fact that there is at least
         // one write event that has guard 'true'.
         implies_exprt read_from(s,
-            and_exprt((is_rfi ? true_exprt() : write_event.guard),
-              equal_exprt(read_event.ssa_lhs, write_event.ssa_lhs)));
+            and_exprt((is_rfi ? true_exprt() : w->guard),
+              equal_exprt(r->ssa_lhs, w->ssa_lhs)));
 
         equation.constraint(
-          true_exprt(), read_from, is_rfi?"rfi":"rf", read_event.source);
+          true_exprt(), read_from, is_rfi?"rfi":"rf", r->source);
+
+        if(!is_rfi)
+        {
+          // if r reads from w, then w must have happened before r
+          exprt cond=implies_exprt(s, po_constraint(w, r));
+          equation.constraint(
+            true_exprt(), cond, "rf-order", r->source);
+        }
 
         rf_some_operands.push_back(s);
       }
@@ -227,7 +235,7 @@ void memory_model_baset::read_from(symex_target_equationt &equation)
       }
 
       equation.constraint(
-        read_event.guard, rf_some, "rf-some", read_event.source);
+        r->guard, rf_some, "rf-some", r->source);
     }
   }
 }
@@ -539,29 +547,6 @@ void memory_model_sct::from_read(symex_target_equationt &equation)
         
       }
     }
-  }
-
-  // Not sure where this belongs. It appears to be needed.
-
-  for(choice_symbolst::const_iterator
-      c_it=choice_symbols.begin();
-      c_it!=choice_symbols.end();
-      c_it++)
-  {
-    event_it r=c_it->first.first;
-    event_it w=c_it->first.second;
-    exprt rf=c_it->second;
-    
-    if(po(w, r)) // uniproc guarantees this
-      continue;
-    
-    // if r reads from w, then w has to happen before r
-    
-    exprt cond=
-      implies_exprt(rf, po_constraint(w, r));
-    
-    equation.constraint(
-      true_exprt(), cond, "fr", r->source);
   }
 
   #if 0
