@@ -729,7 +729,7 @@ Function: configt::ansi_ct::this_operating_system
 
 irep_idt configt::this_operating_system()
 {
-  irep_idt this_os=this_operating_system();
+  irep_idt this_os;
   
   #ifdef _WIN32
   this_os="windows";
