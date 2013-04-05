@@ -67,6 +67,10 @@ void goto_trace_stept::output(
   case goto_trace_stept::DECL: out << "DECL"; break;
   case goto_trace_stept::OUTPUT: out << "OUTPUT"; break;
   case goto_trace_stept::INPUT: out << "INPUT"; break;
+  case goto_trace_stept::ATOMIC_BEGIN: out << "ATOMC_BEGIN"; break;
+  case goto_trace_stept::ATOMIC_END: out << "ATOMIC_END"; break;
+  case goto_trace_stept::SHARED_READ: out << "SHARED_READ"; break;
+  case goto_trace_stept::SHARED_WRITE: out << "SHARED WRITE"; break;
   default: assert(false);
   }
 
