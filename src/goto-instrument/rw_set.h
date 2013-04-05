@@ -11,7 +11,7 @@ Date: February 2006
 #ifndef CPROVER_GOTO_PROGRAMS_RW_SET
 #define CPROVER_GOTO_PROGRAMS_RW_SET
 
-#include <iostream>
+#include <ostream>
 
 #include <hash_cont.h>
 #include <guard.h>
@@ -79,7 +79,8 @@ protected:
   const namespacet &ns;
 };
 
-extern inline std::ostream & operator << (std::ostream &out, const rw_set_baset &rw_set)
+extern inline std::ostream & operator << (
+  std::ostream &out, const rw_set_baset &rw_set)
 {
   rw_set.output(out);
   return out;

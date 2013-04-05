@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <iostream>
+
 #include <xml.h>
 
 #include <solvers/sat/satcheck_minisat2.h>

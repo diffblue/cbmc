@@ -9,7 +9,7 @@ Author:
 #ifndef CPROVER_ALIGNMENT_CHECKS_H
 #define CPROVER_ALIGNMENT_CHECKS_H
 
-#include <iostream>
+#include <ostream>
 
 #include <goto-programs/goto_functions.h>
 

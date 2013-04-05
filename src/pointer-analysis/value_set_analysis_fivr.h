@@ -46,11 +46,11 @@ public:
   {
     forall_goto_program_instructions(it, goto_program)
     {
-      std::cout << "**** " << it->location << std::endl;      
+      out << "**** " << it->location << std::endl;      
       output(it, out);
-      std::cout << std::endl;
-      goto_program.output_instruction(ns, "", std::cout, it);
-      std::cout << std::endl;
+      out << std::endl;
+      goto_program.output_instruction(ns, "", out, it);
+      out << std::endl;
     }
   }
   

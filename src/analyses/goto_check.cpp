@@ -1034,10 +1034,7 @@ void goto_checkt::bounds_check(
   if(array_type.id()==ID_pointer)
     return; // done by the pointer code
   else if(array_type.id()==ID_incomplete_array)
-  {
-    std::cerr << expr.pretty() << std::endl;
     throw "index got incomplete array";
-  }
   else if(array_type.id()!=ID_array)
     throw "bounds check expected array type, got "+array_type.id_string();
 

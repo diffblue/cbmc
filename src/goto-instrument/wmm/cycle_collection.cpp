@@ -8,6 +8,8 @@ Date: 2012
 
 \*******************************************************************/
 
+#include <iostream>
+
 #include "event_graph.h"
 
 //#define DEBUG
@@ -49,10 +51,12 @@ void event_grapht::graph_explorert::filter_thin_air(
 
     it=next;
   }
+
   for(std::set<unsigned>::const_iterator it=thin_air_events.begin();
     it!=thin_air_events.end();
     ++it)
     std::cout<<egraph[*it]<<";";
+
   std::cout<<std::endl;
 }
 

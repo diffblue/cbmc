@@ -13,8 +13,7 @@ Author: Alex Groce
 
 #include <set>
 #include <map>
-
-#include <iostream>
+#include <ostream>
 
 class pbs_dimacs_cnft:public dimacs_cnft
 {

@@ -9,8 +9,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_C_PREPROCESS_H
 #define CPROVER_C_PREPROCESS_H
 
-#include <iostream>
+#include <istream>
+#include <ostream>
 #include <string>
+
 #include <message.h>
 
 typedef enum { PREPROCESS_AUTO, PREPROCESS_C, PREPROCESS_CPP } preprocess_modet;

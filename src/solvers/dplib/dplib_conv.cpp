@@ -577,10 +577,7 @@ void dplib_convt::convert_dplib_expr(const exprt &expr)
       dplib_prop.out << expr.get(ID_value);
     }
     else
-    {
-      std::cerr << expr.pretty() << std::endl;
       throw "unknown constant: "+expr.type().id_string();
-    }
   }
   else if(expr.id()==ID_concatenation || 
           expr.id()==ID_bitand ||

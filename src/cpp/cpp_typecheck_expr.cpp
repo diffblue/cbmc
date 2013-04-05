@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
+#include <iostream>
 #include <cstdlib>
 
 #include <expr_util.h>

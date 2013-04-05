@@ -454,10 +454,7 @@ bool flow_insensitive_analysis_baset::do_function_call_rec(
       goto_functions.function_map.find(identifier);
       
     if(it==goto_functions.function_map.end())
-    {      
-      std::cout << "failed to find function " << id2string(identifier) << std::endl;
       throw "failed to find function "+id2string(identifier);
-    }
     
     new_data = 
       do_function_call(

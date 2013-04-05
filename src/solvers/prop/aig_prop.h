@@ -10,7 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_PROPSOLVE_AIG_PROP_H
 
 #include <cassert>
-#include <iostream>
 
 #include <threeval.h>
 

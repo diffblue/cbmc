@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <cstdlib>
 #include <algorithm>
+#include <iostream>
 
 #include <expr_util.h>
 #include <std_types.h>

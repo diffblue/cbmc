@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <sstream>
 #include <fstream>
 #include <cstdlib>
+#include <iostream>
 
 #include <i2string.h>
 #include <location.h>

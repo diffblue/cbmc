@@ -11,7 +11,7 @@ Date: June 2011
 #ifndef CPROVER_GOTO_SYMEX_VCD_GOTO_TRACE_H
 #define CPROVER_GOTO_SYMEX_VCD_GOTO_TRACE_H
 
-#include <iostream>
+#include <ostream>
 
 #include <namespace.h>
 

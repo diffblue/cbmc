@@ -11,7 +11,7 @@ Date: January 2010
 #ifndef CPROVER_UNINITALIZED_H
 #define CPROVER_UNINITALIZED_H
 
-#include <iostream>
+#include <ostream>
 
 #include <goto-programs/goto_functions.h>
 
