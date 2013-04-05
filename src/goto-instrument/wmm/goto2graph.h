@@ -77,7 +77,7 @@ protected:
     std::ofstream& output,
     std::ofstream& all,
     std::ofstream& table,
-    weak_memory_modelt model,
+    memory_modelt model,
     bool hide_internals);
 
   typedef std::set<goto_programt::instructiont::targett> target_sett;
@@ -108,7 +108,7 @@ protected:
     void visit_cfg_asm_fence(goto_programt::instructionst::iterator i_it);
     void visit_cfg_function_call(value_setst& value_sets, 
       goto_programt::instructionst::iterator i_it, 
-      weak_memory_modelt model,
+      memory_modelt model,
       bool no_dependencies);
     void visit_cfg_goto(goto_programt::instructionst::iterator i_it);
 
@@ -180,7 +180,7 @@ protected:
 
     void inline visit_cfg(
       value_setst &value_sets,
-      weak_memory_modelt model,
+      memory_modelt model,
       bool no_dependencies,
       const irep_idt& function)
     {
@@ -197,7 +197,7 @@ protected:
     virtual void visit_cfg_function(
       /* value_sets and options */
       value_setst& value_sets,
-      weak_memory_modelt model,
+      memory_modelt model,
       bool no_dependencies,
       /* functino to analyse */
       const irep_idt& function,
@@ -241,18 +241,18 @@ public:
      the thread numbering and returns the max number */
   unsigned goto2graph_cfg(
     value_setst& value_sets,
-    weak_memory_modelt model,
+    memory_modelt model,
     bool no_dependencies);
 
   /* collects directly all the cycles in the graph */
-  void collect_cycles(weak_memory_modelt model)
+  void collect_cycles(memory_modelt model)
   {
     egraph.collect_cycles(set_of_cycles,model);
     num_sccs = 0;
   }
 
   /* collects the cycles in the graph by SCCs */
-  void collect_cycles_by_SCCs(weak_memory_modelt model);
+  void collect_cycles_by_SCCs(memory_modelt model);
 
   /* filters cycles spurious by CFG */
   void cfg_cycles_filter();
@@ -285,7 +285,7 @@ public:
      - ref.txt: names of the instrumented cycles
      - output.txt: names of the instructions in the code 
      - all.txt: all */
-  void print_outputs(weak_memory_modelt model, bool hide_internals);
+  void print_outputs(memory_modelt model, bool hide_internals);
 };
 
 #endif

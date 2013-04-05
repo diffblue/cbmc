@@ -41,11 +41,11 @@ class optionst;
   "(error-label):(verbosity):(no-library)" \
   "(version)" \
   "(cover-assertions)" \
-  "(memory-model):" \
+  "(mm):" \
   "(i386-linux)(i386-macos)(i386-win32)(win32)(winx64)(gcc)" \
   "(ppc-macos)(unsigned-char)" \
   "(arrays-uf-always)(arrays-uf-never)" \
-  "(string-abstraction)(no-arch)" \
+  "(string-abstraction)(no-arch)(arch):" \
   "(round-to-nearest)(round-to-plus-inf)(round-to-minus-inf)(round-to-zero)" \
   "(decide)" // legacy, and will eventually disappear
 

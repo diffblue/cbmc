@@ -271,62 +271,13 @@ bool configt::set(const cmdlinet &cmdline)
   if(cmdline.isset("fixedbv"))
     ansi_c.use_fixed_for_float=true;
 
-  irep_idt this_arch;
-  
-  // following http://wiki.debian.org/ArchitectureSpecificsMemo
-
-  #ifdef __alpha__
-  this_arch="alpha";
-  #elif __armel__
-  this_arch="armel";
-  #elif __arm64__
-  this_arch="arm64";
-  #elif __arm__
-  this_arch="arm";
-  #elif __mipsel__
-  this_arch="mipsel";
-  #elif __mips__
-  this_arch="mips";
-  #elif __powerpc__
-  this_arch="powerpc";
-  #elif __ppc64__
-  this_arch="ppc64";
-  #elif __sparc__
-  this_arch="sparc";
-  #elif __ia64__
-  this_arch="ia64";
-  #elif __s390x__
-  this_arch="s390x";
-  #elif __s390__
-  this_arch="s390";
-  #elif __x86_64__
-    #ifdef __ILP32__
-    this_arch="x32"; // variant of x86_64 with 32-bit pointers
-    #else
-    this_arch="x86_64";
-    #endif
-  #elif __i386__
-  this_arch="i386";
-  #else
-  // something new and unknown!
-  this_arch="unknown";
-  #endif
-  
   // the default architecture is the one we run on
+  irep_idt this_arch=this_architecture();
   irep_idt arch=this_arch;
 
   // let's pick an OS now
-  irep_idt this_os;
-  
-  #ifdef _WIN32
-  this_os="windows";
-  #elif __APPLE__
-  this_os="macos";
-  #else
-  this_os="linux";
-  #endif
-
   // the default is the one we run on  
+  irep_idt this_os=this_operating_system();
   irep_idt os=this_os;
 
   if(cmdline.isset("i386-linux"))
@@ -706,3 +657,87 @@ void configt::ansi_ct::set_from_symbol_table(const symbol_tablet &symbol_table)
   memory_operand_size=int_width/8;
 }
 
+/*******************************************************************\
+
+Function: configt::ansi_ct::this_architecture
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+irep_idt configt::this_architecture()
+{
+  irep_idt this_arch;
+  
+  // following http://wiki.debian.org/ArchitectureSpecificsMemo
+
+  #ifdef __alpha__
+  this_arch="alpha";
+  #elif __armel__
+  this_arch="armel";
+  #elif __arm64__
+  this_arch="arm64";
+  #elif __arm__
+  this_arch="arm";
+  #elif __mipsel__
+  this_arch="mipsel";
+  #elif __mips__
+  this_arch="mips";
+  #elif __powerpc__
+  this_arch="powerpc";
+  #elif __ppc64__
+  this_arch="ppc64";
+  #elif __sparc__
+  this_arch="sparc";
+  #elif __ia64__
+  this_arch="ia64";
+  #elif __s390x__
+  this_arch="s390x";
+  #elif __s390__
+  this_arch="s390";
+  #elif __x86_64__
+    #ifdef __ILP32__
+    this_arch="x32"; // variant of x86_64 with 32-bit pointers
+    #else
+    this_arch="x86_64";
+    #endif
+  #elif __i386__
+  this_arch="i386";
+  #else
+  // something new and unknown!
+  this_arch="unknown";
+  #endif
+
+  return this_arch;  
+}
+
+/*******************************************************************\
+
+Function: configt::ansi_ct::this_operating_system
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+irep_idt configt::this_operating_system()
+{
+  irep_idt this_os=this_operating_system();
+  
+  #ifdef _WIN32
+  this_os="windows";
+  #elif __APPLE__
+  this_os="macos";
+  #else
+  this_os="linux";
+  #endif
+
+  return this_os;
+}

@@ -74,7 +74,7 @@ Function: event_grapht::graph_explorert::collect_cycles
 
 void event_grapht::graph_explorert::collect_cycles(
   std::set<critical_cyclet>& set_of_cycles, 
-  weak_memory_modelt model)
+  memory_modelt model)
 {
   /* all the events initially unmarked */
   for(unsigned i = 0; i<egraph.size(); i++)
@@ -193,7 +193,7 @@ bool event_grapht::graph_explorert::backtrack(
   bool lwfence_met, /* if we try to skip a lwsync (only valid for lwsyncWR) */
   bool has_to_be_unsafe,
   irep_idt var_to_avoid,
-  weak_memory_modelt model)
+  memory_modelt model)
 {
 #ifdef DEBUG
   for(unsigned i=0; i<80; std::cout << "-", ++i);

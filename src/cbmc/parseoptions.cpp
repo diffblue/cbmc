@@ -748,24 +748,13 @@ void cbmc_parseoptionst::help()
     " --show-symbol-table          show symbol table\n"
     " --show-goto-functions        show goto program\n"
     " --ppc-macos                  set MACOS/PPC architecture\n"
+    " --mm model                   set memory model (default: sc)\n"
+    " --arch                       set architecture (default: "
+                                   << configt::this_architecture() << ")\n"
+    " --os                         set operating system (default: "
+                                   << configt::this_operating_system() << ")\n"
     #ifdef _WIN32
-    " --i386-macos                 set MACOS/I386 architecture\n"
-    " --i386-linux                 set Linux/I386 architecture\n"
-    " --i386-win32                 set Windows/I386 architecture (default)\n"
-    " --winx64                     set Windows/X64 architecture\n"
     " --gcc                        use GCC as preprocessor\n"
-    #else
-    #ifdef __APPLE__
-    " --i386-macos                 set MACOS/I386 architecture (default)\n"
-    " --i386-linux                 set Linux/I386 architecture\n"
-    " --i386-win32                 set Windows/I386 architecture\n"
-    " --winx64                     set Windows/X64 architecture\n"
-    #else
-    " --i386-macos                 set MACOS/I386 architecture\n"
-    " --i386-linux                 set Linux/I386 architecture (default)\n"
-    " --i386-win32                 set Windows/I386 architecture\n"
-    " --winx64                     set Windows/X64 architecture\n"
-    #endif
     #endif
     " --no-arch                    don't set up an architecture\n"
     " --no-library                 disable built-in abstract C library\n"

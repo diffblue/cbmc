@@ -117,7 +117,7 @@ Function: instrumentert::goto2graph_cfg
 
 unsigned instrumentert::goto2graph_cfg(
   value_setst& value_sets,
-  weak_memory_modelt model,
+  memory_modelt model,
   bool no_dependencies)
 {
   if(!no_dependencies)
@@ -175,7 +175,7 @@ Function: instrumentert::cfg_visitort::visit_cfg_function
 void instrumentert::cfg_visitort::visit_cfg_function(
     /* value_sets and options */
     value_setst& value_sets,
-    weak_memory_modelt model,
+    memory_modelt model,
     bool no_dependencies,
     /* function to analyse */
     const irep_idt& function,
@@ -448,7 +448,7 @@ Function: intrumentert::visit_cfg_function_call
 void instrumentert::cfg_visitort::visit_cfg_function_call(
   value_setst& value_sets, 
   goto_programt::instructionst::iterator i_it,
-  weak_memory_modelt model,
+  memory_modelt model,
   bool no_dependencies)
 {
   const goto_programt::instructiont& instruction=*i_it;
@@ -1144,7 +1144,7 @@ void inline instrumentert::print_outputs_local(
   std::ofstream& output,
   std::ofstream& all,
   std::ofstream& table,
-  weak_memory_modelt model,
+  memory_modelt model,
   bool hide_internals)
 {
   /* to represent the po aligned in the dot */
@@ -1238,7 +1238,7 @@ void inline instrumentert::print_outputs_local(
   table << std::endl;
 }
 
-void instrumentert::print_outputs(weak_memory_modelt model, bool hide_internals)
+void instrumentert::print_outputs(memory_modelt model, bool hide_internals)
 {
   std::ofstream dot;
   std::ofstream ref;
@@ -1304,7 +1304,7 @@ Function: instrumentert::collect_cycles_by_SCCs
 
 #if 1
 //#ifdef _WIN32
-void instrumentert::collect_cycles_by_SCCs(weak_memory_modelt model)
+void instrumentert::collect_cycles_by_SCCs(memory_modelt model)
 {
   unsigned scc = 0;
   set_of_cycles_per_SCC.resize(num_sccs,
@@ -1319,12 +1319,12 @@ class pthread_argumentt
 {
 public:
   instrumentert& instr;
-  weak_memory_modelt mem;
+  memory_modelt mem;
   const std::set<unsigned>& filter;
   std::set<event_grapht::critical_cyclet>& cycles;
 
   pthread_argumentt(instrumentert& _instr,
-    weak_memory_modelt _mem, 
+    memory_modelt _mem, 
     const std::set<unsigned>& _filter,
     std::set<event_grapht::critical_cyclet>& _cycles)
     :instr(_instr),mem(_mem),filter(_filter),cycles(_cycles)
@@ -1337,7 +1337,7 @@ void* collect_cycles_in_thread(void* arg)
 {
   /* arguments */
   instrumentert& this_instrumenter = ((pthread_argumentt*) arg)->instr;
-  weak_memory_modelt model = ((pthread_argumentt*) arg)->mem;
+  memory_modelt model = ((pthread_argumentt*) arg)->mem;
   const std::set<unsigned>& filter = ((pthread_argumentt*) arg)->filter;
   std::set<event_grapht::critical_cyclet>& cycles = 
     ((pthread_argumentt*) arg)->cycles;
@@ -1347,7 +1347,7 @@ void* collect_cycles_in_thread(void* arg)
   return NULL;
 }
 
-void instrumentert::collect_cycles_by_SCCs(weak_memory_modelt model)
+void instrumentert::collect_cycles_by_SCCs(memory_modelt model)
 {
   const unsigned number_of_sccs = num_sccs;
   std::set<unsigned> interesting_SCCs;

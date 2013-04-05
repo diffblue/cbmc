@@ -550,7 +550,7 @@ void goto_instrument_parseoptionst::instrument_goto_program(
 
   if(cmdline.isset("remove-pointers") ||
      cmdline.isset("race-check") ||
-     cmdline.isset("wmm") ||
+     cmdline.isset("mm") ||
      cmdline.isset("isr") ||
      cmdline.isset("concurrency"))
   {
@@ -585,10 +585,10 @@ void goto_instrument_parseoptionst::instrument_goto_program(
         goto_functions);
     }
 
-    if(cmdline.isset("wmm"))
+    if(cmdline.isset("mm"))
     {
-      std::string wmm=cmdline.getval("wmm");
-      weak_memory_modelt model;
+      std::string mm=cmdline.getval("mm");
+      memory_modelt model;
 
       // strategy of instrumentation
       instrumentation_strategyt inst_strategy;
@@ -613,22 +613,22 @@ void goto_instrument_parseoptionst::instrument_goto_program(
       const unsigned max_po_trans =
         ( cmdline.isset("max-po-trans")?atoi(cmdline.getval("max-po-trans")):0 );
 
-      if(wmm=="tso")
+      if(mm=="tso")
       {
         status("Adding weak memory (TSO) Instrumentation");
         model=TSO;
       }
-      else if(wmm=="pso")
+      else if(mm=="pso")
       {
         status("Adding weak memory (PSO) Instrumentation");
         model=PSO;
       }
-      else if(wmm=="rmo")
+      else if(mm=="rmo")
       {
         status("Adding weak memory (RMO) Instrumentation");
         model=RMO;
       }
-      else if(wmm=="power")
+      else if(mm=="power")
       {
         status("Adding weak memory (Power) Instrumentation");
         model=Power;
@@ -824,7 +824,7 @@ void goto_instrument_parseoptionst::help()
     " --accelerate                 add loop accelerators\n"
     "\n"
     "Memory model instrumentations:\n"
-    " --wmm <tso,pso,rmo,power>    instruments a weak memory model\n"
+    " --mm <tso,pso,rmo,power>     instruments a weak memory model\n"
     " --scc                        detects critical cycles per SCC (one thread per SCC)\n"
     " --one-event-per-cycle        only instruments one event per cycle\n"
     " --minimum-interference       instruments an optimal number of events\n"

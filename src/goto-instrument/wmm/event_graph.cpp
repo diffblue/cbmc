@@ -174,7 +174,7 @@ Function: event_grapht::critical_cyclet::is_unsafe
 
 \*******************************************************************/
 
-bool event_grapht::critical_cyclet::is_unsafe(weak_memory_modelt model, bool fast)
+bool event_grapht::critical_cyclet::is_unsafe(memory_modelt model, bool fast)
 {
   DEBUG_MESSAGE("cycle is safe?");
   bool unsafe_met=false;
@@ -459,7 +459,7 @@ Function: event_grapht::critical_cyclet::is_unsafe_asm
 
 \*******************************************************************/
 
-bool event_grapht::critical_cyclet::is_unsafe_asm(weak_memory_modelt model, 
+bool event_grapht::critical_cyclet::is_unsafe_asm(memory_modelt model, 
   bool fast)
 {
   DEBUG_MESSAGE("cycle is safe?");
@@ -1077,7 +1077,7 @@ std::string event_grapht::critical_cyclet::print_detail(
   const critical_cyclet& reduced,
   std::map<std::string,std::string>& map_id2var,
   std::map<std::string,std::string>& map_var2id,
-  weak_memory_modelt model) const
+  memory_modelt model) const
 {
   std::string cycle;
   for(const_iterator it=reduced.begin(); it!=reduced.end(); ++it)
@@ -1115,7 +1115,7 @@ Function: event_grapht::critical_cyclet::print_all
 \*******************************************************************/
 
 std::string event_grapht::critical_cyclet::print_all(
-  weak_memory_modelt model,
+  memory_modelt model,
   std::map<std::string,std::string>& map_id2var,
   std::map<std::string,std::string>& map_var2id,
   bool hide_internals) const
@@ -1245,7 +1245,7 @@ Function: event_grapht::critical_cyclet::print_name
 
 std::string event_grapht::critical_cyclet::print_name(
   const critical_cyclet& reduced,
-  weak_memory_modelt model) const
+  memory_modelt model) const
 {
   std::string name;
   const_iterator prev_it=reduced.end();
@@ -1392,7 +1392,7 @@ Function: event_grapht::critical_cyclet::print_dot
 void event_grapht::critical_cyclet::print_dot(
   std::ostream &str,
   unsigned colour,
-  weak_memory_modelt model) const
+  memory_modelt model) const
 {
   /* print vertices */
   for(const_iterator it=begin(); it!=end(); ++it)

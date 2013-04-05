@@ -32,7 +32,7 @@ Function: abstract_eventt::unsafe_pair_lwfence_param
 \*******************************************************************/
 
 bool abstract_eventt::unsafe_pair_lwfence_param(const abstract_eventt& next, 
-  weak_memory_modelt model,
+  memory_modelt model,
   bool lwsync_met) const
 {
   /* pairs with fences are not properly pairs */
@@ -102,7 +102,7 @@ Function: abstract_eventt::unsafe_pair_asm
 \*******************************************************************/
 
 bool abstract_eventt::unsafe_pair_asm(const abstract_eventt& next,
-  weak_memory_modelt model,
+  memory_modelt model,
   unsigned char met) const
 {
   /* pairs with fences are not properly pairs */
