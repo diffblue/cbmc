@@ -276,6 +276,7 @@ void goto_symext::symex_step(
 
   case ASSERT:
     if(!state.guard.is_false())
+    {
       if(options.get_bool_option("assertions") ||
          !state.source.pc->location.get_bool("user-provided"))
       {
@@ -285,6 +286,7 @@ void goto_symext::symex_step(
         clean_expr(tmp, state, false);
         claim(tmp, msg, state);
       }
+    }
 
     state.source.pc++;
     break;
