@@ -213,12 +213,18 @@ void memory_model_baset::read_from(symex_target_equationt &equation)
         rf_some_operands.push_back(s);
       }
       
+      // value equals the one of some write
+      exprt rf_some;
+
       if(rf_some_operands.empty())
         continue; // don't add blank constraints
-
-      // value equals the one of some write
-      or_exprt rf_some;
-      rf_some.operands().swap(rf_some_operands);
+      else if(rf_some_operands.size()==1)
+        rf_some=rf_some_operands.front();
+      else
+      {
+        rf_some=or_exprt();
+        rf_some.operands().swap(rf_some_operands);
+      }
 
       equation.constraint(
         read_event.guard, rf_some, "rf-some", read_event.source);
