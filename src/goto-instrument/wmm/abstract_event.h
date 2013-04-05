@@ -24,7 +24,7 @@ class abstract_eventt:public graph_nodet<empty_nodet>
 {
 protected:
   bool unsafe_pair_lwfence_param(const abstract_eventt& next,
-    weak_memory_modelt model, bool lwsync_met) const;
+    memory_modelt model, bool lwsync_met) const;
 
 public:
   /* for now, both fence functions and asm fences accepted */
@@ -99,18 +99,21 @@ public:
   /* checks the safety of the pair locally (i.e., w/o taking fences
      or dependencies into account -- use is_unsafe on the whole
      critical cycle for this) */
-  bool unsafe_pair(const abstract_eventt& next, weak_memory_modelt model) const
+  bool unsafe_pair(const abstract_eventt &next, memory_modelt model) const
   {
     return unsafe_pair_lwfence_param(next,model,false);
   }
 
-  bool unsafe_pair_lwfence(const abstract_eventt& next,
-    weak_memory_modelt model) const
+  bool unsafe_pair_lwfence(
+    const abstract_eventt &next,
+    memory_modelt model) const
   {
     return unsafe_pair_lwfence_param(next,model,true);
   }
 
-  bool unsafe_pair_asm(const abstract_eventt& next, weak_memory_modelt model,
+  bool unsafe_pair_asm(
+    const abstract_eventt &next,
+    memory_modelt model,
     unsigned char met) const;
 
   std::string get_operation() const

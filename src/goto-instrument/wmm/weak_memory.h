@@ -17,10 +17,10 @@ class value_setst;
 class goto_functionst;
 
 void weak_memory(
-  weak_memory_modelt model,
-  value_setst& value_sets,
-  symbol_tablet& symbol_table,
-  goto_functionst& goto_functions,
+  memory_modelt model,
+  value_setst &value_sets,
+  symbol_tablet &symbol_table,
+  goto_functionst &goto_functions,
   bool SCC,
   instrumentation_strategyt event_stategy,
   unsigned unwinding_bound,

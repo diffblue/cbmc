@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <list>
 
 #include "ieee_float.h"
+#include "irep.h"
 
 class cmdlinet;
 class symbol_tablet;
@@ -101,6 +102,9 @@ public:
   std::string main;
   
   bool set(const cmdlinet &cmdline);
+  
+  static irep_idt this_architecture();
+  static irep_idt this_operating_system();
 };
 
 extern configt config;

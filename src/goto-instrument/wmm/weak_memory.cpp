@@ -52,7 +52,7 @@ public:
   {
   }
 
-  void set_cav11(weak_memory_modelt model)
+  void set_cav11(memory_modelt model)
   {
     if(model!=TSO)
       throw "Sorry, CAV11 only available for TSO";
@@ -188,7 +188,7 @@ public:
     value_setst &value_sets,
     symbol_tablet &symbol_table,
     goto_programt &goto_program,
-    weak_memory_modelt model,
+    memory_modelt model,
     goto_functionst &goto_functions
   );
 
@@ -226,7 +226,7 @@ public:
   void weak_memory(
     value_setst &value_sets,
     const irep_idt& function,
-    weak_memory_modelt model);
+    memory_modelt model);
   };
  
 protected:
@@ -1597,7 +1597,7 @@ Function: weak_memory_cfg
 void shared_bufferst::cfg_visitort::weak_memory(
   value_setst &value_sets,
   const irep_idt& function,
-  weak_memory_modelt model
+  memory_modelt model
 )
 {
   DEBUG_MESSAGE("visit function "<<function);
@@ -1933,7 +1933,7 @@ Function: weak_memory
 \*******************************************************************/
 
 void weak_memory(
-  weak_memory_modelt model,
+  memory_modelt model,
   value_setst& value_sets,
   symbol_tablet& symbol_table,
   goto_functionst &goto_functions,

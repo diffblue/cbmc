@@ -30,7 +30,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(nan-check)(no-nan-check)" \
   "(race-check)(scc)(one-event-per-cycle)" \
   "(minimum-interference)" \
-  "(wmm):(my-events)(unwind):" \
+  "(mm):(my-events)(unwind):" \
   "(max-var):(max-po-trans):" \
   "(cfg-kill)(no-dependencies)" \
   "(call-graph)" \

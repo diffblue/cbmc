@@ -41,9 +41,9 @@ public:
     std::string print_detail(const critical_cyclet& reduced, 
       std::map<std::string,std::string>& map_id2var,
       std::map<std::string,std::string>& map_var2id,
-      weak_memory_modelt model) const;
+      memory_modelt model) const;
     std::string print_name(const critical_cyclet& redyced, 
-      weak_memory_modelt model) const;
+      memory_modelt model) const;
 
     bool check_AC(const_iterator s_it, const abstract_eventt& first, 
       const abstract_eventt& second) const;
@@ -92,22 +92,22 @@ public:
     /* checks whether there is at leat one pair which is unsafe 
        (takes fences and dependencies into account), and adds
        the unsafe pairs in the set */
-    bool is_unsafe(weak_memory_modelt model, bool fast=false);
+    bool is_unsafe(memory_modelt model, bool fast=false);
 
     /* do not update the unsafe pairs set */
-    bool is_unsafe_fast(weak_memory_modelt model)
+    bool is_unsafe_fast(memory_modelt model)
     {
       return is_unsafe(model,true);
     }
 
-    void compute_unsafe_pairs(weak_memory_modelt model)
+    void compute_unsafe_pairs(memory_modelt model)
     {
       is_unsafe(model);
     }
 
-    bool is_unsafe_asm(weak_memory_modelt model, bool fast=false);
+    bool is_unsafe_asm(memory_modelt model, bool fast=false);
 
-    bool is_not_uniproc(weak_memory_modelt model) const
+    bool is_not_uniproc(memory_modelt model) const
     {
       if(model==RMO)
         return is_not_weak_uniproc();
@@ -159,11 +159,11 @@ public:
     std::string print_events() const;
 
     /* print outputs */
-    std::string print_name(weak_memory_modelt model) const
+    std::string print_name(memory_modelt model) const
     {
       return print_name(*this, model);
     }
-    std::string print_name(weak_memory_modelt model, bool hide_internals) const
+    std::string print_name(memory_modelt model, bool hide_internals) const
     {
       if(hide_internals)
       {
@@ -178,13 +178,13 @@ public:
 
     std::string print_unsafes() const;
     std::string print_output() const;
-    std::string print_all(weak_memory_modelt model, 
+    std::string print_all(memory_modelt model, 
       std::map<std::string,std::string>& map_id2var,
       std::map<std::string,std::string>& map_var2id,
       bool hide_internals) const;
 
     void print_dot(std::ostream &str, 
-      unsigned colour, weak_memory_modelt model) const;
+      unsigned colour, memory_modelt model) const;
 
     inline bool operator<(const critical_cyclet& other) const
     {
@@ -271,12 +271,12 @@ protected:
       bool lwsync_met,
       bool has_to_be_unsafe,
       irep_idt var_to_avoid,
-      weak_memory_modelt model);
+      memory_modelt model);
 
     /* Tarjan 1972 adapted and modified for events + po-transitivity */
     void collect_cycles(
       std::set<critical_cyclet>& set_of_cycles,
-      weak_memory_modelt model);
+      memory_modelt model);
   };
 
   /* explorer for thread */
@@ -451,7 +451,7 @@ public:
 
   /* Tarjan 1972 adapted and modified for events + po-transitivity */
   void collect_cycles(std::set<critical_cyclet>& set_of_cycles, 
-    weak_memory_modelt model,
+    memory_modelt model,
     const std::set<unsigned>& filter)
   {
     graph_conc_explorert exploration(*this, max_var, max_po_trans,filter);
@@ -459,7 +459,7 @@ public:
   }
 
   void collect_cycles(std::set<critical_cyclet>& set_of_cycles,
-    weak_memory_modelt model)
+    memory_modelt model)
   {
     graph_explorert exploration(*this, max_var, max_po_trans);
     exploration.collect_cycles(set_of_cycles,model);
