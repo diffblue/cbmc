@@ -158,11 +158,13 @@ void build_goto_trace(
     if(prop_conv.prop.l_get(SSA_step.guard_literal)!=tvt(true))
       continue;
 
-    if(it->is_constraint() || it->is_read() || it->is_spawn())
+    if(it->is_constraint() ||
+       it->is_shared_read() || it->is_shared_write() ||
+       it->is_spawn() || it->is_atomic_begin() || it->is_atomic_end())
       continue;
 
     if(it->is_assignment() &&
-       SSA_step.assignment_type==symex_target_equationt::HIDDEN)
+       SSA_step.assignment_type!=symex_target_equationt::STATE)
       continue;
       
     step_nr++;

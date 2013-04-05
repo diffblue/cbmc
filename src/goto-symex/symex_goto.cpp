@@ -144,7 +144,7 @@ void goto_symext::symex_goto(statet &state)
         new_lhs, guard_symbol_expr, new_lhs, guard_symbol_expr,
         new_rhs,
         state.source,
-        symex_targett::HIDDEN);
+        symex_targett::GUARD);
       
       guard_expr=guard_symbol_expr;
       guard_expr.make_not();
@@ -366,7 +366,7 @@ void goto_symext::phi_function(
       new_lhs, lhs, new_lhs, lhs,
       rhs,
       dest_state.source,
-      symex_targett::HIDDEN);
+      symex_targett::PHI);
   }
 }
 
