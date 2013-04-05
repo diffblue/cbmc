@@ -140,6 +140,15 @@ void symex_slicet::slice(symex_target_equationt::SSA_stept &SSA_step)
     // ignore for now
     break;
     
+  case goto_trace_stept::CONSTRAINT:
+  case goto_trace_stept::SHARED_READ:
+  case goto_trace_stept::SHARED_WRITE:
+  case goto_trace_stept::ATOMIC_BEGIN:
+  case goto_trace_stept::ATOMIC_END:
+  case goto_trace_stept::SPAWN:
+    // ignore for now
+    break;
+    
   case goto_trace_stept::FUNCTION_CALL:
   case goto_trace_stept::FUNCTION_RETURN:
     // ignore for now
@@ -234,6 +243,12 @@ void symex_slicet::collect_open_variables(
     case goto_trace_stept::DECL:
     case goto_trace_stept::FUNCTION_CALL:
     case goto_trace_stept::FUNCTION_RETURN:
+    case goto_trace_stept::CONSTRAINT:
+    case goto_trace_stept::SHARED_READ:
+    case goto_trace_stept::SHARED_WRITE:
+    case goto_trace_stept::ATOMIC_BEGIN:
+    case goto_trace_stept::ATOMIC_END:
+    case goto_trace_stept::SPAWN:
       // ignore for now
       break;
 
