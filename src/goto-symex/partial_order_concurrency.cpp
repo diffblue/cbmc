@@ -6,6 +6,7 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 
 \*******************************************************************/
 
+#include <i2string.h>
 #include <arith_tools.h>
 
 #include "partial_order_concurrency.h"
@@ -54,17 +55,16 @@ Function: partial_order_concurrencyt::clock
 
 \*******************************************************************/
 
-symbol_exprt partial_order_concurrencyt::clock(
-  const eventt &event)
+symbol_exprt partial_order_concurrencyt::clock(event_it event)
 {
   irep_idt identifier;
 
-  if(event.is_assignment())
+  if(event->is_assignment())
     identifier=id2string(id(event))+"$wclk";
-  else if(event.is_read())
+  else if(event->is_read())
     identifier=id2string(id(event))+"$rclk";
-  else if(event.is_spawn())
-    identifier=id2string(id(event))+"$spwnclk";
+  else if(event->is_spawn())
+    identifier=i2string(event->source.thread_nr+1)+"$spwnclk";
   else
     assert(false);
 
@@ -104,8 +104,7 @@ Function: partial_order_concurrencyt::po_constraint
 \*******************************************************************/
 
 exprt partial_order_concurrencyt::po_constraint(
-  const eventt &e1,
-  const eventt &e2)
+  event_it e1, event_it e2)
 {
   return binary_relation_exprt(clock(e1), ID_lt, clock(e2));
 }

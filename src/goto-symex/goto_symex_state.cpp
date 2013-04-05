@@ -299,7 +299,7 @@ void goto_symex_statet::assignment(
 
   // for value propagation -- the RHS is L2
   
-  if(record_value && constant_propagation(rhs))
+  if(!is_shared && record_value && constant_propagation(rhs))
     propagation.values[l1_identifier]=rhs;
   else
     propagation.remove(l1_identifier);
