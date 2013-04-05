@@ -815,6 +815,12 @@ void symex_target_equationt::SSA_stept::output(
   case goto_trace_stept::DEAD: out << "DEAD" << std::endl; break;
   case goto_trace_stept::FUNCTION_CALL: out << "FUNCTION_CALL" << std::endl; break;
   case goto_trace_stept::FUNCTION_RETURN: out << "FUNCTION_RETURN" << std::endl; break;
+  case goto_trace_stept::CONSTRAINT: out << "CONSTRAINT" << std::endl; break;
+  case goto_trace_stept::SHARED_READ: out << "SHARED READ" << std::endl; break;
+  case goto_trace_stept::SHARED_WRITE: out << "SHARED WRITE" << std::endl; break;
+  case goto_trace_stept::ATOMIC_BEGIN: out << "ATOMIC_BEGIN" << std::endl; break;
+  case goto_trace_stept::ATOMIC_END: out << "AUTOMIC_END" << std::endl; break;
+  case goto_trace_stept::SPAWN: out << "SPAWN" << std::endl; break;
 
   default: assert(false);
   }
