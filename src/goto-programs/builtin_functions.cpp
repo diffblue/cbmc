@@ -1194,7 +1194,6 @@ void goto_convertt::do_function_call_symbol(
     if(!is_lvalue(dest_expr))
     {
       err_location(dest_expr);
-      std::cout << "X: " << dest_expr.pretty() << std::endl;
       throw "va_start argument expected to be lvalue";
     }    
     
