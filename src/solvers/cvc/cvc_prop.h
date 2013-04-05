@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_PROP_CVC_PROP_H
 #define CPROVER_PROP_CVC_PROP_H
 
-#include <iostream>
+#include <ostream>
 
 #include <threeval.h>
 

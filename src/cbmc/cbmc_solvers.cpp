@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <iostream>
+
 #include <solvers/sat/satcheck.h>
 
 #ifdef HAVE_BV_REFINEMENT

@@ -18,7 +18,7 @@ Date: July 2005
  * \date   Sun Jul 31 21:54:44 BST 2011
 */
 
-#include <iostream>
+#include <ostream>
 #include <vector>
 
 #include <std_expr.h>

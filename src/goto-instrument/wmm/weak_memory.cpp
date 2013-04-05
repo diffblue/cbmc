@@ -17,6 +17,7 @@ Date: September 2011
  */
 
 #include <fstream>
+#include <iostream>
 
 #include <expr_util.h>
 #include <cprover_prefix.h>

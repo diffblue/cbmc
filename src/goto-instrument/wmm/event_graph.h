@@ -14,7 +14,7 @@ Date: 2012
 #include <list>
 #include <set>
 #include <map>
-#include <iostream>
+#include <ostream>
 
 #include <graph.h>
 
@@ -182,7 +182,8 @@ public:
       std::map<std::string,std::string>& map_id2var,
       std::map<std::string,std::string>& map_var2id,
       bool hide_internals) const;
-    void print_dot(std::ofstream& str, 
+
+    void print_dot(std::ostream &str, 
       unsigned colour, weak_memory_modelt model) const;
 
     inline bool operator<(const critical_cyclet& other) const

@@ -1390,7 +1390,9 @@ Function: event_grapht::critical_cyclet::print_dot
 \*******************************************************************/
 
 void event_grapht::critical_cyclet::print_dot(
-  std::ofstream& str, unsigned colour, weak_memory_modelt model) const
+  std::ostream &str,
+  unsigned colour,
+  weak_memory_modelt model) const
 {
   /* print vertices */
   for(const_iterator it=begin(); it!=end(); ++it)

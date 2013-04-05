@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
+#include <iostream>
+
 #include <expr_util.h>
 #include <i2string.h>
 #include <simplify_expr_class.h>

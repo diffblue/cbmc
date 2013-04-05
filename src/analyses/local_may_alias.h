@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_LOCAL_MAY_ALIAS_H
 #define CPROVER_LOCAL_MAY_ALIAS_H
 
-#include <iostream>
+#include <ostream>
 #include <stack>
 
 #include <numbering.h>

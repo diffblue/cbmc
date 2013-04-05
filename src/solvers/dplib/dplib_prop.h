@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_PROP_DPLIB_PROP_H
 #define CPROVER_PROP_DPLIB_PROP_H
 
-#include <iostream>
+#include <ostream>
 
 #include <threeval.h>
 

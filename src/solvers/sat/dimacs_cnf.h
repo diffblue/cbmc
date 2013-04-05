@@ -9,9 +9,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_DIMACS_CNF_H
 #define CPROVER_DIMACS_CNF_H
 
-#include "cnf_clause_list.h"
+#include <ostream>
 
-#include <iostream>
+#include "cnf_clause_list.h"
 
 class dimacs_cnft:public cnf_clause_listt
 {

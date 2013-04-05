@@ -9,10 +9,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_ANSI_C_DESIGNATOR_H
 #define CPROVER_ANSI_C_DESIGNATOR_H
 
-#include <type.h>
-
 #include <vector>
-#include <iostream>
+#include <ostream>
+
+#include <type.h>
 
 class designatort
 {

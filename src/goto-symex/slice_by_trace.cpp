@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cstdlib>
 #include <set>
 #include <fstream>
+#include <iostream>
 
 #include <simplify_expr.h>
 #include <i2string.h>

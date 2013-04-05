@@ -141,10 +141,11 @@ void cvc_dect::read_assert(std::istream &in, std::string &line)
     if(pos2==std::string::npos) return;    
     
     std::string value=std::string(line, pos, pos2-pos);
-    
+
+    #if 0    
     std::cout << ">" << identifier << "< = >" << value << "<";
-    
     std::cout << std::endl;
+    #endif
   }
   else
   {

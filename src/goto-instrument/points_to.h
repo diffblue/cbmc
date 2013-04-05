@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_INSTRUMENT_POINTS_TO_H
 #define CPROVER_GOTO_INSTRUMENT_POINTS_TO_H
 
-#include <iostream>
+#include <ostream>
 
 #include <goto-programs/goto_functions.h>
 #include <goto-programs/cfg.h>

@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_ANALYSES_CALL_GRAPH_H
 #define CPROVER_ANALYSES_CALL_GRAPH_H
 
-#include <iostream>
+#include <ostream>
 #include <map>
 
 #include <goto-programs/goto_functions.h>

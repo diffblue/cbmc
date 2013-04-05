@@ -598,10 +598,7 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
       cvc_prop.out << expr.get(ID_value);
     }
     else
-    {
-      std::cerr << expr.pretty() << std::endl;
       throw "unknown constant: "+expr.type().id_string();
-    }
   }
   else if(expr.id()==ID_concatenation || 
           expr.id()==ID_bitand ||

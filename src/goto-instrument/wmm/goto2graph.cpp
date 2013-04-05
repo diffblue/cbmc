@@ -11,10 +11,10 @@ Date: 2012
 #include <vector>
 #include <string>
 #include <fstream>
+#include <iostream>
 
 #ifndef _WIN32
 #include <cstdlib>
-#include <pthread.h>
 #endif
 
 #include <prefix.h>

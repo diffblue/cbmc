@@ -12,7 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <queue>
 #include <map>
-#include <iostream>
+#include <ostream>
 
 #include "goto_functions.h"
 

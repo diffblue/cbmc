@@ -10,7 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_QBF_QDIMACS_CNF_H
 
 #include <set>
-#include <iostream>
+#include <ostream>
 
 #include "../sat/dimacs_cnf.h"
 
