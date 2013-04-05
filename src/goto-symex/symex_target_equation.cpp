@@ -441,7 +441,7 @@ void symex_target_equationt::constraint(
   
   SSA_step.guard=guard;
   SSA_step.cond_expr=cond;
-  SSA_step.type=goto_trace_stept::ASSUME;
+  SSA_step.type=goto_trace_stept::CONSTRAINT;
   SSA_step.source=source;
   SSA_step.comment=msg;
 }
