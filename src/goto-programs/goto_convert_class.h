@@ -154,7 +154,7 @@ protected:
   //
   // conversion
   //
-  void convert_block(const codet &code, goto_programt &dest);
+  void convert_block(const code_blockt &code, goto_programt &dest);
   void convert_decl(const code_declt &code, goto_programt &dest);
   void convert_decl_type(const codet &code, goto_programt &dest);
   void convert_expression(const code_expressiont &code, goto_programt &dest);

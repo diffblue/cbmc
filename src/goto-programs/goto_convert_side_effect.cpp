@@ -631,7 +631,7 @@ void goto_convertt::remove_statement_expression(
     throw "statement_expression takes code as operand";
 
   codet &code=to_code(expr.op0());
-
+  
   if(!result_is_used)
   {
     convert(code, dest);
@@ -639,52 +639,61 @@ void goto_convertt::remove_statement_expression(
     return;
   }
   
-  // get last statement from block
-  codet *last=&code;
-    
-  while(true)
-  {
-    if(last->get_statement()==ID_block)
-    {
-      if(last->operands().empty())
-        throw "statement_expression expects non-empty block";
-      
-      last=&to_code(last->operands().back());
-    }
-    else if(last->get_statement()==ID_label)
-    {
-      assert(last->operands().size()==1);
-      last=&to_code(last->op0());
-    }
-    else
-      break;
-  }
-
-  codet old_last=*last;
-  if(last->get(ID_statement)==ID_expression)
-    last->set_statement(ID_skip);
+  if(code.get_statement()!=ID_block)
+    throw "statement_expression takes block as operand";
   
-  convert(code, dest);
+  if(code.operands().empty())
+    throw "statement_expression takes non-empty block as operand";
+  
+  // get last statement from block, following labels
+  codet *last=&to_code(code.operands().back());
+    
+  while(last->get_statement()==ID_label)
+  {
+    assert(last->operands().size()==1);
+    last=&to_code(last->op0());
+  }
+
+  locationt location=last->find_location();
+
+  symbolt &new_symbol=
+    new_tmp_symbol(expr.type(), "statement_expression", dest, location);
+    
+  symbol_exprt tmp_symbol_expr(new_symbol.name, new_symbol.type);
+  tmp_symbol_expr.location()=location;
+
+  if(last->get(ID_statement)==ID_expression)
+  {
+    // we turn this into an assignment
+    exprt e=to_code_expression(*last).expression();
+    *last=code_assignt(tmp_symbol_expr, e);
+    last->location()=location;
+  }
+  else if(last->get(ID_statement)==ID_assign)
+  {
+    exprt e=to_code_assign(*last).lhs();
+    code_assignt assignment(tmp_symbol_expr, e);
+    assignment.location()=location;
+    code.operands().push_back(assignment);
+  }
+  else
+    throw "statement_expression expects expression as "
+           "last statement, but got `"+
+           id2string(last->get(ID_statement))+"'";
 
   {
-    clean_expr(old_last, dest, true);
-
-    if(old_last.get(ID_statement)==ID_expression &&
-       old_last.operands().size()==1)
-      static_cast<exprt &>(expr)=to_code_expression(old_last).expression();
-    else if(old_last.get(ID_statement)==ID_assign)
-      static_cast<exprt &>(expr)=to_code_assign(old_last).lhs();
-    else
-    {
-      std::stringstream str;
-      str << "statement_expression expects expression as "
-            "last statement, but got `"+
-            id2string(old_last.get(ID_statement))+"'";
-      if(dest.instructions.size() > 0)
-    	str << " - error may be at: " << dest.instructions.back().location;
-      throw str.str();
-    }
+    // this likely needs to be a proper stack
+    tmp_symbolst old_tmp_symbols;
+    old_tmp_symbols.swap(tmp_symbols);
+    
+    goto_programt tmp;  
+    convert(code, tmp);
+    dest.destructive_append(tmp);
+  
+    old_tmp_symbols.swap(tmp_symbols);
   }
+
+  static_cast<exprt &>(expr)=tmp_symbol_expr;
 }
 
 /*******************************************************************\
