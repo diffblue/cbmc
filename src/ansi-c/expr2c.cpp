@@ -2998,6 +2998,32 @@ std::string expr2ct::convert_code_decl(
 
 /*******************************************************************\
 
+Function: expr2ct::convert_code_dead
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+std::string expr2ct::convert_code_dead(
+  const codet &src,
+  unsigned indent)
+{
+  // initializer to go away
+  if(src.operands().size()!=1)
+  {
+    unsigned precedence;
+    return convert_norep(src, precedence);
+  }
+  
+  return "dead "+convert(src.op0())+";";
+}
+
+/*******************************************************************\
+
 Function: expr2ct::convert_code_for
 
   Inputs:
@@ -3196,6 +3222,9 @@ std::string expr2ct::convert_code(
 
   if(statement==ID_decl)
     return convert_code_decl(src, indent);
+
+  if(statement==ID_dead)
+    return convert_code_dead(src, indent);
 
   if(statement==ID_assign)
     return convert_code_assign(to_code_assign(src), indent);
