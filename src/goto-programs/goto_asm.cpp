@@ -85,7 +85,7 @@ void goto_convertt::convert_asm(
         pos++;
       }
 
-      if(command=="xchg")
+      if(command=="xchg" || command=="xchgl")
         x86_32_locked_atomic=true;
 
       if(x86_32_locked_atomic)
