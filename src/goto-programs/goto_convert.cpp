@@ -341,7 +341,7 @@ void goto_convertt::convert(
   const irep_idt &statement=code.get_statement();
   
   if(statement==ID_block)
-    convert_block(code, dest);
+    convert_block(to_code_block(code), dest);
   else if(statement==ID_decl)
     convert_decl(to_code_decl(code), dest);
   else if(statement==ID_decl_type)
@@ -463,9 +463,11 @@ Function: goto_convertt::convert_block
 \*******************************************************************/
 
 void goto_convertt::convert_block(
-  const codet &code,
+  const code_blockt &code,
   goto_programt &dest)
 {
+  const locationt &end_location=code.end_location();
+
   // this needs to be ordered to obtain
   // the correct ordering for the destructor calls
   std::list<irep_idt> locals;
@@ -502,6 +504,7 @@ void goto_convertt::convert_block(
   while(!locals.empty())
   {
     const symbolt &symbol=ns.lookup(locals.back());
+    const symbol_exprt symbol_expr(symbol.name, symbol.type);
 
     code_function_callt destructor=get_destructor(ns, symbol.type);
 
@@ -510,10 +513,18 @@ void goto_convertt::convert_block(
       // add "this"
       exprt this_expr(ID_address_of, pointer_typet());
       this_expr.type().subtype()=symbol.type;
-      this_expr.copy_to_operands(symbol_expr(symbol));
+      this_expr.copy_to_operands(symbol_expr);
       destructor.arguments().push_back(this_expr);
 
       convert(destructor, dest);
+    }
+    
+    // now create a 'dead' instruction
+    {
+      goto_programt::targett dead=dest.add_instruction(DEAD);
+      dead->location=end_location;
+      dead->code=code_deadt(symbol_expr);
+      dead->code.location()=end_location;
     }
     
     locals.pop_back();
