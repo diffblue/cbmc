@@ -619,6 +619,11 @@ void goto_convertt::remove_statement_expression(
   goto_programt &dest,
   bool result_is_used)
 {
+  // This is a gcc extension of the form ({ ....; expr; })
+  // The value is that of the final expression.
+  // The expression is copied into a temporary before the
+  // scope is destoyed.
+
   if(expr.operands().size()!=1)
     throw "statement_expression takes 1 operand";
 
@@ -664,9 +669,11 @@ void goto_convertt::remove_statement_expression(
   {
     clean_expr(old_last, dest, true);
 
-    if((old_last.get(ID_statement)==ID_expression &&
-       old_last.operands().size()==1) || (old_last.get(ID_statement)==ID_assign))
-      static_cast<exprt &>(expr)=old_last.op0();
+    if(old_last.get(ID_statement)==ID_expression &&
+       old_last.operands().size()==1)
+      static_cast<exprt &>(expr)=to_code_expression(old_last).expression();
+    else if(old_last.get(ID_statement)==ID_assign)
+      static_cast<exprt &>(expr)=to_code_assign(old_last).lhs();
     else
     {
       std::stringstream str;
