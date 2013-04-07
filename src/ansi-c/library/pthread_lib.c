@@ -370,3 +370,65 @@ inline int pthread_cond_wait(
   return 0; // we never fail
 }
 
+/* FUNCTION: pthread_spin_lock */
+
+#ifndef __CPROVER_PTHREAD_H_INCLUDED
+#include <pthread.h>
+#define __CPROVER_PTHREAD_H_INCLUDED
+#endif
+
+int pthread_spin_lock(void *lock)
+{
+  __CPROVER_HIDE:;
+  __CPROVER_atomic_begin();
+  __CPROVER_assume(*((unsigned *)lock));
+  (*((unsigned *)lock))=1;
+  __CPROVER_atomic_end();
+  
+  __CPROVER_fence("WWfence", "RRfence", "RWfence", "WRfence",
+                  "WWcumul", "RRcumul", "RWcumul", "WRcumul");
+  return 0;
+}
+
+/* FUNCTION: pthread_spin_unlock */
+
+#ifndef __CPROVER_PTHREAD_H_INCLUDED
+#include <pthread.h>
+#define __CPROVER_PTHREAD_H_INCLUDED
+#endif
+
+int pthread_spin_unlock(void *lock)
+{
+  __CPROVER_HIDE:;
+  // this is atomic_full_barrier() in glibc
+  __CPROVER_fence("WWfence", "RRfence", "RWfence", "WRfence",
+                  "WWcumul", "RRcumul", "RWcumul", "WRcumul");
+  *((unsigned *)lock) = 0;
+  return 0;
+}
+
+/* FUNCTION: pthread_spin_trylock */
+
+#ifndef __CPROVER_PTHREAD_H_INCLUDED
+#include <pthread.h>
+#define __CPROVER_PTHREAD_H_INCLUDED
+#endif
+
+int pthread_spin_trylock(void *lock)
+{
+  __CPROVER_HIDE:;
+  int result;
+  __CPROVER_atomic_begin();
+  if(*((unsigned *)lock))
+    result=EBUSY;
+  else
+  {
+    result=0;
+    (*((unsigned *)lock))=1;
+  }
+  __CPROVER_atomic_end();
+  
+  __CPROVER_fence("WWfence", "RRfence", "RWfence", "WRfence",
+                  "WWcumul", "RRcumul", "RWcumul", "WRcumul");
+  return result;
+}
