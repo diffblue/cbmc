@@ -81,6 +81,12 @@ public:
   {
     copy_to_operands(code);
   }
+  
+  // This is the closing '}' or 'END' at the end of a block
+  locationt end_location() const
+  {
+    return static_cast<const locationt &>(find(ID_C_end_location));
+  }
 };
 
 extern inline const code_blockt &to_code_block(const codet &code)
