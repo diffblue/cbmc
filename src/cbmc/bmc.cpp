@@ -314,6 +314,8 @@ Function: bmct::run
 
 bool bmct::run(const goto_functionst &goto_functions)
 {
+  memory_model_sct memory_model_sc;
+
   //symex.total_claims=0;
   symex.set_message_handler(get_message_handler());
   symex.set_verbosity(get_verbosity());
@@ -332,9 +334,11 @@ bool bmct::run(const goto_functionst &goto_functions)
     symex(goto_functions);
 
     // add a partial ordering, if required    
-    memory_model_sct memory_model_sc;
-    memory_model_sc.set_message_handler(get_message_handler());
-    memory_model_sc(equation);
+    if(equation.has_threads())
+    {
+      memory_model_sc.set_message_handler(get_message_handler());
+      memory_model_sc(equation);
+    }
   }
 
   catch(std::string &error_str)
