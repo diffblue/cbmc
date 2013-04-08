@@ -381,7 +381,7 @@ int pthread_spin_lock(void *lock)
 {
   __CPROVER_HIDE:;
   __CPROVER_atomic_begin();
-  __CPROVER_assume(*((unsigned *)lock));
+  __CPROVER_assume(!*((unsigned *)lock));
   (*((unsigned *)lock))=1;
   __CPROVER_atomic_end();
   
