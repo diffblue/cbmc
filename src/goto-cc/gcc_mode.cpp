@@ -143,10 +143,16 @@ bool gcc_modet::doit()
   // get configuration
   config.set(cmdline);
   
-  if(cmdline.isset("m32"))
+  if(cmdline.isset("m32") || cmdline.isset("mx32"))
     config.ansi_c.set_32();
   else if(cmdline.isset("m64"))
     config.ansi_c.set_64();
+    
+  // ARM-specific
+  if(cmdline.isset("mbig-endian") || cmdline.isset("mbig"))
+    config.ansi_c.endianness=configt::ansi_ct::BIG_ENDIAN;
+  else if(cmdline.isset("little-endian") || cmdline.isset("mlittle"))
+    config.ansi_c.endianness=configt::ansi_ct::LITTLE_ENDIAN;
     
   // -fshort-wchar makes wchar_t "short unsigned int"
   if(cmdline.isset("fshort-wchar"))
