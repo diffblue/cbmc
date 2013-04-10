@@ -66,6 +66,13 @@ STATIC_ASSERT(__builtin_offsetof(struct my_struct2, ch2)==5);
 typedef unsigned int uint32_t;
 typedef unsigned long long int uint64_t;
 
+struct formatted {
+  unsigned short moddate;
+  uint32_t crc32 __attribute__ ((__packed__));
+};
+
+STATIC_ASSERT(__builtin_offsetof(struct formatted, crc32)==2);
+
 typedef struct __attribute__((__packed__))
 {
  uint32_t version;

@@ -116,6 +116,12 @@ bool static_lifetime_init(
     // We won't try to initialize any symbols that have 
     // remained incomplete.
 
+    if(it->second.value.is_nil() &&
+       it->second.is_extern)
+      // Compilers would usually complain about these
+      // symbols being undefined.
+      continue;
+
     if(type.id()==ID_array &&
        to_array_type(type).size().is_nil())
       continue; // do not initialize
