@@ -95,6 +95,8 @@ bool gcc_modet::doit()
       print("gcc (GCC) 3.4.4 (goto-cc " GOTOCC_VERSION ")\n");
 
     print("Copyright (C) 2006-2012 Daniel Kroening, Christoph Wintersteiger\n");
+    print("Architecture: "+id2string(config.this_architecture()));
+    print("OS: "+id2string(config.this_operating_system()));
 
     return false; // Exit!
   }
