@@ -1846,25 +1846,22 @@ bool Parser::rConstructorDecl(
     {
     case TOK_INTEGER:
       {
-        exprt pure_virtual(ID_code);
-        pure_virtual.set(ID_statement, "cpp-pure-virtual");
-        constructor.add(ID_value).swap(pure_virtual);
+        constructor.value()=codet("cpp-pure-virtual");
+        set_location(constructor.value(), value);
       }
       break;
       
     case TOK_DEFAULT: // C++0x
       {
-        exprt pure_virtual(ID_code);
-        pure_virtual.set(ID_statement, ID_default);
-        constructor.add(ID_value).swap(pure_virtual);
+        constructor.value()=codet(ID_default);
+        set_location(constructor.value(), value);
       }
       break;
     
     case TOK_DELETE: // C++0x
       {
-        exprt pure_virtual(ID_code);
-        pure_virtual.set(ID_statement, ID_cpp_delete);
-        constructor.add(ID_value).swap(pure_virtual);
+        constructor.value()=codet(ID_cpp_delete);
+        set_location(constructor.value(), value);
       }
       break;
     
@@ -2017,8 +2014,23 @@ bool Parser::rDeclaratorWithInit(
       Token tk;
       lex->GetToken(tk);
       
-      if(!rInitializeExpr(declarator.value()))
-        return false;
+      if(lex->LookAhead(0)==TOK_DEFAULT) // C++0x
+      {
+        lex->GetToken(tk);
+        declarator.value()=codet(ID_default);
+        set_location(declarator.value(), tk);
+      }
+      else if(lex->LookAhead(0)==TOK_DELETE) // C++0x
+      {
+        lex->GetToken(tk);
+        declarator.value()=codet(ID_cpp_delete);
+        set_location(declarator.value(), tk);
+      }
+      else
+      {
+        if(!rInitializeExpr(declarator.value()))
+          return false;
+      }
 
       dw.swap(declarator);
       return true;
@@ -2397,33 +2409,58 @@ bool Parser::rMemberInitializers(irept &init)
 /*
   member.init
   : name '(' function.arguments ')'
+  : name '(' '{' initialize.expr ... '}' ')'
 */
 bool Parser::rMemberInit(exprt &init)
 {
+  #ifdef DEBUG
+  std::cout << "Parser::rMemberInit 1\n";
+  #endif
+
   irept name;
 
   if(!rName(name))
     return false;
 
+  #ifdef DEBUG
+  std::cout << "Parser::rMemberInit 2\n";
+  #endif
+
   init=codet(ID_member_initializer);
   init.add(ID_member).swap(name);
-
+  
   Token tk1, tk2;
-
-  if(lex->GetToken(tk1)!='(')
-    return false;
-
+  if(lex->GetToken(tk1)!='(') return false;
   set_location(init, tk1);
 
-  exprt args;
+  if(lex->LookAhead(0)=='{')
+  {
+    #ifdef DEBUG
+    std::cout << "Parser::rMemberInit 3\n";
+    #endif
+    exprt exp;
+    if(!rInitializeExpr(exp))
+      return false;
 
-  if(!rFunctionArguments(args))
-    return false;
+    init.operands().push_back(exp);
+  }
+  else
+  {
+    #ifdef DEBUG
+    std::cout << "Parser::rMemberInit 4\n";
+    #endif
 
+    exprt args;
+
+    if(!rFunctionArguments(args))
+      return false;
+
+    init.operands().swap(args.operands());
+  }
+
+  // read closing parenthesis
   if(lex->GetToken(tk2)!=')')
     return false;
-
-  init.operands().swap(args.operands());
 
   return true;
 }
@@ -2470,18 +2507,24 @@ bool Parser::rName(irept &name)
     Token tk;
 
     #ifdef DEBUG
-    std::cout << "Parser::rName 1.1 " << "\n";
+    std::cout << "Parser::rName 2 " << "\n";
     #endif
 
     switch(lex->LookAhead(0))
     {
     case TOK_TEMPLATE:
+      #ifdef DEBUG
+      std::cout << "Parser::rName 3\n";
+      #endif
       lex->GetToken(tk);
       // Skip template token, next will be identifier
       if(lex->LookAhead(0)!=TOK_IDENTIFIER) return false;
       break;
 
     case '<':
+      #ifdef DEBUG
+      std::cout << "Parser::rName 4\n";
+      #endif
       {
         irept args;
         if(!rTemplateArgs(args))
@@ -2496,6 +2539,9 @@ bool Parser::rName(irept &name)
       break;
 
     case TOK_IDENTIFIER:
+      #ifdef DEBUG
+      std::cout << "Parser::rName 5\n";
+      #endif
       lex->GetToken(tk);
       components.push_back(irept(ID_name));
       components.back().set(ID_identifier, tk.text);
@@ -2509,12 +2555,18 @@ bool Parser::rName(irept &name)
       break;
 
     case TOK_SCOPE:
+      #ifdef DEBUG
+      std::cout << "Parser::rName 6\n";
+      #endif
       lex->GetToken(tk);
       components.push_back(irept("::"));
       set_location(components.back(), tk);
       break;
 
     case '~':
+      #ifdef DEBUG
+      std::cout << "Parser::rName 7\n";
+      #endif
       lex->GetToken(tk);
 
       // identifier must be next
@@ -2526,6 +2578,9 @@ bool Parser::rName(irept &name)
       break;
 
     case TOK_OPERATOR:
+      #ifdef DEBUG
+      std::cout << "Parser::rName 8\n";
+      #endif
       lex->GetToken(tk);
       {
         components.push_back(irept(ID_operator));
@@ -5132,10 +5187,6 @@ bool Parser::rMSCTypePredicate(exprt &expr)
   | '(' comma.expression ')'
   | integral.or.class.spec '(' function.arguments ')'
   | typeid.expr
-  | openc++.primary.exp
-
-  openc++.primary.exp
-  : var.name '::' userdef.statement
 */
 bool Parser::rPrimaryExpr(exprt &exp)
 {
