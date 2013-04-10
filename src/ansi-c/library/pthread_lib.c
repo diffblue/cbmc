@@ -377,7 +377,7 @@ inline int pthread_cond_wait(
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
 
-int pthread_spin_lock(void *lock)
+int pthread_spin_lock(pthread_mutex_t *lock)
 {
   __CPROVER_HIDE:;
   __CPROVER_atomic_begin();
@@ -397,7 +397,7 @@ int pthread_spin_lock(void *lock)
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
 
-int pthread_spin_unlock(void *lock)
+int pthread_spin_unlock(pthread_mutex_t *lock)
 {
   __CPROVER_HIDE:;
   // this is atomic_full_barrier() in glibc
@@ -419,7 +419,7 @@ int pthread_spin_unlock(void *lock)
 #define __CPROVER_ERRNO_H_INCLUDED
 #endif
 
-int pthread_spin_trylock(void *lock)
+int pthread_spin_trylock(pthread_mutex_t *lock)
 {
   __CPROVER_HIDE:;
   int result;
