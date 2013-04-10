@@ -131,6 +131,15 @@ bool gcc_modet::doit()
       debug("GCC mode");
   }
   
+  // in gcc mode, if -M or -MM is given, we do dependencies only,
+  // which is handled by simply calling gcc and then exiting
+  if(!act_as_ld && (cmdline.isset('M') || cmdline.isset("MM")))
+  {
+    int result;
+    result=run_gcc();
+    exit(result);
+  }
+  
   // get configuration
   config.set(cmdline);
   
@@ -361,6 +370,47 @@ int gcc_modet::preprocess(const std::string &src, const std::string &dest)
   // source file  
   new_argv.push_back(src);
   
+  // overwrite argv[0]
+  assert(new_argv.size()>=1);
+  new_argv[0]="gcc";
+  
+  #if 0
+  std::cout << "RUN:";
+  for(unsigned i=0; i<new_argv.size(); i++)
+    std::cout << " " << new_argv[i];
+  std::cout << std::endl;
+  #endif
+  
+  return run("gcc", new_argv);
+}
+
+/*******************************************************************\
+
+Function: gcc_modet::run_gcc
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: run gcc with original command line
+
+\*******************************************************************/
+
+int gcc_modet::run_gcc()
+{
+  // build new argv
+  std::vector<std::string> new_argv;
+  
+  new_argv.reserve(cmdline.parsed_argv.size());
+
+  for(gcc_cmdlinet::parsed_argvt::const_iterator
+      it=cmdline.parsed_argv.begin();
+      it!=cmdline.parsed_argv.end();
+      it++)
+  {
+    new_argv.push_back(it->arg);
+  }
+
   // overwrite argv[0]
   assert(new_argv.size()>=1);
   new_argv[0]="gcc";
