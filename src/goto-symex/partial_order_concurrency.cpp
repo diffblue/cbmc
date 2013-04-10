@@ -6,6 +6,8 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 
 \*******************************************************************/
 
+#include <limits>
+
 #include <i2string.h>
 #include <arith_tools.h>
 
