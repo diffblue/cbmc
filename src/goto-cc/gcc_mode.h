@@ -33,6 +33,7 @@ protected:
   bool act_as_ld;
   
   int preprocess(const std::string &src, const std::string &dest);
+  int run_gcc(); // call gcc with original command line
   
   int gcc_hybrid_binary(const cmdlinet::argst &input_files);
   
