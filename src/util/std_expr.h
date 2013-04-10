@@ -2274,6 +2274,12 @@ public:
   {
   }
   
+  inline constant_exprt(const irep_idt &_value, const typet &_type):
+    exprt(ID_constant, _type)
+  {
+    set_value(_value);
+  }
+
   inline const irep_idt &get_value() const
   {
     return get(ID_value);
