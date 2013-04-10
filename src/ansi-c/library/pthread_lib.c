@@ -414,6 +414,11 @@ int pthread_spin_unlock(void *lock)
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
 
+#ifndef __CPROVER_ERRNO_H_INCLUDED
+#include <errno.h>
+#define __CPROVER_ERRNO_H_INCLUDED
+#endif
+
 int pthread_spin_trylock(void *lock)
 {
   __CPROVER_HIDE:;
