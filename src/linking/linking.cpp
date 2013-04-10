@@ -472,6 +472,11 @@ void linkingt::duplicate_non_type_symbol(
         }
       }
     }
+    
+    // care about flags
+    
+    // it's enough that one isn't extern for the final one not to be
+    old_symbol.is_extern=old_symbol.is_extern && new_symbol.is_extern;
   }
 }
 

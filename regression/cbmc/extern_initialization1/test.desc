@@ -1,0 +1,7 @@
+CORE
+file1.c
+file2.c
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--

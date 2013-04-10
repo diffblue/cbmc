@@ -26,6 +26,8 @@ Function: get_symbols_rec
 
 \*******************************************************************/
 
+#include <iostream>
+
 void get_symbols_rec(
   const namespacet &ns,
   const symbolt &symbol,
@@ -143,10 +145,14 @@ void remove_internal_symbols(
     }
     else
     {
-      // export only if there is an initializer and
-      // the symbol is not file-local
-      if(has_initializer && !is_file_local)
+      // 'extern' symbols are only exported if there
+      // is an initializer.
+      if((has_initializer || !symbol.is_extern) && 
+         !is_file_local)
+      {
+        exported.insert(symbol.name);
         get_symbols_rec(ns, symbol, exported);
+      }
     }
   }
 
@@ -164,7 +170,9 @@ void remove_internal_symbols(
       it=next;
     }
     else
+    {
       it++;
+    }
   }
 }
 

@@ -626,6 +626,13 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
       old_symbol.type=new_symbol.type;
     }
   }
+  
+  // take care of some flags
+  old_symbol.is_extern=old_symbol.is_extern && new_symbol.is_extern;
+  
+  // We should likely check is_volatile and
+  // is_thread_local for consistency. GCC complains if these
+  // mismatch.
 }
 
 /*******************************************************************\
