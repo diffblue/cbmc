@@ -150,9 +150,9 @@ bool gcc_modet::doit()
     
   // ARM-specific
   if(cmdline.isset("mbig-endian") || cmdline.isset("mbig"))
-    config.ansi_c.endianness=configt::ansi_ct::BIG_ENDIAN;
+    config.ansi_c.endianness=configt::ansi_ct::IS_BIG_ENDIAN;
   else if(cmdline.isset("little-endian") || cmdline.isset("mlittle"))
-    config.ansi_c.endianness=configt::ansi_ct::LITTLE_ENDIAN;
+    config.ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
     
   // -fshort-wchar makes wchar_t "short unsigned int"
   if(cmdline.isset("fshort-wchar"))
