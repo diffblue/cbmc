@@ -25,7 +25,7 @@ computation that results from any choice of inputs.</p>
 <code>malloc</code>;</li>
 <li>initial values of variables that are <code>extern</code> in all
 compilation units;</li>
-<li>explicit functions for generating nondeterminism.
+<li>explicit functions for generating nondeterminism.</li>
 </ul>
 
 <p class="justified">The CPROVER tools are shipped with a number of stubs
