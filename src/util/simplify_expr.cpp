@@ -4145,6 +4145,7 @@ bool simplify_exprt::simplify_member(exprt &expr)
   {
     if(op_type.id()==ID_struct)
     {
+      // pull out the right member
       const struct_typet &struct_type=to_struct_type(op_type);
       if(struct_type.has_component(component_name))
       {
@@ -4187,8 +4188,136 @@ bool simplify_exprt::simplify_member(exprt &expr)
       return false;
     }
   }
+  else if(op.id()==ID_union && op_type.id()==ID_union)
+  {
+    // trivial?
+    if(ns.follow(to_union_expr(op).op().type())==ns.follow(expr.type()))
+    {
+      exprt tmp=to_union_expr(op).op();
+      expr.swap(tmp);
+      return false;
+    }
+    
+    // need to convert!
+    mp_integer target_size=
+      pointer_offset_size(ns, expr.type());
+
+    if(target_size!=-1)
+    {
+      mp_integer target_bits=target_size*8;
+      std::string bits=expr2bits(op);
+      
+      // TODO: we effectively do little-endian here
+
+      if(mp_integer(bits.size())>=target_bits)
+      {
+        std::string bits_cut=std::string(bits, 0, integer2long(target_bits));
+      
+        exprt tmp=bits2expr(bits_cut, expr.type());
+
+        if(tmp.is_not_nil())
+        {
+          expr=tmp;
+          return false;
+        }
+      }
+    }
+  }
 
   return true;
+}
+
+/*******************************************************************\
+
+Function: simplify_exprt::bits2expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+exprt simplify_exprt::bits2expr(
+  const std::string &bits,
+  const typet &_type)
+{
+  const typet &type=ns.follow(_type);
+
+  if(type.id()==ID_unsignedbv ||
+     type.id()==ID_signedbv ||
+     type.id()==ID_c_enum ||
+     type.id()==ID_floatbv ||
+     type.id()==ID_fixedbv)
+  {
+    unsigned width=to_bitvector_type(type).get_width();
+    if(bits.size()==width)
+      return constant_exprt(bits, type);
+  }
+  else if(type.id()==ID_union)
+  {
+    // need to find full-size member
+  }
+  else if(type.id()==ID_struct)
+  {
+    // need to split up; this exposes endianness
+  }
+  else if(type.id()==ID_array)
+  {
+    // need to split up; this exposes endianness
+  }
+  
+  return nil_exprt();
+}
+
+/*******************************************************************\
+
+Function: simplify_exprt::expr2bits
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+std::string simplify_exprt::expr2bits(const exprt &expr)
+{
+  const typet &type=ns.follow(expr.type());
+
+  if(expr.id()==ID_constant)
+  {
+    if(type.id()==ID_unsignedbv ||
+       type.id()==ID_signedbv ||
+       type.id()==ID_c_enum ||
+       type.id()==ID_floatbv ||
+       type.id()==ID_fixedbv)
+    {
+      return id2string(to_constant_expr(expr).get_value());
+    }
+  }
+  else if(expr.id()==ID_union)
+  {
+    return expr2bits(to_union_expr(expr).op());
+  }
+  else if(expr.id()==ID_struct)
+  {
+    std::string result;
+    forall_operands(it, expr)
+      result+=expr2bits(*it);
+    return result;
+  }
+  else if(expr.id()==ID_array)
+  {
+    std::string result;
+    forall_operands(it, expr)
+      result+=expr2bits(*it);
+    return result;
+  }
+  
+  return "";
 }
 
 /*******************************************************************\
