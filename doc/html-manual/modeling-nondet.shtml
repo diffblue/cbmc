@@ -4,15 +4,29 @@
 
 <h2>Nondeterminism</h2>
 
+<h3>Rationale</h3>
+
 <p class="justified">Programs typically read inputs from an environment. 
 These inputs can take the form of data read from a file, keyboard or network
 socket, or arguments passed on the command line.  It is usually desirable to
 analyze the program for any choice of these inputs.  In Model Checking,
 inputs are therefore modeled by means of <i>nondeterminism</i>, which means
 that the value of the input is not specified. The program may follow any
-computation that results from any choice of inputs. Other sources of
-nondeterminism in programs include the program schedule in the case
-of concurrent programs.</p>
+computation that results from any choice of inputs.</p>
+
+<h3>Sources of Nondeterminism</h3>
+
+<p>The CPROVER tools support the following sources of nondeterminism:</p>
+
+<ul>
+<li>functions that read inputs from the environments;<li>
+<li>the thread schedule in concurrent programs;</li>
+<li>initial values of local-scoped variables and memory allocated with
+<code>malloc</code>;</li>
+<li>initial values of variables that are <code>extern</code> in all
+compilation units;</li>
+<li>explicit functions for generating nondeterminism.
+</ul>
 
 <p class="justified">The CPROVER tools are shipped with a number of stubs
 for the most commonly used library functions. When executing a statement
@@ -30,15 +44,17 @@ unsigned short int nondet_ushortint();
 </code>
 
 <p class="justified">Note that the body of the function is not defined.  The
-name of the function itself is irrelevant (safe for the prefix), but must be
+name of the function itself is irrelevant (save for the prefix), but must be
 unique.  Also note that a nondeterministic choice is not to be confused with
 a probabilistic (or random) choice.</p>
+
+<h3>Uninterpreted Functions</h3>
 
 <p class="justified">It may be necessary to check parts of a program
 independently. Nondeterminism can be used to over-approximate the
 behaviour of part of the system which is not being checked.  Rather
 than calling a complex or unrelated function, a nondeterministic stub
-is used. However separate calls to the function can give different
+is used. However, separate calls to the function can return different
 results, even for the same inputs.  If the function output only
 depends on its inputs then this can introduce spurious errors.  To
 avoid this problem, functions whose names begin with the
