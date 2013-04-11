@@ -121,6 +121,10 @@ public:
   
   typedef bool (simplify_exprt::*jump_table_entryt)(exprt &);
   
+  // bit-level conversions
+  exprt bits2expr(const std::string &bits, const typet &type);
+  std::string expr2bits(const exprt &expr);
+  
 protected:
   const namespacet &ns;
   
