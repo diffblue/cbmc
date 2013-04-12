@@ -526,6 +526,90 @@ extern inline mod_exprt &to_mod_expr(exprt &expr)
   return static_cast<mod_exprt &>(expr);
 }
 
+/*! \brief exponentiation
+ */
+class power_exprt:public binary_exprt
+{
+ public:
+  inline power_exprt():binary_exprt(ID_power)
+  {
+  }
+
+  inline power_exprt(
+      const exprt &_base,
+      const exprt &_exp):
+      binary_exprt(_base, ID_power, _exp)
+  {
+  }
+};
+
+/*! \brief Cast a generic exprt to a \ref power_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * power_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref power_exprt
+ *
+ * \ingroup gr_std_expr
+*/
+extern inline const power_exprt &to_power_expr(const exprt &expr)
+{
+  assert(expr.id()==ID_power && expr.operands().size()==2);
+  return static_cast<const power_exprt &>(expr);
+}
+
+/*! \copydoc to_power_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
+extern inline power_exprt &to_power_expr(exprt &expr)
+{
+  assert(expr.id()==ID_power && expr.operands().size()==2);
+  return static_cast<power_exprt &>(expr);
+}
+
+/*! \brief falling factorial power
+ */
+class factorial_power_exprt:public binary_exprt
+{
+ public:
+  inline factorial_power_exprt():binary_exprt(ID_factorial_power)
+  {
+  }
+
+  inline factorial_power_exprt(
+      const exprt &_base,
+      const exprt &_exp):
+      binary_exprt(_base, ID_factorial_power, _exp)
+  {
+  }
+};
+
+/*! \brief Cast a generic exprt to a \ref factorial_power_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * factorial_power_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref factorial_power_exprt
+ *
+ * \ingroup gr_std_expr
+*/
+extern inline const factorial_power_exprt &to_factorial_power_expr(const exprt &expr)
+{
+  assert(expr.id()==ID_factorial_power && expr.operands().size()==2);
+  return static_cast<const factorial_power_exprt &>(expr);
+}
+
+/*! \copydoc to_factorial_power_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
+extern inline factorial_power_exprt &to_factorial_expr(exprt &expr)
+{
+  assert(expr.id()==ID_factorial_power && expr.operands().size()==2);
+  return static_cast<factorial_power_exprt &>(expr);
+}
+
 /*! \brief equality
 */
 class equal_exprt:public binary_relation_exprt
