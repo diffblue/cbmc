@@ -133,7 +133,7 @@ bool polynomial_acceleratort::accelerate(patht &loop, goto_programt &accelerator
     // OK cool -- the path is monotone, so we can just assume the condition for
     // the last iteration.
     replace_expr(loop_counter,
-                 minus_exprt(loop_counter, make_constant(1)),
+                 minus_exprt(loop_counter, from_integer(1, loop_counter.type())),
                  guard);
   } else {
     // The path is not monotone, so we need to introduce a quantifier to ensure
@@ -142,7 +142,7 @@ bool polynomial_acceleratort::accelerate(patht &loop, goto_programt &accelerator
     symbol_table.add(k_sym);
     exprt k = k_sym.symbol_expr();
 
-    exprt k_bound = and_exprt(binary_relation_exprt(make_constant(0), "<=", k),
+    exprt k_bound = and_exprt(binary_relation_exprt(from_integer(0, k.type()), "<=", k),
                               binary_relation_exprt(k, "<", loop_counter));
     replace_expr(loop_counter, k, guard);
 
@@ -330,7 +330,7 @@ void polynomial_acceleratort::assert_for_values(scratch_programt &program,
   for (map<exprt, int>::iterator it = values.begin();
        it != values.end();
        ++it) {
-    program.assign(it->first, make_constant(it->second));
+    program.assign(it->first, from_integer(it->second, it->first.type()));
   }
 
   // Now unwind the loop as many times as we need to.
@@ -365,7 +365,7 @@ void polynomial_acceleratort::assert_for_values(scratch_programt &program,
     // OK, concrete_value now contains the value of all the relevant variables
     // multiplied together.  Create the term concrete_value*coefficient and add
     // it into the polynomial.
-    exprt term = mult_exprt(make_constant(concrete_value), it->second);
+    exprt term = mult_exprt(from_integer(concrete_value, it->second.type()), it->second);
 
     if (rhs.is_nil()) {
       rhs = term;
@@ -523,7 +523,7 @@ bool polynomial_acceleratort::check_inductive(map<exprt, polynomialt> polynomial
   program.append(body);
 
   codet inc_loop_counter = code_assignt(loop_counter,
-                                        plus_exprt(loop_counter, make_constant(1)));
+                                        plus_exprt(loop_counter, from_integer(1, loop_counter.type())));
   program.add_instruction(ASSIGN)->code = inc_loop_counter;
 
   for (vector<exprt>::iterator it = polynomials_hold.begin();
@@ -700,7 +700,7 @@ bool polynomial_acceleratort::do_assumptions(map<exprt, polynomialt> polynomials
     polynomials_hold.push_back(equal_exprt(lhs, rhs));
   }
 
-  program.assign(loop_counter, make_constant(0));
+  program.assign(loop_counter, from_integer(0, loop_counter.type()));
 
   for (vector<exprt>::iterator it = polynomials_hold.begin();
        it != polynomials_hold.end();
@@ -720,7 +720,7 @@ bool polynomial_acceleratort::do_assumptions(map<exprt, polynomialt> polynomials
 
   program.assume(condition);
   program.assign(loop_counter,
-                 plus_exprt(loop_counter, make_constant(1)));
+                 plus_exprt(loop_counter, from_integer(1, loop_counter.type())));
 
   for (map<exprt, polynomialt>::iterator p_it = polynomials.begin();
        p_it != polynomials.end();
@@ -867,8 +867,8 @@ bool polynomial_acceleratort::do_arrays(goto_programt::instructionst &loop_body,
   symbol_table.add(k_sym);
   exprt k = k_sym.symbol_expr();
 
-  exprt k_bound = and_exprt(binary_relation_exprt(make_constant(0), "<=", k),
-                            binary_relation_exprt(k, "<", loop_counter));
+  exprt k_bound = and_exprt(binary_relation_exprt(from_integer(0, k.type()), ID_le, k),
+                            binary_relation_exprt(k, ID_lt, loop_counter));
   replace_expr(loop_counter, k, arrays_expr);
 
   implies_exprt implies(k_bound, arrays_expr);
@@ -937,11 +937,11 @@ bool polynomial_acceleratort::do_arrays(goto_programt::instructionst &loop_body,
         exprt max_idx, min_idx;
 
         if (index.coeff(loop_counter) == 1) {
-          max_idx = minus_exprt(index.to_expr(), make_constant(1));
+          max_idx = minus_exprt(index.to_expr(), from_integer(1, index.to_expr().type()));
           index.add(pos_eliminator);
           min_idx = index.to_expr();
         } else if (index.coeff(loop_counter) == -1) {
-          min_idx = plus_exprt(index.to_expr(), make_constant(1));
+          min_idx = plus_exprt(index.to_expr(), from_integer(1, index.to_expr().type()));
           index.add(neg_eliminator);
           max_idx = index.to_expr();
         } else {
@@ -980,8 +980,8 @@ bool polynomial_acceleratort::do_arrays(goto_programt::instructionst &loop_body,
       replace_expr(loop_counter, l, idx_not_touched);
 
       // 0 < l <= loop_counter => idx_not_touched
-      and_exprt l_bound(binary_relation_exprt(make_constant(0), "<", l),
-                        binary_relation_exprt(l, "<=", loop_counter));
+      and_exprt l_bound(binary_relation_exprt(from_integer(0, l.type()), ID_lt, l),
+                        binary_relation_exprt(l, ID_le, loop_counter));
       implies_exprt idx_not_touched_bound(l_bound, idx_not_touched);
 
       idx_never_touched = exprt(ID_forall);

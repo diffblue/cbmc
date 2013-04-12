@@ -2,18 +2,20 @@
 
 #include <std_expr.h>
 #include <replace_expr.h>
+#include <arith_tools.h>
+
+#include <ansi-c/c_types.h>
 
 #include "polynomial.h"
-#include "util.h"
-
 
 exprt polynomialt::to_expr() {
   exprt ret = nil_exprt();
 
   for (vector<monomialt>::iterator m_it = monomials.begin();
        m_it != monomials.end();
-       ++m_it) {
-    exprt mon_expr = make_constant(m_it->coeff);
+       ++m_it)
+  {
+    exprt mon_expr = from_integer(m_it->coeff, signed_int_type());
 
     for (vector<monomialt::termt>::iterator t_it = m_it->terms.begin();
          t_it != m_it->terms.end();
