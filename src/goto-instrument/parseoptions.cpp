@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/remove_function_pointers.h>
+#include <goto-programs/remove_skip.h>
 #include <goto-programs/goto_inline.h>
 #include <goto-programs/show_claims.h>
 #include <goto-programs/set_claims.h>
@@ -60,6 +61,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "function.h"
 #include "branch.h"
 #include "wmm/weak_memory.h"
+
+#if 0
+#include "accelerate/accelerate.h"
+#endif
 
 /*******************************************************************\
 
@@ -343,6 +348,16 @@ int goto_instrument_parseoptionst::doit()
         dot(goto_functions, ns, std::cout);
         
       return 0;
+    }
+
+    if(cmdline.isset("accelerate"))
+    {
+      #if 0
+      namespacet ns(symbol_table);
+      accelerate_functions(goto_functions, ns);
+      remove_skip(goto_functions);
+      goto_functions.update();
+      #endif
     }
     
     // write new binary?

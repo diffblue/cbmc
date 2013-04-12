@@ -25,7 +25,8 @@ Function: havoc_loops
 
 void havoc_loops(goto_functionst::goto_functiont &goto_function)
 {
-  natural_loopst natural_loops(goto_function.body);
+  natural_loopst natural_loops;
+  natural_loops(goto_function.body);
   local_may_aliast local_may_alias(goto_function);
 }
 
