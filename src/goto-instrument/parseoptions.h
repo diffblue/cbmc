@@ -48,7 +48,8 @@ Author: Daniel Kroening, kroening@kroening.com
   "(show-rw-set)(cav11)" \
   "(show-natural-loops)(accelerate)(havoc-loops)" \
   "(error-label):(string-abstraction)" \
-  "(verbosity):(version)(xml-ui)"
+  "(verbosity):(version)(xml-ui)(show-loops)" \
+  "(accelerate)"
 
 class goto_instrument_parseoptionst:
   public parseoptions_baset,
