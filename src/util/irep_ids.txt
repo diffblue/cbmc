@@ -335,6 +335,8 @@ unary_minus unary-
 unary_plus unary+
 mult *
 div /
+power **
+factorial_power
 component
 pretty_name
 C_class #class
