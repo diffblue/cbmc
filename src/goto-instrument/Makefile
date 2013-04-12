@@ -28,7 +28,7 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
 
 INCLUDES= -I .. -I ../util
 
-LIBS = -lpthread
+LIBS =
 
 CLEANFILES = goto-instrument$(EXEEXT)
 
