@@ -30,7 +30,7 @@ class acceleratet {
 
   void extend_path(goto_programt::targett &t,
                    goto_programt::targett &loop_header,
-                   natural_loopst::natural_loopt &loop,
+                   natural_loops_mutablet::natural_loopt &loop,
                    patht &prefix,
                    pathst &loop_paths,
                    pathst &exit_paths);
@@ -41,7 +41,7 @@ class acceleratet {
   goto_programt &program;
   goto_functionst &goto_functions;
   const namespacet &ns;
-  natural_loopst natural_loops;
+  natural_loops_mutablet natural_loops;
 
   typedef map<patht, goto_programt> accelerator_mapt;
 };

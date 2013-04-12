@@ -10,6 +10,7 @@
 #include "accelerate.h"
 #include "path.h"
 #include "polynomial_accelerator.h"
+#include "symbolic_accelerator.h"
 
 //#define DEBUG
 
@@ -20,7 +21,7 @@ void acceleratet::find_paths(goto_programt::targett &loop_header,
                              pathst &loop_paths,
                              pathst &exit_paths) {
   patht empty_path;
-  natural_loopst::natural_loopt loop;
+  natural_loops_mutablet::natural_loopt loop;
 
   if (natural_loops.loop_map.find(loop_header) == natural_loops.loop_map.end()) {
     throw "Couldn't find loop";
@@ -34,7 +35,7 @@ void acceleratet::find_paths(goto_programt::targett &loop_header,
 
 void acceleratet::extend_path(goto_programt::targett &t,
                               goto_programt::targett &loop_header,
-                              natural_loopst::natural_loopt &loop,
+                              natural_loops_mutablet::natural_loopt &loop,
                               patht &prefix,
                               pathst &loop_paths,
                               pathst &exit_paths) {
@@ -72,6 +73,14 @@ void acceleratet::extend_path(goto_programt::targett &t,
          it != t->targets.end();
          ++it) {
       goto_programt::targett x = *it;
+
+      if (x->location_number < t->location_number && x != loop_header) {
+        // This is a back edge that isn't to the loop header -- it's an inner
+        // loop, which we're just ignoring for the moment...
+        // XXX - deal with nested loops
+        continue;
+      }
+
       extend_path(x, loop_header, loop, taken_prefix, loop_paths, exit_paths);
     }
 
@@ -155,7 +164,8 @@ int acceleratet::accelerate_loops()
 {
   int num_accelerated = 0;
 
-  for (natural_loopst::loop_mapt::iterator it = natural_loops.loop_map.begin();
+  for (natural_loops_mutablet::loop_mapt::iterator it =
+          natural_loops.loop_map.begin();
        it != natural_loops.loop_map.end();
        ++it) {
     goto_programt::targett t = it->first;

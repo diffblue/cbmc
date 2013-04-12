@@ -1,14 +1,16 @@
+#include <iostream>
 #include <map>
 #include <set>
 #include <string>
 #include <sstream>
 
 #include <goto-programs/goto_program.h>
-#include <goto-programs/goto_check.h>
 #include <goto-programs/wp.h>
 
 #include <goto-symex/goto_symex.h>
 #include <goto-symex/symex_target_equation.h>
+
+#include <analyses/goto_check.h>
 
 #include <ansi-c/expr2c.h>
 
@@ -21,11 +23,12 @@
 #include <rename.h>
 #include <simplify_expr.h>
 #include <replace_expr.h>
+#include <arith_tools.h>
 
 #include "polynomial_accelerator.h"
 #include "util.h"
 
-//#define DEBUG
+#define DEBUG
 
 
 bool polynomial_acceleratort::accelerate(patht &loop, goto_programt &accelerator) {
@@ -43,20 +46,20 @@ bool polynomial_acceleratort::accelerate(patht &loop, goto_programt &accelerator
   goto_programt::instructionst assigns;
 
 #ifdef DEBUG
-  cout << "Polynomial accelerating program:" << endl;
+  std::cout << "Polynomial accelerating program:" << endl;
 
   for (goto_programt::instructionst::iterator it = body.begin();
        it != body.end();
        ++it) {
-    program.output_instruction(ns, "scratch", cout, it);
+    program.output_instruction(ns, "scratch", std::cout, it);
   }
 
-  cout << "Modified:" << endl;
+  std::cout << "Modified:" << endl;
 
   for (set<exprt>::iterator it = targets.begin();
        it != targets.end();
        ++it) {
-    cout << expr2c(*it, ns) << endl;
+    std::cout << expr2c(*it, ns) << endl;
   }
 #endif
 
@@ -106,10 +109,19 @@ bool polynomial_acceleratort::accelerate(patht &loop, goto_programt &accelerator
   }
   */
 
-  exprt guard;
-  bool path_is_monotone = do_assumptions(polynomials, loop, guard);
   substitutiont stashed;
   stash_polynomials(program, polynomials, stashed, body);
+
+  exprt guard;
+  bool path_is_monotone;
+  
+  try {
+    path_is_monotone = do_assumptions(polynomials, loop, guard);
+  } catch (string s) {
+    // Couldn't do WP.
+    std::cout << "Assumptions error: " << s << endl;
+    return false;
+  }
 
   for (map<exprt, polynomialt>::iterator it = polynomials.begin();
        it != polynomials.end();
@@ -157,7 +169,8 @@ bool polynomial_acceleratort::accelerate(patht &loop, goto_programt &accelerator
   // assume(no overflows in previous code);
 
   program.assign(loop_counter, nondet_exprt(loop_counter.type()));
-  program.assume(binary_relation_exprt(loop_counter, ">", make_constant(0)));
+  //program.assume(binary_relation_exprt(loop_counter, ">", make_constant(0)));
+  program.assume(binary_relation_exprt(loop_counter, ">", from_integer(0, signedbv_typet(32))));
 
   for (map<exprt, polynomialt>::iterator it = polynomials.begin();
        it != polynomials.end();
@@ -196,13 +209,13 @@ bool polynomial_acceleratort::fit_polynomial(goto_programt::instructionst &body,
   scratch_programt program(symbol_table);
 
 #ifdef DEBUG
-  cout << "Fitting a polynomial for " << expr2c(var, ns) << ", which depends on:"
+  std::cout << "Fitting a polynomial for " << expr2c(var, ns) << ", which depends on:"
        << endl;
 
   for (set<exprt>::iterator it = influence.begin();
        it != influence.end();
        ++it) {
-    cout << expr2c(*it, ns) << endl;
+    std::cout << expr2c(*it, ns) << endl;
   }
 #endif
 
@@ -282,11 +295,11 @@ bool polynomial_acceleratort::fit_polynomial(goto_programt::instructionst &body,
   goto_programt::targett assertion = program.add_instruction(ASSERT);
   assertion->guard = false_exprt();
 
-  ensure_no_overflows(program);
+  //ensure_no_overflows(program);
 
 #ifdef DEBUG
-  cout << "Fitting polynomial with program:" << endl;
-  program.output(cout);
+  std::cout << "Fitting polynomial with program:" << endl;
+  program.output(std::cout);
 #endif
 
   // If the path is satisfiable, we've fitted a polynomial.  Extract the
@@ -297,9 +310,9 @@ bool polynomial_acceleratort::fit_polynomial(goto_programt::instructionst &body,
       return true;
     }
   } catch (string s) {
-    cout << "Error in fitting polynomial SAT check: " << s << endl;
+    std::cout << "Error in fitting polynomial SAT check: " << s << endl;
   } catch (const char *s) {
-    cout << "Error in fitting polynomial SAT check: " << s << endl;
+    std::cout << "Error in fitting polynomial SAT check: " << s << endl;
   }
 
   return false;
@@ -520,25 +533,25 @@ bool polynomial_acceleratort::check_inductive(map<exprt, polynomialt> polynomial
   }
 
 #ifdef DEBUG
-  cout << "Checking following program for inductiveness:" << endl;
-  program.output(cout);
+  std::cout << "Checking following program for inductiveness:" << endl;
+  program.output(std::cout);
 #endif
 
   try {
     if (program.check_sat()) {
       // We found a counterexample to inductiveness... :-(
   #ifdef DEBUG
-      cout << "Not inductive!" << endl;
+      std::cout << "Not inductive!" << endl;
   #endif
     return false;
     } else {
       return true;
     }
   } catch (string s) {
-    cout << "Error in inductiveness SAT check: " << s << endl;
+    std::cout << "Error in inductiveness SAT check: " << s << endl;
     return false;
   } catch (const  char *s) {
-    cout << "Error in inductiveness SAT check: " << s << endl;
+    std::cout << "Error in inductiveness SAT check: " << s << endl;
     return false;
   }
 }
@@ -629,7 +642,6 @@ exprt polynomial_acceleratort::precondition(patht &path) {
     }
   }
 
-  ret = not_exprt(ret);
   simplify(ret, ns);
 
   return ret;
@@ -723,23 +735,23 @@ bool polynomial_acceleratort::do_assumptions(map<exprt, polynomialt> polynomials
   ensure_no_overflows(program);
 
 #ifdef DEBUG
-  cout << "Checking following program for monotonicity:" << endl;
-  program.output(cout);
+  std::cout << "Checking following program for monotonicity:" << endl;
+  program.output(std::cout);
 #endif
 
   try {
     if (program.check_sat()) {
   #ifdef DEBUG
-      cout << "Path is not monotone" << endl;
+      std::cout << "Path is not monotone" << endl;
   #endif
 
       return false;
     }
   } catch (string s) {
-    cout << "Error in monotonicity SAT check: " << s << endl;
+    std::cout << "Error in monotonicity SAT check: " << s << endl;
      return false;
   } catch (const char *s) {
-    cout << "Error in monotonicity SAT check: " << s << endl;
+    std::cout << "Error in monotonicity SAT check: " << s << endl;
      return false;
   }
 
@@ -755,7 +767,7 @@ void polynomial_acceleratort::ensure_no_overflows(goto_programt &program) {
   checker_options.set_option("assumptions", true);
   checker_options.set_option("simplify", true);
 
-  goto_check(ns, checker_options, program);
+  //goto_check(ns, checker_options, goto_functions);
 }
 
 polynomial_acceleratort::expr_pairst polynomial_acceleratort::gather_array_assignments(
@@ -799,7 +811,7 @@ bool polynomial_acceleratort::do_arrays(goto_programt::instructionst &loop_body,
                                         substitutiont &substitution,
                                         scratch_programt &program) {
 #ifdef DEBUG
-  cout << "Doing arrays..." << endl;
+  std::cout << "Doing arrays..." << endl;
 #endif
 
   set<exprt> arrays_written;
@@ -820,7 +832,7 @@ bool polynomial_acceleratort::do_arrays(goto_programt::instructionst &loop_body,
     // We weren't able to model some array assignment.  That means we need to
     // bail out altogether :-(
 #ifdef DEBUG
-    cout << "Couldn't model an array assignment :-(" << endl;
+    std::cout << "Couldn't model an array assignment :-(" << endl;
 #endif
     return false;
   }
@@ -889,7 +901,7 @@ bool polynomial_acceleratort::do_arrays(goto_programt::instructionst &loop_body,
         if (index.max_degree(loop_counter) > 1 ||
             (index.coeff(loop_counter) != 1 && index.coeff(loop_counter) != -1)) {
 #ifdef DEBUG
-          cout << expr2c(index.to_expr(), ns) << " is nonlinear" << endl;
+          std::cout << expr2c(index.to_expr(), ns) << " is nonlinear" << endl;
 #endif
           nonlinear_index = true;
         }
@@ -1020,13 +1032,13 @@ bool polynomial_acceleratort::array_assignments2polys(
     if (!expr2poly(index_expr.index(), polynomials, poly_assignment.index)) {
       // Couldn't convert the index -- bail out.
 #ifdef DEBUG
-      cout << "Couldn't convert index: " << expr2c(index_expr.index(), ns) << endl;
+      std::cout << "Couldn't convert index: " << expr2c(index_expr.index(), ns) << endl;
 #endif
       return false;
     }
 
 #ifdef DEBUG
-    cout << "Converted index to: " << expr2c(poly_assignment.index.to_expr(), ns)
+    std::cout << "Converted index to: " << expr2c(poly_assignment.index.to_expr(), ns)
         << endl;
 #endif
 
@@ -1035,12 +1047,12 @@ bool polynomial_acceleratort::array_assignments2polys(
     } else if (!expr2poly(it->second, polynomials, poly_assignment.value)) {
       // Couldn't conver the RHS -- bail out.
 #ifdef DEBUG
-      cout << "Couldn't convert RHS: " << expr2c(it->second, ns) << endl;
+      std::cout << "Couldn't convert RHS: " << expr2c(it->second, ns) << endl;
 #endif
       return false;
     } else {
 #ifdef DEBUG
-      cout << "Converted RHS to: " << expr2c(poly_assignment.value.to_expr(), ns)
+      std::cout << "Converted RHS to: " << expr2c(poly_assignment.value.to_expr(), ns)
           << endl;
 #endif
 
@@ -1063,7 +1075,7 @@ bool polynomial_acceleratort::expr2poly(exprt &expr,
   }
 
 #ifdef DEBUG
-  cout << "expr2poly(" << expr2c(subbed_expr, ns) << ")" << endl;
+  std::cout << "expr2poly(" << expr2c(subbed_expr, ns) << ")" << endl;
 #endif
 
   try {
