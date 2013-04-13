@@ -9,21 +9,21 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 #include <cstdlib>
 
-#include <expr_util.h>
-#include <c_misc.h>
-#include <base_type.h>
-#include <arith_tools.h>
-#include <rename.h>
-#include <i2string.h>
-#include <array_name.h>
-#include <config.h>
-#include <std_expr.h>
-#include <cprover_prefix.h>
-#include <pointer_offset_size.h>
-#include <symbol_table.h>
-#include <guard.h>
-#include <options.h>
-#include <pointer_predicates.h>
+#include <util/expr_util.h>
+#include <util/c_misc.h>
+#include <util/base_type.h>
+#include <util/arith_tools.h>
+#include <util/rename.h>
+#include <util/i2string.h>
+#include <util/array_name.h>
+#include <util/config.h>
+#include <util/std_expr.h>
+#include <util/cprover_prefix.h>
+#include <util/pointer_offset_size.h>
+#include <util/symbol_table.h>
+#include <util/guard.h>
+#include <util/options.h>
+#include <util/pointer_predicates.h>
 
 #include <ansi-c/c_types.h>
 #include <ansi-c/c_typecast.h>

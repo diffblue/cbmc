@@ -6,10 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <arith_tools.h>
-#include <config.h>
-#include <std_types.h>
-#include <bitvector.h>
+#include <util/arith_tools.h>
+#include <util/config.h>
+#include <util/std_types.h>
+#include <util/bitvector.h>
 
 #include "boolbv_width.h"
 

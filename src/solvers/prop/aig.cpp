@@ -6,11 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <assert.h>
-
+#include <cassert>
 #include <iostream>
 
-#include <i2string.h>
+#include <util/i2string.h>
 
 #include "aig.h"
 

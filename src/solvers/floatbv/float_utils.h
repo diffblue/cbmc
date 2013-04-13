@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_FLOAT_UTILS_H
 #define CPROVER_FLOAT_UTILS_H
 
-#include <ieee_float.h>
+#include <util/ieee_float.h>
 
 #include <solvers/flattening/bv_utils.h>
 

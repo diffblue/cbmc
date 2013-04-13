@@ -6,7 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <stdlib.h>
+#include <cstdlib>
 
 #ifdef __linux__
 #include <unistd.h>
@@ -24,13 +24,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <unistd.h>
 #endif
 
-#include <std_expr.h>
-#include <std_types.h>
-#include <tempfile.h>
-#include <arith_tools.h>
-#include <i2string.h>
-#include <string2int.h>
-#include <prefix.h>
+#include <util/std_expr.h>
+#include <util/std_types.h>
+#include <util/tempfile.h>
+#include <util/arith_tools.h>
+#include <util/i2string.h>
+#include <util/string2int.h>
+#include <util/prefix.h>
 
 #include "smt1_dec.h"
 

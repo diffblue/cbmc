@@ -8,10 +8,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 //#include <assert.h>
 
-#include <prefix.h>
-#include <cprover_prefix.h>
-#include <xml_expr.h>
-#include <xml.h>
+#include <util/prefix.h>
+#include <util/cprover_prefix.h>
+#include <util/xml_expr.h>
+#include <util/xml.h>
 
 #include <langapi/language_util.h>
 

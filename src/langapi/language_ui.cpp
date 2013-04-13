@@ -10,11 +10,11 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <memory>
 #include <iostream>
 
-#include <i2string.h>
-#include <namespace.h>
-#include <language.h>
-#include <cmdline.h>
-#include <unicode.h>
+#include <util/i2string.h>
+#include <util/namespace.h>
+#include <util/language.h>
+#include <util/cmdline.h>
+#include <util/unicode.h>
 
 #include "language_ui.h"
 #include "mode.h"

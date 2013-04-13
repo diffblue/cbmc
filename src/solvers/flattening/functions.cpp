@@ -8,10 +8,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 //#define DEBUG
 
-#include <assert.h>
+#include <cassert>
 
-#include <std_types.h>
-#include <std_expr.h>
+#include <util/std_types.h>
+#include <util/std_expr.h>
 
 #include <solvers/prop/prop.h>
 

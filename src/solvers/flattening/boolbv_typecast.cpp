@@ -6,9 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <assert.h>
+#include <cassert>
 
-#include <std_types.h>
+#include <util/std_types.h>
 
 #include "boolbv.h"
 #include "boolbv_type.h"

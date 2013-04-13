@@ -6,9 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <string.h>
-#include <stdlib.h>
-#include <assert.h>
+#include <cstring>
+#include <cstdlib>
+#include <cassert>
 
 #ifndef _WIN32
 #include <unistd.h>
@@ -19,8 +19,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #define getpid _getpid
 #endif
 
-#include <i2string.h>
-#include <prefix.h>
+#include <util/i2string.h>
+#include <util/prefix.h>
 
 #include "cvc_dec.h"
 

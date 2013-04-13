@@ -14,7 +14,7 @@ OBJ += ../big-int/bigint$(OBJEXT) \
       ../assembler/assembler$(LIBEXT) \
       ../langapi/langapi$(LIBEXT)
 
-INCLUDES= -I .. -I ../util
+INCLUDES= -I ..
 
 LIBS =
 

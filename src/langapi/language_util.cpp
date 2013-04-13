@@ -8,12 +8,12 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <memory>
 
+#include <util/symbol_table.h>
+#include <util/namespace.h>
+#include <util/language.h>
+
 #include "language_util.h"
 #include "mode.h"
-
-#include <symbol_table.h>
-#include <namespace.h>
-#include <language.h>
 
 /*******************************************************************\
 

@@ -8,9 +8,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 
-#include <arith_tools.h>
-#include <std_expr.h>
-#include <threeval.h>
+#include <util/arith_tools.h>
+#include <util/std_expr.h>
+#include <util/threeval.h>
 
 #include "boolbv.h"
 #include "boolbv_type.h"

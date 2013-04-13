@@ -1,7 +1,7 @@
 SRC = xml_language.cpp xml_parser.cpp y.tab.cpp lex.yy.cpp xml_typecheck.cpp \
       xml_parse_tree.cpp
 
-INCLUDES= -I .. -I ../util
+INCLUDES= -I ..
 
 include ../config.inc
 include ../common

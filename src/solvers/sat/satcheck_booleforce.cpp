@@ -6,9 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <assert.h>
+#include <cassert>
 
-#include <i2string.h>
+#include <util/i2string.h>
 
 #include "satcheck_booleforce.h"
 

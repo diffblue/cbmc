@@ -8,10 +8,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <iostream>
 
-#include <i2string.h>
-
-#include <std_expr.h>
-#include <base_type.h>
+#include <util/i2string.h>
+#include <util/std_expr.h>
+#include <util/base_type.h>
 
 #include <langapi/language_util.h>
 

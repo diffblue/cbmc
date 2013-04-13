@@ -8,7 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <iostream>
 
-#include <std_types.h>
+#include <util/std_types.h>
 
 #include "boolbv.h"
 

@@ -20,7 +20,7 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../solvers/solvers$(LIBEXT) \
       ../util/util$(LIBEXT)
 
-INCLUDES= -I .. -I ../util
+INCLUDES= -I ..
 
 LIBS =
 

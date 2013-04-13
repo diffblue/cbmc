@@ -6,11 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <expr.h>
-#include <std_types.h>
-#include <std_expr.h>
-#include <arith_tools.h>
-#include <pointer_offset_size.h>
+#include <util/expr.h>
+#include <util/std_types.h>
+#include <util/std_expr.h>
+#include <util/arith_tools.h>
+#include <util/pointer_offset_size.h>
 
 #include "flatten_byte_operators.h"
 

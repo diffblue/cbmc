@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <arith_tools.h>
-#include <std_types.h>
+#include <util/arith_tools.h>
+#include <util/std_types.h>
 
 #include "boolbv.h"
 

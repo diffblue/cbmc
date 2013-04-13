@@ -8,8 +8,8 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 
 #include <cassert>
 
-#include <i2string.h>
-#include <threeval.h>
+#include <util/i2string.h>
+#include <util/threeval.h>
 
 #include "satcheck_lingeling.h"
 

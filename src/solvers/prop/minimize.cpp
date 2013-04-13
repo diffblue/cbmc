@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <threeval.h>
-#include <i2string.h>
+#include <util/threeval.h>
+#include <util/i2string.h>
 
 #include "prop.h"
 #include "minimize.h"

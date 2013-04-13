@@ -1,6 +1,6 @@
 SRC = float_utils.cpp
 
-INCLUDES= -I .. -I ../util
+INCLUDES= -I ..
 
 include ../config.inc
 include ../common
@@ -8,8 +8,8 @@ include ../common
 LIBS = ../solvers/solvers$(LIBEXT) \
        ../ansi-c/ansi-c$(LIBEXT) \
        ../linking/linking$(LIBEXT) \
-			 ../util/util$(LIBEXT) \
-			 ../big-int/bigint$(OBJEXT)
+       ../util/util$(LIBEXT) \
+       ../big-int/bigint$(OBJEXT)
 
 CLEANFILES = floatbv$(LIBEXT) float_utils_test$(EXEEXT)
 

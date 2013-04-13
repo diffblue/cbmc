@@ -1,6 +1,6 @@
 SRC = lex.yy.cpp assembler_parser.cpp
 
-INCLUDES= -I .. -I ../util
+INCLUDES= -I ..
 
 include ../config.inc
 include ../common

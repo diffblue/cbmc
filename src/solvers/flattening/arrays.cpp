@@ -11,11 +11,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 #include <iostream>
 
-#include <std_expr.h>
-#include <std_types.h>
-#include <arith_tools.h>
-#include <base_type.h>
-#include <namespace.h>
+#include <util/std_expr.h>
+#include <util/std_types.h>
+#include <util/arith_tools.h>
+#include <util/base_type.h>
+#include <util/namespace.h>
 
 #include <solvers/prop/prop.h>
 

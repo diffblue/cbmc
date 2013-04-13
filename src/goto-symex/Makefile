@@ -9,7 +9,7 @@ SRC = symex_target.cpp symex_target_equation.cpp goto_symex.cpp \
       symex_throw.cpp symex_atomic_section.cpp memory_model.cpp \
       memory_model_sc.cpp partial_order_concurrency.cpp
 
-INCLUDES= -I .. -I ../util
+INCLUDES= -I ..
 
 include ../config.inc
 include ../common

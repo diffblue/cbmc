@@ -8,9 +8,9 @@ Revisions: Roberto Bruttomesso, roberto.bruttomesso@unisi.ch
 
 \*******************************************************************/
 
-#include <assert.h>
+#include <cassert>
 
-#include <i2string.h>
+#include <util/i2string.h>
 
 #include "smt1_prop.h"
 

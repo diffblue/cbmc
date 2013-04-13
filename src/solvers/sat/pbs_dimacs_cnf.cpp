@@ -6,13 +6,12 @@ Author: Alex Groce
 
 \*******************************************************************/
 
-#include <stdlib.h>
-#include <string.h>
-
+#include <cstdlib>
+#include <cstring>
 #include <fstream>
 #include <iostream>
 
-#include <i2string.h>
+#include <util/i2string.h>
 
 #include "pbs_dimacs_cnf.h"
 

@@ -15,7 +15,7 @@ SRC = goto_convert.cpp goto_convert_function_call.cpp \
       compute_called_functions.cpp link_to_library.cpp \
       remove_return_values.cpp
 
-INCLUDES= -I .. -I ../util
+INCLUDES= -I ..
 
 include ../config.inc
 include ../common
