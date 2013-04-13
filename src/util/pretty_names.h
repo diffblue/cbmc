@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 class namespacet;
 
+#if 0
 class pretty_namest
 {
  public:
@@ -31,5 +32,6 @@ class pretty_namest
   
   const irep_idt &pretty_name(const irep_idt &identifier) const;
 };
+#endif
 
 #endif
