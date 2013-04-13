@@ -2382,12 +2382,6 @@ gcc_asm_labels_list:
         | gcc_asm_labels_list ',' gcc_local_label
         ;
 
-/*** External Definitions ***********************************************/
-
-
-/* note: the following has been changed from the ANSI-C grammar:	*/
-/*	- translation unit is allowed to be empty!			*/
-
 translation_unit:
         /* nothing */
         | external_definition_list
@@ -2733,29 +2727,7 @@ parameter_abstract_declarator:
         ;
 
 postfixing_abstract_declarator:
-          array_abstract_declarator
-        | '(' ')'
-        {
-          $$=$1;
-          set($$, ID_code);
-          stack($$).add(ID_arguments);
-          stack($$).add(ID_subtype)=irept(ID_abstract);
-        }
-        | '('
-          {
-            unsigned prefix=++PARSER.current_scope().compound_counter;
-            PARSER.new_scope(i2string(prefix)+"::");
-          }
-          parameter_type_list
-          ')'
-        {
-          $$=$1;
-          set($$, ID_code);
-          stack($$).add(ID_subtype)=irept(ID_abstract);
-          stack($$).add(ID_arguments).get_sub().
-            swap(stack($3).add(ID_subtypes).get_sub());
-          PARSER.pop_scope();
-        }
+          parameter_postfixing_abstract_declarator
         /* The following rule implements K&R headers! */
         | '('
           {
@@ -2788,6 +2760,7 @@ parameter_postfixing_abstract_declarator:
         }
         | '('
           {
+            // this is where functions are produced
             unsigned prefix=++PARSER.current_scope().compound_counter;
             PARSER.new_scope(i2string(prefix)+"::");
           }
