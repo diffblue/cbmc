@@ -13,8 +13,9 @@ Date: 2012
 
 #include <map>
 
-#include <graph.h>
-#include <namespace.h>
+#include <util/graph.h>
+#include <util/namespace.h>
+
 #include <goto-programs/goto_program.h>
 
 #include "event_graph.h"

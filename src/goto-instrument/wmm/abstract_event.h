@@ -11,8 +11,8 @@ Date: 2012
 #ifndef ABSTRACT_EVENT_H
 #define ABSTRACT_EVENT_H
 
-#include <location.h>
-#include <graph.h>
+#include <util/location.h>
+#include <util/graph.h>
 
 #include "wmm.h"
 

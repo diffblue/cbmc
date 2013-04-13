@@ -2,11 +2,11 @@
  * Routines for doing finite calculus.
  */
 
+#include <cassert>
+
+#include <util/replace_expr.h>
+
 #include "finite_calculus.h"
-
-#include <replace_expr.h>
-
-#include <assert.h>
 
 exprt indefinite_sum(const exprt &e, const exprt &x) {
   assert(!"indefinite_sum() not implemented");

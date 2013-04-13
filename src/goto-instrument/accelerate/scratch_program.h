@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include <symbol_table.h>
+#include <util/symbol_table.h>
 
 #include <goto-programs/goto_program.h>
 #include <goto-programs/goto_functions.h>

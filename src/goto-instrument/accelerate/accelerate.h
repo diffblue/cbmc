@@ -1,8 +1,8 @@
+#include <util/namespace.h>
+
 #include <analyses/natural_loops.h>
 
 #include <goto-programs/goto_functions.h>
-
-#include <namespace.h>
 
 #include "path.h"
 

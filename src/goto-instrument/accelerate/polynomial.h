@@ -3,19 +3,18 @@
 
 #include <vector>
 
-#include <expr.h>
+#include <util/expr.h>
 
-using namespace std;
-
-class monomialt {
- public:
+class monomialt
+{
+public:
   typedef struct term {
     exprt var;
     unsigned int exp;   // This means exponent, not expression.
   } termt;
 
   // Invariant: this vector is sorted lexicographically w.r.t. the variable.
-  vector<termt> terms;
+  std::vector<termt> terms;
   int coeff;
 
   int compare(monomialt &other);
@@ -24,13 +23,14 @@ class monomialt {
   bool contains(exprt &var);
 };
 
-typedef map<exprt, exprt> substitutiont;
+typedef std::map<exprt, exprt> substitutiont;
 
-class polynomialt {
- public:
+class polynomialt
+{
+public:
   // Invariant: this vector is sorted according to the monomial ordering induced
   // by monomialt::compare()
-  vector<monomialt> monomials;
+  std::vector<monomialt> monomials;
 
   exprt to_expr();
   void from_expr(exprt &expr);
@@ -47,6 +47,6 @@ class polynomialt {
   int coeff(exprt &expr);
 };
 
-typedef vector<polynomialt> polynomialst;
+typedef std::vector<polynomialt> polynomialst;
 
 #endif // POLYNOMIAL_H

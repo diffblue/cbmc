@@ -1,8 +1,8 @@
 #include <vector>
 
-#include <std_expr.h>
-#include <replace_expr.h>
-#include <arith_tools.h>
+#include <util/std_expr.h>
+#include <util/replace_expr.h>
+#include <util/arith_tools.h>
 
 #include <ansi-c/c_types.h>
 
@@ -11,13 +11,13 @@
 exprt polynomialt::to_expr() {
   exprt ret = nil_exprt();
 
-  for (vector<monomialt>::iterator m_it = monomials.begin();
+  for (std::vector<monomialt>::iterator m_it = monomials.begin();
        m_it != monomials.end();
        ++m_it)
   {
     exprt mon_expr = from_integer(m_it->coeff, signed_int_type());
 
-    for (vector<monomialt::termt>::iterator t_it = m_it->terms.begin();
+    for (std::vector<monomialt::termt>::iterator t_it = m_it->terms.begin();
          t_it != m_it->terms.end();
          ++t_it) {
       for (int i = 0; i < t_it->exp; i++) {
@@ -80,11 +80,12 @@ void polynomialt::from_expr(exprt &expr) {
     throw "Couldn't polynomialize";
   }
 }
+
 void polynomialt::substitute(substitutiont &substitution) {
-  for (vector<monomialt>::iterator m_it = monomials.begin();
+  for (std::vector<monomialt>::iterator m_it = monomials.begin();
        m_it != monomials.end();
        ++m_it) {
-    for (vector<monomialt::termt>::iterator t_it = m_it->terms.begin();
+    for (std::vector<monomialt::termt>::iterator t_it = m_it->terms.begin();
          t_it != m_it->terms.end();
          ++t_it) {
       if (substitution.find(t_it->var) != substitution.end()) {
@@ -99,8 +100,8 @@ void polynomialt::add(polynomialt &other) {
   //
   // Note: it'd be really interesting to try to verify this function
   // automatically.  I don't really know how you'd do it...
-  vector<monomialt>::iterator it, jt;
-  vector<monomialt> new_monomials;
+  std::vector<monomialt>::iterator it, jt;
+  std::vector<monomialt> new_monomials;
 
   it = monomials.begin();
   jt = other.monomials.begin();
@@ -159,21 +160,22 @@ void polynomialt::add(monomialt &monomial) {
 
 void polynomialt::mult(int scalar) {
   // Scalar multiplication.  Just multiply the coefficients of each monomial.
-  for (vector<monomialt>::iterator it = monomials.begin();
+  for (std::vector<monomialt>::iterator it = monomials.begin();
        it != monomials.end();
        ++it) {
     it->coeff *= scalar;
   }
 }
 
-void polynomialt::mult(polynomialt &other) {
-  vector<monomialt> my_monomials = monomials;
-  monomials = vector<monomialt>();
+void polynomialt::mult(polynomialt &other)
+{
+  std::vector<monomialt> my_monomials = monomials;
+  monomials = std::vector<monomialt>();
 
-  for (vector<monomialt>::iterator it = my_monomials.begin();
+  for (std::vector<monomialt>::iterator it = my_monomials.begin();
        it != my_monomials.end();
        ++it) {
-    for (vector<monomialt>::iterator jt = other.monomials.begin();
+    for (std::vector<monomialt>::iterator jt = other.monomials.begin();
          jt != other.monomials.end();
          ++jt) {
       monomialt product;
@@ -185,7 +187,7 @@ void polynomialt::mult(polynomialt &other) {
       }
 
       // Terms are sorted, so lockstep is fine again.
-      vector<monomialt::termt>::iterator t1, t2;
+      std::vector<monomialt::termt>::iterator t1, t2;
 
       t1 = it->terms.begin();
       t2 = jt->terms.begin();
@@ -235,7 +237,7 @@ void polynomialt::mult(polynomialt &other) {
 int monomialt::compare(monomialt &other) {
   // Using lexicographic ordering, for no particular reason other than it's easy
   // to implement...
-  vector<termt>::iterator it, jt;
+  std::vector<termt>::iterator it, jt;
 
   it = terms.begin();
   jt = other.terms.begin();
@@ -286,11 +288,11 @@ int polynomialt::max_degree(exprt &var) {
   // We want the degree of the highest degree monomial in which `var' appears.
   int maxd = 0;
 
-  for (vector<monomialt>::iterator it = monomials.begin();
+  for (std::vector<monomialt>::iterator it = monomials.begin();
        it != monomials.end();
        ++it) {
     if (it->contains(var)) {
-      maxd = max(maxd, it->degree());
+      maxd = std::max(maxd, it->degree());
     }
   }
 
@@ -308,7 +310,7 @@ int polynomialt::coeff(exprt &var) {
 
   monomialt m = p.monomials.front();
 
-  for (vector<monomialt>::iterator it = monomials.begin();
+  for (std::vector<monomialt>::iterator it = monomials.begin();
        it != monomials.end();
        ++it) {
     int res = m.compare(*it);
@@ -326,7 +328,7 @@ int polynomialt::coeff(exprt &var) {
 int monomialt::degree() {
   int deg = 0;
 
-  for (vector<termt>::iterator it = terms.begin();
+  for (std::vector<termt>::iterator it = terms.begin();
        it != terms.end();
        ++it) {
     deg += it->exp;
@@ -342,7 +344,7 @@ bool monomialt::contains(exprt &var) {
     return false;
   }
 
-  for (vector<termt>::iterator it = terms.begin();
+  for (std::vector<termt>::iterator it = terms.begin();
        it != terms.end();
        ++it) {
     if (it->var == var) {

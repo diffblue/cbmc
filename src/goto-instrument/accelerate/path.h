@@ -1,11 +1,11 @@
 #ifndef PATH_H
 #define PATH_H
 
-#include <goto-programs/goto_program.h>
-
-#include <std_expr.h>
-
 #include <list>
+
+#include <util/std_expr.h>
+
+#include <goto-programs/goto_program.h>
 
 using namespace std;
 

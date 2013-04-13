@@ -6,10 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <cprover_prefix.h>
-#include <prefix.h>
-#include <std_expr.h>
-#include <expr_util.h>
+#include <util/cprover_prefix.h>
+#include <util/prefix.h>
+#include <util/std_expr.h>
+#include <util/expr_util.h>
 
 #include <ansi-c/c_types.h>
 #include <ansi-c/string_constant.h>

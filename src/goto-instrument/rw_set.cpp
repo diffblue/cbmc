@@ -8,10 +8,10 @@ Date: February 2006
 
 \*******************************************************************/
 
-#include <expr_util.h>
-#include <std_expr.h>
-#include <std_code.h>
-#include <namespace.h>
+#include <util/expr_util.h>
+#include <util/std_expr.h>
+#include <util/std_code.h>
+#include <util/namespace.h>
 
 #include <langapi/language_util.h>
 

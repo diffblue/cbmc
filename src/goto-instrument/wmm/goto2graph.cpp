@@ -17,11 +17,11 @@ Date: 2012
 #include <cstdlib>
 #endif
 
-#include <prefix.h>
-#include <cprover_prefix.h>
-#include <options.h>
-#include <message.h>
-#include <i2string.h>
+#include <util/prefix.h>
+#include <util/cprover_prefix.h>
+#include <util/options.h>
+#include <util/message.h>
+#include <util/i2string.h>
 
 #include "../rw_set.h"
 #include "fence.h"

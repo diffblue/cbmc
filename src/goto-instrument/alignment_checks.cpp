@@ -6,9 +6,9 @@ Author:
 
 \*******************************************************************/
 
-#include <pointer_offset_size.h>
-#include <config.h>
-#include <symbol_table.h>
+#include <util/pointer_offset_size.h>
+#include <util/config.h>
+#include <util/symbol_table.h>
 
 #include "alignment_checks.h"
 
