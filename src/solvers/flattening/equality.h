@@ -11,8 +11,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <map>
 
-#include <hash_cont.h>
-#include <expr.h>
+#include <util/hash_cont.h>
+#include <util/expr.h>
 
 #include <solvers/prop/prop_conv.h>
 

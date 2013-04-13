@@ -13,9 +13,9 @@ Author: Daniel Kroening, kroening@kroening.com
 // convert expression to boolean formula
 //
 
-#include <hash_cont.h>
-#include <mp_arith.h>
-#include <expr.h>
+#include <util/hash_cont.h>
+#include <util/mp_arith.h>
+#include <util/expr.h>
 
 #include "bv_utils.h"
 #include "boolbv_width.h"

@@ -10,7 +10,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_ARRAYS_H
 
 #include <set>
-#include <union_find.h>
+
+#include <util/union_find.h>
 
 #include "equality.h"
 

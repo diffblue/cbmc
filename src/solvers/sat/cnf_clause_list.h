@@ -11,7 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <list>
 
-#include <threeval.h>
+#include <util/threeval.h>
 
 #include "cnf.h"
 

@@ -11,7 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <map>
 
-#include <message.h>
+#include <util/message.h>
 
 #include "prop_conv.h"
 

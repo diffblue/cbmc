@@ -12,7 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ostream>
 #include <set>
 
-#include <threeval.h>
+#include <util/threeval.h>
 
 #include <solvers/prop/prop.h>
 

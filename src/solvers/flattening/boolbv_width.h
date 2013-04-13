@@ -9,9 +9,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_BOOLBV_WIDTH_H
 #define CPROVER_BOOLBV_WIDTH_H
 
-#include <std_types.h>
-#include <namespace.h>
-#include <hash_cont.h>
+#include <util/std_types.h>
+#include <util/namespace.h>
+#include <util/hash_cont.h>
 
 class boolbv_widtht
 {

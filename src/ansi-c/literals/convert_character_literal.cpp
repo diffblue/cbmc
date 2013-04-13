@@ -6,11 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <assert.h>
+#include <cassert>
 
-#include <arith_tools.h>
-#include <i2string.h>
-#include <std_expr.h>
+#include <util/arith_tools.h>
+#include <util/i2string.h>
+#include <util/std_expr.h>
 
 #include <ansi-c/c_types.h>
 

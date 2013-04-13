@@ -6,10 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <assert.h>
+#include <cassert>
 
-#include <arith_tools.h>
-#include <unicode.h>
+#include <util/arith_tools.h>
+#include <util/unicode.h>
 
 #include "../string_constant.h"
 #include "../c_types.h"

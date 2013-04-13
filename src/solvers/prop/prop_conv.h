@@ -16,9 +16,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <string>
 #include <map>
 
-#include <hash_cont.h>
-#include <decision_procedure.h>
-#include <expr.h>
+#include <util/hash_cont.h>
+#include <util/decision_procedure.h>
+#include <util/expr.h>
 
 #include "literal.h"
 

@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_COVER_GOALS_H
 #define CPROCER_COVER_GOALS_H
 
-#include <message.h>
+#include <util/message.h>
 
 #include "prop_conv.h"
 

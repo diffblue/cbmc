@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_BV_UTILS_H
 #define CPROVER_BV_UTILS_H
 
-#include <mp_arith.h>
+#include <util/mp_arith.h>
 
 #include <solvers/prop/prop.h>
 

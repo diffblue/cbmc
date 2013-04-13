@@ -11,7 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <set>
 
-#include <std_expr.h>
+#include <util/std_expr.h>
 
 #include <solvers/prop/prop_conv.h>
 
