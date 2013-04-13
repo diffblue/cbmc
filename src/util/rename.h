@@ -10,7 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 // automated variable renaming
 //
 
-#include <irep.h>
+#include "irep.h"
 
 class exprt;
 class namespacet;

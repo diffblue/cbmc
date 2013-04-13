@@ -12,7 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 #include <vector>
 
-#include <mp_arith.h>
+#include "mp_arith.h"
 
 class constant_exprt;
 

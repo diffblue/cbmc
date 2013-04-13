@@ -21,7 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ostream>
 
-#include <expr.h>
+#include "expr.h"
 
 /*! \brief Symbol table entry.
     \ingroup gr_symbol_table

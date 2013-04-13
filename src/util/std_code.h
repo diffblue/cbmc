@@ -11,7 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 
-#include <expr.h>
+#include "expr.h"
 
 /*! \brief A statement in a programming language
 */

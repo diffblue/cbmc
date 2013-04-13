@@ -6,13 +6,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <assert.h>
-#include <stdlib.h>
+#include <cassert>
+#include <cstdlib>
 
-#include <arith_tools.h>
-#include <std_types.h>
-#include <std_expr.h>
-
+#include "arith_tools.h"
+#include "std_types.h"
+#include "std_expr.h"
 #include "bv_arithmetic.h"
 
 /*******************************************************************\

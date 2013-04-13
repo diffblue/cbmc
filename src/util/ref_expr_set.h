@@ -11,9 +11,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <set>
 
-#include <hash_cont.h>
-#include <expr.h>
-#include <reference_counting.h>
+#include "hash_cont.h"
+#include "expr.h"
+#include "reference_counting.h"
 
 extern const hash_set_cont<exprt, irep_hash> empty_expr_set;
 

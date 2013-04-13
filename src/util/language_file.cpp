@@ -8,8 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <fstream>
 
-#include <i2string.h>
-
+#include "i2string.h"
 #include "language.h"
 #include "language_file.h"
   

@@ -8,7 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <stdio.h>
 
-#include <c_misc.h>
+#include "c_misc.h"
 
 /*******************************************************************\
 

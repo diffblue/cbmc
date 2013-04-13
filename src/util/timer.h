@@ -1,7 +1,10 @@
 #ifndef CPROVER_TIMER_H
 #define CPROVER_TIMER_H
 
-#include <time_stopping.h>
+#include <string>
+#include <ostream>
+
+#include "time_stopping.h"
 
 class timert
 {
@@ -13,9 +16,8 @@ private:
   bool started;
 
   public:
-  timert()
-     : _total_time(0), _start_time(0), _latest_time(0),
-        nr_starts(0), started(false)
+  timert(): _total_time(0), _start_time(0), _latest_time(0),
+            nr_starts(0), started(false)
   {
   }
 
