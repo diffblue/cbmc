@@ -4,10 +4,10 @@
 #include <map>
 #include <set>
 
+#include <util/symbol_table.h>
+
 #include <goto-programs/goto_program.h>
 #include <goto-programs/goto_functions.h>
-
-#include <symbol_table.h>
 
 #include "scratch_program.h"
 #include "polynomial.h"

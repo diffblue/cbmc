@@ -8,12 +8,12 @@ Date: February 2006
 
 \*******************************************************************/
 
-#include <hash_cont.h>
-#include <std_expr.h>
-#include <expr_util.h>
-#include <guard.h>
-#include <symbol_table.h>
-#include <prefix.h>
+#include <util/hash_cont.h>
+#include <util/std_expr.h>
+#include <util/expr_util.h>
+#include <util/guard.h>
+#include <util/symbol_table.h>
+#include <util/prefix.h>
 
 #include <pointer-analysis/value_sets.h>
 #include <goto-programs/remove_skip.h>

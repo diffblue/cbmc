@@ -10,7 +10,7 @@ Date: 2012
 
 #include <string>
 
-#include <i2string.h>
+#include <util/i2string.h>
 
 #include "goto2graph.h"
 

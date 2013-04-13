@@ -8,14 +8,14 @@ Date: September 2011
 
 \*******************************************************************/
 
-#include <cprover_prefix.h>
+#include <util/cprover_prefix.h>
 
 #if 0
-#include <hash_cont.h>
-#include <std_expr.h>
-#include <expr_util.h>
-#include <guard.h>
-#include <prefix.h>
+#include <util/hash_cont.h>
+#include <util/std_expr.h>
+#include <util/expr_util.h>
+#include <util/guard.h>
+#include <util/prefix.h>
 
 #include <goto-programs/remove_skip.h>
 #endif

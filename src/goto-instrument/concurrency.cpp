@@ -8,9 +8,9 @@ Date: October 2012
 
 \*******************************************************************/
 
-#include <std_expr.h>
-#include <find_symbols.h>
-#include <replace_symbol.h>
+#include <util/std_expr.h>
+#include <util/find_symbols.h>
+#include <util/replace_symbol.h>
 
 #include <analyses/is_threaded.h>
 

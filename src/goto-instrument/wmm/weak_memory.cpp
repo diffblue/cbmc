@@ -19,10 +19,10 @@ Date: September 2011
 #include <fstream>
 #include <iostream>
 
-#include <expr_util.h>
-#include <cprover_prefix.h>
-#include <prefix.h>
-#include <i2string.h>
+#include <util/expr_util.h>
+#include <util/cprover_prefix.h>
+#include <util/prefix.h>
+#include <util/i2string.h>
 
 #include <goto-programs/remove_skip.h>
 

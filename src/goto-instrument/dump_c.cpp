@@ -11,21 +11,21 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <map>
 #include <list>
 
-#include <config.h>
-#include <hash_cont.h>
-#include <language.h>
-#include <std_expr.h>
-#include <std_code.h>
-#include <std_types.h>
-#include <prefix.h>
-#include <simplify_expr.h>
-#include <replace_symbol.h>
-#include <find_symbols.h>
-#include <arith_tools.h>
-#include <suffix.h>
-#include <base_type.h>
-#include <type_eq.h>
-#include <i2string.h>
+#include <util/config.h>
+#include <util/hash_cont.h>
+#include <util/language.h>
+#include <util/std_expr.h>
+#include <util/std_code.h>
+#include <util/std_types.h>
+#include <util/prefix.h>
+#include <util/simplify_expr.h>
+#include <util/replace_symbol.h>
+#include <util/find_symbols.h>
+#include <util/arith_tools.h>
+#include <util/suffix.h>
+#include <util/base_type.h>
+#include <util/type_eq.h>
+#include <util/i2string.h>
 
 #include <langapi/mode.h>
 #include <ansi-c/ansi_c_language.h>

@@ -1,12 +1,12 @@
 #ifndef SYMBOLIC_ACCELERATOR_H
 #define SYMBOLIC_ACCELERATOR_H
 
+#include <util/replace_expr.h>
+#include <util/symbol_table.h>
+
 #include "path.h"
 #include "polynomial.h"
 #include "linearize.h"
-
-#include <replace_expr.h>
-#include <symbol_table.h>
 
 #include "Eigen/Eigen"
 #include "Eigen/Eigenvalues"

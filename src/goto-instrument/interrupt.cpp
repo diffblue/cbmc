@@ -8,11 +8,11 @@ Date: September 2011
 
 \*******************************************************************/
 
-#include <cprover_prefix.h>
-#include <std_expr.h>
-#include <std_code.h>
-#include <prefix.h>
-#include <symbol_table.h>
+#include <util/cprover_prefix.h>
+#include <util/std_expr.h>
+#include <util/std_code.h>
+#include <util/prefix.h>
+#include <util/symbol_table.h>
 
 #include "interrupt.h"
 #include "rw_set.h"

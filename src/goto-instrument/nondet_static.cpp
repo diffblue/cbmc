@@ -8,10 +8,10 @@ Date: November 2011
 
 \*******************************************************************/
 
-#include <namespace.h>
-#include <std_expr.h>
-#include <cprover_prefix.h>
-#include <prefix.h>
+#include <util/namespace.h>
+#include <util/std_expr.h>
+#include <util/cprover_prefix.h>
+#include <util/prefix.h>
 
 #include <goto-programs/goto_functions.h>
 

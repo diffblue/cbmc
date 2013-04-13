@@ -8,8 +8,9 @@ Date: February 2012
 
 \*******************************************************************/
 
-#include "fence.h"
 #include <iostream>
+
+#include "fence.h"
 
 bool is_fence(
   goto_programt::instructiont instruction,

@@ -16,7 +16,7 @@ Date: 2012
 #include <map>
 #include <ostream>
 
-#include <graph.h>
+#include <util/graph.h>
 
 #include "abstract_event.h"
 #include "data_dp.h"

@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <cprover_prefix.h>
-#include <prefix.h>
+#include <util/cprover_prefix.h>
+#include <util/prefix.h>
 
 #include "function.h"
 #include "branch.h"

@@ -11,7 +11,7 @@ Date: February 2012
 #ifndef FENCE_H
 #define FENCE_H
 
-#include <symbol_table.h>
+#include <util/symbol_table.h>
 #include <goto-programs/goto_program.h>
 
 bool is_fence(

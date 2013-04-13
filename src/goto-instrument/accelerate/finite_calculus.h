@@ -1,7 +1,7 @@
 #ifndef FINITE_CALCULUS_H
 #define FINITE_CALCULUS_H
 
-#include <std_expr.h>
+#include <util/std_expr.h>
 
 /*
  * Convert a factorial power to an expression using conventional powers.

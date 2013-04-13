@@ -1,9 +1,8 @@
-#include <i2string.h>
-#include <fixedbv.h>
-#include <decision_procedure.h>
+#include <util/i2string.h>
+#include <util/fixedbv.h>
+#include <util/decision_procedure.h>
 
 #include <goto-symex/slice.h>
-
 
 #include "scratch_program.h"
 

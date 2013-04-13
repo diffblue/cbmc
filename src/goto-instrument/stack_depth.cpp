@@ -8,12 +8,12 @@ Date: November 2011
 
 \*******************************************************************/
 
-#include <symbol_table.h>
-#include <std_expr.h>
-#include <std_types.h>
-#include <arith_tools.h>
-#include <cprover_prefix.h>
-#include <i2string.h>
+#include <util/symbol_table.h>
+#include <util/std_expr.h>
+#include <util/std_types.h>
+#include <util/arith_tools.h>
+#include <util/cprover_prefix.h>
+#include <util/i2string.h>
 
 #include <goto-programs/goto_functions.h>
 
