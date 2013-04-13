@@ -10,7 +10,7 @@ SRC = arith_tools.cpp base_type.cpp cmdline.cpp config.cpp symbol_table.cpp \
       find_symbols.cpp rational_tools.cpp ui_message.cpp simplify_utils.cpp \
       time_stopping.cpp symbol.cpp irep_hash_container.cpp cout_message.cpp \
       type_eq.cpp guard.cpp array_name.cpp gcd.cpp message_stream.cpp \
-      substitute.cpp decision_procedure.cpp union_find.cpp pretty_names.cpp \
+      substitute.cpp decision_procedure.cpp union_find.cpp \
       xml.cpp xml_irep.cpp xml_expr.cpp std_types.cpp std_code.cpp \
       format_constant.cpp find_macros.cpp ref_expr_set.cpp std_expr.cpp \
       irep_serialization.cpp symbol_serialization.cpp fixedbv.cpp \
