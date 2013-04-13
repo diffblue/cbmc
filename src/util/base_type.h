@@ -9,8 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_BASE_TYPE_H
 #define CPROVER_BASE_TYPE_H
 
-#include <union_find.h>
-#include <irep.h>
+#include "union_find.h"
+#include "irep.h"
 
 class exprt;
 class typet;

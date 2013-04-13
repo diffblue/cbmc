@@ -9,8 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_FIXEDBV_UTIL_H
 #define CPROVER_FIXEDBV_UTIL_H
 
-#include <mp_arith.h>
-#include <format_spec.h>
+#include "mp_arith.h"
+#include "format_spec.h"
 
 class constant_exprt;
 class fixedbv_typet;

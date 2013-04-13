@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_PROGRAMS_POINTER_PREDICATES_H
 #define CPROVER_GOTO_PROGRAMS_POINTER_PREDIATES_H
 
-#include <namespace.h>
+#include "namespace.h"
 
 exprt same_object(const exprt &p1, const exprt &p2);
 exprt deallocated(const exprt &pointer, const namespacet &ns);

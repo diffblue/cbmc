@@ -6,10 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <stdlib.h>
+#include <cstdlib>
 
-#include <i2string.h>
-
+#include "i2string.h"
 #include "xml.h"
 
 /*******************************************************************\

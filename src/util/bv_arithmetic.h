@@ -11,7 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ostream>
 
-#include <mp_arith.h>
+#include "mp_arith.h"
 #include "format_spec.h"
 
 class exprt;

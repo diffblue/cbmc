@@ -14,7 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <set>
 #include <map>
 
-#include <irep.h>
+#include "irep.h"
 
 class namespacet;
 

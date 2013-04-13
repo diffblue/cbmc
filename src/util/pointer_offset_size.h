@@ -9,8 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_POINTER_OFFSET_SIZE_H
 #define CPROVER_POINTER_OFFSET_SIZE_H
 
-#include <mp_arith.h>
-#include <irep.h>
+#include "mp_arith.h"
+#include "irep.h"
 
 class exprt;
 class namespacet;

@@ -12,8 +12,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <map>
 #include <set>
 
-#include <type.h>
-#include <mp_arith.h>
+#include "type.h"
+#include "mp_arith.h"
 
 class exprt;
 class index_exprt;

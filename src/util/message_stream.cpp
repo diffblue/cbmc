@@ -6,10 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <string.h>
+#include <cstring>
 
-#include <prefix.h>
-
+#include "prefix.h"
 #include "message_stream.h"
 
 /*******************************************************************\

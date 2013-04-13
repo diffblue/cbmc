@@ -6,14 +6,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <assert.h>
-
-#include <arith_tools.h>
-#include <std_types.h>
-#include <math.h>
 #include <stdint.h>
+
+#include <cassert>
+#include <cmath>
 #include <limits>
 
+#include "arith_tools.h"
+#include "std_types.h"
 #include "std_expr.h"
 #include "ieee_float.h"
 

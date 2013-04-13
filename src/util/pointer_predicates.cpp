@@ -6,12 +6,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <cprover_prefix.h>
-#include <std_expr.h>
-#include <expr_util.h>
-#include <arith_tools.h>
-#include <pointer_offset_size.h>
-#include <config.h>
+#include "cprover_prefix.h"
+#include "std_expr.h"
+#include "expr_util.h"
+#include "arith_tools.h"
+#include "pointer_offset_size.h"
+#include "config.h"
 
 #include "pointer_predicates.h"
 
@@ -349,8 +349,6 @@ Function: object_upper_bound
  Purpose:
 
 \*******************************************************************/
-
-#include <iostream>
 
 exprt object_upper_bound(
   const exprt &pointer,

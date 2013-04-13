@@ -7,10 +7,9 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #ifndef CPROVER_COUT_MESSAGE_H
-
 #define CPROVER_COUT_MESSAGE_H
 
-#include <message.h>
+#include "message.h"
 
 class cout_message_handlert:public message_handlert
 {

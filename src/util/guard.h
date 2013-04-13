@@ -11,7 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ostream>
 
-#include <expr.h>
+#include "expr.h"
 
 class guardt
 {

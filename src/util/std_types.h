@@ -18,8 +18,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 
-#include <expr.h>
-#include <mp_arith.h>
+#include "expr.h"
+#include "mp_arith.h"
 
 class constant_exprt;
 

@@ -8,15 +8,15 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 
-#include <expr.h>
-#include <arith_tools.h>
-#include <std_types.h>
-#include <std_expr.h>
-#include <expr_util.h>
-#include <config.h>
-#include <simplify_expr.h>
-#include <namespace.h>
-#include <symbol.h>
+#include "expr.h"
+#include "arith_tools.h"
+#include "std_types.h"
+#include "std_expr.h"
+#include "expr_util.h"
+#include "config.h"
+#include "simplify_expr.h"
+#include "namespace.h"
+#include "symbol.h"
 
 #include "pointer_offset_size.h"
 

@@ -18,7 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 
-#include <std_types.h>
+#include "std_types.h"
 
 /*! \defgroup gr_std_expr Conversion to specific expressions
  *  Conversion to subclasses of @ref exprt

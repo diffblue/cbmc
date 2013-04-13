@@ -14,8 +14,8 @@ Author: Daniel Kroening, kroening@kroening.com
 // false: replaced something
 //
 
-#include <hash_cont.h>
-#include <expr.h>
+#include "hash_cont.h"
+#include "expr.h"
 
 typedef hash_map_cont<exprt, exprt, irep_hash> replace_mapt;
 

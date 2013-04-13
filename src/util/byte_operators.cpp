@@ -6,10 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <std_types.h>
-#include <pointer_offset_size.h>
-#include <arith_tools.h>
-
+#include "std_types.h"
+#include "pointer_offset_size.h"
+#include "arith_tools.h"
 #include "byte_operators.h"
 #include "namespace.h"
 

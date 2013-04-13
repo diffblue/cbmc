@@ -13,7 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <set>
 #include <string>
 
-#include <message.h>
+#include "message.h"
 
 class symbol_tablet;
 class language_filet;

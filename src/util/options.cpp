@@ -6,9 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <i2string.h>
-#include <string2int.h>
-
+#include "i2string.h"
+#include "string2int.h"
 #include "options.h"
 
 /*******************************************************************\

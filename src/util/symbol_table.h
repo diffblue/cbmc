@@ -19,11 +19,10 @@ Author: Daniel Kroening, kroening@kroening.com
 */
 
 #include <ostream>
-
 #include <map>
 
-#include <hash_cont.h>
-#include <symbol.h>
+#include "hash_cont.h"
+#include "symbol.h"
 
 #define forall_symbols(it, expr) \
   for(symbol_tablet::symbolst::const_iterator it=(expr).begin(); \

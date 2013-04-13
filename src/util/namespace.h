@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_NAMESPACE_H
 #define CPROVER_NAMESPACE_H
 
-#include <irep.h>
+#include "irep.h"
 
 class symbol_tablet;
 class exprt;

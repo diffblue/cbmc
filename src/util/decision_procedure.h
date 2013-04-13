@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_DECISION_PROCEDURE_H
 #define CPROVER_DECISION_PROCEDURE_H
 
-#include <message.h>
+#include "message.h"
 
 class exprt;
 class namespacet;
