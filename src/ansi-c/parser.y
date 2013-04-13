@@ -2772,7 +2772,7 @@ postfixing_abstract_declarator:
           stack($$).add(ID_arguments).get_sub().
             swap(stack($3).add(ID_subtypes).get_sub());
           PARSER.pop_scope();
-          adjust_KnR_arguments(stack($$).add(ID_arguments), stack($5));
+          adjust_KnR_parameters(stack($$).add(ID_arguments), stack($5));
           stack($$).set(ID_C_KnR, true);
         }
         ;

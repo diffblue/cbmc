@@ -49,7 +49,7 @@ void ansi_c_declarationt::to_symbol(symbolt &symbol) const
   symbol.is_type=get_is_type();
   symbol.is_extern=get_is_extern();
   symbol.is_macro=get_is_macro();
-  symbol.is_argument=get_is_argument();
+  symbol.is_parameter=get_is_parameter();
 
   bool is_code=symbol.type.id()==ID_code;
 

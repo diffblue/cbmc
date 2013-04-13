@@ -66,7 +66,7 @@ bool read_bin_goto_object_v2(
     sym.is_input = flags & (1 << 11);
     sym.is_output = flags & (1 << 10);
     sym.is_state_var = flags & (1 << 9);
-    sym.is_argument = flags & (1 << 8);
+    sym.is_parameter = flags & (1 << 8);
     //sym.free_var = flags & (1 << 7);
     //sym.binding = flags & (1 << 6);
     sym.is_lvalue = flags & (1 << 5);

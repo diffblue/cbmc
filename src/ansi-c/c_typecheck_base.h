@@ -234,7 +234,7 @@ protected:
   virtual void typecheck_typeof_type(typet &type);
   virtual void typecheck_array_type(array_typet &type);
   virtual void typecheck_vector_type(vector_typet &type);
-  virtual void adjust_function_argument(typet &type) const;
+  virtual void adjust_function_parameter(typet &type) const;
   virtual bool is_complete_type(const typet &type) const;
 
   // this cleans expressions in array types

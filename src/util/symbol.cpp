@@ -40,7 +40,7 @@ void symbolt::show(std::ostream &out) const
   if(is_input)           out << " input";
   if(is_output)          out << " output";
   if(is_macro)           out << " macro";
-  if(is_argument)        out << " argument";
+  if(is_parameter)       out << " parameter";
   if(is_property)        out << " property";
   if(is_state_var)       out << " state_var";
   if(mode!="")           out << " mode=" << mode;
@@ -110,7 +110,7 @@ void symbolt::to_irep(irept &dest) const
   if(is_input) dest.set("is_input", true);
   if(is_output) dest.set("is_output", true);
   if(is_state_var) dest.set("is_statevar", true);
-  if(is_argument) dest.set("is_argument", true);
+  if(is_parameter) dest.set("is_parameter", true);
   if(is_property) dest.set("is_property", true);
   if(is_lvalue) dest.set("is_lvalue", true);
   if(is_static_lifetime) dest.set("is_static_lifetime", true);
@@ -150,7 +150,7 @@ void symbolt::from_irep(const irept &src)
   is_input=src.get_bool("is_input");
   is_output=src.get_bool("is_output");
   is_state_var=src.get_bool("is_state_var");
-  is_argument=src.get_bool("is_argument");
+  is_parameter=src.get_bool("is_parameter");
   is_property=src.get_bool("property");
   is_lvalue=src.get_bool("lvalue");
   is_static_lifetime=src.get_bool("static_lifetime");
@@ -193,7 +193,7 @@ void symbolt::swap(symbolt &b)
   SYM_SWAP2(is_input);
   SYM_SWAP2(is_output);
   SYM_SWAP2(is_state_var);
-  SYM_SWAP2(is_argument);
+  SYM_SWAP2(is_parameter);
   SYM_SWAP2(is_lvalue);
   SYM_SWAP2(is_static_lifetime);
   SYM_SWAP2(is_thread_local);

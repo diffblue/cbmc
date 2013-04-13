@@ -71,7 +71,7 @@ public:
   // ANSI-C
   bool is_static_lifetime, is_thread_local;
   bool is_lvalue, is_file_local, is_extern, is_volatile,
-       is_argument;
+       is_parameter;
 
   symbolt()
   {
@@ -83,7 +83,7 @@ public:
     value.make_nil();
     location.make_nil();
     is_lvalue=is_thread_local=is_static_lifetime=is_file_local=is_extern=
-    is_type=is_macro=is_exported=is_argument=
+    is_type=is_macro=is_exported=is_parameter=
     is_volatile=is_input=is_output=is_state_var=is_property=false;
     name=module=base_name=mode=pretty_name=irep_idt();
   }
