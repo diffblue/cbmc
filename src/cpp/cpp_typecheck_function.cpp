@@ -6,10 +6,11 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#include <i2string.h>
-#include <identifier.h>
+#include <util/i2string.h>
+#include <util/identifier.h>
+#include <util/expr_util.h>
+
 #include <ansi-c/c_qualifiers.h>
-#include <expr_util.h>
 
 #include "cpp_template_type.h"
 #include "cpp_typecheck.h"

@@ -6,9 +6,9 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#include <assert.h>
+#include <cassert>
 
-#include <std_types.h>
+#include <util/std_types.h>
 
 #include <ansi-c/c_qualifiers.h>
 

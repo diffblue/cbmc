@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_PROGRAMS_CFG_H
 #define CPROVER_GOTO_PROGRAMS_CFG_H
 
-#include <std_expr.h>
+#include <util/std_expr.h>
 
 #include "goto_functions.h"
 

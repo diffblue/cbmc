@@ -6,16 +6,16 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <assert.h>
+#include <cassert>
 
-#include <expr_util.h>
-#include <i2string.h>
-#include <cprover_prefix.h>
-#include <prefix.h>
-#include <arith_tools.h>
-#include <base_type.h>
-#include <std_expr.h>
-#include <symbol_table.h>
+#include <util/expr_util.h>
+#include <util/i2string.h>
+#include <util/cprover_prefix.h>
+#include <util/prefix.h>
+#include <util/arith_tools.h>
+#include <util/base_type.h>
+#include <util/std_expr.h>
+#include <util/symbol_table.h>
 
 #include <ansi-c/c_types.h>
 

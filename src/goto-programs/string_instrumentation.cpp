@@ -8,13 +8,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <algorithm>
 
-#include <std_expr.h>
-#include <std_code.h>
-#include <expr_util.h>
-#include <message_stream.h>
-#include <arith_tools.h>
-#include <config.h>
-#include <symbol_table.h>
+#include <util/std_expr.h>
+#include <util/std_code.h>
+#include <util/expr_util.h>
+#include <util/message_stream.h>
+#include <util/arith_tools.h>
+#include <util/config.h>
+#include <util/symbol_table.h>
 
 #include <goto-programs/format_strings.h>
 #include <ansi-c/c_types.h>

@@ -9,9 +9,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 #include <iostream>
 
-#include <ieee_float.h>
-#include <fixedbv.h>
-#include <std_expr.h>
+#include <util/ieee_float.h>
+#include <util/fixedbv.h>
+#include <util/std_expr.h>
 
 #include "interpreter_class.h"
 

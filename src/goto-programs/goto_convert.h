@@ -9,8 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_PROGRAMS_GOTO_CONVERT_H
 #define CPROVER_GOTO_PROGRAMS_GOTO_CONVERT_H
 
-#include <message.h>
-#include <std_code.h>
+#include <util/message.h>
+#include <util/std_code.h>
 
 #include "goto_program.h"
 

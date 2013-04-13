@@ -9,10 +9,10 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #ifndef CPROVER_LANGUAGE_UI_H
 #define CPROVER_LANGUAGE_UI_H
 
-#include <message.h>
-#include <language_file.h>
-#include <symbol_table.h>
-#include <ui_message.h>
+#include <util/message.h>
+#include <util/language_file.h>
+#include <util/symbol_table.h>
+#include <util/ui_message.h>
 
 class cmdlinet;
 

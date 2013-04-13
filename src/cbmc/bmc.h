@@ -12,8 +12,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <list>
 #include <map>
 
-#include <hash_cont.h>
-#include <options.h>
+#include <util/hash_cont.h>
+#include <util/options.h>
 
 #include <solvers/prop/prop.h>
 #include <solvers/prop/prop_conv.h>

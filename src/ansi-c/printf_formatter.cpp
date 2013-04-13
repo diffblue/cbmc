@@ -6,12 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <assert.h>
-
+#include <cassert>
 #include <sstream>
 
-#include <format_constant.h>
-#include <simplify_expr.h>
+#include <util/format_constant.h>
+#include <util/simplify_expr.h>
 
 #include "c_types.h"
 #include "printf_formatter.h"

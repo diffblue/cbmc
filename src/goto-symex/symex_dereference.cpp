@@ -6,9 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <expr_util.h>
-#include <pointer_offset_size.h>
-#include <arith_tools.h>
+#include <util/expr_util.h>
+#include <util/pointer_offset_size.h>
+#include <util/arith_tools.h>
 
 #include <pointer-analysis/dereference.h>
 #include <pointer-analysis/rewrite_index.h>

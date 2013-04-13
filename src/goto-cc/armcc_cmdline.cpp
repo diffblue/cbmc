@@ -6,8 +6,7 @@ Author: Daniel Kroening
 
 \*******************************************************************/
 
-#include <string.h>
-
+#include <cstring>
 #include <iostream>
 
 #include "armcc_cmdline.h"

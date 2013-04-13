@@ -8,7 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <hash_cont.h>
 
-#include <std_expr.h>
+#include <util/std_expr.h>
 
 #include "slice.h"
 #include "symex_slice_class.h"

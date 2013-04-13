@@ -12,8 +12,9 @@ Date: July 2006
 #ifndef GOTO_PROGRAM_SERIALIZATION_H_
 #define GOTO_PROGRAM_SERIALIZATION_H_
 
+#include <util/irep_serialization.h>
+
 #include <goto-programs/goto_program.h>
-#include <irep_serialization.h>
 
 class goto_program_serializationt {
   private:

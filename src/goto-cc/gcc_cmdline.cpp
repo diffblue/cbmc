@@ -10,7 +10,7 @@ Author: CM Wintersteiger, 2006
 #include <cstring>
 #include <iostream>
 
-#include <prefix.h>
+#include <util/prefix.h>
 
 #include "gcc_cmdline.h"
 

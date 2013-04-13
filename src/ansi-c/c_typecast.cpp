@@ -8,11 +8,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 
-#include <config.h>
-#include <expr_util.h>
-#include <std_expr.h>
-#include <base_type.h>
-#include <symbol.h>
+#include <util/config.h>
+#include <util/expr_util.h>
+#include <util/std_expr.h>
+#include <util/base_type.h>
+#include <util/symbol.h>
 
 #include "c_typecast.h"
 #include "c_types.h"

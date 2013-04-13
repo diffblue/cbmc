@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_PROGRAMS_LINK_TO_LIBRARY_H
 #define CPROVER_GOTO_PROGRAMS_LINK_TO_LIBRARY_H
 
-#include <message.h>
+#include <util/message.h>
 
 #include "goto_functions.h"
 

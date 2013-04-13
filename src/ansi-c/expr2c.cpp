@@ -13,19 +13,19 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <map>
 #include <set>
 
-#include <arith_tools.h>
-#include <c_misc.h>
-#include <config.h>
-#include <std_types.h>
-#include <std_code.h>
-#include <i2string.h>
-#include <ieee_float.h>
-#include <fixedbv.h>
-#include <prefix.h>
-#include <lispirep.h>
-#include <lispexpr.h>
-#include <symbol.h>
-#include <suffix.h>
+#include <util/arith_tools.h>
+#include <util/c_misc.h>
+#include <util/config.h>
+#include <util/std_types.h>
+#include <util/std_code.h>
+#include <util/i2string.h>
+#include <util/ieee_float.h>
+#include <util/fixedbv.h>
+#include <util/prefix.h>
+#include <util/lispirep.h>
+#include <util/lispexpr.h>
+#include <util/symbol.h>
+#include <util/suffix.h>
 
 #include "expr2c.h"
 #include "c_types.h"

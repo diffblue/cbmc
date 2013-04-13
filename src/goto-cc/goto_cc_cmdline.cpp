@@ -11,7 +11,7 @@ Date:   April 2010
 #include <cstring>
 #include <cassert>
 
-#include <prefix.h>
+#include <util/prefix.h>
 
 #include "goto_cc_cmdline.h"
 

@@ -6,14 +6,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <assert.h>
+#include <cassert>
 
-#include <prefix.h>
-#include <cprover_prefix.h>
-#include <base_type.h>
-#include <std_code.h>
-#include <std_expr.h>
-#include <expr_util.h>
+#include <util/prefix.h>
+#include <util/cprover_prefix.h>
+#include <util/base_type.h>
+#include <util/std_code.h>
+#include <util/std_expr.h>
+#include <util/expr_util.h>
 
 #include "remove_skip.h"
 #include "goto_inline.h"

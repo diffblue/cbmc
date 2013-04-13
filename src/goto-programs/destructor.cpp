@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <std_types.h>
-#include <std_code.h>
+#include <util/std_types.h>
+#include <util/std_code.h>
 
 #include "destructor.h"
 

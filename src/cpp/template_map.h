@@ -12,7 +12,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <map>
 #include <ostream>
 
-#include <expr.h>
+#include <util/expr.h>
 
 #include "cpp_template_type.h"
 #include "cpp_template_args.h"

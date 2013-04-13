@@ -6,10 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <config.h>
-#include <arith_tools.h>
-#include <simplify_expr.h>
-#include <std_expr.h>
+#include <util/config.h>
+#include <util/arith_tools.h>
+#include <util/simplify_expr.h>
+#include <util/std_expr.h>
 
 #include "c_sizeof.h"
 #include "c_typecast.h"

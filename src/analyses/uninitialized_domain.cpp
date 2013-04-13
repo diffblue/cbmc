@@ -8,8 +8,8 @@ Date: January 2010
 
 \*******************************************************************/
 
-#include <std_expr.h>
-#include <std_code.h>
+#include <util/std_expr.h>
+#include <util/std_code.h>
 
 #include "uninitialized_domain.h"
 

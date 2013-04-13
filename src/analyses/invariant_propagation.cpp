@@ -6,11 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <expr_util.h>
-#include <simplify_expr.h>
-#include <base_type.h>
-#include <symbol_table.h>
-#include <std_expr.h>
+#include <util/expr_util.h>
+#include <util/simplify_expr.h>
+#include <util/base_type.h>
+#include <util/symbol_table.h>
+#include <util/std_expr.h>
 
 #include "invariant_propagation.h"
 

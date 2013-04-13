@@ -10,10 +10,10 @@ Author: CM Wintersteiger, 2006
 #include <cstdio>
 #include <iostream>
 
-#include <tempdir.h>
-#include <config.h>
-#include <prefix.h>
-#include <suffix.h>
+#include <util/tempdir.h>
+#include <util/config.h>
+#include <util/prefix.h>
+#include <util/suffix.h>
 
 #include "compile.h"
 #include "version.h"

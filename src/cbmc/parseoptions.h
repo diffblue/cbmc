@@ -9,8 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_CBMC_PARSEOPTIONS_H
 #define CPROVER_CBMC_PARSEOPTIONS_H
 
-#include <ui_message.h>
-#include <parseoptions.h>
+#include <util/ui_message.h>
+#include <util/parseoptions.h>
 
 #include <langapi/language_ui.h>
 

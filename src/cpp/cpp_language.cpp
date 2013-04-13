@@ -11,8 +11,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <sstream>
 #include <fstream>
 
-#include <config.h>
-#include <replace_symbol.h>
+#include <util/config.h>
+#include <util/replace_symbol.h>
 
 #include <linking/linking.h>
 #include <linking/entry_point.h>

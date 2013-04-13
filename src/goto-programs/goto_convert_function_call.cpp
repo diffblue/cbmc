@@ -6,14 +6,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <assert.h>
+#include <cassert>
 
-#include <i2string.h>
-#include <replace_expr.h>
-#include <expr_util.h>
-#include <location.h>
-#include <cprover_prefix.h>
-#include <prefix.h>
+#include <util/i2string.h>
+#include <util/replace_expr.h>
+#include <util/expr_util.h>
+#include <util/location.h>
+#include <util/cprover_prefix.h>
+#include <util/prefix.h>
 
 #include <ansi-c/c_types.h>
 

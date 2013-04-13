@@ -6,20 +6,20 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <assert.h>
+#include <cassert>
 
-#include <arith_tools.h>
-#include <bitvector.h>
-#include <config.h>
-#include <expr_util.h>
-#include <std_types.h>
-#include <prefix.h>
-#include <cprover_prefix.h>
-#include <simplify_expr.h>
-#include <base_type.h>
-#include <std_expr.h>
-#include <i2string.h>
-#include <pointer_offset_size.h>
+#include <util/arith_tools.h>
+#include <util/bitvector.h>
+#include <util/config.h>
+#include <util/expr_util.h>
+#include <util/std_types.h>
+#include <util/prefix.h>
+#include <util/cprover_prefix.h>
+#include <util/simplify_expr.h>
+#include <util/base_type.h>
+#include <util/std_expr.h>
+#include <util/i2string.h>
+#include <util/pointer_offset_size.h>
 
 #include "c_types.h"
 #include "c_typecast.h"

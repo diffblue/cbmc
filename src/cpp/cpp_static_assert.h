@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #ifndef CPROVER_CPP_STATIC_ASSERT_H
 #define CPROVER_CPP_STATIC_ASSERT_H
 
-#include <expr.h>
+#include <util/expr.h>
 
 class cpp_static_assertt:public exprt
 {

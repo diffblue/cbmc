@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_POINTER_ANALYSIS_FAILED_SYMBOLS_H
 #define CPROVER_POINTER_ANALYSIS_FAILED_SYMBOLS_H
 
-#include <irep.h>
+#include <util/irep.h>
 
 class symbol_tablet;
 class exprt;

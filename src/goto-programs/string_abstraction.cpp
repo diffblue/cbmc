@@ -8,13 +8,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <string.h>
 
-#include <std_expr.h>
-#include <std_code.h>
-#include <expr_util.h>
-#include <message_stream.h>
-#include <arith_tools.h>
-#include <i2string.h>
-#include <type_eq.h>
+#include <util/std_expr.h>
+#include <util/std_code.h>
+#include <util/expr_util.h>
+#include <util/message_stream.h>
+#include <util/arith_tools.h>
+#include <util/i2string.h>
+#include <util/type_eq.h>
 
 #include <ansi-c/c_types.h>
 

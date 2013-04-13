@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_CBMC_COUNTEREXAMPLE_BEAUTIFICATION_H
 #define CPROVER_CBMC_COUNTEREXAMPLE_BEAUTIFICATION_H
 
-#include <namespace.h>
+#include <util/namespace.h>
 
 #include <goto-symex/symex_target_equation.h>
 

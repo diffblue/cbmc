@@ -6,7 +6,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#include <type_eq.h>
+#include <util/type_eq.h>
 
 #include "cpp_typecheck.h"
 

@@ -14,6 +14,8 @@ Author: CM Wintersteiger
 #include <ostream>
 #include <string>
 
+#include "goto_functions.h"
+
 class symbol_tablet;
 class goto_functionst;
 class message_handlert;

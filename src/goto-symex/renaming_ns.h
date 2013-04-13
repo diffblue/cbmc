@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_SYMEX_RENAMING_NS_H
 #define CPROVER_GOTO_SYMEX_RENAMING_NS_H
 
-#include <namespace.h>
+#include <util/namespace.h>
 
 class renaming_nst:public namespacet
 {

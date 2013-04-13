@@ -8,10 +8,10 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <iostream>
 
-#include <expr_util.h>
-#include <i2string.h>
-#include <simplify_expr_class.h>
-#include <simplify_expr.h>
+#include <util/expr_util.h>
+#include <util/i2string.h>
+#include <util/simplify_expr_class.h>
+#include <util/simplify_expr.h>
 
 #include "cpp_type2name.h"
 #include "cpp_typecheck.h"

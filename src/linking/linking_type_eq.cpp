@@ -6,8 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <base_type.h>
-#include <type.h>
+#include <util/base_type.h>
+#include <util/type.h>
+
+#include "linking_type_eq.h"
 
 /*******************************************************************\
 

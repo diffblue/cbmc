@@ -6,7 +6,7 @@ Author: CM Wintersteiger
 
 \*******************************************************************/
 
-#include <message_stream.h>
+#include <util/message_stream.h>
 
 #include "remove_unused_functions.h"
 

@@ -11,9 +11,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 
-#include <guard.h>
-#include <std_expr.h>
-#include <i2string.h>
+#include <util/guard.h>
+#include <util/std_expr.h>
+#include <util/i2string.h>
 
 #include <pointer-analysis/value_set.h>
 #include <goto-programs/goto_functions.h>

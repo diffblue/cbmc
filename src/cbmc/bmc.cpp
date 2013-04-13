@@ -11,10 +11,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cstdlib>
 #include <iostream>
 
-#include <i2string.h>
-#include <location.h>
-#include <time_stopping.h>
-#include <message_stream.h>
+#include <util/i2string.h>
+#include <util/location.h>
+#include <util/time_stopping.h>
+#include <util/message_stream.h>
 
 #include <langapi/mode.h>
 #include <langapi/languages.h>

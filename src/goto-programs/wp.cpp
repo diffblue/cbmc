@@ -8,10 +8,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 //#include <langapi/language_util.h>
 
-#include <std_expr.h>
-#include <std_code.h>
-#include <base_type.h>
-#include <i2string.h>
+#include <util/std_expr.h>
+#include <util/std_code.h>
+#include <util/base_type.h>
+#include <util/i2string.h>
 
 #include "wp.h"
 

@@ -12,7 +12,7 @@ Date: May 2007
 #ifndef GOTO_FUNCTION_SERIALIZATION_H_
 #define GOTO_FUNCTION_SERIALIZATION_H_
 
-#include <irep_serialization.h>
+#include <util/irep_serialization.h>
 
 #include <goto-programs/goto_functions.h>
 #include <goto-programs/goto_program_serialization.h>

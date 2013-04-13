@@ -13,7 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ostream>
 #include <string>
 
-#include <message.h>
+#include <util/message.h>
 
 typedef enum { PREPROCESS_AUTO, PREPROCESS_C, PREPROCESS_CPP } preprocess_modet;
 

@@ -9,7 +9,7 @@ Author: CM Wintersteiger
 #ifndef CPROVER_GOTO_PROGRAMS_REMOVE_UNUSED_FUNCTIONS_H
 #define CPROVER_GOTO_PROGRAMS_REMOVE_UNUSED_FUNCTIONS_H
 
-#include <message.h>
+#include <util/message.h>
 
 #include <goto-programs/goto_functions.h>
 

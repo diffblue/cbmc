@@ -11,9 +11,9 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <set>
 
-#include <hash_cont.h>
-#include <symbol.h>
-#include <string_hash.h>
+#include <util/hash_cont.h>
+#include <util/symbol.h>
+#include <util/string_hash.h>
 
 #include "cpp_scope.h"
 

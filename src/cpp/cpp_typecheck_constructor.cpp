@@ -6,10 +6,10 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#include <arith_tools.h>
-#include <std_code.h>
-#include <std_expr.h>
-#include <expr_util.h>
+#include <util/arith_tools.h>
+#include <util/std_code.h>
+#include <util/std_expr.h>
+#include <util/expr_util.h>
 
 #include <ansi-c/c_types.h>
 

@@ -9,12 +9,12 @@ Date: June 2011
 \*******************************************************************/
 
 #include <time.h>
-#include <assert.h>
 
-#include <arith_tools.h>
-#include <pointer_offset_size.h>
+#include <cassert>
 
-#include <numbering.h>
+#include <util/arith_tools.h>
+#include <util/pointer_offset_size.h>
+#include <util/numbering.h>
 
 #include "vcd_goto_trace.h"
 

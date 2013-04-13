@@ -9,7 +9,7 @@ Author: Daniel Kroening, 2013
 #include <cassert>
 #include <iostream>
 
-#include <prefix.h>
+#include <util/prefix.h>
 
 #include "ld_cmdline.h"
 

@@ -13,8 +13,8 @@ Date: June 2003
 
 #include <ostream>
 
-#include <std_types.h>
-#include <symbol.h>
+#include <util/std_types.h>
+#include <util/symbol.h>
 
 template <class bodyT>
 class goto_function_templatet

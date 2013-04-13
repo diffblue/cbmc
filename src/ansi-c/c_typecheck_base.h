@@ -9,12 +9,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_C_TYPECHECK_BASE_H
 #define CPROVER_C_TYPECHECK_BASE_H
 
-#include <symbol_table.h>
-#include <typecheck.h>
-#include <namespace.h>
-#include <std_code.h>
-#include <std_expr.h>
-#include <std_types.h>
+#include <util/symbol_table.h>
+#include <util/typecheck.h>
+#include <util/namespace.h>
+#include <util/std_code.h>
+#include <util/std_expr.h>
+#include <util/std_types.h>
 
 #include "designator.h"
 

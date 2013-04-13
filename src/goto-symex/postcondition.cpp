@@ -6,9 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <find_symbols.h>
-#include <expr_util.h>
-#include <std_expr.h>
+#include <util/find_symbols.h>
+#include <util/expr_util.h>
+#include <util/std_expr.h>
 
 #include "goto_symex_state.h"
 #include "postcondition.h"

@@ -11,7 +11,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <algorithm>
 
-#include <expr.h>
+#include <util/expr.h>
 
 class cpp_tokent
 {

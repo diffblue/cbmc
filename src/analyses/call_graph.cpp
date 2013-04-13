@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <std_expr.h>
-#include <xml.h>
+#include <util/std_expr.h>
+#include <util/xml.h>
 
 #include "call_graph.h"
 

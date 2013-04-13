@@ -9,8 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_LINKING_H
 #define CPROVER_LINKING_H
 
-#include <message.h>
-#include <symbol_table.h>
+#include <util/message.h>
+#include <util/symbol_table.h>
 
 // This merges the symbol table "new_symbol_table" into "dest_symbol_table",
 // applying appropriate renamings to symbols in "new_symbol_table"

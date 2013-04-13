@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #ifndef CPROVER_CPP_CPP_STORAGE_SPEC_H
 #define CPROVER_CPP_CPP_STORAGE_SPEC_H
 
-#include <location.h>
+#include <util/location.h>
 
 class cpp_storage_spect:public irept
 {

@@ -6,9 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <std_expr.h>
-#include <expr_util.h>
-#include <cprover_prefix.h>
+#include <util/std_expr.h>
+#include <util/expr_util.h>
+#include <util/cprover_prefix.h>
 
 #include "goto_symex.h"
 

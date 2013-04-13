@@ -8,8 +8,8 @@ Author:
 
 #include <fstream>
 
-#include <message.h>
-#include <unicode.h>
+#include <util/message.h>
+#include <util/unicode.h>
 
 #include "goto_model.h"
 #include "read_goto_binary.h"

@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #ifndef CPROVER_LANGUAGES_H
 #define CPROVER_LANGUAGES_H
 
-#include <language.h>
+#include <util/language.h>
 
 class languagest
 {

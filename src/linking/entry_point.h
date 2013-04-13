@@ -9,9 +9,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_C_MAIN_H
 #define CPROVER_C_MAIN_H
 
-#include <symbol_table.h>
-#include <message.h>
-#include <std_code.h>
+#include <util/symbol_table.h>
+#include <util/message.h>
+#include <util/std_code.h>
 
 bool entry_point(
   symbol_tablet &symbol_table,

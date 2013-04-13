@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <i2string.h>
-#include <config.h>
+#include <util/i2string.h>
+#include <util/config.h>
 
 #include "internal_additions.h"
 

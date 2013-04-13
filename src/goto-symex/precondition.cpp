@@ -6,7 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <find_symbols.h>
+#include <util/find_symbols.h>
 
 #include <pointer-analysis/goto_program_dereference.h>
 

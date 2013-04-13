@@ -9,14 +9,13 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #ifndef CPROVER_CPP_TYPECHECK_H
 #define CPROVER_CPP_TYPECHECK_H
 
-#include <assert.h>
-
+#include <cassert>
 #include <set>
 #include <list>
 #include <map>
 
-#include <std_code.h>
-#include <std_types.h>
+#include <util/std_code.h>
+#include <util/std_types.h>
 
 #include <ansi-c/c_typecheck_base.h>
 

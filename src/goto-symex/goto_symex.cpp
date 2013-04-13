@@ -6,7 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <simplify_expr.h>
+#include <util/simplify_expr.h>
 
 #include "goto_symex.h"
 

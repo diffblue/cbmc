@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #ifndef CPROVER_MODE_H
 #define CPROVER_MODE_H
 
-#include <irep.h>
+#include <util/irep.h>
 
 class languaget;
 

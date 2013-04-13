@@ -12,7 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <vector>
 #include <ostream>
 
-#include <type.h>
+#include <util/type.h>
 
 class designatort
 {

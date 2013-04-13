@@ -13,11 +13,11 @@ Date: February 2006
 
 #include <ostream>
 
-#include <hash_cont.h>
-#include <guard.h>
-#include <std_code.h>
-#include <namespace.h>
-#include <std_expr.h>
+#include <util/hash_cont.h>
+#include <util/guard.h>
+#include <util/std_code.h>
+#include <util/namespace.h>
+#include <util/std_expr.h>
 
 #include <goto-programs/goto_functions.h>
 #include <pointer-analysis/value_sets.h>

@@ -11,7 +11,7 @@ Date:   April 2010
 #ifndef GOTO_CC_CMDLINE_H
 #define GOTO_CC_CMDLINE_H
 
-#include <cmdline.h>
+#include <util/cmdline.h>
 
 class goto_cc_cmdlinet:public cmdlinet
 {

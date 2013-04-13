@@ -6,11 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_C_TYPECAST_H
-#define CPROVER_C_TYPECAST_H
+#ifndef CPROVER_ANSI_C_C_TYPECAST_H
+#define CPROVER_ANSI_C_C_TYPECAST_H
 
-#include <namespace.h>
-#include <expr.h>
+#include <util/namespace.h>
+#include <util/expr.h>
 
 // try a type cast from expr.type() to type
 //

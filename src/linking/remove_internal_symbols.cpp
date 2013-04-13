@@ -6,11 +6,10 @@ Author: Daniel Kroening
 
 \*******************************************************************/
 
-#include <symbol_table.h>
-#include <namespace.h>
-#include <find_symbols.h>
-
-#include <std_types.h>
+#include <util/symbol_table.h>
+#include <util/namespace.h>
+#include <util/find_symbols.h>
+#include <util/std_types.h>
 
 #include "remove_internal_symbols.h"
 

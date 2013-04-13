@@ -11,7 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 // this is just an interface -- it won't actually do any checking!
 
-#include <message.h>
+#include <util/message.h>
 
 #include <goto-symex/goto_trace.h>
 

@@ -11,7 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <set>
 
-#include <std_code.h>
+#include <util/std_code.h>
 
 #include "goto_program_template.h"
 

@@ -1,9 +1,9 @@
 #include <iostream>
 
-#include <cout_message.h>
-#include <config.h>
-#include <simplify_expr.h>
-#include <cmdline.h>
+#include <util/cout_message.h>
+#include <util/config.h>
+#include <util/simplify_expr.h>
+#include <util/cmdline.h>
 
 #include <langapi/mode.h>
 #include <ansi-c/ansi_c_language.h>

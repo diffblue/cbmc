@@ -11,7 +11,7 @@ Date: May 2006
 #include <algorithm>
 #include <iostream>
 
-#include <unicode.h>
+#include <util/unicode.h>
 
 #include "get_base_name.h"
 #include "gcc_cmdline.h"

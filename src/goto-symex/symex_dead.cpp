@@ -8,9 +8,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 
-#include <expr_util.h>
-#include <rename.h>
-#include <std_expr.h>
+#include <util/expr_util.h>
+#include <util/rename.h>
+#include <util/std_expr.h>
 
 #include <pointer-analysis/add_failed_symbols.h>
 

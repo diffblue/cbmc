@@ -9,7 +9,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #ifndef CPROVER_CPP_TYPECHECK_FARGS_H
 #define CPROVER_CPP_TYPECHECK_FARGS_H
 
-#include <std_code.h>
+#include <util/std_code.h>
+
 class cpp_typecheckt;
 
 class cpp_typecheck_fargst // for function overloading

@@ -6,13 +6,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_ANSI_C_C_LINK_CLASS_H
-#define CPROVER_ANSI_C_C_LINK_CLASS_H
+#ifndef CPROVER_LINKING_LINKING_CLASS_H
+#define CPROVER_LINKING_LINKING_CLASS_H
 
-#include <namespace.h>
-#include <replace_symbol.h>
-#include <hash_cont.h>
-#include <typecheck.h>
+#include <util/namespace.h>
+#include <util/replace_symbol.h>
+#include <util/hash_cont.h>
+#include <util/typecheck.h>
 
 class linkingt:public typecheckt
 {

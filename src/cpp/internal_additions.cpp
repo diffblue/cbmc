@@ -6,7 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <config.h>
+#include <util/config.h>
 
 #include <ansi-c/internal_additions.h>
 

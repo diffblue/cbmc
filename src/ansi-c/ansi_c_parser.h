@@ -9,14 +9,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_ANSI_C_PARSER_H
 #define CPROVER_ANSI_C_PARSER_H
 
-#include <assert.h>
+#include <cassert>
 
-#include <parser.h>
-#include <expr.h>
-#include <hash_cont.h>
-#include <string_hash.h>
-#include <i2string.h>
-#include <mp_arith.h>
+#include <util/parser.h>
+#include <util/expr.h>
+#include <util/hash_cont.h>
+#include <util/string_hash.h>
+#include <util/i2string.h>
+#include <util/mp_arith.h>
 
 #include "ansi_c_parse_tree.h"
 

@@ -14,12 +14,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 */
 
-#include <std_code.h>
-#include <numbering.h>
-#include <union_find.h>
-#include <threeval.h>
-#include <mp_arith.h>
-#include <interval.h>
+#include <util/std_code.h>
+#include <util/numbering.h>
+#include <util/union_find.h>
+#include <util/threeval.h>
+#include <util/mp_arith.h>
+#include <util/interval.h>
 
 #include <pointer-analysis/value_sets.h>
 

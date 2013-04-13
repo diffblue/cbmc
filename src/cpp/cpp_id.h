@@ -16,8 +16,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <set>
 #include <ostream>
 
-#include <expr.h>
-#include <std_types.h>
+#include <util/expr.h>
+#include <util/std_types.h>
 
 typedef std::multimap<irep_idt, class cpp_idt> cpp_id_mapt;
 

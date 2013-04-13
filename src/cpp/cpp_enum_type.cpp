@@ -6,7 +6,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#include <config.h>
+#include <util/config.h>
 
 #include "cpp_enum_type.h"
 

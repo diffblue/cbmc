@@ -8,10 +8,10 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <cassert>
 
-#include <std_types.h>
-#include <std_expr.h>
-#include <symbol.h>
-#include <hash_cont.h>
+#include <util/std_types.h>
+#include <util/std_expr.h>
+#include <util/symbol.h>
+#include <util/hash_cont.h>
 
 #include <ansi-c/expr2c_class.h>
 

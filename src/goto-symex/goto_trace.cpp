@@ -10,8 +10,8 @@ Author: Daniel Kroening
 
 #include <cassert>
 
-#include <arith_tools.h>
-#include <symbol.h>
+#include <util/arith_tools.h>
+#include <util/symbol.h>
 
 #include <ansi-c/printf_formatter.h>
 #include <langapi/language_util.h>
