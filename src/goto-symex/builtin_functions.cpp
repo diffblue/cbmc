@@ -248,6 +248,7 @@ void goto_symext::symex_gcc_builtin_va_arg_next(
       {
         exprt symbol_expr=symbol_exprt(symbol->name, symbol->type);
         rhs=address_of_exprt(symbol_expr);
+        rhs.make_typecast(lhs.type());
       }
     }
   }
