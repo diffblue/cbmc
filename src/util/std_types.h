@@ -438,6 +438,8 @@ public:
   {
   }
   
+  // will rename arguments -> parameters to use standard terminology
+
   class argumentt:public exprt
   {
   public:
@@ -485,6 +487,8 @@ public:
     }
   };
   
+  typedef argumentt parametert;
+  
   inline bool has_ellipsis() const
   {
     return find(ID_arguments).get_bool(ID_ellipsis);
@@ -501,6 +505,7 @@ public:
   }
 
   typedef std::vector<argumentt> argumentst;
+  typedef std::vector<argumentt> parameterst;
 
   inline const typet &return_type() const
   {
@@ -511,13 +516,23 @@ public:
   {
     return add_type(ID_return_type);
   }
-
+  
   inline const argumentst &arguments() const
   {
     return (const argumentst &)find(ID_arguments).get_sub();
   }
 
   inline argumentst &arguments()
+  {
+    return (argumentst &)add(ID_arguments).get_sub();
+  }
+  
+  inline const parameterst &parameters() const
+  {
+    return (const argumentst &)find(ID_arguments).get_sub();
+  }
+
+  inline parameterst &parameters()
   {
     return (argumentst &)add(ID_arguments).get_sub();
   }
