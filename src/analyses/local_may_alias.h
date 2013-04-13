@@ -12,7 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ostream>
 #include <stack>
 
-#include <numbering.h>
+#include <util/numbering.h>
 
 #include <goto-programs/goto_functions.h>
 

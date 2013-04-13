@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_MODEL_H
 #define CPROVER_GOTO_MODEL_H
 
-#include <symbol_table.h>
+#include <util/symbol_table.h>
 
 #include "goto_functions.h"
 

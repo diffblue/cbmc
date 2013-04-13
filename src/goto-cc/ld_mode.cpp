@@ -9,21 +9,10 @@ Author: Daniel Kroening, 2013
 #include <cstdlib>
 #include <iostream>
 
-#if 0
-#include <cstdio>
-
-#include <tempdir.h>
-#include <prefix.h>
-#include <suffix.h>
-
-#include "run.h"
-#endif
-
-#include <config.h>
+#include <util/config.h>
 
 #include "compile.h"
 #include "version.h"
-
 #include "ld_mode.h"
 
 /*******************************************************************\

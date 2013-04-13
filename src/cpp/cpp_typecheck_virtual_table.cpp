@@ -10,9 +10,10 @@ Purpose:
 
 \*******************************************************************/
 
-#include <std_types.h>
-#include <std_expr.h>
-#include <expr_util.h>
+#include <util/std_types.h>
+#include <util/std_expr.h>
+#include <util/expr_util.h>
+
 #include "cpp_typecheck.h"
 
 void cpp_typecheckt::do_virtual_table(const symbolt &symbol)

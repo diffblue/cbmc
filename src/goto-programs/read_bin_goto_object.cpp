@@ -8,9 +8,9 @@ Date: June 2006
  
 \*******************************************************************/
 
-#include <namespace.h>
-#include <message_stream.h>
-#include <symbol_table.h>
+#include <util/namespace.h>
+#include <util/message_stream.h>
+#include <util/symbol_table.h>
 
 #include "read_bin_goto_object.h"
 #include "goto_function_serialization.h"

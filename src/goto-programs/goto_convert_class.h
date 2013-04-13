@@ -11,11 +11,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <list>
 
-#include <namespace.h>
-#include <replace_expr.h>
-#include <guard.h>
-#include <std_code.h>
-#include <message_stream.h>
+#include <util/namespace.h>
+#include <util/replace_expr.h>
+#include <util/guard.h>
+#include <util/std_code.h>
+#include <util/message_stream.h>
 
 #include "goto_program.h"
 

@@ -6,11 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <threeval.h>
-#include <bitvector.h>
-#include <expr_util.h>
-#include <arith_tools.h>
-#include <symbol.h>
+#include <util/threeval.h>
+#include <util/bitvector.h>
+#include <util/expr_util.h>
+#include <util/arith_tools.h>
+#include <util/symbol.h>
 
 #include <solvers/prop/minimize.h>
 

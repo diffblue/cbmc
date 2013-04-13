@@ -6,9 +6,9 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#include <expr_util.h>
-#include <arith_tools.h>
-#include <std_expr.h>
+#include <util/expr_util.h>
+#include <util/arith_tools.h>
+#include <util/std_expr.h>
 
 #include <linking/zero_initializer.h>
 #include <ansi-c/c_types.h>

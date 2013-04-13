@@ -6,21 +6,21 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <assert.h>
+#include <cassert>
 
-#include <i2string.h>
-#include <replace_expr.h>
-#include <expr_util.h>
-#include <rational_tools.h>
-#include <location.h>
-#include <cprover_prefix.h>
-#include <prefix.h>
-#include <arith_tools.h>
-#include <simplify_expr.h>
-#include <std_code.h>
-#include <std_expr.h>
-#include <symbol.h>
-#include <pointer_predicates.h>
+#include <util/i2string.h>
+#include <util/replace_expr.h>
+#include <util/expr_util.h>
+#include <util/rational_tools.h>
+#include <util/location.h>
+#include <util/cprover_prefix.h>
+#include <util/prefix.h>
+#include <util/arith_tools.h>
+#include <util/simplify_expr.h>
+#include <util/std_code.h>
+#include <util/std_expr.h>
+#include <util/symbol.h>
+#include <util/pointer_predicates.h>
 
 #include <ansi-c/c_types.h>
 

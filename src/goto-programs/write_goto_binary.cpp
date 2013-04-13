@@ -8,10 +8,10 @@ Author: CM Wintersteiger
 
 #include <fstream>
 
-#include <message.h>
-#include <irep_serialization.h>
-#include <symbol_serialization.h>
-#include <symbol_table.h>
+#include <util/message.h>
+#include <util/irep_serialization.h>
+#include <util/symbol_serialization.h>
+#include <util/symbol_table.h>
 
 #include <goto-programs/goto_function_serialization.h>
 

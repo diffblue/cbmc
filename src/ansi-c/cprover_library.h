@@ -11,8 +11,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <set>
 
-#include <symbol_table.h>
-#include <message.h>
+#include <util/symbol_table.h>
+#include <util/message.h>
 
 void add_cprover_library(
   const std::set<irep_idt> &functions,

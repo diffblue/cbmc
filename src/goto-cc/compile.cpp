@@ -14,16 +14,19 @@ Date: June 2006
 #include <cstdlib>
 #include <algorithm>
 
-#include <config.h>
-#include <tempdir.h>
-#include <replace_symbol.h>
-#include <base_type.h>
-#include <i2string.h>
-#include <cmdline.h>
-#include <file_util.h>
-#include <unicode.h>
+#include <util/config.h>
+#include <util/tempdir.h>
+#include <util/replace_symbol.h>
+#include <util/base_type.h>
+#include <util/i2string.h>
+#include <util/cmdline.h>
+#include <util/file_util.h>
+#include <util/unicode.h>
+#include <util/irep_serialization.h>
+#include <util/symbol_serialization.h>
 
 #include <ansi-c/ansi_c_language.h>
+
 #include <linking/linking_class.h>
 #include <linking/entry_point.h>
 
@@ -35,9 +38,6 @@ Date: June 2006
 #include <goto-programs/write_goto_binary.h>
 
 #include <langapi/mode.h>
-
-#include <irep_serialization.h>
-#include <symbol_serialization.h>
 
 #include "get_base_name.h"
 #include "compile.h"

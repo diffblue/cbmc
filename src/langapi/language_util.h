@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #ifndef CPROVER_LANGUAGE_UTIL_H
 #define CPROVER_LANGUAGE_UTIL_H
 
-#include <irep.h>
+#include <util/irep.h>
 
 class exprt;
 class namespacet;

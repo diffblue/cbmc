@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef XML_PARSER_H
 #define XML_PARSER_H
 
-#include <parser.h>
+#include <util/parser.h>
 
 #include "xml_parse_tree.h"
 

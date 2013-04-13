@@ -8,8 +8,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <sstream>
 
-#include <config.h>
-#include <replace_symbol.h>
+#include <util/config.h>
+#include <util/replace_symbol.h>
 
 #include <linking/linking.h>
 

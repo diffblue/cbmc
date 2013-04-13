@@ -8,9 +8,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <iostream>
 
-#include <xml.h>
-#include <i2string.h>
-#include <xml_expr.h>
+#include <util/xml.h>
+#include <util/i2string.h>
+#include <util/xml_expr.h>
 
 #include <langapi/language_util.h>
 

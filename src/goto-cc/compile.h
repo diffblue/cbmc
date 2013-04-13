@@ -11,8 +11,8 @@ Date: June 2006
 #ifndef GOTO_CC_COMPILE_H
 #define GOTO_CC_COMPILE_H
 
-#include <symbol.h>
-#include <replace_symbol.h>
+#include <util/symbol.h>
+#include <util/replace_symbol.h>
 
 #include <langapi/language_ui.h>
 #include <goto-programs/goto_functions.h>

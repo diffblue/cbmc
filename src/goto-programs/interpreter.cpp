@@ -10,8 +10,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cstdio>
 #include <iostream>
 
-#include <std_types.h>
-#include <symbol_table.h>
+#include <util/std_types.h>
+#include <util/symbol_table.h>
 
 #include "interpreter.h"
 #include "interpreter_class.h"

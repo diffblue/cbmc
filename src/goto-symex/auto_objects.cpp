@@ -6,11 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <i2string.h>
-#include <prefix.h>
-#include <cprover_prefix.h>
-#include <symbol_table.h>
-#include <std_expr.h>
+#include <util/i2string.h>
+#include <util/prefix.h>
+#include <util/cprover_prefix.h>
+#include <util/symbol_table.h>
+#include <util/std_expr.h>
 
 #include "goto_symex.h"
 

@@ -11,7 +11,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <cassert>
 
-#include <type.h>
+#include <util/type.h>
 
 #include "cpp_name.h"
 

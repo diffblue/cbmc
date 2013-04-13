@@ -6,18 +6,17 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <find_symbols.h>
-#include <location.h>
-#include <base_type.h>
-#include <i2string.h>
-#include <std_expr.h>
-#include <std_types.h>
-#include <simplify_expr.h>
+#include <util/find_symbols.h>
+#include <util/location.h>
+#include <util/base_type.h>
+#include <util/i2string.h>
+#include <util/std_expr.h>
+#include <util/std_types.h>
+#include <util/simplify_expr.h>
 
 #include <ansi-c/expr2c.h>
 
 #include "linking_type_eq.h"
-
 #include "linking.h"
 #include "linking_class.h"
 

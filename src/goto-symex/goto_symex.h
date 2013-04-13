@@ -12,7 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 /*! \defgroup goto_symex Symbolic execution of goto programs
 */
 
-#include <options.h>
+#include <util/options.h>
 
 #include <goto-programs/goto_functions.h>
 

@@ -6,9 +6,9 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#include <i2string.h>
-#include <expr_util.h>
-#include <location.h>
+#include <util/i2string.h>
+#include <util/expr_util.h>
+#include <util/location.h>
 
 #include "cpp_typecheck.h"
 #include "cpp_convert_type.h"

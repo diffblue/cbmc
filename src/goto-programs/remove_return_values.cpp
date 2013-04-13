@@ -8,8 +8,8 @@ Date:   September 2009
 
 \*******************************************************************/
 
-#include <std_expr.h>
-#include <symbol_table.h>
+#include <util/std_expr.h>
+#include <util/symbol_table.h>
 
 #include "remove_return_values.h"
 

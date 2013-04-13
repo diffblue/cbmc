@@ -8,9 +8,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <algorithm>
 
-#include <std_expr.h>
-#include <std_code.h>
-#include <expr_util.h>
+#include <util/std_expr.h>
+#include <util/std_code.h>
+#include <util/expr_util.h>
 
 #include <ansi-c/c_types.h>
 #include <langapi/language_util.h>

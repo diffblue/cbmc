@@ -8,11 +8,11 @@ Author:
 
 #include <cstdlib>
 
-#include <config.h>
-#include <arith_tools.h>
-#include <expr_util.h>
-#include <std_types.h>
-#include <std_expr.h>
+#include <util/config.h>
+#include <util/arith_tools.h>
+#include <util/expr_util.h>
+#include <util/std_types.h>
+#include <util/std_expr.h>
 
 #include <ansi-c/c_qualifiers.h>
 #include <ansi-c/c_types.h>

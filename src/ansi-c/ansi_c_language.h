@@ -11,7 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*! \defgroup gr_ansi_c ANSI-C front-end */
 
-#include <language.h>
+#include <util/language.h>
 
 #include "ansi_c_parse_tree.h"
 

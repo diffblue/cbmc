@@ -11,7 +11,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 /*! \defgroup gr_cpp C++ front-end */
 
-#include <language.h>
+#include <util/language.h>
 
 #include "cpp_parse_tree.h"
 

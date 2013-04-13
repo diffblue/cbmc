@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <i2string.h>
-#include <hash_cont.h>
+#include <util/i2string.h>
+#include <util/hash_cont.h>
 
 #include "set_claims.h"
 

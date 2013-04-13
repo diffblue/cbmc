@@ -11,9 +11,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <memory>
 #include <cstdlib>
 
-#include <config.h>
-#include <expr_util.h>
-#include <language.h>
+#include <util/config.h>
+#include <util/expr_util.h>
+#include <util/language.h>
 
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/remove_function_pointers.h>

@@ -8,17 +8,17 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <algorithm>
 
-#include <simplify_expr.h>
-#include <array_name.h>
-#include <ieee_float.h>
-#include <arith_tools.h>
-#include <expr_util.h>
-#include <find_symbols.h>
-#include <std_expr.h>
-#include <std_types.h>
-#include <guard.h>
-#include <base_type.h>
-#include <pointer_predicates.h>
+#include <util/simplify_expr.h>
+#include <util/array_name.h>
+#include <util/ieee_float.h>
+#include <util/arith_tools.h>
+#include <util/expr_util.h>
+#include <util/find_symbols.h>
+#include <util/std_expr.h>
+#include <util/std_types.h>
+#include <util/guard.h>
+#include <util/base_type.h>
+#include <util/pointer_predicates.h>
 
 #include <analyses/local_may_alias.h>
 

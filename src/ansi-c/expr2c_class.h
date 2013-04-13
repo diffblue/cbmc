@@ -12,10 +12,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <set>
 #include <map>
 
-#include <expr.h>
-#include <std_code.h>
-#include <std_expr.h>
-#include <namespace.h>
+#include <util/expr.h>
+#include <util/std_code.h>
+#include <util/std_expr.h>
+#include <util/namespace.h>
 
 #include "c_qualifiers.h"
 

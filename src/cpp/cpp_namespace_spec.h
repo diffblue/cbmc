@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #ifndef CPROVER_CPP_NAMESPACE_SPEC_H
 #define CPROVER_CPP_NAMESPACE_SPEC_H
 
-#include <expr.h>
+#include <util/expr.h>
 
 #include "cpp_name.h"
 

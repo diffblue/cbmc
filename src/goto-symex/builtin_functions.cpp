@@ -9,18 +9,18 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 #include <cstdlib>
 
-#include <expr_util.h>
-#include <i2string.h>
-#include <arith_tools.h>
-#include <cprover_prefix.h>
-#include <std_types.h>
-#include <pointer_offset_size.h>
-#include <symbol_table.h>
-#include <std_expr.h>
-#include <std_code.h>
-#include <simplify_expr.h>
-#include <prefix.h>
-#include <string2int.h>
+#include <util/expr_util.h>
+#include <util/i2string.h>
+#include <util/arith_tools.h>
+#include <util/cprover_prefix.h>
+#include <util/std_types.h>
+#include <util/pointer_offset_size.h>
+#include <util/symbol_table.h>
+#include <util/std_expr.h>
+#include <util/std_code.h>
+#include <util/simplify_expr.h>
+#include <util/prefix.h>
+#include <util/string2int.h>
 
 #include <ansi-c/c_types.h>
 

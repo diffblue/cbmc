@@ -13,7 +13,7 @@ Date: June 2011
 
 #include <ostream>
 
-#include <namespace.h>
+#include <util/namespace.h>
 
 #include "goto_trace.h"
 

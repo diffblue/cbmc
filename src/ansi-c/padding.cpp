@@ -6,11 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <config.h>
-#include <i2string.h>
-#include <pointer_offset_size.h>
-#include <simplify_expr.h>
-#include <arith_tools.h>
+#include <util/config.h>
+#include <util/i2string.h>
+#include <util/pointer_offset_size.h>
+#include <util/simplify_expr.h>
+#include <util/arith_tools.h>
 
 #include "padding.h"
 

@@ -8,7 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <stack>
 
-#include <i2string.h>
+#include <util/i2string.h>
 
 #include "reachability_slicer.h"
 #include "remove_skip.h"

@@ -11,7 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <string>
 
-#include <irep.h>
+#include <util/irep.h>
 
 void preprocessor_line(
   const char *text,

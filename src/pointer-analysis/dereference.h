@@ -12,8 +12,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <set>
 #include <string>
 
-#include <hash_cont.h>
-#include <std_expr.h>
+#include <util/hash_cont.h>
+#include <util/std_expr.h>
 
 #include "value_sets.h"
 

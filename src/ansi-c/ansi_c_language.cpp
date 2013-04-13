@@ -6,14 +6,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <string.h>
-
+#include <cstring>
 #include <sstream>
 #include <fstream>
 
-#include <expr_util.h>
-#include <replace_symbol.h>
-#include <config.h>
+#include <util/expr_util.h>
+#include <util/replace_symbol.h>
+#include <util/config.h>
 
 #include <linking/linking.h>
 #include <linking/remove_internal_symbols.h>

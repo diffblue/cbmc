@@ -10,8 +10,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 #include <iostream>
 
-#include <std_expr.h>
-#include <prefix.h>
+#include <util/std_expr.h>
+#include <util/prefix.h>
 
 #include "goto_symex_state.h"
 

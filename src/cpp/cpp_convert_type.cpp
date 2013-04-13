@@ -6,13 +6,12 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#include <assert.h>
-
+#include <cassert>
 #include <iostream>
 
-#include <config.h>
-#include <arith_tools.h>
-#include <std_types.h>
+#include <util/config.h>
+#include <util/arith_tools.h>
+#include <util/std_types.h>
 
 #include <ansi-c/c_types.h>
 

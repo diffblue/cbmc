@@ -8,14 +8,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <iostream>
 
-#include <symbol_table.h>
-#include <namespace.h>
-#include <expr_util.h>
-#include <arith_tools.h>
-#include <std_expr.h>
-#include <simplify_expr.h>
-#include <base_type.h>
-#include <std_types.h>
+#include <util/symbol_table.h>
+#include <util/namespace.h>
+#include <util/expr_util.h>
+#include <util/arith_tools.h>
+#include <util/std_expr.h>
+#include <util/simplify_expr.h>
+#include <util/base_type.h>
+#include <util/std_types.h>
 
 #include <ansi-c/c_types.h>
 #include <langapi/language_util.h>

@@ -12,11 +12,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <fstream>
 #include <iostream>
 
-#include <simplify_expr.h>
-#include <i2string.h>
-#include <arith_tools.h>
-#include <std_expr.h>
-#include <guard.h>
+#include <util/simplify_expr.h>
+#include <util/i2string.h>
+#include <util/arith_tools.h>
+#include <util/std_expr.h>
+#include <util/guard.h>
 
 #include <langapi/language_util.h>
 

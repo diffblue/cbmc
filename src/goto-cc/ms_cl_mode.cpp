@@ -9,9 +9,9 @@ Author: CM Wintersteiger, 2006
 #include <iostream>
 #include <cstdlib>
 
-#include <message.h>
-#include <prefix.h>
-#include <config.h>
+#include <util/message.h>
+#include <util/prefix.h>
+#include <util/config.h>
 
 #include "ms_cl_mode.h"
 #include "compile.h"

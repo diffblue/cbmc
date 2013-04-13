@@ -6,11 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <message_stream.h>
-#include <arith_tools.h>
-#include <expr_util.h>
-#include <std_types.h>
-#include <std_expr.h>
+#include <util/message_stream.h>
+#include <util/arith_tools.h>
+#include <util/expr_util.h>
+#include <util/std_types.h>
+#include <util/std_expr.h>
 
 #include <ansi-c/c_types.h>
 #include <ansi-c/expr2c.h>

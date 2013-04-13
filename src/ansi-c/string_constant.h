@@ -9,8 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_STRING_CONSTANT_H
 #define CPROVER_STRING_CONSTANT_H
 
-#include <std_expr.h>
-#include <expr.h>
+#include <util/std_expr.h>
+#include <util/expr.h>
 
 class string_constantt:public exprt
 {

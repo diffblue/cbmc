@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <std_types.h>
-#include <config.h>
+#include <util/std_types.h>
+#include <util/config.h>
 
 #include "ansi_c_convert.h"
 #include "ansi_c_convert_type.h"

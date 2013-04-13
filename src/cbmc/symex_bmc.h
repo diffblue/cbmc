@@ -9,8 +9,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_CBMC_SYMEX_BMC_H
 #define CPROVER_CBMC_SYMEX_BMC_H
 
-#include <hash_cont.h>
-#include <message.h>
+#include <util/hash_cont.h>
+#include <util/message.h>
+
 #include <goto-symex/goto_symex.h>
 
 class symex_bmct:

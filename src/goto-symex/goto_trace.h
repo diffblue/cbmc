@@ -21,7 +21,7 @@ Date: July 2005
 #include <ostream>
 #include <vector>
 
-#include <std_expr.h>
+#include <util/std_expr.h>
 
 #include <goto-programs/goto_program.h>
 

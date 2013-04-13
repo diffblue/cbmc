@@ -8,10 +8,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 
-#include <expr_util.h>
-#include <rename.h>
-#include <base_type.h>
-#include <std_expr.h>
+#include <util/expr_util.h>
+#include <util/rename.h>
+#include <util/base_type.h>
+#include <util/std_expr.h>
 
 #include "goto_symex.h"
 

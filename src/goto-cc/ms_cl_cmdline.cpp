@@ -6,14 +6,13 @@ Author: Daniel Kroening
 
 \*******************************************************************/
 
-#include <assert.h>
-#include <string.h>
-#include <stdlib.h>
-
+#include <cassert>
+#include <cstring>
+#include <cstdlib>
 #include <iostream>
 #include <fstream>
 
-#include <unicode.h>
+#include <util/unicode.h>
 
 #include "ms_cl_cmdline.h"
 

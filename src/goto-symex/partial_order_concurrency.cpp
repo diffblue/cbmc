@@ -8,8 +8,8 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 
 #include <limits>
 
-#include <i2string.h>
-#include <arith_tools.h>
+#include <util/i2string.h>
+#include <util/arith_tools.h>
 
 #include "partial_order_concurrency.h"
 

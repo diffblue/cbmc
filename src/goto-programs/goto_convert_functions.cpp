@@ -8,11 +8,11 @@ Date: June 2003
 
 \*******************************************************************/
 
-#include <assert.h>
+#include <cassert>
 
-#include <base_type.h>
-#include <std_code.h>
-#include <symbol_table.h>
+#include <util/base_type.h>
+#include <util/std_code.h>
+#include <util/symbol_table.h>
 
 #include "goto_convert_functions.h"
 #include "goto_inline.h"

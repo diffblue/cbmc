@@ -6,9 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <expr.h>
-#include <namespace.h>
-#include <message.h>
+#include <util/expr.h>
+#include <util/namespace.h>
+#include <util/message.h>
 
 exprt zero_initializer(
   const typet &type,

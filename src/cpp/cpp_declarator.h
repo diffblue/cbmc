@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #ifndef CPROVER_CPP_DECLARATOR_H
 #define CPROVER_CPP_DECLARATOR_H
 
-#include <expr.h>
+#include <util/expr.h>
 
 #include "cpp_name.h"
 

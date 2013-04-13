@@ -10,8 +10,8 @@ Author: Daniel Kroening
 
 #include <cassert>
 
-#include <threeval.h>
-#include <simplify_expr.h>
+#include <util/threeval.h>
+#include <util/simplify_expr.h>
 
 #include <solvers/prop/prop_conv.h>
 #include <solvers/prop/prop.h>

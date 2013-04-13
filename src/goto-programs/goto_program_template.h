@@ -15,9 +15,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ostream>
 #include <set>
 
-#include <namespace.h>
-#include <symbol_table.h>
-#include <location.h>
+#include <util/namespace.h>
+#include <util/symbol_table.h>
+#include <util/location.h>
 
 typedef enum { NO_INSTRUCTION_TYPE=0,
                GOTO=1,          // branch, possibly guarded

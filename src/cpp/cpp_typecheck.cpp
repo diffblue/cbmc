@@ -7,11 +7,12 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 \*******************************************************************/
 
 #include <algorithm>
-#include <expr_util.h>
-#include <arith_tools.h>
-#include <i2string.h>
-#include <location.h>
-#include <symbol.h>
+
+#include <util/expr_util.h>
+#include <util/arith_tools.h>
+#include <util/i2string.h>
+#include <util/location.h>
+#include <util/symbol.h>
 
 #include <linking/zero_initializer.h>
 #include <ansi-c/c_typecast.h>

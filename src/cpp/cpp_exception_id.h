@@ -11,8 +11,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 // turns a type into an exception ID
 
-#include <namespace.h>
-#include <type.h>
+#include <util/namespace.h>
+#include <util/type.h>
 
 irep_idt cpp_exception_id(const typet &, const namespacet &);
 irept cpp_exception_list(const typet &, const namespacet &);

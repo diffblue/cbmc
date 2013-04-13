@@ -9,10 +9,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_PROGRAMS_STRING_ABSTRACTION_H
 #define CPROVER_GOTO_PROGRAMS_STRING_ABSTRACTION_H
 
-#include <symbol_table.h>
-#include <message_stream.h>
-#include <config.h>
-#include <std_expr.h>
+#include <util/symbol_table.h>
+#include <util/message_stream.h>
+#include <util/config.h>
+#include <util/std_expr.h>
 
 #include "goto_functions.h"
 

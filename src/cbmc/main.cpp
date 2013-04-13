@@ -14,7 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 */
 
-#include <unicode.h>
+#include <util/unicode.h>
 
 #include "parseoptions.h"
 

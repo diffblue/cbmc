@@ -7,16 +7,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <assert.h>
+#include <cassert>
 
-#include <std_expr.h>
-#include <std_code.h>
-#include <expr_util.h>
+#include <util/std_expr.h>
+#include <util/std_code.h>
+#include <util/expr_util.h>
 
 #include "flow_insensitive_analysis.h"
-
-//#include <fstream>
-//#include <i2string.h>
 
 /*******************************************************************\
 

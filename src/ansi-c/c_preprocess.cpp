@@ -28,11 +28,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <fstream>
 
-#include <config.h>
-#include <i2string.h>
-#include <message_stream.h>
-#include <tempfile.h>
-#include <unicode.h>
+#include <util/config.h>
+#include <util/i2string.h>
+#include <util/message_stream.h>
+#include <util/tempfile.h>
+#include <util/unicode.h>
 
 #include "c_preprocess.h"
 

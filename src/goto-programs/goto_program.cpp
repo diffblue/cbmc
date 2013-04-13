@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <std_expr.h>
-#include <i2string.h>
+#include <util/std_expr.h>
+#include <util/i2string.h>
 
 #include <langapi/language_util.h>
 

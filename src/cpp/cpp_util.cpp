@@ -6,8 +6,8 @@ Author:
 
 \*******************************************************************/
 
-#include <expr.h>
-#include <symbol.h>
+#include <util/expr.h>
+#include <util/symbol.h>
 
 #include "cpp_util.h"
 

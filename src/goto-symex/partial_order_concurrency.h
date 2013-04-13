@@ -9,7 +9,7 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 #ifndef CPROVER_PARTIAL_ORDER_CONCURRENCY_H
 #define CPROVER_PARTIAL_ORDER_CONCURRENCY_H
 
-#include <message.h>
+#include <util/message.h>
 
 #include "symex_target_equation.h"
 

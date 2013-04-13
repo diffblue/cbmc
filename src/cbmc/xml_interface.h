@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_XML_INTERFACE_H
 #define CPROVER_XML_INTERFACE_H
 
-#include <cmdline.h>
+#include <util/cmdline.h>
 
 class xml_interfacet
 {

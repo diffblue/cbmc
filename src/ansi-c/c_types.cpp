@@ -6,10 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <std_types.h>
+#include <util/std_types.h>
+#include <util/config.h>
 
 #include "c_types.h"
-#include "config.h"
 
 /*******************************************************************\
 

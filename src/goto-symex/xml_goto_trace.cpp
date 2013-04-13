@@ -10,9 +10,9 @@ Author: Daniel Kroening
 
 #include <cassert>
 
-#include <xml_expr.h>
-#include <i2string.h>
-#include <symbol.h>
+#include <util/xml_expr.h>
+#include <util/i2string.h>
+#include <util/symbol.h>
 
 #include <ansi-c/printf_formatter.h>
 #include <langapi/language_util.h>

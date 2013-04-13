@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_PROGRAMS_GOTO_INLINE_CLASS
 #define CPROVER_GOTO_PROGRAMS_GOTO_INLINE_CLASS
 
-#include <message_stream.h>
+#include <util/message_stream.h>
 
 #include "goto_functions.h"
 

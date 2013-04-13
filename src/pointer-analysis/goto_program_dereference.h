@@ -9,7 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_POINTER_ANALYSIS_GOTO_PROGRAM_DEREFERENCE_H
 #define CPROVER_POINTER_ANALYSIS_GOTO_PROGRAM_DEREFERENCE_H
 
-#include <namespace.h>
+#include <util/namespace.h>
+
 #include <goto-programs/goto_functions.h>
 
 #include "value_sets.h"

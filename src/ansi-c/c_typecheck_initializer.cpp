@@ -6,15 +6,15 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <arith_tools.h>
-#include <config.h>
-#include <type_eq.h>
-#include <std_types.h>
-#include <expr_util.h>
-#include <simplify_expr.h>
-#include <cprover_prefix.h>
-#include <prefix.h>
-#include <std_types.h>
+#include <util/arith_tools.h>
+#include <util/config.h>
+#include <util/type_eq.h>
+#include <util/std_types.h>
+#include <util/expr_util.h>
+#include <util/simplify_expr.h>
+#include <util/cprover_prefix.h>
+#include <util/prefix.h>
+#include <util/std_types.h>
 
 #include <linking/zero_initializer.h>
 

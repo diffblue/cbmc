@@ -9,14 +9,14 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <iostream>
 #include <cstdlib>
 
-#include <expr_util.h>
-#include <i2string.h>
-#include <std_types.h>
-#include <arith_tools.h>
-#include <bitvector.h>
-#include <std_expr.h>
-#include <config.h>
-#include <simplify_expr.h>
+#include <util/expr_util.h>
+#include <util/i2string.h>
+#include <util/std_types.h>
+#include <util/arith_tools.h>
+#include <util/bitvector.h>
+#include <util/std_expr.h>
+#include <util/config.h>
+#include <util/simplify_expr.h>
 
 #include <ansi-c/c_types.h>
 #include <ansi-c/c_qualifiers.h>
