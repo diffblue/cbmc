@@ -12,9 +12,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <set>
 
-#include <mp_arith.h>
-#include <namespace.h>
-#include <reference_counting.h>
+#include <util/mp_arith.h>
+#include <util/namespace.h>
+#include <util/reference_counting.h>
 
 #include "object_numbering.h"
 

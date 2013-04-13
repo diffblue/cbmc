@@ -11,7 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 
-#include <threeval.h>
+#include <util/threeval.h>
 
 #include "aig.h"
 

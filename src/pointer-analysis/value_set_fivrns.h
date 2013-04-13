@@ -10,9 +10,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef __CPROVER_VALUE_SET_FIVRNS_H_
 #define __CPROVER_VALUE_SET_FIVRNS_H_
 
-#include <mp_arith.h>
-#include <namespace.h>
-#include <reference_counting.h>
+#include <util/mp_arith.h>
+#include <util/namespace.h>
+#include <util/reference_counting.h>
 
 #include "object_numbering.h"
 
