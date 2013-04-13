@@ -6,7 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <std_types.h>
+#include <util/std_types.h>
 
 #include "boolbv.h"
 #include "boolbv_type.h"
