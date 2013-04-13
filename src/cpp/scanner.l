@@ -9,9 +9,9 @@
 static int isatty(int) { return 0; }
 #endif
 
-#include <expr.h>
-#include <arith_tools.h>
-#include <config.h>
+#include <util/expr.h>
+#include <util/arith_tools.h>
+#include <util/config.h>
 
 #include <ansi-c/c_types.h>
 #include <ansi-c/preprocessor_line.h>
