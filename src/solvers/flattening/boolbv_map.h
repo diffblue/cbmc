@@ -11,9 +11,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <vector>
 
-#include <hash_cont.h>
-#include <type.h>
-#include <namespace.h>
+#include <util/hash_cont.h>
+#include <util/type.h>
+#include <util/namespace.h>
 
 #include <solvers/prop/prop.h>
 

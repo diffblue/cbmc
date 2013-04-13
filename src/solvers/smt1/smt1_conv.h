@@ -13,8 +13,8 @@ Revision: Roberto Bruttomesso, roberto.bruttomesso@unisi.ch
 #include <sstream>
 #include <set>
 
-#include <hash_cont.h>
-#include <std_expr.h>
+#include <util/hash_cont.h>
+#include <util/std_expr.h>
 
 #include <solvers/prop/prop_conv.h>
 #include <solvers/flattening/pointer_logic.h>

@@ -11,7 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 // decision procedure wrapper for boolean propositional logics
 
-#include <message.h>
+#include <util/message.h>
 
 #include "literal.h"
 

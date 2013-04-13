@@ -11,7 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <string>
 
-#include <mp_arith.h>
+#include <util/mp_arith.h>
 
 void parse_float(
   const std::string &src,

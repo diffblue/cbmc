@@ -8,12 +8,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 
-#include <arith_tools.h>
-#include <config.h>
-#include <ieee_float.h>
-#include <std_types.h>
-#include <string2int.h>
-#include <expr_util.h>
+#include <util/arith_tools.h>
+#include <util/config.h>
+#include <util/ieee_float.h>
+#include <util/std_types.h>
+#include <util/string2int.h>
+#include <util/expr_util.h>
 
 #include "../c_types.h"
 #include "parse_float.h"

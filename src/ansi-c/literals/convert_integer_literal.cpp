@@ -10,11 +10,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cstdlib>
 #include <cctype>
 
-#include <arith_tools.h>
-#include <config.h>
-#include <std_types.h>
-#include <std_expr.h>
-#include <expr_util.h>
+#include <util/arith_tools.h>
+#include <util/config.h>
+#include <util/std_types.h>
+#include <util/std_expr.h>
+#include <util/expr_util.h>
 
 #include "convert_integer_literal.h"
 

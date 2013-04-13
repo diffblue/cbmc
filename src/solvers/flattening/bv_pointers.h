@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_BV_POINTERS_H
 #define CPROVER_BV_POINTERS_H
 
-#include <hash_cont.h>
+#include <util/hash_cont.h>
 
 #include "boolbv.h"
 #include "pointer_logic.h"

@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_BOOLBV_TYPE_H
 #define CPROVER_BOOLBV_TYPE_H
 
-#include <type.h>
+#include <util/type.h>
 
 // new stuff
 typedef enum

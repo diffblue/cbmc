@@ -9,10 +9,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_POINTER_LOGIC_H
 #define CPROVER_POINTER_LOGIC_H
 
-#include <mp_arith.h>
-#include <hash_cont.h>
-#include <expr.h>
-#include <numbering.h>
+#include <util/mp_arith.h>
+#include <util/hash_cont.h>
+#include <util/expr.h>
+#include <util/numbering.h>
 
 #define BV_ADDR_BITS 8
 
