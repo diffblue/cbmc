@@ -10,14 +10,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ctype.h>
 #include <cstdlib>
 
-#include <arith_tools.h>
-#include <std_types.h>
-#include <std_expr.h>
-#include <config.h>
-#include <i2string.h>
-#include <expr_util.h>
-#include <find_symbols.h>
-#include <pointer_offset_size.h>
+#include <util/arith_tools.h>
+#include <util/std_types.h>
+#include <util/std_expr.h>
+#include <util/config.h>
+#include <util/i2string.h>
+#include <util/expr_util.h>
+#include <util/find_symbols.h>
+#include <util/pointer_offset_size.h>
 
 #include <ansi-c/string_constant.h>
 

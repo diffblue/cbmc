@@ -3,7 +3,7 @@ SRC = natural_loops.cpp is_threaded.cpp dirty.cpp \
       static_analysis.cpp uninitialized_domain.cpp local_may_alias.cpp \
       locals.cpp goto_check.cpp call_graph.cpp 
 
-INCLUDES= -I .. -I ../util
+INCLUDES= -I ..
 
 include ../config.inc
 include ../common

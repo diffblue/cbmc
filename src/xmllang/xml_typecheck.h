@@ -9,9 +9,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_XML_TYPECHECK_H
 #define CPROVER_XML_TYPECHECK_H
 
-#include <typecheck.h>
-#include <symbol_table.h>
-#include <namespace.h>
+#include <util/typecheck.h>
+#include <util/symbol_table.h>
+#include <util/namespace.h>
 
 #include "xml_parse_tree.h"
 

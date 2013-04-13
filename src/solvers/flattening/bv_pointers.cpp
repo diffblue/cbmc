@@ -6,15 +6,15 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <i2string.h>
-#include <config.h>
-#include <c_misc.h>
-#include <arith_tools.h>
-#include <prefix.h>
-#include <std_expr.h>
-#include <expr_util.h>
-#include <pointer_offset_size.h>
-#include <threeval.h>
+#include <util/i2string.h>
+#include <util/config.h>
+#include <util/c_misc.h>
+#include <util/arith_tools.h>
+#include <util/prefix.h>
+#include <util/std_expr.h>
+#include <util/expr_util.h>
+#include <util/pointer_offset_size.h>
+#include <util/threeval.h>
 
 #include "bv_pointers.h"
 

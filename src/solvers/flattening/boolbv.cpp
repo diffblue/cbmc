@@ -12,15 +12,15 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <set>
 #include <iostream>
 
-#include <symbol.h>
-#include <mp_arith.h>
-#include <i2string.h>
-#include <arith_tools.h>
-#include <replace_expr.h>
-#include <std_types.h>
-#include <prefix.h>
-#include <std_expr.h>
-#include <threeval.h>
+#include <util/symbol.h>
+#include <util/mp_arith.h>
+#include <util/i2string.h>
+#include <util/arith_tools.h>
+#include <util/replace_expr.h>
+#include <util/std_types.h>
+#include <util/prefix.h>
+#include <util/std_expr.h>
+#include <util/threeval.h>
 
 #include <ansi-c/string_constant.h>
 

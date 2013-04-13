@@ -8,8 +8,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 
-#include <arith_tools.h>
-#include <threeval.h>
+#include <util/arith_tools.h>
+#include <util/threeval.h>
 
 #include "float_utils.h"
 

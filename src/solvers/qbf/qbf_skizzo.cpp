@@ -6,12 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <assert.h>
-#include <stdlib.h>
-
+#include <cassert>
+#include <cstdlib>
 #include <fstream>
 
-#include <i2string.h>
+#include <util/i2string.h>
 
 #include "qbf_skizzo.h"
 

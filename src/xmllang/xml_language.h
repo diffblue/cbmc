@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_XML_LANGUAGE_H
 #define CPROVER_XML_LANGUAGE_H
 
-#include <language.h>
+#include <util/language.h>
 
 #include "xml_parse_tree.h"
 

@@ -16,7 +16,7 @@ SRC = c_typecast.cpp y.tab.cpp lex.yy.cpp ansi_c_parser.cpp \
       literals/convert_integer_literal.cpp \
       literals/convert_string_literal.cpp
 
-INCLUDES= -I .. -I ../util
+INCLUDES= -I ..
 
 include ../config.inc
 include ../common

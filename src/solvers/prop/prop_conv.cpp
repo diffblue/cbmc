@@ -10,9 +10,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cstdlib>
 #include <map>
 
-#include <std_expr.h>
-#include <symbol.h>
-#include <threeval.h>
+#include <util/std_expr.h>
+#include <util/symbol.h>
+#include <util/threeval.h>
 
 #include "prop.h"
 #include "prop_conv.h"

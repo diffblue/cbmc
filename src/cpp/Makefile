@@ -21,7 +21,7 @@ SRC = cpp_id.cpp cpp_language.cpp expr2cpp.cpp cpp_parser.cpp \
       cpp_typecheck_constructor.cpp cpp_typecheck_virtual_table.cpp \
       cpp_typecheck_static_assert.cpp
 
-INCLUDES= -I .. -I ../util
+INCLUDES= -I ..
 
 include ../config.inc
 include ../common

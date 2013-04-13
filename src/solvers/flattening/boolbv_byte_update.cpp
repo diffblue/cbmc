@@ -7,11 +7,10 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <iostream>
-
 #include <cassert>
 
-#include <arith_tools.h>
-#include <byte_operators.h>
+#include <util/arith_tools.h>
+#include <util/byte_operators.h>
 
 #include "boolbv.h"
 

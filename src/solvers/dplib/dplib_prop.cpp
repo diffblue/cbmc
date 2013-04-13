@@ -6,11 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <assert.h>
+#include <cassert>
 
 #include <set>
 
-#include <i2string.h>
+#include <util/i2string.h>
 
 #include "dplib_prop.h"
 

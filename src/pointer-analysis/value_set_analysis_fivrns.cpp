@@ -9,10 +9,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 //#include <assert.h>
 
-#include <prefix.h>
-#include <cprover_prefix.h>
-#include <xml_irep.h>
-#include <symbol_table.h>
+#include <util/prefix.h>
+#include <util/cprover_prefix.h>
+#include <util/xml_irep.h>
+#include <util/symbol_table.h>
 
 #include <langapi/language_util.h>
 

@@ -6,8 +6,8 @@ Author: CM Wintersteiger
 
 \*******************************************************************/
 
-#include <arith_tools.h>
-#include <std_expr.h>
+#include <util/arith_tools.h>
+#include <util/std_expr.h>
 
 //#include <solvers/flattening/boolbv_width.h>
 

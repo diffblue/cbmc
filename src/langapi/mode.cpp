@@ -14,7 +14,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <cstring>
 #endif
 
-#include <language.h>
+#include <util/language.h>
 
 #include "mode.h"
 

@@ -9,8 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 #include <iostream>
 
-#include <arith_tools.h>
-#include <std_expr.h>
+#include <util/arith_tools.h>
+#include <util/std_expr.h>
 
 #include "boolbv.h"
 

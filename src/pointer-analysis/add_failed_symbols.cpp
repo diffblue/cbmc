@@ -6,9 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <symbol_table.h>
-#include <namespace.h>
-#include <std_expr.h>
+#include <util/symbol_table.h>
+#include <util/namespace.h>
+#include <util/std_expr.h>
 
 #include "add_failed_symbols.h"
 

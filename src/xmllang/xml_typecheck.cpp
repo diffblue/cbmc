@@ -6,9 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <expr_util.h>
-#include <arith_tools.h>
-#include <i2string.h>
+#include <util/expr_util.h>
+#include <util/arith_tools.h>
+#include <util/i2string.h>
 
 #include "xml_typecheck.h"
 //#include "expr2xml.h"

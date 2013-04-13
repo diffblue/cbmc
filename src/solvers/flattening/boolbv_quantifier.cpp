@@ -6,10 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <assert.h>
+#include <cassert>
 
-#include <arith_tools.h>
-#include <replace_expr.h>
+#include <util/arith_tools.h>
+#include <util/replace_expr.h>
 
 #include "boolbv.h"
 

@@ -6,7 +6,7 @@ SRC = value_set.cpp goto_program_dereference.cpp value_set_analysis.cpp \
       value_set_analysis_fivrns.cpp value_set_fivrns.cpp \
       value_set_domain_fivrns.cpp
 
-INCLUDES= -I .. -I ../util
+INCLUDES= -I ..
 
 include ../config.inc
 include ../common
