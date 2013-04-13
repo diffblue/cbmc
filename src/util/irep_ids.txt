@@ -393,7 +393,7 @@ is_inline
 is_extern
 is_global
 is_thread_local
-is_argument
+is_parameter
 is_type
 is_register
 is_typedef

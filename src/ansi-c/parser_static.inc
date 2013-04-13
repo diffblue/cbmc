@@ -430,14 +430,14 @@ static void create_function_scope(exprt &expr)
   {
     code_typet &code_type=to_code_type(declaration.type());
     
-    code_typet::argumentst &arguments=code_type.arguments();
+    code_typet::parameterst &parameters=code_type.parameters();
     
     unsigned anon_count=0;
     
     // do the parameter declarations
-    for(code_typet::argumentst::iterator
-        it=arguments.begin();
-        it!=arguments.end();
+    for(code_typet::parameterst::iterator
+        it=parameters.begin();
+        it!=parameters.end();
         it++)
     {
       if(it->id()==ID_declaration)
@@ -452,8 +452,8 @@ static void create_function_scope(exprt &expr)
         if(arg_decl.get_base_name()==irep_idt())
           arg_decl.set_base_name("#anon_arg"+i2string(anon_count++));
 
-        // make sure we know it's an argument
-        arg_decl.set_is_argument(true);
+        // make sure we know it's a parameter
+        arg_decl.set_is_parameter(true);
           
         // fix name
         arg_decl.set_name(
@@ -472,27 +472,27 @@ static void create_function_scope(exprt &expr)
 
 /*******************************************************************\
 
-Function: adjust_KnR_arguments
+Function: adjust_KnR_parameters
 
   Inputs:
 
  Outputs:
 
- Purpose: this patches the KnR argument types into the
+ Purpose: this patches the KnR parameter types into the
           function type
 
 \*******************************************************************/
 
-static void adjust_KnR_arguments(irept &arguments, irept &declarations)
+static void adjust_KnR_parameters(irept &parameters, irept &declarations)
 {
   Forall_irep(d_it, declarations.get_sub())
   {
     assert(d_it->id()==ID_declaration);
     irep_idt base_name=d_it->get(ID_base_name);
 
-    // we just do a linear search over the arguments
+    // we just do a linear search over the parameters
     // this could be improved with a hash map
-    Forall_irep(a_it, arguments.get_sub())
+    Forall_irep(a_it, parameters.get_sub())
     {
       if(a_it->get(ID_base_name)==base_name)
       {

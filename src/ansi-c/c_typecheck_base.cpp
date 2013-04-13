@@ -249,8 +249,8 @@ Function: c_typecheck_baset::typecheck_new_symbol
 
 void c_typecheck_baset::typecheck_new_symbol(symbolt &symbol)
 {
-  if(symbol.is_argument)
-    adjust_function_argument(symbol.type);
+  if(symbol.is_parameter)
+    adjust_function_parameter(symbol.type);
 
   // check initializer, if needed
 

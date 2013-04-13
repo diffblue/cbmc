@@ -88,14 +88,14 @@ public:
     set(ID_is_static, is_static);
   }
   
-  bool get_is_argument() const
+  bool get_is_parameter() const
   {
-    return get_bool(ID_is_argument);
+    return get_bool(ID_is_parameter);
   }
   
-  void set_is_argument(bool is_argument)
+  void set_is_parameter(bool is_parameter)
   {
-    set(ID_is_argument, is_argument);
+    set(ID_is_parameter, is_parameter);
   }
   
   bool get_is_global() const

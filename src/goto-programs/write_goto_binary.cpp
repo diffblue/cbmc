@@ -67,7 +67,7 @@ bool write_goto_binary_v2(
     flags = (flags << 1) | (int)sym.is_input;
     flags = (flags << 1) | (int)sym.is_output;
     flags = (flags << 1) | (int)sym.is_state_var;
-    flags = (flags << 1) | (int)sym.is_argument;
+    flags = (flags << 1) | (int)sym.is_parameter;
     flags = (flags << 1) | (int)false; // sym.free_var;
     flags = (flags << 1) | (int)false; // sym.binding;
     flags = (flags << 1) | (int)sym.is_lvalue;

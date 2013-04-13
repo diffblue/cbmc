@@ -95,29 +95,31 @@ Function: c_typecheck_baset::typecheck_code_type
 
 void c_typecheck_baset::typecheck_code_type(code_typet &type)
 {
-  code_typet::argumentst &arguments=type.arguments();
+  code_typet::parameterst &parameters=type.parameters();
   
-  // if we don't have any arguments, we assume it's (...)
-  if(arguments.empty())
+  // if we don't have any parameters, we assume it's (...)
+  if(parameters.empty())
   {
     type.make_ellipsis();
   }
   else
   {
-    for(unsigned i=0; i<type.arguments().size(); i++)
+    // we do have parameters
+  
+    for(unsigned i=0; i<type.parameters().size(); i++)
     {
-      code_typet::argumentt &argument=type.arguments()[i];
+      code_typet::parametert &parameter=type.parameters()[i];
 
       // first fix type
-      typet &type=argument.type();
+      typet &type=parameter.type();
 
       typecheck_type(type);
       
-      adjust_function_argument(type);
+      adjust_function_parameter(type);
       
       // adjust the identifier
 
-      irep_idt identifier=argument.get_identifier();
+      irep_idt identifier=parameter.get_identifier();
 
       if(identifier!=irep_idt())
       {
@@ -129,15 +131,15 @@ void c_typecheck_baset::typecheck_code_type(code_typet &type)
         if(m_it!=id_replace_map.end())
           identifier=m_it->second;
 
-        argument.set_identifier(identifier);
+        parameter.set_identifier(identifier);
       }
     }
   
-    if(arguments.size()==1 &&
-       follow(arguments[0].type()).id()==ID_empty)
+    if(parameters.size()==1 &&
+       follow(parameters[0].type()).id()==ID_empty)
     {
-      // if we just have one argument of type void, remove it
-      arguments.clear();
+      // if we just have one parameter of type void, remove it
+      parameters.clear();
     }
   }
 
@@ -667,7 +669,7 @@ void c_typecheck_baset::typecheck_symbol_type(typet &type)
 
 /*******************************************************************\
 
-Function: c_typecheck_baset::adjust_function_argument
+Function: c_typecheck_baset::adjust_function_parameter
 
   Inputs:
 
@@ -677,7 +679,7 @@ Function: c_typecheck_baset::adjust_function_argument
 
 \*******************************************************************/
 
-void c_typecheck_baset::adjust_function_argument(typet &type) const
+void c_typecheck_baset::adjust_function_parameter(typet &type) const
 {
   if(type.id()==ID_array)
   {
