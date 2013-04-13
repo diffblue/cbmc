@@ -10,9 +10,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef VALUE_SET_FIVR_H_
 #define VALUE_SET_FIVR_H_
 
-#include <mp_arith.h>
-#include <namespace.h>
-#include <reference_counting.h>
+#include <util/mp_arith.h>
+#include <util/namespace.h>
+#include <util/reference_counting.h>
 
 #include "object_numbering.h"
 

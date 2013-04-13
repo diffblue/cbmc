@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_PROP_DPLIB_CONV_H
 #define CPROVER_PROP_DPLIB_CONV_H
 
-#include <hash_cont.h>
+#include <util/hash_cont.h>
 
 #include <solvers/prop/prop_conv.h>
 #include <solvers/flattening/pointer_logic.h>

@@ -11,7 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ostream>
 
-#include <threeval.h>
+#include <util/threeval.h>
 
 #include <solvers/prop/prop.h>
 

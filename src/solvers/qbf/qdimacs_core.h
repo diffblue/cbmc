@@ -9,7 +9,7 @@ Author: CM Wintersteiger
 #ifndef CPROVER_QDIMACS_CORE_H
 #define CPROVER_QDIMACS_CORE_H
 
-#include <expr.h>
+#include <util/expr.h>
 
 #include "qdimacs_cnf.h"
 
