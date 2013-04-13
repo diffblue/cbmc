@@ -546,6 +546,18 @@ public:
   {
     set(ID_C_inlined, value);
   }
+  
+  // this produces the list of parameter identifiers
+  std::vector<irep_idt> parameter_identifiers() const
+  {
+    std::vector<irep_idt> result;
+    const parameterst &p=parameters();
+    result.reserve(p.size());
+    for(parameterst::const_iterator it=p.begin();
+        it!=p.end(); it++)
+      result.push_back(it->get_identifier());
+    return result;
+  }
 };
 
 /*! \brief Cast a generic typet to a \ref code_typet
