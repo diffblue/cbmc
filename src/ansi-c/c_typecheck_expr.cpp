@@ -2068,7 +2068,20 @@ void c_typecheck_baset::do_special_functions(
         throw "same_object expects two operands";
       }
 
-      exprt same_object_expr("same-object", bool_typet());
+      predicate_exprt same_object_expr(ID_same_object);
+      same_object_expr.operands()=expr.arguments();
+      same_object_expr.location()=location;
+      expr.swap(same_object_expr);
+    }
+    else if(identifier==CPROVER_PREFIX "invalid_pointer")
+    {
+      if(expr.arguments().size()!=1)
+      {
+        err_location(f_op);
+        throw "invalid_pointer expects one operand";
+      }
+
+      predicate_exprt same_object_expr(ID_invalid_pointer);
       same_object_expr.operands()=expr.arguments();
       same_object_expr.location()=location;
       expr.swap(same_object_expr);
@@ -2094,7 +2107,7 @@ void c_typecheck_baset::do_special_functions(
         throw "is_zero_string expects one operand";
       }
 
-      exprt is_zero_string_expr("is_zero_string", bool_typet());
+      predicate_exprt is_zero_string_expr("is_zero_string");
       is_zero_string_expr.operands()=expr.arguments();
       is_zero_string_expr.set(ID_C_lvalue, true); // make it an lvalue
       is_zero_string_expr.location()=location;
