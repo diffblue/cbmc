@@ -93,6 +93,7 @@ void ansi_c_internal_additions(std::string &code)
     "void __CPROVER_assert(__CPROVER_bool assertion, const char *description);\n"
     "__CPROVER_bool __CPROVER_equal();\n"
     "__CPROVER_bool __CPROVER_same_object(const void *, const void *);\n"
+    "__CPROVER_bool __CPROVER_invalid_pointer(const void *);\n"
     "__CPROVER_bool __CPROVER_is_zero_string(const void *);\n"
     "__CPROVER_size_t __CPROVER_zero_string_length(const void *);\n"
     "__CPROVER_size_t __CPROVER_buffer_size(const void *);\n"

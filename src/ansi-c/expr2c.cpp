@@ -3996,7 +3996,12 @@ std::string expr2ct::convert(
 
   else if(src.id()==ID_same_object)
   {
-    return convert_function(src, "SAME-OBJECT", precedence=16);
+    return convert_function(src, "__CPROVER_same_object", precedence=16);
+  }
+
+  else if(src.id()==ID_invalid_pointer)
+  {
+    return convert_function(src, "__CPROVER_invalid_pointer", precedence=16);
   }
 
   else if(src.id()==ID_dynamic_object)
