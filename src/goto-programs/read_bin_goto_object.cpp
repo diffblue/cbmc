@@ -11,10 +11,10 @@ Date: June 2006
 #include <util/namespace.h>
 #include <util/message_stream.h>
 #include <util/symbol_table.h>
+#include <util/irep_serialization.h>
 
 #include "read_bin_goto_object.h"
 #include "goto_function_serialization.h"
-#include "irep_serialization.h"
 #include "goto_program_irep.h"
 
 /*******************************************************************\
