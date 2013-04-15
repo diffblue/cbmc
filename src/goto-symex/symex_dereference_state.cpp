@@ -6,7 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <symbol_table.h>
+#include <util/symbol_table.h>
 
 #include "symex_dereference_state.h"
 #include "renaming_ns.h"
