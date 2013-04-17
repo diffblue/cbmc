@@ -49,7 +49,8 @@ Author: Daniel Kroening, kroening@kroening.com
   "(show-natural-loops)(accelerate)(havoc-loops)" \
   "(error-label):(string-abstraction)" \
   "(verbosity):(version)(xml-ui)(show-loops)" \
-  "(accelerate)"
+  "(accelerate)" \
+  "(show-call-sequences)"
 
 class goto_instrument_parseoptionst:
   public parseoptions_baset,

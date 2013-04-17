@@ -7,7 +7,8 @@ SRC = main.cpp parseoptions.cpp document_claims.cpp languages.cpp \
       concurrency.cpp dump_c.cpp dot.cpp havoc_loops.cpp \
       wmm/weak_memory.cpp wmm/fence.cpp wmm/event_graph.cpp \
       wmm/goto2graph.cpp wmm/data_dp.cpp wmm/abstract_event.cpp \
-      wmm/instrumenter_strategies.cpp wmm/cycle_collection.cpp
+      wmm/instrumenter_strategies.cpp wmm/cycle_collection.cpp \
+      call_sequences.cpp
 
 #      accelerate/accelerate.cpp accelerate/polynomial.cpp \
 #      accelerate/scratch_program.cpp accelerate/polynomial_accelerator.cpp \

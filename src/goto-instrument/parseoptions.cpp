@@ -61,6 +61,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "function.h"
 #include "branch.h"
 #include "wmm/weak_memory.h"
+#include "call_sequences.h"
 
 #if 0
 #include "accelerate/accelerate.h"
@@ -195,6 +196,12 @@ int goto_instrument_parseoptionst::doit()
       points_tot points_to;
       points_to(goto_functions);
       points_to.output(std::cout);
+      return 0;
+    }
+    
+    if(cmdline.isset("show-call-sequences"))
+    {
+      show_call_sequences(goto_functions);
       return 0;
     }
 
