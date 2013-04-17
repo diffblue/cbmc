@@ -57,6 +57,7 @@ void show_call_sequences(
         std::cout << function << " -> "
                   << to_symbol_expr(function2).get_identifier() << std::endl;
       }
+      continue; // abort search
     }
 
     // get successors
@@ -90,8 +91,10 @@ void show_call_sequences(
   
   std::cout << "# " << function << std::endl;
   
-  //show_call_sequences(
-  //  );
+  show_call_sequences(
+    function,
+    goto_program,
+    goto_program.instructions.begin());
   
   forall_goto_program_instructions(i_it, goto_program)
   {
