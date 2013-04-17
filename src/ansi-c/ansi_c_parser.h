@@ -101,8 +101,11 @@ public:
     name_mapt name_map;
     
     std::string prefix;
+    irep_idt last_declarator;
     
-    unsigned compound_counter, anon_counter;
+    // for(;;) and { } scopes are numbered
+    unsigned compound_counter;
+    unsigned anon_counter;
     
     scopet():compound_counter(0), anon_counter(0) { }
     
@@ -110,6 +113,7 @@ public:
     {
       name_map.swap(scope.name_map);
       prefix.swap(scope.prefix);
+      last_declarator.swap(scope.last_declarator);
       std::swap(compound_counter, scope.compound_counter);
     }
     
@@ -144,13 +148,14 @@ public:
     irept &declarator,
     const typet &type,
     irept &identifier);
+    
+  typedef enum { TAG, MEMBER, PARAMETER, OTHER } decl_typet;
 
   void new_declaration(
     const irept &type,
     irept &declarator,
     exprt &declaration,
-    bool is_tag=false,
-    bool put_into_scope=true);
+    decl_typet decl_type);
    
   void copy_item(const ansi_c_declarationt &declaration)
   {

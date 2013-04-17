@@ -702,6 +702,16 @@ void c_typecheck_baset::typecheck_expr_symbol(exprt &expr)
   replace_symbol(expr);
   
   const irep_idt &identifier=to_symbol_expr(expr).get_identifier();
+  
+  // Is it a parameter? We do this while checking parameter lists.
+  id_type_mapt::const_iterator p_it=parameter_map.find(identifier);
+  if(p_it!=parameter_map.end())
+  {
+    // yes
+    expr.type()=p_it->second;
+    expr.set(ID_C_lvalue, true);
+    return;
+  }
 
   // look it up
   const symbolt *symbol_ptr;

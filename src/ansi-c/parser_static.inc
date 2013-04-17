@@ -393,7 +393,7 @@ static void do_tag(YYSTYPE &key, YYSTYPE &tag)
 
   // it's new
   ansi_c_declarationt declaration;
-  PARSER.new_declaration(stack(key), stack(tag), declaration, true);
+  PARSER.new_declaration(stack(key), stack(tag), declaration, ansi_c_parsert::TAG);
 
   // grab symbol
   stack(tag).id(ID_symbol);
@@ -415,6 +415,8 @@ Function: create_function_scope
  Purpose:
 
 \*******************************************************************/
+
+#include <iostream>
 
 static void create_function_scope(exprt &expr)
 {
@@ -442,29 +444,29 @@ static void create_function_scope(exprt &expr)
     {
       if(it->id()==ID_declaration)
       {
-        ansi_c_declarationt &arg_decl=to_ansi_c_declaration(*it);
+        ansi_c_declarationt &param_decl=to_ansi_c_declaration(*it);
        
-        // incomplete array type?
-        if(arg_decl.type().id()==ID_array &&
-           arg_decl.type().subtype().is_nil())
-          arg_decl.type().id(ID_pointer);
-
-        if(arg_decl.get_base_name()==irep_idt())
-          arg_decl.set_base_name("#anon_arg"+i2string(anon_count++));
-
         // make sure we know it's a parameter
-        arg_decl.set_is_parameter(true);
-          
-        // fix name
-        arg_decl.set_name(
-          PARSER.current_scope().prefix+id2string(arg_decl.get_base_name()));
-      
+        param_decl.set_is_parameter(true);
+
+        std::cout << "p: " << param_decl.get_base_name() << std::endl;
+
+        if(param_decl.get_base_name()==irep_idt())
+        {
+          param_decl.set_base_name("#anon_param"+i2string(anon_count++));
+          param_decl.set_name(prefix+id2string(param_decl.get_base_name()));
+        }
+        else
+        {
+          // add to scope
+          PARSER.current_scope().name_map
+            [param_decl.get_base_name()].id_class=ANSI_C_SYMBOL;
+        }
+
+        std::cout << "P: " << param_decl.get_name() << std::endl;
+
         // copy declaration
-        PARSER.copy_item(arg_decl);
-      
-        // add to scope
-        PARSER.current_scope().name_map
-          [arg_decl.get_base_name()].id_class=ANSI_C_SYMBOL;
+        PARSER.copy_item(param_decl);        
       }
     }
   }

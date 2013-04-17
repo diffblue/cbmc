@@ -825,7 +825,7 @@ default_declaring_list:
           declaration_qualifier_list identifier_declarator
           {
             init($$);
-            PARSER.new_declaration(stack($1), stack($2), stack($$));
+            PARSER.new_declaration(stack($1), stack($2), stack($$), ansi_c_parsert::OTHER);
             PARSER.copy_item(to_ansi_c_declaration(stack($$)));
           }
           initializer_opt
@@ -837,7 +837,7 @@ default_declaring_list:
         | type_qualifier_list identifier_declarator
           {
             init($$);
-            PARSER.new_declaration(stack($1), stack($2), stack($$));
+            PARSER.new_declaration(stack($1), stack($2), stack($$), ansi_c_parsert::OTHER);
             PARSER.copy_item(to_ansi_c_declaration(stack($$)));
           }
           initializer_opt
@@ -850,7 +850,7 @@ default_declaring_list:
           {
             init($$);
             const irept &t=stack($1).find(ID_type);
-            PARSER.new_declaration(t, stack($3), stack($$));
+            PARSER.new_declaration(t, stack($3), stack($$), ansi_c_parsert::OTHER);
             PARSER.copy_item(to_ansi_c_declaration(stack($$)));
           }
           initializer_opt
@@ -893,7 +893,7 @@ declaring_list:
             // the symbol has to be visible during initialization
             merge_types($1, $3); // type attribute
             init($$);
-            PARSER.new_declaration(stack($1), stack($2), stack($$));
+            PARSER.new_declaration(stack($1), stack($2), stack($$), ansi_c_parsert::OTHER);
             PARSER.copy_item(to_ansi_c_declaration(stack($$)));
           }
           initializer_opt
@@ -908,7 +908,7 @@ declaring_list:
             // the symbol has to be visible during initialization
             merge_types($1, $3); // type attribute
             init($$);
-            PARSER.new_declaration(stack($1), stack($2), stack($$));
+            PARSER.new_declaration(stack($1), stack($2), stack($$), ansi_c_parsert::OTHER);
             PARSER.copy_item(to_ansi_c_declaration(stack($$)));
           }
           initializer_opt
@@ -923,7 +923,7 @@ declaring_list:
             init($$);
             irept t=stack($1).find(ID_type);
             merge_types(t, stack($4)); // type attribute
-            PARSER.new_declaration(t, stack($3), stack($$));
+            PARSER.new_declaration(t, stack($3), stack($$), ansi_c_parsert::OTHER);
             PARSER.copy_item(to_ansi_c_declaration(stack($$)));
           }
           initializer_opt
@@ -1289,7 +1289,7 @@ aggregate_name:
             symbol.set(ID_C_base_name, PARSER.get_anon_name());
 
             init($$);
-            PARSER.new_declaration(stack($1), symbol, stack($$), true);
+            PARSER.new_declaration(stack($1), symbol, stack($$), ansi_c_parsert::TAG);
           }
           '{' member_declaration_list_opt '}'
           gcc_type_attribute_opt
@@ -1314,7 +1314,7 @@ aggregate_name:
           {
             // a struct/union with tag
             init($$);
-            PARSER.new_declaration(stack($1), stack($3), stack($$), true);
+            PARSER.new_declaration(stack($1), stack($3), stack($$), ansi_c_parsert::TAG);
             
             // announce the tag before the members
             ansi_c_declarationt tmp=to_ansi_c_declaration(stack($$)); // copy!
@@ -1439,14 +1439,14 @@ member_default_declaring_list:
           init($$, ID_declaration_list);
 
           exprt declaration;
-          PARSER.new_declaration(stack($2), stack($3), declaration, false, false);
+          PARSER.new_declaration(stack($2), stack($3), declaration, ansi_c_parsert::MEMBER);
 
           stack($$).move_to_operands(declaration);
         }
         | member_default_declaring_list ',' member_identifier_declarator
         {
           exprt declaration;
-          PARSER.new_declaration(stack($1), stack($3), declaration, false, false);
+          PARSER.new_declaration(stack($1), stack($3), declaration, ansi_c_parsert::MEMBER);
 
           $$=$1;
           stack($$).move_to_operands(declaration);
@@ -1466,7 +1466,7 @@ member_declaring_list:
           stack($$).add(ID_type)=stack($2);
 
           exprt declaration;
-          PARSER.new_declaration(stack($2), stack($3), declaration, false, false);
+          PARSER.new_declaration(stack($2), stack($3), declaration, ansi_c_parsert::MEMBER);
 
           stack($$).move_to_operands(declaration);
         }
@@ -1475,7 +1475,7 @@ member_declaring_list:
           exprt declaration;
 
           irept declaration_type=stack($1).find(ID_type);
-          PARSER.new_declaration(declaration_type, stack($3), declaration, false, false);
+          PARSER.new_declaration(declaration_type, stack($3), declaration, ansi_c_parsert::MEMBER);
 
           $$=$1;
           stack($$).move_to_operands(declaration);
@@ -1567,7 +1567,7 @@ enum_name:
             symbol.set(ID_C_base_name, PARSER.get_anon_name());
 
             init($$);
-            PARSER.new_declaration(stack($1), symbol, stack($$), true);
+            PARSER.new_declaration(stack($1), symbol, stack($$), ansi_c_parsert::TAG);
             PARSER.copy_item(to_ansi_c_declaration(stack($$)));
           }
           '{' enumerator_list '}'
@@ -1590,7 +1590,7 @@ enum_name:
           {
             // we want the tag to be visible before the members
             init($$);
-            PARSER.new_declaration(stack($1), stack($3), stack($$), true);
+            PARSER.new_declaration(stack($1), stack($3), stack($$), ansi_c_parsert::TAG);
             PARSER.copy_item(to_ansi_c_declaration(stack($$)));
           }
           '{' enumerator_list '}'
@@ -1648,7 +1648,7 @@ enumerator_declaration:
           // not the enum type!
           init($$);
           irept type(ID_int);
-          PARSER.new_declaration(type, stack($1), stack($$));
+          PARSER.new_declaration(type, stack($1), stack($$), ansi_c_parsert::OTHER);
           stack($$).set(ID_is_macro, true);
           stack($$).add(ID_value).swap(stack($2));
         }
@@ -1693,7 +1693,7 @@ KnR_parameter: identifier
         {
           init($$);
           irept type(ID_KnR);
-          PARSER.new_declaration(type, stack($1), stack($$));
+          PARSER.new_declaration(type, stack($1), stack($$), ansi_c_parsert::PARAMETER);
         }
         ;
 
@@ -1715,80 +1715,80 @@ parameter_declaration:
         {
           init($$);
           exprt declarator=exprt(ID_abstract);
-          PARSER.new_declaration(stack($1), declarator, stack($$));
+          PARSER.new_declaration(stack($1), declarator, stack($$), ansi_c_parsert::PARAMETER);
         }
         | declaration_specifier parameter_abstract_declarator
         {
           init($$);
-          PARSER.new_declaration(stack($1), stack($2), stack($$));
+          PARSER.new_declaration(stack($1), stack($2), stack($$), ansi_c_parsert::PARAMETER);
         }
         | declaration_specifier identifier_declarator gcc_type_attribute_opt
         {
           init($$);
-          PARSER.new_declaration(stack($1), stack($2), stack($$));
+          PARSER.new_declaration(stack($1), stack($2), stack($$), ansi_c_parsert::PARAMETER);
         }
         | declaration_specifier parameter_typedef_declarator
         {
           // the second tree is really the argument -- not part
           // of the type!
           init($$);
-          PARSER.new_declaration(stack($1), stack($2), stack($$));
+          PARSER.new_declaration(stack($1), stack($2), stack($$), ansi_c_parsert::PARAMETER);
         }
         | declaration_qualifier_list
         {
           init($$);
           exprt declarator=exprt(ID_abstract);
-          PARSER.new_declaration(stack($1), declarator, stack($$));
+          PARSER.new_declaration(stack($1), declarator, stack($$), ansi_c_parsert::PARAMETER);
         }
         | declaration_qualifier_list parameter_abstract_declarator
         {
           init($$);
-          PARSER.new_declaration(stack($1), stack($2), stack($$));
+          PARSER.new_declaration(stack($1), stack($2), stack($$), ansi_c_parsert::PARAMETER);
         }
         | declaration_qualifier_list identifier_declarator gcc_type_attribute_opt
         {
           init($$);
-          PARSER.new_declaration(stack($1), stack($2), stack($$));
+          PARSER.new_declaration(stack($1), stack($2), stack($$), ansi_c_parsert::PARAMETER);
         }
         | type_specifier
         {
           init($$);
           exprt declarator=exprt(ID_abstract);
-          PARSER.new_declaration(stack($1), declarator, stack($$));
+          PARSER.new_declaration(stack($1), declarator, stack($$), ansi_c_parsert::PARAMETER);
         }
         | type_specifier parameter_abstract_declarator
         {
           init($$);
-          PARSER.new_declaration(stack($1), stack($2), stack($$));
+          PARSER.new_declaration(stack($1), stack($2), stack($$), ansi_c_parsert::PARAMETER);
         }
         | type_specifier identifier_declarator gcc_type_attribute_opt
         {
           init($$);
           stack($1), stack($2), stack($$);
-          PARSER.new_declaration(stack($1), stack($2), stack($$));
+          PARSER.new_declaration(stack($1), stack($2), stack($$), ansi_c_parsert::PARAMETER);
         }
         | type_specifier parameter_typedef_declarator
         {
           // the second tree is really the argument -- not part
           // of the type!
           init($$);
-          PARSER.new_declaration(stack($1), stack($2), stack($$));
+          PARSER.new_declaration(stack($1), stack($2), stack($$), ansi_c_parsert::PARAMETER);
         }
         | type_qualifier_list
         {
           init($$);
           exprt declarator=exprt(ID_abstract);
-          PARSER.new_declaration(stack($1), declarator, stack($$));
+          PARSER.new_declaration(stack($1), declarator, stack($$), ansi_c_parsert::PARAMETER);
         }
         | type_qualifier_list parameter_abstract_declarator
         {
           init($$);
-          PARSER.new_declaration(stack($1), stack($2), stack($$));
+          PARSER.new_declaration(stack($1), stack($2), stack($$), ansi_c_parsert::PARAMETER);
         }
         | type_qualifier_list identifier_declarator gcc_type_attribute_opt
         {
           init($$);
-          PARSER.new_declaration(stack($1), stack($2), stack($$));
+          PARSER.new_declaration(stack($1), stack($2), stack($$), ansi_c_parsert::PARAMETER);
         }
         ;
 
@@ -2514,7 +2514,7 @@ KnR_parameter_declaring_list:
           init($$);
           stack($$).add(ID_type)=stack($1); // save for later
           exprt tmp;
-          PARSER.new_declaration(stack($1), stack($2), tmp);
+          PARSER.new_declaration(stack($1), stack($2), tmp, ansi_c_parsert::PARAMETER);
           stack($$).move_to_sub(tmp);
         }
         | type_specifier declarator
@@ -2522,7 +2522,7 @@ KnR_parameter_declaring_list:
           init($$);
           stack($$).add(ID_type)=stack($1); // save for later
           exprt tmp;
-          PARSER.new_declaration(stack($1), stack($2), tmp);
+          PARSER.new_declaration(stack($1), stack($2), tmp, ansi_c_parsert::PARAMETER);
           stack($$).move_to_sub(tmp);
         }
         | KnR_parameter_declaring_list ',' declarator
@@ -2531,7 +2531,7 @@ KnR_parameter_declaring_list:
           // need to get type from $1
           const irept &t=stack($1).type();
           exprt tmp;
-          PARSER.new_declaration(t, stack($3), tmp);
+          PARSER.new_declaration(t, stack($3), tmp, ansi_c_parsert::PARAMETER);
           stack($$).move_to_sub(tmp);
         }
         ;
@@ -2541,31 +2541,31 @@ function_head:
         {
           init($$);
           irept return_type(ID_int);
-          PARSER.new_declaration(return_type, stack($1), stack($$));
+          PARSER.new_declaration(return_type, stack($1), stack($$), ansi_c_parsert::OTHER);
           create_function_scope(stack($$));
         }
         | declaration_specifier declarator
         {
           init($$);
-          PARSER.new_declaration(stack($1), stack($2), stack($$));
+          PARSER.new_declaration(stack($1), stack($2), stack($$), ansi_c_parsert::OTHER);
           create_function_scope(stack($$));
         }
         | type_specifier declarator
         {
           init($$);
-          PARSER.new_declaration(stack($1), stack($2), stack($$));
+          PARSER.new_declaration(stack($1), stack($2), stack($$), ansi_c_parsert::OTHER);
           create_function_scope(stack($$));
         }
         | declaration_qualifier_list identifier_declarator
         {
           init($$);
-          PARSER.new_declaration(stack($1), stack($2), stack($$));
+          PARSER.new_declaration(stack($1), stack($2), stack($$), ansi_c_parsert::OTHER);
           create_function_scope(stack($$));
         }
         | type_qualifier_list identifier_declarator
         {
           init($$);
-          PARSER.new_declaration(stack($1), stack($2), stack($$));
+          PARSER.new_declaration(stack($1), stack($2), stack($$), ansi_c_parsert::OTHER);
           create_function_scope(stack($$));
         }
         ;
@@ -2711,6 +2711,12 @@ postfix_identifier_declarator:
 
 paren_identifier_declarator:
           identifier
+        {
+          // We remember the last declarator for the benefit
+          // of function argument scoping.
+          PARSER.current_scope().last_declarator=
+            stack($1).get(ID_identifier);
+        }
         | '(' paren_identifier_declarator ')'
         { $$=$2; }
         ;
@@ -2731,8 +2737,9 @@ postfixing_abstract_declarator:
         /* The following rule implements K&R headers! */
         | '('
           {
-            unsigned prefix=++PARSER.current_scope().compound_counter;
-            PARSER.new_scope(i2string(prefix)+"::");
+            // use last declarator (i.e., function name)
+            PARSER.new_scope(
+              id2string(PARSER.current_scope().last_declarator)+"::");
           }
           KnR_parameter_list
           ')'
@@ -2760,9 +2767,9 @@ parameter_postfixing_abstract_declarator:
         }
         | '('
           {
-            // this is where functions are produced
-            unsigned prefix=++PARSER.current_scope().compound_counter;
-            PARSER.new_scope(i2string(prefix)+"::");
+            // use last declarator (i.e., function name)
+            PARSER.new_scope(
+              id2string(PARSER.current_scope().last_declarator)+"::");
           }
           parameter_type_list
           ')'
