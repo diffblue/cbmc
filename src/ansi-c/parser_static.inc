@@ -449,8 +449,6 @@ static void create_function_scope(exprt &expr)
         // make sure we know it's a parameter
         param_decl.set_is_parameter(true);
 
-        std::cout << "p: " << param_decl.get_base_name() << std::endl;
-
         if(param_decl.get_base_name()==irep_idt())
         {
           param_decl.set_base_name("#anon_param"+i2string(anon_count++));
@@ -462,8 +460,6 @@ static void create_function_scope(exprt &expr)
           PARSER.current_scope().name_map
             [param_decl.get_base_name()].id_class=ANSI_C_SYMBOL;
         }
-
-        std::cout << "P: " << param_decl.get_name() << std::endl;
 
         // copy declaration
         PARSER.copy_item(param_decl);        

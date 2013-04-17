@@ -131,7 +131,7 @@ void ansi_c_parsert::convert_declarator(
     else if(t.id()==irep_idt() ||
             t.is_nil())
     {
-      std::cout << "D: " << declarator.pretty() << std::endl;
+      std::cerr << "D: " << declarator.pretty() << std::endl;
       assert(0);
     }
     else if(t.id()==ID_abstract)
@@ -174,8 +174,6 @@ void ansi_c_parsert::new_declaration(
 
   convert_declarator(declarator, static_cast<const typet &>(type), identifier);
   typet final_type=static_cast<typet &>(declarator);
-  
-  std::cout << "ND: " << identifier.pretty() << std::endl;
   
   std::string base_name=identifier.get_string(ID_C_base_name);
 
