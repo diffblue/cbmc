@@ -105,6 +105,8 @@ void c_typecheck_baset::typecheck_code_type(code_typet &type)
   else
   {
     // we do have parameters
+    
+    parameter_map.clear();
   
     for(unsigned i=0; i<type.parameters().size(); i++)
     {
@@ -132,8 +134,13 @@ void c_typecheck_baset::typecheck_code_type(code_typet &type)
           identifier=m_it->second;
 
         parameter.set_identifier(identifier);
+
+        // make visible now, later parameters might use it
+        parameter_map[identifier]=type;
       }
     }
+    
+    parameter_map.clear();
   
     if(parameters.size()==1 &&
        follow(parameters[0].type()).id()==ID_empty)

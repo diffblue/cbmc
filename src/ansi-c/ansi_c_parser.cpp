@@ -166,8 +166,7 @@ void ansi_c_parsert::new_declaration(
   const irept &type,
   irept &declarator,
   exprt &dest,
-  bool is_tag,
-  bool put_into_scope)
+  decl_typet decl_type)
 {
   assert(declarator.is_not_nil());
 
@@ -176,17 +175,20 @@ void ansi_c_parsert::new_declaration(
   convert_declarator(declarator, static_cast<const typet &>(type), identifier);
   typet final_type=static_cast<typet &>(declarator);
   
-  std::string base_name=identifier.get_string(ID_C_base_name);
+  std::cout << "ND: " << identifier.pretty() << std::endl;
   
+  std::string base_name=identifier.get_string(ID_C_base_name);
+
+  // Visual Studio has global-scope tags  
   bool is_global=current_scope().prefix=="" ||
-                 (mode==MSC && is_tag);
+                 (mode==MSC && decl_type==TAG);
 
   ansi_c_id_classt id_class=get_class(final_type);
   
   const std::string scope_name=
-    is_tag?"tag-"+base_name:base_name;
+    decl_type==TAG?"tag-"+base_name:base_name;
     
-  if(is_tag)
+  if(decl_type==TAG)
     final_type.set(ID_tag, base_name);
 
   std::string name;
@@ -195,14 +197,15 @@ void ansi_c_parsert::new_declaration(
   {
     bool force_root_scope=false;
   
-    if(mode==MSC && is_tag)
+    if(mode==MSC && decl_type==TAG)
     {
       // MSC always puts tags into global scope
       force_root_scope=true;
     }
-    else if(final_type.id()==ID_code)
+    else if(final_type.id()==ID_code && decl_type!=PARAMETER)
     {
-      // functions always go into global scope
+      // functions always go into global scope,
+      // unless it's a parameter
       force_root_scope=true;
     }
 
@@ -210,7 +213,7 @@ void ansi_c_parsert::new_declaration(
          scope_name:
          current_scope().prefix+scope_name;
 
-    if(put_into_scope)
+    if(decl_type!=MEMBER)
     {
       // the following is bad!
       scopet &scope=
@@ -236,7 +239,7 @@ void ansi_c_parsert::new_declaration(
   declaration.set_name(name);
   declaration.location()=identifier.location();
   declaration.value().make_nil();
-  declaration.set_is_type(is_tag || id_class==ANSI_C_TYPEDEF);
+  declaration.set_is_type(decl_type==TAG || id_class==ANSI_C_TYPEDEF);
   declaration.set_is_typedef(id_class==ANSI_C_TYPEDEF);
   declaration.set_is_global(is_global);
 

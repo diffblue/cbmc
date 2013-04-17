@@ -65,6 +65,9 @@ protected:
   typedef hash_map_cont<irep_idt, irep_idt, irep_id_hash> id_replace_mapt;
   id_replace_mapt id_replace_map;
   
+  typedef hash_map_cont<irep_idt, typet, irep_id_hash> id_type_mapt;
+  id_type_mapt parameter_map;
+  
   // apply id_replace_map
   void replace_symbol(irept &symbol);
   
