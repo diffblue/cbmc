@@ -343,7 +343,7 @@ void goto_checkt::integer_overflow_check(
     
     if(type.id()==ID_signedbv)
     {
-      if(old_type.id()==ID_signedbv)
+      if(old_type.id()==ID_signedbv) // signed -> signed
       {
         unsigned new_width=expr.type().get_int(ID_width);
         unsigned old_width=old_type.get_int(ID_width);
@@ -365,7 +365,7 @@ void goto_checkt::integer_overflow_check(
           expr,
           guard);
       }
-      else if(old_type.id()==ID_unsignedbv)
+      else if(old_type.id()==ID_unsignedbv) // unsigned -> signed
       {
         unsigned new_width=expr.type().get_int(ID_width);
         unsigned old_width=old_type.get_int(ID_width);
@@ -383,7 +383,7 @@ void goto_checkt::integer_overflow_check(
           expr,
           guard);
       }
-      else if(old_type.id()==ID_floatbv)
+      else if(old_type.id()==ID_floatbv) // float -> signed
       {
         unsigned new_width=expr.type().get_int(ID_width);
 
@@ -411,7 +411,89 @@ void goto_checkt::integer_overflow_check(
     }
     else if(type.id()==ID_unsignedbv)
     {
-      // todo
+      if(old_type.id()==ID_signedbv) // signed -> unsigned
+      {
+        unsigned new_width=expr.type().get_int(ID_width);
+        unsigned old_width=old_type.get_int(ID_width);
+
+        if(new_width>=old_width-1)
+        {
+          // only need lower bound check
+          binary_relation_exprt no_overflow_lower(ID_ge);
+          no_overflow_lower.lhs()=expr.op0();
+          no_overflow_lower.rhs()=from_integer(0, old_type);
+
+          add_guarded_claim(
+            no_overflow_lower,
+            "arithmetic overflow on signed to unsigned type conversion",
+            "overflow",
+            expr.find_location(),
+            expr,
+            guard);
+        }
+        else
+        {
+          // need both
+          binary_relation_exprt no_overflow_upper(ID_le);
+          no_overflow_upper.lhs()=expr.op0();
+          no_overflow_upper.rhs()=from_integer(power(2, new_width)-1, old_type);
+
+          binary_relation_exprt no_overflow_lower(ID_ge);
+          no_overflow_lower.lhs()=expr.op0();
+          no_overflow_lower.rhs()=from_integer(0, old_type);
+
+          add_guarded_claim(
+            and_exprt(no_overflow_lower, no_overflow_upper),
+            "arithmetic overflow on signed to unsigned type conversion",
+            "overflow",
+            expr.find_location(),
+            expr,
+            guard);
+        }
+      }
+      else if(old_type.id()==ID_unsignedbv) // unsigned -> unsigned
+      {
+        unsigned new_width=expr.type().get_int(ID_width);
+        unsigned old_width=old_type.get_int(ID_width);
+        if(new_width>=old_width) return; // always ok
+
+        binary_relation_exprt no_overflow_upper(ID_le);
+        no_overflow_upper.lhs()=expr.op0();
+        no_overflow_upper.rhs()=from_integer(power(2, new_width)-1, old_type);
+
+        add_guarded_claim(
+          no_overflow_upper,
+          "arithmetic overflow on unsigned to unsigned type conversion",
+          "overflow",
+          expr.find_location(),
+          expr,
+          guard);
+      }
+      else if(old_type.id()==ID_floatbv) // float -> unsigned
+      {
+        unsigned new_width=expr.type().get_int(ID_width);
+
+        // Note that the fractional part is truncated!
+        ieee_floatt upper(to_floatbv_type(old_type));
+        upper.from_integer(power(2, new_width)-1);
+        binary_relation_exprt no_overflow_upper(ID_lt);
+        no_overflow_upper.lhs()=expr.op0();
+        no_overflow_upper.rhs()=upper.to_expr();
+
+        ieee_floatt lower(to_floatbv_type(old_type));
+        lower.from_integer(-1);
+        binary_relation_exprt no_overflow_lower(ID_gt);
+        no_overflow_lower.lhs()=expr.op0();
+        no_overflow_lower.rhs()=lower.to_expr();
+
+        add_guarded_claim(
+          and_exprt(no_overflow_lower, no_overflow_upper),
+          "arithmetic overflow on float to unsigned integer type conversion",
+          "overflow",
+          expr.find_location(),
+          expr,
+          guard);
+      }
     }
 
     return;
@@ -537,188 +619,25 @@ void goto_checkt::float_overflow_check(
   if(type.id()==ID_floatbv)
     return;
 
-  #if 0
   // add overflow subgoal
 
   if(expr.id()==ID_typecast)
   {
-    // conversion to signed int may overflow
-  
-    if(expr.operands().size()!=1)
-      throw "typecast takes one operand";
-
-    const typet &old_type=ns.follow(expr.op0().type());
-    
-    if(type.id()==ID_signedbv)
-    {
-      if(old_type.id()==ID_signedbv)
-      {
-        unsigned new_width=expr.type().get_int(ID_width);
-        unsigned old_width=old_type.get_int(ID_width);
-        if(new_width>=old_width) return; // always ok
-
-        binary_relation_exprt no_overflow_upper(ID_le);
-        no_overflow_upper.lhs()=expr.op0();
-        no_overflow_upper.rhs()=from_integer(power(2, new_width-1)-1, old_type);
-
-        binary_relation_exprt no_overflow_lower(ID_ge);
-        no_overflow_lower.lhs()=expr.op0();
-        no_overflow_lower.rhs()=from_integer(-power(2, new_width-1), old_type);
-
-        add_guarded_claim(
-          and_exprt(no_overflow_lower, no_overflow_upper),
-          "arithmetic overflow on signed type conversion",
-          "overflow",
-          expr.find_location(),
-          expr,
-          guard);
-      }
-      else if(old_type.id()==ID_unsignedbv)
-      {
-        unsigned new_width=expr.type().get_int(ID_width);
-        unsigned old_width=old_type.get_int(ID_width);
-        if(new_width>=old_width+1) return; // always ok
-
-        binary_relation_exprt no_overflow_upper(ID_le);
-        no_overflow_upper.lhs()=expr.op0();
-        no_overflow_upper.rhs()=from_integer(power(2, new_width-1)-1, old_type);
-
-        add_guarded_claim(
-          no_overflow_upper,
-          "arithmetic overflow on unsigned to signed type conversion",
-          "overflow",
-          expr.find_location(),
-          expr,
-          guard);
-      }
-      else if(old_type.id()==ID_floatbv)
-      {
-        unsigned new_width=expr.type().get_int(ID_width);
-
-        // Note that the fractional part is truncated!
-        ieee_floatt upper(to_floatbv_type(old_type));
-        upper.from_integer(power(2, new_width-1));
-        binary_relation_exprt no_overflow_upper(ID_lt);
-        no_overflow_upper.lhs()=expr.op0();
-        no_overflow_upper.rhs()=upper.to_expr();
-
-        ieee_floatt lower(to_floatbv_type(old_type));
-        lower.from_integer(-power(2, new_width-1)-1);
-        binary_relation_exprt no_overflow_lower(ID_gt);
-        no_overflow_lower.lhs()=expr.op0();
-        no_overflow_lower.rhs()=lower.to_expr();
-
-        add_guarded_claim(
-          and_exprt(no_overflow_lower, no_overflow_upper),
-          "arithmetic overflow on float to signed integer type conversion",
-          "overflow",
-          expr.find_location(),
-          expr,
-          guard);
-      }
-    }
-    else if(type.id()==ID_unsignedbv)
-    {
-      // todo
-    }
-
     return;
   }
   else if(expr.id()==ID_div)
   {
     assert(expr.operands().size()==2);
-
-    // undefined for signed division INT_MIN/-1
-    if(type.id()==ID_signedbv)
-    {
-      equal_exprt int_min_eq(
-        expr.op0(), to_signedbv_type(type).smallest_expr());
-
-      equal_exprt minus_one_eq(
-        expr.op1(), from_integer(-1, type));
-
-      add_guarded_claim(
-        not_exprt(and_exprt(int_min_eq, minus_one_eq)),
-        "arithmetic overflow on signed division",
-        "overflow",
-        expr.find_location(),
-        expr,
-        guard);
-    }
-    
     return;
   }
   else if(expr.id()==ID_mod)
   {
-    // these can't overflow
     return;
   }
   else if(expr.id()==ID_unary_minus)
   {
-    if(type.id()==ID_signedbv)
-    {
-      // overflow on unary- can only happen with the smallest
-      // representable number 100....0
-      
-      equal_exprt int_min_eq(
-        expr.op0(), to_signedbv_type(type).smallest_expr());
-
-      add_guarded_claim(
-        not_exprt(int_min_eq),
-        "arithmetic overflow on signed unary minus",
-        "overflow",
-        expr.find_location(),
-        expr,
-        guard);
-    }
-  
     return;
   }
-
-  exprt overflow("overflow-"+expr.id_string(), bool_typet());
-  overflow.operands()=expr.operands();
-
-  if(expr.operands().size()>=3)
-  {
-    // The overflow checks are binary!
-    // We break these up.
-  
-    for(unsigned i=1; i<expr.operands().size(); i++)
-    {
-      exprt tmp;
-      
-      if(i==1)
-        tmp=expr.op0();
-      else
-      {
-        tmp=expr;
-        tmp.operands().resize(i);
-      }
-      
-      overflow.operands().resize(2);
-      overflow.op0()=tmp;
-      overflow.op1()=expr.operands()[i];
-    
-      add_guarded_claim(
-        not_exprt(overflow),
-        "arithmetic overflow on "+expr.id_string(),
-        "overflow",
-        expr.find_location(),
-        expr,
-        guard);
-    }
-  }
-  else
-  {
-    add_guarded_claim(
-      not_exprt(overflow),
-      "arithmetic overflow on "+expr.id_string(),
-      "overflow",
-      expr.find_location(),
-      expr,
-      guard);
-  }
-  #endif
 }
 
 /*******************************************************************\
