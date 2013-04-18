@@ -445,6 +445,9 @@ static void create_function_scope(exprt &expr)
       if(it->id()==ID_declaration)
       {
         ansi_c_declarationt &param_decl=to_ansi_c_declaration(*it);
+
+        // we record the function name in the location
+        param_decl.location().set_function(declaration.get_base_name());
        
         // make sure we know it's a parameter
         param_decl.set_is_parameter(true);
