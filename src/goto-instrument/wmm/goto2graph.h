@@ -114,7 +114,7 @@ protected:
     void visit_cfg_goto(goto_programt::instructionst::iterator i_it);
 
  public:
-    ~cfg_visitort()
+    virtual ~cfg_visitort()
     {
     }
 
