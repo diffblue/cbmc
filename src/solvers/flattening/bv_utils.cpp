@@ -6,8 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <assert.h>
-#include <arith_tools.h>
+#include <cassert>
+
+#include <util/arith_tools.h>
 
 #include "bv_utils.h"
 
