@@ -205,7 +205,7 @@ protected:
   class graph_explorert
   {
   public:
-    ~graph_explorert()
+    virtual ~graph_explorert()
     {
     }
 
