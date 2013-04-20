@@ -1,6 +1,6 @@
 SRC = main.cpp parseoptions.cpp bmc.cpp dimacs.cpp languages.cpp \
       bv_cbmc.cpp symex_bmc.cpp show_vcc.cpp cbmc_solvers.cpp \
-      xml_interface.cpp cover.cpp \
+      xml_interface.cpp cover.cpp all_claims.cpp \
       counterexample_beautification.cpp
 
 OBJ += ../ansi-c/ansi-c$(LIBEXT) \
