@@ -93,7 +93,11 @@ void cover_goalst::operator()()
       break;
 
     case decision_proceduret::D_SATISFIABLE:
-      mark(); // mark the ones we got
+      // store the assignment
+      assignments.push_back(assignmentt());
+      
+      // mark the goals we got
+      mark(); 
       break;
 
     default:

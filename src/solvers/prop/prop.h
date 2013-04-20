@@ -13,13 +13,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/message.h>
 
-#include "literal.h"
+#include "prop_assignment.h"
 
 class tvt;
 
 /*! \brief TO_BE_DOCUMENTED
 */
-class propt:public messaget
+class propt:public messaget, public prop_assignmentt
 {
 public:
   propt() { }
@@ -69,7 +69,7 @@ public:
   typedef enum { P_SATISFIABLE, P_UNSATISFIABLE, P_ERROR } resultt;
   virtual resultt prop_solve()=0;  
   
-  // satisfying assignment
+  // satisfying assignment, from prop_assignmentt
   virtual tvt l_get(literalt a) const=0;
   virtual void set_assignment(literalt a, bool value);
   virtual void copy_assignment_from(const propt &prop);
