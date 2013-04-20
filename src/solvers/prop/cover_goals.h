@@ -66,7 +66,16 @@ public:
     }
   };
 
-  std::list<cover_goalt> goals;
+  typedef std::list<cover_goalt> goalst;
+  goalst goals;
+  
+  class assignmentt
+  {
+  public:;
+  };
+  
+  typedef std::list<assignmentt> assignmentst;
+  assignmentst assignments;
 
 protected:
   unsigned _number_covered, _iterations;
