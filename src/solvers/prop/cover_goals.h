@@ -28,6 +28,8 @@ public:
     prop_conv(_prop_conv), prop(_prop_conv.prop)
   {
   }
+  
+  virtual ~cover_goalst();
 
   void operator()();
 
@@ -69,19 +71,17 @@ public:
   typedef std::list<cover_goalt> goalst;
   goalst goals;
   
-  class assignmentt
-  {
-  public:;
-  };
-  
-  typedef std::list<assignmentt> assignmentst;
-  assignmentst assignments;
-
 protected:
   unsigned _number_covered, _iterations;
   prop_convt &prop_conv;
   propt &prop;
 
+  // this method is called for each satisfying assignment
+  virtual void assignment()
+  {
+  }
+
+private:
   void mark();
   void constraint();
 };

@@ -13,6 +13,22 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
+Function: cover_goalst::~cover_goalst
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+cover_goalst::~cover_goalst()
+{
+}
+
+/*******************************************************************\
+
 Function: cover_goalst::mark
 
   Inputs:
@@ -93,11 +109,11 @@ void cover_goalst::operator()()
       break;
 
     case decision_proceduret::D_SATISFIABLE:
-      // store the assignment
-      assignments.push_back(assignmentt());
-      
       // mark the goals we got
       mark(); 
+      
+      // notify
+      assignment();
       break;
 
     default:
