@@ -43,13 +43,26 @@ inline int pthread_mutex_lock(pthread_mutex_t *mutex)
 inline int pthread_mutex_trylock(pthread_mutex_t *mutex)
 {
   __CPROVER_HIDE:;
+  int return_value;
   __CPROVER_atomic_begin();
+
   __CPROVER_assert(*((signed char *)mutex)!=-1,
     "mutex not initialised or destroyed");
-  if(*((signed char *)mutex)==1) { __CPROVER_atomic_end(); return 1; }
-  *((signed char *)mutex)=1;
+
+  if(*((signed char *)mutex)==1)
+  {
+    // failed
+    return_value=1;
+  }
+  else
+  {
+    // ok
+    return_value=0;
+    *((signed char *)mutex)=1;
+  }
+
   __CPROVER_atomic_end();
-  return 0;
+  return return_value;
 }
 
 /* FUNCTION: pthread_mutex_unlock */
