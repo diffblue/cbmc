@@ -58,12 +58,14 @@ public:
   // constructor and destructor
   string_containert();  
   ~string_containert();
-  
+
+  // the pointer is guaranteed to be stable  
   inline const char *c_str(unsigned no) const
   {
     return string_vector[no]->c_str();
   }
   
+  // the reference is guaranteed to be stable
   inline const std::string &get_string(unsigned no) const
   {
     return *string_vector[no];

@@ -49,7 +49,7 @@ public:
     return as_string()[i];
   }
   
-  // warning! the address returned is not stable
+  // the pointer is guaranteed to be stable
   inline const char *c_str() const
   {
     return as_string().c_str();
@@ -128,7 +128,7 @@ public:
 protected:
   unsigned no;
 
-  // warning! the reference returned is not stable
+  // the reference returned is guaranteed to be stable
   inline const std::string &as_string() const
   { return string_container.get_string(no); }
 
