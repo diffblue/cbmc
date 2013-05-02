@@ -115,6 +115,16 @@ void c_typecheck_baset::typecheck_code(codet &code)
     typecheck_expr(code.op0());
     typecheck_expr(code.op1());
   }
+  else if(statement==ID_CPROVER_try_catch)
+  {
+    assert(code.operands().size()==2);
+    typecheck_code(to_code(code.op0()));
+    typecheck_code(to_code(code.op1()));
+  }
+  else if(statement==ID_CPROVER_throw)
+  {
+    assert(code.operands().size()==0);
+  }
   else
   {
     err_location(code);

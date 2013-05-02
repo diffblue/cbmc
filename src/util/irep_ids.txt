@@ -159,6 +159,8 @@ with
 trans
 throw
 catch
+CPROVER_throw
+CPROVER_try_catch
 protection
 private
 public

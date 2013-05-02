@@ -148,6 +148,9 @@ extern char *yyansi_ctext;
 %token TOK_CPROVER_BITVECTOR "__CPROVER_bitvector"
 %token TOK_CPROVER_ATOMIC "__CPROVER_atomic"
 %token TOK_CPROVER_BOOL "__CPROVER_bool"
+%token TOK_CPROVER_THROW "__CPROVER_throw"
+%token TOK_CPROVER_CATCH "__CPROVER_catch"
+%token TOK_CPROVER_TRY "__CPROVER_try"
 %token TOK_IMPLIES     "==>"
 %token TOK_EQUIVALENT  "<==>"
 %token TOK_TRUE        "TRUE"
@@ -1970,6 +1973,7 @@ statement:
         | gcc_local_label_statement
         | msc_asm_statement
         | msc_seh_statement
+        | cprover_exception_statement
         ;
 
 declaration_statement:
@@ -2277,6 +2281,22 @@ msc_seh_statement:
         {
           $$=$1;
           statement($$, ID_msc_leave);
+        }
+        ;
+
+cprover_exception_statement:
+          TOK_CPROVER_THROW ';'
+        {
+          $$=$1;
+          statement($$, ID_CPROVER_throw);
+        }
+        | TOK_CPROVER_TRY compound_statement
+          TOK_CPROVER_CATCH compound_statement
+        {
+          $$=$1;
+          statement($$, ID_CPROVER_try_catch);
+          mto($$, $2);
+          mto($$, $4);
         }
         ;
 
