@@ -21,6 +21,12 @@ class goto_modelt
 public:
   symbol_tablet symbol_table;
   goto_functionst goto_functions;
+  
+  void clear()
+  {
+    symbol_table.clear();
+    goto_functions.clear();
+  }
 };
 
 #endif
