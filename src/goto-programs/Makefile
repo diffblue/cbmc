@@ -1,5 +1,6 @@
 SRC = goto_convert.cpp goto_convert_function_call.cpp \
       goto_convert_side_effect.cpp goto_program.cpp basic_blocks.cpp \
+      goto_convert_exceptions.cpp \
       remove_function_pointers.cpp goto_functions.cpp goto_inline.cpp \
       remove_skip.cpp goto_convert_functions.cpp string_instrumentation.cpp \
       builtin_functions.cpp show_claims.cpp destructor.cpp set_claims.cpp \

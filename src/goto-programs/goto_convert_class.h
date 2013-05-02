@@ -193,6 +193,8 @@ protected:
   void convert_msc_try_except(const codet &code, goto_programt &dest);
   void convert_msc_leave(const codet &code, goto_programt &dest);
   void convert_catch(const codet &code, goto_programt &dest);
+  void convert_CPROVER_try_catch(const codet &code, goto_programt &dest);
+  void convert_CPROVER_throw(const codet &code, goto_programt &dest);
   void convert_asm(const codet &code, goto_programt &dest);
   void convert(const codet &code, goto_programt &dest);
   void copy(const codet &code, goto_program_instruction_typet type, goto_programt &dest);
@@ -211,74 +213,26 @@ protected:
   typedef std::list<std::pair<goto_programt::targett, caset> > casest;
   typedef std::map<goto_programt::targett, casest::iterator> cases_mapt;
   
-  struct break_continue_targetst
+  struct targetst
   {
-    break_continue_targetst():break_set(false), continue_set(false)
-    {
-    }
-  
-    goto_programt::targett break_target;
-    bool break_set;
-
-    goto_programt::targett continue_target;
-    bool continue_set;
-    
-    void restore(const break_continue_targetst &targets)
-    {
-      *this=targets;
-    }
-  
-    void set_break(goto_programt::targett _break_target)
-    {
-      break_set=true;
-      break_target=_break_target;
-    }
-
-    void set_continue(goto_programt::targett _continue_target)
-    {
-      continue_set=true;
-      continue_target=_continue_target;
-    }
-  };
-  
-  struct break_continue_switch_targetst:public break_continue_targetst
-  {
-    break_continue_switch_targetst():
-      default_set(false)
-    {
-    }
-    
-    using break_continue_targetst::restore;
-    
-    void restore(const break_continue_switch_targetst &targets)
-    {
-      *this=targets;
-    }
-  
-    void set_default(goto_programt::targett _default_target)
-    {
-      default_set=true;
-      default_target=_default_target;
-    }
-
-    goto_programt::targett default_target;
-    bool default_set;
-    casest cases;
-    cases_mapt cases_map;
-  };
-
-  struct targetst:public break_continue_switch_targetst
-  {
-    bool return_is_set;
-    bool has_return_value;
-
+    bool return_is_set, has_return_value, break_set, continue_set, default_set;
     labelst labels;
     gotost gotos;
     computed_gotost computed_gotos;
 
+    casest cases;
+    cases_mapt cases_map;
+
+    goto_programt::targett break_target;
+    goto_programt::targett continue_target;
+    goto_programt::targett default_target;
+
     targetst():
       return_is_set(false),
-      has_return_value(false)
+      has_return_value(false),
+      break_set(false),
+      continue_set(false),
+      default_set(false)
     {
     }
     
@@ -301,7 +255,79 @@ protected:
       targets.cases.swap(cases);
       targets.cases_map.swap(cases_map);
     }
+
+    void set_break(goto_programt::targett _break_target)
+    {
+      break_set=true;
+      break_target=_break_target;
+    }
+
+    void set_continue(goto_programt::targett _continue_target)
+    {
+      continue_set=true;
+      continue_target=_continue_target;
+    }
+
+    void set_default(goto_programt::targett _default_target)
+    {
+      default_set=true;
+      default_target=_default_target;
+    }
+
   } targets;
+
+  struct break_continue_targetst
+  {
+    explicit break_continue_targetst(const targetst &targets)
+    {
+      break_set=targets.break_set;
+      continue_set=targets.continue_set;
+      break_target=targets.break_target;
+      continue_target=targets.continue_target;
+      cases=targets.cases;
+      cases_map=targets.cases_map;
+    }
+
+    void restore(targetst &targets)
+    {
+      targets.break_set=break_set;
+      targets.continue_set=continue_set;
+      targets.break_target=break_target;
+      targets.continue_target=continue_target;
+      targets.cases=cases;
+      targets.cases_map=cases_map;
+    }
+
+    goto_programt::targett break_target;
+    goto_programt::targett continue_target;
+    bool break_set, continue_set;  
+
+    casest cases;
+    cases_mapt cases_map;
+  };
+  
+  struct break_switch_targetst
+  {
+    explicit break_switch_targetst(const targetst &targets)
+    {
+      break_set=targets.break_set;
+      default_set=targets.default_set;
+      break_target=targets.break_target;
+      default_target=targets.default_target;
+    }
+    
+    void restore(targetst &targets)
+    {
+      targets.break_set=break_set;
+      targets.default_set=default_set;
+      targets.break_target=break_target;
+      targets.default_target=default_target;
+    }
+
+    goto_programt::targett break_target;
+    goto_programt::targett default_target;
+    bool break_set, default_set;  
+  };
   
   void case_guard(
     const exprt &value,
