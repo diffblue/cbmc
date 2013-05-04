@@ -208,13 +208,12 @@ void goto_convert_functionst::convert_function(const irep_idt &identifier)
   locationt end_location;
 
   if(code.get_statement()==ID_block)
-    end_location=static_cast<const locationt &>(
-      code.find("#end_location"));
+    end_location=to_code_block(code).end_location();
   else
     end_location.make_nil();
 
   targets=targetst();
-  targets.return_is_set=true;
+  targets.return_set=true;
   targets.has_return_value=
     f.type.return_type().id()!=ID_empty &&
     f.type.return_type().id()!=ID_constructor &&

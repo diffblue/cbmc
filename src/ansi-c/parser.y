@@ -151,6 +151,7 @@ extern char *yyansi_ctext;
 %token TOK_CPROVER_THROW "__CPROVER_throw"
 %token TOK_CPROVER_CATCH "__CPROVER_catch"
 %token TOK_CPROVER_TRY "__CPROVER_try"
+%token TOK_CPROVER_FINALLY "__CPROVER_finally"
 %token TOK_IMPLIES     "==>"
 %token TOK_EQUIVALENT  "<==>"
 %token TOK_TRUE        "TRUE"
@@ -2062,7 +2063,10 @@ statement_list:
           statement
         {
           $$=$1;
-          to_code(stack($$)).make_block();
+          exprt tmp;
+          tmp.swap(stack($1));
+          statement($$, ID_block);
+          stack($$).move_to_operands(tmp);
         }
         | statement_list statement
         {
@@ -2295,6 +2299,14 @@ cprover_exception_statement:
         {
           $$=$1;
           statement($$, ID_CPROVER_try_catch);
+          mto($$, $2);
+          mto($$, $4);
+        }
+        | TOK_CPROVER_TRY compound_statement
+          TOK_CPROVER_FINALLY compound_statement
+        {
+          $$=$1;
+          statement($$, ID_CPROVER_try_finally);
           mto($$, $2);
           mto($$, $4);
         }

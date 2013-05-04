@@ -115,7 +115,8 @@ void c_typecheck_baset::typecheck_code(codet &code)
     typecheck_expr(code.op0());
     typecheck_expr(code.op1());
   }
-  else if(statement==ID_CPROVER_try_catch)
+  else if(statement==ID_CPROVER_try_catch ||
+          statement==ID_CPROVER_try_finally)
   {
     assert(code.operands().size()==2);
     typecheck_code(to_code(code.op0()));

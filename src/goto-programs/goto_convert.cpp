@@ -419,6 +419,8 @@ void goto_convertt::convert(
     convert_CPROVER_try_catch(code, dest);
   else if(statement==ID_CPROVER_throw) // CPROVER-homemade
     convert_CPROVER_throw(code, dest);
+  else if(statement==ID_CPROVER_try_finally)
+    convert_CPROVER_try_finally(code, dest);
   else if(statement==ID_asm)
     convert_asm(code, dest);
   else if(statement==ID_static_assert)
@@ -443,6 +445,8 @@ void goto_convertt::convert(
       // we may wish to complain
     }
   }
+  else if(statement==ID_dead)
+    copy(code, DEAD, dest);
   else
     copy(code, OTHER, dest);
 
@@ -472,66 +476,23 @@ void goto_convertt::convert_block(
 {
   const locationt &end_location=code.end_location();
 
-  // this needs to be ordered to obtain
-  // the correct ordering for the destructor calls
-  std::list<irep_idt> locals;
+  // this saves the size of the destructor stack
+  unsigned old_stack_size=targets.destructor_stack.size();
   
+  // now convert block  
   forall_operands(it, code)
   {
-    const codet &code=to_code(*it);
-
-    if(code.get_statement()==ID_decl)
-    {
-      const exprt &op0=code.op0();
-      assert(op0.id()==ID_symbol);
-      const irep_idt &identifier=op0.get(ID_identifier);
-      const symbolt &symbol=lookup(identifier);
-      
-      if(!symbol.is_static_lifetime &&
-         symbol.type.id()!=ID_code)
-        locals.push_back(identifier);
-    }
-    
-    convert(code, dest);
-
-    for(tmp_symbolst::const_iterator
-        it=tmp_symbols.begin();
-        it!=tmp_symbols.end();
-        it++)
-      locals.push_back(*it);
-
-    tmp_symbols.clear();
+    const codet &b_code=to_code(*it);
+    convert(b_code, dest);
   }
 
-  // see if we need to call any destructors
-
-  while(!locals.empty())
+  // see if we need to do any destructors
+  while(targets.destructor_stack.size()>old_stack_size)
   {
-    const symbolt &symbol=ns.lookup(locals.back());
-    const symbol_exprt symbol_expr(symbol.name, symbol.type);
-
-    code_function_callt destructor=get_destructor(ns, symbol.type);
-
-    if(destructor.is_not_nil())
-    {
-      // add "this"
-      exprt this_expr(ID_address_of, pointer_typet());
-      this_expr.type().subtype()=symbol.type;
-      this_expr.copy_to_operands(symbol_expr);
-      destructor.arguments().push_back(this_expr);
-
-      convert(destructor, dest);
-    }
-    
-    // now create a 'dead' instruction
-    {
-      goto_programt::targett dead=dest.add_instruction(DEAD);
-      dead->location=end_location;
-      dead->code=code_deadt(symbol_expr);
-      dead->code.location()=end_location;
-    }
-    
-    locals.pop_back();
+    codet d_code=targets.destructor_stack.back();
+    d_code.location()=end_location; // override
+    convert(d_code, dest);
+    targets.destructor_stack.pop_back();
   }
 }
 
@@ -624,6 +585,7 @@ void goto_convertt::convert_decl(
   }
   else
   {
+    // this is expected to go away
     exprt initializer;
   
     codet tmp=code;
@@ -638,6 +600,28 @@ void goto_convertt::convert_decl(
     assign.location()=tmp.location();
 
     convert_assign(assign, dest);
+  }
+
+  // do destructor
+  const symbol_exprt symbol_expr(symbol.name, symbol.type);
+
+  code_function_callt destructor=get_destructor(ns, symbol.type);
+
+  if(destructor.is_not_nil())
+  {
+    // add "this"
+    exprt this_expr(ID_address_of, pointer_typet());
+    this_expr.type().subtype()=symbol.type;
+    this_expr.copy_to_operands(symbol_expr);
+    destructor.arguments().push_back(this_expr);
+
+    targets.destructor_stack.push_back(destructor);
+  }
+    
+  // now create a 'dead' instruction
+  {
+    code_deadt code_dead(symbol_expr);
+    targets.destructor_stack.push_back(code_dead);
   }
 }
 
@@ -1328,6 +1312,16 @@ void goto_convertt::convert_break(
     throw "break without target";
   }
 
+  // need to process destructor stack
+  for(unsigned d=targets.destructor_stack.size();
+      d!=targets.break_stack_size;
+      d--)
+  {
+    codet d_code=targets.destructor_stack[d-1];
+    d_code.location()=code.location();
+    convert(d_code, dest);
+  }
+
   goto_programt::targett t=dest.add_instruction();
   t->make_goto(targets.break_target);
   t->location=code.location();
@@ -1349,7 +1343,7 @@ void goto_convertt::convert_return(
   const code_returnt &code,
   goto_programt &dest)
 {
-  if(!targets.return_is_set)
+  if(!targets.return_set)
   {
     err_location(code);
     throw "return without target";
@@ -1395,7 +1389,22 @@ void goto_convertt::convert_return(
       throw "function must not return value";
     }
   }
-
+  
+  // need to process entire destructor stack
+  for(destructor_stackt::const_reverse_iterator
+      s_it=targets.destructor_stack.rbegin();
+      s_it!=targets.destructor_stack.rend();
+      s_it++)
+  {
+    #if 0
+    // need to worry about 'dead' in there
+    codet d_code=*s_it;
+    d_code.location()=code.location();
+    convert(d_code, dest);
+    #endif
+  }
+  
+  // now add return
   goto_programt::targett t=dest.add_instruction();
   t->make_return();
   t->code=new_code;
@@ -1422,6 +1431,16 @@ void goto_convertt::convert_continue(
   {
     err_location(code);
     throw "continue without target";
+  }
+
+  // need to process destructor stack
+  for(unsigned d=targets.destructor_stack.size();
+      d!=targets.continue_stack_size;
+      d--)
+  {
+    codet d_code=targets.destructor_stack[d-1];
+    d_code.location()=code.location();
+    convert(d_code, dest);
   }
 
   goto_programt::targett t=dest.add_instruction();
