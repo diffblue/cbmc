@@ -329,7 +329,8 @@ void ansi_c_convertt::convert_code(codet &code)
   else if(statement==ID_gcc_local_label)
   {
   }
-  else if(statement==ID_CPROVER_try_catch)
+  else if(statement==ID_CPROVER_try_catch ||
+          statement==ID_CPROVER_try_finally)
   {
     assert(code.operands().size()==2);
     convert_code(to_code(code.op0()));
