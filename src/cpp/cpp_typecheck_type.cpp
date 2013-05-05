@@ -250,6 +250,10 @@ void cpp_typecheckt::typecheck_type(typet &type)
   {
     // ok (internally generated)
   }
+  else if(type.id()==ID_block_pointer)
+  {
+    // this is an Apple extension for lambda-like constructs
+  }
   else
   {
     err_location(type);
