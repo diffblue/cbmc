@@ -2,7 +2,7 @@
 
 #include <goto-programs/goto_functions.h>
 
-#include <std_expr.h>
+#include <util/std_expr.h>
 
 #include <iostream>
 #include <list>
@@ -10,7 +10,7 @@
 #include "accelerate.h"
 #include "path.h"
 #include "polynomial_accelerator.h"
-#include "symbolic_accelerator.h"
+//#include "symbolic_accelerator.h"
 
 //#define DEBUG
 

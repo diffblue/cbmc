@@ -62,10 +62,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "branch.h"
 #include "wmm/weak_memory.h"
 #include "call_sequences.h"
-
-#if 0
 #include "accelerate/accelerate.h"
-#endif
 
 /*******************************************************************\
 
@@ -359,12 +356,10 @@ int goto_instrument_parseoptionst::doit()
 
     if(cmdline.isset("accelerate"))
     {
-      #if 0
       namespacet ns(symbol_table);
       accelerate_functions(goto_functions, ns);
       remove_skip(goto_functions);
       goto_functions.update();
-      #endif
     }
     
     // write new binary?

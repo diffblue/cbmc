@@ -22,13 +22,13 @@ class scratch_programt : public goto_programt {
       symbol_table(_symbol_table),
       shadow_symbol_table(_symbol_table),
       ns(shadow_symbol_table),
+      checker(ns, "scratch", "", "AUFBV", smt2_dect::Z3),
       equation(ns),
-      symex(ns, shadow_symbol_table, equation),
-      checker(ns, "scratch", "", "AUFBV", smt2_dect::Z3)
+      symex(ns, shadow_symbol_table, equation)
   {
   }
 
-  symbolt fresh_symbol(string base);
+  symbolt fresh_symbol(string base, typet type);
   void append(goto_programt::instructionst &instructions);
 
   targett assign(const exprt &lhs, const exprt &rhs);

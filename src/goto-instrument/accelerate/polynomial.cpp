@@ -4,24 +4,40 @@
 #include <util/replace_expr.h>
 #include <util/arith_tools.h>
 
-#include <ansi-c/c_types.h>
-
 #include "polynomial.h"
+#include "util.h"
 
 exprt polynomialt::to_expr() {
   exprt ret = nil_exprt();
+  typet itype = nil_typet();
+
+  // Figure out the appropriate type to do all the intermediate calculations
+  // in.
+  for (std::vector<monomialt>::iterator m_it = monomials.begin();
+       m_it != monomials.end();
+       ++m_it) {
+    for (std::vector<monomialt::termt>::iterator t_it = m_it->terms.begin();
+         t_it != m_it->terms.end();
+         ++t_it) {
+      if (itype == nil_typet()) {
+        itype = t_it->var.type();
+      } else {
+        itype = join_types(itype, t_it->var.type());
+      }
+    }
+  }
 
   for (std::vector<monomialt>::iterator m_it = monomials.begin();
        m_it != monomials.end();
        ++m_it)
   {
-    exprt mon_expr = from_integer(m_it->coeff, signed_int_type());
+    exprt mon_expr = from_integer(m_it->coeff, itype);
 
     for (std::vector<monomialt::termt>::iterator t_it = m_it->terms.begin();
          t_it != m_it->terms.end();
          ++t_it) {
-      for (int i = 0; i < t_it->exp; i++) {
-        mon_expr = mult_exprt(mon_expr, t_it->var);
+      for (unsigned int i = 0; i < t_it->exp; i++) {
+        mon_expr = mult_exprt(mon_expr, typecast_exprt(t_it->var, itype));
       }
     }
 

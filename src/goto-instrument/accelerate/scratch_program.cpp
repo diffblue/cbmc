@@ -10,14 +10,14 @@
 
 static int num_symbols;
 
-symbolt scratch_programt::fresh_symbol(string base) {
+symbolt scratch_programt::fresh_symbol(string base, typet type) {
   string name = base + "_" + i2string(num_symbols++);
   symbolt ret;
   ret.module = "scratch";
   ret.name = name;
   ret.base_name = name;
   ret.pretty_name = name;
-  ret.type = signedbv_typet(32);
+  ret.type = type;
 
   shadow_symbol_table.add(ret);
 

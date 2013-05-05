@@ -8,12 +8,10 @@ SRC = main.cpp parseoptions.cpp document_claims.cpp languages.cpp \
       wmm/weak_memory.cpp wmm/fence.cpp wmm/event_graph.cpp \
       wmm/goto2graph.cpp wmm/data_dp.cpp wmm/abstract_event.cpp \
       wmm/instrumenter_strategies.cpp wmm/cycle_collection.cpp \
-      call_sequences.cpp
-
-#      accelerate/accelerate.cpp accelerate/polynomial.cpp \
-#      accelerate/scratch_program.cpp accelerate/polynomial_accelerator.cpp \
-#      accelerate/symbolic_accelerator.cpp \
-#      accelerate/linearize.cpp accelerate/finite_calculus.cpp
+      call_sequences.cpp \
+      accelerate/accelerate.cpp accelerate/polynomial.cpp \
+      accelerate/scratch_program.cpp accelerate/polynomial_accelerator.cpp \
+      accelerate/util.cpp
 
 OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../linking/linking$(LIBEXT) \
