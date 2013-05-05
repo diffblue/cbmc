@@ -2312,31 +2312,51 @@ bool Parser::optPtrOperator(typet &ptrs)
     #ifdef DEBUG
     std::cout << "Parser::optPtrOperator 2 " << t << "\n";
     #endif
-    
-    if(t!='*' && !isPtrToMember(0))
-      break;
-    else
+
+    if(t=='*')
     {
-      typet op;
-      if(t=='*')
-      {
-        Token tk;
-        lex->GetToken(tk);
-        op.id(ID_pointer);
-        set_location(op, tk);
-      }
-      else
-        if(!rPtrToMember(op))
-          return false;
+      typet op(ID_pointer);
+      Token tk;
+      lex->GetToken(tk);
+      set_location(op, tk);
 
       typet cv;
       cv.make_nil();
       optCvQualify(cv);
       op.add(ID_C_qualifier).swap(cv);
 
-      t_list.push_back(typet());
-      t_list.back().swap(op);
+      t_list.push_back(op);
     }
+    else if(t=='^')
+    {
+      // this is an Apple extension called 'block pointer' or 'closure pointer'
+      typet op(ID_block_pointer);
+      Token tk;
+      lex->GetToken(tk);
+      set_location(op, tk);
+
+      typet cv;
+      cv.make_nil();
+      optCvQualify(cv);
+      op.add(ID_C_qualifier).swap(cv);
+
+      t_list.push_back(op);
+    }
+    else if(isPtrToMember(0))
+    {
+      typet op;
+      if(!rPtrToMember(op))
+        return false;
+
+      typet cv;
+      cv.make_nil();
+      optCvQualify(cv);
+      op.add(ID_C_qualifier).swap(cv);
+
+      t_list.push_back(op);
+    }
+    else
+      break;
   }
 
   {
