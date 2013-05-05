@@ -487,13 +487,10 @@ void goto_convertt::convert_block(
   }
 
   // see if we need to do any destructors
-  while(targets.destructor_stack.size()>old_stack_size)
-  {
-    codet d_code=targets.destructor_stack.back();
-    d_code.location()=end_location; // override
-    convert(d_code, dest);
-    targets.destructor_stack.pop_back();
-  }
+  unwind_destructor_stack(end_location, old_stack_size, dest);
+
+  // remove those destructors
+  targets.destructor_stack.resize(old_stack_size);
 }
 
 /*******************************************************************\
@@ -1313,15 +1310,9 @@ void goto_convertt::convert_break(
   }
 
   // need to process destructor stack
-  for(unsigned d=targets.destructor_stack.size();
-      d!=targets.break_stack_size;
-      d--)
-  {
-    codet d_code=targets.destructor_stack[d-1];
-    d_code.location()=code.location();
-    convert(d_code, dest);
-  }
+  unwind_destructor_stack(code.location(), targets.break_stack_size, dest);
 
+  // add goto
   goto_programt::targett t=dest.add_instruction();
   t->make_goto(targets.break_target);
   t->location=code.location();
@@ -1390,19 +1381,10 @@ void goto_convertt::convert_return(
     }
   }
   
-  // need to process entire destructor stack
-  for(destructor_stackt::const_reverse_iterator
-      s_it=targets.destructor_stack.rbegin();
-      s_it!=targets.destructor_stack.rend();
-      s_it++)
-  {
-    #if 0
-    // need to worry about 'dead' in there
-    codet d_code=*s_it;
-    d_code.location()=code.location();
-    convert(d_code, dest);
-    #endif
-  }
+  // Need to process entire destructor stack.
+  // We ignore 'dead' here, as we may need
+  // these for the return value.
+  unwind_destructor_stack(code.location(), 0, dest, false);
   
   // now add return
   goto_programt::targett t=dest.add_instruction();
@@ -1434,15 +1416,9 @@ void goto_convertt::convert_continue(
   }
 
   // need to process destructor stack
-  for(unsigned d=targets.destructor_stack.size();
-      d!=targets.continue_stack_size;
-      d--)
-  {
-    codet d_code=targets.destructor_stack[d-1];
-    d_code.location()=code.location();
-    convert(d_code, dest);
-  }
+  unwind_destructor_stack(code.location(), targets.continue_stack_size, dest);
 
+  // add goto
   goto_programt::targett t=dest.add_instruction();
   t->make_goto(targets.continue_target);
   t->location=code.location();
