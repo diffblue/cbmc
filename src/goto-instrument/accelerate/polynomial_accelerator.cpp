@@ -14,16 +14,16 @@
 
 #include <ansi-c/expr2c.h>
 
-#include <symbol_table.h>
-#include <options.h>
-#include <std_expr.h>
-#include <std_code.h>
-#include <i2string.h>
-#include <find_symbols.h>
-#include <rename.h>
-#include <simplify_expr.h>
-#include <replace_expr.h>
-#include <arith_tools.h>
+#include <util/symbol_table.h>
+#include <util/options.h>
+#include <util/std_expr.h>
+#include <util/std_code.h>
+#include <util/i2string.h>
+#include <util/find_symbols.h>
+#include <util/rename.h>
+#include <util/simplify_expr.h>
+#include <util/replace_expr.h>
+#include <util/arith_tools.h>
 
 #include "polynomial_accelerator.h"
 #include "util.h"
@@ -31,7 +31,8 @@
 #define DEBUG
 
 
-bool polynomial_acceleratort::accelerate(patht &loop, goto_programt &accelerator) {
+bool polynomial_acceleratort::accelerate(patht &loop,
+    goto_programt &accelerator) {
   goto_programt::instructionst body;
 
   for (patht::iterator it = loop.begin();
@@ -72,7 +73,8 @@ bool polynomial_acceleratort::accelerate(patht &loop, goto_programt &accelerator
   }
 
   if (loop_counter.is_nil()) {
-    symbolt loop_sym = program.fresh_symbol("polynomial::loop_counter");
+    symbolt loop_sym = program.fresh_symbol("polynomial::loop_counter",
+        unsignedbv_typet(32));
     symbol_table.add(loop_sym);
     loop_counter = loop_sym.symbol_expr();
   }
@@ -138,7 +140,8 @@ bool polynomial_acceleratort::accelerate(patht &loop, goto_programt &accelerator
   } else {
     // The path is not monotone, so we need to introduce a quantifier to ensure
     // that the condition held for all 0 <= k < n.
-    symbolt k_sym = program.fresh_symbol("polynomial::k");
+    symbolt k_sym = program.fresh_symbol("polynomial::k",
+        unsignedbv_typet(32));
     symbol_table.add(k_sym);
     exprt k = k_sym.symbol_expr();
 
@@ -169,8 +172,6 @@ bool polynomial_acceleratort::accelerate(patht &loop, goto_programt &accelerator
   // assume(no overflows in previous code);
 
   program.assign(loop_counter, nondet_exprt(loop_counter.type()));
-  //program.assume(binary_relation_exprt(loop_counter, ">", make_constant(0)));
-  program.assume(binary_relation_exprt(loop_counter, ">", from_integer(0, signedbv_typet(32))));
 
   for (map<exprt, polynomialt>::iterator it = polynomials.begin();
        it != polynomials.end();
@@ -247,7 +248,8 @@ bool polynomial_acceleratort::fit_polynomial(goto_programt::instructionst &body,
   for (vector<expr_listt>::iterator it = parameters.begin();
        it != parameters.end();
        ++it) {
-    symbolt coeff = program.fresh_symbol("polynomial::coeff");
+    symbolt coeff = program.fresh_symbol("polynomial::coeff",
+        signedbv_typet(32));
     symbol_table.add(coeff);
     coefficients.insert(make_pair(*it, coeff.symbol_expr()));
   }
@@ -326,7 +328,20 @@ void polynomial_acceleratort::assert_for_values(scratch_programt &program,
                                                 goto_programt::instructionst
                                                    &loop_body,
                                                 exprt &target) {
-  // First set the initial values of the all the variables...
+  // First figure out what the appropriate type for this expression is.
+  typet expr_type = nil_typet();
+
+  for (map<exprt, int>::iterator it = values.begin();
+      it != values.end();
+      ++it) {
+    if (expr_type == nil_typet()) {
+      expr_type = it->first.type();
+    } else {
+      expr_type = join_types(expr_type, it->first.type());
+    }
+  }
+
+  // Now set the initial values of the all the variables...
   for (map<exprt, int>::iterator it = values.begin();
        it != values.end();
        ++it) {
@@ -365,7 +380,8 @@ void polynomial_acceleratort::assert_for_values(scratch_programt &program,
     // OK, concrete_value now contains the value of all the relevant variables
     // multiplied together.  Create the term concrete_value*coefficient and add
     // it into the polynomial.
-    exprt term = mult_exprt(from_integer(concrete_value, it->second.type()), it->second);
+    typecast_exprt cast(it->second, expr_type);
+    exprt term = mult_exprt(from_integer(concrete_value, expr_type), cast);
 
     if (rhs.is_nil()) {
       rhs = term;
@@ -373,6 +389,8 @@ void polynomial_acceleratort::assert_for_values(scratch_programt &program,
       rhs = plus_exprt(rhs, term);
     }
   }
+
+  rhs = typecast_exprt(rhs, target.type());
 
   // We now have the RHS of the polynomial.  Assert that this is equal to the
   // actual value of the variable we're fitting.
@@ -589,16 +607,12 @@ void polynomial_acceleratort::stash_variables(scratch_programt &program,
   for (find_symbols_sett::iterator it = vars.begin();
        it != vars.end();
        ++it) {
-    symbolt stashed_sym = program.fresh_symbol("polynomial::stash");
     symbolt orig = symbol_table.lookup(*it);
-    irep_idt stashed_name = stashed_sym.name;
-    irep_idt orig_name = *it;
+    symbolt stashed_sym = program.fresh_symbol("polynomial::stash",
+        orig.type);
 
-    stashed_sym.type = orig.type;
     symbol_table.add(stashed_sym);
-
     substitution[orig.symbol_expr()] = stashed_sym.symbol_expr();
-
     program.assign(stashed_sym.symbol_expr(), orig.symbol_expr());
   }
 }
@@ -863,7 +877,8 @@ bool polynomial_acceleratort::do_arrays(goto_programt::instructionst &loop_body,
 
   and_exprt arrays_expr(array_operands);
 
-  symbolt k_sym = program.fresh_symbol("polynomial::k");
+  symbolt k_sym = program.fresh_symbol("polynomial::k",
+      unsignedbv_typet(32));
   symbol_table.add(k_sym);
   exprt k = k_sym.symbol_expr();
 
@@ -909,7 +924,8 @@ bool polynomial_acceleratort::do_arrays(goto_programt::instructionst &loop_body,
     }
 
     exprt idx_never_touched = nil_exprt();
-    symbolt idx_sym = program.fresh_symbol("polynomial::idx");
+    symbolt idx_sym = program.fresh_symbol("polynomial::idx",
+        signedbv_typet(32));
     symbol_table.add(idx_sym);
     exprt idx = idx_sym.symbol_expr();
 
@@ -973,7 +989,8 @@ bool polynomial_acceleratort::do_arrays(goto_programt::instructionst &loop_body,
       // OK, we have an expression saying idx is not touched by the
       // loop_counter'th iteration.  Let's quantify that to say that idx is not
       // touched at all.
-      symbolt l_sym = program.fresh_symbol("polynomial::l");
+      symbolt l_sym = program.fresh_symbol("polynomial::l",
+          signedbv_typet(32));
       symbol_table.add(l_sym);
       exprt l = l_sym.symbol_expr();
 
