@@ -252,7 +252,8 @@ void cpp_typecheckt::typecheck_type(typet &type)
   }
   else if(type.id()==ID_block_pointer)
   {
-    // this is an Apple extension for lambda-like constructs
+    // This is an Apple extension for lambda-like constructs.
+    // http://thirdcog.eu/pwcblocks/
   }
   else
   {
