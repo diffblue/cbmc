@@ -198,8 +198,21 @@ protected:
   void convert_CPROVER_try_finally(const codet &code, goto_programt &dest);
   void convert_CPROVER_throw(const codet &code, goto_programt &dest);
   void convert_asm(const codet &code, goto_programt &dest);
+
   void convert(const codet &code, goto_programt &dest);
+
   void copy(const codet &code, goto_program_instruction_typet type, goto_programt &dest);
+  
+  //
+  // exceptions
+  //
+  
+  symbol_exprt exception_flag();
+  void unwind_destructor_stack(
+    const locationt &location,
+    unsigned stack_size,
+    goto_programt &dest,
+    bool do_dead=true);
 
   //
   // gotos
@@ -218,7 +231,9 @@ protected:
   
   struct targetst
   {
-    bool return_set, has_return_value, break_set, continue_set, default_set, throw_set;
+    bool return_set, has_return_value, break_set, continue_set,
+         default_set, throw_set, leave_set;
+
     labelst labels;
     gotost gotos;
     computed_gotost computed_gotos;
@@ -227,12 +242,11 @@ protected:
     casest cases;
     cases_mapt cases_map;
 
-    goto_programt::targett break_target;
-    goto_programt::targett continue_target;
-    goto_programt::targett default_target;
-    goto_programt::targett throw_target;
+    goto_programt::targett break_target, continue_target,
+      default_target, throw_target, leave_target;
     
-    unsigned break_stack_size, continue_stack_size, throw_stack_size;
+    unsigned break_stack_size, continue_stack_size, throw_stack_size,
+             leave_stack_size;
 
     targetst():
       return_set(false),
@@ -240,28 +254,9 @@ protected:
       break_set(false),
       continue_set(false),
       default_set(false),
-      throw_set(false)
+      throw_set(false),
+      leave_set(false)
     {
-    }
-    
-    void swap(targetst &targets)
-    {
-      std::swap(targets.break_target, break_target);
-      std::swap(targets.break_set, break_set);
-
-      std::swap(targets.continue_target, continue_target);
-      std::swap(targets.continue_set, continue_set);
-
-      std::swap(targets.has_return_value, has_return_value);
-      std::swap(targets.return_set, return_set);   
-      
-      std::swap(targets.default_target, default_target);
-      std::swap(targets.default_set, default_set);
-      
-      targets.labels.swap(labels);
-      targets.gotos.swap(gotos);
-      targets.cases.swap(cases);
-      targets.cases_map.swap(cases_map);
     }
 
     void set_break(goto_programt::targett _break_target)
@@ -289,6 +284,13 @@ protected:
       throw_set=true;
       throw_target=_throw_target;
       throw_stack_size=destructor_stack.size();
+    }
+
+    void set_leave(goto_programt::targett _leave_target)
+    {
+      leave_set=true;
+      leave_target=_leave_target;
+      leave_stack_size=destructor_stack.size();
     }
 
   } targets;
@@ -352,11 +354,11 @@ protected:
     cases_mapt cases_map;
   };
   
-  struct catch_targett
+  struct throw_targett
   {
     // for 'try...catch' and the like
 
-    explicit catch_targett(const targetst &targets)
+    explicit throw_targett(const targetst &targets)
     {
       throw_set=targets.throw_set;
       throw_target=targets.throw_target;
@@ -372,6 +374,28 @@ protected:
     goto_programt::targett throw_target;
     bool throw_set;
     unsigned throw_stack_size;
+  };
+  
+  struct leave_targett
+  {
+    // for 'try...leave...finally'
+
+    explicit leave_targett(const targetst &targets)
+    {
+      leave_set=targets.leave_set;
+      leave_target=targets.leave_target;
+      leave_stack_size=targets.destructor_stack.size();
+    }
+
+    void restore(targetst &targets)
+    {
+      targets.leave_set=leave_set;
+      targets.leave_target=leave_target;
+    }
+
+    goto_programt::targett leave_target;
+    bool leave_set;
+    unsigned leave_stack_size;
   };
   
   void case_guard(
