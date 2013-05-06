@@ -106,7 +106,8 @@ void cpp_typecheckt::typecheck_enum_type(typet &type)
   
   if(anonymous)
   {
-    base_name="#anon"+i2string(anon_counter++);
+    // we fabricate a tag based on the enum constants contained
+    base_name=enum_type.generate_anon_tag();
   }
   else
   {

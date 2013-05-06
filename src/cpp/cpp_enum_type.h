@@ -54,6 +54,8 @@ public:
   {
     return get_bool(ID_C_tag_only_declaration);
   }
+  
+  irep_idt generate_anon_tag() const;
 };
 
 extern inline const cpp_enum_typet &to_cpp_enum_type(const irept &irep)
