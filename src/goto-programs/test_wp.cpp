@@ -4,6 +4,7 @@
 #include <util/config.h>
 #include <util/simplify_expr.h>
 #include <util/cmdline.h>
+#include <util/options.h>
 
 #include <langapi/mode.h>
 #include <ansi-c/ansi_c_language.h>
@@ -29,12 +30,9 @@ int main(int argc, const char **argv)
     symbol_tablet symbol_table;
     language.typecheck(symbol_table, "cin", message_handler);
 
-    optionst options;
-    options.set_option("assertions", true);
-    options.set_option("assumptions", true);
     goto_functionst goto_functions;
 
-    goto_convert(symbol_table, options, goto_functions, message_handler);
+    goto_convert(symbol_table, goto_functions, message_handler);
 
     goto_functionst::function_mapt::const_iterator
       f_it=goto_functions.function_map.find("c::f");
