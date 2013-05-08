@@ -25,9 +25,11 @@ LIBS = ../ansi-c/ansi-c$(LIBEXT) \
        ../cpp/cpp$(LIBEXT) \
        ../linking/linking$(LIBEXT) \
        ../util/util$(LIBEXT) \
-	../big-int/bigint$(OBJEXT) goto-programs$(LIBEXT) \
-	../pointer-analysis/pointer-analysis$(LIBEXT) \
-	../langapi/langapi$(LIBEXT)
+       ../big-int/bigint$(OBJEXT) goto-programs$(LIBEXT) \
+       ../pointer-analysis/pointer-analysis$(LIBEXT) \
+       ../langapi/langapi$(LIBEXT) \
+       ../assembler/assembler$(LIBEXT) \
+       ../analyses/analyses$(LIBEXT)
 
 CLEANFILES = goto-programs$(LIBEXT) test_wp$(EXEEXT)
 
