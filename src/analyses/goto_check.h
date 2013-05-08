@@ -19,4 +19,9 @@ void goto_check(
   const optionst &options,
   goto_functionst &goto_functions);
 
+void goto_check(
+  const namespacet &ns,
+  const optionst &options,
+  goto_functionst::goto_functiont &goto_function);
+
 #endif
