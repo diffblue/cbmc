@@ -6,8 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <stdint.h>
-
+#include <cstdint>
 #include <cassert>
 #include <cmath>
 #include <limits>

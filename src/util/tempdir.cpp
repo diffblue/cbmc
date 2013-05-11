@@ -12,8 +12,8 @@ Author: CM Wintersteiger
 #include <direct.h>
 #endif
 
-#include <stdlib.h>
-#include <string.h>
+#include <cstdlib>
+#include <cstring>
 
 #ifdef __MACH__
 #include <unistd.h>

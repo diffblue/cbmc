@@ -12,7 +12,7 @@ Date: June 2006
 #define XML_GOTO_PROGRAM_H_
 
 #include <goto-programs/goto_program.h>
-#include <xml.h>
+#include <util/xml.h>
 
 void convert(
   const goto_programt&,

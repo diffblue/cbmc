@@ -12,7 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <windows.h>
 #include <fcntl.h>
 #include <io.h>
-#include <stdio.h>
+#include <cstdio>
 #endif 
 
 #include "unicode.h"

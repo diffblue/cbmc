@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #ifndef CPROVER_CPP_ITEM_H
 #define CPROVER_CPP_ITEM_H
 
-#include <assert.h>
+#include <cassert>
 
 #include "cpp_declaration.h"
 #include "cpp_linkage_spec.h"

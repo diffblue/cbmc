@@ -6,7 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <string.h>
+#include <cstring>
 
 #include <util/std_expr.h>
 #include <util/std_code.h>

@@ -10,8 +10,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #ifdef USE_SPRINTF
 
-#include <stdio.h>
-#include <string.h>
+#include <cstdio>
+#include <cstring>
 
 #include "i2string.h"
 

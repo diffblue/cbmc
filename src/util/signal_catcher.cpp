@@ -12,7 +12,7 @@ Date:
 
 #else
 #include <signal.h>
-#include <stdlib.h>
+#include <cstdlib>
 
 #include <csignal>
 #endif

@@ -6,8 +6,7 @@ Author: CM Wintersteiger
 
 \*******************************************************************/
 
-#include <assert.h>
-
+#include <cassert>
 #include <fstream>
 
 #include <util/i2string.h>

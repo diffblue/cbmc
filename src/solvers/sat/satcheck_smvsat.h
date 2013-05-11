@@ -12,7 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <vector>
 #include <set>
 
-#include <expr.h>
+#include <util/expr.h>
 
 #include "cnf.h"
 

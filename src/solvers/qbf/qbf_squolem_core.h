@@ -9,7 +9,7 @@ Author: CM Wintersteiger
 #ifndef CPROVER_QBF_SQUOLEM_CORE_H
 #define CPROVER_QBF_SQUOLEM_CORE_H
 
-#include <hash_cont.h>
+#include <util/hash_cont.h>
 #include <quannon/squolem2/squolem2.h>
 
 #include "qdimacs_core.h"

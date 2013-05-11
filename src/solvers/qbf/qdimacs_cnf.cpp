@@ -7,8 +7,7 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <iostream>
-
-#include <assert.h>
+#include <cassert>
 
 #include "qdimacs_cnf.h"
 

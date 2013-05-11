@@ -6,7 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <stdlib.h>
+#include <cstdlib>
 
 #include "arith_tools.h"
 #include "std_types.h"

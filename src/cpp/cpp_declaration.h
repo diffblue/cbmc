@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #ifndef CPROVER_CPP_DECLARATION_H
 #define CPROVER_CPP_DECLARATION_H
 
-#include <assert.h>
+#include <cassert>
 
 #include "cpp_declarator.h"
 #include "cpp_storage_spec.h"

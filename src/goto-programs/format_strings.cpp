@@ -6,7 +6,7 @@ Author: CM Wintersteiger
 
 \*******************************************************************/
 
-#include <ctype.h>
+#include <cctype>
 
 #include "format_strings.h"
 

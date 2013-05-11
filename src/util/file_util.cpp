@@ -10,41 +10,41 @@ Date: January 2012
 
 #ifdef __linux__
 #include <unistd.h>
-#include <errno.h>
+#include <cerrno>
 #include <dirent.h>
-#include <stdlib.h>
-#include <stdio.h>
+#include <cstdlib>
+#include <cstdio>
 #endif
 
 #ifdef __FreeBSD_kernel__
 #include <unistd.h>
-#include <errno.h>
+#include <cerrno>
 #include <dirent.h>
-#include <stdlib.h>
-#include <stdio.h>
+#include <cstdlib>
+#include <cstdio>
 #endif
 
 #ifdef __MACH__
 #include <unistd.h>
-#include <errno.h>
+#include <cerrno>
 #include <dirent.h>
-#include <stdlib.h>
-#include <stdio.h>
+#include <cstdlib>
+#include <cstdio>
 #endif
 
 #ifdef __CYGWIN__
 #include <unistd.h>
-#include <errno.h>
+#include <cerrno>
 #include <dirent.h>
-#include <stdlib.h>
-#include <stdio.h>
+#include <cstdlib>
+#include <cstdio>
 #endif
 
 #ifdef _WIN32
 #include <io.h>
 #include <windows.h>
 #include <direct.h>
-#include <errno.h>
+#include <cerrno>
 #define chdir _chdir
 #define popen _popen
 #define pclose _pclose
