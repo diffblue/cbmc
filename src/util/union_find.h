@@ -14,10 +14,16 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "numbering.h"
 
+// Standard union find with weighting and path compression.
+// See http://www.cs.princeton.edu/~rs/AlgsDS07/01UnionFind.pdf
+
 class unsigned_union_find
 {
 public:
+  // merge the sets 'a' and 'b'
   void make_union(unsigned a, unsigned b);
+
+  // find the root of the set 'a' belongs to
   unsigned find(unsigned a) const;  
 
   void intersection(const unsigned_union_find &other);
@@ -32,7 +38,7 @@ public:
 
   inline void resize(unsigned size)
   {
-    // only enlarge
+    // We only enlarge. Shrinking is yet to be implemented.
     assert(nodes.size()<=size);
     nodes.resize(size);
   }
@@ -41,42 +47,49 @@ public:
   {
     nodes.clear();
   }
-  
+
+  // is 'a' a root?  
   inline bool is_root(unsigned a) const
   {
     if(a>=size()) return true;
     return nodes[a].root;
   }
-  
+
+  // are 'a' and 'b' in the same set?
   inline bool same_set(unsigned a, unsigned b) const
   {
     return find(a)==find(b);
   }
-  
+
+  // total number of elements  
   inline unsigned size() const
   {
     return nodes.size();
   }
-  
+
+  // size of the set that 'a' is in  
   inline unsigned count(unsigned a) const
   {
     if(a>=size()) return 1;
     return nodes[find(a)].count;
   }
-  
+
+  // make the array large enough to contain 'a'  
   inline void check_index(unsigned a)
   {
     if(a>=size()) resize(a+1);
   }
-  
+
+  // number of disjoint sets  
   unsigned count_roots() const
   {
     unsigned c=0;
     for(unsigned i=0; i<nodes.size(); i++)
-      if(nodes[i].root) c++;
+      if(is_root(i)) c++;
     return c;
   }
-  
+
+  // makes 'new_root' the root of the set 'old'  
   void re_root(unsigned old, unsigned new_root);
 
   // find a different member of the same set
