@@ -7,7 +7,7 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <cassert>
-#include <ctype.h>
+#include <cctype>
 #include <cstdlib>
 
 #include <util/arith_tools.h>

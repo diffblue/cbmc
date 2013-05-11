@@ -11,7 +11,7 @@ Date: June 2006
 #include <sstream>
 #include <iostream>
 
-#include <xml_irep.h>
+#include <util/xml_irep.h>
 
 #include "xml_goto_program.h"
 

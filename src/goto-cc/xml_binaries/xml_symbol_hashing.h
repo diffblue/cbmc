@@ -11,8 +11,8 @@ Date: July 2006
 #ifndef XML_SYMBOL_HASHING_H_
 #define XML_SYMBOL_HASHING_H_
 
-#include <symbol.h>
-#include <xml.h>
+#include <util/symbol.h>
+#include <util/xml.h>
 
 #include "xml_irep_hashing.h"
 

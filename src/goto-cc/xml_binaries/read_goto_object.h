@@ -11,8 +11,8 @@ Date: June 2006
 #ifndef CPROVER_READ_GOTO_OBJECT_H
 #define CPROVER_READ_GOTO_OBJECT_H
 
-#include <message.h>
-#include <symbol_table.h>
+#include <util/message.h>
+#include <util/symbol_table.h>
 #include <goto-programs/goto_functions.h>
 
 bool read_goto_object(

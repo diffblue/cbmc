@@ -6,8 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-//#include <assert.h>
-
 #include <util/prefix.h>
 #include <util/cprover_prefix.h>
 #include <util/xml_expr.h>

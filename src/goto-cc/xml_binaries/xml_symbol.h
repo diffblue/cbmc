@@ -11,8 +11,8 @@ Date: June 2006
 #ifndef XML_SYMBOL_H_
 #define XML_SYMBOL_H_
 
-#include <symbol.h>
-#include <xml.h>
+#include <util/symbol.h>
+#include <util/xml.h>
 
 void convert(const symbolt &, xmlt &);
 void convert(const xmlt &, symbolt &);

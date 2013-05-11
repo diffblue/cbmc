@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #ifndef CPROVER_CPP_TEMPLATE_TYPE_H
 #define CPROVER_CPP_TEMPLATE_TYPE_H
 
-#include <type.h>
+#include <util/type.h>
 
 // A data structure for expressions of the form
 // <typename T, int x, ...>

@@ -8,7 +8,7 @@ Date: June 2006
  
 \*******************************************************************/
 
-#include <xml_irep.h>
+#include <util/xml_irep.h>
 
 #include "xml_goto_function.h"
 #include "xml_goto_program.h"

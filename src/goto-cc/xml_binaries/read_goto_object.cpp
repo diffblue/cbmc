@@ -9,9 +9,9 @@ Date: June 2006
 \*******************************************************************/
 
 #include <xmllang/xml_parser.h>
-#include <namespace.h>
-#include <base_type.h>
-#include <message_stream.h>
+#include <util/namespace.h>
+#include <util/base_type.h>
+#include <util/message_stream.h>
 
 #define XML_VERSION "1.4"
 

@@ -10,7 +10,8 @@ Author: CM Wintersteiger
 #define CPROVER_QBF_BDD_CORE_H
 
 #include <vector>
-#include <hash_cont.h>
+
+#include <util/hash_cont.h>
 
 #include "qdimacs_core.h"
 

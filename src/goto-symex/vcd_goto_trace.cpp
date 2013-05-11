@@ -8,8 +8,7 @@ Date: June 2011
 
 \*******************************************************************/
 
-#include <time.h>
-
+#include <ctime>
 #include <cassert>
 
 #include <util/arith_tools.h>

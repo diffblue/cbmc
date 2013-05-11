@@ -11,7 +11,7 @@ Date: June 2006
 #ifndef XML_GOTO_FUNCTION_H_
 #define XML_GOTO_FUNCTION_H_
 
-#include <xml.h>
+#include <util/xml.h>
 #include <goto-programs/goto_functions.h>
 
 void convert( const xmlt&, goto_functionst::goto_functiont& );

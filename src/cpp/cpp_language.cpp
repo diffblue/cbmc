@@ -6,8 +6,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#include <string.h>
-
+#include <cstring>
 #include <sstream>
 #include <fstream>
 

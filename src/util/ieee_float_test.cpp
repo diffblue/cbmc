@@ -1,7 +1,7 @@
 #include <cstdlib>
-#include <time.h>
+#include <ctime>
 #include <limits>
-#include <float.h>
+#include <cfloat>
 #include <cmath>
 #include <iostream>
 #include <cassert>
