@@ -29,13 +29,25 @@ public:
   
   loop_mapt loop_map;
 
-  void operator()(P &program);
+  inline void operator()(P &program)
+  {
+    compute(program);
+  }
 
   void output(std::ostream &) const;
   
-  const cfg_dominators_templatet<P, T>& get_dominator_info() const
+  inline const cfg_dominators_templatet<P, T>& get_dominator_info() const
   {
     return cfg_dominators;
+  }
+  
+  inline natural_loops_templatet()
+  {
+  }
+
+  inline natural_loops_templatet(P &program)
+  {
+    compute(program);
   }
 
 protected:
@@ -56,12 +68,6 @@ class natural_loopst:
 
 typedef natural_loops_templatet<goto_programt, goto_programt::targett>
     natural_loops_mutablet;
-
-template<class P, class T>
-void natural_loops_templatet<P, T>::operator()(P &program)
-{
-  compute(program);
-}
 
 /*******************************************************************\
 
