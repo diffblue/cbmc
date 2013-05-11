@@ -26,6 +26,10 @@ public:
   // find the root of the set 'a' belongs to
   unsigned find(unsigned a) const;  
 
+  // Makes 'this' the union-find with the following:
+  // any union in 'this' will be present in both source sets,
+  // i.e., this is the strongest implication of the two
+  // data structures.
   void intersection(const unsigned_union_find &other);
 
   // remove from any sets
