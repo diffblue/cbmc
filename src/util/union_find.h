@@ -40,7 +40,9 @@ public:
   {
     // We only enlarge. Shrinking is yet to be implemented.
     assert(nodes.size()<=size);
-    nodes.resize(size);
+    nodes.reserve(size);
+    while(nodes.size()<size)
+      nodes.push_back(nodet(nodes.size()));
   }
   
   inline void clear()
@@ -52,7 +54,8 @@ public:
   inline bool is_root(unsigned a) const
   {
     if(a>=size()) return true;
-    return nodes[a].root;
+    // a root is its own parent
+    return nodes[a].parent==a;
   }
 
   // are 'a' and 'b' in the same set?
@@ -98,18 +101,17 @@ public:
 protected:  
   struct nodet
   {
-    // these two could be shared
-    unsigned count;
+    unsigned count; // set size
     unsigned parent;
 
-    bool root;
-    
-    nodet():count(1), parent(0), root(true)
+    // constructs a root node        
+    explicit nodet(unsigned index):count(1), parent(index)
     {
     }
   };
 
-  std::vector<nodet> nodes;
+  // This is mutable to allow path compression in find().
+  mutable std::vector<nodet> nodes;
 };
 
 template <typename T>
