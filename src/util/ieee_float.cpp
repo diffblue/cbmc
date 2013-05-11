@@ -6,7 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <cstdint>
+// <cstdint> is yet to come
+#include <stdint.h>
+
 #include <cassert>
 #include <cmath>
 #include <limits>
