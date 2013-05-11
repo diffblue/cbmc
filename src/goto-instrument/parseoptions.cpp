@@ -38,6 +38,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/local_may_alias.h>
 #include <analyses/goto_check.h>
 #include <analyses/call_graph.h>
+#include <analyses/interval_analysis.h>
 
 #include "parseoptions.h"
 #include "version.h"
@@ -706,6 +707,12 @@ void goto_instrument_parseoptionst::instrument_goto_program(
         goto_functions);
     }
   }  
+
+  if(cmdline.isset("interval-analysis"))
+  {
+    status("Interval analysis");
+    interval_analysis(goto_functions);
+  }
 
   if(cmdline.isset("havoc-loops"))
   {
