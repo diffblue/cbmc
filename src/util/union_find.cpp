@@ -36,14 +36,12 @@ void unsigned_union_find::make_union(unsigned j, unsigned k)
   if(nodes[j].count < nodes[k].count)  // j is the smaller set
   {
     nodes[k].count+=nodes[j].count;  // so k becomes parent to j
-    nodes[j].root=false;
     nodes[j].parent=k;
     nodes[j].count=0;
   }
   else // j is NOT the smaller
   {
     nodes[j].count+=nodes[k].count;  // so j becomes parent to k
-    nodes[k].root=false;
     nodes[k].parent=j;
     nodes[k].count=0;
   }
@@ -89,8 +87,7 @@ void unsigned_union_find::isolate(unsigned a)
   assert(r!=a);
 
   nodes[r].count--;
-  nodes[a].root=true;
-  nodes[a].parent=0;
+  nodes[a].parent=a;
   nodes[a].count=1;
 }
 
@@ -121,11 +118,9 @@ void unsigned_union_find::re_root(unsigned old_root, unsigned new_root)
   assert(new_root!=old_root);
   assert(nodes[old_root].count>=2);
   
-  nodes[new_root].root=true;
-  nodes[new_root].parent=0;
+  nodes[new_root].parent=new_root;
   nodes[new_root].count=nodes[old_root].count;
 
-  nodes[old_root].root=false;
   nodes[old_root].parent=new_root;
   nodes[old_root].count=0;
 
@@ -216,6 +211,16 @@ Function: unsigned_union_find::find
 unsigned unsigned_union_find::find(unsigned a) const
 {
   if(a>=size()) return a;
-  while(!nodes[a].root) a=nodes[a].parent;
+
+  while(!is_root(a))
+  {
+    // one-pass variant of path-compression:
+    // make every other node in path
+    // point to its grandparent.
+    nodes[a].parent=nodes[nodes[a].parent].parent;
+    
+    a=nodes[a].parent;
+  }
+
   return a;
 }
