@@ -247,13 +247,19 @@ public:
   void compute_incoming_edges();
 
   //! Insertion that preserves jumps to "target".
-  //! The instruction is destroyed.
-  void insert_before_swap(targett target, instructiont &instruction)
+  void insert_before_swap(targett target)
   {
     assert(target!=instructions.end());
     targett next=target;
     next++;
     instructions.insert(next, instructiont())->swap(*target);
+  }
+  
+  //! Insertion that preserves jumps to "target".
+  //! The instruction is destroyed.
+  void insert_before_swap(targett target, instructiont &instruction)
+  {
+    insert_before_swap(target);
     target->swap(instruction);
   }
   
@@ -268,7 +274,6 @@ public:
     next++;
     p.instructions.erase(p.instructions.begin());
     instructions.splice(next, p.instructions);
-    // BUG: The iterators to p-instructions are invalidated!
   }
   
   //! Insertion before the given target
