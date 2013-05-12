@@ -39,7 +39,7 @@ public:
   target_sett top;
   T entry_node;
 
-  void output(std::ostream&) const;
+  void output(std::ostream &) const;
 
 protected:
   void initialise(P &program);
@@ -68,7 +68,6 @@ std::ostream &operator << (
   cfg_dominators.output(out);
   return out;
 }
-
 
 template<class P, class T>
 void cfg_dominators_templatet<P, T>::operator()(P &program)
@@ -115,9 +114,9 @@ Function: cfg_dominators_templatet::construct_cfg
 template<class P, class T>
 void cfg_dominators_templatet<P, T>::construct_cfg(P &program)
 {
-  for (T it = program.instructions.begin();
-       it != program.instructions.end();
-       ++it)
+  for(T it = program.instructions.begin();
+      it != program.instructions.end();
+      ++it)
   {
     construct_cfg(program, it);
   }
@@ -145,7 +144,7 @@ void cfg_dominators_templatet<P, T>::construct_cfg(P &program, T PC)
 
   // now do backward edges
   for(typename std::list<T>::const_iterator
-        s_it=node.successors.begin();
+      s_it=node.successors.begin();
       s_it!=node.successors.end();
       s_it++)
   {
@@ -174,6 +173,7 @@ void cfg_dominators_templatet<P, T>::fixedpoint(P &program)
   entry_node = program.instructions.begin();
   nodet &n=node_map[entry_node];
   n.dominators.insert(entry_node);
+
   for(typename std::list<T>::const_iterator 
       s_it=n.successors.begin();
       s_it!=n.successors.end();
@@ -221,7 +221,9 @@ void cfg_dominators_templatet<P, T>::fixedpoint(P &program)
         else if(*o_it<*n_it) ++o_it;
         else { ++n_it; ++o_it; }
       }
+
       while(n_it!=node.dominators.end())
+      {
         if(*n_it==current)
           ++n_it;
         else
@@ -229,6 +231,7 @@ void cfg_dominators_templatet<P, T>::fixedpoint(P &program)
           changed=true;
           node.dominators.erase(n_it++);
         }
+      }
     }
 
     if(changed) // fixed point for node reached?

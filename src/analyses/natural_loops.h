@@ -54,12 +54,8 @@ protected:
   cfg_dominators_templatet<P, T> cfg_dominators;
 
   void compute(P &program);
-
-  void compute_natural_loop(T, T);
-  
+  void compute_natural_loop(T, T);  
 };
-
-void show_natural_loops(const goto_functionst &goto_functions);
 
 class natural_loopst:
     public natural_loops_templatet<const goto_programt, goto_programt::const_targett>
@@ -68,6 +64,8 @@ class natural_loopst:
 
 typedef natural_loops_templatet<goto_programt, goto_programt::targett>
     natural_loops_mutablet;
+
+void show_natural_loops(const goto_functionst &goto_functions);
 
 /*******************************************************************\
 
@@ -197,11 +195,10 @@ void natural_loops_templatet<P, T>::output(std::ostream &out) const
     
     out << n << " is head of { ";
     for(typename natural_loopt::const_iterator l_it=h_it->second.begin();
-        l_it!=h_it->second.end();)
+        l_it!=h_it->second.end(); ++l_it)
     {
+      if(l_it!=h_it->second.begin()) out << ", ";
       out << (*l_it)->location_number;
-      if (++l_it!=h_it->second.end()) 
-        out << ", ";
     }
     out << " } " << std::endl;
   }
