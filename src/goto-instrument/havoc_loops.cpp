@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <util/std_expr.h>
+
 #include <analyses/natural_loops.h>
 #include <analyses/local_may_alias.h>
 
@@ -44,7 +46,11 @@ protected:
     goto_programt &dest);
   
   void get_modifies(const loopt &, modifiest &);
-
+  void get_modifies_lhs(
+    goto_programt::const_targett,
+    const exprt &lhs,
+    modifiest &modifies);
+  
   goto_programt::targett get_loop_exit(const loopt &);
 };
 
@@ -63,7 +69,19 @@ Function: havoc_loopst::get_loop_exit
 goto_programt::targett havoc_loopst::get_loop_exit(const loopt &loop)
 {
   assert(!loop.empty());
-  return *loop.begin();
+
+  // find the last instruction in the loop
+  std::map<unsigned, goto_programt::targett> loop_map;
+  
+  for(loopt::const_iterator l_it=loop.begin();
+      l_it!=loop.end();
+      l_it++)
+    loop_map[(*l_it)->location_number]=*l_it;
+
+  // get the one with the highest number
+  goto_programt::targett last=(--loop_map.end())->second;
+  
+  return ++last;
 }
 
 /*******************************************************************\
@@ -88,6 +106,14 @@ void havoc_loopst::build_havoc_code(
       m_it!=modifies.end();
       m_it++)
   {
+    exprt lhs=*m_it;
+    exprt rhs=side_effect_expr_nondett(lhs.type());
+  
+    goto_programt::targett t=dest.add_instruction(ASSIGN);
+    t->function=loop_head->function;
+    t->location=loop_head->location;
+    t->code=code_assignt(lhs, rhs);
+    t->code.location()=loop_head->location;
   }
 }
 
@@ -127,9 +153,9 @@ void havoc_loopst::havoc_loop(
 
   // divert all gotos to the loop head to the loop exit
   for(loopt::const_iterator
-      i_it=loop.begin(); i_it!=loop.end(); i_it++)
+      l_it=loop.begin(); l_it!=loop.end(); l_it++)
   {
-    goto_programt::instructiont &instruction=**i_it;
+    goto_programt::instructiont &instruction=**l_it;
     if(instruction.is_goto())
     {
       for(goto_programt::targetst::iterator
@@ -141,6 +167,45 @@ void havoc_loopst::havoc_loop(
           *t_it=loop_exit; // divert
       }
     }
+  }
+}
+
+/*******************************************************************\
+
+Function: havoc_loopst::get_modifies_lhs
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void havoc_loopst::get_modifies_lhs(
+  goto_programt::const_targett t,
+  const exprt &lhs,
+  modifiest &modifies)
+{
+  if(lhs.id()==ID_symbol)
+    modifies.insert(lhs);
+  else if(lhs.id()==ID_dereference)
+  {
+    modifiest m=local_may_alias.get(t, to_dereference_expr(lhs).pointer());
+    for(modifiest::const_iterator m_it=m.begin();
+        m_it!=m.end(); m_it++)
+      get_modifies_lhs(t, *m_it, modifies);
+  }
+  else if(lhs.id()==ID_member)
+  {
+  }
+  else if(lhs.id()==ID_index)
+  {
+  }
+  else if(lhs.id()==ID_if)
+  {
+    get_modifies_lhs(t, to_if_expr(lhs).true_case(), modifies);
+    get_modifies_lhs(t, to_if_expr(lhs).false_case(), modifies);
   }
 }
 
@@ -168,14 +233,12 @@ void havoc_loopst::get_modifies(
     if(instruction.is_assign())
     {
       const exprt &lhs=to_code_assign(instruction.code).lhs();
-      modifiest m=local_may_alias.get(*i_it, lhs);
-      modifies.insert(m.begin(), m.end());
+      get_modifies_lhs(*i_it, lhs, modifies);
     }
     else if(instruction.is_function_call())
     {
       const exprt &lhs=to_code_function_call(instruction.code).lhs();
-      modifiest m=local_may_alias.get(*i_it, lhs);
-      modifies.insert(m.begin(), m.end());
+      get_modifies_lhs(*i_it, lhs, modifies);
     }
   }
 }
