@@ -2115,12 +2115,13 @@ std::string expr2ct::convert_struct(
   const struct_typet &struct_type=
     to_struct_type(full_type);
 
-  std::string dest="{ ";
-
   const struct_typet::componentst &components=
     struct_type.components();
 
-  assert(components.size()==src.operands().size());
+  if(components.size()!=src.operands().size())
+    return convert_norep(src, precedence);
+
+  std::string dest="{ ";
 
   exprt::operandst::const_iterator o_it=src.operands().begin();
 
