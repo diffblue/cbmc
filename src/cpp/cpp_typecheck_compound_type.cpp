@@ -198,6 +198,7 @@ void cpp_typecheckt::typecheck_compound_type(
 
     base_name=type_str;
     type.set(ID_C_is_anonymous, true);
+
     // anonymous structs always go into the current scope
     dest_scope=&cpp_scopes.current_scope();
   }
@@ -245,10 +246,14 @@ void cpp_typecheckt::typecheck_compound_type(
         symbol.type.swap(type);
         typecheck_compound_body(symbol);
       }
+      else if(symbol.type.get_bool(ID_C_is_anonymous))
+      {
+        // we silently ignore
+      }
       else
       {
         err_location(type.location());
-        str << "error: struct symbol `" << base_name
+        str << "error: compound tag `" << base_name
             << "' declared previously" << std::endl;
         str << "location of previous definition: "
             << symbol.location;
