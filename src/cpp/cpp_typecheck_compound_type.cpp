@@ -160,7 +160,43 @@ void cpp_typecheckt::typecheck_compound_type(
 
   if(anonymous)
   {
-    base_name="#anon_"+type.id_string()+i2string(anon_counter++);
+    // we create a name based on field names and field types
+    const exprt &body=static_cast<const exprt &>(type.find(ID_body));
+    
+    std::string type_str="#anon_"+type.id_string();
+
+    forall_operands(it, body)
+    {
+      if(it->id()!=ID_cpp_declaration)
+        continue;
+        
+      cpp_declarationt declaration=
+        to_cpp_declaration(*it);
+
+      if(declaration.type().id()==irep_idt()) // empty?
+        continue;
+
+      if(convert_typedef(declaration.type()))
+        continue;
+
+      typecheck_type(declaration.type());
+
+      // declarators
+      forall_cpp_declarators(d_it, declaration)
+      {
+        const cpp_declaratort &declarator=*d_it;
+
+        typet final_type=
+          declarator.merge_type(declaration.type());
+
+        typecheck_type(final_type);
+        
+        type_str+="_"+cpp_type2name(follow(final_type));
+        type_str+="_"+id2string(declarator.name().get_base_name());
+      }
+    }
+
+    base_name=type_str;
     type.set(ID_C_is_anonymous, true);
     // anonymous structs always go into the current scope
     dest_scope=&cpp_scopes.current_scope();
