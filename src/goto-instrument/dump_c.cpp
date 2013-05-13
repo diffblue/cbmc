@@ -354,6 +354,9 @@ goto_programt::const_targett goto_program2codet::convert_instruction(
       }
 
     case DEAD:
+      // ignore for now
+      break;
+      
     case THROW:
     case CATCH:
     case NO_INSTRUCTION_TYPE:
