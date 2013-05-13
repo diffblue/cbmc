@@ -190,9 +190,12 @@ void cpp_typecheckt::typecheck_compound_type(
           declarator.merge_type(declaration.type());
 
         typecheck_type(final_type);
-        
-        type_str+="_"+cpp_type2name(follow(final_type));
-        type_str+="_"+id2string(declarator.name().get_base_name());
+
+        if(declarator.name().is_simple_name())
+        {        
+          type_str+="_"+cpp_type2name(follow(final_type));
+          type_str+="_"+id2string(declarator.name().get_base_name());
+        }
       }
     }
 
