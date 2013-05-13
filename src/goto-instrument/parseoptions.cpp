@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/config.h>
 #include <util/expr_util.h>
+#include <util/i2string.h>
 
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/remove_function_pointers.h>
@@ -720,6 +721,27 @@ void goto_instrument_parseoptionst::instrument_goto_program(
     havoc_loops(goto_functions);
   }
 
+  if(cmdline.isset("k-induction"))
+  {
+    bool base_case=cmdline.isset("base-case");
+    bool step_case=cmdline.isset("base-case");
+
+    if(step_case && base_case)
+      throw "please specify only one of --step-case and --base-case";
+    else if(!step_case && !base_case)
+      throw "please specify one of --step-case and --base-case";
+
+    unsigned k=atoi(cmdline.getval("k-induction"));
+    
+    if(k==0)
+      throw "please give k>=1";
+
+    status("Instrumenting k-induction for k="+i2string(k)+", "+
+           (base_case?"base case":"step case"));
+    
+    havoc_loops(goto_functions);
+  }
+
   if(cmdline.isset("function-enter"))
   {
     status("Function enter instrumentation");
@@ -844,6 +866,8 @@ void goto_instrument_parseoptionst::help()
     "\n"
     "Loop transformations:\n"
     " --k-induction <k>            check loops with k-induction\n"
+    " --step-case                  k-induction: do step-case\n"
+    " --base-case                  k-induction: do base-case\n"
     " --havoc-loops                over-approximate all loops\n"
     " --accelerate                 add loop accelerators\n"
     "\n"
