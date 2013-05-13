@@ -11,6 +11,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/natural_loops.h>
 #include <analyses/local_may_alias.h>
 
+#include <goto-programs/remove_skip.h>
+
 #include "havoc_loops.h"
 
 class havoc_loopst
@@ -168,6 +170,9 @@ void havoc_loopst::havoc_loop(
       }
     }
   }
+
+  // remove skips
+  remove_skip(goto_function.body);
 }
 
 /*******************************************************************\
