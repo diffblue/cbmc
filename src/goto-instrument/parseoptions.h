@@ -50,7 +50,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(error-label):(string-abstraction)" \
   "(verbosity):(version)(xml-ui)(show-loops)" \
   "(accelerate)" \
-  "(k-induction):(step)(base)" \
+  "(k-induction):(step-case)(base-case)" \
   "(show-call-sequences)"
 
 class goto_instrument_parseoptionst:

@@ -724,7 +724,7 @@ void goto_instrument_parseoptionst::instrument_goto_program(
   if(cmdline.isset("k-induction"))
   {
     bool base_case=cmdline.isset("base-case");
-    bool step_case=cmdline.isset("base-case");
+    bool step_case=cmdline.isset("step-case");
 
     if(step_case && base_case)
       throw "please specify only one of --step-case and --base-case";

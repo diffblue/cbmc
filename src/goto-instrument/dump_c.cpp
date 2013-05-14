@@ -355,7 +355,8 @@ goto_programt::const_targett goto_program2codet::convert_instruction(
 
     case DEAD:
       // ignore for now
-      break;
+      dest.copy_to_operands(code_skipt());
+      return target;
       
     case THROW:
     case CATCH:
