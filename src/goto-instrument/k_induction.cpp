@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/remove_skip.h>
 
+#include "unwind.h"
 #include "k_induction.h"
 
 class k_inductiont
@@ -61,8 +62,6 @@ protected:
     modifiest &modifies);
   
   goto_programt::targett get_loop_exit(const loopt &);
-  
-  void unwind(const loopt &);
 };
 
 /*******************************************************************\
@@ -146,13 +145,25 @@ void k_inductiont::process_loop(
 {
   assert(!loop.empty());
 
+  // compute the loop exit
+  goto_programt::targett loop_exit=
+    get_loop_exit(loop);
+
   if(base_case)
   {
+    // now unwind k times
+    unwind(goto_function.body, loop_head, loop_exit, k);
   }
-  else
+
+  if(step_case)
   {
     // step case
-    // first find out what can get changed in the loop  
+
+    // first unwind to get k+1 copies
+    std::vector<goto_programt::targett> exit_points;
+    unwind(goto_function.body, loop_head, loop_exit, k, exit_points);
+
+    // find out what can get changed in the loop  
     modifiest modifies;
     get_modifies(loop, modifies);
     
@@ -164,28 +175,18 @@ void k_inductiont::process_loop(
     // preserve jumps to loop head.
     goto_function.body.insert_before_swap(loop_head, havoc_code);
     
-    // compute the loop exit
-    goto_programt::targett loop_exit=
-      get_loop_exit(loop);
-
-    // now unwind k times
-
-    // divert all gotos to the loop head to the loop exit
-    for(loopt::const_iterator
-        l_it=loop.begin(); l_it!=loop.end(); l_it++)
+    // now turn any assertions in iterations 0..k-1 into assumptions
+    assert(exit_points.size()==k+1);
+    goto_programt::targett start=loop_head;
+    for(unsigned i=0; i<k; i++)
     {
-      goto_programt::instructiont &instruction=**l_it;
-      if(instruction.is_goto())
+      goto_programt::targett end=exit_points[i];
+      for(goto_programt::targett t=start; t!=end; t++)
       {
-        for(goto_programt::targetst::iterator
-            t_it=instruction.targets.begin();
-            t_it!=instruction.targets.end();
-            t_it++)
-        {
-          if(*t_it==loop_head)
-            *t_it=loop_exit; // divert
-        }
+        assert(t!=goto_function.body.instructions.end());
+        if(t->is_assert()) t->type=ASSERT;
       }
+      start=end;
     }
   }
 
@@ -264,22 +265,6 @@ void k_inductiont::get_modifies(
       get_modifies_lhs(*i_it, lhs, modifies);
     }
   }
-}
-
-/*******************************************************************\
-
-Function: k_inductiont::unwind
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void k_inductiont::unwind(const loopt &loop)
-{
 }
 
 /*******************************************************************\
