@@ -25,7 +25,7 @@ We assume that you have a Debian/Ubuntu-like distribution.
 0) You need a C/C++ compiler, Flex and Bison, and GNU make.
    The GNU Make needs to be version 3.81 or higher. Do
 
-   apt-get install g++ gcc flex bison make subversion libz-dev libwww-perl
+   apt-get install g++ gcc flex bison make subversion libz-dev libwww-perl patch
 
    WARNING: g++ 4.5.x has been observed to mis-optimize code in
    MiniSat with -O3. Use a different version (or -O1).
