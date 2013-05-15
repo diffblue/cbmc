@@ -79,8 +79,9 @@ process creation, we advise you use Visual Studio.
 Follow these instructions:
 
 0) You need a C/C++ compiler, Flex and Bison, GNU tar, gzip2,
-   zlib, and GNU make. The GNU Make needs to be version 3.81 or higher. If
-   you don't already have the above, we recommend you install Cygwin.
+   zlib, GNU make, and patch. The GNU Make needs to be version 3.81 or
+   higher.  If you don't already have the above, we recommend you install
+   Cygwin.
 
    WARNING: g++ 4.5.x has been observed to mis-optimize code in
    MiniSat with -O3. Use a different version (or -O1).
@@ -94,9 +95,11 @@ Follow these instructions:
 
    tar xfz minisat-2.2.0.tar.gz
    mv minisat minisat-2.2.0
+   cd minisat-2.2.0
+   patch -p1 < ../scripts/minisat-2.2.0-patch
 
-   MiniSat2 relies on zlib, which you have to obtain for your environment.
-   SMV-SAT (if you happen to work for Cadence).
+   The patch removes the dependency on zlib and prevents a problem
+   with a header file that is often unavailable on Windows.
 
 2) Adjust src/config.inc for the paths to item 1).
 
