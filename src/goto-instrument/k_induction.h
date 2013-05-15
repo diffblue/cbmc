@@ -13,7 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 void k_induction(
   goto_functionst &goto_functions,
-  unsigned k,
-  bool base_case, bool step_case);
+  bool base_case, bool step_case,
+  unsigned k);
 
 #endif

@@ -53,26 +53,35 @@ void unwind(
   
   exit_points.resize(k);
   
+  // add a skip after loop as the new loop-end
+  {
+    locationt location=loop_exit->location;
+    irep_idt function=loop_exit->function;
+    goto_program.insert_before_swap(loop_exit);
+    loop_exit->make_skip();
+    loop_exit->location=location;
+    loop_exit->function=function;
+  }
+
+  // record exit point of original
+  exit_points[0]=loop_exit;
+
+  goto_programt::targett loop_exit_next=loop_exit;
+  loop_exit_next++;
+
   // build a map for branch targets inside the loop
   std::map<goto_programt::targett, unsigned> target_map;
 
-  {  
+  { 
     unsigned count=0;
     for(goto_programt::targett t=loop_head;
-        t!=loop_exit; t++, count++)
+        t!=loop_exit_next; t++, count++)
     {
       assert(t!=goto_program.instructions.end());
       target_map[t]=count;
     }
   }
 
-  // add a skip after loop as the new loop-end
-  goto_program.insert_before_swap(loop_exit);
-  loop_exit->make_skip();
-
-  // record exit point of original
-  exit_points[0]=loop_exit;
-  
   // re-direct any branches to loop_head to loop_exit
   
   for(goto_programt::targett t=loop_head;
@@ -96,7 +105,7 @@ void unwind(
     target_vector.reserve(target_map.size());
 
     for(goto_programt::targett t=loop_head;
-        t!=loop_exit; t++)
+        t!=loop_exit_next; t++)
     {
       assert(t!=goto_program.instructions.end());
       goto_programt::targett copied_t=copies.add_instruction();
@@ -128,6 +137,8 @@ void unwind(
       }
     }
   }  
+  
+  assert(copies.instructions.size()==(k-1)*target_map.size());
   
   // now insert copies
   goto_program.destructive_insert(++loop_exit, copies);
