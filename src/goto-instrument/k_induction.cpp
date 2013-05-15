@@ -23,12 +23,12 @@ public:
   
   k_inductiont(
     goto_functiont &_goto_function,
-    unsigned _k,
-    bool _base_case, bool _step_case):
+    bool _base_case, bool _step_case,
+    unsigned _k):
     goto_function(_goto_function),
     local_may_alias(_goto_function),
     natural_loops(_goto_function.body),
-    k(_k), base_case(_base_case), step_case(_step_case)
+    base_case(_base_case), step_case(_step_case), k(_k)
   {
     k_induction();
   }
@@ -38,8 +38,8 @@ protected:
   local_may_aliast local_may_alias;
   natural_loops_mutablet natural_loops;
   
-  const unsigned k;
   const bool base_case, step_case;
+  const unsigned k;
   
   typedef std::set<exprt> modifiest;
   typedef const natural_loops_mutablet::natural_loopt loopt;
@@ -161,7 +161,7 @@ void k_inductiont::process_loop(
 
     // first unwind to get k+1 copies
     std::vector<goto_programt::targett> exit_points;
-    unwind(goto_function.body, loop_head, loop_exit, k, exit_points);
+    unwind(goto_function.body, loop_head, loop_exit, k+1, exit_points);
 
     // find out what can get changed in the loop  
     modifiest modifies;
@@ -191,7 +191,7 @@ void k_inductiont::process_loop(
   }
 
   // remove skips
-  remove_skip(goto_function.body);
+//  remove_skip(goto_function.body);
 }
 
 /*******************************************************************\
@@ -304,9 +304,9 @@ Function: k_induction
 
 void k_induction(
   goto_functionst &goto_functions,
-  unsigned k,
-  bool base_case, bool step_case)
+  bool base_case, bool step_case,
+  unsigned k)
 {
   Forall_goto_functions(it, goto_functions)
-    k_inductiont(it->second, k, base_case, step_case);
+    k_inductiont(it->second, base_case, step_case, k);
 }

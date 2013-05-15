@@ -60,6 +60,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "dump_c.h"
 #include "dot.h"
 #include "havoc_loops.h"
+#include "k_induction.h"
 #include "function.h"
 #include "branch.h"
 #include "wmm/weak_memory.h"
@@ -739,7 +740,7 @@ void goto_instrument_parseoptionst::instrument_goto_program(
     status("Instrumenting k-induction for k="+i2string(k)+", "+
            (base_case?"base case":"step case"));
     
-    havoc_loops(goto_functions);
+    k_induction(goto_functions, base_case, step_case, k);
   }
 
   if(cmdline.isset("function-enter"))
