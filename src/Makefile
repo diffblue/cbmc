@@ -42,5 +42,5 @@ minisat2-download:
 	@tar xfz minisat-2.2.0.tar.gz
 	@rm -Rf ../minisat-2.2.0
 	@mv minisat ../minisat-2.2.0
+	@(cd ../minisat-2.2.0; patch -p1 < ../scripts/minisat-2.2.0-patch)
 	@rm minisat-2.2.0.tar.gz
-

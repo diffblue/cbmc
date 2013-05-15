@@ -1,0 +1,46 @@
+diff -rupN minisat-2.2.0/mtl/IntTypes.h minisat-2.2.0.patched/mtl/IntTypes.h
+--- minisat-2.2.0/mtl/IntTypes.h	2010-07-10 17:07:36.000000000 +0100
++++ minisat-2.2.0.patched/mtl/IntTypes.h	2011-07-15 12:05:38.144000000 +0100
+@@ -31,7 +31,7 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR
+ #else
+ 
+ #   include <stdint.h>
+-#   include <inttypes.h>
++//#   include <inttypes.h>
+ 
+ #endif
+ 
+diff -rupN minisat-2.2.0/utils/ParseUtils.h minisat-2.2.0.patched/utils/ParseUtils.h
+--- minisat-2.2.0/utils/ParseUtils.h	2010-07-10 17:07:36.000000000 +0100
++++ minisat-2.2.0.patched/utils/ParseUtils.h	2011-07-15 12:06:14.362750000 +0100
+@@ -24,7 +24,7 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR
+ #include <stdlib.h>
+ #include <stdio.h>
+ 
+-#include <zlib.h>
++//#include <zlib.h>
+ 
+ namespace Minisat {
+ 
+@@ -35,7 +35,7 @@ static const int buffer_size = 1048576;
+ 
+ 
+ class StreamBuffer {
+-    gzFile        in;
++    //gzFile        in;
+     unsigned char buf[buffer_size];
+     int           pos;
+     int           size;
+@@ -43,10 +43,10 @@ class StreamBuffer {
+     void assureLookahead() {
+         if (pos >= size) {
+             pos  = 0;
+-            size = gzread(in, buf, sizeof(buf)); } }
++            /*size = gzread(in, buf, sizeof(buf));*/ } }
+ 
+ public:
+-    explicit StreamBuffer(gzFile i) : in(i), pos(0), size(0) { assureLookahead(); }
++    //explicit StreamBuffer(gzFile i) : in(i), pos(0), size(0) { assureLookahead(); }
+ 
+     int  operator *  () const { return (pos >= size) ? EOF : buf[pos]; }
+     void operator ++ ()       { pos++; assureLookahead(); }
