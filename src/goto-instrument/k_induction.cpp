@@ -159,10 +159,6 @@ void k_inductiont::process_loop(
   {
     // step case
 
-    // first unwind to get k+1 copies
-    std::vector<goto_programt::targett> exit_points;
-    unwind(goto_function.body, loop_head, loop_exit, k+1, exit_points);
-
     // find out what can get changed in the loop  
     modifiest modifies;
     get_modifies(loop, modifies);
@@ -171,27 +167,28 @@ void k_inductiont::process_loop(
     goto_programt havoc_code;
     build_havoc_code(loop_head, modifies, havoc_code);
     
+    // unwind to get k+1 copies
+    std::vector<goto_programt::targett> iteration_points;
+    unwind(goto_function.body, loop_head, loop_exit, k+1, iteration_points);
+
+    // now turn any assertions in iterations 0..k-1 into assumptions
+    assert(iteration_points.size()==k+1);
+
+    assert(k>=1);
+    goto_programt::targett end=iteration_points[k-1];
+    for(goto_programt::targett t=loop_head; t!=end; t++)
+    {
+      assert(t!=goto_function.body.instructions.end());
+      if(t->is_assert()) t->type=ASSUME;
+    }
+
     // Now havoc at the loop head. Use insert_swap to
     // preserve jumps to loop head.
-    goto_function.body.insert_before_swap(loop_head, havoc_code);
-    
-    // now turn any assertions in iterations 0..k-1 into assumptions
-    assert(exit_points.size()==k+1);
-    goto_programt::targett start=loop_head;
-    for(unsigned i=0; i<k; i++)
-    {
-      goto_programt::targett end=exit_points[i];
-      for(goto_programt::targett t=start; t!=end; t++)
-      {
-        assert(t!=goto_function.body.instructions.end());
-        if(t->is_assert()) t->type=ASSERT;
-      }
-      start=end;
-    }
+    goto_function.body.insert_before_swap(loop_head, havoc_code);    
   }
 
   // remove skips
-//  remove_skip(goto_function.body);
+  remove_skip(goto_function.body);
 }
 
 /*******************************************************************\

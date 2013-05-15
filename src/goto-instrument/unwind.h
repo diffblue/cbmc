@@ -22,6 +22,6 @@ void unwind(
   goto_programt::targett loop_head,
   goto_programt::targett loop_exit,
   const unsigned k,
-  std::vector<goto_programt::targett> &exit_points);
+  std::vector<goto_programt::targett> &iteration_points);
 
 #endif

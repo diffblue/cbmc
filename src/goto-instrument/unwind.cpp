@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <util/std_expr.h>
+
 #include "unwind.h"
 
 /*******************************************************************\
@@ -47,55 +49,77 @@ void unwind(
   goto_programt::targett loop_head,
   goto_programt::targett loop_exit,
   const unsigned k,
-  std::vector<goto_programt::targett> &exit_points)
+  std::vector<goto_programt::targett> &iteration_points)
 {
   assert(k!=0);
   
-  exit_points.resize(k);
+  iteration_points.resize(k);
+
+  // loop_exit: where to go after the loop ends
+  // loop_iter: where to go for the next iteration
   
-  // add a skip after loop as the new loop-end
-  {
-    locationt location=loop_exit->location;
-    irep_idt function=loop_exit->function;
-    goto_program.insert_before_swap(loop_exit);
-    loop_exit->make_skip();
-    loop_exit->location=location;
-    loop_exit->function=function;
+  // Add a 'goto' and a 'skip' _before_ loop_exit.
+  // The goto is to take care of 'fall-out' loop exit, and is
+  // not needed if there is an unconditional goto before loop_exit.
+
+  if(loop_exit!=goto_program.instructions.begin())
+  {  
+    goto_programt::targett t_before=loop_exit;
+    t_before--;
+    
+    if(t_before->is_goto() && t_before->guard.is_true())
+    {
+      // no 'fall-out'
+    }
+    else
+    {
+      // guard against 'fall-out'
+      goto_programt::targett t_goto=goto_program.insert_before(loop_exit);
+  
+      t_goto->make_goto(loop_exit);
+      t_goto->location=loop_exit->location;
+      t_goto->function=loop_exit->function;
+      t_goto->guard=true_exprt();
+    }
   }
-
-  // record exit point of original
-  exit_points[0]=loop_exit;
-
-  goto_programt::targett loop_exit_next=loop_exit;
-  loop_exit_next++;
-
+  
+  goto_programt::targett t_skip=goto_program.insert_before(loop_exit);
+  goto_programt::targett loop_iter=t_skip;
+  
+  t_skip->make_skip();
+  t_skip->location=loop_head->location;
+  t_skip->function=loop_head->function;
+  
+  // record the exit point of first iteration
+  iteration_points[0]=loop_iter;
+  
   // build a map for branch targets inside the loop
   std::map<goto_programt::targett, unsigned> target_map;
 
   { 
     unsigned count=0;
     for(goto_programt::targett t=loop_head;
-        t!=loop_exit_next; t++, count++)
+        t!=loop_exit; t++, count++)
     {
       assert(t!=goto_program.instructions.end());
       target_map[t]=count;
     }
   }
 
-  // re-direct any branches to loop_head to loop_exit
+  // re-direct any branches that go to loop_head to loop_iter
   
   for(goto_programt::targett t=loop_head;
-      t!=loop_exit; t++)
+      t!=loop_iter; t++)
   {
     assert(t!=goto_program.instructions.end());
     for(goto_programt::instructiont::targetst::iterator
         t_it=t->targets.begin();
         t_it!=t->targets.end();
         t_it++)
-      if(*t_it==loop_head) *t_it=loop_exit;
+      if(*t_it==loop_head) *t_it=loop_iter;
   }
   
-  // we make k-1 copies, to be inserted after loop_exit
+  // we make k-1 copies, to be inserted before loop_exit
   goto_programt copies;
 
   for(unsigned i=1; i<k; i++)
@@ -105,7 +129,7 @@ void unwind(
     target_vector.reserve(target_map.size());
 
     for(goto_programt::targett t=loop_head;
-        t!=loop_exit_next; t++)
+        t!=loop_exit; t++)
     {
       assert(t!=goto_program.instructions.end());
       goto_programt::targett copied_t=copies.add_instruction();
@@ -114,7 +138,7 @@ void unwind(
     }
 
     // record exit point of this copy
-    exit_points[i]=target_vector.back();
+    iteration_points[i]=target_vector.back();
     
     // adjust the intra-loop branches
 
@@ -140,8 +164,8 @@ void unwind(
   
   assert(copies.instructions.size()==(k-1)*target_map.size());
   
-  // now insert copies
-  goto_program.destructive_insert(++loop_exit, copies);
+  // now insert copies before loop_exit
+  goto_program.destructive_insert(loop_exit, copies);
 
   // update it all
   goto_program.update();
