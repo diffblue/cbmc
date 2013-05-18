@@ -130,6 +130,7 @@ void simplify_exprt::setup_jump_table()
   ENTRY(ID_ieee_float_notequal, simplify_ieee_float_relation);
   ENTRY(ID_lambda, simplify_lambda);
   ENTRY(ID_with, simplify_with);
+  ENTRY(ID_update, simplify_update);
   ENTRY(ID_index, simplify_index);
   ENTRY(ID_member, simplify_member);
   ENTRY(ID_byte_update_little_endian, simplify_byte_update);
@@ -3476,6 +3477,78 @@ bool simplify_exprt::simplify_with(exprt &expr)
 
 /*******************************************************************\
 
+Function: simplify_exprt::simplify_update
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool simplify_exprt::simplify_update(exprt &expr)
+{
+  if(expr.operands().size()!=3)
+    return true;
+
+  // this is to push updates into (possibly nested) constants
+  
+  const exprt::operandst &designator=to_update_expr(expr).designator();
+  
+  exprt updated_value=to_update_expr(expr).old();
+  exprt *value_ptr=&updated_value;
+
+  for(exprt::operandst::const_iterator
+      it=designator.begin();
+      it!=designator.end();
+      it++)
+  {
+    const typet &value_ptr_type=ns.follow(value_ptr->type());
+    
+    if(it->id()==ID_index_designator &&
+       value_ptr->id()==ID_array)
+    {
+      mp_integer i;
+      
+      if(to_integer(it->op0(), i))
+        return true;
+        
+      if(i<0 || i>=value_ptr->operands().size())
+        return true;
+
+      value_ptr=&value_ptr->operands()[integer2long(i)];
+    }
+    else if(it->id()==ID_member_designator &&
+            value_ptr->id()==ID_struct)
+    {
+      const irep_idt &component_name=
+        it->get(ID_component_name);
+        
+      if(!to_struct_type(value_ptr_type).
+         has_component(component_name))
+        return true;
+
+      unsigned number=to_struct_type(value_ptr_type).
+        component_number(component_name);
+        
+      assert(number<value_ptr->operands().size());
+
+      value_ptr=&value_ptr->operands()[number];
+    }
+    else
+      return true; // give up, unkown designator
+  }
+
+  // found, done
+  *value_ptr=to_update_expr(expr).new_value();
+  expr.swap(updated_value);
+
+  return false;
+}
+
+/*******************************************************************\
+
 Function: simplify_exprt::simplify_index
 
   Inputs:
@@ -3533,6 +3606,8 @@ bool simplify_exprt::simplify_index(exprt &expr)
   }
   else if(array.id()==ID_with)
   {
+    // we have (a WITH [i:=e])[j]
+  
     const exprt &with_expr=array;
 
     if(with_expr.operands().size()!=3) return true;
@@ -3546,8 +3621,8 @@ bool simplify_exprt::simplify_index(exprt &expr)
     }
     else
     {
-      // turn (a with i:=x)[j] into (i==j)?x:a[j]
-      // watch out that the type of i and j might be different
+      // Turn (a with i:=x)[j] into (i==j)?x:a[j].
+      // watch out that the type of i and j might be different.
       equal_exprt equality_expr(expr.op1(), with_expr.op1());
       
       if(equality_expr.lhs().type()!=equality_expr.rhs().type())
@@ -4138,6 +4213,38 @@ bool simplify_exprt::simplify_member(exprt &expr)
       }
 
       return false;      
+    }
+  }
+  else if(op.id()==ID_update)
+  {
+    // the following optimization only works on structs,
+    // and not on unions
+  
+    if(op.operands().size()==3 &&
+       op_type.id()==ID_struct)
+    {
+      const update_exprt &update_expr=to_update_expr(op);
+      const exprt::operandst &designator=update_expr.designator();
+
+      // look at very first designator
+      if(designator.size()==1 &&
+         designator.front().id()==ID_member_designator)
+      {
+        if(designator.front().get(ID_component_name)==component_name)
+        {
+          // UPDATE(s, .m, v).m -> v
+          exprt tmp=update_expr.new_value();
+          expr.swap(tmp);
+        }
+        else
+        {
+          // UPDATE(s, .m1, v).m2 -> s.m2
+          exprt tmp=update_expr.old();
+          op.swap(tmp);
+        }
+          
+        return false;
+      }
     }
   }
   else if(op.id()==ID_struct ||
@@ -4768,6 +4875,8 @@ bool simplify_exprt::simplify_node(exprt &expr)
     result=simplify_lambda(expr) && result;
   else if(expr.id()==ID_with)
     result=simplify_with(expr) && result;
+  else if(expr.id()==ID_update)
+    result=simplify_update(expr) && result;
   else if(expr.id()==ID_index)
     result=simplify_index(expr) && result;
   else if(expr.id()==ID_member)

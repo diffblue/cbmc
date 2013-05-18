@@ -20,6 +20,7 @@ class equal_exprt;
 class if_exprt;
 class index_exprt;
 class with_exprt;
+class update_exprt;
 
 class arrayst:public equalityt
 {
@@ -69,6 +70,7 @@ protected:
   void add_array_constraints(const index_sett &index_set, const array_equalityt &array_equality);
   void add_array_constraints_if(const index_sett &index_set, const if_exprt &exprt);
   void add_array_constraints_with(const index_sett &index_set, const with_exprt &expr);
+  void add_array_constraints_update(const index_sett &index_set, const update_exprt &expr);
   void add_array_constraints_array_of(const index_sett &index_set, const array_of_exprt &exprt);
 
   void build_index_map();
