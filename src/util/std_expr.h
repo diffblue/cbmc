@@ -2062,6 +2062,41 @@ extern inline with_exprt &to_with_expr(exprt &expr)
   return static_cast<with_exprt &>(expr);
 }
 
+class index_designatort:public exprt
+{
+public:
+  inline explicit index_designatort(const exprt &_index):
+    exprt(ID_index_designator)
+  {
+    copy_to_operands(_index);
+  }
+  
+  inline const exprt &index() const
+  {
+    return op0();
+  }
+
+  inline exprt &index()
+  {
+    return op0();
+  }
+};
+
+class member_designatort:public exprt
+{
+public:
+  inline explicit member_designatort(const irep_idt &_component_name):
+    exprt(ID_member_designator)
+  {
+    set(ID_component_name, _component_name);
+  }
+
+  irep_idt get_component_name() const
+  {
+    return get(ID_component_name);
+  }
+};
+
 /*! \brief Operator to update elements in structs and arrays
 */
 class update_exprt:public exprt
@@ -2076,9 +2111,16 @@ public:
     copy_to_operands(_old, _designator, _new_value);
   }
 
+  inline explicit update_exprt(const typet _type):
+    exprt(ID_update, _type)
+  {
+    operands().resize(3);
+  }
+
   inline update_exprt():exprt(ID_update)
   {
     operands().resize(3);
+    op1().id(ID_designator);
   }
   
   inline exprt &old()
@@ -2091,14 +2133,14 @@ public:
     return op0();
   }
 
-  inline exprt &designator()
+  inline exprt::operandst &designator()
   {
-    return op1();
+    return op1().operands();
   }
 
-  inline const exprt &designator() const
+  inline const exprt::operandst &designator() const
   {
-    return op1();
+    return op1().operands();
   }
 
   inline exprt &new_value()

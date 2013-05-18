@@ -124,7 +124,7 @@ void arrayst::collect_arrays(const exprt &a)
     if(!base_type_eq(array_type, a.op0().type(), ns))
     {
       std::cout << a.pretty() << std::endl;
-      throw "collect_arrays got with without matching types";
+      throw "collect_arrays got 'with' without matching types";
     }
       
     arrays.make_union(a, a.op0());
@@ -136,6 +136,30 @@ void arrayst::collect_arrays(const exprt &a)
     index_expr.array()=a.op0();
     index_expr.index()=a.op1();
     record_array_index(index_expr);
+  }
+  else if(a.id()==ID_update)
+  {
+    if(a.operands().size()!=3)
+      throw "update expected to have three operands";
+
+    // check types
+    if(!base_type_eq(array_type, a.op0().type(), ns))
+    {
+      std::cout << a.pretty() << std::endl;
+      throw "collect_arrays got 'update' without matching types";
+    }
+      
+    arrays.make_union(a, a.op0());
+    collect_arrays(a.op0());
+    
+    // make sure this shows as an application
+    #if 0
+    index_exprt index_expr;
+    index_expr.type()=array_type.subtype();
+    index_expr.array()=a.op0();
+    index_expr.index()=a.op1();
+    record_array_index(index_expr);
+    #endif
   }
   else if(a.id()==ID_if)
   {
@@ -405,6 +429,8 @@ void arrayst::add_array_constraints(
 {
   if(expr.id()==ID_with)
     return add_array_constraints_with(index_set, to_with_expr(expr));
+  else if(expr.id()==ID_update)
+    return add_array_constraints_update(index_set, to_update_expr(expr));
   else if(expr.id()==ID_if)
     return add_array_constraints_if(index_set, to_if_expr(expr));
   else if(expr.id()==ID_array_of)
@@ -540,6 +566,93 @@ void arrayst::add_array_constraints_with(
       }
     }
   }
+}
+
+/*******************************************************************\
+
+Function: arrayst::add_array_constraints_update
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void arrayst::add_array_constraints_update(
+  const index_sett &index_set,
+  const update_exprt &expr)
+{
+  // we got x=UPDATE(y, [i], v)
+  // add constaint x[i]=v
+
+  #if 0
+  const exprt &index=expr.where();
+  const exprt &value=expr.new_value();
+
+  {  
+    index_exprt index_expr;
+    index_expr.type()=ns.follow(expr.type()).subtype();
+    index_expr.array()=expr;
+    index_expr.index()=index;
+
+    if(index_expr.type()!=value.type())
+    {
+      std::cout << expr.pretty() << std::endl;
+      assert(false);
+    }
+
+    set_to_true(equal_exprt(index_expr, value));
+  }
+
+  // use other array index applications for "else" case
+  // add constraint x[I]=y[I] for I!=i
+
+  for(index_sett::const_iterator
+      it=index_set.begin();
+      it!=index_set.end();
+      it++)
+  {
+    exprt other_index=*it;
+
+    if(other_index!=index)
+    {
+      // we first build the guard
+      
+      if(other_index.type()!=index.type())
+        other_index.make_typecast(index.type());
+
+      literalt guard_lit=convert(equal_exprt(index, other_index));
+
+      if(guard_lit!=const_literal(true))
+      {
+        index_exprt index_expr1;
+        index_expr1.type()=ns.follow(expr.type()).subtype();
+        index_expr1.array()=expr;
+        index_expr1.index()=other_index;
+
+        index_exprt index_expr2;
+        index_expr2.type()=ns.follow(expr.type()).subtype();
+        index_expr2.array()=expr.op0();
+        index_expr2.index()=other_index;
+
+        assert(index_expr1.type()==index_expr2.type());
+
+        equal_exprt equality_expr(index_expr1, index_expr2);
+        
+        literalt equality_lit=convert(equality_expr);
+
+        // add constraint
+        bvt bv;
+        bv.reserve(2);
+        bv.push_back(equality_lit);
+        bv.push_back(guard_lit);
+        prop.lcnf(bv);
+      }
+    }
+  }
+  #endif
 }
 
 /*******************************************************************\

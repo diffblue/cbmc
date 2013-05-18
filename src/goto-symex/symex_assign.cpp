@@ -11,6 +11,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "goto_symex.h"
 #include "goto_symex_state.h"
 
+//#define USE_UPDATE
+
 /*******************************************************************\
 
 Function: goto_symext::symex_assign
@@ -152,7 +154,8 @@ void goto_symext::symex_assign_rec(
   else if(lhs.id()==ID_byte_extract_little_endian ||
           lhs.id()==ID_byte_extract_big_endian)
     symex_assign_byte_extract(state, lhs, full_lhs, rhs, guard, visibility);
-  else if(lhs.id()==ID_complex_real || lhs.id()==ID_complex_imag)
+  else if(lhs.id()==ID_complex_real ||
+          lhs.id()==ID_complex_imag)
   {
     // this is stuff like __real__ x = 1;
     assert(lhs.operands().size()==1);
@@ -306,6 +309,24 @@ void goto_symext::symex_assign_array(
     throw "index must take array type operand, but got `"+
           lhs_type.id_string()+"'";
 
+  #ifdef USE_UPDATE
+  
+  // turn
+  //   a[i]=e
+  // into
+  //   a'==UPDATE(a, [i], e)
+
+  update_exprt new_rhs(lhs_type);
+  new_rhs.old()=lhs_array;
+  new_rhs.designator().push_back(index_designatort(lhs_index));
+  new_rhs.new_value()=rhs;
+  
+  exprt new_full_lhs=add_to_lhs(full_lhs, lhs);
+
+  symex_assign_rec(
+    state, lhs_array, new_full_lhs, new_rhs, guard, visibility);
+  
+  #else
   // turn
   //   a[i]=e
   // into
@@ -318,6 +339,7 @@ void goto_symext::symex_assign_array(
 
   symex_assign_rec(
     state, lhs_array, new_full_lhs, new_rhs, guard, visibility);
+  #endif
 }
 
 /*******************************************************************\
@@ -379,6 +401,24 @@ void goto_symext::symex_assign_member(
     }
   }
 
+  #ifdef USE_UPDATE
+  
+  // turn
+  //   a.c=e
+  // into
+  //   a'==UPDATE(a, .c, e)
+
+  update_exprt new_rhs(struct_type);
+  new_rhs.old()=lhs_struct;
+  new_rhs.designator().push_back(member_designatort(component_name));
+  new_rhs.new_value()=rhs;
+  
+  exprt new_full_lhs=add_to_lhs(full_lhs, lhs);
+
+  symex_assign_rec(
+    state, lhs_struct, new_full_lhs, new_rhs, guard, visibility);
+  
+  #else
   // turn
   //   a.c=e
   // into
@@ -392,6 +432,7 @@ void goto_symext::symex_assign_member(
 
   symex_assign_rec(
     state, lhs_struct, new_full_lhs, new_rhs, guard, visibility);
+  #endif
 }
 
 /*******************************************************************\

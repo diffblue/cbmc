@@ -66,6 +66,7 @@ public:
   bool simplify_ieee_float_relation(exprt &expr);
   bool simplify_lambda(exprt &expr);
   bool simplify_with(exprt &expr);
+  bool simplify_update(exprt &expr);
   bool simplify_index(exprt &expr);
   bool simplify_member(exprt &expr);
   bool simplify_byte_update(exprt &expr);
