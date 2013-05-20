@@ -14,8 +14,15 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 class cpp_namet:public irept
 {
 public:
-  cpp_namet():irept(ID_cpp_name)
+  inline cpp_namet():irept(ID_cpp_name)
   {
+  }
+  
+  explicit cpp_namet(const irep_idt &base_name):irept(ID_cpp_name)
+  {
+    subt &sub=get_sub();
+    sub.push_back(irept(ID_name));
+    sub.front().set(ID_identifier, base_name);
   }
 
   const locationt &location() const
@@ -30,9 +37,9 @@ public:
   irep_idt get_base_name() const;
   
   // one of three:
-  // 'string'
+  // 'identifier'
   // 'operator X'
-  // '~string'
+  // '~identifier'
   inline bool is_simple_name() const
   {
     const subt &sub=get_sub();
