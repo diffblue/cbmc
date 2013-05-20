@@ -23,7 +23,7 @@ public:
     location().make_nil();
   }
   
-  cpp_declaratort(const typet &type):exprt(ID_cpp_declarator, type)
+  explicit cpp_declaratort(const typet &type):exprt(ID_cpp_declarator, type)
   {
     value().make_nil();
     name().make_nil();
