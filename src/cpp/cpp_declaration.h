@@ -116,8 +116,21 @@ public:
   {
     return get("specialization_of");
   }
+  
+  bool is_typedef() const
+  {
+    const typet &t=type();
+  
+    return t.id()==ID_merged_type &&
+           t.subtypes().size()>=2 &&
+           t.subtypes()[0].id()==ID_typedef;
+  }
 
   void output(std::ostream &out) const;
+
+  // for assigning a tag for struct/union in the type based on
+  // the name of the first declarator
+  void name_anon_struct_union();
 };
 
 extern inline cpp_declarationt &to_cpp_declaration(irept &irep)

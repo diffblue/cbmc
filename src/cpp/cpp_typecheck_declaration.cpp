@@ -177,6 +177,7 @@ void cpp_typecheckt::convert_non_template_declaration(
   typet &type=declaration.type();
   bool is_typedef=convert_typedef(type);
 
+  declaration.name_anon_struct_union();
   typecheck_type(type);
   
   // Elaborate any class template instance _unless_ we do a typedef.
