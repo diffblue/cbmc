@@ -5,7 +5,7 @@
 \newcommand{\code}[1]{\texttt{#1}}
 \newcommand{\prog}[1]{\texttt{#1}}
 
-\title{Begineer's Guide to CPROVER}
+\title{Beginner's Guide to CPROVER}
 \author{Martin Brain\thanks{But most of the content is from Michael Tautschnig}}
 
 \begin{document}
@@ -57,7 +57,7 @@ Identifiers should be lower case with underscores to separate words.
 Types (classes, structures and typedefs) names must\footnote{There are
 a couple of exceptions, including the graph classes} end with a
 \code{t}.  Types that model types (i.e. C types in the program that is
-being interpretted) are named with \code{\_typet}.
+being interpreted) are named with \code{\_typet}.
 For example \code{ui\_message\_handlert} rather than
 \code{UI\_message\_handlert} or \code{UIMessageHandler} and
 \code{union\_typet}.
@@ -91,7 +91,7 @@ In the main archive:
 \begin{description}
   \item[\prog{CBMC}]{A bounded model checking tool for C and C++. See
     Section \ref{section:CBMC}.}
-  \item[\prog{goto-cc}]{A drop-in, flag compatable replacement for GCC
+  \item[\prog{goto-cc}]{A drop-in, flag compatible replacement for GCC
     and other compilers that produces goto-programs rather than
     executable binaries.  See Section \ref{section:goto-cc}.}
   \item[\prog{goto-instrument}]{A collection of functions for
@@ -105,7 +105,7 @@ Model checkers and similar tools:
   \item[\prog{SatABS}]{A CEGAR model checker using predicate
     abstraction.  Is roughly 10,000 lines of code (on top of the CPROVER
     code base) and is developed in its own subversion archive.  It
-    uses an external model cheker to find potentially feasible paths.
+    uses an external model checker to find potentially feasible paths.
     Key limitations are related to code with pointers and there is
     scope for significant improvement.}
 
@@ -113,15 +113,15 @@ Model checkers and similar tools:
     The front-end is in the old project CVS and some of the
     functionality is in \prog{goto-instrument}.}
 
-  \item[\prog{Wolverine}]{An implementation of Ken MacMillian's IMPACT
+  \item[\prog{Wolverine}]{An implementation of Ken McMillan's IMPACT
     algorithm for sequential programs.  In the old project CVS.}
 
-  \item[\prog{C-Impact}]{An implementation of Ken MacMillian's IMPACT
+  \item[\prog{C-Impact}]{An implementation of Ken McMillan's IMPACT
     algorithm for parallel programs.  In the old project CVS.}
 
   \item[\prog{LoopFrog}]{A loop summarisation tool.}
 
-  \item[\prog{???}]{Christoph's termination analysiser.}
+  \item[\prog{???}]{Christoph's termination analyser.}
 
 \end{description}
 
@@ -134,7 +134,7 @@ Test case generation:
 
   \item[\prog{FShell}]{A test-input generation tool that allows the
       user to specify the desired coverage using a custom language
-      (which includes regular experessions over paths).  It uses
+      (which includes regular expressions over paths).  It uses
       incremental SAT and is thus faster than the na\"ive ``add
       assertions one at a time and use the counter-examples''
       approach.  Is developed in its own subversion.}
@@ -160,7 +160,7 @@ Alternative front-ends and input translators:
 Other tools:
 
 \begin{description}
-  \item[\prog{ai}]{Leo's hybrid abstract intepretation / CEGAR tool.}
+  \item[\prog{ai}]{Leo's hybrid abstract interpretation / CEGAR tool.}
 
   \item[\prog{DeltaCheck?}]{Ajitha's slicing tool, aimed at locating
     changes and differential verification.  In the old project CVS.}
@@ -219,7 +219,7 @@ level files there are only a few files:
   \item[\file{Makefile}]{The main systems Make file.  Parallel builds
     are supported and encouraged; please don't break them!}
   \item[\file{common}]{System specific magic required to get the
-    system to build.  This should only need to be editted if porting
+    system to build.  This should only need to be edited if porting
     CBMC to a new platform / build environment.}
   \item[\file{doxygen.cfg}]{The config file for doxygen.cfg}
 \end{description}
@@ -249,9 +249,9 @@ files include:
     intended interface for creating expressions.}
   \item[\file{std\_types.h}]{Provides subclasses of \code{typet} (a
     subclass of \code{irept}) to model C and C++ types.  This is one
-    of the prefered interfaces to \code{irept}.  The front-ends handle
+    of the preferred interfaces to \code{irept}.  The front-ends handle
     type promotion and most coercision so the type system and checking
-    goto-programs is simplier than C.}
+    goto-programs is simpler than C.}
   \item[\file{dstring.h}]{The CPROVER string class.  This enables
     sharing between strings which significantly reduces the amount of
     memory required and speeds comparison.  \code{dstring} should not
@@ -306,9 +306,9 @@ interfaces.
 
 This directory contains the C++ front-end.  It supports the subset of
 C++ commonly found in embedded and system applications.
-Consequentally it doesn't have full support for templates and many of
+Consequentially it doesn't have full support for templates and many of
 the more advanced and obscure C++ features.  The subset of the
-langugae that can be handled is being extended over time so bug
+language that can be handled is being extended over time so bug
 reports of programs that cannot be parsed are useful.
 
 The functionality is very similar to the ANSI C front end; parsing the
@@ -352,7 +352,7 @@ main method from the code.  In the output \code{NONDET} is use to
 represent a nondeterministic assignment to a variable.  Likewise
 \code{IF} as a beautified \code{GOTO} instruction where the guard
 expression is used as the condition.  \code{RETURN} instructions may
-be dropped if they preceed an \code{END\_FUNCTION} instruction.  The
+be dropped if they precede an \code{END\_FUNCTION} instruction.  The
 comment lines are generated from the \code{locationt} field of the
 \code{instructiont} structure.
 
@@ -388,7 +388,7 @@ assignment (SSA) form, which is \emph{not} the case for goto-programs.
 
 \subsubsection{\dir{pointer-analysis/}}
 
-To perform symbolic excution on programs with dereferencing of
+To perform symbolic execution on programs with dereferencing of
 arbitrary pointers, some alias analysis is needed.
 \dir{pointer-analysis} contains the three levels of analysis; flow and
 context insensitive, context sensitive and flow and context
@@ -411,7 +411,7 @@ different decision procedures, roughly one per directory.
      The key functions are \code{convert} which takes an \code{exprt}
      and converts it to the appropriate, solver specific, data
      structures and \code{dec\_solve} (inherited from
-     \code{decision\_proceduret}) which invokes the actual decisiion
+     \code{decision\_proceduret}) which invokes the actual decision
      procedures.  Individual decision procedures (named
      \code{*\_dect}) objects can be created but \code{prop\_convt} is
      the preferred interface for code that uses them.}  
@@ -659,7 +659,7 @@ The common starting point for working with goto-programs is the
 strings to \code{goto\_programt}'s and iteration macros are provided.
 Note that \code{goto\_function\_templatet} (no \code{s}) is defined in
 the same header as \code{goto\_functions\_templatet} and is gives the
-C type for the function and boolean which indicates whether the body
+C type for the function and Boolean which indicates whether the body
 is available (before linking this might not always be true).  Also
 note the slightly counter-intuitive naming; \code{goto\_functionst}
 instances are the top level structure representing the program and
