@@ -713,7 +713,7 @@ void goto_instrument_parseoptionst::instrument_goto_program(
   if(cmdline.isset("interval-analysis"))
   {
     status("Interval analysis");
-    interval_analysis(goto_functions);
+    interval_analysis(ns, goto_functions);
   }
 
   if(cmdline.isset("havoc-loops"))
