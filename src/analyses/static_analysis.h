@@ -88,7 +88,7 @@ public:
   typedef domain_baset statet;
   typedef goto_programt::const_targett locationt;
 
-  static_analysis_baset(const namespacet &_ns):
+  explicit static_analysis_baset(const namespacet &_ns):
     ns(_ns),
     initialized(false)
   {
@@ -256,7 +256,7 @@ class static_analysist:public static_analysis_baset
 {
 public:
   // constructor
-  static_analysist(const namespacet &_ns):
+  explicit static_analysist(const namespacet &_ns):
     static_analysis_baset(_ns)
   {
   }
