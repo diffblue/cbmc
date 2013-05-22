@@ -36,7 +36,7 @@ public:
     }
   };
 
-  float_utilst(propt &_prop):
+  explicit float_utilst(propt &_prop):
     rounding_mode(ieee_floatt::ROUND_TO_EVEN),
     prop(_prop),
     bv_utils(_prop)
