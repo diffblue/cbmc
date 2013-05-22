@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <util/std_expr.h>
+
 #include "interval_domain.h"
 
 /*******************************************************************\
@@ -89,4 +91,6 @@ exprt interval_domaint::make_expression() const
       it!=float_map.end(); it++)
   {
   }
+  
+  return true_exprt();
 }
