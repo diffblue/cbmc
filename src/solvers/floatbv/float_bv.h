@@ -11,7 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 //#include <util/ieee_float.h>
 
-#include <solvers/flattening/prop_conv.h>
+#include <solvers/prop/prop_conv.h>
 
 class float_bvt
 {
