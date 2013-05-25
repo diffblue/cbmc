@@ -138,13 +138,13 @@ protected:
   }
 };
 
-// warning! the reference returned is not stable
+// the reference returned is guaranteed to be stable
 inline const std::string &as_string(const dstring &s)
 { return string_container.get_string(s.get_no()); }
 
 struct dstring_hash
 {
-  size_t operator()(const dstring &s) const { return hash_string(s); }
+  inline size_t operator()(const dstring &s) const { return hash_string(s); }
 };
 
 size_t hash_string(const dstring &s);
