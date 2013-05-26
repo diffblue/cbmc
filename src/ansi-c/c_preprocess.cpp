@@ -527,19 +527,19 @@ bool c_preprocess_codewarrior(
       it=config.ansi_c.defines.begin();
       it!=config.ansi_c.defines.end();
       it++)
-    command+=" -D'"+*it+"'";
+    command+=" -D"+shell_quote(*it);
 
   for(std::list<std::string>::const_iterator
       it=config.ansi_c.include_paths.begin();
       it!=config.ansi_c.include_paths.end();
       it++)
-    command+=" -I'"+*it+"'";
+    command+=" -I"+shell_quote(*it);
 
   for(std::list<std::string>::const_iterator
       it=config.ansi_c.include_files.begin();
       it!=config.ansi_c.include_files.end();
       it++)
-    command+=" -include '"+*it+"'";
+    command+=" -include "+shell_quote(*it);
 
   for(std::list<std::string>::const_iterator
       it=config.ansi_c.preprocessor_options.begin();
@@ -1008,13 +1008,13 @@ bool c_preprocess_arm(
       it=config.ansi_c.defines.begin();
       it!=config.ansi_c.defines.end();
       it++)
-    command+=" \"-D"+*it+"\"";
+    command+=" "+shell_quote("-D"+*it);
 
   for(std::list<std::string>::const_iterator
       it=config.ansi_c.include_paths.begin();
       it!=config.ansi_c.include_paths.end();
       it++)
-    command+=" \"-I"+*it+"\"";
+    command+=" "+shell_quote("-I"+*it);
 
   int result;
 
