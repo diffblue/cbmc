@@ -201,7 +201,7 @@ Function: java_bytecode_languaget::typecheck
 \*******************************************************************/
 
 bool java_bytecode_languaget::typecheck(
-  contextt &context,
+  symbol_tablet &context,
   const std::string &module,
   message_handlert &message_handler)
 {
@@ -209,7 +209,7 @@ bool java_bytecode_languaget::typecheck(
   if(java_bytecode_convert(parse_tree, module, message_handler))
     return true;
 
-  contextt new_context;
+  symbol_tablet new_context;
 
   if(java_bytecode_typecheck(parse_tree, new_context, module, message_handler))
     return true;
@@ -234,7 +234,7 @@ Function: java_bytecode_languaget::final
 \*******************************************************************/
 
 bool java_bytecode_languaget::final(
-  contextt &context,
+  symbol_tablet &context,
   message_handlert &message_handler)
 {
   #if 0
