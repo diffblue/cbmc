@@ -131,7 +131,7 @@ bool java_bytecode_typecheck(
 
   java_bytecode_typecheckt java_bytecode_typecheck(
     java_bytecode_parse_tree, context,
-    ns.get_context(), "", message_handler);
+    ns.get_symbol_table(), "", message_handler);
 
   try
   {
