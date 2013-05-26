@@ -15,6 +15,7 @@ Date: September 2011
 
 class value_setst;
 class goto_functionst;
+class symbol_tablet;
 
 void weak_memory(
   memory_modelt model,

@@ -30,7 +30,7 @@ typedef enum {
   read_first=2,
   write_first=3,
   my_events=4,
-  one_event_per_cycle
+  one_event_per_cycle=5
 } instrumentation_strategyt;
 
 #endif
