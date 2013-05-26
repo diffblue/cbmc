@@ -169,9 +169,13 @@ public:
       return false;
   }
 
-  irep_idt choice(const std::string &suffix)
+  irep_idt choice(const irep_idt &function, const std::string &suffix)
   {
-    return add("weak::choice", suffix, bool_typet());
+    const std::string function_base_name = (symbol_table.has_symbol(function)?
+      id2string(symbol_table.lookup(function).base_name):
+      "main");
+    return add(function_base_name+"_weak_choice", 
+      function_base_name+"_weak_choice", suffix, bool_typet());
   }
 
   bool is_buffered(
@@ -252,14 +256,29 @@ protected:
 
   irep_idt add(
     const irep_idt &object,
+    const irep_idt &base_name,
     const std::string &suffix,
-    const typet &type);
+    const typet &type,
+    bool added_as_instrumentation);
 
+  irep_idt add(
+    const irep_idt &object,
+    const irep_idt &base_name,
+    const std::string &suffix,
+    const typet &type) 
+  {
+    return add(object, base_name, suffix, type, true);
+  }
+
+  /* inserting a non-instrumenting, fresh variable */
   irep_idt add_fresh_var(
     const irep_idt &object,
+    const irep_idt &base_name,
     const std::string &suffix,
-    const typet &type);
-
+    const typet &type)
+  {
+    return add(object, base_name, suffix, type, false);
+  }
 
   void add_initialization(goto_programt &goto_program);
 };
@@ -306,17 +325,22 @@ const shared_bufferst::varst &shared_bufferst::operator()(const irep_idt &object
 
   vars.type=symbol.type;
 
-  vars.w_buff0=add(object, "$w_buff0", symbol.type);
-  vars.w_buff1=add(object, "$w_buff1", symbol.type);
+  vars.w_buff0=add(object, symbol.base_name, "$w_buff0", symbol.type);
+  vars.w_buff1=add(object, symbol.base_name, "$w_buff1", symbol.type);
 
-  vars.w_buff0_used=add(object, "$w_buff0_used", bool_typet());
-  vars.w_buff1_used=add(object, "$w_buff1_used", bool_typet());
+  vars.w_buff0_used=add(object, symbol.base_name, "$w_buff0_used", 
+    bool_typet());
+  vars.w_buff1_used=add(object, symbol.base_name, "$w_buff1_used", 
+    bool_typet());
 
-  vars.mem_tmp=add(object, "$mem_tmp", symbol.type);
-  vars.flush_delayed=add(object, "$flush_delayed", bool_typet());
+  vars.mem_tmp=add(object, symbol.base_name, "$mem_tmp", symbol.type);
+  vars.flush_delayed=add(object, symbol.base_name, "$flush_delayed", 
+    bool_typet());
 
-  vars.read_delayed=add(object, "$read_delayed", bool_typet());
-  vars.read_delayed_var=add(object, "$read_delayed_var", pointer_typet(symbol.type));
+  vars.read_delayed=add(object, symbol.base_name, "$read_delayed", 
+    bool_typet());
+  vars.read_delayed_var=add(object, symbol.base_name, "$read_delayed_var", 
+    pointer_typet(symbol.type));
 
   unsigned cnt;
 
@@ -324,12 +348,10 @@ const shared_bufferst::varst &shared_bufferst::operator()(const irep_idt &object
   {
     vars.r_buff0_thds.push_back(
       shared_bufferst::add(
-        object, 
-        "$r_buff0_thd"+i2string(cnt), bool_typet()));
+        object, symbol.base_name, "$r_buff0_thd"+i2string(cnt), bool_typet()));
     vars.r_buff1_thds.push_back(
       shared_bufferst::add(
-        object, "$r_buff1_thd"+i2string(cnt), 
-        bool_typet()));
+        object, symbol.base_name, "$r_buff1_thd"+i2string(cnt), bool_typet()));
   }
 
   return vars;
@@ -339,7 +361,7 @@ const shared_bufferst::varst &shared_bufferst::operator()(const irep_idt &object
 
 Function: shared_bufferst::add
 
-  Inputs: var, suffix, type of the var
+  Inputs: var, suffix, type of the var, added as an instrumentation
 
  Outputs: identifier of the new var
 
@@ -349,44 +371,27 @@ Function: shared_bufferst::add
 
 irep_idt shared_bufferst::add(
   const irep_idt &object,
+  const irep_idt &base_name,
   const std::string &suffix,
-  const typet &type)
+  const typet &type,
+  bool instrument)
 {
-  const irep_idt identifier=id2string(object)+suffix;
+  const irep_idt identifier = id2string(object)+suffix;
 
   symbolt new_symbol;
   new_symbol.name=identifier;
-  new_symbol.base_name=identifier;
+  new_symbol.base_name=id2string(base_name)+suffix;
   new_symbol.type=type;
   new_symbol.is_static_lifetime=true;
   new_symbol.value.make_nil();
 
-  instrumentations.insert(identifier);
+  if(instrument)
+    instrumentations.insert(identifier);
 
   symbolt *symbol_ptr;
   symbol_table.move(new_symbol, symbol_ptr);
   return identifier;
 }
-
-irep_idt shared_bufferst::add_fresh_var(
-  const irep_idt &object,
-  const std::string &suffix,
-  const typet &type)
-{
-  const irep_idt identifier=id2string(object)+suffix;
-
-  symbolt new_symbol;
-  new_symbol.name=identifier;
-  new_symbol.base_name=identifier;
-  new_symbol.type=type;
-  new_symbol.is_static_lifetime=true;
-  new_symbol.value.make_nil();
-
-  symbolt *symbol_ptr;
-  symbol_table.move(new_symbol, symbol_ptr);
-  return identifier;
-}
-
 
 /*******************************************************************\
 
@@ -821,8 +826,8 @@ void shared_bufferst::nondet_flush(
   const varst &vars=(*this)(object);
 
   // Non deterministic choice
-  irep_idt choice0=choice("0");
-  irep_idt choice2=choice("2"); //delays the write flush
+  irep_idt choice0=choice(target->function, "0");
+  irep_idt choice2=choice(target->function, "2"); //delays the write flush
 
   const symbol_exprt choice0_expr=symbol_exprt(choice0, bool_typet());  
   const symbol_exprt delay_expr=symbol_exprt(choice2, bool_typet());
@@ -1046,7 +1051,7 @@ void shared_bufferst::nondet_flush(
     // a thread can read the other threads' buffers
 
     // One extra non-deterministic choice needed
-    irep_idt choice1=choice("1");
+    irep_idt choice1=choice(target->function, "1");
     const symbol_exprt choice1_expr=symbol_exprt(choice1, bool_typet());
     
     // throw Boolean dice
@@ -1707,7 +1712,8 @@ void shared_bufferst::cfg_visitort::weak_memory(
                       vars.read_delayed, bool_typet());
 
                     // One extra non-deterministic choice needed
-                    irep_idt choice1=shared_buffers.choice("1");
+                    irep_idt choice1=shared_buffers.choice(
+                      instruction.function, "1");
                     const symbol_exprt choice1_expr=symbol_exprt(choice1, 
                       bool_typet());
                     const exprt nondet_bool_expr=side_effect_expr_nondett(
