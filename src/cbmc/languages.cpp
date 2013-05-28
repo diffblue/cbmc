@@ -18,6 +18,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <specc/specc_language.h>
 #endif
 
+#ifdef HAVE_JAVA_BYTECODE
+#include <java_bytecode/java_bytecode_language.h>
+#endif
+
 #include "parseoptions.h"
 
 /*******************************************************************\
@@ -42,6 +46,10 @@ void cbmc_parseoptionst::register_languages()
   
   #ifdef HAVE_SPECC
   register_language(new_specc_language);
+  #endif
+  
+  #ifdef HAVE_JAVA_BYTECODE
+  register_language(new_java_bytecode_language);
   #endif
 }
 
