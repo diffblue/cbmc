@@ -50,6 +50,22 @@ std::string java_bytecode_typecheckt::to_string(const typet &type)
 
 /*******************************************************************\
 
+Function: java_bytecode_typecheckt::typecheck_expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void java_bytecode_typecheckt::typecheck_expr(exprt &expr)
+{ 
+}
+
+/*******************************************************************\
+
 Function: java_bytecode_typecheckt::typecheck_function_body
 
   Inputs:
@@ -126,12 +142,13 @@ bool java_bytecode_typecheck(
   message_handlert &message_handler,
   const namespacet &ns)
 {
+  #if 0
   contextt context;
   java_bytecode_parse_treet java_bytecode_parse_tree;
 
   java_bytecode_typecheckt java_bytecode_typecheck(
     java_bytecode_parse_tree, context,
-    ns.get_symbol_table(), "", message_handler);
+    "", message_handler);
 
   try
   {
@@ -154,4 +171,5 @@ bool java_bytecode_typecheck(
   }
   
   return java_bytecode_typecheck.get_error_found();
+  #endif
 }

@@ -61,7 +61,7 @@ public:
   virtual languaget *new_language()
   { return new java_bytecode_languaget; }
    
-  virtual std::string id() const { return "JAVA"; }
+  virtual std::string id() const { return "java"; }
   virtual std::string description() const { return "Java Bytecode"; }
   virtual std::set<std::string> extensions() const;
 

@@ -20,7 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 bool java_bytecode_typecheck(
   java_bytecode_parse_treet &parse_tree,
-  symbol_tablet &context,
+  symbol_tablet &symbol_table,
   const std::string &module,
   message_handlert &message_handler);
 
@@ -36,30 +36,15 @@ class java_bytecode_typecheckt:
 public:
   java_bytecode_typecheckt(
     java_bytecode_parse_treet &_parse_tree,
-    symbol_tablet &_context,
+    symbol_tablet &_symbol_table,
     const std::string &_module,
     message_handlert &_message_handler):
     typecheckt(_message_handler),
-    namespacet(_context),
+    namespacet(_symbol_table),
     parse_tree(_parse_tree),
-    context(_context),
+    symbol_table(_symbol_table),
     module(_module),
-    mode("JAVA")
-  {
-  }
-
-  java_bytecode_typecheckt(
-    java_bytecode_parse_treet &_parse_tree,
-    symbol_tablet &_context1,
-    const symbol_tablet &_context2,
-    const std::string &_module,
-    message_handlert &_message_handler):
-    typecheckt(_message_handler),
-    namespacet(_context1, _context2),
-    parse_tree(_parse_tree),
-    context(_context1),
-    module(_module),
-    mode("JAVA")
+    mode(ID_java)
   {
   }
 
@@ -70,7 +55,7 @@ public:
 
 protected:
   java_bytecode_parse_treet &parse_tree;
-  symbol_tablet &context;
+  symbol_tablet &symbol_table;
   const irep_idt module;
   const irep_idt mode;
 
