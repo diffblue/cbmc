@@ -1844,7 +1844,42 @@ public:
   {
     operands().resize(1);
   }
+  
+  inline exprt &op()
+  {
+    return op0();
+  }
+
+  inline const exprt &op() const
+  {
+    return op0();
+  }
 };
+
+/*! \brief Cast a generic exprt to an \ref not_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * not_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref not_exprt
+ *
+ * \ingroup gr_std_expr
+*/
+extern inline const not_exprt &to_not_expr(const exprt &expr)
+{
+  assert(expr.id()==ID_not && expr.operands().size()==1);
+  return static_cast<const not_exprt &>(expr);
+}
+
+/*! \copydoc to_not_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
+extern inline not_exprt &to_not_expr(exprt &expr)
+{
+  assert(expr.id()==ID_not && expr.operands().size()==1);
+  return static_cast<not_exprt &>(expr);
+}
 
 /*! \brief Operator to dereference a pointer
 */
