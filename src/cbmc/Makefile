@@ -41,9 +41,9 @@ ifneq ($(wildcard ../cpp/Makefile),)
   CP_CXXFLAGS += -DHAVE_CPP
 endif
 
-ifneq ($(wildcard ../java/Makefile),)
-  OBJ += ../java/java$(LIBEXT)
-  CP_CXXFLAGS += -DHAVE_JAVA
+ifneq ($(wildcard ../java_bytecode/Makefile),)
+  OBJ += ../java_bytecode/java_bytecode$(LIBEXT)
+  CP_CXXFLAGS += -DHAVE_JAVA_BYTECODE
 endif
 
 ifneq ($(wildcard ../specc/Makefile),)
