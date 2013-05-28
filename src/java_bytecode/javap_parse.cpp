@@ -16,7 +16,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "javap_parse.h"
 
+#define DEBUG
+
+#ifdef DEBUG
 #include <iostream>
+#endif
 
 class javap_parsert:public parsert
 {
@@ -32,12 +36,15 @@ public:
   };
 
   virtual bool parse();
+  
+  typedef java_bytecode_parse_treet::itemt itemt;
  
 protected: 
   void rgrammar();
   void rcompiled_from();
   void rclass();
-  void rmember();
+  void rmembers();
+  void rconstant(const std::string &line);
 
   inline std::string getline()
   {
@@ -183,7 +190,7 @@ void javap_parsert::rcompiled_from()
 
 /*******************************************************************\
 
-Function: javap_parsert::rmember
+Function: javap_parsert::rconstant
 
   Inputs:
 
@@ -193,8 +200,44 @@ Function: javap_parsert::rmember
 
 \*******************************************************************/
 
-void javap_parsert::rmember()
+void javap_parsert::rconstant(const std::string &line)
 {
+  // #1 = Method	#6.#15;
+//  parse_tree.add();
+}
+  
+/*******************************************************************\
+
+Function: javap_parsert::rmembers
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void javap_parsert::rmembers()
+{
+  std::string line;
+  
+  while(!eof())
+  {
+    line=getline();
+    
+    #ifdef DEBUG
+    std::cout << "rmembers *** " << line << std::endl;
+    #endif
+
+    if(has_prefix(line, "   line "))
+    {
+    }
+    else if(line=="}")
+    {
+      return;
+    }
+  }
 }
 
 /*******************************************************************\
@@ -217,14 +260,15 @@ void javap_parsert::rclass()
   line=getline();
   if(!has_prefix(line, "class ")) throw parsing_errort("expected 'class'");
 
-  while(true)
+  while(!eof())
   {
     line=getline();
+    
+    #ifdef DEBUG
+    std::cout << "rclass *** " << line << std::endl;
+    #endif
 
-    if(line=="  Constant pool:")
-    {
-    }
-    else if(has_prefix(line, "SourceFile: "))
+    if(has_prefix(line, "SourceFile: "))
     {
     }
     else if(has_prefix(line, "minor version: "))
@@ -235,39 +279,13 @@ void javap_parsert::rclass()
     }
     else if(line=="{")
     {
+      rmembers();
+    }
+    else if(has_prefix(line, "const "))
+    {
+      rconstant(std::string(line, 6, std::string::npos));
     }
   }
-
-  #if 0  
-  
-  if(line=="
-  
-  if(
-
-  irep_idt t=token();
-  
-  if(t==ID_public || t==ID_private || t==ID_protected)
-  {
-    t=token();
-  }
-
-  if(t!=ID_class) 
-  
-  irep_idt class_id=token();
-  
-  if(token()!="extends") throw parsing_errort("expected 'extends'");
-  
-  irep_idt extends=token();
-  
-  if(token()!="{") throw parsing_errort("expected '{'");
-
-  while(true)
-  {
-    irep_idt t=token();
-    if(t=="}") break;
-    rmember();
-  }  
-  #endif
 }
 
 /*******************************************************************\
