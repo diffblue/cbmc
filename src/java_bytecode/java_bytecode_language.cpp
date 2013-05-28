@@ -33,6 +33,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ansi-c/expr2c.h>
 
+#include "javap_parse.h"
+
 /*******************************************************************\
 
 Function: java_bytecode_languaget::extensions
@@ -113,79 +115,9 @@ bool java_bytecode_languaget::parse(
   const std::string &path,
   message_handlert &message_handler)
 {
-  #if 0
   // store the path
-
   parse_path=path;
-
-  // preprocessing
-
-  std::ostringstream o_preprocessed;
-
-  if(preprocess(instream, path, o_preprocessed, message_handler))
-    return true;
-
-  std::istringstream i_preprocessed(o_preprocessed.str());
-
-  // parsing
-
-  std::string code;
-  java_bytecode_internal_additions(code);
-  std::istringstream codestr(code);
-
-  java_bytecode_parser.clear();
-  java_bytecode_parser.filename="<built-in>";
-  java_bytecode_parser.in=&codestr;
-  java_bytecode_parser.set_message_handler(message_handler);
-  java_bytecode_parser.grammar=java_bytecode_parsert::LANGUAGE;
-
-  switch(config.java_bytecode.mode)
-  {
-  case configt::java_bytecodet::MODE_CODEWARRIOR:
-    java_bytecode_parser.mode=java_bytecode_parsert::CW;
-    break;
-   
-  case configt::java_bytecodet::MODE_VISUAL_STUDIO:
-    java_bytecode_parser.mode=java_bytecode_parsert::MSC;
-    break;
-    
-  case configt::java_bytecodet::MODE_ANSI:
-    java_bytecode_parser.mode=java_bytecode_parsert::ANSI;
-    break;
-    
-  case configt::java_bytecodet::MODE_GCC:
-    java_bytecode_parser.mode=java_bytecode_parsert::GCC;
-    break;
-    
-  case configt::java_bytecodet::MODE_ARM:
-    java_bytecode_parser.mode=java_bytecode_parsert::ARM;
-    break;
-    
-  default:
-    assert(false);
-  }
-
-  java_bytecode_scanner_init();
-
-  bool result=java_bytecode_parser.parse();
-
-  if(!result)
-  {
-    java_bytecode_parser.line_no=0;
-    java_bytecode_parser.filename=path;
-    java_bytecode_parser.in=&i_preprocessed;
-    java_bytecode_scanner_init();
-    result=java_bytecode_parser.parse();
-  }
-
-  // save result
-  parse_tree.swap(java_bytecode_parser.parse_tree);
-
-  // save some memory
-  java_bytecode_parser.clear();
-
-  return result;
-  #endif
+  return javap_parse(path, parse_tree, message_handler);
 }
              
 /*******************************************************************\

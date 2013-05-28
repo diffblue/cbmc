@@ -11,13 +11,25 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/parser.h>
 #include <util/message_stream.h>
 #include <util/tempfile.h>
+#include <util/suffix.h>
+#include <util/prefix.h>
 
 #include "javap_parse.h"
+
+#include <iostream>
 
 class javap_parsert:public parsert
 {
 public:
-  class parsing_errort { };
+  class parsing_errort
+  { 
+  public:
+    explicit inline parsing_errort(const char *_msg):msg(_msg)
+    {
+    }
+    
+    const char *msg;
+  };
 
   virtual bool parse();
  
@@ -26,6 +38,24 @@ protected:
   void rcompiled_from();
   void rclass();
   void rmember();
+
+  inline std::string getline()
+  {
+    std::string line;
+    std::getline(*in, line);
+    return line;
+  }
+  
+  bool skip(const std::string &what, std::string &where)
+  {
+    if(std::string(where, 0, what.size())==what)
+    {
+      where=std::string(where, what.size(), std::string::npos);
+      return false;
+    }
+    else
+      return true;
+  }
   
   irep_idt token();
   irep_idt next_token;
@@ -47,12 +77,13 @@ bool javap_parsert::parse()
 {
   try
   {
-    next_token=0;
+    next_token=irep_idt();
     rgrammar();
   }
   
-  catch(parsing_errort)
+  catch(const parsing_errort &p)
   {
+    error(p.msg);
     return true;
   }
   
@@ -73,27 +104,33 @@ Function: javap_parsert::token
 
 irep_idt javap_parsert::token()
 {
-  if(!next_token.empty())
-    return next_token;
-
   std::string t;
+
+  // do we have one buffered?
+
+  if(!next_token.empty())
+  {
+    irep_idt tmp=next_token;
+    next_token=irep_idt();
+    return tmp;
+  }
+  
+  // get a new token
+
   char ch;
 
-  // skip whitespace
-  do
+  while(1)
   {
-    if(!in->read(&ch, 1)) return "";
-  }
-  while(ch=='\t' || ch==' ' || ch=='\r' || ch=='\n');
+    if(!in->read(&ch, 1))
+      return t;
 
-  while(true)
-  {
-    if(!in->read(&ch, 1)) return t;
-
-    if(isalnum(ch) || ch=='.' || ch=='_')
+    if(isalnum(ch) || ch=='.' || ch=='_' || ch=='$')
       t+=ch;
     else if(ch==' ' || ch=='\t' || ch=='\r' || ch=='\n')
-      return t;
+    {
+      // whitespace
+      if(t!="") return t;
+    }
     else
     {
       next_token=std::string(ch, 1);
@@ -139,7 +176,8 @@ void javap_parsert::rcompiled_from()
   std::string line;
   std::getline(*in, line);
   std::string s="Compiled from \"";
-  if(std::string(line, 0, s.size())==s) throw parsing_errort();
+  if(std::string(line, 0, s.size())!=s)
+    throw parsing_errort("Expected 'Compiled from'");
   filename=std::string(line, s.size(), line.size()-s.size()-1);
 }
 
@@ -173,22 +211,55 @@ Function: javap_parsert::rclass
 
 void javap_parsert::rclass()
 {
+  std::string line;
+  
+  // class helloworld extends java.lang.Object
+  line=getline();
+  if(!has_prefix(line, "class ")) throw parsing_errort("expected 'class'");
+
+  while(true)
+  {
+    line=getline();
+
+    if(line=="  Constant pool:")
+    {
+    }
+    else if(has_prefix(line, "SourceFile: "))
+    {
+    }
+    else if(has_prefix(line, "minor version: "))
+    {
+    }
+    else if(has_prefix(line, "major version: "))
+    {
+    }
+    else if(line=="{")
+    {
+    }
+  }
+
+  #if 0  
+  
+  if(line=="
+  
+  if(
+
   irep_idt t=token();
   
   if(t==ID_public || t==ID_private || t==ID_protected)
   {
     t=token();
   }
-  
-  if(t!=ID_class) throw parsing_errort();
+
+  if(t!=ID_class) 
   
   irep_idt class_id=token();
   
-  if(token()!="extends") throw parsing_errort();
+  if(token()!="extends") throw parsing_errort("expected 'extends'");
   
   irep_idt extends=token();
   
-  if(token()!="{") throw parsing_errort();
+  if(token()!="{") throw parsing_errort("expected '{'");
 
   while(true)
   {
@@ -196,6 +267,7 @@ void javap_parsert::rclass()
     if(t=="}") break;
     rmember();
   }  
+  #endif
 }
 
 /*******************************************************************\
@@ -222,9 +294,15 @@ bool javap_parse(
   std::string stderr_file=get_temporary_file("tmp.stderr", "");
   std::string stdout_file=get_temporary_file("tmp.stdout", "");
   
+  // javap likes to get the _class_ name, not the file name,
+  // so we strip the ".class" suffix.
+  
+  std::string stripped_file_name=
+    has_suffix(file, ".class")?std::string(file, 0, file.size()-6):file;
+  
   std::string command="javap";
   
-  command+=" -c -l -private -verbose \""+file+"\"";
+  command+=" -c -l -private -verbose \""+stripped_file_name+"\"";
   command+=" 2>\""+stderr_file+"\" >\""+stdout_file+"\"";  
 
   // _popen isn't very reliable on WIN32
@@ -237,12 +315,13 @@ bool javap_parse(
   {
     unlink(stdout_file.c_str());
     unlink(stderr_file.c_str());
-    message_stream.error("javap failed (open failed)");
+    message_stream.error("javap failed (stdout_stream open failed)");
     return true;
   }
 
   javap_parsert javap_parser;
   javap_parser.in=&stdout_stream;  
+  javap_parser.set_message_handler(message_handler);
   
   bool parser_result=javap_parser.parse();
 
