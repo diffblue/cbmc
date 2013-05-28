@@ -48,14 +48,12 @@ Function: cpp_declarationt::name_anon_struct_union
 
 \*******************************************************************/
 
-void cpp_declarationt::name_anon_struct_union()
+void cpp_declarationt::name_anon_struct_union(typet &dest)
 {
   // We name any anon struct/unions according to the first
   // declarator. No need to do anon enums, which get
   // a name based on the enum elements.
 
-  typet &dest=type();
-  
   if(dest.id()==ID_struct || dest.id()==ID_union)
   {
     if(dest.find(ID_tag).is_nil())
@@ -70,10 +68,15 @@ void cpp_declarationt::name_anon_struct_union()
         // Anon struct/unions without declarator are pretty
         // useless, but still possible.
         
-        irep_idt base_name="anontag-"+id2string(d.front().name().get_base_name());
+        irep_idt base_name="anon-"+id2string(d.front().name().get_base_name());
         dest.set(ID_tag, cpp_namet(base_name));
         dest.set(ID_C_is_anonymous, true);
       }
     }
+  }
+  else if(dest.id()==ID_merged_type)
+  {
+    Forall_subtypes(it, dest)
+      name_anon_struct_union(*it);
   }
 }

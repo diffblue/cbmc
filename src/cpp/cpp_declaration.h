@@ -130,7 +130,8 @@ public:
 
   // for assigning a tag for struct/union in the type based on
   // the name of the first declarator
-  void name_anon_struct_union();
+  void name_anon_struct_union() { name_anon_struct_union(type()); }
+  void name_anon_struct_union(typet &dest);
 };
 
 extern inline cpp_declarationt &to_cpp_declaration(irept &irep)
