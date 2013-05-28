@@ -449,8 +449,50 @@ bool cbmc_parseoptionst::get_goto_program(
         return true;
       }
     }
+    else if(cmdline.isset("show-parse-tree"))
+    {
+      if(cmdline.args.size()!=1)
+      {
+        error("Please give one source file only");
+        return true;
+      }
+      
+      std::string filename=cmdline.args[0];
+      
+      #ifdef _MSC_VER
+      std::ifstream infile(widen(filename).c_str());
+      #else
+      std::ifstream infile(filename.c_str());
+      #endif
+                
+      if(!infile)
+      {
+        error("failed to open input file", filename);
+        return true;
+      }
+                              
+      languaget *language=get_language_from_filename(filename);
+                                                
+      if(language==NULL)
+      {
+        error("failed to figure out type of file", filename);
+        return true;
+      }
+                                                                
+      status("Parsing", filename);
+  
+      if(language->parse(infile, filename, get_message_handler()))
+      {
+        std::cerr << "PARSING ERROR" << std::endl;
+        return true;
+      }
+      
+      language->show_parse(std::cout);
+      return true;
+    }
     else
     {
+    
       if(parse()) return true;
       if(typecheck()) return true;
       if(get_modules(bmc)) return true;    
@@ -745,6 +787,7 @@ void cbmc_parseoptionst::help()
     " --little-endian              allow little-endian word-byte conversions\n"
     " --big-endian                 allow big-endian word-byte conversions\n"
     " --unsigned-char              make \"char\" unsigned by default\n"
+    " --show-parse-tree            show parse tree\n"
     " --show-symbol-table          show symbol table\n"
     " --show-goto-functions        show goto program\n"
     " --ppc-macos                  set MACOS/PPC architecture\n"

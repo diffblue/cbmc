@@ -37,7 +37,7 @@ class optionst;
   "(16)(32)(64)(LP64)(ILP64)(LLP64)(ILP32)(LP32)" \
   "(little-endian)(big-endian)" \
   "(show-goto-functions)(show-value-sets)(show-loops)" \
-  "(show-symbol-table)(show-vcc)(show-claims)(claim):" \
+  "(show-symbol-table)(show-parse-tree)(show-vcc)(show-claims)(claim):" \
   "(error-label):(verbosity):(no-library)" \
   "(version)" \
   "(cover-assertions)" \
