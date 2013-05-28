@@ -277,7 +277,10 @@ void goto_convertt::convert_CPROVER_throw(
     // need to process destructor stack
     for(destructor_stackt::const_reverse_iterator
         d_it=targets.destructor_stack.rbegin();
-        d_it!=targets.destructor_stack.rend();
+        d_it!=
+        (destructor_stackt::const_reverse_iterator)targets.destructor_stack.rend();
+        // The type cast for rend() above is a work-around for broken g++ 3.4.4,
+        // and will enventually go away.
         d_it++)
     {
       codet d_code=*d_it;
