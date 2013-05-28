@@ -8,9 +8,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <fstream>
 
-#include <parser.h>
-#include <message_stream.h>
-#include <tempfile.h>
+#include <util/parser.h>
+#include <util/message_stream.h>
+#include <util/tempfile.h>
 
 #include "javap_parse.h"
 

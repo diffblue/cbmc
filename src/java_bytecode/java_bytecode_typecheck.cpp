@@ -6,9 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <std_types.h>
-#include <prefix.h>
-#include <config.h>
+#include <util/std_types.h>
+#include <util/prefix.h>
+#include <util/config.h>
 
 #include <ansi-c/expr2c.h>
 

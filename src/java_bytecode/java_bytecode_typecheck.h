@@ -9,12 +9,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_JAVA_BYTECODE_TYPECHECK_H
 #define CPROVER_JAVA_BYTECODE_TYPECHECK_H
 
-#include <context.h>
-#include <typecheck.h>
-#include <namespace.h>
-#include <std_code.h>
-#include <std_expr.h>
-#include <std_types.h>
+#include <util/symbol_table.h>
+#include <util/typecheck.h>
+#include <util/namespace.h>
+#include <util/std_code.h>
+#include <util/std_expr.h>
+#include <util/std_types.h>
 
 #include "java_bytecode_parse_tree.h"
 

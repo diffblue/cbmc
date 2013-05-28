@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_JAVA_BYTECODE_PARSE_TREE_H
 #define CPROVER_JAVA_BYTECODE_PARSE_TREE_H
 
-#include <std_code.h>
+#include <util/std_code.h>
 
 class java_bytecode_parse_treet
 {

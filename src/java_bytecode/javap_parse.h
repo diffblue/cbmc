@@ -11,7 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <string>
 
-#include <message.h>
+#include <util/message.h>
 
 #include "java_bytecode_parse_tree.h"
 

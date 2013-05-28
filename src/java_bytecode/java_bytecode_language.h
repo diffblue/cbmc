@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_JAVA_BYTECODE_LANGUAGE_H
 #define CPROVER_JAVA_BYTECODE_LANGUAGE_H
 
-#include <language.h>
+#include <util/language.h>
 
 #include "java_bytecode_parse_tree.h"
 
