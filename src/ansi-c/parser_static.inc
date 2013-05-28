@@ -84,6 +84,7 @@ Function: statement
 static void statement(YYSTYPE &expr, const irep_idt &id)
 {
   set(expr, ID_code);
+  stack(expr).type().id(ID_code);
   stack(expr).set(ID_statement, id);
 }
 

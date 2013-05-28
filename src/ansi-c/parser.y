@@ -2022,10 +2022,6 @@ labeled_statement:
         }
         ;
 
-/* note: the following has been changed from the ANSI-C grammar:	*/
-/*	- rule compound_scope is used to prepare an inner scope for	*/
-/*	  each compound_statement (and to obtain the line infos)	*/
-
 compound_statement:
           compound_scope '{' '}'
         {
@@ -2036,16 +2032,17 @@ compound_statement:
         }
         | compound_scope '{' statement_list '}'
         {
-          $$=$3;
-          stack($$).location()=stack($2).location();
+          $$=$2;
+          statement($$, ID_block);
           stack($$).set(ID_C_end_location, stack($4).location());
+          stack($$).operands().swap(stack($3).operands());
           PARSER.pop_scope();
         }
         | compound_scope '{' TOK_ASM_STRING '}'
         {
           init($$);
+          statement($$, ID_asm);
           stack($$).location()=stack($2).location();
-          stack($$).set(ID_statement, ID_asm);
           mto($$, $3);
           PARSER.pop_scope();
         }
@@ -2062,11 +2059,8 @@ compound_scope:
 statement_list:
           statement
         {
-          $$=$1;
-          exprt tmp;
-          tmp.swap(stack($1));
-          statement($$, ID_block);
-          stack($$).move_to_operands(tmp);
+          init($$);
+          mto($$, $1);
         }
         | statement_list statement
         {
