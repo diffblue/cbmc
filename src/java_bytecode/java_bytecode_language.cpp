@@ -17,22 +17,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <config.h>
 #endif
 
-#include "java_bytecode_language.h"
+#include <util/symbol_table.h>
 
-#if 0
-#include "java_bytecode_convert.h"
-#include "java_bytecode_typecheck.h"
-#include "java_bytecode_parser.h"
-#include "c_final.h"
-#include "trans_unit.h"
-#include "c_link.h"
-#include "c_preprocess.h"
-#include "c_main.h"
-#include "internal_additions.h"
-#endif
+#include <linking/linking.h>
 
 #include <ansi-c/expr2c.h>
 
+#include "java_bytecode_language.h"
+#include "java_bytecode_typecheck.h"
 #include "javap_parse.h"
 
 /*******************************************************************\
@@ -89,13 +81,8 @@ bool java_bytecode_languaget::preprocess(
   std::ostream &outstream,
   message_handlert &message_handler)
 {
-  #if 0
-  // stdin?
-  if(path=="")
-    return c_preprocess(instream, outstream, message_handler);
-
-  return c_preprocess(path, outstream, message_handler);  
-  #endif
+  // there is no preprocessing!
+  return true;
 }
              
 /*******************************************************************\
@@ -133,24 +120,20 @@ Function: java_bytecode_languaget::typecheck
 \*******************************************************************/
 
 bool java_bytecode_languaget::typecheck(
-  symbol_tablet &context,
+  symbol_tablet &symbol_table,
   const std::string &module,
   message_handlert &message_handler)
 {
-  #if 0
-  if(java_bytecode_convert(parse_tree, module, message_handler))
+  symbol_tablet new_symbol_table;
+  
+  if(java_bytecode_typecheck(
+       parse_tree, new_symbol_table, module, message_handler))
     return true;
 
-  symbol_tablet new_context;
-
-  if(java_bytecode_typecheck(parse_tree, new_context, module, message_handler))
-    return true;
-
-  if(c_link(context, new_context, message_handler))
+  if(linking(new_symbol_table, symbol_table, message_handler))
     return true;
     
   return false;
-  #endif
 }
 
 /*******************************************************************\
@@ -169,12 +152,12 @@ bool java_bytecode_languaget::final(
   symbol_tablet &context,
   message_handlert &message_handler)
 {
-  #if 0
+  /*
   if(c_final(context, message_handler)) return true;
   if(c_main(context, "c::", "c::main", message_handler)) return true;
-  
+  */
+  // nothing yet
   return false;
-  #endif
 }
 
 /*******************************************************************\
@@ -309,6 +292,8 @@ bool java_bytecode_languaget::to_expr(
 
   return result;
   #endif
+  
+  return true; // fail for now
 }
 
 /*******************************************************************\

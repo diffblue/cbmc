@@ -116,12 +116,12 @@ Function: java_bytecode_typecheck
 
 bool java_bytecode_typecheck(
   java_bytecode_parse_treet &java_bytecode_parse_tree,
-  contextt &context,
+  symbol_tablet &symbol_table,
   const std::string &module,
   message_handlert &message_handler)
 {
   java_bytecode_typecheckt java_bytecode_typecheck(
-    java_bytecode_parse_tree, context, module, message_handler);
+    java_bytecode_parse_tree, symbol_table, module, message_handler);
   return java_bytecode_typecheck.typecheck_main();
 }
 
@@ -143,11 +143,11 @@ bool java_bytecode_typecheck(
   const namespacet &ns)
 {
   #if 0
-  contextt context;
+  symbol_tablet symbol_table;
   java_bytecode_parse_treet java_bytecode_parse_tree;
 
   java_bytecode_typecheckt java_bytecode_typecheck(
-    java_bytecode_parse_tree, context,
+    java_bytecode_parse_tree, symbol_table,
     "", message_handler);
 
   try
@@ -172,4 +172,7 @@ bool java_bytecode_typecheck(
   
   return java_bytecode_typecheck.get_error_found();
   #endif
+  
+  // fail for now
+  return true;
 }
