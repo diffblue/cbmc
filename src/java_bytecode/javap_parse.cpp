@@ -37,7 +37,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <unistd.h>
 #endif
 
-#define DEBUG
+//#define DEBUG
 
 #ifdef DEBUG
 #include <iostream>
@@ -60,6 +60,7 @@ public:
   
   typedef java_bytecode_parse_treet::classt classt;
   typedef java_bytecode_parse_treet::membert membert;
+  typedef java_bytecode_parse_treet::instructiont instructiont;
   
   java_bytecode_parse_treet parse_tree;
  
@@ -70,7 +71,6 @@ protected:
   void rmembers(classt &dest_class);
   membert &rmember(classt &dest_class);
   void rconstant(const std::string &line);
-  void process_constants();
   typet rtype();
   void rcode(membert &dest_member);
 
@@ -99,7 +99,11 @@ protected:
     irep_idt kind, value;
   };
   
-  std::map<unsigned, constantt> constants;
+  typedef std::map<unsigned, constantt> constantst;
+  constantst constants;
+  
+  typedef std::map<unsigned, unsigned> address_to_linet;
+  address_to_linet address_to_line;
   
   // token scanner
   std::list<irep_idt> tokens;
@@ -260,27 +264,23 @@ void javap_parsert::rconstant(const std::string &line)
   std::string kind=std::string(line, eq_pos+2, tab_pos-eq_pos-2);
   std::string value=std::string(line, tab_pos+1, std::string::npos);  
   
+  // strip trailing ;
+  if(has_suffix(value, ";"))
+    value.resize(value.size()-1);
+  
+  if(kind=="Method" ||
+     kind=="class")
+  {
+    std::size_t pos=value.find("//  ");
+    if(pos!=std::string::npos)
+      value=std::string(value, pos+4, std::string::npos);
+  }
+  
   unsigned no=atoi(no_string.c_str());
   constants[no].kind=kind;
   constants[no].value=value;
 }
   
-/*******************************************************************\
-
-Function: javap_parsert::process_constants
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void javap_parsert::process_constants()
-{
-}
-
 /*******************************************************************\
 
 Function: javap_parsert::rcode
@@ -295,15 +295,34 @@ Function: javap_parsert::rcode
 
 void javap_parsert::rcode(membert &dest_member)
 {
+  instructiont &instruction=dest_member.add_instruction();
+
   //    0:	bipush	123
   irep_idt t;
   t=token(); // address
+  instruction.address=atoi(t.c_str());
   
   t=token(); // :
   
-  t=token(); // instruction
+  t=token(); // statement
+  instruction.statement=t;
 
   t=token(); // argument
+  
+  if(t=="#")
+  {
+    t=token();
+    instruction.argument=constants[atoi(t.c_str())].value;
+  }
+  else
+    instruction.argument=t;
+  
+  // do we have a line number?
+  if(address_to_line.find(instruction.address)!=address_to_line.end())
+  {
+    instruction.location.set_line(address_to_line[instruction.address]);
+    instruction.location.set_file(filename);
+  }
 }
 
 /*******************************************************************\
@@ -337,6 +356,14 @@ void javap_parsert::rmembers(classt &dest_class)
     {
       tokenize(line);
       m=&rmember(dest_class);
+    }
+    else if(has_prefix(line, "   line "))
+    {
+      unsigned line_no=
+        atoi(std::string(line, 3+4+1, std::string::npos).c_str());
+      unsigned address=
+        atoi(std::string(line, line.find(':')+1, std::string::npos).c_str());
+      address_to_line[address]=line_no;
     }
     else if(line.size()>=4 &&
             line[0]==' ' && line[1]==' ' && line[2]==' ' &&
@@ -543,7 +570,6 @@ void javap_parsert::rclass()
     }
     else if(line=="{")
     {
-      process_constants();
       rmembers(c);
     }
     else if(has_prefix(line, "const "))

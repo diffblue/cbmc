@@ -130,9 +130,28 @@ void java_bytecode_parse_treet::membert::output(std::ostream &out) const
     }
     
     out << ")";
-  }
+    out << std::endl;
+    out << "  {" << std::endl;
 
-  out << ";" << std::endl;
+    for(instructionst::const_iterator
+        it=instructions.begin();
+        it!=instructions.end();
+        it++)
+    {
+      if(it->location.get_line()!=irep_idt())
+        out << "    // " << it->location << std::endl;
+
+      out << "    " << it->address << ": " << it->statement;
+      if(it->argument!=irep_idt()) out << " " << it->argument;
+      out << std::endl;
+    }
+
+    out << "  }" << std::endl;
+  }
+  else
+    out << ";" << std::endl;
+
+  out << std::endl;
 }
 
 /*******************************************************************\

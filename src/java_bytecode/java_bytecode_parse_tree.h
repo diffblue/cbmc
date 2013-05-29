@@ -28,8 +28,9 @@ public:
   class instructiont
   {
   public:
+    locationt location;
     unsigned address;
-    irep_idt statement;
+    irep_idt statement, argument;
   };
   
   class membert
@@ -42,6 +43,12 @@ public:
     
     typedef std::vector<instructiont> instructionst;
     instructionst instructions;
+    
+    instructiont &add_instruction()
+    {
+      instructions.push_back(instructiont());
+      return instructions.back();
+    }
 
     void output(std::ostream &out) const;
     
