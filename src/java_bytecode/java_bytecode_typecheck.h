@@ -52,6 +52,10 @@ public:
 
   virtual void typecheck();
   virtual void typecheck_expr(exprt &expr);
+  
+  typedef java_bytecode_parse_treet::classt classt;
+  typedef java_bytecode_parse_treet::membert membert;
+  typedef java_bytecode_parse_treet::instructiont instructiont;
 
 protected:
   java_bytecode_parse_treet &parse_tree;
@@ -63,7 +67,9 @@ protected:
   virtual std::string to_string(const exprt &expr);
   virtual std::string to_string(const typet &type);
 
-  void typecheck_function_body(symbolt &symbol);  
+  void typecheck(const classt &c);
+  void typecheck(const membert &m);
+  void typecheck(const instructiont &i);
 };
 
 #endif

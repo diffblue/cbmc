@@ -66,7 +66,7 @@ void java_bytecode_typecheckt::typecheck_expr(exprt &expr)
 
 /*******************************************************************\
 
-Function: java_bytecode_typecheckt::typecheck_function_body
+Function: java_bytecode_typecheckt::typecheck
 
   Inputs:
 
@@ -76,7 +76,49 @@ Function: java_bytecode_typecheckt::typecheck_function_body
 
 \*******************************************************************/
 
-void java_bytecode_typecheckt::typecheck_function_body(symbolt &symbol)
+void java_bytecode_typecheckt::typecheck(const classt &c)
+{
+  for(classt::memberst::const_iterator
+      it=c.members.begin();
+      it!=c.members.end();
+      it++)
+    typecheck(*it);
+}
+
+/*******************************************************************\
+
+Function: java_bytecode_typecheckt::typecheck
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void java_bytecode_typecheckt::typecheck(const membert &m)
+{
+  for(membert::instructionst::const_iterator
+      it=m.instructions.begin();
+      it!=m.instructions.end();
+      it++)
+    typecheck(*it);
+}
+
+/*******************************************************************\
+
+Function: java_bytecode_typecheckt::typecheck
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void java_bytecode_typecheckt::typecheck(const instructiont &i)
 {
 }
 
@@ -99,6 +141,7 @@ void java_bytecode_typecheckt::typecheck()
       it!=parse_tree.classes.end();
       it++)
   {
+    typecheck(*it);
   }
 }
 
