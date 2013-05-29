@@ -14,11 +14,14 @@ unsigned int sleep(unsigned int seconds)
 
 /* FUNCTION: unlink */
 
-void unlink(const char *s)
+int unlink(const char *s)
 {
-  __CPROVER_hide:;
+  __CPROVER_HIDE:;
+  (void)*s;
   #ifdef __CPROVER_STRING_ABSTRACTION
   __CPROVER_assert(__CPROVER_is_zero_string(s), "unlink zero-termination");
   #endif
+  int retval;
+  return retval;
 }
 

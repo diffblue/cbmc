@@ -22,9 +22,10 @@ inline int putchar(int c)
 
 inline int puts(const char *s)
 {
+  __CPROVER_HIDE:;
   _Bool error;
   int ret;
-  __CPROVER_HIDE: printf("%s\n", s);
+  printf("%s\n", s);
   if(error) ret=-1; else __CPROVER_assume(ret>=0);
   return ret;
 }
@@ -44,6 +45,8 @@ inline int puts(const char *s)
 inline FILE *fopen(const char *filename, const char *mode)
 {
   __CPROVER_HIDE:;
+  (void)*filename;
+  (void)*mode;
   #ifdef __CPROVER_STRING_ABSTRACTION
   __CPROVER_assert(__CPROVER_is_zero_string(filename), "fopen zero-termination of 1st argument");
   __CPROVER_assert(__CPROVER_is_zero_string(mode), "fopen zero-termination of 2nd argument");
@@ -84,6 +87,8 @@ inline int fclose(FILE *stream)
 inline FILE *fdopen(int handle, const char *mode)
 {
   __CPROVER_HIDE:;
+  (void)handle;
+  (void)*mode;
   #ifdef __CPROVER_STRING_ABSTRACTION
   __CPROVER_assert(__CPROVER_is_zero_string(mode),
     "fdopen zero-termination of 2nd argument");
@@ -106,6 +111,8 @@ inline char *fgets(char *str, int size, FILE *stream)
   __CPROVER_HIDE:;
   _Bool error;
 
+  (void)size;
+  (void)*stream;
   #ifdef __CPROVER_STRING_ABSTRACTION
   int resulting_size;
   __CPROVER_assert(__CPROVER_buffer_size(str)>=size, "buffer-overflow in fgets");
@@ -138,6 +145,8 @@ inline size_t fread(
   size_t bytes=nread*size;
   size_t i;
   __CPROVER_assume(nread<=nitems);
+
+  (void)*stream;
 
   for(i=0; i<bytes; i++)
   {
@@ -207,6 +216,7 @@ int fputs(const char *s, FILE *stream)
   #ifdef __CPROVER_STRING_ABSTRACTION
   __CPROVER_assert(__CPROVER_is_zero_string(s), "fputs zero-termination of 1st argument");
   #endif
+  (void)*s;
   (void)*stream;
   return return_value;
 }
@@ -342,6 +352,8 @@ inline int fseek(FILE *stream, long offset, int whence)
   __CPROVER_HIDE:;
   int return_value;
   (void)*stream;
+  (void)offset;
+  (void)whence;
   return return_value;
 }
 
@@ -387,6 +399,8 @@ size_t fwrite(
   FILE *stream)
 {
   __CPROVER_HIDE:;
+  (void)*(char*)ptr;
+  (void)size;
   (void)*stream;
   size_t nwrite;
   __CPROVER_assume(nwrite<=nitems);
@@ -428,7 +442,7 @@ int fscanf(FILE *restrict stream, const char *restrict format, ...)
   __CPOVER_HIDE:;
   __builtin_va_list list;
   __builtin_va_start(list, format);
-  int result=vsfcanf(stream, format, list);
+  int result=vfscanf(stream, format, list);
   __builtin_va_end(list);
   return result;
 }
@@ -482,8 +496,11 @@ int sscanf(const char *restrict s, const char *restrict format, ...)
 int vfscanf(FILE *restrict stream, const char *restrict format, va_list arg)
 {
   __CPROVER_HIDE:;
+  int result;
   (void)*stream;
-  
+  (void)*format;
+  (void)arg;
+  return result;
 }
 
 /* FUNCTION: vscanf */
@@ -516,4 +533,52 @@ int vscanf(const char *restrict format, va_list arg)
 #define __CPROVER_STDARG_H_INCLUDED
 #endif
 
-int vsscanf(const char *restrict s, const char *restrict format, va_list arg);
+int vsscanf(const char *restrict s, const char *restrict format, va_list arg)
+{
+  __CPROVER_HIDE:;
+  int result;
+  (void)*s;
+  (void)*format;
+  (void)arg;
+  return result;
+}
+
+/* FUNCTION: fprintf */
+
+#ifndef __CPROVER_STDIO_H_INCLUDED
+#include <stdio.h>
+#define __CPROVER_STDIO_H_INCLUDED
+#endif
+
+int fprintf(FILE *stream, const char *restrict format, ...)
+{
+  __CPROVER_HIDE:;
+  __builtin_va_list list;
+  __builtin_va_start(list, format);
+  int result=vfprintf(stream, format, list);
+  __builtin_va_end(list);
+  return result;
+}
+
+/* FUNCTION: vfprintf */
+
+#ifndef __CPROVER_STDIO_H_INCLUDED
+#include <stdio.h>
+#define __CPROVER_STDIO_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_STDARG_H_INCLUDED
+#include <stdarg.h>
+#define __CPROVER_STDARG_H_INCLUDED
+#endif
+
+int vfprintf(FILE *stream, const char *restrict format, va_list arg)
+{
+  __CPROVER_HIDE:;
+  int result;
+  (void)*stream;
+  (void)*format;
+  (void)arg;
+  return result;
+}
+

@@ -9,6 +9,8 @@
 inline void longjmp(jmp_buf env, int val)
 {
   // does not return
+  (void)env;
+  (void)val;
   __CPROVER_assume(0);
 }
        
@@ -22,6 +24,8 @@ inline void longjmp(jmp_buf env, int val)
 inline void _longjmp(jmp_buf env, int val)
 {
   // does not return
+  (void)env;
+  (void)val;
   __CPROVER_assume(0);
 }
        
@@ -35,6 +39,8 @@ inline void _longjmp(jmp_buf env, int val)
 inline void siglongjmp(sigjmp_buf env, int val)
 {
   // does not return
+  (void)env;
+  (void)val;
   __CPROVER_assume(0);
 }
 
@@ -48,5 +54,8 @@ inline void siglongjmp(sigjmp_buf env, int val)
 inline int setjmp(jmp_buf env)
 {
   // store PC
+  int retval;
+  (void)env;
+  return retval;
 }
 

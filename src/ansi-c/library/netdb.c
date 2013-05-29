@@ -5,6 +5,7 @@
 struct hostent *gethostbyname(const char *name)
 {
   __CPROVER_HIDE:;
+  (void)*name;
   #ifdef __CPROVER_STRING_ABSTRACTION
   __CPROVER_assert(__CPROVER_is_zero_string(name), "gethostbyname zero-termination of name argument");
   #endif
@@ -24,6 +25,9 @@ struct hostent *gethostbyname(const char *name)
 struct hostent *gethostbyaddr(const void *addr, socklen_t len, int type)
 {
   __CPROVER_HIDE:;
+  (void)*(char*)addr;
+  (void)len;
+  (void)type;
 
   _Bool error;
   if(error) return 0;

@@ -23,7 +23,7 @@ inline void *__new(__typeof__(sizeof(int)) malloc_size)
 /* FUNCTION: __new_array */
 
 #undef malloc
-inline void *malloc(__CPROVER_size_t malloc_size);
+void *malloc(__CPROVER_size_t malloc_size);
 
 inline void *__new_array(__CPROVER_size_t count, __CPROVER_size_t size)
 {
@@ -52,6 +52,7 @@ inline void *__placement_new(__typeof__(sizeof(int)) malloc_size, void *p)
   // The constructor call is done by the front-end.
   // The allocation is done by the user. So this does nothing.
   __CPROVER_HIDE:;
+  (void)malloc_size;
   return p;
 }
 

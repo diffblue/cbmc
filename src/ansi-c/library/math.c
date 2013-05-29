@@ -320,6 +320,7 @@ double __builtin_nan(const char *str)
 {
   // the 'str' argument is not yet used
 __CPROVER_hide:;
+  (void)*str;
   return 0.0/0.0;
 }
 
@@ -329,5 +330,6 @@ float __builtin_nanf(const char *str)
 {
   // the 'str' argument is not yet used
 __CPROVER_hide:;
+  (void)*str;
   return 0.0/0.0;
 }

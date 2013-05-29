@@ -232,11 +232,28 @@ inline short _InterlockedAnd16(short volatile *p, short v)
   return result;
 }
 
+/* FUNCTION: _InterlockedAdd */
+
+inline long _InterlockedAdd(long volatile *p, long v)
+{
+  __CPROVER_HIDE:;
+  __CPROVER_atomic_begin();
+  long result=(*p)+=v;
+  __CPROVER_fence("WWfence", "RRfence", "RWfence", "WRfence");
+  __CPROVER_atomic_end();
+  return result;
+}
+
 /* FUNCTION: _InterlockedAddLargeStatistic */
 
 inline long _InterlockedAddLargeStatistic(long long volatile *p, long v)
 {
   __CPROVER_HIDE:;
+  // not atomic:
+  // http://msdn.microsoft.com/en-us/library/yc92ytxy%28v=vs.90%29.aspx
+  (*p)+=v;
+  __CPROVER_fence("WWfence", "RRfence", "RWfence", "WRfence");
+  return v;
 }
 
 /* FUNCTION: _mm_lfence */

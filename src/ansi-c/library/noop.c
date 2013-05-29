@@ -3,4 +3,5 @@
 int __noop()
 {
   // does nothing
+  return 0;
 }

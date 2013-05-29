@@ -7,6 +7,7 @@ __CPROVER_size_t _beginthread(
 {
   __CPROVER_HIDE:;
   __CPROVER_ASYNC_1: start_address(arglist);
+  (void)stack_size;
   __CPROVER_size_t handle;
   return handle;
 }
@@ -23,6 +24,11 @@ __CPROVER_size_t _beginthreadex(
 {
   __CPROVER_HIDE:;
   __CPROVER_ASYNC_1: start_address(arglist);
+  if(security)
+    (void)*(char*)security;
+  (void)stack_size;
+  (void)initflag;
+  (void)*thrdaddr;
   __CPROVER_size_t handle;
   return handle;
 }

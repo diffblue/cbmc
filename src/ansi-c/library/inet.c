@@ -5,6 +5,7 @@
 in_addr_t inet_addr(const char *cp)
 {
   __CPROVER_HIDE:;
+  (void)*cp;
   #ifdef __CPROVER_STRING_ABSTRACTION
   __CPROVER_assert(__CPROVER_is_zero_string(cp), "inet_addr zero-termination of argument");
   #endif
@@ -18,6 +19,8 @@ in_addr_t inet_addr(const char *cp)
 int inet_aton(const char *cp, struct in_addr *pin)
 {
   __CPROVER_HIDE:;
+  (void)*cp;
+  (void)*pin;
   #ifdef __CPROVER_STRING_ABSTRACTION
   __CPROVER_assert(__CPROVER_is_zero_string(cp), "inet_aton zero-termination of name argument");
   #endif
@@ -31,6 +34,7 @@ int inet_aton(const char *cp, struct in_addr *pin)
 in_addr_t inet_network(const char *cp)
 {
   __CPROVER_HIDE:;
+  (void)*cp;
   #ifdef __CPROVER_STRING_ABSTRACTION
   __CPROVER_assert(__CPROVER_is_zero_string(cp), "inet_network zero-termination of name argument");
   #endif
