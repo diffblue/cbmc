@@ -6,8 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <assert.h>
-
+#include <cassert>
 #include <algorithm>
 
 #include "simplify_expr_class.h"
@@ -224,7 +223,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
   // eliminate typecasts from NULL
   if(expr_type.id()==ID_pointer &&
      expr.op0().is_constant() &&
-     expr.op0().get(ID_value)==ID_NULL)
+     to_constant_expr(expr.op0()).get_value()==ID_NULL)
   {
     exprt tmp=expr.op0();
     tmp.type()=expr.type();
@@ -269,9 +268,9 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
 
   if(operand.is_constant())
   {
-    const irep_idt &value=operand.get(ID_value);
+    const irep_idt &value=to_constant_expr(operand).get_value();
 
-    exprt new_expr(ID_constant, expr.type());
+    constant_exprt new_expr(expr.type());
 
     // preserve the sizeof type annotation
     typet c_sizeof_type=
@@ -288,7 +287,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
 
       if(expr_type_id==ID_bool)
       {
-        new_expr.set(ID_value, (int_value!=0)?ID_true:ID_false);
+        new_expr.set_value((int_value!=0)?ID_true:ID_false);
         expr.swap(new_expr);
         return false;
       }
@@ -297,14 +296,14 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
          expr_type_id==ID_signedbv)
       {
         unsigned expr_width=to_bitvector_type(expr_type).get_width();
-        new_expr.set(ID_value, integer2binary(int_value, expr_width));
+        new_expr.set_value(integer2binary(int_value, expr_width));
         expr.swap(new_expr);
         return false;
       }
 
       if(expr_type_id==ID_integer)
       {
-        new_expr.set(ID_value, value);
+        new_expr.set_value(value);
         expr.swap(new_expr);
         return false;
       }
@@ -312,7 +311,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
       if(expr_type_id==ID_c_enum ||
          expr_type_id==ID_incomplete_c_enum)
       {
-        new_expr.set(ID_value, integer2string(int_value));
+        new_expr.set_value(integer2string(int_value));
         expr.swap(new_expr);
         return false;
       }
@@ -1288,10 +1287,7 @@ bool simplify_exprt::simplify_plus(exprt &expr)
   if(ns.follow(expr.type()).id()==ID_floatbv)
   {
     // we only merge neighboring constants!
-    for(exprt::operandst::iterator
-        it=operands.begin();
-        it!=operands.end();
-        it++)
+    Forall_expr(it, operands)
     {
       exprt::operandst::iterator next=it;
       next++;
@@ -1601,7 +1597,7 @@ bool simplify_exprt::simplify_bitwise(exprt &expr)
       
     assert(a_str.size()==b_str.size());
       
-    exprt new_op(ID_constant, expr.type());
+    constant_exprt new_op(expr.type());
     std::string new_value;
     new_value.resize(width);
                 
@@ -1623,7 +1619,7 @@ bool simplify_exprt::simplify_bitwise(exprt &expr)
     else
       break;
       
-    new_op.set(ID_value, new_value);
+    new_op.set_value(new_value);
 
     // erase first operand
     expr.operands().erase(expr.operands().begin());
@@ -1754,9 +1750,7 @@ bool simplify_exprt::simplify_concatenation(exprt &expr)
       if(op.is_true() || op.is_false())
       {
         bool value=op.is_true();
-        op=exprt(ID_constant, typet(ID_unsignedbv));
-        op.type().set(ID_width, 1);
-        op.set(ID_value, value?ID_1:ID_0);
+        op=constant_exprt(value?ID_1:ID_0, unsignedbv_typet(1));
       }
     }
     
@@ -5056,7 +5050,5 @@ Function: simplify
 
 bool simplify(exprt &expr, const namespacet &ns)
 {
-  simplify_exprt simplify_expr(ns);
-
-  return simplify_expr.simplify(expr);
+  return simplify_exprt(ns).simplify(expr);
 }
