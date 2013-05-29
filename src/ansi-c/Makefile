@@ -24,7 +24,7 @@ include ../common
 CLEANFILES = ansi-c$(LIBEXT) \
   y.tab.h y.tab.cpp lex.yy.cpp y.tab.cpp.output y.output \
   library/converter$(EXEEXT) cprover_library.inc \
-  file_converter$(EXEEXT) \
+  file_converter$(EXEEXT) library_check \
   gcc_builtin_headers_generic.inc gcc_builtin_headers_ia32.inc \
   arm_builtin_headers.inc cw_builtin_headers.inc \
   gcc_builtin_headers_arm.inc gcc_builtin_headers_alpha.inc \
@@ -57,19 +57,22 @@ library/converter$(EXEEXT): library/converter.cpp
 file_converter$(EXEEXT): file_converter.cpp
 	$(LINKNATIVE)
 
-.PHONY: library_check
-
-library_check:
-	for f in library/*.c ; do \
-		[ $$f = "library/windows.c" ] && [ "x$(EXEEXT)" = "x" ] && continue ; \
-		[ $$f = "library/threads.c" ] && continue ; \
-		$(CC) -S -Wall -pedantic -std=gnu99 -fno-builtin $$f -o __libcheck.s \
-			-include library/cprover.h \
-			-Wno-unused-label -Wno-implicit-function-declaration -Wno-uninitialized ; \
+ifeq ($(BUILD_ENV),MinGW)
+  platform_unavail = library/err.c library/threads.c
+else
+  platform_unavail = library/threads.c
+endif
+library_check: library/*.c
+	for f in $(filter-out $(platform_unavail), $^) ; do \
+		$(CC) -S -Wall -Werror -pedantic -Wextra -std=gnu99 $$f -o __libcheck.s \
+			-include library/cprover.h -D__CPROVER_bool=_Bool -fno-builtin \
+			-D_Thread_local=volatile \
+			-Wno-unused-label -Wno-uninitialized ; \
 		ec=$$? ; \
 		$(RM) __libcheck.s ; \
 		[ $$ec -eq 0 ] || exit $$ec ; \
 	done
+	touch $@
 	
 cprover_library.inc: library/converter$(EXEEXT) library/*.c
 	cat library/*.c | library/converter$(EXEEXT) > $@
