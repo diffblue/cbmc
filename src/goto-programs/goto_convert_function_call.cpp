@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/location.h>
 #include <util/cprover_prefix.h>
 #include <util/prefix.h>
+#include <util/std_expr.h>
 
 #include <ansi-c/c_types.h>
 
@@ -71,6 +72,13 @@ void goto_convertt::do_function_call(
     clean_expr(new_lhs, dest);
 
   clean_expr(new_function, dest);
+  
+  // the arguments of __noop do not get evaluated
+  if(new_function.id()==ID_symbol &&
+     to_symbol_expr(new_function).get_identifier()=="c::__noop")
+  {
+    new_arguments.clear();
+  }
 
   Forall_expr(it, new_arguments)
     clean_expr(*it, dest);

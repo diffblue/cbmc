@@ -352,6 +352,7 @@ void goto_convertt::clean_expr(
     {
       // we do a special treatment for x=f(...)
       assert(expr.operands().size()==2);
+
       if(expr.op1().id()==ID_sideeffect &&
          to_side_effect_expr(expr.op1()).get_statement()==ID_function_call)
       {
@@ -370,6 +371,16 @@ void goto_convertt::clean_expr(
         else
           expr.make_nil();
         return;
+      }
+    }
+    else if(statement==ID_function_call)
+    {
+      if(to_side_effect_expr_function_call(expr).function().id()==ID_symbol &&
+         to_symbol_expr(to_side_effect_expr_function_call(expr).function()).get_identifier()=="c::__noop")
+      {
+        // __noop needs special treatment, as arguments are not
+        // evaluated
+        to_side_effect_expr_function_call(expr).arguments().clear();
       }
     }
   }
