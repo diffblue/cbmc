@@ -22,7 +22,7 @@ Function: java_bytecode_parse_treet::swap
 
 void java_bytecode_parse_treet::swap(java_bytecode_parse_treet &java_bytecode_parse_tree)
 {
-  java_bytecode_parse_tree.items.swap(items);
+  java_bytecode_parse_tree.classes.swap(classes);
 }
 
 /*******************************************************************\
@@ -39,7 +39,7 @@ Function: java_bytecode_parse_treet::clear
 
 void java_bytecode_parse_treet::clear()
 {
-  items.clear();
+  classes.clear();
 }
 
 /*******************************************************************\
@@ -56,15 +56,110 @@ Function: java_bytecode_parse_treet::output
 
 void java_bytecode_parse_treet::output(std::ostream &out) const
 {
-  #if 0
-  for(itemst::const_iterator
-      it=items.begin();
-      it!=items.end();
+  for(classest::const_iterator
+      it=classes.begin();
+      it!=classes.end();
       it++)
   {
-    symbolt tmp;
-    it->to_symbol(tmp);
-    out << tmp;
+    it->output(out);
   }
-  #endif
+}
+
+/*******************************************************************\
+
+Function: java_bytecode_parse_treet::classt::output
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void java_bytecode_parse_treet::classt::output(std::ostream &out) const
+{
+  out << "class " << name << " {" << std::endl;
+
+  for(memberst::const_iterator
+      it=members.begin();
+      it!=members.end();
+      it++)
+  {
+    it->output(out);
+  }
+  
+  out << "}" << std::endl;
+  out << std::endl;
+}
+
+/*******************************************************************\
+
+Function: java_bytecode_parse_treet::membert::output
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void java_bytecode_parse_treet::membert::output(std::ostream &out) const
+{
+  out << "  ";
+  if(type.id()!=irep_idt())
+  {
+    output_type(type, out);
+    out << " ";
+  }
+  
+  out << name;
+
+  if(method)
+  {
+    out << "(";
+    for(code_typet::parameterst::const_iterator
+        it=parameters.begin();
+        it!=parameters.end();
+        it++)
+    {
+      if(it!=parameters.begin())
+        out << ", ";
+      output_type(it->type(), out);
+    }
+    
+    out << ")";
+  }
+
+  out << ";" << std::endl;
+}
+
+/*******************************************************************\
+
+Function: java_bytecode_parse_treet::output_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void java_bytecode_parse_treet::output_type(
+  const typet &type,
+  std::ostream &out)
+{
+  if(type.id()==ID_array)
+  {
+    output_type(type.subtype(), out);
+    out << "[]";
+  }
+  else if(type.id()==ID_symbol)
+  {
+    out << type.get(ID_identifier);
+  }
+  else
+    out << type.id();
 }
