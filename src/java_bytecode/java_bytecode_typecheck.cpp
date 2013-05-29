@@ -94,9 +94,9 @@ Function: java_bytecode_typecheckt::typecheck
 
 void java_bytecode_typecheckt::typecheck()
 {
-  for(java_bytecode_parse_treet::itemst::iterator
-      it=parse_tree.items.begin();
-      it!=parse_tree.items.end();
+  for(java_bytecode_parse_treet::classest::iterator
+      it=parse_tree.classes.begin();
+      it!=parse_tree.classes.end();
       it++)
   {
   }

@@ -8,12 +8,16 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cstdlib>
 #include <fstream>
+#include <sstream>
 
 #include <util/parser.h>
 #include <util/message_stream.h>
 #include <util/tempfile.h>
 #include <util/suffix.h>
 #include <util/prefix.h>
+#include <util/std_types.h>
+#include <util/std_code.h>
+#include <util/ieee_float.h>
 
 #include "javap_parse.h"
 
@@ -54,14 +58,21 @@ public:
 
   virtual bool parse();
   
-  typedef java_bytecode_parse_treet::itemt itemt;
+  typedef java_bytecode_parse_treet::classt classt;
+  typedef java_bytecode_parse_treet::membert membert;
+  
+  java_bytecode_parse_treet parse_tree;
  
 protected: 
   void rgrammar();
   void rcompiled_from();
   void rclass();
-  void rmembers();
+  void rmembers(classt &dest_class);
+  membert &rmember(classt &dest_class);
   void rconstant(const std::string &line);
+  void process_constants();
+  typet rtype();
+  void rcode(membert &dest_member);
 
   inline std::string getline()
   {
@@ -81,8 +92,33 @@ protected:
       return true;
   }
   
-  irep_idt token();
-  irep_idt next_token;
+  // constant map
+  class constantt
+  {
+  public:
+    irep_idt kind, value;
+  };
+  
+  std::map<unsigned, constantt> constants;
+  
+  // token scanner
+  std::list<irep_idt> tokens;
+
+  irep_idt token()
+  {
+    if(tokens.empty()) return irep_idt();
+    irep_idt t=tokens.front();
+    tokens.pop_front();
+    return t;
+  }
+  
+  inline irep_idt lookahead()
+  {
+    if(tokens.empty()) return irep_idt();
+    return tokens.front();
+  }
+  
+  void tokenize(const std::string &str);
 };
 
 /*******************************************************************\
@@ -101,7 +137,6 @@ bool javap_parsert::parse()
 {
   try
   {
-    next_token=irep_idt();
     rgrammar();
   }
   
@@ -116,7 +151,7 @@ bool javap_parsert::parse()
 
 /*******************************************************************\
 
-Function: javap_parsert::token
+Function: javap_parsert::tokenize
 
   Inputs:
 
@@ -126,41 +161,38 @@ Function: javap_parsert::token
 
 \*******************************************************************/
 
-irep_idt javap_parsert::token()
+void javap_parsert::tokenize(const std::string &str)
 {
+  // split up into tokens
   std::string t;
+  tokens.clear();
 
-  // do we have one buffered?
-
-  if(!next_token.empty())
+  for(std::size_t s=0; s<str.size(); s++)
   {
-    irep_idt tmp=next_token;
-    next_token=irep_idt();
-    return tmp;
-  }
-  
-  // get a new token
-
-  char ch;
-
-  while(1)
-  {
-    if(!in->read(&ch, 1))
-      return t;
+    char ch=str[s];
 
     if(isalnum(ch) || ch=='.' || ch=='_' || ch=='$')
       t+=ch;
-    else if(ch==' ' || ch=='\t' || ch=='\r' || ch=='\n')
-    {
-      // whitespace
-      if(t!="") return t;
-    }
     else
     {
-      next_token=std::string(ch, 1);
-      return t;
+      if(t!="") { tokens.push_back(t); t.clear(); }
+      
+      if(ch==' ' || ch=='\t' || ch=='\r' || ch=='\n')
+      {
+        // ignore whitespace
+      }
+      else
+      {
+        // single-character token
+        t+=ch;
+        tokens.push_back(t);
+        t.clear();
+      }
     }
   }
+  
+  if(t!="")
+    tokens.push_back(t);
 }
 
 /*******************************************************************\
@@ -219,10 +251,61 @@ Function: javap_parsert::rconstant
 
 void javap_parsert::rconstant(const std::string &line)
 {
-  // #1 = Method	#6.#15;
-//  parse_tree.add();
+  // const #1 = Method	#6.#15;
+  std::size_t no_pos=line.find('#');
+  std::size_t eq_pos=line.find("= ");
+  std::size_t tab_pos=line.find('\t');
+  
+  std::string no_string=std::string(line, no_pos+1, eq_pos-no_pos-2);
+  std::string kind=std::string(line, eq_pos+2, tab_pos-eq_pos-2);
+  std::string value=std::string(line, tab_pos+1, std::string::npos);  
+  
+  unsigned no=atoi(no_string.c_str());
+  constants[no].kind=kind;
+  constants[no].value=value;
 }
   
+/*******************************************************************\
+
+Function: javap_parsert::process_constants
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void javap_parsert::process_constants()
+{
+}
+
+/*******************************************************************\
+
+Function: javap_parsert::rcode
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void javap_parsert::rcode(membert &dest_member)
+{
+  //    0:	bipush	123
+  irep_idt t;
+  t=token(); // address
+  
+  t=token(); // :
+  
+  t=token(); // instruction
+
+  t=token(); // argument
+}
+
 /*******************************************************************\
 
 Function: javap_parsert::rmembers
@@ -235,9 +318,10 @@ Function: javap_parsert::rmembers
 
 \*******************************************************************/
 
-void javap_parsert::rmembers()
+void javap_parsert::rmembers(classt &dest_class)
 {
   std::string line;
+  membert *m=NULL;
   
   while(!eof())
   {
@@ -247,14 +331,167 @@ void javap_parsert::rmembers()
     std::cout << "rmembers *** " << line << std::endl;
     #endif
 
-    if(has_prefix(line, "   line "))
-    {
-    }
-    else if(line=="}")
-    {
+    if(line=="}") // end of members
       return;
+    else if(line!="" && line[0]!=' ')
+    {
+      tokenize(line);
+      m=&rmember(dest_class);
+    }
+    else if(line.size()>=4 &&
+            line[0]==' ' && line[1]==' ' && line[2]==' ' &&
+            isdigit(line[3]))
+    {
+      // code
+      tokenize(line);
+      rcode(*m);
     }
   }
+}
+
+/*******************************************************************\
+
+Function: javap_parsert::rtype
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+typet javap_parsert::rtype()
+{
+  typet type;
+  irep_idt t=token();
+
+  #if 0
+  if(t==ID_void)
+    type=empty_typet();
+  else if(t==ID_int)
+    type=signedbv_typet(32); // 32-bit signed two's complement integer.
+  else if(t==ID_byte)
+    type=signedbv_typet(8);  // 8-bit signed two's complement integer.
+  else if(t==ID_short)
+    type=signedbv_typet(16); // 16-bit signed two's complement integer.
+  else if(t==ID_long)
+    type=signedbv_typet(64); // 64-bit signed two's complement integer.
+  else if(t==ID_float)
+    type=ieee_float_spect::single_precision().to_type();  // 32-bit float
+  else if(t==ID_double)
+    type=ieee_float_spect::double_precision().to_type();  // 64-bit float
+  else if(t==ID_boolean)
+    type=bool_typet();
+  else if(t==ID_char)
+    type=unsignedbv_typet(16); // 16-bit Unicode character
+  else
+  {
+    // must be identifier
+  }
+  #endif
+
+  if(t==ID_void || t==ID_int || t==ID_byte || t==ID_short ||
+     t==ID_long || t==ID_float || t==ID_double || t==ID_boolean ||
+     t==ID_char)
+    type.id(t);
+  else
+  {
+    // identifier
+    type.id(ID_symbol);
+    std::string identifier=id2string(t);
+    while(lookahead()==".")
+    {
+      token(); // read .
+      identifier+=".";
+      identifier+=id2string(token());
+    }
+    type.set(ID_identifier, identifier);
+  }
+  
+  // postfix
+  
+  if(lookahead()=="[")
+  {
+    token(); // read [
+    if(lookahead()=="]")
+    {
+      token(); // read ]
+      array_typet tmp;
+      tmp.subtype()=type;
+      type=tmp;
+    }
+  }
+  
+  return type;
+}
+
+/*******************************************************************\
+
+Function: javap_parsert::rmember
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+javap_parsert::membert &javap_parsert::rmember(classt &dest_class)
+{
+  while(lookahead()==ID_public ||
+        lookahead()==ID_private ||
+        lookahead()==ID_protected ||
+        lookahead()==ID_static)
+  {
+    token();
+  }
+
+  membert &m=dest_class.add_member();
+  
+  // constructor?
+  if(lookahead()==dest_class.name)
+  {
+    // yes, constructor
+  }
+  else
+  {
+    // get type
+    m.type=rtype();
+  }
+
+  // get member name
+  m.name=token();
+
+  // get postfix
+  if(lookahead()=="(")
+  {
+    irep_idt t=token();
+    m.method=true;
+    
+    // parameter list
+    while(lookahead()!=irep_idt())
+    {
+      if(lookahead()==")")
+      {
+        token();
+        break;
+      }
+      else
+      {
+        typet p_type=rtype();
+        m.parameters.push_back(code_typet::parametert());
+        m.parameters.back().type()=p_type;
+        if(lookahead()==",") token();
+      }
+    }
+  }
+
+  // read ;
+  token();
+  
+  return m;
 }
 
 /*******************************************************************\
@@ -275,7 +512,17 @@ void javap_parsert::rclass()
   
   // class helloworld extends java.lang.Object
   line=getline();
-  if(!has_prefix(line, "class ")) throw parsing_errort("expected 'class'");
+  tokenize(line);
+
+  if(token()!=ID_class)
+    throw parsing_errort("expected 'class'");
+
+  classt &c=parse_tree.add_class();
+  
+  c.name=token();
+  
+  if(token()!="extends")
+    throw parsing_errort("expected 'extends'");
 
   while(!eof())
   {
@@ -296,11 +543,12 @@ void javap_parsert::rclass()
     }
     else if(line=="{")
     {
-      rmembers();
+      process_constants();
+      rmembers(c);
     }
     else if(has_prefix(line, "const "))
     {
-      rconstant(std::string(line, 6, std::string::npos));
+      rconstant(line);
     }
   }
 }
@@ -359,6 +607,8 @@ bool javap_parse(
   javap_parser.set_message_handler(message_handler);
   
   bool parser_result=javap_parser.parse();
+
+  parse_tree.swap(javap_parser.parse_tree);
 
   // errors/warnings
   {
