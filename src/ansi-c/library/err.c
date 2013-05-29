@@ -5,9 +5,16 @@
 #define __CPROVER_ERR_H_INCLUDED
 #endif
 
+#ifndef __CPROVER_STDLIB_H_INCLUDED
+#include <stdlib.h>
+#define __CPROVER_STDLIB_H_INCLUDED
+#endif
+
 void err(int eval, const char *fmt, ...)
 {
-  // should check arguments
+  (void)eval;
+  (void)*fmt;
+  abort();
 }
 
 /* FUNCTION: err */
@@ -17,9 +24,16 @@ void err(int eval, const char *fmt, ...)
 #define __CPROVER_ERR_H_INCLUDED
 #endif
 
+#ifndef __CPROVER_STDLIB_H_INCLUDED
+#include <stdlib.h>
+#define __CPROVER_STDLIB_H_INCLUDED
+#endif
+
 void errx(int eval, const char *fmt, ...)
 {
-  // should check arguments
+  (void)eval;
+  (void)*fmt;
+  abort();
 }
 
 /* FUNCTION: warn */
@@ -31,7 +45,7 @@ void errx(int eval, const char *fmt, ...)
 
 void warn(const char *fmt, ...)
 {
-  // should check arguments
+  (void)*fmt;
 }
 
 /* FUNCTION: warnx */
@@ -43,5 +57,5 @@ void warn(const char *fmt, ...)
 
 void warnx(const char *fmt, ...)
 {
-  // should check arguments
+  (void)*fmt;
 }

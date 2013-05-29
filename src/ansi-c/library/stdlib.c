@@ -16,6 +16,7 @@ inline long int labs(long int i) { return __CPROVER_labs(i); }
 
 inline void exit(int status)
 {
+  (void)status;
   __CPROVER_assume(0);
 }
 
@@ -42,7 +43,7 @@ inline void *calloc(__CPROVER_size_t nmemb, __CPROVER_size_t size)
   void *res;
   res=malloc(total_size);
   #ifdef __CPROVER_STRING_ABSTRACTION
-  __CPROVER_is_zero_string(res);
+  __CPROVER_is_zero_string(res)=1;
   __CPROVER_zero_string_length(res)=0;
   //for(int i=0; i<nmemb*size; i++) res[i]=0;
   #else
@@ -117,6 +118,7 @@ inline int atoi(const char *nptr)
 {
   __CPROVER_HIDE:;
   int res;
+  (void)*nptr;
   #ifdef __CPROVER_STRING_ABSTRACTION
   __CPROVER_assert(__CPROVER_is_zero_string(nptr),
     "zero-termination of argument of atoi");
@@ -132,6 +134,7 @@ inline long atol(const char *nptr)
 {
   __CPROVER_HIDE:;
   long res;
+  (void)*nptr;
   #ifdef __CPROVER_STRING_ABSTRACTION
   __CPROVER_assert(__CPROVER_is_zero_string(nptr),
     "zero-termination of argument of atol");
@@ -147,6 +150,7 @@ inline char *getenv(const char *name)
 {
   __CPROVER_HIDE:;
 
+  (void)*name;
   #ifdef __CPROVER_STRING_ABSTRACTION
   __CPROVER_assert(__CPROVER_is_zero_string(name),
     "zero-termination of argument of getenv");

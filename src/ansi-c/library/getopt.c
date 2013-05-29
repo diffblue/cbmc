@@ -7,7 +7,9 @@ inline int getopt(int argc, char * const argv[],
                   const char *optstring)
 {
   __CPROVER_HIDE:;
-  unsigned result_index;
+  int result_index;
+  __CPROVER_assume(result_index>=0);
+  (void)*optstring;
   if(optind>=argc)
     return -1;
   __CPROVER_assume(result_index<argc && result_index>=optind);
