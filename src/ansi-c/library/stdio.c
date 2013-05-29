@@ -263,7 +263,8 @@ inline ssize_t read(int fildes, void *buf, size_t nbyte)
   __CPROVER_HIDE:;
   ssize_t nread;
   size_t i;
-  __CPROVER_assume(nread<=nbyte);
+  (void)filedes;
+  __CPROVER_assume((size_t)nread<=nbyte);
 
   for(i=0; i<nbyte; i++)
   {
