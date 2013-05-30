@@ -171,12 +171,14 @@ inline char *__builtin___strncpy_chk(char *dst, const char *src, size_t n, size_
   #ifdef __CPROVER_STRING_ABSTRACTION
   __CPROVER_assert(__CPROVER_is_zero_string(src), "strncpy zero-termination of 2nd argument");
   __CPROVER_assert(__CPROVER_buffer_size(dst)>=n, "strncpy buffer overflow");
+  __CPROVER_assert(__CPROVER_buffer_size(dst)==object_size, "builtin object size");
   __CPROVER_is_zero_string(dst)=__CPROVER_zero_string_length(src)<n;
   __CPROVER_zero_string_length(dst)=__CPROVER_zero_string_length(src);  
   #else
   __CPROVER_size_t i=0;
   char ch;
   _Bool end;
+  (void)object_size;
 
   // We use a single loop to make bounds checking etc easier.
   // Note that strncpy _always_ writes 'n' characters into 'dst'.
