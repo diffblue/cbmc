@@ -251,6 +251,12 @@ bool configt::set(const cmdlinet &cmdline)
   ansi_c.os=ansi_ct::NO_OS;
   ansi_c.arch=ansi_ct::NO_ARCH;
   ansi_c.lib=configt::ansi_ct::LIB_NONE;
+  
+  // Default is ROUND_TO_EVEN, justified by C99:
+  // 1 At program startup the floating-point environment is initialized as
+  // prescribed by IEC 60559:
+  // — All floating-point exception status flags are cleared.
+  //  — The rounding direction mode is rounding to nearest.
   ansi_c.rounding_mode=ieee_floatt::ROUND_TO_EVEN;
 
   if(cmdline.isset("function"))
