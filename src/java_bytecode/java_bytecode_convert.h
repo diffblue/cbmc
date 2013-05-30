@@ -15,7 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_bytecode_parse_tree.h"
 
 bool java_bytecode_convert(
-  java_bytecode_parse_treet &parse_tree,
+  const java_bytecode_parse_treet &parse_tree,
   symbol_tablet &symbol_table,
   const std::string &module,
   message_handlert &message_handler);
