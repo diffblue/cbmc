@@ -1,5 +1,6 @@
 %option 8bit nodefault
 %option nounput
+%option noinput
 
 %{
 #ifdef _WIN32
