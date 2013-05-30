@@ -25,6 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "java_bytecode_language.h"
 #include "java_bytecode_typecheck.h"
+#include "java_bytecode_convert.h"
 #include "javap_parse.h"
 
 /*******************************************************************\
@@ -125,9 +126,13 @@ bool java_bytecode_languaget::typecheck(
   message_handlert &message_handler)
 {
   symbol_tablet new_symbol_table;
+
+  if(java_bytecode_convert(
+       parse_tree, new_symbol_table, module, message_handler))
+    return true;
   
   if(java_bytecode_typecheck(
-       parse_tree, new_symbol_table, module, message_handler))
+       new_symbol_table, module, message_handler))
     return true;
 
   if(linking(new_symbol_table, symbol_table, message_handler))
