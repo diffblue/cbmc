@@ -328,15 +328,18 @@ public:
   {
     set(ID_C_class, true);
   }
+  
+  typedef componentt methodt;
+  typedef componentst methodst;
 
-  inline const componentst &methods() const
+  inline const methodst &methods() const
   {
-    return (const componentst &)(find(ID_methods).get_sub());
+    return (const methodst &)(find(ID_methods).get_sub());
   }
   
   inline componentst &methods()
   {
-    return (componentst &)(add(ID_methods).get_sub());
+    return (methodst &)(add(ID_methods).get_sub());
   }
 
   inline bool is_class() const
