@@ -326,6 +326,7 @@ class class_typet:public struct_typet
 public:
   inline class_typet():struct_typet()
   {
+    set(ID_C_class, true);
   }
 
   inline const componentst &methods() const
