@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <stack>
+
 #include "java_bytecode_convert.h"
 
 #if 0
@@ -243,8 +245,13 @@ protected:
 
   void convert(const java_bytecode_parse_treet &parse_tree);
   void convert(const classt &c);
-  void convert(const membert &m);
+  void convert(symbolt &class_symbol, const membert &m);
   void convert(const instructiont &i);
+  
+  // JVM
+  typedef std::stack<exprt> stackt;
+  stackt stack;
+  exprt v0, v1, v2, v3;
 };
 
 /*******************************************************************\
@@ -259,7 +266,8 @@ Function: java_bytecode_convertt::convert
 
 \*******************************************************************/
 
-void java_bytecode_convertt::convert(const java_bytecode_parse_treet &parse_tree)
+void java_bytecode_convertt::convert(
+  const java_bytecode_parse_treet &parse_tree)
 {
   for(java_bytecode_parse_treet::classest::const_iterator
       it=parse_tree.classes.begin();
@@ -289,8 +297,53 @@ void java_bytecode_convertt::convert(const classt &c)
   new_symbol.base_name=c.name;
   new_symbol.name="java::"+id2string(c.name);
   new_symbol.type=class_type;
-
+  
+  for(classt::memberst::const_iterator
+      it=c.members.begin();
+      it!=c.members.end();
+      it++)
+    convert(new_symbol, *it);
+  
   symbol_table.add(new_symbol);
+}
+
+/*******************************************************************\
+
+Function: java_bytecode_convertt::convert
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void java_bytecode_convertt::convert(
+  symbolt &class_symbol,
+  const membert &m)
+{
+  class_typet &class_type=to_class_type(class_symbol.type);
+
+  if(m.method)
+  {
+    class_type.methods().push_back(class_typet::methodt());
+    class_typet::methodt &method=class_type.methods().back();
+    
+    code_typet type;
+    
+    method.set_base_name(m.name);
+    method.set_name(m.name);
+    method.type()=type;
+  }
+  else
+  {
+    class_type.components().push_back(class_typet::componentt());
+    class_typet::componentt &component=class_type.components().back();
+    
+    component.set_name(m.name);
+    component.type()=m.type;
+  }
 }
 
 /*******************************************************************\
@@ -306,7 +359,7 @@ Function: java_bytecode_convert
 \*******************************************************************/
 
 bool java_bytecode_convert(
-  java_bytecode_parse_treet &parse_tree,
+  const java_bytecode_parse_treet &parse_tree,
   symbol_tablet &symbol_table,
   const std::string &module,
   message_handlert &message_handler)

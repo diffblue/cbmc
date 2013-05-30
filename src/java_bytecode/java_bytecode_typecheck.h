@@ -16,10 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/std_types.h>
 
-#include "java_bytecode_parse_tree.h"
-
 bool java_bytecode_typecheck(
-  java_bytecode_parse_treet &parse_tree,
   symbol_tablet &symbol_table,
   const std::string &module,
   message_handlert &message_handler);
@@ -35,13 +32,11 @@ class java_bytecode_typecheckt:
 {
 public:
   java_bytecode_typecheckt(
-    java_bytecode_parse_treet &_parse_tree,
     symbol_tablet &_symbol_table,
     const std::string &_module,
     message_handlert &_message_handler):
     typecheckt(_message_handler),
     namespacet(_symbol_table),
-    parse_tree(_parse_tree),
     symbol_table(_symbol_table),
     module(_module),
     mode(ID_java)
@@ -53,12 +48,7 @@ public:
   virtual void typecheck();
   virtual void typecheck_expr(exprt &expr);
   
-  typedef java_bytecode_parse_treet::classt classt;
-  typedef java_bytecode_parse_treet::membert membert;
-  typedef java_bytecode_parse_treet::instructiont instructiont;
-
 protected:
-  java_bytecode_parse_treet &parse_tree;
   symbol_tablet &symbol_table;
   const irep_idt module;
   const irep_idt mode;
@@ -66,10 +56,6 @@ protected:
   // overload to use language specific syntax
   virtual std::string to_string(const exprt &expr);
   virtual std::string to_string(const typet &type);
-
-  void typecheck(const classt &c);
-  void typecheck(const membert &m);
-  void typecheck(const instructiont &i);
 };
 
 #endif

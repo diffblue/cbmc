@@ -76,73 +76,8 @@ Function: java_bytecode_typecheckt::typecheck
 
 \*******************************************************************/
 
-void java_bytecode_typecheckt::typecheck(const classt &c)
-{
-  for(classt::memberst::const_iterator
-      it=c.members.begin();
-      it!=c.members.end();
-      it++)
-    typecheck(*it);
-}
-
-/*******************************************************************\
-
-Function: java_bytecode_typecheckt::typecheck
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void java_bytecode_typecheckt::typecheck(const membert &m)
-{
-  for(membert::instructionst::const_iterator
-      it=m.instructions.begin();
-      it!=m.instructions.end();
-      it++)
-    typecheck(*it);
-}
-
-/*******************************************************************\
-
-Function: java_bytecode_typecheckt::typecheck
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void java_bytecode_typecheckt::typecheck(const instructiont &i)
-{
-}
-
-/*******************************************************************\
-
-Function: java_bytecode_typecheckt::typecheck
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void java_bytecode_typecheckt::typecheck()
 {
-  for(java_bytecode_parse_treet::classest::iterator
-      it=parse_tree.classes.begin();
-      it!=parse_tree.classes.end();
-      it++)
-  {
-    typecheck(*it);
-  }
 }
 
 /*******************************************************************\
@@ -158,13 +93,12 @@ Function: java_bytecode_typecheck
 \*******************************************************************/
 
 bool java_bytecode_typecheck(
-  java_bytecode_parse_treet &java_bytecode_parse_tree,
   symbol_tablet &symbol_table,
   const std::string &module,
   message_handlert &message_handler)
 {
   java_bytecode_typecheckt java_bytecode_typecheck(
-    java_bytecode_parse_tree, symbol_table, module, message_handler);
+    symbol_table, module, message_handler);
   return java_bytecode_typecheck.typecheck_main();
 }
 
