@@ -239,6 +239,7 @@ public:
   typedef java_bytecode_parse_treet::classt classt;
   typedef java_bytecode_parse_treet::membert membert;
   typedef java_bytecode_parse_treet::instructiont instructiont;
+  typedef membert::instructionst instructionst;
 
 protected:
   symbol_tablet &symbol_table;
@@ -247,11 +248,15 @@ protected:
   void convert(const classt &c);
   void convert(symbolt &class_symbol, const membert &m);
   void convert(const instructiont &i);
+  void convert_instructions();
   
-  // JVM
-  typedef std::stack<exprt> stackt;
+  // JVM Stack
+  typedef std::vector<exprt> stackt;
   stackt stack;
-  exprt v0, v1, v2, v3;
+
+  // Local Variables 
+  typedef std::vector<exprt> varst;
+  varst vars;
 };
 
 /*******************************************************************\
@@ -344,6 +349,22 @@ void java_bytecode_convertt::convert(
     component.set_name(m.name);
     component.type()=m.type;
   }
+}
+
+/*******************************************************************\
+
+Function: java_bytecode_convertt::convert_instructions
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void java_bytecode_convertt::convert_instructions()
+{
 }
 
 /*******************************************************************\
