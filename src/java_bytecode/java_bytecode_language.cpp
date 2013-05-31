@@ -135,8 +135,10 @@ bool java_bytecode_languaget::typecheck(
        new_symbol_table, module, message_handler))
     return true;
 
-  if(linking(new_symbol_table, symbol_table, message_handler))
-    return true;
+  symbol_table.swap(new_symbol_table);
+
+//  if(linking(new_symbol_table, symbol_table, message_handler))
+//    return true;
     
   return false;
 }
