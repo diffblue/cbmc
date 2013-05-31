@@ -494,7 +494,7 @@ javap_parsert::membert &javap_parsert::rmember(classt &dest_class)
   // get postfix
   if(lookahead()=="(")
   {
-    irep_idt t=token();
+    token(); // get (
     m.method=true;
     
     // parameter list
@@ -502,7 +502,7 @@ javap_parsert::membert &javap_parsert::rmember(classt &dest_class)
     {
       if(lookahead()==")")
       {
-        token();
+        token(); // get )
         break;
       }
       else
