@@ -605,6 +605,11 @@ public:
   inline code_gotot():codet(ID_goto)
   {
   }
+
+  explicit inline code_gotot(const irep_idt &label):codet(ID_goto)
+  {
+    set_destination(label);
+  }
   
   void set_destination(const irep_idt &label)
   {
@@ -745,6 +750,20 @@ public:
   inline code_labelt():codet(ID_label)
   {
     operands().resize(1);
+  }
+
+  explicit inline code_labelt(const irep_idt &_label):codet(ID_label)
+  {
+    operands().resize(1);
+    set_label(_label);
+  }
+
+  inline code_labelt(
+    const irep_idt &_label, const codet &_code):codet(ID_label)
+  {
+    operands().resize(1);
+    set_label(_label);
+    code()=_code;
   }
 
   inline bool is_default() const
