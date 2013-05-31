@@ -441,7 +441,6 @@ extern inline code_switcht &to_code_switch(codet &code)
   return static_cast<code_switcht &>(code);
 }
 
-
 /*! \brief A `while' instruction
 */
 class code_whilet:public codet
@@ -596,6 +595,40 @@ extern inline code_fort &to_code_for(codet &code)
   assert(code.get_statement()==ID_for &&
          code.operands().size()==4);
   return static_cast<code_fort &>(code);
+}
+
+/*! \brief A `goto' instruction
+*/
+class code_gotot:public codet
+{
+public:
+  inline code_gotot():codet(ID_goto)
+  {
+  }
+  
+  void set_destination(const irep_idt &label)
+  {
+    set(ID_destination, label);
+  }
+
+  const irep_idt &get_destination() const
+  {
+    return get(ID_destination);
+  }
+};
+
+extern inline const code_gotot &to_code_goto(const codet &code)
+{
+  assert(code.get_statement()==ID_goto &&
+         code.operands().size()==0);
+  return static_cast<const code_gotot &>(code);
+}
+
+extern inline code_gotot &to_code_goto(codet &code)
+{
+  assert(code.get_statement()==ID_goto &&
+         code.operands().size()==0);
+  return static_cast<code_gotot &>(code);
 }
 
 /*! \brief A function call
