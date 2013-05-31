@@ -252,6 +252,9 @@ public:
 
   unsigned component_number(const irep_idt &component_name) const;
   typet component_type(const irep_idt &component_name) const;
+  
+  irep_idt get_tag() const { return get(ID_tag); }
+  void set_tag(const irep_idt &tag) { set(ID_tag, tag); }
 };
 
 /*! \brief Cast a generic typet to a \ref struct_union_typet
