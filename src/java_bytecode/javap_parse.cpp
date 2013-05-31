@@ -312,10 +312,24 @@ void javap_parsert::rcode(membert &dest_member)
   if(t=="#")
   {
     t=token();
-    instruction.argument=constants[atoi(t.c_str())].value;
+    instruction.arg1=constants[atoi(t.c_str())].value;
   }
   else
-    instruction.argument=t;
+    instruction.arg1=t;
+
+  if(lookahead()==",")
+  {
+    token(); // eat ,
+
+    t=token();
+    if(t=="#")
+    {
+      t=token();
+      instruction.arg2=constants[atoi(t.c_str())].value;
+    }
+    else
+      instruction.arg2=t;
+  }
   
   // do we have a line number?
   if(address_to_line.find(instruction.address)!=address_to_line.end())

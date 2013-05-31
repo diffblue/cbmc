@@ -142,7 +142,8 @@ void java_bytecode_parse_treet::membert::output(std::ostream &out) const
         out << "    // " << it->location << std::endl;
 
       out << "    " << it->address << ": " << it->statement;
-      if(it->argument!=irep_idt()) out << " " << it->argument;
+      if(it->arg1!=irep_idt()) out << " " << it->arg1;
+      if(it->arg2!=irep_idt()) out << ", " << it->arg2;
       out << std::endl;
     }
 

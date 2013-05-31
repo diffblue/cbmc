@@ -19,7 +19,7 @@ typet java_char_type();
 typet java_float_type();
 typet java_double_type();
 typet java_boolean_type();
-typet java_reference_type();
+typet java_reference_type(const typet &subtype);
 
 // i  integer
 // l  long

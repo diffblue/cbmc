@@ -161,9 +161,9 @@ Function: java_reference_type
 
 \*******************************************************************/
 
-typet java_reference_type()
+typet java_reference_type(const typet &subtype)
 {
-  return reference_typet();
+  return reference_typet(subtype);
 }
 
 /*******************************************************************\
@@ -190,7 +190,7 @@ typet java_type(char t)
   case 'f': return java_float_type();
   case 'd': return java_double_type();
   case 'z': return java_boolean_type();
-  case 'a': return java_reference_type();
+  case 'a': return java_reference_type(typet());
   default: assert(false);
   }
 }

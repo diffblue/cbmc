@@ -30,7 +30,7 @@ public:
   public:
     locationt location;
     unsigned address;
-    irep_idt statement, argument;
+    irep_idt statement, arg1, arg2;
   };
   
   class membert

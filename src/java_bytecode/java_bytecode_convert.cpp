@@ -16,6 +16,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/std_expr.h>
 #include <util/arith_tools.h>
+#include <util/i2string.h>
+#include <util/expr_util.h>
 
 #include "java_types.h"
 #include "java_bytecode_convert.h"
@@ -88,6 +90,16 @@ public:
 
 protected:
   symbol_tablet &symbol_table;
+  
+  symbol_exprt variable(const irep_idt &id)
+  {
+    return symbol_exprt("java::local"+id2string(id), java_int_type());
+  }
+  
+  irep_idt label(const irep_idt &address)
+  {
+    return "pc"+id2string(address);
+  }
 
   void convert(const java_bytecode_parse_treet &parse_tree);
   void convert(const classt &c);
@@ -105,6 +117,7 @@ protected:
       throw "malformed bytecode (pop too high)";
 
     exprt::operandst operands;
+    operands.resize(n);
     for(unsigned i=0; i<n; i++)
       operands[i]=stack[stack.size()-n+i];
     
@@ -266,113 +279,289 @@ Function: java_bytecode_convertt::convert_instructions
 codet java_bytecode_convertt::convert_instructions(
   const instructionst &instructions)
 {
-  code_blockt result;
+  code_blockt code;
 
   for(instructionst::const_iterator
       i_it=instructions.begin();
       i_it!=instructions.end();
       i_it++)
   {
+    codet c;
+    c.make_nil();
+  
     irep_idt statement=i_it->statement;
+    irep_idt arg1=i_it->arg1;
+    irep_idt arg2=i_it->arg2;
+    
+    const bytecode_infot &bytecode_info=get_bytecode_info(statement);
     
     // deal with _idx suffixes
     if(statement.size()>=2 &&
        statement[statement.size()-2]=='_' &&
        isdigit(statement[statement.size()-1]))
     {
+      arg1=
+        std::string(id2string(statement), statement.size()-1, 1);
+      statement=std::string(id2string(statement), 0, statement.size()-2);
     }
     
-    const bytecode_infot &bytecode_info=get_bytecode_info(statement);
-      
-    exprt::operandst op=pop(stack.size()<bytecode_info.pop);
+    exprt::operandst op=pop(bytecode_info.pop);
     exprt::operandst results;
     results.resize(bytecode_info.push, nil_exprt());
 
-    if(statement=="invokedynamic" ||
-       statement=="invokeinterface" ||
-       statement=="invokespecial" ||
-       statement=="invokestatic" ||
-       statement=="invokevirtual")
+    if(statement=="aconst_null")
+    {
+      assert(results.size()==1);
+      results[0]=gen_zero(java_reference_type(typet()));
+    }
+    else if(statement=="athrow")
+    {
+      assert(op.size()==1 && results.size()==1);
+      results[0]=op[0];
+    }
+    else if(statement=="checkcast")
+    {
+      assert(op.size()==1 && results.size()==1);
+      results[0]=op[0];
+    }
+    else if(statement=="invokedynamic" ||
+            statement=="invokeinterface" ||
+            statement=="invokespecial" ||
+            statement=="invokestatic" ||
+            statement=="invokevirtual")
     {
       code_function_callt call;
-      result.add(call);
+      call.function()=symbol_exprt(arg1);
+      c=call;
     }
     else if(statement=="return")
     {
       code_returnt code_return;
-      result.add(code_return);
+      c=code_return;
     }
-    else if(statement=="aastore" ||
-            statement=="bastore" ||
-            statement=="castore" ||
-            statement=="dastore" ||
-            statement=="fastore" ||
-            statement=="iastore" ||
-            statement=="lastore" ||
-            statement=="sastore")
+    else if(statement==patternt("?return"))
+    {
+      assert(op.size()==1);
+      code_returnt code_return(op[0]);
+      c=code_return;
+    }
+    else if(statement==patternt("?astore"))
     {
       // store value into an array
       assert(op.size()==3 && results.empty());
       code_assignt code_assign;
       code_assign.lhs()=index_exprt(op[0], op[1]);
       code_assign.rhs()=op[2];
-      result.add(code_assign);
+      c=code_assign;
     }
-    else if(statement==patternt("?store") ||
-            statement==patternt("?store_?"))
+    else if(statement==patternt("?store"))
     {
       // store value into some local variable
       assert(op.size()==1 && results.empty());
       code_assignt code_assign;
-      code_assign.lhs()=symbol_exprt();
+      code_assign.lhs()=variable(arg1);
       code_assign.rhs()=op[0];
-      result.add(code_assign);
+      c=code_assign;
+    }
+    else if(statement==patternt("?load"))
+    {
+      // load a value from a local variable
+      results[0]=variable(arg1);
     }
     else if(statement=="goto")
     {
-      code_gotot code_goto;
-      result.add(code_goto);
+      code_gotot code_goto(label(arg1));
+      c=code_goto;
     }
     else if(statement=="iconst_m1")
     {
       assert(results.size()==1);
       results[0]=from_integer(-1, java_int_type());
     }
-    else if(statement=="iconst_0")
+    else if(statement=="iconst")
     {
       assert(results.size()==1);
       results[0]=from_integer(0, java_int_type());
     }
-    else if(statement=="iconst_1")
+    else if(statement=="bipush")
     {
       assert(results.size()==1);
-      results[0]=from_integer(1, java_int_type());
+      mp_integer value=string2integer(id2string(arg1));
+      results[0]=from_integer(value, java_int_type());
     }
-    else if(statement=="iconst_2")
+    else if(statement==patternt("if_?cmp??"))
     {
-      assert(results.size()==1);
-      results[0]=from_integer(2, java_int_type());
+      assert(op.size()==2 && results.empty());
+      code_ifthenelset code_branch;
+      code_branch.cond()=binary_relation_exprt(op[0], ID_equal, op[1]);
+      code_branch.then_case()=code_gotot(label(arg1));
+      c=code_branch;
     }
-    else if(statement=="iconst_3")
+    else if(statement==patternt("if??"))
     {
-      assert(results.size()==1);
-      results[0]=from_integer(3, java_int_type());
+      assert(op.size()==2 && results.empty());
+      code_ifthenelset code_branch;
+      code_branch.cond()=binary_relation_exprt(op[0], ID_equal, op[1]);
+      code_branch.then_case()=code_gotot(label(arg1));
+      c=code_branch;
     }
-    else if(statement=="iconst_4")
+    else if(statement==patternt("ifnonnull"))
     {
-      assert(results.size()==1);
-      results[0]=from_integer(4, java_int_type());
+      assert(op.size()==1 && results.empty());
+      code_ifthenelset code_branch;
+      code_branch.cond()=binary_relation_exprt(op[0], ID_notequal, gen_zero(java_int_type()));
+      code_branch.then_case()=code_gotot(label(arg1));
+      c=code_branch;
     }
-    else if(statement=="iconst_5")
+    else if(statement==patternt("ifnull"))
     {
-      assert(results.size()==1);
-      results[0]=from_integer(5, java_int_type());
+      assert(op.size()==1 && results.empty());
+      code_ifthenelset code_branch;
+      code_branch.cond()=binary_relation_exprt(op[0], ID_equal, gen_zero(java_int_type()));
+      code_branch.then_case()=code_gotot(label(arg1));
+      c=code_branch;
     }
+    else if(statement=="iinc")
+    {
+      mp_integer value=string2integer(id2string(i_it->arg2));
+      code_assignt code_assign;
+      code_assign.lhs()=variable(arg1);
+      code_assign.rhs()=
+        plus_exprt(variable(arg1), from_integer(value, java_int_type()));
+      c=code_assign;
+    }
+    else if(statement==patternt("?xor"))
+    {
+      assert(op.size()==2 && results.size()==1);
+      results[0]=bitxor_exprt(op[0], op[1]);
+    }
+    else if(statement==patternt("?add"))
+    {
+      assert(op.size()==2 && results.size()==1);
+      results[0]=plus_exprt(op[0], op[1]);
+    }
+    else if(statement==patternt("?sub"))
+    {
+      assert(op.size()==2 && results.size()==1);
+      results[0]=minus_exprt(op[0], op[1]);
+    }
+    else if(statement==patternt("?div"))
+    {
+      assert(op.size()==2 && results.size()==1);
+      results[0]=div_exprt(op[0], op[1]);
+    }
+    else if(statement==patternt("?mul"))
+    {
+      assert(op.size()==2 && results.size()==1);
+      results[0]=mult_exprt(op[0], op[1]);
+    }
+    else if(statement==patternt("?neg"))
+    {
+      assert(op.size()==1 && results.size()==1);
+      results[0]=unary_minus_exprt(op[0], op[0].type());
+    }
+    else if(statement==patternt("?rem"))
+    {
+      assert(op.size()==2 && results.size()==1);
+      results[0]=mod_exprt(op[0], op[1]);
+    }
+    else if(statement==patternt("?cmpg"))
+    {
+      assert(op.size()==2 && results.size()==1);
+      results[0]=binary_relation_exprt(op[0], ID_gt, op[1]);
+    }
+    else if(statement==patternt("?cmpl"))
+    {
+      assert(op.size()==2 && results.size()==1);
+      results[0]=binary_relation_exprt(op[0], ID_lt, op[1]);
+    }
+    else if(statement=="dup")
+    {
+      assert(op.size()==1 && results.size()==2);
+      results[0]=results[1]=op[0];
+    }
+    else if(statement=="dup_x1")
+    {
+      assert(op.size()==2 && results.size()==3);
+      results[0]=op[1];
+      results[1]=op[0];
+      results[2]=op[1];
+    }
+    else if(statement=="dconst")
+    {
+      assert(op.empty() && results.size()==1);
+    }
+    else if(statement=="fconst")
+    {
+      assert(op.empty() && results.size()==1);
+    }
+    else if(statement=="getfield")
+    {
+      assert(op.size()==1 && results.size()==1);
+      results[0]=member_exprt(dereference_exprt(op[0]), arg1);
+    }
+    else if(statement=="getstatic")
+    {
+      assert(op.empty() && results.size()==1);
+    }
+    else if(statement==patternt("?il"))
+    {
+      assert(op.size()==1 && results.size()==1);
+      results[0]=typecast_exprt(op[0], java_long_type());
+    }
+    else if(statement==patternt("?if"))
+    {
+      assert(op.size()==1 && results.size()==1);
+      results[0]=typecast_exprt(op[0], java_float_type());
+    }
+    else if(statement==patternt("?id"))
+    {
+      assert(op.size()==1 && results.size()==1);
+      results[0]=typecast_exprt(op[0], java_double_type());
+    }
+    else if(statement==patternt("?ib"))
+    {
+      assert(op.size()==1 && results.size()==1);
+      results[0]=typecast_exprt(op[0], java_byte_type());
+    }
+    else if(statement==patternt("?is"))
+    {
+      assert(op.size()==1 && results.size()==1);
+      results[0]=typecast_exprt(op[0], java_short_type());
+    }
+    else if(statement=="new")
+    {
+      assert(op.empty() && results.size()==1);
+      symbol_typet obj_t(arg1);
+      results[0]=side_effect_exprt(ID_cpp_new, obj_t);
+    }
+    else if(statement=="newarray")
+    {
+      assert(op.size()==1 && results.size()==1);
+      symbol_typet obj_t(arg1);
+      array_typet array_type(obj_t, op[0]);
+      results[0]=side_effect_exprt(ID_cpp_new_array, array_type);
+    }
+    else if(statement=="anewarray")
+    {
+      assert(op.size()==1 && results.size()==1);
+      symbol_typet obj_t(arg1);
+      array_typet array_type(java_reference_type(obj_t), op[0]);
+      results[0]=side_effect_exprt(ID_cpp_new_array, array_type);
+    }
+    else
+      throw "unhandled statement "+id2string(statement);
 
     push(results);
-  }  
+
+    if(c.is_not_nil())
+    {
+      irep_idt a_str=i2string(i_it->address);
+      code.add(code_labelt(label(a_str), c));
+    }
+  }
   
-  return result;
+  return code;
 }
 
 /*******************************************************************\
