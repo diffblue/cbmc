@@ -959,6 +959,10 @@ public:
   {
     set(ID_C_reference, true);
   }
+
+  inline explicit reference_typet(const typet &_subtype):pointer_typet(_subtype)
+  {
+  }
 };
 
 /*! \brief TO_BE_DOCUMENTED
