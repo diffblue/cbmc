@@ -120,13 +120,13 @@ void java_bytecode_parse_treet::membert::output(std::ostream &out) const
   {
     out << "(";
     for(code_typet::parameterst::const_iterator
-        it=parameters.begin();
-        it!=parameters.end();
-        it++)
+        p_it=parameters.begin();
+        p_it!=parameters.end();
+        p_it++)
     {
-      if(it!=parameters.begin())
+      if(p_it!=parameters.begin())
         out << ", ";
-      output_type(it->type(), out);
+      output_type(p_it->type(), out);
     }
     
     out << ")";
@@ -134,16 +134,22 @@ void java_bytecode_parse_treet::membert::output(std::ostream &out) const
     out << "  {" << std::endl;
 
     for(instructionst::const_iterator
-        it=instructions.begin();
-        it!=instructions.end();
-        it++)
+        i_it=instructions.begin();
+        i_it!=instructions.end();
+        i_it++)
     {
-      if(it->location.get_line()!=irep_idt())
-        out << "    // " << it->location << std::endl;
+      if(i_it->location.get_line()!=irep_idt())
+        out << "    // " << i_it->location << std::endl;
 
-      out << "    " << it->address << ": " << it->statement;
-      if(it->arg1!=irep_idt()) out << " " << it->arg1;
-      if(it->arg2!=irep_idt()) out << ", " << it->arg2;
+      out << "    " << i_it->address << ": " << i_it->statement;
+      
+      for(std::vector<irep_idt>::const_iterator
+          a_it=i_it->args.begin(); a_it!=i_it->args.end(); a_it++)
+      {
+        if(a_it!=i_it->args.begin()) out << ", ";
+        out << *a_it;
+      }
+
       out << std::endl;
     }
 
