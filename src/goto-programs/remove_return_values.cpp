@@ -66,7 +66,7 @@ void remove_return_valuest::do_return_value(
   symbolt &function_symbol=s_it->second;
 
   // make the return type 'void'
-  f_it->second.type.return_type()==empty_typet();
+  f_it->second.type.return_type()=empty_typet();
   function_symbol.type=f_it->second.type;
 
   // add symbol to symbol_table
