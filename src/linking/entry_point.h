@@ -11,7 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/symbol_table.h>
 #include <util/message.h>
-#include <util/std_code.h>
+#include <util/location.h>
 
 bool entry_point(
   symbol_tablet &symbol_table,
