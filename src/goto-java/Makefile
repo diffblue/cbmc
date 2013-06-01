@@ -1,6 +1,16 @@
-SRC = java_bytecode_language.cpp java_bytecode_parse_tree.cpp \
+SRC = main.cpp java_bytecode_parse_tree.cpp \
       java_bytecode_typecheck.cpp javap_parse.cpp \
       java_bytecode_convert.cpp java_types.cpp java_entry_point.cpp
+
+OBJ += ../big-int/bigint$(OBJEXT) \
+      ../goto-programs/goto-programs$(LIBEXT) \
+      ../util/util$(LIBEXT) \
+      ../linking/linking$(LIBEXT) \
+      ../ansi-c/ansi-c$(LIBEXT) \
+      ../cpp/cpp$(LIBEXT) \
+      ../xmllang/xmllang$(LIBEXT) \
+      ../assembler/assembler$(LIBEXT) \
+      ../langapi/langapi$(LIBEXT)
 
 INCLUDES= -I ..
 
@@ -9,10 +19,15 @@ include ../common
 
 CLEANFILES = java_bytecode$(LIBEXT)
 
-all: java_bytecode$(LIBEXT)
+all: goto-java$(EXEEXT)
 
 ###############################################################################
 
-java_bytecode$(LIBEXT): $(OBJ) 
-	$(LINKLIB)
+goto-java$(EXEEXT): $(OBJ)
+	$(LINKBIN)
+
+.PHONY: goto-java-mac-signed
+
+goto-java-mac-signed: goto-cc$(EXEEXT)
+	codesign -v -s $(OSX_IDENTITY) goto-java$(EXEEXT)
 
