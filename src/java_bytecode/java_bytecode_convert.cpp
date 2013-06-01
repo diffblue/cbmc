@@ -290,8 +290,8 @@ codet java_bytecode_convertt::convert_instructions(
     c.make_nil();
   
     irep_idt statement=i_it->statement;
-    irep_idt arg1=i_it->arg1;
-    irep_idt arg2=i_it->arg2;
+    irep_idt arg0=i_it->args.size()>=1?i_it->args[0]:irep_idt();
+    irep_idt arg1=i_it->args.size()>=2?i_it->args[1]:irep_idt();
     
     const bytecode_infot &bytecode_info=get_bytecode_info(statement);
     
@@ -300,7 +300,7 @@ codet java_bytecode_convertt::convert_instructions(
        statement[statement.size()-2]=='_' &&
        isdigit(statement[statement.size()-1]))
     {
-      arg1=
+      arg0=
         std::string(id2string(statement), statement.size()-1, 1);
       statement=std::string(id2string(statement), 0, statement.size()-2);
     }
@@ -331,7 +331,7 @@ codet java_bytecode_convertt::convert_instructions(
             statement=="invokevirtual")
     {
       code_function_callt call;
-      call.function()=symbol_exprt(arg1);
+      call.function()=symbol_exprt(arg0);
       c=call;
     }
     else if(statement=="return")
@@ -359,18 +359,18 @@ codet java_bytecode_convertt::convert_instructions(
       // store value into some local variable
       assert(op.size()==1 && results.empty());
       code_assignt code_assign;
-      code_assign.lhs()=variable(arg1);
+      code_assign.lhs()=variable(arg0);
       code_assign.rhs()=op[0];
       c=code_assign;
     }
     else if(statement==patternt("?load"))
     {
       // load a value from a local variable
-      results[0]=variable(arg1);
+      results[0]=variable(arg0);
     }
     else if(statement=="goto")
     {
-      code_gotot code_goto(label(arg1));
+      code_gotot code_goto(label(arg0));
       c=code_goto;
     }
     else if(statement=="iconst_m1")
@@ -383,10 +383,10 @@ codet java_bytecode_convertt::convert_instructions(
       assert(results.size()==1);
       results[0]=from_integer(0, java_int_type());
     }
-    else if(statement=="bipush")
+    else if(statement=="bipush" || statement=="sipush")
     {
       assert(results.size()==1);
-      mp_integer value=string2integer(id2string(arg1));
+      mp_integer value=string2integer(id2string(arg0));
       results[0]=from_integer(value, java_int_type());
     }
     else if(statement==patternt("if_?cmp??"))
@@ -394,7 +394,7 @@ codet java_bytecode_convertt::convert_instructions(
       assert(op.size()==2 && results.empty());
       code_ifthenelset code_branch;
       code_branch.cond()=binary_relation_exprt(op[0], ID_equal, op[1]);
-      code_branch.then_case()=code_gotot(label(arg1));
+      code_branch.then_case()=code_gotot(label(arg0));
       c=code_branch;
     }
     else if(statement==patternt("if??"))
@@ -402,7 +402,7 @@ codet java_bytecode_convertt::convert_instructions(
       assert(op.size()==2 && results.empty());
       code_ifthenelset code_branch;
       code_branch.cond()=binary_relation_exprt(op[0], ID_equal, op[1]);
-      code_branch.then_case()=code_gotot(label(arg1));
+      code_branch.then_case()=code_gotot(label(arg0));
       c=code_branch;
     }
     else if(statement==patternt("ifnonnull"))
@@ -410,7 +410,7 @@ codet java_bytecode_convertt::convert_instructions(
       assert(op.size()==1 && results.empty());
       code_ifthenelset code_branch;
       code_branch.cond()=binary_relation_exprt(op[0], ID_notequal, gen_zero(java_int_type()));
-      code_branch.then_case()=code_gotot(label(arg1));
+      code_branch.then_case()=code_gotot(label(arg0));
       c=code_branch;
     }
     else if(statement==patternt("ifnull"))
@@ -418,16 +418,16 @@ codet java_bytecode_convertt::convert_instructions(
       assert(op.size()==1 && results.empty());
       code_ifthenelset code_branch;
       code_branch.cond()=binary_relation_exprt(op[0], ID_equal, gen_zero(java_int_type()));
-      code_branch.then_case()=code_gotot(label(arg1));
+      code_branch.then_case()=code_gotot(label(arg0));
       c=code_branch;
     }
     else if(statement=="iinc")
     {
-      mp_integer value=string2integer(id2string(i_it->arg2));
+      mp_integer value=string2integer(id2string(arg1));
       code_assignt code_assign;
-      code_assign.lhs()=variable(arg1);
+      code_assign.lhs()=variable(arg0);
       code_assign.rhs()=
-        plus_exprt(variable(arg1), from_integer(value, java_int_type()));
+        plus_exprt(variable(arg0), from_integer(value, java_int_type()));
       c=code_assign;
     }
     else if(statement==patternt("?xor"))
@@ -498,7 +498,7 @@ codet java_bytecode_convertt::convert_instructions(
     else if(statement=="getfield")
     {
       assert(op.size()==1 && results.size()==1);
-      results[0]=member_exprt(dereference_exprt(op[0]), arg1);
+      results[0]=member_exprt(dereference_exprt(op[0]), arg0);
     }
     else if(statement=="getstatic")
     {
@@ -532,22 +532,25 @@ codet java_bytecode_convertt::convert_instructions(
     else if(statement=="new")
     {
       assert(op.empty() && results.size()==1);
-      symbol_typet obj_t(arg1);
+      symbol_typet obj_t(arg0);
       results[0]=side_effect_exprt(ID_cpp_new, obj_t);
     }
     else if(statement=="newarray")
     {
       assert(op.size()==1 && results.size()==1);
-      symbol_typet obj_t(arg1);
+      symbol_typet obj_t(arg0);
       array_typet array_type(obj_t, op[0]);
       results[0]=side_effect_exprt(ID_cpp_new_array, array_type);
     }
     else if(statement=="anewarray")
     {
       assert(op.size()==1 && results.size()==1);
-      symbol_typet obj_t(arg1);
+      symbol_typet obj_t(arg0);
       array_typet array_type(java_reference_type(obj_t), op[0]);
       results[0]=side_effect_exprt(ID_cpp_new_array, array_type);
+    }
+    else if(statement=="tableswitch")
+    {
     }
     else
       throw "unhandled statement "+id2string(statement);

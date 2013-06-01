@@ -30,7 +30,8 @@ public:
   public:
     locationt location;
     unsigned address;
-    irep_idt statement, arg1, arg2;
+    irep_idt statement;
+    std::vector<irep_idt> args;
   };
   
   class membert

@@ -307,28 +307,22 @@ void javap_parsert::rcode(membert &dest_member)
   t=token(); // statement
   instruction.statement=t;
 
-  t=token(); // argument
+  while(true)
+  {
+    t=token(); // arguments
   
-  if(t=="#")
-  {
-    t=token();
-    instruction.arg1=constants[atoi(t.c_str())].value;
-  }
-  else
-    instruction.arg1=t;
-
-  if(lookahead()==",")
-  {
-    token(); // eat ,
-
-    t=token();
     if(t=="#")
     {
       t=token();
-      instruction.arg2=constants[atoi(t.c_str())].value;
+      instruction.args.push_back(constants[atoi(t.c_str())].value);
     }
     else
-      instruction.arg2=t;
+      instruction.args.push_back(t);
+
+    if(lookahead()==",")
+      token(); // eat ,
+    else
+      break;
   }
   
   // do we have a line number?
