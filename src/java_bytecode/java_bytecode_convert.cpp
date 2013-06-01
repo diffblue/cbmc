@@ -183,6 +183,7 @@ void java_bytecode_convertt::convert(const classt &c)
   // produce symbol
   symbolt new_symbol;
   new_symbol.base_name=c.name;
+  new_symbol.pretty_name=c.name;
   new_symbol.name="java::"+id2string(c.name);
   new_symbol.type=class_type;
   
@@ -223,13 +224,15 @@ void java_bytecode_convertt::convert(
     //type.parameters()=m.parameters;
     
     method.set_base_name(m.name);
-    method.set_name(m.name);
+    method.set_name(id2string(class_symbol.name)+"."+id2string(m.name));
     method.type()=type;
     
     // create method symbol
     symbolt method_symbol;
-    method_symbol.name=m.name;
-    method_symbol.base_name=m.name;
+    method_symbol.name=method.get_name();
+    method_symbol.base_name=method.get_base_name();
+    method_symbol.pretty_name=id2string(class_symbol.pretty_name)+"."+
+                              id2string(method.get_base_name())+"()";
     method_symbol.type=type;
     method_symbol.value=convert_instructions(m.instructions);
     symbol_table.add(method_symbol);
