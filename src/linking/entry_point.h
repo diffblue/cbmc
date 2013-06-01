@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_C_MAIN_H
-#define CPROVER_C_MAIN_H
+#ifndef CPROVER_LINKING_ENTRY_POINT_H
+#define CPROVER_LINKING_ENTRY_POINT_H
 
 #include <util/symbol_table.h>
 #include <util/message.h>
