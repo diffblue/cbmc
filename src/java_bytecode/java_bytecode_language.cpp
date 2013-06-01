@@ -6,17 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#if 0
-#include <string.h>
-
-#include <sstream>
-#include <fstream>
-
-#include <expr_util.h>
-#include <replace_symbol.h>
-#include <config.h>
-#endif
-
 #include <util/symbol_table.h>
 
 #include <linking/linking.h>
@@ -26,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_bytecode_language.h"
 #include "java_bytecode_typecheck.h"
 #include "java_bytecode_convert.h"
+#include "java_entry_point.h"
 #include "javap_parse.h"
 
 /*******************************************************************\
@@ -156,14 +146,15 @@ Function: java_bytecode_languaget::final
 \*******************************************************************/
 
 bool java_bytecode_languaget::final(
-  symbol_tablet &context,
+  symbol_tablet &symbol_table,
   message_handlert &message_handler)
 {
   /*
-  if(c_final(context, message_handler)) return true;
-  if(c_main(context, "c::", "c::main", message_handler)) return true;
+  if(c_final(symbol_table, message_handler)) return true;
   */
-  // nothing yet
+
+  if(java_entry_point(symbol_table, message_handler)) return true;
+  
   return false;
 }
 
