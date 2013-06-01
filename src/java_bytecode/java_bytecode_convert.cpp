@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 #endif
 
+#include <set>
 #include <stack>
 
 #include <util/std_expr.h>
@@ -279,6 +280,32 @@ Function: java_bytecode_convertt::convert_instructions
 codet java_bytecode_convertt::convert_instructions(
   const instructionst &instructions)
 {
+  // first pass: get targets
+  
+  std::set<irep_idt> targets;
+  
+  for(instructionst::const_iterator
+      i_it=instructions.begin();
+      i_it!=instructions.end();
+      i_it++)
+  {
+    if(i_it->statement=="goto" ||
+       i_it->statement==patternt("if_?cmp??") ||
+       i_it->statement==patternt("if??") ||
+       i_it->statement=="ifnonnull" ||
+       i_it->statement=="ifnull")
+    {
+      assert(!i_it->args.empty());
+      targets.insert(label(i_it->args[0]));
+    }
+    else if(i_it->statement=="tableswitch")
+    {
+    }
+    else if(i_it->statement=="lookupswitch")
+    {
+    }
+  }
+
   code_blockt code;
 
   for(instructionst::const_iterator
@@ -286,8 +313,7 @@ codet java_bytecode_convertt::convert_instructions(
       i_it!=instructions.end();
       i_it++)
   {
-    codet c;
-    c.make_nil();
+    codet c=code_skipt();
   
     irep_idt statement=i_it->statement;
     irep_idt arg0=i_it->args.size()>=1?i_it->args[0]:irep_idt();
@@ -368,6 +394,11 @@ codet java_bytecode_convertt::convert_instructions(
       // load a value from a local variable
       results[0]=variable(arg0);
     }
+    else if(statement=="ldc")
+    {
+      assert(results.size()==1);
+      //results[0]=;
+    }
     else if(statement=="goto")
     {
       code_gotot code_goto(label(arg0));
@@ -435,6 +466,21 @@ codet java_bytecode_convertt::convert_instructions(
       assert(op.size()==2 && results.size()==1);
       results[0]=bitxor_exprt(op[0], op[1]);
     }
+    else if(statement==patternt("?shl"))
+    {
+      assert(op.size()==2 && results.size()==1);
+      results[0]=shl_exprt(op[0], op[1]);
+    }
+    else if(statement==patternt("?shr"))
+    {
+      assert(op.size()==2 && results.size()==1);
+      results[0]=ashr_exprt(op[0], op[1]);
+    }
+    else if(statement==patternt("?ushr"))
+    {
+      assert(op.size()==2 && results.size()==1);
+      results[0]=lshr_exprt(op[0], op[1]);
+    }
     else if(statement==patternt("?add"))
     {
       assert(op.size()==2 && results.size()==1);
@@ -464,6 +510,10 @@ codet java_bytecode_convertt::convert_instructions(
     {
       assert(op.size()==2 && results.size()==1);
       results[0]=mod_exprt(op[0], op[1]);
+    }
+    else if(statement==patternt("?cmp"))
+    {
+      assert(op.size()==2 && results.size()==1);
     }
     else if(statement==patternt("?cmpg"))
     {
@@ -553,14 +603,20 @@ codet java_bytecode_convertt::convert_instructions(
     {
     }
     else
-      throw "unhandled statement "+id2string(statement);
+    {
+      c=codet(statement);
+      c.operands()=op;
+    }
 
     push(results);
 
-    if(c.is_not_nil())
     {
-      irep_idt a_str=i2string(i_it->address);
-      code.add(code_labelt(label(a_str), c));
+      irep_idt l=label(i2string(i_it->address));
+
+      if(targets.find(l)!=targets.end())
+        code.add(code_labelt(l, c));
+      else if(c.get_statement()!=ID_skip)
+        code.add(c);
     }
   }
   
