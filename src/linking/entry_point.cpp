@@ -242,7 +242,7 @@ bool entry_point(
   if(s_it==symbol_table.symbols.end())
   {
     messaget message(message_handler);
-    message.error("main symbol `"+id2string(main_symbol)+"' not in symbol_table");
+    message.error("main symbol `"+id2string(main_symbol)+"' not in symbol table");
     return true; // give up, no main
   }
     
