@@ -90,7 +90,6 @@ void assemlber_scanner_init()
 
 <GRAMMAR>{
 {ws}                { /* ignore */ }
-{newline}           { /* ignore */ }
 {identifier}        { irept identifier(ID_symbol);
                       identifier.set(ID_identifier, yytext);
                       PARSER.add_token(identifier); }
