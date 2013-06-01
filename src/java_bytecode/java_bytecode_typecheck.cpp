@@ -78,6 +78,7 @@ Function: java_bytecode_typecheckt::typecheck
 
 void java_bytecode_typecheckt::typecheck()
 {
+  
 }
 
 /*******************************************************************\

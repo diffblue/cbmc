@@ -73,7 +73,7 @@ protected:
   void rconstant(const std::string &line);
   typet rtype();
   void rcode(membert &dest_member);
-
+  irep_idt rname();
   inline std::string getline()
   {
     std::string line;
@@ -386,6 +386,35 @@ void javap_parsert::rmembers(classt &dest_class)
 
 /*******************************************************************\
 
+Function: javap_parsert::rname
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+irep_idt javap_parsert::rname()
+{
+  // read a sequence of '.' and identifiers
+  std::string result;
+
+  while(true)
+  {
+    irep_idt t=token();
+    result+=id2string(t);
+    if(lookahead()!=".") break;
+    token(); // read .
+    result+=".";
+  }
+  
+  return result;
+}
+
+/*******************************************************************\
+
 Function: javap_parsert::rtype
 
   Inputs:
@@ -478,7 +507,9 @@ javap_parsert::membert &javap_parsert::rmember(classt &dest_class)
   while(lookahead()==ID_public ||
         lookahead()==ID_private ||
         lookahead()==ID_protected ||
-        lookahead()==ID_static)
+        lookahead()==ID_static ||
+        lookahead()==ID_final ||
+        lookahead()==ID_native)
   {
     token();
   }
@@ -522,6 +553,11 @@ javap_parsert::membert &javap_parsert::rmember(classt &dest_class)
       }
     }
   }
+  
+  if(lookahead()=="throws")
+  {
+    token(); // get 'throws'
+  }
 
   // read ;
   token();
@@ -554,10 +590,13 @@ void javap_parsert::rclass()
 
   classt &c=parse_tree.add_class();
   
-  c.name=token();
+  c.name=rname();
   
-  if(token()!="extends")
-    throw parsing_errort("expected 'extends'");
+  if(lookahead()=="extends")
+  {
+    token(); // read 'extends'
+    c.extends=rname();
+  }
 
   while(!eof())
   {

@@ -61,8 +61,7 @@ public:
   class classt
   {
   public:
-    irep_idt name;
-    irep_idt extends;
+    irep_idt name, extends;
     
     typedef std::list<membert> memberst;
     memberst members;
