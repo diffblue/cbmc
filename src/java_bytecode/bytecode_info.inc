@@ -14,7 +14,7 @@
 { "astore_1",      0x4c, 1, 0, ' ' }, // objectref →; store a reference into local variable 1
 { "astore_2",      0x4d, 1, 0, ' ' }, // objectref →; store a reference into local variable 2
 { "astore_3",      0x4e, 1, 0, ' ' }, // objectref →; store a reference into local variable 3
-{ "athrow",        0xbf, 1, 0, ' ' }, // objectref → [empty], objectref; throws an error or exception (notice that the rest of the stack is cleared, leaving only a reference to the Throwable)
+{ "athrow",        0xbf, 1, 1, ' ' }, // objectref → [empty], objectref; throws an error or exception (notice that the rest of the stack is cleared, leaving only a reference to the Throwable)
 { "baload",        0x33, 2, 1, 'b' }, // arrayref, index → value; load a byte or Boolean value from an array
 { "bastore",       0x54, 3, 0, ' ' }, // arrayref, index, value →; store a byte or Boolean value into an array
 { "bipush",        0x10, 0, 1, 'i' }, // → value; push a byte onto the stack as an integer value

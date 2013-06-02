@@ -433,9 +433,9 @@ codet java_bytecode_convertt::convert_instructions(
     }
     else if(statement==patternt("if??"))
     {
-      assert(op.size()==2 && results.empty());
+      assert(op.size()==1 && results.empty());
       code_ifthenelset code_branch;
-      code_branch.cond()=binary_relation_exprt(op[0], ID_equal, op[1]);
+      code_branch.cond()=binary_relation_exprt(op[0], ID_equal, gen_zero(op[0].type()));
       code_branch.then_case()=code_gotot(label(arg0));
       c=code_branch;
     }
