@@ -66,6 +66,22 @@ void java_bytecode_typecheckt::typecheck_expr(exprt &expr)
 
 /*******************************************************************\
 
+Function: java_bytecode_typecheckt::typecheck_symbol
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void java_bytecode_typecheckt::typecheck_symbol(symbolt &symbol)
+{
+}
+
+/*******************************************************************\
+
 Function: java_bytecode_typecheckt::typecheck
 
   Inputs:
@@ -79,10 +95,11 @@ Function: java_bytecode_typecheckt::typecheck
 void java_bytecode_typecheckt::typecheck()
 {
   for(symbol_tablet::symbolst::iterator
-      s_it=symbols.begin();
-      s_it!=symbols.end();
+      s_it=symbol_table.symbols.begin();
+      s_it!=symbol_table.symbols.end();
       s_it++)
   {
+    typecheck_symbol(s_it->second);
   }
 }
 

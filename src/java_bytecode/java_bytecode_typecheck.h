@@ -53,6 +53,8 @@ protected:
   const irep_idt module;
   const irep_idt mode;
 
+  void typecheck_symbol(symbolt &symbol);
+
   // overload to use language specific syntax
   virtual std::string to_string(const exprt &expr);
   virtual std::string to_string(const typet &type);
