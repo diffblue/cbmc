@@ -78,7 +78,12 @@ Function: java_bytecode_typecheckt::typecheck
 
 void java_bytecode_typecheckt::typecheck()
 {
-  
+  for(symbol_tablet::symbolst::iterator
+      s_it=symbols.begin();
+      s_it!=symbols.end();
+      s_it++)
+  {
+  }
 }
 
 /*******************************************************************\
