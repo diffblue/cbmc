@@ -143,7 +143,7 @@ void java_bytecode_parse_treet::membert::output(std::ostream &out) const
 
       out << "    " << i_it->address << ": " << i_it->statement;
       
-      for(std::vector<irep_idt>::const_iterator
+      for(std::vector<exprt>::const_iterator
           a_it=i_it->args.begin(); a_it!=i_it->args.end(); a_it++)
       {
         if(a_it!=i_it->args.begin()) out << ", ";

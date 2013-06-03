@@ -31,7 +31,7 @@ public:
     locationt location;
     unsigned address;
     irep_idt statement;
-    std::vector<irep_idt> args;
+    std::vector<exprt> args;
   };
   
   class membert

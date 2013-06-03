@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_types.h>
 #include <util/std_code.h>
 #include <util/ieee_float.h>
+#include <util/std_expr.h>
 
 #include "javap_parse.h"
 
@@ -92,11 +93,13 @@ protected:
       return true;
   }
   
-  // constant map
+  // constant map, per-class
   class constantt
   {
   public:
-    irep_idt kind, value;
+    irep_idt kind;
+    std::string value_string;
+    exprt value_expr;
   };
   
   typedef std::map<unsigned, constantt> constantst;
@@ -263,22 +266,17 @@ void javap_parsert::rconstant(const std::string &line)
   std::string no_string=std::string(line, no_pos+1, eq_pos-no_pos-2);
   std::string kind=std::string(line, eq_pos+2, tab_pos-eq_pos-2);
   std::string value=std::string(line, tab_pos+1, std::string::npos);  
-  
+
   // strip trailing ;
   if(has_suffix(value, ";"))
     value.resize(value.size()-1);
   
-  if(kind=="Method" ||
-     kind=="class")
-  {
-    std::size_t pos=value.find("//  ");
-    if(pos!=std::string::npos)
-      value=std::string(value, pos+4, std::string::npos);
-  }
-  
   unsigned no=atoi(no_string.c_str());
-  constants[no].kind=kind;
-  constants[no].value=value;
+  constantt &constant=constants[no];
+  constant.kind=kind;
+  constant.value_string=value;
+  
+  // the expressions are produced once all are read
 }
   
 /*******************************************************************\
@@ -313,11 +311,12 @@ void javap_parsert::rcode(membert &dest_member)
   
     if(t=="#")
     {
+      // a constant from the constant table
       t=token();
-      instruction.args.push_back(constants[atoi(t.c_str())].value);
+      instruction.args.push_back(constants[atoi(t.c_str())].value_expr);
     }
     else
-      instruction.args.push_back(t);
+      instruction.args.push_back(constant_exprt(t, integer_typet())); // some number
 
     if(lookahead()==",")
       token(); // eat ,
