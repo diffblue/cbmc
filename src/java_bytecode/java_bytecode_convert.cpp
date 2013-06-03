@@ -92,9 +92,10 @@ public:
 protected:
   symbol_tablet &symbol_table;
   
-  symbol_exprt variable(const irep_idt &id)
+  symbol_exprt variable(const exprt &arg)
   {
-    return symbol_exprt("java::local"+id2string(id), java_int_type());
+    irep_idt number=to_constant_expr(arg).get_value();
+    return symbol_exprt("java::local"+id2string(number));
   }
   
   irep_idt label(const irep_idt &address)
@@ -299,7 +300,7 @@ codet java_bytecode_convertt::convert_instructions(
        i_it->statement=="ifnull")
     {
       assert(!i_it->args.empty());
-      targets.insert(label(i_it->args[0]));
+      targets.insert(label(to_constant_expr(i_it->args[0]).get_value()));
     }
     else if(i_it->statement=="tableswitch")
     {
@@ -319,8 +320,8 @@ codet java_bytecode_convertt::convert_instructions(
     codet c=code_skipt();
   
     irep_idt statement=i_it->statement;
-    irep_idt arg0=i_it->args.size()>=1?i_it->args[0]:irep_idt();
-    irep_idt arg1=i_it->args.size()>=2?i_it->args[1]:irep_idt();
+    exprt arg0=i_it->args.size()>=1?i_it->args[0]:nil_exprt();
+    exprt arg1=i_it->args.size()>=2?i_it->args[1]:nil_exprt();
     
     const bytecode_infot &bytecode_info=get_bytecode_info(statement);
     
@@ -329,8 +330,9 @@ codet java_bytecode_convertt::convert_instructions(
        statement[statement.size()-2]=='_' &&
        isdigit(statement[statement.size()-1]))
     {
-      arg0=
-        std::string(id2string(statement), statement.size()-1, 1);
+      arg0=constant_exprt(
+        std::string(id2string(statement), statement.size()-1, 1),
+        integer_typet());
       statement=std::string(id2string(statement), 0, statement.size()-2);
     }
     
@@ -360,7 +362,7 @@ codet java_bytecode_convertt::convert_instructions(
             statement=="invokevirtual")
     {
       code_function_callt call;
-      call.function()=symbol_exprt(arg0);
+      call.function()=arg0;
       c=call;
     }
     else if(statement=="return")
@@ -405,7 +407,8 @@ codet java_bytecode_convertt::convert_instructions(
     }
     else if(statement=="goto")
     {
-      code_gotot code_goto(label(arg0));
+      irep_idt number=to_constant_expr(arg0).get_value();
+      code_gotot code_goto(label(number));
       c=code_goto;
     }
     else if(statement=="iconst_m1")
@@ -421,48 +424,49 @@ codet java_bytecode_convertt::convert_instructions(
     else if(statement=="bipush" || statement=="sipush")
     {
       assert(results.size()==1);
-      mp_integer value=string2integer(id2string(arg0));
-      results[0]=from_integer(value, java_int_type());
+      results[0]=arg0;
     }
     else if(statement==patternt("if_?cmp??"))
     {
+      irep_idt number=to_constant_expr(arg0).get_value();
       assert(op.size()==2 && results.empty());
       code_ifthenelset code_branch;
       code_branch.cond()=binary_relation_exprt(op[0], ID_equal, op[1]);
-      code_branch.then_case()=code_gotot(label(arg0));
+      code_branch.then_case()=code_gotot(label(number));
       c=code_branch;
     }
     else if(statement==patternt("if??"))
     {
+      irep_idt number=to_constant_expr(arg0).get_value();
       assert(op.size()==1 && results.empty());
       code_ifthenelset code_branch;
       code_branch.cond()=binary_relation_exprt(op[0], ID_equal, gen_zero(op[0].type()));
-      code_branch.then_case()=code_gotot(label(arg0));
+      code_branch.then_case()=code_gotot(label(number));
       c=code_branch;
     }
     else if(statement==patternt("ifnonnull"))
     {
+      irep_idt number=to_constant_expr(arg0).get_value();
       assert(op.size()==1 && results.empty());
       code_ifthenelset code_branch;
       code_branch.cond()=binary_relation_exprt(op[0], ID_notequal, gen_zero(java_int_type()));
-      code_branch.then_case()=code_gotot(label(arg0));
+      code_branch.then_case()=code_gotot(label(number));
       c=code_branch;
     }
     else if(statement==patternt("ifnull"))
     {
+      irep_idt number=to_constant_expr(arg0).get_value();
       assert(op.size()==1 && results.empty());
       code_ifthenelset code_branch;
       code_branch.cond()=binary_relation_exprt(op[0], ID_equal, gen_zero(java_int_type()));
-      code_branch.then_case()=code_gotot(label(arg0));
+      code_branch.then_case()=code_gotot(label(number));
       c=code_branch;
     }
     else if(statement=="iinc")
     {
-      mp_integer value=string2integer(id2string(arg1));
       code_assignt code_assign;
       code_assign.lhs()=variable(arg0);
-      code_assign.rhs()=
-        plus_exprt(variable(arg0), from_integer(value, java_int_type()));
+      code_assign.rhs()=plus_exprt(variable(arg0), arg1);
       c=code_assign;
     }
     else if(statement==patternt("?xor"))
@@ -552,7 +556,7 @@ codet java_bytecode_convertt::convert_instructions(
     else if(statement=="getfield")
     {
       assert(op.size()==1 && results.size()==1);
-      results[0]=member_exprt(dereference_exprt(op[0]), arg0);
+      results[0]=member_exprt(dereference_exprt(op[0]), arg0.get(ID_component_name));
     }
     else if(statement=="getstatic")
     {
@@ -586,21 +590,18 @@ codet java_bytecode_convertt::convert_instructions(
     else if(statement=="new")
     {
       assert(op.empty() && results.size()==1);
-      symbol_typet obj_t(arg0);
-      results[0]=side_effect_exprt(ID_cpp_new, obj_t);
+      results[0]=side_effect_exprt(ID_cpp_new, arg0.type());
     }
     else if(statement=="newarray")
     {
       assert(op.size()==1 && results.size()==1);
-      symbol_typet obj_t(arg0);
-      array_typet array_type(obj_t, op[0]);
+      array_typet array_type(arg0.type(), op[0]);
       results[0]=side_effect_exprt(ID_cpp_new_array, array_type);
     }
     else if(statement=="anewarray")
     {
       assert(op.size()==1 && results.size()==1);
-      symbol_typet obj_t(arg0);
-      array_typet array_type(java_reference_type(obj_t), op[0]);
+      array_typet array_type(java_reference_type(arg0.type()), op[0]);
       results[0]=side_effect_exprt(ID_cpp_new_array, array_type);
     }
     else if(statement=="tableswitch")
