@@ -365,12 +365,13 @@ codet java_bytecode_convertt::convert_instructions(
     }
     else if(statement=="return")
     {
+      assert(op.empty() && results.empty());
       code_returnt code_return;
       c=code_return;
     }
     else if(statement==patternt("?return"))
     {
-      assert(op.size()==1);
+      assert(op.size()==1 && results.empty());
       code_returnt code_return(op[0]);
       c=code_return;
     }

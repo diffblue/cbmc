@@ -50,22 +50,6 @@ std::string java_bytecode_typecheckt::to_string(const typet &type)
 
 /*******************************************************************\
 
-Function: java_bytecode_typecheckt::typecheck_expr
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void java_bytecode_typecheckt::typecheck_expr(exprt &expr)
-{ 
-}
-
-/*******************************************************************\
-
 Function: java_bytecode_typecheckt::typecheck_symbol
 
   Inputs:
@@ -78,6 +62,7 @@ Function: java_bytecode_typecheckt::typecheck_symbol
 
 void java_bytecode_typecheckt::typecheck_symbol(symbolt &symbol)
 {
+  typecheck_expr(symbol.value);
 }
 
 /*******************************************************************\
