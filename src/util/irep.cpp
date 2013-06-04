@@ -685,6 +685,33 @@ Function: irept::hash
 
 \*******************************************************************/
 
+#if 1
+
+static inline unsigned int _rotl(const size_t value, int shift)
+{
+  return (value << shift) | (value >> (sizeof(value)*8 - shift));
+}
+
+size_t irept::hash() const
+{
+  const irept::subt &sub=get_sub();
+  const irept::named_subt &named_sub=get_named_sub();
+
+  size_t result=hash_string(id());
+
+  forall_irep(it, sub) result=_rotl(result, 7)^it->hash();
+
+  forall_named_irep(it, named_sub)
+  {
+    result=_rotl(result, 7)^hash_string(it->first);
+    result=_rotl(result, 7)^it->second.hash();
+  }
+
+  return result;
+}
+
+#else
+
 size_t irept::hash() const
 {
   const irept::subt &sub=get_sub();
@@ -702,6 +729,8 @@ size_t irept::hash() const
 
   return result;
 }
+
+#endif
 
 /*******************************************************************\
 
