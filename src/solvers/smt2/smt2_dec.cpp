@@ -321,23 +321,26 @@ decision_proceduret::resultt smt2_dect::read_result_mathsat(std::istream &in)
       std::size_t pos1=line.find('(', 1);
       std::size_t pos2=line.find(' ', pos1);
       std::size_t pos3=line.find(')', pos2);
+
       if(pos1!=std::string::npos &&
          pos2!=std::string::npos &&
          pos3!=std::string::npos)
       {
         std::string id=std::string(line, pos1+1, pos2-pos1-1);
         int op = 0;
-        for (size_t i = pos2+1; i < line.size(); ++i) {
+        for (size_t i = pos2+1; i < line.size(); ++i)
+        {
             if (line[i] == '(') {
                 ++op;
             } else if (line[i] == ')') {
                 --op;
             }
             if (op < 0) {
-                pos3 = i;
-                break;
+              pos3 = i;
+              break;
             }
         }
+
         std::string value=std::string(line, pos2+1, pos3-pos2-1);
         values[id]=value;
       }
@@ -353,7 +356,9 @@ decision_proceduret::resultt smt2_dect::read_result_mathsat(std::istream &in)
     std::string conv_id=convert_identifier(it->first);
     std::string value=values[conv_id];
     if(value=="") continue;
-    if (value.substr(0, 5) == "(_ bv") {
+
+    if(value.substr(0, 5) == "(_ bv")
+    {
       // value is "(_ bvDECIMAL_VALUE SIZE)"
       // convert to binary
       value = value.substr(5);
@@ -362,45 +367,54 @@ decision_proceduret::resultt smt2_dect::read_result_mathsat(std::istream &in)
       std::string w = value.substr(pos+1, value.size()-pos-2);
       value = integer2binary(string2integer(v, 10),
                              string2integer(w, 10).to_ulong());
-    } else if (value.substr(0, 10) == "((_ fpnum ") {
-        // value is "((_ fpnum EXP_SIZE MANT_SIZE) DECIMAL_VALUE)"
-        value = value.substr(10);
-        size_t pos = value.find(' ');
-        std::string e = value.substr(0, pos);
-        size_t pos2 = value.find(')');
-        std::string m = value.substr(pos+1, pos2-pos-1);
-        unsigned long w = (string2integer(e, 10).to_ulong() +
-                           string2integer(m, 10).to_ulong() + 1);
-        value = integer2binary(
-            string2integer(value.substr(pos2+2, value.size()-pos2-3), 10), w);
-    } else if (value.substr(0, 8) == "(_ +inf ") {
-        value = value.substr(8);
-        size_t pos = value.find(' ');
-        unsigned long e = string2integer(value.substr(0, pos), 10).to_ulong();
-        size_t pos2 = value.find(')');
-        unsigned long m =
-            string2integer(value.substr(pos+1, pos2-pos-1), 10).to_ulong();
-        value = integer2binary(
-            ieee_floatt::plus_infinity(ieee_float_spect(m, e)).pack(), e+m+1);
-    } else if (value.substr(0, 8) == "(_ -inf ") {
-        value = value.substr(8);
-        size_t pos = value.find(' ');
-        unsigned long e = string2integer(value.substr(0, pos), 10).to_ulong();
-        size_t pos2 = value.find(')');
-        unsigned long m =
-            string2integer(value.substr(pos+1, pos2-pos-1), 10).to_ulong();
-        value = integer2binary(
-            ieee_floatt::minus_infinity(ieee_float_spect(m, e)).pack(), e+m+1);
-    } else if (value.substr(0, 7) == "(_ NaN ") {
-        value = value.substr(7);
-        size_t pos = value.find(' ');
-        unsigned long e = string2integer(value.substr(0, pos), 10).to_ulong();
-        size_t pos2 = value.find(')');
-        unsigned long m =
-            string2integer(value.substr(pos+1, pos2-pos-1), 10).to_ulong();
-        value = integer2binary(
-            ieee_floatt::NaN(ieee_float_spect(m, e)).pack(), e+m+1);
     }
+    else if(value.substr(0, 10) == "((_ fpnum ")
+    {
+      // value is "((_ fpnum EXP_SIZE MANT_SIZE) DECIMAL_VALUE)"
+      value = value.substr(10);
+      size_t pos = value.find(' ');
+      std::string e = value.substr(0, pos);
+      size_t pos2 = value.find(')');
+      std::string m = value.substr(pos+1, pos2-pos-1);
+      unsigned long w = (string2integer(e, 10).to_ulong() +
+                         string2integer(m, 10).to_ulong() + 1);
+      value = integer2binary(
+          string2integer(value.substr(pos2+2, value.size()-pos2-3), 10), w);
+    }
+    else if(value.substr(0, 8) == "(_ +inf ")
+    {
+      value = value.substr(8);
+      size_t pos = value.find(' ');
+      unsigned long e = string2integer(value.substr(0, pos), 10).to_ulong();
+      size_t pos2 = value.find(')');
+      unsigned long m =
+          string2integer(value.substr(pos+1, pos2-pos-1), 10).to_ulong();
+      value = integer2binary(
+          ieee_floatt::plus_infinity(ieee_float_spect(m, e)).pack(), e+m+1);
+    }
+    else if(value.substr(0, 8) == "(_ -inf ")
+    {
+      value = value.substr(8);
+      size_t pos = value.find(' ');
+      unsigned long e = string2integer(value.substr(0, pos), 10).to_ulong();
+      size_t pos2 = value.find(')');
+      unsigned long m =
+          string2integer(value.substr(pos+1, pos2-pos-1), 10).to_ulong();
+      value = integer2binary(
+          ieee_floatt::minus_infinity(ieee_float_spect(m, e)).pack(), e+m+1);
+    }
+    else if (value.substr(0, 7) == "(_ NaN ")
+    {
+      value = value.substr(7);
+      size_t pos = value.find(' ');
+      unsigned long e = string2integer(value.substr(0, pos), 10).to_ulong();
+      size_t pos2 = value.find(')');
+      unsigned long m =
+          string2integer(value.substr(pos+1, pos2-pos-1), 10).to_ulong();
+      value = integer2binary(
+          ieee_floatt::NaN(ieee_float_spect(m, e)).pack(), e+m+1);
+    }
+
     set_value(it->second, value);
   }
 
