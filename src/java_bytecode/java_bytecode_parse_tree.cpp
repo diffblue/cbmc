@@ -20,7 +20,8 @@ Function: java_bytecode_parse_treet::swap
 
 \*******************************************************************/
 
-void java_bytecode_parse_treet::swap(java_bytecode_parse_treet &java_bytecode_parse_tree)
+void java_bytecode_parse_treet::swap(
+  java_bytecode_parse_treet &java_bytecode_parse_tree)
 {
   java_bytecode_parse_tree.classes.swap(classes);
 }
@@ -141,13 +142,14 @@ void java_bytecode_parse_treet::membert::output(std::ostream &out) const
       if(i_it->location.get_line()!=irep_idt())
         out << "    // " << i_it->location << std::endl;
 
-      out << "    " << i_it->address << ": " << i_it->statement;
+      out << "    " << i_it->address << ": ";
+      out << i_it->statement;
       
       for(std::vector<exprt>::const_iterator
           a_it=i_it->args.begin(); a_it!=i_it->args.end(); a_it++)
       {
-        if(a_it!=i_it->args.begin()) out << ", ";
-        out << *a_it;
+        if(a_it!=i_it->args.begin()) out << ",";
+        out << " " << *a_it;
       }
 
       out << std::endl;
