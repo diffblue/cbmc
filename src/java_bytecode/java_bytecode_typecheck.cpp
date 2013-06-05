@@ -79,12 +79,17 @@ Function: java_bytecode_typecheckt::typecheck
 
 void java_bytecode_typecheckt::typecheck()
 {
+  // we add symbols, so the iterators won't be stable
+  symbol_tablet tmp_symbol_table;
+  tmp_symbol_table.swap(symbol_table);
+  
   for(symbol_tablet::symbolst::iterator
-      s_it=symbol_table.symbols.begin();
-      s_it!=symbol_table.symbols.end();
+      s_it=tmp_symbol_table.symbols.begin();
+      s_it!=tmp_symbol_table.symbols.end();
       s_it++)
   {
     typecheck_symbol(s_it->second);
+    symbol_table.add(s_it->second);
   }
 }
 
