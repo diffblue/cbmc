@@ -815,13 +815,25 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
   {
     convert_plus(to_plus_expr(expr));
   }
+  else if(expr.id()==ID_floatbv_plus)
+  {
+    convert_floatbv_plus(expr);
+  }
   else if(expr.id()==ID_minus)
   {
     convert_minus(to_minus_expr(expr));
   }
+  else if(expr.id()==ID_floatbv_minus)
+  {
+    convert_floatbv_minus(expr);
+  }
   else if(expr.id()==ID_div)
   {
     convert_div(to_div_expr(expr));
+  }
+  else if(expr.id()==ID_floatbv_div)
+  {
+    convert_floatbv_div(expr);
   }
   else if(expr.id()==ID_mod)
   {
@@ -830,6 +842,10 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
   else if(expr.id()==ID_mult)
   {
     convert_mult(to_mult_expr(expr));
+  }
+  else if(expr.id()==ID_floatbv_mult)
+  {
+    convert_floatbv_mult(expr);
   }
   else if(expr.id()==ID_address_of)
   {
@@ -2210,6 +2226,26 @@ void smt1_convt::convert_plus(const plus_exprt &expr)
 
 /*******************************************************************\
 
+Function: smt1_convt::convert_floatbv_plus
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void smt1_convt::convert_floatbv_plus(const exprt &expr)
+{
+  assert(expr.operands().size()==3);
+  assert(expr.type().id()==ID_floatbv);
+
+  throw "todo: floatbv_plus";
+}
+
+/*******************************************************************\
+
 Function: smt1_convt::convert_minus
 
   Inputs:
@@ -2257,6 +2293,26 @@ void smt1_convt::convert_minus(const minus_exprt &expr)
   }
   else
     throw "unsupported type for -: "+expr.type().id_string();
+}
+
+/*******************************************************************\
+
+Function: smt1_convt::convert_floatbv_minus
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void smt1_convt::convert_floatbv_minus(const exprt &expr)
+{
+  assert(expr.operands().size()==3); 
+  assert(expr.type().id()==ID_floatbv);
+    
+  throw "todo: floatbv_minus";
 }
 
 /*******************************************************************\
@@ -2310,6 +2366,26 @@ void smt1_convt::convert_div(const div_exprt &expr)
     throw "unsupported type for /: "+expr.type().id_string();
 }
 
+/*******************************************************************\
+
+Function: smt1_convt::convert_floatbv_div
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void smt1_convt::convert_floatbv_div(const exprt &expr)
+{
+  assert(expr.operands().size()==3); 
+  assert(expr.type().id()==ID_floatbv);
+    
+  throw "todo: floatbv_div";
+}
+      
 /*******************************************************************\
 
 Function: smt1_convt::convert_mult
@@ -2385,6 +2461,26 @@ void smt1_convt::convert_mult(const mult_exprt &expr)
     throw "unsupported type for *: "+expr.type().id_string();
 }
 
+/*******************************************************************\
+
+Function: smt1_convt::convert_floatbv_mult
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void smt1_convt::convert_floatbv_mult(const exprt &expr)
+{
+  assert(expr.operands().size()==3); 
+  assert(expr.type().id()==ID_floatbv);
+    
+  throw "todo: floatbv_mult";
+}
+        
 /*******************************************************************\
 
 Function: smt1_convt::convert_with

@@ -2394,8 +2394,8 @@ void smt2_convt::convert_floatbv_plus(const exprt &expr)
 
   if(use_FPA_theory)
   {
-    smt2_prop.out << "(+ ";
-    smt2_prop.out << "RNE"; // hard-wired
+    smt2_prop.out << "(fpadd ";
+    smt2_prop.out << "fp_round_nearest_even"; // hard-wired
     smt2_prop.out << " ";
     convert_expr(expr.op0());
     smt2_prop.out << " ";
@@ -2480,8 +2480,8 @@ void smt2_convt::convert_floatbv_minus(const exprt &expr)
 
   if(use_FPA_theory)
   {
-    smt2_prop.out << "(- ";
-    smt2_prop.out << "RNE"; // hard-wired
+    smt2_prop.out << "(fpsub ";
+    smt2_prop.out << "fp_round_nearest_even"; // hard-wired
     convert_expr(expr.op0());
     smt2_prop.out << " ";
     convert_expr(expr.op1());
@@ -2578,8 +2578,8 @@ void smt2_convt::convert_floatbv_div(const exprt &expr)
 
   if(use_FPA_theory)
   {
-    smt2_prop.out << "(/ ";
-    smt2_prop.out << "RNE";
+    smt2_prop.out << "(fpdiv ";
+    smt2_prop.out << "fp_round_nearest_even";
     smt2_prop.out << " ";
     convert_expr(expr.op0());
     smt2_prop.out << " ";
@@ -2707,8 +2707,8 @@ void smt2_convt::convert_floatbv_mult(const exprt &expr)
   
   if(use_FPA_theory)
   {
-    smt2_prop.out << "(* ";
-    smt2_prop.out << "RNE";
+    smt2_prop.out << "(fpmul ";
+    smt2_prop.out << "fp_round_nearest_even";
     smt2_prop.out << " ";
     convert_expr(expr.op0());
     smt2_prop.out << " ";
