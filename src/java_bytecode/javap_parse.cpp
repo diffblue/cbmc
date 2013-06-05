@@ -19,6 +19,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_code.h>
 #include <util/ieee_float.h>
 #include <util/std_expr.h>
+#include <util/string2int.h>
+
+#include <ansi-c/string_constant.h>
 
 #include "javap_parse.h"
 
@@ -75,6 +78,7 @@ protected:
   typet rtype();
   void rcode(membert &dest_member);
   irep_idt rname();
+
   inline std::string getline()
   {
     std::string line;
@@ -100,10 +104,23 @@ protected:
     irep_idt kind;
     std::string value_string;
     exprt value_expr;
+    
+    constantt():value_expr(nil_exprt())
+    {
+    }
   };
   
   typedef std::map<unsigned, constantt> constantst;
   constantst constants;
+
+  void post_process_constants();
+
+  std::string constant(const std::string &ref)
+  {
+    // follow a #number
+    assert(!ref.empty() && ref[0]=='#');
+    return constants[atoi(ref.c_str()+1)].value_string;
+  }
   
   typedef std::map<unsigned, unsigned> address_to_linet;
   address_to_linet address_to_line;
@@ -271,12 +288,71 @@ void javap_parsert::rconstant(const std::string &line)
   if(has_suffix(value, ";"))
     value.resize(value.size()-1);
   
-  unsigned no=atoi(no_string.c_str());
+  unsigned no=safe_string2unsigned(no_string);
   constantt &constant=constants[no];
   constant.kind=kind;
   constant.value_string=value;
   
   // the expressions are produced once all are read
+}
+  
+/*******************************************************************\
+
+Function: javap_parsert::post_process_constants
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+#include <iostream>
+
+void javap_parsert::post_process_constants()
+{
+  for(constantst::iterator
+      c_it=constants.begin();
+      c_it!=constants.end();
+      c_it++)
+  {
+    constantt &c=c_it->second;
+
+    if(c.kind=="Method" || c.kind=="Field")
+    {
+      // this is #class.#NameAndType
+      assert(!c.value_string.empty());
+      std::size_t member_pos=c.value_string.find('#', 1);
+      assert(member_pos!=std::string::npos);
+      std::string class_string=constant(constant(c.value_string));
+      std::string name_and_type=constant(std::string(c.value_string, member_pos, std::string::npos));
+      assert(!name_and_type.empty()); // this is #name:#type
+      std::size_t type_pos=name_and_type.find('#', 1);
+      assert(type_pos!=std::string::npos);
+      std::string type_string=constant(std::string(name_and_type, type_pos, std::string::npos));
+      std::string member_string=constant(name_and_type);
+      
+      irep_idt identifier="java::"+class_string+"."+member_string;
+      c.value_expr=symbol_exprt(identifier);
+    }
+    else if(c.kind=="String")
+    {
+      // this is a ref to an Asciz
+      c.value_expr=string_constantt(constant(c.value_string));
+    }
+    else if(c.kind=="class")
+    {
+      // this is just a ref to a string with the identifier
+      c.value_expr=type_exprt(symbol_typet(constant(c.value_string)));
+    }
+    else if(c.kind=="Asciz" || c.kind=="NameAndType")
+    {
+      // nothing, only used indirectly
+    }
+    else
+      throw std::string("unhandled constant: ")+id2string(c.kind);
+  }
 }
   
 /*******************************************************************\
@@ -305,7 +381,7 @@ void javap_parsert::rcode(membert &dest_member)
   t=token(); // statement
   instruction.statement=t;
 
-  while(true)
+  while(lookahead()!="" && lookahead()!=";")
   {
     t=token(); // arguments
   
@@ -616,6 +692,7 @@ void javap_parsert::rclass()
     }
     else if(line=="{")
     {
+      post_process_constants();
       rmembers(c);
     }
     else if(has_prefix(line, "const "))
