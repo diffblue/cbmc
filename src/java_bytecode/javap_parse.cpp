@@ -543,31 +543,6 @@ typet javap_parsert::rtype()
   typet type;
   irep_idt t=token();
 
-  #if 0
-  if(t==ID_void)
-    type=empty_typet();
-  else if(t==ID_int)
-    type=signedbv_typet(32); // 32-bit signed two's complement integer.
-  else if(t==ID_byte)
-    type=signedbv_typet(8);  // 8-bit signed two's complement integer.
-  else if(t==ID_short)
-    type=signedbv_typet(16); // 16-bit signed two's complement integer.
-  else if(t==ID_long)
-    type=signedbv_typet(64); // 64-bit signed two's complement integer.
-  else if(t==ID_float)
-    type=ieee_float_spect::single_precision().to_type();  // 32-bit float
-  else if(t==ID_double)
-    type=ieee_float_spect::double_precision().to_type();  // 64-bit float
-  else if(t==ID_boolean)
-    type=bool_typet();
-  else if(t==ID_char)
-    type=unsignedbv_typet(16); // 16-bit Unicode character
-  else
-  {
-    // must be identifier
-  }
-  #endif
-
   if(t==ID_void || t==ID_int || t==ID_byte || t==ID_short ||
      t==ID_long || t==ID_float || t==ID_double || t==ID_boolean ||
      t==ID_char)
@@ -624,7 +599,7 @@ javap_parsert::membert &javap_parsert::rmember(classt &dest_class)
         lookahead()==ID_final ||
         lookahead()==ID_native)
   {
-    token();
+    token(); // eat
   }
 
   membert &m=dest_class.add_member();
@@ -633,15 +608,27 @@ javap_parsert::membert &javap_parsert::rmember(classt &dest_class)
   if(lookahead()==dest_class.name)
   {
     // yes, constructor
+    m.name=token();
+    m.type=typet(ID_constructor);
+  }
+  else if(lookahead()=="{")
+  {
+    // static {};
+    // These are static initializers, executed when the class is loaded.
+    token();
+    if(lookahead()=="}") token();
+    m.method=true;
+    m.name="{}";
+    m.type=typet(ID_constructor);
   }
   else
   {
     // get type
     m.type=rtype();
-  }
 
-  // get member name
-  m.name=token();
+    // get member name
+    m.name=token();
+  }
 
   // get postfix
   if(lookahead()=="(")

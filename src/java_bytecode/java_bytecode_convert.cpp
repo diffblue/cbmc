@@ -400,13 +400,15 @@ codet java_bytecode_convertt::convert_instructions(
       // load a value from a local variable
       results[0]=variable(arg0);
     }
-    else if(statement=="ldc")
+    else if(statement=="ldc" || statement=="ldc_w" ||
+            statement=="ldc2" || statement=="ldc2_w")
     {
-      assert(results.size()==1);
-      //results[0]=;
+      assert(op.empty() && results.size()==1);
+      results[0]=arg0;
     }
-    else if(statement=="goto")
+    else if(statement=="goto" || statement=="goto_w")
     {
+      assert(op.empty() && results.size()==0);
       irep_idt number=to_constant_expr(arg0).get_value();
       code_gotot code_goto(label(number));
       c=code_goto;
