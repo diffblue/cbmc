@@ -109,6 +109,10 @@ protected:
   void convert_minus(const minus_exprt &expr);
   void convert_div(const div_exprt &expr);
   void convert_mult(const mult_exprt &expr);
+  void convert_floatbv_plus(const exprt &expr);
+  void convert_floatbv_minus(const exprt &expr);
+  void convert_floatbv_div(const exprt &expr);
+  void convert_floatbv_mult(const exprt &expr);
   void convert_mod(const mod_exprt &expr);
   void convert_index(const index_exprt &expr);
   void convert_member(const member_exprt &expr);
