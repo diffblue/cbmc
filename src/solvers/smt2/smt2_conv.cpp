@@ -1822,22 +1822,23 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
     }
     else if(op_type.id()==ID_unsignedbv)
     {
+      // unsignedbv to floatbv
       const floatbv_typet &dst=to_floatbv_type(expr_type);
 
       if(use_FPA_theory)
       {
-        smt2_prop.out << "((_ fpromubv " << dst.get_e() << " "
+        smt2_prop.out << "((_ fpfromubv " << dst.get_e() << " "
                       << dst.get_f() << ") fp_round_nearest_even ";
         convert_expr(op);
         smt2_prop.out << ")";
       }
       else
       {
-        throw "TODO typecast6 floatbv -> int";
+        throw "TODO typecast6 int -> floatbv";
       }
     }
     else
-      throw "TODO typecast7 floatbv -> "+op_type.id_string();
+      throw "TODO typecast7 "+op_type.id_string()+" -> floatbv";
   }
   else
     throw "TODO typecast8 "+op_type.id_string()+" -> "+expr_type.id_string();
