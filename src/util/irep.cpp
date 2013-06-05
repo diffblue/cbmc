@@ -685,32 +685,15 @@ Function: irept::hash
 
 \*******************************************************************/
 
-#if 1
-
-static inline unsigned int _rotl(const size_t value, int shift)
+static inline size_t hash_rotl(const size_t value, int shift)
 {
   return (value << shift) | (value >> (sizeof(value)*8 - shift));
 }
 
-size_t irept::hash() const
+static inline size_t hash_combine(size_t h1, size_t h2)
 {
-  const irept::subt &sub=get_sub();
-  const irept::named_subt &named_sub=get_named_sub();
-
-  size_t result=hash_string(id());
-
-  forall_irep(it, sub) result=_rotl(result, 7)^it->hash();
-
-  forall_named_irep(it, named_sub)
-  {
-    result=_rotl(result, 7)^hash_string(it->first);
-    result=_rotl(result, 7)^it->second.hash();
-  }
-
-  return result;
+  return hash_rotl(h1, 7)^h2;
 }
-
-#else
 
 size_t irept::hash() const
 {
@@ -719,18 +702,16 @@ size_t irept::hash() const
 
   size_t result=hash_string(id());
 
-  forall_irep(it, sub) result=result^it->hash();
+  forall_irep(it, sub) result=hash_combine(result, it->hash());
 
   forall_named_irep(it, named_sub)
   {
-    result=result^hash_string(it->first);
-    result=result^it->second.hash();
+    result=hash_combine(result, hash_string(it->first));
+    result=hash_combine(result, it->second.hash());
   }
 
   return result;
 }
-
-#endif
 
 /*******************************************************************\
 
@@ -752,18 +733,18 @@ size_t irept::full_hash() const
 
   size_t result=hash_string(id());
 
-  forall_irep(it, sub) result=result^it->full_hash();
+  forall_irep(it, sub) result=hash_combine(result, it->full_hash());
 
   forall_named_irep(it, named_sub)
   {
-    result=result^hash_string(it->first);
-    result=result^it->second.full_hash();
+    result=hash_combine(result, hash_string(it->first));
+    result=hash_combine(result, it->second.full_hash());
   }
 
   forall_named_irep(it, comments)
   {
-    result=result^hash_string(it->first);
-    result=result^it->second.full_hash();
+    result=hash_combine(result, hash_string(it->first));
+    result=hash_combine(result, it->second.full_hash());
   }
 
   return result;
