@@ -16,6 +16,8 @@ class float1
     // constants
     f=1.1234f;
     f=java.lang.Float.POSITIVE_INFINITY;
+    f=java.lang.Float.NEGATIVE_INFINITY;
+    f=java.lang.Float.NaN;
   }
 }
 
