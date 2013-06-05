@@ -20,9 +20,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/ieee_float.h>
 #include <util/std_expr.h>
 #include <util/string2int.h>
+#include <util/arith_tools.h>
 
 #include <ansi-c/string_constant.h>
+#include <ansi-c/literals/convert_float_literal.h>
 
+#include "java_types.h"
 #include "javap_parse.h"
 
 #ifdef __linux__
@@ -349,6 +352,41 @@ void javap_parsert::post_process_constants()
     else if(c.kind=="Asciz" || c.kind=="NameAndType")
     {
       // nothing, only used indirectly
+    }
+    else if(c.kind=="long")
+    {
+      std::string number_str;
+
+      for(size_t i=0; i<c.value_string.size(); i++)
+      {
+        if(!isdigit(c.value_string[i]) && c.value_string[i]!='-') break;
+        number_str+=c.value_string[i];
+      }
+
+      mp_integer i=string2integer(number_str);
+      c.value_expr=from_integer(i, java_long_type());
+    }
+    else if(c.kind=="float")
+    {
+      if(c.value_string=="Infinityf")
+        c.value_expr=ieee_floatt::plus_infinity(ieee_float_spect::single_precision()).to_expr();
+      else if(c.value_string=="-Infinityf")
+        c.value_expr=ieee_floatt::plus_infinity(ieee_float_spect::single_precision()).to_expr();
+      else if(c.value_string=="NaNf")
+        c.value_expr=ieee_floatt::NaN(ieee_float_spect::single_precision()).to_expr();
+      else
+        c.value_expr=convert_float_literal(c.value_string);
+    }
+    else if(c.kind=="double")
+    {
+      if(c.value_string=="Infinityd")
+        c.value_expr=ieee_floatt::plus_infinity(ieee_float_spect::single_precision()).to_expr();
+      else if(c.value_string=="-Infinityd")
+        c.value_expr=ieee_floatt::plus_infinity(ieee_float_spect::single_precision()).to_expr();
+      else if(c.value_string=="NaNd")
+        c.value_expr=ieee_floatt::NaN(ieee_float_spect::single_precision()).to_expr();
+      else
+        c.value_expr=convert_float_literal(c.value_string);
     }
     else
       throw std::string("unhandled constant: ")+id2string(c.kind);
