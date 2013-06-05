@@ -22,12 +22,8 @@ Function: java_bytecode_typecheckt::typecheck_expr
 
 \*******************************************************************/
 
-#include <iostream>
-
 void java_bytecode_typecheckt::typecheck_expr(exprt &expr)
 { 
-  std::cout << "E: " << expr.id() << std::endl;
-
   if(expr.id()==ID_code)
     return typecheck_code(to_code(expr));
   
