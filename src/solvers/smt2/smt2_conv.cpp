@@ -104,7 +104,7 @@ constant_exprt smt2_convt::parse_constant(
   // * Decimal -- this is a decimal expansion of a real number and is of the form:
   //                (0|[1-9][0-9]*)[.]([0-9]+)
   // * Binary -- this is a natural number in binary and is of the form:
-  //                #x[01]+
+  //                #b[01]+
   // * Hex -- this is a natural number in hexadecimal and is of the form:
   //                #x[0-9a-fA-F]+
   //
@@ -255,7 +255,7 @@ void smt2_convt::set_value(
      type.id()==ID_fixedbv ||
      type.id()==ID_floatbv)
   {
-    constant_exprt c = parse_constant(v, type);
+    constant_exprt c=parse_constant(v, type);
     identifier.value=c;
 
     assert(boolbv_width(type) == boolbv_width(c.type()));
