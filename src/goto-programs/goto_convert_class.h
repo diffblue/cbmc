@@ -101,18 +101,12 @@ protected:
   void remove_function_call(side_effect_exprt &expr, goto_programt &dest, bool result_is_used);
   void remove_cpp_new(side_effect_exprt &expr, goto_programt &dest, bool result_is_used);
   void remove_cpp_delete(side_effect_exprt &expr, goto_programt &dest, bool result_is_used);
-  void remove_java_new(side_effect_exprt &expr, goto_programt &dest, bool result_is_used);
   void remove_malloc(side_effect_exprt &expr, goto_programt &dest, bool result_is_used);
   void remove_temporary_object(side_effect_exprt &expr, goto_programt &dest, bool result_is_used);
   void remove_statement_expression(side_effect_exprt &expr, goto_programt &dest, bool result_is_used);
   void remove_gcc_conditional_expression(exprt &expr, goto_programt &dest);
 
   virtual void do_cpp_new(
-    const exprt &lhs,
-    const side_effect_exprt &rhs,
-    goto_programt &dest);
-
-  virtual void do_java_new(
     const exprt &lhs,
     const side_effect_exprt &rhs,
     goto_programt &dest);
