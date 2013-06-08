@@ -480,6 +480,46 @@ void goto_convertt::remove_cpp_new(
 
 /*******************************************************************\
 
+Function: goto_convertt::remove_java_new
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void goto_convertt::remove_java_new(
+  side_effect_exprt &expr,
+  goto_programt &dest,
+  bool result_is_used)
+{
+  codet call;
+
+  symbolt new_symbol;
+
+  new_symbol.base_name="new_ref$"+i2string(++temporary_counter);
+  new_symbol.is_lvalue=true;
+  new_symbol.type=expr.type();
+  new_symbol.is_file_local=true;
+  new_symbol.name=tmp_symbol_prefix+id2string(new_symbol.base_name);
+
+  new_name(new_symbol);
+  tmp_symbols.push_back(new_symbol.name);
+
+  call=code_assignt(symbol_expr(new_symbol), expr);
+
+  if(result_is_used)
+    static_cast<exprt &>(expr)=symbol_expr(new_symbol);
+  else
+    expr.make_nil();
+
+  convert(call, dest);
+}
+
+/*******************************************************************\
+
 Function: goto_convertt::remove_cpp_delete
 
   Inputs:
@@ -739,6 +779,9 @@ void goto_convertt::remove_side_effect(
   else if(statement==ID_cpp_new ||
           statement==ID_cpp_new_array)
     remove_cpp_new(expr, dest, result_is_used);
+  else if(statement==ID_java_new ||
+          statement==ID_java_new_array)
+    remove_java_new(expr, dest, result_is_used);
   else if(statement==ID_cpp_delete ||
           statement==ID_cpp_delete_array)
     remove_cpp_delete(expr, dest, result_is_used);
