@@ -534,6 +534,129 @@ void goto_convertt::do_cpp_new(
 
 /*******************************************************************\
 
+Function: goto_convertt::do_java_new
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void goto_convertt::do_java_new(
+  const exprt &lhs,
+  const side_effect_exprt &rhs,
+  goto_programt &dest)
+{
+  if(lhs.is_nil())
+    throw "do_java_new without lhs is yet to be implemented";
+  
+  #if 0
+  // build size expression
+  exprt object_size=
+    static_cast<const exprt &>(rhs.find(ID_sizeof));
+
+  bool new_array=rhs.get(ID_statement)==ID_java_new_array;
+  
+  exprt count;
+
+  if(new_array)
+  {
+    count=static_cast<const exprt &>(rhs.find(ID_size));
+
+    if(count.type()!=object_size.type())
+      count.make_typecast(object_size.type());
+
+    // might have side-effect
+    clean_expr(count, dest);
+  }
+
+  exprt tmp_symbol_expr;
+
+  // is this a placement new?
+  if(rhs.operands().size()==0) // no, "regular" one
+  {
+    // call __new or __new_array
+    exprt new_symbol=symbol_expr(
+      ns.lookup(new_array?"c::__new_array":"c::__new"));
+    
+    const code_typet &code_type=
+      to_code_type(new_symbol.type());
+
+    const typet &return_type=
+      code_type.return_type();
+
+    assert(code_type.arguments().size()==1 ||
+           code_type.arguments().size()==2);
+
+    const symbolt &tmp_symbol=
+      new_tmp_symbol(return_type, "new", dest, rhs.location());
+    
+    tmp_symbol_expr=symbol_expr(tmp_symbol);
+    
+    code_function_callt new_call;
+    new_call.function()=new_symbol;
+    if(new_array) new_call.arguments().push_back(count);
+    new_call.arguments().push_back(object_size);
+    new_call.set("#type", lhs.type().subtype());
+    new_call.lhs()=tmp_symbol_expr;
+    new_call.location()=rhs.location();
+    
+    convert(new_call, dest);
+  }
+  else if(rhs.operands().size()==1)
+  {
+    // call __placement_new
+    exprt new_symbol=symbol_expr(
+      ns.lookup(new_array?"c::__placement_new_array":"c::__placement_new"));
+    
+    const code_typet &code_type=
+      to_code_type(new_symbol.type());
+
+    const typet &return_type=code_type.return_type();
+    
+    assert(code_type.arguments().size()==2 ||
+           code_type.arguments().size()==3);
+
+    const symbolt &tmp_symbol=
+      new_tmp_symbol(return_type, "new", dest, rhs.location());
+
+    tmp_symbol_expr=symbol_expr(tmp_symbol);
+
+    code_function_callt new_call;
+    new_call.function()=new_symbol;
+    if(new_array) new_call.arguments().push_back(count);
+    new_call.arguments().push_back(object_size);
+    new_call.arguments().push_back(rhs.op0()); // memory location
+    new_call.set("#type", lhs.type().subtype());
+    new_call.lhs()=tmp_symbol_expr;
+    new_call.location()=rhs.location();
+
+    for(unsigned i=0; i<code_type.arguments().size(); i++)
+      if(new_call.arguments()[i].type()!=code_type.arguments()[i].type())
+        new_call.arguments()[i].make_typecast(code_type.arguments()[i].type());
+    
+    convert(new_call, dest);
+  }
+  else
+    throw "java_new expected to have 0 or 1 operands";
+
+  goto_programt::targett t_n=dest.add_instruction(ASSIGN);
+  t_n->code=code_assignt(
+    lhs, typecast_exprt(tmp_symbol_expr, lhs.type()));
+  t_n->location=rhs.find_location();
+    
+  // grab initializer
+  goto_programt tmp_initializer;
+  cpp_new_initializer(lhs, rhs, tmp_initializer);
+
+  dest.destructive_append(tmp_initializer);
+  #endif
+}
+
+/*******************************************************************\
+
 Function: goto_convertt::cpp_new_initializer
 
   Inputs:
