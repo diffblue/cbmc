@@ -57,6 +57,12 @@ public:
   }
 };
 
+/*! \brief The void type
+*/
+class void_typet:public empty_typet
+{
+};
+
 /*! \brief Unbounded, signed integers
 */
 class integer_typet:public typet
