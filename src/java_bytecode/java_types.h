@@ -32,5 +32,6 @@ typet java_reference_type(const typet &subtype);
 // a  reference
 
 typet java_type(char t);
+typet java_type_from_string(const std::string &);
 
 #endif

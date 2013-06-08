@@ -337,13 +337,8 @@ void javap_parsert::post_process_constants()
       std::string member_string=constant(name_and_type);
       
       irep_idt identifier="java::"+class_string+"."+member_string;
+      typet type=java_type_from_string(type_string);
       
-      typet type;
-      if(c.kind=="Method")
-        type=code_typet();
-      else
-        type=java_int_type();
-
       c.value_expr=symbol_exprt(identifier, type);
       c.value_expr.set(ID_C_base_name, member_string);
     }

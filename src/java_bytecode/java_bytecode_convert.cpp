@@ -105,6 +105,18 @@ protected:
     return result;
   }
   
+  // temporary variables
+  unsigned tmp_counter;
+  
+  symbol_exprt tmp_variable(const typet &type)
+  {
+    irep_idt base_name="tmp"+i2string(tmp_counter++);
+    irep_idt identifier=id2string(current_method)+"::"+id2string(base_name);
+    symbol_exprt result(identifier, type);
+    result.set(ID_C_base_name, base_name);
+    return result;
+  }
+  
   // JVM program locations
   irep_idt label(const irep_idt &address)
   {
@@ -242,6 +254,7 @@ void java_bytecode_convertt::convert(
                               id2string(method.get_base_name())+"()";
     method_symbol.type=type;
     current_method=method_symbol.name;
+    tmp_counter=0;
     method_symbol.value=convert_instructions(m.instructions);
     symbol_table.add(method_symbol);
   }
@@ -368,8 +381,17 @@ codet java_bytecode_convertt::convert_instructions(
             statement=="invokestatic" ||
             statement=="invokevirtual")
     {
+      const typet &return_type=to_code_type(arg0.type()).return_type();
       code_function_callt call;
       call.function()=arg0;
+
+      if(return_type.id()!=ID_void)
+      {
+        call.lhs()=tmp_variable(return_type);
+        results.resize(1);
+        results[0]=call.lhs();
+      }
+      
       c=call;
     }
     else if(statement=="return")
@@ -425,10 +447,10 @@ codet java_bytecode_convertt::convert_instructions(
       assert(results.size()==1);
       results[0]=from_integer(-1, java_int_type());
     }
-    else if(statement=="iconst")
+    else if(statement==patternt("?const"))
     {
       assert(results.size()==1);
-      results[0]=from_integer(0, java_int_type());
+      results[0]=from_integer(0, java_type(statement[0]));
     }
     else if(statement=="bipush")
     {
@@ -497,6 +519,16 @@ codet java_bytecode_convertt::convert_instructions(
       assert(op.size()==2 && results.size()==1);
       results[0]=bitxor_exprt(op[0], op[1]);
     }
+    else if(statement==patternt("?or"))
+    {
+      assert(op.size()==2 && results.size()==1);
+      results[0]=bitor_exprt(op[0], op[1]);
+    }
+    else if(statement==patternt("?and"))
+    {
+      assert(op.size()==2 && results.size()==1);
+      results[0]=bitand_exprt(op[0], op[1]);
+    }
     else if(statement==patternt("?shl"))
     {
       assert(op.size()==2 && results.size()==1);
@@ -545,6 +577,18 @@ codet java_bytecode_convertt::convert_instructions(
     else if(statement==patternt("?cmp"))
     {
       assert(op.size()==2 && results.size()==1);
+
+      // The integer result on the stack is:
+      //  0 if op[1] equals op[0]
+      // -1 if op[1] is less than op[0]
+      //  1 if op[1] is greater than op[0]
+      
+      typet t=java_int_type();
+
+      results[0]=
+        if_exprt(binary_relation_exprt(op[0], ID_equal, op[1]), gen_zero(t),
+        if_exprt(binary_relation_exprt(op[0], ID_gt, op[1]), from_integer(-1, t),
+        from_integer(1, t)));
     }
     else if(statement==patternt("?cmpg"))
     {
@@ -598,20 +642,29 @@ codet java_bytecode_convertt::convert_instructions(
     }
     else if(statement=="new")
     {
+      // use temporary since the stack symbol might get duplicated
       assert(op.empty() && results.size()==1);
-      results[0]=side_effect_exprt(ID_java_new, arg0.type());
+      exprt tmp=tmp_variable(arg0.type());
+      c=code_assignt(tmp, side_effect_exprt(ID_java_new, arg0.type()));
+      results[0]=tmp;
     }
     else if(statement=="newarray")
     {
+      // use temporary since the stack symbol might get duplicated
       assert(op.size()==1 && results.size()==1);
       array_typet array_type(arg0.type(), op[0]);
-      results[0]=side_effect_exprt(ID_java_new_array, array_type);
+      exprt tmp=tmp_variable(arg0.type());
+      c=code_assignt(tmp, side_effect_exprt(ID_java_new, array_type));
+      results[0]=tmp;
     }
     else if(statement=="anewarray")
     {
+      // use temporary since the stack symbol might get duplicated
       assert(op.size()==1 && results.size()==1);
       array_typet array_type(java_reference_type(arg0.type()), op[0]);
-      results[0]=side_effect_exprt(ID_java_new_array, array_type);
+      exprt tmp=tmp_variable(arg0.type());
+      c=code_assignt(tmp, side_effect_exprt(ID_java_new, array_type));
+      results[0]=tmp;
     }
     else if(statement=="tableswitch")
     {
