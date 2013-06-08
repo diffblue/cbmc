@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_bytecode_convert.h"
 #include "java_entry_point.h"
 #include "javap_parse.h"
+#include "internal_additions.h"
 
 /*******************************************************************\
 
@@ -152,6 +153,7 @@ bool java_bytecode_languaget::final(
   /*
   if(c_final(symbol_table, message_handler)) return true;
   */
+  java_internal_additions(symbol_table);
 
   if(java_entry_point(symbol_table, message_handler)) return true;
   
