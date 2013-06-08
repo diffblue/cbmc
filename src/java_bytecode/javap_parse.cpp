@@ -339,6 +339,7 @@ void javap_parsert::post_process_constants()
       irep_idt identifier="java::"+class_string+"."+member_string;
       code_typet type;
       c.value_expr=symbol_exprt(identifier, type);
+      c.value_expr.set(ID_C_base_name, member_string);
     }
     else if(c.kind=="String")
     {
