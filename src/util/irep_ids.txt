@@ -194,6 +194,8 @@ cpp_new
 cpp_delete
 cpp_new_array cpp_new[]
 cpp_delete_array cpp_delete[]
+java_new
+java_new_array
 printf
 input
 output
