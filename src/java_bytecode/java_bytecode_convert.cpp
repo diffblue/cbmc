@@ -368,6 +368,9 @@ codet java_bytecode_convertt::convert_instructions(
     else if(statement=="athrow")
     {
       assert(op.size()==1 && results.size()==1);
+      side_effect_exprt throw_expr(ID_throw);
+      throw_expr.copy_to_operands(op[0]);
+      c=code_expressiont(throw_expr);
       results[0]=op[0];
     }
     else if(statement=="checkcast")
