@@ -361,24 +361,24 @@ public:
     return op0();
   }
   
-  inline const exprt &then_case() const
+  inline const codet &then_case() const
   {
-    return op1();
+    return static_cast<const codet &>(op1());
   }
 
   inline const exprt &else_case() const
   {
-    return op2();
+    return static_cast<const codet &>(op2());
   }
 
-  inline exprt &then_case()
+  inline codet &then_case()
   {
-    return op1();
+    return static_cast<codet &>(op1());
   }
 
   inline exprt &else_case()
   {
-    return op2();
+    return static_cast<codet &>(op2());
   }
 };
 

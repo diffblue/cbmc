@@ -222,7 +222,7 @@ void goto_convertt::convert_CPROVER_try_catch(
   code_ifthenelset catch_code;
   catch_code.cond()=exception_flag();
   catch_code.location()=code.location();
-  catch_code.then_case()=code.op1();
+  catch_code.then_case()=to_code(code.op1());
 
   targets.destructor_stack.push_back(catch_code);
 
