@@ -618,19 +618,19 @@ codet java_bytecode_convertt::convert_instructions(
     else if(statement=="new")
     {
       assert(op.empty() && results.size()==1);
-      results[0]=side_effect_exprt(ID_cpp_new, arg0.type());
+      results[0]=side_effect_exprt(ID_java_new, arg0.type());
     }
     else if(statement=="newarray")
     {
       assert(op.size()==1 && results.size()==1);
       array_typet array_type(arg0.type(), op[0]);
-      results[0]=side_effect_exprt(ID_cpp_new_array, array_type);
+      results[0]=side_effect_exprt(ID_java_new_array, array_type);
     }
     else if(statement=="anewarray")
     {
       assert(op.size()==1 && results.size()==1);
       array_typet array_type(java_reference_type(arg0.type()), op[0]);
-      results[0]=side_effect_exprt(ID_cpp_new_array, array_type);
+      results[0]=side_effect_exprt(ID_java_new_array, array_type);
     }
     else if(statement=="tableswitch")
     {
