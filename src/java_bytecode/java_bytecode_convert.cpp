@@ -648,7 +648,7 @@ codet java_bytecode_convertt::convert_instructions(
       // use temporary since the stack symbol might get duplicated
       assert(op.empty() && results.size()==1);
       exprt tmp=tmp_variable(arg0.type());
-      c=code_assignt(tmp, side_effect_exprt(ID_java_new, arg0.type()));
+      c=code_assignt(tmp, side_effect_exprt(ID_cpp_new, arg0.type()));
       results[0]=tmp;
     }
     else if(statement=="newarray")
