@@ -98,9 +98,10 @@ protected:
   symbol_exprt variable(const exprt &arg, char type_char)
   {
     irep_idt number=to_constant_expr(arg).get_value();
-    irep_idt identifier=id2string(current_method)+"::local"+id2string(number);
+    irep_idt base_name="local"+id2string(number)+type_char;
+    irep_idt identifier=id2string(current_method)+"::"+id2string(base_name);
     symbol_exprt result(identifier, java_type(type_char));
-    result.set(ID_C_base_name, "local"+id2string(number));
+    result.set(ID_C_base_name, base_name);
     return result;
   }
   
