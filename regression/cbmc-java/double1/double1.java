@@ -4,7 +4,7 @@ class double1
   {
     java.util.Random random = new java.util.Random(42);
     
-    double d=random.nextFloat();
+    double d=random.nextDouble();
 
     // conversions
     int i=(int)d;
