@@ -95,28 +95,13 @@ protected:
   irep_idt current_method;
   
   // JVM local variables
-  struct vart
-  {  
-    symbol_exprt symbol_expr;
-  };
-  
-  typedef std::map<irep_idt, vart> varst;
-  varst vars;
-  
-  symbol_exprt read_variable(const exprt &arg)
-  {
-    irep_idt number=to_constant_expr(arg).get_value();
-    return vars[number].symbol_expr;
-  }
-  
-  symbol_exprt write_variable(const exprt &arg, const typet &type)
+  symbol_exprt variable(const exprt &arg, char type_char)
   {
     irep_idt number=to_constant_expr(arg).get_value();
     irep_idt identifier=id2string(current_method)+"::local"+id2string(number);
-    vart &var=vars[number];
-    var.symbol_expr=symbol_exprt(identifier, type);
-    var.symbol_expr.set(ID_C_base_name, "local"+id2string(number));
-    return var.symbol_expr;
+    symbol_exprt result(identifier, java_type(type_char));
+    result.set(ID_C_base_name, "local"+id2string(number));
+    return result;
   }
   
   // JVM program locations
@@ -412,14 +397,14 @@ codet java_bytecode_convertt::convert_instructions(
       // store value into some local variable
       assert(op.size()==1 && results.empty());
       code_assignt code_assign;
-      code_assign.lhs()=write_variable(arg0, op[0].type());
+      code_assign.lhs()=variable(arg0, statement[0]);
       code_assign.rhs()=op[0];
       c=code_assign;
     }
     else if(statement==patternt("?load"))
     {
       // load a value from a local variable
-      results[0]=read_variable(arg0);
+      results[0]=variable(arg0, statement[0]);
     }
     else if(statement=="ldc" || statement=="ldc_w" ||
             statement=="ldc2" || statement=="ldc2_w")
@@ -465,10 +450,19 @@ codet java_bytecode_convertt::convert_instructions(
     }
     else if(statement==patternt("if??"))
     {
+      const irep_idt id=
+        statement=="ifeq"?ID_equal:
+        statement=="ifne"?ID_notequal:
+        statement=="iflt"?ID_lt:
+        statement=="ifge"?ID_ge:
+        statement=="ifgt"?ID_gt:
+        statement=="ifle"?ID_le:
+        (assert(false), "");
+    
       irep_idt number=to_constant_expr(arg0).get_value();
       assert(op.size()==1 && results.empty());
       code_ifthenelset code_branch;
-      code_branch.cond()=binary_relation_exprt(op[0], ID_equal, gen_zero(op[0].type()));
+      code_branch.cond()=binary_relation_exprt(op[0], id, gen_zero(op[0].type()));
       code_branch.then_case()=code_gotot(label(number));
       c=code_branch;
     }
@@ -493,8 +487,8 @@ codet java_bytecode_convertt::convert_instructions(
     else if(statement=="iinc")
     {
       code_assignt code_assign;
-      code_assign.lhs()=write_variable(arg0, java_int_type());
-      code_assign.rhs()=plus_exprt(read_variable(arg0), typecast_exprt(arg1, java_int_type()));
+      code_assign.lhs()=variable(arg0, 'i');
+      code_assign.rhs()=plus_exprt(variable(arg0, 'i'), typecast_exprt(arg1, java_int_type()));
       c=code_assign;
     }
     else if(statement==patternt("?xor"))
@@ -589,31 +583,17 @@ codet java_bytecode_convertt::convert_instructions(
     else if(statement=="getstatic")
     {
       assert(op.empty() && results.size()==1);
+      results[0]=arg0;
     }
-    else if(statement==patternt("?il"))
+    else if(statement=="putstatic")
+    {
+      assert(op.size()==1 && results.empty());
+      c=code_assignt(arg0, op[0]);
+    }
+    else if(statement==patternt("?2?")) // i2c etc.
     {
       assert(op.size()==1 && results.size()==1);
-      results[0]=typecast_exprt(op[0], java_long_type());
-    }
-    else if(statement==patternt("?if"))
-    {
-      assert(op.size()==1 && results.size()==1);
-      results[0]=typecast_exprt(op[0], java_float_type());
-    }
-    else if(statement==patternt("?id"))
-    {
-      assert(op.size()==1 && results.size()==1);
-      results[0]=typecast_exprt(op[0], java_double_type());
-    }
-    else if(statement==patternt("?ib"))
-    {
-      assert(op.size()==1 && results.size()==1);
-      results[0]=typecast_exprt(op[0], java_byte_type());
-    }
-    else if(statement==patternt("?is"))
-    {
-      assert(op.size()==1 && results.size()==1);
-      results[0]=typecast_exprt(op[0], java_short_type());
+      results[0]=typecast_exprt(op[0], java_type(statement[2]));
     }
     else if(statement=="new")
     {

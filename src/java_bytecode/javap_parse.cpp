@@ -337,7 +337,13 @@ void javap_parsert::post_process_constants()
       std::string member_string=constant(name_and_type);
       
       irep_idt identifier="java::"+class_string+"."+member_string;
-      code_typet type;
+      
+      typet type;
+      if(c.kind=="Method")
+        type=code_typet();
+      else
+        type=java_int_type();
+
       c.value_expr=symbol_exprt(identifier, type);
       c.value_expr.set(ID_C_base_name, member_string);
     }
@@ -349,7 +355,8 @@ void javap_parsert::post_process_constants()
     else if(c.kind=="class")
     {
       // this is just a ref to a string with the identifier
-      c.value_expr=type_exprt(symbol_typet(constant(c.value_string)));
+      irep_idt identifier="java::"+constant(c.value_string);
+      c.value_expr=type_exprt(symbol_typet(identifier));
     }
     else if(c.kind=="Asciz" || c.kind=="NameAndType")
     {

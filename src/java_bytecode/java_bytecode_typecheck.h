@@ -55,7 +55,7 @@ protected:
 
   void typecheck_symbol(symbolt &symbol);
   void typecheck_code(codet &code);
-  
+  void typecheck_type(typet &type);
   void typecheck_expr_symbol(symbol_exprt &expr);
 
   // overload to use language specific syntax
