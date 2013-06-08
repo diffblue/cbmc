@@ -92,24 +92,39 @@ public:
 protected:
   symbol_tablet &symbol_table;
   
-  symbol_exprt variable(const exprt &arg)
+  irep_idt current_method;
+  
+  // JVM local variables
+  struct vart
+  {  
+    symbol_exprt symbol_expr;
+  };
+  
+  typedef std::map<irep_idt, vart> varst;
+  varst vars;
+  
+  symbol_exprt read_variable(const exprt &arg)
   {
     irep_idt number=to_constant_expr(arg).get_value();
-    return symbol_exprt("java::local"+id2string(number));
+    return vars[number].symbol_expr;
   }
   
+  symbol_exprt write_variable(const exprt &arg, const typet &type)
+  {
+    irep_idt number=to_constant_expr(arg).get_value();
+    irep_idt identifier=id2string(current_method)+"::local"+id2string(number);
+    vart &var=vars[number];
+    var.symbol_expr=symbol_exprt(identifier, type);
+    var.symbol_expr.set(ID_C_base_name, "local"+id2string(number));
+    return var.symbol_expr;
+  }
+  
+  // JVM program locations
   irep_idt label(const irep_idt &address)
   {
     return "pc"+id2string(address);
   }
 
-  void convert(const java_bytecode_parse_treet &parse_tree);
-  void convert(const classt &c);
-  void convert(symbolt &class_symbol, const membert &m);
-  void convert(const instructiont &i);
-  typet convert(const typet &type);
-  codet convert_instructions(const instructionst &);
-  
   // JVM Stack
   typedef std::vector<exprt> stackt;
   stackt stack;
@@ -136,10 +151,14 @@ protected:
       stack[stack.size()-o.size()+i]=o[i];
   }
 
-  // Local Variables 
-  typedef std::vector<exprt> varst;
-  varst vars;
-  
+  // conversion
+  void convert(const java_bytecode_parse_treet &parse_tree);
+  void convert(const classt &c);
+  void convert(symbolt &class_symbol, const membert &m);
+  void convert(const instructiont &i);
+  typet convert(const typet &type);
+  codet convert_instructions(const instructionst &);  
+
   static const bytecode_infot &get_bytecode_info(const irep_idt &statement);
 };
 
@@ -236,6 +255,7 @@ void java_bytecode_convertt::convert(
     method_symbol.pretty_name=id2string(class_symbol.pretty_name)+"."+
                               id2string(method.get_base_name())+"()";
     method_symbol.type=type;
+    current_method=method_symbol.name;
     method_symbol.value=convert_instructions(m.instructions);
     symbol_table.add(method_symbol);
   }
@@ -392,14 +412,14 @@ codet java_bytecode_convertt::convert_instructions(
       // store value into some local variable
       assert(op.size()==1 && results.empty());
       code_assignt code_assign;
-      code_assign.lhs()=variable(arg0);
+      code_assign.lhs()=write_variable(arg0, op[0].type());
       code_assign.rhs()=op[0];
       c=code_assign;
     }
     else if(statement==patternt("?load"))
     {
       // load a value from a local variable
-      results[0]=variable(arg0);
+      results[0]=read_variable(arg0);
     }
     else if(statement=="ldc" || statement=="ldc_w" ||
             statement=="ldc2" || statement=="ldc2_w")
@@ -424,10 +444,15 @@ codet java_bytecode_convertt::convert_instructions(
       assert(results.size()==1);
       results[0]=from_integer(0, java_int_type());
     }
-    else if(statement=="bipush" || statement=="sipush")
+    else if(statement=="bipush")
     {
       assert(results.size()==1);
-      results[0]=arg0;
+      results[0]=typecast_exprt(arg0, java_int_type());
+    }
+    else if(statement=="sipush")
+    {
+      assert(results.size()==1);
+      results[0]=typecast_exprt(arg0, java_short_type());
     }
     else if(statement==patternt("if_?cmp??"))
     {
@@ -468,8 +493,8 @@ codet java_bytecode_convertt::convert_instructions(
     else if(statement=="iinc")
     {
       code_assignt code_assign;
-      code_assign.lhs()=variable(arg0);
-      code_assign.rhs()=plus_exprt(variable(arg0), arg1);
+      code_assign.lhs()=write_variable(arg0, java_int_type());
+      code_assign.rhs()=plus_exprt(read_variable(arg0), typecast_exprt(arg1, java_int_type()));
       c=code_assign;
     }
     else if(statement==patternt("?xor"))
@@ -720,4 +745,3 @@ bool java_bytecode_convert(
 
   return true;
 }
-

@@ -62,12 +62,11 @@ void java_bytecode_typecheckt::typecheck_expr_symbol(symbol_exprt &expr)
     if(colon_pos==std::string::npos)
       throw "mal-formed Java identifier: `"+id2string(identifier)+"'";
 
-    
-  
     // no, create the symbol
     symbolt new_symbol;
     new_symbol.name=identifier;
     new_symbol.type=expr.type();
+    new_symbol.base_name=expr.get(ID_C_base_name);
     
     symbol_table.add(new_symbol);
     
