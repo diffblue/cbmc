@@ -67,6 +67,7 @@ void java_bytecode_typecheckt::typecheck_expr_symbol(symbol_exprt &expr)
     // no, create the symbol
     symbolt new_symbol;
     new_symbol.name=identifier;
+    new_symbol.type=expr.type();
     
     symbol_table.add(new_symbol);
     

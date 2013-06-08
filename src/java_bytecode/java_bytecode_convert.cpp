@@ -107,6 +107,7 @@ protected:
   void convert(const classt &c);
   void convert(symbolt &class_symbol, const membert &m);
   void convert(const instructiont &i);
+  typet convert(const typet &type);
   codet convert_instructions(const instructionst &);
   
   // JVM Stack
@@ -221,7 +222,7 @@ void java_bytecode_convertt::convert(
     class_typet::methodt &method=class_type.methods().back();
     
     code_typet type;
-    type.return_type()=m.type;
+    type.return_type()=convert(m.type);
     //type.parameters()=m.parameters;
     
     method.set_base_name(m.name);
@@ -250,7 +251,7 @@ void java_bytecode_convertt::convert(
 
 /*******************************************************************\
 
-Function: java_bytecode_convertt::convert_instructions
+Function: java_bytecode_convertt::get_bytecode_info
 
   Inputs:
 
@@ -637,6 +638,44 @@ codet java_bytecode_convertt::convert_instructions(
   }
   
   return code;
+}
+
+/*******************************************************************\
+
+Function: java_bytecode_convertt::convert
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+typet java_bytecode_convertt::convert(const typet &type)
+{
+  if(type.id()==ID_void)
+    return empty_typet();
+  else if(type.id()==ID_code)
+  {
+    code_typet code_type=to_code_type(type); // copy
+    
+    code_type.return_type()=convert(code_type.return_type());
+    
+    code_typet::parameterst &parameters=code_type.parameters();
+
+    for(code_typet::parameterst::iterator
+        it=parameters.begin();
+        it!=parameters.end();
+        it++)
+    {
+      it->type()=convert(it->type());
+    }
+    
+    return code_type;
+  }
+  else
+    return type;
 }
 
 /*******************************************************************\

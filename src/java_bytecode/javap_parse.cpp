@@ -337,7 +337,8 @@ void javap_parsert::post_process_constants()
       std::string member_string=constant(name_and_type);
       
       irep_idt identifier="java::"+class_string+"."+member_string;
-      c.value_expr=symbol_exprt(identifier);
+      code_typet type;
+      c.value_expr=symbol_exprt(identifier, type);
     }
     else if(c.kind=="String")
     {
@@ -609,7 +610,7 @@ javap_parsert::membert &javap_parsert::rmember(classt &dest_class)
   {
     // yes, constructor
     m.name=token();
-    m.type=typet(ID_constructor);
+    m.type=typet(ID_void);
   }
   else if(lookahead()=="{")
   {
@@ -619,7 +620,7 @@ javap_parsert::membert &javap_parsert::rmember(classt &dest_class)
     if(lookahead()=="}") token();
     m.method=true;
     m.name="{}";
-    m.type=typet(ID_constructor);
+    m.type=typet(ID_void);
   }
   else
   {
