@@ -243,7 +243,9 @@ typet java_type_from_string(const std::string &src)
     
   case 'F': return java_float_type();    
   case 'D': return java_double_type();
-  case 'Z': return java_int_type();
+  case 'I': return java_int_type();
+  case 'C': return java_char_type();
+  case 'Z': return java_boolean_type();
   case 'V': return java_void_type();  
   case 'J': return java_long_type();  
 
