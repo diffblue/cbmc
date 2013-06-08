@@ -32,6 +32,23 @@ typet java_int_type()
 
 /*******************************************************************\
 
+Function: java_void_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+typet java_void_type()
+{
+  return void_typet();
+}
+
+/*******************************************************************\
+
 Function: java_long_type
 
   Inputs:
@@ -194,3 +211,54 @@ typet java_type(char t)
   default: assert(false);
   }
 }
+
+/*******************************************************************\
+
+Function: java_type_from_string
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+typet java_type_from_string(const std::string &src)
+{
+  if(src.empty())
+    return nil_typet();
+
+  switch(src[0])
+  {
+  case '(': // function type
+    {
+      std::size_t e_pos=src.rfind(')');
+      if(e_pos==std::string::npos) return nil_typet();
+      code_typet result;
+      result.return_type()=
+        java_type_from_string(std::string(src, e_pos+1, std::string::npos));
+      return result;
+    }
+    
+  case 'F': return java_float_type();    
+  case 'D': return java_double_type();
+  case 'Z': return java_int_type();
+  case 'V': return java_void_type();  
+  case 'J': return java_long_type();  
+
+  case 'L':
+    {
+      std::size_t e_pos=src.rfind(';');
+      if(e_pos==std::string::npos) return nil_typet();
+      reference_typet result;
+      result.subtype()=
+        java_type_from_string(std::string(src, 1, e_pos-2));
+      return result;
+    }
+  
+  default:
+    return nil_typet();
+  }
+}
+
