@@ -207,7 +207,7 @@ typet java_type(char t)
   case 'f': return java_float_type();
   case 'd': return java_double_type();
   case 'z': return java_boolean_type();
-  case 'a': return java_reference_type(typet());
+  case 'a': return java_reference_type(void_typet());
   default: assert(false);
   }
 }

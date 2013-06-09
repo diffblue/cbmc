@@ -37,7 +37,8 @@ public:
     message_handlert &_message_handler):
     typecheckt(_message_handler),
     namespacet(_symbol_table),
-    symbol_table(_symbol_table),
+    src_symbol_table(_symbol_table),
+    ns(dest_symbol_table),
     module(_module),
     mode(ID_java)
   {
@@ -49,7 +50,9 @@ public:
   virtual void typecheck_expr(exprt &expr);
   
 protected:
-  symbol_tablet &symbol_table;
+  symbol_tablet &src_symbol_table;
+  symbol_tablet dest_symbol_table;
+  const namespacet ns;
   const irep_idt module;
   const irep_idt mode;
 
@@ -57,6 +60,7 @@ protected:
   void typecheck_code(codet &code);
   void typecheck_type(typet &type);
   void typecheck_expr_symbol(symbol_exprt &expr);
+  void typecheck_expr_java_new(side_effect_exprt &expr);
 
   // overload to use language specific syntax
   virtual std::string to_string(const exprt &expr);

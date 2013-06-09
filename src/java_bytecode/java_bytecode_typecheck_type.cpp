@@ -7,6 +7,7 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <util/std_types.h>
+#include <util/prefix.h>
 
 #include "java_bytecode_typecheck.h"
 
@@ -28,29 +29,36 @@ void java_bytecode_typecheckt::typecheck_type(typet &type)
   {
     irep_idt identifier=to_symbol_type(type).get_identifier();
     
-    // does it exist already in the symbol table?
+    // does it exist already in the destination symbol table?
     symbol_tablet::symbolst::const_iterator s_it=
-      symbol_table.symbols.find(identifier);
+      dest_symbol_table.symbols.find(identifier);
     
-    if(s_it==symbol_table.symbols.end())
+    if(s_it==dest_symbol_table.symbols.end())
     {
-      // parse the symbol; the type is in the suffix
-      std::size_t colon_pos=id2string(identifier).rfind(':');
-      if(colon_pos==std::string::npos)
-        throw "mal-formed Java identifier: `"+id2string(identifier)+"'";
-
+      assert(has_prefix(id2string(identifier), "java::"));
+    
       // no, create the symbol
       symbolt new_symbol;
       new_symbol.name=identifier;
+      new_symbol.is_type=true;
+      new_symbol.type=class_typet();
+      new_symbol.pretty_name=id2string(identifier).substr(6, std::string::npos);
+      new_symbol.mode=ID_java;
       
-      symbol_table.add(new_symbol);
+      dest_symbol_table.add(new_symbol);
       
-      s_it=symbol_table.symbols.find(identifier);
-      assert(s_it!=symbol_table.symbols.end());
+      s_it=dest_symbol_table.symbols.find(identifier);
+      assert(s_it!=dest_symbol_table.symbols.end());
     }
     else
     {
       // yes!
     }
+  }
+  else if(type.id()==ID_pointer)
+    typecheck_type(type.subtype());
+  else if(type.id()==ID_array)
+  {
+    typecheck_type(type.subtype());
   }
 }
