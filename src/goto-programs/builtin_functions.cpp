@@ -952,7 +952,7 @@ void goto_convertt::do_function_call_symbol(
       throw id2string(identifier)+" expected not to have LHS";
     }
   }
-  else if(identifier=="java::java.lang.AssertionError.<init>")
+  else if(identifier=="java::java.lang.AssertionError.<init>:()V")
   {
     // insert function call anyway
     code_function_callt function_call;
