@@ -7,7 +7,7 @@ class assert2
     int i=random.nextInt();
     
     if(i>=1000)
-      assert i>1000; // should fail
+      assert i>1000 : "i is greater 1000"; // should fail
   }
 }
 
