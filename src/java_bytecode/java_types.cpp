@@ -185,6 +185,34 @@ typet java_reference_type(const typet &subtype)
 
 /*******************************************************************\
 
+Function: java_array_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+typet java_array_type(const typet &subtype)
+{
+  // array types are proper object types in Java,
+  // inheriting from java.lang.Object
+  
+  class_typet result;
+  
+  class_typet::componentt length;
+  length.set_name("length");
+  length.type()=java_int_type(); // the length is 'int'
+
+  result.components().push_back(length);
+  
+  return result;
+}
+
+/*******************************************************************\
+
 Function: java_type
 
   Inputs:
@@ -238,7 +266,43 @@ typet java_type_from_string(const std::string &src)
       code_typet result;
       result.return_type()=
         java_type_from_string(std::string(src, e_pos+1, std::string::npos));
+        
+      for(std::size_t i=1; i<src.size() && src[i]!=')'; i++)
+      {
+        code_typet::parametert param;
+        
+        size_t start=i;
+        
+        while(i<src.size())
+        {
+          if(src[i]=='L')
+          {
+            i=src.find(';', i); // ends on ;
+            break;
+          }
+          else if(src[i]=='[')
+            i++;
+          else
+            break;
+        }
+        
+        std::string sub_str=src.substr(start, i-start+1);
+        param.type()=java_type_from_string(sub_str);
+
+        if(param.type().id()==ID_symbol)
+          param.type()=java_reference_type(param.type());
+        
+        result.parameters().push_back(param);
+      }
+        
       return result;
+    }
+
+  case '[': // array type
+    {
+      if(src.size()<=2) return nil_typet();
+      typet subtype=java_type_from_string(src.substr(1, std::string::npos));
+      return java_reference_type(java_array_type(subtype));
     }
     
   case 'F': return java_float_type();    
@@ -251,11 +315,16 @@ typet java_type_from_string(const std::string &src)
 
   case 'L':
     {
-      std::size_t e_pos=src.rfind(';');
-      if(e_pos==std::string::npos) return nil_typet();
+      // ends on ;
+      if(src[src.size()-1]!=';') return nil_typet();
+      std::string identifier="java::"+src.substr(1, src.size()-2);
+
+      for(unsigned i=0; i<identifier.size(); i++)
+        if(identifier[i]=='/') identifier[i]='.';
+
       reference_typet result;
-      result.subtype()=
-        java_type_from_string(std::string(src, 1, e_pos-2));
+      result.subtype()=symbol_typet(identifier);
+
       return result;
     }
   

@@ -6,17 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#if 0
-#include <cassert>
-#include <cstdlib>
+#include <set>
 
-#include <util/namespace.h>
-#include <util/expr_util.h>
-#include <util/arith_tools.h>
-#include <util/cprover_prefix.h>
 #include <util/prefix.h>
-#endif
-
 #include <util/std_types.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
@@ -25,6 +17,33 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "java_entry_point.h"
 //#include "zero_initializer.h"
+
+/*******************************************************************\
+
+Function: gen_argument
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+static exprt gen_argument(const typet &type)
+{
+  if(type.id()==ID_pointer)
+  {
+    /*
+    side_effect_exprt result(ID_java_new);
+    result.operands().resize(1);
+    return result;
+    */
+    return side_effect_expr_nondett(type);
+  }
+  else
+    return side_effect_expr_nondett(type);
+}
 
 /*******************************************************************\
 
@@ -51,26 +70,43 @@ bool java_entry_point(
   if(config.main=="")
     return false; // no, give up silently
 
-  irep_idt main_symbol="java::"+id2string(config.main);
+  std::string prefix="java::"+id2string(config.main)+":";
   
   // look it up
-  symbol_tablet::symbolst::const_iterator s_it=
-    symbol_table.symbols.find(main_symbol);
+  std::set<irep_idt> matches;
   
-  if(s_it==symbol_table.symbols.end())
+  for(symbol_tablet::symbolst::const_iterator
+      s_it=symbol_table.symbols.begin();
+      s_it!=symbol_table.symbols.end();
+      s_it++)
+  {
+    if(s_it->second.type.id()==ID_code &&
+       has_prefix(id2string(s_it->first), prefix))
+      matches.insert(s_it->first);
+  }
+  
+  if(matches.empty())
   {
     messaget message(message_handler);
-    message.error("main method `"+id2string(main_symbol)+"' not in symbol table");
+    message.error("main method `"+id2string(config.main)+"' not in symbol table");
     return true; // give up with error, no main
   }
     
-  const symbolt &symbol=s_it->second;
+  if(matches.size()>=2)
+  {
+    messaget message(message_handler);
+    message.error("main method `"+id2string(config.main)+"' is ambiguous");
+    return true; // give up with error, no main
+  }
+  
+  const symbolt &symbol=
+    symbol_table.symbols.find(*matches.begin())->second;
   
   // check if it has a body
   if(symbol.value.is_nil())
   {
     messaget message(message_handler);
-    message.error("main method `"+id2string(main_symbol)+"' has no body");
+    message.error("main method `"+id2string(config.main)+"' has no body");
     return true; // give up with error
   }
 
@@ -113,7 +149,7 @@ bool java_entry_point(
   main_arguments.resize(arguments.size());
 
   for(unsigned i=0; i<arguments.size(); i++)
-    main_arguments[i]=side_effect_expr_nondett(arguments[i].type());
+    main_arguments[i]=gen_argument(arguments[i].type());
   
   call_main.arguments()=main_arguments;
 

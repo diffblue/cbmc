@@ -109,29 +109,19 @@ Function: java_bytecode_parse_treet::membert::output
 void java_bytecode_parse_treet::membert::output(std::ostream &out) const
 {
   out << "  ";
-  if(type.id()!=irep_idt())
-  {
-    output_type(type, out);
-    out << " ";
-  }
+
+  if(is_static)
+    out << "static ";
+  
+  if(is_native)
+    out << "native ";
   
   out << name;
 
-  if(method)
+  if(is_method)
   {
-    out << "(";
-    for(code_typet::parameterst::const_iterator
-        p_it=parameters.begin();
-        p_it!=parameters.end();
-        p_it++)
-    {
-      if(p_it!=parameters.begin())
-        out << ", ";
-      output_type(p_it->type(), out);
-    }
-    
-    out << ")";
     out << std::endl;
+
     out << "  {" << std::endl;
 
     for(instructionst::const_iterator
@@ -158,36 +148,9 @@ void java_bytecode_parse_treet::membert::output(std::ostream &out) const
     out << "  }" << std::endl;
   }
   else
-    out << ";" << std::endl;
+  {
+    out << ";";
+  }
 
   out << std::endl;
-}
-
-/*******************************************************************\
-
-Function: java_bytecode_parse_treet::output_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void java_bytecode_parse_treet::output_type(
-  const typet &type,
-  std::ostream &out)
-{
-  if(type.id()==ID_array)
-  {
-    output_type(type.subtype(), out);
-    out << "[]";
-  }
-  else if(type.id()==ID_symbol)
-  {
-    out << type.get(ID_identifier);
-  }
-  else
-    out << type.id();
 }

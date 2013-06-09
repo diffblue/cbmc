@@ -93,12 +93,14 @@ protected:
   symbol_tablet &symbol_table;
   
   irep_idt current_method;
+  unsigned number_of_parameters;
   
   // JVM local variables
   symbol_exprt variable(const exprt &arg, char type_char)
   {
     irep_idt number=to_constant_expr(arg).get_value();
-    irep_idt base_name="local"+id2string(number)+type_char;
+    std::string prefix=((unsigned)atoi(number.c_str())<number_of_parameters)?"arg":"local";
+    irep_idt base_name=prefix+id2string(number)+type_char;
     irep_idt identifier=id2string(current_method)+"::"+id2string(base_name);
     symbol_exprt result(identifier, java_type(type_char));
     result.set(ID_C_base_name, base_name);
@@ -233,19 +235,52 @@ void java_bytecode_convertt::convert(
   const membert &m)
 {
   class_typet &class_type=to_class_type(class_symbol.type);
+  
+  typet member_type=java_type_from_string(m.signature);
 
-  if(m.method)
+  if(member_type.id()==ID_code)
   {
+    irep_idt method_identifier=
+      id2string(class_symbol.name)+"."+id2string(m.name)+":"+m.signature;
+
+    code_typet &code_type=to_code_type(member_type);
+    code_typet::parameterst &parameters=code_type.parameters();
+    
+    // do we need to add 'this'?
+    if(!m.is_static)
+    {
+      code_typet::parametert this_p;
+      symbol_typet class_type(class_symbol.name);
+      this_p.set(ID_C_this, true);
+      this_p.type()=java_reference_type(class_type);
+      parameters.insert(parameters.begin(), this_p);
+    }
+    
+    // assign names to parameters
+    for(unsigned i=0; i<parameters.size(); i++)
+    {
+      irep_idt base_name="arg"+i2string(i);
+      irep_idt identifier=id2string(method_identifier)+"::"+id2string(base_name);
+      parameters[i].set_base_name(base_name);
+      parameters[i].set_identifier(identifier);
+      
+      // add to symbol table
+      symbolt parameter_symbol;
+      parameter_symbol.base_name=base_name;
+      parameter_symbol.mode=ID_java;
+      parameter_symbol.name=identifier;
+      parameter_symbol.type=parameters[i].type();
+      parameter_symbol.is_lvalue=true;
+      parameter_symbol.is_state_var=true;
+      symbol_table.add(parameter_symbol);
+    }
+
     class_type.methods().push_back(class_typet::methodt());
     class_typet::methodt &method=class_type.methods().back();
     
-    code_typet type;
-    type.return_type()=convert(m.type);
-    //type.parameters()=m.parameters;
-    
-    method.set_base_name(m.name);
-    method.set_name(id2string(class_symbol.name)+"."+id2string(m.name));
-    method.type()=type;
+    method.set_base_name(m.base_name);
+    method.set_name(method_identifier);
+    method.type()=member_type;
     
     // create method symbol
     symbolt method_symbol;
@@ -254,8 +289,9 @@ void java_bytecode_convertt::convert(
     method_symbol.base_name=method.get_base_name();
     method_symbol.pretty_name=id2string(class_symbol.pretty_name)+"."+
                               id2string(method.get_base_name())+"()";
-    method_symbol.type=type;
+    method_symbol.type=member_type;
     current_method=method_symbol.name;
+    number_of_parameters=parameters.size();
     tmp_counter=0;
     method_symbol.value=convert_instructions(m.instructions);
     symbol_table.add(method_symbol);
@@ -266,7 +302,8 @@ void java_bytecode_convertt::convert(
     class_typet::componentt &component=class_type.components().back();
     
     component.set_name(m.name);
-    component.type()=m.type;
+    component.set_base_name(m.base_name);
+    component.type()=member_type;
   }
 }
 
@@ -380,22 +417,65 @@ codet java_bytecode_convertt::convert_instructions(
       assert(op.size()==1 && results.size()==1);
       results[0]=op[0];
     }
-    else if(statement=="invokedynamic" ||
-            statement=="invokeinterface" ||
-            statement=="invokespecial" ||
-            statement=="invokestatic" ||
-            statement=="invokevirtual")
+    else if(statement=="invokedynamic")
     {
-      const typet &return_type=to_code_type(arg0.type()).return_type();
+      // not used in Java, will need to investigate what it does
+    }
+    else if(statement=="invokeinterface" ||
+            statement=="invokespecial" ||
+            statement=="invokevirtual" ||
+            statement=="invokestatic")
+    {
+      bool use_this=statement!="invokestatic";
+      bool is_virtual=statement=="invokevirtual";
+    
       code_function_callt call;
-      call.function()=arg0;
+      
+      code_typet code_type=to_code_type(arg0.type());
+      code_typet::parameterst &parameters=code_type.parameters();
 
-      if(return_type.id()!=ID_void)
+      // check for 'this'
+      if(use_this)
+      {
+        // does the function have 'this'?
+        if(parameters.empty() ||
+           !parameters[0].get_bool(ID_C_this))
+        {
+          // add 'this'
+          code_typet::parametert this_p;
+          this_p.type()=java_reference_type(typet());
+          this_p.set(ID_C_this, true);
+          parameters.insert(parameters.begin(), this_p);
+        }
+      }
+      
+      // arguments, these all come off the stack
+      call.arguments()=pop(parameters.size());
+
+      // return value, goes onto the stack
+      const typet &return_type=code_type.return_type();
+      if(return_type.id()!=ID_empty)
       {
         call.lhs()=tmp_variable(return_type);
         results.resize(1);
         results[0]=call.lhs();
       }
+
+      if(is_virtual)
+      {
+        /*
+        irep_idt identifier=arg0.get(ID_identifier);
+        member_exprt member_expr;
+        member_expr.set_component_name(identifier);
+        member_expr.type()=pointer_typet(arg0.type());
+        member_expr.struct_op()=call.arguments()[0]; // this
+        dereference_exprt deref_expr(member_expr, arg0.type());
+        call.function()=deref_expr;
+        */
+        call.function()=arg0;
+      }
+      else
+        call.function()=arg0;
       
       c=call;
     }

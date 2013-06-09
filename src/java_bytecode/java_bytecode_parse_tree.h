@@ -37,11 +37,10 @@ public:
   class membert
   {
   public:
-    typet type;
-    code_typet::parameterst parameters;
-    irep_idt name;
-    bool method;
-    
+    std::string signature;
+    irep_idt base_name, name;
+    bool is_method, is_static, is_native;
+
     typedef std::vector<instructiont> instructionst;
     instructionst instructions;
     
@@ -53,7 +52,7 @@ public:
 
     void output(std::ostream &out) const;
     
-    inline membert():method(false)
+    inline membert():is_method(false), is_static(false), is_native(false)
     {
     }
   };
@@ -87,8 +86,6 @@ public:
   void swap(java_bytecode_parse_treet &other);
   void clear();
   void output(std::ostream &out) const;
-  
-  static void output_type(const typet &, std::ostream &out);
 };
 
 #endif
