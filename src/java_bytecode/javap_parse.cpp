@@ -369,6 +369,19 @@ void javap_parsert::post_process_constants()
     {
       // nothing, only used indirectly
     }
+    else if(c.kind=="int")
+    {
+      std::string number_str;
+
+      for(size_t i=0; i<c.value_string.size(); i++)
+      {
+        if(!isdigit(c.value_string[i]) && c.value_string[i]!='-') break;
+        number_str+=c.value_string[i];
+      }
+
+      mp_integer i=string2integer(number_str);
+      c.value_expr=from_integer(i, java_int_type());
+    }
     else if(c.kind=="long")
     {
       std::string number_str;
