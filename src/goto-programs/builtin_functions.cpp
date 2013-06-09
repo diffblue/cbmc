@@ -952,6 +952,29 @@ void goto_convertt::do_function_call_symbol(
       throw id2string(identifier)+" expected not to have LHS";
     }
   }
+  else if(identifier=="java::java.lang.AssertionError.<init>")
+  {
+    // insert function call anyway
+    code_function_callt function_call;
+    function_call.lhs()=lhs;
+    function_call.function()=function;
+    function_call.arguments()=arguments;
+    function_call.location()=function.location();
+
+    copy(function_call, FUNCTION_CALL, dest);
+
+    if(arguments.size()!=1)
+    {
+      err_location(function);
+      throw "`"+id2string(identifier)+"' expected to have one argument";
+    }
+
+    goto_programt::targett t=dest.add_instruction(ASSERT);
+    t->guard=false_exprt();
+    t->location=function.location();
+    t->location.set("user-provided", true);
+    t->location.set_property(ID_assertion);    
+  }
   else if(identifier=="c::assert")
   {
     if(arguments.size()!=1)
