@@ -61,4 +61,13 @@ void java_bytecode_typecheckt::typecheck_type(typet &type)
   {
     typecheck_type(type.subtype());
   }
+  else if(type.id()==ID_code)
+  {
+    code_typet &code_type=to_code_type(type);
+    typecheck_type(code_type.return_type());
+    code_typet::parameterst &parameters=code_type.parameters();
+    for(code_typet::parameterst::iterator
+        it=parameters.begin(); it!=parameters.end(); it++)
+      typecheck_type(it->type());
+  }
 }

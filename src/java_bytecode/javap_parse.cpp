@@ -21,6 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/string2int.h>
 #include <util/arith_tools.h>
+#include <util/i2string.h>
 
 #include <ansi-c/string_constant.h>
 #include <ansi-c/literals/convert_float_literal.h>
@@ -341,9 +342,12 @@ void javap_parsert::post_process_constants()
       std::size_t type_pos=name_and_type.find('#', 1);
       assert(type_pos!=std::string::npos);
       std::string type_string=constant(std::string(name_and_type, type_pos, std::string::npos));
-      std::string member_string=constant(name_and_type);
+      std::string member_string=constant(std::string(name_and_type, 0, type_pos-1));
+
+      // for overloading
+      std::string member_suffix=(c.kind=="Method")?":"+type_string:"";
       
-      irep_idt identifier="java::"+slash_to_dot(class_string)+"."+member_string;
+      irep_idt identifier="java::"+slash_to_dot(class_string)+"."+member_string+member_suffix;
       typet type=java_type_from_string(type_string);
       
       c.value_expr=symbol_exprt(identifier, type);
@@ -508,6 +512,10 @@ void javap_parsert::rmembers(classt &dest_class)
       tokenize(line);
       rcode(*m);
     }
+    else if(has_prefix(line, "  Signature: "))
+    {
+      m->signature=line.substr(13, std::string::npos);
+    }
   }
 }
 
@@ -606,6 +614,8 @@ Function: javap_parsert::rmember
 
 javap_parsert::membert &javap_parsert::rmember(classt &dest_class)
 {
+  membert &m=dest_class.add_member();
+  
   while(lookahead()==ID_public ||
         lookahead()==ID_private ||
         lookahead()==ID_protected ||
@@ -613,17 +623,20 @@ javap_parsert::membert &javap_parsert::rmember(classt &dest_class)
         lookahead()==ID_final ||
         lookahead()==ID_native)
   {
-    token(); // eat
+    irep_idt t=token(); // eat
+
+    if(t==ID_static)
+      m.is_static=true;
+    else if(t==ID_native)
+      m.is_native=true;
   }
 
-  membert &m=dest_class.add_member();
-  
   // constructor?
   if(lookahead()==dest_class.name)
   {
     // yes, constructor
     m.name=token();
-    m.type=typet(ID_void);
+    m.base_name=m.name;
   }
   else if(lookahead()=="{")
   {
@@ -631,50 +644,18 @@ javap_parsert::membert &javap_parsert::rmember(classt &dest_class)
     // These are static initializers, executed when the class is loaded.
     token();
     if(lookahead()=="}") token();
-    m.method=true;
     m.name="{}";
-    m.type=typet(ID_void);
+    m.base_name=m.name;
   }
   else
   {
-    // get type
-    m.type=rtype();
+    // eat (return) type
+    rtype();
 
     // get member name
     m.name=token();
+    m.base_name=m.name;
   }
-
-  // get postfix
-  if(lookahead()=="(")
-  {
-    token(); // get (
-    m.method=true;
-    
-    // parameter list
-    while(lookahead()!=irep_idt())
-    {
-      if(lookahead()==")")
-      {
-        token(); // get )
-        break;
-      }
-      else
-      {
-        typet p_type=rtype();
-        m.parameters.push_back(code_typet::parametert());
-        m.parameters.back().type()=p_type;
-        if(lookahead()==",") token();
-      }
-    }
-  }
-  
-  if(lookahead()=="throws")
-  {
-    token(); // get 'throws'
-  }
-
-  // read ;
-  token();
   
   return m;
 }
@@ -773,7 +754,7 @@ bool javap_parse(
   
   std::string command="javap";
   
-  command+=" -c -l -private -verbose \""+stripped_file_name+"\"";
+  command+=" -s -c -l -private -verbose \""+stripped_file_name+"\"";
   command+=" 2>\""+stderr_file+"\" >\""+stdout_file+"\"";  
 
   // _popen isn't very reliable on WIN32

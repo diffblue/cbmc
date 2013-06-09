@@ -62,6 +62,7 @@ Function: java_bytecode_typecheckt::typecheck_symbol
 
 void java_bytecode_typecheckt::typecheck_symbol(symbolt &symbol)
 {
+  typecheck_type(symbol.type);
   typecheck_expr(symbol.value);
 }
 
