@@ -1,0 +1,8 @@
+CORE
+assert1.class
+--function assert1.main
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
