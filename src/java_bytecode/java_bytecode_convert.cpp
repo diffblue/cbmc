@@ -537,15 +537,10 @@ codet java_bytecode_convertt::convert_instructions(
       assert(results.size()==1);
       results[0]=from_integer(0, java_type(statement[0]));
     }
-    else if(statement=="bipush")
+    else if(statement==patternt("?ipush"))
     {
       assert(results.size()==1);
       results[0]=typecast_exprt(arg0, java_int_type());
-    }
-    else if(statement=="sipush")
-    {
-      assert(results.size()==1);
-      results[0]=typecast_exprt(arg0, java_short_type());
     }
     else if(statement==patternt("if_?cmp??"))
     {
