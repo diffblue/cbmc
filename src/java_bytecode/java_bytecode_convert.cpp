@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 #endif
 
+#include <cstdlib>
 #include <set>
 #include <stack>
 
