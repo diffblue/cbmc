@@ -80,17 +80,17 @@ Function: java_bytecode_typecheckt::typecheck
 void java_bytecode_typecheckt::typecheck()
 {
   // we add symbols, so the iterators won't be stable
-  symbol_tablet tmp_symbol_table;
-  tmp_symbol_table.swap(symbol_table);
-  
   for(symbol_tablet::symbolst::iterator
-      s_it=tmp_symbol_table.symbols.begin();
-      s_it!=tmp_symbol_table.symbols.end();
+      s_it=src_symbol_table.symbols.begin();
+      s_it!=src_symbol_table.symbols.end();
       s_it++)
   {
     typecheck_symbol(s_it->second);
-    symbol_table.add(s_it->second);
+    dest_symbol_table.add(s_it->second);
   }
+  
+  // now swap dest and src
+  src_symbol_table.swap(dest_symbol_table);
 }
 
 /*******************************************************************\

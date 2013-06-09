@@ -311,8 +311,6 @@ Function: javap_parsert::post_process_constants
 
 \*******************************************************************/
 
-#include <iostream>
-
 void javap_parsert::post_process_constants()
 {
   for(constantst::iterator

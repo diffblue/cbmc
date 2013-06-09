@@ -534,6 +534,67 @@ void goto_convertt::do_cpp_new(
 
 /*******************************************************************\
 
+Function: goto_convertt::do_java_new
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void goto_convertt::do_java_new(
+  const exprt &lhs,
+  const side_effect_exprt &rhs,
+  goto_programt &dest)
+{
+  if(lhs.is_nil())
+    throw "do_java_new without lhs is yet to be implemented";
+
+  // the object size is the first argument
+  bool new_array=rhs.get(ID_statement)==ID_java_new_array;
+
+  if(new_array)
+    assert(rhs.operands().size()==2);
+  else
+    assert(rhs.operands().size()==1);
+
+  typet object_type=rhs.type().subtype();
+
+  // build size expression
+  exprt object_size=rhs.op0();
+
+  if(new_array)
+  {
+    exprt count=rhs.op1();
+
+    // might have side-effect
+    clean_expr(count, dest);
+
+    if(count.type()!=object_size.type())
+      count.make_typecast(object_size.type());
+  }
+
+  // we produce a malloc side-effect, which stays
+  side_effect_exprt malloc_expr(ID_malloc);
+  
+  malloc_expr.copy_to_operands(object_size);
+  malloc_expr.set("#type", object_type);
+
+  goto_programt::targett t_n=dest.add_instruction(ASSIGN);
+  t_n->code=code_assignt(lhs, malloc_expr);
+  t_n->location=rhs.find_location();
+
+  // grab initializer
+  goto_programt tmp_initializer;
+  cpp_new_initializer(lhs, rhs, tmp_initializer);
+
+  dest.destructive_append(tmp_initializer);
+}
+
+/*******************************************************************\
+
 Function: goto_convertt::cpp_new_initializer
 
   Inputs:

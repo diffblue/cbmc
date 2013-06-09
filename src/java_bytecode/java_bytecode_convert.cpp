@@ -199,12 +199,13 @@ void java_bytecode_convertt::convert(const classt &c)
   class_typet class_type;
   class_type.set_tag(c.name);
   
-  // produce symbol
+  // produce class symbol
   symbolt new_symbol;
   new_symbol.base_name=c.name;
   new_symbol.pretty_name=c.name;
   new_symbol.name="java::"+id2string(c.name);
   new_symbol.type=class_type;
+  new_symbol.mode=ID_java;
   
   for(classt::memberst::const_iterator
       it=c.members.begin();
@@ -248,6 +249,7 @@ void java_bytecode_convertt::convert(
     
     // create method symbol
     symbolt method_symbol;
+    method_symbol.mode=ID_java;
     method_symbol.name=method.get_name();
     method_symbol.base_name=method.get_base_name();
     method_symbol.pretty_name=id2string(class_symbol.pretty_name)+"."+
@@ -363,7 +365,7 @@ codet java_bytecode_convertt::convert_instructions(
     if(statement=="aconst_null")
     {
       assert(results.size()==1);
-      results[0]=gen_zero(java_reference_type(typet()));
+      results[0]=gen_zero(java_reference_type(void_typet()));
     }
     else if(statement=="athrow")
     {
@@ -647,8 +649,12 @@ codet java_bytecode_convertt::convert_instructions(
     {
       // use temporary since the stack symbol might get duplicated
       assert(op.empty() && results.size()==1);
-      exprt tmp=tmp_variable(arg0.type());
-      c=code_assignt(tmp, side_effect_exprt(ID_cpp_new, arg0.type()));
+      reference_typet ref_type;
+      ref_type.subtype()=arg0.type();
+      exprt tmp=tmp_variable(ref_type);
+      exprt new_expr=side_effect_exprt(ID_java_new, ref_type);
+      new_expr.operands().resize(1);
+      c=code_assignt(tmp, new_expr);
       results[0]=tmp;
     }
     else if(statement=="newarray")
@@ -657,7 +663,8 @@ codet java_bytecode_convertt::convert_instructions(
       assert(op.size()==1 && results.size()==1);
       array_typet array_type(arg0.type(), op[0]);
       exprt tmp=tmp_variable(arg0.type());
-      c=code_assignt(tmp, side_effect_exprt(ID_java_new, array_type));
+      exprt new_expr=side_effect_exprt(ID_java_new, array_type);
+      c=code_assignt(tmp, new_expr);
       results[0]=tmp;
     }
     else if(statement=="anewarray")
@@ -666,7 +673,8 @@ codet java_bytecode_convertt::convert_instructions(
       assert(op.size()==1 && results.size()==1);
       array_typet array_type(java_reference_type(arg0.type()), op[0]);
       exprt tmp=tmp_variable(arg0.type());
-      c=code_assignt(tmp, side_effect_exprt(ID_java_new, array_type));
+      exprt new_expr=side_effect_exprt(ID_java_new, array_type);
+      c=code_assignt(tmp, new_expr);
       results[0]=tmp;
     }
     else if(statement=="tableswitch")
