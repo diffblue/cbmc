@@ -661,9 +661,22 @@ codet java_bytecode_convertt::convert_instructions(
     {
       // use temporary since the stack symbol might get duplicated
       assert(op.size()==1 && results.size()==1);
-      array_typet array_type(arg0.type(), op[0]);
-      exprt tmp=tmp_variable(arg0.type());
-      exprt new_expr=side_effect_exprt(ID_java_new, array_type);
+
+      typet object_type=arg0.id()==ID_boolean?java_boolean_type():
+                        arg0.id()==ID_char?java_char_type():
+                        arg0.id()==ID_float?java_float_type():
+                        arg0.id()==ID_double?java_double_type():
+                        arg0.id()==ID_byte?java_byte_type():
+                        arg0.id()==ID_short?java_short_type():
+                        arg0.id()==ID_int?java_int_type():
+                        arg0.id()==ID_long?java_long_type():
+                        (assert(false), typet());
+      
+      reference_typet ref_type(object_type);
+      exprt tmp=tmp_variable(ref_type);
+      exprt new_expr=side_effect_exprt(ID_java_new_array, ref_type);
+      new_expr.operands().resize(2);
+      new_expr.op1()=op[0]; // number of elements
       c=code_assignt(tmp, new_expr);
       results[0]=tmp;
     }
@@ -671,11 +684,19 @@ codet java_bytecode_convertt::convert_instructions(
     {
       // use temporary since the stack symbol might get duplicated
       assert(op.size()==1 && results.size()==1);
-      array_typet array_type(java_reference_type(arg0.type()), op[0]);
-      exprt tmp=tmp_variable(arg0.type());
-      exprt new_expr=side_effect_exprt(ID_java_new, array_type);
+
+      reference_typet ref_type(arg0.type());
+      exprt tmp=tmp_variable(ref_type);
+      exprt new_expr=side_effect_exprt(ID_java_new_array, ref_type);
+      new_expr.operands().resize(2);
+      new_expr.op1()=op[0]; // number of elements
       c=code_assignt(tmp, new_expr);
       results[0]=tmp;
+    }
+    else if(statement=="arraylength")
+    {
+      assert(op.size()==1 && results.size()==1);
+      results[0]=gen_zero(java_int_type());
     }
     else if(statement=="tableswitch")
     {

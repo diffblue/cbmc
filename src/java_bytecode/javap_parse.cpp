@@ -431,8 +431,10 @@ void javap_parsert::rcode(membert &dest_member)
       t=token();
       instruction.args.push_back(constants[atoi(t.c_str())].value_expr);
     }
-    else
+    else if(t!="" && isdigit(t[0]))
       instruction.args.push_back(constant_exprt(t, integer_typet())); // some number
+    else
+      instruction.args.push_back(exprt(t)); // some string, e.g., primitive type
 
     if(lookahead()==",")
       token(); // eat ,
