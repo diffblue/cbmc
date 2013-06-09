@@ -146,6 +146,15 @@ protected:
   }
   
   void tokenize(const std::string &str);
+  
+  // java/lang/Object -> java.lang.Object
+  static std::string slash_to_dot(const std::string &src)
+  {
+    std::string result=src;
+    for(std::string::iterator it=result.begin(); it!=result.end(); it++)
+      if(*it=='/') *it='.';
+    return result;
+  }
 };
 
 /*******************************************************************\
@@ -334,7 +343,7 @@ void javap_parsert::post_process_constants()
       std::string type_string=constant(std::string(name_and_type, type_pos, std::string::npos));
       std::string member_string=constant(name_and_type);
       
-      irep_idt identifier="java::"+class_string+"."+member_string;
+      irep_idt identifier="java::"+slash_to_dot(class_string)+"."+member_string;
       typet type=java_type_from_string(type_string);
       
       c.value_expr=symbol_exprt(identifier, type);
@@ -342,13 +351,14 @@ void javap_parsert::post_process_constants()
     }
     else if(c.kind=="String")
     {
-      // this is a ref to an Asciz
+      // this is a ref to an Asciz,
+      // in a stupid layering of custom UTF-8 and UTF-16
       c.value_expr=string_constantt(constant(c.value_string));
     }
     else if(c.kind=="class")
     {
       // this is just a ref to a string with the identifier
-      irep_idt identifier="java::"+constant(c.value_string);
+      irep_idt identifier="java::"+slash_to_dot(constant(c.value_string));
       c.value_expr=type_exprt(symbol_typet(identifier));
     }
     else if(c.kind=="Asciz" || c.kind=="NameAndType")
