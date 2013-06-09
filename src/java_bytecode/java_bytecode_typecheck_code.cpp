@@ -30,13 +30,6 @@ Function: java_bytecode_typecheckt::typecheck_code
 
 void java_bytecode_typecheckt::typecheck_code(codet &code)
 { 
-  #if 1
-  
-  Forall_operands(it, code)
-    typecheck_expr(*it);
-  
-  #else
-
   const irep_idt &statement=code.get_statement();
   
   if(statement==ID_assign)
@@ -84,7 +77,5 @@ void java_bytecode_typecheckt::typecheck_code(codet &code)
         a_it++)
       typecheck_expr(*a_it);
   }
-  
-  #endif
 }
 
