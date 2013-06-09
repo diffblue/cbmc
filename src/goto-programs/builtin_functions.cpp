@@ -564,6 +564,7 @@ void goto_convertt::do_java_new(
 
   // build size expression
   exprt object_size=rhs.op0();
+  exprt size;
 
   if(new_array)
   {
@@ -574,12 +575,17 @@ void goto_convertt::do_java_new(
 
     if(count.type()!=object_size.type())
       count.make_typecast(object_size.type());
+
+    // multiply to get final size
+    size=mult_exprt(object_size, count);
   }
+  else
+    size=object_size;
 
   // we produce a malloc side-effect, which stays
   side_effect_exprt malloc_expr(ID_malloc);
   
-  malloc_expr.copy_to_operands(object_size);
+  malloc_expr.copy_to_operands(size);
   malloc_expr.set("#type", object_type);
 
   goto_programt::targett t_n=dest.add_instruction(ASSIGN);
