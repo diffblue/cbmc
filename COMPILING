@@ -67,7 +67,7 @@ process creation, we advise you use Visual Studio.
 Follow these instructions:
 
 0) You need a C/C++ compiler, Flex and Bison, GNU tar, gzip2,
-   zlib, GNU make, and patch. The GNU Make needs to be version 3.81 or
+   GNU make, and patch. The GNU Make needs to be version 3.81 or
    higher.  If you don't already have the above, we recommend you install
    Cygwin.
 
@@ -84,7 +84,7 @@ Follow these instructions:
    tar xfz minisat-2.2.0.tar.gz
    mv minisat minisat-2.2.0
    cd minisat-2.2.0
-   patch -p1 < ../scripts/minisat-2.2.0-patch
+   patch -p1 < scripts/minisat-2.2.0-patch
 
    The patch removes the dependency on zlib and prevents a problem
    with a header file that is often unavailable on Windows.
@@ -101,7 +101,7 @@ Follow these instructions:
 
    BUILD_ENV = MSVC
 
-   Open the Visual Studio Command prompt, and then run the bash.exe
+   Open the Visual Studio Command prompt, and then run the make.exe
    from Cygwin from in there.
 
 4) Type cd src; make - that should do it.
