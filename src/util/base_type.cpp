@@ -296,6 +296,10 @@ bool base_type_eqt::base_type_eq_rec(
   for(unsigned i=0; i<expr1.operands().size(); i++)
     if(!base_type_eq(expr1.operands()[i], expr2.operands()[i]))
       return false;
+
+  if(expr1.id()==ID_constant)
+    if(expr1.get(ID_value)!=expr2.get(ID_value))
+      return false;
   
   return true;
 }
