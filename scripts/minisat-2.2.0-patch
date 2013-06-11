@@ -1,12 +1,13 @@
 diff -rupN minisat-2.2.0/mtl/IntTypes.h minisat-2.2.0.patched/mtl/IntTypes.h
 --- minisat-2.2.0/mtl/IntTypes.h	2010-07-10 17:07:36.000000000 +0100
 +++ minisat-2.2.0.patched/mtl/IntTypes.h	2011-07-15 12:05:38.144000000 +0100
-@@ -31,7 +31,7 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR
+@@ -31,7 +31,9 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR
  #else
  
  #   include <stdint.h>
--#   include <inttypes.h>
-+//#   include <inttypes.h>
++#ifndef _MSC_VER
+ #   include <inttypes.h>
++#endif
  
  #endif
  
