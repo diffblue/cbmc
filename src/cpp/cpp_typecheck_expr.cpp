@@ -1297,22 +1297,10 @@ void cpp_typecheckt::typecheck_expr_member(
   // The member operator will trigger template elaboration
   elaborate_class_template(op0.type());
 
-  if(op0.type().id()!=ID_symbol)
-  {
-    err_location(expr);
-    str << "error: member operator requires type symbol "
-           "on left hand side but got `"
-        << to_string(op0.type()) << "'";
-    throw 0;
-  }
-  
-  const irep_idt &struct_identifier=
-    to_symbol_type(op0.type()).get_identifier();
+  const typet &followed_op0_type=follow(op0.type());
 
-  const symbolt &struct_symbol=lookup(struct_identifier);
-
-  if(struct_symbol.type.id()==ID_incomplete_struct ||
-     struct_symbol.type.id()==ID_incomplete_union)
+  if(followed_op0_type.id()==ID_incomplete_struct ||
+     followed_op0_type.id()==ID_incomplete_union)
   {
     err_location(expr);
     str << "error: member operator got incomplete type "
@@ -1320,18 +1308,20 @@ void cpp_typecheckt::typecheck_expr_member(
     throw 0;
   }
 
-  if(struct_symbol.type.id()!=ID_struct &&
-     struct_symbol.type.id()!=ID_union)
+  if(followed_op0_type.id()!=ID_struct &&
+     followed_op0_type.id()!=ID_union)
   {
     err_location(expr);
     str << "error: member operator requires struct/union type "
            "on left hand side but got `"
-        << to_string(struct_symbol.type) << "'";
+        << to_string(followed_op0_type) << "'";
     throw 0;
   }
 
   const struct_union_typet &type=
-    to_struct_union_type(struct_symbol.type);
+    to_struct_union_type(followed_op0_type);
+    
+  irep_idt struct_identifier=type.get(ID_name);
 
   if(expr.find("component_cpp_name").is_not_nil())
   {
@@ -1389,7 +1379,7 @@ void cpp_typecheckt::typecheck_expr_member(
           str << "error: `"
               << symbol_expr.get(ID_identifier)
               << "' is not static member "
-              << "of class `" << struct_symbol.base_name << "'";
+              << "of class `" << to_string(type) << "'";
           throw 0;
         }
       }
@@ -1433,7 +1423,7 @@ void cpp_typecheckt::typecheck_expr_member(
   {
     err_location(expr);
     str << "error: member `" << component_name
-        << "' of `" << struct_symbol.pretty_name
+        << "' of `" << to_string(type)
         << "' not found";
     throw 0;
   }
