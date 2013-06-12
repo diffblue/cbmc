@@ -521,7 +521,13 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
 
   if(!symbol.is_type)
   {
-    if(!is_code)
+    if(is_code)
+    {
+      // it is a function
+      if(storage_spec.is_static())
+        symbol.is_file_local=true;
+    }
+    else
     {
       // it is a variable
       symbol.is_state_var=true;
