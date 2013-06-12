@@ -328,12 +328,12 @@ void linkingt::duplicate_non_type_symbol(
     str << "error: conflicting definition for symbol \""
         << old_symbol.display_name()
         << "\"" << std::endl;
-    str << "old definition: " << to_string(old_symbol.type)
-        << std::endl;
-    str << "Module: " << old_symbol.module << std::endl;
-    str << "new definition: " << to_string(new_symbol.type)
-        << std::endl;
-    str << "Module: " << new_symbol.module;
+    str << "old definition in module " << old_symbol.module
+        << " " << old_symbol.location << std::endl
+        << to_string(old_symbol.type) << std::endl;
+    str << "new definition in module " << new_symbol.module
+        << " " << new_symbol.location << std::endl
+        << to_string(new_symbol.type);
     throw 0;
   }
 
@@ -353,7 +353,7 @@ void linkingt::duplicate_non_type_symbol(
       }
       else if(to_code_type(old_symbol.type).get_inlined())
       {
-        // ok
+        // ok, silently ignore
       }
       else if(base_type_eq(old_symbol.type, new_symbol.type, ns))
       {
@@ -382,11 +382,16 @@ void linkingt::duplicate_non_type_symbol(
     if(!base_type_eq(old_symbol.type, new_symbol.type, ns))
     {
       if(ns.follow(old_symbol.type).id()==ID_array &&
-         ns.follow(new_symbol.type).id()==ID_array)
+         ns.follow(new_symbol.type).id()==ID_array &&
+         base_type_eq(old_symbol.type.subtype(), new_symbol.type.subtype(), ns))
       {
         if(to_array_type(ns.follow(old_symbol.type)).size().is_nil() &&
            to_array_type(ns.follow(new_symbol.type)).size().is_not_nil())
           old_symbol.type=new_symbol.type; // store new type
+        else
+        {
+          // size seems different, ignore for now
+        }
       }
       else if(ns.follow(old_symbol.type).id()==ID_pointer &&
               ns.follow(new_symbol.type).id()==ID_array)
@@ -418,21 +423,21 @@ void linkingt::duplicate_non_type_symbol(
       else
       {
         err_location(new_symbol.location);
-        str << "error: conflicting definition for variable `"
+        str << "error: conflicting types for variable `"
             << old_symbol.name
             << "'" << std::endl;
-        str << "old definition: " << to_string_verbose(old_symbol.type)
-            << std::endl;
-        str << "Module: " << old_symbol.module << std::endl;
-        str << "new definition: " << to_string_verbose(new_symbol.type)
-            << std::endl;
-        str << "Module: " << new_symbol.module;
+        str << "old definition in module " << old_symbol.module
+            << " " << old_symbol.location
+            << to_string_verbose(old_symbol.type) << std::endl;
+        str << "new definition in module " << new_symbol.module
+            << " " << new_symbol.location
+            << to_string_verbose(new_symbol.type);
         throw 0;
       }
     }
 
     // care about initializers    
-
+    
     if(!new_symbol.value.is_nil() &&
        !new_symbol.value.get_bool(ID_C_zero_initializer))
     {
@@ -461,12 +466,12 @@ void linkingt::duplicate_non_type_symbol(
           str << "error: conflicting initializers for variable `"
               << old_symbol.name
               << "'" << std::endl;
-          str << "old value: " << to_string(tmp_old)
-              << std::endl;
-          str << "Module: " << old_symbol.module << std::endl;
-          str << "new value: " << to_string(tmp_new)
-              << std::endl;
-          str << "Module: " << new_symbol.module;
+          str << "old value in module " << old_symbol.module
+              << " " << old_symbol.value.find_location() << std::endl
+              << to_string(tmp_old) << std::endl;
+          str << "new value in module " << new_symbol.module
+              << " " << new_symbol.value.find_location() << std::endl
+              << to_string(tmp_new);
           throw 0;
         }
       }
