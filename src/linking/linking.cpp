@@ -381,42 +381,48 @@ void linkingt::duplicate_non_type_symbol(
 
     if(!base_type_eq(old_symbol.type, new_symbol.type, ns))
     {
-      if(ns.follow(old_symbol.type).id()==ID_array &&
-         ns.follow(new_symbol.type).id()==ID_array &&
-         base_type_eq(old_symbol.type.subtype(), new_symbol.type.subtype(), ns))
+      const typet &old_type=ns.follow(old_symbol.type);
+      const typet &new_type=ns.follow(new_symbol.type);
+    
+      if(old_type.id()==ID_array && new_type.id()==ID_array &&
+         base_type_eq(old_type.subtype(), new_type.subtype(), ns))
       {
-        if(to_array_type(ns.follow(old_symbol.type)).size().is_nil() &&
-           to_array_type(ns.follow(new_symbol.type)).size().is_not_nil())
+        // still need to compare size
+        const exprt &old_size=to_array_type(old_type).size();
+        const exprt &new_size=to_array_type(new_type).size();
+        
+        if(old_size.is_nil() && new_size.is_not_nil())
+        {
           old_symbol.type=new_symbol.type; // store new type
+        }
+        else if(old_size.is_not_nil() && new_size.is_nil())
+        {
+          // ok, we will use the old type
+        }
         else
         {
           // size seems different, ignore for now
         }
       }
-      else if(ns.follow(old_symbol.type).id()==ID_pointer &&
-              ns.follow(new_symbol.type).id()==ID_array)
+      else if(old_type.id()==ID_pointer && new_type.id()==ID_array)
       {
         // store new type
         old_symbol.type=new_symbol.type;
       }
-      else if(ns.follow(old_symbol.type).id()==ID_array &&
-              ns.follow(new_symbol.type).id()==ID_pointer)
+      else if(old_type.id()==ID_array && new_type.id()==ID_pointer)
       {
         // ignore
       }
-      else if(ns.follow(old_symbol.type).id()==ID_pointer &&
-              ns.follow(new_symbol.type).id()==ID_pointer)
+      else if(old_type.id()==ID_pointer && new_type.id()==ID_pointer)
       {
         // ignore, generally ok
       }
-      else if(old_symbol.type.id()==ID_incomplete_struct &&
-              new_symbol.type.id()==ID_struct)
+      else if(old_type.id()==ID_incomplete_struct && new_type.id()==ID_struct)
       {
         // store new type
         old_symbol.type=new_symbol.type;
       }
-      else if(old_symbol.type.id()==ID_struct &&
-              new_symbol.type.id()==ID_incomplete_struct)
+      else if(old_type.id()==ID_struct && new_type.id()==ID_incomplete_struct)
       {
         // ignore
       }
@@ -427,10 +433,10 @@ void linkingt::duplicate_non_type_symbol(
             << old_symbol.name
             << "'" << std::endl;
         str << "old definition in module " << old_symbol.module
-            << " " << old_symbol.location
+            << " " << old_symbol.location << std::endl
             << to_string_verbose(old_symbol.type) << std::endl;
         str << "new definition in module " << new_symbol.module
-            << " " << new_symbol.location
+            << " " << new_symbol.location << std::endl
             << to_string_verbose(new_symbol.type);
         throw 0;
       }
