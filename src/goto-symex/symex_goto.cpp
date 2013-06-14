@@ -355,6 +355,7 @@ void goto_symext::phi_function(
       tmp_guard-=dest_state.guard;
       
       rhs=if_exprt(tmp_guard.as_expr(), goto_state_rhs, dest_state_rhs, type);
+      do_simplify(rhs);
     }
 
     symbol_exprt lhs=symbol_expr(symbol);
