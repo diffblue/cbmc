@@ -129,11 +129,11 @@ std::string get_temporary_file(
   const std::string &suffix)
 {
   #ifdef _WIN32
-  TCHAR lpTempPathBuffer[MAX_PATH];
+  char lpTempPathBuffer[MAX_PATH];
   DWORD dwRetVal;
 
-  dwRetVal = GetTempPath(MAX_PATH,          // length of the buffer
-                         lpTempPathBuffer); // buffer for path 
+  dwRetVal = GetTempPathA(MAX_PATH,          // length of the buffer
+                          lpTempPathBuffer); // buffer for path 
 
   if (dwRetVal > MAX_PATH || (dwRetVal == 0))
     throw "GetTempPath failed";
