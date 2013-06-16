@@ -96,7 +96,7 @@ bool ansi_c_typecheck(
     ansi_c_typecheck.typecheck_expr(expr);
   }
 
-  catch(int e)
+  catch(int)
   {
     ansi_c_typecheck.error();
   }

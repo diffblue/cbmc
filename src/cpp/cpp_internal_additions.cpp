@@ -8,9 +8,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/config.h>
 
-#include <ansi-c/internal_additions.h>
+#include <ansi-c/ansi_c_internal_additions.h>
 
-#include "internal_additions.h"
+#include "cpp_internal_additions.h"
 
 /*******************************************************************\
 

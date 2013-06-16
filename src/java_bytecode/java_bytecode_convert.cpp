@@ -871,7 +871,7 @@ bool java_bytecode_convert(
     return false;
   }
   
-  catch(int e)
+  catch(int)
   {    
   }
 

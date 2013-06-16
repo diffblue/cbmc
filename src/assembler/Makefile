@@ -1,4 +1,4 @@
-SRC = lex.yy.cpp assembler_parser.cpp
+SRC = assembler_lex.yy.cpp assembler_parser.cpp
 
 INCLUDES= -I ..
 
@@ -6,13 +6,13 @@ include ../config.inc
 include ../common
 
 CLEANFILES = assembler$(LIBEXT) \
-  lex.yy.cpp
+  assembler_lex.yy.cpp
 
 all: assembler$(LIBEXT)
 
 ###############################################################################
 
-lex.yy.cpp: scanner.l
+assembler_lex.yy.cpp: scanner.l
 	$(LEX) -Pyyassembler -o$@ scanner.l
 
 ###############################################################################

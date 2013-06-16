@@ -25,7 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "expr2c.h"
 #include "trans_unit.h"
 #include "c_preprocess.h"
-#include "internal_additions.h"
+#include "ansi_c_internal_additions.h"
 
 /*******************************************************************\
 

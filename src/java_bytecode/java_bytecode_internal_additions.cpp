@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_types.h>
 #include <ansi-c/c_types.h>
 
-#include "internal_additions.h"
+#include "java_bytecode_internal_additions.h"
 
 /*******************************************************************\
 

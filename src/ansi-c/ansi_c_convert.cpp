@@ -576,7 +576,7 @@ bool ansi_c_convert(
     ansi_c_convert.convert(ansi_c_parse_tree);
   }
 
-  catch(int e)
+  catch(int)
   {
     ansi_c_convert.error();
     return true;
@@ -621,7 +621,7 @@ bool ansi_c_convert(
     ansi_c_convert.convert_expr(expr);
   }
 
-  catch(int e)
+  catch(int)
   {
     ansi_c_convert.error();
   }

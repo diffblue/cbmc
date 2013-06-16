@@ -17,7 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_bytecode_convert.h"
 #include "java_entry_point.h"
 #include "javap_parse.h"
-#include "internal_additions.h"
+#include "java_bytecode_internal_additions.h"
 
 /*******************************************************************\
 
