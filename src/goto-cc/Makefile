@@ -5,7 +5,7 @@ SRC = main.cpp goto_cc_mode.cpp gcc_mode.cpp \
       goto_cc_languages.cpp goto_cc_cmdline.cpp \
       ms_cl_mode.cpp armcc_mode.cpp cw_mode.cpp ld_mode.cpp
 
-OBJ += ../big-int/bigint$(OBJEXT) \
+OBJ += ../big-int/big-int$(LIBEXT) \
       ../goto-programs/goto-programs$(LIBEXT) \
       ../util/util$(LIBEXT) \
       ../linking/linking$(LIBEXT) \
