@@ -39,7 +39,7 @@ std::string i2string(int i)
 {
   #ifdef USE_SPRINTF
   char buffer[100];
-  sprintf(buffer, "%d", i);
+  snprintf(buffer, sizeof(buffer), "%d", i);
   return buffer;
   #else
   std::ostringstream strInt;
@@ -97,7 +97,7 @@ std::string i2string(unsigned i)
 {
   #ifdef USE_SPRINTF
   char buffer[100];
-  sprintf(buffer, "%u", i);
+  snprintf(buffer, sizeof(buffer), "%u", i);
   return buffer;
   #else
   std::ostringstream strInt;
@@ -122,7 +122,7 @@ std::string i2string(unsigned long int i)
 {
   #ifdef USE_SPRINTF
   char buffer[100];
-  sprintf(buffer, "%lu", i);
+  snprintf(buffer, sizeof(buffer), "%lu", i);
   return buffer;
   #else
   std::ostringstream strInt;
@@ -147,7 +147,7 @@ std::string i2string(signed long long i)
 {
   #ifdef USE_SPRINTF
   char buffer[100];
-  sprintf(buffer, "%lld", i);
+  snprintf(buffer, sizeof(buffer), "%lld", i);
   return buffer;
   #else
   std::ostringstream strInt;
@@ -176,7 +176,7 @@ std::string i2string(unsigned long long i)
 {
   #ifdef USE_SPRINTF
   char buffer[100];
-  sprintf(buffer, "%llu", i);
+  snprintf(buffer, sizeof(buffer), "%llu", i);
   return buffer;
   #else
   std::ostringstream strInt;
