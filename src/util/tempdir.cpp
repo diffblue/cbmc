@@ -45,7 +45,7 @@ std::string get_temporary_directory(const std::string &name_template)
   #ifdef _WIN32    
     DWORD dwBufSize = MAX_PATH;
     char lpPathBuffer[MAX_PATH];
-    DWORD dwRetVal = GetTempPath(dwBufSize, lpPathBuffer);
+    DWORD dwRetVal = GetTempPathA(dwBufSize, lpPathBuffer);
 
     if(dwRetVal > dwBufSize || (dwRetVal == 0))
       throw "GetTempPath failed";
@@ -54,7 +54,7 @@ std::string get_temporary_directory(const std::string &name_template)
     
     strncpy(t, name_template.c_str(), MAX_PATH);
 
-    UINT uRetVal=GetTempFileName(lpPathBuffer, "TLO", 0, t);
+    UINT uRetVal=GetTempFileNameA(lpPathBuffer, "TLO", 0, t);
     if(uRetVal == 0)
       throw "GetTempFileName failed";
 
