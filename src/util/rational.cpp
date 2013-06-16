@@ -9,7 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <algorithm>
 
 #include "rational.h"
-#include "gcd.h"
 
 /*******************************************************************\
 

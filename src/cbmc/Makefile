@@ -5,7 +5,7 @@ SRC = main.cpp cbmc_parseoptions.cpp bmc.cpp dimacs.cpp cbmc_languages.cpp \
 
 OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../linking/linking$(LIBEXT) \
-      ../big-int/bigint$(OBJEXT) \
+      ../big-int/big-int$(LIBEXT) \
       ../goto-programs/goto-programs$(LIBEXT) \
       ../goto-symex/goto-symex$(LIBEXT) \
       ../pointer-analysis/value_set$(OBJEXT) \

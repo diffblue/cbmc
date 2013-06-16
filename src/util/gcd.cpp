@@ -22,6 +22,7 @@ Function: gcd
 
 \*******************************************************************/
 
+#if 0
 mp_integer gcd(const mp_integer &_a, const mp_integer &_b)
 {
   mp_integer a=_a, b=_b;
@@ -45,3 +46,4 @@ mp_integer gcd(const mp_integer &_a, const mp_integer &_b)
 
   return a;
 }
+#endif

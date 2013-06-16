@@ -16,7 +16,7 @@ SRC = main.cpp parseoptions.cpp document_claims.cpp \
 
 OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../linking/linking$(LIBEXT) \
-      ../big-int/bigint$(OBJEXT) \
+      ../big-int/big-int$(LIBEXT) \
       ../goto-programs/goto-programs$(LIBEXT) \
       ../goto-symex/goto-symex$(LIBEXT) \
       ../assembler/assembler$(LIBEXT) \
