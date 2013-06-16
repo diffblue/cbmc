@@ -7,21 +7,7 @@ echo Generating Visual Studio Project files in $dest
 function doit {
   echo Generating $dest/$1.vcxproj
 
-  echo "<?xml version=\"1.0\" encoding=\"utf-8\"?>" > $dest/$1.vcxproj
-
-  echo -n "<Project DefaultTargets=\"Build\" ToolsVersion=\"4.0\"" >> $dest/$1.vcxproj
-  echo " xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\">" >> $dest/$1.vcxproj
-
-  echo "  <ItemGroup Label=\"ProjectConfigurations\">" >> $dest/$1.vcxproj
-  echo "    <ProjectConfiguration Include=\"Debug|Win32\">" >> $dest/$1.vcxproj
-  echo "      <Configuration>Debug</Configuration>" >> $dest/$1.vcxproj
-  echo "      <Platform>Win32</Platform>" >> $dest/$1.vcxproj
-  echo "    </ProjectConfiguration>" >> $dest/$1.vcxproj
-  echo "    <ProjectConfiguration Include=\"Release|Win32\">" >> $dest/$1.vcxproj
-  echo "      <Configuration>Release</Configuration>" >> $dest/$1.vcxproj
-  echo "      <Platform>Win32</Platform>" >> $dest/$1.vcxproj
-  echo "    </ProjectConfiguration>">> $dest/$1.vcxproj
-  echo "  </ItemGroup>" >> $dest/$1.vcxproj
+  cat vcxproj.1 > $dest/$1.vcxproj
 
   # this collects all the files needed
   echo "  <ItemGroup>" >> $dest/$1.vcxproj
@@ -33,7 +19,7 @@ function doit {
   done
   echo "  </ItemGroup>" >> $dest/$1.vcxproj
 
-  echo "</Project>" >> $dest/$1.vcxproj
+  cat vcxproj.2 >> $dest/$1.vcxproj
 }
 
 dirs="ansi-c cpp java_bytecode solvers goto-symex analyses pointer-analysis goto-programs linking cbmc"
