@@ -32,13 +32,13 @@ function doit {
   for dir in $dirs ; do
     sources="`(cd $dest/$dir; make sources)`"
     for s in $sources ; do
-      echo "    <ClCompile Include=\"${dir}\\${s}\"><Filter>${dir}</Filter></ClCompile>" >> $dest/$1.vcxproj.filter
+      echo "    <ClCompile Include=\"${dir}\\${s}\"><Filter>${dir}</Filter></ClCompile>" >> $dest/$1.vcxproj.filters
     done
   done
   echo "  </ItemGroup>" >> $dest/$1.vcxproj.filters
 
   for dir in $dirs ; do
-    echo "  <ItemGroup><Filter Include=\"${dir}\"/></ItemGroup>" >> $dest/$1.vcxproj.filter
+    echo "  <ItemGroup><Filter Include=\"${dir}\"/></ItemGroup>" >> $dest/$1.vcxproj.filters
   done
 
   echo "</Project>" >> $dest/$1.vcxproj.filters
