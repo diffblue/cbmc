@@ -8,6 +8,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cstdio>
 
+#ifdef _WIN32
+#ifndef __MINGW32__
+#define snprintf sprintf_s
+#endif
+#endif
+
 #include "c_misc.h"
 
 /*******************************************************************\
