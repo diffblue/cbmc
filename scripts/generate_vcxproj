@@ -1,0 +1,34 @@
+dest=../src
+
+if ! [ -e $dest/Makefile ] ; then echo Makefile not found ; exit 1; fi
+
+echo Generating Visual Studio Project files in $dest
+
+function doit {
+  echo Generating $dest/$1.vcxproj
+
+  echo "<?xml version=\"1.0\" encoding=\"utf-8\"?>" > $dest/$1.vcxproj
+  echo -n "<Project DefaultTargets=\"Build\" ToolsVersion=\"4.0\"" >> $dest/$1.vcxproj
+  echo "xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\">" >> $dest/$1.vcxproj
+
+  # this collects all the files needed
+  echo "  <ItemGroup>" >> $dest/$1.vcxproj
+  for dir in $dirs ; do
+    sources="`(cd $dest/$dir; make sources)`"
+    for s in $sources ; do
+      echo "    <ClCompile Include=\"${s}\"/>" >> $dest/$1.vcxproj
+    done
+  done
+  echo "  </ItemGroup>" >> $dest/$1.vcxproj
+
+  echo "</Project>" >> $dest/$1.vcxproj
+}
+
+dirs="ansi-c cpp java_bytecode solvers goto-symex analyses pointer-analysis goto-programs linking cbmc"
+doit cbmc
+
+dirs="ansi-c cpp java_bytecode solvers goto-symex analyses pointer-analysis goto-programs linking goto-cc"
+doit goto-cc
+
+dirs="ansi-c cpp java_bytecode solvers goto-symex analyses pointer-analysis goto-programs linking goto-instrument"
+doit goto-instrument
