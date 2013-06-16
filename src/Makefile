@@ -25,9 +25,13 @@ cbmc.dir: languages solvers.dir goto-symex.dir analyses.dir \
 
 goto-cc.dir: languages pointer-analysis.dir goto-programs.dir linking.dir
 
+# building for a particular directory
+
 $(patsubst %, %.dir, $(DIRS)):
 	## Entering $(basename $@)
 	$(MAKE) $(MAKEARGS) -C $(basename $@)
+
+# cleaning
 
 clean: $(patsubst %, %_clean, $(DIRS))
 
@@ -35,6 +39,8 @@ $(patsubst %, %_clean, $(DIRS)):
 	if [ -e $(patsubst %_clean, %, $@)/. ] ; then \
 		$(MAKE) $(MAKEARGS) -C $(patsubst %_clean, %, $@) clean ; \
 	fi
+
+# minisat 2 download, for your convenience
 
 minisat2-download:
 	@echo "Downloading Minisat 2.2.0"
@@ -44,3 +50,4 @@ minisat2-download:
 	@mv minisat ../minisat-2.2.0
 	@(cd ../minisat-2.2.0; patch -p1 < ../scripts/minisat-2.2.0-patch)
 	@rm minisat-2.2.0.tar.gz
+
