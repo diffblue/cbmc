@@ -81,7 +81,7 @@ void MetaChar(std::string &out, char c, bool inString)
     if(((unsigned char)c < ' ') || (c == 127))
     {
       char octbuf[8];
-      sprintf(octbuf, "%03o", (unsigned char) c);
+      snprintf(octbuf, sizeof(octbuf), "%03o", (unsigned char) c);
       out+="\\";
       out+=octbuf;
     }
