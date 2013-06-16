@@ -104,14 +104,14 @@ cw_builtin_headers.inc: cw_builtin_headers.h file_converter$(EXEEXT)
 
 cprover_library.cpp: cprover_library.inc
 
-internal_additions$(OBJEXT): gcc_builtin_headers_generic.inc
-internal_additions$(OBJEXT): gcc_builtin_headers_ia32.inc
-internal_additions$(OBJEXT): gcc_builtin_headers_alpha.inc
-internal_additions$(OBJEXT): gcc_builtin_headers_arm.inc
-internal_additions$(OBJEXT): gcc_builtin_headers_mips.inc
-internal_additions$(OBJEXT): gcc_builtin_headers_power.inc
-internal_additions$(OBJEXT): arm_builtin_headers.inc
-internal_additions$(OBJEXT): cw_builtin_headers.inc
+ansi_c_internal_additions$(OBJEXT): gcc_builtin_headers_generic.inc
+ansi_c_internal_additions$(OBJEXT): gcc_builtin_headers_ia32.inc
+ansi_c_internal_additions$(OBJEXT): gcc_builtin_headers_alpha.inc
+ansi_c_internal_additions$(OBJEXT): gcc_builtin_headers_arm.inc
+ansi_c_internal_additions$(OBJEXT): gcc_builtin_headers_mips.inc
+ansi_c_internal_additions$(OBJEXT): gcc_builtin_headers_power.inc
+ansi_c_internal_additions$(OBJEXT): arm_builtin_headers.inc
+ansi_c_internal_additions$(OBJEXT): cw_builtin_headers.inc
 
 ###############################################################################
 
