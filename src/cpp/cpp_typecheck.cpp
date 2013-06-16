@@ -192,7 +192,7 @@ bool cpp_typecheck(
     cpp_typecheck.typecheck_expr(expr);
   }
 
-  catch(int e)
+  catch(int)
   {
     cpp_typecheck.error();
   }

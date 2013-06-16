@@ -19,7 +19,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <ansi-c/c_preprocess.h>
 #include <ansi-c/trans_unit.h>
 
-#include "internal_additions.h"
+#include "cpp_internal_additions.h"
 #include "cpp_language.h"
 #include "expr2cpp.h"
 #include "cpp_parser.h"

@@ -1,4 +1,4 @@
-SRC = c_typecast.cpp y.tab.cpp lex.yy.cpp ansi_c_parser.cpp \
+SRC = c_typecast.cpp ansi_c_y.tab.cpp ansi_c_lex.yy.cpp ansi_c_parser.cpp \
       expr2c.cpp ansi_c_language.cpp c_sizeof.cpp \
       c_types.cpp trans_unit.cpp ansi_c_typecheck.cpp \
       c_preprocess.cpp \
@@ -8,7 +8,7 @@ SRC = c_typecast.cpp y.tab.cpp lex.yy.cpp ansi_c_parser.cpp \
       c_qualifiers.cpp c_typecheck_argc_argv.cpp ansi_c_parse_tree.cpp \
       preprocessor_line.cpp ansi_c_convert.cpp ansi_c_convert_type.cpp \
       type2name.cpp cprover_library.cpp anonymous_member.cpp \
-      printf_formatter.cpp internal_additions.cpp padding.cpp \
+      printf_formatter.cpp ansi_c_internal_additions.cpp padding.cpp \
       ansi_c_declaration.cpp designator.cpp \
       literals/parse_float.cpp literals/unescape_string.cpp \
       literals/convert_float_literal.cpp \
@@ -22,7 +22,8 @@ include ../config.inc
 include ../common
 
 CLEANFILES = ansi-c$(LIBEXT) \
-  y.tab.h y.tab.cpp lex.yy.cpp y.tab.cpp.output y.output \
+  ansi_c_y.tab.h ansi_c_y.tab.cpp ansi_c_lex.yy.cpp ansi_c_y.tab.cpp.output \
+  ansi_c_y.output \
   library/converter$(EXEEXT) cprover_library.inc \
   file_converter$(EXEEXT) library_check \
   gcc_builtin_headers_generic.inc gcc_builtin_headers_ia32.inc \
@@ -34,19 +35,19 @@ all: ansi-c$(LIBEXT)
 
 ###############################################################################
 
-y.tab.cpp: parser.y
-	$(YACC) $(YFLAGS) $$flags -pyyansi_c -d parser.y -o y.tab.cpp
+ansi_c_y.tab.cpp: parser.y
+	$(YACC) $(YFLAGS) $$flags -pyyansi_c -d parser.y -o $@
 
-y.tab.h: y.tab.cpp
-	if [ -e y.tab.hpp ] ; then mv y.tab.hpp y.tab.h ; else \
-        mv y.tab.cpp.h y.tab.h ; fi
+ansi_c_y.tab.h: ansi_c_y.tab.cpp
+	if [ -e ansi_c_y.tab.hpp ] ; then mv ansi_c_y.tab.hpp ansi_c_y.tab.h ; else \
+        mv ansi_c_y.tab.cpp.h ansi_c_y.tab.h ; fi
 
-lex.yy.cpp: scanner.l
+ansi_c_lex.yy.cpp: scanner.l
 	$(LEX) -Pyyansi_c -o$@ scanner.l
 
 # extra dependencies
-y.tab$(OBJEXT): y.tab.cpp y.tab.h
-lex.yy$(OBJEXT): y.tab.cpp lex.yy.cpp y.tab.h
+ansi_c_y.tab$(OBJEXT): ansi_c_y.tab.cpp ansi_c_y.tab.h
+ansi_c_lex.yy$(OBJEXT): ansi_c_y.tab.cpp ansi_c_lex.yy.cpp ansi_c_y.tab.h
 cprover_library$(OBJEXT): cprover_library.inc
 
 ###############################################################################
