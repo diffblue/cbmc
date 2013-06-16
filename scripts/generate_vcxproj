@@ -44,11 +44,11 @@ function doit {
   echo "</Project>" >> $dest/$1.vcxproj.filters
 }
 
-dirs="ansi-c cpp java_bytecode solvers goto-symex analyses pointer-analysis goto-programs linking cbmc"
+dirs="util ansi-c cpp java_bytecode xmllang solvers goto-symex analyses pointer-analysis goto-programs linking cbmc"
 doit cbmc
 
-dirs="ansi-c cpp java_bytecode solvers goto-symex analyses pointer-analysis goto-programs linking goto-cc"
+dirs="util ansi-c cpp java_bytecode xmllang solvers goto-symex analyses pointer-analysis goto-programs linking goto-cc"
 doit goto-cc
 
-dirs="ansi-c cpp java_bytecode solvers goto-symex analyses pointer-analysis goto-programs linking goto-instrument"
+dirs="util ansi-c cpp java_bytecode xmllang solvers goto-symex analyses pointer-analysis goto-programs linking goto-instrument"
 doit goto-instrument
