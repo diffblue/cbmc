@@ -10,6 +10,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cctype>
 #include <cstdio>
 
+#ifdef _WIN32
+#ifndef __MINGW32__
+#define snprintf sprintf_s
+#endif
+#endif
+
 #include <map>
 #include <set>
 
@@ -2346,7 +2352,7 @@ std::string expr2ct::convert_array(
         else
         {
           char hexbuf[10];
-          sprintf(hexbuf, "\\x%x", ch);
+          snprintf(hexbuf, sizeof(hexbuf), "\\x%x", ch);
           dest+=hexbuf;
           last_was_hex=true;
         }
