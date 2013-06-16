@@ -49,6 +49,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions);STL_HASH_TR1;HAVE_MINISAT2</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)/src;$(SolutionDir)/minisat-2.2.0</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -63,6 +64,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions);STL_HASH_TR1;HAVE_MINISAT2</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)/src;$(SolutionDir)/minisat-2.2.0</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
