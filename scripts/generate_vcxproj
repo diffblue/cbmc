@@ -17,8 +17,8 @@ function doit {
       echo "    <ClCompile Include=\"${dir}\\${s}\"/>" >> $dest/$1.vcxproj
     done
   done
-  echo "    <ClCompile Include=\"..\\minisat-2.2.0\\core\\Solver.cc\"/>" >> $dest/$1.vcxproj.filters
-  echo "    <ClCompile Include=\"..\\minisat-2.2.0\\simp\\SimpSolver.cc\"/>" >> $dest/$1.vcxproj.filters
+  echo "    <ClCompile Include=\"..\\minisat-2.2.0\\core\\Solver.cc\"/>" >> $dest/$1.vcxproj
+  echo "    <ClCompile Include=\"..\\minisat-2.2.0\\simp\\SimpSolver.cc\"/>" >> $dest/$1.vcxproj
   echo "  </ItemGroup>" >> $dest/$1.vcxproj
 
   cat vcxproj.2 >> $dest/$1.vcxproj
