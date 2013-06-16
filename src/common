@@ -160,6 +160,11 @@ clean:
 
 .PHONY: first_target clean all
 
+.PHONY: sources
+
+sources: Makefile
+	@echo $(SRC)
+
 #
 # include a dependency file if one exists
 #
