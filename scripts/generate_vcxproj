@@ -8,15 +8,27 @@ function doit {
   echo Generating $dest/$1.vcxproj
 
   echo "<?xml version=\"1.0\" encoding=\"utf-8\"?>" > $dest/$1.vcxproj
+
   echo -n "<Project DefaultTargets=\"Build\" ToolsVersion=\"4.0\"" >> $dest/$1.vcxproj
-  echo "xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\">" >> $dest/$1.vcxproj
+  echo " xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\">" >> $dest/$1.vcxproj
+
+  echo "  <ItemGroup Label=\"ProjectConfigurations\">" >> $dest/$1.vcxproj
+  echo "    <ProjectConfiguration Include=\"Debug|Win32\">" >> $dest/$1.vcxproj
+  echo "      <Configuration>Debug</Configuration>" >> $dest/$1.vcxproj
+  echo "      <Platform>Win32</Platform>" >> $dest/$1.vcxproj
+  echo "    </ProjectConfiguration>" >> $dest/$1.vcxproj
+  echo "    <ProjectConfiguration Include=\"Release|Win32\">" >> $dest/$1.vcxproj
+  echo "      <Configuration>Release</Configuration>" >> $dest/$1.vcxproj
+  echo "      <Platform>Win32</Platform>" >> $dest/$1.vcxproj
+  echo "    </ProjectConfiguration>">> $dest/$1.vcxproj
+  echo "  </ItemGroup>" >> $dest/$1.vcxproj
 
   # this collects all the files needed
   echo "  <ItemGroup>" >> $dest/$1.vcxproj
   for dir in $dirs ; do
     sources="`(cd $dest/$dir; make sources)`"
     for s in $sources ; do
-      echo "    <ClCompile Include=\"${s}\"/>" >> $dest/$1.vcxproj
+      echo "    <ClCompile Include=\"${dir}\\${s}\"/>" >> $dest/$1.vcxproj
     done
   done
   echo "  </ItemGroup>" >> $dest/$1.vcxproj
