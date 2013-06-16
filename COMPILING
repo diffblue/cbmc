@@ -107,4 +107,8 @@ Follow these instructions:
 4) Type cd src; make - that should do it.
    Note that "nmake" is not expected to work. Use "make".
 
-
+(Optional) A Visual Studio project file can be generated with the script
+"generate_vcxproj" that is in the subdirectory "scripts".  The project file
+is helpful for GUI-based tasks, e.g., the class viewer, debugging, etc. 
+Note that the steps above have to be completed before the project file can
+be used.
