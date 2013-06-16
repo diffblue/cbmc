@@ -16,7 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/unicode.h>
 
-#include "parseoptions.h"
+#include "cbmc_parseoptions.h"
 
 /*******************************************************************\
 

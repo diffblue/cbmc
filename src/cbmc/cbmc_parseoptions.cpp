@@ -35,7 +35,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <langapi/mode.h>
 
-#include "parseoptions.h"
+#include "cbmc_parseoptions.h"
 #include "bmc.h"
 #include "version.h"
 #include "xml_interface.h"
