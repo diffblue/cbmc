@@ -15,7 +15,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "i2string.h"
 
-#else
+#ifdef _WIN32
+#ifndef __MINGW32__
+#define snprintf sprintf_s
+#endif
+#endif
 
 #include <sstream>
 
@@ -64,15 +68,7 @@ std::string i2string(signed long int i)
 {
   #ifdef USE_SPRINTF
   char buffer[100];
-  #ifdef _WIN32
-  #ifdef __MINGW32__
   snprintf(buffer, sizeof(buffer), "%ld", i);
-  #else
-  sprintf_s(buffer, sizeof(buffer), "%ld", i);
-  #endif
-  #else
-  snprintf(buffer, sizeof(buffer), "%ld", i);
-  #endif
   return buffer;
   #else
   std::ostringstream strInt;
