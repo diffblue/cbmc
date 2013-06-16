@@ -27,7 +27,7 @@ bool typecheckt::typecheck_main()
     typecheck();
   }
 
-  catch(int e)
+  catch(int)
   {
     error();
   }
