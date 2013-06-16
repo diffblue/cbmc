@@ -17,6 +17,8 @@ function doit {
       echo "    <ClCompile Include=\"${dir}\\${s}\"/>" >> $dest/$1.vcxproj
     done
   done
+  echo "    <ClCompile Include=\"..\\minisat-2.2.0\\core\\Solver.cc\"/>" >> $dest/$1.vcxproj.filters
+  echo "    <ClCompile Include=\"..\\minisat-2.2.0\\simp\\SimpSolver.cc\"/>" >> $dest/$1.vcxproj.filters
   echo "  </ItemGroup>" >> $dest/$1.vcxproj
 
   cat vcxproj.2 >> $dest/$1.vcxproj
@@ -35,20 +37,22 @@ function doit {
       echo "    <ClCompile Include=\"${dir}\\${s}\"><Filter>${dir}</Filter></ClCompile>" >> $dest/$1.vcxproj.filters
     done
   done
+  echo "    <ClCompile Include=\"..\\minisat-2.2.0\\core\\Solver.cc\"><Filter>minisat2</Filter></ClCompile>" >> $dest/$1.vcxproj.filters
+  echo "    <ClCompile Include=\"..\\minisat-2.2.0\\simp\\SimpSolver.cc\"><Filter>minisat2</Filter></ClCompile>" >> $dest/$1.vcxproj.filters
   echo "  </ItemGroup>" >> $dest/$1.vcxproj.filters
 
-  for dir in $dirs ; do
+  for dir in $dirs minisat2 ; do
     echo "  <ItemGroup><Filter Include=\"${dir}\"/></ItemGroup>" >> $dest/$1.vcxproj.filters
   done
 
   echo "</Project>" >> $dest/$1.vcxproj.filters
 }
 
-dirs="big-int langapi util ansi-c cpp java_bytecode xmllang solvers goto-symex analyses pointer-analysis goto-programs linking cbmc"
+dirs="big-int langapi util ansi-c assembler cpp java_bytecode xmllang solvers goto-symex analyses pointer-analysis goto-programs linking cbmc"
 doit cbmc
 
-dirs="big-int langapi util ansi-c cpp java_bytecode xmllang solvers goto-symex analyses pointer-analysis goto-programs linking goto-cc"
+dirs="big-int langapi util ansi-c assembler cpp java_bytecode xmllang solvers goto-symex analyses pointer-analysis goto-programs linking goto-cc"
 doit goto-cc
 
-dirs="big-int langapi util ansi-c cpp java_bytecode xmllang solvers goto-symex analyses pointer-analysis goto-programs linking goto-instrument"
+dirs="big-int langapi util ansi-c assembler cpp java_bytecode xmllang solvers goto-symex analyses pointer-analysis goto-programs linking goto-instrument"
 doit goto-instrument
