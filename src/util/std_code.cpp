@@ -28,6 +28,23 @@ const irep_idt &code_declt::get_identifier() const
 
 /*******************************************************************\
 
+Function: code_deadt::get_identifier
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+const irep_idt &code_deadt::get_identifier() const
+{
+  return to_symbol_expr(symbol()).get_identifier();
+}
+
+/*******************************************************************\
+
 Function: codet::make_block
 
   Inputs:
