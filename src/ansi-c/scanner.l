@@ -247,7 +247,9 @@ void ansi_c_scanner_init()
 		 }
 <STRING_LITERAL>{cppdirective} { /* ignore */ }
 <STRING_LITERAL>. { 
+                  locationt l=stack(yyansi_clval).location();
                   stack(yyansi_clval)=convert_string_literal(PARSER.string_literal);
+                  stack(yyansi_clval).location().swap(l);
                   BEGIN(GRAMMAR); // back to normal
                   yyless(0); // put back
                   return TOK_STRING;
