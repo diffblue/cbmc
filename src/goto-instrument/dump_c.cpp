@@ -40,6 +40,7 @@ class goto_program2codet
   typedef hash_set_cont<irep_idt,irep_id_hash> id_sett;
   typedef std::map<goto_programt::const_targett, goto_programt::const_targett> loopt;
   typedef hash_map_cont<irep_idt, irep_idt, irep_id_hash> tag_mapt;
+  typedef hash_map_cont<irep_idt, unsigned, irep_id_hash> dead_mapt;
 
 public:
   goto_program2codet(
@@ -76,8 +77,10 @@ protected:
   replace_symbolt replace_symbols;
   tag_mapt reverse_tag_map;
   id_sett expanded_symbols;
+  dead_mapt dead_map;
 
   void build_loop_map();
+  void build_dead_map();
 
   void cleanup_code(codet &code, const bool is_top);
 
@@ -94,8 +97,7 @@ protected:
   goto_programt::const_targett convert_instruction(
       goto_programt::const_targett target,
       goto_programt::const_targett upper_bound,
-      codet &dest,
-      bool include_dead_code);
+      codet &dest);
 
   void convert_labels(
       goto_programt::const_targett target,
@@ -151,6 +153,15 @@ protected:
       goto_programt::const_targett target,
       goto_programt::const_targett upper_bound,
       codet &dest);
+
+  goto_programt::const_targett convert_throw(
+      goto_programt::const_targett target,
+      codet &dest);
+
+  goto_programt::const_targett convert_catch(
+      goto_programt::const_targett target,
+      goto_programt::const_targett upper_bound,
+      codet &dest);
 };
 
 /*******************************************************************\
@@ -180,13 +191,15 @@ void goto_program2codet::operator()()
   reverse_tag_map.clear();
   expanded_symbols.clear();
 
+  // gather variable scope information
+  build_dead_map();
+
   // convert
   forall_goto_program_instructions(target, goto_program)
     target=convert_instruction(
         target,
         goto_program.instructions.end(),
-        toplevel_block,
-        false);
+        toplevel_block);
 
   replace_symbols.replace(toplevel_block);
   for(type_namest::const_iterator
@@ -252,6 +265,29 @@ void goto_program2codet::build_loop_map()
 
 /*******************************************************************\
 
+Function: goto_program2codet::build_dead_map
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
+void goto_program2codet::build_dead_map()
+{
+  dead_map.clear();
+
+  forall_goto_program_instructions(target, goto_program)
+    if(target->is_dead())
+      dead_map.insert(std::make_pair(
+          to_code_dead(target->code).get_identifier(),
+          target->location_number));
+}
+
+/*******************************************************************\
+
 Function: goto_program2codet::convert_instruction
 
 Inputs:
@@ -265,21 +301,9 @@ Purpose:
 goto_programt::const_targett goto_program2codet::convert_instruction(
     goto_programt::const_targett target,
     goto_programt::const_targett upper_bound,
-    codet &dest,
-    bool include_dead_code)
+    codet &dest)
 {
   assert(target!=goto_program.instructions.end());
-
-  if(!include_dead_code)
-  {
-    const cfg_dominatorst &dominators=loops.get_dominator_info();
-    cfg_dominatorst::node_mapt::const_iterator i_entry=
-      dominators.node_map.find(target);
-    assert(i_entry!=dominators.node_map.end());
-    const cfg_dominatorst::nodet &n=i_entry->second;
-    if(n.dominators.find(target)==n.dominators.end())
-      return target;
-  }
 
   // try do-while first
   if(target->is_target() && !target->is_goto())
@@ -299,6 +323,8 @@ goto_programt::const_targett goto_program2codet::convert_instruction(
     case SKIP:
     case LOCATION:
     case END_FUNCTION:
+    case DEAD:
+      // ignore for now
       dest.copy_to_operands(code_skipt());
       return target;
 
@@ -353,13 +379,12 @@ goto_programt::const_targett goto_program2codet::convert_instruction(
         return target;
       }
 
-    case DEAD:
-      // ignore for now
-      dest.copy_to_operands(code_skipt());
-      return target;
-      
     case THROW:
+      return convert_throw(target, dest);
+
     case CATCH:
+      return convert_catch(target, upper_bound, dest);
+
     case NO_INSTRUCTION_TYPE:
       assert(false);
   }
@@ -392,11 +417,9 @@ void goto_program2codet::convert_labels(
   {
     std::stringstream label;
     label << "__CPROVER_DUMP_L" << target->target_number;
-    code_labelt l;
-    l.set_label(label.str());
-    target_label=l.get_label();
-    l.code()=code_blockt();
+    code_labelt l(label.str(), code_blockt());
     l.location()=target->location;
+    target_label=l.get_label();
     latest_block->move_to_operands(l);
     latest_block=&to_code_label(
         to_code(latest_block->operands().back())).code();
@@ -414,9 +437,7 @@ void goto_program2codet::convert_labels(
     // keep all original labels
     labels_in_use.insert(*it);
 
-    code_labelt l;
-    l.set_label(*it);
-    l.code()=code_blockt();
+    code_labelt l(*it, code_blockt());
     l.location()=target->location;
     latest_block->move_to_operands(l);
     latest_block=&to_code_label(
@@ -622,22 +643,27 @@ goto_programt::const_targett goto_program2codet::convert_return(
 {
   const code_returnt &ret=to_code_return(target->code);
 
-  goto_programt::const_targett next=target;
-  ++next;
-  assert(next!=goto_program.instructions.end());
-
   // catch the specific case where the original code was missing a return
-  // statement to avoid NONDET() in output
+  // statement to avoid NONDET() in output when the instruction is dead anyway
   if(ret.has_return_value() &&
-      ret.return_value().id()==ID_sideeffect &&
-      to_sideeffect_expr(ret.return_value()).get_statement()==ID_nondet &&
-      next->is_end_function())
+     ret.return_value().id()==ID_sideeffect &&
+     to_sideeffect_expr(ret.return_value()).get_statement()==ID_nondet)
   {
-    if(target->is_target())
-      dest.copy_to_operands(code_skipt());
+    const cfg_dominatorst &dominators=loops.get_dominator_info();
+    cfg_dominatorst::node_mapt::const_iterator i_entry=
+      dominators.node_map.find(target);
+    assert(i_entry!=dominators.node_map.end());
+    const cfg_dominatorst::nodet &n=i_entry->second;
+
+    if(n.dominators.empty())
+    {
+      if(target->is_target())
+        dest.copy_to_operands(code_skipt());
+      return target;
+    }
   }
-  else
-    dest.copy_to_operands(target->code);
+
+  dest.copy_to_operands(target->code);
 
   return target;
 }
@@ -660,20 +686,27 @@ goto_programt::const_targett goto_program2codet::convert_decl(
     codet &dest)
 {
   code_declt d=to_code_decl(target->code);
+  symbol_exprt &symbol=to_symbol_expr(d.symbol());
 
   goto_programt::const_targett next=target;
   ++next;
   assert(next!=goto_program.instructions.end());
 
+  // see if decl can go in current dest block
+  dead_mapt::const_iterator entry=dead_map.find(symbol.get_identifier());
+  bool move_to_dest= &toplevel_block==&dest ||
+    (entry!=dead_map.end() &&
+     upper_bound->location_number > entry->second);
+
   // move back initialising assignments into the decl, unless crossing the
   // current boundary
   if(next!=upper_bound &&
-      &toplevel_block==&dest &&
-      !next->is_target() &&
-      next->is_assign())
+     move_to_dest &&
+     !next->is_target() &&
+     next->is_assign())
   {
     const code_assignt &a=to_code_assign(next->code);
-    if(a.lhs()==d.symbol())
+    if(a.lhs()==symbol)
     {
       d.copy_to_operands(a.rhs());
       ++target;
@@ -682,11 +715,11 @@ goto_programt::const_targett goto_program2codet::convert_decl(
   }
   // if we have a constant but can't initialize them right away, we need to
   // remove the const marker
-  else if(d.symbol().type().get_bool(ID_C_constant))
-    d.symbol().type().remove(ID_C_constant);
-  else if(d.symbol().type().id()==ID_array)
+  else if(symbol.type().get_bool(ID_C_constant))
+    symbol.type().remove(ID_C_constant);
+  else if(symbol.type().id()==ID_array)
   {
-    for(typet * t=&(d.symbol().type());
+    for(typet * t=&(symbol.type());
         t->id()==ID_array;
         t=&(t->subtype()))
       if(t->subtype().id()!=ID_array &&
@@ -694,7 +727,11 @@ goto_programt::const_targett goto_program2codet::convert_decl(
         t->subtype().remove(ID_C_constant);
   }
 
-  toplevel_block.move_to_operands(d);
+  if(move_to_dest)
+    dest.move_to_operands(d);
+  else
+    toplevel_block.move_to_operands(d);
+
   return target;
 }
 
@@ -723,7 +760,7 @@ goto_programt::const_targett goto_program2codet::convert_do_while(
   d.body()=code_blockt();
 
   for( ; target!=loop_end; ++target)
-    target=convert_instruction(target, loop_end, d.body(), false);
+    target=convert_instruction(target, loop_end, d.body());
 
   convert_labels(loop_end, d.body());
 
@@ -803,7 +840,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_while(
   }
 
   for(++target; target!=loop_end; ++target)
-    target=convert_instruction(target, loop_end, w.body(), false);
+    target=convert_instruction(target, loop_end, w.body());
 
   convert_labels(loop_end, w.body());
   if(!loop_end->guard.is_true())
@@ -862,6 +899,16 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
   if(target->is_backwards_goto() ||
       target->guard.id()!=ID_equal ||
       !skip_typecast(to_equal_expr(target->guard).rhs()).is_constant())
+    return convert_goto_if(target, upper_bound, dest);
+
+  const cfg_dominatorst &dominators=loops.get_dominator_info();
+
+  // always use convert_goto_if for dead code as the construction below relies
+  // on effective dominator information 
+  cfg_dominatorst::node_mapt::const_iterator t_entry=
+    dominators.node_map.find(target);
+  assert(t_entry!=dominators.node_map.end());
+  if(t_entry->second.dominators.empty())
     return convert_goto_if(target, upper_bound, dest);
 
   // maybe, let's try some more
@@ -944,10 +991,9 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
   // add any instructions that go in the body of the switch before any cases
   goto_programt::const_targett orig_target=target;
   for(target=cases_it; target!=first_target; ++target)
-    target=convert_instruction(target, first_target, s.body(), true);
+    target=convert_instruction(target, first_target, s.body());
 
   std::set<unsigned> processed_locations;
-  const cfg_dominatorst &dominators=loops.get_dominator_info();
   goto_programt::const_targett max_target=target;
   std::map<goto_programt::const_targett, unsigned> targets_done;
 
@@ -974,8 +1020,10 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
     if(it->second.first!=orig_target)
       convert_labels(it->second.first, c);
 
+    // compute the block that belongs to this case
     target=it->second.second;
     goto_programt::const_targett case_end=target;
+    goto_programt::const_targett last_non_dead=target;
     for( ;
         case_end!=goto_program.instructions.end() &&
         case_end!=upper_bound;
@@ -986,6 +1034,11 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
       assert(i_entry!=dominators.node_map.end());
       const cfg_dominatorst::nodet &n=i_entry->second;
 
+      // ignore dead instructions for the following checks
+      if(n.dominators.empty())
+        continue;
+
+      // is this instruction dominated by at least one of the cases
       bool some_goto_dom=
         n.dominators.find(it->second.first)!=n.dominators.end();
       for(cases_listt::const_iterator it2=cases.begin();
@@ -999,7 +1052,11 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
         break;
       else if(!processed_locations.insert(case_end->location_number).second)
         assert(false);
+
+      last_non_dead=case_end;
+      ++last_non_dead;
     }
+    case_end=last_non_dead;
 
     // empty case
     if(case_end==target)
@@ -1018,7 +1075,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
     else
     {
       for( ; target!=case_end; ++target)
-        target=convert_instruction(target, case_end, c, false);
+        target=convert_instruction(target, case_end, c);
       if((--case_end)->location_number > max_target->location_number)
         max_target=case_end;
     }
@@ -1084,15 +1141,14 @@ goto_programt::const_targett goto_program2codet::convert_goto_if(
       return target;
     }
 
+    assert(!before_else->is_goto() ||
+           before_else->targets.size()==1);
     has_else=before_else->is_goto() &&
-      !before_else->is_backwards_goto() &&
+      before_else->targets.front()->location_number > end_if->location_number &&
       before_else->guard.is_true();
 
     if(has_else)
-    {
-      assert(before_else->targets.size()==1);
       end_if=before_else->targets.front();
-    }
   }
 
   code_ifthenelset i;
@@ -1113,16 +1169,16 @@ goto_programt::const_targett goto_program2codet::convert_goto_if(
   if(has_else)
   {
     for(++target; target!=before_else; ++target)
-      target=convert_instruction(target, before_else, to_code(i.then_case()), false);
+      target=convert_instruction(target, before_else, to_code(i.then_case()));
 
     convert_labels(before_else, to_code(i.then_case()));
 
     for(++target; target!=end_if; ++target)
-      target=convert_instruction(target, end_if, to_code(i.else_case()), false);
+      target=convert_instruction(target, end_if, to_code(i.else_case()));
   }
   else
     for(++target; target!=end_if; ++target)
-      target=convert_instruction(target, end_if, to_code(i.then_case()), false);
+      target=convert_instruction(target, end_if, to_code(i.then_case()));
 
   dest.move_to_operands(i);
   return --target;
@@ -1164,12 +1220,13 @@ goto_programt::const_targett goto_program2codet::convert_goto_goto(
     label << *it;
     break;
   }
+
   if(label.str().empty())
     label << "__CPROVER_DUMP_L" << target->targets.front()->target_number;
+
   labels_in_use.insert(label.str());
 
-  codet goto_code(ID_goto);
-  goto_code.set(ID_destination, label.str());
+  code_gotot goto_code(label.str());
 
   if(!target->guard.is_true())
   {
@@ -1227,7 +1284,7 @@ goto_programt::const_targett goto_program2codet::convert_start_thread(
     assert(thread_start->location_number > this_end->location_number);
 
     codet b=code_blockt();
-    convert_instruction(next, this_end, b, false);
+    convert_instruction(next, this_end, b);
 
     for(goto_programt::instructiont::labelst::const_iterator
         it=target->labels.begin();
@@ -1237,8 +1294,7 @@ goto_programt::const_targett goto_program2codet::convert_start_thread(
       {
         labels_in_use.insert(*it);
 
-        code_labelt l;
-        l.set_label(*it);
+        code_labelt l(*it);
         l.code().swap(b);
         l.location()=target->location;
         b.swap(l);
@@ -1298,7 +1354,7 @@ goto_programt::const_targett goto_program2codet::convert_start_thread(
 
   codet b=code_blockt();
   for( ; thread_start!=thread_end; ++thread_start)
-    thread_start=convert_instruction(thread_start, upper_bound, b, false);
+    thread_start=convert_instruction(thread_start, upper_bound, b);
 
   for(goto_programt::instructiont::labelst::const_iterator
       it=target->labels.begin();
@@ -1308,8 +1364,7 @@ goto_programt::const_targett goto_program2codet::convert_start_thread(
     {
       labels_in_use.insert(*it);
 
-      code_labelt l;
-      l.set_label(*it);
+      code_labelt l(*it);
       l.code().swap(b);
       l.location()=target->location;
       b.swap(l);
@@ -1318,6 +1373,49 @@ goto_programt::const_targett goto_program2codet::convert_start_thread(
   assert(b.get_statement()==ID_label);
   dest.move_to_operands(b);
   return thread_end;
+}
+
+/*******************************************************************\
+
+Function: goto_program2codet::convert_throw
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
+goto_programt::const_targett goto_program2codet::convert_throw(
+    goto_programt::const_targett target,
+    codet &dest)
+{
+  // this isn't really clear as throw is not supported in expr2cpp either
+  assert(false);
+  return target;
+}
+
+/*******************************************************************\
+
+Function: goto_program2codet::convert_catch
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
+goto_programt::const_targett goto_program2codet::convert_catch(
+    goto_programt::const_targett target,
+    goto_programt::const_targett upper_bound,
+    codet &dest)
+{
+  // this isn't really clear as catch is not supported in expr2cpp either
+  assert(false);
+  return target;
 }
 
 /*******************************************************************\
@@ -1693,8 +1791,7 @@ void goto_program2codet::cleanup_expr(exprt &expr)
           ns.follow(new_type).get_bool(ID_C_transparent_union))
         expr.type()=new_type;
 
-      typecast_exprt tc(expr, new_type);
-      expr.swap(tc);
+      expr.make_typecast(new_type);
     }
     else
     {
@@ -1718,16 +1815,13 @@ void goto_program2codet::cleanup_expr(exprt &expr)
           assert(false);
       }
 
-      typecast_exprt tc(expr, t);
-      expr.swap(tc);
+      expr.make_typecast(t);
     }
   }
-  else if(expr.id()==ID_vector)
+  else if(expr.id()==ID_vector ||
+          expr.id()==ID_array)
   {
-    const typet &t=expr.type();
-
-    typecast_exprt tc(expr, t);
-    expr.swap(tc);
+    expr.make_typecast(expr.type());
   }
   else if(expr.id()==ID_sideeffect)
   {
