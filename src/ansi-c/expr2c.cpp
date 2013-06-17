@@ -468,11 +468,15 @@ std::string expr2ct::convert_rec(
 
     dest+=")";
 
-    const typet &return_type=code_type.return_type();
+    const typet &return_type=ns.follow(code_type.return_type());
 
-    // return type may be a function pointer!
-    if(return_type.id()==ID_pointer &&
-        return_type.subtype().id()==ID_code)
+    // return type may be a function pointer or array
+    const typet *non_ptr_type=&return_type;
+    while(non_ptr_type->id()==ID_pointer)
+      non_ptr_type=&(ns.follow(non_ptr_type->subtype()));
+
+    if(non_ptr_type->id()==ID_code ||
+       non_ptr_type->id()==ID_array)
       dest=convert_rec(return_type, c_qualifierst(), dest);
     else
       dest=convert(return_type)+" "+dest;
@@ -490,9 +494,11 @@ std::string expr2ct::convert_rec(
   else if(src.id()==ID_vector)
   {
     const vector_typet &vector_type=to_vector_type(src);
+    
+    mp_integer size_int;
+    to_integer(vector_type.size(), size_int);
 
-    std::string dest="__gcc_v";
-    dest+=convert(vector_type.size());
+    std::string dest="__gcc_v"+integer2string(size_int);
 
     std::string tmp=convert(vector_type.subtype());
 
