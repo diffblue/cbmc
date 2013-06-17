@@ -2201,7 +2201,7 @@ bool cpp_typecheckt::static_typecast(
         }
 
         exprt address_of(ID_address_of, pointer_typet());
-        address_of.type().subtype()==e.type();
+        address_of.type().subtype()=e.type();
         address_of.copy_to_operands(e);
         make_ptr_typecast(address_of ,type);
         new_expr.swap(address_of);
