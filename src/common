@@ -159,8 +159,7 @@ clean:
 		$(CLEANFILES)
 
 .PHONY: first_target clean all
-
-.PHONY: sources
+.PHONY: sources generated_files
 
 sources: Makefile
 	@echo $(SRC)

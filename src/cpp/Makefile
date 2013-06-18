@@ -38,5 +38,7 @@ cpp$(LIBEXT): $(OBJ)
 cpp_lex.yy.cpp: scanner.l
 	$(LEX) -Pyycpp -o$@ scanner.l
 
+generated_files: cpp_lex.yy.cpp
+
 cpp_lex.yy$(OBJEXT): cpp_lex.yy.cpp
 

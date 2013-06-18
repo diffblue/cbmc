@@ -31,14 +31,19 @@ $(patsubst %, %.dir, $(DIRS)):
 	## Entering $(basename $@)
 	$(MAKE) $(MAKEARGS) -C $(basename $@)
 
+# generate source files
+
+$(patsubst %, %_generated_files, $(DIRS)):
+	$(MAKE) $(MAKEARGS) -C $(patsubst %_generated_files, %, $@) generated_files
+	
+generated_files: $(patsubst %, %_generated_files, $(DIRS))
+
 # cleaning
 
 clean: $(patsubst %, %_clean, $(DIRS))
 
 $(patsubst %, %_clean, $(DIRS)):
-	if [ -e $(patsubst %_clean, %, $@)/. ] ; then \
-		$(MAKE) $(MAKEARGS) -C $(patsubst %_clean, %, $@) clean ; \
-	fi
+	$(MAKE) $(MAKEARGS) -C $(patsubst %_clean, %, $@) clean ; \
 
 # minisat 2 download, for your convenience
 

@@ -27,6 +27,8 @@ xml_y.tab.h: y.tab.cpp
 xml_lex.yy.cpp: scanner.l
 	$(LEX) -Pyyxml -o$@ scanner.l
 
+generated_files: xml_lex.yy.cpp xml_y.tab.cpp
+
 # extra dependencies
 xml_y.tab$(OBJEXT): xml_y.tab.cpp xml_y.tab.h
 xml_lex.yy$(OBJEXT): xml_y.tab.cpp xml_lex.yy.cpp xml_y.tab.h
