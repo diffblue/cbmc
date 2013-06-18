@@ -80,7 +80,7 @@ exprt smt2_convt::get(const exprt &expr) const
 
 /*******************************************************************\
 
-Function: smt2_convt::parse_constant
+Function: smt2_convt::parse_literal
 
   Inputs:
 
@@ -90,7 +90,7 @@ Function: smt2_convt::parse_constant
 
 \*******************************************************************/
 
-constant_exprt smt2_convt::parse_constant(
+constant_exprt smt2_convt::parse_literal(
   const std::string &s,
   const typet &type)
 {
@@ -209,7 +209,7 @@ exprt smt2_convt::parse_struct(
       }
 
       std::string val = s.substr(p, (end-p));
-      ret.operands()[i]=parse_constant(val, sub_type);
+      ret.operands()[i]=parse_literal(val, sub_type);
 
       p = end+1;
     }
@@ -248,7 +248,7 @@ void smt2_convt::set_value(
      type.id()==ID_fixedbv ||
      type.id()==ID_floatbv)
   {
-    constant_exprt c=parse_constant(v, type);
+    constant_exprt c=parse_literal(v, type);
     identifier.value=c;
 
     assert(boolbv_width(type) == boolbv_width(c.type()));
@@ -263,7 +263,7 @@ void smt2_convt::set_value(
   else if(type.id()==ID_pointer)
   {
     // TODO
-    constant_exprt result = parse_constant(v, type);
+    constant_exprt result = parse_literal(v, type);
     assert(boolbv_width(type) == boolbv_width(result.type()));
 
     // add elaborated expression as operand
