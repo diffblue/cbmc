@@ -47,7 +47,9 @@ Function: smt2_dect::decision_procedure_text
 
 std::string smt2_dect::decision_procedure_text() const
 {
-  return "SMT "+logic+" using "+
+  return "SMT "+logic+
+    (use_FPA_theory?" (with FPA)":"")+
+    " using "+
     (solver==BOOLECTOR?"Boolector":
      solver==CVC3?"CVC3":
      solver==MATHSAT?"MathSAT":
