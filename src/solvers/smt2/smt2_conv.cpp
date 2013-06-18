@@ -110,56 +110,49 @@ constant_exprt smt2_convt::parse_constant(
   //
   // Right now I'm not parsing decimals.  It'd be nice if we had a real YACC
   // parser here, but whatever.
+  
+  mp_integer value;
 
-  if(s[0] == '#' && s[1] == 'b')
+  if(s.size()>=2 && s[0]=='#' && s[1]=='b')
   {
     // Binary
-    unsigned int width=s.size()-2;
-    
-    if(type.id()==ID_signedbv)
-      assert(width==to_signedbv_type(type).get_width());
-    else if(type.id()==ID_unsignedbv)
-      assert(width==to_unsignedbv_type(type).get_width());
-    else if(type.id()==ID_fixedbv)
-      assert(width==to_fixedbv_type(type).get_width());
-    else if(type.id()==ID_pointer)
-      assert(width==to_pointer_type(type).get_width());
-    
-    constant_exprt constant(type);
-    constant.set_value(s.substr(2));
-
-    return constant;
+    value=string2integer(s.substr(2), 2);
   }
-  else if (s[0] == '#' && s[1] == 'x')
+  else if(s.size()>=2 && s[0]=='#' && s[1]=='x')
   {
     // Hex
-    unsigned int width = (s.size() - 2) * 4;
-
-    if(type.id()==ID_signedbv)
-      assert(width==to_signedbv_type(type).get_width());
-    else if(type.id()==ID_unsignedbv)
-      assert(width==to_unsignedbv_type(type).get_width());
-    else if(type.id()==ID_fixedbv)
-      assert(width==to_fixedbv_type(type).get_width());
-    else if(type.id()==ID_pointer)
-      assert(width==to_pointer_type(type).get_width());
-
-    mp_integer value = string2integer(s.substr(2), 16);
-    constant_exprt constant(type);
-    constant.set_value(integer2binary(value, width));
-
-    return constant;
+    value=string2integer(s.substr(2), 16);
   }
   else
   {
-    // Numeral
-    assert(type.id()==ID_integer);
+    std::size_t dot_pos=s.find('.');
     
-    constant_exprt constant(type);
-    constant.set_value(s);
-
-    return constant;
+    if(dot_pos==std::string::npos)
+    {
+      // Numeral
+      value=string2integer(s);
+    }
+    else
+    {
+      // Decimal
+      throw "smt2_convt::parse_constant can't do Decimal";
+    }
   }
+  
+  if(type.id()==ID_fixedbv ||
+     type.id()==ID_floatbv ||
+     type.id()==ID_pointer ||
+     type.id()==ID_signedbv ||
+     type.id()==ID_unsignedbv)
+  {
+    unsigned width=boolbv_width(type);
+    return constant_exprt(integer2binary(value, width), type);
+  }
+  else if(type.id()==ID_integer ||
+          type.id()==ID_range)
+    return from_integer(value, type);
+  else
+    throw "smt2_convt::parse_constant can't do type "+type.id_string();
 }
 
 /*******************************************************************\
