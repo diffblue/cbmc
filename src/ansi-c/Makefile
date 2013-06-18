@@ -113,6 +113,12 @@ ansi_c_internal_additions$(OBJEXT): gcc_builtin_headers_power.inc
 ansi_c_internal_additions$(OBJEXT): arm_builtin_headers.inc
 ansi_c_internal_additions$(OBJEXT): cw_builtin_headers.inc
 
+generated_files: cprover_library.inc gcc_builtin_headers_generic.inc \
+	gcc_builtin_headers_ia32.inc gcc_builtin_headers_alpha.inc \
+	gcc_builtin_headers_arm.inc gcc_builtin_headers_mips.inc \
+	gcc_builtin_headers_power.inc arm_builtin_headers.inc \
+	cw_builtin_headers.inc ansi_c_y.tab.cpp ansi_c_lex.yy.cpp
+
 ###############################################################################
 
 ansi-c$(LIBEXT): $(OBJ) 

@@ -15,6 +15,8 @@ all: assembler$(LIBEXT)
 assembler_lex.yy.cpp: scanner.l
 	$(LEX) -Pyyassembler -o$@ scanner.l
 
+generated_files: assembler_lex.yy.cpp
+
 ###############################################################################
 
 assembler$(LIBEXT): $(OBJ) 

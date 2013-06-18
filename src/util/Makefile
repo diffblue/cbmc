@@ -45,6 +45,8 @@ irep_ids.cpp: irep_ids.inc irep_ids.h
 irep_ids_convert$(EXEEXT): irep_ids_convert.cpp
 	$(LINKNATIVE)
 
+generated_files: irep_ids.h irep_ids.inc
+
 # Most of the others will need irep_ids.h,
 # which we first need to generate.
 $(OBJ): irep_ids.h
