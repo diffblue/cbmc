@@ -14,7 +14,7 @@ SRC = goto_convert.cpp goto_convert_function_call.cpp \
       remove_unused_functions.cpp \
       wp.cpp goto_rw.cpp goto_clean_expr.cpp safety_checker.cpp \
       compute_called_functions.cpp link_to_library.cpp \
-      remove_return_values.cpp
+      remove_return_values.cpp osx_fat_reader.cpp
 
 INCLUDES= -I ..
 
@@ -25,13 +25,13 @@ LIBS = ../ansi-c/ansi-c$(LIBEXT) \
        ../cpp/cpp$(LIBEXT) \
        ../linking/linking$(LIBEXT) \
        ../util/util$(LIBEXT) \
-       ../big-int/bigint$(OBJEXT) goto-programs$(LIBEXT) \
+       ../big-int/big-int$(LIBEXT) \
        ../pointer-analysis/pointer-analysis$(LIBEXT) \
        ../langapi/langapi$(LIBEXT) \
        ../assembler/assembler$(LIBEXT) \
        ../analyses/analyses$(LIBEXT)
 
-CLEANFILES = goto-programs$(LIBEXT) test_wp$(EXEEXT)
+CLEANFILES = goto-programs$(LIBEXT) test_wp$(EXEEXT) osx_fat_reader_test$(EXEEXT)
 
 all: goto-programs$(LIBEXT)
 
@@ -41,5 +41,8 @@ goto-programs$(LIBEXT): $(OBJ)
 	$(LINKLIB)
 
 test_wp$(EXEEXT): test_wp$(OBJEXT) goto-programs$(LIBEXT)
+	$(LINKBIN)
+
+osx_fat_reader_test$(EXEEXT): osx_fat_reader_test$(OBJEXT) goto-programs$(LIBEXT)
 	$(LINKBIN)
 
