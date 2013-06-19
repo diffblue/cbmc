@@ -6,15 +6,33 @@ Author:
 
 \*******************************************************************/
 
+#ifdef __linux__
+#include <unistd.h>
+#endif
+
+#ifdef __FreeBSD_kernel__
+#include <unistd.h>
+#endif
+
+#ifdef __GNU__
+#include <unistd.h>
+#endif
+
+#ifdef __MACH__
+#include <unistd.h>
+#endif
+
 #include <fstream>
 
 #include <util/message.h>
 #include <util/unicode.h>
+#include <util/tempfile.h>
 
 #include "goto_model.h"
 #include "read_goto_binary.h"
 #include "read_bin_goto_object.h"
 #include "elf_reader.h"
+#include "osx_fat_reader.h"
 
 /*******************************************************************\
 
@@ -106,6 +124,42 @@ bool read_goto_binary(
       messaget(message_handler).error(s);
     }
   }
+  else if(is_osx_fat_magic(hdr))
+  {
+    std::string tempname;
+    // Mach-O universal binary
+    // This _may_ have a goto binary as hppa7100LC architecture
+    try
+    {
+      osx_fat_readert osx_fat_reader(in);
+
+      if(osx_fat_reader.has_gb())
+      {
+        tempname=get_temporary_file("tmp.goto-binary", ".gb");
+        osx_fat_reader.extract_gb(filename, tempname);
+
+        std::ifstream temp_in(tempname.c_str(), std::ios::binary);
+        if(!temp_in)
+          messaget(message_handler).error("failed to read temp binary");
+        const bool read_err=read_bin_goto_object(
+          temp_in, filename, symbol_table, goto_functions, message_handler);
+        temp_in.close();
+
+        unlink(tempname.c_str());
+        return read_err;
+      }
+
+      // architecture not found
+      messaget(message_handler).error("failed to find goto binary in Mach-O file");
+    }
+
+    catch(const char *s)
+    {
+      if(!tempname.empty())
+        unlink(tempname.c_str());
+      messaget(message_handler).error(s);
+    }
+  }
   else
   {
     messaget(message_handler).error("not a goto binary");
@@ -158,6 +212,21 @@ bool is_goto_binary(const std::string &filename)
       in.seekg(0);
       elf_readert elf_reader(in);
       if(elf_reader.has_section("goto-cc")) return true;
+    }
+    
+    catch(...)
+    {
+      // ignore any errors
+    }
+  }
+  else if(is_osx_fat_magic(hdr))
+  {
+    // this _may_ have a goto binary as hppa7100LC architecture
+    try
+    {
+      in.seekg(0);
+      osx_fat_readert osx_fat_reader(in);
+      if(osx_fat_reader.has_gb()) return true;
     }
     
     catch(...)
