@@ -252,8 +252,7 @@ void goto_program2codet::build_loop_map()
         ++it)
       if((*it)->is_goto())
       {
-        assert((*it)->targets.size()==1);
-        if((*it)->targets.front()==loop_start &&
+        if((*it)->get_target()==loop_start &&
             (*it)->location_number>loop_end->location_number)
           loop_end=*it;
       }
@@ -828,7 +827,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_while(
   goto_programt::const_targett after_loop=loop_end;
   ++after_loop;
   assert(after_loop!=goto_program.instructions.end());
-  if(target->targets.front()==after_loop)
+  if(target->get_target()==after_loop)
   {
     w.cond()=not_exprt(target->guard);
     simplify(w.cond(), ns);
@@ -935,8 +934,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
         !cases_it->is_backwards_goto() &&
         cases_it->guard.is_true())
     {
-      assert(cases_it->targets.size()==1);
-      goto_programt::const_targett default_target=cases_it->targets.front();
+      goto_programt::const_targett default_target=cases_it->get_target();
 
       if(first_target==goto_program.instructions.end() ||
           first_target->location_number > default_target->location_number)
@@ -958,10 +956,9 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
         skip_typecast(to_equal_expr(cases_it->guard).rhs()).is_constant() &&
         s.value()==to_equal_expr(cases_it->guard).lhs())
     {
-      assert(cases_it->targets.size()==1);
       cases.push_back(std::make_pair(
             to_equal_expr(cases_it->guard).rhs(),
-            std::make_pair(cases_it, cases_it->targets.front())));
+            std::make_pair(cases_it, cases_it->get_target())));
       assert(cases.back().first.is_not_nil());
 
       if(first_target==goto_program.instructions.end() ||
@@ -1122,9 +1119,9 @@ goto_programt::const_targett goto_program2codet::convert_goto_if(
     goto_programt::const_targett upper_bound,
     codet &dest)
 {
-  goto_programt::const_targett else_case=target->targets.front();
+  goto_programt::const_targett else_case=target->get_target();
   goto_programt::const_targett before_else=else_case;
-  goto_programt::const_targett end_if=target->targets.front();
+  goto_programt::const_targett end_if=target->get_target();
   assert(end_if!=goto_program.instructions.end());
   bool has_else=false;
 
@@ -1141,14 +1138,12 @@ goto_programt::const_targett goto_program2codet::convert_goto_if(
       return target;
     }
 
-    assert(!before_else->is_goto() ||
-           before_else->targets.size()==1);
     has_else=before_else->is_goto() &&
-      before_else->targets.front()->location_number > end_if->location_number &&
+      before_else->get_target()->location_number > end_if->location_number &&
       before_else->guard.is_true();
 
     if(has_else)
-      end_if=before_else->targets.front();
+      end_if=before_else->get_target();
   }
 
   code_ifthenelset i;
@@ -1203,14 +1198,14 @@ goto_programt::const_targett goto_program2codet::convert_goto_goto(
   // filter out useless goto 1; 1: ...
   goto_programt::const_targett next=target;
   ++next;
-  if(target->targets.front()==next)
+  if(target->get_target()==next)
     return target;
 
   std::stringstream label;
   // try user-defined labels first
   for(goto_programt::instructiont::labelst::const_iterator
-      it=target->targets.front()->labels.begin();
-      it!=target->targets.front()->labels.end();
+      it=target->get_target()->labels.begin();
+      it!=target->get_target()->labels.end();
       ++it)
   {
     if(has_prefix(id2string(*it), "__CPROVER_ASYNC_") ||
@@ -1222,7 +1217,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_goto(
   }
 
   if(label.str().empty())
-    label << "__CPROVER_DUMP_L" << target->targets.front()->target_number;
+    label << "__CPROVER_DUMP_L" << target->get_target()->target_number;
 
   labels_in_use.insert(label.str());
 
@@ -1261,10 +1256,8 @@ goto_programt::const_targett goto_program2codet::convert_start_thread(
     codet &dest)
 {
   assert(target->is_start_thread());
-  // we only do one target now
-  assert(target->targets.size()==1);
 
-  goto_programt::const_targett thread_start=target->targets.front();
+  goto_programt::const_targett thread_start=target->get_target();
   assert(thread_start->location_number > target->location_number);
 
   goto_programt::const_targett next=target;
@@ -1313,12 +1306,12 @@ goto_programt::const_targett goto_program2codet::convert_start_thread(
   // 2: code in existing thread
   /* check the structure and compute the iterators */
   assert(next->is_goto() && next->guard.is_true());
-  assert(next->targets.size()==1 && !next->is_backwards_goto());
-  assert(thread_start->location_number < next->targets.front()->location_number);
+  assert(!next->is_backwards_goto());
+  assert(thread_start->location_number < next->get_target()->location_number);
   goto_programt::const_targett after_thread_start=thread_start;
   ++after_thread_start;
 
-  goto_programt::const_targett thread_end=next->targets.front();
+  goto_programt::const_targett thread_end=next->get_target();
   --thread_end;
   assert(thread_start->location_number < thread_end->location_number);
   assert(thread_end->is_end_thread());
