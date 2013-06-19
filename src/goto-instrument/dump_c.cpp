@@ -278,11 +278,11 @@ void goto_program2codet::build_dead_map()
 {
   dead_map.clear();
 
+  // record last dead X
   forall_goto_program_instructions(target, goto_program)
     if(target->is_dead())
-      dead_map.insert(std::make_pair(
-          to_code_dead(target->code).get_identifier(),
-          target->location_number));
+      dead_map[to_code_dead(target->code).get_identifier()]=
+        target->location_number;
 }
 
 /*******************************************************************\
