@@ -544,9 +544,10 @@ int gcc_modet::gcc_hybrid_binary(const cmdlinet::argst &input_files)
       it!=output_files.end();
       it++)
   {
-    #ifdef __linux__
     debug("merging "+*it);
+    std::string saved=*it+".goto-cc-saved";
 
+    #ifdef __linux__
     if(!cmdline.isset('c'))
     {
       // remove any existing goto-cc section
@@ -560,8 +561,6 @@ int gcc_modet::gcc_hybrid_binary(const cmdlinet::argst &input_files)
     }
 
     // now add goto-binary as goto-cc section  
-    std::string saved=*it+".goto-cc-saved";
-
     std::vector<std::string> objcopy_argv;
   
     objcopy_argv.push_back("objcopy");
@@ -571,44 +570,28 @@ int gcc_modet::gcc_hybrid_binary(const cmdlinet::argst &input_files)
     
     run(objcopy_argv[0], objcopy_argv);
 
-    remove(saved.c_str());    
-
+    remove(saved.c_str());
     #elif defined(__APPLE__)
     // Mac
-
-    for(std::list<std::string>::const_iterator
-        it=output_files.begin();
-        it!=output_files.end();
-        it++)
-    {
-      debug("merging "+*it);
-
-      std::vector<std::string> lipo_argv;
+    std::vector<std::string> lipo_argv;
+  
+    // now add goto-binary as hppa7100LC section  
+    lipo_argv.push_back("lipo");
+    lipo_argv.push_back(*it);
+    lipo_argv.push_back("-create");
+    lipo_argv.push_back("-arch");
+    lipo_argv.push_back("hppa7100LC");
+    lipo_argv.push_back(saved);
+    lipo_argv.push_back("-output");
+    lipo_argv.push_back(*it);
     
-      // now add goto-binary as hppa7100LC section  
-      std::string saved=*it+".goto-cc-saved";
+    run(lipo_argv[0], lipo_argv);
 
-      lipo_argv.push_back("lipo");
-      lipo_argv.push_back(*it);
-      lipo_argv.push_back("-create");
-      lipo_argv.push_back("-arch");
-      lipo_argv.push_back("hppa7100LC");
-      lipo_argv.push_back(saved);
-      lipo_argv.push_back("-output");
-      lipo_argv.push_back(*it);
-      
-      run(lipo_argv[0], lipo_argv);
+    remove(saved.c_str());
 
-      remove(saved.c_str());    
-    }
-    
-    return 0;
-    
     #else
-    
-    error("binary merging not implemented for this architecture");
+    error("binary merging not implemented for this platform");
     return 1;
-
     #endif
   }
   
