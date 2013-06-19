@@ -14,68 +14,60 @@ Author: Daniel Kroening, kroening@kroening.com
 //#define SATCHECK_ZCHAFF
 //#define SATCHECK_MINISAT1
 #define SATCHECK_MINISAT2
+//#define SATCHECK_GLUCOSE
 //#define SATCHECK_BOOLEFORCE
 //#define SATCHECK_PRECOSAT
 //#define SATCHECK_PICOSAT
 //#define SATCHECK_LINGELING
 
-#ifdef SATCHECK_ZCHAFF
+#if defined SATCHECK_ZCHAFF
 
 #include "satcheck_zchaff.h"
 
 typedef satcheck_zchafft satcheckt;
 
-#else
-#ifdef SATCHECK_BOOLEFORCE
+#elif defined SATCHECK_BOOLEFORCE
 
 #include "satcheck_booleforce.h"
 
 typedef satcheck_booleforcet satcheckt;
 
-#else
-
-#ifdef SATCHECK_MINISAT1
+#elif defined SATCHECK_MINISAT1
 
 #include "satcheck_minisat.h"
 
 typedef satcheck_minisat1t satcheckt;
 
-#else
-#ifdef SATCHECK_MINISAT2
+#elif defined SATCHECK_MINISAT2
 
 #include "satcheck_minisat2.h"
 
 typedef satcheck_minisat_simplifiert satcheckt;
 
-#else
-#ifdef SATCHECK_PRECOSAT
+#elif defined SATCHECK_PRECOSAT
 
 #include "satcheck_precosat.h"
 
 typedef satcheck_precosatt satcheckt;
 
-#else
-#ifdef SATCHECK_PICOSAT
+#elif defined SATCHECK_PICOSAT
 
 #include "satcheck_picosat.h"
 
 typedef satcheck_picosatt satcheckt;
 
-#else
-#ifdef SATCHECK_LINGELING
+#elif defined SATCHECK_LINGELING
 
 #include "satcheck_lingeling.h"
 
 typedef satcheck_lingelingt satcheckt;
 
-#else
-#error NO SAT CHECKER
-#endif
-#endif
-#endif
-#endif
-#endif
-#endif
+#elif defined SATCHECK_GLUCOSE
+
+#include "satcheck_glucose.h"
+
+typedef satcheck_glucose_simplifiert satcheckt;
+
 #endif
 
 #endif

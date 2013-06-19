@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 
 #include <solvers/sat/satcheck.h>
+#include <solvers/sat/satcheck_minisat2.h>
 
 #ifdef HAVE_BV_REFINEMENT
 #include <bv_refinement/bv_refinement_loop.h>
