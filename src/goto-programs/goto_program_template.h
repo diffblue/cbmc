@@ -100,6 +100,13 @@ public:
     typedef std::list<const_targett> const_targetst;
 
     targetst targets;
+    
+    // for the usual case of a single target
+    inline targett get_target() const
+    {
+      assert(targets.size()==1);
+      return targets.front();
+    }
 
     //! goto target labels    
     typedef std::list<irep_idt> labelst;
