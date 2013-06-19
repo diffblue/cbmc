@@ -57,7 +57,7 @@ void goto_symext::symex_goto(statet &state)
     throw "no support for non-deterministic gotos";
     
   goto_programt::const_targett goto_target=
-    instruction.targets.front();
+    instruction.get_target();
     
   bool forward=
     state.source.pc->location_number<
