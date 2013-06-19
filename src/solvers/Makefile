@@ -22,6 +22,14 @@ ifneq ($(MINISAT2),)
   override CXXFLAGS := $(filter-out -pedantic, $(CXXFLAGS))
 endif
 
+ifneq ($(GLUCOSE),)
+  GLUCOSE_SRC=sat/satcheck_glucose.cpp
+  GLUCOSE_INCLUDE=-I $(GLUCOSE)
+  GLUCOSE_LIB=$(GLUCOSE)/simp/SimpSolver$(OBJEXT) $(GLUCOSE)/core/Solver$(OBJEXT)
+  CP_CXXFLAGS += -DHAVE_GLUCOSE -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS
+  override CXXFLAGS := $(filter-out -pedantic, $(CXXFLAGS))
+endif
+
 ifneq ($(SMVSAT),)
   SMVSAT_SRC=sat/satcheck_smvsat.cpp
   SMVSAT_INCLUDE=-I $(SMVSAT)/include
@@ -64,8 +72,8 @@ ifneq ($(LINGELING),)
 endif
 
 SRC = $(CHAFF_SRC) $(BOOLEFORCE_SRC) $(MINISAT_SRC) $(MINISAT2_SRC) \
-      $(SMVSAT_SRC) $(SQUOLEM2_SRC) $(CUDD_SRC) \
-			$(PRECOSAT_SRC) $(PICOSAT_SRC) $(LINGELING_SRC) \
+      $(SMVSAT_SRC) $(SQUOLEM2_SRC) $(CUDD_SRC) $(GLUCOSE_SRC) \
+      $(PRECOSAT_SRC) $(PICOSAT_SRC) $(LINGELING_SRC) \
       sat/cnf.cpp sat/dimacs_cnf.cpp sat/cnf_clause_list.cpp \
       sat/pbs_dimacs_cnf.cpp sat/read_dimacs_cnf.cpp \
       sat/resolution_proof.cpp sat/satcheck.cpp \
@@ -110,7 +118,7 @@ SRC = $(CHAFF_SRC) $(BOOLEFORCE_SRC) $(MINISAT_SRC) $(MINISAT2_SRC) \
 
 INCLUDES= -I .. \
   $(CHAFF_INCLUDE) $(BOOLEFORCE_INCLUDE) $(MINISAT_INCLUDE) $(MINISAT2_INCLUDE) \
-  $(SMVSAT_INCLUDE) $(SQUOLEM2_INC) $(CUDD_INCLUDE) \
+  $(SMVSAT_INCLUDE) $(SQUOLEM2_INC) $(CUDD_INCLUDE) $(GLUCOSE_INCLUDE) \
 	$(PRECOSAT_INCLUDE) $(PICOSAT_INCLUDE) $(LINGELING_INCLUDE)
 
 CLEANFILES = solvers$(LIBEXT)
@@ -133,6 +141,6 @@ endif
 
 solvers$(LIBEXT): $(OBJ) $(CHAFF_LIB) $(BOOLEFORCE_LIB) $(MINISAT_LIB) \
         $(MINISAT2_LIB) $(SMVSAT_LIB) $(SQUOLEM2_LIB) $(CUDD_LIB) \
-				$(PRECOSAT_LIB) $(PICOSAT_LIB) $(LINGELING_LIB)
+	$(PRECOSAT_LIB) $(PICOSAT_LIB) $(LINGELING_LIB) $(GLUCOSE_LIB)
 	$(LINKLIB)
 
