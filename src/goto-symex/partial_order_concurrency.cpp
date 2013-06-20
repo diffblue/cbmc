@@ -25,7 +25,8 @@ Function: partial_order_concurrencyt::~partial_order_concurrencyt
 
 \*******************************************************************/
 
-partial_order_concurrencyt::partial_order_concurrencyt()
+partial_order_concurrencyt::partial_order_concurrencyt(
+  const namespacet &_ns):ns(_ns)
 {
 }
 
@@ -62,15 +63,59 @@ symbol_exprt partial_order_concurrencyt::clock(event_it event)
   irep_idt identifier;
 
   if(event->is_assignment())
+  {
+    assert(is_shared_write(event));
     identifier=id2string(id(event))+"$wclk";
+  }
   else if(event->is_shared_read())
+  {
+    assert(is_shared_read(event));
     identifier=id2string(id(event))+"$rclk";
+  }
   else if(event->is_spawn())
     identifier=i2string(event->source.thread_nr+1)+"$spwnclk";
   else
     assert(false);
 
   return symbol_exprt(identifier, clock_type);
+}
+
+/*******************************************************************\
+
+Function: partial_order_concurrencyt::is_shared_write
+
+  Inputs: 
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool partial_order_concurrencyt::is_shared_write(event_it event) const
+{
+  if(!event->is_assignment()) return false;
+  const symbolt &symbol=ns.lookup(event->original_lhs_object.get_identifier());
+  return !symbol.is_thread_local;
+}
+
+/*******************************************************************\
+
+Function: partial_order_concurrencyt::is_shared_read
+
+  Inputs: 
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool partial_order_concurrencyt::is_shared_read(event_it event) const
+{
+  if(!event->is_shared_read()) return false;
+  const symbolt &symbol=ns.lookup(event->original_lhs_object.get_identifier());
+  return !symbol.is_thread_local;
 }
 
 /*******************************************************************\

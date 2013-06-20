@@ -16,7 +16,7 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 class partial_order_concurrencyt:public messaget
 {
 public:
-  partial_order_concurrencyt();
+  explicit partial_order_concurrencyt(const namespacet &_ns);
   virtual ~partial_order_concurrencyt();
 
   typedef symex_target_equationt::SSA_stept eventt;
@@ -24,6 +24,8 @@ public:
   typedef eventst::const_iterator event_it;
   
 protected:
+  const namespacet &ns;
+
   typedef std::vector<const eventt *> event_listt;
   
   // produces the symbol ID for an event
@@ -45,6 +47,18 @@ protected:
   
   // the partial order constraint for two events
   exprt before(event_it e1, event_it e2);
+
+  // is it an assignment for a shared variable?
+  bool is_shared_write(event_it e) const;
+
+  // is it a read from a shared variable?
+  bool is_shared_read(event_it e) const;
+  
+  // is this a spawn?
+  static inline bool is_spawn(event_it e)
+  {
+    return e->is_spawn();
+  }
 };
 
 #if 0

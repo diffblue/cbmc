@@ -14,7 +14,7 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 class memory_model_baset:public partial_order_concurrencyt
 {
 public:
-  memory_model_baset();
+  explicit memory_model_baset(const namespacet &_ns);
   virtual ~memory_model_baset();
 
   virtual void operator()(symex_target_equationt &)=0;
@@ -54,18 +54,6 @@ protected:
   
   // maps thread numbers to an event list
   typedef std::map<unsigned, event_listt> per_thread_mapt;
-};
-
-class memory_model_sct:public memory_model_baset
-{
-public:
-  virtual void operator()(symex_target_equationt &equation);
-  
-protected:
-  void program_order(symex_target_equationt &equation);
-  void from_read(symex_target_equationt &equation);
-  void write_serialization_internal(symex_target_equationt &equation);
-  void write_serialization_external(symex_target_equationt &equation);
 };
 
 #endif
