@@ -370,7 +370,7 @@ void race_check(
 
   // get "main"
   goto_functionst::function_mapt::iterator
-    m_it=goto_functions.function_map.find(goto_functions.main_id());
+    m_it=goto_functions.function_map.find(goto_functions.entry_point());
 
   if(m_it==goto_functions.function_map.end())
     throw "Race check instrumentation needs an entry point";

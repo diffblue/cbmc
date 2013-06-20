@@ -465,7 +465,7 @@ void shared_bufferst::add_initialization_code(goto_functionst &goto_functions)
 {
   // get "main"
   goto_functionst::function_mapt::iterator
-    m_it=goto_functions.function_map.find(goto_functions.main_id());
+    m_it=goto_functions.function_map.find(goto_functions.entry_point());
 
   if(m_it==goto_functions.function_map.end())
     throw "Weak memory instrumentation needs an entry point";
@@ -2069,7 +2069,7 @@ void weak_memory(
 
   shared_bufferst::cfg_visitort visitor(shared_buffers, symbol_table, 
     goto_functions);
-  visitor.weak_memory(value_sets, goto_functions.main_id(), model);
+  visitor.weak_memory(value_sets, goto_functions.entry_point(), model);
 
   /* removes potential skips */
   Forall_goto_functions(f_it, goto_functions)

@@ -123,13 +123,10 @@ unsigned instrumentert::goto2graph_cfg(
   if(!no_dependencies)
     std::cout << "Dependencies analysis enabled" << std::endl;
 
-  if(goto_functions.main_id()=="")
-    throw "Main function not found";
-
   /* builds the graph following the CFG */
   cfg_visitort visitor(ns, *this);
   visitor.visit_cfg(value_sets, model, no_dependencies, 
-    goto_functions.main_id());
+    goto_functions.entry_point());
 
   std::vector<unsigned> subgraph_index;
   num_sccs = egraph_alt.SCCs(subgraph_index);

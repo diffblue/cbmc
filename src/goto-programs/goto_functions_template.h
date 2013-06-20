@@ -70,11 +70,11 @@ public:
   typedef std::map<irep_idt, goto_functiont> function_mapt;
   function_mapt function_map;
   
-  goto_functions_templatet()
+  inline goto_functions_templatet()
   {
   }
   
-  void clear()
+  inline void clear()
   {
     function_map.clear();
   }
@@ -95,12 +95,18 @@ public:
     compute_location_numbers();
   }
 
-  irep_idt main_id() const
+  // will go away, use below
+  inline irep_idt main_id() const
   {
     return ID_main;
   }
   
-  void swap(goto_functions_templatet &other)
+  inline irep_idt entry_point() const
+  {
+    return ID_main;
+  }
+  
+  inline void swap(goto_functions_templatet &other)
   {
     function_map.swap(other.function_map);
   }

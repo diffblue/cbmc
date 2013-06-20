@@ -215,7 +215,7 @@ void string_abstractiont::operator()(goto_functionst &dest)
 
   // do we have a main?
   goto_functionst::function_mapt::iterator
-    m_it=dest.function_map.find(dest.main_id());
+    m_it=dest.function_map.find(dest.entry_point());
 
   if(m_it!=dest.function_map.end())
   {

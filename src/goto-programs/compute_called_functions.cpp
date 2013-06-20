@@ -127,7 +127,7 @@ void compute_called_functions(
   std::set<irep_idt> done;
   
   // start from entry point
-  working_queue.insert(goto_functions.main_id());
+  working_queue.insert(goto_functions.entry_point());
   
   while(!working_queue.empty())
   {
