@@ -45,16 +45,24 @@ exprt convert_float_literal(const std::string &src)
   
   result.set(ID_C_cformat, src);
   
-  // In ANSI-C, float literals are double by default
+  // In ANSI-C, float literals are double by default,
   // unless marked with 'f'.
   // All of these can be complex as well.
+  // This can be overriden with
+  // config.ansi_c.single_precision_constant.
 
   if(is_float)
     result.type()=float_type();
   else if(is_long)
     result.type()=long_double_type();
   else
-    result.type()=double_type(); // default
+  {
+    // default
+    if(config.ansi_c.single_precision_constant)
+      result.type()=float_type(); // default
+    else
+      result.type()=double_type(); // default
+  }
   
   if(config.ansi_c.use_fixed_for_float)
   {

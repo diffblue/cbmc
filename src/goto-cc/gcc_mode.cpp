@@ -161,6 +161,11 @@ bool gcc_modet::doit()
     config.ansi_c.wchar_t_is_unsigned=true;
   }
   
+  // -fsingle-precision-constant makes floating-point constants "float"
+  // instead of double
+  if(cmdline.isset("-fsingle-precision-constant"))
+    config.ansi_c.single_precision_constant=true;
+  
   // -fshort-double makes double the same as float
   if(cmdline.isset("fshort-double"))
     config.ansi_c.double_width=config.ansi_c.single_width;

@@ -38,9 +38,11 @@ public:
     unsigned long_double_width;
     unsigned wchar_t_width;
     
+    // various language options
     bool char_is_unsigned, wchar_t_is_unsigned;
     bool use_fixed_for_float;
     bool for_has_scope;
+    bool single_precision_constant;
     
     ieee_floatt::rounding_modet rounding_mode;
 

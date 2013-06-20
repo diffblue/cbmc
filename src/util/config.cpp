@@ -245,6 +245,7 @@ bool configt::set(const cmdlinet &cmdline)
 {
   // defaults -- we match the architecture we have ourselves
   
+  ansi_c.single_precision_constant=false;
   ansi_c.for_has_scope=false; // ealier than C99
   ansi_c.use_fixed_for_float=false;
   ansi_c.endianness=ansi_ct::NO_ENDIANNESS;
