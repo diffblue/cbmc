@@ -95,7 +95,7 @@ void partial_order_concurrencyt::build_clock_type(
 
 /*******************************************************************\
 
-Function: partial_order_concurrencyt::po_constraint
+Function: partial_order_concurrencyt::before
 
   Inputs: 
 
@@ -105,12 +105,11 @@ Function: partial_order_concurrencyt::po_constraint
 
 \*******************************************************************/
 
-exprt partial_order_concurrencyt::po_constraint(
+exprt partial_order_concurrencyt::before(
   event_it e1, event_it e2)
 {
   return binary_relation_exprt(clock(e1), ID_lt, clock(e2));
 }
-
 
 #if 0
 
@@ -344,14 +343,14 @@ Function: partial_order_concurrencyt::add_clock_constraint
 \*******************************************************************/
 
 symbol_exprt partial_order_concurrencyt::add_clock_constraint(
-    const symbol_exprt &n1_sym,
-    const symbol_exprt &n2_sym,
-    const symex_targett::sourcet &source,
-    const std::string &po_name)
+  const symbol_exprt &n1_sym,
+  const symbol_exprt &n2_sym,
+  const symex_targett::sourcet &source,
+  const std::string &po_name)
 {
   symbol_exprt s=fresh_nondet_bool();
 
-  equal_exprt e(s, binary_relation_exprt(n1_sym, ID_lt, n2_sym));
+  equal_exprt e(s, before(n1_sym, n2_sym));
   add_constraint(e, guardt(), source, po_name);
 
   return s;

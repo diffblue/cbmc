@@ -44,7 +44,7 @@ protected:
   void build_clock_type(const symex_target_equationt &);
   
   // the partial order constraint for two events
-  exprt po_constraint(event_it e1, event_it e2);
+  exprt before(event_it e1, event_it e2);
 };
 
 #if 0
