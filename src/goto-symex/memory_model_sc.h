@@ -11,19 +11,22 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 
 #include "memory_model.h"
 
-#if 0
 class memory_model_sct:public memory_model_baset
 {
 public:
+  inline explicit memory_model_sct(const namespacet &_ns):
+    memory_model_baset(_ns)
+  {
+  }
+
   virtual void operator()(symex_target_equationt &equation);
   
 protected:
-  virtual void read_from(symex_target_equationt &equation);
-  virtual void program_order(symex_target_equationt &equation);
-  virtual void write_serialization_internal(symex_target_equationt &equation);
-  virtual void write_serialization_external(symex_target_equationt &equation);
+  void program_order(symex_target_equationt &equation);
+  void from_read(symex_target_equationt &equation);
+  void write_serialization_internal(symex_target_equationt &equation);
+  void write_serialization_external(symex_target_equationt &equation);
 };
-#endif
 
 #endif
 

@@ -27,7 +27,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-symex/slice.h>
 #include <goto-symex/slice_by_trace.h>
 #include <goto-symex/xml_goto_trace.h>
-#include <goto-symex/memory_model.h>
+#include <goto-symex/memory_model_sc.h>
 
 #include <solvers/sat/satcheck_minisat2.h>
 
@@ -313,7 +313,7 @@ Function: bmct::run
 
 bool bmct::run(const goto_functionst &goto_functions)
 {
-  memory_model_sct memory_model_sc;
+  memory_model_sct memory_model_sc(ns);
 
   //symex.total_claims=0;
   symex.set_message_handler(get_message_handler());
