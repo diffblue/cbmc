@@ -517,10 +517,13 @@ void goto_instrument_parseoptionst::instrument_goto_program(
     options.set_option("unwind", cmdline.getval("unwind"));
   }
 
-  // we add the library, as some analyses benefit
-  
-  status("Adding CPROVER library");      
-  link_to_library(symbol_table, goto_functions, ui_message_handler);
+  // we add the library in some cases, as some analyses benefit
+
+  if(cmdline.isset("mm"))
+  {
+    status("Adding CPROVER library");      
+    link_to_library(symbol_table, goto_functions, ui_message_handler);
+  }
 
   namespacet ns(symbol_table);
 
