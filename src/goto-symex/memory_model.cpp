@@ -213,7 +213,7 @@ void memory_model_baset::read_from(symex_target_equationt &equation)
         if(!is_rfi)
         {
           // if r reads from w, then w must have happened before r
-          exprt cond=implies_exprt(s, po_constraint(w, r));
+          exprt cond=implies_exprt(s, before(w, r));
           equation.constraint(
             true_exprt(), cond, "rf-order", r->source);
         }
@@ -324,7 +324,7 @@ void memory_model_sct::program_order(
 
       equation.constraint(
         true_exprt(),
-        po_constraint(previous, *e_it),
+        before(previous, *e_it),
         "po",
         (*e_it)->source);
 
@@ -358,7 +358,7 @@ void memory_model_sct::program_order(
       {
         equation.constraint(
           true_exprt(),
-          po_constraint(*e_it, next_thread->second.front()),
+          before(*e_it, next_thread->second.front()),
           "thread-spawn",
           (*e_it)->source);
       }
@@ -465,13 +465,13 @@ void memory_model_sct::write_serialization_external(
         // write-to-write edge
         equation.constraint(
           true_exprt(),
-          implies_exprt(s, po_constraint(*w_it1, *w_it2)),
+          implies_exprt(s, before(*w_it1, *w_it2)),
           "ws-ext",
           (*w_it1)->source);
 
         equation.constraint(
           true_exprt(),
-          implies_exprt(not_exprt(s), po_constraint(*w_it2, *w_it1)),
+          implies_exprt(not_exprt(s), before(*w_it2, *w_it1)),
           "ws-ext",
           (*w_it1)->source);
       }
@@ -520,7 +520,7 @@ void memory_model_sct::from_read(symex_target_equationt &equation)
         if(po(*w_prime, *w))
           ws=true_exprt(); // true on SC only!
         else
-          ws=po_constraint(*w_prime, *w);
+          ws=before(*w_prime, *w);
 
         // smells like cubic
         for(choice_symbolst::const_iterator
@@ -534,7 +534,7 @@ void memory_model_sct::from_read(symex_target_equationt &equation)
             continue;
 
           exprt rf=c_it->second;
-          exprt fr=po_constraint(r, *w);
+          exprt fr=before(r, *w);
           
           exprt cond=
             implies_exprt(
