@@ -36,7 +36,7 @@ static int isatty(int) { return 0; }
 #define ECHO
 
 #include "ansi_c_parser.h"
-#include "y.tab.h"
+#include "ansi_c_y.tab.h"
 
 #define loc() \
   { newstack(yyansi_clval); PARSER.set_location(stack(yyansi_clval)); }

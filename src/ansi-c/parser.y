@@ -19,7 +19,7 @@ extern char *yyansi_ctext;
 
 #include "parser_static.inc"
 
-#include "y.tab.h"
+#include "ansi_c_y.tab.h"
 
 /*** token declaration **************************************************/
 %}

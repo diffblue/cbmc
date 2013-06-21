@@ -13,7 +13,7 @@ static int isatty(int) { return 0; }
 #include <stdlib.h>
 
 #include "xml_parser.h"
-#include "y.tab.h"
+#include "xml_y.tab.h"
 
 #define PARSER xml_parser
 
