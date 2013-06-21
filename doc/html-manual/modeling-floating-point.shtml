@@ -47,7 +47,12 @@
 <li><p class="justified">
   Constant expressions are evaluated at `run' time wherever possible
   and so will respect changes in the rounding mode.  In effect,
-  the <code>FENV_ACCESS</code> pragma is always off.
+  the <code>FENV_ACCESS</code> pragma is always off.  Note that
+  floating point constants are treated as doubles (unless they are
+  followed by <code>f</code> when they are float) as specified in the
+  C standard.  <code>goto-cc</code>
+  supports <code>-fsingle-precision-constant</code>, which allows the
+  (non-standard) treatment of constants as floats.
   </p></li>
 </ul>
 
