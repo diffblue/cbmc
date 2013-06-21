@@ -246,6 +246,8 @@ void ansi_c_scanner_init()
                   PARSER.line_no--;
 		 }
 <STRING_LITERAL>{cppdirective} { /* ignore */ }
+<STRING_LITERAL>"/*"(.|\n)*"*/"	{ /* C comment, ignore */ }
+<STRING_LITERAL>"//".*\n	{ /* C++ comment, ignore */ }
 <STRING_LITERAL>. { 
                   locationt l=stack(yyansi_clval).location();
                   stack(yyansi_clval)=convert_string_literal(PARSER.string_literal);
