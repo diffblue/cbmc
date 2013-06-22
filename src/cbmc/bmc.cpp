@@ -6,7 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <sstream>
 #include <fstream>
 #include <cstdlib>
 #include <iostream>
@@ -160,13 +159,9 @@ bmct::run_decision_procedure(prop_convt &prop_conv)
   // output runtime
 
   {
-    std::ostringstream str;
     fine_timet sat_stop=current_time();
-
-    str << "Runtime decision procedure: ";
-    output_time(sat_stop-sat_start, str);
-    str << "s";
-    status(str.str());
+    status() << "Runtime decision procedure: "
+             << (sat_stop-sat_start) << "s" << eom;
   }
 
   return dec_result;

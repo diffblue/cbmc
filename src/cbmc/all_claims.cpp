@@ -128,10 +128,8 @@ bool bmct::all_claims(const goto_functionst &goto_functions)
 
   {
     fine_timet sat_stop=current_time();
-
-    status() << "Runtime decision procedure: ";
-    output_time(sat_stop-sat_start, status());
-    status() << "s" << eom;
+    status() << "Runtime decision procedure: "
+             << (sat_stop-sat_start) << "s" << eom;
   }
   
   // report

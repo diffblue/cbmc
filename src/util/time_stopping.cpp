@@ -58,12 +58,12 @@ fine_timet current_time()
 
   gettimeofday(&tv, &tz);
 
-  return tv.tv_usec/1000+(fine_timet)tv.tv_sec*1000;
+  return fine_timet(tv.tv_usec/1000+(unsigned long long)tv.tv_sec*1000);
 }
 
 /*******************************************************************\
 
-Function: outout_time
+Function: operator << 
 
   Inputs:
 
@@ -73,14 +73,14 @@ Function: outout_time
 
 \*******************************************************************/
 
-void output_time(const fine_timet &fine_time, std::ostream &out)
+std::ostream &operator << (std::ostream &out, const fine_timet &fine_time)
 {
-  out << (double)(fine_time)/1000;
+  return out << (double)(fine_time.get_t())/1000;
 }
 
 /*******************************************************************\
 
-Function: time2string
+Function: fine_timet::as_string
 
   Inputs:
 
@@ -90,10 +90,10 @@ Function: time2string
 
 \*******************************************************************/
 
-std::string time2string(const fine_timet &fine_time)
+std::string fine_timet::as_string() const
 {
   std::ostringstream out;
-  output_time(fine_time, out);
+  out << *this;
   return out.str();
 }
 
