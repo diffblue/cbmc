@@ -65,7 +65,7 @@ Function: bmct::error_trace
 
 void bmct::error_trace(const prop_convt &prop_conv)
 {
-  status("Building error trace");
+  status() << "Building error trace" << eom;
 
   goto_tracet goto_trace;
   build_goto_trace(equation, prop_conv, ns, goto_trace);
@@ -143,7 +143,8 @@ Function: bmct::run_decision_procedure
 decision_proceduret::resultt
 bmct::run_decision_procedure(prop_convt &prop_conv)
 {
-  status("Passing problem to "+prop_conv.decision_procedure_text());
+  status() << "Passing problem to " 
+           << prop_conv.decision_procedure_text() << eom;
 
   prop_conv.set_message_handler(get_message_handler());
   prop_conv.set_verbosity(get_verbosity());
@@ -153,7 +154,7 @@ bmct::run_decision_procedure(prop_convt &prop_conv)
   
   do_conversion(prop_conv);  
 
-  status("Running "+prop_conv.decision_procedure_text());
+  status() << "Running " << prop_conv.decision_procedure_text() << eom;
 
   decision_proceduret::resultt dec_result=prop_conv.dec_solve();
   // output runtime
@@ -185,7 +186,7 @@ Function: bmct::report_success
 
 void bmct::report_success()
 {
-  status("VERIFICATION SUCCESSFUL");
+  status() << "VERIFICATION SUCCESSFUL" << eom;
 
   switch(ui)
   {
@@ -220,7 +221,7 @@ Function: bmct::report_failure
 
 void bmct::report_failure()
 {
-  status("VERIFICATION FAILED");
+  status() << "VERIFICATION FAILED" << eom;
 
   switch(ui)
   {
@@ -320,7 +321,7 @@ bool bmct::run(const goto_functionst &goto_functions)
   symex.set_verbosity(get_verbosity());
   symex.options=options;
 
-  status("Starting Bounded Model Checking");
+  status() << "Starting Bounded Model Checking" << eom;
 
   symex.last_location.make_nil();
 
@@ -358,14 +359,13 @@ bool bmct::run(const goto_functionst &goto_functions)
 
   catch(std::bad_alloc)
   {
-    message_streamt message_stream(get_message_handler());
-    message_stream.error("Out of memory");
+    error() << "Out of memory" << eom;
     return true;
   }
 
-  print(8, "size of program expression: "+
-           i2string(equation.SSA_steps.size())+
-           " steps");
+  statistics() << "size of program expression: "
+               << equation.SSA_steps.size()
+               << " steps" << eom;
 
   try
   {
@@ -380,21 +380,23 @@ bool bmct::run(const goto_functionst &goto_functions)
     if(equation.has_threads())
     {
       // we should build a thread-aware SSA slicer
-      print(8, "no slicing due to threads");
+      statistics() << "no slicing due to threads" << eom;
     }
     else
     {
       if(options.get_bool_option("slice-formula"))
       {
         slice(equation);
-        print(8, "slicing removed "+
-          i2string(equation.count_ignored_SSA_steps())+" assignments");
+        statistics() << "slicing removed "
+                     << equation.count_ignored_SSA_steps()
+                     << " assignments" << eom;
       }
       else
       {
         simple_slice(equation);
-        print(8, "simple slicing removed "+
-          i2string(equation.count_ignored_SSA_steps())+" assignments");
+        statistics() << "simple slicing removed "
+                     << equation.count_ignored_SSA_steps()
+                     << " assignments" << eom;
       }
     }
 
@@ -405,11 +407,9 @@ bool bmct::run(const goto_functionst &goto_functions)
     }
 
     {
-      std::string msg;
-      msg="Generated "+i2string(symex.total_claims)+
-          " VCC(s), "+i2string(symex.remaining_claims)+
-          " remaining after simplification";
-      print(8, msg);
+      statistics() << "Generated " << symex.total_claims
+                   << " VCC(s), " << symex.remaining_claims
+                   << " remaining after simplification" << eom;
     }
 
     if(options.get_bool_option("show-vcc"))
@@ -473,7 +473,7 @@ bool bmct::run(const goto_functionst &goto_functions)
 
   catch(std::bad_alloc)
   {
-    error("Out of memory");
+    error() << "Out of memory" << eom;
     return true;
   }
 }
@@ -514,7 +514,7 @@ bool bmct::decide(prop_convt &prop_conv)
     break;
 
   default:
-    error("decision procedure failed");
+    error() << "decision procedure failed" << eom;
   }
 
   return result;

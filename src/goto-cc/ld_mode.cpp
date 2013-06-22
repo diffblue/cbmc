@@ -293,7 +293,7 @@ int ld_modet::gcc_hybrid_binary(const cmdlinet::argst &input_files)
     
     #else
     
-    error("binary merging not implemented for this architecture");
+    error() << "binary merging not implemented for this architecture" << eom;
     return 1;
 
     #endif

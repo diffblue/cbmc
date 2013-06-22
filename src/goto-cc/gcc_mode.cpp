@@ -293,7 +293,7 @@ bool gcc_modet::doit()
 
       if(exit_code!=0)
       {
-        error("preprocessing has failed");
+        error() << "preprocessing has failed" << eom;
         return true;
       }
       
@@ -595,7 +595,7 @@ int gcc_modet::gcc_hybrid_binary(const cmdlinet::argst &input_files)
     remove(saved.c_str());
 
     #else
-    error("binary merging not implemented for this platform");
+    error() << "binary merging not implemented for this platform" << eom;
     return 1;
     #endif
   }

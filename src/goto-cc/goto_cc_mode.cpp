@@ -135,7 +135,7 @@ int goto_cc_modet::main(int argc, const char **argv)
   
   catch(std::bad_alloc)
   {
-    error("Out of memory");
+    error() << "Out of memory" << eom;
     return EX_SOFTWARE;
   }
 }

@@ -102,7 +102,7 @@ void bmct::cover_assertions(const goto_functionst &goto_functions)
     cover_goals.add(condition);
   }
 
-  status("Total number of coverage goals: "+i2string(cover_goals.size()));
+  status() << "Total number of coverage goals: " << cover_goals.size() << eom;
 
   cover_goals();
 
@@ -128,15 +128,13 @@ void bmct::cover_assertions(const goto_functionst &goto_functions)
     else
     {
       if(!g_it->covered)
-      {
-        warning("!! failed to cover "+it->first->location.as_string());
-      }
+        warning() << "!! failed to cover " << it->first->location;
     }
   }
 
-  status("");
+  status() << eom;
 
-  status("** Covered "+i2string(cover_goals.number_covered())+
-         " of "+i2string(cover_goals.size())+" in "+
-         i2string(cover_goals.iterations())+" iterations");
+  status() << "** Covered " << cover_goals.number_covered()
+           << " of " << cover_goals.size() << " in "
+           << cover_goals.iterations() << " iterations" << eom;
 }

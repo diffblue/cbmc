@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/config.h>
 #include <util/expr_util.h>
-#include <util/i2string.h>
 
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/remove_function_pointers.h>
@@ -138,14 +137,14 @@ int goto_instrument_parseoptionst::doit()
 
       if(!cmdline.isset("inline"))
       {
-        status("Function Pointer Removal");
+        status() << "Function Pointer Removal" << eom;
         remove_function_pointers(symbol_table, goto_functions, false);
 
-        status("Partial Inlining");
+        status() << "Partial Inlining" << eom;
         goto_partial_inline(goto_functions, ns, ui_message_handler);
       }
     
-      status("Pointer Analysis");
+      status() << "Pointer Analysis" << eom;
       value_set_analysist value_set_analysis(ns);
       value_set_analysis(goto_functions);
 
@@ -159,10 +158,10 @@ int goto_instrument_parseoptionst::doit()
 
       if(!cmdline.isset("inline"))
       {
-        status("Function Pointer Removal");
+        status() << "Function Pointer Removal" << eom;
         remove_function_pointers(symbol_table, goto_functions, false);
 
-        status("Partial Inlining");
+        status() << "Partial Inlining" << eom;
         goto_partial_inline(goto_functions, ns, ui_message_handler);
       }
     
@@ -185,14 +184,14 @@ int goto_instrument_parseoptionst::doit()
 
       if(!cmdline.isset("inline"))
       {
-        status("Function Pointer Removal");
+        status() << "Function Pointer Removal" << eom;
         remove_function_pointers(symbol_table, goto_functions, false);
 
-        status("Partial Inlining");
+        status() << "Partial Inlining" << eom;
         goto_partial_inline(goto_functions, ns, ui_message_handler);
       }
     
-      status("Pointer Analysis");
+      status() << "Pointer Analysis" << eom;
       points_tot points_to;
       points_to(goto_functions);
       points_to.output(std::cout);
@@ -211,14 +210,14 @@ int goto_instrument_parseoptionst::doit()
 
       if(!cmdline.isset("inline"))
       {
-        status("Function Pointer Removal");
+        status() << "Function Pointer Removal" << eom;
         remove_function_pointers(symbol_table, goto_functions, false);
 
-        status("Partial Inlining");
+        status() << "Partial Inlining" << eom;
         goto_partial_inline(goto_functions, ns, ui_message_handler);
       }
     
-      status("Pointer Analysis");
+      status() << "Pointer Analysis" << eom;
       value_set_analysist value_set_analysis(ns);
       value_set_analysis(goto_functions);
       
@@ -243,7 +242,7 @@ int goto_instrument_parseoptionst::doit()
 
     if(cmdline.isset("interpreter"))
     {
-      status("Starting interpreter");
+      status() << "Starting interpreter" << eom;
       interpreter(symbol_table, goto_functions);
       return 0;
     }
@@ -311,7 +310,7 @@ int goto_instrument_parseoptionst::doit()
         std::ofstream out(cmdline.args[1].c_str());
         if(!out)
         {
-          error("failed to write to "+cmdline.args[1]);
+          error() << "failed to write to `" << cmdline.args[1] << "'";
           return 10;
         }
         (is_cpp ? dump_cpp : dump_c)(goto_functions, ns, out);
@@ -345,7 +344,7 @@ int goto_instrument_parseoptionst::doit()
         std::ofstream out(cmdline.args[1].c_str());
         if(!out)
         {
-          error("failed to write to "+cmdline.args[1]);
+          error() << "failed to write to " << cmdline.args[1] << "'";
           return 10;
         }
 
@@ -368,7 +367,7 @@ int goto_instrument_parseoptionst::doit()
     // write new binary?
     if(cmdline.args.size()==2)
     {
-      status("Writing GOTO program to "+cmdline.args[1]);
+      status() << "Writing GOTO program to `"+cmdline.args[1] << "'" << eom;
       
       if(write_goto_binary(
         cmdline.args[1], symbol_table, goto_functions, get_message_handler()))
@@ -400,7 +399,7 @@ int goto_instrument_parseoptionst::doit()
   
   catch(std::bad_alloc)
   {
-    error("Out of memory");
+    error() << "Out of memory" << eom;
     return 11;
   }
 }
@@ -420,7 +419,7 @@ Function: goto_instrument_parseoptionst::get_goto_program
 void goto_instrument_parseoptionst::get_goto_program(
   goto_functionst &goto_functions)
 {
-  status("Reading GOTO program from "+cmdline.args[0]);
+  status() << "Reading GOTO program from `" << cmdline.args[0] << "'" << eom;
 
   if(read_goto_binary(cmdline.args[0],
     symbol_table, goto_functions, get_message_handler()))
@@ -513,7 +512,7 @@ void goto_instrument_parseoptionst::instrument_goto_program(
   // unwind loops 
   if(cmdline.isset("unwind"))
   {
-    status("Unwinding loops");
+    status() << "Unwinding loops" << eom;
     options.set_option("unwind", cmdline.getval("unwind"));
   }
 
@@ -521,7 +520,7 @@ void goto_instrument_parseoptionst::instrument_goto_program(
 
   if(cmdline.isset("mm"))
   {
-    status("Adding CPROVER library");      
+    status() << "Adding CPROVER library" << eom;
     link_to_library(symbol_table, goto_functions, ui_message_handler);
   }
 
@@ -530,11 +529,11 @@ void goto_instrument_parseoptionst::instrument_goto_program(
   // now do full inlining, if requested
   if(cmdline.isset("inline"))
   {
-    status("Function Pointer Removal");
+    status() << "Function Pointer Removal" << eom;
     remove_function_pointers(
       symbol_table, goto_functions, cmdline.isset("pointer-check"));
 
-    status("Performing full inlining");
+    status() << "Performing full inlining" << eom;
     goto_inline(goto_functions, ns, ui_message_handler);
   }
 
@@ -544,14 +543,14 @@ void goto_instrument_parseoptionst::instrument_goto_program(
   // check for uninitalized local varibles
   if(cmdline.isset("uninitialized-check"))
   {
-    status("Adding checks for uninitialized local variables");
+    status() << "Adding checks for uninitialized local variables" << eom;
     add_uninitialized_locals_assertions(symbol_table, goto_functions);
   }
   
   // check for maximum call stack size
   if(cmdline.isset("stack-depth"))
   {
-    status("Adding check for maximum call stack size");
+    status() << "Adding check for maximum call stack size" << eom;
     stack_depth(symbol_table, goto_functions,
         atoi(cmdline.getval("stack-depth")));
   }
@@ -560,13 +559,13 @@ void goto_instrument_parseoptionst::instrument_goto_program(
   // lifetime
   if(cmdline.isset("nondet-static"))
   {
-    status("Adding nondeterministic initialization of static/global variables");
+    status() << "Adding nondeterministic initialization of static/global variables" << eom;
     nondet_static(ns, goto_functions);
   }
 
   if(cmdline.isset("string-abstraction"))
   {
-    status("String Abstraction");
+    status() << "String Abstraction" << eom;
     string_abstraction(symbol_table,
       get_message_handler(), goto_functions);
   }
@@ -579,29 +578,29 @@ void goto_instrument_parseoptionst::instrument_goto_program(
   {
     if(!cmdline.isset("inline"))
     {
-      status("Function Pointer Removal");
+      status() << "Function Pointer Removal" << eom;
       remove_function_pointers(symbol_table, goto_functions, cmdline.isset("pointer-check"));
 
       // do partial inlining
-      status("Partial Inlining");
+      status() << "Partial Inlining" << eom;
       goto_partial_inline(goto_functions, ns, ui_message_handler);
     }
     
-    status("Pointer Analysis");
+    status() << "Pointer Analysis" << eom;
     value_set_analysist value_set_analysis(ns);
     value_set_analysis(goto_functions);
 
     if(cmdline.isset("remove-pointers"))
     {
       // removing pointers
-      status("Removing Pointers");
+      status() << "Removing Pointers" << eom;
       remove_pointers(
         goto_functions, symbol_table, value_set_analysis);
     }
 
     if(cmdline.isset("race-check"))
     {
-      status("Adding Race Checks");
+      status() << "Adding Race Checks" << eom;
       race_check(
         value_set_analysis,
         symbol_table,
@@ -638,27 +637,27 @@ void goto_instrument_parseoptionst::instrument_goto_program(
 
       if(mm=="tso")
       {
-        status("Adding weak memory (TSO) Instrumentation");
+        status() << "Adding weak memory (TSO) Instrumentation" << eom;
         model=TSO;
       }
       else if(mm=="pso")
       {
-        status("Adding weak memory (PSO) Instrumentation");
+        status() << "Adding weak memory (PSO) Instrumentation" << eom;
         model=PSO;
       }
       else if(mm=="rmo")
       {
-        status("Adding weak memory (RMO) Instrumentation");
+        status() << "Adding weak memory (RMO) Instrumentation" << eom;
         model=RMO;
       }
       else if(mm=="power")
       {
-        status("Adding weak memory (Power) Instrumentation");
+        status() << "Adding weak memory (Power) Instrumentation" << eom;
         model=Power;
       }
       else
       {
-        error("Unknown weak memory model");
+        error() << "Unknown weak memory model `" << mm << "'" << eom;
         model=Unknown;
       }
 
@@ -685,7 +684,7 @@ void goto_instrument_parseoptionst::instrument_goto_program(
     // Interrupt handler
     if(cmdline.isset("isr"))
     {
-      status("Instrumenting interrupt handler");
+      status() << "Instrumenting interrupt handler" << eom;
       interrupt(
         value_set_analysis,
         symbol_table,
@@ -696,7 +695,7 @@ void goto_instrument_parseoptionst::instrument_goto_program(
     // Memory-mapped I/O
     if(cmdline.isset("mmio"))
     {
-      status("Instrumenting memory-mapped I/O");
+      status() << "Instrumenting memory-mapped I/O" << eom;
       mmio(
         value_set_analysis,
         symbol_table,
@@ -705,7 +704,7 @@ void goto_instrument_parseoptionst::instrument_goto_program(
 
     if(cmdline.isset("concurrency"))
     {
-      status("Sequentializing concurrency");
+      status() << "Sequentializing concurrency" << eom;
       concurrency(
         value_set_analysis,
         symbol_table,
@@ -715,13 +714,13 @@ void goto_instrument_parseoptionst::instrument_goto_program(
 
   if(cmdline.isset("interval-analysis"))
   {
-    status("Interval analysis");
+    status() << "Interval analysis" << eom;
     interval_analysis(ns, goto_functions);
   }
 
   if(cmdline.isset("havoc-loops"))
   {
-    status("Havocing loops");
+    status() << "Havocing loops" << eom;
     havoc_loops(goto_functions);
   }
 
@@ -740,15 +739,15 @@ void goto_instrument_parseoptionst::instrument_goto_program(
     if(k==0)
       throw "please give k>=1";
 
-    status("Instrumenting k-induction for k="+i2string(k)+", "+
-           (base_case?"base case":"step case"));
+    status() << "Instrumenting k-induction for k=" << k << ", "
+             << (base_case?"base case":"step case") << eom;
     
     k_induction(goto_functions, base_case, step_case, k);
   }
 
   if(cmdline.isset("function-enter"))
   {
-    status("Function enter instrumentation");
+    status() << "Function enter instrumentation" << eom;
     function_enter(
       symbol_table,
       goto_functions,
@@ -757,7 +756,7 @@ void goto_instrument_parseoptionst::instrument_goto_program(
 
   if(cmdline.isset("function-exit"))
   {
-    status("Function exit instrumentation");
+    status() << "Function exit instrumentation" << eom;
     function_exit(
       symbol_table,
       goto_functions,
@@ -766,7 +765,7 @@ void goto_instrument_parseoptionst::instrument_goto_program(
 
   if(cmdline.isset("branch"))
   {
-    status("Branch instrumentation");
+    status() << "Branch instrumentation" << eom;
     branch(
       symbol_table,
       goto_functions,
@@ -785,21 +784,21 @@ void goto_instrument_parseoptionst::instrument_goto_program(
   // nondet volatile?
   if(cmdline.isset("nondet-volatile"))
   {
-    status("Making volatile variables non-deterministic");
+    status() << "Making volatile variables non-deterministic" << eom;
     nondet_volatile(symbol_table, goto_functions);
   }
 
   // reachability slice?
   if(cmdline.isset("reachability-slice"))
   {
-    status("Performing a reachability slice");
+    status() << "Performing a reachability slice" << eom;
     reachability_slicer(goto_functions);
   }
 
   // full slice?
   if(cmdline.isset("full-slice"))
   {
-    status("Performing a full slice");
+    status() << "Performing a full slice" << eom;
     full_slicer(goto_functions);
   }
   
