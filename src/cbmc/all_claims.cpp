@@ -61,7 +61,7 @@ bool bmct::all_claims(const goto_functionst &goto_functions)
     
   prop_convt &prop_conv=bv_cbmc;
 
-  status("Passing problem to "+prop_conv.decision_procedure_text());
+  status() << "Passing problem to " << prop_conv.decision_procedure_text();
 
   prop_conv.set_message_handler(get_message_handler());
   prop_conv.set_verbosity(get_verbosity());
@@ -120,27 +120,25 @@ bool bmct::all_claims(const goto_functionst &goto_functions)
     cover_goals.add(p);
   }
 
-  status("Running "+prop_conv.decision_procedure_text());
+  status() << "Running " << prop_conv.decision_procedure_text();
 
   cover_goals();  
 
   // output runtime
 
   {
-    std::ostringstream str;
     fine_timet sat_stop=current_time();
 
-    str << "Runtime decision procedure: ";
-    output_time(sat_stop-sat_start, str);
-    str << "s";
-    status(str.str());
+    status() << "Runtime decision procedure: ";
+    output_time(sat_stop-sat_start, status());
+    status() << "s" << eom;
   }
   
   // report
   if(ui!=ui_message_handlert::XML_UI)
   {
-    status("");
-    status("** Results:");
+    status() << eom;
+    status() << "** Results:" << eom;
   }
   
   std::list<cover_goalst::cover_goalt>::const_iterator g_it=
@@ -163,16 +161,17 @@ bool bmct::all_claims(const goto_functionst &goto_functions)
     }
     else
     {
-      status(std::string("[")+id2string(it->first)+"] "+
-             it->second.description+": "+(g_it->covered?"FAILED":"OK"));
+      status() << "[" << it->first << "] "
+               << it->second.description << ": " << (g_it->covered?"FAILED":"OK")
+               << eom;
     }
   }
 
-  status("");
+  status() << eom;
   
-  status("** "+i2string(cover_goals.number_covered())+
-         " of "+i2string(cover_goals.size())+" failed ("+
-         i2string(cover_goals.iterations())+" iterations)");
+  status() << "** " << cover_goals.number_covered()
+           << " of " << cover_goals.size() << " failed ("
+           << cover_goals.iterations() << " iterations)" << eom;
   
   return false;
 }

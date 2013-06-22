@@ -34,7 +34,7 @@ void bmct::show_vcc(std::ostream &out)
   switch(ui)
   {
   case ui_message_handlert::XML_UI:
-    error("not supported");
+    error() << "not supported" << eom;
     return;
     
   case ui_message_handlert::PLAIN:

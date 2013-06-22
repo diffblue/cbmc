@@ -70,7 +70,7 @@ bool bmct::decide_default()
       break;
 
     default:
-      error("decision procedure failed");
+      error() << "decision procedure failed" << eom;
     }
   }
   else
@@ -99,7 +99,7 @@ bool bmct::decide_default()
       break;
 
     default:
-      error("decision procedure failed");
+      error() << "decision procedure failed" << eom;
     }
   }
 

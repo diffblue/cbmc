@@ -51,9 +51,10 @@ void symex_bmct::symex_step(
 
   if(!location.is_nil() && last_location!=location)
   {
-    print(9, "File "+location.get_string("file")+
-             " line "+location.get_string("line")+
-             " function "+location.get_string("function"));
+    debug() << "BMC at file " << location.get_file()
+            << " line " << location.get_line()
+            << " function " << location.get_function()
+            << eom;
 
     last_location=location;
   }
@@ -86,13 +87,9 @@ bool symex_bmct::get_unwind(
     this_loop_max_unwind=unwind_set[id];
 
   #if 1
-  {
-    std::string msg=
-      "Unwinding loop "+id2string(id)+" iteration "+i2string(unwind)+
-      " "+source.pc->location.as_string()+
-      " thread "+i2string(source.thread_nr);      
-    print(8, msg);
-  }
+  statistics() << "Unwinding loop " << id << " iteration "
+               << unwind << " " << source.pc->location
+               << " thread " << source.thread_nr << eom;
   #endif
 
   return this_loop_max_unwind!=0 &&
@@ -121,16 +118,15 @@ bool symex_bmct::get_unwind_recursion(
   if(unwind!=0)
   {
     const symbolt &symbol=ns.lookup(identifier);
-  
-    std::string msg=
-      "Unwinding recursion "+
-      id2string(symbol.display_name())+
-      " iteration "+i2string(unwind);
+
+    statistics() << "Unwinding recursion "
+                 << symbol.display_name()
+                 << " iteration " << unwind;
       
     if(this_loop_max_unwind!=0)
-      msg+=" ("+i2string(this_loop_max_unwind)+" max)";
+      statistics() << " (" << this_loop_max_unwind << " max)";
 
-    print(8, msg);
+    statistics() << eom;
   }
   #endif
 
@@ -154,9 +150,7 @@ void symex_bmct::no_body(const irep_idt &identifier)
 {
   if(body_warnings.insert(identifier).second)
   {
-    std::string msg=
-      "**** WARNING: no body for function "+id2string(identifier);
-
-    print(2, msg);
+    warning() <<
+      "**** WARNING: no body for function " << identifier << eom;
   }
 }

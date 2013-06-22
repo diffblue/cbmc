@@ -95,6 +95,7 @@ Function: cbmc_parseoptionst::set_verbosity
 
 void cbmc_parseoptionst::set_verbosity(messaget &message)
 {
+  // this is our default verbosity
   int v=8;
   
   if(cmdline.isset("verbosity"))
@@ -317,8 +318,8 @@ int cbmc_parseoptionst::doit()
      cmdline.isset("gen-interface"))
 
   {
-    error("This version of CBMC has no support for "
-          " hardware modules. Please use hw-cbmc.");
+    error() << "This version of CBMC has no support for "
+               " hardware modules. Please use hw-cbmc." << eom;
     return 1;
   }
   
@@ -421,7 +422,7 @@ bool cbmc_parseoptionst::get_goto_program(
 {
   if(cmdline.args.size()==0)
   {
-    error("Please provide a program to verify");
+    error() << "Please provide a program to verify" << eom;
     return true;
   }
 
@@ -430,7 +431,7 @@ bool cbmc_parseoptionst::get_goto_program(
     if(cmdline.args.size()==1 &&
        is_goto_binary(cmdline.args[0]))
     {
-      status("Reading GOTO program from file");
+      status() << "Reading GOTO program from file" << eom;
 
       if(read_goto_binary(cmdline.args[0],
            symbol_table, goto_functions, get_message_handler()))
@@ -444,9 +445,11 @@ bool cbmc_parseoptionst::get_goto_program(
         return true;
       }
       
-      if(symbol_table.symbols.find(ID_main)==symbol_table.symbols.end())
+      irep_idt entry_point=goto_functions.entry_point();
+      
+      if(symbol_table.symbols.find(entry_point)==symbol_table.symbols.end())
       {
-        error("The goto binary has no entry point; please complete linking");
+        error() << "The goto binary has no entry point; please complete linking" << eom;
         return true;
       }
     }
@@ -454,7 +457,7 @@ bool cbmc_parseoptionst::get_goto_program(
     {
       if(cmdline.args.size()!=1)
       {
-        error("Please give one source file only");
+        error() << "Please give one source file only" << eom;
         return true;
       }
       
@@ -468,7 +471,7 @@ bool cbmc_parseoptionst::get_goto_program(
                 
       if(!infile)
       {
-        error("failed to open input file", filename);
+        error() << "failed to open input file `" << filename << "'" << eom;
         return true;
       }
                               
@@ -476,7 +479,7 @@ bool cbmc_parseoptionst::get_goto_program(
                                                 
       if(language==NULL)
       {
-        error("failed to figure out type of file", filename);
+        error() << "failed to figure out type of file `" <<  filename << "'" << eom;
         return true;
       }
                                                                 
@@ -484,7 +487,7 @@ bool cbmc_parseoptionst::get_goto_program(
   
       if(language->parse(infile, filename, get_message_handler()))
       {
-        std::cerr << "PARSING ERROR" << std::endl;
+        error() << "PARSING ERROR" << eom;
         return true;
       }
       
@@ -510,17 +513,17 @@ bool cbmc_parseoptionst::get_goto_program(
 
       if(symbol_table.symbols.find(ID_main)==symbol_table.symbols.end())
       {
-        error("No entry point; please provide a main function");
+        error() << "No entry point; please provide a main function" << eom;
         return true;
       }
 
-      status("Generating GOTO Program");
+      status() << "Generating GOTO Program" << eom;
 
       goto_convert(symbol_table, goto_functions, ui_message_handler);
     }
 
     // finally add the library
-    status("Adding CPROVER library");      
+    status() << "Adding CPROVER library" << eom;
     link_to_library(symbol_table, goto_functions, ui_message_handler);
 
     if(process_goto_program(options, goto_functions))
@@ -546,7 +549,7 @@ bool cbmc_parseoptionst::get_goto_program(
   
   catch(std::bad_alloc)
   {
-    error("Out of memory");
+    error() << "Out of memory" << eom;
     return true;
   }
   
@@ -571,7 +574,7 @@ void cbmc_parseoptionst::preprocessing()
   {
     if(cmdline.args.size()!=1)
     {
-      error("Please provide one program to preprocess");
+      error() << "Please provide one program to preprocess" << eom;
       return;
     }
 
@@ -581,7 +584,7 @@ void cbmc_parseoptionst::preprocessing()
 
     if(!infile)
     {
-      error("failed to open input file");
+      error() << "failed to open input file" << eom;
       return;
     }
 
@@ -589,7 +592,7 @@ void cbmc_parseoptionst::preprocessing()
 
     if(ptr==NULL)
     {
-      error("failed to figure out type of file");
+      error() << "failed to figure out type of file" << eom;
       return;
     }
 
@@ -597,7 +600,7 @@ void cbmc_parseoptionst::preprocessing()
   
     if(language->preprocess(
       infile, filename, std::cout, get_message_handler()))
-      error("PREPROCESSING ERROR");
+      error() << "PREPROCESSING ERROR" << eom;
   }
 
   catch(const char *e)
@@ -616,7 +619,7 @@ void cbmc_parseoptionst::preprocessing()
 
   catch(std::bad_alloc)
   {
-    error("Out of memory");
+    error() << "Out of memory" << eom;
   }
 }
 
@@ -644,21 +647,21 @@ bool cbmc_parseoptionst::process_goto_program(
       string_instrumentation(
         symbol_table, get_message_handler(), goto_functions);
 
-    status("Function Pointer Removal");
+    status() << "Function Pointer Removal" << eom;
     remove_function_pointers(symbol_table, goto_functions,
       cmdline.isset("pointer-check"));
 
-    status("Partial Inlining");
     // do partial inlining
+    status() << "Partial Inlining" << eom;
     goto_partial_inline(goto_functions, ns, ui_message_handler);
     
-    status("Generic Property Instrumentation");
     // add generic checks
+    status() << "Generic Property Instrumentation" << eom;
     goto_check(ns, options, goto_functions);
     
     if(cmdline.isset("string-abstraction"))
     {
-      status("String Abstraction");
+      status() << "String Abstraction" << eom;
       string_abstraction(symbol_table,
         get_message_handler(), goto_functions);
     }
@@ -713,7 +716,7 @@ bool cbmc_parseoptionst::process_goto_program(
   
   catch(std::bad_alloc)
   {
-    error("Out of memory");
+    error() << "Out of memory" << eom;
     return true;
   }
   

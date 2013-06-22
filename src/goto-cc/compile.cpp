@@ -117,19 +117,19 @@ bool compilet::doit()
 
   if(source_files.size()==0 && object_files.size()==0)
   {
-    error("no input files");
+    error() << "no input files" << eom;
     return true;
   }
 
   if(mode==LINK_LIBRARY && source_files.size()>0)
   {
-    error("cannot link source files");
+    error() << "cannot link source files" << eom;
     return true;
   }
 
   if(mode==PREPROCESS_ONLY && object_files.size()>0)
   {
-    error("cannot preprocess object files");
+    error() << "cannot preprocess object files" << eom;
     return true;
   }
 
@@ -191,7 +191,7 @@ bool compilet::add_input_file(const std::string &file_name)
 
       if(tstr=="")
       {
-        error("Cannot create temporary directory");
+        error() << "Cannot create temporary directory" << eom;
         return true;
       }
 
@@ -199,7 +199,7 @@ bool compilet::add_input_file(const std::string &file_name)
       std::stringstream cmd("");
       if(chdir(tmp_dirs.back().c_str())!=0)
       {
-        error("Cannot switch to temporary directory");
+        error() << "Cannot switch to temporary directory" << eom;
         return true;
       }
 
@@ -279,7 +279,7 @@ bool compilet::add_input_file(const std::string &file_name)
       cmd.str("");
 
       if(chdir(working_directory.c_str())!=0)
-        error("Could not change back to working directory.");
+        error() << "Could not change back to working directory" << eom;
     }
     else if(is_goto_binary(file_name))
       object_files.push_back(file_name);
@@ -497,7 +497,7 @@ bool compilet::parse(const std::string &file_name)
 
   if(!infile)
   {
-    error("failed to open input file", file_name);
+    error() << "failed to open input file `" << file_name << "'" << eom;
     return true;
   }
 
@@ -518,7 +518,7 @@ bool compilet::parse(const std::string &file_name)
 
   if(languagep==NULL)
   {
-    error("failed to figure out type of file", file_name);
+    error() << "failed to figure out type of file `" << file_name << "'" << eom;
     return true;
   }
 
@@ -547,8 +547,8 @@ bool compilet::parse(const std::string &file_name)
 
       if(!ofs.is_open())
       {
-        error(std::string("failed to open output file `")+
-              cmdline.getval('o')+"'");
+        error() << "failed to open output file `" 
+                << cmdline.getval('o') << "'" << eom;
         return true;
       }
     }
@@ -562,7 +562,7 @@ bool compilet::parse(const std::string &file_name)
     if(language.parse(infile, file_name, get_message_handler()))
     {
       if(get_ui()==ui_message_handlert::PLAIN)
-        error("PARSING ERROR");
+        error() << "PARSING ERROR" << eom;
       return true;
     }
   }
@@ -601,8 +601,8 @@ bool compilet::parse_stdin()
 
       if(!ofs.is_open())
       {
-        error(std::string("failed to open output file `")+
-              cmdline.getval('o'));
+        error() << "failed to open output file `"
+                << cmdline.getval('o') << "'" << eom;
         return true;
       }
     }
@@ -614,7 +614,7 @@ bool compilet::parse_stdin()
     if(language.parse(std::cin, "", get_message_handler()))
     {
       if(get_ui()==ui_message_handlert::PLAIN)
-        error("PARSING ERROR");
+        error() << "PARSING ERROR" << eom;
       return true;
     }
   }
@@ -671,7 +671,7 @@ bool compilet::write_bin_object_file(
 
   if(!outfile.is_open())
   {
-    error("Error opening file `"+file_name+"'");
+    error() << "Error opening file `" << file_name << "'" << eom;
     return true;
   }
 
@@ -754,7 +754,7 @@ bool compilet::read_object(
 
   if(seen_modes.size()!=0)
   {
-    error("Multi-language linking not supported");
+    error() << "Multi-language linking not supported" << eom;
     return true;
   }
 
@@ -920,24 +920,22 @@ bool compilet::link_functions(
       else if(base_type_eq(in_dest_symbol_table.type, src_func.type, ns))
       {
         // keep the one in in_symbol_table -- libraries come last!
-        std::stringstream str;
-        str << "warning: function `" << final_id << "' in module `"
-            << src_symbol_table.symbols.begin()->second.module
-            << "' is shadowed by a definition in module `"
-            << symbol_table.symbols.begin()->second.module << "'";
-        warning(str.str());
+        warning() << "warning: function `" << final_id << "' in module `"
+                  << src_symbol_table.symbols.begin()->second.module
+                  << "' is shadowed by a definition in module `"
+                  << symbol_table.symbols.begin()->second.module << "'"
+                  << eom;
       }
       else
       {
-        std::stringstream str;
-        str << "error: duplicate definition of function `"
-            << final_id
-            << "'" << std::endl;
-        str << "In module `" 
-            << symbol_table.symbols.begin()->second.module
-            << "' and module `"
-            << src_symbol_table.symbols.begin()->second.module << "'";
-        error(str.str());
+        error() << "error: duplicate definition of function `"
+                << final_id
+                << "'" << messaget::endl
+                << "In module `" 
+                << symbol_table.symbols.begin()->second.module
+                << "' and module `"
+                << src_symbol_table.symbols.begin()->second.module << "'"
+                << eom;
         return true;
       }
     }
