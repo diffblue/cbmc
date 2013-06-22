@@ -14,6 +14,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "message.h"
 #include "expr.h"
 
+// deprecated; use warning(), error(), etc. streams in messaget
+
 class message_streamt:public message_clientt
 {
 public:
