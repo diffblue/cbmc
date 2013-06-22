@@ -14,11 +14,48 @@ Date: February 2004
 #include <ostream>
 #include <string>
 
-typedef unsigned long long fine_timet;
+class fine_timet
+{
+public:
+  inline fine_timet():t(0)
+  {
+  }
+  
+  inline explicit fine_timet(unsigned long long _t):t(_t)
+  {
+  }
+  
+  inline fine_timet &operator-(const fine_timet &other)
+  {
+    t-=other.t;
+    return *this;
+  }
+  
+  inline fine_timet &operator+=(const fine_timet &other)
+  {
+    t+=other.t;
+    return *this;
+  }
+  
+  inline unsigned long long get_t() const
+  {
+    return t;
+  }
+  
+  void clear()
+  {
+    t=0;
+  }
+  
+  std::string as_string() const;
+  
+protected:
+  unsigned long long t;
+};
 
 fine_timet current_time();
-void output_time(const fine_timet &fine_time, std::ostream &out);
-std::string time2string(const fine_timet &fine_time);
+
+std::ostream &operator << (std::ostream &, const fine_timet &);
 
 #endif
 
