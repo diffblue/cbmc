@@ -37,6 +37,12 @@ public:
     return *this;
   }
   
+  inline fine_timet &operator+(const fine_timet &other)
+  {
+    t+=other.t;
+    return *this;
+  }
+  
   inline unsigned long long get_t() const
   {
     return t;
