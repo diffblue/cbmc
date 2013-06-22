@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <string>
 #include <ostream>
+#include <sstream>
 
 #include "location.h"
 
@@ -50,7 +51,7 @@ public:
 class stream_message_handlert:public message_handlert
 {
 public:
-  stream_message_handlert(std::ostream &_out):out(_out)
+  explicit inline stream_message_handlert(std::ostream &_out):out(_out)
   {
   }
 
@@ -64,47 +65,39 @@ protected:
 class message_clientt
 {
 public:
-  virtual ~message_clientt();
-
-  virtual void set_message_handler(message_handlert &_message_handler);
-
-/*
-  virtual void set_verbosity(int cmdline_val, unsigned default_v)
-  {
-    if(cmdline_val<0 || cmdline_val>10)
-      set_verbosity(default_v);
-    else
-      set_verbosity(cmdline_val);
-  }
-*/
-
-  // Levels:
+  // Standard message levels:
   //
   //  0 none
   //  1 only errors
   //  2 + warnings
   //  4 + results
-  //  6 + phase information
+  //  6 + status/phase information
   //  8 + statistical information
   //  9 + progress information
   // 10 + debug info
-  
+    
+  enum message_levelt { 
+    M_ERROR=1, M_WARNING=2, M_RESULT=4, M_STATUS=6, M_STATISTICS=8, M_DEBUG=10
+  };
+
+  virtual ~message_clientt();
+
+  virtual void set_message_handler(message_handlert &_message_handler);
+
   virtual void set_verbosity(unsigned _verbosity);
   virtual unsigned get_verbosity() const;
   
-  message_clientt()
+  inline message_clientt():
+    verbosity(M_DEBUG), message_handler(NULL)
   {
-    message_handler=(message_handlert *)NULL;
-    verbosity=10;
   }
    
-  message_clientt(message_handlert &_message_handler)
+  inline explicit message_clientt(message_handlert &_message_handler):
+    verbosity(M_DEBUG), message_handler(&_message_handler)
   {
-    message_handler=&_message_handler;
-    verbosity=10;
   }
    
-  message_handlert &get_message_handler()
+  inline message_handlert &get_message_handler()
   {
     return *message_handler;
   }
@@ -113,19 +106,27 @@ protected:
   unsigned verbosity;
   message_handlert *message_handler;
 };
- 
+
 class messaget:public message_clientt
 {
 public:
-  inline messaget()
+  // constructors, destructor
+  
+  inline messaget():
+    mstream(M_DEBUG, &message_handler)
   {
   }
    
   inline explicit messaget(message_handlert &_message_handler):
-    message_clientt(_message_handler)
+    message_clientt(_message_handler),
+    mstream(M_DEBUG, &message_handler)
   {
   }
    
+  virtual ~messaget() { }
+  
+  // old interface, will go away
+
   inline void print(const std::string &message)
   { print(1, message); }
 
@@ -173,7 +174,85 @@ public:
     int sequence_number, // -1: no sequence information
     const locationt &location);
   
-  virtual ~messaget() {  }
+  // New interface
+  
+  class mstreamt:public std::ostringstream
+  {
+  public:
+    inline mstreamt(
+      unsigned _message_level, message_handlert **_message_handler):
+      message_level(_message_level),
+      message_handler(_message_handler)
+    {
+    }
+
+    unsigned message_level;
+    message_handlert **message_handler;
+
+    template <class T>
+    inline mstreamt &operator << (const T &x)
+    {
+      static_cast<std::ostream &>(*this) << x;
+      return *this;
+    }
+
+    // for feeding in functions such as endl and eom
+    inline mstreamt &operator << (mstreamt &(*func)(mstreamt &))
+    {
+      return func(*this);
+    }
+  };
+
+  // Feeding 'eom' into the stream triggers
+  // the printing of the message
+  static inline mstreamt &eom(mstreamt &m)
+  {
+    if((*m.message_handler)!=NULL)
+      (*m.message_handler)->print(m.message_level, m.str());
+    m.clear(); // clears error bits
+    m.str(std::string()); // clears the string
+    return m;
+  }
+
+  // in lieu of std::endl
+  static inline mstreamt &endl(mstreamt &m)
+  {
+    static_cast<std::ostream &>(m) << std::endl;
+    return m;
+  }
+  
+  inline mstreamt &error()
+  {
+    mstream.message_level=M_ERROR;
+    return mstream;
+  }
+  
+  inline mstreamt &warning()
+  {
+    mstream.message_level=M_WARNING;
+    return mstream;
+  }
+  
+  inline mstreamt &status()
+  {
+    mstream.message_level=M_STATUS;
+    return mstream;
+  }
+  
+  inline mstreamt &statistics()
+  {
+    mstream.message_level=M_STATISTICS;
+    return mstream;
+  }
+  
+  inline mstreamt &debug()
+  {
+    mstream.message_level=M_DEBUG;
+    return mstream;
+  }
+  
+protected:
+  mstreamt mstream;
 };
 
 #endif
