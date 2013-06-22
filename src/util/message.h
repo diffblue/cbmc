@@ -116,6 +116,12 @@ public:
     mstream(M_DEBUG, verbosity, &message_handler)
   {
   }
+  
+  inline messaget(const messaget &other):
+    message_clientt(other),
+    mstream(M_DEBUG, verbosity, &message_handler)
+  {
+  }
    
   inline explicit messaget(message_handlert &_message_handler):
     message_clientt(_message_handler),
