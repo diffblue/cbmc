@@ -367,7 +367,7 @@ int goto_instrument_parseoptionst::doit()
     // write new binary?
     if(cmdline.args.size()==2)
     {
-      status() << "Writing GOTO program to `"+cmdline.args[1] << "'" << eom;
+      status() << "Writing GOTO program to `" << cmdline.args[1] << "'" << eom;
       
       if(write_goto_binary(
         cmdline.args[1], symbol_table, goto_functions, get_message_handler()))
