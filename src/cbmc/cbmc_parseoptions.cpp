@@ -512,7 +512,9 @@ bool cbmc_parseoptionst::get_goto_program(
         return true;
       }
 
-      if(symbol_table.symbols.find(ID_main)==symbol_table.symbols.end())
+      irep_idt entry_point=goto_functions.entry_point();
+      
+      if(symbol_table.symbols.find(entry_point)==symbol_table.symbols.end())
       {
         error() << "No entry point; please provide a main function" << eom;
         return true;
