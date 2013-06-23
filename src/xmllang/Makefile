@@ -20,7 +20,7 @@ xmllang$(LIBEXT): $(OBJ)
 xml_y.tab.cpp: parser.y
 	$(YACC) $(YFLAGS) $$flags -pyyxml -d parser.y -o $@
 
-xml_y.tab.h: y.tab.cpp
+xml_y.tab.h: xml_y.tab.cpp
 	if [ -e xml_y.tab.hpp ] ; then mv xml_y.tab.hpp $@ ; else \
         mv xml_y.tab.cpp.h $@ ; fi
 
