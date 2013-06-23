@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #ifdef _WIN32
 #include <windows.h>
+#include <psapi.h>
 #endif
 
 #include "memory_info.h"
@@ -49,12 +50,14 @@ void memory_info(std::ostream &out)
   #endif
   
   #ifdef _WIN32
+  #if 0
   PROCESS_MEMORY_COUNTERS pmc;
   if(GetProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof(pmc)))
   {
     out << "  PeakWorkingSetSize: " << pmc.PeakWorkingSetSize << std::endl;
     out << "  WorkingSetSize: " << pmc.WorkingSetSize << std::endl;
   }
+  #endif
   #endif
   
   #ifdef __APPLE__
