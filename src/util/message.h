@@ -243,6 +243,13 @@ public:
     return mstream;
   }
   
+  inline mstreamt &result()
+  {
+    mstream.message_level=M_RESULT;
+    mstream.verbosity=verbosity;
+    return mstream;
+  }
+  
   inline mstreamt &status()
   {
     mstream.message_level=M_STATUS;

@@ -181,7 +181,7 @@ Function: bmct::report_success
 
 void bmct::report_success()
 {
-  status() << "VERIFICATION SUCCESSFUL" << eom;
+  result() << "VERIFICATION SUCCESSFUL" << eom;
 
   switch(ui)
   {
@@ -216,7 +216,7 @@ Function: bmct::report_failure
 
 void bmct::report_failure()
 {
-  status() << "VERIFICATION FAILED" << eom;
+  result() << "VERIFICATION FAILED" << eom;
 
   switch(ui)
   {
