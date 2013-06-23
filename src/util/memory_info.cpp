@@ -11,7 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <mach/mach_init.h>
 #endif
 
-#ifdef __LINUX__
+#ifdef __linux__
 #include <malloc.h>
 #endif
 
@@ -35,7 +35,7 @@ Function: memory_info
 
 void memory_info(std::ostream &out)
 {
-  #ifdef __LINUX__
+  #ifdef __linux__
   struct mallinfo m = mallinfo();
   out << "  non-mmapped space allocated from system: " << m.arena << std::endl;
   out << "  number of free chunks: " << m.ordblks << std::endl;
