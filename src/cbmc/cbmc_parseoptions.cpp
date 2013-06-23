@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/expr_util.h>
 #include <util/language.h>
 #include <util/unicode.h>
+#include <util/memory_info.h>
 
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/remove_function_pointers.h>
@@ -96,15 +97,15 @@ Function: cbmc_parseoptionst::set_verbosity
 void cbmc_parseoptionst::set_verbosity(messaget &message)
 {
   // this is our default verbosity
-  int v=8;
+  int v=messaget::M_STATISTICS;
   
   if(cmdline.isset("verbosity"))
   {
     v=atoi(cmdline.getval("verbosity"));
     if(v<0)
       v=0;
-    else if(v>9)
-      v=9;
+    else if(v>10)
+      v=10;
   }
   
   message.set_verbosity(v);
@@ -742,10 +743,16 @@ int cbmc_parseoptionst::do_bmc(
   bmc.set_ui(get_ui());
 
   // do actual BMC
-  if(bmc.run(goto_functions))
-    return 10;
+  bool result=bmc.run(goto_functions);
 
-  return 0;
+  // let's log some more statistics
+  debug() << "Memory consumption:" << messaget::endl;
+  memory_info(debug());
+  debug() << eom;
+
+  // We return '0' if the property holds,
+  // and '10' if it is violated.
+  return result?10:0;
 }
 
 /*******************************************************************\
