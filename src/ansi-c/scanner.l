@@ -168,6 +168,7 @@ string_lit      ("L"|"u"|"U"|"u8")?["]{s_char}*["]
 %x COMMENT1
 %x COMMENT2
 %x STRING_LITERAL
+%x STRING_LITERAL_COMMENT
 %x ASM_BLOCK
 %x MSC_ASM
 %x MSC_DECLSPEC
@@ -179,7 +180,6 @@ string_lit      ("L"|"u"|"U"|"u8")?["]{s_char}*["]
 %x GCC_ATTRIBUTE4
 %x GCC_ATTRIBUTE5
 %x GCC_ASM
-%x GCC_ASM_VOLATILE
 %x GCC_ASM_PAREN
 
 %{
@@ -206,7 +206,16 @@ void ansi_c_scanner_init()
 <GRAMMAR>"/*"   { BEGIN(COMMENT1); } /* begin C comment state */
 
 <COMMENT1>{
-   "*/"	        { BEGIN(GRAMMAR); } /* end comment state, back GRAMMAR */
+   "*/"	        { BEGIN(GRAMMAR); } /* end comment state, back to GRAMMAR */
+   "/*"		{ yyansi_cerror("Probably nested comments"); }
+   <<EOF>>	{ yyansi_cerror("Unterminated comment"); return TOK_SCANNER_ERROR; }
+   [^*/\n]*	{ /* ignore every char except '*' and NL (performance!) */ }
+   .		{ } /* all single characters within comments are ignored */
+   \n		{ }
+	}
+
+<STRING_LITERAL_COMMENT>{
+   "*/"	        { BEGIN(STRING_LITERAL); } /* end comment state, back to STRING_LITERAL */
    "/*"		{ yyansi_cerror("Probably nested comments"); }
    <<EOF>>	{ yyansi_cerror("Unterminated comment"); return TOK_SCANNER_ERROR; }
    [^*/\n]*	{ /* ignore every char except '*' and NL (performance!) */ }
@@ -246,9 +255,9 @@ void ansi_c_scanner_init()
                   PARSER.line_no--;
 		 }
 <STRING_LITERAL>{cppdirective} { /* ignore */ }
-<STRING_LITERAL>"/*"(.|\n)*"*/"	{ /* C comment, ignore */ }
+<STRING_LITERAL>"/*" { BEGIN(STRING_LITERAL_COMMENT); /* C comment, ignore */ }
 <STRING_LITERAL>"//".*\n	{ /* C++ comment, ignore */ }
-<STRING_LITERAL>. { 
+<STRING_LITERAL>. { // anything else: back to normal
                   locationt l=stack(yyansi_clval).location();
                   stack(yyansi_clval)=convert_string_literal(PARSER.string_literal);
                   stack(yyansi_clval).location().swap(l);
