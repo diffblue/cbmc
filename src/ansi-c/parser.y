@@ -2233,12 +2233,12 @@ gcc_asm_statement:
           stack($$).set(ID_flavor, ID_gcc);
           stack($$).operands().swap(stack($4).operands());
         }
-        | TOK_GCC_ASM_PAREN '{' TOK_ASM_STRING '}'
+        | TOK_GCC_ASM_PAREN volatile_or_goto_opt '{' TOK_ASM_STRING '}'
         {
           $$=$1;
           statement($$, ID_asm);
           stack($$).set(ID_flavor, ID_gcc);
-          mto($$, $3);
+          mto($$, $4);
         }
         ;
 
