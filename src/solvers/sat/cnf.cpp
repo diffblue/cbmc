@@ -495,6 +495,8 @@ literalt cnft::lxor(literalt a, literalt b)
   if(b==const_literal(false)) return a;
   if(a==const_literal(true)) return lnot(b);
   if(b==const_literal(true)) return lnot(a);
+  if(a==b) return const_literal(false);
+  if(a==lnot(b)) return const_literal(true);
 
   literalt o=new_variable();
   gate_xor(a, b, o);
