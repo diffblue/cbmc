@@ -38,7 +38,7 @@ protected:
 class dimacs_cnf_dumpt:public cnft
 {
 public:
-  dimacs_cnf_dumpt(std::ostream &_out);
+  explicit dimacs_cnf_dumpt(std::ostream &_out);
   virtual ~dimacs_cnf_dumpt() { }
  
   virtual const std::string solver_text()
