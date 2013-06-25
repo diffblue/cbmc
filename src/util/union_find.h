@@ -131,6 +131,13 @@ public:
     return is_union;
   }
   
+  // are 'a' and 'b' in the same set?
+  inline bool same_set(const T &a, const T &b) const
+  {
+    unsigned na=number(a), nb=number(b);
+    return uuf.same_set(na, nb);
+  }
+
   inline const T &find(const T &a)
   {
     return find(number(a));
