@@ -35,6 +35,11 @@ public:
     return (result.first)->second;
   }
   
+  inline unsigned operator()(const T &a)
+  {
+    return number(a);
+  }
+  
   bool get_number(const T &a, unsigned &n) const
   {
     typename numberst::const_iterator it=numbers.find(a);
