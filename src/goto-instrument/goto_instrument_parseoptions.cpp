@@ -40,7 +40,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/call_graph.h>
 #include <analyses/interval_analysis.h>
 
-#include "parseoptions.h"
+#include "goto_instrument_parseoptions.h"
 #include "version.h"
 #include "document_claims.h"
 #include "uninitialized.h"

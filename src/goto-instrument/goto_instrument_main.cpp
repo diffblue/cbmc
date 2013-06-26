@@ -6,7 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include "parseoptions.h"
+#include "goto_instrument_parseoptions.h"
 
 /*******************************************************************\
 
