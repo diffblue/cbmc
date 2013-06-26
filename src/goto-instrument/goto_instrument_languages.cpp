@@ -15,7 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <specc/specc_language.h>
 #endif
 
-#include "parseoptions.h"
+#include "goto_instrument_parseoptions.h"
 
 /*******************************************************************\
 
