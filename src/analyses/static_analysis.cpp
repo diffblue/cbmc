@@ -266,7 +266,7 @@ void static_analysis_baset::update(
       generate_state(i_it);
       
       if(!first)
-        merge(get_state(i_it), get_state(previous));
+        merge(get_state(i_it), get_state(previous), i_it);
     }
     
     first=false;
@@ -386,7 +386,7 @@ bool static_analysis_baset::visit(
         to_code_function_call(l->code);
 
       do_function_call_rec(
-        l,
+        l, to_l,
         code.function(),
         code.arguments(),
         new_values,
@@ -398,7 +398,7 @@ bool static_analysis_baset::visit(
     statet &other=get_state(to_l);
 
     bool have_new_values=
-      merge(other, new_values);
+      merge(other, new_values, to_l);
   
     if(have_new_values)
       new_data=true;
@@ -423,7 +423,7 @@ Function: static_analysis_baset::do_function_call
 \*******************************************************************/
 
 void static_analysis_baset::do_function_call(
-  locationt l_call,
+  locationt l_call, locationt l_return,
   const goto_functionst &goto_functions,
   const goto_functionst::function_mapt::const_iterator f_it,
   const exprt::operandst &arguments,
@@ -448,7 +448,7 @@ void static_analysis_baset::do_function_call(
     bool new_data=false;
 
     // merge the new stuff
-    if(merge(begin_state, new_state))
+    if(merge(begin_state, new_state, l_begin))
       new_data=true;
 
     // do each function at least once
@@ -483,7 +483,7 @@ void static_analysis_baset::do_function_call(
     // propagate those -- not exceedingly precise, this is,
     // as still it contains all the state from the
     // call site
-    merge(new_state, end_of_function);
+    merge(new_state, end_of_function, l_end);
   }
 }    
 
@@ -500,7 +500,7 @@ Function: static_analysis_baset::do_function_call_rec
 \*******************************************************************/
 
 void static_analysis_baset::do_function_call_rec(
-  locationt l_call,
+  locationt l_call, locationt l_return,
   const exprt &function,
   const exprt::operandst &arguments,
   statet &new_state,
@@ -529,7 +529,7 @@ void static_analysis_baset::do_function_call_rec(
       throw "failed to find function "+id2string(identifier);
     
     do_function_call(
-      l_call,
+      l_call, l_return,
       goto_functions,
       it,
       arguments,
@@ -545,20 +545,20 @@ void static_analysis_baset::do_function_call_rec(
     std::auto_ptr<statet> n2(make_temporary_state(new_state));
     
     do_function_call_rec(
-      l_call,
+      l_call, l_return,
       function.op1(),
       arguments,
       new_state,
       goto_functions);
 
     do_function_call_rec(
-      l_call,
+      l_call, l_return,
       function.op2(),
       arguments,
       *n2,
       goto_functions);
       
-    merge(new_state, *n2);
+    merge(new_state, *n2, l_return);
   }
   else if(function.id()==ID_dereference)
   {
@@ -577,8 +577,8 @@ void static_analysis_baset::do_function_call_rec(
       {
         const object_descriptor_exprt &o=to_object_descriptor_expr(*it);
         std::auto_ptr<statet> n2(make_temporary_state(new_state));    
-        do_function_call_rec(l_call, o.object(), arguments, *n2, goto_functions);
-        merge(new_state, *n2);
+        do_function_call_rec(l_call, l_return, o.object(), arguments, *n2, goto_functions);
+        merge(new_state, *n2, l_return);
       }
     }
   }

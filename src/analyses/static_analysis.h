@@ -69,7 +69,7 @@ public:
   
   // also add
   //
-  //   bool merge(const T &b);
+  //   bool merge(const T &b, locationt to);
   //
   // this computes the join between "this" and b
   // return true if "this" has changed
@@ -204,7 +204,7 @@ protected:
     return l;
   }
   
-  virtual bool merge(statet &a, const statet &b)=0;
+  virtual bool merge(statet &a, const statet &b, locationt to)=0;
   
   typedef std::set<irep_idt> functions_donet;
   functions_donet functions_done;
@@ -222,14 +222,14 @@ protected:
   
   // function calls
   void do_function_call_rec(
-    locationt l_call,
+    locationt l_call, locationt l_return,
     const exprt &function,
     const exprt::operandst &arguments,
     statet &new_state,
     const goto_functionst &goto_functions);
 
   void do_function_call(
-    locationt l_call,
+    locationt l_call, locationt l_return,
     const goto_functionst &goto_functions,
     const goto_functionst::function_mapt::const_iterator f_it,
     const exprt::operandst &arguments,
@@ -306,9 +306,9 @@ protected:
     return it->second;
   }
 
-  virtual bool merge(statet &a, const statet &b)
+  virtual bool merge(statet &a, const statet &b, locationt to)
   {
-    return static_cast<T &>(a).merge(static_cast<const T &>(b));
+    return static_cast<T &>(a).merge(static_cast<const T &>(b), to);
   }
   
   virtual statet *make_temporary_state(statet &s)

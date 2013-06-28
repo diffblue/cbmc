@@ -20,7 +20,7 @@ public:
 
   // overloading  
 
-  virtual bool merge(const value_set_domaint &other)
+  virtual bool merge(const value_set_domaint &other, locationt to)
   {
     return value_set.make_union(other.value_set);
   }
