@@ -43,11 +43,15 @@ public:
                  D_UNSATISFIABLE, D_ERROR } resultt;
   
   virtual resultt dec_solve()=0;
-  
+
+  // old-style, will go away  
   virtual bool in_core(const exprt &expr);
   
   // return a textual description of the decision procedure
   virtual std::string decision_procedure_text() const=0;
+
+  // reset state of solver  
+  virtual void clear();
   
 protected:
   const namespacet &ns;

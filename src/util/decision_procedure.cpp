@@ -27,3 +27,20 @@ bool decision_proceduret::in_core(const exprt &expr)
   assert(false);
   return true;
 }
+
+/*******************************************************************\
+
+Function: decision_proceduret::in_core
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void decision_proceduret::clear()
+{
+  assert(false);
+}
