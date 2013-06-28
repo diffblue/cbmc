@@ -19,7 +19,7 @@ public:
 
   // overloading  
 
-  virtual bool merge(const invariant_set_domaint &other, locationt to)
+  inline bool merge(const invariant_set_domaint &other, locationt to)
   {
     return invariant_set.make_union(other.invariant_set);
   }
