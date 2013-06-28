@@ -49,9 +49,6 @@ public:
   
   // return a textual description of the decision procedure
   virtual std::string decision_procedure_text() const=0;
-
-  // reset state of solver  
-  virtual void clear();
   
 protected:
   const namespacet &ns;
