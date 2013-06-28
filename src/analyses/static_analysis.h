@@ -23,9 +23,14 @@ public:
   {
   }
 
+  virtual ~domain_baset()
+  {
+  }
+  
   typedef goto_programt::const_targett locationt;
 
-  // will go away
+  // will go away,
+  // to be replaced by a factory class option to static_analysist
   virtual void initialize(
     const namespacet &ns,
     locationt l)
@@ -45,10 +50,6 @@ public:
     locationt from,
     locationt to)=0;
 
-  virtual ~domain_baset()
-  {
-  }
-  
   virtual void output(
     const namespacet &ns,
     std::ostream &out) const
@@ -71,7 +72,7 @@ public:
   //
   //   bool merge(const T &b, locationt to);
   //
-  // this computes the join between "this" and b
+  // this computes the join between "this" and "b"
   // return true if "this" has changed
   
 protected:
