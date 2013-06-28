@@ -60,7 +60,7 @@ Function: interval_domaint::merge
 
 \*******************************************************************/
 
-bool interval_domaint::merge(const interval_domaint &b)
+bool interval_domaint::merge(const interval_domaint &b, locationt to)
 {
   return false;
 }

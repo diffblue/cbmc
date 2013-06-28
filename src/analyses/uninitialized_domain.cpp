@@ -113,7 +113,9 @@ Function: uninitialized_domaint::merge
 
 \*******************************************************************/
 
-bool uninitialized_domaint::merge(const uninitialized_domaint &other)
+bool uninitialized_domaint::merge(
+  const uninitialized_domaint &other,
+  locationt to)
 {
   unsigned old_uninitialized=uninitialized.size();
   

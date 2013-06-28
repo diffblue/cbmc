@@ -20,7 +20,7 @@ public:
   {
   }
 
-  inline bool merge(const is_threaded_domaint &other)
+  inline bool merge(const is_threaded_domaint &other, locationt to)
   {
     bool old=is_threaded;
     is_threaded=is_threaded || other.is_threaded;

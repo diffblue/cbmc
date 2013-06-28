@@ -27,7 +27,7 @@ public:
     std::ostream &out) const;
   
   // returns true iff there is s.th. new
-  bool merge(const uninitialized_domaint &other);
+  bool merge(const uninitialized_domaint &other, locationt to);
   
 protected:
   void assign(const exprt &lhs);

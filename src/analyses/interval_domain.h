@@ -48,7 +48,7 @@ public:
     const namespacet &ns,
     std::ostream &out) const;
 
-  bool merge(const interval_domaint &b);
+  bool merge(const interval_domaint &b, locationt to);
   
   exprt make_expression() const;
 };
