@@ -20,23 +20,6 @@ public:
   virtual void operator()(symex_target_equationt &)=0;
   
 protected:
-  typedef std::vector<event_it> event_listt;
-  
-  // lists of reads and writes per address
-  struct a_rect
-  {
-    event_listt reads, writes;
-  };
-  
-  typedef std::map<irep_idt, a_rect> address_mapt;
-  address_mapt address_map;
-  
-  void build_event_lists(symex_target_equationt &);
-  
-  // a per-thread numbering of the events
-  typedef std::map<event_it, unsigned> numberingt;
-  numberingt numbering;
-  
   // program order
   bool po(event_it e1, event_it e2);
 
@@ -44,12 +27,13 @@ protected:
   unsigned var_cnt;
   symbol_exprt nondet_bool_symbol(const std::string &prefix);
   
-  // This gives us the choice symbol for a R-W pair;
+  // This gives us the choice symbol for an R-W pair;
   // built by the method below.
   typedef std::map<
     std::pair<event_it, event_it>, symbol_exprt> choice_symbolst;
   choice_symbolst choice_symbols;
 
+  exprt write_symbol_primed(partial_order_concurrencyt::event_it e) const;
   void read_from(symex_target_equationt &equation);
   
   // maps thread numbers to an event list

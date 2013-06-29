@@ -22,14 +22,33 @@ public:
   typedef symex_target_equationt::SSA_stept eventt;
   typedef symex_target_equationt::SSA_stepst eventst;
   typedef eventst::const_iterator event_it;
+
+  // the name of a clock variable for a shared read/write
+  static irep_idt rw_clock_id(event_it e);
   
 protected:
   const namespacet &ns;
 
-  typedef std::vector<const eventt *> event_listt;
+  typedef std::vector<event_it> event_listt;
+  
+  // lists of reads and writes per address
+  struct a_rect
+  {
+    event_listt reads, writes;
+  };
+  
+  typedef std::map<irep_idt, a_rect> address_mapt;
+  address_mapt address_map;
+  
+  void build_event_lists(symex_target_equationt &);
+  
+  // a per-thread numbering of the events
+  typedef std::map<event_it, unsigned> numberingt;
+  numberingt numbering;
+  
   
   // produces the symbol ID for an event
-  inline irep_idt id(event_it event) const
+  static inline irep_idt id(event_it event)
   {
     return event->ssa_lhs.get_identifier();
   }
