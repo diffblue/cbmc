@@ -6,9 +6,9 @@ int main()
 
   __CPROVER_ASYNC_1: assert(global==1);
 
-  __CPROVER_ATOMIC_BEGIN();
+  __CPROVER_atomic_begin();
   global=2;
   // no interleaving here
   global=1;
-  __CPROVER_ATOMIC_END();
+  __CPROVER_atomic_end();
 }
