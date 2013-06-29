@@ -1,6 +1,6 @@
 CORE
 main.c
-
+--error-label ERROR
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
