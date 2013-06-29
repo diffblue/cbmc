@@ -61,7 +61,7 @@ bool bmct::all_claims(const goto_functionst &goto_functions)
     
   prop_convt &prop_conv=bv_cbmc;
 
-  status() << "Passing problem to " << prop_conv.decision_procedure_text();
+  status() << "Passing problem to " << prop_conv.decision_procedure_text() << eom;
 
   prop_conv.set_message_handler(get_message_handler());
   prop_conv.set_verbosity(get_verbosity());
@@ -120,7 +120,7 @@ bool bmct::all_claims(const goto_functionst &goto_functions)
     cover_goals.add(p);
   }
 
-  status() << "Running " << prop_conv.decision_procedure_text();
+  status() << "Running " << prop_conv.decision_procedure_text() << eom;
 
   cover_goals();  
 
