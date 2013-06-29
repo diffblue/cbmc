@@ -140,6 +140,9 @@ void cbmc_parseoptionst::get_command_line_options(optionst &options)
   if(cmdline.isset("cover-assertions"))
     options.set_option("cover-assertions", true);
 
+  if(cmdline.isset("mm"))
+    options.set_option("mm", cmdline.getval("mm"));
+
   if(cmdline.isset("no-simplify"))
     options.set_option("simplify", false);
   else
@@ -833,6 +836,8 @@ void cbmc_parseoptionst::help()
     " --no-assumptions             ignore user assumptions\n"
     " --error-label label          check that label is unreachable\n"
     " --cover-assertions           check which assertions are reachable\n"
+  //" --mm MM                      memory consistency model for concurrent programs\n"
+  //"                              (sc, tso, pso, alpha, rmo, power, arm, arm-pldi, ppc-pldi)\n"
     "\n"
     "BMC options:\n"
     " --function name              set main function name\n"
