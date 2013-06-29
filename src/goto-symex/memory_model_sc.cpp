@@ -107,34 +107,23 @@ void memory_model_sct::program_order(
   // thread spawn: the spawn precedes the first
   // instruction of the new thread in program order
   
-  for(per_thread_mapt::const_iterator
-      t_it=per_thread_map.begin();
-      t_it!=per_thread_map.end();
-      t_it++)
+  unsigned next_thread_id=0;
+  for(eventst::const_iterator
+      e_it=equation.SSA_steps.begin();
+      e_it!=equation.SSA_steps.end();
+      e_it++)
   {
-    per_thread_mapt::const_iterator next_thread=t_it;
-    next_thread++;
-    if(next_thread==per_thread_map.end()) continue;
-    if(next_thread->second.empty()) continue;
-
-    const event_listt &events=t_it->second;
-    
-    // iterate over events in the thread
-    
-    for(event_listt::const_iterator
-        e_it=events.begin();
-        e_it!=events.end();
-        e_it++)
+    if(is_spawn(e_it))
     {
-      if(is_spawn(*e_it))
-      {
+      per_thread_mapt::const_iterator next_thread=
+        per_thread_map.find(++next_thread_id);
+      if(next_thread!=per_thread_map.end())
         equation.constraint(
           true_exprt(),
-          before(*e_it, next_thread->second.front()),
+          before(e_it, next_thread->second.front()),
           "thread-spawn",
-          (*e_it)->source);
-      }
-    }    
+          e_it->source);
+    }
   }
 }
 
@@ -153,36 +142,75 @@ Function: memory_model_sct::write_serialization_internal
 void memory_model_sct::write_serialization_internal(
   symex_target_equationt &equation)
 {
+  per_thread_mapt per_thread_write_map;
+
+  for(eventst::const_iterator
+      e_it=equation.SSA_steps.begin();
+      e_it!=equation.SSA_steps.end();
+      e_it++)
+    if(is_shared_write(e_it))
+      per_thread_write_map[e_it->source.thread_nr].push_back(e_it);
+
+  // the zero-initialisation of a shared variable precedes any
+  // write in any of the threads
+  typedef hash_map_cont<irep_idt, event_it, irep_id_hash> previoust;
+  previoust init;
   for(address_mapt::const_iterator
       a_it=address_map.begin();
       a_it!=address_map.end();
       a_it++)
   {
     const a_rect &a_rec=a_it->second;
-    
+
+    assert(!a_rec.writes.empty());
+    event_it init_write=a_rec.writes.front();
+
+    // only writes with a true guard are considered initialisation
+    if(init_write->guard.is_true())
+      init.insert(std::make_pair(address(init_write), init_write));
+  }
+
+  // iterate over threads
+
+  for(per_thread_mapt::const_iterator
+      t_it=per_thread_write_map.begin();
+      t_it!=per_thread_write_map.end();
+      t_it++)
+  {
+    const event_listt &events=t_it->second;
+
+    // iterate over relevant events in the thread
+
+    previoust previous(init);
+
     for(event_listt::const_iterator
-        w_it=a_rec.writes.begin();
-        w_it!=a_rec.writes.end();
-        ++w_it)
+        e_it=events.begin();
+        e_it!=events.end();
+        e_it++)
     {
-      //const eventt &write_event=**w_it;
+      previoust::iterator p_entry=
+        previous.insert(std::make_pair(address(*e_it), *e_it)).first;
 
-      #if 0
-      if(reads.find(w_evt2.address)!=reads.end())
-      {
-        assert(!mr.empty() || w_evt2.guard.is_true());
-        equal_exprt eq(write_symbol_primed(w_evt2),
-            w_evt2.guard.is_true() ?
-            // value' equals value
-            w_evt2.value :
-            // value' equals preceding write if guard is false
-            if_exprt(w_evt2.guard.as_expr(),
-              w_evt2.value,
-              write_symbol_primed(*mr.back())));
+      event_it w_prev=p_entry->second;
+      event_it w=*e_it;
+      const exprt &w_value=w->ssa_lhs;
 
-        poc.add_constraint(eq, guardt(), w_evt2.source, "ws-preceding");
-      }
-      #endif
+      equal_exprt eq(write_symbol_primed(w),
+                     // if guard is true or this is the first write
+                     w->guard.is_true() || p_entry->second==*e_it ?
+                     // value' equals value
+                     w_value :
+                     // value' equals preceding write if guard is false
+                     if_exprt(w->guard,
+                              w_value,
+                              write_symbol_primed(w_prev)));
+      equation.constraint(
+        true_exprt(),
+        eq,
+        "ws-preceding",
+        (*e_it)->source);
+
+      p_entry->second=*e_it;
     }
   }
 }
@@ -287,12 +315,23 @@ void memory_model_sct::from_read(symex_target_equationt &equation)
           w!=a_rec.writes.end();
           ++w)
       {
-        exprt ws;
+        exprt ws1, ws2;
         
         if(po(*w_prime, *w))
-          ws=true_exprt(); // true on SC only!
+        {
+          ws1=true_exprt(); // true on SC only!
+          ws2=false_exprt(); // true on SC only!
+        }
+        else if(po(*w, *w_prime))
+        {
+          ws1=false_exprt(); // true on SC only!
+          ws2=true_exprt(); // true on SC only!
+        }
         else
-          ws=before(*w_prime, *w);
+        {
+          ws1=before(*w_prime, *w);
+          ws2=before(*w, *w_prime);
+        }
 
         // smells like cubic
         for(choice_symbolst::const_iterator
@@ -301,98 +340,36 @@ void memory_model_sct::from_read(symex_target_equationt &equation)
             c_it++)
         {
           event_it r=c_it->first.first;
-        
-          if(c_it->first.second!=*w_prime)
-            continue;
-
           exprt rf=c_it->second;
-          exprt fr=before(r, *w);
-          
-          exprt cond=
-            implies_exprt(
-              and_exprt(r->guard, (*w_prime)->guard, ws, rf),
-              fr);
-          
-          equation.constraint(
-            true_exprt(), cond, "fr", r->source);
+          exprt cond;
+          cond.make_nil();
+        
+          if(c_it->first.second==*w_prime && !ws1.is_false())
+          {
+            exprt fr=before(r, *w);
+
+            cond=
+              implies_exprt(
+                and_exprt(r->guard, (*w_prime)->guard, ws1, rf),
+                fr);
+          }
+          else if(c_it->first.second==*w && !ws2.is_false())
+          {
+            exprt fr=before(r, *w_prime);
+
+            cond=
+              implies_exprt(
+                and_exprt(r->guard, (*w)->guard, ws2, rf),
+                fr);
+          }
+
+          if(cond.is_not_nil())
+            equation.constraint(
+              true_exprt(), cond, "fr", r->source);
         }
         
       }
     }
   }
-
-  #if 0
-  // from-read: (w', w) in ws and (w', r) in rf -> (r, w) in fr
-  // uniproc and ghb orders are guaranteed to be in sync via the
-  // underlying orders rf and ws
-
-  for(partial_order_concurrencyt::adj_matrixt::const_iterator
-      w_prime=ws.begin();
-      w_prime!=ws.end();
-      ++w_prime)
-  {
-    partial_order_concurrencyt::adj_matrixt::const_iterator w_prime_rf=
-      rf.find(w_prime->first);
-    if(w_prime_rf==rf.end())
-      continue;
-
-    for(std::map<evtt const*, exprt>::const_iterator
-        r=w_prime_rf->second.begin();
-        r!=w_prime_rf->second.end();
-        ++r)
-    {
-      const evtt &r_evt=*(r->first);
-
-      for(std::map<evtt const*, exprt>::const_iterator
-          w=w_prime->second.begin();
-          w!=w_prime->second.end();
-          ++w)
-      {
-        const evtt &w_evt=*(w->first);
-
-        const evtt* f_e=poc.first_of(r_evt, w_evt);
-        bool is_fri=f_e!=0;
-        // TODO: make sure the following skips are ok even if guard does not
-        // evaluate to true
-        // internal fr only backward or to first successor (in po)
-        if(check==AC_GHB)
-        {
-          numbered_evtst::const_iterator w_entry=
-            poc.get_thread(w_evt).find(w_evt);
-          assert(w_entry!=poc.get_thread(w_evt).end());
-          numbered_evtst::const_iterator r_entry=
-            poc.get_thread(w_evt).find(r_evt);
-
-          if(r_entry!=poc.get_thread(w_evt).end() &&
-              r_entry<w_entry)
-          {
-            bool is_next=true;
-            for(++r_entry; r_entry!=w_entry && is_next; ++r_entry)
-              is_next&=(*r_entry)->direction!=evtt::D_WRITE ||
-                (*r_entry)->address!=w_evt.address;
-            if(!is_next)
-              continue;
-          }
-        }
-        // no internal forward fr, these are redundant with po-loc
-        else if(check==AC_UNIPROC && is_fri && f_e==&r_evt)
-          continue;
-
-        and_exprt a(and_exprt(r->second, w->second),
-            and_exprt(w_evt.guard.as_expr(), r_evt.guard.as_expr()));
-        poc.add_partial_order_constraint(check, "fr", r_evt, w_evt, a);
-        // read-to-write edge
-        std::pair<std::map<evtt const*, exprt>::iterator, bool> fr_map_entry=
-          fr[&r_evt].insert(std::make_pair(&w_evt, a));
-        if(!fr_map_entry.second)
-        {
-          or_exprt o(fr_map_entry.first->second, a);
-          fr_map_entry.first->second.swap(o);
-        }
-      }
-    }
-  }
-  #endif
 }
-
 
