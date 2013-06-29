@@ -13,7 +13,7 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 
 /*******************************************************************\
 
-Function: memory_model_baset::~memory_model_baset
+Function: memory_model_baset::memory_model_baset
 
   Inputs: 
 
@@ -67,46 +67,6 @@ symbol_exprt memory_model_baset::nondet_bool_symbol(
 
 /*******************************************************************\
 
-Function: memory_model_baset::build_event_lists
-
-  Inputs: 
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void memory_model_baset::build_event_lists(
-  symex_target_equationt &equation)
-{
-  // a per-thread counter
-  std::map<unsigned, unsigned> counter;
-
-  for(eventst::const_iterator
-      e_it=equation.SSA_steps.begin();
-      e_it!=equation.SSA_steps.end();
-      e_it++)
-  {
-    if(is_shared_read(e_it) || is_shared_write(e_it))
-    {
-      unsigned thread_nr=e_it->source.thread_nr;    
-      a_rect &a_rec=address_map[address(e_it)];
-    
-      if(is_shared_read(e_it))
-        a_rec.reads.push_back(e_it);
-      else // must be write
-        a_rec.writes.push_back(e_it);
-
-      // maps an event id to a per-thread counter
-      unsigned cnt=counter[thread_nr]++;
-      numbering[e_it]=cnt;
-    }
-  }
-}
-
-/*******************************************************************\
-
 Function: memory_model_baset::po
 
   Inputs: 
@@ -127,6 +87,36 @@ bool memory_model_baset::po(event_it e1, event_it e2)
     // in general un-ordered, with exception of thread-spawning
     return false;
   }
+}
+
+/*******************************************************************\
+
+Function: memory_model_baset::write_symbol_primed
+
+  Inputs: 
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+exprt memory_model_baset::write_symbol_primed(
+  partial_order_concurrencyt::event_it e) const
+{
+  assert(is_shared_write(e));
+
+  if(e->ssa_lhs.id()!=ID_symbol)
+  {
+    // initialisation
+    assert(e->guard.is_true());
+    return e->ssa_lhs;
+  }
+
+  const std::string name=
+    id2string(to_symbol_expr(e->ssa_lhs).get_identifier()) + "$val";
+
+  return symbol_exprt(name, e->ssa_lhs.type());
 }
 
 /*******************************************************************\
@@ -188,7 +178,7 @@ void memory_model_baset::read_from(symex_target_equationt &equation)
           event_it e_it=*w_it;
           bool is_most_recent=true;
           for(++e_it; e_it!=*r_it && is_most_recent; ++e_it)
-            is_most_recent&=!e_it->is_assignment() ||
+            is_most_recent&=!is_shared_write(e_it) ||
                             address(e_it)!=address(*r_it);
 
           if(!is_most_recent)
@@ -199,13 +189,13 @@ void memory_model_baset::read_from(symex_target_equationt &equation)
         
         // record the symbol
         choice_symbols[
-          std::pair<event_it, event_it>(*r_it, *w_it)]=s;
+          std::make_pair(*r_it, *w_it)]=s;
 
         // We rely on the fact that there is at least
         // one write event that has guard 'true'.
         implies_exprt read_from(s,
             and_exprt((is_rfi ? true_exprt() : w->guard),
-              equal_exprt(r->ssa_lhs, w->ssa_lhs)));
+              equal_exprt(r->ssa_lhs, write_symbol_primed(w))));
 
         equation.constraint(
           true_exprt(), read_from, is_rfi?"rfi":"rf", r->source);
@@ -224,8 +214,9 @@ void memory_model_baset::read_from(symex_target_equationt &equation)
       // value equals the one of some write
       exprt rf_some;
 
+      // uninitialised global symbol like symex_dynamic::dynamic_object*
       if(rf_some_operands.empty())
-        continue; // don't add blank constraints
+        continue;
       else if(rf_some_operands.size()==1)
         rf_some=rf_some_operands.front();
       else
