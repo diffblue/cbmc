@@ -806,6 +806,8 @@ void symex_target_equationt::SSA_stept::output(
     {
     case HIDDEN: out << "HIDDEN"; break;
     case STATE: out << "STATE"; break;
+    case PHI: out << "PHI"; break;
+    case GUARD: out << "GUARD"; break; 
     default:;
     }
 
