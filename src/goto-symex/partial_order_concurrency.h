@@ -44,8 +44,7 @@ protected:
   
   // a per-thread numbering of the events
   typedef std::map<event_it, unsigned> numberingt;
-  numberingt numbering;
-  
+  numberingt numbering;  
   
   // produces the symbol ID for an event
   static inline irep_idt id(event_it event)
