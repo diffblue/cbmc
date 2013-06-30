@@ -32,10 +32,10 @@ public:
   // the expression must be of Boolean type  
   virtual void set_to(const exprt &expr, bool value)=0;
   
-  void set_to_true(const exprt &expr)
+  inline void set_to_true(const exprt &expr)
   { set_to(expr, true); }
    
-  void set_to_false(const exprt &expr)
+  inline void set_to_false(const exprt &expr)
   { set_to(expr, false); }
   
   // solve the problem
@@ -53,5 +53,13 @@ public:
 protected:
   const namespacet &ns;
 };
+
+static inline decision_proceduret & operator << (
+  decision_proceduret &dest,
+  const exprt &src)
+{
+  dest.set_to_true(src);
+  return dest;
+}
 
 #endif
