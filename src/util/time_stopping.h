@@ -25,10 +25,11 @@ public:
   {
   }
   
-  inline fine_timet &operator-(const fine_timet &other)
+  inline fine_timet operator-(const fine_timet &other)
   {
-    t-=other.t;
-    return *this;
+    fine_timet tmp=*this;
+    tmp.t-=other.t;
+    return tmp;
   }
   
   inline fine_timet &operator+=(const fine_timet &other)
@@ -37,10 +38,11 @@ public:
     return *this;
   }
   
-  inline fine_timet &operator+(const fine_timet &other)
+  inline fine_timet operator+(const fine_timet &other)
   {
-    t+=other.t;
-    return *this;
+    fine_timet tmp=*this;
+    tmp.t+=other.t;
+    return tmp;
   }
   
   inline unsigned long long get_t() const
