@@ -1,4 +1,4 @@
- /*******************************************************************\
+/*******************************************************************\
 
 Module: GOTO Programs
 
@@ -1006,10 +1006,13 @@ void goto_checkt::bounds_check(
     }
   }
 
+  if(to_array_type(array_type).size().is_nil())
   {
-    if(to_array_type(array_type).size().is_nil())
-      throw "index array operand of wrong type";
-
+    // Linking didn't complete, we don't have a size.
+    // Not clear what to do.
+  }
+  else
+  {
     const exprt &size=to_array_type(array_type).size();
 
     if(size.id()==ID_infinity)
