@@ -168,6 +168,18 @@ void ansi_c_internal_additions(std::string &code)
     "void __CPROVER_parameter_predicates();\n"
     "void __CPROVER_return_predicates();\n"
 
+    // pipes, write, read, close
+    "struct __CPROVER_pipet {\n"
+    "  _Bool widowed;\n"
+    "  char data[4];\n"
+    "  short next_avail;\n"
+    "  short next_unread;\n"
+    "};\n"
+    "extern struct __CPROVER_pipet __CPROVER_pipes[__CPROVER_constant_infinity_uint];\n"
+    // offset to make sure we don't collide with other fds
+    "extern const int __CPROVER_pipe_offset;\n"
+    "unsigned __CPROVER_pipe_count=0;\n"
+
     "\n";
     
   // GCC junk stuff, also for ARM
