@@ -161,136 +161,145 @@ Function: compilet::add_input_file
 
 bool compilet::add_input_file(const std::string &file_name)
 {
-  size_t r=file_name.rfind('.', file_name.length()-1);
-
-  if(r!=std::string::npos)
+  // first of all, try to open the file
   {
-    std::string ext = file_name.substr(r+1, file_name.length());
-
-    if(ext=="c" ||
-       ext=="cc" ||
-       ext=="cp" ||
-       ext=="cpp" ||
-       ext=="CPP" ||
-       ext=="c++" ||
-       ext=="C" ||
-       ext=="i" ||
-       ext=="ii")
+    std::ifstream in(file_name.c_str());
+    if(!in)
     {
-      source_files.push_back(file_name);
-    }
-    else if(ext=="a")
-    {
-      #ifdef _WIN32
-      char td[MAX_PATH+1];
-      #else
-      char td[] = "goto-cc.XXXXXX";
-      #endif
-
-      std::string tstr=get_temporary_directory(td);
-
-      if(tstr=="")
-      {
-        error() << "Cannot create temporary directory" << eom;
-        return true;
-      }
-
-      tmp_dirs.push_back(tstr);
-      std::stringstream cmd("");
-      if(chdir(tmp_dirs.back().c_str())!=0)
-      {
-        error() << "Cannot switch to temporary directory" << eom;
-        return true;
-      }
-
-      // unpack now
-      #ifdef _WIN32
-      if(file_name[0]!='/' && file_name[1]!=':')
-      #else
-      if(file_name[0]!='/')
-      #endif
-      {
-        cmd << "ar x " <<
-        #ifdef _WIN32
-          working_directory << "\\" << file_name;
-        #else
-          working_directory << "/" << file_name;
-        #endif
-      }
-      else
-      {
-        cmd << "ar x " << file_name;
-      }
-      
-      FILE *stream;
-
-      stream=popen(cmd.str().c_str(), "r");
-      pclose(stream);
-      
-      cmd.clear();
-      cmd.str("");
-      
-      // add the files from "ar t"
-      #ifdef _WIN32
-      if(file_name[0]!='/' && file_name[1]!=':')
-      #else
-      if(file_name[0]!='/')
-      #endif
-      {
-        cmd << "ar t " <<
-        #ifdef _WIN32
-          working_directory << "\\" << file_name;
-        #else
-          working_directory << "/" << file_name;
-        #endif
-      }
-      else
-      {
-        cmd << "ar t " << file_name;
-      }
-
-      stream=popen(cmd.str().c_str(), "r");
-      if(stream!=NULL)
-      {
-        std::string line;
-        char ch;
-        while((ch=fgetc(stream))!=EOF)
-        {
-          if(ch!='\n' && ch!=EOF)
-          {
-            line += ch;
-          }
-          else
-          {
-            std::string t;
-            #ifdef _WIN32
-            t = tmp_dirs.back() + '\\' + line;
-            #else
-            t = tmp_dirs.back() + '/' + line;
-            #endif
-
-            if(is_goto_binary(t))
-              object_files.push_back(t);
-            line = "";
-          }
-        }
-      }
-      pclose(stream);
-      cmd.str("");
-
-      if(chdir(working_directory.c_str())!=0)
-        error() << "Could not change back to working directory" << eom;
-    }
-    else if(is_goto_binary(file_name))
-      object_files.push_back(file_name);
-    else
-    {
-      // unknown extension, not a goto binary, will ignore
+      error() << "failed to open file `" << file_name << "'" << eom;
+      return false; // generously ignore
     }
   }
+
+  size_t r=file_name.rfind('.', file_name.length()-1);
+
+  if(r==std::string::npos)
+  {
+    // a file without extension; will ignore
+    return false;
+  }
+  
+  std::string ext = file_name.substr(r+1, file_name.length());
+
+  if(ext=="c" ||
+     ext=="cc" ||
+     ext=="cp" ||
+     ext=="cpp" ||
+     ext=="CPP" ||
+     ext=="c++" ||
+     ext=="C" ||
+     ext=="i" ||
+     ext=="ii")
+  {
+    source_files.push_back(file_name);
+  }
+  else if(ext=="a")
+  {
+    #ifdef _WIN32
+    char td[MAX_PATH+1];
+    #else
+    char td[] = "goto-cc.XXXXXX";
+    #endif
+
+    std::string tstr=get_temporary_directory(td);
+
+    if(tstr=="")
+    {
+      error() << "Cannot create temporary directory" << eom;
+      return true;
+    }
+
+    tmp_dirs.push_back(tstr);
+    std::stringstream cmd("");
+    if(chdir(tmp_dirs.back().c_str())!=0)
+    {
+      error() << "Cannot switch to temporary directory" << eom;
+      return true;
+    }
+
+    // unpack now
+    #ifdef _WIN32
+    if(file_name[0]!='/' && file_name[1]!=':')
+    #else
+    if(file_name[0]!='/')
+    #endif
+    {
+      cmd << "ar x " <<
+      #ifdef _WIN32
+        working_directory << "\\" << file_name;
+      #else
+        working_directory << "/" << file_name;
+      #endif
+    }
+    else
+    {
+      cmd << "ar x " << file_name;
+    }
+    
+    FILE *stream;
+
+    stream=popen(cmd.str().c_str(), "r");
+    pclose(stream);
+    
+    cmd.clear();
+    cmd.str("");
+    
+    // add the files from "ar t"
+    #ifdef _WIN32
+    if(file_name[0]!='/' && file_name[1]!=':')
+    #else
+    if(file_name[0]!='/')
+    #endif
+    {
+      cmd << "ar t " <<
+      #ifdef _WIN32
+        working_directory << "\\" << file_name;
+      #else
+        working_directory << "/" << file_name;
+      #endif
+    }
+    else
+    {
+      cmd << "ar t " << file_name;
+    }
+
+    stream=popen(cmd.str().c_str(), "r");
+    if(stream!=NULL)
+    {
+      std::string line;
+      char ch;
+      while((ch=fgetc(stream))!=EOF)
+      {
+        if(ch!='\n' && ch!=EOF)
+        {
+          line += ch;
+        }
+        else
+        {
+          std::string t;
+          #ifdef _WIN32
+          t = tmp_dirs.back() + '\\' + line;
+          #else
+          t = tmp_dirs.back() + '/' + line;
+          #endif
+
+          if(is_goto_binary(t))
+            object_files.push_back(t);
+          line = "";
+        }
+      }
+    }
+    pclose(stream);
+    cmd.str("");
+
+    if(chdir(working_directory.c_str())!=0)
+      error() << "Could not change back to working directory" << eom;
+  }
+  else if(is_goto_binary(file_name))
+    object_files.push_back(file_name);
   else
   {
-    // don't care about no extensions
+    // unknown extension, not a goto binary, will silently ignore
   }
 
   return false;
