@@ -251,30 +251,6 @@ int fpurge(FILE *stream)
   return return_value;
 }
 
-/* FUNCTION: read */
-
-#ifndef __CPROVER_UNISTD_H_INCLUDED
-#include <unistd.h>
-#define __CPROVER_UNISTD_H_INCLUDED
-#endif
-
-inline ssize_t read(int fildes, void *buf, size_t nbyte)
-{
-  __CPROVER_HIDE:;
-  ssize_t nread;
-  size_t i;
-  (void)fildes;
-  __CPROVER_assume((size_t)nread<=nbyte);
-
-  for(i=0; i<nbyte; i++)
-  {
-    char nondet_char;
-    ((char *)buf)[i]=nondet_char;
-  }
-
-  return nread;
-}
-
 /* FUNCTION: fgetc */
 
 #ifndef __CPROVER_STDIO_H_INCLUDED

@@ -91,8 +91,8 @@ struct __CPROVER_pipet {
   short next_avail;
   short next_unread;
 };
-struct __CPROVER_pipet __CPROVER_pipes[3];
-// magic offset to make sure we don't collide with other fds
-const int __CPROVER_magic_pipe_offset=42;
+extern struct __CPROVER_pipet __CPROVER_pipes[__CPROVER_constant_infinity_uint];
+// offset to make sure we don't collide with other fds
+extern const int __CPROVER_pipe_offset;
 #endif
 
