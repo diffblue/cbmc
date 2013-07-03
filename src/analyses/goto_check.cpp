@@ -572,10 +572,13 @@ void goto_checkt::integer_overflow_check(
       overflow.operands().resize(2);
       overflow.op0()=tmp;
       overflow.op1()=expr.operands()[i];
+      
+      std::string kind=
+        type.id()==ID_unsignedbv?"unsigned":"signed";
     
       add_guarded_claim(
         not_exprt(overflow),
-        "arithmetic overflow on "+expr.id_string(),
+        "arithmetic overflow on "+kind+" "+expr.id_string(),
         "overflow",
         expr.find_location(),
         expr,
@@ -584,9 +587,12 @@ void goto_checkt::integer_overflow_check(
   }
   else
   {
+    std::string kind=
+      type.id()==ID_unsignedbv?"unsigned":"signed";
+
     add_guarded_claim(
       not_exprt(overflow),
-      "arithmetic overflow on "+expr.id_string(),
+      "arithmetic overflow on "+kind+" "+expr.id_string(),
       "overflow",
       expr.find_location(),
       expr,
