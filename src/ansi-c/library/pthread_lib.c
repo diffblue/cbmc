@@ -104,14 +104,14 @@ inline int pthread_mutex_destroy(pthread_mutex_t *mutex)
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
 
-extern unsigned long long __CPROVER_threads_exited;
+extern __CPROVER_bool __CPROVER_threads_exited[];
 extern _Thread_local unsigned long __CPROVER_thread_id;
 
 inline void pthread_exit(void *value_ptr)
 {
   __CPROVER_HIDE:;
   if(value_ptr!=0) (void)*(char*)value_ptr;
-  __CPROVER_threads_exited|=1<<__CPROVER_thread_id;
+  __CPROVER_threads_exited[__CPROVER_thread_id]=1;
   __CPROVER_assume(0);
 }
 
@@ -122,18 +122,16 @@ inline void pthread_exit(void *value_ptr)
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
 
-extern unsigned long long __CPROVER_threads_exited;
+extern __CPROVER_bool __CPROVER_threads_exited[];
 
 inline int pthread_join(pthread_t thread, void **value_ptr)
 {
   __CPROVER_HIDE:;
   if(value_ptr!=0) (void)**(char**)value_ptr;
 #ifdef __APPLE__
-  if((unsigned long)(thread->__sig)<8*sizeof(unsigned long long))
-    __CPROVER_assume(__CPROVER_threads_exited&(1<<(unsigned long)thread->__sig));
+  __CPROVER_assume(__CPROVER_threads_exited[(unsigned long)thread->__sig]);
 #else
-  if((unsigned long)thread<8*sizeof(unsigned long long))
-    __CPROVER_assume(__CPROVER_threads_exited&(1<<(unsigned long)thread));
+  __CPROVER_assume(__CPROVER_threads_exited[(unsigned long)thread]);
 #endif
   return 0;
 }
@@ -271,7 +269,7 @@ inline int pthread_rwlock_wrlock(pthread_rwlock_t *lock)
 #define __CPROVER_STDLIB_H_INCLUDED
 #endif
 
-extern unsigned long long __CPROVER_threads_exited;
+extern __CPROVER_bool __CPROVER_threads_exited[];
 extern _Thread_local unsigned long __CPROVER_thread_id;
 extern unsigned long __CPROVER_next_thread_id;
 
@@ -285,7 +283,7 @@ void __actual_thread_spawn(
   __CPROVER_HIDE:;
   __CPROVER_ASYNC_1: __CPROVER_thread_id=id,
                        start_routine(arg),
-                       __CPROVER_threads_exited|=1<<id;
+                       __CPROVER_threads_exited[id]=1;
 }
 
 int pthread_create(
