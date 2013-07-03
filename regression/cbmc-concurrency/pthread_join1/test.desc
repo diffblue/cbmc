@@ -1,0 +1,10 @@
+CORE
+main.c
+--all-claims
+^EXIT=0$
+^SIGNAL=0$
+^\[main\.1\] assertion i==1: FAILED$
+^\[main\.2\] assertion i==2: OK$
+^\*\* 1 of 2 failed (2 iterations)$
+--
+^warning: ignoring

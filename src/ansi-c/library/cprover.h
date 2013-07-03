@@ -30,7 +30,7 @@ void __CPROVER_atomic_begin();
 void __CPROVER_atomic_end();
 void __CPROVER_fence(const char *kind, ...);
 #if 0
-unsigned long long __CPROVER_threads_exited=0;
+__CPROVER_bool __CPROVER_threads_exited[__CPROVER_constant_infinity_uint];
 unsigned long __CPROVER_next_thread_id=0;
 
 // traces
