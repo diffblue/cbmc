@@ -260,6 +260,8 @@ void goto_symext::symex_step(
 
       if(!tmp.is_true())
       {
+        // not clear why different treatment for threads vs. no threads
+        // is essential
         if(state.threads.size()==1)
         {
           exprt tmp2=tmp;
