@@ -260,14 +260,14 @@ void goto_symext::symex_step(
 
       if(!tmp.is_true())
       {
-        exprt tmp2=tmp;
-        state.guard.guard_expr(tmp2);
-        target.assumption(state.guard.as_expr(), tmp2, state.source);
-
-        #if 0      
-        // we also add it to the state guard
-        state.guard.add(tmp);
-        #endif
+        if(state.threads.size()==1)
+        {
+          exprt tmp2=tmp;
+          state.guard.guard_expr(tmp2);
+          target.assumption(state.guard.as_expr(), tmp2, state.source);
+        }
+        else
+          state.guard.add(tmp);
       }
     }
 

@@ -563,8 +563,17 @@ bool goto_symex_statet::l2_thread_write_encoding(
     
   if(threads.size()<=1)
     return false;
+  // record a shared write
+  assert(symex_target!=NULL);
+  symbol_exprt original_symbol(orig_identifier, expr.type());
+  symex_target->shared_write(
+    guard.as_expr(),
+    expr,
+    original_symbol,
+    source);
 
-  return true;
+  // do we have threads?
+  return threads.size()>1;
 }
 
 /*******************************************************************\
