@@ -764,9 +764,10 @@ void c_typecheck_baset::clean_type(
       unsigned count=0;
       irep_idt temp_identifier;
       std::string suffix;
+
       do
       {
-        suffix="#array_size"+i2string(count);
+        suffix="$array_size"+i2string(count);
         temp_identifier=id2string(base_symbol.name)+suffix;
         count++;
       }
@@ -778,23 +779,31 @@ void c_typecheck_baset::clean_type(
       new_symbol.pretty_name=id2string(base_symbol.pretty_name)+suffix;
       new_symbol.base_name=id2string(base_symbol.base_name)+suffix;
       new_symbol.type=size.type();
+      new_symbol.type.set(ID_C_constant, true);
       new_symbol.is_file_local=true;
       new_symbol.is_type=false;
-      new_symbol.is_thread_local=true;
+      new_symbol.is_thread_local=false;
+      new_symbol.is_static_lifetime=false;
       new_symbol.value.make_nil();
       new_symbol.location=location;
+      
       symbol_table.add(new_symbol);
 
-      // produce the code that initializes the symbol      
+      // produce the code that declares and initializes the symbol
       symbol_exprt symbol_expr;
       symbol_expr.set_identifier(temp_identifier);
-      symbol_expr.type()=size.type();
+      symbol_expr.type()=new_symbol.type;
+      
+      code_declt declaration(symbol_expr);
+      declaration.location()=location;
+
       code_assignt assignment;
       assignment.lhs()=symbol_expr;
       assignment.rhs()=size;
       assignment.location()=location;
 
       // store the code
+      code.push_back(declaration);
       code.push_back(assignment);
 
       // fix type

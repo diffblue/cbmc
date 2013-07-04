@@ -356,9 +356,10 @@ void c_typecheck_baset::typecheck_decl_type(codet &code)
   if(!clean_code.empty())
   {
     // build a decl-block
-    codet decl_block(ID_decl_block);
-    decl_block.copy_to_operands(code_blockt(clean_code), code);
-    code.swap(decl_block);
+    code_blockt code_block(clean_code);
+    code_block.set_statement(ID_decl_block);
+    code_block.copy_to_operands(code);
+    code.swap(code_block);
   }
 }
 
@@ -382,9 +383,10 @@ void c_typecheck_baset::typecheck_decl(codet &code)
   if(!clean_code.empty())
   {
     // build a decl-block
-    codet decl_block(ID_decl_block);
-    decl_block.copy_to_operands(code_blockt(clean_code), code);
-    code.swap(decl_block);    
+    code_blockt code_block(clean_code);
+    code_block.set_statement(ID_decl_block);
+    code_block.copy_to_operands(code);
+    code.swap(code_block);    
   }
 }
 
