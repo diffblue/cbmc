@@ -12,9 +12,12 @@ Author: Daniel Kroening
 
 #include <util/threeval.h>
 #include <util/simplify_expr.h>
+#include <util/arith_tools.h>
 
 #include <solvers/prop/prop_conv.h>
 #include <solvers/prop/prop.h>
+
+#include "partial_order_concurrency.h"
 
 #include "build_goto_trace.h"
 
@@ -146,7 +149,11 @@ void build_goto_trace(
   const namespacet &ns,
   goto_tracet &goto_trace)
 {
-  unsigned step_nr=0;
+  // we need to re-sort the steps according to their clock
+  typedef std::map<mp_integer, goto_tracet::stepst> time_mapt;
+  time_mapt time_map;
+  
+  mp_integer current_time=0;
   
   for(symex_target_equationt::SSA_stepst::const_iterator
       it=target.SSA_steps.begin();
@@ -159,25 +166,33 @@ void build_goto_trace(
       continue;
 
     if(it->is_constraint() ||
-       it->is_shared_read() || it->is_shared_write() ||
        it->is_spawn() || it->is_atomic_begin() || it->is_atomic_end())
       continue;
 
+    if(it->is_shared_read() || it->is_shared_write())
+    {
+      // these are just used to get the time stamp
+      exprt clock_value=prop_conv.get(
+        symbol_exprt(partial_order_concurrencyt::rw_clock_id(it)));
+    
+      to_integer(clock_value, current_time);
+      continue;
+    }
+
+    // drop hidden assignments
     if(it->is_assignment() &&
        SSA_step.assignment_type!=symex_target_equationt::STATE)
       continue;
-      
-    step_nr++;
-    
-    goto_trace.steps.push_back(goto_trace_stept());    
-    goto_trace_stept &goto_trace_step=goto_trace.steps.back();
+
+    goto_tracet::stepst &steps=time_map[current_time];
+    steps.push_back(goto_trace_stept());    
+    goto_trace_stept &goto_trace_step=steps.back();
     
     goto_trace_step.thread_nr=SSA_step.source.thread_nr;
     goto_trace_step.pc=SSA_step.source.pc;
     goto_trace_step.comment=SSA_step.comment;
     goto_trace_step.lhs_object=SSA_step.original_lhs_object;
     goto_trace_step.type=SSA_step.type;
-    goto_trace_step.step_nr=step_nr;
     goto_trace_step.format_string=SSA_step.format_string;
     goto_trace_step.io_id=SSA_step.io_id;
     goto_trace_step.formatted=SSA_step.formatted;
@@ -224,9 +239,6 @@ void build_goto_trace(
 
     if(SSA_step.is_assert())
     {
-      // we stop after a violated assertion
-      if(!goto_trace_step.cond_value)
-        break;
     }
     else if(SSA_step.is_assume())
     {
@@ -234,4 +246,38 @@ void build_goto_trace(
       assert(goto_trace_step.cond_value);
     }
   }
+  
+  // Now assemble into a single goto_trace.
+  // This expoits sorted-ness of the map.
+  for(time_mapt::iterator t_it=time_map.begin();
+      t_it!=time_map.end(); t_it++)
+  {
+    goto_trace.steps.splice(goto_trace.steps.end(), t_it->second);
+  }
+
+  // produce the step numbers
+  unsigned step_nr=0;
+  
+  for(goto_tracet::stepst::iterator
+      s_it=goto_trace.steps.begin();
+      s_it!=goto_trace.steps.end();
+      s_it++)
+    s_it->step_nr=++step_nr;
+  
+  // Now delete anything after failed assertion
+  for(goto_tracet::stepst::iterator
+      s_it1=goto_trace.steps.begin();
+      s_it1!=goto_trace.steps.end();
+      s_it1++)
+    if(s_it1->is_assert() && !s_it1->cond_value)
+    {
+      s_it1++;
+
+      for(goto_tracet::stepst::iterator
+          s_it2=s_it1;
+          s_it2!=goto_trace.steps.end();
+          s_it2=goto_trace.steps.erase(s_it2));
+        
+      break;
+    }
 }
