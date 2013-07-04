@@ -52,7 +52,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(accelerate)" \
   "(k-induction):(step-case)(base-case)" \
   "(show-call-sequences)" \
-  "(interpreter)"
+  "(interpreter)(show-reaching-definitions)"
 
 class goto_instrument_parseoptionst:
   public parseoptions_baset,

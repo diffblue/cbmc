@@ -39,6 +39,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/goto_check.h>
 #include <analyses/call_graph.h>
 #include <analyses/interval_analysis.h>
+#include <analyses/reaching_definitions.h>
 
 #include "goto_instrument_parseoptions.h"
 #include "version.h"
@@ -231,6 +232,27 @@ int goto_instrument_parseoptionst::doit()
     if(cmdline.isset("show-symbol-table"))
     {
       show_symbol_table();
+      return 0;
+    }
+
+    if(cmdline.isset("show-reaching-definitions"))
+    {
+      const namespacet ns(symbol_table);
+      reaching_definitions_analysist rd_analysis(ns);
+      rd_analysis(goto_functions);
+
+      forall_goto_functions(f_it, goto_functions)
+      {
+        if(f_it->second.body_available)
+        {
+          std::cout << "////" << std::endl;
+          std::cout << "//// Function: " << f_it->first << std::endl;
+          std::cout << "////" << std::endl;
+          std::cout << std::endl;
+          rd_analysis.output(f_it->second.body, std::cout);
+        }
+      }
+
       return 0;
     }
 
