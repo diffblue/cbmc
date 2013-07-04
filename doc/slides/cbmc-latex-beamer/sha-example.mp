@@ -120,3 +120,5 @@ endfig;
 verbatimtex
 \end{document}
 etex
+
+end.

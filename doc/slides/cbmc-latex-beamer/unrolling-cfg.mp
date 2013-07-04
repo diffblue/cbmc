@@ -31,3 +31,5 @@ beginfig (0)
   drawarrow z[4]..(3cm,ypart 0.5[z[4],z[1]])..z[1] cutbefore fullcircle scaled 3pt shifted z[4] cutafter fullcircle scaled 3pt shifted z[1];
   
 endfig;
+
+end.
