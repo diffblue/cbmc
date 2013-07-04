@@ -559,21 +559,22 @@ bool goto_symex_statet::l2_thread_write_encoding(
   // is it a shared object?
   if(orig_identifier=="goto_symex::\\guard" ||
      !ns.lookup(orig_identifier).is_shared())
-    return false;
+    return false; // not shared
     
+  // do we have threads?
   if(threads.size()<=1)
-    return false;
+    return false; // not shared
+
   // record a shared write
-  assert(symex_target!=NULL);
   symbol_exprt original_symbol(orig_identifier, expr.type());
+
   symex_target->shared_write(
     guard.as_expr(),
     expr,
     original_symbol,
     source);
 
-  // do we have threads?
-  return threads.size()>1;
+  return true; // yes, shared
 }
 
 /*******************************************************************\
