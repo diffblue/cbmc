@@ -1,4 +1,6 @@
-FIG=cbmc-flow.fig frontend.fig
+#!/bin/bash
+
+FIG="cbmc-flow.fig frontend.fig"
 
 for a in ${FIG} ; do
   fig2dev -L pdftex $a > `echo $a | sed s/.fig/.pdf/`
@@ -8,7 +10,7 @@ for a in ${FIG} ; do
   fig2dev -L pdftex_t -p `echo $a | sed s/.fig/.pdf/` $a > `echo $a | sed s/.fig/.xfigtex/`
 done
 
-MP=bmc-loop.mp unrolling-cfg.mp unrolling.mp sha-example.mp unrolling-full.mp
+MP="bmc-loop unrolling-cfg unrolling sha-example unrolling-full"
 
 for a in ${MP} ; do
   mptopdf --rawmp $a
