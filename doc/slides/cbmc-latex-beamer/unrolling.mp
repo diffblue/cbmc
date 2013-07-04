@@ -10,8 +10,8 @@ vardef connectred(suffix s, t)=
   drawarrow s..t cutbefore fullcircle scaled 3pt 
     shifted s cutafter fullcircle scaled 3pt shifted t
     withcolor red;
-  drawdot s withpen pencircle scaled 3pt withcolor darkred;
-  drawdot t withpen pencircle scaled 3pt withcolor darkred;
+  drawdot s withpen pencircle scaled 3pt withcolor red;
+  drawdot t withpen pencircle scaled 3pt withcolor red;
 enddef;
 
 ystep = 0.9cm;
@@ -169,3 +169,5 @@ beginfig (4)
   endfor;
 
 endfig;
+
+end.
