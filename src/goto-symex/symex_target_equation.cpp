@@ -827,11 +827,14 @@ void symex_target_equationt::SSA_stept::output(
   default: assert(false);
   }
 
-  if(is_assert() || is_assume() || is_assignment())
+  if(is_assert() || is_assume() || is_assignment() || is_constraint())
     out << from_expr(ns, "", cond_expr) << std::endl;
   
-  if(is_assert())
+  if(is_assert() || is_constraint())
     out << comment << std::endl;
+
+  if(is_shared_read() || is_shared_write())
+    out << from_expr(ns, "", ssa_lhs) << std::endl;
 
   out << "Guard: " << from_expr(ns, "", guard) << std::endl;
 }
