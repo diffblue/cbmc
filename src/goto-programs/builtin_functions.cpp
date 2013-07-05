@@ -1162,6 +1162,28 @@ void goto_convertt::do_function_call_symbol(
     t->location.set_comment(description);
     // we ignore any LHS
   }
+  else if(identifier=="c::__assert_func")
+  {
+    // __assert_func is newlib (used by, e.g., cygwin)
+    // These take four arguments:
+    // "file.c", line, __func__, "expression"
+    if(arguments.size()!=4)
+    {
+      err_location(function);
+      throw "`"+id2string(identifier)+"' expected to have four arguments";
+    }
+
+    const irep_idt description=
+      "assertion "+id2string(get_string_constant(arguments[3]));
+      goto_programt::targett t=dest.add_instruction(ASSERT);
+
+    t->guard=false_exprt();
+    t->location=function.location();
+    t->location.set("user-provided", true);
+    t->location.set_property(ID_assertion);
+    t->location.set_comment(description);
+    // we ignore any LHS
+  }
   else if(identifier=="c::_wassert")
   {
     // This is Windows. The arguments are
