@@ -86,7 +86,7 @@ Function: string_constantt:to_array_expr
 array_exprt string_constantt::to_array_expr() const
 {
   const std::string &str=get_string(ID_value);
-  unsigned string_size=str.size()+1; // zero
+  unsigned string_size=str.size()+1; // we add the zero
   const typet &char_type=type().subtype();
   bool char_is_unsigned=char_type.id()==ID_unsignedbv;
 
@@ -102,6 +102,7 @@ array_exprt string_constantt::to_array_expr() const
   exprt::operandst::iterator it=dest.operands().begin();
   for(unsigned i=0; i<string_size; i++, it++)
   {
+    // Are we at the end? Do implicit zero.
     int ch=i==string_size-1?0:str[i];
 
     if(char_is_unsigned)
@@ -122,5 +123,40 @@ array_exprt string_constantt::to_array_expr() const
   }
   
   return dest;
+}
+
+/*******************************************************************\
+
+Function: string_constantt:from_array_expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: convert array constant into string
+
+\*******************************************************************/
+
+void string_constantt::from_array_expr(const array_exprt &src)
+{
+  id(ID_string_constant);
+  type()=src.type();
+  
+  std::string value;
+  
+  forall_operands(it, src)
+  {
+    mp_integer int_value=0;
+    to_integer(*it, int_value);
+    unsigned long long_value=integer2long(int_value);
+    value+=(char)long_value;
+  }
+  
+  // Drop the implicit zero at the end.
+  // Not clear what the semantics should be if it's not there.
+  if(!value.empty() && value[value.size()-1]==0)
+    value.resize(value.size()-1);
+    
+  set_value(value);
 }
 
