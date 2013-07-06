@@ -131,23 +131,30 @@ Function: string_constantt:from_array_expr
 
   Inputs:
 
- Outputs:
+ Outputs: true on error
 
  Purpose: convert array constant into string
 
 \*******************************************************************/
 
-void string_constantt::from_array_expr(const array_exprt &src)
+bool string_constantt::from_array_expr(const array_exprt &src)
 {
   id(ID_string_constant);
   type()=src.type();
+  
+  const typet &subtype=type().subtype();
+
+  // check subtype
+  if(subtype!=signed_char_type() &&
+     subtype!=unsigned_char_type())
+    return true;
   
   std::string value;
   
   forall_operands(it, src)
   {
     mp_integer int_value=0;
-    to_integer(*it, int_value);
+    if(to_integer(*it, int_value)) return true;
     unsigned long long_value=integer2long(int_value);
     value+=(char)long_value;
   }
@@ -158,5 +165,7 @@ void string_constantt::from_array_expr(const array_exprt &src)
     value.resize(value.size()-1);
     
   set_value(value);
+  
+  return false;
 }
 
