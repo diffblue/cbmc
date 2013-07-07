@@ -30,6 +30,10 @@ void goto_symext::symex_atomic_begin(statet &state)
   state.level2_at_atomic_section_entry=state.level2;
   state.read_in_atomic_section.clear();
   state.written_in_atomic_section.clear();
+  target.atomic_begin(
+      state.guard.as_expr(),
+      atomic_section_counter,
+      state.source);
 }
 
 /*******************************************************************\
@@ -101,4 +105,9 @@ void goto_symext::symex_atomic_end(statet &state)
       atomic_section_id,
       state.source);
   }
+
+  target.atomic_end(
+    state.guard.as_expr(),
+    atomic_section_id,
+    state.source);
 }

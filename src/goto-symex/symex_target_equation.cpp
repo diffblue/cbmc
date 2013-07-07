@@ -137,6 +137,56 @@ void symex_target_equationt::spawn(
 
 /*******************************************************************\
 
+Function: symex_target_equationt::atomic_begin
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: start an atomic section
+
+\*******************************************************************/
+
+void symex_target_equationt::atomic_begin(
+  const exprt &guard,
+  unsigned atomic_section_id,
+  const sourcet &source)
+{
+  SSA_steps.push_back(SSA_stept());
+  SSA_stept &SSA_step=SSA_steps.back();
+  SSA_step.guard=guard;
+  SSA_step.type=goto_trace_stept::ATOMIC_BEGIN;
+  SSA_step.atomic_section_id=atomic_section_id;
+  SSA_step.source=source;
+}
+
+/*******************************************************************\
+
+Function: symex_target_equationt::atomic_end
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: end an atomic section
+
+\*******************************************************************/
+
+void symex_target_equationt::atomic_end(
+  const exprt &guard,
+  unsigned atomic_section_id,
+  const sourcet &source)
+{
+  SSA_steps.push_back(SSA_stept());
+  SSA_stept &SSA_step=SSA_steps.back();
+  SSA_step.guard=guard;
+  SSA_step.type=goto_trace_stept::ATOMIC_END;
+  SSA_step.atomic_section_id=atomic_section_id;
+  SSA_step.source=source;
+}
+
+/*******************************************************************\
+
 Function: symex_target_equationt::assignment
 
   Inputs:

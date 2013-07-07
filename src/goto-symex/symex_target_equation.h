@@ -133,6 +133,16 @@ public:
     const exprt &guard,
     const sourcet &source);
 
+  // record atomic section
+  virtual void atomic_begin(
+    const exprt &guard,
+    unsigned atomic_section_id,
+    const sourcet &source);
+  virtual void atomic_end(
+    const exprt &guard,
+    unsigned atomic_section_id,
+    const sourcet &source);
+
   void convert(prop_convt &prop_conv);
   void convert_assignments(decision_proceduret &decision_procedure) const;
   void convert_decls(prop_convt &prop_conv) const;
@@ -188,7 +198,7 @@ public:
     // for function call/return
     irep_idt identifier;
 
-    // for SHARED_READ/SHARED_WRITE
+    // for SHARED_READ/SHARED_WRITE and ATOMIC_BEGIN/ATOMIC_END
     unsigned atomic_section_id;
     
     // for slicing
