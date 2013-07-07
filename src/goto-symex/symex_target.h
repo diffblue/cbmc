@@ -156,6 +156,16 @@ public:
   virtual void spawn(
     const exprt &guard,
     const sourcet &source)=0;
+
+  // record atomic section
+  virtual void atomic_begin(
+    const exprt &guard,
+    unsigned atomic_section_id,
+    const sourcet &source)=0;
+  virtual void atomic_end(
+    const exprt &guard,
+    unsigned atomic_section_id,
+    const sourcet &source)=0;
 };
 
 bool operator < (

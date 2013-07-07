@@ -166,16 +166,45 @@ void build_goto_trace(
       continue;
 
     if(it->is_constraint() ||
-       it->is_spawn() || it->is_atomic_begin() || it->is_atomic_end())
+       it->is_spawn())
       continue;
-
-    if(it->is_shared_read() || it->is_shared_write())
+    // for atomic sections the timing can only be determined once we see
+    // a shared read or write (if there is none, the time will be
+    // reverted to the time before entering the atomic section); we thus
+    // use a temporary negative time slot to gather all events
+    else if(it->is_atomic_begin())
     {
-      // these are just used to get the time stamp
-      exprt clock_value=prop_conv.get(
-        symbol_exprt(partial_order_concurrencyt::rw_clock_id(it)));
-    
-      to_integer(clock_value, current_time);
+      current_time*=-1;
+      continue;
+    }
+    else if(it->is_shared_read() || it->is_shared_write() ||
+            it->is_atomic_end())
+    {
+      mp_integer time_before=current_time;
+
+      if(it->is_shared_read() || it->is_shared_write())
+      {
+        // these are just used to get the time stamp
+        exprt clock_value=prop_conv.get(
+          symbol_exprt(partial_order_concurrencyt::rw_clock_id(it)));
+
+        to_integer(clock_value, current_time);
+      }
+      else if(it->is_atomic_end() && current_time<0)
+        current_time*=-1;
+
+      assert(current_time>=0);
+      // move any steps gathered in an atomic section
+      if(time_before<0)
+      {
+        time_mapt::iterator entry=
+          time_map.insert(std::make_pair(
+              current_time,
+              goto_tracet::stepst())).first;
+        entry->second.splice(entry->second.end(), time_map[time_before]);
+        time_map.erase(time_before);
+      }
+
       continue;
     }
 
@@ -237,14 +266,8 @@ void build_goto_trace(
         prop_conv.prop.l_get(SSA_step.cond_literal).is_true();
     }
 
-    if(SSA_step.is_assert())
-    {
-    }
-    else if(SSA_step.is_assume())
-    {
-      // assumptions can't be false
-      assert(goto_trace_step.cond_value);
-    }
+    // assumptions can't be false
+    assert(!SSA_step.is_assume() || goto_trace_step.cond_value);
   }
   
   // Now assemble into a single goto_trace.
