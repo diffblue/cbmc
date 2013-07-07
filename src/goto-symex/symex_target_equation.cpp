@@ -68,6 +68,7 @@ void symex_target_equationt::shared_read(
   const exprt &guard,
   const symbol_exprt &ssa_object,
   const symbol_exprt &original_object,
+  unsigned atomic_section_id,
   const sourcet &source)
 {
   SSA_steps.push_back(SSA_stept());
@@ -77,6 +78,7 @@ void symex_target_equationt::shared_read(
   SSA_step.ssa_lhs=ssa_object;
   SSA_step.original_lhs_object=original_object;
   SSA_step.type=goto_trace_stept::SHARED_READ;
+  SSA_step.atomic_section_id=atomic_section_id;
   SSA_step.source=source;
 }
 
@@ -96,6 +98,7 @@ void symex_target_equationt::shared_write(
   const exprt &guard,
   const symbol_exprt &ssa_object,
   const symbol_exprt &original_object,
+  unsigned atomic_section_id,
   const sourcet &source)
 {
   SSA_steps.push_back(SSA_stept());
@@ -105,6 +108,7 @@ void symex_target_equationt::shared_write(
   SSA_step.ssa_lhs=ssa_object;
   SSA_step.original_lhs_object=original_object;
   SSA_step.type=goto_trace_stept::SHARED_WRITE;
+  SSA_step.atomic_section_id=atomic_section_id;
   SSA_step.source=source;
 }
 

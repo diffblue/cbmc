@@ -249,13 +249,15 @@ public:
     value_sett value_set;
     guardt guard;
     propagationt propagation;
+    unsigned atomic_section_id;
     
     explicit goto_statet(const goto_symex_statet &s):
       depth(s.depth),
       level2(s.level2),
       value_set(s.value_set),
       guard(s.guard),
-      propagation(s.propagation)
+      propagation(s.propagation),
+      atomic_section_id(s.atomic_section_id)
     {
     }
   };
@@ -322,7 +324,10 @@ public:
   inline const framet &previous_frame() { return *(--(--call_stack().end())); }
 
   // threads
-  unsigned atomic_section_count;
+  unsigned atomic_section_id;
+  level2t level2_at_atomic_section_entry;
+  hash_map_cont<irep_idt, irep_idt, irep_id_hash> read_in_atomic_section;
+  hash_set_cont<irep_idt, irep_id_hash> written_in_atomic_section;
   
   class threadt
   {
@@ -331,6 +336,12 @@ public:
     guardt guard;
     call_stackt call_stack;
     std::map<irep_idt, unsigned> function_frame;
+    unsigned atomic_section_id;
+
+    threadt():
+      atomic_section_id(0)
+    {
+    }
   };
 
   typedef std::vector<threadt> threadst;

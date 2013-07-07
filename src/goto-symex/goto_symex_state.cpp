@@ -30,7 +30,7 @@ Function: goto_symex_statet::goto_symex_statet
 goto_symex_statet::goto_symex_statet():
   depth(0),
   symex_target(NULL),
-  atomic_section_count(0)
+  atomic_section_id(0)
 {
   threads.resize(1);
   new_frame();
@@ -501,25 +501,18 @@ bool goto_symex_statet::l2_thread_read_encoding(
     return false;
 
   // see whether we are within an atomic section
-  if(atomic_section_count>0)
+  if(atomic_section_id!=0)
   {
-    #if 0
-    if(is_write)
-      written_in_atomic_section.insert(orig_identifier);
-    else
+    const irep_idt l1_identifier=rename(orig_identifier, ns, L1);
+    if(level2.current_count(l1_identifier)==
+      level2_at_atomic_section_entry.current_count(l1_identifier))
     {
-      const irep_idt l1_identifier=rename(orig_identifier, ns, L1);
-      if(level2.current_count(l1_identifier)==
-        level2_at_atomic_section_entry.current_count(l1_identifier))
-      {
-        propagation.remove(l1_identifier);
-        irep_idt new_l2_name=level2.increase_counter(l1_identifier);
-        read_in_atomic_section.insert(
-            std::make_pair(orig_identifier, new_l2_name));
-      }
+      propagation.remove(l1_identifier);
+      irep_idt new_l2_name=level2.increase_counter(l1_identifier);
+      read_in_atomic_section.insert(
+          std::make_pair(orig_identifier, new_l2_name));
     }
     return false;
-    #endif
   }
 
   irep_idt new_l2_name=identifier;
@@ -532,7 +525,12 @@ bool goto_symex_statet::l2_thread_read_encoding(
   // and record that
   assert(symex_target!=NULL);
   symbol_exprt original_symbol(orig_identifier, expr.type());
-  symex_target->shared_read(guard.as_expr(), expr, original_symbol, source);
+  symex_target->shared_read(
+    guard.as_expr(),
+    expr,
+    original_symbol,
+    atomic_section_id,
+    source);
 
   return true;
 }
@@ -561,6 +559,13 @@ bool goto_symex_statet::l2_thread_write_encoding(
      !ns.lookup(orig_identifier).is_shared())
     return false; // not shared
     
+  // see whether we are within an atomic section
+  if(atomic_section_id!=0)
+  {
+    written_in_atomic_section.insert(orig_identifier);
+    return false;
+  }
+
   // record a shared write
   symbol_exprt original_symbol(orig_identifier, expr.type());
 
@@ -568,6 +573,7 @@ bool goto_symex_statet::l2_thread_write_encoding(
     guard.as_expr(),
     expr,
     original_symbol,
+    atomic_section_id,
     source);
 
   // do we have threads?
@@ -882,6 +888,7 @@ void goto_symex_statet::switch_to_thread(unsigned t)
   
   // save PC
   threads[source.thread_nr].pc=source.pc;
+  threads[source.thread_nr].atomic_section_id=atomic_section_id;
 
   // get new PC
   source.thread_nr=t;

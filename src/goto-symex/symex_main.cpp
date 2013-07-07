@@ -270,6 +270,10 @@ void goto_symext::symex_step(
         }
         else
           state.guard.add(tmp);
+
+        if(state.atomic_section_id!=0 &&
+            state.guard.is_false())
+          symex_atomic_end(state);
       }
     }
 

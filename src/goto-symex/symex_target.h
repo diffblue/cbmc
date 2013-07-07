@@ -57,6 +57,7 @@ public:
     const exprt &guard,
     const symbol_exprt &ssa_rhs,
     const symbol_exprt &original_rhs,
+    unsigned atomic_section_id,
     const sourcet &source)=0;
 
   // write event
@@ -64,6 +65,7 @@ public:
     const exprt &guard,
     const symbol_exprt &ssa_rhs,
     const symbol_exprt &original_rhs,
+    unsigned atomic_section_id,
     const sourcet &source)=0;
 
   // write event - lhs must be symbol

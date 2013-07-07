@@ -50,6 +50,7 @@ public:
     new_symbol_table(_new_symbol_table),
     ns(_ns),
     target(_target),
+    atomic_section_counter(0),
     guard_identifier("goto_symex::\\guard")
   {
     options.set_option("simplify", true);
@@ -97,6 +98,8 @@ public:
 protected:
   const namespacet &ns;
   symex_targett &target;  
+  unsigned atomic_section_counter;
+  guardt atomic_section_entry_guard;
 
   friend class symex_dereference_statet;
   
