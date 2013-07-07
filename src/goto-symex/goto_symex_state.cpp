@@ -561,10 +561,6 @@ bool goto_symex_statet::l2_thread_write_encoding(
      !ns.lookup(orig_identifier).is_shared())
     return false; // not shared
     
-  // do we have threads?
-  if(threads.size()<=1)
-    return false; // not shared
-
   // record a shared write
   symbol_exprt original_symbol(orig_identifier, expr.type());
 
@@ -574,7 +570,8 @@ bool goto_symex_statet::l2_thread_write_encoding(
     original_symbol,
     source);
 
-  return true; // yes, shared
+  // do we have threads?
+  return threads.size()>1;
 }
 
 /*******************************************************************\
