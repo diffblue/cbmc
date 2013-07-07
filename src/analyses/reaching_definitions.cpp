@@ -494,7 +494,7 @@ bool rd_range_domaint::merge(
       ++it;
     if(it==values.end() || ito->first<it->first)
     {
-      values.insert(it, *ito);
+      values.insert(*ito);
       more=true;
     }
     else if(it!=values.end())
