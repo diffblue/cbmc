@@ -132,7 +132,7 @@ inline int atoi(const char *nptr)
   char sign=0;
 
   // 32 chars is an arbitrarily chosen limit
-  for(char i=0; i<31; ++i)
+  for(int i=0; i<31; ++i)
   {
     char ch=nptr[i];
     if(ch==0)
