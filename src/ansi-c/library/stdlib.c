@@ -113,16 +113,48 @@ inline void free(void *ptr)
 /* FUNCTION: atoi */
 
 #undef atoi
+#undef isdigit
+#undef isspace
+
+int isspace(int);
+int isdigit(int);
 
 inline int atoi(const char *nptr)
 {
   __CPROVER_HIDE:;
-  int res;
-  (void)*nptr;
   #ifdef __CPROVER_STRING_ABSTRACTION
   __CPROVER_assert(__CPROVER_is_zero_string(nptr),
     "zero-termination of argument of atoi");
   #endif
+
+  int res=0;
+  _Bool in_number=0;
+  char sign=0;
+
+  // 32 chars is an arbitrarily chosen limit
+  for(char i=0; i<31; ++i)
+  {
+    char ch=nptr[i];
+    if(ch==0)
+      break;
+    else if((in_number || sign) && !isdigit(ch))
+      break;
+    else if(isspace(ch))
+      continue;
+    else if(ch=='-' || ch=='+')
+      sign=ch;
+    else if(isdigit(ch))
+    {
+      in_number=1;
+      res=res*10+ch-'0';
+    }
+    else
+      break;
+  }
+
+  if(sign=='-')
+    res*=-1;
+
   return res;
 }
 
