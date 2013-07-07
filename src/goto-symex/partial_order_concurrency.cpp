@@ -233,12 +233,10 @@ Function: partial_order_concurrencyt::before
 exprt partial_order_concurrencyt::before(
   event_it e1, event_it e2)
 {
-  #if 0
   if(e1->atomic_section_id!=0 &&
      e1->atomic_section_id==e2->atomic_section_id)
     return equal_exprt(clock(e1), clock(e2));
   else
-  #endif
     return binary_relation_exprt(clock(e1), ID_lt, clock(e2));
 }
 

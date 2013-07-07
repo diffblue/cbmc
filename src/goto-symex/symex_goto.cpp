@@ -226,6 +226,13 @@ void goto_symext::merge_gotos(statet &state)
       list_it++)
   {
     statet::goto_statet &goto_state=*list_it;
+
+    // fix up atomic section
+    if(state.guard.is_false())
+      state.atomic_section_id=goto_state.atomic_section_id;
+    else
+      assert(goto_state.guard.is_false() ||
+          state.atomic_section_id==goto_state.atomic_section_id);
     
     // do SSA phi functions
     phi_function(goto_state, state);
@@ -309,13 +316,16 @@ void goto_symext::phi_function(
     irep_idt original_identifier=
       dest_state.get_original_name(l1_identifier);
 
-    // get type (may need renaming)      
+    // shared variables are renamed on every access anyway, we don't need to
+    // merge anything
     const symbolt &symbol=ns.lookup(original_identifier);
     
     // shared?
-    if(dest_state.threads.size()>=2 && symbol.is_shared())
+    if(dest_state.atomic_section_id==0 &&
+       dest_state.threads.size()>=2 && symbol.is_shared())
       continue; // no phi nodes for shared stuff
     
+    // get type (may need renaming)      
     typet type=symbol.type;
     dest_state.rename(type, ns);
     

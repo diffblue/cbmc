@@ -33,6 +33,7 @@ public:
     const exprt &guard,
     const symbol_exprt &ssa_object,
     const symbol_exprt &original_object,
+    unsigned atomic_section_id,
     const sourcet &source);
 
   // write event
@@ -40,6 +41,7 @@ public:
     const exprt &guard,
     const symbol_exprt &ssa_object,
     const symbol_exprt &original_object,
+    unsigned atomic_section_id,
     const sourcet &source);
 
   // assignment to a variable - lhs must be symbol
@@ -185,6 +187,9 @@ public:
     
     // for function call/return
     irep_idt identifier;
+
+    // for SHARED_READ/SHARED_WRITE
+    unsigned atomic_section_id;
     
     // for slicing
     bool ignore;
@@ -198,6 +203,7 @@ public:
       ssa_rhs(static_cast<const exprt &>(get_nil_irep())),
       cond_expr(static_cast<const exprt &>(get_nil_irep())),
       formatted(false),
+      atomic_section_id(0),
       ignore(false)
     {
     }
