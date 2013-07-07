@@ -351,6 +351,7 @@ public:
   bool l2_thread_write_encoding(const symbol_exprt &expr, const namespacet &ns);
 
   void switch_to_thread(unsigned t);
+  bool record_events;
 };
 
 #endif
