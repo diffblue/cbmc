@@ -25,7 +25,7 @@ class optionst;
   "(no-simplify)(unwind):(unwindset):(slice-formula)" \
   "(debug-level):(no-propagation)(no-simplify-if)" \
   "(bounds-check)(outfile):(pointer-check)" \
-  "(document-subgoals)(all-claims)D:I:(depth):" \
+  "(document-subgoals)D:I:(depth):" \
   "(div-by-zero-check)(no-unwinding-assertions)" \
   "(signed-overflow-check)(unsigned-overflow-check)" \
   "(partial-loops)" \
@@ -37,7 +37,9 @@ class optionst;
   "(16)(32)(64)(LP64)(ILP64)(LLP64)(ILP32)(LP32)" \
   "(little-endian)(big-endian)" \
   "(show-goto-functions)(show-value-sets)(show-loops)" \
-  "(show-symbol-table)(show-parse-tree)(show-vcc)(show-claims)(claim):" \
+  "(show-symbol-table)(show-parse-tree)(show-vcc)" \
+  "(show-claims)(claim):(show-properties)(property):" \
+  "(all-claims)(all-properties)" \
   "(error-label):(verbosity):(no-library)" \
   "(version)" \
   "(cover-assertions)" \

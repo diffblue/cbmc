@@ -148,7 +148,8 @@ void cbmc_parseoptionst::get_command_line_options(optionst &options)
   else
     options.set_option("simplify", true);
 
-  if(cmdline.isset("all-claims"))
+  if(cmdline.isset("all-claims") ||
+     cmdline.isset("all-properties"))
     options.set_option("all-claims", true);
   else
     options.set_option("all-claims", false);
@@ -353,7 +354,8 @@ int cbmc_parseoptionst::doit()
     
   label_claims(goto_functions);
 
-  if(cmdline.isset("show-claims"))
+  if(cmdline.isset("show-claims") ||
+     cmdline.isset("show-properties"))
   {
     const namespacet ns(symbol_table);
     show_claims(ns, get_ui(), goto_functions);
@@ -384,7 +386,10 @@ bool cbmc_parseoptionst::set_claims(goto_functionst &goto_functions)
   try
   {
     if(cmdline.isset("claim"))
-      ::set_claims(goto_functions, cmdline.get_values("claim"));  
+      ::set_claims(goto_functions, cmdline.get_values("claim"));
+
+    if(cmdline.isset("property"))
+      ::set_claims(goto_functions, cmdline.get_values("property"));
   }
 
   catch(const char *e)
@@ -829,8 +834,8 @@ void cbmc_parseoptionst::help()
     " --signed-overflow-check      enable arithmetic over- and underflow checks\n"
     " --unsigned-overflow-check    enable arithmetic over- and underflow checks\n"
     " --nan-check                  check floating-point for NaN\n"
-    " --all-claims                 report status of all claims\n"
-    " --show-claims                only show claims\n"
+    " --all-properties             report status of all properties\n"
+    " --show-properties            show the properties\n"
     " --show-loops                 show the loops in the program\n"
     " --no-assertions              ignore user assertions\n"
     " --no-assumptions             ignore user assumptions\n"
