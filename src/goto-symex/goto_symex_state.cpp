@@ -30,7 +30,8 @@ Function: goto_symex_statet::goto_symex_statet
 goto_symex_statet::goto_symex_statet():
   depth(0),
   symex_target(NULL),
-  atomic_section_id(0)
+  atomic_section_id(0),
+  record_events(true)
 {
   threads.resize(1);
   new_frame();
@@ -488,6 +489,9 @@ bool goto_symex_statet::l2_thread_read_encoding(
   symbol_exprt &expr,
   const namespacet &ns)
 {
+  if(!record_events)
+    return false;
+
   // do we have threads?
   if(threads.size()<=1)
     return false;

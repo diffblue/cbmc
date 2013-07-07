@@ -70,7 +70,10 @@ void goto_symext::symex_atomic_end(statet &state)
     symbol_exprt r(r_it->second, type);
 
     // properly rename type, if necessary
+    const bool record_events=state.record_events;
+    state.record_events=false;
     state.rename(r, ns, goto_symex_statet::L2);
+    state.record_events=record_events;
 
     symbol_exprt original_symbol(orig_identifier, r.type());
     target.shared_read(
@@ -92,10 +95,13 @@ void goto_symext::symex_atomic_end(statet &state)
     const typet &type=ns.lookup(orig_identifier).type;
     symbol_exprt w(orig_identifier, type);
 
+    const bool record_events=state.record_events;
+    state.record_events=false;
     state.rename(w, ns, goto_symex_statet::L1);
     state.rename(w.type(), ns, goto_symex_statet::L2);
     const irep_idt new_name=state.level2(w.get_identifier());
     w.set_identifier(new_name);
+    state.record_events=record_events;
 
     symbol_exprt original_symbol(orig_identifier, w.type());
     target.shared_write(
