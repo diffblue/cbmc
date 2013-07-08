@@ -54,7 +54,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(accelerate)" \
   "(k-induction):(step-case)(base-case)" \
   "(show-call-sequences)" \
-  "(interpreter)(show-reaching-definitions)"
+  "(interpreter)(show-reaching-definitions)(count-eloc)"
 
 class goto_instrument_parseoptionst:
   public parseoptions_baset,
