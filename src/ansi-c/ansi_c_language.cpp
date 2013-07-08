@@ -126,7 +126,7 @@ bool ansi_c_languaget::parse(
   std::istringstream codestr(code);
 
   ansi_c_parser.clear();
-  ansi_c_parser.location.set_file(ID_built_in);
+  ansi_c_parser.set_file(ID_built_in);
   ansi_c_parser.in=&codestr;
   ansi_c_parser.set_message_handler(message_handler);
   ansi_c_parser.grammar=ansi_c_parsert::LANGUAGE;
@@ -165,7 +165,7 @@ bool ansi_c_languaget::parse(
   if(!result)
   {
     ansi_c_parser.set_line_no(0);
-    ansi_c_parser.location.set_file(path);
+    ansi_c_parser.set_file(path);
     ansi_c_parser.in=&i_preprocessed;
     ansi_c_scanner_init();
     result=ansi_c_parser.parse();
@@ -338,7 +338,7 @@ bool ansi_c_languaget::to_expr(
   // parsing
 
   ansi_c_parser.clear();
-  ansi_c_parser.location.set_file(irep_idt());
+  ansi_c_parser.set_file(irep_idt());
   ansi_c_parser.in=&i_preprocessed;
   ansi_c_parser.set_message_handler(message_handler);
   ansi_c_parser.grammar=ansi_c_parsert::EXPRESSION;
