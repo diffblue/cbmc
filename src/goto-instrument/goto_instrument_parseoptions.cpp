@@ -269,21 +269,24 @@ int goto_instrument_parseoptionst::doit()
       return 0;
     }
 
-    if(cmdline.isset("show-claims"))
+    if(cmdline.isset("show-claims") ||
+       cmdline.isset("show-properties"))
     {
       const namespacet ns(symbol_table);
       show_claims(ns, get_ui(), goto_functions);
       return 0;
     }
 
-    if(cmdline.isset("document-claims-html"))
+    if(cmdline.isset("document-claims-html") ||
+       cmdline.isset("document-properties-html"))
     {
       const namespacet ns(symbol_table);
       document_claims_html(ns, goto_functions, std::cout);
       return 0;
     }
 
-    if(cmdline.isset("document-claims-latex"))
+    if(cmdline.isset("document-claims-latex") ||
+       cmdline.isset("document-properties-latex"))
     {
       const namespacet ns(symbol_table);
       document_claims_latex(ns, goto_functions, std::cout);
@@ -854,15 +857,15 @@ void goto_instrument_parseoptionst::help()
     " goto-instrument in out              perform instrumentation\n"
     "\n"
     "Main options:\n"
-    " --document-claims-html       generate HTML claim documentation\n"
-    " --document-claims-latex      generate Latex claim documentation\n"
+    " --document-properties-html   generate HTML property documentation\n"
+    " --document-properties-latex  generate Latex property documentation\n"
     " --dump-c                     generate C source\n"
     " --dot                        generate CFG graph in DOT format\n"
     " --interpreter                do concrete execution\n"
     "\n"
     "Diagnosis:\n"
     " --show-loops                 show the loops in the program\n"
-    " --show-claims                show claims\n"
+    " --show-properties            show the properties\n"
     " --show-symbol-table          show symbol table\n"
     " --show-goto-functions        show goto program\n"
     " --show-struct-alignment      show struct members that might be concurrently accessed\n"
