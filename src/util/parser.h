@@ -12,9 +12,8 @@ class parsert:public messaget
 {
 public:
   std::istream *in;
-  irep_idt filename, function;
+  locationt location;
   
-  unsigned line_no;
   std::string last_line;
   
   std::vector<exprt> stack;
@@ -23,7 +22,7 @@ public:
   {
     line_no=0;
     stack.clear();
-    filename.clear();
+    location.clear();
     char_buffer.clear();
   }
   
@@ -72,17 +71,26 @@ public:
     const std::string &message,
     const std::string &before);
     
+  void inc_line_no()
+  {
+    ++line_no;
+    location.set_line(line_no);
+  }
+  
+  void set_line_no(unsigned _line_no)
+  {
+    line_no=_line_no;
+    location.set_line(line_no);
+  }
+  
+  unsigned get_line_no() const
+  {
+    return line_no;
+  }
+
   void set_location(exprt &e)
   {
-    locationt &l=e.location();
-
-    l.set_line(line_no);
-
-    if(filename!=irep_idt())
-      l.set_file(filename);
-      
-    if(function!=irep_idt())
-      l.set_function(function);
+    e.location()=location;
   }
 
 private:
@@ -98,6 +106,7 @@ private:
     return in->read(&ch, 1)!=NULL;
   }
    
+  unsigned line_no;
   std::list<char> char_buffer;
 };
  
@@ -121,7 +130,7 @@ exprt &_newstack(parsert &parser, unsigned &x);
           if(ch!='\r') \
           { \
             buf[result++]=ch; \
-            if(ch=='\n') { PARSER.line_no++; break; } \
+            if(ch=='\n') { PARSER.inc_line_no(); break; } \
           } \
         } \
     } while(0)

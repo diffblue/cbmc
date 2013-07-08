@@ -263,7 +263,7 @@ void javap_parsert::rcompiled_from()
   std::string s="Compiled from \"";
   if(std::string(line, 0, s.size())!=s)
     throw parsing_errort("Expected 'Compiled from'");
-  filename=std::string(line, s.size(), line.size()-s.size()-1);
+  location.set_file(std::string(line, s.size(), line.size()-s.size()-1));
 }
 
 /*******************************************************************\
@@ -465,7 +465,7 @@ void javap_parsert::rcode(membert &dest_member)
   if(address_to_line.find(instruction.address)!=address_to_line.end())
   {
     instruction.location.set_line(address_to_line[instruction.address]);
-    instruction.location.set_file(filename);
+    instruction.location.set_file(location.get_file());
   }
 }
 

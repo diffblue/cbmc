@@ -74,7 +74,7 @@ bool xml_languaget::parse(
   // parsing
 
   xml_parser.clear();
-  xml_parser.filename=path;
+  xml_parser.location.set_file(path);
   xml_parser.in=&instream;
   xml_parser.set_message_handler(message_handler);
 

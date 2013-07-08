@@ -55,9 +55,6 @@ void parsert::parse_error(
   const std::string &message,
   const std::string &before)
 {
-  locationt location;
-  location.set_file(filename);
-  location.set_line(i2string(line_no));
   std::string tmp=message;
   if(before!="") tmp+=" before `"+before+"'";
   print(1, tmp, -1, location);

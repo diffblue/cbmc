@@ -522,7 +522,7 @@ int yywrap() { return 1; }
 
 void set_line_no()
 {
-  preprocessor_line(yytext, PARSER.line_no, PARSER.filename);
+  preprocessor_line(yytext, PARSER);
 }
 
 int yycpperror(const std::string &error)
