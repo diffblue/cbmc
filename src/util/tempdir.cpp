@@ -15,11 +15,11 @@ Author: CM Wintersteiger
 #include <cstdlib>
 #include <cstring>
 
-#ifdef __MACH__
-#include <unistd.h>
-#endif
-
-#if defined(__linux__) || defined(__FreeBSD_kernel__) || defined(__CYGWIN__)
+#if defined(__linux__) || \
+    defined(__FreeBSD_kernel__) || \
+    defined(__GNU__) || \
+    defined(__CYGWIN__) || \
+    defined(__MACH__)
 #include <unistd.h>
 #endif
 

@@ -10,7 +10,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cstdlib>
 #include <cassert>
 
-#ifndef _WIN32
+#if defined(__linux__) || \
+    defined(__FreeBSD_kernel__) || \
+    defined(__GNU__) || \
+    defined(__CYGWIN__) || \
+    defined(__MACH__)
 #include <unistd.h>
 #endif
 
