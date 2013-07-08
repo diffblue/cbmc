@@ -218,15 +218,17 @@ void goto_symext::symex_assign_symbol(
   
   state.rename(ssa_rhs, ns);
   do_simplify(ssa_rhs);
-
-  exprt ssa_full_lhs=full_lhs;
-  state.rename(ssa_full_lhs, ns);
   
   symbol_exprt ssa_lhs=lhs;
   state.rename(ssa_lhs, ns, goto_symex_statet::L1);
   state.assignment(ssa_lhs, ssa_rhs, ns, constant_propagation);
   
+  exprt ssa_full_lhs=full_lhs;
   ssa_full_lhs=add_to_lhs(ssa_full_lhs, ssa_lhs);
+  const bool record_events=state.record_events;
+  state.record_events=false;
+  state.rename(ssa_full_lhs, ns);
+  state.record_events=record_events;
 
   guardt tmp_guard(state.guard);
   tmp_guard.append(guard);
