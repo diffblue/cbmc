@@ -166,14 +166,16 @@ void uninitializedt::add_assertions(goto_programt &goto_program)
       //const code_function_callt &code_function_call=
       //  to_code_function_call(instruction.code);
 
+      assert(uninitialized_analysis.has_location(i_it));
+      const std::set<irep_idt> &uninitialized=
+        uninitialized_analysis[i_it].uninitialized;
+
       // check tracking variables
       forall_expr_list(it, read)
       {
         if(it->id()==ID_symbol)
         {
           const irep_idt &identifier=to_symbol_expr(*it).get_identifier();
-          const std::set<irep_idt> &uninitialized=
-            uninitialized_analysis[i_it].uninitialized;
 
           if(uninitialized.find(identifier)!=uninitialized.end())
           {
