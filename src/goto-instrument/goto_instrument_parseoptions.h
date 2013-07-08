@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define GOTO_INSTRUMENT_OPTIONS \
   "(all)" \
   "(document-claims-latex)(document-claims-html)" \
+  "(document-properties-latex)(document-properties-html)" \
   "(dump-c)(dump-cpp)(dot)(xml)" \
   "(bounds-check)(no-bounds-check)" \
   "(pointer-check)(no-pointer-check)" \
@@ -44,8 +45,9 @@ Author: Daniel Kroening, kroening@kroening.com
   "(show-uninitialized)(show-locations)" \
   "(full-slice)(reachability-slice)" \
   "(inline)" \
-  "(show-symbol-table)(show-claims)(show-points-to)" \
-  "(show-rw-set)(cav11)" \
+  "(show-claims)(show-properties)" \
+  "(show-symbol-table)(show-points-to)(show-rw-set)" \
+  "(cav11)" \
   "(show-natural-loops)(accelerate)(havoc-loops)" \
   "(error-label):(string-abstraction)" \
   "(verbosity):(version)(xml-ui)(show-loops)" \
