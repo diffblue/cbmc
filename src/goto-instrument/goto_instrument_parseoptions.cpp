@@ -66,6 +66,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "wmm/weak_memory.h"
 #include "call_sequences.h"
 #include "accelerate/accelerate.h"
+#include "count_eloc.h"
 
 /*******************************************************************\
 
@@ -253,6 +254,12 @@ int goto_instrument_parseoptionst::doit()
         }
       }
 
+      return 0;
+    }
+
+    if(cmdline.isset("count-eloc"))
+    {
+      count_eloc(goto_functions);
       return 0;
     }
 
@@ -862,6 +869,7 @@ void goto_instrument_parseoptionst::help()
     " --dump-c                     generate C source\n"
     " --dot                        generate CFG graph in DOT format\n"
     " --interpreter                do concrete execution\n"
+    " --count-eloc                 count effective lines of code\n"
     "\n"
     "Diagnosis:\n"
     " --show-loops                 show the loops in the program\n"

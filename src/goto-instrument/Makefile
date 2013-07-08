@@ -12,7 +12,7 @@ SRC = goto_instrument_main.cpp goto_instrument_parseoptions.cpp \
       call_sequences.cpp unwind.cpp \
       accelerate/accelerate.cpp accelerate/polynomial.cpp \
       accelerate/scratch_program.cpp accelerate/polynomial_accelerator.cpp \
-      accelerate/util.cpp
+      accelerate/util.cpp count_eloc.cpp
 
 OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../linking/linking$(LIBEXT) \
