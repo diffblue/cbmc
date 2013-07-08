@@ -790,7 +790,7 @@ goto_programt::const_targett goto_program2codet::convert_return(
     goto_programt::const_targett target,
     codet &dest)
 {
-  const code_returnt &ret=to_code_return(target->code);
+  code_returnt ret=to_code_return(target->code);
 
   // catch the specific case where the original code was missing a return
   // statement to avoid NONDET() in output when the instruction is dead anyway
@@ -811,8 +811,12 @@ goto_programt::const_targett goto_program2codet::convert_return(
       return target;
     }
   }
+  else if(ret.has_return_value() &&
+          (ret.return_value().id()==ID_vector ||
+           ret.return_value().id()==ID_array))
+    ret.return_value().make_typecast(ret.return_value().type());
 
-  dest.copy_to_operands(target->code);
+  dest.copy_to_operands(ret);
 
   return target;
 }
@@ -1941,11 +1945,6 @@ void goto_program2codet::cleanup_expr(exprt &expr)
 
       expr.make_typecast(t);
     }
-  }
-  else if(expr.id()==ID_vector ||
-          expr.id()==ID_array)
-  {
-    expr.make_typecast(expr.type());
   }
   else if(expr.id()==ID_sideeffect)
   {
