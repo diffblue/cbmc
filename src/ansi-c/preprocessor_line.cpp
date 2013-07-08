@@ -81,5 +81,5 @@ void preprocessor_line(
 
   std::string file_name_tmp2;
   unescape_string(file_name_tmp, file_name_tmp2);
-  parser.location.set_file(file_name_tmp2);
+  parser.set_file(file_name_tmp2);
 }
