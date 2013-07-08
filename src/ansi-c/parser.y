@@ -2445,7 +2445,7 @@ function_definition:
           
           // kill scope
           PARSER.pop_scope();
-          PARSER.function=irep_idt();
+          PARSER.location.set_function(irep_idt());
         }
         ;
 

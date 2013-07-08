@@ -423,7 +423,7 @@ static void create_function_scope(exprt &expr)
 {
   ansi_c_declarationt &declaration=to_ansi_c_declaration(expr);
 
-  PARSER.function=declaration.get_base_name();
+  PARSER.location.set_function(declaration.get_base_name());
 
   std::string prefix=PARSER.current_scope().prefix+
                      id2string(declaration.get_base_name())+"::";

@@ -67,8 +67,8 @@ public:
    
   void set_location()
   {
-    token_buffer.current_token().line_no=line_no-1;
-    token_buffer.current_token().filename=filename;
+    token_buffer.current_token().line_no=get_line_no()-1;
+    token_buffer.current_token().filename=location.get_file();
   }
   
   // scanner

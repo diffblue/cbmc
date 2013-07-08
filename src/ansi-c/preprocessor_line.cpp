@@ -6,8 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <stdlib.h>
-#include <ctype.h>
+#include <cstdlib>
+#include <cctype>
+
+#include <util/parser.h>
 
 #include "literals/unescape_string.h"
 #include "preprocessor_line.h"
@@ -26,8 +28,7 @@ Function: preprocessor_line
 
 void preprocessor_line(
   const char *text,
-  unsigned &line_no,
-  irep_idt &file_name)
+  parsert &parser)
 {
   const char *ptr=text;
   std::string line_number;
@@ -61,7 +62,7 @@ void preprocessor_line(
   // skip until "
   while(*ptr!='\n' && *ptr!='"') ptr++;
 
-  line_no=atoi(line_number.c_str());
+  parser.set_line_no(atoi(line_number.c_str()));
 
   // skip "
   if(*ptr!='"')
@@ -80,5 +81,5 @@ void preprocessor_line(
 
   std::string file_name_tmp2;
   unescape_string(file_name_tmp, file_name_tmp2);
-  file_name=file_name_tmp2;
+  parser.location.set_file(file_name_tmp2);
 }

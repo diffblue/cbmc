@@ -146,7 +146,7 @@ bool cpp_languaget::parse(
   // parsing
 
   cpp_parser.clear();
-  cpp_parser.filename=path;
+  cpp_parser.location.set_file(path);
   cpp_parser.in=&i_preprocessed;
   cpp_parser.set_message_handler(message_handler);
   cpp_parser.grammar=cpp_parsert::LANGUAGE;
@@ -412,7 +412,7 @@ bool cpp_languaget::to_expr(
   // parsing
 
   cpp_parser.clear();
-  cpp_parser.filename="";
+  cpp_parser.location.set_file(irep_idt());
   cpp_parser.in=&i_preprocessed;
   cpp_parser.set_message_handler(message_handler);
   cpp_parser.grammar=cpp_parsert::EXPRESSION;

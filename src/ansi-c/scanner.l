@@ -251,8 +251,8 @@ void ansi_c_scanner_init()
 <STRING_LITERAL>{newline} { /* ignore */ }
 <STRING_LITERAL>{whitespace} { /* ignore */ }
 <STRING_LITERAL>{cpplineno} {
-                  preprocessor_line(yytext, PARSER.line_no, PARSER.filename);
-                  PARSER.line_no--;
+                  preprocessor_line(yytext, PARSER);
+                  PARSER.set_line_no(PARSER.get_line_no()-1);
 		 }
 <STRING_LITERAL>{cppdirective} { /* ignore */ }
 <STRING_LITERAL>"/*" { BEGIN(STRING_LITERAL_COMMENT); /* C comment, ignore */ }
@@ -270,8 +270,8 @@ void ansi_c_scanner_init()
 <GRAMMAR>{whitespace}	{ } /* skipped */
 
 <GRAMMAR>{cpplineno}	{
-                  preprocessor_line(yytext, PARSER.line_no, PARSER.filename);
-                  PARSER.line_no--;
+                  preprocessor_line(yytext, PARSER);
+                  PARSER.set_line_no(PARSER.get_line_no()-1);
 		 }
 
 <GRAMMAR>{cppstart}"pragma"{ws}"pack"{ws}"("{integer_s}")"{ws}{newline} {
