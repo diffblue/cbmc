@@ -8,6 +8,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 //#define DEBUG
 
+#ifdef DEBUG
+#include <iostream>
+#endif
+
 #include "equality.h"
 #include "bv_utils.h"
 
