@@ -265,9 +265,6 @@ void build_goto_trace(
       goto_trace_step.cond_value=
         prop_conv.prop.l_get(SSA_step.cond_literal).is_true();
     }
-
-    // assumptions can't be false
-    assert(!SSA_step.is_assume() || goto_trace_step.cond_value);
   }
   
   // Now assemble into a single goto_trace.
