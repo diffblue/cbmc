@@ -8,31 +8,11 @@ Date: January 2012
 
 \*******************************************************************/
 
-#ifdef __linux__
-#include <unistd.h>
-#include <cerrno>
-#include <dirent.h>
-#include <cstdlib>
-#include <cstdio>
-#endif
-
-#ifdef __FreeBSD_kernel__
-#include <unistd.h>
-#include <cerrno>
-#include <dirent.h>
-#include <cstdlib>
-#include <cstdio>
-#endif
-
-#ifdef __MACH__
-#include <unistd.h>
-#include <cerrno>
-#include <dirent.h>
-#include <cstdlib>
-#include <cstdio>
-#endif
-
-#ifdef __CYGWIN__
+#if defined(__linux__) || \
+    defined(__FreeBSD_kernel__) || \
+    defined(__GNU__) || \
+    defined(__CYGWIN__) || \
+    defined(__MACH__)
 #include <unistd.h>
 #include <cerrno>
 #include <dirent.h>
