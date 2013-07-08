@@ -2717,19 +2717,26 @@ bool simplify_exprt::simplify_inequality_address_of(exprt &expr)
 {
   assert(expr.type().id()==ID_bool);
   assert(expr.operands().size()==2);
-  assert(expr.op0().id()==ID_address_of);
-  assert(expr.op1().id()==ID_address_of);
   assert(expr.id()==ID_equal || expr.id()==ID_notequal);
 
-  if(expr.op0().operands().size()!=1) return true;
-  if(expr.op1().operands().size()!=1) return true;
+  exprt tmp0=expr.op0();
+  if(tmp0.id()==ID_typecast)
+    tmp0=expr.op0().op0();
+  exprt tmp1=expr.op1();
+  if(tmp1.id()==ID_typecast)
+    tmp1=expr.op1().op0();
+  assert(tmp0.id()==ID_address_of);
+  assert(tmp1.id()==ID_address_of);
+
+  if(tmp0.operands().size()!=1) return true;
+  if(tmp1.operands().size()!=1) return true;
   
-  if(expr.op0().op0().id()==ID_symbol &&
-     expr.op1().op0().id()==ID_symbol)
+  if(tmp0.op0().id()==ID_symbol &&
+     tmp1.op0().id()==ID_symbol)
   {
     bool equal=
-       expr.op0().op0().get(ID_identifier)==
-       expr.op1().op0().get(ID_identifier);
+       tmp0.op0().get(ID_identifier)==
+       tmp1.op0().get(ID_identifier);
        
     expr.make_bool(expr.id()==ID_equal?equal:!equal);
     
@@ -2758,24 +2765,27 @@ bool simplify_exprt::simplify_inequality(exprt &expr)
   if(expr.type().id()!=ID_bool) return true;
 
   if(operands.size()!=2) return true;
+
+  exprt tmp0=expr.op0();
+  exprt tmp1=expr.op1();
   
   // types must match
-  if(!base_type_eq(expr.op0().type(), expr.op1().type(), ns))
+  if(!base_type_eq(tmp0.type(), tmp1.type(), ns))
     return true;
     
   // see if we are comparing pointers that are address_of
-  if(expr.op0().id()==ID_address_of &&
-     expr.op1().id()==ID_address_of &&
-     (expr.id()==ID_equal || expr.id()==ID_notequal))
+  if((tmp0.id()==ID_address_of ||
+        (tmp0.id()==ID_typecast && tmp0.op0().id()==ID_address_of)) &&
+      (tmp1.id()==ID_address_of ||
+       (tmp1.id()==ID_typecast && tmp1.op0().id()==ID_address_of)) &&
+      (expr.id()==ID_equal || expr.id()==ID_notequal))
     return simplify_inequality_address_of(expr);
 
   // first see if we compare to a constant
   
-  bool op0_is_const=expr.op0().is_constant();
-  bool op1_is_const=expr.op1().is_constant();
+  bool op0_is_const=tmp0.is_constant();
+  bool op1_is_const=tmp1.is_constant();
   
-  exprt tmp0=expr.op0();
-  exprt tmp1=expr.op1();
   ns.follow_symbol(tmp0.type());
   ns.follow_symbol(tmp1.type());
 
