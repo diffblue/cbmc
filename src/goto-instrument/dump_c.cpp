@@ -34,6 +34,27 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "dump_c.h"
 
+/*******************************************************************\
+
+Function: skip_typecast
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
+static const exprt& skip_typecast(const exprt &expr)
+{
+  if(expr.id()!=ID_typecast)
+    return expr;
+
+  return skip_typecast(to_typecast_expr(expr).op());
+}
+
+
 class goto_program2codet
 {
   typedef std::list<irep_idt> type_namest;
@@ -69,7 +90,8 @@ protected:
   const namespacet ns;
   code_blockt &toplevel_block;
   type_namest &type_names;
-  std::set<std::string> system_headers;
+  std::set<std::string> &system_headers;
+  exprt va_list_expr;
 
   natural_loopst loops;
   loopt loop_map;
@@ -81,6 +103,7 @@ protected:
 
   void build_loop_map();
   void build_dead_map();
+  void scan_for_varargs();
 
   void cleanup_code(codet &code, const bool is_top);
 
@@ -105,6 +128,12 @@ protected:
 
   goto_programt::const_targett convert_assign(
       goto_programt::const_targett target,
+      goto_programt::const_targett upper_bound,
+      codet &dest);
+
+  goto_programt::const_targett convert_assign_varargs(
+      goto_programt::const_targett target,
+      goto_programt::const_targett upper_bound,
       codet &dest);
 
   void convert_assign_rec(
@@ -193,6 +222,9 @@ void goto_program2codet::operator()()
 
   // gather variable scope information
   build_dead_map();
+
+  // see whether var args are in use, identify va_list symbol
+  scan_for_varargs();
 
   // convert
   forall_goto_program_instructions(target, goto_program)
@@ -287,6 +319,40 @@ void goto_program2codet::build_dead_map()
 
 /*******************************************************************\
 
+Function: goto_program2codet::scan_for_varargs
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
+void goto_program2codet::scan_for_varargs()
+{
+  va_list_expr.make_nil();
+
+  forall_goto_program_instructions(target, goto_program)
+    if(target->is_assign())
+    {
+      const exprt &r=to_code_assign(target->code).rhs();
+
+      if(r.id()==ID_sideeffect &&
+         to_side_effect_expr(r).get_statement()==ID_gcc_builtin_va_arg_next)
+      {
+        assert(r.has_operands());
+        va_list_expr=r.op0();
+        break;
+      }
+    }
+
+  if(va_list_expr.is_not_nil())
+    system_headers.insert("stdarg.h");
+}
+
+/*******************************************************************\
+
 Function: goto_program2codet::convert_instruction
 
 Inputs:
@@ -333,7 +399,7 @@ goto_programt::const_targett goto_program2codet::convert_instruction(
       return target;
 
     case ASSIGN:
-      return convert_assign(target, dest);
+      return convert_assign(target, upper_bound, dest);
 
     case RETURN:
       return convert_return(target, dest);
@@ -461,6 +527,7 @@ Purpose:
 
 goto_programt::const_targett goto_program2codet::convert_assign(
     goto_programt::const_targett target,
+    goto_programt::const_targett upper_bound,
     codet &dest)
 {
   const code_assignt &a=to_code_assign(target->code);
@@ -475,6 +542,9 @@ goto_programt::const_targett goto_program2codet::convert_assign(
 
     dest.copy_to_operands(code_skipt());
   }
+  else if(va_list_expr.is_not_nil() &&
+          a.lhs()==va_list_expr)
+    return convert_assign_varargs(target, upper_bound, dest);
   else
     convert_assign_rec(a, dest);
 
@@ -564,6 +634,86 @@ goto_programt::const_targett goto_program2codet::convert_assign(
         }
       }
 #endif
+}
+
+/*******************************************************************\
+
+Function: goto_program2codet::convert_assign_varargs
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
+goto_programt::const_targett goto_program2codet::convert_assign_varargs(
+    goto_programt::const_targett target,
+    goto_programt::const_targett upper_bound,
+    codet &dest)
+{
+  const exprt &r=skip_typecast(to_code_assign(target->code).rhs());
+
+  // we don't bother setting the type
+  code_function_callt f;
+  f.lhs().make_nil();
+
+  if(r.is_zero())
+  {
+    f.function()=symbol_exprt("va_end", code_typet());
+    f.arguments().push_back(va_list_expr);
+
+    dest.move_to_operands(f);
+  }
+  else if(r.id()==ID_address_of)
+  {
+    f.function()=symbol_exprt("va_start", code_typet());
+    f.arguments().push_back(va_list_expr);
+    f.arguments().push_back(to_address_of_expr(r).object());
+
+    dest.move_to_operands(f);
+  }
+  else if(r.id()==ID_sideeffect &&
+          to_side_effect_expr(r).get_statement()==ID_gcc_builtin_va_arg_next)
+  {
+    f.function()=symbol_exprt("va_arg", code_typet());
+    f.arguments().push_back(va_list_expr);
+
+    goto_programt::const_targett next=target;
+    ++next;
+    assert(next!=goto_program.instructions.end());
+    if(next!=upper_bound &&
+       next->is_assign())
+    {
+       const exprt &n_r=to_code_assign(next->code).rhs();
+       if(n_r.id()==ID_dereference &&
+          skip_typecast(to_dereference_expr(n_r).pointer())==va_list_expr)
+       {
+         f.lhs()=to_code_assign(next->code).lhs();
+
+         side_effect_expr_function_callt type_of;
+         type_of.function()=symbol_exprt("__typeof__", code_typet());
+         type_of.arguments().push_back(f.lhs());
+         f.arguments().push_back(type_of);
+
+         dest.move_to_operands(f);
+         return next;
+       }
+    }
+
+    dest.move_to_operands(f);
+  }
+  else
+  {
+    f.function()=symbol_exprt("va_copy", code_typet());
+    f.arguments().push_back(va_list_expr);
+    f.arguments().push_back(r);
+
+    dest.move_to_operands(f);
+  }
+
+  return target;
 }
 
 /*******************************************************************\
@@ -705,7 +855,8 @@ goto_programt::const_targett goto_program2codet::convert_decl(
      next->is_assign())
   {
     const code_assignt &a=to_code_assign(next->code);
-    if(a.lhs()==symbol)
+    if(a.lhs()==symbol &&
+       (va_list_expr.is_nil() || a.lhs()!=va_list_expr))
     {
       d.copy_to_operands(a.rhs());
       ++target;
@@ -855,26 +1006,6 @@ goto_programt::const_targett goto_program2codet::convert_goto_while(
 
   dest.move_to_operands(w);
   return target;
-}
-
-/*******************************************************************\
-
-Function: skip_typecast
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
-
-static const exprt& skip_typecast(const exprt &expr)
-{
-  if(expr.id()!=ID_typecast)
-    return expr;
-
-  return skip_typecast(to_typecast_expr(expr).op());
 }
 
 /*******************************************************************\
