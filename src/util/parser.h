@@ -26,7 +26,7 @@ public:
     char_buffer.clear();
   }
   
-  parsert() { clear(); }
+  inline parsert() { clear(); }
   
   virtual ~parsert() { }
 
@@ -83,12 +83,17 @@ public:
     location.set_line(line_no);
   }
   
-  unsigned get_line_no() const
+  inline void set_file(const irep_idt &file)
+  {
+    location.set_file(file);
+  }
+  
+  inline unsigned get_line_no() const
   {
     return line_no;
   }
 
-  void set_location(exprt &e)
+  inline void set_location(exprt &e)
   {
     e.location()=location;
   }
