@@ -162,7 +162,10 @@ void memory_model_sct::write_serialization_internal(
   {
     const a_rect &a_rec=a_it->second;
 
-    assert(!a_rec.writes.empty());
+    // uninitialised global symbol like symex_dynamic::dynamic_object*
+    // or *$object
+    if(a_rec.writes.empty())
+      continue;
     event_it init_write=a_rec.writes.front();
 
     // only writes with a true guard are considered initialisation
