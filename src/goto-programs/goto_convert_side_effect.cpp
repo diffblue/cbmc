@@ -759,11 +759,10 @@ void goto_convertt::remove_side_effect(
   else if(statement==ID_throw)
   {
     goto_programt::targett t=dest.add_instruction(THROW);
-    t->code=codet(ID_throw);
-    t->code.operands().swap(expr.operands());
+    t->code=code_expressiont(side_effect_expr_throwt(expr.find(ID_exception_list)));
+    t->code.op0().operands().swap(expr.operands());
     t->code.location()=expr.location();
     t->location=expr.location();
-    t->code.set(ID_exception_list, expr.find(ID_exception_list));
  
     // the result can't be used, these are void
     expr.make_nil();
