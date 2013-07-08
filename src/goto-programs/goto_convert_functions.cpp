@@ -13,6 +13,7 @@ Date: June 2003
 #include <util/base_type.h>
 #include <util/std_code.h>
 #include <util/symbol_table.h>
+#include <util/prefix.h>
 
 #include "goto_convert_functions.h"
 #include "goto_inline.h"
@@ -225,6 +226,37 @@ void goto_convert_functionst::convert_function(const irep_idt &identifier)
   if(targets.has_return_value)
     add_return(f, end_location);
       
+  // handle SV-COMP's __VERIFIER_atomic_
+  if(!f.body.instructions.empty() &&
+      has_prefix(id2string(identifier), "c::__VERIFIER_atomic_"))
+  {
+    goto_programt::instructiont a_begin;
+    a_begin.make_atomic_begin();
+    a_begin.location=f.body.instructions.front().location;
+    f.body.insert_before_swap(f.body.instructions.begin(), a_begin);
+
+    bool last_is_return=false;
+    Forall_goto_program_instructions(i_it, f.body)
+    {
+      last_is_return=i_it->is_return();
+      if(last_is_return)
+      {
+        goto_programt::instructiont a_end;
+        a_end.make_atomic_end();
+        a_end.location=i_it->location;
+        f.body.insert_before_swap(i_it, a_end);
+        ++i_it;
+      }
+    }
+
+    if(!last_is_return)
+    {
+      goto_programt::targett t=f.body.add_instruction();
+      t->make_atomic_end();
+      t->location=end_location;
+    }
+  }
+
   // add "end of function"
   goto_programt::targett t=f.body.add_instruction();
   t->type=END_FUNCTION;
