@@ -4441,8 +4441,7 @@ bool Parser::rThrowExpr(exprt &exp)
 
   int t=lex->LookAhead(0);
 
-  exp=exprt(ID_sideeffect);
-  exp.set(ID_statement, ID_throw);
+  exp=side_effect_expr_throwt();
   set_location(exp, tk);
 
   if(t==':' || t==';')

@@ -159,6 +159,7 @@ with
 trans
 throw
 catch
+try_catch
 CPROVER_throw
 CPROVER_try_catch
 CPROVER_try_finally

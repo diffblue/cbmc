@@ -1003,4 +1003,98 @@ public:
 side_effect_expr_function_callt &to_side_effect_expr_function_call(exprt &expr);
 const side_effect_expr_function_callt &to_side_effect_expr_function_call(const exprt &expr);
 
+/*! \brief A side effect that throws an exception
+*/
+class side_effect_expr_throwt:public side_effect_exprt
+{
+public:
+  inline side_effect_expr_throwt():side_effect_exprt(ID_throw)
+  {
+  }
+
+  inline explicit side_effect_expr_throwt(const irept &exception_list):
+    side_effect_exprt(ID_throw)
+  {
+    set(ID_exception_list, exception_list);
+  }
+};
+
+extern inline side_effect_expr_throwt &to_side_effect_expr_throw(exprt &expr)
+{
+  assert(expr.id()==ID_sideeffect);
+  assert(expr.get(ID_statement)==ID_throw);
+  return static_cast<side_effect_expr_throwt &>(expr);
+}
+
+extern inline const side_effect_expr_throwt &to_side_effect_expr_throw(const exprt &expr)
+{
+  assert(expr.id()==ID_sideeffect);
+  assert(expr.get(ID_statement)==ID_throw);
+  return static_cast<const side_effect_expr_throwt &>(expr);
+}
+
+/*! \brief A try/catch block
+*/
+class code_try_catcht:public codet
+{
+public:
+  inline code_try_catcht():codet(ID_try_catch)
+  {
+    operands().resize(1);
+  }
+
+  codet &try_code()
+  {
+    return static_cast<codet &>(op0());
+  }
+
+  const codet &try_code() const
+  {
+    return static_cast<const codet &>(op0());
+  }
+
+  code_declt &get_catch_decl(unsigned i)
+  {
+    assert((2*i+2)<operands().size());
+    return to_code_decl(to_code(operands()[2*i+1]));
+  }
+
+  const code_declt &get_catch_decl(unsigned i) const
+  {
+    assert((2*i+2)<operands().size());
+    return to_code_decl(to_code(operands()[2*i+1]));
+  }
+
+  codet &get_catch_code(unsigned i)
+  {
+    assert((2*i+2)<operands().size());
+    return to_code(operands()[2*i+2]);
+  }
+
+  const codet &get_catch_code(unsigned i) const
+  {
+    assert((2*i+2)<operands().size());
+    return to_code(operands()[2*i+2]);
+  }
+
+  void add_catch(const code_declt &to_catch, const codet &code_catch)
+  {
+    operands().reserve(operands().size()+2);
+    copy_to_operands(to_catch);
+    copy_to_operands(code_catch);
+  }
+};
+
+extern inline const code_try_catcht &to_code_try_catch(const codet &code)
+{
+  assert(code.get_statement()==ID_try_catch && code.operands().size()>=3);
+  return static_cast<const code_try_catcht &>(code);
+}
+
+extern inline code_try_catcht &to_code_try_catch(codet &code)
+{
+  assert(code.get_statement()==ID_try_catch && code.operands().size()>=3);
+  return static_cast<code_try_catcht &>(code);
+}
+
 #endif
