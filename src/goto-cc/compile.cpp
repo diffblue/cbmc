@@ -328,21 +328,22 @@ bool compilet::find_library(const std::string &name)
     std::ifstream in((tmp+name+".a").c_str());
 
     if(in.is_open())
-      add_input_file(tmp+name+".a");
+      return !add_input_file(tmp+name+".a");
     else
     {
       std::string libname=tmp+name+".so";
 
       if(is_goto_binary(libname))
-        add_input_file(libname);
+        return !add_input_file(libname);
       else if(is_elf_file(libname))
+      {
         warning("Warning: Cannot read ELF library "+libname);
-      else
         return false;
+      }
     }
   }
   
-  return true;
+  return false;
 }
 
 /*******************************************************************\
