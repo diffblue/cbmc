@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "show_claims.h"
 #include "goto_functions.h"
+#include "goto_model.h"
 
 /*******************************************************************\
 
@@ -118,3 +119,24 @@ void show_claims(
     if(!it->second.is_inlined())
       show_claims(ns, it->first, ui, it->second.body);
 }
+
+/*******************************************************************\
+
+Function: show_claims
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void show_claims(
+  const goto_modelt &goto_model,
+  ui_message_handlert::uit ui)
+{
+  const namespacet ns(goto_model.symbol_table);
+  show_claims(ns, ui, goto_model.goto_functions);
+}
+  
