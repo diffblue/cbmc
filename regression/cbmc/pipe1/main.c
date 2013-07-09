@@ -1,10 +1,22 @@
+#ifdef _WIN32
+#include <io.h>
+#include <fcntl.h>
+#else
 #include <unistd.h>
+#endif
+
 #include <assert.h>
 
 int main()
 {
   int filedesc[2];
+
+  #ifdef _WIN32
+  int ret=_pipe(filedesc, 1000, O_BINARY);
+  #else  
   int ret=pipe(filedesc);
+  #endif
+
   __CPROVER_assume(ret==0);
 
   char data[2] = { 7, 42 };
