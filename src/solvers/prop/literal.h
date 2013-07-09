@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_PROPDEC_LITERAL_H
 
 #include <vector>
+#include <ostream>
 
 // a pair of a variable number and a sign, encoded as follows:
 //
