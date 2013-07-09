@@ -680,6 +680,10 @@ goto_programt::const_targett goto_program2codet::convert_assign_varargs(
     f.function()=symbol_exprt("va_arg", code_typet());
     f.arguments().push_back(va_list_expr);
 
+    side_effect_expr_function_callt type_of;
+    type_of.function()=symbol_exprt("__typeof__", code_typet());
+
+    // if the return value is used, the next instruction will be assign
     goto_programt::const_targett next=target;
     ++next;
     assert(next!=goto_program.instructions.end());
@@ -692,8 +696,6 @@ goto_programt::const_targett goto_program2codet::convert_assign_varargs(
        {
          f.lhs()=to_code_assign(next->code).lhs();
 
-         side_effect_expr_function_callt type_of;
-         type_of.function()=symbol_exprt("__typeof__", code_typet());
          type_of.arguments().push_back(f.lhs());
          f.arguments().push_back(type_of);
 
@@ -702,7 +704,23 @@ goto_programt::const_targett goto_program2codet::convert_assign_varargs(
        }
     }
 
-    dest.move_to_operands(f);
+    // assignment not found, still need a proper typeof expression
+    assert(r.find("#va_arg_type").is_not_nil());
+    const typet &va_arg_type=
+      static_cast<typet const&>(r.find("#va_arg_type"));
+
+    dereference_exprt deref(
+      typecast_exprt(
+        from_integer(0, signedbv_typet(config.ansi_c.pointer_width)),
+        pointer_typet(va_arg_type)),
+      va_arg_type);
+
+    type_of.arguments().push_back(deref);
+    f.arguments().push_back(type_of);
+
+    code_expressiont void_f(typecast_exprt(f, empty_typet()));
+
+    dest.move_to_operands(void_f);
   }
   else
   {
