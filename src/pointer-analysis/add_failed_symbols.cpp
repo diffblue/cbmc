@@ -45,7 +45,7 @@ void add_failed_symbol(symbolt &symbol, symbol_tablet &symbol_table)
 {
   if(!symbol.is_lvalue) return;
   
-  if(symbol.type.get("#failed_symbol")!="")
+  if(symbol.type.get(ID_C_failed_symbol)!="")
     return;
 
   if(symbol.type.id()==ID_pointer)
@@ -54,7 +54,7 @@ void add_failed_symbol(symbolt &symbol, symbol_tablet &symbol_table)
     new_symbol.is_lvalue=true;
     new_symbol.module=symbol.module;
     new_symbol.mode=symbol.mode;
-    new_symbol.base_name=id2string(symbol.base_name)+"$object";
+    new_symbol.base_name=failed_symbol_id(symbol.base_name);
     new_symbol.name=failed_symbol_id(symbol.name);
     new_symbol.type=symbol.type.subtype();
     new_symbol.value.make_nil();
@@ -118,7 +118,7 @@ exprt get_failed_symbol(
   const namespacet &ns)
 {
   const symbolt &symbol=ns.lookup(expr);
-  irep_idt failed_symbol_id=symbol.type.get("#failed_symbol");
+  irep_idt failed_symbol_id=symbol.type.get(ID_C_failed_symbol);
 
   if(failed_symbol_id==irep_idt())
     return nil_exprt();
