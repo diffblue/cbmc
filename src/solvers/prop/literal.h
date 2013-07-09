@@ -193,5 +193,9 @@ typedef std::vector<literalt> bvt;
   for(bvt::iterator it=(bv).begin(); \
       it!=(bv).end(); ++it)
 
+static inline std::ostream & operator << (std::ostream &out, literalt l)
+{
+  return out << l.dimacs();
+}
 
 #endif
