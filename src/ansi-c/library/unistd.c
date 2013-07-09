@@ -73,9 +73,13 @@ int pipe(int fildes[2])
 
 /* FUNCTION: close */
 
+#ifdef _WIN32
+#include <io.h>
+#else
 #ifndef __CPROVER_UNISTD_H_INCLUDED
 #include <unistd.h>
 #define __CPROVER_UNISTD_H_INCLUDED
+#endif
 #endif
 
 #ifndef __CPROVER_pipet_declared
@@ -114,9 +118,13 @@ int close(int fildes)
 
 /* FUNCTION: write */
 
+#ifdef _WIN32
+#include <io.h>
+#else
 #ifndef __CPROVER_UNISTD_H_INCLUDED
 #include <unistd.h>
 #define __CPROVER_UNISTD_H_INCLUDED
+#endif
 #endif
 
 #ifndef __CPROVER_pipet_declared
@@ -163,9 +171,13 @@ ssize_t write(int fildes, const void *buf, size_t nbyte)
 
 /* FUNCTION: read */
 
+#ifdef _WIN32
+#include <io.h>
+#else
 #ifndef __CPROVER_UNISTD_H_INCLUDED
 #include <unistd.h>
 #define __CPROVER_UNISTD_H_INCLUDED
+#endif
 #endif
 
 #ifndef __CPROVER_pipet_declared
