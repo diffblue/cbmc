@@ -92,9 +92,20 @@ protected:
   
   numbering<irep_idt> pointers;
   numbering<exprt> objects;
+
+  struct destt
+  {
+  public:
+    destt() { }
   
-  // pointers -> set of objects
-  typedef std::map<unsigned, std::set<unsigned> > points_tot;
+    std::set<unsigned> objects;
+    
+    bool merge(const destt &);
+    void clear() { objects.clear(); }
+  };
+  
+  // pointers -> destt
+  typedef std::map<unsigned, destt> points_tot;
   
   class loc_infot
   {
@@ -114,7 +125,7 @@ protected:
     loc_infot &loc_info_dest);
     
   void get_rec(
-    std::set<unsigned> &dest,
+    destt &dest,
     const exprt &rhs,
     const loc_infot &loc_info_src);
     
