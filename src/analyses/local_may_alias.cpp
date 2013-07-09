@@ -96,6 +96,39 @@ void cfgt::build(const goto_programt &goto_program)
 
 /*******************************************************************\
 
+Function: local_may_aliast::destt::merge
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: 
+
+\*******************************************************************/
+
+bool local_may_aliast::destt::merge(const destt &src)
+{
+  bool result=false;
+
+  unsigned old_size=objects.size();
+  objects.insert(src.objects.begin(), src.objects.end());
+
+  if(objects.size()!=old_size)
+    result=true;
+
+  #if 0
+  if(offset_zero && !src.offset_zero)
+  {
+    offset_zero=false;
+    result=true;
+  }
+  #endif
+  
+  return result;
+}
+
+/*******************************************************************\
+
 Function: local_may_aliast::loc_infot::merge
 
   Inputs:
@@ -132,14 +165,8 @@ bool local_may_aliast::loc_infot::merge(const loc_infot &src)
     }
     
     assert(dest_it->first==src_it->first);
-      
-    std::set<unsigned> &dest_e=dest_it->second;
-    const std::set<unsigned> &src_e=src_it->second;
-
-    unsigned old_size=dest_e.size();
-    dest_e.insert(src_e.begin(), src_e.end());
-
-    if(dest_e.size()!=old_size)
+    
+    if(dest_it->second.merge(src_it->second))
       result=true;
 
     dest_it++;
@@ -195,7 +222,7 @@ void local_may_aliast::assign_lhs(
     if(track(identifier))
     {
       unsigned dest_pointer=pointers.number(identifier);
-      std::set<unsigned> &dest_set=loc_info_dest.points_to[dest_pointer];
+      destt &dest_set=loc_info_dest.points_to[dest_pointer];
       dest_set.clear();
       get_rec(dest_set, rhs, loc_info_src);
     }
@@ -244,13 +271,14 @@ std::set<exprt> local_may_aliast::get(
   
   const loc_infot &loc_info_src=loc_infos[loc_it->second];
   
-  std::set<unsigned> result_tmp;
+  destt result_tmp;
   get_rec(result_tmp, rhs, loc_info_src);
 
   std::set<exprt> result;
+
   for(std::set<unsigned>::const_iterator
-      it=result_tmp.begin();
-      it!=result_tmp.end();
+      it=result_tmp.objects.begin();
+      it!=result_tmp.objects.end();
       it++)
   {
     result.insert(objects[*it]);
@@ -281,18 +309,19 @@ bool local_may_aliast::aliases(
   
   const loc_infot &loc_info_src=loc_infos[loc_it->second];
   
-  std::set<unsigned> tmp1, tmp2;
+  destt tmp1, tmp2;
   get_rec(tmp1, src1, loc_info_src);
   get_rec(tmp2, src2, loc_info_src);
 
-  if(tmp1.find(unknown_object)!=tmp1.end() ||
-     tmp2.find(unknown_object)!=tmp2.end())
+  if(tmp1.objects.find(unknown_object)!=tmp1.objects.end() ||
+     tmp2.objects.find(unknown_object)!=tmp2.objects.end())
     return true;
 
   std::list<unsigned> result;
   
   std::set_intersection(
-    tmp1.begin(), tmp1.end(), tmp2.begin(), tmp2.end(), result.begin());
+    tmp1.objects.begin(), tmp1.objects.end(),
+    tmp2.objects.begin(), tmp2.objects.end(), result.begin());
   
   return !result.empty();
 }
@@ -310,16 +339,16 @@ Function: local_may_aliast::get_rec
 \*******************************************************************/
 
 void local_may_aliast::get_rec(
-  std::set<unsigned> &dest,
+  destt &dest,
   const exprt &rhs,
   const loc_infot &loc_info_src)
 {
   if(rhs.id()==ID_constant)
   {
     if(rhs.is_zero())
-      dest.insert(objects.number(exprt(ID_null_object)));
+      dest.objects.insert(objects.number(exprt(ID_null_object)));
     else
-      dest.insert(objects.number(exprt(ID_integer_address_object)));
+      dest.objects.insert(objects.number(exprt(ID_integer_address_object)));
   }
   else if(rhs.id()==ID_symbol)
   {
@@ -330,12 +359,12 @@ void local_may_aliast::get_rec(
       points_tot::const_iterator src_it=loc_info_src.points_to.find(src_pointer);
       if(src_it!=loc_info_src.points_to.end())
       {
-        const std::set<unsigned> &src=src_it->second;
-        dest.insert(src.begin(), src.end());
+        const std::set<unsigned> &src=src_it->second.objects;
+        dest.objects.insert(src.begin(), src.end());
       }
     }
     else
-      dest.insert(unknown_object);
+      dest.objects.insert(unknown_object);
   }
   else if(rhs.id()==ID_address_of)
   {
@@ -344,7 +373,7 @@ void local_may_aliast::get_rec(
     if(object.id()==ID_symbol)
     {
       unsigned object_nr=objects.number(object);
-      dest.insert(object_nr);
+      dest.objects.insert(object_nr);
     }
     else if(object.id()==ID_index)
     {
@@ -353,13 +382,13 @@ void local_may_aliast::get_rec(
       {
         index_exprt tmp=index_expr;
         tmp.index()=gen_zero(index_type());
-        dest.insert(objects.number(tmp));
+        dest.objects.insert(objects.number(tmp));
       }
       else
-        dest.insert(unknown_object);
+        dest.objects.insert(unknown_object);
     }
     else
-      dest.insert(unknown_object);
+      dest.objects.insert(unknown_object);
   }
   else if(rhs.id()==ID_typecast)
   {
@@ -383,10 +412,10 @@ void local_may_aliast::get_rec(
         get_rec(dest, rhs.op1(), loc_info_src);
       }
       else
-        dest.insert(unknown_object);
+        dest.objects.insert(unknown_object);
     }
     else
-      dest.insert(unknown_object);
+      dest.objects.insert(unknown_object);
   }
   else if(rhs.id()==ID_minus)
   {
@@ -395,19 +424,19 @@ void local_may_aliast::get_rec(
       get_rec(dest, rhs.op0(), loc_info_src);
     }
     else
-      dest.insert(unknown_object);
+      dest.objects.insert(unknown_object);
   }
   else if(rhs.id()==ID_member)
   {
-    dest.insert(unknown_object);
+    dest.objects.insert(unknown_object);
   }
   else if(rhs.id()==ID_index)
   {
-    dest.insert(unknown_object);
+    dest.objects.insert(unknown_object);
   }
   else if(rhs.id()==ID_dereference)
   {
-    dest.insert(unknown_object);
+    dest.objects.insert(unknown_object);
   }
   else if(rhs.id()==ID_sideeffect)
   {
@@ -415,13 +444,13 @@ void local_may_aliast::get_rec(
     const irep_idt &statement=side_effect_expr.get_statement();
     if(statement==ID_malloc)
     {
-      dest.insert(objects.number(exprt(ID_dynamic_object)));
+      dest.objects.insert(objects.number(exprt(ID_dynamic_object)));
     }
     else
-      dest.insert(unknown_object);
+      dest.objects.insert(unknown_object);
   }
   else
-    dest.insert(unknown_object);
+    dest.objects.insert(unknown_object);
 }
  
 /*******************************************************************\
@@ -455,7 +484,7 @@ void local_may_aliast::build(const goto_functiont &goto_function)
   {
     const irep_idt &identifier=it->get_identifier();
     if(track(identifier))
-      loc_infos[0].points_to[pointers.number(identifier)].insert(unknown_object);
+      loc_infos[0].points_to[pointers.number(identifier)].objects.insert(unknown_object);
   }
 
   for(localst::locals_mapt::const_iterator
@@ -464,7 +493,7 @@ void local_may_aliast::build(const goto_functiont &goto_function)
       l_it++)
   {
     if(track(l_it->first))
-      loc_infos[0].points_to[pointers.number(l_it->first)].insert(unknown_object);
+      loc_infos[0].points_to[pointers.number(l_it->first)].objects.insert(unknown_object);
   }
 
   while(!work_queue.empty())
@@ -555,11 +584,11 @@ void local_may_aliast::output(
       out << "  " << pointers[p_it->first] << " = { ";
 
       for(std::set<unsigned>::const_iterator
-          s_it=p_it->second.begin();
-          s_it!=p_it->second.end();
+          s_it=p_it->second.objects.begin();
+          s_it!=p_it->second.objects.end();
           s_it++)
       {
-        if(s_it!=p_it->second.begin()) out << ", ";
+        if(s_it!=p_it->second.objects.begin()) out << ", ";
         out << from_expr(ns, "", objects[*s_it]);
       }
         
