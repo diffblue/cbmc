@@ -335,6 +335,69 @@ bool value_sett::make_union(object_mapt &dest, const object_mapt &src) const
 
 /*******************************************************************\
 
+Function: value_sett::eval_pointer_offset
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void value_sett::eval_pointer_offset(
+  exprt &expr,
+  const namespacet &ns) const
+{
+  if(expr.id()==ID_pointer_offset)
+  {
+    assert(expr.operands().size()==1);
+
+    object_mapt reference_set;
+    get_value_set(expr.op0(), reference_set, ns);
+
+    exprt new_expr;
+    new_expr.make_nil();
+
+    const object_map_dt &object_map=reference_set.read();
+    for(object_map_dt::const_iterator
+        it=object_map.begin();
+        it!=object_map.end();
+        it++)
+      if(!it->second.offset_is_set)
+        return;
+      else
+      {
+        const exprt &object=object_numbering[it->first];
+        mp_integer ptr_offset=compute_pointer_offset(ns, object);
+        exprt offset=from_integer(it->second.offset, index_type());
+
+        if(ptr_offset<0 || offset.id()!=ID_constant)
+          return;
+
+        plus_exprt offset_sum(
+          offset,
+          from_integer(ptr_offset, index_type()));
+        simplify(offset_sum, ns);
+
+        if(new_expr.is_not_nil() && offset_sum!=new_expr)
+          return;
+
+        new_expr=offset_sum;
+      }
+
+    if(new_expr.is_not_nil())
+      expr.swap(new_expr);
+  }
+  else
+  {
+    Forall_operands(it, expr)
+      eval_pointer_offset(*it, ns);
+  }
+}
+
+/*******************************************************************\
+
 Function: value_sett::get_value_set
 
   Inputs:
@@ -843,8 +906,47 @@ void value_sett::get_value_set_rec(
     if(expr.operands().size()!=2)
       throw "byte_extract takes two operands";
       
-    // we just pass through
-    get_value_set_rec(expr.op0(), dest, suffix, original_type, ns);
+    bool found=false;
+
+    exprt op1=expr.op1();
+    eval_pointer_offset(op1, ns);
+    simplify(op1, ns);
+
+    const typet &op0_type=ns.follow(expr.op0().type());
+    if(op1.id()==ID_constant && op0_type.id()==ID_struct)
+    {
+      const struct_typet &struct_type=to_struct_type(op0_type);
+
+      for(struct_union_typet::componentst::const_iterator
+          c_it=struct_type.components().begin();
+          !found && c_it!=struct_type.components().end();
+          c_it++)
+      {
+        const irep_idt &name=c_it->get_name();
+
+        exprt offset=member_offset_expr(struct_type, name, ns);
+        if(offset.is_nil())
+          continue;
+
+        equal_exprt eq(offset, op1);
+        simplify(eq, ns);
+
+        if(!eq.is_true())
+          continue;
+
+        found=true;
+
+        member_exprt member(c_it->type());
+        member.set_component_name(name);
+        member.struct_op()=expr.op0();
+
+        get_value_set_rec(member, dest, suffix, original_type, ns);
+      }
+    }
+
+    if(!found)
+      // we just pass through
+      get_value_set_rec(expr.op0(), dest, suffix, original_type, ns);
   }
   else if(expr.id()==ID_byte_update_little_endian ||
           expr.id()==ID_byte_update_big_endian)

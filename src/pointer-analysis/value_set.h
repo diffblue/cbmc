@@ -185,6 +185,10 @@ public:
     value_setst::valuest &dest,
     const namespacet &ns) const;
 
+  void eval_pointer_offset(
+    exprt &expr,
+    const namespacet &ns) const;
+
 protected:
   void get_value_set_rec(
     const exprt &expr,
