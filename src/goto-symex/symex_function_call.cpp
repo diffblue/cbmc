@@ -268,8 +268,18 @@ void goto_symext::symex_function_call_code(
   // see if it's too much
   if(get_unwind_recursion(identifier, unwinding_counter))
   {
-    if(options.get_bool_option("unwinding-assertions"))
-      claim(false_exprt(), "recursion unwinding assertion", state);
+    if(options.get_bool_option("partial-loops"))
+    {
+      // it's ok, ignore
+    }
+    else
+    {
+      if(options.get_bool_option("unwinding-assertions"))
+        claim(false_exprt(), "recursion unwinding assertion", state);
+      
+      // add to state guard to prevent further assignments
+      state.guard.add(false_exprt());
+    }
 
     state.source.pc++;
     return;
