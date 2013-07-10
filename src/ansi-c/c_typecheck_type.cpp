@@ -749,8 +749,13 @@ void c_typecheck_baset::clean_type(
     
     if(size.is_not_nil() &&
        !size.is_constant() &&
-       size.id()!=ID_infinity)
+       size.id()!=ID_infinity &&
+       !(size.id()==ID_symbol && size.type().get_bool(ID_C_constant)))
     {
+      // The criterion above can be tricked:
+      // Of course we can modify a 'const' symbol, e.g.,
+      // using a pointer type cast.
+    
       assert(current_symbol_id!=irep_idt());
         
       const symbolt &base_symbol=
