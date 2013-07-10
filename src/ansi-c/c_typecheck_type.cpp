@@ -754,7 +754,8 @@ void c_typecheck_baset::clean_type(
     {
       // The criterion above can be tricked:
       // Of course we can modify a 'const' symbol, e.g.,
-      // using a pointer type cast.
+      // using a pointer type cast. Interestingly,
+      // at least gcc 4.2.1 makes the very same mistake!
     
       assert(current_symbol_id!=irep_idt());
         
