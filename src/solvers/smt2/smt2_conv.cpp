@@ -710,7 +710,7 @@ void smt2_convt::convert_expr(const exprt &expr)
     {
       if(use_FPA_theory)
       {
-        smt2_prop.out << "(fpneg "; // no rounding
+        smt2_prop.out << "(fp.neg "; // no rounding
         convert_expr(expr.op0());
         smt2_prop.out << ")";
       }
@@ -808,7 +808,7 @@ void smt2_convt::convert_expr(const exprt &expr)
     {
       if(expr.id()==ID_ieee_float_notequal)
       {
-        smt2_prop.out << "(not (fpeq ";
+        smt2_prop.out << "(not (fp.eq ";
         convert_expr(expr.op0());
         smt2_prop.out << " ";
         convert_expr(expr.op1());
@@ -816,7 +816,7 @@ void smt2_convt::convert_expr(const exprt &expr)
       }
       else
       {
-        smt2_prop.out << "(fpeq ";
+        smt2_prop.out << "(fp.eq ";
         convert_expr(expr.op0());
         smt2_prop.out << " ";
         convert_expr(expr.op1());
@@ -1211,11 +1211,10 @@ void smt2_convt::convert_expr(const exprt &expr)
 
       if(use_FPA_theory)
       {
-          smt2_prop.out << "(ite (fplt ";
+          smt2_prop.out << "(ite (fp.lt ";
           convert_expr(expr.op0());
-          smt2_prop.out << " ((_ fpnum " << floatbv_type.get_e() << " "
-                        << floatbv_type.get_f() << ") 0))";
-          smt2_prop.out << "(fpneg ";
+          smt2_prop.out << " (fp 0x0 0x0 0x0)";
+          smt2_prop.out << "(fp.neg ";
           convert_expr(expr.op0());
           smt2_prop.out << ") ";
           convert_expr(expr.op0());
@@ -1251,11 +1250,11 @@ void smt2_convt::convert_expr(const exprt &expr)
         smt2_prop.out << "(= ";
         convert_expr(expr.op0());
         smt2_prop.out << " (_ NaN " << floatbv_type.get_e()
-                      << " " << floatbv_type.get_f() << "))";
+                      << " " << floatbv_type.get_f() + 1 << "))";
       }
       else
       {
-        throw "TODO: isNaN for flaotbv";
+        throw "TODO: isNaN for floatbv";
       }
     }
     else
@@ -1276,13 +1275,13 @@ void smt2_convt::convert_expr(const exprt &expr)
       if(use_FPA_theory)
       {
           size_t e = floatbv_type.get_e();
-          size_t f = floatbv_type.get_f();
+          size_t f = floatbv_type.get_f() + 1;
           smt2_prop.out << "(let ((?op ";
           convert_expr(expr.op0());
           smt2_prop.out << ")) ";
           smt2_prop.out << "(and ";
-          smt2_prop.out << "(fplt (_ -inf " << e << " " << f << ") ?op) ";
-          smt2_prop.out << "(fplt ?op (_ +inf " << e << " " << f << ")))";
+          smt2_prop.out << "(fp.lt (_ -oo " << e << " " << f << ") ?op) ";
+          smt2_prop.out << "(fp.lt ?op (_ +oo " << e << " " << f << ")))";
           smt2_prop.out << ")";
       }
       else
@@ -1308,14 +1307,14 @@ void smt2_convt::convert_expr(const exprt &expr)
       if(use_FPA_theory)
       {
           size_t e = floatbv_type.get_e();
-          size_t f = floatbv_type.get_f();
+          size_t f = floatbv_type.get_f() + 1;
           smt2_prop.out << "(let ((?op ";
           convert_expr(expr.op0());
           smt2_prop.out << ")) ";
           smt2_prop.out << "(or "
                         << "(= ?op (_ NaN " << e << " " << f << "))"
-                        << "(= ?op (_ +inf " << e << " " << f << "))"
-                        << "(= ?op (_ -inf " << e << " " << f << "))"
+                        << "(= ?op (_ +oo " << e << " " << f << "))"
+                        << "(= ?op (_ -oo " << e << " " << f << "))"
                         << "))";
       }
       else
@@ -1340,7 +1339,7 @@ void smt2_convt::convert_expr(const exprt &expr)
       //const floatbv_typet &floatbv_type=to_floatbv_type(op_type);
       if(use_FPA_theory)
       {
-        smt2_prop.out << "(fpisnormal ";
+        smt2_prop.out << "(fp.isNormal ";
         convert_expr(expr.op0());
         smt2_prop.out << ")";
       }
@@ -1557,7 +1556,7 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
 
       if(use_FPA_theory)
       {
-        smt2_prop.out << "((_ fptobv " << to_width << ") ";
+        smt2_prop.out << "((_ fp.to_sbv " << to_width << ") ";
         convert_expr(op);
         smt2_prop.out << ")";
       }
@@ -1787,8 +1786,8 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
 
       if(use_FPA_theory)
       {
-        smt2_prop.out << "((_ fpcast " << dst.get_e() << " "
-                      << dst.get_f() << ") fp_round_nearest_even ";
+        smt2_prop.out << "((_ to_fp " << dst.get_e() << " "
+                      << dst.get_f() + 1 << ") roundNearestTiesToEven ";
         convert_expr(op);
         smt2_prop.out << ")";
       }
@@ -1803,8 +1802,8 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
 
       if(use_FPA_theory)
       {
-        smt2_prop.out << "((_ fpfromsbv " << dst.get_e() << " "
-                      << dst.get_f() << ") fp_round_nearest_even ";
+        smt2_prop.out << "((_ to_fp " << dst.get_e() << " "
+                      << dst.get_f() + 1 << ") roundNearestTiesToEven ";
         convert_expr(op);
         smt2_prop.out << ")";
       }
@@ -1820,8 +1819,8 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
 
       if(use_FPA_theory)
       {
-        smt2_prop.out << "((_ fpfromubv " << dst.get_e() << " "
-                      << dst.get_f() << ") fp_round_nearest_even ";
+        smt2_prop.out << "((_ to_fp_unsigned " << dst.get_e() << " "
+                      << dst.get_f() + 1 << ") roundNearestTiesToEven ";
         convert_expr(op);
         smt2_prop.out << ")";
       }
@@ -1986,14 +1985,52 @@ void smt2_convt::convert_constant(const constant_exprt &expr)
   
     if(use_FPA_theory)
     {
+      /* CBMC stores floating point literals in the most
+	 computationally useful form; biased exponents and
+	 significands including the hidden bit.  Thus some encoding
+	 is needed to get to IEEE-754 style representations*/
+
       ieee_floatt v=ieee_floatt(expr);
-      smt2_prop.out << "((_ fpnum "
-                    << floatbv_type.get_e() << " "
-                    << floatbv_type.get_f() << ") "
-                    << v.pack() << ")";
-                    // << "(RNE " << v.get_sign() << " "
-                    // << v.get_fraction() << " "
-                    // << v.get_exponent() << "))";
+      size_t e = floatbv_type.get_e();
+      size_t f = floatbv_type.get_f() + 1;
+
+      /* Should be sufficient but not currently supported by mathsat */
+#if 0
+      mp_integer binary = v.pack();
+
+      smt2_prop.out << "((_ to_fp " << e << " " << f << ")"
+		    << " #b" << integer2binary(v.pack(), v.spec.width()) << ")";
+#endif
+
+      if (v.is_NaN())
+      {
+	smt2_prop.out << "(_ NaN " << e << " " << f << ")";
+      }
+      else if (v.is_infinity())
+      {
+	if (v.get_sign())
+	{
+	  smt2_prop.out << "(_ -oo " << e << " " << f << ")";
+	}
+	else
+	{
+	  smt2_prop.out << "(_ +oo " << e << " " << f << ")";
+	}
+
+      }
+      else
+      {
+	// Zero, normal or subnormal
+
+	mp_integer binary = v.pack();
+	std::string binaryString(integer2binary(v.pack(), v.spec.width()));
+
+	
+	smt2_prop.out << "(fp "
+		      << "#b" << binaryString.substr(0,1) << " "
+		      << "#b" << binaryString.substr(1,e) << " "
+		      << "#b" << binaryString.substr(1+e,f-1) << ")";
+      }
     }
     else
     {
@@ -2200,13 +2237,13 @@ void smt2_convt::convert_relation(const exprt &expr)
     if(use_FPA_theory)
     {
       if(expr.id()==ID_le)
-        smt2_prop.out << "fple";
+        smt2_prop.out << "fp.le";
       else if(expr.id()==ID_lt)
-        smt2_prop.out << "fplt";
+        smt2_prop.out << "fp.lt";
       else if(expr.id()==ID_ge)
-        smt2_prop.out << "fpge";
+        smt2_prop.out << "fp.ge";
       else if(expr.id()==ID_gt)
-        smt2_prop.out << "fpgt";
+        smt2_prop.out << "fp.gt";
 
       smt2_prop.out << " ";
       convert_expr(expr.op0());
@@ -2283,7 +2320,7 @@ void smt2_convt::convert_plus(const plus_exprt &expr)
     
     if(use_FPA_theory)
     {
-      smt2_prop.out << "(fpadd fp_round_nearest_even ";
+      smt2_prop.out << "(fp.add roundNearestTiesToEven ";
 
       forall_operands(it, expr)
       {
@@ -2388,8 +2425,8 @@ void smt2_convt::convert_floatbv_plus(const exprt &expr)
 
   if(use_FPA_theory)
   {
-    smt2_prop.out << "(fpadd ";
-    smt2_prop.out << "fp_round_nearest_even"; // hard-wired
+    smt2_prop.out << "(fp.add ";
+    smt2_prop.out << "roundNearestTiesToEven"; // hard-wired : FIX!
     smt2_prop.out << " ";
     convert_expr(expr.op0());
     smt2_prop.out << " ";
@@ -2432,7 +2469,7 @@ void smt2_convt::convert_minus(const minus_exprt &expr)
   {
     if(use_FPA_theory)
     {
-      smt2_prop.out << "(fpsub fp_round_nearest_even ";
+      smt2_prop.out << "(fp.sub roundNearestTiesToEven ";
       convert_expr(expr.op0());
       smt2_prop.out << " ";
       convert_expr(expr.op1());
@@ -2474,8 +2511,8 @@ void smt2_convt::convert_floatbv_minus(const exprt &expr)
 
   if(use_FPA_theory)
   {
-    smt2_prop.out << "(fpsub ";
-    smt2_prop.out << "fp_round_nearest_even"; // hard-wired
+    smt2_prop.out << "(fp.sub ";
+    smt2_prop.out << "roundNearestTiesToEven"; // hard-wired : FIX!
     convert_expr(expr.op0());
     smt2_prop.out << " ";
     convert_expr(expr.op1());
@@ -2538,7 +2575,7 @@ void smt2_convt::convert_div(const div_exprt &expr)
   {
     if(use_FPA_theory)
     {
-      smt2_prop.out << "(fpdiv fp_round_nearest_even ";
+      smt2_prop.out << "(fp.div roundNearestTiesToEven ";
       convert_expr(expr.op0());
       smt2_prop.out << " ";
       convert_expr(expr.op1());
@@ -2572,8 +2609,8 @@ void smt2_convt::convert_floatbv_div(const exprt &expr)
 
   if(use_FPA_theory)
   {
-    smt2_prop.out << "(fpdiv ";
-    smt2_prop.out << "fp_round_nearest_even";
+    smt2_prop.out << "(fp.div ";
+    smt2_prop.out << "roundNearestTiesToEven";
     smt2_prop.out << " ";
     convert_expr(expr.op0());
     smt2_prop.out << " ";
@@ -2633,7 +2670,7 @@ void smt2_convt::convert_mult(const mult_exprt &expr)
     {
       forall_operands(it, expr)
         if(it!=expr.operands().begin())
-          smt2_prop.out << "(fpmul fp_round_nearest_even ";
+          smt2_prop.out << "(fp.mul roundNearestTiesToEven ";
 
       convert_expr(expr.op0());
       smt2_prop.out << " ";
@@ -2701,8 +2738,8 @@ void smt2_convt::convert_floatbv_mult(const exprt &expr)
   
   if(use_FPA_theory)
   {
-    smt2_prop.out << "(fpmul ";
-    smt2_prop.out << "fp_round_nearest_even";
+    smt2_prop.out << "(fp.mul ";
+    smt2_prop.out << "roundNearestTiesToEven";
     smt2_prop.out << " ";
     convert_expr(expr.op0());
     smt2_prop.out << " ";
@@ -3353,9 +3390,9 @@ void smt2_convt::convert_type(const typet &type)
     const floatbv_typet &floatbv_type=to_floatbv_type(type);
   
     if(use_FPA_theory)
-      smt2_prop.out << "(_ Float "
+      smt2_prop.out << "(_ FloatingPoint "
                     << floatbv_type.get_e() << " "
-                    << floatbv_type.get_f() << ")";
+                    << floatbv_type.get_f() + 1 << ")";
     else
       smt2_prop.out << "(_ BitVec "
                     << floatbv_type.get_width() << ")";
