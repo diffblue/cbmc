@@ -714,6 +714,10 @@ irep_idt configt::this_architecture()
     #endif
   #elif __i386__
   this_arch="i386";
+  #elif _WIN64
+  this_arch="x86_64";
+  #elif _WIN32
+  this_arch="i386";
   #else
   // something new and unknown!
   this_arch="unknown";
