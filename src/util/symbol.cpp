@@ -216,8 +216,6 @@ Function: symbolt::symbol_expr
 
 symbol_exprt symbolt::symbol_expr() const
 {
-  symbol_exprt tmp(type);
-  tmp.set_identifier(name);
-  return tmp;
+  return symbol_exprt(name, type);
 }
 
