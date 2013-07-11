@@ -3,7 +3,7 @@ include ../common
 
 SRC = bigint-func.cc bigint.cc
 PRG = test-bigint$(EXEEXT)
-CLEANFILES = $(PRG)
+CLEANFILES = $(PRG) big-int$(LIBEXT) bigint-test$(OBJEXT) bigint-test.d
 
 all : $(PRG) big-int$(LIBEXT)
 
