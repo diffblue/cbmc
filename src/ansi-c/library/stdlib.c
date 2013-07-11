@@ -110,47 +110,83 @@ inline void free(void *ptr)
   }
 }
 
-/* FUNCTION: atoi */
+/* FUNCTION: strtol */
 
-#undef atoi
+#ifndef __CPROVER_ERRNO_H_INCLUDED
+#include <errno.h>
+#define __CPROVER_ERRNO_H_INCLUDED
+#endif
+
+#undef strtol
 #undef isdigit
 #undef isspace
 
 int isspace(int);
 int isdigit(int);
 
-inline int atoi(const char *nptr)
+inline long strtol(const char *nptr, char **endptr, int base)
 {
   __CPROVER_HIDE:;
   #ifdef __CPROVER_STRING_ABSTRACTION
   __CPROVER_assert(__CPROVER_is_zero_string(nptr),
-    "zero-termination of argument of atoi");
+    "zero-termination of argument of strtol");
   #endif
+
+  if(base==1 || base<0 || base>36)
+  {
+    errno=EINVAL;
+    return 0;
+  }
 
   int res=0;
   _Bool in_number=0;
   char sign=0;
 
   // 32 chars is an arbitrarily chosen limit
-  for(int i=0; i<31; ++i)
+  int i=0;
+  for( ; i<31; ++i)
   {
     char ch=nptr[i];
     if(ch==0)
       break;
-    else if((in_number || sign) && !isdigit(ch))
-      break;
-    else if(isspace(ch))
+    else if((base==0 || base==16) && !in_number &&
+            ch=='0' && (nptr[i+1]=='x' || nptr[i+1]=='X'))
+    {
+      base=16;
+      in_number=1;
+      ++i;
+    }
+    else if(base==0 && !in_number && ch=='0')
+    {
+      base=8;
+      in_number=1;
+    }
+    else if(!in_number && !sign && isspace(ch))
       continue;
-    else if(ch=='-' || ch=='+')
+    else if(!in_number && !sign && (ch=='-' || ch=='+'))
       sign=ch;
+    else if(base>10 && ch>='a' && ch-'a'<base-10)
+    {
+      in_number=1;
+      res=res*base+ch-'a'+10;
+    }
+    else if(base>10 && ch>='A' && ch-'A'<base-10)
+    {
+      in_number=1;
+      res=res*base+ch-'A'+10;
+    }
     else if(isdigit(ch))
     {
       in_number=1;
-      res=res*10+ch-'0';
+      base=base==0 ? 10 : base;
+      res=res*base+ch-'0';
     }
     else
       break;
   }
+
+  if(endptr!=0)
+    *endptr=(char*)nptr+i;
 
   if(sign=='-')
     res*=-1;
@@ -158,20 +194,30 @@ inline int atoi(const char *nptr)
   return res;
 }
 
+/* FUNCTION: atoi */
+
+#undef atoi
+#undef strtol
+
+long strtol(const char *nptr, char **endptr, int base);
+
+inline int atoi(const char *nptr)
+{
+  __CPROVER_HIDE:;
+  return (int)strtol(nptr, (char **)0, 10);
+}
+
 /* FUNCTION: atol */
 
 #undef atol
+#undef strtol
+
+long strtol(const char *nptr, char **endptr, int base);
 
 inline long atol(const char *nptr)
 {
   __CPROVER_HIDE:;
-  long res;
-  (void)*nptr;
-  #ifdef __CPROVER_STRING_ABSTRACTION
-  __CPROVER_assert(__CPROVER_is_zero_string(nptr),
-    "zero-termination of argument of atol");
-  #endif
-  return res;
+  return strtol(nptr, (char **)0, 10);
 }
 
 /* FUNCTION: getenv */
