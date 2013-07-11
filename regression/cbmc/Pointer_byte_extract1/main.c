@@ -23,7 +23,7 @@ struct NICState {
 typedef int OpenEthState;
 
 #define OPEN_ETH_STATE(a) \
-    ((OpenEthState *) container_of(nc, struct NICState, nc)->opaque)
+    ((OpenEthState *) container_of(a, struct NICState, nc)->opaque)
 
 #define OPEN_ETH_STATE2(a) \
     ((OpenEthState *) container_of(a, struct NICState, nc2)->opaque)
@@ -35,19 +35,37 @@ int main()
   int x=42;
 
   struct NICState nic;
+#ifndef __GNUC__
+  int *xptr=0, *xptr2=0;
+  const struct NetClientState *__mptr1=0, *__mptr2=0;
+#endif
   nic.opaque = &x;
   nc = &(nic.nc);
 
   assert(x==42);
   assert(*((int*)nic.opaque) == 42);
 
+#ifdef __GNUC__
   int *xptr = OPEN_ETH_STATE(nc);
+#else
+  __mptr1 = nc;
+  xptr = (OpenEthState *)
+    ((struct NICState *)
+     ((char *) __mptr1 - offsetof(struct NICState, nc)))->opaque;
+#endif
   assert(xptr == &x);
   assert(*xptr == 42);
 
   nc = &(nic.nc2);
 
+#ifdef __GNUC__
   int *xptr2 = OPEN_ETH_STATE2(nc);
+#else
+  __mptr2 = nc;
+  xptr2 = (OpenEthState *)
+    ((struct NICState *)
+     ((char *) __mptr2 - offsetof(struct NICState, nc2)))->opaque;
+#endif
   assert(xptr2 == &x);
   assert(*xptr2 == 42);
 
