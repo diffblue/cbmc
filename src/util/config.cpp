@@ -336,13 +336,15 @@ bool configt::set(const cmdlinet &cmdline)
     ansi_c.pointer_width=8*8;
     ansi_c.char_is_unsigned=false;
   }
-  else if(arch=="armel")
+  else if(arch=="armel" || arch=="armhf")
   {
     ansi_c.set_ILP32();
     ansi_c.arch=configt::ansi_ct::ARCH_ARM;
     ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
     ansi_c.long_double_width=8*8;
     ansi_c.char_is_unsigned=true;
+    if(arch=="armhf")
+      ansi_c.defines.push_back("__ARM_PCS_VFP");
   }
   else if(arch=="arm64")
   {
@@ -689,7 +691,11 @@ irep_idt configt::this_architecture()
   #elif __arm64__
   this_arch="arm64";
   #elif __arm__
-  this_arch="arm";
+    #ifdef __ARM_PCS_VFP
+    this_arch="armhf"; // variant of arm with hard float
+    #else
+    this_arch="arm";
+    #endif
   #elif __mipsel__
   this_arch="mipsel";
   #elif __mips__
