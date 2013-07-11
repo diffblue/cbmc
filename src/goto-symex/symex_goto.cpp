@@ -368,7 +368,7 @@ void goto_symext::phi_function(
       do_simplify(rhs);
     }
 
-    symbol_exprt lhs=symbol_expr(symbol);
+    symbol_exprt lhs=symbol.symbol_expr();
     symbol_exprt new_lhs=symbol_exprt(l1_identifier, type);
     dest_state.assignment(new_lhs, rhs, ns, true);
     
@@ -404,7 +404,7 @@ void goto_symext::loop_bound_exceeded(
   if(guard.is_true())
     negated_cond=false_exprt();
   else
-    negated_cond=gen_not(guard);
+    negated_cond=not_exprt(guard);
 
   bool unwinding_assertions=
     options.get_bool_option("unwinding-assertions");

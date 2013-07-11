@@ -822,7 +822,7 @@ void goto_convertt::convert_cpp_delete(
   }
   
   // now do "free"
-  exprt delete_symbol=symbol_expr(ns.lookup(delete_identifier));
+  exprt delete_symbol=ns.lookup(delete_identifier).symbol_expr();
   
   assert(to_code_type(delete_symbol.type()).arguments().size()==1);
 
@@ -1052,7 +1052,7 @@ void goto_convertt::convert_while(
   z->make_skip();
 
   goto_programt tmp_branch;
-  generate_conditional_branch(gen_not(cond), z, location, tmp_branch);
+  generate_conditional_branch(not_exprt(cond), z, location, tmp_branch);
 
   // do the v label
   goto_programt::targett v=tmp_branch.instructions.begin();
@@ -1996,7 +1996,7 @@ void goto_convertt::generate_ifthenelse(
 
   if(true_case.instructions.empty())
     return generate_ifthenelse(
-      gen_not(guard), false_case, true_case, location, dest);
+      not_exprt(guard), false_case, true_case, location, dest);
 
   bool has_else=!false_case.instructions.empty();
 
@@ -2035,7 +2035,7 @@ void goto_convertt::generate_ifthenelse(
   // v: if(!c) goto z/y;
   goto_programt tmp_v;
   generate_conditional_branch(
-    gen_not(guard), has_else?y:z, location, tmp_v);
+    not_exprt(guard), has_else?y:z, location, tmp_v);
 
   // w: P;
   goto_programt tmp_w;
@@ -2158,7 +2158,7 @@ void goto_convertt::generate_conditional_branch(
   
     forall_expr_list(it, op)
       generate_conditional_branch(
-        gen_not(*it), target_false, location, dest);
+        not_exprt(*it), target_false, location, dest);
 
     goto_programt::targett t_true=dest.add_instruction();
     t_true->make_goto(target_true);
@@ -2334,7 +2334,7 @@ symbolt &goto_convertt::new_tmp_symbol(
   tmp_symbols.push_back(symbol_ptr->name);
   
   goto_programt::targett t=dest.add_instruction(DECL);
-  t->code=code_declt(symbol_expr(*symbol_ptr));
+  t->code=code_declt(symbol_ptr->symbol_expr());
   t->location=location;
 
   return *symbol_ptr;  
@@ -2363,13 +2363,13 @@ void goto_convertt::make_temp_symbol(
     new_tmp_symbol(expr.type(), suffix, dest, location);
 
   code_assignt assignment;
-  assignment.lhs()=symbol_expr(new_symbol);
+  assignment.lhs()=new_symbol.symbol_expr();
   assignment.rhs()=expr;
   assignment.location()=location;
 
   convert(assignment, dest);
 
-  expr=symbol_expr(new_symbol);  
+  expr=new_symbol.symbol_expr();
 }
 
 /*******************************************************************\

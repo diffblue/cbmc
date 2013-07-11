@@ -76,9 +76,6 @@ public:
    
   void show(std::ostream &out) const;
   
-  // deprecated -- will go away
-  const irept &value(const irep_idt &name) const;
-  
   inline void swap(symbol_tablet &other)
   {
     symbols.swap(other.symbols);

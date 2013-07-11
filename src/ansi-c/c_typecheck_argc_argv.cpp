@@ -84,7 +84,7 @@ void c_typecheck_baset::add_argc_argv(const symbolt &main_symbol)
     exprt one_expr=from_integer(1, argc_new_symbol->type);
     
     exprt size_expr(ID_plus, argc_new_symbol->type);
-    size_expr.copy_to_operands(symbol_expr(*argc_new_symbol), one_expr);
+    size_expr.copy_to_operands(argc_new_symbol->symbol_expr(), one_expr);
     argv_type.add(ID_size).swap(size_expr);
 
     symbolt argv_symbol;
@@ -122,7 +122,7 @@ void c_typecheck_baset::add_argc_argv(const symbolt &main_symbol)
       throw 0;
     }
     
-    exprt size_expr = symbol_expr(*envp_new_size_symbol);
+    exprt size_expr = envp_new_size_symbol->symbol_expr();
 
     envp_symbol.type.id(ID_array);
     envp_symbol.type.add(ID_size).swap(size_expr);

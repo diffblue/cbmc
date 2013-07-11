@@ -1168,7 +1168,7 @@ void goto_checkt::check_rec(
       check_rec(op, guard, false);
 
       if(expr.id()==ID_or)
-        guard.add(gen_not(op));
+        guard.add(not_exprt(op));
       else
         guard.add(op);
     }
@@ -1201,7 +1201,7 @@ void goto_checkt::check_rec(
 
     {
       unsigned old_guard=guard.size();
-      guard.add(gen_not(expr.op0()));
+      guard.add(not_exprt(expr.op0()));
       check_rec(expr.op2(), guard, false);
       guard.resize(old_guard);
     }

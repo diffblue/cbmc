@@ -119,7 +119,7 @@ exprt dereferencet::dereference(
     guardt false_guard=guard;
     
     true_guard.add(if_expr.cond());
-    false_guard.add(gen_not(if_expr.cond()));
+    false_guard.add(not_exprt(if_expr.cond()));
     
     exprt true_case=dereference(if_expr.true_case(), true_guard, mode);
     exprt false_case=dereference(if_expr.true_case(), false_guard, mode);
@@ -195,7 +195,7 @@ exprt dereferencet::dereference(
          pointer, failed_symbol))
     {
       // yes!
-      failure_value=symbol_expr(*failed_symbol);
+      failure_value=failed_symbol->symbol_expr();
       failure_value.set(ID_C_invalid_object, true);
     }
     else
@@ -212,7 +212,7 @@ exprt dereferencet::dereference(
       
       get_new_name(symbol, ns);
 
-      failure_value=symbol_expr(symbol);
+      failure_value=symbol.symbol_expr();
       failure_value.set(ID_C_invalid_object, true);
       
       new_symbol_table.move(symbol);
@@ -397,7 +397,7 @@ dereferencet::valuet dereferencet::build_reference_to(
 
     // the object produced by malloc
     exprt malloc_object=
-      symbol_expr(ns.lookup(CPROVER_PREFIX "malloc_object"));
+      ns.lookup(CPROVER_PREFIX "malloc_object").symbol_expr();
 
     exprt is_malloc_object=exprt(ID_same_object, bool_typet());
     is_malloc_object.copy_to_operands(pointer_expr, malloc_object);

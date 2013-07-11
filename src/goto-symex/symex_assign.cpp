@@ -474,7 +474,7 @@ void goto_symext::symex_assign_if(
    
   if(!renamed_guard.is_true())
   { 
-    guard.add(gen_not(renamed_guard));
+    guard.add(not_exprt(renamed_guard));
     symex_assign_rec(state, lhs.false_case(), full_lhs, rhs, guard, visibility);
     guard.resize(old_guard_size);
   }

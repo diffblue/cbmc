@@ -908,7 +908,7 @@ cpp_scopet &cpp_typecheckt::typecheck_template_parameters(
       parameter.type().location()=declaration.find_location();
     }
     else
-      parameter=symbol_expr(symbol);
+      parameter=symbol.symbol_expr();
       
     // set (non-typechecked) default value
     if(default_value.is_not_nil())

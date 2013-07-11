@@ -19,7 +19,6 @@ Date: September 2011
 #include <fstream>
 #include <iostream>
 
-#include <util/expr_util.h>
 #include <util/cprover_prefix.h>
 #include <util/prefix.h>
 #include <util/i2string.h>
@@ -156,7 +155,7 @@ public:
   {
     namespacet ns(symbol_table);
     assignment(goto_program, t, location, id_lhs, 
-      symbol_expr(ns.lookup(id_rhs)));
+      ns.lookup(id_rhs).symbol_expr());
   }
 
   bool track(const irep_idt &id) const
@@ -506,18 +505,19 @@ void shared_bufferst::assignment(
   }
 //#endif
 
-  try {
-  const exprt symbol=symbol_expr(ns.lookup(identifier));
+  try
+  {
+    const exprt symbol=ns.lookup(identifier).symbol_expr();
 
-  t=goto_program.insert_before(t);
-  t->type=ASSIGN;
-  t->code=code_assignt(symbol, value);
-  t->code.location()=location;
-  t->location=location;
+    t=goto_program.insert_before(t);
+    t->type=ASSIGN;
+    t->code=code_assignt(symbol, value);
+    t->code.location()=location;
+    t->location=location;
  
-  //instrumentations.insert((const irep_idt) (t->code.id()));
+    //instrumentations.insert((const irep_idt) (t->code.id()));
  
-  t++;
+    t++;
   }
   catch(std::string s)
   {
@@ -1868,7 +1868,7 @@ void introduce_temporaries(
       new_symbol.is_thread_local=true;
       new_symbol.value.make_nil();
       
-      symbol_exprt symbol_expr=::symbol_expr(new_symbol);
+      symbol_exprt symbol_expr=new_symbol.symbol_expr();
       
       symbolt *symbol_ptr;
       symbol_table.move(new_symbol, symbol_ptr);

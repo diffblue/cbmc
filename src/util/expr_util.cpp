@@ -235,7 +235,7 @@ void gen_binary(exprt &expr, const irep_idt &id, bool default_value)
 
 /*******************************************************************\
 
-Function: gen_and
+Function: gen_and_old
 
   Inputs:
 
@@ -245,14 +245,14 @@ Function: gen_and
 
 \*******************************************************************/
 
-void gen_and(exprt &expr)
+void gen_and_old(exprt &expr)
 {
   gen_binary(expr, ID_and, true);
 }
 
 /*******************************************************************\
 
-Function: gen_or
+Function: gen_or_old
 
   Inputs:
 
@@ -262,7 +262,7 @@ Function: gen_or
 
 \*******************************************************************/
 
-void gen_or(exprt &expr)
+void gen_or_old(exprt &expr)
 {
   gen_binary(expr, ID_or, false);
 }

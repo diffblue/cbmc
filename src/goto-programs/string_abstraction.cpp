@@ -446,7 +446,7 @@ void string_abstractiont::make_decl_and_def(goto_programt &dest,
     const irep_idt &source_sym)
 {
   const symbolt &symbol=ns.lookup(identifier);
-  symbol_exprt sym_expr=symbol_expr(symbol);
+  symbol_exprt sym_expr=symbol.symbol_expr();
 
   goto_programt::targett decl1=dest.add_instruction();
   decl1->make_decl();
@@ -536,7 +536,7 @@ exprt string_abstractiont::make_val_or_dummy_rec(goto_programt &dest,
             dest, ref_instr, symbol, it2->get_name(),
             it2->type(), ns.follow(it->type()));
 
-        member_exprt member(symbol_expr(symbol), it2->get_name(), it2->type());
+        member_exprt member(symbol.symbol_expr(), it2->get_name(), it2->type());
 
         goto_programt::targett assignment1=dest.add_instruction();
         assignment1->make_assignment();
@@ -598,7 +598,7 @@ symbol_exprt string_abstractiont::add_dummy_symbol_and_value(
   new_symbol.is_lvalue=true;
   new_symbol.is_file_local=true;
 
-  symbol_exprt sym_expr=symbol_expr(new_symbol);
+  symbol_exprt sym_expr=new_symbol.symbol_expr();
 
   // make sure it is declared before the recursive call
   goto_programt::targett decl=dest.add_instruction();
@@ -857,7 +857,7 @@ goto_programt::targett string_abstractiont::abstract_return(
 
   irep_idt identifier=abstract_ret_val_name(fct_symbol);
   const symbolt &str_symbol=ns.lookup(identifier);
-  symbol_exprt sym_expr=symbol_expr(str_symbol);
+  symbol_exprt sym_expr=str_symbol.symbol_expr();
 
   goto_programt::instructiont is_null;
   is_null.function=target->function;
@@ -1392,7 +1392,7 @@ exprt string_abstractiont::build_unknown(const typet &type, bool write)
 
   symbol_table.move(new_symbol);
 
-  return symbol_expr(ns.lookup(identifier));
+  return ns.lookup(identifier).symbol_expr();
 }
 
 /*******************************************************************\
@@ -1426,7 +1426,7 @@ bool string_abstractiont::build_symbol(const symbol_exprt &sym, exprt &dest)
   }
 
   const symbolt &str_symbol=ns.lookup(identifier);
-  dest=symbol_expr(str_symbol);
+  dest=str_symbol.symbol_expr();
   if(current_args.find(symbol.name)!=current_args.end() &&
       !is_ptr_argument(abstract_type))
     dest=dereference_exprt(dest, dest.type().subtype());
@@ -1525,7 +1525,7 @@ bool string_abstractiont::build_symbol_constant(const mp_integer &zero_length,
       // initialization
       goto_programt::targett assignment1=initialization.add_instruction();
       assignment1->make_assignment();
-      assignment1->code=code_assignt(symbol_expr(new_symbol), value);
+      assignment1->code=code_assignt(new_symbol.symbol_expr(), value);
     }
 
     symbol_table.move(new_symbol);

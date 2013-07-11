@@ -169,7 +169,7 @@ bool static_lifetime_init(
        it->second.type.id()==ID_code)
     {
       code_function_callt function_call;      
-      function_call.function()=symbol_expr(it->second);
+      function_call.function()=it->second.symbol_expr();
       function_call.location()=location;
       dest.move_to_operands(function_call);
     }
@@ -273,7 +273,7 @@ bool entry_point(
     code_function_callt call_init;
     call_init.lhs().make_nil();
     call_init.location()=symbol.location;
-    call_init.function()=symbol_expr(init_it->second);
+    call_init.function()=init_it->second.symbol_expr();
 
     init_code.move_to_operands(call_init);
   }
@@ -282,7 +282,7 @@ bool entry_point(
   
   code_function_callt call_main;
   call_main.location()=symbol.location;
-  call_main.function()=symbol_expr(symbol);
+  call_main.function()=symbol.symbol_expr();
 
   const code_typet::argumentst &arguments=
     to_code_type(symbol.type).arguments();
@@ -305,7 +305,7 @@ bool entry_point(
         exprt one=from_integer(1, argc_symbol.type);
         
         exprt ge(ID_ge, typet(ID_bool));
-        ge.copy_to_operands(symbol_expr(argc_symbol), one);
+        ge.copy_to_operands(argc_symbol.symbol_expr(), one);
         
         codet assumption;
         assumption.set_statement(ID_assume);
@@ -321,7 +321,7 @@ bool entry_point(
         exprt bound_expr=from_integer(upper_bound, argc_symbol.type);
         
         exprt le(ID_le, typet(ID_bool));
-        le.copy_to_operands(symbol_expr(argc_symbol), bound_expr);
+        le.copy_to_operands(argc_symbol.symbol_expr(), bound_expr);
         
         codet assumption;
         assumption.set_statement(ID_assume);
@@ -350,7 +350,7 @@ bool entry_point(
         exprt max_minus_one=from_integer(max-1, envp_size_symbol.type);
         
         exprt le(ID_le, bool_typet());
-        le.copy_to_operands(symbol_expr(envp_size_symbol), max_minus_one);
+        le.copy_to_operands(envp_size_symbol.symbol_expr(), max_minus_one);
         
         codet assumption;
         assumption.set_statement(ID_assume);
@@ -379,7 +379,7 @@ bool entry_point(
         array_of.copy_to_operands(address_of);
         
         init_code.copy_to_operands(
-          code_assignt(symbol_expr(argv_symbol), array_of));
+          code_assignt(argv_symbol.symbol_expr(), array_of));
         */
       }
 
@@ -390,8 +390,8 @@ bool entry_point(
         
         exprt index_expr(ID_index, argv_symbol.type.subtype());
         index_expr.copy_to_operands(
-          symbol_expr(argv_symbol),
-          symbol_expr(argc_symbol));
+          argv_symbol.symbol_expr(),
+          argc_symbol.symbol_expr());
           
         // disable bounds check on that one
         index_expr.set("bounds_check", false);
@@ -410,8 +410,8 @@ bool entry_point(
         
         exprt index_expr(ID_index, envp_symbol.type.subtype());
         index_expr.copy_to_operands(
-          symbol_expr(envp_symbol),
-          symbol_expr(envp_size_symbol));
+          envp_symbol.symbol_expr(),
+          envp_size_symbol.symbol_expr());
           
         // disable bounds check on that one
         index_expr.set("bounds_check", false);
@@ -436,13 +436,13 @@ bool entry_point(
         exprt &op0=operands[0];
         exprt &op1=operands[1];
         
-        op0=symbol_expr(argc_symbol);
+        op0=argc_symbol.symbol_expr();
         
         {
           const exprt &arg1=arguments[1];
 
           exprt index_expr(ID_index, arg1.type().subtype());
-          index_expr.copy_to_operands(symbol_expr(argv_symbol), gen_zero(index_type()));
+          index_expr.copy_to_operands(argv_symbol.symbol_expr(), gen_zero(index_type()));
 
           // disable bounds check on that one
           index_expr.set("bounds_check", false);
@@ -461,7 +461,7 @@ bool entry_point(
           
           exprt index_expr(ID_index, arg2.type().subtype());
           index_expr.copy_to_operands(
-            symbol_expr(envp_symbol), gen_zero(index_type()));
+            envp_symbol.symbol_expr(), gen_zero(index_type()));
             
           op2=exprt(ID_address_of, arg2.type());
           op2.move_to_operands(index_expr);

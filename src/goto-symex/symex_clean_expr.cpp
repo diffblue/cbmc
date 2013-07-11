@@ -121,7 +121,7 @@ void goto_symext::adjust_float_expressions(exprt &expr)
       ns.follow(type.subtype()).id()==ID_floatbv))
   {
     symbol_exprt rounding_mode=
-      symbol_expr(ns.lookup(CPROVER_PREFIX "rounding_mode"));
+      ns.lookup(CPROVER_PREFIX "rounding_mode").symbol_expr();
       
     rounding_mode.location()=expr.location();
   

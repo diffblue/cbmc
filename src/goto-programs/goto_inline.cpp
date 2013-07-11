@@ -76,7 +76,7 @@ void goto_inlinet::parameter_assignments(
 
       goto_programt::targett decl=dest.add_instruction();
       decl->make_decl();
-      decl->code=code_declt(symbol_expr(symbol));
+      decl->code=code_declt(symbol.symbol_expr());
       decl->code.location()=location;
       decl->location=location;
       decl->function=function_name; 

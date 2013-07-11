@@ -55,7 +55,7 @@ symbol_exprt goto_convertt::make_static_symbol(
   // The value might depend on a variable, thus
   // generate code for this.
 
-  symbol_exprt result=symbol_expr(*symbol_ptr);
+  symbol_exprt result=symbol_ptr->symbol_expr();
   result.location()=location;
   
   code_assignt code_assign(result, expr);
@@ -234,19 +234,19 @@ void goto_convertt::clean_expr(
         new_tmp_symbol(expr.type(), "if_expr", dest, location);
 
       code_assignt assignment_true;
-      assignment_true.lhs()=symbol_expr(new_symbol);
+      assignment_true.lhs()=new_symbol.symbol_expr();
       assignment_true.rhs()=if_expr.true_case();
       assignment_true.location()=location;
       convert(assignment_true, tmp_true);
 
       code_assignt assignment_false;
-      assignment_false.lhs()=symbol_expr(new_symbol);
+      assignment_false.lhs()=new_symbol.symbol_expr();
       assignment_false.rhs()=if_expr.false_case();
       assignment_false.location()=location;
       convert(assignment_false, tmp_false);
 
       // overwrites expr
-      expr=symbol_expr(new_symbol);  
+      expr=new_symbol.symbol_expr();
     }
     else
     {

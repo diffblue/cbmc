@@ -121,7 +121,8 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
       else if(resolved_expr.id()==ID_member)
       {
         symbol.value =
-          address_of_exprt(symbol_expr(lookup(resolved_expr.get(ID_component_name))));
+          address_of_exprt(
+            lookup(resolved_expr.get(ID_component_name)).symbol_expr());
 
         symbol.value.type().add("to-member") = resolved_expr.op0().type();
       }

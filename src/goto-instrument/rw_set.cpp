@@ -8,7 +8,6 @@ Date: February 2006
 
 \*******************************************************************/
 
-#include <util/expr_util.h>
 #include <util/std_expr.h>
 #include <util/std_code.h>
 #include <util/namespace.h>
@@ -199,7 +198,7 @@ void rw_set_loct::read_write_rec(
     read_write_rec(expr.op1(), r, w, suffix, true_guard);
     
     guardt false_guard(guard);
-    false_guard.add(gen_not(expr.op0()));
+    false_guard.add(not_exprt(expr.op0()));
     read_write_rec(expr.op2(), r, w, suffix, false_guard);
   }
   else
