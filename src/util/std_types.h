@@ -453,14 +453,14 @@ public:
   
   // will rename arguments -> parameters to use standard terminology
 
-  class argumentt:public exprt
+  class parametert:public exprt
   {
   public:
-    inline argumentt():exprt(ID_argument)
+    inline parametert():exprt(ID_argument)
     {
     }
     
-    explicit inline argumentt(const typet &type):exprt(ID_argument, type)
+    explicit inline parametert(const typet &type):exprt(ID_argument, type)
     {
     }
     
@@ -500,7 +500,7 @@ public:
     }
   };
   
-  typedef argumentt parametert;
+  typedef parametert argumentt;
   
   inline bool has_ellipsis() const
   {
@@ -517,8 +517,8 @@ public:
     add(ID_arguments).set(ID_ellipsis, true);
   }
 
-  typedef std::vector<argumentt> argumentst;
-  typedef std::vector<argumentt> parameterst;
+  typedef std::vector<parametert> argumentst;
+  typedef std::vector<parametert> parameterst;
 
   inline const typet &return_type() const
   {
@@ -530,24 +530,24 @@ public:
     return add_type(ID_return_type);
   }
   
-  inline const argumentst &arguments() const
+  inline const parameterst &arguments() const
   {
-    return (const argumentst &)find(ID_arguments).get_sub();
+    return (const parameterst &)find(ID_arguments).get_sub();
   }
 
-  inline argumentst &arguments()
+  inline parameterst &arguments()
   {
-    return (argumentst &)add(ID_arguments).get_sub();
+    return (parameterst &)add(ID_arguments).get_sub();
   }
   
   inline const parameterst &parameters() const
   {
-    return (const argumentst &)find(ID_arguments).get_sub();
+    return (const parameterst &)find(ID_arguments).get_sub();
   }
 
   inline parameterst &parameters()
   {
-    return (argumentst &)add(ID_arguments).get_sub();
+    return (parameterst &)add(ID_arguments).get_sub();
   }
   
   inline bool get_inlined() const
