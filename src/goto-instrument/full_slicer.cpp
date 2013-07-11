@@ -193,7 +193,7 @@ object_id_sett full_slicert::transform(cfgt::iterator e)
         {
           found=true;
           // remove what is written
-          new_set.erase(o_it2);
+          new_set.erase(*o_it2);
         }
       }
 
