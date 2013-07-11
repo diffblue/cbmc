@@ -11,8 +11,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/bitvector.h>
 #include <util/config.h>
-#include <util/expr_util.h>
 #include <util/std_types.h>
+#include <util/expr_util.h>
 #include <util/prefix.h>
 #include <util/cprover_prefix.h>
 #include <util/simplify_expr.h>
@@ -762,7 +762,7 @@ void c_typecheck_baset::typecheck_expr_symbol(exprt &expr)
   }
   else
   {
-    expr=symbol_expr(symbol);
+    expr=symbol.symbol_expr();
 
     // put it back
     expr.location()=location;

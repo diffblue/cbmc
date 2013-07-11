@@ -456,8 +456,8 @@ void goto_convertt::do_cpp_new(
   if(rhs.operands().size()==0) // no, "regular" one
   {
     // call __new or __new_array
-    exprt new_symbol=symbol_expr(
-      ns.lookup(new_array?"c::__new_array":"c::__new"));
+    exprt new_symbol=
+      ns.lookup(new_array?"c::__new_array":"c::__new").symbol_expr();
     
     const code_typet &code_type=
       to_code_type(new_symbol.type());
@@ -471,7 +471,7 @@ void goto_convertt::do_cpp_new(
     const symbolt &tmp_symbol=
       new_tmp_symbol(return_type, "new", dest, rhs.location());
     
-    tmp_symbol_expr=symbol_expr(tmp_symbol);
+    tmp_symbol_expr=tmp_symbol.symbol_expr();
     
     code_function_callt new_call;
     new_call.function()=new_symbol;
@@ -486,8 +486,8 @@ void goto_convertt::do_cpp_new(
   else if(rhs.operands().size()==1)
   {
     // call __placement_new
-    exprt new_symbol=symbol_expr(
-      ns.lookup(new_array?"c::__placement_new_array":"c::__placement_new"));
+    exprt new_symbol=
+      ns.lookup(new_array?"c::__placement_new_array":"c::__placement_new").symbol_expr();
     
     const code_typet &code_type=
       to_code_type(new_symbol.type());
@@ -500,7 +500,7 @@ void goto_convertt::do_cpp_new(
     const symbolt &tmp_symbol=
       new_tmp_symbol(return_type, "new", dest, rhs.location());
 
-    tmp_symbol_expr=symbol_expr(tmp_symbol);
+    tmp_symbol_expr=tmp_symbol.symbol_expr();
 
     code_function_callt new_call;
     new_call.function()=new_symbol;

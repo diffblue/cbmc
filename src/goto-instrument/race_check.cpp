@@ -10,7 +10,6 @@ Date: February 2006
 
 #include <util/hash_cont.h>
 #include <util/std_expr.h>
-#include <util/expr_util.h>
 #include <util/guard.h>
 #include <util/symbol_table.h>
 #include <util/prefix.h>
@@ -34,7 +33,7 @@ public:
   
   const exprt get_guard_symbol_expr(const irep_idt &object)
   {
-    return symbol_expr(get_guard_symbol(object));
+    return get_guard_symbol(object).symbol_expr();
   }
   
   const exprt get_w_guard_expr(const rw_set_baset::entryt &entry)
@@ -44,7 +43,7 @@ public:
   
   const exprt get_assertion(const rw_set_baset::entryt &entry)
   {
-    return gen_not(get_guard_symbol_expr(entry.object));
+    return not_exprt(get_guard_symbol_expr(entry.object));
   }
   
   void add_initialization(goto_programt &goto_program) const;
@@ -111,7 +110,7 @@ void w_guardst::add_initialization(goto_programt &goto_program) const
       it!=w_guards.end();
       it++)
   {
-    exprt symbol=symbol_expr(ns.lookup(*it));
+    exprt symbol=ns.lookup(*it).symbol_expr();
   
     t=goto_program.insert_before(t);
     t->type=ASSIGN;

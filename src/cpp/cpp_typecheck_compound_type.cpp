@@ -665,8 +665,8 @@ void cpp_typecheckt::typecheck_compound_declarator(
         typecast_exprt late_cast(to_code_type(component.type()).arguments()[0].type());
 
         late_cast.op0()=
-          symbol_expr(namespacet(symbol_table).lookup(
-            args[0].get(ID_C_identifier)));
+          namespacet(symbol_table).lookup(
+            args[0].get(ID_C_identifier)).symbol_expr();
         
         if(code_type.return_type().id()!=ID_empty &&
            code_type.return_type().id()!=ID_destructor)
@@ -680,8 +680,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
           for(unsigned i=1; i < args.size(); i++)
           {
             expr_call.arguments().push_back(
-              symbol_expr(namespacet(symbol_table).lookup(
-                args[i].get(ID_C_identifier))));
+              namespacet(symbol_table).lookup(args[i].get(ID_C_identifier)).symbol_expr());
           }
 
           code_returnt code_return;
@@ -699,8 +698,8 @@ void cpp_typecheckt::typecheck_compound_declarator(
           for(unsigned i=1; i < args.size(); i++)
           {
             code_func.arguments().push_back(
-              symbol_expr(namespacet(symbol_table).lookup(
-                args[i].get(ID_C_identifier))));
+              namespacet(symbol_table).lookup(
+                args[i].get(ID_C_identifier)).symbol_expr());
           }
 
           func_symb.value = code_func;

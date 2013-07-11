@@ -360,7 +360,7 @@ void cpp_typecheckt::default_cpctor(
         namespacet(symbol_table).lookup(id2string(virtual_table_symbol_type.name) + "@" +
         id2string(symbol.name));
 
-      exprt var = symbol_expr(virtual_table_symbol_var);
+      exprt var = virtual_table_symbol_var.symbol_expr();
       address_of_exprt address(var);
       assert(address.type() == mem_it->type());
 
@@ -928,7 +928,7 @@ void cpp_typecheckt::full_member_initialization(
         lookup(id2string(virtual_table_symbol_type.name) + "@" + 
             id2string(struct_type.get(ID_name)));
 
-      exprt var =symbol_expr(virtual_table_symbol_var);
+      exprt var = virtual_table_symbol_var.symbol_expr();
       address_of_exprt address(var);
       assert(address.type() == mem_it->type());
 
@@ -1247,7 +1247,7 @@ codet cpp_typecheckt::dtor(const symbolt &symb)
         namespacet(symbol_table).lookup(
           id2string(virtual_table_symbol_type.name) + "@" + id2string(symb.name));
 
-      exprt var=symbol_expr(virtual_table_symbol_var);
+      exprt var=virtual_table_symbol_var.symbol_expr();
       address_of_exprt address(var);
       assert(address.type()==cit->type());
 

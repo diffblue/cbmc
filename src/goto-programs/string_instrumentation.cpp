@@ -985,7 +985,7 @@ void string_instrumentationt::do_strerror(
 
     array_typet type;
     type.subtype()=char_type();
-    type.size()=symbol_expr(new_symbol_size);
+    type.size()=new_symbol_size.symbol_expr();
     symbolt new_symbol_buf;
     new_symbol_buf.mode=ID_C;
     new_symbol_buf.type=type;
@@ -1009,13 +1009,13 @@ void string_instrumentationt::do_strerror(
     goto_programt::targett assignment1=tmp.add_instruction(ASSIGN);
     exprt nondet_size=side_effect_expr_nondett(size_type());
 
-    assignment1->code=code_assignt(symbol_expr(symbol_size), nondet_size);
+    assignment1->code=code_assignt(symbol_size.symbol_expr(), nondet_size);
     assignment1->location=it->location;
     
     goto_programt::targett assumption1=tmp.add_instruction();
 
     assumption1->make_assumption(binary_relation_exprt(
-      symbol_expr(symbol_size), ID_notequal,
+      symbol_size.symbol_expr(), ID_notequal,
       gen_zero(symbol_size.type)));
 
     assumption1->location=it->location;
@@ -1023,7 +1023,7 @@ void string_instrumentationt::do_strerror(
 
   // return a pointer to some magic buffer
   exprt index=exprt(ID_index, char_type());
-  index.copy_to_operands(symbol_expr(symbol_buf), gen_zero(index_type()));
+  index.copy_to_operands(symbol_buf.symbol_expr(), gen_zero(index_type()));
 
   exprt ptr=exprt(ID_address_of, pointer_typet());
   ptr.type().subtype()=char_type();
@@ -1092,7 +1092,7 @@ void string_instrumentationt::invalidate_buffer(
   
   goto_programt::targett init=dest.add_instruction(ASSIGN);
   init->location=target->location;  
-  init->code=code_assignt(symbol_expr(cntr_sym), gen_zero(cntr_sym.type));
+  init->code=code_assignt(cntr_sym.symbol_expr(), gen_zero(cntr_sym.type));
   
   goto_programt::targett check=dest.add_instruction();
   check->location=target->location;  
@@ -1104,10 +1104,10 @@ void string_instrumentationt::invalidate_buffer(
   increment->location=target->location;  
   
   exprt plus(ID_plus, unsigned_int_type());
-  plus.copy_to_operands(symbol_expr(cntr_sym));
+  plus.copy_to_operands(cntr_sym.symbol_expr());
   plus.copy_to_operands(gen_one(unsigned_int_type()));
   
-  increment->code=code_assignt(symbol_expr(cntr_sym), plus);
+  increment->code=code_assignt(cntr_sym.symbol_expr(), plus);
   
   goto_programt::targett back=dest.add_instruction();
   back->location=target->location;  
@@ -1134,18 +1134,18 @@ void string_instrumentationt::invalidate_buffer(
   exprt deref(ID_dereference, buf_type.subtype());
   exprt b_plus_i(ID_plus, bufp.type());
   b_plus_i.copy_to_operands(bufp);
-  b_plus_i.copy_to_operands(symbol_expr(cntr_sym));
+  b_plus_i.copy_to_operands(cntr_sym.symbol_expr());
   deref.copy_to_operands(b_plus_i);
   
   check->make_goto(exit);
   
   if(limit==0)
     check->guard=
-          binary_relation_exprt(symbol_expr(cntr_sym), ID_ge, 
+          binary_relation_exprt(cntr_sym.symbol_expr(), ID_ge, 
                                 buffer_size(bufp));
   else
     check->guard=
-          binary_relation_exprt(symbol_expr(cntr_sym), ID_gt, 
+          binary_relation_exprt(cntr_sym.symbol_expr(), ID_gt, 
                                 from_integer(limit, unsigned_int_type()));
   
   exprt nondet=side_effect_expr_nondett(buf_type.subtype());

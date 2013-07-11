@@ -28,12 +28,12 @@ exprt gen_zero(const typet &type);
 /*! \copydoc gen_zero(const typet &) */
 exprt gen_one(const typet &type);
 /*! \copydoc gen_zero(const typet &) */
-exprt gen_not(const exprt &op);
+exprt gen_not_old(const exprt &op);
 
 /*! \copydoc gen_zero(const typet &) */
-void gen_and(exprt &expr);
+void gen_and_old(exprt &expr);
 /*! \copydoc gen_zero(const typet &) */
-void gen_or(exprt &expr);
+void gen_or_old(exprt &expr);
 
 /*! \copydoc gen_zero(const typet &) */
 symbol_exprt symbol_expr(const symbolt &symbol);

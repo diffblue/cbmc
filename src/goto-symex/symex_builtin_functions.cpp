@@ -137,9 +137,9 @@ void goto_symext::symex_malloc(
       new_symbol_table.add(size_symbol);
 
       guardt guard;
-      symex_assign_rec(state, symbol_expr(size_symbol), nil_exprt(), size, guard, VISIBLE);
+      symex_assign_rec(state, size_symbol.symbol_expr(), nil_exprt(), size, guard, VISIBLE);
 
-      size=symbol_expr(size_symbol);
+      size=size_symbol.symbol_expr();
     }
   }
   
@@ -161,13 +161,13 @@ void goto_symext::symex_malloc(
   {
     rhs.type()=pointer_typet(value_symbol.type.subtype());
     index_exprt index_expr(value_symbol.type.subtype());
-    index_expr.array()=symbol_expr(value_symbol);
+    index_expr.array()=value_symbol.symbol_expr();
     index_expr.index()=gen_zero(index_type());
     rhs.op0()=index_expr;
   }
   else
   {
-    rhs.op0()=symbol_expr(value_symbol);
+    rhs.op0()=value_symbol.symbol_expr();
     rhs.type()=pointer_typet(value_symbol.type);
   }
   
@@ -483,11 +483,11 @@ void goto_symext::symex_cpp_new(
   if(do_array)
   {
     exprt index_expr(ID_index, code.type().subtype());
-    index_expr.copy_to_operands(symbol_expr(symbol), gen_zero(index_type()));
+    index_expr.copy_to_operands(symbol.symbol_expr(), gen_zero(index_type()));
     rhs.move_to_operands(index_expr);
   }
   else
-    rhs.copy_to_operands(symbol_expr(symbol));
+    rhs.copy_to_operands(symbol.symbol_expr());
   
   state.rename(rhs, ns);
 

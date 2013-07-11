@@ -90,7 +90,7 @@ void goto_symext::argument_assignments(
       throw "no identifier for function argument";
 
     const symbolt &symbol=ns.lookup(identifier);
-    symbol_exprt lhs=symbol_expr(symbol);
+    symbol_exprt lhs=symbol.symbol_expr();
 
     if(it1->is_nil())
     {

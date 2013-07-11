@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "arith_tools.h"
 #include "pointer_offset_size.h"
 #include "config.h"
+#include "symbol.h"
 
 #include "pointer_predicates.h"
 
@@ -85,7 +86,7 @@ exprt malloc_object(const exprt &pointer, const namespacet &ns)
   // we check __CPROVER_malloc_object!
   const symbolt &malloc_object_symbol=ns.lookup(CPROVER_PREFIX "malloc_object");
 
-  return same_object(pointer, symbol_expr(malloc_object_symbol));
+  return same_object(pointer, malloc_object_symbol.symbol_expr());
 }
 
 /*******************************************************************\
@@ -105,7 +106,7 @@ exprt deallocated(const exprt &pointer, const namespacet &ns)
   // we check __CPROVER_deallocated!
   const symbolt &deallocated_symbol=ns.lookup(CPROVER_PREFIX "deallocated");
 
-  return same_object(pointer, symbol_expr(deallocated_symbol));
+  return same_object(pointer, deallocated_symbol.symbol_expr());
 }
 
 /*******************************************************************\
@@ -122,7 +123,7 @@ Function: dynamic_size
 
 exprt dynamic_size(const namespacet &ns)
 {
-  return symbol_expr(ns.lookup(CPROVER_PREFIX "malloc_size"));
+  return ns.lookup(CPROVER_PREFIX "malloc_size").symbol_expr();
 }
 
 /*******************************************************************\

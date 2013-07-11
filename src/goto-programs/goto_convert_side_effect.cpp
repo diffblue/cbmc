@@ -397,7 +397,7 @@ void goto_convertt::remove_function_call(
   
   {
     code_declt decl;
-    decl.symbol()=symbol_expr(new_symbol);
+    decl.symbol()=new_symbol.symbol_expr();
     decl.location()=new_symbol.location;
     convert_decl(decl, dest);
   }
@@ -405,14 +405,14 @@ void goto_convertt::remove_function_call(
   {
     goto_programt tmp_program2;
     code_function_callt call;
-    call.lhs()=symbol_expr(new_symbol);
+    call.lhs()=new_symbol.symbol_expr();
     call.function()=expr.op0();
     call.arguments()=expr.op1().operands();
     call.location()=new_symbol.location;
     convert_function_call(call, dest);
   }
 
-  static_cast<exprt &>(expr)=symbol_expr(new_symbol);
+  static_cast<exprt &>(expr)=new_symbol.symbol_expr();
 }
 
 /*******************************************************************\
@@ -468,10 +468,10 @@ void goto_convertt::remove_cpp_new(
   new_name(new_symbol);
   tmp_symbols.push_back(new_symbol.name);
 
-  call=code_assignt(symbol_expr(new_symbol), expr);
+  call=code_assignt(new_symbol.symbol_expr(), expr);
 
   if(result_is_used)
-    static_cast<exprt &>(expr)=symbol_expr(new_symbol);
+    static_cast<exprt &>(expr)=new_symbol.symbol_expr();
   else
     expr.make_nil();
 
@@ -541,9 +541,9 @@ void goto_convertt::remove_malloc(
     new_name(new_symbol);
     tmp_symbols.push_back(new_symbol.name);
 
-    call=code_assignt(symbol_expr(new_symbol), expr);
+    call=code_assignt(new_symbol.symbol_expr(), expr);
     
-    static_cast<exprt &>(expr)=symbol_expr(new_symbol);
+    static_cast<exprt &>(expr)=new_symbol.symbol_expr();
   }
   else
   {
@@ -584,7 +584,7 @@ void goto_convertt::remove_temporary_object(
   {
     codet assignment(ID_assign);
     assignment.reserve_operands(2);
-    assignment.copy_to_operands(symbol_expr(new_symbol));
+    assignment.copy_to_operands(new_symbol.symbol_expr());
     assignment.move_to_operands(expr.op0());
 
     convert(assignment, dest);
@@ -594,12 +594,12 @@ void goto_convertt::remove_temporary_object(
   {
     assert(expr.operands().empty());
     exprt initializer=static_cast<const exprt &>(expr.find(ID_initializer));
-    replace_new_object(symbol_expr(new_symbol), initializer);
+    replace_new_object(new_symbol.symbol_expr(), initializer);
 
     convert(to_code(initializer), dest);
   }
 
-  static_cast<exprt &>(expr)=symbol_expr(new_symbol);  
+  static_cast<exprt &>(expr)=new_symbol.symbol_expr();
 }
 
 /*******************************************************************\

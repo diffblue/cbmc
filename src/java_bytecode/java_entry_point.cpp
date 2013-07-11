@@ -140,7 +140,7 @@ bool java_entry_point(
   
   code_function_callt call_main;
   call_main.location()=symbol.location;
-  call_main.function()=symbol_expr(symbol);
+  call_main.function()=symbol.symbol_expr();
 
   const code_typet::argumentst &arguments=
     to_code_type(symbol.type).arguments();

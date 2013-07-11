@@ -136,7 +136,7 @@ void invariant_propagationt::get_objects(
 {
   std::list<exprt> object_list;
 
-  get_objects_rec(symbol_expr(symbol), object_list);
+  get_objects_rec(symbol.symbol_expr(), object_list);
   
   for(std::list<exprt>::const_iterator
       it=object_list.begin();
