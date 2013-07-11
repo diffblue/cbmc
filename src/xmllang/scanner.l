@@ -79,7 +79,7 @@ string		\"([^"&]|{esc})*\"|\'([^'&]|{esc})*\'
 <DTD>.   {/* skip */}
 <DTD>\]{close}    {BEGIN(INITIAL); /* skip */}
 
-.			{ yyxmlerror("unexpected charater"); }
+.			{ yyxmlerror("unexpected character"); }
 {nl}			{/* skip, must be an extra one at EOF */;}
 
 %%
