@@ -1252,6 +1252,7 @@ public:
     op[3]=op3;
   }
 
+  // deprecated, use conjunction()
   and_exprt(const exprt::operandst &op):exprt(ID_and, bool_typet())
   {
     if(op.empty())
@@ -1262,6 +1263,8 @@ public:
       operands()=op;
   }
 };
+
+exprt conjunction(const exprt::operandst &op);
 
 /*! \brief Cast a generic exprt to a \ref typecast_exprt
  *
@@ -1357,6 +1360,7 @@ public:
     op[3]=op3;
   }
 
+  // obsolete, use disjunction()
   or_exprt(const exprt::operandst &op):exprt(ID_or, bool_typet())
   {
     if(op.empty())
@@ -1367,6 +1371,8 @@ public:
       operands()=op;
   }
 };
+
+exprt disjunction(const exprt::operandst &op);
 
 /*! \brief Cast a generic exprt to a \ref or_exprt
  *
