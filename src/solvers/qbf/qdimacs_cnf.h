@@ -71,12 +71,12 @@ public:
 
   inline void add_existential_quantifier(const literalt l)
   {
-    add_quantifier(quantifiert(EXISTENTIAL, l));
+    add_quantifier(quantifiert(quantifiert::EXISTENTIAL, l));
   }
 
   inline void add_universal_quantifier(const literalt l)
   {
-    add_quantifier(quantifiert(UNIVERSAL, l));
+    add_quantifier(quantifiert(quantifiert::UNIVERSAL, l));
   }
 
   bool is_quantified(const literalt l) const;
