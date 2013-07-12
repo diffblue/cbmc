@@ -6,8 +6,9 @@ VERSION=`./cbmc --version`
 echo $VERSION_FILE
 
 mkdir /tmp/cbmc-dist
-( cd /tmp/cbmc-dist; svn export http://www.cprover.org/svn/cbmc/releases/cbmc-${VERSION} cbmc-src )
-( tar cfz cbmc-${VERSION}.tgz cbmc-src )
+cd /tmp/cbmc-dist
+svn export http://www.cprover.org/svn/cbmc/releases/cbmc-${VERSION} cbmc-src
+tar cfz cbmc-${VERSION}.tgz cbmc-src/
 
 echo Copying.
 scp cbmc-${VERSION}.tgz \
