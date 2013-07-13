@@ -77,10 +77,10 @@ void goto_trace_stept::output(
   if(type==ASSERT || type==ASSUME)
     out << " (" << cond_value << ")";
 
-  out << std::endl;
+  out << "\n";
 
   if(!pc->location.is_nil())
-    out << pc->location << std::endl;
+    out << pc->location << "\n";
 
   if(pc->is_goto())
     out << "GOTO   ";
@@ -101,31 +101,31 @@ void goto_trace_stept::output(
   else
     out << "(?)    ";
 
-  out << std::endl;
+  out << "\n";
 
   if(pc->is_other() || pc->is_assign())
   {
     irep_idt identifier=lhs_object.get_identifier();
     out << "  " << identifier
         << " = " << from_expr(ns, identifier, lhs_object_value)
-        << std::endl;
+        << "\n";
   }
   else if(pc->is_assert())
   {
     if(!cond_value)
     {
-      out << "Violated property:" << std::endl;
+      out << "Violated property:" << "\n";
       if(pc->location.is_nil())
-        out << "  " << pc->location << std::endl;
+        out << "  " << pc->location << "\n";
       
       if(comment!="")
-        out << "  " << comment << std::endl;
-      out << "  " << from_expr(ns, "", pc->guard) << std::endl;
-      out << std::endl;
+        out << "  " << comment << "\n";
+      out << "  " << from_expr(ns, "", pc->guard) << "\n";
+      out << "\n";
     }
   }
   
-  out << std::endl;
+  out << "\n";
 }
 
 /*******************************************************************\
@@ -231,7 +231,7 @@ void counterexample_value(
   out << "  "
       << from_expr(ns, identifier, full_lhs)
       << "=" << value_string
-      << std::endl;
+      << "\n";
 }
 
 /*******************************************************************\
@@ -252,7 +252,7 @@ void show_state_header(
   const locationt &location,
   unsigned step_nr)
 {
-  out << std::endl;
+  out << "\n";
   
   if(step_nr==0)
     out << "Initial State";
@@ -260,8 +260,8 @@ void show_state_header(
     out << "State " << step_nr;
   
   out << " " << location
-      << " thread " << state.thread_nr << std::endl;
-  out << "----------------------------------------------------" << std::endl;
+      << " thread " << state.thread_nr << "\n";
+  out << "----------------------------------------------------" << "\n";
 }
 
 /*******************************************************************\
@@ -318,16 +318,16 @@ void show_goto_trace(
     case goto_trace_stept::ASSERT:
       if(!it->cond_value)
       {
-        out << std::endl;
-        out << "Violated property:" << std::endl;
+        out << "\n";
+        out << "Violated property:" << "\n";
         if(!it->pc->location.is_nil())
-          out << "  " << it->pc->location << std::endl;
-        out << "  " << it->comment << std::endl;
+          out << "  " << it->pc->location << "\n";
+        out << "  " << it->comment << "\n";
 
         if(it->pc->is_assert())
-          out << "  " << from_expr(ns, "", it->pc->guard) << std::endl;
+          out << "  " << from_expr(ns, "", it->pc->guard) << "\n";
         
-        out << std::endl;
+        out << "\n";
       }
       break;
       
@@ -375,7 +375,7 @@ void show_goto_trace(
         printf_formattert printf_formatter(ns);
         printf_formatter(id2string(it->format_string), it->io_args);
         printf_formatter.print(out);
-        out << std::endl;
+        out << "\n";
       }
       else
       {
@@ -394,7 +394,7 @@ void show_goto_trace(
           out << " (" << counterexample_value_binary(*l_it, ns) << ")";
         }
       
-        out << std::endl;
+        out << "\n";
       }
       break;
 
@@ -414,7 +414,7 @@ void show_goto_trace(
         out << " (" << counterexample_value_binary(*l_it, ns) << ")";
       }
       
-      out << std::endl;
+      out << "\n";
       break;
       
     case goto_trace_stept::FUNCTION_CALL:
