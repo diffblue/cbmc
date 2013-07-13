@@ -641,6 +641,6 @@ void prop_convt::print_assignment(std::ostream &out) const
   for(symbolst::const_iterator it=symbols.begin();
       it!=symbols.end();
       it++)
-    out << it->first << " = " << prop.l_get(it->second) << std::endl;
+    out << it->first << " = " << prop.l_get(it->second) << "\n";
 }
 

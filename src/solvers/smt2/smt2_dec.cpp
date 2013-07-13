@@ -512,12 +512,12 @@ decision_proceduret::resultt smt2_dect::read_result_z3(std::istream &in)
     std::string value=values[conv_id];
     if(value=="") continue;
 
-//    std::cout << it->first << " := " << value << std::endl;
+//    std::cout << it->first << " := " << value << "\n";
 
     exprt e;
     if(string_to_expr_z3(it->second.type, value, e))
     {
-//      std::cout << "E: " << e << std::endl;
+//      std::cout << "E: " << e << "\n";
       it->second.value=e;
     }
     else
@@ -593,7 +593,7 @@ bool smt2_dect::string_to_expr_z3(
   }
   else if(value.substr(0,6)=="(store")
   {
-//    std::cout << "STR: " << value << std::endl;
+//    std::cout << "STR: " << value << "\n";
 
     size_t p1=value.rfind(' ')+1;
     size_t p2=value.rfind(' ', p1-2)+1;
@@ -604,9 +604,9 @@ bool smt2_dect::string_to_expr_z3(
     std::string inx = value.substr(p2, p1-p2-1);
     std::string array = value.substr(7, p2-8);
 
-//    std::cout << "ELEM: " << elem << std::endl;
-//    std::cout << "INX: " << inx << std::endl;
-//    std::cout << "ARR: " << array << std::endl;
+//    std::cout << "ELEM: " << elem << "\n";
+//    std::cout << "INX: " << inx << "\n";
+//    std::cout << "ARR: " << array << "\n";
 
     exprt old;
     if(!string_to_expr_z3(type, array, old)) return false;
@@ -719,7 +719,7 @@ decision_proceduret::resultt smt2_dect::read_result_cvc3(std::istream &in)
             std::string t=var; var=val; val=t;
           }
 
-//          std::cout << "OPS: " << ops << std::endl;
+//          std::cout << "OPS: " << ops << "\n";
         }
         else if(line.substr(pos+1,3)=="not")
         {
@@ -733,8 +733,8 @@ decision_proceduret::resultt smt2_dect::read_result_cvc3(std::istream &in)
           val = "true";
         }
 
-//        std::cout << "VAR: " << var << std::endl;
-//        std::cout << "VAL: " << val << std::endl;
+//        std::cout << "VAR: " << var << "\n";
+//        std::cout << "VAL: " << val << "\n";
 
         values[var]=val;
       }
@@ -751,7 +751,7 @@ decision_proceduret::resultt smt2_dect::read_result_cvc3(std::istream &in)
     std::string value=values[conv_id];
     if(value=="") continue;
 
-//    std::cout << it->first << " := " << value << std::endl;
+//    std::cout << it->first << " := " << value << "\n";
 
     if(value.substr(0,2)=="bv")
     {

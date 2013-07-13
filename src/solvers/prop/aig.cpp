@@ -187,14 +187,14 @@ void aigt::output_dot_node(
 
   if(node.is_and())
   {
-    out << v << " [label=\"" << v << "\"]" << std::endl;
+    out << v << " [label=\"" << v << "\"]" << "\n";
     output_dot_edge(out, v, node.a);
     output_dot_edge(out, v, node.b);
   }
   else // the node is a terminal
   {
     out << v << " [label=\"" << dot_label(v) << "\""
-        << ",shape=box]" << std::endl;
+        << ",shape=box]" << "\n";
   }
 }
 
@@ -230,7 +230,7 @@ void aigt::output_dot_edge(
     if(l.sign()) out << " [arrowhead=odiamond]";
   }
 
-  out << std::endl;
+  out << "\n";
 }
 
 /*******************************************************************\
@@ -248,7 +248,7 @@ Function: aigt::output_dot
 void aigt::output_dot(std::ostream& out) const
 {
   // constant TRUE
-  out << "TRUE [label=\"TRUE\", shape=box]" << std::endl;
+  out << "TRUE [label=\"TRUE\", shape=box]" << "\n";
 
   // now the nodes
   for(unsigned n=0; n<number_of_nodes(); n++)
@@ -275,7 +275,7 @@ void aigt::print(std::ostream &out) const
     literalt l;
     l.set(n, false);
     print(out, l);
-    out << std::endl;
+    out << "\n";
   }
 }
 

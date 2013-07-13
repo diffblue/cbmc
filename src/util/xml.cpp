@@ -89,7 +89,7 @@ void xmlt::output(std::ostream &out, unsigned indent) const
 
   if(elements.empty() && data.empty())
   {
-    out << "/>" << std::endl;;
+    out << "/>" << "\n";
     return;
   }
 
@@ -99,7 +99,7 @@ void xmlt::output(std::ostream &out, unsigned indent) const
     escape(data, out);
   else
   {
-    out << std::endl;
+    out << "\n";
 
     for(elementst::const_iterator
         it=elements.begin();
@@ -110,7 +110,7 @@ void xmlt::output(std::ostream &out, unsigned indent) const
     do_indent(out, indent);
   }
 
-  out << '<' << '/' << name << '>' << std::endl;
+  out << '<' << '/' << name << '>' << "\n";
 }
 
 /*******************************************************************\

@@ -557,15 +557,15 @@ literalt smt2_convt::convert(const exprt &expr)
   else if(expr.is_false())
     return const_literal(false);
 
-  smt2_prop.out << std::endl;
+  smt2_prop.out << "\n";
 
   find_symbols(expr);
 
   literalt l=smt2_prop.define_new_variable();
-  smt2_prop.out << "; convert " << std::endl
+  smt2_prop.out << "; convert " << "\n"
                 << " ";
   convert_expr(expr);
-  smt2_prop.out << ")" << std::endl;
+  smt2_prop.out << ")" << "\n";
 
   return l;
 }
@@ -3091,7 +3091,7 @@ void smt2_convt::set_to(const exprt &expr, bool value)
 
     core_map[core_name] = expr;
 
-    smt2_prop.out << ")" << std::endl;
+    smt2_prop.out << ")" << "\n";
 
     return;    
   }
@@ -3116,7 +3116,7 @@ void smt2_convt::set_to(const exprt &expr, bool value)
     return set_to(expr.op0(), !value);
   }
 
-  smt2_prop.out << std::endl;
+  smt2_prop.out << "\n";
 
   assert(expr.type().id()==ID_bool);
   
@@ -3144,7 +3144,7 @@ void smt2_convt::set_to(const exprt &expr, bool value)
         std::string smt2_identifier=convert_identifier(identifier);
         smt2_prop.smt2_identifiers.insert(smt2_identifier);
 
-        smt2_prop.out << "(define-fun ; set_to true" << std::endl
+        smt2_prop.out << "(define-fun ; set_to true" << "\n"
                       << " " << smt2_identifier
                       << " () ";
 
@@ -3152,7 +3152,7 @@ void smt2_convt::set_to(const exprt &expr, bool value)
         smt2_prop.out << " ";
         convert_expr(equal_expr.rhs());
 
-        smt2_prop.out << ")" << std::endl;
+        smt2_prop.out << ")" << "\n";
         return; // done
       }
     }
@@ -3162,11 +3162,11 @@ void smt2_convt::set_to(const exprt &expr, bool value)
 
   #if 0
   smt2_prop.out << "; CONV: "
-                << from_expr(expr) << std::endl;
+                << from_expr(expr) << "\n";
   #endif
 
   smt2_prop.out << "(assert ; set_to "
-                << (value?"true":"false") << std::endl
+                << (value?"true":"false") << "\n"
                 << " ";
 
   if(!value)
@@ -3178,7 +3178,7 @@ void smt2_convt::set_to(const exprt &expr, bool value)
   else
     convert_expr(expr);
 
-  smt2_prop.out << ")" << std::endl;
+  smt2_prop.out << ")" << "\n";
 
   return;
 }
@@ -3230,7 +3230,7 @@ void smt2_convt::find_symbols(const exprt &expr)
                     << smt2_identifier
                     << " () ";
       convert_type(expr.type());
-      smt2_prop.out << ")" << std::endl;
+      smt2_prop.out << ")" << "\n";
     }
   }
   else if(expr.id()==ID_array_of)
@@ -3238,10 +3238,10 @@ void smt2_convt::find_symbols(const exprt &expr)
     if(defined_expressions.find(expr)==defined_expressions.end())
     {
       irep_idt id="array_of."+i2string(defined_expressions.size());
-      smt2_prop.out << "; the following is a substitute for lambda i. x" << std::endl;
+      smt2_prop.out << "; the following is a substitute for lambda i. x" << "\n";
       smt2_prop.out << "(declare-fun " << id << " () ";
       convert_type(expr.type());
-      smt2_prop.out << ")" << std::endl;
+      smt2_prop.out << ")" << "\n";
 
       // use a quantifier instead of the lambda
       #if 0 // not really working in any sover yet!
@@ -3249,7 +3249,7 @@ void smt2_convt::find_symbols(const exprt &expr)
       convert_type(array_index_type());
       smt2_prop.out << ")) (= (select " << id << " i) ";
       convert_expr(expr.op0());
-      smt2_prop.out << ")))" << std::endl;
+      smt2_prop.out << ")))" << "\n";
       #endif
 
       defined_expressions[expr]=id;
@@ -3260,17 +3260,17 @@ void smt2_convt::find_symbols(const exprt &expr)
     if(defined_expressions.find(expr)==defined_expressions.end())
     {
       irep_idt id="array."+i2string(defined_expressions.size());
-      smt2_prop.out << "; the following is a substitute for an array constructor" << std::endl;
+      smt2_prop.out << "; the following is a substitute for an array constructor" << "\n";
       smt2_prop.out << "(declare-fun " << id << " () ";
       convert_type(expr.type());
-      smt2_prop.out << ")" << std::endl;
+      smt2_prop.out << ")" << "\n";
 
       for(unsigned i=0; i<expr.operands().size(); i++)
       {
         smt2_prop.out << "(assert (= (select " << id 
                       << " (_ bv" << i << " " << array_index_bits << ")) ";
         convert_expr(expr.operands()[i]);
-        smt2_prop.out << "))" << std::endl;
+        smt2_prop.out << "))" << "\n";
       }
 
       defined_expressions[expr]=id;
@@ -3284,17 +3284,17 @@ void smt2_convt::find_symbols(const exprt &expr)
       exprt tmp=to_string_constant(expr).to_array_expr();
 
       irep_idt id="string."+i2string(defined_expressions.size());
-      smt2_prop.out << "; the following is a substitute for a string" << std::endl;
+      smt2_prop.out << "; the following is a substitute for a string" << "\n";
       smt2_prop.out << "(declare-fun " << id << " () ";
       convert_type(expr.type());
-      smt2_prop.out << ")" << std::endl;
+      smt2_prop.out << ")" << "\n";
 
       for(unsigned i=0; i<tmp.operands().size(); i++)
       {
         smt2_prop.out << "(assert (= (select " << id 
                       << " (_ bv" << i << " " << array_index_bits << ")) ";
         convert_expr(tmp.operands()[i]);
-        smt2_prop.out << "))" << std::endl;
+        smt2_prop.out << "))" << "\n";
       }
 
       defined_expressions[expr]=id;
@@ -3489,7 +3489,7 @@ void smt2_convt::find_symbols_rec(
          smt2_prop.out << ") ";
        }
 
-       smt2_prop.out << "))))" << std::endl;
+       smt2_prop.out << "))))" << "\n";
 
        // Let's also declare some convenience functions to update members of
        // the struct whil we're at it.  The functions are named like
@@ -3530,10 +3530,10 @@ void smt2_convt::find_symbols_rec(
            }
          }
 
-         smt2_prop.out << "))" << std::endl;
+         smt2_prop.out << "))" << "\n";
        }
 
-       smt2_prop.out << std::endl;
+       smt2_prop.out << "\n";
      }
    }
    else if(type.id()==ID_union)
