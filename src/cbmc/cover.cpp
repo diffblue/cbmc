@@ -123,7 +123,7 @@ void bmct::cover_assertions(const goto_functionst &goto_functions)
       xml_result.set_attribute("status",
         g_it->covered?"COVERED":"NOT_COVERED");
       
-      std::cout << xml_result << std::endl;
+      std::cout << xml_result << "\n";
     }
     else
     {

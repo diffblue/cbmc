@@ -155,7 +155,7 @@ bool bmct::all_claims(const goto_functionst &goto_functions)
       xml_result.set_attribute("status",
         g_it->covered?"FAILURE":"SUCCESS");
     
-      std::cout << xml_result << std::endl;
+      std::cout << xml_result << "\n";
     }
     else
     {
