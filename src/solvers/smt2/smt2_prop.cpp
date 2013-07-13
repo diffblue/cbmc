@@ -33,17 +33,17 @@ smt2_propt::smt2_propt(
   out(_out),
   core_enabled(_core_enabled)
 {
-  out << "; SMT 2" << std::endl;
+  out << "; SMT 2" << "\n";
   
-  out << "(set-info :source \"" << source << "\")" << std::endl;
-  out << "(set-option :produce-models true)" << std::endl;
+  out << "(set-info :source \"" << source << "\")" << "\n";
+  out << "(set-option :produce-models true)" << "\n";
 
   if (core_enabled)
   {
-    out << "(set-option :produce-unsat-cores true)" << std::endl;
+    out << "(set-option :produce-unsat-cores true)" << "\n";
   }
 
-  out << "(set-logic " << logic << ")" << std::endl;
+  out << "(set-logic " << logic << ")" << "\n";
 
   _no_variables=0;
 }
@@ -78,22 +78,22 @@ Function: smt2_propt::finalize
 
 void smt2_propt::finalize()
 {
-  out << std::endl;
-  out << "(check-sat)" << std::endl;
-  out << std::endl;
+  out << "\n";
+  out << "(check-sat)" << "\n";
+  out << "\n";
   
   for(smt2_identifierst::const_iterator
       it=smt2_identifiers.begin();
       it!=smt2_identifiers.end();
       it++)
-    out << "(get-value (" << *it << "))" << std::endl;
+    out << "(get-value (" << *it << "))" << "\n";
   
-  out << std::endl;
+  out << "\n";
 
   if(core_enabled)
-    out << "(get-unsat-core)" << std::endl;
+    out << "(get-unsat-core)" << "\n";
   
-  out << "; end of SMT2 file" << std::endl;
+  out << "; end of SMT2 file" << "\n";
 }
 
 /*******************************************************************\
@@ -110,17 +110,17 @@ Function: smt2_propt::land
 
 literalt smt2_propt::land(const bvt &bv)
 {
-  out << std::endl;
+  out << "\n";
 
   literalt l=define_new_variable();
 
-  out << "; land" << std::endl;
+  out << "; land" << "\n";
   out << " (and";
   
   forall_literals(it, bv)
     out << " " << smt2_literal(*it);
 
-  out << "))" << std::endl;
+  out << "))" << "\n";
 
   return l;
 }
@@ -139,17 +139,17 @@ Function: smt2_propt::lor
 
 literalt smt2_propt::lor(const bvt &bv)
 {
-  out << std::endl;
+  out << "\n";
 
   literalt l=define_new_variable();
 
-  out << "; lor" << std::endl;
+  out << "; lor" << "\n";
   out << " (or";
 
   forall_literals(it, bv)
     out << " " << smt2_literal(*it);
 
-  out << "))" << std::endl;
+  out << "))" << "\n";
 
   return l;
 }
@@ -171,17 +171,17 @@ literalt smt2_propt::lxor(const bvt &bv)
   if(bv.size()==0) return const_literal(false);
   if(bv.size()==1) return bv[0];
 
-  out << std::endl;
+  out << "\n";
 
   literalt l=define_new_variable();
 
-  out << "; lxor" << std::endl;
+  out << "; lxor" << "\n";
   out << " (xor";
 
   forall_literals(it, bv)
     out << " " << smt2_literal(*it);
 
-  out << "))" << std::endl;
+  out << "))" << "\n";
 
   return l;
 }
@@ -206,15 +206,15 @@ literalt smt2_propt::land(literalt a, literalt b)
   if(b==const_literal(false)) return const_literal(false);
   if(a==b) return a;
 
-  out << std::endl;
+  out << "\n";
 
   literalt l=define_new_variable();
 
-  out << "; land" << std::endl;
+  out << "; land" << "\n";
   out << " (and";
   out << " " << smt2_literal(a);
   out << " " << smt2_literal(b);
-  out << "))" << std::endl;
+  out << "))" << "\n";
 
   return l;
 }
@@ -239,15 +239,15 @@ literalt smt2_propt::lor(literalt a, literalt b)
   if(b==const_literal(true)) return const_literal(true);
   if(a==b) return a;
   
-  out << std::endl;
+  out << "\n";
 
   literalt l=define_new_variable();
 
-  out << "; lor" << std::endl;
+  out << "; lor" << "\n";
   out << " (or";
   out << " " << smt2_literal(a);
   out << " " << smt2_literal(b);
-  out << "))" << std::endl;
+  out << "))" << "\n";
 
   return l;
 }
@@ -289,15 +289,15 @@ literalt smt2_propt::lxor(literalt a, literalt b)
   if(a==const_literal(true)) return lnot(b);
   if(b==const_literal(true)) return lnot(a);
 
-  out << std::endl;
+  out << "\n";
 
   literalt l=new_variable();
 
-  out << "; lxor" << std::endl;
+  out << "; lxor" << "\n";
   out << " (xor";
   out << " " << smt2_literal(a);
   out << " " << smt2_literal(b);
-  out << "))" << std::endl;
+  out << "))" << "\n";
 
   return l;
 }
@@ -393,14 +393,14 @@ literalt smt2_propt::lselect(literalt a, literalt b, literalt c)
   if(a==const_literal(true)) return lnot(b);
   if(b==const_literal(true)) return lnot(a);
 
-  out << std::endl;
+  out << "\n";
 
   literalt l=define_new_variable();
 
-  out << "; lselect" << std::endl;
+  out << "; lselect" << "\n";
   out << " (if_then_else "
       << smt2_literal(a) << " " << smt2_literal(b) << " "
-      << smt2_literal(c) << "))" << std::endl;
+      << smt2_literal(c) << "))" << "\n";
 
   return l;
 }
@@ -423,7 +423,7 @@ literalt smt2_propt::new_variable()
   l.set(_no_variables, false);
   _no_variables++;
   
-  out << "(declare-fun " << smt2_literal(l) << " () Bool)" << std::endl;
+  out << "(declare-fun " << smt2_literal(l) << " () Bool)" << "\n";
 
   return l;
 }
@@ -467,8 +467,8 @@ Function: smt2_propt::lcnf
 
 void smt2_propt::lcnf(const bvt &bv)
 {
-  out << std::endl;
-  out << "(assert ; lcnf" << std::endl;
+  out << "\n";
+  out << "(assert ; lcnf" << "\n";
   out << " ";
 
   if(bv.empty())
@@ -485,7 +485,7 @@ void smt2_propt::lcnf(const bvt &bv)
     out << ")";
   }
 
-  out << ")" <<  std::endl;
+  out << ")" <<  "\n";
 }
 
 /*******************************************************************\

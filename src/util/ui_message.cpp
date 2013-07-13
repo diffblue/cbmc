@@ -33,8 +33,8 @@ ui_message_handlert::ui_message_handlert(
   switch(__ui)
   {
   case XML_UI:
-    std::cout << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << std::endl;
-    std::cout << "<cprover>" << std::endl;
+    std::cout << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << "\n";
+    std::cout << "<cprover>" << "\n";
     
     {
       xmlt program_xml;
@@ -67,7 +67,7 @@ Function: ui_message_handlert::~ui_message_handlert
 ui_message_handlert::~ui_message_handlert()
 {
   if(get_ui()==XML_UI)
-    std::cout << "</cprover>" << std::endl;
+    std::cout << "</cprover>" << "\n";
 }
 
 /*******************************************************************\
@@ -178,11 +178,11 @@ void ui_message_handlert::old_gui_msg(
   const std::string &msg2,
   const locationt &location)
 {
-  std::cout << type   << std::endl
-            << msg1   << std::endl
-            << msg2   << std::endl
-            << location.get_file() << std::endl
-            << location.get_line() << std::endl
+  std::cout << type   << "\n"
+            << msg1   << "\n"
+            << msg2   << "\n"
+            << location.get_file() << "\n"
+            << location.get_line() << "\n"
             << location.get_column() << std::endl;
 }
 

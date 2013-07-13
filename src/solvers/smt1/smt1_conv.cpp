@@ -502,15 +502,15 @@ literalt smt1_convt::convert(const exprt &expr)
   else if(expr.is_false())
     return const_literal(false);
 
-  smt1_prop.out << std::endl;
+  smt1_prop.out << "\n";
 
   find_symbols(expr);
 
   literalt l=smt1_prop.new_variable();
-  smt1_prop.out << ":assumption ; convert " << std::endl
+  smt1_prop.out << ":assumption ; convert " << "\n"
                 << " (iff " << smt1_prop.smt1_literal(l) << " ";
   convert_expr(expr, false);
-  smt1_prop.out << ")" << std::endl;
+  smt1_prop.out << ")" << "\n";
 
   return l;
 }
@@ -3019,17 +3019,17 @@ void smt1_convt::set_to(const exprt &expr, bool value)
     return set_to(expr.op0(), !value);
   }
 
-  smt1_prop.out << std::endl;
+  smt1_prop.out << "\n";
 
   find_symbols(expr);
 
   #if 0
   smt1_prop.out << "; CONV: "
-                << from_expr(expr) << std::endl;
+                << from_expr(expr) << "\n";
   #endif
 
   smt1_prop.out << ":assumption ; set_to "
-                << (value?"true":"false") << std::endl
+                << (value?"true":"false") << "\n"
                 << " ";
 
   assert(expr.type().id()==ID_bool);
@@ -3043,7 +3043,7 @@ void smt1_convt::set_to(const exprt &expr, bool value)
   else
     convert_expr(expr, false);
 
-  smt1_prop.out << std::endl;
+  smt1_prop.out << "\n";
 }
 
 /*******************************************************************\
@@ -3104,7 +3104,7 @@ void smt1_convt::find_symbols(const exprt &expr)
       {
         smt1_prop.out << ":extrapreds(("
                       << convert_identifier(identifier)
-                      << "))" << std::endl;
+                      << "))" << "\n";
       }
       else
       {
@@ -3112,7 +3112,7 @@ void smt1_convt::find_symbols(const exprt &expr)
                       << convert_identifier(identifier)
                       << " ";
         convert_type(type);
-        smt1_prop.out << "))" << std::endl;
+        smt1_prop.out << "))" << "\n";
       }
     }
   }
@@ -3121,12 +3121,12 @@ void smt1_convt::find_symbols(const exprt &expr)
     if(array_of_map.find(expr)==array_of_map.end())
     {
       irep_idt id="array_of'"+i2string(array_of_map.size());
-      smt1_prop.out << "; the following is a poor substitute for lambda i. x" << std::endl;
+      smt1_prop.out << "; the following is a poor substitute for lambda i. x" << "\n";
       smt1_prop.out << ":extrafuns(("
                     << id
                     << " ";
       convert_type(type);
-      smt1_prop.out << "))" << std::endl;
+      smt1_prop.out << "))" << "\n";
 
       // we can initialize array_ofs if they have
       // a constant size and a constant element
@@ -3144,7 +3144,7 @@ void smt1_convt::find_symbols(const exprt &expr)
             smt1_prop.out << ":assumption (= (select " << id << " bv" <<
              i << "[" << array_index_bits << "]) ";
             convert_expr(expr.op0(), true);
-            smt1_prop.out << ")" << std::endl;
+            smt1_prop.out << ")" << "\n";
           }
         }
       }
@@ -3162,7 +3162,7 @@ void smt1_convt::find_symbols(const exprt &expr)
                     << id
                     << " ";
       convert_type(type);
-      smt1_prop.out << "))" << std::endl;
+      smt1_prop.out << "))" << "\n";
       array_expr_map[expr]=id;
     }
   }
@@ -3179,7 +3179,7 @@ void smt1_convt::find_symbols(const exprt &expr)
                     << id
                     << " ";
       convert_type(t.type());
-      smt1_prop.out << "))" << std::endl;
+      smt1_prop.out << "))" << "\n";
       array_expr_map[t]=id;
     }
   }
