@@ -76,10 +76,10 @@ bool bmct::write_dimacs(std::ostream &out)
   {
     if(s_it->second.is_constant())
       out << "c " << (s_it->second.is_true()?"TRUE":"FALSE") << " "
-          << s_it->first << std::endl;
+          << s_it->first << "\n";
     else
       out << "c " << s_it->second.dimacs() << " "
-          << s_it->first << std::endl;
+          << s_it->first << "\n";
   }
 
   // dump mapping for selected bit-vectors
@@ -104,7 +104,7 @@ bool bmct::write_dimacs(std::ostream &out)
         else
           out << " " << literal_map[i].l.dimacs();
 
-      out << std::endl;
+      out << "\n";
     }
   }
   

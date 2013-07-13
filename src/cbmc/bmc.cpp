@@ -85,7 +85,7 @@ void bmct::error_trace(const prop_convt &prop_conv)
   switch(ui)
   {
   case ui_message_handlert::PLAIN:
-    std::cout << std::endl << "Counterexample:" << std::endl;
+    std::cout << "\n" << "Counterexample:" << "\n";
     show_goto_trace(std::cout, ns, goto_trace);
     break;
   
@@ -93,7 +93,7 @@ void bmct::error_trace(const prop_convt &prop_conv)
     {
       xmlt xml;
       convert(ns, goto_trace, xml);
-      std::cout << xml << std::endl;
+      std::cout << xml << "\n";
     }
     break;
   
@@ -193,7 +193,7 @@ void bmct::report_success()
       xmlt xml("cprover-status");
       xml.data="SUCCESS";
       std::cout << xml;
-      std::cout << std::endl;
+      std::cout << "\n";
     }
     break;
     
@@ -228,7 +228,7 @@ void bmct::report_failure()
       xmlt xml("cprover-status");
       xml.data="FAILURE";
       std::cout << xml;
-      std::cout << std::endl;
+      std::cout << "\n";
     }
     break;
     
@@ -255,7 +255,7 @@ void bmct::show_program()
 
   languagest languages(ns, new_ansi_c_language());
   
-  std::cout << std::endl << "Program constraints:" << std::endl;
+  std::cout << "\n" << "Program constraints:" << "\n";
 
   for(symex_target_equationt::SSA_stepst::const_iterator
       it=equation.SSA_steps.begin();
@@ -265,13 +265,13 @@ void bmct::show_program()
     {
       std::string string_value;
       languages.from_expr(it->cond_expr, string_value);
-      std::cout << "(" << count << ") " << string_value << std::endl;
+      std::cout << "(" << count << ") " << string_value << "\n";
 
       if(!it->guard.is_true())
       {
         languages.from_expr(it->guard, string_value);
         std::cout << std::string(i2string(count).size()+3, ' ');
-        std::cout << "guard: " << string_value << std::endl;
+        std::cout << "guard: " << string_value << "\n";
       }
       
       count++;
@@ -281,13 +281,13 @@ void bmct::show_program()
       std::string string_value;
       languages.from_expr(it->cond_expr, string_value);
       std::cout << "(" << count << ") ASSERT("
-                << string_value <<") " << std::endl;
+                << string_value <<") " << "\n";
 
       if(!it->guard.is_true())
       {
         languages.from_expr(it->guard, string_value);
         std::cout << std::string(i2string(count).size()+3, ' ');
-        std::cout << "guard: " << string_value << std::endl;
+        std::cout << "guard: " << string_value << "\n";
       }
 
       count++;
