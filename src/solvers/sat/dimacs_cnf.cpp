@@ -75,7 +75,7 @@ Function: dimacs_cnft::write_problem_line
 void dimacs_cnft::write_problem_line(std::ostream &out)
 {
   out << "p cnf " << no_variables() << " " 
-      << clauses.size() << std::endl;
+      << clauses.size() << "\n";
 }
 
 /*******************************************************************\
@@ -99,10 +99,10 @@ static void write_dimacs_clause(
   {
     out << clause[j].dimacs() << " ";
     // newline to avoid overflow in sat checkers
-    if((j&15)==0 && j!=0 && break_lines) out << std::endl;
+    if((j&15)==0 && j!=0 && break_lines) out << "\n";
   }
 
-  out << "0" << std::endl;
+  out << "0" << "\n";
 }
 
 /*******************************************************************\
