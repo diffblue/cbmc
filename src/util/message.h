@@ -204,7 +204,7 @@ public:
       return *this;
     }
 
-    // for feeding in functions such as endl and eom
+    // for feeding in manipulator functions such as eom
     inline mstreamt &operator << (mstreamt &(*func)(mstreamt &))
     {
       return func(*this);
