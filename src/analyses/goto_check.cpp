@@ -832,6 +832,7 @@ void goto_checkt::pointer_validity_check(
   #else
   
   std::set<exprt> alias_set=local_may_alias->get(t, pointer);
+  bool may_use_offset=local_may_alias->may_use_offset(t, pointer);
   bool aliases_unknown=alias_set.find(exprt(ID_unknown))!=alias_set.end();
   bool aliases_dynamic_object=alias_set.find(exprt(ID_dynamic_object))!=alias_set.end();
   bool aliases_null_object=alias_set.find(exprt(ID_null_object))!=alias_set.end();
@@ -875,7 +876,7 @@ void goto_checkt::pointer_validity_check(
       expr,
       guard);
 
-  if(enable_bounds_check)
+  if(enable_bounds_check && may_use_offset)
   {
     if(aliases_unknown || aliases_dynamic_object)
     {
@@ -893,7 +894,7 @@ void goto_checkt::pointer_validity_check(
     }
   }
 
-  if(enable_bounds_check)
+  if(enable_bounds_check && may_use_offset)
   {
     if(aliases_unknown || aliases_other_object)
     {

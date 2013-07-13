@@ -27,7 +27,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-class cfgt
+class local_cfgt
 {
 public:
   typedef std::vector<unsigned> successorst;
@@ -45,7 +45,7 @@ public:
   typedef std::vector<loct> locst;
   locst locs;
   
-  inline explicit cfgt(const goto_programt &_goto_program)
+  inline explicit local_cfgt(const goto_programt &_goto_program)
   {
     build(_goto_program);
   }
@@ -75,7 +75,7 @@ public:
   
   dirtyt dirty;
   localst locals;
-  cfgt cfg;
+  local_cfgt cfg;
 
   std::set<exprt> get(
     const goto_programt::const_targett t,
@@ -84,29 +84,38 @@ public:
   bool aliases(
     const goto_programt::const_targett t,
     const exprt &src1, const exprt &src2);
+    
+  bool may_use_offset(
+    const goto_programt::const_targett t,
+    const exprt &src);
   
 protected:
   void build(const goto_functiont &goto_function);
 
   typedef std::stack<unsigned> work_queuet;
-  
+
+  // the following may eventually get merged  
   numbering<irep_idt> pointers;
   numbering<exprt> objects;
 
+  // The following struct describes what a pointer
+  // may point to
   struct destt
   {
   public:
-    destt() { }
+    destt():may_use_offset(false) { }
   
     std::set<unsigned> objects;
+    bool may_use_offset;
     
     bool merge(const destt &);
-    void clear() { objects.clear(); }
+    void clear() { objects.clear(); may_use_offset=false; }
   };
   
   // pointers -> destt
   typedef std::map<unsigned, destt> points_tot;
-  
+
+  // the information tracked per program location  
   class loc_infot
   {
   public:
@@ -129,7 +138,7 @@ protected:
     const exprt &rhs,
     const loc_infot &loc_info_src);
     
-  bool track(const irep_idt &identifier);
+  bool is_tracked(const irep_idt &identifier);
   
   unsigned unknown_object;
   std::set<exprt> empty_set;
