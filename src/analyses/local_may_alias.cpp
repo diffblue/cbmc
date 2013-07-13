@@ -29,7 +29,7 @@ Function: cfgt::build
 
 \*******************************************************************/
 
-void cfgt::build(const goto_programt &goto_program)
+void local_cfgt::build(const goto_programt &goto_program)
 {
   locs.resize(goto_program.instructions.size());
 
@@ -116,13 +116,12 @@ bool local_may_aliast::destt::merge(const destt &src)
   if(objects.size()!=old_size)
     result=true;
 
-  #if 0
-  if(offset_zero && !src.offset_zero)
+  // the following does an "OR"
+  if(!may_use_offset && src.may_use_offset)
   {
-    offset_zero=false;
+    may_use_offset=true;
     result=true;
   }
-  #endif
   
   return result;
 }
@@ -178,17 +177,18 @@ bool local_may_aliast::loc_infot::merge(const loc_infot &src)
 
 /*******************************************************************\
 
-Function: local_may_aliast::track
+Function: local_may_aliast::is_tracked
 
   Inputs:
 
- Outputs:
+ Outputs: return 'true' iff we track the object with given
+          identifier
 
- Purpose: 
+ Purpose:
 
 \*******************************************************************/
 
-bool local_may_aliast::track(const irep_idt &identifier)
+bool local_may_aliast::is_tracked(const irep_idt &identifier)
 {
   localst::locals_mapt::const_iterator it=locals.locals_map.find(identifier);
   if(it==locals.locals_map.end()) return false;
@@ -219,7 +219,7 @@ void local_may_aliast::assign_lhs(
   {
     const irep_idt &identifier=to_symbol_expr(lhs).get_identifier();
 
-    if(track(identifier))
+    if(is_tracked(identifier))
     {
       unsigned dest_pointer=pointers.number(identifier);
       destt &dest_set=loc_info_dest.points_to[dest_pointer];
@@ -265,7 +265,7 @@ std::set<exprt> local_may_aliast::get(
   const goto_programt::const_targett t,
   const exprt &rhs)
 {
-  cfgt::loc_mapt::const_iterator loc_it=cfg.loc_map.find(t);
+  local_cfgt::loc_mapt::const_iterator loc_it=cfg.loc_map.find(t);
   
   assert(loc_it!=cfg.loc_map.end());
   
@@ -289,6 +289,34 @@ std::set<exprt> local_may_aliast::get(
 
 /*******************************************************************\
 
+Function: local_may_aliast::may_use_offset
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: 
+
+\*******************************************************************/
+
+bool local_may_aliast::may_use_offset(
+  const goto_programt::const_targett t,
+  const exprt &rhs)
+{
+  local_cfgt::loc_mapt::const_iterator loc_it=cfg.loc_map.find(t);
+  
+  assert(loc_it!=cfg.loc_map.end());
+  
+  const loc_infot &loc_info_src=loc_infos[loc_it->second];
+  
+  destt result_tmp;
+  get_rec(result_tmp, rhs, loc_info_src);
+
+  return result_tmp.may_use_offset;
+}
+
+/*******************************************************************\
+
 Function: local_may_aliast::aliases
 
   Inputs:
@@ -303,7 +331,7 @@ bool local_may_aliast::aliases(
   const goto_programt::const_targett t,
   const exprt &src1, const exprt &src2)
 {
-  cfgt::loc_mapt::const_iterator loc_it=cfg.loc_map.find(t);
+  local_cfgt::loc_mapt::const_iterator loc_it=cfg.loc_map.find(t);
   
   assert(loc_it!=cfg.loc_map.end());
   
@@ -353,7 +381,7 @@ void local_may_aliast::get_rec(
   else if(rhs.id()==ID_symbol)
   {
     const irep_idt &identifier=to_symbol_expr(rhs).get_identifier();
-    if(track(identifier))
+    if(is_tracked(identifier))
     {
       unsigned src_pointer=pointers.number(identifier);
       points_tot::const_iterator src_it=loc_info_src.points_to.find(src_pointer);
@@ -383,6 +411,7 @@ void local_may_aliast::get_rec(
         index_exprt tmp=index_expr;
         tmp.index()=gen_zero(index_type());
         dest.objects.insert(objects.number(tmp));
+        dest.may_use_offset=true;
       }
       else
         dest.objects.insert(unknown_object);
@@ -406,10 +435,12 @@ void local_may_aliast::get_rec(
       if(rhs.op0().type().id()==ID_pointer)
       {
         get_rec(dest, rhs.op0(), loc_info_src);
+        dest.may_use_offset=true;
       }
       else if(rhs.op1().type().id()==ID_pointer)
       {
         get_rec(dest, rhs.op1(), loc_info_src);
+        dest.may_use_offset=true;
       }
       else
         dest.objects.insert(unknown_object);
@@ -422,6 +453,7 @@ void local_may_aliast::get_rec(
     if(rhs.op0().type().id()==ID_pointer)
     {
       get_rec(dest, rhs.op0(), loc_info_src);
+      dest.may_use_offset=true;
     }
     else
       dest.objects.insert(unknown_object);
@@ -442,6 +474,7 @@ void local_may_aliast::get_rec(
   {
     const side_effect_exprt &side_effect_expr=to_side_effect_expr(rhs);
     const irep_idt &statement=side_effect_expr.get_statement();
+
     if(statement==ID_malloc)
     {
       dest.objects.insert(objects.number(exprt(ID_dynamic_object)));
@@ -483,7 +516,7 @@ void local_may_aliast::build(const goto_functiont &goto_function)
       it++)
   {
     const irep_idt &identifier=it->get_identifier();
-    if(track(identifier))
+    if(is_tracked(identifier))
       loc_infos[0].points_to[pointers.number(identifier)].objects.insert(unknown_object);
   }
 
@@ -492,14 +525,14 @@ void local_may_aliast::build(const goto_functiont &goto_function)
       l_it!=locals.locals_map.end();
       l_it++)
   {
-    if(track(l_it->first))
+    if(is_tracked(l_it->first))
       loc_infos[0].points_to[pointers.number(l_it->first)].objects.insert(unknown_object);
   }
 
   while(!work_queue.empty())
   {
     unsigned loc_nr=work_queue.top();
-    const cfgt::loct &loc=cfg.locs[loc_nr];
+    const local_cfgt::loct &loc=cfg.locs[loc_nr];
     const goto_programt::instructiont &instruction=*loc.t;
     work_queue.pop();
     
@@ -540,7 +573,7 @@ void local_may_aliast::build(const goto_functiont &goto_function)
     default:;
     }
 
-    for(cfgt::successorst::const_iterator
+    for(local_cfgt::successorst::const_iterator
         it=loc.successors.begin();
         it!=loc.successors.end();
         it++)
@@ -572,7 +605,7 @@ void local_may_aliast::output(
 
   forall_goto_program_instructions(i_it, goto_function.body)
   {
-    out << "**** " << i_it->location << std::endl;
+    out << "**** " << i_it->location << "\n";
 
     const loc_infot &loc_info=loc_infos[l];
 
@@ -592,12 +625,17 @@ void local_may_aliast::output(
         out << from_expr(ns, "", objects[*s_it]);
       }
         
-      out << " }" << std::endl;
+      out << " }";
+      
+      if(p_it->second.may_use_offset)
+        out << " + ?";
+      
+      out << "\n";
     }
 
-    out << std::endl;
+    out << "\n";
     goto_function.body.output_instruction(ns, "", out, i_it);
-    out << std::endl;
+    out << "\n";
     
     l++;
   }
