@@ -115,10 +115,10 @@ void output_vcd(
 {
   time_t t;
   time(&t);
-  out << "$date\n  " << ctime(&t) << "$end" << std::endl;
+  out << "$date\n  " << ctime(&t) << "$end" << "\n";
   
   // this is pretty arbitrary
-  out << "$timescale 1 ns $end" << std::endl;
+  out << "$timescale 1 ns $end" << "\n";
 
   // we first collect all variables that are assigned
   
@@ -152,12 +152,12 @@ void output_vcd(
         
       if(width>=1)
         out << "$var reg " << width << " V" << number << " "
-            << identifier << " $end" << std::endl;
+            << identifier << " $end" << "\n";
     }
   }  
 
   // end of header
-  out << "$enddefinitions $end" << std::endl;
+  out << "$enddefinitions $end" << "\n";
 
   unsigned timestamp=0;
 
@@ -173,7 +173,7 @@ void output_vcd(
         irep_idt identifier=it->lhs_object.get_identifier();
         const typet &type=it->lhs_object.type();
 
-        out << '#' << timestamp << std::endl;
+        out << '#' << timestamp << "\n";
         timestamp++;
 
         unsigned number=n.number(identifier);
@@ -182,18 +182,18 @@ void output_vcd(
         if(type.id()==ID_bool)
         {
           if(it->lhs_object_value.is_true())
-            out << "1" << "V" << number << std::endl;
+            out << "1" << "V" << number << "\n";
           else if(it->lhs_object_value.is_false())
-            out << "0" << "V" << number << std::endl;
+            out << "0" << "V" << number << "\n";
           else
-            out << "x" << "V" << number << std::endl;
+            out << "x" << "V" << number << "\n";
         }
         else
         {
           std::string binary=as_vcd_binary(it->lhs_object_value, ns);
 
           if(binary!="")
-            out << "b" << binary << " V" << number << " " << std::endl;
+            out << "b" << binary << " V" << number << " " << "\n";
         }
       }
       break;
