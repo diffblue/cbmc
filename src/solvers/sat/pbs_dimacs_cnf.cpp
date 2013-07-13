@@ -31,35 +31,39 @@ void pbs_dimacs_cnft::write_dimacs_pb(std::ostream &out)
 {
   double d_sum = 0;
 
-  //std::cout << "enter: No Lit. = " << no_variables () << std::endl;
+  //std::cout << "enter: No Lit. = " << no_variables () << "\n";
 
   for(std::map<literalt,unsigned>::const_iterator it=pb_constraintmap.begin();
-      it != pb_constraintmap.end (); ++it) {
+      it != pb_constraintmap.end (); ++it)
     d_sum += ((*it).second);
+
+  if (!optimize)
+  {
+    out << "# PBType: E" << "\n";
+    out << "# PBGoal: " << goal << "\n";
+  }
+  else if (!maximize)
+  {
+    out << "# PBType: SE" << "\n";
+    out << "# PBGoal: " << d_sum << "\n";
+    out << "# PBObj : MIN" << "\n";
+  } else
+  {
+    out << "# PBType: GE" << "\n";
+    out << "# PBGoal: " << 0 << "\n";
+    out << "# PBObj : MAX" << "\n";
   }
 
-  if (!optimize) {
-    out << "# PBType: E" << std::endl;
-    out << "# PBGoal: " << goal << std::endl;
-  } else if (!maximize) {
-    out << "# PBType: SE" << std::endl;
-    out << "# PBGoal: " << d_sum << std::endl;
-    out << "# PBObj : MIN" << std::endl;
-  } else {
-    out << "# PBType: GE" << std::endl;
-    out << "# PBGoal: " << 0 << std::endl;
-    out << "# PBObj : MAX" << std::endl;
-  }
-  out << "# NumCoef: " << pb_constraintmap.size() << std::endl;
+  out << "# NumCoef: " << pb_constraintmap.size() << "\n";
 
   for(std::map<literalt,unsigned>::const_iterator it=pb_constraintmap.begin();
       it!=pb_constraintmap.end();++it)
     {
       int dimacs_lit = (*it).first.dimacs();
-      out << "v" << dimacs_lit << " c" << ((*it).second) << std::endl;
+      out << "v" << dimacs_lit << " c" << ((*it).second) << "\n";
     }
 
-  //std::cout << "exit: No Lit. = " << no_variables () << std::endl;
+  //std::cout << "exit: No Lit. = " << no_variables () << "\n";
 }
 
 /*******************************************************************\
@@ -76,7 +80,7 @@ Function: pbs_dimacs_cnft::pbs_solve
 
 bool pbs_dimacs_cnft::pbs_solve()
 {
-  //std::cout << "solve: No Lit. = " << no_variables () << std::endl;
+  //std::cout << "solve: No Lit. = " << no_variables () << "\n";
 
   std::string command;
 
@@ -88,7 +92,7 @@ bool pbs_dimacs_cnft::pbs_solve()
 
   command += "pbs";
 
-  //std::cout << "PBS COMMAND IS: " << command << std::endl;
+  //std::cout << "PBS COMMAND IS: " << command << "\n";
   /*
     if (!(getenv("PBS_PATH") == NULL)) 
     {
@@ -110,7 +114,7 @@ bool pbs_dimacs_cnft::pbs_solve()
 	command += " -S 1000 -D 1 -H -I -a";
       }
       else {
-	//std::cout << "NO BINARY SEARCH" << std::endl;
+	//std::cout << "NO BINARY SEARCH" << "\n";
 	command += " -S 1000 -D 1 -I -a";
       }
     }
@@ -146,7 +150,7 @@ bool pbs_dimacs_cnft::pbs_solve()
 		"Variable Assignments Satisfying CNF Formula:")!=NULL)
 	{
 	  //print ("Reading assignments...\n");
-	  //std::cout << "No literals: " << no_variables() << std::endl;
+	  //std::cout << "No literals: " << no_variables() << "\n";
 	  satisfied = true;
 	  assigned.clear ();
 	  for (size_t i = 0; (file && (i < no_variables())); ++i)
@@ -158,7 +162,7 @@ bool pbs_dimacs_cnft::pbs_solve()
 		  assigned.insert(v);
 		}
 	    }
-	  //std::cout << std::endl;
+	  //std::cout << "\n";
 	  //print ("Finished reading assignments.\n");
 	}
       else if (strstr(line.c_str(),"SAT... SUM") != NULL)
@@ -270,12 +274,12 @@ tvt pbs_dimacs_cnft::l_get(literalt a) const
     {
       if(f == assigned.end())
 	{
-	  //std::cout << "FALSE" << std::endl;
+	  //std::cout << "FALSE" << "\n";
 	  return tvt(false);
 	}
       else
 	{
-	  //std::cout << "TRUE" << std::endl;
+	  //std::cout << "TRUE" << "\n";
 	  return tvt(true);
 	}
     }
@@ -283,16 +287,16 @@ tvt pbs_dimacs_cnft::l_get(literalt a) const
     {
       if(f != assigned.end())
 	{
-	  //std::cout << "FALSE" << std::endl;
+	  //std::cout << "FALSE" << "\n";
 	  return tvt(false);
 	}
       else
 	{
-	  //std::cout << "TRUE" << std::endl;
+	  //std::cout << "TRUE" << "\n";
 	  return tvt(true);
 	}
     }
 
-  //std::cout << "ERROR" << std::endl;
+  //std::cout << "ERROR" << "\n";
   return tvt(tvt::TV_UNKNOWN);
 }
