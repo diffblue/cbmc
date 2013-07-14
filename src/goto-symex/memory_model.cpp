@@ -149,7 +149,7 @@ void memory_model_baset::read_from(symex_target_equationt &equation)
         r_it!=a_rec.reads.end();
         r_it++)
     {
-      event_it r=*r_it;
+      const event_it r=*r_it;
       
       exprt::operandst rf_some_operands;
       rf_some_operands.reserve(a_rec.writes.size());
@@ -160,10 +160,10 @@ void memory_model_baset::read_from(symex_target_equationt &equation)
           w_it!=a_rec.writes.end();
           ++w_it)
       {
-        event_it w=*w_it;
+        const event_it w=*w_it;
         
         // rf cannot contradict program order
-        if(po(*r_it, *w_it))
+        if(po(r, w))
           continue; // contradicts po
 
         bool is_rfi=
@@ -175,11 +175,11 @@ void memory_model_baset::read_from(symex_target_equationt &equation)
           // Extra wsi constraints ensure that even a
           // write with guard false will have the proper value.
           
-          event_it e_it=*w_it;
+          event_it e_it=w;
           bool is_most_recent=true;
-          for(++e_it; e_it!=*r_it && is_most_recent; ++e_it)
+          for(++e_it; e_it!=r && is_most_recent; ++e_it)
             is_most_recent&=!is_shared_write(e_it) ||
-                            address(e_it)!=address(*r_it);
+                            address(e_it)!=address(r);
 
           if(!is_most_recent)
             continue;
@@ -189,7 +189,7 @@ void memory_model_baset::read_from(symex_target_equationt &equation)
         
         // record the symbol
         choice_symbols[
-          std::make_pair(*r_it, *w_it)]=s;
+          std::make_pair(r, w)]=s;
 
         // We rely on the fact that there is at least
         // one write event that has guard 'true'.
