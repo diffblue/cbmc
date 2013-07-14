@@ -389,6 +389,7 @@ void local_may_aliast::get_rec(
       {
         const std::set<unsigned> &src=src_it->second.objects;
         dest.objects.insert(src.begin(), src.end());
+        dest.may_use_offset=dest.may_use_offset || src_it->second.may_use_offset;
       }
     }
     else
@@ -431,7 +432,7 @@ void local_may_aliast::get_rec(
     }
     else if(rhs.operands().size()==2)
     {
-      // one must be pointer
+      // one must be pointer, one an integer
       if(rhs.op0().type().id()==ID_pointer)
       {
         get_rec(dest, rhs.op0(), loc_info_src);
