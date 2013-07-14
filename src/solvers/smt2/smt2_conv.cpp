@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/fixedbv.h>
 #include <util/pointer_offset_size.h>
 #include <util/ieee_float.h>
+#include <util/base_type.h>
 
 #include <ansi-c/string_constant.h>
 
@@ -777,7 +778,7 @@ void smt2_convt::convert_expr(const exprt &expr)
           expr.id()==ID_notequal)
   {
     assert(expr.operands().size()==2);
-    assert(expr.op0().type()==expr.op1().type());
+    assert(base_type_eq(expr.op0().type(), expr.op1().type(), ns));
 
     if(expr.id()==ID_notequal)
     {
@@ -800,7 +801,7 @@ void smt2_convt::convert_expr(const exprt &expr)
           expr.id()==ID_ieee_float_notequal)
   {
     assert(expr.operands().size()==2);
-    assert(expr.op0().type()==expr.op1().type());
+    assert(base_type_eq(expr.op0().type(), expr.op1().type(), ns));
 
     // These are not the same as (= A B)!
 
