@@ -213,7 +213,9 @@ Function: partial_order_concurrencyt::build_clock_type
 void partial_order_concurrencyt::build_clock_type(
   const symex_target_equationt &equation)
 {
-  mp_integer width=address_bits(equation.SSA_steps.size());
+  assert(!numbering.empty());
+
+  mp_integer width=address_bits(numbering.size());
   assert(width<std::numeric_limits<unsigned>::max());
   clock_type=unsignedbv_typet(integer2long(width));
 }
