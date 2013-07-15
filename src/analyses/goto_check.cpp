@@ -850,7 +850,7 @@ void goto_checkt::pointer_validity_check(
   if(aliases_unknown || aliases_null_object)
   {
     add_guarded_claim(
-      not_exprt(null_object(pointer)),
+      not_exprt(null_pointer(pointer)),
       "dereference failure: pointer NULL",
       "pointer dereference",
       expr.find_location(),
