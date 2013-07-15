@@ -213,7 +213,7 @@ exprt good_pointer_def(
              good_dynamic_tmp2);
 
   exprt not_null=
-    not_exprt(null_object(pointer));
+    not_exprt(null_pointer(pointer));
   
   exprt not_invalid=
     not_exprt(invalid_pointer(pointer));
@@ -249,6 +249,25 @@ exprt null_object(const exprt &pointer)
 {
   null_pointer_exprt null_pointer(to_pointer_type(pointer.type()));
   return same_object(null_pointer, pointer);
+}
+
+/*******************************************************************\
+
+Function: integer_address
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+exprt integer_address(const exprt &pointer)
+{
+  null_pointer_exprt null_pointer(to_pointer_type(pointer.type()));
+  return and_exprt(same_object(null_pointer, pointer),
+                   notequal_exprt(null_pointer, pointer));
 }
 
 /*******************************************************************\
