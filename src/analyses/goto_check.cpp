@@ -1458,3 +1458,31 @@ void goto_check(
     goto_check.goto_check(it->second);
   }
 }                    
+
+/*******************************************************************\
+
+Function: goto_check
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void goto_check(
+  const optionst &options,
+  goto_modelt &goto_model)
+{
+  const namespacet ns(goto_model.symbol_table);
+  goto_checkt goto_check(ns, options);
+  
+  for(goto_functionst::function_mapt::iterator
+      it=goto_model.goto_functions.function_map.begin();
+      it!=goto_model.goto_functions.function_map.end();
+      it++)
+  {
+    goto_check.goto_check(it->second);
+  }
+}                    

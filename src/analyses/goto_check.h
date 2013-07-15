@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/options.h>
 
 #include <goto-programs/goto_functions.h>
+#include <goto-programs/goto_model.h>
 
 void goto_check(
   const namespacet &ns,
@@ -23,5 +24,9 @@ void goto_check(
   const namespacet &ns,
   const optionst &options,
   goto_functionst::goto_functiont &goto_function);
+
+void goto_check(
+  const optionst &options,
+  goto_modelt &goto_model);
 
 #endif
