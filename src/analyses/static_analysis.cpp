@@ -168,7 +168,8 @@ void static_analysis_baset::output(
 {
   forall_goto_program_instructions(i_it, goto_program)
   {
-    out << "**** " << i_it->location << std::endl;
+    out << "**** " << i_it->location_number << " "
+        << i_it->location << std::endl;
 
     get_state(i_it).output(ns, out);
     out << std::endl;
