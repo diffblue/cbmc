@@ -508,14 +508,33 @@ bool goto_symex_statet::l2_thread_read_encoding(
   if(atomic_section_id!=0)
   {
     const irep_idt l1_identifier=rename(orig_identifier, ns, L1);
-    if(level2.current_count(l1_identifier)==
-      level2_at_atomic_section_entry.current_count(l1_identifier))
+
+    written_in_atomic_sectiont::const_iterator a_s_writes=
+      written_in_atomic_section.find(orig_identifier);
+    if(a_s_writes!=written_in_atomic_section.end())
+    {
+      for(a_s_w_entryt::const_iterator it=a_s_writes->second.begin();
+          it!=a_s_writes->second.end();
+          ++it)
+        if(it->as_expr()==guard.as_expr())
+          // there has already been a write to orig_identifier within
+          // this atomic section under the same guard
+          return false;
+    }
+
+    // we cannot determine for sure that there has been a write already
+    // so generate a read even if orig_identifier has been written on
+    // all branches flowing into this read
+    // (from_read will ensure consistency)
+    a_s_r_entryt &a_s_read=read_in_atomic_section[orig_identifier];
+    if(a_s_read.second.empty())
     {
       propagation.remove(l1_identifier);
       irep_idt new_l2_name=level2.increase_counter(l1_identifier);
-      read_in_atomic_section.insert(
-          std::make_pair(orig_identifier, new_l2_name));
+      a_s_read.first=new_l2_name;
     }
+    a_s_read.second.push_back(guard);
+
     return false;
   }
 
@@ -566,7 +585,7 @@ bool goto_symex_statet::l2_thread_write_encoding(
   // see whether we are within an atomic section
   if(atomic_section_id!=0)
   {
-    written_in_atomic_section.insert(orig_identifier);
+    written_in_atomic_section[orig_identifier].push_back(guard);
     return false;
   }
 

@@ -99,7 +99,6 @@ protected:
   const namespacet &ns;
   symex_targett &target;  
   unsigned atomic_section_counter;
-  guardt atomic_section_entry_guard;
 
   friend class symex_dereference_statet;
   
