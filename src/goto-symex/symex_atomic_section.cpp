@@ -29,8 +29,6 @@ void goto_symext::symex_atomic_begin(statet &state)
     throw "nested atomic section detected";
     
   state.atomic_section_id=++atomic_section_counter;
-  atomic_section_entry_guard=state.guard;
-  state.level2_at_atomic_section_entry=state.level2;
   state.read_in_atomic_section.clear();
   state.written_in_atomic_section.clear();
   target.atomic_begin(
@@ -61,8 +59,7 @@ void goto_symext::symex_atomic_end(statet &state)
   const unsigned atomic_section_id=state.atomic_section_id;
   state.atomic_section_id=0;
 
-  state.guard.swap(atomic_section_entry_guard);
-  for(hash_map_cont<irep_idt, irep_idt, irep_id_hash>::const_iterator
+  for(goto_symex_statet::read_in_atomic_sectiont::const_iterator
       r_it=state.read_in_atomic_section.begin();
       r_it!=state.read_in_atomic_section.end();
       ++r_it)
@@ -70,7 +67,7 @@ void goto_symext::symex_atomic_end(statet &state)
     const irep_idt &orig_identifier=r_it->first;
 
     const typet &type=ns.lookup(orig_identifier).type;
-    symbol_exprt r(r_it->second, type);
+    symbol_exprt r(r_it->second.first, type);
 
     // properly rename type, if necessary
     const bool record_events=state.record_events;
@@ -78,22 +75,30 @@ void goto_symext::symex_atomic_end(statet &state)
     state.rename(r, ns, goto_symex_statet::L2);
     state.record_events=record_events;
 
+    // guard is the disjunction over reads
+    assert(!r_it->second.second.empty());
+    guardt read_guard(r_it->second.second.front());
+    for(std::list<guardt>::const_iterator
+        it=++(r_it->second.second.begin());
+        it!=r_it->second.second.end();
+        ++it)
+      read_guard|=*it;
+
     symbol_exprt original_symbol(orig_identifier, r.type());
     target.shared_read(
-      state.guard.as_expr(),
+      read_guard.as_expr(),
       r,
       original_symbol,
       atomic_section_id,
       state.source);
   }
-  state.guard.swap(atomic_section_entry_guard);
 
-  for(hash_set_cont<irep_idt, irep_id_hash>::const_iterator
+  for(goto_symex_statet::written_in_atomic_sectiont::const_iterator
       w_it=state.written_in_atomic_section.begin();
       w_it!=state.written_in_atomic_section.end();
       ++w_it)
   {
-    const irep_idt &orig_identifier=*w_it;
+    const irep_idt &orig_identifier=w_it->first;
 
     const typet &type=ns.lookup(orig_identifier).type;
     symbol_exprt w(orig_identifier, type);
@@ -106,9 +111,18 @@ void goto_symext::symex_atomic_end(statet &state)
     w.set_identifier(new_name);
     state.record_events=record_events;
 
+    // guard is the disjunction over writes
+    assert(!w_it->second.empty());
+    guardt write_guard(w_it->second.front());
+    for(std::list<guardt>::const_iterator
+        it=++(w_it->second.begin());
+        it!=w_it->second.end();
+        ++it)
+      write_guard|=*it;
+
     symbol_exprt original_symbol(orig_identifier, w.type());
     target.shared_write(
-      state.guard.as_expr(),
+      write_guard.as_expr(),
       w,
       original_symbol,
       atomic_section_id,
