@@ -231,8 +231,11 @@ void goto_symext::merge_gotos(statet &state)
     if(state.guard.is_false())
       state.atomic_section_id=goto_state.atomic_section_id;
     else
-      assert(goto_state.guard.is_false() ||
-          state.atomic_section_id==goto_state.atomic_section_id);
+    {
+      if(!goto_state.guard.is_false() &&
+         state.atomic_section_id!=goto_state.atomic_section_id)
+        throw "unmatched atomic section detected";
+    }
     
     // do SSA phi functions
     phi_function(goto_state, state);

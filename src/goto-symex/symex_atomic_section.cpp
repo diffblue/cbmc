@@ -24,7 +24,10 @@ void goto_symext::symex_atomic_begin(statet &state)
 {
   if(state.guard.is_false()) return;
 
-  assert(state.atomic_section_id==0);
+  // we don't allow any nesting of atomic sections
+  if(state.atomic_section_id!=0)
+    throw "nested atomic section detected";
+    
   state.atomic_section_id=++atomic_section_counter;
   atomic_section_entry_guard=state.guard;
   state.level2_at_atomic_section_entry=state.level2;
