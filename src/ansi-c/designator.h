@@ -10,7 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_ANSI_C_DESIGNATOR_H
 
 #include <vector>
-#include <ostream>
+#include <iosfwd>
 
 #include <util/type.h>
 

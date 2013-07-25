@@ -20,6 +20,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <psapi.h>
 #endif
 
+#include <ostream>
+
 #include "memory_info.h"
 
 /*******************************************************************\

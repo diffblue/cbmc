@@ -9,8 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_PREPROCESSOR_H
 #define CPROVER_PREPROCESSOR_H
 
-#include <istream>
-#include <ostream>
+#include <iosfwd>
 #include <string>
 
 #include "message.h"

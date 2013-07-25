@@ -13,7 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <map>
 #include <string>
 #include <cassert>
-#include <ostream>
+#include <iosfwd>
 
 #define USE_DSTRING
 #define SHARING
