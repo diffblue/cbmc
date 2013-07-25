@@ -332,8 +332,6 @@ bool configt::set(const cmdlinet &cmdline)
     ansi_c.arch=configt::ansi_ct::ARCH_ALPHA;
     ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
     ansi_c.long_double_width=16*8;
-    ansi_c.long_int_width=8*8;
-    ansi_c.pointer_width=8*8;
     ansi_c.char_is_unsigned=false;
   }
   else if(arch=="armel" || arch=="armhf")
@@ -351,8 +349,6 @@ bool configt::set(const cmdlinet &cmdline)
     ansi_c.set_LP64();
     ansi_c.arch=configt::ansi_ct::ARCH_ARM;
     ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
-    ansi_c.long_int_width=8*8;
-    ansi_c.pointer_width=8*8;
     ansi_c.long_double_width=16*8;
     ansi_c.char_is_unsigned=true;
   }
@@ -408,8 +404,6 @@ bool configt::set(const cmdlinet &cmdline)
   {
     ansi_c.set_LP64();
     ansi_c.arch=configt::ansi_ct::ARCH_IA64;
-    ansi_c.long_int_width=8*8;
-    ansi_c.pointer_width=8*8;
     ansi_c.long_double_width=16*8;
     ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
     ansi_c.char_is_unsigned=false;
@@ -418,8 +412,6 @@ bool configt::set(const cmdlinet &cmdline)
   {
     ansi_c.set_LP64();
     ansi_c.arch=configt::ansi_ct::ARCH_S390X;
-    ansi_c.long_int_width=8*8;
-    ansi_c.pointer_width=8*8;
     ansi_c.endianness=configt::ansi_ct::IS_BIG_ENDIAN;
     ansi_c.char_is_unsigned=true;
   }
@@ -438,8 +430,7 @@ bool configt::set(const cmdlinet &cmdline)
     ansi_c.set_LP64();
     ansi_c.arch=configt::ansi_ct::ARCH_X32;
     ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
-    ansi_c.long_int_width=8*8;
-    ansi_c.pointer_width=4*8;
+    ansi_c.pointer_width=4*8; // exception!
     ansi_c.long_double_width=16*8;
     ansi_c.char_is_unsigned=false;
   }
@@ -449,7 +440,6 @@ bool configt::set(const cmdlinet &cmdline)
     ansi_c.arch=configt::ansi_ct::ARCH_X86_64;
     ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
     ansi_c.long_double_width=16*8;
-    ansi_c.pointer_width=8*8;
     ansi_c.char_is_unsigned=false;
   }
   else if(arch=="i386")
