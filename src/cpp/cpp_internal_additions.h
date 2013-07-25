@@ -6,6 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <ostream>
+#include <iosfwd>
 
 void cpp_internal_additions(std::ostream &code);

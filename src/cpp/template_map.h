@@ -10,7 +10,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #define CPROVER_CPP_TEMPLATE_MAP_H
 
 #include <map>
-#include <ostream>
+#include <iosfwd>
 
 #include <util/expr.h>
 
