@@ -334,31 +334,28 @@ bool configt::set(const cmdlinet &cmdline)
     ansi_c.long_double_width=16*8;
     ansi_c.char_is_unsigned=false;
   }
-  else if(arch=="armel" || arch=="armhf")
+  else if(arch=="arm64" ||
+          arch=="armel" ||
+          arch=="armhf" ||
+          arch=="arm")
   {
-    ansi_c.set_ILP32();
+    if(arch=="arm64")
+    {
+      ansi_c.set_LP64();
+      ansi_c.long_double_width=16*8;
+    }
+    else
+    {
+      ansi_c.set_ILP32();
+      ansi_c.long_double_width=8*8;
+    }
+
     ansi_c.arch=configt::ansi_ct::ARCH_ARM;
     ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
-    ansi_c.long_double_width=8*8;
     ansi_c.char_is_unsigned=true;
+
     if(arch=="armhf")
       ansi_c.defines.push_back("__ARM_PCS_VFP");
-  }
-  else if(arch=="arm64")
-  {
-    ansi_c.set_LP64();
-    ansi_c.arch=configt::ansi_ct::ARCH_ARM;
-    ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
-    ansi_c.long_double_width=16*8;
-    ansi_c.char_is_unsigned=true;
-  }
-  else if(arch=="arm")
-  {
-    ansi_c.set_ILP32();
-    ansi_c.arch=configt::ansi_ct::ARCH_ARM;
-    ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
-    ansi_c.long_double_width=8*8;
-    ansi_c.char_is_unsigned=true;
   }
   else if(arch=="mipsel")
   {
@@ -376,17 +373,13 @@ bool configt::set(const cmdlinet &cmdline)
     ansi_c.long_double_width=8*8;
     ansi_c.char_is_unsigned=false;
   }
-  else if(arch=="powerpc")
+  else if(arch=="powerpc" ||
+          arch=="ppc64")
   {
-    ansi_c.set_ILP32();
-    ansi_c.arch=configt::ansi_ct::ARCH_POWER;
-    ansi_c.endianness=configt::ansi_ct::IS_BIG_ENDIAN;
-    ansi_c.long_double_width=16*8;
-    ansi_c.char_is_unsigned=true;
-  }
-  else if(arch=="ppc64")
-  {
-    ansi_c.set_LP64();
+    if(arch=="power")
+      ansi_c.set_ILP32();
+    else
+      ansi_c.set_LP64();
     ansi_c.arch=configt::ansi_ct::ARCH_POWER;
     ansi_c.endianness=configt::ansi_ct::IS_BIG_ENDIAN;
     ansi_c.long_double_width=16*8;
