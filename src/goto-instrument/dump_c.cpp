@@ -1007,7 +1007,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_while(
   }
   else
   {
-    w.cond().make_true();
+    w.cond()=true_exprt();
     convert_goto_goto(target, w.body());
   }
 
@@ -1216,7 +1216,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
       if(it!=--cases.end())
       {
         goto_programt::instructiont i=*(it->second.first);
-        i.guard.make_true();
+        i.guard=true_exprt();
         goto_programt tmp;
         tmp.insert_before_swap(tmp.insert_before(tmp.instructions.end()), i);
         convert_goto_goto(tmp.instructions.begin(), c);
