@@ -229,3 +229,23 @@ bool guardt::is_false() const
       
   return false;
 }
+
+/*******************************************************************\
+
+Function: guardt::make_false
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void guardt::make_false()
+{
+  guard_list.clear();
+  guard_list.push_back(exprt());
+  guard_list.back()=false_exprt();
+}
+

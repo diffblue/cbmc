@@ -1556,9 +1556,9 @@ bool simplify_exprt::simplify_bitwise(exprt &expr)
           it->swap(tmp);
         }
         else if(it->is_zero())
-          it->make_false();
+          *it=false_exprt();
         else if(it->is_one())
-          it->make_true();
+          *it=true_exprt();
       }
         
       new_expr.type()=bool_typet();
@@ -1963,9 +1963,10 @@ bool simplify_exprt::simplify_if_implies(
   bool truth,
   bool &new_truth)
 {
-  if(expr == cond) {
-   new_truth = truth;
-   return false;
+  if(expr == cond)
+  {
+    new_truth = truth;
+    return false;
   }
 
   if(truth && cond.id()==ID_lt && expr.id()==ID_lt)
@@ -1980,30 +1981,30 @@ bool simplify_exprt::simplify_if_implies(
       {
 	if(string2integer(cond.op1().get_string(ID_value)) >=
 	  string2integer(expr.op1().get_string(ID_value)))
-	 {
+        {
 	  new_truth = true;
 	  return false;
-	 }
+        }
       }
       else if(type_id==ID_unsignedbv)
       {
 	const mp_integer i1, i2;
 	if(binary2integer(cond.op1().get_string(ID_value), false) >=
            binary2integer(expr.op1().get_string(ID_value), false))
-	 {
+        {
 	  new_truth = true;
 	  return false;
-	 }
+        }
       }
       else if(type_id==ID_signedbv)
       {
 	const mp_integer i1, i2;
 	if(binary2integer(cond.op1().get_string(ID_value), true) >=
            binary2integer(expr.op1().get_string(ID_value), true))
-	 {
+        {
 	  new_truth = true;
 	  return false;
-	 }
+        }
       }
     }
     if(cond.op1() == expr.op1() &&
@@ -2016,30 +2017,30 @@ bool simplify_exprt::simplify_if_implies(
       {
 	if(string2integer(cond.op1().get_string(ID_value)) <=
            string2integer(expr.op1().get_string(ID_value)))
-	 {
+        {
 	  new_truth = true;
 	  return false;
-	 }
+        }
       }
       else if(type_id==ID_unsignedbv)
       {
 	const mp_integer i1, i2;
 	if(binary2integer(cond.op1().get_string(ID_value), false) <=
            binary2integer(expr.op1().get_string(ID_value), false))
-	 {
+        {
 	  new_truth = true;
 	  return false;
-	 }
+        }
       }
       else if(type_id==ID_signedbv)
       {
 	const mp_integer i1, i2;
 	if(binary2integer(cond.op1().get_string(ID_value), true) <=
            binary2integer(expr.op1().get_string(ID_value), true))
-	 {
+        {
 	  new_truth = true;
 	  return false;
-	 }
+        }
       }
     }
   }
@@ -2072,12 +2073,12 @@ bool simplify_exprt::simplify_if_recursive(
     {
       if(new_truth)
       {
-	expr.make_true();
+	expr=true_exprt();
 	return false;
       }
       else
       {
-	expr.make_false();
+	expr=false_exprt();
 	return false;
       }
     }
@@ -2111,7 +2112,7 @@ bool simplify_exprt::simplify_if_conj(
   {
     if(expr == *it)
     {
-      expr.make_true();
+      expr=true_exprt();
       return false;
     }
   }
@@ -2144,7 +2145,7 @@ bool simplify_exprt::simplify_if_disj(
   {
     if(expr == *it)
     {
-      expr.make_false();
+      expr=false_exprt();
       return false;
     }
   }
@@ -2405,12 +2406,12 @@ bool simplify_exprt::simplify_not(exprt &expr)
   }
   else if(op.is_false())
   {
-    expr.make_true();
+    expr=true_exprt();
     return false;
   }
   else if(op.is_true())
   {
-    expr.make_false();
+    expr=false_exprt();
     return false;
   }
   else if(op.id()==ID_and ||
@@ -2532,12 +2533,12 @@ bool simplify_exprt::simplify_boolean(exprt &expr)
 
       if(expr.id()==ID_and && is_false)
       {
-        expr.make_false();
+        expr=false_exprt();
         return false;
       }
       else if(expr.id()==ID_or && is_true)
       {
-        expr.make_true();
+        expr=true_exprt();
         return false;
       }
 
@@ -2596,9 +2597,9 @@ bool simplify_exprt::simplify_boolean(exprt &expr)
     if(operands.size()==0)
     {
       if(expr.id()==ID_and || negate)
-        expr.make_true();
+        expr=true_exprt();
       else
-        expr.make_false();
+        expr=false_exprt();
 
       return false;
     }
@@ -3057,7 +3058,7 @@ bool simplify_exprt::simplify_inequality_not_constant(exprt &expr)
 
   if(operands.front()==operands.back())
   {
-    expr.make_true();
+    expr=true_exprt();
     return false;
   }
 
@@ -3167,7 +3168,7 @@ bool simplify_exprt::simplify_inequality_constant(exprt &expr)
            expr.op0().op0().id()==ID_member ||
            expr.op0().op0().id()==ID_index)
         {
-          expr.make_false();
+          expr=false_exprt();
           return false;
         }
       }
@@ -3237,7 +3238,7 @@ bool simplify_exprt::simplify_inequality_constant(exprt &expr)
        expr.op0().type().id()==ID_unsignedbv)
     {
       // zero is always smaller or equal something unsigned
-      expr.make_true();
+      expr=true_exprt();
       return false;
     }
 
@@ -3868,7 +3869,7 @@ bool simplify_exprt::simplify_dynamic_object(exprt &expr)
   // NULL is not dynamic
   if(op.id()==ID_constant && op.get(ID_value)==ID_NULL)
   {
-    expr.make_false();
+    expr=false_exprt();
     return false;
   }  
 
@@ -3885,12 +3886,12 @@ bool simplify_exprt::simplify_dynamic_object(exprt &expr)
     }
     else if(op.op0().id()==ID_string_constant)
     {
-      expr.make_false();
+      expr=false_exprt();
       return false;
     }
     else if(op.op0().id()==ID_array)
     {
-      expr.make_false();
+      expr=false_exprt();
       return false;
     }
   }
@@ -3923,14 +3924,14 @@ bool simplify_exprt::simplify_invalid_pointer(exprt &expr)
   // NULL is not invalid
   if(op.id()==ID_constant && op.get(ID_value)==ID_NULL)
   {
-    expr.make_false();
+    expr=false_exprt();
     return false;
   }  
   
   // &anything is not invalid
   if(op.id()==ID_address_of)
   {
-    expr.make_false();
+    expr=false_exprt();
     return false;
   }  
   
@@ -4042,12 +4043,12 @@ bool simplify_exprt::simplify_same_object(exprt &expr)
 
   if(res.is_true())
   {
-    expr.make_true();
+    expr=true_exprt();
     return false;
   }
   else if(res.is_false())
   {
-    expr.make_false();
+    expr=false_exprt();
     return false;
   }
 
