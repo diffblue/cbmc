@@ -875,7 +875,7 @@ bool polynomial_acceleratort::do_arrays(goto_programt::instructionst &loop_body,
             stashed_value.to_expr()));
   }
 
-  and_exprt arrays_expr(array_operands);
+  exprt arrays_expr=conjunction(array_operands);
 
   symbolt k_sym = program.fresh_symbol("polynomial::k",
       unsignedbv_typet(32));
@@ -970,8 +970,10 @@ bool polynomial_acceleratort::do_arrays(goto_programt::instructionst &loop_body,
         unchanged_operands.push_back(unchanged_by_this_one);
       }
 
-      idx_never_touched = and_exprt(unchanged_operands);
-    } else {
+      idx_never_touched = conjunction(unchanged_operands);
+    }
+    else
+    {
       // The vector `indices' now contains all of the indices written to for the
       // current array, each with the free variable loop_counter.  Now let's
       // build an expression saying that the fresh variable idx is none of these
@@ -984,7 +986,7 @@ bool polynomial_acceleratort::do_arrays(goto_programt::instructionst &loop_body,
         idx_touched_operands.push_back(not_exprt(equal_exprt(idx, it->to_expr())));
       }
 
-      and_exprt idx_not_touched(idx_touched_operands);
+      exprt idx_not_touched=conjunction(idx_touched_operands);
 
       // OK, we have an expression saying idx is not touched by the
       // loop_counter'th iteration.  Let's quantify that to say that idx is not
