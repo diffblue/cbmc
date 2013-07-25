@@ -81,7 +81,7 @@ const symbolt &w_guardst::get_guard_symbol(const irep_idt &object)
   new_symbol.base_name=identifier;
   new_symbol.type=bool_typet();
   new_symbol.is_static_lifetime=true;
-  new_symbol.value.make_false();
+  new_symbol.value=false_exprt();
   
   symbolt *symbol_ptr;
   symbol_table.move(new_symbol, symbol_ptr);
