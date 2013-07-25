@@ -623,7 +623,7 @@ void c_typecheck_baset::typecheck_for(codet &code)
   if(code.op0().is_nil())
   {
     if(code.op1().is_nil())
-      code.op1().make_true();
+      code.op1()=true_exprt();
     else
     {
       typecheck_expr(code.op1());

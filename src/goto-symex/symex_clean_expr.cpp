@@ -84,7 +84,7 @@ void goto_symext::replace_array_equal(exprt &expr)
     // type checking
     if(ns.follow(expr.op0().type())!=
        ns.follow(expr.op1().type()))
-      expr.make_false();
+      expr=false_exprt();
     else
     {
       equal_exprt equality_expr(expr.op0(), expr.op1());

@@ -165,12 +165,12 @@ void symex_slice_by_tracet::read_trace(std::string filename)
   
   for (size_t i = 0; i < sigma.size(); i++) {
     exprt f_e = static_cast<const exprt &>(get_nil_irep());
-    f_e.make_false();
+    f_e=false_exprt();
     t.push_back(f_e);
   }
     
   exprt t_e = static_cast<const exprt &>(get_nil_irep());
-  t_e.make_true();
+  t_e=true_exprt();
   t.push_back(t_e);
 }  
 
@@ -356,11 +356,11 @@ void symex_slice_by_tracet::compute_ts_back(
 	  simplify(u_lhs, ns);
 	  
 	  if ((!u_lhs.is_false()) && implies_false(u_lhs))
-	    u_lhs.make_false();
+	    u_lhs=false_exprt();
 	  if (!u_lhs.is_false())
 	    slice_this = false;
 	} else {
-	  u_lhs.make_false();
+	  u_lhs=false_exprt();
 	}
 	exprt u_rhs = exprt (ID_and, typet(ID_bool));
 	if ((semantics != ":suffix") || (j != 0)) {
@@ -382,7 +382,7 @@ void symex_slice_by_tracet::compute_ts_back(
       }
       
       if (semantics == ":prefix")
-	t[t.size()-1].make_true();
+	t[t.size()-1]=true_exprt();
       
       if (slice_this) {
 	exprt guard_copy(guard);
@@ -460,9 +460,9 @@ void symex_slice_by_tracet::slice_SSA_steps(
       simplify(guard, ns);
       
       if (implications.count(guard) != 0) {
-	it->cond_expr.make_true();
-	it->ssa_rhs.make_true();
-	it->guard.make_false();
+	it->cond_expr=true_exprt();
+	it->ssa_rhs=true_exprt();
+	it->guard=false_exprt();
 	sliced_SSA_steps++;
 	if (it->is_output() || it->is_location())
 	  trace_loc_sliced++;
@@ -478,9 +478,9 @@ void symex_slice_by_tracet::slice_SSA_steps(
 	simplify(neg_expr, ns);
 	
 	if (implications.count(neg_expr) != 0) {
-	  it->cond_expr.make_true();
-	  it->ssa_rhs.make_true();
-	  it->guard.make_false();
+	  it->cond_expr=true_exprt();
+	  it->ssa_rhs=true_exprt();
+	  it->guard=false_exprt();
 	  sliced_SSA_steps++;
 	  if (it->is_output() || it->is_location())
 	    trace_loc_sliced++;

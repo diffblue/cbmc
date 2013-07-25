@@ -179,7 +179,7 @@ void postconditiont::weaken(exprt &dest)
     s.get_original_name(SSA_step.ssa_lhs.get_identifier());
 
   if(is_used(dest, lhs_identifier))
-    dest.make_true();
+    dest=true_exprt();
     
   // otherwise, no weakening needed
 }  

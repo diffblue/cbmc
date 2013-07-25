@@ -169,7 +169,7 @@ void make_assertions_false(
         i_it++)
     {
       if(!i_it->is_assert()) continue;
-      i_it->guard.make_false();
+      i_it->guard=false_exprt();
     }
   }
 }
