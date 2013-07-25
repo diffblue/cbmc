@@ -19,7 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 /*! \defgroup gr_symbol_table Symbol Table
 */
 
-#include <ostream>
+#include <iosfwd>
 
 #include "expr.h"
 
