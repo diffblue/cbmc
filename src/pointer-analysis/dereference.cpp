@@ -220,7 +220,7 @@ exprt dereferencet::dereference(
 
     valuet value;
     value.value=failure_value;
-    value.pointer_guard.make_true();    
+    value.pointer_guard=true_exprt();
     values.push_front(value);
   }
   
