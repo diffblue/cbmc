@@ -128,16 +128,16 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
     follow_symbol(deriv);
 
     if(base.id()!=ID_struct || deriv.id()!=ID_struct)
-      expr.make_false();
+      expr=false_exprt();
     else
     {
       irep_idt base_name=base.get(ID_name);
       const class_typet &class_type=to_class_type(deriv);
 
       if(class_type.has_base(base_name))
-        expr.make_true();
+        expr=true_exprt();
       else
-        expr.make_false();
+        expr=false_exprt();
     }
   }
   else if(expr.id()==ID_msc_uuidof)

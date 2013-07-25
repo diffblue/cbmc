@@ -257,9 +257,9 @@ void smt2_convt::set_value(
   else if(type.id()==ID_bool)
   {
     if(v=="1" || v=="true")
-      identifier.value.make_true();
+      identifier.value=true_exprt();
     else if(v=="0" || v=="false")
-      identifier.value.make_false();
+      identifier.value=false_exprt();
   }
   else if(type.id()==ID_pointer)
   {

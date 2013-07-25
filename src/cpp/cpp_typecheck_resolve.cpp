@@ -1560,15 +1560,13 @@ exprt cpp_typecheck_resolvet::resolve(
   {
     if(base_name==ID_true)
     {
-      exprt result;
-      result.make_true();
+      exprt result=true_exprt();
       result.location()=location;
       return result;
     }
     else if(base_name==ID_false)
     {
-      exprt result;
-      result.make_false();
+      exprt result=false_exprt();
       result.location()=location;
       return result;
     }
