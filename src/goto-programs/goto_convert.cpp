@@ -1002,7 +1002,7 @@ void goto_convertt::convert_for(
   goto_programt tmp_y;
   goto_programt::targett y=tmp_y.add_instruction();
   y->make_goto(u);
-  y->guard.make_true();
+  y->guard=true_exprt();
   y->location=code.location();
 
   dest.destructive_append(sideeffects);
@@ -1071,7 +1071,7 @@ void goto_convertt::convert_while(
 
   // y: if(c) goto v;
   y->make_goto(v);
-  y->guard.make_true();
+  y->guard=true_exprt();
   y->location=code.location();
 
   dest.destructive_append(tmp_branch);

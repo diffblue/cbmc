@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/namespace.h>
 #include <util/symbol_table.h>
 #include <util/location.h>
+#include <util/std_expr.h>
 
 typedef enum { NO_INSTRUCTION_TYPE=0,
                GOTO=1,          // branch, possibly guarded
@@ -93,12 +94,13 @@ public:
     //! guard for gotos, assume, assert
     guardT guard;
     
+    // The below will eventually become a single target only.
     //! the target for gotos and for start_thread nodes
     typedef typename std::list<class instructiont>::iterator targett;
     typedef typename std::list<class instructiont>::const_iterator const_targett;
     typedef std::list<targett> targetst;
     typedef std::list<const_targett> const_targetst;
-
+    
     targetst targets;
     
     // for the usual case of a single target
@@ -112,6 +114,7 @@ public:
     typedef std::list<irep_idt> labelst;
     labelst labels;
 
+    // will go away
     std::set<targett> incoming_edges;
 
     //! is this node a branch target?
@@ -123,7 +126,7 @@ public:
     {
       type=_type;
       targets.clear();
-      guard.make_true();
+      guard=true_exprt();
       code.make_nil();
     }
      
@@ -179,19 +182,19 @@ public:
     inline instructiont():
       location(static_cast<const locationt &>(get_nil_irep())),
       type(NO_INSTRUCTION_TYPE),
+      guard(true_exprt()),
       location_number(0),
       target_number(unsigned(-1))
     {
-      guard.make_true();
     }
 
     inline instructiont(goto_program_instruction_typet _type):
       location(static_cast<const locationt &>(get_nil_irep())),
       type(_type),
+      guard(true_exprt()),
       location_number(0),
       target_number(unsigned(-1))
     {
-      guard.make_true();
     }
 
     //! swap two instructions    
