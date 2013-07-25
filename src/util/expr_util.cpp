@@ -63,7 +63,7 @@ exprt gen_zero(const typet &type)
   }
   else if(type_id==ID_bool)
   {
-    result.make_false();
+    result=false_exprt();
   }
   else if(type_id==ID_pointer)
   {
@@ -197,74 +197,6 @@ exprt gen_binary(
   exprt result(id, type);
   result.copy_to_operands(op1, op2);
   return result;
-}
-
-/*******************************************************************\
-
-Function: gen_binary
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void gen_binary(exprt &expr, const irep_idt &id, bool default_value)
-{
-  if(expr.operands().size()==0)
-  {
-    if(default_value)
-      expr.make_true();
-    else
-      expr.make_false();
-  }
-  else if(expr.operands().size()==1)
-  {
-    exprt tmp;
-    tmp.swap(expr.op0());
-    expr.swap(tmp);
-  }
-  else
-  {
-    expr.id(id);
-    expr.type()=bool_typet();
-  }
-}
-
-/*******************************************************************\
-
-Function: gen_and_old
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void gen_and_old(exprt &expr)
-{
-  gen_binary(expr, ID_and, true);
-}
-
-/*******************************************************************\
-
-Function: gen_or_old
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void gen_or_old(exprt &expr)
-{
-  gen_binary(expr, ID_or, false);
 }
 
 /*******************************************************************\

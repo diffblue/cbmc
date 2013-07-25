@@ -46,12 +46,7 @@ public:
     guard_list.clear();
   }
   
-  void make_false()
-  {
-    guard_list.clear();
-    guard_list.push_back(exprt());
-    guard_list.back().make_false();
-  }
+  void make_false();
   
   friend guardt &operator -= (guardt &g1, const guardt &g2);
   friend guardt &operator |= (guardt &g1, const guardt &g2);
