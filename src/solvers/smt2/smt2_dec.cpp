@@ -765,9 +765,9 @@ decision_proceduret::resultt smt2_dect::read_result_cvc3(std::istream &in)
       set_value(it->second, binary);
     }
     else if(value=="false")
-      it->second.value.make_false();
+      it->second.value=false_exprt();
     else if(value=="true")
-      it->second.value.make_true();
+      it->second.value=true_exprt();
     else if(value.substr(0,8)=="array_of")
     {
       // We assume that array_of has only concrete arguments...

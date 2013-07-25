@@ -214,11 +214,10 @@ codet cpp_typecheckt::cpp_constructor(
       member.location() = location;
       member.set(ID_C_lvalue, object_tc.get_bool(ID_C_lvalue));
 
-      exprt val;
-      val.make_false();
+      exprt val=false_exprt();
 
       if(!component.get_bool("from_base"))
-        val.make_true();
+        val=true_exprt();
 
       side_effect_exprt assign(ID_assign);
       assign.location()=location;

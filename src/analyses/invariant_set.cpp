@@ -970,11 +970,11 @@ void invariant_sett::nnf(exprt &expr, bool negate)
 
   if(expr.is_true())
   {
-    if(negate) expr.make_false();
+    if(negate) expr=false_exprt();
   }
   else if(expr.is_false())
   {
-    if(negate) expr.make_true();
+    if(negate) expr=true_exprt();
   }
   else if(expr.id()==ID_not)
   {
