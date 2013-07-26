@@ -190,12 +190,12 @@ void exprt::make_not()
 {
   if(is_true())
   {
-    make_false();
+    *this=false_exprt();
     return;
   }
   else if(is_false())
   {
-    make_true();
+    *this=true_exprt();
     return;
   }
 
