@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "static_analysis.h"
 #include "interval_analysis.h"
+#include "intervals.h"
 
 class interval_domaint:public domain_baset
 {
@@ -21,20 +22,8 @@ public:
   // trivial, conjunctive interval domain for both float
   // and integers
   
-  struct int_boundt {
-    mp_integer lower, upper;
-    bool lower_set, upper_set;
-    int_boundt():lower_set(false), upper_set(false) { }
-  };
-  
-  struct float_boundt {
-    ieee_floatt lower, upper;
-    bool lower_set, upper_set;
-    float_boundt():lower_set(false), upper_set(false) { }
-  };
-  
-  typedef std::map<irep_idt, int_boundt> int_mapt;
-  typedef std::map<irep_idt, float_boundt> float_mapt;
+  typedef std::map<irep_idt, integer_intervalt> int_mapt;
+  typedef std::map<irep_idt, ieee_float_intervalt> float_mapt;
 
   int_mapt int_map;
   float_mapt float_map;
