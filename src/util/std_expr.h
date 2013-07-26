@@ -1251,18 +1251,12 @@ public:
     op[2]=op2;
     op[3]=op3;
   }
-
-  // deprecated, use conjunction()
-  and_exprt(const exprt::operandst &op):exprt(ID_and, bool_typet())
-  {
-    if(op.empty())
-      make_true();
-    else if(op.size()==1)
-      *this=static_cast<const and_exprt &>(op.front());
-    else
-      operands()=op;
-  }
 };
+
+/*! 1) generates a conjunction for two or more operands
+ *  2) for one operand, returns the operand
+ *  3) returns true otherwise 
+*/
 
 exprt conjunction(const exprt::operandst &op);
 
@@ -1359,18 +1353,12 @@ public:
     op[2]=op2;
     op[3]=op3;
   }
-
-  // obsolete, use disjunction()
-  or_exprt(const exprt::operandst &op):exprt(ID_or, bool_typet())
-  {
-    if(op.empty())
-      make_false();
-    else if(op.size()==1)
-      *this=static_cast<const or_exprt &>(op.front());
-    else
-      operands()=op;
-  }
 };
+
+/*! 1) generates a disjunction for two or more operands
+ *  2) for one operand, returns the operand
+ *  3) returns false otherwise 
+*/
 
 exprt disjunction(const exprt::operandst &op);
 
