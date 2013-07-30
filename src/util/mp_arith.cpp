@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cctype>
 
 #include <sstream>
+#include <ostream>
 
 #include "mp_arith.h"
 #include "arith_tools.h"
@@ -25,8 +26,6 @@ Function: >>
  Purpose:
 
 \*******************************************************************/
-
-#include <iostream>
 
 mp_integer operator>>(const mp_integer &a, const mp_integer &b)
 {
