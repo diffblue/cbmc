@@ -139,10 +139,10 @@ void static_analysis_baset::output(
   {
     if(f_it->second.body_available)
     {
-      out << "////" << std::endl;
-      out << "//// Function: " << f_it->first << std::endl;
-      out << "////" << std::endl;
-      out << std::endl;
+      out << "////\n";
+      out << "//// Function: " << f_it->first << "\n";
+      out << "////\n";
+      out << "\n";
 
       output(f_it->second.body, f_it->first, out);
     }
@@ -169,12 +169,12 @@ void static_analysis_baset::output(
   forall_goto_program_instructions(i_it, goto_program)
   {
     out << "**** " << i_it->location_number << " "
-        << i_it->location << std::endl;
+        << i_it->location << "\n";
 
     get_state(i_it).output(ns, out);
-    out << std::endl;
+    out << "\n";
     goto_program.output_instruction(ns, identifier, out, i_it);
-    out << std::endl;
+    out << "\n";
   }
 }
 

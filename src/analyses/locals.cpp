@@ -61,5 +61,5 @@ void localst::output(std::ostream &out) const
       it=locals_map.begin();
       it!=locals_map.end();
       it++)
-    out << it->first << std::endl;
+    out << it->first << "\n";
 }

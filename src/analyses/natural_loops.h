@@ -111,7 +111,7 @@ void natural_loops_templatet<P, T>::compute(P &program)
 #ifdef DEBUG
           std::cout << "Computing loop for " 
                     << m_it->location_number << " -> " 
-                    << (*n_it)->location_number << std::endl;
+                    << (*n_it)->location_number << "\n";
 #endif
           if(node.dominators.find(*n_it)!=node.dominators.end())
           {
@@ -200,7 +200,7 @@ void natural_loops_templatet<P, T>::output(std::ostream &out) const
       if(l_it!=h_it->second.begin()) out << ", ";
       out << (*l_it)->location_number;
     }
-    out << " } " << std::endl;
+    out << " }\n";
   }
 }
 

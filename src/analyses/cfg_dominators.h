@@ -275,7 +275,7 @@ void cfg_dominators_templatet<P, T>::output(std::ostream &out) const
       if (++d_it!=it->second.dominators.end()) 
         out << ", ";
     }
-    out << std::endl;
+    out << "\n";
   }
 }
 

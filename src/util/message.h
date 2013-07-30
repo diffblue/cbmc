@@ -56,7 +56,7 @@ public:
   }
 
   virtual void print(unsigned level, const std::string &message)
-  { out << message << std::endl; }
+  { out << message << '\n'; }
   
 protected:
   std::ostream &out;
