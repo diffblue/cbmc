@@ -104,7 +104,7 @@ void convert(
     {
       // Should not happen
       std::cout << "Unknown sub found (" << it->name << "); malformed xml?";
-      std::cout << std::endl;
+      std::cout << "\n";
     }
   }
 }

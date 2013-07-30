@@ -98,7 +98,7 @@ void uninitialized_domaint::output(
       it=uninitialized.begin();
       it!=uninitialized.end();
       it++)
-    out << *it << std::endl;
+    out << *it << '\n';
 }
 
 /*******************************************************************\

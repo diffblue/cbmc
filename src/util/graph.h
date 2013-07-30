@@ -676,7 +676,7 @@ void graph<N>::output_dot_node(std::ostream &out, unsigned n) const
       it=node.out.begin();
       it!=node.out.end();
       it++)
-    out << n << " -> " << it->first << std::endl;
+    out << n << " -> " << it->first << '\n';
 }
 
 #endif

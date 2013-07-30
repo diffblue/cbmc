@@ -108,7 +108,7 @@ Function: call_grapht::output_dot
 
 void call_grapht::output_dot(std::ostream &out) const
 {
-  out << "digraph call_graph {" << std::endl;
+  out << "digraph call_graph {\n";
 
   for(grapht::const_iterator it=graph.begin();
       it!=graph.end();
@@ -117,10 +117,10 @@ void call_grapht::output_dot(std::ostream &out) const
     out << "  \"" << it->first << "\" -> "
         << "\"" << it->second << "\" "
         << " [arrowhead=\"vee\"];"
-        << std::endl;
+        << "\n";
   }
   
-  out << "}" << std::endl;
+  out << "}\n";
 }
 
 /*******************************************************************\
@@ -142,7 +142,7 @@ void call_grapht::output(std::ostream &out) const
       it!=graph.end();
       it++)
   {
-    out << it->first << " -> " << it->second << std::endl;
+    out << it->first << " -> " << it->second << "\n";
   }
 }
 
@@ -169,6 +169,6 @@ void call_grapht::output_xml(std::ostream &out) const
     xmlt::escape_attribute(id2string(it->first), out);
     out << "\" callee=\"";
     xmlt::escape_attribute(id2string(it->second), out);
-    out << "\">" << std::endl;
+    out << "\">\n";
   }
 }

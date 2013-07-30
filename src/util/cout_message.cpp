@@ -22,14 +22,14 @@ void cout_message_handlert::print(
   unsigned level,
   const std::string &message)
 {
-  std::cout << message << std::endl;
+  std::cout << message << '\n';
 }
  
 void cerr_message_handlert::print(
   unsigned level,
   const std::string &message)
 {
-  std::cerr << message << std::endl;
+  std::cerr << message << '\n' << std::flush;
 }
 
 void console_message_handlert::print(
@@ -61,14 +61,14 @@ void console_message_handlert::print(
   {
     // writing to a file
     if(level>=4)
-      std::cout << message << std::endl;
+      std::cout << message << '\n';
     else
-      std::cerr << message << std::endl;
+      std::cerr << message << '\n' << std::flush;
   }
   #else
   if(level>=4)
-    std::cout << message << std::endl;
+    std::cout << message << '\n';
   else
-    std::cerr << message << std::endl;
+    std::cerr << message << '\n' << std::flush;
   #endif
 }
