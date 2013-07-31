@@ -90,10 +90,12 @@ public:
   }
 
   #ifdef SHARING
+  // constructor for blank irep
   inline irept():data(&empty_d)
   {
   }
 
+  // copy constructor
   inline irept(const irept &irep):data(irep.data)
   {
     if(data!=&empty_d)
@@ -105,6 +107,19 @@ public:
       #endif
     }
   }
+
+  #ifdef USE_MOVE
+  // Copy from rvalue reference.
+  // Note that this does avoid a branch compared to the
+  // standard copy constructor above.
+  inline irept(const irept &&irep):data(irep.data)
+  {
+    #ifdef IREP_DEBUG
+    std::cout << "COPY MOVE\n";
+    #endif
+    irep.data=&empty_d;
+  }
+  #endif
 
   inline irept &operator=(const irept &irep)
   {
@@ -123,11 +138,26 @@ public:
     return *this;
   }
 
+  #ifdef USE_MOVE
+  // Note that the move assignment operator does avoid
+  // three branches compared to standard operator above.
+  inline irept &operator=(const irept &&irep)
+  {
+    #ifdef IREP_DEBUG
+    std::cout << "ASSIGN MOVE\n";
+    #endif
+    // we simply swap two pointers
+    std::swap(data, irep.data);
+    return *this;
+  }
+  #endif
+  
   inline ~irept()
   {
     remove_ref(data);
     data=NULL;
   }
+  
   #else
   inline irept()
   {
