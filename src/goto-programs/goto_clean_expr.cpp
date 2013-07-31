@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <util/simplify_expr.h>
 #include <util/expr_util.h>
 #include <util/std_expr.h>
 #include <util/rename.h>
@@ -79,14 +80,24 @@ Function: goto_convertt::needs_cleaning
 
 bool goto_convertt::needs_cleaning(const exprt &expr)
 {
-  if(expr.id()==ID_index ||
-     expr.id()==ID_dereference ||
+  if(expr.id()==ID_dereference ||
      expr.id()==ID_sideeffect ||
      expr.id()==ID_struct ||
      expr.id()==ID_array ||
      expr.id()==ID_union ||
      expr.id()==ID_comma)
     return true;
+
+  if(expr.id()==ID_index)
+  {
+    // Will usually clean index because of possible memory violation.
+    // We do an exception for "string-lit"[0], which is safe.
+    if(to_index_expr(expr).array().id()==ID_string_constant &&
+       to_index_expr(expr).index().is_zero())
+      return false;
+    
+    return true;
+  }
 
   // We can't flatten quantified expressions by introducing new literals for
   // conditional expressions.  This is because the body of the quantified
@@ -215,13 +226,32 @@ void goto_convertt::clean_expr(
 
     // copy expression
     if_exprt if_expr=to_if_expr(expr);
-
+    
     if(!if_expr.cond().is_boolean())
       throw "first argument of `if' must be boolean, but got "
         +if_expr.cond().to_string();
 
     const locationt location=expr.find_location();
   
+    // We do some constant-folding here, to mimic
+    // what typical compilers do.
+    {
+      exprt tmp_cond=if_expr.cond();
+      simplify(tmp_cond, ns);
+      if(tmp_cond.is_true())
+      {
+        clean_expr(if_expr.true_case(), dest, result_is_used);
+        expr=if_expr.true_case();
+        return;
+      }
+      else if(tmp_cond.is_false())
+      {
+        clean_expr(if_expr.false_case(), dest, result_is_used);
+        expr=if_expr.false_case();
+        return;
+      }
+    }
+
     goto_programt tmp_true;
     clean_expr(if_expr.true_case(), tmp_true, result_is_used);
 
