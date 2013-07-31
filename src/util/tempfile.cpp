@@ -159,3 +159,19 @@ std::string get_temporary_file(
   return result;
 }
 
+/*******************************************************************\
+
+Function: temporary_filet::~temporary_filet
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+temporary_filet::~temporary_filet()
+{
+  unlink(name.c_str());
+}
