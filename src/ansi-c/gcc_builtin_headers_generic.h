@@ -4,7 +4,7 @@ void __builtin_va_end(void *ap);
 void __builtin_va_copy(__builtin_va_list dest, __builtin_va_list src);
 void *__builtin_va_arg_pack();
 int __builtin_va_arg_pack_len();
-int __builtin_constant_p(int);
+int __builtin_constant_p();
 int __builtin_abs(int);
 long int __builtin_labs(long);
 double __builtin_cos(double);

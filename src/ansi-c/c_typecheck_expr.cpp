@@ -2398,8 +2398,25 @@ void c_typecheck_baset::do_special_functions(
       // try to produce constant
       exprt tmp1=expr.arguments().front();
       simplify(tmp1, *this);
-
-      exprt tmp2=from_integer(tmp1.is_constant(), expr.type());      
+      
+      bool is_constant=false;
+      
+      // Need to do some special treatment for string literals,
+      // which are (void *)&("lit"[0])
+      if(tmp1.id()==ID_typecast &&
+         tmp1.operands().size()==1 &&
+         tmp1.op0().id()==ID_address_of &&
+         tmp1.op0().operands().size()==1 &&
+         tmp1.op0().op0().id()==ID_index &&
+         tmp1.op0().op0().operands().size()==2 &&
+         tmp1.op0().op0().op0().id()==ID_string_constant)
+      {
+        is_constant=true;
+      }
+      else
+        is_constant=tmp1.is_constant();
+      
+      exprt tmp2=from_integer(is_constant, expr.type());
       tmp2.location()=location;
       expr.swap(tmp2);
     }
