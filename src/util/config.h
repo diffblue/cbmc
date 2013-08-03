@@ -76,6 +76,18 @@ public:
                    ARCH_ALPHA, ARCH_MIPS, ARCH_S390, ARCH_S390X, ARCH_SPARC,
                    ARCH_IA64, ARCH_X32 } archt;
     archt arch;
+
+    void set_arch_spec_i386();
+    void set_arch_spec_x86_64();
+    void set_arch_spec_power(const irep_idt &subarch);
+    void set_arch_spec_arm(const irep_idt &subarch);
+    void set_arch_spec_alpha();
+    void set_arch_spec_mips(const irep_idt &subarch);
+    void set_arch_spec_s390();
+    void set_arch_spec_s390x();
+    void set_arch_spec_sparc();
+    void set_arch_spec_ia64();
+    void set_arch_spec_x32();
     
     typedef enum { NO_MODE, MODE_ANSI, MODE_GCC, MODE_VISUAL_STUDIO,
                    MODE_CODEWARRIOR, MODE_ARM } modet;
