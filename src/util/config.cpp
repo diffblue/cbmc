@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "arith_tools.h"
 #include "cmdline.h"
 #include "simplify_expr.h"
+#include "i2string.h"
 
 configt config;
 
@@ -231,7 +232,466 @@ void configt::ansi_ct::set_LP32()
 
 /*******************************************************************\
 
-Function: configt::ansi_ct::set
+Function: configt::ansi_ct::set_arch_spec_i386
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void configt::ansi_ct::set_arch_spec_i386()
+{
+  set_ILP32();
+  arch=ARCH_I386;
+  endianness=IS_LITTLE_ENDIAN;
+  char_is_unsigned=false;
+
+  switch(mode)
+  {
+  case MODE_GCC:
+    defines.push_back("i386");
+    defines.push_back("__i386");
+    defines.push_back("__i386__");
+    if(os==OS_MACOS)
+      defines.push_back("__LITTLE_ENDIAN__");
+    break;
+  case MODE_VISUAL_STUDIO:
+    defines.push_back("_M_IX86");
+    break;
+  case MODE_CODEWARRIOR:
+  case MODE_ARM:
+  case MODE_ANSI:
+    break;
+  case NO_MODE:
+    assert(false);
+  }
+}
+
+/*******************************************************************\
+
+Function: configt::ansi_ct::set_arch_spec_x86_64
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void configt::ansi_ct::set_arch_spec_x86_64()
+{
+  set_LP64();
+  arch=ARCH_X86_64;
+  endianness=IS_LITTLE_ENDIAN;
+  long_double_width=16*8;
+  pointer_width=8*8;
+  char_is_unsigned=false;
+
+  switch(mode)
+  {
+  case MODE_GCC:
+    defines.push_back("__LP64__");
+    defines.push_back("__x86_64");
+    defines.push_back("__x86_64__");
+    defines.push_back("_LP64");
+    defines.push_back("__amd64__");
+    defines.push_back("__amd64");
+    if(os==OS_MACOS)
+      defines.push_back("__LITTLE_ENDIAN__");
+    break;
+  case MODE_VISUAL_STUDIO:
+    defines.push_back("_M_X64");
+    defines.push_back("_M_AMD64");
+    break;
+  case MODE_CODEWARRIOR:
+  case MODE_ARM:
+  case MODE_ANSI:
+    break;
+  case NO_MODE:
+    assert(false);
+  }
+}
+
+/*******************************************************************\
+
+Function: configt::ansi_ct::set_arch_spec_power
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void configt::ansi_ct::set_arch_spec_power(const irep_idt &subarch)
+{
+  if(subarch=="power")
+    set_ILP32();
+  else
+    set_LP64();
+  arch=ARCH_POWER;
+  endianness=IS_BIG_ENDIAN;
+  long_double_width=16*8;
+  char_is_unsigned=true;
+
+  switch(mode)
+  {
+  case MODE_GCC:
+    defines.push_back("__powerpc");
+    defines.push_back("__powerpc__");
+    defines.push_back("__POWERPC__");
+    defines.push_back("__ppc__");
+    if(os==OS_MACOS)
+      defines.push_back("__BIG_ENDIAN__");
+    break;
+  case MODE_VISUAL_STUDIO:
+    defines.push_back("_M_PPC");
+    break;
+  case MODE_CODEWARRIOR:
+  case MODE_ARM:
+  case MODE_ANSI:
+    break;
+  case NO_MODE:
+    assert(false);
+  }
+}
+
+/*******************************************************************\
+
+Function: configt::ansi_ct::set_arch_spec_arm
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void configt::ansi_ct::set_arch_spec_arm(const irep_idt &subarch)
+{
+  if(subarch=="arm64")
+  {
+    set_LP64();
+    long_int_width=8*8;
+    pointer_width=8*8;
+    long_double_width=16*8;
+  }
+  else
+  {
+    set_ILP32();
+    long_double_width=8*8;
+  }
+  arch=ARCH_ARM;
+  endianness=IS_LITTLE_ENDIAN;
+  char_is_unsigned=true;
+
+  switch(mode)
+  {
+  case MODE_GCC:
+    defines.push_back("__arm__");
+    if(subarch=="armhf")
+      defines.push_back("__ARM_PCS_VFP");
+    break;
+  case MODE_VISUAL_STUDIO:
+    defines.push_back("_M_ARM");
+    break;
+  case MODE_CODEWARRIOR:
+  case MODE_ARM:
+  case MODE_ANSI:
+    break;
+  case NO_MODE:
+    assert(false);
+  }
+}
+
+/*******************************************************************\
+
+Function: configt::ansi_ct::set_arch_spec_alpha
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void configt::ansi_ct::set_arch_spec_alpha()
+{
+  set_LP64();
+  arch=ARCH_ALPHA;
+  endianness=IS_LITTLE_ENDIAN;
+  long_double_width=16*8;
+  long_int_width=8*8;
+  pointer_width=8*8;
+  char_is_unsigned=false;
+
+  switch(mode)
+  {
+  case MODE_GCC:
+    defines.push_back("__alpha__");
+    break;
+  case MODE_VISUAL_STUDIO:
+    defines.push_back("_M_ALPHA");
+    break;
+  case MODE_CODEWARRIOR:
+  case MODE_ARM:
+  case MODE_ANSI:
+    break;
+  case NO_MODE:
+    assert(false);
+  }
+}
+
+/*******************************************************************\
+
+Function: configt::ansi_ct::set_arch_spec_mips
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void configt::ansi_ct::set_arch_spec_mips(const irep_idt &subarch)
+{
+  set_ILP32();
+  arch=ARCH_MIPS;
+  if(subarch=="mipsel")
+    endianness=IS_LITTLE_ENDIAN;
+  else
+    endianness=IS_BIG_ENDIAN;
+  long_double_width=8*8;
+  char_is_unsigned=false;
+
+  switch(mode)
+  {
+  case MODE_GCC:
+    defines.push_back("__mips__");
+    defines.push_back("mips");
+    defines.push_back("_MIPS_SZPTR="+i2string(config.ansi_c.pointer_width));
+    break;
+  case MODE_VISUAL_STUDIO:
+    assert(false); // not supported by Visual Studio
+    break;
+  case MODE_CODEWARRIOR:
+  case MODE_ARM:
+  case MODE_ANSI:
+    break;
+  case NO_MODE:
+    assert(false);
+  }
+}
+
+/*******************************************************************\
+
+Function: configt::ansi_ct::set_arch_spec_s390
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void configt::ansi_ct::set_arch_spec_s390()
+{
+  set_ILP32();
+  arch=ARCH_S390;
+  endianness=IS_BIG_ENDIAN;
+  long_double_width=16*8;
+  char_is_unsigned=true;
+
+  switch(mode)
+  {
+  case MODE_GCC:
+    defines.push_back("__s390__");
+    break;
+  case MODE_VISUAL_STUDIO:
+    assert(false); // not supported by Visual Studio
+    break;
+  case MODE_CODEWARRIOR:
+  case MODE_ARM:
+  case MODE_ANSI:
+    break;
+  case NO_MODE:
+    assert(false);
+  }
+}
+
+/*******************************************************************\
+
+Function: configt::ansi_ct::set_arch_spec_s390x
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void configt::ansi_ct::set_arch_spec_s390x()
+{
+  set_LP64();
+  arch=ARCH_S390X;
+  long_int_width=8*8;
+  pointer_width=8*8;
+  endianness=IS_BIG_ENDIAN;
+  char_is_unsigned=true;
+
+  switch(mode)
+  {
+  case MODE_GCC:
+    defines.push_back("__s390x__");
+    break;
+  case MODE_VISUAL_STUDIO:
+    assert(false); // not supported by Visual Studio
+    break;
+  case MODE_CODEWARRIOR:
+  case MODE_ARM:
+  case MODE_ANSI:
+    break;
+  case NO_MODE:
+    assert(false);
+  }
+}
+
+/*******************************************************************\
+
+Function: configt::ansi_ct::set_arch_spec_sparc
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void configt::ansi_ct::set_arch_spec_sparc()
+{
+  set_ILP32();
+  arch=ARCH_SPARC;
+  endianness=IS_BIG_ENDIAN;
+  long_double_width=16*8;
+  char_is_unsigned=false;
+
+  switch(mode)
+  {
+  case MODE_GCC:
+    defines.push_back("__sparc__");
+    break;
+  case MODE_VISUAL_STUDIO:
+    assert(false); // not supported by Visual Studio
+    break;
+  case MODE_CODEWARRIOR:
+  case MODE_ARM:
+  case MODE_ANSI:
+    break;
+  case NO_MODE:
+    assert(false);
+  }
+}
+
+/*******************************************************************\
+
+Function: configt::ansi_ct::set_arch_spec_ia64
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void configt::ansi_ct::set_arch_spec_ia64()
+{
+  set_LP64();
+  arch=ARCH_IA64;
+  long_int_width=8*8;
+  pointer_width=8*8;
+  long_double_width=16*8;
+  endianness=IS_LITTLE_ENDIAN;
+  char_is_unsigned=false;
+
+  switch(mode)
+  {
+  case MODE_GCC:
+    defines.push_back("__ia64__");
+    defines.push_back("_IA64");
+    defines.push_back("__IA64__");
+    break;
+  case MODE_VISUAL_STUDIO:
+    defines.push_back("_M_IA64");
+    break;
+  case MODE_CODEWARRIOR:
+  case MODE_ARM:
+  case MODE_ANSI:
+    break;
+  case NO_MODE:
+    assert(false);
+  }
+}
+
+/*******************************************************************\
+
+Function: configt::ansi_ct::set_arch_spec_x32
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void configt::ansi_ct::set_arch_spec_x32()
+{
+  // This is a variant of x86_64 that has
+  // 64-bit long int but 32-bit pointers.
+  set_LP64();
+  arch=ARCH_X32;
+  endianness=IS_LITTLE_ENDIAN;
+  long_int_width=8*8;
+  pointer_width=4*8;
+  long_double_width=16*8;
+  char_is_unsigned=false;
+
+  switch(mode)
+  {
+  case MODE_GCC:
+    defines.push_back("__ILP32__");
+    defines.push_back("__x86_64");
+    defines.push_back("__x86_64__");
+    defines.push_back("__amd64__");
+    defines.push_back("__amd64");
+    break;
+  case MODE_VISUAL_STUDIO:
+    assert(false); // not supported by Visual Studio
+    break;
+  case MODE_CODEWARRIOR:
+  case MODE_ARM:
+  case MODE_ANSI:
+    break;
+  case NO_MODE:
+    assert(false);
+  }
+}
+
+/*******************************************************************\
+
+Function: configt::set
 
   Inputs:
 
@@ -360,126 +820,36 @@ bool configt::set(const cmdlinet &cmdline)
       ansi_c.set_32();
   }
   else if(arch=="alpha")
-  {
-    ansi_c.set_LP64();
-    ansi_c.arch=configt::ansi_ct::ARCH_ALPHA;
-    ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
-    ansi_c.long_double_width=16*8;
-    ansi_c.char_is_unsigned=false;
-  }
+    ansi_c.set_arch_spec_alpha();
   else if(arch=="arm64" ||
           arch=="armel" ||
           arch=="armhf" ||
           arch=="arm")
-  {
-    if(arch=="arm64")
-    {
-      ansi_c.set_LP64();
-      ansi_c.long_double_width=16*8;
-    }
-    else
-    {
-      ansi_c.set_ILP32();
-      ansi_c.long_double_width=8*8;
-    }
-
-    ansi_c.arch=configt::ansi_ct::ARCH_ARM;
-    ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
-    ansi_c.char_is_unsigned=true;
-
-    if(arch=="armhf")
-      ansi_c.defines.push_back("__ARM_PCS_VFP");
-  }
+    ansi_c.set_arch_spec_arm(arch);
   else if(arch=="mipsel" ||
           arch=="mips")
-  {
-    ansi_c.set_ILP32();
-    ansi_c.arch=configt::ansi_ct::ARCH_MIPS;
-
-    if(arch=="mipsel")
-      ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
-    else
-      ansi_c.endianness=configt::ansi_ct::IS_BIG_ENDIAN;
-
-    ansi_c.long_double_width=8*8;
-    ansi_c.char_is_unsigned=false;
-  }
+    ansi_c.set_arch_spec_mips(arch);
   else if(arch=="powerpc" ||
           arch=="ppc64")
-  {
-    if(arch=="power")
-      ansi_c.set_ILP32();
-    else
-      ansi_c.set_LP64();
-    ansi_c.arch=configt::ansi_ct::ARCH_POWER;
-    ansi_c.endianness=configt::ansi_ct::IS_BIG_ENDIAN;
-    ansi_c.long_double_width=16*8;
-    ansi_c.char_is_unsigned=true;
-  }
+    ansi_c.set_arch_spec_power(arch);
   else if(arch=="sparc")
-  {
-    ansi_c.set_ILP32();
-    ansi_c.arch=configt::ansi_ct::ARCH_SPARC;
-    ansi_c.endianness=configt::ansi_ct::IS_BIG_ENDIAN;
-    ansi_c.long_double_width=16*8;
-    ansi_c.char_is_unsigned=false;
-  }
+    ansi_c.set_arch_spec_sparc();
   else if(arch=="ia64")
-  {
-    ansi_c.set_LP64();
-    ansi_c.arch=configt::ansi_ct::ARCH_IA64;
-    ansi_c.long_double_width=16*8;
-    ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
-    ansi_c.char_is_unsigned=false;
-  }
+    ansi_c.set_arch_spec_ia64();
   else if(arch=="s390x")
-  {
-    ansi_c.set_LP64();
-    ansi_c.arch=configt::ansi_ct::ARCH_S390X;
-    ansi_c.endianness=configt::ansi_ct::IS_BIG_ENDIAN;
-    ansi_c.char_is_unsigned=true;
-  }
+    ansi_c.set_arch_spec_s390x();
   else if(arch=="s390")
-  {
-    ansi_c.set_ILP32();
-    ansi_c.arch=configt::ansi_ct::ARCH_S390;
-    ansi_c.endianness=configt::ansi_ct::IS_BIG_ENDIAN;
-    ansi_c.long_double_width=16*8;
-    ansi_c.char_is_unsigned=true;
-  }
+    ansi_c.set_arch_spec_s390();
   else if(arch=="x32")
-  {
-    // This is a variant of x86_64 that has
-    // 64-bit long int but 32-bit pointers.
-    ansi_c.set_LP64();
-    ansi_c.arch=configt::ansi_ct::ARCH_X32;
-    ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
-    ansi_c.pointer_width=4*8; // exception!
-    ansi_c.long_double_width=16*8;
-    ansi_c.char_is_unsigned=false;
-  }
+    ansi_c.set_arch_spec_x32();
   else if(arch=="x86_64")
-  {
-    ansi_c.set_LP64();
-    ansi_c.arch=configt::ansi_ct::ARCH_X86_64;
-    ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
-    ansi_c.long_double_width=16*8;
-    ansi_c.char_is_unsigned=false;
-  }
+    ansi_c.set_arch_spec_x86_64();
   else if(arch=="i386")
-  {
-    ansi_c.set_ILP32();
-    ansi_c.arch=configt::ansi_ct::ARCH_I386;
-    ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
-    ansi_c.char_is_unsigned=false;
-  }
+    ansi_c.set_arch_spec_i386();
   else
   {
-    // something new and unknown!
-    ansi_c.set_ILP32();
-    ansi_c.arch=configt::ansi_ct::ARCH_I386;
-    ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
-    ansi_c.char_is_unsigned=false;
+    // something new and unknown, we use i386 instead
+    ansi_c.set_arch_spec_i386();
   }
 
   if(os=="windows")
