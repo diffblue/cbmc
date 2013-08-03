@@ -281,11 +281,6 @@ bool c_preprocess_visual_studio(
   if(is_dot_i_file(file))
     return c_preprocess_none(mode, file, outstream, message_handler);
 
-  #ifndef _WIN32
-  // we fall back to gcc
-  return c_preprocess_gcc(mode, file, outstream, message_handler);
-  #endif
-
   message_streamt message_stream(message_handler);
 
   // use Visual Studio's CL
