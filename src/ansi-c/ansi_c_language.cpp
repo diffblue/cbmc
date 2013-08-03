@@ -84,9 +84,9 @@ bool ansi_c_languaget::preprocess(
 {
   // stdin?
   if(path=="")
-    return c_preprocess(PREPROCESS_C, instream, outstream, message_handler);
+    return c_preprocess(instream, outstream, message_handler);
 
-  return c_preprocess(PREPROCESS_C, path, outstream, message_handler);  
+  return c_preprocess(path, outstream, message_handler);  
 }
              
 /*******************************************************************\
@@ -134,23 +134,23 @@ bool ansi_c_languaget::parse(
 
   switch(config.ansi_c.mode)
   {
-  case configt::ansi_ct::MODE_CODEWARRIOR:
+  case configt::ansi_ct::MODE_CODEWARRIOR_C_CPP:
     ansi_c_parser.mode=ansi_c_parsert::CW;
     break;
    
-  case configt::ansi_ct::MODE_VISUAL_STUDIO:
+  case configt::ansi_ct::MODE_VISUAL_STUDIO_C_CPP:
     ansi_c_parser.mode=ansi_c_parsert::MSC;
     break;
     
-  case configt::ansi_ct::MODE_ANSI:
+  case configt::ansi_ct::MODE_ANSI_C_CPP:
     ansi_c_parser.mode=ansi_c_parsert::ANSI;
     break;
     
-  case configt::ansi_ct::MODE_GCC:
+  case configt::ansi_ct::MODE_GCC_C:
     ansi_c_parser.mode=ansi_c_parsert::GCC;
     break;
     
-  case configt::ansi_ct::MODE_ARM:
+  case configt::ansi_ct::MODE_ARM_C_CPP:
     ansi_c_parser.mode=ansi_c_parsert::ARM;
     break;
     

@@ -60,7 +60,7 @@ bool cw_modet::doit()
   // get configuration
   config.set(cmdline);
 
-  config.ansi_c.mode=configt::ansi_ct::MODE_CODEWARRIOR;
+  config.ansi_c.mode=configt::ansi_ct::MODE_CODEWARRIOR_C_CPP;
 
   compiler.object_file_extension="o";
 

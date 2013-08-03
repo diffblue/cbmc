@@ -473,8 +473,8 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
         // definition is marked as "extern inline"
         
         if(old_symbol.type.get_bool(ID_C_inlined) &&
-           (config.ansi_c.mode==configt::ansi_ct::MODE_GCC ||
-            config.ansi_c.mode==configt::ansi_ct::MODE_ARM))
+           (config.ansi_c.mode==configt::ansi_ct::MODE_GCC_C ||
+            config.ansi_c.mode==configt::ansi_ct::MODE_ARM_C_CPP))
         {
         }
         else

@@ -90,8 +90,11 @@ bool cpp_languaget::preprocess(
   std::ostream &outstream,
   message_handlert &message_handler)
 {
+  if(config.ansi_c.mode==configt::ansi_ct::MODE_GCC_C)
+    config.ansi_c.mode=configt::ansi_ct::MODE_GCC_CPP;
+
   if(path=="")
-    return c_preprocess(PREPROCESS_CPP, instream, outstream, message_handler);
+    return c_preprocess(instream, outstream, message_handler);
 
   // check extension
 
@@ -108,7 +111,7 @@ bool cpp_languaget::preprocess(
     return false;
   }
 
-  return c_preprocess(PREPROCESS_CPP, path, outstream, message_handler);
+  return c_preprocess(path, outstream, message_handler);
 }
 
 /*******************************************************************\
@@ -153,23 +156,24 @@ bool cpp_languaget::parse(
 
   switch(config.ansi_c.mode)
   {
-  case configt::ansi_ct::MODE_CODEWARRIOR:
+  case configt::ansi_ct::MODE_CODEWARRIOR_C_CPP:
     cpp_parser.mode=cpp_parsert::CW;
     break;
    
-  case configt::ansi_ct::MODE_VISUAL_STUDIO:
+  case configt::ansi_ct::MODE_VISUAL_STUDIO_C_CPP:
     cpp_parser.mode=cpp_parsert::MSC;
     break;
     
-  case configt::ansi_ct::MODE_ANSI:
+  case configt::ansi_ct::MODE_ANSI_C_CPP:
     cpp_parser.mode=cpp_parsert::ANSI;
     break;
     
-  case configt::ansi_ct::MODE_GCC:
+  case configt::ansi_ct::MODE_GCC_C:
+  case configt::ansi_ct::MODE_GCC_CPP:
     cpp_parser.mode=cpp_parsert::GCC;
     break;
     
-  case configt::ansi_ct::MODE_ARM:
+  case configt::ansi_ct::MODE_ARM_C_CPP:
     cpp_parser.mode=cpp_parsert::ARM;
     break;
     
