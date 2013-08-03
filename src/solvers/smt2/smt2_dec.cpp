@@ -1,3 +1,4 @@
+
 /*******************************************************************\
 
 Module:
@@ -144,7 +145,22 @@ decision_proceduret::resultt smt2_dect::dec_solve()
     break;
 
   case MATHSAT:
-    command = "mathsat -input=smt2"
+    // The options below were recommended by Alberto Griggio
+    // on 10 July 2013
+    command = "mathsat -input=smt2 \
+ -preprocessor.toplevel_propagation=true \
+ -preprocessor.simplification=7 \
+ -dpll.branching_random_frequency=0.01 \
+ -dpll.branching_random_invalidate_phase_cache=true \
+ -dpll.restart_strategy=3 \
+ -dpll.glucose_var_activity=true \
+ -dpll.glucose_learnt_minimization=true \
+ -theory.bv.eager=true \
+ -theory.bv.bit_blast_mode=1 \
+ -theory.bv.delay_propagated_eqs=true \
+ -theory.fp.mode=1 \
+ -theory.fp.bit_blast_mode=2 \
+ -theory.arr.mode=1"
               " < "+temp_out_filename
             + " > "+temp_result_filename;
     break;
@@ -364,10 +380,10 @@ decision_proceduret::resultt smt2_dect::read_result_mathsat(std::istream &in)
       //                       string2integer(w, 10).to_ulong());
       it->second.value=parse_literal(v, it->second.type);
     }
-    else if(value.substr(0, 10) == "((_ fpnum ")
+    else if(value.substr(0, 4) == "(fp ")
     {
-      // value is "((_ fpnum EXP_SIZE MANT_SIZE) DECIMAL_VALUE)"
-      value = value.substr(10);
+      // value is "(fpnum signbv exponentbv significandbv)"
+      value = value.substr(4);
       size_t pos = value.find(' ');
       std::string e = value.substr(0, pos);
       size_t pos2 = value.find(')');
@@ -379,7 +395,7 @@ decision_proceduret::resultt smt2_dect::read_result_mathsat(std::istream &in)
       //    string2integer(, 10), w);
       it->second.value=parse_literal(v, it->second.type);
     }
-    else if(value.substr(0, 8) == "(_ +inf ")
+    else if(value.substr(0, 8) == "(_ +oo ")
     {
       value = value.substr(8);
       size_t pos = value.find(' ');
@@ -391,7 +407,7 @@ decision_proceduret::resultt smt2_dect::read_result_mathsat(std::istream &in)
       //    ieee_floatt::plus_infinity(ieee_float_spect(m, e)).pack(), e+m+1);
       it->second.value=ieee_floatt::plus_infinity(ieee_float_spect(m, e)).to_expr();
     }
-    else if(value.substr(0, 8) == "(_ -inf ")
+    else if(value.substr(0, 8) == "(_ -oo ")
     {
       value = value.substr(8);
       size_t pos = value.find(' ');
