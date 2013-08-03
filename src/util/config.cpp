@@ -390,19 +390,17 @@ bool configt::set(const cmdlinet &cmdline)
     if(arch=="armhf")
       ansi_c.defines.push_back("__ARM_PCS_VFP");
   }
-  else if(arch=="mipsel")
+  else if(arch=="mipsel" ||
+          arch=="mips")
   {
     ansi_c.set_ILP32();
     ansi_c.arch=configt::ansi_ct::ARCH_MIPS;
-    ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
-    ansi_c.long_double_width=8*8;
-    ansi_c.char_is_unsigned=false;
-  }
-  else if(arch=="mips")
-  {
-    ansi_c.set_ILP32();
-    ansi_c.arch=configt::ansi_ct::ARCH_MIPS;
-    ansi_c.endianness=configt::ansi_ct::IS_BIG_ENDIAN;
+
+    if(arch=="mipsel")
+      ansi_c.endianness=configt::ansi_ct::IS_LITTLE_ENDIAN;
+    else
+      ansi_c.endianness=configt::ansi_ct::IS_BIG_ENDIAN;
+
     ansi_c.long_double_width=8*8;
     ansi_c.char_is_unsigned=false;
   }
