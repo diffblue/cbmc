@@ -314,6 +314,39 @@ bool configt::set(const cmdlinet &cmdline)
     os="macos";
   }
 
+  if(os=="windows")
+  {
+    ansi_c.lib=configt::ansi_ct::LIB_FULL;
+    ansi_c.os=configt::ansi_ct::OS_WIN;
+    #ifndef _WIN32
+    ansi_c.mode=ansi_ct::MODE_GCC;
+    #else
+    // there are gcc versions that target Windows
+    if(cmdline.isset("gcc"))
+      ansi_c.mode=ansi_ct::MODE_GCC;
+    else
+      ansi_c.mode=ansi_ct::MODE_VISUAL_STUDIO;
+    #endif
+  }
+  else if(os=="macos")
+  {
+    ansi_c.lib=configt::ansi_ct::LIB_FULL;
+    ansi_c.os=configt::ansi_ct::OS_MACOS;
+    ansi_c.mode=ansi_ct::MODE_GCC;
+  }
+  else if(os=="linux")
+  {
+    ansi_c.lib=configt::ansi_ct::LIB_FULL;
+    ansi_c.os=configt::ansi_ct::OS_LINUX;
+    ansi_c.mode=ansi_ct::MODE_GCC;
+  }
+  else
+  {
+    ansi_c.lib=configt::ansi_ct::LIB_NONE;
+    ansi_c.os=configt::ansi_ct::NO_OS;
+    ansi_c.mode=ansi_ct::MODE_GCC;
+  }
+  
   if(arch=="none")
   {
     // the architecture for people who can't commit
@@ -453,9 +486,6 @@ bool configt::set(const cmdlinet &cmdline)
 
   if(os=="windows")
   {
-    ansi_c.lib=configt::ansi_ct::LIB_FULL;
-    ansi_c.os=configt::ansi_ct::OS_WIN;
-
     // note that sizeof(void *)==8, but sizeof(long)==4!
     if(arch=="x86_64")
       ansi_c.set_LLP64();
@@ -470,32 +500,8 @@ bool configt::set(const cmdlinet &cmdline)
       ansi_c.long_double_width=16*8;
     else
       ansi_c.long_double_width=8*8;
+  }
 
-    // there are gcc versions that target Windows
-    if(cmdline.isset("gcc"))
-      ansi_c.mode=ansi_ct::MODE_GCC;
-    else
-      ansi_c.mode=ansi_ct::MODE_VISUAL_STUDIO;
-  }
-  else if(os=="macos")
-  {
-    ansi_c.lib=configt::ansi_ct::LIB_FULL;
-    ansi_c.os=configt::ansi_ct::OS_MACOS;
-    ansi_c.mode=ansi_ct::MODE_GCC;
-  }
-  else if(os=="linux")
-  {
-    ansi_c.lib=configt::ansi_ct::LIB_FULL;
-    ansi_c.os=configt::ansi_ct::OS_LINUX;
-    ansi_c.mode=ansi_ct::MODE_GCC;
-  }
-  else
-  {
-    ansi_c.lib=configt::ansi_ct::LIB_NONE;
-    ansi_c.os=configt::ansi_ct::NO_OS;
-    ansi_c.mode=ansi_ct::MODE_GCC;
-  }
-  
   // let's check some of the type widths
   if(arch==this_arch && os==this_os)
   {
