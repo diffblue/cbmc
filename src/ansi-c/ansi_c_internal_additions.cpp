@@ -183,8 +183,8 @@ void ansi_c_internal_additions(std::string &code)
     "\n";
     
   // GCC junk stuff, also for ARM
-  if(config.ansi_c.mode==configt::ansi_ct::MODE_GCC ||
-     config.ansi_c.mode==configt::ansi_ct::MODE_ARM)
+  if(config.ansi_c.mode==configt::ansi_ct::MODE_GCC_C ||
+     config.ansi_c.mode==configt::ansi_ct::MODE_ARM_C_CPP)
   {
     code+=gcc_builtin_headers_generic;
 
@@ -233,11 +233,11 @@ void ansi_c_internal_additions(std::string &code)
           "int __assume(int);\n";
     
   // ARM stuff
-  if(config.ansi_c.mode==configt::ansi_ct::MODE_ARM)
+  if(config.ansi_c.mode==configt::ansi_ct::MODE_ARM_C_CPP)
     code+=arm_builtin_headers;
     
   // CW stuff
-  if(config.ansi_c.mode==configt::ansi_ct::MODE_CODEWARRIOR)
+  if(config.ansi_c.mode==configt::ansi_ct::MODE_CODEWARRIOR_C_CPP)
     code+=cw_builtin_headers;
     
   // Architecture strings

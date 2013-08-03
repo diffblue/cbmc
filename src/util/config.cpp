@@ -251,19 +251,20 @@ void configt::ansi_ct::set_arch_spec_i386()
 
   switch(mode)
   {
-  case MODE_GCC:
+  case MODE_GCC_C:
+  case MODE_GCC_CPP:
     defines.push_back("i386");
     defines.push_back("__i386");
     defines.push_back("__i386__");
     if(os==OS_MACOS)
       defines.push_back("__LITTLE_ENDIAN__");
     break;
-  case MODE_VISUAL_STUDIO:
+  case MODE_VISUAL_STUDIO_C_CPP:
     defines.push_back("_M_IX86");
     break;
-  case MODE_CODEWARRIOR:
-  case MODE_ARM:
-  case MODE_ANSI:
+  case MODE_CODEWARRIOR_C_CPP:
+  case MODE_ARM_C_CPP:
+  case MODE_ANSI_C_CPP:
     break;
   case NO_MODE:
     assert(false);
@@ -293,7 +294,8 @@ void configt::ansi_ct::set_arch_spec_x86_64()
 
   switch(mode)
   {
-  case MODE_GCC:
+  case MODE_GCC_C:
+  case MODE_GCC_CPP:
     defines.push_back("__LP64__");
     defines.push_back("__x86_64");
     defines.push_back("__x86_64__");
@@ -303,13 +305,13 @@ void configt::ansi_ct::set_arch_spec_x86_64()
     if(os==OS_MACOS)
       defines.push_back("__LITTLE_ENDIAN__");
     break;
-  case MODE_VISUAL_STUDIO:
+  case MODE_VISUAL_STUDIO_C_CPP:
     defines.push_back("_M_X64");
     defines.push_back("_M_AMD64");
     break;
-  case MODE_CODEWARRIOR:
-  case MODE_ARM:
-  case MODE_ANSI:
+  case MODE_CODEWARRIOR_C_CPP:
+  case MODE_ARM_C_CPP:
+  case MODE_ANSI_C_CPP:
     break;
   case NO_MODE:
     assert(false);
@@ -341,7 +343,8 @@ void configt::ansi_ct::set_arch_spec_power(const irep_idt &subarch)
 
   switch(mode)
   {
-  case MODE_GCC:
+  case MODE_GCC_C:
+  case MODE_GCC_CPP:
     defines.push_back("__powerpc");
     defines.push_back("__powerpc__");
     defines.push_back("__POWERPC__");
@@ -349,12 +352,12 @@ void configt::ansi_ct::set_arch_spec_power(const irep_idt &subarch)
     if(os==OS_MACOS)
       defines.push_back("__BIG_ENDIAN__");
     break;
-  case MODE_VISUAL_STUDIO:
+  case MODE_VISUAL_STUDIO_C_CPP:
     defines.push_back("_M_PPC");
     break;
-  case MODE_CODEWARRIOR:
-  case MODE_ARM:
-  case MODE_ANSI:
+  case MODE_CODEWARRIOR_C_CPP:
+  case MODE_ARM_C_CPP:
+  case MODE_ANSI_C_CPP:
     break;
   case NO_MODE:
     assert(false);
@@ -393,17 +396,18 @@ void configt::ansi_ct::set_arch_spec_arm(const irep_idt &subarch)
 
   switch(mode)
   {
-  case MODE_GCC:
+  case MODE_GCC_C:
+  case MODE_GCC_CPP:
     defines.push_back("__arm__");
     if(subarch=="armhf")
       defines.push_back("__ARM_PCS_VFP");
     break;
-  case MODE_VISUAL_STUDIO:
+  case MODE_VISUAL_STUDIO_C_CPP:
     defines.push_back("_M_ARM");
     break;
-  case MODE_CODEWARRIOR:
-  case MODE_ARM:
-  case MODE_ANSI:
+  case MODE_CODEWARRIOR_C_CPP:
+  case MODE_ARM_C_CPP:
+  case MODE_ANSI_C_CPP:
     break;
   case NO_MODE:
     assert(false);
@@ -434,15 +438,16 @@ void configt::ansi_ct::set_arch_spec_alpha()
 
   switch(mode)
   {
-  case MODE_GCC:
+  case MODE_GCC_C:
+  case MODE_GCC_CPP:
     defines.push_back("__alpha__");
     break;
-  case MODE_VISUAL_STUDIO:
+  case MODE_VISUAL_STUDIO_C_CPP:
     defines.push_back("_M_ALPHA");
     break;
-  case MODE_CODEWARRIOR:
-  case MODE_ARM:
-  case MODE_ANSI:
+  case MODE_CODEWARRIOR_C_CPP:
+  case MODE_ARM_C_CPP:
+  case MODE_ANSI_C_CPP:
     break;
   case NO_MODE:
     assert(false);
@@ -474,17 +479,18 @@ void configt::ansi_ct::set_arch_spec_mips(const irep_idt &subarch)
 
   switch(mode)
   {
-  case MODE_GCC:
+  case MODE_GCC_C:
+  case MODE_GCC_CPP:
     defines.push_back("__mips__");
     defines.push_back("mips");
     defines.push_back("_MIPS_SZPTR="+i2string(config.ansi_c.pointer_width));
     break;
-  case MODE_VISUAL_STUDIO:
+  case MODE_VISUAL_STUDIO_C_CPP:
     assert(false); // not supported by Visual Studio
     break;
-  case MODE_CODEWARRIOR:
-  case MODE_ARM:
-  case MODE_ANSI:
+  case MODE_CODEWARRIOR_C_CPP:
+  case MODE_ARM_C_CPP:
+  case MODE_ANSI_C_CPP:
     break;
   case NO_MODE:
     assert(false);
@@ -513,15 +519,16 @@ void configt::ansi_ct::set_arch_spec_s390()
 
   switch(mode)
   {
-  case MODE_GCC:
+  case MODE_GCC_C:
+  case MODE_GCC_CPP:
     defines.push_back("__s390__");
     break;
-  case MODE_VISUAL_STUDIO:
+  case MODE_VISUAL_STUDIO_C_CPP:
     assert(false); // not supported by Visual Studio
     break;
-  case MODE_CODEWARRIOR:
-  case MODE_ARM:
-  case MODE_ANSI:
+  case MODE_CODEWARRIOR_C_CPP:
+  case MODE_ARM_C_CPP:
+  case MODE_ANSI_C_CPP:
     break;
   case NO_MODE:
     assert(false);
@@ -551,15 +558,16 @@ void configt::ansi_ct::set_arch_spec_s390x()
 
   switch(mode)
   {
-  case MODE_GCC:
+  case MODE_GCC_C:
+  case MODE_GCC_CPP:
     defines.push_back("__s390x__");
     break;
-  case MODE_VISUAL_STUDIO:
+  case MODE_VISUAL_STUDIO_C_CPP:
     assert(false); // not supported by Visual Studio
     break;
-  case MODE_CODEWARRIOR:
-  case MODE_ARM:
-  case MODE_ANSI:
+  case MODE_CODEWARRIOR_C_CPP:
+  case MODE_ARM_C_CPP:
+  case MODE_ANSI_C_CPP:
     break;
   case NO_MODE:
     assert(false);
@@ -588,15 +596,16 @@ void configt::ansi_ct::set_arch_spec_sparc()
 
   switch(mode)
   {
-  case MODE_GCC:
+  case MODE_GCC_C:
+  case MODE_GCC_CPP:
     defines.push_back("__sparc__");
     break;
-  case MODE_VISUAL_STUDIO:
+  case MODE_VISUAL_STUDIO_C_CPP:
     assert(false); // not supported by Visual Studio
     break;
-  case MODE_CODEWARRIOR:
-  case MODE_ARM:
-  case MODE_ANSI:
+  case MODE_CODEWARRIOR_C_CPP:
+  case MODE_ARM_C_CPP:
+  case MODE_ANSI_C_CPP:
     break;
   case NO_MODE:
     assert(false);
@@ -627,17 +636,18 @@ void configt::ansi_ct::set_arch_spec_ia64()
 
   switch(mode)
   {
-  case MODE_GCC:
+  case MODE_GCC_C:
+  case MODE_GCC_CPP:
     defines.push_back("__ia64__");
     defines.push_back("_IA64");
     defines.push_back("__IA64__");
     break;
-  case MODE_VISUAL_STUDIO:
+  case MODE_VISUAL_STUDIO_C_CPP:
     defines.push_back("_M_IA64");
     break;
-  case MODE_CODEWARRIOR:
-  case MODE_ARM:
-  case MODE_ANSI:
+  case MODE_CODEWARRIOR_C_CPP:
+  case MODE_ARM_C_CPP:
+  case MODE_ANSI_C_CPP:
     break;
   case NO_MODE:
     assert(false);
@@ -670,19 +680,20 @@ void configt::ansi_ct::set_arch_spec_x32()
 
   switch(mode)
   {
-  case MODE_GCC:
+  case MODE_GCC_C:
+  case MODE_GCC_CPP:
     defines.push_back("__ILP32__");
     defines.push_back("__x86_64");
     defines.push_back("__x86_64__");
     defines.push_back("__amd64__");
     defines.push_back("__amd64");
     break;
-  case MODE_VISUAL_STUDIO:
+  case MODE_VISUAL_STUDIO_C_CPP:
     assert(false); // not supported by Visual Studio
     break;
-  case MODE_CODEWARRIOR:
-  case MODE_ARM:
-  case MODE_ANSI:
+  case MODE_CODEWARRIOR_C_CPP:
+  case MODE_ARM_C_CPP:
+  case MODE_ANSI_C_CPP:
     break;
   case NO_MODE:
     assert(false);
@@ -778,33 +789,42 @@ bool configt::set(const cmdlinet &cmdline)
   {
     ansi_c.lib=configt::ansi_ct::LIB_FULL;
     ansi_c.os=configt::ansi_ct::OS_WIN;
-    #ifndef _WIN32
-    ansi_c.mode=ansi_ct::MODE_GCC;
-    #else
     // there are gcc versions that target Windows
     if(cmdline.isset("gcc"))
-      ansi_c.mode=ansi_ct::MODE_GCC;
+    {
+      ansi_c.mode=ansi_ct::MODE_GCC_C;
+      ansi_c.preprocessor=ansi_ct::PP_GCC;
+    }
     else
-      ansi_c.mode=ansi_ct::MODE_VISUAL_STUDIO;
-    #endif
+    {
+      ansi_c.mode=ansi_ct::MODE_VISUAL_STUDIO_C_CPP;
+      #ifndef _WIN32
+      ansi_c.preprocessor=ansi_ct::PP_GCC;
+      #else
+      ansi_c.preprocessor=ansi_ct::PP_VISUAL_STUDIO;
+      #endif
+    }
   }
   else if(os=="macos")
   {
     ansi_c.lib=configt::ansi_ct::LIB_FULL;
     ansi_c.os=configt::ansi_ct::OS_MACOS;
-    ansi_c.mode=ansi_ct::MODE_GCC;
+    ansi_c.mode=ansi_ct::MODE_GCC_C;
+    ansi_c.preprocessor=ansi_ct::PP_GCC;
   }
   else if(os=="linux")
   {
     ansi_c.lib=configt::ansi_ct::LIB_FULL;
     ansi_c.os=configt::ansi_ct::OS_LINUX;
-    ansi_c.mode=ansi_ct::MODE_GCC;
+    ansi_c.mode=ansi_ct::MODE_GCC_C;
+    ansi_c.preprocessor=ansi_ct::PP_GCC;
   }
   else
   {
     ansi_c.lib=configt::ansi_ct::LIB_NONE;
     ansi_c.os=configt::ansi_ct::NO_OS;
-    ansi_c.mode=ansi_ct::MODE_GCC;
+    ansi_c.mode=ansi_ct::MODE_GCC_C;
+    ansi_c.preprocessor=ansi_ct::PP_GCC;
   }
   
   if(arch=="none")

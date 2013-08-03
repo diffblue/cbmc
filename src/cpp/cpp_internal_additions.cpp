@@ -122,8 +122,9 @@ void cpp_internal_additions(std::ostream &out)
   out << "void __CPROVER::array_set(const void dest[], ...);" << std::endl;
             
   // GCC stuff, but also for ARM
-  if(config.ansi_c.mode==configt::ansi_ct::MODE_GCC ||
-     config.ansi_c.mode==configt::ansi_ct::MODE_ARM)
+  if(config.ansi_c.mode==configt::ansi_ct::MODE_GCC_C ||
+     config.ansi_c.mode==configt::ansi_ct::MODE_GCC_CPP ||
+     config.ansi_c.mode==configt::ansi_ct::MODE_ARM_C_CPP)
   {
     out << "extern \"C\" {" << std::endl;
     out << c2cpp(gcc_builtin_headers_generic);
@@ -144,7 +145,7 @@ void cpp_internal_additions(std::ostream &out)
   out << "}" << std::endl;
   
   // Microsoft stuff
-  if(config.ansi_c.mode==configt::ansi_ct::MODE_VISUAL_STUDIO)
+  if(config.ansi_c.mode==configt::ansi_ct::MODE_VISUAL_STUDIO_C_CPP)
   {
     // type_info infrastructure -- the standard wants this to be in the
     // std:: namespace, but MS has it in the root namespace

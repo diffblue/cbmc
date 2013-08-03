@@ -171,7 +171,6 @@ Function: c_preprocess
 \*******************************************************************/
 
 bool c_preprocess(
-  preprocess_modet mode,
   std::istream &instream,
   std::ostream &outstream,
   message_handlert &message_handler)
@@ -185,7 +184,7 @@ bool c_preprocess(
 
   fclose(tmp);
 
-  bool result=c_preprocess(mode, file, outstream, message_handler);
+  bool result=c_preprocess(file, outstream, message_handler);
   
   unlink(file.c_str());
   
@@ -225,34 +224,33 @@ Function: c_preprocess
 
 \*******************************************************************/
 
-bool c_preprocess_codewarrior(preprocess_modet, const std::string &, std::ostream &, message_handlert &);
-bool c_preprocess_arm(preprocess_modet, const std::string &, std::ostream &, message_handlert &);
-bool c_preprocess_gcc(preprocess_modet, const std::string &, std::ostream &, message_handlert &);
-bool c_preprocess_none(preprocess_modet, const std::string &, std::ostream &, message_handlert &);
-bool c_preprocess_visual_studio(preprocess_modet, const std::string &, std::ostream &, message_handlert &);
+bool c_preprocess_codewarrior(const std::string &, std::ostream &, message_handlert &);
+bool c_preprocess_arm(const std::string &, std::ostream &, message_handlert &);
+bool c_preprocess_gcc(const std::string &, std::ostream &, message_handlert &);
+bool c_preprocess_none(const std::string &, std::ostream &, message_handlert &);
+bool c_preprocess_visual_studio(const std::string &, std::ostream &, message_handlert &);
 
 bool c_preprocess(
-  preprocess_modet mode,
   const std::string &path,
   std::ostream &outstream,
   message_handlert &message_handler)
 {
-  switch(config.ansi_c.mode)
+  switch(config.ansi_c.preprocessor)
   {
-  case configt::ansi_ct::MODE_CODEWARRIOR:
-    return c_preprocess_codewarrior(mode, path, outstream, message_handler);
+  case configt::ansi_ct::PP_CODEWARRIOR:
+    return c_preprocess_codewarrior(path, outstream, message_handler);
   
-  case configt::ansi_ct::MODE_GCC:
-    return c_preprocess_gcc(mode, path, outstream, message_handler);
+  case configt::ansi_ct::PP_GCC:
+    return c_preprocess_gcc(path, outstream, message_handler);
   
-  case configt::ansi_ct::MODE_VISUAL_STUDIO:
-    return c_preprocess_visual_studio(mode, path, outstream, message_handler);
+  case configt::ansi_ct::PP_VISUAL_STUDIO:
+    return c_preprocess_visual_studio(path, outstream, message_handler);
   
-  case configt::ansi_ct::MODE_ARM:
-    return c_preprocess_arm(mode, path, outstream, message_handler);
+  case configt::ansi_ct::PP_ARM:
+    return c_preprocess_arm(path, outstream, message_handler);
   
-  default:
-    assert(false);
+  case configt::ansi_ct::NO_PP:
+    return c_preprocess_none(path, outstream, message_handler);
   }
 
   // not reached  
@@ -272,14 +270,13 @@ Function: c_preprocess_visual_studio
 \*******************************************************************/
 
 bool c_preprocess_visual_studio(
-  preprocess_modet mode,
   const std::string &file,
   std::ostream &outstream,
   message_handlert &message_handler)
 {
   // check extension
   if(is_dot_i_file(file))
-    return c_preprocess_none(mode, file, outstream, message_handler);
+    return c_preprocess_none(file, outstream, message_handler);
 
   message_streamt message_stream(message_handler);
 
@@ -454,14 +451,13 @@ Function: c_preprocess_codewarrior
 \*******************************************************************/
 
 bool c_preprocess_codewarrior(
-  preprocess_modet mode,
   const std::string &file,
   std::ostream &outstream,
   message_handlert &message_handler)
 {
   // check extension
   if(is_dot_i_file(file))
-    return c_preprocess_none(mode, file, outstream, message_handler);
+    return c_preprocess_none(file, outstream, message_handler);
 
   // preprocessing
   message_streamt message_stream(message_handler);
@@ -557,14 +553,13 @@ Function: c_preprocess_gcc
 \*******************************************************************/
 
 bool c_preprocess_gcc(
-  preprocess_modet mode,
   const std::string &file,
   std::ostream &outstream,
   message_handlert &message_handler)
 {
   // check extension
   if(is_dot_i_file(file))
-    return c_preprocess_none(mode, file, outstream, message_handler);
+    return c_preprocess_none(file, outstream, message_handler);
 
   // preprocessing
   message_streamt message_stream(message_handler);
@@ -747,10 +742,10 @@ bool c_preprocess_gcc(
   int result;
   
   // the following forces the mode
-  switch(mode)
+  switch(config.ansi_c.mode)
   {
-  case PREPROCESS_C: command+=" -x c"; break;
-  case PREPROCESS_CPP: command+=" -x c++"; break;
+  case configt::ansi_ct::MODE_GCC_C: command+=" -x c"; break;
+  case configt::ansi_ct::MODE_GCC_CPP: command+=" -x c++"; break;
   default:;
   }
 
@@ -847,14 +842,13 @@ Function: c_preprocess_arm
 \*******************************************************************/
 
 bool c_preprocess_arm(
-  preprocess_modet mode,
   const std::string &file,
   std::ostream &outstream,
   message_handlert &message_handler)
 {
   // check extension
   if(is_dot_i_file(file))
-    return c_preprocess_none(mode, file, outstream, message_handler);
+    return c_preprocess_none(file, outstream, message_handler);
 
   // preprocessing using armcc
   message_streamt message_stream(message_handler);
@@ -996,7 +990,6 @@ Function: c_preprocess_none
 \*******************************************************************/
 
 bool c_preprocess_none(
-  preprocess_modet mode,
   const std::string &file,
   std::ostream &outstream,
   message_handlert &message_handler)
@@ -1014,7 +1007,7 @@ bool c_preprocess_none(
     return true;
   }
   
-  if(config.ansi_c.mode==configt::ansi_ct::MODE_CODEWARRIOR)
+  if(config.ansi_c.mode==configt::ansi_ct::MODE_CODEWARRIOR_C_CPP)
   {
     // special treatment for "/* #line"
     postprocess_codewarrior(infile, outstream);

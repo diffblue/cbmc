@@ -89,9 +89,14 @@ public:
     void set_arch_spec_ia64();
     void set_arch_spec_x32();
     
-    typedef enum { NO_MODE, MODE_ANSI, MODE_GCC, MODE_VISUAL_STUDIO,
-                   MODE_CODEWARRIOR, MODE_ARM } modet;
-    modet mode;
+    typedef enum { NO_MODE, MODE_ANSI_C_CPP, MODE_GCC_C, MODE_GCC_CPP,
+                   MODE_VISUAL_STUDIO_C_CPP,
+                   MODE_CODEWARRIOR_C_CPP, MODE_ARM_C_CPP } flavourt;
+    flavourt mode; // the syntax of source files
+
+    typedef enum { NO_PP, PP_GCC, PP_VISUAL_STUDIO,
+                   PP_CODEWARRIOR, PP_ARM } preprocessort;
+    preprocessort preprocessor; // the preprocessor to use
 
     std::list<std::string> defines;
     std::list<std::string> undefines;

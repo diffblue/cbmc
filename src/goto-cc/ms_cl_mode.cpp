@@ -67,7 +67,7 @@ bool ms_cl_modet::doit()
   // get configuration
   config.set(cmdline);
 
-  config.ansi_c.mode=configt::ansi_ct::MODE_VISUAL_STUDIO;
+  config.ansi_c.mode=configt::ansi_ct::MODE_VISUAL_STUDIO_C_CPP;
   compiler.object_file_extension="obj";
   
   // determine actions to be undertaken

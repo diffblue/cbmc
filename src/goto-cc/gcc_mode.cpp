@@ -201,11 +201,11 @@ bool gcc_modet::doit()
      cmdline.isset("winx64"))
   {
     // We may wish to reconsider the below.
-    config.ansi_c.mode=configt::ansi_ct::MODE_VISUAL_STUDIO;
+    config.ansi_c.mode=configt::ansi_ct::MODE_VISUAL_STUDIO_C_CPP;
     debug("Enabling Visual Studio syntax");
   }
   else
-    config.ansi_c.mode=configt::ansi_ct::MODE_GCC;
+    config.ansi_c.mode=configt::ansi_ct::MODE_GCC_C;
 
   if(compiler.mode==compilet::ASSEMBLE_ONLY)
     compiler.object_file_extension="s";
