@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <fstream>
 #include <cstdlib>
 #include <iostream>
+#include <memory>
 
 #include <util/i2string.h>
 #include <util/location.h>
@@ -27,6 +28,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-symex/slice_by_trace.h>
 #include <goto-symex/xml_goto_trace.h>
 #include <goto-symex/memory_model_sc.h>
+#include <goto-symex/memory_model_tso.h>
+#include <goto-symex/memory_model_pso.h>
 
 #include <solvers/sat/satcheck_minisat2.h>
 
@@ -309,7 +312,16 @@ Function: bmct::run
 
 bool bmct::run(const goto_functionst &goto_functions)
 {
-  memory_model_sct memory_model_sc(ns);
+  const std::string mm=options.get_option("mm");
+  std::auto_ptr<memory_model_baset> memory_model(0);
+  if(mm.empty() || mm=="sc")
+    memory_model.reset(new memory_model_sct(ns));
+  else if(mm=="tso")
+    memory_model.reset(new memory_model_tsot(ns));
+  else if(mm=="pso")
+    memory_model.reset(new memory_model_psot(ns));
+  else
+    throw "Invalid memory model "+mm+" -- use one of sc, tso, pso";
 
   //symex.total_claims=0;
   symex.set_message_handler(get_message_handler());
@@ -331,8 +343,8 @@ bool bmct::run(const goto_functionst &goto_functions)
     // add a partial ordering, if required    
     if(equation.has_threads())
     {
-      memory_model_sc.set_message_handler(get_message_handler());
-      memory_model_sc(equation);
+      memory_model->set_message_handler(get_message_handler());
+      (*memory_model)(equation);
     }
   }
 

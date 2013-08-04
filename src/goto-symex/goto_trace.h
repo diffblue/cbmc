@@ -47,6 +47,7 @@ public:
   bool is_shared_read() const     { return type==SHARED_READ; }
   bool is_shared_write() const    { return type==SHARED_WRITE; }
   bool is_spawn() const           { return type==SPAWN; }
+  bool is_memory_barrier() const  { return type==MEMORY_BARRIER; }
   bool is_atomic_begin() const    { return type==ATOMIC_BEGIN; }
   bool is_atomic_end() const      { return type==ATOMIC_END; }
 
@@ -55,7 +56,7 @@ public:
                  FUNCTION_CALL, FUNCTION_RETURN,
                  CONSTRAINT,
                  SHARED_READ, SHARED_WRITE,
-                 SPAWN, ATOMIC_BEGIN, ATOMIC_END } typet;
+                 SPAWN, MEMORY_BARRIER, ATOMIC_BEGIN, ATOMIC_END } typet;
   typet type;
     
   goto_programt::const_targett pc;

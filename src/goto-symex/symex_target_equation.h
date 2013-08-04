@@ -133,6 +133,11 @@ public:
     const exprt &guard,
     const sourcet &source);
 
+  // record memory barrier
+  virtual void memory_barrier(
+    const exprt &guard,
+    const sourcet &source);
+
   // record atomic section
   virtual void atomic_begin(
     const exprt &guard,
@@ -172,6 +177,7 @@ public:
     bool is_shared_read() const     { return type==goto_trace_stept::SHARED_READ; }
     bool is_shared_write() const    { return type==goto_trace_stept::SHARED_WRITE; }
     bool is_spawn() const           { return type==goto_trace_stept::SPAWN; }
+    bool is_memory_barrier() const  { return type==goto_trace_stept::MEMORY_BARRIER; }
     bool is_atomic_begin() const    { return type==goto_trace_stept::ATOMIC_BEGIN; }
     bool is_atomic_end() const      { return type==goto_trace_stept::ATOMIC_END; }
     

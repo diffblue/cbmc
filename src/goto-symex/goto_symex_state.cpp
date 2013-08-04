@@ -286,9 +286,9 @@ void goto_symex_statet::assignment(
   #if 0  
   assert(l1_identifier != get_original_name(l1_identifier)
       || l1_identifier=="goto_symex::\\guard"
-      || is_global(ns.lookup(l1_identifier))
-      || has_prefix(l1_identifier.as_string(), "symex::invalid_object")
-      || has_prefix(l1_identifier.as_string(), "symex_dynamic::dynamic_object"));
+      || ns.lookup(l1_identifier).is_shared()
+      || has_prefix(id2string(l1_identifier), "symex::invalid_object")
+      || has_prefix(id2string(l1_identifier), "symex_dynamic::dynamic_object"));
   #endif
 
   // do the l2 renaming 

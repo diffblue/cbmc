@@ -137,6 +137,29 @@ void symex_target_equationt::spawn(
 
 /*******************************************************************\
 
+Function: symex_target_equationt::memory_barrier
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void symex_target_equationt::memory_barrier(
+  const exprt &guard,
+  const sourcet &source)
+{
+  SSA_steps.push_back(SSA_stept());
+  SSA_stept &SSA_step=SSA_steps.back();
+  SSA_step.guard=guard;
+  SSA_step.type=goto_trace_stept::MEMORY_BARRIER;
+  SSA_step.source=source;
+}
+
+/*******************************************************************\
+
 Function: symex_target_equationt::atomic_begin
 
   Inputs:

@@ -157,6 +157,11 @@ public:
     const exprt &guard,
     const sourcet &source)=0;
 
+  // record memory barrier
+  virtual void memory_barrier(
+    const exprt &guard,
+    const sourcet &source)=0;
+
   // record atomic section
   virtual void atomic_begin(
     const exprt &guard,
