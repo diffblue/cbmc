@@ -39,7 +39,25 @@ public:
 
   bool merge(const interval_domaint &b, locationt to);
   
-  exprt make_expression() const;
+  exprt make_expression(const symbol_exprt &) const;
+  
+  static bool is_int(const typet &src)
+  {
+    return src.id()==ID_signedbv || src.id()==ID_unsignedbv;
+  }
+  
+  static bool is_float(const typet &src)
+  {
+    return src.id()==ID_floatbv;
+  }
+
+protected:
+  void havoc_rec(const exprt &);
+  void assume_rec(const exprt &, bool negation=false);
+  void assume_rec(const exprt &lhs, irep_idt id, const exprt &rhs);
+  void assign(const class code_assignt &assignment);
+  integer_intervalt get_int_rec(const exprt &);
+  ieee_float_intervalt get_float_rec(const exprt &);
 };
 
 #endif

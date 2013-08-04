@@ -20,9 +20,18 @@ class interval_templatet
 public:
   bool lower_set, upper_set;
   T lower, upper;
+
+  // construct from singleton  
+  explicit interval_templatet(const T &value):
+    lower_set(true), upper_set(true),
+    lower(value), upper(value)
+  {
+  }
   
   // 'top' is the default
-  inline interval_templatet():lower_set(false), upper_set(false) { }
+  inline interval_templatet():
+    lower_set(false), upper_set(false)
+  { }
 
   inline void set_lower(const T &value)
   {
@@ -47,6 +56,10 @@ public:
   {
     return lower_set && upper_set && lower>upper;
   }
+
+  // constraints
+  bool make_le_than(const T &value); // upper bound
+  bool make_ge_than(const T &value); // lower bound
   
   // Union or disjunction
   bool join(const interval_templatet<T> &other);
@@ -54,6 +67,44 @@ public:
   // Intersection or conjunction
   bool meet(const interval_templatet<T> &other);
 };
+
+// return 'true' if there is change
+template<typename T>
+bool interval_templatet<T>::make_le_than(const T &other)
+{
+  if(!upper_set)
+  {
+    set_upper(other);
+    return true;
+  }
+  else if(upper>other)
+  {
+    // new, tighter upper bound
+    upper=other;
+    return true;
+  }
+  
+  return false;
+}
+
+// return 'true' if there is change
+template<typename T>
+bool interval_templatet<T>::make_ge_than(const T &other)
+{
+  if(!lower_set)
+  {
+    set_lower(other);
+    return true;
+  }
+  else if(lower<other)
+  {
+    // new, tighter lower bound
+    lower=other;
+    return true;
+  }
+  
+  return false;
+}
 
 // Union or disjunction
 // return 'true' if there is change
