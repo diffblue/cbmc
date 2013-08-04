@@ -33,7 +33,6 @@ protected:
     std::pair<event_it, event_it>, symbol_exprt> choice_symbolst;
   choice_symbolst choice_symbols;
 
-  exprt write_symbol_primed(partial_order_concurrencyt::event_it e) const;
   void read_from(symex_target_equationt &equation);
   
   // maps thread numbers to an event list

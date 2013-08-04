@@ -31,7 +31,6 @@ void memory_model_sct::operator()(symex_target_equationt &equation)
   build_clock_type(equation);
   
   read_from(equation);
-  write_serialization_internal(equation);
   write_serialization_external(equation);
   program_order(equation);
   from_read(equation);
@@ -123,97 +122,6 @@ void memory_model_sct::program_order(
           before(e_it, next_thread->second.front()),
           "thread-spawn",
           e_it->source);
-    }
-  }
-}
-
-/*******************************************************************\
-
-Function: memory_model_sct::write_serialization_internal
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void memory_model_sct::write_serialization_internal(
-  symex_target_equationt &equation)
-{
-  per_thread_mapt per_thread_write_map;
-
-  for(eventst::const_iterator
-      e_it=equation.SSA_steps.begin();
-      e_it!=equation.SSA_steps.end();
-      e_it++)
-    if(is_shared_write(e_it))
-      per_thread_write_map[e_it->source.thread_nr].push_back(e_it);
-
-  // the zero-initialisation of a shared variable precedes any
-  // write in any of the threads
-  typedef hash_map_cont<irep_idt, event_it, irep_id_hash> previoust;
-  previoust init;
-  for(address_mapt::const_iterator
-      a_it=address_map.begin();
-      a_it!=address_map.end();
-      a_it++)
-  {
-    const a_rect &a_rec=a_it->second;
-
-    // uninitialised global symbol like symex_dynamic::dynamic_object*
-    // or *$object
-    if(a_rec.writes.empty())
-      continue;
-    event_it init_write=a_rec.writes.front();
-
-    // only writes with a true guard are considered initialisation
-    if(init_write->guard.is_true())
-      init.insert(std::make_pair(address(init_write), init_write));
-  }
-
-  // iterate over threads
-
-  for(per_thread_mapt::const_iterator
-      t_it=per_thread_write_map.begin();
-      t_it!=per_thread_write_map.end();
-      t_it++)
-  {
-    const event_listt &events=t_it->second;
-
-    // iterate over relevant events in the thread
-
-    previoust previous(init);
-
-    for(event_listt::const_iterator
-        e_it=events.begin();
-        e_it!=events.end();
-        e_it++)
-    {
-      previoust::iterator p_entry=
-        previous.insert(std::make_pair(address(*e_it), *e_it)).first;
-
-      event_it w_prev=p_entry->second;
-      event_it w=*e_it;
-      const exprt &w_value=w->ssa_lhs;
-
-      equal_exprt eq(write_symbol_primed(w),
-                     // if guard is true or this is the first write
-                     w->guard.is_true() || p_entry->second==*e_it ?
-                     // value' equals value
-                     w_value :
-                     // value' equals preceding write if guard is false
-                     if_exprt(w->guard,
-                              w_value,
-                              write_symbol_primed(w_prev)));
-      equation.constraint(
-        true_exprt(),
-        eq,
-        "ws-preceding",
-        (*e_it)->source);
-
-      p_entry->second=*e_it;
     }
   }
 }

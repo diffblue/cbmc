@@ -91,36 +91,6 @@ bool memory_model_baset::po(event_it e1, event_it e2)
 
 /*******************************************************************\
 
-Function: memory_model_baset::write_symbol_primed
-
-  Inputs: 
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-exprt memory_model_baset::write_symbol_primed(
-  partial_order_concurrencyt::event_it e) const
-{
-  assert(is_shared_write(e));
-
-  if(e->ssa_lhs.id()!=ID_symbol)
-  {
-    // initialisation
-    assert(e->guard.is_true());
-    return e->ssa_lhs;
-  }
-
-  const std::string name=
-    id2string(to_symbol_expr(e->ssa_lhs).get_identifier()) + "$val";
-
-  return symbol_exprt(name, e->ssa_lhs.type());
-}
-
-/*******************************************************************\
-
 Function: memory_model_baset::read_from
 
   Inputs: 
@@ -169,22 +139,6 @@ void memory_model_baset::read_from(symex_target_equationt &equation)
         bool is_rfi=
           w->source.thread_nr==r->source.thread_nr;
 
-        if(is_rfi)
-        {
-          // We only read from the most recent write of the same thread.
-          // Extra wsi constraints ensure that even a
-          // write with guard false will have the proper value.
-          
-          event_it e_it=w;
-          bool is_most_recent=true;
-          for(++e_it; e_it!=r && is_most_recent; ++e_it)
-            is_most_recent&=!is_shared_write(e_it) ||
-                            address(e_it)!=address(r);
-
-          if(!is_most_recent)
-            continue;
-        }
-
         symbol_exprt s=nondet_bool_symbol("rf");
         
         // record the symbol
@@ -194,8 +148,8 @@ void memory_model_baset::read_from(symex_target_equationt &equation)
         // We rely on the fact that there is at least
         // one write event that has guard 'true'.
         implies_exprt read_from(s,
-            and_exprt((is_rfi ? true_exprt() : w->guard),
-              equal_exprt(r->ssa_lhs, write_symbol_primed(w))));
+            and_exprt(w->guard,
+              equal_exprt(r->ssa_lhs, w->ssa_lhs)));
 
         equation.constraint(
           true_exprt(), read_from, is_rfi?"rfi":"rf", r->source);
