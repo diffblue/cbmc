@@ -27,13 +27,29 @@ Function: to_integer
 bool to_integer(const exprt &expr, mp_integer &int_value)
 {
   if(!expr.is_constant()) return true;
+  return to_integer(to_constant_expr(expr), int_value);
+}
 
-  const std::string &value=expr.get_string(ID_value);
+/*******************************************************************\
+
+Function: to_integer
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool to_integer(const constant_exprt &expr, mp_integer &int_value)
+{
+  const irep_idt &value=expr.get_value();
   const irep_idt &type_id=expr.type().id();
 
   if(type_id==ID_pointer)
   {
-    if(value=="NULL")
+    if(value==ID_NULL)
     {
       int_value=0;
       return false;
@@ -43,17 +59,17 @@ bool to_integer(const exprt &expr, mp_integer &int_value)
           type_id==ID_natural ||
           type_id==ID_c_enum)
   {
-    int_value=string2integer(value);
+    int_value=string2integer(id2string(value));
     return false;
   }
   else if(type_id==ID_unsignedbv)
   {
-    int_value=binary2integer(value, false);
+    int_value=binary2integer(id2string(value), false);
     return false;
   }
   else if(type_id==ID_signedbv)
   {
-    int_value=binary2integer(value, true);
+    int_value=binary2integer(id2string(value), true);
     return false;
   }
 
