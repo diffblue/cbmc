@@ -38,7 +38,7 @@ void memory_model_sct::operator()(symex_target_equationt &equation)
 
 /*******************************************************************\
 
-Function: memory_model_sct::program_order
+Function: memory_model_sct::build_per_thread_map
 
   Inputs:
 
@@ -48,12 +48,11 @@ Function: memory_model_sct::program_order
 
 \*******************************************************************/
 
-void memory_model_sct::program_order(
-  symex_target_equationt &equation)
+void memory_model_sct::build_per_thread_map(
+  const symex_target_equationt &equation,
+  per_thread_mapt &dest) const
 {
   // this orders the events within a thread
-
-  per_thread_mapt per_thread_map;
   
   for(eventst::const_iterator
       e_it=equation.SSA_steps.begin();
@@ -63,46 +62,29 @@ void memory_model_sct::program_order(
     // concurreny-related?
     if(!is_shared_read(e_it) &&
        !is_shared_write(e_it) &&
-       !is_spawn(e_it)) continue;
+       !is_spawn(e_it) &&
+       !is_memory_barrier(e_it)) continue;
 
-    per_thread_map[e_it->source.thread_nr].push_back(e_it);
+    dest[e_it->source.thread_nr].push_back(e_it);
   }
-  
-  // iterate over threads
+}
 
-  for(per_thread_mapt::const_iterator
-      t_it=per_thread_map.begin();
-      t_it!=per_thread_map.end();
-      t_it++)
-  {
-    const event_listt &events=t_it->second;
-    
-    // iterate over relevant events in the thread
-    
-    event_it previous=equation.SSA_steps.end();
-    
-    for(event_listt::const_iterator
-        e_it=events.begin();
-        e_it!=events.end();
-        e_it++)
-    {
-      if(previous==equation.SSA_steps.end())
-      {
-        // first one?
-        previous=*e_it;
-        continue;
-      }
+/*******************************************************************\
 
-      equation.constraint(
-        true_exprt(),
-        before(previous, *e_it),
-        "po",
-        (*e_it)->source);
+Function: memory_model_sct::thread_spawn
 
-      previous=*e_it;
-    }
-  }
+  Inputs:
 
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void memory_model_sct::thread_spawn(
+  symex_target_equationt &equation,
+  const per_thread_mapt &per_thread_map)
+{
   // thread spawn: the spawn precedes the first
   // instruction of the new thread in program order
   
@@ -122,6 +104,65 @@ void memory_model_sct::program_order(
           before(e_it, next_thread->second.front()),
           "thread-spawn",
           e_it->source);
+    }
+  }
+}
+
+/*******************************************************************\
+
+Function: memory_model_sct::program_order
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void memory_model_sct::program_order(
+  symex_target_equationt &equation)
+{
+  per_thread_mapt per_thread_map;
+  build_per_thread_map(equation, per_thread_map);
+
+  thread_spawn(equation, per_thread_map);
+  
+  // iterate over threads
+
+  for(per_thread_mapt::const_iterator
+      t_it=per_thread_map.begin();
+      t_it!=per_thread_map.end();
+      t_it++)
+  {
+    const event_listt &events=t_it->second;
+    
+    // iterate over relevant events in the thread
+    
+    event_it previous=equation.SSA_steps.end();
+    
+    for(event_listt::const_iterator
+        e_it=events.begin();
+        e_it!=events.end();
+        e_it++)
+    {
+      if(is_memory_barrier(*e_it))
+         continue;
+
+      if(previous==equation.SSA_steps.end())
+      {
+        // first one?
+        previous=*e_it;
+        continue;
+      }
+
+      equation.constraint(
+        true_exprt(),
+        before(previous, *e_it),
+        "po",
+        (*e_it)->source);
+
+      previous=*e_it;
     }
   }
 }

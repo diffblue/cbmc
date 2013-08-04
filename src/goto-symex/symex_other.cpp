@@ -163,7 +163,7 @@ void goto_symext::symex_other(
   }
   else if(statement==ID_fence)
   {
-    // like skip
+    target.memory_barrier(state.guard.as_expr(), state.source);
   }
   else
     throw "unexpected statement: "+id2string(statement);

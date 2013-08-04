@@ -77,6 +77,12 @@ protected:
   {
     return e->is_spawn();
   }
+
+  // is this a fence?
+  static inline bool is_memory_barrier(event_it e)
+  {
+    return e->is_memory_barrier();
+  }
 };
 
 #if 0

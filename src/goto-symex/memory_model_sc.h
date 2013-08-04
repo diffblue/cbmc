@@ -22,6 +22,12 @@ public:
   virtual void operator()(symex_target_equationt &equation);
   
 protected:
+  void build_per_thread_map(
+    const symex_target_equationt &equation,
+    per_thread_mapt &dest) const;
+  void thread_spawn(
+    symex_target_equationt &equation,
+    const per_thread_mapt &per_thread_map);
   void program_order(symex_target_equationt &equation);
   void from_read(symex_target_equationt &equation);
   void write_serialization_external(symex_target_equationt &equation);
