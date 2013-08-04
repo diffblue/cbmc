@@ -91,6 +91,17 @@ void interval_domaint::transform(
     break;
   
   case GOTO:
+    {
+      locationt next=from;
+      next++;
+      if(next==to)
+        assume_rec(not_exprt(instruction.guard));
+      else
+        assume_rec(instruction.guard);
+    }
+    break;
+  
+  case ASSUME:
     assume_rec(instruction.guard);
     break;
   
