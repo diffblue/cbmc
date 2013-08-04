@@ -39,6 +39,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/goto_check.h>
 #include <analyses/call_graph.h>
 #include <analyses/interval_analysis.h>
+#include <analyses/interval_domain.h>
 #include <analyses/reaching_definitions.h>
 
 #include "goto_instrument_parseoptions.h"
@@ -137,14 +138,11 @@ int goto_instrument_parseoptionst::doit()
     {
       namespacet ns(symbol_table);
 
-      if(!cmdline.isset("inline"))
-      {
-        status() << "Function Pointer Removal" << eom;
-        remove_function_pointers(symbol_table, goto_functions, false);
+      status() << "Function Pointer Removal" << eom;
+      remove_function_pointers(symbol_table, goto_functions, false);
 
-        status() << "Partial Inlining" << eom;
-        goto_partial_inline(goto_functions, ns, ui_message_handler);
-      }
+      status() << "Partial Inlining" << eom;
+      goto_partial_inline(goto_functions, ns, ui_message_handler);
     
       status() << "Pointer Analysis" << eom;
       value_set_analysist value_set_analysis(ns);
@@ -158,14 +156,11 @@ int goto_instrument_parseoptionst::doit()
     {
       namespacet ns(symbol_table);
 
-      if(!cmdline.isset("inline"))
-      {
-        status() << "Function Pointer Removal" << eom;
-        remove_function_pointers(symbol_table, goto_functions, false);
+      status() << "Function Pointer Removal" << eom;
+      remove_function_pointers(symbol_table, goto_functions, false);
 
-        status() << "Partial Inlining" << eom;
-        goto_partial_inline(goto_functions, ns, ui_message_handler);
-      }
+      status() << "Partial Inlining" << eom;
+      goto_partial_inline(goto_functions, ns, ui_message_handler);
     
       forall_goto_functions(it, goto_functions)
       {
@@ -184,19 +179,34 @@ int goto_instrument_parseoptionst::doit()
     {
       namespacet ns(symbol_table);
 
-      if(!cmdline.isset("inline"))
-      {
-        status() << "Function Pointer Removal" << eom;
-        remove_function_pointers(symbol_table, goto_functions, false);
+      status() << "Function Pointer Removal" << eom;
+      remove_function_pointers(symbol_table, goto_functions, false);
 
-        status() << "Partial Inlining" << eom;
-        goto_partial_inline(goto_functions, ns, ui_message_handler);
-      }
+      status() << "Partial Inlining" << eom;
+      goto_partial_inline(goto_functions, ns, ui_message_handler);
     
       status() << "Pointer Analysis" << eom;
       points_tot points_to;
       points_to(goto_functions);
       points_to.output(std::cout);
+      return 0;
+    }
+    
+    if(cmdline.isset("show-intervals"))
+    {
+      namespacet ns(symbol_table);
+
+      status() << "Function Pointer Removal" << eom;
+      remove_function_pointers(symbol_table, goto_functions, false);
+
+      status() << "Partial Inlining" << eom;
+      goto_partial_inline(goto_functions, ns, ui_message_handler);
+    
+      status() << "Interval Analysis" << eom;
+      static_analysist<interval_domaint> interval_analysis(ns);
+      interval_analysis(goto_functions);
+      
+      interval_analysis.output(goto_functions, std::cout);
       return 0;
     }
     
