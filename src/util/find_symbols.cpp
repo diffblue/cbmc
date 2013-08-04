@@ -7,6 +7,7 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include "std_types.h"
+#include "std_expr.h"
 
 #include "find_symbols.h"
 
@@ -127,6 +128,31 @@ void find_symbols(
 {
   if(src.id()==ID_symbol || src.id()==ID_next_symbol)
     dest.insert(src);
+  else
+  {
+    forall_operands(it, src)
+      find_symbols(*it, dest);
+  }
+}
+
+/*******************************************************************\
+
+Function: find_symbols
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void find_symbols(
+  const exprt &src,
+  std::set<symbol_exprt> &dest)
+{
+  if(src.id()==ID_symbol)
+    dest.insert(to_symbol_expr(src));
   else
   {
     forall_operands(it, src)

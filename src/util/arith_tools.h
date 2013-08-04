@@ -15,7 +15,12 @@ class exprt;
 class constant_exprt;
 class typet;
 
+// this one will go away
 bool to_integer(const exprt &expr, mp_integer &int_value);
+
+// use this one
+bool to_integer(const constant_exprt &expr, mp_integer &int_value);
+
 constant_exprt from_integer(const mp_integer &int_value, const typet &type);
 
 // ceil(log2(size))
