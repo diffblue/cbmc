@@ -3321,6 +3321,9 @@ Function: simplify_exprt::simplify_ieee_float_relation
 
 bool simplify_exprt::simplify_ieee_float_relation(exprt &expr)
 {
+  assert(expr.id()==ID_ieee_float_equal ||
+         expr.id()==ID_ieee_float_notequal);
+
   exprt::operandst &operands=expr.operands();
 
   if(expr.type().id()!=ID_bool) return true;
