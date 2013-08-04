@@ -24,7 +24,6 @@ public:
 protected:
   void program_order(symex_target_equationt &equation);
   void from_read(symex_target_equationt &equation);
-  void write_serialization_internal(symex_target_equationt &equation);
   void write_serialization_external(symex_target_equationt &equation);
 };
 
