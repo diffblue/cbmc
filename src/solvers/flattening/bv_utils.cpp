@@ -202,6 +202,19 @@ Function: bv_utilst::carry
 literalt bv_utilst::carry(literalt a, literalt b, literalt c)
 {
   #if 0
+  // propagation possible?
+  unsigned const_count=
+    a.is_constant() + b.is_constant() + c.is_constant();
+  
+  // propagation is possible if two or three inputs are constant
+  if(const_count>=2)
+    return prop.lor(prop.lor(
+        prop.land(a, b),
+        prop.land(a, c)),
+        prop.land(b, c));
+        
+  // the below yields fewer clauses and variables,
+  // but doesn't propagate anything
 
   bvt clause;
 
@@ -223,41 +236,41 @@ literalt bv_utilst::carry(literalt a, literalt b, literalt c)
   clause[0]=a;
   clause[1]=b;
   clause[2]=neg(x);
-  lcnf(clause);
+  prop.lcnf(clause);
 
   clause.resize(4);
   clause[0]=a;
   clause[1]=neg(b);
   clause[2]=c;
   clause[3]=neg(x);
-  lcnf(clause);
+  prop.lcnf(clause);
 
   clause.resize(4);
   clause[0]=a;
   clause[1]=neg(b);
   clause[2]=neg(c);
   clause[3]=x;
-  lcnf(clause);
+  prop.lcnf(clause);
 
   clause.resize(4);
   clause[0]=neg(a);
   clause[1]=b;
   clause[2]=c;
   clause[3]=neg(x);
-  lcnf(clause);
+  prop.lcnf(clause);
 
   clause.resize(4);
   clause[0]=neg(a);
   clause[1]=b;
   clause[2]=neg(c);
   clause[3]=x;
-  lcnf(clause);
+  prop.lcnf(clause);
 
   clause.resize(3);
   clause[0]=neg(a);
   clause[1]=neg(b);
   clause[2]=x;
-  lcnf(clause);
+  prop.lcnf(clause);
 
   return x;
 
