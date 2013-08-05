@@ -584,16 +584,52 @@ Function: cnft::lselect
 \*******************************************************************/
 
 literalt cnft::lselect(literalt a, literalt b, literalt c)
-{  // a?b:c = (a AND b) OR (/a AND c)
+{ // a?b:c = (a AND b) OR (/a AND c)
+
   if(a==const_literal(true)) return b;
   if(a==const_literal(false)) return c;
   if(b==c) return b;
 
-  bvt bv;
-  bv.reserve(2);
-  bv.push_back(land(a, b));
-  bv.push_back(land(lnot(a), c));
-  return lor(bv);
+  #if 1
+  return lor(land(a, b), land(lnot(a), c));
+
+  #else
+  // (a+c'+o) (a+c+o') (a'+b'+o) (a'+b+o')
+
+  literalt o=new_variable();
+
+  bvt lits;
+  
+  lits.clear();
+  lits.reserve(3);
+  lits.push_back(a);
+  lits.push_back(lnot(c));
+  lits.push_back(o);
+  lcnf(lits);
+  
+  lits.clear();
+  lits.reserve(3);
+  lits.push_back(a);
+  lits.push_back(c);
+  lits.push_back(lnot(o));
+  lcnf(lits);
+  
+  lits.clear();
+  lits.reserve(3);
+  lits.push_back(lnot(a));
+  lits.push_back(lnot(b));
+  lits.push_back(o);
+  lcnf(lits);
+  
+  lits.clear();
+  lits.reserve(3);
+  lits.push_back(lnot(a));
+  lits.push_back(b);
+  lits.push_back(lnot(o));
+  lcnf(lits);
+
+  return o;
+  #endif
 }
 
 /*******************************************************************\
