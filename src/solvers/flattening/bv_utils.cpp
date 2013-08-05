@@ -213,8 +213,16 @@ literalt bv_utilst::carry(literalt a, literalt b, literalt c)
         prop.land(a, c)),
         prop.land(b, c));
         
+  // it's also possible if two of a,b,c are the same
+  if(a==b)
+    return a;
+  else if(a==c)
+    return a;
+  else if(b==c)
+    return b;
+        
   // the below yields fewer clauses and variables,
-  // but doesn't propagate anything
+  // but doesn't propagate anything at all
 
   bvt clause;
 
