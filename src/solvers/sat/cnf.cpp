@@ -590,7 +590,7 @@ literalt cnft::lselect(literalt a, literalt b, literalt c)
   if(a==const_literal(false)) return c;
   if(b==c) return b;
 
-  #if 1
+  #if 0
   return lor(land(a, b), land(lnot(a), c));
 
   #else
