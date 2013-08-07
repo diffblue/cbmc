@@ -167,16 +167,9 @@ void satcheck_minisat2_baset<T>::lcnf(const bvt &bv)
 
   convert(bv, c);
 
-  // Minisat can't do empty clauses
-  if(c.size()==0)
-  {
-    empty_clause_added=true;
-    return;
-  }
-
   // Note the underscore.
   // Add a clause to the solver without making superflous internal copy.
-  
+
   solver->addClause_(c);
 
   clause_counter++;
@@ -210,12 +203,7 @@ propt::resultt satcheck_minisat2_baset<T>::prop_solve()
   
   std::string msg;
 
-  if(empty_clause_added)
-  {
-    msg="empty clause: negated claim is UNSATISFIABLE, i.e., holds";
-    messaget::status(msg);
-  }
-  else if(!solver->okay())
+  if(!solver->okay())
   {
     msg="SAT checker inconsistent: negated claim is UNSATISFIABLE, i.e., holds";
     messaget::status(msg);
@@ -283,10 +271,9 @@ Function: satcheck_minisat2_baset::satcheck_minisat2_baset
 \*******************************************************************/
 
 template<typename T>
-satcheck_minisat2_baset<T>::satcheck_minisat2_baset()
+satcheck_minisat2_baset<T>::satcheck_minisat2_baset(T *_solver):
+  solver(_solver)
 {
-  empty_clause_added=false;
-  solver=NULL;
 }
 
 /*******************************************************************\
@@ -301,9 +288,9 @@ Function: satcheck_minisat_no_simplifiert::satcheck_minisat_no_simplifiert
 
 \*******************************************************************/
 
-satcheck_minisat_no_simplifiert::satcheck_minisat_no_simplifiert()
+satcheck_minisat_no_simplifiert::satcheck_minisat_no_simplifiert():
+  satcheck_minisat2_baset<Minisat::Solver>(new Minisat::Solver)
 {
-  solver=new Minisat::Solver;
 }
 
 /*******************************************************************\
@@ -318,9 +305,9 @@ Function: satcheck_minisat_simplifiert::satcheck_minisat_simplifiert
 
 \*******************************************************************/
 
-satcheck_minisat_simplifiert::satcheck_minisat_simplifiert()
+satcheck_minisat_simplifiert::satcheck_minisat_simplifiert():
+  satcheck_minisat2_baset<Minisat::SimpSolver>(new Minisat::SimpSolver)
 {
-  solver=new Minisat::SimpSolver;
 }
 
 /*******************************************************************\

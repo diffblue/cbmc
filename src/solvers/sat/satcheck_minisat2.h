@@ -26,7 +26,7 @@ template<typename T>
 class satcheck_minisat2_baset:public cnf_solvert
 {
 public:
-  satcheck_minisat2_baset();
+  explicit satcheck_minisat2_baset(T *);
   virtual ~satcheck_minisat2_baset();
   
   virtual resultt prop_solve();
@@ -47,7 +47,6 @@ protected:
   
   void add_variables();
   bvt assumptions;
-  bool empty_clause_added;
 };
 
 class satcheck_minisat_no_simplifiert:
