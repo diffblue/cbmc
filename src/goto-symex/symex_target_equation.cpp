@@ -535,7 +535,6 @@ Function: symex_target_equationt::constraint
 \*******************************************************************/
 
 void symex_target_equationt::constraint(
-  const exprt &guard,
   const exprt &cond,
   const std::string &msg,
   const sourcet &source)
@@ -544,7 +543,7 @@ void symex_target_equationt::constraint(
   SSA_steps.push_back(SSA_stept());
   SSA_stept &SSA_step=SSA_steps.back();
   
-  SSA_step.guard=guard;
+  SSA_step.guard=true_exprt();
   SSA_step.cond_expr=cond;
   SSA_step.type=goto_trace_stept::CONSTRAINT;
   SSA_step.source=source;
