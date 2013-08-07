@@ -289,7 +289,6 @@ void configt::ansi_ct::set_arch_spec_x86_64()
   arch=ARCH_X86_64;
   endianness=IS_LITTLE_ENDIAN;
   long_double_width=16*8;
-  pointer_width=8*8;
   char_is_unsigned=false;
 
   switch(mode)
@@ -381,8 +380,6 @@ void configt::ansi_ct::set_arch_spec_arm(const irep_idt &subarch)
   if(subarch=="arm64")
   {
     set_LP64();
-    long_int_width=8*8;
-    pointer_width=8*8;
     long_double_width=16*8;
   }
   else
@@ -432,8 +429,6 @@ void configt::ansi_ct::set_arch_spec_alpha()
   arch=ARCH_ALPHA;
   endianness=IS_LITTLE_ENDIAN;
   long_double_width=16*8;
-  long_int_width=8*8;
-  pointer_width=8*8;
   char_is_unsigned=false;
 
   switch(mode)
@@ -551,8 +546,6 @@ void configt::ansi_ct::set_arch_spec_s390x()
 {
   set_LP64();
   arch=ARCH_S390X;
-  long_int_width=8*8;
-  pointer_width=8*8;
   endianness=IS_BIG_ENDIAN;
   char_is_unsigned=true;
 
@@ -628,8 +621,6 @@ void configt::ansi_ct::set_arch_spec_ia64()
 {
   set_LP64();
   arch=ARCH_IA64;
-  long_int_width=8*8;
-  pointer_width=8*8;
   long_double_width=16*8;
   endianness=IS_LITTLE_ENDIAN;
   char_is_unsigned=false;
@@ -673,8 +664,7 @@ void configt::ansi_ct::set_arch_spec_x32()
   set_LP64();
   arch=ARCH_X32;
   endianness=IS_LITTLE_ENDIAN;
-  long_int_width=8*8;
-  pointer_width=4*8;
+  pointer_width=4*8; // exception!
   long_double_width=16*8;
   char_is_unsigned=false;
 
