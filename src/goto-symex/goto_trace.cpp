@@ -420,6 +420,7 @@ void show_goto_trace(
     case goto_trace_stept::FUNCTION_CALL:
     case goto_trace_stept::FUNCTION_RETURN:
     case goto_trace_stept::SPAWN:
+    case goto_trace_stept::MEMORY_BARRIER:
     case goto_trace_stept::ATOMIC_BEGIN:
     case goto_trace_stept::ATOMIC_END:
       break;

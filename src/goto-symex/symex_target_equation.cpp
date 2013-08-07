@@ -899,6 +899,7 @@ void symex_target_equationt::SSA_stept::output(
   case goto_trace_stept::ATOMIC_BEGIN: out << "ATOMIC_BEGIN" << std::endl; break;
   case goto_trace_stept::ATOMIC_END: out << "AUTOMIC_END" << std::endl; break;
   case goto_trace_stept::SPAWN: out << "SPAWN" << std::endl; break;
+  case goto_trace_stept::MEMORY_BARRIER: out << "MEMORY_BARRIER" << std::endl; break;
 
   default: assert(false);
   }

@@ -145,6 +145,7 @@ void symex_slicet::slice(symex_target_equationt::SSA_stept &SSA_step)
   case goto_trace_stept::ATOMIC_BEGIN:
   case goto_trace_stept::ATOMIC_END:
   case goto_trace_stept::SPAWN:
+  case goto_trace_stept::MEMORY_BARRIER:
     // ignore for now
     break;
     
@@ -248,6 +249,7 @@ void symex_slicet::collect_open_variables(
     case goto_trace_stept::ATOMIC_BEGIN:
     case goto_trace_stept::ATOMIC_END:
     case goto_trace_stept::SPAWN:
+    case goto_trace_stept::MEMORY_BARRIER:
       // ignore for now
       break;
 
