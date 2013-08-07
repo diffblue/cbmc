@@ -26,10 +26,9 @@ Function: cnft::cnft
 
 \*******************************************************************/
 
-cnft::cnft()
+cnft::cnft() :
+  _no_variables(1) // for CNF, we don't use 0 as a matter of principle
 {
-  // for CNF, we don't use 0 as a matter of principle
-  _no_variables=1;
 }
 
 /*******************************************************************\
@@ -63,18 +62,14 @@ Function: cnft::gate_and
 void cnft::gate_and(literalt a, literalt b, literalt o)
 {
   // a*b=c <==> (a + o')( b + o')(a'+b'+o)
-  bvt lits;
+  bvt lits(2);
 
-  lits.clear();
-  lits.reserve(2);
-  lits.push_back(pos(a));
-  lits.push_back(neg(o));
+  lits[0]=pos(a);
+  lits[1]=neg(o);
   lcnf(lits);
 
-  lits.clear();
-  lits.reserve(2);
-  lits.push_back(pos(b));
-  lits.push_back(neg(o));
+  lits[0]=pos(b);
+  lits[1]=neg(o);
   lcnf(lits);
 
   lits.clear();
@@ -100,25 +95,20 @@ Function: cnft::gate_or
 void cnft::gate_or(literalt a, literalt b, literalt o)
 {
   // a+b=c <==> (a' + c)( b' + c)(a + b + c')
-  bvt lits;
+  bvt lits(2);
 
-  lits.clear();
-  lits.reserve(2);
-  lits.push_back(neg(a));
-  lits.push_back(pos(o));
+  lits[0]=neg(a);
+  lits[1]=pos(o);
   lcnf(lits);
 
-  lits.clear();
-  lits.reserve(2);
-  lits.push_back(neg(b));
-  lits.push_back(pos(o));
+  lits[0]=neg(b);
+  lits[1]=pos(o);
   lcnf(lits);
 
-  lits.clear();
-  lits.reserve(3);
-  lits.push_back(pos(a));
-  lits.push_back(pos(b));
-  lits.push_back(neg(o));
+  lits.resize(3);
+  lits[0]=pos(a);
+  lits[1]=pos(b);
+  lits[2]=neg(o);
   lcnf(lits);
 }
 
@@ -140,34 +130,26 @@ void cnft::gate_xor(literalt a, literalt b, literalt o)
   //                  (a + b + o' )
   //                  (a' + b + o)
   //                  (a + b' + o)
-  bvt lits;
+  bvt lits(3);
 
-  lits.clear();
-  lits.reserve(3);
-  lits.push_back(neg(a));
-  lits.push_back(neg(b));
-  lits.push_back(neg(o));
+  lits[0]=neg(a);
+  lits[1]=neg(b);
+  lits[2]=neg(o);
   lcnf(lits);
 
-  lits.clear();
-  lits.reserve(3);
-  lits.push_back(pos(a));
-  lits.push_back(pos(b));
-  lits.push_back(neg(o));
+  lits[0]=pos(a);
+  lits[1]=pos(b);
+  lits[2]=neg(o);
   lcnf(lits);
 
-  lits.clear();
-  lits.reserve(3);
-  lits.push_back(neg(a));
-  lits.push_back(pos(b));
-  lits.push_back(pos(o));
+  lits[0]=neg(a);
+  lits[1]=pos(b);
+  lits[2]=pos(o);
   lcnf(lits);
 
-  lits.clear();
-  lits.reserve(3);
-  lits.push_back(pos(a));
-  lits.push_back(neg(b));
-  lits.push_back(pos(o));
+  lits[0]=pos(a);
+  lits[1]=neg(b);
+  lits[2]=pos(o);
   lcnf(lits);
 }
 
@@ -186,25 +168,20 @@ Function: cnft::gate_nand
 void cnft::gate_nand(literalt a, literalt b, literalt o)
 {
   // a Nand b = o <==> (a + o)( b + o)(a' + b' + o')
-  bvt lits;
+  bvt lits(2);
 
-  lits.clear();
-  lits.reserve(2);
-  lits.push_back(pos(a));
-  lits.push_back(pos(o));
+  lits[0]=pos(a);
+  lits[1]=pos(o);
   lcnf(lits);
 
-  lits.clear();
-  lits.reserve(2);
-  lits.push_back(pos(b));
-  lits.push_back(pos(o));
+  lits[0]=pos(b);
+  lits[1]=pos(o);
   lcnf(lits);
 
-  lits.clear();
-  lits.reserve(3);
-  lits.push_back(neg(a));
-  lits.push_back(neg(b));
-  lits.push_back(neg(o));
+  lits.resize(3);
+  lits[0]=neg(a);
+  lits[1]=neg(b);
+  lits[2]=neg(o);
   lcnf(lits);
 }
 
@@ -223,25 +200,20 @@ Function: cnft::gate_nor
 void cnft::gate_nor(literalt a, literalt b, literalt o)
 {
   // a Nor b = o <==> (a' + o')( b' + o')(a + b + o)
-  bvt lits;
+  bvt lits(2);
 
-  lits.clear();
-  lits.reserve(2);
-  lits.push_back(neg(a));
-  lits.push_back(neg(o));
+  lits[0]=neg(a);
+  lits[1]=neg(o);
   lcnf(lits);
 
-  lits.clear();
-  lits.reserve(2);
-  lits.push_back(neg(b));
-  lits.push_back(neg(o));
+  lits[0]=neg(b);
+  lits[1]=neg(o);
   lcnf(lits);
 
-  lits.clear();
-  lits.reserve(3);
-  lits.push_back(pos(a));
-  lits.push_back(pos(b));
-  lits.push_back(pos(o));
+  lits.resize(3);
+  lits[0]=pos(a);
+  lits[1]=pos(b);
+  lits[2]=pos(o);
   lcnf(lits);
 }
 
@@ -298,8 +270,8 @@ literalt cnft::land(const bvt &bv)
   if(bv.size()==2) return land(bv[0], bv[1]);
 
   forall_literals(it, bv)
-    if(*it==const_literal(false))
-      return const_literal(false);
+    if(it->is_false())
+      return *it;
 
   if(is_all(bv, const_literal(true)))
     return const_literal(true);
@@ -308,18 +280,17 @@ literalt cnft::land(const bvt &bv)
 
   eliminate_duplicates(bv, new_bv);
 
+  bvt lits(2);
   literalt literal=new_variable();
+  lits[1]=neg(literal);
 
   forall_literals(it, new_bv)
   {
-    bvt lits;
-    lits.reserve(2);
-    lits.push_back(pos(*it));
-    lits.push_back(neg(literal));
+    lits[0]=pos(*it);
     lcnf(lits);
   }
 
-  bvt lits;
+  lits.clear();
   lits.reserve(new_bv.size()+1);
 
   forall_literals(it, new_bv)
@@ -350,8 +321,8 @@ literalt cnft::lor(const bvt &bv)
   if(bv.size()==2) return lor(bv[0], bv[1]);
 
   forall_literals(it, bv)
-    if(*it==const_literal(true))
-      return const_literal(true);
+    if(it->is_true())
+      return *it;
 
   if(is_all(bv, const_literal(false)))
     return const_literal(false);
@@ -360,18 +331,17 @@ literalt cnft::lor(const bvt &bv)
 
   eliminate_duplicates(bv, new_bv);
 
+  bvt lits(2);
   literalt literal=new_variable();
+  lits[1]=pos(literal);
 
   forall_literals(it, new_bv)
   {
-    bvt lits;
-    lits.reserve(2);
-    lits.push_back(neg(*it));
-    lits.push_back(pos(literal));
+    lits[0]=neg(*it);
     lcnf(lits);
   }
 
-  bvt lits;
+  lits.clear();
   lits.reserve(new_bv.size()+1);
 
   forall_literals(it, new_bv)
@@ -423,10 +393,10 @@ Function: cnft::land
 
 literalt cnft::land(literalt a, literalt b)
 {
-  if(a==const_literal(true)) return b;
-  if(b==const_literal(true)) return a;
-  if(a==const_literal(false)) return const_literal(false);
-  if(b==const_literal(false)) return const_literal(false);
+  if(a.is_true()) return b;
+  if(b.is_true()) return a;
+  if(a.is_false()) return a;
+  if(b.is_false()) return b;
   if(a==b) return a;
 
   literalt o=new_variable();
@@ -448,10 +418,10 @@ Function: cnft::lor
 
 literalt cnft::lor(literalt a, literalt b)
 {
-  if(a==const_literal(false)) return b;
-  if(b==const_literal(false)) return a;
-  if(a==const_literal(true)) return const_literal(true);
-  if(b==const_literal(true)) return const_literal(true);
+  if(a.is_false()) return b;
+  if(b.is_false()) return a;
+  if(a.is_true()) return a;
+  if(b.is_true()) return b;
   if(a==b) return a;
 
   literalt o=new_variable();
@@ -491,10 +461,10 @@ Function: cnft::lxor
 
 literalt cnft::lxor(literalt a, literalt b)
 {
-  if(a==const_literal(false)) return b;
-  if(b==const_literal(false)) return a;
-  if(a==const_literal(true)) return lnot(b);
-  if(b==const_literal(true)) return lnot(a);
+  if(a.is_false()) return b;
+  if(b.is_false()) return a;
+  if(a.is_true()) return lnot(b);
+  if(b.is_true()) return lnot(a);
   if(a==b) return const_literal(false);
   if(a==lnot(b)) return const_literal(true);
 
@@ -586,8 +556,7 @@ Function: cnft::lselect
 literalt cnft::lselect(literalt a, literalt b, literalt c)
 { // a?b:c = (a AND b) OR (/a AND c)
 
-  if(a==const_literal(true)) return b;
-  if(a==const_literal(false)) return c;
+  if(a.is_constant()) return a.sign() ? b : c;
   if(b==c) return b;
 
   #if 0
