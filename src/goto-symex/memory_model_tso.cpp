@@ -62,11 +62,6 @@ bool memory_model_tsot::program_order_is_relaxed(
      e1->atomic_section_id==e2->atomic_section_id)
     return false;
 
-  // no relaxation if induced wsi
-  if(is_shared_write(e1) && is_shared_write(e2) &&
-     address(e1)==address(e2))
-    return false;
-
   // write to read program order is relaxed
   return is_shared_write(e1) && is_shared_read(e2);
 }
