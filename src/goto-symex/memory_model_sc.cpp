@@ -100,7 +100,6 @@ void memory_model_sct::thread_spawn(
         per_thread_map.find(++next_thread_id);
       if(next_thread!=per_thread_map.end())
         equation.constraint(
-          true_exprt(),
           before(e_it, next_thread->second.front()),
           "thread-spawn",
           e_it->source);
@@ -157,7 +156,6 @@ void memory_model_sct::program_order(
       }
 
       equation.constraint(
-        true_exprt(),
         before(previous, *e_it),
         "po",
         (*e_it)->source);
@@ -216,13 +214,11 @@ void memory_model_sct::write_serialization_external(
 
         // write-to-write edge
         equation.constraint(
-          true_exprt(),
           implies_exprt(s, before(*w_it1, *w_it2)),
           "ws-ext",
           (*w_it1)->source);
 
         equation.constraint(
-          true_exprt(),
           implies_exprt(not_exprt(s), before(*w_it2, *w_it1)),
           "ws-ext",
           (*w_it1)->source);
@@ -300,24 +296,30 @@ void memory_model_sct::from_read(symex_target_equationt &equation)
           {
             exprt fr=before(r, *w);
 
+            // the guard of w_prime follows from rf; with rfi
+            // optimisation such as the previous write_symbol_primed
+            // it would even be wrong to add this guard
             cond=
               implies_exprt(
-                and_exprt(r->guard, (*w_prime)->guard, ws1, rf),
+                and_exprt(r->guard, (*w)->guard, ws1, rf),
                 fr);
           }
           else if(c_it->first.second==*w && !ws2.is_false())
           {
             exprt fr=before(r, *w_prime);
 
+            // the guard of w follows from rf; with rfi
+            // optimisation such as the previous write_symbol_primed
+            // it would even be wrong to add this guard
             cond=
               implies_exprt(
-                and_exprt(r->guard, (*w)->guard, ws2, rf),
+                and_exprt(r->guard, (*w_prime)->guard, ws2, rf),
                 fr);
           }
 
           if(cond.is_not_nil())
             equation.constraint(
-              true_exprt(), cond, "fr", r->source);
+              cond, "fr", r->source);
         }
         
       }

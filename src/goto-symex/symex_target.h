@@ -147,7 +147,6 @@ public:
 
   // record a constraint
   virtual void constraint(
-    const exprt &guard,
     const exprt &cond,
     const std::string &msg,
     const sourcet &source)=0;
