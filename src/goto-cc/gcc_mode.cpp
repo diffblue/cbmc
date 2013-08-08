@@ -344,6 +344,18 @@ bool gcc_modet::doit()
     }
   }
   
+  // Revert to gcc in case there is no source to compile
+  // and no binary to link.
+
+  if(compiler.source_files.empty() &&
+     compiler.object_files.empty())
+  {
+    temp_dir.clear();
+    int result;
+    result=run_gcc();
+    exit(result);
+  }
+
   // do all the rest
   bool result=compiler.doit();
 
