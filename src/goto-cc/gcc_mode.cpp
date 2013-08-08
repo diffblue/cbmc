@@ -127,18 +127,21 @@ bool gcc_modet::doit()
     else
       debug("GCC mode");
   }
-  
+
   // In gcc mode, we have just pass on to gcc to handle the following:
   // * if -M or -MM is given, we do dependencies only
   // * assembly (-S)
   // * preprocessing (-E).
+  // * no input files given
+  
   if(act_as_ld)
   {
   }
   else if(cmdline.isset('M') || 
           cmdline.isset("MM") ||
           cmdline.isset('S') ||
-          cmdline.isset('E'))
+          cmdline.isset('E') ||
+          !cmdline.have_infile_arg())
   {
     int result;
     result=run_gcc();
@@ -321,6 +324,8 @@ bool gcc_modet::doit()
           
           compiler.add_input_file(dest);
         }
+        else
+          compiler.add_input_file(arg_it->arg);
       }
       else if(arg_it->arg=="-x")
       {
@@ -338,7 +343,7 @@ bool gcc_modet::doit()
       }
     }
   }
-
+  
   // do all the rest
   bool result=compiler.doit();
 
