@@ -52,7 +52,7 @@ public:
   // constructors
   inline exprt() { }
   inline explicit exprt(const irep_idt &_id):irept(_id) { }
-  inline exprt(const irep_idt &_id, const typet &_type):irept(_id) { type()=_type; }
+  inline exprt(const irep_idt &_id, const typet &_type):irept(_id) { add(ID_type, _type); }
  
   /// returns the type of the expression
   inline typet &type() { return static_cast<typet &>(add(ID_type)); }

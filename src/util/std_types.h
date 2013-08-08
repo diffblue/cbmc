@@ -608,10 +608,9 @@ public:
   }
   
   inline array_typet(const typet &_subtype,
-                     const exprt &_size):typet(ID_array)
+                     const exprt &_size):typet(ID_array, _subtype)
   {
     size()=_size;
-    subtype()=_subtype;
   }
   
   inline const exprt &size() const
@@ -667,6 +666,11 @@ class bitvector_typet:public typet
 {
 public:
   inline explicit bitvector_typet(const irep_idt &_id):typet(_id)
+  {
+  }
+
+  inline bitvector_typet(const irep_idt &_id, const typet &_subtype):
+    typet(_id, _subtype)
   {
   }
 
@@ -913,15 +917,14 @@ public:
   {
   }
 
-  inline explicit pointer_typet(const typet &_subtype):bitvector_typet(ID_pointer)
+  inline explicit pointer_typet(const typet &_subtype):
+    bitvector_typet(ID_pointer, _subtype)
   {
-    subtype()=_subtype;
   }
 
   inline explicit pointer_typet(const typet &_subtype, unsigned width):
-    bitvector_typet(ID_pointer)
+    bitvector_typet(ID_pointer, _subtype)
   {
-    subtype()=_subtype;
     set_width(width);
   }
   
@@ -1056,10 +1059,9 @@ public:
   }
   
   inline vector_typet(const typet &_subtype,
-                      const exprt &_size):typet(ID_vector)
+                      const exprt &_size):typet(ID_vector, _subtype)
   {
     size()=_size;
-    subtype()=_subtype;
   }
   
   inline const exprt &size() const
@@ -1108,9 +1110,8 @@ public:
   {
   }
   
-  inline complex_typet(const typet &_subtype):typet(ID_complex)
+  inline complex_typet(const typet &_subtype):typet(ID_complex, _subtype)
   {
-    subtype()=_subtype;
   }
 };
 

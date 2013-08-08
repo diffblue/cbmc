@@ -175,6 +175,7 @@ public:
 
   const irept &find(const irep_namet &name) const;
   irept &add(const irep_namet &name);
+  irept &add(const irep_namet &name, const irept &irep);
 
   inline const std::string &get_string(const irep_namet &name) const
   {
