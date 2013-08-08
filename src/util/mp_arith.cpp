@@ -196,6 +196,8 @@ const mp_integer binary2integer(const std::string &n, bool is_signed)
 
   if(n.size()<=(sizeof(unsigned long)*8))
   {
+    // this is a tuned implementation for short integers
+
     unsigned long mask=1;
     mask=mask << (n.size()-1);
     mp_integer result=(n[0]=='1') ? mask : 0;
@@ -215,6 +217,8 @@ const mp_integer binary2integer(const std::string &n, bool is_signed)
     return result;
   }
 
+  #if 0
+
   mp_integer mask=1;
   mask=mask << (n.size()-1);
   mp_integer result=(n[0]=='1') ? mask : 0;
@@ -232,6 +236,19 @@ const mp_integer binary2integer(const std::string &n, bool is_signed)
   }
 
   return result;
+
+  #else
+
+  if(is_signed && n[0]=='1')
+  {
+    mp_integer result(n.c_str()+1, 2);
+    result-=mp_integer(1)<<(n.size()-1);
+    return result;
+  }
+  else
+    return BigInt(n.c_str(), 2);
+
+  #endif
 }
 
 /*******************************************************************\
