@@ -450,13 +450,12 @@ bool exprt::is_zero() const
 {
   if(is_constant())
   {
-    const irep_idt value=get_string(ID_value);
+    const constant_exprt &constant=to_constant_expr(*this);
     const irep_idt &type_id=type().id_string();
 
     if(type_id==ID_integer || type_id==ID_natural)
     {
-      mp_integer int_value=string2integer(id2string(value));
-      if(int_value==0) return true;
+      return constant.value_is_zero_string();
     }
     else if(type_id==ID_rational)
     {
@@ -466,22 +465,20 @@ bool exprt::is_zero() const
     }
     else if(type_id==ID_unsignedbv || type_id==ID_signedbv)
     {
-      mp_integer int_value=binary2integer(id2string(value), false);
-      if(int_value==0) return true;
+      return constant.value_is_zero_string();
     }
     else if(type_id==ID_fixedbv)
     {
-      if(fixedbvt(to_constant_expr(*this))==0) return true;
+      if(fixedbvt(constant)==0) return true;
     }
     else if(type_id==ID_floatbv)
     {
-      if(ieee_floatt(to_constant_expr(*this))==0) return true;
+      if(ieee_floatt(constant)==0) return true;
     }
     else if(type_id==ID_pointer)
     {
-      if(value==ID_NULL) return true;
-      mp_integer int_value=binary2integer(id2string(value), false);
-      if(int_value==0) return true;
+      if(constant.get_value()==ID_NULL) return true;
+      return constant.value_is_zero_string();
     }
   }
 

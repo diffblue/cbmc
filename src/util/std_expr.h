@@ -2444,6 +2444,8 @@ public:
   {
     set(ID_value, value);
   }
+
+  bool value_is_zero_string() const;
 };
 
 /*! \brief Cast a generic exprt to a \ref constant_exprt

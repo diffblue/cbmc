@@ -10,6 +10,24 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
+Function: constant_exprt::value_is_zero_string
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool constant_exprt::value_is_zero_string() const
+{
+  const std::string val=id2string(get_value());
+  return val.find_first_not_of('0')==std::string::npos;
+}
+
+/*******************************************************************\
+
 Function: disjunction
 
   Inputs:
