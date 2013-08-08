@@ -151,9 +151,7 @@ public:
 
   friend inline literalt const_literal(bool value)
   {
-    literalt l;
-    l.set(literalt::const_var_no(), value);
-    return l;
+    return literalt(literalt::const_var_no(), value);
   }
   
   inline bool is_constant() const
@@ -178,12 +176,18 @@ protected:
   unsigned l;  
 };
 
+static inline std::ostream & operator << (std::ostream &out, literalt l)
+{
+  return out << l.dimacs();
+}
+
 // constants
 literalt const_literal(bool value);
 
 literalt neg(literalt a);
 literalt pos(literalt a);
 
+// bit-vectors
 typedef std::vector<literalt> bvt;
 
 #define forall_literals(it, bv) \
@@ -193,10 +197,5 @@ typedef std::vector<literalt> bvt;
 #define Forall_literals(it, bv) \
   for(bvt::iterator it=(bv).begin(); \
       it!=(bv).end(); ++it)
-
-static inline std::ostream & operator << (std::ostream &out, literalt l)
-{
-  return out << l.dimacs();
-}
 
 #endif
