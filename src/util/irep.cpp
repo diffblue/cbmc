@@ -397,6 +397,32 @@ irept &irept::add(const irep_namet &name)
 
 /*******************************************************************\
 
+Function: irept::add
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+irept &irept::add(const irep_namet &name, const irept &irep)
+{
+  named_subt &s=
+    is_comment(name)?get_comments():get_named_sub();
+
+  std::pair<named_subt::iterator, bool> entry=
+    s.insert(std::make_pair(name, irep));
+
+  if(!entry.second)
+    entry.first->second=irep;
+
+  return entry.first->second;
+}
+
+/*******************************************************************\
+
 Function: operator==
 
   Inputs:

@@ -196,9 +196,8 @@ public:
 class predicate_exprt:public exprt
 {
 public:
-  inline predicate_exprt()
+  inline predicate_exprt():exprt("", typet(ID_bool))
   {
-    type()=typet(ID_bool);
   }
 
   explicit inline predicate_exprt(const irep_idt &_id):
@@ -780,11 +779,9 @@ public:
   }
  
   explicit inline array_of_exprt(
-    const exprt &_what, const typet &_type):exprt(ID_array_of)
+    const exprt &_what, const typet &_type):exprt(ID_array_of, _type)
   {
-    operands().resize(1);
-    op0()=_what;
-    type()=_type;
+    copy_to_operands(_what);
   }
  
   inline exprt &what()
@@ -1776,9 +1773,8 @@ class address_of_exprt:public exprt
 {
 public:
   explicit address_of_exprt(const exprt &op):
-    exprt(ID_address_of, pointer_typet())
+    exprt(ID_address_of, pointer_typet(op.type()))
   {
-    type().subtype()=op.type();
     copy_to_operands(op);
   }
 
