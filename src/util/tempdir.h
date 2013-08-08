@@ -22,6 +22,8 @@ public:
 
   std::string operator()(const std::string &file);
   
+  void clear();
+  
   explicit temp_dirt(const std::string &name_template);
   ~temp_dirt();
 };
