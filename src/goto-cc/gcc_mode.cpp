@@ -23,7 +23,7 @@ Author: CM Wintersteiger, 2006
 
 /*******************************************************************\
 
-Function: gcc_modet::is_supported_source_file
+Function: gcc_modet::needs_preprocessing
 
   Inputs:
 
@@ -33,7 +33,7 @@ Function: gcc_modet::is_supported_source_file
 
 \*******************************************************************/
 
-bool gcc_modet::is_supported_source_file(const std::string &file)
+bool gcc_modet::needs_preprocessing(const std::string &file)
 {
   if(has_suffix(file, ".c") ||
      has_suffix(file, ".cc") ||
@@ -262,42 +262,67 @@ bool gcc_modet::doit()
     compiler.output_file_object="";
     compiler.output_file_executable="a.out";
   }
-
-  // Using '-x', the type of a file can be overridden;
-  // otherwise, it's guessed from the extension.
   
-  if(cmdline.isset('x'))
-  {
-    const std::string language=cmdline.getval('x');
-    compiler.override_language=language;
-  }
-    
-  // Iterate over file arguments, and do any preprocessing needed
-
+  // We now iterate over any input files
+  
   temp_dirt temp_dir("goto-cc-XXXXXX");
   
-  cmdlinet::argst original_args=cmdline.args;
-
-  for(cmdlinet::argst::iterator
-      a_it=cmdline.args.begin();
-      a_it!=cmdline.args.end();
-      a_it++)
   {
-    if(is_supported_source_file(*a_it))
+    std::string language;
+    
+    for(goto_cc_cmdlinet::parsed_argvt::iterator
+        arg_it=cmdline.parsed_argv.begin();
+        arg_it!=cmdline.parsed_argv.end();
+        arg_it++)
     {
-      std::string new_suffix=has_suffix(*a_it, ".c")?".i":".ii";
-      std::string new_name=get_base_name(*a_it)+new_suffix;
-      std::string dest=temp_dir(new_name);
-
-      int exit_code=preprocess(*a_it, dest);
-
-      if(exit_code!=0)
+      if(arg_it->is_infile_name)
       {
-        error() << "preprocessing has failed" << eom;
-        return true;
+        // do any preprocessing needed
+
+        if(language=="cpp-output" || language=="c++-cpp-output")
+        {
+          compiler.add_input_file(arg_it->arg);
+        }
+        else if(language=="c" || language=="c++" ||
+                (language=="" && needs_preprocessing(arg_it->arg)))
+        {
+          std::string new_suffix;
+
+          if(language=="c")
+            new_suffix=".i";
+          else if(language=="c++")
+            new_suffix=".ii";
+          else
+            new_suffix=has_suffix(arg_it->arg, ".c")?".i":".ii";
+
+          std::string new_name=get_base_name(arg_it->arg)+new_suffix;
+          std::string dest=temp_dir(new_name);
+
+          int exit_code=preprocess(language, arg_it->arg, dest);
+
+          if(exit_code!=0)
+          {
+            error() << "preprocessing has failed" << eom;
+            return true;
+          }
+          
+          compiler.add_input_file(dest);
+        }
       }
-      
-      *a_it=dest;
+      else if(arg_it->arg=="-x")
+      {
+        arg_it++;
+        if(arg_it!=cmdline.parsed_argv.end())
+        {
+          language=arg_it->arg;
+          if(language=="none") language="";
+        }
+      }
+      else if(has_prefix(arg_it->arg, "-x"))
+      {
+        language=std::string(arg_it->arg, 2, std::string::npos);
+        if(language=="none") language="";
+      }
     }
   }
 
@@ -308,7 +333,7 @@ bool gcc_modet::doit()
   // containing both executable machine code and the goto-binary.
   if(produce_hybrid_binary)
   {
-    if(gcc_hybrid_binary(original_args))
+    if(gcc_hybrid_binary())
       result=true;
   }
   
@@ -327,7 +352,10 @@ Function: gcc_modet::preprocess
 
 \*******************************************************************/
 
-int gcc_modet::preprocess(const std::string &src, const std::string &dest)
+int gcc_modet::preprocess(
+  const std::string &language,
+  const std::string &src,
+  const std::string &dest)
 {
   // build new argv
   std::vector<std::string> new_argv;
@@ -377,6 +405,13 @@ int gcc_modet::preprocess(const std::string &src, const std::string &dest)
   // destination file
   new_argv.push_back("-o");
   new_argv.push_back(dest);
+  
+  // language, if given
+  if(language!="")
+  {
+    new_argv.push_back("-x");
+    new_argv.push_back(language);
+  }
   
   // source file  
   new_argv.push_back(src);
@@ -448,10 +483,21 @@ Function: gcc_modet::gcc_hybrid_binary
 
 \*******************************************************************/
 
-int gcc_modet::gcc_hybrid_binary(const cmdlinet::argst &input_files)
+int gcc_modet::gcc_hybrid_binary()
 {
-  if(input_files.empty())
-    return 0;
+  {
+    bool have_files=false;
+
+    for(gcc_cmdlinet::parsed_argvt::const_iterator
+        it=cmdline.parsed_argv.begin();
+        it!=cmdline.parsed_argv.end();
+        it++)
+      if(it->is_infile_name)
+        have_files=true;
+
+    if(!have_files)
+      return 0;
+  }
 
   std::list<std::string> output_files;
   
@@ -464,14 +510,15 @@ int gcc_modet::gcc_hybrid_binary(const cmdlinet::argst &input_files)
     }
     else
     {
-      for(cmdlinet::argst::const_iterator
-          i_it=input_files.begin();
-          i_it!=input_files.end();
+      for(gcc_cmdlinet::parsed_argvt::const_iterator
+          i_it=cmdline.parsed_argv.begin();
+          i_it!=cmdline.parsed_argv.end();
           i_it++)
-      {
-        if(is_supported_source_file(*i_it) && cmdline.isset('c'))
-          output_files.push_back(get_base_name(*i_it)+".o");
-      }
+        if(i_it->is_infile_name)
+        {
+          if(needs_preprocessing(i_it->arg))
+            output_files.push_back(get_base_name(i_it->arg)+".o");
+        }
     }
   }
   else

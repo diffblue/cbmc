@@ -32,12 +32,16 @@ public:
 protected:
   bool act_as_ld;
   
-  int preprocess(const std::string &src, const std::string &dest);
+  int preprocess(
+    const std::string &language,
+    const std::string &src,
+    const std::string &dest);
+
   int run_gcc(); // call gcc with original command line
   
-  int gcc_hybrid_binary(const cmdlinet::argst &input_files);
+  int gcc_hybrid_binary();
   
-  static bool is_supported_source_file(const std::string &);
+  static bool needs_preprocessing(const std::string &);
 };
 
 #endif /* GOTO_CC_GCC_MODE_H */
