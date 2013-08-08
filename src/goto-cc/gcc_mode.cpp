@@ -74,8 +74,6 @@ bool gcc_modet::doit()
 
   int verbosity=1;
 
-  compilet compiler(cmdline);
-  
   if(cmdline.isset('v'))
   {
     // This a) prints the version and b) increases verbosity.
@@ -113,7 +111,6 @@ bool gcc_modet::doit()
   if(cmdline.isset("verbosity"))
     verbosity=atoi(cmdline.getval("verbosity"));
 
-  compiler.set_verbosity(verbosity);
   set_verbosity(verbosity);
 
   if(act_as_ld)
@@ -131,9 +128,17 @@ bool gcc_modet::doit()
       debug("GCC mode");
   }
   
-  // in gcc mode, if -M or -MM is given, we do dependencies only,
-  // which is handled by simply calling gcc and then exiting
-  if(!act_as_ld && (cmdline.isset('M') || cmdline.isset("MM")))
+  // In gcc mode, we have just pass on to gcc to handle the following:
+  // * if -M or -MM is given, we do dependencies only
+  // * assembly (-S)
+  // * preprocessing (-E).
+  if(act_as_ld)
+  {
+  }
+  else if(cmdline.isset('M') || 
+          cmdline.isset("MM") ||
+          cmdline.isset('S') ||
+          cmdline.isset('E'))
   {
     int result;
     result=run_gcc();
@@ -171,15 +176,23 @@ bool gcc_modet::doit()
     config.ansi_c.double_width=config.ansi_c.single_width;
 
   // determine actions to be undertaken
+  compilet compiler(cmdline);  
+  compiler.set_verbosity(verbosity);
   
   if(act_as_ld)
     compiler.mode=compilet::LINK_LIBRARY;
   else if(cmdline.isset('c'))
     compiler.mode=compilet::COMPILE_ONLY;
   else if(cmdline.isset('S'))
+  {
     compiler.mode=compilet::ASSEMBLE_ONLY;
+    assert(false);
+  }
   else if(cmdline.isset('E'))
+  {
     compiler.mode=compilet::PREPROCESS_ONLY;
+    assert(false);
+  }
   else if(cmdline.isset("shared") ||
           cmdline.isset('r')) // really not well documented
     compiler.mode=compilet::COMPILE_LINK;
