@@ -191,26 +191,42 @@ Function: binary2integer
 
 const mp_integer binary2integer(const std::string &n, bool is_signed)
 {
-  if(n.size()==0) return 0;
+  if(n.size()==0 || n.find_first_not_of("01")!=std::string::npos)
+    return 0;
 
-  mp_integer result=0;
+  if(n.size()<=(sizeof(unsigned long)*8))
+  {
+    unsigned long mask=1;
+    mask=mask << (n.size()-1);
+    mp_integer result=(n[0]=='1') ? mask : 0;
+    if(is_signed) result.negate();
+    mask>>=1;
+
+    for(std::string::const_iterator it=++n.begin();
+        it!=n.end();
+        ++it)
+    {
+      if(*it=='1')
+        result+=mask;
+
+      mask>>=1;
+    }
+
+    return result;
+  }
+
   mp_integer mask=1;
   mask=mask << (n.size()-1);
+  mp_integer result=(n[0]=='1') ? mask : 0;
+  if(is_signed) result.negate();
+  mask=mask>>1;
 
-  for(unsigned i=0; i<n.size(); i++)
+  for(std::string::const_iterator it=++n.begin();
+      it!=n.end();
+      ++it)
   {
-    if(n[i]=='0')
-    {
-    }
-    else if(n[i]=='1')
-    {
-      if(is_signed && i==0)
-        result=-mask;
-      else
-        result=result+mask;
-    }
-    else
-      return 0;
+    if(*it=='1')
+      result+=mask;
 
     mask=mask>>1;
   }
