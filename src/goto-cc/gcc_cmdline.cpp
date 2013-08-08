@@ -59,6 +59,8 @@ const char *gcc_options_with_separated_argument[]=
   "-iwithprefixbefore",
   "-isystem",
   "-isysroot",
+  "-imultilib",
+  "-imultiarch",
   "-Xpreprocessor",
   "-Xassembler",
   "-Xlinker",
