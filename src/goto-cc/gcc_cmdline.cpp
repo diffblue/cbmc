@@ -207,7 +207,6 @@ bool gcc_cmdlinet::parse(int argc, const char **argv)
     // file?
     if(argv_i=="-" || !has_prefix(argv_i, "-"))
     {
-      args.push_back(argv_i);
       add_infile_arg(argv_i);
       continue;
     }    
