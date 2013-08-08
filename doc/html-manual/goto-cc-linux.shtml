@@ -34,7 +34,7 @@ http://www.kernel.org/pub/linux/kernel/v2.6/linux-2.6.39.tar.bz2
 <li><p class="justified">Now ensure that you can actually
 compile a kernel by doing</p>
 <p>
-&nbsp;&nbsp;<code>make xconfig</code><br>
+&nbsp;&nbsp;<code>make defconfig</code><br>
 &nbsp;&nbsp;<code>make</code></p>
 <p class="justified">
 These steps need to succeed before you can try to extract
