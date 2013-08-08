@@ -12,6 +12,7 @@ Date: June 2003
 #define CPROVER_GOTO_FUNCTIONS_TEMPLATE_H
 
 #include <ostream>
+#include <cassert>
 
 #include <util/std_types.h>
 #include <util/symbol.h>
@@ -73,6 +74,12 @@ public:
   inline goto_functions_templatet()
   {
   }
+
+  // copy constructor, don't use me!
+  goto_functions_templatet(const goto_functions_templatet<bodyT> &src)
+  {
+    assert(src.function_map.empty());
+  }
   
   inline void clear()
   {
@@ -120,9 +127,6 @@ public:
       function_map[f_it->first].copy_from(f_it->second);
   }
 
-private:
-  // copy constructor, deliberatly unavailable
-  goto_functions_templatet(const goto_functions_templatet<bodyT> &src);
 };
 
 /*******************************************************************\
