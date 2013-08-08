@@ -54,6 +54,14 @@ public:
   
   typedef std::list<argt> parsed_argvt;
   parsed_argvt parsed_argv;
+  
+  bool have_infile_arg() const
+  {
+    for(parsed_argvt::const_iterator
+        it=parsed_argv.begin(); it!=parsed_argv.end(); it++)
+      if(it->is_infile_name) return true;
+    return false;
+  }
 
 protected:  
   void add_arg(const std::string &arg)
