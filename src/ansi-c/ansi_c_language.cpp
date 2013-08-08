@@ -147,6 +147,7 @@ bool ansi_c_languaget::parse(
     break;
     
   case configt::ansi_ct::MODE_GCC_C:
+  case configt::ansi_ct::MODE_GCC_CPP:
     ansi_c_parser.mode=ansi_c_parsert::GCC;
     break;
     
