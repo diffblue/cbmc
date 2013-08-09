@@ -278,40 +278,6 @@ satcheck_minisat2_baset<T>::satcheck_minisat2_baset(T *_solver):
 
 /*******************************************************************\
 
-Function: satcheck_minisat_no_simplifiert::satcheck_minisat_no_simplifiert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-satcheck_minisat_no_simplifiert::satcheck_minisat_no_simplifiert():
-  satcheck_minisat2_baset<Minisat::Solver>(new Minisat::Solver)
-{
-}
-
-/*******************************************************************\
-
-Function: satcheck_minisat_simplifiert::satcheck_minisat_simplifiert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-satcheck_minisat_simplifiert::satcheck_minisat_simplifiert():
-  satcheck_minisat2_baset<Minisat::SimpSolver>(new Minisat::SimpSolver)
-{
-}
-
-/*******************************************************************\
-
 Function: satcheck_minisat2_baset::~satcheck_minisat2_baset
 
   Inputs:
@@ -322,8 +288,14 @@ Function: satcheck_minisat2_baset::~satcheck_minisat2_baset
 
 \*******************************************************************/
 
-template<typename T>
-satcheck_minisat2_baset<T>::~satcheck_minisat2_baset()
+template<>
+satcheck_minisat2_baset<Minisat::Solver>::~satcheck_minisat2_baset()
+{
+  delete solver;
+}
+
+template<>
+satcheck_minisat2_baset<Minisat::SimpSolver>::~satcheck_minisat2_baset()
 {
   delete solver;
 }
@@ -371,6 +343,40 @@ void satcheck_minisat2_baset<T>::set_assumptions(const bvt &bv)
 
   forall_literals(it, assumptions)
     assert(!it->is_constant());
+}
+
+/*******************************************************************\
+
+Function: satcheck_minisat_no_simplifiert::satcheck_minisat_no_simplifiert
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+satcheck_minisat_no_simplifiert::satcheck_minisat_no_simplifiert():
+  satcheck_minisat2_baset<Minisat::Solver>(new Minisat::Solver)
+{
+}
+
+/*******************************************************************\
+
+Function: satcheck_minisat_simplifiert::satcheck_minisat_simplifiert
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+satcheck_minisat_simplifiert::satcheck_minisat_simplifiert():
+  satcheck_minisat2_baset<Minisat::SimpSolver>(new Minisat::SimpSolver)
+{
 }
 
 /*******************************************************************\
