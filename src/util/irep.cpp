@@ -335,23 +335,6 @@ void irept::remove(const irep_namet &name)
 
 /*******************************************************************\
 
-Function: irept::set
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void irept::set(const irep_namet &name, const irept &irep)
-{
-  add(name)=irep;
-}  
-
-/*******************************************************************\
-
 Function: irept::find
 
   Inputs:

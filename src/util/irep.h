@@ -188,9 +188,10 @@ public:
 
   inline void set(const irep_namet &name, const irep_idt &value)
   { add(name).id(value); }
-  
+  inline void set(const irep_namet &name, const irept &irep)
+  { add(name, irep); }
   void set(const irep_namet &name, const long value);
-  void set(const irep_namet &name, const irept &irep);
+  
   void remove(const irep_namet &name);
   void move_to_sub(irept &irep);
   void move_to_named_sub(const irep_namet &name, irept &irep);
