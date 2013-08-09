@@ -128,11 +128,7 @@ inline int pthread_join(pthread_t thread, void **value_ptr)
 {
   __CPROVER_HIDE:;
   if(value_ptr!=0) (void)**(char**)value_ptr;
-#ifdef __APPLE__
-  __CPROVER_assume(__CPROVER_threads_exited[(unsigned long)thread->__sig]);
-#else
   __CPROVER_assume(__CPROVER_threads_exited[(unsigned long)thread]);
-#endif
   return 0;
 }
 
@@ -298,15 +294,16 @@ int pthread_create(
   this_thread_id=++__CPROVER_next_thread_id;
   __CPROVER_atomic_end();
 
-#ifdef __APPLE__
   if(thread)
   {
-    *thread=malloc(sizeof(typeof(**thread)));
-    (*thread)->__sig=this_thread_id;
+    #ifdef __APPLE__
+    // pthread_t is a pointer type on the Mac
+    *thread=(pthread_t)this_thread_id;
+    #else
+    *thread=this_thread_id;
+    #endif
   }
-#else
-  if(thread) *thread=this_thread_id;
-#endif
+
   if(attr) (void)*attr;
   __actual_thread_spawn(start_routine, arg, this_thread_id);
 
@@ -388,6 +385,8 @@ inline int pthread_cond_wait(
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
 
+// no pthread_spinlock_t on the Mac
+#ifndef __APPLE__
 int pthread_spin_lock(pthread_spinlock_t *lock)
 {
   __CPROVER_HIDE:;
@@ -400,6 +399,7 @@ int pthread_spin_lock(pthread_spinlock_t *lock)
                   "WWcumul", "RRcumul", "RWcumul", "WRcumul");
   return 0;
 }
+#endif
 
 /* FUNCTION: pthread_spin_unlock */
 
@@ -408,6 +408,8 @@ int pthread_spin_lock(pthread_spinlock_t *lock)
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
 
+// no pthread_spinlock_t on the Mac
+#ifndef __APPLE__
 int pthread_spin_unlock(pthread_spinlock_t *lock)
 {
   __CPROVER_HIDE:;
@@ -417,6 +419,7 @@ int pthread_spin_unlock(pthread_spinlock_t *lock)
   *((unsigned *)lock) = 0;
   return 0;
 }
+#endif
 
 /* FUNCTION: pthread_spin_trylock */
 
