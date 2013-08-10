@@ -90,7 +90,8 @@
   standard.  Consult the compiler manual and disable any
   optimisations that are described as unsafe (for
   example, the GCC options <code>-ffast-math</code>).
-  The options <code>-mno-fused-madd</code>, <code>-frounding-math</code>
+  The options <code>-ffp-contract=off</code> (which replaces
+  <code>-mno-fused-madd</code>), <code>-frounding-math</code>
   and <code>-fsignaling-nans</code> are needed for GCC to be strictly
   compliant with IEEE-754.</p>
 
