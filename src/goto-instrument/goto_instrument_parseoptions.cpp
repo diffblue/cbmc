@@ -26,7 +26,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/string_abstraction.h>
 #include <goto-programs/string_instrumentation.h>
 #include <goto-programs/loop_ids.h>
-#include <goto-programs/reachability_slicer.h>
 #include <goto-programs/link_to_library.h>
 
 #include <pointer-analysis/value_set_analysis.h>
@@ -47,6 +46,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "document_claims.h"
 #include "uninitialized.h"
 #include "full_slicer.h"
+#include "reachability_slicer.h"
 #include "show_locations.h"
 #include "points_to.h"
 #include "alignment_checks.h"
