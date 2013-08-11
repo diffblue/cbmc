@@ -276,7 +276,7 @@ void concurrency_instrumentationt::instrument(
   goto_functionst &goto_functions)
 {
   namespacet ns(symbol_table);
-  is_threadedt is_threaded(ns, goto_functions);
+  is_threadedt is_threaded(goto_functions);
   
   // this first collects all shared and thread-local variables
   forall_goto_functions(f_it, goto_functions)
