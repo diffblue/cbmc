@@ -260,17 +260,12 @@ inline int pthread_rwlock_wrlock(pthread_rwlock_t *lock)
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
 
-#ifndef __CPROVER_STDLIB_H_INCLUDED
-#include <stdlib.h>
-#define __CPROVER_STDLIB_H_INCLUDED
-#endif
-
 extern __CPROVER_bool __CPROVER_threads_exited[];
 extern _Thread_local unsigned long __CPROVER_thread_id;
 extern unsigned long __CPROVER_next_thread_id;
 
 // using separate function avoid unnecessary copies of local variables
-// (malloc!), don't inline!
+// from functions invoking pthread_create, don't inline!
 void __actual_thread_spawn(
   void * (*start_routine)(void *),
   void *arg,
@@ -433,6 +428,8 @@ int pthread_spin_unlock(pthread_spinlock_t *lock)
 #define __CPROVER_ERRNO_H_INCLUDED
 #endif
 
+// no pthread_spinlock_t on the Mac
+#ifndef __APPLE__
 int pthread_spin_trylock(pthread_spinlock_t *lock)
 {
   __CPROVER_HIDE:;
@@ -451,3 +448,5 @@ int pthread_spin_trylock(pthread_spinlock_t *lock)
                   "WWcumul", "RRcumul", "RWcumul", "WRcumul");
   return result;
 }
+#endif
+
