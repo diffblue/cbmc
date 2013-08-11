@@ -349,7 +349,8 @@ bool local_may_aliast::aliases(
   
   std::set_intersection(
     tmp1.objects.begin(), tmp1.objects.end(),
-    tmp2.objects.begin(), tmp2.objects.end(), result.begin());
+    tmp2.objects.begin(), tmp2.objects.end(),
+    std::back_inserter(result));
   
   return !result.empty();
 }
