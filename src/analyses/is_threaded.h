@@ -18,10 +18,8 @@ Date: October 2012
 class is_threadedt
 {
 public:
-  is_threadedt(
-    const namespacet &_ns,
-    const goto_functionst &goto_functions):
-    ns(_ns)
+  explicit is_threadedt(
+    const goto_functionst &goto_functions)
   {
     compute(goto_functions);
   }
@@ -32,8 +30,6 @@ public:
   }
   
 protected:
-  const namespacet &ns;
-
   typedef std::set<goto_programt::const_targett> is_threaded_sett;
   is_threaded_sett is_threaded_set;
 
