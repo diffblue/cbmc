@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/expr_util.h>
 #include <util/pointer_offset_size.h>
 #include <util/arith_tools.h>
+#include <util/base_type.h>
 
 #include <pointer-analysis/dereference.h>
 #include <pointer-analysis/rewrite_index.h>
@@ -161,18 +162,22 @@ exprt goto_symext::address_arithmetic(
       exprt sum=exprt(ID_plus, tc1.type());
       sum.copy_to_operands(tc1, from_integer(offset, size_type()));
       
+      // treat &array as &array[0]
+      const typet &expr_type=ns.follow(expr.type());
       pointer_typet dest_type;
 
-      if(expr.type().id()==ID_array)
-        dest_type.subtype()=expr.type().subtype();
+      if(expr_type.id()==ID_array)
+        dest_type.subtype()=expr_type.subtype();
       else
-        dest_type.subtype()=expr.type();
+        dest_type.subtype()=expr_type;
     
       return typecast_exprt(sum, dest_type);
     }
   }
   else if(expr.id()==ID_dereference)
   {
+    // ANSI-C guarantees &*p == p no matter what p is,
+    // even if it's complete garbage
     // just grab the pointer, but be wary of further dereferencing
     // in the pointer itself
     exprt tmp=to_dereference_expr(expr).pointer();
@@ -287,18 +292,7 @@ void goto_symext::dereference_rec(
     
     exprt &object=address_of_expr.object();
 
-    if(object.id()==ID_dereference)
-    {
-      // ANSI-C guarantees &*p == p no matter what p is,
-      // even if it's complete garbage
-      assert(object.operands().size()==1);
-      exprt tmp=object.op0();
-      expr.swap(tmp);
-    
-      // do rec. call, as p itself might have dereferencing in it
-      dereference_rec(expr, state, guard, false);
-    }
-    else if(is_index_member_symbol_if(object))
+    if(is_index_member_symbol_if(object))
     {
       // simply dereference, this yields "&object"
       dereference_rec_address_of(object, state, guard);
@@ -307,6 +301,8 @@ void goto_symext::dereference_rec(
     {
       // fallback: do address arithmetic
       exprt result=address_arithmetic(object, state, guard);
+      assert(expr.type().subtype().id()==ID_array ||
+             base_type_eq(expr.type(), result.type(), ns));
       expr.swap(result);
     }
   }
