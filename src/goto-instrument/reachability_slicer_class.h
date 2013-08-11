@@ -9,8 +9,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_PROGRAM_SLICER_CLASS_H
 #define CPROVER_GOTO_PROGRAM_SLICER_CLASS_H
 
-#include "goto_functions.h"
-#include "cfg.h"
+#include <goto-programs/goto_functions.h>
+#include <goto-programs/cfg.h>
+
+#include <analyses/is_threaded.h>
 
 /*******************************************************************\
 
@@ -26,25 +28,19 @@ public:
   void operator()(goto_functionst &goto_functions)
   {
     cfg(goto_functions);
-    fixedpoints();
+    is_threadedt is_threaded(goto_functions);
+    fixedpoint_assertions(is_threaded);
     slice(goto_functions);
-  }
-
-  void operator()(goto_programt &goto_program)
-  {
-    cfg(goto_program);
-    fixedpoints();
-    slice(goto_program);
   }
 
 protected:
   struct slicer_entryt
   {
-    slicer_entryt():reaches_assertion(false), threaded(false)
+    slicer_entryt():reaches_assertion(false)
     {
     }
 
-    bool reaches_assertion, threaded;
+    bool reaches_assertion;
   };
 
   typedef cfg_baset<slicer_entryt> cfgt;
@@ -52,17 +48,8 @@ protected:
 
   typedef std::stack<cfgt::iterator> queuet;
 
-  void fixedpoint_assertions();
-  void fixedpoint_threads();
+  void fixedpoint_assertions(const is_threadedt &is_threaded);
 
-  void fixedpoints()
-  {
-    // do threads first
-    fixedpoint_threads();
-    fixedpoint_assertions();
-  }
-
-  void slice(goto_programt &goto_program);
   void slice(goto_functionst &goto_functions);
 };
 
