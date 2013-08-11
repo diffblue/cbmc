@@ -51,6 +51,21 @@ public:
 };
 
 template<class E>
+class visited_nodet:public graph_nodet<E>
+{
+  public:
+    typedef typename graph_nodet<E>::edget edget;
+    typedef typename graph_nodet<E>::edgest edgest;
+
+    bool visited;
+
+    visited_nodet():
+      visited(false)
+  {
+  }
+};
+
+template<class E>
 void intersection(
   const typename graph_nodet<E>::edgest &a,
   const typename graph_nodet<E>::edgest &b,
@@ -448,8 +463,8 @@ void graph<N>::visit_reachable(unsigned src)
         it=node.out.begin();
         it!=node.out.end();
         it++)
-      if(!nodes[*it].visited)
-        s.push(*it);
+      if(!nodes[it->first].visited)
+        s.push(it->first);
   }
 }
 
