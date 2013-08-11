@@ -51,6 +51,10 @@ Function: is_threadedt::compute
 
 void is_threadedt::compute(const goto_functionst &goto_functions)
 {
+  // the analysis doesn't actually use the namespace, fake one
+  const symbol_tablet symbol_table;
+  const namespacet ns(symbol_table);
+
   static_analysist<is_threaded_domaint> is_threaded_analysis(ns);
   
   is_threaded_analysis(goto_functions);
