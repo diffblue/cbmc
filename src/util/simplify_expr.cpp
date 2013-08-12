@@ -1450,6 +1450,8 @@ Function: simplify_exprt::simplify_floatbv_typecast
 
 bool simplify_exprt::simplify_floatbv_typecast(exprt &expr)
 {
+  // These casts usually reduce precision, and thus, usually round.
+
   assert(expr.operands().size()==2);
         
   const typet &dest_type=ns.follow(expr.type());
