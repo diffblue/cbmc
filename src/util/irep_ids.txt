@@ -604,6 +604,7 @@ floatbv_mult
 floatbv_div
 floatbv_sin
 floatbv_cos
+floatbv_typecast
 read
 write
 native

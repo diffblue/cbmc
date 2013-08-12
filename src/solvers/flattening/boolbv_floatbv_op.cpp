@@ -17,6 +17,46 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
+Function: boolbvt::convert_floatbv_typecast
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void boolbvt::convert_floatbv_typecast(const exprt &expr, bvt &bv)
+{
+  const exprt::operandst &operands=expr.operands();
+  
+  if(operands.size()!=2)
+    throw "operator "+expr.id_string()+" takes two operands";
+
+  const exprt &op0=expr.op0();
+  const exprt &op1=expr.op1();
+
+  bvt bv0=convert_bv(op0);
+  bvt bv1=convert_bv(op1);
+
+  const typet &src_type=ns.follow(expr.op0().type());
+  const typet &dest_type=ns.follow(expr.type());
+
+  float_utilst float_utils(prop);
+
+  if(src_type.id()==ID_floatbv &&
+     dest_type.id()==ID_floatbv)
+  {
+    float_utils.spec=to_floatbv_type(src_type);
+    bv=float_utils.conversion(bv0, to_floatbv_type(dest_type));
+  }
+  else
+    return conversion_failed(expr, bv);
+}
+
+/*******************************************************************\
+
 Function: boolbvt::convert_floatbv_op
 
   Inputs:
@@ -30,7 +70,7 @@ Function: boolbvt::convert_floatbv_op
 void boolbvt::convert_floatbv_op(const exprt &expr, bvt &bv)
 {
   const exprt::operandst &operands=expr.operands();
-
+  
   if(operands.size()!=3)
     throw "operator "+expr.id_string()+" takes three operands";
 
@@ -52,7 +92,6 @@ void boolbvt::convert_floatbv_op(const exprt &expr, bvt &bv)
 
   float_utilst float_utils(prop);
 
-  // TODO: complex and vector  
   if(type.id()==ID_floatbv)
   {
     float_utils.spec=to_floatbv_type(expr.type());
@@ -108,6 +147,8 @@ void boolbvt::convert_floatbv_op(const exprt &expr, bvt &bv)
         std::copy(tmp_bv.begin(), tmp_bv.end(), bv.begin()+i*sub_width);
       }
     }
+    else
+      return conversion_failed(expr, bv);
   }
   else
     return conversion_failed(expr, bv);

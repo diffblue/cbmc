@@ -143,6 +143,20 @@ void goto_symext::adjust_float_expressions(exprt &expr)
       expr.operands().resize(3);
       expr.op2()=rounding_mode;
     }
+    else if(expr.id()==ID_typecast)
+    {
+      // casts from bigger to smaller type might round
+      if(expr.operands().size()==1 &&
+         expr.type().id()==ID_floatbv &&
+         expr.op0().type().id()==ID_floatbv &&
+         to_floatbv_type(expr.type()).get_width()<
+         to_floatbv_type(expr.op0().type()).get_width())
+      {
+        expr.id(ID_floatbv_typecast);
+        expr.operands().resize(2);
+        expr.op1()=rounding_mode;
+      }
+    }
   }
 }
 

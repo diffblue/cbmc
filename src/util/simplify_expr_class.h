@@ -56,6 +56,7 @@ public:
   bool simplify_plus(exprt &expr);
   bool simplify_minus(exprt &expr);
   bool simplify_floatbv_op(exprt &expr);
+  bool simplify_floatbv_typecast(exprt &expr);
   bool simplify_shifts(exprt &expr);
   bool simplify_bitwise(exprt &expr);
   bool simplify_if(exprt &expr);
