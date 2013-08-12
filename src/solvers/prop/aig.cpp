@@ -145,22 +145,21 @@ void aigt::print(
   {
     const aig_nodet &node=nodes[node_nr];
 
-    switch(node.type)
+    if(node.is_and())
     {
-    case aig_nodet::AND:
       if(a.sign()) out << "!(";
       print(out, node.a);
       out << " & ";
       print(out, node.b);
       if(a.sign()) out << ")";
-      break;
-      
-    case aig_nodet::VAR:
+    }
+    else if(node.is_var())
+    {
       if(a.sign()) out << "!";
-      out << label(node_nr);
-      break;
-      
-    default:
+      out << label(node_nr);\
+    }
+    else
+    {
       if(a.sign()) out << "!";
       out << "unknown(" << node_nr << ")";
     }
