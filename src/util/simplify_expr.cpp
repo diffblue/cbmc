@@ -1454,6 +1454,13 @@ bool simplify_exprt::simplify_floatbv_typecast(exprt &expr)
         
   const typet &dest_type=ns.follow(expr.type());
   const typet &src_type=ns.follow(expr.op0().type());
+
+  // eliminate redundant casts
+  if(dest_type==src_type)
+  {
+    expr=expr.op0();
+    return false;
+  }
   
   if(dest_type.id()!=ID_floatbv &&
      src_type.id()!=ID_floatbv)
@@ -1461,7 +1468,8 @@ bool simplify_exprt::simplify_floatbv_typecast(exprt &expr)
 
   exprt op0=expr.op0();
   exprt op1=expr.op1(); // rounding mode
-  
+
+  // constant folding  
   if(op0.is_constant() && op1.is_constant())
   {
     ieee_floatt value(to_constant_expr(op0));
@@ -1475,7 +1483,19 @@ bool simplify_exprt::simplify_floatbv_typecast(exprt &expr)
       return false;
     }    
   }
-
+  
+  // (T)(a?b:c) --> a?(T)b:(T)c
+  if(expr.op0().id()==ID_if && expr.op0().operands().size()==3)
+  {
+    exprt tmp_op1=binary_exprt(expr.op0().op1(), ID_floatbv_typecast, expr.op1(), dest_type);
+    exprt tmp_op2=binary_exprt(expr.op0().op2(), ID_floatbv_typecast, expr.op1(), dest_type);
+    simplify_floatbv_typecast(tmp_op1);
+    simplify_floatbv_typecast(tmp_op2);
+    expr=if_exprt(expr.op0(), tmp_op1, tmp_op2, dest_type);
+    simplify_if(expr);
+    return false;
+  }
+  
   return true;
 }
 
