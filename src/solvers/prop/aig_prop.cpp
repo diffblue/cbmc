@@ -12,7 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
-Function: aig_propt::set_l
+Function: aig_propt::lcnf
 
   Inputs:
 
@@ -22,87 +22,11 @@ Function: aig_propt::set_l
 
 \*******************************************************************/
 
-#if 0
-void aig_propt::set_l(propt &dest, literalt a, literalt l)
+void aig_propt::lcnf(const bvt &clause)
 {
-  unsigned v=a.var_no();
-  bool sign=a.sign();
-  
-  assert(v<vars.size());
-  aig_nodet &var=vars[v];
-
-  assert(!var.l_is_set);
-
-  var.l_is_set=true;
-  var.l=sign?dest.lnot(l):l;
+  l_set_to_true(lor(clause));
 }
-#endif
-
-/*******************************************************************\
-
-Function: aig_propt::convert_prop
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-#if 0
-literalt aig_propt::convert_prop(propt &dest, literalt a)
-{
-  if(a==const_literal(false)) return dest.constant(false);
-  if(a==const_literal(true)) return dest.constant(true);
-
-  unsigned v=a.var_no();
-  bool sign=a.sign();
   
-  assert(v<vars.size());
-  aig_nodet &var=vars[v];
-
-  if(!var.l_is_set)
-  {
-    assert(var.is_and);
-
-    var.l_is_set=true;
-    var.l=dest.land(convert_prop(dest, var.a),
-                    convert_prop(dest, var.b));
-  }
-
-  return sign?dest.lnot(var.l):var.l;
-}
-#endif
-
-/*******************************************************************\
-
-Function: aig_propt::can_convert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-#if 0
-bool aig_propt::can_convert(literalt a) const
-{
-  if(a==const_literal(false) || a==const_literal(true)) return true;
-
-  unsigned v=a.var_no();
-  
-  assert(v<vars.size());
-  const aig_nodet &var=vars[v];
-
-  if(var.l_is_set) return true;
-  
-  return var.is_and;
-}
-#endif
-
 /*******************************************************************\
 
 Function: aig_propt::land
@@ -183,13 +107,13 @@ Function: aig_propt::land
 
 literalt aig_propt::land(literalt a, literalt b)
 {
-  if(a==const_literal(true)) return b;
-  if(b==const_literal(true)) return a;
-  if(a==const_literal(false)) return const_literal(false);
-  if(b==const_literal(false)) return const_literal(false);
+  if(a.is_true()) return b;
+  if(b.is_true()) return a;
+  if(a.is_false()) return a;
+  if(b.is_false()) return b;
 
-  if(a==lnot(b)) return const_literal(false);
-  if(a == b) return a;
+  if(a==neg(b)) return const_literal(false);
+  if(a==b) return a;
 
   return dest.new_and_node(a, b);
 }
@@ -208,7 +132,7 @@ Function: aig_propt::lor
 
 literalt aig_propt::lor(literalt a, literalt b)
 {
-  return lnot(land(lnot(a), lnot(b)));
+  return neg(land(neg(a), neg(b))); // De Morgan's
 }
 
 /*******************************************************************\
@@ -225,8 +149,7 @@ Function: aig_propt::lnot
 
 literalt aig_propt::lnot(literalt a)
 {
-  a.invert();
-  return a;
+  return neg(a);
 }
 
 /*******************************************************************\
@@ -243,15 +166,16 @@ Function: aig_propt::lxor
 
 literalt aig_propt::lxor(literalt a, literalt b)
 {
-  if(a==const_literal(false)) return b;
-  if(b==const_literal(false)) return a;
-  if(a==const_literal(true)) return lnot(b);
-  if(b==const_literal(true)) return lnot(a);
+  if(a.is_false()) return b;
+  if(b.is_false()) return a;
+  if(a.is_true()) return neg(b);
+  if(b.is_true()) return neg(a);
 
   if(a==b) return const_literal(false);
-  if(a==lnot(b)) return const_literal(true);
+  if(a==neg(b)) return const_literal(true);
 
-  return lor(land(a, lnot(b)), land(lnot(a), b));
+  // This produces up to three nodes!
+  return lor(land(a, neg(b)), land(neg(a), b));
 }
 
 /*******************************************************************\
@@ -268,7 +192,7 @@ Function: aig_propt::lnand
 
 literalt aig_propt::lnand(literalt a, literalt b)
 {
-  return lnot(land(a, b));
+  return land(a, b).negation();
 }
 
 /*******************************************************************\
@@ -285,7 +209,7 @@ Function: aig_propt::lnor
 
 literalt aig_propt::lnor(literalt a, literalt b)
 {
-  return lnot(lor(a, b));
+  return lor(a, b).negation();
 }
 
 /*******************************************************************\
@@ -302,7 +226,7 @@ Function: aig_propt::lequal
 
 literalt aig_propt::lequal(literalt a, literalt b)
 {
-  return lnot(lxor(a, b));
+  return lxor(a, b).negation();
 }
 
 /*******************************************************************\
@@ -319,7 +243,7 @@ Function: aig_propt::limplies
 
 literalt aig_propt::limplies(literalt a, literalt b)
 {
-  return lor(lnot(a), b);
+  return lor(neg(a), b);
 }
 
 /*******************************************************************\
@@ -336,10 +260,30 @@ Function: aig_propt::lselect
 
 literalt aig_propt::lselect(literalt a, literalt b, literalt c)
 {  // a?b:c = (a AND b) OR (/a AND c)
-  if(a==const_literal(true)) return b;
-  if(a==const_literal(false)) return c;
+  if(a.is_true()) return b;
+  if(a.is_false()) return c;
   if(b==c) return b;
 
-  return lor(land(a, b), land(lnot(a), c));
+  return lor(land(a, b), land(neg(a), c));
 }
 
+/*******************************************************************\
+
+Function: aig_propt::set_equal
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void aig_propt::set_equal(literalt a, literalt b)
+{
+  // we produce two constraints:
+  // a|!b   !a|b
+
+  l_set_to_true(land(pos(a), neg(b)));
+  l_set_to_true(land(neg(a), pos(b)));
+}
