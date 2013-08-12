@@ -18,7 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class aig_propt:public propt
 {
 public:
-  aig_propt(aigt &_dest):
+  explicit inline aig_propt(aigt &_dest):
     dest(_dest)
   {
   }

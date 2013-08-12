@@ -190,14 +190,8 @@ literalt aig_propt::land(literalt a, literalt b)
 
   if(a==lnot(b)) return const_literal(false);
   if(a == b) return a;
-  literalt l=new_variable();
-  unsigned n=l.var_no();
 
-  assert(n<dest.number_of_nodes());
-  aig_nodet &node=dest.get_node(n);
-  node.make_and(a, b);
-
-  return l;
+  return dest.new_and_node(a, b);
 }
 
 /*******************************************************************\

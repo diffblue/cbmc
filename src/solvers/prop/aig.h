@@ -18,51 +18,46 @@ Author: Daniel Kroening, kroening@kroening.com
 class aig_nodet
 {
 public:
-  typedef enum { UNKNOWN, AND, VAR } typet;
-  typet type;
   literalt a, b;
   
-  aig_nodet():type(UNKNOWN)
+  inline aig_nodet()
   {
-    a.clear();
-    b.clear();
   }
   
-  bool is_and() const
+  inline bool is_and() const
   {
-    return type==AND;
+    return a.var_no()!=literalt::unused_var_no();
   }
   
-  bool is_var() const
+  inline bool is_var() const
   {
-    return type==VAR;
+    return a.var_no()==literalt::unused_var_no();
   }
   
   void make_and(literalt _a, literalt _b)
   {
-    type=AND;
     a=_a;
     b=_b;
   }
   
   void make_var()
   {
-    type=VAR;
+    a.set(literalt::unused_var_no(), false);
   }
 };
 
 class aigt
 {
 public:
-  aigt()
+  inline aigt()
   {
   }
   
-  virtual ~aigt()
+  ~aigt()
   {
   }
   
-  void clear()
+  inline void clear()
   {
     nodes.clear();
   }
@@ -70,34 +65,26 @@ public:
   typedef std::set<unsigned> terminal_sett;
   typedef std::map<unsigned, terminal_sett> terminalst;
 
+  // produces the support set
+  // should get re-written
   void get_terminals(terminalst &terminals) const;
 
-  const aig_nodet &get_node(literalt l) const
+  inline const aig_nodet &get_node(literalt l) const
   {
     return nodes[l.var_no()];
   }
   
-  const aig_nodet &get_node(unsigned v) const
-  {
-    return nodes[v];
-  }
-  
-  aig_nodet &get_node(literalt l)
+  inline aig_nodet &get_node(literalt l)
   {
     return nodes[l.var_no()];
   }
   
-  aig_nodet &get_node(unsigned v)
-  {
-    return nodes[v];
-  }
-  
-  unsigned number_of_nodes() const
+  inline unsigned number_of_nodes() const
   {
     return nodes.size();
   }
   
-  void swap(aigt &g)
+  inline void swap(aigt &g)
   {
     nodes.swap(g.nodes);
   }
@@ -110,21 +97,21 @@ public:
     return l;
   }
   
-  literalt new_var_node()
+  inline literalt new_var_node()
   {
     literalt l=new_node();
     nodes.back().make_var();
     return l;
   }
   
-  literalt new_and_node(literalt a, literalt b)
+  inline literalt new_and_node(literalt a, literalt b)
   {
     literalt l=new_node();
     nodes.back().make_and(a, b);
     return l;
   }
   
-  bool empty() const
+  inline bool empty() const
   {
     return nodes.empty();
   }
@@ -132,14 +119,14 @@ public:
   typedef std::vector<aig_nodet> nodest;
   nodest nodes;
 
-  virtual void print(std::ostream &out) const;
-  virtual void print(std::ostream &out, literalt a) const;
-  virtual void output_dot_node(std::ostream &out, unsigned v) const;
-  virtual void output_dot_edge(std::ostream &out, unsigned v, literalt l) const;
-  virtual void output_dot(std::ostream &out) const;
+  void print(std::ostream &out) const;
+  void print(std::ostream &out, literalt a) const;
+  void output_dot_node(std::ostream &out, unsigned v) const;
+  void output_dot_edge(std::ostream &out, unsigned v, literalt l) const;
+  void output_dot(std::ostream &out) const;
 
-  virtual std::string label(unsigned v) const;
-  virtual std::string dot_label(unsigned v) const;
+  std::string label(unsigned v) const;
+  std::string dot_label(unsigned v) const;
 
 protected:  
   const std::set<unsigned> &get_terminals_rec(
