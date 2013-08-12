@@ -3886,74 +3886,49 @@ std::string expr2ct::convert(
     return convert_binary(src, "+", precedence=12, false);
 
   else if(src.id()==ID_minus)
-  {
-      return convert_binary(src, "-", precedence=12, true);
-  }
+    return convert_binary(src, "-", precedence=12, true);
 
   else if(src.id()==ID_unary_minus)
-  {
-      return convert_unary(src, "-", precedence=15);
-  }
+    return convert_unary(src, "-", precedence=15);
 
   else if(src.id()==ID_unary_plus)
-  {
-      return convert_unary(src, "+", precedence=15);
-  }
+    return convert_unary(src, "+", precedence=15);
 
   else if(src.id()==ID_floatbv_plus)
-  {
     return convert_function(src, "FLOAT+", precedence=16);
-  }  
 
   else if(src.id()==ID_floatbv_minus)
-  {
     return convert_function(src, "FLOAT-", precedence=16);
-  }  
 
   else if(src.id()==ID_floatbv_mult)
-  {
     return convert_function(src, "FLOAT*", precedence=16);
-  }  
 
   else if(src.id()==ID_floatbv_div)
-  {
     return convert_function(src, "FLOAT/", precedence=16);
-  }  
+
+  else if(src.id()==ID_floatbv_typecast)
+    return convert_function(src, "FLOAT_TYPECAST", precedence=16);
 
   else if(src.id()==ID_invalid_pointer)
-  {
     return convert_function(src, "INVALID-POINTER", precedence=16);
-  }
 
   else if(src.id()==ID_good_pointer)
-  {
     return convert_function(src, "GOOD_POINTER", precedence=16);
-  }
 
   else if(src.id()==ID_object_size)
-  {
     return convert_function(src, "OBJECT_SIZE", precedence=16);
-  }
 
   else if(src.id()=="pointer_arithmetic")
-  {
     return convert_pointer_arithmetic(src, precedence=16);
-  }
 
   else if(src.id()=="pointer_difference")
-  {
     return convert_pointer_difference(src, precedence=16);
-  }
 
   else if(src.id()=="NULL-object")
-  {
     return "NULL-object";
-  }
 
   else if(src.id()==ID_null_object)
-  {
     return "NULL-object";
-  }
 
   else if(src.id()==ID_integer_address ||
           src.id()==ID_stack_object ||
@@ -3963,135 +3938,83 @@ std::string expr2ct::convert(
   }
   
   else if(src.id()==ID_infinity)
-  {
     return convert_function(src, "INFINITY", precedence=16);
-  }
 
   else if(src.id()=="builtin-function")
-  {
     return src.get_string(ID_identifier);
-  }
 
   else if(src.id()==ID_pointer_object)
-  {
     return convert_function(src, "POINTER_OBJECT", precedence=16);
-  }
 
   else if(src.id()=="object_value")
-  {
     return convert_function(src, "OBJECT_VALUE", precedence=16);
-  }
 
   else if(src.id()=="pointer_object_has_type")
-  {
     return convert_pointer_object_has_type(src, precedence=16);
-  }
 
   else if(src.id()==ID_array_of)
-  {
     return convert_array_of(src, precedence=16);
-  }
 
   else if(src.id()==ID_pointer_offset)
-  {
     return convert_function(src, "POINTER_OFFSET", precedence=16);
-  }
 
   else if(src.id()=="pointer_base")
-  {
     return convert_function(src, "POINTER_BASE", precedence=16);
-  }
 
   else if(src.id()=="pointer_cons")
-  {
     return convert_function(src, "POINTER_CONS", precedence=16);
-  }
 
   else if(src.id()==ID_same_object)
-  {
     return convert_function(src, "__CPROVER_same_object", precedence=16);
-  }
 
   else if(src.id()==ID_invalid_pointer)
-  {
     return convert_function(src, "__CPROVER_invalid_pointer", precedence=16);
-  }
 
   else if(src.id()==ID_dynamic_object)
-  {
     return convert_function(src, "DYNAMIC_OBJECT", precedence=16);
-  }
 
   else if(src.id()=="is_zero_string")
-  {
     return convert_function(src, "IS_ZERO_STRING", precedence=16);
-  }
 
   else if(src.id()=="zero_string")
-  {
     return convert_function(src, "ZERO_STRING", precedence=16);
-  }
 
   else if(src.id()=="zero_string_length")
-  {
     return convert_function(src, "ZERO_STRING_LENGTH", precedence=16);
-  }
 
   else if(src.id()=="buffer_size")
-  {
     return convert_function(src, "BUFFER_SIZE", precedence=16);
-  }
 
   else if(src.id()==ID_pointer_offset)
-  {
     return convert_function(src, "POINTER_OFFSET", precedence=16);
-  }
 
   else if(src.id()==ID_isnan)
-  {
     return convert_function(src, "isnan", precedence=16);
-  }
 
   else if(src.id()==ID_isfinite)
-  {
     return convert_function(src, "isfinite", precedence=16);
-  }
 
   else if(src.id()==ID_isinf)
-  {
     return convert_function(src, "isinf", precedence=16);
-  }
 
   else if(src.id()==ID_isnormal)
-  {
     return convert_function(src, "isnormal", precedence=16);
-  }
 
   else if(src.id()==ID_builtin_offsetof)
-  {
     return convert_function(src, "builtin_offsetof", precedence=16);
-  }
 
   else if(src.id()==ID_gcc_builtin_va_arg)
-  {
     return convert_function(src, "gcc_builtin_va_arg", precedence=16);
-  }
 
   else if(src.id()==ID_alignof)
-  {
     // C uses "_Alignof", C++ uses "alignof"
     return convert_function(src, "alignof", precedence=16);
-  }
 
   else if(has_prefix(src.id_string(), "byte_extract"))
-  {
     return convert_byte_extract(src, precedence=16);
-  }
 
   else if(has_prefix(src.id_string(), "byte_update"))
-  {
     return convert_byte_update(src, precedence=16);
-  }
 
   else if(src.id()==ID_address_of)
   {

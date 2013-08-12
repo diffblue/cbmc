@@ -104,6 +104,7 @@ void simplify_exprt::setup_jump_table()
   ENTRY(ID_floatbv_minus, simplify_floatbv_op);
   ENTRY(ID_floatbv_mult, simplify_floatbv_op);
   ENTRY(ID_floatbv_div, simplify_floatbv_op);
+  ENTRY(ID_floatbv_typecast, simplify_floatbv_typecast);
   ENTRY(ID_ashr, simplify_shifts);
   ENTRY(ID_lshr, simplify_shifts);
   ENTRY(ID_shl, simplify_shifts);
@@ -168,7 +169,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
   
   const typet &expr_type=ns.follow(expr.type());
   const typet &op_type=ns.follow(expr.op0().type());
-  
+
   // eliminate casts of infinity
   if(expr.op0().id()==ID_infinity)
   {
@@ -179,7 +180,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
     expr.swap(tmp);
     return false;
   }
-
+  
   // casts from pointer to integer
   // where width of integer >= width of pointer
   // (void*)(intX)expr -> (void*)expr
@@ -1437,6 +1438,49 @@ bool simplify_exprt::simplify_minus(exprt &expr)
 
 /*******************************************************************\
 
+Function: simplify_exprt::simplify_floatbv_typecast
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool simplify_exprt::simplify_floatbv_typecast(exprt &expr)
+{
+  assert(expr.operands().size()==2);
+        
+  const typet &dest_type=ns.follow(expr.type());
+  const typet &src_type=ns.follow(expr.op0().type());
+  
+  if(dest_type.id()!=ID_floatbv &&
+     src_type.id()!=ID_floatbv)
+    return true;
+
+  exprt op0=expr.op0();
+  exprt op1=expr.op1(); // rounding mode
+  
+  if(op0.is_constant() && op1.is_constant())
+  {
+    ieee_floatt value(to_constant_expr(op0));
+
+    mp_integer rounding_mode;
+    if(!to_integer(op1, rounding_mode))
+    {
+      value.rounding_mode=(ieee_floatt::rounding_modet)integer2long(rounding_mode);
+      value.change_spec(to_floatbv_type(dest_type));
+      expr=value.to_expr();
+      return false;
+    }    
+  }
+
+  return true;
+}
+
+/*******************************************************************\
+
 Function: simplify_exprt::simplify_floatbv_op
 
   Inputs:
@@ -1458,7 +1502,7 @@ bool simplify_exprt::simplify_floatbv_op(exprt &expr)
   
   exprt op0=expr.op0();
   exprt op1=expr.op1();
-  exprt op2=expr.op2();
+  exprt op2=expr.op2(); // rounding mode
 
   assert(ns.follow(op0.type())==type);
   assert(ns.follow(op1.type())==type);
@@ -2352,6 +2396,20 @@ bool simplify_exprt::simplify_if(exprt &expr)
         return false;
       }
     }
+
+    #if 0
+    // a ? b : c  --> a ? b[a/true] : c
+    exprt tmp_true=truevalue;
+    replace_expr(cond, true_exprt(), tmp_true);
+    if(tmp_true!=truevalue)
+    { truevalue=tmp_true; simplify_rec(truevalue); result=false; }
+
+    // a ? b : c  --> a ? b : c[a/false]
+    exprt tmp_false=falsevalue;
+    replace_expr(cond, false_exprt(), tmp_false);
+    if(tmp_false!=falsevalue)
+    { falsevalue=tmp_false; simplify_rec(falsevalue); result=false; }
+    #endif
   }
 
   if(cond.is_true())
@@ -4933,6 +4991,8 @@ bool simplify_exprt::simplify_node(exprt &expr)
           expr.id()==ID_floatbv_mult ||
           expr.id()==ID_floatbv_div)
     result=simplify_floatbv_op(expr) && result;
+  else if(expr.id()==ID_floatbv_typecast)
+    result=simplify_floatbv_typecast(expr) && result;
   else if(expr.id()==ID_unary_minus)
     result=simplify_unary_minus(expr) && result;
   else if(expr.id()==ID_unary_plus)
