@@ -19,6 +19,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <solvers/smt2/smt2_dec.h>
 #include <solvers/cvc/cvc_dec.h>
 
+#include <solvers/prop/aig_prop.h>
+
 #include "bmc.h"
 #include "bv_cbmc.h"
 #include "counterexample_beautification.h"
@@ -75,7 +77,13 @@ bool bmct::decide_default()
   }
   else
   {
+    #if 1
     satcheckt satcheck;
+    #else
+    aigt aig;
+    aig_propt satcheck(aig);
+    #endif
+
     satcheck.set_message_handler(get_message_handler());
     satcheck.set_verbosity(get_verbosity());
     

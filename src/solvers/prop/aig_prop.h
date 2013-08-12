@@ -29,7 +29,7 @@ public:
   virtual literalt lor(literalt a, literalt b);
   virtual literalt land(const bvt &bv);
   virtual literalt lor(const bvt &bv);
-  virtual void lcnf(const bvt &bv) { assert(0); }
+  virtual void lcnf(const bvt &clause);
   virtual literalt lnot(literalt a);
   virtual literalt lxor(literalt a, literalt b);
   virtual literalt lxor(const bvt &bv);
@@ -38,6 +38,12 @@ public:
   virtual literalt lequal(literalt a, literalt b);
   virtual literalt limplies(literalt a, literalt b);
   virtual literalt lselect(literalt a, literalt b, literalt c); // a?b:c
+  virtual void set_equal(literalt a, literalt b);
+
+  virtual void l_set_to(literalt a, bool value)
+  {
+    constraints.push_back(a.cond_negation(value));
+  }
 
   virtual literalt new_variable()
   {
@@ -58,6 +64,9 @@ public:
   
 protected:
   aigt &dest;
+
+  typedef std::vector<literalt> constraintst;
+  constraintst constraints;
 };
 
 #endif
