@@ -14,5 +14,6 @@ Date: September 2011
 #include <goto-programs/goto_functions.h>
 
 void show_call_sequences(const goto_functionst &goto_functions);
+void check_call_sequence(const goto_functionst &goto_functions);
 
 #endif

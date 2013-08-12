@@ -216,6 +216,12 @@ int goto_instrument_parseoptionst::doit()
       return 0;
     }
 
+    if(cmdline.isset("check-call-sequence"))
+    {
+      check_call_sequence(goto_functions);
+      return 0;
+    }
+
     if(cmdline.isset("show-rw-set"))
     {
       namespacet ns(symbol_table);
