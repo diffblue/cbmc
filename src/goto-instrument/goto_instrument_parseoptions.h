@@ -53,7 +53,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(verbosity):(version)(xml-ui)(show-loops)" \
   "(accelerate)" \
   "(k-induction):(step-case)(base-case)" \
-  "(show-call-sequences)" \
+  "(show-call-sequences)(check-call-sequence)" \
   "(interpreter)(show-reaching-definitions)(count-eloc)"
 
 class goto_instrument_parseoptionst:

@@ -139,3 +139,222 @@ void show_call_sequences(const goto_functionst &goto_functions)
     show_call_sequences(f_it->first, f_it->second.body);
 }
 
+/*******************************************************************\
+
+Function: check_call_sequence
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+class check_call_sequencet
+{
+public:
+  explicit check_call_sequencet(
+    const goto_functionst &_goto_functions,
+    const std::vector<irep_idt> &_sequence):
+    goto_functions(_goto_functions),
+    sequence(_sequence)
+  {
+  }  
+
+  void operator()();
+  
+protected:
+  const goto_functionst &goto_functions;
+  const std::vector<irep_idt> &sequence;
+
+  struct call_stack_entryt
+  {
+    goto_functionst::function_mapt::const_iterator f;
+    goto_programt::const_targett return_address;
+  };
+  
+  friend bool operator==(goto_functionst::function_mapt::const_iterator f1,
+                         goto_functionst::function_mapt::const_iterator f2)
+  {
+    return f1->first==f2->first;
+  }
+
+  friend bool operator==(const call_stack_entryt &e1,
+                         const call_stack_entryt &e2)
+  {
+    return e1.f==e2.f && e1.return_address==e2.return_address;
+  }
+  
+  struct statet
+  {
+    goto_functionst::function_mapt::const_iterator f;
+    goto_programt::const_targett pc;
+    std::vector<call_stack_entryt> call_stack;
+    unsigned index;
+
+    friend bool operator==(const statet &s1, const statet &s2)
+    {
+      return s1.f==s2.f &&
+             s1.pc==s2.pc &&
+             s1.call_stack==s2.call_stack &&
+             s1.index==s2.index;
+    }
+  };
+  
+  class state_hash
+  {
+  public:
+    std::size_t operator()(const statet &s) const
+    {
+      return hash_string(s.f->first)^
+             (size_t)&*s.pc^
+             s.index^s.call_stack.size();
+    }
+  };
+    
+  typedef hash_set_cont<statet, state_hash> statest;
+  statest states;
+};
+
+void check_call_sequencet::operator()()
+{
+  std::stack<statet> queue;
+
+  if(sequence.empty())
+  {
+    std::cout << "empty sequence given\n";
+    return;
+  }
+  
+  irep_idt entry=sequence.front();
+
+  goto_functionst::function_mapt::const_iterator f_it=
+    goto_functions.function_map.find(entry);
+
+  if(f_it!=goto_functions.function_map.end())
+  {
+    queue.push(statet());
+    queue.top().f=f_it;
+    queue.top().pc=f_it->second.body.instructions.begin();
+    queue.top().index=1;
+  }
+  
+  while(!queue.empty())
+  {
+    statet &e=queue.top();
+    
+    // seen already?
+    if(states.find(e)!=states.end())
+    {
+      // drop, continue
+      queue.pop();
+      continue;
+    }
+    
+    // insert
+    states.insert(e);
+    
+    // satisfies sequence?
+    if(e.index==sequence.size())
+    {
+      std::cout << "sequence feasible\n";
+      return;
+    }
+
+    // new, explore
+    if(e.pc==e.f->second.body.instructions.end())
+    {
+      if(e.call_stack.empty())
+        queue.pop();
+      else
+      {
+        // successor is the return location
+        e.pc=e.call_stack.back().return_address;
+        e.f=e.call_stack.back().f;
+        e.call_stack.pop_back();
+      }
+    }
+    else if(e.pc->is_function_call())
+    {
+      const exprt &function=to_code_function_call(e.pc->code).function();
+      if(function.id()==ID_symbol)
+      {
+        irep_idt identifier=to_symbol_expr(function).get_identifier();
+        
+        if(sequence[e.index]==identifier)
+        {
+          e.index++; // yes, we have seen it
+        
+          goto_functionst::function_mapt::const_iterator f_call_it=
+            goto_functions.function_map.find(identifier);
+          
+          if(f_call_it==goto_functions.function_map.end())
+            e.pc++;
+          else
+          {
+            e.pc++;
+            e.call_stack.push_back(call_stack_entryt());
+            e.call_stack.back().return_address=e.pc;
+            e.call_stack.back().f=e.f;
+            e.pc=f_call_it->second.body.instructions.begin();
+            e.f=f_call_it;
+          }
+        }
+        else
+          queue.pop();
+      }
+    }
+    else if(e.pc->is_goto())
+    {
+      goto_programt::const_targett t=e.pc->get_target();
+
+      if(e.pc->guard.is_true())
+        e.pc=t;
+      else
+      {
+        e.pc++;
+        queue.push(e); // deque doesn't invalidate references
+        queue.top().pc=t;
+      }
+    }
+    else
+    {
+      e.pc++;
+    }
+  }
+
+  std::cout << "sequence not feasible\n";
+}
+
+/*******************************************************************\
+
+Function: check_call_sequence
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void check_call_sequence(const goto_functionst &goto_functions)
+{
+  // read the sequence from stdin
+  
+  std::vector<irep_idt> sequence;
+  
+  std::string line;
+  while(std::getline(std::cin, line))
+  {
+    if(line!="" && line[line.size()-1]=='\r')
+      line.resize(line.size()-1);
+      
+    if(line!="")
+      sequence.push_back(line);
+  }
+
+  check_call_sequencet(goto_functions, sequence)();
+}
+
