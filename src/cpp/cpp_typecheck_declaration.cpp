@@ -174,15 +174,16 @@ void cpp_typecheckt::convert_non_template_declaration(
   assert(!declaration.is_template());
 
   // we first check if this is a typedef
-  typet &type=declaration.type();
-  bool is_typedef=convert_typedef(type);
+  typet &declaration_type=declaration.type();
+  bool is_typedef=convert_typedef(declaration_type);
 
   declaration.name_anon_struct_union();
-  typecheck_type(type);
+  typecheck_type(declaration_type);
   
   // Elaborate any class template instance _unless_ we do a typedef.
   // These are only elaborated on usage!
-  if(!is_typedef) elaborate_class_template(type);
+  if(!is_typedef)
+    elaborate_class_template(declaration_type);
   
   // Special treatment for anonymous unions
   if(declaration.declarators().empty() &&
@@ -211,7 +212,7 @@ void cpp_typecheckt::convert_non_template_declaration(
     cpp_declarator_converter.is_typedef=is_typedef;
 
     symbolt &symbol=cpp_declarator_converter.convert(
-      type, declaration.storage_spec(),
+      declaration_type, declaration.storage_spec(),
       declaration.member_spec(), declarator);
 
     // any template instance to remember?
