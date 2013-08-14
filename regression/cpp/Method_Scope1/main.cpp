@@ -18,3 +18,7 @@ void Derived::m00(my_t message)
 {
   return;
 }
+
+int main()
+{
+}
