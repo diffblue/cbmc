@@ -51,14 +51,14 @@ Function: cpp_declarator_convertert::convert
 \*******************************************************************/
 
 symbolt &cpp_declarator_convertert::convert(
-  const typet &type,
+  const typet &declaration_type,
   const cpp_storage_spect &storage_spec,
   const cpp_member_spect &member_spec,
   cpp_declaratort &declarator)
 {
-  assert(type.is_not_nil());
+  assert(declaration_type.is_not_nil());
 
-  if(type.id()=="cpp-cast-operator")
+  if(declaration_type.id()=="cpp-cast-operator")
   {
     typet type;
     type.swap(declarator.name().get_sub().back());
@@ -71,11 +71,11 @@ symbolt &cpp_declarator_convertert::convert(
   }
 
   assert(declarator.id()==ID_cpp_declarator);
-  final_type=declarator.merge_type(type);
+  final_type=declarator.merge_type(declaration_type);
   assert(final_type.is_not_nil());
   
   cpp_template_args_non_tct template_args;
-
+  
   // run resolver on scope
   {
     cpp_save_scopet save_scope(cpp_typecheck.cpp_scopes);
@@ -86,10 +86,10 @@ symbolt &cpp_declarator_convertert::convert(
       declarator.name(), base_name, template_args);
 
     scope=&cpp_typecheck.cpp_scopes.current_scope();
+
+    // check the declarator-part of the type, in that scope
+    cpp_typecheck.typecheck_type(final_type);
   }
-  
-  // check the type
-  cpp_typecheck.typecheck_type(final_type);
 
   is_code=is_code_type(final_type);
 
