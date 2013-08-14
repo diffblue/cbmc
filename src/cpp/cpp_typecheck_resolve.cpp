@@ -1632,7 +1632,7 @@ exprt cpp_typecheck_resolvet::resolve(
     }
 
     //cpp_typecheck.cpp_scopes.get_root_scope().print(std::cout);
-    cpp_typecheck.cpp_scopes.current_scope().print(std::cout);
+    //cpp_typecheck.cpp_scopes.current_scope().print(std::cout);
     throw 0;
   }
   
