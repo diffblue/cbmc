@@ -845,7 +845,7 @@ void cbmc_parseoptionst::help()
     "\n"
     "BMC options:\n"
     " --function name              set main function name\n"
-    " --claim nr                   only check specific claim\n"
+    " --property nr                only check one specific property\n"
     " --program-only               only show program expression\n"
     " --depth nr                   limit search depth\n"
     " --unwind nr                  unwind nr times\n"
