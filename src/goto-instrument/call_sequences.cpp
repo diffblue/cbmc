@@ -174,16 +174,11 @@ protected:
     goto_programt::const_targett return_address;
   };
   
-  friend bool operator==(goto_functionst::function_mapt::const_iterator f1,
-                         goto_functionst::function_mapt::const_iterator f2)
-  {
-    return f1->first==f2->first;
-  }
-
   friend bool operator==(const call_stack_entryt &e1,
                          const call_stack_entryt &e2)
   {
-    return e1.f==e2.f && e1.return_address==e2.return_address;
+    return e1.f->first==e2.f->first &&
+           e1.return_address==e2.return_address;
   }
   
   struct statet
@@ -195,7 +190,7 @@ protected:
 
     friend bool operator==(const statet &s1, const statet &s2)
     {
-      return s1.f==s2.f &&
+      return s1.f->first==s2.f->first &&
              s1.pc==s2.pc &&
              s1.call_stack==s2.call_stack &&
              s1.index==s2.index;
