@@ -75,9 +75,12 @@ codet cpp_typecheckt::cpp_constructor(
       nil.make_nil();
       return nil;
     }
+    
+    exprt tmp_size=size_expr;
+    make_constant_index(tmp_size);
 
     mp_integer s;
-    if(to_integer(size_expr, s))
+    if(to_integer(tmp_size, s))
     {
       err_location(location);
       str << "array size `" << to_string(size_expr)
