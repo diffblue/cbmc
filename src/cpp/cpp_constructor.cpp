@@ -79,7 +79,7 @@ codet cpp_typecheckt::cpp_constructor(
     mp_integer s;
     if(to_integer(size_expr, s))
     {
-      err_location(tmp_type);
+      err_location(location);
       str << "array size `" << to_string(size_expr)
           << "' is not a constant";
       throw 0;
