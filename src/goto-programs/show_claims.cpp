@@ -77,7 +77,7 @@ void show_claims(
       break;
       
     case ui_message_handlert::PLAIN:
-      std::cout << "Claim " << claim_name << ":" << std::endl;
+      std::cout << "Property " << claim_name << ":" << std::endl;
 
       std::cout << "  " << it->location << std::endl
                 << "  " << description << std::endl
