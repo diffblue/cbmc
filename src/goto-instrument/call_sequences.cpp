@@ -202,8 +202,12 @@ protected:
   public:
     std::size_t operator()(const statet &s) const
     {
+      size_t pc_hash=
+        s.pc==s.f->second.body.instructions.end()?0:
+        (size_t)&*s.pc;
+      
       return hash_string(s.f->first)^
-             (size_t)&*s.pc^
+             pc_hash^
              s.index^s.call_stack.size();
     }
   };
