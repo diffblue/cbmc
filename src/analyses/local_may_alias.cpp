@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <iterator>
 #include <algorithm>
 
 #include <util/std_expr.h>
