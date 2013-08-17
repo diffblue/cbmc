@@ -27,6 +27,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/string_instrumentation.h>
 #include <goto-programs/loop_ids.h>
 #include <goto-programs/link_to_library.h>
+#include <goto-programs/remove_returns.h>
 
 #include <pointer-analysis/value_set_analysis.h>
 #include <pointer-analysis/goto_program_dereference.h>
@@ -218,6 +219,7 @@ int goto_instrument_parseoptionst::doit()
 
     if(cmdline.isset("check-call-sequence"))
     {
+      remove_returns(symbol_table, goto_functions);
       check_call_sequence(goto_functions);
       return 0;
     }
