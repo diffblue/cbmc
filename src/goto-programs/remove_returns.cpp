@@ -11,12 +11,13 @@ Date:   September 2009
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
 
-#include "remove_return_values.h"
+#include "remove_returns.h"
 
-class remove_return_valuest
+class remove_returnst
 {
 public:
-  remove_return_valuest(symbol_tablet &_symbol_table):symbol_table(_symbol_table)
+  explicit remove_returnst(symbol_tablet &_symbol_table):
+    symbol_table(_symbol_table)
   {
   }
 
@@ -36,56 +37,64 @@ protected:
 
 /*******************************************************************\
 
-Function: remove_return_valuest::do_return_value
+Function: remove_returnst::do_return_value
 
 Inputs:
 
 Outputs:
 
 Purpose: turns 'return x' into an assignment to fkt#return_value
-         and 'return'
+         and a 'goto the_end_of_the_function'
 
 \*******************************************************************/
 
-void remove_return_valuest::do_return_value(
+void remove_returnst::do_return_value(
   goto_functionst::function_mapt::iterator f_it)
 {
   typet return_type=f_it->second.type.return_type();
 
-  // returns void?
-  if(return_type==empty_typet())
-    return;
-
-  // look up the function symbol
   const irep_idt function_id=f_it->first;
 
-  symbol_tablet::symbolst::iterator s_it=
-    symbol_table.symbols.find(function_id);
+  // returns something but void?
+  if(return_type!=empty_typet())
+  {
+    // look up the function symbol
+    symbol_tablet::symbolst::iterator s_it=
+      symbol_table.symbols.find(function_id);
 
-  assert(s_it!=symbol_table.symbols.end());
-  symbolt &function_symbol=s_it->second;
+    assert(s_it!=symbol_table.symbols.end());
+    symbolt &function_symbol=s_it->second;
 
-  // make the return type 'void'
-  f_it->second.type.return_type()=empty_typet();
-  function_symbol.type=f_it->second.type;
+    // make the return type 'void'
+    f_it->second.type.return_type()=empty_typet();
+    function_symbol.type=f_it->second.type;
 
-  // add symbol to symbol_table
-  symbolt new_symbol;
-  new_symbol.is_lvalue=true;
-  new_symbol.is_state_var=true;
-  new_symbol.is_thread_local=true;
-  new_symbol.is_file_local=true;
-  new_symbol.is_static_lifetime=true;
-  new_symbol.module=function_symbol.module;
-  new_symbol.value.make_nil();
-  new_symbol.base_name=id2string(function_symbol.base_name)+"#return_value";
-  new_symbol.name=id2string(function_symbol.name)+"#return_value";
-  new_symbol.mode=function_symbol.mode;
-  new_symbol.type=return_type;
+    // add symbol to symbol_table
+    symbolt new_symbol;
+    new_symbol.is_lvalue=true;
+    new_symbol.is_state_var=true;
+    new_symbol.is_thread_local=true;
+    new_symbol.is_file_local=true;
+    new_symbol.is_static_lifetime=true;
+    new_symbol.module=function_symbol.module;
+    new_symbol.value.make_nil();
+    new_symbol.base_name=id2string(function_symbol.base_name)+"#return_value";
+    new_symbol.name=id2string(function_symbol.name)+"#return_value";
+    new_symbol.mode=function_symbol.mode;
+    new_symbol.type=return_type;
 
-  symbol_table.add(new_symbol);
+    symbol_table.add(new_symbol);
+  }
 
   goto_programt &goto_program=f_it->second.body;
+  
+  if(goto_program.empty())
+    return;
+
+  goto_programt::targett end_function=
+    --goto_program.instructions.end();
+
+  assert(end_function->is_end_function());
 
   Forall_goto_program_instructions(i_it, goto_program)
   {
@@ -93,15 +102,15 @@ void remove_return_valuest::do_return_value(
     {
       assert(i_it->code.operands().size()==1);
 
-      // replace "return x;" by "fkt#return_value=x; return;"
+      // replace "return x;" by "fkt#return_value=x; goto end_function;"
       symbol_exprt lhs_expr;
       lhs_expr.set_identifier(id2string(function_id)+"#return_value");
       lhs_expr.type()=return_type;
 
       code_assignt assignment(lhs_expr, i_it->code.op0());
 
-      // now remove return value from i_it
-      i_it->code.operands().resize(0);
+      // now turn return into goto
+      i_it->make_goto(end_function);
 
       goto_programt::instructiont tmp_i;
       tmp_i.make_assignment();
@@ -109,6 +118,7 @@ void remove_return_valuest::do_return_value(
       tmp_i.location=i_it->location;
       tmp_i.function=i_it->function;
 
+      // inserts the assignment
       goto_program.insert_before_swap(i_it, tmp_i);
 
       i_it++;
@@ -118,7 +128,7 @@ void remove_return_valuest::do_return_value(
 
 /*******************************************************************\
 
-Function: remove_return_valuest::do_function_calls
+Function: remove_returnst::do_function_calls
 
 Inputs:
 
@@ -128,7 +138,7 @@ Purpose: turns x=f(...) into f(...); lhs=f#return_value;
 
 \*******************************************************************/
 
-void remove_return_valuest::do_function_calls(
+void remove_returnst::do_function_calls(
   goto_functionst &goto_functions,
   goto_programt &goto_program)
 {
@@ -223,7 +233,7 @@ void remove_return_valuest::do_function_calls(
 
 /*******************************************************************\
 
-Function: remove_return_valuest::operator()
+Function: remove_returnst::operator()
 
 Inputs:
 
@@ -233,7 +243,7 @@ Purpose:
 
 \*******************************************************************/
 
-void remove_return_valuest::operator()(goto_functionst &goto_functions)
+void remove_returnst::operator()(goto_functionst &goto_functions)
 {
   Forall_goto_functions(it, goto_functions)
   {
@@ -244,7 +254,7 @@ void remove_return_valuest::operator()(goto_functionst &goto_functions)
 
 /*******************************************************************\
 
-Function: remove_return_values
+Function: remove_returns
 
 Inputs:
 
@@ -254,11 +264,11 @@ Purpose: removes returns
 
 \*******************************************************************/
 
-void remove_return_values(
+void remove_returns(
   symbol_tablet &symbol_table,
   goto_functionst &goto_functions)
 {
-  remove_return_valuest rrv(symbol_table);
-  rrv(goto_functions);
+  remove_returnst rr(symbol_table);
+  rr(goto_functions);
 }
 

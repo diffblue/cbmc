@@ -1,6 +1,6 @@
 /*******************************************************************\
 
-Module: Remove function return values
+Module: Remove function returns
 
 Author: Daniel Kroening
 
@@ -15,7 +15,7 @@ Date:   September 2009
 
 class symbol_tablet;
 
-void remove_return_values(
+void remove_returns(
   symbol_tablet &symbol_table,
   goto_functionst &goto_functions);
 

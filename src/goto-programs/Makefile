@@ -14,7 +14,7 @@ SRC = goto_convert.cpp goto_convert_function_call.cpp \
       remove_unused_functions.cpp \
       wp.cpp goto_rw.cpp goto_clean_expr.cpp safety_checker.cpp \
       compute_called_functions.cpp link_to_library.cpp \
-      remove_return_values.cpp osx_fat_reader.cpp
+      remove_returns.cpp osx_fat_reader.cpp
 
 INCLUDES= -I ..
 
