@@ -171,6 +171,7 @@ protected:
   bool rString(Token &tk);
 
   unsigned number_of_errors;
+  irep_idt current_function;
 
   void merge_types(typet &src, typet &dest);
 
@@ -179,6 +180,8 @@ protected:
     locationt &location=(locationt &)dest.add(ID_C_location);
     location.set_file(token.filename);
     location.set_line(token.line_no);
+    if(!current_function.empty())
+      location.set_function(current_function);
   }
 
   void make_subtype(typet &src, typet &dest)
@@ -5595,11 +5598,20 @@ bool Parser::rFunctionBody(cpp_declaratort &declarator)
   }
   else
   {
+    // this is for the benefit of set_location
+    const cpp_namet &cpp_name=declarator.name();
+    current_function=cpp_name.get_base_name();
+  
     codet body;
     if(!rCompoundStatement(body))
+    {
+      current_function.clear();
       return false;
+    }
 
-    declarator.value()=body;    
+    declarator.value()=body;
+    
+    current_function.clear();
     
     return true;
   }
