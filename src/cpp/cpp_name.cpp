@@ -25,18 +25,26 @@ Function: cpp_namet::get_base_name
 
 irep_idt cpp_namet::get_base_name() const
 {
-  assert(is_simple_name());
-
   const subt &sub=get_sub();
+  
+  // find last "::"
+  unsigned base=0;
 
-  if(sub.size()==1 && sub.front().id()==ID_name)
-    return sub.front().get(ID_identifier);
-  else if(sub.size()==2 && sub.front().id()==ID_operator)
-    return "operator"+sub[1].id_string();
-  else if(sub.size()==2 && sub[0].id()=="~" && sub[1].id()==ID_name)
-    return sub[0].id_string()+sub[1].get_string(ID_identifier); 
-  else
-    assert(false);
+  for(unsigned i=0; i<sub.size(); i++)
+  {
+    if(sub[i].id()=="::")
+      base=i+1;
+  }
+
+  if(base>=sub.size())
+    return irep_idt();
+
+  if(sub[base].id()==ID_name)
+    return sub[base].get(ID_identifier);
+  else if(base+1<sub.size() && sub[base].id()==ID_operator)
+    return "operator"+sub[base+1].id_string();
+  else if(base+1<sub.size() && sub[base].id()=="~" && sub[base+1].id()==ID_name)
+    return "~"+sub[base+1].get_string(ID_identifier); 
 
   return irep_idt();
 }
