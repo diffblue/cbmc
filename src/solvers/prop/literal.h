@@ -178,7 +178,7 @@ protected:
 
 static inline std::ostream & operator << (std::ostream &out, literalt l)
 {
-  return out << l.dimacs();
+  return out << (l.sign()?"-":"") << l.var_no();
 }
 
 // constants
