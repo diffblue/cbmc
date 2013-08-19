@@ -1,6 +1,6 @@
 /*******************************************************************\
 
-Module: Claim Documentation
+Module: Documentation of Properties
 
 Author: Daniel Kroening, kroening@kroening.com
 
@@ -10,12 +10,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/goto_functions.h>
 
-void document_claims_latex(
+void document_properties_latex(
   const namespacet &ns,
   const goto_functionst &goto_functions,
   std::ostream &out);
 
-void document_claims_html(
+void document_properties_html(
   const namespacet &ns,
   const goto_functionst &goto_functions,
   std::ostream &out);

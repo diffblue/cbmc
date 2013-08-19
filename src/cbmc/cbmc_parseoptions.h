@@ -81,7 +81,7 @@ protected:
     const optionst &options,
     goto_functionst &goto_functions);
     
-  bool set_claims(goto_functionst &goto_functions);
+  bool set_properties(goto_functionst &goto_functions);
   
   void set_verbosity(messaget &message);
   

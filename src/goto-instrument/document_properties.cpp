@@ -13,14 +13,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ansi-c/expr2c.h>
 
-#include "document_claims.h"
+#include "document_properties.h"
 
 #define MAXWIDTH 62
 
-class document_claimst
+class document_propertiest
 {
 public:
-  document_claimst(
+  document_propertiest(
     const namespacet &_ns,
     const goto_functionst &_goto_functions,
     std::ostream &_out):
@@ -71,7 +71,7 @@ private:
 
 /*******************************************************************\
 
-Function: document_claimst::strip_space
+Function: document_propertiest::strip_space
 
   Inputs:
 
@@ -81,7 +81,7 @@ Function: document_claimst::strip_space
 
 \*******************************************************************/
 
-void document_claimst::strip_space(std::list<linet> &lines)
+void document_propertiest::strip_space(std::list<linet> &lines)
 {
   unsigned strip=50;
 
@@ -196,7 +196,7 @@ bool is_empty(const std::string &s)
 
 /*******************************************************************\
 
-Function: document_claimst::get_code
+Function: document_propertiest::get_code
 
   Inputs:
 
@@ -206,7 +206,7 @@ Function: document_claimst::get_code
 
 \*******************************************************************/
 
-void document_claimst::get_code(
+void document_propertiest::get_code(
   const locationt &location,
   std::string &dest)
 {
@@ -328,7 +328,7 @@ void document_claimst::get_code(
 
 /*******************************************************************\
 
-Function: document_claimst::doit
+Function: document_propertiest::doit
 
   Inputs:
 
@@ -338,7 +338,7 @@ Function: document_claimst::doit
 
 \*******************************************************************/
 
-void document_claimst::doit()
+void document_propertiest::doit()
 {
   typedef std::map<locationt, doc_claimt> claim_sett;
   claim_sett claim_set;
@@ -432,7 +432,7 @@ void document_claimst::doit()
 
 /*******************************************************************\
 
-Function: document_claims_html
+Function: document_properties_html
 
   Inputs:
 
@@ -442,17 +442,17 @@ Function: document_claims_html
 
 \*******************************************************************/
 
-void document_claims_html(
+void document_properties_html(
   const namespacet &ns,
   const goto_functionst &goto_functions,
   std::ostream &out)
 {
-  document_claimst(ns, goto_functions, out).html();
+  document_propertiest(ns, goto_functions, out).html();
 }
 
 /*******************************************************************\
 
-Function: document_claims_latex
+Function: document_properties_latex
 
   Inputs:
 
@@ -462,11 +462,11 @@ Function: document_claims_latex
 
 \*******************************************************************/
 
-void document_claims_latex(
+void document_properties_latex(
   const namespacet &ns,
   const goto_functionst &goto_functions,
   std::ostream &out)
 {
-  document_claimst(ns, goto_functions, out).latex();
+  document_propertiest(ns, goto_functions, out).latex();
 }
 

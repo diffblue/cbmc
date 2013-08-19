@@ -18,8 +18,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/remove_function_pointers.h>
 #include <goto-programs/remove_skip.h>
 #include <goto-programs/goto_inline.h>
-#include <goto-programs/show_claims.h>
-#include <goto-programs/set_claims.h>
+#include <goto-programs/show_properties.h>
+#include <goto-programs/set_properties.h>
 #include <goto-programs/read_goto_binary.h>
 #include <goto-programs/write_goto_binary.h>
 #include <goto-programs/interpreter.h>
@@ -44,7 +44,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_instrument_parseoptions.h"
 #include "version.h"
-#include "document_claims.h"
+#include "document_properties.h"
 #include "uninitialized.h"
 #include "full_slicer.h"
 #include "reachability_slicer.h"
@@ -298,7 +298,7 @@ int goto_instrument_parseoptionst::doit()
        cmdline.isset("show-properties"))
     {
       const namespacet ns(symbol_table);
-      show_claims(ns, get_ui(), goto_functions);
+      show_properties(ns, get_ui(), goto_functions);
       return 0;
     }
 
@@ -306,7 +306,7 @@ int goto_instrument_parseoptionst::doit()
        cmdline.isset("document-properties-html"))
     {
       const namespacet ns(symbol_table);
-      document_claims_html(ns, goto_functions, std::cout);
+      document_properties_html(ns, goto_functions, std::cout);
       return 0;
     }
 
@@ -314,7 +314,7 @@ int goto_instrument_parseoptionst::doit()
        cmdline.isset("document-properties-latex"))
     {
       const namespacet ns(symbol_table);
-      document_claims_latex(ns, goto_functions, std::cout);
+      document_properties_latex(ns, goto_functions, std::cout);
       return 0;
     }
 
@@ -853,7 +853,7 @@ void goto_instrument_parseoptionst::instrument_goto_program(
   }
   
   // label the assertions
-  label_claims(goto_functions);
+  label_properties(goto_functions);
 }
 
 /*******************************************************************\

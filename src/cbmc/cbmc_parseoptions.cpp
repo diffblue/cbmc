@@ -20,8 +20,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/remove_function_pointers.h>
 #include <goto-programs/goto_inline.h>
-#include <goto-programs/show_claims.h>
-#include <goto-programs/set_claims.h>
+#include <goto-programs/show_properties.h>
+#include <goto-programs/set_properties.h>
 #include <goto-programs/read_goto_binary.h>
 #include <goto-programs/interpreter.h>
 #include <goto-programs/string_abstraction.h>
@@ -148,8 +148,8 @@ void cbmc_parseoptionst::get_command_line_options(optionst &options)
   else
     options.set_option("simplify", true);
 
-  if(cmdline.isset("all-claims") ||
-     cmdline.isset("all-properties"))
+  if(cmdline.isset("all-claims") || // will go away
+     cmdline.isset("all-properties")) // use this one
     options.set_option("all-claims", true);
   else
     options.set_option("all-claims", false);
@@ -352,17 +352,17 @@ int cbmc_parseoptionst::doit()
   if(get_goto_program(options, bmc, goto_functions))
     return 6;
     
-  label_claims(goto_functions);
+  label_properties(goto_functions);
 
-  if(cmdline.isset("show-claims") ||
-     cmdline.isset("show-properties"))
+  if(cmdline.isset("show-claims") || // will go away
+     cmdline.isset("show-properties")) // use this one
   {
     const namespacet ns(symbol_table);
-    show_claims(ns, get_ui(), goto_functions);
+    show_properties(ns, get_ui(), goto_functions);
     return 0;
   }
 
-  if(set_claims(goto_functions))
+  if(set_properties(goto_functions))
     return 7;
 
   // do actual BMC
@@ -371,7 +371,7 @@ int cbmc_parseoptionst::doit()
 
 /*******************************************************************\
 
-Function: cbmc_parseoptionst::set_claims
+Function: cbmc_parseoptionst::set_properties
 
   Inputs:
 
@@ -381,15 +381,15 @@ Function: cbmc_parseoptionst::set_claims
 
 \*******************************************************************/
 
-bool cbmc_parseoptionst::set_claims(goto_functionst &goto_functions)
+bool cbmc_parseoptionst::set_properties(goto_functionst &goto_functions)
 {
   try
   {
-    if(cmdline.isset("claim"))
-      ::set_claims(goto_functions, cmdline.get_values("claim"));
+    if(cmdline.isset("claim")) // will go away
+      ::set_properties(goto_functions, cmdline.get_values("claim"));
 
-    if(cmdline.isset("property"))
-      ::set_claims(goto_functions, cmdline.get_values("property"));
+    if(cmdline.isset("property")) // use this one
+      ::set_properties(goto_functions, cmdline.get_values("property"));
   }
 
   catch(const char *e)

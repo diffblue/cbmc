@@ -14,13 +14,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <langapi/language_util.h>
 
-#include "show_claims.h"
+#include "show_properties.h"
 #include "goto_functions.h"
 #include "goto_model.h"
 
 /*******************************************************************\
 
-Function: cbmc_parseoptionst::show_claims
+Function: cbmc_parseoptionst::show_properties
 
   Inputs:
 
@@ -30,7 +30,7 @@ Function: cbmc_parseoptionst::show_claims
 
 \*******************************************************************/
 
-void show_claims(
+void show_properties(
   const namespacet &ns,
   const irep_idt &identifier,
   ui_message_handlert::uit ui,
@@ -53,16 +53,16 @@ void show_claims(
     const irep_idt description=
       (comment==""?"assertion":comment);
       
-    irep_idt claim_name=location.get_claim();
+    irep_idt property_name=location.get_claim();
     
     switch(ui)
     {
     case ui_message_handlert::XML_UI:
       {
         xmlt xml_claim("claim");
-        xml_claim.new_element("number").data=id2string(claim_name); // will go away
-        xml_claim.new_element("name").data=id2string(claim_name); // will go away
-        xml_claim.set_attribute("name", id2string(claim_name));
+        xml_claim.new_element("number").data=id2string(property_name); // will go away
+        xml_claim.new_element("name").data=id2string(property_name); // will go away
+        xml_claim.set_attribute("name", id2string(property_name)); // use this one
         
         xmlt &l=xml_claim.new_element();
         l=xml(it->location);
@@ -77,7 +77,7 @@ void show_claims(
       break;
       
     case ui_message_handlert::PLAIN:
-      std::cout << "Property " << claim_name << ":" << std::endl;
+      std::cout << "Property " << property_name << ":" << std::endl;
 
       std::cout << "  " << it->location << std::endl
                 << "  " << description << std::endl
@@ -97,7 +97,7 @@ void show_claims(
 
 /*******************************************************************\
 
-Function: show_claims
+Function: show_properties
 
   Inputs:
 
@@ -107,7 +107,7 @@ Function: show_claims
 
 \*******************************************************************/
 
-void show_claims(
+void show_properties(
   const namespacet &ns,
   ui_message_handlert::uit ui,
   const goto_functionst &goto_functions)
@@ -117,12 +117,12 @@ void show_claims(
       it!=goto_functions.function_map.end();
       it++)
     if(!it->second.is_inlined())
-      show_claims(ns, it->first, ui, it->second.body);
+      show_properties(ns, it->first, ui, it->second.body);
 }
 
 /*******************************************************************\
 
-Function: show_claims
+Function: show_properties
 
   Inputs:
 
@@ -132,11 +132,11 @@ Function: show_claims
 
 \*******************************************************************/
 
-void show_claims(
+void show_properties(
   const goto_modelt &goto_model,
   ui_message_handlert::uit ui)
 {
   const namespacet ns(goto_model.symbol_table);
-  show_claims(ns, ui, goto_model.goto_functions);
+  show_properties(ns, ui, goto_model.goto_functions);
 }
   
