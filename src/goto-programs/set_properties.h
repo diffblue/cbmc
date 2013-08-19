@@ -1,22 +1,22 @@
 /*******************************************************************\
 
-Module: Set claims
+Module: Set the properties to check
 
 Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_GOTO_PROGRAMS_SET_CLAIMS_H
-#define CPROVER_GOTO_PROGRAMS_SET_CLAIMS_H
+#ifndef CPROVER_GOTO_PROGRAMS_SET_PROPERTIES_H
+#define CPROVER_GOTO_PROGRAMS_SET_PROPERTIES_H
 
 #include <goto-programs/goto_functions.h>
 
-void set_claims(
+void set_properties(
   goto_functionst &goto_functions,
-  const std::list<std::string> &claims);
+  const std::list<std::string> &properties);
 
 void make_assertions_false(goto_functionst &goto_functions);
   
-void label_claims(goto_functionst &goto_functions);
+void label_properties(goto_functionst &goto_functions);
 
 #endif

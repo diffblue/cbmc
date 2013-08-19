@@ -3,9 +3,9 @@ SRC = goto_convert.cpp goto_convert_function_call.cpp \
       goto_convert_exceptions.cpp \
       remove_function_pointers.cpp goto_functions.cpp goto_inline.cpp \
       remove_skip.cpp goto_convert_functions.cpp string_instrumentation.cpp \
-      builtin_functions.cpp show_claims.cpp destructor.cpp set_claims.cpp \
+      builtin_functions.cpp show_properties.cpp set_properties.cpp \
       read_goto_binary.cpp goto_asm.cpp elf_reader.cpp \
-      string_abstraction.cpp \
+      string_abstraction.cpp destructor.cpp \
       goto_program_serialization.cpp goto_function_serialization.cpp \
       read_bin_goto_object.cpp goto_program_irep.cpp interpreter.cpp \
       interpreter_evaluate.cpp flow_insensitive_analysis.cpp \
