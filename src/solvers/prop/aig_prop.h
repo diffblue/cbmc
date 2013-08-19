@@ -12,14 +12,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 
 #include <util/threeval.h>
+#include <solvers/prop/prop.h>
 
 #include "aig.h"
 
-class aig_propt:public propt
+class aig_prop_baset:public propt
 {
 public:
-  explicit inline aig_propt(aigt &_dest):
-    dest(_dest)
+  explicit inline aig_prop_baset(aigt &_dest):dest(_dest)
   {
   }
 
@@ -29,7 +29,7 @@ public:
   virtual literalt lor(literalt a, literalt b);
   virtual literalt land(const bvt &bv);
   virtual literalt lor(const bvt &bv);
-  virtual void lcnf(const bvt &clause);
+  virtual void lcnf(const bvt &clause) { assert(false); }
   virtual literalt lnot(literalt a);
   virtual literalt lxor(literalt a, literalt b);
   virtual literalt lxor(const bvt &bv);
@@ -40,10 +40,7 @@ public:
   virtual literalt lselect(literalt a, literalt b, literalt c); // a?b:c
   virtual void set_equal(literalt a, literalt b);
 
-  virtual void l_set_to(literalt a, bool value)
-  {
-    constraints.push_back(a.cond_negation(value));
-  }
+  virtual void l_set_to(literalt a, bool value) { assert(false); }
 
   virtual literalt new_variable()
   {
@@ -61,12 +58,56 @@ public:
   
   virtual resultt prop_solve()
   { assert(0); return P_ERROR; }
-  
+
 protected:
   aigt &dest;
+};
 
+class aig_prop_constraintt:public aig_prop_baset
+{
+public:
+  inline aig_prop_constraintt():aig_prop_baset(aig)
+  {
+  }
+
+  aigt aig;
   typedef std::vector<literalt> constraintst;
   constraintst constraints;
+
+  virtual bool has_set_to() const { return true; }
+ 
+  virtual void lcnf(const bvt &clause);
+  virtual void l_set_to(literalt a, bool value)
+  {
+    constraints.push_back(a.cond_negation(!value));
+  }
+};
+
+class aig_prop_solvert:public aig_prop_constraintt
+{
+public:
+  explicit inline aig_prop_solvert(propt &_solver):
+    solver(_solver)
+  {
+  }
+
+  virtual const std::string solver_text()
+  { return "conversion into and-inverter graph followed by "+
+           solver.solver_text(); }
+
+  virtual tvt l_get(literalt a) const;
+  virtual resultt prop_solve();
+  
+  virtual void set_message_handler(message_handlert &m)
+  {
+    aig_prop_constraintt::set_message_handler(m);
+    solver.set_message_handler(m);
+  }
+  
+protected:
+  propt &solver;
+  
+  void convert_aig();
 };
 
 #endif
