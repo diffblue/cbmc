@@ -80,8 +80,8 @@ bool bmct::decide_default()
     #if 1
     satcheckt satcheck;
     #else
-    aigt aig;
-    aig_propt satcheck(aig);
+    satcheckt sub_solver;
+    aig_prop_solvert satcheck(sub_solver);
     #endif
 
     satcheck.set_message_handler(get_message_handler());
