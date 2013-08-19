@@ -13,7 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <set>
 #include <map>
 
-#include <solvers/prop/prop.h>
+#include <solvers/prop/literal.h>
 
 class aig_nodet
 {
@@ -115,8 +115,9 @@ public:
   {
     return nodes.empty();
   }
-  
-  typedef std::vector<aig_nodet> nodest;
+
+  typedef aig_nodet nodet;  
+  typedef std::vector<nodet> nodest;
   nodest nodes;
 
   void print(std::ostream &out) const;
