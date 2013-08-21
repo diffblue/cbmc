@@ -15,7 +15,7 @@ STATIC_ASSERT('\xff' == (char)0xff);
 STATIC_ASSERT(L'\xff'==255);
 STATIC_ASSERT(L'a'=='a');
 
-#ifndef _WIN32
+#if !defined(_WIN32) && !defined(__CYGWIN__)
 STATIC_ASSERT(L'\x12345678'==0x12345678L);
 #endif
 
