@@ -63,7 +63,7 @@ void irep_hash_container_baset::pack(
     1+1+sub.size()+named_sub.size()*2+
     full?comments.size()*2:0);
   
-  packed.push_back(irep.id().get_no());
+  packed.push_back(irep_id_hash()(irep.id()));
 
   packed.push_back(sub.size());  
   forall_irep(it, sub)
@@ -72,7 +72,7 @@ void irep_hash_container_baset::pack(
   packed.push_back(named_sub.size());
   forall_named_irep(it, named_sub)
   {
-    packed.push_back(it->first.get_no()); // id
+    packed.push_back(irep_id_hash()(it->first)); // id
     packed.push_back(number(it->second)); // sub-irep
   }
 
@@ -81,7 +81,7 @@ void irep_hash_container_baset::pack(
     packed.push_back(comments.size());
     forall_named_irep(it, comments)
     {
-      packed.push_back(it->first.get_no()); // id
+      packed.push_back(irep_id_hash()(it->first)); // id
       packed.push_back(number(it->second)); // sub-irep
     }
   }
