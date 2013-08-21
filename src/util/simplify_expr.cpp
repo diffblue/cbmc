@@ -1485,7 +1485,8 @@ bool simplify_exprt::simplify_floatbv_typecast(exprt &expr)
       return false;
     }    
   }
-  
+
+  #if 0
   // (T)(a?b:c) --> a?(T)b:(T)c
   if(expr.op0().id()==ID_if && expr.op0().operands().size()==3)
   {
@@ -1493,10 +1494,11 @@ bool simplify_exprt::simplify_floatbv_typecast(exprt &expr)
     exprt tmp_op2=binary_exprt(expr.op0().op2(), ID_floatbv_typecast, expr.op1(), dest_type);
     simplify_floatbv_typecast(tmp_op1);
     simplify_floatbv_typecast(tmp_op2);
-    expr=if_exprt(expr.op0(), tmp_op1, tmp_op2, dest_type);
+    expr=if_exprt(expr.op0().op0(), tmp_op1, tmp_op2, dest_type);
     simplify_if(expr);
     return false;
   }
+  #endif
   
   return true;
 }
