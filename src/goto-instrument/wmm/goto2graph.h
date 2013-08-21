@@ -83,10 +83,11 @@ protected:
 
   typedef std::set<goto_programt::instructiont::targett> target_sett;
 
+public:
   class cfg_visitort 
   {
   protected: 
-    namespacet& ns;
+    const namespacet& ns;
     instrumentert& instrumenter;
 
     /* pointer to the egraph(s) that we construct */
@@ -101,7 +102,7 @@ protected:
     /* transformers */
     void visit_cfg_thread() const;
     void visit_cfg_propagate(goto_programt::instructionst::iterator i_it);
-    void visit_cfg_assign(value_setst& value_sets, namespacet& ns,
+    void visit_cfg_assign(value_setst& value_sets,
       goto_programt::instructionst::iterator& i_it, bool no_dependencies);
     void visit_cfg_fence(goto_programt::instructionst::iterator i_it);
     void visit_cfg_skip(goto_programt::instructionst::iterator i_it);
@@ -154,7 +155,7 @@ protected:
     /* set of functions visited so far -- we don't handle recursive functions */
     std::set<irep_idt> functions_met;
 
-    cfg_visitort(namespacet& _ns, instrumentert& _instrumenter)
+    cfg_visitort(const namespacet& _ns, instrumentert& _instrumenter)
     :ns(_ns), instrumenter(_instrumenter), egraph(_instrumenter.egraph),
       egraph_SCCs(_instrumenter.egraph_SCCs), 
       egraph_alt(_instrumenter.egraph_alt)
@@ -210,7 +211,6 @@ protected:
     bool inline local(const irep_idt& i);
   };
 
-public:
   /* graph */
   event_grapht egraph;
 

@@ -311,6 +311,15 @@ protected:
   };
 
 public:
+  event_grapht():
+    filter_thin_air(true),
+    filter_uniproc(true)
+  {
+  }
+
+  bool filter_thin_air;
+  bool filter_uniproc;
+
   /* data dependencies per thread */
   std::map<unsigned,data_dpt> map_data_dp;
 
@@ -370,6 +379,7 @@ public:
 
   void add_po_edge(unsigned a, unsigned b)
   {
+    assert(operator[](a).thread==operator[](b).thread);
     po_graph.add_edge(a,b);
     po_order.push_back(a);
     poUrfe_order.push_back(a);
@@ -377,6 +387,7 @@ public:
 
   void add_po_back_edge(unsigned a, unsigned b)
   {
+    assert(operator[](a).thread==operator[](b).thread);
     po_graph.add_edge(a,b);
     po_order.push_back(a);
     poUrfe_order.push_back(a);
