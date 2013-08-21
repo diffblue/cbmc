@@ -37,7 +37,13 @@ STATIC_ASSERT(sizeof(void *)<=sizeof(long int));
 STATIC_ASSERT(sizeof(int)==4);
 STATIC_ASSERT(sizeof(long int)==4 || sizeof(long int)==8);
 STATIC_ASSERT(sizeof(long long int)==8);
+
+#ifdef __CYGWIN__
+STATIC_ASSERT(sizeof(wchar_t)==2);
+#else
 STATIC_ASSERT(sizeof(wchar_t)==4);
+#endif
+
 STATIC_ASSERT(sizeof(float)==4);
 STATIC_ASSERT(sizeof(double)==8);
 STATIC_ASSERT(sizeof(long double)>=sizeof(double));
