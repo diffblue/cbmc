@@ -641,11 +641,9 @@ void cnft::eliminate_duplicates(const bvt &bv, bvt &dest)
 
   dest.reserve(bv.size());
 
-  for(bvt::const_iterator it=bv.begin(); it!=bv.end(); it++)
-  {
+  forall_literals(it, bv)
     if(s.insert(*it).second)
       dest.push_back(*it);
-  }
 }
 
 /*******************************************************************\
