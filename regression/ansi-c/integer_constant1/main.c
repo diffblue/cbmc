@@ -31,7 +31,7 @@ STATIC_ASSERT(0b10000000000000000000000000000000==2147483648);
 STATIC_ASSERT(sizeof(0b10000000000000000000000000000000)==sizeof(int));
 #endif
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(__CYGWIN__)
 STATIC_ASSERT(sizeof(L'x')==2);
 #else
 STATIC_ASSERT(sizeof(L'x')==sizeof(int));
