@@ -218,7 +218,7 @@ void instrumentert::cfg_visitort::visit_cfg_function(
     /* a:=b -o-> Rb -po-> Wa */
     else if(instruction.is_assign())
     {
-      visit_cfg_assign(value_sets, ns, i_it, no_dependencies);
+      visit_cfg_assign(value_sets, i_it, no_dependencies);
     }
 
     else if(is_fence(instruction,instrumenter.ns))
@@ -365,7 +365,8 @@ void instrumentert::cfg_visitort::visit_cfg_goto(
              to!=in_pos[*targ].end(); ++to)
              for(std::set<nodet>::const_iterator from=in_pos[i_it].begin();
                from!=in_pos[i_it].end(); ++from)
-               if(from->first!=to->first)
+               if(from->first!=to->first &&
+                  egraph[from->first].thread==egraph[to->first].thread)
                {
                  DEBUG_MESSAGE(from->first<<"-po->"<<to->first);
                  egraph.add_po_back_edge(from->first,to->first);
@@ -408,7 +409,8 @@ void instrumentert::cfg_visitort::visit_cfg_goto(
                to!=out_pos[*targ].end(); ++to)
                for(std::set<nodet>::const_iterator from=in_pos[i_it].begin();
                  from!=in_pos[i_it].end(); ++from)
-                 if(from->first!=to->first)
+                 if(from->first!=to->first &&
+                    egraph[from->first].thread==egraph[to->first].thread)
                  {
 #if 0
                    /* copies inner-graph twice */
@@ -459,10 +461,18 @@ void instrumentert::cfg_visitort::visit_cfg_function_call(
 
   const exprt& fun=to_code_function_call(instruction.code).function();
   const irep_idt& fun_id=to_symbol_expr(fun).get_identifier();
-  enter_function(fun_id);
-  visit_cfg_function(value_sets, model, no_dependencies, fun_id, s, in_pos[i_it]);
-  updated.insert(i_it);
-  leave_function(fun_id);
+  if(functions_met.find(fun_id)!=functions_met.end())
+  {
+    in_pos[i_it]=s;
+    updated.insert(i_it);
+  }
+  else
+  {
+    enter_function(fun_id);
+    visit_cfg_function(value_sets, model, no_dependencies, fun_id, s, in_pos[i_it]);
+    updated.insert(i_it);
+    leave_function(fun_id);
+  }
 }
 
 /*******************************************************************\
@@ -569,7 +579,6 @@ Function: instrumentert::visit_cfg_assign
 
 void instrumentert::cfg_visitort::visit_cfg_assign(
   value_setst& value_sets,
-  namespacet& ns,
   goto_programt::instructionst::iterator& i_it,
   bool no_dependencies)
 {
@@ -628,6 +637,8 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
           s_it!=in_pos[*prev].end();
           ++s_it)
         {
+          if(new_read_event.thread!=egraph[s_it->first].thread)
+            continue;
            DEBUG_MESSAGE(s_it->first<<"-po->"<<new_read_node);
            egraph.add_po_edge(s_it->first,new_read_node);
            egraph_alt.add_edge(s_it->second,new_read_gnode);
@@ -702,6 +713,9 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
             s_it!=in_pos[*prev].end();
             ++s_it)
           {
+            if(new_write_event.thread!=egraph[s_it->first].thread)
+              continue;
+   
             DEBUG_MESSAGE(s_it->first<<"-po->"<<new_write_node);
             egraph.add_po_edge(s_it->first,new_write_node);
             egraph_alt.add_edge(s_it->second,new_write_gnode);

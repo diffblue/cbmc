@@ -123,7 +123,8 @@ void event_grapht::graph_explorert::collect_cycles(
   }
 
   /* end of collection -- remove spurious by thin-air cycles */
-  filter_thin_air(set_of_cycles);
+  if(egraph.filter_thin_air)
+    filter_thin_air(set_of_cycles);
 }
 
 /*******************************************************************\
@@ -396,7 +397,7 @@ bool event_grapht::graph_explorert::backtrack(
             || this_vertex.unsafe_pair(egraph[source],model)) )
         {
           critical_cyclet new_cycle = extract_cycle(vertex, source, cycle_nb++);
-          not_thin_air = new_cycle.is_not_thin_air();
+          not_thin_air = !egraph.filter_thin_air || new_cycle.is_not_thin_air();
           if(!not_thin_air)
           {
             for(critical_cyclet::const_iterator e_it=new_cycle.begin();
@@ -404,7 +405,7 @@ bool event_grapht::graph_explorert::backtrack(
               ++e_it)
               thin_air_events.insert(*e_it);
           }
-          if(new_cycle.is_not_uniproc(model) && not_thin_air 
+          if((!egraph.filter_uniproc || new_cycle.is_not_uniproc(model)) && not_thin_air 
             && new_cycle.is_cycle() &&
 #ifndef ASMFENCE
             new_cycle.is_unsafe(model))
@@ -443,7 +444,7 @@ bool event_grapht::graph_explorert::backtrack(
           || this_vertex.unsafe_pair(egraph[source],model)) )
       {
         critical_cyclet new_cycle = extract_cycle(vertex, source, cycle_nb++);
-        not_thin_air = new_cycle.is_not_thin_air();
+        not_thin_air = !egraph.filter_thin_air || new_cycle.is_not_thin_air();
         if(!not_thin_air)
         {
           for(critical_cyclet::const_iterator e_it=new_cycle.begin();
@@ -451,7 +452,7 @@ bool event_grapht::graph_explorert::backtrack(
             ++e_it)
             thin_air_events.insert(*e_it);
         }
-        if(new_cycle.is_not_uniproc(model) && not_thin_air 
+        if((!egraph.filter_uniproc || new_cycle.is_not_uniproc(model)) && not_thin_air 
           && new_cycle.is_cycle() &&
 #ifndef ASMFENCE
           new_cycle.is_unsafe(model))
