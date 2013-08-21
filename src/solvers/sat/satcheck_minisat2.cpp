@@ -41,9 +41,9 @@ void convert(const bvt &bv, Minisat::vec<Minisat::Lit> &dest)
 {
   dest.capacity(bv.size());
 
-  for(unsigned i=0; i<bv.size(); i++)
-    if(!bv[i].is_false())
-      dest.push(Minisat::mkLit(bv[i].var_no(), bv[i].sign()));
+  forall_literals(it, bv)
+    if(!it->is_false())
+      dest.push(Minisat::mkLit(it->var_no(), it->sign()));
 }
 
 /*******************************************************************\
