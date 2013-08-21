@@ -181,6 +181,17 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
     return false;
   }
   
+  // casts from NULL to any integer
+  if(op_type.id()==ID_pointer &&
+     expr.op0().is_constant() &&
+     to_constant_expr(expr.op0()).get_value()==ID_NULL &&
+     (expr_type.id()==ID_unsignedbv || expr_type.id()==ID_signedbv))
+  {
+    exprt tmp=gen_zero(expr_type);
+    expr.swap(tmp);
+    return false;
+  }
+  
   // casts from pointer to integer
   // where width of integer >= width of pointer
   // (void*)(intX)expr -> (void*)expr
