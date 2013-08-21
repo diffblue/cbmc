@@ -159,6 +159,8 @@ protected:
     const bvt &op0, const bvt &op1);
 
   bvt cond_negate_no_overflow(const bvt &bv, const literalt cond);
+
+  bvt wallace_tree(const std::vector<bvt> &pps);
 };
 
 #endif
