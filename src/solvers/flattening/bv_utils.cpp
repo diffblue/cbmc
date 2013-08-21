@@ -777,6 +777,62 @@ bvt bv_utilst::inverted(const bvt &bv)
 
 /*******************************************************************\
 
+Function: bv_utilst::wallace_tree
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bvt bv_utilst::wallace_tree(const std::vector<bvt> &pps)
+{
+  assert(!pps.empty());
+
+  if(pps.size()==1)
+    return pps.front();
+  else if(pps.size()==2)
+    return add(pps[0], pps[1]);
+  else
+  {
+    std::vector<bvt> new_pps;
+    unsigned no_full_adders=pps.size()/3;
+
+    // add groups of three partial products using CSA
+    for(unsigned i=0; i<no_full_adders; i++)
+    {
+      const bvt &a=pps[i*3+0], 
+                &b=pps[i*3+1],
+                &c=pps[i*3+2];
+                
+      assert(a.size()==b.size() && a.size()==c.size());
+
+      bvt s(a.size()), t(a.size());
+      
+      for(unsigned bit=0; bit<a.size(); bit++)
+      {
+        s[bit]=prop.lxor(a[bit], prop.lxor(b[bit], c[bit]));
+        t[bit]=(bit==0)?const_literal(false):
+               carry(a[bit-1], b[bit-1], c[bit-1]);
+      }
+
+      new_pps.push_back(s);
+      new_pps.push_back(t);
+    }
+    
+    // pass onwards up to two remaining partial products
+    for(unsigned i=no_full_adders*3; i<pps.size(); i++)
+      new_pps.push_back(pps[i]);
+
+    assert(new_pps.size()<pps.size());    
+    return wallace_tree(new_pps);
+  }
+}
+
+/*******************************************************************\
+
 Function: bv_utilst::unsigned_multiplier
 
   Inputs:
@@ -789,6 +845,7 @@ Function: bv_utilst::unsigned_multiplier
 
 bvt bv_utilst::unsigned_multiplier(const bvt &_op0, const bvt &_op1)
 {
+  #if 1
   bvt op0=_op0, op1=_op1;
 
   if(is_constant(op1))
@@ -817,6 +874,41 @@ bvt bv_utilst::unsigned_multiplier(const bvt &_op0, const bvt &_op1)
     }
 
   return product;
+  #else
+  
+  // build the usual quadratic number of partial products
+
+  bvt op0=_op0, op1=_op1;
+
+  if(is_constant(op1))
+    std::swap(op0, op1);
+    
+  std::vector<bvt> pps;
+  pps.reserve(op0.size());
+
+  for(unsigned bit=0; bit<op0.size(); bit++)
+    if(op0[bit]!=const_literal(false))
+    {
+      bvt pp;
+
+      pp.reserve(op0.size());
+
+      // zeros according to weight
+      for(unsigned idx=0; idx<bit; idx++)
+        pp.push_back(const_literal(false));
+
+      for(unsigned idx=bit; idx<op0.size(); idx++)
+        pp.push_back(prop.land(op1[idx-bit], op0[bit]));
+
+      pps.push_back(pp);
+    }
+
+  if(pps.empty())
+    return zeros(op0.size());
+  else
+    return wallace_tree(pps);
+  
+  #endif
 }
 
 /*******************************************************************\
@@ -1241,13 +1333,21 @@ literalt bv_utilst::equal(const bvt &op0, const bvt &op1)
 
 Function: bv_utilst::lt_or_le
 
-  Inputs:
+  Inputs: bvts for each input and whether they are signed and whether
+          a model of < or <= is required.
 
- Outputs:
+ Outputs: A literalt that models the value of the comparison.
 
- Purpose:
+ Purpose: To provide a bitwise model of < or <=.
 
 \*******************************************************************/
+
+/* Some clauses are not needed for correctness but they remove
+   models (effectively setting "don't care" bits) and so may be worth
+   including.*/
+//#define INCLUDE_REDUNDANT_CLAUSES
+
+//#define NEW_ENCODING
 
 literalt bv_utilst::lt_or_le(
   bool or_equal,
@@ -1255,8 +1355,192 @@ literalt bv_utilst::lt_or_le(
   const bvt &bv1,
   representationt rep)
 {
+  assert(bv0.size() == bv1.size());
+
+  bvt clause;
   literalt top0=bv0[bv0.size()-1],
-           top1=bv1[bv1.size()-1];
+    top1=bv1[bv1.size()-1];
+  
+#ifdef NEW_ENCODING
+
+  bvt compareBelow;   // 1 if a compare is needed below this bit
+  literalt result;
+  size_t start;
+  size_t i;
+
+  compareBelow.resize(bv0.size());
+  Forall_literals(it, compareBelow) { (*it) = prop.new_variable(); }
+  result = prop.new_variable();
+
+  if (rep==SIGNED)
+  {
+    assert(bv0.size() >= 2);
+    start = compareBelow.size() - 2;
+
+    literalt firstComp=compareBelow[start];
+
+    // When comparing signs we are comparing the top bit
+#ifdef INCLUDE_REDUNDANT_CLAUSES
+    clause.resize(1);
+    clause[0] = compareBelow[start + 1];
+    prop.lcnf(clause);
+#endif    
+
+    // Four cases...
+    // + +        compare needed
+    clause.resize(3);
+    clause[0] = top0;
+    clause[1] = top1;
+    clause[2] = firstComp;
+    prop.lcnf(clause);
+
+
+    //   + -        result false and no compare needed
+    clause.resize(3);
+    clause[0] = top0;
+    clause[1] = neg(top1);
+    clause[2] = neg(result);
+    prop.lcnf(clause);
+
+#ifdef INCLUDE_REDUNDANT_CLAUSES
+    clause.resize(3);
+    clause[0] = top0;
+    clause[1] = neg(top1);
+    clause[2] = neg(firstComp);
+    prop.lcnf(clause);
+#endif
+
+
+    //   - +        result true
+    clause.resize(3);
+    clause[0] = neg(top0);
+    clause[1] = top1;
+    clause[2] = result;
+    prop.lcnf(clause);
+
+#ifdef INCLUDE_REDUNDANT_CLAUSES
+    clause.resize(3);
+    clause[0] = neg(top0);
+    clause[1] = top1;
+    clause[2] = neg(firstComp);
+    prop.lcnf(clause);
+#endif
+
+
+    //   - -        negated compare needed
+    clause.resize(3);
+    clause[0] = neg(top0);
+    clause[1] = neg(top1);
+    clause[2] = firstComp;
+    prop.lcnf(clause);
+
+  }
+  else
+  {
+    // Unsigned is much easier
+    start = compareBelow.size() - 1;
+
+    clause.resize(1);
+    clause[0] = compareBelow[start];
+    prop.lcnf(clause);
+  }
+
+
+  // Determine the output
+  //  \forall i .  cb[i] & -a[i] &  b[i] =>  result
+  //  \forall i .  cb[i] &  a[i] & -b[i] => -result
+  i = start;
+  do
+  {
+    clause.resize(4);
+    clause[0] = neg(compareBelow[i]);
+    clause[1] = bv0[i];
+    clause[2] = neg(bv1[i]);
+    clause[3] = result;
+    prop.lcnf(clause);
+
+    clause.resize(4);
+    clause[0] = neg(compareBelow[i]);
+    clause[1] = neg(bv0[i]);
+    clause[2] = bv1[i];
+    clause[3] = neg(result);
+    prop.lcnf(clause);
+  }
+  while (i-- != 0);
+
+
+  // Chain the comparison bit
+  //  \forall i != 0 . cb[i] &  a[i] &  b[i] => cb[i-1]
+  //  \forall i != 0 . cb[i] & -a[i] & -b[i] => cb[i-1]
+  for (i = start; i > 0; i--)
+  {
+    clause.resize(4);
+    clause[0] = neg(compareBelow[i]);
+    clause[1] = neg(bv0[i]);
+    clause[2] = neg(bv1[i]);
+    clause[3] = compareBelow[i-1];
+    prop.lcnf(clause);
+    
+    clause.resize(4);
+    clause[0] = neg(compareBelow[i]);
+    clause[1] = bv0[i];
+    clause[2] = bv1[i];
+    clause[3] = compareBelow[i-1];
+    prop.lcnf(clause);
+  }
+
+
+#ifdef INCLUDE_REDUNDANT_CLAUSES
+  
+// Optional zeroing of the comparison bit when not needed
+//  \forall i != 0 . -c[i] => -c[i-1]
+//  \forall i != 0 .  c[i] & -a[i] &  b[i] => -c[i-1]
+//  \forall i != 0 .  c[i] &  a[i] & -b[i] => -c[i-1]
+  for (i = start; i > 0; i--)
+  {
+    clause.resize(2);
+    clause[0] = compareBelow[i];
+    clause[1] = neg(compareBelow[i-1]);
+    prop.lcnf(clause);
+
+    clause.resize(4);
+    clause[0] = neg(compareBelow[i]);
+    clause[1] = bv0[i];
+    clause[2] = neg(bv1[i]);
+    clause[3] = neg(compareBelow[i-1]);
+    prop.lcnf(clause);
+
+    clause.resize(4);
+    clause[0] = neg(compareBelow[i]);
+    clause[1] = neg(bv0[i]);
+    clause[2] = bv1[i];
+    clause[3] = neg(compareBelow[i-1]);
+    prop.lcnf(clause);
+  }
+#endif
+
+
+  // The 'base case' of the induction is the case when they are equal
+  clause.resize(4);
+  clause[0] = neg(compareBelow[0]);
+  clause[1] = neg(bv0[0]);
+  clause[2] = neg(bv1[0]);
+  clause[3] = (or_equal) ? result : neg(result);
+  prop.lcnf(clause);
+
+  clause.resize(4);
+  clause[0] = neg(compareBelow[0]);
+  clause[1] = bv0[0];
+  clause[2] = bv1[0];
+  clause[3] = (or_equal) ? result : neg(result);
+  prop.lcnf(clause);
+
+
+  return result;
+
+
+#else
+
 
   literalt carry=
     carry_out(bv0, inverted(bv1), const_literal(true));
@@ -1274,6 +1558,8 @@ literalt bv_utilst::lt_or_le(
     result=prop.lor(result, equal(bv0, bv1));
 
   return result;
+
+#endif
 }
 
 /*******************************************************************\
@@ -1292,10 +1578,13 @@ literalt bv_utilst::unsigned_less_than(
   const bvt &op0,
   const bvt &op1)
 {
+#ifdef NEW_ENCODING
+  return lt_or_le(false,op0,op1,UNSIGNED);
+#else
   // A <= B  iff  there is an overflow on A-B
-
   return prop.lnot(
     carry_out(op0, inverted(op1), const_literal(true)));
+#endif
 }
 
 /*******************************************************************\
