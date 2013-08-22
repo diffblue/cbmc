@@ -211,6 +211,22 @@ can be applied. The usual arithmetic promotions will be
 applied to operands of this type.
 </p>
 
+<h4>__CPROVER_floatbv</h4>
+
+<hr>
+<code>
+__CPROVER_floatbv [ <i>expression</i> ] [ <i>expression</i> ]
+</code>
+<hr>
+
+<p class="justified">
+This type is only available in the C frontend.  It is used
+to specify an IEEE-754 floating point number with arbitrary
+but fixed size.  The first parameter is the total size (in bits)
+of the number, and the second is the size (in bits) of the
+mantissa, or significand.
+</p>
+
 <h4>__CPROVER_size_t</h4>
 
 <p class="justified">

@@ -218,7 +218,11 @@ std::string expr2ct::convert_rec(
     else if(width==config.ansi_c.double_width)
       return q+"double"+d;
     else
-      assert(false);
+    {
+      std::string swidth=src.get_string(ID_width);
+      std::string fwidth=src.get_string(ID_f);
+      return q+"__CPROVER_floatbv["+swidth+"]["+fwidth+"]";
+    }
   }
   else if(src.id()==ID_fixedbv)
   {

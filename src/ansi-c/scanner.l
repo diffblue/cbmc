@@ -899,6 +899,7 @@ __decltype          { if(PARSER.cpp && PARSER.mode==ansi_c_parsert::GCC)
 "__CPROVER_array_of"     { loc(); return TOK_ARRAY_OF; }
 "__CPROVER_thread_local" { loc(); return TOK_THREAD_LOCAL; }
 "__CPROVER_bitvector"    { loc(); return TOK_CPROVER_BITVECTOR; }
+"__CPROVER_floatbv"      { loc(); return TOK_CPROVER_FLOATBV; }
 "__CPROVER_bool"         { loc(); return TOK_CPROVER_BOOL; }
 "__CPROVER_throw"        { loc(); return TOK_CPROVER_THROW; }
 "__CPROVER_catch"        { loc(); return TOK_CPROVER_CATCH; }
