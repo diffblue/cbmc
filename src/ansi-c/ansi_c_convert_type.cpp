@@ -130,6 +130,50 @@ void ansi_c_convert_typet::read_rec(const typet &type)
     
     bv_width=integer2long(size_int);
   }
+  else if(type.id()==ID_floatbv &&
+          !type.find(ID_f).is_nil() &&
+          !type.find(ID_size).is_nil())
+  {
+    floatbv_cnt++;
+
+    const exprt &size_expr=
+      static_cast<const exprt &>(type.find(ID_size));
+    const exprt &fsize_expr=
+      static_cast<const exprt &>(type.find(ID_f));
+
+    mp_integer size_int;
+    if(to_integer(size_expr, size_int))
+    {
+      err_location(location);
+      error("floatbv width has to be constant (got " + size_expr.to_string() + ")");
+      throw 0;
+    }
+    
+    if(size_int<1 || size_int>1024)
+    {
+      err_location(location);
+      error("floatbv width invalid");
+      throw 0;
+    }
+
+    bv_width=integer2long(size_int);
+
+    if(to_integer(fsize_expr, size_int))
+    {
+      err_location(location);
+      error("floatbv mantissa size has to be constant");
+      throw 0;
+    }
+
+    if(size_int<1 || size_int>bv_width)
+    {
+      err_location(location);
+      error("floatbv mantissa size invalid");
+      throw 0;
+    }
+
+    mantissa_width=integer2long(size_int);
+  }
   else if(type.id()==ID_short)
     short_cnt++;
   else if(type.id()==ID_long)
@@ -428,6 +472,12 @@ void ansi_c_convert_typet::write(typet &type)
       type.set(ID_width, bv_width);
       
       // need to decide on ID_C_c_type to set
+    }
+    else if(floatbv_cnt)
+    {
+      type.id(ID_floatbv);
+      type.set(ID_width, bv_width);
+      type.set(ID_f, mantissa_width);
     }
     else if(short_cnt)
     {

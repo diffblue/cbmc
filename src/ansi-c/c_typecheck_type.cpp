@@ -294,7 +294,7 @@ void c_typecheck_baset::typecheck_vector_type(vector_typet &type)
   
   // the subtype must have constant size
   exprt size_expr=c_sizeof(type.subtype(), *this);
-  
+
   simplify(size_expr, *this);
 
   mp_integer sub_size;
@@ -303,6 +303,14 @@ void c_typecheck_baset::typecheck_vector_type(vector_typet &type)
   {
     err_location(size_location);
     str << "failed to determine size of vector base type `"
+        << to_string(type.subtype()) << "'";
+    throw 0;
+  }
+
+  if(sub_size==0)
+  {
+    err_location(size_location);
+    str << "type had size 0: `"
         << to_string(type.subtype()) << "'";
     throw 0;
   }
