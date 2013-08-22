@@ -67,7 +67,7 @@ library_check: library/*.c
 	for f in $(filter-out $(platform_unavail), $^) ; do \
 		$(CC) -S -Wall -Werror -pedantic -Wextra -std=gnu99 $$f -o __libcheck.s \
 			-include library/cprover.h -D__CPROVER_bool=_Bool -fno-builtin \
-			-D_Thread_local=volatile \
+			-D_Thread_local=volatile -DLIBRARY_CHECK \
 			-Wno-unused-label -Wno-uninitialized ; \
 		ec=$$? ; \
 		$(RM) __libcheck.s ; \

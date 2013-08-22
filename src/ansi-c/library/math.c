@@ -342,7 +342,11 @@ __CPROVER_hide:;
 union mixf
 {
   float f;
+  #ifdef LIBRARY_CHECK
+  int bv;
+  #else
   __CPROVER_bitvector[32] bv;
+  #endif
 };
 
 float nextUpf(float f)
@@ -364,7 +368,7 @@ __CPROVER_hide:;
   }
   else
   {
-    assert(f < 0.0f);
+    //assert(f < 0.0f);
 
     union mixf m;
     m.f = f;
@@ -381,7 +385,11 @@ __CPROVER_hide:;
 union mixd
 {
   double f;
+  #ifdef LIBRARY_CHECK
+  long long int bv;
+  #else
   __CPROVER_bitvector[64] bv;
+  #endif
 };
 
 double nextUp(double d)
@@ -403,7 +411,7 @@ __CPROVER_hide:;
   }
   else
   {
-    assert(d < 0.0);
+    //assert(d < 0.0);
 
     union mixd m;
     m.f = d;
@@ -443,9 +451,9 @@ __CPROVER_hide:;
 #define __CPROVER_FENV_H_INCLUDED
 #endif
 
-
-
 float nextUpf(float f);
+
+extern int __CPROVER_rounding_mode;
 
 float sqrtf(float f)
 {
@@ -491,15 +499,15 @@ float sqrtf(float f)
     case FE_DOWNWARD : // Fall through
     case FE_TOWARDZERO :
       return (f - lowerSquare == 0.0f) ? lower : upper; break;
-    default :
-      assert(0);
+    default:;
+      //assert(0);
     }
 
   }
   else
   {
-    assert(fpclassify(f) == FP_SUBNORMAL);
-    assert(f > 0.0f);
+    //assert(fpclassify(f) == FP_SUBNORMAL);
+    //assert(f > 0.0f);
 
     // With respect to the algebra of floating point number
     // all subnormals seem to be perfect squares, thus ...
@@ -561,22 +569,22 @@ double sqrt(double d)
 
     switch(__CPROVER_rounding_mode)
     {
-    case FE_TONEAREST :
+    case FE_TONEAREST:
       return (d - lowerSquare < upperSquare - d) ? lower : upper; break;
-    case FE_UPWARD :
+    case FE_UPWARD:
       return (d - lowerSquare == 0.0f) ? lower : upper; break;
-    case FE_DOWNWARD : // Fall through
-    case FE_TOWARDZERO :
+    case FE_DOWNWARD: // Fall through
+    case FE_TOWARDZERO:
       return (d - lowerSquare == 0.0f) ? lower : upper; break;
-    default :
-      assert(0);
+    default:;
+      //assert(0);
     }
 
   }
   else
   {
-    assert(fpclassify(d) == FP_SUBNORMAL);
-    assert(d > 0.0f);
+    //assert(fpclassify(d) == FP_SUBNORMAL);
+    //assert(d > 0.0f);
 
     double root;    // Intentionally non-deterministic
     __CPROVER_assume(root >= 0.0f);
