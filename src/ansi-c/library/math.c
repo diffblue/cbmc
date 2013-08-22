@@ -333,3 +333,259 @@ __CPROVER_hide:;
   (void)*str;
   return 0.0/0.0;
 }
+
+/* FUNCTION: nextUpf */
+
+// IEEE_754 2008 althought similar to C's nextafter / nexttowards
+// Assumes that float is (IEEE-754) binary32
+
+union mixf
+{
+  float f;
+  __CPROVER_bitvector[32] bv;
+};
+
+float nextUpf(float f)
+{
+__CPROVER_hide:;
+  if (__CPROVER_isnan(f))
+    return 0.0f/0.0f;  // NaN
+  else if (f == 0.0f)
+    return 0x1p-149f;
+  else if (f > 0.0f)
+  {
+    if (__CPROVER_isinf(f))
+      return f;
+
+    union mixf m;
+    m.f = f;
+    ++m.bv;
+    return m.f;
+  }
+  else
+  {
+    assert(f < 0.0f);
+
+    union mixf m;
+    m.f = f;
+    --m.bv;
+    return m.f;
+  }
+}
+
+/* FUNCTION: nextUp */
+
+// IEEE_754 2008 althought similar to C's nextafter / nexttowards
+// Assumes that double is (IEEE-754) binary64
+
+union mixd
+{
+  double f;
+  __CPROVER_bitvector[64] bv;
+};
+
+double nextUp(double d)
+{
+__CPROVER_hide:;
+  if (__CPROVER_isnan(d))
+    return 0.0/0.0;  // NaN
+  else if (d == 0.0)
+    return 0x1.0p-1074;
+  else if (d > 0.0)
+  {
+    if (__CPROVER_isinf(d))
+      return d;
+
+    union mixd m;
+    m.f = d;
+    ++m.bv;
+    return m.f;
+  }
+  else
+  {
+    assert(d < 0.0);
+
+    union mixd m;
+    m.f = d;
+    --m.bv;
+    return m.f;
+  }
+}
+
+
+/* Not nextUpl  as there is no obvious choice for the bit width of a
+   long double.*/
+
+
+/* FUNCTION: sqrtf */
+
+/* This code is *WRONG* in some circumstances, specifically:
+ *
+ *   1. If run with a rounding mode other than RNE the
+ *      answer will be out by one or two ULP.  This could be fixed
+ *      with careful choice of round mode for the multiplications.
+ *
+ *   2. Subnormals have the unusual property that there are
+ *      multiple numbers that square to give them.  I.E. if
+ *      f is subnormal then there are multiple f1 != f2 such that
+ *      f1 * f1 == f == f2 * f2.  This code will return *a*
+ *      square root of a subnormal input but not necessarily *the*
+ *      square root (i.e. the real value of the square root rounded).
+ */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_FENV_H_INCLUDED
+#include <fenv.h>
+#define __CPROVER_FENV_H_INCLUDED
+#endif
+
+
+
+float nextUpf(float f);
+
+float sqrtf(float f)
+{
+ __CPROVER_hide:;
+
+  if ( f < 0.0f )
+    return 0.0f/0.0f; // NaN
+  else if (__CPROVER_isinf(f) ||   // +Inf only
+	   f == 0.0f          ||   // Includes -0
+	   __CPROVER_isnan(f))
+    return f;
+  else if (__CPROVER_isnormal(f))
+  {
+    float lower;    // Intentionally non-deterministic
+    __CPROVER_assume(lower > 0);
+    __CPROVER_assume(__CPROVER_isnormal(lower));
+    // Tighter bounds can be given but are dependent on the
+    // number of exponent and significand bits.  Thus they are
+    // given implicitly...
+
+    float lowerSquare = lower * lower;
+    __CPROVER_assume(__CPROVER_isnormal(lowerSquare));
+
+    float upper = nextUpf(lower);
+    float upperSquare = upper * upper;  // Might be +Inf
+
+    // Restrict these to bound f and thus compute the possible
+    // values for the square root.  Note that the lower bound 
+    // can be equal, this is important to catch edge cases such as
+    // 0x1.fffffep+127f and relies on the smallest normal number
+    // being a perfect square (which it will be for any sensible
+    // bit width).
+    __CPROVER_assume(lowerSquare <= f);
+    __CPROVER_assume(f < upperSquare);
+
+    // Select between them to work out which to return
+    switch(__CPROVER_rounding_mode)
+    {
+    case FE_TONEAREST :
+      return (f - lowerSquare < upperSquare - f) ? lower : upper; break;
+    case FE_UPWARD :
+      return (f - lowerSquare == 0.0f) ? lower : upper; break;
+    case FE_DOWNWARD : // Fall through
+    case FE_TOWARDZERO :
+      return (f - lowerSquare == 0.0f) ? lower : upper; break;
+    default :
+      assert(0);
+    }
+
+  }
+  else
+  {
+    assert(fpclassify(f) == FP_SUBNORMAL);
+    assert(f > 0.0f);
+
+    // With respect to the algebra of floating point number
+    // all subnormals seem to be perfect squares, thus ...
+
+    float root;    // Intentionally non-deterministic
+    __CPROVER_assume(root >= 0.0f);
+
+    __CPROVER_assume(root * root == f);
+
+    return root;
+  }
+}
+
+
+
+
+/* FUNCTION: sqrt */
+
+/* The same caveats as sqrtf apply */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_FENV_H_INCLUDED
+#include <fenv.h>
+#define __CPROVER_FENV_H_INCLUDED
+#endif
+
+
+
+double nextUp (double d);
+
+double sqrt(double d)
+{
+ __CPROVER_hide:;
+
+  if ( d < 0.0f )
+    return 0.0f/0.0f; // NaN
+  else if (__CPROVER_isinf(d) ||   // +Inf only
+	   d == 0.0f          ||   // Includes -0
+	   __CPROVER_isnan(d))
+    return d;
+  else if (__CPROVER_isnormal(d))
+  {
+    double lower;    // Intentionally non-deterministic
+    __CPROVER_assume(lower > 0);
+    __CPROVER_assume(__CPROVER_isnormal(lower));
+
+    double lowerSquare = lower * lower;
+    __CPROVER_assume(__CPROVER_isnormal(lowerSquare));
+
+    double upper = nextUp(lower);
+    double upperSquare = upper * upper;  // Might be +Inf
+
+    __CPROVER_assume(lowerSquare <= d);
+    __CPROVER_assume(d < upperSquare);
+
+    switch(__CPROVER_rounding_mode)
+    {
+    case FE_TONEAREST :
+      return (d - lowerSquare < upperSquare - d) ? lower : upper; break;
+    case FE_UPWARD :
+      return (d - lowerSquare == 0.0f) ? lower : upper; break;
+    case FE_DOWNWARD : // Fall through
+    case FE_TOWARDZERO :
+      return (d - lowerSquare == 0.0f) ? lower : upper; break;
+    default :
+      assert(0);
+    }
+
+  }
+  else
+  {
+    assert(fpclassify(d) == FP_SUBNORMAL);
+    assert(d > 0.0f);
+
+    double root;    // Intentionally non-deterministic
+    __CPROVER_assume(root >= 0.0f);
+
+    __CPROVER_assume(root * root == d);
+
+    return root;
+  }
+}
+
+/* No sqrtl as no nextUpl */
+
