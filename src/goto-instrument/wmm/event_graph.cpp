@@ -1261,37 +1261,34 @@ std::string event_grapht::critical_cyclet::print_name(
 
       if(cur.operation == abstract_eventt::Fence)
       {
-        const_iterator n_it=cur_it;
-        ++n_it;
-        const abstract_eventt& succ=( n_it!=reduced.end() ?
-          egraph[*n_it] : egraph[reduced.front()] );
+        ++cur_it;
+        const abstract_eventt& succ=( cur_it!=reduced.end() ?
+          egraph[*cur_it] : egraph[reduced.front()] );
         name += (model==Power?" Sync":" MFence"); 
-        name += (prev.variable==cur.variable?"s":"d")
+        name += (prev.variable==succ.variable?"s":"d")
           + prev.get_operation() + succ.get_operation();
       }
 
       else if(cur.operation == abstract_eventt::Lwfence)
       {
-        const_iterator n_it=cur_it;
-        ++n_it;
-        const abstract_eventt& succ=( n_it!=reduced.end() ?
-          egraph[*n_it] : egraph[reduced.front()] );
+        ++cur_it;
+        const abstract_eventt& succ=( cur_it!=reduced.end() ?
+          egraph[*cur_it] : egraph[reduced.front()] );
         name += " LwSync";
-        name += (prev.variable==cur.variable?"s":"d")
+        name += (prev.variable==succ.variable?"s":"d")
           + prev.get_operation() + succ.get_operation();
       }
 
       else if(cur.operation == abstract_eventt::ASMfence)
       {
-        const_iterator n_it=cur_it;
-        ++n_it;
-        const abstract_eventt& succ=( n_it!=reduced.end() ?
-          egraph[*n_it] : egraph[reduced.front()] );
+        ++cur_it;
+        const abstract_eventt& succ=( cur_it!=reduced.end() ?
+          egraph[*cur_it] : egraph[reduced.front()] );
         if(cur.fence_value()&1)
           name += (model==Power?" Sync":" MFence"); 
         else
           name += " LwSync";
-        name += (prev.variable==cur.variable?"s":"d")
+        name += (prev.variable==succ.variable?"s":"d")
           + prev.get_operation() + succ.get_operation();
       }
 
@@ -1347,7 +1344,7 @@ std::string event_grapht::critical_cyclet::print_name(
     ++next;
     const abstract_eventt& succ=egraph[ *next ];
     name += (model==Power?" Sync":" MFence");
-    name += (last.variable==first.variable?"s":"d")
+    name += (last.variable==succ.variable?"s":"d")
       + last.get_operation() + succ.get_operation();
   }
 
@@ -1357,7 +1354,7 @@ std::string event_grapht::critical_cyclet::print_name(
     ++next;
     const abstract_eventt& succ= egraph[ *next ];
     name += " LwSync";
-    name += (last.variable==first.variable?"s":"d") 
+    name += (last.variable==succ.variable?"s":"d") 
       + last.get_operation() + succ.get_operation();
   }
 
@@ -1370,7 +1367,7 @@ std::string event_grapht::critical_cyclet::print_name(
       name += (model==Power?" Sync":" MFence"); 
     else
       name += " LwSync";
-    name += (last.variable==first.variable?"s":"d") 
+    name += (last.variable==succ.variable?"s":"d") 
       + last.get_operation() + succ.get_operation();
   }
 
