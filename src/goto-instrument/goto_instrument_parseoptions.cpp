@@ -475,6 +475,7 @@ void goto_instrument_parseoptionst::get_goto_program(
     symbol_table, goto_functions, get_message_handler()))
     throw 0;
 
+  config.set(cmdline);
   config.ansi_c.set_from_symbol_table(symbol_table);
 }
 
