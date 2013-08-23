@@ -419,8 +419,6 @@ Function: prop_convt::set_to
 
 \*******************************************************************/
 
-#include <iostream>
-
 void prop_convt::set_to(const exprt &expr, bool value)
 {
   if(expr.type().id()!=ID_bool)
