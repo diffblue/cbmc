@@ -30,6 +30,10 @@ inline int pthread_mutex_lock(pthread_mutex_t *mutex)
   __CPROVER_assume(!*((signed char *)mutex));
   *((signed char *)mutex)=1;
   __CPROVER_atomic_end();
+
+  __CPROVER_fence("WWfence", "RRfence", "RWfence", "WRfence",
+                  "WWcumul", "RRcumul", "RWcumul", "WRcumul");
+
   return 0; // we never fail
 }
 
@@ -62,6 +66,10 @@ inline int pthread_mutex_trylock(pthread_mutex_t *mutex)
   }
 
   __CPROVER_atomic_end();
+
+  __CPROVER_fence("WWfence", "RRfence", "RWfence", "WRfence",
+                  "WWcumul", "RRcumul", "RWcumul", "WRcumul");
+
   return return_value;
 }
 
@@ -75,9 +83,15 @@ inline int pthread_mutex_trylock(pthread_mutex_t *mutex)
 inline int pthread_mutex_unlock(pthread_mutex_t *mutex)
 {
   __CPROVER_HIDE:;
+  __CPROVER_atomic_begin();
   __CPROVER_assert(*((signed char *)mutex)==1,
     "must hold lock upon unlock");
   *((signed char *)mutex)=0;
+  __CPROVER_atomic_end();
+
+  __CPROVER_fence("WWfence", "RRfence", "RWfence", "WRfence",
+                  "WWcumul", "RRcumul", "RWcumul", "WRcumul");
+
   return 0; // we never fail
 }
 
