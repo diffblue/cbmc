@@ -36,7 +36,7 @@ bool bmct::write_dimacs()
   std::ofstream out(filename.c_str());
   if(!out)
   {
-    std::cerr << "failed to open " << filename << std::endl;
+    error() << "failed to open " << filename << eom;
     return false;
   }
 
