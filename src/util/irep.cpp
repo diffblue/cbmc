@@ -9,6 +9,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cstdlib>
 #include <cassert>
 
+#ifdef IREP_DEBUG
+#include <iostream>
+#endif
+
 #include "irep.h"
 #include "i2string.h"
 #include "string_hash.h"
@@ -135,8 +139,6 @@ Function: irept::remove_ref
 
 \*******************************************************************/
 
-#include <iostream>
-  
 #ifdef SHARING
 void irept::remove_ref(dt *old_data)
 {
