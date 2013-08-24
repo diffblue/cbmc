@@ -18,7 +18,6 @@ Author: CM Wintersteiger, 2006
 #include <cbmc/version.h>
 
 #include "compile.h"
-#include "version.h"
 #include "run.h"
 
 #include "gcc_mode.h"
@@ -82,17 +81,17 @@ bool gcc_modet::doit()
     // Compilation continues, don't exit!
     
     if(act_as_ld)
-      print("GNU ld version 2.16.91 20050610 (goto-cc " GOTOCC_VERSION ")");
+      print("GNU ld version 2.16.91 20050610 (goto-cc " CBMC_VERSION ")");
     else
-      print("gcc version 3.4.4 (goto-cc " GOTOCC_VERSION ")");
+      print("gcc version 3.4.4 (goto-cc " CBMC_VERSION ")");
   }
 
   if(cmdline.isset("version"))
   {
     if(act_as_ld)
-      print("GNU ld version 2.16.91 20050610 (goto-cc " GOTOCC_VERSION ")");
+      print("GNU ld version 2.16.91 20050610 (goto-cc " CBMC_VERSION ")");
     else
-      print("gcc (GCC) 3.4.4 (goto-cc " GOTOCC_VERSION ")\n");
+      print("gcc (GCC) 3.4.4 (goto-cc " CBMC_VERSION ")\n");
 
     print("Copyright (C) 2006-2013 Daniel Kroening, Christoph Wintersteiger\n");
     print("CBMC version: " CBMC_VERSION);
