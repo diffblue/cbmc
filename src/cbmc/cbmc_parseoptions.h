@@ -24,15 +24,18 @@ class optionst;
   "(program-only)(function):(preprocess)(slice-by-trace):" \
   "(no-simplify)(unwind):(unwindset):(slice-formula)" \
   "(debug-level):(no-propagation)(no-simplify-if)" \
-  "(bounds-check)(outfile):(pointer-check)" \
-  "(document-subgoals)D:I:(depth):" \
+  "(document-subgoals)(outfile):" \
+  "D:I:" \
+  "(depth):(partial-loops)" \
+  "(bounds-check)(pointer-check)" \
   "(div-by-zero-check)(no-unwinding-assertions)" \
   "(signed-overflow-check)(unsigned-overflow-check)" \
-  "(partial-loops)" \
   "(xml-ui)(xml-interface)(vcd):" \
   "(cvc)(smt1)(smt2)(boolector)(yices)(z3)(opensmt)(mathsat)(fpa)" \
+  "(no-sat-preprocessor)" \
   "(no-pretty-names)(beautify)" \
-  "(floatbv)(fixedbv)(no-assertions)(no-assumptions)(nan-check)" \
+  "(floatbv)(fixedbv)" \
+  "(no-assertions)(no-assumptions)(nan-check)" \
   "(dimacs)(refine)" \
   "(16)(32)(64)(LP64)(ILP64)(LLP64)(ILP32)(LP32)" \
   "(little-endian)(big-endian)" \

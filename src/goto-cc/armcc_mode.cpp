@@ -15,7 +15,6 @@ Author: CM Wintersteiger, 2006
 
 #include "armcc_mode.h"
 #include "compile.h"
-#include "version.h"
 
 /*******************************************************************\
 

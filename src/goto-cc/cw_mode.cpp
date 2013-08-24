@@ -15,7 +15,6 @@ Author: CM Wintersteiger, 2006
 
 #include "cw_mode.h"
 #include "compile.h"
-#include "version.h"
 
 /*******************************************************************\
 

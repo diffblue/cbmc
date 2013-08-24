@@ -11,8 +11,9 @@ Author: Daniel Kroening, 2013
 
 #include <util/config.h>
 
+#include <cbmc/version.h>
+
 #include "compile.h"
-#include "version.h"
 #include "ld_mode.h"
 
 /*******************************************************************\
@@ -44,14 +45,14 @@ bool ld_modet::doit()
     // This a) prints the version and b) increases verbosity.
     // Linking continues, don't exit!
     
-    print("GNU ld version 2.16.91 20050610 (goto-cc " GOTOCC_VERSION ")");
+    print("GNU ld version 2.16.91 20050610 (goto-cc " CBMC_VERSION ")");
     
     // 'V' should also print some supported "emulations".
   }
 
   if(cmdline.isset("version"))
   {
-    print("GNU ld version 2.16.91 20050610 (goto-cc " GOTOCC_VERSION ")");
+    print("GNU ld version 2.16.91 20050610 (goto-cc " CBMC_VERSION ")");
     print("Copyright (C) 2006-2013 Daniel Kroening, Christoph Wintersteiger");
     return false; // Exit!
   }
