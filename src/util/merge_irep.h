@@ -12,6 +12,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "irep.h"
 #include "hash_cont.h"
 
+// Warning: the below uses irep_hash, as opposed to irep_full_hash,
+// i.e., any comments will be disregarded during merging.
+
 class merge_irept
 {
 public:
