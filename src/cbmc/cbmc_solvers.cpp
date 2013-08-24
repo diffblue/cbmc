@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <memory>
 #include <iostream>
 
 #include <solvers/sat/satcheck.h>
@@ -41,74 +42,51 @@ Function: bmct::decide_default
 bool bmct::decide_default()
 {
   bool result=true;
-
-  if(options.get_bool_option("beautify"))
+  
+  std::auto_ptr<propt> solver;
+  
+  // simplifier won't work with beautification
+  if(options.get_bool_option("sat-preprocessor") &&
+     !options.get_bool_option("beautify"))
   {
-    // simplifier won't work with beautification
-    satcheck_minisat_no_simplifiert satcheck;
-    satcheck.set_message_handler(get_message_handler());
-    satcheck.set_verbosity(get_verbosity());
-    
-    bv_cbmct bv_cbmc(ns, satcheck);
-    
-    if(options.get_option("arrays-uf")=="never")
-      bv_cbmc.unbounded_array=bv_cbmct::U_NONE;
-    else if(options.get_option("arrays-uf")=="always")
-      bv_cbmc.unbounded_array=bv_cbmct::U_ALL;
-      
-    switch(run_decision_procedure(bv_cbmc))
-    {
-    case decision_proceduret::D_UNSATISFIABLE:
-      result=false;
-      report_success();
-      break;
+    #if 1
+    solver=std::auto_ptr<propt>(new satcheckt);
+    #else
+    satcheckt sub_solver;
+    solver=std::auto_ptr<propt>(new aig_prop_solvert(sub_solver));
+    #endif
+  }
+  else
+    solver=std::auto_ptr<propt>(new satcheck_minisat_no_simplifiert);
 
-    case decision_proceduret::D_SATISFIABLE:
+  solver->set_message_handler(get_message_handler());
+  solver->set_verbosity(get_verbosity());
+    
+  bv_cbmct bv_cbmc(ns, *solver);
+    
+  if(options.get_option("arrays-uf")=="never")
+    bv_cbmc.unbounded_array=bv_cbmct::U_NONE;
+  else if(options.get_option("arrays-uf")=="always")
+    bv_cbmc.unbounded_array=bv_cbmct::U_ALL;
+    
+  switch(run_decision_procedure(bv_cbmc))
+  {
+  case decision_proceduret::D_UNSATISFIABLE:
+    result=false;
+    report_success();
+    break;
+
+  case decision_proceduret::D_SATISFIABLE:
+    if(options.get_bool_option("beautify"))
       counterexample_beautificationt()(
         bv_cbmc, equation, ns);
 
-      error_trace(bv_cbmc);
-      report_failure();
-      break;
+    error_trace(bv_cbmc);
+    report_failure();
+    break;
 
-    default:
-      error() << "decision procedure failed" << eom;
-    }
-  }
-  else
-  {
-    #if 1
-    satcheckt satcheck;
-    #else
-    satcheckt sub_solver;
-    aig_prop_solvert satcheck(sub_solver);
-    #endif
-
-    satcheck.set_message_handler(get_message_handler());
-    satcheck.set_verbosity(get_verbosity());
-    
-    bv_cbmct bv_cbmc(ns, satcheck);
-    
-    if(options.get_option("arrays-uf")=="never")
-      bv_cbmc.unbounded_array=bv_cbmct::U_NONE;
-    else if(options.get_option("arrays-uf")=="always")
-      bv_cbmc.unbounded_array=bv_cbmct::U_ALL;
-      
-    switch(run_decision_procedure(bv_cbmc))
-    {
-    case decision_proceduret::D_UNSATISFIABLE:
-      result=false;
-      report_success();
-      break;
-
-    case decision_proceduret::D_SATISFIABLE:
-      error_trace(bv_cbmc);
-      report_failure();
-      break;
-
-    default:
-      error() << "decision procedure failed" << eom;
-    }
+  default:
+    error() << "decision procedure failed" << eom;
   }
 
   return result;

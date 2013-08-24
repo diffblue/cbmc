@@ -288,6 +288,11 @@ void cbmc_parseoptionst::get_command_line_options(optionst &options)
   if(cmdline.isset("beautify"))
     options.set_option("beautify", true);
 
+  if(cmdline.isset("no-sat-preprocessor"))
+    options.set_option("sat-preprocessor", false);
+  else
+    options.set_option("sat-preprocessor", true);
+
   options.set_option("pretty-names", 
                      !cmdline.isset("no-pretty-names"));
 
