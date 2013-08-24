@@ -12,6 +12,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <list>
 #include <ostream>
 
+#include <util/merge_irep.h>
+
 #include <goto-programs/goto_program.h>
 #include <solvers/prop/literal.h>
 
@@ -282,6 +284,10 @@ public:
   
 protected:
   const namespacet &ns;
+
+  // for enforcing sharing in the expressions stored
+  merge_irept merge_irep;
+  void merge_ireps(SSA_stept &SSA_step);
 };
 
 extern inline bool operator<(
