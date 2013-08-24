@@ -42,8 +42,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/interval_domain.h>
 #include <analyses/reaching_definitions.h>
 
+#include <cbmc/version.h>
+
 #include "goto_instrument_parseoptions.h"
-#include "version.h"
 #include "document_properties.h"
 #include "uninitialized.h"
 #include "full_slicer.h"
@@ -114,7 +115,7 @@ int goto_instrument_parseoptionst::doit()
 {
   if(cmdline.isset("version"))
   {
-    std::cout << GOTO_INSTRUMENT_VERSION << std::endl;
+    std::cout << CBMC_VERSION << std::endl;
     return 0;
   }
   
@@ -873,7 +874,7 @@ void goto_instrument_parseoptionst::help()
 {
   std::cout <<
     "\n"
-    "* *     Goto-Instrument " GOTO_INSTRUMENT_VERSION " - Copyright (C) 2008-2013       * *\n"
+    "* *     Goto-Instrument " CBMC_VERSION " - Copyright (C) 2008-2013       * *\n"
     "* *                    Daniel Kroening                      * *\n"
     "* *                 kroening@kroening.com                   * *\n"
     "\n"
