@@ -80,6 +80,8 @@ void symex_target_equationt::shared_read(
   SSA_step.type=goto_trace_stept::SHARED_READ;
   SSA_step.atomic_section_id=atomic_section_id;
   SSA_step.source=source;
+
+  merge_ireps(SSA_step);
 }
 
 /*******************************************************************\
@@ -110,6 +112,8 @@ void symex_target_equationt::shared_write(
   SSA_step.type=goto_trace_stept::SHARED_WRITE;
   SSA_step.atomic_section_id=atomic_section_id;
   SSA_step.source=source;
+
+  merge_ireps(SSA_step);
 }
 
 /*******************************************************************\
@@ -133,6 +137,8 @@ void symex_target_equationt::spawn(
   SSA_step.guard=guard;
   SSA_step.type=goto_trace_stept::SPAWN;
   SSA_step.source=source;
+
+  merge_ireps(SSA_step);
 }
 
 /*******************************************************************\
@@ -156,6 +162,8 @@ void symex_target_equationt::memory_barrier(
   SSA_step.guard=guard;
   SSA_step.type=goto_trace_stept::MEMORY_BARRIER;
   SSA_step.source=source;
+
+  merge_ireps(SSA_step);
 }
 
 /*******************************************************************\
@@ -181,6 +189,8 @@ void symex_target_equationt::atomic_begin(
   SSA_step.type=goto_trace_stept::ATOMIC_BEGIN;
   SSA_step.atomic_section_id=atomic_section_id;
   SSA_step.source=source;
+
+  merge_ireps(SSA_step);
 }
 
 /*******************************************************************\
@@ -206,6 +216,8 @@ void symex_target_equationt::atomic_end(
   SSA_step.type=goto_trace_stept::ATOMIC_END;
   SSA_step.atomic_section_id=atomic_section_id;
   SSA_step.source=source;
+
+  merge_ireps(SSA_step);
 }
 
 /*******************************************************************\
@@ -246,6 +258,8 @@ void symex_target_equationt::assignment(
   SSA_step.cond_expr=equal_exprt(SSA_step.ssa_lhs, SSA_step.ssa_rhs);
   SSA_step.type=goto_trace_stept::ASSIGNMENT;
   SSA_step.source=source;
+
+  merge_ireps(SSA_step);
 }
 
 /*******************************************************************\
@@ -282,6 +296,8 @@ void symex_target_equationt::decl(
   // the condition is trivially true, and only
   // there so we see the symbols
   SSA_step.cond_expr=equal_exprt(SSA_step.ssa_lhs, SSA_step.ssa_lhs);
+
+  merge_ireps(SSA_step);
 }
 
 /*******************************************************************\
@@ -327,6 +343,8 @@ void symex_target_equationt::location(
   SSA_step.guard=guard;
   SSA_step.type=goto_trace_stept::LOCATION;
   SSA_step.source=source;
+
+  merge_ireps(SSA_step);
 }
 
 /*******************************************************************\
@@ -353,6 +371,8 @@ void symex_target_equationt::function_call(
   SSA_step.type=goto_trace_stept::FUNCTION_CALL;
   SSA_step.source=source;
   SSA_step.identifier=identifier;
+
+  merge_ireps(SSA_step);
 }
 
 /*******************************************************************\
@@ -379,6 +399,8 @@ void symex_target_equationt::function_return(
   SSA_step.type=goto_trace_stept::FUNCTION_RETURN;
   SSA_step.source=source;
   SSA_step.identifier=identifier;
+
+  merge_ireps(SSA_step);
 }
 
 /*******************************************************************\
@@ -407,6 +429,8 @@ void symex_target_equationt::output(
   SSA_step.source=source;
   SSA_step.io_args=args;
   SSA_step.io_id=output_id;
+
+  merge_ireps(SSA_step);
 }
 
 /*******************************************************************\
@@ -438,6 +462,8 @@ void symex_target_equationt::output_fmt(
   SSA_step.io_id=output_id;
   SSA_step.formatted=true;
   SSA_step.format_string=fmt;
+
+  merge_ireps(SSA_step);
 }
 
 /*******************************************************************\
@@ -466,6 +492,8 @@ void symex_target_equationt::input(
   SSA_step.source=source;
   SSA_step.io_args=args;
   SSA_step.io_id=input_id;
+
+  merge_ireps(SSA_step);
 }
 
 /*******************************************************************\
@@ -492,6 +520,8 @@ void symex_target_equationt::assumption(
   SSA_step.cond_expr=cond;
   SSA_step.type=goto_trace_stept::ASSUME;
   SSA_step.source=source;
+
+  merge_ireps(SSA_step);
 }
 
 /*******************************************************************\
@@ -520,6 +550,8 @@ void symex_target_equationt::assertion(
   SSA_step.type=goto_trace_stept::ASSERT;
   SSA_step.source=source;
   SSA_step.comment=msg;
+
+  merge_ireps(SSA_step);
 }
 
 /*******************************************************************\
@@ -548,6 +580,8 @@ void symex_target_equationt::constraint(
   SSA_step.type=goto_trace_stept::CONSTRAINT;
   SSA_step.source=source;
   SSA_step.comment=msg;
+
+  merge_ireps(SSA_step);
 }
 
 /*******************************************************************\
@@ -806,11 +840,47 @@ void symex_target_equationt::convert_io(
           symbol_exprt symbol;
           symbol.type()=tmp.type();
           symbol.set_identifier("symex::io::"+i2string(io_count++));
-          dec_proc.set_to(equal_exprt(tmp, symbol), true);
+
+          equal_exprt eq(tmp, symbol);
+          merge_irep(eq);
+
+          dec_proc.set_to(eq, true);
           it->converted_io_args.push_back(symbol);
         }
       }
     }
+}
+
+/*******************************************************************\
+
+Function: symex_target_equationt::merge_ireps
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void symex_target_equationt::merge_ireps(SSA_stept &SSA_step)
+{
+  merge_irep(SSA_step.guard);
+
+  merge_irep(SSA_step.ssa_lhs);
+  merge_irep(SSA_step.original_lhs_object);
+  merge_irep(SSA_step.ssa_full_lhs);
+  merge_irep(SSA_step.original_full_lhs);
+  merge_irep(SSA_step.ssa_rhs);
+
+  merge_irep(SSA_step.cond_expr);
+
+  for(std::list<exprt>::iterator
+      it=SSA_step.io_args.begin();
+      it!=SSA_step.io_args.end();
+      ++it)
+    merge_irep(*it);
+  // converted_io_args is merged in convert_io
 }
 
 /*******************************************************************\
