@@ -22,7 +22,10 @@ Function: merge_irept::operator()
 
 void merge_irept::operator()(irept &irep)
 {
+  // only useful if there is sharing
+  #ifdef SHARING
   irep=merged(irep);
+  #endif
 }
 
 /*******************************************************************\
@@ -74,7 +77,10 @@ Function: merge_full_irept::operator()
 
 void merge_full_irept::operator()(irept &irep)
 {
+  // only useful if there is sharing
+  #ifdef SHARING
   irep=merged(irep);
+  #endif
 }
 
 /*******************************************************************\
