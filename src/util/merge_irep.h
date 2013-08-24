@@ -24,6 +24,8 @@ public:
 protected:
   typedef hash_set_cont<irept, irep_hash> irep_storet;
   irep_storet irep_store;     
+
+  const irept& merged(const irept &irep);
 };
 
 class merge_full_irept
@@ -34,6 +36,8 @@ public:
 protected:
   typedef hash_set_cont<irept, irep_full_hash, irep_full_eq> irep_storet;
   irep_storet irep_store;     
+
+  const irept& merged(const irept &irep);
 };
 
 #endif

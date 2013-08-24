@@ -22,22 +22,42 @@ Function: merge_irept::operator()
 
 void merge_irept::operator()(irept &irep)
 {
+  irep=merged(irep);
+}
+
+/*******************************************************************\
+
+Function: merge_irept::merged
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+const irept& merge_irept::merged(const irept &irep)
+{
   irep_storet::const_iterator entry=irep_store.find(irep);
   if(entry!=irep_store.end())
-  {
-    irep=*entry;
-    return;
-  }
+    return *entry;
 
-  irept::subt &sub=irep.get_sub();
-  Forall_irep(it, sub)
-    operator()(*it); // recursive call
+  irept new_irep(irep.id());
 
-  irept::named_subt &named_sub=irep.get_named_sub();
-  Forall_named_irep(it, named_sub)
-    operator()(it->second); // recursive call
+  const irept::subt &src_sub=irep.get_sub();
+  irept::subt &dest_sub=new_irep.get_sub();
+  dest_sub.reserve(src_sub.size());
 
-  irep=*irep_store.insert(irep).first;
+  forall_irep(it, src_sub)
+    dest_sub.push_back(merged(*it)); // recursive call
+
+  const irept::named_subt &src_named_sub=irep.get_named_sub();
+  irept::named_subt &dest_named_sub=new_irep.get_named_sub();
+  forall_named_irep(it, src_named_sub)
+    dest_named_sub[it->first]=merged(it->second); // recursive call
+
+  return *irep_store.insert(new_irep).first;
 }
 
 /*******************************************************************\
@@ -54,24 +74,45 @@ Function: merge_full_irept::operator()
 
 void merge_full_irept::operator()(irept &irep)
 {
+  irep=merged(irep);
+}
+
+/*******************************************************************\
+
+Function: merge_full_irept::merged
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+const irept& merge_full_irept::merged(const irept &irep)
+{
   irep_storet::const_iterator entry=irep_store.find(irep);
   if(entry!=irep_store.end())
-  {
-    irep=*entry;
-    return;
-  }
+    return *entry;
 
-  irept::subt &sub=irep.get_sub();
-  Forall_irep(it, sub)
-    operator()(*it); // recursive call
+  irept new_irep(irep.id());
 
-  irept::named_subt &named_sub=irep.get_named_sub();
-  Forall_named_irep(it, named_sub)
-    operator()(it->second); // recursive call
+  const irept::subt &src_sub=irep.get_sub();
+  irept::subt &dest_sub=new_irep.get_sub();
+  dest_sub.reserve(src_sub.size());
 
-  irept::named_subt &comments=irep.get_comments();
-  Forall_named_irep(it, comments)
-    operator()(it->second); // recursive call
+  forall_irep(it, src_sub)
+    dest_sub.push_back(merged(*it)); // recursive call
 
-  irep=*irep_store.insert(irep).first;
+  const irept::named_subt &src_named_sub=irep.get_named_sub();
+  irept::named_subt &dest_named_sub=new_irep.get_named_sub();
+  forall_named_irep(it, src_named_sub)
+    dest_named_sub[it->first]=merged(it->second); // recursive call
+
+  const irept::named_subt &src_comments=irep.get_comments();
+  irept::named_subt &dest_comments=new_irep.get_comments();
+  forall_named_irep(it, src_comments)
+    dest_comments[it->first]=merged(it->second); // recursive call
+
+  return *irep_store.insert(new_irep).first;
 }
