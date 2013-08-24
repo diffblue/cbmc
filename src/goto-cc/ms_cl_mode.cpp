@@ -13,9 +13,10 @@ Author: CM Wintersteiger, 2006
 #include <util/prefix.h>
 #include <util/config.h>
 
+#include <cbmc/version.h>
+
 #include "ms_cl_mode.h"
 #include "compile.h"
-#include "version.h"
 
 /*******************************************************************\
 
