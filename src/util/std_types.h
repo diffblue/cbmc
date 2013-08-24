@@ -479,6 +479,9 @@ public:
       return add_expr(ID_C_default_value);
     }
     
+    // The following for methods will go away;
+    // these should not be part of the signature of a function,
+    // but rather part of the body.
     inline void set_identifier(const irep_idt &identifier)
     {
       set(ID_C_identifier, identifier);
