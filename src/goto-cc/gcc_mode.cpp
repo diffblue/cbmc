@@ -15,6 +15,8 @@ Author: CM Wintersteiger, 2006
 #include <util/prefix.h>
 #include <util/suffix.h>
 
+#include <cbmc/version.h>
+
 #include "compile.h"
 #include "version.h"
 #include "run.h"
@@ -92,7 +94,8 @@ bool gcc_modet::doit()
     else
       print("gcc (GCC) 3.4.4 (goto-cc " GOTOCC_VERSION ")\n");
 
-    print("Copyright (C) 2006-2012 Daniel Kroening, Christoph Wintersteiger\n");
+    print("Copyright (C) 2006-2013 Daniel Kroening, Christoph Wintersteiger\n");
+    print("CBMC version: " CBMC_VERSION);
     print("Architecture: "+id2string(config.this_architecture()));
     print("OS: "+id2string(config.this_operating_system()));
 

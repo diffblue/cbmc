@@ -39,9 +39,10 @@ Date: June 2006
 
 #include <langapi/mode.h>
 
+#include <cbmc/version.h>
+
 #include "get_base_name.h"
 #include "compile.h"
-#include "version.h"
 
 #define DOTGRAPHSETTINGS  "color=black;" \
                           "orientation=portrait;" \
@@ -790,7 +791,7 @@ Function: compilet::compilet
 \*******************************************************************/
 
 compilet::compilet(cmdlinet &_cmdline):
-  language_uit("goto-cc " GOTOCC_VERSION, _cmdline),
+  language_uit("goto-cc " CBMC_VERSION, _cmdline),
   ns(symbol_table),
   cmdline(_cmdline)
 {
@@ -986,7 +987,7 @@ Function: compilet::add_compiler_specific_defines
 
 void compilet::add_compiler_specific_defines(configt &config) const
 {
-  config.ansi_c.defines.push_back("__GOTO_CC_VERSION__=" GOTOCC_VERSION);
+  config.ansi_c.defines.push_back("__GOTO_CC_VERSION__=" CBMC_VERSION);
 }
 
 /*******************************************************************\
