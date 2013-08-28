@@ -145,13 +145,23 @@ void goto_symext::adjust_float_expressions(exprt &expr)
     }
     else if(expr.id()==ID_typecast)
     {
-      // casts from bigger to smaller type might round
-      if(expr.operands().size()==1 &&
-         expr.type().id()==ID_floatbv &&
-         expr.op0().type().id()==ID_floatbv &&
-         to_floatbv_type(expr.type()).get_width()<
-         to_floatbv_type(expr.op0().type()).get_width())
+      const typecast_exprt &typecast_expr=to_typecast_expr(expr);
+
+      if(typecast_expr.type().id()==ID_floatbv &&
+         typecast_expr.op().type().id()==ID_floatbv &&
+         to_floatbv_type(typecast_expr.type()).get_width()<
+         to_floatbv_type(typecast_expr.op().type()).get_width())
       {
+        // casts from bigger to smaller float-type might round
+        expr.id(ID_floatbv_typecast);
+        expr.operands().resize(2);
+        expr.op1()=rounding_mode;
+      }
+      else if(typecast_expr.type().id()==ID_floatbv &&
+              (typecast_expr.op().type().id()==ID_signedbv ||
+               typecast_expr.op().type().id()==ID_unsignedbv))
+      {
+        // casts from integer to float-type might round
         expr.id(ID_floatbv_typecast);
         expr.operands().resize(2);
         expr.op1()=rounding_mode;
