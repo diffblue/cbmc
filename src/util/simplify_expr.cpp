@@ -1475,8 +1475,7 @@ bool simplify_exprt::simplify_floatbv_typecast(exprt &expr)
     return false;
   }
   
-  if(dest_type.id()!=ID_floatbv &&
-     src_type.id()!=ID_floatbv)
+  if(dest_type.id()!=ID_floatbv)
     return true;
 
   exprt op0=expr.op0();
@@ -1485,16 +1484,31 @@ bool simplify_exprt::simplify_floatbv_typecast(exprt &expr)
   // constant folding  
   if(op0.is_constant() && op1.is_constant())
   {
-    ieee_floatt value(to_constant_expr(op0));
-
     mp_integer rounding_mode;
     if(!to_integer(op1, rounding_mode))
     {
-      value.rounding_mode=(ieee_floatt::rounding_modet)integer2long(rounding_mode);
-      value.change_spec(to_floatbv_type(dest_type));
-      expr=value.to_expr();
-      return false;
-    }    
+      if(src_type.id()==ID_floatbv)
+      {
+        ieee_floatt result(to_constant_expr(op0));
+        result.rounding_mode=(ieee_floatt::rounding_modet)integer2long(rounding_mode);
+        result.change_spec(to_floatbv_type(dest_type));
+        expr=result.to_expr();
+        return false;
+      }
+      else if(src_type.id()==ID_signedbv ||
+              src_type.id()==ID_unsignedbv)
+      {
+        mp_integer value;
+        if(!to_integer(op0, value))
+        {
+          ieee_floatt result;
+          result.spec=to_floatbv_type(dest_type);
+          result.from_integer(value);
+          expr=result.to_expr();
+          return false;
+        }
+      }
+    }
   }
 
   #if 0
