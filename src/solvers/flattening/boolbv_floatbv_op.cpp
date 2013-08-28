@@ -34,8 +34,8 @@ void boolbvt::convert_floatbv_typecast(const exprt &expr, bvt &bv)
   if(operands.size()!=2)
     throw "operator "+expr.id_string()+" takes two operands";
 
-  const exprt &op0=expr.op0();
-  const exprt &op1=expr.op1();
+  const exprt &op0=expr.op0(); // number to convert
+  const exprt &op1=expr.op1(); // rounding mode
 
   bvt bv0=convert_bv(op0);
   bvt bv1=convert_bv(op1);
@@ -44,12 +44,24 @@ void boolbvt::convert_floatbv_typecast(const exprt &expr, bvt &bv)
   const typet &dest_type=ns.follow(expr.type());
 
   float_utilst float_utils(prop);
-
+  
   if(src_type.id()==ID_floatbv &&
      dest_type.id()==ID_floatbv)
   {
     float_utils.spec=to_floatbv_type(src_type);
     bv=float_utils.conversion(bv0, to_floatbv_type(dest_type));
+  }
+  else if(src_type.id()==ID_signedbv &&
+          dest_type.id()==ID_floatbv)
+  {
+    float_utils.spec=to_floatbv_type(dest_type);
+    bv=float_utils.from_signed_integer(bv0);
+  }
+  else if(src_type.id()==ID_unsignedbv &&
+          dest_type.id()==ID_floatbv)
+  {
+    float_utils.spec=to_floatbv_type(dest_type);
+    bv=float_utils.from_unsigned_integer(bv0);
   }
   else
     return conversion_failed(expr, bv);
