@@ -26,16 +26,15 @@ class optionst;
   "(debug-level):(no-propagation)(no-simplify-if)" \
   "(document-subgoals)(outfile):" \
   "D:I:" \
-  "(depth):(partial-loops)" \
-  "(bounds-check)(pointer-check)" \
-  "(div-by-zero-check)(no-unwinding-assertions)" \
-  "(signed-overflow-check)(unsigned-overflow-check)" \
+  "(depth):(partial-loops)(no-unwinding-assertions)" \
+  "(bounds-check)(pointer-check)(div-by-zero-check)" \
+  "(signed-overflow-check)(unsigned-overflow-check)(nan-check)" \
+  "(no-assertions)(no-assumptions)" \
   "(xml-ui)(xml-interface)(vcd):" \
   "(cvc)(smt1)(smt2)(boolector)(yices)(z3)(opensmt)(mathsat)(fpa)" \
   "(no-sat-preprocessor)" \
   "(no-pretty-names)(beautify)" \
   "(floatbv)(fixedbv)" \
-  "(no-assertions)(no-assumptions)(nan-check)" \
   "(dimacs)(refine)" \
   "(16)(32)(64)(LP64)(ILP64)(LLP64)(ILP32)(LP32)" \
   "(little-endian)(big-endian)" \
