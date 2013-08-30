@@ -20,7 +20,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <solvers/smt2/smt2_dec.h>
 #include <solvers/cvc/cvc_dec.h>
 
+#ifdef USE_AIG
 #include <solvers/prop/aig_prop.h>
+#endif
 
 #include "bmc.h"
 #include "bv_cbmc.h"
@@ -49,11 +51,11 @@ bool bmct::decide_default()
   if(options.get_bool_option("sat-preprocessor") &&
      !options.get_bool_option("beautify"))
   {
-    #if 1
-    solver=std::auto_ptr<propt>(new satcheckt);
-    #else
+    #ifdef USE_AIG
     satcheckt sub_solver;
     solver=std::auto_ptr<propt>(new aig_prop_solvert(sub_solver));
+    #else
+    solver=std::auto_ptr<propt>(new satcheckt);
     #endif
   }
   else
