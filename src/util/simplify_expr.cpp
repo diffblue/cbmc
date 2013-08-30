@@ -5175,3 +5175,23 @@ bool simplify(exprt &expr, const namespacet &ns)
 {
   return simplify_exprt(ns).simplify(expr);
 }
+
+/*******************************************************************\
+
+Function: simplify_expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+exprt simplify_expr(const exprt &src, const namespacet &ns)
+{
+  exprt tmp=src;
+  simplify_exprt(ns).simplify(tmp);
+  return tmp;
+}
+
