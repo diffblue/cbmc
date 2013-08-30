@@ -9,6 +9,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 #include <iostream>
 
+#include <util/namespace.h>
+#include <util/context.h>
+#include <util/simplify_expr.h>
 #include <util/config.h>
 #include <util/arith_tools.h>
 #include <util/std_types.h>
@@ -113,8 +116,13 @@ void ansi_c_convert_typet::read_rec(const typet &type)
     const exprt &size_expr=
       static_cast<const exprt &>(type.find(ID_size));
 
+    // should do this in type checker, not here
+    contextt context;
+    namespacet ns(context);
+    const exprt simplified=simplify_expr(size_expr, ns);
+
     mp_integer size_int;
-    if(to_integer(size_expr, size_int))
+    if(to_integer(simplified, size_int))
     {
       err_location(location);
       error("bit vector width has to be constant");
