@@ -122,7 +122,7 @@ Function: xmlt::escape
 
  Outputs:
 
- Purpose:
+ Purpose: escaping for XML elements
 
 \*******************************************************************/
 
@@ -145,8 +145,16 @@ void xmlt::escape(const std::string &s, std::ostream &out)
     case '>':
       out << "&gt;";
       break;
+    
+    case '\r':
+      break; // drop!
+    
+    case '\n':
+      out << '\n';
+      break;
 
     default:
+      // &#0; isn't allowed, but what shall we do?
       if((ch>=0 && ch<' ') || ch==127)
         out << "&#"+i2string((unsigned char)ch)+";";
       else
@@ -163,7 +171,9 @@ Function: xmlt::escape_attribute
 
  Outputs:
 
- Purpose:
+ Purpose: escaping for XML attributes, assuming that
+          double quotes " are used consistently,
+          not single quotes
 
 \*******************************************************************/
 
@@ -192,7 +202,11 @@ void xmlt::escape_attribute(const std::string &s, std::ostream &out)
       break;
 
     default:
-      out << ch;
+      // &#0; isn't allowed, but what shall we do?
+      if((ch>=0 && ch<' ') || ch==127)
+        out << "&#"+i2string((unsigned char)ch)+";";
+      else
+        out << ch;
     }
   }
 }
