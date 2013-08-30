@@ -201,7 +201,7 @@ Function: bv_utilst::carry
 
 literalt bv_utilst::carry(literalt a, literalt b, literalt c)
 {
-  #if 1
+  #ifndef USE_AIG
   // propagation possible?
   unsigned const_count=
     a.is_constant() + b.is_constant() + c.is_constant();
