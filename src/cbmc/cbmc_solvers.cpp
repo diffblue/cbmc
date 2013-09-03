@@ -45,14 +45,17 @@ bool bmct::decide_default()
 {
   bool result=true;
   
-  std::auto_ptr<propt> solver;
+  #ifdef USE_AIG
+  satcheckt sub_solver;
+  #endif
   
+  std::auto_ptr<propt> solver;
+
   // simplifier won't work with beautification
   if(options.get_bool_option("sat-preprocessor") &&
      !options.get_bool_option("beautify"))
   {
     #ifdef USE_AIG
-    satcheckt sub_solver;
     solver=std::auto_ptr<propt>(new aig_prop_solvert(sub_solver));
     #else
     solver=std::auto_ptr<propt>(new satcheckt);
