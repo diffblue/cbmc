@@ -423,6 +423,10 @@ void goto_symex_statet::rename(
 
   if(expr.id()==ID_symbol)
   {
+    // we never rename function symbols
+    if(ns.follow(expr.type()).id()==ID_code)
+      return;
+  
     const irep_idt identifier=to_symbol_expr(expr).get_identifier();
 
     if(level==L0 || level==L1)
