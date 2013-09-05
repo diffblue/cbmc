@@ -23,6 +23,10 @@ class goto_function_templatet
 public:
   bodyT body;
   code_typet type;
+  
+  typedef std::vector<irep_idt> parameter_identifierst;
+  parameter_identifierst parameter_identifiers;
+
   bool body_available;
 
   bool is_inlined() const
@@ -38,6 +42,7 @@ public:
   {
     body.clear();
     type.clear();
+    parameter_identifiers.clear();
     body_available=false;
   }
 
@@ -45,18 +50,21 @@ public:
   {
     body.swap(other.body);
     type.swap(other.type);
+    parameter_identifiers.swap(other.parameter_identifiers);
     std::swap(body_available, other.body_available);
   }
-  
+
   void copy_from(const goto_function_templatet<bodyT> &other)
   {
     body.copy_from(other.body);
     type=other.type;
+    parameter_identifiers=other.parameter_identifiers;
     body_available=other.body_available;
   }
 
   goto_function_templatet(const goto_function_templatet<bodyT> &src):
     type(src.type),
+    parameter_identifiers(src.parameter_identifiers),
     body_available(src.body_available)
   {
     body.copy_from(src.body);
