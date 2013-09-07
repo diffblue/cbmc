@@ -133,7 +133,13 @@ public:
   bvt select(literalt s, const bvt &a, const bvt &b);
 
   // computes a[last:first]  
-  bvt extract(const bvt &a, unsigned first, unsigned last) const;
+  static bvt extract(const bvt &a, unsigned first, unsigned last);
+  
+  // extracts the n most significant bits
+  static bvt extract_msb(const bvt &a, unsigned n);
+
+  // extracts the n least significant bits
+  static bvt extract_lsb(const bvt &a, unsigned n);
 
   // put a and b together, where a comes first (lower indices)
   bvt concatenate(const bvt &a, const bvt &b) const;

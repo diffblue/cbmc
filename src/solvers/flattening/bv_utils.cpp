@@ -87,7 +87,7 @@ Function: bv_utilst::extract
 
 \*******************************************************************/
 
-bvt bv_utilst::extract(const bvt &a, unsigned first, unsigned last) const
+bvt bv_utilst::extract(const bvt &a, unsigned first, unsigned last)
 {
   // preconditions
   assert(first<a.size());
@@ -99,6 +99,52 @@ bvt bv_utilst::extract(const bvt &a, unsigned first, unsigned last) const
   if(first!=0) result.erase(result.begin(), result.begin()+first);
 
   assert(result.size()==last-first+1);
+  return result;
+}
+
+/*******************************************************************\
+
+Function: bv_utilst::extract_msb
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bvt bv_utilst::extract_msb(const bvt &a, unsigned n)
+{
+  // preconditions
+  assert(n<=a.size());
+
+  bvt result=a;
+  result.erase(result.begin(), result.begin()+(result.size()-n));
+
+  assert(result.size()==n);
+  return result;
+}
+
+/*******************************************************************\
+
+Function: bv_utilst::extract_lsb
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bvt bv_utilst::extract_lsb(const bvt &a, unsigned n)
+{
+  // preconditions
+  assert(n<=a.size());
+
+  bvt result=a;
+  result.resize(n);
   return result;
 }
 
