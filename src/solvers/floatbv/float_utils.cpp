@@ -969,14 +969,14 @@ Function: float_utilst::normalization_shift
  Outputs:
 
  Purpose: normalize fraction/exponent pair
+          returns 'zero' if fraction is zero
 
 \*******************************************************************/
 
 void float_utilst::normalization_shift(bvt &fraction, bvt &exponent)
 {
+  #if 0
   // this thing is quadratic!
-  // TODO: replace by n log n construction
-  // returns 'zero' if fraction is zero
 
   bvt new_fraction=prop.new_variables(fraction.size());
   bvt new_exponent=prop.new_variables(exponent.size());
@@ -1007,15 +1007,54 @@ void float_utilst::normalization_shift(bvt &fraction, bvt &exponent)
     bv_utils.cond_implies_equal(shift, added_exponent, new_exponent);
   }
 
-  // fraction all zero? it stays zero
-  // the exponent is undefined in that case
+  // Fraction all zero? It stays zero.
+  // The exponent is undefined in that case.
   literalt fraction_all_zero=bv_utils.is_zero(fraction);
   bvt zero_fraction;
   zero_fraction.resize(fraction.size(), const_literal(false));
   bv_utils.cond_implies_equal(fraction_all_zero, zero_fraction, new_fraction);
-
+  
   fraction=new_fraction;
   exponent=new_exponent;
+
+  #else
+
+  // n-log-n alignment shifter.
+  // The worst-case shift is the number of fraction
+  // bits minus one, in case the faction is one exactly.
+  assert(!fraction.empty());  
+  unsigned depth=address_bits(fraction.size()-1).to_long();
+  
+  if(exponent.size()<depth)
+    exponent=bv_utils.sign_extension(exponent, depth);
+  
+  bvt exponent_delta=bv_utils.zeros(exponent.size());
+  
+  for(int d=depth-1; d>=0; d--)
+  {
+    unsigned distance=(1<<d);
+    assert(fraction.size()>distance);
+    
+    // check if first 'distance'-many bits are zeros
+    const bvt prefix=bv_utils.extract_msb(fraction, distance);
+    literalt prefix_is_zero=bv_utils.is_zero(prefix);
+    
+    // If so, shift the zeros out left by 'distance'.
+    // Otherwise, leave as is.
+    const bvt shifted=
+      bv_utils.shift(fraction, bv_utilst::LEFT, distance);
+    
+    fraction=
+      bv_utils.select(prefix_is_zero, shifted, fraction);
+      
+    // add corresponding weight to exponent
+    assert(d<(signed)exponent_delta.size());
+    exponent_delta[d]=prefix_is_zero;
+  }  
+    
+  exponent=bv_utils.sub(exponent, exponent_delta);
+  
+  #endif
 }
 
 /*******************************************************************\
