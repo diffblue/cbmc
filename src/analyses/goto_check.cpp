@@ -20,8 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/base_type.h>
 #include <util/pointer_predicates.h>
 
-#include <analyses/local_may_alias.h>
-
+#include "local_may_alias.h"
 #include "goto_check.h"
 
 class goto_checkt
@@ -1324,8 +1323,8 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
 
       t->guard=false_exprt();
       t->location=i.location;
-      t->location.set(ID_property, "error label");
-      t->location.set(ID_comment, "error label");
+      t->location.set_property("error label");
+      t->location.set_comment("error label");
       t->location.set("user-provided", true);
     }
     
@@ -1380,6 +1379,7 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
     else if(i.is_assert())
     {
       if(i.location.get_bool("user-provided") &&
+         i.location.get_property()!="error label" &&
          !enable_assertions)
         i.type=SKIP;
     }
