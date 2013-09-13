@@ -388,6 +388,7 @@ void configt::ansi_ct::set_arch_spec_arm(const irep_idt &subarch)
     set_ILP32();
     long_double_width=8*8;
   }
+
   arch=ARCH_ARM;
   endianness=IS_LITTLE_ENDIAN;
   char_is_unsigned=true;
@@ -661,12 +662,10 @@ Function: configt::ansi_ct::set_arch_spec_x32
 void configt::ansi_ct::set_arch_spec_x32()
 {
   // This is a variant of x86_64 that has
-  // 64-bit long int but 32-bit pointers.
-  set_LP64();
+  // 32-bit long int and 32-bit pointers.
+  set_ILP32();
   arch=ARCH_X32;
   endianness=IS_LITTLE_ENDIAN;
-  pointer_width=4*8; // exception!
-  long_double_width=16*8;
   char_is_unsigned=false;
 
   switch(mode)
