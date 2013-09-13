@@ -333,8 +333,9 @@ void configt::ansi_ct::set_arch_spec_power(const irep_idt &subarch)
 {
   if(subarch=="power")
     set_ILP32();
-  else
+  else // ppc64
     set_LP64();
+
   arch=ARCH_POWER;
   endianness=IS_BIG_ENDIAN;
   long_double_width=16*8;
@@ -858,8 +859,10 @@ bool configt::set(const cmdlinet &cmdline)
     ansi_c.set_arch_spec_i386();
   else
   {
-    // something new and unknown, we use i386 instead
+    // We run on something new and unknown.
+    // We verify for i386 instead.
     ansi_c.set_arch_spec_i386();
+    arch="i386";
   }
 
   if(os=="windows")
@@ -880,7 +883,8 @@ bool configt::set(const cmdlinet &cmdline)
       ansi_c.long_double_width=8*8;
   }
 
-  // let's check some of the type widths
+  // Let's check some of the type widths in case we run
+  // the same architecture and OS that we are verifying for.
   if(arch==this_arch && os==this_os)
   {
     assert(ansi_c.int_width==sizeof(int)*8);
