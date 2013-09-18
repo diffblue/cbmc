@@ -4,6 +4,9 @@ int main()
 {
   int some_int=20;
   int *p;
+  
+  // Compound literals are l-values, so their address
+  // can be taken.
   p=(int []){ 1, 2, 3, some_int };
   
   assert(p[0]==1);
