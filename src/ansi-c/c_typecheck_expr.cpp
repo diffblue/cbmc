@@ -1058,11 +1058,18 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
   }
 
   // We allow (TYPE){ expression }
+  // This is called "compound literal".
   if(op.id()==ID_initializer_list)
   {
     // just do a normal initialization
     do_initializer(op, expr_type, false);
+    
+    // This produces a struct-expression,
+    // union-expression, array-expression,
+    // or an expression for a pointer or scalar.
+    // We produce a compound_literal expression.
 
+    
     exprt tmp=op;
     expr=tmp;
     expr.set(ID_C_lvalue, true);
