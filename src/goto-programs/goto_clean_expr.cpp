@@ -82,9 +82,7 @@ bool goto_convertt::needs_cleaning(const exprt &expr)
 {
   if(expr.id()==ID_dereference ||
      expr.id()==ID_sideeffect ||
-     expr.id()==ID_struct ||
-     expr.id()==ID_array ||
-     expr.id()==ID_union ||
+     expr.id()==ID_compound_literal ||
      expr.id()==ID_comma)
     return true;
 
@@ -202,6 +200,7 @@ void goto_convertt::clean_expr(
   //   object constructors like arrays, string constants, structs
   //   ++ --
   //   compound assignments
+  //   compound literals
 
   if(!needs_cleaning(expr)) return;
 
@@ -424,6 +423,12 @@ void goto_convertt::clean_expr(
       throw "no side-effects in quantified expressions allowed";
     return;
   }
+  else if(expr.id()==ID_address_of)
+  {
+    assert(expr.operands().size()==1);
+    address_of_replace_objects(expr.op0(), dest);
+    return;
+  }
 
   // TODO: evaluation order
 
@@ -434,10 +439,11 @@ void goto_convertt::clean_expr(
   {
     remove_side_effect(to_side_effect_expr(expr), dest, result_is_used);
   }
-  else if(expr.id()==ID_address_of)
+  else if(expr.id()==ID_compound_literal)
   {
+    // This is simply replaced by the literal
     assert(expr.operands().size()==1);
-    address_of_replace_objects(expr.op0(), dest);
+    expr=expr.op0();
   }
 }
 
@@ -457,16 +463,27 @@ void goto_convertt::address_of_replace_objects(
   exprt &expr,
   goto_programt &dest)
 {
-  if(expr.id()==ID_struct)
-    expr=make_static_symbol(expr, "struct", dest);
-  else if(expr.id()==ID_union)
-    expr=make_static_symbol(expr, "union", dest);
-  else if(expr.id()==ID_array)
-    expr=make_static_symbol(expr, "array", dest);
+  if(expr.id()==ID_compound_literal)
+  {
+    assert(expr.operands().size()==1);
+    clean_expr(expr.op0(), dest);
+    expr=make_static_symbol(expr.op0(), "literal", dest);
+  }
   else if(expr.id()==ID_string_constant)
   {
     // Leave for now, but long-term these might become static symbols.
     // LLVM appears to do precisely that.
+  }
+  else if(expr.id()==ID_index)
+  {
+    assert(expr.operands().size()==2);
+    address_of_replace_objects(expr.op0(), dest);
+    clean_expr(expr.op1(), dest);
+  }
+  else if(expr.id()==ID_dereference)
+  {
+    assert(expr.operands().size()==1);
+    clean_expr(expr.op0(), dest);
   }
   else
     Forall_operands(it, expr)

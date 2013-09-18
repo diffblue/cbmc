@@ -1057,8 +1057,9 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
     throw 0;
   }
 
-  // We allow (TYPE){ expression }
-  // This is called "compound literal".
+  // We allow (TYPE){ initializer_list }
+  // This is called "compound literal", and is syntactic
+  // sugar for a (possibly local) declaration.
   if(op.id()==ID_initializer_list)
   {
     // just do a normal initialization
@@ -1068,11 +1069,10 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
     // union-expression, array-expression,
     // or an expression for a pointer or scalar.
     // We produce a compound_literal expression.
-
-    
-    exprt tmp=op;
+    exprt tmp(ID_compound_literal, expr_type);
+    tmp.move_to_operands(op);
     expr=tmp;
-    expr.set(ID_C_lvalue, true);
+    expr.set(ID_C_lvalue, true); // these are l-values
     return;
   }
   
