@@ -19,7 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
-Function: goto_convertt::make_static_symbol
+Function: goto_convertt::make_compound_literal
 
   Inputs:
 
@@ -29,9 +29,8 @@ Function: goto_convertt::make_static_symbol
 
 \*******************************************************************/
 
-symbol_exprt goto_convertt::make_static_symbol(
+symbol_exprt goto_convertt::make_compound_literal(
   const exprt &expr,
-  const std::string &suffix,
   goto_programt &dest)
 {
   const locationt location=expr.find_location();
@@ -41,7 +40,9 @@ symbol_exprt goto_convertt::make_static_symbol(
   
   do
   {
-    new_symbol.base_name="static_"+suffix+"$"+i2string(++temporary_counter);
+    // The lifetime of compound literals is really that of
+    // the block they are in.
+    new_symbol.base_name="literal$"+i2string(++temporary_counter);
     new_symbol.name=tmp_symbol_prefix+id2string(new_symbol.base_name);
     new_symbol.is_lvalue=true;
     new_symbol.is_thread_local=false;
@@ -467,7 +468,7 @@ void goto_convertt::address_of_replace_objects(
   {
     assert(expr.operands().size()==1);
     clean_expr(expr.op0(), dest);
-    expr=make_static_symbol(expr.op0(), "literal", dest);
+    expr=make_compound_literal(expr.op0(), dest);
   }
   else if(expr.id()==ID_string_constant)
   {
