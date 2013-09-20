@@ -788,13 +788,14 @@ ieee_floatt &ieee_floatt::operator += (const ieee_floatt &other)
     return *this;
   }
 
+  // 0 + 0 needs special treatment for the signs
   if(is_zero() && other.is_zero())
   { 
-    if(get_sign() == other.get_sign())
+    if(get_sign()==other.get_sign())
       return *this;
     else 
     {
-      if(rounding_mode == ROUND_TO_MINUS_INF)
+      if(rounding_mode==ROUND_TO_MINUS_INF)
       {
         set_sign(true);
         return *this;      
@@ -826,8 +827,16 @@ ieee_floatt &ieee_floatt::operator += (const ieee_floatt &other)
   
   fraction+=_other.fraction;
   
-  // on zero, retain original sign
-  if(fraction!=0)
+  // if the result is zero,
+  // there is some set of rules to get the sign
+  if(fraction==0)
+  {
+    if(rounding_mode==ROUND_TO_MINUS_INF)
+      sign_flag=true;
+    else
+      sign_flag=false;
+  }
+  else // fraction!=0
   {
     sign_flag=(fraction<0);
     if(sign_flag) fraction.negate();
