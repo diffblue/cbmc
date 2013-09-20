@@ -1974,7 +1974,7 @@ void weak_memory(
 
   unsigned max_thds = 0;
   instrumentert instrumenter(symbol_table, goto_functions);
-  max_thds=instrumenter.goto2graph_cfg(value_sets, model, no_dependencies);
+  max_thds=instrumenter.build_event_graph(value_sets, model, no_dependencies);
   std::cout<<"abstraction completed"<<std::endl;
 
   // collects cycles, directly or by SCCs
