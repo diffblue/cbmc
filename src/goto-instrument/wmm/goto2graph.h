@@ -17,6 +17,7 @@ Date: 2012
 #include <util/namespace.h>
 
 #include <goto-programs/goto_program.h>
+#include <goto-programs/cfg.h>
 
 #include "event_graph.h"
 #include "wmm.h"
@@ -81,136 +82,91 @@ protected:
     memory_modelt model,
     bool hide_internals);
 
-  typedef std::set<goto_programt::instructiont::targett> target_sett;
-
 public:
-  class cfg_visitort 
+  /* forward traversal of program */
+  typedef std::list<unsigned> nodest;
+  struct thread_eventst
   {
-  protected: 
-    const namespacet& ns;
-    instrumentert& instrumenter;
-
-    /* pointer to the egraph(s) that we construct */
-    event_grapht& egraph;
-    std::vector<std::set<unsigned> >& egraph_SCCs;    
-    graph<abstract_eventt>& egraph_alt;  
-
-    /* for thread marking (dynamic) */
-    unsigned current_thread;
-    unsigned coming_from;
-
-    /* transformers */
-    void visit_cfg_thread() const;
-    void visit_cfg_propagate(goto_programt::instructionst::iterator i_it);
-    void visit_cfg_assign(value_setst& value_sets,
-      goto_programt::instructionst::iterator& i_it, bool no_dependencies);
-    void visit_cfg_fence(goto_programt::instructionst::iterator i_it);
-    void visit_cfg_skip(goto_programt::instructionst::iterator i_it);
-    void visit_cfg_lwfence(goto_programt::instructionst::iterator i_it);
-    void visit_cfg_asm_fence(goto_programt::instructionst::iterator i_it);
-    void visit_cfg_function_call(value_setst& value_sets, 
-      goto_programt::instructionst::iterator i_it, 
-      memory_modelt model,
-      bool no_dependencies);
-    void visit_cfg_goto(goto_programt::instructionst::iterator i_it);
-
- public:
-    virtual ~cfg_visitort()
-    {
-    }
-
-    unsigned max_thread;
-
-    /* relations between irep and Reads/Writes */
-    typedef std::multimap<irep_idt,unsigned> id2nodet;
-    typedef std::pair<irep_idt,unsigned> id2node_pairt;
-    id2nodet map_reads, map_writes;
-
-    unsigned write_counter;
-    unsigned read_counter;
-
-    /* previous nodes (fwd analysis) */
-    typedef std::pair<unsigned,unsigned> nodet;
-    typedef std::map<goto_programt::instructiont::targett,std::set<nodet> > 
-      incoming_post;
-
-    incoming_post in_pos;
-    std::set<goto_programt::instructiont::targett> updated;
-
-    /* "next nodes" (bwd steps in fwd/bck analysis) */
-    incoming_post out_pos;    
-
-    #define add_all_pos(it, target, source) \
-    for(std::set<nodet>::const_iterator \
-      it=(source).begin(); \
-      it!=(source).end(); ++it) \
-      (target).insert(*it);
-
-    /* current thread number */
-    unsigned thread;
-
-    /* dependencies */
-    data_dpt data_dp;
-
-    /* set of functions visited so far -- we don't handle recursive functions */
-    std::set<irep_idt> functions_met;
-
-    cfg_visitort(const namespacet& _ns, instrumentert& _instrumenter)
-    :ns(_ns), instrumenter(_instrumenter), egraph(_instrumenter.egraph),
-      egraph_SCCs(_instrumenter.egraph_SCCs), 
-      egraph_alt(_instrumenter.egraph_alt)
-    {
-      write_counter = 0;
-      read_counter = 0;
-      thread = 0;
-      current_thread = 0;
-      max_thread = 0;
-      coming_from = 0;
-    }
-
-    void inline enter_function(const irep_idt& function)
-    {
-      if(functions_met.find(function)!=functions_met.end())
-        throw ("Sorry, doesn't handle recursive function for the moment");
-      functions_met.insert(function);
-    }
-
-    void inline leave_function(const irep_idt& function)
-    {
-      functions_met.erase(function);
-    }
-
-    void inline visit_cfg(
-      value_setst &value_sets,
-      memory_modelt model,
-      bool no_dependencies,
-      const irep_idt& function)
-    {
-      /* forbids recursive function */
-      enter_function(function);
-      const std::set<nodet> empty_in;
-      std::set<nodet> end_out;
-      visit_cfg_function(value_sets, model, no_dependencies, function,
-        empty_in, end_out);
-      leave_function(function);
-    }
-
-    // TODO: move the visitor outside, and inherit
-    virtual void visit_cfg_function(
-      /* value_sets and options */
-      value_setst& value_sets,
-      memory_modelt model,
-      bool no_dependencies,
-      /* functino to analyse */
-      const irep_idt& function,
-      /* incoming edges */
-      const std::set<nodet>& initial_vertex,
-      /* outcoming edges */
-      std::set<nodet>& ending_vertex);
-
-    bool inline local(const irep_idt& i);
+    nodest reads;
+    nodest writes;
+    nodest fences;
   };
 
+  struct event_datat
+  {
+    std::map<unsigned, thread_eventst> events;
+    std::set<goto_programt::const_targett> use_events_from;
+  };
+
+  /* per-thread control flow graph only, no inter-thread edges */
+  typedef cfg_baset<event_datat> cfgt;
+  cfgt cfg;
+
+protected:
+  /* for thread marking (dynamic) */
+  unsigned max_thread;
+  /* current thread number */
+  unsigned thread;
+
+  /* relations between irep and Reads/Writes */
+  typedef std::multimap<irep_idt,unsigned> id2nodet;
+  typedef std::pair<irep_idt,unsigned> id2node_pairt;
+  id2nodet map_reads, map_writes;
+
+  /* dependencies */
+  data_dpt data_dp;
+
+  /* set of functions visited so far -- we don't handle recursive functions */
+  std::set<irep_idt> functions_met;
+
+  /* transformers */
+  void extract_events_rw(
+    value_setst& value_sets,
+    memory_modelt model,
+    bool no_dependencies,
+    goto_programt::const_targett target,
+    thread_eventst &dest);
+  void extract_events_fence(
+    memory_modelt model,
+    goto_programt::const_targett target,
+    thread_eventst &dest);
+  void extract_events(
+    value_setst& value_sets,
+    memory_modelt model,
+    bool no_dependencies,
+    cfgt::entryt &cfg_entry);
+
+  void add_po_edges(
+    const nodest &from_events,
+    const unsigned event_node,
+    const unsigned event_gnode,
+    const bool is_backward);
+  void add_po_edges(
+    const unsigned thread_nr,
+    const cfgt::entryt &from,
+    const cfgt::entryt &to,
+    const unsigned event_node,
+    const unsigned event_gnode);
+  void add_po_edges(
+    const cfgt::entryt &cfg_entry,
+    const unsigned thread_nr,
+    const unsigned event_node);
+  void add_po_edges(
+    const cfgt::entryt &cfg_entry,
+    const unsigned thread_nr,
+    const thread_eventst &thread_events);
+  void add_edges_assign(
+    const cfgt::entryt &cfg_entry,
+    const thread_eventst &thread_events);
+  void add_com_edges(
+    const cfgt::entryt &cfg_entry,
+    const thread_eventst &thread_events);
+  void add_edges(
+    const cfgt::entryt &cfg_entry,
+    const unsigned thread_nr,
+    const thread_eventst &thread_events);
+
+public:
   /* graph */
   event_grapht egraph;
 
@@ -234,13 +190,34 @@ public:
 
   instrumentert(symbol_tablet& _symbol_table, goto_functionst& _goto_f)
     :ns(_symbol_table), goto_functions(_goto_f), render_po_aligned(true), 
-      render_by_file(false), render_by_function(false)
+      render_by_file(false), render_by_function(false),
+    max_thread(0),
+    thread(0),
+    write_counter(0),
+    read_counter(0)
   {
   }
 
   /* abstracts goto-programs in abstract event graph, and computes
      the thread numbering and returns the max number */
-  unsigned goto2graph_cfg(
+  unsigned write_counter;
+  unsigned read_counter;
+
+  void forward_traverse_once(
+    value_setst& value_sets,
+    memory_modelt model,
+    bool no_dependencies,
+    goto_programt::const_targett target);
+  void forward_traverse_once(
+    value_setst& value_sets,
+    memory_modelt model,
+    bool no_dependencies);
+
+  void propagate_events_in_po();
+
+  void add_edges();
+
+  unsigned build_event_graph(
     value_setst& value_sets,
     memory_modelt model,
     bool no_dependencies);
