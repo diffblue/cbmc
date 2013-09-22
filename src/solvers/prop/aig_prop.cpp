@@ -176,7 +176,7 @@ Function: aig_prop_baset::lnand
 
 literalt aig_prop_baset::lnand(literalt a, literalt b)
 {
-  return land(a, b).negation();
+  return !land(a, b);
 }
 
 /*******************************************************************\
@@ -193,7 +193,7 @@ Function: aig_prop_baset::lnor
 
 literalt aig_prop_baset::lnor(literalt a, literalt b)
 {
-  return lor(a, b).negation();
+  return !lor(a, b);
 }
 
 /*******************************************************************\
@@ -210,7 +210,7 @@ Function: aig_prop_baset::lequal
 
 literalt aig_prop_baset::lequal(literalt a, literalt b)
 {
-  return lxor(a, b).negation();
+  return !lxor(a, b);
 }
 
 /*******************************************************************\
@@ -346,6 +346,7 @@ void aig_prop_solvert::convert_aig()
   while(solver.no_variables()<=aig.nodes.size())
     solver.new_variable();
 
+  #if 0
   // Get phases
   std::vector<bool> n_pos, n_neg;
   n_pos.resize(aig.nodes.size(), false);
@@ -365,26 +366,82 @@ void aig_prop_solvert::convert_aig()
     literalt l=queue.top();
     queue.pop();
 
+    if(l.is_constant()) continue;
+
     bool sign=l.sign();
     unsigned var_no=l.var_no();
-
+    
+    // already set?
+    if(sign?n_neg[var_no]:n_pos[var_no]) continue; // done already
+    
+    // set
+    sign?n_neg[var_no]=1:n_pos[var_no]=1;
+    
     const aigt::nodet &node=aig.nodes[var_no];
 
     if(node.is_and())
     {
-      literalt l_a=node.a^sign;
-      literalt l_b=node.b^sign;
-      //queue.push(aig.node.a^sign);
+      queue.push(node.a^sign);
+      queue.push(node.b^sign);
     }    
-    
-    /*
-    if()
-      n_neg[var_no]=true;
-    else
-      n_pos[var_no]=true;
-    */
   }  
+  
+  // Count
+  unsigned pos_only=0, neg_only=0, mixed=0;
+  
+  for(unsigned n=0; n<aig.nodes.size(); n++)
+  {
+    if(aig.nodes[n].is_and())
+    {
+      if(n_neg[n] && n_pos[n])
+        mixed++;
+      else if(n_pos[n])
+        pos_only++;
+      else if(n_neg[n])
+        neg_only++;
+    }
+  }
+  
+  statistics() << "Pos only: " << pos_only << "\n"
+               << "Neg only: " << neg_only << "\n"
+               << "Mixed: " << mixed << eom;
 
+  for(unsigned n=0; n<aig.nodes.size(); n++)
+  {
+    const aigt::nodet &node=aig.nodes[n];
+
+    if(node.is_and())
+    {
+      literalt o=literalt(n, false);
+      literalt a=node.a;
+      literalt b=node.b;
+      
+      if(n_pos[n])
+      {
+        bvt lits(2);
+
+        lits[0]=pos(a);
+        lits[1]=neg(o);
+        solver.lcnf(lits);
+
+        lits[0]=pos(b);
+        lits[1]=neg(o);
+        solver.lcnf(lits);
+      }
+
+      if(n_neg[n])
+      {
+        bvt lits(3);
+        lits[0]=neg(a);
+        lits[1]=neg(b);
+        lits[2]=pos(o);
+        solver.lcnf(lits);
+      }
+    }
+  }
+
+  #else
+            
   // 2. Do nodes
 
   for(unsigned n=0; n<aig.nodes.size(); n++)
@@ -415,6 +472,7 @@ void aig_prop_solvert::convert_aig()
       solver.lcnf(lits);
     }
   }
+  #endif
   
   // 3. Do constraints
   
