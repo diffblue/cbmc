@@ -171,6 +171,13 @@ public:
   {
     return (unsigned(-2)<<1)>>1;
   }
+  
+  inline literalt operator^(bool b) const
+  {
+    literalt result=*this;
+    result.l^=b;
+    return result;
+  }
 
 protected:
   unsigned l;  
