@@ -57,10 +57,10 @@ public:
   
   // also add
   //
-  //   bool merge(const T &b, locationt to);
+  //   bool merge(const T &b, locationt from, locationt to);
   //
-  // this computes the join between "this" and "b"
-  // return true if "this" has changed
+  // This computes the join between "this" and "b".
+  // Return true if "this" has changed.
 };
 
 // don't use me -- I am just a base class
@@ -83,12 +83,16 @@ public:
     const goto_programt &goto_program)
   {
     goto_functionst goto_functions;
+    initialize(goto_program);
+    entry_point(goto_program);
     fixedpoint(goto_program, goto_functions);
   }
     
   inline void operator()(
     const goto_functionst &goto_functions)
   {
+    initialize(goto_functions);
+    entry_point(goto_functions);
     fixedpoint(goto_functions);      
   }
 
@@ -126,14 +130,15 @@ protected:
     working_set.insert(
       std::pair<unsigned, locationt>(l->location_number, l));
   }
+  
+  void initialize(const goto_programt &);
+  void initialize(const goto_functionst &);
+  void entry_point(const goto_programt &);
+  void entry_point(const goto_functionst &);
 
   // true = found s.th. new
   bool fixedpoint(
     const goto_programt &goto_program,
-    const goto_functionst &goto_functions);
-    
-  bool fixedpoint(
-    goto_functionst::function_mapt::const_iterator it,
     const goto_functionst &goto_functions);
     
   void fixedpoint(
@@ -152,34 +157,28 @@ protected:
     return l;
   }
   
-  typedef std::set<irep_idt> functions_donet;
-  functions_donet functions_done;
-
   typedef std::set<irep_idt> recursion_sett;
   recursion_sett recursion_set;
     
   // function calls
-  void do_function_call_rec(
+  bool do_function_call_rec(
     locationt l_call, locationt l_return,
     const exprt &function,
     const exprt::operandst &arguments,
-    statet &new_state,
     const goto_functionst &goto_functions);
 
-  void do_function_call(
+  bool do_function_call(
     locationt l_call, locationt l_return,
     const goto_functionst &goto_functions,
     const goto_functionst::function_mapt::const_iterator f_it,
-    const exprt::operandst &arguments,
-    statet &new_state);
+    const exprt::operandst &arguments);
 
   // abstract methods
     
-  virtual bool merge(statet &a, const statet &b, locationt to)=0;  
-  virtual void generate_state(locationt l)=0;
+  virtual bool merge(const statet &src, locationt from, locationt to)=0;
   virtual statet &get_state(locationt l)=0;
-  virtual const statet &get_state(locationt l) const=0;
-  virtual statet* make_temporary_state(statet &s)=0;
+  virtual const statet &find_state(locationt l) const=0;
+  virtual statet* make_temporary_state(const statet &s)=0;
 };
 
 // T is expected to be derived from domain_baset
@@ -219,38 +218,34 @@ protected:
   typedef std::map<locationt, T> state_mapt;
   state_mapt state_map;
 
+  // this one creates states
   virtual statet &get_state(locationt l)
   {
-    typename state_mapt::iterator it=state_map.find(l);
-    if(it==state_map.end()) throw "failed to find state";
-    return it->second;
+    return state_map[l]; // create if need be
   }
 
-  virtual const statet &get_state(locationt l) const
+  // this one just finds states
+  virtual const statet &find_state(locationt l) const
   {
     typename state_mapt::const_iterator it=state_map.find(l);
     if(it==state_map.end()) throw "failed to find state";
     return it->second;
   }
 
-  virtual bool merge(statet &a, const statet &b, locationt to)
+  virtual bool merge(const statet &src, locationt from, locationt to)
   {
-    return static_cast<T &>(a).merge(static_cast<const T &>(b), to);
+    statet &dest=get_state(to);
+    return static_cast<T &>(dest).merge(static_cast<const T &>(src), from, to);
   }
   
-  virtual statet *make_temporary_state(statet &s)
+  virtual statet *make_temporary_state(const statet &s)
   {
-    return new T(static_cast<T &>(s));
-  }
-
-  virtual void generate_state(locationt l)
-  {
-    state_map[l];
+    return new T(static_cast<const T &>(s));
   }
 
 private:  
-  // to enforce that T is derived from domain_baset
-  void dummy(const T &s) { const statet &x=dummy1(s); }
+  // to enforce that T is derived from ai_domain_baset
+  void dummy(const T &s) { const statet &x=s; }
 };
 
 #endif
