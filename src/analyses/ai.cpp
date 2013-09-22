@@ -70,11 +70,98 @@ void ai_baset::output(
     out << "**** " << i_it->location_number << " "
         << i_it->location << "\n";
 
-    get_state(i_it).output(ns, out);
+    find_state(i_it).output(ns, out);
     out << "\n";
     goto_program.output_instruction(ns, identifier, out, i_it);
     out << "\n";
   }
+}
+
+/*******************************************************************\
+
+Function: ai_baset::initialize
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void ai_baset::initialize(const goto_programt &goto_program)
+{
+  forall_goto_program_instructions(i_it, goto_program)
+    get_state(i_it);
+}
+
+/*******************************************************************\
+
+Function: ai_baset::initialize
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void ai_baset::initialize(const goto_functionst &goto_functions)
+{
+  for(goto_functionst::function_mapt::const_iterator
+      it=goto_functions.function_map.begin();
+      it!=goto_functions.function_map.end();
+      it++)
+  {
+    initialize(it->second.body);
+  }
+}
+
+/*******************************************************************\
+
+Function: ai_baset::entry_point
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: entry point for single-function analysis
+
+\*******************************************************************/
+
+void ai_baset::entry_point(const goto_programt &goto_program)
+{
+  if(!goto_program.instructions.empty())
+    get_state(goto_program.instructions.begin()).make_entry_state();
+}
+
+/*******************************************************************\
+
+Function: ai_baset::entry_point
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: entry point for a full program
+
+\*******************************************************************/
+
+void ai_baset::entry_point(const goto_functionst &goto_functions)
+{
+  // which function is the entry point?
+  
+  irep_idt entry_point_function=
+    goto_functions.entry_point();
+    
+  // do we have it?
+  
+  goto_functionst::function_mapt::const_iterator f_it=
+    goto_functions.function_map.find(entry_point_function);
+  
+  if(f_it!=goto_functions.function_map.end())
+    entry_point(f_it->second.body);
 }
 
 /*******************************************************************\
@@ -179,33 +266,36 @@ bool ai_baset::visit(
       make_temporary_state(current));
   
     statet &new_values=*tmp_state;
+    
+    bool have_new_values=false;
 
-    if(l->is_function_call())
+    if(l->is_function_call() &&
+       !goto_functions.function_map.empty())
     {
       // this is a big special case
       const code_function_callt &code=
         to_code_function_call(l->code);
 
-      do_function_call_rec(
-        l, to_l,
-        code.function(),
-        code.arguments(),
-        new_values,
-        goto_functions);
+      if(do_function_call_rec(
+          l, to_l,
+          code.function(),
+          code.arguments(),
+          goto_functions))
+        have_new_values=true;
     }
     else
+    {
       new_values.transform(ns, l, to_l);
     
-    statet &other=get_state(to_l);
-
-    bool have_new_values=
-      merge(other, new_values, to_l);
+      if(merge(new_values, l, to_l))
+        have_new_values=true;
+    }
   
     if(have_new_values)
+    {
       new_data=true;
-  
-    if(have_new_values)
       put_in_working_set(working_set, to_l);
+    }
   }
   
   return new_data;
@@ -223,68 +313,52 @@ Function: ai_baset::do_function_call
 
 \*******************************************************************/
 
-void ai_baset::do_function_call(
+bool ai_baset::do_function_call(
   locationt l_call, locationt l_return,
   const goto_functionst &goto_functions,
   const goto_functionst::function_mapt::const_iterator f_it,
-  const exprt::operandst &arguments,
-  statet &new_state)
+  const exprt::operandst &arguments)
 {
-  const goto_functionst::goto_functiont &goto_function=f_it->second;
+  const goto_functionst::goto_functiont &goto_function=
+    f_it->second;
 
   if(!goto_function.body_available)
-    return; // do nothing
+    return false; // do nothing, no change
     
   assert(!goto_function.body.instructions.empty());
-
+  
   {
     // get the state at the beginning of the function
     locationt l_begin=goto_function.body.instructions.begin();
     
     // do the edge from the call site to the beginning of the function
-    new_state.transform(ns, l_call, l_begin);  
+    std::auto_ptr<statet> state(make_temporary_state(get_state(l_call)));
+
+    state->transform(ns, l_call, l_begin);  
     
-    statet &begin_state=get_state(l_begin);
-
-    bool new_data=false;
-
     // merge the new stuff
-    if(merge(begin_state, new_state, l_begin))
-      new_data=true;
-
-    // do each function at least once
-    if(functions_done.find(f_it->first)==
-       functions_done.end())
+    if(merge(*state, l_call, l_begin))
     {
-      new_data=true;
-      functions_done.insert(f_it->first);
-    }
-
-    // do we need to do the fixedpoint of the body?
-    if(new_data)
-    {
-      // recursive call
+      // also do the fixedpoint of the body via a recursive call
       fixedpoint(goto_function.body, goto_functions);
     }
   }
 
   {
-    // get location at end of procedure
+    // get location at end of the procedure we have called
     locationt l_end=--goto_function.body.instructions.end();
-
     assert(l_end->is_end_function());
-
-    statet &end_of_function=get_state(l_end);
 
     // do edge from end of function to instruction after call
     locationt l_next=l_call;
     l_next++;
-    end_of_function.transform(ns, l_end, l_next);
 
-    // propagate those -- not exceedingly precise, this is,
-    // as still it contains all the state from the
-    // call site
-    merge(new_state, end_of_function, l_end);
+    std::auto_ptr<statet> state(make_temporary_state(get_state(l_end)));
+
+    state->transform(ns, l_end, l_next);
+
+    // Propagate those -- not exceedingly precise, this is.
+    return merge(*state, l_end, l_next);
   }
 }    
 
@@ -300,16 +374,15 @@ Function: ai_baset::do_function_call_rec
 
 \*******************************************************************/
 
-void ai_baset::do_function_call_rec(
+bool ai_baset::do_function_call_rec(
   locationt l_call, locationt l_return,
   const exprt &function,
   const exprt::operandst &arguments,
-  statet &new_state,
   const goto_functionst &goto_functions)
 {
-  // see if we have the functions at all
-  if(goto_functions.function_map.empty())
-    return;
+  assert(!goto_functions.function_map.empty());
+  
+  bool new_data=false;
 
   if(function.id()==ID_symbol)
   {
@@ -318,7 +391,7 @@ void ai_baset::do_function_call_rec(
     if(recursion_set.find(identifier)!=recursion_set.end())
     {
       // recursion detected!
-      return;
+      return new_data;
     }
     else
       recursion_set.insert(identifier);
@@ -329,12 +402,11 @@ void ai_baset::do_function_call_rec(
     if(it==goto_functions.function_map.end())
       throw "failed to find function "+id2string(identifier);
     
-    do_function_call(
+    new_data=do_function_call(
       l_call, l_return,
       goto_functions,
       it,
-      arguments,
-      new_state);
+      arguments);
     
     recursion_set.erase(identifier);
   }
@@ -343,23 +415,22 @@ void ai_baset::do_function_call_rec(
     if(function.operands().size()!=3)
       throw "if takes three arguments";
     
-    std::auto_ptr<statet> n2(make_temporary_state(new_state));
-    
-    do_function_call_rec(
-      l_call, l_return,
-      function.op1(),
-      arguments,
-      new_state,
-      goto_functions);
+    bool new_data1=
+      do_function_call_rec(
+        l_call, l_return,
+        function.op1(),
+        arguments,
+        goto_functions);
 
-    do_function_call_rec(
-      l_call, l_return,
-      function.op2(),
-      arguments,
-      *n2,
-      goto_functions);
-      
-    merge(new_state, *n2, l_return);
+    bool new_data2=
+      do_function_call_rec(
+        l_call, l_return,
+        function.op2(),
+        arguments,
+        goto_functions);
+
+    if(new_data1 || new_data2)
+      new_data=true;
   }
   else if(function.id()==ID_dereference)
   {
@@ -379,6 +450,8 @@ void ai_baset::do_function_call_rec(
     throw "unexpected function_call argument: "+
       function.id_string();
   }
+  
+  return new_data;
 }
 
 /*******************************************************************\
@@ -402,29 +475,5 @@ void ai_baset::fixedpoint(
       it=goto_functions.function_map.begin();
       it!=goto_functions.function_map.end();
       it++)
-    if(functions_done.find(it->first)==
-       functions_done.end())
-    {
-      fixedpoint(it, goto_functions);
-    }
-}
-
-/*******************************************************************\
-
-Function: ai_baset::fixedpoint
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-bool ai_baset::fixedpoint(
-  const goto_functionst::function_mapt::const_iterator it,
-  const goto_functionst &goto_functions)
-{
-  functions_done.insert(it->first);
-  return fixedpoint(it->second.body, goto_functions);
+    fixedpoint(it->second.body, goto_functions);
 }
