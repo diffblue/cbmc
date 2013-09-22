@@ -32,20 +32,6 @@ public:
     set(v, sign);
   }
 
-  class literalt negation() const
-  {
-    literalt result(*this);
-    result.invert();
-    return result;
-  }
-  
-  class literalt cond_negation(bool cond) const
-  {
-    literalt result(*this);
-    result.cond_invert(cond);
-    return result;
-  }
-  
   friend inline bool operator ==(const literalt a, const literalt b)
   {
     return a.l==b.l;
@@ -61,7 +47,30 @@ public:
   {
     return a.l<b.l;
   }
-  
+
+  // negates if 'b' is true  
+  friend inline literalt operator^(const literalt a, const bool b)
+  {
+    literalt result=a;
+    result.l^=b;
+    return result;
+  }
+
+  // negates the literal
+  friend inline literalt operator!(const literalt a)
+  {
+    literalt result(a);
+    result.invert();
+    return result;
+  }
+
+  inline literalt operator^=(const bool a)
+  {
+    // we use the least significant bit to store the sign
+    l^=a;
+    return *this;
+  }
+
   inline unsigned var_no() const
   {
     return l>>1;
@@ -90,11 +99,6 @@ public:
   inline void invert()
   {
     l^=1;
-  }
-  
-  inline void cond_invert(bool a)
-  {
-    l^=(a?1:0);
   }
 
   //
@@ -159,7 +163,7 @@ public:
     return var_no()==const_var_no();
   }
 
-  friend inline literalt neg(literalt a) { return a.negation(); }
+  friend inline literalt neg(literalt a) { return !a; }
   friend inline literalt pos(literalt a) { return a; }
 
   static inline unsigned const_var_no()
@@ -172,13 +176,6 @@ public:
     return (unsigned(-2)<<1)>>1;
   }
   
-  inline literalt operator^(bool b) const
-  {
-    literalt result=*this;
-    result.l^=b;
-    return result;
-  }
-
 protected:
   unsigned l;  
 };

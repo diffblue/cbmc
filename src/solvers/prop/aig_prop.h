@@ -79,7 +79,7 @@ public:
   virtual void lcnf(const bvt &clause);
   virtual void l_set_to(literalt a, bool value)
   {
-    constraints.push_back(a.cond_negation(!value));
+    constraints.push_back(a^!value);
   }
 };
 
