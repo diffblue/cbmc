@@ -7,6 +7,7 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <set>
+#include <stack>
 
 #include "aig_prop.h"
 
@@ -344,6 +345,45 @@ void aig_prop_solvert::convert_aig()
   
   while(solver.no_variables()<=aig.nodes.size())
     solver.new_variable();
+
+  // Get phases
+  std::vector<bool> n_pos, n_neg;
+  n_pos.resize(aig.nodes.size(), false);
+  n_neg.resize(aig.nodes.size(), false);
+
+  std::stack<literalt> queue;
+
+  // Get phases of constraints
+  for(constraintst::const_iterator
+      c_it=constraints.begin();
+      c_it!=constraints.end();
+      c_it++)
+    queue.push(*c_it);
+
+  while(!queue.empty())
+  {
+    literalt l=queue.top();
+    queue.pop();
+
+    bool sign=l.sign();
+    unsigned var_no=l.var_no();
+
+    const aigt::nodet &node=aig.nodes[var_no];
+
+    if(node.is_and())
+    {
+      literalt l_a=node.a^sign;
+      literalt l_b=node.b^sign;
+      //queue.push(aig.node.a^sign);
+    }    
+    
+    /*
+    if()
+      n_neg[var_no]=true;
+    else
+      n_pos[var_no]=true;
+    */
+  }  
 
   // 2. Do nodes
 
