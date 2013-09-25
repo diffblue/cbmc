@@ -31,11 +31,6 @@ public:
   
   typedef goto_programt::const_targett locationt;
   
-  // produce initial state
-  virtual void make_entry_state()
-  {
-  }
-  
   // how function calls are treated:
   // a) there is an edge from each call site to the function head
   // b) there is an edge from each return to the last instruction (END_FUNCTION)
@@ -45,12 +40,10 @@ public:
   //    (for setting the LHS)
 
   virtual void transform(
-    const namespacet &ns,
     locationt from,
     locationt to)=0;
 
   virtual void output(
-    const namespacet &ns,
     std::ostream &out) const
   {
   }
@@ -71,7 +64,7 @@ public:
   typedef ai_domain_baset statet;
   typedef goto_programt::const_targett locationt;
 
-  explicit ai_baset(const namespacet &_ns):ns(_ns)
+  ai_baset()
   {
   }
   
@@ -84,7 +77,6 @@ public:
   {
     goto_functionst goto_functions;
     initialize(goto_program);
-    entry_point(goto_program);
     fixedpoint(goto_program, goto_functions);
   }
     
@@ -92,8 +84,15 @@ public:
     const goto_functionst &goto_functions)
   {
     initialize(goto_functions);
-    entry_point(goto_functions);
     fixedpoint(goto_functions);      
+  }
+
+  inline void operator()(
+    const goto_functionst::goto_functiont &goto_function)
+  {
+    goto_functionst goto_functions;
+    initialize(goto_function);
+    fixedpoint(goto_function.body, goto_functions);
   }
 
   virtual void clear()
@@ -101,20 +100,26 @@ public:
   }
   
   virtual void output(
+    const namespacet &ns,
     const goto_functionst &goto_functions,
     std::ostream &out) const;
 
   void output(
+    const namespacet &ns,
     const goto_programt &goto_program,
     std::ostream &out) const
   {
-    output(goto_program, "", out);
+    output(ns, goto_program, "", out);
   }
 
 protected:
-  const namespacet &ns;
-  
+  // overload to add a factory
+  virtual void initialize(const goto_programt &);
+  virtual void initialize(const goto_functionst::goto_functiont &);
+  virtual void initialize(const goto_functionst &);
+
   virtual void output(
+    const namespacet &ns,
     const goto_programt &goto_program,
     const irep_idt &identifier,
     std::ostream &out) const;
@@ -131,11 +136,6 @@ protected:
       std::pair<unsigned, locationt>(l->location_number, l));
   }
   
-  void initialize(const goto_programt &);
-  void initialize(const goto_functionst &);
-  void entry_point(const goto_programt &);
-  void entry_point(const goto_functionst &);
-
   // true = found s.th. new
   bool fixedpoint(
     const goto_programt &goto_program,
@@ -181,27 +181,26 @@ protected:
   virtual statet* make_temporary_state(const statet &s)=0;
 };
 
-// T is expected to be derived from domain_baset
-template<typename T>
+// domainT is expected to be derived from ai_domain_baseT
+template<typename domainT>
 class ait:public ai_baset
 {
 public:
   // constructor
-  explicit ait(const namespacet &_ns):
-    ai_baset(_ns)
+  ait():ai_baset()
   {
   }
 
   typedef goto_programt::const_targett locationt;
 
-  inline T &operator[](locationt l)
+  inline domainT &operator[](locationt l)
   {
     typename state_mapt::iterator it=state_map.find(l);
     if(it==state_map.end()) throw "failed to find state";
     return it->second;
   }
     
-  inline const T &operator[](locationt l) const
+  inline const domainT &operator[](locationt l) const
   {
     typename state_mapt::const_iterator it=state_map.find(l);
     if(it==state_map.end()) throw "failed to find state";
@@ -213,15 +212,15 @@ public:
     state_map.clear();
     ai_baset::clear();
   }
-  
+
 protected:
-  typedef std::map<locationt, T> state_mapt;
+  typedef std::map<locationt, domainT> state_mapt;
   state_mapt state_map;
 
-  // this one creates states
+  // this one creates states, if need be
   virtual statet &get_state(locationt l)
   {
-    return state_map[l]; // create if need be
+    return state_map[l]; // calls default constructor
   }
 
   // this one just finds states
@@ -235,17 +234,17 @@ protected:
   virtual bool merge(const statet &src, locationt from, locationt to)
   {
     statet &dest=get_state(to);
-    return static_cast<T &>(dest).merge(static_cast<const T &>(src), from, to);
+    return static_cast<domainT &>(dest).merge(static_cast<const domainT &>(src), from, to);
   }
   
   virtual statet *make_temporary_state(const statet &s)
   {
-    return new T(static_cast<const T &>(s));
+    return new domainT(static_cast<const domainT &>(s));
   }
 
 private:  
-  // to enforce that T is derived from ai_domain_baset
-  void dummy(const T &s) { const statet &x=s; }
+  // to enforce that domainT is derived from ai_domain_baset
+  void dummy(const domainT &s) { const statet &x=s; }
 };
 
 #endif

@@ -28,6 +28,7 @@ Function: ai_baset::output
 \*******************************************************************/
 
 void ai_baset::output(
+  const namespacet &ns,
   const goto_functionst &goto_functions,
   std::ostream &out) const
 {
@@ -43,7 +44,7 @@ void ai_baset::output(
       out << "////\n";
       out << "\n";
 
-      output(f_it->second.body, f_it->first, out);
+      output(ns, f_it->second.body, f_it->first, out);
     }
   }
 }
@@ -61,6 +62,7 @@ Function: ai_baset::output
 \*******************************************************************/
 
 void ai_baset::output(
+  const namespacet &ns,
   const goto_programt &goto_program,
   const irep_idt &identifier,
   std::ostream &out) const
@@ -70,11 +72,28 @@ void ai_baset::output(
     out << "**** " << i_it->location_number << " "
         << i_it->location << "\n";
 
-    find_state(i_it).output(ns, out);
+    find_state(i_it).output(out);
     out << "\n";
     goto_program.output_instruction(ns, identifier, out, i_it);
     out << "\n";
   }
+}
+
+/*******************************************************************\
+
+Function: ai_baset::initialize
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void ai_baset::initialize(const goto_functionst::goto_functiont &goto_function)
+{
+  initialize(goto_function.body);
 }
 
 /*******************************************************************\
@@ -113,55 +132,7 @@ void ai_baset::initialize(const goto_functionst &goto_functions)
       it=goto_functions.function_map.begin();
       it!=goto_functions.function_map.end();
       it++)
-  {
-    initialize(it->second.body);
-  }
-}
-
-/*******************************************************************\
-
-Function: ai_baset::entry_point
-
-  Inputs:
-
- Outputs:
-
- Purpose: entry point for single-function analysis
-
-\*******************************************************************/
-
-void ai_baset::entry_point(const goto_programt &goto_program)
-{
-  if(!goto_program.instructions.empty())
-    get_state(goto_program.instructions.begin()).make_entry_state();
-}
-
-/*******************************************************************\
-
-Function: ai_baset::entry_point
-
-  Inputs:
-
- Outputs:
-
- Purpose: entry point for a full program
-
-\*******************************************************************/
-
-void ai_baset::entry_point(const goto_functionst &goto_functions)
-{
-  // which function is the entry point?
-  
-  irep_idt entry_point_function=
-    goto_functions.entry_point();
-    
-  // do we have it?
-  
-  goto_functionst::function_mapt::const_iterator f_it=
-    goto_functions.function_map.find(entry_point_function);
-  
-  if(f_it!=goto_functions.function_map.end())
-    entry_point(f_it->second.body);
+    initialize(it->second);
 }
 
 /*******************************************************************\
@@ -285,7 +256,7 @@ bool ai_baset::visit(
     }
     else
     {
-      new_values.transform(ns, l, to_l);
+      new_values.transform(l, to_l);
     
       if(merge(new_values, l, to_l))
         have_new_values=true;
@@ -334,7 +305,7 @@ bool ai_baset::do_function_call(
     // do the edge from the call site to the beginning of the function
     std::auto_ptr<statet> state(make_temporary_state(get_state(l_call)));
 
-    state->transform(ns, l_call, l_begin);  
+    state->transform(l_call, l_begin);  
     
     // merge the new stuff
     if(merge(*state, l_call, l_begin))
@@ -355,7 +326,7 @@ bool ai_baset::do_function_call(
 
     std::auto_ptr<statet> state(make_temporary_state(get_state(l_end)));
 
-    state->transform(ns, l_end, l_next);
+    state->transform(l_end, l_next);
 
     // Propagate those -- not exceedingly precise, this is.
     return merge(*state, l_end, l_next);
