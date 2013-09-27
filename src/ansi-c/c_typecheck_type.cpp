@@ -467,34 +467,6 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
 
 /*******************************************************************\
 
-Function: alignment_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-static const typet &alignment_type(const typet &type)
-{
-  if(type.id()==ID_array)
-    return alignment_type(type.subtype());
-  else if(type.id()==ID_struct)
-  {
-    const struct_typet::componentst &components=
-      to_struct_type(type).components();
-
-    if(!components.empty())
-      return alignment_type(components.front().type());
-  }
-
-  return type;
-}
-
-/*******************************************************************\
-
 Function: c_typecheck_baset::typecheck_c_bit_field_type
 
   Inputs:
