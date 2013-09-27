@@ -257,7 +257,7 @@ protected:
 
 private:  
   // to enforce that T is derived from abstract_domain_baset
-  void dummy(const T &s) { const statet &x=dummy1(s); }
+  void dummy(const T &s) { const statet &x=dummy1(s); (void)x; }
 };
 
 #endif /*FLOW_INSENSITIVE_ANALYSIS_H_*/
