@@ -397,10 +397,10 @@ void boolbvt::convert_lambda(const exprt &expr, bvt &bv)
   {
     exprt counter=from_integer(i, counter_type);
 
-    exprt expr(expr.op1());
-    replace_expr(expr.op0(), counter, expr);
+    exprt expr_op1(expr.op1());
+    replace_expr(expr.op0(), counter, expr_op1);
 
-    const bvt &tmp=convert_bv(expr);
+    const bvt &tmp=convert_bv(expr_op1);
 
     unsigned offset=integer2long(i*tmp.size());
 
