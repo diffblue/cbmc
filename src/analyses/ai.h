@@ -244,7 +244,7 @@ protected:
 
 private:  
   // to enforce that domainT is derived from ai_domain_baset
-  void dummy(const domainT &s) { const statet &x=s; }
+  void dummy(const domainT &s) { const statet &x=s; (void)x; }
 };
 
 #endif
