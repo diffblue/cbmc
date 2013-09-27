@@ -61,7 +61,7 @@ void irep_hash_container_baset::pack(
 
   packed.reserve(
     1+1+sub.size()+named_sub.size()*2+
-    full?comments.size()*2:0);
+    (full?comments.size()*2:0));
   
   packed.push_back(irep_id_hash()(irep.id()));
 
