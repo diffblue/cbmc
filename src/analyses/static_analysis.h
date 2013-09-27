@@ -332,7 +332,7 @@ protected:
 
 private:  
   // to enforce that T is derived from domain_baset
-  void dummy(const T &s) { const statet &x=dummy1(s); }
+  void dummy(const T &s) { const statet &x=dummy1(s); (void)x; }
 };
 
 #endif
