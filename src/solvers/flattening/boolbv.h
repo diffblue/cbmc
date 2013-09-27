@@ -68,6 +68,8 @@ public:
     const exprt &expr,
     unsigned bit,
     literalt &literal) const;
+
+  using arrayst::literal;
     
   typedef enum { U_NONE, U_ALL, U_AUTO } unbounded_arrayt;
   unbounded_arrayt unbounded_array;
