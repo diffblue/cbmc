@@ -403,6 +403,7 @@ bool rd_range_domaint::gen(
     for(rangest::iterator it=ranges.begin();
         it!=ranges.end();
         ) // no ++it
+    {
       if(it->second.second!=from ||
          (it->second.first!=-1 && it->second.first <= range_start) ||
          (range_end!=-1 && it->first >= range_end))
@@ -425,6 +426,7 @@ bool rd_range_domaint::gen(
         it->second.first=range_end;
         return true;
       }
+    }
 
   ranges.insert(std::make_pair(
       range_start,
