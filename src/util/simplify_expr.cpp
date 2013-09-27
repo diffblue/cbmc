@@ -1615,6 +1615,7 @@ bool simplify_exprt::simplify_bitwise(exprt &expr)
     bool all_bool=true;
     
     forall_operands(it, expr)
+    {
       if(it->id()==ID_typecast &&
          it->operands().size()==1 &&
          ns.follow(it->op0().type()).id()==ID_bool)
@@ -1625,6 +1626,7 @@ bool simplify_exprt::simplify_bitwise(exprt &expr)
       }
       else
         all_bool=false;
+    }
         
     if(all_bool)
     {
