@@ -16,6 +16,7 @@ Date:   April 2010
 class goto_cc_cmdlinet:public cmdlinet
 {
 public:
+  using cmdlinet::parse;
   virtual bool parse(int argc, const char **argv)=0;
   
   static bool in_list(const char *option, const char **list);
