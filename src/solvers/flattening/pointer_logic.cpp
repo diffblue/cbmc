@@ -154,7 +154,7 @@ exprt pointer_logict::pointer_expr(
     return result;
   }
   
-  if(pointer.object>=objects.size() || pointer.object<0)
+  if(pointer.object>=objects.size())
   {
     constant_exprt result(type);
     result.set_value("INVALID-"+i2string(pointer.object));
