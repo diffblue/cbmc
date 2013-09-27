@@ -73,7 +73,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
-Function: goto_instrument_parseoptionst::set_verbosity
+Function: goto_instrument_parseoptionst::eval_verbosity
 
   Inputs:
 
@@ -83,7 +83,7 @@ Function: goto_instrument_parseoptionst::set_verbosity
 
 \*******************************************************************/
 
-void goto_instrument_parseoptionst::set_verbosity(messaget &message)
+void goto_instrument_parseoptionst::eval_verbosity()
 {
   int v=8;
   
@@ -96,7 +96,7 @@ void goto_instrument_parseoptionst::set_verbosity(messaget &message)
       v=9;
   }
   
-  message.set_verbosity(v);
+  set_verbosity(v);
 }
 
 /*******************************************************************\
@@ -125,7 +125,7 @@ int goto_instrument_parseoptionst::doit()
     return 0;
   }
   
-  set_verbosity(*this);
+  eval_verbosity();
 
   try
   {

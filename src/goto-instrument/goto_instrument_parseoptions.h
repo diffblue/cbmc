@@ -79,7 +79,7 @@ protected:
   void instrument_goto_program(
     goto_functionst &goto_functions);
     
-  void set_verbosity(messaget &message);
+  void eval_verbosity();
 };
 
 #endif
