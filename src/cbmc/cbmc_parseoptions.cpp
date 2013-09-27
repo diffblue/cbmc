@@ -84,7 +84,7 @@ Function: cbmc_parseoptionst::cbmc_parseoptionst
 
 /*******************************************************************\
 
-Function: cbmc_parseoptionst::set_verbosity
+Function: cbmc_parseoptionst::eval_verbosity
 
   Inputs:
 
@@ -94,7 +94,7 @@ Function: cbmc_parseoptionst::set_verbosity
 
 \*******************************************************************/
 
-void cbmc_parseoptionst::set_verbosity(messaget &message)
+void cbmc_parseoptionst::eval_verbosity()
 {
   // this is our default verbosity
   int v=messaget::M_STATISTICS;
@@ -108,7 +108,7 @@ void cbmc_parseoptionst::set_verbosity(messaget &message)
       v=10;
   }
   
-  message.set_verbosity(v);
+  set_verbosity(v);
 }
 
 /*******************************************************************\
@@ -343,8 +343,8 @@ int cbmc_parseoptionst::doit()
   get_command_line_options(options);
 
   bmct bmc(options, symbol_table, ui_message_handler);
-  set_verbosity(bmc);
-  set_verbosity(*this);
+  eval_verbosity();
+  bmc.set_verbosity(get_verbosity());
   
   if(cmdline.isset("preprocess"))
   {

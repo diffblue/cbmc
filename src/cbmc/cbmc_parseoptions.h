@@ -85,7 +85,7 @@ protected:
     
   bool set_properties(goto_functionst &goto_functions);
   
-  void set_verbosity(messaget &message);
+  void eval_verbosity();
   
   // get any additional stuff before finalizing
   virtual bool get_modules(bmct &bmc)
