@@ -166,6 +166,8 @@ public:
     if(symbol.is_thread_local) return false;
     if(has_prefix(id2string(id), CPROVER_PREFIX))
       return false;
+
+    return true;
   }
 
   irep_idt choice(const irep_idt &function, const std::string &suffix)
