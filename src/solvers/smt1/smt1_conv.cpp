@@ -2202,10 +2202,12 @@ void smt1_convt::convert_plus(const plus_exprt &expr)
       exprt integer_sum(ID_plus, integer_type);
       
       forall_operands(it, expr)
+      {
         if(it->type().id()==ID_pointer)
           p=*it;
         else
           integer_sum.copy_to_operands(*it);
+      }
           
       Forall_operands(it, integer_sum)
         if(it->type()!=integer_type)
