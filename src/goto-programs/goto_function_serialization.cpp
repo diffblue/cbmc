@@ -28,7 +28,7 @@ void goto_function_serializationt::convert(
   const goto_functionst::goto_functiont& function, 
   std::ostream &out)
 {
-  if (function.body_available)
+  if(function.body_available)
     gpconverter.convert(function.body, out);
 }
 
@@ -43,6 +43,7 @@ Function: goto_function_serializationt::convert
  Purpose: reconstructs a goto_function from a serialized stream
  
 \*******************************************************************/
+
 void goto_function_serializationt::convert( 
   std::istream &in, 
   irept &funsymb)
