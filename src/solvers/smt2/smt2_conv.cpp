@@ -2238,11 +2238,11 @@ void smt2_convt::convert_relation(const exprt &expr)
     if(use_FPA_theory)
     {
       if(expr.id()==ID_le)
-        smt2_prop.out << "fp.le";
+        smt2_prop.out << "fp.leq";
       else if(expr.id()==ID_lt)
         smt2_prop.out << "fp.lt";
       else if(expr.id()==ID_ge)
-        smt2_prop.out << "fp.ge";
+        smt2_prop.out << "fp.geq";
       else if(expr.id()==ID_gt)
         smt2_prop.out << "fp.gt";
 
