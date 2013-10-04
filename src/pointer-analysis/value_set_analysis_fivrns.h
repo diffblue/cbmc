@@ -36,7 +36,9 @@ public:
   virtual void initialize(const goto_programt &goto_program);
   virtual void initialize(const goto_functionst &goto_functions);
 
-  void output(locationt l, std::ostream &out) 
+  using flow_insensitive_analysist<value_set_domain_fivrnst>::output;
+
+  virtual void output(locationt l, std::ostream &out)
   {
     state.value_set.set_from(l->function, l->location_number);
     state.value_set.set_to(l->function, l->location_number);    
