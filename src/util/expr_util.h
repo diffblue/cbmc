@@ -16,8 +16,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "irep.h"
 
 class exprt;
-class pointer_typet;
 class symbol_exprt;
+class update_exprt;
+class with_exprt;
 class symbolt;
 class typet;
 
@@ -39,7 +40,10 @@ void gen_or_old(exprt &expr);
 symbol_exprt symbol_expr(const symbolt &symbol);
 
 /*! \copydoc gen_zero(const typet &) */
-void make_next_state(exprt &expr);
+void make_next_state(exprt &);
 
 /*! \copydoc splits an expression with >=3 operands into nested binary expressions */
-exprt make_binary(const exprt &src);
+exprt make_binary(const exprt &);
+
+/*! converts an udpate expr into a (possibly nested) with expression */
+with_exprt make_with_expr(const update_exprt &);
