@@ -272,3 +272,45 @@ exprt make_binary(const exprt &expr)
   return previous;
 }
 
+/*******************************************************************\
+
+Function: make_with_expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+with_exprt make_with_expr(const update_exprt &src)
+{
+  const exprt::operandst &designator=src.designator();
+  assert(!designator.empty());
+
+  with_exprt result;  
+  exprt *dest=&result;
+
+  forall_expr(it, designator)
+  {
+    with_exprt tmp;
+  
+    if(it->id()==ID_index_designator)
+    {
+      tmp.where()=to_index_designator(*it).index();
+    }
+    else if(it->id()==ID_member_designator)
+    {
+      //irep_idt component_name=
+      //  to_member_designator(*it).get_component_name();
+    }
+    else
+      assert(false);
+      
+    *dest=tmp;
+    dest=&to_with_expr(*dest).new_value();
+  }
+  
+  return result;
+}
