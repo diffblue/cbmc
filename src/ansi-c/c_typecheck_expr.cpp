@@ -1261,8 +1261,10 @@ void c_typecheck_baset::typecheck_expr_index(exprt &expr)
 
     if(array_full_type.id()!=ID_array &&
        array_full_type.id()!=ID_pointer &&
+       array_full_type.id()!=ID_vector &&
        (index_full_type.id()==ID_array ||
-        index_full_type.id()==ID_pointer))
+        index_full_type.id()==ID_pointer ||
+        index_full_type.id()==ID_vector))
       std::swap(array_expr, index_expr);
   }
 
@@ -1270,7 +1272,8 @@ void c_typecheck_baset::typecheck_expr_index(exprt &expr)
 
   const typet &final_array_type=follow(array_expr.type());
   
-  if(final_array_type.id()==ID_array)
+  if(final_array_type.id()==ID_array ||
+     final_array_type.id()==ID_vector)
   {
     if(array_expr.get_bool(ID_C_lvalue))
       expr.set(ID_C_lvalue, true);
@@ -1289,7 +1292,7 @@ void c_typecheck_baset::typecheck_expr_index(exprt &expr)
   else
   {
     err_location(expr);
-    str << "operator [] must take array or pointer but got `"
+    str << "operator [] must take array/vector or pointer but got `"
         << to_string(array_expr.type()) << "'";
     throw 0;
   }
@@ -1337,8 +1340,6 @@ Function: c_typecheck_baset::typecheck_expr_rel
 
 void c_typecheck_baset::typecheck_expr_rel(exprt &expr)
 {
-  expr.type()=typet(ID_bool);
-
   if(expr.operands().size()!=2)
   {
     err_location(expr);
@@ -1352,6 +1353,15 @@ void c_typecheck_baset::typecheck_expr_rel(exprt &expr)
 
   const typet o_type0=op0.type();
   const typet o_type1=op1.type();
+
+  if(follow(o_type0).id()==ID_vector ||
+     follow(o_type1).id()==ID_vector)
+  {
+    typecheck_expr_rel_vector(expr);
+    return;
+  }
+
+  expr.type()=typet(ID_bool);
 
   if(expr.id()==ID_equal || expr.id()==ID_notequal)
   {
@@ -1439,6 +1449,43 @@ void c_typecheck_baset::typecheck_expr_rel(exprt &expr)
       << to_string(o_type0) << "' and `"
       << to_string(o_type1) << "'";
   throw 0;
+}
+
+/*******************************************************************\
+
+Function: c_typecheck_baset::typecheck_expr_rel_vector
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void c_typecheck_baset::typecheck_expr_rel_vector(exprt &expr)
+{
+  assert(expr.operands().size()==2);
+
+  exprt &op0=expr.op0();
+  exprt &op1=expr.op1();
+
+  const typet o_type0=follow(op0.type());
+  const typet o_type1=follow(op1.type());
+
+  if(o_type0.id()!=ID_vector ||
+     o_type1.id()!=ID_vector ||
+     follow(o_type0.subtype())!=follow(o_type1.subtype()))
+  {
+    err_location(expr);
+    str << "vector operator `" << expr.id()
+        << "' not defined for types `"
+        << to_string(o_type0) << "' and `"
+        << to_string(o_type1) << "'";
+    throw 0;
+  }
+
+  expr.type()=vector_typet(bool_typet(), to_vector_type(o_type0).size());
 }
 
 /*******************************************************************\
