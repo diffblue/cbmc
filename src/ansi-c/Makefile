@@ -29,7 +29,8 @@ CLEANFILES = ansi-c$(LIBEXT) \
   gcc_builtin_headers_generic.inc gcc_builtin_headers_ia32.inc \
   arm_builtin_headers.inc cw_builtin_headers.inc \
   gcc_builtin_headers_arm.inc gcc_builtin_headers_alpha.inc \
-  gcc_builtin_headers_mips.inc gcc_builtin_headers_power.inc
+  gcc_builtin_headers_mips.inc gcc_builtin_headers_power.inc \
+	clang_builtin_headers.inc
 
 all: ansi-c$(LIBEXT)
 
@@ -78,29 +79,8 @@ library_check: library/*.c
 cprover_library.inc: library/converter$(EXEEXT) library/*.c
 	cat library/*.c | library/converter$(EXEEXT) > $@
 
-gcc_builtin_headers_ia32.inc: gcc_builtin_headers_ia32.h file_converter$(EXEEXT)
-	./file_converter$(EXEEXT) < gcc_builtin_headers_ia32.h > $@
-
-gcc_builtin_headers_alpha.inc: gcc_builtin_headers_alpha.h file_converter$(EXEEXT)
-	./file_converter$(EXEEXT) < gcc_builtin_headers_alpha.h > $@
-
-gcc_builtin_headers_arm.inc: gcc_builtin_headers_arm.h file_converter$(EXEEXT)
-	./file_converter$(EXEEXT) < gcc_builtin_headers_arm.h > $@
-
-gcc_builtin_headers_mips.inc: gcc_builtin_headers_mips.h file_converter$(EXEEXT)
-	./file_converter$(EXEEXT) < gcc_builtin_headers_mips.h > $@
-
-gcc_builtin_headers_power.inc: gcc_builtin_headers_power.h file_converter$(EXEEXT)
-	./file_converter$(EXEEXT) < gcc_builtin_headers_power.h > $@
-
-gcc_builtin_headers_generic.inc: gcc_builtin_headers_generic.h file_converter$(EXEEXT)
-	./file_converter$(EXEEXT) < gcc_builtin_headers_generic.h > $@
-
-arm_builtin_headers.inc: arm_builtin_headers.h file_converter$(EXEEXT)
-	./file_converter$(EXEEXT) < arm_builtin_headers.h > $@
-
-cw_builtin_headers.inc: cw_builtin_headers.h file_converter$(EXEEXT)
-	./file_converter$(EXEEXT) < cw_builtin_headers.h > $@
+%.inc: %.h file_converter$(EXEEXT)
+	./file_converter$(EXEEXT) < $< > $@
 
 cprover_library.cpp: cprover_library.inc
 
@@ -112,13 +92,14 @@ ansi_c_internal_additions$(OBJEXT): gcc_builtin_headers_mips.inc
 ansi_c_internal_additions$(OBJEXT): gcc_builtin_headers_power.inc
 ansi_c_internal_additions$(OBJEXT): arm_builtin_headers.inc
 ansi_c_internal_additions$(OBJEXT): cw_builtin_headers.inc
+ansi_c_internal_additions$(OBJEXT): clang_builtin_headers.inc
 
 generated_files: cprover_library.inc gcc_builtin_headers_generic.inc \
 	gcc_builtin_headers_ia32.inc gcc_builtin_headers_alpha.inc \
 	gcc_builtin_headers_arm.inc gcc_builtin_headers_mips.inc \
 	gcc_builtin_headers_power.inc arm_builtin_headers.inc \
 	cw_builtin_headers.inc ansi_c_y.tab.cpp ansi_c_lex.yy.cpp \
-	ansi_c_y.tab.h
+	ansi_c_y.tab.h clang_builtin_headers.inc
 
 ###############################################################################
 
