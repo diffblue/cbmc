@@ -108,7 +108,7 @@ private:
       return true;
     }
     
-    return in->read(&ch, 1)!=NULL;
+    return in->read(&ch, 1)!=0;
   }
    
   unsigned line_no;
