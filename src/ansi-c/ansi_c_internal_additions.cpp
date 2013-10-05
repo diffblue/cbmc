@@ -51,6 +51,11 @@ const char cw_builtin_headers[]=
 #include "cw_builtin_headers.inc"
 ;
 
+const char clang_builtin_headers[]=
+"# 1 \"clang_builtin_headers.h\"\n"
+#include "clang_builtin_headers.inc"
+;
+
 /*******************************************************************\
 
 Function: architecture_string
@@ -187,6 +192,7 @@ void ansi_c_internal_additions(std::string &code)
      config.ansi_c.mode==configt::ansi_ct::MODE_ARM_C_CPP)
   {
     code+=gcc_builtin_headers_generic;
+    code+=clang_builtin_headers;
 
     // there are many more, e.g., look at
     // https://developer.apple.com/library/mac/#documentation/developertools/gcc-4.0.1/gcc/Target-Builtins.html
