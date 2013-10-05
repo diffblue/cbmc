@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 // #define STL_HASH_STDEXT
 // #define STL_HASH_GNU
 // #define STL_HASH_TR1
+// #define STL_HASH_STD
 
 #if defined(STL_HASH_NONE)
 
@@ -65,6 +66,15 @@ typedef std::multiset<T1> hash_multiset_cont;
 #define hash_map_cont std::tr1::unordered_map
 #define hash_set_cont std::tr1::unordered_set
 #define hash_multiset_cont std::tr1::unordered_multiset
+
+#elif defined(STL_HASH_STD)
+
+#include <unordered_set>
+#include <unordered_map>
+
+#define hash_map_cont std::unordered_map
+#define hash_set_cont std::unordered_set
+#define hash_multiset_cont std::unordered_multiset
 
 #else
 
