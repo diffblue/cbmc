@@ -788,7 +788,7 @@ bool javap_parse(
   {
     std::ifstream stderr_stream(stderr_file.c_str());
     char ch;
-    while((stderr_stream.read(&ch, 1))!=NULL)
+    while((stderr_stream.read(&ch, 1))!=0)
       message_stream.str << ch;
   }
 
