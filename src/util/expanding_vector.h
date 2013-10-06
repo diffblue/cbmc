@@ -23,14 +23,15 @@ public:
   
   inline const T & operator[] (size_t n) const
   {
-    check_index(n);
+    // hack-ish const cast
+    const_cast<expanding_vector *>(this)->check_index(n);
     return subt::operator[](n);
   }
 
 protected:  
   typedef std::vector<T> subt;
 
-  // make the vector large enough to contain 'i'
+  // make the vector large enough to contain 'n'
   inline void check_index(size_t n)
   {
     if(n>=subt::size()) subt::resize(n+1);
