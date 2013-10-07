@@ -1088,7 +1088,6 @@ void float_utilst::denormalization_shift(bvt &fraction, bvt &exponent)
     prop.lnot(distance.back()),
     prop.lnot(bv_utils.is_zero(distance)));
 
-  #if 1
   fraction=
     bv_utils.select(
       denormal,
@@ -1099,19 +1098,6 @@ void float_utilst::denormalization_shift(bvt &fraction, bvt &exponent)
     bv_utils.select(denormal,
       bv_utils.build_constant(-bias, exponent.size()),
       exponent);
-
-  #else
-  //for(unsigned i=0; i<fraction.size(); i++)
-  //  fraction[i]=const_literal(0);
-
-  bvt bvbias=bv_utils.build_constant(bias, exponent.size());
-  bvt expadd=bv_utils.add(exponent, bvbias);
-
-  for(unsigned i=0; i<exponent.size(); i++)
-    fraction[i+2]=exponent[i];
-  //for(unsigned i=0; i<exponent.size(); i++)
-  //  fraction[i+2+exponent.size()]=distance[i];
-  #endif
 }
 
 /*******************************************************************\
