@@ -214,9 +214,13 @@ bvt float_utilst::conversion(
 {
   assert(src.size()==spec.width());
 
-  // catch the special case in which we extend,
-  // e.g., single to double
-  
+  // Catch the special case in which we extend,
+  // e.g., single to double.
+  // In this case, rounding can be avoided,
+  // but a denormal number may be come normal.
+
+  #if 0
+  // disabled to to problem with denormals
   if(dest_spec.e>=spec.e &&
      dest_spec.f>=spec.f)
   {
@@ -232,16 +236,22 @@ bvt float_utilst::conversion(
     result.exponent=
       bv_utils.sign_extension(unpacked_src.exponent, dest_spec.e);
 
+    spec=dest_spec;
+
+    // a denormal number often does become normal
+    normalization_shift(result.fraction, result.exponent);
+    denormalization_shift(result.fraction, result.exponent);
+
     // the flags get copied
     result.sign=unpacked_src.sign;
     result.NaN=unpacked_src.NaN;
     result.infinity=unpacked_src.infinity;
 
     // no rounding needed!
-    spec=dest_spec;
     return pack(bias(result));
   }
   else
+  #endif
   {
     // we actually need to round
     unbiased_floatt result=unpack(src);
@@ -1074,8 +1084,8 @@ void float_utilst::denormalization_shift(bvt &fraction, bvt &exponent)
 {
   mp_integer bias=spec.bias();
 
-  // is the exponent strictly less than -bias+1, i.e., exponent<-bias+1?
-  // this is transformed to distance=(-bias+1)-exponent
+  // Is the exponent strictly less than -bias+1, i.e., exponent<-bias+1?
+  // This is transformed to distance=(-bias+1)-exponent
   // i.e., distance>0
 
   assert(exponent.size()>=spec.e);
@@ -1115,7 +1125,7 @@ Function: float_utilst::rounder
 bvt float_utilst::rounder(const unbiased_floatt &src)
 {
   // incoming: some fraction (with explicit 1),
-  // some exponent without bias
+  //           some exponent without bias
   // outgoing: rounded, with right size, with hidden bit, bias
 
   bvt aligned_fraction=src.fraction,
