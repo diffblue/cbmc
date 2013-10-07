@@ -1283,6 +1283,8 @@ void float_utilst::round_fraction(unbiased_floatt &result)
 
     assert(result.fraction.size()==fraction_size);
 
+#if 0
+    // *** does not catch when the overflow goes subnormal -> normal ***
     // incrementing the fraction might result in an overflow
     result.fraction=
       bv_utils.zero_extension(result.fraction, result.fraction.size()+1);
@@ -1303,6 +1305,39 @@ void float_utilst::round_fraction(unbiased_floatt &result)
 
     result.fraction.resize(result.fraction.size()-1);
     result.fraction.back()=new_integer_part;
+
+#else
+    // When incrementing due to rounding there are two edge
+    // cases we need to be aware of:
+    //  1. If the number is normal, the increment can overflow.
+    //     In this case we need to increment the exponent and
+    //     set the MSB of the fraction to 1.
+    //  2. If the number is the largest subnormal, the increment
+    //     can change the MSB making it normal.  Thus the exponent
+    //     must be incremented but the fraction will be OK.
+    literalt oldMSB = result.fraction.back();
+
+    result.fraction=bv_utils.incrementer(result.fraction, increment);
+
+    // Normal overflow when old MSB == 1 and new MSB == 0
+    literalt overflow=prop.land(oldMSB, neg(result.fraction.back()));
+
+    // Subnormal to normal transition when old MSB == 0 and new MSB == 1
+    literalt subnormal_to_normal=
+      prop.land(neg(oldMSB), result.fraction.back());
+
+    // In case of an overflow or subnormal to normal conversion,
+    // the exponent has to be incremented.
+    result.exponent=
+      bv_utils.incrementer(result.exponent, 
+			   prop.lor(overflow, subnormal_to_normal));
+
+    // post normalization of the fraction
+    // In the case of overflow, set the MSB to 1
+    // The subnormal case will have (only) the MSB set to 1
+    result.fraction.back() = prop.lor(result.fraction.back(), overflow);
+#endif
+
   }
 }
 
