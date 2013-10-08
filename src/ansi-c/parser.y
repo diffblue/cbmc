@@ -1375,6 +1375,7 @@ gcc_type_attribute_opt:
           /* empty */
         {
           init($$);
+          if(PARSER.pragma_pack!=0) set($$, ID_packed);
         }
         | gcc_type_attribute_list
         ;

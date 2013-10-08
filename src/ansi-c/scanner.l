@@ -278,7 +278,7 @@ void ansi_c_scanner_init()
                    // Done by Visual Studio and gcc
                    std::string tmp(yytext);
                    std::size_t p=tmp.find('(')+1;
-                   std::string value=std::string(tmp, p, p-tmp.rfind(')'));
+                   std::string value=std::string(tmp, p, tmp.rfind(')')-p);
                    exprt l=convert_integer_literal(value);
                    to_integer(l, PARSER.pragma_pack);
                    // needs push, pop
