@@ -384,6 +384,8 @@ std::string expr2ct::convert_rec(
   }
   else if(src.id()==ID_pointer)
   {
+    c_qualifierst sub_qualifiers;
+    sub_qualifiers.read(src.subtype());
     const typet &subtype=ns.follow(src.subtype());
   
     // The star gets attached to the declarator.
@@ -401,7 +403,7 @@ std::string expr2ct::convert_rec(
           subtype.id()==ID_incomplete_array)))
       new_declarator="("+new_declarator+")";
     
-    return convert_rec(subtype, c_qualifierst(), new_declarator);
+    return convert_rec(subtype, sub_qualifiers, new_declarator);
   }
   else if(src.id()==ID_array)
   {
@@ -472,6 +474,8 @@ std::string expr2ct::convert_rec(
 
     dest+=")";
 
+    c_qualifierst ret_qualifiers;
+    ret_qualifiers.read(code_type.return_type());
     const typet &return_type=ns.follow(code_type.return_type());
 
     // return type may be a function pointer or array
@@ -481,9 +485,9 @@ std::string expr2ct::convert_rec(
 
     if(non_ptr_type->id()==ID_code ||
        non_ptr_type->id()==ID_array)
-      dest=convert_rec(return_type, c_qualifierst(), dest);
+      dest=convert_rec(return_type, ret_qualifiers, dest);
     else
-      dest=convert(return_type)+" "+dest;
+      dest=convert_rec(return_type, ret_qualifiers, "")+" "+dest;
 
     if(!q.empty())
     {
