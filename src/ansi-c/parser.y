@@ -2487,8 +2487,22 @@ KnR_parameter_declaration:
         ;
 
         /* The following is stripped down because of conflicts due to gcc type attributes! */
+KnR_declaration_qualifier_list:
+          storage_class
+        | type_qualifier storage_class
+        {
+          $$=$1;
+          merge_types($$, $2);
+        }
+        | KnR_declaration_qualifier_list declaration_qualifier
+        {
+          $$=$1;
+          merge_types($$, $2);
+        }
+        ;
+
 KnR_basic_declaration_specifier:
-          storage_class basic_type_name gcc_type_attribute_opt
+          KnR_declaration_qualifier_list basic_type_name gcc_type_attribute_opt
         {
           $$=$1;
           merge_types($$, $2);
@@ -2522,7 +2536,7 @@ KnR_typedef_declaration_specifier:
           merge_types($$, $2);
           merge_types($$, $3); // type attribute
         }
-        | storage_class typedef_name gcc_type_attribute_opt
+        | KnR_declaration_qualifier_list typedef_name gcc_type_attribute_opt
         {
           $$=$1;
           merge_types($$, $2);
@@ -2537,9 +2551,22 @@ KnR_typedef_declaration_specifier:
         ;
 
         /* The following is stripped down because of conflicts due to gcc type attributes! */
+KnR_sue_declaration_specifier:
+        KnR_declaration_qualifier_list aggregate_key identifier_or_typedef_name gcc_type_attribute_opt
+        {
+          do_tag($2, $3);
+          $$=$3;
+          // type attributes
+          merge_types($$, $1);
+          merge_types($$, $4); // type attribute
+        }
+        ;
+
+        /* The following is stripped down because of conflicts due to gcc type attributes! */
 KnR_declaration_specifier:
           KnR_basic_declaration_specifier
         | KnR_typedef_declaration_specifier
+        | KnR_sue_declaration_specifier
         ;
 
 KnR_parameter_declaring_list:
@@ -2768,7 +2795,17 @@ parameter_abstract_declarator:
 
 postfixing_abstract_declarator:
           parameter_postfixing_abstract_declarator
-        /* The following rule implements K&R headers! */
+        /* The following two rules implement K&R headers! */
+        | '(' 
+          ')'
+          KnR_parameter_header
+        {
+          $$=$1;
+          set($$, ID_code);
+          stack($$).add(ID_subtype)=irept(ID_abstract);
+          stack($$).add(ID_arguments);
+          stack($$).set(ID_C_KnR, true);
+        }
         | '('
           {
             // use last declarator (i.e., function name)
