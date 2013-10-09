@@ -139,4 +139,4 @@ void show_properties(
   const namespacet ns(goto_model.symbol_table);
   show_properties(ns, ui, goto_model.goto_functions);
 }
-  
+

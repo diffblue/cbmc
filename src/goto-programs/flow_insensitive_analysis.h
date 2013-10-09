@@ -131,11 +131,11 @@ public:
   
   virtual void output(
     const goto_functionst &goto_functions,
-    std::ostream &out) const;
+    std::ostream &out);
 
-  void output(
+  virtual void output(
     const goto_programt &goto_program,
-    std::ostream &out) const
+    std::ostream &out)
   {
     output(goto_program, "", out);
   }
