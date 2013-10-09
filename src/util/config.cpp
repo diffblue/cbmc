@@ -331,7 +331,7 @@ Function: configt::ansi_ct::set_arch_spec_power
 
 void configt::ansi_ct::set_arch_spec_power(const irep_idt &subarch)
 {
-  if(subarch=="power")
+  if(subarch=="powerpc")
     set_ILP32();
   else // ppc64
     set_LP64();
