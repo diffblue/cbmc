@@ -906,8 +906,12 @@ BigInt::mul (onedig_t const *dig, unsigned len, bool pos)
       length += len;
       adjust();
     }
+
   if (!pos)
+  {
     positive = !positive;
+    if(is_zero()) positive = true;
+  }
 }
 
 
