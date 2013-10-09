@@ -286,3 +286,15 @@ inline void *valloc(__CPROVER_size_t malloc_size)
   __CPROVER_HIDE:;
   return malloc(malloc_size);
 }
+
+/* FUNCTION: random */
+
+long random(void)
+{
+  // We return a non-deterministic value instead of a random one.
+  __CPROVER_HIDE:;
+  long result;
+  __CPROVER_assume(result>=0 && result<=2147483647);
+  return result;
+}
+
