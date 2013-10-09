@@ -501,22 +501,24 @@ void instrumentert::propagate_events_in_po()
     cfgt::entryt &cfg_entry=cfg.entry_map[target];
 
     // consistency checks first
-    assert(!cfg_entry.events.empty());
-    for(std::map<unsigned, thread_eventst>::const_iterator
-        it1=cfg_entry.events.begin(), it2=++(cfg_entry.events.begin());
-        it1!=cfg_entry.events.end() && it2!=cfg_entry.events.end();
-        ++it1, ++it2)
-      assert(it1->second.reads.size()==it2->second.reads.size() &&
-             it1->second.writes.size()==it2->second.writes.size() &&
-             it1->second.fences.size()==it2->second.fences.size());
+    if(!cfg_entry.events.empty())
+    {
+      for(std::map<unsigned, thread_eventst>::const_iterator
+          it1=cfg_entry.events.begin(), it2=++(cfg_entry.events.begin());
+          it1!=cfg_entry.events.end() && it2!=cfg_entry.events.end();
+          ++it1, ++it2)
+        assert(it1->second.reads.size()==it2->second.reads.size() &&
+               it1->second.writes.size()==it2->second.writes.size() &&
+               it1->second.fences.size()==it2->second.fences.size());
+    }
 
-    const thread_eventst &events=cfg_entry.events.begin()->second;
     const std::set<goto_programt::const_targett>::size_type size_before=
       cfg_entry.use_events_from.size();
 
-    if(!events.reads.empty() ||
-       !events.writes.empty() ||
-       !events.fences.empty())
+    if(!cfg_entry.events.empty() &&
+       (!cfg_entry.events.begin()->second.reads.empty() ||
+        !cfg_entry.events.begin()->second.writes.empty() ||
+        !cfg_entry.events.begin()->second.fences.empty()))
       cfg_entry.use_events_from.insert(target);
     else
     {
