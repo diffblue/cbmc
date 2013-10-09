@@ -96,7 +96,9 @@ sub test($$$$$) {
           $included--;
         } else {
           my $r;
-          system "grep '$result' '$output' >/dev/null";
+          $result =~ s/\\/\\\\/g;
+          $result =~ s/([^\\])\$/$1\\r\\\\?\$/;
+          system("bash", "-c", "grep \$'$result' '$output' >/dev/null");
           $r = ($included ? $? != 0 : $? == 0);
           if($r) {
             print LOG "$result [FAILED]\n";
