@@ -163,7 +163,7 @@ decision_proceduret::resultt smt1_dect::dec_solve()
     break;
 
   case Z3:
-    command = "z3 -m "
+    command = "z3 -smt "
             + temp_out_filename
             + " > "
             + temp_result_filename;
