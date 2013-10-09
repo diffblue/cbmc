@@ -5,10 +5,10 @@ int main() {
   for(;;)
   {
     i++;
-    if(i==100) break;
+    if(i==30) break;
   }
   
-  assert(i==100);
+  assert(i==30);
 
   return 0;
 }
