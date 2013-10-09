@@ -35,6 +35,7 @@ public:
   virtual void initialize(const goto_programt &goto_program);
   virtual void initialize(const goto_functionst &goto_functions);
 
+  using baset::output;
   void output(locationt l, std::ostream &out) 
   {
     state.value_set.set_from(l->function, l->location_number);
