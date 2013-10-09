@@ -98,9 +98,23 @@ void memory_model_sct::thread_spawn(
     {
       per_thread_mapt::const_iterator next_thread=
         per_thread_map.find(++next_thread_id);
-      if(next_thread!=per_thread_map.end())
+      if(next_thread==per_thread_map.end()) continue;
+
+      // For SC and several weaker memory models a memory barrier
+      // at the beginning of a thread can simply be ignored, because
+      // we enforce program order in the thread-spawn constraint
+      // anyway. Memory models with cumulative memory barriers
+      // require explicit handling of these.
+      event_listt::const_iterator n_it=next_thread->second.begin();
+      for( ;
+          n_it!=next_thread->second.end() &&
+          (*n_it)->is_memory_barrier();
+          ++n_it)
+        ;
+
+      if(n_it!=next_thread->second.end())
         equation.constraint(
-          before(e_it, next_thread->second.front()),
+          before(e_it, *n_it),
           "thread-spawn",
           e_it->source);
     }
