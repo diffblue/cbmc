@@ -159,7 +159,7 @@ public:
   static ieee_floatt fltmin(const ieee_float_spect &_spec)
   { ieee_floatt c(_spec); c.make_fltmin(); return c; }
 
-  // set to next representable number towards plus or minus infinity
+  // set to next representable number towards plus infinity
   void increment(bool distinguish_zero=false)
   { 
     if(is_zero() && get_sign() && distinguish_zero)
@@ -168,6 +168,7 @@ public:
       next_representable(true);
   }
 
+  // set to previous representable number towards minus infinity
   void decrement(bool distinguish_zero=false)
   { 
     if(is_zero() && !get_sign() && distinguish_zero)
@@ -184,7 +185,7 @@ public:
   const mp_integer &get_exponent() const { return exponent; }
   const mp_integer &get_fraction() const { return fraction; }
   
-  // performs conversion to ieee floating point format
+  // performs conversion to IEEE floating point format
   void from_integer(const mp_integer &i);
   void from_base10(const mp_integer &exp, const mp_integer &frac);
   void build(const mp_integer &exp, const mp_integer &frac);
@@ -192,15 +193,16 @@ public:
   void from_double(const double d);
   void from_float(const float f);
 
-  // perfroms conversions from ieee float-point format
+  // perfroms conversions from IEEE float-point format
   // to something else
   double to_double() const;
   float to_float() const;
   bool is_double() const;
   bool is_float() const;
   mp_integer pack() const;
-  void extract(mp_integer &_exponent, mp_integer &_fraction) const;
-  mp_integer to_integer() const; // this rounds to zero
+  void extract_base2(mp_integer &_exponent, mp_integer &_fraction) const;
+  void extract_base10(mp_integer &_exponent, mp_integer &_fraction) const;
+  mp_integer to_integer() const; // this always rounds to zero
 
   // conversions
   void change_spec(const ieee_float_spect &dest_spec);
@@ -213,6 +215,8 @@ public:
     return format(format_spect());
   }
   
+  std::string to_string_decimal(unsigned precision) const;
+  std::string to_string_scientific(unsigned precision) const;  
   std::string format(const format_spect &format_spec) const;
   
   friend inline std::ostream& operator << (std::ostream &out, const ieee_floatt &f)
@@ -255,6 +259,9 @@ protected:
   mp_integer exponent; // this is unbiased
   mp_integer fraction; // this _does_ include the hidden bit
   bool NaN_flag, infinity_flag;
+  
+  // number of digits of an integer >=1 in base 10
+  static mp_integer base10_digits(const mp_integer &src);
 };
 
 bool operator < (const ieee_floatt &a, const ieee_floatt &b);

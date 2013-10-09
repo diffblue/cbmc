@@ -281,10 +281,10 @@ void check_build_extract()
   t.from_float(f);
 
   mp_integer old_frac, old_exp;
-  t.extract(old_frac, old_exp);
+  t.extract_base2(old_frac, old_exp);
   mp_integer frac_bak=old_frac, exp_bak=old_exp;
   t.build(old_frac, old_exp);
-  t.extract(old_frac, old_exp);
+  t.extract_base2(old_frac, old_exp);
   if(frac_bak != old_frac || exp_bak != old_exp)
     std::cout << "extract - build - extract is broken for " << t << std::endl;
 }

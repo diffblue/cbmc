@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "std_types.h"
 #include "std_expr.h"
 #include "ieee_float.h"
+#include "i2string.h"
 
 /*******************************************************************\
 
@@ -143,6 +144,85 @@ std::string ieee_floatt::format(const format_spect &format_spec) const
 {
   std::string result;
 
+  switch(format_spec.style)
+  {
+  case format_spect::DECIMAL:
+    result+=to_string_decimal(format_spec.precision);
+    break;
+    
+  case format_spect::SCIENTIFIC:
+    result+=to_string_scientific(format_spec.precision);
+    break;
+  
+  case format_spect::AUTOMATIC:
+    {
+      // "Style e is used if the exponent from its conversion
+      //  is less than -4 or greater than or equal to the precision."    
+
+      mp_integer _exponent, _fraction;
+      extract_base10(_fraction, _exponent);
+
+      if(_exponent>=0)
+      {
+        if(base10_digits(_fraction)+_exponent>=format_spec.precision)
+          result+=to_string_scientific(format_spec.precision);
+        else
+          result+=to_string_decimal(format_spec.precision);
+      }
+      else // _exponent<0
+      {
+        if(true)//base10_digits(fraction)+_exponent<-4)
+          result+=to_string_scientific(format_spec.precision);
+        else
+          result+=to_string_decimal(format_spec.precision);
+      }
+    }      
+    break;
+  }
+
+  while(result.size()<format_spec.min_width)
+    result=" "+result;
+  
+  return result;
+}
+
+/*******************************************************************\
+
+Function: ieee_floatt::base10_digits
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+mp_integer ieee_floatt::base10_digits(const mp_integer &src)
+{
+  mp_integer tmp=src;
+  assert(tmp>=0);
+  mp_integer result=0;
+  while(tmp!=0) { ++result; tmp/=10; }
+  return result;
+}
+
+/*******************************************************************\
+
+Function: ieee_floatt::to_string_decimal
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+std::string ieee_floatt::to_string_decimal(unsigned precision) const
+{
+  std::string result;
+
   if(sign_flag) result+="-";
   
   if((NaN_flag || infinity_flag) && !sign_flag) result+="+";
@@ -157,28 +237,28 @@ std::string ieee_floatt::format(const format_spect &format_spec) const
     result+="0";
 
     // add zeros, if needed
-    if(format_spec.precision>0)
+    if(precision>0)
     {
       result+='.';
-      for(unsigned i=0; i<format_spec.precision; i++)
+      for(unsigned i=0; i<precision; i++)
         result+='0';
     }
   }
   else
   {
     mp_integer _exponent, _fraction;
-    extract(_fraction, _exponent);
+    extract_base2(_fraction, _exponent);
 
     // convert to base 10
     if(_exponent>=0)
     {
       result+=integer2string(_fraction*power(2, _exponent));
       
-      // add zeros, if needed
-      if(format_spec.precision>0)
+      // add dot and zeros, if needed
+      if(precision>0)
       {
         result+='.';
-        for(unsigned i=0; i<format_spec.precision; i++)
+        for(unsigned i=0; i<precision; i++)
           result+='0';
       }
     }
@@ -191,14 +271,14 @@ std::string ieee_floatt::format(const format_spect &format_spec) const
       _fraction*=power(5, position);
 
       // apply rounding
-      if(position>format_spec.precision)
+      if(position>precision)
       {
-        mp_integer r=power(10, position-format_spec.precision);
+        mp_integer r=power(10, position-precision);
         mp_integer remainder=_fraction%r;
         _fraction/=r;
         // not sure if this is the right kind of rounding here
         if(remainder>=r/2) ++_fraction;
-        position=format_spec.precision;
+        position=precision;
       }
 
       std::string tmp=integer2string(_fraction);
@@ -211,7 +291,7 @@ std::string ieee_floatt::format(const format_spect &format_spec) const
       result+=std::string(tmp, dot, std::string::npos);
 
       // append zeros if needed
-      for(mp_integer i=position; i<format_spec.precision; ++i)
+      for(mp_integer i=position; i<precision; ++i)
         result+='0';
       #else
 
@@ -224,8 +304,98 @@ std::string ieee_floatt::format(const format_spect &format_spec) const
     }
   }
 
-  while(result.size()<format_spec.min_width)
-    result=" "+result;
+  return result;
+}
+
+/*******************************************************************\
+
+Function: ieee_floatt::to_string_scientific
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: format as [-]d.ddde+-d
+          Note that printf always produces at least two digits
+          for the exponent.
+
+\*******************************************************************/
+
+std::string ieee_floatt::to_string_scientific(unsigned precision) const
+{
+  std::string result;
+
+  if(sign_flag) result+="-";
+  
+  if((NaN_flag || infinity_flag) && !sign_flag) result+="+";
+
+  // special cases
+  if(NaN_flag)
+    result+="NaN";
+  else if(infinity_flag)
+    result+="inf";
+  else if(is_zero())
+  {
+    result+="0";
+
+    // add zeros, if needed
+    if(precision>0)
+    {
+      result+='.';
+      for(unsigned i=0; i<precision; i++)
+        result+='0';
+    }
+    
+    result+="e0";
+  }
+  else
+  {
+    mp_integer _exponent, _fraction;
+    extract_base10(_fraction, _exponent);
+
+    // C99 appears to say that conversion to decimal should
+    // use the currently selected IEEE rounding mode.
+    if(base10_digits(_fraction)>precision+1)
+    {
+      // re-align
+      mp_integer distance=base10_digits(_fraction)-(precision+1);
+      mp_integer p=power(10, distance);
+      mp_integer remainder=_fraction%p;
+      _fraction/=p;
+      _exponent+=distance;
+
+      if(remainder==p/2)
+      {
+        // need to do rounding mode here
+        ++_fraction;
+      }
+      else if(remainder>p/2)
+        ++_fraction;
+    }
+    
+    std::string decimals=integer2string(_fraction);
+    
+    assert(!decimals.empty());
+
+    // First add top digit to result.
+    result+=decimals[0];
+    
+    // Now add dot and further zeros, if needed.
+    if(precision>0)
+    {
+      result+='.';
+      
+      while(decimals.size()<precision+1)
+        decimals+='0';
+
+      result+=decimals.substr(1, precision);
+    }
+    
+    // add exponent
+    result+='e';
+    result+='+';
+    result+=integer2string(base10_digits(_fraction)+_exponent-1);
+  }
 
   return result;
 }
@@ -342,7 +512,7 @@ mp_integer ieee_floatt::pack() const
 
 /*******************************************************************\
 
-Function: ieee_floatt::extract
+Function: ieee_floatt::extract_base2
 
   Inputs:
 
@@ -352,7 +522,7 @@ Function: ieee_floatt::extract
 
 \*******************************************************************/
 
-void ieee_floatt::extract(
+void ieee_floatt::extract_base2(
   mp_integer &_fraction,
   mp_integer &_exponent) const
 {
@@ -372,6 +542,54 @@ void ieee_floatt::extract(
   while((_fraction%2)==0)
   {
     _fraction/=2;
+    ++_exponent;
+  }
+}
+
+/*******************************************************************\
+
+Function: ieee_floatt::extract_base10
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void ieee_floatt::extract_base10(
+  mp_integer &_fraction,
+  mp_integer &_exponent) const
+{
+  if(is_zero() || is_NaN() || is_infinity())
+  {
+    _fraction=_exponent=0;
+    return;
+  }
+
+  _exponent=exponent;
+  _fraction=fraction;
+
+  // adjust exponent
+  _exponent-=spec.f;
+  
+  // now make it base 10
+  if(_exponent>=0)
+  {
+    _fraction*=power(2, _exponent);
+    _exponent=0;
+  }
+  else // _exponent<0
+  {
+    // 10/2=5 -- this makes it base 10
+    _fraction*=power(5, -_exponent);
+  }
+
+  // try to re-normalize
+  while((_fraction%10)==0)
+  {
+    _fraction/=10;
     ++_exponent;
   }
 }
