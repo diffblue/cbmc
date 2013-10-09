@@ -8,13 +8,13 @@ Date: February 2012
 
 \*******************************************************************/
 
-#include <iostream>
+#include <util/namespace.h>
 
 #include "fence.h"
 
 bool is_fence(
-  goto_programt::instructiont instruction,
-  namespacet &ns)
+  const goto_programt::instructiont &instruction,
+  const namespacet &ns)
 {
   return (instruction.is_function_call() && ns.lookup(
     to_code_function_call(instruction.code).function()).base_name == "fence")
@@ -27,8 +27,8 @@ bool is_fence(
 }
 
 bool is_lwfence(
-  goto_programt::instructiont instruction,
-  namespacet &ns)
+  const goto_programt::instructiont &instruction,
+  const namespacet &ns)
 {
   return (instruction.is_function_call() && ns.lookup(
     to_code_function_call(instruction.code).function()).base_name == "lwfence")
