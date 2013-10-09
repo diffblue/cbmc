@@ -147,7 +147,7 @@ symbol_exprt partial_order_concurrencyt::clock(event_it event)
   {
     assert(is_spawn(event));
     identifier=
-      i2string(event->source.thread_nr+1)+"$"+
+      "t"+i2string(event->source.thread_nr+1)+"$"+
       i2string(numbering[event])+"$spwnclk";
   }
   else
