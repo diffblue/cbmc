@@ -1605,7 +1605,7 @@ public:
 class ashr_exprt:public shift_exprt
 {
 public:
-  inline ashr_exprt():shift_exprt(ID_shl)
+  inline ashr_exprt():shift_exprt(ID_ashr)
   {
   }
 
@@ -1619,7 +1619,7 @@ public:
 class lshr_exprt:public shift_exprt
 {
 public:
-  inline lshr_exprt():shift_exprt(ID_shl)
+  inline lshr_exprt():shift_exprt(ID_lshr)
   {
   }
 
