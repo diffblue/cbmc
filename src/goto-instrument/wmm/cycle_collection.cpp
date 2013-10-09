@@ -8,13 +8,12 @@ Date: 2012
 
 \*******************************************************************/
 
-#include <iostream>
-
 #include "event_graph.h"
 
 //#define DEBUG
 
 #ifdef DEBUG
+#include <iostream>
 #define DEBUG_MESSAGE(a) std::cout<<a<<std::endl
 #else
 #define DEBUG_MESSAGE(a)
@@ -52,12 +51,14 @@ void event_grapht::graph_explorert::filter_thin_air(
     it=next;
   }
 
+#ifdef DEBUG
   for(std::set<unsigned>::const_iterator it=thin_air_events.begin();
     it!=thin_air_events.end();
     ++it)
     std::cout<<egraph[*it]<<";";
 
   std::cout<<std::endl;
+#endif
 }
 
 /*******************************************************************\
@@ -407,11 +408,8 @@ bool event_grapht::graph_explorert::backtrack(
           }
           if((!egraph.filter_uniproc || new_cycle.is_not_uniproc(model)) && not_thin_air 
             && new_cycle.is_cycle() &&
-#ifndef ASMFENCE
-            new_cycle.is_unsafe(model))
-#else
+            new_cycle.is_unsafe(model) &&
             new_cycle.is_unsafe_asm(model))
-#endif
           {
             DEBUG_MESSAGE(new_cycle.print_name(model,false));
             set_of_cycles.insert(new_cycle);
@@ -454,11 +452,8 @@ bool event_grapht::graph_explorert::backtrack(
         }
         if((!egraph.filter_uniproc || new_cycle.is_not_uniproc(model)) && not_thin_air 
           && new_cycle.is_cycle() &&
-#ifndef ASMFENCE
-          new_cycle.is_unsafe(model))
-#else
+          new_cycle.is_unsafe(model) &&
           new_cycle.is_unsafe_asm(model))
-#endif
         {
           DEBUG_MESSAGE(new_cycle.print_name(model,false));
           set_of_cycles.insert(new_cycle);

@@ -11,7 +11,6 @@ Date: 2012
 #include "abstract_event.h"
 
 //#define DEBUG
-//#define ASMFENCE
 
 #ifdef DEBUG
 #define DEBUG_MESSAGE(a) std::cout<<a<<std::endl

@@ -14,9 +14,9 @@ Date: 2012
 #include <fstream>
 
 //#define DEBUG
-//#define ASMFENCE
 
 #ifdef DEBUG
+#include <iostream>
 #define DEBUG_MESSAGE(a) std::cout<<a<<std::endl
 #else
 #define DEBUG_MESSAGE(a)
@@ -180,7 +180,8 @@ bool event_grapht::critical_cyclet::is_unsafe(memory_modelt model, bool fast)
   bool unsafe_met=false;
 
   /* critical cycles contain at least 4 events */
-  assert(size()>=4);
+  if(size()<4)
+    return false;
 
   /* critical cycles contain at least 2 threads */
   unsigned thread=egraph[*begin()].thread;
@@ -985,7 +986,8 @@ std::string event_grapht::critical_cyclet::print_unsafes() const
 
     else if(last.variable == first.variable
       && last.operation == abstract_eventt::Read
-      && first.operation == abstract_eventt::Write)
+      && first.operation == abstract_eventt::Write
+      && (last.thread != first.thread || it->first > it->second))
     {
       name += " Fr";
       name += (last.thread==first.thread?"i":"e");
@@ -994,7 +996,7 @@ std::string event_grapht::critical_cyclet::print_unsafes() const
     else if(last.variable == first.variable
       && last.operation == abstract_eventt::Write
       && first.operation == abstract_eventt::Write
-      && last.thread != first.thread)
+      && (last.thread != first.thread || it->first > it->second))
       /* we prefer to write Po rather than Wsi */
     {
       name += " Ws";
@@ -1056,7 +1058,8 @@ std::string event_grapht::critical_cyclet::print_output() const
   {
     const abstract_eventt& it_evt=egraph[*it];
     cycle += id2string(it_evt.variable) + " ("; 
-    cycle += it_evt.location.as_string() + ") ";
+    cycle += it_evt.location.as_string();
+    cycle += " thread " + i2string(it_evt.thread) + ") ";
   }
   return cycle;
 }
@@ -1248,9 +1251,11 @@ std::string event_grapht::critical_cyclet::print_name(
   memory_modelt model) const
 {
   assert(reduced.size()>=2);
+  unsigned extra_fence_count=0;
 
   std::string name;
   const_iterator prev_it=reduced.end();
+  bool first_done=false;
   for(const_iterator cur_it=reduced.begin(); cur_it!=reduced.end(); ++cur_it)
   {
     const abstract_eventt& cur=egraph[*cur_it];
@@ -1259,11 +1264,39 @@ std::string event_grapht::critical_cyclet::print_name(
     {
       const abstract_eventt& prev=egraph[*prev_it];
 
-      if(cur.operation == abstract_eventt::Fence)
+      if(prev.operation == abstract_eventt::Fence ||
+         prev.operation == abstract_eventt::Lwfence ||
+         prev.operation == abstract_eventt::ASMfence)
       {
-        ++cur_it;
-        const abstract_eventt& succ=( cur_it!=reduced.end() ?
-          egraph[*cur_it] : egraph[reduced.front()] );
+        ++extra_fence_count;
+        // nothing to do
+      }
+
+      else if(cur.operation == abstract_eventt::Fence)
+      {
+        const_iterator n_it=cur_it;
+        bool wraparound=false;
+        while(true)
+        {
+          ++n_it;
+          if(n_it==reduced.end())
+          {
+            assert(!wraparound);
+            wraparound=true;
+            n_it=reduced.begin();
+          }
+          const abstract_eventt& cand=egraph[*n_it];
+          if(cand.operation != abstract_eventt::Fence &&
+             cand.operation != abstract_eventt::Lwfence &&
+             cand.operation != abstract_eventt::ASMfence)
+            break;
+          if(!wraparound) ++cur_it;
+          ++extra_fence_count;
+          first_done=wraparound;
+        }
+        const abstract_eventt& succ=egraph[*n_it];
+        assert(succ.operation == abstract_eventt::Read ||
+               succ.operation == abstract_eventt::Write);
         name += (model==Power?" Sync":" MFence"); 
         name += (prev.variable==succ.variable?"s":"d")
           + prev.get_operation() + succ.get_operation();
@@ -1271,23 +1304,74 @@ std::string event_grapht::critical_cyclet::print_name(
 
       else if(cur.operation == abstract_eventt::Lwfence)
       {
-        ++cur_it;
-        const abstract_eventt& succ=( cur_it!=reduced.end() ?
-          egraph[*cur_it] : egraph[reduced.front()] );
-        name += " LwSync";
+        std::string cand_name=" LwSync";
+        const_iterator n_it=cur_it;
+        bool wraparound=false;
+        while(true)
+        {
+          ++n_it;
+          if(n_it==reduced.end())
+          {
+            assert(!wraparound);
+            wraparound=true;
+            n_it=reduced.begin();
+          }
+          const abstract_eventt& cand=egraph[*n_it];
+          if(cand.operation != abstract_eventt::Fence &&
+             cand.operation != abstract_eventt::Lwfence &&
+             cand.operation != abstract_eventt::ASMfence)
+            break;
+          else if(cand.operation == abstract_eventt::Fence ||
+                  (cand.operation == abstract_eventt::ASMfence &&
+                   cand.fence_value()&1))
+            cand_name = (model==Power?" Sync":" MFence"); 
+          if(!wraparound) ++cur_it;
+          ++extra_fence_count;
+          first_done=wraparound;
+        }
+        const abstract_eventt& succ=egraph[*n_it];
+        assert(succ.operation == abstract_eventt::Read ||
+               succ.operation == abstract_eventt::Write);
+        name += cand_name;
         name += (prev.variable==succ.variable?"s":"d")
           + prev.get_operation() + succ.get_operation();
       }
 
       else if(cur.operation == abstract_eventt::ASMfence)
       {
-        ++cur_it;
-        const abstract_eventt& succ=( cur_it!=reduced.end() ?
-          egraph[*cur_it] : egraph[reduced.front()] );
+        std::string cand_name;
         if(cur.fence_value()&1)
-          name += (model==Power?" Sync":" MFence"); 
+          cand_name = (model==Power?" Sync":" MFence"); 
         else
-          name += " LwSync";
+          cand_name = " LwSync";
+        const_iterator n_it=cur_it;
+        bool wraparound=false;
+        while(true)
+        {
+          ++n_it;
+          if(n_it==reduced.end())
+          {
+            assert(!wraparound);
+            wraparound=true;
+            n_it=reduced.begin();
+          }
+          const abstract_eventt& cand=egraph[*n_it];
+          if(cand.operation != abstract_eventt::Fence &&
+             cand.operation != abstract_eventt::Lwfence &&
+             cand.operation != abstract_eventt::ASMfence)
+            break;
+          else if(cand.operation == abstract_eventt::Fence ||
+                  (cand.operation == abstract_eventt::ASMfence &&
+                   cand.fence_value()&1))
+            cand_name = (model==Power?" Sync":" MFence"); 
+          if(!wraparound) ++cur_it;
+          ++extra_fence_count;
+          first_done=wraparound;
+        }
+        const abstract_eventt& succ=egraph[*n_it];
+        assert(succ.operation == abstract_eventt::Read ||
+               succ.operation == abstract_eventt::Write);
+        name += cand_name;
         name += (prev.variable==succ.variable?"s":"d")
           + prev.get_operation() + succ.get_operation();
       }
@@ -1302,7 +1386,8 @@ std::string event_grapht::critical_cyclet::print_name(
 
       else if(prev.variable == cur.variable
         && prev.operation == abstract_eventt::Read
-        && cur.operation == abstract_eventt::Write)
+        && cur.operation == abstract_eventt::Write
+        && (prev.thread != cur.thread || *prev_it > *cur_it))
       {
         name += " Fr";
         name += (prev.thread==cur.thread?"i":"e");
@@ -1311,7 +1396,7 @@ std::string event_grapht::critical_cyclet::print_name(
       else if(prev.variable == cur.variable
         && prev.operation == abstract_eventt::Write
         && cur.operation == abstract_eventt::Write
-        && prev.thread != cur.thread) 
+        && (prev.thread != cur.thread || *prev_it > *cur_it))
         /* we prefer to write Po rather than Wsi */
       {
         name += " Ws";
@@ -1323,9 +1408,21 @@ std::string event_grapht::critical_cyclet::print_name(
         && prev.operation != abstract_eventt::Lwfence
         && prev.operation != abstract_eventt::ASMfence)
       {
-        name += " Po";
-        name += (prev.variable==cur.variable?"s":"d") + prev.get_operation() 
-          + cur.get_operation();
+        const data_dpt& dep=egraph.map_data_dp[cur.thread];
+
+        if(prev.operation == abstract_eventt::Read &&
+           dep.dp(prev, cur))
+        {
+          name += " DpData";
+          name += (prev.variable==cur.variable?"s":"d")
+            + cur.get_operation();
+        }
+        else
+        {
+          name += " Po";
+          name += (prev.variable==cur.variable?"s":"d") + prev.get_operation() 
+            + cur.get_operation();
+        }
       }
       
       else
@@ -1333,6 +1430,19 @@ std::string event_grapht::critical_cyclet::print_name(
     }
 
     prev_it=cur_it;
+  }
+
+  if(first_done)
+  {
+    critical_cyclet::size_type n_events=extra_fence_count;
+    for(std::string::const_iterator it=name.begin();
+        it!=name.end();
+        ++it)
+      if(*it==' ')
+        ++n_events;
+    assert(n_events==reduced.size());
+
+    return name;
   }
 
   const abstract_eventt& first=egraph[reduced.front()];
@@ -1364,11 +1474,19 @@ std::string event_grapht::critical_cyclet::print_name(
     ++next;
     const abstract_eventt& succ= egraph[ *next ];
     if(first.fence_value()&1)
-      name += (model==Power?" Sync":" MFence"); 
+      name += (model==Power||model==Static_Weak?" Sync":" MFence"); 
     else
       name += " LwSync";
     name += (last.variable==succ.variable?"s":"d") 
       + last.get_operation() + succ.get_operation();
+  }
+
+  else if(last.operation == abstract_eventt::Fence ||
+          last.operation == abstract_eventt::Lwfence ||
+          last.operation == abstract_eventt::ASMfence)
+  {
+    ++extra_fence_count;
+    // nothing to do
   }
 
   else if(last.variable == first.variable
@@ -1381,7 +1499,8 @@ std::string event_grapht::critical_cyclet::print_name(
 
   else if(last.variable == first.variable
     && last.operation == abstract_eventt::Read
-    && first.operation == abstract_eventt::Write)
+    && first.operation == abstract_eventt::Write
+    && (last.thread != first.thread || reduced.back() > reduced.front()))
   {
     name += " Fr";
     name += (last.thread==first.thread?"i":"e");
@@ -1390,7 +1509,7 @@ std::string event_grapht::critical_cyclet::print_name(
   else if(last.variable == first.variable
     && last.operation == abstract_eventt::Write
     && first.operation == abstract_eventt::Write
-    && last.thread != first.thread) 
+    && (last.thread != first.thread || reduced.back() > reduced.front()))
     /* we prefer to write Po rather than Wsi */
   {
     name += " Ws";
@@ -1402,13 +1521,33 @@ std::string event_grapht::critical_cyclet::print_name(
     && last.operation != abstract_eventt::Lwfence
     && last.operation != abstract_eventt::ASMfence)
   {
-    name += " Po";
-    name += (last.variable==first.variable?"s":"d") + last.get_operation() 
-      + first.get_operation();
+    const data_dpt& dep=egraph.map_data_dp[last.thread];
+
+    if(last.operation == abstract_eventt::Read &&
+       dep.dp(last, first))
+    {
+      name += " DpData";
+      name += (last.variable==first.variable?"s":"d")
+        + first.get_operation();
+    }
+    else
+    {
+      name += " Po";
+      name += (last.variable==first.variable?"s":"d") + last.get_operation() 
+        + first.get_operation();
+    }
   }
 
   else
         assert(false);
+
+  critical_cyclet::size_type n_events=extra_fence_count;
+  for(std::string::const_iterator it=name.begin();
+      it!=name.end();
+      ++it)
+    if(*it==' ')
+      ++n_events;
+  assert(n_events==reduced.size());
 
   return name;
 }
