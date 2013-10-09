@@ -130,7 +130,7 @@ Function: flow_insensitive_analysis_baset::output
 
 void flow_insensitive_analysis_baset::output(
   const goto_functionst &goto_functions,
-  std::ostream &out) const
+  std::ostream &out)
 {
   for(goto_functionst::function_mapt::const_iterator
       f_it=goto_functions.function_map.begin();
