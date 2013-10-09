@@ -188,7 +188,8 @@ public:
   void shortest_path(
     unsigned src,
     unsigned dest,
-    patht &path);
+    patht &path,
+    bool non_trivial) const;
     
   void visit_reachable(unsigned src);
   
@@ -350,7 +351,8 @@ template<class N>
 void graph<N>::shortest_path(
   unsigned src,
   unsigned dest,
-  patht &path)
+  patht &path,
+  bool non_trivial) const
 {
   std::vector<bool> visited;
   std::vector<unsigned> distance;
@@ -361,8 +363,11 @@ void graph<N>::shortest_path(
   distance.resize(nodes.size(), (unsigned)(-1));
   previous.resize(nodes.size(), 0);
 
-  distance[src]=0;
-  visited[src]=true;
+  if(!non_trivial)
+  {
+    distance[src]=0;
+    visited[src]=true;
+  }
 
   // does BFS, not Dijkstra
   // we hope the graph is sparse
@@ -388,10 +393,10 @@ void graph<N>::shortest_path(
         f_it++)
     {
       unsigned i=*f_it;
-      nodet &n=nodes[i];
+      const nodet &n=nodes[i];
       
       // do all neighbors
-      for(typename edgest::iterator
+      for(typename edgest::const_iterator
           o_it=n.out.begin();
           o_it!=n.out.end() && !found;
           o_it++)
@@ -426,7 +431,9 @@ void graph<N>::shortest_path(
   while(true)
   {
     path.push_front(dest);
-    if(distance[dest]==0) break; // we are there
+    if(distance[dest]==0 ||
+       previous[dest]==src) break; // we are there
+    assert(dest!=previous[dest]);
     dest=previous[dest];
   }
 }
