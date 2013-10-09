@@ -1474,7 +1474,7 @@ std::string event_grapht::critical_cyclet::print_name(
     ++next;
     const abstract_eventt& succ= egraph[ *next ];
     if(first.fence_value()&1)
-      name += (model==Power||model==Static_Weak?" Sync":" MFence"); 
+      name += (model==Power /*||model==Static_Weak */ ?" Sync":" MFence"); 
     else
       name += " LwSync";
     name += (last.variable==succ.variable?"s":"d") 
