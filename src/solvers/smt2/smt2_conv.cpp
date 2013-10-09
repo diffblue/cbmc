@@ -1747,7 +1747,7 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
       // this just passes through
       convert_expr(op);
     }
-    else if(op_type.id()==ID_unsigned ||
+    else if(op_type.id()==ID_unsignedbv ||
             op_type.id()==ID_signedbv)
     {
       // integer to pointer
