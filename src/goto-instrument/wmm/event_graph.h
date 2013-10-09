@@ -379,6 +379,7 @@ public:
 
   void add_po_edge(unsigned a, unsigned b)
   {
+    assert(a!=b);
     assert(operator[](a).thread==operator[](b).thread);
     po_graph.add_edge(a,b);
     po_order.push_back(a);
@@ -387,6 +388,7 @@ public:
 
   void add_po_back_edge(unsigned a, unsigned b)
   {
+    assert(a!=b);
     assert(operator[](a).thread==operator[](b).thread);
     po_graph.add_edge(a,b);
     po_order.push_back(a);
@@ -397,12 +399,14 @@ public:
 
   void add_com_edge(unsigned a, unsigned b)
   {
+    assert(a!=b);
     com_graph.add_edge(a,b);
     poUrfe_order.push_back(a);
   }
 
   void add_undirected_com_edge(unsigned a, unsigned b)
   {
+    assert(a!=b);
     add_com_edge(a,b);
     add_com_edge(b,a);
   }
