@@ -1502,6 +1502,7 @@ bool simplify_exprt::simplify_floatbv_typecast(exprt &expr)
         if(!to_integer(op0, value))
         {
           ieee_floatt result;
+          result.rounding_mode=(ieee_floatt::rounding_modet)integer2long(rounding_mode);
           result.spec=to_floatbv_type(dest_type);
           result.from_integer(value);
           expr=result.to_expr();
