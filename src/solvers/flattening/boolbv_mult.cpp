@@ -10,8 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "boolbv.h"
 
-#include "../floatbv/float_utils.h"
-
 /*******************************************************************\
 
 Function: boolbvt::convert_mult
@@ -76,35 +74,6 @@ void boolbvt::convert_mult(const exprt &expr, bvt &bv)
     // cut it down again
     bv.erase(bv.begin(), bv.begin()+fraction_bits);
 
-    return;
-  }
-  else if(expr.type().id()==ID_floatbv)
-  {
-    if(op0.type()!=expr.type())
-      throw "multiplication with mixed types";
-    
-    bv=convert_bv(op0);
-
-    if(bv.size()!=width)
-      throw "convert_mult: unexpected operand width";
-
-    float_utilst float_utils(prop);
-    float_utils.spec=to_floatbv_type(expr.type());
-
-    for(exprt::operandst::const_iterator it=operands.begin()+1;
-        it!=operands.end(); it++)
-    {
-      if(it->type()!=expr.type())
-        throw "multiplication with mixed types";
-
-      const bvt &op=convert_bv(*it);
-
-      if(op.size()!=width)
-        throw "convert_mult: unexpected operand width";
-
-      bv=float_utils.mul(bv, op);
-    }
-    
     return;
   }
   else if(expr.type().id()==ID_unsignedbv ||
