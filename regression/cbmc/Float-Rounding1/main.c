@@ -37,8 +37,8 @@ int main (void) {
   float f3 = nondet_value();
   float f4 = nondet_value();
 
-  assume((0x1.fffffep-1f < f3) && (f3 < 0x1.000002p+0f));
-  assume((0x1.7ffffep-24f < f4) && (f4 < 0x1.800002p-24f));
+  __CPROVER_assume((0x1.fffffep-1f < f3) && (f3 < 0x1.000002p+0f));
+  __CPROVER_assume((0x1.7ffffep-24f < f4) && (f4 < 0x1.800002p-24f));
 
   roundingTest(f3,f4);
 
