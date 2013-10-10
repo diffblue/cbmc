@@ -188,8 +188,17 @@ public:
   void shortest_path(
     unsigned src,
     unsigned dest,
-    patht &path,
-    bool non_trivial) const;
+    patht &path) const
+  {
+    shortest_path(src, dest, path, false);
+  }
+
+  void shortest_loop(
+    unsigned node,
+    patht &path) const
+  {
+    shortest_path(node, node, path, true);
+  }
     
   void visit_reachable(unsigned src);
   
@@ -231,6 +240,12 @@ protected:
   };
 
   void tarjan(class tarjant &t, unsigned v);
+
+  void shortest_path(
+    unsigned src,
+    unsigned dest,
+    patht &path,
+    bool non_trivial) const;
 };
 
 /*******************************************************************\
