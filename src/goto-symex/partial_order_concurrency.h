@@ -41,6 +41,7 @@ protected:
   address_mapt address_map;
   
   void build_event_lists(symex_target_equationt &);
+  void add_init_writes(symex_target_equationt &);
   
   // a per-thread numbering of the events
   typedef std::map<event_it, unsigned> numberingt;

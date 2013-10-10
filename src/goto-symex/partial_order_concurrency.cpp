@@ -48,6 +48,66 @@ partial_order_concurrencyt::~partial_order_concurrencyt()
 
 /*******************************************************************\
 
+Function: partial_order_concurrencyt::add_init_writes
+
+  Inputs: 
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void partial_order_concurrencyt::add_init_writes(
+  symex_target_equationt &equation)
+{
+  hash_set_cont<irep_idt, irep_id_hash> init_done;
+  bool spawn_seen=false;
+
+  symex_target_equationt::SSA_stepst init_steps;
+
+  for(eventst::const_iterator
+      e_it=equation.SSA_steps.begin();
+      e_it!=equation.SSA_steps.end();
+      e_it++)
+  {
+    if(is_spawn(e_it))
+    {
+      spawn_seen=true;
+      continue;
+    }
+    else if(!is_shared_read(e_it) &&
+            !is_shared_write(e_it))
+      continue;
+
+    const irep_idt &a=address(e_it);
+
+    if(init_done.find(a)!=init_done.end()) continue;
+
+    if(spawn_seen ||
+       is_shared_read(e_it) ||
+       !e_it->guard.is_true())
+    {
+      init_steps.push_back(symex_target_equationt::SSA_stept());
+      symex_target_equationt::SSA_stept &SSA_step=init_steps.back();
+
+      SSA_step.guard=true_exprt();
+      // no SSA index, thus nondet value
+      SSA_step.ssa_lhs=e_it->original_lhs_object;
+      SSA_step.original_lhs_object=e_it->original_lhs_object;
+      SSA_step.type=goto_trace_stept::SHARED_WRITE;
+      SSA_step.atomic_section_id=0;
+      SSA_step.source=e_it->source;
+    }
+
+    init_done.insert(a);
+  }
+
+  equation.SSA_steps.splice(equation.SSA_steps.begin(), init_steps);
+}
+
+/*******************************************************************\
+
 Function: partial_order_concurrencyt::build_event_lists
 
   Inputs: 
@@ -61,6 +121,8 @@ Function: partial_order_concurrencyt::build_event_lists
 void partial_order_concurrencyt::build_event_lists(
   symex_target_equationt &equation)
 {
+  add_init_writes(equation);
+
   // a per-thread counter
   std::map<unsigned, unsigned> counter;
 
