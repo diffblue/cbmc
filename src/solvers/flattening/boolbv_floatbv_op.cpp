@@ -45,6 +45,8 @@ void boolbvt::convert_floatbv_typecast(const exprt &expr, bvt &bv)
 
   float_utilst float_utils(prop);
   
+  float_utils.set_rounding_mode(convert_bv(op1));
+  
   if(src_type.id()==ID_floatbv &&
      dest_type.id()==ID_floatbv)
   {
@@ -86,9 +88,9 @@ void boolbvt::convert_floatbv_op(const exprt &expr, bvt &bv)
   if(operands.size()!=3)
     throw "operator "+expr.id_string()+" takes three operands";
 
-  const exprt &op0=expr.op0();
-  const exprt &op1=expr.op1();
-  const exprt &op2=expr.op2();
+  const exprt &op0=expr.op0(); // first operand
+  const exprt &op1=expr.op1(); // second operand
+  const exprt &op2=expr.op2(); // rounding mode
 
   bvt bv0=convert_bv(op0);
   bvt bv1=convert_bv(op1);
@@ -103,6 +105,8 @@ void boolbvt::convert_floatbv_op(const exprt &expr, bvt &bv)
   }
 
   float_utilst float_utils(prop);
+  
+  float_utils.set_rounding_mode(bv2);
 
   if(type.id()==ID_floatbv)
   {

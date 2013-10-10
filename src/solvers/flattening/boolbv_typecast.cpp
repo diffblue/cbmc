@@ -310,7 +310,7 @@ bool boolbvt::type_conversion(
         // note that float to int conversion in ANSI-C is hardwired
         // to ROUND TO ZERO, also known as truncate.
         float_utilst float_utils(prop);
-        float_utils.rounding_mode=ieee_floatt::ROUND_TO_ZERO;
+        float_utils.rounding_mode_bits.set(ieee_floatt::ROUND_TO_ZERO);
         float_utils.spec=to_floatbv_type(src_type);
         dest=float_utils.to_integer(src, dest_width, dest_bvtype!=IS_UNSIGNED);
         return false;
