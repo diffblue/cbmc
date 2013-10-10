@@ -15,6 +15,31 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
+Function: float_utilst::set_rounding_mode
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void float_utilst::set_rounding_mode(const bvt &src)
+{
+  bvt round_to_even=bv_utils.build_constant(ieee_floatt::ROUND_TO_EVEN, src.size());
+  bvt round_to_plus_inf=bv_utils.build_constant(ieee_floatt::ROUND_TO_PLUS_INF, src.size());
+  bvt round_to_minus_inf=bv_utils.build_constant(ieee_floatt::ROUND_TO_MINUS_INF, src.size());
+  bvt round_to_zero=bv_utils.build_constant(ieee_floatt::ROUND_TO_ZERO, src.size());
+
+  rounding_mode_bits.round_to_even=bv_utils.equal(src, round_to_even);
+  rounding_mode_bits.round_to_plus_inf=bv_utils.equal(src, round_to_plus_inf);
+  rounding_mode_bits.round_to_minus_inf=bv_utils.equal(src, round_to_minus_inf);
+  rounding_mode_bits.round_to_zero=bv_utils.equal(src, round_to_zero);
+}
+
+/*******************************************************************\
+
 Function: float_utilst::from_signed_integer
 
   Inputs:
@@ -128,7 +153,7 @@ bvt float_utilst::to_integer(
   const unbiased_floatt unpacked=unpack(src);
 
   // The following is the usual case in ANSI-C, and we optimize for that.
-  if(rounding_mode==ieee_floatt::ROUND_TO_ZERO)
+  if(rounding_mode_bits.round_to_zero.is_true())
   {
     // if the exponent is positive, shift right
     bvt offset=bv_utils.build_constant(spec.f, unpacked.exponent.size());
@@ -1204,36 +1229,31 @@ literalt float_utilst::fraction_rounding_decision(
   // we get one bit of the fraction for some rounding decisions
   literalt rounding_least=fraction[extra_bits];
 
-  switch(rounding_mode)
-  {
-  case ieee_floatt::ROUND_TO_EVEN: // round-to-nearest (ties to even)
-    return prop.land(rounding_bit,
-                     prop.lor(rounding_least, sticky_bit));
-    break;
-
-  case ieee_floatt::ROUND_TO_PLUS_INF: // round up
-    return prop.land(prop.lnot(sign),
-                     prop.lor(rounding_bit, sticky_bit));
-    break;
-
-  case ieee_floatt::ROUND_TO_MINUS_INF: // round down
-    return prop.land(sign,
-                     prop.lor(rounding_bit, sticky_bit));
-
-  case ieee_floatt::ROUND_TO_ZERO: // round to zero
-    return const_literal(false);
-
-  case ieee_floatt::UNKNOWN: // UNKNOWN, rounding is not determined
-    assert(0);
-    break;
-    
-  case ieee_floatt::NONDETERMINISTIC:
-    // the increment is non-deterministic
-    return prop.new_variable();
+  // round-to-nearest (ties to even)
+  literalt round_to_even=
+    prop.land(rounding_bit,
+              prop.lor(rounding_least, sticky_bit));
   
-  default:
-    assert(0);
-  }
+  // round up
+  literalt round_to_plus_inf=
+    prop.land(prop.lnot(sign),
+              prop.lor(rounding_bit, sticky_bit));
+
+  // round down
+  literalt round_to_minus_inf=
+    prop.land(sign,
+              prop.lor(rounding_bit, sticky_bit));
+
+  // round to zero
+  literalt round_to_zero=
+    const_literal(false);
+
+  // now select appropriate one
+  return prop.lselect(rounding_mode_bits.round_to_even, round_to_even,
+         prop.lselect(rounding_mode_bits.round_to_plus_inf, round_to_plus_inf,
+         prop.lselect(rounding_mode_bits.round_to_minus_inf, round_to_minus_inf,
+         prop.lselect(rounding_mode_bits.round_to_zero, round_to_zero,
+           prop.new_variable())))); // otherwise non-det
 }                
 
 /*******************************************************************\

@@ -16,8 +16,6 @@ Author: Daniel Kroening, kroening@kroening.com
 class float_utilst
 {
 public:
-  ieee_floatt::rounding_modet rounding_mode;
-
   struct rounding_mode_bitst
   {
   public:
@@ -34,14 +32,44 @@ public:
       round_to_minus_inf(const_literal(false))
     {
     }
+    
+    void set(const ieee_floatt::rounding_modet mode)
+    {
+      round_to_even=round_to_zero=round_to_plus_inf=round_to_minus_inf=
+        const_literal(false);
+
+      switch(mode)
+      {
+      case ieee_floatt::ROUND_TO_EVEN:
+        round_to_even=const_literal(true);
+        break;
+        
+      case ieee_floatt::ROUND_TO_MINUS_INF:
+        round_to_minus_inf=const_literal(true);
+        break;
+        
+      case ieee_floatt::ROUND_TO_PLUS_INF:
+        round_to_plus_inf=const_literal(true);
+        break;
+        
+      case ieee_floatt::ROUND_TO_ZERO:
+        round_to_zero=const_literal(true);
+        break;
+          
+      default:;
+      }
+    }
   };
+  
+  rounding_mode_bitst rounding_mode_bits;
 
   explicit float_utilst(propt &_prop):
-    rounding_mode(ieee_floatt::ROUND_TO_EVEN),
     prop(_prop),
     bv_utils(_prop)
   {
   }
+  
+  void set_rounding_mode(const bvt &src);
 
   virtual ~float_utilst()
   {

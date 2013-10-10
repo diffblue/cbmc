@@ -126,6 +126,7 @@ void boolbvt::convert_add_sub(const exprt &expr, bvt &bv)
         
         if(type.subtype().id()==ID_floatbv)
         {
+          // needs to change due to rounding mode
           float_utilst float_utils(prop);
           float_utils.spec=to_floatbv_type(subtype);
           tmp_result=float_utils.add_sub(tmp_result, tmp_op, subtract);
@@ -144,6 +145,7 @@ void boolbvt::convert_add_sub(const exprt &expr, bvt &bv)
     }
     else if(type.id()==ID_floatbv)
     {
+      // needs to change due to rounding mode
       float_utilst float_utils(prop);
       float_utils.spec=to_floatbv_type(arithmetic_type);
       bv=float_utils.add_sub(bv, op, subtract);
