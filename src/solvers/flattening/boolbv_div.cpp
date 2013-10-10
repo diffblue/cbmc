@@ -10,8 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "boolbv.h"
 
-#include "../floatbv/float_utils.h"
-
 /*******************************************************************\
 
 Function: boolbvt::convert_div
@@ -28,8 +26,7 @@ void boolbvt::convert_div(const exprt &expr, bvt &bv)
 {
   if(expr.type().id()!=ID_unsignedbv &&
      expr.type().id()!=ID_signedbv &&
-     expr.type().id()!=ID_fixedbv &&
-     expr.type().id()!=ID_floatbv)
+     expr.type().id()!=ID_fixedbv)
     return conversion_failed(expr, bv);
 
   unsigned width=boolbv_width(expr.type());
@@ -69,12 +66,6 @@ void boolbvt::convert_div(const exprt &expr, bvt &bv)
     
     // cut it down again
     res.resize(width);
-  }
-  else if(expr.type().id()==ID_floatbv)
-  {
-    float_utilst float_utils(prop);
-    float_utils.spec=to_floatbv_type(expr.type());
-    res=float_utils.div(op0, op1);
   }
   else
   {
