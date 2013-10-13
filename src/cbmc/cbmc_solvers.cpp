@@ -12,10 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <solvers/sat/satcheck.h>
 #include <solvers/sat/satcheck_minisat2.h>
 
-#ifdef HAVE_BV_REFINEMENT
-#include <bv_refinement/bv_refinement_loop.h>
-#endif
-
+#include <solvers/refinement/bv_refinement.h>
 #include <solvers/smt1/smt1_dec.h>
 #include <solvers/smt2/smt2_dec.h>
 #include <solvers/cvc/cvc_dec.h>
@@ -111,17 +108,13 @@ Function: bmct::bv_refinement
 
 bool bmct::decide_bv_refinement()
 {
-  #ifdef HAVE_BV_REFINEMENT
   satcheckt satcheck;
   satcheck.set_message_handler(get_message_handler());
   satcheck.set_verbosity(get_verbosity());
 
-  bv_refinement_loopt bv_refinement_loop(ns, satcheck);
+  bv_refinementt bv_refinement(ns, satcheck);
   
-  return decide(bv_refinement_loop);
-  #else
-  throw "bv refinement not linked in";
-  #endif
+  return decide(bv_refinement);
 }
 
 /*******************************************************************\
