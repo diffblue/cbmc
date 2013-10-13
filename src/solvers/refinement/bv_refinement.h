@@ -34,12 +34,13 @@ protected:
   {
   public:
     exprt expr;
-    bvt op0_bv, op1_bv;
-    mp_integer op0_value, op1_value;
-    bvt result_bv;
+    unsigned no_operands;
+
+    bvt op0_bv, op1_bv, op2_bv, result_bv;
+    mp_integer op0_value, op1_value, op2_value, result_value;
+
     bvt under_assumptions;
     bvt over_assumptions;
-    mp_integer result_value;
 
     // the kind of under- or over-approximation    
     unsigned under_state, over_state;
@@ -73,11 +74,10 @@ protected:
   void arrays_overapproximated();
   
   // we refine expensive arithmetic
-  virtual void convert_add_sub(const exprt &expr, bvt &bv);
   virtual void convert_mult(const exprt &expr, bvt &bv);
   virtual void convert_div(const exprt &expr, bvt &bv);
   virtual void convert_mod(const exprt &expr, bvt &bv);
-  virtual void convert_typecast(const exprt &expr, bvt &bv);
+  virtual void convert_floatbv_op(const exprt &expr, bvt &bv);
 
   // for collecting statistics
   virtual void set_to(const exprt &expr, bool value);

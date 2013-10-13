@@ -64,7 +64,7 @@ void bv_refinementt::approximationt::add_under_assumption(literalt l)
 
 /*******************************************************************\
 
-Function: bv_refinementt::convert_add_sub
+Function: bv_refinementt::convert_floatbv_op
 
   Inputs:
 
@@ -74,20 +74,11 @@ Function: bv_refinementt::convert_add_sub
 
 \*******************************************************************/
 
-void bv_refinementt::convert_add_sub(const exprt &expr, bvt &bv)
+void bv_refinementt::convert_floatbv_op(const exprt &expr, bvt &bv)
 {
-  // We catch floating-point add/sub,
-  // but leave integers alone for now.
-
-  if(expr.type().id()!=ID_floatbv)
-    return SUB::convert_add_sub(expr, bv);
-
-  const exprt::operandst &operands=expr.operands();
-
-  assert(operands.size()>=2);
-
-  if(operands.size()>2)
-    return convert_add_sub(make_binary(expr), bv); // make binary
+  if(ns.follow(expr.type()).id()!=ID_floatbv ||
+     expr.operands().size()!=3)
+    return SUB::convert_floatbv_op(expr, bv);
 
   add_approximation(expr, bv);
 }
@@ -111,7 +102,7 @@ void bv_refinementt::convert_mult(const exprt &expr, bvt &bv)
 
   const exprt::operandst &operands=expr.operands();
   
-  const typet &type=expr.type();
+  const typet &type=ns.follow(expr.type());
 
   assert(operands.size()>=2);
 
@@ -165,9 +156,8 @@ void bv_refinementt::convert_div(const exprt &expr, bvt &bv)
   
   assert(expr.operands().size()==2);
 
-  if(expr.type().id()!=ID_floatbv)
-    if(expr.op1().is_constant())
-      return SUB::convert_div(expr, bv);
+  if(expr.op1().is_constant())
+    return SUB::convert_div(expr, bv);
 
   add_approximation(expr, bv);
 }
@@ -199,33 +189,6 @@ void bv_refinementt::convert_mod(const exprt &expr, bvt &bv)
 
 /*******************************************************************\
 
-Function: bv_refinementt::convert_typecast
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void bv_refinementt::convert_typecast(const exprt &expr, bvt &bv)
-{
-  // certain floating-point typecasts are pricey
-  
-  assert(expr.operands().size()==1);
-
-  if(expr.type().id()!=ID_floatbv)
-    return SUB::convert_typecast(expr, bv);
-
-
-  return SUB::convert_typecast(expr, bv);
-
-  add_approximation(expr, bv);
-}
-
-/*******************************************************************\
-
 Function: bv_refinementt::get_values
 
   Inputs:
@@ -246,6 +209,12 @@ void bv_refinementt::get_values(approximationt &a)
   {
     a.op0_value=get_value(a.op0_bv);
     a.op1_value=get_value(a.op1_bv);
+  }
+  else if(o==3)
+  {
+    a.op0_value=get_value(a.op0_bv);
+    a.op1_value=get_value(a.op1_bv);
+    a.op2_value=get_value(a.op2_bv);
   }
   else
     assert(0);
@@ -620,15 +589,22 @@ bv_refinementt::add_approximation(
 
   a.expr=expr;
   a.result_bv=prop.new_variables(width);
+  a.no_operands=expr.operands().size();
 
-  if(expr.operands().size()==1)
+  if(a.no_operands==1)
   {
     a.op0_bv=convert_bv(expr.op0());
   }
-  else if(expr.operands().size()==2)
+  else if(a.no_operands==2)
   {
     a.op0_bv=convert_bv(expr.op0());
     a.op1_bv=convert_bv(expr.op1());
+  }
+  else if(a.no_operands==3)
+  {
+    a.op0_bv=convert_bv(expr.op0());
+    a.op1_bv=convert_bv(expr.op1());
+    a.op2_bv=convert_bv(expr.op2());
   }
   else
     assert(false);
