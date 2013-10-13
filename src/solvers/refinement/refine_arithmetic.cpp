@@ -76,10 +76,10 @@ Function: bv_refinementt::convert_add_sub
 
 void bv_refinementt::convert_add_sub(const exprt &expr, bvt &bv)
 {
-  // we catch floating-point add/sub,
-  // but leave integers alone
+  // We catch floating-point add/sub,
+  // but leave integers alone for now.
 
-  if(expr.type().id()!="floatbv")
+  if(expr.type().id()!=ID_floatbv)
     return SUB::convert_add_sub(expr, bv);
 
   const exprt::operandst &operands=expr.operands();
@@ -119,15 +119,15 @@ void bv_refinementt::convert_mult(const exprt &expr, bvt &bv)
     return convert_mult(make_binary(expr), bv); // make binary
 
   // we keep multiplication by a constant for integers
-  if(type.id()!="floatbv")
+  if(type.id()!=ID_floatbv)
     if(operands[0].is_constant() || operands[1].is_constant())
       return SUB::convert_mult(expr, bv);
 
   approximationt &a=add_approximation(expr, bv);
   
   // initially, we have a partial interpretation for integers
-  if(type.id()=="signedbv" ||
-     type.id()=="unsignedbv")
+  if(type.id()==ID_signedbv ||
+     type.id()==ID_unsignedbv)
   {
     // x*0==0 and 0*x==0
     literalt op0_zero=bv_utils.is_zero(a.op0_bv);
@@ -165,7 +165,7 @@ void bv_refinementt::convert_div(const exprt &expr, bvt &bv)
   
   assert(expr.operands().size()==2);
 
-  if(expr.type().id()!="floatbv")
+  if(expr.type().id()!=ID_floatbv)
     if(expr.op1().is_constant())
       return SUB::convert_div(expr, bv);
 
@@ -215,7 +215,7 @@ void bv_refinementt::convert_typecast(const exprt &expr, bvt &bv)
   
   assert(expr.operands().size()==1);
 
-  if(expr.type().id()!="floatbv")
+  if(expr.type().id()!=ID_floatbv)
     return SUB::convert_typecast(expr, bv);
 
 
@@ -278,7 +278,7 @@ void bv_refinementt::check_SAT(approximationt &a)
   // these are all binary
   assert(a.expr.operands().size()==2);
 
-  if(type.id()=="floatbv")
+  if(type.id()==ID_floatbv)
   {
     if(a.over_state==MAX_STATE) return;
   
@@ -293,13 +293,13 @@ void bv_refinementt::check_SAT(approximationt &a)
     o1.rounding_mode=RM;
     result.rounding_mode=RM;
 
-    if(a.expr.id()=="+")
+    if(a.expr.id()==ID_plus)
       result+=o1;
-    else if(a.expr.id()=="-")
+    else if(a.expr.id()==ID_minus)
       result-=o1;
-    else if(a.expr.id()=="*")
+    else if(a.expr.id()==ID_mult)
       result*=o1;
-    else if(a.expr.id()=="/")
+    else if(a.expr.id()==ID_div)
       result/=o1;
     else
       assert(false);
@@ -363,13 +363,13 @@ void bv_refinementt::check_SAT(approximationt &a)
 
       bvt op0=a.op0_bv, op1=a.op1_bv, res=a.result_bv;
 
-      if(a.expr.id()=="+")
+      if(a.expr.id()==ID_plus)
         r=float_utils.add(op0, op1);
-      else if(a.expr.id()=="-")
+      else if(a.expr.id()==ID_minus)
         r=float_utils.sub(op0, op1);
-      else if(a.expr.id()=="*")
+      else if(a.expr.id()==ID_mult)
         r=float_utils.mul(op0, op1);
-      else if(a.expr.id()=="/")
+      else if(a.expr.id()==ID_div)
         r=float_utils.div(op0, op1);
       else
         assert(0);
@@ -378,8 +378,8 @@ void bv_refinementt::check_SAT(approximationt &a)
       bv_utils.set_equal(r, res);
     }
   }
-  else if(type.id()=="signedbv" ||
-          type.id()=="unsignedbv")
+  else if(type.id()==ID_signedbv ||
+          type.id()==ID_unsignedbv)
   {
     // already full interpretation?
     if(a.over_state>0) return;
@@ -391,15 +391,15 @@ void bv_refinementt::check_SAT(approximationt &a)
 
     // division by zero is never spurious
 
-    if((a.expr.id()=="/" || a.expr.id()=="mod") &&
+    if((a.expr.id()==ID_div || a.expr.id()==ID_mod) &&
        o1==0)
       return;
 
-    if(a.expr.id()=="*")
+    if(a.expr.id()==ID_mult)
       o0*=o1;
-    else if(a.expr.id()=="/")
+    else if(a.expr.id()==ID_div)
       o0/=o1;
-    else if(a.expr.id()=="mod")
+    else if(a.expr.id()==ID_mod)
       o0%=o1;
     else
       assert(false);
@@ -411,23 +411,23 @@ void bv_refinementt::check_SAT(approximationt &a)
     {
       // we give up right away and add the full interpretation
       bvt r;
-      if(a.expr.id()=="*")
+      if(a.expr.id()==ID_mult)
       {
         r=bv_utils.multiplier(
           a.op0_bv, a.op1_bv,
-          a.expr.type().id()=="signedbv"?bv_utilst::SIGNED:bv_utilst::UNSIGNED);
+          a.expr.type().id()==ID_signedbv?bv_utilst::SIGNED:bv_utilst::UNSIGNED);
       }
-      else if(a.expr.id()=="/")
+      else if(a.expr.id()==ID_div)
       {
         r=bv_utils.divider(
           a.op0_bv, a.op1_bv,
-          a.expr.type().id()=="signedbv"?bv_utilst::SIGNED:bv_utilst::UNSIGNED);
+          a.expr.type().id()==ID_signedbv?bv_utilst::SIGNED:bv_utilst::UNSIGNED);
       }
-      else if(a.expr.id()=="mod")
+      else if(a.expr.id()==ID_mod)
       {
         r=bv_utils.remainder(
           a.op0_bv, a.op1_bv,
-          a.expr.type().id()=="signedbv"?bv_utilst::SIGNED:bv_utilst::UNSIGNED);
+          a.expr.type().id()==ID_signedbv?bv_utilst::SIGNED:bv_utilst::UNSIGNED);
       }
       else
         assert(0);
@@ -472,7 +472,7 @@ void bv_refinementt::check_UNSAT(approximationt &a)
 
   a.under_assumptions.clear();
 
-  if(a.expr.type().id()=="floatbv")
+  if(a.expr.type().id()==ID_floatbv)
   {
     const floatbv_typet &floatbv_type=to_floatbv_type(a.expr.type());
     ieee_float_spect spec=floatbv_type;
