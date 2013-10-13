@@ -108,7 +108,7 @@ Function: bmct::bv_refinement
 
 bool bmct::decide_bv_refinement()
 {
-  satcheckt satcheck;
+  satcheck_minisat_no_simplifiert satcheck;
   satcheck.set_message_handler(get_message_handler());
   satcheck.set_verbosity(get_verbosity());
 
