@@ -332,13 +332,13 @@ void bv_refinementt::check_SAT(approximationt &a)
 
       bvt op0=a.op0_bv, op1=a.op1_bv, res=a.result_bv;
 
-      if(a.expr.id()==ID_plus)
+      if(a.expr.id()==ID_floatbv_plus)
         r=float_utils.add(op0, op1);
-      else if(a.expr.id()==ID_minus)
+      else if(a.expr.id()==ID_floatbv_minus)
         r=float_utils.sub(op0, op1);
-      else if(a.expr.id()==ID_mult)
+      else if(a.expr.id()==ID_floatbv_mult)
         r=float_utils.mul(op0, op1);
-      else if(a.expr.id()==ID_div)
+      else if(a.expr.id()==ID_floatbv_div)
         r=float_utils.div(op0, op1);
       else
         assert(0);
