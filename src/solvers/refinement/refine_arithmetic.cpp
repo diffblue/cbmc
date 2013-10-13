@@ -242,13 +242,13 @@ void bv_refinementt::check_SAT(approximationt &a)
 
   // see if the satisfying assignment is spurious in any way
 
-  const typet &type=a.expr.type();
-
-  // these are all binary
-  assert(a.expr.operands().size()==2);
+  const typet &type=ns.follow(a.expr.type());
 
   if(type.id()==ID_floatbv)
   {
+    // these are all trinary
+    assert(a.expr.operands().size()==3);
+
     if(a.over_state==MAX_STATE) return;
   
     ieee_float_spect spec(to_floatbv_type(type));
@@ -262,13 +262,13 @@ void bv_refinementt::check_SAT(approximationt &a)
     o1.rounding_mode=RM;
     result.rounding_mode=RM;
 
-    if(a.expr.id()==ID_plus)
+    if(a.expr.id()==ID_floatbv_plus)
       result+=o1;
-    else if(a.expr.id()==ID_minus)
+    else if(a.expr.id()==ID_floatbv_minus)
       result-=o1;
-    else if(a.expr.id()==ID_mult)
+    else if(a.expr.id()==ID_floatbv_mult)
       result*=o1;
-    else if(a.expr.id()==ID_div)
+    else if(a.expr.id()==ID_floatbv_div)
       result/=o1;
     else
       assert(false);
@@ -350,6 +350,9 @@ void bv_refinementt::check_SAT(approximationt &a)
   else if(type.id()==ID_signedbv ||
           type.id()==ID_unsignedbv)
   {
+    // these are all binary
+    assert(a.expr.operands().size()==2);
+
     // already full interpretation?
     if(a.over_state>0) return;
   
@@ -630,6 +633,10 @@ Function: bv_refinementt::approximationt::as_string
 
 std::string bv_refinementt::approximationt::as_string() const
 {
+  #if 0
   return from_expr(expr);
+  #else
+  return id2string(expr.id());
+  #endif
 }
 
