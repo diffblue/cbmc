@@ -114,7 +114,9 @@ SRC = $(CHAFF_SRC) $(BOOLEFORCE_SRC) $(MINISAT_SRC) $(MINISAT2_SRC) \
       flattening/boolbv_complex.cpp flattening/boolbv_floatbv_op.cpp \
       flattening/boolbv_union.cpp flattening/flatten_byte_operators.cpp \
       flattening/boolbv_update.cpp \
-      floatbv/float_utils.cpp floatbv/float_bv.cpp
+      floatbv/float_utils.cpp floatbv/float_bv.cpp \
+      refinement/bv_refinement_loop.cpp refinement/refine_arithmetic.cpp \
+      refinement/refine_arrays.cpp
 
 INCLUDES= -I .. \
   $(CHAFF_INCLUDE) $(BOOLEFORCE_INCLUDE) $(MINISAT_INCLUDE) $(MINISAT2_INCLUDE) \
