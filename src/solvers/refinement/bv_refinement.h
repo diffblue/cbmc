@@ -22,7 +22,7 @@ public:
   virtual decision_proceduret::resultt dec_solve();
 
   virtual std::string decision_procedure_text() const
-  { return "refinement loop"; }
+  { return "refinement loop with "+prop.solver_text(); }
   
   typedef bv_pointerst SUB;
 
