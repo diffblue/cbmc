@@ -27,6 +27,12 @@ public:
     symbol_table.clear();
     goto_functions.clear();
   }
+  
+  void output(std::ostream &out)
+  {
+    namespacet ns(symbol_table);
+    goto_functions.output(ns, out);
+  }
 };
 
 #endif
