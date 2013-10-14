@@ -652,6 +652,26 @@ void goto_inline(
 
 /*******************************************************************\
 
+Function: goto_inline
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void goto_inline(
+  goto_modelt &goto_model,
+  message_handlert &message_handler)
+{
+  const namespacet ns(goto_model.symbol_table);
+  goto_inline(goto_model.goto_functions, ns, message_handler);
+}
+
+/*******************************************************************\
+
 Function: goto_partial_inline
 
   Inputs:
@@ -702,4 +722,25 @@ void goto_partial_inline(
 
   if(goto_inline.get_error_found())
     throw 0;
+}
+
+/*******************************************************************\
+
+Function: goto_partial_inline
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void goto_partial_inline(
+  goto_modelt &goto_model,
+  message_handlert &message_handler,
+  unsigned _smallfunc_limit)
+{
+  const namespacet ns(goto_model.symbol_table);
+  goto_partial_inline(goto_model.goto_functions, ns, message_handler, _smallfunc_limit);
 }
