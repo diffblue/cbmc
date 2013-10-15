@@ -782,8 +782,7 @@ void c_typecastt::do_typecast(exprt &expr, const typet &dest_type)
       }
       else // * -> _Bool
       {
-        notequal_exprt notequal_zero(expr, gen_zero(src_type));
-        expr=notequal_zero;
+        expr=convert_to_c_boolean(expr);
         expr.make_typecast(dest_type);
       }
     }
