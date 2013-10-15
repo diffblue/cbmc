@@ -194,7 +194,15 @@ void goto_convertt::remove_pre(
     rhs.copy_to_operands(expr.op0(), gen_one(signed_int_type()));
     rhs.op0().make_typecast(signed_int_type());
     rhs.type()=signed_int_type();
-    rhs.make_typecast(typet(ID_bool));
+    rhs=convert_to_c_boolean(rhs);
+  }
+  else if(op_type.get(ID_C_c_type)==ID_bool)
+  {
+    rhs.copy_to_operands(expr.op0(), gen_one(signed_int_type()));
+    rhs.op0().make_typecast(signed_int_type());
+    rhs.type()=signed_int_type();
+    rhs=convert_to_c_boolean(rhs);
+    rhs.make_typecast(op_type);
   }
   else if(op_type.id()==ID_c_enum ||
           op_type.id()==ID_incomplete_c_enum)
@@ -278,7 +286,15 @@ void goto_convertt::remove_post(
     rhs.copy_to_operands(expr.op0(), gen_one(signed_int_type()));
     rhs.op0().make_typecast(signed_int_type());
     rhs.type()=signed_int_type();
-    rhs.make_typecast(typet(ID_bool));
+    rhs=convert_to_c_boolean(rhs);
+  }
+  else if(op_type.get(ID_C_c_type)==ID_bool)
+  {
+    rhs.copy_to_operands(expr.op0(), gen_one(signed_int_type()));
+    rhs.op0().make_typecast(signed_int_type());
+    rhs.type()=signed_int_type();
+    rhs=convert_to_c_boolean(rhs);
+    rhs.make_typecast(op_type);
   }
   else if(op_type.id()==ID_c_enum ||
           op_type.id()==ID_incomplete_c_enum)
