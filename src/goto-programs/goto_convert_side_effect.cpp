@@ -87,30 +87,30 @@ void goto_convertt::remove_assignment(
       throw 0;
     }
 
-    exprt rhs;
+    irep_idt new_id;
 
     if(statement==ID_assign_plus)
-      rhs.id(ID_plus);
+      new_id=ID_plus;
     else if(statement==ID_assign_minus)
-      rhs.id(ID_minus);
+      new_id=ID_minus;
     else if(statement==ID_assign_mult)
-      rhs.id(ID_mult);
+      new_id=ID_mult;
     else if(statement==ID_assign_div)
-      rhs.id(ID_div);
+      new_id=ID_div;
     else if(statement==ID_assign_mod)
-      rhs.id(ID_mod);
+      new_id=ID_mod;
     else if(statement==ID_assign_shl)
-      rhs.id(ID_shl);
+      new_id=ID_shl;
     else if(statement==ID_assign_ashr)
-      rhs.id(ID_ashr);
+      new_id=ID_ashr;
     else if(statement==ID_assign_lshr)
-      rhs.id(ID_lshr);
+      new_id=ID_lshr;
     else if(statement==ID_assign_bitand)
-      rhs.id(ID_bitand);
+      new_id=ID_bitand;
     else if(statement==ID_assign_bitxor)
-      rhs.id(ID_bitxor);
+      new_id=ID_bitxor;
     else if(statement==ID_assign_bitor)
-      rhs.id(ID_bitor);
+      new_id=ID_bitor;
     else
     {
       err_location(expr);
@@ -118,17 +118,21 @@ void goto_convertt::remove_assignment(
       throw 0;
     }
 
-    rhs.copy_to_operands(expr.op0(), expr.op1());
-    rhs.type()=expr.op0().type();
-    
-    // bool doesn't really exist as a type,
-    // fake promotion!
-    if(rhs.op0().type().id()==ID_bool)
+    exprt rhs;
+
+    // C/C++ Booleans get very special treatment.
+    if(ns.follow(expr.op0().type()).get(ID_C_c_type)==ID_bool)
     {
-      rhs.op0().make_typecast(signed_int_type());
-      rhs.op1().make_typecast(signed_int_type());
-      rhs.type()=signed_int_type();
-      rhs.make_typecast(typet(ID_bool));
+      binary_exprt tmp(expr.op0(), new_id, expr.op1(), expr.op1().type());
+      tmp.op0().make_typecast(expr.op1().type());
+      rhs=typecast_exprt(convert_to_c_boolean(tmp), expr.op0().type());
+    }
+    else
+    {
+      rhs.id(new_id);
+      rhs.copy_to_operands(expr.op0(), expr.op1());
+      rhs.type()=expr.op0().type();
+      rhs.location()=expr.location();
     }
     
     exprt lhs=expr.op0();
