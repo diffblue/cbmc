@@ -1170,16 +1170,9 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
   if(expr_type.get(ID_C_c_type)==ID_bool)
   {
     // we replace (_Bool)x by x!=0; use ieee_float_notequal for floats
-    irep_idt id=
-      op_type.id()==ID_floatbv?ID_ieee_float_notequal:ID_notequal;
-      
-    exprt zero=gen_zero(expr.op0().type());
-    assert(zero.is_not_nil());
-
-    binary_exprt comparison(expr.op0(), id, zero, bool_typet());
-
-    comparison.location()=expr.location();
-    expr.swap(comparison);
+    locationt l=expr.location();
+    expr=convert_to_c_boolean(expr.op0());
+    expr.location()=l;
     return;
   }
 
@@ -1195,14 +1188,13 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
   }
 
   // The new thing is an lvalue if the previous one is
-  // an lvalue, and it's just a pointer type cast.
+  // an lvalue and it's just a pointer type cast.
   // This isn't really standard conformant!
-
   // Note that gcc says "warning: target of assignment not really an lvalue;
   // this will be a hard error in the future", i.e., we
-  // can hope that the below will one day go away.
+  // can hope that the code below will one day simply go away.
   
-  // Current versions of gcc in fact do not do this! Yay!
+  // Current versions of gcc in fact refuse to do this! Yay!
   
   if(expr.op0().get_bool(ID_C_lvalue))
   {
@@ -1952,8 +1944,9 @@ void c_typecheck_baset::typecheck_expr_side_effect(side_effect_exprt &expr)
       throw 0;
     }
 
-    if(is_number(final_type0) ||
-       final_type0.id()==ID_bool ||
+    if(final_type0.id()==ID_bool ||
+       final_type0.get(ID_C_c_type)==ID_bool ||
+       is_number(final_type0) ||
        final_type0.id()==ID_c_enum ||
        final_type0.id()==ID_incomplete_c_enum)
     {
@@ -3178,10 +3171,13 @@ void c_typecheck_baset::typecheck_side_effect_assignment(exprt &expr)
       return;
     }
     else if(final_type0.id()==ID_bool ||
+            final_type0.get(ID_C_c_type)==ID_bool ||
             final_type0.id()==ID_c_enum ||
             final_type0.id()==ID_incomplete_c_enum)
-    {
+    {      
+      // promote
       implicit_typecast_arithmetic(op1);
+
       if(is_number(op1.type()))
         return;
     }
@@ -3194,10 +3190,7 @@ void c_typecheck_baset::typecheck_side_effect_assignment(exprt &expr)
     {
       implicit_typecast(op1, op0.type());
       if(is_number(op0.type()))
-      {
-        expr.type()=type0;
         return;
-      }
     }
   }
 
