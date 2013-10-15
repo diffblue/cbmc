@@ -314,3 +314,36 @@ with_exprt make_with_expr(const update_exprt &src)
   
   return result;
 }
+
+/*******************************************************************\
+
+Function: convert_to_c_boolean
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+exprt convert_to_c_boolean(const exprt &src)
+{
+  // Casts to C/C++ booleans have particular meaning.
+  // We replace (_Bool)x by x!=0; use ieee_float_notequal for floats.
+  // Note that this returns a proper bool_typet(), not a C/C++ boolean.
+  // Further casting may be thus required.
+  const typet &src_type=src.type();
+  
+  irep_idt id=
+    src_type.id()==ID_floatbv?ID_ieee_float_notequal:ID_notequal;
+      
+  exprt zero=gen_zero(src_type);
+  assert(zero.is_not_nil());
+
+  binary_exprt comparison(src, id, zero, bool_typet());
+  comparison.location()=src.location();
+  
+  return comparison;
+}
+
