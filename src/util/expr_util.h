@@ -47,3 +47,6 @@ exprt make_binary(const exprt &);
 
 /*! converts an udpate expr into a (possibly nested) with expression */
 with_exprt make_with_expr(const update_exprt &);
+
+/*! converts a scalar/float expression to C/C++ Booleans */
+exprt convert_to_c_boolean(const exprt &);
