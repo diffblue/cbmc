@@ -149,7 +149,10 @@ void build_goto_trace(
   const namespacet &ns,
   goto_tracet &goto_trace)
 {
-  // we need to re-sort the steps according to their clock
+  // We need to re-sort the steps according to their clock.
+  // Furthermore, read-events need to occur before write
+  // events with the same clock.
+  
   typedef std::map<mp_integer, goto_tracet::stepst> time_mapt;
   time_mapt time_map;
   
@@ -168,12 +171,12 @@ void build_goto_trace(
     if(it->is_constraint() ||
        it->is_spawn())
       continue;
-    // for atomic sections the timing can only be determined once we see
-    // a shared read or write (if there is none, the time will be
-    // reverted to the time before entering the atomic section); we thus
-    // use a temporary negative time slot to gather all events
     else if(it->is_atomic_begin())
     {
+      // for atomic sections the timing can only be determined once we see
+      // a shared read or write (if there is none, the time will be
+      // reverted to the time before entering the atomic section); we thus
+      // use a temporary negative time slot to gather all events
       current_time*=-1;
       continue;
     }
@@ -195,6 +198,7 @@ void build_goto_trace(
 
       assert(current_time>=0);
       // move any steps gathered in an atomic section
+
       if(time_before<0)
       {
         time_mapt::iterator entry=
