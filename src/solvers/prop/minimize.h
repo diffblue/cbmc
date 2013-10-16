@@ -1,6 +1,6 @@
 /*******************************************************************\
 
-Module: Cover a set of objectives incrementally
+Module: SAT Minimizer
 
 Author: Daniel Kroening, kroening@kroening.com
 
@@ -19,7 +19,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
    Class: prop_minimizet
 
- Purpose: Try to cover some given set of objectives
+ Purpose: Computes a satisfying assignment of minimal cost
+          according to a const function using incremental SAT
 
 \*******************************************************************/
 
@@ -56,6 +57,7 @@ public:
   
   typedef long long signed int weightt;
 
+  // adds an objective with given weight
   void objective(
     const literalt condition,
     const weightt weight=1);
@@ -71,6 +73,7 @@ public:
     }
   };
 
+  // the map of objectives, sorted by weight
   typedef std::map<weightt, std::vector<objectivet> > objectivest;
   objectivest objectives;
 
