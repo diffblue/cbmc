@@ -519,7 +519,8 @@ void goto_convertt::convert_expression(
   
   if(expr.id()==ID_if)
   {
-    // we do a special treatment for ?: 
+    // We do a special treatment for c?t:f
+    // by compiling to if(c) t; else f;
     const if_exprt &if_expr=to_if_expr(expr);
     code_ifthenelset tmp_code;
     tmp_code.location()=expr.location();
@@ -1052,7 +1053,7 @@ void goto_convertt::convert_while(
   z->make_skip();
 
   goto_programt tmp_branch;
-  generate_conditional_branch(not_exprt(cond), z, location, tmp_branch);
+  generate_conditional_branch(boolean_negate(cond), z, location, tmp_branch);
 
   // do the v label
   goto_programt::targett v=tmp_branch.instructions.begin();
@@ -1895,8 +1896,8 @@ void goto_convertt::convert_ifthenelse(
 
   const locationt &location=code.location();
 
-  // we do a bit of special treatment for && in the condition
-  // in case cleaning would be needed otherwise
+  // We do a bit of special treatment for && in the condition
+  // in case cleaning would be needed otherwise.
   if(code.cond().id()==ID_and &&
      code.cond().operands().size()==2 &&
      (needs_cleaning(code.cond().op0()) || needs_cleaning(code.cond().op1())) &&
@@ -1965,7 +1966,7 @@ Function: goto_convertt::generate_ifthenelse
 
  Outputs:
 
- Purpose: if(guard) goto target;
+ Purpose: if(guard) true_case; else false_case;
 
 \*******************************************************************/
 
@@ -1994,9 +1995,10 @@ void goto_convertt::generate_ifthenelse(
     return;
   }
 
+  // Flip around if no 'true' case code.
   if(true_case.instructions.empty())
     return generate_ifthenelse(
-      not_exprt(guard), false_case, true_case, location, dest);
+      boolean_negate(guard), false_case, true_case, location, dest);
 
   bool has_else=!false_case.instructions.empty();
 
@@ -2035,7 +2037,7 @@ void goto_convertt::generate_ifthenelse(
   // v: if(!c) goto z/y;
   goto_programt tmp_v;
   generate_conditional_branch(
-    not_exprt(guard), has_else?y:z, location, tmp_v);
+    boolean_negate(guard), has_else?y:z, location, tmp_v);
 
   // w: P;
   goto_programt tmp_w;
@@ -2043,6 +2045,8 @@ void goto_convertt::generate_ifthenelse(
 
   // x: goto z;
   x->make_goto(z);
+  if(!tmp_w.instructions.empty())
+    x->location=tmp_w.instructions.back().location;
 
   dest.destructive_append(tmp_v);
   dest.destructive_append(tmp_w);
@@ -2158,7 +2162,7 @@ void goto_convertt::generate_conditional_branch(
   
     forall_expr_list(it, op)
       generate_conditional_branch(
-        not_exprt(*it), target_false, location, dest);
+        boolean_negate(*it), target_false, location, dest);
 
     goto_programt::targett t_true=dest.add_instruction();
     t_true->make_goto(target_true);

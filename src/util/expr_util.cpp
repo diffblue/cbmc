@@ -317,7 +317,7 @@ with_exprt make_with_expr(const update_exprt &src)
 
 /*******************************************************************\
 
-Function: convert_to_c_boolean
+Function: is_not_zero
 
   Inputs:
 
@@ -327,13 +327,17 @@ Function: convert_to_c_boolean
 
 \*******************************************************************/
 
-exprt convert_to_c_boolean(const exprt &src)
+exprt is_not_zero(const exprt &src)
 {
-  // Casts to C/C++ booleans have particular meaning.
+  // We frequently need to check if a numerical type is not zero.
   // We replace (_Bool)x by x!=0; use ieee_float_notequal for floats.
   // Note that this returns a proper bool_typet(), not a C/C++ boolean.
-  // Further casting may be thus required.
+  // To get a C/C++ boolean, add a further typecast.
+
   const typet &src_type=src.type();
+  
+  if(src_type.id()==ID_bool) // already there
+    return src; // do nothing
   
   irep_idt id=
     src_type.id()==ID_floatbv?ID_ieee_float_notequal:ID_notequal;
@@ -347,3 +351,22 @@ exprt convert_to_c_boolean(const exprt &src)
   return comparison;
 }
 
+/*******************************************************************\
+
+Function: boolean_negate
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+exprt boolean_negate(const exprt &src)
+{
+  if(src.id()==ID_not && src.operands().size()==1)
+    return src.op0();
+  else
+    return not_exprt(src);
+}

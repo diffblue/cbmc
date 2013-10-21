@@ -772,19 +772,19 @@ void c_typecastt::do_typecast(exprt &expr, const typet &dest_type)
 
   if(src_type!=dest_type)
   {
-    // C booleans are special: we compile to ?0:1
+    // C booleans are special; we produce the
+    // explicit comparision with zero.
+    // Note that this requires ieee_float_notequal
+    // in case of floating-point numbers.
     
     if(dest_type.get(ID_C_c_type)==ID_bool)
     {
-      if(src_type.id()==ID_bool) // bool proper -> _Bool
-      {
-        expr.make_typecast(dest_type);
-      }
-      else // * -> _Bool
-      {
-        expr=convert_to_c_boolean(expr);
-        expr.make_typecast(dest_type);
-      }
+      expr=is_not_zero(expr);
+      expr.make_typecast(dest_type);
+    }
+    else if(dest_type.id()==ID_bool)
+    {
+      expr=is_not_zero(expr);
     }
     else
     {    
