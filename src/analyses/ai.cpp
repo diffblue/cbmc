@@ -74,8 +74,10 @@ void ai_baset::output(
 
     find_state(i_it).output(out);
     out << "\n";
+    #if 0
     goto_program.output_instruction(ns, identifier, out, i_it);
     out << "\n";
+    #endif
   }
 }
 
