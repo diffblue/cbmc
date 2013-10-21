@@ -1171,7 +1171,7 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
   {
     // we replace (_Bool)x by x!=0; use ieee_float_notequal for floats
     locationt l=expr.location();
-    expr=convert_to_c_boolean(expr.op0());
+    expr=is_not_zero(expr.op0());
     expr.location()=l;
     return;
   }
@@ -2355,7 +2355,12 @@ void c_typecheck_baset::do_special_functions(
     }
     else if(identifier=="c::__builtin_expect")
     {
-      // this is a gcc extension to provide branch prediction
+      // This is a gcc extension to provide branch prediction.
+      // We compile it away, but adding some IR instruction for
+      // this would clearly be an option. Note that the type
+      // of the return value is wired to "long", i.e.,
+      // this may trigger a type conversion due to the signature
+      // of this function.
       if(expr.arguments().size()!=2)
       {
         err_location(f_op);
