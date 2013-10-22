@@ -779,12 +779,12 @@ void c_typecastt::do_typecast(exprt &expr, const typet &dest_type)
     
     if(dest_type.get(ID_C_c_type)==ID_bool)
     {
-      expr=is_not_zero(expr);
+      expr=is_not_zero(expr, ns);
       expr.make_typecast(dest_type);
     }
     else if(dest_type.id()==ID_bool)
     {
-      expr=is_not_zero(expr);
+      expr=is_not_zero(expr, ns);
     }
     else
     {    

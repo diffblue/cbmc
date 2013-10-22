@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "ieee_float.h"
 #include "std_expr.h"
 #include "symbol.h"
+#include "namespace.h"
 
 /*******************************************************************\
 
@@ -327,14 +328,16 @@ Function: is_not_zero
 
 \*******************************************************************/
 
-exprt is_not_zero(const exprt &src)
+exprt is_not_zero(
+  const exprt &src,
+  const namespacet &ns)
 {
   // We frequently need to check if a numerical type is not zero.
   // We replace (_Bool)x by x!=0; use ieee_float_notequal for floats.
   // Note that this returns a proper bool_typet(), not a C/C++ boolean.
   // To get a C/C++ boolean, add a further typecast.
 
-  const typet &src_type=src.type();
+  const typet &src_type=ns.follow(src.type());
   
   if(src_type.id()==ID_bool) // already there
     return src; // do nothing

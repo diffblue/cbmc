@@ -1171,7 +1171,7 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
   {
     // we replace (_Bool)x by x!=0; use ieee_float_notequal for floats
     locationt l=expr.location();
-    expr=is_not_zero(expr.op0());
+    expr=is_not_zero(expr.op0(), *this);
     expr.location()=l;
     return;
   }
