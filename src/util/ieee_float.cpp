@@ -753,7 +753,48 @@ void ieee_floatt::align()
 
   // exponent too large (infinity)?
   if(biased_exponent>=spec.max_exponent())
-    infinity_flag=true;
+  {
+    // we need to consider the rounding mode here
+    switch(rounding_mode)
+    {
+    case UNKNOWN:
+    case NONDETERMINISTIC:
+    case ROUND_TO_EVEN:
+      infinity_flag=true;
+      break;
+      
+    case ROUND_TO_MINUS_INF:
+      // the result of the rounding is never larger than the argument
+      if(sign_flag)
+        infinity_flag=true;
+      else
+        make_fltmax();
+      break;
+    
+    case ROUND_TO_PLUS_INF:
+      // the result of the rounding is never smaller than the argument
+      if(sign_flag)
+      {
+        make_fltmax();
+        sign_flag=true; // restore sign
+      }
+      else
+        infinity_flag=true;
+      break;
+      
+    case ROUND_TO_ZERO:
+      if(sign_flag)
+      {
+        make_fltmax();
+        sign_flag=true; // restore sign
+      }
+      else
+        make_fltmax(); // positive
+      break;
+    }
+    
+    return; // done
+  }
   else if(biased_exponent<=0) // exponent too small?
   {
     // produce a denormal (or zero)
@@ -1340,17 +1381,17 @@ void ieee_floatt::change_spec(const ieee_float_spect &dest_spec)
   mp_integer _exponent=exponent-spec.f;
   mp_integer _fraction=fraction;
   
-  bool old_sign = sign_flag;
   if(sign_flag) _fraction.negate();
 
   spec=dest_spec;
-  build(_fraction, _exponent);
-
-  if(old_sign && !sign_flag) //this can happen if fraction == 0
+  
+  if(_fraction==0)
   {
-    assert(fraction == 0);
-    negate();
+    // We have a zero. It stays a zero.
+    // Don't call build to preserve sign.
   }
+  else
+    build(_fraction, _exponent);
 }
 
 /*******************************************************************\
@@ -1501,7 +1542,8 @@ Function: ieee_floatt::make_fltmax
 
 void ieee_floatt::make_fltmax()
 {
-  mp_integer bit_pattern = power(2,spec.e + spec.f)-1 - power(2,spec.f);
+  mp_integer bit_pattern=
+    power(2, spec.e+spec.f)-1 - power(2,spec.f);
   unpack(bit_pattern);
 }
 
@@ -1519,7 +1561,7 @@ Function: ieee_floatt::make_fltmin
 
 void ieee_floatt::make_fltmin()
 {
-  unpack(power(2,spec.f));
+  unpack(power(2, spec.f));
 }
 
 /*******************************************************************\

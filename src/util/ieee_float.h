@@ -141,8 +141,8 @@ public:
   void make_NaN();
   void make_plus_infinity();
   void make_minus_infinity();
-  void make_fltmax();
-  void make_fltmin();
+  void make_fltmax(); // maximum representable finite floating-point number
+  void make_fltmin(); // minimum normalized positive floating-point number
   
   static ieee_floatt NaN(const ieee_float_spect &_spec)
   { ieee_floatt c(_spec); c.make_NaN(); return c; }
@@ -153,9 +153,11 @@ public:
   static ieee_floatt minus_infinity(const ieee_float_spect &_spec)
   { ieee_floatt c(_spec); c.make_minus_infinity(); return c; }
 
+  // maximum representable finite floating-point number
   static ieee_floatt fltmax(const ieee_float_spect &_spec)
   { ieee_floatt c(_spec); c.make_fltmax(); return c; }
 
+  // minimum normalized positive floating-point number
   static ieee_floatt fltmin(const ieee_float_spect &_spec)
   { ieee_floatt c(_spec); c.make_fltmin(); return c; }
 
