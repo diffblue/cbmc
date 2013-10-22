@@ -21,6 +21,7 @@ class update_exprt;
 class with_exprt;
 class symbolt;
 class typet;
+class namespacet;
 
 /*! \deprecated This function will eventually be removed. Use functions from
  * \ref util/std_expr.h instead.
@@ -49,6 +50,6 @@ exprt make_binary(const exprt &);
 with_exprt make_with_expr(const update_exprt &);
 
 /*! converts a scalar/float expression to C/C++ Booleans */
-exprt is_not_zero(const exprt &);
+exprt is_not_zero(const exprt &, const namespacet &ns);
 
 exprt boolean_negate(const exprt &);

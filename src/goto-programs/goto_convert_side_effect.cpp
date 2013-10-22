@@ -125,7 +125,7 @@ void goto_convertt::remove_assignment(
     {
       binary_exprt tmp(expr.op0(), new_id, expr.op1(), expr.op1().type());
       tmp.op0().make_typecast(expr.op1().type());
-      rhs=typecast_exprt(is_not_zero(tmp), expr.op0().type());
+      rhs=typecast_exprt(is_not_zero(tmp, ns), expr.op0().type());
     }
     else
     {
@@ -194,14 +194,14 @@ void goto_convertt::remove_pre(
     rhs.copy_to_operands(expr.op0(), gen_one(signed_int_type()));
     rhs.op0().make_typecast(signed_int_type());
     rhs.type()=signed_int_type();
-    rhs=is_not_zero(rhs);
+    rhs=is_not_zero(rhs, ns);
   }
   else if(op_type.get(ID_C_c_type)==ID_bool)
   {
     rhs.copy_to_operands(expr.op0(), gen_one(signed_int_type()));
     rhs.op0().make_typecast(signed_int_type());
     rhs.type()=signed_int_type();
-    rhs=is_not_zero(rhs);
+    rhs=is_not_zero(rhs, ns);
     rhs.make_typecast(op_type);
   }
   else if(op_type.id()==ID_c_enum ||
@@ -286,14 +286,14 @@ void goto_convertt::remove_post(
     rhs.copy_to_operands(expr.op0(), gen_one(signed_int_type()));
     rhs.op0().make_typecast(signed_int_type());
     rhs.type()=signed_int_type();
-    rhs=is_not_zero(rhs);
+    rhs=is_not_zero(rhs, ns);
   }
   else if(op_type.get(ID_C_c_type)==ID_bool)
   {
     rhs.copy_to_operands(expr.op0(), gen_one(signed_int_type()));
     rhs.op0().make_typecast(signed_int_type());
     rhs.type()=signed_int_type();
-    rhs=is_not_zero(rhs);
+    rhs=is_not_zero(rhs, ns);
     rhs.make_typecast(op_type);
   }
   else if(op_type.id()==ID_c_enum ||
