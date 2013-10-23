@@ -31,8 +31,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-symex/memory_model_tso.h>
 #include <goto-symex/memory_model_pso.h>
 
-#include <solvers/sat/satcheck_minisat2.h>
-
 #include "bmc.h"
 #include "bv_cbmc.h"
 
