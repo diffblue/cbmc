@@ -48,7 +48,7 @@ bool bmct::decide_default()
   
   std::auto_ptr<propt> solver;
 
-  // simplifier won't work with beautification
+  // SAT preprocessor won't work with beautification.
   if(options.get_bool_option("sat-preprocessor") &&
      !options.get_bool_option("beautify"))
   {
@@ -108,11 +108,18 @@ Function: bmct::bv_refinement
 
 bool bmct::decide_bv_refinement()
 {
-  satcheck_minisat_no_simplifiert satcheck;
-  satcheck.set_message_handler(get_message_handler());
-  satcheck.set_verbosity(get_verbosity());
+  std::auto_ptr<propt> solver;
 
-  bv_refinementt bv_refinement(ns, satcheck);
+  // We offer the option to disable the SAT preprocessor
+  if(options.get_bool_option("sat-preprocessor"))
+    solver=std::auto_ptr<propt>(new satcheckt);
+  else
+    solver=std::auto_ptr<propt>(new satcheck_minisat_no_simplifiert);
+  
+  solver->set_message_handler(get_message_handler());
+  solver->set_verbosity(get_verbosity());
+
+  bv_refinementt bv_refinement(ns, *solver);
   
   return decide(bv_refinement);
 }
