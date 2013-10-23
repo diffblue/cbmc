@@ -99,11 +99,13 @@ Function: propt::is_in_core
 
 \*******************************************************************/
 
+#if 0
 bool propt::is_in_core(literalt l) const
 {
   assert(false);
   return false;
 }
+#endif
 
 /*******************************************************************\
 
