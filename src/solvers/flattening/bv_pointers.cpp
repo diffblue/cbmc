@@ -935,7 +935,8 @@ void bv_pointerst::post_process()
       it!=postponed_list.end();
       it++)
     do_postponed(*it);
-  
+
+  // Clear the list to avoid re-doing in case of incremental usage.
   postponed_list.clear();
   
   SUB::post_process();
