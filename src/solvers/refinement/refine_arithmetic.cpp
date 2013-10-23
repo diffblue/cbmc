@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <util/i2string.h>
 #include <util/bv_arithmetic.h>
 #include <util/ieee_float.h>
 #include <util/expr_util.h>
@@ -584,7 +585,7 @@ bv_refinementt::approximationt &
 bv_refinementt::add_approximation(
   const exprt &expr, bvt &bv)
 {
-  approximations.push_back(approximationt());
+  approximations.push_back(approximationt(approximations.size()));
   approximationt &a=approximations.back(); // stable!
 
   unsigned width=boolbv_width(expr.type());
@@ -643,7 +644,7 @@ std::string bv_refinementt::approximationt::as_string() const
   #if 0
   return from_expr(expr);
   #else
-  return id2string(expr.id());
+  return i2string(id_nr)+"/"+id2string(expr.id());
   #endif
 }
 

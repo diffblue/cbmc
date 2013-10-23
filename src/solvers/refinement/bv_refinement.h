@@ -33,6 +33,10 @@ protected:
   struct approximationt
   {
   public:
+    explicit approximationt(unsigned _id_nr):id_nr(_id_nr)
+    {
+    }
+  
     exprt expr;
     unsigned no_operands;
 
@@ -53,6 +57,8 @@ protected:
     
     void add_over_assumption(literalt l);
     void add_under_assumption(literalt l);
+    
+    unsigned id_nr;
   };
   
   typedef std::list<approximationt> approximationst;
