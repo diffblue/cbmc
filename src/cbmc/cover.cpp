@@ -10,7 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/xml.h>
 
-#include <solvers/sat/satcheck_minisat2.h>
+#include <solvers/sat/satcheck.h>
 #include <solvers/prop/cover_goals.h>
 
 #include "bmc.h"
@@ -30,9 +30,7 @@ Function: bmct::cover_assertions
 
 void bmct::cover_assertions(const goto_functionst &goto_functions)
 {
-  // with simplifier: need to freeze goal variables
-  // to prevent them from being eliminated
-  satcheck_minisat_no_simplifiert satcheck;
+  satcheckt satcheck;
   
   satcheck.set_message_handler(get_message_handler());
   satcheck.set_verbosity(get_verbosity());

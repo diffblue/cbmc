@@ -10,11 +10,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/time_stopping.h>
 
-#include <solvers/sat/satcheck_minisat2.h>
+#include <solvers/sat/satcheck.h>
+#include <solvers/prop/cover_goals.h>
 
 #include <goto-symex/xml_goto_trace.h>
-
-#include <solvers/prop/cover_goals.h>
 
 #include "bmc.h"
 #include "bv_cbmc.h"
@@ -48,7 +47,7 @@ struct goalt
 
 bool bmct::all_claims(const goto_functionst &goto_functions)
 {
-  satcheck_minisat_no_simplifiert satcheck;
+  satcheckt satcheck;
   satcheck.set_message_handler(get_message_handler());
   satcheck.set_verbosity(get_verbosity());
   
