@@ -199,6 +199,25 @@ void bv_refinementt::check_UNSAT()
 
 /*******************************************************************\
 
+Function: bv_refinementt::set_frozen
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void bv_refinementt::set_frozen(const bvt &bv)
+{
+  for(unsigned i=0; i<bv.size(); i++)
+    if(!bv[i].is_constant())
+      prop.set_frozen(bv[i]);
+}
+
+/*******************************************************************\
+
 Function: bv_refinementt::set_to
 
   Inputs:

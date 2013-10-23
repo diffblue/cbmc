@@ -243,7 +243,7 @@ void bv_refinementt::check_SAT(approximationt &a)
   // see if the satisfying assignment is spurious in any way
 
   const typet &type=ns.follow(a.expr.type());
-
+  
   if(type.id()==ID_floatbv)
   {
     // these are all trinary
@@ -593,25 +593,32 @@ bv_refinementt::add_approximation(
   a.expr=expr;
   a.result_bv=prop.new_variables(width);
   a.no_operands=expr.operands().size();
+  set_frozen(a.result_bv);
 
   if(a.no_operands==1)
   {
     a.op0_bv=convert_bv(expr.op0());
+    set_frozen(a.op0_bv);
   }
   else if(a.no_operands==2)
   {
     a.op0_bv=convert_bv(expr.op0());
     a.op1_bv=convert_bv(expr.op1());
+    set_frozen(a.op0_bv);
+    set_frozen(a.op1_bv);
   }
   else if(a.no_operands==3)
   {
     a.op0_bv=convert_bv(expr.op0());
     a.op1_bv=convert_bv(expr.op1());
     a.op2_bv=convert_bv(expr.op2());
+    set_frozen(a.op0_bv);
+    set_frozen(a.op1_bv);
+    set_frozen(a.op2_bv);
   }
   else
     assert(false);
-
+    
   bv=a.result_bv;
 
   initialize(a);

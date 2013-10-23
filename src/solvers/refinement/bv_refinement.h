@@ -64,6 +64,7 @@ protected:
   void initialize(approximationt &approximation);
   void get_values(approximationt &approximation);
   bool is_in_conflict(approximationt &approximation);
+  void set_frozen(const bvt &);
   
   void check_SAT();
   void check_UNSAT();
