@@ -81,6 +81,28 @@ void cover_goalst::constraint()
 
 /*******************************************************************\
 
+Function: cover_goalst::freeze_goal_variables
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: Build clause
+
+\*******************************************************************/
+
+void cover_goalst::freeze_goal_variables()
+{
+  for(std::list<cover_goalt>::const_iterator
+      g_it=goals.begin();
+      g_it!=goals.end();
+      g_it++)
+    if(!g_it->condition.is_constant())
+      prop.set_frozen(g_it->condition);
+}
+
+/*******************************************************************\
+
 Function: cover_goalst::operator()
 
   Inputs:
@@ -95,6 +117,10 @@ void cover_goalst::operator()()
 {
   _iterations=_number_covered=0;
   decision_proceduret::resultt dec_result;
+  
+  // We use incremental solving, so need to freeze some variables
+  // to prevent them from being eliminated.      
+  freeze_goal_variables();
 
   do
   {

@@ -17,7 +17,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
    Class: cover_gooalst
 
- Purpose: Try to cover some given set of goals
+ Purpose: Try to cover some given set of goals incrementally.
+          This can be seen as a heuristic variant of
+          SAT-based set-cover. No minimality guarantee.
 
 \*******************************************************************/
 
@@ -84,6 +86,7 @@ protected:
 private:
   void mark();
   void constraint();
+  void freeze_goal_variables();
 };
 
 #endif
