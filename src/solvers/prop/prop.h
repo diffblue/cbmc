@@ -77,6 +77,9 @@ public:
   // returns true if an assumption is in the final conflict
   virtual bool is_in_conflict(literalt l) const;  
   virtual bool has_is_in_conflict() const { return false; }
+  
+  // an incremental solver may remove any variables that aren't frozen
+  virtual void set_frozen(literalt a) { }
 
   // cores -- will be removed
   virtual bool is_in_core(literalt l) const;

@@ -64,7 +64,7 @@ class satcheck_glucose_simplifiert:
 public:
   satcheck_glucose_simplifiert();
   virtual const std::string solver_text();
-  void set_frozen(literalt a);
+  virtual void set_frozen(literalt a);
   bool is_eliminated(literalt a) const;
 };
 
