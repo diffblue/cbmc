@@ -25,6 +25,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 //#define DEBUG
 
+#ifdef DEBUG
+#include <iostream>
+#endif
+
 /*******************************************************************\
 
 Function: bv_refinementt::approximationt::add_over_assumption
@@ -281,14 +285,14 @@ void bv_refinementt::check_SAT(approximationt &a)
     ieee_floatt rr(spec);
     rr.unpack(a.result_value);
     
-    std::cout << "S1: " << o0 << a.expr.id() << o1
-              << "!=" << rr << std::endl;
+    std::cout << "S1: " << o0 << " " << a.expr.id() << " " << o1
+              << " != " << rr << std::endl;
     std::cout << "S2: " << integer2binary(a.op0_value, spec.width())
-                        << a.expr.id() <<
+                        << " " << a.expr.id() << " " <<
                            integer2binary(a.op1_value, spec.width())
               << "!=" << integer2binary(a.result_value, spec.width()) << std::endl;
     std::cout << "S3: " << integer2binary(a.op0_value, spec.width())
-                        << a.expr.id() <<
+                        << " " << a.expr.id() << " " <<
                            integer2binary(a.op1_value, spec.width())
               << "==" << integer2binary(result.pack(), spec.width()) << std::endl;
     #endif
@@ -300,7 +304,7 @@ void bv_refinementt::check_SAT(approximationt &a)
       bvt r;
       float_utilst float_utils(prop);
       float_utils.spec=spec;
-      //float_utils.rounding_mode=RM;
+      float_utils.rounding_mode_bits.set(RM);
       
       literalt op0_equal=
         bv_utils.equal(a.op0_bv, float_utils.build_constant(o0));
@@ -329,7 +333,7 @@ void bv_refinementt::check_SAT(approximationt &a)
       bvt r;
       float_utilst float_utils(prop);
       float_utils.spec=spec;
-      //float_utils.rounding_mode=RM;
+      float_utils.rounding_mode_bits.set(RM);
 
       bvt op0=a.op0_bv, op1=a.op1_bv, res=a.result_bv;
 
@@ -417,7 +421,8 @@ void bv_refinementt::check_SAT(approximationt &a)
            << "' (state " << a.over_state << ")" << eom;
 
   progress=true;
-  a.over_state++;
+  if(a.over_state<MAX_STATE)
+    a.over_state++;
 }
 
 /*******************************************************************\
