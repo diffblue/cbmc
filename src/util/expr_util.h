@@ -52,4 +52,5 @@ with_exprt make_with_expr(const update_exprt &);
 /*! converts a scalar/float expression to C/C++ Booleans */
 exprt is_not_zero(const exprt &, const namespacet &ns);
 
+/*! negate a Boolean expression, possibly removing a not_exprt */
 exprt boolean_negate(const exprt &);
