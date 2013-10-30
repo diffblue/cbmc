@@ -67,6 +67,11 @@ void c_typecheck_baset::typecheck_type(typet &type)
     typecheck_symbol_type(type);
   else if(type.id()==ID_vector)
     typecheck_vector_type(to_vector_type(type));
+  else if(type.id()==ID_custom_unsignedbv ||
+          type.id()==ID_custom_signedbv ||
+          type.id()==ID_custom_floatbv ||
+          type.id()==ID_custom_fixedbv)
+    typecheck_custom_type(type);
 
   // do a bit of rule checking
 
@@ -79,6 +84,110 @@ void c_typecheck_baset::typecheck_type(typet &type)
     throw 0;
   }
   
+}
+
+/*******************************************************************\
+
+Function: c_typecheck_baset::typecheck_custom_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void c_typecheck_baset::typecheck_custom_type(typet &type)
+{
+  // they all have a width
+  exprt size_expr=
+    static_cast<const exprt &>(type.find(ID_size));
+
+  typecheck_expr(size_expr);
+  make_constant_index(size_expr);
+
+  mp_integer size_int;
+  if(to_integer(size_expr, size_int))
+  {
+    err_location(size_expr);
+    throw "failed to convert bit vector width to constant";
+  }
+
+  if(size_int<1 || size_int>1024)
+  {
+    err_location(size_expr);
+    error("bit vector width invalid");
+    throw 0;
+  }
+  
+  type.remove(ID_size);
+  type.set(ID_width, integer2string(size_int));
+
+  // depending on type, there may be a number of factional bits
+  
+  if(type.id()==ID_custom_unsignedbv)
+    type.id(ID_unsignedbv);  
+  else if(type.id()==ID_custom_signedbv)
+    type.id(ID_signedbv);  
+  else if(type.id()==ID_custom_fixedbv)
+  {
+    type.id(ID_fixedbv);  
+
+    exprt f_expr=
+      static_cast<const exprt &>(type.find(ID_f));
+
+    typecheck_expr(f_expr);
+    
+    make_constant_index(f_expr);
+
+    mp_integer f_int;
+    if(to_integer(f_expr, f_int))
+    {
+      err_location(f_expr);
+      throw "failed to convert number of faction bits to constant";
+    }
+
+    if(f_int<0 || f_int>size_int)
+    {
+      err_location(f_expr);
+      error("faction width invalid");
+      throw 0;
+    }
+    
+    type.remove(ID_f);
+    type.set(ID_integer_bits, integer2string(size_int-f_int));
+  }
+  else if(type.id()==ID_custom_floatbv)
+  {
+    type.id(ID_floatbv);  
+
+    exprt f_expr=
+      static_cast<const exprt &>(type.find(ID_f));
+
+    typecheck_expr(f_expr);
+    
+    make_constant_index(f_expr);
+
+    mp_integer f_int;
+    if(to_integer(f_expr, f_int))
+    {
+      err_location(f_expr);
+      throw "failed to convert number of faction bits to constant";
+    }
+
+    if(f_int<1 || f_int+1>=size_int)
+    {
+      err_location(f_expr);
+      error("faction width invalid");
+      throw 0;
+    }
+    
+    type.remove(ID_f);
+    type.set(ID_f, integer2string(f_int));
+  }
+  else
+    assert(false);
 }
 
 /*******************************************************************\
