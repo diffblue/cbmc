@@ -147,6 +147,7 @@ extern char *yyansi_ctext;
 %token TOK_ARRAY_OF    "array_of"
 %token TOK_CPROVER_BITVECTOR "__CPROVER_bitvector"
 %token TOK_CPROVER_FLOATBV "__CPROVER_floatbv"
+%token TOK_CPROVER_FIXEDBV "__CPROVER_fixedbv"
 %token TOK_CPROVER_ATOMIC "__CPROVER_atomic"
 %token TOK_CPROVER_BOOL "__CPROVER_bool"
 %token TOK_CPROVER_THROW "__CPROVER_throw"
@@ -1268,13 +1269,20 @@ basic_type_name:
         | TOK_CPROVER_BITVECTOR '[' comma_expression ']'
         {
           $$=$1;
-          set($$, ID_bv);
+          set($$, ID_custom_bv);
           stack($$).add(ID_size).swap(stack($3));
         }
         | TOK_CPROVER_FLOATBV '[' comma_expression ']' '[' comma_expression ']'
         {
           $$=$1;
-          set($$, ID_floatbv);
+          set($$, ID_custom_floatbv);
+          stack($$).add(ID_size).swap(stack($3));
+          stack($$).add(ID_f).swap(stack($6));
+        }
+        | TOK_CPROVER_FIXEDBV '[' comma_expression ']' '[' comma_expression ']'
+        {
+          $$=$1;
+          set($$, ID_custom_fixedbv);
           stack($$).add(ID_size).swap(stack($3));
           stack($$).add(ID_f).swap(stack($6));
         }

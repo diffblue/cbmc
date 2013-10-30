@@ -110,37 +110,15 @@ void ansi_c_convert_typet::read_rec(const typet &type)
       // we ignore without whining
     }
   }
-  else if(type.id()==ID_bv)
+  else if(type.id()==ID_custom_bv)
   {
     bv_cnt++;
     const exprt &size_expr=
       static_cast<const exprt &>(type.find(ID_size));
-
-    // should do this in type checker, not here
-    contextt context;
-    namespacet ns(context);
-    const exprt simplified=simplify_expr(size_expr, ns);
-
-    mp_integer size_int;
-    if(to_integer(simplified, size_int))
-    {
-      err_location(location);
-      error("bit vector width has to be constant");
-      throw 0;
-    }
-    
-    if(size_int<1 || size_int>1024)
-    {
-      err_location(location);
-      error("bit vector width invalid");
-      throw 0;
-    }
-    
-    bv_width=integer2long(size_int);
+      
+    bv_width=size_expr;
   }
-  else if(type.id()==ID_floatbv &&
-          !type.find(ID_f).is_nil() &&
-          !type.find(ID_size).is_nil())
+  else if(type.id()==ID_custom_floatbv)
   {
     floatbv_cnt++;
 
@@ -149,38 +127,20 @@ void ansi_c_convert_typet::read_rec(const typet &type)
     const exprt &fsize_expr=
       static_cast<const exprt &>(type.find(ID_f));
 
-    mp_integer size_int;
-    if(to_integer(size_expr, size_int))
-    {
-      err_location(location);
-      error("floatbv width has to be constant (got " + size_expr.to_string() + ")");
-      throw 0;
-    }
-    
-    if(size_int<1 || size_int>1024)
-    {
-      err_location(location);
-      error("floatbv width invalid");
-      throw 0;
-    }
+    bv_width=size_expr;
+    fraction_width=fsize_expr;
+  }
+  else if(type.id()==ID_custom_fixedbv)
+  {
+    fixedbv_cnt++;
 
-    bv_width=integer2long(size_int);
+    const exprt &size_expr=
+      static_cast<const exprt &>(type.find(ID_size));
+    const exprt &fsize_expr=
+      static_cast<const exprt &>(type.find(ID_f));
 
-    if(to_integer(fsize_expr, size_int))
-    {
-      err_location(location);
-      error("floatbv mantissa size has to be constant");
-      throw 0;
-    }
-
-    if(size_int<1 || size_int>bv_width)
-    {
-      err_location(location);
-      error("floatbv mantissa size invalid");
-      throw 0;
-    }
-
-    mantissa_width=integer2long(size_int);
+    bv_width=size_expr;
+    fraction_width=fsize_expr;
   }
   else if(type.id()==ID_short)
     short_cnt++;
@@ -475,17 +435,23 @@ void ansi_c_convert_typet::write(typet &type)
     }
     else if(bv_cnt)
     {
-      // explicitly given width
-      type.id(is_signed?ID_signedbv:ID_unsignedbv);
-      type.set(ID_width, bv_width);
+      // explicitly given expression for width
+      type.id(is_signed?ID_custom_signedbv:ID_custom_unsignedbv);
+      type.set(ID_size, bv_width);
       
-      // need to decide on ID_C_c_type to set
+      // need to decide on ID_C_c_type to set in type checker
     }
     else if(floatbv_cnt)
     {
-      type.id(ID_floatbv);
-      type.set(ID_width, bv_width);
-      type.set(ID_f, mantissa_width);
+      type.id(ID_custom_floatbv);
+      type.set(ID_size, bv_width);
+      type.set(ID_f, fraction_width);
+    }
+    else if(fixedbv_cnt)
+    {
+      type.id(ID_custom_floatbv);
+      type.set(ID_size, bv_width);
+      type.set(ID_f, fraction_width);
     }
     else if(short_cnt)
     {

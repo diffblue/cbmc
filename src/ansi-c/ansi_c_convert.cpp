@@ -476,10 +476,24 @@ void ansi_c_convertt::convert_type(
     if(array_type.size().is_not_nil())
       convert_expr(array_type.size());
   }
-  else if(type.id()==ID_bv)
+  else if(type.id()==ID_custom_bv)
   {
     exprt &size=static_cast<exprt &>(type.add(ID_size));
     convert_expr(size);
+  }
+  else if(type.id()==ID_custom_floatbv)
+  {
+    exprt &size=static_cast<exprt &>(type.add(ID_size));
+    exprt &f=static_cast<exprt &>(type.add(ID_f));
+    convert_expr(size);
+    convert_expr(f);
+  }
+  else if(type.id()==ID_custom_fixedbv)
+  {
+    exprt &size=static_cast<exprt &>(type.add(ID_size));
+    exprt &f=static_cast<exprt &>(type.add(ID_f));
+    convert_expr(size);
+    convert_expr(f);
   }
   else if(type.id()==ID_struct ||
           type.id()==ID_union)
