@@ -23,6 +23,9 @@ void cout_message_handlert::print(
   const std::string &message)
 {
   std::cout << message << '\n';
+
+  // We flush for level 6 or below.
+  if(level<=6) std::cout << std::flush;
 }
  
 void cerr_message_handlert::print(
@@ -60,14 +63,31 @@ void console_message_handlert::print(
   else
   {
     // writing to a file
+
     if(level>=4)
+    {
       std::cout << message << '\n';
+
+      if(level<=6)
+        std::cout << std::flush;
+    }
     else
       std::cerr << message << '\n' << std::flush;
   }
   #else
+  // We flush after messages of level 6 or lower.
+  // We don't for messages of level 7 or higher to improve performance,
+  // in particular when writing to NFS.
+  // Messages level 3 or lower go to cerr, messages level 4 or
+  // above go to cout.
+
   if(level>=4)
+  {
     std::cout << message << '\n';
+
+    if(level<=6)
+      std::cout << std::flush;
+  }
   else
     std::cerr << message << '\n' << std::flush;
   #endif
