@@ -239,15 +239,28 @@ bvt float_utilst::conversion(
 {
   assert(src.size()==spec.width());
 
+  #if 0
   // Catch the special case in which we extend,
   // e.g., single to double.
   // In this case, rounding can be avoided,
   // but a denormal number may be come normal.
+  // Be careful to exclude the difficult case
+  // when denormalised numbers in the old format
+  // can be converted to denormalised numbers in the
+  // new format.  Note that this is rare and will only
+  // happen with very non-standard formats.
+ 
+  int sourceSmallestNormalExponent = -((1 << (spec.e - 1)) - 1);
+  int sourceSmallestDenormalExponent = 
+    sourceSmallestNormalExponent - spec.f;
 
-  #if 0
-  // disabled to to problem with denormals
+  // Using the fact that f doesn't include the hidden bit
+   
+  int destSmallestNormalExponent = -((1 << (dest_spec.e - 1)) - 1);
+
   if(dest_spec.e>=spec.e &&
-     dest_spec.f>=spec.f)
+     dest_spec.f>=spec.f &&
+     !(sourceSmallestDenormalExponent < destSmallestNormalExponent))
   {
     unbiased_floatt unpacked_src=unpack(src);
     unbiased_floatt result;
@@ -271,6 +284,13 @@ bvt float_utilst::conversion(
     result.sign=unpacked_src.sign;
     result.NaN=unpacked_src.NaN;
     result.infinity=unpacked_src.infinity;
+
+    // if the number was denormal and is normal in the new format,
+    // normalise it!
+    if (dest_spec.e > spec.e)
+    {
+      normalization_shift(result.fraction,result.exponent);	
+    }
 
     // no rounding needed!
     return pack(bias(result));
