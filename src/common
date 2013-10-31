@@ -26,7 +26,7 @@ endif
   CFLAGS ?= -Wall -O2
   CXXFLAGS ?= -Wall -O2
   CP_CFLAGS = -MMD -MP
-  CP_CXXFLAGS = -MMD -MP -DSTL_HASH_STD
+  CP_CXXFLAGS = -MMD -MP -DSTL_HASH_TR1
   #LINKFLAGS = -static
 ifeq ($(BUILD_ENV_),OSX_Universal)
   # MacOS Fat Binaries
