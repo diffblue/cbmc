@@ -149,6 +149,87 @@ void simplify_exprt::setup_jump_table()
   ENTRY(ID_dereference, simplify_dereference);
   ENTRY(ID_address_of, simplify_address_of);
   ENTRY(ID_pointer_offset, simplify_pointer_offset);
+  ENTRY(ID_isinf, simplify_isinf);
+  ENTRY(ID_isnan, simplify_isnan);
+  ENTRY(ID_isnormal, simplify_isnormal);
+}
+
+/*******************************************************************\
+
+Function: simplify_exprt::simplify_isinf
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool simplify_exprt::simplify_isinf(exprt &expr)
+{
+  if(expr.operands().size()!=1) return true;
+ 
+  if(expr.op0().is_constant())
+  {
+    ieee_floatt value(to_constant_expr(expr.op0()));
+    expr.make_bool(value.is_infinity());
+    return false;
+  }
+  
+  return true; 
+}
+
+/*******************************************************************\
+
+Function: simplify_exprt::simplify_isnan
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool simplify_exprt::simplify_isnan(exprt &expr)
+{
+  if(expr.operands().size()!=1) return true;
+ 
+  if(expr.op0().is_constant())
+  {
+    ieee_floatt value(to_constant_expr(expr.op0()));
+    expr.make_bool(value.is_NaN());
+    return false;
+  }
+  
+  return true; 
+}
+
+/*******************************************************************\
+
+Function: simplify_exprt::simplify_isnormal
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool simplify_exprt::simplify_isnormal(exprt &expr)
+{
+  if(expr.operands().size()!=1) return true;
+ 
+  if(expr.op0().is_constant())
+  {
+    ieee_floatt value(to_constant_expr(expr.op0()));
+    expr.make_bool(value.is_normal());
+    return false;
+  }
+  
+  return true; 
 }
 
 /*******************************************************************\
@@ -5070,6 +5151,12 @@ bool simplify_exprt::simplify_node(exprt &expr)
   else if(expr.id()==ID_ieee_float_equal ||
           expr.id()==ID_ieee_float_notequal)
     result=simplify_ieee_float_relation(expr) && result;
+  else if(expr.id()==ID_isinf)
+    result=simplify_isinf(expr) && result;
+  else if(expr.id()==ID_isnan)
+    result=simplify_isnan(expr) && result;
+  else if(expr.id()==ID_isnormal)
+    result=simplify_isnormal(expr) && result;
   #else
   
   unsigned no=expr.id().get_no();
