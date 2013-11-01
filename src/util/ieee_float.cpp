@@ -470,6 +470,23 @@ void ieee_floatt::unpack(const mp_integer &i)
 
 /*******************************************************************\
 
+Function: ieee_floatt::is_normal
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool ieee_floatt::is_normal() const
+{
+  return fraction>=power(2, spec.f);
+}
+
+/*******************************************************************\
+
 Function: ieee_floatt::pack
 
   Inputs:
@@ -498,8 +515,9 @@ mp_integer ieee_floatt::pack() const
   }
   else if(fraction==0 && exponent==0)
   {
+    // zero
   }
-  else if(fraction>=power(2, spec.f)) // normal?
+  else if(is_normal()) // normal?
   {
     // fraction -- need to hide hidden bit
     result+=fraction-power(2, spec.f); // hidden bit

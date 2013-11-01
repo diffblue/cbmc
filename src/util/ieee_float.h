@@ -183,6 +183,7 @@ public:
   bool get_sign() const { return sign_flag; }
   bool is_NaN() const { return NaN_flag; }
   bool is_infinity() const { return !NaN_flag && infinity_flag; }
+  bool is_normal() const;
 
   const mp_integer &get_exponent() const { return exponent; }
   const mp_integer &get_fraction() const { return fraction; }
