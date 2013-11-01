@@ -435,11 +435,9 @@ void ansi_c_convert_typet::write(typet &type)
     }
     else if(bv_cnt)
     {
-      // explicitly given expression for width
+      // explicitly-given expression for width
       type.id(is_signed?ID_custom_signedbv:ID_custom_unsignedbv);
       type.set(ID_size, bv_width);
-      
-      // need to decide on ID_C_c_type to set in type checker
     }
     else if(floatbv_cnt)
     {
