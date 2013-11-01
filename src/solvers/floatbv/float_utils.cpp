@@ -239,9 +239,9 @@ bvt float_utilst::conversion(
 {
   assert(src.size()==spec.width());
 
-  #if 0
+  #if 1
   // Catch the special case in which we extend,
-  // e.g., single to double.
+  // e.g. single to double.
   // In this case, rounding can be avoided,
   // but a denormal number may be come normal.
   // Be careful to exclude the difficult case
@@ -274,25 +274,20 @@ bvt float_utilst::conversion(
     result.exponent=
       bv_utils.sign_extension(unpacked_src.exponent, dest_spec.e);
 
-    spec=dest_spec;
-
-    // a denormal number often does become normal
-    normalization_shift(result.fraction, result.exponent);
-    denormalization_shift(result.fraction, result.exponent);
+    // if the number was denormal and is normal in the new format,
+    // normalise it!
+    if(dest_spec.e > spec.e)
+    {
+      normalization_shift(result.fraction,result.exponent);	
+    }
 
     // the flags get copied
     result.sign=unpacked_src.sign;
     result.NaN=unpacked_src.NaN;
     result.infinity=unpacked_src.infinity;
 
-    // if the number was denormal and is normal in the new format,
-    // normalise it!
-    if (dest_spec.e > spec.e)
-    {
-      normalization_shift(result.fraction,result.exponent);	
-    }
-
     // no rounding needed!
+    spec=dest_spec; 
     return pack(bias(result));
   }
   else
