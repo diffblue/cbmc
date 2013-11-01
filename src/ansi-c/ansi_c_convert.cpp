@@ -476,7 +476,8 @@ void ansi_c_convertt::convert_type(
     if(array_type.size().is_not_nil())
       convert_expr(array_type.size());
   }
-  else if(type.id()==ID_custom_bv)
+  else if(type.id()==ID_custom_unsignedbv ||
+          type.id()==ID_custom_signedbv)
   {
     exprt &size=static_cast<exprt &>(type.add(ID_size));
     convert_expr(size);
