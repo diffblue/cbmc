@@ -24,71 +24,71 @@ inline float __builtin_fabsf(float f) { return __CPROVER_fabsf(f); }
 
 /* FUNCTION: isfinite */
 
-int isfinite(double d) { return __CPROVER_isfinite(d); }
+int isfinite(double d) { return __CPROVER_isfinited(d); }
 
 /* FUNCTION: __finite */
 
-int __finite(double d) { return __CPROVER_isfinite(d); }
+int __finite(double d) { return __CPROVER_isfinited(d); }
 
 /* FUNCTION: __finitef */
 
-int __finitef(float f) { return __CPROVER_isfinite(f); }
+int __finitef(float f) { return __CPROVER_isfinitef(f); }
 
 /* FUNCTION: __finitel */
 
-int __finitel(long double d) { return __CPROVER_isfinite(d); }
+int __finitel(long double ld) { return __CPROVER_isfiniteld(ld); }
 
 /* FUNCTION: isinf */
 
-inline int isinf(double d) { return __CPROVER_isinf(d); }
+inline int isinf(double d) { return __CPROVER_isinfd(d); }
 
 /* FUNCTION: __isinf */
 
-inline int __isinf(double d) { return __CPROVER_isinf(d); }
+inline int __isinf(double d) { return __CPROVER_isinfd(d); }
 
 /* FUNCTION: isinff */
 
-inline int isinff(float f) { return __CPROVER_isinf(f); }
+inline int isinff(float f) { return __CPROVER_isinff(f); }
 
 /* FUNCTION: __isinff */
 
-inline int __isinff(float f) { return __CPROVER_isinf(f); }
+inline int __isinff(float f) { return __CPROVER_isinff(f); }
 
 /* FUNCTION: isinfl */
 
-inline int isinfl(long double d) { return __CPROVER_isinf(d); }
+inline int isinfl(long double ld) { return __CPROVER_isinfld(ld); }
 
 /* FUNCTION: __isinfl */
 
-inline int __isinfl(long double d) { return __CPROVER_isinf(d); }
+inline int __isinfl(long double ld) { return __CPROVER_isinfld(ld); }
 
 /* FUNCTION: isnan */
 
-inline int isnan(double d) { return __CPROVER_isnan(d); }
+inline int isnan(double d) { return __CPROVER_isnand(d); }
 
 /* FUNCTION: __isnan */
 
-inline int __isnan(double d) { return __CPROVER_isnan(d); }
+inline int __isnan(double d) { return __CPROVER_isnand(d); }
 
 /* FUNCTION: __isnanf */
 
-inline int __isnanf(float f) { return __CPROVER_isnan(f); }
+inline int __isnanf(float f) { return __CPROVER_isnanf(f); }
 
 /* FUNCTION: isnanf */
 
-inline int isnanf(float f) { return __CPROVER_isnan(f); }
+inline int isnanf(float f) { return __CPROVER_isnanf(f); }
 
 /* FUNCTION: isnanl */
 
-inline int isnanl(long double d) { return __CPROVER_isnan(d); }
+inline int isnanl(long double ld) { return __CPROVER_isnanld(ld); }
 
 /* FUNCTION: __isnanl */
 
-inline int __isnanl(long double d) { return __CPROVER_isnan(d); }
+inline int __isnanl(long double ld) { return __CPROVER_isnanld(ld); }
 
 /* FUNCTION: isnormal */
 
-int isnormal(double d) { return __CPROVER_isnormal(d); }
+int isnormal(double d) { return __CPROVER_isnormald(d); }
 
 /* FUNCTION: __builtin_inff */
 
@@ -116,15 +116,15 @@ long double __builtin_huge_vall(void) { return 1.0l/0.0l; }
 
 /* FUNCTION: signbit */
 
-inline int signbit(double d) { return __CPROVER_sign(d); }
+inline int signbit(double d) { return __CPROVER_signd(d); }
 
 /* FUNCTION: __signbitf */
 
-inline int __signbitf(float f) { return __CPROVER_sign(f); }
+inline int __signbitf(float f) { return __CPROVER_signf(f); }
 
 /* FUNCTION: __signbit */
 
-inline int __signbit(double d) { return __CPROVER_sign(d); }
+inline int __signbit(double ld) { return __CPROVER_signld(ld); }
 
 /* FUNCTION: __fpclassifyd */
 
@@ -135,10 +135,10 @@ inline int __signbit(double d) { return __CPROVER_sign(d); }
 
 inline int __fpclassifyd(double d) {
   __CPROVER_HIDE:
-  return __CPROVER_isnan(d)?FP_NAN:
-         __CPROVER_isinf(d)?FP_INFINITE:
+  return __CPROVER_isnand(d)?FP_NAN:
+         __CPROVER_isinfd(d)?FP_INFINITE:
          d==0?FP_ZERO:
-         __CPROVER_isnormal(d)?FP_NORMAL:
+         __CPROVER_isnormald(d)?FP_NORMAL:
          FP_SUBNORMAL;
 }
 
@@ -151,10 +151,10 @@ inline int __fpclassifyd(double d) {
 
 inline int __fpclassifyf(float f) {
   __CPROVER_HIDE:
-  return __CPROVER_isnan(f)?FP_NAN:
-         __CPROVER_isinf(f)?FP_INFINITE:
+  return __CPROVER_isnanf(f)?FP_NAN:
+         __CPROVER_isinff(f)?FP_INFINITE:
          f==0?FP_ZERO:
-         __CPROVER_isnormal(f)?FP_NORMAL:
+         __CPROVER_isnormalf(f)?FP_NORMAL:
          FP_SUBNORMAL;
 }
 
@@ -167,10 +167,10 @@ inline int __fpclassifyf(float f) {
 
 inline int __fpclassifyl(long double f) {
   __CPROVER_HIDE:
-  return __CPROVER_isnan(f)?FP_NAN:
-         __CPROVER_isinf(f)?FP_INFINITE:
+  return __CPROVER_isnanld(f)?FP_NAN:
+         __CPROVER_isinfld(f)?FP_INFINITE:
          f==0?FP_ZERO:
-         __CPROVER_isnormal(f)?FP_NORMAL:
+         __CPROVER_isnormalld(f)?FP_NORMAL:
          FP_SUBNORMAL;
 }
 
@@ -184,20 +184,25 @@ inline int __fpclassifyl(long double f) {
 // The variant with long double below is needed for older Macs
 // only; newer ones use __fpclassifyd.
 
-inline int __fpclassify(
 #ifdef __APPLE__
-    long double d
-#else
-    double d
-#endif
-    ) {
+inline int __fpclassify(long double d) {
   __CPROVER_HIDE:
-  return __CPROVER_isnan(d)?FP_NAN:
-         __CPROVER_isinf(d)?FP_INFINITE:
+  return __CPROVER_isnanld(d)?FP_NAN:
+         __CPROVER_isinfld(d)?FP_INFINITE:
          d==0?FP_ZERO:
-         __CPROVER_isnormal(d)?FP_NORMAL:
+         __CPROVER_isnormalld(d)?FP_NORMAL:
          FP_SUBNORMAL;
 }
+#else
+inline int __fpclassify(double d) {
+  __CPROVER_HIDE:
+  return __CPROVER_isnand(d)?FP_NAN:
+         __CPROVER_isinfd(d)?FP_INFINITE:
+         d==0?FP_ZERO:
+         __CPROVER_isnormald(d)?FP_NORMAL:
+         FP_SUBNORMAL;
+}
+#endif
 
 /* FUNCTION: sin */
 
@@ -206,7 +211,7 @@ double sin(double x)
   // gross over-approximation
   double ret;
 
-  if(__CPROVER_isinf(x) || __CPROVER_isnan(x))
+  if(__CPROVER_isinfd(x) || __CPROVER_isnand(x))
     __CPROVER_assume(__CPROVER_isnan(ret));
   else
   {
@@ -225,8 +230,8 @@ long double sinl(long double x)
   // gross over-approximation
   long double ret;
 
-  if(__CPROVER_isinf(x) || __CPROVER_isnan(x))
-    __CPROVER_assume(__CPROVER_isnan(ret));
+  if(__CPROVER_isinfld(x) || __CPROVER_isnanld(x))
+    __CPROVER_assume(__CPROVER_isnanld(ret));
   else
   {
     __CPROVER_assume(ret<=1);
@@ -244,8 +249,8 @@ float sinf(float x)
   // gross over-approximation
   float ret;
 
-  if(__CPROVER_isinf(x) || __CPROVER_isnan(x))
-    __CPROVER_assume(__CPROVER_isnan(ret));
+  if(__CPROVER_isinff(x) || __CPROVER_isnanf(x))
+    __CPROVER_assume(__CPROVER_isnanf(ret));
   else
   {
     __CPROVER_assume(ret<=1);
@@ -263,8 +268,8 @@ double cos(double x)
   // gross over-approximation
   double ret;
 
-  if(__CPROVER_isinf(x) || __CPROVER_isnan(x))
-    __CPROVER_assume(__CPROVER_isnan(ret));
+  if(__CPROVER_isinfd(x) || __CPROVER_isnand(x))
+    __CPROVER_assume(__CPROVER_isnand(ret));
   else
   {
     __CPROVER_assume(ret<=1);
@@ -282,8 +287,8 @@ long double cosl(long double x)
   // gross over-approximation
   long double ret;
 
-  if(__CPROVER_isinf(x) || __CPROVER_isnan(x))
-    __CPROVER_assume(__CPROVER_isnan(ret));
+  if(__CPROVER_isinfld(x) || __CPROVER_isnanld(x))
+    __CPROVER_assume(__CPROVER_isnanld(ret));
   else
   {
     __CPROVER_assume(ret<=1);
@@ -302,8 +307,8 @@ __CPROVER_hide:;
   // gross over-approximation
   float ret;
 
-  if(__CPROVER_isinf(x) || __CPROVER_isnan(x))
-    __CPROVER_assume(__CPROVER_isnan(ret));
+  if(__CPROVER_isinff(x) || __CPROVER_isnanf(x))
+    __CPROVER_assume(__CPROVER_isnanf(ret));
   else
   {
     __CPROVER_assume(ret<=1);
@@ -352,13 +357,13 @@ union mixf
 float nextUpf(float f)
 {
 __CPROVER_hide:;
-  if (__CPROVER_isnan(f))
+  if (__CPROVER_isnanf(f))
     return 0.0f/0.0f;  // NaN
   else if (f == 0.0f)
     return 0x1p-149f;
   else if (f > 0.0f)
   {
-    if (__CPROVER_isinf(f))
+    if (__CPROVER_isinff(f))
       return f;
 
     union mixf m;
@@ -395,13 +400,13 @@ union mixd
 double nextUp(double d)
 {
 __CPROVER_hide:;
-  if (__CPROVER_isnan(d))
+  if (__CPROVER_isnand(d))
     return 0.0/0.0;  // NaN
   else if (d == 0.0)
     return 0x1.0p-1074;
   else if (d > 0.0)
   {
-    if (__CPROVER_isinf(d))
+    if (__CPROVER_isinfd(d))
       return d;
 
     union mixd m;
@@ -461,21 +466,21 @@ float sqrtf(float f)
 
   if ( f < 0.0f )
     return 0.0f/0.0f; // NaN
-  else if (__CPROVER_isinf(f) ||   // +Inf only
+  else if (__CPROVER_isinff(f) ||   // +Inf only
 	   f == 0.0f          ||   // Includes -0
-	   __CPROVER_isnan(f))
+	   __CPROVER_isnanf(f))
     return f;
-  else if (__CPROVER_isnormal(f))
+  else if (__CPROVER_isnormalf(f))
   {
     float lower;    // Intentionally non-deterministic
     __CPROVER_assume(lower > 0);
-    __CPROVER_assume(__CPROVER_isnormal(lower));
+    __CPROVER_assume(__CPROVER_isnormalf(lower));
     // Tighter bounds can be given but are dependent on the
     // number of exponent and significand bits.  Thus they are
     // given implicitly...
 
     float lowerSquare = lower * lower;
-    __CPROVER_assume(__CPROVER_isnormal(lowerSquare));
+    __CPROVER_assume(__CPROVER_isnormalf(lowerSquare));
 
     float upper = nextUpf(lower);
     float upperSquare = upper * upper;  // Might be +Inf
@@ -538,9 +543,7 @@ float sqrtf(float f)
 #define __CPROVER_FENV_H_INCLUDED
 #endif
 
-
-
-double nextUp (double d);
+double nextUp(double d);
 
 double sqrt(double d)
 {
@@ -548,18 +551,18 @@ double sqrt(double d)
 
   if ( d < 0.0f )
     return 0.0f/0.0f; // NaN
-  else if (__CPROVER_isinf(d) ||   // +Inf only
+  else if (__CPROVER_isinfd(d) ||   // +Inf only
 	   d == 0.0f          ||   // Includes -0
-	   __CPROVER_isnan(d))
+	   __CPROVER_isnand(d))
     return d;
-  else if (__CPROVER_isnormal(d))
+  else if (__CPROVER_isnormald(d))
   {
     double lower;    // Intentionally non-deterministic
     __CPROVER_assume(lower > 0);
-    __CPROVER_assume(__CPROVER_isnormal(lower));
+    __CPROVER_assume(__CPROVER_isnormald(lower));
 
     double lowerSquare = lower * lower;
-    __CPROVER_assume(__CPROVER_isnormal(lowerSquare));
+    __CPROVER_assume(__CPROVER_isnormald(lowerSquare));
 
     double upper = nextUp(lower);
     double upperSquare = upper * upper;  // Might be +Inf
