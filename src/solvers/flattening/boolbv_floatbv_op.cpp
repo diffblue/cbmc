@@ -42,6 +42,12 @@ void boolbvt::convert_floatbv_typecast(const exprt &expr, bvt &bv)
 
   const typet &src_type=ns.follow(expr.op0().type());
   const typet &dest_type=ns.follow(expr.type());
+  
+  if(src_type==dest_type) // redundant type cast?
+  {
+    bv=bv0;
+    return;
+  }
 
   float_utilst float_utils(prop);
   
