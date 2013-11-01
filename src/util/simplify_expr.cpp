@@ -1562,29 +1562,35 @@ bool simplify_exprt::simplify_floatbv_typecast(exprt &expr)
   exprt op0=expr.op0();
   exprt op1=expr.op1(); // rounding mode
   
-  // We can soundly re-write (float)(x op y)
-  // to (float)x op (float)y. True for any rounding mode!
-  
+  // We can soundly re-write (float)((double)x op (double)y)
+  // to x op y. True for any rounding mode!
+
+  #if 0
   if(op0.id()==ID_floatbv_div ||
      op0.id()==ID_floatbv_mult ||
      op0.id()==ID_floatbv_plus ||
      op0.id()==ID_floatbv_minus)
   {
-    if(op0.operands().size()==3)
+    if(op0.operands().size()==3 &&
+       op0.op0().id()==ID_typecast &&
+       op0.op1().id()==ID_typecast &&
+       op0.op0().operands().size()==1 &&
+       op0.op1().operands().size()==1 &&
+       ns.follow(op0.op0().type())==dest_type &&
+       ns.follow(op0.op1().type())==dest_type)
     {
       exprt result(op0.id(), expr.type());
       result.operands().resize(3);
-      result.op0()=binary_exprt(op0.op0(), ID_floatbv_typecast, op1, expr.type());
-      result.op1()=binary_exprt(op0.op1(), ID_floatbv_typecast, op1, expr.type());
-      result.op2()=op1; // ?
+      result.op0()=op0.op0().op0();
+      result.op1()=op0.op1().op0();
+      result.op2()=op1;
 
-      simplify_node(result.op0());
-      simplify_node(result.op1());
       simplify_node(result);
       expr.swap(result);
       return false;
     }
   }
+  #endif
 
   // constant folding  
   if(op0.is_constant() && op1.is_constant())
@@ -1619,7 +1625,8 @@ bool simplify_exprt::simplify_floatbv_typecast(exprt &expr)
 
   #if 0
   // (T)(a?b:c) --> a?(T)b:(T)c
-  if(expr.op0().id()==ID_if && expr.op0().operands().size()==3)
+  if(expr.op0().id()==ID_if &&
+     expr.op0().operands().size()==3)
   {
     exprt tmp_op1=binary_exprt(expr.op0().op1(), ID_floatbv_typecast, expr.op1(), dest_type);
     exprt tmp_op2=binary_exprt(expr.op0().op2(), ID_floatbv_typecast, expr.op1(), dest_type);
@@ -2554,7 +2561,7 @@ bool simplify_exprt::simplify_if(exprt &expr)
       }
     }
 
-    #if 0
+    #if 1
     // a ? b : c  --> a ? b[a/true] : c
     exprt tmp_true=truevalue;
     replace_expr(cond, true_exprt(), tmp_true);
@@ -3444,6 +3451,31 @@ bool simplify_exprt::simplify_inequality_constant(exprt &expr)
       }
     }
   }
+  
+  #if 1
+  // (double)value REL const ---> value rel const
+  // if 'const' can be represented exactly.
+  
+  if(expr.op0().id()==ID_typecast &&
+     expr.op0().operands().size()==1 &&
+     ns.follow(expr.op0().type()).id()==ID_floatbv &&
+     ns.follow(expr.op0().op0().type()).id()==ID_floatbv)
+  {
+    ieee_floatt const_val(to_constant_expr(expr.op1()));
+    ieee_floatt const_val_converted=const_val;
+    const_val_converted.change_spec(to_floatbv_type(ns.follow(expr.op0().op0().type())));
+    ieee_floatt const_val_converted_back=const_val_converted;
+    const_val_converted_back.change_spec(to_floatbv_type(ns.follow(expr.op0().type())));
+    if(const_val_converted_back==const_val)
+    {
+      exprt result=expr;
+      result.op0()=expr.op0().op0();
+      result.op1()=const_val_converted.to_expr();
+      expr.swap(result);
+      return false;
+    }
+  }
+  #endif
 
   // is the constant zero?
 
