@@ -725,7 +725,15 @@ void c_typecastt::implicit_typecast_arithmetic(
 
     return;
   }
-    
+  else if(max_type==SINGLE || max_type==DOUBLE || max_type==LONGDOUBLE)
+  {
+    // Special-case optimisation:
+    // If we have two non-standard sized floats, don't do implicit type
+    // promotion if we can possibly avoid it.
+    if(type1==type2)
+      return;
+  }
+
   implicit_typecast_arithmetic(expr1, max_type);
   implicit_typecast_arithmetic(expr2, max_type);
   
