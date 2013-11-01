@@ -351,6 +351,21 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
     simplify_typecast(expr); // rec. call
     return false;
   }
+
+  #if 0
+  // (T)(a?b:c) --> a?(T)b:(T)c
+  if(expr.op0().id()==ID_if &&
+     expr.op0().operands().size()==3)
+  {
+    exprt tmp_op1=typecast_exprt(expr.op0().op1(), expr_type);
+    exprt tmp_op2=typecast_exprt(expr.op0().op2(), expr_type);
+    simplify_typecast(tmp_op1);
+    simplify_typecast(tmp_op2);
+    expr=if_exprt(expr.op0().op0(), tmp_op1, tmp_op2, expr_type);
+    simplify_if(expr);
+    return false;
+  }
+  #endif
   
   const irep_idt &expr_type_id=expr_type.id();
   const exprt &operand=expr.op0();
