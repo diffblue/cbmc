@@ -2214,7 +2214,9 @@ void c_typecheck_baset::do_special_functions(
       pointer_object_expr.location()=location;
       expr.swap(pointer_object_expr);
     }
-    else if(identifier==CPROVER_PREFIX "isnan")
+    else if(identifier==CPROVER_PREFIX "isnanf" || 
+            identifier==CPROVER_PREFIX "isnand" ||
+            identifier==CPROVER_PREFIX "isnanld")
     {
       if(expr.arguments().size()!=1)
       {
@@ -2227,7 +2229,9 @@ void c_typecheck_baset::do_special_functions(
       isnan_expr.location()=location;
       expr.swap(isnan_expr);
     }
-    else if(identifier==CPROVER_PREFIX "isfinite")
+    else if(identifier==CPROVER_PREFIX "isfinitef" ||
+            identifier==CPROVER_PREFIX "isfinited" ||
+            identifier==CPROVER_PREFIX "isfiniteld")
     {
       if(expr.arguments().size()!=1)
       {
@@ -2293,7 +2297,9 @@ void c_typecheck_baset::do_special_functions(
       malloc_expr.operands()=expr.arguments();
       expr.swap(malloc_expr);
     }
-    else if(identifier==CPROVER_PREFIX "isinf")
+    else if(identifier==CPROVER_PREFIX "isinff" ||
+            identifier==CPROVER_PREFIX "isinfd" ||
+            identifier==CPROVER_PREFIX "isinfld")
     {
       if(expr.arguments().size()!=1)
       {
@@ -2306,7 +2312,9 @@ void c_typecheck_baset::do_special_functions(
       isinf_expr.location()=location;
       expr.swap(isinf_expr);
     }
-    else if(identifier==CPROVER_PREFIX "isnormal")
+    else if(identifier==CPROVER_PREFIX "isnormalf" ||
+            identifier==CPROVER_PREFIX "isnormald" ||
+            identifier==CPROVER_PREFIX "isnormalld")
     {
       if(expr.arguments().size()!=1)
       {
@@ -2319,7 +2327,9 @@ void c_typecheck_baset::do_special_functions(
       isnormal_expr.location()=location;
       expr.swap(isnormal_expr);
     }
-    else if(identifier==CPROVER_PREFIX "sign")
+    else if(identifier==CPROVER_PREFIX "signf" ||            
+            identifier==CPROVER_PREFIX "signd" ||
+            identifier==CPROVER_PREFIX "signld")
     {
       if(expr.arguments().size()!=1)
       {
