@@ -1558,9 +1558,33 @@ bool simplify_exprt::simplify_floatbv_typecast(exprt &expr)
   
   if(dest_type.id()!=ID_floatbv)
     return true;
-
+    
   exprt op0=expr.op0();
   exprt op1=expr.op1(); // rounding mode
+  
+  // We can soundly re-write (float)(x op y)
+  // to (float)x op (float)y. True for any rounding mode!
+  
+  if(op0.id()==ID_floatbv_div ||
+     op0.id()==ID_floatbv_mult ||
+     op0.id()==ID_floatbv_plus ||
+     op0.id()==ID_floatbv_minus)
+  {
+    if(op0.operands().size()==3)
+    {
+      exprt result(op0.id(), expr.type());
+      result.operands().resize(3);
+      result.op0()=binary_exprt(op0.op0(), ID_floatbv_typecast, op1, expr.type());
+      result.op1()=binary_exprt(op0.op1(), ID_floatbv_typecast, op1, expr.type());
+      result.op2()=op1; // ?
+
+      simplify_node(result.op0());
+      simplify_node(result.op1());
+      simplify_node(result);
+      expr.swap(result);
+      return false;
+    }
+  }
 
   // constant folding  
   if(op0.is_constant() && op1.is_constant())
