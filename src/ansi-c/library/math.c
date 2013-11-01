@@ -460,16 +460,17 @@ union mixl
 long double nextUpl(long double d)
 {
 __CPROVER_hide:;
-  if (__CPROVER_isnan(d))
+  if(__CPROVER_isnanld(d))
     return 0.0/0.0;  // NaN
   else if (d == 0.0)
   {
     union mixl m;
     m.bv = 0x1;
     return m.f;
+  }
   else if (d > 0.0)
   {
-    if (__CPROVER_isinf(d))
+    if(__CPROVER_isinfld(d))
       return d;
 
     union mixl m;
