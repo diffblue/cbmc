@@ -341,8 +341,14 @@ __CPROVER_hide:;
 
 /* FUNCTION: nextUpf */
 
+#ifndef __CPROVER_LIMITS_H_INCLUDED
+#include <limits.h>
+#define __CPROVER_LIMITS_H_INCLUDED
+#endif
+
+
 // IEEE_754 2008 althought similar to C's nextafter / nexttowards
-// Assumes that float is (IEEE-754) binary32
+// Loosely assumes that float is (IEEE-754) binary32
 
 union mixf
 {
@@ -350,7 +356,7 @@ union mixf
   #ifdef LIBRARY_CHECK
   int bv;
   #else
-  __CPROVER_bitvector[32] bv;
+  __CPROVER_bitvector[CHAR_BIT * sizeof(float)] bv;
   #endif
 };
 
@@ -384,8 +390,14 @@ __CPROVER_hide:;
 
 /* FUNCTION: nextUp */
 
+#ifndef __CPROVER_LIMITS_H_INCLUDED
+#include <limits.h>
+#define __CPROVER_LIMITS_H_INCLUDED
+#endif
+
+
 // IEEE_754 2008 althought similar to C's nextafter / nexttowards
-// Assumes that double is (IEEE-754) binary64
+// Loosely assumes that double is (IEEE-754) binary64
 
 union mixd
 {
@@ -393,7 +405,7 @@ union mixd
   #ifdef LIBRARY_CHECK
   long long int bv;
   #else
-  __CPROVER_bitvector[64] bv;
+  __CPROVER_bitvector[CHAR_BIT * sizeof(double)] bv;
   #endif
 };
 
@@ -426,8 +438,57 @@ __CPROVER_hide:;
 }
 
 
-/* Not nextUpl  as there is no obvious choice for the bit width of a
-   long double.*/
+/* FUNCTION: nextUpl */
+
+#ifndef __CPROVER_LIMITS_H_INCLUDED
+#include <limits.h>
+#define __CPROVER_LIMITS_H_INCLUDED
+#endif
+
+// IEEE_754 2008 althought similar to C's nextafter / nexttowards
+
+union mixl
+{
+  long double f;
+  #ifdef LIBRARY_CHECK
+  long long int bv;
+  #else
+  __CPROVER_bitvector[CHAR_BIT * sizeof(long double)] bv;
+  #endif
+};
+
+long double nextUpl(long double d)
+{
+__CPROVER_hide:;
+  if (__CPROVER_isnan(d))
+    return 0.0/0.0;  // NaN
+  else if (d == 0.0)
+  {
+    union mixl m;
+    m.bv = 0x1;
+    return m.f;
+  else if (d > 0.0)
+  {
+    if (__CPROVER_isinf(d))
+      return d;
+
+    union mixl m;
+    m.f = d;
+    ++m.bv;
+    return m.f;
+  }
+  else
+  {
+    //assert(d < 0.0);
+
+    union mixl m;
+    m.f = d;
+    --m.bv;
+    return m.f;
+  }
+}
+
+
 
 
 /* FUNCTION: sqrtf */
@@ -473,7 +534,7 @@ float sqrtf(float f)
   else if (__CPROVER_isnormalf(f))
   {
     float lower;    // Intentionally non-deterministic
-    __CPROVER_assume(lower > 0);
+    __CPROVER_assume(lower > 0.0f);
     __CPROVER_assume(__CPROVER_isnormalf(lower));
     // Tighter bounds can be given but are dependent on the
     // number of exponent and significand bits.  Thus they are
@@ -549,16 +610,16 @@ double sqrt(double d)
 {
  __CPROVER_hide:;
 
-  if ( d < 0.0f )
-    return 0.0f/0.0f; // NaN
+  if ( d < 0.0 )
+    return 0.0/0.0; // NaN
   else if (__CPROVER_isinfd(d) ||   // +Inf only
-	   d == 0.0f          ||   // Includes -0
+	   d == 0.0            ||   // Includes -0
 	   __CPROVER_isnand(d))
     return d;
   else if (__CPROVER_isnormald(d))
   {
     double lower;    // Intentionally non-deterministic
-    __CPROVER_assume(lower > 0);
+    __CPROVER_assume(lower > 0.0);
     __CPROVER_assume(__CPROVER_isnormald(lower));
 
     double lowerSquare = lower * lower;
@@ -578,7 +639,7 @@ double sqrt(double d)
       return (d - lowerSquare == 0.0f) ? lower : upper; break;
     case FE_DOWNWARD: // Fall through
     case FE_TOWARDZERO:
-      return (d - lowerSquare == 0.0f) ? lower : upper; break;
+      return (d - lowerSquare == 0.0) ? lower : upper; break;
     default:;
       //assert(0);
     }
@@ -587,10 +648,10 @@ double sqrt(double d)
   else
   {
     //assert(fpclassify(d) == FP_SUBNORMAL);
-    //assert(d > 0.0f);
+    //assert(d > 0.0);
 
     double root;    // Intentionally non-deterministic
-    __CPROVER_assume(root >= 0.0f);
+    __CPROVER_assume(root >= 0.0);
 
     __CPROVER_assume(root * root == d);
 
@@ -598,5 +659,71 @@ double sqrt(double d)
   }
 }
 
-/* No sqrtl as no nextUpl */
+/* FUNCTION: sqrtl */
 
+/* The same caveats as sqrtf apply */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_FENV_H_INCLUDED
+#include <fenv.h>
+#define __CPROVER_FENV_H_INCLUDED
+#endif
+
+long double nextUpl(long double d);
+
+long double sqrtl(long double d)
+{
+ __CPROVER_hide:;
+
+  if(d < 0.0l)
+    return 0.0l/0.0l; // NaN
+  else if (__CPROVER_isinfld(d) ||   // +Inf only
+	   d == 0.0l            ||   // Includes -0
+	   __CPROVER_isnanld(d))
+    return d;
+  else if (__CPROVER_isnormalld(d))
+  {
+    long double lower;    // Intentionally non-deterministic
+    __CPROVER_assume(lower > 0.0l);
+    __CPROVER_assume(__CPROVER_isnormalld(lower));
+
+    long double lowerSquare = lower * lower;
+    __CPROVER_assume(__CPROVER_isnormalld(lowerSquare));
+
+    long double upper = nextUpl(lower);
+    long double upperSquare = upper * upper;  // Might be +Inf
+
+    __CPROVER_assume(lowerSquare <= d);
+    __CPROVER_assume(d < upperSquare);
+
+    switch(__CPROVER_rounding_mode)
+    {
+    case FE_TONEAREST:
+      return (d - lowerSquare < upperSquare - d) ? lower : upper; break;
+    case FE_UPWARD:
+      return (d - lowerSquare == 0.0l) ? lower : upper; break;
+    case FE_DOWNWARD: // Fall through
+    case FE_TOWARDZERO:
+      return (d - lowerSquare == 0.0l) ? lower : upper; break;
+    default:;
+      //assert(0);
+    }
+
+  }
+  else
+  {
+    //assert(fpclassify(d) == FP_SUBNORMAL);
+    //assert(d > 0.0l);
+
+    long double root;    // Intentionally non-deterministic
+    __CPROVER_assume(root >= 0.0l);
+
+    __CPROVER_assume(root * root == d);
+
+    return root;
+  }
+}
