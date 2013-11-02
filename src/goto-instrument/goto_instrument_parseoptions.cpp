@@ -306,16 +306,14 @@ int goto_instrument_parseoptionst::doit()
     if(cmdline.isset("document-claims-html") ||
        cmdline.isset("document-properties-html"))
     {
-      const namespacet ns(symbol_table);
-      document_properties_html(ns, goto_functions, std::cout);
+      document_properties_html(goto_functions, std::cout);
       return 0;
     }
 
     if(cmdline.isset("document-claims-latex") ||
        cmdline.isset("document-properties-latex"))
     {
-      const namespacet ns(symbol_table);
-      document_properties_latex(ns, goto_functions, std::cout);
+      document_properties_latex(goto_functions, std::cout);
       return 0;
     }
 
