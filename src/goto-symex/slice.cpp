@@ -130,11 +130,14 @@ void symex_slicet::slice(symex_target_equationt::SSA_stept &SSA_step)
     slice_assignment(SSA_step);
     break;
 
+  case goto_trace_stept::DECL:
+    slice_decl(SSA_step);
+    break;
+    
   case goto_trace_stept::OUTPUT:
   case goto_trace_stept::INPUT:
     break;
     
-  case goto_trace_stept::DECL:
   case goto_trace_stept::DEAD:
     // ignore for now
     break;
@@ -184,6 +187,31 @@ void symex_slicet::slice_assignment(
   }
   else
     get_symbols(SSA_step.ssa_rhs);
+}
+
+/*******************************************************************\
+
+Function: symex_slicet::slice_decl
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void symex_slicet::slice_decl(
+  symex_target_equationt::SSA_stept &SSA_step)
+{
+  assert(SSA_step.ssa_lhs.id()==ID_symbol);
+  const irep_idt &id=SSA_step.ssa_lhs.get_identifier();
+
+  if(depends.find(id)==depends.end())
+  {
+    // we don't really need it
+    SSA_step.ignore=true;
+  }
 }
 
 /*******************************************************************\
