@@ -66,12 +66,16 @@ else
 endif
 library_check: library/*.c
 	for f in $(filter-out $(platform_unavail), $^) ; do \
-		$(CC) -S -Wall -Werror -pedantic -Wextra -std=gnu99 $$f -o __libcheck.s \
-			-include library/cprover.h -D__CPROVER_bool=_Bool -fno-builtin \
-			-D_Thread_local=volatile -DLIBRARY_CHECK \
+		cp $$f __libcheck.c ; \
+		sed -i 's/__builtin_[^v]/s&/' __libcheck.c ; \
+		sed -i 's/__sync_/s&/' __libcheck.c ; \
+		sed -i 's/__noop/s&/' __libcheck.c ; \
+		$(CC) -std=gnu99 -E -include library/cprover.h -D__CPROVER_bool=_Bool \
+			-D_Thread_local=volatile -DLIBRARY_CHECK -o __libcheck.i __libcheck.c ; \
+		$(CC) -S -Wall -Werror -pedantic -Wextra -std=gnu99 __libcheck.i -o __libcheck.s \
 			-Wno-unused-label -Wno-uninitialized ; \
 		ec=$$? ; \
-		$(RM) __libcheck.s ; \
+		$(RM) __libcheck.s __libcheck.i __libcheck.c ; \
 		[ $$ec -eq 0 ] || exit $$ec ; \
 	done
 	touch $@

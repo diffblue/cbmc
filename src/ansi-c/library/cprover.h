@@ -4,6 +4,7 @@ extern const void *__CPROVER_deallocated;
 extern const void *__CPROVER_malloc_object;
 extern __CPROVER_size_t __CPROVER_malloc_size;
 extern _Bool __CPROVER_malloc_is_new_array;
+extern const void *__CPROVER_memory_leak;
 
 void __CPROVER_assume(__CPROVER_bool assumption) __attribute__((__noreturn__));
 void __CPROVER_assert(__CPROVER_bool assertion, const char *description);
@@ -58,8 +59,24 @@ __CPROVER_bool __CPROVER_isfinite(double f);
 __CPROVER_bool __CPROVER_isinf(double f);
 __CPROVER_bool __CPROVER_isnormal(double f);
 __CPROVER_bool __CPROVER_sign(double f);
+__CPROVER_bool __CPROVER_isnanf(float f);
+__CPROVER_bool __CPROVER_isnand(double f);
+__CPROVER_bool __CPROVER_isnanld(long double f);
+__CPROVER_bool __CPROVER_isfinitef(float f);
+__CPROVER_bool __CPROVER_isfinited(double f);
+__CPROVER_bool __CPROVER_isfiniteld(long double f);
+__CPROVER_bool __CPROVER_isinff(float f);
+__CPROVER_bool __CPROVER_isinfd(double f);
+__CPROVER_bool __CPROVER_isinfld(long double f);
+__CPROVER_bool __CPROVER_isnormalf(float f);
+__CPROVER_bool __CPROVER_isnormald(double f);
+__CPROVER_bool __CPROVER_isnormalld(long double f);
+__CPROVER_bool __CPROVER_signf(float f);
+__CPROVER_bool __CPROVER_signd(double f);
+__CPROVER_bool __CPROVER_signld(long double f);
 double __CPROVER_inf(void);
 float __CPROVER_inff(void);
+long double __CPROVER_infl(void);
 //extern int __CPROVER_thread_local __CPROVER_rounding_mode;
 
 // absolute value
@@ -94,5 +111,6 @@ struct __CPROVER_pipet {
 extern struct __CPROVER_pipet __CPROVER_pipes[__CPROVER_constant_infinity_uint];
 // offset to make sure we don't collide with other fds
 extern const int __CPROVER_pipe_offset;
+extern unsigned __CPROVER_pipe_count;
 #endif
 
