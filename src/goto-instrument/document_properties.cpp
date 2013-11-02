@@ -21,10 +21,8 @@ class document_propertiest
 {
 public:
   document_propertiest(
-    const namespacet &_ns,
     const goto_functionst &_goto_functions,
     std::ostream &_out):
-    ns(_ns),
     goto_functions(_goto_functions),
     out(_out)
   {
@@ -43,7 +41,6 @@ public:
   }
 
 private:
-  const namespacet &ns;
   const goto_functionst &goto_functions;
   std::ostream &out;
     
@@ -443,11 +440,10 @@ Function: document_properties_html
 \*******************************************************************/
 
 void document_properties_html(
-  const namespacet &ns,
   const goto_functionst &goto_functions,
   std::ostream &out)
 {
-  document_propertiest(ns, goto_functions, out).html();
+  document_propertiest(goto_functions, out).html();
 }
 
 /*******************************************************************\
@@ -463,10 +459,9 @@ Function: document_properties_latex
 \*******************************************************************/
 
 void document_properties_latex(
-  const namespacet &ns,
   const goto_functionst &goto_functions,
   std::ostream &out)
 {
-  document_propertiest(ns, goto_functions, out).latex();
+  document_propertiest(goto_functions, out).latex();
 }
 
