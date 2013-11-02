@@ -320,8 +320,6 @@ void bv_refinementt::check_SAT(approximationt &a)
       
       prop.l_set_to_true(
         prop.limplies(op0_and_op1_equal, result_equal));
-        
-      a.over_state++;
     }
     else
     {
