@@ -14,7 +14,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_expr.h>
 #include <util/cprover_prefix.h>
 #include <util/prefix.h>
-#include <util/std_types.h>
 
 #include <linking/zero_initializer.h>
 
@@ -442,14 +441,14 @@ void c_typecheck_baset::do_designated_initializer(
     }
     else if(type.id()==ID_union)
     {
-      // union initialization is quite special
+      // union initialization is quite special -- always use the first
+      // component according to C standard section 6.7.9
       const union_typet &union_type=to_union_type(type);
-      const union_typet::componentt &component=union_type.components()[index];
+      const union_typet::componentt &component=union_type.components().front();
 
-      // build a union expression from the argument
-      exprt union_expr(ID_union, type);
-      union_expr.operands().resize(1);
-      union_expr.op0()=zero_initializer(component.type(), value.location(), *this, get_message_handler());
+      // build a union expression from first component
+      union_exprt union_expr(union_type);
+      union_expr.op()=zero_initializer(component.type(), value.location(), *this, get_message_handler());
       union_expr.location()=value.location();
       union_expr.set(ID_component_name, component.get_name());
 
