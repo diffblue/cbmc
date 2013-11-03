@@ -11,6 +11,7 @@ Date: March 2013
 #ifndef CPROVER_DIRTY_H
 #define CPROVER_DIRTY_H
 
+#include <util/std_expr.h>
 #include <goto-programs/goto_functions.h>
 
 class dirtyt
@@ -24,10 +25,21 @@ public:
   }
 
   void output(std::ostream &out) const;
-  
-  bool is_dirty(const irep_idt &id) const
+
+  // will go away, use below  
+  inline bool is_dirty(const irep_idt &id) const
   {
     return dirty.find(id)!=dirty.end();
+  }
+  
+  inline bool operator()(const irep_idt &id) const
+  {
+    return dirty.find(id)!=dirty.end();
+  }
+
+  inline bool operator()(const symbol_exprt &expr) const
+  {
+    return operator()(expr.get_identifier());
   }
 
 protected:

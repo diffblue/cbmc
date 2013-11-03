@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 exprt same_object(const exprt &p1, const exprt &p2);
 exprt deallocated(const exprt &pointer, const namespacet &ns);
+exprt dead_object(const exprt &pointer, const namespacet &ns);
 exprt dynamic_size(const namespacet &ns);
 exprt malloc_object(const exprt &pointer, const namespacet &ns);
 exprt object_size(const exprt &pointer);

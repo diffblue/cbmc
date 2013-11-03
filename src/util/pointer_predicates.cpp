@@ -111,6 +111,26 @@ exprt deallocated(const exprt &pointer, const namespacet &ns)
 
 /*******************************************************************\
 
+Function: dead_object
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+exprt dead_object(const exprt &pointer, const namespacet &ns)
+{
+  // we check __CPROVER_dead_object!
+  const symbolt &deallocated_symbol=ns.lookup(CPROVER_PREFIX "dead_object");
+
+  return same_object(pointer, deallocated_symbol.symbol_expr());
+}
+
+/*******************************************************************\
+
 Function: dynamic_size
 
   Inputs:
