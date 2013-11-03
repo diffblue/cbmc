@@ -1000,15 +1000,15 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
 
     if(!clean_code.empty())
     {
-      sideeffect_exprt sideeffect_expr(ID_statement_expression, empty_typet());
-      sideeffect_expr.copy_to_operands(code_blockt(clean_code));
+      side_effect_exprt side_effect_expr(ID_statement_expression, empty_typet());
+      side_effect_expr.copy_to_operands(code_blockt(clean_code));
     
       // We merge the side-effect into the operand, using
       // a comma-expression.
       // I.e., (type)e becomes (type)(side-effect, e)
     
       exprt comma_expr(ID_comma, op.type());
-      comma_expr.copy_to_operands(sideeffect_expr, op);
+      comma_expr.copy_to_operands(side_effect_expr, op);
       op.swap(comma_expr);
     }
   }

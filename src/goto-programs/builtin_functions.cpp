@@ -59,7 +59,7 @@ void goto_convertt::do_prob_uniform(
     throw "`"+id2string(identifier)+"' expected to have LHS";
   }
 
-  exprt rhs=sideeffect_exprt("prob_uniform", lhs.type());
+  exprt rhs=side_effect_exprt("prob_uniform", lhs.type());
   rhs.location()=function.location();
 
   if(lhs.type().id()!=ID_unsignedbv &&
@@ -138,7 +138,7 @@ void goto_convertt::do_prob_coin(
     throw "`"+id2string(identifier)+"' expected to have LHS";
   }
 
-  exprt rhs=sideeffect_exprt("prob_coin", lhs.type());
+  exprt rhs=side_effect_exprt("prob_coin", lhs.type());
   rhs.location()=function.location();
 
   if(lhs.type()!=bool_typet())
@@ -210,7 +210,7 @@ void goto_convertt::do_printf(
      f_id=="c::printf")
   {
     typet return_type=static_cast<const typet &>(function.type().find(ID_return_type));
-    sideeffect_exprt printf_code(ID_printf, return_type);
+    side_effect_exprt printf_code(ID_printf, return_type);
 
     printf_code.operands()=arguments;
     printf_code.location()=function.location();
@@ -1249,7 +1249,7 @@ void goto_convertt::do_function_call_symbol(
     exprt list_arg=make_va_list(arguments[0]);
     
     {
-      sideeffect_exprt rhs(ID_gcc_builtin_va_arg_next, list_arg.type());
+      side_effect_exprt rhs(ID_gcc_builtin_va_arg_next, list_arg.type());
       rhs.copy_to_operands(list_arg);
       rhs.set("#va_arg_type", to_code_type(function.type()).return_type());
       goto_programt::targett t1=dest.add_instruction(ASSIGN);

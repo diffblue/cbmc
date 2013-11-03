@@ -2731,48 +2731,6 @@ public:
   }
 };
 
-/*! \brief Base class for all side effects
-    \remark Will eventually be replaced by side_effect_exprt
-*/
-class sideeffect_exprt:public exprt
-{
-public:
-  inline sideeffect_exprt(
-    const irep_idt &_statement,
-    const typet &type):exprt(ID_sideeffect, type)
-  {
-    set_statement(_statement);
-  }
-  
-  inline irep_idt get_statement() const
-  {
-    return get(ID_statement);
-  }
-
-  inline void set_statement(const irep_idt &_statement)
-  {
-    set(ID_statement, _statement);
-  }
-};
-
-extern inline const sideeffect_exprt &to_sideeffect_expr(const exprt &expr)
-{
-  assert(expr.id()==ID_sideeffect);
-  return static_cast<const sideeffect_exprt &>(expr);
-}
-
-/*! \brief A side effect that returns a non-deterministically chosen value
-    \remark Will be replaced by side_effect_nondet_exprt
-*/
-class nondet_exprt:public sideeffect_exprt
-{
-public:
-  inline explicit nondet_exprt(const typet &_type):
-    sideeffect_exprt(ID_nondet, _type)
-  {
-  }
-};
-
 /*! \brief An expression denoting infinity
 */
 class infinity_exprt:public exprt
