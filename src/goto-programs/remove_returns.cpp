@@ -207,7 +207,7 @@ void remove_returnst::do_function_calls(
         // return value
         if(function_call.lhs().is_not_nil())
         {
-          exprt rhs=nondet_exprt(function_call.lhs().type());
+          exprt rhs=side_effect_expr_nondett(function_call.lhs().type());
           rhs.location()=i_it->location;
 
           code_assignt code(function_call.lhs(), rhs);

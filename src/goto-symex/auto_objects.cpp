@@ -93,7 +93,7 @@ void goto_symext::initialize_auto_object(
             address_of_exprt(make_auto_object(t.subtype()));
 
           if_exprt rhs(
-            nondet_exprt(bool_typet()),
+            side_effect_expr_nondett(bool_typet()),
             null_pointer_exprt(to_pointer_type(t)),
             address_of_expr);
           

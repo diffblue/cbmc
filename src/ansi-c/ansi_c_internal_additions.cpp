@@ -130,6 +130,7 @@ void ansi_c_internal_additions(std::string &code)
     // malloc
     "void *__CPROVER_malloc(__CPROVER_size_t size);\n"
     "const void *__CPROVER_deallocated=0;\n"
+    "const void *__CPROVER_dead_object=0;\n"
     "const void *__CPROVER_malloc_object=0;\n"
     "__CPROVER_size_t __CPROVER_malloc_size;\n"
     "__CPROVER_bool __CPROVER_malloc_is_new_array=0;\n" // for the benefit of C++

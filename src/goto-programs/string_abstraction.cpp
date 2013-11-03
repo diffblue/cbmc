@@ -1345,7 +1345,7 @@ exprt string_abstractiont::build_unknown(whatt what, bool write)
 
   case LENGTH:
   case SIZE:
-    result=nondet_exprt(type);
+    result=side_effect_expr_nondett(type);
     break;
   }
 
