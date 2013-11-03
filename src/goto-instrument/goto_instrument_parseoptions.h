@@ -21,7 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(document-properties-latex)(document-properties-html)" \
   "(dump-c)(dump-cpp)(dot)(xml)" \
   "(bounds-check)(no-bounds-check)" \
-  "(pointer-check)(no-pointer-check)" \
+  "(pointer-check)(memory-leak-check)(no-pointer-check)" \
   "(remove-pointers)" \
   "(leak-check)" \
   "(assert-to-assume)" \
