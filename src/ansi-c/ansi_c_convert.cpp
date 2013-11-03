@@ -217,9 +217,19 @@ void ansi_c_convertt::convert_code(codet &code)
   {
     assert(code.operands().size()==1);
     convert_code(to_code(code.op0()));
-
-    if(code.find(ID_case).is_not_nil())
-      convert_expr(static_cast<exprt &>(code.add(ID_case)));
+  }
+  else if(statement==ID_switch_case)
+  {
+    assert(code.operands().size()==2);
+    convert_expr(code.op0());
+    convert_code(to_code(code.op1()));
+  }
+  else if(statement==ID_gcc_switch_case_range)
+  {
+    assert(code.operands().size()==3);
+    convert_expr(code.op0());
+    convert_expr(code.op1());
+    convert_code(to_code(code.op2()));
   }
   else if(statement==ID_block ||
           statement==ID_decl_block)

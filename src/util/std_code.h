@@ -765,12 +765,7 @@ public:
     set_label(_label);
     code()=_code;
   }
-
-  inline bool is_default() const
-  {
-    return get_bool(ID_default);
-  }
-
+  
   inline const exprt::operandst &case_op() const
   {
     return static_cast<const exprt &>(find(ID_case)).operands();
@@ -799,14 +794,73 @@ public:
 
 extern inline const code_labelt &to_code_label(const codet &code)
 {
-  assert(code.get_statement()==ID_label);
+  assert(code.get_statement()==ID_label && code.operands().size()==1);
   return static_cast<const code_labelt &>(code);
 }
 
 extern inline code_labelt &to_code_label(codet &code)
 {
-  assert(code.get_statement()==ID_label);
+  assert(code.get_statement()==ID_label && code.operands().size()==1);
   return static_cast<code_labelt &>(code);
+}
+
+/*! \brief A switch-case
+*/
+class code_switch_caset:public codet
+{
+public:
+  inline code_switch_caset():codet(ID_switch_case)
+  {
+    operands().resize(2);
+  }
+
+  inline code_switch_caset(
+    const exprt &_case_op, const codet &_code):codet(ID_switch_case)
+  {
+    copy_to_operands(_case_op, _code);
+  }
+
+  inline bool is_default() const
+  {
+    return get_bool(ID_default);
+  }
+
+  inline void set_default()
+  {
+    return set(ID_default, true);
+  }
+
+  inline const exprt &case_op() const
+  {
+    return op0();
+  }
+  
+  inline exprt &case_op()
+  {
+    return op0();
+  }
+  
+  codet &code()
+  {
+    return static_cast<codet &>(op1());
+  }
+
+  const codet &code() const
+  {
+    return static_cast<const codet &>(op1());
+  }
+};
+
+extern inline const code_switch_caset &to_code_switch_case(const codet &code)
+{
+  assert(code.get_statement()==ID_switch_case && code.operands().size()==2);
+  return static_cast<const code_switch_caset &>(code);
+}
+
+extern inline code_switch_caset &to_code_switch_case(codet &code)
+{
+  assert(code.get_statement()==ID_switch_case && code.operands().size()==2);
+  return static_cast<code_switch_caset &>(code);
 }
 
 /*! \brief A break for `for' and `while' loops

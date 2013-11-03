@@ -269,38 +269,9 @@ void goto_convertt::convert_label(
   goto_programt::targett target=tmp.instructions.begin();
   dest.destructive_append(tmp);
 
-  if(!label.empty())
-  {
-    targets.labels.insert(std::pair<irep_idt, goto_programt::targett>
-                          (label, target));
-    target->labels.push_front(label);
-  }
-
-  // cases?
-
-  const exprt::operandst &case_op=code.case_op();
-
-  if(!case_op.empty())
-  {
-    cases_mapt::iterator cases_entry=targets.cases_map.find(target);
-    if(cases_entry==targets.cases_map.end())
-    {
-      targets.cases.push_back(std::make_pair(target, caset()));
-      cases_entry=targets.cases_map.insert(std::make_pair(
-            target, --targets.cases.end())).first;
-    }
-    exprt::operandst &case_op_dest=cases_entry->second->second;
-    
-    case_op_dest.reserve(case_op_dest.size()+case_op.size());
-    
-    forall_expr(it, case_op)
-      case_op_dest.push_back(*it);
-  }
-
-  // default?
-
-  if(code.is_default())
-    targets.set_default(target);
+  targets.labels.insert(std::pair<irep_idt, goto_programt::targett>
+                        (label, target));
+  target->labels.push_front(label);
 }
 
 /*******************************************************************\
@@ -320,6 +291,98 @@ void goto_convertt::convert_gcc_local_label(
   goto_programt &dest)
 {
   // ignore for now
+}
+
+/*******************************************************************\
+
+Function: goto_convert::convert_switch_case
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void goto_convertt::convert_switch_case(
+  const code_switch_caset &code,
+  goto_programt &dest)
+{
+  if(code.operands().size()!=2)
+  {
+    err_location(code);
+    throw "switch-case statement expected to have two operands";
+  }
+  
+  goto_programt tmp;
+  convert(code.code(), tmp);
+  
+  goto_programt::targett target=tmp.instructions.begin();
+  dest.destructive_append(tmp);
+
+  // default?
+
+  if(code.is_default())
+    targets.set_default(target);
+  else
+  {
+    // cases?
+
+    cases_mapt::iterator cases_entry=targets.cases_map.find(target);
+    if(cases_entry==targets.cases_map.end())
+    {
+      targets.cases.push_back(std::make_pair(target, caset()));
+      cases_entry=targets.cases_map.insert(std::make_pair(
+            target, --targets.cases.end())).first;
+    }
+
+    exprt::operandst &case_op_dest=cases_entry->second->second;
+    case_op_dest.push_back(code.case_op());
+  }
+}
+
+/*******************************************************************\
+
+Function: goto_convert::convert_gcc_switch_case_range
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void goto_convertt::convert_gcc_switch_case_range(
+  const codet &code,
+  goto_programt &dest)
+{
+  if(code.operands().size()!=3)
+  {
+    err_location(code);
+    throw "GCC's switch-case-range statement expected to have three operands";
+  }
+  
+  goto_programt tmp;
+  convert(to_code(code.op2()), tmp);
+  
+  goto_programt::targett target=tmp.instructions.begin();
+  dest.destructive_append(tmp);
+
+  cases_mapt::iterator cases_entry=targets.cases_map.find(target);
+  if(cases_entry==targets.cases_map.end())
+  {
+    targets.cases.push_back(std::make_pair(target, caset()));
+    cases_entry=targets.cases_map.insert(std::make_pair(
+          target, --targets.cases.end())).first;
+  }
+
+  #if 0
+  // TODO
+  exprt::operandst &case_op_dest=cases_entry->second->second;
+  case_op_dest.push_back(code.case_op());
+  #endif
 }
 
 /*******************************************************************\
@@ -362,6 +425,10 @@ void goto_convertt::convert(
     convert_label(to_code_label(code), dest);
   else if(statement==ID_gcc_local_label)
     convert_gcc_local_label(code, dest);
+  else if(statement==ID_switch_case)
+    convert_switch_case(to_code_switch_case(code), dest);
+  else if(statement==ID_gcc_switch_case_range)
+    convert_gcc_switch_case_range(code, dest);
   else if(statement==ID_for)
     convert_for(to_code_for(code), dest);
   else if(statement==ID_while)

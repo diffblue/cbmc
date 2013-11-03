@@ -173,6 +173,8 @@ protected:
   virtual void typecheck_computed_goto(codet &code);
   virtual void typecheck_ifthenelse(code_ifthenelset &code);
   virtual void typecheck_label(code_labelt &code);
+  virtual void typecheck_switch_case(code_switch_caset &code);
+  virtual void typecheck_gcc_switch_case_range(codet &code);
   virtual void typecheck_gcc_local_label(codet &code);
   virtual void typecheck_return(codet &code);
   virtual void typecheck_switch(code_switcht &code);
