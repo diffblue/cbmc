@@ -27,7 +27,7 @@ class optionst;
   "(document-subgoals)(outfile):" \
   "D:I:" \
   "(depth):(partial-loops)(no-unwinding-assertions)" \
-  "(bounds-check)(pointer-check)(div-by-zero-check)" \
+  "(bounds-check)(pointer-check)(div-by-zero-check)(memory-leak-check)" \
   "(signed-overflow-check)(unsigned-overflow-check)(nan-check)" \
   "(no-assertions)(no-assumptions)" \
   "(xml-ui)(xml-interface)(vcd):" \

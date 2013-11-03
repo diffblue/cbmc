@@ -35,6 +35,7 @@ public:
   {
     enable_bounds_check=_options.get_bool_option("bounds-check");
     enable_pointer_check=_options.get_bool_option("pointer-check");
+    enable_memory_leak_check=_options.get_bool_option("memory-leak-check");
     enable_div_by_zero_check=_options.get_bool_option("div-by-zero-check");
     enable_signed_overflow_check=_options.get_bool_option("signed-overflow-check");
     enable_unsigned_overflow_check=_options.get_bool_option("unsigned-overflow-check");
@@ -102,6 +103,7 @@ protected:
 
   bool enable_bounds_check;
   bool enable_pointer_check;  
+  bool enable_memory_leak_check;
   bool enable_div_by_zero_check;
   bool enable_signed_overflow_check;
   bool enable_unsigned_overflow_check;
@@ -1426,7 +1428,7 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
     }
     else if(i.is_end_function() &&
             i.function==ID_main &&
-            enable_pointer_check)
+            enable_memory_leak_check)
     {
       const symbolt &leak=ns.lookup("c::__CPROVER_memory_leak");
       const symbol_exprt leak_expr=leak.symbol_expr();
