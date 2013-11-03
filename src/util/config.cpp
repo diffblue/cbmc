@@ -777,17 +777,18 @@ bool configt::set(const cmdlinet &cmdline)
 
   if(os=="windows")
   {
+    // Cygwin uses GCC throughout, use i386-linux
+    // MinGW needs --win32 --gcc
     ansi_c.lib=configt::ansi_ct::LIB_FULL;
     ansi_c.os=configt::ansi_ct::OS_WIN;
+    ansi_c.mode=ansi_ct::MODE_VISUAL_STUDIO_C_CPP;
     // there are gcc versions that target Windows
     if(cmdline.isset("gcc"))
     {
-      ansi_c.mode=ansi_ct::MODE_GCC_C;
       ansi_c.preprocessor=ansi_ct::PP_GCC;
     }
     else
     {
-      ansi_c.mode=ansi_ct::MODE_VISUAL_STUDIO_C_CPP;
       #ifndef _WIN32
       ansi_c.preprocessor=ansi_ct::PP_GCC;
       #else

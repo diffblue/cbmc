@@ -692,7 +692,8 @@ bool c_preprocess_gcc(
   case configt::ansi_ct::OS_WIN:
     command+=" -D _MSC_VER=1400";
     command+=" -D _WIN32";
-    command+=" -D _M_IX86=Blend";
+    if(config.ansi_c.mode!=configt::ansi_ct::MODE_VISUAL_STUDIO_C_CPP)
+      command+=" -D _M_IX86=Blend";
 
     if(config.ansi_c.arch==configt::ansi_ct::ARCH_X86_64)
       command+=" -D _WIN64"; // yes, both _WIN32 and _WIN64 get defined
