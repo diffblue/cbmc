@@ -149,7 +149,7 @@ void acceleratet::add_accelerator(goto_programt::targett &loop_header,
 
   goto_programt::targett jump = program.insert_before(loop_body);
   jump->make_goto();
-  jump->guard = nondet_exprt(bool_typet());
+  jump->guard = side_effect_expr_nondett(bool_typet());
   jump->targets.push_back(loop_body);
 
   program.destructive_insert(loop_body, accelerator);

@@ -814,7 +814,7 @@ goto_programt::const_targett goto_program2codet::convert_return(
   // statement to avoid NONDET() in output when the instruction is dead anyway
   if(ret.has_return_value() &&
      ret.return_value().id()==ID_sideeffect &&
-     to_sideeffect_expr(ret.return_value()).get_statement()==ID_nondet)
+     to_side_effect_expr(ret.return_value()).get_statement()==ID_nondet)
   {
     const cfg_dominatorst &dominators=loops.get_dominator_info();
     cfg_dominatorst::node_mapt::const_iterator i_entry=

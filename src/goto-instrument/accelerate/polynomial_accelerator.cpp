@@ -171,7 +171,7 @@ bool polynomial_acceleratort::accelerate(patht &loop,
   // assume(guard);
   // assume(no overflows in previous code);
 
-  program.assign(loop_counter, nondet_exprt(loop_counter.type()));
+  program.assign(loop_counter, side_effect_expr_nondett(loop_counter.type()));
 
   for (map<exprt, polynomialt>::iterator it = polynomials.begin();
        it != polynomials.end();
@@ -724,7 +724,7 @@ bool polynomial_acceleratort::do_assumptions(map<exprt, polynomialt> polynomials
 
   program.assume(not_exprt(condition));
 
-  program.assign(loop_counter, nondet_exprt(loop_counter.type()));
+  program.assign(loop_counter, side_effect_expr_nondett(loop_counter.type()));
 
   for (vector<exprt>::iterator it = polynomials_hold.begin();
        it != polynomials_hold.end();
@@ -855,7 +855,7 @@ bool polynomial_acceleratort::do_arrays(goto_programt::instructionst &loop_body,
   for (set<exprt>::iterator it = arrays_written.begin();
        it != arrays_written.end();
        ++it) {
-    program.assign(*it, nondet_exprt(it->type()));
+    program.assign(*it, side_effect_expr_nondett(it->type()));
   }
 
  // Now add in all the effects of this loop on the arrays.
