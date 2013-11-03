@@ -766,11 +766,6 @@ public:
     code()=_code;
   }
   
-  inline const exprt::operandst &case_op() const
-  {
-    return static_cast<const exprt &>(find(ID_case)).operands();
-  }
-  
   inline const irep_idt &get_label() const
   {
     return get(ID_label);
