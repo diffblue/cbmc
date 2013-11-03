@@ -543,6 +543,12 @@ void goto_instrument_parseoptionst::instrument_goto_program(
   else
     options.set_option("pointer-check", false);
 
+  // check pointers
+  if(cmdline.isset("memory-leak-check"))
+    options.set_option("memory-leak-check", true);
+  else
+    options.set_option("memory-leak-check", false);
+
   // check assertions
   if(cmdline.isset("no-assertions"))
     options.set_option("assertions", false);
@@ -902,6 +908,7 @@ void goto_instrument_parseoptionst::help()
     " --bounds-check               add array bounds checks\n"
     " --div-by-zero-check          add division by zero checks\n"
     " --pointer-check              add pointer checks\n"
+    " --memory-leak-check          add memory leak checks\n"
     " --signed-overflow-check      add arithmetic over- and underflow checks\n"
     " --unsigned-overflow-check    add arithmetic over- and underflow checks\n"
     " --undefined-shift-check      add range checks for shift distances\n"
