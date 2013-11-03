@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <string.h> 
+void free(void *);
 
 int main()
 {
@@ -13,7 +14,9 @@ int main()
   assert(strncmp("ASDxx", "ASDyy", 3)==0);
 
   assert(strlen(str)==5);
-  assert(strcmp(str, strdup(str))==0);
+  char * str_cpy=strdup(str);
+  assert(strcmp(str, str_cpy)==0);
+  free(str_cpy);
 
   return 0;
 }

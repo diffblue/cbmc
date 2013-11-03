@@ -75,6 +75,10 @@ inline void *malloc(__CPROVER_size_t malloc_size)
   __CPROVER_malloc_size=record_malloc?malloc_size:__CPROVER_malloc_size;
   __CPROVER_malloc_is_new_array=record_malloc?0:__CPROVER_malloc_is_new_array;
   
+  // detect memory leaks
+  _Bool record_may_leak;
+  __CPROVER_memory_leak=record_may_leak?res:__CPROVER_memory_leak;
+
   return res;
 }
 
@@ -107,6 +111,9 @@ inline void free(void *ptr)
     // non-deterministically record as deallocated
     _Bool record;
     if(record) __CPROVER_deallocated=ptr;
+
+    // detect memory leaks
+    if(__CPROVER_memory_leak==ptr) __CPROVER_memory_leak=0;
   }
 }
 
@@ -243,6 +250,11 @@ inline char *getenv(const char *name)
   __CPROVER_assume(buf_size>=1);
   buffer=(char *)__CPROVER_malloc(buf_size);
   buffer[buf_size-1]=0;
+
+  // detect memory leaks
+  _Bool record_may_leak;
+  __CPROVER_memory_leak=record_may_leak?buffer:__CPROVER_memory_leak;
+
   return buffer;
 }
 

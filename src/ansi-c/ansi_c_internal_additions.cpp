@@ -134,6 +134,7 @@ void ansi_c_internal_additions(std::string &code)
     "const void *__CPROVER_malloc_object=0;\n"
     "__CPROVER_size_t __CPROVER_malloc_size;\n"
     "__CPROVER_bool __CPROVER_malloc_is_new_array=0;\n" // for the benefit of C++
+    "const void *__CPROVER_memory_leak=0;\n"
 
     // this is ANSI-C
     "extern __CPROVER_thread_local const char __func__[__CPROVER_constant_infinity_uint];\n"

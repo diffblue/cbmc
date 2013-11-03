@@ -17,6 +17,10 @@ inline void *__new(__typeof__(sizeof(int)) malloc_size)
   __CPROVER_malloc_size=record_malloc?malloc_size:__CPROVER_malloc_size;
   __CPROVER_malloc_is_new_array=record_malloc?0:__CPROVER_malloc_is_new_array;
   
+  // detect memory leaks
+  _Bool record_may_leak;
+  __CPROVER_memory_leak=record_may_leak?res:__CPROVER_memory_leak;
+
   return res;
 }
 
@@ -42,6 +46,10 @@ inline void *__new_array(__CPROVER_size_t count, __CPROVER_size_t size)
   __CPROVER_malloc_size=record_malloc?size*count:__CPROVER_malloc_size;
   __CPROVER_malloc_is_new_array=record_malloc?1:__CPROVER_malloc_is_new_array;
   
+  // detect memory leaks
+  _Bool record_may_leak;
+  __CPROVER_memory_leak=record_may_leak?res:__CPROVER_memory_leak;
+
   return res;
 }
 
