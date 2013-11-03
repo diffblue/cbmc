@@ -19,6 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/guard.h>
 #include <util/base_type.h>
 #include <util/pointer_predicates.h>
+#include <util/cprover_prefix.h>
 
 #include "local_may_alias.h"
 #include "goto_check.h"
@@ -831,18 +832,22 @@ void goto_checkt::pointer_validity_check(
   #else
   
   std::set<exprt> alias_set=local_may_alias->get(t, pointer);
+
   bool may_use_offset=local_may_alias->may_use_offset(t, pointer);
   bool aliases_unknown=alias_set.find(exprt(ID_unknown))!=alias_set.end();
   bool aliases_dynamic_object=alias_set.find(exprt(ID_dynamic_object))!=alias_set.end();
   bool aliases_null_object=alias_set.find(exprt(ID_null_object))!=alias_set.end();
-  
   bool aliases_other_object=false;
   
   for(std::set<exprt>::const_iterator it=alias_set.begin();
       it!=alias_set.end();
       it++)
-    if(it->id()!=ID_unknown && it->id()!=ID_dynamic_object && it->id()!=ID_null_object)
+    if(it->id()!=ID_unknown &&
+       it->id()!=ID_dynamic_object &&
+       it->id()!=ID_null_object)
+    {
       aliases_other_object=true;
+    }
 
   const typet &dereference_type=pointer_type.subtype();
 
@@ -870,6 +875,15 @@ void goto_checkt::pointer_validity_check(
     add_guarded_claim(
       or_exprt(not_exprt(dynamic_object(pointer)), not_exprt(deallocated(pointer, ns))),
       "dereference failure: deallocated dynamic object",
+      "pointer dereference",
+      expr.find_location(),
+      expr,
+      guard);
+
+  if(aliases_unknown || aliases_other_object)
+    add_guarded_claim(
+      not_exprt(dead_object(pointer, ns)),
+      "dereference failure: dead object",
       "pointer dereference",
       expr.find_location(),
       expr,
@@ -1387,6 +1401,28 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
     {
       if(!enable_assumptions)
         i.type=SKIP;
+    }
+    else if(i.is_dead())
+    {
+      if(enable_pointer_check)
+      {
+        assert(i.code.operands().size()==1);
+        const symbol_exprt &variable=to_symbol_expr(i.code.op0());
+        
+        // is it dirty?
+        if(local_may_alias->dirty(variable))
+        {
+          // need to mark the dead variable as dead
+          goto_programt::targett t=new_code.add_instruction(ASSIGN);
+          exprt address_of_expr=address_of_exprt(variable);
+          exprt lhs=symbol_expr(ns.lookup(CPROVER_PREFIX "dead_object"));
+          exprt rhs=if_exprt(
+            side_effect_expr_nondett(bool_typet()), address_of_expr, lhs, lhs.type());
+          t->location=i.location;
+          t->code=code_assignt(lhs, rhs);
+          t->code.location()=i.location;
+        }
+      }
     }
 
     for(goto_programt::instructionst::iterator
