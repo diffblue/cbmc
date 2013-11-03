@@ -1,4 +1,5 @@
 void *malloc(unsigned);
+void free(void *);
 
 struct S
 {
@@ -15,4 +16,6 @@ int main()
   p->x=1;
   p->a[0]=3;
   p->a[9]=3;
+
+  free(p);
 }
