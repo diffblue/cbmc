@@ -3265,6 +3265,9 @@ std::string expr2ct::convert_code(
   if(statement==ID_label)
     return convert_code_label(to_code_label(src), indent);
 
+  if(statement==ID_switch_case)
+    return convert_code_switch_case(to_code_switch_case(src), indent);
+
   if(statement==ID_free)
     return convert_code_free(src, indent);
 
@@ -3700,43 +3703,51 @@ std::string expr2ct::convert_code_label(
   const code_labelt &src,
   unsigned indent)
 {
-  bool first=true;
   std::string labels_string;
 
+  irep_idt label=src.get_label();
+  
+  labels_string+="\n";
+  labels_string+=indent_str(indent);
+  labels_string+=name2string(label);
+  labels_string+=":\n";
+
+  std::string tmp=convert_code(src.code(), indent+2);
+
+  return labels_string+tmp;
+}
+
+/*******************************************************************\
+
+Function: expr2ct::convert_code_switch_case
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+std::string expr2ct::convert_code_switch_case(
+  const code_switch_caset &src,
+  unsigned indent)
+{
+  std::string labels_string;
+
+  if(src.is_default())
   {
-    irep_idt label=src.get_label();
-    
-    if(label!=irep_idt())
-    {
-      if(first) { labels_string+="\n"; first=false; }
-      labels_string+=indent_str(indent);
-      labels_string+=name2string(label);
-      labels_string+=":\n";
-    }
-
-    const exprt::operandst &case_op=src.case_op();
-
-    forall_expr(it, case_op)
-    {
-      if(first) { labels_string+="\n"; first=false; }
-      labels_string+=indent_str(indent);
-      labels_string+="case ";
-      labels_string+=convert(*it);
-      labels_string+=":\n";
-    }
-
-    if(src.is_default())
-    {
-      if(first) { labels_string+="\n"; first=false; }
-      labels_string+=indent_str(indent);
-      labels_string+="default:\n";
-    }
+    labels_string+="\n";
+    labels_string+=indent_str(indent);
+    labels_string+="default:\n";
   }
-
-  if(src.operands().size()!=1)
+  else
   {
-    unsigned precedence;
-    return convert_norep(src, precedence);
+    labels_string+="\n";
+    labels_string+=indent_str(indent);
+    labels_string+="case ";
+    labels_string+=convert(src.case_op());
+    labels_string+=":\n";
   }
 
   std::string tmp=convert_code(src.code(), indent+2);
@@ -3915,7 +3926,23 @@ std::string expr2ct::convert(
     return convert_function(src, "FLOAT/", precedence=16);
 
   else if(src.id()==ID_floatbv_typecast)
+  {
+    #if 0
     return convert_function(src, "FLOAT_TYPECAST", precedence=16);
+    #else
+    const typet &to_type=ns.follow(src.type());
+    std::string dest="("+convert(to_type)+")";
+
+    unsigned p;
+    std::string tmp=convert(src.op0(), p);
+
+    if(precedence>p) dest+='(';
+    dest+=tmp;
+    if(precedence>p) dest+=')';
+
+    return dest;
+    #endif
+  }
 
   else if(src.id()==ID_invalid_pointer)
     return convert_function(src, "INVALID-POINTER", precedence=16);

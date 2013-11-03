@@ -5800,25 +5800,50 @@ bool Parser::rStatement(codet &statement)
     {
       lex.GetToken(tk1);
 
-      statement=codet(ID_code);
-      set_location(statement, tk1);
-      statement.set(ID_statement, ID_label);
-
-      exprt exp;
-      if(!rExpression(exp))
+      exprt case_expr;
+      if(!rExpression(case_expr))
         return false;
+      
+      if(lex.LookAhead(0)==TOK_ELLIPSIS)
+      {
+        // This is a gcc extension for case ranges.
+        // Should really refuse in non-GCC modes.
+        lex.GetToken(tk2);
+        
+        exprt range_end;
+        if(!rExpression(range_end))
+          return false;
 
-      exprt &case_ops=statement.add_expr(ID_case);
-      case_ops.copy_to_operands(exp);
+        statement=codet(ID_gcc_switch_case_range);
+        statement.operands().resize(3);
+        statement.op0()=case_expr;
+        statement.op1()=range_end;
+        set_location(statement, tk1);
 
-      if(lex.GetToken(tk2)!=':')
-        return false;
+        if(lex.GetToken(tk2)!=':')
+          return false;
 
-      codet statement2;
-      if(!rStatement(statement2))
-        return false;
+        codet statement2;
+        if(!rStatement(statement2))
+          return false;
 
-      statement.move_to_operands(statement2);
+        statement.op2().swap(statement2);
+      }
+      else
+      {
+        statement=code_switch_caset();
+        set_location(statement, tk1);
+        statement.op0()=case_expr;
+      
+        if(lex.GetToken(tk2)!=':')
+          return false;
+
+        codet statement2;
+        if(!rStatement(statement2))
+          return false;
+
+        statement.op1().swap(statement2);
+      }
     }
     return true;
 
@@ -5826,10 +5851,9 @@ bool Parser::rStatement(codet &statement)
     {
       lex.GetToken(tk1);
 
-      statement=codet(ID_code);
-      set_location(statement, tk1);
-      statement.set(ID_statement, ID_label);
+      statement=code_switch_caset();
       statement.set(ID_default, true);
+      set_location(statement, tk1);
 
       if(lex.GetToken(tk2)!=':')
         return false;
@@ -5838,8 +5862,7 @@ bool Parser::rStatement(codet &statement)
       if(!rStatement(statement2))
         return false;
 
-      statement.move_to_operands(statement2);
-
+      statement.op1().swap(statement2);
     }
     return true;
 

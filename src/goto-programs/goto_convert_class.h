@@ -182,6 +182,8 @@ protected:
   void convert_non_deterministic_goto(const codet &code, goto_programt &dest);
   void convert_label(const code_labelt &code, goto_programt &dest);
   void convert_gcc_local_label(const codet &code, goto_programt &dest);
+  void convert_switch_case(const code_switch_caset &code, goto_programt &dest);
+  void convert_gcc_switch_case_range(const codet &code, goto_programt &dest);
   void convert_function_call(const code_function_callt &code, goto_programt &dest);
   void convert_specc_notify(const codet &code, goto_programt &dest);
   void convert_specc_wait(const codet &code, goto_programt &dest);

@@ -1084,8 +1084,8 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
       ++cases_it)
   {
     if(cases_it->is_goto() &&
-        !cases_it->is_backwards_goto() &&
-        cases_it->guard.is_true())
+       !cases_it->is_backwards_goto() &&
+       cases_it->guard.is_true())
     {
       goto_programt::const_targett default_target=cases_it->get_target();
 
@@ -1104,10 +1104,10 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
       break;
     }
     else if(cases_it->is_goto() &&
-        !cases_it->is_backwards_goto() &&
-        cases_it->guard.id()==ID_equal &&
-        skip_typecast(to_equal_expr(cases_it->guard).rhs()).is_constant() &&
-        s.value()==to_equal_expr(cases_it->guard).lhs())
+            !cases_it->is_backwards_goto() &&
+            cases_it->guard.id()==ID_equal &&
+            skip_typecast(to_equal_expr(cases_it->guard).rhs()).is_constant() &&
+            s.value()==to_equal_expr(cases_it->guard).lhs())
     {
       cases.push_back(std::make_pair(
             to_equal_expr(cases_it->guard).rhs(),
@@ -1596,14 +1596,11 @@ void goto_program2codet::cleanup_code(
   if(statement==ID_label)
   {
     code_labelt &cl=to_code_label(code);
-
     const irep_idt &label=cl.get_label();
-    assert(!label.empty() ||
-        !cl.case_op().empty() ||
-        cl.is_default());
 
-    if(!label.empty() &&
-      labels_in_use.find(label)==labels_in_use.end())
+    assert(!label.empty());
+
+    if(labels_in_use.find(label)==labels_in_use.end())
     {
       codet tmp;
       tmp.swap(cl.code());

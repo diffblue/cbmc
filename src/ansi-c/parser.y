@@ -2015,25 +2015,24 @@ labeled_statement:
         | TOK_CASE constant_expression ':' statement
         {
           $$=$1;
-          statement($$, ID_label);
+          statement($$, ID_switch_case);
+          mto($$, $2);
           mto($$, $4);
-          static_cast<exprt &>(stack($$).add(ID_case)).
-                move_to_operands(stack($2));
         }
         | TOK_CASE constant_expression TOK_ELLIPSIS constant_expression ':' statement
         {
           // this is a GCC extension
           $$=$1;
-          statement($$, ID_label);
+          statement($$, ID_gcc_switch_case_range);
+          mto($$, $2);
+          mto($$, $4);
           mto($$, $6);
-          static_cast<exprt &>(stack($$).add(ID_case)).
-                move_to_operands(stack($2));
-          // TODO -- the other one
         }
         | TOK_DEFAULT ':' statement
         {
           $$=$1;
-          statement($$, ID_label);
+          statement($$, ID_switch_case);
+          stack($$).operands().push_back(nil_exprt());
           mto($$, $3);
           stack($$).set(ID_default, true);
         }

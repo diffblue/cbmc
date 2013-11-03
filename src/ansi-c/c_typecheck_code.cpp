@@ -52,6 +52,10 @@ void c_typecheck_baset::typecheck_code(codet &code)
     typecheck_expression(code);
   else if(statement==ID_label)
     typecheck_label(to_code_label(code));
+  else if(statement==ID_switch_case)
+    typecheck_switch_case(to_code_switch_case(code));
+  else if(statement==ID_gcc_switch_case_range)
+    typecheck_gcc_switch_case_range(code);
   else if(statement==ID_block)
     typecheck_block(code);
   else if(statement==ID_ifthenelse)
@@ -683,7 +687,30 @@ void c_typecheck_baset::typecheck_label(code_labelt &code)
     throw "label expected to have one operand";
   }
 
-  typecheck_code(to_code(code.op0()));
+  typecheck_code(code.code());
+}
+
+/*******************************************************************\
+
+Function: c_typecheck_baset::typecheck_switch_case
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void c_typecheck_baset::typecheck_switch_case(code_switch_caset &code)
+{
+  if(code.operands().size()!=2)
+  {
+    err_location(code);
+    throw "switch_case expected to have two operands";
+  }
+
+  typecheck_code(code.code());
 
   if(code.is_default())
   {
@@ -693,23 +720,52 @@ void c_typecheck_baset::typecheck_label(code_labelt &code)
       throw "did not expect default label here";
     }
   }
-
-  if(code.find(ID_case).is_not_nil())
+  else
   {
     if(!case_is_allowed)
     {
       err_location(code);
       throw "did not expect `case' here";
     }
-
-    exprt &case_expr=static_cast<exprt &>(code.add(ID_case));
-
-    Forall_operands(it, case_expr)
-    {
-      typecheck_expr(*it);
-      implicit_typecast(*it, switch_op_type);
-    }
+  
+    exprt &case_expr=code.case_op();
+    typecheck_expr(case_expr);
+    implicit_typecast(case_expr, switch_op_type);
   }
+}
+
+/*******************************************************************\
+
+Function: c_typecheck_baset::typecheck_gcc_switch_case_range
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void c_typecheck_baset::typecheck_gcc_switch_case_range(codet &code)
+{
+  if(code.operands().size()!=3)
+  {
+    err_location(code);
+    throw "gcc_switch_case_range expected to have three operands";
+  }
+
+  typecheck_code(to_code(code.op2()));
+
+  if(!case_is_allowed)
+  {
+    err_location(code);
+    throw "did not expect `case' here";
+  }
+
+  typecheck_expr(code.op0());
+  typecheck_expr(code.op1());
+  implicit_typecast(code.op0(), switch_op_type);
+  implicit_typecast(code.op1(), switch_op_type);
 }
 
 /*******************************************************************\
