@@ -352,6 +352,39 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
     simplify_typecast(expr); // rec. call
     return false;
   }
+  
+  // Push a numerical typecast into various integer operations, i.e.,
+  // (T)(x OP y) ---> (T)x OP (T)y
+  //
+  // Doesn't work for many, e.g., pointer difference, floating-point,
+  // division, modulo.
+  //
+  if((expr_type.id()==ID_signedbv || expr_type.id()==ID_unsignedbv) &&
+     (op_type.id()==ID_signedbv || op_type.id()==ID_unsignedbv))
+  {
+    irep_idt op_id=expr.op0().id();
+
+    if(op_id==ID_plus || op_id==ID_minus || op_id==ID_mult ||
+       op_id==ID_unary_minus || 
+       op_id==ID_bitnot || op_id==ID_bitxor || op_id==ID_bitor || op_id==ID_bitand)
+    {
+      exprt result=expr.op0();
+      result.type()=expr.type();
+
+      Forall_operands(it, result)
+      {
+        it->make_typecast(expr.type());
+        simplify_typecast(*it); // recursive call
+      }
+
+      simplify_node(result); // possibly recursive call
+      expr.swap(result);
+      return false;
+    }
+    else if(op_id==ID_ashr || op_id==ID_lshr || op_id==ID_shl)
+    {
+    }
+  }
 
   #if 0
   // (T)(a?b:c) --> a?(T)b:(T)c
@@ -597,6 +630,8 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
   }
   else if(operand.id()==ID_typecast) // typecast of typecast
   {
+    // (T1)(T2)x ---> (T1)
+    // where T1 has fewer bits than T2
     if(operand.operands().size()==1 &&
        op_type_id==expr_type_id &&
        (expr_type_id==ID_unsignedbv || expr_type_id==ID_signedbv) &&
@@ -605,34 +640,10 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
       exprt tmp;
       tmp.swap(expr.op0().op0());
       expr.op0().swap(tmp);
+      // might enable further simplification
+      simplify_typecast(expr); // recursive call
       return false;
     }
-  }
-
-  // propagate type casts into arithmetic operators
-  // over integers (e.g., doesn't apply to pointer difference)
-  
-  if((op_type_id==ID_unsignedbv || op_type_id==ID_signedbv) &&
-     (expr_type_id==ID_unsignedbv || expr_type_id==ID_signedbv) &&
-     (operand.id()==ID_plus || operand.id()==ID_minus ||
-      operand.id()==ID_unary_minus || operand.id()==ID_mult) &&
-     operand.operands().size()>=1 &&
-     operand.op0().type()==operand.type() &&
-     expr_width<=op_width)
-  {
-    exprt new_expr;
-    new_expr.swap(expr.op0());
-    new_expr.type()=expr.type();
-
-    Forall_operands(it, new_expr)
-    {
-      it->make_typecast(expr.type());
-      simplify_rec(*it); // recursive call
-    }
-
-    expr.swap(new_expr);
-
-    return false;
   }
 
   return true;
