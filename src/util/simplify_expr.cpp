@@ -369,17 +369,22 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
        op_id==ID_bitnot || op_id==ID_bitxor || op_id==ID_bitor || op_id==ID_bitand)
     {
       exprt result=expr.op0();
-      result.type()=expr.type();
-
-      Forall_operands(it, result)
+      
+      if(result.operands().size()>=1 && 
+         base_type_eq(result.op0().type(), result.type(), ns))
       {
-        it->make_typecast(expr.type());
-        simplify_typecast(*it); // recursive call
-      }
+        result.type()=expr.type();
 
-      simplify_node(result); // possibly recursive call
-      expr.swap(result);
-      return false;
+        Forall_operands(it, result)
+        {
+          it->make_typecast(expr.type());
+          simplify_typecast(*it); // recursive call
+        }
+
+        simplify_node(result); // possibly recursive call
+        expr.swap(result);
+        return false;
+      }
     }
     else if(op_id==ID_ashr || op_id==ID_lshr || op_id==ID_shl)
     {
