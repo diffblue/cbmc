@@ -108,6 +108,9 @@ protected:
   propt &solver;
   
   void convert_aig();
+  void usage_count(std::vector<unsigned> &p_usage_count, std::vector<unsigned> &n_usage_count);
+  void compute_phase(std::vector<bool> &n_pos, std::vector<bool> &n_neg);
+  void convert_node(unsigned n, const aigt::nodet &node, bool n_pos, bool n_neg, std::vector<unsigned> &p_usage_count, std::vector<unsigned> &n_usage_count);
 };
 
 #endif

@@ -1388,12 +1388,16 @@ Function: bv_utilst::lt_or_le
 
 \*******************************************************************/
 
+#ifndef USE_AIG
+
 /* Some clauses are not needed for correctness but they remove
    models (effectively setting "don't care" bits) and so may be worth
    including.*/
 //#define INCLUDE_REDUNDANT_CLAUSES
 
 //#define NEW_ENCODING
+
+#endif
 
 literalt bv_utilst::lt_or_le(
   bool or_equal,
