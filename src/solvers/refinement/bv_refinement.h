@@ -26,6 +26,9 @@ public:
   
   typedef bv_pointerst SUB;
 
+  // maximal number of times we refine a formula node
+  unsigned max_node_refinement;
+
 protected:
   resultt prop_solve();
 

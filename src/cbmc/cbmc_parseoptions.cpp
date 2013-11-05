@@ -267,6 +267,12 @@ void cbmc_parseoptionst::get_command_line_options(optionst &options)
   if(cmdline.isset("refine"))
     options.set_option("refine", true);
 
+  if(cmdline.isset("max-node-refinement"))
+    options.set_option("max-node-refinement", cmdline.getval("max-node-refinement"));
+
+  if(cmdline.isset("aig"))
+    options.set_option("aig", true);
+
   if(cmdline.isset("boolector"))
     options.set_option("boolector", true);
 
