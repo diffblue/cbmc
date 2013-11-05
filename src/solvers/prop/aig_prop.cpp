@@ -11,6 +11,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "aig_prop.h"
 
+#define USE_AIG_COMPACT
+#define USE_PG
+
 /*******************************************************************\
 
 Function: aig_prop_baset::land
@@ -499,16 +502,16 @@ void aig_prop_solvert::usage_count(std::vector<unsigned> &p_usage_count, std::ve
     }
   }
 
-  statistics() << "Unused : " << unused << " "
-	       << "Used once : " << usedOncePositive + usedOnceNegative
+  statistics() << "Unused: " << unused << " "
+	       << "Used once: " << usedOncePositive + usedOnceNegative
 	       << " (P: " << usedOncePositive
                << ", N: " << usedOnceNegative << ") "
-	       << "Used twice : " << usedTwicePositive + usedTwiceNegative + usedTwiceMixed
+	       << "Used twice: " << usedTwicePositive + usedTwiceNegative + usedTwiceMixed
                << " (P: " << usedTwicePositive
                << ", N: " << usedTwiceNegative
                << ", M: " << usedTwiceMixed << ") "
-	       << "Used three times : " << usedThreeTimes << " "
-	       << "Used more : " << usedMore
+	       << "Used three times: " << usedThreeTimes << " "
+	       << "Used more: " << usedMore
 	       << eom;
   #endif
 }
@@ -526,7 +529,13 @@ Function: aig_prop_solvert::convert_node
 
 \*******************************************************************/
 
-void aig_prop_solvert::convert_node(unsigned n, const aigt::nodet &node, bool n_pos, bool n_neg, std::vector<unsigned> &p_usage_count, std::vector<unsigned> &n_usage_count) {
+void aig_prop_solvert::convert_node(
+  unsigned n,
+  const aigt::nodet &node,
+  bool n_pos, bool n_neg,
+  std::vector<unsigned> &p_usage_count,
+  std::vector<unsigned> &n_usage_count)
+{
 
   if (p_usage_count[n] > 0 || n_usage_count[n] > 0) {
     
