@@ -17,9 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <solvers/smt2/smt2_dec.h>
 #include <solvers/cvc/cvc_dec.h>
 
-#ifdef USE_AIG
 #include <solvers/prop/aig_prop.h>
-#endif
 
 #include "bmc.h"
 #include "bv_cbmc.h"
@@ -42,21 +40,13 @@ bool bmct::decide_default()
 {
   bool result=true;
   
-  #ifdef USE_AIG
-  satcheckt sub_solver;
-  #endif
-  
   std::auto_ptr<propt> solver;
 
   // SAT preprocessor won't work with beautification.
   if(options.get_bool_option("sat-preprocessor") &&
      !options.get_bool_option("beautify"))
   {
-    #ifdef USE_AIG
-    solver=std::auto_ptr<propt>(new aig_prop_solvert(sub_solver));
-    #else
     solver=std::auto_ptr<propt>(new satcheckt);
-    #endif
   }
   else
     solver=std::auto_ptr<propt>(new satcheck_minisat_no_simplifiert);
@@ -96,6 +86,60 @@ bool bmct::decide_default()
 
 /*******************************************************************\
 
+Function: bmct::decide_aig
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: Decide using AIG followed by SAT
+
+\*******************************************************************/
+
+bool bmct::decide_aig()
+{
+  bool result=true;
+
+  std::auto_ptr<propt> sub_solver;
+
+  if(options.get_bool_option("sat-preprocessor"))
+    sub_solver=std::auto_ptr<propt>(new satcheckt);
+  else
+    sub_solver=std::auto_ptr<propt>(new satcheck_minisat_no_simplifiert);
+
+  aig_prop_solvert solver(*sub_solver);
+
+  solver.set_message_handler(get_message_handler());
+  solver.set_verbosity(get_verbosity());
+    
+  bv_cbmct bv_cbmc(ns, solver);
+    
+  if(options.get_option("arrays-uf")=="never")
+    bv_cbmc.unbounded_array=bv_cbmct::U_NONE;
+  else if(options.get_option("arrays-uf")=="always")
+    bv_cbmc.unbounded_array=bv_cbmct::U_ALL;
+    
+  switch(run_decision_procedure(bv_cbmc))
+  {
+  case decision_proceduret::D_UNSATISFIABLE:
+    result=false;
+    report_success();
+    break;
+
+  case decision_proceduret::D_SATISFIABLE:
+    error_trace(bv_cbmc);
+    report_failure();
+    break;
+
+  default:
+    error() << "decision procedure failed" << eom;
+  }
+
+  return result;
+}
+
+/*******************************************************************\
+
 Function: bmct::bv_refinement
 
   Inputs:
@@ -120,6 +164,10 @@ bool bmct::decide_bv_refinement()
   solver->set_verbosity(get_verbosity());
 
   bv_refinementt bv_refinement(ns, *solver);
+
+  // we allow setting some parameters  
+  if(options.get_option("max-node-refinement")!="")
+    bv_refinement.max_node_refinement=options.get_int_option("max-node-refinement");
   
   return decide(bv_refinement);
 }

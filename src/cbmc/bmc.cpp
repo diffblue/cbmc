@@ -450,6 +450,8 @@ bool bmct::run(const goto_functionst &goto_functions)
       return decide_opensmt();
     else if(options.get_bool_option("refine"))
       return decide_bv_refinement();
+    else if(options.get_bool_option("aig"))
+      return decide_aig();
     else if(options.get_bool_option("smt1"))
       // this is the 'default' smt1 solver
       return decide_smt1(smt1_dect::BOOLECTOR);

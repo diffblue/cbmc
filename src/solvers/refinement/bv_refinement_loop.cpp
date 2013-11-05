@@ -22,7 +22,8 @@ Function: bv_refinementt::bv_refinementt
 
 bv_refinementt::bv_refinementt(
   const namespacet &_ns, propt &_prop):
-  bv_pointerst(_ns, _prop)
+  bv_pointerst(_ns, _prop),
+  max_node_refinement(5)
 {
   // check features we need
   assert(prop.has_set_assumptions());

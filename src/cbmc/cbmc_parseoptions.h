@@ -35,7 +35,7 @@ class optionst;
   "(no-sat-preprocessor)" \
   "(no-pretty-names)(beautify)" \
   "(floatbv)(fixedbv)" \
-  "(dimacs)(refine)" \
+  "(dimacs)(refine)(max-node-refinement):(aig)" \
   "(16)(32)(64)(LP64)(ILP64)(LLP64)(ILP32)(LP32)" \
   "(little-endian)(big-endian)" \
   "(show-goto-functions)(show-value-sets)(show-loops)" \

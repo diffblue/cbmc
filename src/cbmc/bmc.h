@@ -73,6 +73,7 @@ protected:
   // the solvers we have
   virtual bool decide_default();
   virtual bool decide_bv_refinement();
+  virtual bool decide_aig();
   virtual bool decide_cvc();
   virtual bool decide_yices();
   virtual bool decide_smt1(smt1_dect::solvert solver);

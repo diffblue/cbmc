@@ -299,7 +299,7 @@ void bv_refinementt::check_SAT(approximationt &a)
   
     //if(a.over_state==1) { std::cout << "DISAGREEMENT!\n"; exit(1); }
     
-    if(a.over_state<50)
+    if(a.over_state<max_node_refinement)
     {
       bvt r;
       float_utilst float_utils(prop);
