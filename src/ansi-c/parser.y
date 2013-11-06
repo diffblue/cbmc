@@ -3018,9 +3018,15 @@ postfix_abstract_declarator:
         { $$ = $2; }
         | '(' postfixing_abstract_declarator ')'
         { $$ = $2; }
+        | '(' postfix_abstract_declarator ')' postfixing_abstract_declarator
+        {
+          /* note: this is a pointer ($2) to a function or array ($4) */
+          $$=$2;
+          make_subtype($$, $4);
+        }
         | '(' unary_abstract_declarator ')' postfixing_abstract_declarator
         {
-          /* note: this is a pointer ($2) to a function ($4) */
+          /* note: this is a pointer ($2) to a function or array ($4) */
           $$=$2;
           make_subtype($$, $4);
         }
