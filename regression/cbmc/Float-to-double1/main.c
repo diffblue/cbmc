@@ -1,6 +1,11 @@
 #include <assert.h>
 #include <math.h>
 
+#ifdef _WIN32
+#include <float.h>
+#define isnan _isnan
+#endif
+
 float nondet_float();
 
 int main()

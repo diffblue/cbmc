@@ -1,5 +1,6 @@
 // gcc -Wall -W -lm double-to-float-with-rounding-modes.c -o double-to-float-with-rounding-modes -frounding-math -fsignaling-nans -ffp-contract=off -msse2 -mfpmath=sse
 
+#ifdef __GNUC__
 #include <assert.h>
 #include <fenv.h>
 #include <math.h>
@@ -14,8 +15,11 @@ void test (int mode, double d, float result) {
   assert(f == result);
   return;
 }
+#endif
 
-int main (void) {
+int main (void)
+{
+  #ifdef __GNUC__
   // 0x1.fffffep+127f is the largest binary32 float so
   // these should all be representable as floats...
   test(FE_TONEAREST, 0x1.fffffep+127, 0x1.fffffep+127);
@@ -94,6 +98,7 @@ int main (void) {
   test(FE_UPWARD, -0x1.fffffffffffffp+1023, -0x1.fffffep+127);
   test(FE_DOWNWARD, -0x1.fffffffffffffp+1023, -INFINITY);
   test(FE_TOWARDZERO, -0x1.fffffffffffffp+1023, -0x1.fffffep+127);
+  #endif
 
   return 1;
 }

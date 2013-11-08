@@ -1,3 +1,5 @@
+#ifdef __GNUC__
+
 #include <fenv.h>
 #include <assert.h>
 
@@ -9,9 +11,11 @@ float castWithRounding (int rounding_mode, int value)
 
   return (float)value;
 }
+#endif
 
-int main (void)
+int main(void)
 {
+  #ifdef __GNUC__
   float low = 0x1p+25f;          // 33554432
   float high = 0x1.000002p+25f;  // 33554436
   float higher = 0x1.000004p+25f;// 33554440
@@ -59,4 +63,5 @@ int main (void)
   assert(castWithRounding(FE_TOWARDZERO,-33554434) == -low);
   assert(castWithRounding(FE_TOWARDZERO,-33554435) == -low);
   assert(castWithRounding(FE_TOWARDZERO,-33554436) == -high);
+  #endif
 }

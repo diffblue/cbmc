@@ -12,6 +12,7 @@
 
 int main (void)
 {
+  #ifdef __GNUC__
   float largestSubnormalFloat = 0x1.fffffcp-127f;
 
   assert(fpclassify(largestSubnormalFloat) != FP_NAN);
@@ -25,6 +26,7 @@ int main (void)
   char b = __CPROVER_isnormalf(largestSubnormalFloat);
 
   assert(!b);
+  #endif
 
   return 0;
 }

@@ -1,3 +1,4 @@
+#ifdef __GNUC__
 #include <assert.h>
 #include <math.h>
 #include <fenv.h>
@@ -25,8 +26,11 @@ void roundingTest (float f1, float f2) {
 
   return;
 }
+#endif
 
-int main (void) {
+int main (void)
+{
+  #ifdef __GNUC__
   float f1 = 0x1.0p+0;
   float f2 = 0x1.8p-24;
 
@@ -41,6 +45,7 @@ int main (void) {
   __CPROVER_assume((0x1.7ffffep-24f < f4) && (f4 < 0x1.800002p-24f));
 
   roundingTest(f3,f4);
+  #endif
 
   return 0;
 }

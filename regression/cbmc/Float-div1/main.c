@@ -1,8 +1,9 @@
 #include <assert.h>
 #include <math.h>
 
-
-void inductiveStepHunt (float startState) {
+#ifdef __GNUC__
+void inductiveStepHunt (float startState)
+{
   float target = 0x1.fffffep-3f;
 
   __CPROVER_assume((0 < startState) && (fpclassify(startState) == FP_NORMAL) && (0x1p-126f <= startState));
@@ -16,8 +17,8 @@ void inductiveStepHunt (float startState) {
   assert(oneAfter > 0);
 }
 
-
-void simplifiedInductiveStepHunt (float nextState) {
+void simplifiedInductiveStepHunt (float nextState)
+{
   float target = 0x1.fffffep-3f;
 
   // Implies nextState == 0x1p+124f;
@@ -31,8 +32,11 @@ void simplifiedInductiveStepHunt (float nextState) {
 
   assert(oneAfter > 0);
 }
+#endif
 
-int main (void) {
+int main (void)
+{
+  #ifdef __GNUC__
   //  inductiveStepHunt(0x1p+125f);
   //  simplifiedInductiveStepHunt(0x1p+124f);
 
@@ -40,6 +44,7 @@ int main (void) {
 
   inductiveStepHunt(f);
   simplifiedInductiveStepHunt(g);
+  #endif
 
   return 0;
 }
