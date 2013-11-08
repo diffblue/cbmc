@@ -12,11 +12,12 @@
 #include <assert.h>
 #include <math.h>
 
-
 float nondet_float(void);
 
+int main (void)
+{
+  #ifdef __GNUC__
 
-int main (void) {
   float smallestNormalFloat = 0x1.0p-126f;
   float largestSubnormalFloat = 0x1.fffffcp-127f;
   
@@ -58,6 +59,8 @@ int main (void) {
   f = nondet_float();
   __CPROVER_assume(fpclassify(f) == FP_SUBNORMAL);
   assert( ((float)((double)f)) == f );
+  
+  #endif
 
   return 0;
 }
