@@ -140,6 +140,10 @@ extern struct __CPROVER_pipet __CPROVER_pipes[];
 // offset to make sure we don't collide with other fds
 extern const int __CPROVER_pipe_offset;
 
+#ifdef _MSC_VER
+#define ssize_t signed long
+#endif
+
 ssize_t write(int fildes, const void *buf, size_t nbyte)
 {
   __CPROVER_HIDE:;
@@ -192,6 +196,10 @@ struct __CPROVER_pipet {
 extern struct __CPROVER_pipet __CPROVER_pipes[];
 // offset to make sure we don't collide with other fds
 extern const int __CPROVER_pipe_offset;
+
+#ifdef _MSC_VER
+#define ssize_t signed long
+#endif
 
 ssize_t read(int fildes, void *buf, size_t nbyte)
 {

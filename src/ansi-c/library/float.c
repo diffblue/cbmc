@@ -60,3 +60,10 @@ inline void _statusfp2(unsigned int *px86, unsigned int *pSSE2)
 }
 
 #endif
+
+/* FUNCTION: _isnan */
+
+inline int _isnan(double x)
+{
+  return __CPROVER_isnand(x);
+}
