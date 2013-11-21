@@ -893,6 +893,6 @@ void cbmc_parseoptionst::help()
     "Other options:\n"
     " --version                    show version and exit\n"
     " --xml-ui                     use XML-formatted output\n"
-    " --xml-interface              stdio-XML interface\n"
+    " --xml-interface              bi-directional XML interface\n"
     "\n";
 }
