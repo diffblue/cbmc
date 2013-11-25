@@ -1,0 +1,45 @@
+#!/bin/bash
+umask u=rwx,g=rx,o=rx
+
+# http://s.sudre.free.fr/Stuff/PackageMaker_Howto.html
+
+make cbmc-mac-signed
+
+(cd ../goto-cc; make goto-cc-mac-signed)
+(cd ../goto-instrument; make goto-instrument-mac-signed)
+(cd ~/progr/hw-cbmc/trunk/src/hw-cbmc; make hw-cbmc-mac-signed)
+
+VERSION=`./cbmc --version`
+VERSION_FILE=`echo $VERSION | sed "y/./-/"`
+BITS=`getconf LONG_BIT`
+
+echo $VERSION_FILE
+
+mkdir /tmp/cbmc-dist
+mkdir /tmp/cbmc-dist/package-root
+mkdir /tmp/cbmc-dist/package-root/usr
+mkdir /tmp/cbmc-dist/package-root/usr/bin
+mkdir /tmp/cbmc-dist/resources
+mkdir /tmp/cbmc-dist/resources/en.lproj
+
+cp ~/progr/hw-cbmc/trunk/src/hw-cbmc/hw-cbmc ../cbmc/cbmc ../goto-cc/goto-cc \
+  ../goto-instrument/goto-instrument /tmp/cbmc-dist/package-root/usr/bin
+cp ../../LICENSE /tmp/cbmc-dist/resources/License.txt
+
+echo "Building cbmc-${VERSION_FILE}.pkg (${BITS} bits)"
+
+/Applications/PackageMaker.app/Contents/MacOS/PackageMaker \
+  --root /tmp/cbmc-dist/package-root/ \
+  -o /tmp/cbmc-dist/cbmc-${VERSION_FILE}.pkg \
+  --version $VERSION \
+  --title "CBMC ${VERSION}" \
+  --resources /tmp/cbmc-dist/resources/ \
+  --target 10.5 \
+  --id org.cprover.cbmc
+
+echo Copying.
+scp /tmp/cbmc-dist/cbmc-${VERSION_FILE}.pkg \
+  kroening@dkr-srv.cs.ox.ac.uk:/srv/www/cprover.org/cbmc/download/
+
+cd /tmp
+rm -R /tmp/cbmc-dist
