@@ -25,6 +25,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-symex/symex_target_equation.h>
 
 #include "symex_bmc.h"
+#include "bv_cbmc.h"
+
 
 class bmct:public messaget
 {
@@ -32,12 +34,13 @@ public:
   bmct(
     const optionst &_options,
     const symbol_tablet &_symbol_table,
-    message_handlert &_message_handler):
+    message_handlert &_message_handler,
+    prop_convt& _prop_conv):
     messaget(_message_handler),
     options(_options),
     ns(_symbol_table, new_symbol_table),
     equation(ns),
-    symex(ns, new_symbol_table, equation),
+    symex(ns, new_symbol_table, equation,_prop_conv),
     ui(ui_message_handlert::PLAIN)
   {
     symex.constant_propagation=options.get_bool_option("propagation");
@@ -95,7 +98,6 @@ protected:
   void do_conversion(prop_convt &solver);
 
   virtual void show_vcc();
-  virtual bool all_claims(const goto_functionst &goto_functions);
   virtual void show_vcc(std::ostream &out);
   virtual void show_program();
   virtual void report_success();
@@ -106,6 +108,32 @@ protected:
   
   // vacuity checks
   void cover_assertions(const goto_functionst &goto_functions);
+
+  // all claims
+  struct goalt
+  {
+    bvt bv;
+    std::string description;
+    bool covered; //goal reachable?
+
+    explicit goalt(const goto_programt::instructiont &instruction)
+    {
+      description=id2string(instruction.location.get_comment());
+      covered = false;
+    }
+  
+    goalt()
+    {
+    }
+  };
+
+  // Collect _all_ goals in `goal_map'.
+  // This maps claim IDs to 'goalt'
+  typedef std::map<irep_idt, goalt> goal_mapt;
+  goal_mapt goal_map;
+ 
+  virtual bool all_claims(const goto_functionst &goto_functions);
+
 };
 
 #endif

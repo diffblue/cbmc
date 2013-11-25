@@ -107,7 +107,11 @@ bool bmct::all_claims(const goto_functionst &goto_functions)
     }
   }
   
-  cover_goalst cover_goals(prop_conv);
+  cover_goalst cover_goals(symex.prop_conv);
+
+  //set activation literal for incremental checking
+  cover_goals.activation_literal = symex.current_activation_literal();
+  std::cout << "cover_goals.activation_literal = " << cover_goals.activation_literal << std::endl;
   
   for(goal_mapt::const_iterator
       it=goal_map.begin();
@@ -115,11 +119,12 @@ bool bmct::all_claims(const goto_functionst &goto_functions)
       it++)
   {
     // the following is TRUE if the bv is empty
-    literalt p=prop_conv.prop.lnot(prop_conv.prop.land(it->second.bv));
+    literalt p=symex.prop_conv.prop.lnot(symex.prop_conv.prop.land(it->second.bv));
     cover_goals.add(p);
+    cover_goals.goals.back().covered = it->second.covered;
   }
 
-  status() << "Running " << prop_conv.decision_procedure_text() << eom;
+  status() << "Running " << symex.prop_conv.decision_procedure_text() << eom;
 
   cover_goals();  
 
@@ -131,7 +136,7 @@ bool bmct::all_claims(const goto_functionst &goto_functions)
              << (sat_stop-sat_start) << "s" << eom;
   }
   
-  // report
+  // report 
   if(ui!=ui_message_handlert::XML_UI)
   {
     status() << eom;
@@ -141,11 +146,15 @@ bool bmct::all_claims(const goto_functionst &goto_functions)
   std::list<cover_goalst::cover_goalt>::const_iterator g_it=
     cover_goals.goals.begin();
     
-  for(goal_mapt::const_iterator
+  bool res = true;
+
+  for(goal_mapt::iterator
       it=goal_map.begin();
       it!=goal_map.end();
       it++, g_it++)
   {
+    it->second.covered = g_it->covered;
+    if(!g_it->covered) res = false;
     if(ui==ui_message_handlert::XML_UI)
     {
       xmlt xml_result("result");
@@ -169,7 +178,6 @@ bool bmct::all_claims(const goto_functionst &goto_functions)
   status() << "** " << cover_goals.number_covered()
            << " of " << cover_goals.size() << " failed ("
            << cover_goals.iterations() << " iterations)" << eom;
-  
-  return false;
-}
 
+  return res;
+}

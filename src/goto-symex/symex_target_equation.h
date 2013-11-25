@@ -149,15 +149,6 @@ public:
     unsigned atomic_section_id,
     const sourcet &source);
 
-  void convert(prop_convt &prop_conv);
-  void convert_assignments(decision_proceduret &decision_procedure) const;
-  void convert_decls(prop_convt &prop_conv) const;
-  void convert_assumptions(prop_convt &prop_conv);
-  void convert_assertions(prop_convt &prop_conv);
-  void convert_constraints(decision_proceduret &decision_procedure) const;
-  void convert_guards(prop_convt &prop_conv);
-  void convert_io(decision_proceduret &decision_procedure);
-
   exprt make_expression() const;
 
   class SSA_stept
@@ -229,7 +220,8 @@ public:
       const namespacet &ns,
       std::ostream &out) const;
   };
-  
+
+ 
   unsigned count_assertions() const
   {
     unsigned i=0;
@@ -250,8 +242,26 @@ public:
     return i;
   }
 
+  bvt activate_assertions; //assumptions for incremental solving
   typedef std::list<SSA_stept> SSA_stepst;
   SSA_stepst SSA_steps;
+
+  SSA_stepst::iterator convert(prop_convt &prop_conv, SSA_stepst::iterator step);
+  void convert_assignments(decision_proceduret &decision_procedure, SSA_stepst::const_iterator step) const;
+  void convert_decls(prop_convt &prop_conv, SSA_stepst::const_iterator step) const;
+  void convert_assumptions(prop_convt &prop_conv, SSA_stepst::iterator step);
+  void convert_assertions(prop_convt &prop_conv, SSA_stepst::iterator step);
+  void convert_constraints(decision_proceduret &decision_procedure, SSA_stepst::const_iterator step) const;
+  void convert_guards(prop_convt &prop_conv, SSA_stepst::iterator step);
+  void convert_io(decision_proceduret &decision_procedure, SSA_stepst::iterator step);
+  void convert(prop_convt &prop_conv);
+  void convert_assignments(decision_proceduret &decision_procedure) const;
+  void convert_decls(prop_convt &prop_conv) const;
+  void convert_assumptions(prop_convt &prop_conv);
+  void convert_assertions(prop_convt &prop_conv);
+  void convert_constraints(decision_proceduret &decision_procedure) const;
+  void convert_guards(prop_convt &prop_conv);
+  void convert_io(decision_proceduret &decision_procedure);
   
   SSA_stepst::iterator get_SSA_step(unsigned s)
   {

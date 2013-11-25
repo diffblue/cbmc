@@ -27,7 +27,8 @@ class cover_goalst:public messaget
 {
 public:
   explicit inline cover_goalst(prop_convt &_prop_conv):
-    prop_conv(_prop_conv), prop(_prop_conv.prop)
+  activation_literal(const_literal(false)),
+  prop_conv(_prop_conv), prop(_prop_conv.prop)
   {
   }
   
@@ -72,6 +73,7 @@ public:
 
   typedef std::list<cover_goalt> goalst;
   goalst goals;
+  literalt activation_literal; //for incremental solving
   
 protected:
   unsigned _number_covered, _iterations;

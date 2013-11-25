@@ -26,12 +26,13 @@ Function: bmct::write_dimacs
 
 \*******************************************************************/
 
-bool bmct::write_dimacs()
+bool bmct::write_dimacs(prop_convt& prop_conv)
 {
+  bv_cbmct& bv_cbmc = dynamic_cast<bv_cbmct&>(prop_conv);
   const std::string &filename=options.get_option("outfile");
   
   if(filename.empty() || filename=="-")
-    return write_dimacs(std::cout);
+    return write_dimacs(bv_cbmc,std::cout);
 
   std::ofstream out(filename.c_str());
   if(!out)
@@ -40,7 +41,7 @@ bool bmct::write_dimacs()
     return false;
   }
 
-  return write_dimacs(out);
+  return write_dimacs(bv_cbmc,out);
 }
 
 /*******************************************************************\
@@ -55,14 +56,10 @@ Function: bmct::write_dimacs
 
 \*******************************************************************/
 
-bool bmct::write_dimacs(std::ostream &out)
+bool bmct::write_dimacs(prop_convt& prop_conv, std::ostream &out)
 {
-  dimacs_cnft dimacs_cnf;
-  dimacs_cnf.set_message_handler(get_message_handler());
-
-  bv_cbmct bv_cbmc(ns, dimacs_cnf);
-
-  do_conversion(bv_cbmc);
+  bv_cbmct& bv_cbmc = dynamic_cast<bv_cbmct&>(prop_conv);
+  dimacs_cnft& dimacs_cnf = dynamic_cast<dimacs_cnft&>(bv_cbmc.prop);
 
   bv_cbmc.dec_solve();
 

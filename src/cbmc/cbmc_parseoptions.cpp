@@ -36,6 +36,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <langapi/mode.h>
 
+#include <solvers/prop/prop_conv.h>
+#include <solvers/sat/satcheck.h>
+#include <solvers/sat/satcheck_minisat2.h>
+
+#include "cbmc_solvers.h"
 #include "cbmc_parseoptions.h"
 #include "bmc.h"
 #include "version.h"
@@ -168,6 +173,9 @@ void cbmc_parseoptionst::get_command_line_options(optionst &options)
 
   if(cmdline.isset("unwindset"))
     options.set_option("unwindset", cmdline.getval("unwindset"));
+
+  if(cmdline.isset("incremental-check"))
+    options.set_option("incremental-check", cmdline.getval("incremental-check"));
 
   // constant propagation
   if(cmdline.isset("no-propagation"))
@@ -869,6 +877,7 @@ void cbmc_parseoptionst::help()
     " --unwind nr                  unwind nr times\n"
     " --unwindset L:B,...          unwind loop L with a bound of B\n"
     "                              (use --show-loops to get the loop IDs)\n"
+    " --incremental-check L        check after each unwinding of loop L\n"
     " --show-vcc                   show the verification conditions\n"
     " --slice-formula              remove assignments unrelated to property\n"
     " --no-unwinding-assertions    do not generate unwinding assertions\n"

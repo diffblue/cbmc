@@ -33,6 +33,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "bmc.h"
 #include "bv_cbmc.h"
+#include "counterexample_beautification.h"
 
 /*******************************************************************\
 
@@ -121,7 +122,7 @@ void bmct::do_conversion(prop_convt &prop_conv)
   do_unwind_module(prop_conv);
 
   // convert SSA
-  equation.convert(prop_conv);
+  symex.convert();
 
   // the 'extra constraints'
   forall_expr_list(it, bmc_constraints)
@@ -300,11 +301,11 @@ void bmct::show_program()
 
 Function: bmct::run
 
-  Inputs:
+  Inputs: goto functions
 
- Outputs:
+ Outputs: true, if FAILED or an error occurred, false if SUCCEEDED
 
- Purpose:
+ Purpose: run BMC
 
 \*******************************************************************/
 
@@ -499,13 +500,14 @@ Function: bmct::decide
 
 bool bmct::decide(prop_convt &prop_conv)
 {
-  if(options.get_bool_option("beautify-pbs") ||
-     options.get_bool_option("beautify-greedy"))
-    throw "sorry, this solver does not support beautification";
-
   prop_conv.set_message_handler(get_message_handler());
   prop_conv.set_verbosity(get_verbosity());
-  
+ 
+  if(options.get_bool_option("dimacs")) {
+    do_conversion(prop_conv);
+    return write_dimacs(prop_conv);
+  }
+
   bool result=true;
 
   switch(run_decision_procedure(prop_conv))
@@ -516,6 +518,11 @@ bool bmct::decide(prop_convt &prop_conv)
     break;
 
   case decision_proceduret::D_SATISFIABLE:
+    if(options.get_bool_option("beautify")) {
+      bv_cbmct& bv_cbmc = dynamic_cast<bv_cbmct&>(prop_conv);
+      counterexample_beautificationt()(
+        bv_cbmc, equation, ns);
+    }
     error_trace(prop_conv);
     report_failure();
     break;
@@ -561,4 +568,5 @@ void bmct::setup_unwind()
   }
 
   symex.max_unwind=options.get_int_option("unwind");
+  symex.incr_loop_id = options.get_option("incremental-check");
 }

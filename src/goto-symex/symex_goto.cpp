@@ -18,15 +18,15 @@ Author: Daniel Kroening, kroening@kroening.com
 
 Function: goto_symext::symex_goto
 
-  Inputs:
+  Inputs: symex state
 
- Outputs:
+ Outputs: true if symbolic execution should to be interrupted, false otherwise
 
- Purpose:
+ Purpose: symbolic execution of goto statements
 
 \*******************************************************************/
 
-void goto_symext::symex_goto(statet &state)
+bool goto_symext::symex_goto(statet &state)
 {
   const goto_programt::instructiont &instruction=*state.source.pc;
   
@@ -35,6 +35,7 @@ void goto_symext::symex_goto(statet &state)
 
   exprt new_guard=old_guard;
   state.rename(new_guard, ns);
+  replace_nondet(new_guard);
   do_simplify(new_guard);
   
   target.location(state.guard.as_expr(), state.source);
@@ -47,7 +48,7 @@ void goto_symext::symex_goto(statet &state)
 
     // next instruction
     state.source.pc++;
-    return; // nothing to do
+    return false; // nothing to do
   }
     
   assert(!instruction.targets.empty());
@@ -68,7 +69,7 @@ void goto_symext::symex_goto(statet &state)
     unsigned &unwind=unwind_map[state.source];
     unwind++;
     
-    if(get_unwind(state.source, unwind))
+    if(get_unwind(state.source, unwind)) //loop bound exceeded
     {
       loop_bound_exceeded(state, new_guard);
 
@@ -77,13 +78,14 @@ void goto_symext::symex_goto(statet &state)
       
       // next instruction
       state.source.pc++;
-      return;
+      return false; //do not break, but continue symex to the end of the program
     }      
   
-    if(new_guard.is_true())
+    if(new_guard.is_true()) //continue looping
     {
+      bool do_break = check_break(state.source);
       state.source.pc=goto_target;
-      return; // nothing else to do
+      return do_break;
     }
   }
   
@@ -164,7 +166,28 @@ void goto_symext::symex_goto(statet &state)
       new_state.guard.add(guard_expr);
     }
   }
+  return false;
 }
+
+
+/*******************************************************************\
+
+Function: goto_symext::check_break
+
+  Inputs: symex source
+
+ Outputs: false (dummy implementation)
+
+ Purpose: check whether symbolic execution should be interrupted for
+          incremental solving
+
+\*******************************************************************/
+
+bool goto_symext::check_break(const symex_targett::sourcet &source) {
+  //dummy implementation
+  return false;
+}
+
 
 /*******************************************************************\
 
@@ -392,7 +415,7 @@ Function: goto_symext::loop_bound_exceeded
 
  Outputs:
 
- Purpose:
+ Purpose: insert an unwinding assertion if needed
 
 \*******************************************************************/
 

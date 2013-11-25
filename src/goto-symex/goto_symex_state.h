@@ -67,7 +67,11 @@ public:
 
       // record
       irep_idt i=current_name(identifier);
-      original_identifiers[i]=identifier;
+
+      if (i != identifier) {
+        original_identifiers[i]=identifier;
+      }
+
       return i;
     }
 

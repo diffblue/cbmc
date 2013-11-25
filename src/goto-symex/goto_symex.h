@@ -73,13 +73,13 @@ public:
     const goto_programt &goto_program);
 
   /** start symex in a given state */
-  virtual void operator()(
+  virtual bool operator()(
     statet &state,
     const goto_functionst &goto_functions,
     const goto_programt &goto_program);	   
 
   /** execute just one step */
-  virtual void symex_step(
+  virtual bool symex_step(
     const goto_functionst &goto_functions,
     statet &state);
 
@@ -102,6 +102,8 @@ protected:
 
   friend class symex_dereference_statet;
   
+  virtual bool check_break(const symex_targett::sourcet &source);
+
   void new_name(symbolt &symbol);
   
   // this does the following:
@@ -147,7 +149,7 @@ protected:
   
   // symex
 
-  virtual void symex_goto(statet &state);
+  virtual bool symex_goto(statet &state);
   virtual void symex_start_thread(statet &state);
   virtual void symex_atomic_begin(statet &state);
   virtual void symex_atomic_end(statet &state);  
