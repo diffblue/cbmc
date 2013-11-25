@@ -10,7 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_CBMC_SYMEX_BMC_H
 
 #include <util/hash_cont.h>
-#include <util/message.h>xf
+#include <util/message.h>
 
 #include <goto-symex/goto_symex.h>
 #include <goto-symex/symex_target_equation.h>
