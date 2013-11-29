@@ -73,22 +73,8 @@ protected:
     
   virtual bool decide(prop_convt &prop_conv);
     
-  // the solvers we have
-  virtual bool decide_default();
-  virtual bool decide_bv_refinement();
-  virtual bool decide_aig();
-  virtual bool decide_cvc();
-  virtual bool decide_yices();
-  virtual bool decide_smt1(smt1_dect::solvert solver);
-  virtual bool decide_smt2(smt2_dect::solvert solver);
-  virtual bool decide_boolector();
-  virtual bool decide_mathsat();
-  virtual bool decide_opensmt();
-  virtual bool decide_z3();
-  virtual void smt1_convert(std::ostream &out);
-  virtual void smt2_convert(std::ostream &out);
-  virtual bool write_dimacs();
-  virtual bool write_dimacs(std::ostream &out);
+  virtual bool write_dimacs(prop_convt& bv_cbmc);
+  virtual bool write_dimacs(prop_convt& bv_cbmc, std::ostream &out);
   
   // unwinding
   virtual void setup_unwind();

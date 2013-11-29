@@ -31,6 +31,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-symex/memory_model_tso.h>
 #include <goto-symex/memory_model_pso.h>
 
+#include <solvers/sat/satcheck_minisat2.h>
+
 #include "bmc.h"
 #include "bv_cbmc.h"
 #include "counterexample_beautification.h"
@@ -336,15 +338,127 @@ bool bmct::run(const goto_functionst &goto_functions)
     // get unwinding info
     setup_unwind();
 
+    bool verification_result = false; //true = "FAILED"
+
+    goto_functionst::function_mapt::const_iterator it=
+      goto_functions.function_map.find(ID_main);
+    if(it==goto_functions.function_map.end())
+      throw "main symbol not found; please set an entry point";
+    const goto_programt &body=it->second.body;
+    goto_symext::statet symex_state;
     // perform symbolic execution
-    symex(goto_functions);
+    bool symex_done = false;
+    while(!symex_done) {
+      symex_done = symex(symex_state,goto_functions,body);
 
-    // add a partial ordering, if required    
-    if(equation.has_threads())
-    {
-      memory_model->set_message_handler(get_message_handler());
-      (*memory_model)(equation);
-    }
+      // add a partial ordering, if required    
+      if(equation.has_threads())
+      {
+        memory_model->set_message_handler(get_message_handler());
+        (*memory_model)(equation); // TODO: not clear whether supports incremental symex
+      }
+
+      statistics() << "size of program expression: "
+		   << equation.SSA_steps.size()
+		   << " steps" << eom;
+
+      try
+	{
+	  if(options.get_option("slice-by-trace")!="")
+	    {
+	      symex_slice_by_tracet symex_slice_by_trace(ns);
+
+	      symex_slice_by_trace.slice_by_trace
+		(options.get_option("slice-by-trace"), equation);
+	    }
+
+	  if(equation.has_threads())
+	    {
+	      // we should build a thread-aware SSA slicer
+	      statistics() << "no slicing due to threads" << eom;
+	    }
+	  else
+	    {
+	      if(options.get_bool_option("slice-formula"))
+		{
+		  slice(equation);
+		  statistics() << "slicing removed "
+			       << equation.count_ignored_SSA_steps()
+			       << " assignments" << eom;
+		}
+	      else
+		{
+		  simple_slice(equation);
+		  statistics() << "simple slicing removed "
+			       << equation.count_ignored_SSA_steps()
+			       << " assignments" << eom;
+		}
+	    }
+
+	  if(options.get_bool_option("program-only"))
+	    {
+	      show_program();
+	      return false;
+	    }
+
+	  {
+	    statistics() << "Generated " << symex.total_claims
+			 << " VCC(s), " << symex.remaining_claims
+			 << " remaining after simplification" << eom;
+	  }
+
+	  if(options.get_bool_option("show-vcc"))
+	    {
+	      show_vcc();
+	      return false;
+	    }
+    
+  
+	  if(options.get_bool_option("cover-assertions"))
+	    {
+              if(options.get_option("incremental-check")!="")
+                throw "incremental vacuity checks not supported";
+
+	      cover_assertions(goto_functions);
+	      return false;
+	    }
+
+	  if(symex.remaining_claims==0)
+	    {
+	      report_success();
+              continue;
+	    }
+
+          //call decision procedure
+	  if(options.get_bool_option("all-claims")) {
+	    if(all_claims(goto_functions)) return true; //all claims FAILED, exit
+	  }
+          else {
+            verification_result = decide(symex.prop_conv);
+            if(verification_result) return true; //bug found, exit
+	  }
+	}
+      catch(std::string &error_str)
+	{
+	  error(error_str);
+	  return true;
+	}
+
+      catch(const char *error_str)
+	{
+	  error(error_str);
+	  return true;
+	}
+
+      catch(std::bad_alloc)
+	{
+	  error() << "Out of memory" << eom;
+	  return true;
+	}
+
+    } //while
+
+    return verification_result;
   }
 
   catch(std::string &error_str)
@@ -360,122 +474,6 @@ bool bmct::run(const goto_functionst &goto_functions)
     message_streamt message_stream(get_message_handler());
     message_stream.err_location(symex.last_location);
     message_stream.error(error_str);
-    return true;
-  }
-
-  catch(std::bad_alloc)
-  {
-    error() << "Out of memory" << eom;
-    return true;
-  }
-
-  statistics() << "size of program expression: "
-               << equation.SSA_steps.size()
-               << " steps" << eom;
-
-  try
-  {
-    if(options.get_option("slice-by-trace")!="")
-    {
-      symex_slice_by_tracet symex_slice_by_trace(ns);
-
-      symex_slice_by_trace.slice_by_trace
-	(options.get_option("slice-by-trace"), equation);
-    }
-
-    if(equation.has_threads())
-    {
-      // we should build a thread-aware SSA slicer
-      statistics() << "no slicing due to threads" << eom;
-    }
-    else
-    {
-      if(options.get_bool_option("slice-formula"))
-      {
-        slice(equation);
-        statistics() << "slicing removed "
-                     << equation.count_ignored_SSA_steps()
-                     << " assignments" << eom;
-      }
-      else
-      {
-        simple_slice(equation);
-        statistics() << "simple slicing removed "
-                     << equation.count_ignored_SSA_steps()
-                     << " assignments" << eom;
-      }
-    }
-
-    if(options.get_bool_option("program-only"))
-    {
-      show_program();
-      return false;
-    }
-
-    {
-      statistics() << "Generated " << symex.total_claims
-                   << " VCC(s), " << symex.remaining_claims
-                   << " remaining after simplification" << eom;
-    }
-
-    if(options.get_bool_option("show-vcc"))
-    {
-      show_vcc();
-      return false;
-    }
-    
-    if(options.get_bool_option("all-claims"))
-      return all_claims(goto_functions);
-    
-    if(options.get_bool_option("cover-assertions"))
-    {
-      cover_assertions(goto_functions);
-      return false;
-    }
-
-    if(symex.remaining_claims==0)
-    {
-      report_success();
-      return false;
-    }
-
-    if(options.get_bool_option("boolector"))
-      return decide_boolector();
-    else if(options.get_bool_option("mathsat"))
-      return decide_mathsat();
-    else if(options.get_bool_option("cvc"))
-      return decide_cvc();
-    else if(options.get_bool_option("dimacs"))
-      return write_dimacs();
-    else if(options.get_bool_option("opensmt"))
-      return decide_opensmt();
-    else if(options.get_bool_option("refine"))
-      return decide_bv_refinement();
-    else if(options.get_bool_option("aig"))
-      return decide_aig();
-    else if(options.get_bool_option("smt1"))
-      // this is the 'default' smt1 solver
-      return decide_smt1(smt1_dect::BOOLECTOR);
-    else if(options.get_bool_option("smt2"))
-      // this is the 'default' smt2 solver
-      return decide_smt2(smt2_dect::MATHSAT);
-    else if(options.get_bool_option("yices"))
-      return decide_yices();
-    else if(options.get_bool_option("z3"))
-      return decide_z3();
-    else
-      return decide_default();
-  }
-
-  catch(std::string &error_str)
-  {
-    error(error_str);
-    return true;
-  }
-
-  catch(const char *error_str)
-  {
-    error(error_str);
     return true;
   }
 

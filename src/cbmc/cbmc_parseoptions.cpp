@@ -362,7 +362,11 @@ int cbmc_parseoptionst::doit()
   optionst options;
   get_command_line_options(options);
 
-  bmct bmc(options, symbol_table, ui_message_handler);
+  //get solver
+  cbmc_solverst cbmc_solvers(options, symbol_table, ui_message_handler);
+  prop_convt& prop_conv = cbmc_solvers.get_solver();
+
+  bmct bmc(options, symbol_table, ui_message_handler,prop_conv);
   eval_verbosity();
   bmc.set_verbosity(get_verbosity());
   

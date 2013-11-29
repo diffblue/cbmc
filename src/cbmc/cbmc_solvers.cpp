@@ -12,164 +12,130 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <solvers/sat/satcheck.h>
 #include <solvers/sat/satcheck_minisat2.h>
 
-#include <solvers/refinement/bv_refinement.h>
+#ifdef HAVE_BV_REFINEMENT
+#include <bv_refinement/bv_refinement_loop.h>
+#endif
+
 #include <solvers/smt1/smt1_dec.h>
 #include <solvers/smt2/smt2_dec.h>
 #include <solvers/cvc/cvc_dec.h>
 
 #include <solvers/prop/aig_prop.h>
+#include <solvers/sat/dimacs_cnf.h>
 
-#include "bmc.h"
+
+#include "cbmc_solvers.h"
+
 #include "bv_cbmc.h"
 #include "counterexample_beautification.h"
 #include "version.h"
 
+
+
 /*******************************************************************\
 
-Function: bmct::decide_default
+Function: cbmc_solverst::get_default
 
   Inputs:
 
  Outputs:
 
- Purpose: Decide using "default" decision procedure
+ Purpose: Get the default decision procedure
 
 \*******************************************************************/
 
-bool bmct::decide_default()
+prop_convt* cbmc_solverst::get_default()
 {
-  bool result=true;
-  
-  std::auto_ptr<propt> solver;
-
-  // SAT preprocessor won't work with beautification.
-  if(options.get_bool_option("sat-preprocessor") &&
-     !options.get_bool_option("beautify"))
+  bv_cbmct* bv_cbmc;
+  if(options.get_bool_option("beautify") || 
+     options.get_bool_option("all-claims") ||
+     options.get_bool_option("cover-assertions") ||
+     options.get_option("incremental-check")!="")
   {
-    solver=std::auto_ptr<propt>(new satcheckt);
+    // simplifier won't work with beautification
+    prop = new satcheck_minisat_no_simplifiert();
+    prop->set_message_handler(get_message_handler());
+    prop->set_verbosity(get_verbosity());
+    
+    bv_cbmc = new bv_cbmct(ns, *prop);
+    
+    if(options.get_option("arrays-uf")=="never")
+      bv_cbmc->unbounded_array=bv_cbmct::U_NONE;
+    else if(options.get_option("arrays-uf")=="always")
+      bv_cbmc->unbounded_array=bv_cbmct::U_ALL;
   }
   else
-    solver=std::auto_ptr<propt>(new satcheck_minisat_no_simplifiert);
-
-  solver->set_message_handler(get_message_handler());
-  solver->set_verbosity(get_verbosity());
-    
-  bv_cbmct bv_cbmc(ns, *solver);
-    
-  if(options.get_option("arrays-uf")=="never")
-    bv_cbmc.unbounded_array=bv_cbmct::U_NONE;
-  else if(options.get_option("arrays-uf")=="always")
-    bv_cbmc.unbounded_array=bv_cbmct::U_ALL;
-    
-  switch(run_decision_procedure(bv_cbmc))
   {
-  case decision_proceduret::D_UNSATISFIABLE:
-    result=false;
-    report_success();
-    break;
+    #if 1
+    prop = new satcheckt();
+    #else
+    aig = new aigt();
+    prop = new aig_propt(*aig);
+    #endif
 
-  case decision_proceduret::D_SATISFIABLE:
-    if(options.get_bool_option("beautify"))
-      counterexample_beautificationt()(
-        bv_cbmc, equation, ns);
-
-    error_trace(bv_cbmc);
-    report_failure();
-    break;
-
-  default:
-    error() << "decision procedure failed" << eom;
+    prop->set_message_handler(get_message_handler());
+    prop->set_verbosity(get_verbosity());
+    
+    bv_cbmc = new bv_cbmct(ns, *prop);
+    
+    if(options.get_option("arrays-uf")=="never")
+      bv_cbmc->unbounded_array=bv_cbmct::U_NONE;
+    else if(options.get_option("arrays-uf")=="always")
+      bv_cbmc->unbounded_array=bv_cbmct::U_ALL;
   }
 
-  return result;
+  return bv_cbmc;
 }
 
 /*******************************************************************\
 
-Function: bmct::decide_aig
+Function: cbmc_solverst::get_dimacs
 
   Inputs:
 
  Outputs:
 
- Purpose: Decide using AIG followed by SAT
+ Purpose:
 
 \*******************************************************************/
-
-bool bmct::decide_aig()
+ 
+prop_convt* cbmc_solverst::get_dimacs()
 {
-  bool result=true;
+  prop = new dimacs_cnft();
+  prop->set_message_handler(get_message_handler());
 
-  std::auto_ptr<propt> sub_solver;
-
-  if(options.get_bool_option("sat-preprocessor"))
-    sub_solver=std::auto_ptr<propt>(new satcheckt);
-  else
-    sub_solver=std::auto_ptr<propt>(new satcheck_minisat_no_simplifiert);
-
-  aig_prop_solvert solver(*sub_solver);
-
-  solver.set_message_handler(get_message_handler());
-  solver.set_verbosity(get_verbosity());
-    
-  bv_cbmct bv_cbmc(ns, solver);
-    
-  if(options.get_option("arrays-uf")=="never")
-    bv_cbmc.unbounded_array=bv_cbmct::U_NONE;
-  else if(options.get_option("arrays-uf")=="always")
-    bv_cbmc.unbounded_array=bv_cbmct::U_ALL;
-    
-  switch(run_decision_procedure(bv_cbmc))
-  {
-  case decision_proceduret::D_UNSATISFIABLE:
-    result=false;
-    report_success();
-    break;
-
-  case decision_proceduret::D_SATISFIABLE:
-    error_trace(bv_cbmc);
-    report_failure();
-    break;
-
-  default:
-    error() << "decision procedure failed" << eom;
-  }
-
-  return result;
+  return new bv_cbmct(ns, *prop);
 }
+
 
 /*******************************************************************\
 
-Function: bmct::bv_refinement
+Function: cbmc_solverst::get_bv_refinement
 
   Inputs:
 
  Outputs:
 
- Purpose: Decide using refinement decision procedure
+ Purpose:
 
 \*******************************************************************/
-
-bool bmct::decide_bv_refinement()
+ 
+prop_convt* cbmc_solverst::get_bv_refinement()
 {
-  std::auto_ptr<propt> solver;
+  #ifdef HAVE_BV_REFINEMENT
 
-  // We offer the option to disable the SAT preprocessor
-  if(options.get_bool_option("sat-preprocessor"))
-    solver=std::auto_ptr<propt>(new satcheckt);
-  else
-    solver=std::auto_ptr<propt>(new satcheck_minisat_no_simplifiert);
+  no_beautification();
+  no_incremental_check();
+
+  prop = new satcheckt();
+  prop->set_message_handler(get_message_handler());
+  prop->set_verbosity(get_verbosity());
+
+  return new bv_refinement_loopt(ns, *prop);
   
-  solver->set_message_handler(get_message_handler());
-  solver->set_verbosity(get_verbosity());
-
-  bv_refinementt bv_refinement(ns, *solver);
-
-  // we allow setting some parameters  
-  if(options.get_option("max-node-refinement")!="")
-    bv_refinement.max_node_refinement=options.get_int_option("max-node-refinement");
-  
-  return decide(bv_refinement);
+  #else
+  throw "bv refinement not linked in";
+  #endif
 }
 
 /*******************************************************************\
