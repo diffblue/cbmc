@@ -51,6 +51,8 @@ public:
     bvtypet bvtype;
     typet type;
     literal_mapt literal_map;
+    
+    std::string get_value(const propt &) const;
   };
   
   typedef hash_map_cont<irep_idt, map_entryt, irep_id_hash> mappingt;  
