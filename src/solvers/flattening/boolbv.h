@@ -99,7 +99,7 @@ protected:
   
   // overloading
   virtual literalt convert_rest(const exprt &expr);
-  virtual bool boolbv_set_equality_to_true(const exprt &expr);
+  virtual bool boolbv_set_equality_to_true(const equal_exprt &expr);
   
   typedef arrayst SUB;
 
