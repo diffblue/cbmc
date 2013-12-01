@@ -136,12 +136,14 @@ void boolbvt::convert_with_array(
   if(size*op2_bv.size()!=prev_bv.size())
     throw "convert_with_array: unexpected operand 2 width";
 
+  // Is the index a constant?
   mp_integer op1_value;
   if(!to_integer(op1, op1_value))
   {
+    // Yes, it is!
     next_bv=prev_bv;
 
-    if(op1_value<size)
+    if(op1_value>=0 && op1_value<size) // bounds check
     {
       unsigned offset=integer2long(op1_value*op2_bv.size());
 
