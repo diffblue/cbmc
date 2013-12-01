@@ -145,6 +145,9 @@ const bvt& boolbvt::convert_bv(const exprt &expr)
     return cache_result.first->second;
   }
   
+  // Iterators into hash_maps supposedly stay stable
+  // even though we are inserting more elements recursively.
+
   convert_bitvector(expr, cache_result.first->second);
   
   // check
@@ -836,29 +839,8 @@ void boolbvt::print_assignment(std::ostream &out) const
       it!=map.mapping.end();
       it++)
   {
-    out << it->first << "=";
-    const boolbv_mapt::map_entryt &map_entry=it->second;
-
-    std::string result="";
-    for(unsigned i=0; i<map_entry.literal_map.size(); i++)
-    {
-      char ch='*';
-
-      if(map_entry.literal_map[i].is_set)
-      {
-        tvt value=prop.l_get(map_entry.literal_map[i].l);
-        if(value.is_true())
-          ch='1';
-        else if(value.is_false())
-          ch='0';
-        else
-          ch='?';
-      }
-      
-      result=result+ch;
-    }
-    
-    out << result << std::endl;
+    out << it->first << "="
+        << it->second.get_value(prop) << '\n';
   }
 }
 
