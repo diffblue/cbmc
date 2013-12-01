@@ -163,7 +163,7 @@ void boolbv_mapt::get_literals(
 
 /*******************************************************************\
 
-Function: boolbv_mapt::set_literal
+Function: boolbv_mapt::set_literals
 
   Inputs:
 
