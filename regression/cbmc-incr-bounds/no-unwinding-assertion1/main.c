@@ -3,9 +3,8 @@ int main()
 {
   int x = nondet_int();
   __CPROVER_assume(0<=x && x<=1);
-  //no error within loop => will unwind forever if no loop bound is given
-  while(x<4) { 
+  while(x<15) {
     x=x+1;
+    assert(x<15);
   }
-  assert(x<4);
 }

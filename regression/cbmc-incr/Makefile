@@ -14,5 +14,5 @@ show:
 	done;
 
 clean:
-	@rm -f *.out
+	@rm -f *.log
 	@for dir in *; do rm -f $$dir/*.out; done;

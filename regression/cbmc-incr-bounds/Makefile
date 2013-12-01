@@ -1,10 +1,10 @@
 default: tests.log
 
 test:
-	@../test.pl -c "perl -e 'alarm shift @ARGV; exec @ARGV' 3 ../../../src/cbmc/cbmc --incremental-check c::main.0 --no-unwinding-assertions --unwind 10"
+	@../test.pl -c "perl -e 'alarm shift @ARGV; exec @ARGV' 3 ../../../src/cbmc/cbmc --incremental-check c::main.0"
 
 tests.log: ../test.pl
-	@../test.pl -c "perl -e 'alarm shift @ARGV; exec @ARGV' 3 ../../../src/cbmc/cbmc --incremental-check c::main.0 --no-unwinding-assertions --unwind 10"
+	@../test.pl -c "perl -e 'alarm shift @ARGV; exec @ARGV' 3 ../../../src/cbmc/cbmc --incremental-check c::main.0"
 
 show:
 	@for dir in *; do \
@@ -14,5 +14,5 @@ show:
 	done;
 
 clean:
-	@rm -f *.out
+	@rm -f *.log
 	@for dir in *; do rm -f $$dir/*.out; done;
