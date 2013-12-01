@@ -71,6 +71,8 @@ void goto_trace_stept::output(
   case goto_trace_stept::ATOMIC_END: out << "ATOMIC_END"; break;
   case goto_trace_stept::SHARED_READ: out << "SHARED_READ"; break;
   case goto_trace_stept::SHARED_WRITE: out << "SHARED WRITE"; break;
+  case goto_trace_stept::FUNCTION_CALL: out << "FUNCTION CALL"; break;
+  case goto_trace_stept::FUNCTION_RETURN: out << "FUNCTION RETURN"; break;
   default: assert(false);
   }
 
