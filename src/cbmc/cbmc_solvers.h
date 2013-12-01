@@ -28,6 +28,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "bv_cbmc.h"
 
 
+/*******************************************************************\
+Solver factory
+\*******************************************************************/
+ 
 class cbmc_solverst:public messaget
 {
 public:
@@ -38,36 +42,55 @@ public:
     messaget(_message_handler),
     options(_options),
     symbol_table(_symbol_table),
-    ns(_symbol_table),
-    prop_conv(NULL),prop(NULL),aig(NULL)
+    ns(_symbol_table)
   {
   }
- 
-  virtual prop_convt& get_solver() {
-    if(options.get_bool_option("boolector")) prop_conv = get_boolector();
-    else if(options.get_bool_option("dimacs")) prop_conv = get_dimacs();
-    else if(options.get_bool_option("mathsat")) prop_conv = get_mathsat();
-    else if(options.get_bool_option("cvc")) prop_conv = get_cvc();
-    else if(options.get_bool_option("opensmt")) prop_conv = get_opensmt();
-    else if(options.get_bool_option("refine")) prop_conv = get_bv_refinement();
+
+  //The solver class (that takes care of allocated objects)
+  class solvert {
+    public:
+      solvert(prop_convt* _prop_conv) {
+        assert(_prop_conv!=NULL);
+        prop_conv_ptr = _prop_conv;
+      }
+      ~solvert() {
+        assert(prop_conv_ptr!=NULL);
+        delete prop_conv_ptr;
+      }
+
+      //use this to get the prop_conv
+      prop_convt& prop_conv() const { 
+        assert(prop_conv_ptr!=NULL);
+        return *prop_conv_ptr;
+      }
+    protected:
+      prop_convt* prop_conv_ptr;
+  };
+
+  //returns a solvert object
+  virtual std::auto_ptr<solvert> get_solver() {
+    solvert* solver;
+    if(options.get_bool_option("boolector")) solver = get_boolector();
+    else if(options.get_bool_option("dimacs")) solver = get_dimacs();
+    else if(options.get_bool_option("mathsat")) solver = get_mathsat();
+    else if(options.get_bool_option("cvc")) solver = get_cvc();
+    else if(options.get_bool_option("opensmt")) solver = get_opensmt();
+    else if(options.get_bool_option("refine")) solver = get_bv_refinement();
     else if(options.get_bool_option("smt1")) 
 	    // this is the 'default' smt1 solver
-      prop_conv = get_smt1(smt1_dect::BOOLECTOR);
+      solver = get_smt1(smt1_dect::BOOLECTOR);
     else if(options.get_bool_option("smt2"))
 	    // this is the 'default' smt2 solver
-      prop_conv = get_smt2(smt2_dect::MATHSAT);
+      solver = get_smt2(smt2_dect::MATHSAT);
     else if(options.get_bool_option("yices"))
-      prop_conv = get_yices();
+      solver = get_yices();
     else if(options.get_bool_option("z3"))
-      prop_conv = get_z3();
-    else prop_conv = get_default();
-    return *prop_conv; 
+      solver = get_z3();
+    else solver = get_default();
+    return std::auto_ptr<solvert>(solver); 
   }
 
   virtual ~cbmc_solverst() { 
-    if(aig!=NULL) delete aig;
-    if(prop!=NULL) delete prop;
-    if(prop_conv!=NULL) delete prop_conv;
   }
 
 protected:
@@ -75,23 +98,19 @@ protected:
   const symbol_tablet &symbol_table;
   namespacet ns;
 
-  //allocated objects
-  prop_convt* prop_conv;
-  propt* prop;
-  aigt* aig;
+  solvert* get_default();
+  solvert* get_dimacs();
+  solvert* get_bv_refinement();
+  solvert* get_smt1(smt1_dect::solvert solver);
+  solvert* get_cvc();
+  solvert* get_yices();
+  solvert* get_smt2(smt2_dect::solvert solver);
+  solvert* get_boolector();
+  solvert* get_mathsat();
+  solvert* get_opensmt();
+  solvert* get_z3(); 
 
-  prop_convt* get_default();
-  prop_convt* get_dimacs();
-  prop_convt* get_bv_refinement();
-  prop_convt* get_smt1(smt1_dect::solvert solver);
-  prop_convt* get_cvc();
-  prop_convt* get_yices();
-  prop_convt* get_smt2(smt2_dect::solvert solver);
-  prop_convt* get_boolector();
-  prop_convt* get_mathsat();
-  prop_convt* get_opensmt();
-  prop_convt* get_z3(); 
-
+  //consistency checks during solver creation
   void no_beautification();
   void no_incremental_check();
 
