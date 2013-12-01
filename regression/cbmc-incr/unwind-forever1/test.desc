@@ -1,6 +1,6 @@
 CORE
 main.c
-
+ --incremental-check c::main.0
 ^EXIT=142$
 ^SIGNAL=0$
 ^Alarm clock$

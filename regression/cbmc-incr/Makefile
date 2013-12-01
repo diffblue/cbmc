@@ -1,10 +1,10 @@
 default: tests.log
 
 test:
-	@../test.pl -c "perl -e 'alarm shift @ARGV; exec @ARGV' 3 ../../../src/cbmc/cbmc --incremental-check c::main.0"
+	@../test.pl -c "perl -e 'alarm shift @ARGV; exec @ARGV' 3 ../../../src/cbmc/cbmc"
 
 tests.log: ../test.pl
-	@../test.pl -c "perl -e 'alarm shift @ARGV; exec @ARGV' 3 ../../../src/cbmc/cbmc --incremental-check c::main.0"
+	@../test.pl -c "perl -e 'alarm shift @ARGV; exec @ARGV' 3 ../../../src/cbmc/cbmc"
 
 show:
 	@for dir in *; do \

@@ -1,4 +1,4 @@
-DIRS = cbmc-incr cbmc-incr-bounds
+DIRS = cbmc-incr
 
 test:
 	$(foreach var,$(DIRS), make -C $(var) test;)

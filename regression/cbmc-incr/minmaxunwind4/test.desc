@@ -1,0 +1,8 @@
+CORE
+main.c
+--no-unwinding-assertions --unwind-min 6 --unwind-max 8 --incremental-check c::main.0
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
