@@ -83,7 +83,7 @@ bool goto_symext::symex_goto(statet &state)
   
     if(new_guard.is_true()) //continue looping
     {
-      bool do_break = check_break(state.source);
+      bool do_break = check_break(state.source,unwind);
       state.source.pc=goto_target;
       return do_break;
     }
@@ -183,7 +183,8 @@ Function: goto_symext::check_break
 
 \*******************************************************************/
 
-bool goto_symext::check_break(const symex_targett::sourcet &source) {
+bool goto_symext::check_break(const symex_targett::sourcet &source, 
+             unsigned unwind) {
   //dummy implementation
   return false;
 }

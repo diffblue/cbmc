@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "symex_bmc.h"
 #include "bv_cbmc.h"
 #include <iostream>
+#include <climits>
 
 /*******************************************************************\
 
@@ -92,6 +93,10 @@ void symex_bmct::convert() {
     loop_last_SSA_step++;
   }
   loop_last_SSA_step = e_target.convert(prop_conv,loop_last_SSA_step);
+
+#if 0
+  e_target.output(std::cout);
+#endif
 }
 
 /*******************************************************************\
@@ -126,12 +131,13 @@ Function: symex_bmct::check_break
 
 \*******************************************************************/
 
-bool symex_bmct::check_break(const symex_targett::sourcet &source) {
+bool symex_bmct::check_break(const symex_targett::sourcet &source,
+                             unsigned unwind) {
   irep_idt id=(source.thread_nr!=0?(i2string(source.thread_nr)+":"):"")+
               id2string(source.pc->function)+"."+
               i2string(source.pc->loop_number);
 
-  return (id==incr_loop_id);
+  return (unwind>=incr_min_unwind) && (id==incr_loop_id);
 }
 
 
@@ -158,10 +164,8 @@ bool symex_bmct::get_unwind(
 
   if(unwind_set.count(id)!=0)
     this_loop_max_unwind=unwind_set[id];
-
-  if(this_loop_max_unwind==(unsigned long)-1) { //TODO just for test
-    this_loop_max_unwind=max_unwind;
-  }
+  if(id==incr_loop_id) this_loop_max_unwind = incr_max_unwind;
+  if(this_loop_max_unwind==0) this_loop_max_unwind = UINT_MAX;
 
   #if 1
   statistics() << "Unwinding loop " << id << " iteration "
@@ -172,8 +176,7 @@ bool symex_bmct::get_unwind(
   statistics() << "Unwind bound = " << this_loop_max_unwind << eom;
 
 
-  return this_loop_max_unwind!=0 &&
-         unwind>=this_loop_max_unwind;
+  return unwind>=this_loop_max_unwind;
 }
 
 /*******************************************************************\

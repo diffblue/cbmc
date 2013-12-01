@@ -159,8 +159,13 @@ void cbmc_parseoptionst::get_command_line_options(optionst &options)
   else
     options.set_option("all-claims", false);
 
-  if(cmdline.isset("unwind"))
+  if(cmdline.isset("unwind-max"))
+    options.set_option("unwind-max", cmdline.getval("unwind-max"));
+  if(cmdline.isset("unwind-min"))
+    options.set_option("unwind-min", cmdline.getval("unwind-min"));
+  if(cmdline.isset("unwind")) {
     options.set_option("unwind", cmdline.getval("unwind"));
+  }
 
   if(cmdline.isset("depth"))
     options.set_option("depth", cmdline.getval("depth"));
@@ -883,6 +888,8 @@ void cbmc_parseoptionst::help()
     " --unwindset L:B,...          unwind loop L with a bound of B\n"
     "                              (use --show-loops to get the loop IDs)\n"
     " --incremental-check L        check after each unwinding of loop L\n"
+    " --unwind-min nr              start incremental check after nr unwindings\n"
+    " --unwind-max nr              stop incremental check after nr unwindings\n"
     " --show-vcc                   show the verification conditions\n"
     " --slice-formula              remove assignments unrelated to property\n"
     " --no-unwinding-assertions    do not generate unwinding assertions\n"

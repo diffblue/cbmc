@@ -35,6 +35,8 @@ public:
   unsigned long max_unwind;
   std::map<irep_idt, long> unwind_set;
   irep_idt incr_loop_id;
+  unsigned long incr_max_unwind;
+  unsigned long incr_min_unwind;
 
   prop_convt& prop_conv;
 
@@ -46,7 +48,7 @@ protected:
   // for incremental unwinding and checking
   symex_target_equationt::SSA_stepst::iterator loop_last_SSA_step;
 
-  virtual bool check_break(const symex_targett::sourcet &source);
+  virtual bool check_break(const symex_targett::sourcet &source, unsigned unwind);
 
   //
   // overloaded from goto_symext

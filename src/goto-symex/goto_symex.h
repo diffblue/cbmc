@@ -102,7 +102,7 @@ protected:
 
   friend class symex_dereference_statet;
   
-  virtual bool check_break(const symex_targett::sourcet &source);
+  virtual bool check_break(const symex_targett::sourcet &source, unsigned unwind);
 
   void new_name(symbolt &symbol);
   

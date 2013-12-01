@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <fstream>
 #include <cstdlib>
+#include <climits>
 #include <iostream>
 #include <memory>
 
@@ -351,6 +352,10 @@ bool bmct::run(const goto_functionst &goto_functions)
     while(!symex_done) {
       symex_done = symex(symex_state,goto_functions,body);
 
+#if 0
+      equation.output(std::cout);
+#endif
+
       // add a partial ordering, if required    
       if(equation.has_threads())
       {
@@ -566,5 +571,8 @@ void bmct::setup_unwind()
   }
 
   symex.max_unwind=options.get_int_option("unwind");
+  symex.incr_min_unwind=options.get_int_option("unwind-min");
+  symex.incr_max_unwind=options.get_int_option("unwind-max");
+  if(symex.incr_max_unwind==0) symex.incr_max_unwind = UINT_MAX;
   symex.incr_loop_id = options.get_option("incremental-check");
 }
