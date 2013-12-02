@@ -390,7 +390,7 @@ int main() {
     if(_state_old.AlarmArmed_OPEN && _io_.AlarmSensor) {
       assert(_state_.AlarmAcousticAndOptical_OPEN);
     }
-    if(!_state_.InitSystem_OPEN && !_io_.VehLocked) assert(_state_.VehicleOpen_OPEN);
+    if(!_state_.InitSystem_OPEN && _state_old.Counter!=0 && !_io_.AlarmSensor && !_io_.VehLocked) assert(_state_.VehicleOpen_OPEN);
   }
   return 0;
 }
