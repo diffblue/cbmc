@@ -2744,31 +2744,28 @@ public:
 
 /*! \brief Expression providing an SSA-renamed symbol of expressions
 */
-class ssa_exprt:public exprt
+class ssa_exprt:public symbol_exprt
 {
 public:
-  inline ssa_exprt():exprt(ID_SSA_symbol)
+  inline ssa_exprt()
   {
+    set(ID_C_SSA_symbol, true);
   }
 
   /*! \brief Constructor
    * \param expr Expression to be converted to SSA symbol
   */
   inline explicit ssa_exprt(const exprt &expr):
-    exprt(ID_SSA_symbol, expr.type())
+    symbol_exprt(expr.type())
   {
+    set(ID_C_SSA_symbol, true);
     add(ID_expression, expr);
     update_identifier();
   }
 
-  inline const irep_idt &get_identifier() const
-  {
-    return get(ID_identifier);
-  }
-
   inline const exprt &get_original_expr() const
   {
-    return static_cast<const exprt&>(find(ID_expression));
+    return static_cast<const exprt &>(find(ID_expression));
   }
 
   inline const irep_idt &get_object_name() const
@@ -2821,17 +2818,17 @@ public:
     update_identifier();
   }
 
-  inline const irep_idt& get_level_0() const
+  inline const irep_idt get_level_0() const
   {
     return get(ID_L0);
   }
 
-  inline const irep_idt& get_level_1() const
+  inline const irep_idt get_level_1() const
   {
     return get(ID_L1);
   }
 
-  inline const irep_idt& get_level_2() const
+  inline const irep_idt get_level_2() const
   {
     return get(ID_L2);
   }
@@ -2851,7 +2848,9 @@ public:
 */
 extern inline const ssa_exprt &to_ssa_expr(const exprt &expr)
 {
-  assert(expr.id()==ID_SSA_symbol && !expr.has_operands());
+  assert(expr.id()==ID_symbol &&
+         expr.get_bool(ID_C_SSA_symbol) &&
+         !expr.has_operands());
   return static_cast<const ssa_exprt &>(expr);
 }
 
@@ -2860,7 +2859,9 @@ extern inline const ssa_exprt &to_ssa_expr(const exprt &expr)
 */
 extern inline ssa_exprt &to_ssa_expr(exprt &expr)
 {
-  assert(expr.id()==ID_SSA_symbol && !expr.has_operands());
+  assert(expr.id()==ID_symbol &&
+         expr.get_bool(ID_C_SSA_symbol) &&
+         !expr.has_operands());
   return static_cast<ssa_exprt &>(expr);
 }
 
