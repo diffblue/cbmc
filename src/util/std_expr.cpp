@@ -159,6 +159,6 @@ void ssa_exprt::update_identifier()
   if(!l2.empty())
     oss << '#' << l2;
 
-  return set(ID_identifier, oss.str());
+  set_identifier(oss.str());
 }
 
