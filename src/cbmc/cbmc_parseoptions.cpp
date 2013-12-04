@@ -816,7 +816,7 @@ void cbmc_parseoptionst::help()
 {
   std::cout <<
     "\n"
-    "* *   CBMC " CBMC_VERSION " - Copyright (C) 2001-2011 ";
+    "* *   CBMC " CBMC_VERSION " - Copyright (C) 2001-2013 ";
     
   std::cout << "(" << (sizeof(void *)*8) << "-bit version)";
     
@@ -890,6 +890,7 @@ void cbmc_parseoptionst::help()
     " --incremental-check L        check after each unwinding of loop L\n"
     " --unwind-min nr              start incremental check after nr unwindings\n"
     " --unwind-max nr              stop incremental check after nr unwindings\n"
+    " --ignore-assertions-before-unwind-min\n"
     " --show-vcc                   show the verification conditions\n"
     " --slice-formula              remove assignments unrelated to property\n"
     " --no-unwinding-assertions    do not generate unwinding assertions\n"

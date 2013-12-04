@@ -44,6 +44,8 @@ public:
     ui(ui_message_handlert::PLAIN)
   {
     symex.constant_propagation=options.get_bool_option("propagation");
+    symex.ignore_assertions_before_unwind_min =
+      options.get_bool_option("ignore-assertions-before-unwind-min");
   }
  
   virtual bool run(const goto_functionst &goto_functions);
@@ -56,7 +58,10 @@ public:
   friend class hw_cbmc_satt;
   friend class counterexample_beautification_greedyt;
   
-  void set_ui(language_uit::uit _ui) { ui=_ui; }
+  void set_ui(language_uit::uit _ui) { 
+    ui=_ui; 
+    symex.set_ui(ui);
+  }
   
 protected:
   const optionst &options;  

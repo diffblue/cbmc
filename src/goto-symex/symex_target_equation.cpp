@@ -598,7 +598,7 @@ Function: symex_target_equationt::convert
 \*******************************************************************/
 
 symex_target_equationt::SSA_stepst::iterator symex_target_equationt::convert(
-  prop_convt &prop_conv, SSA_stepst::iterator step)
+   prop_convt &prop_conv, SSA_stepst::iterator step)
 {
   #if 0
   std::cout << "Converted SSA steps: " << std::endl;

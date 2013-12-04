@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/location.h>
 #include <util/i2string.h>
+#include <util/xml.h>
 #include <goto-symex/goto_trace.h>
 #include <goto-symex/build_goto_trace.h>
 #include <solvers/sat/satcheck.h>
@@ -37,7 +38,9 @@ symex_bmct::symex_bmct(
   prop_convt& _prop_conv):
   goto_symext(_ns, _new_symbol_table, _target),
   prop_conv(_prop_conv),
-  loop_last_SSA_step(_target.SSA_steps.end())
+  unwind_min_reached(false),
+  loop_last_SSA_step(_target.SSA_steps.end()),
+  ui(ui_message_handlert::PLAIN)
 {
 }
 
@@ -69,6 +72,8 @@ bool symex_bmct::symex_step(
 
     last_location=location;
   }
+
+  //  if(!unwind_min_reached && ignore_assertions_before_unwind_min)
 
   return goto_symext::symex_step(goto_functions, state);
 }
@@ -164,17 +169,28 @@ bool symex_bmct::get_unwind(
 
   if(unwind_set.count(id)!=0)
     this_loop_max_unwind=unwind_set[id];
-  if(id==incr_loop_id) this_loop_max_unwind = incr_max_unwind;
+  if(id==incr_loop_id) {
+    this_loop_max_unwind = incr_max_unwind;
+    if(unwind>=incr_min_unwind) unwind_min_reached = true;
+  }
   if(this_loop_max_unwind==0) this_loop_max_unwind = UINT_MAX;
 
   #if 1
   statistics() << "Unwinding loop " << id << " iteration "
                << unwind << " " << source.pc->location
                << " thread " << source.thread_nr << eom;
+
+  if(ui==ui_message_handlert::XML_UI) {
+      xmlt xml("current-unwinding");
+      xml.data=i2string(unwind);
+      std::cout << xml;
+      std::cout << "\n";
+  }
   #endif
 
-  statistics() << "Unwind bound = " << this_loop_max_unwind << eom;
-
+  #if 0
+    statistics() << "Unwind bound = " << this_loop_max_unwind << eom;
+  #endif
 
   return unwind>=this_loop_max_unwind;
 }
