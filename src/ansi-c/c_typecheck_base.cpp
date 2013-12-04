@@ -411,11 +411,23 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
   symbolt &old_symbol,
   symbolt &new_symbol)
 {
+  const typet &final_old=follow(old_symbol.type);
+  const typet &initial_new=follow(new_symbol.type);
+
+  if(final_old.id()==ID_array &&
+     to_array_type(final_old).size().is_not_nil() &&
+     initial_new.id()==ID_array &&
+     to_array_type(initial_new).size().is_nil() &&
+     final_old.subtype()==initial_new.subtype())
+  {
+    // this is ok, just use old type
+    new_symbol.type=old_symbol.type;
+  }
+
   // do initializer, this may change the type
   if(follow(new_symbol.type).id()!=ID_code)
     do_initializer(new_symbol);
   
-  const typet &final_old=follow(old_symbol.type);
   const typet &final_new=follow(new_symbol.type);
   
   // K&R stuff?
@@ -505,15 +517,6 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
   if(final_old!=final_new)
   {
     if(final_old.id()==ID_array &&
-       to_array_type(final_old).size().is_not_nil() &&
-       final_new.id()==ID_array &&
-       to_array_type(final_new).size().is_nil() &&
-       final_old.subtype()==final_new.subtype())
-    {
-      // this is ok, just use old type
-      new_symbol.type=old_symbol.type;
-    }
-    else if(final_old.id()==ID_array &&
             to_array_type(final_old).size().is_nil() &&
             final_new.id()==ID_array &&
             to_array_type(final_new).size().is_not_nil() &&
