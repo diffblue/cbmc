@@ -668,20 +668,37 @@ Function: simplify_exprt::simplify_dereference
 
 bool simplify_exprt::simplify_dereference(exprt &expr)
 {
-  if(expr.operands().size()!=1) return true;
-  
-  exprt &pointer=expr.op0();
+  const exprt &pointer=to_dereference_expr(expr).pointer();
 
   if(pointer.type().id()!=ID_pointer) return true;
   
   if(pointer.id()==ID_address_of)
   {
-    if(pointer.operands().size()==1)
+    exprt tmp=to_address_of_expr(pointer).object();
+    // one address_of is gone, try again
+    simplify_rec(tmp);
+    expr.swap(tmp);
+    return false;
+  }
+  // rewrite *(&a[0] + x) to a[x]
+  else if(pointer.id()==ID_plus &&
+          pointer.operands().size()==2 &&
+          pointer.op0().id()==ID_address_of)
+  {
+    const address_of_exprt &address_of=
+      to_address_of_expr(pointer.op0());
+    if(address_of.object().id()==ID_index)
     {
-      exprt tmp;
-      tmp.swap(pointer.op0());
-      expr.swap(tmp);
-      return false;
+      const index_exprt &old=to_index_expr(address_of.object());
+      if(ns.follow(old.array().type()).id()==ID_array)
+      {
+        index_exprt idx(old.array(),
+                        plus_exprt(old.index(), pointer.op1()),
+                        ns.follow(old.array().type()).subtype());
+        simplify_rec(idx);
+        expr.swap(idx);
+        return false;
+      }
     }
   }
 
