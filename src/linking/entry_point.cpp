@@ -82,7 +82,7 @@ bool static_lifetime_init(
   
   // do assignments based on "value"
 
-  forall_symbols(it, symbol_table.symbols)
+  Forall_symbols(it, symbol_table.symbols)
   {
     const irep_idt &identifier=it->first;
   
@@ -124,7 +124,12 @@ bool static_lifetime_init(
 
     if(type.id()==ID_array &&
        to_array_type(type).size().is_nil())
-      continue; // do not initialize
+    {
+      // C standard 6.9.2, paragraph 5
+      // adjust the type to an array of size 1
+      it->second.type=type;
+      it->second.type.set(ID_size, gen_one(size_type()));
+    }
       
     if(type.id()==ID_incomplete_struct ||
        type.id()==ID_incomplete_union)
