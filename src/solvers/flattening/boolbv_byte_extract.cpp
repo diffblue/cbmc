@@ -71,25 +71,20 @@ void boolbvt::convert_byte_extract(const exprt &expr, bvt &bv)
     unsigned byte_width=8;
     mp_integer offset=index*byte_width;
     
-    if(mp_integer(op0_bv.size())<offset+width || offset<0)
-    {
+    endianness_mapt op0_map(op0.type(), little_endian, ns);
+    endianness_mapt bv_map(expr.type(), little_endian, ns);
+
+    assert(width==byte_width*bv_map.size());
+
+    unsigned offset_i=integer2long(offset);
+
+    for(unsigned i=0; i<width; i++)
       // out of bounds
-      for(unsigned i=0; i<width; i++)
+      if(offset<0 || offset_i+i>=op0_bv.size())
         bv[i]=prop.new_variable();
-    }
-    else
-    {
-      endianness_mapt op0_map(op0.type(), little_endian, ns);
-      endianness_mapt bv_map(expr.type(), little_endian, ns);
-
-      assert(width==byte_width*bv_map.size());
-      
-      unsigned offset_i=integer2long(offset);
-
-      for(unsigned i=0; i<width; i++)
+      else
         bv[bv_map.map_bit(i)]=
           op0_bv[op0_map.map_bit(offset_i+i)];
-    }
     
     return;
   }
