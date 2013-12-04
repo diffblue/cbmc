@@ -47,6 +47,8 @@ void goto_symext::symex_start_thread(statet &state)
   new_thread.pc=thread_target;
   new_thread.guard=state.guard;
   new_thread.call_stack.push_back(state.top());
+  new_thread.call_stack.back().local_variables.clear();
+  new_thread.call_stack.back().goto_state_map.clear();
   #if 0
   new_thread.abstract_events=&(target.new_thread(cur_thread.abstract_events));
   #endif
