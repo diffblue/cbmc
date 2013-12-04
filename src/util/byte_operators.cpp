@@ -6,11 +6,41 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <cassert>
+
 #include "std_types.h"
 #include "pointer_offset_size.h"
 #include "arith_tools.h"
 #include "byte_operators.h"
 #include "namespace.h"
+#include "config.h"
+
+/*******************************************************************\
+
+Function: byte_extract_id
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+irep_idt byte_extract_id()
+{
+  switch(config.ansi_c.endianness)
+  {
+  case configt::ansi_ct::IS_LITTLE_ENDIAN:
+    return ID_byte_extract_little_endian;
+
+  case configt::ansi_ct::IS_BIG_ENDIAN:
+    return ID_byte_extract_big_endian;
+
+  default:
+    assert(false);
+  }
+}
 
 /*******************************************************************\
 

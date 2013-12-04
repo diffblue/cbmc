@@ -161,8 +161,6 @@ private:
     const typet &type,
     const guardt &guard,
     const exprt &offset);
-
-  static irep_idt byte_extract_id();
 };
 
 #endif

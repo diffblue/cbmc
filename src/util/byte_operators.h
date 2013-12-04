@@ -51,6 +51,8 @@ extern inline byte_extract_exprt &to_byte_extract_expr(exprt &expr)
   return static_cast<byte_extract_exprt &>(expr);
 }
 
+irep_idt byte_extract_id();
+
 /*! \brief TO_BE_DOCUMENTED
 */
 class byte_extract_little_endian_exprt:public byte_extract_exprt

@@ -24,6 +24,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/guard.h>
 #include <util/options.h>
 #include <util/pointer_predicates.h>
+#include <util/byte_operators.h>
 
 #include <ansi-c/c_types.h>
 #include <ansi-c/c_typecast.h>
@@ -969,29 +970,3 @@ bool dereferencet::memory_model_bytes(
   return true;
 }
 
-/*******************************************************************\
-
-Function: dereferencet::byte_extract_id
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-irep_idt dereferencet::byte_extract_id()
-{
-  switch(config.ansi_c.endianness)
-  {
-  case configt::ansi_ct::IS_LITTLE_ENDIAN:
-    return ID_byte_extract_little_endian;
-
-  case configt::ansi_ct::IS_BIG_ENDIAN:
-    return ID_byte_extract_big_endian;
-    
-  default:
-    assert(false);
-  }
-}
