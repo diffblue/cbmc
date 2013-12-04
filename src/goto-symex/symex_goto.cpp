@@ -29,6 +29,7 @@ Function: goto_symext::symex_goto
 void goto_symext::symex_goto(statet &state)
 {
   const goto_programt::instructiont &instruction=*state.source.pc;
+  statet::framet &frame=state.top();
   
   exprt old_guard=instruction.guard;
   clean_expr(old_guard, state, false);
@@ -43,7 +44,8 @@ void goto_symext::symex_goto(statet &state)
      state.guard.is_false())
   {
     // reset unwinding counter
-    unwind_map[state.source]=0;
+    if(instruction.is_backwards_goto())
+      frame.loop_iterations[goto_programt::loop_id(state.source.pc)].count=0;
 
     // next instruction
     state.source.pc++;
@@ -59,13 +61,12 @@ void goto_symext::symex_goto(statet &state)
   goto_programt::const_targett goto_target=
     instruction.get_target();
     
-  bool forward=
-    state.source.pc->location_number<
-    goto_target->location_number;
+  bool forward=!instruction.is_backwards_goto();
     
   if(!forward) // backwards?
   {
-    unsigned &unwind=unwind_map[state.source];
+    unsigned &unwind=
+      frame.loop_iterations[goto_programt::loop_id(state.source.pc)].count;
     unwind++;
     
     if(get_unwind(state.source, unwind))
@@ -73,7 +74,7 @@ void goto_symext::symex_goto(statet &state)
       loop_bound_exceeded(state, new_guard);
 
       // reset unwinding
-      unwind_map[state.source]=0;
+      unwind=0;
       
       // next instruction
       state.source.pc++;

@@ -549,11 +549,22 @@ void bmct::setup_unwind()
     std::string::size_type next=set.find(",", idx);
     std::string val=set.substr(idx, next-idx);
 
+    long thread_nr=-1;
+    if(!val.empty() &&
+       isdigit(val[0]) &&
+       val.find(":")!=std::string::npos)
+    {
+      std::string nr=val.substr(0, val.find(":"));
+      thread_nr=atol(nr.c_str());
+      val.erase(0, nr.size()+1);
+    }
+
     if(val.rfind(":")!=std::string::npos)
     {
       std::string id=val.substr(0, val.rfind(":"));
-      unsigned long uw=atol(val.substr(val.rfind(":")+1).c_str());
-      symex.unwind_set[id]=uw;
+      long uw=atol(val.substr(val.rfind(":")+1).c_str());
+
+      symex.set_unwind_limit(id, thread_nr, uw);
     }
     
     if(next==std::string::npos) break;

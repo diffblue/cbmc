@@ -1721,17 +1721,6 @@ void goto_convertt::convert_start_thread(
 
   start_thread->location=code.location();
   
-  // see if op0 is an unconditional goto
-  
-  if(code.op0().get(ID_statement)==ID_goto)
-  {
-    start_thread->code.set(ID_destination,
-      code.op0().get(ID_destination));
-      
-    // remember it to do target later
-    targets.gotos.push_back(start_thread);
-  }
-  else
   {
     // start_thread label;
     // goto tmp;

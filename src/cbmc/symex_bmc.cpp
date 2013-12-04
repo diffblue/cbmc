@@ -78,13 +78,11 @@ bool symex_bmct::get_unwind(
   const symex_targett::sourcet &source,
   unsigned unwind)
 {
-  irep_idt id=(source.thread_nr!=0?(i2string(source.thread_nr)+":"):"")+
-              id2string(source.pc->function)+"."+
-              i2string(source.pc->loop_number);
-  unsigned long this_loop_max_unwind=max_unwind;
-
-  if(unwind_set.count(id)!=0)
-    this_loop_max_unwind=unwind_set[id];
+  const irep_idt id=goto_programt::loop_id(source.pc);
+  const long this_loop_max_unwind=
+    std::max(max_unwind,
+             std::max(thread_loop_limits[(unsigned)-1][id],
+                      thread_loop_limits[source.thread_nr][id]));
 
   #if 1
   statistics() << "Unwinding loop " << id << " iteration "
@@ -109,15 +107,19 @@ Function: symex_bmct::get_unwind_recursion
 \*******************************************************************/
 
 bool symex_bmct::get_unwind_recursion(
-  const irep_idt &identifier,
+  const irep_idt &id,
+  const unsigned thread_nr,
   unsigned unwind)
 {
-  unsigned long this_loop_max_unwind=max_unwind;
+  const long this_loop_max_unwind=
+    std::max(max_unwind,
+             std::max(thread_loop_limits[(unsigned)-1][id],
+                      thread_loop_limits[thread_nr][id]));
 
   #if 1
   if(unwind!=0)
   {
-    const symbolt &symbol=ns.lookup(identifier);
+    const symbolt &symbol=ns.lookup(id);
 
     statistics() << "Unwinding recursion "
                  << symbol.display_name()
