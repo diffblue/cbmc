@@ -301,8 +301,7 @@ void goto_symext::symex_function_call_code(
   
     if(call.lhs().is_not_nil())
     {
-      exprt rhs=exprt(ID_nondet_symbol, call.lhs().type());
-      rhs.set(ID_identifier, "symex::"+i2string(nondet_count++));
+      side_effect_expr_nondett rhs(call.lhs().type());
       rhs.location()=call.location();
       state.rename(rhs, ns, goto_symex_statet::L1);
       code_assignt code(call.lhs(), rhs);
