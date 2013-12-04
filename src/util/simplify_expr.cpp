@@ -690,7 +690,7 @@ bool simplify_exprt::simplify_dereference(exprt &expr)
 
 /*******************************************************************\
 
-Function: simplify_exprt::simplify_address_of_arg
+Function: is_dereference_integer_object
 
   Inputs:
 
@@ -722,6 +722,18 @@ static bool is_dereference_integer_object(
   
   return false;
 }
+
+/*******************************************************************\
+
+Function: simplify_exprt::simplify_address_of_arg
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool simplify_exprt::simplify_address_of_arg(exprt &expr)
 {
