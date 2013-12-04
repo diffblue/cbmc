@@ -233,12 +233,15 @@ void goto_symext::symex_step(
     break;
 
   case END_FUNCTION:
+    // do even if state.guard.is_false() to clear out frame created
+    // in symex_start_thread
     symex_end_of_function(state);
     state.source.pc++;
     break;
   
   case LOCATION:
-    target.location(state.guard.as_expr(), state.source);
+    if(!state.guard.is_false())
+      target.location(state.guard.as_expr(), state.source);
     state.source.pc++;
     break;
   

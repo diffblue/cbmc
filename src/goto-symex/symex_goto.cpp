@@ -38,8 +38,6 @@ void goto_symext::symex_goto(statet &state)
   state.rename(new_guard, ns);
   do_simplify(new_guard);
   
-  target.location(state.guard.as_expr(), state.source);
-  
   if(new_guard.is_false() ||
      state.guard.is_false())
   {
@@ -51,6 +49,8 @@ void goto_symext::symex_goto(statet &state)
     state.source.pc++;
     return; // nothing to do
   }
+  
+  target.location(state.guard.as_expr(), state.source);
     
   assert(!instruction.targets.empty());
   
