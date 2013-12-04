@@ -113,7 +113,8 @@ void memory_model_sct::thread_spawn(
         ;
 
       if(n_it!=next_thread->second.end())
-        equation.constraint(
+        add_constraint(
+          equation,
           before(e_it, *n_it),
           "thread-spawn",
           e_it->source);
@@ -169,7 +170,8 @@ void memory_model_sct::program_order(
         continue;
       }
 
-      equation.constraint(
+      add_constraint(
+        equation,
         before(previous, *e_it),
         "po",
         (*e_it)->source);
@@ -227,12 +229,14 @@ void memory_model_sct::write_serialization_external(
         symbol_exprt s=nondet_bool_symbol("ws-ext");
 
         // write-to-write edge
-        equation.constraint(
+        add_constraint(
+          equation,
           implies_exprt(s, before(*w_it1, *w_it2)),
           "ws-ext",
           (*w_it1)->source);
 
-        equation.constraint(
+        add_constraint(
+          equation,
           implies_exprt(not_exprt(s), before(*w_it2, *w_it1)),
           "ws-ext",
           (*w_it1)->source);
@@ -332,7 +336,7 @@ void memory_model_sct::from_read(symex_target_equationt &equation)
           }
 
           if(cond.is_not_nil())
-            equation.constraint(
+            add_constraint(equation,
               cond, "fr", r->source);
         }
         

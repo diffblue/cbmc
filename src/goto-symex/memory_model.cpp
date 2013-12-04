@@ -153,14 +153,14 @@ void memory_model_baset::read_from(symex_target_equationt &equation)
 
         // Uses only the write's guard as precondition, read's guard
         // follows from rf_some
-        equation.constraint(
+        add_constraint(equation,
           read_from, is_rfi?"rfi":"rf", r->source);
 
         if(!is_rfi)
         {
           // if r reads from w, then w must have happened before r
           exprt cond=implies_exprt(s, before(w, r));
-          equation.constraint(
+          add_constraint(equation,
             cond, "rf-order", r->source);
         }
 
@@ -184,7 +184,7 @@ void memory_model_baset::read_from(symex_target_equationt &equation)
 
       // Add the read's guard, each of the writes' guards is implied
       // by each entry in rf_some
-      equation.constraint(
+      add_constraint(equation,
         implies_exprt(r->guard, rf_some), "rf-some", r->source);
     }
   }
