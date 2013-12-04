@@ -297,17 +297,31 @@ void c_typecheck_baset::designator_enter(
 {
   designatort::entryt entry;
   entry.type=type;
+  entry.index=0;
 
   assert(entry.type.id()!=ID_symbol);
   
   if(entry.type.id()==ID_struct)
   {
-    entry.size=to_struct_type(entry.type).components().size();
+    const struct_union_typet &struct_type=to_struct_type(entry.type);
 
-    if(entry.size!=0)
-      entry.subtype=to_struct_type(entry.type).components().front().type();
-    else
-      entry.subtype.make_nil();
+    entry.size=struct_type.components().size();
+    entry.subtype.make_nil();
+
+    for(struct_union_typet::componentst::const_iterator
+        it=struct_type.components().begin();
+        it!=struct_type.components().end();
+        ++it)
+    {
+      if(it->type().id()!=ID_code &&
+         !it->get_is_padding())
+      {
+        entry.subtype=it->type();
+        break;
+      }
+
+      ++entry.index;
+    }
   }
   else if(entry.type.id()==ID_union)
   {
@@ -413,8 +427,7 @@ void c_typecheck_baset::do_designated_initializer(
     assert(type.id()!=ID_symbol);
 
     if(type.id()==ID_array ||
-       type.id()==ID_vector ||
-       type.id()==ID_struct)
+       type.id()==ID_vector)
     {
       if(index>=dest->operands().size())
       {
@@ -438,6 +451,24 @@ void c_typecheck_baset::do_designated_initializer(
       }
 
       dest=&(dest->operands()[integer2long(index)]);
+    }
+    else if(type.id()==ID_struct)
+    {
+      const struct_union_typet::componentst &components=
+        to_struct_type(type).components();
+      assert(index<components.size());
+      assert(components[index].type().id()!=ID_code &&
+             !components[index].get_is_padding());
+
+      if(index>=dest->operands().size())
+      {
+        err_location(value);
+        str << "index designator " << index
+            << " out of bounds (" << dest->operands().size() << ")";
+        throw 0;
+      }
+
+      dest=&(dest->operands()[index]);
     }
     else if(type.id()==ID_union)
     {
@@ -528,7 +559,14 @@ void c_typecheck_baset::do_designated_initializer(
     // we are initializing a compound type, and enter it!
     designator_enter(type, designator);
     
-    assert(!dest->operands().empty());
+    if(dest->operands().empty())
+    {
+      err_location(value);
+      str << "cannot initialize compound type "
+          << to_string(type) << " using " << to_string(value);
+      throw 0;
+    }
+
     dest=&(dest->op0());
 
     // we run into another loop iteration
@@ -571,9 +609,10 @@ void c_typecheck_baset::increment_designator(designatort &designator)
         struct_type.components();
       assert(components.size()==entry.size);
       
-      // we skip over any padding
+      // we skip over any padding or code
       while(entry.index<entry.size &&
-            components[entry.index].get_is_padding())
+            (components[entry.index].get_is_padding() ||
+             components[entry.index].type().id()==ID_code))
         entry.index++;
 
       if(entry.index<entry.size)
@@ -767,7 +806,8 @@ exprt c_typecheck_baset::do_initializer_list(
 
   exprt result;
   if(type.id()==ID_struct ||
-     type.id()==ID_union)
+     type.id()==ID_union ||
+     type.id()==ID_vector)
   {
     // start with zero everywhere
     result=zero_initializer(type, value.location(), *this, get_message_handler());
@@ -785,11 +825,6 @@ exprt c_typecheck_baset::do_initializer_list(
       // start with zero everywhere
       result=zero_initializer(type, value.location(), *this, get_message_handler());
     }
-  }
-  else if(type.id()==ID_vector)
-  {
-    // start with zero everywhere
-    result=zero_initializer(type, value.location(), *this, get_message_handler());
   }
   else
   {
@@ -816,6 +851,23 @@ exprt c_typecheck_baset::do_initializer_list(
 
     // increase designator -- might go up    
     increment_designator(current_designator);
+  }
+
+  // make sure we didn't mess up index computation
+  if(type.id()==ID_struct)
+  {
+    assert(result.operands().size()==
+           to_struct_type(type).components().size());
+
+    const struct_union_typet::componentst &components=
+      to_struct_type(type).components();
+
+    exprt::operandst::const_iterator o_it=result.operands().begin();
+    for(struct_union_typet::componentst::const_iterator
+        c_it=components.begin();
+        c_it!=components.end();
+        c_it++, ++o_it)
+      assert(!c_it->get_is_padding() || o_it->is_zero());
   }
   
   if(type.id()==ID_array &&

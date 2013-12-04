@@ -1,0 +1,8 @@
+CORE
+main.c
+
+^SIGNAL=0$
+^file main.c line 6: cannot initialize compound type .* using 42$
+^CONVERSION ERROR$
+--
+^EXIT=0$
