@@ -120,7 +120,8 @@ void memory_model_tsot::program_order(
         if(is_spawn(*e_it) ||
            is_spawn(*e_it2))
         {
-          equation.constraint(
+          add_constraint(
+            equation,
             before(*e_it, *e_it2),
             "po",
             (*e_it)->source);
@@ -168,7 +169,8 @@ void memory_model_tsot::program_order(
         simplify(cond, ns);
 
         if(!cond.is_false())
-          equation.constraint(
+          add_constraint(
+            equation,
             implies_exprt(cond, before(*e_it, *e_it2)),
             "po",
             (*e_it)->source);

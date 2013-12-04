@@ -63,6 +63,13 @@ protected:
   typet clock_type;
   symbol_exprt clock(event_it e);
   void build_clock_type(const symex_target_equationt &);
+
+  // preprocess and add a constraint to equation
+  void add_constraint(
+    symex_target_equationt &equation,
+    const exprt &cond,
+    const std::string &msg,
+    const symex_targett::sourcet &source) const;
   
   // the partial order constraint for two events
   exprt before(event_it e1, event_it e2);
