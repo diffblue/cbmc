@@ -920,26 +920,11 @@ bool compilet::link_functions(
       {
         // ok, we silently ignore
       }
-      else if(base_type_eq(in_dest_symbol_table.type, src_func.type, ns))
-      {
-        // keep the one in in_symbol_table -- libraries come last!
-        warning() << "warning: function `" << final_id << "' in module `"
-                  << src_symbol_table.symbols.begin()->second.module
-                  << "' is shadowed by a definition in module `"
-                  << symbol_table.symbols.begin()->second.module << "'"
-                  << eom;
-      }
       else
       {
-        error() << "error: duplicate definition of function `"
-                << final_id
-                << "'" << messaget::endl
-                << "In module `" 
-                << symbol_table.symbols.begin()->second.module
-                << "' and module `"
-                << src_symbol_table.symbols.begin()->second.module << "'"
-                << eom;
-        return true;
+        // the linking code will have ensured that types match
+        replace_symbol.replace(src_func.type);
+        assert(base_type_eq(in_dest_symbol_table.type, src_func.type, ns));
       }
     }
   }
