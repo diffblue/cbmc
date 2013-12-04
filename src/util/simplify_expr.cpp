@@ -3303,7 +3303,7 @@ bool simplify_exprt::simplify_inequality_not_constant(exprt &expr)
     expr.id(ID_equal);
     simplify_inequality_not_constant(expr);
     expr.make_not();
-    simplify_not(expr);
+    simplify_node(expr);
     return false;
   }
   else if(expr.id()==ID_gt)
@@ -3313,7 +3313,7 @@ bool simplify_exprt::simplify_inequality_not_constant(exprt &expr)
     expr.op0().swap(expr.op1());
     simplify_inequality_not_constant(expr);
     expr.make_not();
-    simplify_not(expr);
+    simplify_node(expr);
     return false;
   }
   else if(expr.id()==ID_lt)
@@ -3321,7 +3321,7 @@ bool simplify_exprt::simplify_inequality_not_constant(exprt &expr)
     expr.id(ID_ge);
     simplify_inequality_not_constant(expr);
     expr.make_not();
-    simplify_not(expr);
+    simplify_node(expr);
     return false;
   }
   else if(expr.id()==ID_le)
@@ -3433,7 +3433,7 @@ bool simplify_exprt::simplify_inequality_constant(exprt &expr)
       expr.id(ID_equal);
       simplify_inequality_constant(expr);
       expr.make_not();
-      simplify_not(expr);
+      simplify_node(expr);
       return false;
     }
   
@@ -3597,17 +3597,15 @@ bool simplify_exprt::simplify_inequality_constant(exprt &expr)
     // we re-write (TYPE)boolean == 0 -> !boolean
     if(expr.op1().is_zero() && expr.id()==ID_equal)
     {
-      exprt tmp=expr.op0().op0();
-      tmp.make_not();
-      expr.swap(tmp);
+      expr=expr.op0().op0();
+      expr.make_not();
       return false;
     }
 
     // we re-write (TYPE)boolean != 0 -> boolean
     if(expr.op1().is_zero() && expr.id()==ID_notequal)
     {
-      exprt tmp=expr.op0().op0();
-      expr.swap(tmp);
+      expr=expr.op0().op0();
       return false;
     }
   }
