@@ -28,10 +28,23 @@ public:
   irept last_location;
 
   // control unwinding  
-  unsigned long max_unwind;
-  std::map<irep_idt, long> unwind_set;
+  long max_unwind;
+
+  void set_unwind_limit(
+    const irep_idt &id,
+    long thread_nr,
+    long limit)
+  {
+    unsigned t=thread_nr>=0 ? thread_nr : (unsigned)-1;
+
+    thread_loop_limits[t][id]=limit;
+  }
 
 protected:  
+  typedef hash_map_cont<irep_idt, long, irep_id_hash> loop_limitst;
+  typedef std::map<unsigned, loop_limitst> thread_loop_limitst;
+  thread_loop_limitst thread_loop_limits;
+
   //
   // overloaded from goto_symext
   //
@@ -46,6 +59,7 @@ protected:
 
   virtual bool get_unwind_recursion(
     const irep_idt &identifier,
+    const unsigned thread_nr,
     unsigned unwind);
     
   virtual void no_body(const irep_idt &identifier);
