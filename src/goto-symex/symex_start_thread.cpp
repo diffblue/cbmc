@@ -6,6 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <util/message.h>
+
+#include <linking/zero_initializer.h>
+
 #include "goto_symex.h"
 
 /*******************************************************************\
@@ -73,6 +77,38 @@ void goto_symext::symex_start_thread(statet &state)
     typet type=ns.lookup(original_name).type;
     symbol_exprt lhs(l1_name, type);
     symbol_exprt rhs(*it, type);
+
+    guardt guard;
+    symex_assign_symbol(state, lhs, nil_exprt(), rhs, guard, HIDDEN);
+  }
+
+  // initialize all variables marked thread-local
+  const symbol_tablet &symbol_table=ns.get_symbol_table();
+
+  forall_symbols(it, symbol_table.symbols)
+  {
+    const symbolt &symbol=it->second;
+
+    if(!symbol.is_thread_local ||
+       !symbol.is_static_lifetime ||
+       (symbol.is_extern && symbol.value.is_nil()))
+      continue;
+
+    // get original name
+    irep_idt original_name=symbol.name;
+
+    // get L0 name for current thread
+    irep_idt l0_name=state.level0.rename(original_name, t);
+
+    symbol_exprt lhs=symbol.symbol_expr();
+    lhs.set_identifier(l0_name);
+
+    exprt rhs=symbol.value;
+    if(rhs.is_nil())
+    {
+      null_message_handlert null_message;
+      rhs=zero_initializer(symbol.type, symbol.location, ns, null_message);
+    }
 
     guardt guard;
     symex_assign_symbol(state, lhs, nil_exprt(), rhs, guard, HIDDEN);
