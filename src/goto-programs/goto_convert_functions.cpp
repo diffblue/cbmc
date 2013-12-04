@@ -167,8 +167,7 @@ void goto_convert_functionst::add_return(
   t->code=code_returnt();
   t->location=location;
 
-  exprt rhs=exprt(ID_sideeffect, f.type.return_type());
-  rhs.set(ID_statement, ID_nondet);
+  side_effect_expr_nondett rhs(f.type.return_type());
   t->code.move_to_operands(rhs);
 }
 
