@@ -624,8 +624,7 @@ void goto_symex_statet::rename_address(
   const namespacet &ns,
   levelt level)
 {
-  // only do L1!
-  rename(expr.type(), ns, L1);
+  rename(expr.type(), ns, level);
 
   if(expr.id()==ID_symbol)
   {
