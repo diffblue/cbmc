@@ -373,7 +373,10 @@ void goto_symext::phi_function(
 
     symbol_exprt lhs=symbol.symbol_expr();
     symbol_exprt new_lhs=symbol_exprt(l1_identifier, type);
+    const bool record_events=dest_state.record_events;
+    dest_state.record_events=false;
     dest_state.assignment(new_lhs, rhs, ns, true);
+    dest_state.record_events=record_events;
     
     target.assignment(
       true_exprt(),
