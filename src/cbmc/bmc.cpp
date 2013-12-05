@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/location.h>
 #include <util/time_stopping.h>
 #include <util/message_stream.h>
+#include <util/signal_exception.h>
 
 #include <langapi/mode.h>
 #include <langapi/languages.h>
@@ -448,16 +449,9 @@ bool bmct::run(const goto_functionst &goto_functions)
 	  error(error_str);
 	  return true;
 	}
-
       catch(const char *error_str)
 	{
 	  error(error_str);
-	  return true;
-	}
-
-      catch(std::bad_alloc)
-	{
-	  error() << "Out of memory" << eom;
 	  return true;
 	}
 
@@ -465,7 +459,6 @@ bool bmct::run(const goto_functionst &goto_functions)
 
     return verification_result;
   }
-
   catch(std::string &error_str)
   {
     message_streamt message_stream(get_message_handler());
@@ -473,7 +466,6 @@ bool bmct::run(const goto_functionst &goto_functions)
     message_stream.error(error_str);
     return true;
   }
-
   catch(const char *error_str)
   {
     message_streamt message_stream(get_message_handler());
@@ -481,10 +473,14 @@ bool bmct::run(const goto_functionst &goto_functions)
     message_stream.error(error_str);
     return true;
   }
-
   catch(std::bad_alloc)
   {
     error() << "Out of memory" << eom;
+    return true;
+  }
+  catch(signal_exceptiont& e)
+  {
+    error() << e.what() << eom;
     return true;
   }
 }
