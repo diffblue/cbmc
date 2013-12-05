@@ -3,7 +3,7 @@
 #include <iostream>
 
 #ifdef _MSC_VER
-  #include <windows.h>
+//  #include <windows.h>
 #else
   #include <csignal>
 #endif
@@ -19,6 +19,7 @@ static class exceptiont: public std::exception
 } exception;
 
 #ifdef _MSC_VER
+  /*
 //should work if CBMC is launched from a console, but does not with CreateProcess/TerminateProcess
   static bool signal_caught;
   static BOOL kill_handler(DWORD s) 
@@ -32,18 +33,20 @@ static class exceptiont: public std::exception
       break;
     }
     return TRUE;
-  }
+    }*/
 #else
   static void kill_handler(int s)  {} //just to override default handler
 #endif
 
 static void init() {
 #ifdef _MSC_VER
+  /*
   signal_caught = false;
   if (!SetConsoleCtrlHandler((PHANDLER_ROUTINE)kill_handler,TRUE)) {
     std::cerr << "Unable to install signal handler!" << std::endl;
     exit(243);
   }
+  */
 #else
   struct sigaction sa;
   sa.sa_handler = kill_handler;
@@ -62,7 +65,7 @@ static void init() {
 
 static void check_caught_signal() {
 #ifdef _MSC_VER
-  if(signal_caught) throw exception;
+  //  if(signal_caught) throw exception;
 #else
   sigset_t waiting_mask;
   sigpending(&waiting_mask);
