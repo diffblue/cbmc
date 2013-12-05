@@ -73,6 +73,40 @@ void goto_symext::claim(
 
 /*******************************************************************\
 
+Function: goto_symext::symex_assume
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void goto_symext::symex_assume(statet &state, const exprt &cond)
+{
+  do_simplify(cond);
+
+  if(cond.is_true()) return;
+
+  // not clear why different treatment for threads vs. no threads
+  // is essential
+  if(state.threads.size()==1)
+  {
+    exprt tmp=cond;
+    state.guard.guard_expr(tmp);
+    target.assumption(state.guard.as_expr(), tmp, state.source);
+  }
+  else
+    state.guard.add(cond);
+
+  if(state.atomic_section_id!=0 &&
+     state.guard.is_false())
+    symex_atomic_end(state);
+}
+
+/*******************************************************************\
+
 Function: goto_symext::rewrite_quantifiers
 
   Inputs:
@@ -255,25 +289,7 @@ void goto_symext::symex_step(
       exprt tmp=instruction.guard;
       clean_expr(tmp, state, false);
       state.rename(tmp, ns);
-      do_simplify(tmp);
-
-      if(!tmp.is_true())
-      {
-        // not clear why different treatment for threads vs. no threads
-        // is essential
-        if(state.threads.size()==1)
-        {
-          exprt tmp2=tmp;
-          state.guard.guard_expr(tmp2);
-          target.assumption(state.guard.as_expr(), tmp2, state.source);
-        }
-        else
-          state.guard.add(tmp);
-
-        if(state.atomic_section_id!=0 &&
-            state.guard.is_false())
-          symex_atomic_end(state);
-      }
+      symex_assume(state, tmp);
     }
 
     state.source.pc++;

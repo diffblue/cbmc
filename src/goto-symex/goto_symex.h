@@ -163,6 +163,7 @@ protected:
     const exprt &expr,
     const std::string &msg,
     statet &state);
+  virtual void symex_assume(statet &state, const exprt &cond);
     
   // gotos
   void merge_gotos(statet &state);
