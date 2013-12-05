@@ -28,14 +28,14 @@ goto-cc.dir: languages pointer-analysis.dir goto-programs.dir linking.dir
 # building for a particular directory
 
 $(patsubst %, %.dir, $(DIRS)):
-	## Entering $(basename $@)
+## Entering $(basename $@)
 	$(MAKE) $(MAKEARGS) -C $(basename $@)
 
 # generate source files
 
 $(patsubst %, %_generated_files, $(DIRS)):
 	$(MAKE) $(MAKEARGS) -C $(patsubst %_generated_files, %, $@) generated_files
-	
+
 generated_files: $(patsubst %, %_generated_files, $(DIRS))
 
 # cleaning
@@ -54,5 +54,6 @@ minisat2-download:
 	@rm -Rf ../minisat-2.2.0
 	@mv minisat ../minisat-2.2.0
 	@(cd ../minisat-2.2.0; patch -p1 < ../scripts/minisat-2.2.0-patch)
+	@(cd ../minisat-2.2.0/core; patch Solver.cc < ../../scripts/minisat.patch)
 	@rm minisat-2.2.0.tar.gz
 

@@ -48,6 +48,7 @@ public:
     remaining_claims(0),
     constant_propagation(true),
     new_symbol_table(_new_symbol_table),
+    ignore_assertions(false),
     ns(_ns),
     target(_target),
     atomic_section_counter(0),
@@ -94,6 +95,7 @@ public:
 
   optionst options;
   symbol_tablet &new_symbol_table;
+  bool ignore_assertions;
 
 protected:
   const namespacet &ns;

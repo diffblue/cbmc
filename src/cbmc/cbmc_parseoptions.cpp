@@ -166,6 +166,8 @@ void cbmc_parseoptionst::get_command_line_options(optionst &options)
   if(cmdline.isset("unwind")) {
     options.set_option("unwind", cmdline.getval("unwind"));
   }
+  if(cmdline.isset("ignore-assertions-before-unwind-min"))
+    options.set_option("ignore-assertions-before-unwind-min", true);
 
   if(cmdline.isset("depth"))
     options.set_option("depth", cmdline.getval("depth"));

@@ -13,6 +13,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/symbol_table.h>
 #include <util/replace_symbol.h>
 
+#include <util/signal_handling.h>
+
 #include "goto_symex.h"
 
 /*******************************************************************\
@@ -135,6 +137,7 @@ bool goto_symext::operator()(
 
   while(!state.call_stack().empty())
   {
+    signal_handling::check_caught_signal();
     if(symex_step(goto_functions, state)) return false;
     
     // is there another thread to execute?
@@ -287,7 +290,7 @@ bool goto_symext::symex_step(
     break;
 
   case ASSERT:
-    if(!state.guard.is_false())
+    if(!state.guard.is_false() && !ignore_assertions)
     {
       std::string msg=id2string(state.source.pc->location.get_comment());
       if(msg=="") msg="assertion";

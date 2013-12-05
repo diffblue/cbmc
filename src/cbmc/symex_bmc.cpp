@@ -38,7 +38,6 @@ symex_bmct::symex_bmct(
   prop_convt& _prop_conv):
   goto_symext(_ns, _new_symbol_table, _target),
   prop_conv(_prop_conv),
-  unwind_min_reached(false),
   loop_last_SSA_step(_target.SSA_steps.end()),
   ui(ui_message_handlert::PLAIN)
 {
@@ -72,8 +71,6 @@ bool symex_bmct::symex_step(
 
     last_location=location;
   }
-
-  //  if(!unwind_min_reached && ignore_assertions_before_unwind_min)
 
   return goto_symext::symex_step(goto_functions, state);
 }
@@ -171,7 +168,7 @@ bool symex_bmct::get_unwind(
     this_loop_max_unwind=unwind_set[id];
   if(id==incr_loop_id) {
     this_loop_max_unwind = incr_max_unwind;
-    if(unwind>=incr_min_unwind) unwind_min_reached = true;
+    if(unwind+1>=incr_min_unwind) ignore_assertions = false;
   }
   if(this_loop_max_unwind==0) this_loop_max_unwind = UINT_MAX;
 

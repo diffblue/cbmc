@@ -45,8 +45,6 @@ public:
     ui(ui_message_handlert::PLAIN)
   {
     symex.constant_propagation=options.get_bool_option("propagation");
-    symex.ignore_assertions_before_unwind_min =
-      options.get_bool_option("ignore-assertions-before-unwind-min");
   }
  
   virtual bool run(const goto_functionst &goto_functions);

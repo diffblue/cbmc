@@ -38,7 +38,6 @@ public:
   irep_idt incr_loop_id;
   unsigned long incr_max_unwind;
   unsigned long incr_min_unwind;
-  bool ignore_assertions_before_unwind_min;
 
   prop_convt& prop_conv;
 
@@ -49,9 +48,6 @@ public:
   void set_ui(language_uit::uit _ui) { ui=_ui; }
 
 protected:  
-  // becomes true unwind>=incr_min_unwind for incr_loop_id
-  bool unwind_min_reached;
-
   // for incremental unwinding and checking
   symex_target_equationt::SSA_stepst::iterator loop_last_SSA_step;
 

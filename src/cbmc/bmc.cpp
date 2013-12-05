@@ -16,7 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/location.h>
 #include <util/time_stopping.h>
 #include <util/message_stream.h>
-#include <util/signal_exception.h>
+#include <util/signal_handling.h>
 
 #include <langapi/mode.h>
 #include <langapi/languages.h>
@@ -478,7 +478,7 @@ bool bmct::run(const goto_functionst &goto_functions)
     error() << "Out of memory" << eom;
     return true;
   }
-  catch(signal_exceptiont& e)
+  catch(signal_handling::exceptiont& e)
   {
     error() << e.what() << eom;
     return true;
@@ -570,5 +570,8 @@ void bmct::setup_unwind()
   symex.incr_min_unwind=options.get_int_option("unwind-min");
   symex.incr_max_unwind=options.get_int_option("unwind-max");
   if(symex.incr_max_unwind==0) symex.incr_max_unwind = UINT_MAX;
+  symex.ignore_assertions = (symex.incr_min_unwind>=2) &&
+      options.get_bool_option("ignore-assertions-before-unwind-min");
+ 
   symex.incr_loop_id = options.get_option("incremental-check");
 }
