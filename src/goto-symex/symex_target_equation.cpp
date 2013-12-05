@@ -749,7 +749,7 @@ void symex_target_equationt::convert_guards(
   for(SSA_stepst::iterator it=step;
       it!=SSA_steps.end(); it++)
   {
-    if(it->ignore) //TODO?
+    if(it->ignore)
       it->guard_literal=const_literal(false);
     else 
       it->guard_literal=prop_conv.convert(it->guard);
@@ -794,11 +794,10 @@ void symex_target_equationt::convert_assumptions(
   {
     if(it->is_assume())
     {
-      if(it->ignore) //TODO?
+      if(it->ignore) 
         it->cond_literal=const_literal(true);
-      else {
+      else
         it->cond_literal=prop_conv.convert(it->cond_expr);
-      }
     }
   }
 }
