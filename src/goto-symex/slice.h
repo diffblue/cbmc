@@ -21,6 +21,9 @@ void simple_slice(symex_target_equationt &equation);
 void slice(symex_target_equationt &equation, 
            const expr_listt &expressions);
 
+// Undo symex slicing
+void undo_slice(symex_target_equationt &equation);
+
 // Collects "open" variables that are used but not assigned
 
 typedef hash_set_cont<irep_idt, irep_id_hash> symbol_sett;

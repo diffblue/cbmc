@@ -87,14 +87,17 @@ Function: symex_bmct::convert
 
 \*******************************************************************/
 
-void symex_bmct::convert() {    
+void symex_bmct::convert() {  
+  //TODO: looop_last_SSA_step is probably not needed  
   symex_target_equationt& e_target = dynamic_cast<symex_target_equationt&>(target); 
   if(loop_last_SSA_step == e_target.SSA_steps.end()) //first call
     loop_last_SSA_step = e_target.SSA_steps.begin();
   else {
     loop_last_SSA_step++;
   }
-  loop_last_SSA_step = e_target.convert(prop_conv,loop_last_SSA_step);
+
+  //  loop_last_SSA_step = e_target.convert(prop_conv,loop_last_SSA_step);
+  loop_last_SSA_step = e_target.convert(prop_conv,e_target.SSA_steps.begin());
 
 #if 0
   e_target.output(std::cout);

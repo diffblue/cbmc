@@ -389,3 +389,25 @@ void simple_slice(symex_target_equationt &equation)
       s_it->ignore=true;
 }
 
+/*******************************************************************\
+
+Function: simple_slice
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void undo_slice(symex_target_equationt &equation)
+{
+  //set ignore to false
+  for(symex_target_equationt::SSA_stepst::iterator
+      it=equation.SSA_steps.begin();
+      it!=equation.SSA_steps.end();
+      it++) {
+    it->ignore = false;
+  }
+} 

@@ -653,14 +653,14 @@ Function: symex_target_equationt::convert_assignments
 \*******************************************************************/
 
 void symex_target_equationt::convert_assignments(
-  decision_proceduret &decision_procedure, SSA_stepst::const_iterator step) const
+  decision_proceduret &decision_procedure, SSA_stepst::iterator step)
 {
-  for(SSA_stepst::const_iterator it=step;
+  for(SSA_stepst::iterator it=step;
       it!=SSA_steps.end(); it++)
   {
-    if(it->is_assignment() && !it->ignore)
+    if(it->is_assignment() && !it->ignore && !it->converted)
     {
-      //it->asserted_expr = it->cond_expr;
+      it->converted = true;
       decision_procedure.set_to_true(it->cond_expr);
     }
   }
@@ -678,9 +678,9 @@ Function: symex_target_equationt::convert_assignments
 \*******************************************************************/
 
 void symex_target_equationt::convert_assignments(
-  decision_proceduret &decision_procedure) const
+  decision_proceduret &decision_procedure)
 {
-  SSA_stepst::const_iterator step = SSA_steps.begin(); 
+  SSA_stepst::iterator step = SSA_steps.begin(); 
   convert_assignments(decision_procedure,step);
 }
 
@@ -697,13 +697,14 @@ Function: symex_target_equationt::convert_decls
 \*******************************************************************/
 
 void symex_target_equationt::convert_decls(
-  prop_convt &prop_conv, SSA_stepst::const_iterator step) const
+  prop_convt &prop_conv, SSA_stepst::iterator step)
 {
-  for(SSA_stepst::const_iterator it=step;
+  for(SSA_stepst::iterator it=step;
       it!=SSA_steps.end(); it++)
   {
-    if(it->is_decl() && !it->ignore)
+    if(it->is_decl() && !it->ignore && !it->converted)
     {
+      it->converted = true;
       // The result is not used, these have no impact on
       // the satisfiability of the formula.
       prop_conv.convert(it->cond_expr);
@@ -724,9 +725,9 @@ Function: symex_target_equationt::convert_decls
 \*******************************************************************/
 
 void symex_target_equationt::convert_decls(
-  prop_convt &prop_conv) const
+  prop_convt &prop_conv)
 {
-  SSA_stepst::const_iterator step = SSA_steps.begin(); 
+  SSA_stepst::iterator step = SSA_steps.begin(); 
   convert_decls(prop_conv,step);
 }
 
@@ -748,9 +749,9 @@ void symex_target_equationt::convert_guards(
   for(SSA_stepst::iterator it=step;
       it!=SSA_steps.end(); it++)
   {
-    if(it->ignore)
+    if(it->ignore) //TODO?
       it->guard_literal=const_literal(false);
-    else
+    else 
       it->guard_literal=prop_conv.convert(it->guard);
   }
 }
@@ -793,7 +794,7 @@ void symex_target_equationt::convert_assumptions(
   {
     if(it->is_assume())
     {
-      if(it->ignore)
+      if(it->ignore) //TODO?
         it->cond_literal=const_literal(true);
       else {
         it->cond_literal=prop_conv.convert(it->cond_expr);
@@ -834,17 +835,18 @@ Function: symex_target_equationt::convert_constraints
 \*******************************************************************/
 
 void symex_target_equationt::convert_constraints(
-  decision_proceduret &decision_procedure, SSA_stepst::const_iterator step) const
+  decision_proceduret &decision_procedure, SSA_stepst::iterator step)
 {
-  for(SSA_stepst::const_iterator it=step;
+  for(SSA_stepst::iterator it=step;
       it!=SSA_steps.end();
       it++)
   {
     if(it->is_constraint())
     {
-      if(it->ignore)
+      if(it->ignore || it->converted)
         continue;
 
+      //it->converted = true;
       decision_procedure.set_to_true(it->cond_expr);
     }
   }
@@ -863,9 +865,9 @@ Function: symex_target_equationt::convert_constraints
 \*******************************************************************/
 
 void symex_target_equationt::convert_constraints(
-  decision_proceduret &decision_procedure) const
+  decision_proceduret &decision_procedure)
 {
-  SSA_stepst::const_iterator step = SSA_steps.begin();
+  SSA_stepst::iterator step = SSA_steps.begin();
   convert_constraints(decision_procedure,step);
 }
 
@@ -988,8 +990,9 @@ void symex_target_equationt::convert_io(
 
   for(SSA_stepst::iterator it=step;
       it!=SSA_steps.end(); it++)
-    if(!it->ignore)
+    if(!it->ignore && !it->converted)
     {
+      it->converted = true;
       for(std::list<exprt>::const_iterator
           o_it=it->io_args.begin();
           o_it!=it->io_args.end();
@@ -1167,6 +1170,8 @@ void symex_target_equationt::SSA_stept::output(
     out << from_expr(ns, "", ssa_lhs) << std::endl;
 
   out << "Guard: " << from_expr(ns, "", guard) << std::endl;
+  out << "Ignore: " << ignore << std::endl;
+  out << "Converted: " << converted << std::endl;
 }
 
 /*******************************************************************\

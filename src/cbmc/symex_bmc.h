@@ -49,7 +49,7 @@ public:
 
 protected:  
   // for incremental unwinding and checking
-  symex_target_equationt::SSA_stepst::iterator loop_last_SSA_step;
+  symex_target_equationt::SSA_stepst::iterator loop_last_SSA_step; //TODO: probably not needed in future
 
   // use gui format
   language_uit::uit ui;

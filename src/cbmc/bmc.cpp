@@ -159,6 +159,11 @@ bmct::run_decision_procedure(prop_convt &prop_conv)
   
   do_conversion(prop_conv);  
 
+#if 0
+  statistics() << "ignored after conversion: " <<  equation.count_ignored_SSA_steps() << eom;
+  statistics() << "converted after conversion: " <<  equation.count_converted_SSA_steps() << eom;
+#endif
+
   status() << "Running " << prop_conv.decision_procedure_text() << eom;
 
   decision_proceduret::resultt dec_result=prop_conv.dec_solve();
@@ -350,8 +355,14 @@ bool bmct::run(const goto_functionst &goto_functions)
     goto_symext::statet symex_state;
     // perform symbolic execution
     bool symex_done = false;
-    while(!symex_done) {
+    while(!symex_done) { //THE MAIN LOOP FOR INCREMENTAL UNWINDING
       symex_done = symex(symex_state,goto_functions,body);
+      undo_slice(equation);
+
+#if 0
+  statistics() << "ignored after conversion: " <<  equation.count_ignored_SSA_steps() << eom;
+  statistics() << "converted after conversion: " <<  equation.count_converted_SSA_steps() << eom;
+#endif
 
 #if 0
       equation.output(std::cout);
@@ -434,6 +445,11 @@ bool bmct::run(const goto_functionst &goto_functions)
 	      report_success();
               continue;
 	    }
+
+#if 0
+  statistics() << "ignored after conversion: " <<  equation.count_ignored_SSA_steps() << eom;
+  statistics() << "converted after conversion: " <<  equation.count_converted_SSA_steps() << eom;
+#endif
 
           //call decision procedure
 	  if(options.get_bool_option("all-claims")) {
