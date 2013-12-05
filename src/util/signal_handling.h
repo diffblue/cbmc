@@ -20,11 +20,10 @@ static class exceptiont: public std::exception
 
 #ifdef _MSC_VER
 //should work if CBMC is launched from a console, but does not with CreateProcess/TerminateProcess
-  static bool signal_caught = false;
-  BOOL WINAPI CCHandler(DWORD);
-  BOOL WINAPI kill_handler(DWORD dwType) 
+  static bool signal_caught;
+  static BOOL kill_handler(DWORD s) 
   {
-    switch(dwType) {
+    switch(s) {
     case CTRL_C_EVENT:
     case CTRL_BREAK_EVENT:
       signal_caught = true;
@@ -40,7 +39,8 @@ static class exceptiont: public std::exception
 
 static void init() {
 #ifdef _MSC_VER
-  if (!SetConsoleCtrlHandler((PHANDLER_ROUTINE)CCHandler,TRUE)) {
+  signal_caught = false;
+  if (!SetConsoleCtrlHandler((PHANDLER_ROUTINE)kill_handler,TRUE)) {
     std::cerr << "Unable to install signal handler!" << std::endl;
     exit(243);
   }
