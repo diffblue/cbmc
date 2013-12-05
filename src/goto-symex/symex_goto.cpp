@@ -427,17 +427,15 @@ void goto_symext::loop_bound_exceeded(
       claim(negated_cond,
             "unwinding assertion loop "+i2string(loop_number),
             state);
+
+      // add to state guard to prevent further assignments
+      state.guard.add(negated_cond);
     }
     else
     {
       // generate unwinding assumption, unless we permit partial loops
-      exprt guarded_expr=negated_cond;
-      state.guard.guard_expr(guarded_expr);
-      target.assumption(state.guard.as_expr(), guarded_expr, state.source);
+      symex_assume(state, negated_cond);
     }
-
-    // add to state guard to prevent further assignments
-    state.guard.add(negated_cond);
   }
 }
 
