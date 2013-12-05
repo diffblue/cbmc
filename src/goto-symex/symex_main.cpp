@@ -85,20 +85,22 @@ Function: goto_symext::symex_assume
 
 void goto_symext::symex_assume(statet &state, const exprt &cond)
 {
-  do_simplify(cond);
+  exprt simplified_cond=cond;
 
-  if(cond.is_true()) return;
+  do_simplify(simplified_cond);
+
+  if(simplified_cond.is_true()) return;
 
   // not clear why different treatment for threads vs. no threads
   // is essential
   if(state.threads.size()==1)
   {
-    exprt tmp=cond;
+    exprt tmp=simplified_cond;
     state.guard.guard_expr(tmp);
     target.assumption(state.guard.as_expr(), tmp, state.source);
   }
   else
-    state.guard.add(cond);
+    state.guard.add(simplified_cond);
 
   if(state.atomic_section_id!=0 &&
      state.guard.is_false())
