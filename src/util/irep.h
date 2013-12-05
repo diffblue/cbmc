@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #define USE_DSTRING
 #define SHARING
+//#define HASH_CODE
 
 #ifdef USE_DSTRING
 #include "dstring.h"
@@ -240,7 +241,9 @@ protected:
 public:
   class dt
   {
-  public:
+  private:
+    friend class irept;
+
     #ifdef SHARING
     unsigned ref_count;
     #endif
@@ -255,6 +258,10 @@ public:
     named_subt comments;
     subt sub;
 
+    #ifdef HASH_CODE
+    mutable size_t hash_code;
+    #endif
+
     void clear()
     {
       #ifdef USE_DSTRING
@@ -265,6 +272,9 @@ public:
       sub.clear();
       named_sub.clear();
       comments.clear();
+      #ifdef HASH_CODE
+      hash_code=0;
+      #endif
     }
     
     void swap(dt &d)
@@ -273,14 +283,23 @@ public:
       d.sub.swap(sub);
       d.named_sub.swap(named_sub);
       d.comments.swap(comments);
+      #ifdef HASH_CODE
+      std::swap(d.hash_code, hash_code);
+      #endif
     }
     
     #ifdef SHARING
     dt():ref_count(1)
+      #ifdef HASH_CODE
+         , hash_code(0)
+      #endif
     {
     }
     #else
     dt()
+      #ifdef HASH_CODE
+      :hash_code(0)
+      #endif
     {
     }
     #endif
@@ -303,6 +322,9 @@ public:
   inline dt &write()
   {
     detatch();
+    #ifdef HASH_CODE
+    data->hash_code=0;
+    #endif
     return *data;
   }
   
@@ -319,6 +341,9 @@ public:
 
   inline dt &write()
   {
+    #ifdef HASH_CODE
+    data.hash_code=0;
+    #endif
     return data;
   }
   #endif
