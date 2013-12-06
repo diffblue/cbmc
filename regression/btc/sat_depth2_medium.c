@@ -31,12 +31,8 @@ float nondet_float(void);
 double nondet_double(void);
 
 // Main routine.
-int main(int argc, char* argv[])
+void main()
 {
-  assert(argc>=2);
-  int iterations = atoi(argv[1]);
-  assert(argc>=2+3*iterations);
-
   // Declaration of all non-input variables.
   float press = (float) 0x0.00000000000000000000p+0;
   float speed = (float) 0x0.00000000000000000000p+0;
@@ -1703,17 +1699,9 @@ int main(int argc, char* argv[])
   _Bool _aux_18210 = (_Bool) 0;
 
   // Range assumptions for non-determistic variables.
-  int k=0;
   // Main while loop.
-  for(;k<iterations;k++) {
-
-
-    //***** assign inputs *****
-    double osc_in_if1 = (double)(atof(argv[2+k*3])*0.5);
-    double osc_in_if2 = (double)(atof(argv[2+k*3+1])*0.5);
-    double osc_in_if4 = (double)(atof(argv[2+k*3+2])*0.5);
-
-    /*    // Declaration of all input variables.
+  while(1) {  
+   // Declaration of all input variables.
     double osc_in_if1 = nondet_double();
     double osc_in_if2 = nondet_double();
     double osc_in_if4 = nondet_double();
@@ -1722,8 +1710,7 @@ int main(int argc, char* argv[])
     __CPROVER_assume(osc_in_if1 >= (double) 0 && osc_in_if1 <= (double) 120);
     __CPROVER_assume(osc_in_if2 >= (double) 0 && osc_in_if2 <= (double) 1000);
     __CPROVER_assume(osc_in_if4 >= (double) 0 && osc_in_if4 <= (double) 1);
-    */
-
+ 
     // Program code.
     _aux_13 = ((((__cpprs_3_SIBFS_control_logic_a_Ca2_X_OxygenSensMode) && (__cpprs_3_SIBFS_control_logic_a_Ca6_X_PressureSensMode))) && (!(((((__cpprs_3_SIBFS_control_logic_a_Ca2_X_OxygenSensMode) && (__cpprs_3_SIBFS_control_logic_a_Ca6_X_PressureSensMode))) && (__cpprs_3_SIBFS_control_logic_a_Ca7_X_PressNorm)))));
     _aux_14 = (float) osc_in_if4;
@@ -3390,85 +3377,12 @@ int main(int argc, char* argv[])
     _loop_divergence_observer_2 = _aux_5442;
     _loop_divergence_observer_3 = _aux_11253;
 
-    /*
+    
     // Assumption: variable 'invariance_assumption' must hold.
     __CPROVER_assume(invariance_assumption == 1);
 
     // Assertion: variable 'invariance_property' must hold.
     __CPROVER_assert(invariance_property == 1, "invariance property");
-    */
-
-    //***** print state *****
-    printf(
-      "("
-      "(press==(float)%.20a) && "
-      "(speed==(float)%.20a) && "
-      "(throttle==(float)%.20a) && "
-      "(fail_PRESS==(_Bool)%d) && "
-      "(fail_SPEED==(_Bool)%d) && "
-      "(fail_THROT==(_Bool)%d) && "
-      "(OSC_G545==(_Bool)%d) && "
-      "(OSC_ASSUMPTION==(_Bool)%d) && "
-      "(_RELOP_9_prop3==(_Bool)%d) && "
-  "(__cpprs_3_SIBFS_control_logic_a_Ca10_X_ThrotFail==(_Bool)%d) && "
-  "(__cpprs_3_SIBFS_control_logic_a_Ca11_X_ThrotNorm==(_Bool)%d) && "
-  "(__cpprs_3_SIBFS_control_logic_a_Ca12_X_SpeedSensMode==(_Bool)%d) && "
-  "(__cpprs_3_SIBFS_control_logic_a_Ca13_X_SpeedFail==(_Bool)%d) && "
-  "(__cpprs_3_SIBFS_control_logic_a_Ca14_X_SpeedNorm==(_Bool)%d) && "
-  "(__cpprs_3_SIBFS_control_logic_a_Ca1_control_logic==(_Bool)%d) && "
-  "(__cpprs_3_SIBFS_control_logic_a_Ca2_X_OxygenSensMode==(_Bool)%d) && "
-  "(__cpprs_3_SIBFS_control_logic_a_Ca6_X_PressureSensMode==(_Bool)%d) && "
-  "(__cpprs_3_SIBFS_control_logic_a_Ca7_X_PressNorm==(_Bool)%d) && "
-  "(__cpprs_3_SIBFS_control_logic_a_Ca8_X_PressFail==(_Bool)%d) && "
-  "(__cpprs_3_SIBFS_control_logic_a_Ca9_X_ThrottleSensMode==(_Bool)%d) && "
-  "(_assumption_linked_patterns==(_Bool)%d) && "
-  "(_assumption_simple==(_Bool)%d) && "
-  "(_assumption_valid_input_ranges==(_Bool)%d) && "
-  "(_assumption_calibration==(_Bool)%d) && "
-  "(_assumption_freezings==(_Bool)%d) && "
-  "(_commitment_observer_dtp==(_Bool)%d) && "
-  "(_loop_divergence_observer==(_Bool)%d) && "
-  "(_assumption_conjunction==(_Bool)%d) && "
-  "(_assumption_state==(_Bool)%d) && "
-  "(invariance_assumption==(_Bool)%d) && "
-  "(_invariance_property_1==(_Bool)%d) && "
-  "(invariance_property==(_Bool)%d) && "
-  "(_invariance_property_state==(_Bool)%d) && "
-  "(_loop_divergence_observer_1==(_Bool)%d) && "
-  "(_loop_divergence_observer_2==(_Bool)%d) && "
-  "(_loop_divergence_observer_3==(_Bool)%d)"
-      ") || ",
-      press,speed,throttle, 
-      fail_PRESS,fail_SPEED,fail_THROT,
-      OSC_G545,OSC_ASSUMPTION,_RELOP_9_prop3,
-  __cpprs_3_SIBFS_control_logic_a_Ca10_X_ThrotFail,
-  __cpprs_3_SIBFS_control_logic_a_Ca11_X_ThrotNorm,
-  __cpprs_3_SIBFS_control_logic_a_Ca12_X_SpeedSensMode,
-  __cpprs_3_SIBFS_control_logic_a_Ca13_X_SpeedFail,
-  __cpprs_3_SIBFS_control_logic_a_Ca14_X_SpeedNorm,
-  __cpprs_3_SIBFS_control_logic_a_Ca1_control_logic,
-  __cpprs_3_SIBFS_control_logic_a_Ca2_X_OxygenSensMode,
-  __cpprs_3_SIBFS_control_logic_a_Ca6_X_PressureSensMode,
-  __cpprs_3_SIBFS_control_logic_a_Ca7_X_PressNorm,
-  __cpprs_3_SIBFS_control_logic_a_Ca8_X_PressFail,
-  __cpprs_3_SIBFS_control_logic_a_Ca9_X_ThrottleSensMode,
-  _assumption_linked_patterns,
-  _assumption_simple,
-  _assumption_valid_input_ranges,
-  _assumption_calibration,
-  _assumption_freezings,
-  _commitment_observer_dtp,
-  _loop_divergence_observer,
-  _assumption_conjunction,
-      _assumption_state,
-  invariance_assumption,
-  _invariance_property_1,
-  invariance_property,
-      _invariance_property_state,
-  _loop_divergence_observer_1,
-  _loop_divergence_observer_2,
-  _loop_divergence_observer_3
-    );
 
   }
 

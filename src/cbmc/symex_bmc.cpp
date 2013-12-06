@@ -88,7 +88,7 @@ Function: symex_bmct::convert
 \*******************************************************************/
 
 void symex_bmct::convert() {  
-  //TODO: looop_last_SSA_step is probably not needed  
+  //TODO: loop_last_SSA_step is probably not needed  
   symex_target_equationt& e_target = dynamic_cast<symex_target_equationt&>(target); 
   if(loop_last_SSA_step == e_target.SSA_steps.end()) //first call
     loop_last_SSA_step = e_target.SSA_steps.begin();
@@ -112,7 +112,7 @@ Function: symex_bmct::current_activation_literal
 
  Outputs: current activation literal
 
- Purpose: get activation literal used for the assertions having been 
+ Purpose: get activation literal used for the assertions that have been 
           translated in the most recent call to convert()
 
 \*******************************************************************/

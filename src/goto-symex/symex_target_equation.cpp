@@ -593,7 +593,7 @@ Function: symex_target_equationt::convert
 
  Outputs: last converted SSA step
 
- Purpose: converts from given SSA step
+ Purpose: converts starting from given SSA step
 
 \*******************************************************************/
 
@@ -608,6 +608,23 @@ symex_target_equationt::SSA_stepst::iterator symex_target_equationt::convert(
   }
   #endif
 
+  #if 0
+  //freeze literals involving variables where unrollings are stitched together
+  std::cout << "last assignments: " << std::endl; //TODO: for test only
+  typedef std::map<irep_idt,irep_idt> symbol_mapt;
+  symbol_mapt last_symbol_assignments;
+  for(SSA_stepst::iterator it=--SSA_steps.end();
+      it!=step; it--) {
+    if(it->is_assignment() && !it->ignore  && !it->converted) {
+      irep_idt stripped_lhs = it->original_lhs_object.get_identifier();
+      if(it->assignment_type==GUARD) stripped_lhs = it->ssa_lhs.get_identifier();
+      if(last_symbol_assignments.find(stripped_lhs)==last_symbol_assignments.end()) {
+        last_symbol_assignments[stripped_lhs] = it->ssa_lhs.get_identifier();
+      }
+    }
+  }
+  #endif
+
   convert_guards(prop_conv,step);
   convert_assignments(prop_conv,step);
   convert_decls(prop_conv,step);
@@ -615,6 +632,20 @@ symex_target_equationt::SSA_stepst::iterator symex_target_equationt::convert(
   convert_assertions(prop_conv,step);
   convert_io(prop_conv,step);
   convert_constraints(prop_conv,step);
+
+  #if 0
+  const prop_convt::symbolst& symbols = prop_conv.get_symbols(); //TODO: for test only
+  for(prop_convt::symbolst::const_iterator it=symbols.begin();
+      it!=symbols.end(); it++) {
+    std::cout << "SAT symbols: " << it->first << "  -> " << it->second << std::endl;
+    //    prop_conv.prop.set_frozen(it->second);
+  }
+  for(symbol_mapt::iterator it=last_symbol_assignments.begin();
+      it!=last_symbol_assignments.end(); it++) {
+    std::cout << "symbol: " << it->first << " (" << it->second << ")" << std::endl;
+    prop_conv.prop.set_frozen(symbols.at(it->second));
+  }
+  #endif
 
   SSA_stepst::iterator ret = SSA_steps.end();
   ret--;
@@ -845,7 +876,7 @@ void symex_target_equationt::convert_constraints(
       if(it->ignore || it->converted)
         continue;
 
-      //it->converted = true;
+      it->converted = true;
       decision_procedure.set_to_true(it->cond_expr);
     }
   }
