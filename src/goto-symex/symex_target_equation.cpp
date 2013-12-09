@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/i2string.h>
 #include <util/std_expr.h>
 #include <util/expr_util.h>
+#include <util/find_symbols.h>
 
 #include <langapi/language_util.h>
 #include <solvers/prop/prop_conv.h>
@@ -32,7 +33,7 @@ Function: symex_target_equationt::symex_target_equationt
 \*******************************************************************/
 
 symex_target_equationt::symex_target_equationt(
-  const namespacet &_ns):ns(_ns)
+  const namespacet &_ns):ns(_ns), mark(SSA_steps.end())
 {
 }
 
@@ -82,6 +83,42 @@ void symex_target_equationt::shared_read(
   SSA_step.source=source;
 
   merge_ireps(SSA_step);
+}
+
+/*******************************************************************\
+
+Function: symex_target_equationt::remove_unused_reads
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void symex_target_equationt::remove_unused_reads(const exprt &expr)
+{
+  find_symbols_sett symbols;
+  find_symbols(expr, symbols);
+
+  for(SSA_stepst::iterator it=mark;
+      it!=SSA_steps.end();
+      ) // no ++it
+  {
+    if(it==mark ||
+       !it->is_shared_read() ||
+       symbols.find(it->ssa_lhs.get_identifier())!=symbols.end())
+    {
+      ++it;
+      continue;
+    }
+
+    SSA_stepst::iterator next=it;
+    ++next;
+    SSA_steps.erase(it);
+    it=next;
+  }
 }
 
 /*******************************************************************\

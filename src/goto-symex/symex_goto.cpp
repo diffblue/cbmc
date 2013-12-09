@@ -33,22 +33,26 @@ void goto_symext::symex_goto(statet &state)
   exprt old_guard=instruction.guard;
   clean_expr(old_guard, state, false);
 
+  target.set_mark();
   exprt new_guard=old_guard;
   state.rename(new_guard, ns);
   do_simplify(new_guard);
-  
-  target.location(state.guard.as_expr(), state.source);
+  target.remove_unused_reads(new_guard);
   
   if(new_guard.is_false() ||
      state.guard.is_false())
   {
     // reset unwinding counter
-    unwind_map[state.source]=0;
+    if(instruction.is_backwards_goto())
+      unwind_info[state.source.thread_nr].
+        loop_unwind[thread_unwind_infot::loop_id(state.source)].iterations=0;
 
     // next instruction
     state.source.pc++;
     return; // nothing to do
   }
+  
+  target.location(state.guard.as_expr(), state.source);
     
   assert(!instruction.targets.empty());
   
@@ -59,13 +63,13 @@ void goto_symext::symex_goto(statet &state)
   goto_programt::const_targett goto_target=
     instruction.get_target();
     
-  bool forward=
-    state.source.pc->location_number<
-    goto_target->location_number;
+  bool forward=!instruction.is_backwards_goto();
     
   if(!forward) // backwards?
   {
-    unsigned &unwind=unwind_map[state.source];
+    unsigned &unwind=
+      unwind_info[state.source.thread_nr].
+        loop_unwind[thread_unwind_infot::loop_id(state.source)].iterations;
     unwind++;
     
     if(get_unwind(state.source, unwind))
@@ -73,7 +77,7 @@ void goto_symext::symex_goto(statet &state)
       loop_bound_exceeded(state, new_guard);
 
       // reset unwinding
-      unwind_map[state.source]=0;
+      unwind=0;
       
       // next instruction
       state.source.pc++;
@@ -184,12 +188,14 @@ void goto_symext::symex_step_goto(statet &state, bool taken)
   
   exprt guard(instruction.guard);
   dereference(guard, state, false);
+  target.set_mark();
   state.rename(guard, ns);
   
   if(!taken) guard.make_not();
   
   state.guard.guard_expr(guard);
   do_simplify(guard);
+  target.remove_unused_reads(guard);
 
   target.assumption(state.guard.as_expr(), guard, state.source);  
 }
@@ -327,6 +333,16 @@ void goto_symext::phi_function(
     if(dest_state.atomic_section_id==0 &&
        dest_state.threads.size()>=2 && symbol.is_shared())
       continue; // no phi nodes for shared stuff
+
+    // does it belong to another thread (introduced by symex_start_thread)?
+    const irep_idt &l0_identifier=
+      dest_state.level1.get_original_name(l1_identifier);
+    const irep_idt cur_thread_l0=
+      dest_state.level0.name(original_identifier, dest_state.source.thread_nr);
+
+    if(l0_identifier!=l1_identifier &&
+       l0_identifier!=cur_thread_l0)
+      continue;
     
     // get type (may need renaming)      
     typet type=symbol.type;
@@ -373,7 +389,10 @@ void goto_symext::phi_function(
 
     symbol_exprt lhs=symbol.symbol_expr();
     symbol_exprt new_lhs=symbol_exprt(l1_identifier, type);
+    const bool record_events=dest_state.record_events;
+    dest_state.record_events=false;
     dest_state.assignment(new_lhs, rhs, ns, true);
+    dest_state.record_events=record_events;
     
     target.assignment(
       true_exprt(),
@@ -427,9 +446,14 @@ void goto_symext::loop_bound_exceeded(
     else
     {
       // generate unwinding assumption, unless we permit partial loops
-      exprt guarded_expr=negated_cond;
-      state.guard.guard_expr(guarded_expr);
-      target.assumption(state.guard.as_expr(), guarded_expr, state.source);
+      // when there are multiple threads, only add to state guard below,
+      // just like ASSUME
+      if(state.threads.size()==1)
+      {
+        exprt guarded_expr=negated_cond;
+        state.guard.guard_expr(guarded_expr);
+        target.assumption(state.guard.as_expr(), guarded_expr, state.source);
+      }
     }
 
     // add to state guard to prevent further assignments

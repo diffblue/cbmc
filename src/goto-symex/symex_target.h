@@ -170,6 +170,10 @@ public:
     const exprt &guard,
     unsigned atomic_section_id,
     const sourcet &source)=0;
+
+  // cleanup unused shared memory reads
+  virtual void set_mark() {}
+  virtual void remove_unused_reads(const exprt &expr) {}
 };
 
 bool operator < (

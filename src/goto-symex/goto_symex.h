@@ -86,6 +86,16 @@ public:
   // these bypass the target maps
   virtual void symex_step_return(statet &state);
   virtual void symex_step_goto(statet &state, bool taken);
+
+  void set_unwind_limit(
+    const irep_idt &id,
+    long thread_nr,
+    long limit)
+  {
+    unsigned t=thread_nr>=0 ? thread_nr : (unsigned)-1;
+
+    unwind_info[t].loop_unwind[id].limit=limit;
+  }
   
   // statistics
   unsigned total_claims, remaining_claims;
@@ -209,6 +219,7 @@ protected:
     
   virtual bool get_unwind_recursion(
     const irep_idt &identifier,
+    const unsigned thread_nr,
     unsigned unwind);
 
   void argument_assignments(
@@ -226,8 +237,46 @@ protected:
     exprt &code,
     const irep_idt &identifier);
                            
-  std::map<irep_idt, unsigned> function_unwind;
-  std::map<symex_targett::sourcet, unsigned> unwind_map;
+  struct thread_unwind_infot
+  {
+    struct loop_unwind_infot
+    {
+      loop_unwind_infot():
+        limit(0),
+        iterations(0)
+      {
+      }
+
+      long limit;
+      unsigned iterations;
+    };
+
+    static irep_idt loop_id(const symex_targett::sourcet &source)
+    {
+      return id2string(source.pc->function)+"."+
+             i2string(source.pc->loop_number);
+    }
+
+    typedef hash_map_cont<irep_idt, loop_unwind_infot, irep_id_hash>
+      loop_unwindt;
+    loop_unwindt loop_unwind;
+  };
+
+  std::map<unsigned, thread_unwind_infot> unwind_info;
+
+  void copy_thread_iterations(
+    const unsigned src,
+    const unsigned dest)
+  {
+    thread_unwind_infot &src_u=unwind_info[src];
+    thread_unwind_infot &dest_u=unwind_info[dest];
+
+    for(thread_unwind_infot::loop_unwindt::const_iterator
+        it=src_u.loop_unwind.begin();
+        it!=src_u.loop_unwind.end();
+        ++it)
+      dest_u.loop_unwind[it->first].iterations=it->second.iterations;
+  }
   
   // exceptions
   

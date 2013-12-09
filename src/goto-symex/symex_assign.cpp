@@ -216,8 +216,10 @@ void goto_symext::symex_assign_symbol(
   symbol_exprt original_lhs=lhs;
   state.get_original_name(original_lhs);
   
+  target.set_mark();
   state.rename(ssa_rhs, ns);
   do_simplify(ssa_rhs);
+  target.remove_unused_reads(ssa_rhs);
   
   symbol_exprt ssa_lhs=lhs;
   state.rename(ssa_lhs, ns, goto_symex_statet::L1);
@@ -461,9 +463,11 @@ void goto_symext::symex_assign_if(
 
   unsigned old_guard_size=guard.size();
   
+  target.set_mark();
   exprt renamed_guard=lhs.cond();
   state.rename(renamed_guard, ns);
   do_simplify(renamed_guard);
+  target.remove_unused_reads(renamed_guard);
 
   if(!renamed_guard.is_false())  
   {

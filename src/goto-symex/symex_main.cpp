@@ -58,10 +58,12 @@ void goto_symext::claim(
   rewrite_quantifiers(expr, state);
 
   // now rename, enables propagation    
+  target.set_mark();
   state.rename(expr, ns);
   
   // now try simplifier on it
   do_simplify(expr);
+  target.remove_unused_reads(expr);
 
   if(expr.is_true()) return;
 
@@ -237,12 +239,15 @@ void goto_symext::symex_step(
     break;
 
   case END_FUNCTION:
+    // do even if state.guard.is_false() to clear out frame created
+    // in symex_start_thread
     symex_end_of_function(state);
     state.source.pc++;
     break;
   
   case LOCATION:
-    target.location(state.guard.as_expr(), state.source);
+    if(!state.guard.is_false())
+      target.location(state.guard.as_expr(), state.source);
     state.source.pc++;
     break;
   
@@ -255,8 +260,10 @@ void goto_symext::symex_step(
     {
       exprt tmp=instruction.guard;
       clean_expr(tmp, state, false);
+      target.set_mark();
       state.rename(tmp, ns);
       do_simplify(tmp);
+      target.remove_unused_reads(tmp);
 
       if(!tmp.is_true())
       {

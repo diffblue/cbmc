@@ -578,6 +578,9 @@ bool goto_symex_statet::l2_thread_write_encoding(
   const symbol_exprt &expr,
   const namespacet &ns)
 {
+  if(!record_events)
+    return false;
+
   const irep_idt &identifier=expr.get_identifier();
   const irep_idt &orig_identifier=get_original_name(identifier);
 

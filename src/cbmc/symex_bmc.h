@@ -28,8 +28,7 @@ public:
   irept last_location;
 
   // control unwinding  
-  unsigned long max_unwind;
-  std::map<irep_idt, long> unwind_set;
+  long max_unwind;
 
 protected:  
   //
@@ -46,6 +45,7 @@ protected:
 
   virtual bool get_unwind_recursion(
     const irep_idt &identifier,
+    const unsigned thread_nr,
     unsigned unwind);
     
   virtual void no_body(const irep_idt &identifier);

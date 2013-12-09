@@ -240,7 +240,9 @@ protected:
 public:
   class dt
   {
-  public:
+  private:
+    friend class irept;
+
     #ifdef SHARING
     unsigned ref_count;
     #endif
@@ -255,6 +257,8 @@ public:
     named_subt comments;
     subt sub;
 
+    mutable size_t hash_code;
+
     void clear()
     {
       #ifdef USE_DSTRING
@@ -265,6 +269,7 @@ public:
       sub.clear();
       named_sub.clear();
       comments.clear();
+      hash_code=0;
     }
     
     void swap(dt &d)
@@ -273,14 +278,15 @@ public:
       d.sub.swap(sub);
       d.named_sub.swap(named_sub);
       d.comments.swap(comments);
+      std::swap(d.hash_code, hash_code);
     }
     
     #ifdef SHARING
-    dt():ref_count(1)
+    dt():ref_count(1), hash_code(0)
     {
     }
     #else
-    dt()
+    dt():hash_code(0)
     {
     }
     #endif
@@ -303,6 +309,7 @@ public:
   inline dt &write()
   {
     detatch();
+    data->hash_code=0;
     return *data;
   }
   
@@ -319,6 +326,7 @@ public:
 
   inline dt &write()
   {
+    data.hash_code=0;
     return data;
   }
   #endif

@@ -35,6 +35,7 @@ Function: goto_symext::get_unwind_recursion
 
 bool goto_symext::get_unwind_recursion(
   const irep_idt &identifier,
+  const unsigned thread_nr,
   unsigned unwind)
 {
   return false;
@@ -263,10 +264,12 @@ void goto_symext::symex_function_call_code(
 
   const goto_functionst::goto_functiont &goto_function=it->second;
   
-  unsigned &unwinding_counter=function_unwind[identifier];
+  const unsigned t=state.source.thread_nr;
+  unsigned &unwinding_counter=
+    unwind_info[t].loop_unwind[identifier].iterations;
 
   // see if it's too much
-  if(get_unwind_recursion(identifier, unwinding_counter))
+  if(get_unwind_recursion(identifier, t, unwinding_counter))
   {
     if(options.get_bool_option("partial-loops"))
     {
@@ -297,12 +300,11 @@ void goto_symext::symex_function_call_code(
   
     if(call.lhs().is_not_nil())
     {
-      exprt rhs=exprt(ID_nondet_symbol, call.lhs().type());
-      rhs.set(ID_identifier, "symex::"+i2string(nondet_count++));
+      side_effect_expr_nondett rhs(call.lhs().type());
       rhs.location()=call.location();
-      state.rename(rhs, ns, goto_symex_statet::L1);
+      clean_expr(rhs, state, false);
       code_assignt code(call.lhs(), rhs);
-      symex_assign(state, to_code_assign(code)); /* TODO: clean_expr? */
+      symex_assign(state, to_code_assign(code));
     }
 
     state.source.pc++;
@@ -370,7 +372,8 @@ void goto_symext::pop_frame(statet &state)
 
     // decrease recursion unwinding counter
     if(frame.function_identifier!="")
-      function_unwind[frame.function_identifier]--;
+      unwind_info[state.source.thread_nr].
+        loop_unwind[frame.function_identifier].iterations--;
   }
   
   state.pop_frame();

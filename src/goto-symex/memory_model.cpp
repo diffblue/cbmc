@@ -8,6 +8,7 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 
 #include <util/std_expr.h>
 #include <util/i2string.h>
+#include <util/guard.h>
 
 #include "memory_model.h"
 
@@ -91,6 +92,56 @@ bool memory_model_baset::po(event_it e1, event_it e2)
 
 /*******************************************************************\
 
+Function: memory_model_baset::is_overwritten
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool memory_model_baset::is_overwritten(
+  event_it read,
+  event_listt::const_iterator w_it,
+  const event_listt &writes)
+{
+  event_it w1=*w_it;
+
+  if(!po(w1, read))
+    return false;
+
+  for(++w_it; w_it!=writes.end(); ++w_it)
+  {
+    event_it w2=*w_it;
+
+    if(!po(w2, read))
+      return false;
+
+    // assuming the read's guard, will w2 always manifest when w1 does?
+    // simulate
+    // or_exprt o(not_exprt(read->guard), not_exprt(w1->guard), w2->guard);
+    // which simplify can't nicely deal with
+    guardt w2_guard;
+    w2_guard.add(w2->guard);
+    guardt read_guard;
+    read_guard.add(read->guard);
+    guardt w1_guard;
+    w1_guard.add(w1->guard);
+
+    read_guard|=w1_guard;
+    w2_guard-=read_guard;
+
+    if(w2_guard.is_true())
+      return true;
+  }
+
+  return false;
+}
+
+/*******************************************************************\
+
 Function: memory_model_baset::read_from
 
   Inputs: 
@@ -138,6 +189,12 @@ void memory_model_baset::read_from(symex_target_equationt &equation)
 
         bool is_rfi=
           w->source.thread_nr==r->source.thread_nr;
+
+        // see whether we could ever read from this write,
+        // or would necessarily read from a later one
+        if(is_rfi &&
+           is_overwritten(r, w_it, a_rec.writes))
+          continue;
 
         symbol_exprt s=nondet_bool_symbol("rf");
         

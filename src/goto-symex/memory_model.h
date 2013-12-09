@@ -23,6 +23,14 @@ protected:
   // program order
   bool po(event_it e1, event_it e2);
 
+  // return true if there is another write program-order after
+  // *w_it and before read, taking into account all their
+  // guards
+  bool is_overwritten(
+    event_it read,
+    event_listt::const_iterator w_it,
+    const event_listt &writes);
+
   // produce fresh symbols  
   unsigned var_cnt;
   symbol_exprt nondet_bool_symbol(const std::string &prefix);
