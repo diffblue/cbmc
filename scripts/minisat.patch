@@ -1,4 +1,4 @@
 21a22
-> #include <util/signal_handling.h>
+> #include <util/signal_catcher.h>
 622a624
->         signal_handling::check_caught_signal();
+>         signal_catchert::check_caught_signal();

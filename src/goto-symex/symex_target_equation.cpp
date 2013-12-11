@@ -609,23 +609,6 @@ symex_target_equationt::SSA_stepst::iterator symex_target_equationt::convert(
   }
   #endif
 
-  //freeze literals involving variables where unrollings are stitched together
-  //  std::cout << "last assignments: " << std::endl;
-  typedef std::map<irep_idt,symbol_exprt> symbol_mapt;
-  symbol_mapt last_symbol_assignments;
-  for(SSA_stepst::iterator it=--SSA_steps.end();
-      it!=step; it--) {
-    if(it->is_assignment() && !it->ignore  && !it->converted) {
-      irep_idt stripped_lhs = it->original_lhs_object.get_identifier();
-      if(it->assignment_type==GUARD) stripped_lhs = it->ssa_lhs.get_identifier();
-      if(last_symbol_assignments.find(stripped_lhs)==last_symbol_assignments.end()) {
-        symbol_exprt lhs_sym = it->ssa_lhs;
-        last_symbol_assignments.insert(symbol_mapt::value_type(stripped_lhs,lhs_sym));
-	//        std::cout << "symbol: " << stripped_lhs << " (" << lhs_sym << ")" << std::endl;
-      }
-    }
-  }
-
   convert_guards(prop_conv,step);
   convert_assignments(prop_conv,step);
   convert_decls(prop_conv,step);
@@ -633,40 +616,6 @@ symex_target_equationt::SSA_stepst::iterator symex_target_equationt::convert(
   convert_assertions(prop_conv,step);
   convert_io(prop_conv,step);
   convert_constraints(prop_conv,step);
-
-  #if 0
-  //not really necessary, because variables created through get_literal() are frozen anyway
-  const prop_convt::symbolst& symbols = prop_conv.get_symbols();
-  for(prop_convt::symbolst::const_iterator it=symbols.begin();
-      it!=symbols.end(); it++) {
-    if(!it->second.is_constant()) {
-      prop_conv.prop.set_frozen(it->second);
-    }
-  } 
-  #endif
-
-  const propt::variablest& vars_to_be_frozen = prop_conv.prop.get_vars_to_be_frozen();
-  for(propt::variablest::const_iterator it=vars_to_be_frozen.begin();
-      it!=vars_to_be_frozen.end(); it++) {
-    prop_conv.prop.set_frozen(literalt(*it,false));
-  } 
-
-  for(symbol_mapt::iterator it=last_symbol_assignments.begin();
-      it!=last_symbol_assignments.end(); it++) {
-    if(it->second.type().id()!=ID_bv && it->second.type().id()!=ID_signedbv &&
-       it->second.type().id()!=ID_unsignedbv) continue;
-     bvt literals;
-     unsigned width =  to_bitvector_type(it->second.type()).get_width();
-     literals.resize(width);
-     boolbv_mapt lmap =  (dynamic_cast<boolbvt&>(prop_conv)).get_map();
-     lmap.get_literals(it->second.get_identifier(),it->second.type(),width,literals);
-
-     for(bvt::iterator l=literals.begin(); l!=literals.end(); l++) {
-       if(!l->is_constant()) prop_conv.prop.set_frozen(*l);
-     }
-  }
-
-  
 
   SSA_stepst::iterator ret = SSA_steps.end();
   return --ret;
@@ -980,7 +929,6 @@ void symex_target_equationt::convert_assertions(
     activate_assertions.push_back(prop_conv.prop.lnot(last_activation_literal));    
   }
   activate_assertions.push_back(prop_conv.prop.lnot(activation_literal));
-  //prop_conv.prop.set_frozen(activation_literal); //TODO: remove
 
   for(SSA_stepst::iterator it=SSA_steps.begin();
       it!=SSA_steps.end(); it++) {
@@ -999,14 +947,6 @@ void symex_target_equationt::convert_assertions(
 
   if(!bv.empty()) {
     prop_conv.prop.lcnf(bv);
-
-    //TODO: remove
-    /*    std::cout << "ASSERT set frozen: ";
-    for(bvt::iterator l=bv.begin(); l!=bv.end(); l++) {
-      std::cout << *l << " "; 
-      //  if(!l->is_constant()) prop_conv.prop.set_frozen(*l);
-    }
-    std::cout << std::endl;*/
   }
 
   //set assumptions (a_0 ... -a_k) for incremental solving

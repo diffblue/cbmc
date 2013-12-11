@@ -83,8 +83,8 @@ cbmc_solverst::solvert* cbmc_solverst::get_default()
   solvert* solver;
   if(options.get_bool_option("beautify") || 
      options.get_bool_option("all-claims") ||
-     options.get_bool_option("cover-assertions")
-     //   || options.get_option("incremental-check")!=""
+     options.get_bool_option("cover-assertions") ||
+     !options.get_bool_option("sat-preprocessor") //no Minisat simplifier
     )
   {
     // simplifier won't work with beautification
@@ -101,7 +101,7 @@ cbmc_solverst::solvert* cbmc_solverst::get_default()
    
     solver = new cbmc_solver_with_propt(bv_cbmc,prop);
   }
-  else
+  else //with simplifier
   {
   #if 1
     propt* prop = new satcheckt();
