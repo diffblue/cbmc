@@ -20,7 +20,7 @@ machine.
 COMPILATION ON LINUX
 --------------------
 
-We assume that you have a Debian/Ubuntu-like distribution.
+We assume that you have a Debian/Ubuntu or Red Hat-like distribution.
 
 0) You need a C/C++ compiler, Flex and Bison, and GNU make.
    The GNU Make needs to be version 3.81 or higher. On Debian-like
@@ -40,7 +40,32 @@ We assume that you have a Debian/Ubuntu-like distribution.
    cd src
    make minisat2-download
 
-2) Type cd src; make - that should do it.
+2) Type make - that should do it.
+
+
+COMPILATION ON SOLARIS 11
+-------------------------
+
+0) Install the relevant development tools as root:
+
+   pkg install developer/versioning/subversion flex bison gcc-3
+
+1) As a user, get MiniSat2 by entering
+
+   cd src
+   wget http://minisat.se/downloads/minisat-2.2.0.tar.gz
+   gtar xfz minisat-2.2.0.tar.gz
+   mv minisat ../minisat-2.2.0
+   (cd ../minisat-2.2.0; patch -p1 < ../scripts/minisat-2.2.0-patch)
+
+2) Adjust util/hash_cont.h to use STL_HASH_GNU
+
+3) Type
+
+   gmake CXX=/usr/sfw/bin/g++
+
+   That should do it. Do not compile with gcc-45. It will mis-optimize
+   MiniSat2.
 
 
 COMPILATION ON MACOS X
