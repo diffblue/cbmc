@@ -97,11 +97,13 @@ void symex_bmct::convert() {
     loop_last_SSA_step++;
   }
 
+  //get variables where unrollings are stitched together
   symbol_mapt last_symbol_assignments = get_last_symbol_assignments();
 
   //  loop_last_SSA_step = e_target.convert(prop_conv,loop_last_SSA_step);
   loop_last_SSA_step = e_target.convert(prop_conv,e_target.SSA_steps.begin());
 
+  //freeze variables where unrollings are stitched together
   freeze_variables(last_symbol_assignments);
 #if 0
   e_target.output(std::cout);
@@ -264,28 +266,28 @@ Function: symex_bmct::freeze_variables
 
   Inputs:
 
- Outputs:
+ Outputs: map (orig_id -> SSA_id) for last assignment of orig_id
 
- Purpose:
+ Purpose: get variables where unrollings are stitched together
 
 \*******************************************************************/
 
 symex_bmct::symbol_mapt symex_bmct::get_last_symbol_assignments() {
-  //freeze literals involving variables where unrollings are stitched together
-  //  std::cout << "last assignments: " << std::endl;
   symex_target_equationt& e_target = dynamic_cast<symex_target_equationt&>(target); 
   symbol_mapt last_symbol_assignments;
   for(symex_target_equationt::SSA_stepst::iterator it=--e_target.SSA_steps.end();
       it!=loop_last_SSA_step; it--) {
-    if(it->is_assignment() && !it->ignore  && !it->converted) {
+    if(it->is_assignment() && !it->ignore  && !it->converted &&
+         it->assignment_type!=symex_target_equationt::GUARD) {
       irep_idt stripped_lhs = it->original_lhs_object.get_identifier();
-      if(it->assignment_type==symex_target_equationt::GUARD) {
-        stripped_lhs = it->ssa_lhs.get_identifier();
-      }
+      if(id2string(stripped_lhs).find("::$tmp::")!=std::string::npos) continue;
       if(last_symbol_assignments.find(stripped_lhs)==last_symbol_assignments.end()) {
         symbol_exprt lhs_sym = it->ssa_lhs;
         last_symbol_assignments.insert(symbol_mapt::value_type(stripped_lhs,lhs_sym));
-	//        std::cout << "symbol: " << stripped_lhs << " (" << lhs_sym << ")" << std::endl;
+
+#if 0
+	std::cout << "symbol: " << stripped_lhs << " (" << lhs_sym << ")" << std::endl;
+#endif
       }
     }
   }
@@ -296,11 +298,11 @@ symex_bmct::symbol_mapt symex_bmct::get_last_symbol_assignments() {
 
 Function: symex_bmct::freeze_variables
 
-  Inputs:
+  Inputs: last assignments to variables
 
  Outputs:
 
- Purpose:
+ Purpose: freeze variables where unrollings are stitched together
 
 \*******************************************************************/
 
