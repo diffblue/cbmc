@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 #include <cstdlib>
 #include <map>
+#include <iostream>
 
 #include <util/std_expr.h>
 #include <util/symbol.h>
@@ -78,6 +79,9 @@ literalt prop_convt::get_literal(const irep_idt &identifier)
 
   // insert
   result.first->second=literal;
+  if(!literal.is_constant()) {  //for incremental unwinding with incremental solver
+    prop.to_be_frozen(literal);
+  }
 
   return literal;
 }
@@ -202,6 +206,9 @@ literalt prop_convt::convert(const exprt &expr)
   // insert into cache
 
   result.first->second=literal;
+  if(!literal.is_constant()) {  //for incremental unwinding with incremental solver
+    prop.to_be_frozen(literal);
+  }
 
   #if 0
   std::cout << literal << "=" << expr << std::endl;
@@ -421,6 +428,8 @@ Function: prop_convt::set_to
 
 void prop_convt::set_to(const exprt &expr, bool value)
 {
+  //  std::cout << "set to: " << expr << std::endl; 
+
   if(expr.type().id()!=ID_bool)
   {
     std::string msg="prop_convt::set_to got "

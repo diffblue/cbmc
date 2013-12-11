@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 // decision procedure wrapper for boolean propositional logics
 
 #include <util/message.h>
+#include <set>
 
 #include "prop_assignment.h"
 
@@ -80,10 +81,18 @@ public:
   
   // an incremental solver may remove any variables that aren't frozen
   virtual void set_frozen(literalt a) { }
+  virtual bool is_eliminated(literalt a) const { return false; }
+  typedef std::set<unsigned> variablest;
+  const variablest &get_vars_to_be_frozen() const { return vars_to_be_frozen; }
+  void to_be_frozen(literalt a) { vars_to_be_frozen.insert(a.var_no()); }
 
   // cores -- will be removed
   //virtual bool is_in_core(literalt l) const;
   //virtual bool has_in_core() const { return false; }
+
+ protected:
+  // variables to be frozen (for incremental solving)
+  variablest vars_to_be_frozen;
 };
 
 #endif

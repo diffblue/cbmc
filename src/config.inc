@@ -2,7 +2,8 @@
 BUILD_ENV = AUTO
 
 # Variables you may want to override
-#CXXFLAGS = -Wall -O0 -g -Werror -Wno-long-long -Wno-sign-compare -Wno-parentheses -Wno-strict-aliasing -pedantic
+CXXFLAGS = -Wall -O0 -g 
+#-Werror -Wno-long-long -Wno-sign-compare -Wno-parentheses -Wno-strict-aliasing -pedantic
 
 # SAT-solvers we have
 #PRECOSAT = ../../precosat-576-7e5e66f-120112

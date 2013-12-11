@@ -99,7 +99,7 @@ int parseoptions_baset::main()
   }
   
   // install signal catcher
-  install_signal_catcher();
+  signal_catchert::init();
 
   return doit();
 }

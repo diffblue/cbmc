@@ -83,8 +83,9 @@ cbmc_solverst::solvert* cbmc_solverst::get_default()
   solvert* solver;
   if(options.get_bool_option("beautify") || 
      options.get_bool_option("all-claims") ||
-     options.get_bool_option("cover-assertions") ||
-     options.get_option("incremental-check")!="")
+     options.get_bool_option("cover-assertions")
+     //   || options.get_option("incremental-check")!=""
+    )
   {
     // simplifier won't work with beautification
     propt* prop = new satcheck_minisat_no_simplifiert();

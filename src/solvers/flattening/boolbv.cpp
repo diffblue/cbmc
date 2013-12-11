@@ -146,7 +146,7 @@ const bvt& boolbvt::convert_bv(const exprt &expr)
   }
   
   convert_bitvector(expr, cache_result.first->second);
-  
+
   // check
   forall_literals(it, cache_result.first->second)
     if(it->var_no()==literalt::unused_var_no())

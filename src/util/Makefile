@@ -17,7 +17,7 @@ SRC = arith_tools.cpp base_type.cpp cmdline.cpp config.cpp symbol_table.cpp \
       ieee_float.cpp signal_catcher.cpp pointer_offset_size.cpp \
       bv_arithmetic.cpp tempdir.cpp tempfile.cpp timer.cpp unicode.cpp \
       irep_ids.cpp byte_operators.cpp string2int.cpp file_util.cpp \
-      memory_info.cpp
+      memory_info.cpp 
 
 INCLUDES= -I ..
 

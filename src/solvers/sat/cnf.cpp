@@ -566,6 +566,7 @@ literalt cnft::lselect(literalt a, literalt b, literalt c)
   // (a+c'+o) (a+c+o') (a'+b'+o) (a'+b+o')
 
   literalt o=new_variable();
+  to_be_frozen(o); //for incremental unwinding with incremental solver
 
   bvt lits;
   
@@ -617,6 +618,10 @@ literalt cnft::new_variable()
 {
   literalt l;
   l.set(_no_variables, false);
+
+  #if 0
+     std::cout << "new_variable: " << _no_variables << std::endl;
+  #endif
 
   set_no_variables(_no_variables+1);
 

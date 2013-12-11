@@ -458,7 +458,7 @@ void bv_refinementt::check_UNSAT(approximationt &a)
     float_utilst float_utils(prop);
     float_utils.spec=spec;
 
-    // the faction without hidden bit
+    // the fraction without hidden bit
     const bvt fraction0=float_utils.get_fraction(a.op0_bv);
     const bvt fraction1=float_utils.get_fraction(a.op1_bv);
     
