@@ -127,3 +127,44 @@ bvt propt::new_variables(unsigned width)
     result[i]=new_variable();
   return result;
 }
+
+/*******************************************************************\
+
+Function: propt::set_frozen
+
+  Inputs: bitvector
+
+ Outputs:
+
+ Purpose: freezes all variables in the bitvector
+
+\*******************************************************************/
+
+void propt::set_frozen(bvt bv) 
+{ 
+  for(unsigned i=0; i<bv.size(); i++) 
+    if(!bv[i].is_constant()) set_frozen(bv[i]); 
+}
+
+
+/*******************************************************************\
+
+Function: propt::set_frozen
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: freezes the variables to be frozen and clears the set
+
+\*******************************************************************/
+
+void propt::set_frozen() 
+{  
+  for(variablest::const_iterator it = vars_to_be_frozen.begin();  
+      it!=vars_to_be_frozen.end(); it++) 
+  {
+    set_frozen(literalt(*it,false));
+  }
+  vars_to_be_frozen.clear();
+}

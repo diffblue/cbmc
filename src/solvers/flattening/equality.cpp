@@ -102,7 +102,7 @@ literalt equalityt::equality2(const exprt &e1, const exprt &e2)
     if(result==equalities.end())
     {
       l=prop.new_variable();
-      prop.to_be_frozen(l); //for incremental unwinding with incremental solver
+      prop.to_be_frozen(l); // for incremental unwinding with incremental solver
       equalities.insert(std::pair<std::pair<unsigned, unsigned>, literalt>(u, l));
     }
     else

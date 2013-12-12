@@ -98,13 +98,15 @@ void symex_bmct::convert() {
   }
 
   //get variables where unrollings are stitched together
-  symbol_mapt last_symbol_assignments = get_last_symbol_assignments();
+  // symbol_mapt last_symbol_assignments = get_last_symbol_assignments();
 
   //  loop_last_SSA_step = e_target.convert(prop_conv,loop_last_SSA_step);
   loop_last_SSA_step = e_target.convert(prop_conv,e_target.SSA_steps.begin());
 
   //freeze variables where unrollings are stitched together
-  freeze_variables(last_symbol_assignments);
+  //freeze_variables(last_symbol_assignments);
+  prop_conv.prop.set_frozen();
+
 #if 0
   e_target.output(std::cout);
 #endif
@@ -262,7 +264,7 @@ void symex_bmct::no_body(const irep_idt &identifier)
 
 /*******************************************************************\
 
-Function: symex_bmct::freeze_variables
+Function: symex_bmct::freeze_variables   TODO to be removed
 
   Inputs:
 
@@ -271,7 +273,7 @@ Function: symex_bmct::freeze_variables
  Purpose: get variables where unrollings are stitched together
 
 \*******************************************************************/
-
+/*
 symex_bmct::symbol_mapt symex_bmct::get_last_symbol_assignments() {
   symex_target_equationt& e_target = dynamic_cast<symex_target_equationt&>(target); 
   symbol_mapt last_symbol_assignments;
@@ -279,13 +281,13 @@ symex_bmct::symbol_mapt symex_bmct::get_last_symbol_assignments() {
       it!=loop_last_SSA_step; it--) {
     if(it->is_assignment() && !it->ignore  && !it->converted &&
          it->assignment_type!=symex_target_equationt::GUARD) {
-      irep_idt stripped_lhs = it->original_lhs_object.get_identifier();
+      irep_idt stripped_lhs = it->ssa_lhs.get_identifier(); //it->original_lhs_object.get_identifier();
       if(id2string(stripped_lhs).find("::$tmp::")!=std::string::npos) continue;
       if(last_symbol_assignments.find(stripped_lhs)==last_symbol_assignments.end()) {
         symbol_exprt lhs_sym = it->ssa_lhs;
         last_symbol_assignments.insert(symbol_mapt::value_type(stripped_lhs,lhs_sym));
 
-#if 0
+#if 1
 	std::cout << "symbol: " << stripped_lhs << " (" << lhs_sym << ")" << std::endl;
 #endif
       }
@@ -293,10 +295,10 @@ symex_bmct::symbol_mapt symex_bmct::get_last_symbol_assignments() {
   }
   return last_symbol_assignments;
 }
-
+*/
 /*******************************************************************\
 
-Function: symex_bmct::freeze_variables
+Function: symex_bmct::freeze_variables  TODO to be removed
 
   Inputs: last assignments to variables
 
@@ -305,7 +307,7 @@ Function: symex_bmct::freeze_variables
  Purpose: freeze variables where unrollings are stitched together
 
 \*******************************************************************/
-
+/*
 void symex_bmct::freeze_variables(symbol_mapt& last_symbol_assignments) {
   #if 0
   // freeze guard variables
@@ -318,7 +320,7 @@ void symex_bmct::freeze_variables(symbol_mapt& last_symbol_assignments) {
       prop_conv.prop.set_frozen(it->second);
     }
   } 
-  #endif
+
 
   // freeze variables set to be frozen (cached variables, etc)
   const propt::variablest& vars_to_be_frozen = prop_conv.prop.get_vars_to_be_frozen();
@@ -330,8 +332,9 @@ void symex_bmct::freeze_variables(symbol_mapt& last_symbol_assignments) {
   // freeze variables occurring in last symbol assignments
   for(symbol_mapt::iterator it=last_symbol_assignments.begin();
       it!=last_symbol_assignments.end(); it++) {
-    if(it->second.type().id()!=ID_bv && it->second.type().id()!=ID_signedbv &&
-       it->second.type().id()!=ID_unsignedbv) continue;
+    std::cout << it->first << ": " << it->second.type() << std::endl;
+     if(it->second.type().id()!=ID_bv && it->second.type().id()!=ID_signedbv &&
+        it->second.type().id()!=ID_unsignedbv) continue;
      bvt literals;
      unsigned width =  to_bitvector_type(it->second.type()).get_width();
      literals.resize(width);
@@ -339,7 +342,13 @@ void symex_bmct::freeze_variables(symbol_mapt& last_symbol_assignments) {
      lmap.get_literals(it->second.get_identifier(),it->second.type(),width,literals);
 
      for(bvt::iterator l=literals.begin(); l!=literals.end(); l++) {
-       if(!l->is_constant()) prop_conv.prop.set_frozen(*l);
+       if(!l->is_constant()) {
+         prop_conv.prop.set_frozen(*l);
+         std::cout << *l << " ";
+       }
      }
+     std::cout << std::endl;
   }
+  #endif
 }
+*/

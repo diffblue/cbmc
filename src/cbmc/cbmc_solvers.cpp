@@ -12,10 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <solvers/sat/satcheck.h>
 #include <solvers/sat/satcheck_minisat2.h>
 
-#ifdef HAVE_BV_REFINEMENT
-#include <bv_refinement/bv_refinement_loop.h>
-#endif
-
+#include <solvers/refinement/bv_refinement.h>
 #include <solvers/smt1/smt1_dec.h>
 #include <solvers/smt2/smt2_dec.h>
 #include <solvers/cvc/cvc_dec.h>
@@ -162,20 +159,26 @@ Function: cbmc_solverst::get_bv_refinement
  
 cbmc_solverst::solvert* cbmc_solverst::get_bv_refinement()
 {
-  #ifdef HAVE_BV_REFINEMENT
+  propt* prop;
 
-  no_beautification();
-  no_incremental_check();
-
-  prop = new satcheckt();
+  // We offer the option to disable the SAT preprocessor
+  if(options.get_bool_option("sat-preprocessor")) {
+    no_beautification();
+    prop=new satcheckt();
+  }
+  else
+    prop=new satcheck_minisat_no_simplifiert();
+  
   prop->set_message_handler(get_message_handler());
   prop->set_verbosity(get_verbosity());
 
-  return new cbmc_solver_with_propt(new bv_refinement_loopt(ns, *prop),prop);
-  
-  #else
-  throw "bv refinement not linked in";
-  #endif
+  bv_refinementt* bv_refinement = new bv_refinementt(ns, *prop);
+
+  // we allow setting some parameters  
+  if(options.get_option("max-node-refinement")!="")
+    bv_refinement->max_node_refinement=options.get_int_option("max-node-refinement");
+
+  return new cbmc_solver_with_propt(bv_refinement,prop);
 }
 
 /*******************************************************************\

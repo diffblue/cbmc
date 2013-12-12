@@ -2,7 +2,7 @@
 BUILD_ENV = AUTO
 
 # Variables you may want to override
-CXXFLAGS = -Wall -O0 -g 
+#CXXFLAGS = -Wall -O0 -g 
 #-Werror -Wno-long-long -Wno-sign-compare -Wno-parentheses -Wno-strict-aliasing -pedantic
 
 # SAT-solvers we have

@@ -566,7 +566,6 @@ literalt cnft::lselect(literalt a, literalt b, literalt c)
   // (a+c'+o) (a+c+o') (a'+b'+o) (a'+b+o')
 
   literalt o=new_variable();
-  to_be_frozen(o); //for incremental unwinding with incremental solver
 
   bvt lits;
   

@@ -79,9 +79,6 @@ literalt prop_convt::get_literal(const irep_idt &identifier)
 
   // insert
   result.first->second=literal;
-  if(!literal.is_constant()) {  //for incremental unwinding with incremental solver
-    prop.to_be_frozen(literal);
-  }
 
   return literal;
 }
@@ -190,9 +187,12 @@ literalt prop_convt::convert(const exprt &expr)
 {
   if(!use_cache || 
      expr.id()==ID_symbol ||
-     expr.id()==ID_constant)
-    return convert_bool(expr);
-
+     expr.id()==ID_constant) 
+  {
+    literalt literal=convert_bool(expr);
+    prop.to_be_frozen(literal); //for incremental unwinding with incremental solver
+    return literal;
+  }
   // check cache first
 
   std::pair<cachet::iterator, bool> result=
@@ -206,9 +206,7 @@ literalt prop_convt::convert(const exprt &expr)
   // insert into cache
 
   result.first->second=literal;
-  if(!literal.is_constant()) {  //for incremental unwinding with incremental solver
-    prop.to_be_frozen(literal);
-  }
+  prop.to_be_frozen(literal); //for incremental unwinding with incremental solver
 
   #if 0
   std::cout << literal << "=" << expr << std::endl;

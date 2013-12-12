@@ -397,7 +397,6 @@ void satcheck_minisat_simplifiert::set_frozen(literalt a)
   assert(!a.is_constant());
   add_variables();
   solver->setFrozen(a.var_no(), true);
-  //  std::cout << "set frozen: " << a.var_no() << std::endl; //TODO: remove this
 }
 
 /*******************************************************************\

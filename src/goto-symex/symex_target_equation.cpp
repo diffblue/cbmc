@@ -890,28 +890,6 @@ void symex_target_equationt::convert_assertions(
 
   if(number_of_assertions==0)
     return;
-    
-  /* // not much advantage in the incremental case
-  if(number_of_assertions==1)
-  {
-    for(SSA_stepst::iterator it=SSA_steps.begin();
-        it!=SSA_steps.end(); it++)
-      if(it->is_assert())
-      {
-        prop_conv.set_to_false(it->cond_expr);
-        //it->asserted_expr = it->cond_expr;
-        it->cond_literal=const_literal(false);
-        return; // prevent further assumptions!
-      }
-      else if(it->is_assume())
-      {
-        //it->asserted_expr = it->cond_expr;
-        prop_conv.set_to_true(it->cond_expr);
-      }
-
-    assert(false); // unreachable
-  }
-  */
 
   bvt bv;
   bv.reserve(number_of_assertions+1); 

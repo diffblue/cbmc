@@ -52,8 +52,9 @@ protected:
   symex_target_equationt::SSA_stepst::iterator loop_last_SSA_step; //TODO: probably not needed in future
 
   typedef std::map<irep_idt,symbol_exprt> symbol_mapt;
-  symbol_mapt get_last_symbol_assignments();
-  void freeze_variables(symbol_mapt& last_symbol_assignments);
+
+  //  symbol_mapt get_last_symbol_assignments(); //TODO to be removed
+  //  void freeze_variables(symbol_mapt& last_symbol_assignments); //TODO to be removed
 
   // use gui format
   language_uit::uit ui;
