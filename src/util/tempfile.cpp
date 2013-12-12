@@ -24,6 +24,7 @@ Author: Daniel Kroening
 #if defined(__linux__) || \
     defined(__FreeBSD_kernel__) || \
     defined(__GNU__) || \
+    defined(__unix__) || \
     defined(__CYGWIN__) || \
     defined(__MACH__)
 #include <unistd.h>

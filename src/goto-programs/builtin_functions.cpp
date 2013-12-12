@@ -1139,6 +1139,29 @@ void goto_convertt::do_function_call_symbol(
     t->location.set_comment(description);
     // we ignore any LHS
   }
+  else if(identifier=="c::__assert_c99")
+  {
+    // This has been seen in Solaris 11.
+    // Signature:
+    // void __assert_c99(const char *desc, const char *file, int line, const char *func);
+
+    if(arguments.size()!=4)
+    {
+      err_location(function);
+      throw "`"+id2string(identifier)+"' expected to have four arguments";
+    }
+    
+    const irep_idt description=
+      "assertion "+id2string(get_string_constant(arguments[0]));
+
+    goto_programt::targett t=dest.add_instruction(ASSERT);
+    t->guard=false_exprt();
+    t->location=function.location();
+    t->location.set("user-provided", true);
+    t->location.set_property(ID_assertion);
+    t->location.set_comment(description);
+    // we ignore any LHS
+  }
   else if(identifier=="c::__assert_rtn")
   {
     // __assert_rtn has been seen on MacOS    
