@@ -1,3 +1,37 @@
+4.7
+===
+
+Added support for Solaris 11.
+
+Bugfixes in partial-order encoding.
+
+
+4.6
+===
+
+Improved floating-point encoding.
+
+Improved AIG->CNF encoder.
+
+
+4.5
+===
+
+Optimizations to reduce memory consumption.
+
+Bugfixes in partial-order encoding.
+
+
+4.4
+===
+
+Now checks concurrent programs, with partial-order encoding.
+
+Support for SMT-LIB standard floating-point theory.
+
+goto-instrument knows k-induction and underapproximating loop accelleration.
+
+
 4.3
 ===
 
