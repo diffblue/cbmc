@@ -357,6 +357,7 @@ bool bmct::run(const goto_functionst &goto_functions)
     bool symex_done = false;
     while(!symex_done) { //THE MAIN LOOP FOR INCREMENTAL UNWINDING
       symex_done = symex(symex_state,goto_functions,body);
+
       undo_slice(equation);
 
 #if 0

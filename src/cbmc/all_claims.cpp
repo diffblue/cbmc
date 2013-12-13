@@ -111,8 +111,11 @@ bool bmct::all_claims(const goto_functionst &goto_functions)
 
   //set activation literal for incremental checking
   cover_goals.activation_literal = symex.current_activation_literal();
+
+#if 0
   std::cout << "cover_goals.activation_literal = " << cover_goals.activation_literal << std::endl;
-  
+#endif
+
   for(goal_mapt::const_iterator
       it=goal_map.begin();
       it!=goal_map.end();

@@ -56,8 +56,10 @@ public:
   virtual bool has_set_to() const { return true; }
   
   // assumptions
-  virtual void set_assumptions(const bvt &_assumptions) { }
+  virtual void set_assumptions(const bvt &_assumptions) { } //bypasses the stack
   virtual bool has_set_assumptions() const { return false; }
+  void push_assumptions(const bvt &_assumptions);
+  bool pop_assumptions(bvt &_assumptions);
 
   // variables
   virtual literalt new_variable()=0;
@@ -94,6 +96,10 @@ public:
   // variables to be frozen (for incremental solving)
   typedef std::set<unsigned> variablest;
   variablest vars_to_be_frozen;
+
+  // stack for assumptions
+  typedef std::list<bvt> assumption_stackt;
+  assumption_stackt assumptions;
 };
 
 #endif

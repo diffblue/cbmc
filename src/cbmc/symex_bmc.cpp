@@ -105,7 +105,7 @@ void symex_bmct::convert() {
 
   //freeze variables where unrollings are stitched together
   //freeze_variables(last_symbol_assignments);
-  prop_conv.prop.set_frozen();
+  if(incr_loop_id!="") prop_conv.prop.set_frozen();
 
 #if 0
   e_target.output(std::cout);

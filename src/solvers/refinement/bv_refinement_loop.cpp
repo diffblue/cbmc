@@ -138,10 +138,12 @@ decision_proceduret::resultt bv_refinementt::prop_solve()
       a_it->under_assumptions.begin(), a_it->under_assumptions.end());
   }
 
-  prop.set_assumptions(assumptions);
+  prop.push_assumptions(assumptions);
 
   propt::resultt result=prop.prop_solve();
 
+  assert(prop.pop_assumptions(assumptions));
+ 
   switch(result)
   {
    case propt::P_SATISFIABLE: return D_SATISFIABLE;

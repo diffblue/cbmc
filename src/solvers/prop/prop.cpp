@@ -18,7 +18,7 @@ Function: propt::set_equal
 
  Outputs:
 
- Purpose:
+ Purpose: asserts a==b in the propositional formula
 
 \*******************************************************************/
 
@@ -75,9 +75,9 @@ Function: propt::is_in_conflict
 
   Inputs:
 
- Outputs:
+ Outputs: true iff the given literal is part of the final conflict
 
- Purpose:
+ Purpose:  
 
 \*******************************************************************/
 
@@ -95,7 +95,7 @@ Function: propt::is_in_core
 
  Outputs:
 
- Purpose:
+ Purpose: do not use - will be removed
 
 \*******************************************************************/
 
@@ -111,11 +111,11 @@ bool propt::is_in_core(literalt l) const
 
 Function: propt::new_variables
 
-  Inputs:
+  Inputs: width
 
- Outputs:
+ Outputs: bitvector 
 
- Purpose:
+ Purpose: generates a bitvector of given width with new variables 
 
 \*******************************************************************/
 
@@ -167,4 +167,66 @@ void propt::set_frozen()
     set_frozen(literalt(*it,false));
   }
   vars_to_be_frozen.clear();
+}
+
+/*******************************************************************\
+
+Function: propt::push_assumptions
+
+  Inputs: _assumptions
+
+ Outputs:
+
+ Purpose: pushes a set of assumptions to the assumption stack
+
+\*******************************************************************/
+
+void propt::push_assumptions(const bvt &_assumptions) {
+
+  // push assumption literals
+  assumptions.push_front(_assumptions);
+
+  // collect literals in the whole stack
+  bvt current_assumptions;
+  for(assumption_stackt::const_iterator it = assumptions.begin(); 
+      it != assumptions.end(); it++) {
+    current_assumptions.insert(current_assumptions.end(),it->begin(),it->end());
+  }
+  
+  // update assumptions in solver
+  set_assumptions(current_assumptions);
+}
+
+/*******************************************************************\
+
+Function: propt::pop_assumptions
+
+  Inputs: _assumptions being popped (output)
+
+ Outputs: true if assumptions where popped and assigned to _assumptions
+
+ Purpose: pops a set of assumptions from the assumption stack
+
+\*******************************************************************/
+
+bool propt::pop_assumptions(bvt &_assumptions) {
+
+  if(assumptions.empty()) return false;
+
+  // pop assumptions from stack
+  _assumptions.clear();
+  _assumptions.insert(_assumptions.end(),assumptions.front().begin(),assumptions.front().end());
+  assumptions.pop_front();
+
+  // collect literals in the whole stack
+  bvt current_assumptions;
+  for(assumption_stackt::const_iterator it = assumptions.begin(); 
+      it != assumptions.end(); it++) {
+    current_assumptions.insert(current_assumptions.end(),it->begin(),it->end());
+  }
+
+  // update assumptions in solver
+  set_assumptions(current_assumptions);
+
+  return true;
 }
