@@ -160,8 +160,8 @@ bmct::run_decision_procedure(prop_convt &prop_conv)
   do_conversion(prop_conv);  
 
 #if 0
-  statistics() << "ignored after conversion: " <<  equation.count_ignored_SSA_steps() << eom;
-  statistics() << "converted after conversion: " <<  equation.count_converted_SSA_steps() << eom;
+  statistics() << "ignored: " <<  equation.count_ignored_SSA_steps() << eom;
+  statistics() << "converted: " <<  equation.count_converted_SSA_steps() << eom;
 #endif
 
   status() << "Running " << prop_conv.decision_procedure_text() << eom;
@@ -353,17 +353,15 @@ bool bmct::run(const goto_functionst &goto_functions)
       throw "main symbol not found; please set an entry point";
     const goto_programt &body=it->second.body;
     goto_symext::statet symex_state;
+
     // perform symbolic execution
     bool symex_done = false;
-    while(!symex_done) { //THE MAIN LOOP FOR INCREMENTAL UNWINDING
+
+    //THE MAIN LOOP FOR INCREMENTAL UNWINDING
+    while(!symex_done) { 
       symex_done = symex(symex_state,goto_functions,body);
 
-      undo_slice(equation);
-
-#if 0
-  statistics() << "ignored after conversion: " <<  equation.count_ignored_SSA_steps() << eom;
-  statistics() << "converted after conversion: " <<  equation.count_converted_SSA_steps() << eom;
-#endif
+      undo_slice(equation); //undo all previous slicings
 
 #if 0
       equation.output(std::cout);
@@ -446,11 +444,6 @@ bool bmct::run(const goto_functionst &goto_functions)
 	      report_success();
               continue;
 	    }
-
-#if 0
-  statistics() << "ignored after conversion: " <<  equation.count_ignored_SSA_steps() << eom;
-  statistics() << "converted after conversion: " <<  equation.count_converted_SSA_steps() << eom;
-#endif
 
           //call decision procedure
 	  if(options.get_bool_option("all-claims")) {

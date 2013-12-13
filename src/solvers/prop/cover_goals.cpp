@@ -82,10 +82,12 @@ void cover_goalst::constraint()
     if(!g_it->covered && !g_it->condition.is_false())
       bv.push_back(g_it->condition);
 
+#if 0
   std::cout << "cover_goals.assertion_clause = ";
   forall_literals(it, bv) 
     std::cout << *it << ", ";
   std::cout << std::endl;
+#endif
 
   prop.lcnf(bv);
 }

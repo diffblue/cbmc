@@ -598,46 +598,24 @@ Function: symex_target_equationt::convert
 
 \*******************************************************************/
 
-symex_target_equationt::SSA_stepst::iterator symex_target_equationt::convert(
-   prop_convt &prop_conv, SSA_stepst::iterator step)
+void symex_target_equationt::convert(
+   prop_convt &prop_conv)
 {
   #if 0
   std::cout << "Converted SSA steps: " << std::endl;
-  for(SSA_stepst::iterator it=step;
+  for(SSA_stepst::iterator it=SSA_steps.begin();;
       it!=SSA_steps.end(); it++) {
-    it->output(ns,std::cout);
+    if(it->converted) it->output(ns,std::cout);
   }
   #endif
 
-  convert_guards(prop_conv,step);
-  convert_assignments(prop_conv,step);
-  convert_decls(prop_conv,step);
-  convert_assumptions(prop_conv,step);
-  convert_assertions(prop_conv,step);
-  convert_io(prop_conv,step);
-  convert_constraints(prop_conv,step);
-
-  SSA_stepst::iterator ret = SSA_steps.end();
-  return --ret;
-}
-
-/*******************************************************************\
-
-Function: symex_target_equationt::convert
-
-  Inputs: converter
-
- Outputs: -
-
- Purpose: converts all SSA steps
-
-\*******************************************************************/
-
-void symex_target_equationt::convert(
-  prop_convt &prop_conv)
-{
-  activate_assertions.clear();
-  convert(prop_conv,SSA_steps.begin());
+  convert_guards(prop_conv);
+  convert_assignments(prop_conv);
+  convert_decls(prop_conv);
+  convert_assumptions(prop_conv);
+  convert_assertions(prop_conv);
+  convert_io(prop_conv);
+  convert_constraints(prop_conv);
 }
 
 /*******************************************************************\
@@ -653,9 +631,9 @@ Function: symex_target_equationt::convert_assignments
 \*******************************************************************/
 
 void symex_target_equationt::convert_assignments(
-  decision_proceduret &decision_procedure, SSA_stepst::iterator step)
+  decision_proceduret &decision_procedure)
 {
-  for(SSA_stepst::iterator it=step;
+  for(SSA_stepst::iterator it=SSA_steps.begin();
       it!=SSA_steps.end(); it++)
   {
     if(it->is_assignment() && !it->ignore && !it->converted)
@@ -665,24 +643,6 @@ void symex_target_equationt::convert_assignments(
       decision_procedure.set_to_true(it->cond_expr);
     }
   }
-}
-/*******************************************************************\
-
-Function: symex_target_equationt::convert_assignments
-
-  Inputs: decision procedure
-
- Outputs: -
-
- Purpose: converts all assignments from beginning
-
-\*******************************************************************/
-
-void symex_target_equationt::convert_assignments(
-  decision_proceduret &decision_procedure)
-{
-  SSA_stepst::iterator step = SSA_steps.begin(); 
-  convert_assignments(decision_procedure,step);
 }
 
 /*******************************************************************\
@@ -698,9 +658,9 @@ Function: symex_target_equationt::convert_decls
 \*******************************************************************/
 
 void symex_target_equationt::convert_decls(
-  prop_convt &prop_conv, SSA_stepst::iterator step)
+  prop_convt &prop_conv)
 {
-  for(SSA_stepst::iterator it=step;
+  for(SSA_stepst::iterator it=SSA_steps.begin();
       it!=SSA_steps.end(); it++)
   {
     if(it->is_decl() && !it->ignore && !it->converted)
@@ -711,25 +671,6 @@ void symex_target_equationt::convert_decls(
       prop_conv.convert(it->cond_expr);
     }
   }
-}
-
-/*******************************************************************\
-
-Function: symex_target_equationt::convert_decls
-
-  Inputs: converter
-
- Outputs: -
-
- Purpose: converts all declarations from beginning
-
-\*******************************************************************/
-
-void symex_target_equationt::convert_decls(
-  prop_convt &prop_conv)
-{
-  SSA_stepst::iterator step = SSA_steps.begin(); 
-  convert_decls(prop_conv,step);
 }
 
 /*******************************************************************\
@@ -745,9 +686,9 @@ Function: symex_target_equationt::convert_guards
 \*******************************************************************/
 
 void symex_target_equationt::convert_guards(
-  prop_convt &prop_conv, SSA_stepst::iterator step)
+  prop_convt &prop_conv)
 {
-  for(SSA_stepst::iterator it=step;
+  for(SSA_stepst::iterator it=SSA_steps.begin();
       it!=SSA_steps.end(); it++)
   {
     if(it->ignore)
@@ -755,24 +696,6 @@ void symex_target_equationt::convert_guards(
     else 
       it->guard_literal=prop_conv.convert(it->guard);
   }
-}
-
-/*******************************************************************\
-
-Function: symex_target_equationt::convert_guards
-
-  Inputs: converter
-
- Outputs: -
-
- Purpose: converts guards from beginning
-
-\*******************************************************************/
-
-void symex_target_equationt::convert_guards(
-  prop_convt &prop_conv)
-{
-  convert_guards(prop_conv,SSA_steps.begin());
 }
 
 /*******************************************************************\
@@ -788,9 +711,9 @@ Function: symex_target_equationt::convert_assumptions
 \*******************************************************************/
 
 void symex_target_equationt::convert_assumptions(
-  prop_convt &prop_conv, SSA_stepst::iterator step)
+  prop_convt &prop_conv)
 {
-  for(SSA_stepst::iterator it=step;
+  for(SSA_stepst::iterator it=SSA_steps.begin();
       it!=SSA_steps.end(); it++)
   {
     if(it->is_assume())
@@ -805,25 +728,6 @@ void symex_target_equationt::convert_assumptions(
 
 /*******************************************************************\
 
-Function: symex_target_equationt::convert_assumptions
-
-  Inputs: converter
-
- Outputs: -
-
- Purpose: converts assumptions from beginning
-
-\*******************************************************************/
-
-void symex_target_equationt::convert_assumptions(
-  prop_convt &prop_conv)
-{
-  convert_assumptions(prop_conv,SSA_steps.begin());
-}
-
-
-/*******************************************************************\
-
 Function: symex_target_equationt::convert_constraints
 
   Inputs: decision procedure, first SSA step to be converted
@@ -835,9 +739,9 @@ Function: symex_target_equationt::convert_constraints
 \*******************************************************************/
 
 void symex_target_equationt::convert_constraints(
-  decision_proceduret &decision_procedure, SSA_stepst::iterator step)
+  decision_proceduret &decision_procedure)
 {
-  for(SSA_stepst::iterator it=step;
+  for(SSA_stepst::iterator it=SSA_steps.begin();
       it!=SSA_steps.end();
       it++)
   {
@@ -854,25 +758,6 @@ void symex_target_equationt::convert_constraints(
 
 /*******************************************************************\
 
-Function: symex_target_equationt::convert_constraints
-
-  Inputs: decision procedure
-
- Outputs: -
-
- Purpose: converts constraints from beginning
-
-\*******************************************************************/
-
-void symex_target_equationt::convert_constraints(
-  decision_proceduret &decision_procedure)
-{
-  SSA_stepst::iterator step = SSA_steps.begin();
-  convert_constraints(decision_procedure,step);
-}
-
-/*******************************************************************\
-
 Function: symex_target_equationt::convert_assertions
 
   Inputs: converter, first SSA step to be converted
@@ -884,7 +769,7 @@ Function: symex_target_equationt::convert_assertions
 \*******************************************************************/
 
 void symex_target_equationt::convert_assertions(
-  prop_convt &prop_conv, SSA_stepst::iterator step)
+  prop_convt &prop_conv)
 {
   unsigned number_of_assertions=count_assertions();
 
@@ -927,33 +812,12 @@ void symex_target_equationt::convert_assertions(
     prop_conv.prop.lcnf(bv);
   }
 
-  //set assumptions (a_0 ... -a_k) for incremental solving
-  // prop_conv.prop.set_assumptions(activate_assertions);  
-
-  bvt popped_assumptions;
   //Caution - assumes that the activate_assertions are always the bottom element of the stack
+  bvt popped_assumptions;
   prop_conv.prop.pop_assumptions(popped_assumptions); 
+
+  //set assumptions (a_0 ... -a_k) for incremental solving
   prop_conv.prop.push_assumptions(activate_assertions);
-
-}
-
-
-/*******************************************************************\
-
-Function: symex_target_equationt::convert_assertions
-
-  Inputs: converter
-
- Outputs: -
-
- Purpose: converts assertions from beginning
-
-\*******************************************************************/
-
-void symex_target_equationt::convert_assertions(
-  prop_convt &prop_conv)
-{
-  convert_assertions(prop_conv,SSA_steps.begin());
 }
 
 /*******************************************************************\
@@ -969,11 +833,11 @@ Function: symex_target_equationt::convert_io
 \*******************************************************************/
 
 void symex_target_equationt::convert_io(
-  decision_proceduret &dec_proc, SSA_stepst::iterator step)
+  decision_proceduret &dec_proc)
 {
   unsigned io_count=0;
 
-  for(SSA_stepst::iterator it=step;
+  for(SSA_stepst::iterator it=SSA_steps.begin();
       it!=SSA_steps.end(); it++)
     if(!it->ignore && !it->converted)
     {
@@ -1034,24 +898,6 @@ void symex_target_equationt::merge_ireps(SSA_stept &SSA_step)
       ++it)
     merge_irep(*it);
   // converted_io_args is merged in convert_io
-}
-
-/*******************************************************************\
-
-Function: symex_target_equationt::convert_io
-
-  Inputs: decision procedure
-
- Outputs: -
-
- Purpose: converts I/O from beginning
-
-\*******************************************************************/
-
-void symex_target_equationt::convert_io(
-  decision_proceduret &dec_proc)
-{
-  convert_constraints(dec_proc,SSA_steps.begin());
 }
 
 /*******************************************************************\
@@ -1155,8 +1001,11 @@ void symex_target_equationt::SSA_stept::output(
     out << from_expr(ns, "", ssa_lhs) << std::endl;
 
   out << "Guard: " << from_expr(ns, "", guard) << std::endl;
+
+#if 0
   out << "Ignore: " << ignore << std::endl;
   out << "Converted: " << converted << std::endl;
+#endif
 }
 
 /*******************************************************************\

@@ -260,14 +260,6 @@ public:
   typedef std::list<SSA_stept> SSA_stepst;
   SSA_stepst SSA_steps;
 
-  SSA_stepst::iterator convert(prop_convt &prop_conv, SSA_stepst::iterator step);
-  void convert_assignments(decision_proceduret &decision_procedure, SSA_stepst::iterator step);
-  void convert_decls(prop_convt &prop_conv, SSA_stepst::iterator step);
-  void convert_assumptions(prop_convt &prop_conv, SSA_stepst::iterator step);
-  void convert_assertions(prop_convt &prop_conv, SSA_stepst::iterator step);
-  void convert_constraints(decision_proceduret &decision_procedure, SSA_stepst::iterator step);
-  void convert_guards(prop_convt &prop_conv, SSA_stepst::iterator step);
-  void convert_io(decision_proceduret &decision_procedure, SSA_stepst::iterator step);
   void convert(prop_convt &prop_conv);
   void convert_assignments(decision_proceduret &decision_procedure);
   void convert_decls(prop_convt &prop_conv);

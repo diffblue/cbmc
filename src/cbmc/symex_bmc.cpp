@@ -39,7 +39,6 @@ symex_bmct::symex_bmct(
   prop_convt& _prop_conv):
   goto_symext(_ns, _new_symbol_table, _target),
   prop_conv(_prop_conv),
-  loop_last_SSA_step(_target.SSA_steps.end()),
   ui(ui_message_handlert::PLAIN)
 {
 }
@@ -89,27 +88,13 @@ Function: symex_bmct::convert
 \*******************************************************************/
 
 void symex_bmct::convert() {  
-  //TODO: loop_last_SSA_step is probably not needed  
+
+  //convert  
   symex_target_equationt& e_target = dynamic_cast<symex_target_equationt&>(target); 
-  if(loop_last_SSA_step == e_target.SSA_steps.end()) //first call
-    loop_last_SSA_step = e_target.SSA_steps.begin();
-  else {
-    loop_last_SSA_step++;
-  }
-
-  //get variables where unrollings are stitched together
-  // symbol_mapt last_symbol_assignments = get_last_symbol_assignments();
-
-  //  loop_last_SSA_step = e_target.convert(prop_conv,loop_last_SSA_step);
-  loop_last_SSA_step = e_target.convert(prop_conv,e_target.SSA_steps.begin());
+  e_target.convert(prop_conv);
 
   //freeze variables where unrollings are stitched together
-  //freeze_variables(last_symbol_assignments);
   if(incr_loop_id!="") prop_conv.prop.set_frozen();
-
-#if 0
-  e_target.output(std::cout);
-#endif
 }
 
 /*******************************************************************\
@@ -261,94 +246,3 @@ void symex_bmct::no_body(const irep_idt &identifier)
       "**** WARNING: no body for function " << identifier << eom;
   }
 }
-
-/*******************************************************************\
-
-Function: symex_bmct::freeze_variables   TODO to be removed
-
-  Inputs:
-
- Outputs: map (orig_id -> SSA_id) for last assignment of orig_id
-
- Purpose: get variables where unrollings are stitched together
-
-\*******************************************************************/
-/*
-symex_bmct::symbol_mapt symex_bmct::get_last_symbol_assignments() {
-  symex_target_equationt& e_target = dynamic_cast<symex_target_equationt&>(target); 
-  symbol_mapt last_symbol_assignments;
-  for(symex_target_equationt::SSA_stepst::iterator it=--e_target.SSA_steps.end();
-      it!=loop_last_SSA_step; it--) {
-    if(it->is_assignment() && !it->ignore  && !it->converted &&
-         it->assignment_type!=symex_target_equationt::GUARD) {
-      irep_idt stripped_lhs = it->ssa_lhs.get_identifier(); //it->original_lhs_object.get_identifier();
-      if(id2string(stripped_lhs).find("::$tmp::")!=std::string::npos) continue;
-      if(last_symbol_assignments.find(stripped_lhs)==last_symbol_assignments.end()) {
-        symbol_exprt lhs_sym = it->ssa_lhs;
-        last_symbol_assignments.insert(symbol_mapt::value_type(stripped_lhs,lhs_sym));
-
-#if 1
-	std::cout << "symbol: " << stripped_lhs << " (" << lhs_sym << ")" << std::endl;
-#endif
-      }
-    }
-  }
-  return last_symbol_assignments;
-}
-*/
-/*******************************************************************\
-
-Function: symex_bmct::freeze_variables  TODO to be removed
-
-  Inputs: last assignments to variables
-
- Outputs:
-
- Purpose: freeze variables where unrollings are stitched together
-
-\*******************************************************************/
-/*
-void symex_bmct::freeze_variables(symbol_mapt& last_symbol_assignments) {
-  #if 0
-  // freeze guard variables
-  //not really necessary, 
-  //   because variables created through get_literal() are set to be frozen anyway
-  const prop_convt::symbolst& symbols = prop_conv.get_symbols();
-  for(prop_convt::symbolst::const_iterator it=symbols.begin();
-      it!=symbols.end(); it++) {
-    if(!it->second.is_constant()) {
-      prop_conv.prop.set_frozen(it->second);
-    }
-  } 
-
-
-  // freeze variables set to be frozen (cached variables, etc)
-  const propt::variablest& vars_to_be_frozen = prop_conv.prop.get_vars_to_be_frozen();
-  for(propt::variablest::const_iterator it=vars_to_be_frozen.begin();
-      it!=vars_to_be_frozen.end(); it++) {
-    prop_conv.prop.set_frozen(literalt(*it,false));
-  } 
-
-  // freeze variables occurring in last symbol assignments
-  for(symbol_mapt::iterator it=last_symbol_assignments.begin();
-      it!=last_symbol_assignments.end(); it++) {
-    std::cout << it->first << ": " << it->second.type() << std::endl;
-     if(it->second.type().id()!=ID_bv && it->second.type().id()!=ID_signedbv &&
-        it->second.type().id()!=ID_unsignedbv) continue;
-     bvt literals;
-     unsigned width =  to_bitvector_type(it->second.type()).get_width();
-     literals.resize(width);
-     boolbv_mapt lmap =  (dynamic_cast<boolbvt&>(prop_conv)).get_map();
-     lmap.get_literals(it->second.get_identifier(),it->second.type(),width,literals);
-
-     for(bvt::iterator l=literals.begin(); l!=literals.end(); l++) {
-       if(!l->is_constant()) {
-         prop_conv.prop.set_frozen(*l);
-         std::cout << *l << " ";
-       }
-     }
-     std::cout << std::endl;
-  }
-  #endif
-}
-*/
