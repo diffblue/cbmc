@@ -62,6 +62,10 @@ public:
     functions.post_process();
     SUB::post_process();
   }
+  
+  // an obvious extension of the prop_convt API
+  using SUB::set_frozen;
+  void set_frozen(const bvt &);
 
   // get literals for variables/expressions, if available
   virtual bool literal(

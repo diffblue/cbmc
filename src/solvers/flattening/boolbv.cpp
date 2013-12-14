@@ -33,6 +33,25 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
+Function: boolbvt::set_frozen
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void boolbvt::set_frozen(const bvt &bv)
+{
+  for(unsigned i=0; i<bv.size(); i++)
+    if(!bv[i].is_constant())
+      prop.set_frozen(bv[i]);
+}
+
+/*******************************************************************\
+
 Function: boolbvt::literal
 
   Inputs:

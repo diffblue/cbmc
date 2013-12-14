@@ -21,9 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/expr.h>
 
 #include "literal.h"
-
-class propt;
-class tvt;
+#include "prop.h"
 
 class prop_conv_baset:public decision_proceduret
 {
@@ -45,6 +43,13 @@ public:
     return convert(expr);
   }
 
+  // selected methods from the lower propt API are passed up
+  virtual tvt l_get(literalt a) const { return prop.l_get(a); }
+  virtual void set_frozen(literalt a) { prop.set_frozen(a); }
+  virtual void set_assumptions(const bvt &_assumptions) { prop.set_assumptions(_assumptions); }
+  virtual bool has_set_assumptions() const { return prop.has_set_assumptions(); }
+
+  // this will become protected
   propt &prop;
 };
 
