@@ -668,20 +668,37 @@ Function: simplify_exprt::simplify_dereference
 
 bool simplify_exprt::simplify_dereference(exprt &expr)
 {
-  if(expr.operands().size()!=1) return true;
-  
-  exprt &pointer=expr.op0();
+  const exprt &pointer=to_dereference_expr(expr).pointer();
 
   if(pointer.type().id()!=ID_pointer) return true;
   
   if(pointer.id()==ID_address_of)
   {
-    if(pointer.operands().size()==1)
+    exprt tmp=to_address_of_expr(pointer).object();
+    // one address_of is gone, try again
+    simplify_rec(tmp);
+    expr.swap(tmp);
+    return false;
+  }
+  // rewrite *(&a[0] + x) to a[x]
+  else if(pointer.id()==ID_plus &&
+          pointer.operands().size()==2 &&
+          pointer.op0().id()==ID_address_of)
+  {
+    const address_of_exprt &address_of=
+      to_address_of_expr(pointer.op0());
+    if(address_of.object().id()==ID_index)
     {
-      exprt tmp;
-      tmp.swap(pointer.op0());
-      expr.swap(tmp);
-      return false;
+      const index_exprt &old=to_index_expr(address_of.object());
+      if(ns.follow(old.array().type()).id()==ID_array)
+      {
+        index_exprt idx(old.array(),
+                        plus_exprt(old.index(), pointer.op1()),
+                        ns.follow(old.array().type()).subtype());
+        simplify_rec(idx);
+        expr.swap(idx);
+        return false;
+      }
     }
   }
 
@@ -690,7 +707,7 @@ bool simplify_exprt::simplify_dereference(exprt &expr)
 
 /*******************************************************************\
 
-Function: simplify_exprt::simplify_address_of_arg
+Function: is_dereference_integer_object
 
   Inputs:
 
@@ -722,6 +739,18 @@ static bool is_dereference_integer_object(
   
   return false;
 }
+
+/*******************************************************************\
+
+Function: simplify_exprt::simplify_address_of_arg
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool simplify_exprt::simplify_address_of_arg(exprt &expr)
 {
@@ -3274,7 +3303,7 @@ bool simplify_exprt::simplify_inequality_not_constant(exprt &expr)
     expr.id(ID_equal);
     simplify_inequality_not_constant(expr);
     expr.make_not();
-    simplify_not(expr);
+    simplify_node(expr);
     return false;
   }
   else if(expr.id()==ID_gt)
@@ -3284,7 +3313,7 @@ bool simplify_exprt::simplify_inequality_not_constant(exprt &expr)
     expr.op0().swap(expr.op1());
     simplify_inequality_not_constant(expr);
     expr.make_not();
-    simplify_not(expr);
+    simplify_node(expr);
     return false;
   }
   else if(expr.id()==ID_lt)
@@ -3292,7 +3321,7 @@ bool simplify_exprt::simplify_inequality_not_constant(exprt &expr)
     expr.id(ID_ge);
     simplify_inequality_not_constant(expr);
     expr.make_not();
-    simplify_not(expr);
+    simplify_node(expr);
     return false;
   }
   else if(expr.id()==ID_le)
@@ -3404,7 +3433,7 @@ bool simplify_exprt::simplify_inequality_constant(exprt &expr)
       expr.id(ID_equal);
       simplify_inequality_constant(expr);
       expr.make_not();
-      simplify_not(expr);
+      simplify_node(expr);
       return false;
     }
   
@@ -3568,17 +3597,15 @@ bool simplify_exprt::simplify_inequality_constant(exprt &expr)
     // we re-write (TYPE)boolean == 0 -> !boolean
     if(expr.op1().is_zero() && expr.id()==ID_equal)
     {
-      exprt tmp=expr.op0().op0();
-      tmp.make_not();
-      expr.swap(tmp);
+      expr=expr.op0().op0();
+      expr.make_not();
       return false;
     }
 
     // we re-write (TYPE)boolean != 0 -> boolean
     if(expr.op1().is_zero() && expr.id()==ID_notequal)
     {
-      exprt tmp=expr.op0().op0();
-      expr.swap(tmp);
+      expr=expr.op0().op0();
       return false;
     }
   }

@@ -6,10 +6,54 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <util/threeval.h>
+
+#include "../prop/prop.h"
+
 #include "boolbv_map.h"
 #include "boolbv_width.h"
 
 //#define DEBUG
+
+/*******************************************************************\
+
+Function: boolbv_mapt::map_entryt::get_value
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+std::string boolbv_mapt::map_entryt::get_value(const propt &prop) const
+{
+  std::string result;
+  
+  result.reserve(literal_map.size());
+
+  for(unsigned i=0; i<literal_map.size(); i++)
+  {
+    char ch='*';
+
+    if(literal_map[i].is_set)
+    {
+      tvt value=prop.l_get(literal_map[i].l);
+
+      if(value.is_true())
+        ch='1';
+      else if(value.is_false())
+        ch='0';
+      else
+        ch='?';
+    }
+    
+    result=result+ch;
+  }
+  
+  return result;  
+}
 
 /*******************************************************************\
 
@@ -119,7 +163,7 @@ void boolbv_mapt::get_literals(
 
 /*******************************************************************\
 
-Function: boolbv_mapt::set_literal
+Function: boolbv_mapt::set_literals
 
   Inputs:
 

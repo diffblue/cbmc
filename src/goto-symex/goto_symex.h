@@ -167,6 +167,7 @@ protected:
     const exprt &expr,
     const std::string &msg,
     statet &state);
+  virtual void symex_assume(statet &state, const exprt &cond);
     
   // gotos
   void merge_gotos(statet &state);
@@ -213,6 +214,7 @@ protected:
     
   virtual bool get_unwind_recursion(
     const irep_idt &identifier,
+    const unsigned thread_nr,
     unsigned unwind);
 
   void argument_assignments(
@@ -229,9 +231,6 @@ protected:
   void add_end_of_function(
     exprt &code,
     const irep_idt &identifier);
-                           
-  std::map<irep_idt, unsigned> function_unwind;
-  std::map<symex_targett::sourcet, unsigned> unwind_map;
   
   // exceptions
   

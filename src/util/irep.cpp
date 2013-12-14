@@ -708,6 +708,11 @@ static inline size_t hash_combine(size_t h1, size_t h2)
 
 size_t irept::hash() const
 {
+  #ifdef HASH_CODE
+  if(read().hash_code!=0)
+    return read().hash_code;
+  #endif
+
   const irept::subt &sub=get_sub();
   const irept::named_subt &named_sub=get_named_sub();
 
@@ -721,6 +726,9 @@ size_t irept::hash() const
     result=hash_combine(result, it->second.hash());
   }
 
+  #ifdef HASH_CODE
+  read().hash_code=result;
+  #endif
   return result;
 }
 

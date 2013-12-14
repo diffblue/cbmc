@@ -578,6 +578,9 @@ bool goto_symex_statet::l2_thread_write_encoding(
   const symbol_exprt &expr,
   const namespacet &ns)
 {
+  if(!record_events)
+    return false;
+
   const irep_idt &identifier=expr.get_identifier();
   const irep_idt &orig_identifier=get_original_name(identifier);
 
@@ -624,8 +627,7 @@ void goto_symex_statet::rename_address(
   const namespacet &ns,
   levelt level)
 {
-  // only do L1!
-  rename(expr.type(), ns, L1);
+  rename(expr.type(), ns, level);
 
   if(expr.id()==ID_symbol)
   {

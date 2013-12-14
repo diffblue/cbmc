@@ -13,10 +13,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/message.h>
 #include <set>
+#include <util/threeval.h>
 
 #include "prop_assignment.h"
-
-class tvt;
 
 /*! \brief TO_BE_DOCUMENTED
 */
@@ -87,10 +86,6 @@ public:
   void to_be_frozen(bvt bv) { for(unsigned i=0; i<bv.size(); i++) to_be_frozen(bv[i]); }
   void to_be_frozen(literalt a) { if(!a.is_constant()) vars_to_be_frozen.insert(a.var_no()); }
   void set_frozen(); //freezes variables-to-be-frozen
-
-  // cores -- will be removed
-  //virtual bool is_in_core(literalt l) const;
-  //virtual bool has_in_core() const { return false; }
 
  protected:
   // variables to be frozen (for incremental solving)

@@ -8,7 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <fstream>
 #include <cstdlib>
-#include <climits>
 #include <iostream>
 #include <memory>
 
@@ -565,11 +564,22 @@ void bmct::setup_unwind()
     std::string::size_type next=set.find(",", idx);
     std::string val=set.substr(idx, next-idx);
 
+    long thread_nr=-1;
+    if(!val.empty() &&
+       isdigit(val[0]) &&
+       val.find(":")!=std::string::npos)
+    {
+      std::string nr=val.substr(0, val.find(":"));
+      thread_nr=atol(nr.c_str());
+      val.erase(0, nr.size()+1);
+    }
+
     if(val.rfind(":")!=std::string::npos)
     {
       std::string id=val.substr(0, val.rfind(":"));
-      unsigned long uw=atol(val.substr(val.rfind(":")+1).c_str());
-      symex.unwind_set[id]=uw;
+      long uw=atol(val.substr(val.rfind(":")+1).c_str());
+
+      symex.set_unwind_limit(id, thread_nr, uw);
     }
     
     if(next==std::string::npos) break;
@@ -577,9 +587,10 @@ void bmct::setup_unwind()
   }
 
   symex.max_unwind=options.get_int_option("unwind");
+  if(symex.max_unwind==0) symex.max_unwind = (unsigned)-1;
   symex.incr_min_unwind=options.get_int_option("unwind-min");
   symex.incr_max_unwind=options.get_int_option("unwind-max");
-  if(symex.incr_max_unwind==0) symex.incr_max_unwind = UINT_MAX;
+  if(symex.incr_max_unwind==0) symex.incr_max_unwind = (unsigned)-1;
   symex.ignore_assertions = (symex.incr_min_unwind>=2) &&
       options.get_bool_option("ignore-assertions-before-unwind-min");
  

@@ -88,31 +88,39 @@ inline int __isnanl(long double ld) { return __CPROVER_isnanld(ld); }
 
 /* FUNCTION: isnormal */
 
-int isnormal(double d) { return __CPROVER_isnormald(d); }
+inline int isnormal(double d) { return __CPROVER_isnormald(d); }
 
 /* FUNCTION: __builtin_inff */
 
-float __builtin_inff(void) { return 1.0f/0.0f; }
+inline float __builtin_inff(void) { return 1.0f/0.0f; }
 
 /* FUNCTION: __builtin_inf */
 
-double __builtin_inf(void) { return 1.0/0.0; }
+inline double __builtin_inf(void) { return 1.0/0.0; }
 
 /* FUNCTION: __builtin_infl */
 
-long double __builtin_infl(void) { return 1.0l/0.0l; }
+inline long double __builtin_infl(void) { return 1.0l/0.0l; }
+
+/* FUNCTION: __builtin_isnan */
+
+inline int __builtin_isnan(double d) { return __CPROVER_isnand(d); }
+
+/* FUNCTION: __builtin_isnanf */
+
+inline int __builtin_isnanf(float f) { return __CPROVER_isnanf(f); }
 
 /* FUNCTION: __builtin_huge_valf */
 
-float __builtin_huge_valf(void) { return 1.0f/0.0f; }
+inline float __builtin_huge_valf(void) { return 1.0f/0.0f; }
 
 /* FUNCTION: __builtin_huge_val */
 
-double __builtin_huge_val(void) { return 1.0/0.0; }
+inline double __builtin_huge_val(void) { return 1.0/0.0; }
 
 /* FUNCTION: __builtin_huge_vall */
 
-long double __builtin_huge_vall(void) { return 1.0l/0.0l; }
+inline long double __builtin_huge_vall(void) { return 1.0l/0.0l; }
 
 /* FUNCTION: signbit */
 

@@ -145,6 +145,9 @@ const bvt& boolbvt::convert_bv(const exprt &expr)
     return cache_result.first->second;
   }
   
+  // Iterators into hash_maps supposedly stay stable
+  // even though we are inserting more elements recursively.
+
   convert_bitvector(expr, cache_result.first->second);
 
   // check
@@ -677,36 +680,31 @@ Function: boolbvt::boolbv_set_equality_to_true
 
 \*******************************************************************/
 
-bool boolbvt::boolbv_set_equality_to_true(const exprt &expr)
+bool boolbvt::boolbv_set_equality_to_true(const equal_exprt &expr)
 {
   if(!equality_propagation) return true;
 
-  const exprt::operandst &operands=expr.operands();
+  const typet &type=ns.follow(expr.lhs().type());
 
-  if(operands.size()==2)
+  if(expr.lhs().id()==ID_symbol &&
+     type==ns.follow(expr.rhs().type()) &&
+     type.id()!=ID_bool)
   {
-    const typet &type=ns.follow(operands[0].type());
+    // see if it is an unbounded array
+    if(is_unbounded_array(type))
+      return true;
 
-    if(operands[0].id()==ID_symbol &&
-       type==ns.follow(operands[1].type()) &&
-       type.id()!=ID_bool)
-    {
-      // see if it is an unbounded array
-      if(is_unbounded_array(type))
-        return true;
+    const bvt &bv1=convert_bv(expr.rhs());
+    
+    const irep_idt &identifier=
+      to_symbol_expr(expr.lhs()).get_identifier();
 
-      const bvt &bv1=convert_bv(operands[1]);
-      
-      const irep_idt &identifier=
-        to_symbol_expr(operands[0]).get_identifier();
+    map.set_literals(identifier, type, bv1);
 
-      map.set_literals(identifier, type, bv1);
+    //for incremental unwinding with incremental solver
+    prop.to_be_frozen(bv1);
 
-      //for incremental unwinding with incremental solver
-      prop.to_be_frozen(bv1);
-
-      return false;
-    }
+    return false;
   }
 
   return true;
@@ -736,7 +734,7 @@ void boolbvt::set_to(const exprt &expr, bool value)
   {
     if(expr.id()==ID_equal)
     {
-      if(!boolbv_set_equality_to_true(expr))
+      if(!boolbv_set_equality_to_true(to_equal_expr(expr)))
         return;
     }
   }
@@ -846,29 +844,8 @@ void boolbvt::print_assignment(std::ostream &out) const
       it!=map.mapping.end();
       it++)
   {
-    out << it->first << "=";
-    const boolbv_mapt::map_entryt &map_entry=it->second;
-
-    std::string result="";
-    for(unsigned i=0; i<map_entry.literal_map.size(); i++)
-    {
-      char ch='*';
-
-      if(map_entry.literal_map[i].is_set)
-      {
-        tvt value=prop.l_get(map_entry.literal_map[i].l);
-        if(value.is_true())
-          ch='1';
-        else if(value.is_false())
-          ch='0';
-        else
-          ch='?';
-      }
-      
-      result=result+ch;
-    }
-    
-    out << result << std::endl;
+    out << it->first << "="
+        << it->second.get_value(prop) << '\n';
   }
 }
 

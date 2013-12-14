@@ -195,9 +195,12 @@ exprt zero_initializert::zero_initializer_rec(
         it!=components.end();
         it++)
     {
-      // skip methods
       if(it->type().id()==ID_code)
       {
+        constant_exprt code_value(it->type());
+        code_value.set_value(ID_nil);
+        code_value.location()=location;
+        value.copy_to_operands(code_value);
       }
       else
         value.copy_to_operands(zero_initializer_rec(it->type(), location));

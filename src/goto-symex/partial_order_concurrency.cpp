@@ -10,6 +10,7 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 
 #include <util/i2string.h>
 #include <util/arith_tools.h>
+#include <util/simplify_expr.h>
 
 #include "partial_order_concurrency.h"
 
@@ -302,5 +303,29 @@ exprt partial_order_concurrencyt::before(
     return equal_exprt(clock(e1), clock(e2));
   else
     return binary_relation_exprt(clock(e1), ID_lt, clock(e2));
+}
+
+/*******************************************************************\
+
+Function: partial_order_concurrencyt::add_constraint
+
+  Inputs: 
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void partial_order_concurrencyt::add_constraint(
+  symex_target_equationt &equation,
+  const exprt &cond,
+  const std::string &msg,
+  const symex_targett::sourcet &source) const
+{
+  exprt tmp=cond;
+  simplify(tmp, ns);
+
+  equation.constraint(tmp, msg, source);
 }
 

@@ -396,6 +396,33 @@ void c_typecheck_baset::typecheck_decl(codet &code)
 
 /*******************************************************************\
 
+Function: move_declarations
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+static void move_declarations(
+  exprt &code,
+  std::list<codet> &clean_code)
+{
+  Forall_operands(it, code)
+    move_declarations(*it, clean_code);
+
+  if(code.id()==ID_code &&
+     to_code(code).get_statement()==ID_decl)
+  {
+    clean_code.push_back(code_skipt());
+    code.swap(clean_code.back());
+  }
+}
+
+/*******************************************************************\
+
 Function: c_typecheck_baset::typecheck_decl
 
   Inputs:
@@ -467,15 +494,19 @@ void c_typecheck_baset::typecheck_decl(
 
   code.location()=symbol.location;
   
-  // check the initializer, if any
+  // handle the initializer, if any
   if(code.operands().size()==2)
   {
-    typecheck_expr(code.op1());
-    do_initializer(code.op1(), symbol.type, false);
-
-    if(follow(symbol.type).id()==ID_array &&
-       to_array_type(follow(symbol.type)).size().is_nil())
-      symbol.type=code.op1().type();
+    // the symbol must have a non-nil value, and its initializer has
+    // been type checked via typecheck_redefinition_non_type already
+    assert(symbol.value.is_not_nil());
+    // move any declarations towards clean_code to make sure these
+    // symbols (e.g., $array_size) have the same lifetime as symbol
+    // and aren't marked dead immediately
+    move_declarations(symbol.value, clean_code);
+    // add typecast, if necessary
+    implicit_typecast(symbol.value, symbol.type);
+    code.op1()=symbol.value;
   }
   
   // set type now (might be changed by initializer)

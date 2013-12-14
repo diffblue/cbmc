@@ -35,6 +35,7 @@ Function: goto_symext::get_unwind_recursion
 
 bool goto_symext::get_unwind_recursion(
   const irep_idt &identifier,
+  const unsigned thread_nr,
   unsigned unwind)
 {
   return false;
@@ -263,10 +264,13 @@ void goto_symext::symex_function_call_code(
 
   const goto_functionst::goto_functiont &goto_function=it->second;
   
-  unsigned &unwinding_counter=function_unwind[identifier];
+  const bool stop_recursing=get_unwind_recursion(
+    identifier,
+    state.source.thread_nr,
+    state.top().loop_iterations[identifier].count);
 
   // see if it's too much
-  if(get_unwind_recursion(identifier, unwinding_counter))
+  if(stop_recursing)
   {
     if(options.get_bool_option("partial-loops"))
     {
@@ -297,8 +301,7 @@ void goto_symext::symex_function_call_code(
   
     if(call.lhs().is_not_nil())
     {
-      exprt rhs=exprt(ID_nondet_symbol, call.lhs().type());
-      rhs.set(ID_identifier, "symex::"+i2string(nondet_count++));
+      side_effect_expr_nondett rhs(call.lhs().type());
       rhs.location()=call.location();
       state.rename(rhs, ns, goto_symex_statet::L1);
       code_assignt code(call.lhs(), rhs);
@@ -314,9 +317,6 @@ void goto_symext::symex_function_call_code(
   for(unsigned i=0; i<arguments.size(); i++)
     state.rename(arguments[i], ns);
   
-  // increase unwinding counter
-  unwinding_counter++;
-  
   // produce a new frame
   assert(!state.call_stack().empty());
   goto_symex_statet::framet &frame=state.new_frame();
@@ -331,6 +331,17 @@ void goto_symext::symex_function_call_code(
   frame.return_value=call.lhs();
   frame.calling_location=state.source;
   frame.function_identifier=identifier;
+
+  const goto_symex_statet::framet &p_frame=state.previous_frame();
+  for(goto_symex_statet::framet::loop_iterationst::const_iterator
+      it=p_frame.loop_iterations.begin();
+      it!=p_frame.loop_iterations.end();
+      ++it)
+    if(it->second.is_recursion)
+      frame.loop_iterations.insert(*it);
+  // increase unwinding counter
+  frame.loop_iterations[identifier].is_recursion=true;
+  frame.loop_iterations[identifier].count++;
 
   state.source.is_set=true;
   state.source.pc=goto_function.body.instructions.begin();
@@ -367,10 +378,6 @@ void goto_symext::pop_frame(statet &state)
         it!=frame.local_variables.end();
         it++)
       state.level2.remove(*it);
-
-    // decrease recursion unwinding counter
-    if(frame.function_identifier!="")
-      function_unwind[frame.function_identifier]--;
   }
   
   state.pop_frame();

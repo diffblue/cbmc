@@ -381,6 +381,13 @@ public:
 
   //! Update all indices  
   void update();
+
+  //! Human-readable loop name
+  inline static irep_idt loop_id(const_targett target)
+  {
+    return id2string(target->function)+"."+
+           i2string(target->loop_number);
+  }
   
   //! Is the program empty?
   inline bool empty() const

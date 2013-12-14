@@ -33,8 +33,7 @@ public:
   irept last_location;
 
   // control unwinding  
-  unsigned long max_unwind;
-  std::map<irep_idt, long> unwind_set;
+  long max_unwind;
   irep_idt incr_loop_id;
   unsigned long incr_max_unwind;
   unsigned long incr_min_unwind;
@@ -47,11 +46,25 @@ public:
 
   void set_ui(language_uit::uit _ui) { ui=_ui; }
 
+  void set_unwind_limit(
+    const irep_idt &id,
+    long thread_nr,
+    long limit)
+  {
+    unsigned t=thread_nr>=0 ? thread_nr : (unsigned)-1;
+
+    thread_loop_limits[t][id]=limit;
+  }
+
 protected:  
   // use gui format
   language_uit::uit ui;
 
   virtual bool check_break(const symex_targett::sourcet &source, unsigned unwind);
+
+  typedef hash_map_cont<irep_idt, long, irep_id_hash> loop_limitst;
+  typedef std::map<unsigned, loop_limitst> thread_loop_limitst;
+  thread_loop_limitst thread_loop_limits;
 
   //
   // overloaded from goto_symext
@@ -67,6 +80,7 @@ protected:
 
   virtual bool get_unwind_recursion(
     const irep_idt &identifier,
+    const unsigned thread_nr,
     unsigned unwind);
     
   virtual void no_body(const irep_idt &identifier);

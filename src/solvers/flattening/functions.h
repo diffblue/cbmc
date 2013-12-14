@@ -49,8 +49,8 @@ protected:
   virtual void add_function_constraints();
   virtual void add_function_constraints(const function_infot &info);
 
-  literalt arguments_equal(const exprt::operandst &o1,
-                           const exprt::operandst &o2);
+  exprt arguments_equal(const exprt::operandst &o1,
+                        const exprt::operandst &o2);
 };
 
 #endif

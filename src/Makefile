@@ -1,8 +1,8 @@
 DIRS = ansi-c big-int cbmc cpp goto-cc goto-instrument goto-programs \
        goto-symex langapi pointer-analysis solvers util linking xmllang \
-       assembler analyses java_bytecode
+       assembler analyses java_bytecode xmlrecover
 
-all: cbmc.dir goto-cc.dir goto-instrument.dir
+all: cbmc.dir goto-cc.dir goto-instrument.dir xmlrecover.dir
 
 ###############################################################################
 
@@ -24,6 +24,8 @@ cbmc.dir: languages solvers.dir goto-symex.dir analyses.dir \
           pointer-analysis.dir goto-programs.dir linking.dir
 
 goto-cc.dir: languages pointer-analysis.dir goto-programs.dir linking.dir
+
+xml-recover.dir: 
 
 # building for a particular directory
 

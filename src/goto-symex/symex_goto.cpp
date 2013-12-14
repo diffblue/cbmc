@@ -29,6 +29,7 @@ Function: goto_symext::symex_goto
 bool goto_symext::symex_goto(statet &state)
 {
   const goto_programt::instructiont &instruction=*state.source.pc;
+  statet::framet &frame=state.top();
   
   exprt old_guard=instruction.guard;
   clean_expr(old_guard, state, false);
@@ -38,18 +39,19 @@ bool goto_symext::symex_goto(statet &state)
   replace_nondet(new_guard);
   do_simplify(new_guard);
   
-  target.location(state.guard.as_expr(), state.source);
-  
   if(new_guard.is_false() ||
      state.guard.is_false())
   {
     // reset unwinding counter
-    unwind_map[state.source]=0;
+    if(instruction.is_backwards_goto())
+      frame.loop_iterations[goto_programt::loop_id(state.source.pc)].count=0;
 
     // next instruction
     state.source.pc++;
     return false; // nothing to do
   }
+  
+  target.location(state.guard.as_expr(), state.source);
     
   assert(!instruction.targets.empty());
   
@@ -60,13 +62,12 @@ bool goto_symext::symex_goto(statet &state)
   goto_programt::const_targett goto_target=
     instruction.get_target();
     
-  bool forward=
-    state.source.pc->location_number<
-    goto_target->location_number;
+  bool forward=!instruction.is_backwards_goto();
     
   if(!forward) // backwards?
   {
-    unsigned &unwind=unwind_map[state.source];
+    unsigned &unwind=
+      frame.loop_iterations[goto_programt::loop_id(state.source.pc)].count;
     unwind++;
     
     if(get_unwind(state.source, unwind)) //loop bound exceeded
@@ -74,7 +75,7 @@ bool goto_symext::symex_goto(statet &state)
       loop_bound_exceeded(state, new_guard);
 
       // reset unwinding
-      unwind_map[state.source]=0;
+      unwind=0;
       
       // next instruction
       state.source.pc++;
@@ -397,7 +398,10 @@ void goto_symext::phi_function(
 
     symbol_exprt lhs=symbol.symbol_expr();
     symbol_exprt new_lhs=symbol_exprt(l1_identifier, type);
+    const bool record_events=dest_state.record_events;
+    dest_state.record_events=false;
     dest_state.assignment(new_lhs, rhs, ns, true);
+    dest_state.record_events=record_events;
     
     target.assignment(
       true_exprt(),
@@ -447,17 +451,15 @@ void goto_symext::loop_bound_exceeded(
       claim(negated_cond,
             "unwinding assertion loop "+i2string(loop_number),
             state);
+
+      // add to state guard to prevent further assignments
+      state.guard.add(negated_cond);
     }
     else
     {
       // generate unwinding assumption, unless we permit partial loops
-      exprt guarded_expr=negated_cond;
-      state.guard.guard_expr(guarded_expr);
-      target.assumption(state.guard.as_expr(), guarded_expr, state.source);
+      symex_assume(state, negated_cond);
     }
-
-    // add to state guard to prevent further assignments
-    state.guard.add(negated_cond);
   }
 }
 
