@@ -12,10 +12,9 @@ Author: Daniel Kroening, kroening@kroening.com
 // decision procedure wrapper for boolean propositional logics
 
 #include <util/message.h>
+#include <util/threeval.h>
 
 #include "prop_assignment.h"
-
-class tvt;
 
 /*! \brief TO_BE_DOCUMENTED
 */
