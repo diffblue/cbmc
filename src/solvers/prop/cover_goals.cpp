@@ -46,7 +46,7 @@ void cover_goalst::mark()
       g_it!=goals.end();
       g_it++)
     if(!g_it->covered &&
-       prop.l_get(g_it->condition).is_true())
+       prop_conv.l_get(g_it->condition).is_true())
     {
       g_it->covered=true;
       _number_covered++;
@@ -98,7 +98,7 @@ void cover_goalst::freeze_goal_variables()
       g_it!=goals.end();
       g_it++)
     if(!g_it->condition.is_constant())
-      prop.set_frozen(g_it->condition);
+      prop_conv.set_frozen(g_it->condition);
 }
 
 /*******************************************************************\

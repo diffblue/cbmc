@@ -9,7 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/threeval.h>
 #include <util/i2string.h>
 
-#include "prop.h"
 #include "minimize.h"
 
 /*******************************************************************\
@@ -63,11 +62,11 @@ void prop_minimizet::block()
       ++o_it)
   {
     if(!o_it->fixed &&
-       prop.l_get(o_it->condition).is_false())
+       prop_conv.l_get(o_it->condition).is_false())
     {
       _number_satisfied++;
       _value+=current->first;
-      prop.l_set_to(o_it->condition, false); // fix it
+      prop_conv.prop.l_set_to(o_it->condition, false); // fix it
       o_it->fixed=true;
       found=true;
     }
@@ -122,7 +121,7 @@ Function: prop_minimizet::operator()
 void prop_minimizet::operator()()
 {
   // we need to use assumptions
-  assert(prop_conv.prop.has_set_assumptions());
+  assert(prop_conv.has_set_assumptions());
 
   _iterations=_number_satisfied=0;
   _value=0;
@@ -150,7 +149,7 @@ void prop_minimizet::operator()()
 
         bvt assumptions;
         assumptions.push_back(c);
-        prop_conv.prop.set_assumptions(assumptions);
+        prop_conv.set_assumptions(assumptions);
         dec_result=prop_conv.dec_solve();
     
         switch(dec_result)
