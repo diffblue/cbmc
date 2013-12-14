@@ -191,7 +191,8 @@ public:
   }
 };
 
-/*! \brief A generic base class for expressions that are predicates
+/*! \brief A generic base class for expressions that are predicates,
+           i.e., boolean-typed.
 */
 class predicate_exprt:public exprt
 {
