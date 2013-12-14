@@ -16,8 +16,28 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "prop.h"
 #include "prop_conv.h"
+#include "literal_expr.h"
 
 //#define DEBUG
+
+/*******************************************************************\
+
+Function: prop_conv_baset::set_frozen
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void prop_conv_baset::set_frozen(const bvt &bv)
+{
+  for(unsigned i=0; i<bv.size(); i++)
+    if(!bv[i].is_constant())
+      set_frozen(bv[i]);
+}
 
 /*******************************************************************\
 
@@ -249,9 +269,7 @@ literalt prop_convt::convert_bool(const exprt &expr)
   }
   else if(expr.id()==ID_literal)
   {
-    literalt l;
-    l.set(atoi(expr.get(ID_literal).c_str()));
-    return l;
+    return to_literal_expr(expr).get_literal();
   }
   else if(expr.id()==ID_nondet_symbol)
   {
