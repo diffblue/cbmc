@@ -165,7 +165,7 @@ void build_goto_trace(
   {
     const symex_target_equationt::SSA_stept &SSA_step=*it;
     
-    if(prop_conv.prop.l_get(SSA_step.guard_literal)!=tvt(true))
+    if(prop_conv.l_get(SSA_step.guard_literal)!=tvt(true))
       continue;
 
     if(it->is_constraint() ||
@@ -267,7 +267,7 @@ void build_goto_trace(
       goto_trace_step.cond_expr=SSA_step.cond_expr;
 
       goto_trace_step.cond_value=
-        prop_conv.prop.l_get(SSA_step.cond_literal).is_true();
+        prop_conv.l_get(SSA_step.cond_literal).is_true();
     }
   }
   
