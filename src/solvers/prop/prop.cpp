@@ -89,26 +89,6 @@ bool propt::is_in_conflict(literalt l) const
 
 /*******************************************************************\
 
-Function: propt::is_in_core
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-#if 0
-bool propt::is_in_core(literalt l) const
-{
-  assert(false);
-  return false;
-}
-#endif
-
-/*******************************************************************\
-
 Function: propt::new_variables
 
   Inputs:

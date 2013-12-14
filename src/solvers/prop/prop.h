@@ -80,10 +80,6 @@ public:
   
   // an incremental solver may remove any variables that aren't frozen
   virtual void set_frozen(literalt a) { }
-
-  // cores -- will be removed
-  //virtual bool is_in_core(literalt l) const;
-  //virtual bool has_in_core() const { return false; }
 };
 
 #endif
