@@ -1052,3 +1052,19 @@ std::ostream &operator<<(
   return out;
 }
 
+/*******************************************************************\
+
+Function: symex_target_equationt::current_activation_literal
+
+  Inputs: -
+
+ Outputs: current activation literal
+
+ Purpose: get activation literal used for the assertions that have been 
+          translated in the most recent call to convert()
+
+\*******************************************************************/
+
+literalt symex_target_equationt::current_activation_literal(prop_convt &prop_conv) {
+  return prop_conv.prop.lnot(activate_assertions.back());
+}

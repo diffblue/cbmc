@@ -40,9 +40,7 @@ public:
 
   prop_convt& prop_conv;
 
-  void convert();
-
-  literalt current_activation_literal();
+  void post_convert();
 
   void set_ui(language_uit::uit _ui) { ui=_ui; }
 

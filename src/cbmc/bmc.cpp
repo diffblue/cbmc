@@ -125,7 +125,8 @@ void bmct::do_conversion(prop_convt &prop_conv)
   do_unwind_module(prop_conv);
 
   // convert SSA
-  symex.convert();
+  equation.convert(prop_conv);
+  symex.post_convert(); //freeze variables if necessary
 
   // the 'extra constraints'
   forall_expr_list(it, bmc_constraints)

@@ -86,32 +86,9 @@ Function: symex_bmct::convert
 
 \*******************************************************************/
 
-void symex_bmct::convert() {  
-
-  //convert  
-  symex_target_equationt& e_target = dynamic_cast<symex_target_equationt&>(target); 
-  e_target.convert(prop_conv);
-
+void symex_bmct::post_convert() {  
   //freeze variables where unrollings are stitched together
   if(incr_loop_id!="") prop_conv.prop.set_frozen();
-}
-
-/*******************************************************************\
-
-Function: symex_bmct::current_activation_literal
-
-  Inputs: -
-
- Outputs: current activation literal
-
- Purpose: get activation literal used for the assertions that have been 
-          translated in the most recent call to convert()
-
-\*******************************************************************/
-
-literalt symex_bmct::current_activation_literal() {
-  symex_target_equationt& e_target = dynamic_cast<symex_target_equationt&>(target); 
-  return prop_conv.prop.lnot(e_target.activate_assertions.back());
 }
 
 /*******************************************************************\
