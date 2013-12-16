@@ -96,6 +96,9 @@ public:
 
   const cachet &get_cache() const { return cache; }
   const symbolst &get_symbols() const { return symbols; }
+
+  // assumptions
+  virtual void set_assumptions(const bvt &_assumptions) { prop.set_assumptions(_assumptions); }
   
 protected:
   // get a _boolean_ value from counterexample if not valid

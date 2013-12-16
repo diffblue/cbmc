@@ -123,7 +123,7 @@ Function: bv_refinementt::prop_solve
 decision_proceduret::resultt bv_refinementt::prop_solve()
 {
   // this puts the underapproximations into effect
-  bvt assumptions;
+  bvt assumptions = parent_assumptions;
   
   for(approximationst::const_iterator
       a_it=approximations.begin();
@@ -138,11 +138,9 @@ decision_proceduret::resultt bv_refinementt::prop_solve()
       a_it->under_assumptions.begin(), a_it->under_assumptions.end());
   }
 
-  prop.push_assumptions(assumptions);
-
+  prop.set_assumptions(assumptions);
   propt::resultt result=prop.prop_solve();
-
-  assert(prop.pop_assumptions(assumptions));
+  prop.set_assumptions(parent_assumptions);
  
   switch(result)
   {
@@ -226,4 +224,21 @@ void bv_refinementt::set_to(const exprt &expr, bool value)
   #else
   SUB::set_to(expr, value);
   #endif
+}
+
+/*******************************************************************\
+
+Function: bv_refinementt::set_assumptions
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void bv_refinementt::set_assumptions(const bvt &_assumptions) {
+  parent_assumptions = _assumptions;
+  prop.set_assumptions(_assumptions);
 }
