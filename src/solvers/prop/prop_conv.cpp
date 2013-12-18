@@ -481,6 +481,9 @@ void prop_convt::set_to(const exprt &expr, bool value)
         }
         else if(expr.id()==ID_or)
         {
+          // Special case for a CNF-clause,
+          // i.e., a constraint that's a disjunction.
+          
           if(expr.operands().size()>0)
           {
             bvt bv;
