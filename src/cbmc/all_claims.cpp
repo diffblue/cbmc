@@ -110,7 +110,7 @@ bool bmct::all_claims(const goto_functionst &goto_functions)
   cover_goalst cover_goals(symex.prop_conv);
 
   //set activation literal for incremental checking
-  cover_goals.activation_literal = equation.current_activation_literal(symex.prop_conv);
+  cover_goals.activation_literal = equation.current_activation_literal();
 
 #if 0
   std::cout << "cover_goals.activation_literal = " << cover_goals.activation_literal << std::endl;

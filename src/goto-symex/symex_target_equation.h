@@ -257,7 +257,7 @@ public:
   }
 
   bvt activate_assertions; //assumptions for incremental solving
-  literalt current_activation_literal(prop_convt &prop_conv); //returns last assumption literal
+  literalt current_activation_literal(); //returns last assumption literal
 
   typedef std::list<SSA_stept> SSA_stepst;
   SSA_stepst SSA_steps;

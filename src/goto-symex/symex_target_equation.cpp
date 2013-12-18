@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/i2string.h>
 #include <util/std_expr.h>
+#include <solvers/prop/literal_expr.h>
 #include <util/expr_util.h>
 
 #include <langapi/language_util.h>
@@ -776,8 +777,7 @@ void symex_target_equationt::convert_assertions(
   if(number_of_assertions==0)
     return;
 
-  bvt bv;
-  bv.reserve(number_of_assertions+1); 
+  exprt::operandst disjuncts;
   
   literalt assumption_literal=const_literal(true);
 
@@ -785,13 +785,13 @@ void symex_target_equationt::convert_assertions(
   literalt activation_literal=prop_conv.prop.new_variable();
 
   //assumptions for incremental solving: (a_0 ... -a_k-1) --> (a_0 ... a_k-1 -a_k)
-  bv.push_back(activation_literal);
+  disjuncts.push_back(literal_exprt(activation_literal));
   if(!activate_assertions.empty()) {
     literalt last_activation_literal = activate_assertions.back();
     activate_assertions.pop_back();
-    activate_assertions.push_back(prop_conv.prop.lnot(last_activation_literal));    
+    activate_assertions.push_back(!last_activation_literal);    
   }
-  activate_assertions.push_back(prop_conv.prop.lnot(activation_literal));
+  activate_assertions.push_back(!activation_literal);
 
   for(SSA_stepst::iterator it=SSA_steps.begin();
       it!=SSA_steps.end(); it++) {
@@ -800,7 +800,7 @@ void symex_target_equationt::convert_assertions(
       // do the expression
       literalt tmp_literal=prop_conv.convert(it->cond_expr);
       it->cond_literal=prop_conv.prop.limplies(assumption_literal, tmp_literal);
-      bv.push_back(prop_conv.prop.lnot(it->cond_literal));
+      disjuncts.push_back(literal_exprt(!it->cond_literal));
      }
     else if(it->is_assume()) {
       assumption_literal=
@@ -808,8 +808,8 @@ void symex_target_equationt::convert_assertions(
     }
   }
 
-  if(!bv.empty()) {
-    prop_conv.prop.lcnf(bv);
+  if(!disjuncts.empty()) {
+    prop_conv.set_to_true(disjunction(disjuncts));
   }
 
   //set assumptions (a_0 ... -a_k) for incremental solving
@@ -1051,7 +1051,7 @@ std::ostream &operator<<(
 
 Function: symex_target_equationt::current_activation_literal
 
-  Inputs: -
+  Inputs: 
 
  Outputs: current activation literal
 
@@ -1060,6 +1060,6 @@ Function: symex_target_equationt::current_activation_literal
 
 \*******************************************************************/
 
-literalt symex_target_equationt::current_activation_literal(prop_convt &prop_conv) {
-  return prop_conv.prop.lnot(activate_assertions.back());
+literalt symex_target_equationt::current_activation_literal() {
+  return !activate_assertions.back();
 }
