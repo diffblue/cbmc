@@ -29,8 +29,7 @@ class prop_minimizet:public messaget
 public:
   explicit inline prop_minimizet(prop_convt &_prop_conv):
     _number_objectives(0),
-    prop_conv(_prop_conv),
-    prop(_prop_conv.prop)
+    prop_conv(_prop_conv)
   {
   }
 
@@ -81,7 +80,6 @@ protected:
   unsigned _iterations, _number_satisfied, _number_objectives;
   weightt _value;
   prop_convt &prop_conv;
-  propt &prop;
 
   literalt constraint();
   void block();

@@ -8,7 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/threeval.h>
 
-#include "prop.h"
+#include "literal_expr.h"
 #include "cover_goals.h"
 
 /*******************************************************************\
@@ -67,16 +67,16 @@ Function: cover_goalst::constaint
 
 void cover_goalst::constraint()
 {
-  bvt bv;
+  or_exprt disjuncts;
 
   for(std::list<cover_goalt>::const_iterator
       g_it=goals.begin();
       g_it!=goals.end();
       g_it++)
     if(!g_it->covered && !g_it->condition.is_false())
-      bv.push_back(g_it->condition);
+      disjuncts.copy_to_operands(literal_exprt(g_it->condition));
 
-  prop.lcnf(bv);
+  prop_conv.set_to_true(disjuncts);
 }
 
 /*******************************************************************\
@@ -133,7 +133,7 @@ void cover_goalst::operator()()
     _iterations++;
     
     constraint();
-    prop_result=prop.prop_solve();
+    prop_result=prop_conv.prop.prop_solve();
     
     switch(prop_result)
     {

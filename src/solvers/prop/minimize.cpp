@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/threeval.h>
 #include <util/i2string.h>
 
+#include "literal_expr.h"
 #include "minimize.h"
 
 /*******************************************************************\
@@ -34,7 +35,7 @@ void prop_minimizet::objective(
   }
   else if(weight<0)
   {
-    objectives[-weight].push_back(objectivet(prop.lnot(condition)));
+    objectives[-weight].push_back(objectivet(!condition));
     _number_objectives++;
   }
 }
@@ -66,7 +67,7 @@ void prop_minimizet::block()
     {
       _number_satisfied++;
       _value+=current->first;
-      prop_conv.prop.l_set_to(o_it->condition, false); // fix it
+      prop_conv.set_to(literal_exprt(o_it->condition), false); // fix it
       o_it->fixed=true;
       found=true;
     }
@@ -99,11 +100,11 @@ literalt prop_minimizet::constraint()
       ++o_it)
   {
     if(!o_it->fixed)
-      or_clause.push_back(prop.lnot(o_it->condition));
+      or_clause.push_back(!o_it->condition);
   }
 
   // this returns false if the clause is empty
-  return prop.lor(or_clause);
+  return prop_conv.prop.lor(or_clause);
 }
 
 /*******************************************************************\
@@ -187,10 +188,10 @@ Function: prop_minimizet::save_assignment
 
 void prop_minimizet::save_assignment()
 {
-  assignment.resize(prop.no_variables());
+  assignment.resize(prop_conv.prop.no_variables());
 
-  for(unsigned i=1; i<prop.no_variables(); i++)
-    assignment[i]=prop.l_get(literalt(i, false)).is_true();
+  for(unsigned i=1; i<prop_conv.prop.no_variables(); i++)
+    assignment[i]=prop_conv.l_get(literalt(i, false)).is_true();
 }  
 
 /*******************************************************************\
@@ -207,8 +208,8 @@ Function: prop_minimizet::restore_assignment
 
 void prop_minimizet::restore_assignment()
 {
-  assert(assignment.size()<=prop.no_variables());
+  assert(assignment.size()<=prop_conv.prop.no_variables());
 
-  for(unsigned i=1; i<prop.no_variables(); i++)
-    prop.set_assignment(literalt(i, false), assignment[i]);
+  for(unsigned i=1; i<prop_conv.prop.no_variables(); i++)
+    prop_conv.prop.set_assignment(literalt(i, false), assignment[i]);
 }
