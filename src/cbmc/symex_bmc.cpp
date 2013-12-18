@@ -76,23 +76,6 @@ bool symex_bmct::symex_step(
 
 /*******************************************************************\
 
-Function: symex_bmct::convert
-
-  Inputs: -
-
- Outputs: -
-
- Purpose: continue converting SSA steps where the last conversion stopped
-
-\*******************************************************************/
-
-void symex_bmct::post_convert() {  
-  //freeze variables where unrollings are stitched together
-  if(incr_loop_id!="") prop_conv.prop.set_frozen();
-}
-
-/*******************************************************************\
-
 Function: symex_bmct::check_break
 
  Inputs: source of the current symbolic execution state

@@ -152,7 +152,7 @@ const bvt& boolbvt::convert_bv(const exprt &expr)
 
   // check
   forall_literals(it, cache_result.first->second) {
-    prop.to_be_frozen(*it);
+    if(freeze_all && !it->is_constant()) prop.set_frozen(*it);
     if(it->var_no()==literalt::unused_var_no())
     {
       std::cout << "unused_var_no: " << expr.pretty() << std::endl;
@@ -701,8 +701,7 @@ bool boolbvt::boolbv_set_equality_to_true(const equal_exprt &expr)
 
     map.set_literals(identifier, type, bv1);
 
-    //for incremental unwinding with incremental solver
-    prop.to_be_frozen(bv1);
+    if(freeze_all) set_frozen(bv1);
 
     return false;
   }

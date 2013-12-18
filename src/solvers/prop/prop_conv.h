@@ -63,7 +63,8 @@ public:
   prop_convt(const namespacet &_ns, propt &_prop):
     prop_conv_baset(_ns, _prop),
     use_cache(true),
-    equality_propagation(true) { }
+    equality_propagation(true),
+    freeze_all(false) { }
   virtual ~prop_convt() { }
 
   // overloading from decision_proceduret
@@ -81,24 +82,19 @@ public:
   
   bool use_cache;
   bool equality_propagation;
+  bool freeze_all; // freezing variables (for incremental solving)
   
   friend struct prop_conv_store_constraintt;
 
   virtual void post_process();
   
-  virtual void clear_cache()
-  {
-    cache.clear();
-  }
+  virtual void clear_cache() { cache.clear();}
 
   typedef std::map<irep_idt, literalt> symbolst;
   typedef hash_map_cont<exprt, literalt, irep_hash> cachet;
 
   const cachet &get_cache() const { return cache; }
   const symbolst &get_symbols() const { return symbols; }
-
-  // assumptions
-  virtual void set_assumptions(const bvt &_assumptions) { prop.set_assumptions(_assumptions); }
   
 protected:
   // get a _boolean_ value from counterexample if not valid

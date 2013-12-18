@@ -597,28 +597,28 @@ bv_refinementt::add_approximation(
   a.expr=expr;
   a.result_bv=prop.new_variables(width);
   a.no_operands=expr.operands().size();
-  prop.set_frozen(a.result_bv);
+  set_frozen(a.result_bv);
 
   if(a.no_operands==1)
   {
     a.op0_bv=convert_bv(expr.op0());
-    prop.set_frozen(a.op0_bv);
+    set_frozen(a.op0_bv);
   }
   else if(a.no_operands==2)
   {
     a.op0_bv=convert_bv(expr.op0());
     a.op1_bv=convert_bv(expr.op1());
-    prop.set_frozen(a.op0_bv);
-    prop.set_frozen(a.op1_bv);
+    set_frozen(a.op0_bv);
+    set_frozen(a.op1_bv);
   }
   else if(a.no_operands==3)
   {
     a.op0_bv=convert_bv(expr.op0());
     a.op1_bv=convert_bv(expr.op1());
     a.op2_bv=convert_bv(expr.op2());
-    prop.set_frozen(a.op0_bv);
-    prop.set_frozen(a.op1_bv);
-    prop.set_frozen(a.op2_bv);
+    set_frozen(a.op0_bv);
+    set_frozen(a.op1_bv);
+    set_frozen(a.op2_bv);
   }
   else
     assert(false);

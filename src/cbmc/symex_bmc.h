@@ -40,8 +40,6 @@ public:
 
   prop_convt& prop_conv;
 
-  void post_convert();
-
   void set_ui(language_uit::uit _ui) { ui=_ui; }
 
   void set_unwind_limit(

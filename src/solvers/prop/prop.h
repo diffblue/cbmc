@@ -80,15 +80,6 @@ public:
   
   // an incremental solver may remove any variables that aren't frozen
   virtual void set_frozen(literalt a) { }
-  void set_frozen(bvt bv);
-  void to_be_frozen(bvt bv) { for(unsigned i=0; i<bv.size(); i++) to_be_frozen(bv[i]); }
-  void to_be_frozen(literalt a) { if(!a.is_constant()) vars_to_be_frozen.insert(a.var_no()); }
-  void set_frozen(); //freezes variables-to-be-frozen
-
- protected:
-  // variables to be frozen (for incremental solving)
-  typedef std::set<unsigned> variablest;
-  variablest vars_to_be_frozen;
 };
 
 #endif

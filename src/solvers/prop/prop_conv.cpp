@@ -29,7 +29,7 @@ Function: prop_conv_baset::set_frozen
 
  Outputs:
 
- Purpose:
+ Purpose: freezes all variables in the bitvector
 
 \*******************************************************************/
 
@@ -210,7 +210,7 @@ literalt prop_convt::convert(const exprt &expr)
      expr.id()==ID_constant) 
   {
     literalt literal=convert_bool(expr);
-    prop.to_be_frozen(literal); //for incremental unwinding with incremental solver
+    if(freeze_all && !literal.is_constant()) prop.set_frozen(literal);
     return literal;
   }
   // check cache first
@@ -226,7 +226,7 @@ literalt prop_convt::convert(const exprt &expr)
   // insert into cache
 
   result.first->second=literal;
-  prop.to_be_frozen(literal); //for incremental unwinding with incremental solver
+  if(freeze_all && !literal.is_constant()) prop.set_frozen(literal);
 
   #if 0
   std::cout << literal << "=" << expr << std::endl;
@@ -666,4 +666,3 @@ void prop_convt::print_assignment(std::ostream &out) const
       it++)
     out << it->first << " = " << prop.l_get(it->second) << "\n";
 }
-

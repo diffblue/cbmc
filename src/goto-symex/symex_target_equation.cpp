@@ -812,12 +812,7 @@ void symex_target_equationt::convert_assertions(
     prop_conv.prop.lcnf(bv);
   }
 
-  //Caution - assumes that the activate_assertions are always the bottom element of the stack
-  //bvt popped_assumptions;
-  //prop_conv.prop.pop_assumptions(popped_assumptions); 
-
   //set assumptions (a_0 ... -a_k) for incremental solving
-  //  prop_conv.prop.push_assumptions(activate_assertions);
   prop_conv.set_assumptions(activate_assertions);
 }
 

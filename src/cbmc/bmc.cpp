@@ -126,7 +126,6 @@ void bmct::do_conversion(prop_convt &prop_conv)
 
   // convert SSA
   equation.convert(prop_conv);
-  symex.post_convert(); //freeze variables if necessary
 
   // the 'extra constraints'
   forall_expr_list(it, bmc_constraints)
@@ -596,4 +595,7 @@ void bmct::setup_unwind()
       options.get_bool_option("ignore-assertions-before-unwind-min");
  
   symex.incr_loop_id = options.get_option("incremental-check");
+
+  //freeze variables where unrollings are stitched together
+  if(symex.incr_loop_id!="") symex.prop_conv.freeze_all = true;
 }
