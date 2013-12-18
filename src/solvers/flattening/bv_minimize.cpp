@@ -38,39 +38,26 @@ void bv_minimizet::add_objective(
      type.id()==ID_signedbv ||
      type.id()==ID_fixedbv)
   {    
-    unsigned width=boolbv.boolbv_width(type);
+    // convert it
+    bvt bv=boolbv.convert_bv(objective);
   
-    for(unsigned i=0; i<width; i++)
+    for(unsigned i=0; i<bv.size(); i++)
     {
-      literalt lit;
+      literalt lit=bv[i];
   
-      if(boolbv.literal(objective, i, lit))
-        continue; // there's no corresponding literal, ignore
-      
       if(lit.is_constant()) // fixed already, ignore
         continue;
 
       prop_minimizet::weightt weight=(1LL<<i);
       
-      if(type.id()==ID_signedbv || type.id()==ID_fixedbv)
+      if(type.id()==ID_signedbv ||
+         type.id()==ID_fixedbv ||
+         type.id()==ID_floatbv)
       {
-        if(absolute_value)
-        {
-          // need to minimize sign XOR bit
-          if(i!=width-1)
-          {
-            literalt sign;
-            boolbv.literal(objective, width-1, sign);
-            lit=boolbv.prop.lxor(sign, lit);
-          }
-        }
-        else
-        {
-          // The top bit makes things _smaller_, and thus needs
-          // to be maximized.
-          if(i==width-1)
-            weight=-weight;
-        }
+        // The top bit is the sign bit, and makes things _smaller_,
+        // and thus needs to be maximized.
+        if(i==bv.size()-1)
+          weight=-weight;
       }
       
       prop_minimize.objective(lit, weight);
