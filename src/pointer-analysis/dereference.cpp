@@ -400,8 +400,7 @@ dereferencet::valuet dereferencet::build_reference_to(
     exprt malloc_object=
       ns.lookup(CPROVER_PREFIX "malloc_object").symbol_expr();
 
-    exprt is_malloc_object=exprt(ID_same_object, bool_typet());
-    is_malloc_object.copy_to_operands(pointer_expr, malloc_object);
+    exprt is_malloc_object=same_object(pointer_expr, malloc_object);
 
     // constraint that it actually is a dynamic object
     exprt dynamic_object_expr(ID_dynamic_object, bool_typet());
@@ -509,8 +508,7 @@ dereferencet::valuet dereferencet::build_reference_to(
     }
     else
     {
-      result.pointer_guard=exprt(ID_same_object, bool_typet());
-      result.pointer_guard.copy_to_operands(pointer_expr, object_pointer);
+      result.pointer_guard=same_object(pointer_expr, object_pointer);
     }
     
     guardt tmp_guard(guard);

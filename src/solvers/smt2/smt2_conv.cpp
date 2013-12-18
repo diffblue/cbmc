@@ -1009,22 +1009,6 @@ void smt2_convt::convert_expr(const exprt &expr)
     if(ext>0)
       smt2_prop.out << ")"; // zero_extend
   }
-  else if(expr.id()==ID_same_object)
-  {
-    assert(expr.operands().size()==2);
-    unsigned pointer_width0=boolbv_width(expr.op0().type());
-    unsigned pointer_width1=boolbv_width(expr.op1().type());
-
-    smt2_prop.out << "(= ((_ extract " << pointer_width0-1
-                  << " " << pointer_width0-BV_ADDR_BITS << ") ";
-    convert_expr(expr.op0());
-    smt2_prop.out << ")";
-
-    smt2_prop.out << " ((_ extract " << pointer_width1-1
-                  << " " << pointer_width1-BV_ADDR_BITS << ") ";
-    convert_expr(expr.op1());
-    smt2_prop.out << "))";
-  }
   else if(expr.id()=="is_dynamic_object")
   {
     convert_is_dynamic_object(expr);
