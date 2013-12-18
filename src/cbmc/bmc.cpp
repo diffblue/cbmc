@@ -405,12 +405,6 @@ bool bmct::run(const goto_functionst &goto_functions)
       }
     }
 
-    if(options.get_bool_option("program-only"))
-    {
-      show_program();
-      return false;
-    }
-
     {
       statistics() << "Generated " << symex.total_claims
                    << " VCC(s), " << symex.remaining_claims
@@ -423,21 +417,23 @@ bool bmct::run(const goto_functionst &goto_functions)
       return false;
     }
     
-    if(options.get_bool_option("all-claims"))
-      return all_claims(goto_functions);
-    
     if(options.get_bool_option("cover-assertions"))
     {
       cover_assertions(goto_functions);
       return false;
     }
 
-    if(symex.remaining_claims==0)
+    // any properties to check at all?
+    if(!options.get_bool_option("program-only") &&
+       symex.remaining_claims==0)
     {
       report_success();
       return false;
     }
 
+    if(options.get_bool_option("all-claims"))
+      return all_claims(goto_functions);
+    
     if(options.get_bool_option("boolector"))
       return decide_boolector();
     else if(options.get_bool_option("mathsat"))
@@ -463,7 +459,15 @@ bool bmct::run(const goto_functionst &goto_functions)
     else if(options.get_bool_option("z3"))
       return decide_z3();
     else
+    {
+      if(options.get_bool_option("program-only"))
+      {
+        show_program();
+        return false;
+      }
+
       return decide_default();
+    }
   }
 
   catch(std::string &error_str)
