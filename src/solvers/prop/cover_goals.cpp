@@ -67,16 +67,17 @@ Function: cover_goalst::constaint
 
 void cover_goalst::constraint()
 {
-  or_exprt disjuncts;
+  exprt::operandst disjuncts;
 
   for(std::list<cover_goalt>::const_iterator
       g_it=goals.begin();
       g_it!=goals.end();
       g_it++)
     if(!g_it->covered && !g_it->condition.is_false())
-      disjuncts.copy_to_operands(literal_exprt(g_it->condition));
+      disjuncts.push_back(literal_exprt(g_it->condition));
 
-  prop_conv.set_to_true(disjuncts);
+  // this is 'false' if there are no disjuncts
+  prop_conv.set_to_true(disjunction(disjuncts));
 }
 
 /*******************************************************************\
