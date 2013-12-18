@@ -27,7 +27,7 @@ class cover_goalst:public messaget
 {
 public:
   explicit inline cover_goalst(prop_convt &_prop_conv):
-    prop_conv(_prop_conv), prop(_prop_conv.prop)
+    prop_conv(_prop_conv)
   {
   }
   
@@ -76,7 +76,6 @@ public:
 protected:
   unsigned _number_covered, _iterations;
   prop_convt &prop_conv;
-  propt &prop;
 
   // this method is called for each satisfying assignment
   virtual void assignment()
