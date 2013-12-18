@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/expr_util.h>
 #include <util/arith_tools.h>
 #include <util/symbol.h>
+#include <util/std_expr.h>
 
 #include <solvers/prop/minimize.h>
 
@@ -29,7 +30,7 @@ Function: counterexample_beautificationt::get_minimization_list
 \*******************************************************************/
 
 void counterexample_beautificationt::get_minimization_list(
-  const bv_cbmct &bv_cbmc,
+  bv_cbmct &bv_cbmc,
   const symex_target_equationt &equation,
   minimization_listt &minimization_list)
 {
@@ -43,8 +44,23 @@ void counterexample_beautificationt::get_minimization_list(
        it->assignment_type==symex_targett::STATE)
     {
       if(!bv_cbmc.prop.l_get(it->guard_literal).is_false())
-        if(it->original_lhs_object.type()!=bool_typet())
-          minimization_list.insert(it->ssa_lhs);
+      {
+        const typet &type=it->original_lhs_object.type();
+      
+        if(type!=bool_typet())
+        {
+          // we minimize the absolute value, if applicable
+          if(type.id()==ID_signedbv ||
+             type.id()==ID_fixedbv ||
+             type.id()==ID_floatbv)
+          {
+            abs_exprt abs_expr(it->ssa_lhs);
+            minimization_list.insert(abs_expr);
+          }
+          else
+            minimization_list.insert(it->ssa_lhs);
+        }
+      }
     }
 
     // reached failed assertion?
@@ -155,7 +171,6 @@ void counterexample_beautificationt::operator()(
   
     // minimize
     bv_minimizet bv_minimize(bv_cbmc);
-    bv_minimize.absolute_value=true;
     bv_minimize.set_message_handler(bv_cbmc.get_message_handler());
     bv_minimize(minimization_list);
   }

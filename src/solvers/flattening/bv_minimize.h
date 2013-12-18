@@ -23,15 +23,12 @@ class bv_minimizet:public messaget
 {
 public:
   explicit bv_minimizet(boolbvt &_boolbv):
-    absolute_value(false),
     boolbv(_boolbv)
   {
   }
   
   void operator()(const minimization_listt &objectives);
   
-  bool absolute_value;
-
 protected:
   boolbvt &boolbv;
   
