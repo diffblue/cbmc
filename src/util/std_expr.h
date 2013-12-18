@@ -174,6 +174,21 @@ public:
   }
 };
 
+/*! \brief absolute value
+*/
+class abs_exprt:public unary_exprt
+{
+public:
+  inline abs_exprt()
+  {
+  }
+
+  inline explicit abs_exprt(const exprt &_op):
+    unary_exprt(ID_abs, _op, _op.type())
+  {
+  }
+};
+
 /*! \brief The unary minus expression
 */
 class unary_minus_exprt:public unary_exprt
