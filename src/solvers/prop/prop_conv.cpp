@@ -317,7 +317,7 @@ literalt prop_convt::convert_bool(const exprt &expr)
           expr.id()==ID_nor || expr.id()==ID_nand)
   {
     if(op.size()==0)
-      throw "operator "+expr.id_string()+" takes at least one operand";
+      throw "operator `"+expr.id_string()+"' takes at least one operand";
 
     bvt bv;
 
