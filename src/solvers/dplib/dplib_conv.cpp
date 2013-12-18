@@ -1043,15 +1043,6 @@ void dplib_convt::convert_dplib_expr(const exprt &expr)
     // TODO, this has the wrong type
   }
   #endif
-  else if(expr.id()==ID_same_object)
-  {
-    assert(expr.operands().size()==2);
-    dplib_prop.out << "(";
-    convert_dplib_expr(expr.op0());
-    dplib_prop.out << ").object=(";
-    convert_dplib_expr(expr.op1());
-    dplib_prop.out << ").object";
-  }
   else if(expr.id()==ID_string_constant)
   {
     convert_dplib_expr(to_string_constant(expr).to_array_expr());

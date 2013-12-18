@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/i2string.h>
 #include <util/pointer_offset_size.h>
+#include <util/pointer_predicates.h>
 
 #include "c_types.h"
 #include "c_typecast.h"
@@ -2125,8 +2126,7 @@ void c_typecheck_baset::do_special_functions(
         throw "same_object expects two operands";
       }
 
-      predicate_exprt same_object_expr(ID_same_object);
-      same_object_expr.operands()=expr.arguments();
+      exprt same_object_expr=same_object(expr.arguments()[0], expr.arguments()[1]);
       same_object_expr.location()=location;
       expr.swap(same_object_expr);
     }

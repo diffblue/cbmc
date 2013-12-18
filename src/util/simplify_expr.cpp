@@ -140,10 +140,8 @@ void simplify_exprt::setup_jump_table()
   ENTRY(ID_byte_extract_big_endian, simplify_byte_extract);
   ENTRY(ID_pointer_object, simplify_pointer_object);
   ENTRY(ID_object_size, simplify_object_size);
-  ENTRY(ID_dynamic_size, simplify_dynamic_size);
   ENTRY(ID_dynamic_object, simplify_dynamic_object);
   ENTRY(ID_invalid_pointer, simplify_invalid_pointer);
-  ENTRY(ID_same_object, simplify_same_object);
   ENTRY(ID_good_pointer, simplify_good_pointer);
   ENTRY(ID_unary_minus, simplify_unary_minus);
   ENTRY(ID_unary_plus, simplify_unary_plus);
@@ -4319,53 +4317,6 @@ tvt simplify_exprt::objects_equal_address_of(const exprt &a, const exprt &b)
 
 /*******************************************************************\
 
-Function: simplify_exprt::simplify_same_object
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-bool simplify_exprt::simplify_same_object(exprt &expr)
-{
-  if(expr.operands().size()!=2) return true;
-  
-  exprt &op0=expr.op0();
-  exprt &op1=expr.op1();
-
-  bool result=true;
-
-  if(!simplify_object(op0)) result=false;
-  if(!simplify_object(op1)) result=false;
-  
-  // same_object is symmetric, i.e., we order the operands
-  if(!(op0<op1))
-  {
-    op0.swap(op1);
-    result=false;
-  }
-  
-  tvt res=objects_equal(op0, op1);
-
-  if(res.is_true())
-  {
-    expr=true_exprt();
-    return false;
-  }
-  else if(res.is_false())
-  {
-    expr=false_exprt();
-    return false;
-  }
-
-  return result;
-}
-
-/*******************************************************************\
-
 Function: simplify_exprt::simplify_object_size
 
   Inputs:
@@ -4418,27 +4369,6 @@ bool simplify_exprt::simplify_object_size(exprt &expr)
   }
   
   return result;
-}
-
-/*******************************************************************\
-
-Function: simplify_exprt::simplify_dynamic_size
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-bool simplify_exprt::simplify_dynamic_size(exprt &expr)
-{
-  if(expr.operands().size()!=1) return true;
-  
-  exprt &op=expr.op0();
-  
-  return simplify_object(op);
 }
 
 /*******************************************************************\
@@ -5343,16 +5273,12 @@ bool simplify_exprt::simplify_node(exprt &expr)
     result=simplify_byte_extract(expr) && result;
   else if(expr.id()==ID_pointer_object)
     result=simplify_pointer_object(expr) && result;
-  else if(expr.id()==ID_same_object)
-    result=simplify_same_object(expr) && result;
   else if(expr.id()==ID_dynamic_object)
     result=simplify_dynamic_object(expr) && result;
   else if(expr.id()==ID_invalid_pointer)
     result=simplify_invalid_pointer(expr) && result;
   else if(expr.id()==ID_object_size)
     result=simplify_object_size(expr) && result;
-  else if(expr.id()==ID_dynamic_size)
-    result=simplify_dynamic_size(expr) && result;
   else if(expr.id()==ID_good_pointer)
     result=simplify_good_pointer(expr) && result;
   else if(expr.id()==ID_div)

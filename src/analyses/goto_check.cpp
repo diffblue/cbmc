@@ -875,7 +875,7 @@ void goto_checkt::pointer_validity_check(
 
   if(aliases_unknown || aliases_dynamic_object)
     add_guarded_claim(
-      or_exprt(not_exprt(dynamic_object(pointer)), not_exprt(deallocated(pointer, ns))),
+      not_exprt(deallocated(pointer, ns)),
       "dereference failure: deallocated dynamic object",
       "pointer dereference",
       expr.find_location(),
@@ -900,7 +900,7 @@ void goto_checkt::pointer_validity_check(
                  dynamic_object_upper_bound(pointer, dereference_type, ns));
 
       add_guarded_claim(
-        or_exprt(not_exprt(dynamic_object(pointer)), not_exprt(malloc_object(pointer, ns)), not_exprt(dynamic_bounds)),
+        implies_exprt(malloc_object(pointer, ns), not_exprt(dynamic_bounds)),
         "dereference failure: dynamic object bounds",
         "pointer dereference",
         expr.find_location(),
