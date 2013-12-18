@@ -396,30 +396,27 @@ Function: prop_convt::set_equality_to_true
 
 \*******************************************************************/
 
-bool prop_convt::set_equality_to_true(const exprt &expr)
+bool prop_convt::set_equality_to_true(const equal_exprt &expr)
 {
   if(!equality_propagation) return true;
 
-  if(expr.operands().size()==2)
+  // optimization for constraint of the form
+  // new_variable = value
+
+  if(expr.lhs().id()==ID_symbol)
   {
-    // optimization for constraint of the form
-    // new_variable = value
+    const irep_idt &identifier=
+      to_symbol_expr(expr.lhs()).get_identifier();
 
-    if(expr.op0().id()==ID_symbol)
-    {
-      const irep_idt &identifier=
-        to_symbol_expr(expr.op0()).get_identifier();
+    literalt tmp=convert(expr.rhs());
 
-      literalt tmp=convert(expr.op1());
+    std::pair<symbolst::iterator, bool> result=
+      symbols.insert(std::pair<irep_idt, literalt>(identifier, tmp));
 
-      std::pair<symbolst::iterator, bool> result=
-        symbols.insert(std::pair<irep_idt, literalt>(identifier, tmp));
-
-      if(result.second)
-        return false; // ok, inserted!
-        
-      // nah, already there
-    }
+    if(result.second)
+      return false; // ok, inserted!
+      
+    // nah, already there
   }
 
   return true;
@@ -510,7 +507,7 @@ void prop_convt::set_to(const exprt &expr, bool value)
         }
         else if(expr.id()==ID_equal)
         {
-          if(!set_equality_to_true(expr))
+          if(!set_equality_to_true(to_equal_expr(expr)))
             return;
         }
       }
