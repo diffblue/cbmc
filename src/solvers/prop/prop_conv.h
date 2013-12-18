@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/hash_cont.h>
 #include <util/decision_procedure.h>
 #include <util/expr.h>
+#include <util/std_expr.h>
 
 #include "literal.h"
 #include "prop.h"
@@ -103,7 +104,7 @@ protected:
   virtual literalt convert_rest(const exprt &expr);
   virtual literalt convert_bool(const exprt &expr);
   
-  virtual bool set_equality_to_true(const exprt &expr);
+  virtual bool set_equality_to_true(const equal_exprt &expr);
 
   // symbols
   symbolst symbols;

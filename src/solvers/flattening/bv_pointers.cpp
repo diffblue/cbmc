@@ -85,27 +85,6 @@ literalt bv_pointerst::convert_rest(const exprt &expr)
       return l;
     }
   }
-  else if(expr.id()==ID_same_object)
-  {
-    if(operands.size()==2 &&
-       is_ptr(operands[0].type()) &&
-       is_ptr(operands[1].type()))
-    {
-      const bvt &bv0=convert_bv(operands[0]);
-      const bvt &bv1=convert_bv(operands[1]);
-
-      {
-        bvt equal_bv;
-        equal_bv.resize(object_bits);
-
-        for(unsigned i=0; i<object_bits; i++)
-          equal_bv[i]=prop.lequal(bv0[offset_bits+i],
-                                  bv1[offset_bits+i]);
-
-        return prop.land(equal_bv);
-      }
-    }
-  }
   else if(expr.id()==ID_lt || expr.id()==ID_le ||
           expr.id()==ID_gt || expr.id()==ID_ge)
   {
@@ -818,8 +797,6 @@ Function: bv_pointerst::do_postponed
  Purpose:
 
 \*******************************************************************/
-
-#include <iostream>
 
 void bv_pointerst::do_postponed(
   const postponedt &postponed)

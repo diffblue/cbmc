@@ -427,17 +427,14 @@ bool bmct::run(const goto_functionst &goto_functions)
 	      show_vcc();
 	      return false;
 	    }
-    
   
 	  if(options.get_bool_option("cover-assertions"))
 	    {
               if(options.get_option("incremental-check")!="")
                 throw "incremental vacuity checks not supported";
-
 	      cover_assertions(goto_functions);
 	      return false;
 	    }
-
 	  if(symex.remaining_claims==0)
 	    {
 	      report_success();

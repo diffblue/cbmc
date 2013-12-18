@@ -3999,9 +3999,6 @@ std::string expr2ct::convert(
   else if(src.id()=="pointer_cons")
     return convert_function(src, "POINTER_CONS", precedence=16);
 
-  else if(src.id()==ID_same_object)
-    return convert_function(src, "__CPROVER_same_object", precedence=16);
-
   else if(src.id()==ID_invalid_pointer)
     return convert_function(src, "__CPROVER_invalid_pointer", precedence=16);
 

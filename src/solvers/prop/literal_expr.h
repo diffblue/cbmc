@@ -16,7 +16,8 @@ Author: Daniel Kroening, kroening@kroening.com
 class literal_exprt:public predicate_exprt
 {
 public:
-  inline explicit literal_exprt(literalt a)
+  inline explicit literal_exprt(literalt a):
+    predicate_exprt(ID_literal)
   {
     set_literal(a);
   }

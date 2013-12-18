@@ -31,7 +31,7 @@ public:
 
 protected:
   void get_minimization_list(
-    const bv_cbmct &bv_cbmc,
+    bv_cbmct &bv_cbmc,
     const symex_target_equationt &equation,        
     minimization_listt &minimization_list);
 

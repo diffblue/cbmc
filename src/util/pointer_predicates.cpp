@@ -18,6 +18,25 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
+Function: pointer_object
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+exprt pointer_object(const exprt &p)
+{
+  return unary_exprt(
+    ID_pointer_object, p,
+    unsignedbv_typet(config.ansi_c.pointer_width));
+}
+
+/*******************************************************************\
+
 Function: same_object
 
   Inputs:
@@ -30,7 +49,7 @@ Function: same_object
 
 exprt same_object(const exprt &p1, const exprt &p2)
 {
-  return binary_relation_exprt(p1, ID_same_object, p2);
+  return equal_exprt(pointer_object(p1), pointer_object(p2));
 }
 
 /*******************************************************************\

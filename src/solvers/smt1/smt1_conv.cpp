@@ -975,36 +975,6 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
 
     if(ext>0) smt1_prop.out << ")";
   }
-  else if(expr.id()==ID_same_object)
-  {
-    const typet &type=expr.type();
-
-    assert(expr.operands().size()==2);
-    assert(expr.op0().type().id()==ID_pointer);
-    assert(expr.op1().type().id()==ID_pointer);
-
-    unsigned op0_width=boolbv_width(expr.op0().type());
-    unsigned op1_width=boolbv_width(expr.op1().type());
-
-    // this may have to be converted
-    from_bool_begin(type, bool_as_bv);
-    
-    smt1_prop.out << "(= (extract["
-                  << (op0_width-1)
-                  << ":"
-                  << op0_width-BV_ADDR_BITS << "] ";
-    convert_expr(expr.op0(), true);
-    smt1_prop.out << ")";
-    smt1_prop.out << " (extract["
-                  << (op1_width-1)
-                  << ":"
-                  << op1_width-BV_ADDR_BITS << "] ";
-    convert_expr(expr.op1(), true);
-    smt1_prop.out << "))";
-
-    // this may have to be converted
-    from_bool_end(type, bool_as_bv);
-  }
   else if(expr.id()=="is_dynamic_object")
   {
     convert_is_dynamic_object(expr, bool_as_bv);

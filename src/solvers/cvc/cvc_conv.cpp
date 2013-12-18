@@ -1064,15 +1064,6 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
     // TODO, this has the wrong type
   }
   #endif
-  else if(expr.id()==ID_same_object)
-  {
-    assert(expr.operands().size()==2);
-    cvc_prop.out << "(";
-    convert_cvc_expr(expr.op0());
-    cvc_prop.out << ").object=(";
-    convert_cvc_expr(expr.op1());
-    cvc_prop.out << ").object";
-  }
   else if(expr.id()==ID_string_constant)
   {
     convert_cvc_expr(to_string_constant(expr).to_array_expr());
