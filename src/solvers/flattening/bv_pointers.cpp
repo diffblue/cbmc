@@ -819,8 +819,6 @@ Function: bv_pointerst::do_postponed
 
 \*******************************************************************/
 
-#include <iostream>
-
 void bv_pointerst::do_postponed(
   const postponedt &postponed)
 {
