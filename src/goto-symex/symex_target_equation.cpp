@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <langapi/language_util.h>
 #include <solvers/prop/prop_conv.h>
 #include <solvers/prop/prop.h>
+#include <solvers/prop/literal_expr.h>
 
 #include "goto_symex_state.h"
 #include "symex_target_equation.h"
@@ -779,29 +780,36 @@ void symex_target_equationt::convert_assertions(
     assert(false); // unreachable
   }
 
-  bvt bv;
+  // We do (NOT a1) OR (NOT a2) ...
+  // where the a's are the assertions
+  or_exprt::operandst disjuncts;
+  disjuncts.reserve(number_of_assertions);
 
-  bv.reserve(number_of_assertions);
-  
-  literalt assumption_literal=const_literal(true);
+  exprt assumption=true_exprt();
 
   for(SSA_stepst::iterator it=SSA_steps.begin();
       it!=SSA_steps.end(); it++)
     if(it->is_assert())
     {
-      // do the expression
-      literalt tmp_literal=prop_conv.convert(it->cond_expr);
+      implies_exprt implication(
+        assumption,
+        it->cond_expr);
+      
+      // do the conversion
+      it->cond_literal=prop_conv.convert(implication);
 
-      it->cond_literal=prop_conv.prop.limplies(assumption_literal, tmp_literal);
-
-      bv.push_back(prop_conv.prop.lnot(it->cond_literal));
+      // store disjunct
+      disjuncts.push_back(literal_exprt(!it->cond_literal));
     }
     else if(it->is_assume())
-      assumption_literal=
-        prop_conv.prop.land(assumption_literal, it->cond_literal);
+    {
+      // the assumptions have been converted before
+      assumption=
+        and_exprt(assumption, literal_exprt(it->cond_literal));
+    }
 
-  if(!bv.empty())
-    prop_conv.prop.lcnf(bv);
+  // the below is 'true' if there are no assertions
+  prop_conv.set_to_true(disjunction(disjuncts));
 }
 
 /*******************************************************************\
