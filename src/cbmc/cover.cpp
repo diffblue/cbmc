@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 
 #include <util/xml.h>
+#include <util/std_expr.h>
 
 #include <solvers/sat/satcheck.h>
 #include <solvers/prop/cover_goals.h>
@@ -54,17 +55,17 @@ void bmct::cover_assertions(const goto_functionst &goto_functions)
   equation.convert_assumptions(prop_conv);
 
   // collect _all_ goals in `goal_map'
-  typedef std::map<goto_programt::const_targett, bvt> goal_mapt;
+  typedef std::map<goto_programt::const_targett, exprt::operandst> goal_mapt;
   goal_mapt goal_map;
   
   forall_goto_functions(f_it, goto_functions)
     forall_goto_program_instructions(i_it, f_it->second.body)
       if(i_it->is_assert())
-        goal_map[i_it]=bvt();
+        goal_map[i_it]=exprt::operandst();
 
   // get the conditions for these goals from formula
 
-  literalt assumption_literal=const_literal(true);
+  exprt assumption=true_exprt();
 
   for(symex_target_equationt::SSA_stepst::iterator
       it=equation.SSA_steps.begin();
@@ -73,16 +74,18 @@ void bmct::cover_assertions(const goto_functionst &goto_functions)
   {
     if(it->is_assert())
     {
-      // we just want reachability, i.e., the guard of the instruction,
-      // not the assertion itself
-      literalt l=
-        prop_conv.prop.land(assumption_literal, it->guard_literal);
+      // We just want reachability, i.e., the guard of the instruction,
+      // not the assertion itself. The guard has been converted above.
+      exprt goal=and_exprt(assumption, literal_exprt(it->guard_literal));
 
-      goal_map[it->source.pc].push_back(l);
+      goal_map[it->source.pc].push_back(goal);
     }
     else if(it->is_assume())
-      assumption_literal=
-        prop_conv.prop.land(assumption_literal, it->cond_literal);
+    {
+      // Assumptions have been converted above.
+      assumption=
+        and_exprt(assumption, literal_exprt(it->cond_literal));
+    }
   }
   
   // try to cover those
@@ -96,7 +99,7 @@ void bmct::cover_assertions(const goto_functionst &goto_functions)
       it++)
   {
     // the following is FALSE if the bv is empty
-    literalt condition=prop_conv.prop.lor(it->second);
+    literalt condition=prop_conv.convert(disjunction(it->second));
     cover_goals.add(condition);
   }
 
