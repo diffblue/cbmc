@@ -586,7 +586,13 @@ Function: prop_convt::solve
 
 decision_proceduret::resultt prop_convt::dec_solve()
 {
-  post_process();
+  // post-processing isn't incremental yet
+  if(!post_processing_done)
+  {
+    print(8, "Post-processing");
+    post_process();
+    post_processing_done=true;
+  }
 
   print(7, "Solving with "+prop.solver_text());
 

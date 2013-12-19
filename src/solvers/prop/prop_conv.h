@@ -64,7 +64,9 @@ public:
   prop_convt(const namespacet &_ns, propt &_prop):
     prop_conv_baset(_ns, _prop),
     use_cache(true),
-    equality_propagation(true) { }
+    equality_propagation(true),
+    post_processing_done(false) { }
+
   virtual ~prop_convt() { }
 
   // overloading from decision_proceduret
@@ -85,8 +87,6 @@ public:
   
   friend struct prop_conv_store_constraintt;
 
-  virtual void post_process();
-  
   virtual void clear_cache()
   {
     cache.clear();
@@ -99,6 +99,10 @@ public:
   const symbolst &get_symbols() const { return symbols; }
   
 protected:
+  virtual void post_process();
+  
+  bool post_processing_done;
+
   // get a _boolean_ value from counterexample if not valid
   virtual bool get_bool(const exprt &expr, tvt &value) const;
   
