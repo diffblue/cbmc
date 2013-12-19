@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <solvers/sat/satcheck.h>
 #include <solvers/prop/cover_goals.h>
+#include <solvers/prop/literal_expr.h>
 
 #include <goto-symex/xml_goto_trace.h>
 
@@ -32,7 +33,8 @@ Function: bmct::all_claims
 
 struct goalt
 {
-  bvt bv;
+  // a property holds if all instances of it are true
+  exprt::operandst conjuncts;
   std::string description;
 
   explicit goalt(const goto_programt::instructiont &instruction)
@@ -84,6 +86,7 @@ bool bmct::all_claims(const goto_functionst &goto_functions)
   
   unsigned claim_counter=0;
 
+  // collect all 'instances' of the properties
   for(symex_target_equationt::SSA_stepst::iterator
       it=equation.SSA_steps.begin();
       it!=equation.SSA_steps.end();
@@ -103,7 +106,8 @@ bool bmct::all_claims(const goto_functionst &goto_functions)
         goal_map[claim_id].description=it->comment;
       }
       
-      goal_map[claim_id].bv.push_back(it->cond_literal);
+      goal_map[claim_id].conjuncts.push_back(
+        literal_exprt(it->cond_literal));
     }
   }
   
@@ -121,8 +125,9 @@ bool bmct::all_claims(const goto_functionst &goto_functions)
       it!=goal_map.end();
       it++)
   {
-    // the following is TRUE if the bv is empty
-    literalt p=symex.prop_conv.prop.lnot(symex.prop_conv.prop.land(it->second.bv));
+    // Our goal is to falsify a property.
+    // The following is TRUE if the conjunction is empty.
+    literalt p=!prop_conv.convert(conjunction(it->second.conjuncts));
     cover_goals.add(p);
     cover_goals.goals.back().covered = it->second.covered;
   }

@@ -24,6 +24,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "cbmc_solvers.h"
 
 #include "bv_cbmc.h"
+#include "dimacs.h"
 #include "counterexample_beautification.h"
 #include "version.h"
 
@@ -138,10 +139,10 @@ Function: cbmc_solverst::get_dimacs
  
 cbmc_solverst::solvert* cbmc_solverst::get_dimacs()
 {
-  propt* prop = new dimacs_cnft();
+  dimacs_cnft* prop = new dimacs_cnft();
   prop->set_message_handler(get_message_handler());
 
-  return new cbmc_solver_with_propt(new bv_cbmct(ns, *prop),prop);
+  return new cbmc_solver_with_propt(new dimacst(ns, *prop),prop);
 }
 
 

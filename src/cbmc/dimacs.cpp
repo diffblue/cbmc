@@ -9,10 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <fstream>
 #include <iostream>
 
-#include <solvers/sat/dimacs_cnf.h>
-
-#include "bmc.h"
-#include "bv_cbmc.h"
+#include "dimacs.h"
 
 /*******************************************************************\
 
@@ -26,13 +23,10 @@ Function: bmct::write_dimacs
 
 \*******************************************************************/
 
-bool bmct::write_dimacs(prop_convt& prop_conv)
-{
-  bv_cbmct& bv_cbmc = dynamic_cast<bv_cbmct&>(prop_conv);
-  const std::string &filename=options.get_option("outfile");
-  
+bool dimacst::write_dimacs(const std::string &filename)
+{ 
   if(filename.empty() || filename=="-")
-    return write_dimacs(bv_cbmc,std::cout);
+    return write_dimacs(std::cout);
 
   std::ofstream out(filename.c_str());
   if(!out)
@@ -41,12 +35,12 @@ bool bmct::write_dimacs(prop_convt& prop_conv)
     return false;
   }
 
-  return write_dimacs(bv_cbmc,out);
+  return write_dimacs(out);
 }
 
 /*******************************************************************\
 
-Function: bmct::write_dimacs
+Function: dimacst::write_dimacs
 
   Inputs:
 
@@ -56,19 +50,16 @@ Function: bmct::write_dimacs
 
 \*******************************************************************/
 
-bool bmct::write_dimacs(prop_convt& prop_conv, std::ostream &out)
+bool dimacst::write_dimacs(std::ostream &out)
 {
-  bv_cbmct& bv_cbmc = dynamic_cast<bv_cbmct&>(prop_conv);
-  dimacs_cnft& dimacs_cnf = dynamic_cast<dimacs_cnft&>(bv_cbmc.prop);
+  dec_solve();
 
-  bv_cbmc.dec_solve();
-
-  dimacs_cnf.write_dimacs_cnf(out);
+  dynamic_cast<dimacs_cnft&>(prop).write_dimacs_cnf(out);
 
   // we dump the mapping variable<->literals
   for(prop_convt::symbolst::const_iterator
-      s_it=bv_cbmc.get_symbols().begin();
-      s_it!=bv_cbmc.get_symbols().end();
+      s_it=get_symbols().begin();
+      s_it!=get_symbols().end();
       s_it++)
   {
     if(s_it->second.is_constant())
@@ -80,7 +71,7 @@ bool bmct::write_dimacs(prop_convt& prop_conv, std::ostream &out)
   }
 
   // dump mapping for selected bit-vectors
-  const boolbv_mapt &boolbv_map=bv_cbmc.get_map();
+  const boolbv_mapt &boolbv_map=get_map();
 
   for(boolbv_mapt::mappingt::const_iterator
       m_it=boolbv_map.mapping.begin();

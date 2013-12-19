@@ -77,8 +77,7 @@ protected:
     
   virtual bool decide(prop_convt &prop_conv);
     
-  virtual bool write_dimacs(prop_convt& bv_cbmc);
-  virtual bool write_dimacs(prop_convt& bv_cbmc, std::ostream &out);
+  virtual bool write_dimacs(prop_convt &prop_conv);
   
   // unwinding
   virtual void setup_unwind();
@@ -102,7 +101,7 @@ protected:
   // all claims
   struct goalt
   {
-    bvt bv;
+    exprt::operandst conjuncts;
     std::string description;
     bool covered; //goal reachable?
 

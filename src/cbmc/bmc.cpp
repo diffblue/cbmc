@@ -36,6 +36,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "bmc.h"
 #include "bv_cbmc.h"
+#include "dimacs.h"
 #include "counterexample_beautification.h"
 
 /*******************************************************************\
@@ -537,6 +538,23 @@ bool bmct::decide(prop_convt &prop_conv)
   }
 
   return result;
+}
+
+/*******************************************************************\
+
+Function: bmct::write_dimacs
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool bmct::write_dimacs(prop_convt& prop_conv) {
+  return dynamic_cast<dimacst&>(prop_conv).write_dimacs(
+    options.get_option("outfile"));
 }
 
 /*******************************************************************\

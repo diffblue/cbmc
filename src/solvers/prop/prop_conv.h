@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 
 #include "literal.h"
+#include "literal_expr.h"
 #include "prop.h"
 
 class prop_conv_baset:public decision_proceduret
@@ -47,8 +48,8 @@ public:
   virtual void set_assumptions(const bvt &_assumptions) { prop.set_assumptions(_assumptions); }
   virtual bool has_set_assumptions() const { return prop.has_set_assumptions(); }
 
-  // this will become protected
   //protected:
+  // deliberately protected now to protect lower-level API
   propt &prop;
 };
 
@@ -65,7 +66,9 @@ public:
     prop_conv_baset(_ns, _prop),
     use_cache(true),
     equality_propagation(true),
-    freeze_all(false) { }
+    freeze_all(false),
+    post_processing_done(false) { }
+
   virtual ~prop_convt() { }
 
   // overloading from decision_proceduret
@@ -87,8 +90,6 @@ public:
   
   friend struct prop_conv_store_constraintt;
 
-  virtual void post_process();
-  
   virtual void clear_cache() { cache.clear();}
 
   typedef std::map<irep_idt, literalt> symbolst;
@@ -98,6 +99,10 @@ public:
   const symbolst &get_symbols() const { return symbols; }
   
 protected:
+  virtual void post_process();
+  
+  bool post_processing_done;
+
   // get a _boolean_ value from counterexample if not valid
   virtual bool get_bool(const exprt &expr, tvt &value) const;
   

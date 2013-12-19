@@ -17,7 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <langapi/language_util.h>
 #include <solvers/prop/prop_conv.h>
 #include <solvers/prop/prop.h>
-#include <solvers/flattening/boolbv.h>
+#include <solvers/prop/literal_expr.h>
 
 #include "goto_symex_state.h"
 #include "symex_target_equation.h"
@@ -777,11 +777,15 @@ void symex_target_equationt::convert_assertions(
   if(number_of_assertions==0)
     return;
 
-  exprt::operandst disjuncts;
-  
-  literalt assumption_literal=const_literal(true);
+  // We do (NOT a1) OR (NOT a2) ...
+  // where the a's are the assertions
+  or_exprt::operandst disjuncts;
+  disjuncts.reserve(number_of_assertions+1);
+
+  exprt assumption=true_exprt();
 
   //literal a_k to be added to assertions clauses to de-/activate them for incr. solving
+  //  literalt activation_literal2=prop_conv.convert(exprt(ID_nondet_symbol, bool_typet()));
   literalt activation_literal=prop_conv.prop.new_variable();
 
   //assumptions for incremental solving: (a_0 ... -a_k-1) --> (a_0 ... a_k-1 -a_k)
@@ -797,20 +801,25 @@ void symex_target_equationt::convert_assertions(
       it!=SSA_steps.end(); it++) {
     if(it->is_assert())
     {
-      // do the expression
-      literalt tmp_literal=prop_conv.convert(it->cond_expr);
-      it->cond_literal=prop_conv.prop.limplies(assumption_literal, tmp_literal);
+      implies_exprt implication(
+        assumption,
+        it->cond_expr);
+      
+      // do the conversion
+      it->cond_literal=prop_conv.convert(implication);
+      // store disjunct
       disjuncts.push_back(literal_exprt(!it->cond_literal));
-     }
-    else if(it->is_assume()) {
-      assumption_literal=
-        prop_conv.prop.land(assumption_literal, it->cond_literal);
+    }
+    else if(it->is_assume())
+    {
+      // the assumptions have been converted before
+      assumption=
+        and_exprt(assumption, literal_exprt(it->cond_literal));
     }
   }
 
-  if(!disjuncts.empty()) {
-    prop_conv.set_to_true(disjunction(disjuncts));
-  }
+  // if(!disjuncts.empty())
+  prop_conv.set_to_true(disjunction(disjuncts));
 
   //set assumptions (a_0 ... -a_k) for incremental solving
   prop_conv.set_assumptions(activate_assertions);

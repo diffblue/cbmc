@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 
 #include <solvers/prop/minimize.h>
+#include <solvers/prop/literal_expr.h>
 
 #include "counterexample_beautification.h"
 
@@ -43,7 +44,7 @@ void counterexample_beautificationt::get_minimization_list(
     if(it->is_assignment() &&
        it->assignment_type==symex_targett::STATE)
     {
-      if(!bv_cbmc.prop.l_get(it->guard_literal).is_false())
+      if(!bv_cbmc.l_get(it->guard_literal).is_false())
       {
         const typet &type=it->original_lhs_object.type();
       
@@ -92,8 +93,8 @@ counterexample_beautificationt::get_failed_claim(
       it=equation.SSA_steps.begin();
       it!=equation.SSA_steps.end(); it++)
     if(it->is_assert() &&
-       bv_cbmc.prop.l_get(it->guard_literal).is_true() &&
-       bv_cbmc.prop.l_get(it->cond_literal).is_false())
+       bv_cbmc.l_get(it->guard_literal).is_true() &&
+       bv_cbmc.l_get(it->cond_literal).is_false())
       return it;
   
   assert(false);
@@ -122,7 +123,7 @@ void counterexample_beautificationt::operator()(
   failed=get_failed_claim(bv_cbmc, equation);
   
   // lock the failed assertion
-  bv_cbmc.prop.l_set_to(failed->cond_literal, false);
+  bv_cbmc.set_to(literal_exprt(failed->cond_literal), false);
 
   {
     bv_cbmc.status("Beautifying counterexample (guards)");
