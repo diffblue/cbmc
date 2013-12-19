@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 
 #include "literal.h"
+#include "literal_expr.h"
 #include "prop.h"
 
 class prop_conv_baset:public decision_proceduret
@@ -47,8 +48,8 @@ public:
   virtual void set_assumptions(const bvt &_assumptions) { prop.set_assumptions(_assumptions); }
   virtual bool has_set_assumptions() const { return prop.has_set_assumptions(); }
 
-  // this will become protected
-  //protected:
+protected:
+  // deliberately protected now to protect lower-level API
   propt &prop;
 };
 

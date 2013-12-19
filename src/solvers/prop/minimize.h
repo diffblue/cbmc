@@ -82,11 +82,7 @@ protected:
   prop_convt &prop_conv;
 
   literalt constraint();
-  void block();
-  
-  std::vector<bool> assignment;
-  void save_assignment();
-  void restore_assignment();
+  void fix_objectives();
   
   objectivest::reverse_iterator current;
 };
