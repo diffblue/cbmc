@@ -118,45 +118,6 @@ void cover_goalst::operator()()
 {
   _iterations=_number_covered=0;
   
-  #if 1
-  propt::resultt prop_result;
-  
-  // We use incremental solving, so need to freeze some variables
-  // to prevent them from being eliminated.      
-  freeze_goal_variables();
-
-  // Do post-processing in decision procedure, just once
-  prop_conv.post_process();
-
-  do
-  {
-    // We want (at least) one of the remaining goals, please!
-    _iterations++;
-    
-    constraint();
-    prop_result=prop_conv.prop.prop_solve();
-    
-    switch(prop_result)
-    {
-    case propt::P_UNSATISFIABLE: // DONE
-      break;
-
-    case propt::P_SATISFIABLE:
-      // mark the goals we got
-      mark(); 
-      
-      // notify
-      assignment();
-      break;
-
-    default:
-      error("propositional solver has failed");
-      return;
-    }
-  }
-  while(prop_result==propt::P_SATISFIABLE &&
-        number_covered()<size());
-  #else
   decision_proceduret::resultt dec_result;
   
   // We use incremental solving, so need to freeze some variables
@@ -185,12 +146,11 @@ void cover_goalst::operator()()
       break;
 
     default:
-      error("decision procedure failed");
+      error("decision procedure has failed");
       return;
     }
   }
   while(dec_result==decision_proceduret::D_SATISFIABLE &&
         number_covered()<size());
-  #endif
 }
 
