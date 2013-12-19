@@ -90,6 +90,13 @@ protected:
 
   // for collecting statistics
   virtual void set_to(const exprt &expr, bool value);
+
+  // overloading
+  virtual void set_assumptions(const bvt &_assumptions);
+
+ protected:
+  bvt parent_assumptions;
+
 };
 
 #endif
