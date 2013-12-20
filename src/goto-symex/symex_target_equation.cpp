@@ -785,8 +785,9 @@ void symex_target_equationt::convert_assertions(
   exprt assumption=true_exprt();
 
   //literal a_k to be added to assertions clauses to de-/activate them for incr. solving
-  //  literalt activation_literal2=prop_conv.convert(exprt(ID_nondet_symbol, bool_typet()));
-  literalt activation_literal=prop_conv.prop.new_variable();
+  literalt activation_literal=
+    prop_conv.convert(
+      symbol_exprt("goto_symex::\\act$"+i2string(activate_assertions.size()), bool_typet()));
 
   //assumptions for incremental solving: (a_0 ... -a_k-1) --> (a_0 ... a_k-1 -a_k)
   disjuncts.push_back(literal_exprt(activation_literal));
