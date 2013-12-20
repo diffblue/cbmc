@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 
 #include "dimacs.h"
+#include <solvers/sat/dimacs_cnf.h>
 
 /*******************************************************************\
 
