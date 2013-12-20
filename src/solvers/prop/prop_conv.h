@@ -21,19 +21,18 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "literal_expr.h"
 #include "prop.h"
 
-class prop_conv_baset:public decision_proceduret
+// API that provides a "handle" in the form of a literalt
+// for expressions.
+
+class prop_convt:public decision_proceduret
 {
 public:
-  explicit prop_conv_baset(
-    const namespacet &_ns, propt &_prop):
-    decision_proceduret(_ns), prop(_prop) { }
-  virtual ~prop_conv_baset() { }
+  explicit prop_convt(
+    const namespacet &_ns):
+    decision_proceduret(_ns) { }
+  virtual ~prop_convt() { }
 
-  // overloading from decision_proceduret
-  virtual std::string decision_procedure_text() const
-  { return "propositional reduction"; }
-
-  // conversion
+  // conversion to handle
   virtual literalt convert(const exprt &expr)=0;
   
   inline literalt operator()(const exprt &expr)
@@ -41,43 +40,49 @@ public:
     return convert(expr);
   }
 
-  // selected methods from the lower propt API are passed up
-  virtual tvt l_get(literalt a) const { return prop.l_get(a); }
-  virtual void set_frozen(literalt a) { prop.set_frozen(a); }
+  // specialised variant of get
+  virtual tvt l_get(literalt a) const=0;
+  
+  // incremental solving
+  virtual void set_frozen(literalt a)=0;
   virtual void set_frozen(const bvt &);
-  virtual void set_assumptions(const bvt &_assumptions) { prop.set_assumptions(_assumptions); }
-  virtual bool has_set_assumptions() const { return prop.has_set_assumptions(); }
-
-protected:
-  // deliberately protected now to protect lower-level API
-  propt &prop;
+  virtual void set_assumptions(const bvt &_assumptions)=0;
+  virtual bool has_set_assumptions() const { return false; }
 };
 
 //
-// converts the propositional skeleton
+// an instance of the above that converts the
+// propositional skeleton by passing it to a propt
 //
 
 /*! \brief TO_BE_DOCUMENTED
 */
-class prop_convt:public prop_conv_baset
+class prop_conv_solvert:public prop_convt
 {
 public:
-  prop_convt(const namespacet &_ns, propt &_prop):
-    prop_conv_baset(_ns, _prop),
+  prop_conv_solvert(const namespacet &_ns, propt &_prop):
+    prop_convt(_ns),
     use_cache(true),
     equality_propagation(true),
-    post_processing_done(false) { }
+    post_processing_done(false),
+    prop(_prop) { }
 
-  virtual ~prop_convt() { }
+  virtual ~prop_conv_solvert() { }
 
   // overloading from decision_proceduret
   virtual void set_to(const exprt &expr, bool value);
   virtual decision_proceduret::resultt dec_solve();
   virtual void print_assignment(std::ostream &out) const;
-
+  virtual std::string decision_procedure_text() const
+  { return "propositional reduction"; }
   virtual exprt get(const exprt &expr) const;
 
-  // conversion
+  // overloading from prop_convt
+  using prop_convt::set_frozen;
+  virtual tvt l_get(literalt a) const { return prop.l_get(a); }
+  virtual void set_frozen(literalt a) { prop.set_frozen(a); }
+  virtual void set_assumptions(const bvt &_assumptions) { prop.set_assumptions(_assumptions); }
+  virtual bool has_set_assumptions() const { return prop.has_set_assumptions(); }
   virtual literalt convert(const exprt &expr);
 
   // get literal for expression, if available
@@ -86,8 +91,6 @@ public:
   bool use_cache;
   bool equality_propagation;
   
-  friend struct prop_conv_store_constraintt;
-
   virtual void clear_cache()
   {
     cache.clear();
@@ -121,6 +124,9 @@ protected:
   cachet cache;
   
   virtual void ignoring(const exprt &expr);
+
+  // deliberately protected now to protect lower-level API
+  propt &prop;
 };
 
 #endif
