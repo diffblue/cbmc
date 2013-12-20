@@ -22,7 +22,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
-Function: prop_conv_baset::set_frozen
+Function: prop_convt::set_frozen
 
   Inputs:
 
@@ -32,7 +32,7 @@ Function: prop_conv_baset::set_frozen
 
 \*******************************************************************/
 
-void prop_conv_baset::set_frozen(const bvt &bv)
+void prop_convt::set_frozen(const bvt &bv)
 {
   for(unsigned i=0; i<bv.size(); i++)
     if(!bv[i].is_constant())
@@ -41,7 +41,7 @@ void prop_conv_baset::set_frozen(const bvt &bv)
 
 /*******************************************************************\
 
-Function: prop_convt::literal
+Function: prop_conv_solvert::literal
 
   Inputs:
 
@@ -51,7 +51,7 @@ Function: prop_convt::literal
 
 \*******************************************************************/
 
-bool prop_convt::literal(const exprt &expr, literalt &dest) const
+bool prop_conv_solvert::literal(const exprt &expr, literalt &dest) const
 {
   assert(expr.type().id()==ID_bool);
 
@@ -72,7 +72,7 @@ bool prop_convt::literal(const exprt &expr, literalt &dest) const
 
 /*******************************************************************\
 
-Function: prop_convt::get_literal
+Function: prop_conv_solvert::get_literal
 
   Inputs:
 
@@ -82,7 +82,7 @@ Function: prop_convt::get_literal
 
 \*******************************************************************/
 
-literalt prop_convt::get_literal(const irep_idt &identifier)
+literalt prop_conv_solvert::get_literal(const irep_idt &identifier)
 {
   std::pair<symbolst::iterator, bool> result=
     symbols.insert(std::pair<irep_idt, literalt>(identifier, literalt()));
@@ -104,7 +104,7 @@ literalt prop_convt::get_literal(const irep_idt &identifier)
 
 /*******************************************************************\
 
-Function: prop_convt::get_bool
+Function: prop_conv_solvert::get_bool
 
   Inputs:
 
@@ -114,7 +114,7 @@ Function: prop_convt::get_bool
 
 \*******************************************************************/
 
-bool prop_convt::get_bool(const exprt &expr, tvt &value) const
+bool prop_conv_solvert::get_bool(const exprt &expr, tvt &value) const
 {
   // trivial cases
 
@@ -192,7 +192,7 @@ bool prop_convt::get_bool(const exprt &expr, tvt &value) const
 
 /*******************************************************************\
 
-Function: prop_convt::convert
+Function: prop_conv_solvert::convert
 
   Inputs:
 
@@ -202,7 +202,7 @@ Function: prop_convt::convert
 
 \*******************************************************************/
 
-literalt prop_convt::convert(const exprt &expr)
+literalt prop_conv_solvert::convert(const exprt &expr)
 {
   if(!use_cache || 
      expr.id()==ID_symbol ||
@@ -232,7 +232,7 @@ literalt prop_convt::convert(const exprt &expr)
 
 /*******************************************************************\
 
-Function: prop_convt::convert_bool
+Function: prop_conv_solvert::convert_bool
 
   Inputs:
 
@@ -242,7 +242,7 @@ Function: prop_convt::convert_bool
 
 \*******************************************************************/
 
-literalt prop_convt::convert_bool(const exprt &expr)
+literalt prop_conv_solvert::convert_bool(const exprt &expr)
 {
   if(expr.type().id()!=ID_bool)
   {
@@ -367,7 +367,7 @@ literalt prop_convt::convert_bool(const exprt &expr)
 
 /*******************************************************************\
 
-Function: prop_convt::convert_rest
+Function: prop_conv_solvert::convert_rest
 
   Inputs:
 
@@ -377,7 +377,7 @@ Function: prop_convt::convert_rest
 
 \*******************************************************************/
 
-literalt prop_convt::convert_rest(const exprt &expr)
+literalt prop_conv_solvert::convert_rest(const exprt &expr)
 {
   // fall through
   ignoring(expr);
@@ -386,7 +386,7 @@ literalt prop_convt::convert_rest(const exprt &expr)
 
 /*******************************************************************\
 
-Function: prop_convt::set_equality_to_true
+Function: prop_conv_solvert::set_equality_to_true
 
   Inputs:
 
@@ -396,7 +396,7 @@ Function: prop_convt::set_equality_to_true
 
 \*******************************************************************/
 
-bool prop_convt::set_equality_to_true(const equal_exprt &expr)
+bool prop_conv_solvert::set_equality_to_true(const equal_exprt &expr)
 {
   if(!equality_propagation) return true;
 
@@ -424,7 +424,7 @@ bool prop_convt::set_equality_to_true(const equal_exprt &expr)
 
 /*******************************************************************\
 
-Function: prop_convt::set_to
+Function: prop_conv_solvert::set_to
 
   Inputs:
 
@@ -434,7 +434,7 @@ Function: prop_convt::set_to
 
 \*******************************************************************/
 
-void prop_convt::set_to(const exprt &expr, bool value)
+void prop_conv_solvert::set_to(const exprt &expr, bool value)
 {
   if(expr.type().id()!=ID_bool)
   {
@@ -537,7 +537,7 @@ void prop_convt::set_to(const exprt &expr, bool value)
 
 /*******************************************************************\
 
-Function: prop_convt::ignoring
+Function: prop_conv_solvert::ignoring
 
   Inputs:
 
@@ -547,7 +547,7 @@ Function: prop_convt::ignoring
 
 \*******************************************************************/
 
-void prop_convt::ignoring(const exprt &expr)
+void prop_conv_solvert::ignoring(const exprt &expr)
 {
   // fall through
 
@@ -558,7 +558,7 @@ void prop_convt::ignoring(const exprt &expr)
 
 /*******************************************************************\
 
-Function: prop_convt::post_process
+Function: prop_conv_solvert::post_process
 
   Inputs:
 
@@ -568,13 +568,13 @@ Function: prop_convt::post_process
 
 \*******************************************************************/
 
-void prop_convt::post_process()
+void prop_conv_solvert::post_process()
 {
 }
 
 /*******************************************************************\
 
-Function: prop_convt::solve
+Function: prop_conv_solvert::solve
 
   Inputs:
 
@@ -584,7 +584,7 @@ Function: prop_convt::solve
 
 \*******************************************************************/
 
-decision_proceduret::resultt prop_convt::dec_solve()
+decision_proceduret::resultt prop_conv_solvert::dec_solve()
 {
   // post-processing isn't incremental yet
   if(!post_processing_done)
@@ -610,7 +610,7 @@ decision_proceduret::resultt prop_convt::dec_solve()
 
 /*******************************************************************\
 
-Function: prop_convt::get
+Function: prop_conv_solvert::get
 
   Inputs:
 
@@ -620,7 +620,7 @@ Function: prop_convt::get
 
 \*******************************************************************/
 
-exprt prop_convt::get(const exprt &expr) const
+exprt prop_conv_solvert::get(const exprt &expr) const
 {
   tvt value;
 
@@ -648,7 +648,7 @@ exprt prop_convt::get(const exprt &expr) const
 
 /*******************************************************************\
 
-Function: prop_convt::print_assignment
+Function: prop_conv_solvert::print_assignment
 
   Inputs:
 
@@ -658,7 +658,7 @@ Function: prop_convt::print_assignment
 
 \*******************************************************************/
 
-void prop_convt::print_assignment(std::ostream &out) const
+void prop_conv_solvert::print_assignment(std::ostream &out) const
 {
   for(symbolst::const_iterator it=symbols.begin();
       it!=symbols.end();
