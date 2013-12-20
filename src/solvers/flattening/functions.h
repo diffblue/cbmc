@@ -18,7 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class functionst
 {
 public:
-  explicit functionst(prop_conv_baset &_prop_conv):
+  explicit functionst(prop_convt &_prop_conv):
     prop_conv(_prop_conv) { }
     
   virtual ~functionst()
@@ -34,7 +34,7 @@ public:
   }
   
 protected:
-  prop_conv_baset &prop_conv;
+  prop_convt &prop_conv;
 
   typedef std::set<function_application_exprt> applicationst;
   
