@@ -14,49 +14,35 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <solvers/prop/prop_conv.h>
 #include <solvers/flattening/pointer_logic.h>
 
-#include "cvc_prop.h"
-
-class cvc_prop_wrappert
-{
-public:
-  cvc_prop_wrappert(std::ostream &_out):cvc_prop(_out) { }
-
-protected:
-  cvc_propt cvc_prop;
-};
-
-class cvc_convt:protected cvc_prop_wrappert, public prop_convt
+class cvc_convt:public prop_convt
 {
 public:
   cvc_convt(const namespacet &_ns,
             std::ostream &_out):
-    cvc_prop_wrappert(_out),
-    prop_convt(_ns, cvc_prop),
-    pointer_logic(_ns) { }
+    prop_convt(_ns),
+    out(_out),
+    pointer_logic(_ns),
+    no_boolean_variables(0)
+  {
+  }
 
   virtual ~cvc_convt() { }
 
-protected:
-  virtual literalt convert_rest(const exprt &expr);
-  virtual void convert_cvc_expr(const exprt &expr);
-  virtual void convert_cvc_type(const typet &type);
+  // API methods
   virtual void set_to(const exprt &expr, bool value);
+  virtual literalt convert(const exprt &expr);
+  virtual tvt l_get(const literalt) const;
+  virtual void print_assignment(std::ostream &out) const;
+
+protected:
+  std::ostream &out;
+
+  virtual void convert_expr(const exprt &expr);
+  virtual void convert_type(const typet &type);
   virtual void convert_address_of_rec(const exprt &expr);
 
-  pointer_logict pointer_logic;
-  
-private:
-  void convert_identifier(const std::string &identifier);
-  void find_symbols(const exprt &expr);
-  void find_symbols(const typet &type);
-  void convert_array_value(const exprt &expr);
-  void convert_as_bv(const exprt &expr);
-  void convert_array_index(const exprt &expr);
-  static typet gen_array_index_type();
-  static std::string bin_zero(unsigned bits);
-  static std::string array_index_type();
-  static std::string array_index(unsigned i);
-  static std::string cvc_pointer_type();
+  pointer_logict pointer_logic;  
+  unsigned no_boolean_variables;
   
   struct identifiert
   {
@@ -74,6 +60,22 @@ private:
     identifier_mapt;
 
   identifier_mapt identifier_map;
+  
+  std::vector<bool> boolean_assignment;
+
+private:
+  void convert_identifier(const std::string &identifier);
+  void convert_literal(const literalt l);
+  void find_symbols(const exprt &expr);
+  void find_symbols(const typet &type);
+  void convert_array_value(const exprt &expr);
+  void convert_as_bv(const exprt &expr);
+  void convert_array_index(const exprt &expr);
+  static typet gen_array_index_type();
+  static std::string bin_zero(unsigned bits);
+  static std::string array_index_type();
+  static std::string array_index(unsigned i);
+  static std::string cvc_pointer_type();  
 };
 
 #endif
