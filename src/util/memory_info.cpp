@@ -72,5 +72,6 @@ void memory_info(std::ostream &out)
   malloc_statistics_t t;
   malloc_zone_statistics(NULL, &t);
   out << "  max_size_in_use: " << (double)t.max_size_in_use/1000000 << "m\n";
+  out << "  size_allocated: " << (double)t.size_allocated/1000000 << "m\n";
   #endif
 }

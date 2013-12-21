@@ -189,6 +189,31 @@ public:
   }
 };
 
+/*! \brief Cast a generic exprt to a \ref abs_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * abs_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref abs_exprt
+ *
+ * \ingroup gr_std_expr
+*/
+extern inline const abs_exprt &to_abs_expr(const exprt &expr)
+{
+  assert(expr.id()==ID_abs && expr.operands().size()==1);
+  return static_cast<const abs_exprt &>(expr);
+}
+
+/*! \copydoc to_abs_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
+extern inline abs_exprt &to_abs_expr(exprt &expr)
+{
+  assert(expr.id()==ID_abs && expr.operands().size()==1);
+  return static_cast<abs_exprt &>(expr);
+}
+
 /*! \brief The unary minus expression
 */
 class unary_minus_exprt:public unary_exprt
@@ -205,6 +230,31 @@ public:
   {
   }
 };
+
+/*! \brief Cast a generic exprt to a \ref unary_minus_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * unary_minus_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref unary_minus_exprt
+ *
+ * \ingroup gr_std_expr
+*/
+extern inline const unary_minus_exprt &to_unary_minus_expr(const exprt &expr)
+{
+  assert(expr.id()==ID_unary_minus && expr.operands().size()==1);
+  return static_cast<const unary_minus_exprt &>(expr);
+}
+
+/*! \copydoc to_unary_minus_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
+extern inline unary_minus_exprt &to_unary_minus_expr(exprt &expr)
+{
+  assert(expr.id()==ID_unary_minus && expr.operands().size()==1);
+  return static_cast<unary_minus_exprt &>(expr);
+}
 
 /*! \brief A generic base class for expressions that are predicates,
            i.e., boolean-typed.
