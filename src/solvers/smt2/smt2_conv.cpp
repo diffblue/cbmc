@@ -63,6 +63,8 @@ Function: smt2_convt::l_get
 
 tvt smt2_convt::l_get(const literalt l) const
 {
+  if(l.is_true()) return tvt(true);
+  if(l.is_false()) return tvt(false);
   assert(l.var_no()<boolean_assignment.size());
   return tvt(boolean_assignment[l.var_no()]^l.sign());
 }
@@ -388,10 +390,13 @@ Function: smt2_convt::array_index_type
 
 \*******************************************************************/
 
+#include <iostream>
+
 typet smt2_convt::array_index_type() const
 {
   signedbv_typet t;
   t.set_width(array_index_bits);
+  std::cout << "XX: " << t << std::endl;
   return t;
 }
 
@@ -495,8 +500,8 @@ void smt2_convt::convert_address_of_rec(
 
       mp_integer offset=member_offset(ns, struct_type, component_name);
 
-      typet index_type(ID_unsignedbv);
-      index_type.set(ID_width, boolbv_width(result_type));
+      unsignedbv_typet index_type;
+      index_type.set_width(boolbv_width(result_type));
 
       // pointer arithmetic
       out << "(bvadd ";
@@ -661,12 +666,44 @@ literalt smt2_convt::convert(const exprt &expr)
   literalt l(no_boolean_variables, false);
   no_boolean_variables++;
 
-  out << "; convert " << "\n"
-      << " ";
+  out << "; convert\n";
+  out << "(define-fun ";
+  convert_literal(l);
+  out << " () Bool ";
   convert_expr(expr);
   out << ")" << "\n";
 
   return l;
+}
+
+/*******************************************************************\
+
+Function: smt2_convt::convert_literal
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void smt2_convt::convert_literal(const literalt l)
+{
+  if(l==const_literal(false))
+    out << "false";
+  else if(l==const_literal(true))
+    out << "true";
+
+  if(l.sign())
+    out << "(not ";
+
+  out << "B" << l.var_no();
+  
+  if(l.sign())
+    out << ")";  
+
+  smt2_identifiers.insert("B"+i2string(l.var_no()));
 }
 
 /*******************************************************************\
@@ -3201,9 +3238,8 @@ void smt2_convt::set_to(const exprt &expr, bool value)
         std::string smt2_identifier=convert_identifier(identifier);
         smt2_identifiers.insert(smt2_identifier);
 
-        out << "(define-fun ; set_to true" << "\n"
-                      << " " << smt2_identifier
-                      << " () ";
+        out << "; set_to true\n";
+        out << "(define-fun " << smt2_identifier << " () ";
 
         convert_type(equal_expr.lhs().type());
         out << " ";
@@ -3222,9 +3258,8 @@ void smt2_convt::set_to(const exprt &expr, bool value)
                 << from_expr(expr) << "\n";
   #endif
 
-  out << "(assert ; set_to "
-                << (value?"true":"false") << "\n"
-                << " ";
+  out << "; set_to " << (value?"true":"false") << "\n"
+      << "(assert ";
 
   if(!value)
   {
@@ -3282,6 +3317,7 @@ void smt2_convt::find_symbols(const exprt &expr)
       std::string smt2_identifier=convert_identifier(identifier);
       smt2_identifiers.insert(smt2_identifier);
 
+      out << "; find_symbols\n";
       out << "(declare-fun "
                     << smt2_identifier
                     << " () ";

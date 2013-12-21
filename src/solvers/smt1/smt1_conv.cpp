@@ -64,6 +64,8 @@ Function: smt1_convt::l_get
 
 tvt smt1_convt::l_get(const literalt l) const
 {
+  if(l.is_true()) return tvt(true);
+  if(l.is_false()) return tvt(false);
   assert(l.var_no()<boolean_assignment.size());
   return tvt(boolean_assignment[l.var_no()]^l.sign());
 }
@@ -243,10 +245,12 @@ exprt smt1_convt::ce_value(
   }
   else if(type.id()==ID_array)
   {
+    const typet &subtype=ns.follow(type.subtype());
+  
     // arrays in structs are flat, no index
     if(in_struct)
     {
-      // we can only do fixed-size
+      // we can only do fixed-size arrays
       mp_integer size;
         
       if(!to_integer(to_array_type(type).size(), size))
@@ -263,20 +267,22 @@ exprt smt1_convt::ce_value(
           offset-=sub_width;
           std::string sub_value=value.substr(offset, sub_width);
           array_list.operands()[i]=
-            ce_value(type.subtype(), "", sub_value, true);
+            ce_value(subtype, "", sub_value, true);
         }
         
         return array_list;
       }
     }
-    else if(ns.follow(type.subtype()).id()==ID_array) 
+    else if(subtype.id()==ID_array) 
     {
       // a 2 dimensional array - second dimension is flattened
-      return ce_value(type.subtype(), "", value, true);
+      return ce_value(subtype, "", value, true);
     }
     else
     {
-      exprt value_expr=ce_value(type.subtype(), "", value, in_struct);
+      exprt value_expr=ce_value(subtype, "", value, in_struct);
+      
+      if(index=="") return nil_exprt();
   
       // use index, recusive call
       exprt index_expr=
@@ -594,8 +600,12 @@ literalt smt1_convt::convert(const exprt &expr)
   literalt l(no_boolean_variables, false);
   no_boolean_variables++;
 
+  out << ":extrapreds((";
+  convert_literal(l);
+  out << "))" << "\n";
+  
   out << ":assumption ; convert " << "\n"
-                << " (iff ";
+      << " (iff ";
   convert_literal(l);
   out << " ";
   convert_expr(expr, false);

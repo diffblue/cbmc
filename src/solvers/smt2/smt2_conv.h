@@ -73,6 +73,7 @@ protected:
   // new stuff
   void convert_expr(const exprt &expr);
   void convert_type(const typet &type);
+  void convert_literal(const literalt);
   
   // specific expressions go here
   void convert_byte_update(const exprt &expr);

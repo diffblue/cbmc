@@ -59,6 +59,8 @@ Function: cvc_convt::l_get
 
 tvt cvc_convt::l_get(const literalt l) const
 {
+  if(l.is_true()) return tvt(true);
+  if(l.is_false()) return tvt(false);
   assert(l.var_no()<boolean_assignment.size());
   return tvt(boolean_assignment[l.var_no()]^l.sign());
 }
