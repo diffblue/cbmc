@@ -369,10 +369,10 @@ Function: bmct::decide_mathsat
 
 bool bmct::decide_mathsat()
 {
-  if(options.get_bool_option("smt2"))
-    return decide_smt2(smt2_dect::MATHSAT);
-  else
+  if(options.get_bool_option("smt1"))
     return decide_smt1(smt1_dect::MATHSAT);
+  else
+    return decide_smt2(smt2_dect::MATHSAT);
 }
 
 /*******************************************************************\
@@ -406,7 +406,10 @@ Function: bmct::decide_z3
 
 bool bmct::decide_z3()
 {
-  return decide_smt1(smt1_dect::Z3);
+  if(options.get_bool_option("smt1"))
+    return decide_smt1(smt1_dect::Z3);
+  else
+    return decide_smt2(smt2_dect::Z3);
 }
 
 /*******************************************************************\
