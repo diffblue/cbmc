@@ -22,6 +22,23 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
+Function: prop_convt::is_in_conflict
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool prop_convt::is_in_conflict(literalt l) const
+{
+  assert(false);
+}
+
+/*******************************************************************\
+
 Function: prop_convt::set_assumptions
 
   Inputs:
