@@ -282,21 +282,21 @@ exprt smt2_convt::parse_struct(
   assert(s.find(constructor) == 0);
   p = constructor.length();
 
-  for(unsigned i = 0; i < components.size(); i++)
+  for(unsigned i=0; i<components.size(); i++)
   {
     const struct_typet::componentt &c = components[i];
     const typet &sub_type = ns.follow(c.type());
 
-    if (sub_type.id() == ID_signedbv ||
-        sub_type.id() == ID_unsignedbv ||
-        sub_type.id() == ID_fixedbv ||
-        sub_type.id() == ID_bv ||
-        sub_type.id() == ID_pointer)
+    if(sub_type.id() == ID_signedbv ||
+       sub_type.id() == ID_unsignedbv ||
+       sub_type.id() == ID_fixedbv ||
+       sub_type.id() == ID_bv ||
+       sub_type.id() == ID_pointer)
     {
       // Find the terminating space or ')'.
       size_t end = s.find(' ', p);
 
-      if (end == std::string::npos)
+      if(end == std::string::npos)
       {
         end = s.find(')', p);
       }
@@ -307,9 +307,7 @@ exprt smt2_convt::parse_struct(
       p = end+1;
     }
     else
-    {
-      throw "Unsupported struct member type";
-    }
+      throw "Unsupported struct member type "+sub_type.id_string();
   }
 
   return ret;
