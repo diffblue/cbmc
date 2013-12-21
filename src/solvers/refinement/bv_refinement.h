@@ -28,6 +28,8 @@ public:
 
   // maximal number of times we refine a formula node
   unsigned max_node_refinement;
+  
+  using bv_pointerst::is_in_conflict;
 
 protected:
   resultt prop_solve();
