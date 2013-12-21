@@ -44,9 +44,9 @@ public:
   virtual tvt l_get(literalt a) const=0;
   
   // incremental solving
-  virtual void set_frozen(literalt a)=0;
+  virtual void set_frozen(literalt a);
   virtual void set_frozen(const bvt &);
-  virtual void set_assumptions(const bvt &_assumptions)=0;
+  virtual void set_assumptions(const bvt &_assumptions);
   virtual bool has_set_assumptions() const { return false; }
 };
 

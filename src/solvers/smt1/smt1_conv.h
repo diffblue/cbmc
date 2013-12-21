@@ -20,31 +20,12 @@ Revision: Roberto Bruttomesso, roberto.bruttomesso@unisi.ch
 #include <solvers/flattening/pointer_logic.h>
 #include <solvers/flattening/boolbv_width.h>
 
-#include "smt1_prop.h"
-
-class smt1_prop_wrappert
-{
-public:
-  smt1_prop_wrappert(
-    const std::string &_benchmark,
-    const std::string &_source,
-    const std::string &_logic,
-    std::ostream &_out):
-    smt1_prop(_benchmark, _source, _logic, _out) 
-  { }
-
-protected:
-  smt1_propt smt1_prop;
-};
-
 class typecast_exprt;
 class constant_exprt;
 class index_exprt;
 class member_exprt;
 
-class smt1_convt:
-  protected smt1_prop_wrappert,
-  public prop_convt
+class smt1_convt:public prop_convt
 {
 public:
   smt1_convt(
@@ -53,12 +34,18 @@ public:
     const std::string &_source,
     const std::string &_logic,    
     std::ostream &_out):
-    smt1_prop_wrappert(_benchmark, _source, _logic, _out),
-    prop_convt(_ns, smt1_prop),
+    prop_convt(_ns),
+    benchmark(_benchmark),
+    source(_source),
+    logic(_logic),
+    out(_out),
     boolbv_width(_ns),
     pointer_logic(_ns),
-    array_index_bits(32)
-  { }
+    array_index_bits(32),
+    no_boolean_variables(0)
+  {
+    write_header();
+  }
 
   virtual ~smt1_convt() { }
   virtual resultt dec_solve();
@@ -67,9 +54,17 @@ public:
   virtual literalt convert(const exprt &expr);
   virtual void set_to(const exprt &expr, bool value);
   virtual exprt get(const exprt &expr) const;
+  virtual tvt l_get(const literalt) const;
+  virtual std::string decision_procedure_text() const { return "SMT1"; }
+  virtual void print_assignment(std::ostream &out) const;
 
 protected:
+  std::string benchmark, source, logic;
+  std::ostream &out;
   boolbv_widtht boolbv_width;
+  
+  void write_header();
+  void write_footer();
 
   // new stuff
   void convert_expr(const exprt &expr, bool bool_as_bv);
@@ -100,6 +95,7 @@ protected:
   void convert_update(const exprt &expr);
   
   std::string convert_identifier(const irep_idt &identifier);
+  void convert_literal(const literalt l);
   
   // auxiliary methods
   std::set<irep_idt> quantified_symbols;
@@ -189,6 +185,10 @@ protected:
   void convert_nary(const exprt &expr, 
                     const irep_idt op_string,
                     bool bool_as_bv);
+
+  // Boolean part
+  unsigned no_boolean_variables;
+  std::vector<bool> boolean_assignment;
 };
 
 #endif

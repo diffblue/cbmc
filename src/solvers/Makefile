@@ -84,10 +84,9 @@ SRC = $(CHAFF_SRC) $(BOOLEFORCE_SRC) $(MINISAT_SRC) $(MINISAT2_SRC) \
       prop/cover_goals.cpp \
       prop/aig.cpp prop/aig_prop.cpp prop/minimize.cpp \
       prop/prop_assignment.cpp \
-      cvc/cvc_prop.cpp cvc/cvc_conv.cpp cvc/cvc_dec.cpp \
-      smt1/smt1_dec.cpp smt1/smt1_prop.cpp smt1/smt1_conv.cpp \
-      smt2/smt2_dec.cpp smt2/smt2_prop.cpp smt2/smt2_conv.cpp \
-      dplib/dplib_conv.cpp dplib/dplib_dec.cpp dplib/dplib_prop.cpp \
+      cvc/cvc_conv.cpp cvc/cvc_dec.cpp \
+      smt1/smt1_dec.cpp smt1/smt1_conv.cpp \
+      smt2/smt2_dec.cpp smt2/smt2_conv.cpp \
       flattening/equality.cpp flattening/arrays.cpp \
       flattening/functions.cpp flattening/bv_minimize.cpp \
       flattening/boolbv_width.cpp flattening/boolbv.cpp \

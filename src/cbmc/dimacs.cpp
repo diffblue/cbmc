@@ -69,7 +69,7 @@ bool bmct::write_dimacs(std::ostream &out)
   dimacs_cnf.write_dimacs_cnf(out);
 
   // we dump the mapping variable<->literals
-  for(prop_convt::symbolst::const_iterator
+  for(bv_cbmct::symbolst::const_iterator
       s_it=bv_cbmc.get_symbols().begin();
       s_it!=bv_cbmc.get_symbols().end();
       s_it++)

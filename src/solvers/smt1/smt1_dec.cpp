@@ -113,10 +113,7 @@ decision_proceduret::resultt smt1_dect::dec_solve()
   assert(!dec_solve_was_called);
   dec_solve_was_called=true;
 
-  post_process();
-
   // this closes the SMT benchmark
-  smt1_prop.finalize();
   temp_out.close();
 
   temp_result_filename=
@@ -226,7 +223,8 @@ decision_proceduret::resultt smt1_dect::read_result_boolector(std::istream &in)
 
   if(line=="sat")
   {
-    smt1_prop.reset_assignment();
+    boolean_assignment.clear();
+    boolean_assignment.resize(no_boolean_variables, false);
 
     typedef hash_map_cont<std::string, valuet, string_hash> valuest;
     valuest values;
@@ -281,11 +279,11 @@ decision_proceduret::resultt smt1_dect::read_result_boolector(std::istream &in)
 
     // Booleans
 
-    for(unsigned v=0; v<smt1_prop.no_variables(); v++)
+    for(unsigned v=0; v<no_boolean_variables; v++)
     {
       std::string value=values["B"+i2string(v)].value;
       if(value=="") continue;
-      smt1_prop.set_assignment(literalt(v, false), value=="1");
+      boolean_assignment[v]=(value=="1");
     }
 
     return D_SATISFIABLE;
@@ -392,7 +390,8 @@ decision_proceduret::resultt smt1_dect::read_result_mathsat(std::istream &in)
   std::string line;
   decision_proceduret::resultt res = D_ERROR;
 
-  smt1_prop.reset_assignment();
+  boolean_assignment.clear();
+  boolean_assignment.resize(no_boolean_variables, false);
 
   typedef hash_map_cont<std::string, valuet, string_hash> valuest;
   valuest values;
@@ -444,11 +443,11 @@ decision_proceduret::resultt smt1_dect::read_result_mathsat(std::istream &in)
   }
 
   // Booleans
-  for(unsigned v=0; v<smt1_prop.no_variables(); v++)
+  for(unsigned v=0; v<no_boolean_variables; v++)
   {
     std::string value=values["B"+i2string(v)].value;
     if(value=="") continue;
-    smt1_prop.set_assignment(literalt(v, false), value=="true");
+    boolean_assignment[v]=(value=="true");
   }
 
   return res;
@@ -471,7 +470,8 @@ decision_proceduret::resultt smt1_dect::read_result_z3(std::istream &in)
   std::string line;
   decision_proceduret::resultt res = D_ERROR;
 
-  smt1_prop.reset_assignment();
+  boolean_assignment.clear();
+  boolean_assignment.resize(no_boolean_variables, false);
 
   typedef hash_map_cont<std::string, std::string, string_hash> valuest;
   valuest values;
@@ -509,11 +509,11 @@ decision_proceduret::resultt smt1_dect::read_result_z3(std::istream &in)
   }
 
   // Booleans
-  for(unsigned v=0; v<smt1_prop.no_variables(); v++)
+  for(unsigned v=0; v<no_boolean_variables; v++)
   {
     std::string value=values["B"+i2string(v)];
     if(value=="") continue;
-    smt1_prop.set_assignment(literalt(v, false), value=="true");
+    boolean_assignment[v]=(value=="true");
   }
 
   return res;
@@ -659,7 +659,8 @@ decision_proceduret::resultt smt1_dect::read_result_cvc3(std::istream &in)
   std::string line;
   decision_proceduret::resultt res = D_ERROR;
 
-  smt1_prop.reset_assignment();
+  boolean_assignment.clear();
+  boolean_assignment.resize(no_boolean_variables, false);
 
   typedef hash_map_cont<std::string, std::string, string_hash> valuest;
   valuest values;
@@ -757,11 +758,11 @@ decision_proceduret::resultt smt1_dect::read_result_cvc3(std::istream &in)
   }
 
   // Booleans
-  for(unsigned v=0; v<smt1_prop.no_variables(); v++)
+  for(unsigned v=0; v<no_boolean_variables; v++)
   {
     std::string value=values["B"+i2string(v)];
     if(value=="") continue;
-    smt1_prop.set_assignment(literalt(v, false), value=="true");
+    boolean_assignment[v]=(value=="true");
   }
 
   return res;

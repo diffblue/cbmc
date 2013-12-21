@@ -22,6 +22,40 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
+Function: prop_convt::set_assumptions
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void prop_convt::set_assumptions(const bvt &)
+{
+  assert(false);
+}
+
+/*******************************************************************\
+
+Function: prop_convt::set_frozen
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void prop_convt::set_frozen(const literalt)
+{
+  assert(false);
+}
+
+/*******************************************************************\
+
 Function: prop_convt::set_frozen
 
   Inputs:

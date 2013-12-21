@@ -86,11 +86,9 @@ Function: cvc_dect::dec_solve
 
 decision_proceduret::resultt cvc_dect::dec_solve()
 {
-  cvc_prop.out << "QUERY FALSE;" << std::endl;
-  cvc_prop.out << "COUNTERMODEL;" << std::endl;
+  out << "QUERY FALSE;" << std::endl;
+  out << "COUNTERMODEL;" << std::endl;
   
-  post_process();
-
   temp_out.close();
 
   temp_result_filename=
@@ -154,12 +152,12 @@ void cvc_dect::read_assert(std::istream &in, std::string &line)
   else
   {
     // boolean
-    tvt value=tvt(true);
+    bool value=true;
     
     if(has_prefix(line, "NOT "))
     {
       line=std::string(line, strlen("NOT "), std::string::npos);
-      value=tvt(false);
+      value=false;
     }
     
     if(line=="") return;
@@ -167,8 +165,9 @@ void cvc_dect::read_assert(std::istream &in, std::string &line)
     if(line[0]=='l')
     {
       unsigned number=atoi(line.c_str()+1);
-      assert(number<cvc_prop.no_variables());
-      cvc_prop.assignment[number]=value;
+      assert(number<no_boolean_variables);
+      assert(no_boolean_variables==boolean_assignment.size());
+      boolean_assignment[number]=value;
     }
   }
 }
@@ -195,7 +194,8 @@ decision_proceduret::resultt cvc_dect::read_cvcl_result()
   {
     if(has_prefix(line, "Invalid."))
     {
-      cvc_prop.reset_assignment();
+      boolean_assignment.clear();
+      boolean_assignment.resize(no_boolean_variables);
     
       while(std::getline(in, line))
       {
