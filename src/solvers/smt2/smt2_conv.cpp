@@ -390,13 +390,10 @@ Function: smt2_convt::array_index_type
 
 \*******************************************************************/
 
-#include <iostream>
-
 typet smt2_convt::array_index_type() const
 {
   signedbv_typet t;
   t.set_width(array_index_bits);
-  std::cout << "XX: " << t << std::endl;
   return t;
 }
 
