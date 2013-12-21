@@ -114,6 +114,7 @@ decision_proceduret::resultt smt1_dect::dec_solve()
   dec_solve_was_called=true;
 
   // this closes the SMT benchmark
+  write_footer();
   temp_out.close();
 
   temp_result_filename=
@@ -347,7 +348,7 @@ decision_proceduret::resultt smt1_dect::read_result_yices(std::istream &in)
 
 /*******************************************************************\
 
-Function: smt1_dect::read_result_mathsat
+Function: smt1_dect::mathsat_value
 
   Inputs:
 
@@ -404,6 +405,7 @@ decision_proceduret::resultt smt1_dect::read_result_mathsat(std::istream &in)
       res=D_UNSATISFIABLE;
     else if(line.size()>=1 && line[0]=='(')
     {
+      // (iff B0 true)
       // (= c_h39__h39___CPROVER_malloc_size_h39_35_h39_1 bv0[64])
       // (= (select __h64_0 bv0[32]) bv5[8])
       std::size_t pos1=line.find(' ');
