@@ -1133,8 +1133,8 @@ void smt2_convt::convert_expr(const exprt &expr)
       out << "((_ zero_extend " << ext << ") ";
 
     out << "((_ extract "
-                  << pointer_width-1 << " "
-                  << pointer_width-BV_ADDR_BITS << ") ";
+        << pointer_width-1 << " "
+        << pointer_width-BV_ADDR_BITS << ") ";
     convert_expr(expr.op0());
     out << ")";
 
@@ -1151,11 +1151,11 @@ void smt2_convt::convert_expr(const exprt &expr)
 
     unsigned pointer_width=boolbv_width(expr.op0().type());
     out << "(= ((_ extract "
-                  << pointer_width-1 << " "
-                  << pointer_width-BV_ADDR_BITS << ") ";
+        << pointer_width-1 << " "
+        << pointer_width-BV_ADDR_BITS << ") ";
     convert_expr(expr.op0());
     out << ") (_ bv" << pointer_logic.get_invalid_object()
-                  << " " << BV_ADDR_BITS << "))";
+        << " " << BV_ADDR_BITS << "))";
   }
   else if(expr.id()=="pointer_object_has_type")
   {
@@ -1288,7 +1288,7 @@ void smt2_convt::convert_expr(const exprt &expr)
       throw "conversion failed";
 
     out << "(_ bv" << op_width/8
-                  << " " << result_width << ")";
+        << " " << result_width << ")";
   }
   else if(expr.id()==ID_abs)
   {
@@ -1328,14 +1328,14 @@ void smt2_convt::convert_expr(const exprt &expr)
 
       if(use_FPA_theory)
       {
-          out << "(ite (fp.lt ";
-          convert_expr(expr.op0());
-          out << " (fp 0x0 0x0 0x0)";
-          out << "(fp.neg ";
-          convert_expr(expr.op0());
-          out << ") ";
-          convert_expr(expr.op0());
-          out << ")";
+        out << "(ite (fp.lt ";
+        convert_expr(expr.op0());
+        out << " (fp 0x0 0x0 0x0)";
+        out << "(fp.neg ";
+        convert_expr(expr.op0());
+        out << ") ";
+        convert_expr(expr.op0());
+        out << ")";
       }
       else
       {
@@ -1344,8 +1344,8 @@ void smt2_convt::convert_expr(const exprt &expr)
         out << "(bvand ";
         convert_expr(expr.op0());
         out << " (_ bv"
-                      << (power(2, result_width-1)-1)
-                      << " " << result_width << "))";
+            << (power(2, result_width-1)-1)
+            << " " << result_width << "))";
       }
     }
     else
@@ -1367,7 +1367,7 @@ void smt2_convt::convert_expr(const exprt &expr)
         out << "(= ";
         convert_expr(expr.op0());
         out << " (_ NaN " << floatbv_type.get_e()
-                      << " " << floatbv_type.get_f() + 1 << "))";
+            << " " << floatbv_type.get_f() + 1 << "))";
       }
       else
       {
@@ -1391,15 +1391,15 @@ void smt2_convt::convert_expr(const exprt &expr)
       const floatbv_typet &floatbv_type=to_floatbv_type(op_type);
       if(use_FPA_theory)
       {
-          size_t e = floatbv_type.get_e();
-          size_t f = floatbv_type.get_f() + 1;
-          out << "(let ((?op ";
-          convert_expr(expr.op0());
-          out << ")) ";
-          out << "(and ";
-          out << "(fp.lt (_ -oo " << e << " " << f << ") ?op) ";
-          out << "(fp.lt ?op (_ +oo " << e << " " << f << ")))";
-          out << ")";
+        size_t e = floatbv_type.get_e();
+        size_t f = floatbv_type.get_f() + 1;
+        out << "(let ((?op ";
+        convert_expr(expr.op0());
+        out << ")) ";
+        out << "(and ";
+        out << "(fp.lt (_ -oo " << e << " " << f << ") ?op) ";
+        out << "(fp.lt ?op (_ +oo " << e << " " << f << ")))";
+        out << ")";
       }
       else
       {
@@ -1423,16 +1423,16 @@ void smt2_convt::convert_expr(const exprt &expr)
       const floatbv_typet &floatbv_type=to_floatbv_type(op_type);
       if(use_FPA_theory)
       {
-          size_t e = floatbv_type.get_e();
-          size_t f = floatbv_type.get_f() + 1;
-          out << "(let ((?op ";
-          convert_expr(expr.op0());
-          out << ")) ";
-          out << "(or "
-                        << "(= ?op (_ NaN " << e << " " << f << "))"
-                        << "(= ?op (_ +oo " << e << " " << f << "))"
-                        << "(= ?op (_ -oo " << e << " " << f << "))"
-                        << "))";
+        size_t e = floatbv_type.get_e();
+        size_t f = floatbv_type.get_f() + 1;
+        out << "(let ((?op ";
+        convert_expr(expr.op0());
+        out << ")) ";
+        out << "(or "
+            << "(= ?op (_ NaN " << e << " " << f << "))"
+            << "(= ?op (_ +oo " << e << " " << f << "))"
+            << "(= ?op (_ -oo " << e << " " << f << "))"
+            << "))";
       }
       else
       {
@@ -1547,12 +1547,17 @@ void smt2_convt::convert_expr(const exprt &expr)
     defined_expressionst::const_iterator it=defined_expressions.find(expr);
     assert(it!=defined_expressions.end());
     out << it->second;
-  } else if(expr.id() == ID_forall || expr.id() == ID_exists) {
-    if (expr.id() == ID_forall) {
+  }
+  else if(expr.id()==ID_literal)
+  {
+    convert_literal(to_literal_expr(expr).get_literal());
+  }
+  else if(expr.id() == ID_forall || expr.id() == ID_exists)
+  {
+    if (expr.id() == ID_forall)
       out << "(forall ";
-    } else if (expr.id() == ID_exists) {
+    else if (expr.id() == ID_exists)
       out << "(exists ";
-    }
 
     exprt bound = expr.op0();
 
@@ -1631,7 +1636,7 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
           out << "((_ zero_extend ";
 
         out << (to_width-from_width)
-                      << ") "; // ind
+            << ") "; // ind
         convert_expr(op);
         out << ")";
       }
@@ -1653,16 +1658,16 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
       if(to_width>from_integer_bits)
       {
         out << "((_ sign_extend "
-                      << (to_width-from_integer_bits) << ") ";
+            << (to_width-from_integer_bits) << ") ";
         out << "((_ extract " << (from_width-1) << " "
-                      << from_fraction_bits << ") ";
+            << from_fraction_bits << ") ";
         convert_expr(op);
         out << "))";
       }
       else
       {
         out << "((_ extract " << (from_fraction_bits+to_width-1)
-                      << " " << from_fraction_bits << ") ";
+            << " " << from_fraction_bits << ") ";
         convert_expr(op);
         out << ")";
       }
@@ -1689,9 +1694,9 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
       {
         fixedbv_spect spec(to_fixedbv_type(expr_type));
         out << " (concat (_ bv1 "
-                      << spec.integer_bits << ") " <<
-                         "(_ bv0 " << spec.get_fraction_bits() << ")) " <<
-                         "(_ bv0 " << spec.width << ")";
+            << spec.integer_bits << ") " <<
+               "(_ bv0 " << spec.get_fraction_bits() << ")) " <<
+               "(_ bv0 " << spec.width << ")";
       }
       else
       {
@@ -1709,7 +1714,7 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
       {
         out << "((_ sign_extend ";
         out << (to_width-from_width)
-                      << ") ";
+            << ") ";
         convert_expr(op);
         out << ")";
       }
@@ -1769,14 +1774,14 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
         if(expr_type.id()==ID_unsignedbv)
         {
           out << "(_ zero_extend "
-                        << (to_integer_bits-from_width) << ") ";
+              << (to_integer_bits-from_width) << ") ";
           convert_expr(op);
           out << ")";
         }
         else
         {
           out << "((_ sign_extend "
-                        << (to_integer_bits-from_width) << ") ";
+              << (to_integer_bits-from_width) << ") ";
           convert_expr(op);
           out << ")";
         }
@@ -1788,12 +1793,12 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
     else if(op_type.id()==ID_bool)
     {
       out << "(concat (concat"
-                    << " (_ bv0 " << (to_integer_bits-1) << ")"
-                    << " (ite ";
+          << " (_ bv0 " << (to_integer_bits-1) << ")"
+          << " (ite ";
       convert_expr(op); // this returns a Bool
       out << " bit1 bit0)) (_ bv0 "
-                    << to_fraction_bits
-                    << "))";
+          << to_fraction_bits
+          << "))";
     }
     else if(op_type.id()==ID_fixedbv)
     {
@@ -1808,9 +1813,9 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
       if(to_integer_bits<=from_integer_bits)
       {
         out << "((_ extract "
-                      << (from_fraction_bits+to_integer_bits-1) << " "
-                      << from_fraction_bits
-                      << ") ";
+            << (from_fraction_bits+to_integer_bits-1) << " "
+            << from_fraction_bits
+            << ") ";
         convert_expr(op);
         out << ")";
       }
@@ -1818,11 +1823,11 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
       {
         assert(to_integer_bits>from_integer_bits);
         out << "((_ sign_extend "
-                      << (to_integer_bits-from_integer_bits)
-                      << ") ((_ extract "
-                      << (from_width-1) << " "
-                      << from_fraction_bits
-                      << ") ";
+            << (to_integer_bits-from_integer_bits)
+            << ") ((_ extract "
+            << (from_width-1) << " "
+            << from_fraction_bits
+            << ") ";
         convert_expr(op);
         out << "))";
       }
@@ -1832,9 +1837,9 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
       if(to_fraction_bits<=from_fraction_bits)
       {
         out << "((_ extract "
-                      << (from_fraction_bits-1) << " "
-                      << (from_fraction_bits-to_fraction_bits)
-                      << ") ";
+            << (from_fraction_bits-1) << " "
+            << (from_fraction_bits-to_fraction_bits)
+            << ") ";
         convert_expr(op);
         out << ")";
       }
@@ -1842,11 +1847,11 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
       {
         assert(to_fraction_bits>from_fraction_bits);
         out << "(concat ((_ extract "
-                      << (from_fraction_bits-1) << " 0) ";
+            << (from_fraction_bits-1) << " 0) ";
         convert_expr(op);
         out << ")"
-                      << " (_ bv0 " << to_fraction_bits-from_fraction_bits
-                      << "))";
+            << " (_ bv0 " << to_fraction_bits-from_fraction_bits
+            << "))";
       }
 
       out << ")"; // concat
@@ -1875,8 +1880,8 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
       else if(from_width<to_width)
       {
         out << "((_ sign_extend "
-                      << (to_width-from_width)
-                      << ") ";
+            << (to_width-from_width)
+            << ") ";
         convert_expr(op);
         out << ")"; // sign_extend
       }
@@ -1904,7 +1909,7 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
       if(use_FPA_theory)
       {
         out << "((_ to_fp " << dst.get_e() << " "
-                      << dst.get_f() + 1 << ") roundNearestTiesToEven ";
+            << dst.get_f() + 1 << ") roundNearestTiesToEven ";
         convert_expr(op);
         out << ")";
       }
@@ -1920,7 +1925,7 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
       if(use_FPA_theory)
       {
         out << "((_ to_fp " << dst.get_e() << " "
-                      << dst.get_f() + 1 << ") roundNearestTiesToEven ";
+            << dst.get_f() + 1 << ") roundNearestTiesToEven ";
         convert_expr(op);
         out << ")";
       }
@@ -1937,7 +1942,7 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
       if(use_FPA_theory)
       {
         out << "((_ to_fp_unsigned " << dst.get_e() << " "
-                      << dst.get_f() + 1 << ") roundNearestTiesToEven ";
+            << dst.get_f() + 1 << ") roundNearestTiesToEven ";
         convert_expr(op);
         out << ")";
       }
@@ -2048,7 +2053,7 @@ void smt2_convt::convert_union(const exprt &expr)
     assert(total_width>member_width);
     out << "(concat ";
     out << "(_ bv0 "
-                  << (total_width-member_width) << ") ";
+        << (total_width-member_width) << ") ";
     // TODO: deal with boolean
     convert_expr(op);
     out << ")";
@@ -2084,7 +2089,7 @@ void smt2_convt::convert_constant(const constant_exprt &expr)
     if(value<0) value=power(2, width)+value;
 
     out << "(_ bv" << value
-                  << " " << width << ")";
+        << " " << width << ")";
   }
   else if(expr.type().id()==ID_fixedbv)
   {
@@ -2116,7 +2121,7 @@ void smt2_convt::convert_constant(const constant_exprt &expr)
       mp_integer binary = v.pack();
 
       out << "((_ to_fp " << e << " " << f << ")"
-		    << " #b" << integer2binary(v.pack(), v.spec.width()) << ")";
+          << " #b" << integer2binary(v.pack(), v.spec.width()) << ")";
 #endif
 
       if (v.is_NaN())
@@ -2126,14 +2131,9 @@ void smt2_convt::convert_constant(const constant_exprt &expr)
       else if (v.is_infinity())
       {
 	if (v.get_sign())
-	{
 	  out << "(_ -oo " << e << " " << f << ")";
-	}
 	else
-	{
 	  out << "(_ +oo " << e << " " << f << ")";
-	}
-
       }
       else
       {
@@ -2142,11 +2142,10 @@ void smt2_convt::convert_constant(const constant_exprt &expr)
 	mp_integer binary = v.pack();
 	std::string binaryString(integer2binary(v.pack(), v.spec.width()));
 
-	
 	out << "(fp "
-		      << "#b" << binaryString.substr(0,1) << " "
-		      << "#b" << binaryString.substr(1,e) << " "
-		      << "#b" << binaryString.substr(1+e,f-1) << ")";
+            << "#b" << binaryString.substr(0,1) << " "
+            << "#b" << binaryString.substr(1,e) << " "
+            << "#b" << binaryString.substr(1+e,f-1) << ")";
       }
     }
     else
@@ -2167,7 +2166,7 @@ void smt2_convt::convert_constant(const constant_exprt &expr)
     if(value==ID_NULL)
     {
       out << "(_ bv0 " << boolbv_width(expr.type())
-                    << ")";
+          << ")";
     }
     else
       throw "unknown pointer constant: "+id2string(value);
@@ -2197,7 +2196,7 @@ void smt2_convt::convert_constant(const constant_exprt &expr)
     else
     {
       out << "(/ " << value.substr(0,pos) << ".0 "
-                             << value.substr(pos+1) << ".0)";
+                   << value.substr(pos+1) << ".0)";
     }
   }
   else if(expr.type().id()==ID_integer)
@@ -2267,15 +2266,15 @@ void smt2_convt::convert_is_dynamic_object(const exprt &expr)
     unsigned pointer_width=boolbv_width(expr.op0().type());
   
     out << "(let ((?obj ((_ extract " 
-                  << pointer_width-1 << " "
-                  << pointer_width-BV_ADDR_BITS << ") ";
+        << pointer_width-1 << " "
+        << pointer_width-BV_ADDR_BITS << ") ";
     convert_expr(expr.op0());
     out << "))) ";
 
     if(dynamic_objects.size()==1)
     {
       out << "(= (_ bv" << dynamic_objects.front()
-                    << " " << BV_ADDR_BITS << ") ?obj)";
+          << " " << BV_ADDR_BITS << ") ?obj)";
     }
     else
     {
@@ -2286,7 +2285,7 @@ void smt2_convt::convert_is_dynamic_object(const exprt &expr)
           it!=dynamic_objects.end();
           it++)
         out << " (= (_ bv" << *it
-                      << " " << BV_ADDR_BITS << ") ?obj)";
+            << " " << BV_ADDR_BITS << ") ?obj)";
 
       out << ")"; // or
     }
@@ -2807,8 +2806,8 @@ void smt2_convt::convert_mult(const mult_exprt &expr)
     unsigned fraction_bits=spec.get_fraction_bits();
 
     out << "((_ extract "
-                  << spec.width+fraction_bits-1 << " "
-                  << fraction_bits << ") ";
+        << spec.width+fraction_bits-1 << " "
+        << fraction_bits << ") ";
 
     out << "(bvmul ";
 
@@ -2978,8 +2977,8 @@ void smt2_convt::convert_with(const exprt &expr)
       assert(total_width>member_width);
       out << "(concat ";
       out << "((_ extract "
-                    << (total_width-1)
-                    << " " << member_width << ") ";
+          << (total_width-1)
+          << " " << member_width << ") ";
       convert_expr(expr.op0());
       out << ") ";
       // TODO: need to deal with booleans
@@ -3117,8 +3116,8 @@ void smt2_convt::convert_member(const member_exprt &expr)
     const std::string smt_typename = type_map.find(struct_type)->second;
 
     out << "(" << smt_typename << "."
-                  << struct_type.get_component(name).get_name()
-                  << " ";
+        << struct_type.get_component(name).get_name()
+        << " ";
     convert_expr(struct_op);
     out << ")";
   }
@@ -3137,8 +3136,8 @@ void smt2_convt::convert_member(const member_exprt &expr)
         throw "failed to get union member width";
 
       out << "((_ extract "
-                    << (width-1)
-                    << " 0) ";
+          << (width-1)
+          << " 0) ";
       convert_expr(struct_op);
       out << ")";
     }
@@ -3252,7 +3251,7 @@ void smt2_convt::set_to(const exprt &expr, bool value)
 
   #if 0
   out << "; CONV: "
-                << from_expr(expr) << "\n";
+      << from_expr(expr) << "\n";
   #endif
 
   out << "; set_to " << (value?"true":"false") << "\n"
@@ -3316,8 +3315,8 @@ void smt2_convt::find_symbols(const exprt &expr)
 
       out << "; find_symbols\n";
       out << "(declare-fun "
-                    << smt2_identifier
-                    << " () ";
+          << smt2_identifier
+          << " () ";
       convert_type(expr.type());
       out << ")" << "\n";
     }
@@ -3357,7 +3356,7 @@ void smt2_convt::find_symbols(const exprt &expr)
       for(unsigned i=0; i<expr.operands().size(); i++)
       {
         out << "(assert (= (select " << id 
-                      << " (_ bv" << i << " " << array_index_bits << ")) ";
+            << " (_ bv" << i << " " << array_index_bits << ")) ";
         convert_expr(expr.operands()[i]);
         out << "))" << "\n";
       }
@@ -3381,7 +3380,7 @@ void smt2_convt::find_symbols(const exprt &expr)
       for(unsigned i=0; i<tmp.operands().size(); i++)
       {
         out << "(assert (= (select " << id 
-                      << " (_ bv" << i << " " << array_index_bits << ")) ";
+            << " (_ bv" << i << " " << array_index_bits << ")) ";
         convert_expr(tmp.operands()[i]);
         out << "))" << "\n";
       }
@@ -3463,7 +3462,7 @@ void smt2_convt::convert_type(const typet &type)
           type.id()==ID_reference)
   {
     out << "(_ BitVec "
-                  << boolbv_width(type) << ")";
+        << boolbv_width(type) << ")";
   }
   else if(type.id()==ID_bv ||
           type.id()==ID_fixedbv ||
@@ -3472,7 +3471,7 @@ void smt2_convt::convert_type(const typet &type)
           type.id()==ID_c_enum)
   {
     out << "(_ BitVec "
-                  << to_bitvector_type(type).get_width() << ")";
+        << to_bitvector_type(type).get_width() << ")";
   }
   else if(type.id()==ID_floatbv)
   {
@@ -3480,11 +3479,11 @@ void smt2_convt::convert_type(const typet &type)
   
     if(use_FPA_theory)
       out << "(_ FloatingPoint "
-                    << floatbv_type.get_e() << " "
-                    << floatbv_type.get_f() + 1 << ")";
+          << floatbv_type.get_e() << " "
+          << floatbv_type.get_f() + 1 << ")";
     else
       out << "(_ BitVec "
-                    << floatbv_type.get_width() << ")";
+          << floatbv_type.get_width() << ")";
   }
   else if(type.id()==ID_rational)
     out << "Real";
@@ -3492,10 +3491,10 @@ void smt2_convt::convert_type(const typet &type)
     out << "Int";
   else if(type.id()==ID_symbol)
     convert_type(ns.follow(type));
-  else {
+  else
+  {
     throw "unsupported type: "+type.id_string();
   }
-
 }
 
 /*******************************************************************\
@@ -3567,7 +3566,7 @@ void smt2_convt::find_symbols_rec(
        //                                   ...
        //                                   (struct.0.componentN typeN)))))
        out << "(declare-datatypes () ((" << smt_typename << " "
-                     << "(mk-" << smt_typename << " ";
+           << "(mk-" << smt_typename << " ";
 
        for (unsigned i = 0; i < components.size(); i++)
        {
@@ -3598,13 +3597,13 @@ void smt2_convt::find_symbols_rec(
        {
          const struct_union_typet::componentt &component = components[i];
          out << "(define-fun update-" << smt_typename << "."
-                       << component.get_name() << " "
-                       << "((s " << smt_typename << ") "
-                       <<  "(v ";
+             << component.get_name() << " "
+             << "((s " << smt_typename << ") "
+             <<  "(v ";
          convert_type(component.type());
          out << ")) " << smt_typename << " "
-                       << "(mk-" << smt_typename
-                       << " ";
+             << "(mk-" << smt_typename
+             << " ";
 
          for (unsigned j = 0; j < components.size(); j++)
          {
@@ -3615,7 +3614,7 @@ void smt2_convt::find_symbols_rec(
            else
            {
              out << "(" << smt_typename << "."
-                           << components[j].get_name() << " s) ";
+                 << components[j].get_name() << " s) ";
            }
          }
 
