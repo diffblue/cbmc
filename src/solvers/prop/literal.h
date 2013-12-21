@@ -22,12 +22,12 @@ class literalt
 {
 public:
   // constructors
-  literalt()
+  inline literalt()
   {
     set(unused_var_no(), false);
   }
 
-  literalt(unsigned v, bool sign)
+  inline literalt(unsigned v, bool sign)
   {
     set(v, sign);
   }
@@ -122,7 +122,7 @@ public:
     set(d, sign);
   }
   
-  void clear()
+  inline void clear()
   {
     l=0;
   }
