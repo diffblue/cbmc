@@ -1277,8 +1277,7 @@ void smt2_convt::convert_expr(const exprt &expr)
       throw "replication takes constant as first parameter";
 
     out << "((_ repeat " << times << ") ";
-    // todo: need to deal with boolean
-    convert_expr(expr.op1());
+    bool2bv(expr.op1());
     out << ")";
   }
   else if(expr.id()==ID_byte_extract_little_endian ||
@@ -1814,10 +1813,9 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
     else if(op_type.id()==ID_bool)
     {
       out << "(concat (concat"
-          << " (_ bv0 " << (to_integer_bits-1) << ")"
-          << " (ite ";
-      convert_expr(op); // this returns a Bool
-      out << " bit1 bit0)) (_ bv0 "
+          << " (_ bv0 " << (to_integer_bits-1) << ")";
+      bool2bv(op); // produces bit0 or bit1
+      out << ") (_ bv0 "
           << to_fraction_bits
           << "))";
     }
@@ -2079,8 +2077,7 @@ void smt2_convt::convert_union(const exprt &expr)
 
   if(total_width==member_width)
   {
-    // TODO: deal with boolean
-    convert_expr(op);
+    bool2bv(op);
   }
   else
   {
@@ -2089,8 +2086,7 @@ void smt2_convt::convert_union(const exprt &expr)
     out << "(concat ";
     out << "(_ bv0 "
         << (total_width-member_width) << ") ";
-    // TODO: deal with boolean
-    convert_expr(op);
+    bool2bv(op);
     out << ")";
   }
 }
@@ -3012,8 +3008,7 @@ void smt2_convt::convert_with(const exprt &expr)
 
     if(total_width==member_width)
     {
-      // TODO: need to deal with booleans
-      convert_expr(value);
+      bool2bv(value);
     }
     else
     {
@@ -3024,8 +3019,7 @@ void smt2_convt::convert_with(const exprt &expr)
           << " " << member_width << ") ";
       convert_expr(expr.op0());
       out << ") ";
-      // TODO: need to deal with booleans
-      convert_expr(value);
+      bool2bv(value);
       out << ")";
     }
   }
@@ -3119,11 +3113,24 @@ void smt2_convt::convert_index(const index_exprt &expr)
 {
   assert(expr.operands().size()==2);
 
-  out << "(select ";
-  convert_expr(expr.array());
-  out << " ";
-  array_index(expr.index());
-  out << ")";
+  if(ns.follow(expr.type()).id()==ID_bool && !use_array_of_bool)
+  {
+    out << "(= ";
+    out << "(select ";
+    convert_expr(expr.array());
+    out << " ";
+    array_index(expr.index());
+    out << ")";
+    out << " bit1 bit0)";
+  }
+  else
+  {
+    out << "(select ";
+    convert_expr(expr.array());
+    out << " ";
+    array_index(expr.index());
+    out << ")";
+  }
 }
 
 /*******************************************************************\
@@ -3174,10 +3181,15 @@ void smt2_convt::convert_member(const member_exprt &expr)
   }
   else if(struct_op_type.id()==ID_union)
   {
-    if(expr.type().id()==ID_signedbv ||
-       expr.type().id()==ID_unsignedbv ||
-       expr.type().id()==ID_fixedbv ||
-       expr.type().id()==ID_bv)
+    if(expr.type().id()==ID_bool)
+    {
+      out << "(= ";
+      out << "((_ extract 0 0) ";
+      convert_expr(struct_op);
+      out << ")";
+      out << " bit1)";
+    }
+    else
     {
       boolbv_widtht boolbv_width(ns);
     
@@ -3192,19 +3204,57 @@ void smt2_convt::convert_member(const member_exprt &expr)
       convert_expr(struct_op);
       out << ")";
     }
-    else if(expr.type().id()==ID_bool)
-    {
-      out << "(= ";
-      out << "((_ extract 0 0) ";
-      convert_expr(struct_op);
-      out << ")";
-      out << " bit1)";
-    }
-    else
-      throw "union member not implemented";
   }
   else
     assert(false);
+}
+
+/*******************************************************************\
+
+Function: smt2_convt::bool2bv
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void smt2_convt::bool2bv(const exprt &expr)
+{
+  if(ns.follow(expr.type()).id()==ID_bool)
+  {
+    out << "(ite ";
+    convert_expr(expr); // this returns a Bool
+    out << " bit1 bit0)";
+  }
+  else
+    convert_expr(expr);
+}
+
+/*******************************************************************\
+
+Function: smt2_convt::bv2bool
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void smt2_convt::bv2bool(const exprt &expr)
+{
+  if(ns.follow(expr.type()).id()==ID_bool)
+  {
+    out << "(= "; // produces a bool
+    convert_expr(expr); // assumed to produce bit0 or bit1
+    out << " bit1)";
+  }
+  else
+    convert_expr(expr);
 }
 
 /*******************************************************************\
@@ -3459,11 +3509,17 @@ void smt2_convt::convert_type(const typet &type)
   if(type.id()==ID_array)
   {
     const array_typet &array_type=to_array_type(type);
+    const typet &subtype=ns.follow(array_type.subtype());
 
     out << "(Array ";
     convert_type(array_index_type());
     out << " ";
-    convert_type(array_type.subtype());
+
+    if(subtype.id()==ID_bool && !use_array_of_bool)
+      out << "(_ BitVec 1)";
+    else
+      convert_type(array_type.subtype());
+      
     out << ")";
   }
   else if(type.id()==ID_bool)
@@ -3548,6 +3604,24 @@ void smt2_convt::convert_type(const typet &type)
     out << "Int";
   else if(type.id()==ID_symbol)
     convert_type(ns.follow(type));
+  else if(type.id()==ID_complex)
+  {
+    if(use_datatypes)
+    {
+      throw "complex yet to be built";
+    }
+    else
+    {
+      boolbv_widtht boolbv_width(ns);
+    
+      unsigned width=boolbv_width(type);
+      
+      if(width==0)
+        throw "failed to get width of complex";
+
+      out << "(_ BitVec " << width << ")";
+    }
+  }
   else
   {
     throw "unsupported type: "+type.id_string();
@@ -3595,6 +3669,10 @@ void smt2_convt::find_symbols_rec(
      find_symbols_rec(array_type.subtype(), recstack);
    }
    else if(type.id()==ID_incomplete_array)
+   {
+     find_symbols_rec(type.subtype(), recstack);
+   }
+   else if(type.id()==ID_complex)
    {
      find_symbols_rec(type.subtype(), recstack);
    }
