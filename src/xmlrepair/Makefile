@@ -1,6 +1,6 @@
 SRC = xmlrepair.cpp
 
-OBJ + =  
+OBJ +=  
 
 INCLUDES= -I ..
 
