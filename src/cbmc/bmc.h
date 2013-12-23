@@ -82,8 +82,8 @@ protected:
   virtual bool decide_mathsat();
   virtual bool decide_opensmt();
   virtual bool decide_z3();
-  virtual void smt1_convert(std::ostream &out);
-  virtual void smt2_convert(std::ostream &out);
+  virtual void smt1_convert(smt1_dect::solvert solver, std::ostream &out);
+  virtual void smt2_convert(smt2_dect::solvert solver, std::ostream &out);
   virtual bool write_dimacs();
   virtual bool write_dimacs(std::ostream &out);
   

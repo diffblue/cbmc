@@ -85,9 +85,24 @@ void smt2_convt::write_header()
 {
   out << "; SMT 2" << "\n";
   
+  switch(solver)
+  {
+  case GENERIC: break;
+  case BOOLECTOR: out << "; Generated for Boolector\n"; break;
+  case CVC3: out << "; Generated for CVC 3\n"; break;
+  case MATHSAT: out << "; Generated for MathSAT\n"; break;
+  case YICES: out << "; Generated for Yices\n"; break;
+  case Z3: out << "; Generated for Z3\n"; break;
+  }
+  
   out << "(set-info :source \"" << notes << "\")" << "\n";
   out << "(set-option :produce-models true)" << "\n";
-  out << "(set-logic " << logic << ")" << "\n";
+
+  // We use a broad mixture of logics, so on some solvers
+  // its better not to declare here.
+
+  if(emit_set_logic)
+    out << "(set-logic " << logic << ")" << "\n";
 }
 
 /*******************************************************************\

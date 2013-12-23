@@ -27,23 +27,57 @@ class member_exprt;
 class smt2_convt:public prop_convt
 {
 public:
+  typedef enum { GENERIC, BOOLECTOR, CVC3, MATHSAT, YICES, Z3 } solvert;
+
   smt2_convt(
     const namespacet &_ns,
     const std::string &_benchmark,
     const std::string &_notes,
     const std::string &_logic,
+    solvert _solver,
     std::ostream &_out):
     prop_convt(_ns),
     use_FPA_theory(false),
+    use_array_of_bool(false),
+    emit_set_logic(true),
     out(_out),
     benchmark(_benchmark),
     notes(_notes),
     logic(_logic),
+    solver(_solver),
     boolbv_width(_ns),
     pointer_logic(_ns),
     array_index_bits(32),
     no_boolean_variables(0)
   {
+    // We set some defaults differently
+    // for some solvers.
+
+    switch(solver)
+    {
+    case GENERIC:
+      break;
+    
+    case BOOLECTOR:
+      break;
+      
+    case CVC3:
+      break;
+
+    case MATHSAT:
+      use_FPA_theory=true;
+      break;
+      
+    case YICES:
+      break;
+    
+    case Z3:
+      use_array_of_bool=true;
+      use_FPA_theory=true;
+      emit_set_logic=false;
+      break;
+    }
+
     write_header();
   }
 
@@ -51,6 +85,8 @@ public:
   virtual resultt dec_solve();
 
   bool use_FPA_theory;
+  bool use_array_of_bool;
+  bool emit_set_logic;
 
   // overloading interfaces
   virtual literalt convert(const exprt &expr);
@@ -64,6 +100,8 @@ public:
 protected:
   std::ostream &out;
   std::string benchmark, notes, logic;
+  solvert solver;
+  
   bvt assumptions;
   boolbv_widtht boolbv_width;
   
