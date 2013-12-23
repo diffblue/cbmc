@@ -93,6 +93,8 @@ protected:
   virtual void do_unwind_module(
     decision_proceduret &decision_procedure);
   void do_conversion(prop_convt &solver);
+  
+  prop_convt *solver_factory();
 
   virtual void show_vcc();
   virtual bool all_claims(
