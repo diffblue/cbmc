@@ -38,6 +38,7 @@ public:
     std::ostream &_out):
     prop_convt(_ns),
     use_FPA_theory(false),
+    use_datatypes(false),
     use_array_of_bool(false),
     emit_set_logic(true),
     out(_out),
@@ -75,6 +76,7 @@ public:
       use_array_of_bool=true;
       use_FPA_theory=true;
       emit_set_logic=false;
+      use_datatypes=true;
       break;
     }
 
@@ -85,6 +87,7 @@ public:
   virtual resultt dec_solve();
 
   bool use_FPA_theory;
+  bool use_datatypes;
   bool use_array_of_bool;
   bool emit_set_logic;
 
@@ -156,7 +159,7 @@ protected:
   void convert_address_of_rec(
     const exprt &expr, const pointer_typet &result_type);
 
-  // keeps track of all symbols
+  // keeps track of all non-Boolean symbols and their value
   struct identifiert
   {
     typet type;
@@ -178,8 +181,10 @@ protected:
 
   identifier_mapt identifier_map;
 
-  typedef std::map<typet, std::string> type_mapt;
-  type_mapt type_map;
+  // for modeling structs as Z3 datatype, enabled when
+  // use_datatype is set
+  typedef std::map<typet, std::string> datatype_mapt;
+  datatype_mapt datatype_map;
   
   unsigned array_index_bits;
   
