@@ -27,10 +27,20 @@ public:
   {
     loc_number++;
   }
+  
+  inline bool is_nil() const
+  {
+    return loc_number==nil().loc_number;
+  }
 
   loc_reft():loc_number(-1)
   {
   }  
+  
+  static inline loc_reft nil()
+  {
+    return loc_reft();
+  }
 };
 
 static inline bool operator < (const loc_reft l1, const loc_reft l2)
