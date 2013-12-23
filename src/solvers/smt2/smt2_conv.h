@@ -150,6 +150,10 @@ protected:
   constant_exprt parse_literal(const std::string &s, const typet &type);
   exprt parse_struct(const std::string &s, const typet &type);
   
+  // booleans vs. bv[1]
+  void bool2bv(const exprt &);
+  void bv2bool(const exprt &);
+  
   // arrays
   typet array_index_type() const;
   void array_index(const exprt &expr);
