@@ -26,6 +26,84 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
+Function: bmct::solver_factory
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: Decide using "default" decision procedure
+
+\*******************************************************************/
+
+prop_convt *bmct::solver_factory()
+{
+  //const std::string &filename=options.get_option("outfile");
+  
+  if(options.get_bool_option("boolector"))
+  {
+  }
+  else if(options.get_bool_option("mathsat"))
+  {
+  }
+  else if(options.get_bool_option("cvc"))
+  {
+  }
+  else if(options.get_bool_option("dimacs"))
+  {
+  }
+  else if(options.get_bool_option("opensmt"))
+  {
+  }
+  else if(options.get_bool_option("refine"))
+  {
+  }
+  else if(options.get_bool_option("aig"))
+  {
+  }
+  else if(options.get_bool_option("smt1"))
+  {
+  }
+  else if(options.get_bool_option("smt2"))
+  {
+  }
+  else if(options.get_bool_option("yices"))
+  {
+  }
+  else if(options.get_bool_option("z3"))
+  {
+  }
+  else
+  {
+    // THE DEFAULT
+
+    #if 0
+    // SAT preprocessor won't work with beautification.
+    if(options.get_bool_option("sat-preprocessor") &&
+       !options.get_bool_option("beautify"))
+    {
+      solver=std::auto_ptr<propt>(new satcheckt);
+    }
+    else
+      solver=std::auto_ptr<propt>(new satcheck_minisat_no_simplifiert);
+
+    solver->set_message_handler(get_message_handler());
+    solver->set_verbosity(get_verbosity());
+      
+    bv_cbmct bv_cbmc(ns, *solver);
+      
+    if(options.get_option("arrays-uf")=="never")
+      bv_cbmc.unbounded_array=bv_cbmct::U_NONE;
+    else if(options.get_option("arrays-uf")=="always")
+      bv_cbmc.unbounded_array=bv_cbmct::U_ALL;
+    #endif
+  }      
+
+  return 0;
+}
+
+/*******************************************************************\
+
 Function: bmct::decide_default
 
   Inputs:
