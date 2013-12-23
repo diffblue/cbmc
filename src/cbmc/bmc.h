@@ -95,7 +95,9 @@ protected:
   void do_conversion(prop_convt &solver);
 
   virtual void show_vcc();
-  virtual bool all_claims(const goto_functionst &goto_functions);
+  virtual bool all_claims(
+    const goto_functionst &goto_functions,
+    prop_convt &solver);
   virtual void show_vcc(std::ostream &out);
   virtual void show_program();
   virtual void report_success();
@@ -105,7 +107,9 @@ protected:
     const prop_convt &prop_conv);
   
   // vacuity checks
-  void cover_assertions(const goto_functionst &goto_functions);
+  void cover_assertions(
+    const goto_functionst &goto_functions,
+    prop_convt &solver);
 };
 
 #endif

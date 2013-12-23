@@ -47,30 +47,19 @@ struct goalt
   }
 };
 
-bool bmct::all_claims(const goto_functionst &goto_functions)
+bool bmct::all_claims(
+  const goto_functionst &goto_functions,
+  prop_convt &solver)
 {
-  satcheckt satcheck;
-  satcheck.set_message_handler(get_message_handler());
-  satcheck.set_verbosity(get_verbosity());
-  
-  bv_cbmct bv_cbmc(ns, satcheck);
-  
-  if(options.get_option("arrays-uf")=="never")
-    bv_cbmc.unbounded_array=bv_cbmct::U_NONE;
-  else if(options.get_option("arrays-uf")=="always")
-    bv_cbmc.unbounded_array=bv_cbmct::U_ALL;
-    
-  prop_convt &prop_conv=bv_cbmc;
+  status() << "Passing problem to " << solver.decision_procedure_text() << eom;
 
-  status() << "Passing problem to " << prop_conv.decision_procedure_text() << eom;
-
-  prop_conv.set_message_handler(get_message_handler());
-  prop_conv.set_verbosity(get_verbosity());
+  solver.set_message_handler(get_message_handler());
+  solver.set_verbosity(get_verbosity());
 
   // stop the time
   fine_timet sat_start=current_time();
   
-  do_conversion(prop_conv);  
+  do_conversion(solver);  
   
   // Collect _all_ goals in `goal_map'.
   // This maps claim IDs to 'goalt'
@@ -111,7 +100,7 @@ bool bmct::all_claims(const goto_functionst &goto_functions)
     }
   }
   
-  cover_goalst cover_goals(prop_conv);
+  cover_goalst cover_goals(solver);
   
   for(goal_mapt::const_iterator
       it=goal_map.begin();
@@ -120,11 +109,11 @@ bool bmct::all_claims(const goto_functionst &goto_functions)
   {
     // Our goal is to falsify a property.
     // The following is TRUE if the conjunction is empty.
-    literalt p=!prop_conv.convert(conjunction(it->second.conjuncts));
+    literalt p=!solver.convert(conjunction(it->second.conjuncts));
     cover_goals.add(p);
   }
 
-  status() << "Running " << prop_conv.decision_procedure_text() << eom;
+  status() << "Running " << solver.decision_procedure_text() << eom;
 
   cover_goals();  
 

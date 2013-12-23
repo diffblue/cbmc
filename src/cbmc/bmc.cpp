@@ -419,7 +419,19 @@ bool bmct::run(const goto_functionst &goto_functions)
     
     if(options.get_bool_option("cover-assertions"))
     {
-      cover_assertions(goto_functions);
+      satcheckt satcheck;
+      satcheck.set_message_handler(get_message_handler());
+      satcheck.set_verbosity(get_verbosity());
+      bv_cbmct bv_cbmc(ns, satcheck);
+      bv_cbmc.set_message_handler(get_message_handler());
+      bv_cbmc.set_verbosity(get_verbosity());
+
+      if(options.get_option("arrays-uf")=="never")
+        bv_cbmc.unbounded_array=bv_cbmct::U_NONE;
+      else if(options.get_option("arrays-uf")=="always")
+        bv_cbmc.unbounded_array=bv_cbmct::U_ALL;
+    
+      cover_assertions(goto_functions, bv_cbmc);
       return false;
     }
 
@@ -432,7 +444,21 @@ bool bmct::run(const goto_functionst &goto_functions)
     }
 
     if(options.get_bool_option("all-claims"))
-      return all_claims(goto_functions);
+    {
+      satcheckt satcheck;
+      satcheck.set_message_handler(get_message_handler());
+      satcheck.set_verbosity(get_verbosity());
+      bv_cbmct bv_cbmc(ns, satcheck);
+      bv_cbmc.set_message_handler(get_message_handler());
+      bv_cbmc.set_verbosity(get_verbosity());
+
+      if(options.get_option("arrays-uf")=="never")
+        bv_cbmc.unbounded_array=bv_cbmct::U_NONE;
+      else if(options.get_option("arrays-uf")=="always")
+        bv_cbmc.unbounded_array=bv_cbmct::U_ALL;
+
+      return all_claims(goto_functions, bv_cbmc);
+    }
     
     if(options.get_bool_option("boolector"))
       return decide_boolector();
