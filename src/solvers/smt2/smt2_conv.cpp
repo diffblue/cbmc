@@ -120,6 +120,21 @@ Function: smt2_convt::write_footer
 void smt2_convt::write_footer()
 {
   out << "\n";
+  
+  // push the assumptions, if any
+  if(!assumptions.empty())
+  {
+    out << "; assumptions\n";
+    out << "(push 1)\n";
+
+    forall_literals(it, assumptions)
+    {
+      out << "(assert ";
+      convert_literal(*it);
+      out << ")" << "\n";
+    }
+  }
+  
   out << "(check-sat)" << "\n";
   out << "\n";
   
@@ -128,6 +143,10 @@ void smt2_convt::write_footer()
       it!=smt2_identifiers.end();
       it++)
     out << "(get-value (" << *it << "))" << "\n";
+
+  // pop the assumptions, if any
+  if(!assumptions.empty())
+    out << "(pop 1)\n";
   
   out << "\n";
 
