@@ -32,8 +32,6 @@ protected:
 class smt2_dect:protected smt2_temp_filet, public smt2_convt
 {
 public:
-  typedef enum { BOOLECTOR, CVC3, MATHSAT, YICES, Z3 } solvert;
-
   smt2_dect(
     const namespacet &_ns,
     const std::string &_benchmark,
@@ -41,8 +39,7 @@ public:
     const std::string &_logic,
     solvert _solver):
     smt2_temp_filet(),
-    smt2_convt(_ns, _benchmark, _notes, _logic, temp_out),
-    solver(_solver)
+    smt2_convt(_ns, _benchmark, _notes, _logic, _solver, temp_out)
   {
   }
 
@@ -53,8 +50,6 @@ public:
   virtual bool has_set_assumptions() const { return true; }
   
 protected:
-  solvert solver;
-
   resultt read_result_boolector(std::istream &in);
   resultt read_result_cvc3(std::istream &in);
   resultt read_result_mathsat(std::istream &in);

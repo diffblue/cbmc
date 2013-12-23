@@ -28,11 +28,14 @@ class member_exprt;
 class smt1_convt:public prop_convt
 {
 public:
+  typedef enum { GENERIC, BOOLECTOR, CVC3, YICES, OPENSMT, MATHSAT, Z3 } solvert;
+
   smt1_convt(
     const namespacet &_ns,
     const std::string &_benchmark,
     const std::string &_source,
     const std::string &_logic,    
+    solvert _solver,
     std::ostream &_out):
     prop_convt(_ns),
     benchmark(_benchmark),
@@ -60,6 +63,7 @@ public:
 
 protected:
   std::string benchmark, source, logic;
+  solvert solver;
   std::ostream &out;
   boolbv_widtht boolbv_width;
   
