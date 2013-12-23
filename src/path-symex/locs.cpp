@@ -53,9 +53,9 @@ void locst::build(const goto_functionst &goto_functions)
 
     if(goto_function.body_available)
     {
-      const loc_reft& entry = last_loc();
-      function_map[f_it->first]=function_entryt(last_loc(),goto_function.type);
-  
+      const loc_reft entry_loc=last_loc();
+      function_map[f_it->first]=function_entryt(entry_loc, goto_function.type);
+
       forall_goto_program_instructions(i_it, goto_function.body)
       {
         target_map[i_it]=last_loc();
@@ -63,7 +63,7 @@ void locst::build(const goto_functionst &goto_functions)
       }
     }
     else
-      function_map[f_it->first]=function_entryt(loc_reft(),goto_function.type);
+      function_map[f_it->first]=function_entryt(loc_reft::nil(), goto_function.type);
   }
   
   if(function_map.find(ID_main)==function_map.end())

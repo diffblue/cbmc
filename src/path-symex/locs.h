@@ -59,7 +59,7 @@ public:
     return loc_vector[l.loc_number];
   }
   
-  const inline loc_reft last_loc()
+  inline loc_reft last_loc() const
   {
     loc_reft tmp;
     tmp.loc_number=loc_vector.size();
