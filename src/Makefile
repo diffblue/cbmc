@@ -1,8 +1,8 @@
 DIRS = ansi-c big-int cbmc cpp goto-cc goto-instrument goto-programs \
        goto-symex langapi pointer-analysis solvers util linking xmllang \
-       assembler analyses java_bytecode
+       assembler analyses java_bytecode path-symex
 
-all: cbmc.dir goto-cc.dir goto-instrument.dir
+all: cbmc.dir goto-cc.dir goto-instrument.dir path-symex.dir
 
 ###############################################################################
 
