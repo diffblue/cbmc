@@ -124,7 +124,7 @@ void c_typecheck_baset::typecheck_custom_type(typet &type)
   type.remove(ID_size);
   type.set(ID_width, integer2string(size_int));
 
-  // depending on type, there may be a number of factional bits
+  // depending on type, there may be a number of fractional bits
   
   if(type.id()==ID_custom_unsignedbv)
     type.id(ID_unsignedbv);  
@@ -145,13 +145,13 @@ void c_typecheck_baset::typecheck_custom_type(typet &type)
     if(to_integer(f_expr, f_int))
     {
       err_location(f_expr);
-      throw "failed to convert number of faction bits to constant";
+      throw "failed to convert number of fraction bits to constant";
     }
 
     if(f_int<0 || f_int>size_int)
     {
       err_location(f_expr);
-      error("faction width invalid");
+      error("fraction width invalid");
       throw 0;
     }
     
@@ -173,13 +173,13 @@ void c_typecheck_baset::typecheck_custom_type(typet &type)
     if(to_integer(f_expr, f_int))
     {
       err_location(f_expr);
-      throw "failed to convert number of faction bits to constant";
+      throw "failed to convert number of fraction bits to constant";
     }
 
     if(f_int<1 || f_int+1>=size_int)
     {
       err_location(f_expr);
-      error("faction width invalid");
+      error("fraction width invalid");
       throw 0;
     }
     
