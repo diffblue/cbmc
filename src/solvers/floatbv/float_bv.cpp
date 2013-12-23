@@ -60,7 +60,7 @@ exprt float_bvt::convert_abs(const abs_exprt &src)
   
   constant_exprt mask(mask_str, src.type());
   
-//  return bitand_exprt(src.op(), mask);
+  return bitand_exprt(src.op(), mask);
 }
 
 /*******************************************************************\
@@ -87,7 +87,7 @@ exprt float_bvt::convert_unary_minus(const unary_minus_exprt &src)
   
   constant_exprt mask(mask_str, src.type());
   
-//  return bitxor_exprt(src.op(), mask);
+  return bitxor_exprt(src.op(), mask);
 }
 
 /*******************************************************************\
@@ -104,6 +104,7 @@ Function: float_bvt::convert_ieee_float_equal
 
 exprt float_bvt::convert_ieee_float_equal(const ieee_float_equal_exprt &src)
 {
+  return nil_exprt();
 }
 
 /*******************************************************************\
