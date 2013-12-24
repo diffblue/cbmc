@@ -119,8 +119,8 @@ int pipe_stream::run()
   si.hStdError=hErrorWrite;
 
   std::string command = executable;
-  std::list<std::string>::const_iterator s_it=arguments.begin();
-  for(; s_it!=arguments.end(); ++s_it)
+  std::list<std::string>::const_iterator s_it=args.begin();
+  for(; s_it!=args.end(); ++s_it)
     command += " " + (*s_it);
 
   LPSTR lpCommandLine = new char[command.length()+1];
@@ -137,8 +137,8 @@ int pipe_stream::run()
   if(!async)
     return wait();
 
-  buffer.in(hInputWrite);
-  buffer.out(hOutputRead);
+  buffer.set_in(hInputWrite);
+  buffer.set_out(hOutputRead);
   return 0;
 }
 
@@ -283,8 +283,8 @@ filedescriptor_streambuf::~filedescriptor_streambuf()
   if(proc_in!=INVALID_HANDLE_VALUE)
     CloseHandle(proc_in);
 
-  if(out()!=INVALID_HANDLE_VALUE)
-    CloseHandle(out());
+  if(proc_out!=INVALID_HANDLE_VALUE)
+    CloseHandle(proc_out);
 
   #else
 
