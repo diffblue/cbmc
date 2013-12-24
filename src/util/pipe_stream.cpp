@@ -53,13 +53,10 @@ Function: pipe_stream::run
 
   Inputs:
 
- Outputs:
+ Outputs: Returns -1 if an error occurs.
 
- Purpose: Starts an external process. If the parameter async
-          is true, a new process is forked and run returns
-          immediately. Otherwise, the run method waits until 
-          the process has completed.
-          Returns -1 if an error occurs.
+ Purpose: Starts an external process. A new process is forked and
+          run returns immediately.
 
 \*******************************************************************/
 
@@ -134,11 +131,9 @@ int pipe_stream::run()
   if(!ret)
     return -1;
   
-  if(!async)
-    return wait();
-
   buffer.set_in(hInputWrite);
   buffer.set_out(hOutputRead);
+
   return 0;
 }
 
