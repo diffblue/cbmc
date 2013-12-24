@@ -35,6 +35,7 @@ Function: prop_convt::is_in_conflict
 bool prop_convt::is_in_conflict(literalt l) const
 {
   assert(false);
+  return false;
 }
 
 /*******************************************************************\
