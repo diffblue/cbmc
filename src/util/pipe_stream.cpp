@@ -6,6 +6,7 @@ Author:
 
 \*******************************************************************/
 
+#include <cstdio>
 #include <vector>
 
 #include "pipe_stream.h"
