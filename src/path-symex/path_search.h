@@ -32,7 +32,11 @@ protected:
   typedef std::list<statet> queuet;
   queuet queue;
   
+  queuet::iterator pick_state();
+  
   bool execute(queuet::iterator state, const namespacet &);
+  
+  bool check_assertion(const statet &state, const namespacet &);
 };
 
 #endif

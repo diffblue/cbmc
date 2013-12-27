@@ -29,8 +29,8 @@ public:
     const locst &_locs):
     var_map(_var_map),
     locs(_locs),
-    current_thread(0),
-    inside_atomic_section(false)
+    inside_atomic_section(false),
+    current_thread(0)
   {
   }
 
@@ -81,6 +81,8 @@ public:
   
   typedef std::vector<threadt> threadst;
   threadst threads;
+
+  bool inside_atomic_section;
   
   inline unsigned get_current_thread() const
   {
@@ -91,6 +93,8 @@ public:
   {
     current_thread=_thread;
   }
+  
+  goto_programt::const_targett get_instruction() const;
   
   inline bool is_executable() const
   {
@@ -106,6 +110,9 @@ public:
   
   // execution history
   path_symex_historyt history;
+  
+  // adds an entry to the history
+  path_symex_stept &record_step();
 
   // various state transformers
   
@@ -114,17 +121,28 @@ public:
     threads.resize(threads.size()+1);
     return threads.back();
   }
+  
+  inline void remove_current_thread()
+  {
+    threads.erase(threads.begin()+current_thread);
+    if(current_thread>threads.size()) current_thread--;
+  }
 
   inline loc_reft pc() const
   {
     return threads[current_thread].pc;
   }
 
+  inline void next_pc()
+  {
+    threads[current_thread].pc.increase();
+  }
+
   inline void set_pc(loc_reft new_pc)
   {
     threads[current_thread].pc=new_pc;
   }
-
+  
   // output  
   void output(std::ostream &out) const;
   void output(const threadt &thread, std::ostream &out) const;
@@ -137,7 +155,6 @@ public:
 
 protected:
   unsigned current_thread;
-  bool inside_atomic_section;
 
   exprt instantiate_rec(
     const exprt &src,

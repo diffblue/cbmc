@@ -42,11 +42,21 @@ public:
 protected:
   const namespacet &ns;
 
-  static exprt as_expr(const exprt::operandst &guard);
+  void do_goto(
+    path_symex_statet &state,
+    std::list<path_symex_statet> &further_states);
 
   void function_call(
     path_symex_statet &state,
-    const code_function_callt &function_call);
+    const code_function_callt &call)
+  {
+    function_call(state, call, call.function());
+  }
+    
+  void function_call(
+    path_symex_statet &state,
+    const code_function_callt &function_call,
+    const exprt &function);
     
   void return_from_function(
     path_symex_statet &state,
@@ -58,31 +68,31 @@ protected:
     const exprt &lhs,
     const side_effect_exprt &code,
     const std::string &suffix,
-    const typet& lhs_suffix_type);
+    const exprt &full_lhs);
 
-  void assign(
+  inline void assign(
     path_symex_statet &state,
     const exprt &lhs,
     const exprt &rhs)
   {
     exprt::operandst _guard; // start with empty guard
-    assign_rec(state, _guard, lhs, rhs, std::string(), ns.follow(lhs.type()));
+    assign_rec(state, _guard, lhs, rhs, std::string(), lhs);
   }
 
   inline void assign(
     path_symex_statet &state,
-    const code_assignt &assign)
+    const code_assignt &assignment)
   {
-    this->assign(state, assign.lhs(), assign.rhs());
+    assign(state, assignment.lhs(), assignment.rhs());
   }
 
   void assign_rec(
     path_symex_statet &state,
     exprt::operandst &guard,
-    const exprt &lhs, // not instantiated
+    const exprt &lhs, // not instantiated, recursion here
     const exprt &rhs, // not instantiated
     const std::string &suffix,
-    const typet& lhs_suffix_type);
+    const exprt &full_lhs); // no recursion here
 
   static bool propagate(const exprt &src);
 };
@@ -143,33 +153,6 @@ bool path_symext::propagate(const exprt &src)
 
 /*******************************************************************\
 
-Function: path_symext::as_expr
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-exprt path_symext::as_expr(const exprt::operandst &guard)
-{
-  if(guard.empty())
-    return true_exprt();
-  else if(guard.size()==1)
-    return guard.front();
-  else
-  {
-    exprt result(ID_and, bool_typet());
-    result.operands()=guard;
-    return result;
-  }
-}
-
-
-/*******************************************************************\
-
 Function: path_symext::symex_malloc
 
   Inputs:
@@ -180,7 +163,7 @@ Function: path_symext::symex_malloc
 
 \*******************************************************************/
 
-
+#if 0
 inline static typet c_sizeof_type_rec(const exprt &expr)
 {
   const irept &sizeof_type=expr.find(ID_C_c_sizeof_type);
@@ -200,6 +183,7 @@ inline static typet c_sizeof_type_rec(const exprt &expr)
   
   return nil_typet();
 }
+#endif
 
 #if 0
 void path_symext::symex_malloc(
@@ -346,15 +330,15 @@ Function: path_symext::assign_rec
 
 \*******************************************************************/
 
-#if 0
 void path_symext::assign_rec(
   path_symex_statet &state,
   exprt::operandst &guard, 
   const exprt &lhs, 
   const exprt &rhs, 
   const std::string &suffix,
-  const typet& lhs_suffix_type) 
+  const exprt &full_lhs) 
 {
+  #if 0
   if(lhs_suffix_type.id()==ID_struct) // lhs is a struct
   {
 	const struct_typet &struct_type=to_struct_type(lhs_suffix_type);
@@ -607,8 +591,8 @@ void path_symext::assign_rec(
     //throw "path_symext::assign_rec(): unexpected lhs: ";
 
   }
+  #endif
 }
-#endif
 
 /*******************************************************************\
 
@@ -622,72 +606,77 @@ Function: path_symext::function_call
 
 \*******************************************************************/
 
-#if 0
 void path_symext::function_call(
   path_symex_statet &state,
-  const code_function_callt &function_call)
+  const code_function_callt &call,
+  const exprt &function)
 {
-  assert(function_call.function().id()==ID_symbol);
-
-  const irep_idt& function_identifier=to_symbol_expr(function_call.function()).get_identifier();
-
-  // find the function
-  var_mapt::function_mapt::const_iterator f_it=
-    state.var_map.function_map.find(function_identifier);
-
-  if(f_it==state.var_map.function_map.end())
-    throw "failed to find `"+id2string(function_identifier)+"' in function_map";
-  
-  const var_mapt::function_entryt& function_entry (f_it->second);
-
-  loc_reft function_entry_point=function_entry.first;
-  
-  // do we have a body?
-  if(function_entry_point==loc_reft())
+  if(function.id()==ID_symbol)
   {
-    // no body
-    state.next_pc();
-    return;
-  }
+    const irep_idt &function_identifier=
+      to_symbol_expr(function).get_identifier();
+
+    // find the function
+    locst::function_mapt::const_iterator f_it=
+      state.locs.function_map.find(function_identifier);
+
+    if(f_it==state.locs.function_map.end())
+      throw "failed to find `"+id2string(function_identifier)+"' in function_map";
   
-  // push a frame on the call stack
-  path_symex_statet::threadt &thread=state.threads[state.get_current_thread()];
-  thread.call_stack.push_back(path_symex_statet::framet());
-  thread.call_stack.back().return_location=thread.pc.next_loc();
-  thread.call_stack.back().return_lhs=function_call.lhs();
-  thread.call_stack.back().saved_local_vars=thread.local_vars;
+    const locst::function_entryt &function_entry=f_it->second;
 
-   const code_typet &code_type=
-    to_code_type(ns.follow(function_entry.second));
-
-  const code_typet::argumentst &function_arguments=code_type.arguments();
-
-  const exprt::operandst &call_arguments=function_call.arguments();
+    loc_reft function_entry_point=function_entry.first;
   
-
-  // now assign the argument values
-  for(unsigned i=0; i<call_arguments.size(); i++)
-  {
-    if(i<function_arguments.size())
+    // do we have a body?
+    if(function_entry_point==loc_reft())
     {
-      const code_typet::argumentt &function_argument=function_arguments[i];
-      irep_idt identifier=function_argument.get_identifier();
+      // no body, this is a skip
+      if(call.lhs().is_not_nil())
+        assign(state, call.lhs(), nil_exprt());
 
-      if(identifier==irep_idt())
-        throw "function_call " + id2string(function_identifier) + " no identifier for function argument";
-
-      symbol_exprt lhs(identifier, function_argument.type());
-            
-      // TODO: need to save+restore
-
-      assign(state, lhs, call_arguments[i]);
+      state.next_pc();
+      return;
     }
-  }
+  
+    // push a frame on the call stack
+    path_symex_statet::threadt &thread=state.threads[state.get_current_thread()];
+    thread.call_stack.push_back(path_symex_statet::framet());
+    thread.call_stack.back().return_location=thread.pc.next_loc();
+    thread.call_stack.back().return_lhs=call.lhs();
+    thread.call_stack.back().saved_local_vars=thread.local_vars;
 
-  // set the new PC
-  thread.pc=function_entry_point;
+    const code_typet &code_type=
+      to_code_type(ns.follow(function_entry.second));
+
+    const code_typet::argumentst &function_arguments=code_type.arguments();
+
+    const exprt::operandst &call_arguments=call.arguments();
+  
+    // now assign the argument values
+    for(unsigned i=0; i<call_arguments.size(); i++)
+    {
+      if(i<function_arguments.size())
+      {
+        const code_typet::argumentt &function_argument=function_arguments[i];
+        irep_idt identifier=function_argument.get_identifier();
+
+        if(identifier==irep_idt())
+          throw "function_call " + id2string(function_identifier) + " no identifier for function argument";
+
+        symbol_exprt lhs(identifier, function_argument.type());
+            
+        // TODO: need to save+restore
+
+        assign(state, lhs, call_arguments[i]);
+      }
+    }
+
+    // set the new PC
+    thread.pc=function_entry_point;
+  }
+  else
+    throw "TODO: function_call "+function.id_string();
 }
-#endif
 
 /*******************************************************************\
 
@@ -701,20 +690,20 @@ Function: path_symext::return_from_function
 
 \*******************************************************************/
 
-#if 0
 void path_symext::return_from_function(
   path_symex_statet &state,
   const exprt &return_value)
 {
   if(state.threads[state.get_current_thread()].call_stack.empty())
   {
-    state.threads[state.get_current_thread()].active=false;
+    state.remove_current_thread();
   }
   else
   {
     path_symex_statet::threadt &thread=state.threads[state.get_current_thread()];
     thread.pc=thread.call_stack.back().return_location;
 
+    // assign the return value
     if(return_value.is_not_nil() &&
        thread.call_stack.back().return_lhs.is_not_nil())
       assign(state, thread.call_stack.back().return_lhs, return_value);
@@ -722,7 +711,97 @@ void path_symext::return_from_function(
     thread.call_stack.pop_back();
   }
 }
-#endif
+
+/*******************************************************************\
+
+Function: path_symext::do_goto
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void path_symext::do_goto(
+  path_symex_statet &state,
+  std::list<path_symex_statet> &further_states)
+{
+  const goto_programt::instructiont &instruction=
+    *state.get_instruction();
+
+  if(instruction.is_backwards_goto())
+  {
+    #if 0
+    unsigned unwinding_steps=++state.unwind_map[state.pc().loc_number];
+
+    if(unwinding_steps > max_unwind) {
+      std::cout << "unwinding steps " << state.pc().loc_number << " : " << unwinding_steps << std::endl;
+      state.threads[thread_nr].active=false;
+      break;
+    }
+    #endif
+  }
+
+  const loct &loc=state.locs[state.pc()];
+
+  // first do hard, deterministic gotos
+  if(instruction.guard.is_false())
+  {
+    // really just a SKIP
+    state.next_pc();
+  }
+  else if(instruction.guard.is_true() &&
+          loc.targets.size()==1)
+  {
+    // unconditional GOTO to one target
+    state.set_pc(loc.targets.front());
+  }
+  else
+  {
+    // we force that both branches are pursued (if the target is unknown)
+    
+    #if 0
+    exprt deref_guard=state.dereference(instruction.guard);
+    exprt guard=state.read(deref_guard);
+    exprt guard_no_prop=state.read_no_propagate(deref_guard);
+    #endif
+    
+    // branch taken case
+    for(loct::targetst::const_iterator
+        t_it=loc.targets.begin();
+        t_it!=loc.targets.end();
+        t_it++)
+    {
+      state.set_pc(*t_it);
+    }
+
+    #if 0
+    if(branch_taken)
+    {
+      state.history.back().guard=guard;
+      state.history.back().guard_no_prop=guard_no_prop;
+    } else {
+      if(guard.is_true())
+      {
+        state.history.back().guard=false_exprt();
+      }
+      else if(guard.is_false())
+      {
+        state.history.back().guard=true_exprt();
+      }
+      else {
+        state.history.back().guard=not_exprt(guard);
+      }
+      state.history.back().guard_no_prop=not_exprt(guard_no_prop);
+    }        
+    #endif
+    
+    // branch not take case
+    state.next_pc();
+  }
+}
 
 /*******************************************************************\
 
@@ -740,50 +819,8 @@ void path_symext::operator()(
   path_symex_statet &state,
   std::list<path_symex_statet> &further_states)
 {
-#if 0
-  unsigned thread_nr=state.get_current_thread();
-  const path_symex_statet::threadt &thread=state.threads[thread_nr];
-  const loct &loc=locs[thread.pc];
-  const goto_programt::instructiont &instruction=*loc.target;
-
-  #ifdef DEBUG
-
-  std::cout << "EXE ";
-
-  std::cout << "( ";
-
-  for(unsigned i=0; i<state.threads.size(); ++i)
-  {
-    const path_symex_statet::threadt &thread=state.threads[i];
-
-    if(i==thread_nr)
-    {
-      std::cout << "<";
-    }
-
-    std::cout << thread.pc;
-
-    if(i==thread_nr)
-    {
-      std::cout << "> ";
-    }
-    else
-    {
-      std::cout << " ";
-    }
-  }
-
-  std::cout << ")";
-
-  std::cout << " N" << state.node->number
-            << " " << as_string(ns, instruction)
-            << std::endl;
-  #endif
-
-
-  #ifndef DEBUG  
-  try {
-  #endif
+  const goto_programt::instructiont &instruction=
+    *state.get_instruction();
 
   switch(instruction.type)
   {
@@ -797,15 +834,17 @@ void path_symext::operator()(
     // pop the call stack
     {
       state.record_step();
-      exprt v=instruction.code.operands().size()==1?
-              instruction.code.op0():nil_exprt();
-      return_from_function(state, v);
+      exprt return_val=instruction.code.operands().size()==1?
+                       instruction.code.op0():nil_exprt();
+      return_from_function(state, return_val);
     }
     break;
     
   case START_THREAD:
     {
+      const loct &loc=state.locs[state.pc()];
       assert(loc.targets.size()==1);
+      
       state.record_step();
       state.next_pc();
       
@@ -819,115 +858,12 @@ void path_symext::operator()(
     
   case END_THREAD:
     state.record_step();
-    state.threads[thread_nr].active=false;
+    state.remove_current_thread();
     break;
     
   case GOTO:
     state.record_step();
-    
-    if(instruction.is_backwards_goto())
-    {
-      unsigned unwinding_steps=++state.unwind_map[state.pc().loc_number];
-
-
-      if(unwinding_steps > max_unwind) {
-        std::cout << "unwinding steps " << state.pc().loc_number << " : " << unwinding_steps << std::endl;
-        state.threads[thread_nr].active=false;
-        break;
-      }
-    }
-
-    // first do hard, deterministic gotos
-    if(instruction.guard.is_false())
-    {
-      // really a SKIP
-      state.next_pc();
-    }
-    else if(instruction.guard.is_true() &&
-            loc.targets.size()==1)
-    {
-      // unconditional GOTO
-      state.set_pc(loc.targets.front());
-    }
-    else
-    {
-      // we force that both branches are pursued (if the target is unknown)
-      exprt deref_guard=state.dereference(instruction.guard);
-      exprt guard=state.read(deref_guard);
-      exprt guard_no_prop=state.read_no_propagate(deref_guard);
-      
-      if(next_loc.loc_number==(unsigned)-1) // branch target unknown
-      {
-        // branch taken (possibly more than one target)
-        for(loct::targetst::const_iterator
-            t_it=loc.targets.begin();
-            t_it!=loc.targets.end();
-            t_it++)
-        {
-          further_states.push_back(state); // fresh copy
-          path_symex_statet &state_taken=further_states.back(); 
-          state_taken.history.back().guard=guard;
-          state_taken.history.back().guard_no_prop=guard_no_prop;
-          state_taken.set_pc(*t_it);
-        }
-        
-        // branch not taken -- order is important!
-        if(guard.is_true())
-        {
-          state.history.back().guard=false_exprt();
-        }
-        else if(guard.is_false())
-        {
-          state.history.back().guard=true_exprt();
-        }
-        else {
-          state.history.back().guard=not_exprt(guard);
-        }
-
-        state.history.back().guard_no_prop=not_exprt(guard_no_prop);
-
-        assert(!state.history.back().guard_no_prop.is_nil());
-
-        state.next_pc();
-      } else { // branch target known
-        // true branch or false branch?
-        bool branch_taken=false;
-
-        // branch taken?
-        for(loct::targetst::const_iterator
-            t_it=loc.targets.begin();
-            t_it!=loc.targets.end();
-            t_it++)
-        {
-          if(*t_it == next_loc)
-          {
-            branch_taken=true;
-            break;          
-          }
-        }
-
-        if(branch_taken)
-        {
-          state.history.back().guard=guard;
-          state.history.back().guard_no_prop=guard_no_prop;
-        } else {
-          if(guard.is_true())
-          {
-            state.history.back().guard=false_exprt();
-          }
-          else if(guard.is_false())
-          {
-            state.history.back().guard=true_exprt();
-          }
-          else {
-            state.history.back().guard=not_exprt(guard);
-          }
-          state.history.back().guard_no_prop=not_exprt(guard_no_prop);
-        }        
-        state.set_pc(next_loc);
-      }
-    }
-
+    do_goto(state, further_states);
     break;
     
   case CATCH:
@@ -943,15 +879,17 @@ void path_symext::operator()(
   case ASSUME:
     state.record_step();
     if(instruction.guard.is_false())
-      state.threads[thread_nr].active=false;
+      state.remove_current_thread();
     else
     {
+      #if 0
       exprt deref_guard=state.dereference(instruction.guard);
       exprt guard=state.read(deref_guard);
       exprt guard_no_prop=state.read_no_propagate(deref_guard);
       state.history.back().guard=guard; //gen_not(guard);
       state.history.back().guard_no_prop=guard_no_prop;
       state.next_pc();
+      #endif
     }
     break;
     
@@ -964,24 +902,27 @@ void path_symext::operator()(
     break;
 
   case DECL:
-    // an RHS of NIL means 'nondet'
+    // assigning an RHS of NIL means 'nondet'
     assign(state, to_code_decl(instruction.code).symbol(), nil_exprt());
     state.next_pc();
     break;
 
   case ATOMIC_BEGIN:
+    if(state.inside_atomic_section)
+      throw "nested ATOMIC_BEGIN";
+
     state.record_step();
     state.next_pc();
-    ++state.atomic_section_count;
+    state.inside_atomic_section=true;
     break;
 
   case ATOMIC_END:
-    if(state.atomic_section_count==0)
+    if(state.inside_atomic_section)
       throw "ATOMIC_END unmatched";
 
     state.record_step();
     state.next_pc();
-    --state.atomic_section_count;
+    state.inside_atomic_section=false;
     break;
     
   case ASSIGN:
@@ -1018,34 +959,15 @@ void path_symext::operator()(
         // ignore for SC
       }
       else
-      {
-        std::cerr << "unexpected OTHER statement: " << statement << std::endl;
-        // ignore
-      }
+        throw "unexpected OTHER statement: "+id2string(statement);
     }
 
     state.next_pc();
     break;
 
   default:
-    std::cerr << "Not implemented: " << instruction.type << std::endl;
-    // ignore
+    throw "path_symext: unexpected instruction";
   }
-  
-  #ifndef DEBUG
-  }
-  catch (std::string& msg)
-  {
-    state.show_vcc(state.history[0].node,true_exprt(),true_exprt(), true, std::cout);
-
-    std::string new_msg(" T" + i2string(thread_nr) 
-                      + " Node " + i2string(state.node->number)
-                      + " " + as_string(ns, instruction));
-
-    throw "path_symext::operator(): " + new_msg + "\n  " + msg;
-  }
-  #endif
-#endif
 }
 
 /*******************************************************************\

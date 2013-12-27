@@ -32,6 +32,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cbmc/version.h>
 
 #include <path-symex/path_search.h>
+#include <path-symex/locs.h>
 
 #include "symex_parseoptions.h"
 
@@ -221,6 +222,15 @@ int symex_parseoptionst::doit()
 
   if(set_properties(goto_functions))
     return 7;
+    
+  if(cmdline.isset("show-locs"))
+  {
+    const namespacet ns(symbol_table);
+    locst locs(ns);
+    locs.build(goto_functions);
+    locs.output(std::cout);    
+    return 0;
+  }
 
   // do actual Symex
   return do_symex(goto_functions);
@@ -516,6 +526,9 @@ int symex_parseoptionst::do_symex(
   const goto_functionst &goto_functions)
 {
   path_searcht path_search;
+  
+  path_search.set_message_handler(get_message_handler());
+  path_search.set_verbosity(get_verbosity());
 
   // do actual symex
   bool result=path_search(symbol_table, goto_functions);

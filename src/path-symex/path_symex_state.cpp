@@ -22,8 +22,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <langapi/language_util.h>
 
-#include <goto-programs/goto_functions.h>
-
 #include <path-symex/locs.h>
 #endif
 
@@ -54,10 +52,29 @@ path_symex_statet initial_state(
   path_symex_statet s(var_map, locs);
   
   // create one new thread
-  s.add_thread().pc=locs.entry_loc;
+  path_symex_statet::threadt &thread=s.add_thread();
+  thread.pc=locs.entry_loc; // set its PC
   s.set_current_thread(0);
-
+  
   return s;
+}
+
+/*******************************************************************\
+
+Function: path_symex_statet::output
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+goto_programt::const_targett path_symex_statet::get_instruction() const
+{
+  assert(current_thread<threads.size());
+  return locs[threads[current_thread].pc].target;
 }
 
 /*******************************************************************\
@@ -75,7 +92,7 @@ Function: path_symex_statet::output
 void path_symex_statet::output(const threadt &thread, std::ostream &out) const
 {
   out << "  PC: " << thread.pc << std::endl;
-  out << "  Stack:";
+  out << "  Call stack:";
   for(call_stackt::const_iterator
       it=thread.call_stack.begin();
       it!=thread.call_stack.end();
@@ -496,16 +513,14 @@ Function: path_symex_statet::record_step
 
 \*******************************************************************/
 
-#if 0
-path_symex_statet::stept &path_symex_statet::record_step()
+path_symex_stept &path_symex_statet::record_step()
 {
-  history.push_back(path_symex_stept());
-  path_symex_stept &step=history.back();
-  step.get_pc_vector(*this);
+  history.steps.push_back(path_symex_stept());
+  path_symex_stept &step=history.steps.back();
+  //step.get_pc_vector(*this);
   step.thread_nr=current_thread;
   return step;
 }
-#endif
 
 /*******************************************************************\
 

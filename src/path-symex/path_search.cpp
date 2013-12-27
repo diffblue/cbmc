@@ -30,16 +30,34 @@ bool path_searcht::operator()(
   locst locs(ns);
   var_mapt var_map(ns);
   
+  locs.build(goto_functions);
+  
   queue.push_back(initial_state(var_map, locs));
-
+  
   while(!queue.empty())
   {
-    // pick a state from the queue
-    queuet::iterator state=queue.begin();
+    // Pick a state from the queue,
+    // according to some heuristic.
+    queuet::iterator state=pick_state();
+    
+    if(!state->is_executable())
+    {
+      queue.erase(state);
+      continue;
+    }
+    
+    status() << "Queue " << queue.size()
+             << " thread " << state->get_current_thread()
+             << "/" << state->threads.size()
+             << " PC " << state->pc() << messaget::eom;
+
+    // an error, possibly?
+    if(state->get_instruction()->is_assert())
+      if(check_assertion(*state, ns))
+        return true; // property fails
     
     // execute
-    if(execute(state, ns))
-      return true; // property fails
+    path_symex(*state, queue, ns);
   }
 
   return false; // property holds
@@ -47,7 +65,7 @@ bool path_searcht::operator()(
 
 /*******************************************************************\
 
-Function: path_searcht::execute
+Function: path_searcht::pick_state
 
   Inputs:
 
@@ -57,18 +75,27 @@ Function: path_searcht::execute
 
 \*******************************************************************/
 
-bool path_searcht::execute(
-  queuet::iterator state,
-  const namespacet &ns)
+path_searcht::queuet::iterator path_searcht::pick_state()
 {
-  if(!state->is_executable())
-  {
-    queue.erase(state);
-    return false; // no error found
-  }
-  
-  path_symex(*state, queue, ns);
-  
-  return false;
+  // Picking the first one is a DFS.
+  return queue.begin();
 }
 
+/*******************************************************************\
+
+Function: path_searcht::check_assertion
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool path_searcht::check_assertion(
+  const statet &state,
+  const namespacet &ns)
+{
+  return false; // no error
+}
