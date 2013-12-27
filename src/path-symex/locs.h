@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_LOCS_H
-#define CPROVER_LOCS_H
+#ifndef CPROVER_PATH_SYMEX_LOCS_H
+#define CPROVER_PATH_SYMEX_LOCS_H
 
 #include <util/std_expr.h>
 
