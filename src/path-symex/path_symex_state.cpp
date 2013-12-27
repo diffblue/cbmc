@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <util/simplify_expr.h>
+
+#if 0
 #include <util/std_expr.h>
 #include <util/expr_util.h>
 #include <util/decision_procedure.h>
@@ -14,7 +17,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <solvers/prop/prop_conv.h>
 
 #include <util/i2string.h>
-#include <util/simplify_expr.h>
 #include <util/replace_expr.h>
 #include <util/find_symbols.h>
 
@@ -23,8 +25,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/goto_functions.h>
 
 #include <path-symex/locs.h>
+#endif
 
-#include "state.h"
+#include "path_symex_state.h"
 
 //#define DEBUG
 
@@ -44,20 +47,22 @@ Function: initial_state
 
 \*******************************************************************/
 
-statet initial_state(
+path_symex_statet initial_state(
   var_mapt &var_map,
-  loc_reft entry_loc)
+  const locst &locs)
 {
-  statet s(var_map);
-  s.threads.resize(1);
-  s.threads[0].pc=entry_loc;
+  path_symex_statet s(var_map, locs);
+  
+  // create one new thread
+  s.add_thread().pc=locs.entry_loc;
   s.set_current_thread(0);
+
   return s;
 }
 
 /*******************************************************************\
 
-Function: statet::output
+Function: path_symex_statet::output
 
   Inputs:
 
@@ -67,7 +72,7 @@ Function: statet::output
 
 \*******************************************************************/
 
-void statet::output(const threadt &thread, std::ostream &out) const
+void path_symex_statet::output(const threadt &thread, std::ostream &out) const
 {
   out << "  PC: " << thread.pc << std::endl;
   out << "  Stack:";
@@ -81,7 +86,7 @@ void statet::output(const threadt &thread, std::ostream &out) const
 
 /*******************************************************************\
 
-Function: statet::output
+Function: path_symex_statet::output
 
   Inputs:
 
@@ -91,7 +96,7 @@ Function: statet::output
 
 \*******************************************************************/
 
-void statet::output(std::ostream &out) const
+void path_symex_statet::output(std::ostream &out) const
 {
   for(unsigned t=0; t<threads.size(); t++)
   {
@@ -103,7 +108,7 @@ void statet::output(std::ostream &out) const
 
 /*******************************************************************\
 
-Function: statet::read
+Function: path_symex_statet::read
 
   Inputs:
 
@@ -113,11 +118,11 @@ Function: statet::read
 
 \*******************************************************************/
 
-exprt statet::read(const exprt &src)
+exprt path_symex_statet::read(const exprt &src)
 {
 
   #ifdef DEBUG
-  //std::cout << "statet::read " << src.pretty() << std::endl;
+  //std::cout << "path_symex_statet::read " << src.pretty() << std::endl;
   #endif
 
   exprt tmp=instantiate_rec(src, "", src.type(), true, false);
@@ -131,7 +136,7 @@ exprt statet::read(const exprt &src)
 
 /*******************************************************************\
 
-Function: statet::read
+Function: path_symex_statet::read
 
   Inputs:
 
@@ -141,10 +146,10 @@ Function: statet::read
 
 \*******************************************************************/
 
-exprt statet::read_no_propagate(const exprt &src)
+exprt path_symex_statet::read_no_propagate(const exprt &src)
 {
   #ifdef DEBUG
-  std::cout << "statet::read_no_propagate " << src.pretty() << std::endl;
+  std::cout << "path_symex_statet::read_no_propagate " << src.pretty() << std::endl;
   #endif
 
   exprt tmp=instantiate_rec(src, "", src.type(), false, false);
@@ -160,7 +165,7 @@ exprt statet::read_no_propagate(const exprt &src)
 
 /*******************************************************************\
 
-Function: statet::instantiate_rec
+Function: path_symex_statet::instantiate_rec
 
   Inputs:
 
@@ -170,7 +175,7 @@ Function: statet::instantiate_rec
 
 \*******************************************************************/
 
-exprt statet::instantiate_rec(
+exprt path_symex_statet::instantiate_rec(
   const exprt &src,
   const std::string &suffix,
   const typet& suffix_type,
@@ -219,6 +224,7 @@ exprt statet::instantiate_rec(
   }
   else if(src.id()==ID_sideeffect)
   {
+    #if 0
     const irep_idt &statement=to_side_effect_expr(src).get_statement();
     
     if(statement==ID_nondet)
@@ -232,9 +238,11 @@ exprt statet::instantiate_rec(
     }
     else
       throw "instantiate_rec: unexpected side effect "+id2string(statement);
+    #endif
   }
   else if(src.id()==ID_member)
   {
+    #if 0
     const member_exprt &member_expr=to_member_expr(src);
 	const irep_idt& component_name=member_expr.get_component_name();
     const exprt &struct_op=member_expr.struct_op();
@@ -259,8 +267,11 @@ exprt statet::instantiate_rec(
       "."+id2string(component_name)+suffix;
 
     return instantiate_rec(struct_op, new_suffix, new_suffix_type, propagate, is_address);
+    #endif
   }
-  else if(src.id()==ID_symbol) {
+  else if(src.id()==ID_symbol)
+  {
+    #if 0
 
 	  // special nondeterminism symbol
 	  if(var_map.is_nondet(src)) {
@@ -274,7 +285,7 @@ exprt statet::instantiate_rec(
 
 	  var_mapt::var_infot& var_info=var_map(identifier, suffix, symbol_type);
 
-		var_statet &var_state=get_var_state(var_info);
+		var_path_symex_statet &var_state=get_var_state(var_info);
 
 		// 'src' is symbol.member    
 		if(var_state.identifier==irep_idt())
@@ -290,6 +301,7 @@ exprt statet::instantiate_rec(
 		}
 		else
 		  return symbol_exprt(var_state.identifier, symbol_type);
+    #endif
   }
 
   if(!src.has_operands())
@@ -309,7 +321,7 @@ exprt statet::instantiate_rec(
 
 /*******************************************************************\
 
-Function: statet::original_name
+Function: path_symex_statet::original_name
 
   Inputs:
 
@@ -319,7 +331,8 @@ Function: statet::original_name
 
 \*******************************************************************/
 
-exprt statet::original_name(const exprt &src)
+#if 0
+exprt path_symex_statet::original_name(const exprt &src)
 {
   if(src.id()==ID_symbol)
   {
@@ -342,11 +355,11 @@ exprt statet::original_name(const exprt &src)
   
   return tmp;
 }
-
+#endif
 
 /*******************************************************************\
 
-Function: statet::ssa_name
+Function: path_symex_statet::ssa_name
 
   Inputs:
 
@@ -357,7 +370,7 @@ Function: statet::ssa_name
 \*******************************************************************/
 
 #if 0
-exprt statet::ssa_name(const exprt &src)
+exprt path_symex_statet::ssa_name(const exprt &src)
 {
   if(src.is_true() || src.is_false())
     return src;
@@ -416,7 +429,7 @@ exprt statet::ssa_name(const exprt &src)
 
 /*******************************************************************\
 
-Function: statet::ssa_eval
+Function: path_symex_statet::ssa_eval
 
   Inputs:
 
@@ -426,8 +439,8 @@ Function: statet::ssa_eval
 
 \*******************************************************************/
 
-
-exprt statet::ssa_eval(const exprt &src, statet::historyt::reverse_iterator rit)
+#if 0
+exprt path_symex_statet::ssa_eval(const exprt &src, path_symex_statet::historyt::reverse_iterator rit)
 {
   if(src.is_true() || src.is_false())
     return src;
@@ -442,7 +455,7 @@ exprt statet::ssa_eval(const exprt &src, statet::historyt::reverse_iterator rit)
   replace_mapt replace_map;
 
   // replace the symbols in src by the suitable SSA assignments
-  for(statet::historyt::reverse_iterator 
+  for(path_symex_statet::historyt::reverse_iterator 
       h_rit=rit+1;
       h_rit!=history.rend() 
       &&!depends.empty();
@@ -469,31 +482,11 @@ exprt statet::ssa_eval(const exprt &src, statet::historyt::reverse_iterator rit)
 
   return result;
 }
+#endif
 
 /*******************************************************************\
 
-Function: statet::record_step
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-statet::stept &statet::record_step()
-{
-  history.push_back(stept());
-  stept &step=history.back();
-  step.get_pc_vector(*this);
-  step.thread_nr=current_thread;
-  return step;
-}
-
-/*******************************************************************\
-
-Function: statet::ssa_constraints
+Function: path_symex_statet::record_step
 
   Inputs:
 
@@ -504,12 +497,35 @@ Function: statet::ssa_constraints
 \*******************************************************************/
 
 #if 0
-void statet::ssa_constraints(std::vector<exprt>& constraints, 
+path_symex_statet::stept &path_symex_statet::record_step()
+{
+  history.push_back(path_symex_stept());
+  path_symex_stept &step=history.back();
+  step.get_pc_vector(*this);
+  step.thread_nr=current_thread;
+  return step;
+}
+#endif
+
+/*******************************************************************\
+
+Function: path_symex_statet::ssa_constraints
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+#if 0
+void path_symex_statet::ssa_constraints(std::vector<exprt>& constraints, 
                              bool prop) const
 {
 	bool reached_ancestor=false;
 
-	for(statet::historyt::const_iterator
+	for(path_symex_statet::historyt::const_iterator
 		  h_it=history.begin();
 		  h_it!=history.end();
 		  h_it++)
@@ -540,7 +556,7 @@ void statet::ssa_constraints(std::vector<exprt>& constraints,
 
 /*******************************************************************\
 
-Function: statet::ssa_constraints
+Function: path_symex_statet::ssa_constraints
 
   Inputs:
 
@@ -551,7 +567,7 @@ Function: statet::ssa_constraints
 \*******************************************************************/
 
 #if 0
-void statet::ssa_constraints(prop_conv_solvert &dest, 
+void path_symex_statet::ssa_constraints(prop_conv_solvert &dest, 
                              std::map<exprt,exprt>& activation,
                              bool prop) const
 {
@@ -561,7 +577,7 @@ void statet::ssa_constraints(prop_conv_solvert &dest,
 
   int i=0; // counter for debugging purposes
 
-  for(statet::historyt::const_iterator
+  for(path_symex_statet::historyt::const_iterator
       h_it=history.begin();
       h_it!=history.end();
       h_it++)
@@ -616,12 +632,12 @@ void statet::ssa_constraints(prop_conv_solvert &dest,
 
     catch (std::string s)
     {
-      throw "statet::ssa_constraints: {" + i2string(i) + "} : " + s; 
+      throw "path_symex_statet::ssa_constraints: {" + i2string(i) + "} : " + s; 
     }
    
     catch (char const* c)
     {
-      throw "statet::ssa_constraints: {" + i2string(i) + "} : " + c; 
+      throw "path_symex_statet::ssa_constraints: {" + i2string(i) + "} : " + c; 
     }
 
   }
@@ -631,7 +647,7 @@ void statet::ssa_constraints(prop_conv_solvert &dest,
 
 /*******************************************************************\
 
-Function: statet::shared_accesses
+Function: path_symex_statet::shared_accesses
 
   Inputs: expr
 
@@ -641,7 +657,8 @@ Function: statet::shared_accesses
 
 \*******************************************************************/
 
-bool statet::shared_accesses(const stept& step,
+#if 0
+bool path_symex_statet::shared_accesses(const stept& step,
 							 std::set<exprt>& reads, 
 					         std::set<exprt>& writes)
 {
@@ -662,9 +679,10 @@ bool statet::shared_accesses(const stept& step,
 
 	return !reads.empty() || !writes.empty();
 }
+#endif
 
 #if 0
-bool statet::last_shared_accesses(std::set<exprt>& reads, 
+bool path_symex_statet::last_shared_accesses(std::set<exprt>& reads, 
 					         std::set<exprt>& writes)
 {
 	nodet* parent_node = node->parent;
@@ -686,7 +704,7 @@ bool statet::last_shared_accesses(std::set<exprt>& reads,
 
 /*******************************************************************\
 
-Function: statet::shared_accesses
+Function: path_symex_statet::shared_accesses
 
   Inputs: expr
 
@@ -697,7 +715,8 @@ Function: statet::shared_accesses
 
 \*******************************************************************/
 
-bool statet::shared_accesses(
+#if 0
+bool path_symex_statet::shared_accesses(
   const exprt& expr,
   std::set<exprt>& accesses,
   bool record
@@ -708,7 +727,7 @@ bool statet::shared_accesses(
 
 
 
-bool statet::shared_accesses(
+bool path_symex_statet::shared_accesses(
   const exprt& expr,
   const std::string &suffix,
   std::set<exprt>& accesses,
@@ -737,7 +756,7 @@ bool statet::shared_accesses(
   {
     const index_exprt &index_expr=to_index_expr(expr);
 
-    //std::cout << "statet::shared_accesses " << from_expr(index_expr.array()) << std::endl;
+    //std::cout << "path_symex_statet::shared_accesses " << from_expr(index_expr.array()) << std::endl;
 
     return shared_accesses(index_expr.array(),suffix,accesses,record);
   }
@@ -767,92 +786,11 @@ bool statet::shared_accesses(
     return false;
   }
 }
-
-
-void slicert::reset_ignore() 
-{
-  for(statet::historyt::reverse_iterator
-      h_rit=history.rbegin();
-      h_rit!=history.rend();
-      h_rit++)
-  {
-    statet::stept &step=*h_rit;
-    step.ignore=false;
-  }
-}
-
-void slicert::operator()(statet::historyt::iterator& step)
-{
-  reset_ignore();
-
-  find_symbols((*step).guard_no_prop,depends);
-
-  slice_assignments();
-
-  (*step).ignore=false;
-}
-
-
-void slicert::operator()(const exprt& start, const exprt& cond, bool include_guards) 
-{
-  reset_ignore();
-
-  find_symbols(start,depends);
-  find_symbols(cond,depends);
-
-  if(include_guards)
-  {
-    // add variables of guards to depend
-    for(statet::historyt::reverse_iterator
-     h_rit=history.rbegin();
-     h_rit!=history.rend();
-     h_rit++)
-    {
-      statet::stept &step=*h_rit;
-      const exprt& expr = step.guard_no_prop;
-     
-      if(expr.is_not_nil()) 
-      {
-        find_symbols(expr,depends);      
-      }    
-    }
-  }
-
-  slice_assignments();
-}
-
-void slicert::slice_assignments(bool include_guards)
-{
-  for(statet::historyt::reverse_iterator
-   h_rit=history.rbegin();
-   h_rit!=history.rend();
-   h_rit++)
-  {
-    statet::stept &step=*h_rit;
-
-    if(step.guard_no_prop.is_nil())
-      step.ignore=true;
-
-    if(step.lhs.is_not_nil())
-    { 
-      if(depends.find(step.ssa_lhs.get_identifier())==depends.end())
-      {        
-        step.ignore=true;
-      }
-      else
-      {
-        find_symbols(step.ssa_rhs_no_prop,depends);
-        step.ignore=false;
-      }
-    }
-  }
-}
-
-
+#endif
 
 /*******************************************************************\
 
-Function: statet::show_vcc
+Function: path_symex_statet::show_vcc
 
   Inputs: show verification condition
 
@@ -863,7 +801,7 @@ Function: statet::show_vcc
 \*******************************************************************/
 
 #if 0
-void statet::show_vcc(
+void path_symex_statet::show_vcc(
   nodet* ancestor,
   const exprt& start, 
   const exprt& cond,
@@ -877,7 +815,7 @@ void statet::show_vcc(
 
   out << "0:" << from_expr(var_map.ns, "", ssa_name(start,ancestor)) << "\n";
   
-  for(statet::historyt::const_iterator
+  for(path_symex_statet::historyt::const_iterator
       h_it=history.begin();
       h_it!=history.end();
       h_it++, ++step_nr)
