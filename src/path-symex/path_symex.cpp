@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#if 0
 #include <cstdlib>
 #include <iostream>
 
@@ -19,75 +20,64 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 
 #include <ansi-c/c_types.h>
+#endif
 
-#include "symex.h"
+#include "path_symex.h"
 
 // #define DEBUG
 
-class symext
+class path_symext
 {
 public:
-  symext(
-    const locst &_locs,
-    nodest &_nodes,
-    const namespacet &_ns,
-    const optionst &_options):
-    locs(_locs),
-    nodes(_nodes),
-    ns(_ns),
-    options(_options)
+  explicit path_symext(
+    const namespacet &_ns):
+    ns(_ns)
   {
-    max_unwind=options.get_int_option("unwind");
-
-    if(max_unwind==0)
-      max_unwind=100000000;
   }
   
   void operator()(
-    statet &state,
-    std::list<statet> &furter_states,
-    loc_reft next_loc);
+    path_symex_statet &state,
+    std::list<path_symex_statet> &furter_states);
 
 protected:
-  const locst &locs;
-  nodest &nodes;
   const namespacet &ns;
-  const optionst &options;
-
-  unsigned long max_unwind;
 
   static exprt as_expr(const exprt::operandst &guard);
 
   void function_call(
-    statet &state,
+    path_symex_statet &state,
     const code_function_callt &function_call);
     
   void return_from_function(
-    statet &state,
+    path_symex_statet &state,
     const exprt &return_value);
 
   void symex_malloc(
-	statet &state,
+    path_symex_statet &state,
     exprt::operandst &guard,
-  	const exprt &lhs,
-	const side_effect_exprt &code,
+    const exprt &lhs,
+    const side_effect_exprt &code,
     const std::string &suffix,
     const typet& lhs_suffix_type);
 
-
-  void assign(statet &state, const exprt &lhs, const exprt &rhs)
+  void assign(
+    path_symex_statet &state,
+    const exprt &lhs,
+    const exprt &rhs)
   {
-	    exprt::operandst _guard; // start with empty guard
-  		assign_rec(state, _guard, lhs, rhs, std::string(), ns.follow(lhs.type()));
+    exprt::operandst _guard; // start with empty guard
+    assign_rec(state, _guard, lhs, rhs, std::string(), ns.follow(lhs.type()));
   }
 
-  inline void assign(statet &state, const code_assignt &assign)
+  inline void assign(
+    path_symex_statet &state,
+    const code_assignt &assign)
   {
     this->assign(state, assign.lhs(), assign.rhs());
   }
 
   void assign_rec(
-    statet &state,
+    path_symex_statet &state,
     exprt::operandst &guard,
     const exprt &lhs, // not instantiated
     const exprt &rhs, // not instantiated
@@ -99,7 +89,7 @@ protected:
 
 /*******************************************************************\
 
-Function: symext::propagate
+Function: path_symext::propagate
 
   Inputs:
 
@@ -109,7 +99,7 @@ Function: symext::propagate
 
 \*******************************************************************/
 
-bool symext::propagate(const exprt &src)
+bool path_symext::propagate(const exprt &src)
 {
   // propagate things that are 'simple enough'
   bool result = false;  
@@ -142,7 +132,7 @@ bool symext::propagate(const exprt &src)
   
   #ifdef DEBUG
     /* 
-    std::cout << "symext::propagate: " << (result ? "yes" : "no") 
+    std::cout << "path_symext::propagate: " << (result ? "yes" : "no") 
               << " " << src.id_string() << std::endl;
      */
   #endif
@@ -153,7 +143,7 @@ bool symext::propagate(const exprt &src)
 
 /*******************************************************************\
 
-Function: symext::as_expr
+Function: path_symext::as_expr
 
   Inputs:
 
@@ -163,7 +153,7 @@ Function: symext::as_expr
 
 \*******************************************************************/
 
-exprt symext::as_expr(const exprt::operandst &guard)
+exprt path_symext::as_expr(const exprt::operandst &guard)
 {
   if(guard.empty())
     return true_exprt();
@@ -180,7 +170,7 @@ exprt symext::as_expr(const exprt::operandst &guard)
 
 /*******************************************************************\
 
-Function: symext::symex_malloc
+Function: path_symext::symex_malloc
 
   Inputs:
 
@@ -211,8 +201,9 @@ inline static typet c_sizeof_type_rec(const exprt &expr)
   return nil_typet();
 }
 
-void symext::symex_malloc(
-  statet &state,
+#if 0
+void path_symext::symex_malloc(
+  path_symex_statet &state,
   exprt::operandst &guard, // not instantiated
   const exprt &lhs,
   const side_effect_exprt &code,
@@ -341,12 +332,11 @@ void symext::symex_malloc(
              suffix,
              object_type);
 }
-
-
+#endif
 
 /*******************************************************************\
 
-Function: symext::assign_rec
+Function: path_symext::assign_rec
 
   Inputs:
 
@@ -356,8 +346,9 @@ Function: symext::assign_rec
 
 \*******************************************************************/
 
-void symext::assign_rec(
-  statet &state,
+#if 0
+void path_symext::assign_rec(
+  path_symex_statet &state,
   exprt::operandst &guard, 
   const exprt &lhs, 
   const exprt &rhs, 
@@ -462,7 +453,7 @@ void symext::assign_rec(
     */
 
     // record the step
-    statet::stept &step=state.record_step();
+    path_symex_statet::stept &step=state.record_step();
     step.guard=as_expr(guard);
     step.guard_no_prop=as_expr(guard);
     step.lhs=lhs;
@@ -470,7 +461,7 @@ void symext::assign_rec(
     step.ssa_rhs=ssa_rhs_prop;
     step.ssa_rhs_no_prop=ssa_rhs_no_prop;
 
-    statet::var_statet &var_state=state.get_var_state(var_info);
+    path_symex_statet::var_statet &var_state=state.get_var_state(var_info);
     var_state.identifier=ssa_lhs_post.get_identifier();
 
     // propagate the rhs?
@@ -539,7 +530,7 @@ void symext::assign_rec(
 
     if(tmp_lhs.id() == ID_dereference) // otherwise nontermination
     {
-	    throw "symext::operator(): unable to resolve pointer of lhs " + tmp_lhs.pretty(2);
+	    throw "path_symext::operator(): unable to resolve pointer of lhs " + tmp_lhs.pretty(2);
     }
 
     assign_rec(state, guard, tmp_lhs, rhs, suffix, lhs_suffix_type);
@@ -613,14 +604,15 @@ void symext::assign_rec(
   else
   {
 	  // ignore
-    //throw "symext::assign_rec(): unexpected lhs: ";
+    //throw "path_symext::assign_rec(): unexpected lhs: ";
 
   }
 }
+#endif
 
 /*******************************************************************\
 
-Function: symext::function_call
+Function: path_symext::function_call
 
   Inputs:
 
@@ -630,8 +622,9 @@ Function: symext::function_call
 
 \*******************************************************************/
 
-void symext::function_call(
-  statet &state,
+#if 0
+void path_symext::function_call(
+  path_symex_statet &state,
   const code_function_callt &function_call)
 {
   assert(function_call.function().id()==ID_symbol);
@@ -658,8 +651,8 @@ void symext::function_call(
   }
   
   // push a frame on the call stack
-  statet::threadt &thread=state.threads[state.get_current_thread()];
-  thread.call_stack.push_back(statet::framet());
+  path_symex_statet::threadt &thread=state.threads[state.get_current_thread()];
+  thread.call_stack.push_back(path_symex_statet::framet());
   thread.call_stack.back().return_location=thread.pc.next_loc();
   thread.call_stack.back().return_lhs=function_call.lhs();
   thread.call_stack.back().saved_local_vars=thread.local_vars;
@@ -694,10 +687,11 @@ void symext::function_call(
   // set the new PC
   thread.pc=function_entry_point;
 }
+#endif
 
 /*******************************************************************\
 
-Function: symext::return_from_function
+Function: path_symext::return_from_function
 
   Inputs:
 
@@ -707,8 +701,9 @@ Function: symext::return_from_function
 
 \*******************************************************************/
 
-void symext::return_from_function(
-  statet &state,
+#if 0
+void path_symext::return_from_function(
+  path_symex_statet &state,
   const exprt &return_value)
 {
   if(state.threads[state.get_current_thread()].call_stack.empty())
@@ -717,7 +712,7 @@ void symext::return_from_function(
   }
   else
   {
-    statet::threadt &thread=state.threads[state.get_current_thread()];
+    path_symex_statet::threadt &thread=state.threads[state.get_current_thread()];
     thread.pc=thread.call_stack.back().return_location;
 
     if(return_value.is_not_nil() &&
@@ -727,10 +722,11 @@ void symext::return_from_function(
     thread.call_stack.pop_back();
   }
 }
+#endif
 
 /*******************************************************************\
 
-Function: symext::operator()
+Function: path_symext::operator()
 
   Inputs:
 
@@ -740,13 +736,13 @@ Function: symext::operator()
 
 \*******************************************************************/
 
-void symext::operator()(
-  statet &state,
-  std::list<statet> &further_states,
-  loc_reft next_loc)
+void path_symext::operator()(
+  path_symex_statet &state,
+  std::list<path_symex_statet> &further_states)
 {
+#if 0
   unsigned thread_nr=state.get_current_thread();
-  const statet::threadt &thread=state.threads[thread_nr];
+  const path_symex_statet::threadt &thread=state.threads[thread_nr];
   const loct &loc=locs[thread.pc];
   const goto_programt::instructiont &instruction=*loc.target;
 
@@ -758,7 +754,7 @@ void symext::operator()(
 
   for(unsigned i=0; i<state.threads.size(); ++i)
   {
-    const statet::threadt &thread=state.threads[i];
+    const path_symex_statet::threadt &thread=state.threads[i];
 
     if(i==thread_nr)
     {
@@ -814,8 +810,8 @@ void symext::operator()(
       state.next_pc();
       
       // ordering of the following matters due to vector instability
-      statet::threadt &new_thread=state.add_thread();
-      statet::threadt &old_thread=state.threads[state.get_current_thread()];
+      path_symex_statet::threadt &new_thread=state.add_thread();
+      path_symex_statet::threadt &old_thread=state.threads[state.get_current_thread()];
       new_thread.pc=loc.targets.front();
       new_thread.local_vars=old_thread.local_vars;
     }
@@ -869,7 +865,7 @@ void symext::operator()(
             t_it++)
         {
           further_states.push_back(state); // fresh copy
-          statet &state_taken=further_states.back(); 
+          path_symex_statet &state_taken=further_states.back(); 
           state_taken.history.back().guard=guard;
           state_taken.history.back().guard_no_prop=guard_no_prop;
           state_taken.set_pc(*t_it);
@@ -1046,14 +1042,15 @@ void symext::operator()(
                       + " Node " + i2string(state.node->number)
                       + " " + as_string(ns, instruction));
 
-    throw "symext::operator(): " + new_msg + "\n  " + msg;
+    throw "path_symext::operator(): " + new_msg + "\n  " + msg;
   }
   #endif
+#endif
 }
 
 /*******************************************************************\
 
-Function: symex
+Function: path_symex
 
   Inputs:
 
@@ -1063,110 +1060,12 @@ Function: symex
 
 \*******************************************************************/
 
-void symex(
-  const locst &locs,
-  nodest &nodes,
-  statet &state,
-  std::list<statet> &further_states,
-  const namespacet &ns,
-  const optionst &options)
+void path_symex(
+  path_symex_statet &state,
+  std::list<path_symex_statet> &further_states,
+  const namespacet &ns)
 {
-  symext symex_class(locs, nodes, ns, options);
-  
-  loc_reft next_loc;
-
-  symex_class(state, further_states, next_loc);
+  path_symext path_symex(ns);  
+  path_symex(state, further_states);
 }
-
-/*******************************************************************\
-
-Function: symex
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void symex(
-  const locst &locs,
-  nodest &nodes,
-  statet &state,
-  nodet* node,
-  const namespacet &ns,
-  const optionst &options)
-{
-  unsigned path_length=0;
-
-  #ifdef DEBUG
-  std::cout << "path symex " << std::endl;
-  #endif
-
-  if(node == state.node)
-	  return;
-
-  for(nodet* 
-      current=node;
-      current&&current!=state.node;
-      current=current->parent)
-  {
-    ++path_length;
-  }
-
-  std::vector<nodet*> path;
-
-  path.reserve(path_length);
-
-  nodet* current;
-
-  for(current=node;
-      current&&current!=state.node;
-      current=current->parent)
-  {
-    path.push_back(current);
-  }
-
-  assert(current == state.node);
-
-  symext symex_class(locs, nodes, ns, options);
-
-  std::list<statet> further_states;
-
-  for(int 
-      i=path.size()-1;
-      i>=0;
-      --i)
-  {
-    nodet* current=path[i];
-
-    // get the class of the node
-    node_equiv_classt *class_ptr=current->class_ptr;    
-
-    // get the location in the current thread
-    const global_vectort& global_vector=*(class_ptr->global_vector);
-
-    unsigned thread=current->thread;
-
-    assert(thread!=unsigned(-1));
-
-    loc_reft next_loc=global_vector[thread].back(); 
-    state.set_current_thread(thread);
-
-    symex_class(state, further_states, next_loc);
-    state.node=current;
-  }
-
-  assert(state.node==node);
-
-  assert(further_states.empty());  
-
-  #ifdef DEBUG
-  std::cout << "End of path symex " << std::endl;
-  #endif
-
-}
-
-
 

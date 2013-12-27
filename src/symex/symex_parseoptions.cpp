@@ -31,6 +31,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cbmc/version.h>
 
+#include <path-symex/path_search.h>
+
 #include "symex_parseoptions.h"
 
 /*******************************************************************\
@@ -513,11 +515,10 @@ Function: symex_parseoptionst::do_symex
 int symex_parseoptionst::do_symex(
   const goto_functionst &goto_functions)
 {
-  #if 0
-  bmc.set_ui(get_ui());
+  path_searcht path_search;
 
-  // do actual BMC
-  bool result=bmc.run(goto_functions);
+  // do actual symex
+  bool result=path_search(symbol_table, goto_functions);
 
   // let's log some more statistics
   debug() << "Memory consumption:" << messaget::endl;
@@ -527,7 +528,6 @@ int symex_parseoptionst::do_symex(
   // We return '0' if the property holds,
   // and '10' if it is violated.
   return result?10:0;
-  #endif
 }
 
 /*******************************************************************\
@@ -546,22 +546,21 @@ void symex_parseoptionst::help()
 {
   std::cout <<
     "\n"
-    "* *   CBMC " CBMC_VERSION " - Copyright (C) 2001-2011 ";
+    "* *     Symex " CBMC_VERSION " - Copyright (C) 2013 ";
     
   std::cout << "(" << (sizeof(void *)*8) << "-bit version)";
     
-  std::cout << "   * *\n";
+  std::cout << "     * *\n";
     
   std::cout <<
-    "* *              Daniel Kroening, Edmund Clarke             * *\n"
-    "* * Carnegie Mellon University, Computer Science Department * *\n"
+    "* *                    Daniel Kroening                      * *\n"
+    "* *                 University of Oxford                    * *\n"
     "* *                 kroening@kroening.com                   * *\n"
-    "* *        Protected in part by U.S. patent 7,225,417       * *\n"
     "\n"
     "Usage:                       Purpose:\n"
     "\n"
-    " symex [-?] [-h] [--help]      show help\n"
-    " symex file.c ...              source file names\n"
+    " symex [-?] [-h] [--help]     show help\n"
+    " symex file.c ...             source file names\n"
     "\n"
     "Frontend options:\n"
     " -I path                      set include path (C/C++)\n"
@@ -600,43 +599,16 @@ void symex_parseoptionst::help()
     " --signed-overflow-check      enable arithmetic over- and underflow checks\n"
     " --unsigned-overflow-check    enable arithmetic over- and underflow checks\n"
     " --nan-check                  check floating-point for NaN\n"
-    " --all-properties             report status of all properties\n"
     " --show-properties            show the properties\n"
-    " --show-loops                 show the loops in the program\n"
     " --no-assertions              ignore user assertions\n"
     " --no-assumptions             ignore user assumptions\n"
     " --error-label label          check that label is unreachable\n"
-    " --cover-assertions           check which assertions are reachable\n"
-    " --mm MM                      memory consistency model for concurrent programs\n"
     "\n"
-    "BMC options:\n"
+    "Symex options:\n"
     " --function name              set main function name\n"
     " --property nr                only check one specific property\n"
-    " --program-only               only show program expression\n"
     " --depth nr                   limit search depth\n"
     " --unwind nr                  unwind nr times\n"
-    " --unwindset L:B,...          unwind loop L with a bound of B\n"
-    "                              (use --show-loops to get the loop IDs)\n"
-    " --show-vcc                   show the verification conditions\n"
-    " --slice-formula              remove assignments unrelated to property\n"
-    " --no-unwinding-assertions    do not generate unwinding assertions\n"
-    " --partial-loops              permit paths with partial loops\n"
-    " --no-pretty-names            do not simplify identifiers\n"
-    "\n"
-    "Backend options:\n"
-    " --dimacs                     generate CNF in DIMACS format\n"
-    " --beautify                   beautify the counterexample (greedy heuristic)\n"
-    " --smt1                       output subgoals in SMT1 syntax (experimental)\n"
-    " --smt2                       output subgoals in SMT2 syntax (experimental)\n"
-    " --boolector                  use Boolector (experimental)\n"
-    " --mathsat                    use MathSAT (experimental)\n"
-    " --cvc                        use CVC3 (experimental)\n"
-    " --yices                      use Yices (experimental)\n"
-    " --z3                         use Z3 (experimental)\n"
-    " --refine                     use refinement procedure (experimental)\n"
-    " --outfile filename           output formula to given file\n"
-    " --arrays-uf-never            never turn arrays into uninterpreted functions\n"
-    " --arrays-uf-always           always turn arrays into uninterpreted functions\n"
     "\n"
     "Other options:\n"
     " --version                    show version and exit\n"
