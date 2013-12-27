@@ -1,6 +1,6 @@
 /*******************************************************************\
 
-Module: Program Locations
+Module: CFG made of Program Locations, built from goto_functionst
 
 Author: Daniel Kroening, kroening@kroening.com
 
