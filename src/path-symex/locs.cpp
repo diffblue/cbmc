@@ -119,13 +119,13 @@ void locst::output(std::ostream &out) const
     if(function!=loc.function)
     {
       function=loc.function;
-      out << "*** " << function << std::endl;
+      out << "*** " << function << "\n";
     }
    
     out << "  L" << l << ": "
 //        << loc.target->type << " "
 //        << loc.target->location
-        << " " << as_string(ns, *loc.target) << std::endl;
+        << " " << as_string(ns, *loc.target) << "\n";
               
     if(!loc.targets.empty())
     {
@@ -135,8 +135,11 @@ void locst::output(std::ostream &out) const
           t_it!=loc.targets.end();
           t_it++)
         out << " " << *t_it;
-      out << std::endl;
+      out << "\n";
     }
   }
+  
+  out << "\n";
+  out << "The entry location is L" << entry_loc << ".\n";
 }
 

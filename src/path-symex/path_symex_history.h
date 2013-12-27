@@ -17,10 +17,11 @@ class path_symex_stept
 {
 public:
   unsigned thread_nr;
-  std::vector<loc_reft> pc_vector;
+  typedef std::vector<loc_reft> pc_vectort;
+  pc_vectort pc_vector;
 
   exprt guard, ssa_rhs;
-  exprt lhs;
+  exprt full_lhs;
   symbol_exprt ssa_lhs;
 
   bool ignore; 
@@ -28,7 +29,7 @@ public:
   path_symex_stept():
     guard(nil_exprt()),
     ssa_rhs(nil_exprt()),
-    lhs(nil_exprt()),
+    full_lhs(nil_exprt()),
     ignore(false)
   {
   }
@@ -41,6 +42,7 @@ public:
 
 class path_symex_historyt
 {
+public:
   typedef std::vector<path_symex_stept> stepst;
   stepst steps;
   

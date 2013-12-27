@@ -60,7 +60,10 @@ static inline bool operator == (const loc_reft l1, const loc_reft l2)
 
 static inline std::ostream &operator << (std::ostream &out, loc_reft l)
 {
-  return out << l.loc_number;
+  if(l.is_nil())
+    return out << "nil";
+  else
+    return out << l.loc_number;
 }
 
 #endif

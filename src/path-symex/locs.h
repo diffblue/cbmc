@@ -38,8 +38,8 @@ public:
   typedef std::vector<loct> loc_vectort;
   loc_vectort loc_vector;
   loc_reft entry_loc;
-
-  typedef std::pair<loc_reft,code_typet> function_entryt;
+  
+  typedef std::pair<loc_reft, code_typet> function_entryt;
   typedef std::map<irep_idt, function_entryt> function_mapt;
   function_mapt function_map;
   
