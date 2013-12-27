@@ -25,8 +25,6 @@ Function: get_symbols_rec
 
 \*******************************************************************/
 
-#include <iostream>
-
 void get_symbols_rec(
   const namespacet &ns,
   const symbolt &symbol,
@@ -104,8 +102,9 @@ void remove_internal_symbols(
   special.insert("c::__CPROVER_initialize");
   special.insert("c::__CPROVER_malloc_size");
   special.insert("c::__CPROVER_deallocated");
+  special.insert("c::__CPROVER_dead_object");
   special.insert("c::__CPROVER_rounding_mode");
-  
+
   for(symbol_tablet::symbolst::const_iterator
       it=symbol_table.symbols.begin();
       it!=symbol_table.symbols.end();

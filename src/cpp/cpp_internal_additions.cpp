@@ -106,6 +106,7 @@ void cpp_internal_additions(std::ostream &out)
   out << "extern \"C\" signed __CPROVER_POINTER_OFFSET(const void *p);" << std::endl;
   out << "extern \"C\" bool __CPROVER_DYNAMIC_OBJECT(const void *p);" << std::endl;
   out << "extern \"C\" extern unsigned char __CPROVER_memory[__CPROVER::constant_infinity_uint];" << std::endl;
+  out << "extern \"C\" const void *__CPROVER_dead_object=0;" << std::endl;
     
   // malloc
   out << "extern \"C\" void *__CPROVER_malloc(__CPROVER::size_t size);" << std::endl;
