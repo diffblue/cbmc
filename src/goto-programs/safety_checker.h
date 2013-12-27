@@ -13,8 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/message.h>
 
-#include <goto-symex/goto_trace.h>
-
+#include "goto_trace.h"
 #include "goto_functions.h"
 
 class safety_checkert:public messaget

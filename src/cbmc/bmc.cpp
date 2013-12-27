@@ -22,11 +22,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ansi-c/ansi_c_language.h>
 
-#include <goto-symex/goto_trace.h>
+#include <goto-programs/xml_goto_trace.h>
+
 #include <goto-symex/build_goto_trace.h>
 #include <goto-symex/slice.h>
 #include <goto-symex/slice_by_trace.h>
-#include <goto-symex/xml_goto_trace.h>
 #include <goto-symex/memory_model_sc.h>
 #include <goto-symex/memory_model_tso.h>
 #include <goto-symex/memory_model_pso.h>

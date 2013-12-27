@@ -9,12 +9,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 
 #include <util/time_stopping.h>
+#include <util/xml.h>
 
 #include <solvers/sat/satcheck.h>
 #include <solvers/prop/cover_goals.h>
 #include <solvers/prop/literal_expr.h>
-
-#include <goto-symex/xml_goto_trace.h>
 
 #include "bmc.h"
 #include "bv_cbmc.h"
