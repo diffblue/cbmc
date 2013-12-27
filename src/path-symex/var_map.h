@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_VAR_MAP_H
-#define CPROVER_VAR_MAP_H
+#ifndef CPROVER_PATH_SYMEX_VAR_MAP_H
+#define CPROVER_PATH_SYMEX_VAR_MAP_H
 
 #include <map>
 

@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_STATE_H
-#define CPROVER_STATE_H
+#ifndef CPROVER_PATH_SYMEX_STATE_H
+#define CPROVER_PATH_SYMEX_STATE_H
 
 #include <set>
 
@@ -25,7 +25,6 @@ public:
   explicit inline statet(var_mapt &_var_map):
     var_map(_var_map),
     atomic_section_count(0),
-    node(NULL),
     current_thread(0),
     context_switches(0)
   {
@@ -153,7 +152,6 @@ public:
     exprt guard_no_prop, ssa_rhs_no_prop; // not propagated
     exprt lhs;
     symbol_exprt ssa_lhs;
-    class nodet *node;
     bool ignore; 
     
     stept():
@@ -162,7 +160,6 @@ public:
       guard_no_prop(nil_exprt()),
       ssa_rhs_no_prop(nil_exprt()),
       lhs(nil_exprt()),
-      node(NULL),
       ignore(false)
     {
     }
@@ -186,8 +183,6 @@ public:
   
 
   std::map<unsigned, unsigned> unwind_map;
-
-  class nodet *node;
 
   typedef std::vector<stept> historyt;
   historyt history;
@@ -230,13 +225,11 @@ public:
 
   // output history as SSA constraints into dest
   void ssa_constraints(class prop_conv_solvert &dest, 
-                       nodet* ancestor,
                        std::map<exprt,exprt>& activation,
                        bool prop=true) const;
   
 
   void ssa_constraints(std::vector<exprt>& constraints, 
-                       nodet* ancestor,
                        bool prop=true) const;
 
   stept &record_step();
@@ -248,7 +241,6 @@ public:
     history.swap(other.history);
     std::swap(atomic_section_count, other.atomic_section_count);
     std::swap(current_thread, other.current_thread);
-    std::swap(node, other.node);
     assert(&var_map==&other.var_map);
   }
   
@@ -314,7 +306,7 @@ public:
   
   static bool is_null(const exprt& e);
 
-  exprt ssa_name(const exprt& src, nodet*);
+  //exprt ssa_name(const exprt& src, nodet*);
   exprt ssa_eval(const exprt& src, statet::historyt::reverse_iterator h_rit); 
    
   static bool overlap(const std::set<exprt>& a, const std::set<exprt>& b)
@@ -349,7 +341,6 @@ public:
   }
 
   void show_vcc(
-    nodet* ancestor,
     const exprt& start, 
     const exprt& cond,
     bool prop,
@@ -398,12 +389,8 @@ class slicert
    void slice_assignments(bool include_guards=false);
 };
 
-
 statet initial_state(
   var_mapt &var_map,
-  class nodest &nodes,
-  loc_reft entry_loc,
-  nodet* node);
-
+  loc_reft entry_loc);
   
 #endif

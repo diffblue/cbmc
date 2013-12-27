@@ -25,7 +25,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <path-symex/locs.h>
 
 #include "state.h"
-#include "nodes.h"
 
 //#define DEBUG
 
@@ -47,15 +46,12 @@ Function: initial_state
 
 statet initial_state(
   var_mapt &var_map,
-  nodest &nodes,
-  loc_reft entry_loc,
-  nodet* node)
+  loc_reft entry_loc)
 {
   statet s(var_map);
   s.threads.resize(1);
   s.threads[0].pc=entry_loc;
   s.set_current_thread(0);
-  s.node=node?node:(&nodes.new_node(s));
   return s;
 }
 
@@ -360,8 +356,8 @@ Function: statet::ssa_name
 
 \*******************************************************************/
 
-
-exprt statet::ssa_name(const exprt &src, nodet* ancestor)
+#if 0
+exprt statet::ssa_name(const exprt &src)
 {
   if(src.is_true() || src.is_false())
     return src;
@@ -416,7 +412,7 @@ exprt statet::ssa_name(const exprt &src, nodet* ancestor)
 
   return result;
 }
-
+#endif
 
 /*******************************************************************\
 
@@ -492,7 +488,6 @@ statet::stept &statet::record_step()
   stept &step=history.back();
   step.get_pc_vector(*this);
   step.thread_nr=current_thread;
-  step.node=node;
   return step;
 }
 
@@ -508,8 +503,8 @@ Function: statet::ssa_constraints
 
 \*******************************************************************/
 
+#if 0
 void statet::ssa_constraints(std::vector<exprt>& constraints, 
-                             nodet* ancestor,
                              bool prop) const
 {
 	bool reached_ancestor=false;
@@ -541,8 +536,7 @@ void statet::ssa_constraints(std::vector<exprt>& constraints,
 
 	}
 }
-
-
+#endif
 
 /*******************************************************************\
 
@@ -556,12 +550,11 @@ Function: statet::ssa_constraints
 
 \*******************************************************************/
 
+#if 0
 void statet::ssa_constraints(prop_conv_solvert &dest, 
-                             nodet* ancestor,
                              std::map<exprt,exprt>& activation,
                              bool prop) const
 {
-
   unsigned activation_counter=0;
 
   bool reached_ancestor=false;
@@ -634,9 +627,7 @@ void statet::ssa_constraints(prop_conv_solvert &dest,
   }
 
 }
-
-
-
+#endif
 
 /*******************************************************************\
 
@@ -672,8 +663,7 @@ bool statet::shared_accesses(const stept& step,
 	return !reads.empty() || !writes.empty();
 }
 
-
-
+#if 0
 bool statet::last_shared_accesses(std::set<exprt>& reads, 
 					         std::set<exprt>& writes)
 {
@@ -692,7 +682,7 @@ bool statet::last_shared_accesses(std::set<exprt>& reads,
 
 	return !reads.empty() || !writes.empty();
 }
-
+#endif
 
 /*******************************************************************\
 
@@ -872,6 +862,7 @@ Function: statet::show_vcc
 
 \*******************************************************************/
 
+#if 0
 void statet::show_vcc(
   nodet* ancestor,
   const exprt& start, 
@@ -933,3 +924,4 @@ void statet::show_vcc(
   out << "{1} " << from_expr(var_map.ns, "", read(cond)) 
       << " ( " << from_expr(var_map.ns, "", read_no_propagate(cond)) << " ) " << "\n";
 }
+#endif

@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <path-symex/locs.h>
 
 #include "state.h"
-#include "nodes.h"
 
 // Transforms a state by executing a thread (state.current_thread).
 // May occasionally yield more than one next state
@@ -21,7 +20,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 void symex(
   const locst &locs,
-  nodest &nodes,
   statet &state,
   std::list<statet> &further_states,
   const namespacet &ns,
@@ -31,9 +29,7 @@ void symex(
 // at the node of the current state to node.
 void symex(
   const locst &locs,
-  nodest &nodes,
   statet &state,
-  nodet* node,
   const namespacet &ns,
   const optionst &options);
 
