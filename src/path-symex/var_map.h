@@ -14,8 +14,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/namespace.h>
 #include <util/expr.h>
 
-#include <path-symex/loc_ref.h>
-
 class var_mapt
 {
 public:
@@ -96,11 +94,6 @@ public:
     const typet &type,
     var_infot &var_info);
 
-  // maps function identifiers to first PC and function type
-  typedef std::pair<loc_reft,code_typet> function_entryt;
-  typedef std::map<irep_idt, function_entryt> function_mapt;
-  function_mapt function_map;
-
   // if expr is a symbol.member, return var_info
   // otherwise return NULL
   inline var_infot *operator()(const exprt &expr)
@@ -124,8 +117,7 @@ protected:
 
 public:
   unsigned nondet_count;  // free inputs
-  unsigned dynamic_count; // memory allocation
-  
+  unsigned dynamic_count; // memory allocation  
 };
 
 #endif
