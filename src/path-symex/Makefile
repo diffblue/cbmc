@@ -1,4 +1,4 @@
-SRC = locs.cpp
+SRC = locs.cpp var_map.cpp state.cpp symex.cpp
 
 INCLUDES= -I ..
 
