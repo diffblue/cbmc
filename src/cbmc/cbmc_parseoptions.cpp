@@ -1,6 +1,6 @@
 /*******************************************************************\
 
-Module: Main Module 
+Module: CBMC Command Line Option Processing
 
 Author: Daniel Kroening, kroening@kroening.com
 

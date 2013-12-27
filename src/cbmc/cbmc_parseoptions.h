@@ -1,6 +1,6 @@
 /*******************************************************************\
 
-Module: Command Line Parsing
+Module: CBMC Command Line Option Processing
 
 Author: Daniel Kroening, kroening@kroening.com
 
