@@ -24,6 +24,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/loop_ids.h>
 #include <goto-programs/link_to_library.h>
 #include <goto-programs/goto_inline.h>
+#include <goto-programs/xml_goto_trace.h>
 
 #include <analyses/goto_check.h>
 
@@ -233,7 +234,36 @@ int symex_parseoptionst::doit()
   }
 
   // do actual Symex
-  return do_symex(goto_functions);
+
+  const namespacet ns(symbol_table);
+  path_searcht path_search(ns);
+  
+  path_search.set_message_handler(get_message_handler());
+  path_search.set_verbosity(get_verbosity());
+
+  // do actual symex
+
+  switch(path_search(goto_functions))
+  {
+  case safety_checkert::SAFE:
+    report_success();   
+    return 0;
+ 
+  case safety_checkert::UNSAFE:
+    show_counterexample(path_search);
+    report_failure();
+    return 10;
+  
+  default:
+    return 8;
+  }
+
+  #if 0                                         
+  // let's log some more statistics
+  debug() << "Memory consumption:" << messaget::endl;
+  memory_info(debug());
+  debug() << eom;
+  #endif
 }
 
 /*******************************************************************\
@@ -512,35 +542,109 @@ bool symex_parseoptionst::process_goto_program(
 
 /*******************************************************************\
 
-Function: symex_parseoptionst::do_symex
+Function: symex_parseoptionst::report_success
 
   Inputs:
 
  Outputs:
 
- Purpose: invoke main modules
+ Purpose:
 
 \*******************************************************************/
 
-int symex_parseoptionst::do_symex(
-  const goto_functionst &goto_functions)
+void symex_parseoptionst::report_success()
 {
-  path_searcht path_search;
+  result() << "VERIFICATION SUCCESSFUL" << eom;
+
+  switch(get_ui())
+  {
+  case ui_message_handlert::PLAIN:
+    break;
+    
+  case ui_message_handlert::XML_UI:
+    {
+      xmlt xml("cprover-status");
+      xml.data="SUCCESS";
+      std::cout << xml;
+      std::cout << std::endl;
+    }
+    break;
+    
+  default:
+    assert(false);
+  }
+}
+
+/*******************************************************************\
+
+Function: symex_parseoptionst::show_counterexample
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void symex_parseoptionst::show_counterexample(
+  const safety_checkert &safety_checker)
+{
+  const namespacet ns(symbol_table);
+
+  switch(get_ui())
+  {
+  case ui_message_handlert::PLAIN:
+    std::cout << std::endl << "Counterexample:" << std::endl;
+    show_goto_trace(std::cout, ns, safety_checker.error_trace);
+    break;
   
-  path_search.set_message_handler(get_message_handler());
-  path_search.set_verbosity(get_verbosity());
+  case ui_message_handlert::XML_UI:
+    {
+      xmlt xml;
+      convert(ns, safety_checker.error_trace, xml);
+      std::cout << xml << std::endl;
+    }
+    break;
+  
+  default:
+    assert(false);
+  }
+}
 
-  // do actual symex
-  bool result=path_search(symbol_table, goto_functions);
+/*******************************************************************\
 
-  // let's log some more statistics
-  debug() << "Memory consumption:" << messaget::endl;
-  memory_info(debug());
-  debug() << eom;
+Function: symex_parseoptionst::report_failure
 
-  // We return '0' if the property holds,
-  // and '10' if it is violated.
-  return result?10:0;
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void symex_parseoptionst::report_failure()
+{
+  result() << "VERIFICATION FAILED" << eom;
+
+  switch(get_ui())
+  {
+  case ui_message_handlert::PLAIN:
+    break;
+    
+  case ui_message_handlert::XML_UI:
+    {
+      xmlt xml("cprover-status");
+      xml.data="FAILURE";
+      std::cout << xml;
+      std::cout << std::endl;
+    }
+    break;
+    
+  default:
+    assert(false);
+  }
 }
 
 /*******************************************************************\

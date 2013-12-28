@@ -137,7 +137,6 @@ Function: path_symex_statet::read
 
 exprt path_symex_statet::read(const exprt &src)
 {
-
   #ifdef DEBUG
   //std::cout << "path_symex_statet::read " << src.pretty() << std::endl;
   #endif
@@ -148,6 +147,7 @@ exprt path_symex_statet::read(const exprt &src)
   #ifdef DEBUG
   //std::cout << " ==> " << tmp.pretty() << std::endl;
   #endif
+
   return tmp;
 }
 
@@ -178,7 +178,6 @@ exprt path_symex_statet::read_no_propagate(const exprt &src)
 
   return tmp;
 }
-  
 
 /*******************************************************************\
 
@@ -195,7 +194,7 @@ Function: path_symex_statet::instantiate_rec
 exprt path_symex_statet::instantiate_rec(
   const exprt &src,
   const std::string &suffix,
-  const typet& suffix_type,
+  const typet &suffix_type,
   bool propagate,
   bool is_address)
 {
@@ -220,7 +219,8 @@ exprt path_symex_statet::instantiate_rec(
       tmp.op0()=instantiate_rec(src.op0(), suffix, suffix_type, propagate, false);
       return tmp;
     }
-    else {
+    else
+    {
       if(!src.has_operands())
         return src;
 
@@ -259,66 +259,57 @@ exprt path_symex_statet::instantiate_rec(
   }
   else if(src.id()==ID_member)
   {
-    #if 0
     const member_exprt &member_expr=to_member_expr(src);
-	const irep_idt& component_name=member_expr.get_component_name();
+    const irep_idt &component_name=member_expr.get_component_name();
     const exprt &struct_op=member_expr.struct_op();
-	typet struct_op_type=var_map.ns.follow(struct_op.type());
-	
-	if(struct_op_type.id()!=ID_struct)
-	{
-		return nil_exprt();
-	}
+    typet struct_op_type=var_map.ns.follow(struct_op.type());
+  
+    if(struct_op_type.id()!=ID_struct)
+      return nil_exprt();
 
     const struct_typet &struct_type=to_struct_type(var_map.ns.follow(struct_op.type()));
 
-	if(!struct_type.has_component(component_name))
-	{
-		throw "No component " + id2string(component_name) + " in member expr ";
-	}
+    if(!struct_type.has_component(component_name))
+      throw "No component "+id2string(component_name)+" in member expression";
 
-	typet new_suffix_type=suffix.size() ? suffix_type : var_map.ns.follow(struct_type.component_type(component_name));
+    typet new_suffix_type=suffix.size() ? suffix_type : var_map.ns.follow(struct_type.component_type(component_name));
 
     // add to suffix
-	const std::string new_suffix=
+    const std::string new_suffix=
       "."+id2string(component_name)+suffix;
 
     return instantiate_rec(struct_op, new_suffix, new_suffix_type, propagate, is_address);
-    #endif
   }
   else if(src.id()==ID_symbol)
   {
-    #if 0
-
-	  // special nondeterminism symbol
-	  if(var_map.is_nondet(src)) {
-		  return src;
-	  }
+    // special nondeterminism symbol
+    if(var_map.is_nondet(src)) {
+      return src;
+    }
 
     const symbol_exprt &symbol_expr=to_symbol_expr(src);
     const irep_idt &identifier=symbol_expr.get_identifier();
 
-    const typet& symbol_type=suffix.size() ? suffix_type : src.type();
+    const typet &symbol_type=suffix.size() ? suffix_type : src.type();
 
-	  var_mapt::var_infot& var_info=var_map(identifier, suffix, symbol_type);
+    var_mapt::var_infot &var_info=var_map(identifier, suffix, symbol_type);
 
-		var_path_symex_statet &var_state=get_var_state(var_info);
+    var_statet &var_state=get_var_state(var_info);
 
-		// 'src' is symbol.member    
-		if(var_state.identifier==irep_idt())
-		{
-		  // never used before
-		  var_state.identifier=var_info.ssa_identifier(get_current_thread());
+    // 'src' is symbol.member    
+    if(var_state.identifier==irep_idt())
+    {
+      // never used before
+      var_state.identifier=var_info.ssa_identifier(get_current_thread());
 
-		  return symbol_exprt(var_state.identifier, symbol_type);
-		}
-		else if(propagate && var_state.value.is_not_nil())
-		{
-		  return var_state.value;
-		}
-		else
-		  return symbol_exprt(var_state.identifier, symbol_type);
-    #endif
+      return symbol_exprt(var_state.identifier, symbol_type);
+    }
+    else if(propagate && var_state.value.is_not_nil())
+    {
+      return var_state.value;
+    }
+    else
+      return symbol_exprt(var_state.identifier, symbol_type);
   }
 
   if(!src.has_operands())
@@ -416,11 +407,11 @@ exprt path_symex_statet::ssa_name(const exprt &src)
   {
     stept& step=*h_rit;
 
-	if(step.node == parent)
-		start_recording=true;
+  if(step.node == parent)
+    start_recording=true;
     
-	if(!start_recording)
-		continue;
+  if(!start_recording)
+    continue;
 
     if(step.ssa_lhs.is_not_nil())
     {
@@ -517,7 +508,12 @@ path_symex_stept &path_symex_statet::record_step()
 {
   history.steps.push_back(path_symex_stept());
   path_symex_stept &step=history.steps.back();
-  //step.get_pc_vector(*this);
+
+  // copy PCs
+  step.pc_vector.resize(threads.size());
+  for(unsigned t=0; t<threads.size(); t++)
+    step.pc_vector[t]=threads[t].pc;
+  
   step.thread_nr=current_thread;
   return step;
 }
@@ -538,34 +534,34 @@ Function: path_symex_statet::ssa_constraints
 void path_symex_statet::ssa_constraints(std::vector<exprt>& constraints, 
                              bool prop) const
 {
-	bool reached_ancestor=false;
+  bool reached_ancestor=false;
 
-	for(path_symex_statet::historyt::const_iterator
-		  h_it=history.begin();
-		  h_it!=history.end();
-		  h_it++)
-	{
-		const stept &step=*h_it;
-		
-		reached_ancestor=reached_ancestor || step.node==ancestor;
-
-
-		if(!reached_ancestor || step.ignore) continue;
+  for(path_symex_statet::historyt::const_iterator
+      h_it=history.begin();
+      h_it!=history.end();
+      h_it++)
+  {
+    const stept &step=*h_it;
+    
+    reached_ancestor=reached_ancestor || step.node==ancestor;
 
 
-		const exprt& guard = prop ? step.guard : step.guard_no_prop;
-		const exprt& lhs   = step.ssa_lhs;
-		const exprt& rhs   = prop ? step.ssa_rhs : step.ssa_rhs_no_prop;
+    if(!reached_ancestor || step.ignore) continue;
 
-		if(guard.is_not_nil() && !guard.is_true())
-			constraints.push_back(guard);
 
-		if(lhs.is_not_nil())
-		{
-	    constraints.push_back(equal_exprt(lhs, rhs.is_nil() ? lhs : rhs));
-		}
+    const exprt& guard = prop ? step.guard : step.guard_no_prop;
+    const exprt& lhs   = step.ssa_lhs;
+    const exprt& rhs   = prop ? step.ssa_rhs : step.ssa_rhs_no_prop;
 
-	}
+    if(guard.is_not_nil() && !guard.is_true())
+      constraints.push_back(guard);
+
+    if(lhs.is_not_nil())
+    {
+      constraints.push_back(equal_exprt(lhs, rhs.is_nil() ? lhs : rhs));
+    }
+
+  }
 }
 #endif
 
@@ -674,46 +670,46 @@ Function: path_symex_statet::shared_accesses
 
 #if 0
 bool path_symex_statet::shared_accesses(const stept& step,
-							 std::set<exprt>& reads, 
-					         std::set<exprt>& writes)
+               std::set<exprt>& reads, 
+                   std::set<exprt>& writes)
 {
-	if(step.lhs.is_not_nil())
-	{
-		shared_accesses(step.ssa_lhs,writes,true);
-	}
+  if(step.lhs.is_not_nil())
+  {
+    shared_accesses(step.ssa_lhs,writes,true);
+  }
 
-	if(step.ssa_rhs.is_not_nil())
-	{
-	  shared_accesses(step.ssa_rhs_no_prop,reads,true);
-	}
+  if(step.ssa_rhs.is_not_nil())
+  {
+    shared_accesses(step.ssa_rhs_no_prop,reads,true);
+  }
 
-	if(step.guard.is_not_nil())
-	{
-	  shared_accesses(step.guard_no_prop,reads,true);
-	}
+  if(step.guard.is_not_nil())
+  {
+    shared_accesses(step.guard_no_prop,reads,true);
+  }
 
-	return !reads.empty() || !writes.empty();
+  return !reads.empty() || !writes.empty();
 }
 #endif
 
 #if 0
 bool path_symex_statet::last_shared_accesses(std::set<exprt>& reads, 
-					         std::set<exprt>& writes)
+                   std::set<exprt>& writes)
 {
-	nodet* parent_node = node->parent;
+  nodet* parent_node = node->parent;
 
-	if(parent_node==NULL)
-		return false;
+  if(parent_node==NULL)
+    return false;
 
-	for(historyt::const_reverse_iterator 
-		it=history.rbegin(); 
-		it!=history.rend() && it->node == parent_node; 
-	    ++it)
-	{
-		shared_accesses(*it, reads, writes);
-	}
+  for(historyt::const_reverse_iterator 
+    it=history.rbegin(); 
+    it!=history.rend() && it->node == parent_node; 
+      ++it)
+  {
+    shared_accesses(*it, reads, writes);
+  }
 
-	return !reads.empty() || !writes.empty();
+  return !reads.empty() || !writes.empty();
 }
 #endif
 

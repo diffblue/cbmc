@@ -49,19 +49,22 @@ public:
     const std::string &extra_options);
 
 protected:
-  virtual void get_command_line_options(optionst &options);
-  virtual int do_symex(const goto_functionst &goto_functions);
+  void get_command_line_options(optionst &options);
 
-  virtual bool get_goto_program(
+  bool get_goto_program(
     const optionst &options,
     goto_functionst &goto_functions);
 
-  virtual bool process_goto_program(
+  bool process_goto_program(
     const optionst &options,
     goto_functionst &goto_functions);
     
   bool set_properties(goto_functionst &goto_functions);
-  
+
+  void report_success();
+  void report_failure();
+  void show_counterexample(const class safety_checkert &);
+            
   void eval_verbosity();
 };
 

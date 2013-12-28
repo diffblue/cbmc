@@ -6,8 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <path-symex/path_symex.h>
+#include <solvers/flattening/bv_pointers.h>
+#include <solvers/sat/satcheck.h>
 
+#include "path_symex.h"
+#include "build_goto_trace.h"
 #include "path_search.h"
 
 /*******************************************************************\
@@ -22,11 +25,9 @@ Function: path_searcht::operator()
 
 \*******************************************************************/
 
-bool path_searcht::operator()(
-  const symbol_tablet &symbol_table,
+path_searcht::resultt path_searcht::operator()(
   const goto_functionst &goto_functions)
 {
-  namespacet ns(symbol_table);
   locst locs(ns);
   var_mapt var_map(ns);
   
@@ -54,13 +55,13 @@ bool path_searcht::operator()(
     // an error, possibly?
     if(state->get_instruction()->is_assert())
       if(check_assertion(*state, ns))
-        return true; // property fails
+        return UNSAFE; // property fails
     
     // execute
     path_symex(*state, queue, ns);
   }
 
-  return false; // property holds
+  return SAFE; // property holds
 }
 
 /*******************************************************************\
@@ -94,8 +95,32 @@ Function: path_searcht::check_assertion
 \*******************************************************************/
 
 bool path_searcht::check_assertion(
-  const statet &state,
+  statet &state,
   const namespacet &ns)
 {
-  return false; // no error
+  satcheckt satcheck;
+  bv_pointerst bv_pointers(ns, satcheck);
+
+  // the path constraint
+  bv_pointers << state.history;
+
+  // the assertion in SSA
+  exprt assertion=
+    state.read(state.get_instruction()->guard);
+
+  // negate  
+  bv_pointers.set_to(assertion, false);
+  
+  switch(bv_pointers.dec_solve())
+  {
+  case decision_proceduret::D_SATISFIABLE:
+    build_goto_trace(state, bv_pointers, error_trace);
+    return true; // error
+  
+  case decision_proceduret::D_UNSATISFIABLE:
+    return false; // no error
+  
+  default:
+    throw "error from solver";
+  }
 }

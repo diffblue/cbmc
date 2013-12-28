@@ -1,5 +1,5 @@
 SRC = locs.cpp var_map.cpp path_symex_history.cpp path_symex_state.cpp \
-      path_symex.cpp path_search.cpp
+      path_symex.cpp path_search.cpp build_goto_trace.cpp
 
 INCLUDES= -I ..
 

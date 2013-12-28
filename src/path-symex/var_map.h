@@ -37,7 +37,7 @@ public:
     // identifier=symbol+suffix
     irep_idt identifier, symbol, suffix;
 
-    // the type of the field/array
+    // the type of the identifier (struct member or array)
     typet type;
     
     unsigned ssa_counter;
