@@ -9,21 +9,19 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_PATH_SEARCH_H
 #define CPROVER_PATH_SEARCH_H
 
-#include <util/message.h>
-
-#include <goto-programs/goto_model.h>
+#include <goto-programs/safety_checker.h>
 
 #include <path-symex/path_symex_state.h>
 
-class path_searcht:public messaget
+class path_searcht:public safety_checkert
 {
 public:
-  inline path_searcht()
+  explicit inline path_searcht(const namespacet &_ns):
+    safety_checkert(_ns)
   {
   }
 
-  bool operator()(
-    const symbol_tablet &symbol_table,
+  virtual resultt operator()(
     const goto_functionst &goto_functions);
 
 protected:
@@ -36,7 +34,7 @@ protected:
   
   bool execute(queuet::iterator state, const namespacet &);
   
-  bool check_assertion(const statet &state, const namespacet &);
+  bool check_assertion(statet &state, const namespacet &);
 };
 
 #endif

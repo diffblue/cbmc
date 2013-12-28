@@ -54,7 +54,7 @@ public:
   // the values of the shared variables
   typedef std::vector<var_statet> var_valt;
   var_valt shared_vars;
-
+  
   // procedure frame
   struct framet
   {
@@ -81,6 +81,14 @@ public:
   
   typedef std::vector<threadt> threadst;
   threadst threads;
+
+  var_statet &get_var_state(const var_mapt::var_infot &var_info)
+  {
+    var_valt &var_val=
+      var_info.is_shared()?shared_vars:threads[current_thread].local_vars;
+    if(var_val.size()>=var_info.number) var_val.resize(var_info.number+1);
+    return var_val[var_info.number];
+  }
 
   bool inside_atomic_section;
   

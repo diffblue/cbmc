@@ -40,6 +40,8 @@ public:
   }
 };
 
+class decision_proceduret;
+
 class path_symex_historyt
 {
 public:
@@ -48,6 +50,17 @@ public:
   
   // output  
   void output(std::ostream &out) const;
+  
+  // interface to solvers
+  void convert(decision_proceduret &dest) const;
 };
+
+static inline decision_proceduret &operator << (
+  decision_proceduret &dest,
+  const path_symex_historyt &src)
+{
+  src.convert(dest);
+  return dest;
+}
 
 #endif

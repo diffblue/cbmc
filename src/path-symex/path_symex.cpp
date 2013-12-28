@@ -341,54 +341,54 @@ void path_symext::assign_rec(
   #if 0
   if(lhs_suffix_type.id()==ID_struct) // lhs is a struct
   {
-	const struct_typet &struct_type=to_struct_type(lhs_suffix_type);
-	const struct_typet::componentst &components=struct_type.components();
+    const struct_typet &struct_type=to_struct_type(lhs_suffix_type);
+    const struct_typet::componentst &components=struct_type.components();
 
-	bool is_struct_const=rhs.id() == ID_struct;
+    bool is_struct_const=rhs.id() == ID_struct;
 
-	int i=0;
+    int i=0;
 
-	for(struct_typet::componentst::const_iterator
-      it=components.begin();
-      it!=components.end();
-      it++)
-	{
-		const typet &subtype=it->type();	
-		const irep_idt& component_name=it->get_name();
-		typet lhs_type=ns.follow(subtype);
+    for(struct_typet::componentst::const_iterator
+        it=components.begin();
+        it!=components.end();
+        it++)
+    {
+      const typet &subtype=it->type();  
+      const irep_idt& component_name=it->get_name();
+      typet lhs_type=ns.follow(subtype);
 
-		// add to suffix
-		const std::string new_suffix=
-			suffix + "."+id2string(component_name); // note the order
+      // add to suffix
+      const std::string new_suffix=
+        suffix + "."+id2string(component_name); // note the order
 
-		exprt component;
+      exprt component;
 
-		if(is_struct_const) 
-		{
-			component=rhs.operands()[i];
-		}
-		else
-		{
-			component=member_exprt(rhs, component_name, lhs_type);
-		}
-		
-		assign_rec(state, guard, lhs, component, new_suffix, lhs_type);
-		++i;
-	 }
-	 return;
+      if(is_struct_const) 
+      {
+        component=rhs.operands()[i];
+      }
+      else
+      {
+        component=member_exprt(rhs, component_name, lhs_type);
+      }
+    
+      assign_rec(state, guard, lhs, component, new_suffix, lhs_type);
+      ++i;
+    }
+    return;
   } 
   else if(rhs.id()==ID_sideeffect) // catch side effects on rhs
-	{
-		const side_effect_exprt &side_effect_expr=to_side_effect_expr(rhs);
-		const irep_idt &statement=side_effect_expr.get_statement();
+  {
+    const side_effect_exprt &side_effect_expr=to_side_effect_expr(rhs);
+    const irep_idt &statement=side_effect_expr.get_statement();
 
-		if(statement==ID_malloc)
-		{
-			symex_malloc(state, guard, lhs, side_effect_expr, suffix, lhs_suffix_type);
-			return;
-		}
-	} 
-	
+    if(statement==ID_malloc)
+    {
+      symex_malloc(state, guard, lhs, side_effect_expr, suffix, lhs_suffix_type);
+      return;
+    }
+  } 
+  
   if(lhs.id()==ID_symbol)
   {
     // We might have SSA variables if this comes from dereferenced point.
@@ -425,7 +425,7 @@ void path_symext::assign_rec(
     
     // make sure that rhs and lhs have matching types
 
-	/*
+  /*
     if(ssa_rhs_no_prop.is_not_nil() && ssa_rhs_no_prop.type() != lhs_type)
     {
 
@@ -510,11 +510,11 @@ void path_symext::assign_rec(
 
     exprt tmp_lhs=state.dereference(lhs);
 
-	  simplify(tmp_lhs, state.var_map.ns);
+    simplify(tmp_lhs, state.var_map.ns);
 
     if(tmp_lhs.id() == ID_dereference) // otherwise nontermination
     {
-	    throw "path_symext::operator(): unable to resolve pointer of lhs " + tmp_lhs.pretty(2);
+      throw "path_symext::operator(): unable to resolve pointer of lhs " + tmp_lhs.pretty(2);
     }
 
     assign_rec(state, guard, tmp_lhs, rhs, suffix, lhs_suffix_type);
@@ -587,9 +587,8 @@ void path_symext::assign_rec(
   }
   else
   {
-	  // ignore
+    // ignore
     //throw "path_symext::assign_rec(): unexpected lhs: ";
-
   }
   #endif
 }
