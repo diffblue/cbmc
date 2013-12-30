@@ -66,7 +66,7 @@ void path_symex_historyt::convert(decision_proceduret &dest) const
       s_it!=steps.end();
       s_it++)
   {
-    if(s_it->ssa_lhs.is_not_nil())
+    if(s_it->ssa_rhs.is_not_nil())
       dest << equal_exprt(s_it->ssa_lhs, s_it->ssa_rhs);
 
     if(s_it->guard.is_not_nil())

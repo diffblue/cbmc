@@ -266,7 +266,6 @@ void path_symext::symex_malloc(
 
       state.var_map(size_symbol.name, suffix, size_symbol.type);
 
-
       assign_rec(state,
                  guard,
                  size_symbol.symbol_expr(), 
@@ -387,41 +386,40 @@ void path_symext::assign_rec(
       symex_malloc(state, guard, lhs, side_effect_expr, suffix, lhs_suffix_type);
       return;
     }
-  } 
+  }
+  #endif
   
   if(lhs.id()==ID_symbol)
   {
     // We might have SSA variables if this comes from dereferenced point.
+
     // TODO: Please, check!     
-    exprt original_lhs=state.original_name(lhs);
-    exprt original_rhs=state.original_name(rhs);
+    //exprt original_lhs=state.original_name(lhs);
+    //exprt original_rhs=state.original_name(rhs);
 
     // Deal with LHS.
-    const symbol_exprt &symbol_expr=to_symbol_expr(original_lhs);
+    const symbol_exprt &symbol_expr=to_symbol_expr(lhs);
     const irep_idt &identifier=symbol_expr.get_identifier();
     
-    typet lhs_type= suffix.size() ? lhs_suffix_type : lhs.type();
-
     var_mapt::var_infot &var_info=
-      state.var_map(identifier, suffix, lhs_type );
+      state.var_map(identifier, suffix, full_lhs.type());
 
     // increase SSA counter and produce symbol expression
     var_info.increment_ssa_counter();
  
-    symbol_exprt ssa_lhs_post = symbol_exprt(var_info.ssa_identifier(state.get_current_thread()), 
-                                             var_info.type);
+    symbol_exprt ssa_lhs=
+      symbol_exprt(var_info.ssa_identifier(), var_info.type);
 
     // setup final RHS: deal with arrays on LHS
-    exprt final_rhs=original_rhs ;
+    #if 0
+    exprt final_rhs=original_rhs;
 
     // now dereference, instantiate, propagate RHS
-
     exprt rhs_deref=state.dereference(final_rhs);
     exprt ssa_rhs_no_prop=state.read_no_propagate(rhs_deref);
 
     exprt ssa_rhs_prop=state.read(rhs_deref);
-
-
+    #endif
     
     // make sure that rhs and lhs have matching types
 
@@ -437,9 +435,9 @@ void path_symext::assign_rec(
     */
 
     // record the step
-    path_symex_statet::stept &step=state.record_step();
-    step.guard=as_expr(guard);
-    step.guard_no_prop=as_expr(guard);
+    path_symex_stept &step=state.record_step();
+    #if 0
+    step.guard=conjunction(guard);
     step.lhs=lhs;
     step.ssa_lhs=ssa_lhs_post;
     step.ssa_rhs=ssa_rhs_prop;
@@ -451,11 +449,14 @@ void path_symext::assign_rec(
     // propagate the rhs?
     var_state.value=propagate(ssa_rhs_prop) ? ssa_rhs_prop : nil_exprt();
     var_state.step_number=state.history.size()-1;
+    #endif
 
     #ifdef DEBUG
     std::cout << "assign_rec ID_symbol " << identifier << suffix << std::endl;
     #endif
   }
+  
+  #if 0
   else if(lhs.id()==ID_member)
   {
     #ifdef DEBUG

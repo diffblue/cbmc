@@ -238,10 +238,15 @@ int symex_parseoptionst::doit()
   const namespacet ns(symbol_table);
   path_searcht path_search(ns);
   
-  path_search.show_vcc=cmdline.isset("show-vcc");
-  
   path_search.set_message_handler(get_message_handler());
   path_search.set_verbosity(get_verbosity());
+
+  if(cmdline.isset("show-vcc"))
+  {
+    path_search.show_vcc=true;
+    path_search(goto_functions);
+    return 0;
+  }
 
   // do actual symex
 

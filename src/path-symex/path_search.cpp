@@ -101,7 +101,7 @@ void path_searcht::do_show_vcc(
   const goto_programt::instructiont &instruction=
     *state.get_instruction();
     
-  mstreamt &out=status();
+  mstreamt &out=result();
 
   if(instruction.location.is_not_nil())
     out << instruction.location << "\n";
@@ -123,7 +123,7 @@ void path_searcht::do_show_vcc(
       count++;
     }
 
-    if(s_it->ssa_lhs.is_not_nil())
+    if(s_it->ssa_rhs.is_not_nil())
     {
       equal_exprt equality(s_it->ssa_lhs, s_it->ssa_rhs);
       std::string string_value=from_expr(ns, "", equality);
@@ -137,7 +137,7 @@ void path_searcht::do_show_vcc(
   out << "{" << 1 << "} "
       << from_expr(ns, "", state.read(instruction.guard)) << "\n";
   
-  out << "\n" << eom;
+  out << eom;
 }
 
 /*******************************************************************\
