@@ -44,9 +44,11 @@ public:
   {
     // it's a given explicit value or a symbol with given identifier
     exprt value;
-    irep_idt identifier;
+    symbol_exprt ssa_symbol;
 
-    var_statet():value(nil_exprt())
+    var_statet():
+      value(nil_exprt()),
+      ssa_symbol(irep_idt())
     {
     }
   };
@@ -167,7 +169,7 @@ protected:
   exprt instantiate_rec(
     const exprt &src,
     const std::string &suffix,
-    const typet &suffix_type,
+    const typet &symbol_type,
     bool propagate,
     bool is_address);
 };

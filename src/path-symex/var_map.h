@@ -46,12 +46,12 @@ public:
     {
     }
     
-    irep_idt ssa_identifier(unsigned thread) const;
+    irep_idt ssa_identifier() const;
 
-	  inline void increment_ssa_counter() 
-	  {
-		  ++ssa_counter;
-	  }
+    inline void increment_ssa_counter() 
+    {
+      ++ssa_counter;
+    }
   };
   
   typedef std::map<irep_idt, var_infot> id_mapt;
