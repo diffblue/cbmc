@@ -84,6 +84,64 @@ path_searcht::queuet::iterator path_searcht::pick_state()
 
 /*******************************************************************\
 
+Function: path_searcht::do_show_vcc
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void path_searcht::do_show_vcc(
+  statet &state,
+  const namespacet &ns)
+{
+  const goto_programt::instructiont &instruction=
+    *state.get_instruction();
+    
+  mstreamt &out=status();
+
+  if(instruction.location.is_not_nil())
+    out << instruction.location << "\n";
+  
+  if(instruction.location.get_comment()!="")
+    out << instruction.location.get_comment() << "\n";
+    
+  unsigned count=1;
+
+  for(path_symex_historyt::stepst::const_iterator
+      s_it=state.history.steps.begin();
+      s_it!=state.history.steps.end();
+      s_it++)
+  {      
+    if(s_it->guard.is_not_nil())
+    {
+      std::string string_value=from_expr(ns, "", s_it->guard);
+      out << "{-" << count << "} " << string_value << "\n";
+      count++;
+    }
+
+    if(s_it->ssa_lhs.is_not_nil())
+    {
+      equal_exprt equality(s_it->ssa_lhs, s_it->ssa_rhs);
+      std::string string_value=from_expr(ns, "", equality);
+      out << "{-" << count << "} " << string_value << "\n";
+      count++;
+    }
+  }
+
+  out << "|--------------------------" << "\n";
+
+  out << "{" << 1 << "} "
+      << from_expr(ns, "", state.read(instruction.guard)) << "\n";
+  
+  out << "\n" << eom;
+}
+
+/*******************************************************************\
+
 Function: path_searcht::check_assertion
 
   Inputs:
@@ -98,6 +156,15 @@ bool path_searcht::check_assertion(
   statet &state,
   const namespacet &ns)
 {
+  if(show_vcc)
+  {
+    do_show_vcc(state, ns);
+    return false; // no error
+  }
+
+  const goto_programt::instructiont &instruction=
+    *state.get_instruction();
+
   satcheckt satcheck;
   bv_pointerst bv_pointers(ns, satcheck);
 
@@ -106,7 +173,7 @@ bool path_searcht::check_assertion(
 
   // the assertion in SSA
   exprt assertion=
-    state.read(state.get_instruction()->guard);
+    state.read(instruction.guard);
 
   // negate  
   bv_pointers.set_to(assertion, false);
