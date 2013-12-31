@@ -427,7 +427,7 @@ void goto_convertt::clean_expr(
   else if(expr.id()==ID_address_of)
   {
     assert(expr.operands().size()==1);
-    address_of_replace_objects(expr.op0(), dest);
+    clean_expr_address_of(expr.op0(), dest);
     return;
   }
 
@@ -450,7 +450,7 @@ void goto_convertt::clean_expr(
 
 /*******************************************************************\
 
-Function: goto_convertt::address_of_replace_objects
+Function: goto_convertt::clean_expr_address_of
 
   Inputs:
 
@@ -460,10 +460,13 @@ Function: goto_convertt::address_of_replace_objects
 
 \*******************************************************************/
 
-void goto_convertt::address_of_replace_objects(
+void goto_convertt::clean_expr_address_of(
   exprt &expr,
   goto_programt &dest)
 {
+  // The address of object constructors can be taken,
+  // which is re-written into the address of a variable.
+
   if(expr.id()==ID_compound_literal)
   {
     assert(expr.operands().size()==1);
@@ -478,7 +481,7 @@ void goto_convertt::address_of_replace_objects(
   else if(expr.id()==ID_index)
   {
     assert(expr.operands().size()==2);
-    address_of_replace_objects(expr.op0(), dest);
+    clean_expr_address_of(expr.op0(), dest);
     clean_expr(expr.op1(), dest);
   }
   else if(expr.id()==ID_dereference)
@@ -486,9 +489,38 @@ void goto_convertt::address_of_replace_objects(
     assert(expr.operands().size()==1);
     clean_expr(expr.op0(), dest);
   }
+  else if(expr.id()==ID_comma)
+  {
+    // Yes, one can take the address of a comma expression.
+    // Treatment is similar to clean_expr() above.
+
+    exprt result;
+  
+    Forall_operands(it, expr)
+    {
+      bool last=(it==--expr.operands().end());
+      
+      // special treatment for last one
+      if(last)
+        result.swap(*it);
+      else
+      {
+        clean_expr(*it, dest, false);
+
+        // get any side-effects
+        if(it->is_not_nil())
+          convert(code_expressiont(*it), dest);
+      }
+    }
+
+    expr.swap(result);
+    
+    // do again
+    clean_expr_address_of(expr, dest);
+  }
   else
     Forall_operands(it, expr)
-      address_of_replace_objects(*it, dest);
+      clean_expr_address_of(*it, dest);
 }
 
 /*******************************************************************\
