@@ -220,7 +220,7 @@ double sin(double x)
   double ret;
 
   if(__CPROVER_isinfd(x) || __CPROVER_isnand(x))
-    __CPROVER_assume(__CPROVER_isnan(ret));
+    __CPROVER_assume(__CPROVER_isnand(ret));
   else
   {
     __CPROVER_assume(ret<=1);
