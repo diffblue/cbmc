@@ -30,6 +30,7 @@ public:
 protected:
   typedef path_symex_statet statet;
 
+  // State queue. Iterators are stable.
   typedef std::list<statet> queuet;
   queuet queue;
   
