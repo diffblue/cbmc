@@ -7,10 +7,15 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <util/simplify_expr.h>
+#include <util/arith_tools.h>
+#include <util/expr_util.h>
+
+#include <ansi-c/c_types.h>
+
+#include <pointer-analysis/dereference.h>
 
 #if 0
 #include <util/std_expr.h>
-#include <util/expr_util.h>
 #include <util/decision_procedure.h>
 #include <util/prefix.h>
 
@@ -135,20 +140,15 @@ Function: path_symex_statet::read
 
 \*******************************************************************/
 
-exprt path_symex_statet::read(const exprt &src)
+path_symex_statet::var_statet &path_symex_statet::get_var_state(
+  const var_mapt::var_infot &var_info)
 {
-  #ifdef DEBUG
-  //std::cout << "path_symex_statet::read " << src.pretty() << std::endl;
-  #endif
+  assert(current_thread<threads.size());
 
-  exprt tmp=instantiate_rec(src, "", src.type(), true, false);
-  simplify(tmp, var_map.ns);
-
-  #ifdef DEBUG
-  //std::cout << " ==> " << tmp.pretty() << std::endl;
-  #endif
-
-  return tmp;
+  var_valt &var_val=
+    var_info.is_shared()?shared_vars:threads[current_thread].local_vars;
+  if(var_val.size()<=var_info.number) var_val.resize(var_info.number+1);
+  return var_val[var_info.number];
 }
 
 /*******************************************************************\
@@ -163,17 +163,17 @@ Function: path_symex_statet::read
 
 \*******************************************************************/
 
-exprt path_symex_statet::read_no_propagate(const exprt &src)
+exprt path_symex_statet::read(const exprt &src, bool propagate)
 {
   #ifdef DEBUG
-  std::cout << "path_symex_statet::read_no_propagate " << src.pretty() << std::endl;
+  //std::cout << "path_symex_statet::read " << src.pretty() << std::endl;
   #endif
 
-  exprt tmp=instantiate_rec(src, "", src.type(), false, false);
-  simplify(tmp, var_map.ns); // trade-off here, speed-up may not justify this
+  exprt tmp=instantiate_rec(src, "", src.type(), propagate);
+  simplify(tmp, var_map.ns);
 
   #ifdef DEBUG
-  std::cout << " ==> " << tmp.pretty() << std::endl;
+  //std::cout << " ==> " << tmp.pretty() << std::endl;
   #endif
 
   return tmp;
@@ -191,53 +191,22 @@ Function: path_symex_statet::instantiate_rec
 
 \*******************************************************************/
 
+#include <iostream>
+
 exprt path_symex_statet::instantiate_rec(
   const exprt &src,
   const std::string &suffix,
   const typet &symbol_type,
-  bool propagate,
-  bool is_address)
+  bool propagate)
 {
-  if(is_address)
-  {
-    if(src.id()==ID_symbol)
-    {
-      return src;
-    } 
-    else if(src.id()==ID_index)
-    {
-      assert(src.operands().size()==2);
-      exprt tmp=src;
-      tmp.op0()=instantiate_rec(src.op0(), suffix, symbol_type, propagate, true);
-      tmp.op1()=instantiate_rec(src.op1(), suffix, symbol_type, propagate, false);
-      return tmp;
-    }
-    else if(src.id()==ID_dereference)
-    {
-      assert(src.operands().size()==1);
-      exprt tmp=src;
-      tmp.op0()=instantiate_rec(src.op0(), suffix, symbol_type, propagate, false);
-      return tmp;
-    }
-    else
-    {
-      if(!src.has_operands())
-        return src;
+  std::cout << "instantiate_rec: " << src.id() << " " << suffix << std::endl;
 
-      exprt tmp=src;
-  
-      Forall_operands(it, tmp)
-      {
-        exprt tmp2=instantiate_rec(*it, suffix, symbol_type, propagate, true);
-        *it=tmp2;
-      }
-
-      return tmp;
-    }
-  } 
-  else if(src.id()==ID_address_of)
+  if(src.id()==ID_address_of)
   {
-    return instantiate_rec(src, suffix, symbol_type, propagate, true);
+    assert(src.operands().size()==1);
+    exprt tmp=src;
+    tmp.op0()=instantiate_rec_address(tmp.op0(), propagate);
+    return tmp;
   }
   else if(src.id()==ID_sideeffect)
   {
@@ -267,7 +236,7 @@ exprt path_symex_statet::instantiate_rec(
     if(struct_op_type.id()!=ID_struct)
       return nil_exprt();
 
-    const struct_typet &struct_type=to_struct_type(var_map.ns.follow(struct_op.type()));
+    const struct_typet &struct_type=to_struct_type(struct_op_type);
 
     if(!struct_type.has_component(component_name))
       throw "No component "+id2string(component_name)+" in member expression";
@@ -278,7 +247,29 @@ exprt path_symex_statet::instantiate_rec(
     const std::string new_suffix=
       "."+id2string(component_name)+suffix;
 
-    return instantiate_rec(struct_op, new_suffix, new_symbol_type, propagate, is_address);
+    return instantiate_rec(struct_op, new_suffix, new_symbol_type, propagate);
+  }
+  else if(src.id()==ID_index)
+  {
+    const index_exprt &index_expr=to_index_expr(src);
+    const exprt &index_op=index_expr.index();
+    const exprt &array_op=index_expr.array();
+    typet array_op_type=var_map.ns.follow(array_op.type());
+  
+    if(array_op_type.id()!=ID_array)
+      return nil_exprt();
+
+    const array_typet &array_type=to_array_type(array_op_type);
+    
+    std::string array_element=array_index_as_string(index_op);
+    if(array_element=="") array_element="[*]";
+
+    typet new_symbol_type=suffix.size() ? symbol_type : var_map.ns.follow(array_type.subtype());
+
+    // add to suffix
+    const std::string new_suffix=array_element+suffix;
+
+    return instantiate_rec(array_op, new_suffix, new_symbol_type, propagate);
   }
   else if(src.id()==ID_symbol)
   {
@@ -288,7 +279,7 @@ exprt path_symex_statet::instantiate_rec(
 
     const symbol_exprt &symbol_expr=to_symbol_expr(src);
     const irep_idt &identifier=symbol_expr.get_identifier();
-
+    
     var_mapt::var_infot &var_info=
       var_map(identifier, suffix, symbol_type);
 
@@ -307,6 +298,12 @@ exprt path_symex_statet::instantiate_rec(
       return var_state.ssa_symbol;
     }
   }
+  else if(src.id()==ID_dereference)
+  {
+    const dereference_exprt &dereference_expr=to_dereference_expr(src);
+    exprt address=read(dereference_expr.pointer(), propagate);
+    return read(dereference(address), propagate);
+  }
 
   if(!src.has_operands())
     return src;
@@ -316,11 +313,104 @@ exprt path_symex_statet::instantiate_rec(
   
   Forall_operands(it, tmp)
   {
-    exprt tmp2=instantiate_rec(*it, suffix, symbol_type, propagate, false);
+    exprt tmp2=instantiate_rec(*it, suffix, symbol_type, propagate);
     *it=tmp2;
   }
   
   return tmp;
+}
+
+/*******************************************************************\
+
+Function: path_symex_statet::array_index_as_string
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+std::string path_symex_statet::array_index_as_string(const exprt &src) const
+{
+  exprt tmp=simplify_expr(src, var_map.ns);
+  mp_integer i;
+
+  if(!to_integer(tmp, i))
+    return "["+integer2string(i)+"]";
+  else
+    return "";
+}
+
+/*******************************************************************\
+
+Function: path_symex_statet::dereference
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+exprt path_symex_statet::dereference(const exprt &address)
+{
+  dereferencet dereference_object(var_map.ns);
+  return dereference_object(address);
+}
+
+/*******************************************************************\
+
+Function: path_symex_statet::instantiate_rec_address
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+#include <iostream>
+
+exprt path_symex_statet::instantiate_rec_address(
+  const exprt &src,
+  bool propagate)
+{
+  if(src.id()==ID_symbol)
+  {
+    return src;
+  } 
+  else if(src.id()==ID_index)
+  {
+    assert(src.operands().size()==2);
+    exprt tmp=src;
+    tmp.op0()=instantiate_rec_address(src.op0(), propagate);
+    tmp.op1()=instantiate_rec(src.op1(), "", src.op1().type(), propagate);
+    return tmp;
+  }
+  else if(src.id()==ID_dereference)
+  {
+    assert(src.operands().size()==1);
+    exprt tmp=src;
+    tmp.op0()=instantiate_rec(src.op0(), "", src.op1().type(), propagate);
+    return tmp;
+  }
+  else if(src.id()==ID_member)
+  {
+    assert(src.operands().size()==1);
+    exprt tmp=src;
+    tmp.op0()=instantiate_rec_address(src.op0(), propagate);
+    return tmp;
+  }
+  else
+  {
+    // this shouldn't really happen
+    std::cout << "SRC: " << src.pretty() << std::endl;
+    assert(0);
+  }
 }
 
 /*******************************************************************\

@@ -84,14 +84,8 @@ public:
   typedef std::vector<threadt> threadst;
   threadst threads;
 
-  var_statet &get_var_state(const var_mapt::var_infot &var_info)
-  {
-    var_valt &var_val=
-      var_info.is_shared()?shared_vars:threads[current_thread].local_vars;
-    if(var_val.size()>=var_info.number) var_val.resize(var_info.number+1);
-    return var_val[var_info.number];
-  }
-
+  var_statet &get_var_state(const var_mapt::var_infot &var_info);
+  
   bool inside_atomic_section;
   
   inline unsigned get_current_thread() const
@@ -158,20 +152,37 @@ public:
   void output(const threadt &thread, std::ostream &out) const;
 
   // instantiate expressions with propagation
-  exprt read(const exprt &src);
+  inline exprt read(const exprt &src)
+  {
+    return read(src, true);
+  }
   
   // instantiate without constant propagation
-  exprt read_no_propagate(const exprt &src);
+  inline exprt read_no_propagate(const exprt &src)
+  {
+    return read(src, false);
+  }
+
+  exprt dereference(const exprt &address);
+
+  std::string array_index_as_string(const exprt &) const;
 
 protected:
   unsigned current_thread;
+
+  exprt read(
+    const exprt &src,
+    bool propagate);
 
   exprt instantiate_rec(
     const exprt &src,
     const std::string &suffix,
     const typet &symbol_type,
-    bool propagate,
-    bool is_address);
+    bool propagate);
+
+  exprt instantiate_rec_address(
+    const exprt &src,
+    bool propagate);
 };
 
 path_symex_statet initial_state(
