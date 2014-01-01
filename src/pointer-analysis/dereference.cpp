@@ -6,12 +6,17 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <util/std_expr.h>
+#include <util/expr_util.h>
+#include <util/byte_operators.h>
+
+#include <ansi-c/c_types.h>
+
 #if 0
 
 #include <cassert>
 #include <cstdlib>
 
-#include <util/expr_util.h>
 #include <util/c_misc.h>
 #include <util/base_type.h>
 #include <util/arith_tools.h>
@@ -28,22 +33,61 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_predicates.h>
 #include <util/byte_operators.h>
 
-#include <ansi-c/c_types.h>
 #include <ansi-c/c_typecast.h>
 
 #include <pointer-analysis/value_set.h>
 
 #include <langapi/language_util.h>
+#endif
 
 #include "dereference.h"
-#include "pointer_offset_sum.h"
-
-// global data, horrible
-unsigned int dereferencet::invalid_counter=0;
 
 /*******************************************************************\
 
-Function: dereferencet::has_dereference
+Function: dereferencet::operator()
+
+  Inputs: expression, to be dereferenced
+
+ Outputs: returns object after dereferencing
+
+ Purpose:
+
+\*******************************************************************/
+
+exprt dereferencet::operator()(const exprt &pointer)
+{
+  if(pointer.type().id()!=ID_pointer)
+    throw "dereference expected pointer type, but got "+
+          pointer.type().pretty();  
+
+  // we may get ifs due to recursive calls
+  if(pointer.id()==ID_if)
+  {
+    const if_exprt &if_expr=to_if_expr(pointer);
+
+    // push down the if
+    exprt true_case=operator()(if_expr.true_case());
+    exprt false_case=operator()(if_expr.true_case());
+    
+    return if_exprt(if_expr.cond(), true_case, false_case);
+  }
+  
+  // type of the object
+  const typet &type=pointer.type().subtype();
+
+  #if 0
+  std::cout << "DEREF: " << from_expr(ns, "", pointer) << std::endl;
+  #endif
+
+  return dereference_rec(
+    pointer,
+    gen_zero(index_type()), // offset
+    type);
+}
+
+/*******************************************************************\
+
+Function: dereferencet::dereference_rec
 
   Inputs:
 
@@ -53,23 +97,136 @@ Function: dereferencet::has_dereference
 
 \*******************************************************************/
 
-bool dereferencet::has_dereference(const exprt &expr)
+exprt dereferencet::dereference_rec(
+  const exprt &address,
+  const exprt &offset,
+  const typet &type)
 {
-  forall_operands(it, expr)
-    if(has_dereference(*it))
-      return true;
+  if(address.id()==ID_address_of)
+  {
+    const address_of_exprt &address_of_expr=to_address_of_expr(address);
+    
+    const exprt &object=address_of_expr.object();
+    
+    const typet &src_type=ns.follow(object.type());
+    const typet &dest_type=ns.follow(type);
 
-  if(expr.id()==ID_dereference)
+    // is the object an array with matching subtype?
+    
+    // check if offset is zero
+    if(offset.is_zero())
+    {
+      // check type
+      if(src_type==dest_type)
+        return object; // trivial case
+      else
+      {
+        // the type differs -- can we do this with a typecast?
+        if(type_compatible(src_type, dest_type))
+        {
+          // yes, do typecast
+          return typecast_exprt(object, dest_type);
+        }
+        else
+        {
+          // no, give up and use byte_extract
+          return binary_exprt(object, byte_extract_id(), offset, dest_type);
+        }
+      }
+    }
+    else
+    {
+      // give up, use byte_extract
+      return binary_exprt(object, byte_extract_id(), offset, dest_type);
+    }
+  }
+  else if(address.id()==ID_typecast)
+  {
+    // pointer type cast
+    return dereference_rec(to_typecast_expr(address).op(), offset, type);
+  }
+  else if(address.id()==ID_plus)
+  {
+    // pointer arithmetic
+    if(address.operands().size()<2)
+      throw "plus with less than two operands";
+    
+    if(address.operands().size()>2)
+      return dereference_rec(make_binary(address), offset, type);
+
+    // binary
+    exprt pointer=address.op0(), integer=address.op1();
+    
+    if(ns.follow(integer.type()).id()==ID_pointer)
+      std::swap(pointer, integer);
+      
+    exprt new_offset=
+      offset.is_nil()?integer:plus_exprt(offset, integer);
+
+    return dereference_rec(pointer, new_offset, type);
+  }
+  else
+  {
+    throw "failed to dereference `"+address.id_string()+"'";
+  }
+}
+
+/*******************************************************************\
+
+Function: dereferencet::type_compatible
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool dereferencet::type_compatible(
+  const typet &object_type,
+  const typet &dereference_type) const
+{
+  if(dereference_type.id()==ID_empty)
+    return true; // always ok
+
+  if(object_type==dereference_type)
+    return true; // ok, they just match
+
+  // check for struct prefixes
+
+  if(object_type.id()==ID_struct &&
+     dereference_type.id()==ID_struct)
+  {
+    if(to_struct_type(dereference_type).is_prefix_of(
+         to_struct_type(object_type)))
+      return true; // ok, dreference_type is a prefix of object_type
+  }
+
+  // any code is ok
+  if(dereference_type.id()==ID_code &&
+     object_type.id()==ID_code)
     return true;
 
-  // we no longer do this one
-  if(expr.id()==ID_index &&
-     expr.operands().size()==2 &&
-     expr.op0().type().id()==ID_pointer)
-    assert(false);  
+  // vectors of same size are ok
+  if((object_type.id()==ID_signedbv || object_type.id()==ID_unsignedbv) &&
+     (dereference_type.id()==ID_signedbv || dereference_type.id()==ID_unsignedbv))
+  {
+    return object_type.get(ID_width)==dereference_type.get(ID_width);
+  }
+
+  // pointer to pointer is always ok
+  if(object_type.id()==ID_pointer &&
+     dereference_type.id()==ID_pointer)
+    return true;
+
+  // really different
 
   return false;
 }
+
+#if 0
+#include "pointer_offset_sum.h"
 
 /*******************************************************************\
 
@@ -89,213 +246,6 @@ const exprt &dereferencet::get_symbol(const exprt &expr)
     return get_symbol(expr.op0());
   
   return expr;
-}
-
-/*******************************************************************\
-
-Function: dereferencet::dereference
-
-  Inputs: expression dest, to be dereferenced under given guard,
-          and given mode
-
- Outputs: returns pointer after dereferencing
-
- Purpose:
-
-\*******************************************************************/
-
-exprt dereferencet::dereference(
-  const exprt &pointer,
-  const guardt &guard,
-  const modet mode)
-{
-  if(pointer.type().id()!=ID_pointer)
-    throw "dereference expected pointer type, but got "+
-          pointer.type().pretty();  
-
-  // we may get ifs due to recursive calls
-  if(pointer.id()==ID_if)
-  {
-    const if_exprt &if_expr=to_if_expr(pointer);
-    // push down the if
-    guardt true_guard=guard;
-    guardt false_guard=guard;
-    
-    true_guard.add(if_expr.cond());
-    false_guard.add(not_exprt(if_expr.cond()));
-    
-    exprt true_case=dereference(if_expr.true_case(), true_guard, mode);
-    exprt false_case=dereference(if_expr.true_case(), false_guard, mode);
-    
-    return if_exprt(if_expr.cond(), true_case, false_case);
-  }
-  
-  // type of the object
-  const typet &type=pointer.type().subtype();
-
-  #if 0
-  std::cout << "DEREF: " << from_expr(ns, "", pointer) << std::endl;
-  #endif
-
-  // collect objects the pointer may point to
-  value_setst::valuest points_to_set;
-  
-  dereference_callback.get_value_set(pointer, points_to_set);
-  
-  #if 0
-  for(value_setst::valuest::const_iterator
-      it=points_to_set.begin();
-      it!=points_to_set.end();
-      it++)
-    std::cout << "P: " << from_expr(ns, "", *it) << std::endl;
-  #endif
-
-  // get the values of these
-
-  std::list<valuet> values;
-
-  for(value_setst::valuest::const_iterator
-      it=points_to_set.begin();
-      it!=points_to_set.end();
-      it++)
-  {
-    valuet value=build_reference_to(*it, mode, pointer, guard);
-    
-    #if 0
-    std::cout << "V: " << from_expr(ns, "", value.pointer_guard) << " --> ";
-    std::cout << from_expr(ns, "", value.value) << std::endl;
-    #endif
-
-    values.push_back(value);
-  }
-
-  // can this fail?
-  bool may_fail;
-  
-  if(values.empty())
-  {
-    invalid_pointer(pointer, guard);
-    may_fail=true;
-  }
-  else
-  {
-    may_fail=false;
-    for(std::list<valuet>::const_iterator
-        it=values.begin();
-        it!=values.end();
-        it++)
-      if(it->value.is_nil()) may_fail=true;
-  }
-  
-  if(may_fail)
-  {
-    // first see if we have a "failed object" for this pointer
-    
-    const symbolt *failed_symbol;
-    exprt failure_value;
-
-    if(dereference_callback.has_failed_symbol(
-         pointer, failed_symbol))
-    {
-      // yes!
-      failure_value=failed_symbol->symbol_expr();
-      failure_value.set(ID_C_invalid_object, true);
-    }
-    else
-    {
-      // else: produce new symbol
-
-      symbolt symbol;
-      symbol.name="symex::invalid_object"+i2string(invalid_counter++);
-      symbol.base_name="invalid_object";
-      symbol.type=type;
-
-      // make it a lvalue, so we can assign to it
-      symbol.is_lvalue=true;
-      
-      get_new_name(symbol, ns);
-
-      failure_value=symbol.symbol_expr();
-      failure_value.set(ID_C_invalid_object, true);
-      
-      new_symbol_table.move(symbol);
-    }
-
-    valuet value;
-    value.value=failure_value;
-    value.pointer_guard=true_exprt();
-    values.push_front(value);
-  }
-  
-  // now build big case split, but we only do "good" objects
-  
-  exprt value=nil_exprt();
-
-  for(std::list<valuet>::const_iterator
-      it=values.begin();
-      it!=values.end();
-      it++)
-  {
-    if(it->value.is_not_nil())
-    {
-      if(value.is_nil()) // first?
-        value=it->value;
-      else
-        value=if_exprt(it->pointer_guard, it->value, value);
-    }
-  }
-  
-  #if 0
-  std::cout << "R: " << from_expr(ns, "", value) << std::endl
-            << std::endl;
-  #endif
-
-  return value;
-}
-
-/*******************************************************************\
-
-Function: dereferencet::dereference_type_compare
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-bool dereferencet::dereference_type_compare(
-  const typet &object_type,
-  const typet &dereference_type) const
-{
-  if(dereference_type.id()==ID_empty)
-    return true; // always ok
-
-  if(base_type_eq(object_type, dereference_type, ns))
-    return true; // ok, they just match
-
-  // check for struct prefixes
-
-  const typet ot_base=ns.follow(object_type),
-              dt_base=ns.follow(dereference_type);
-
-  if(ot_base.id()==ID_struct &&
-     dt_base.id()==ID_struct)
-  {
-    if(to_struct_type(dt_base).is_prefix_of(
-         to_struct_type(ot_base)))
-      return true; // ok, dt is a prefix of ot
-  }
-  
-  // we are generous about code pointers
-  if(dereference_type.id()==ID_code &&
-     object_type.id()==ID_code)
-    return true;
-
-  // really different
-
-  return false;
 }
 
 /*******************************************************************\
