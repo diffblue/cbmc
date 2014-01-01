@@ -139,7 +139,7 @@ Function: goto_program_dereferencet::dereference_rec
 void goto_program_dereferencet::dereference_rec(
   exprt &expr,
   guardt &guard,
-  const dereferencet::modet mode)
+  const value_set_dereferencet::modet mode)
 {
   if(!dereference.has_dereference(expr))
     return;
@@ -161,7 +161,7 @@ void goto_program_dereferencet::dereference_rec(
               op.pretty();
 
       if(dereference.has_dereference(op))
-        dereference_rec(op, guard, dereferencet::READ);
+        dereference_rec(op, guard, value_set_dereferencet::READ);
 
       if(expr.id()==ID_or)
       {
@@ -190,7 +190,7 @@ void goto_program_dereferencet::dereference_rec(
       throw msg;
     }
 
-    dereference_rec(expr.op0(), guard, dereferencet::READ);
+    dereference_rec(expr.op0(), guard, value_set_dereferencet::READ);
 
     bool o1=dereference.has_dereference(expr.op1());
     bool o2=dereference.has_dereference(expr.op2());
@@ -313,7 +313,7 @@ Function: goto_program_dereferencet::dereference_expr
 void goto_program_dereferencet::dereference_expr(
   exprt &expr,
   const bool checks_only,
-  const dereferencet::modet mode)
+  const value_set_dereferencet::modet mode)
 {
   guardt guard;
   
@@ -407,30 +407,30 @@ void goto_program_dereferencet::dereference_instruction(
   #endif
   goto_programt::instructiont &i=*target;
 
-  dereference_expr(i.guard, checks_only, dereferencet::READ);
+  dereference_expr(i.guard, checks_only, value_set_dereferencet::READ);
 
   if(i.is_assign())
   {
     if(i.code.operands().size()!=2)
       throw "assignment expects two operands";
 
-    dereference_expr(i.code.op0(), checks_only, dereferencet::WRITE);
-    dereference_expr(i.code.op1(), checks_only, dereferencet::READ);
+    dereference_expr(i.code.op0(), checks_only, value_set_dereferencet::WRITE);
+    dereference_expr(i.code.op1(), checks_only, value_set_dereferencet::READ);
   }
   else if(i.is_function_call())
   {
     code_function_callt &function_call=to_code_function_call(to_code(i.code));
     
     if(function_call.lhs().is_not_nil())
-      dereference_expr(function_call.lhs(), checks_only, dereferencet::WRITE);
+      dereference_expr(function_call.lhs(), checks_only, value_set_dereferencet::WRITE);
     
-    dereference_expr(function_call.function(), checks_only, dereferencet::READ);
-    dereference_expr(function_call.op2(), checks_only, dereferencet::READ);
+    dereference_expr(function_call.function(), checks_only, value_set_dereferencet::READ);
+    dereference_expr(function_call.op2(), checks_only, value_set_dereferencet::READ);
   }
   else if(i.is_return())
   {
     Forall_operands(it, i.code)
-      dereference_expr(*it, checks_only, dereferencet::READ);
+      dereference_expr(*it, checks_only, value_set_dereferencet::READ);
   }
   else if(i.is_other())
   {
@@ -441,12 +441,12 @@ void goto_program_dereferencet::dereference_instruction(
       if(i.code.operands().size()!=1)
         throw "expression expects one operand";
 
-      dereference_expr(i.code.op0(), checks_only, dereferencet::READ);
+      dereference_expr(i.code.op0(), checks_only, value_set_dereferencet::READ);
     }
     else if(statement==ID_printf)
     {
       Forall_operands(it, i.code)
-        dereference_expr(*it, checks_only, dereferencet::READ);
+        dereference_expr(*it, checks_only, value_set_dereferencet::READ);
     }
   }
 }
@@ -472,7 +472,7 @@ void goto_program_dereferencet::dereference_expression(
   valid_local_variables=&target->local_variables;
   #endif
 
-  dereference_expr(expr, false, dereferencet::READ);
+  dereference_expr(expr, false, value_set_dereferencet::READ);
 }
 
 /*******************************************************************\

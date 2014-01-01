@@ -6,8 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#if 0
-
 #include <cassert>
 #include <cstdlib>
 
@@ -35,15 +33,15 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <langapi/language_util.h>
 
-#include "dereference.h"
+#include "value_set_dereference.h"
 #include "pointer_offset_sum.h"
 
 // global data, horrible
-unsigned int dereferencet::invalid_counter=0;
+unsigned int value_set_dereferencet::invalid_counter=0;
 
 /*******************************************************************\
 
-Function: dereferencet::has_dereference
+Function: value_set_dereferencet::has_dereference
 
   Inputs:
 
@@ -53,7 +51,7 @@ Function: dereferencet::has_dereference
 
 \*******************************************************************/
 
-bool dereferencet::has_dereference(const exprt &expr)
+bool value_set_dereferencet::has_dereference(const exprt &expr)
 {
   forall_operands(it, expr)
     if(has_dereference(*it))
@@ -73,7 +71,7 @@ bool dereferencet::has_dereference(const exprt &expr)
 
 /*******************************************************************\
 
-Function: dereferencet::get_symbol
+Function: value_set_dereferencet::get_symbol
 
   Inputs:
 
@@ -83,7 +81,7 @@ Function: dereferencet::get_symbol
 
 \*******************************************************************/
 
-const exprt &dereferencet::get_symbol(const exprt &expr)
+const exprt &value_set_dereferencet::get_symbol(const exprt &expr)
 {
   if(expr.id()==ID_member || expr.id()==ID_index)
     return get_symbol(expr.op0());
@@ -93,7 +91,7 @@ const exprt &dereferencet::get_symbol(const exprt &expr)
 
 /*******************************************************************\
 
-Function: dereferencet::dereference
+Function: value_set_dereferencet::dereference
 
   Inputs: expression dest, to be dereferenced under given guard,
           and given mode
@@ -104,7 +102,7 @@ Function: dereferencet::dereference
 
 \*******************************************************************/
 
-exprt dereferencet::dereference(
+exprt value_set_dereferencet::dereference(
   const exprt &pointer,
   const guardt &guard,
   const modet mode)
@@ -255,7 +253,7 @@ exprt dereferencet::dereference(
 
 /*******************************************************************\
 
-Function: dereferencet::dereference_type_compare
+Function: value_set_dereferencet::dereference_type_compare
 
   Inputs:
 
@@ -265,7 +263,7 @@ Function: dereferencet::dereference_type_compare
 
 \*******************************************************************/
 
-bool dereferencet::dereference_type_compare(
+bool value_set_dereferencet::dereference_type_compare(
   const typet &object_type,
   const typet &dereference_type) const
 {
@@ -300,7 +298,7 @@ bool dereferencet::dereference_type_compare(
 
 /*******************************************************************\
 
-Function: dereferencet::invalid_pointer
+Function: value_set_dereferencet::invalid_pointer
 
   Inputs:
 
@@ -310,7 +308,7 @@ Function: dereferencet::invalid_pointer
 
 \*******************************************************************/
 
-void dereferencet::invalid_pointer(
+void value_set_dereferencet::invalid_pointer(
   const exprt &pointer,
   const guardt &guard)
 {
@@ -329,7 +327,7 @@ void dereferencet::invalid_pointer(
 
 /*******************************************************************\
 
-Function: dereferencet::build_reference_to
+Function: value_set_dereferencet::build_reference_to
 
   Inputs:
 
@@ -339,7 +337,7 @@ Function: dereferencet::build_reference_to
 
 \*******************************************************************/
 
-dereferencet::valuet dereferencet::build_reference_to(
+value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
   const exprt &what,
   const modet mode,
   const exprt &pointer_expr,
@@ -618,7 +616,7 @@ dereferencet::valuet dereferencet::build_reference_to(
 
 /*******************************************************************\
 
-Function: dereferencet::valid_check
+Function: value_set_dereferencet::valid_check
 
   Inputs:
 
@@ -628,7 +626,7 @@ Function: dereferencet::valid_check
 
 \*******************************************************************/
 
-void dereferencet::valid_check(
+void value_set_dereferencet::valid_check(
   const exprt &object,
   const guardt &guard,
   const modet mode)
@@ -680,7 +678,7 @@ void dereferencet::valid_check(
 
 /*******************************************************************\
 
-Function: dereferencet::bounds_check
+Function: value_set_dereferencet::bounds_check
 
   Inputs:
 
@@ -690,7 +688,7 @@ Function: dereferencet::bounds_check
 
 \*******************************************************************/
 
-void dereferencet::bounds_check(
+void value_set_dereferencet::bounds_check(
   const index_exprt &expr,
   const guardt &guard)
 {
@@ -765,7 +763,7 @@ void dereferencet::bounds_check(
 
 /*******************************************************************\
 
-Function: dereferencet::memory_model
+Function: value_set_dereferencet::memory_model
 
   Inputs:
 
@@ -789,7 +787,7 @@ static bool is_a_bv_type(const typet &type)
          type.id()==ID_floatbv;
 }
 
-bool dereferencet::memory_model(
+bool value_set_dereferencet::memory_model(
   exprt &value,
   const typet &to_type,
   const guardt &guard,
@@ -825,7 +823,7 @@ bool dereferencet::memory_model(
 
 /*******************************************************************\
 
-Function: dereferencet::memory_model_conversion
+Function: value_set_dereferencet::memory_model_conversion
 
   Inputs:
 
@@ -835,7 +833,7 @@ Function: dereferencet::memory_model_conversion
 
 \*******************************************************************/
 
-bool dereferencet::memory_model_conversion(
+bool value_set_dereferencet::memory_model_conversion(
   exprt &value,
   const typet &to_type,
   const guardt &guard,
@@ -877,7 +875,7 @@ bool dereferencet::memory_model_conversion(
 
 /*******************************************************************\
 
-Function: dereferencet::memory_model_bytes
+Function: value_set_dereferencet::memory_model_bytes
 
   Inputs:
 
@@ -887,7 +885,7 @@ Function: dereferencet::memory_model_bytes
 
 \*******************************************************************/
 
-bool dereferencet::memory_model_bytes(
+bool value_set_dereferencet::memory_model_bytes(
   exprt &value,
   const typet &to_type,
   const guardt &guard,
@@ -970,4 +968,3 @@ bool dereferencet::memory_model_bytes(
   return true;
 }
 
-#endif

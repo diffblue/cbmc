@@ -6,7 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <pointer-analysis/dereference.h>
+#include <pointer-analysis/value_set_dereference.h>
 
 #include "goto_symex.h"
 

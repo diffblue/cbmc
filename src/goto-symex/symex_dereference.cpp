@@ -11,7 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/base_type.h>
 
-#include <pointer-analysis/dereference.h>
+#include <pointer-analysis/value_set_dereference.h>
 #include <pointer-analysis/rewrite_index.h>
 #include <langapi/language_util.h>
 #include <ansi-c/c_types.h>
@@ -232,7 +232,7 @@ void goto_symext::dereference_rec(
     symex_dereference_statet symex_dereference_state(*this, state);
     renaming_nst renaming_ns(ns, state);
 
-    dereferencet dereference(
+    value_set_dereferencet dereference(
       renaming_ns,
       new_symbol_table,
       options,
@@ -240,7 +240,7 @@ void goto_symext::dereference_rec(
     
     // std::cout << "**** " << from_expr(ns, "", tmp1) << std::endl;
     exprt tmp2=dereference.dereference(
-      tmp1, guard, write?dereferencet::WRITE:dereferencet::READ);
+      tmp1, guard, write?value_set_dereferencet::WRITE:value_set_dereferencet::READ);
     //std::cout << "**** " << from_expr(ns, "", tmp2) << std::endl;
 
     expr.swap(tmp2);
