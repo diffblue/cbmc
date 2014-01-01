@@ -235,33 +235,48 @@ int symex_parseoptionst::doit()
 
   // do actual Symex
 
-  const namespacet ns(symbol_table);
-  path_searcht path_search(ns);
-  
-  path_search.set_message_handler(get_message_handler());
-  path_search.set_verbosity(get_verbosity());
-
-  if(cmdline.isset("show-vcc"))
+  try
   {
-    path_search.show_vcc=true;
-    path_search(goto_functions);
-    return 0;
+    const namespacet ns(symbol_table);
+    path_searcht path_search(ns);
+    
+    path_search.set_message_handler(get_message_handler());
+    path_search.set_verbosity(get_verbosity());
+
+    if(cmdline.isset("show-vcc"))
+    {
+      path_search.show_vcc=true;
+      path_search(goto_functions);
+      return 0;
+    }
+
+    // do actual symex
+
+    switch(path_search(goto_functions))
+    {
+    case safety_checkert::SAFE:
+      report_success();   
+      return 0;
+   
+    case safety_checkert::UNSAFE:
+      show_counterexample(path_search);
+      report_failure();
+      return 10;
+    
+    default:
+      return 8;
+    }
+  }
+  
+  catch(const std::string error_msg)
+  {
+    error() << error_msg << messaget::eom;
+    return 8;
   }
 
-  // do actual symex
-
-  switch(path_search(goto_functions))
+  catch(const char *error_msg)
   {
-  case safety_checkert::SAFE:
-    report_success();   
-    return 0;
- 
-  case safety_checkert::UNSAFE:
-    show_counterexample(path_search);
-    report_failure();
-    return 10;
-  
-  default:
+    error() << error_msg << messaget::eom;
     return 8;
   }
 
