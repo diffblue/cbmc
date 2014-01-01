@@ -6,10 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_POINTER_ANALYSIS_DEREFERENCE_H
-#define CPROVER_POINTER_ANALYSIS_DEREFERENCE_H
-
-#if 0
+#ifndef CPROVER_POINTER_ANALYSIS_VALUE_SET_DEREFERENCE_H
+#define CPROVER_POINTER_ANALYSIS_VALUE_SET_DEREFERENCE_H
 
 #include <set>
 #include <string>
@@ -52,7 +50,7 @@ public:
 
 /*! \brief TO_BE_DOCUMENTED
 */
-class dereferencet
+class value_set_dereferencet
 {
 public:
   /*! \brief Constructor 
@@ -62,7 +60,7 @@ public:
             to be performed
    * \param _dereference_callback Callback object for error reporting
   */
-  dereferencet(
+  value_set_dereferencet(
     const namespacet &_ns,
     symbol_tablet &_new_symbol_table,
     const optionst &_options,
@@ -73,7 +71,7 @@ public:
     dereference_callback(_dereference_callback)
   { }
 
-  virtual ~dereferencet() { }
+  virtual ~value_set_dereferencet() { }
   
   typedef enum { READ, WRITE } modet;
   
@@ -164,6 +162,5 @@ private:
     const guardt &guard,
     const exprt &offset);
 };
-#endif
 
 #endif

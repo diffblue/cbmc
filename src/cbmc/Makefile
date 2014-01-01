@@ -9,7 +9,7 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../goto-programs/goto-programs$(LIBEXT) \
       ../goto-symex/goto-symex$(LIBEXT) \
       ../pointer-analysis/value_set$(OBJEXT) \
-      ../pointer-analysis/dereference$(OBJEXT) \
+      ../pointer-analysis/value_set_dereference$(OBJEXT) \
       ../pointer-analysis/add_failed_symbols$(OBJEXT) \
       ../pointer-analysis/rewrite_index$(OBJEXT) \
       ../pointer-analysis/goto_program_dereference$(OBJEXT) \

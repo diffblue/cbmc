@@ -14,7 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/goto_functions.h>
 
 #include "value_sets.h"
-#include "dereference.h"
+#include "value_set_dereference.h"
 
 class goto_program_dereferencet:protected dereference_callbackt
 {
@@ -52,7 +52,7 @@ protected:
   const optionst &options;
   const namespacet &ns;
   value_setst &value_sets;
-  dereferencet dereference;
+  value_set_dereferencet dereference;
 
   virtual bool is_valid_object(const irep_idt &identifier);
 
@@ -72,8 +72,8 @@ protected:
     bool checks_only=false);
 
 protected:
-  void dereference_rec(exprt &expr, guardt &guard, const dereferencet::modet mode);
-  void dereference_expr(exprt &expr, const bool checks_only, const dereferencet::modet mode);
+  void dereference_rec(exprt &expr, guardt &guard, const value_set_dereferencet::modet mode);
+  void dereference_expr(exprt &expr, const bool checks_only, const value_set_dereferencet::modet mode);
   
   const std::set<irep_idt> *valid_local_variables;
   locationt dereference_location;
