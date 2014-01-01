@@ -32,7 +32,8 @@ class optionst;
   "(ppc-macos)(unsigned-char)" \
   "(string-abstraction)(no-arch)(arch):" \
   "(round-to-nearest)(round-to-plus-inf)(round-to-minus-inf)(round-to-zero)" \
-  "(show-locs)(show-vcc)"
+  "(show-locs)(show-vcc)(show-properties)" \
+  "(property):"
 
 class symex_parseoptionst:
   public parseoptions_baset,
