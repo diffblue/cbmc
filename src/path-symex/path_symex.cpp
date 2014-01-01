@@ -12,7 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/i2string.h>
 #include <util/expr_util.h>
-#include <util/simplify_expr.h>
 #include <util/byte_operators.h>
 #include <util/prefix.h>
 #include <util/pointer_offset_size.h>
@@ -21,6 +20,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ansi-c/c_types.h>
 #endif
+
+#include <util/simplify_expr.h>
 
 #include "path_symex.h"
 
@@ -109,46 +110,34 @@ Function: path_symext::propagate
 
 \*******************************************************************/
 
+#include <iostream>
+
 bool path_symext::propagate(const exprt &src)
 {
   // propagate things that are 'simple enough'
-  bool result = false;  
-
-
   if(src.is_constant())
-    result=true;
+    return true;
   else if(src.id()==ID_member)
-  {
-    result=true;
-  }
-  else if (src.id()==ID_index)
-    {
-      const index_exprt &src_index_expr=to_index_expr(src);
-      result=src_index_expr.index().id()==ID_constant
-             && src_index_expr.array().id()==ID_symbol;
-  }
+    return propagate(to_member_expr(src).struct_op());
+  else if(src.id()==ID_index)
+    return false;
   else if(src.id()==ID_typecast)
-  {
-    assert(src.operands().size()==1);
- 
-    result=propagate(src.op0());
-  }
+    return propagate(to_typecast_expr(src).op());
   else if(src.id()==ID_symbol)
-    result=true;
+    return true;
+  else if(src.id()==ID_address_of)
+    return true;
   else if(src.id()==ID_plus)
   {
-    result=propagate(src.op0()) && propagate(src.op1());
-  }  
-  
-  #ifdef DEBUG
-    /* 
-    std::cout << "path_symext::propagate: " << (result ? "yes" : "no") 
-              << " " << src.id_string() << std::endl;
-     */
-  #endif
- 
-
-  return result;
+    forall_operands(it, src)
+      if(!propagate(*it)) return false;
+    return true;
+  }
+  else
+  {
+    std::cout << "PROP: " << src.pretty() << std::endl;
+    return false;
+  }
 }
 
 /*******************************************************************\
@@ -329,6 +318,8 @@ Function: path_symext::assign_rec
 
 \*******************************************************************/
 
+#include <iostream>
+
 void path_symext::assign_rec(
   path_symex_statet &state,
   exprt::operandst &guard, 
@@ -337,45 +328,36 @@ void path_symext::assign_rec(
   const std::string &suffix,
   const exprt &full_lhs) 
 {
-  #if 0
-  if(lhs_suffix_type.id()==ID_struct) // lhs is a struct
+  if(ns.follow(full_lhs.type()).id()==ID_struct) // full_lhs is a struct
   {
-    const struct_typet &struct_type=to_struct_type(lhs_suffix_type);
+    const struct_typet &struct_type=to_struct_type(ns.follow(full_lhs.type()));
     const struct_typet::componentst &components=struct_type.components();
 
-    bool is_struct_const=rhs.id() == ID_struct;
-
-    int i=0;
-
+    // split it up into components
     for(struct_typet::componentst::const_iterator
         it=components.begin();
         it!=components.end();
         it++)
     {
       const typet &subtype=it->type();  
-      const irep_idt& component_name=it->get_name();
-      typet lhs_type=ns.follow(subtype);
+      const irep_idt &component_name=it->get_name();
 
-      // add to suffix
-      const std::string new_suffix=
-        suffix + "."+id2string(component_name); // note the order
-
-      exprt component;
-
-      if(is_struct_const) 
-      {
-        component=rhs.operands()[i];
-      }
-      else
-      {
-        component=member_exprt(rhs, component_name, lhs_type);
-      }
-    
-      assign_rec(state, guard, lhs, component, new_suffix, lhs_type);
-      ++i;
+      exprt new_rhs=member_exprt(rhs, component_name, subtype);
+      exprt new_full_lhs=member_exprt(full_lhs, component_name, subtype);
+      exprt new_lhs=member_exprt(lhs, component_name, subtype);
+      
+      // struct constructor on rhs?
+      if(rhs.id()==ID_struct)
+        new_rhs=simplify_expr(new_rhs, ns);
+      
+      // recursive call
+      assign_rec(state, guard, new_lhs, new_rhs, suffix, new_full_lhs);
     }
-    return;
+
+    return; // done
   } 
+
+  #if 0
   else if(rhs.id()==ID_sideeffect) // catch side effects on rhs
   {
     const side_effect_exprt &side_effect_expr=to_side_effect_expr(rhs);
@@ -411,19 +393,17 @@ void path_symext::assign_rec(
       symbol_exprt(var_info.ssa_identifier(), var_info.type);
 
     // setup final RHS: deal with arrays on LHS
-    #if 0
-    exprt final_rhs=original_rhs;
+    //exprt final_rhs=rhs;
 
     // now dereference, instantiate, propagate RHS
-    exprt rhs_deref=state.dereference(final_rhs);
-    exprt ssa_rhs_no_prop=state.read_no_propagate(rhs_deref);
+    //exprt rhs_deref=state.dereference(final_rhs);
+    //exprt ssa_rhs_no_prop=state.read_no_propagate(rhs_deref);
 
-    exprt ssa_rhs_prop=state.read(rhs_deref);
-    #endif
+    exprt ssa_rhs=state.read(rhs);
     
     // make sure that rhs and lhs have matching types
 
-  /*
+    /*
     if(ssa_rhs_no_prop.is_not_nil() && ssa_rhs_no_prop.type() != lhs_type)
     {
 
@@ -436,27 +416,24 @@ void path_symext::assign_rec(
 
     // record the step
     path_symex_stept &step=state.record_step();
-    #if 0
-    step.guard=conjunction(guard);
-    step.lhs=lhs;
-    step.ssa_lhs=ssa_lhs_post;
-    step.ssa_rhs=ssa_rhs_prop;
-    step.ssa_rhs_no_prop=ssa_rhs_no_prop;
+    
+    if(!guard.empty()) step.guard=conjunction(guard);
+    step.full_lhs=full_lhs;
+    step.ssa_lhs=ssa_lhs;
+    step.ssa_rhs=ssa_rhs;
+    //step.ssa_rhs_no_prop=ssa_rhs_no_prop;
 
+    // record new state of lhs
     path_symex_statet::var_statet &var_state=state.get_var_state(var_info);
-    var_state.identifier=ssa_lhs_post.get_identifier();
+    var_state.ssa_symbol=ssa_lhs;
 
     // propagate the rhs?
-    var_state.value=propagate(ssa_rhs_prop) ? ssa_rhs_prop : nil_exprt();
-    var_state.step_number=state.history.size()-1;
-    #endif
+    var_state.value=propagate(ssa_rhs)?ssa_rhs:nil_exprt();
 
     #ifdef DEBUG
     std::cout << "assign_rec ID_symbol " << identifier << suffix << std::endl;
     #endif
   }
-  
-  #if 0
   else if(lhs.id()==ID_member)
   {
     #ifdef DEBUG
@@ -465,15 +442,15 @@ void path_symext::assign_rec(
 
     const member_exprt &lhs_member_expr=to_member_expr(lhs);
   
-    // add to suffix
+    // add component name to the suffix
     const std::string new_suffix=
       "."+id2string(lhs_member_expr.get_component_name())+suffix;
 
-    const exprt& struct_op = lhs_member_expr.struct_op();
+    const exprt &struct_op=lhs_member_expr.struct_op();
 
-    typet lhs_type=state.var_map.ns.follow(lhs_suffix_type);
+    //typet lhs_type=state.var_map.ns.follow(lhs_suffix_type);
 
-    assign_rec(state, guard, struct_op, rhs, new_suffix, lhs_type);
+    assign_rec(state, guard, struct_op, rhs, new_suffix, full_lhs);
   }
   else if(lhs.id()==ID_index)
   {
@@ -483,25 +460,21 @@ void path_symext::assign_rec(
 
     const index_exprt &lhs_index_expr=to_index_expr(lhs);
 
-    // lhs must be index operand
-    // that takes two operands: the first must be an array
-    // the second is the index
-
-    if(lhs.operands().size()!=2)
-      throw "index must have two operands";
-
     const exprt &lhs_array=lhs_index_expr.array();
     const exprt &lhs_index=lhs_index_expr.index();
     const typet &lhs_type=ns.follow(lhs_array.type());
-    
+
     if(lhs_type.id()!=ID_array)
       throw "index must take array type operand, but got `"+
-        lhs_type.id_string()+"'\n in expr " + lhs.pretty(2) + "\n";
+            lhs_type.id_string()+"'";
+            
+    std::string array_index=state.array_index_as_string(lhs_index);
+    if(array_index=="") array_index="[*]";
     
-    exprt new_rhs(ID_with, lhs_type);
-    new_rhs.copy_to_operands(lhs_array, lhs_index, rhs);
-       
-    assign_rec(state, guard, lhs_array, new_rhs, suffix, lhs_suffix_type);
+    // add index to the suffix
+    const std::string new_suffix=array_index+suffix;
+
+    assign_rec(state, guard, lhs_array, rhs, new_suffix, full_lhs);
   }
   else if(lhs.id()==ID_dereference)
   {
@@ -509,21 +482,15 @@ void path_symext::assign_rec(
     std::cout << "assign_rec ID_dereference" << std::endl;
     #endif
 
-    exprt tmp_lhs=state.dereference(lhs);
+    const dereference_exprt &dereference_expr=to_dereference_expr(lhs);
+    exprt address=state.read(dereference_expr.pointer());
+    exprt tmp_lhs=state.dereference(address);
 
-    simplify(tmp_lhs, state.var_map.ns);
-
-    if(tmp_lhs.id() == ID_dereference) // otherwise nontermination
-    {
-      throw "path_symext::operator(): unable to resolve pointer of lhs " + tmp_lhs.pretty(2);
-    }
-
-    assign_rec(state, guard, tmp_lhs, rhs, suffix, lhs_suffix_type);
+    assign_rec(state, guard, tmp_lhs, rhs, suffix, full_lhs);
 
     #ifdef DEBUG
     //std::cout << "assign_rec ID_dereference (done)" << std::endl;
     #endif
-
   }
   else if(lhs.id()==ID_if)
   {
@@ -532,18 +499,20 @@ void path_symext::assign_rec(
     #endif
 
     const if_exprt &lhs_if_expr=to_if_expr(lhs);
-    exprt cond=lhs_if_expr.cond();
+    exprt cond=state.read(lhs_if_expr.cond());
 
     // true
     guard.push_back(cond);
-    assign_rec(state, guard, lhs_if_expr.true_case(), rhs, suffix, lhs_suffix_type);
+    assign_rec(state, guard, lhs_if_expr.true_case(), rhs, suffix, full_lhs);
     guard.pop_back();
     
     // false
     guard.push_back(not_exprt(cond));
-    assign_rec(state, guard, lhs_if_expr.false_case(), rhs, suffix, lhs_suffix_type);
+    assign_rec(state, guard, lhs_if_expr.false_case(), rhs, suffix, full_lhs);
     guard.pop_back();
   }
+  
+  #if 0
   else if(lhs.id()==ID_byte_extract_little_endian ||
           lhs.id()==ID_byte_extract_big_endian)
   {
@@ -746,61 +715,37 @@ void path_symext::do_goto(
 
   const loct &loc=state.locs[state.pc()];
 
-  // first do hard, deterministic gotos
-  if(instruction.guard.is_false())
+  #if 0
+  exprt deref_guard=state.dereference(instruction.guard);
+  #endif
+
+  exprt guard=state.read(instruction.guard);
+  
+  if(guard.is_true() && loc.targets.size()==1)
   {
-    // really just a SKIP
-    state.next_pc();
-  }
-  else if(instruction.guard.is_true() &&
-          loc.targets.size()==1)
-  {
-    // unconditional GOTO to one target
     state.set_pc(loc.targets.front());
+    return; // we are done
   }
-  else
+
+  if(!guard.is_false())
   {
-    // we force that both branches are pursued (if the target is unknown)
-    
-    #if 0
-    exprt deref_guard=state.dereference(instruction.guard);
-    exprt guard=state.read(deref_guard);
-    exprt guard_no_prop=state.read_no_propagate(deref_guard);
-    #endif
-    
     // branch taken case
     for(loct::targetst::const_iterator
         t_it=loc.targets.begin();
         t_it!=loc.targets.end();
         t_it++)
     {
-      state.set_pc(*t_it);
+      // copy the state into 'furhter_states'
+      further_states.push_back(state);
+      further_states.back().set_pc(*t_it);
+      further_states.back().history.steps.back().guard=guard;
     }
-
-    #if 0
-    if(branch_taken)
-    {
-      state.history.back().guard=guard;
-      state.history.back().guard_no_prop=guard_no_prop;
-    } else {
-      if(guard.is_true())
-      {
-        state.history.back().guard=false_exprt();
-      }
-      else if(guard.is_false())
-      {
-        state.history.back().guard=true_exprt();
-      }
-      else {
-        state.history.back().guard=not_exprt(guard);
-      }
-      state.history.back().guard_no_prop=not_exprt(guard_no_prop);
-    }        
-    #endif
-    
-    // branch not take case
-    state.next_pc();
   }
+
+  // branch not taken case
+  exprt negated_guard=simplify_expr(not_exprt(guard), ns);
+  state.next_pc();
+  state.history.steps.back().guard=negated_guard;
 }
 
 /*******************************************************************\
