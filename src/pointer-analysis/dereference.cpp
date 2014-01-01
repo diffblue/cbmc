@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/expr_util.h>
 #include <util/byte_operators.h>
+#include <util/pointer_offset_size.h>
 
 #include <ansi-c/c_types.h>
 
@@ -26,7 +27,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/config.h>
 #include <util/std_expr.h>
 #include <util/cprover_prefix.h>
-#include <util/pointer_offset_size.h>
 #include <util/symbol_table.h>
 #include <util/guard.h>
 #include <util/options.h>
@@ -159,9 +159,17 @@ exprt dereferencet::dereference_rec(
     
     if(ns.follow(integer.type()).id()==ID_pointer)
       std::swap(pointer, integer);
-      
-    exprt new_offset=
-      offset.is_nil()?integer:plus_exprt(offset, integer);
+
+    // multiply integer by object size
+    exprt size=size_of_expr(pointer.type().subtype(), ns);
+    if(size.is_nil())
+      throw "dereference failed to get object size for pointer arithmetic";
+
+    // make types of offset and size match
+    if(size.type()!=integer.type())
+      integer.make_typecast(size.type());
+  
+    exprt new_offset=plus_exprt(offset, mult_exprt(size, integer));
 
     return dereference_rec(pointer, new_offset, type);
   }
