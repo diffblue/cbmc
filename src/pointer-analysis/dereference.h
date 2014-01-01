@@ -9,46 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_POINTER_ANALYSIS_DEREFERENCE_H
 #define CPROVER_POINTER_ANALYSIS_DEREFERENCE_H
 
-#if 0
-
-#include <set>
-#include <string>
-
-#include <util/hash_cont.h>
-#include <util/std_expr.h>
-
-#include "value_sets.h"
-
-class symbol_tablet;
-class guardt;
-class optionst;
-class modet;
-class symbolt;
-
-/*! \brief TO_BE_DOCUMENTED
-*/
-class dereference_callbackt
-{
-public:
-  virtual ~dereference_callbackt()
-  {
-  }
-
-  virtual void dereference_failure(
-    const std::string &property,
-    const std::string &msg,
-    const guardt &guard)=0;
-
-  typedef hash_set_cont<exprt, irep_hash> expr_sett;
-
-  virtual void get_value_set(
-    const exprt &expr,
-    value_setst::valuest &value_set)=0;
-  
-  virtual bool has_failed_symbol(
-    const exprt &expr,
-    const symbolt *&symbol)=0;
-};
+#include <util/namespace.h>
+#include <util/expr.h>
 
 /*! \brief TO_BE_DOCUMENTED
 */
@@ -62,54 +24,33 @@ public:
             to be performed
    * \param _dereference_callback Callback object for error reporting
   */
-  dereferencet(
-    const namespacet &_ns,
-    symbol_tablet &_new_symbol_table,
-    const optionst &_options,
-    dereference_callbackt &_dereference_callback):
-    ns(_ns),
-    new_symbol_table(_new_symbol_table),
-    options(_options),
-    dereference_callback(_dereference_callback)
-  { }
+  explicit dereferencet(
+    const namespacet &_ns):
+    ns(_ns)
+  {
+  }
 
-  virtual ~dereferencet() { }
-  
-  typedef enum { READ, WRITE } modet;
+  ~dereferencet() { }
   
   /*! 
-   * The method 'dereference' dereferences the
-   * given pointer-expression. Any errors are
-   * reported to the callback method given in the
-   * constructor.
+   * The operator '()' dereferences the
+   * given pointer-expression.
    *
    * \param pointer A pointer-typed expression, to
             be dereferenced.
-   * \param guard A guard, which is assumed to hold when
-            dereferencing.
-   * \param mode Indicates whether the dereferencing
-            is a load or store.
   */
 
-  virtual exprt dereference(
-    const exprt &pointer,
-    const guardt &guard,
-    const modet mode);
+  exprt operator()(const exprt &pointer);
     
-  /*! \brief Returns 'true' iff the given expression contains unary '*'
-  */
-  static bool has_dereference(const exprt &expr);
-
-  typedef hash_set_cont<exprt, irep_hash> expr_sett;
-
 private:
   const namespacet &ns;
-  symbol_tablet &new_symbol_table;
-  const optionst &options;
-  dereference_callbackt &dereference_callback;
-  static unsigned invalid_counter;
 
-  bool dereference_type_compare(
+  exprt dereference_rec(
+    const exprt &address,
+    const exprt &offset,
+    const typet &type);
+
+  bool type_compatible(
     const typet &object_type,
     const typet &dereference_type) const;
 
@@ -117,35 +58,7 @@ private:
     exprt &dest,
     const exprt &offset) const;
     
-  class valuet
-  {
-  public:
-    exprt value;
-    exprt pointer_guard;
-    
-    valuet():value(nil_exprt()), pointer_guard(false_exprt())
-    {
-    }
-  };
-  
-  valuet build_reference_to(
-    const exprt &what, 
-    const modet mode,
-    const exprt &pointer,
-    const guardt &guard);
-
-  bool get_value_guard(
-    const exprt &symbol,
-    const exprt &premise,
-    exprt &value);
-             
-  static const exprt &get_symbol(const exprt &object);
-  
-  void bounds_check(const index_exprt &expr, const guardt &guard);
-  void valid_check(const exprt &expr, const guardt &guard, const modet mode);
-  
-  void invalid_pointer(const exprt &expr, const guardt &guard);
-
+  #if 0
   bool memory_model(
     exprt &value,
     const typet &type,
@@ -163,7 +76,7 @@ private:
     const typet &type,
     const guardt &guard,
     const exprt &offset);
+  #endif
 };
-#endif
 
 #endif
