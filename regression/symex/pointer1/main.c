@@ -22,4 +22,14 @@ int main()
   
   unsigned int *up=(unsigned int *)q;
   assert(*up==i);
+  
+  // pointer with conditional
+  int input, x, y;
+  p=input?&x:&y;
+  *p=1;
+  
+  if(input)
+    assert(x==1);
+  else
+    assert(y==1);
 }
