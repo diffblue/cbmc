@@ -30,7 +30,8 @@ public:
     var_map(_var_map),
     locs(_locs),
     inside_atomic_section(false),
-    current_thread(0)
+    current_thread(0),
+    no_thread_interleavings(0)
   {
   }
 
