@@ -34,15 +34,17 @@ protected:
 
   void function_call(
     path_symex_statet &state,
-    const code_function_callt &call)
+    const code_function_callt &call,
+    std::list<path_symex_statet> &further_states)
   {
-    function_call(state, call, call.function());
+    function_call_rec(state, call, call.function(), further_states);
   }
     
-  void function_call(
+  void function_call_rec(
     path_symex_statet &state,
     const code_function_callt &function_call,
-    const exprt &function);
+    const exprt &function,
+    std::list<path_symex_statet> &further_states);
     
   void return_from_function(
     path_symex_statet &state,
@@ -117,6 +119,17 @@ bool path_symext::propagate(const exprt &src)
     forall_operands(it, src)
       if(!propagate(*it)) return false;
     return true;
+  }
+  else if(src.id()==ID_if)
+  {
+    const if_exprt &if_expr=to_if_expr(src);
+    if(!propagate(if_expr.true_case())) return false;
+    if(!propagate(if_expr.false_case())) return false;
+    return true;
+  }
+  else if(src.id()==ID_array_of)
+  {
+    return propagate(to_array_of_expr(src).what());
   }
   else
   {
@@ -550,7 +563,7 @@ void path_symext::assign_rec(
 
 /*******************************************************************\
 
-Function: path_symext::function_call
+Function: path_symext::function_call_rec
 
   Inputs:
 
@@ -560,10 +573,11 @@ Function: path_symext::function_call
 
 \*******************************************************************/
 
-void path_symext::function_call(
+void path_symext::function_call_rec(
   path_symex_statet &state,
   const code_function_callt &call,
-  const exprt &function)
+  const exprt &function,
+  std::list<path_symex_statet> &further_states)
 {
   if(function.id()==ID_symbol)
   {
@@ -627,6 +641,34 @@ void path_symext::function_call(
 
     // set the new PC
     thread.pc=function_entry_point;
+  }
+  else if(function.id()==ID_dereference)
+  {
+    exprt deref=state.read(function);
+    assert(deref.id()!=ID_dereference);
+    function_call_rec(state, call, deref, further_states);
+  }
+  else if(function.id()==ID_if)
+  {
+    const if_exprt &if_expr=to_if_expr(function);
+    exprt guard=state.read(if_expr.cond());
+    
+    // add a 'further state' for the false-case
+    
+    {
+      further_states.push_back(state);
+      path_symex_statet &false_state=further_states.back();
+      path_symex_stept &step=false_state.record_step();
+      step.guard=not_exprt(guard);
+      function_call_rec(further_states.back(), call, if_expr.false_case(), further_states);
+    }
+
+    // do the true-case in 'state'
+    {
+      path_symex_stept &step=state.record_step();
+      step.guard=guard;
+      function_call_rec(state, call, if_expr.true_case(), further_states);
+    }
   }
   else
     throw "TODO: function_call "+function.id_string();
@@ -853,7 +895,7 @@ void path_symext::operator()(
     
   case FUNCTION_CALL:
     state.record_step();
-    function_call(state, to_code_function_call(instruction.code));
+    function_call(state, to_code_function_call(instruction.code), further_states);
     break;
     
   case OTHER:
