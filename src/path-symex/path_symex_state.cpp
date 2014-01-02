@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_expr.h>
 #include <util/arith_tools.h>
 #include <util/expr_util.h>
+#include <util/decision_procedure.h>
 
 #include <ansi-c/c_types.h>
 
@@ -257,6 +258,10 @@ exprt path_symex_statet::instantiate_rec(
   }
   else if(src.id()==ID_symbol)
   {
+    // Is this a function?
+    if(src.type().id()==ID_code)
+      return src; // leave as is
+  
     // special nondeterminism symbol
     if(var_map.is_nondet(src))
       return src;
@@ -876,3 +881,31 @@ bool path_symex_statet::shared_accesses(
 }
 #endif
 
+/*******************************************************************\
+
+Function: path_symex_statet::is_feasible
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool path_symex_statet::is_feasible(decision_proceduret &decision_procedure) const
+{
+  // feed path constraint to decision procedure
+  decision_procedure << history;
+  
+  // check whether SAT
+  switch(decision_procedure())
+  {
+  case decision_proceduret::D_TAUTOLOGY:
+  case decision_proceduret::D_SATISFIABLE: return true;
+  
+  case decision_proceduret::D_UNSATISFIABLE: return false;
+  
+  case decision_proceduret::D_ERROR: throw "error from decsion procedure";
+  }
+}
