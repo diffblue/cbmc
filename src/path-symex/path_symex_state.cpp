@@ -215,24 +215,41 @@ exprt path_symex_statet::instantiate_rec(
   {
     const member_exprt &member_expr=to_member_expr(src);
     const irep_idt &component_name=member_expr.get_component_name();
-    const exprt &struct_op=member_expr.struct_op();
-    typet struct_op_type=var_map.ns.follow(struct_op.type());
-  
-    if(struct_op_type.id()!=ID_struct)
-      return nil_exprt();
+    const exprt &compound_op=member_expr.struct_op();
+    typet compound_op_type=var_map.ns.follow(compound_op.type());
+    
+    if(compound_op_type.id()==ID_struct)
+    {
+      const struct_typet &struct_type=to_struct_type(compound_op_type);
 
-    const struct_typet &struct_type=to_struct_type(struct_op_type);
+      if(!struct_type.has_component(component_name))
+        throw "No struct component "+id2string(component_name)+" in member expression";
 
-    if(!struct_type.has_component(component_name))
-      throw "No component "+id2string(component_name)+" in member expression";
+      typet new_symbol_type=suffix.size() ? symbol_type : var_map.ns.follow(struct_type.component_type(component_name));
 
-    typet new_symbol_type=suffix.size() ? symbol_type : var_map.ns.follow(struct_type.component_type(component_name));
+      // add to suffix
+      const std::string new_suffix=
+        "."+id2string(component_name)+suffix;
+ 
+      return instantiate_rec(compound_op, new_suffix, new_symbol_type, propagate);
+    }
+    else if(compound_op_type.id()==ID_union)
+    {
+      const union_typet &union_type=to_union_type(compound_op_type);
 
-    // add to suffix
-    const std::string new_suffix=
-      "."+id2string(component_name)+suffix;
+      if(!union_type.has_component(component_name))
+        throw "No union component "+id2string(component_name)+" in member expression";
 
-    return instantiate_rec(struct_op, new_suffix, new_symbol_type, propagate);
+      typet new_symbol_type=suffix.size() ? symbol_type : var_map.ns.follow(union_type.component_type(component_name));
+
+      // add to suffix
+      const std::string new_suffix=
+        "."+id2string(component_name)+suffix;
+ 
+      return instantiate_rec(compound_op, new_suffix, new_symbol_type, propagate);
+    }
+    else
+      throw "member of non struct/union type";
   }
   else if(src.id()==ID_index)
   {
@@ -393,6 +410,10 @@ exprt path_symex_statet::instantiate_rec_address(
     exprt tmp=src;
     tmp.op0()=instantiate_rec_address(src.op0(), propagate);
     return tmp;
+  }
+  else if(src.id()==ID_string_constant)
+  {
+    return src;
   }
   else
   {
