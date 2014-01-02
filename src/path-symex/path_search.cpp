@@ -196,17 +196,22 @@ bool path_searcht::check_assertion(
   const goto_programt::instructiont &instruction=
     *state.get_instruction();
 
-  satcheckt satcheck;
-  bv_pointerst bv_pointers(ns, satcheck);
-
-  // the path constraint
-  bv_pointers << state.history;
-
   // the assertion in SSA
   exprt assertion=
     state.read(instruction.guard);
 
-  // negate  
+  if(assertion.is_true()) return false; // no error
+
+  satcheckt satcheck;
+  bv_pointerst bv_pointers(ns, satcheck);
+  
+  satcheck.set_message_handler(get_message_handler());
+  bv_pointers.set_message_handler(get_message_handler());
+
+  // the path constraint
+  bv_pointers << state.history;
+
+  // negate the assertion
   bv_pointers.set_to(assertion, false);
   
   switch(bv_pointers.dec_solve())
