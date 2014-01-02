@@ -20,7 +20,7 @@ class optionst;
 #define SYMEX_OPTIONS \
   "(function):" \
   "D:I:" \
-  "(depth):" \
+  "(depth):(context-bound):" \
   "(bounds-check)(pointer-check)(div-by-zero-check)(memory-leak-check)" \
   "(signed-overflow-check)(unsigned-overflow-check)(nan-check)" \
   "(no-assertions)(no-assumptions)" \
