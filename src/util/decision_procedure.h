@@ -41,8 +41,14 @@ public:
   // solve the problem
   typedef enum { D_TAUTOLOGY, D_SATISFIABLE,
                  D_UNSATISFIABLE, D_ERROR } resultt;
-  
+
+  // will eventually be protected, use below call operator  
   virtual resultt dec_solve()=0;
+  
+  inline resultt operator()()
+  {
+    return dec_solve();
+  }
 
   // old-style, will go away  
   virtual bool in_core(const exprt &expr);
