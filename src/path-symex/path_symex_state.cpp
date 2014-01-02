@@ -14,22 +14,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <pointer-analysis/dereference.h>
 
-#if 0
-#include <util/std_expr.h>
-#include <util/decision_procedure.h>
-#include <util/prefix.h>
-
-#include <solvers/prop/prop_conv.h>
-
-#include <util/i2string.h>
-#include <util/replace_expr.h>
-#include <util/find_symbols.h>
-
-#include <langapi/language_util.h>
-
-#include <path-symex/locs.h>
-#endif
-
 #include "path_symex_state.h"
 
 //#define DEBUG
@@ -191,15 +175,15 @@ Function: path_symex_statet::instantiate_rec
 
 \*******************************************************************/
 
-#include <iostream>
-
 exprt path_symex_statet::instantiate_rec(
   const exprt &src,
   const std::string &suffix,
   const typet &symbol_type,
   bool propagate)
 {
+  #ifdef DEBUG
   std::cout << "instantiate_rec: " << src.id() << " " << suffix << std::endl;
+  #endif
 
   if(src.id()==ID_address_of)
   {
@@ -892,78 +876,3 @@ bool path_symex_statet::shared_accesses(
 }
 #endif
 
-/*******************************************************************\
-
-Function: path_symex_statet::show_vcc
-
-  Inputs: show verification condition
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-#if 0
-void path_symex_statet::show_vcc(
-  nodet* ancestor,
-  const exprt& start, 
-  const exprt& cond,
-  bool prop,
-  std::ostream &out)
-{
-  unsigned step_nr=0;
-  unsigned count=1;
-
-  bool reached_ancestor=false;
-
-  out << "0:" << from_expr(var_map.ns, "", ssa_name(start,ancestor)) << "\n";
-  
-  for(path_symex_statet::historyt::const_iterator
-      h_it=history.begin();
-      h_it!=history.end();
-      h_it++, ++step_nr)
-  {
-    const stept &step=*h_it;
-    
-    reached_ancestor=reached_ancestor||step.node==ancestor;
-
-    if(!reached_ancestor) continue;
-    
-    if( step.guard.is_not_nil() && !step.guard_no_prop.is_true())
-    {
-      out << (count++) << ":" << step_nr << ":"
-          << step.node->number 
-          << "T"<<step.thread_nr << " "
-          << (step.ignore ? "    //":"")
-                          << "[" << from_expr(var_map.ns, "", step.guard ) << "]" 
-          << (step.guard_no_prop!=step.guard ? 
-                "("+from_expr(var_map.ns, "", step.guard_no_prop)+")" 
-                : "") 
-          << "\n";
-    }
-
-    if(step.lhs.is_not_nil())
-    {
-      std::string constraint;
-
-      if(step.ssa_rhs.is_nil())
-        constraint=from_expr(var_map.ns, "", step.ssa_lhs) + " := "+from_expr(var_map.ns, "", step.ssa_lhs);
-      else
-        constraint=from_expr(step.ssa_lhs) + " := " 
-                  + from_expr(var_map.ns, "",step.ssa_rhs) 
-                  + ( step.ssa_rhs_no_prop != step.ssa_rhs ? 
-                      " ( " + from_expr(var_map.ns, "", step.ssa_rhs_no_prop) + ")" : 
-                    " ");
-
-      out << (count++) << ":" << step_nr << ": " << step.node->number 
-          << "T" <<step.thread_nr << " " 
-          << (step.ignore ? "    //":"") << constraint << "\n";
-    }
-  }
-  
-  out << "|--------------------------" << "\n";
-  out << "{1} " << from_expr(var_map.ns, "", read(cond)) 
-      << " ( " << from_expr(var_map.ns, "", read_no_propagate(cond)) << " ) " << "\n";
-}
-#endif

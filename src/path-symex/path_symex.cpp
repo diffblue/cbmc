@@ -6,21 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#if 0
-#include <cstdlib>
-#include <iostream>
-
-#include <util/i2string.h>
-#include <util/expr_util.h>
-#include <util/byte_operators.h>
-#include <util/prefix.h>
-#include <util/pointer_offset_size.h>
-
-#include <util/arith_tools.h>
-
-#include <ansi-c/c_types.h>
-#endif
-
 #include <util/simplify_expr.h>
 
 #include "path_symex.h"
@@ -715,10 +700,6 @@ void path_symext::do_goto(
 
   const loct &loc=state.locs[state.pc()];
 
-  #if 0
-  exprt deref_guard=state.dereference(instruction.guard);
-  #endif
-
   exprt guard=state.read(instruction.guard);
   
   if(guard.is_true() && loc.targets.size()==1)
@@ -827,14 +808,9 @@ void path_symext::operator()(
       state.remove_current_thread();
     else
     {
-      #if 0
-      exprt deref_guard=state.dereference(instruction.guard);
-      exprt guard=state.read(deref_guard);
-      exprt guard_no_prop=state.read_no_propagate(deref_guard);
-      state.history.back().guard=guard; //gen_not(guard);
-      state.history.back().guard_no_prop=guard_no_prop;
+      exprt guard=state.read(instruction.guard);
+      //state.history.back().guard=guard;
       state.next_pc();
-      #endif
     }
     break;
     
