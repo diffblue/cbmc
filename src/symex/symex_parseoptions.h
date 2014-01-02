@@ -20,7 +20,7 @@ class optionst;
 #define SYMEX_OPTIONS \
   "(function):" \
   "D:I:" \
-  "(depth):(context-bound):" \
+  "(depth):(context-bound):(unwind):" \
   "(bounds-check)(pointer-check)(div-by-zero-check)(memory-leak-check)" \
   "(signed-overflow-check)(unsigned-overflow-check)(nan-check)" \
   "(no-assertions)(no-assumptions)" \
@@ -30,7 +30,7 @@ class optionst;
   "(version)" \
   "(i386-linux)(i386-macos)(i386-win32)(win32)(winx64)(gcc)" \
   "(ppc-macos)(unsigned-char)" \
-  "(string-abstraction)(no-arch)(arch):" \
+  "(string-abstraction)(no-arch)(arch):(floatbv)(fixedbv)" \
   "(round-to-nearest)(round-to-plus-inf)(round-to-minus-inf)(round-to-zero)" \
   "(show-locs)(show-vcc)(show-properties)" \
   "(property):"
