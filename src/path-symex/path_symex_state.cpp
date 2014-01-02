@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/expr_util.h>
 #include <util/decision_procedure.h>
+#include <util/i2string.h>
 
 #include <ansi-c/c_types.h>
 
@@ -17,7 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "path_symex_state.h"
 
-//#define DEBUG
+#define DEBUG
 
 #ifdef DEBUG
 #include <iostream>
@@ -195,21 +196,16 @@ exprt path_symex_statet::instantiate_rec(
   }
   else if(src.id()==ID_sideeffect)
   {
-    #if 0
     const irep_idt &statement=to_side_effect_expr(src).get_statement();
     
     if(statement==ID_nondet)
     {        
       irep_idt id="symex::nondet"+i2string(var_map.nondet_count);
-
-      if(propagate)
-        ++var_map.nondet_count;
-
+      var_map.nondet_count++;
       return symbol_exprt(id, src.type());
     }
     else
       throw "instantiate_rec: unexpected side effect "+id2string(statement);
-    #endif
   }
   else if(src.id()==ID_member)
   {
@@ -385,6 +381,10 @@ exprt path_symex_statet::instantiate_rec_address(
   const exprt &src,
   bool propagate)
 {
+  #ifdef DEBUG
+  std::cout << "instantiate_rec_address: " << src.id() << std::endl;
+  #endif
+
   if(src.id()==ID_symbol)
   {
     return src;
@@ -399,10 +399,9 @@ exprt path_symex_statet::instantiate_rec_address(
   }
   else if(src.id()==ID_dereference)
   {
-    assert(src.operands().size()==1);
-    exprt tmp=src;
-    tmp.op0()=instantiate_rec(src.op0(), "", src.op1().type(), propagate);
-    return tmp;
+    const dereference_exprt &dereference_expr=to_dereference_expr(src);
+    const exprt &pointer=dereference_expr.pointer();
+    return dereference(read(pointer, propagate));
   }
   else if(src.id()==ID_member)
   {
