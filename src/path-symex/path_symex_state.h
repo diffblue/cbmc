@@ -177,6 +177,8 @@ public:
   {
     return history.steps.size();
   }
+  
+  bool is_feasible(class decision_proceduret &) const;
 
 protected:
   unsigned current_thread;
