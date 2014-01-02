@@ -166,9 +166,20 @@ public:
   exprt dereference(const exprt &address);
 
   std::string array_index_as_string(const exprt &) const;
+  
+  inline unsigned get_no_thread_interleavings() const
+  {
+    return no_thread_interleavings;
+  }
+  
+  inline unsigned get_depth() const
+  {
+    return history.steps.size();
+  }
 
 protected:
   unsigned current_thread;
+  unsigned no_thread_interleavings;
 
   exprt read(
     const exprt &src,
