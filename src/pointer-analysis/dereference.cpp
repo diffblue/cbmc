@@ -60,14 +60,14 @@ exprt dereferencet::operator()(const exprt &pointer)
     throw "dereference expected pointer type, but got "+
           pointer.type().pretty();  
 
-  // we may get ifs due to recursive calls
+  // we may get ifs
   if(pointer.id()==ID_if)
   {
     const if_exprt &if_expr=to_if_expr(pointer);
 
-    // push down the if
+    // push down the if, do recursive call
     exprt true_case=operator()(if_expr.true_case());
-    exprt false_case=operator()(if_expr.true_case());
+    exprt false_case=operator()(if_expr.false_case());
     
     return if_exprt(if_expr.cond(), true_case, false_case);
   }
