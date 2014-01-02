@@ -142,8 +142,19 @@ exprt dereferencet::dereference_rec(
   }
   else if(address.id()==ID_typecast)
   {
-    // pointer type cast
-    return dereference_rec(to_typecast_expr(address).op(), offset, type);
+    const exprt &op=to_typecast_expr(address).op();
+    const typet &op_type=ns.follow(op.type());
+    
+    // pointer type cast?
+    if(op_type.id()==ID_pointer)
+      return dereference_rec(op, offset, type); // just pass down
+    else if(op_type.id()==ID_signedbv || op_type.id()==ID_unsignedbv)
+    {
+      // integer address
+      throw "dereferencet: integer address unhandled";
+    }
+    else
+      throw "dereferencet: unexpected cast";
   }
   else if(address.id()==ID_plus)
   {
@@ -172,6 +183,16 @@ exprt dereferencet::dereference_rec(
     exprt new_offset=plus_exprt(offset, mult_exprt(size, integer));
 
     return dereference_rec(pointer, new_offset, type);
+  }
+  else if(address.id()==ID_constant)
+  {
+    // pointer-typed constant
+    if(to_constant_expr(address).get_value()==ID_NULL) // NULL
+    {
+      return exprt(ID_null_object, ns.follow(address.type()).subtype());
+    }
+    else
+      throw "dereferencet: unexpected pointer constant "+address.pretty();
   }
   else
   {
