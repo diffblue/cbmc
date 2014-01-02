@@ -692,7 +692,7 @@ void path_symext::return_from_function(
 {
   if(state.threads[state.get_current_thread()].call_stack.empty())
   {
-    state.remove_current_thread();
+    state.disable_current_thread();
   }
   else
   {
@@ -826,7 +826,7 @@ void path_symext::operator()(
     
   case END_THREAD:
     state.record_step();
-    state.remove_current_thread();
+    state.disable_current_thread();
     break;
     
   case GOTO:
@@ -847,11 +847,11 @@ void path_symext::operator()(
   case ASSUME:
     state.record_step();
     if(instruction.guard.is_false())
-      state.remove_current_thread();
+      state.disable_current_thread();
     else
     {
       exprt guard=state.read(instruction.guard);
-      //state.history.back().guard=guard;
+      state.history.steps.back().guard=guard;
       state.next_pc();
     }
     break;
