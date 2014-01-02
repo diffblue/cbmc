@@ -245,7 +245,10 @@ exprt path_symex_statet::instantiate_rec(
       return instantiate_rec(compound_op, new_suffix, new_symbol_type, propagate);
     }
     else
+    {
+      std::cerr << compound_op.pretty() << std::endl;
       throw "member of non struct/union type";
+    }
   }
   else if(src.id()==ID_index)
   {
@@ -411,6 +414,10 @@ exprt path_symex_statet::instantiate_rec_address(
     return tmp;
   }
   else if(src.id()==ID_string_constant)
+  {
+    return src;
+  }
+  else if(src.id()==ID_label)
   {
     return src;
   }

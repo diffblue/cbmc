@@ -120,6 +120,12 @@ bool path_symext::propagate(const exprt &src)
       if(!propagate(*it)) return false;
     return true;
   }
+  else if(src.id()==ID_array)
+  {
+    forall_operands(it, src)
+      if(!propagate(*it)) return false;
+    return true;
+  }
   else if(src.id()==ID_if)
   {
     const if_exprt &if_expr=to_if_expr(src);
