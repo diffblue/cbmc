@@ -35,11 +35,21 @@ path_searcht::resultt path_searcht::operator()(
   
   queue.push_back(initial_state(var_map, locs));
   
+  // set up the statistics
+  number_of_dropped_states=0;
+  
   while(!queue.empty())
   {
     // Pick a state from the queue,
     // according to some heuristic.
     queuet::iterator state=pick_state();
+    
+    if(drop_state(*state))
+    {
+      number_of_dropped_states++;
+      queue.erase(state);
+      continue;
+    }
     
     if(!state->is_executable())
     {
@@ -138,6 +148,27 @@ void path_searcht::do_show_vcc(
       << from_expr(ns, "", state.read(instruction.guard)) << "\n";
   
   out << eom;
+}
+
+/*******************************************************************\
+
+Function: path_searcht::drop_state
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: decide whether to drop a state
+
+\*******************************************************************/
+
+bool path_searcht::drop_state(const statet &state) const
+{
+  if(depth_limit!=-1 && state.get_depth()>depth_limit) return true;
+  
+  if(context_bound!=-1 && state.get_no_thread_interleavings()) return true;
+  
+  return false;
 }
 
 /*******************************************************************\

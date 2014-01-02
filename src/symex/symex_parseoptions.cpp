@@ -243,6 +243,12 @@ int symex_parseoptionst::doit()
     path_search.set_message_handler(get_message_handler());
     path_search.set_verbosity(get_verbosity());
 
+    if(cmdline.isset("depth"))
+      path_search.depth_limit=atoi(cmdline.getval("depth"));
+
+    if(cmdline.isset("context-bound"))
+      path_search.context_bound=atoi(cmdline.getval("context-bound"));
+
     if(cmdline.isset("show-vcc"))
     {
       path_search.show_vcc=true;
@@ -747,6 +753,7 @@ void symex_parseoptionst::help()
     " --function name              set main function name\n"
     " --property nr                only check one specific property\n"
     " --depth nr                   limit search depth\n"
+    " --context-bound nr           limit number of context switches\n"
     " --unwind nr                  unwind nr times\n"
     "\n"
     "Other options:\n"
