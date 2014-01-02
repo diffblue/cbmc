@@ -9,14 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_PATH_SYMEX_STATE_H
 #define CPROVER_PATH_SYMEX_STATE_H
 
-#if 0
-#include <set>
-
-#include <util/expr.h>
-#include <util/std_code.h>
-#include <util/std_expr.h>
-#endif
-
 #include "locs.h"
 #include "var_map.h"
 #include "path_symex_history.h"
@@ -76,8 +68,9 @@ public:
     loc_reft pc;    
     call_stackt call_stack; // the call stack
     var_valt local_vars; // thread-local variables
+    bool active;
     
-    threadt()
+    threadt():active(true)
     {
     }
   };
@@ -103,7 +96,8 @@ public:
   
   inline bool is_executable() const
   {
-    return !threads.empty();
+    return !threads.empty() &&
+           threads[current_thread].active;
   }
 
   inline void swap(path_symex_statet &other)
@@ -127,10 +121,9 @@ public:
     return threads.back();
   }
   
-  inline void remove_current_thread()
+  inline void disable_current_thread()
   {
-    threads.erase(threads.begin()+current_thread);
-    if(current_thread>threads.size()) current_thread--;
+    threads[current_thread].active=false;
   }
 
   inline loc_reft pc() const
