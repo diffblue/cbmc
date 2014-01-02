@@ -425,6 +425,7 @@ void show_goto_trace(
     case goto_trace_stept::MEMORY_BARRIER:
     case goto_trace_stept::ATOMIC_BEGIN:
     case goto_trace_stept::ATOMIC_END:
+    case goto_trace_stept::DEAD:
       break;
     
     case goto_trace_stept::CONSTRAINT:
