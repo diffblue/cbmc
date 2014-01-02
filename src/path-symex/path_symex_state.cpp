@@ -592,6 +592,12 @@ Function: path_symex_statet::record_step
 
 path_symex_stept &path_symex_statet::record_step()
 {
+  // is there a context switch happening?
+  if(!history.steps.empty() &&
+     history.steps.back().thread_nr!=current_thread)
+    no_thread_interleavings++;
+  
+  // add the step
   history.steps.push_back(path_symex_stept());
   path_symex_stept &step=history.steps.back();
 
@@ -601,6 +607,7 @@ path_symex_stept &path_symex_statet::record_step()
     step.pc_vector[t]=threads[t].pc;
   
   step.thread_nr=current_thread;
+  
   return step;
 }
 
