@@ -104,12 +104,6 @@ void symex_parseoptionst::get_command_line_options(optionst &options)
     exit(1);
   }
 
-  if(cmdline.isset("unwind"))
-    options.set_option("unwind", cmdline.getval("unwind"));
-
-  if(cmdline.isset("depth"))
-    options.set_option("depth", cmdline.getval("depth"));
-
   if(cmdline.isset("debug-level"))
     options.set_option("debug-level", cmdline.getval("debug-level"));
 
@@ -248,6 +242,9 @@ int symex_parseoptionst::doit()
 
     if(cmdline.isset("context-bound"))
       path_search.context_bound=atoi(cmdline.getval("context-bound"));
+
+    if(cmdline.isset("unwind"))
+      path_search.unwind_limit=atoi(cmdline.getval("unwind"));
 
     if(cmdline.isset("show-vcc"))
     {

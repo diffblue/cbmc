@@ -615,9 +615,13 @@ void path_symext::function_call_rec(
     // push a frame on the call stack
     path_symex_statet::threadt &thread=state.threads[state.get_current_thread()];
     thread.call_stack.push_back(path_symex_statet::framet());
+    thread.call_stack.back().current_function=function_identifier;
     thread.call_stack.back().return_location=thread.pc.next_loc();
     thread.call_stack.back().return_lhs=call.lhs();
     thread.call_stack.back().saved_local_vars=thread.local_vars;
+    
+    // update statistics
+    state.recursion_map[function_identifier]++;
 
     const code_typet &code_type=
       to_code_type(ns.follow(function_entry.second));
@@ -696,13 +700,19 @@ void path_symext::return_from_function(
   path_symex_statet &state,
   const exprt &return_value)
 {
-  if(state.threads[state.get_current_thread()].call_stack.empty())
+  path_symex_statet::threadt &thread=state.threads[state.get_current_thread()];
+
+  // returning from very last function?
+  if(thread.call_stack.empty())
   {
     state.disable_current_thread();
   }
   else
   {
-    path_symex_statet::threadt &thread=state.threads[state.get_current_thread()];
+    // update statistics
+    state.recursion_map[thread.call_stack.back().current_function]--;
+  
+    // set PC to return location
     thread.pc=thread.call_stack.back().return_location;
 
     // assign the return value
@@ -735,15 +745,8 @@ void path_symext::do_goto(
 
   if(instruction.is_backwards_goto())
   {
-    #if 0
-    unsigned unwinding_steps=++state.unwind_map[state.pc().loc_number];
-
-    if(unwinding_steps > max_unwind) {
-      std::cout << "unwinding steps " << state.pc().loc_number << " : " << unwinding_steps << std::endl;
-      state.threads[thread_nr].active=false;
-      break;
-    }
-    #endif
+    // we keep a statistic on how many times we execute backwards gotos
+    state.unwinding_map[state.pc()]++;
   }
 
   const loct &loc=state.locs[state.pc()];

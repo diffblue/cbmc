@@ -53,6 +53,7 @@ public:
   // procedure frame
   struct framet
   {
+    irep_idt current_function;
     loc_reft return_location;
     exprt return_lhs;
     var_valt saved_local_vars;
@@ -105,6 +106,9 @@ public:
     threads.swap(other.threads);
     std::swap(inside_atomic_section, other.inside_atomic_section);
     std::swap(current_thread, other.current_thread);
+    std::swap(no_thread_interleavings, other.no_thread_interleavings);
+    std::swap(unwinding_map, other.unwinding_map);
+    std::swap(recursion_map, other.recursion_map);
   }
   
   // execution history
@@ -172,6 +176,14 @@ public:
   }
   
   bool is_feasible(class decision_proceduret &) const;
+
+  // counts how many times we have executed backwards edges
+  typedef std::map<loc_reft, unsigned> unwinding_mapt;
+  unwinding_mapt unwinding_map;
+
+  // similar for recursive function calls
+  typedef std::map<irep_idt, unsigned> recursion_mapt;
+  recursion_mapt recursion_map;
 
 protected:
   unsigned current_thread;
