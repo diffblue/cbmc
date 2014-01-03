@@ -616,16 +616,6 @@ public:
     size()=_size;
   }
   
-  const typet &index_type() const
-  {
-    return static_cast<const typet &>(find(ID_index_type));
-  }
-  
-  typet &index_type()
-  {
-    return static_cast<typet &>(add(ID_index_type));
-  }
-  
   inline const exprt &size() const
   {
     return static_cast<const exprt &>(find(ID_size));
