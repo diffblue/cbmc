@@ -20,7 +20,8 @@ public:
     safety_checkert(_ns),
     show_vcc(false),
     depth_limit(-1), // no limit
-    context_bound(-1)
+    context_bound(-1),
+    unwind_limit(-1)
   {
   }
 
@@ -31,6 +32,8 @@ public:
   
   unsigned depth_limit;
   unsigned context_bound;
+  unsigned unwind_limit;
+
   unsigned number_of_dropped_states;
 
 protected:
