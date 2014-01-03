@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <util/arith_tools.h>
 #include <util/simplify_expr.h>
 
 #include "path_symex.h"
@@ -332,9 +333,11 @@ void path_symext::assign_rec(
   const std::string &suffix,
   const exprt &full_lhs) 
 {
-  if(ns.follow(full_lhs.type()).id()==ID_struct) // full_lhs is a struct
+  const typet &full_lhs_type=ns.follow(full_lhs.type());
+
+  if(full_lhs_type.id()==ID_struct) // full_lhs is a struct
   {
-    const struct_typet &struct_type=to_struct_type(ns.follow(full_lhs.type()));
+    const struct_typet &struct_type=to_struct_type(full_lhs_type);
     const struct_typet::componentst &components=struct_type.components();
 
     // split it up into components
@@ -360,6 +363,40 @@ void path_symext::assign_rec(
 
     return; // done
   } 
+  else if(full_lhs_type.id()==ID_array) // full_lhs is an array
+  {
+    const array_typet &array_type=to_array_type(full_lhs_type);
+    const typet &subtype=array_type.subtype();
+    
+    if(array_type.size().is_constant())
+    {
+      mp_integer size;
+      if(to_integer(array_type.size(), size))
+        throw "failed to convert array size";
+    
+      // split it up into elements
+      for(mp_integer i=0; i!=size; ++i)
+      {
+        exprt index=from_integer(i, array_type.size().type());
+        exprt new_rhs=index_exprt(rhs, index, subtype);
+        exprt new_full_lhs=index_exprt(full_lhs, index, subtype);
+        exprt new_lhs=index_exprt(lhs, index, subtype);
+        
+        // array constructor on rhs?
+        if(rhs.id()==ID_array)
+          new_rhs=simplify_expr(new_rhs, ns);
+        
+        // recursive call
+        assign_rec(state, guard, new_lhs, new_rhs, suffix, new_full_lhs);
+      }
+    }
+    else
+    {
+      // TODO
+    }
+
+    return; // done
+  }
 
   #if 0
   else if(rhs.id()==ID_sideeffect) // catch side effects on rhs
