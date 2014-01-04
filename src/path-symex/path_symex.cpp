@@ -437,12 +437,16 @@ void path_symext::assign_rec(
       symbol_exprt(var_info.ssa_identifier(), var_info.type);
 
     // record new state of lhs
-    path_symex_statet::var_statet &var_state=state.get_var_state(var_info);
-    var_state.ssa_symbol=ssa_lhs;
+    {
+      // reference is not stable
+      path_symex_statet::var_statet &var_state=state.get_var_state(var_info);
+      var_state.ssa_symbol=ssa_lhs;
+    }
 
     // rhs nil means non-det assignment
     if(rhs.is_nil())
     {
+      path_symex_statet::var_statet &var_state=state.get_var_state(var_info);
       var_state.value=nil_exprt();
     }
     else
@@ -462,6 +466,7 @@ void path_symext::assign_rec(
       step.ssa_rhs=ssa_rhs;
 
       // propagate the rhs?
+      path_symex_statet::var_statet &var_state=state.get_var_state(var_info);
       var_state.value=propagate(ssa_rhs)?ssa_rhs:nil_exprt();
 
       #ifdef DEBUG

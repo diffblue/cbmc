@@ -118,7 +118,7 @@ void path_symex_statet::output(std::ostream &out) const
 
 /*******************************************************************\
 
-Function: path_symex_statet::read
+Function: path_symex_statet::get_var_state
 
   Inputs:
 

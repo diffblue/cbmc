@@ -79,6 +79,7 @@ public:
   typedef std::vector<threadt> threadst;
   threadst threads;
 
+  // warning: reference is not stable
   var_statet &get_var_state(const var_mapt::var_infot &var_info);
   
   bool inside_atomic_section;
