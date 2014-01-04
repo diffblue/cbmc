@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/arith_tools.h>
 #include <util/simplify_expr.h>
+#include <util/byte_operators.h>
 
 #include "path_symex.h"
 
@@ -461,7 +462,13 @@ void path_symext::assign_rec(
       
       // consistency check
       if(ns.follow(ssa_rhs.type())!=ns.follow(ssa_lhs.type()))
+      {
+        #ifdef DEBUG
+        std::cout << "ssa_rhs: " << ssa_rhs.pretty() << std::endl;
+        std::cout << "ssa_lhs: " << ssa_lhs.pretty() << std::endl;
+        #endif
         throw "assign_rec got different types";
+      }
 
       // record the step
       path_symex_stept &step=state.record_step();
@@ -557,8 +564,6 @@ void path_symext::assign_rec(
     assign_rec(state, guard, lhs_if_expr.false_case(), rhs, suffix, full_lhs);
     guard.pop_back();
   }
-  
-  #if 0
   else if(lhs.id()==ID_byte_extract_little_endian ||
           lhs.id()==ID_byte_extract_big_endian)
   {
@@ -590,8 +595,10 @@ void path_symext::assign_rec(
     new_rhs.op()=byte_extract_expr.op();
     new_rhs.offset()=byte_extract_expr.offset();
     new_rhs.value()=rhs;
+    
+    const exprt new_lhs=byte_extract_expr.op();
 
-    assign_rec(state, guard, lhs.op0(), new_rhs, suffix, lhs_suffix_type);
+    assign_rec(state, guard, new_lhs, new_rhs, "", new_lhs);
   }
   else if(lhs.id()==ID_string_constant ||
           lhs.id()=="NULL-object" ||
@@ -606,7 +613,6 @@ void path_symext::assign_rec(
     // ignore
     //throw "path_symext::assign_rec(): unexpected lhs: ";
   }
-  #endif
 }
 
 /*******************************************************************\
