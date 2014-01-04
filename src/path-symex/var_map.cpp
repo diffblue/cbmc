@@ -151,6 +151,10 @@ var_mapt::var_infot *var_mapt::expr_rec(
 {
   if(src.id()==ID_symbol)
   {
+    // Is this a function?
+    if(src.type().id()==ID_code)
+      return NULL;
+      
     if(src.get_bool(ID_C_SSA_symbol))
       return NULL; // SSA already
   
@@ -170,7 +174,7 @@ var_mapt::var_infot *var_mapt::expr_rec(
     const member_exprt &member_expr=to_member_expr(src);
     return expr_rec(
       member_expr.struct_op(),
-      "."+id2string(member_expr.get_component_name()),
+      "."+id2string(member_expr.get_component_name())+suffix,
       type);
   }
   else if(src.id()==ID_index)
