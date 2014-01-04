@@ -16,6 +16,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <pointer-analysis/dereference.h>
 
+#include <goto-symex/adjust_float_expressions.h>
+
 #include "path_symex_state.h"
 
 #define DEBUG
@@ -154,15 +156,18 @@ exprt path_symex_statet::read(const exprt &src, bool propagate)
   #ifdef DEBUG
   //std::cout << "path_symex_statet::read " << src.pretty() << std::endl;
   #endif
+  
+  exprt tmp1=adjust_float_expressions(src, var_map.ns);
 
-  exprt tmp=instantiate_rec(src, "", src.type(), propagate);
-  simplify(tmp, var_map.ns);
+  exprt tmp2=instantiate_rec(tmp1, "", src.type(), propagate);
+
+  exprt tmp3=simplify_expr(tmp2, var_map.ns);
 
   #ifdef DEBUG
   //std::cout << " ==> " << tmp.pretty() << std::endl;
   #endif
 
-  return tmp;
+  return tmp3;
 }
 
 /*******************************************************************\
@@ -186,7 +191,7 @@ exprt path_symex_statet::instantiate_rec(
   #ifdef DEBUG
   std::cout << "instantiate_rec: " << src.id() << " " << suffix << std::endl;
   #endif
-
+  
   if(src.id()==ID_address_of)
   {
     assert(src.operands().size()==1);
