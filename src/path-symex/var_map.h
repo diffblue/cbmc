@@ -24,7 +24,7 @@ public:
 
   struct var_infot
   {
-    enum { SHARED, THREAD_LOCAL, PROCEDURE_LOCAL , DYNAMIC} kind;
+    enum { SHARED, THREAD_LOCAL, PROCEDURE_LOCAL, DYNAMIC } kind;
     
     inline bool is_shared() const
     {
@@ -52,6 +52,8 @@ public:
     {
       ++ssa_counter;
     }
+    
+    void output(std::ostream &out) const;
   };
   
   typedef std::map<irep_idt, var_infot> id_mapt;

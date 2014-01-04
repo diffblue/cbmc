@@ -14,6 +14,39 @@ Author: Daniel Kroening, kroening@kroening.com
 
 // #define DEBUG
 
+/*******************************************************************\
+
+Function: var_mapt::var_infot::output
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void var_mapt::var_infot::output(std::ostream &out) const
+{
+  out << "identiier: " << identifier << "\n";
+  out << "symbol: " << symbol << "\n";
+  out << "suffix: " << suffix << "\n";
+
+  out << "kind: ";
+
+  switch(kind)
+  {
+  case PROCEDURE_LOCAL: out << "PROCEDURE_LOCAL"; break;
+  case THREAD_LOCAL: out << "THREAD_LOCAL"; break;
+  case SHARED: out << "SHARED"; break;
+  }
+  
+  out << "number: " << number << "\n";
+  
+  out << "type: " << type << "\n";
+  
+  out << "\n";
+}
 
 /*******************************************************************\
 
