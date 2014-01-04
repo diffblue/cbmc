@@ -84,9 +84,6 @@ bool var_mapt::is_nondet(const exprt &src)
 	return false;        
 }
 
-
-
-
 /*******************************************************************\
 
 Function: var_mapt::init
@@ -101,31 +98,38 @@ Function: var_mapt::init
 
 void var_mapt::init(var_infot &var_info)
 {
-  try
+  if(has_prefix(id2string(var_info.symbol), "symex::dynamic_object"))
   {
-    const symbolt &symbol=ns.lookup(var_info.symbol);
-
-    if(symbol.is_static_lifetime)
+    var_info.kind=var_infot::SHARED;
+  }
+  else
+  {
+    try
     {
-      if(symbol.is_thread_local)
-        var_info.kind=var_infot::THREAD_LOCAL;
-      else
-        var_info.kind=var_infot::SHARED;
-    }
-    else
-      var_info.kind=var_infot::PROCEDURE_LOCAL;
+      const symbolt &symbol=ns.lookup(var_info.symbol);
 
-    if(var_info.is_shared())
-      var_info.number=shared_count++;
-    else
-      var_info.number=local_count++;
+      if(symbol.is_static_lifetime)
+      {
+        if(symbol.is_thread_local)
+          var_info.kind=var_infot::THREAD_LOCAL;
+        else
+          var_info.kind=var_infot::SHARED;
+      }
+      else
+        var_info.kind=var_infot::PROCEDURE_LOCAL;
+    }
+    
+    catch(std::string s)
+    {
+      throw "var_mapt::init identifier \"" + id2string(var_info.identifier)+
+            "\" lookup in ns failed";
+    }
   }
-  
-  catch(std::string& s)
-  {
-    throw "var_mapt::init identifier \"" + id2string(var_info.identifier)+
-          "\" lookup in ns failed";
-  }
+
+  if(var_info.is_shared())
+    var_info.number=shared_count++;
+  else
+    var_info.number=local_count++;
 }
 
 /*******************************************************************\

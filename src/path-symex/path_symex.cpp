@@ -9,6 +9,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/simplify_expr.h>
 #include <util/byte_operators.h>
+#include <util/i2string.h>
+#include <util/pointer_offset_size.h>
+#include <util/expr_util.h>
+
+#include <ansi-c/c_types.h>
 
 #include "path_symex.h"
 
@@ -160,7 +165,6 @@ Function: path_symext::symex_malloc
 
 \*******************************************************************/
 
-#if 0
 inline static typet c_sizeof_type_rec(const exprt &expr)
 {
   const irept &sizeof_type=expr.find(ID_C_c_sizeof_type);
@@ -180,23 +184,18 @@ inline static typet c_sizeof_type_rec(const exprt &expr)
   
   return nil_typet();
 }
-#endif
 
-#if 0
 void path_symext::symex_malloc(
   path_symex_statet &state,
   exprt::operandst &guard, // not instantiated
   const exprt &lhs,
   const side_effect_exprt &code,
   const std::string &suffix,
-  const typet& lhs_suffix_type)
+  const exprt &full_lhs)
 {
   if(code.operands().size()!=1)
     throw "malloc expected to have one operand";
     
-  if(lhs.is_nil())
-    return; // ignore
-
   // increment dynamic object counter
   unsigned dynamic_count=++state.var_map.dynamic_count;
   
@@ -268,7 +267,7 @@ void path_symext::symex_malloc(
                  size_symbol.symbol_expr(), 
                  size,
                  suffix,
-                 lhs_suffix_type);
+                 full_lhs);
 
       size=size_symbol.symbol_expr();
     }
@@ -310,9 +309,8 @@ void path_symext::symex_malloc(
              lhs,
              rhs,
              suffix,
-             object_type);
+             full_lhs);
 }
-#endif
 
 /*******************************************************************\
 
@@ -403,8 +401,6 @@ void path_symext::assign_rec(
 
     return; // done
   }
-
-  #if 0
   else if(rhs.id()==ID_sideeffect) // catch side effects on rhs
   {
     const side_effect_exprt &side_effect_expr=to_side_effect_expr(rhs);
@@ -412,11 +408,10 @@ void path_symext::assign_rec(
 
     if(statement==ID_malloc)
     {
-      symex_malloc(state, guard, lhs, side_effect_expr, suffix, lhs_suffix_type);
+      symex_malloc(state, guard, lhs, side_effect_expr, suffix, full_lhs);
       return;
     }
   }
-  #endif
   
   if(lhs.id()==ID_symbol)
   {
