@@ -436,6 +436,7 @@ void path_symext::assign_rec(
  
     symbol_exprt ssa_lhs=
       symbol_exprt(var_info.ssa_identifier(), var_info.type);
+    ssa_lhs.set(ID_C_SSA_symbol, true);
 
     #ifdef DEBUG
     std::cout << "ssa_lhs: " << ssa_lhs.get_identifier() << std::endl;
