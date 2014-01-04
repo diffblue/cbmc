@@ -28,7 +28,7 @@ Function: var_mapt::var_infot::output
 
 void var_mapt::var_infot::output(std::ostream &out) const
 {
-  out << "identiier: " << identifier << "\n";
+  out << "identifier: " << identifier << "\n";
   out << "symbol: " << symbol << "\n";
   out << "suffix: " << suffix << "\n";
 
@@ -40,6 +40,8 @@ void var_mapt::var_infot::output(std::ostream &out) const
   case THREAD_LOCAL: out << "THREAD_LOCAL"; break;
   case SHARED: out << "SHARED"; break;
   }
+  
+  out << "\n";
   
   out << "number: " << number << "\n";
   
@@ -97,51 +99,33 @@ Function: var_mapt::init
 
 \*******************************************************************/
 
-void var_mapt::init(
-  const irep_idt &identifier,
-  const irep_idt &suffix,
-  const typet &type,
-  var_infot &var_info)
+void var_mapt::init(var_infot &var_info)
 {
-  try {
-
-	if(has_prefix(identifier, "symex::"))
-	{
-		var_info.kind=var_infot::DYNAMIC; // FIXME: this would actually require a points to analysis
-		var_info.suffix=suffix;
-		var_info.identifier=identifier;
-		var_info.type=type;
-	} else {
-		const symbolt &symbol=ns.lookup(identifier);
-    
-		if(symbol.is_static_lifetime)
-		{
-			if(symbol.is_thread_local)
-			var_info.kind=var_infot::THREAD_LOCAL;
-			else
-			var_info.kind=var_infot::SHARED;
-		}
-		else
-			var_info.kind=var_infot::PROCEDURE_LOCAL;
-
-		var_info.identifier=identifier;
-		var_info.suffix=suffix;
-		var_info.type=type;
-	}
-
-	if(var_info.is_shared())
-		var_info.number=shared_count++;
-	else
-		var_info.number=local_count++;
-
-	
-   }
-  
-  catch (std::string& s)
+  try
   {
-    throw "var_mapt::init identifier \"" + id2string(identifier) + "\" lookup in ns failed";
-  }
+    const symbolt &symbol=ns.lookup(var_info.symbol);
 
+    if(symbol.is_static_lifetime)
+    {
+      if(symbol.is_thread_local)
+        var_info.kind=var_infot::THREAD_LOCAL;
+      else
+        var_info.kind=var_infot::SHARED;
+    }
+    else
+      var_info.kind=var_infot::PROCEDURE_LOCAL;
+
+    if(var_info.is_shared())
+      var_info.number=shared_count++;
+    else
+      var_info.number=local_count++;
+  }
+  
+  catch(std::string& s)
+  {
+    throw "var_mapt::init identifier \"" + id2string(var_info.identifier)+
+          "\" lookup in ns failed";
+  }
 }
 
 /*******************************************************************\

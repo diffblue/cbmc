@@ -10,6 +10,7 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
        ../assembler/assembler$(LIBEXT) \
        ../solvers/solvers$(LIBEXT) \
        ../util/util$(LIBEXT) \
+       ../goto-symex/adjust_float_expressions$(OBJEXT) \
        ../pointer-analysis/dereference$(OBJEXT) \
        ../path-symex/path-symex$(LIBEXT)
 

@@ -24,7 +24,7 @@ public:
 
   struct var_infot
   {
-    enum { SHARED, THREAD_LOCAL, PROCEDURE_LOCAL, DYNAMIC } kind;
+    enum { SHARED, THREAD_LOCAL, PROCEDURE_LOCAL } kind;
     
     inline bool is_shared() const
     {
@@ -59,42 +59,32 @@ public:
   typedef std::map<irep_idt, var_infot> id_mapt;
   id_mapt id_map;
 
-  void strip(std::string& s, char c)
-  {
-    std::size_t pos=s.rfind(c);
-    if(pos!=std::string::npos) {
-       s.erase(pos,s.size());  
-    } 
-  }
-
   inline var_infot &operator()(
-    const irep_idt &identifier,
+    const irep_idt &symbol,
     const irep_idt &suffix,
     const typet &type)
   {
+    std::string identifier=
+      id2string(symbol)+id2string(suffix);
 
     std::pair<id_mapt::iterator, bool> result;
 
-    std::string id(id2string(identifier)+id2string(suffix));
-
-     // drop the #
-    strip(id,'#');
-
-    result=
-    id_map.insert(std::pair<irep_idt, var_infot>(
-      id, var_infot()));      
+    result=id_map.insert(std::pair<irep_idt, var_infot>(
+      identifier, var_infot()));      
   
     if(result.second) // inserted?
-      init(identifier, suffix, type, result.first->second);
+    {
+      result.first->second.identifier=identifier;
+      result.first->second.symbol=symbol;
+      result.first->second.suffix=suffix;
+      result.first->second.type=type;
+      init(result.first->second);
+    }
     
     return result.first->second;
   }
   
-  void init(
-    const irep_idt &identifier,
-    const irep_idt &suffix,
-    const typet &type,
-    var_infot &var_info);
+  void init(var_infot &var_info);
 
   // if expr is a symbol.member, return var_info
   // otherwise return NULL
