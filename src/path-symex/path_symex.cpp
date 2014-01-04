@@ -42,7 +42,8 @@ protected:
     const code_function_callt &call,
     std::list<path_symex_statet> &further_states)
   {
-    function_call_rec(state, call, call.function(), further_states);
+    exprt f=state.read(call.function());
+    function_call_rec(state, call, f, further_states);
   }
     
   void function_call_rec(
@@ -436,6 +437,10 @@ void path_symext::assign_rec(
     symbol_exprt ssa_lhs=
       symbol_exprt(var_info.ssa_identifier(), var_info.type);
 
+    #ifdef DEBUG
+    std::cout << "ssa_lhs: " << ssa_lhs.get_identifier() << std::endl;
+    #endif
+
     // record new state of lhs
     {
       // reference is not stable
@@ -621,6 +626,10 @@ void path_symext::function_call_rec(
   const exprt &function,
   std::list<path_symex_statet> &further_states)
 {
+  #ifdef DEBUG
+  std::cout << "function_call_rec: " << function.pretty() << std::endl;
+  #endif
+
   if(function.id()==ID_symbol)
   {
     const irep_idt &function_identifier=
@@ -690,14 +699,13 @@ void path_symext::function_call_rec(
   }
   else if(function.id()==ID_dereference)
   {
-    exprt deref=state.read(function);
-    assert(deref.id()!=ID_dereference);
-    function_call_rec(state, call, deref, further_states);
+    // should not happen, we read() before
+    throw "function_call_rec got dereference";
   }
   else if(function.id()==ID_if)
   {
     const if_exprt &if_expr=to_if_expr(function);
-    exprt guard=state.read(if_expr.cond());
+    exprt guard=if_expr.cond();
     
     // add a 'further state' for the false-case
     
@@ -834,6 +842,11 @@ void path_symext::operator()(
 {
   const goto_programt::instructiont &instruction=
     *state.get_instruction();
+    
+  #ifdef DEBUG
+  std::cout << "path_symext::operator(): " << instruction.type
+            << std::endl;
+  #endif
 
   switch(instruction.type)
   {
