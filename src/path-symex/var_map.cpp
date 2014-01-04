@@ -149,13 +149,18 @@ var_mapt::var_infot *var_mapt::expr_rec(
   const std::string &suffix,
   const typet &type)
 {
-  if(src.id()==ID_symbol) {
+  if(src.id()==ID_symbol)
+  {
+    if(src.get_bool(ID_C_SSA_symbol))
+      return NULL; // SSA already
+  
     irep_idt identifier=to_symbol_expr(src).get_identifier();
 
-    var_infot& var_info=(*this)(identifier, suffix, type);
+    var_infot &var_info=operator()(identifier, suffix, type);
 
     #ifdef DEBUG
-      std::cout << "expr_rec " << identifier << " var_info " << var_info.identifier << std::endl;
+    std::cout << "expr_rec " << identifier << " var_info "
+              << var_info.identifier << std::endl;
     #endif
 
     return &var_info;
@@ -167,6 +172,10 @@ var_mapt::var_infot *var_mapt::expr_rec(
       member_expr.struct_op(),
       "."+id2string(member_expr.get_component_name()),
       type);
+  }
+  else if(src.id()==ID_index)
+  {
+    return NULL;
   }
   else
     return NULL;
