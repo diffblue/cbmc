@@ -183,6 +183,5 @@ Function: var_mapt::var_infot::ssa_identifier
 irep_idt var_mapt::var_infot::ssa_identifier() const
 {
   return id2string(identifier)+
-         id2string(suffix)+
          "#"+i2string(ssa_counter);
 }
