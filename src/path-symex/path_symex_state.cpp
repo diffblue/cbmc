@@ -284,6 +284,10 @@ exprt path_symex_statet::instantiate_rec(
     // Is this a function?
     if(src.type().id()==ID_code)
       return src; // leave as is
+      
+    // Is this already SSA?
+    if(src.get_bool(ID_C_SSA_symbol))
+      return src; // leave as is
   
     // special nondeterminism symbol
     if(var_map.is_nondet(src))
@@ -307,6 +311,7 @@ exprt path_symex_statet::instantiate_rec(
       if(var_state.ssa_symbol.get_identifier()==irep_idt())
       {
         var_state.ssa_symbol.set_identifier(var_info.ssa_identifier());
+        var_state.ssa_symbol.set(ID_C_SSA_symbol, true);
         var_state.ssa_symbol.type()=var_info.type;
       }
         
@@ -317,6 +322,8 @@ exprt path_symex_statet::instantiate_rec(
   {
     const dereference_exprt &dereference_expr=to_dereference_expr(src);
     exprt address=read(dereference_expr.pointer(), propagate);
+    // the address is a mixture of non-SSA and SSA symbols
+    // (e.g., if-guards and array indices)
     return read(dereference(address), propagate);
   }
   
