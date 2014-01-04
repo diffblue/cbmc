@@ -196,7 +196,7 @@ protected:
   exprt instantiate_rec(
     const exprt &src,
     const std::string &suffix,
-    const typet &symbol_type,
+    const typet &ssa_type,
     bool propagate);
 
   exprt instantiate_rec_address(

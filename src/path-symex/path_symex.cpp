@@ -11,7 +11,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "path_symex.h"
 
-// #define DEBUG
+//#define DEBUG
+
+#ifdef DEBUG
+#include <iostream>
+#endif
 
 class path_symext
 {
@@ -98,8 +102,6 @@ Function: path_symext::propagate
 
 \*******************************************************************/
 
-#include <iostream>
-
 bool path_symext::propagate(const exprt &src)
 {
   // propagate things that are 'simple enough'
@@ -140,7 +142,6 @@ bool path_symext::propagate(const exprt &src)
   }
   else
   {
-    std::cout << "PROP: " << src.pretty() << std::endl;
     return false;
   }
 }
@@ -323,8 +324,6 @@ Function: path_symext::assign_rec
 
 \*******************************************************************/
 
-#include <iostream>
-
 void path_symext::assign_rec(
   path_symex_statet &state,
   exprt::operandst &guard, 
@@ -334,7 +333,12 @@ void path_symext::assign_rec(
   const exprt &full_lhs) 
 {
   const typet &full_lhs_type=ns.follow(full_lhs.type());
-
+  
+  #ifdef DEBUG
+  std::cout << "assign_rec: " << lhs.pretty() << std::endl;
+  std::cout << "full_lhs_type: " << full_lhs_type.id() << std::endl;
+  #endif
+  
   if(full_lhs_type.id()==ID_struct) // full_lhs is a struct
   {
     const struct_typet &struct_type=to_struct_type(full_lhs_type);
@@ -349,7 +353,7 @@ void path_symext::assign_rec(
       const typet &subtype=it->type();  
       const irep_idt &component_name=it->get_name();
 
-      exprt new_rhs=member_exprt(rhs, component_name, subtype);
+      exprt new_rhs=rhs.is_nil()?rhs:member_exprt(rhs, component_name, subtype);
       exprt new_full_lhs=member_exprt(full_lhs, component_name, subtype);
       exprt new_lhs=member_exprt(lhs, component_name, subtype);
       
@@ -378,7 +382,7 @@ void path_symext::assign_rec(
       for(mp_integer i=0; i!=size; ++i)
       {
         exprt index=from_integer(i, array_type.size().type());
-        exprt new_rhs=index_exprt(rhs, index, subtype);
+        exprt new_rhs=rhs.is_nil()?rhs:index_exprt(rhs, index, subtype);
         exprt new_full_lhs=index_exprt(full_lhs, index, subtype);
         exprt new_lhs=index_exprt(lhs, index, subtype);
         
@@ -414,15 +418,14 @@ void path_symext::assign_rec(
   
   if(lhs.id()==ID_symbol)
   {
-    // We might have SSA variables if this comes from dereferenced point.
-
-    // TODO: Please, check!     
-    //exprt original_lhs=state.original_name(lhs);
-    //exprt original_rhs=state.original_name(rhs);
-
     // Deal with LHS.
     const symbol_exprt &symbol_expr=to_symbol_expr(lhs);
     const irep_idt &identifier=symbol_expr.get_identifier();
+    
+    #ifdef DEBUG
+    std::cout << "symbol identifier: " << identifier << std::endl;
+    std::cout << "symbol suffix: " << suffix << std::endl;
+    #endif
     
     var_mapt::var_infot &var_info=
       state.var_map(identifier, suffix, full_lhs.type());
@@ -433,47 +436,38 @@ void path_symext::assign_rec(
     symbol_exprt ssa_lhs=
       symbol_exprt(var_info.ssa_identifier(), var_info.type);
 
-    // setup final RHS: deal with arrays on LHS
-    //exprt final_rhs=rhs;
-
-    // now dereference, instantiate, propagate RHS
-    //exprt rhs_deref=state.dereference(final_rhs);
-    //exprt ssa_rhs_no_prop=state.read_no_propagate(rhs_deref);
-
-    exprt ssa_rhs=state.read(rhs);
-    
-    // make sure that rhs and lhs have matching types
-
-    /*
-    if(ssa_rhs_no_prop.is_not_nil() && ssa_rhs_no_prop.type() != lhs_type)
-    {
-
-      std::cout << "different types " << std::endl;
-      exprt rhs_typecasted=ssa_rhs_no_prop;
-      rhs_typecasted.make_typecast(lhs_type);
-      ssa_rhs_no_prop=rhs_typecasted;
-    }
-    */
-
-    // record the step
-    path_symex_stept &step=state.record_step();
-    
-    if(!guard.empty()) step.guard=conjunction(guard);
-    step.full_lhs=full_lhs;
-    step.ssa_lhs=ssa_lhs;
-    step.ssa_rhs=ssa_rhs;
-    //step.ssa_rhs_no_prop=ssa_rhs_no_prop;
-
     // record new state of lhs
     path_symex_statet::var_statet &var_state=state.get_var_state(var_info);
     var_state.ssa_symbol=ssa_lhs;
 
-    // propagate the rhs?
-    var_state.value=propagate(ssa_rhs)?ssa_rhs:nil_exprt();
+    // rhs nil means non-det assignment
+    if(rhs.is_nil())
+    {
+      var_state.value=nil_exprt();
+    }
+    else
+    {
+      exprt ssa_rhs=state.read(rhs);
+      
+      // consistency check
+      if(ns.follow(ssa_rhs.type())!=ns.follow(ssa_lhs.type()))
+        throw "assign_rec got different types";
 
-    #ifdef DEBUG
-    std::cout << "assign_rec ID_symbol " << identifier << suffix << std::endl;
-    #endif
+      // record the step
+      path_symex_stept &step=state.record_step();
+      
+      if(!guard.empty()) step.guard=conjunction(guard);
+      step.full_lhs=full_lhs;
+      step.ssa_lhs=ssa_lhs;
+      step.ssa_rhs=ssa_rhs;
+
+      // propagate the rhs?
+      var_state.value=propagate(ssa_rhs)?ssa_rhs:nil_exprt();
+
+      #ifdef DEBUG
+      std::cout << "assign_rec ID_symbol " << identifier << suffix << std::endl;
+      #endif
+    }
   }
   else if(lhs.id()==ID_member)
   {

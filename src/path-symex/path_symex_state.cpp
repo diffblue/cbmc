@@ -20,7 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "path_symex_state.h"
 
-#define DEBUG
+//#define DEBUG
 
 #ifdef DEBUG
 #include <iostream>
@@ -159,7 +159,7 @@ exprt path_symex_statet::read(const exprt &src, bool propagate)
   
   exprt tmp1=adjust_float_expressions(src, var_map.ns);
 
-  exprt tmp2=instantiate_rec(tmp1, "", src.type(), propagate);
+  exprt tmp2=instantiate_rec(tmp1, "", nil_typet(), propagate);
 
   exprt tmp3=simplify_expr(tmp2, var_map.ns);
 
@@ -185,7 +185,7 @@ Function: path_symex_statet::instantiate_rec
 exprt path_symex_statet::instantiate_rec(
   const exprt &src,
   const std::string &suffix,
-  const typet &symbol_type,
+  const typet &ssa_type,
   bool propagate)
 {
   #ifdef DEBUG
@@ -226,13 +226,13 @@ exprt path_symex_statet::instantiate_rec(
       if(!struct_type.has_component(component_name))
         throw "No struct component "+id2string(component_name)+" in member expression";
 
-      typet new_symbol_type=suffix.size() ? symbol_type : var_map.ns.follow(struct_type.component_type(component_name));
+      typet new_ssa_type=ssa_type.is_nil()?src.type():ssa_type;
 
       // add to suffix
       const std::string new_suffix=
         "."+id2string(component_name)+suffix;
  
-      return instantiate_rec(compound_op, new_suffix, new_symbol_type, propagate);
+      return instantiate_rec(compound_op, new_suffix, new_ssa_type, propagate);
     }
     else if(compound_op_type.id()==ID_union)
     {
@@ -241,17 +241,19 @@ exprt path_symex_statet::instantiate_rec(
       if(!union_type.has_component(component_name))
         throw "No union component "+id2string(component_name)+" in member expression";
 
-      typet new_symbol_type=suffix.size() ? symbol_type : var_map.ns.follow(union_type.component_type(component_name));
+      typet new_ssa_type=ssa_type.is_nil()?src.type():ssa_type;
 
       // add to suffix
       const std::string new_suffix=
         "."+id2string(component_name)+suffix;
  
-      return instantiate_rec(compound_op, new_suffix, new_symbol_type, propagate);
+      return instantiate_rec(compound_op, new_suffix, new_ssa_type, propagate);
     }
     else
     {
+      #ifdef DEBUG
       std::cerr << compound_op.pretty() << std::endl;
+      #endif
       throw "member of non struct/union type";
     }
   }
@@ -265,17 +267,17 @@ exprt path_symex_statet::instantiate_rec(
     if(array_op_type.id()!=ID_array)
       return nil_exprt();
 
-    const array_typet &array_type=to_array_type(array_op_type);
+    //const array_typet &array_type=to_array_type(array_op_type);
     
     std::string array_element=array_index_as_string(index_op);
     if(array_element=="") array_element="[*]";
 
-    typet new_symbol_type=suffix.size() ? symbol_type : var_map.ns.follow(array_type.subtype());
+    typet new_ssa_type=ssa_type.is_nil()?src.type():ssa_type;
 
     // add to suffix
     const std::string new_suffix=array_element+suffix;
 
-    return instantiate_rec(array_op, new_suffix, new_symbol_type, propagate);
+    return instantiate_rec(array_op, new_suffix, new_ssa_type, propagate);
   }
   else if(src.id()==ID_symbol)
   {
@@ -289,6 +291,9 @@ exprt path_symex_statet::instantiate_rec(
 
     const symbol_exprt &symbol_expr=to_symbol_expr(src);
     const irep_idt &identifier=symbol_expr.get_identifier();
+    
+    const typet symbol_type=
+      ssa_type.is_nil()?src.type():ssa_type;
     
     var_mapt::var_infot &var_info=
       var_map(identifier, suffix, symbol_type);
@@ -314,6 +319,16 @@ exprt path_symex_statet::instantiate_rec(
     exprt address=read(dereference_expr.pointer(), propagate);
     return read(dereference(address), propagate);
   }
+  
+  if(!ssa_type.is_nil())
+  {
+    throw "can't instantiate with ssa_type: "+src.pretty();
+  }
+
+  if(!suffix.empty())
+  {
+    throw "can't instantiate with suffix: "+src.pretty();
+  }
 
   if(!src.has_operands())
     return src;
@@ -323,8 +338,8 @@ exprt path_symex_statet::instantiate_rec(
   
   Forall_operands(it, tmp)
   {
-    exprt tmp2=instantiate_rec(*it, suffix, symbol_type, propagate);
-    *it=tmp2;
+    exprt tmp_op=instantiate_rec(*it, "", nil_typet(), propagate);
+    *it=tmp_op;
   }
   
   return tmp;
@@ -383,8 +398,6 @@ Function: path_symex_statet::instantiate_rec_address
 
 \*******************************************************************/
 
-#include <iostream>
-
 exprt path_symex_statet::instantiate_rec_address(
   const exprt &src,
   bool propagate)
@@ -402,7 +415,7 @@ exprt path_symex_statet::instantiate_rec_address(
     assert(src.operands().size()==2);
     exprt tmp=src;
     tmp.op0()=instantiate_rec_address(src.op0(), propagate);
-    tmp.op1()=instantiate_rec(src.op1(), "", src.op1().type(), propagate);
+    tmp.op1()=instantiate_rec(src.op1(), "", nil_typet(), propagate);
     return tmp;
   }
   else if(src.id()==ID_dereference)
@@ -429,8 +442,10 @@ exprt path_symex_statet::instantiate_rec_address(
   else
   {
     // this shouldn't really happen
+    #ifdef DEBUG
     std::cout << "SRC: " << src.pretty() << std::endl;
-    assert(0);
+    #endif
+    throw "address of unexpected "+src.id_string();
   }
 }
 
