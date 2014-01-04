@@ -33,7 +33,8 @@ class optionst;
   "(string-abstraction)(no-arch)(arch):(floatbv)(fixedbv)" \
   "(round-to-nearest)(round-to-plus-inf)(round-to-minus-inf)(round-to-zero)" \
   "(show-locs)(show-vcc)(show-properties)" \
-  "(property):"
+  "(property):" \
+  "(no-simplify)"
 
 class symex_parseoptionst:
   public parseoptions_baset,
