@@ -1,5 +1,5 @@
 SRC = symex_target.cpp symex_target_equation.cpp goto_symex.cpp \
-      symex_main.cpp build_goto_trace.cpp \
+      symex_main.cpp build_goto_trace.cpp adjust_float_expressions.cpp \
       symex_function_call.cpp goto_symex_state.cpp symex_dereference.cpp \
       symex_goto.cpp symex_builtin_functions.cpp slice.cpp symex_other.cpp \
       slice_by_trace.cpp symex_decl.cpp symex_dead.cpp \
