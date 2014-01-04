@@ -20,7 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "path_symex_state.h"
 
-//#define DEBUG
+// #define DEBUG
 
 #ifdef DEBUG
 #include <iostream>
@@ -159,7 +159,7 @@ exprt path_symex_statet::read(const exprt &src, bool propagate)
   
   exprt tmp1=adjust_float_expressions(src, var_map.ns);
 
-  exprt tmp2=instantiate_rec(tmp1, "", nil_typet(), propagate);
+  exprt tmp2=instantiate_rec(tmp1, propagate);
 
   exprt tmp3=simplify_expr(tmp2, var_map.ns);
 
@@ -184,13 +184,38 @@ Function: path_symex_statet::instantiate_rec
 
 exprt path_symex_statet::instantiate_rec(
   const exprt &src,
-  const std::string &suffix,
-  const typet &ssa_type,
   bool propagate)
 {
   #ifdef DEBUG
-  std::cout << "instantiate_rec: " << src.id() << " " << suffix << std::endl;
+  std::cout << "instantiate_rec: " << src.id() << " " << std::endl;
   #endif
+  
+  //const typet &type=var_map.ns.follow(src.type());
+
+  // check first whether this is a symbol.(member*)
+  var_mapt::var_infot *var_info=var_map(src);
+  
+  if(var_info!=NULL)
+  {
+    // yes!
+    var_statet &var_state=get_var_state(*var_info);
+
+    if(propagate && var_state.value.is_not_nil())
+    {
+      return var_state.value; // propagate a value
+    }
+    else
+    {
+      if(var_state.ssa_symbol.get_identifier()==irep_idt())
+      {
+        var_state.ssa_symbol.set_identifier(var_info->ssa_identifier());
+        var_state.ssa_symbol.set(ID_C_SSA_symbol, true);
+        var_state.ssa_symbol.type()=var_info->type;
+      }
+        
+      return var_state.ssa_symbol;
+    }
+  }
   
   if(src.id()==ID_address_of)
   {
@@ -214,6 +239,7 @@ exprt path_symex_statet::instantiate_rec(
   }
   else if(src.id()==ID_member)
   {
+    #if 0
     const member_exprt &member_expr=to_member_expr(src);
     const irep_idt &component_name=member_expr.get_component_name();
     const exprt &compound_op=member_expr.struct_op();
@@ -226,13 +252,7 @@ exprt path_symex_statet::instantiate_rec(
       if(!struct_type.has_component(component_name))
         throw "No struct component "+id2string(component_name)+" in member expression";
 
-      typet new_ssa_type=ssa_type.is_nil()?src.type():ssa_type;
-
-      // add to suffix
-      const std::string new_suffix=
-        "."+id2string(component_name)+suffix;
- 
-      return instantiate_rec(compound_op, new_suffix, new_ssa_type, propagate);
+      return instantiate_rec(compound_op, propagate);
     }
     else if(compound_op_type.id()==ID_union)
     {
@@ -241,13 +261,7 @@ exprt path_symex_statet::instantiate_rec(
       if(!union_type.has_component(component_name))
         throw "No union component "+id2string(component_name)+" in member expression";
 
-      typet new_ssa_type=ssa_type.is_nil()?src.type():ssa_type;
-
-      // add to suffix
-      const std::string new_suffix=
-        "."+id2string(component_name)+suffix;
- 
-      return instantiate_rec(compound_op, new_suffix, new_ssa_type, propagate);
+      return instantiate_rec(compound_op, propagate);
     }
     else
     {
@@ -256,9 +270,11 @@ exprt path_symex_statet::instantiate_rec(
       #endif
       throw "member of non struct/union type";
     }
+    #endif
   }
   else if(src.id()==ID_index)
   {
+    #if 0
     const index_exprt &index_expr=to_index_expr(src);
     const exprt &index_op=index_expr.index();
     const exprt &array_op=index_expr.array();
@@ -272,51 +288,8 @@ exprt path_symex_statet::instantiate_rec(
     std::string array_element=array_index_as_string(index_op);
     if(array_element=="") array_element="[*]";
 
-    typet new_ssa_type=ssa_type.is_nil()?src.type():ssa_type;
-
-    // add to suffix
-    const std::string new_suffix=array_element+suffix;
-
-    return instantiate_rec(array_op, new_suffix, new_ssa_type, propagate);
-  }
-  else if(src.id()==ID_symbol)
-  {
-    // Is this a function?
-    if(src.type().id()==ID_code)
-      return src; // leave as is
-      
-    // Is this already SSA?
-    if(src.get_bool(ID_C_SSA_symbol))
-      return src; // leave as is
-  
-    // special nondeterminism symbol
-    if(var_map.is_nondet(src))
-      return src;
-
-    const symbol_exprt &symbol_expr=to_symbol_expr(src);
-    const irep_idt &identifier=symbol_expr.get_identifier();
-    
-    const typet symbol_type=
-      ssa_type.is_nil()?src.type():ssa_type;
-    
-    var_mapt::var_infot &var_info=
-      var_map(identifier, suffix, symbol_type);
-
-    var_statet &var_state=get_var_state(var_info);
-
-    if(propagate && var_state.value.is_not_nil())
-      return var_state.value;
-    else
-    {
-      if(var_state.ssa_symbol.get_identifier()==irep_idt())
-      {
-        var_state.ssa_symbol.set_identifier(var_info.ssa_identifier());
-        var_state.ssa_symbol.set(ID_C_SSA_symbol, true);
-        var_state.ssa_symbol.type()=var_info.type;
-      }
-        
-      return var_state.ssa_symbol;
-    }
+    return instantiate_rec(array_op, propagate);
+    #endif
   }
   else if(src.id()==ID_dereference)
   {
@@ -327,16 +300,6 @@ exprt path_symex_statet::instantiate_rec(
     return read(dereference(address), propagate);
   }
   
-  if(!ssa_type.is_nil())
-  {
-    throw "can't instantiate with ssa_type: "+src.pretty();
-  }
-
-  if(!suffix.empty())
-  {
-    throw "can't instantiate with suffix: "+src.pretty();
-  }
-
   if(!src.has_operands())
     return src;
 
@@ -345,7 +308,7 @@ exprt path_symex_statet::instantiate_rec(
   
   Forall_operands(it, tmp)
   {
-    exprt tmp_op=instantiate_rec(*it, "", nil_typet(), propagate);
+    exprt tmp_op=instantiate_rec(*it, propagate);
     *it=tmp_op;
   }
   
@@ -422,7 +385,7 @@ exprt path_symex_statet::instantiate_rec_address(
     assert(src.operands().size()==2);
     exprt tmp=src;
     tmp.op0()=instantiate_rec_address(src.op0(), propagate);
-    tmp.op1()=instantiate_rec(src.op1(), "", nil_typet(), propagate);
+    tmp.op1()=instantiate_rec(src.op1(), propagate);
     return tmp;
   }
   else if(src.id()==ID_dereference)
