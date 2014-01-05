@@ -9,8 +9,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <solvers/flattening/bv_pointers.h>
 #include <solvers/sat/satcheck.h>
 
-#include "path_symex.h"
-#include "build_goto_trace.h"
+#include <path-symex/path_symex.h>
+#include <path-symex/build_goto_trace.h>
+
 #include "path_search.h"
 
 /*******************************************************************\
