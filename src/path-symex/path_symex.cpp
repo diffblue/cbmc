@@ -415,7 +415,13 @@ void path_symext::assign_rec(
   
   if(lhs.id()==ID_symbol)
   {
-    // Deal with LHS.
+    // First do RHS. This needs to be evaluated before dealing
+    // with the LHS.
+    
+    exprt ssa_rhs=
+      rhs.is_nil()?nil_exprt():state.read(rhs);
+      
+    // Now deal with LHS.
     const symbol_exprt &symbol_expr=to_symbol_expr(lhs);
     const irep_idt &identifier=symbol_expr.get_identifier();
     
@@ -446,15 +452,13 @@ void path_symext::assign_rec(
     }
 
     // rhs nil means non-det assignment
-    if(rhs.is_nil())
+    if(ssa_rhs.is_nil())
     {
       path_symex_statet::var_statet &var_state=state.get_var_state(var_info);
       var_state.value=nil_exprt();
     }
     else
     {
-      exprt ssa_rhs=state.read(rhs);
-      
       // consistency check
       if(ns.follow(ssa_rhs.type())!=ns.follow(ssa_lhs.type()))
       {
