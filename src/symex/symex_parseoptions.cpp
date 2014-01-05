@@ -32,9 +32,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cbmc/version.h>
 
-#include <path-symex/path_search.h>
 #include <path-symex/locs.h>
 
+#include "path_search.h"
 #include "symex_parseoptions.h"
 
 /*******************************************************************\
