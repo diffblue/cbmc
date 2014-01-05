@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/symbol.h>
 #include <util/std_expr.h>
 #include <util/i2string.h>
+#include <util/prefix.h>
 
 #include "var_map.h"
 
@@ -48,40 +49,6 @@ void var_mapt::var_infot::output(std::ostream &out) const
   out << "type: " << type << "\n";
   
   out << "\n";
-}
-
-/*******************************************************************\
-
-Function: var_mapt::is_symex
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-bool has_prefix(const irep_idt &identifier, const std::string& prefix)
-{   
-	return as_string(identifier).find(prefix)!=std::string::npos;
-}
-  
-
-bool var_mapt::is_symex(const exprt &src)
-{
-	if(src.id()==ID_symbol) {
-		return has_prefix(to_symbol_expr(src).get_identifier(),"symex::");
-	}
-	return false;        
-}
-
-bool var_mapt::is_nondet(const exprt &src)
-{
-	if(src.id()==ID_symbol) {
-		return has_prefix(to_symbol_expr(src).get_identifier(), "symex::nondet");
-	}
-	return false;        
 }
 
 /*******************************************************************\
@@ -130,59 +97,6 @@ void var_mapt::init(var_infot &var_info)
     var_info.number=shared_count++;
   else
     var_info.number=local_count++;
-}
-
-/*******************************************************************\
-
-Function: var_mapt::expr_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-var_mapt::var_infot *var_mapt::expr_rec(
-  const exprt &src,
-  const std::string &suffix,
-  const typet &type)
-{
-  if(src.id()==ID_symbol)
-  {
-    // Is this a function?
-    if(src.type().id()==ID_code)
-      return NULL;
-      
-    if(src.get_bool(ID_C_SSA_symbol))
-      return NULL; // SSA already
-  
-    irep_idt identifier=to_symbol_expr(src).get_identifier();
-
-    var_infot &var_info=operator()(identifier, suffix, type);
-
-    #ifdef DEBUG
-    std::cout << "expr_rec " << identifier << " var_info "
-              << var_info.identifier << std::endl;
-    #endif
-
-    return &var_info;
-  }
-  else if(src.id()==ID_member)
-  {
-    const member_exprt &member_expr=to_member_expr(src);
-    return expr_rec(
-      member_expr.struct_op(),
-      "."+id2string(member_expr.get_component_name())+suffix,
-      type);
-  }
-  else if(src.id()==ID_index)
-  {
-    return NULL;
-  }
-  else
-    return NULL;
 }
 
 /*******************************************************************\

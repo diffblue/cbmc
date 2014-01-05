@@ -201,6 +201,12 @@ protected:
   exprt instantiate_rec_address(
     const exprt &src,
     bool propagate);
+
+  exprt read_symbol_member_index_rec(
+    const exprt &src,
+    const std::string &suffix,
+    const typet &type,
+    bool propagate);
 };
 
 path_symex_statet initial_state(
