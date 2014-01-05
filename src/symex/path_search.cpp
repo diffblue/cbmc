@@ -38,6 +38,7 @@ path_searcht::resultt path_searcht::operator()(
   
   // set up the statistics
   number_of_dropped_states=0;
+  number_of_calls_to_SAT=0;
   
   while(!queue.empty())
   {
@@ -66,17 +67,40 @@ path_searcht::resultt path_searcht::operator()(
     // an error, possibly?
     if(state->get_instruction()->is_assert())
       if(check_assertion(*state, ns))
+      {
+        report_statistics();
         return UNSAFE; // property fails
+      }
     
     // execute
     path_symex(*state, queue, ns);
   }
   
+  report_statistics();
+  
+  return SAFE; // property holds
+}
+
+/*******************************************************************\
+
+Function: path_searcht::report_statistics
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void path_searcht::report_statistics()
+{
   // report a bit
   status() << "Number of dropped states: "
            << number_of_dropped_states << messaget::eom;
 
-  return SAFE; // property holds
+  status() << "Number of calls to SAT: "
+           << number_of_calls_to_SAT << messaget::eom;
 }
 
 /*******************************************************************\
@@ -242,6 +266,9 @@ bool path_searcht::check_assertion(
 
   // negate the assertion
   bv_pointers.set_to(assertion, false);
+  
+  // keep statistics
+  number_of_calls_to_SAT++;
   
   switch(bv_pointers.dec_solve())
   {
