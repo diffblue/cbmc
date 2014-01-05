@@ -34,7 +34,9 @@ public:
   unsigned context_bound;
   unsigned unwind_limit;
 
+  // statistics
   unsigned number_of_dropped_states;
+  unsigned number_of_calls_to_SAT;
 
 protected:
   typedef path_symex_statet statet;
@@ -51,6 +53,8 @@ protected:
   void do_show_vcc(statet &state, const namespacet &);
   
   bool drop_state(const statet &state) const;
+  
+  void report_statistics();
 };
 
 #endif
