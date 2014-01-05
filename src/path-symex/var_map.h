@@ -12,7 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <map>
 
 #include <util/namespace.h>
-#include <util/expr.h>
+#include <util/type.h>
 
 class var_mapt
 {
@@ -86,26 +86,10 @@ public:
   
   void init(var_infot &var_info);
 
-  // if expr is a symbol.member, return var_info
-  // otherwise return NULL
-  inline var_infot *operator()(const exprt &expr)
-  {
-    return expr_rec(expr, "", expr.type());
-  }
-
-  bool is_symex(const exprt &src);
-
-  bool is_nondet(const exprt &src);
-
   const namespacet &ns;
 
 protected:
   unsigned shared_count, local_count;
-
-  var_infot *expr_rec(
-    const exprt &expr,
-    const std::string &suffix,
-    const typet &type);
 
 public:
   unsigned nondet_count;  // free inputs
