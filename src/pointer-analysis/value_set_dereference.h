@@ -15,38 +15,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/hash_cont.h>
 #include <util/std_expr.h>
 
-#include "value_sets.h"
+#include "dereference_callback.h"
 
 class symbol_tablet;
 class guardt;
 class optionst;
 class modet;
 class symbolt;
-
-/*! \brief TO_BE_DOCUMENTED
-*/
-class dereference_callbackt
-{
-public:
-  virtual ~dereference_callbackt()
-  {
-  }
-
-  virtual void dereference_failure(
-    const std::string &property,
-    const std::string &msg,
-    const guardt &guard)=0;
-
-  typedef hash_set_cont<exprt, irep_hash> expr_sett;
-
-  virtual void get_value_set(
-    const exprt &expr,
-    value_setst::valuest &value_set)=0;
-  
-  virtual bool has_failed_symbol(
-    const exprt &expr,
-    const symbolt *&symbol)=0;
-};
 
 /*! \brief TO_BE_DOCUMENTED
 */
