@@ -68,11 +68,11 @@ bool bmct::all_claims(
   forall_goto_functions(f_it, goto_functions)
     forall_goto_program_instructions(i_it, f_it->second.body)
       if(i_it->is_assert())
-        goal_map[i_it->location.get_claim()]=goalt(*i_it);
+        goal_map[i_it->location.get_property()]=goalt(*i_it);
 
   // get the conditions for these goals from formula
   
-  unsigned claim_counter=0;
+  unsigned property_counter=0;
 
   // collect all 'instances' of the properties
   for(symex_target_equationt::SSA_stepst::iterator
@@ -82,19 +82,19 @@ bool bmct::all_claims(
   {
     if(it->is_assert())
     {
-      irep_idt claim_id;
+      irep_idt property_id;
 
       if(it->source.pc->is_assert())
-        claim_id=it->source.pc->location.get_claim();
+        property_id=it->source.pc->location.get_property();
       else
       {
-        // need new claim ID, say for an unwinding assertion
-        claim_counter++;
-        claim_id=i2string(claim_counter);
-        goal_map[claim_id].description=it->comment;
+        // need new property ID, say for an unwinding assertion
+        property_counter++;
+        property_id=i2string(property_counter);
+        goal_map[property_id].description=it->comment;
       }
       
-      goal_map[claim_id].conjuncts.push_back(
+      goal_map[property_id].conjuncts.push_back(
         literal_exprt(it->cond_literal));
     }
   }
@@ -143,6 +143,7 @@ bool bmct::all_claims(
     {
       xmlt xml_result("result");
       xml_result.set_attribute("claim", id2string(it->first));
+      xml_result.set_attribute("property", id2string(it->first));
 
       xml_result.set_attribute("status",
         g_it->covered?"FAILURE":"SUCCESS");
