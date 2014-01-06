@@ -129,7 +129,7 @@ exprt dereferencet::read_object(
     exprt index=index_expr.index();
     
     // multiply index by object size
-    exprt size=size_of_expr(object_type.subtype(), ns);
+    exprt size=size_of_expr(object_type, ns);
 
     if(size.is_nil())
       throw "dereference failed to get object size for index";
