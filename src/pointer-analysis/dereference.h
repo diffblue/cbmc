@@ -57,6 +57,11 @@ private:
   void offset_sum(
     exprt &dest,
     const exprt &offset) const;
+
+  exprt read_object(
+    const exprt &object,
+    const exprt &offset,
+    const typet &type);
     
   #if 0
   bool memory_model(
