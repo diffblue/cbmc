@@ -11,6 +11,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/byte_operators.h>
 #include <util/pointer_offset_size.h>
 #include <util/base_type.h>
+#include <util/simplify_expr.h>
+#include <util/arith_tools.h>
 
 #include <ansi-c/c_types.h>
 
@@ -108,8 +110,10 @@ exprt dereferencet::read_object(
 
   // is the object an array with matching subtype?
   
+  exprt simplified_offset=simplify_expr(offset, ns);
+  
   // check if offset is zero
-  if(offset.is_zero())
+  if(simplified_offset.is_zero())
   {
     // check type
     if(base_type_eq(object_type, dest_type, ns))
@@ -135,10 +139,10 @@ exprt dereferencet::read_object(
     if(size.is_nil())
       throw "dereference failed to get object size for index";
       
-    index.make_typecast(offset.type());
+    index.make_typecast(simplified_offset.type());
     size.make_typecast(index.type());
       
-    exprt new_offset=plus_exprt(offset, mult_exprt(index, size));
+    exprt new_offset=plus_exprt(simplified_offset, mult_exprt(index, size));
 
     return read_object(index_expr.array(), new_offset, type);
   }
@@ -160,9 +164,9 @@ exprt dereferencet::read_object(
       if(member_offset.is_nil())
         throw "dereference failed to get member offset";
         
-      member_offset.make_typecast(offset.type());
+      member_offset.make_typecast(simplified_offset.type());
         
-      exprt new_offset=plus_exprt(offset, member_offset);
+      exprt new_offset=plus_exprt(simplified_offset, member_offset);
       
       return read_object(member_expr.struct_op(), new_offset, type);
     }
@@ -174,8 +178,30 @@ exprt dereferencet::read_object(
     }
   }
   
+  // check if we have an array with the right subtype
+  if(object_type.id()==ID_array &&
+     base_type_eq(object_type.subtype(), dest_type, ns))
+  {
+    // check proper alignment
+    exprt size=size_of_expr(dest_type, ns);
+    
+    if(size.is_not_nil())
+    {
+      mp_integer size_constant, offset_constant;
+      if(!to_integer(simplify_expr(size, ns), size_constant) &&
+         !to_integer(simplified_offset, offset_constant) &&
+         (offset_constant%size_constant)==0)
+      {
+        // Yes! Can use index expression!
+        mp_integer index_constant=offset_constant/size_constant;
+        exprt index_expr=from_integer(index_constant, size.type());
+        return index_exprt(object, index_expr, dest_type);
+      }
+    }
+  }
+  
   // give up and use byte_extract
-  return binary_exprt(object, byte_extract_id(), offset, dest_type);
+  return binary_exprt(object, byte_extract_id(), simplified_offset, dest_type);
 }
 
 /*******************************************************************\
