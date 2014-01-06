@@ -87,6 +87,67 @@ exprt dereferencet::operator()(const exprt &pointer)
 
 /*******************************************************************\
 
+Function: dereferencet::read_object
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+exprt dereferencet::read_object(
+  const exprt &object,
+  const exprt &offset,
+  const typet &type)
+{
+  const typet &object_type=ns.follow(object.type());
+  const typet &dest_type=ns.follow(type);
+
+  // is the object an array with matching subtype?
+  
+  // check if offset is zero
+  if(offset.is_zero())
+  {
+    // check type
+    if(object_type==dest_type)
+    {
+      return object; // trivial case
+    }
+    else if(type_compatible(object_type, dest_type))
+    {
+      // the type differs, but we can do this with a typecast
+      return typecast_exprt(object, dest_type);
+    }
+  }
+  
+  if(object.id()==ID_index)
+  {
+    const index_exprt &index_expr=to_index_expr(object);
+    
+    exprt index=index_expr.index();
+    
+    // multiply index by object size
+    exprt size=size_of_expr(object_type.subtype(), ns);
+
+    if(size.is_nil())
+      throw "dereference failed to get object size for index";
+      
+    index.make_typecast(offset.type());
+    size.make_typecast(index.type());
+      
+    exprt new_offset=plus_exprt(offset, mult_exprt(index, size));
+
+    return read_object(index_expr.array(), new_offset, type);
+  }
+  
+  // give up and use byte_extract
+  return binary_exprt(object, byte_extract_id(), offset, dest_type);
+}
+
+/*******************************************************************\
+
 Function: dereferencet::dereference_rec
 
   Inputs:
@@ -107,38 +168,8 @@ exprt dereferencet::dereference_rec(
     const address_of_exprt &address_of_expr=to_address_of_expr(address);
     
     const exprt &object=address_of_expr.object();
-    
-    const typet &src_type=ns.follow(object.type());
-    const typet &dest_type=ns.follow(type);
 
-    // is the object an array with matching subtype?
-    
-    // check if offset is zero
-    if(offset.is_zero())
-    {
-      // check type
-      if(src_type==dest_type)
-        return object; // trivial case
-      else
-      {
-        // the type differs -- can we do this with a typecast?
-        if(type_compatible(src_type, dest_type))
-        {
-          // yes, do typecast
-          return typecast_exprt(object, dest_type);
-        }
-        else
-        {
-          // no, give up and use byte_extract
-          return binary_exprt(object, byte_extract_id(), offset, dest_type);
-        }
-      }
-    }
-    else
-    {
-      // give up, use byte_extract
-      return binary_exprt(object, byte_extract_id(), offset, dest_type);
-    }
+    return read_object(object, offset, type);    
   }
   else if(address.id()==ID_typecast)
   {
