@@ -36,7 +36,19 @@ public:
 
   // statistics
   unsigned number_of_dropped_states;
-  unsigned number_of_calls_to_SAT;
+  unsigned number_of_VCCs;
+  unsigned number_of_VCCs_after_simplification;
+  unsigned number_of_failed_properties;
+
+  struct property_entryt
+  {
+    resultt status;
+    irep_idt description;
+    goto_tracet error_trace;
+  };
+  
+  typedef std::map<irep_idt, property_entryt> property_mapt;
+  property_mapt property_map;
 
 protected:
   typedef path_symex_statet statet;
@@ -49,12 +61,15 @@ protected:
   
   bool execute(queuet::iterator state, const namespacet &);
   
-  bool check_assertion(statet &state, const namespacet &);
+  void check_assertion(statet &state, const namespacet &);
   void do_show_vcc(statet &state, const namespacet &);
   
   bool drop_state(const statet &state) const;
   
   void report_statistics();
+  
+  void initialize_property_map(
+    const goto_functionst &goto_functions);
 };
 
 #endif

@@ -38,7 +38,11 @@ path_searcht::resultt path_searcht::operator()(
   
   // set up the statistics
   number_of_dropped_states=0;
-  number_of_calls_to_SAT=0;
+  number_of_VCCs=0;
+  number_of_VCCs_after_simplification=0;
+  number_of_failed_properties=0;
+  
+  initialize_property_map(goto_functions);
   
   while(!queue.empty())
   {
@@ -66,11 +70,18 @@ path_searcht::resultt path_searcht::operator()(
 
     // an error, possibly?
     if(state->get_instruction()->is_assert())
-      if(check_assertion(*state, ns))
+    {
+      if(show_vcc)
+        do_show_vcc(*state, ns);
+      else
       {
-        report_statistics();
-        return UNSAFE; // property fails
+        check_assertion(*state, ns);
+        
+        // all assertions failed?
+        if(number_of_failed_properties==property_map.size())
+          break;
       }
+    }
     
     // execute
     path_symex(*state, queue, ns);
@@ -78,7 +89,7 @@ path_searcht::resultt path_searcht::operator()(
   
   report_statistics();
   
-  return SAFE; // property holds
+  return number_of_failed_properties==0?SAFE:UNSAFE;
 }
 
 /*******************************************************************\
@@ -99,8 +110,10 @@ void path_searcht::report_statistics()
   status() << "Number of dropped states: "
            << number_of_dropped_states << messaget::eom;
 
-  status() << "Number of calls to SAT: "
-           << number_of_calls_to_SAT << messaget::eom;
+  status() << "Generated " << number_of_VCCs << " VCC(s), "
+           << number_of_VCCs_after_simplification
+           << " remaining after simplification"
+           << messaget::eom;
 }
 
 /*******************************************************************\
@@ -137,6 +150,9 @@ void path_searcht::do_show_vcc(
   statet &state,
   const namespacet &ns)
 {
+  // keep statistics
+  number_of_VCCs++;
+  
   const goto_programt::instructiont &instruction=
     *state.get_instruction();
     
@@ -172,9 +188,14 @@ void path_searcht::do_show_vcc(
   }
 
   out << "|--------------------------" << "\n";
+  
+  exprt assertion=state.read(instruction.guard);
 
   out << "{" << 1 << "} "
-      << from_expr(ns, "", state.read(instruction.guard)) << "\n";
+      << from_expr(ns, "", assertion) << "\n";
+
+  if(!assertion.is_true())
+    number_of_VCCs_after_simplification++;
   
   out << eom;
 }
@@ -236,24 +257,29 @@ Function: path_searcht::check_assertion
 
 \*******************************************************************/
 
-bool path_searcht::check_assertion(
+void path_searcht::check_assertion(
   statet &state,
   const namespacet &ns)
 {
-  if(show_vcc)
-  {
-    do_show_vcc(state, ns);
-    return false; // no error
-  }
-
+  // keep statistics
+  number_of_VCCs++;
+  
   const goto_programt::instructiont &instruction=
     *state.get_instruction();
+
+  irep_idt property_name=instruction.location.get_claim();
+  property_entryt &property_entry=property_map[property_name];
+  
+  if(property_entry.status==UNSAFE)
+    return; // already failed
 
   // the assertion in SSA
   exprt assertion=
     state.read(instruction.guard);
 
-  if(assertion.is_true()) return false; // no error
+  if(assertion.is_true()) return; // no error
+
+  status() << "Checking property " << property_name << eom;
 
   satcheckt satcheck;
   bv_pointerst bv_pointers(ns, satcheck);
@@ -268,18 +294,62 @@ bool path_searcht::check_assertion(
   bv_pointers.set_to(assertion, false);
   
   // keep statistics
-  number_of_calls_to_SAT++;
+  number_of_VCCs_after_simplification++;
   
   switch(bv_pointers.dec_solve())
   {
   case decision_proceduret::D_SATISFIABLE:
-    build_goto_trace(state, bv_pointers, error_trace);
-    return true; // error
+    build_goto_trace(state, bv_pointers, property_entry.error_trace);
+    property_entry.status=UNSAFE;
+    number_of_failed_properties++;
+    return; // error
   
   case decision_proceduret::D_UNSATISFIABLE:
-    return false; // no error
+    return; // no error
   
   default:
     throw "error from solver";
   }
+}
+
+/*******************************************************************\
+
+Function: path_searcht::initialize_property_map
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void path_searcht::initialize_property_map(
+  const goto_functionst &goto_functions)
+{
+  for(goto_functionst::function_mapt::const_iterator
+      it=goto_functions.function_map.begin();
+      it!=goto_functions.function_map.end();
+      it++)
+    if(!it->second.is_inlined())
+    {
+      const goto_programt &goto_program=it->second.body;
+    
+      for(goto_programt::instructionst::const_iterator
+          it=goto_program.instructions.begin();
+          it!=goto_program.instructions.end();
+          it++)
+      {
+        if(!it->is_assert())
+          continue;
+      
+        const locationt &location=it->location;
+      
+        irep_idt property_name=location.get_claim();
+        
+        property_entryt &property_entry=property_map[property_name];
+        property_entry.status=SAFE;
+        property_entry.description=location.get_comment();
+      }
+    }    
 }
