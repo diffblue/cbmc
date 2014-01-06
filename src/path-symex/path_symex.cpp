@@ -16,6 +16,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ansi-c/c_types.h>
 
+#include <pointer-analysis/dereference.h>
+
 #include "path_symex.h"
 
 //#define DEBUG
@@ -537,7 +539,8 @@ void path_symext::assign_rec(
 
     const dereference_exprt &dereference_expr=to_dereference_expr(lhs);
     exprt address=state.read(dereference_expr.pointer());
-    exprt tmp_lhs=state.dereference(address);
+    dereferencet dereference(state.var_map.ns);
+    exprt tmp_lhs=dereference(address);
 
     assign_rec(state, guard, tmp_lhs, rhs, suffix, full_lhs);
 
