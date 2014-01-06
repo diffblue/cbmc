@@ -1,6 +1,6 @@
-SRC = xmlrepair.cpp
+SRC = xmlrepair.cpp ../util/unicode.cpp
 
-OBJ +=  
+OBJ += 
 
 INCLUDES= -I ..
 

@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <util/unicode.h>
+
 #include <fstream>
 #include <iostream>
 #include <stack>
@@ -153,7 +155,7 @@ int wmain(int argc, const wchar_t **argv_wide)
 {
   const char **argv=narrow_argv(argc, argv_wide);
   if(argc!=3) {
-    std::cerr << "Usage: xmlrecover.exe <infile> <outfile>" << 
+    std::cerr << "Usage: xmlrepair.exe <infile> <outfile>" << 
       std::endl << std::endl;
     return -1;
   }
@@ -163,7 +165,7 @@ int wmain(int argc, const wchar_t **argv_wide)
 int main(int argc, const char **argv)
 {
   if(argc!=3) {
-    std::cerr << "Usage: xmlrecover <infile> <outfile>" << 
+    std::cerr << "Usage: xmlrepair <infile> <outfile>" << 
       std::endl << std::endl;
     return -1;
   }
