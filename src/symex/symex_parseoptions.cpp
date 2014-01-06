@@ -254,15 +254,15 @@ int symex_parseoptionst::doit()
     }
 
     // do actual symex
-
     switch(path_search(goto_functions))
     {
     case safety_checkert::SAFE:
-      report_success();   
+      report_properties(path_search.property_map);
+      report_success();
       return 0;
-   
+    
     case safety_checkert::UNSAFE:
-      show_counterexample(path_search);
+      report_properties(path_search.property_map);
       report_failure();
       return 10;
     
@@ -567,6 +567,81 @@ bool symex_parseoptionst::process_goto_program(
 
 /*******************************************************************\
 
+Function: symex_parseoptionst::report_properties
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void symex_parseoptionst::report_properties(
+  const path_searcht::property_mapt &property_map)
+{
+  for(path_searcht::property_mapt::const_iterator
+      it=property_map.begin();
+      it!=property_map.end();
+      it++)
+  {
+    if(get_ui()==ui_message_handlert::XML_UI)
+    {
+      xmlt xml_result("result");
+      xml_result.set_attribute("claim", id2string(it->first));
+
+      std::string status_string;
+
+      switch(it->second.status)
+      {
+      case path_searcht::SAFE: status_string="OK"; break;
+      case path_searcht::UNSAFE: status_string="FAILURE"; break;
+      case path_searcht::ERROR: status_string="ERROR"; break;
+      }
+
+      xml_result.set_attribute("status", status_string);
+
+      std::cout << xml_result << "\n";
+    }
+    else
+    {
+      status() << "[" << it->first << "] "
+               << it->second.description << ": ";
+      switch(it->second.status)
+      {
+      case path_searcht::SAFE: status() << "OK"; break;
+      case path_searcht::UNSAFE: status() << "FAILED"; break;
+      case path_searcht::ERROR: status() << "ERROR"; break;
+      }
+      status() << eom;
+    }
+
+    if(cmdline.isset("show-trace") &&
+       it->second.status==path_searcht::UNSAFE)
+      show_counterexample(it->second.error_trace);
+  }
+
+  if(!cmdline.isset("property"))
+  {
+    status() << eom;
+
+    unsigned failed=0;
+
+    for(path_searcht::property_mapt::const_iterator
+        it=property_map.begin();
+        it!=property_map.end();
+        it++)
+      if(it->second.status==path_searcht::UNSAFE)
+        failed++;
+    
+    status() << "** " << failed
+             << " of " << property_map.size() << " failed"
+             << eom;  
+  }
+}
+
+/*******************************************************************\
+
 Function: symex_parseoptionst::report_success
 
   Inputs:
@@ -613,7 +688,7 @@ Function: symex_parseoptionst::show_counterexample
 \*******************************************************************/
 
 void symex_parseoptionst::show_counterexample(
-  const safety_checkert &safety_checker)
+  const goto_tracet &error_trace)
 {
   const namespacet ns(symbol_table);
 
@@ -621,13 +696,13 @@ void symex_parseoptionst::show_counterexample(
   {
   case ui_message_handlert::PLAIN:
     std::cout << std::endl << "Counterexample:" << std::endl;
-    show_goto_trace(std::cout, ns, safety_checker.error_trace);
+    show_goto_trace(std::cout, ns, error_trace);
     break;
   
   case ui_message_handlert::XML_UI:
     {
       xmlt xml;
-      convert(ns, safety_checker.error_trace, xml);
+      convert(ns, error_trace, xml);
       std::cout << xml << std::endl;
     }
     break;

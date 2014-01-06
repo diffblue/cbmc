@@ -14,6 +14,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <langapi/language_ui.h>
 
+#include "path_search.h"
+
 class goto_functionst;
 class optionst;
 
@@ -32,7 +34,7 @@ class optionst;
   "(ppc-macos)(unsigned-char)" \
   "(string-abstraction)(no-arch)(arch):(floatbv)(fixedbv)" \
   "(round-to-nearest)(round-to-plus-inf)(round-to-minus-inf)(round-to-zero)" \
-  "(show-locs)(show-vcc)(show-properties)" \
+  "(show-locs)(show-vcc)(show-properties)(show-trace)" \
   "(property):" \
   "(no-simplify)"
 
@@ -65,7 +67,8 @@ protected:
 
   void report_success();
   void report_failure();
-  void show_counterexample(const class safety_checkert &);
+  void report_properties(const path_searcht::property_mapt &);
+  void show_counterexample(const class goto_tracet &);
             
   void eval_verbosity();
 };
