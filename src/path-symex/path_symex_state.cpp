@@ -279,10 +279,14 @@ exprt path_symex_statet::instantiate_rec(
   else if(src.id()==ID_dereference)
   {
     const dereference_exprt &dereference_expr=to_dereference_expr(src);
+
     exprt address=read(dereference_expr.pointer(), propagate);
-    // the address is a mixture of non-SSA and SSA symbols
+
+    exprt address_dereferenced=dereference(address);
+    
+    // the dereferenced address is a mixture of non-SSA and SSA symbols
     // (e.g., if-guards and array indices)
-    return read(dereference(address), propagate);
+    return read(address_dereferenced, propagate);
   }
   
   if(!src.has_operands())
