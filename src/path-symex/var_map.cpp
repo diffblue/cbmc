@@ -65,7 +65,7 @@ Function: var_mapt::init
 
 void var_mapt::init(var_infot &var_info)
 {
-  if(has_prefix(id2string(var_info.symbol), "symex::dynamic_object"))
+  if(has_prefix(id2string(var_info.symbol), "symex_dynamic::"))
   {
     var_info.kind=var_infot::SHARED;
   }

@@ -280,7 +280,7 @@ void path_symext::symex_malloc(
   symbolt value_symbol;
 
   value_symbol.base_name="dynamic_object"+i2string(state.var_map.dynamic_count);
-  value_symbol.name="symex::"+id2string(value_symbol.base_name);
+  value_symbol.name="symex_dynamic::"+id2string(value_symbol.base_name);
   value_symbol.is_lvalue=true;
   value_symbol.type=object_type;
   value_symbol.type.set("#dynamic", true);
