@@ -64,6 +64,11 @@ public:
     tmp.t+=other.t;
     return tmp;
   }  
+
+  inline time_periodt operator-(const time_periodt &other)
+  {
+    return time_periodt(t-other.t);
+  }
 };
 
 class absolute_timet:public fine_timet
@@ -79,8 +84,7 @@ public:
 
   inline time_periodt operator-(const absolute_timet &other)
   {
-    time_periodt tmp(t-other.t);
-    return tmp;
+    return time_periodt(t-other.t);
   }
 };
 
