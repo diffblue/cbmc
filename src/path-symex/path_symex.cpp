@@ -150,6 +150,10 @@ bool path_symext::propagate(const exprt &src)
   {
     return propagate(to_array_of_expr(src).what());
   }
+  else if(src.id()==ID_union)
+  {
+    return propagate(to_union_expr(src).op());
+  }
   else
   {
     return false;
@@ -496,16 +500,34 @@ void path_symext::assign_rec(
     #endif
 
     const member_exprt &lhs_member_expr=to_member_expr(lhs);
-  
-    // add component name to the suffix
-    const std::string new_suffix=
-      "."+id2string(lhs_member_expr.get_component_name())+suffix;
-
+    
     const exprt &struct_op=lhs_member_expr.struct_op();
 
-    //typet lhs_type=state.var_map.ns.follow(lhs_suffix_type);
+    const typet &compound_type=
+      state.var_map.ns.follow(struct_op.type());
+  
+    if(compound_type.id()==ID_struct)
+    {
+      // add component name to the suffix
+      const std::string new_suffix=
+        "."+id2string(lhs_member_expr.get_component_name())+suffix;
 
-    assign_rec(state, guard, struct_op, rhs, new_suffix, full_lhs);
+      //typet lhs_type=state.var_map.ns.follow(lhs_suffix_type);
+
+      assign_rec(state, guard, struct_op, rhs, new_suffix, full_lhs);
+    }
+    else if(compound_type.id()==ID_union)
+    {
+      // adjust rhs
+      union_exprt new_rhs;
+      new_rhs.type()=struct_op.type();
+      new_rhs.set_component_name(lhs_member_expr.get_component_name());
+      new_rhs.op()=rhs;
+      
+      assign_rec(state, guard, struct_op, new_rhs, suffix, full_lhs);
+    }
+    else
+      throw "assign_rec: member expects struct or union type";
   }
   else if(lhs.id()==ID_index)
   {
