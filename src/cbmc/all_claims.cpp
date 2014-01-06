@@ -56,7 +56,7 @@ bool bmct::all_claims(
   solver.set_verbosity(get_verbosity());
 
   // stop the time
-  fine_timet sat_start=current_time();
+  absolute_timet sat_start=current_time();
   
   do_conversion(solver);  
   
@@ -119,7 +119,7 @@ bool bmct::all_claims(
   // output runtime
 
   {
-    fine_timet sat_stop=current_time();
+    absolute_timet sat_stop=current_time();
     status() << "Runtime decision procedure: "
              << (sat_stop-sat_start) << "s" << eom;
   }

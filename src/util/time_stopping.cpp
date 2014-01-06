@@ -51,14 +51,14 @@ Function: current_time
 
 \*******************************************************************/
 
-fine_timet current_time()
+absolute_timet current_time()
 {
   struct timeval tv;
   struct timezone tz;
 
   gettimeofday(&tv, &tz);
 
-  return fine_timet(tv.tv_usec/1000+(unsigned long long)tv.tv_sec*1000);
+  return absolute_timet(tv.tv_usec/1000+(unsigned long long)tv.tv_sec*1000);
 }
 
 /*******************************************************************\
@@ -73,14 +73,14 @@ Function: operator <<
 
 \*******************************************************************/
 
-std::ostream &operator << (std::ostream &out, const fine_timet &fine_time)
+std::ostream &operator << (std::ostream &out, const time_periodt &period)
 {
-  return out << (double)(fine_time.get_t())/1000;
+  return out << (double)(period.get_t())/1000;
 }
 
 /*******************************************************************\
 
-Function: fine_timet::as_string
+Function: time_periodt::as_string
 
   Inputs:
 
@@ -90,7 +90,7 @@ Function: fine_timet::as_string
 
 \*******************************************************************/
 
-std::string fine_timet::as_string() const
+std::string time_periodt::as_string() const
 {
   std::ostringstream out;
   out << *this;

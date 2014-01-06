@@ -150,7 +150,7 @@ bmct::run_decision_procedure(prop_convt &prop_conv)
   prop_conv.set_verbosity(get_verbosity());
 
   // stop the time
-  fine_timet sat_start=current_time();
+  absolute_timet sat_start=current_time();
   
   do_conversion(prop_conv);  
 
@@ -160,7 +160,7 @@ bmct::run_decision_procedure(prop_convt &prop_conv)
   // output runtime
 
   {
-    fine_timet sat_stop=current_time();
+    absolute_timet sat_stop=current_time();
     status() << "Runtime decision procedure: "
              << (sat_stop-sat_start) << "s" << eom;
   }
