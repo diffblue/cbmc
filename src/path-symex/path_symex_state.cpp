@@ -306,11 +306,20 @@ exprt path_symex_statet::read_symbol_member_index_rec(
   else if(src.id()==ID_member)
   {
     const member_exprt &member_expr=to_member_expr(src);
-    return read_symbol_member_index_rec(
-      member_expr.struct_op(),
-      "."+id2string(member_expr.get_component_name())+suffix,
-      type,
-      propagate);
+    
+    const typet &compound_type=
+      var_map.ns.follow(member_expr.struct_op().type());
+    
+    if(compound_type.id()==ID_struct)
+    {    
+      return read_symbol_member_index_rec(
+        member_expr.struct_op(),
+        "."+id2string(member_expr.get_component_name())+suffix,
+        type,
+        propagate);
+    }
+    else
+      return nil_exprt(); // includes unions
   }
   else if(src.id()==ID_index)
   {
