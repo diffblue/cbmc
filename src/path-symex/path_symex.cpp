@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/i2string.h>
 #include <util/pointer_offset_size.h>
 #include <util/expr_util.h>
+#include <util/base_type.h>
 
 #include <ansi-c/c_types.h>
 
@@ -460,7 +461,7 @@ void path_symext::assign_rec(
     else
     {
       // consistency check
-      if(ns.follow(ssa_rhs.type())!=ns.follow(ssa_lhs.type()))
+      if(!base_type_eq(ssa_rhs.type(), ssa_lhs.type(), ns))
       {
         #ifdef DEBUG
         std::cout << "ssa_rhs: " << ssa_rhs.pretty() << std::endl;
