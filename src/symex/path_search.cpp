@@ -121,8 +121,8 @@ void path_searcht::report_statistics()
            << messaget::eom;
   
   time_periodt total_time=current_time()-start_time;
-  status() << "Runtime: " << total_time << " total, "
-           << sat_time << " SAT" << messaget::eom;
+  status() << "Runtime: " << total_time << "s total, "
+           << sat_time << "s SAT" << messaget::eom;
 }
 
 /*******************************************************************\
