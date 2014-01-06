@@ -170,7 +170,7 @@ exprt path_symex_statet::read(const exprt &src, bool propagate)
   //std::cout << " ==> " << tmp.pretty() << std::endl;
   #endif
 
-  return tmp3;
+  return tmp4;
 }
 
 /*******************************************************************\
