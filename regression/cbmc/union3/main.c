@@ -18,9 +18,9 @@ int main(void)
     float f;
   } union_object;
   
-  float some_float=1.5;
+  float some_float=1.5f;
   
   union_object=(union my_U)some_float;
   
-  assert(union_object.f==1.5);
+  assert(union_object.f==1.5f);
 } 
