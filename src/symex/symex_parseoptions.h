@@ -36,7 +36,8 @@ class optionst;
   "(round-to-nearest)(round-to-plus-inf)(round-to-minus-inf)(round-to-zero)" \
   "(show-locs)(show-vcc)(show-properties)(show-trace)" \
   "(property):" \
-  "(no-simplify)"
+  "(no-simplify)(no-unwinding-assertions)(no-propagation)"
+  // the last line is for CBMC-regression testing only
 
 class symex_parseoptionst:
   public parseoptions_baset,
