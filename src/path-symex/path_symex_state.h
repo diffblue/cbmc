@@ -162,7 +162,7 @@ public:
     return read(src, false);
   }
 
-  exprt dereference(const exprt &address);
+  exprt dereference_rec(const exprt &src, bool propagate);
 
   std::string array_index_as_string(const exprt &) const;
   

@@ -159,9 +159,11 @@ exprt path_symex_statet::read(const exprt &src, bool propagate)
   
   exprt tmp1=adjust_float_expressions(src, var_map.ns);
 
-  exprt tmp2=instantiate_rec(tmp1, propagate);
-
-  exprt tmp3=simplify_expr(tmp2, var_map.ns);
+  exprt tmp2=dereference_rec(tmp1, propagate);
+  
+  exprt tmp3=instantiate_rec(tmp2, propagate);
+  
+  exprt tmp4=simplify_expr(tmp3, var_map.ns);
 
   #ifdef DEBUG
   //std::cout << " ==> " << tmp.pretty() << std::endl;
@@ -189,10 +191,8 @@ exprt path_symex_statet::instantiate_rec(
   #ifdef DEBUG
   std::cout << "instantiate_rec: " << src.id() << " " << std::endl;
   #endif
-  
-  //const typet &type=var_map.ns.follow(src.type());
 
-  // check first whether this is a symbol(.member|[index])*
+  // check whether this is a symbol(.member|[index])*
   
   {
     exprt tmp_symbol_member_index=
@@ -211,6 +211,7 @@ exprt path_symex_statet::instantiate_rec(
   }
   else if(src.id()==ID_sideeffect)
   {
+    // could be done separately
     const irep_idt &statement=to_side_effect_expr(src).get_statement();
     
     if(statement==ID_nondet)
@@ -222,86 +223,24 @@ exprt path_symex_statet::instantiate_rec(
     else
       throw "instantiate_rec: unexpected side effect "+id2string(statement);
   }
-  else if(src.id()==ID_member)
-  {
-    #if 0
-    const member_exprt &member_expr=to_member_expr(src);
-    const irep_idt &component_name=member_expr.get_component_name();
-    const exprt &compound_op=member_expr.struct_op();
-    typet compound_op_type=var_map.ns.follow(compound_op.type());
-    
-    if(compound_op_type.id()==ID_struct)
-    {
-      const struct_typet &struct_type=to_struct_type(compound_op_type);
-
-      if(!struct_type.has_component(component_name))
-        throw "No struct component "+id2string(component_name)+" in member expression";
-
-      return instantiate_rec(compound_op, propagate);
-    }
-    else if(compound_op_type.id()==ID_union)
-    {
-      const union_typet &union_type=to_union_type(compound_op_type);
-
-      if(!union_type.has_component(component_name))
-        throw "No union component "+id2string(component_name)+" in member expression";
-
-      return instantiate_rec(compound_op, propagate);
-    }
-    else
-    {
-      #ifdef DEBUG
-      std::cerr << compound_op.pretty() << std::endl;
-      #endif
-      throw "member of non struct/union type";
-    }
-    #endif
-  }
-  else if(src.id()==ID_index)
-  {
-    #if 0
-    const index_exprt &index_expr=to_index_expr(src);
-    const exprt &index_op=index_expr.index();
-    const exprt &array_op=index_expr.array();
-    typet array_op_type=var_map.ns.follow(array_op.type());
-  
-    if(array_op_type.id()!=ID_array)
-      return nil_exprt();
-
-    //const array_typet &array_type=to_array_type(array_op_type);
-    
-    std::string array_element=array_index_as_string(index_op);
-    if(array_element=="") array_element="[*]";
-
-    return instantiate_rec(array_op, propagate);
-    #endif
-  }
   else if(src.id()==ID_dereference)
   {
-    const dereference_exprt &dereference_expr=to_dereference_expr(src);
-
-    exprt address=read(dereference_expr.pointer(), propagate);
-
-    exprt address_dereferenced=dereference(address);
-    
-    // the dereferenced address is a mixture of non-SSA and SSA symbols
-    // (e.g., if-guards and array indices)
-    return read(address_dereferenced, propagate);
+    assert(false); // should be gone already
   }
-  
+
   if(!src.has_operands())
     return src;
 
-  // recursive calls on structure of 'src'
-  exprt tmp=src;
+  exprt src2=src;
   
-  Forall_operands(it, tmp)
+  // recursive calls on structure of 'src'
+  Forall_operands(it, src2)
   {
     exprt tmp_op=instantiate_rec(*it, propagate);
     *it=tmp_op;
   }
   
-  return tmp;
+  return src2;
 }
 
 /*******************************************************************\
@@ -423,7 +362,7 @@ std::string path_symex_statet::array_index_as_string(const exprt &src) const
 
 /*******************************************************************\
 
-Function: path_symex_statet::dereference
+Function: path_symex_statet::dereference_rec
 
   Inputs:
 
@@ -433,10 +372,41 @@ Function: path_symex_statet::dereference
 
 \*******************************************************************/
 
-exprt path_symex_statet::dereference(const exprt &address)
+exprt path_symex_statet::dereference_rec(
+  const exprt &src,
+  bool propagate)
 {
-  dereferencet dereference_object(var_map.ns);
-  return dereference_object(address);
+  if(src.id()==ID_dereference)
+  {
+    const dereference_exprt &dereference_expr=to_dereference_expr(src);
+
+    // read the address to propagate the pointers
+    exprt address=read(dereference_expr.pointer(), propagate);
+
+    // now hand over to dereferencet
+    dereferencet dereference_object(var_map.ns);
+    exprt address_dereferenced=dereference_object(address);
+    
+    // the dereferenced address is a mixture of non-SSA and SSA symbols
+    // (e.g., if-guards and array indices)
+    return address_dereferenced;
+  }
+
+  if(!src.has_operands())
+    return src;
+
+  exprt src2=src;
+  
+  {
+    // recursive calls on structure of 'src'
+    Forall_operands(it, src2)
+    {
+      exprt tmp_op=dereference_rec(*it, propagate);
+      *it=tmp_op;
+    }
+  }
+  
+  return src2;
 }
 
 /*******************************************************************\
@@ -473,9 +443,7 @@ exprt path_symex_statet::instantiate_rec_address(
   }
   else if(src.id()==ID_dereference)
   {
-    const dereference_exprt &dereference_expr=to_dereference_expr(src);
-    const exprt &pointer=dereference_expr.pointer();
-    return dereference(read(pointer, propagate));
+    assert(false); // should be gone already
   }
   else if(src.id()==ID_member)
   {
