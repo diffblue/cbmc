@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/expr_util.h>
 #include <util/byte_operators.h>
 #include <util/pointer_offset_size.h>
+#include <util/base_type.h>
 
 #include <ansi-c/c_types.h>
 
@@ -111,7 +112,7 @@ exprt dereferencet::read_object(
   if(offset.is_zero())
   {
     // check type
-    if(object_type==dest_type)
+    if(base_type_eq(object_type, dest_type, ns))
     {
       return object; // trivial case
     }
@@ -281,7 +282,7 @@ bool dereferencet::type_compatible(
   if(dereference_type.id()==ID_empty)
     return true; // always ok
 
-  if(object_type==dereference_type)
+  if(base_type_eq(object_type, dereference_type, ns))
     return true; // ok, they just match
 
   // check for struct prefixes
