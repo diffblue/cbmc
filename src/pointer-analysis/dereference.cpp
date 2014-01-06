@@ -141,6 +141,37 @@ exprt dereferencet::read_object(
 
     return read_object(index_expr.array(), new_offset, type);
   }
+  else if(object.id()==ID_member)
+  {
+    const member_exprt &member_expr=to_member_expr(object);
+    
+    const typet &compound_type=
+      ns.follow(member_expr.struct_op().type());
+    
+    if(compound_type.id()==ID_struct)
+    {
+      const struct_typet &struct_type=
+        to_struct_type(compound_type);
+    
+      exprt member_offset=member_offset_expr(
+        struct_type, member_expr.get_component_name(), ns);
+
+      if(member_offset.is_nil())
+        throw "dereference failed to get member offset";
+        
+      member_offset.make_typecast(offset.type());
+        
+      exprt new_offset=plus_exprt(offset, member_offset);
+      
+      return read_object(member_expr.struct_op(), new_offset, type);
+    }
+    else if(compound_type.id()==ID_union)
+    {
+      // Unions are easy: the offset is always zero,
+      // so simply pass down.
+      return read_object(member_expr.struct_op(), offset, type);
+    }
+  }
   
   // give up and use byte_extract
   return binary_exprt(object, byte_extract_id(), offset, dest_type);
