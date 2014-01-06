@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_PATH_SEARCH_H
 #define CPROVER_PATH_SEARCH_H
 
+#include <util/time_stopping.h>
+
 #include <goto-programs/safety_checker.h>
 
 #include <path-symex/path_symex_state.h>
@@ -39,6 +41,8 @@ public:
   unsigned number_of_VCCs;
   unsigned number_of_VCCs_after_simplification;
   unsigned number_of_failed_properties;
+  absolute_timet start_time;
+  time_periodt sat_time;
 
   struct property_entryt
   {

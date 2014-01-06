@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <util/time_stopping.h>
+
 #include <solvers/flattening/bv_pointers.h>
 #include <solvers/sat/satcheck.h>
 
@@ -41,6 +43,9 @@ path_searcht::resultt path_searcht::operator()(
   number_of_VCCs=0;
   number_of_VCCs_after_simplification=0;
   number_of_failed_properties=0;
+
+  // stop the time
+  start_time=current_time();
   
   initialize_property_map(goto_functions);
   
@@ -114,6 +119,10 @@ void path_searcht::report_statistics()
            << number_of_VCCs_after_simplification
            << " remaining after simplification"
            << messaget::eom;
+  
+  time_periodt total_time=current_time()-start_time;
+  status() << "Runtime: " << total_time << " total, "
+           << sat_time << " SAT" << messaget::eom;
 }
 
 /*******************************************************************\
@@ -281,6 +290,9 @@ void path_searcht::check_assertion(
 
   status() << "Checking property " << property_name << eom;
 
+  // take the time
+  absolute_timet sat_start_time=current_time();
+  
   satcheckt satcheck;
   bv_pointerst bv_pointers(ns, satcheck);
   
@@ -302,14 +314,16 @@ void path_searcht::check_assertion(
     build_goto_trace(state, bv_pointers, property_entry.error_trace);
     property_entry.status=UNSAFE;
     number_of_failed_properties++;
-    return; // error
-  
+    break; // error
+   
   case decision_proceduret::D_UNSATISFIABLE:
-    return; // no error
+    break; // no error
   
   default:
     throw "error from solver";
   }
+  
+  sat_time+=current_time()-sat_start_time;
 }
 
 /*******************************************************************\
