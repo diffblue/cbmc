@@ -25,26 +25,6 @@ public:
   {
   }
   
-  inline fine_timet operator-(const fine_timet &other)
-  {
-    fine_timet tmp=*this;
-    tmp.t-=other.t;
-    return tmp;
-  }
-  
-  inline fine_timet &operator+=(const fine_timet &other)
-  {
-    t+=other.t;
-    return *this;
-  }
-  
-  inline fine_timet operator+(const fine_timet &other)
-  {
-    fine_timet tmp=*this;
-    tmp.t+=other.t;
-    return tmp;
-  }
-  
   inline unsigned long long get_t() const
   {
     return t;
@@ -55,15 +35,58 @@ public:
     t=0;
   }
   
-  std::string as_string() const;
-  
 protected:
   unsigned long long t;
 };
 
-fine_timet current_time();
+class time_periodt:public fine_timet
+{
+public:
+  inline time_periodt()
+  {
+  }
+  
+  inline explicit time_periodt(unsigned long long _t):fine_timet(_t)
+  {
+  }
 
-std::ostream &operator << (std::ostream &, const fine_timet &);
+  std::string as_string() const;
+
+  inline time_periodt &operator+=(const time_periodt &other)
+  {
+    t+=other.t;
+    return *this;
+  }
+  
+  inline time_periodt operator+(const time_periodt &other)
+  {
+    time_periodt tmp=*this;
+    tmp.t+=other.t;
+    return tmp;
+  }  
+};
+
+class absolute_timet:public fine_timet
+{
+public:
+  inline absolute_timet()
+  {
+  }
+  
+  inline explicit absolute_timet(unsigned long long _t):fine_timet(_t)
+  {
+  }
+
+  inline time_periodt operator-(const absolute_timet &other)
+  {
+    time_periodt tmp(t-other.t);
+    return tmp;
+  }
+};
+
+absolute_timet current_time();
+
+std::ostream &operator << (std::ostream &, const time_periodt &);
 
 #endif
 
