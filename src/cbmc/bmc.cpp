@@ -601,8 +601,7 @@ void bmct::setup_unwind()
     idx=next;
   }
 
-  symex.max_unwind=options.get_int_option("unwind");
-  if(symex.max_unwind==0) symex.max_unwind = (unsigned)-1;
+  symex.max_unwind=options.get_int_option("unwind"); // 0 if unbounded
   symex.incr_min_unwind=options.get_int_option("unwind-min");
   symex.incr_max_unwind=options.get_int_option("unwind-max");
   if(symex.incr_max_unwind==0) symex.incr_max_unwind = (unsigned)-1;

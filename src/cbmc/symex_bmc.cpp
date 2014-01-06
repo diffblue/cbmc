@@ -112,10 +112,13 @@ bool symex_bmct::get_unwind(
   unsigned unwind)
 {
   const irep_idt id=goto_programt::loop_id(source.pc);
-  long this_loop_max_unwind=
+  unsigned this_loop_max_unwind=
     std::max(max_unwind,
              std::max(thread_loop_limits[(unsigned)-1][id],
                       thread_loop_limits[source.thread_nr][id]));
+
+  if(this_loop_max_unwind==0) // 0 if unbounded => set to UINT_MAX
+    this_loop_max_unwind = (unsigned)-1;
 
   if(id==incr_loop_id) {
     this_loop_max_unwind = incr_max_unwind;
@@ -159,10 +162,13 @@ bool symex_bmct::get_unwind_recursion(
   const unsigned thread_nr,
   unsigned unwind)
 {
-  const long this_loop_max_unwind=
+  unsigned this_loop_max_unwind=
     std::max(max_unwind,
              std::max(thread_loop_limits[(unsigned)-1][id],
                       thread_loop_limits[thread_nr][id]));
+
+  if(this_loop_max_unwind==0) // 0 if unbounded => set to UINT_MAX
+    this_loop_max_unwind = (unsigned)-1;
 
   #if 1
   if(unwind!=0)
@@ -173,8 +179,7 @@ bool symex_bmct::get_unwind_recursion(
                  << symbol.display_name()
                  << " iteration " << unwind;
       
-    if(this_loop_max_unwind!=0)
-      statistics() << " (" << this_loop_max_unwind << " max)";
+    statistics() << " (" << this_loop_max_unwind << " max)";
 
     statistics() << eom;
   }
