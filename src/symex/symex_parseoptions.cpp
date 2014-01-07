@@ -611,7 +611,7 @@ void symex_parseoptionst::report_properties(
       {
       case path_searcht::PASS: status() << "OK"; break;
       case path_searcht::FAIL: status() << "FAILED"; break;
-      case path_searcht::NOT_REACHED: status() << "OK (not reached)"; break;
+      case path_searcht::NOT_REACHED: status() << "OK"; break;
       }
       status() << eom;
     }
