@@ -279,8 +279,10 @@ void path_searcht::check_assertion(
   irep_idt property_name=instruction.location.get_claim();
   property_entryt &property_entry=property_map[property_name];
   
-  if(property_entry.status==UNSAFE)
+  if(property_entry.status==FAIL)
     return; // already failed
+  else if(property_entry.status==NOT_REACHED)
+    property_entry.status=PASS; // well, for now!
 
   // the assertion in SSA
   exprt assertion=
@@ -312,7 +314,7 @@ void path_searcht::check_assertion(
   {
   case decision_proceduret::D_SATISFIABLE:
     build_goto_trace(state, bv_pointers, property_entry.error_trace);
-    property_entry.status=UNSAFE;
+    property_entry.status=FAIL;
     number_of_failed_properties++;
     break; // error
    
@@ -362,7 +364,7 @@ void path_searcht::initialize_property_map(
         irep_idt property_name=location.get_claim();
         
         property_entryt &property_entry=property_map[property_name];
-        property_entry.status=SAFE;
+        property_entry.status=NOT_REACHED;
         property_entry.description=location.get_comment();
       }
     }    
