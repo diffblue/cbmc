@@ -594,9 +594,9 @@ void symex_parseoptionst::report_properties(
 
       switch(it->second.status)
       {
-      case path_searcht::SAFE: status_string="OK"; break;
-      case path_searcht::UNSAFE: status_string="FAILURE"; break;
-      case path_searcht::ERROR: status_string="ERROR"; break;
+      case path_searcht::PASS: status_string="OK"; break;
+      case path_searcht::FAIL: status_string="FAILURE"; break;
+      case path_searcht::NOT_REACHED: status_string="OK"; break;
       }
 
       xml_result.set_attribute("status", status_string);
@@ -609,15 +609,15 @@ void symex_parseoptionst::report_properties(
                << it->second.description << ": ";
       switch(it->second.status)
       {
-      case path_searcht::SAFE: status() << "OK"; break;
-      case path_searcht::UNSAFE: status() << "FAILED"; break;
-      case path_searcht::ERROR: status() << "ERROR"; break;
+      case path_searcht::PASS: status() << "OK"; break;
+      case path_searcht::FAIL: status() << "FAILED"; break;
+      case path_searcht::NOT_REACHED: status() << "OK (not reached)"; break;
       }
       status() << eom;
     }
 
     if(cmdline.isset("show-trace") &&
-       it->second.status==path_searcht::UNSAFE)
+       it->second.status==path_searcht::FAIL)
       show_counterexample(it->second.error_trace);
   }
 
@@ -631,7 +631,7 @@ void symex_parseoptionst::report_properties(
         it=property_map.begin();
         it!=property_map.end();
         it++)
-      if(it->second.status==path_searcht::UNSAFE)
+      if(it->second.status==path_searcht::FAIL)
         failed++;
     
     status() << "** " << failed

@@ -44,9 +44,11 @@ public:
   absolute_timet start_time;
   time_periodt sat_time;
 
+  enum statust { NOT_REACHED, PASS, FAIL };
+
   struct property_entryt
   {
-    resultt status;
+    statust status;
     irep_idt description;
     goto_tracet error_trace;
   };
