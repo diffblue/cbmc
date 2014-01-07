@@ -33,10 +33,10 @@ public:
   irept last_location;
 
   // control unwinding  
-  long max_unwind;
+  unsigned max_unwind;
   irep_idt incr_loop_id;
-  unsigned long incr_max_unwind;
-  unsigned long incr_min_unwind;
+  unsigned incr_max_unwind;
+  unsigned incr_min_unwind;
 
   prop_convt& prop_conv;
 
@@ -45,7 +45,7 @@ public:
   void set_unwind_limit(
     const irep_idt &id,
     long thread_nr,
-    long limit)
+    unsigned limit)
   {
     unsigned t=thread_nr>=0 ? thread_nr : (unsigned)-1;
 
@@ -58,7 +58,7 @@ protected:
 
   virtual bool check_break(const symex_targett::sourcet &source, unsigned unwind);
 
-  typedef hash_map_cont<irep_idt, long, irep_id_hash> loop_limitst;
+  typedef hash_map_cont<irep_idt, unsigned, irep_id_hash> loop_limitst;
   typedef std::map<unsigned, loop_limitst> thread_loop_limitst;
   thread_loop_limitst thread_loop_limits;
 

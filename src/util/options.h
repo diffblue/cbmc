@@ -22,6 +22,7 @@ public:
   virtual const std::string get_option(const std::string &option) const;
   virtual bool get_bool_option(const std::string &option) const;
   virtual int get_int_option(const std::string &option) const;
+  virtual unsigned get_unsigned_option(const std::string &option) const;
   virtual void set_option(const std::string &option, const bool value);
   virtual void set_option(const std::string &option, const char *value);
   virtual void set_option(const std::string &option, const int value);

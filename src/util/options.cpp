@@ -123,6 +123,25 @@ int optionst::get_int_option(const std::string &option) const
 
 /*******************************************************************\
 
+Function: optionst::get_unsigned_option
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+unsigned optionst::get_unsigned_option(const std::string &option) const
+{
+  const std::string value=get_option(option);
+  return value.empty()?0:safe_str2unsigned(value.c_str());
+}
+
+
+/*******************************************************************\
+
 Function: optionst::get_option
 
   Inputs:

@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <memory>
 
 #include <util/i2string.h>
+#include <util/string2int.h>
 #include <util/location.h>
 #include <util/time_stopping.h>
 #include <util/message_stream.h>
@@ -592,7 +593,7 @@ void bmct::setup_unwind()
     if(val.rfind(":")!=std::string::npos)
     {
       std::string id=val.substr(0, val.rfind(":"));
-      long uw=atol(val.substr(val.rfind(":")+1).c_str());
+      unsigned uw=safe_str2unsigned(val.substr(val.rfind(":")+1).c_str());
 
       symex.set_unwind_limit(id, thread_nr, uw);
     }
@@ -601,9 +602,9 @@ void bmct::setup_unwind()
     idx=next;
   }
 
-  symex.max_unwind=options.get_int_option("unwind"); // 0 if unbounded
-  symex.incr_min_unwind=options.get_int_option("unwind-min");
-  symex.incr_max_unwind=options.get_int_option("unwind-max");
+  symex.max_unwind=options.get_unsigned_option("unwind"); // 0 if unbounded
+  symex.incr_min_unwind=options.get_unsigned_option("unwind-min");
+  symex.incr_max_unwind=options.get_unsigned_option("unwind-max");
   if(symex.incr_max_unwind==0) symex.incr_max_unwind = (unsigned)-1;
   symex.ignore_assertions = (symex.incr_min_unwind>=2) &&
       options.get_bool_option("ignore-assertions-before-unwind-min");
