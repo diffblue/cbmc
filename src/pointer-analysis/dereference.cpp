@@ -212,8 +212,17 @@ exprt dereferencet::dereference_rec(
       return dereference_rec(op, offset, type); // just pass down
     else if(op_type.id()==ID_signedbv || op_type.id()==ID_unsignedbv)
     {
-      // integer address
-      throw "dereferencet: integer address unhandled";
+      // We got an integer-typed address A. We turn this back (!)
+      // into *(type *)(A+offset), and then let some other layer
+      // worry about it.
+      
+      exprt integer=
+        plus_exprt(offset, typecast_exprt(op, offset.type()));
+
+      exprt new_typecast=
+        typecast_exprt(integer, pointer_typet(type));
+      
+      return dereference_exprt(new_typecast, type);
     }
     else
       throw "dereferencet: unexpected cast";
@@ -248,10 +257,15 @@ exprt dereferencet::dereference_rec(
   }
   else if(address.id()==ID_constant)
   {
+    const typet result_type=ns.follow(address.type()).subtype();
+  
     // pointer-typed constant
     if(to_constant_expr(address).get_value()==ID_NULL) // NULL
     {
-      return exprt(ID_null_object, ns.follow(address.type()).subtype());
+      // we turn this into (type *)0
+      exprt zero=gen_zero(index_type());
+      return dereference_rec(
+        typecast_exprt(zero, address.type()), offset, type);
     }
     else
       throw "dereferencet: unexpected pointer constant "+address.pretty();
@@ -299,14 +313,15 @@ bool dereferencet::type_compatible(
      object_type.id()==ID_code)
     return true;
 
-  // vectors of same size are ok
+  // bit vectors of same size are ok
   if((object_type.id()==ID_signedbv || object_type.id()==ID_unsignedbv) &&
      (dereference_type.id()==ID_signedbv || dereference_type.id()==ID_unsignedbv))
   {
     return object_type.get(ID_width)==dereference_type.get(ID_width);
   }
 
-  // pointer to pointer is always ok
+  // Any pointer to pointer is always ok,
+  // but should likely check that width is the same.
   if(object_type.id()==ID_pointer &&
      dereference_type.id()==ID_pointer)
     return true;
