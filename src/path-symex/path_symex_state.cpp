@@ -227,7 +227,9 @@ exprt path_symex_statet::instantiate_rec(
   }
   else if(src.id()==ID_dereference)
   {
-    assert(false); // should be gone already
+    // dereferencet has run already, so we should only be left with
+    // integer addresses. Will transform into __CPROVER_memory[]
+    // eventually.
   }
 
   if(!src.has_operands())
@@ -454,13 +456,16 @@ exprt path_symex_statet::instantiate_rec_address(
   }
   else if(src.id()==ID_dereference)
   {
-    assert(false); // should be gone already
+    // dereferenct ran before, and this can only be *(type *)integer-address,
+    // which we simply instantiate as non-address
+    dereference_exprt tmp=to_dereference_expr(src);
+    tmp.pointer()=instantiate_rec(tmp.pointer(), propagate);
+    return tmp;
   }
   else if(src.id()==ID_member)
   {
-    assert(src.operands().size()==1);
-    exprt tmp=src;
-    tmp.op0()=instantiate_rec_address(src.op0(), propagate);
+    member_exprt tmp=to_member_expr(src);
+    tmp.struct_op()=instantiate_rec_address(tmp.struct_op(), propagate);
     return tmp;
   }
   else if(src.id()==ID_string_constant)
