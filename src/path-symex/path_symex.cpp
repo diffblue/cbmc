@@ -139,6 +139,12 @@ bool path_symext::propagate(const exprt &src)
       if(!propagate(*it)) return false;
     return true;
   }
+  else if(src.id()==ID_vector)
+  {
+    forall_operands(it, src)
+      if(!propagate(*it)) return false;
+    return true;
+  }
   else if(src.id()==ID_if)
   {
     const if_exprt &if_expr=to_if_expr(src);
@@ -408,6 +414,36 @@ void path_symext::assign_rec(
 
     return; // done
   }
+  else if(full_lhs_type.id()==ID_vector) // full_lhs is a vector
+  {
+    const vector_typet &vector_type=to_vector_type(full_lhs_type);
+    const typet &subtype=vector_type.subtype();
+    
+    if(!vector_type.size().is_constant())
+      throw "vector with non-constant size";
+
+    mp_integer size;
+    if(to_integer(vector_type.size(), size))
+      throw "failed to convert vector size";
+  
+    // split it up into elements
+    for(mp_integer i=0; i!=size; ++i)
+    {
+      exprt index=from_integer(i, vector_type.size().type());
+      exprt new_rhs=rhs.is_nil()?rhs:index_exprt(rhs, index, subtype);
+      exprt new_full_lhs=index_exprt(full_lhs, index, subtype);
+      exprt new_lhs=index_exprt(lhs, index, subtype);
+      
+      // vector constructor on rhs?
+      if(rhs.id()==ID_vector)
+        new_rhs=simplify_expr(new_rhs, ns);
+      
+      // recursive call
+      assign_rec(state, guard, new_lhs, new_rhs, suffix, new_full_lhs);
+    }
+
+    return; // done
+  }
   else if(rhs.id()==ID_sideeffect) // catch side effects on rhs
   {
     const side_effect_exprt &side_effect_expr=to_side_effect_expr(rhs);
@@ -541,15 +577,15 @@ void path_symext::assign_rec(
     const exprt &lhs_index=lhs_index_expr.index();
     const typet &lhs_type=ns.follow(lhs_array.type());
 
-    if(lhs_type.id()!=ID_array)
-      throw "index must take array type operand, but got `"+
-            lhs_type.id_string()+"'";
-            
-    std::string array_index=state.array_index_as_string(lhs_index);
-    if(array_index=="") array_index="[*]";
+    if(lhs_type.id()!=ID_array && lhs_type.id()!=ID_vector)
+      throw "index must take array or vector type operand, but got `"+
+            lhs_type.id_string()+"'";            
+
+    std::string index_string=state.array_index_as_string(lhs_index);
+    if(index_string=="") index_string="[*]";
     
     // add index to the suffix
-    const std::string new_suffix=array_index+suffix;
+    const std::string new_suffix=index_string+suffix;
 
     assign_rec(state, guard, lhs_array, rhs, new_suffix, full_lhs);
   }
