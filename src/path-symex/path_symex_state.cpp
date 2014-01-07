@@ -321,7 +321,7 @@ exprt path_symex_statet::read_symbol_member_index_rec(
         propagate);
     }
     else
-      return nil_exprt(); // includes unions
+      return nil_exprt(); // includes unions, deliberatley
   }
   else if(src.id()==ID_index)
   {
@@ -340,9 +340,9 @@ exprt path_symex_statet::read_symbol_member_index_rec(
         type,
         propagate);
     }
-    else
+    else // no
     {
-      // no
+      // is the size a constant?
       return nil_exprt();
     }
   }
