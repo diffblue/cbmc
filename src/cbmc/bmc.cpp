@@ -120,6 +120,8 @@ void bmct::do_conversion(prop_convt &prop_conv)
   // convert HDL
   do_unwind_module(prop_conv);
 
+  equation.output(std::cout);
+
   // convert SSA
   equation.convert(prop_conv);
 
@@ -484,6 +486,8 @@ bool bmct::run(const goto_functionst &goto_functions)
       return decide_yices();
     else if(options.get_bool_option("z3"))
       return decide_z3();
+    else if(options.get_bool_option("use-heap-theory"))
+      return decide_heap();
     else
     {
       if(options.get_bool_option("program-only"))

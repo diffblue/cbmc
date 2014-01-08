@@ -266,6 +266,10 @@ protected:
   void read(exprt &expr);
   void replace_nondet(exprt &expr);
   void rewrite_quantifiers(exprt &expr, statet &state);
+
+  //heap theory
+  virtual bool is_heap_type(typet type) { return false; }
+
 };
 
 #endif

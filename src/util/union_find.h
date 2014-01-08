@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 #include <vector>
+#include <map>
 
 #include "numbering.h"
 
@@ -140,7 +141,13 @@ public:
 
   inline const T &find(const T &a)
   {
-    return find(number(a));
+    unsigned n = find_number(number(a));
+
+    if (reverse_number.find(n) == reverse_number.end()) {
+      reverse_number[n] = a;
+    }
+
+    return reverse_number[n];
   }
   
   inline unsigned find_number(unsigned a) const
@@ -184,6 +191,7 @@ public:
 protected:
   unsigned_union_find uuf;
   typedef numbering<T> subt;
+  std::map<unsigned, T> reverse_number;
 };
 
 #endif

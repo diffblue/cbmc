@@ -156,3 +156,23 @@ void symex_bmct::no_body(const irep_idt &identifier)
       "**** WARNING: no body for function " << identifier << eom;
   }
 }
+
+/*******************************************************************\
+
+Function: symex_bmct::is_heap_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: returns true if the type is to be handled by the heap theory
+
+\*******************************************************************/
+
+
+bool symex_bmct::is_heap_type(typet type) {
+  if(options.get_bool_option("use-heap-theory")) return false;
+
+  //TODO: implement more reasonable criterion or let the user specify, etc
+  return type.id()==ID_pointer && to_pointer_type(type).subtype().id()==ID_struct;
+}

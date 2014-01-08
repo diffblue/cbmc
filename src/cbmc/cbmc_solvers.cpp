@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <solvers/smt1/smt1_dec.h>
 #include <solvers/smt2/smt2_dec.h>
 #include <solvers/cvc/cvc_dec.h>
+#include <solvers/heap/heap_dec.h>
 
 #include <solvers/prop/aig_prop.h>
 
@@ -396,7 +397,6 @@ void bmct::smt2_convert(
 
   if(options.get_bool_option("fpa"))
     smt2_conv.use_FPA_theory=true;
-
   smt2_conv.set_message_handler(get_message_handler());
   
   do_conversion(smt2_conv);
@@ -510,4 +510,22 @@ Function: bmct::decide_yices
 bool bmct::decide_yices()
 {
   return decide_smt1(smt1_dect::YICES);
+}
+
+/*******************************************************************\
+
+Function: bmct::decide_heap
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool bmct::decide_heap()
+{
+  heap_dect heap_dec(ns);
+  return decide(heap_dec);
 }

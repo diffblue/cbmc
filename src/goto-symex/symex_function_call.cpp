@@ -7,6 +7,7 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <cassert>
+#include <iostream>
 
 #include <util/expr_util.h>
 #include <util/i2string.h>
@@ -253,6 +254,94 @@ void goto_symext::symex_function_call_code(
 {
   const irep_idt &identifier=
     to_symbol_expr(call.function()).get_identifier();
+
+  std::cout << "symex_function_call: " << identifier << std::endl;  
+    
+  // symex special functions
+  /*  if(identifier=="c::malloc") {
+    if(call.arguments().size()!=1) throw "malloc expected to have one operand";
+    if(call.lhs().is_nil()) return; // ignore
+
+    //get objecttype from sizeof
+    struct_typet struct_type = 
+      to_struct_type(ns.follow(c_sizeof_type_rec(call.arguments()[0])));  
+    pointer_typet type = pointer_typet(struct_type);
+    //    std::cout << "pointer type: " << type << std::endl;  
+
+    if(is_heap_type(type)) {
+      exprt lhs = call.lhs();
+      lhs.type() = type; // set to mallocked type
+      state.rename(lhs, ns, goto_symex_statet::L2);
+      symbol_exprt lhs_symbol = to_symbol_expr(lhs);
+      target.heap_objects.insert(lhs_symbol.get_identifier());
+
+      irep_idt old_heap_id = make_heap_id(struct_type.get_tag());
+      heap_counter++; //new heap
+      target.heap_malloc(state.guard.as_expr(), lhs_symbol, 
+        old_heap_id, make_heap_id(struct_type.get_tag()), state.source); 
+
+      state.source.pc++;
+      return;
+    }
+  }
+  if(identifier=="c::free") {
+    if(call.arguments().size()!=1) throw "free expected one operand";
+
+    exprt arg = call.arguments()[0].op0(); //remove (void*)  typecast
+
+    struct_typet struct_type = to_struct_type(ns.follow(arg.type().subtype()));
+    pointer_typet type = pointer_typet(struct_type);
+    //    std::cout << "pointer type: " << type << std::endl;  
+
+    if(is_heap_type(type)) {
+      state.rename(arg, ns, goto_symex_statet::L2);
+
+      irep_idt old_heap_id = make_heap_id(struct_type.get_tag());
+      heap_counter++; //new heap
+      target.heap_free(state.guard.as_expr(), arg, 
+        old_heap_id, make_heap_id(struct_type.get_tag()), state.source); 
+
+      state.source.pc++;
+      return;
+    }
+  }
+  if(identifier=="c::__CPROVER_HEAP_dangling" ||
+     identifier=="c::__CPROVER_HEAP_disjoint" ||
+     identifier=="c::__CPROVER_HEAP_onpath" ||
+     identifier=="c::__CPROVER_HEAP_path") {
+
+    //check number of arguments
+    if(identifier=="c::__CPROVER_HEAP_dangling" && call.arguments().size()!=1) 
+      throw id2string(identifier)+" expected one operand";
+    if(identifier=="c::__CPROVER_HEAP_disjoint" && call.arguments().size()!=2) 
+      throw id2string(identifier)+" expected one operand";
+    if((identifier=="c::__CPROVER_HEAP_path") && call.arguments().size()!=2) 
+      throw id2string(identifier)+" expected three operands";
+    if((identifier=="c::__CPROVER_HEAP_onpath") && call.arguments().size()!=3) 
+      throw id2string(identifier)+" expected four operands";
+
+    exprt lhs = call.lhs();
+    function_application_exprt rhs = function_application_exprt();
+    rhs.function() = call.function();
+    rhs.arguments() = call.arguments(); 
+    //remove (void*)  typecasts
+    for(function_application_exprt::argumentst::iterator it = rhs.arguments().begin();
+	it != rhs.arguments().end(); it++) {
+      *it = it->op0();
+      replace_heap_member(*it,false);
+    }
+    code_assignt assignment(lhs, rhs);
+    symex_assign(state, assignment); 
+ 
+    state.source.pc++;
+    return;
+    }*/
+  if(identifier=="c::__CPROVER_initialize") {
+    //ignore 
+
+    state.source.pc++;
+    return;
+  }
   
   // find code in function map
   

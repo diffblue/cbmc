@@ -86,6 +86,7 @@ protected:
   virtual void smt2_convert(smt2_dect::solvert solver, std::ostream &out);
   virtual bool write_dimacs();
   virtual bool write_dimacs(std::ostream &out);
+  virtual bool decide_heap();
   
   // unwinding
   virtual void setup_unwind();

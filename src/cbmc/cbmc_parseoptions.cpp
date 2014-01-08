@@ -168,6 +168,9 @@ void cbmc_parseoptionst::get_command_line_options(optionst &options)
   if(cmdline.isset("unwindset"))
     options.set_option("unwindset", cmdline.getval("unwindset"));
 
+  if(cmdline.isset("heap"))
+    options.set_option("use-heap-theory", true);
+
   // constant propagation
   if(cmdline.isset("no-propagation"))
     options.set_option("propagation", false);
@@ -888,6 +891,7 @@ void cbmc_parseoptionst::help()
     " --outfile filename           output formula to given file\n"
     " --arrays-uf-never            never turn arrays into uninterpreted functions\n"
     " --arrays-uf-always           always turn arrays into uninterpreted functions\n"
+    " --heap                       encoding for heap properties (experimental)\n"
     "\n"
     "Other options:\n"
     " --version                    show version and exit\n"

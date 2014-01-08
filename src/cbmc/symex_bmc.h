@@ -65,6 +65,10 @@ protected:
   virtual void no_body(const irep_idt &identifier);
   
   hash_set_cont<irep_idt, irep_id_hash> body_warnings;
+
+  //heap theory
+  virtual bool is_heap_type(typet type);
+
 };
 
 #endif
