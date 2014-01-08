@@ -29,9 +29,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class path_symext
 {
 public:
-  explicit path_symext(
-    const namespacet &_ns):
-    ns(_ns)
+  path_symext()
   {
   }
   
@@ -39,9 +37,11 @@ public:
     path_symex_statet &state,
     std::list<path_symex_statet> &furter_states);
 
-protected:
-  const namespacet &ns;
+  void do_goto(
+    path_symex_statet &state,
+    bool taken);
 
+protected:
   void do_goto(
     path_symex_statet &state,
     std::list<path_symex_statet> &further_states);
@@ -234,7 +234,7 @@ void path_symext::symex_malloc(
       if(tmp_type.is_not_nil())
       {
         // Did the size get multiplied?
-        mp_integer elem_size=pointer_offset_size(ns, tmp_type);
+        mp_integer elem_size=pointer_offset_size(state.var_map.ns, tmp_type);
         mp_integer alloc_size;
         if(elem_size<0 || to_integer(tmp_size, alloc_size))
         {
@@ -345,7 +345,7 @@ void path_symext::assign_rec(
   const std::string &suffix,
   const exprt &full_lhs) 
 {
-  const typet &full_lhs_type=ns.follow(full_lhs.type());
+  const typet &full_lhs_type=state.var_map.ns.follow(full_lhs.type());
   
   #ifdef DEBUG
   std::cout << "assign_rec: " << lhs.pretty() << std::endl;
@@ -372,7 +372,7 @@ void path_symext::assign_rec(
       
       // struct constructor on rhs?
       if(rhs.id()==ID_struct)
-        new_rhs=simplify_expr(new_rhs, ns);
+        new_rhs=simplify_expr(new_rhs, state.var_map.ns);
       
       // recursive call
       assign_rec(state, guard, new_lhs, new_rhs, suffix, new_full_lhs);
@@ -401,7 +401,7 @@ void path_symext::assign_rec(
         
         // array constructor on rhs?
         if(rhs.id()==ID_array)
-          new_rhs=simplify_expr(new_rhs, ns);
+          new_rhs=simplify_expr(new_rhs, state.var_map.ns);
         
         // recursive call
         assign_rec(state, guard, new_lhs, new_rhs, suffix, new_full_lhs);
@@ -436,7 +436,7 @@ void path_symext::assign_rec(
       
       // vector constructor on rhs?
       if(rhs.id()==ID_vector)
-        new_rhs=simplify_expr(new_rhs, ns);
+        new_rhs=simplify_expr(new_rhs, state.var_map.ns);
       
       // recursive call
       assign_rec(state, guard, new_lhs, new_rhs, suffix, new_full_lhs);
@@ -503,7 +503,7 @@ void path_symext::assign_rec(
     else
     {
       // consistency check
-      if(!base_type_eq(ssa_rhs.type(), ssa_lhs.type(), ns))
+      if(!base_type_eq(ssa_rhs.type(), ssa_lhs.type(), state.var_map.ns))
       {
         #ifdef DEBUG
         std::cout << "ssa_rhs: " << ssa_rhs.pretty() << std::endl;
@@ -575,7 +575,7 @@ void path_symext::assign_rec(
 
     const exprt &lhs_array=lhs_index_expr.array();
     const exprt &lhs_index=lhs_index_expr.index();
-    const typet &lhs_type=ns.follow(lhs_array.type());
+    const typet &lhs_type=state.var_map.ns.follow(lhs_array.type());
 
     if(lhs_type.id()!=ID_array && lhs_type.id()!=ID_vector)
       throw "index must take array or vector type operand, but got `"+
@@ -851,6 +851,8 @@ void path_symext::do_goto(
   path_symex_statet &state,
   std::list<path_symex_statet> &further_states)
 {
+  state.record_step();
+
   const goto_programt::instructiont &instruction=
     *state.get_instruction();
 
@@ -861,34 +863,75 @@ void path_symext::do_goto(
   }
 
   const loct &loc=state.locs[state.pc()];
+  assert(!loc.branch_target.is_nil());
 
   exprt guard=state.read(instruction.guard);
   
-  if(guard.is_true() && loc.targets.size()==1)
+  if(guard.is_true())
   {
-    state.set_pc(loc.targets.front());
+    state.set_pc(loc.branch_target);
     return; // we are done
   }
 
   if(!guard.is_false())
   {
     // branch taken case
-    for(loct::targetst::const_iterator
-        t_it=loc.targets.begin();
-        t_it!=loc.targets.end();
-        t_it++)
-    {
-      // copy the state into 'furhter_states'
-      further_states.push_back(state);
-      further_states.back().set_pc(*t_it);
-      further_states.back().history.steps.back().guard=guard;
-    }
+    // copy the state into 'furhter_states'
+    further_states.push_back(state);
+    further_states.back().set_pc(loc.branch_target);
+    further_states.back().history.steps.back().guard=guard;
   }
 
   // branch not taken case
-  exprt negated_guard=simplify_expr(not_exprt(guard), ns);
+  exprt negated_guard=not_exprt(guard);
   state.next_pc();
   state.history.steps.back().guard=negated_guard;
+}
+
+/*******************************************************************\
+
+Function: path_symext::do_goto
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void path_symext::do_goto(
+  path_symex_statet &state,
+  bool taken)
+{
+  state.record_step();
+
+  const goto_programt::instructiont &instruction=
+    *state.get_instruction();
+
+  if(instruction.is_backwards_goto())
+  {
+    // we keep a statistic on how many times we execute backwards gotos
+    state.unwinding_map[state.pc()]++;
+  }
+
+  exprt guard=state.read(instruction.guard);
+  
+  if(taken)
+  {
+    // branch taken case
+    const loct &loc=state.locs[state.pc()];
+    assert(!loc.branch_target.is_nil());
+    state.set_pc(loc.branch_target);
+    state.history.steps.back().guard=guard;
+  }
+  else
+  {
+    // branch not taken case
+    exprt negated_guard=not_exprt(guard);
+    state.next_pc();
+    state.history.steps.back().guard=negated_guard;
+  }
 }
 
 /*******************************************************************\
@@ -936,7 +979,7 @@ void path_symext::operator()(
   case START_THREAD:
     {
       const loct &loc=state.locs[state.pc()];
-      assert(loc.targets.size()==1);
+      assert(!loc.branch_target.is_nil());
       
       state.record_step();
       state.next_pc();
@@ -944,7 +987,7 @@ void path_symext::operator()(
       // ordering of the following matters due to vector instability
       path_symex_statet::threadt &new_thread=state.add_thread();
       path_symex_statet::threadt &old_thread=state.threads[state.get_current_thread()];
-      new_thread.pc=loc.targets.front();
+      new_thread.pc=loc.branch_target;
       new_thread.local_vars=old_thread.local_vars;
     }
     break;
@@ -955,7 +998,6 @@ void path_symext::operator()(
     break;
     
   case GOTO:
-    state.record_step();
     do_goto(state, further_states);
     break;
     
@@ -1072,10 +1114,29 @@ Function: path_symex
 
 void path_symex(
   path_symex_statet &state,
-  std::list<path_symex_statet> &further_states,
-  const namespacet &ns)
+  std::list<path_symex_statet> &further_states)
 {
-  path_symext path_symex(ns);  
+  path_symext path_symex;
   path_symex(state, further_states);
+}
+
+/*******************************************************************\
+
+Function: path_symex_goto
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void path_symex_goto(
+  path_symex_statet &state,
+  bool taken)
+{
+  path_symext path_symex;
+  path_symex.do_goto(state, taken);
 }
 

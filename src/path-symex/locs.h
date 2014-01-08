@@ -28,8 +28,8 @@ public:
   goto_programt::const_targett target;
   irep_idt function;
   
-  typedef std::vector<loc_reft> targetst;
-  targetst targets;
+  // we only support a single branch target
+  loc_reft branch_target;
 };
 
 class locst
