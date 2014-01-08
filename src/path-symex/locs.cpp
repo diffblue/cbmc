@@ -74,19 +74,18 @@ void locst::build(const goto_functionst &goto_functions)
   
   entry_loc=function_map[ID_main].first_loc;
     
-  // build targets
+  // build branch targets
   for(unsigned l=0; l<loc_vector.size(); l++)
   {
     const goto_programt::instructiont &i=*loc_vector[l].target;
 
-    loc_vector[l].targets.reserve(i.targets.size());
-  
-    for(goto_programt::instructiont::targetst::const_iterator
-        t_it=i.targets.begin();
-        t_it!=i.targets.end();
-        t_it++)
+    if(i.targets.empty())
     {
-      const target_mapt::const_iterator m_it=target_map.find(*t_it);
+    }
+    else if(i.targets.size()==1)
+    {
+      const target_mapt::const_iterator m_it=target_map.find(i.get_target());
+
       if(m_it==target_map.end())
         throw "locst::build: jump target not found";
 
@@ -95,8 +94,10 @@ void locst::build(const goto_functionst &goto_functions)
       if(target.loc_number>=loc_vector.size())
         throw "locst::build: illegal jump target";
 
-      loc_vector[l].targets.push_back(target);
+      loc_vector[l].branch_target=target;
     }
+    else
+      throw "locst does not support more than one branch target";
   }
 }
 
@@ -130,16 +131,8 @@ void locst::output(std::ostream &out) const
 //        << loc.target->location
         << " " << as_string(ns, *loc.target) << "\n";
               
-    if(!loc.targets.empty())
-    {
-      out << "    T:";
-      for(loct::targetst::const_iterator
-          t_it=loc.targets.begin();
-          t_it!=loc.targets.end();
-          t_it++)
-        out << " " << *t_it;
-      out << "\n";
-    }
+    if(!loc.branch_target.is_nil())
+      out << "    T: " << loc.branch_target << "\n";
   }
   
   out << "\n";

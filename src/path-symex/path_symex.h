@@ -19,7 +19,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 void path_symex(
   path_symex_statet &state,
-  std::list<path_symex_statet> &further_states,
-  const namespacet &ns);
+  std::list<path_symex_statet> &further_states);
+
+// Transforms a state by executing a goto statement;
+// the 'taken' argument indicates which way.
+void path_symex_goto(
+  path_symex_statet &state,
+  bool taken);
 
 #endif
