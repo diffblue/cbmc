@@ -56,12 +56,12 @@ void locst::build(const goto_functionst &goto_functions)
 
     if(goto_function.body_available)
     {
-      const loc_reft entry_loc=next_free_loc();
+      const loc_reft entry_loc=end();
       function_entry.first_loc=entry_loc;
 
       forall_goto_program_instructions(i_it, goto_function.body)
       {
-        target_map[i_it]=next_free_loc();
+        target_map[i_it]=end();
         loc_vector.push_back(loct(i_it, f_it->first));
       }
     }
