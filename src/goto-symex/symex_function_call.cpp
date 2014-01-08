@@ -305,6 +305,7 @@ void goto_symext::symex_function_call_code(
       return;
     }
   }
+  */
   if(identifier=="c::__CPROVER_HEAP_dangling" ||
      identifier=="c::__CPROVER_HEAP_disjoint" ||
      identifier=="c::__CPROVER_HEAP_onpath" ||
@@ -328,14 +329,14 @@ void goto_symext::symex_function_call_code(
     for(function_application_exprt::argumentst::iterator it = rhs.arguments().begin();
 	it != rhs.arguments().end(); it++) {
       *it = it->op0();
-      replace_heap_member(*it,false);
+      //replace_heap_member(*it,false); //TODO
     }
     code_assignt assignment(lhs, rhs);
     symex_assign(state, assignment); 
  
     state.source.pc++;
     return;
-    }*/
+  }
   if(identifier=="c::__CPROVER_initialize") {
     //ignore 
 

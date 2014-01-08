@@ -167,6 +167,8 @@ protected:
   formulat formula;
   typedef std::map<literalt,exprt> literal_mapt;
   literal_mapt literal_map;
+  typedef std::map<unsigned,heaplit*> heap_literal_mapt;
+  heap_literal_mapt heap_literal_map;
 
 };
 

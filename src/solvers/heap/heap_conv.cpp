@@ -3480,10 +3480,9 @@ void heap_convt::find_symbols(const exprt &expr)
 
     if(id.type.is_nil())
     {
-      std::cout << "NOT IMPLEMENTED: nil type" << std::endl;
-      /*
       id.type=expr.type();
       
+      /*
       std::string heap_identifier=convert_identifier(identifier);
       heap_identifiers.insert(heap_identifier);
 

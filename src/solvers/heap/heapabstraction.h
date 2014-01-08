@@ -473,6 +473,35 @@ public :
   /*   return gamma; */
   /* } */
 
+  bool entails_literal(const heaplitp& hl) {
+    debugc("[entails_literal]: hl = " << hl, 0);
+    /* heaplitp hl = e->lit; */
+
+    switch(hl->type) {
+    case EQ:
+      if(hl->state == stateTrue)
+	return entails_eq(hl->x, hl->rhs);
+      return entails_not_eq(hl->x, hl->rhs);
+    case PATH:
+      if(hl->state == stateTrue)
+	return entails_path(hl->m, hl->x, hl->y, hl->f);
+      return entails_not_path(hl->m, hl->x, hl->y, hl->f);
+    case ONPATH:
+      /* if(hl->state == stateTrue) */
+      /* 	return entails_onpath(hl->m, hl->x, hl->y, hl->z, hl->f); */
+      /* return entails_not_onpath(hl->m, hl->x, hl->y, hl->z, hl->f); */
+      break;
+    case DANGLING:
+      if(hl->state == stateTrue)
+	return entails_dangling(hl->m, hl->x);
+      return entails_not_dangling(hl->m, hl->x);
+    default:
+      debugc("[entails_literal] : hl = " << hl, 0);
+      assert (1 == 0);
+      return false;
+    }
+  } 
+
  protected:
 
   void setTop() {
@@ -622,33 +651,8 @@ public :
   } 
 
   bool entails_literal(const meetIrreduciblep& e) {
-    debugc("[entails_literal]: e = " << e, 0);
-    heaplitp hl = e->lit;
-
-    switch(hl->type) {
-    case EQ:
-      if(hl->state == stateTrue)
-	return entails_eq(hl->x, hl->rhs);
-      return entails_not_eq(hl->x, hl->rhs);
-    case PATH:
-      if(hl->state == stateTrue)
-	return entails_path(hl->m, hl->x, hl->y, hl->f);
-      return entails_not_path(hl->m, hl->x, hl->y, hl->f);
-    case ONPATH:
-      /* if(hl->state == stateTrue) */
-      /* 	return entails_onpath(hl->m, hl->x, hl->y, hl->z, hl->f); */
-      /* return entails_not_onpath(hl->m, hl->x, hl->y, hl->z, hl->f); */
-      break;
-    case DANGLING:
-      if(hl->state == stateTrue)
-	return entails_dangling(hl->m, hl->x);
-      return entails_not_dangling(hl->m, hl->x);
-    default:
-      debugc("[entails_literal] : hl = " << hl, 0);
-      assert (1 == 0);
-      return false;
-    }
-  } 
+    return entails_literal(e->lit);
+  }
 
   entailResult::s entails(clauset* f, hintt* h) {
     meetIrreduciblep m;

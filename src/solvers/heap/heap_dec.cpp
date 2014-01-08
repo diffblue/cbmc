@@ -74,9 +74,9 @@ decision_proceduret::resultt heap_dect::dec_solve()
 
   if(ret==transformerRefinementResult::NotBottom)
   {
-    /*    boolean_assignment.clear();
+    boolean_assignment.clear();
     boolean_assignment.resize(no_boolean_variables, false);
-
+/*    
     typedef hash_map_cont<std::string, std::string, string_hash> valuest;
     valuest values;
 
@@ -87,7 +87,7 @@ decision_proceduret::resultt heap_dect::dec_solve()
         values[std::string(line, 0, pos)]=
           std::string(line, pos+1, std::string::npos);
     }
-
+*/
     // Theory variables
 
     for(identifier_mapt::iterator
@@ -96,20 +96,29 @@ decision_proceduret::resultt heap_dect::dec_solve()
         it++)
     {
       it->second.value.make_nil();
-      std::string conv_id=convert_identifier(it->first);
-      std::string value=values[conv_id];
-      if(value=="") continue;
-      set_value(it->second, value);
+      std::string id = convert_identifier(it->first);
+      heapvar v(id);
+      heaplit* l = new eq_lit(v,heapexpr(std::string("NULL")),stateTrue);
+      if(sol.entails_literal(l)) {
+        std::cout << "have " << id << "==NULL" << std::endl;
+	std::cout << "type: " << ns.follow(it->second.type) << std::endl;
+        pointer_typet type = to_pointer_type(ns.follow(it->second.type));
+        it->second.value = null_pointer_exprt(type);
+      }
+      else
+        std::cout << "do not have " << id << "==NULL" << std::endl;
     }
 
     // Booleans
-
+   
     for(unsigned v=0; v<no_boolean_variables; v++)
     {
-      std::string value=values["B"+i2string(v)];
-      if(value=="") continue;
-      boolean_assignment[v]=(value=="1");
-      } */
+      if(heap_literal_map.find(v)==heap_literal_map.end()) continue;
+      heaplit* l = heap_literal_map[v];
+      bool value = !(l->state==stateTrue);
+      if(sol.entails_literal(l)) value = true;
+      boolean_assignment[v] = value;
+    }
 
     return D_SATISFIABLE;
   }
