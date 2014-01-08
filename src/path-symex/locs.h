@@ -92,7 +92,7 @@ public:
       map[locs[it].target]=it;
   }
   
-  inline loc_reft operator[](const goto_programt::const_targett t)
+  inline loc_reft operator[](const goto_programt::const_targett t) const
   {
     mapt::const_iterator it=map.find(t);
     assert(it!=map.end());
