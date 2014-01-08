@@ -37,6 +37,8 @@ public:
     path_symex_statet &state,
     std::list<path_symex_statet> &furter_states);
 
+  void operator()(path_symex_statet &state);
+
   void do_goto(
     path_symex_statet &state,
     bool taken);
@@ -1113,6 +1115,26 @@ void path_symext::operator()(
 
 /*******************************************************************\
 
+Function: path_symext::operator()
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void path_symext::operator()(path_symex_statet &state)
+{
+  std::list<path_symex_statet> further_states;
+  operator()(state, further_states);
+  if(!further_states.empty())
+    throw "path_symext got unexpected further states";
+}
+
+/*******************************************************************\
+
 Function: path_symex
 
   Inputs:
@@ -1129,6 +1151,24 @@ void path_symex(
 {
   path_symext path_symex;
   path_symex(state, further_states);
+}
+
+/*******************************************************************\
+
+Function: path_symex
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void path_symex(path_symex_statet &state)
+{
+  path_symext path_symex;
+  path_symex(state);
 }
 
 /*******************************************************************\
