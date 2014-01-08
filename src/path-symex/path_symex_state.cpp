@@ -573,6 +573,9 @@ bool path_symex_statet::check_assertion(
 
   // the assertion in SSA
   exprt assertion=read(instruction.guard);
+  
+  // trivial?
+  if(assertion.is_true()) return true; // no error
 
   // the path constraint
   decision_procedure << history;
