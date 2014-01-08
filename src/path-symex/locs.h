@@ -58,8 +58,9 @@ public:
     assert(l.loc_number>=0 && l.loc_number < loc_vector.size());
     return loc_vector[l.loc_number];
   }
-  
-  inline loc_reft last_loc() const
+
+protected:  
+  inline loc_reft next_free_loc() const
   {
     loc_reft tmp;
     tmp.loc_number=loc_vector.size();
