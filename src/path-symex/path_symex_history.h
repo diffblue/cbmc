@@ -24,13 +24,13 @@ public:
   exprt full_lhs;
   symbol_exprt ssa_lhs;
 
-  bool ignore; 
+  bool hidden; 
   
   path_symex_stept():
     guard(nil_exprt()),
     ssa_rhs(nil_exprt()),
     full_lhs(nil_exprt()),
-    ignore(false)
+    hidden(false)
   {
   }
   
