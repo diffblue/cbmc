@@ -178,6 +178,8 @@ public:
   
   bool is_feasible(class decision_proceduret &) const;
 
+  bool check_assertion(class decision_proceduret &);
+
   // counts how many times we have executed backwards edges
   typedef std::map<loc_reft, unsigned> unwinding_mapt;
   unwinding_mapt unwinding_map;
