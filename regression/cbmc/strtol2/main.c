@@ -11,11 +11,11 @@ int main()
 
     errno=0;
     assert(strtol(a[0], 0, 16)==LONG_MAX);
-    assert(errno=ERANGE);
+    assert(errno==ERANGE);
 
     errno=0;
     assert(strtol(a[1], 0, 16)==LONG_MIN);
-    assert(errno=ERANGE);
+    assert(errno==ERANGE);
   }
 
   return 0;
