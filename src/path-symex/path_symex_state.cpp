@@ -531,7 +531,8 @@ Function: path_symex_statet::is_feasible
 
 \*******************************************************************/
 
-bool path_symex_statet::is_feasible(decision_proceduret &decision_procedure) const
+bool path_symex_statet::is_feasible(
+  decision_proceduret &decision_procedure) const
 {
   // feed path constraint to decision procedure
   decision_procedure << history;
@@ -549,3 +550,50 @@ bool path_symex_statet::is_feasible(decision_proceduret &decision_procedure) con
   
   return true; // not really reachable
 }
+
+/*******************************************************************\
+
+Function: path_symex_statet::check_assertion
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool path_symex_statet::check_assertion(
+  decision_proceduret &decision_procedure)
+{
+  const goto_programt::instructiont &instruction=*get_instruction();
+
+  // assert that this is an assertion
+  assert(instruction.is_assert());
+
+  // the assertion in SSA
+  exprt assertion=read(instruction.guard);
+
+  // the path constraint
+  decision_procedure << history;
+
+  // negate the assertion
+  decision_procedure.set_to(assertion, false);
+
+  // check whether SAT  
+  switch(decision_procedure.dec_solve())
+  {
+  case decision_proceduret::D_TAUTOLOGY:
+  case decision_proceduret::D_SATISFIABLE:
+    return false; // error
+   
+  case decision_proceduret::D_UNSATISFIABLE:
+    return true; // no error
+  
+  default:
+    throw "error from decision procedure";
+  }
+
+  return true; // not really reachable
+}
+
