@@ -3322,12 +3322,31 @@ void heap_convt::set_to(const exprt &expr, bool value)
 
   assert(expr.type().id()==ID_bool);
   
-  if(expr.id()==ID_equal)
+  if(expr.id()==ID_symbol) //boolean symbol
+  {      
+    find_symbols(expr);
+    const irep_idt &identifier=to_symbol_expr(expr).get_identifier();
+    literalt& l = symbols[identifier];
+    heaplit* hl = heap_literal_map[l.var_no()];
+
+    if(!value) hl->complement();
+   
+    clauset* clause = new clauset(); 
+    clause->push_back(hl);
+    std::cout << "adding clause " << clause << std::endl;
+    formula.push_back(clause);
+
+    return; // done 
+  }
+  
+  if(expr.id()==ID_equal) //equality
   {
     const equal_exprt &equal_expr=to_equal_expr(expr);
 
-    if(equal_expr.lhs().id()==ID_symbol || equal_expr.lhs().id()==ID_constant ||
-      equal_expr.rhs().id()==ID_symbol || equal_expr.rhs().id()==ID_constant)
+    if(equal_expr.lhs().id()==ID_symbol && equal_expr.rhs().id()==ID_constant ||
+      equal_expr.lhs().id()==ID_constant && equal_expr.rhs().id()==ID_symbol ||
+      equal_expr.lhs().id()==ID_symbol && equal_expr.rhs().id()==ID_symbol ||
+      equal_expr.lhs().id()==ID_constant && equal_expr.rhs().id()==ID_constant)
     {
       std::string idl, idr;
       if(equal_expr.lhs().id()==ID_symbol) 
@@ -3354,22 +3373,53 @@ void heap_convt::set_to(const exprt &expr, bool value)
         const irep_idt &value=to_constant_expr(equal_expr.rhs()).get_value();
         idr = id2string(value);
       }
+      
+      clauset* clause = new clauset(); 
+      heaplit* hl;
    
       if(value) {
-        std::cout << "EQ literal (" << idl << " == " << idr << ")" << std::endl;
-        clauset* clause = new clauset(); 
-        clause->push_back(new eq_lit(heapvar(idl),heapexpr(idr),stateTrue));
-        formula.push_back(clause);
+        std::cout << "create EQ literal (" << idl << " == " << idr << ")" << std::endl;
+        hl = new eq_lit(heapvar(idl),heapexpr(idr),stateTrue);
       }
       else {
-        std::cout << "EQ literal -(" << idl << " == " << idr << ")" << std::endl;
-        clauset* clause = new clauset(); 
-        clause->push_back(new eq_lit(heapvar(idl),heapexpr(idr),stateFalse));
-        formula.push_back(clause);
+        std::cout << "create EQ literal -(" << idl << " == " << idr << ")" << std::endl;
+        hl = new eq_lit(heapvar(idl),heapexpr(idr),stateFalse);
       }
+      clause->push_back(hl);
+      std::cout << "adding clause " << clause << std::endl;
+      formula.push_back(clause);
 
       return; // done
     }
+
+    if(equal_expr.lhs().id()==ID_symbol && equal_expr.rhs().id()==ID_function_application) 
+    {
+      function_application_exprt f = to_function_application_expr(equal_expr.rhs());
+      if(to_symbol_expr(f.function()).get_identifier()=="c::__CPROVER_HEAP_dangling") 
+      {
+        find_symbols(equal_expr.lhs());
+        const irep_idt &identifier=to_symbol_expr(equal_expr.lhs()).get_identifier();
+	std::string op1 = convert_identifier(to_symbol_expr(f.arguments()[0]).get_identifier());
+	std::string op2 = "heapdummy"; //convert_identifier(to_symbol_expr(f.arguments()[1]).get_identifier()); //TODO
+
+        heaplit* hl;
+        if(value) {
+          std::cout << "create DANGLING literal (" << op1 << "," << op2 << ")" << std::endl;
+          hl = new dangling_lit(heapvar(op1),heapvar(op2),stateTrue);
+	}
+        else {
+          std::cout << "create DANGLING literal -(" << op1 << "," << op2 << ")" << std::endl;
+          hl = new dangling_lit(heapvar(op1),heapvar(op2),stateFalse);
+	}
+        
+        heap_literal_map.insert(heap_literal_mapt::value_type(no_boolean_variables,hl));
+	symbols.insert(symbolst::value_type(identifier,literalt(no_boolean_variables,true)));
+        no_boolean_variables++;
+        
+        return; // done
+      }
+    }
+
   }
 
   std::cout << expr << std::endl;

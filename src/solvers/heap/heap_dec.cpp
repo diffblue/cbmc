@@ -95,18 +95,41 @@ decision_proceduret::resultt heap_dect::dec_solve()
         it!=identifier_map.end();
         it++)
     {
-      it->second.value.make_nil();
-      std::string id = convert_identifier(it->first);
-      heapvar v(id);
-      heaplit* l = new eq_lit(v,heapexpr(std::string("NULL")),stateTrue);
-      if(sol.entails_literal(l)) {
-        std::cout << "have " << id << "==NULL" << std::endl;
-	std::cout << "type: " << ns.follow(it->second.type) << std::endl;
-        pointer_typet type = to_pointer_type(ns.follow(it->second.type));
-        it->second.value = null_pointer_exprt(type);
+      if(it->second.type.id()==ID_pointer) 
+      {
+        it->second.value.make_nil();
+        std::string id = convert_identifier(it->first);
+        heapvar v(id);
+        heaplit* l = new eq_lit(v,heapexpr(std::string("NULL")),stateTrue);
+        if(sol.entails_literal(l)) {
+          std::cout << "have " << id << "==NULL" << std::endl;
+  	  std::cout << "type: " << ns.follow(it->second.type) << std::endl;
+          pointer_typet type = to_pointer_type(ns.follow(it->second.type));
+          it->second.value = null_pointer_exprt(type);
+        }
+        else
+          std::cout << "do not have " << id << "==NULL" << std::endl;
       }
-      else
-        std::cout << "do not have " << id << "==NULL" << std::endl;
+      if(it->second.type.id()==ID_bool) 
+      {
+        it->second.value.make_nil();
+        literalt& l = symbols[it->first];
+        if(heap_literal_map.find(l.var_no())==heap_literal_map.end()) continue;
+        heaplit* hl = heap_literal_map[l.var_no()];
+        if(sol.entails_literal(hl)) {
+          std::cout << "have " << it->first << "==" << (hl->state==stateTrue) << std::endl;
+          if(hl->state==stateTrue) it->second.value = true_exprt(); 
+          else it->second.value =  false_exprt();
+        }
+        else {
+          hl->complement();
+          if(sol.entails_literal(hl)) {
+            std::cout << "have " << it->first << "==" << (hl->state==stateTrue) << std::endl;
+          if(hl->state==stateTrue) it->second.value = true_exprt(); 
+          else it->second.value =  false_exprt();
+	  }
+        }
+      }
     }
 
     // Booleans
