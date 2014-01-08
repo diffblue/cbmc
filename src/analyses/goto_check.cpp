@@ -835,7 +835,7 @@ void goto_checkt::pointer_validity_check(
   
   std::set<exprt> alias_set=local_may_alias->get(t, pointer);
 
-  bool may_use_offset=local_may_alias->may_use_offset(t, pointer);
+  //bool may_use_offset=local_may_alias->may_use_offset(t, pointer);
   bool aliases_unknown=alias_set.find(exprt(ID_unknown))!=alias_set.end();
   bool aliases_dynamic_object=alias_set.find(exprt(ID_dynamic_object))!=alias_set.end();
   bool aliases_null_object=alias_set.find(exprt(ID_null_object))!=alias_set.end();
