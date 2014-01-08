@@ -891,7 +891,7 @@ void goto_checkt::pointer_validity_check(
       expr,
       guard);
 
-  if(enable_bounds_check && may_use_offset)
+  if(enable_bounds_check)
   {
     if(aliases_unknown || aliases_dynamic_object)
     {
@@ -909,7 +909,7 @@ void goto_checkt::pointer_validity_check(
     }
   }
 
-  if(enable_bounds_check && may_use_offset)
+  if(enable_bounds_check)
   {
     if(aliases_unknown || aliases_other_object)
     {
