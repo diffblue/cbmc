@@ -14,12 +14,16 @@ Author: Daniel Kroening, kroening@kroening.com
 
 // Transform a state by executing a single statement.
 // May occasionally yield more than one successor state
-// (e.g., branches, the trinary operator, etc),
+// (branches, function calls with trinary operator),
 // which are put into "further_states".
 
 void path_symex(
   path_symex_statet &state,
   std::list<path_symex_statet> &further_states);
+
+// Transform a state by executing a single statement.
+// Will fail if there is more than one successor state.
+void path_symex(path_symex_statet &state);
 
 // Transforms a state by executing a goto statement;
 // the 'taken' argument indicates which way.
