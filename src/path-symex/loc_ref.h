@@ -28,18 +28,35 @@ public:
     loc_number++;
   }
   
+  inline void decrease()
+  {
+    loc_number--;
+  }
+  
   inline bool is_nil() const
   {
     return loc_number==nil().loc_number;
   }
 
-  loc_reft():loc_number(-1)
+  loc_reft():loc_number(-1) // ugly conversion
   {
   }  
   
   static inline loc_reft nil()
   {
     return loc_reft();
+  }
+  
+  inline loc_reft &operator++() // this is pre-increment
+  {
+    increase();
+    return *this;
+  }
+
+  inline loc_reft &operator--() // this is pre-decrement
+  {
+    decrease();
+    return *this;
   }
 };
 

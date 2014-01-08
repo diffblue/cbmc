@@ -64,17 +64,44 @@ public:
     assert(l.loc_number>=0 && l.loc_number < loc_vector.size());
     return loc_vector[l.loc_number];
   }
+  
+  static inline loc_reft begin()
+  {
+    loc_reft tmp;
+    tmp.loc_number=0;
+    return tmp;
+  }
 
-protected:  
-  inline loc_reft next_free_loc() const
+  inline loc_reft end() const
   {
     loc_reft tmp;
     tmp.loc_number=loc_vector.size();
     return tmp;
   }
-  
+
 protected:
   const namespacet &ns;
+};
+
+class target_to_loc_mapt
+{
+public:
+  explicit target_to_loc_mapt(const locst &locs)
+  {
+    for(loc_reft it=locs.begin(); it!=locs.end(); ++it)
+      map[locs[it].target]=it;
+  }
+  
+  inline loc_reft operator[](const goto_programt::const_targett t)
+  {
+    mapt::const_iterator it=map.find(t);
+    assert(it!=map.end());
+    return it->second;
+  }
+  
+protected:
+  typedef std::map<goto_programt::const_targett, loc_reft> mapt;
+  mapt map;
 };
 
 #define forall_locs(it, locs) \
