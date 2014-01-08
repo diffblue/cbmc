@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_PATH_SYMEX_HISTORY_H
 #define CPROVER_PATH_SYMEX_HISTORY_H
 
+#include <cassert>
+
 #include <util/std_expr.h>
 
 #include "loc_ref.h"
@@ -36,6 +38,7 @@ public:
   
   inline loc_reft pc() const
   {
+    assert(thread_nr<pc_vector.size());
     return pc_vector[thread_nr];
   }
 };
