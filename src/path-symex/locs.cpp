@@ -51,10 +51,13 @@ void locst::build(const goto_functionst &goto_functions)
   {
     const goto_functionst::goto_functiont &goto_function = f_it->second;
 
+    function_entryt &function_entry=function_map[f_it->first];
+    function_entry.type=goto_function.type;
+
     if(goto_function.body_available)
     {
       const loc_reft entry_loc=next_free_loc();
-      function_map[f_it->first]=function_entryt(entry_loc, goto_function.type);
+      function_entry.first_loc=entry_loc;
 
       forall_goto_program_instructions(i_it, goto_function.body)
       {
@@ -63,13 +66,13 @@ void locst::build(const goto_functionst &goto_functions)
       }
     }
     else
-      function_map[f_it->first]=function_entryt(loc_reft::nil(), goto_function.type);
+      function_entry.first_loc=loc_reft::nil();
   }
   
   if(function_map.find(ID_main)==function_map.end())
     throw "no entry point";
   
-  entry_loc=function_map[ID_main].first;
+  entry_loc=function_map[ID_main].first_loc;
     
   // build targets
   for(unsigned l=0; l<loc_vector.size(); l++)

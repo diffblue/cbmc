@@ -712,7 +712,7 @@ void path_symext::function_call_rec(
   
     const locst::function_entryt &function_entry=f_it->second;
 
-    loc_reft function_entry_point=function_entry.first;
+    loc_reft function_entry_point=function_entry.first_loc;
   
     // do we have a body?
     if(function_entry_point==loc_reft())
@@ -736,8 +736,7 @@ void path_symext::function_call_rec(
     // update statistics
     state.recursion_map[function_identifier]++;
 
-    const code_typet &code_type=
-      to_code_type(ns.follow(function_entry.second));
+    const code_typet &code_type=function_entry.type;
 
     const code_typet::argumentst &function_arguments=code_type.arguments();
 

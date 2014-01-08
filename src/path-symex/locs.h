@@ -39,7 +39,13 @@ public:
   loc_vectort loc_vector;
   loc_reft entry_loc;
   
-  typedef std::pair<loc_reft, code_typet> function_entryt;
+  class function_entryt
+  {
+  public:
+    loc_reft first_loc;
+    code_typet type;
+  };
+  
   typedef std::map<irep_idt, function_entryt> function_mapt;
   function_mapt function_map;
   
