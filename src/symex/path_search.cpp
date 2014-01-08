@@ -288,41 +288,27 @@ void path_searcht::check_assertion(
   exprt assertion=
     state.read(instruction.guard);
 
-  if(assertion.is_true()) return; // no error
+  if(assertion.is_true()) return; // no error, trivially
 
+  // keep statistics
+  number_of_VCCs_after_simplification++;
+  
   status() << "Checking property " << property_name << eom;
 
   // take the time
   absolute_timet sat_start_time=current_time();
-  
+
   satcheckt satcheck;
   bv_pointerst bv_pointers(ns, satcheck);
   
   satcheck.set_message_handler(get_message_handler());
   bv_pointers.set_message_handler(get_message_handler());
 
-  // the path constraint
-  bv_pointers << state.history;
-
-  // negate the assertion
-  bv_pointers.set_to(assertion, false);
-  
-  // keep statistics
-  number_of_VCCs_after_simplification++;
-  
-  switch(bv_pointers.dec_solve())
+  if(!state.check_assertion(bv_pointers))
   {
-  case decision_proceduret::D_SATISFIABLE:
     build_goto_trace(state, bv_pointers, property_entry.error_trace);
     property_entry.status=FAIL;
     number_of_failed_properties++;
-    break; // error
-   
-  case decision_proceduret::D_UNSATISFIABLE:
-    break; // no error
-  
-  default:
-    throw "error from solver";
   }
   
   sat_time+=current_time()-sat_start_time;
