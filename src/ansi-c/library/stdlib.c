@@ -124,6 +124,11 @@ inline void free(void *ptr)
 #define __CPROVER_ERRNO_H_INCLUDED
 #endif
 
+#ifndef __CPROVER_LIMITS_H_INCLUDED
+#include <limits.h>
+#define __CPROVER_LIMITS_H_INCLUDED
+#endif
+
 #undef strtol
 #undef isdigit
 #undef isspace
@@ -145,7 +150,7 @@ inline long strtol(const char *nptr, char **endptr, int base)
     return 0;
   }
 
-  int res=0;
+  long res=0;
   _Bool in_number=0;
   char sign=0;
 
@@ -154,6 +159,7 @@ inline long strtol(const char *nptr, char **endptr, int base)
   for( ; i<31; ++i)
   {
     char ch=nptr[i];
+    char sub=0;
     if(ch==0)
       break;
     else if((base==0 || base==16) && !in_number &&
@@ -162,34 +168,44 @@ inline long strtol(const char *nptr, char **endptr, int base)
       base=16;
       in_number=1;
       ++i;
+      continue;
     }
     else if(base==0 && !in_number && ch=='0')
     {
       base=8;
       in_number=1;
+      continue;
     }
     else if(!in_number && !sign && isspace(ch))
       continue;
     else if(!in_number && !sign && (ch=='-' || ch=='+'))
+    {
       sign=ch;
+      continue;
+    }
     else if(base>10 && ch>='a' && ch-'a'<base-10)
-    {
-      in_number=1;
-      res=res*base+ch-'a'+10;
-    }
+      sub='a'-10;
     else if(base>10 && ch>='A' && ch-'A'<base-10)
-    {
-      in_number=1;
-      res=res*base+ch-'A'+10;
-    }
+      sub='A'-10;
     else if(isdigit(ch))
     {
-      in_number=1;
+      sub='0';
       base=base==0 ? 10 : base;
-      res=res*base+ch-'0';
     }
     else
       break;
+
+    in_number=1;
+    long res_before=res;
+    res=res*base+ch-sub;
+    if(res<res_before)
+    {
+      errno=ERANGE;
+      if(sign=='-')
+        return LONG_MIN;
+      else
+        return LONG_MAX;
+    }
   }
 
   if(endptr!=0)
