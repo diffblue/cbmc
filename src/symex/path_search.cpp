@@ -89,7 +89,7 @@ path_searcht::resultt path_searcht::operator()(
     }
     
     // execute
-    path_symex(*state, queue, ns);
+    path_symex(*state, queue);
   }
   
   report_statistics();
