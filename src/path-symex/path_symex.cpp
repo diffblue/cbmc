@@ -29,7 +29,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class path_symext
 {
 public:
-  path_symext()
+  inline path_symext()
   {
   }
   
@@ -40,6 +40,17 @@ public:
   void do_goto(
     path_symex_statet &state,
     bool taken);
+    
+  void do_assert_fail(path_symex_statet &state)
+  {
+    const goto_programt::instructiont &instruction=
+      *state.get_instruction();
+    
+    state.record_step();
+    state.next_pc();
+    exprt guard=state.read(not_exprt(instruction.guard));
+    state.history.steps.back().guard=guard;
+  }  
 
 protected:
   void do_goto(
@@ -1013,13 +1024,13 @@ void path_symext::operator()(
     
   case ASSUME:
     state.record_step();
+    state.next_pc();
     if(instruction.guard.is_false())
       state.disable_current_thread();
     else
     {
       exprt guard=state.read(instruction.guard);
       state.history.steps.back().guard=guard;
-      state.next_pc();
     }
     break;
     
@@ -1138,5 +1149,23 @@ void path_symex_goto(
 {
   path_symext path_symex;
   path_symex.do_goto(state, taken);
+}
+
+/*******************************************************************\
+
+Function: path_symex_assert_fail
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void path_symex_assert_fail(path_symex_statet &state)
+{
+  path_symext path_symex;
+  path_symex.do_assert_fail(state);
 }
 

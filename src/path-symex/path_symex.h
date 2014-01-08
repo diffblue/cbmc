@@ -27,4 +27,9 @@ void path_symex_goto(
   path_symex_statet &state,
   bool taken);
 
+// Transforms a state by executing an assertion statement;
+// it is enforced that the assertion fails.
+void path_symex_assert_fail(
+  path_symex_statet &state);
+
 #endif
