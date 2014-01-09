@@ -81,7 +81,7 @@ void stack_depth(
   assert_ins->function=first->function;
 
   assert_ins->location.set_comment("Stack depth exceeds "+i2string(i_depth));
-  assert_ins->location.set_property("stack-depth");
+  assert_ins->location.set_property_class("stack-depth");
 
   goto_programt::targett plus_ins=goto_program.insert_before(first);
   plus_ins->make_assignment();

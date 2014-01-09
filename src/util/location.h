@@ -36,9 +36,14 @@ public:
     return get(ID_function);
   }
 
-  inline const irep_idt &get_property() const
+  inline const irep_idt &get_property_id() const
   {
-    return get(ID_property);
+    return get(ID_property_id);
+  }
+
+  inline const irep_idt &get_property_class() const
+  {
+    return get(ID_property_class);
   }
 
   inline const irep_idt &get_source() const
@@ -51,11 +56,6 @@ public:
     return get(ID_comment);
   }
   
-  inline const irep_idt &get_claim() const
-  {
-    return get(ID_claim);
-  }
-
   inline void set_file(const irep_idt &file)
   {
     set(ID_file, file);
@@ -86,9 +86,14 @@ public:
     set(ID_function, function);
   }
 
-  inline void set_property(const irep_idt &property)
+  inline void set_property_id(const irep_idt &property_id)
   {
-    set(ID_property, property);
+    set(ID_property_id, property_id);
+  }
+
+  inline void set_property_class(const irep_idt &property_class)
+  {
+    set(ID_property_class, property_class);
   }
 
   inline void set_source(const irep_idt &source)
@@ -100,12 +105,6 @@ public:
   {
     set(ID_comment, comment);
   }
-  
-  inline void set_claim(const irep_idt &claim)
-  {
-    set(ID_claim, claim);
-  }
-
 };
 
 std::ostream &operator <<(std::ostream &out, const locationt &location);
