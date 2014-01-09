@@ -34,10 +34,10 @@ void set_properties(
   {
     if(!it->is_assert()) continue;
     
-    irep_idt property_name=it->location.get_claim();
+    irep_idt property_id=it->location.get_property_id();
 
     hash_set_cont<irep_idt, irep_id_hash>::iterator
-      c_it=property_set.find(property_name);
+      c_it=property_set.find(property_id);
       
     if(c_it==property_set.end())
       it->type=SKIP;
@@ -74,11 +74,11 @@ void label_properties(
     
     count++;
     
-    std::string property_name=
+    std::string property_id=
       function==""?i2string(count):
       id2string(function)+"."+i2string(count);
     
-    it->location.set_claim(property_name);
+    it->location.set_property_id(property_id);
   }
 }
 

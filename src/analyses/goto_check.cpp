@@ -77,7 +77,7 @@ protected:
   void add_guarded_claim(
     const exprt &expr,
     const std::string &comment,
-    const std::string &property,
+    const std::string &property_class,
     const locationt &location,
     const exprt &src_expr,
     const guardt &guard);
@@ -1073,7 +1073,7 @@ Function: goto_checkt::add_guarded_claim
 void goto_checkt::add_guarded_claim(
   const exprt &_expr,
   const std::string &comment,
-  const std::string &property,
+  const std::string &property_class,
   const locationt &location,
   const exprt &src_expr,
   const guardt &guard)
@@ -1112,7 +1112,7 @@ void goto_checkt::add_guarded_claim(
     t->guard.swap(new_expr);
     t->location=location;
     t->location.set_comment(comment);
-    t->location.set_property(property);
+    t->location.set_property_class(property_class);
     t->location.set_source(source_string);
   }
 }
@@ -1339,7 +1339,7 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
 
       t->guard=false_exprt();
       t->location=i.location;
-      t->location.set_property("error label");
+      t->location.set_property_class("error label");
       t->location.set_comment("error label");
       t->location.set("user-provided", true);
     }
@@ -1395,7 +1395,7 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
     else if(i.is_assert())
     {
       if(i.location.get_bool("user-provided") &&
-         i.location.get_property()!="error label" &&
+         i.location.get_property_class()!="error label" &&
          !enable_assertions)
         i.type=SKIP;
     }

@@ -48,27 +48,27 @@ void show_properties(
       
     const irep_idt &comment=location.get_comment();
     //const irep_idt &function=location.get_function();
-    const irep_idt &property=location.get_property();
+    const irep_idt &property_class=location.get_property_class();
     const irep_idt &source=location.get_source();
     const irep_idt description=
       (comment==""?"assertion":comment);
       
-    irep_idt property_name=location.get_claim();
+    irep_idt property_id=location.get_property_id();
     
     switch(ui)
     {
     case ui_message_handlert::XML_UI:
       {
         xmlt xml_claim("claim");
-        xml_claim.new_element("number").data=id2string(property_name); // will go away
-        xml_claim.new_element("name").data=id2string(property_name); // will go away
-        xml_claim.set_attribute("name", id2string(property_name)); // use this one
+        xml_claim.new_element("number").data=id2string(property_id); // will go away
+        xml_claim.new_element("name").data=id2string(property_id); // will go away
+        xml_claim.set_attribute("name", id2string(property_id)); // use this one
         
         xmlt &l=xml_claim.new_element();
         l=xml(it->location);
         
         xml_claim.new_element("description").data=id2string(description);        
-        xml_claim.new_element("property").data=id2string(property);        
+        xml_claim.new_element("property").data=id2string(property_class);
         xml_claim.new_element("expression").data=from_expr(ns, identifier, it->guard);
         xml_claim.new_element("source").data=id2string(source);
 
@@ -77,7 +77,7 @@ void show_properties(
       break;
       
     case ui_message_handlert::PLAIN:
-      std::cout << "Property " << property_name << ":" << std::endl;
+      std::cout << "Property " << property_id << ":" << std::endl;
 
       std::cout << "  " << it->location << std::endl
                 << "  " << description << std::endl

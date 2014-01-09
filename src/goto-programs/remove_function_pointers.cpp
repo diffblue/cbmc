@@ -400,11 +400,11 @@ void remove_function_pointerst::remove_function_pointer(
   // set locations
   Forall_goto_program_instructions(it, new_code)
   {
-    irep_idt property=it->location.get_property();
+    irep_idt property_class=it->location.get_property_class();
     irep_idt comment=it->location.get_comment();
     it->location=target->location;
     it->function=target->function;
-    if(!property.empty()) it->location.set_property(property);
+    if(!property_class.empty()) it->location.set_property_class(property_class);
     if(!comment.empty()) it->location.set_comment(comment);
   }
   
