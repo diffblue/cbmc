@@ -38,6 +38,10 @@ public:
     // it's a given explicit value or a symbol with given identifier
     exprt value;
     symbol_exprt ssa_symbol;
+    
+    // for uninterpreted functions or arrays we maintain an index set
+    typedef std::set<exprt> index_sett;
+    index_sett index_set;
 
     var_statet():
       value(nil_exprt()),
@@ -204,10 +208,8 @@ protected:
     const exprt &src,
     bool propagate);
 
-  exprt read_symbol_member_index_rec(
+  exprt read_symbol_member_index(
     const exprt &src,
-    const std::string &suffix,
-    const typet &type,
     bool propagate);
 };
 
