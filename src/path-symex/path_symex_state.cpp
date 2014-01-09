@@ -306,9 +306,7 @@ exprt path_symex_statet::read_symbol_member_index(
         if(var_state.ssa_symbol.get_identifier()==irep_idt())
         {
           // produce one
-          var_state.ssa_symbol.set_identifier(var_info.ssa_identifier());
-          var_state.ssa_symbol.set(ID_C_SSA_symbol, true);
-          var_state.ssa_symbol.type()=var_info.type;
+          var_state.ssa_symbol=var_info.ssa_symbol();
         }
             
         return var_state.ssa_symbol;
