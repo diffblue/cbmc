@@ -1,0 +1,12 @@
+CORE
+main.c
+--unwind 1 --partial-loops --depth 100
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+^Unwinding loop c::main.0 iteration 1 file main.c line 12 function main thread 1
+^Unwinding loop c::main.1 iteration 1 file main.c line 17 function main thread 2
+^Unwinding recursion rec_spawn iteration 1
+--
+^warning: ignoring
+^Unwinding recursion rec_spawn iteration [0-9][0-9]
