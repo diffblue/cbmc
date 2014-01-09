@@ -48,6 +48,13 @@ public:
     
     irep_idt ssa_identifier() const;
 
+    symbol_exprt ssa_symbol() const
+    {
+      symbol_exprt s=symbol_exprt(ssa_identifier(), type);
+      s.set(ID_C_SSA_symbol, true);
+      return s;
+    }
+
     inline void increment_ssa_counter() 
     {
       ++ssa_counter;
@@ -82,6 +89,11 @@ public:
     }
     
     return result.first->second;
+  }
+  
+  inline var_infot &operator[](const irep_idt &ssa_identifier)
+  {
+    return id_map[ssa_identifier];
   }
   
   void init(var_infot &var_info);
