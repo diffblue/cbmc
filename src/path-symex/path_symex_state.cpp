@@ -198,7 +198,7 @@ exprt path_symex_statet::instantiate_rec(
   
   {
     exprt tmp_symbol_member_index=
-      read_symbol_member_index_rec(src, "", src.type(), propagate);
+      read_symbol_member_index(src, propagate);
   
     if(tmp_symbol_member_index.is_not_nil())
       return tmp_symbol_member_index; // yes!
@@ -249,7 +249,7 @@ exprt path_symex_statet::instantiate_rec(
 
 /*******************************************************************\
 
-Function: path_symex_statet::read_symbol_member_index_rec
+Function: path_symex_statet::read_symbol_member_index
 
   Inputs:
 
@@ -259,95 +259,97 @@ Function: path_symex_statet::read_symbol_member_index_rec
 
 \*******************************************************************/
 
-exprt path_symex_statet::read_symbol_member_index_rec(
+exprt path_symex_statet::read_symbol_member_index(
   const exprt &src,
-  const std::string &suffix,
-  const typet &type,
   bool propagate)
 {
-  if(src.id()==ID_symbol)
-  {
-    // Is this a function?
-    if(src.type().id()==ID_code)
-      return nil_exprt();
-      
-    if(src.get_bool(ID_C_SSA_symbol))
-      return nil_exprt(); // SSA already
+  std::string suffix="";
+  exprt current=src;
+  const typet final_type=src.type();
+  exprt::operandst indices;
   
-    irep_idt identifier=
-      to_symbol_expr(src).get_identifier();
-
-    var_mapt::var_infot &var_info=var_map(identifier, suffix, type);
-
-    #ifdef DEBUG
-    std::cout << "read_symbol_member_index_rec " << identifier
-              << " var_info " << var_info.identifier << std::endl;
-    #endif
-
-    // warning: reference is not stable      
-    var_statet &var_state=get_var_state(var_info);
-
-    if(propagate && var_state.value.is_not_nil())
-    {
-      return var_state.value; // propagate a value
-    }
-    else
-    {
-      // we do some SSA symbol
-      if(var_state.ssa_symbol.get_identifier()==irep_idt())
-      {
-        // produce one
-        var_state.ssa_symbol.set_identifier(var_info.ssa_identifier());
-        var_state.ssa_symbol.set(ID_C_SSA_symbol, true);
-        var_state.ssa_symbol.type()=var_info.type;
-      }
-          
-      return var_state.ssa_symbol;
-    }
-  }
-  else if(src.id()==ID_member)
-  {
-    const member_exprt &member_expr=to_member_expr(src);
-    
-    const typet &compound_type=
-      var_map.ns.follow(member_expr.struct_op().type());
-    
-    if(compound_type.id()==ID_struct)
-    {    
-      return read_symbol_member_index_rec(
-        member_expr.struct_op(),
-        "."+id2string(member_expr.get_component_name())+suffix,
-        type,
-        propagate);
-    }
-    else
-      return nil_exprt(); // includes unions, deliberatley
-  }
-  else if(src.id()==ID_index)
-  {
-    const index_exprt &index_expr=to_index_expr(src);
-    
-    exprt index_tmp=read(index_expr.index(), propagate);
-
-    // constant?    
-    mp_integer i;
-    if(!to_integer(index_tmp, i))
-    {
-      // yes
-      return read_symbol_member_index_rec(
-        index_expr.array(),
-        "["+integer2string(i)+"]"+suffix,
-        type,
-        propagate);
-    }
-    else // no
-    {
-      // is the size a constant?
-      return nil_exprt();
-    }
-  }
-  else
+  // don't touch function symbols
+  if(var_map.ns.follow(final_type).id()==ID_code)
     return nil_exprt();
+
+  // the loop avoids recursion
+  while(true)
+  {
+    exprt next=nil_exprt();
+  
+    if(current.id()==ID_symbol)
+    {
+      if(current.get_bool(ID_C_SSA_symbol))
+        return nil_exprt(); // SSA already
+    
+      irep_idt identifier=
+        to_symbol_expr(current).get_identifier();
+
+      var_mapt::var_infot &var_info=
+        var_map(identifier, suffix, final_type);
+
+      #ifdef DEBUG
+      std::cout << "read_symbol_member_index_rec " << identifier
+                << " var_info " << var_info.identifier << std::endl;
+      #endif
+
+      // warning: reference is not stable      
+      var_statet &var_state=get_var_state(var_info);
+
+      if(propagate && var_state.value.is_not_nil())
+      {
+        return var_state.value; // propagate a value
+      }
+      else
+      {
+        // we do some SSA symbol
+        if(var_state.ssa_symbol.get_identifier()==irep_idt())
+        {
+          // produce one
+          var_state.ssa_symbol.set_identifier(var_info.ssa_identifier());
+          var_state.ssa_symbol.set(ID_C_SSA_symbol, true);
+          var_state.ssa_symbol.type()=var_info.type;
+        }
+            
+        return var_state.ssa_symbol;
+      }
+    }
+    else if(current.id()==ID_member)
+    {
+      const member_exprt &member_expr=to_member_expr(current);
+      
+      const typet &compound_type=
+        var_map.ns.follow(member_expr.struct_op().type());
+      
+      if(compound_type.id()==ID_struct)
+      { 
+        // go into next iteration
+        next=member_expr.struct_op();
+        suffix="."+id2string(member_expr.get_component_name())+suffix;
+      }
+      else
+        return nil_exprt(); // includes unions, deliberatley
+    }
+    else if(current.id()==ID_index)
+    {
+      const index_exprt &index_expr=to_index_expr(src);
+      
+      exprt index_tmp=read(index_expr.index(), propagate);
+      indices.push_back(index_tmp);
+      
+      std::string index_string=array_index_as_string(index_tmp);
+      
+      // go into next iteration
+      next=index_expr.array();
+      suffix=index_string+suffix;
+    }
+    else
+      return nil_exprt();
+
+    // next round  
+    assert(next.is_not_nil());
+    current=next;
+  }
 }
 
 /*******************************************************************\
@@ -370,7 +372,7 @@ std::string path_symex_statet::array_index_as_string(const exprt &src) const
   if(!to_integer(tmp, i))
     return "["+integer2string(i)+"]";
   else
-    return "";
+    return "[*]";
 }
 
 /*******************************************************************\
