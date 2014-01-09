@@ -777,11 +777,6 @@ void symex_target_equationt::convert_assertions(
   if(number_of_assertions==0)
     return;
 
-  // We do (NOT a1) OR (NOT a2) ...
-  // where the a's are the assertions
-  or_exprt::operandst disjuncts;
-  disjuncts.reserve(number_of_assertions+1);
-
   exprt assumption=true_exprt();
 
   //literal a_k to be added to assertions clauses to de-/activate them for incr. solving
@@ -789,14 +784,39 @@ void symex_target_equationt::convert_assertions(
     prop_conv.convert(
       symbol_exprt("goto_symex::\\act$"+i2string(activate_assertions.size()), bool_typet()));
 
-  //assumptions for incremental solving: (a_0 ... -a_k-1) --> (a_0 ... a_k-1 -a_k)
-  disjuncts.push_back(literal_exprt(activation_literal));
   if(!activate_assertions.empty()) {
     literalt last_activation_literal = activate_assertions.back();
     activate_assertions.pop_back();
     activate_assertions.push_back(!last_activation_literal);    
   }
   activate_assertions.push_back(!activation_literal);
+
+  //set assumptions (a_0 ... -a_k) for incremental solving
+  prop_conv.set_assumptions(activate_assertions);
+
+  if(number_of_assertions==1)
+  {
+    for(SSA_stepst::iterator it=SSA_steps.begin();
+        it!=SSA_steps.end(); it++)
+      if(it->is_assert())
+      {
+        prop_conv.set_to_true(or_exprt(literal_exprt(activation_literal),not_exprt(it->cond_expr)));
+        it->cond_literal=const_literal(false);
+        return; // prevent further assumptions!
+      }
+      else if(it->is_assume())
+        prop_conv.set_to_true(or_exprt(literal_exprt(activation_literal),it->cond_expr));
+
+    assert(false); // unreachable
+  }
+
+  // We do (NOT a1) OR (NOT a2) ...
+  // where the a's are the assertions
+  or_exprt::operandst disjuncts;
+  disjuncts.reserve(number_of_assertions+1);
+
+  //assumptions for incremental solving: (a_0 ... -a_k-1) --> (a_0 ... a_k-1 -a_k)
+  disjuncts.push_back(literal_exprt(activation_literal));
 
   for(SSA_stepst::iterator it=SSA_steps.begin();
       it!=SSA_steps.end(); it++) {
@@ -821,9 +841,6 @@ void symex_target_equationt::convert_assertions(
 
   // if(!disjuncts.empty())
   prop_conv.set_to_true(disjunction(disjuncts));
-
-  //set assumptions (a_0 ... -a_k) for incremental solving
-  prop_conv.set_assumptions(activate_assertions);
 }
 
 /*******************************************************************\
