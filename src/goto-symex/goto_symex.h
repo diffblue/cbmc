@@ -262,6 +262,7 @@ protected:
 
   static unsigned nondet_count;
   static unsigned dynamic_counter;
+  static unsigned heap_counter;
   
   void read(exprt &expr);
   void replace_nondet(exprt &expr);
@@ -269,6 +270,8 @@ protected:
 
   //heap theory
   virtual bool is_heap_type(typet type) { return false; }
+
+  irep_idt make_heap_id(irep_idt tag) { return id2string(tag)+"heap"+i2string(heap_counter); }
 
 };
 

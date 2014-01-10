@@ -3107,4 +3107,188 @@ extern inline ssa_exprt &to_ssa_expr(exprt &expr)
   return static_cast<ssa_exprt &>(expr);
 }
 
+/*! \brief application of (mathematical) function (with heap ids)
+*/
+class heap_function_application_exprt:public exprt
+{
+public:
+  heap_function_application_exprt(irep_idt heap_id):exprt(ID_heap_function_application)
+  {
+    operands().resize(2);
+    set(ID_old_heap_id,heap_id);
+    set(ID_new_heap_id,heap_id);
+  }
+
+ heap_function_application_exprt(irep_idt old_heap_id,irep_idt new_heap_id):
+    exprt(ID_heap_function_application)
+  {
+    operands().resize(2);
+    set(ID_old_heap_id,old_heap_id);
+    set(ID_new_heap_id,new_heap_id);
+  }
+
+  exprt &function()
+  {
+    return op0();
+  }
+
+  const exprt &function() const
+  {
+    return op0();
+  }
+
+  typedef exprt::operandst argumentst;
+
+  argumentst &arguments()
+  {
+    return op1().operands();
+  }
+
+  const argumentst &arguments() const
+  {
+    return op1().operands();
+  }
+
+  const irep_idt &get_heap_id() const
+  {
+    return get(ID_old_heap_id);
+  }
+
+  const irep_idt &get_old_heap_id() const
+  {
+    return get(ID_old_heap_id);
+  }
+
+  const irep_idt &get_new_heap_id() const
+  {
+    return get(ID_new_heap_id);
+  }
+};
+
+/*! \brief Cast a generic exprt to a \ref heap_function_application_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * heap_function_application_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref heap_function_application_exprt
+ *
+ * \ingroup gr_std_expr
+*/
+extern inline const heap_function_application_exprt &to_heap_function_application_expr(const exprt &expr)
+{
+  assert(expr.id()==ID_heap_function_application && expr.operands().size()==2);
+  return static_cast<const heap_function_application_exprt &>(expr);
+}
+
+/*! \copydoc to_heap_function_application_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
+extern inline heap_function_application_exprt &to_heap_function_application_expr(exprt &expr)
+{
+  assert(expr.id()==ID_heap_function_application && expr.operands().size()==2);
+  return static_cast<heap_function_application_exprt &>(expr);
+}
+
+/*! \brief Extract member of heap struct
+*/
+class heap_member_exprt:public exprt
+{
+public:
+  inline explicit heap_member_exprt(const exprt &op):exprt(ID_heap_member)
+  {
+    copy_to_operands(op);
+  }
+
+  inline explicit heap_member_exprt(const typet &_type):exprt(ID_heap_member, _type)
+  {
+    operands().resize(1);
+  }
+
+  inline heap_member_exprt(const exprt &op, const irep_idt &component_name, const irep_idt &heap_id):exprt(ID_heap_member)
+  {
+    copy_to_operands(op);
+    set_component_name(component_name);
+    set_heap_id(heap_id);
+  }
+
+  inline heap_member_exprt(const exprt &op, const irep_idt &component_name, const irep_idt &heap_id, const typet &_type):exprt(ID_heap_member, _type)
+  {
+    copy_to_operands(op);
+    set_component_name(component_name);
+    set_heap_id(heap_id);
+  }
+
+  inline heap_member_exprt():exprt(ID_heap_member)
+  {
+    operands().resize(1);
+  }
+  
+  inline irep_idt get_component_name() const
+  {
+    return get(ID_component_name);
+  }
+
+  inline void set_component_name(const irep_idt &component_name)
+  {
+    set(ID_component_name, component_name);
+  }
+
+  inline irep_idt get_heap_id() const
+  {
+    return get(ID_new_heap_id);
+  }
+
+  inline void set_heap_id(const irep_idt &heap_id)
+  {
+    set(ID_new_heap_id, heap_id);
+  }
+  
+  inline unsigned get_component_number() const
+  {
+    return get_int(ID_component_number);
+  }
+
+  inline void set_component_number(unsigned component_number)
+  {
+    set(ID_component_number, component_number);
+  }
+  
+  inline const exprt &struct_op() const
+  {
+    return op0();
+  }
+
+  inline exprt &struct_op()
+  {
+    return op0();
+  }
+};
+
+/*! \brief Cast a generic exprt to a \ref heap_member_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * member_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref heap_member_exprt
+ *
+ * \ingroup gr_std_expr
+*/
+inline const heap_member_exprt &to_heap_member_expr(const exprt &expr)
+{
+  assert(expr.id()==ID_heap_member);
+  return static_cast<const heap_member_exprt &>(expr);
+}
+
+/*! \copydoc to_heap_member_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
+inline heap_member_exprt &to_heap_member_expr(exprt &expr)
+{
+  assert(expr.id()==ID_heap_member);
+  return static_cast<heap_member_exprt &>(expr);
+}
+
+
 #endif

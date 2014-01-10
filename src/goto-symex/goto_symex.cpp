@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 unsigned goto_symext::nondet_count=0;
 unsigned goto_symext::dynamic_counter=0;
+unsigned goto_symext::heap_counter=0;
 
 /*******************************************************************\
 

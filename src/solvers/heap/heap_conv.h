@@ -95,6 +95,12 @@ protected:
   void convert_with(const exprt &expr);
   void convert_update(const exprt &expr);
   
+  literalt convert_bool(const exprt &expr);
+  literalt convert_equality(const equal_exprt &expr);
+  literalt convert_function(const heap_function_application_exprt &expr);
+  exprt to_nnf(const exprt &expr);
+  exprt to_cnf(const exprt &expr);
+  and_exprt distribute(const or_exprt &expr);
   std::string convert_identifier(const irep_idt &identifier);
   
   // auxiliary methods

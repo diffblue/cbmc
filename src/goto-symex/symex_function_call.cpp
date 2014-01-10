@@ -314,19 +314,27 @@ void goto_symext::symex_function_call_code(
     //check number of arguments
     if(identifier=="c::__CPROVER_HEAP_dangling" && call.arguments().size()!=1) 
       throw id2string(identifier)+" expected one operand";
-    if(identifier=="c::__CPROVER_HEAP_disjoint" && call.arguments().size()!=2) 
-      throw id2string(identifier)+" expected one operand";
-    if((identifier=="c::__CPROVER_HEAP_path") && call.arguments().size()!=2) 
+    //    if(identifier=="c::__CPROVER_HEAP_disjoint" && call.arguments().size()!=2) 
+    //      throw id2string(identifier)+" expected one operand";
+    if((identifier=="c::__CPROVER_HEAP_path") && call.arguments().size()!=3) 
       throw id2string(identifier)+" expected three operands";
-    if((identifier=="c::__CPROVER_HEAP_onpath") && call.arguments().size()!=3) 
+    if((identifier=="c::__CPROVER_HEAP_onpath") && call.arguments().size()!=4) 
       throw id2string(identifier)+" expected four operands";
 
     exprt lhs = call.lhs();
-    function_application_exprt rhs = function_application_exprt();
+
+    //make heap id
+    exprt arg0 = call.arguments()[0].op0(); //remove (void*)  typecast
+    struct_typet struct_type = to_struct_type(ns.follow(arg0.type().subtype()));
+    irep_idt heap_id = make_heap_id(struct_type.get_tag());
+
+    //replace by function application expression
+    heap_function_application_exprt rhs = heap_function_application_exprt(heap_id);
     rhs.function() = call.function();
     rhs.arguments() = call.arguments(); 
+    rhs.type() = call.lhs().type();
     //remove (void*)  typecasts
-    for(function_application_exprt::argumentst::iterator it = rhs.arguments().begin();
+    for(heap_function_application_exprt::argumentst::iterator it = rhs.arguments().begin();
 	it != rhs.arguments().end(); it++) {
       *it = it->op0();
       //replace_heap_member(*it,false); //TODO
