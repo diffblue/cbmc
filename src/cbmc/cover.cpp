@@ -105,7 +105,12 @@ void bmct::cover_assertions(
     if(ui==ui_message_handlert::XML_UI)
     {
       xmlt xml_result("result");
-      xml_result.set_attribute("claim", id2string(it->first->location.get_claim()));
+      
+      // will go away
+      xml_result.set_attribute("claim", id2string(it->first->location.get_property_id()));
+      
+      // use this one
+      xml_result.set_attribute("name", id2string(it->first->location.get_property_id()));
 
       xml_result.set_attribute("status",
         g_it->covered?"COVERED":"NOT_COVERED");
