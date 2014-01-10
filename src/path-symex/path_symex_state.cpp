@@ -160,7 +160,8 @@ exprt path_symex_statet::read(const exprt &src, bool propagate)
   
   exprt tmp1=adjust_float_expressions(src, var_map.ns);
 
-  exprt tmp2=dereference_rec(tmp1, propagate);
+  // we force propagation for dereferencing
+  exprt tmp2=dereference_rec(tmp1, true);
   
   exprt tmp3=instantiate_rec(tmp2, propagate);
   

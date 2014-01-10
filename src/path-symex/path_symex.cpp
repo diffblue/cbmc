@@ -80,7 +80,6 @@ protected:
 
   void symex_malloc(
     path_symex_statet &state,
-    exprt::operandst &guard,
     const exprt &lhs,
     const side_effect_exprt &code);
 
@@ -188,6 +187,112 @@ void path_symext::assign(
   const exprt &lhs,
   const exprt &rhs)
 {
+  const typet &lhs_type=state.var_map.ns.follow(lhs.type());
+
+  if(lhs_type.id()==ID_struct) // lhs is a struct
+  {
+    const struct_typet &struct_type=to_struct_type(lhs_type);
+    const struct_typet::componentst &components=struct_type.components();
+
+    // split it up into components
+    for(struct_typet::componentst::const_iterator
+        it=components.begin();
+        it!=components.end();
+        it++)
+    {
+      const typet &subtype=it->type();  
+      const irep_idt &component_name=it->get_name();
+
+      exprt new_rhs=
+        rhs.is_nil()?rhs:member_exprt(rhs, component_name, subtype);
+      exprt new_lhs=member_exprt(lhs, component_name, subtype);
+      
+      // struct constructor on rhs?
+      if(rhs.id()==ID_struct)
+        new_rhs=simplify_expr(new_rhs, state.var_map.ns);
+      
+      // recursive call
+      assign(state, new_lhs, new_rhs);
+    }
+
+    return; // done
+  } 
+  else if(lhs_type.id()==ID_array) // lhs is an array
+  {
+    const array_typet &array_type=to_array_type(lhs_type);
+    const typet &subtype=array_type.subtype();
+    
+    if(array_type.size().is_constant())
+    {
+      mp_integer size;
+      if(to_integer(array_type.size(), size))
+        throw "failed to convert array size";
+    
+      // split it up into elements
+      for(mp_integer i=0; i!=size; ++i)
+      {
+        exprt index=from_integer(i, array_type.size().type());
+        exprt new_rhs=rhs.is_nil()?rhs:index_exprt(rhs, index, subtype);
+        exprt new_lhs=index_exprt(lhs, index, subtype);
+        
+        // array constructor on rhs?
+        if(rhs.id()==ID_array)
+          new_rhs=simplify_expr(new_rhs, state.var_map.ns);
+        
+        // recursive call
+        assign(state, new_lhs, new_rhs);
+      }
+    }
+    else
+    {
+      // TODO
+    }
+
+    return; // done
+  }
+  else if(lhs_type.id()==ID_vector) // lhs is a vector
+  {
+    const vector_typet &vector_type=to_vector_type(lhs_type);
+    const typet &subtype=vector_type.subtype();
+    
+    if(!vector_type.size().is_constant())
+      throw "vector with non-constant size";
+
+    mp_integer size;
+    if(to_integer(vector_type.size(), size))
+      throw "failed to convert vector size";
+  
+    // split it up into elements
+    for(mp_integer i=0; i!=size; ++i)
+    {
+      exprt index=from_integer(i, vector_type.size().type());
+      exprt new_rhs=rhs.is_nil()?rhs:index_exprt(rhs, index, subtype);
+      exprt new_lhs=index_exprt(lhs, index, subtype);
+      
+      // vector constructor on rhs?
+      if(rhs.id()==ID_vector)
+        new_rhs=simplify_expr(new_rhs, state.var_map.ns);
+      
+      // recursive call
+      assign(state, new_lhs, new_rhs);
+    }
+
+    return; // done
+  }
+  else if(rhs.id()==ID_sideeffect) // catch side effects on rhs
+  {
+    const side_effect_exprt &side_effect_expr=to_side_effect_expr(rhs);
+    const irep_idt &statement=side_effect_expr.get_statement();
+
+    if(statement==ID_malloc)
+    {
+      symex_malloc(state, lhs, side_effect_expr);
+      return;
+    }
+    else
+      throw "unexpected side-effect on rhs: "+id2string(statement);
+  }
+
   exprt::operandst _guard; // start with empty guard
   
   // don't propagate into the lhs
@@ -234,7 +339,6 @@ inline static typet c_sizeof_type_rec(const exprt &expr)
 
 void path_symext::symex_malloc(
   path_symex_statet &state,
-  exprt::operandst &guard, // not instantiated
   const exprt &lhs,
   const side_effect_exprt &code)
 {
@@ -307,10 +411,9 @@ void path_symext::symex_malloc(
 
       //state.var_map(size_symbol.name, suffix, size_symbol.type);
 
-      assign_rec(state,
-                 guard,
-                 size_symbol.symbol_expr(), 
-                 size);
+      assign(state,
+             size_symbol.symbol_expr(), 
+             size);
 
       size=size_symbol.symbol_expr();
     }
@@ -347,7 +450,7 @@ void path_symext::symex_malloc(
   if(rhs.type()!=lhs.type())
     rhs.make_typecast(lhs.type());
 
-  assign_rec(state, guard, lhs, rhs);
+  assign(state, lhs, rhs);
 }
 
 /*******************************************************************\
@@ -372,110 +475,7 @@ void path_symext::assign_rec(
   
   #ifdef DEBUG
   std::cout << "assign_rec: " << ssa_lhs.pretty() << std::endl;
-  std::cout << "lhs_type: " << ssa_lhs_type.id() << std::endl;
-  #endif
-  
-  #if 0
-  if(lhs_type.id()==ID_struct) // lhs is a struct
-  {
-    const struct_typet &struct_type=to_struct_type(lhs_type);
-    const struct_typet::componentst &components=struct_type.components();
-
-    // split it up into components
-    for(struct_typet::componentst::const_iterator
-        it=components.begin();
-        it!=components.end();
-        it++)
-    {
-      const typet &subtype=it->type();  
-      const irep_idt &component_name=it->get_name();
-
-      exprt new_rhs=rhs.is_nil()?rhs:member_exprt(rhs, component_name, subtype);
-      exprt new_lhs=member_exprt(lhs, component_name, subtype);
-      
-      // struct constructor on rhs?
-      if(rhs.id()==ID_struct)
-        new_rhs=simplify_expr(new_rhs, state.var_map.ns);
-      
-      // recursive call
-      assign_rec(state, guard, new_lhs, new_rhs);
-    }
-
-    return; // done
-  } 
-  else if(lhs_type.id()==ID_array) // lhs is an array
-  {
-    const array_typet &array_type=to_array_type(lhs_type);
-    const typet &subtype=array_type.subtype();
-    
-    if(array_type.size().is_constant())
-    {
-      mp_integer size;
-      if(to_integer(array_type.size(), size))
-        throw "failed to convert array size";
-    
-      // split it up into elements
-      for(mp_integer i=0; i!=size; ++i)
-      {
-        exprt index=from_integer(i, array_type.size().type());
-        exprt new_rhs=rhs.is_nil()?rhs:index_exprt(rhs, index, subtype);
-        exprt new_lhs=index_exprt(lhs, index, subtype);
-        
-        // array constructor on rhs?
-        if(rhs.id()==ID_array)
-          new_rhs=simplify_expr(new_rhs, state.var_map.ns);
-        
-        // recursive call
-        assign_rec(state, guard, new_lhs, new_rhs);
-      }
-    }
-    else
-    {
-      // TODO
-    }
-
-    return; // done
-  }
-  else if(lhs_type.id()==ID_vector) // lhs is a vector
-  {
-    const vector_typet &vector_type=to_vector_type(lhs_type);
-    const typet &subtype=vector_type.subtype();
-    
-    if(!vector_type.size().is_constant())
-      throw "vector with non-constant size";
-
-    mp_integer size;
-    if(to_integer(vector_type.size(), size))
-      throw "failed to convert vector size";
-  
-    // split it up into elements
-    for(mp_integer i=0; i!=size; ++i)
-    {
-      exprt index=from_integer(i, vector_type.size().type());
-      exprt new_rhs=rhs.is_nil()?rhs:index_exprt(rhs, index, subtype);
-      exprt new_lhs=index_exprt(lhs, index, subtype);
-      
-      // vector constructor on rhs?
-      if(rhs.id()==ID_vector)
-        new_rhs=simplify_expr(new_rhs, state.var_map.ns);
-      
-      // recursive call
-      assign_rec(state, guard, new_lhs, new_rhs);
-    }
-
-    return; // done
-  }
-  else if(rhs.id()==ID_sideeffect) // catch side effects on rhs
-  {
-    const side_effect_exprt &side_effect_expr=to_side_effect_expr(rhs);
-    const irep_idt &statement=side_effect_expr.get_statement();
-
-    if(statement==ID_malloc)
-    {
-      symex_malloc(state, guard, lhs, side_effect_expr);
-      return;
-    }
-  }
+  std::cout << "ssa_lhs_type: " << ssa_lhs_type.id() << std::endl;
   #endif
   
   if(ssa_lhs.id()==ID_symbol)
