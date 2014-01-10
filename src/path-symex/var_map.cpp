@@ -29,7 +29,7 @@ Function: var_mapt::var_infot::output
 
 void var_mapt::var_infot::output(std::ostream &out) const
 {
-  out << "identifier: " << identifier << "\n";
+  out << "full_identifier: " << full_identifier << "\n";
   out << "symbol: " << symbol << "\n";
   out << "suffix: " << suffix << "\n";
 
@@ -88,7 +88,8 @@ void var_mapt::init(var_infot &var_info)
     
     catch(std::string s)
     {
-      throw "var_mapt::init identifier \"" + id2string(var_info.identifier)+
+      throw "var_mapt::init identifier \"" +
+            id2string(var_info.full_identifier)+
             "\" lookup in ns failed";
     }
   }
@@ -113,6 +114,6 @@ Function: var_mapt::var_infot::ssa_identifier
 
 irep_idt var_mapt::var_infot::ssa_identifier() const
 {
-  return id2string(identifier)+
+  return id2string(full_identifier)+
          "#"+i2string(ssa_counter);
 }
