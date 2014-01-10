@@ -119,7 +119,7 @@ inline int pthread_mutex_destroy(pthread_mutex_t *mutex)
 #endif
 
 extern __CPROVER_bool __CPROVER_threads_exited[];
-extern _Thread_local unsigned long __CPROVER_thread_id;
+extern __CPROVER_thread_local unsigned long __CPROVER_thread_id;
 
 inline void pthread_exit(void *value_ptr)
 {
@@ -275,7 +275,7 @@ inline int pthread_rwlock_wrlock(pthread_rwlock_t *lock)
 #endif
 
 extern __CPROVER_bool __CPROVER_threads_exited[];
-extern _Thread_local unsigned long __CPROVER_thread_id;
+extern __CPROVER_thread_local unsigned long __CPROVER_thread_id;
 extern unsigned long __CPROVER_next_thread_id;
 
 // using separate function avoid unnecessary copies of local variables
