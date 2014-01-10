@@ -194,6 +194,40 @@ exprt path_symex_statet::instantiate_rec(
             << from_expr(var_map.ns, "", src) << std::endl;
   #endif
 
+  #if 0
+  const typet &src_type=var_map.ns.follow(src.type());
+  
+  if(src_type.id()==ID_struct) // src is a struct
+  {
+    const struct_typet &struct_type=to_struct_type(src_type);
+    const struct_typet::componentst &components=struct_type.components();
+    
+    struct_exprt result(src.type());
+    result.operands().resize(components.size());
+
+    // split it up into components
+    for(unsigned i=0; i<components.size(); i++)
+    {
+      const typet &subtype=components[i].type();
+      const irep_idt &component_name=components[i].get_name();
+
+      exprt new_src;
+      if(src.id()==ID_struct) // struct constructor?
+      {
+        assert(src.operands().size()==components.size());
+        new_src=src.operands()[i];
+      }
+      else
+        new_src=member_exprt(src, component_name, subtype);
+      
+      // recursive call
+      result.operands()[i]=instantiate_rec(new_src, propagate);
+    }
+
+    return result; // done
+  } 
+  #endif
+
   // check whether this is a symbol(.member|[index])*
   
   {
@@ -330,7 +364,7 @@ exprt path_symex_statet::read_symbol_member_index(
     }
     else if(current.id()==ID_index)
     {
-      const index_exprt &index_expr=to_index_expr(src);
+      const index_exprt &index_expr=to_index_expr(current);
       
       exprt index_tmp=read(index_expr.index(), propagate);
       indices.push_back(index_tmp);
