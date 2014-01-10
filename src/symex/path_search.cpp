@@ -276,7 +276,7 @@ void path_searcht::check_assertion(
   const goto_programt::instructiont &instruction=
     *state.get_instruction();
 
-  irep_idt property_name=instruction.location.get_claim();
+  irep_idt property_name=instruction.location.get_property_id();
   property_entryt &property_entry=property_map[property_name];
   
   if(property_entry.status==FAIL)
@@ -347,7 +347,7 @@ void path_searcht::initialize_property_map(
       
         const locationt &location=it->location;
       
-        irep_idt property_name=location.get_claim();
+        irep_idt property_name=location.get_property_id();
         
         property_entryt &property_entry=property_map[property_name];
         property_entry.status=NOT_REACHED;
