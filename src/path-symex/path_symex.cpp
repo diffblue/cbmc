@@ -20,7 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "path_symex.h"
 
-//#define DEBUG
+#define DEBUG
 
 #ifdef DEBUG
 #include <iostream>
@@ -82,18 +82,12 @@ protected:
     path_symex_statet &state,
     exprt::operandst &guard,
     const exprt &lhs,
-    const side_effect_exprt &code,
-    const std::string &suffix,
-    const exprt &full_lhs);
+    const side_effect_exprt &code);
 
-  inline void assign(
+  void assign(
     path_symex_statet &state,
     const exprt &lhs,
-    const exprt &rhs)
-  {
-    exprt::operandst _guard; // start with empty guard
-    assign_rec(state, _guard, lhs, rhs, std::string(), lhs);
-  }
+    const exprt &rhs);
 
   inline void assign(
     path_symex_statet &state,
@@ -104,11 +98,9 @@ protected:
 
   void assign_rec(
     path_symex_statet &state,
-    exprt::operandst &guard,
+    exprt::operandst &guard, // not instantiated
     const exprt &lhs, // not instantiated, recursion here
-    const exprt &rhs, // not instantiated
-    const std::string &suffix,
-    const exprt &full_lhs); // no recursion here
+    const exprt &rhs); // not instantiated
 
   static bool propagate(const exprt &src);
 };
@@ -181,6 +173,35 @@ bool path_symext::propagate(const exprt &src)
 
 /*******************************************************************\
 
+Function: path_symext::assign
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void path_symext::assign(
+  path_symex_statet &state,
+  const exprt &lhs,
+  const exprt &rhs)
+{
+  exprt::operandst _guard; // start with empty guard
+  
+  // don't propagate into the lhs
+  exprt read_lhs=state.read_no_propagate(lhs);
+  
+  // ok on the rhs
+  exprt read_rhs=state.read(rhs);
+
+  // start recursion  
+  assign_rec(state, _guard, read_lhs, read_rhs);
+}
+
+/*******************************************************************\
+
 Function: path_symext::symex_malloc
 
   Inputs:
@@ -215,9 +236,7 @@ void path_symext::symex_malloc(
   path_symex_statet &state,
   exprt::operandst &guard, // not instantiated
   const exprt &lhs,
-  const side_effect_exprt &code,
-  const std::string &suffix,
-  const exprt &full_lhs)
+  const side_effect_exprt &code)
 {
   if(code.operands().size()!=1)
     throw "malloc expected to have one operand";
@@ -286,14 +305,12 @@ void path_symext::symex_malloc(
       size_symbol.type=tmp_size.type();
       size_symbol.mode=ID_C;
 
-      state.var_map(size_symbol.name, suffix, size_symbol.type);
+      //state.var_map(size_symbol.name, suffix, size_symbol.type);
 
       assign_rec(state,
                  guard,
                  size_symbol.symbol_expr(), 
-                 size,
-                 suffix,
-                 full_lhs);
+                 size);
 
       size=size_symbol.symbol_expr();
     }
@@ -309,7 +326,7 @@ void path_symext::symex_malloc(
   value_symbol.type.set("#dynamic", true);
   value_symbol.mode=ID_C;
 
-  state.var_map(value_symbol.name, suffix, value_symbol.type);
+  //state.var_map(value_symbol.name, suffix, value_symbol.type);
 
   address_of_exprt rhs;
   
@@ -330,12 +347,7 @@ void path_symext::symex_malloc(
   if(rhs.type()!=lhs.type())
     rhs.make_typecast(lhs.type());
 
-  assign_rec(state,
-             guard,
-             lhs,
-             rhs,
-             suffix,
-             full_lhs);
+  assign_rec(state, guard, lhs, rhs);
 }
 
 /*******************************************************************\
@@ -354,20 +366,19 @@ void path_symext::assign_rec(
   path_symex_statet &state,
   exprt::operandst &guard, 
   const exprt &lhs, 
-  const exprt &rhs, 
-  const std::string &suffix,
-  const exprt &full_lhs) 
+  const exprt &rhs)
 {
-  const typet &full_lhs_type=state.var_map.ns.follow(full_lhs.type());
+  const typet &lhs_type=state.var_map.ns.follow(lhs.type());
   
   #ifdef DEBUG
   std::cout << "assign_rec: " << lhs.pretty() << std::endl;
-  std::cout << "full_lhs_type: " << full_lhs_type.id() << std::endl;
+  std::cout << "lhs_type: " << lhs_type.id() << std::endl;
   #endif
   
-  if(full_lhs_type.id()==ID_struct) // full_lhs is a struct
+  #if 0
+  if(lhs_type.id()==ID_struct) // lhs is a struct
   {
-    const struct_typet &struct_type=to_struct_type(full_lhs_type);
+    const struct_typet &struct_type=to_struct_type(lhs_type);
     const struct_typet::componentst &components=struct_type.components();
 
     // split it up into components
@@ -380,7 +391,6 @@ void path_symext::assign_rec(
       const irep_idt &component_name=it->get_name();
 
       exprt new_rhs=rhs.is_nil()?rhs:member_exprt(rhs, component_name, subtype);
-      exprt new_full_lhs=member_exprt(full_lhs, component_name, subtype);
       exprt new_lhs=member_exprt(lhs, component_name, subtype);
       
       // struct constructor on rhs?
@@ -388,14 +398,14 @@ void path_symext::assign_rec(
         new_rhs=simplify_expr(new_rhs, state.var_map.ns);
       
       // recursive call
-      assign_rec(state, guard, new_lhs, new_rhs, suffix, new_full_lhs);
+      assign_rec(state, guard, new_lhs, new_rhs);
     }
 
     return; // done
   } 
-  else if(full_lhs_type.id()==ID_array) // full_lhs is an array
+  else if(lhs_type.id()==ID_array) // lhs is an array
   {
-    const array_typet &array_type=to_array_type(full_lhs_type);
+    const array_typet &array_type=to_array_type(lhs_type);
     const typet &subtype=array_type.subtype();
     
     if(array_type.size().is_constant())
@@ -409,7 +419,6 @@ void path_symext::assign_rec(
       {
         exprt index=from_integer(i, array_type.size().type());
         exprt new_rhs=rhs.is_nil()?rhs:index_exprt(rhs, index, subtype);
-        exprt new_full_lhs=index_exprt(full_lhs, index, subtype);
         exprt new_lhs=index_exprt(lhs, index, subtype);
         
         // array constructor on rhs?
@@ -417,7 +426,7 @@ void path_symext::assign_rec(
           new_rhs=simplify_expr(new_rhs, state.var_map.ns);
         
         // recursive call
-        assign_rec(state, guard, new_lhs, new_rhs, suffix, new_full_lhs);
+        assign_rec(state, guard, new_lhs, new_rhs);
       }
     }
     else
@@ -427,9 +436,9 @@ void path_symext::assign_rec(
 
     return; // done
   }
-  else if(full_lhs_type.id()==ID_vector) // full_lhs is a vector
+  else if(lhs_type.id()==ID_vector) // lhs is a vector
   {
-    const vector_typet &vector_type=to_vector_type(full_lhs_type);
+    const vector_typet &vector_type=to_vector_type(lhs_type);
     const typet &subtype=vector_type.subtype();
     
     if(!vector_type.size().is_constant())
@@ -444,7 +453,6 @@ void path_symext::assign_rec(
     {
       exprt index=from_integer(i, vector_type.size().type());
       exprt new_rhs=rhs.is_nil()?rhs:index_exprt(rhs, index, subtype);
-      exprt new_full_lhs=index_exprt(full_lhs, index, subtype);
       exprt new_lhs=index_exprt(lhs, index, subtype);
       
       // vector constructor on rhs?
@@ -452,7 +460,7 @@ void path_symext::assign_rec(
         new_rhs=simplify_expr(new_rhs, state.var_map.ns);
       
       // recursive call
-      assign_rec(state, guard, new_lhs, new_rhs, suffix, new_full_lhs);
+      assign_rec(state, guard, new_lhs, new_rhs);
     }
 
     return; // done
@@ -464,51 +472,43 @@ void path_symext::assign_rec(
 
     if(statement==ID_malloc)
     {
-      symex_malloc(state, guard, lhs, side_effect_expr, suffix, full_lhs);
+      symex_malloc(state, guard, lhs, side_effect_expr);
       return;
     }
   }
+  #endif
   
   if(lhs.id()==ID_symbol)
   {
-    // First do RHS. This needs to be evaluated before dealing
-    // with the LHS.
+    // These are expected to the SSA symbols
+    assert(lhs.get_bool(ID_C_SSA_symbol));
     
-    exprt ssa_rhs=
-      rhs.is_nil()?nil_exprt():state.read(rhs);
-      
-    // Now deal with LHS.
     const symbol_exprt &symbol_expr=to_symbol_expr(lhs);
-    const irep_idt &identifier=symbol_expr.get_identifier();
+    const irep_idt &ssa_identifier=symbol_expr.get_identifier();
     
     #ifdef DEBUG
-    std::cout << "symbol identifier: " << identifier << std::endl;
-    std::cout << "symbol suffix: " << suffix << std::endl;
+    std::cout << "SSA symbol identifier: " << ssa_identifier << std::endl;
     #endif
     
-    var_mapt::var_infot &var_info=
-      state.var_map(identifier, suffix, full_lhs.type());
+    var_mapt::var_infot &var_info=state.var_map[ssa_identifier];
 
-    // increase SSA counter and produce symbol expression
+    // increase the SSA counter and produce new SSA symbol expression
     var_info.increment_ssa_counter();
- 
-    symbol_exprt ssa_lhs=
-      symbol_exprt(var_info.ssa_identifier(), var_info.type);
-    ssa_lhs.set(ID_C_SSA_symbol, true);
+    symbol_exprt new_lhs=var_info.ssa_symbol();
 
     #ifdef DEBUG
-    std::cout << "ssa_lhs: " << ssa_lhs.get_identifier() << std::endl;
+    std::cout << "new_lhs: " << new_lhs.get_identifier() << std::endl;
     #endif
 
     // record new state of lhs
     {
       // reference is not stable
       path_symex_statet::var_statet &var_state=state.get_var_state(var_info);
-      var_state.ssa_symbol=ssa_lhs;
+      var_state.ssa_symbol=new_lhs;
     }
 
     // rhs nil means non-det assignment
-    if(ssa_rhs.is_nil())
+    if(rhs.is_nil())
     {
       path_symex_statet::var_statet &var_state=state.get_var_state(var_info);
       var_state.value=nil_exprt();
@@ -516,11 +516,11 @@ void path_symext::assign_rec(
     else
     {
       // consistency check
-      if(!base_type_eq(ssa_rhs.type(), ssa_lhs.type(), state.var_map.ns))
+      if(!base_type_eq(rhs.type(), new_lhs.type(), state.var_map.ns))
       {
         #ifdef DEBUG
-        std::cout << "ssa_rhs: " << ssa_rhs.pretty() << std::endl;
-        std::cout << "ssa_lhs: " << ssa_lhs.pretty() << std::endl;
+        std::cout << "rhs: " << rhs.pretty() << std::endl;
+        std::cout << "lhs: " << new_lhs.pretty() << std::endl;
         #endif
         throw "assign_rec got different types";
       }
@@ -529,17 +529,13 @@ void path_symext::assign_rec(
       path_symex_stept &step=state.record_step();
       
       if(!guard.empty()) step.guard=conjunction(guard);
-      step.full_lhs=full_lhs;
-      step.ssa_lhs=ssa_lhs;
-      step.ssa_rhs=ssa_rhs;
+      step.full_lhs=lhs;
+      step.ssa_lhs=new_lhs;
+      step.ssa_rhs=rhs;
 
       // propagate the rhs?
       path_symex_statet::var_statet &var_state=state.get_var_state(var_info);
-      var_state.value=propagate(ssa_rhs)?ssa_rhs:nil_exprt();
-
-      #ifdef DEBUG
-      std::cout << "assign_rec ID_symbol " << identifier << suffix << std::endl;
-      #endif
+      var_state.value=propagate(rhs)?rhs:nil_exprt();
     }
   }
   else if(lhs.id()==ID_member)
@@ -549,7 +545,6 @@ void path_symext::assign_rec(
     #endif
 
     const member_exprt &lhs_member_expr=to_member_expr(lhs);
-    
     const exprt &struct_op=lhs_member_expr.struct_op();
 
     const typet &compound_type=
@@ -557,23 +552,17 @@ void path_symext::assign_rec(
   
     if(compound_type.id()==ID_struct)
     {
-      // add component name to the suffix
-      const std::string new_suffix=
-        "."+id2string(lhs_member_expr.get_component_name())+suffix;
-
-      //typet lhs_type=state.var_map.ns.follow(lhs_suffix_type);
-
-      assign_rec(state, guard, struct_op, rhs, new_suffix, full_lhs);
+      throw "unexpected struct member on lhs";
     }
     else if(compound_type.id()==ID_union)
     {
-      // adjust rhs
+      // adjust the rhs
       union_exprt new_rhs;
       new_rhs.type()=struct_op.type();
       new_rhs.set_component_name(lhs_member_expr.get_component_name());
       new_rhs.op()=rhs;
       
-      assign_rec(state, guard, struct_op, new_rhs, suffix, full_lhs);
+      assign_rec(state, guard, struct_op, new_rhs);
     }
     else
       throw "assign_rec: member expects struct or union type";
@@ -584,23 +573,7 @@ void path_symext::assign_rec(
     std::cout << "assign_rec ID_index" << std::endl;
     #endif
 
-    const index_exprt &lhs_index_expr=to_index_expr(lhs);
-
-    const exprt &lhs_array=lhs_index_expr.array();
-    const exprt &lhs_index=lhs_index_expr.index();
-    const typet &lhs_type=state.var_map.ns.follow(lhs_array.type());
-
-    if(lhs_type.id()!=ID_array && lhs_type.id()!=ID_vector)
-      throw "index must take array or vector type operand, but got `"+
-            lhs_type.id_string()+"'";            
-
-    std::string index_string=state.array_index_as_string(lhs_index);
-    if(index_string=="") index_string="[*]";
-    
-    // add index to the suffix
-    const std::string new_suffix=index_string+suffix;
-
-    assign_rec(state, guard, lhs_array, rhs, new_suffix, full_lhs);
+    throw "unexpected array index on lhs";    
   }
   else if(lhs.id()==ID_dereference)
   {
@@ -608,16 +581,7 @@ void path_symext::assign_rec(
     std::cout << "assign_rec ID_dereference" << std::endl;
     #endif
 
-    const dereference_exprt &dereference_expr=to_dereference_expr(lhs);
-    exprt address=state.read(dereference_expr.pointer());
-    dereferencet dereference(state.var_map.ns);
-    exprt tmp_lhs=dereference(address);
-
-    assign_rec(state, guard, tmp_lhs, rhs, suffix, full_lhs);
-
-    #ifdef DEBUG
-    //std::cout << "assign_rec ID_dereference (done)" << std::endl;
-    #endif
+    throw "unexpected dereference on lhs";
   }
   else if(lhs.id()==ID_if)
   {
@@ -626,16 +590,16 @@ void path_symext::assign_rec(
     #endif
 
     const if_exprt &lhs_if_expr=to_if_expr(lhs);
-    exprt cond=state.read(lhs_if_expr.cond());
+    exprt cond=lhs_if_expr.cond();
 
     // true
     guard.push_back(cond);
-    assign_rec(state, guard, lhs_if_expr.true_case(), rhs, suffix, full_lhs);
+    assign_rec(state, guard, lhs_if_expr.true_case(), rhs);
     guard.pop_back();
     
     // false
     guard.push_back(not_exprt(cond));
-    assign_rec(state, guard, lhs_if_expr.false_case(), rhs, suffix, full_lhs);
+    assign_rec(state, guard, lhs_if_expr.false_case(), rhs);
     guard.pop_back();
   }
   else if(lhs.id()==ID_byte_extract_little_endian ||
@@ -672,7 +636,7 @@ void path_symext::assign_rec(
     
     const exprt new_lhs=byte_extract_expr.op();
 
-    assign_rec(state, guard, new_lhs, new_rhs, "", new_lhs);
+    assign_rec(state, guard, new_lhs, new_rhs);
   }
   else if(lhs.id()==ID_string_constant ||
           lhs.id()=="NULL-object" ||
