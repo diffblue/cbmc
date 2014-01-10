@@ -98,9 +98,9 @@ protected:
 
   void assign_rec(
     path_symex_statet &state,
-    exprt::operandst &guard, // not instantiated
-    const exprt &lhs, // not instantiated, recursion here
-    const exprt &rhs); // not instantiated
+    exprt::operandst &guard, // instantiated
+    const exprt &ssa_lhs, // instantiated, recursion here
+    const exprt &ssa_rhs); // instantiated
 
   static bool propagate(const exprt &src);
 };
@@ -191,13 +191,13 @@ void path_symext::assign(
   exprt::operandst _guard; // start with empty guard
   
   // don't propagate into the lhs
-  exprt read_lhs=state.read_no_propagate(lhs);
+  exprt ssa_lhs=state.read_no_propagate(lhs);
   
   // ok on the rhs
-  exprt read_rhs=state.read(rhs);
+  exprt ssa_rhs=state.read(rhs);
 
   // start recursion  
-  assign_rec(state, _guard, read_lhs, read_rhs);
+  assign_rec(state, _guard, ssa_lhs, ssa_rhs);
 }
 
 /*******************************************************************\
@@ -365,14 +365,14 @@ Function: path_symext::assign_rec
 void path_symext::assign_rec(
   path_symex_statet &state,
   exprt::operandst &guard, 
-  const exprt &lhs, 
-  const exprt &rhs)
+  const exprt &ssa_lhs, 
+  const exprt &ssa_rhs)
 {
-  const typet &lhs_type=state.var_map.ns.follow(lhs.type());
+  const typet &ssa_lhs_type=state.var_map.ns.follow(ssa_lhs.type());
   
   #ifdef DEBUG
-  std::cout << "assign_rec: " << lhs.pretty() << std::endl;
-  std::cout << "lhs_type: " << lhs_type.id() << std::endl;
+  std::cout << "assign_rec: " << ssa_lhs.pretty() << std::endl;
+  std::cout << "lhs_type: " << ssa_lhs_type.id() << std::endl;
   #endif
   
   #if 0
@@ -478,19 +478,22 @@ void path_symext::assign_rec(
   }
   #endif
   
-  if(lhs.id()==ID_symbol)
+  if(ssa_lhs.id()==ID_symbol)
   {
     // These are expected to the SSA symbols
-    assert(lhs.get_bool(ID_C_SSA_symbol));
+    assert(ssa_lhs.get_bool(ID_C_SSA_symbol));
     
-    const symbol_exprt &symbol_expr=to_symbol_expr(lhs);
+    const symbol_exprt &symbol_expr=to_symbol_expr(ssa_lhs);
     const irep_idt &ssa_identifier=symbol_expr.get_identifier();
+    const irep_idt &full_identifier=symbol_expr.get(ID_C_full_identifier);
     
     #ifdef DEBUG
     std::cout << "SSA symbol identifier: " << ssa_identifier << std::endl;
+    std::cout << "full identifier: " << full_identifier << std::endl;
     #endif
     
-    var_mapt::var_infot &var_info=state.var_map[ssa_identifier];
+    var_mapt::var_infot &var_info=state.var_map[full_identifier];
+    assert(var_info.full_identifier==full_identifier);
 
     // increase the SSA counter and produce new SSA symbol expression
     var_info.increment_ssa_counter();
@@ -508,7 +511,7 @@ void path_symext::assign_rec(
     }
 
     // rhs nil means non-det assignment
-    if(rhs.is_nil())
+    if(ssa_rhs.is_nil())
     {
       path_symex_statet::var_statet &var_state=state.get_var_state(var_info);
       var_state.value=nil_exprt();
@@ -516,11 +519,11 @@ void path_symext::assign_rec(
     else
     {
       // consistency check
-      if(!base_type_eq(rhs.type(), new_lhs.type(), state.var_map.ns))
+      if(!base_type_eq(ssa_rhs.type(), new_lhs.type(), state.var_map.ns))
       {
         #ifdef DEBUG
-        std::cout << "rhs: " << rhs.pretty() << std::endl;
-        std::cout << "lhs: " << new_lhs.pretty() << std::endl;
+        std::cout << "ssa_rhs: " << ssa_rhs.pretty() << std::endl;
+        std::cout << "new_lhs: " << new_lhs.pretty() << std::endl;
         #endif
         throw "assign_rec got different types";
       }
@@ -529,23 +532,23 @@ void path_symext::assign_rec(
       path_symex_stept &step=state.record_step();
       
       if(!guard.empty()) step.guard=conjunction(guard);
-      step.full_lhs=lhs;
+      step.full_lhs=ssa_lhs;
       step.ssa_lhs=new_lhs;
-      step.ssa_rhs=rhs;
+      step.ssa_rhs=ssa_rhs;
 
       // propagate the rhs?
       path_symex_statet::var_statet &var_state=state.get_var_state(var_info);
-      var_state.value=propagate(rhs)?rhs:nil_exprt();
+      var_state.value=propagate(ssa_rhs)?ssa_rhs:nil_exprt();
     }
   }
-  else if(lhs.id()==ID_member)
+  else if(ssa_lhs.id()==ID_member)
   {
     #ifdef DEBUG
     std::cout << "assign_rec ID_member" << std::endl;
     #endif
 
-    const member_exprt &lhs_member_expr=to_member_expr(lhs);
-    const exprt &struct_op=lhs_member_expr.struct_op();
+    const member_exprt &ssa_lhs_member_expr=to_member_expr(ssa_lhs);
+    const exprt &struct_op=ssa_lhs_member_expr.struct_op();
 
     const typet &compound_type=
       state.var_map.ns.follow(struct_op.type());
@@ -559,15 +562,15 @@ void path_symext::assign_rec(
       // adjust the rhs
       union_exprt new_rhs;
       new_rhs.type()=struct_op.type();
-      new_rhs.set_component_name(lhs_member_expr.get_component_name());
-      new_rhs.op()=rhs;
+      new_rhs.set_component_name(ssa_lhs_member_expr.get_component_name());
+      new_rhs.op()=ssa_rhs;
       
       assign_rec(state, guard, struct_op, new_rhs);
     }
     else
       throw "assign_rec: member expects struct or union type";
   }
-  else if(lhs.id()==ID_index)
+  else if(ssa_lhs.id()==ID_index)
   {
     #ifdef DEBUG
     std::cout << "assign_rec ID_index" << std::endl;
@@ -575,7 +578,7 @@ void path_symext::assign_rec(
 
     throw "unexpected array index on lhs";    
   }
-  else if(lhs.id()==ID_dereference)
+  else if(ssa_lhs.id()==ID_dereference)
   {
     #ifdef DEBUG
     std::cout << "assign_rec ID_dereference" << std::endl;
@@ -583,34 +586,34 @@ void path_symext::assign_rec(
 
     throw "unexpected dereference on lhs";
   }
-  else if(lhs.id()==ID_if)
+  else if(ssa_lhs.id()==ID_if)
   {
     #ifdef DEBUG
     std::cout << "assign_rec ID_if" << std::endl;
     #endif
 
-    const if_exprt &lhs_if_expr=to_if_expr(lhs);
+    const if_exprt &lhs_if_expr=to_if_expr(ssa_lhs);
     exprt cond=lhs_if_expr.cond();
 
     // true
     guard.push_back(cond);
-    assign_rec(state, guard, lhs_if_expr.true_case(), rhs);
+    assign_rec(state, guard, lhs_if_expr.true_case(), ssa_rhs);
     guard.pop_back();
     
     // false
     guard.push_back(not_exprt(cond));
-    assign_rec(state, guard, lhs_if_expr.false_case(), rhs);
+    assign_rec(state, guard, lhs_if_expr.false_case(), ssa_rhs);
     guard.pop_back();
   }
-  else if(lhs.id()==ID_byte_extract_little_endian ||
-          lhs.id()==ID_byte_extract_big_endian)
+  else if(ssa_lhs.id()==ID_byte_extract_little_endian ||
+          ssa_lhs.id()==ID_byte_extract_big_endian)
   {
     #ifdef DEBUG
     std::cout << "assign_rec ID_byte_extract" << std::endl;
     #endif
 
     const byte_extract_exprt &byte_extract_expr=
-      to_byte_extract_expr(lhs);
+      to_byte_extract_expr(ssa_lhs);
   
     // assignment to byte_extract operators:
     // turn into byte_update operator
@@ -620,9 +623,9 @@ void path_symext::assign_rec(
     
     irep_idt new_id;
     
-    if(lhs.id()==ID_byte_extract_little_endian)
+    if(ssa_lhs.id()==ID_byte_extract_little_endian)
       new_id=ID_byte_update_little_endian;
-    else if(lhs.id()==ID_byte_extract_big_endian)
+    else if(ssa_lhs.id()==ID_byte_extract_big_endian)
       new_id=ID_byte_update_big_endian;
     else
       assert(false);
@@ -632,17 +635,17 @@ void path_symext::assign_rec(
     new_rhs.type()=byte_extract_expr.op().type();
     new_rhs.op()=byte_extract_expr.op();
     new_rhs.offset()=byte_extract_expr.offset();
-    new_rhs.value()=rhs;
+    new_rhs.value()=ssa_rhs;
     
     const exprt new_lhs=byte_extract_expr.op();
 
     assign_rec(state, guard, new_lhs, new_rhs);
   }
-  else if(lhs.id()==ID_string_constant ||
-          lhs.id()=="NULL-object" ||
-          lhs.id()=="zero_string" ||
-          lhs.id()=="is_zero_string" ||
-          lhs.id()=="zero_string_length")
+  else if(ssa_lhs.id()==ID_string_constant ||
+          ssa_lhs.id()=="NULL-object" ||
+          ssa_lhs.id()=="zero_string" ||
+          ssa_lhs.id()=="is_zero_string" ||
+          ssa_lhs.id()=="zero_string_length")
   {
     // ignore
   }

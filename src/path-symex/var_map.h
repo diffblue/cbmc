@@ -34,8 +34,8 @@ public:
     // the variables are numbered
     unsigned number;
 
-    // identifier=symbol+suffix
-    irep_idt identifier, symbol, suffix;
+    // full_identifier=symbol+suffix
+    irep_idt full_identifier, symbol, suffix;
 
     // the type of the identifier (struct member or array)
     typet type;
@@ -52,6 +52,7 @@ public:
     {
       symbol_exprt s=symbol_exprt(ssa_identifier(), type);
       s.set(ID_C_SSA_symbol, true);
+      s.set(ID_C_full_identifier, full_identifier);
       return s;
     }
 
@@ -71,17 +72,17 @@ public:
     const irep_idt &suffix,
     const typet &type)
   {
-    std::string identifier=
+    std::string full_identifier=
       id2string(symbol)+id2string(suffix);
 
     std::pair<id_mapt::iterator, bool> result;
 
     result=id_map.insert(std::pair<irep_idt, var_infot>(
-      identifier, var_infot()));      
+      full_identifier, var_infot()));
   
     if(result.second) // inserted?
     {
-      result.first->second.identifier=identifier;
+      result.first->second.full_identifier=full_identifier;
       result.first->second.symbol=symbol;
       result.first->second.suffix=suffix;
       result.first->second.type=type;
@@ -91,9 +92,9 @@ public:
     return result.first->second;
   }
   
-  inline var_infot &operator[](const irep_idt &ssa_identifier)
+  inline var_infot &operator[](const irep_idt &full_identifier)
   {
-    return id_map[ssa_identifier];
+    return id_map[full_identifier];
   }
   
   void init(var_infot &var_info);
