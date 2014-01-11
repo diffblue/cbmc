@@ -222,6 +222,9 @@ void goto_symext::dereference_rec(
     if(expr.operands().size()!=1)
       throw "dereference takes one operand";
 
+    expr.swap(expr.op0());
+    return; //TODO: for heap
+
     exprt tmp1;
     tmp1.swap(expr.op0());
     

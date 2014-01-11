@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <iostream>
+
 #include <util/simplify_expr.h>
 
 #include "goto_symex.h"
@@ -57,4 +59,37 @@ void goto_symext::replace_nondet(exprt &expr)
   else
     Forall_operands(it, expr)
       replace_nondet(*it);
+}
+
+/*******************************************************************\
+
+Function: goto_symext::replace_nondet
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void goto_symext::replace_heap_member(exprt &expr, bool write)
+{
+  if(expr.id()==ID_member && is_heap_type(expr.type()))
+  {
+    struct_typet struct_type = to_struct_type(ns.follow(expr.type().subtype()));
+    member_exprt struct_expr = to_member_expr(expr);
+    irep_idt heap_id = make_heap_id(struct_type.get_tag());
+    heap_member_exprt hexpr(struct_expr.struct_op());
+    hexpr.set_component_name(struct_expr.get_component_name());
+    hexpr.location()=expr.location();
+    hexpr.set_heap_id(heap_id);
+
+    std::cout << "replaced heap member: " << hexpr << std::endl;
+   
+    expr.swap(hexpr);
+  }
+  else
+    Forall_operands(it, expr)
+      replace_heap_member(*it,write);
 }

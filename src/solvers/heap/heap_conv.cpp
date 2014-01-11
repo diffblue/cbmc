@@ -3373,49 +3373,70 @@ Function: heap_convt::convert_equality
 
 \*******************************************************************/
 
-literalt heap_convt::convert_equality(const equal_exprt &expr)
+heapexpr heap_convt::convert_heapexpr(const exprt &expr)
 {
-  if(expr.lhs().id()==ID_symbol && expr.rhs().id()==ID_constant ||
-      expr.lhs().id()==ID_constant && expr.rhs().id()==ID_symbol ||
-      expr.lhs().id()==ID_symbol && expr.rhs().id()==ID_symbol ||
-      expr.lhs().id()==ID_constant && expr.rhs().id()==ID_constant)
+  find_symbols(expr);
+  if(expr.id()==ID_symbol) 
   {
-      std::string idl, idr;
-      if(expr.lhs().id()==ID_symbol) 
-      {
-        find_symbols(expr.lhs());
-        const irep_idt &identifier=to_symbol_expr(expr.lhs()).get_identifier();
-        idl = convert_identifier(identifier);
-        heap_identifiers.insert(idl);
-      }
-      if(expr.rhs().id()==ID_symbol) 
-      {
-        find_symbols(expr.rhs());
-        const irep_idt &identifier=to_symbol_expr(expr.rhs()).get_identifier();
-        idr = convert_identifier(identifier);
-        heap_identifiers.insert(idr);
-      }
-      if(expr.lhs().id()==ID_constant)
-      {
-        const irep_idt &value=to_constant_expr(expr.lhs()).get_value();
-        idl = id2string(value);
-      }
-      if(expr.rhs().id()==ID_constant)
-      {
-        const irep_idt &value=to_constant_expr(expr.rhs()).get_value();
-        idr = id2string(value);
-      }
-      
-    heaplit* hl = new eq_lit(heapvar(idl),heapexpr(idr),stateTrue);
-    std::cout << "create EQ literal (" << idl << " == " << idr << ")" << std::endl;
-    heap_literal_map.insert(heap_literal_mapt::value_type(no_boolean_variables,hl));
-     std::cout << "adding heaplit " << no_boolean_variables << " = " << *hl << std::endl;
-    no_boolean_variables++;
-    return literalt(no_boolean_variables-1,true);
+    const irep_idt &identifier=to_symbol_expr(expr).get_identifier();
+    std::string id = convert_identifier(identifier);
+    heap_identifiers.insert(id);
+    return heapexpr(id);
+  }
+  if(expr.id()==ID_constant)
+  {
+    const irep_idt &value=to_constant_expr(expr).get_value();
+    return heapexpr(id2string(value));
+  }
+  if(expr.id()==ID_heap_member) 
+  {
+    heap_member_exprt hexpr = to_heap_member_expr(expr);
+
+    assert(hexpr.struct_op().id()==ID_symbol);
+    std::string id = convert_identifier(to_symbol_expr(hexpr.struct_op()).get_identifier());
+    std::string field = convert_identifier(hexpr.get_component_name());
+    std::string heap_id = convert_identifier(hexpr.get_heap_id());
+    
+    return heapexpr(id,heap_id,field);
   }
 
   std::cout << expr << std::endl;
-  throw "NOT IMPLEMENTED: equality";
+  throw "NOT IMPLEMENTED: heapexpr";
+}
+
+/*******************************************************************\
+
+Function: heap_convt::convert_equality
+
+  Inputs:
+
+ Outputs: literal
+
+ Purpose:
+
+\*******************************************************************/
+
+literalt heap_convt::convert_equality(const equal_exprt &expr)
+{
+  find_symbols(expr.lhs());
+  heapexpr e1 = convert_heapexpr(expr.lhs());
+  find_symbols(expr.rhs());
+  heapexpr e2 = convert_heapexpr(expr.rhs());
+
+  heaplit* hl;
+  if(expr.lhs().id()==ID_heap_member) {
+    assert(expr.rhs().id()!=ID_heap_member);
+    hl = new eq_lit(e2.v,e1,stateTrue);
+  }
+  else hl = new eq_lit(e1.v,e2,stateTrue);
+
+  std::cout << "create EQ literal (" << e1 << " == " << e2 << ")" << std::endl;
+
+  heap_literal_map[no_boolean_variables++] = hl;
+
+  std::cout << "adding heaplit " << (no_boolean_variables-1) << " = " << *hl << std::endl;
+
+  return literalt(no_boolean_variables-1,true);
 }
 
 /*******************************************************************\
@@ -3471,7 +3492,13 @@ literalt heap_convt::convert_bool(const exprt &expr)
   }
   if(expr.id()==ID_equal)
   {
+    assert(expr.operands().size()==2);
     return convert_equality(to_equal_expr(expr));
+  }
+  if(expr.id()==ID_notequal)
+  {
+    assert(expr.operands().size()==2);
+    return !convert_equality(equal_exprt(expr.op0(),expr.op1()));
   }
   if(expr.id()==ID_if)
   {

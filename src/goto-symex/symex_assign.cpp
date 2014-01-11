@@ -34,6 +34,7 @@ void goto_symext::symex_assign(
 
   replace_nondet(lhs);
   replace_nondet(rhs);
+  replace_heap_member(rhs,false);
   
   if(rhs.id()==ID_sideeffect)
   {

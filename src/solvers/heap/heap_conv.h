@@ -101,6 +101,7 @@ protected:
   exprt to_nnf(const exprt &expr);
   exprt to_cnf(const exprt &expr);
   and_exprt distribute(const or_exprt &expr);
+  heapexpr convert_heapexpr(const exprt &expr);
   std::string convert_identifier(const irep_idt &identifier);
   
   // auxiliary methods
