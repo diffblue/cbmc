@@ -187,99 +187,7 @@ void path_symext::assign(
   const exprt &lhs,
   const exprt &rhs)
 {
-  const typet &lhs_type=state.var_map.ns.follow(lhs.type());
-
-  if(lhs_type.id()==ID_struct) // lhs is a struct
-  {
-    const struct_typet &struct_type=to_struct_type(lhs_type);
-    const struct_typet::componentst &components=struct_type.components();
-
-    // split it up into components
-    for(struct_typet::componentst::const_iterator
-        it=components.begin();
-        it!=components.end();
-        it++)
-    {
-      const typet &subtype=it->type();  
-      const irep_idt &component_name=it->get_name();
-
-      exprt new_rhs=
-        rhs.is_nil()?rhs:member_exprt(rhs, component_name, subtype);
-      exprt new_lhs=member_exprt(lhs, component_name, subtype);
-      
-      // struct constructor on rhs?
-      if(rhs.id()==ID_struct)
-        new_rhs=simplify_expr(new_rhs, state.var_map.ns);
-      
-      // recursive call
-      assign(state, new_lhs, new_rhs);
-    }
-
-    return; // done
-  } 
-  else if(lhs_type.id()==ID_array) // lhs is an array
-  {
-    const array_typet &array_type=to_array_type(lhs_type);
-    const typet &subtype=array_type.subtype();
-    
-    if(array_type.size().is_constant())
-    {
-      mp_integer size;
-      if(to_integer(array_type.size(), size))
-        throw "failed to convert array size";
-    
-      // split it up into elements
-      for(mp_integer i=0; i!=size; ++i)
-      {
-        exprt index=from_integer(i, array_type.size().type());
-        exprt new_rhs=rhs.is_nil()?rhs:index_exprt(rhs, index, subtype);
-        exprt new_lhs=index_exprt(lhs, index, subtype);
-        
-        // array constructor on rhs?
-        if(rhs.id()==ID_array)
-          new_rhs=simplify_expr(new_rhs, state.var_map.ns);
-        
-        // recursive call
-        assign(state, new_lhs, new_rhs);
-      }
-    }
-    else
-    {
-      // TODO
-    }
-
-    return; // done
-  }
-  else if(lhs_type.id()==ID_vector) // lhs is a vector
-  {
-    const vector_typet &vector_type=to_vector_type(lhs_type);
-    const typet &subtype=vector_type.subtype();
-    
-    if(!vector_type.size().is_constant())
-      throw "vector with non-constant size";
-
-    mp_integer size;
-    if(to_integer(vector_type.size(), size))
-      throw "failed to convert vector size";
-  
-    // split it up into elements
-    for(mp_integer i=0; i!=size; ++i)
-    {
-      exprt index=from_integer(i, vector_type.size().type());
-      exprt new_rhs=rhs.is_nil()?rhs:index_exprt(rhs, index, subtype);
-      exprt new_lhs=index_exprt(lhs, index, subtype);
-      
-      // vector constructor on rhs?
-      if(rhs.id()==ID_vector)
-        new_rhs=simplify_expr(new_rhs, state.var_map.ns);
-      
-      // recursive call
-      assign(state, new_lhs, new_rhs);
-    }
-
-    return; // done
-  }
-  else if(rhs.id()==ID_sideeffect) // catch side effects on rhs
+  if(rhs.id()==ID_sideeffect) // catch side effects on rhs
   {
     const side_effect_exprt &side_effect_expr=to_side_effect_expr(rhs);
     const irep_idt &statement=side_effect_expr.get_statement();
@@ -471,11 +379,11 @@ void path_symext::assign_rec(
   const exprt &ssa_lhs, 
   const exprt &ssa_rhs)
 {
-  const typet &ssa_lhs_type=state.var_map.ns.follow(ssa_lhs.type());
+  //const typet &ssa_lhs_type=state.var_map.ns.follow(ssa_lhs.type());
   
   #ifdef DEBUG
   std::cout << "assign_rec: " << ssa_lhs.pretty() << std::endl;
-  std::cout << "ssa_lhs_type: " << ssa_lhs_type.id() << std::endl;
+  //std::cout << "ssa_lhs_type: " << ssa_lhs_type.id() << std::endl;
   #endif
   
   if(ssa_lhs.id()==ID_symbol)
@@ -484,10 +392,10 @@ void path_symext::assign_rec(
     assert(ssa_lhs.get_bool(ID_C_SSA_symbol));
     
     const symbol_exprt &symbol_expr=to_symbol_expr(ssa_lhs);
-    const irep_idt &ssa_identifier=symbol_expr.get_identifier();
     const irep_idt &full_identifier=symbol_expr.get(ID_C_full_identifier);
     
     #ifdef DEBUG
+    const irep_idt &ssa_identifier=symbol_expr.get_identifier();
     std::cout << "SSA symbol identifier: " << ssa_identifier << std::endl;
     std::cout << "full identifier: " << full_identifier << std::endl;
     #endif
@@ -641,6 +549,60 @@ void path_symext::assign_rec(
 
     assign_rec(state, guard, new_lhs, new_rhs);
   }
+  else if(ssa_lhs.id()==ID_struct)
+  {
+    const struct_typet &struct_type=
+      to_struct_type(state.var_map.ns.follow(ssa_lhs.type()));
+    const struct_typet::componentst &components=
+      struct_type.components();
+    
+    // split up into components
+    const exprt::operandst &operands=ssa_lhs.operands();
+    
+    assert(operands.size()==components.size());
+    
+    for(unsigned i=0; i<components.size(); i++)
+    {
+      exprt new_rhs=
+        ssa_rhs.is_nil()?ssa_rhs:member_exprt(ssa_rhs, components[i].get_name(), components[i].type());
+      assign_rec(state, guard, operands[i], new_rhs);
+    }
+  }
+  else if(ssa_lhs.id()==ID_array)
+  {
+    const typet &ssa_lhs_type=state.var_map.ns.follow(ssa_lhs.type());
+  
+    if(ssa_lhs_type.id()!=ID_array)
+      throw "array constructor must have array type";
+      
+    const array_typet &array_type=
+      to_array_type(ssa_lhs_type);
+      
+    const exprt::operandst &operands=ssa_lhs.operands();
+    
+    // split up into elements
+    for(unsigned i=0; i<operands.size(); i++)
+    {
+      exprt new_rhs=
+        ssa_rhs.is_nil()?ssa_rhs:index_exprt(ssa_rhs, from_integer(i, index_type()), array_type.subtype());
+      assign_rec(state, guard, operands[i], new_rhs);
+    }
+  }
+  else if(ssa_lhs.id()==ID_vector)
+  {
+    const vector_typet &vector_type=
+      to_vector_type(state.var_map.ns.follow(ssa_lhs.type()));
+    
+    const exprt::operandst &operands=ssa_lhs.operands();
+    
+    // split up into elements
+    for(unsigned i=0; i<operands.size(); i++)
+    {
+      exprt new_rhs=
+        ssa_rhs.is_nil()?ssa_rhs:index_exprt(ssa_rhs, from_integer(i, index_type()), vector_type.subtype());
+      assign_rec(state, guard, operands[i], new_rhs);
+    }
+  }
   else if(ssa_lhs.id()==ID_string_constant ||
           ssa_lhs.id()=="NULL-object" ||
           ssa_lhs.id()=="zero_string" ||
@@ -652,7 +614,7 @@ void path_symext::assign_rec(
   else
   {
     // ignore
-    //throw "path_symext::assign_rec(): unexpected lhs: ";
+    throw "path_symext::assign_rec(): unexpected lhs: "+ssa_lhs.id_string();
   }
 }
 
