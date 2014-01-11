@@ -84,4 +84,10 @@ private:
   #endif
 };
 
+static inline exprt dereference(const exprt &pointer, const namespacet &ns)
+{
+  dereferencet dereference_object(ns);
+  return dereference_object(pointer);
+}
+
 #endif
