@@ -39,7 +39,7 @@ Function: goto_symext::symex_malloc
 
 \*******************************************************************/
 
-inline static typet c_sizeof_type_rec(const exprt &expr)
+typet goto_symext::c_sizeof_type_rec(const exprt &expr)
 {
   const irept &sizeof_type=expr.find(ID_C_c_sizeof_type);
 

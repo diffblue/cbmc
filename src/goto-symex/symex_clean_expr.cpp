@@ -116,8 +116,6 @@ void goto_symext::clean_expr(
   statet &state,
   const bool write)
 {
-  std::cout << "CLEAN: " << expr << std::endl;  
-
   replace_nondet(expr);
   dereference(expr, state, write);
   replace_array_equal(expr);

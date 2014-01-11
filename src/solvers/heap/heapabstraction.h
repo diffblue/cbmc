@@ -490,6 +490,7 @@ public :
       /* if(hl->state == stateTrue) */
       /* 	return entails_onpath(hl->m, hl->x, hl->y, hl->z, hl->f); */
       /* return entails_not_onpath(hl->m, hl->x, hl->y, hl->z, hl->f); */
+      throw "NOT IMPLEMENTED: entails_literal(onpath)";
       break;
     case DANGLING:
       if(hl->state == stateTrue)

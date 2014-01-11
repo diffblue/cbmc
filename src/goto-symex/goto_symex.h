@@ -260,6 +260,8 @@ protected:
   virtual void symex_input         (statet &state, const codet &code);
   virtual void symex_output        (statet &state, const codet &code);
 
+  typet c_sizeof_type_rec(const exprt &expr);
+
   static unsigned nondet_count;
   static unsigned dynamic_counter;
   static unsigned heap_counter;

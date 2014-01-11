@@ -3376,6 +3376,10 @@ Function: heap_convt::convert_equality
 heapexpr heap_convt::convert_heapexpr(const exprt &expr)
 {
   find_symbols(expr);
+  if(expr.id()==ID_typecast) 
+  {  //ignore
+    return convert_heapexpr(expr.op0()); 
+  }
   if(expr.id()==ID_symbol) 
   {
     const irep_idt &identifier=to_symbol_expr(expr).get_identifier();
@@ -3418,6 +3422,35 @@ Function: heap_convt::convert_equality
 
 literalt heap_convt::convert_equality(const equal_exprt &expr)
 {
+  if(expr.lhs().id()==ID_symbol &&               
+     expr.rhs().id()==ID_heap_function_application) //malloc 
+  {
+    heap_function_application_exprt f = 
+        to_heap_function_application_expr(expr.rhs());
+    if(to_symbol_expr(f.function()).get_identifier()=="c::malloc") 
+    {
+      const irep_idt &identifier=to_symbol_expr(expr.lhs()).get_identifier();
+      std::string op3 = convert_identifier(identifier);
+      heap_identifiers.insert(op3);
+
+      find_symbols(expr.rhs());
+      std::string op1 = convert_identifier(f.get_new_heap_id());
+      std::string op2 = convert_identifier(f.get_old_heap_id());
+
+     std::cout << "create NEW literal (" << op1 << "," << op2  << "," << op3 << ")" << std::endl;
+
+     heaplit* hl = new new_lit(heapvar(op1),heapvar(op2),heapvar(op3),stateTrue);
+        
+     heap_literal_map[no_boolean_variables++] = hl;
+
+     std::cout << "adding heaplit " << (no_boolean_variables-1) << " = " << *hl << std::endl;
+        
+     return literalt(no_boolean_variables-1,true); 
+    }
+    assert(false);
+  }
+
+
   find_symbols(expr.lhs());
   heapexpr e1 = convert_heapexpr(expr.lhs());
   find_symbols(expr.rhs());

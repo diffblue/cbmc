@@ -258,7 +258,7 @@ void goto_symext::symex_function_call_code(
   std::cout << "symex_function_call: " << identifier << std::endl;  
     
   // symex special functions
-  /*  if(identifier=="c::malloc") {
+  if(identifier=="c::malloc") {
     if(call.arguments().size()!=1) throw "malloc expected to have one operand";
     if(call.lhs().is_nil()) return; // ignore
 
@@ -266,24 +266,31 @@ void goto_symext::symex_function_call_code(
     struct_typet struct_type = 
       to_struct_type(ns.follow(c_sizeof_type_rec(call.arguments()[0])));  
     pointer_typet type = pointer_typet(struct_type);
-    //    std::cout << "pointer type: " << type << std::endl;  
+    //std::cout << "pointer type: " << type << std::endl;  
 
     if(is_heap_type(type)) {
       exprt lhs = call.lhs();
       lhs.type() = type; // set to mallocked type
-      state.rename(lhs, ns, goto_symex_statet::L2);
       symbol_exprt lhs_symbol = to_symbol_expr(lhs);
-      target.heap_objects.insert(lhs_symbol.get_identifier());
+      //     target.heap_objects.insert(lhs_symbol.get_identifier());
 
       irep_idt old_heap_id = make_heap_id(struct_type.get_tag());
       heap_counter++; //new heap
-      target.heap_malloc(state.guard.as_expr(), lhs_symbol, 
-        old_heap_id, make_heap_id(struct_type.get_tag()), state.source); 
+      irep_idt new_heap_id = make_heap_id(struct_type.get_tag());
 
+      heap_function_application_exprt rhs = 
+        heap_function_application_exprt(old_heap_id,new_heap_id);
+      rhs.function() = call.function();
+      rhs.arguments() = call.arguments(); 
+      rhs.type() = call.lhs().type();
+      code_assignt assignment(lhs, rhs);
+      symex_assign(state, assignment); 
+ 
       state.source.pc++;
       return;
     }
   }
+/*
   if(identifier=="c::free") {
     if(call.arguments().size()!=1) throw "free expected one operand";
 

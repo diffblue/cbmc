@@ -56,6 +56,7 @@ inline void *calloc(__CPROVER_size_t nmemb, __CPROVER_size_t size)
 
 /* FUNCTION: malloc */
 
+/*
 #undef malloc
 
 inline void *malloc(__CPROVER_size_t malloc_size)
@@ -81,7 +82,7 @@ inline void *malloc(__CPROVER_size_t malloc_size)
 
   return res;
 }
-
+*/
 /* FUNCTION: free */
 
 #undef free

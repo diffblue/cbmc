@@ -110,7 +110,7 @@ decision_proceduret::resultt heap_dect::dec_solve()
         else
           std::cout << "do not have " << id << "==NULL" << std::endl;
       }
-      if(it->second.type.id()==ID_bool) 
+      else if(it->second.type.id()==ID_bool) 
       {
         it->second.value.make_nil();
         literalt& l = symbols[it->first];
