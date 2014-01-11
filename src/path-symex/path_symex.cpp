@@ -197,6 +197,10 @@ void path_symext::assign(
       symex_malloc(state, lhs, side_effect_expr);
       return;
     }
+    else if(statement==ID_nondet)
+    {
+      // done in statet:instantiate_rec
+    }
     else
       throw "unexpected side-effect on rhs: "+id2string(statement);
   }
@@ -564,7 +568,9 @@ void path_symext::assign_rec(
     for(unsigned i=0; i<components.size(); i++)
     {
       exprt new_rhs=
-        ssa_rhs.is_nil()?ssa_rhs:member_exprt(ssa_rhs, components[i].get_name(), components[i].type());
+        ssa_rhs.is_nil()?ssa_rhs:
+        simplify_expr(member_exprt(ssa_rhs, components[i].get_name(), components[i].type()),
+          state.var_map.ns);
       assign_rec(state, guard, operands[i], new_rhs);
     }
   }
@@ -584,7 +590,9 @@ void path_symext::assign_rec(
     for(unsigned i=0; i<operands.size(); i++)
     {
       exprt new_rhs=
-        ssa_rhs.is_nil()?ssa_rhs:index_exprt(ssa_rhs, from_integer(i, index_type()), array_type.subtype());
+        ssa_rhs.is_nil()?ssa_rhs:
+        simplify_expr(index_exprt(ssa_rhs, from_integer(i, index_type()), array_type.subtype()),
+          state.var_map.ns);
       assign_rec(state, guard, operands[i], new_rhs);
     }
   }
@@ -599,7 +607,9 @@ void path_symext::assign_rec(
     for(unsigned i=0; i<operands.size(); i++)
     {
       exprt new_rhs=
-        ssa_rhs.is_nil()?ssa_rhs:index_exprt(ssa_rhs, from_integer(i, index_type()), vector_type.subtype());
+        ssa_rhs.is_nil()?ssa_rhs:
+        simplify_expr(index_exprt(ssa_rhs, from_integer(i, index_type()), vector_type.subtype()),
+          state.var_map.ns);
       assign_rec(state, guard, operands[i], new_rhs);
     }
   }
