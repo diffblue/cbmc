@@ -85,6 +85,8 @@ inline void *malloc(__CPROVER_size_t malloc_size)
 */
 /* FUNCTION: free */
 
+ 
+ /*
 #undef free
 
 inline void free(void *ptr)
@@ -118,6 +120,7 @@ inline void free(void *ptr)
   }
 }
 
+ */
 /* FUNCTION: strtol */
 
 #ifndef __CPROVER_ERRNO_H_INCLUDED

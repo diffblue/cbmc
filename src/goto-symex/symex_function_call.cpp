@@ -258,7 +258,8 @@ void goto_symext::symex_function_call_code(
   std::cout << "symex_function_call: " << identifier << std::endl;  
     
   // symex special functions
-  if(identifier=="c::malloc") {
+  if(identifier=="c::malloc") 
+  {
     if(call.arguments().size()!=1) throw "malloc expected to have one operand";
     if(call.lhs().is_nil()) return; // ignore
 
@@ -268,7 +269,8 @@ void goto_symext::symex_function_call_code(
     pointer_typet type = pointer_typet(struct_type);
     //std::cout << "pointer type: " << type << std::endl;  
 
-    if(is_heap_type(type)) {
+    if(is_heap_type(type)) 
+    {
       exprt lhs = call.lhs();
       lhs.type() = type; // set to mallocked type
       symbol_exprt lhs_symbol = to_symbol_expr(lhs);
@@ -290,34 +292,55 @@ void goto_symext::symex_function_call_code(
       return;
     }
   }
-/*
-  if(identifier=="c::free") {
+
+  if(identifier=="c::free") 
+  {
     if(call.arguments().size()!=1) throw "free expected one operand";
 
-    exprt arg = call.arguments()[0].op0(); //remove (void*)  typecast
-
-    struct_typet struct_type = to_struct_type(ns.follow(arg.type().subtype()));
+    struct_typet struct_type = to_struct_type(
+      ns.follow(call.arguments()[0].op0().type().subtype()));
     pointer_typet type = pointer_typet(struct_type);
     //    std::cout << "pointer type: " << type << std::endl;  
 
-    if(is_heap_type(type)) {
-      state.rename(arg, ns, goto_symex_statet::L2);
+    if(is_heap_type(type)) 
+    {
+      symbolt dummy; //pseudo-lhs
+      dummy.name = "symex://nil";
+      new_name(dummy);
+      exprt lhs = symbol_exprt(dummy.name); 
+      lhs.type() = dummy.type;
 
       irep_idt old_heap_id = make_heap_id(struct_type.get_tag());
       heap_counter++; //new heap
-      target.heap_free(state.guard.as_expr(), arg, 
-        old_heap_id, make_heap_id(struct_type.get_tag()), state.source); 
+      irep_idt new_heap_id = make_heap_id(struct_type.get_tag());
+
+      heap_function_application_exprt rhs = 
+        heap_function_application_exprt(old_heap_id,new_heap_id);
+      rhs.function() = call.function();
+      rhs.arguments() = call.arguments(); 
+      rhs.type() = lhs.type();
+
+      //remove (void*)  typecasts
+      for(heap_function_application_exprt::argumentst::iterator it = 
+              rhs.arguments().begin();
+            it != rhs.arguments().end(); it++) {
+        *it = it->op0();
+        //replace_heap_member(*it,false); //TODO
+      }
+
+      code_assignt assignment(lhs, rhs);
+      symex_assign(state, assignment); 
 
       state.source.pc++;
       return;
     }
   }
-  */
+  
   if(identifier=="c::__CPROVER_HEAP_dangling" ||
      identifier=="c::__CPROVER_HEAP_disjoint" ||
      identifier=="c::__CPROVER_HEAP_onpath" ||
-     identifier=="c::__CPROVER_HEAP_path") {
-
+     identifier=="c::__CPROVER_HEAP_path") 
+  {
     //check number of arguments
     if(identifier=="c::__CPROVER_HEAP_dangling" && call.arguments().size()!=1) 
       throw id2string(identifier)+" expected one operand";

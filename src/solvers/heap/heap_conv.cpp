@@ -3304,55 +3304,74 @@ Function: heap_convt::convert_function
 
 literalt heap_convt::convert_function(const heap_function_application_exprt &f)
 {
-   if(to_symbol_expr(f.function()).get_identifier()=="c::__CPROVER_HEAP_dangling") 
+   if(to_symbol_expr(f.function()).get_identifier()==
+       "c::__CPROVER_HEAP_dangling") 
    {
      find_symbols(f);
      std::string op1 = convert_identifier(f.get_heap_id());
-     std::string op2 = convert_identifier(to_symbol_expr(f.arguments()[0]).get_identifier());
+     std::string op2 = 
+       convert_identifier(to_symbol_expr(f.arguments()[0]).get_identifier());
 
-     std::cout << "create DANGLING literal (" << op1 << "," << op2 << ")" << std::endl;
+     std::cout << 
+       "create DANGLING literal (" << op1 << "," << op2 << ")" << std::endl;
+
      heaplit* hl = new dangling_lit(heapvar(op1),heapvar(op2),stateTrue);
-        
-     heap_literal_map.insert(heap_literal_mapt::value_type(no_boolean_variables,hl));
-     std::cout << "adding heaplit " << no_boolean_variables << " = " << *hl << std::endl;
-     no_boolean_variables++;
+     heap_literal_map[no_boolean_variables++] = hl;
+
+     std::cout << "adding heaplit " << (no_boolean_variables-1) << " = " << 
+       *hl << std::endl;
         
      return literalt(no_boolean_variables-1,true); 
    }
-   if(to_symbol_expr(f.function()).get_identifier()=="c::__CPROVER_HEAP_path") 
+   if(to_symbol_expr(f.function()).get_identifier()==
+       "c::__CPROVER_HEAP_path") 
    {
      find_symbols(f);
      std::string op1 = convert_identifier(f.get_heap_id());
-     std::string op2 = convert_identifier(to_symbol_expr(f.arguments()[0]).get_identifier());
-     std::string op3 = convert_identifier(to_symbol_expr(f.arguments()[1]).get_identifier());
-     std::string op4 = convert_identifier(f.arguments()[2].op0().op0().get(ID_value));
+     std::string op2 = 
+       convert_identifier(to_symbol_expr(f.arguments()[0]).get_identifier());
+     std::string op3 = 
+       convert_identifier(to_symbol_expr(f.arguments()[1]).get_identifier());
+     std::string op4 = 
+       convert_identifier(f.arguments()[2].op0().op0().get(ID_value));
 
-     std::cout << "create PATH literal (" << op1 << "," << op2 << "," << op3 << "," << op4 << ")" << std::endl;
-     heaplit* hl = new path_lit(heapvar(op1),heapvar(op2),heapvar(op3),heapvar(op4),stateTrue);
+     std::cout << "create PATH literal (" << op1 << "," << op2 << "," << 
+       op3 << "," << op4 << ")" << std::endl;
 
-     heap_literal_map.insert(heap_literal_mapt::value_type(no_boolean_variables,hl));
-     std::cout << "adding heaplit " << no_boolean_variables << " = " << *hl << std::endl;
-     no_boolean_variables++;
+     heaplit* hl = new path_lit(heapvar(op1),heapvar(op2),heapvar(op3),
+       heapvar(op4),stateTrue);
+
+     heap_literal_map[no_boolean_variables++] = hl;
+
+     std::cout << "adding heaplit " << (no_boolean_variables-1) << " = " << 
+       *hl << std::endl;
         
      return literalt(no_boolean_variables-1,true); 
   }
-  if(to_symbol_expr(f.function()).get_identifier()=="c::__CPROVER_HEAP_onpath") 
+  if(to_symbol_expr(f.function()).get_identifier()==
+      "c::__CPROVER_HEAP_onpath") 
   {
      find_symbols(f);
      std::string op1 = convert_identifier(f.get_heap_id());
-     std::string op2 = convert_identifier(to_symbol_expr(f.arguments()[0]).get_identifier());
-     std::string op3 = convert_identifier(to_symbol_expr(f.arguments()[1]).get_identifier());
-     std::string op4 = convert_identifier(to_symbol_expr(f.arguments()[2]).get_identifier());
-     std::string op5 = convert_identifier(f.arguments()[3].op0().op0().get(ID_value));
+     std::string op2 = 
+       convert_identifier(to_symbol_expr(f.arguments()[0]).get_identifier());
+     std::string op3 = 
+       convert_identifier(to_symbol_expr(f.arguments()[1]).get_identifier());
+     std::string op4 = 
+       convert_identifier(to_symbol_expr(f.arguments()[2]).get_identifier());
+     std::string op5 = 
+       convert_identifier(f.arguments()[3].op0().op0().get(ID_value));
 
-     std::cout << "create ONPATH literal (" << op1 << "," << op2 << "," << op3 << "," << op4  << "," << op5 << ")" << std::endl;
+     std::cout << "create ONPATH literal (" << op1 << "," << op2 << "," << 
+       op3 << "," << op4  << "," << op5 << ")" << std::endl;
 
-     heaplit* hl = new onpath_lit(heapvar(op1),heapvar(op2),heapvar(op3),heapvar(op4),heapvar(op5),
-                              stateTrue);
+     heaplit* hl = new onpath_lit(heapvar(op1),heapvar(op2),heapvar(op3),
+                         heapvar(op4),heapvar(op5),stateTrue);
 
-     heap_literal_map.insert(heap_literal_mapt::value_type(no_boolean_variables,hl));
-     std::cout << "adding heaplit " << no_boolean_variables << " = " << *hl << std::endl;
-     no_boolean_variables++;
+     heap_literal_map[no_boolean_variables++] = hl;
+
+     std::cout << "adding heaplit " << (no_boolean_variables-1) << " = " << 
+       *hl << std::endl;
         
      return literalt(no_boolean_variables-1,true); 
   }
@@ -3422,8 +3441,10 @@ Function: heap_convt::convert_equality
 
 literalt heap_convt::convert_equality(const equal_exprt &expr)
 {
+  std::cout << "convert_equality()" << std::endl;
+
   if(expr.lhs().id()==ID_symbol &&               
-     expr.rhs().id()==ID_heap_function_application) //malloc 
+     expr.rhs().id()==ID_heap_function_application) //malloc, free
   {
     heap_function_application_exprt f = 
         to_heap_function_application_expr(expr.rhs());
@@ -3447,6 +3468,29 @@ literalt heap_convt::convert_equality(const equal_exprt &expr)
         
      return literalt(no_boolean_variables-1,true); 
     }
+
+    if(to_symbol_expr(f.function()).get_identifier()=="c::free") 
+    {
+      find_symbols(f);
+      std::string op1 = convert_identifier(f.get_new_heap_id());
+      std::string op2 = convert_identifier(f.get_old_heap_id());
+      std::string op3 = 
+        convert_identifier(to_symbol_expr(f.arguments()[0]).get_identifier());
+
+      std::cout << "create FREE literal (" << op1 << "," << op2 << "," << 
+        op3 << ")" << std::endl;
+
+      heaplit* hl = 
+        new free_lit(heapvar(op1),heapvar(op2),heapvar(op3),stateTrue);
+
+      heap_literal_map[no_boolean_variables++] = hl;
+
+      std::cout << "adding heaplit " << (no_boolean_variables-1) << " = " << 
+        *hl << std::endl;
+        
+      return literalt(no_boolean_variables-1,true); 
+    }
+
     assert(false);
   }
 
