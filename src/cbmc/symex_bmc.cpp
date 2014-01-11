@@ -174,6 +174,7 @@ bool symex_bmct::is_heap_type(typet type) {
   if(!options.get_bool_option("use-heap-theory")) return false;
 
   //TODO: implement more reasonable criterion or let the user specify, etc
-  return type.id()==ID_pointer && 
-    ns.follow(to_pointer_type(type).subtype()).id()==ID_struct;
+  return (type.id()==ID_pointer && 
+	  ns.follow(to_pointer_type(type).subtype()).id()==ID_struct) ||
+         (ns.follow(type).id()==ID_struct);
 }

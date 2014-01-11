@@ -3107,7 +3107,7 @@ extern inline ssa_exprt &to_ssa_expr(exprt &expr)
   return static_cast<ssa_exprt &>(expr);
 }
 
-/*! \brief application of (mathematical) function (with heap ids)
+/*! \brief application of (mathematical) function (for heap theory)
 */
 class heap_function_application_exprt:public exprt
 {
@@ -3190,7 +3190,7 @@ extern inline heap_function_application_exprt &to_heap_function_application_expr
   return static_cast<heap_function_application_exprt &>(expr);
 }
 
-/*! \brief Extract member of heap struct
+/*! \brief Extract member of struct (for heap theory)
 */
 class heap_member_exprt:public exprt
 {
@@ -3288,6 +3288,98 @@ inline heap_member_exprt &to_heap_member_expr(exprt &expr)
 {
   assert(expr.id()==ID_heap_member);
   return static_cast<heap_member_exprt &>(expr);
+}
+
+/*! \brief Operator to update elements in structs and arrays (for heap theory)
+    \remark This expression will eventually be replaced by separate
+            array and struct update operators.
+*/
+class heap_with_exprt:public exprt
+{
+public:
+  heap_with_exprt(
+    const exprt &_old,
+    const exprt &_where,
+    const exprt &_new_value,
+    const irep_idt old_heap_id,
+    const irep_idt new_heap_id):
+    exprt(ID_heap_with, _old.type())
+  {
+    copy_to_operands(_old, _where, _new_value);
+    set(ID_old_heap_id,old_heap_id);
+    set(ID_new_heap_id,new_heap_id);
+  }
+
+  inline heap_with_exprt():exprt(ID_heap_with)
+  {
+    operands().resize(3);
+  }
+  
+  inline exprt &old()
+  {
+    return op0();
+  }
+
+  inline const exprt &old() const
+  {
+    return op0();
+  }
+
+  inline exprt &where()
+  {
+    return op1();
+  }
+
+  inline const exprt &where() const
+  {
+    return op1();
+  }
+
+  inline exprt &new_value()
+  {
+    return op2();
+  }
+
+  inline const exprt &new_value() const
+  {
+    return op2();
+  }
+
+  const irep_idt &get_old_heap_id() const
+  {
+    return get(ID_old_heap_id);
+  }
+
+  const irep_idt &get_new_heap_id() const
+  {
+    return get(ID_new_heap_id);
+  }
+
+};
+
+/*! \brief Cast a generic exprt to a \ref heap_with_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * heap_with_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref heap_with_exprt
+ *
+ * \ingroup gr_std_expr
+*/
+extern inline const heap_with_exprt &to_heap_with_expr(const exprt &expr)
+{
+  assert(expr.id()==ID_heap_with && expr.operands().size()==3);
+  return static_cast<const heap_with_exprt &>(expr);
+}
+
+/*! \copydoc to_heap_with_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
+extern inline heap_with_exprt &to_heap_with_expr(exprt &expr)
+{
+  assert(expr.id()==ID_heap_with && expr.operands().size()==3);
+  return static_cast<heap_with_exprt &>(expr);
 }
 
 

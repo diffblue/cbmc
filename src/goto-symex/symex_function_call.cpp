@@ -322,10 +322,10 @@ void goto_symext::symex_function_call_code(
 
       //remove (void*)  typecasts
       for(heap_function_application_exprt::argumentst::iterator it = 
-              rhs.arguments().begin();
-            it != rhs.arguments().end(); it++) {
+           rhs.arguments().begin();it!=rhs.arguments().end(); it++) 
+      {
         *it = it->op0();
-        //replace_heap_member(*it,false); //TODO
+        replace_heap_member(*it);
       }
 
       code_assignt assignment(lhs, rhs);
@@ -364,10 +364,11 @@ void goto_symext::symex_function_call_code(
     rhs.arguments() = call.arguments(); 
     rhs.type() = call.lhs().type();
     //remove (void*)  typecasts
-    for(heap_function_application_exprt::argumentst::iterator it = rhs.arguments().begin();
-	it != rhs.arguments().end(); it++) {
+    for(heap_function_application_exprt::argumentst::iterator it = 
+         rhs.arguments().begin();it!=rhs.arguments().end(); it++) 
+    {
       *it = it->op0();
-      //replace_heap_member(*it,false); //TODO
+      replace_heap_member(*it);
     }
     code_assignt assignment(lhs, rhs);
     symex_assign(state, assignment); 

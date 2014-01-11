@@ -65,6 +65,8 @@ void goto_symext::claim(
 
   if(expr.is_true()) return;
   
+  replace_heap_member(expr);
+
   state.guard.guard_expr(expr);
   
   remaining_claims++;

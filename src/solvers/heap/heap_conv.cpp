@@ -3444,12 +3444,44 @@ literalt heap_convt::convert_equality(const equal_exprt &expr)
   std::cout << "convert_equality()" << std::endl;
 
   if(expr.lhs().id()==ID_symbol &&               
+     expr.rhs().id()==ID_heap_with) //heap update
+  {
+    find_symbols(expr.lhs());
+    const irep_idt &identifier=to_symbol_expr(expr.lhs()).get_identifier();
+    std::string op3 = convert_identifier(identifier);
+    heap_identifiers.insert(op3);
+
+    find_symbols(expr.rhs());
+    heap_with_exprt with = to_heap_with_expr(expr.rhs());
+    std::string op1 = convert_identifier(with.get_new_heap_id());
+    std::string op2 = convert_identifier(with.get_old_heap_id());
+    std::cout << "WHERE: " << with.where() << std::endl;
+    std::string op4 = convert_identifier(with.where().get(ID_component_name));
+    heapexpr op5 = convert_heapexpr(with.new_value());
+    assert(with.new_value().id()==ID_symbol ||
+           with.new_value().id()==ID_constant); //otherwise introduce an EQ
+
+    std::cout << "create STORE literal (" << op1 << "," << op2  << "," << 
+       op3 << "," << op4  << "," << op5 << ")" << std::endl;
+
+    heaplit* hl = new store_lit(heapvar(op1),heapvar(op2),
+       heapvar(op3),heapvar(op4),op5.v,stateTrue);
+        
+    heap_literal_map[no_boolean_variables++] = hl;
+
+    std::cout << "adding heaplit " << (no_boolean_variables-1) << " = " << *hl << std::endl;
+        
+    return literalt(no_boolean_variables-1,true); 
+  }
+
+  if(expr.lhs().id()==ID_symbol &&               
      expr.rhs().id()==ID_heap_function_application) //malloc, free
   {
     heap_function_application_exprt f = 
         to_heap_function_application_expr(expr.rhs());
     if(to_symbol_expr(f.function()).get_identifier()=="c::malloc") 
     {
+      find_symbols(expr.lhs());
       const irep_idt &identifier=to_symbol_expr(expr.lhs()).get_identifier();
       std::string op3 = convert_identifier(identifier);
       heap_identifiers.insert(op3);

@@ -63,7 +63,7 @@ void goto_symext::replace_nondet(exprt &expr)
 
 /*******************************************************************\
 
-Function: goto_symext::replace_nondet
+Function: goto_symext::replace_heap_member
 
   Inputs:
 
@@ -73,7 +73,7 @@ Function: goto_symext::replace_nondet
 
 \*******************************************************************/
 
-void goto_symext::replace_heap_member(exprt &expr, bool write)
+void goto_symext::replace_heap_member(exprt &expr)
 {
   if(expr.id()==ID_member && is_heap_type(expr.type()))
   {
@@ -91,5 +91,6 @@ void goto_symext::replace_heap_member(exprt &expr, bool write)
   }
   else
     Forall_operands(it, expr)
-      replace_heap_member(*it,write);
+      replace_heap_member(*it);
 }
+

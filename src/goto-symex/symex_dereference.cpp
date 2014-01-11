@@ -222,9 +222,13 @@ void goto_symext::dereference_rec(
     if(expr.operands().size()!=1)
       throw "dereference takes one operand";
 
+    //quick deference hack for heap theory
     expr.swap(expr.op0());
-    return; //TODO: for heap
+    if(expr.type().id()==ID_pointer) 
+      expr.type() = ns.follow(expr.type().subtype());
+    return; //done for heap 
 
+    //TODO
     exprt tmp1;
     tmp1.swap(expr.op0());
     

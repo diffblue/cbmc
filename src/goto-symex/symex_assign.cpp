@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <iostream>
+
 #include <util/expr_util.h>
 
 #include "goto_symex.h"
@@ -34,7 +36,7 @@ void goto_symext::symex_assign(
 
   replace_nondet(lhs);
   replace_nondet(rhs);
-  replace_heap_member(rhs,false);
+  replace_heap_member(rhs);
   
   if(rhs.id()==ID_sideeffect)
   {
@@ -341,7 +343,7 @@ void goto_symext::symex_assign_array(
   exprt new_full_lhs=add_to_lhs(full_lhs, lhs);
 
   symex_assign_rec(
-    state, lhs_array, new_full_lhs, new_rhs, guard, visibility);
+      state, lhs_array, new_full_lhs, new_rhs, guard, visibility);
   #endif
 }
 
@@ -365,6 +367,8 @@ void goto_symext::symex_assign_member(
   guardt &guard,
   visibilityt visibility)
 {
+  std::cout << "ASSIGN_MEMBER: " << lhs << std::endl;
+
   // symbolic execution of a struct member assignment
 
   // lhs must be member operand
@@ -427,14 +431,29 @@ void goto_symext::symex_assign_member(
   // into
   //   a'==a WITH [c:=e]
 
-  exprt new_rhs(ID_with, struct_type);
-  new_rhs.copy_to_operands(lhs_struct, exprt(ID_member_name), rhs);
-  new_rhs.op1().set(ID_component_name, component_name);
+  if(is_heap_type(struct_type))
+  {
+    irep_idt old_heap_id = make_heap_id(to_struct_type(struct_type).get_tag());
+    heap_counter++; //new heap
+    irep_idt new_heap_id = make_heap_id(to_struct_type(struct_type).get_tag());
+    heap_with_exprt new_rhs(lhs_struct, exprt(ID_member_name), 
+      rhs,old_heap_id,new_heap_id);
+    new_rhs.op1().set(ID_component_name, component_name);
+    exprt new_full_lhs=add_to_lhs(full_lhs, lhs);
+    symex_assign_rec(
+      state, lhs_struct, new_full_lhs, new_rhs, guard, visibility);
+  }
+  else 
+  {
+    exprt new_rhs(ID_with, struct_type);
+    new_rhs.copy_to_operands(lhs_struct, exprt(ID_member_name), rhs);
+    new_rhs.op1().set(ID_component_name, component_name);
   
-  exprt new_full_lhs=add_to_lhs(full_lhs, lhs);
+    exprt new_full_lhs=add_to_lhs(full_lhs, lhs);
 
-  symex_assign_rec(
-    state, lhs_struct, new_full_lhs, new_rhs, guard, visibility);
+    symex_assign_rec(
+      state, lhs_struct, new_full_lhs, new_rhs, guard, visibility);
+  }
   #endif
 }
 
