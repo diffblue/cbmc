@@ -534,9 +534,8 @@ exprt path_symex_statet::dereference_rec(
     // read the address to propagate the pointers
     exprt address=read(dereference_expr.pointer(), propagate);
 
-    // now hand over to dereferencet
-    dereferencet dereference_object(var_map.ns);
-    exprt address_dereferenced=dereference_object(address);
+    // now hand over to dereference
+    exprt address_dereferenced=::dereference(address, var_map.ns);
     
     // the dereferenced address is a mixture of non-SSA and SSA symbols
     // (e.g., if-guards and array indices)
