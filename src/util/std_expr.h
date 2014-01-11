@@ -915,7 +915,7 @@ public:
   {
   }
  
-  explicit inline array_exprt(const typet &_type):
+  explicit inline array_exprt(const array_typet &_type):
     exprt(ID_array, _type)
   {
   }
@@ -958,7 +958,7 @@ public:
   {
   }
  
-  explicit inline vector_exprt(const typet &_type):
+  explicit inline vector_exprt(const vector_typet &_type):
     exprt(ID_vector, _type)
   {
   }
