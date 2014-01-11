@@ -3309,13 +3309,16 @@ literalt heap_convt::convert_function(const heap_function_application_exprt &f)
    {
      find_symbols(f);
      std::string op1 = convert_identifier(f.get_heap_id());
-     std::string op2 = 
-       convert_identifier(to_symbol_expr(f.arguments()[0]).get_identifier());
+     heapexpr op2 = convert_heapexpr(f.arguments()[0]);
+
+     assert(f.arguments()[0].id()==ID_symbol ||
+             f.arguments()[0].id()==ID_constant);
+       //otherwise introduce an EQ
 
      std::cout << 
        "create DANGLING literal (" << op1 << "," << op2 << ")" << std::endl;
 
-     heaplit* hl = new dangling_lit(heapvar(op1),heapvar(op2),stateTrue);
+     heaplit* hl = new dangling_lit(heapvar(op1),op2.v,stateTrue);
      heap_literal_map[no_boolean_variables++] = hl;
 
      std::cout << "adding heaplit " << (no_boolean_variables-1) << " = " << 
@@ -3328,17 +3331,22 @@ literalt heap_convt::convert_function(const heap_function_application_exprt &f)
    {
      find_symbols(f);
      std::string op1 = convert_identifier(f.get_heap_id());
-     std::string op2 = 
-       convert_identifier(to_symbol_expr(f.arguments()[0]).get_identifier());
-     std::string op3 = 
-       convert_identifier(to_symbol_expr(f.arguments()[1]).get_identifier());
+     heapexpr op2 = convert_heapexpr(f.arguments()[0]);
+     heapexpr op3 = convert_heapexpr(f.arguments()[1]);
      std::string op4 = 
        convert_identifier(f.arguments()[2].op0().op0().get(ID_value));
+
+     assert((f.arguments()[0].id()==ID_symbol ||
+             f.arguments()[0].id()==ID_constant) &&
+            (f.arguments()[1].id()==ID_symbol ||
+             f.arguments()[1].id()==ID_constant));
+       //otherwise introduce an EQ
+
 
      std::cout << "create PATH literal (" << op1 << "," << op2 << "," << 
        op3 << "," << op4 << ")" << std::endl;
 
-     heaplit* hl = new path_lit(heapvar(op1),heapvar(op2),heapvar(op3),
+     heaplit* hl = new path_lit(heapvar(op1),op2.v,op3.v,
        heapvar(op4),stateTrue);
 
      heap_literal_map[no_boolean_variables++] = hl;
@@ -3526,6 +3534,40 @@ literalt heap_convt::convert_equality(const equal_exprt &expr)
     assert(false);
   }
 
+  if(expr.lhs().id()==ID_symbol && expr.rhs().id()==ID_if)
+  {
+    assert(expr.rhs().operands().size()==3);
+
+    find_symbols(expr.lhs());
+    const irep_idt &identifier=to_symbol_expr(expr.lhs()).get_identifier();
+    std::string op1 = convert_identifier(identifier);
+    heap_identifiers.insert(op1);
+
+    find_symbols(expr.rhs());
+    literalt c = convert_bool(expr.rhs().op0());
+    heapexpr i = convert_heapexpr(expr.rhs().op1());
+    heapexpr e = convert_heapexpr(expr.rhs().op2());
+    std::cout << "if " << c << " then " << i << " else " << e << std::endl;
+
+    heaplit* hli = new eq_lit(heapvar(op1),i,stateTrue);
+    std::cout << "create EQ literal (" << op1 << " == " << i << ")" << std::endl;
+    heaplit* hle = new eq_lit(heapvar(op1),e,stateTrue);
+    std::cout << "create EQ literal (" << op1 << " == " << e << ")" << std::endl;
+
+    unsigned li = no_boolean_variables++;
+    unsigned le = no_boolean_variables++;
+    heap_literal_map[li] = hli;
+    heap_literal_map[le] = hle;
+
+    literalt l(no_boolean_variables++, true);
+    literal_map[l] = or_exprt(and_exprt(literal_exprt(c),
+                                        literal_exprt(literalt(li,true))),
+                              and_exprt(literal_exprt(!c),
+                                        literal_exprt(literalt(le,true))));
+    std::cout << "adding literal " << l << " = " << literal_map[l] << std::endl;
+    return l;
+  }
+
 
   find_symbols(expr.lhs());
   heapexpr e1 = convert_heapexpr(expr.lhs());
@@ -3566,6 +3608,10 @@ literalt heap_convt::convert_bool(const exprt &expr)
 
   assert(expr.type().id()==ID_bool);
   
+  if(expr.id()==ID_literal)
+  {
+    return to_literal_expr(expr).get_literal();
+  }
   if(expr.id()==ID_constant)
   {
     assert(expr.operands().size()==0);
@@ -3583,10 +3629,31 @@ literalt heap_convt::convert_bool(const exprt &expr)
     forall_operands(it, expr)  {
       and_expr.operands().push_back(literal_exprt(convert_bool(*it)));
     }
-    literalt l(no_boolean_variables, true);
-    no_boolean_variables++;
+    literalt l(no_boolean_variables++, true);
     literal_map[l] = and_expr;
     std::cout << "adding literal " << l << " = " << and_expr << std::endl;
+    return l;
+  }
+  if(expr.id()==ID_or)
+  {
+    or_exprt or_expr;
+    forall_operands(it, expr)  {
+      or_expr.operands().push_back(literal_exprt(convert_bool(*it)));
+    }
+    literalt l(no_boolean_variables++, true);
+    literal_map[l] = or_expr;
+    std::cout << "adding literal " << l << " = " << or_expr << std::endl;
+    return l;
+  }
+  if(expr.id()==ID_implies)
+  {
+    assert(expr.operands().size()==2);
+    or_exprt or_expr;
+    or_expr.operands().push_back(literal_exprt(!convert_bool(expr.op0())));
+    or_expr.operands().push_back(literal_exprt(convert_bool(expr.op1())));
+    literalt l(no_boolean_variables++, true);
+    literal_map[l] = or_expr;
+    std::cout << "adding literal " << l << " = " << or_expr << std::endl;
     return l;
   }
   if(expr.id()==ID_symbol) //boolean symbol
@@ -3896,7 +3963,32 @@ void heap_convt::set_to(const exprt &expr, bool value)
       std::cout << "cnf: " << cnf << std::endl;
       if(cnf.id()==ID_literal)
       {
+        literalt l = to_literal_expr(cnf).get_literal();
+        if(l.is_false()) throw "UNSAT: empty clause";
+        if(l.is_true()) return; //clause is satisfied
         set_to(cnf,value);
+        return;
+      }
+      if(cnf.id()==ID_or) 
+      {
+        std::cout << "adding clause for " << cnf << std::endl;
+        clauset* clause = new clauset(); 
+        forall_operands(it, cnf) 
+        {          
+          if(it->id()==ID_literal) 
+          { 
+            literalt l = to_literal_expr(*it).get_literal();
+            if(l.is_false()) continue; //ignore
+            if(l.is_true()) return; //clause is satisfied
+            heaplit* hl = heap_literal_map[l.var_no()];
+            assert(hl!=NULL);
+            if(!l.sign()) hl->complement();
+            if(!value) hl->complement();
+            clause->push_back(hl);
+          }
+        }
+        std::cout << "adding clause " << *clause << std::endl;
+        formula.push_back(clause);
         return;
       }
       if(cnf.id()==ID_and) 
@@ -3906,29 +3998,46 @@ void heap_convt::set_to(const exprt &expr, bool value)
         {
           std::cout << "adding clause for " << *it1 << std::endl;
 	  clauset* clause = new clauset(); 
+          bool ignore_clause = false;
           if(it1->id()==ID_literal) 
           { 
             literalt l = to_literal_expr(*it1).get_literal();
+            if(l.is_false()) throw "UNSAT: empty clause";
+            if(l.is_true()) continue; //clause is satisfied
             heaplit* hl = heap_literal_map[l.var_no()];
             assert(hl!=NULL);
             if(!l.sign()) hl->complement();
             if(!value) hl->complement();
             clause->push_back(hl);
           }
-          else forall_operands(it2, *it1) 
-          {          
-            if(it2->id()==ID_literal) 
-            { 
-              literalt l = to_literal_expr(*it2).get_literal();
-              heaplit* hl = heap_literal_map[l.var_no()];
-              assert(hl!=NULL);
-              if(!l.sign()) hl->complement();
-              if(!value) hl->complement();
-              clause->push_back(hl);
+          else 
+          {
+            forall_operands(it2, *it1) 
+            {          
+              if(it2->id()==ID_literal) 
+              { 
+                literalt l = to_literal_expr(*it2).get_literal();
+                if(l.is_true()) //clause is satisfied
+		{
+                  ignore_clause = true;
+                  break;
+		}
+                if(!l.is_false()) 
+		{
+                  heaplit* hl = heap_literal_map[l.var_no()];
+                  assert(hl!=NULL);
+                  if(!l.sign()) hl->complement();
+                  if(!value) hl->complement();
+                  clause->push_back(hl);
+		}
+	      }
 	    }
           }
-	  std::cout << "adding clause " << *clause << std::endl;
-	  formula.push_back(clause);
+          if(!ignore_clause) 
+	  {
+	    std::cout << "adding clause " << *clause << std::endl;
+	    formula.push_back(clause);
+	  }
 	}
         return;
       }

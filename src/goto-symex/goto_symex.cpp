@@ -84,9 +84,6 @@ void goto_symext::replace_heap_member(exprt &expr)
     hexpr.set_component_name(struct_expr.get_component_name());
     hexpr.location()=expr.location();
     hexpr.set_heap_id(heap_id);
-
-    std::cout << "replaced heap member: " << hexpr << std::endl;
-   
     expr.swap(hexpr);
   }
   else

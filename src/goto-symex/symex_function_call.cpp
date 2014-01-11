@@ -324,7 +324,7 @@ void goto_symext::symex_function_call_code(
       for(heap_function_application_exprt::argumentst::iterator it = 
            rhs.arguments().begin();it!=rhs.arguments().end(); it++) 
       {
-        *it = it->op0();
+        if(it->id()==ID_typecast) *it = it->op0();
         replace_heap_member(*it);
       }
 
@@ -367,7 +367,7 @@ void goto_symext::symex_function_call_code(
     for(heap_function_application_exprt::argumentst::iterator it = 
          rhs.arguments().begin();it!=rhs.arguments().end(); it++) 
     {
-      *it = it->op0();
+      if(it->id()==ID_typecast) *it = it->op0();
       replace_heap_member(*it);
     }
     code_assignt assignment(lhs, rhs);

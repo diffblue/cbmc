@@ -367,8 +367,6 @@ void goto_symext::symex_assign_member(
   guardt &guard,
   visibilityt visibility)
 {
-  std::cout << "ASSIGN_MEMBER: " << lhs << std::endl;
-
   // symbolic execution of a struct member assignment
 
   // lhs must be member operand
