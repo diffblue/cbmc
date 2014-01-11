@@ -158,6 +158,12 @@ exprt path_symex_statet::read(const exprt &src, bool propagate)
   //std::cout << "path_symex_statet::read " << src.pretty() << std::endl;
   #endif
   
+  // This has four phases!
+  // 1. Floating-point expression adjustment (rounding mode)
+  // 2. Dereferencing, including propagation of pointers.
+  // 3. Rewriting to SSA symbols
+  // 4. Simplifier
+  
   exprt tmp1=adjust_float_expressions(src, var_map.ns);
 
   // we force propagation for dereferencing
@@ -195,7 +201,6 @@ exprt path_symex_statet::instantiate_rec(
             << from_expr(var_map.ns, "", src) << std::endl;
   #endif
 
-  #if 0
   const typet &src_type=var_map.ns.follow(src.type());
   
   if(src_type.id()==ID_struct) // src is a struct
@@ -227,7 +232,77 @@ exprt path_symex_statet::instantiate_rec(
 
     return result; // done
   } 
-  #endif
+  else if(src_type.id()==ID_array) // src is an array
+  {
+    const array_typet &array_type=to_array_type(src_type);
+    const typet &subtype=array_type.subtype();
+    
+    if(array_type.size().is_constant())
+    {
+      mp_integer size;
+      if(to_integer(array_type.size(), size))
+        throw "failed to convert array size";
+        
+      signed long size_int=integer2long(size);
+        
+      array_exprt result(array_type);
+      result.operands().resize(size_int);
+    
+      // split it up into elements
+      for(signed long i=0; i<size_int; ++i)
+      {
+        exprt index=from_integer(i, array_type.size().type());
+        exprt new_src=index_exprt(src, index, subtype);
+        
+        // array constructor?
+        if(src.id()==ID_array)
+          new_src=simplify_expr(new_src, var_map.ns);
+        
+        // recursive call
+        result.operands()[i]=instantiate_rec(new_src, propagate);
+      }
+      
+      return result; // done
+    }
+    else
+    {
+      // TODO
+    }
+  }
+  else if(src_type.id()==ID_vector) // src is a vector
+  {
+    const vector_typet &vector_type=to_vector_type(src_type);
+    const typet &subtype=vector_type.subtype();
+    
+    if(!vector_type.size().is_constant())
+      throw "vector with non-constant size";
+
+    mp_integer size;
+    if(to_integer(vector_type.size(), size))
+      throw "failed to convert vector size";
+      
+    signed long int size_int=integer2long(size);
+    
+    vector_exprt result(vector_type);
+    exprt::operandst &operands=result.operands();
+    operands.resize(size_int);
+  
+    // split it up into elements
+    for(signed long i=0; i<size_int; ++i)
+    {
+      exprt index=from_integer(i, vector_type.size().type());
+      exprt new_src=index_exprt(src, index, subtype);
+      
+      // vector constructor?
+      if(src.id()==ID_vector)
+        new_src=simplify_expr(new_src, var_map.ns);
+      
+      // recursive call
+      operands[i]=instantiate_rec(new_src, propagate);
+    }
+
+    return result; // done
+  }
 
   // check whether this is a symbol(.member|[index])*
   
@@ -265,6 +340,32 @@ exprt path_symex_statet::instantiate_rec(
     // dereferencet has run already, so we should only be left with
     // integer addresses. Will transform into __CPROVER_memory[]
     // eventually.
+  }
+  else if(src.id()==ID_index)
+  {
+    // avoids indefinite recursion above
+    return src;
+  }
+  else if(src.id()==ID_member)
+  {
+    const typet &compound_type=
+      var_map.ns.follow(to_member_expr(src).struct_op().type());
+      
+    if(compound_type.id()==ID_struct)
+    {  
+      // avoids indefinite recursion above
+      return src;
+    }
+    else if(compound_type.id()==ID_union)
+    {
+      member_exprt tmp=to_member_expr(src);
+      tmp.struct_op()=instantiate_rec(tmp.struct_op(), propagate);
+      return tmp;
+    }
+    else
+    {
+      throw "member expects struct or union type"+src.pretty();
+    }
   }
 
   if(!src.has_operands())
@@ -377,7 +478,9 @@ exprt path_symex_statet::read_symbol_member_index(
       suffix=index_string+suffix;
     }
     else
+    {
       return nil_exprt();
+    }
 
     // next round  
     assert(next.is_not_nil());
