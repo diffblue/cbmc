@@ -164,7 +164,8 @@ exprt path_symex_statet::read(const exprt &src, bool propagate)
   // 3. Rewriting to SSA symbols
   // 4. Simplifier
   
-  exprt tmp1=adjust_float_expressions(src, var_map.ns);
+  exprt tmp1=src;
+  adjust_float_expressions(tmp, var_map.ns);
 
   // we force propagation for dereferencing
   exprt tmp2=dereference_rec(tmp1, true);

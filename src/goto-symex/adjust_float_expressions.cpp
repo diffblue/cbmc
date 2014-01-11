@@ -26,14 +26,12 @@ Function: adjust_float_expressions
 
 \*******************************************************************/
 
-exprt adjust_float_expressions(
-  const exprt &src,
+void adjust_float_expressions(
+  exprt &expr,
   const namespacet &ns)
 {
-  exprt expr=src;
-  
   Forall_operands(it, expr)
-    *it=adjust_float_expressions(*it, ns);
+    adjust_float_expressions(*it, ns);
 
   const typet &type=ns.follow(expr.type());
 
@@ -89,7 +87,5 @@ exprt adjust_float_expressions(
       }
     }
   }
-
-  return expr;
 }
 

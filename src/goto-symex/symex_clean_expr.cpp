@@ -117,5 +117,5 @@ void goto_symext::clean_expr(
   replace_nondet(expr);
   dereference(expr, state, write);
   replace_array_equal(expr);
-  expr=adjust_float_expressions(expr, ns);
+  adjust_float_expressions(expr, ns);
 }
