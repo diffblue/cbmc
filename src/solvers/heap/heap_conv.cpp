@@ -3461,12 +3461,30 @@ literalt heap_convt::convert_equality(const equal_exprt &expr)
     std::string op4 = convert_identifier(with.where().get(ID_component_name));
     std::string old = 
       convert_identifier(to_symbol_expr(with.old()).get_identifier());
-    heapexpr op5 = convert_heapexpr(with.new_value());
-    assert(with.new_value().id()==ID_symbol ||
-           with.new_value().id()==ID_constant); //otherwise introduce an EQ
+    heapvar op5;
+    heaplit* hl3;
+    if(with.new_value().id()==ID_symbol ||
+       with.new_value().id()==ID_constant)
+    {
+      op5 = convert_heapexpr(with.new_value()).v;
+    }
+    else //introduce an EQ with auxiliary variable
+    {
+      heapexpr he = convert_heapexpr(with.new_value());
+      std::string tmpvar = 
+        convert_identifier("heap://tmp"+i2string(++no_tmp_variables));
+      hl3 = new eq_lit(heapvar(tmpvar),he,stateTrue);
+      heap_literal_map[++no_boolean_variables] = hl3;
+      op5 = heapvar(tmpvar);
+
+#if 1
+      std::cout << "adding heaplit " << no_boolean_variables << " = " << 
+        *hl3 << std::endl;
+#endif
+    }
 
     heaplit* hl1 = new store_lit(heapvar(op1),heapvar(op2),
-       heapvar(op3),heapvar(op4),op5.v,stateTrue);
+       heapvar(op3),heapvar(op4),op5,stateTrue);
     heap_literal_map[++no_boolean_variables] = hl1;
 
 #if 1
@@ -3484,9 +3502,20 @@ literalt heap_convt::convert_equality(const equal_exprt &expr)
 #endif
         
     literalt l(++no_boolean_variables,false);
-    literal_map[l] = and_exprt(
-      literal_exprt(literalt(no_boolean_variables-1,false)),
-      literal_exprt(literalt(no_boolean_variables-2,false)));
+    if(with.new_value().id()==ID_symbol ||
+       with.new_value().id()==ID_constant)
+    {
+      literal_map[l] = and_exprt(
+        literal_exprt(literalt(no_boolean_variables-1,false)),
+        literal_exprt(literalt(no_boolean_variables-2,false)));
+    }
+    else
+    {
+      literal_map[l] = and_exprt(
+        literal_exprt(literalt(no_boolean_variables-1,false)),
+        literal_exprt(literalt(no_boolean_variables-2,false)),
+        literal_exprt(literalt(no_boolean_variables-3,false)));
+    }
 
 #if 1
     std::cout << "adding literal " << l << " = " << literal_map[l] << std::endl;

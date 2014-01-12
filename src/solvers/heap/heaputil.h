@@ -15,7 +15,7 @@
 #define debugc(s, cond) if (cond) std::cout << s << std::endl;
 #define debug(s) std::cout << s << std::endl;
 
-#elsif
+#else
 
 #define debugc(s, cond) ;
 #define debug(s) ;

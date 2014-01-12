@@ -39,7 +39,8 @@ public:
     boolbv_width(_ns),
     pointer_logic(_ns),
     array_index_bits(32),
-    no_boolean_variables(0)
+    no_boolean_variables(0),
+    no_tmp_variables(0)
   {
 
   }
@@ -171,6 +172,7 @@ protected:
   std::vector<bool> boolean_assignment;
 
   //Heap
+  unsigned no_tmp_variables;
 
   typedef std::map<irep_idt, literalt> symbolst;
   symbolst symbols;
