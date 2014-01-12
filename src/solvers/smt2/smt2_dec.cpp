@@ -1,4 +1,3 @@
-
 /*******************************************************************\
 
 Module:
@@ -585,6 +584,11 @@ bool smt2_dect::string_to_expr_z3(
   }
   else if(value.substr(0,6)=="(store")
   {
+    if(type.id()!=ID_array)
+      return false;
+  
+    const array_typet &array_type=to_array_type(type);
+
 //    std::cout << "STR: " << value << "\n";
 
     size_t p1=value.rfind(' ')+1;
@@ -604,10 +608,10 @@ bool smt2_dect::string_to_expr_z3(
     if(!string_to_expr_z3(type, array, old)) return false;
 
     exprt where;
-    if(!string_to_expr_z3(array_index_type(), inx, where)) return false;
+    if(!string_to_expr_z3(array_type.size().type(), inx, where)) return false;
 
     exprt new_val;
-    if(!string_to_expr_z3(type.subtype(), elem, new_val)) return false;
+    if(!string_to_expr_z3(array_type.subtype(), elem, new_val)) return false;
 
     e = with_exprt(old, where, new_val);
 

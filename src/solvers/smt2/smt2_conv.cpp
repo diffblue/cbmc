@@ -420,46 +420,6 @@ void smt2_convt::set_value(
 
 /*******************************************************************\
 
-Function: smt2_convt::array_index_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-typet smt2_convt::array_index_type() const
-{
-  signedbv_typet t;
-  t.set_width(array_index_bits);
-  return t;
-}
-
-/*******************************************************************\
-
-Function: smt2_convt::array_index
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void smt2_convt::array_index(const exprt &expr)
-{
-  typet t=array_index_type();
-  if(t==expr.type()) return convert_expr(expr);
-  typecast_exprt tmp(t);
-  tmp.op0()=expr;
-  convert_expr(tmp);
-}
-
-/*******************************************************************\
-
 Function: smt2_convt::convert_address_of_rec
 
   Inputs:
@@ -2961,21 +2921,14 @@ void smt2_convt::convert_with(const exprt &expr)
 
   if(expr_type.id()==ID_array)
   {
+    const array_typet &array_type=to_array_type(expr_type);
+  
     out << "(store ";
-
     convert_expr(expr.op0());
-
     out << " ";
-
-    if(expr.op1().type()!=array_index_type())
-      convert_expr(typecast_exprt(expr.op1(), array_index_type()));
-    else
-      convert_expr(expr.op1());
-
+    convert_expr(typecast_exprt(expr.op1(), array_type.size().type()));
     out << " ";
-
     convert_expr(expr.op2());
-
     out << ")";
   }
   else if(expr_type.id()==ID_struct)
@@ -3131,25 +3084,34 @@ Function: smt2_convt::convert_index
 void smt2_convt::convert_index(const index_exprt &expr)
 {
   assert(expr.operands().size()==2);
+  
+  const typet &array_op_type=ns.follow(expr.array().type());
 
-  if(ns.follow(expr.type()).id()==ID_bool && !use_array_of_bool)
+  if(array_op_type.id()==ID_array)
   {
-    out << "(= ";
-    out << "(select ";
-    convert_expr(expr.array());
-    out << " ";
-    array_index(expr.index());
-    out << ")";
-    out << " bit1 bit0)";
+    const array_typet &array_type=to_array_type(array_op_type);
+    
+    if(ns.follow(expr.type()).id()==ID_bool && !use_array_of_bool)
+    {
+      out << "(= ";
+      out << "(select ";
+      convert_expr(expr.array());
+      out << " ";
+      convert_expr(typecast_exprt(expr.index(), array_type.size().type()));
+      out << ")";
+      out << " bit1 bit0)";
+    }
+    else
+    {
+      out << "(select ";
+      convert_expr(expr.array());
+      out << " ";
+      convert_expr(typecast_exprt(expr.index(), array_type.size().type()));
+      out << ")";
+    }
   }
   else
-  {
-    out << "(select ";
-    convert_expr(expr.array());
-    out << " ";
-    array_index(expr.index());
-    out << ")";
-  }
+    throw "index with unsupported array type: "+array_op_type.id_string();
 }
 
 /*******************************************************************\
@@ -3467,18 +3429,21 @@ void smt2_convt::find_symbols(const exprt &expr)
   {
     if(defined_expressions.find(expr)==defined_expressions.end())
     {
+      const array_typet &array_type=to_array_type(expr.type());
+    
       irep_idt id="array."+i2string(defined_expressions.size());
       out << "; the following is a substitute for an array constructor" << "\n";
       out << "(declare-fun " << id << " () ";
-      convert_type(expr.type());
+      convert_type(array_type);
       out << ")" << "\n";
 
       for(unsigned i=0; i<expr.operands().size(); i++)
       {
-        out << "(assert (= (select " << id 
-            << " (_ bv" << i << " " << array_index_bits << ")) ";
+        out << "(assert (= (select " << id;
+        convert_expr(from_integer(i, array_type.size().type()));
+        out << ") "; // select
         convert_expr(expr.operands()[i]);
-        out << "))" << "\n";
+        out << "))" << "\n"; // =, assert
       }
 
       defined_expressions[expr]=id;
@@ -3490,6 +3455,7 @@ void smt2_convt::find_symbols(const exprt &expr)
     {
       // introduce a temporary array.
       exprt tmp=to_string_constant(expr).to_array_expr();
+      const array_typet &array_type=to_array_type(tmp.type());
 
       irep_idt id="string."+i2string(defined_expressions.size());
       out << "; the following is a substitute for a string" << "\n";
@@ -3499,8 +3465,9 @@ void smt2_convt::find_symbols(const exprt &expr)
 
       for(unsigned i=0; i<tmp.operands().size(); i++)
       {
-        out << "(assert (= (select " << id 
-            << " (_ bv" << i << " " << array_index_bits << ")) ";
+        out << "(assert (= (select " << id;
+        convert_expr(from_integer(i, array_type.size().type()));
+        out << ") "; // select
         convert_expr(tmp.operands()[i]);
         out << "))" << "\n";
       }
@@ -3531,7 +3498,7 @@ void smt2_convt::convert_type(const typet &type)
     const typet &subtype=ns.follow(array_type.subtype());
 
     out << "(Array ";
-    convert_type(array_index_type());
+    convert_type(array_type.size().type());
     out << " ";
 
     if(subtype.id()==ID_bool && !use_array_of_bool)
