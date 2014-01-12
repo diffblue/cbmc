@@ -149,13 +149,12 @@ protected:
   constant_exprt parse_literal(const std::string &s, const typet &type);
   exprt parse_struct(const std::string &s, const typet &type);
   
-  // booleans vs. bv[1]
-  void bool2bv(const exprt &);
-  void bv2bool(const exprt &);
-
   // flattens any non-bitvector type into a bitvector,
   // e.g., booleans, vectors, structs, arrays, ...
+  // unflatten() does the opposite.
+  typedef enum { BEGIN, END } wheret;
   void flatten2bv(const exprt &);
+  void unflatten(wheret, const typet &);
   
   // pointers
   pointer_logict pointer_logic;

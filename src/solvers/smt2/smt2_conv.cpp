@@ -825,9 +825,16 @@ void smt2_convt::convert_expr(const exprt &expr)
   else if(expr.id()==ID_bitnot)
   {
     assert(expr.operands().size()==1);
-    out << "(bvnot ";
-    convert_expr(expr.op0());
-    out << ")";
+    
+    if(expr.type().id()==ID_vector)
+    {
+    }
+    else
+    {
+      out << "(bvnot ";
+      convert_expr(expr.op0());
+      out << ")";
+    }
   }
   else if(expr.id()==ID_unary_minus)
   {
@@ -851,6 +858,9 @@ void smt2_convt::convert_expr(const exprt &expr)
       {
         throw "TODO: unary minus for floatbv";
       }
+    }
+    else if(expr.type().id()==ID_vector)
+    {
     }
     else
     {
@@ -1256,7 +1266,7 @@ void smt2_convt::convert_expr(const exprt &expr)
       throw "replication takes constant as first parameter";
 
     out << "((_ repeat " << times << ") ";
-    bool2bv(expr.op1());
+    flatten2bv(expr.op1());
     out << ")";
   }
   else if(expr.id()==ID_byte_extract_little_endian ||
@@ -1825,7 +1835,7 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
     {
       out << "(concat (concat"
           << " (_ bv0 " << (to_integer_bits-1) << ")";
-      bool2bv(op); // produces bit0 or bit1
+      flatten2bv(op); // produces bit0 or bit1
       out << ") (_ bv0 "
           << to_fraction_bits
           << "))";
@@ -2088,7 +2098,7 @@ void smt2_convt::convert_union(const exprt &expr)
 
   if(total_width==member_width)
   {
-    bool2bv(op);
+    flatten2bv(op);
   }
   else
   {
@@ -2097,7 +2107,7 @@ void smt2_convt::convert_union(const exprt &expr)
     out << "(concat ";
     out << "(_ bv0 "
         << (total_width-member_width) << ") ";
-    bool2bv(op);
+    flatten2bv(op);
     out << ")";
   }
 }
@@ -3084,7 +3094,7 @@ void smt2_convt::convert_with(const exprt &expr)
 
     if(total_width==member_width)
     {
-      bool2bv(value);
+      flatten2bv(value);
     }
     else
     {
@@ -3095,7 +3105,7 @@ void smt2_convt::convert_with(const exprt &expr)
           << " " << member_width << ") ";
       convert_expr(expr.op0());
       out << ") ";
-      bool2bv(value);
+      flatten2bv(value);
       out << ")";
     }
   }
@@ -3195,23 +3205,48 @@ void smt2_convt::convert_index(const index_exprt &expr)
   {
     const array_typet &array_type=to_array_type(array_op_type);
     
-    if(ns.follow(expr.type()).id()==ID_bool && !use_array_of_bool)
+    // fixed size?
+    unsigned width=boolbv_width(array_type);
+    
+    if(width!=0)
     {
-      out << "(= ";
-      out << "(select ";
+      // yes
+      unflatten(BEGIN, array_type.subtype());
+      
+      unsigned sub_width=boolbv_width(array_type.subtype());
+      unsigned index_width=boolbv_width(expr.index().type());
+      
+      out << "((_ extract " << sub_width-1 << " 0) ";
+      out << "(bvlshr ";
       convert_expr(expr.array());
       out << " ";
-      convert_expr(typecast_exprt(expr.index(), array_type.size().type()));
-      out << ")";
-      out << " bit1 bit0)";
+      out << "(bvmul (_ bv" << sub_width << " " << width << ") ";
+      out << "((_ zero_extend " << width-index_width << ") ";
+      convert_expr(expr.index());
+      out << "))))"; // zero_extend, mult, bvlshr, extract
+      
+      unflatten(END, array_type.subtype());
     }
     else
     {
-      out << "(select ";
-      convert_expr(expr.array());
-      out << " ";
-      convert_expr(typecast_exprt(expr.index(), array_type.size().type()));
-      out << ")";
+      if(ns.follow(expr.type()).id()==ID_bool && !use_array_of_bool)
+      {
+        out << "(= ";
+        out << "(select ";
+        convert_expr(expr.array());
+        out << " ";
+        convert_expr(typecast_exprt(expr.index(), array_type.size().type()));
+        out << ")";
+        out << " bit1 bit0)";
+      }
+      else
+      {
+        out << "(select ";
+        convert_expr(expr.array());
+        out << " ";
+        convert_expr(typecast_exprt(expr.index(), array_type.size().type()));
+        out << ")";
+      }
     }
   }
   else if(array_op_type.id()==ID_vector)
@@ -3295,29 +3330,22 @@ void smt2_convt::convert_member(const member_exprt &expr)
   }
   else if(struct_op_type.id()==ID_union)
   {
-    if(expr.type().id()==ID_bool)
-    {
-      out << "(= ";
-      out << "((_ extract 0 0) ";
-      convert_expr(struct_op);
-      out << ")";
-      out << " bit1)";
-    }
-    else
-    {
-      boolbv_widtht boolbv_width(ns);
+    boolbv_widtht boolbv_width(ns);
     
-      unsigned width=boolbv_width(expr.type());
+    unsigned width=boolbv_width(expr.type());
       
-      if(width==0)
-        throw "failed to get union member width";
+    if(width==0)
+      throw "failed to get union member width";
 
-      out << "((_ extract "
-          << (width-1)
-          << " 0) ";
-      convert_expr(struct_op);
-      out << ")";
-    }
+    unflatten(BEGIN, expr.type());
+
+    out << "((_ extract "
+           << (width-1)
+           << " 0) ";
+    convert_expr(struct_op);
+    out << ")";
+
+    unflatten(END, expr.type());
   }
   else
     assert(false);
@@ -3347,7 +3375,35 @@ void smt2_convt::flatten2bv(const exprt &expr)
   }
   else if(type.id()==ID_vector)
   {
-    convert_expr(expr);
+    if(use_datatypes)
+    {
+      assert(datatype_map.find(type) != datatype_map.end());
+
+      const std::string smt_typename=
+        datatype_map.find(type)->second;
+
+      // concatenate elements
+      const vector_typet &vector_type=to_vector_type(expr.type());
+      
+      mp_integer size;
+      if(to_integer(vector_type.size(), size))
+        throw "failed to convert vector size to constant";
+        
+      out << "(let ((op? ";
+      convert_expr(expr);
+      out << ")) ";
+        
+      out << "(concat";
+
+      for(mp_integer i=0; i!=size; ++i)        
+      {
+        out << " (" << smt_typename << "." << i << " op?)";
+      }
+
+      out << "))"; // concat, let
+    }
+    else
+      convert_expr(expr); // already a bv
   }
   else if(type.id()==ID_array)
   {
@@ -3363,7 +3419,7 @@ void smt2_convt::flatten2bv(const exprt &expr)
 
 /*******************************************************************\
 
-Function: smt2_convt::bool2bv
+Function: smt2_convt::unflatten
 
   Inputs:
 
@@ -3373,40 +3429,69 @@ Function: smt2_convt::bool2bv
 
 \*******************************************************************/
 
-void smt2_convt::bool2bv(const exprt &expr)
+void smt2_convt::unflatten(wheret where, const typet &type)
 {
-  if(ns.follow(expr.type()).id()==ID_bool)
+  if(type.id()==ID_symbol)
+    return unflatten(where, ns.follow(type));
+    
+  if(type.id()==ID_bool)
   {
-    out << "(ite ";
-    convert_expr(expr); // this returns a Bool
-    out << " bit1 bit0)";
+    if(where==BEGIN)
+      out << "(= "; // produces a bool
+    else
+      out << " bit1)";
+  }
+  else if(type.id()==ID_vector)
+  {
+    if(use_datatypes)
+    {
+      assert(datatype_map.find(type) != datatype_map.end());
+
+      const std::string smt_typename=
+        datatype_map.find(type)->second;
+
+      // extract elements
+      const vector_typet &vector_type=to_vector_type(type);
+      
+      unsigned subtype_width=boolbv_width(vector_type.subtype());
+      
+      mp_integer size;
+      if(to_integer(vector_type.size(), size))
+        throw "failed to convert vector size to constant";
+
+      if(where==BEGIN)
+        out << "(let ((op? ";
+      else
+      {
+        out << ")) ";
+        
+        out << "(mk-" << smt_typename;
+
+        unsigned offset=0;
+
+        for(mp_integer i=0; i!=size; ++i, offset+=subtype_width)
+        {
+          out << " ";
+          // TODO: need to deal with nesting here
+          out << "((_ extract " << offset+subtype_width-1 << " "
+              << offset << ") op?)";
+        }
+
+        out << "))"; // mk-, let
+      }
+    }
+    else
+    {
+      // nop, already a bv
+    }
+  }
+  else if(type.id()==ID_struct)
+  {
   }
   else
-    convert_expr(expr);
-}
-
-/*******************************************************************\
-
-Function: smt2_convt::bv2bool
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void smt2_convt::bv2bool(const exprt &expr)
-{
-  if(ns.follow(expr.type()).id()==ID_bool)
   {
-    out << "(= "; // produces a bool
-    convert_expr(expr); // assumed to produce bit0 or bit1
-    out << " bit1)";
+    // nop
   }
-  else
-    convert_expr(expr);
 }
 
 /*******************************************************************\
@@ -3666,18 +3751,31 @@ void smt2_convt::convert_type(const typet &type)
   if(type.id()==ID_array)
   {
     const array_typet &array_type=to_array_type(type);
-    const typet &subtype=ns.follow(array_type.subtype());
 
-    out << "(Array ";
-    convert_type(array_type.size().type());
-    out << " ";
-
-    if(subtype.id()==ID_bool && !use_array_of_bool)
-      out << "(_ BitVec 1)";
+    // fixed-size array?
+    unsigned width=boolbv_width(array_type);
+    
+    if(width!=0)
+    {
+      // yes, flatten
+      out << "(_ BitVec " << width << ")";
+    }
     else
-      convert_type(array_type.subtype());
+    {
+      // no, use array theory
+      const typet &subtype=ns.follow(array_type.subtype());
+
+      out << "(Array ";
+      convert_type(array_type.size().type());
+      out << " ";
+
+      if(subtype.id()==ID_bool && !use_array_of_bool)
+        out << "(_ BitVec 1)";
+      else
+        convert_type(array_type.subtype());
       
-    out << ")";
+      out << ")";
+    }
   }
   else if(type.id()==ID_bool)
   {
