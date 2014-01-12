@@ -341,10 +341,10 @@ public:
 
   // threads
   unsigned atomic_section_id;
-  typedef std::pair<irep_idt, std::list<guardt> > a_s_r_entryt;
-  typedef hash_map_cont<irep_idt, a_s_r_entryt, irep_id_hash> read_in_atomic_sectiont;
+  typedef std::pair<unsigned, std::list<guardt> > a_s_r_entryt;
+  typedef hash_map_cont<symbol_exprt, a_s_r_entryt, irep_hash> read_in_atomic_sectiont;
   typedef std::list<guardt> a_s_w_entryt;
-  typedef hash_map_cont<irep_idt, a_s_w_entryt, irep_id_hash> written_in_atomic_sectiont;
+  typedef hash_map_cont<symbol_exprt, a_s_w_entryt, irep_hash> written_in_atomic_sectiont;
   read_in_atomic_sectiont read_in_atomic_section;
   written_in_atomic_sectiont written_in_atomic_section;
   
