@@ -116,7 +116,7 @@ SRC = $(CHAFF_SRC) $(BOOLEFORCE_SRC) $(MINISAT_SRC) $(MINISAT2_SRC) \
       floatbv/float_utils.cpp floatbv/float_bv.cpp \
       refinement/bv_refinement_loop.cpp refinement/refine_arithmetic.cpp \
       refinement/refine_arrays.cpp \
-      heap/heap_prop.cpp heap/heap_conv.cpp heap/heap_dec.cpp \
+      heap/heap_conv.cpp heap/heap_dec.cpp \
       heap/heapabstraction.cpp heap/heapliteral.cpp heap/heaptransformer.cpp
 
 INCLUDES= -I .. \
