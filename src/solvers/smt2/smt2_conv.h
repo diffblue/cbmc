@@ -152,6 +152,10 @@ protected:
   // booleans vs. bv[1]
   void bool2bv(const exprt &);
   void bv2bool(const exprt &);
+
+  // flattens any non-bitvector type into a bitvector,
+  // e.g., booleans, vectors, structs, arrays, ...
+  void flatten2bv(const exprt &);
   
   // pointers
   pointer_logict pointer_logic;
