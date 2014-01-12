@@ -169,6 +169,21 @@ meetIrreduciblep copy_lit(const heaplit& lit) {
   }
 }
 
+heaplit* copy_lit(heaplit* lit) {
+  switch (lit->type) {
+  case PATH: return new path_lit(*lit);
+  case ONPATH: return new onpath_lit(*lit);
+  case DANGLING: return new dangling_lit(*lit);
+  case DISJ: return new disj_lit(*lit);
+  case EQ: return new eq_lit(*lit);
+  case NEW: return new new_lit(*lit);
+  case FREE: return new free_lit(*lit);
+  case STORE: return new store_lit(*lit);
+  default: 
+    assert(false);
+  }
+}
+
 std::ostream& operator<< (std::ostream& s, const clauset& f) {
   s << "(";
 

@@ -477,6 +477,19 @@ class store_lit : public heap_update_lit {
     y = _y; 
   }
 
+  store_lit(const heaplit& other) {
+    state = other.state;
+    type = other.type;
+    x = heapvar(other.x);
+    y = heapvar(other.y);
+    t = heapvar(other.t);
+    f = heapvar(other.f);
+    m = heapvar(other.m);
+    mnew = heapvar(other.mnew);
+    rhs = heapexpr(other.rhs);
+    dummy = other.dummy;
+  }
+
   virtual std::set<heapvar> get_vars() const {
     std::set<heapvar> res;
     res.insert(x);
@@ -533,6 +546,19 @@ class new_lit : public heap_update_lit {
     x = _x; 
   }
 
+  new_lit(const heaplit& other) {
+    state = other.state;
+    type = other.type;
+    x = heapvar(other.x);
+    y = heapvar(other.y);
+    t = heapvar(other.t);
+    f = heapvar(other.f);
+    m = heapvar(other.m);
+    mnew = heapvar(other.mnew);
+    rhs = heapexpr(other.rhs);
+    dummy = other.dummy;
+  }
+
   virtual std::set<heapvar> get_vars() const {
     std::set<heapvar> res;
     res.insert(x);
@@ -582,6 +608,19 @@ class free_lit : public heap_update_lit {
 	  uint8_t _state) : heap_update_lit(_mnew, _m, _state) {
     type = FREE; 
     x = _x; 
+  }
+
+  free_lit(const heaplit& other) {
+    state = other.state;
+    type = other.type;
+    x = heapvar(other.x);
+    y = heapvar(other.y);
+    t = heapvar(other.t);
+    f = heapvar(other.f);
+    m = heapvar(other.m);
+    mnew = heapvar(other.mnew);
+    rhs = heapexpr(other.rhs);
+    dummy = other.dummy;
   }
 
   virtual std::set<heapvar> get_vars() const {
@@ -1306,6 +1345,7 @@ struct inferenceRecord_comp {
 //meetIrreduciblep copy_lit(const heaplit&);
 meetIrreduciblep copy_lit(const meetIrreduciblep&);
 meetIrreduciblep copy_lit(const heaplit&);
+heaplit* copy_lit(heaplit*);
 
 
 std::ostream& operator<< (std::ostream&, const meetIrreducible&);
