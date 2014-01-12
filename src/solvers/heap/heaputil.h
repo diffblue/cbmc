@@ -10,8 +10,17 @@
 
 #include <util/union_find.h>
 
+#if DEBUG
+
 #define debugc(s, cond) if (cond) std::cout << s << std::endl;
 #define debug(s) std::cout << s << std::endl;
+
+#elsif
+
+#define debugc(s, cond) ;
+#define debug(s) ;
+
+#endif
 
 /* Theory DSL */ 
 #define path(m, v1, v2, f) new path_lit(m, v1, v2, f, stateTrue)
