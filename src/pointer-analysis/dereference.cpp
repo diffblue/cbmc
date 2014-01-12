@@ -36,18 +36,6 @@ exprt dereferencet::operator()(const exprt &pointer)
     throw "dereference expected pointer type, but got "+
           pointer.type().pretty();  
 
-  // we may get ifs
-  if(pointer.id()==ID_if)
-  {
-    const if_exprt &if_expr=to_if_expr(pointer);
-
-    // push down the if, do recursive call
-    exprt true_case=operator()(if_expr.true_case());
-    exprt false_case=operator()(if_expr.false_case());
-    
-    return if_exprt(if_expr.cond(), true_case, false_case);
-  }
-  
   // type of the object
   const typet &type=pointer.type().subtype();
 
@@ -204,56 +192,23 @@ exprt dereferencet::dereference_rec(
   }
   else if(address.id()==ID_typecast)
   {
-    const exprt &op=to_typecast_expr(address).op();
-    const typet &op_type=ns.follow(op.type());
-    
-    // pointer type cast?
-    if(op_type.id()==ID_pointer)
-      return dereference_rec(op, offset, type); // just pass down
-    else if(op_type.id()==ID_signedbv || op_type.id()==ID_unsignedbv)
-    {
-      // We got an integer-typed address A. We turn this back (!)
-      // into *(type *)(A+offset), and then let some other layer
-      // worry about it.
-      
-      exprt integer=
-        plus_exprt(offset, typecast_exprt(op, offset.type()));
+    const typecast_exprt &typecast_expr=to_typecast_expr(address);
 
-      exprt new_typecast=
-        typecast_exprt(integer, pointer_typet(type));
-      
-      return dereference_exprt(new_typecast, type);
-    }
-    else
-      throw "dereferencet: unexpected cast";
+    return dereference_typecast(typecast_expr, offset, type);
   }
   else if(address.id()==ID_plus)
   {
     // pointer arithmetic
     if(address.operands().size()<2)
       throw "plus with less than two operands";
-    
-    if(address.operands().size()>2)
-      return dereference_rec(make_binary(address), offset, type);
 
-    // binary
-    exprt pointer=address.op0(), integer=address.op1();
-    
-    if(ns.follow(integer.type()).id()==ID_pointer)
-      std::swap(pointer, integer);
+    return dereference_plus(address, offset, type);
+  }
+  else if(address.id()==ID_if)
+  {
+    const if_exprt &if_expr=to_if_expr(address);
 
-    // multiply integer by object size
-    exprt size=size_of_expr(pointer.type().subtype(), ns);
-    if(size.is_nil())
-      throw "dereference failed to get object size for pointer arithmetic";
-
-    // make types of offset and size match
-    if(size.type()!=integer.type())
-      integer.make_typecast(size.type());
-  
-    exprt new_offset=plus_exprt(offset, mult_exprt(size, integer));
-
-    return dereference_rec(pointer, new_offset, type);
+    return dereference_if(if_expr, offset, type);
   }
   else if(address.id()==ID_constant)
   {
@@ -274,6 +229,111 @@ exprt dereferencet::dereference_rec(
   {
     throw "failed to dereference `"+address.id_string()+"'";
   }
+}
+
+/*******************************************************************\
+
+Function: dereferencet::dereference_if
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+exprt dereferencet::dereference_if(
+  const if_exprt &expr,
+  const exprt &offset,
+  const typet &type)
+{
+  // push down the if, do recursive call
+  exprt true_case=dereference_rec(expr.true_case(), offset, type);
+  exprt false_case=dereference_rec(expr.false_case(), offset, type);
+
+  return if_exprt(expr.cond(), true_case, false_case);
+}
+
+/*******************************************************************\
+
+Function: dereferencet::dereference_plus
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+exprt dereferencet::dereference_plus(
+  const exprt &expr,
+  const exprt &offset,
+  const typet &type)
+{
+  if(expr.operands().size()>2)
+    return dereference_rec(make_binary(expr), offset, type);
+
+  // binary
+  exprt pointer=expr.op0(), integer=expr.op1();
+
+  if(ns.follow(integer.type()).id()==ID_pointer)
+    std::swap(pointer, integer);
+
+  // multiply integer by object size
+  exprt size=size_of_expr(pointer.type().subtype(), ns);
+  if(size.is_nil())
+    throw "dereference failed to get object size for pointer arithmetic";
+
+  // make types of offset and size match
+  if(size.type()!=integer.type())
+    integer.make_typecast(size.type());
+
+  exprt new_offset=plus_exprt(offset, mult_exprt(size, integer));
+
+  return dereference_rec(pointer, new_offset, type);
+}
+
+/*******************************************************************\
+
+Function: dereferencet::dereference_typecast
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+exprt dereferencet::dereference_typecast(
+  const typecast_exprt &expr,
+  const exprt &offset,
+  const typet &type)
+{
+  const exprt &op=expr.op();
+  const typet &op_type=ns.follow(op.type());
+
+  // pointer type cast?
+  if(op_type.id()==ID_pointer)
+    return dereference_rec(op, offset, type); // just pass down
+  else if(op_type.id()==ID_signedbv || op_type.id()==ID_unsignedbv)
+  {
+    // We got an integer-typed address A. We turn this back (!)
+    // into *(type *)(A+offset), and then let some other layer
+    // worry about it.
+
+    exprt integer=
+      plus_exprt(offset, typecast_exprt(op, offset.type()));
+
+    exprt new_typecast=
+      typecast_exprt(integer, pointer_typet(type));
+
+    return dereference_exprt(new_typecast, type);
+  }
+  else
+    throw "dereferencet: unexpected cast";
 }
 
 /*******************************************************************\
