@@ -606,7 +606,10 @@ Function: heap_convt::convert
 
 literalt heap_convt::convert(const exprt &expr)
 {
+#if 0
   std::cout << "convert()" << std::endl;
+#endif
+
   assert(expr.type().id()==ID_bool);
 
   // Three cases where no new handle is needed.
@@ -3315,14 +3318,13 @@ literalt heap_convt::convert_function(const heap_function_application_exprt &f)
              f.arguments()[0].id()==ID_constant);
        //otherwise introduce an EQ
 
-     std::cout << 
-       "create DANGLING literal (" << op1 << "," << op2 << ")" << std::endl;
-
      heaplit* hl = new dangling_lit(heapvar(op1),op2.v,stateTrue);
      heap_literal_map[++no_boolean_variables] = hl;
 
+#if 1
      std::cout << "adding heaplit " << no_boolean_variables << " = " << 
        *hl << std::endl;
+#endif
         
      return literalt(no_boolean_variables,false); 
    }
@@ -3339,20 +3341,16 @@ literalt heap_convt::convert_function(const heap_function_application_exprt &f)
      assert((f.arguments()[0].id()==ID_symbol ||
              f.arguments()[0].id()==ID_constant) &&
             (f.arguments()[1].id()==ID_symbol ||
-             f.arguments()[1].id()==ID_constant));
-       //otherwise introduce an EQ
-
-
-     std::cout << "create PATH literal (" << op1 << "," << op2 << "," << 
-       op3 << "," << op4 << ")" << std::endl;
-
+             f.arguments()[1].id()==ID_constant)); //otherwise introduce an EQ
+       
      heaplit* hl = new path_lit(heapvar(op1),op2.v,op3.v,
        heapvar(op4),stateTrue);
-
      heap_literal_map[++no_boolean_variables] = hl;
 
+#if 1
      std::cout << "adding heaplit " << no_boolean_variables << " = " << 
        *hl << std::endl;
+#endif
         
      return literalt(no_boolean_variables,false); 
   }
@@ -3370,16 +3368,14 @@ literalt heap_convt::convert_function(const heap_function_application_exprt &f)
      std::string op5 = 
        convert_identifier(f.arguments()[3].op0().op0().get(ID_value));
 
-     std::cout << "create ONPATH literal (" << op1 << "," << op2 << "," << 
-       op3 << "," << op4  << "," << op5 << ")" << std::endl;
-
      heaplit* hl = new onpath_lit(heapvar(op1),heapvar(op2),heapvar(op3),
                          heapvar(op4),heapvar(op5),stateTrue);
-
      heap_literal_map[++no_boolean_variables] = hl;
 
+#if 1
      std::cout << "adding heaplit " << no_boolean_variables << " = " << 
        *hl << std::endl;
+#endif
         
      return literalt(no_boolean_variables,false); 
   }
@@ -3424,7 +3420,8 @@ heapexpr heap_convt::convert_heapexpr(const exprt &expr)
     heap_member_exprt hexpr = to_heap_member_expr(expr);
 
     assert(hexpr.struct_op().id()==ID_symbol);
-    std::string id = convert_identifier(to_symbol_expr(hexpr.struct_op()).get_identifier());
+    std::string id = 
+      convert_identifier(to_symbol_expr(hexpr.struct_op()).get_identifier());
     std::string field = convert_identifier(hexpr.get_component_name());
     std::string heap_id = convert_identifier(hexpr.get_heap_id());
     
@@ -3449,8 +3446,6 @@ Function: heap_convt::convert_equality
 
 literalt heap_convt::convert_equality(const equal_exprt &expr)
 {
-  std::cout << "convert_equality()" << std::endl;
-
   if(expr.lhs().id()==ID_symbol &&               
      expr.rhs().id()==ID_heap_with) //heap update
   {
@@ -3470,26 +3465,33 @@ literalt heap_convt::convert_equality(const equal_exprt &expr)
     assert(with.new_value().id()==ID_symbol ||
            with.new_value().id()==ID_constant); //otherwise introduce an EQ
 
-    std::cout << "create STORE literal (" << op1 << "," << op2  << "," << 
-       op3 << "," << op4  << "," << op5 << ")" << std::endl;
-
     heaplit* hl1 = new store_lit(heapvar(op1),heapvar(op2),
        heapvar(op3),heapvar(op4),op5.v,stateTrue);
-       
     heap_literal_map[++no_boolean_variables] = hl1;
-    std::cout << "adding heaplit " << no_boolean_variables << " = " << *hl1 << std::endl;
+
+#if 1
+    std::cout << "adding heaplit " << no_boolean_variables << " = " << 
+      *hl1 << std::endl;
+#endif
 
     //equality of old and new var
-    std::cout << "create EQ literal (" << old << " == " << op3 << ")" << std::endl;
     heaplit* hl2 = new eq_lit(heapvar(old),heapexpr(op3),stateTrue);
     heap_literal_map[++no_boolean_variables] = hl2;
-    std::cout << "adding heaplit " << no_boolean_variables << " = " << *hl2 << std::endl;
+
+#if 1
+    std::cout << "adding heaplit " << no_boolean_variables << " = " << 
+      *hl2 << std::endl;
+#endif
         
     literalt l(++no_boolean_variables,false);
     literal_map[l] = and_exprt(
       literal_exprt(literalt(no_boolean_variables-1,false)),
       literal_exprt(literalt(no_boolean_variables-2,false)));
+
+#if 1
     std::cout << "adding literal " << l << " = " << literal_map[l] << std::endl;
+#endif
+
     return l;
   }
 
@@ -3509,15 +3511,15 @@ literalt heap_convt::convert_equality(const equal_exprt &expr)
       std::string op1 = convert_identifier(f.get_new_heap_id());
       std::string op2 = convert_identifier(f.get_old_heap_id());
 
-     std::cout << "create NEW literal (" << op1 << "," << op2  << "," << op3 << ")" << std::endl;
+      heaplit* hl =new new_lit(heapvar(op1),heapvar(op2),heapvar(op3),stateTrue);
+      heap_literal_map[++no_boolean_variables] = hl;
 
-     heaplit* hl = new new_lit(heapvar(op1),heapvar(op2),heapvar(op3),stateTrue);
+#if 1
+      std::cout << "adding heaplit " << no_boolean_variables << " = " << 
+        *hl << std::endl;
+#endif
         
-     heap_literal_map[++no_boolean_variables] = hl;
-
-     std::cout << "adding heaplit " << no_boolean_variables << " = " << *hl << std::endl;
-        
-     return literalt(no_boolean_variables,false); 
+      return literalt(no_boolean_variables,false); 
     }
 
     if(to_symbol_expr(f.function()).get_identifier()=="c::free") 
@@ -3528,16 +3530,14 @@ literalt heap_convt::convert_equality(const equal_exprt &expr)
       std::string op3 = 
         convert_identifier(to_symbol_expr(f.arguments()[0]).get_identifier());
 
-      std::cout << "create FREE literal (" << op1 << "," << op2 << "," << 
-        op3 << ")" << std::endl;
-
       heaplit* hl = 
         new free_lit(heapvar(op1),heapvar(op2),heapvar(op3),stateTrue);
-
       heap_literal_map[++no_boolean_variables] = hl;
 
+#if 1
       std::cout << "adding heaplit " << no_boolean_variables << " = " << 
         *hl << std::endl;
+#endif
         
       return literalt(no_boolean_variables,false); 
     }
@@ -3561,9 +3561,12 @@ literalt heap_convt::convert_equality(const equal_exprt &expr)
     std::cout << "if " << c << " then " << i << " else " << e << std::endl;
 
     heaplit* hli = new eq_lit(heapvar(op1),i,stateTrue);
-    std::cout << "create EQ literal (" << op1 << " == " << i << ")" << std::endl;
     heaplit* hle = new eq_lit(heapvar(op1),e,stateTrue);
+
+#if 1
+    std::cout << "create EQ literal (" << op1 << " == " << i << ")" << std::endl;
     std::cout << "create EQ literal (" << op1 << " == " << e << ")" << std::endl;
+#endif
 
     unsigned li = ++no_boolean_variables;
     unsigned le = ++no_boolean_variables;
@@ -3575,11 +3578,15 @@ literalt heap_convt::convert_equality(const equal_exprt &expr)
                                         literal_exprt(literalt(li,false))),
                               and_exprt(literal_exprt(!c),
                                         literal_exprt(literalt(le,false))));
+
+#if 1
     std::cout << "adding literal " << l << " = " << literal_map[l] << std::endl;
+#endif
+
     return l;
   }
 
-
+  //equality between heap expressions
   find_symbols(expr.lhs());
   heapexpr e1 = convert_heapexpr(expr.lhs());
   find_symbols(expr.rhs());
@@ -3592,11 +3599,12 @@ literalt heap_convt::convert_equality(const equal_exprt &expr)
   }
   else hl = new eq_lit(e1.v,e2,stateTrue);
 
-  std::cout << "create EQ literal (" << e1 << " == " << e2 << ")" << std::endl;
-
   heap_literal_map[++no_boolean_variables] = hl;
 
-  std::cout << "adding heaplit " << no_boolean_variables << " = " << *hl << std::endl;
+#if 1
+  std::cout << "adding heaplit " << no_boolean_variables << " = " << 
+    *hl << std::endl;
+#endif
 
   return literalt(no_boolean_variables,false);
 }
@@ -3615,7 +3623,9 @@ Function: heap_convt::convert_bool
 
 literalt heap_convt::convert_bool(const exprt &expr)
 {
+#if 0
   std::cout << "convert_bool(): " << expr << std::endl;
+#endif
 
   assert(expr.type().id()==ID_bool);
   
@@ -3645,7 +3655,11 @@ literalt heap_convt::convert_bool(const exprt &expr)
       return to_literal_expr(and_expr.op0()).get_literal();
     literalt l(++no_boolean_variables,false);
     literal_map[l] = and_expr;
+
+#if 1
     std::cout << "adding literal " << l << " = " << and_expr << std::endl;
+#endif 
+
     return l;
   }
   if(expr.id()==ID_or)
@@ -3659,7 +3673,11 @@ literalt heap_convt::convert_bool(const exprt &expr)
       return to_literal_expr(or_expr.op0()).get_literal();
     literalt l(++no_boolean_variables,false);
     literal_map[l] = or_expr;
+
+#if 1
     std::cout << "adding literal " << l << " = " << or_expr << std::endl;
+#endif
+
     return l;
   }
   if(expr.id()==ID_implies)
@@ -3678,9 +3696,18 @@ literalt heap_convt::convert_bool(const exprt &expr)
     const irep_idt &identifier=to_symbol_expr(expr).get_identifier();
     if(symbols.find(identifier)==symbols.end()) {
       symbols[identifier] = literalt(++no_boolean_variables,false);
-      std::cout << "adding symbol " << symbols[identifier] << " = " << identifier << std::endl;
+
+#if 1
+      std::cout << "adding symbol " << symbols[identifier] << " = " << 
+        identifier << std::endl;
+#endif
     }
-    std::cout << "retrieving symbol " << symbols[identifier] << " = " << identifier << std::endl;
+
+#if 0
+    std::cout << "retrieving symbol " << symbols[identifier] << " = " << 
+      identifier << std::endl;
+#endif
+
     return symbols[identifier];
   }
   if(expr.id()==ID_equal)
@@ -3699,12 +3726,15 @@ literalt heap_convt::convert_bool(const exprt &expr)
     literalt c = convert_bool(expr.op0());
     literalt i = convert_bool(expr.op1());
     literalt e = convert_bool(expr.op2());
-    std::cout << "if " << c << " then " << i << " else " << e << std::endl;
 
     literalt l(++no_boolean_variables,false);
     literal_map[l] = or_exprt(and_exprt(literal_exprt(c),literal_exprt(i)),
                               and_exprt(literal_exprt(!c),literal_exprt(e)));
+
+#if 1
     std::cout << "adding literal " << l << " = " << literal_map[l] << std::endl;
+#endif
+
     return l;
   }
   if(expr.id()==ID_heap_function_application) 
@@ -3730,12 +3760,9 @@ Function: heap_convt::to_nnf
 
 exprt heap_convt::to_nnf(const exprt &expr)
 {
-  std::cout << std::endl << "to_nnf: " << expr << std::endl << std::endl;
-
   if(expr.id()==ID_literal) 
   {
     literalt l = to_literal_expr(expr).get_literal();
-    std::cout << "lookup literal " << l << std::endl;
     if(heap_literal_map.find(l.var_no())!=heap_literal_map.end()) return expr;
     if(literal_map.find(l)!=literal_map.end()) {
       if(!l.sign()) return to_nnf(literal_map[l]);
@@ -3744,7 +3771,6 @@ exprt heap_convt::to_nnf(const exprt &expr)
         return to_nnf(not_expr);
       }
     }
-    std::cout << "lookup literal " << !l << std::endl;
     if(literal_map.find(!l)!=literal_map.end()) {
       if(!l.sign()) return to_nnf(literal_map[!l]);
       else {
@@ -3816,8 +3842,6 @@ Function: heap_convt::distribute
 and_exprt heap_convt::distribute(const or_exprt &expr)
 {
   //distribute ((a1 /\ ... ) \/ (b1 ...) \/ ...) to (a1 \/ b1 \/ ...) \/ (a1 \/ b2 ...) ...
-  std::cout << std::endl << "distribute: " << expr << std::endl << std::endl;
-
   and_exprt d_expr;
   forall_operands(it1, expr)  {
     if(it1->id()==ID_literal) {
@@ -3825,9 +3849,11 @@ and_exprt heap_convt::distribute(const or_exprt &expr)
       else for(exprt::operandst::iterator it2 = d_expr.operands().begin(); 
               it2!=d_expr.operands().end();it2++)  
       {
-        if(it2->id()==ID_literal) { *it2 = or_exprt(*it2,*it1); continue; }
-        assert(it2->id()==ID_literal);
-        it2->operands().push_back(*it1);
+        if(it2->id()==ID_literal) *it2 = or_exprt(*it2,*it1); 
+        else {
+          assert(it2->id()==ID_literal);
+          it2->operands().push_back(*it1);
+	}
       }
     }
     else if(it1->id()==ID_and) 
@@ -3879,7 +3905,6 @@ and_exprt heap_convt::distribute(const or_exprt &expr)
       }
     }
   }
-  std::cout << "distributed: " << d_expr << std::endl << std::endl;
   return d_expr;
 }
 
@@ -3897,7 +3922,9 @@ Function: heap_convt::to_cnf
 
 exprt heap_convt::to_cnf(const exprt &expr)
 {
+#if 0
   std::cout << "to_cnf: " << expr << std::endl;
+#endif
 
   if(expr.id()==ID_literal) return expr;
 
@@ -3967,7 +3994,10 @@ Function: heap_convt::set_to
 
 void heap_convt::set_to(const exprt &expr, bool value)
 {
+#if 0
   std::cout << "set_to(" << value << ")" << std::endl;
+#endif
+
   assert(expr.type().id()==ID_bool);
 
   if(expr.id()==ID_and && value)
@@ -4003,17 +4033,33 @@ void heap_convt::set_to(const exprt &expr, bool value)
       if(l.sign()) hl->complement(); 
       if(!value) hl->complement();
       clause->push_back(hl);
+
+#if 1
       std::cout << "adding clause " << *clause << std::endl;
+#endif
+
       formula.push_back(clause);
       return;
     }
     if(literal_map.find(l)!=literal_map.end())
       {
+
+#if 0
       std::cout << "building cnf for " << l << std::endl;
+#endif
+
       exprt nnf = to_nnf(value ? literal_map[l] : not_exprt(literal_map[l]));
+
+#if 0
       std::cout << "NNF: " << nnf << std::endl;
+#endif
+
       exprt cnf = to_cnf(nnf);
+
+#if 0
       std::cout << "CNF: " << cnf << std::endl;
+#endif 
+
       if(cnf.id()==ID_literal)
       {
         literalt l = to_literal_expr(cnf).get_literal();
@@ -4024,7 +4070,10 @@ void heap_convt::set_to(const exprt &expr, bool value)
       }
       if(cnf.id()==ID_or) 
       {
+#if 0
         std::cout << "adding clause for " << cnf << std::endl;
+#endif
+
         clauset* clause = new clauset(); 
         forall_operands(it, cnf) 
         {          
@@ -4039,16 +4088,25 @@ void heap_convt::set_to(const exprt &expr, bool value)
             clause->push_back(hl);
           }
         }
+#if 1
         std::cout << "adding clause " << *clause << std::endl;
+#endif
+
         formula.push_back(clause);
         return;
       }
       if(cnf.id()==ID_and) 
       {
+#if 0
         std::cout << "adding cnf " << cnf << std::endl;
+#endif 
+
         forall_operands(it1, cnf) 
         {
+#if 0
           std::cout << "adding clause for " << *it1 << std::endl;
+#endif
+
 	  clauset* clause = new clauset(); 
           bool ignore_clause = false;
           if(it1->id()==ID_literal) 
@@ -4078,7 +4136,6 @@ void heap_convt::set_to(const exprt &expr, bool value)
                   heaplit* hl = heap_literal_map[l.var_no()];
                   assert(hl!=NULL);
                   if(l.sign()) { hl = copy_lit(hl); hl->complement(); }
-                  std::cout << "literal " << l << " = " << *hl << std::endl;
                   clause->push_back(hl);
 		}
 	      }
@@ -4086,7 +4143,9 @@ void heap_convt::set_to(const exprt &expr, bool value)
           }
           if(!ignore_clause) 
 	  {
+#if 1
 	    std::cout << "adding clause " << *clause << std::endl;
+#endif
 	    formula.push_back(clause);
 	  }
 	}
@@ -4120,13 +4179,25 @@ void heap_convt::set_to(const exprt &expr, bool value)
       if(!value) l.invert();
       if(symbols.find(identifier)==symbols.end()) {
         symbols.insert(symbolst::value_type(identifier,l));
+
+#if 1
         std::cout << "adding symbol " << l << " = " << identifier << std::endl;
+#endif
       }
       else {
         literal_map[l] = literal_exprt(symbols[identifier]);
-        std::cout << "adding literal " << l << " = " << symbols[identifier] << std::endl;
+
+#if 1
+        std::cout << "adding literal " << l << " = " << 
+          symbols[identifier] << std::endl;
+#endif
+
         literal_map[symbols[identifier]] = literal_exprt(l);
-        std::cout << "adding literal " << symbols[identifier]  << " = " << l << std::endl;
+
+#if 1
+        std::cout << "adding literal " << symbols[identifier]  << 
+          " = " << l << std::endl;
+#endif
       }
       return; // done
     }
