@@ -5,10 +5,10 @@
 **
 */
 
-#include "heaputil.h"
-
 #ifndef TRP_HEAPLIT
 #define TRP_HEAPLIT
+
+#include "heaputil.h"
 
 /** heap theory terms **/
 typedef enum { NO_TERM = 0,

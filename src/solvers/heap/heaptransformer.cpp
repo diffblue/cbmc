@@ -1,5 +1,7 @@
-#include "heaptransformer.h"
+#include <iostream>
 #include <cstdarg>
+
+#include "heaptransformer.h"
 
 std::ostream& operator<< (std::ostream& s, const heaptrans& h) {
   s << "F = ";

@@ -1,4 +1,3 @@
-
 /*******************************************************************\
 
 Module:
@@ -7,19 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <iostream>
 #include <cstdlib>
-
-#if defined(__linux__) || \
-    defined(__FreeBSD_kernel__) || \
-    defined(__GNU__) || \
-    defined(__CYGWIN__) || \
-    defined(__MACH__)
-#include <unistd.h>
-#endif
 
 #include <util/std_expr.h>
 #include <util/std_types.h>
-#include <util/tempfile.h>
 #include <util/arith_tools.h>
 #include <util/i2string.h>
 #include <util/ieee_float.h>
@@ -30,7 +21,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "heapabstraction.h"
 #include "heapheuristics.h"
 #include "heaprefine.h"
-
 
 /*******************************************************************\
 
@@ -48,7 +38,6 @@ std::string heap_dect::decision_procedure_text() const
 {
   return "hippo";
 }
-
 
 /*******************************************************************\
 

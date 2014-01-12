@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "heapabstraction.h"
 
 // std::ostream& operator<< (std::ostream& s, const solutiont& contents) {

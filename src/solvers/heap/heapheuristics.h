@@ -3,10 +3,10 @@
 **
 **
 */
-#include "heaprefine.h"
-
 #ifndef HEAPHEURISTICS
 #define HEAPHEURISTICS
+
+#include "heaprefine.h"
 
 class heapheuristics {
  public:

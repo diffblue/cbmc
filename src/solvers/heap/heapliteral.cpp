@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "heapliteral.h"
 
 domaint mode;

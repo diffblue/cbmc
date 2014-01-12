@@ -4,13 +4,14 @@
 ** A heap theory & transformers. 
 **
 */
-#include "heapabstraction.h"
-#include "heapwatches.h"
+#ifndef HEAPTRANSFORMER
+#define HEAPTRANSFORMER
+
 #include <sstream>
 #include <string>
 
-#ifndef HEAPTRANSFORMER
-#define HEAPTRANSFORMER
+#include "heapabstraction.h"
+#include "heapwatches.h"
 
 class heaptrans {
  public:

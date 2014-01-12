@@ -5,12 +5,12 @@
 **
 */
 
-#include "heapliteral.h"
-#include <iostream>
-
 #ifndef TRP_HEAPABS
 #define TRP_HEAPABS
- 
+
+#include <ostream>
+
+#include "heapliteral.h"
 
 class heapabs {
 public :

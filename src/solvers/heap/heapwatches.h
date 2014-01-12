@@ -1,8 +1,8 @@
 //#include "heaputil.h"
-#include "heapabstraction.h"
-
 #ifndef HEAPWATCHES
 #define HEAPWATCHES
+
+#include "heapabstraction.h"
 
 class heapwatches {
  public:

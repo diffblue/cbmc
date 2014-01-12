@@ -1,15 +1,14 @@
-#include <string>
-#include <iostream>
-#include <stdint.h>
-#include <cassert>
-#include <set>
-#include <vector>
-#include <boost/shared_ptr.hpp>
-#include <map>
-#include <util/union_find.h>
-
 #ifndef HEAPUTIL
 #define HEAPUTIL
+
+#include <string>
+#include <set>
+#include <vector>
+#include <map>
+#include <cassert>
+#include <stdint.h>
+
+#include <util/union_find.h>
 
 #define debugc(s, cond) if (cond) std::cout << s << std::endl;
 #define debug(s) std::cout << s << std::endl;
