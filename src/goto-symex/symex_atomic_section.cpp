@@ -64,16 +64,9 @@ void goto_symext::symex_atomic_end(statet &state)
       r_it!=state.read_in_atomic_section.end();
       ++r_it)
   {
-    const irep_idt &orig_identifier=r_it->first;
-
-    const typet &type=ns.lookup(orig_identifier).type;
-    symbol_exprt r(r_it->second.first, type);
-
-    // properly rename type, if necessary
-    const bool record_events=state.record_events;
-    state.record_events=false;
-    state.rename(r, ns, goto_symex_statet::L2);
-    state.record_events=record_events;
+    symbol_exprt r=r_it->first;
+    r.set_identifier(
+      state.level2.name(r.get_identifier(), r_it->second.first));
 
     // guard is the disjunction over reads
     assert(!r_it->second.second.empty());
@@ -83,10 +76,13 @@ void goto_symext::symex_atomic_end(statet &state)
         it!=r_it->second.second.end();
         ++it)
       read_guard|=*it;
+    exprt read_guard_expr=read_guard.as_expr();
+    do_simplify(read_guard_expr);
 
-    symbol_exprt original_symbol(orig_identifier, r.type());
+    symbol_exprt original_symbol=r_it->first;
+    state.get_original_name(original_symbol);
     target.shared_read(
-      read_guard.as_expr(),
+      read_guard_expr,
       r,
       original_symbol,
       atomic_section_id,
@@ -98,18 +94,8 @@ void goto_symext::symex_atomic_end(statet &state)
       w_it!=state.written_in_atomic_section.end();
       ++w_it)
   {
-    const irep_idt &orig_identifier=w_it->first;
-
-    const typet &type=ns.lookup(orig_identifier).type;
-    symbol_exprt w(orig_identifier, type);
-
-    const bool record_events=state.record_events;
-    state.record_events=false;
-    state.rename(w, ns, goto_symex_statet::L1);
-    state.rename(w.type(), ns, goto_symex_statet::L2);
-    const irep_idt new_name=state.level2(w.get_identifier());
-    w.set_identifier(new_name);
-    state.record_events=record_events;
+    symbol_exprt w=w_it->first;
+    state.level2(w);
 
     // guard is the disjunction over writes
     assert(!w_it->second.empty());
@@ -119,10 +105,13 @@ void goto_symext::symex_atomic_end(statet &state)
         it!=w_it->second.end();
         ++it)
       write_guard|=*it;
+    exprt write_guard_expr=write_guard.as_expr();
+    do_simplify(write_guard_expr);
 
-    symbol_exprt original_symbol(orig_identifier, w.type());
+    symbol_exprt original_symbol=w_it->first;
+    state.get_original_name(original_symbol);
     target.shared_write(
-      write_guard.as_expr(),
+      write_guard_expr,
       w,
       original_symbol,
       atomic_section_id,
