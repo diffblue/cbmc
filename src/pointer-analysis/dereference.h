@@ -12,6 +12,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/namespace.h>
 #include <util/expr.h>
 
+class if_exprt;
+class typecast_exprt;
+
 /*! \brief TO_BE_DOCUMENTED
 */
 class dereferencet
@@ -47,6 +50,18 @@ private:
 
   exprt dereference_rec(
     const exprt &address,
+    const exprt &offset,
+    const typet &type);
+  exprt dereference_if(
+    const if_exprt &expr,
+    const exprt &offset,
+    const typet &type);
+  exprt dereference_plus(
+    const exprt &expr,
+    const exprt &offset,
+    const typet &type);
+  exprt dereference_typecast(
+    const typecast_exprt &expr,
     const exprt &offset,
     const typet &type);
 
