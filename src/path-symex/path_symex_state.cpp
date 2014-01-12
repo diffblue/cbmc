@@ -165,7 +165,7 @@ exprt path_symex_statet::read(const exprt &src, bool propagate)
   // 4. Simplifier
   
   exprt tmp1=src;
-  adjust_float_expressions(tmp, var_map.ns);
+  adjust_float_expressions(tmp1, var_map.ns);
 
   // we force propagation for dereferencing
   exprt tmp2=dereference_rec(tmp1, true);
