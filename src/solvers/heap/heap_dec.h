@@ -26,11 +26,10 @@ public:
   virtual resultt dec_solve();
   virtual std::string decision_procedure_text() const;
   
-  // yes, we are incremental!
+  // this is not yet incremental
   virtual bool has_set_assumptions() const { return false; }
   
 protected:
-
 };
 
 #endif

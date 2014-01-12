@@ -8,7 +8,7 @@
 #ifndef TRP_HEAPABS
 #define TRP_HEAPABS
 
-#include <ostream>
+#include <iostream>
 
 #include "heapliteral.h"
 

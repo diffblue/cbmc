@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <iostream>
-#include <cstdlib>
-
 #include <util/std_expr.h>
 #include <util/std_types.h>
 #include <util/arith_tools.h>
@@ -65,6 +62,7 @@ decision_proceduret::resultt heap_dect::dec_solve()
   {
     boolean_assignment.clear();
     boolean_assignment.resize(no_boolean_variables, false);
+
 /*    
     typedef hash_map_cont<std::string, std::string, string_hash> valuest;
     valuest values;
@@ -77,6 +75,7 @@ decision_proceduret::resultt heap_dect::dec_solve()
           std::string(line, pos+1, std::string::npos);
     }
 */
+
     // Theory variables
 
     for(identifier_mapt::iterator
@@ -90,14 +89,15 @@ decision_proceduret::resultt heap_dect::dec_solve()
         std::string id = convert_identifier(it->first);
         heapvar v(id);
         heaplit* l = new eq_lit(v,heapexpr(std::string("NULL")),stateTrue);
-        if(sol.entails_literal(l)) {
-          std::cout << "have " << id << "==NULL" << std::endl;
-  	  std::cout << "type: " << ns.follow(it->second.type) << std::endl;
+        if(sol.entails_literal(l))
+        {
+          status() << "have " << id << "==NULL" << eom;
+  	  status() << "type: " << ns.follow(it->second.type) << eom;
           pointer_typet type = to_pointer_type(ns.follow(it->second.type));
           it->second.value = null_pointer_exprt(type);
         }
         else
-          std::cout << "do not have " << id << "==NULL" << std::endl;
+          status() << "do not have " << id << "==NULL" << eom;
       }
       else if(it->second.type.id()==ID_bool) 
       {
@@ -106,16 +106,20 @@ decision_proceduret::resultt heap_dect::dec_solve()
         if(heap_literal_map.find(l.var_no())==heap_literal_map.end()) continue;
         heaplit* hl = heap_literal_map[l.var_no()];
         if(sol.entails_literal(hl)) {
-          std::cout << "have " << it->first << "==" << (hl->state==stateTrue) << std::endl;
-          if(hl->state==stateTrue) it->second.value = true_exprt(); 
-          else it->second.value =  false_exprt();
+          status() << "have " << it->first << "==" << (hl->state==stateTrue) << eom;
+          if(hl->state==stateTrue)
+            it->second.value = true_exprt(); 
+          else
+            it->second.value =  false_exprt();
         }
         else {
           hl->complement();
           if(sol.entails_literal(hl)) {
-            std::cout << "have " << it->first << "==" << (hl->state==stateTrue) << std::endl;
-          if(hl->state==stateTrue) it->second.value = true_exprt(); 
-          else it->second.value =  false_exprt();
+            status() << "have " << it->first << "==" << (hl->state==stateTrue) << eom;
+            if(hl->state==stateTrue)
+              it->second.value = true_exprt(); 
+            else
+              it->second.value =  false_exprt();
 	  }
         }
       }
@@ -134,9 +138,11 @@ decision_proceduret::resultt heap_dect::dec_solve()
 
     return D_SATISFIABLE;
   }
-  else if(ret==transformerRefinementResult::Bottom) {
+  else if(ret==transformerRefinementResult::Bottom)
+  {
     return D_UNSATISFIABLE;
   }
+
   assert(false);
 }
 
