@@ -1551,14 +1551,15 @@ void smt2_convt::convert_expr(const exprt &expr)
   {
     convert_literal(to_literal_expr(expr).get_literal());
   }
-  else if(expr.id() == ID_forall || expr.id() == ID_exists)
+  else if(expr.id()==ID_forall || 
+          expr.id()==ID_exists)
   {
-    if (expr.id() == ID_forall)
+    if(expr.id()==ID_forall)
       out << "(forall ";
-    else if (expr.id() == ID_exists)
+    else if(expr.id()==ID_exists)
       out << "(exists ";
 
-    exprt bound = expr.op0();
+    exprt bound=expr.op0();
 
     out << "((";
     convert_expr(bound);
@@ -1570,6 +1571,37 @@ void smt2_convt::convert_expr(const exprt &expr)
 
     out << ")";
   }
+  else if(expr.id()==ID_vector)
+  {
+    const vector_typet &vector_type=to_vector_type(expr.type());
+   
+    mp_integer size;
+    if(to_integer(vector_type.size(), size))
+      throw "failed to convert vector size to constant";
+      
+    assert(size==expr.operands().size());
+      
+    if(use_datatypes)
+    {
+      assert(datatype_map.find(vector_type)!=datatype_map.end());
+
+      const std::string smt_typename=
+        datatype_map.find(vector_type)->second;
+      
+      out << "(mk-" << smt_typename;
+    }
+    else
+      out << "(concat";
+      
+    // build component-by-component
+    forall_operands(it, expr)
+    {
+      out << " ";
+      convert_expr(*it);
+    }
+
+    out << ")"; // mk-... or concat
+  }  
   else
     throw "smt2_convt::convert_expr: `"+
           expr.id_string()+"' is unsupported";
@@ -2530,6 +2562,42 @@ void smt2_convt::convert_plus(const plus_exprt &expr)
 
     out << ")";
   }
+  else if(expr.type().id()==ID_vector)
+  {
+    const vector_typet &vector_type=to_vector_type(expr.type());
+   
+    mp_integer size;
+    if(to_integer(vector_type.size(), size))
+      throw "failed to convert vector size to constant";
+      
+    typet index_type=vector_type.size().type();
+
+    if(use_datatypes)
+    {
+      assert(datatype_map.find(vector_type)!=datatype_map.end());
+
+      const std::string smt_typename=
+        datatype_map.find(vector_type)->second;
+      
+      out << "(mk-" << smt_typename;
+    }
+    else
+      out << "(concat";
+      
+    // add component-by-component
+    for(mp_integer i=0; i!=size; ++i)
+    {
+      exprt tmp(ID_plus, vector_type.subtype());
+      forall_operands(it, expr)
+        tmp.copy_to_operands(
+          index_exprt(*it, from_integer(i, index_type), vector_type.subtype()));
+
+      out << " ";
+      convert_expr(tmp);
+    }
+
+    out << ")"; // mk-... or concat
+  }
   else
     throw "unsupported type for +: "+expr.type().id_string();
 }
@@ -2615,6 +2683,42 @@ void smt2_convt::convert_minus(const minus_exprt &expr)
         "+",
         unary_minus_exprt(expr.op1(), expr.op1().type()),
         expr.type()));
+  }
+  else if(expr.type().id()==ID_vector)
+  {
+    const vector_typet &vector_type=to_vector_type(expr.type());
+   
+    mp_integer size;
+    if(to_integer(vector_type.size(), size))
+      throw "failed to convert vector size to constant";
+      
+    typet index_type=vector_type.size().type();
+
+    if(use_datatypes)
+    {
+      assert(datatype_map.find(vector_type)!=datatype_map.end());
+
+      const std::string smt_typename=
+        datatype_map.find(vector_type)->second;
+      
+      out << "(mk-" << smt_typename;
+    }
+    else
+      out << "(concat";
+      
+    // subtract component-by-component
+    for(mp_integer i=0; i!=size; ++i)
+    {
+      exprt tmp(ID_minus, vector_type.subtype());
+      forall_operands(it, expr)
+        tmp.copy_to_operands(
+          index_exprt(*it, from_integer(i, index_type), vector_type.subtype()));
+
+      out << " ";
+      convert_expr(tmp);
+    }
+
+    out << ")"; // mk-... or concat
   }
   else
     throw "unsupported type for -: "+expr.type().id_string();
@@ -3110,6 +3214,35 @@ void smt2_convt::convert_index(const index_exprt &expr)
       out << ")";
     }
   }
+  else if(array_op_type.id()==ID_vector)
+  {
+    const vector_typet &vector_type=to_vector_type(array_op_type);
+    
+    if(use_datatypes)
+    {
+      assert(datatype_map.find(vector_type)!=datatype_map.end());
+      const std::string smt_typename=
+        datatype_map.find(vector_type)->second;
+        
+      // this is easy for constant indicies
+      
+      mp_integer index_int;
+      if(to_integer(expr.index(), index_int))
+      {
+        throw "todo: non-constant index on vectors";
+      }
+      else
+      {
+        out << "(" << smt_typename << "." << index_int << " ";
+        convert_expr(expr.array());
+        out << ")";
+      }
+    }
+    else
+    {
+      throw "todo: index on vectors";
+    }
+  }
   else
     throw "index with unsupported array type: "+array_op_type.id_string();
 }
@@ -3188,6 +3321,44 @@ void smt2_convt::convert_member(const member_exprt &expr)
   }
   else
     assert(false);
+}
+
+/*******************************************************************\
+
+Function: smt2_convt::flatten2bv
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void smt2_convt::flatten2bv(const exprt &expr)
+{
+  const typet &type=ns.follow(expr.type());
+
+  if(type.id()==ID_bool)
+  {
+    out << "(ite ";
+    convert_expr(expr); // this returns a Bool
+    out << " bit1 bit0)";
+  }
+  else if(type.id()==ID_vector)
+  {
+    convert_expr(expr);
+  }
+  else if(type.id()==ID_array)
+  {
+    convert_expr(expr);
+  }
+  else if(type.id()==ID_struct)
+  {
+    convert_expr(expr);
+  }
+  else
+    convert_expr(expr);
 }
 
 /*******************************************************************\
@@ -3521,23 +3692,34 @@ void smt2_convt::convert_type(const typet &type)
     }
     else
     {
-      // TODO
+      boolbv_widtht boolbv_width(ns);
+    
+      unsigned width=boolbv_width(type);
+      
+      if(width==0)
+        throw "failed to get width of struct";
+
+      out << "(_ BitVec " << width << ")";
     }
   }
   else if(type.id()==ID_vector)
   {
-    const vector_typet &vector_type=to_vector_type(type);
+    if(use_datatypes)
+    {
+      assert(datatype_map.find(type)!=datatype_map.end());
+      out << datatype_map.find(type)->second;
+    }
+    else
+    {
+      boolbv_widtht boolbv_width(ns);
     
-    mp_integer size;
-    if(to_integer(vector_type.size(), size))
-      throw "failed to convert vector size to constant";
+      unsigned width=boolbv_width(type);
+      
+      if(width==0)
+        throw "failed to get width of vector";
 
-    out << "((_ Tuple " << size << ") ";
-
-    for(mp_integer i=0; i!=size; ++i)
-      convert_type(vector_type.subtype());
-
-    out << ")";
+      out << "(_ BitVec " << width << ")";
+    }
   }
   else if(type.id()==ID_code)
   {
@@ -3594,7 +3776,8 @@ void smt2_convt::convert_type(const typet &type)
   {
     if(use_datatypes)
     {
-      throw "complex yet to be built";
+      assert(datatype_map.find(type)!=datatype_map.end());
+      out << datatype_map.find(type)->second;
     }
     else
     {
@@ -3661,6 +3844,55 @@ void smt2_convt::find_symbols_rec(
    else if(type.id()==ID_complex)
    {
      find_symbols_rec(type.subtype(), recstack);
+
+     if(use_datatypes &&
+        datatype_map.find(type)==datatype_map.end())
+     {
+       std::string smt_typename = "complex."+i2string(datatype_map.size());
+       datatype_map[type] = smt_typename;
+
+       out << "(declare-datatypes () ((" << smt_typename << " "
+           << "(mk-" << smt_typename;
+
+       out << " (" << smt_typename << ".imag ";
+       convert_type(type.subtype());
+       out << ")";
+
+       out << " (" << smt_typename << ".real ";
+       convert_type(type.subtype());
+       out << ")";
+       
+       out << "))))\n";
+     }
+   }
+   else if(type.id()==ID_vector)
+   {
+     find_symbols_rec(type.subtype(), recstack);
+
+     if(use_datatypes &&
+        datatype_map.find(type)==datatype_map.end())
+     {
+       const vector_typet &vector_type=to_vector_type(type);
+      
+       mp_integer size;
+       if(to_integer(vector_type.size(), size))
+         throw "failed to convert vector size to constant";
+
+       std::string smt_typename = "vector."+i2string(datatype_map.size());
+       datatype_map[type] = smt_typename;
+
+       out << "(declare-datatypes () ((" << smt_typename << " "
+           << "(mk-" << smt_typename;
+
+       for(mp_integer i=0; i!=size; ++i)
+       {
+         out << " (" << smt_typename << "." << i << " ";
+         convert_type(type.subtype());
+         out << ")";
+       }
+       
+       out << "))))\n";
+     }
    }
    else if(type.id()==ID_struct)
    {
@@ -3670,82 +3902,77 @@ void smt2_convt::find_symbols_rec(
      for(unsigned i=0; i<components.size(); i++)
        find_symbols_rec(components[i].type(), recstack);
 
-     if(use_datatypes)
+     // Declare the corresponding SMT type if we haven't already.
+     if(use_datatypes &&
+        datatype_map.find(type)==datatype_map.end())
      {
-       // Declare the corresponding SMT type if we haven't already.
+       std::string smt_typename = "struct."+i2string(datatype_map.size());
+       datatype_map[type] = smt_typename;
 
-       if(datatype_map.find(type)==datatype_map.end())
+       // We're going to create a datatype named something like `struct.0'.
+       // It's going to have a single constructor named `mk-struct.0' with an
+       // argument for each member of the struct.  The declaration that
+       // creates this type looks like:
+       //
+       // (declare-datatypes () ((struct.0 (mk-struct.0
+       //                                   (struct.0.component1 type1)
+       //                                   ...
+       //                                   (struct.0.componentN typeN)))))
+       out << "(declare-datatypes () ((" << smt_typename << " "
+           << "(mk-" << smt_typename << " ";
+
+       for (unsigned i = 0; i < components.size(); i++)
        {
-         std::string smt_typename = "struct."+i2string(datatype_map.size());
-         datatype_map[type] = smt_typename;
-
-         // We're going to create a datatype named something like `struct.0'.
-         // It's going to have a single constructor named `mk-struct.0' with an
-         // argument for each member of the struct.  The declaration that
-         // creates this type looks like:
-         //
-         // (declare-datatypes () ((struct.0 (mk-struct.0
-         //                                   (struct.0.component1 type1)
-         //                                   ...
-         //                                   (struct.0.componentN typeN)))))
-         out << "(declare-datatypes () ((" << smt_typename << " "
-             << "(mk-" << smt_typename << " ";
-
-         for (unsigned i = 0; i < components.size(); i++)
-         {
-           const struct_union_typet::componentt &component = components[i];
-           out << "(" << smt_typename << "." << component.get_name()
-                         << " ";
-           convert_type(component.type());
-           out << ") ";
-         }
-
-         out << "))))" << "\n";
-
-         // Let's also declare some convenience functions to update members of
-         // the struct whil we're at it.  The functions are named like
-         // `update-struct.0.component1'.  Their declarations look like:
-         //
-         // (declare-fun update-struct.0.component1
-         //               ((s struct.0)     ; first arg -- the struct to update
-         //                (v type1))       ; second arg -- the value to update
-         //               struct.0          ; the output type
-         //               (mk-struct.0      ; build the new struct...
-         //                v                ; the updated value
-         //                (struct.0.component2 s)  ; retain the other members
-         //                ...
-         //                (struct.0.componentN s)))
-
-         for (unsigned i = 0; i < components.size(); i++)
-         {
-           const struct_union_typet::componentt &component = components[i];
-           out << "(define-fun update-" << smt_typename << "."
-               << component.get_name() << " "
-               << "((s " << smt_typename << ") "
-               <<  "(v ";
-           convert_type(component.type());
-           out << ")) " << smt_typename << " "
-               << "(mk-" << smt_typename
-               << " ";
-
-           for (unsigned j = 0; j < components.size(); j++)
-           {
-             if (j == i)
-             {
-               out << "v ";
-             }
-             else
-             {
-               out << "(" << smt_typename << "."
-                   << components[j].get_name() << " s) ";
-             }
-           }
-
-           out << "))" << "\n";
-         }
-
-         out << "\n";
+         const struct_union_typet::componentt &component = components[i];
+         out << "(" << smt_typename << "." << component.get_name()
+                       << " ";
+         convert_type(component.type());
+         out << ") ";
        }
+
+       out << "))))" << "\n";
+
+       // Let's also declare convenience functions to update individual members of
+       // the struct whil we're at it.  The functions are named like
+       // `update-struct.0.component1'.  Their declarations look like:
+       //
+       // (declare-fun update-struct.0.component1
+       //               ((s struct.0)     ; first arg -- the struct to update
+       //                (v type1))       ; second arg -- the value to update
+       //               struct.0          ; the output type
+       //               (mk-struct.0      ; build the new struct...
+       //                v                ; the updated value
+       //                (struct.0.component2 s)  ; retain the other members
+       //                ...
+       //                (struct.0.componentN s)))
+
+       for (unsigned i = 0; i < components.size(); i++)
+       {
+         const struct_union_typet::componentt &component = components[i];
+         out << "(define-fun update-" << smt_typename << "."
+             << component.get_name() << " "
+             << "((s " << smt_typename << ") "
+             <<  "(v ";
+         convert_type(component.type());
+         out << ")) " << smt_typename << " "
+             << "(mk-" << smt_typename
+             << " ";
+
+         for(unsigned j = 0; j < components.size(); j++)
+         {
+           if(j==i)
+             out << "v ";
+           else
+           {
+             out << "(" << smt_typename << "."
+                 << components[j].get_name() << " s) ";
+           }
+         }
+
+         out << "))" << "\n";
+       }
+
+       out << "\n";
      }
    }
    else if(type.id()==ID_union)
