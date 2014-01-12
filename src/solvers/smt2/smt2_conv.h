@@ -48,7 +48,6 @@ public:
     solver(_solver),
     boolbv_width(_ns),
     pointer_logic(_ns),
-    array_index_bits(32),
     no_boolean_variables(0)
   {
     // We set some defaults differently
@@ -154,10 +153,6 @@ protected:
   void bool2bv(const exprt &);
   void bv2bool(const exprt &);
   
-  // arrays
-  typet array_index_type() const;
-  void array_index(const exprt &expr);
-
   // pointers
   pointer_logict pointer_logic;
   void convert_address_of_rec(
@@ -189,8 +184,6 @@ protected:
   // use_datatype is set
   typedef std::map<typet, std::string> datatype_mapt;
   datatype_mapt datatype_map;
-  
-  unsigned array_index_bits;
   
   // for replacing various defined expressions:
   //
