@@ -200,6 +200,9 @@ public :
 
   bool add_eq(heapvar x, heapexpr y, uint8_t s) {
     bool ret;
+    sel_eqst tmp_sel_eqs;
+
+    tmp_sel_eqs.clear();
 
     debugc("[add_eq] adding x = " << x << " and y = " << y, 1);
 
@@ -207,8 +210,8 @@ public :
       heapvar old_x = aliases.find(x);
       heapvar old_y = aliases.find(y.v);
 
-      debugc("[add_eq] : x = " << x << " and old_x = " << old_x, 0);
-      debugc("[add_eq] : y.v = " << y.v << " and old_y = " << old_y, 0);
+      debugc("[add_eq] : x = " << x << " and old_x = " << old_x, 1);
+      debugc("[add_eq] : y.v = " << y.v << " and old_y = " << old_y, 1);
 
       if(y.is_sel()) {
 	not_eqt seleq = std::make_pair(old_x, heapexpr(old_y, y.m, y.f));
@@ -228,10 +231,16 @@ public :
 	      debugc("[add_eq] : found sel_eq (2) " << *it, 0);
 	      // todo: add_eq also modifies sel_eqs...
 	      debugc("[add_eq] : add eq (6) " << sel_eqs_it->first << " = " << heapexpr(it->first), 1);
-	      add_eq(sel_eqs_it->first, heapexpr(it->first), stateTrue);
+	      tmp_sel_eqs.insert(std::make_pair(sel_eqs_it->first, heapexpr(it->first)));
+
+	      //add_eq(sel_eqs_it->first, heapexpr(it->first), stateTrue);
 	    }
 	  }
 	}
+
+	for(sel_eqst::const_iterator it = tmp_sel_eqs.begin(); it != tmp_sel_eqs.end(); ++it) 
+	  add_eq(it->first, it->second, stateTrue);
+
 
        // check whether sel_eqs generates any new disequality
        // todo : change the equiv classes to store heapexpr and remove this..
@@ -315,21 +324,24 @@ public :
 
 	  }
 
+
+      not_eqst tmp_not_eqs = not_eqs;
+
        // update not_eqs 
-      for(not_eqst::iterator not_eqs_it = not_eqs.begin(); not_eqs_it != not_eqs.end(); ++not_eqs_it) {
+      for(not_eqst::iterator not_eqs_it = tmp_not_eqs.begin(); not_eqs_it != tmp_not_eqs.end(); ++not_eqs_it) {
 	debugc("[add_eq] : not_eq = " << *not_eqs_it, 1);
 	if(!(old_x == new_x)) {
 	  not_eqt noteq;
 	  if(not_eqs_it->first == old_x) {
 	    noteq = *not_eqs_it;
-	    not_eqs.erase(not_eqs_it);
+	    not_eqs.erase(*not_eqs_it);
 	    noteq.first = new_x;
 	    debugc("[add_eq]: add not_eq (1) " << noteq, 1);
 	    not_eqs.insert(noteq);
 	  }
 	  if((not_eqs_it->second).v == old_x) {
 	    noteq = *not_eqs_it;
-	    not_eqs.erase(not_eqs_it);
+	    not_eqs.erase(*not_eqs_it);
 	    noteq.second.v = new_x;
 	    debugc("[add_eq]: add not_eq (2) " << noteq, 1);
 	    not_eqs.insert(noteq);
@@ -338,14 +350,14 @@ public :
 	if(!(old_y == new_x)) {
 	  if(not_eqs_it->first == old_y) {
 	    not_eqt noteq = *not_eqs_it;
-	    not_eqs.erase(not_eqs_it);
+	    not_eqs.erase(*not_eqs_it);
 	    noteq.first = new_x;
 	    debugc("[add_eq]: add not_eq (3) " << noteq, 1);
 	    not_eqs.insert(noteq);
 	  }
 	  if((not_eqs_it->second).v == old_y) {
 	    not_eqt noteq = *not_eqs_it;
-	    not_eqs.erase(not_eqs_it);
+	    not_eqs.erase(*not_eqs_it);
 	    noteq.second.v = new_x;
 	    debugc("[add_eq]: add not_eq (4) " << noteq, 1);
 	    not_eqs.insert(noteq);
@@ -353,18 +365,21 @@ public :
 	}
       }
 
+
+      sel_eqst tmp_sel_eqs = sel_eqs;
+
        // update sel_eqs 
-      for(sel_eqst::iterator sel_eqs_it = sel_eqs.begin(); sel_eqs_it != sel_eqs.end(); ++sel_eqs_it) {
+      for(sel_eqst::iterator sel_eqs_it = tmp_sel_eqs.begin(); sel_eqs_it != tmp_sel_eqs.end(); ++sel_eqs_it) {
 	if(!(old_x == new_x)) {
 	  if(sel_eqs_it->first == old_x) {
 	    not_eqt sel_eq = *sel_eqs_it;
-	    sel_eqs.erase(sel_eqs_it);
+	    sel_eqs.erase(*sel_eqs_it);
 	    sel_eq.first = new_x;
 	    sel_eqs.insert(sel_eq);
 	  }
 	  if((sel_eqs_it->second).v == old_x) {
 	    not_eqt sel_eq = *sel_eqs_it;
-	    sel_eqs.erase(sel_eqs_it);
+	    sel_eqs.erase(*sel_eqs_it);
 	    sel_eq.second.v = new_x;
 	    sel_eqs.insert(sel_eq);
 	  }
@@ -372,13 +387,13 @@ public :
 	if(!(old_y == new_x)) {
 	  if(sel_eqs_it->first == old_y) {
 	    not_eqt sel_eq = *sel_eqs_it;
-	    sel_eqs.erase(sel_eqs_it);
+	    sel_eqs.erase(*sel_eqs_it);
 	    sel_eq.first = new_x;
 	    sel_eqs.insert(sel_eq);
 	  }
 	  if((sel_eqs_it->second).v == old_y) {
 	    not_eqt sel_eq = *sel_eqs_it;
-	    sel_eqs.erase(sel_eqs_it);
+	    sel_eqs.erase(*sel_eqs_it);
 	    sel_eq.second.v = new_x;
 	    sel_eqs.insert(sel_eq);
 	  }
@@ -387,15 +402,22 @@ public :
 
       // check whether sel_eqs generates any new equality
       // todo : change the equiv classes to store heapexpr and remove this..
+
+      tmp_sel_eqs.clear();
       for(sel_eqst::iterator sel_eqs_it = sel_eqs.begin(); sel_eqs_it != sel_eqs.end(); ++sel_eqs_it) {
 	heapexpr sel1 = sel_eqs_it->second;
 	for(sel_eqst::iterator it = sel_eqs.begin(); it != sel_eqs.end(); ++it) {
 	  if(sel_eqs_it != it && sel1 == it->second) {
 	    // todo: add_eq also modifies sel_eqs...
-	    add_eq(sel_eqs_it->first, heapexpr(it->first), stateTrue);
+	    //add_eq(sel_eqs_it->first, heapexpr(it->first), stateTrue);
+	    tmp_sel_eqs.insert(std::make_pair(sel_eqs_it->first, heapexpr(it->first)));
 	  }
 	}
       }
+
+      for(sel_eqst::const_iterator it = tmp_sel_eqs.begin(); it != tmp_sel_eqs.end(); ++it) 
+	add_eq(it->first, it->second, stateTrue);
+
 
       debugc("[add_eq/not_paths] : not_paths = " << not_paths, 1);
        // update not_paths 
@@ -543,6 +565,7 @@ public :
     }
   } 
 
+
  protected:
 
 
@@ -683,6 +706,7 @@ public :
   bool entails_literal(const meetIrreduciblep& e) {
     return entails_literal(e->lit);
   }
+
 
   entailResult::s entails(clauset* f, solutiont& h) {
     meetIrreduciblep m;

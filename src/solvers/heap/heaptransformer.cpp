@@ -573,6 +573,7 @@ bool heaptrans::hint_heuristic(clauset*& c,  heapabs& sol) {
     // increment the weight
     ++(h.second);
     hint.erase(it);
+    debugc("hint " << *(h.first.begin()),1);
     debugc("[hint_heuristic] : hint already inserted " << h, 1);
     hint.insert(h);
     return true;
@@ -856,3 +857,25 @@ void heaptrans::insert_clause(clauset* c) {
 
 }
 
+void heaptrans::construct_literal_table() {
+  literal_tablet::iterator it_l;
+
+
+  for(formulat::iterator it_f = formula.begin(); it_f != formula.end(); ++it_f) {
+    for(clauset::iterator it_c = (*it_f)->begin(); it_c != (*it_f)->end(); ++it_c) {
+      for(it_l = literal_table.begin(); it_l != literal_table.end(); ++it_l) {
+	if (**it_c == *(it_l->first)) {
+	  (it_l->second).push_back(*it_f);
+	  break;
+	}
+      }
+
+      if(it_l == literal_table.end()) {
+	formulat clauses;
+	clauses.push_back(*it_f);
+	literal_recordt lr = std::make_pair(*it_c, clauses);
+      }
+    }
+  }
+
+}

@@ -780,6 +780,42 @@ void symex_target_equationt::convert_assertions(
     assert(false); // unreachable
   }
 
+  // check whether assumptions and assertions are interleaved
+  bool interleaved = false;
+  bool assertion_seen = false;
+  for(SSA_stepst::iterator it=SSA_steps.begin();
+      it!=SSA_steps.end(); it++)
+    if(it->is_assert()) assertion_seen = true;
+    else if(it->is_assume() && assertion_seen)
+    {
+      interleaved = true;
+      break;
+    }
+
+  if(!interleaved) 
+  {
+    or_exprt::operandst disjuncts;
+    disjuncts.reserve(number_of_assertions);
+
+    for(SSA_stepst::iterator it=SSA_steps.begin();
+        it!=SSA_steps.end(); it++)
+      if(it->is_assert())
+      {
+        // do the conversion
+        it->cond_literal=prop_conv.convert(it->cond_expr);
+
+        // store disjunct
+        disjuncts.push_back(literal_exprt(!it->cond_literal));
+      }
+      else if(it->is_assume())
+        prop_conv.set_to_true(it->cond_expr);
+
+    // the below is 'true' if there are no assertions
+    prop_conv.set_to_true(disjunction(disjuncts));
+
+    return;
+  }
+
   // We do (NOT a1) OR (NOT a2) ...
   // where the a's are the assertions
   or_exprt::operandst disjuncts;

@@ -66,13 +66,16 @@ template <class abst, class transt, class heurt>
     	upwardCompleteness::s refinementResult;
 
 	trans.original_formula = trans.formula;
+	//trans.simplify_formula(abs);
+	//debugc("[solve]: formula after simplification: " << trans.formula, 1);
 	
 	do {
           debugc("[solve]: reset", 1);
 	  abs.clear();
 	  trans.hint.clear();
-	  trans.simplify_formula(abs);
-	  debugc("[solve]: formula after simplification: " << trans.formula, 1);
+	  
+	  //trans.reset = true;
+
 	  debugc("[solve]: hint after reset: " << trans.hint, 1);
 	  debugc("[solve]: trail after reset: " << abs.trail, 0);
 	  constructionResult = construct(abs, trans, h);

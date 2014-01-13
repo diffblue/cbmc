@@ -19,6 +19,9 @@ class heaptrans {
     formulat formula;
     formulat original_formula;    
 
+    literal_tablet literal_table;
+    bool reset;
+
     // after full CBMC integration this can be removed
     ssa_countst* ssa_count;
 
@@ -26,10 +29,12 @@ class heaptrans {
     // heapwatches watch;
 
     heaptrans() {
+      reset = true;
       ssa_count = new ssa_countst;
     }
 
     heaptrans(formulat _formula) {
+      reset = true;
       ssa_count = new ssa_countst;
       formula = _formula;
     }
@@ -710,6 +715,11 @@ class heaptrans {
     gamma = downwardCompleteness::Complete;
     bool already_applied;
 
+    /* if(reset) { */
+    /*   simplify_formula(); */
+    /*   reset = false; */
+    /* } */
+
     debugc("[apply]: solution = " << sol, 1);
     debugc("[apply]: formula size = " << formula.size(), 0);
     for(unsigned int i = 0; i < formula.size(); ++i) {
@@ -1092,6 +1102,10 @@ class heaptrans {
   bool hint_contains(const meetIrreduciblep&) const;
   clauset* simplify_clause (clauset*, heapabs&);
   void simplify_formula (heapabs&);
+
+  void construct_literal_table();
+
+
 }; 
 
 std::ostream& operator<< (std::ostream&, const heaptrans&);

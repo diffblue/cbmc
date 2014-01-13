@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <iostream>
+
 #include <util/std_expr.h>
 #include <util/std_types.h>
 #include <util/arith_tools.h>
@@ -54,6 +56,9 @@ decision_proceduret::resultt heap_dect::dec_solve()
   heaprefine<heapabs, heaptrans, heapheuristics> solver;
   heapabs sol;
   heapheuristics h;
+
+  std::cout << "Number of clauses: " << formula.size() << std::endl;
+
   heaptrans t(formula);
 
   transformerRefinementResult::s ret = solver.solve(sol, t, h);

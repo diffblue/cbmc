@@ -238,4 +238,7 @@ namespace transformerRefinementResult {
   enum s { Bottom = 0, Unknown = 1, NotBottom = 2};
 }
 
+typedef std::pair< heaplitp, formulat > literal_recordt;
+typedef std::vector< literal_recordt > literal_tablet;
+
 #endif

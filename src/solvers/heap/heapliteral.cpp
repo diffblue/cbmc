@@ -76,6 +76,8 @@ std::ostream& operator<< (std::ostream& s, const solutiont& v) {
 
 std::ostream& operator<< (std::ostream& s, const hintt& h) {
   s << "([" << h.first << "], " << h.second << ")";
+
+  return s;
 }
 
 
