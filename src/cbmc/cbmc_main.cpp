@@ -1,6 +1,6 @@
 /*******************************************************************\
 
-Module: Main Module 
+Module: CBMC Main Module 
 
 Author: Daniel Kroening, kroening@kroening.com
 

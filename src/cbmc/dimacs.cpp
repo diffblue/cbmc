@@ -58,7 +58,7 @@ bool dimacst::write_dimacs(std::ostream &out)
   dynamic_cast<dimacs_cnft&>(prop).write_dimacs_cnf(out);
 
   // we dump the mapping variable<->literals
-  for(prop_convt::symbolst::const_iterator
+  for(bv_cbmct::symbolst::const_iterator
       s_it=get_symbols().begin();
       s_it!=get_symbols().end();
       s_it++)

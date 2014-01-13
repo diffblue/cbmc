@@ -25,6 +25,76 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
+Function: cvc_convt::print_assignment
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void cvc_convt::print_assignment(std::ostream &out) const
+{
+  // Boolean stuff
+  
+  for(unsigned v=0; v<boolean_assignment.size(); v++)
+    out << "b" << v << "=" << boolean_assignment[v] << "\n";
+
+  // others
+}
+
+/*******************************************************************\
+
+Function: cvc_convt::l_get
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+tvt cvc_convt::l_get(const literalt l) const
+{
+  if(l.is_true()) return tvt(true);
+  if(l.is_false()) return tvt(false);
+  assert(l.var_no()<boolean_assignment.size());
+  return tvt(boolean_assignment[l.var_no()]^l.sign());
+}
+
+/*******************************************************************\
+
+Function: cvc_convt::convert_literal
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void cvc_convt::convert_literal(const literalt l)
+{
+  if(l==const_literal(false))
+    out << "FALSE";
+  else if(l==const_literal(true))
+    out << "TRUE";
+
+  if(l.sign())
+    out << "(NOT ";
+  
+  out << "l" << l.var_no();
+
+  if(l.sign())
+    out << ")";
+}
+
+/*******************************************************************\
+
 Function: cvc_convt::bin_zero
 
   Inputs:
@@ -132,13 +202,13 @@ void cvc_convt::convert_array_index(const exprt &expr)
 {
   if(expr.type()==gen_array_index_type())
   {
-    convert_cvc_expr(expr);
+    convert_expr(expr);
   }
   else
   {
     exprt tmp(ID_typecast, gen_array_index_type());
     tmp.copy_to_operands(expr);
-    convert_cvc_expr(tmp);
+    convert_expr(tmp);
   }
 }
 
@@ -160,7 +230,7 @@ void cvc_convt::convert_address_of_rec(const exprt &expr)
      expr.id()==ID_constant ||
      expr.id()==ID_string_constant)
   {
-    cvc_prop.out
+    out
       << "(# object:="
       << pointer_logic.add_object(expr)
       << ", offset:="
@@ -177,7 +247,7 @@ void cvc_convt::convert_address_of_rec(const exprt &expr)
     if(index.is_zero())
     {
       if(array.type().id()==ID_pointer)
-        convert_cvc_expr(array);
+        convert_expr(array);
       else if(array.type().id()==ID_array)
         convert_address_of_rec(array);
       else
@@ -185,22 +255,22 @@ void cvc_convt::convert_address_of_rec(const exprt &expr)
     }
     else
     {    
-      cvc_prop.out << "(LET P: ";
-      cvc_prop.out << cvc_pointer_type();
-      cvc_prop.out << " = ";
+      out << "(LET P: ";
+      out << cvc_pointer_type();
+      out << " = ";
       
       if(array.type().id()==ID_pointer)
-        convert_cvc_expr(array);
+        convert_expr(array);
       else if(array.type().id()==ID_array)
         convert_address_of_rec(array);
       else
         assert(false);
 
-      cvc_prop.out << " IN P WITH .offset:=BVPLUS("
+      out << " IN P WITH .offset:=BVPLUS("
                    << config.ansi_c.pointer_width
                    << ", P.offset, ";
-      convert_cvc_expr(index);
-      cvc_prop.out << "))";
+      convert_expr(index);
+      out << "))";
     }
   }
   else if(expr.id()==ID_member)
@@ -210,9 +280,9 @@ void cvc_convt::convert_address_of_rec(const exprt &expr)
 
     const exprt &struct_op=expr.op0();
 
-    cvc_prop.out << "(LET P: ";
-    cvc_prop.out << cvc_pointer_type();
-    cvc_prop.out << " = ";
+    out << "(LET P: ";
+    out << cvc_pointer_type();
+    out << " = ";
     
     convert_address_of_rec(struct_op);
 
@@ -228,11 +298,11 @@ void cvc_convt::convert_address_of_rec(const exprt &expr)
 
     exprt index=from_integer(offset, index_type);
 
-    cvc_prop.out << " IN P WITH .offset:=BVPLUS("
+    out << " IN P WITH .offset:=BVPLUS("
                  << config.ansi_c.pointer_width
                  << ", P.offset, ";
-    convert_cvc_expr(index);
-    cvc_prop.out << "))";
+    convert_expr(index);
+    out << "))";
   }
   else
     throw "don't know how to take address of: "+expr.id_string();
@@ -240,7 +310,7 @@ void cvc_convt::convert_address_of_rec(const exprt &expr)
 
 /*******************************************************************\
 
-Function: cvc_convt::convert_rest
+Function: cvc_convt::convert
 
   Inputs:
 
@@ -250,17 +320,41 @@ Function: cvc_convt::convert_rest
 
 \*******************************************************************/
 
-literalt cvc_convt::convert_rest(const exprt &expr)
+literalt cvc_convt::convert(const exprt &expr)
 {
-  //cvc_prop.out << "%% E: " << expr << std::endl;
+  //out << "%% E: " << expr << std::endl;
 
-  literalt l=prop.new_variable();
+  if(expr.type().id()!=ID_bool)
+  {
+    std::string msg="cvc_convt::convert got "
+                    "non-boolean expression:\n";
+    msg+=expr.to_string();
+    throw msg;
+  }
+
+  // Three special cases in which we don't need to generate
+  // a handle.
+  
+  if(expr.is_true())
+    return const_literal(true);
+  else if(expr.is_false())
+    return const_literal(false);
+  else if(expr.id()==ID_literal)
+    return to_literal_expr(expr).get_literal();
+
+  // Generate new handle
+
+  literalt l(no_boolean_variables, false);
+  no_boolean_variables++;
   
   find_symbols(expr);
 
-  cvc_prop.out << "ASSERT " << cvc_prop.cvc_literal(l) << " <=> (";
-  convert_cvc_expr(expr);
-  cvc_prop.out << ");" << std::endl << std::endl;
+  // define new handle
+  out << "ASSERT ";
+  convert_literal(l);
+  out << " <=> (";
+  convert_expr(expr);
+  out << ");" << std::endl << std::endl;
 
   return l;
 }
@@ -287,28 +381,28 @@ void cvc_convt::convert_identifier(const std::string &identifier)
     char ch=*it;
 
     if(isalnum(ch) || ch=='$' || ch=='?')
-      cvc_prop.out << ch;
+      out << ch;
     else if(ch==':')
     {
       std::string::const_iterator next_it(it);
       next_it++;
       if(next_it!=identifier.end() && *next_it==':')
       {
-        cvc_prop.out << "__";
+        out << "__";
         it=next_it;
       }
       else
       {
-        cvc_prop.out << '_';
-        cvc_prop.out << int(ch);
-        cvc_prop.out << '_';
+        out << '_';
+        out << int(ch);
+        out << '_';
       }
     }
     else
     {
-      cvc_prop.out << '_';
-      cvc_prop.out << int(ch);
-      cvc_prop.out << '_';
+      out << '_';
+      out << int(ch);
+      out << '_';
     }
   }
 }
@@ -330,18 +424,18 @@ void cvc_convt::convert_as_bv(const exprt &expr)
   if(expr.type().id()==ID_bool)
   {
     if(expr.is_true())
-      cvc_prop.out << "0bin1";
+      out << "0bin1";
     else if(expr.is_false())
-      cvc_prop.out << "0bin0";
+      out << "0bin0";
     else
     {
-      cvc_prop.out << "IF ";
-      convert_cvc_expr(expr);
-      cvc_prop.out << " THEN 0bin1 ELSE 0bin0 ENDIF";
+      out << "IF ";
+      convert_expr(expr);
+      out << " THEN 0bin1 ELSE 0bin0 ENDIF";
     }
   }
   else
-    convert_cvc_expr(expr);
+    convert_expr(expr);
 }
 
 /*******************************************************************\
@@ -363,7 +457,7 @@ void cvc_convt::convert_array_value(const exprt &expr)
 
 /*******************************************************************\
 
-Function: cvc_convt::convert_cvc_expr
+Function: cvc_convt::convert_expr
 
   Inputs:
 
@@ -373,9 +467,72 @@ Function: cvc_convt::convert_cvc_expr
 
 \*******************************************************************/
 
-void cvc_convt::convert_cvc_expr(const exprt &expr)
+void cvc_convt::convert_expr(const exprt &expr)
 {
-  if(expr.id()==ID_symbol)
+  const exprt::operandst &op=expr.operands();
+
+  if(expr.id()==ID_implies)
+  {
+    if(op.size()!=2)
+      throw "implication takes two operands";
+
+    out << "(";
+    convert_expr(op[0]);
+    out << ") => (";
+    convert_expr(op[1]);
+    out << ")";
+  }
+  else if(expr.id()==ID_constraint_select_one)
+  {
+    if(op.size()<2)
+      throw "constraint_select_one takes at least two operands";
+
+    // TODO
+    throw "cvc_convt::convert_expr needs constraint_select_one";
+  }
+  else if(expr.id()==ID_or || expr.id()==ID_and || expr.id()==ID_xor ||
+          expr.id()==ID_nor || expr.id()==ID_nand)
+  {
+    if(op.size()==0)
+      throw "operator `"+expr.id_string()+"' takes at least one operand";
+    else if(op.size()==1)
+      convert_expr(op[0]);
+    else
+    {
+      forall_expr(it, op)
+      {
+        if(it!=op.begin())
+        {
+          if(expr.id()==ID_or)
+            out << " OR ";
+          else if(expr.id()==ID_nor)
+            out << " NOR ";
+          else if(expr.id()==ID_and)
+            out << " AND ";
+          else if(expr.id()==ID_nand)
+            out << " NAND ";
+          else if(expr.id()==ID_xor) 
+            out << " XOR ";
+          else
+            assert(false);
+        }
+
+        out << "(";
+        convert_expr(*it);
+        out << ")";
+      }
+    }
+  }
+  else if(expr.id()==ID_not)
+  {
+    if(op.size()!=1)
+      throw "not takes one operand";
+
+    out << "NOT (";
+    convert_expr(op[0]);
+    out << ")";
+  }
+  else if(expr.id()==ID_symbol)
   {
     convert_identifier(expr.get_string(ID_identifier));
   }
@@ -394,9 +551,9 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
          op.type().id()==ID_unsignedbv ||
          op.type().id()==ID_pointer)
       {
-        convert_cvc_expr(op);
-        cvc_prop.out << "/=";
-        convert_cvc_expr(gen_zero(op.type()));
+        convert_expr(op);
+        out << "/=";
+        convert_expr(gen_zero(op.type()));
       }
       else
       {
@@ -413,18 +570,18 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
         unsigned from_width=atoi(op.type().get(ID_width).c_str());
         
         if(from_width==to_width)
-          convert_cvc_expr(op);
+          convert_expr(op);
         else if(from_width<to_width)
         {
-          cvc_prop.out << "SX(";
-          convert_cvc_expr(op);
-          cvc_prop.out << ", " << to_width << ")";
+          out << "SX(";
+          convert_expr(op);
+          out << ", " << to_width << ")";
         }
         else
         {
-          cvc_prop.out << "(";
-          convert_cvc_expr(op);
-          cvc_prop.out << ")[" << (to_width-1) << ":0]";
+          out << "(";
+          convert_expr(op);
+          out << ")[" << (to_width-1) << ":0]";
         }
       }
       else if(op.type().id()==ID_unsignedbv)
@@ -432,47 +589,47 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
         unsigned from_width=atoi(op.type().get(ID_width).c_str());
         
         if(from_width==to_width)
-          convert_cvc_expr(op);
+          convert_expr(op);
         else if(from_width<to_width)
         {
-          cvc_prop.out << "(0bin";
+          out << "(0bin";
 
           for(unsigned i=from_width; i<to_width; i++)
-            cvc_prop.out << "0";
+            out << "0";
 
-          cvc_prop.out << " @ ";
+          out << " @ ";
             
-          cvc_prop.out << "(";
-          convert_cvc_expr(op);
-          cvc_prop.out << "))";
+          out << "(";
+          convert_expr(op);
+          out << "))";
         }
         else
         {
-          cvc_prop.out << "(";
-          convert_cvc_expr(op);
-          cvc_prop.out << ")[" << (to_width-1) << ":0]";
+          out << "(";
+          convert_expr(op);
+          out << ")[" << (to_width-1) << ":0]";
         }
       }
       else if(op.type().id()==ID_bool)
       {
         if(to_width>1)
         {
-          cvc_prop.out << "(0bin";
+          out << "(0bin";
 
           for(unsigned i=1; i<to_width; i++)
-            cvc_prop.out << "0";
+            out << "0";
 
-          cvc_prop.out << " @ ";
+          out << " @ ";
           
-          cvc_prop.out << "IF ";
-          convert_cvc_expr(op);
-          cvc_prop.out << " THEN 0bin1 ELSE 0bin0 ENDIF)";
+          out << "IF ";
+          convert_expr(op);
+          out << " THEN 0bin1 ELSE 0bin0 ENDIF)";
         }
         else
         {
-          cvc_prop.out << "IF ";
-          convert_cvc_expr(op);
-          cvc_prop.out << " THEN 0bin1 ELSE 0bin0 ENDIF";
+          out << "IF ";
+          convert_expr(op);
+          out << " THEN 0bin1 ELSE 0bin0 ENDIF";
         }
       }
       else
@@ -485,7 +642,7 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
     {
       if(op.type().id()==ID_pointer)
       {
-        convert_cvc_expr(op);
+        convert_expr(op);
       }
       else
         throw "TODO typecast3 "+op.type().id_string()+" -> pointer";
@@ -495,7 +652,7 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
   }
   else if(expr.id()==ID_struct)
   {
-    cvc_prop.out << "(# ";
+    out << "(# ";
     
     const struct_typet &struct_type=to_struct_type(expr.type());
   
@@ -510,13 +667,13 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
         it!=components.end();
         it++, i++)
     {
-      if(i!=0) cvc_prop.out << ", ";
-      cvc_prop.out << it->get(ID_name);
-      cvc_prop.out << ":=";
-      convert_cvc_expr(expr.operands()[i]);
+      if(i!=0) out << ", ";
+      out << it->get(ID_name);
+      out << ":=";
+      convert_expr(expr.operands()[i]);
     }
     
-    cvc_prop.out << " #)";
+    out << " #)";
   }
   else if(expr.id()==ID_constant)
   {
@@ -538,11 +695,11 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
         
         while(hex.size()<w) hex="0"+hex;
         
-        cvc_prop.out << "0hex" << hex;
+        out << "0hex" << hex;
       }
       else
       {
-        cvc_prop.out << "0bin" << value;
+        out << "0bin" << value;
       }
     }
     else if(expr.type().id()==ID_pointer)
@@ -551,7 +708,7 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
       
       if(value=="NULL")
       {
-        cvc_prop.out << "(# object:="
+        out << "(# object:="
                      << pointer_logic.get_null_object()
                      << ", offset:="
                      << bin_zero(config.ansi_c.pointer_width) << " #)";
@@ -562,15 +719,15 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
     else if(expr.type().id()==ID_bool)
     {
       if(expr.is_true())
-        cvc_prop.out << "TRUE";
+        out << "TRUE";
       else if(expr.is_false())
-        cvc_prop.out << "FALSE";
+        out << "FALSE";
       else
         throw "unknown boolean constant";
     }
     else if(expr.type().id()==ID_array)
     {
-      cvc_prop.out << "ARRAY (i: " << array_index_type() << "):";
+      out << "ARRAY (i: " << array_index_type() << "):";
       
       assert(expr.operands().size()!=0);
       
@@ -578,24 +735,24 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
       forall_operands(it, expr)
       {
         if(i==0)
-          cvc_prop.out << "\n  IF ";
+          out << "\n  IF ";
         else
-          cvc_prop.out << "\n  ELSIF ";
+          out << "\n  ELSIF ";
 
-        cvc_prop.out << "i=" << array_index(i) << " THEN ";
+        out << "i=" << array_index(i) << " THEN ";
         convert_array_value(*it);
         i++;
       }
       
-      cvc_prop.out << "\n  ELSE ";
-      convert_cvc_expr(expr.op0());
-      cvc_prop.out << "\n  ENDIF";
+      out << "\n  ELSE ";
+      convert_expr(expr.op0());
+      out << "\n  ENDIF";
     }
     else if(expr.type().id()==ID_integer ||
             expr.type().id()==ID_natural ||
             expr.type().id()==ID_range)
     {
-      cvc_prop.out << expr.get(ID_value);
+      out << expr.get(ID_value);
     }
     else
       throw "unknown constant: "+expr.type().id_string();
@@ -604,24 +761,24 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
           expr.id()==ID_bitand ||
           expr.id()==ID_bitor)
   {
-    cvc_prop.out << "(";
+    out << "(";
 
     forall_operands(it, expr)
     {
       if(it!=expr.operands().begin())
       {
         if(expr.id()==ID_concatenation)
-          cvc_prop.out << " @ ";
+          out << " @ ";
         else if(expr.id()==ID_bitand)
-          cvc_prop.out << " & ";
+          out << " & ";
         else if(expr.id()==ID_bitor)
-          cvc_prop.out << " | ";
+          out << " | ";
       }
 
       convert_as_bv(*it);
     }
 
-    cvc_prop.out << ")";
+    out << ")";
   }
   else if(expr.id()==ID_bitxor)
   {
@@ -629,15 +786,15 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
   
     if(expr.operands().size()==1)
     {
-      convert_cvc_expr(expr.op0());
+      convert_expr(expr.op0());
     }
     else if(expr.operands().size()==2)
     {
-      cvc_prop.out << "BVXOR(";
-      convert_cvc_expr(expr.op0());
-      cvc_prop.out << ", ";
-      convert_cvc_expr(expr.op1());
-      cvc_prop.out << ")";
+      out << "BVXOR(";
+      convert_expr(expr.op0());
+      out << ", ";
+      convert_expr(expr.op1());
+      out << ")";
     }
     else
     {
@@ -646,29 +803,29 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
       exprt tmp(expr);
       tmp.operands().resize(tmp.operands().size()-1);
 
-      cvc_prop.out << "BVXOR(";
-      convert_cvc_expr(tmp);
-      cvc_prop.out << ", ";
-      convert_cvc_expr(expr.operands().back());
-      cvc_prop.out << ")";
+      out << "BVXOR(";
+      convert_expr(tmp);
+      out << ", ";
+      convert_expr(expr.operands().back());
+      out << ")";
     }
   }
   else if(expr.id()==ID_bitnand)
   {
     assert(expr.operands().size()==2);
 
-    cvc_prop.out << "BVNAND(";
-    convert_cvc_expr(expr.op0());
-    cvc_prop.out << ", ";
-    convert_cvc_expr(expr.op1());
-    cvc_prop.out << ")";
+    out << "BVNAND(";
+    convert_expr(expr.op0());
+    out << ", ";
+    convert_expr(expr.op1());
+    out << ")";
   }
   else if(expr.id()==ID_bitnot)
   {
     assert(expr.operands().size()==1);
-    cvc_prop.out << "~(";
-    convert_cvc_expr(expr.op0());
-    cvc_prop.out << ")";
+    out << "~(";
+    convert_expr(expr.op0());
+    out << ")";
   }
   else if(expr.id()==ID_unary_minus)
   {
@@ -676,9 +833,9 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
     if(expr.type().id()==ID_unsignedbv ||
        expr.type().id()==ID_signedbv)
     {
-      cvc_prop.out << "BVUMINUS(";
-      convert_cvc_expr(expr.op0());
-      cvc_prop.out << ")";
+      out << "BVUMINUS(";
+      convert_expr(expr.op0());
+      out << ")";
     }
     else
       throw "unsupported type for unary-: "+expr.type().id_string();
@@ -686,13 +843,13 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
   else if(expr.id()==ID_if)
   {
     assert(expr.operands().size()==3);
-    cvc_prop.out << "IF ";
-    convert_cvc_expr(expr.op0());
-    cvc_prop.out << " THEN ";
-    convert_cvc_expr(expr.op1());
-    cvc_prop.out << " ELSE ";
-    convert_cvc_expr(expr.op2());
-    cvc_prop.out << " ENDIF";
+    out << "IF ";
+    convert_expr(expr.op0());
+    out << " THEN ";
+    convert_expr(expr.op1());
+    out << " ELSE ";
+    convert_expr(expr.op2());
+    out << " ENDIF";
   }
   else if(expr.id()==ID_and ||
           expr.id()==ID_or ||
@@ -707,21 +864,21 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
         if(it!=expr.operands().begin())
         {
           if(expr.id()==ID_and)
-            cvc_prop.out << " AND ";
+            out << " AND ";
           else if(expr.id()==ID_or)
-            cvc_prop.out << " OR ";
+            out << " OR ";
           else if(expr.id()==ID_xor)
-            cvc_prop.out << " XOR ";
+            out << " XOR ";
         }
         
-        cvc_prop.out << "(";
-        convert_cvc_expr(*it);
-        cvc_prop.out << ")";
+        out << "(";
+        convert_expr(*it);
+        out << ")";
       }
     }
     else if(expr.operands().size()==1)
     {
-      convert_cvc_expr(expr.op0());
+      convert_expr(expr.op0());
     }
     else
       assert(false);
@@ -729,9 +886,9 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
   else if(expr.id()==ID_not)
   {
     assert(expr.operands().size()==1);
-    cvc_prop.out << "NOT (";
-    convert_cvc_expr(expr.op0());
-    cvc_prop.out << ")";
+    out << "NOT (";
+    convert_expr(expr.op0());
+    out << ")";
   }
   else if(expr.id()==ID_equal ||
           expr.id()==ID_notequal)
@@ -741,23 +898,23 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
 
     if(expr.op0().type().id()==ID_bool)
     {
-      if(expr.id()==ID_notequal) cvc_prop.out << "NOT (";
-      cvc_prop.out << "(";
-      convert_cvc_expr(expr.op0());
-      cvc_prop.out << ") <=> (";
-      convert_cvc_expr(expr.op1());
-      cvc_prop.out << ")";
-      if(expr.id()==ID_notequal) cvc_prop.out << ")";
+      if(expr.id()==ID_notequal) out << "NOT (";
+      out << "(";
+      convert_expr(expr.op0());
+      out << ") <=> (";
+      convert_expr(expr.op1());
+      out << ")";
+      if(expr.id()==ID_notequal) out << ")";
     }
     else
     {
-      cvc_prop.out << "(";
-      convert_cvc_expr(expr.op0());
-      cvc_prop.out << ")";
-      cvc_prop.out << (expr.id()==ID_equal?"=":"/=");
-      cvc_prop.out << "(";
-      convert_cvc_expr(expr.op1());
-      cvc_prop.out << ")";
+      out << "(";
+      convert_expr(expr.op0());
+      out << ")";
+      out << (expr.id()==ID_equal?"=":"/=");
+      out << "(";
+      convert_expr(expr.op1());
+      out << ")";
     }
   }
   else if(expr.id()==ID_le ||
@@ -772,36 +929,36 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
     if(op_type.id()==ID_unsignedbv)
     {
       if(expr.id()==ID_le)
-        cvc_prop.out << "BVLE";
+        out << "BVLE";
       else if(expr.id()==ID_lt)
-        cvc_prop.out << "BVLT";
+        out << "BVLT";
       else if(expr.id()==ID_ge)
-        cvc_prop.out << "BVGE";
+        out << "BVGE";
       else if(expr.id()==ID_gt)
-        cvc_prop.out << "BVGT";
+        out << "BVGT";
       
-      cvc_prop.out << "(";
-      convert_cvc_expr(expr.op0());
-      cvc_prop.out << ", ";
-      convert_cvc_expr(expr.op1());
-      cvc_prop.out << ")";
+      out << "(";
+      convert_expr(expr.op0());
+      out << ", ";
+      convert_expr(expr.op1());
+      out << ")";
     }
     else if(op_type.id()==ID_signedbv)
     {
       if(expr.id()==ID_le)
-        cvc_prop.out << "SBVLE";
+        out << "SBVLE";
       else if(expr.id()==ID_lt)
-        cvc_prop.out << "SBVLT";
+        out << "SBVLT";
       else if(expr.id()==ID_ge)
-        cvc_prop.out << "SBVGE";
+        out << "SBVGE";
       else if(expr.id()==ID_gt)
-        cvc_prop.out << "SBVGT";
+        out << "SBVGT";
       
-      cvc_prop.out << "(";
-      convert_cvc_expr(expr.op0());
-      cvc_prop.out << ", ";
-      convert_cvc_expr(expr.op1());
-      cvc_prop.out << ")";
+      out << "(";
+      convert_expr(expr.op0());
+      out << ", ";
+      convert_expr(expr.op1());
+      out << ")";
     }
     else
       throw "unsupported type for "+expr.id_string()+": "+expr.type().id_string();
@@ -813,15 +970,15 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
       if(expr.type().id()==ID_unsignedbv ||
          expr.type().id()==ID_signedbv)
       {
-        cvc_prop.out << "BVPLUS(" << expr.type().get(ID_width);
+        out << "BVPLUS(" << expr.type().get(ID_width);
 
         forall_operands(it, expr)
         {
-          cvc_prop.out << ", ";
-          convert_cvc_expr(*it);
+          out << ", ";
+          convert_expr(*it);
         }
           
-        cvc_prop.out << ")";
+        out << ")";
       }
       else if(expr.type().id()==ID_pointer)
       {
@@ -843,20 +1000,20 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
         else
           throw "unexpected mixture in pointer arithmetic";
         
-        cvc_prop.out << "(LET P: " << cvc_pointer_type() << " = ";
-        convert_cvc_expr(*p);
-        cvc_prop.out << " IN P WITH .offset:=BVPLUS("
+        out << "(LET P: " << cvc_pointer_type() << " = ";
+        convert_expr(*p);
+        out << " IN P WITH .offset:=BVPLUS("
                      << config.ansi_c.pointer_width
                      << ", P.offset, ";
-        convert_cvc_expr(*i);
-        cvc_prop.out << "))";
+        convert_expr(*i);
+        out << "))";
       }
       else
         throw "unsupported type for +: "+expr.type().id_string();
     }
     else if(expr.operands().size()==1)
     {
-      convert_cvc_expr(expr.op0());
+      convert_expr(expr.op0());
     }
     else
       assert(false);
@@ -868,18 +1025,18 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
       if(expr.type().id()==ID_unsignedbv ||
          expr.type().id()==ID_signedbv)
       {
-        cvc_prop.out << "BVSUB(" << expr.type().get(ID_width) << ", ";
-        convert_cvc_expr(expr.op0());
-        cvc_prop.out << ", ";
-        convert_cvc_expr(expr.op1());
-        cvc_prop.out << ")";
+        out << "BVSUB(" << expr.type().get(ID_width) << ", ";
+        convert_expr(expr.op0());
+        out << ", ";
+        convert_expr(expr.op1());
+        out << ")";
       }
       else
         throw "unsupported type for -: "+expr.type().id_string();
     }
     else if(expr.operands().size()==1)
     {
-      convert_cvc_expr(expr.op0());
+      convert_expr(expr.op0());
     }
     else
       assert(false);
@@ -892,15 +1049,15 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
        expr.type().id()==ID_signedbv)
     {
       if(expr.type().id()==ID_unsignedbv)
-        cvc_prop.out << "BVDIV";
+        out << "BVDIV";
       else
-        cvc_prop.out << "SBVDIV";
+        out << "SBVDIV";
 
-      cvc_prop.out << "(" << expr.type().get(ID_width) << ", ";
-      convert_cvc_expr(expr.op0());
-      cvc_prop.out << ", ";
-      convert_cvc_expr(expr.op1());
-      cvc_prop.out << ")";
+      out << "(" << expr.type().get(ID_width) << ", ";
+      convert_expr(expr.op0());
+      out << ", ";
+      convert_expr(expr.op1());
+      out << ")";
     }
     else
       throw "unsupported type for /: "+expr.type().id_string();
@@ -913,15 +1070,15 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
        expr.type().id()==ID_signedbv)
     {
       if(expr.type().id()==ID_unsignedbv)
-        cvc_prop.out << "BVMOD";
+        out << "BVMOD";
       else
-        cvc_prop.out << "SBVMOD";
+        out << "SBVMOD";
 
-      cvc_prop.out << "(" << expr.type().get(ID_width) << ", ";
-      convert_cvc_expr(expr.op0());
-      cvc_prop.out << ", ";
-      convert_cvc_expr(expr.op1());
-      cvc_prop.out << ")";
+      out << "(" << expr.type().get(ID_width) << ", ";
+      convert_expr(expr.op0());
+      out << ", ";
+      convert_expr(expr.op1());
+      out << ")";
     }
     else
       throw "unsupported type for mod: "+expr.type().id_string();
@@ -933,18 +1090,18 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
       if(expr.type().id()==ID_unsignedbv ||
          expr.type().id()==ID_signedbv)
       {
-        cvc_prop.out << "BVMULT(" << expr.type().get(ID_width) << ", ";
-        convert_cvc_expr(expr.op0());
-        cvc_prop.out << ", ";
-        convert_cvc_expr(expr.op1());
-        cvc_prop.out << ")";
+        out << "BVMULT(" << expr.type().get(ID_width) << ", ";
+        convert_expr(expr.op0());
+        out << ", ";
+        convert_expr(expr.op1());
+        out << ")";
       }
       else
         throw "unsupported type for *: "+expr.type().id_string();
     }
     else if(expr.operands().size()==1)
     {
-      convert_cvc_expr(expr.op0());
+      convert_expr(expr.op0());
     }
     else
       assert(false);
@@ -961,18 +1118,18 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
   {
     assert(expr.type().id()==ID_array);
     assert(expr.operands().size()==1);
-    cvc_prop.out << "(ARRAY (i: " << array_index_type() << "): ";
+    out << "(ARRAY (i: " << array_index_type() << "): ";
     convert_array_value(expr.op0());
-    cvc_prop.out << ")";
+    out << ")";
   }
   else if(expr.id()==ID_index)
   {
     assert(expr.operands().size()==2);
-    cvc_prop.out << "(";
-    convert_cvc_expr(expr.op0());
-    cvc_prop.out << ")[";
+    out << "(";
+    convert_expr(expr.op0());
+    out << ")[";
     convert_array_index(expr.op1());
-    cvc_prop.out << "]";
+    out << "]";
   }
   else if(expr.id()==ID_ashr ||
           expr.id()==ID_lshr ||
@@ -984,19 +1141,19 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
        expr.type().id()==ID_signedbv)
     {
       if(expr.id()==ID_ashr)
-        cvc_prop.out << "BVASHR";
+        out << "BVASHR";
       else if(expr.id()==ID_lshr)
-        cvc_prop.out << "BVLSHR";
+        out << "BVLSHR";
       else if(expr.id()==ID_shl)
-        cvc_prop.out << "BVSHL";
+        out << "BVSHL";
       else
         assert(false);
 
-      cvc_prop.out << "(" << expr.type().get(ID_width) << ", ";
-      convert_cvc_expr(expr.op0());
-      cvc_prop.out << ", ";
-      convert_cvc_expr(expr.op1());
-      cvc_prop.out << ")";
+      out << "(" << expr.type().get(ID_width) << ", ";
+      convert_expr(expr.op0());
+      out << ", ";
+      convert_expr(expr.op1());
+      out << ")";
     }
     else
       throw "unsupported type for "+expr.id_string()+": "+expr.type().id_string();
@@ -1004,9 +1161,9 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
   else if(expr.id()==ID_with)
   {
     assert(expr.operands().size()>=1);
-    cvc_prop.out << "(";
-    convert_cvc_expr(expr.op0());
-    cvc_prop.out << ")";
+    out << "(";
+    convert_expr(expr.op0());
+    out << ")";
   
     for(unsigned i=1; i<expr.operands().size(); i+=2)
     {
@@ -1016,25 +1173,25 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
 
       if(expr.type().id()==ID_struct)
       {
-        cvc_prop.out << " WITH ." << index.get(ID_component_name);
-        cvc_prop.out << ":=(";
+        out << " WITH ." << index.get(ID_component_name);
+        out << ":=(";
         convert_array_value(value);
-        cvc_prop.out << ")";
+        out << ")";
       }
       else if(expr.type().id()==ID_union)
       {
-        cvc_prop.out << " WITH ." << index.get(ID_component_name);
-        cvc_prop.out << ":=(";
+        out << " WITH ." << index.get(ID_component_name);
+        out << ":=(";
         convert_array_value(value);
-        cvc_prop.out << ")";
+        out << ")";
       }
       else if(expr.type().id()==ID_array)
       {
-        cvc_prop.out << " WITH [";
+        out << " WITH [";
         convert_array_index(index);
-        cvc_prop.out << "]:=(";
+        out << "]:=(";
         convert_array_value(value);
-        cvc_prop.out << ")";
+        out << ")";
       }
       else
         throw "with expects struct or array type, but got "+expr.type().id_string();
@@ -1043,30 +1200,30 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
   else if(expr.id()==ID_member)
   {
     assert(expr.operands().size()==1);
-    convert_cvc_expr(expr.op0());
-    cvc_prop.out << ".";
-    cvc_prop.out << expr.get(ID_component_name);
+    convert_expr(expr.op0());
+    out << ".";
+    out << expr.get(ID_component_name);
   }
   else if(expr.id()==ID_pointer_offset)
   {
     assert(expr.operands().size()==1);
-    cvc_prop.out << "(";
-    convert_cvc_expr(expr.op0());
-    cvc_prop.out << ").offset";
+    out << "(";
+    convert_expr(expr.op0());
+    out << ").offset";
   }
   #if 0
   else if(expr.id()==ID_pointer_object)
   {
     assert(expr.operands().size()==1);
-    cvc_prop.out << "(";
-    convert_cvc_expr(expr.op0());
-    cvc_prop.out << ").object";
+    out << "(";
+    convert_expr(expr.op0());
+    out << ").object";
     // TODO, this has the wrong type
   }
   #endif
   else if(expr.id()==ID_string_constant)
   {
-    convert_cvc_expr(to_string_constant(expr).to_array_expr());
+    convert_expr(to_string_constant(expr).to_array_expr());
   }
   else if(expr.id()==ID_extractbit)
   {
@@ -1075,14 +1232,14 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
     if(expr.op0().type().id()==ID_unsignedbv ||
        expr.op0().type().id()==ID_signedbv)
     {
-      cvc_prop.out << "(";
-      convert_cvc_expr(expr.op0());
+      out << "(";
+      convert_expr(expr.op0());
       
       mp_integer i;
       if(to_integer(expr.op1(), i))
         throw "extractbit takes constant as second parameter";
         
-      cvc_prop.out << "[" << i << ":" << i << "]=0bin1)";
+      out << "[" << i << ":" << i << "]=0bin1)";
     }
     else
       throw "unsupported type for "+expr.id_string()+": "+expr.op0().type().id_string();
@@ -1095,22 +1252,22 @@ void cvc_convt::convert_cvc_expr(const exprt &expr)
     if(to_integer(expr.op0(), times))
       throw "replication takes constant as first parameter";
     
-    cvc_prop.out << "(LET v: BITVECTOR(1) = ";
+    out << "(LET v: BITVECTOR(1) = ";
 
-    convert_cvc_expr(expr.op1());
+    convert_expr(expr.op1());
 
-    cvc_prop.out << " IN ";
+    out << " IN ";
 
     for(mp_integer i=0; i<times; ++i)
     {
-      if(i!=0) cvc_prop.out << "@";
-      cvc_prop.out << "v";
+      if(i!=0) out << "@";
+      out << "v";
     }
     
-    cvc_prop.out << ")";
+    out << ")";
   }
   else
-    throw "convert_cvc_expr: "+expr.id_string()+" is unsupported";
+    throw "convert_expr: "+expr.id_string()+" is unsupported";
 }
 
 /*******************************************************************\
@@ -1134,10 +1291,7 @@ void cvc_convt::set_to(const exprt &expr, bool value)
     return;
   }
   
-  if(value && expr.is_true())
-    return;
-
-  cvc_prop.out << "%% set_to " << (value?"true":"false") << std::endl;
+  out << "%% set_to " << (value?"true":"false") << std::endl;
 
   if(expr.id()==ID_equal && value)
   {
@@ -1162,12 +1316,12 @@ void cvc_convt::set_to(const exprt &expr, bool value)
           find_symbols(expr.op1());
 
           convert_identifier(id2string(identifier));
-          cvc_prop.out << ": ";
-          convert_cvc_type(expr.op0().type());
-          cvc_prop.out << " = ";
-          convert_cvc_expr(expr.op1());
+          out << ": ";
+          convert_type(expr.op0().type());
+          out << " = ";
+          convert_expr(expr.op1());
         
-          cvc_prop.out << ";" << std::endl << std::endl;
+          out << ";" << std::endl << std::endl;
           return;
         }
       }
@@ -1176,17 +1330,17 @@ void cvc_convt::set_to(const exprt &expr, bool value)
   
   find_symbols(expr);
 
-  cvc_prop.out << "ASSERT ";
+  out << "ASSERT ";
 
   if(!value)
-    cvc_prop.out << "NOT (";
+    out << "NOT (";
     
-  convert_cvc_expr(expr);
+  convert_expr(expr);
 
   if(!value)
-    cvc_prop.out << ")";
+    out << ")";
     
-  cvc_prop.out << ";" << std::endl << std::endl;
+  out << ";" << std::endl << std::endl;
 }
 
 /*******************************************************************\
@@ -1222,9 +1376,9 @@ void cvc_convt::find_symbols(const exprt &expr)
       id.type=expr.type();
 
       convert_identifier(id2string(identifier));
-      cvc_prop.out << ": ";
-      convert_cvc_type(expr.type());
-      cvc_prop.out << ";" << std::endl;
+      out << ": ";
+      convert_type(expr.type());
+      out << ";" << std::endl;
     }
   }  
   else if(expr.id()==ID_nondet_symbol)
@@ -1241,16 +1395,16 @@ void cvc_convt::find_symbols(const exprt &expr)
       id.type=expr.type();
 
       convert_identifier(id2string(identifier));
-      cvc_prop.out << ": ";
-      convert_cvc_type(expr.type());
-      cvc_prop.out << ";" << std::endl;
+      out << ": ";
+      convert_type(expr.type());
+      out << ";" << std::endl;
     }
   }  
 }
 
 /*******************************************************************\
 
-Function: cvc_convt::convert_cvc_type
+Function: cvc_convt::convert_type
 
   Inputs:
 
@@ -1260,30 +1414,30 @@ Function: cvc_convt::convert_cvc_type
 
 \*******************************************************************/
 
-void cvc_convt::convert_cvc_type(const typet &type)
+void cvc_convt::convert_type(const typet &type)
 {
   if(type.id()==ID_array)
   {
     const array_typet &array_type=to_array_type(type);
     
-    cvc_prop.out << "ARRAY " << array_index_type()
+    out << "ARRAY " << array_index_type()
                  << " OF ";
                  
     if(array_type.subtype().id()==ID_bool)
-      cvc_prop.out << "BITVECTOR(1)";
+      out << "BITVECTOR(1)";
     else
-      convert_cvc_type(array_type.subtype());
+      convert_type(array_type.subtype());
   }
   else if(type.id()==ID_bool)
   {
-    cvc_prop.out << "BOOLEAN";
+    out << "BOOLEAN";
   }
   else if(type.id()==ID_struct ||
           type.id()==ID_union)
   {
     const struct_typet &struct_type=to_struct_type(type);
   
-    cvc_prop.out << "[#";
+    out << "[#";
     
     const struct_typet::componentst &components=
       struct_type.components();
@@ -1293,23 +1447,23 @@ void cvc_convt::convert_cvc_type(const typet &type)
         it!=components.end();
         it++)
     {
-      if(it!=components.begin()) cvc_prop.out << ",";
-      cvc_prop.out << " ";
-      cvc_prop.out << it->get(ID_name);
-      cvc_prop.out << ": ";
-      convert_cvc_type(it->type());
+      if(it!=components.begin()) out << ",";
+      out << " ";
+      out << it->get(ID_name);
+      out << ": ";
+      convert_type(it->type());
     }
     
-    cvc_prop.out << " #]";
+    out << " #]";
   }
   else if(type.id()==ID_pointer ||
           type.id()==ID_reference)
   {
-    cvc_prop.out << cvc_pointer_type();
+    out << cvc_pointer_type();
   }
   else if(type.id()==ID_integer)
   {
-    cvc_prop.out << "INT";
+    out << "INT";
   }
   else if(type.id()==ID_signedbv)
   {
@@ -1318,7 +1472,7 @@ void cvc_convt::convert_cvc_type(const typet &type)
     if(width==0)
       throw "zero-width vector type: "+type.id_string();
   
-    cvc_prop.out << "BITVECTOR(" << width << ")";
+    out << "BITVECTOR(" << width << ")";
   }
   else if(type.id()==ID_unsignedbv)
   {
@@ -1327,7 +1481,7 @@ void cvc_convt::convert_cvc_type(const typet &type)
     if(width==0)
       throw "zero-width vector type: "+type.id_string();
   
-    cvc_prop.out << "BITVECTOR(" << width << ")";
+    out << "BITVECTOR(" << width << ")";
   }
   else
     throw "unsupported type: "+type.id_string();

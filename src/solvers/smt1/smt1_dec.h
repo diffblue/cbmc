@@ -32,8 +32,6 @@ protected:
 class smt1_dect:protected smt1_temp_filet, public smt1_convt
 {
 public:
-  typedef enum { BOOLECTOR, CVC3, YICES, OPENSMT, MATHSAT, Z3 } solvert;
-
   smt1_dect(
     const namespacet &_ns,
     const std::string &_benchmark,
@@ -41,9 +39,8 @@ public:
     const std::string &_logic,
     solvert _solver):
     smt1_temp_filet(),
-    smt1_convt(_ns, _benchmark, _source, _logic, temp_out),
+    smt1_convt(_ns, _benchmark, _source, _logic, _solver, temp_out),
     logic(_logic),
-    solver(_solver),
     dec_solve_was_called(false)
   {
   }
@@ -53,7 +50,6 @@ public:
   
 protected:
   std::string logic;
-  solvert solver;
   bool dec_solve_was_called;
 
   resultt read_result_boolector(std::istream &in);

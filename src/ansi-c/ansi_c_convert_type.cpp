@@ -447,7 +447,7 @@ void ansi_c_convert_typet::write(typet &type)
     }
     else if(fixedbv_cnt)
     {
-      type.id(ID_custom_floatbv);
+      type.id(ID_custom_fixedbv);
       type.set(ID_size, bv_width);
       type.set(ID_f, fraction_width);
     }

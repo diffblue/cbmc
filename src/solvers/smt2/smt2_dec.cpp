@@ -1,4 +1,3 @@
-
 /*******************************************************************\
 
 Module:
@@ -40,7 +39,7 @@ Function: smt2_dect::decision_procedure_text
 
 std::string smt2_dect::decision_procedure_text() const
 {
-  return "SMT "+logic+
+  return "SMT2 "+logic+
     (use_FPA_theory?" (with FPA)":"")+
     " using "+
     (solver==BOOLECTOR?"Boolector":
@@ -110,10 +109,8 @@ Function: smt2_dect::dec_solve
 
 decision_proceduret::resultt smt2_dect::dec_solve()
 {
-  post_process();
-
   // this closes the SMT2 file
-  smt2_prop.finalize();
+  write_footer();
   temp_out.close();
 
   temp_result_filename=
@@ -226,7 +223,8 @@ decision_proceduret::resultt smt2_dect::read_result_boolector(std::istream &in)
 
   if(line=="sat")
   {
-    smt2_prop.reset_assignment();
+    boolean_assignment.clear();
+    boolean_assignment.resize(no_boolean_variables, false);
 
     typedef hash_map_cont<std::string, std::string, string_hash> valuest;
     valuest values;
@@ -255,11 +253,11 @@ decision_proceduret::resultt smt2_dect::read_result_boolector(std::istream &in)
 
     // Booleans
 
-    for(unsigned v=0; v<smt2_prop.no_variables(); v++)
+    for(unsigned v=0; v<no_boolean_variables; v++)
     {
       std::string value=values["B"+i2string(v)];
       if(value=="") continue;
-      smt2_prop.set_assignment(literalt(v, false), value=="1");
+      boolean_assignment[v]=(value=="1");
     }
 
     return D_SATISFIABLE;
@@ -314,7 +312,8 @@ decision_proceduret::resultt smt2_dect::read_result_mathsat(std::istream &in)
   std::string line;
   decision_proceduret::resultt res=D_ERROR;
 
-  smt2_prop.reset_assignment();
+  boolean_assignment.clear();
+  boolean_assignment.resize(no_boolean_variables, false);
 
   typedef hash_map_cont<std::string, std::string, string_hash> valuest;
   valuest values;
@@ -434,11 +433,11 @@ decision_proceduret::resultt smt2_dect::read_result_mathsat(std::istream &in)
   }
 
   // Booleans
-  for(unsigned v=0; v<smt2_prop.no_variables(); v++)
+  for(unsigned v=0; v<no_boolean_variables; v++)
   {
     std::string value=values["B"+i2string(v)];
     if(value=="") continue;
-    smt2_prop.set_assignment(literalt(v, false), value=="true");
+    boolean_assignment[v]=(value=="true");
   }
 
   return res;
@@ -461,7 +460,8 @@ decision_proceduret::resultt smt2_dect::read_result_z3(std::istream &in)
   std::string line;
   decision_proceduret::resultt res = D_ERROR;
 
-  smt2_prop.reset_assignment();
+  boolean_assignment.clear();
+  boolean_assignment.resize(no_boolean_variables, false);
 
   typedef hash_map_cont<std::string, std::string, string_hash> valuest;
   valuest values;
@@ -472,31 +472,6 @@ decision_proceduret::resultt smt2_dect::read_result_z3(std::istream &in)
       res = D_SATISFIABLE;
     else if(line=="unsat")
       res = D_UNSATISFIABLE;
-    // XXX -- this is a really nasty hack.  It'll disappear when I write a
-    // proper parser (Matt).
-    else if(line.substr(0, 11) == "(core_expr_")
-    {
-      // This is the unsat core.  It looks like
-      //
-      // (core_expr_N1 core_expr_N2 ... core_expr_Nk)
-      //
-      // where each Ni is an integer.
-      size_t start, end;
-
-      // Start scanning from the 2nd character, so we skip over the leading
-      // '('.
-      start = 1;
-
-      while (start < line.size()) {
-        for (end = start; line[end] != ' ' && line[end] != ')'; end++);
-
-        std::string core_name = line.substr(start, end-start);
-        exprt &core_expr = core_map[core_name];
-        unsat_core.insert(core_expr);
-
-        start = end+1;
-      }
-    }
     else
     {
       // Values look like:
@@ -541,11 +516,11 @@ decision_proceduret::resultt smt2_dect::read_result_z3(std::istream &in)
   }
 
   // Booleans
-  for(unsigned v=0; v<smt2_prop.no_variables(); v++)
+  for(unsigned v=0; v<no_boolean_variables; v++)
   {
     std::string value=values["B"+i2string(v)];
     if(value=="") continue;
-    smt2_prop.set_assignment(literalt(v, false), value=="true");
+    boolean_assignment[v]=(value=="true");
   }
 
   return res;
@@ -609,6 +584,11 @@ bool smt2_dect::string_to_expr_z3(
   }
   else if(value.substr(0,6)=="(store")
   {
+    if(type.id()!=ID_array)
+      return false;
+  
+    const array_typet &array_type=to_array_type(type);
+
 //    std::cout << "STR: " << value << "\n";
 
     size_t p1=value.rfind(' ')+1;
@@ -628,10 +608,10 @@ bool smt2_dect::string_to_expr_z3(
     if(!string_to_expr_z3(type, array, old)) return false;
 
     exprt where;
-    if(!string_to_expr_z3(array_index_type(), inx, where)) return false;
+    if(!string_to_expr_z3(array_type.size().type(), inx, where)) return false;
 
     exprt new_val;
-    if(!string_to_expr_z3(type.subtype(), elem, new_val)) return false;
+    if(!string_to_expr_z3(array_type.subtype(), elem, new_val)) return false;
 
     e = with_exprt(old, where, new_val);
 
@@ -694,7 +674,8 @@ decision_proceduret::resultt smt2_dect::read_result_cvc3(std::istream &in)
   std::string line;
   decision_proceduret::resultt res = D_ERROR;
 
-  smt2_prop.reset_assignment();
+  boolean_assignment.clear();
+  boolean_assignment.resize(no_boolean_variables, false);
 
   typedef hash_map_cont<std::string, std::string, string_hash> valuest;
   valuest values;
@@ -799,11 +780,11 @@ decision_proceduret::resultt smt2_dect::read_result_cvc3(std::istream &in)
   }
 
   // Booleans
-  for(unsigned v=0; v<smt2_prop.no_variables(); v++)
+  for(unsigned v=0; v<no_boolean_variables; v++)
   {
     std::string value=values["B"+i2string(v)];
     if(value=="") continue;
-    smt2_prop.set_assignment(literalt(v, false), value=="true");
+    boolean_assignment[v]=(value=="true");
   }
 
   return res;

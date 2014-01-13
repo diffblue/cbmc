@@ -508,45 +508,91 @@ bool goto_symex_statet::l2_thread_read_encoding(
      !ns.lookup(orig_identifier).is_shared())
     return false;
 
+  const irep_idt l1_identifier=rename(orig_identifier, ns, L1);
+  symbol_exprt ssa_l1=expr;
+  ssa_l1.set_identifier(l1_identifier);
+
   // see whether we are within an atomic section
   if(atomic_section_id!=0)
   {
-    const irep_idt l1_identifier=rename(orig_identifier, ns, L1);
+    guardt write_guard;
+    write_guard.add(false_exprt());
 
     written_in_atomic_sectiont::const_iterator a_s_writes=
-      written_in_atomic_section.find(orig_identifier);
+      written_in_atomic_section.find(ssa_l1);
     if(a_s_writes!=written_in_atomic_section.end())
     {
       for(a_s_w_entryt::const_iterator it=a_s_writes->second.begin();
           it!=a_s_writes->second.end();
           ++it)
+      {
         if(it->as_expr()==guard.as_expr())
-          // there has already been a write to orig_identifier within
+          // there has already been a write to l1_identifier within
           // this atomic section under the same guard
           return false;
+
+        write_guard|=*it;
+      }
     }
+
+    not_exprt no_write(write_guard.as_expr());
 
     // we cannot determine for sure that there has been a write already
-    // so generate a read even if orig_identifier has been written on
+    // so generate a read even if l1_identifier has been written on
     // all branches flowing into this read
-    // (from_read will ensure consistency)
-    a_s_r_entryt &a_s_read=read_in_atomic_section[orig_identifier];
+    guardt read_guard;
+    read_guard.add(false_exprt());
+
+    a_s_r_entryt &a_s_read=read_in_atomic_section[ssa_l1];
+    for(std::list<guardt>::const_iterator it=a_s_read.second.begin();
+        it!=a_s_read.second.end();
+        ++it)
+    {
+      if(it->as_expr()==guard.as_expr())
+        // there has already been a read l1_identifier within
+        // this atomic section under the same guard
+        return false;
+
+      read_guard|=*it;
+    }
+
+    if_exprt tmp(or_exprt(no_write.op(), read_guard.as_expr()), ssa_l1, ssa_l1);
+    level2(to_symbol_expr(tmp.true_case()));
+
     if(a_s_read.second.empty())
     {
-      propagation.remove(l1_identifier);
-      irep_idt new_l2_name=level2.increase_counter(l1_identifier);
-      a_s_read.first=new_l2_name;
-    }
-    a_s_read.second.push_back(guard);
+      level2.increase_counter(l1_identifier);
+      a_s_read.first=level2.current_count(l1_identifier);
+      level2(to_symbol_expr(tmp.false_case()));
 
-    return false;
+      const bool record_events_bak=record_events;
+      record_events=false;
+      assignment(expr, tmp, ns, true);
+      record_events=record_events_bak;
+
+      symbol_exprt lhs=ns.lookup(orig_identifier).symbol_expr();
+      symex_target->assignment(
+        guard.as_expr(),
+        expr, lhs, expr, lhs,
+        tmp,
+        source,
+        symex_targett::PHI);
+    }
+    else
+    {
+      to_symbol_expr(tmp.false_case()).set_identifier(
+        level2.name(l1_identifier, a_s_read.first));
+      expr.swap(tmp);
+    }
+
+    a_s_read.second.push_back(guard);
+    a_s_read.second.back().add(no_write);
+
+    return true;
   }
 
-  irep_idt new_l2_name=identifier;
-
   // produce a fresh L2 name
-  const irep_idt l1_identifier=rename(orig_identifier, ns, L1);
-  new_l2_name=level2.increase_counter(l1_identifier);
+  irep_idt new_l2_name=level2.increase_counter(l1_identifier);
   expr.set_identifier(new_l2_name);
 
   // and record that
@@ -592,7 +638,11 @@ bool goto_symex_statet::l2_thread_write_encoding(
   // see whether we are within an atomic section
   if(atomic_section_id!=0)
   {
-    written_in_atomic_section[orig_identifier].push_back(guard);
+    const irep_idt l1_identifier=rename(orig_identifier, ns, L1);
+    symbol_exprt ssa_l1=expr;
+    ssa_l1.set_identifier(l1_identifier);
+
+    written_in_atomic_section[ssa_l1].push_back(guard);
     return false;
   }
 

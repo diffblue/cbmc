@@ -1147,7 +1147,7 @@ void value_set_fit::assign(
   if(type.id()==ID_struct ||
      type.id()==ID_union)
   {
-    const struct_typet &struct_type=to_struct_type(type);
+    const struct_union_typet &struct_type=to_struct_union_type(type);
     
     unsigned no=0;
     
@@ -1703,6 +1703,9 @@ void value_set_fit::apply_code(
       symbol_exprt lhs(rvs, code.op0().type());
       assign(lhs, code.op0(), ns);
     }
+  }
+  else if(statement==ID_fence)
+  {
   }
   else
   {

@@ -42,12 +42,14 @@ Function: prop_conv_storet::convert_rest
 
 \*******************************************************************/
 
-literalt prop_conv_storet::convert_rest(const exprt &expr)
+literalt prop_conv_storet::convert(const exprt &expr)
 {
   constraintt &constraint=constraints.add_constraint();
-  constraint.type=constraintt::CONVERT_REST;
+  constraint.type=constraintt::CONVERT;
   constraint.expr=expr;
+  #if 0
   constraint.literal=prop.new_variable();
+  #endif
   return constraint.literal;
 }
 
@@ -95,7 +97,7 @@ void prop_conv_storet::constraintst::print(std::ostream &out) const
 
 /*******************************************************************\
 
-Function: prop_conv_store_constraintt::replay
+Function: prop_conv_storet::constraintt::replay
 
   Inputs:
 
@@ -105,7 +107,7 @@ Function: prop_conv_store_constraintt::replay
 
 \*******************************************************************/
 
-void prop_conv_store_constraintt::replay(prop_convt &dest) const
+void prop_conv_storet::constraintt::replay(prop_convt &dest) const
 {
   switch(type)
   {
@@ -113,10 +115,10 @@ void prop_conv_store_constraintt::replay(prop_convt &dest) const
     dest.set_to(expr, value);
     break;
   
-  case CONVERT_REST:
-    dest.prop.set_equal(dest.convert_rest(expr), literal);
+  case CONVERT:
+    //dest.prop.set_equal(dest.convert_rest(expr), literal);
     break;
-  
+
   default:
     assert(false);
   }
@@ -124,7 +126,7 @@ void prop_conv_store_constraintt::replay(prop_convt &dest) const
 
 /*******************************************************************\
 
-Function: prop_conv_store_constraintt::print
+Function: prop_conv_storet::constraintt::print
 
   Inputs:
 
@@ -134,7 +136,7 @@ Function: prop_conv_store_constraintt::print
 
 \*******************************************************************/
 
-void prop_conv_store_constraintt::print(std::ostream &out) const
+void prop_conv_storet::constraintt::print(std::ostream &out) const
 {
   switch(type)
   {
@@ -143,7 +145,7 @@ void prop_conv_store_constraintt::print(std::ostream &out) const
     out << expr << "\n";
     break;
   
-  case CONVERT_REST:
+  case CONVERT:
     out << "CONVERT(" << literal.dimacs() << "): ";
     out << expr << "\n";
     break;

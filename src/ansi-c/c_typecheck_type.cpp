@@ -124,7 +124,7 @@ void c_typecheck_baset::typecheck_custom_type(typet &type)
   type.remove(ID_size);
   type.set(ID_width, integer2string(size_int));
 
-  // depending on type, there may be a number of factional bits
+  // depending on type, there may be a number of fractional bits
   
   if(type.id()==ID_custom_unsignedbv)
     type.id(ID_unsignedbv);  
@@ -137,6 +137,8 @@ void c_typecheck_baset::typecheck_custom_type(typet &type)
     exprt f_expr=
       static_cast<const exprt &>(type.find(ID_f));
 
+    locationt location=f_expr.find_location();
+
     typecheck_expr(f_expr);
     
     make_constant_index(f_expr);
@@ -144,14 +146,14 @@ void c_typecheck_baset::typecheck_custom_type(typet &type)
     mp_integer f_int;
     if(to_integer(f_expr, f_int))
     {
-      err_location(f_expr);
-      throw "failed to convert number of faction bits to constant";
+      err_location(location);
+      throw "failed to convert number of fraction bits to constant";
     }
 
     if(f_int<0 || f_int>size_int)
     {
-      err_location(f_expr);
-      error("faction width invalid");
+      err_location(location);
+      error("fixedbv fraction width invalid");
       throw 0;
     }
     
@@ -164,6 +166,8 @@ void c_typecheck_baset::typecheck_custom_type(typet &type)
 
     exprt f_expr=
       static_cast<const exprt &>(type.find(ID_f));
+      
+    locationt location=f_expr.find_location();
 
     typecheck_expr(f_expr);
     
@@ -172,14 +176,14 @@ void c_typecheck_baset::typecheck_custom_type(typet &type)
     mp_integer f_int;
     if(to_integer(f_expr, f_int))
     {
-      err_location(f_expr);
-      throw "failed to convert number of faction bits to constant";
+      err_location(location);
+      throw "failed to convert number of fraction bits to constant";
     }
 
     if(f_int<1 || f_int+1>=size_int)
     {
-      err_location(f_expr);
-      error("faction width invalid");
+      err_location(location);
+      error("floatbv fraction width invalid");
       throw 0;
     }
     

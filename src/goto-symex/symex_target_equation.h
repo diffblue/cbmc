@@ -15,10 +15,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/merge_irep.h>
 
 #include <goto-programs/goto_program.h>
+#include <goto-programs/goto_trace.h>
+
 #include <solvers/prop/literal.h>
 
 #include "symex_target.h"
-#include "goto_trace.h"
 
 class decision_proceduret;
 class namespacet;

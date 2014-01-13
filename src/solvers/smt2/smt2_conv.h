@@ -19,82 +19,101 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <solvers/flattening/boolbv_width.h>
 #include <solvers/flattening/pointer_logic.h>
 
-#include "smt2_prop.h"
-
-class smt2_prop_wrappert
-{
-public:
-  smt2_prop_wrappert(
-    const std::string &_benchmark,
-    const std::string &_notes,
-    const std::string &_logic,
-    bool _core_enabled,
-    std::ostream &_out):
-    smt2_prop(_benchmark, _notes, _logic, _core_enabled, _out) 
-  { }
-
-protected:
-  smt2_propt smt2_prop;
-};
-
 class typecast_exprt;
 class constant_exprt;
 class index_exprt;
 class member_exprt;
 
-class smt2_convt:
-  protected smt2_prop_wrappert,
-  public prop_convt
+class smt2_convt:public prop_convt
 {
 public:
-  smt2_convt(
-    const namespacet &_ns,
-    const std::string &_benchmark,
-    const std::string &_notes,
-    const std::string &_logic,
-    std::ostream &_out):
-    smt2_prop_wrappert(_benchmark, _notes, _logic, false, _out),
-    prop_convt(_ns, smt2_prop),
-    use_FPA_theory(false),
-    boolbv_width(_ns),
-    pointer_logic(_ns),
-    array_index_bits(32),
-    num_core_constraints(0)
-  { }
+  typedef enum { GENERIC, BOOLECTOR, CVC3, MATHSAT, YICES, Z3 } solvert;
 
   smt2_convt(
     const namespacet &_ns,
     const std::string &_benchmark,
     const std::string &_notes,
     const std::string &_logic,
-    bool _core_enabled,
+    solvert _solver,
     std::ostream &_out):
-    smt2_prop_wrappert(_benchmark, _notes, _logic, _core_enabled, _out),
-    prop_convt(_ns, smt2_prop),
+    prop_convt(_ns),
     use_FPA_theory(false),
+    use_datatypes(false),
+    use_array_of_bool(false),
+    emit_set_logic(true),
+    out(_out),
+    benchmark(_benchmark),
+    notes(_notes),
+    logic(_logic),
+    solver(_solver),
     boolbv_width(_ns),
     pointer_logic(_ns),
-    array_index_bits(32),
-    num_core_constraints(0)
-  { }
+    no_boolean_variables(0)
+  {
+    // We set some defaults differently
+    // for some solvers.
+
+    switch(solver)
+    {
+    case GENERIC:
+      break;
+    
+    case BOOLECTOR:
+      break;
+      
+    case CVC3:
+      break;
+
+    case MATHSAT:
+      use_FPA_theory=true;
+      break;
+      
+    case YICES:
+      break;
+    
+    case Z3:
+      use_array_of_bool=true;
+      use_FPA_theory=true;
+      emit_set_logic=false;
+      use_datatypes=true;
+      break;
+    }
+
+    write_header();
+  }
 
   virtual ~smt2_convt() { }
   virtual resultt dec_solve();
 
   bool use_FPA_theory;
+  bool use_datatypes;
+  bool use_array_of_bool;
+  bool emit_set_logic;
 
   // overloading interfaces
   virtual literalt convert(const exprt &expr);
   virtual void set_to(const exprt &expr, bool value);
   virtual exprt get(const exprt &expr) const;
-  virtual bool in_core(const exprt &expr);
+  virtual std::string decision_procedure_text() const { return "SMT2"; }
+  virtual void print_assignment(std::ostream &out) const;
+  virtual tvt l_get(const literalt l) const;
+  virtual void set_assumptions(const bvt &bv) { assumptions=bv; }
 
 protected:
+  std::ostream &out;
+  std::string benchmark, notes, logic;
+  solvert solver;
+  
+  bvt assumptions;
   boolbv_widtht boolbv_width;
+  
+  void write_header();
+  void write_footer();
 
   // new stuff
   void convert_expr(const exprt &expr);
   void convert_type(const typet &type);
+  void convert_literal(const literalt);
   
   // specific expressions go here
   void convert_byte_update(const exprt &expr);
@@ -130,16 +149,19 @@ protected:
   constant_exprt parse_literal(const std::string &s, const typet &type);
   exprt parse_struct(const std::string &s, const typet &type);
   
-  // arrays
-  typet array_index_type() const;
-  void array_index(const exprt &expr);
-
+  // flattens any non-bitvector type into a bitvector,
+  // e.g., booleans, vectors, structs, arrays, ...
+  // unflatten() does the opposite.
+  typedef enum { BEGIN, END } wheret;
+  void flatten2bv(const exprt &);
+  void unflatten(wheret, const typet &);
+  
   // pointers
   pointer_logict pointer_logic;
   void convert_address_of_rec(
     const exprt &expr, const pointer_typet &result_type);
 
-  // keeps track of all symbols
+  // keeps track of all non-Boolean symbols and their value
   struct identifiert
   {
     typet type;
@@ -161,10 +183,10 @@ protected:
 
   identifier_mapt identifier_map;
 
-  typedef std::map<typet, std::string> type_mapt;
-  type_mapt type_map;
-  
-  unsigned array_index_bits;
+  // for modeling structs as Z3 datatype, enabled when
+  // use_datatype is set
+  typedef std::map<typet, std::string> datatype_mapt;
+  datatype_mapt datatype_map;
   
   // for replacing various defined expressions:
   //
@@ -175,9 +197,12 @@ protected:
   typedef std::map<exprt, irep_idt> defined_expressionst;
   defined_expressionst defined_expressions;
 
-  int num_core_constraints;
-  std::map<std::string, exprt> core_map;
-  std::set<exprt> unsat_core;
+  typedef std::set<std::string> smt2_identifierst;
+  smt2_identifierst smt2_identifiers;
+
+  // Boolean part
+  unsigned no_boolean_variables;
+  std::vector<bool> boolean_assignment;
 };
 
 #endif

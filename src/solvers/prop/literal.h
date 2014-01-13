@@ -22,12 +22,12 @@ class literalt
 {
 public:
   // constructors
-  literalt()
+  inline literalt()
   {
     set(unused_var_no(), false);
   }
 
-  literalt(unsigned v, bool sign)
+  inline literalt(unsigned v, bool sign)
   {
     set(v, sign);
   }
@@ -52,7 +52,7 @@ public:
   friend inline literalt operator^(const literalt a, const bool b)
   {
     literalt result=a;
-    result.l^=b;
+    result.l^=(unsigned)b;
     return result;
   }
 
@@ -67,7 +67,7 @@ public:
   inline literalt operator^=(const bool a)
   {
     // we use the least significant bit to store the sign
-    l^=a;
+    l^=(unsigned)a;
     return *this;
   }
 
@@ -98,7 +98,7 @@ public:
   
   inline void invert()
   {
-    l^=1;
+    l^=(unsigned)1;
   }
 
   //
@@ -122,7 +122,7 @@ public:
     set(d, sign);
   }
   
-  void clear()
+  inline void clear()
   {
     l=0;
   }

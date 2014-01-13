@@ -9,9 +9,9 @@
 class timert
 {
 private:
-  fine_timet _total_time;
-  fine_timet _start_time;
-  fine_timet _latest_time;
+  time_periodt _total_time;
+  absolute_timet _start_time;
+  time_periodt _latest_time;
   long nr_starts;
   bool started;
 
@@ -27,7 +27,7 @@ public:
   virtual void stop();
   virtual void clear();
 
-  virtual fine_timet total_time()
+  virtual time_periodt total_time()
   {
     return _total_time;
   }

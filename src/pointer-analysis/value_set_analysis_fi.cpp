@@ -156,7 +156,7 @@ void value_set_analysis_fit::get_entries_rec(
   if(t.id()==ID_struct ||
      t.id()==ID_union)
   {
-    const struct_typet &struct_type=to_struct_type(t);
+    const struct_union_typet &struct_type=to_struct_union_type(t);
     
     const struct_typet::componentst &c=struct_type.components();
     
@@ -291,7 +291,7 @@ bool value_set_analysis_fit::check_type(const typet &type)
   else if(type.id()==ID_struct ||
           type.id()==ID_union)
   {
-    const struct_typet &struct_type=to_struct_type(type);
+    const struct_union_typet &struct_type=to_struct_union_type(type);
     
     const struct_typet::componentst &components=
       struct_type.components();

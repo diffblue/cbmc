@@ -9,9 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_FLOAT_BV_H
 #define CPROVER_FLOAT_BV_H
 
-//#include <util/ieee_float.h>
-
-#include <solvers/prop/prop_conv.h>
+#include <util/std_expr.h>
 
 class float_bvt
 {
@@ -20,7 +18,7 @@ public:
   {
   }
 
-  virtual ~float_bvt()
+  ~float_bvt()
   {
   }
 
@@ -30,7 +28,11 @@ public:
   }
   
 protected:
-  exprt convert(const exprt &src);
+  exprt convert(const exprt &);
+  exprt convert_abs(const abs_exprt &);
+  exprt convert_unary_minus(const unary_minus_exprt &);
+  exprt convert_ieee_float_equal(const ieee_float_equal_exprt &);
+  //exprt convert_ieee_float_notequal(const ieee_float_notequal_exprt &);
 
 #if 0
   // extraction

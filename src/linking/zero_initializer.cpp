@@ -110,7 +110,7 @@ exprt zero_initializert::zero_initializer_rec(
     {
       // we initialize this with an empty array
 
-      array_exprt value(type);
+      array_exprt value(array_type);
       value.type().id(ID_array);
       value.type().set(ID_size, gen_zero(size_type()));
       value.location()=location;
@@ -145,7 +145,7 @@ exprt zero_initializert::zero_initializer_rec(
         throw 0;
       }
 
-      array_exprt value(type);
+      array_exprt value(array_type);
       value.operands().resize(integer2long(array_size), tmpval);
       value.location()=location;
       return value;

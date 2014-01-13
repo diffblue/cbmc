@@ -16,19 +16,19 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <solvers/prop/prop_conv.h>
 
-class equalityt:public prop_convt
+class equalityt:public prop_conv_solvert
 {
 public:
   equalityt(
     const namespacet &_ns,
-    propt &_prop):prop_convt(_ns, _prop) { }
+    propt &_prop):prop_conv_solvert(_ns, _prop) { }
 
   virtual literalt equality(const exprt &e1, const exprt &e2);
   
   virtual void post_process()
   {
     add_equality_constraints();
-    prop_convt::post_process();
+    prop_conv_solvert::post_process();
   }
 
 protected:

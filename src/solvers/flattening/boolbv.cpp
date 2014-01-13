@@ -51,7 +51,7 @@ bool boolbvt::literal(
   if(expr.type().id()==ID_bool)
   {
     assert(bit==0);
-    return prop_convt::literal(expr, dest);
+    return prop_conv_solvert::literal(expr, dest);
   }
   else
   {

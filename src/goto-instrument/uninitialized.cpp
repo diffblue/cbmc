@@ -188,7 +188,7 @@ void uninitializedt::add_assertions(goto_programt &goto_program)
             assertion.guard=symbol_exprt(new_identifier, bool_typet());
             assertion.location=instruction.location;
             assertion.location.set_comment("use of uninitialized local variable");
-            assertion.location.set_property("uninitialized local");
+            assertion.location.set_property_class("uninitialized local");
             
             goto_program.insert_before_swap(i_it, assertion);
             i_it++;

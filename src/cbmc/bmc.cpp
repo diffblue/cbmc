@@ -24,11 +24,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ansi-c/ansi_c_language.h>
 
-#include <goto-symex/goto_trace.h>
+#include <goto-programs/xml_goto_trace.h>
+
 #include <goto-symex/build_goto_trace.h>
 #include <goto-symex/slice.h>
 #include <goto-symex/slice_by_trace.h>
-#include <goto-symex/xml_goto_trace.h>
 #include <goto-symex/memory_model_sc.h>
 #include <goto-symex/memory_model_tso.h>
 #include <goto-symex/memory_model_pso.h>
@@ -156,7 +156,7 @@ bmct::run_decision_procedure(prop_convt &prop_conv)
   prop_conv.set_verbosity(get_verbosity());
 
   // stop the time
-  fine_timet sat_start=current_time();
+  absolute_timet sat_start=current_time();
   
   do_conversion(prop_conv);  
 
@@ -171,7 +171,7 @@ bmct::run_decision_procedure(prop_convt &prop_conv)
   // output runtime
 
   {
-    fine_timet sat_stop=current_time();
+    absolute_timet sat_stop=current_time();
     status() << "Runtime decision procedure: "
              << (sat_stop-sat_start) << "s" << eom;
   }
@@ -434,7 +434,7 @@ bool bmct::run(const goto_functionst &goto_functions)
 	    {
               if(options.get_option("incremental-check")!="")
                 throw "incremental vacuity checks not supported";
-	      cover_assertions(goto_functions);
+	      cover_assertions(goto_functions,symex.prop_conv);
 	      return false;
 	    }
 	  if(symex.remaining_claims==0)
@@ -445,7 +445,7 @@ bool bmct::run(const goto_functionst &goto_functions)
 
           //call decision procedure
 	  if(options.get_bool_option("all-claims")) {
-	    if(all_claims(goto_functions)) return true; //all claims FAILED, exit
+	    if(all_claims(goto_functions,symex.prop_conv)) return true; //all claims FAILED, exit
 	  }
           else {
             verification_result = decide(symex.prop_conv);
@@ -612,5 +612,5 @@ void bmct::setup_unwind()
   symex.incr_loop_id = options.get_option("incremental-check");
 
   //freeze variables where unrollings are stitched together
-  if(symex.incr_loop_id!="") symex.prop_conv.freeze_all = true;
+  if(symex.incr_loop_id!="") symex.prop_conv.set_all_frozen();
 }

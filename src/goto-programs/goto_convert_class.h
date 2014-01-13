@@ -77,15 +77,15 @@ protected:
     goto_programt &dest,
     bool result_is_used=true);
 
+  void clean_expr_address_of(
+    exprt &expr,
+    goto_programt &dest);
+
   static bool needs_cleaning(const exprt &expr);
   
   void make_temp_symbol(
     exprt &expr,
     const std::string &suffix,
-    goto_programt &dest);
-
-  void address_of_replace_objects(
-    exprt &expr,
     goto_programt &dest);
 
   void rewrite_boolean(exprt &dest);

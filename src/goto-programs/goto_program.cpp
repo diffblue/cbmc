@@ -532,7 +532,7 @@ std::string as_string(
 
     {
       const irep_idt &comment=i.location.get(ID_comment);
-      if(comment!="") result+="/* "+id2string(comment)+" */";
+      if(comment!="") result+=" /* "+id2string(comment)+" */";
     }
     return result;
 

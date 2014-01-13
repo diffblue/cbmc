@@ -85,6 +85,8 @@ protected:
   virtual void do_unwind_module(
     decision_proceduret &decision_procedure);
   void do_conversion(prop_convt &solver);
+  
+  prop_convt *solver_factory();
 
   virtual void show_vcc();
   virtual void show_vcc(std::ostream &out);
@@ -96,7 +98,9 @@ protected:
     const prop_convt &prop_conv);
   
   // vacuity checks
-  void cover_assertions(const goto_functionst &goto_functions);
+  void cover_assertions(
+    const goto_functionst &goto_functions,
+    prop_convt &solver);
 
   // all claims
   struct goalt
@@ -121,7 +125,7 @@ protected:
   typedef std::map<irep_idt, goalt> goal_mapt;
   goal_mapt goal_map;
  
-  virtual bool all_claims(const goto_functionst &goto_functions);
+  virtual bool all_claims(const goto_functionst &goto_functions, prop_convt &solver);
 
 };
 

@@ -29,30 +29,16 @@ Function: bmct::cover_assertions
 
 \*******************************************************************/
 
-void bmct::cover_assertions(const goto_functionst &goto_functions)
+void bmct::cover_assertions(
+  const goto_functionst &goto_functions,
+  prop_convt &solver)
 {
-  satcheckt satcheck;
-  
-  satcheck.set_message_handler(get_message_handler());
-  satcheck.set_verbosity(get_verbosity());
-  
-  bv_cbmct bv_cbmc(ns, satcheck);
-  bv_cbmc.set_message_handler(get_message_handler());
-  bv_cbmc.set_verbosity(get_verbosity());
-  
-  if(options.get_option("arrays-uf")=="never")
-    bv_cbmc.unbounded_array=bv_cbmct::U_NONE;
-  else if(options.get_option("arrays-uf")=="always")
-    bv_cbmc.unbounded_array=bv_cbmct::U_ALL;
-
-  prop_convt &prop_conv=bv_cbmc;
-
   // convert
 
-  equation.convert_guards(prop_conv);
-  equation.convert_assignments(prop_conv);
-  equation.convert_decls(prop_conv);
-  equation.convert_assumptions(prop_conv);
+  equation.convert_guards(solver);
+  equation.convert_assignments(solver);
+  equation.convert_decls(solver);
+  equation.convert_assumptions(solver);
 
   // collect _all_ goals in `goal_map'
   typedef std::map<goto_programt::const_targett, exprt::operandst> goal_mapt;
@@ -89,7 +75,7 @@ void bmct::cover_assertions(const goto_functionst &goto_functions)
   }
   
   // try to cover those
-  cover_goalst cover_goals(prop_conv);
+  cover_goalst cover_goals(solver);
   cover_goals.set_message_handler(get_message_handler());
   cover_goals.set_verbosity(get_verbosity());
 
@@ -99,7 +85,7 @@ void bmct::cover_assertions(const goto_functionst &goto_functions)
       it++)
   {
     // the following is FALSE if the bv is empty
-    literalt condition=prop_conv.convert(disjunction(it->second));
+    literalt condition=solver.convert(disjunction(it->second));
     cover_goals.add(condition);
   }
 
@@ -119,7 +105,12 @@ void bmct::cover_assertions(const goto_functionst &goto_functions)
     if(ui==ui_message_handlert::XML_UI)
     {
       xmlt xml_result("result");
-      xml_result.set_attribute("claim", id2string(it->first->location.get_claim()));
+      
+      // will go away
+      xml_result.set_attribute("claim", id2string(it->first->location.get_property_id()));
+      
+      // use this one
+      xml_result.set_attribute("name", id2string(it->first->location.get_property_id()));
 
       xml_result.set_attribute("status",
         g_it->covered?"COVERED":"NOT_COVERED");
