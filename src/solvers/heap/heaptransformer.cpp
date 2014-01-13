@@ -1,7 +1,5 @@
-#include <iostream>
-#include <cstdarg>
-
 #include "heaptransformer.h"
+#include <cstdarg>
 
 std::ostream& operator<< (std::ostream& s, const heaptrans& h) {
   s << "F = ";
@@ -73,7 +71,7 @@ formulat* heaptrans::complement_clause(clauset* c) {
     hl->complement();
     res = heaptrans::insert_lit_in_formula(hl, res);
   }
-  debugc("[complement_clause]: res = " << *res, 1);
+  debugc("[complement_clause]: res = " << *res, 0);
   return res;
 }
 
@@ -342,11 +340,11 @@ ssa_countst* heaptrans::ssa(formulat* v) {
       ssa_count = ssa_literal(*it2);
     }
   }
-  debugc("[ssa] : res = " << *ssa_count, 1);
+  debugc("[ssa] : res = " << *ssa_count, 0);
   aux = ssa_count;
   ssa_count = res;
   res = aux;
-  debugc("[ssa] : res = " << *res, 1);
+  debugc("[ssa] : res = " << *res, 0);
   return res;
 }
  
@@ -383,7 +381,7 @@ std::set<heapvar> heaptrans::get_vars_before(heaplit* lit) const {
   for(formulat::const_iterator it=heaptrans::formula.begin(); it!=heaptrans::formula.end() && !done; ++it) {
     for(clauset::const_iterator clause_it = (*it)->begin(); clause_it != (*it)->end() && !done; ++clause_it) {
       if(**clause_it == *lit) {
-	debugc("[get_vars_before] : **clause_it == " << **clause_it, 1);
+	debugc("[get_vars_before] : **clause_it == " << **clause_it, 0);
 	done = true;
       }
       if (!(*clause_it)->dummy) {
@@ -393,7 +391,7 @@ std::set<heapvar> heaptrans::get_vars_before(heaplit* lit) const {
     }
   }
 
-  debugc("[get_vars_before] : ret = " << ret, 1);
+  debugc("[get_vars_before] : ret = " << ret, 0);
 
   return ret;
 }
@@ -490,7 +488,6 @@ bool heaptrans::pure_literal(const heaplitp l) const {
 //add the pure literals in clause c as hints
 void heaptrans::add_hints(const clauset* c, heapabs& sol) {
   debugc("[add_hints]: trying clause = " << *c, 0);
-  debugc("[add_hints]: sol = " << sol.contents, 0);
   debugc("[add_hints]: formula = " << heaptrans::formula, 0);
   for(clauset::const_iterator it = c->begin(); it != c->end(); ++it) {
     heaplitp hl = *it;
@@ -513,16 +510,18 @@ void heaptrans::add_hints(const clauset* c, heapabs& sol) {
 	continue;
 
       entailResult::s insol = sol.entails(mi);
-      bool informula = heaptrans::formula_contains_literal(mi->lit, sol);
+      //bool informula = heaptrans::formula_contains_literal(mi->lit, sol);
 
-      debugc("[add_hints]: hl = " << hl << " and informula = " << informula, 0);
       debugc("[add_hints]: hl = " << hl << " and insol = " << insol, 0);
       mi->lit->complement();
 
-      // not in formula, solution, hint
-      if (!informula && insol==entailResult::Incomplete) {
-	hint.insert(std::make_pair(mi, hintPriority::High));
-	debugc("[add_hints]: inserted hint " << mi, 1);
+      // not in solution, hint
+      if (/*!informula &&*/ insol==entailResult::Incomplete) {
+	solutiont new_hint;
+	new_hint.insert(mi);
+	hint.insert(std::make_pair(new_hint, /*hintPriority::High*/0));
+	debugc("[add_hints] : hints = " << hint, 1);
+	debugc("[add_hints] : " << new_hint, 1);
       }
       else {
 	delete mi;
@@ -532,75 +531,203 @@ void heaptrans::add_hints(const clauset* c, heapabs& sol) {
   return;
 }
 
-bool heaptrans::unit_clause (const clauset* c, heaplitp& unit, heapabs& sol) {
-  bool unitb = true;
+// heuristic that prioritizes those hints that can solve multiple clauses
+// for each non-unit clause check if there is already a hint that  
+// matches it, and if there is increment its weight
+// return true if a hint already exists, and false otherwise
+bool heaptrans::hint_heuristic(clauset*& c,  heapabs& sol) {
+  bool found_hint = false;
+  hintst::iterator it;
+
+  for(it = hint.begin(); it != hint.end(); ++it) {
+    meetIrreduciblep mi = *((it->first).begin());
+    debugc("[unit_clause] : trying existent hint " << mi, 0);
+    debugc("[unit_clause] : c = " << *c, 0);
+
+    for(clauset::iterator it1 = c->begin(); it1 != c->end(); ++it1) {
+      if(**it1 == *(mi->lit) && sol.entails(mi) != entailResult::False) {
+	debugc("[hint_heuristic] : hint already inserted (1) " << mi, 0);
+	found_hint = true;
+	break;
+      }
+
+      if(pure_literal(mi->lit)) {
+	meetIrreduciblep negmi = copy_lit(mi);
+	negmi->complement();
+	if(**it1 == *(negmi->lit) && sol.entails(negmi) != entailResult::True) {
+	  debugc("[hint_heuristic] : hint already inserted (2) " << negmi, 0);
+	  found_hint = true;
+	  break;
+	}
+	delete(negmi);
+      }
+    }
+
+    if(found_hint)
+      break;
+  }
+
+  if(found_hint) {
+    assert(it != hint.end());
+    hintt h = *it;
+    // increment the weight
+    ++(h.second);
+    hint.erase(it);
+    debugc("[hint_heuristic] : hint already inserted " << h, 1);
+    hint.insert(h);
+    return true;
+  }
+
+  // no appropriate hint was found
+  return false;
+}
+
+// more aggressive heuristic
+// return true if a hint already exists, and false otherwise
+bool heaptrans::hint_heuristic_aggressive(clauset*& c,  heapabs& sol, hintst::iterator start_it) {
+  bool found_hint = false;
+  hintst::iterator it;
+
+  if(start_it == hint.end())
+    return false;
+
+  for(it = start_it; it != hint.end(); ++it) {
+    meetIrreduciblep mi = *((it->first).begin());
+    debugc("[hint_heuristic_aggressive] : trying existent hint " << mi, 0);
+    debugc("[hint_heuristic_aggressive] : c = " << *c, 0);
+
+    for(clauset::iterator it1 = c->begin(); it1 != c->end(); ++it1) {
+      if(**it1 == *(mi->lit) && sol.entails(mi) != entailResult::False) {
+	debugc("[hint_heuristic] : hint already inserted (1) " << mi, 0);
+	found_hint = true;
+	break;
+      }
+
+      if(pure_literal(mi->lit)) {
+	meetIrreduciblep negmi = copy_lit(mi);
+	negmi->complement();
+	if(**it1 == *(negmi->lit) && sol.entails(negmi) != entailResult::True) {
+	  debugc("[hint_heuristic_aggressive] : hint already inserted (2) " << negmi, 0);
+	  found_hint = true;
+	  break;
+	}
+	delete(negmi);
+      }
+    }
+
+    if(found_hint)
+      break;
+  }
+
+  if(found_hint) {
+    assert(it != hint.end());
+    hintt h = *it;
+    // increment the weight
+    ++(h.second);
+    hint.erase(it);
+    debugc("[hint_heuristic_aggressive] : hint already inserted " << h, 1);
+    hint.insert(h);
+    bool res = hint_heuristic_aggressive(c, sol, ++it);
+    return true;
+  }
+
+  // no appropriate hint was found
+  return false;
+}
+
+// adds a new hint
+void heaptrans::set_hint(heaplitp& unit, clauset*& c, heapabs& sol) {
+
+  if(pure_literal(unit)) {
+    meetIrreduciblep h = copy_lit(*unit);
+    solutiont new_hint;
+ 
+    debugc("[set_hint]: hints = " << hint, 0);
+ 
+    // construct the new hint
+    new_hint.insert(h);
+    hint.insert(std::make_pair(new_hint, /*hintPriority::High*/0));
+    debugc("[set_hint]: inserted hint: " << h, 1);
+    debugc("[set_hint]: hints = " << hint, 0);
+  }
+  else {
+    // could not add the processed literal as a hint as it was not pure
+    // try the rest of the literals
+    add_hints(c, sol);
+  }
+
+}
+
+// returns true if c is unit clause, and false otherwise
+bool heaptrans::unit_clause (clauset*& c, heaplitp& unit, heapabs& sol) {
+  bool unit_flag = true;
   bool found;
+  clauset* newc = new clauset();
 
   debugc("[unit_clause]: clause = " << *c, 1);
 
   for(unsigned int i = 0; i < c->size(); ++i) {
     // current literal
     heaplitp hl = (*c)[i];
-    debugc("[unit_clause] : current hl = " << hl, 1);
+    debugc("[unit_clause] : current hl = " << hl, 0);
 
-    // search for the complement in both formula and current solution
+    found = false;
+
+    // if the literal is pure search for the complement in the current solution
     // as it could have been added to the solution as a decision
     if(hl->type != NEW && hl->type != STORE && hl->type != FREE && hl->type != MEMEQ) {
       meetIrreduciblep newl = copy_lit(*hl);
       debugc("[unit_clause] : literal currently processed = " << newl, 1);
       newl->complement();
-      debugc("[unit_clause] : newl complemented = " << newl, 0);
+      debugc("[unit_clause] : newl complemented = " << newl, 1);
     
-      if(sol.entails(newl) != entailResult::True) {
-	// did not find it in the current solution
-	// search in formula
-	found = false;
 
-	debugc("[unit_clause] : searching in formula for newl = " << newl, 1);
-	for(formulat::const_iterator it = heaptrans::formula.begin(); it != heaptrans::formula.end(); ++it) {
-	  if (*it != c && heaptrans::single_literal(*it, newl->lit)) {
-	    found = true;
-	    break;
-	  }
-	}
+      // the second conjunct corresponds to clauses that are false
+      // and will generate a cntradiction in the solution
+      if(sol.entails(newl) == entailResult::True && (i != c->size()-1 || !unit_flag)) {
+	debugc("[unit_clause] : " << newl << " exists in the solution ", 1);
+	debugc("[unit_clause] : sol.not_eqs = " << sol.not_eqs, 0);
+	found = true;
       } 
       else {
-	debugc("[unit_clause] : " << newl << " exists in the solution ", 1);
-	debugc("[unit_clause] : sol.not_eqs = " << sol.not_eqs, 1);
-	//debugc("[unit_clause] : equiv classes " << sol.equiv_sets, 1);
-	found = true;
+      	newc->push_back(hl);
       }
-      debugc("[unit_clause] : found = " << found, 0);
-      //newl->complement();
-      delete newl;
 
+      debugc("[unit_clause] : found = " << found, 1);
+      delete newl;
     }
     else {
-      found = false;
+     	newc->push_back(hl);
     }
 
-    if (!found || (i == c->size()-1 && unitb)) {
-      if (unitb) {
+    if (!found) {
+      if (unit_flag) {
 	// set the literal believed to be unit clause
 	unit = hl;
-	debugc("[unit_clause] : possible unit clause " << unit, 1);
+	debugc("[unit_clause] : possible unit clause " << unit, 0);
 	// literal set
-	unitb = false;
+	unit_flag = false;
       }
       else {
 	// not unit clause
-	debugc("[unit_clause] : END", 1);
+	// add the remaining disjuncts that were not processed
+	for(unsigned int j = i+1; j < c->size(); ++j) {
+	  newc->push_back((*c)[j]);
+	}
 
-	// set it as a hint
-	// meetIrreduciblep h = copy_lit(*unit);
-	// sol.hint.insert(std::make_pair(h, hintPriority::High));
-	// debugc("[add_hints]: inserted hint: " << h, 1);
+	if(!hint_heuristic(c, sol)) {
+	  // no appropriate hint exists
+	  set_hint(unit, c, sol);
+ 	}
 
+	c = newc;
 	return false;
       }
     }
   }
-  debugc("[unit_clause]: unit clause :) ", 1);
+
+  c = newc;
+  debugc("[unit_clause]: unit clause :) c = " << *c, 1);
   return true;
 }
 
@@ -609,7 +736,6 @@ clauset* heaptrans::simplify_clause (clauset* c, heapabs& sol) {
   bool unitb = true;
   bool found;
   unsigned int i;
-  clauset* newc = new clauset;
 
   debugc("[simplify_clause]: clause = " << *c, 0);
 
@@ -618,13 +744,13 @@ clauset* heaptrans::simplify_clause (clauset* c, heapabs& sol) {
     return c;
   }
 
+  clauset* newc = new clauset;
+
   for(i = 0; i < c->size(); ++i) {
     // current literal
     heaplitp hl = (*c)[i];
 
     if(hl->type == NEW || hl->type == STORE || hl->type == FREE || hl->type == MEMEQ) {
-      //newc->push_back(hl);
-      //break;
       newc->push_back(hl);
       continue;
     }
@@ -635,23 +761,22 @@ clauset* heaptrans::simplify_clause (clauset* c, heapabs& sol) {
     debugc("[simplify_clause] : literal currently processed = " << newl, 0);      
 
     // check if the clause is true
-    for(clauset::const_iterator it = c->begin(); it != c->end(); ++it) {
-      if(*(newl->lit) == **it) {
-	debugc("[simplify_clause] : clause is True (1) c = " << *c, 1);
-	newc->clear();
-	//delete newl;
-	return newc;
-      }
-    }
+    // for(clauset::const_iterator it = c->begin(); it != c->end(); ++it) {
+    //   if(*(newl->lit) == **it) {
+    // 	debugc("[simplify_clause] : clause is True (1) c = " << *c, 1);
+    // 	//delete newl;
+    // 	return c;//new clauset;
+    //   }
+    // }
 
     found = false;
 
     // search for the complement in the formula 
     for(formulat::const_iterator it = heaptrans::formula.begin(); it != heaptrans::formula.end(); ++it) {
       if(*it != c && heaptrans::single_literal(*it, newl->lit)) {
-	debugc("[simplify_clause] : found literal (2) newl = " << newl, 1);
-	found = true;
-	break;
+    	debugc("[simplify_clause] : found literal (2) newl = " << newl, 0);
+    	found = true;
+    	break;
       }
     }
 
@@ -659,17 +784,19 @@ clauset* heaptrans::simplify_clause (clauset* c, heapabs& sol) {
     if(!found && sol.entails(newl) != entailResult::True) {
       // cannot be removed
       newl->complement();
-      newc->push_back(newl->lit);
+      newc->push_back(hl);
     }
 
   }
   
-  debugc("[simplify_clause] : newc = " << *newc << " and c = " << *c, 1);
+  debugc("[simplify_clause] : newc = " << *newc << " and c = " << *c, 0);
   return newc;
 }
 
 void heaptrans::simplify_formula (heapabs& sol) {
   formulat f;
+
+  f.clear();
 
   for(formulat::iterator it = formula.begin(); it != formula.end(); ++it) {
     clauset* c = simplify_clause(*it, sol);
@@ -677,8 +804,7 @@ void heaptrans::simplify_formula (heapabs& sol) {
       f.push_back(c);
   }
   
-  formula = f;
-
+  heaptrans::formula = f;
 }
 
 clauset* heaptrans::create_disjunction(std::vector< meetIrreduciblep >& v ) {
@@ -692,27 +818,26 @@ clauset* heaptrans::create_disjunction(std::vector< meetIrreduciblep >& v ) {
 }
 
 bool heaptrans::hint_contains(const meetIrreduciblep& e) const {
-  hintt::const_iterator it;
 
-  for(it = hint.begin(); it != hint.end(); ++it) {
-    meetIrreducible_comp comp;
+  for(hintst::const_iterator it = hint.begin(); it != hint.end(); ++it) {
+    for(solutiont::const_iterator it1 = (it->first).begin(); it1 != (it->first).end(); ++it1) {
+      meetIrreducible_comp comp;
 
-    if (!comp(it->first, e) && !comp(e, it->first)) {
-      //debugc("[hint_contains] : found hint " << e, 1);
-      return true;
+      if (!comp(*it1, e) && !comp(e, *it1)) {
+	return true;
+      }
     }
   }
 
   return false;
 }
 
-
 void heaptrans::clear () {
   for(formulat::const_iterator it=heaptrans::formula.begin(); it!=heaptrans::formula.end(); ++it) {
     (*it)->clear();
   }
   heaptrans::formula.clear();    
-  heaptrans::watch.w.clear(); // todo: fix mem leak
+  //heaptrans::watch.w.clear(); // todo: fix mem leak
 }
 
 void heaptrans::insert_literal(const heaplitp e) {
@@ -720,13 +845,14 @@ void heaptrans::insert_literal(const heaplitp e) {
   newclause->push_back(e);
 
   heaptrans::formula.push_back(newclause);
-  heaptrans::watch.add_clause_to_watch(newclause);
+  //heaptrans::watch.add_clause_to_watch(newclause);
 }
 
 void heaptrans::insert_clause(clauset* c) {
   heaptrans::formula.push_back(c);
  
   // add the clause to the watch lists of the first two literals
-  heaptrans::watch.add_clause_to_watch(c);
+  //heaptrans::watch.add_clause_to_watch(c);
 
 }
+

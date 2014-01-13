@@ -31,25 +31,21 @@ template <class abst, class transt, class heurt>
       	    res = trans.apply(abs);
 	    
       	    if (res & transformerResult::Bottom) {
-	      debug("[construct]: exit with Bottom");
+	      debugc("[construct]: exit with Bottom", 1);
       	      return downwardCompleteness::Bottom;
       	    }
 	    
       	  } while (res & transformerResult::CallAgain);
 	  
-	  
       	  // Check completeness
-	  debugc("[construct]: before completeness check - abs.contents = " << abs.contents, 0);
       	  completeness = trans.isComplete(abs);
-	  debugc("[construct]: after completeness check - abs.contents = " << abs.contents, 0);
-      	  if (completeness != downwardCompleteness::Incomplete) {
-            debug("[construct]: exit with Complete");
+      	  if (completeness == downwardCompleteness::Complete) {
+            debugc("[construct]: exit with Complete", 1);
       	    return completeness;
       	  }
   	  debugc("[construct]: before extrapolation", 0);
-	  debugc("[construct]: abs.contents = " << abs.contents, 0);
       	  // Extrapolate
-      	} while (h.extrapolate(abs, trans)); ///h.extrapolate(abs);
+      	} while (h.extrapolate(abs, trans, completeness)); ///h.extrapolate(abs);
 	
       	return downwardCompleteness::Unknown;
       }
@@ -57,9 +53,10 @@ template <class abst, class transt, class heurt>
 
       upwardCompleteness::s refine (abst& abs, transt& trans, heurt& h) {
 	
-      	debug("Refine");
-	
-      	// Abstract
+      	debugc("Refine", 1);
+	trans.formula = trans.original_formula;
+
+     	// Abstract
       	return h.interpolate(abs, trans);
       }
 	
@@ -67,12 +64,14 @@ template <class abst, class transt, class heurt>
       transformerRefinementResult::s solve (abst& abs, transt& trans, heurt& h) {
     	downwardCompleteness::s constructionResult;
     	upwardCompleteness::s refinementResult;
+
+	trans.original_formula = trans.formula;
 	
 	do {
-          debug("[solve]: reset");
+          debugc("[solve]: reset", 1);
 	  abs.clear();
 	  trans.hint.clear();
-	  //trans.simplify_formula(abs);
+	  trans.simplify_formula(abs);
 	  debugc("[solve]: formula after simplification: " << trans.formula, 1);
 	  debugc("[solve]: hint after reset: " << trans.hint, 1);
 	  debugc("[solve]: trail after reset: " << abs.trail, 0);
@@ -84,7 +83,8 @@ template <class abst, class transt, class heurt>
 
 	  switch (constructionResult) {
 	  default :      
-	  case downwardCompleteness::Incomplete:
+	  case downwardCompleteness::IncompleteProp:
+	  case downwardCompleteness::IncompleteTransformer:
 	    assert(0);
 	  case downwardCompleteness::Unknown: 
    	    debug("[solve]: exit with Unknown");

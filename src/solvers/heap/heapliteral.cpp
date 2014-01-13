@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include "heapliteral.h"
 
 domaint mode;
@@ -76,10 +74,15 @@ std::ostream& operator<< (std::ostream& s, const solutiont& v) {
   return s;
 }
 
-std::ostream& operator<< (std::ostream& s, const hintt& v) {
+std::ostream& operator<< (std::ostream& s, const hintt& h) {
+  s << "([" << h.first << "], " << h.second << ")";
+}
 
-  for(std::set< std::pair<meetIrreduciblep, hintPriority::s> >::const_iterator it = v.begin(); it != v.end(); ++it) {
-    s << (*it).first << " ";
+
+std::ostream& operator<< (std::ostream& s, const hintst& v) {
+
+  for(hintst::const_iterator it = v.begin(); it != v.end(); ++it) {
+    s << *it << " ";
   }
 
   return s;
@@ -120,10 +123,6 @@ meetIrreduciblep copy_lit(const meetIrreduciblep& l) {
     hl = new meetIrreducible(new eq_lit(*(l->lit)));
     return hl; 
   }
-  // default: {  
-  //   hl = new meetIrreducible(new heapelem(*(l->lit)));
-  //   return hl;
-  // }
   default: 
     assert(1 == 0);
     return new meetIrreducible(new heapelem(*(l->lit)));
@@ -162,12 +161,9 @@ meetIrreduciblep copy_lit(const heaplit& lit) {
     assert(1 == 0);
     return new meetIrreducible(new heapelem(lit));
     
-  // {  
-  //   hl = new meetIrreducible(new heapelem(lit));
-  //   return hl;
-  // }
   }
 }
+
 
 heaplit* copy_lit(heaplit* lit) {
   switch (lit->type) {
@@ -199,13 +195,6 @@ std::ostream& operator<< (std::ostream& s, const clauset& f) {
   return s;
 }
 
-// std::ostream& operator<< (std::ostream& s, const std::set< heapvar >& f) {
-//   for(std::set< heapvar >::const_iterator it = f.begin(); it != f.end(); ++it) {
-//     s << it->name << " ";
-//   }
-//   s << std::endl;
-// } 
-
 std::ostream& operator<< (std::ostream& s, const formulat& f) {
 
   if(f.size() > 0) {
@@ -221,35 +210,6 @@ std::ostream& operator<< (std::ostream& s, const formulat& f) {
   return s;
 }
 
-
-// std::ostream& operator<< (std::ostream& s, const solutiont& sol) {
-//    s << "{";
-
-//    for(solutiont::const_iterator it = sol.begin(); it!= sol.end(); ++it) {
-//      s << *it << ";";
-//    }
-
-//    s << "}";
-//    return s;
-//  }
-
-
-// std::ostream& operator<< (std::ostream& s, const equiv_sett& es) {
-//   for(equiv_sett::const_iterator it = es.begin(); it != es.end(); ++it) {
-//     s << *it << "; ";
-//   }
-
-//   return s;
-// }
-
-// std::ostream& operator<< (std::ostream& s, const equiv_setst& es) {
-
-//   for(equiv_setst::const_iterator it = es.begin(); it != es.end(); ++it) {
-//     s << *it << std::endl;
-//   }
-
-//   return s;
-// }
 
 
 std::ostream& operator<< (std::ostream& s, const not_eqst& sne) {

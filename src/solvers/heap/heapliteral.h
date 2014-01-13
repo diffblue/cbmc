@@ -5,10 +5,10 @@
 **
 */
 
+#include "heaputil.h"
+
 #ifndef TRP_HEAPLIT
 #define TRP_HEAPLIT
-
-#include "heaputil.h"
 
 /** heap theory terms **/
 typedef enum { NO_TERM = 0,
@@ -21,7 +21,6 @@ typedef enum { NO_TERM = 0,
 	       MEMEQ = 7,   // e.g. m' = m; --> two memory configurations are equal
 	       DANGLING = 8,
 	       ONPATH = 9
-	       //ASSIGN = 9 // this is only used inside a loop, while computing the loop invariant
 } heap_term_typet;
 
 // choice of abstract domain
@@ -159,12 +158,12 @@ class heapexpr {
 
   void rename_mems(std::string name, std::string new_name) {
 
-    debugc("[rename_mems] (BEFORE): m.name = " << m.name, 1);
+    debugc("[rename_mems] (BEFORE): m.name = " << m.name, 0);
 
     if (m.name.std::string::compare(name) == 0)
       m.name = new_name;
 
-    debugc("[rename_mems] (AFTER): m.name = " << m.name, 1);
+    debugc("[rename_mems] (AFTER): m.name = " << m.name, 0);
   }
 
   bool operator< (heapexpr const &other) const {
@@ -231,6 +230,7 @@ class heaplit {
   heapvar f;
   heapexpr rhs;
   // dummy eq_lit's are introduced during SSA in order to reach the same SSA-number on different branches
+  // this will disappear after CBMC integration 
   bool dummy;
 
  public:
@@ -282,27 +282,14 @@ class heaplit {
   }
 
   virtual void rename_vars_rhs(std::string name, std::string new_name) = 0;
-  /* { */
-  /*   if (y.name.std::string::compare(name) == 0) */
-  /*     y.name = new_name; */
-  /*   if (z.name.std::string::compare(name) == 0) */
-  /*     z.name = new_name; */
-  /*   if (t.name.std::string::compare(name) == 0) */
-  /*     t.name = new_name; */
-  /*   rhs.rename_vars(name, new_name); */
-  /* } */
 
   virtual void rename_vars_lhs(std::string name, std::string new_name) = 0;
-  /* { */
-  /*   if (x.name.std::string::compare(name) == 0) */
-  /*     x.name = new_name; */
-  /* } */
 
   void rename_rhs_mems(std::string name, std::string new_name) {
     if (m.name.std::string::compare(name) == 0)
       m.name = new_name;
 
-    debugc("[rename_rhs_mems] : new_name = " << new_name, 1);
+    debugc("[rename_rhs_mems] : new_name = " << new_name, 0);
     rhs.rename_mems(name, new_name);
   }
 
@@ -350,12 +337,6 @@ class heaplit {
       break;
     }
   }
-
-  /* // same as complement but returns the literal  */
-  /* virtual heaplitp negate() { */
-  /*   complement(); */
-  /*   return this; */
-  /* } */
 
   // return the set of pointer vars in the literal
   virtual std::set<heapvar> get_vars() const = 0;
@@ -461,10 +442,6 @@ class heap_update_lit : public heaplit {
 \*********************************************************************************/
 class store_lit : public heap_update_lit {
  public:
-  //heapvar x, y;
-  //heapvar f;
-  
- public:
  store_lit(heapvar _mnew, 
 	   heapvar _m, 
 	   heapvar _x, 
@@ -535,9 +512,6 @@ class store_lit : public heap_update_lit {
 \*********************************************************************************/
 class new_lit : public heap_update_lit {
  public:
-  //heapvar x;
-  
- public:
  new_lit(heapvar _mnew, 
 	 heapvar _m, 
 	 heapvar _x, 
@@ -598,9 +572,6 @@ class new_lit : public heap_update_lit {
  * mnew = free(m,x)                                                              *
 \*********************************************************************************/
 class free_lit : public heap_update_lit {
- public:
-  //heapvar x;
-  
  public:
  free_lit(heapvar _mnew, 
 	  heapvar _m, 
@@ -710,9 +681,6 @@ class mem_eq_lit : public heap_update_lit {
 \*********************************************************************************/
 class heap_lookup_lit : public heaplit {
  public:
-  //heapvar x;
-  
- public:
  heap_lookup_lit() : heaplit() {}
 
  heap_lookup_lit(heapvar _x, uint8_t _state) : heaplit(_state) {
@@ -801,9 +769,6 @@ class heap_lookup_lit : public heaplit {
 \*********************************************************************************/
 
 class path_lit : public heap_lookup_lit {
-  //heapvar m;
-  //heapvar y, f;
-
  public:
  path_lit(heapvar _m, 
 	  heapvar _x, 
@@ -881,9 +846,6 @@ class path_lit : public heap_lookup_lit {
 \*********************************************************************************/
 
 class onpath_lit : public heap_lookup_lit {
-  //heapvar m
-  //heapvar y, f;
-
  public:
  onpath_lit(heapvar _m, 
 	  heapvar _x, 
@@ -1031,11 +993,6 @@ class dangling_lit : public heap_lookup_lit {
 \*********************************************************************************/
 
 class disj_lit : public heap_lookup_lit {
- public:
-  //heapvar m;
-  //heapvar y, z, t;
-  //heapvar f;
-  
  public:
  disj_lit(heapvar _m, 
 	  heapvar _x, 
@@ -1281,8 +1238,6 @@ class meetIrreducible {
 struct heaplit_comp {
 
   bool operator() (const heaplit* lhs, const heaplit* rhs) const {
-    /* if (lhs == NULL && rhs == NULL) */
-    /*   return false; */
     if (lhs == NULL || rhs == NULL)
       return false;
     return *lhs < *rhs;
@@ -1291,8 +1246,6 @@ struct heaplit_comp {
 
 struct meetIrreducible_comp {
   bool operator() (const meetIrreducible* lhs, const meetIrreducible* rhs) const {
-    /* if (lhs == NULL && rhs == NULL) */
-    /*   return false; */
     if (lhs == NULL || rhs == NULL)
       return false;
     return *(lhs->lit) < *(rhs->lit);
@@ -1300,20 +1253,31 @@ struct meetIrreducible_comp {
 };
 
 struct hint_comp {
-  bool operator() (const std::pair<meetIrreducible*, hintPriority::s> lhs, const std::pair<meetIrreducible*, hintPriority::s> rhs) const {
-    /* if (lhs == NULL && rhs == NULL) */
-    /*   return false; */
-    if (lhs.first == NULL || rhs.first == NULL)
-      return false;
-    return *((lhs.first)->lit) < *((rhs.first)->lit);
+  bool operator() (const hintt lhs, const hintt rhs) const {
+    bool res = false;
+
+    //std::cout << "[hint_comp] : lhs = " << lhs.first << " and rhs = " << rhs.first << std::endl;
+
+    if (lhs.first.size() != rhs.first.size())
+      return lhs.first.size() < rhs.first.size();
+
+    if (lhs.first.size() == rhs.first.size() == 1)
+      return ((*(lhs.first.begin()))->lit) < ((*(rhs.first.begin()))->lit);
+    
+    for(solutiont::const_iterator it = lhs.first.begin(); it != lhs.first.end(); ++it)
+      if(rhs.first.find(*it) == rhs.first.end())
+	return true;
+
+    return false;
+
+    //debugc("[hint_comp] : res = " << res, 1);
+    //return res;
   }
 };
 
 
 struct heapelem_comp {
   bool operator() (const heapelem* lhs, const heapelem* rhs) const {
-    /* if (lhs == NULL && rhs == NULL) */
-    /*   return false; */
     if (lhs == NULL || rhs == NULL)
       return false;
     bool ret = (*lhs < *rhs);
@@ -1321,18 +1285,8 @@ struct heapelem_comp {
   }
 };
 
-/* struct heapvar_comp { */
-/*   bool operator() (const heapvar lhs, const heapvar rhs) const { */
-/*     bool ret = (lhs < rhs); */
-/*     return ret; */
-/*   } */
-/* }; */
-
-
 struct inferenceRecord_comp {
   bool operator() (const inferenceRecord* lhs, const inferenceRecord* rhs) const {
-    /* if (lhs == NULL && rhs == NULL) */
-    /*   return false; */
     if (lhs == NULL || rhs == NULL)
       return false;
     //todo: fix the reason part
@@ -1341,8 +1295,6 @@ struct inferenceRecord_comp {
 };
 
 
-//boost::shared_ptr<heapelem> copy_lit(const heaplit&);
-//meetIrreduciblep copy_lit(const heaplit&);
 meetIrreduciblep copy_lit(const meetIrreduciblep&);
 meetIrreduciblep copy_lit(const heaplit&);
 heaplit* copy_lit(heaplit*);
@@ -1357,9 +1309,8 @@ std::ostream& operator<< (std::ostream&, const std::vector< meetIrreduciblep >&)
 std::ostream& operator<< (std::ostream&, const std::set< heapvar >&); 
 std::ostream& operator<< (std::ostream&, const std::vector< heapvar >&); 
 std::ostream& operator<< (std::ostream&, const solutiont&); 
+std::ostream& operator<< (std::ostream&, const hintst&); 
 std::ostream& operator<< (std::ostream&, const hintt&); 
-//std::ostream& operator<< (std::ostream&, const equiv_setst&); 
-//std::ostream& operator<< (std::ostream&, const equiv_sett&); 
 std::ostream& operator<< (std::ostream&, const not_eqst&); 
 std::ostream& operator<< (std::ostream&, const not_eqt&); 
 std::ostream& operator<< (std::ostream&, const fld_adj_listt&); 

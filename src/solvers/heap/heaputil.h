@@ -1,14 +1,15 @@
-#ifndef HEAPUTIL
-#define HEAPUTIL
-
 #include <string>
+#include <iostream>
+#include <stdint.h>
+#include <assert.h>
 #include <set>
 #include <vector>
+#include <boost/shared_ptr.hpp>
 #include <map>
-#include <cassert>
-#include <stdint.h>
+#include "util/union_find.h"
 
-#include <util/union_find.h>
+#ifndef HEAPUTIL
+#define HEAPUTIL
 
 #if DEBUG
 
@@ -40,6 +41,7 @@ class heapexpr;
 class heaplit;
 class heap_lookup_lit;
 struct heapelem_comp;
+struct heaplit_comp;
 struct meetIrreducible_comp;
 struct heaplit_comp;
 struct hint_comp;
@@ -66,7 +68,8 @@ namespace hintPriority {
   enum s { High, 
 	   Low };
 }
-typedef std::set< std::pair< meetIrreduciblep, hintPriority::s>, hint_comp > hintt;
+typedef std::pair<solutiont, /*hintPriority::s*/unsigned int> hintt;
+typedef std::set< hintt, hint_comp > hintst;
 
 typedef heapelem* heapelemp;
 typedef heaplit* heaplitp;
@@ -152,7 +155,8 @@ typedef std::set< inferenceRecord*, inferenceRecord_comp > trailt;
 namespace downwardCompleteness {
   enum s { Bottom, 
 	   Complete, 
-	   Incomplete, 
+	   IncompleteProp,
+	   IncompleteTransformer,
 	   Unknown };
 }
 

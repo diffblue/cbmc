@@ -5,22 +5,20 @@
 **
 */
 
-#ifndef TRP_HEAPABS
-#define TRP_HEAPABS
-
+#include "heapliteral.h"
 #include <iostream>
 
-#include "heapliteral.h"
+#ifndef TRP_HEAPABS
+#define TRP_HEAPABS
+ 
 
 class heapabs {
 public :
-  solutiont contents;
   trailt trail;
 
   // positive heap facts:
   // equivalence classes
   aliasest aliases; 
-
   // reachability graph
   adj_listt adj_list;
   // eqs of the form v1 = sel(m, v2, n)
@@ -30,38 +28,69 @@ public :
   not_eqst not_eqs;
   not_pathst not_paths;
 
-  //heapabs () : gamma(downwardCompleteness::Incomplete) {}
-
   ~heapabs () {
-    for(solutiont::iterator it = contents.begin(); it != contents.end(); ++it) {
-	delete *it;
-    }
+    /* for(solutiont::iterator it = contents.begin(); it != contents.end(); ++it) { */
+    /* 	delete *it; */
+    /* } */
   }
 
   entailResult::s entails(const meetIrreduciblep& e) {
     entailResult::s ret = entailResult::Incomplete;
 
+    debugc("[entails] : (0)", 0);
+
+    debugc("[entails] : (1) e = " << e, 0);
+
     if (entails_literal(e)) 
       return entailResult::True;
 
+    debugc("[entails] : (2)", 0);
+
     e->complement();
+
+    debugc("[entails] : (3)", 0);
 
     if (entails_literal(e))
       ret = entailResult::False;		     
 
+    debugc("[entails] : (4)", 0);
+
     e->complement();
+
+    debugc("[entails] : (5)", 0);
 
     return ret;
   }
 
-  entailResult::s entails(formulat* f, hintt* h) {
+  entailResult::s entails(formulat* f, hintt& h) {
     entailResult::s ret = entailResult::True;
 
+    solutiont new_hint;
+
     for(formulat::const_iterator it = f->begin(); it != f->end(); ++it) {
-      if(entails(*it, h) == entailResult::Incomplete) 
+      if(entails(*it, new_hint) == entailResult::Incomplete) 
 	ret = entailResult::Incomplete;
-      if(entails(*it, h) == entailResult::False)
+      if(entails(*it, new_hint) == entailResult::False) {
+	h = std::make_pair(new_hint, /*hintPriority::Low*/0);
 	return entailResult::False;
+      }
+    }
+
+    h = std::make_pair(new_hint, hintPriority::Low);
+    return ret;
+  }
+
+  entailResult::s entails(formulat* f) {
+    entailResult::s ret = entailResult::True;
+
+    solutiont new_hint;
+
+    for(formulat::const_iterator it = f->begin(); it != f->end(); ++it) {
+      if(entails(*it, new_hint) == entailResult::Incomplete) 
+	ret = entailResult::Incomplete;
+      if(entails(*it, new_hint) == entailResult::False) {
+	return entailResult::False;
+      }
     }
 
     return ret;
@@ -102,9 +131,9 @@ public :
     heapvar y_ = aliases.find(y);
 
     debugc("[add_path] : add path(" << m << ", " << x << ", " << y << ", " << f << ")", 1);
-    debugc("[add path] : x_ = :" << x_, 1); 
-    debugc("[add path] : y_ = :" << y_, 1); 
-    debugc("[add path] : adj list :" << adj_list, 1); 
+    debugc("[add path] : x_ = :" << x_, 0); 
+    debugc("[add path] : y_ = :" << y_, 0); 
+    debugc("[add path] : adj list :" << adj_list, 0); 
 
     if(s == stateTrue) {
       // locate the adj list corresponding to the memory configuration m
@@ -116,7 +145,7 @@ public :
 	fal[x_] = targets;
 	mal[f] = fal;
 	adj_list[m] = mal;
-	debugc("[add path] : 1. adj list after insertion:" << adj_list, 1);
+	debugc("[add path] : 1. adj list after insertion:" << adj_list, 0);
 	return true;
       }
 
@@ -127,7 +156,7 @@ public :
 	targets.insert(y_);
 	fal[x_] = targets;
 	(adj_list_it->second)[f] = fal;
-	debugc("[add path] : 2. adj list after insertion:" << adj_list, 1);
+	debugc("[add path] : 2. adj list after insertion:" << adj_list, 0);
 	return true;
       }
 
@@ -143,7 +172,7 @@ public :
 
       targetst::iterator targets_it = (fld_adj_list_it->second).find(y_);
       if (targets_it != (fld_adj_list_it->second).end()) {
-	debugc("[add_path] : no change ", 1);
+	debugc("[add_path] : no change ", 0);
 	return false;
       }
 
@@ -153,14 +182,14 @@ public :
     }
     else {
       heaplitp hl = new path_lit(m, x_, y_, f, s);
-      debugc("[add_path/not] : add " << hl, 1);
+      debugc("[add_path/not] : add " << hl, 0);
       if(not_paths.find(hl) != not_paths.end()) {
 	//delete hl;
-	debugc("[add_path] : no change", 1);
+	debugc("[add_path] : no change", 0);
 	return false;
       }
       not_paths.insert(hl);
-      debugc("[add_path/not] : not_paths = " << not_paths, 1);
+      debugc("[add_path/not] : not_paths = " << not_paths, 0);
       return true;
     }
   }
@@ -178,8 +207,8 @@ public :
       heapvar old_x = aliases.find(x);
       heapvar old_y = aliases.find(y.v);
 
-      debugc("[add_eq] : x = " << x << " and old_x = " << old_x, 1);
-      debugc("[add_eq] : y.v = " << y.v << " and old_y = " << old_y, 1);
+      debugc("[add_eq] : x = " << x << " and old_x = " << old_x, 0);
+      debugc("[add_eq] : y.v = " << y.v << " and old_y = " << old_y, 0);
 
       if(y.is_sel()) {
 	not_eqt seleq = std::make_pair(old_x, heapexpr(old_y, y.m, y.f));
@@ -193,10 +222,10 @@ public :
 	// todo : change the equiv classes to store heapexpr and remove this..
 	for(sel_eqst::iterator sel_eqs_it = sel_eqs.begin(); sel_eqs_it != sel_eqs.end(); ++sel_eqs_it) {
 	  heapexpr sel1 = sel_eqs_it->second;
-	  debugc("[add_eq] : found sel_eq (1) " << *sel_eqs_it, 1);
+	  debugc("[add_eq] : found sel_eq (1) " << *sel_eqs_it, 0);
 	  for(sel_eqst::iterator it = sel_eqs.begin(); it != sel_eqs.end(); ++it) {
 	    if(sel_eqs_it != it && sel1 == it->second) {
-	      debugc("[add_eq] : found sel_eq (2) " << *it, 1);
+	      debugc("[add_eq] : found sel_eq (2) " << *it, 0);
 	      // todo: add_eq also modifies sel_eqs...
 	      debugc("[add_eq] : add eq (6) " << sel_eqs_it->first << " = " << heapexpr(it->first), 1);
 	      add_eq(sel_eqs_it->first, heapexpr(it->first), stateTrue);
@@ -218,16 +247,16 @@ public :
       ret = aliases.make_union(x, y.v);
       
       if(ret) {
-	debugc("[add_eq] : no change", 1);
+	debugc("[add_eq] : no change", 0);
 	return false;
       }
 
       // get the new representative for x and y
       heapvar new_x = aliases.find(x);
 
-      debugc("[add_eq] : old_x = " << old_x, 1);
-      debugc("[add_eq] : old_y = " << old_y, 1);
-      debugc("[add_eq] : new_x = " << new_x, 1);
+      debugc("[add_eq] : old_x = " << old_x, 0);
+      debugc("[add_eq] : old_y = " << old_y, 0);
+      debugc("[add_eq] : new_x = " << new_x, 0);
 
       // collapse facts in the reachability graph
       for(adj_listt::iterator adj_list_it = adj_list.begin(); adj_list_it != adj_list.end(); ++adj_list_it) 
@@ -373,38 +402,38 @@ public :
       for(not_pathst::iterator not_paths_it = not_paths.begin(); not_paths_it != not_paths.end(); ++not_paths_it) {
 	if(!(old_x == new_x)) {
 	  if((*not_paths_it)->x == old_x) {
-	    debugc("[add_eq/not_path] : replacing old_x = " << old_x, 1);
+	    debugc("[add_eq/not_path] : replacing old_x = " << old_x, 0);
 	    heaplitp not_path = *not_paths_it;
 	    not_paths.erase(not_paths_it);
 	    not_path->x = new_x;
 	    not_paths.insert(not_path);
-	    debugc("[add_eq/not_path] : after replacement not_paths = " << not_paths, 1);
+	    debugc("[add_eq/not_path] : after replacement not_paths = " << not_paths, 0);
 	  }
 	  if((*not_paths_it)->y == old_x) {
-	    debugc("[add_eq/not_path] : replacing old_x = " << old_x, 1);
+	    debugc("[add_eq/not_path] : replacing old_x = " << old_x, 0);
 	    heaplitp not_path = *not_paths_it;
 	    not_paths.erase(not_paths_it);
 	    not_path->y = new_x;
 	    not_paths.insert(not_path);
-	    debugc("[add_eq/not_path] : after replacement not_paths = " << not_paths, 1);
+	    debugc("[add_eq/not_path] : after replacement not_paths = " << not_paths, 0);
 	  }
 	}
 	if(!(old_y == new_x)) {
 	  if((*not_paths_it)->x == old_y) {
-	    debugc("[add_eq/not_path] : replacing old_y = " << old_y, 1);
+	    debugc("[add_eq/not_path] : replacing old_y = " << old_y, 0);
 	    heaplitp not_path = *not_paths_it;
 	    not_paths.erase(not_paths_it);
 	    not_path->x = new_x;
 	    not_paths.insert(not_path);
-	    debugc("[add_eq/not_path] : after replacement not_paths = " << not_paths, 1);
+	    debugc("[add_eq/not_path] : after replacement not_paths = " << not_paths, 0);
 	  }
 	  if((*not_paths_it)->y == old_y) {
-	    debugc("[add_eq/not_path] : replacing old_y = " << old_y, 1);
+	    debugc("[add_eq/not_path] : replacing old_y = " << old_y, 0);
 	    heaplitp not_path = *not_paths_it;
 	    not_paths.erase(not_paths_it);
 	    not_path->y = new_x;
 	    not_paths.insert(not_path);
-	    debugc("[add_eq/not_path] : after replacement not_paths = " << not_paths, 1);
+	    debugc("[add_eq/not_path] : after replacement not_paths = " << not_paths, 0);
 	  }
 	}
       }
@@ -430,7 +459,6 @@ public :
 
 
   void clear() {
-    //contents.clear(); 
     trail.clear();
     not_eqs.clear();
     adj_list.clear();
@@ -475,13 +503,22 @@ public :
 
   bool entails_literal(const heaplitp& hl) {
     debugc("[entails_literal]: hl = " << hl, 0);
-    /* heaplitp hl = e->lit; */
 
+    debugc("[entails_literal] : type = " << hl->type, 0);
+    //assert(hl->type == EQ || hl->type == PATH || hl->type == ONPATH || hl->type == DANGLING);
+    
     switch(hl->type) {
     case EQ:
-      if(hl->state == stateTrue)
-	return entails_eq(hl->x, hl->rhs);
-      return entails_not_eq(hl->x, hl->rhs);
+      bool res;
+      if(hl->state == stateTrue) {
+	res = entails_eq(hl->x, hl->rhs);
+	debugc("[entails_literal] : (1) res = " << res, 0);
+      }
+      else {
+	res = entails_not_eq(hl->x, hl->rhs);
+	debugc("[entails_literal] : (2) res = " << res, 0);
+      }
+      return res;
     case PATH:
       if(hl->state == stateTrue)
 	return entails_path(hl->m, hl->x, hl->y, hl->f);
@@ -490,25 +527,23 @@ public :
       /* if(hl->state == stateTrue) */
       /* 	return entails_onpath(hl->m, hl->x, hl->y, hl->z, hl->f); */
       /* return entails_not_onpath(hl->m, hl->x, hl->y, hl->z, hl->f); */
-      throw "NOT IMPLEMENTED: entails_literal(onpath)";
       break;
     case DANGLING:
       if(hl->state == stateTrue)
 	return entails_dangling(hl->m, hl->x);
       return entails_not_dangling(hl->m, hl->x);
     default:
-      debugc("[entails_literal] : hl = " << hl, 0);
-      assert (1 == 0);
+      for(trailt::const_iterator it3 = trail.begin(); it3 != trail.end(); ++it3) {
+	if (*hl == *((*it3)->inference->lit)) {
+	  debugc("[entails_literal]: literal found " << hl, 1);
+	  return true;
+	}
+      }
       return false;
     }
   } 
 
  protected:
-
-  void setTop() {
-    contents.clear();
-  }
-
 
 
   bool entails_eq(const heapvar hv1, const heapvar he2) {
@@ -520,7 +555,7 @@ public :
     heapvar he1_ = aliases.find(he1);
 
     if(he2.is_sel()) {
-      debugc("[is_eq/sel] : sel_eqs = " << sel_eqs, 1);
+      debugc("[is_eq/sel] : sel_eqs = " << sel_eqs, 0);
       not_eqt hl = std::make_pair(he1_, heapexpr(he2_, he2.m, he2.f));
       return sel_eqs.find(hl) != sel_eqs.end();
     }
@@ -548,22 +583,20 @@ public :
 
   // exists a path from hv1 to hv2 in the memory configuration m
   bool entails_path(heapvar m, heapvar hv1, heapvar hv2, heapvar f) {
-    debugc("[entails_path] : Start", 1);
     
     // get the representatives
     heapvar hv1_ = aliases.find(hv1);
     heapvar hv2_ = aliases.find(hv2);
 
     debugc("[entails_path] : path(" << m << ", " << hv1 << ", " << hv2 << ", " << f << ")", 1);
-    debugc("[entails_path] : hv1_ = :" << hv1_, 1); 
-    debugc("[entails_path] : hv2_ = :" << hv2_, 1); 
+    debugc("[entails_path] : hv1_ = :" << hv1_, 0); 
+    debugc("[entails_path] : hv2_ = :" << hv2_, 0); 
 
     // trivially true path
     if (hv1_ == hv2_)
       return true;
 
-    debugc("[entails_path] : adj_lit : " << adj_list, 1);
-    //debugc("[entails_path] : check path(" << m << ", " << hv1_ << ", " << hv2_ << ", " << f << ")", 1);
+    debugc("[entails_path] : adj_lit : " << adj_list, 0);
 
     // locate the corresponding reachability subgraph
     adj_listt::iterator it1 = adj_list.find(m);
@@ -591,17 +624,16 @@ public :
 
       visited.insert(tmp);
 
-      debugc("[entails_path] : current element processesed = " << tmp, 1);
+      debugc("[entails_path] : current element processesed = " << tmp, 0);
       //debugc("[entails_path] : queue after popping = " << q, 1);
 
       // did i find the target?
       if (tmp == hv2_) {
-	debugc("[entails_path] : target found " << tmp, 1);
+	debugc("[entails_path] : target found " << tmp, 0);
         return true;
       }
 
-      debugc("[entails_path] : " << tmp << " != " << hv2_, 1);
-      //debugc("[entails_path] : adj_list = " << it2->second, 1);
+      debugc("[entails_path] : " << tmp << " != " << hv2_, 0);
 
       // search for the current node's targets
       fld_adj_listt::iterator it3 = (it2->second).find(tmp);
@@ -610,14 +642,11 @@ public :
 	continue;
 
       targetst targets = it3->second;
-      debugc("[entails_path] : add targets " << targets, 1);
-
-      //debugc("[entails_path] : targets = " << targets, 1);
+      debugc("[entails_path] : add targets " << targets, 0);
 
       for(targetst::iterator it4 = targets.begin(); it4 != targets.end(); ++it4) 
 	q.push_back(*it4);
 
-      //debugc("[entails_path] : queue = " << q, 0);
     }
 
     return false;
@@ -628,10 +657,10 @@ public :
     heapvar hv1_ = aliases.find(hv1);
     heapvar hv2_ = aliases.find(hv2);
 
-    debugc("[entails_not_path] : path(" << m << ", " << hv1 << ", " << hv2 << ", " << f << ")", 1);
-    debugc("[entails_not_path] : hv1_ = :" << hv1_, 1); 
-    debugc("[entails_not_path] : hv2_ = :" << hv2_, 1); 
-    debugc("[entails_not_path] : not_paths = :" << not_paths, 1); 
+    debugc("[entails_not_path] : path(" << m << ", " << hv1 << ", " << hv2 << ", " << f << ", false)", 1);
+    debugc("[entails_not_path] : hv1_ = :" << hv1_, 0); 
+    debugc("[entails_not_path] : hv2_ = :" << hv2_, 0); 
+    debugc("[entails_not_path] : not_paths = :" << not_paths, 0); 
 
     for(not_pathst::const_iterator it = not_paths.begin(); it != not_paths.end(); ++it) {
       heaplitp hl = *it;
@@ -655,7 +684,7 @@ public :
     return entails_literal(e->lit);
   }
 
-  entailResult::s entails(clauset* f, hintt* h) {
+  entailResult::s entails(clauset* f, solutiont& h) {
     meetIrreduciblep m;
     entailResult::s ret = entailResult::False;
 
@@ -671,7 +700,7 @@ public :
       case entailResult::Incomplete:
 	ret = entailResult::Incomplete;
 	// record the element as a hint
-	h->insert(std::make_pair(m, hintPriority::Low));
+	h.insert(m);
       default:;
       }
     }
