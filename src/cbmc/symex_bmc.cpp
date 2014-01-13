@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/location.h>
 #include <util/i2string.h>
 #include <util/xml.h>
-#include <goto-symex/goto_trace.h>
+#include <goto-programs/goto_trace.h>
 #include <goto-symex/build_goto_trace.h>
 #include <solvers/sat/satcheck.h>
 #include <solvers/sat/satcheck_minisat2.h>
