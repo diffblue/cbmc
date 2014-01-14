@@ -23,12 +23,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <langapi/language_util.h>
 
+#include <solvers/prop/literal.h>
 #include <solvers/flattening/boolbv_width.h>
 #include <solvers/flattening/flatten_byte_operators.h>
 
 #include "heap_conv.h"
 
 #define DEBUG 0
+#define SIMPLIFY 1
 
 /*******************************************************************\
 
@@ -3954,13 +3956,89 @@ Function: heap_convt::distribute
 
 \*******************************************************************/
 
-and_exprt heap_convt::distribute(const or_exprt &expr)
+void simplify_expr(exprt &expr)
 {
+  // std::cout << std::endl << "simplify_expr: " << expr << std::endl << std::endl;
+
+  if(expr.id()==ID_literal) return;
+  if(expr.id()==ID_or) 
+  {
+    for(exprt::operandst::iterator it = expr.operands().begin(); 
+              it!=expr.operands().end();it++) 
+      simplify_expr(*it);
+    exprt e = or_exprt();
+    forall_operands(it1, expr)  {
+      if(it1->id()==ID_literal) 
+      {
+        literalt l1 = to_literal_expr(*it1).get_literal();
+        if(l1.is_true()) { e = literal_exprt(const_literal(true)); break; }
+        if(!l1.is_false()) 
+        {
+          bool has_neg = false;
+          forall_operands(it2, expr)  {
+            if(it2->id()==ID_literal)
+	    {
+              literalt l2 = to_literal_expr(*it2).get_literal();
+              if(l1==!l2) { has_neg = true; break; }
+	    }
+          } 
+          if(!has_neg) e.operands().push_back(*it1);
+          else { e = literal_exprt(const_literal(true)); break; }
+        }
+      }
+      else e.operands().push_back(*it1); //not a literal
+    }
+    if(e.operands().size()==0) e = literal_exprt(const_literal(true)); 
+    //    std::cout << std::endl << "simplified expr: " << std::endl << expr << std::endl;
+    //    std::cout <<  "to" << std::endl << e << std::endl << std::endl;
+    expr.swap(e);
+    return;
+  }
+  if(expr.id()==ID_and) 
+  {
+    for(exprt::operandst::iterator it = expr.operands().begin(); 
+              it!=expr.operands().end();it++) 
+      simplify_expr(*it);
+    exprt e = and_exprt();
+    forall_operands(it1, expr)  {
+      if(it1->id()==ID_literal) 
+      {
+        literalt l1 = to_literal_expr(*it1).get_literal();
+        if(l1.is_false()) { e = literal_exprt(const_literal(false)); break; }
+        if(!l1.is_true()) 
+        {
+          bool has_neg = false;
+          forall_operands(it2, expr)  {
+            if(it2->id()==ID_literal)
+	    {
+              literalt l2 = to_literal_expr(*it2).get_literal();
+              if(l1==!l2) { has_neg = true; break; }
+	    }
+          } 
+          if(!has_neg) e.operands().push_back(*it1);
+          else { e = literal_exprt(const_literal(false)); break; }
+        }
+      }
+      else e.operands().push_back(*it1); //not a literal
+    }
+    if(e.operands().size()==0) e = literal_exprt(const_literal(false)); 
+    expr.swap(e);
+    return;
+  }
+}
+
+and_exprt heap_convt::distribute(const or_exprt &_expr)
+{
+  exprt expr = _expr;
+#if SIMPLIFY
+  simplify_expr(expr);
+#endif
+
 #if 0
   std::cout << std::endl << "distribute: " << expr << std::endl << std::endl;
 #endif
 
-  //distribute ((a1 /\ ... ) \/ (b1 ...) \/ ...) to (a1 \/ b1 \/ ...) \/ (a1 \/ b2 ...) ...
+  //distribute ((a1 /\ ... ) \/ (b1 ...) \/ ...) to (a1 \/ b1 \/ ...) /\ (a1 \/ b2 ...) ...
   and_exprt d_expr;
   forall_operands(it1, expr)  {
     if(it1->id()==ID_literal) {
@@ -3974,12 +4052,12 @@ and_exprt heap_convt::distribute(const or_exprt &expr)
     }
     else if(it1->id()==ID_and) 
     {
-      if(d_expr.operands().size()==0) { 
+      if(d_expr.operands().size()==0) { //no clauses yet
         forall_operands(it2, *it1) {
           d_expr.operands().push_back(*it2);
 	}
       }
-      else 
+      else //add to existing clauses
       {
         and_exprt new_d_expr;
         forall_operands(it3, *it1) 
@@ -4021,6 +4099,10 @@ and_exprt heap_convt::distribute(const or_exprt &expr)
       }
     }
   }
+
+#if SIMPLIFY
+  simplify_expr(d_expr);
+#endif
 
 #if 0
   std::cout << "distributed: " << d_expr << std::endl << std::endl;

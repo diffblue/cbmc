@@ -437,6 +437,7 @@ void goto_symext::symex_assign_member(
     heap_with_exprt new_rhs(lhs_struct, exprt(ID_member_name), 
       rhs,old_heap_id,new_heap_id);
     new_rhs.op1().set(ID_component_name, component_name);
+    replace_heap_member(new_rhs);
     exprt new_full_lhs=add_to_lhs(full_lhs, lhs);
     symex_assign_rec(
       state, lhs_struct, new_full_lhs, new_rhs, guard, visibility);

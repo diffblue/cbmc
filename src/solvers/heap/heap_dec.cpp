@@ -96,13 +96,19 @@ decision_proceduret::resultt heap_dect::dec_solve()
         heaplit* l = new eq_lit(v,heapexpr(std::string("NULL")),stateTrue);
         if(sol.entails_literal(l))
         {
+
+#if 0
           status() << "have " << id << "==NULL" << eom;
   	  status() << "type: " << ns.follow(it->second.type) << eom;
+#endif
+
           pointer_typet type = to_pointer_type(ns.follow(it->second.type));
           it->second.value = null_pointer_exprt(type);
         }
+#if 0
         else
           status() << "do not have " << id << "==NULL" << eom;
+#endif
       }
       else if(it->second.type.id()==ID_bool) 
       {
@@ -111,7 +117,10 @@ decision_proceduret::resultt heap_dect::dec_solve()
         if(heap_literal_map.find(l.var_no())==heap_literal_map.end()) continue;
         heaplit* hl = heap_literal_map[l.var_no()];
         if(sol.entails_literal(hl)) {
+#if 0
           status() << "have " << it->first << "==" << (hl->state==stateTrue) << eom;
+#endif
+
           if(hl->state==stateTrue)
             it->second.value = true_exprt(); 
           else
@@ -120,7 +129,10 @@ decision_proceduret::resultt heap_dect::dec_solve()
         else {
           hl->complement();
           if(sol.entails_literal(hl)) {
+#if 0
             status() << "have " << it->first << "==" << (hl->state==stateTrue) << eom;
+#endif
+
             if(hl->state==stateTrue)
               it->second.value = true_exprt(); 
             else
