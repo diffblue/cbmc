@@ -54,8 +54,10 @@ template <class abst, class transt, class heurt>
       upwardCompleteness::s refine (abst& abs, transt& trans, heurt& h) {
 	
       	debugc("Refine", 1);
-	trans.formula = trans.original_formula;
 
+	// reset
+	trans.formula = trans.original_formula;
+	trans.literal_table = trans.original_literal_table;
      	// Abstract
       	return h.interpolate(abs, trans);
       }
@@ -65,21 +67,28 @@ template <class abst, class transt, class heurt>
     	downwardCompleteness::s constructionResult;
     	upwardCompleteness::s refinementResult;
 
-	trans.original_formula = trans.formula;
 	//trans.simplify_formula(abs);
+	// backup
+	trans.original_formula = trans.formula;
+	trans.construct_literal_table();
+	trans.original_literal_table = trans.literal_table;
+
 	//debugc("[solve]: formula after simplification: " << trans.formula, 1);
 	
 	do {
           debugc("[solve]: reset", 1);
 	  abs.clear();
 	  trans.hint.clear();
+	  trans.precision_hint.clear();
+	  //trans.potential_unit_clauses.clear();
 	  
-	  //trans.reset = true;
+	  trans.reset = true;
 
 	  debugc("[solve]: hint after reset: " << trans.hint, 1);
 	  debugc("[solve]: trail after reset: " << abs.trail, 0);
+	  debugc("[solve] : literal_table = " << trans.literal_table, 1);
+
 	  constructionResult = construct(abs, trans, h);
-	  
 
 	  // print the trail;
 	  debugc("[solve]: trail after construction phase: " << abs.trail, 1);

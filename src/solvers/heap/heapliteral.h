@@ -1348,5 +1348,7 @@ class keyt {
 };
 */
 
+std::ostream& operator<< (std::ostream&, const literal_recordt&); 
+std::ostream& operator<< (std::ostream&, const literal_tablet&); 
 
 #endif

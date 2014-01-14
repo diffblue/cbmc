@@ -546,7 +546,7 @@ bool heaptrans::hint_heuristic(clauset*& c,  heapabs& sol) {
 
     for(clauset::iterator it1 = c->begin(); it1 != c->end(); ++it1) {
       if(**it1 == *(mi->lit) && sol.entails(mi) != entailResult::False) {
-	debugc("[hint_heuristic] : hint already inserted (1) " << mi, 0);
+	debugc("[hint_heuristic] : hint already inserted (1) " << mi, 1);
 	found_hint = true;
 	break;
       }
@@ -554,8 +554,8 @@ bool heaptrans::hint_heuristic(clauset*& c,  heapabs& sol) {
       if(pure_literal(mi->lit)) {
 	meetIrreduciblep negmi = copy_lit(mi);
 	negmi->complement();
-	if(**it1 == *(negmi->lit) && sol.entails(negmi) != entailResult::True) {
-	  debugc("[hint_heuristic] : hint already inserted (2) " << negmi, 0);
+	if(**it1 == *(negmi->lit) && sol.entails(negmi) == entailResult::Incomplete /*!= entailResult::True*/) {
+	  debugc("[hint_heuristic] : hint already inserted (2) " << negmi, 1);
 	  found_hint = true;
 	  break;
 	}
@@ -573,7 +573,6 @@ bool heaptrans::hint_heuristic(clauset*& c,  heapabs& sol) {
     // increment the weight
     ++(h.second);
     hint.erase(it);
-    debugc("hint " << *(h.first.begin()),1);
     debugc("[hint_heuristic] : hint already inserted " << h, 1);
     hint.insert(h);
     return true;
@@ -716,10 +715,10 @@ bool heaptrans::unit_clause (clauset*& c, heaplitp& unit, heapabs& sol) {
 	  newc->push_back((*c)[j]);
 	}
 
-	if(!hint_heuristic(c, sol)) {
+	//	if(!hint_heuristic(c, sol)) {
 	  // no appropriate hint exists
-	  set_hint(unit, c, sol);
- 	}
+	  //set_hint(unit, c, sol);
+	  //}
 
 	c = newc;
 	return false;
@@ -860,22 +859,75 @@ void heaptrans::insert_clause(clauset* c) {
 void heaptrans::construct_literal_table() {
   literal_tablet::iterator it_l;
 
-
   for(formulat::iterator it_f = formula.begin(); it_f != formula.end(); ++it_f) {
-    for(clauset::iterator it_c = (*it_f)->begin(); it_c != (*it_f)->end(); ++it_c) {
-      for(it_l = literal_table.begin(); it_l != literal_table.end(); ++it_l) {
-	if (**it_c == *(it_l->first)) {
-	  (it_l->second).push_back(*it_f);
+
+    // already a unit clause; hence, no need to record it
+    if((*it_f)->size() == 1)
+      continue;
+
+    add_to_literal_table(*it_f);
+
+    // for(clauset::iterator it_c = (*it_f)->begin(); it_c != (*it_f)->end(); ++it_c) {
+
+    //   // record only pure literals as only these can constitute decisions
+    //   if((*it_c)->type != EQ && (*it_c)->type != PATH && (*it_c)->type != ONPATH && (*it_c)->type != DANGLING) {
+    // 	debugc("[construct_literal_table] : impure lit " << **it_c, 0);
+    // 	continue;
+    //   }
+
+    //   heaplitp hl = (copy_lit(**it_c))->lit;
+    //   hl->complement();
+      
+    //   for(it_l = literal_table.begin(); it_l != literal_table.end(); ++it_l) {
+
+    // 	if (*hl == *(it_l->first)) {
+    // 	  (it_l->second).push_back(*it_f);
+    // 	  break;
+    // 	}
+    //   }
+
+    //   if(it_l == literal_table.end()) {
+    // 	debugc("[construct_literal_table] : not found literal" << *hl, 0);
+    // 	formulat clauses;
+    // 	clauses.push_back(*it_f);
+    // 	literal_recordt lr = std::make_pair(hl, clauses);
+    // 	literal_table.push_back(lr);
+    //   }
+    // }
+  }
+}
+
+void heaptrans::add_to_literal_table(clauset*& c) {
+    literal_tablet::iterator it_l;
+
+    for(clauset::iterator it_c = c->begin(); it_c != c->end(); ++it_c) {
+      // record only pure literals as only these can constitute decisions
+      if((*it_c)->type != EQ && (*it_c)->type != PATH && (*it_c)->type != ONPATH && (*it_c)->type != DANGLING) {
+	debugc("[construct_literal_table] : impure lit " << **it_c, 0);
+	continue;
+      }
+
+      heaplitp hl = (copy_lit(**it_c))->lit;
+      hl->complement();
+
+      //literal_tablet tmp_literal_table = literal_table;
+      for (it_l = literal_table.begin(); it_l != literal_table.end(); ++it_l) {
+
+	if (*hl == *(it_l->first)) {
+	  (it_l->second).push_back(c);
 	  break;
 	}
       }
 
       if(it_l == literal_table.end()) {
+	debugc("[construct_literal_table] : not found literal" << *hl, 0);
 	formulat clauses;
-	clauses.push_back(*it_f);
-	literal_recordt lr = std::make_pair(*it_c, clauses);
+	clauses.push_back(c);
+	literal_recordt lr = std::make_pair(hl, clauses);
+	literal_table.push_back(lr);
       }
     }
-  }
 
 }
+
+

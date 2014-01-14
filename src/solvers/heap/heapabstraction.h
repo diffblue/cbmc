@@ -76,7 +76,7 @@ public :
       }
     }
 
-    h = std::make_pair(new_hint, hintPriority::Low);
+    h = std::make_pair(new_hint, /*hintPriority::Low*/0);
     return ret;
   }
 

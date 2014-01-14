@@ -166,7 +166,6 @@ meetIrreduciblep copy_lit(const heaplit& lit) {
   }
 }
 
-
 heaplit* copy_lit(heaplit* lit) {
   switch (lit->type) {
   case PATH: return new path_lit(*lit);
@@ -265,3 +264,17 @@ std::ostream& operator<< (std::ostream& s, const not_pathst& np) {
   
   return s;
 }
+
+std::ostream& operator<< (std::ostream& s, const literal_recordt& lr) {
+  s << lr.first << " -> " << lr.second;
+
+  return s;
+}
+
+std::ostream& operator<< (std::ostream& s, const literal_tablet& lt) {
+  for(literal_tablet::const_iterator it = lt.begin(); it != lt.end(); ++it)
+    s << *it; 
+
+  return s;    
+} 
+

@@ -16,10 +16,14 @@ class heaptrans {
  public:
     downwardCompleteness::s gamma;
     hintst hint;
+    hintst precision_hint;
+
     formulat formula;
     formulat original_formula;    
 
+    literal_tablet original_literal_table;
     literal_tablet literal_table;
+    //formulat potential_unit_clauses;
     bool reset;
 
     // after full CBMC integration this can be removed
@@ -58,9 +62,9 @@ class heaptrans {
       debugc("[check_constraint] : constraint = " << *constraint, 1);
       debugc("[check_constraint] : add hint " << h, 1);
       gamma = downwardCompleteness::IncompleteTransformer;
-      debugc("[check_constraint] : (1) hints " << hint, 1); 
-      hint.insert(h);
-      debugc("[check_constraint] : (2) hints " << hint, 1);
+      debugc("[check_constraint] : (1) hints " << precision_hint, 1); 
+      precision_hint.insert(h);
+      debugc("[check_constraint] : (2) hints " << precision_hint, 1);
     }
 
     return res;
@@ -707,13 +711,58 @@ class heaptrans {
     return callAgain;
   }
 
+  bool apply_one_ded(heaplitp& unit, heapabs& sol) {
 
+    bool callAgain = false;
+
+    debugc("unit clause:" << unit, 1);
+    debugc("************************************************", 1);
+    debugc("Transformer " << unit << ":", 1);
+    debugc("************************************************", 1);
+    switch(unit->type) {
+    case PATH:
+      callAgain |= ded_path(unit, sol);;
+      break;
+    case ONPATH:
+      /* callAgain |= ded_onpath(unit, sol); */
+      break;
+    case NEW:
+      callAgain |= ded_new(unit, sol);
+      break;
+    case EQ:
+      callAgain |= ded_eq(unit, sol);
+      break;
+    case FREE:
+      callAgain |= ded_free(unit, sol);
+      break;
+    case STORE:
+      callAgain |= ded_store(unit, sol);
+      break;
+    case DANGLING:
+      callAgain |= ded_dangling(unit, sol);
+      break;
+    case MEMEQ:
+      callAgain |= ded_mem_eq(unit, sol);
+      break;
+    case NO_TERM:;
+    default:;  
+    }
+    debugc("sol = " << sol, 1);
+
+    inferenceRecord* ir = new inferenceRecord(new meetIrreducible(unit), this);
+    sol.trail.insert(ir);
+
+    return callAgain;
+  }
 
   // the main transformer
   transformerResult::s apply(heapabs& sol) {
     bool callAgain = false;
     gamma = downwardCompleteness::Complete;
     bool already_applied;
+    heaplitp unit;
+    bool unitb;
+
 
     /* if(reset) { */
     /*   simplify_formula(); */
@@ -722,66 +771,93 @@ class heaptrans {
 
     debugc("[apply]: solution = " << sol, 1);
     debugc("[apply]: formula size = " << formula.size(), 0);
+    debugc("[apply]: reset = " << reset, 0);
+
     for(unsigned int i = 0; i < formula.size(); ++i) {
-      heaplitp unit;
+      debugc("[apply] : current processed clause = " << *formula[i], 0);
+      unitb = false;
 
-      debugc("[apply] : check unit clause ", 0);
-      bool unitb = unit_clause(formula[i], unit, sol);
-
-      if(unitb) {
-	already_applied = false;
-	for(unsigned int j = 0; j < i; ++j) {
-	  if(formula[j]->size() == 1 && *(formula[i]) == *(formula[j])) {
-	    already_applied = true;
-	    debugc("[apply] : clause already applied", 1);
-	    break;
+      /*-- if(reset) { */
+      /*-- 	unitb = unit_clause(formula[i], unit, sol); */
+      /*-- 	debugc("[apply] : (1) unitb = " << unitb, 1); */
+      /*-- 	if(unitb) { */
+      /*-- 	  debugc("[apply] : unit = " << *unit, 1); */
+      /*-- 	} */
+      /*-- 	already_applied = false; */
+      /*-- } */
+      /*-- else { */
+	if (formula[i]->size() == 1) {
+	  unitb = true;
+	  unit = *(formula[i]->begin());
+      
+	  // simplification
+	  // checks whether the unit clause has already been applied
+	  // todo: can be removed once the formula is simplified to start with..
+	  already_applied = false;
+	  for(unsigned int j = 0; j < i; ++j) {
+	    if(formula[j]->size() == 1 && *(formula[i]) == *(formula[j])) {
+	      already_applied = true;
+	      debugc("[apply] : clause already applied", 1);
+	      break;
+	    }
 	  }
 	}
-      }
-      
-      if(unitb && !already_applied) {
-	debugc("unit clause: " << unitb << " => unit = " << unit, 1);
-	debugc("************************************************", 1);
-	debugc("Transformer " << unit << ":", 1);
-	debugc("************************************************", 1);
-	switch(unit->type) {
-	case PATH:
-	  callAgain |= ded_path(unit, sol);;
-	  break;
-	case ONPATH:
-	  /* callAgain |= ded_onpath(unit, sol); */
-	  break;
-	case NEW:
-	  callAgain |= ded_new(unit, sol);
-	  break;
-        case EQ:
-	  callAgain |= ded_eq(unit, sol);
-	  break;
-	case FREE:
-	  callAgain |= ded_free(unit, sol);
-	  break;
-	case STORE:
-	  callAgain |= ded_store(unit, sol);
-	  break;
-	case DANGLING:
-	  callAgain |= ded_dangling(unit, sol);
-	  break;
-	case MEMEQ:
-	  callAgain |= ded_mem_eq(unit, sol);
-	  break;
-	case NO_TERM:;
-	default:;  
-	}
-	debugc("sol = " << sol, 1);
 
-	// record it in the trail
-	//	if (transformer_ret == transformerResult::CallAgain) {
-	inferenceRecord* ir = new inferenceRecord(new meetIrreducible(unit), this);
-	sol.trail.insert(ir);
-	//}
-	  
+	debugc("[apply] : (2) unitb = " << unitb, 0);
+	//--}
+
+      
+      /* if(unitb) { */
+      /* 	already_applied = false; */
+      /* 	for(unsigned int j = 0; j < i; ++j) { */
+      /* 	  if(formula[j]->size() == 1 && *(formula[i]) == *(formula[j])) { */
+      /* 	    already_applied = true; */
+      /* 	    debugc("[apply] : clause already applied", 1); */
+      /* 	    break; */
+      /* 	  } */
+      /* 	} */
+      /* } */
+      
+      // unit clause application
+      if(unitb && !already_applied) {
+	debugc("[apply] : apply the transformer for " << unit, 0);
+	callAgain |= apply_one_ded(unit, sol);
       }
     }
+
+    /* if(!reset) { */
+    /*   for(formulat::iterator it = potential_unit_clauses.begin(); it != potential_unit_clauses.end(); ++it) { */
+    /* 	debugc("[apply] : try from literal_table " << **it, 1); */
+    /* 	if(unit_clause(*it, unit, sol)) */
+    /* 	  callAgain |= apply_one_ded(unit, sol); */
+    /*   } */
+    /* } */
+
+
+    debugc("[apply] : Checking the enabled clauses", 1);
+    literal_tablet tmp_literal_table;
+    for(literal_tablet::iterator it = literal_table.begin(); it != literal_table.end(); ++it) {
+      heaplitp hl = it->first;
+      meetIrreduciblep mi = new meetIrreducible(hl);
+      
+      switch(sol.entails(mi)) {
+      case entailResult::True:
+	// record enabled
+	for(formulat::iterator it1 = (it->second).begin(); it1 != (it->second).end(); ++it1) {
+	  if(unit_clause(*it1, unit, sol))
+	    callAgain |= apply_one_ded(unit, sol);
+	}
+	break;
+      case entailResult::False:
+	// clauses already satisfied
+	break;
+      default:
+	// keep the record
+	tmp_literal_table.push_back(*it);
+      }
+    }
+
+    literal_table = tmp_literal_table;
 
     debugc("transformerResult: " << (int)callAgain, 0);
 
@@ -800,6 +876,8 @@ class heaptrans {
     }
 
     debugc("[apply]: transformerResult::DoNotCallAgain", 1);
+    /* if(reset) */
+    /*   reset = false; */
     return transformerResult::DoNotCallAgain;
   }
 
@@ -1104,7 +1182,7 @@ class heaptrans {
   void simplify_formula (heapabs&);
 
   void construct_literal_table();
-
+  void add_to_literal_table(clauset*&);
 
 }; 
 

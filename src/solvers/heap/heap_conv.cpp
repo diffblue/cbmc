@@ -30,7 +30,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "heap_conv.h"
 
 #define DEBUG 0
-#define SIMPLIFY 1
+#define SIMPLIFY 0
 
 /*******************************************************************\
 
@@ -3589,8 +3589,22 @@ literalt heap_convt::convert_equality(const equal_exprt &expr)
       find_symbols(f);
       std::string op1 = convert_identifier(f.get_new_heap_id());
       std::string op2 = convert_identifier(f.get_old_heap_id());
-      std::string op3 = 
-        convert_identifier(to_symbol_expr(f.arguments()[0]).get_identifier());
+      std::string op3;
+      if(f.arguments()[0].id()==ID_symbol) {
+        op3 = convert_identifier(to_symbol_expr(f.arguments()[0]).get_identifier());
+      }
+      else //introduce auxiliary EQ
+      { 
+        heapexpr he = convert_heapexpr(f.arguments()[0]);
+        op3 = convert_identifier("heap::tmp"+i2string(++no_tmp_variables));
+        heaplit* hl2 = new eq_lit(heapvar(op3),he,stateTrue);
+        heap_literal_map[++no_boolean_variables] = hl2;
+
+#if DEBUG
+         std::cout << "adding heaplit " << no_boolean_variables << " = " << 
+            *hl2 << std::endl;
+#endif
+     }
 
       heaplit* hl = 
         new free_lit(heapvar(op1),heapvar(op2),heapvar(op3),stateTrue);
@@ -3600,8 +3614,21 @@ literalt heap_convt::convert_equality(const equal_exprt &expr)
       std::cout << "adding heaplit " << no_boolean_variables << " = " << 
         *hl << std::endl;
 #endif
-        
-      return literalt(no_boolean_variables,false); 
+      
+      if(f.arguments()[0].id()!=ID_symbol)
+      {
+        literalt l(++no_boolean_variables,false);
+        literal_map[l] = and_exprt(
+          literal_exprt(literalt(no_boolean_variables-1,false)),
+          literal_exprt(literalt(no_boolean_variables-2,false)));
+
+#if DEBUG
+          std::cout << "adding literal " << l << " = " << literal_map[l] << std::endl;
+#endif
+
+        return l;
+      }
+      else return literalt(no_boolean_variables,false); 
     }
 
     assert(false);
@@ -4228,6 +4255,11 @@ void heap_convt::set_to(const exprt &expr, bool value)
   {
     assert(!expr.has_operands());
     literalt l = to_literal_expr(expr).get_literal();
+    if(l.is_constant()) {
+      if(!value) l.invert();
+      if(l.is_false()) throw "UNSAT: empty clause";
+      return;
+    }
     if(heap_literal_map.find(l.var_no())!=heap_literal_map.end())
     {
       clauset* clause = new clauset(); 
@@ -4245,7 +4277,7 @@ void heap_convt::set_to(const exprt &expr, bool value)
       return;
     }
     if(literal_map.find(l)!=literal_map.end())
-      {
+    {
 
 #if 0
       std::cout << "building cnf for " << l << std::endl;
