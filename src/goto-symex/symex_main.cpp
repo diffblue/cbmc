@@ -90,6 +90,7 @@ void goto_symext::symex_assume(statet &state, const exprt &cond)
   exprt simplified_cond=cond;
 
   do_simplify(simplified_cond);
+  replace_heap_member(simplified_cond);
 
   if(simplified_cond.is_true()) return;
 

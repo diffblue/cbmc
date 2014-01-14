@@ -77,9 +77,13 @@ void goto_symext::replace_heap_member(exprt &expr)
 {
   if(expr.id()==ID_member && is_heap_type(expr.type()))
   {
-    struct_typet struct_type = to_struct_type(ns.follow(expr.type().subtype()));
+    //    std::cout  << std::endl << "replace_heap_member: " << expr << std::endl;
+    struct_typet struct_type;
+    if(expr.type().id()==ID_pointer) struct_type = to_struct_type(ns.follow(expr.type().subtype()));
+    else struct_type = to_struct_type(ns.follow(expr.type()));
     member_exprt struct_expr = to_member_expr(expr);
     irep_idt heap_id = make_heap_id(struct_type.get_tag());
+    replace_heap_member(struct_expr.struct_op());
     heap_member_exprt hexpr(struct_expr.struct_op());
     hexpr.set_component_name(struct_expr.get_component_name());
     hexpr.location()=expr.location();

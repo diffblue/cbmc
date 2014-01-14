@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <iostream>
+
 #include <util/expr_util.h>
 #include <util/pointer_offset_size.h>
 #include <util/arith_tools.h>
@@ -224,8 +226,8 @@ void goto_symext::dereference_rec(
 
     //quick deference hack for heap theory
     expr.swap(expr.op0());
-    if(expr.type().id()==ID_pointer) 
-      expr.type() = ns.follow(expr.type().subtype());
+    if(expr.type().id()==ID_pointer) expr.type() = ns.follow(expr.type().subtype());
+    dereference_rec(expr, state, guard, false);
     return; //done for heap 
 
     //TODO

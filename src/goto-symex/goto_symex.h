@@ -272,7 +272,7 @@ protected:
 
   //heap theory
   virtual bool is_heap_type(typet type) { return false; }
-  irep_idt make_heap_id(irep_idt tag) { return id2string(tag)+"heap"+i2string(heap_counter); }
+  irep_idt make_heap_id(irep_idt tag) { return /*id2string(tag)+*/"heap"+i2string(heap_counter); }
   void replace_heap_member(exprt &expr);
 
 };
