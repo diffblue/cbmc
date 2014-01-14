@@ -862,8 +862,10 @@ void heaptrans::construct_literal_table() {
   for(formulat::iterator it_f = formula.begin(); it_f != formula.end(); ++it_f) {
 
     // already a unit clause; hence, no need to record it
-    if((*it_f)->size() == 1)
+    if((*it_f)->size() == 1) {
+      unit_clauses.push_back(*((*it_f)->begin()));
       continue;
+    }
 
     add_to_literal_table(*it_f);
 

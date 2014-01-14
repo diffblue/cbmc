@@ -56,8 +56,10 @@ template <class abst, class transt, class heurt>
       	debugc("Refine", 1);
 
 	// reset
+	trans.unit_clauses = trans.original_unit_clauses;
 	trans.formula = trans.original_formula;
 	trans.literal_table = trans.original_literal_table;
+
      	// Abstract
       	return h.interpolate(abs, trans);
       }
@@ -72,6 +74,7 @@ template <class abst, class transt, class heurt>
 	trans.original_formula = trans.formula;
 	trans.construct_literal_table();
 	trans.original_literal_table = trans.literal_table;
+	trans.original_unit_clauses = trans.unit_clauses;
 
 	//debugc("[solve]: formula after simplification: " << trans.formula, 1);
 	

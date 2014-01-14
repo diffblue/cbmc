@@ -39,6 +39,7 @@ class heapheuristics {
       // backup
       trans.original_formula = trans.formula;
       trans.original_literal_table = trans.literal_table;
+      trans.original_unit_clauses = trans.unit_clauses;
       debugc("[interpolate]: formula after interpolation = " << trans.formula, 1); 
       return upwardCompleteness::Complete;
     }
@@ -257,6 +258,22 @@ class heapheuristics {
     return hint;
   }
   
+  // return the weight for !hl
+  unsigned int get_weight_neg(heaptrans& trans, heaplitp hl) {
+    
+    meetIrreduciblep mi = copy_lit(*hl);
+    mi->complement();
+
+    for(literal_tablet::const_iterator lt_it = trans.literal_table.begin(); lt_it != trans.literal_table.end(); ++ lt_it) 
+      if(*(mi->lit) == *(lt_it->first)) {
+	delete mi;
+	return (lt_it->second).size(); 
+      }
+
+    delete mi;
+    return 0;
+  }
+
   hintt get_next_hint2(heapabs& abs, heaptrans& trans, downwardCompleteness::s complete) {
     hintt hint;
     bool firsthint = false;
@@ -309,44 +326,22 @@ class heapheuristics {
     }
     else {
 
-      int max_priority = 0;
-      for(literal_tablet::const_iterator lt_it = trans.literal_table.begin(); lt_it != trans.literal_table.end(); ++ lt_it) {
-	//for(hintst::iterator it = trans.hint.begin(); it != trans.hint.end(); ++it) {
-  	solutiont new_hint;
+      unsigned int max_priority = 0;
+      debugc("[get_next_hint2] : literal_table = " << trans.literal_table, 1);
       
-	//debugc("[get_next_hint] : hint = " << it->first, 0);
-	//candidate_hint = false;
+      for(literal_tablet::const_iterator lt_it = trans.literal_table.begin(); lt_it != trans.literal_table.end(); ++ lt_it) {
+  	solutiont new_hint;
+	unsigned int w;
 
-	// compute its weight
-	unsigned int w = 0;
-	//for(literal_tablet::const_iterator lt_it = trans.literal_table.begin(); lt_it != trans.literal_table.end(); ++ lt_it) {
-	//if(*(lt_it->first) == *((*((it->first).begin()))->lit)) {
-	    w = (lt_it->second).size(); 
-	    //  break;
-	    //}
-	    //}
+	w = (lt_it->second).size() + get_weight_neg(trans, lt_it->first); 
+	debugc("[get_net_hint2] : current weight = " << w, 1);
       
 	if(w > max_priority || !firsthint) {
-	  // some preceding decision might have rendered the hint or some of its conjuncts obsolete
-	  //for(solutiont::iterator it1 = (it->first).begin(); it1 != (it->first).end(); ++it1) {
-	  //--  debugc("[get_next_hint] : hint conjunct = " << *it1, 1);
-	
-	      //--entailResult::s ret1 = abs.entails(*it1);
-
-	      //--    if (ret1 == entailResult::Incomplete) {
-	      // candidate hints
-	        meetIrreduciblep mi = copy_lit(*(lt_it->first));
-		new_hint.insert(mi);
-		candidate_hint = true;
-	  //--  debugc("[get_next_hint] : candidate = " << *it1, 1);
-	  // --  debugc("[get_next_hint] : tmp hint = " << new_hint, 1);
-		//-- }
-
-		//}
+	  meetIrreduciblep mi = copy_lit(*(lt_it->first));
+	  new_hint.insert(mi);
+	  candidate_hint = true;
 
 	  if (!firsthint) {
-	  //	  if (candidate_hint && !firsthint) {
-	    // a possible hint if case all the priorities are 0
 	    max_priority = w;
 	    hint = std::make_pair(new_hint, w);
 	    firsthint = true;
@@ -354,18 +349,16 @@ class heapheuristics {
 	
 	  // the desired priority?
 	  if (w > max_priority) {
-	  //if (candidate_hint && w > max_priority) {
 	    max_priority = w;
 	    hint = std::make_pair(new_hint, w);
-	    debugc("[get_next_hint2] : found hint " << hint, 1);
-	    //return hint;
+	    debugc("[get_next_hint2] : found hint with higher weight" << hint, 1);
 	  }
 	}
       }
 
+      assert(firsthint == true);
     }
 
-    assert(firsthint == true);
     // ----no other option but returning a different priority hint
     debugc("[get_next_hint2] : hint = " << hint, 1);
     return hint;

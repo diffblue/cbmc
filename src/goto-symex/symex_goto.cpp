@@ -7,6 +7,7 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <cassert>
+#include <iostream>
 
 #include <util/expr_util.h>
 #include <util/std_expr.h>
@@ -176,7 +177,7 @@ Function: goto_symext::symex_step_goto
 
  Outputs:
 
- Purpose:
+ Purpose: NOT USED
 
 \*******************************************************************/
 

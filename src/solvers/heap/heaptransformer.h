@@ -21,6 +21,9 @@ class heaptrans {
     formulat formula;
     formulat original_formula;    
 
+    clauset unit_clauses;
+    clauset original_unit_clauses;
+
     literal_tablet original_literal_table;
     literal_tablet literal_table;
     //formulat potential_unit_clauses;
@@ -622,7 +625,16 @@ class heaptrans {
 	callAgain |= sol.add_path(mnew, v3, v4, fpath, stateFalse);
       }
     }
-    
+
+    for(sel_eqst::iterator it = sol.sel_eqs.begin(); it != sol.sel_eqs.end(); ++it) 
+      if((it->second).m == m)
+	callAgain |= sol.add_eq(it->first, heapexpr((it->second).v, mnew, (it->second).f), stateTrue);
+
+    for(not_eqst::iterator it = sol.not_eqs.begin(); it != sol.not_eqs.end(); ++it) 
+      if((it->second).is_sel() && (it->second).m == m)
+	callAgain |= sol.add_eq(it->first, heapexpr((it->second).v,  mnew, (it->second).f), stateFalse);
+
+
     if (callAgain) {
       debugc("[ded_mem_eq]: transformerResult::CallAgain", 1);
     }
@@ -777,62 +789,36 @@ class heaptrans {
       debugc("[apply] : current processed clause = " << *formula[i], 0);
       unitb = false;
 
-      /*-- if(reset) { */
-      /*-- 	unitb = unit_clause(formula[i], unit, sol); */
-      /*-- 	debugc("[apply] : (1) unitb = " << unitb, 1); */
-      /*-- 	if(unitb) { */
-      /*-- 	  debugc("[apply] : unit = " << *unit, 1); */
-      /*-- 	} */
-      /*-- 	already_applied = false; */
-      /*-- } */
-      /*-- else { */
-	if (formula[i]->size() == 1) {
-	  unitb = true;
-	  unit = *(formula[i]->begin());
+    	if (formula[i]->size() == 1) {
+    	  unitb = true;
+    	  unit = *(formula[i]->begin());
       
-	  // simplification
-	  // checks whether the unit clause has already been applied
-	  // todo: can be removed once the formula is simplified to start with..
-	  already_applied = false;
-	  for(unsigned int j = 0; j < i; ++j) {
-	    if(formula[j]->size() == 1 && *(formula[i]) == *(formula[j])) {
-	      already_applied = true;
-	      debugc("[apply] : clause already applied", 1);
-	      break;
-	    }
-	  }
-	}
+    	  // simplification
+    	  // checks whether the unit clause has already been applied
+    	  // todo: can be removed once the formula is simplified to start with..
+    	  already_applied = false;
+    	  for(unsigned int j = 0; j < i; ++j) {
+    	    if(formula[j]->size() == 1 && *(formula[i]) == *(formula[j])) {
+    	      already_applied = true;
+    	      debugc("[apply] : clause already applied", 1);
+    	      break;
+    	    }
+    	  }
+    	}
 
-	debugc("[apply] : (2) unitb = " << unitb, 0);
-	//--}
-
-      
-      /* if(unitb) { */
-      /* 	already_applied = false; */
-      /* 	for(unsigned int j = 0; j < i; ++j) { */
-      /* 	  if(formula[j]->size() == 1 && *(formula[i]) == *(formula[j])) { */
-      /* 	    already_applied = true; */
-      /* 	    debugc("[apply] : clause already applied", 1); */
-      /* 	    break; */
-      /* 	  } */
-      /* 	} */
-      /* } */
+    	debugc("[apply] : (2) unitb = " << unitb, 0);
       
       // unit clause application
       if(unitb && !already_applied) {
-	debugc("[apply] : apply the transformer for " << unit, 0);
-	callAgain |= apply_one_ded(unit, sol);
+    	debugc("[apply] : apply the transformer for " << unit, 0);
+    	callAgain |= apply_one_ded(unit, sol);
       }
     }
 
-    /* if(!reset) { */
-    /*   for(formulat::iterator it = potential_unit_clauses.begin(); it != potential_unit_clauses.end(); ++it) { */
-    /* 	debugc("[apply] : try from literal_table " << **it, 1); */
-    /* 	if(unit_clause(*it, unit, sol)) */
-    /* 	  callAgain |= apply_one_ded(unit, sol); */
-    /*   } */
-    /* } */
 
+    debugc("[apply] : Apply the unit clauses already computed: ", 1);
+    for(clauset::iterator it = unit_clauses.begin(); it != unit_clauses.end(); ++it)
+      callAgain |= apply_one_ded(*it, sol);
 
     debugc("[apply] : Checking the enabled clauses", 1);
     literal_tablet tmp_literal_table;
@@ -844,8 +830,11 @@ class heaptrans {
       case entailResult::True:
 	// record enabled
 	for(formulat::iterator it1 = (it->second).begin(); it1 != (it->second).end(); ++it1) {
-	  if(unit_clause(*it1, unit, sol))
+	  if(unit_clause(*it1, unit, sol)) {
 	    callAgain |= apply_one_ded(unit, sol);
+	    unit_clauses.push_back(unit);
+	  }
+	  
 	}
 	break;
       case entailResult::False:
