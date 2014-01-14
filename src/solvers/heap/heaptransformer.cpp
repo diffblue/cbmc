@@ -857,6 +857,7 @@ void heaptrans::insert_clause(clauset* c) {
 }
 
 void heaptrans::construct_literal_table() {
+  literal_table.clear();
   literal_tablet::iterator it_l;
 
   for(formulat::iterator it_f = formula.begin(); it_f != formula.end(); ++it_f) {
