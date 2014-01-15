@@ -33,6 +33,8 @@ public :
     aliases.clear();
     adj_list.clear();
     sel_eqs.clear();
+    not_eqs.clear();
+    not_paths.clear();
   }
 
   entailResult::s entails(const meetIrreduciblep& e) {
