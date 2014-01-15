@@ -3682,8 +3682,8 @@ literalt heap_convt::convert_equality(const equal_exprt &expr)
       if(hid1!=hid2)
       { //generate if then else for heap ids
 	std::string hid0 = convert_identifier(expr.lhs().get(ID_new_heap_id));
-        heaplit* hli2 = new eq_lit(heapvar(hid0),heapexpr(hid1),stateTrue);
-        heaplit* hle2 = new eq_lit(heapvar(hid0),heapexpr(hid2),stateTrue);
+        heaplit* hli2 = new mem_eq_lit(heapvar(hid0),heapvar(hid1),stateTrue);
+        heaplit* hle2 = new mem_eq_lit(heapvar(hid0),heapvar(hid2),stateTrue);
 	unsigned li2 = ++no_boolean_variables;
 	unsigned le2 = ++no_boolean_variables;
 	heap_literal_map[li2] = hli2;

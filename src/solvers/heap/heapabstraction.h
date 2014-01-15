@@ -613,6 +613,8 @@ public :
 
     if(he2.is_sel()) {
       debugc("[is_eq/sel] : sel_eqs = " << sel_eqs, 0);
+      heapvar m_ = aliases.find(he2.m);
+      debugc("[is_eq/sel] : m_ = " << m_, 1);
       not_eqt hl = std::make_pair(he1_, heapexpr(he2_, he2.m, he2.f));
       return sel_eqs.find(hl) != sel_eqs.end();
     }
@@ -627,6 +629,7 @@ public :
     // find the representatives
     heapvar he1_ = aliases.find(he1);
     heapvar he2_ = aliases.find(he2.v);
+    heapvar m_ = aliases.find(he2.m);
 
     debugc("[entails_not_eq] : he1 = " << he1_ << " and he2 = " << he2_, 0);
 
