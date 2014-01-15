@@ -11,5 +11,6 @@ std::ostream& operator<< (std::ostream& s, const heapabs& sol) {
   return s;
 }
 
+
 std::ostream& operator<< (std::ostream&, const std::vector< meetIrreduciblep >&); 
 

@@ -3,6 +3,7 @@
 **
 ** A heap abstraction. 
 **
+**
 */
 
 #include "heapliteral.h"
@@ -605,13 +606,12 @@ public :
   }
 
   bool entails_eq(const heapvar he1, const heapexpr he2) {
-    heapvar m_ = aliases.find(he2.m);
     heapvar he2_ = aliases.find(he2.v);
     heapvar he1_ = aliases.find(he1);
 
     if(he2.is_sel()) {
-      debugc("[is_eq/sel] : sel_eqs = " << sel_eqs, 1);
-      not_eqt hl = std::make_pair(he1_, heapexpr(he2_, m_, he2.f));
+      debugc("[is_eq/sel] : sel_eqs = " << sel_eqs, 0);
+      not_eqt hl = std::make_pair(he1_, heapexpr(he2_, he2.m, he2.f));
       return sel_eqs.find(hl) != sel_eqs.end();
     }
 
@@ -623,14 +623,13 @@ public :
     debugc("[entails_not_eq] : he1 = " << he1 << " and he2 = " << he2, 0);
 
     // find the representatives
-    heapvar m_ = aliases.find(he2.m);
     heapvar he1_ = aliases.find(he1);
     heapvar he2_ = aliases.find(he2.v);
 
     debugc("[entails_not_eq] : he1 = " << he1_ << " and he2 = " << he2_, 0);
 
     for(not_eqst::const_iterator it = not_eqs.begin(); it != not_eqs.end(); ++it) {
-      if (it->first == he1_ && it->second == heapexpr(he2_, m_, he2.f))
+      if (it->first == he1_ && it->second == heapexpr(he2_, he2.m, he2.f))
 	return true;
       if (!he2.is_sel() && it->first == he2_ && it->second == heapexpr(he1_))
 	return true;

@@ -1,5 +1,6 @@
 #include "heapliteral.h"
 
+
 domaint mode;
 
 std::ostream& operator<< (std::ostream& s, const heapvar& v) {

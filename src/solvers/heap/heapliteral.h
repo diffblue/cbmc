@@ -10,6 +10,8 @@
 #ifndef TRP_HEAPLIT
 #define TRP_HEAPLIT
 
+
+
 /** heap theory terms **/
 typedef enum { NO_TERM = 0,
                NEW = 1,     // e.g. m' = new(m,x); --> m' is the memory configuration obtained from m after allocating a new memory location pointed by x

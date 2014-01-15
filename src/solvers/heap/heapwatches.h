@@ -1,4 +1,3 @@
-//#include "heaputil.h"
 #include "heapabstraction.h"
 
 #ifndef HEAPWATCHES

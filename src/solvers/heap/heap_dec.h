@@ -29,7 +29,6 @@ public:
   // this is not yet incremental
   virtual bool has_set_assumptions() const { return false; }
   
-protected:
 };
 
 #endif

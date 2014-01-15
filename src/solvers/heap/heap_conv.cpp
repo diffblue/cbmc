@@ -3403,6 +3403,7 @@ Function: heap_convt::convert_equality
 heapexpr heap_convt::convert_heapexpr(const exprt &expr)
 {
   find_symbols(expr);
+
   if(expr.id()==ID_typecast) 
   {  //ignore
     return convert_heapexpr(expr.op0()); 
