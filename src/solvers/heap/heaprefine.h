@@ -22,6 +22,7 @@ template <class abst, class transt, class heurt>
       	do {
       	  do {
       	    res = trans.apply(abs);
+	    //assert(trans.literal_table.size() > 0);
 	    
       	    if (res & transformerResult::Bottom) {
 	      debugc("[construct]: exit with Bottom", 1);
@@ -30,6 +31,8 @@ template <class abst, class transt, class heurt>
 	    
       	  } while (res & transformerResult::CallAgain);
 	  
+	  //assert(trans.literal_table.size() > 0);
+
       	  // Check completeness
       	  completeness = trans.isComplete(abs);
       	  if (completeness == downwardCompleteness::Complete) {

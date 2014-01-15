@@ -167,6 +167,7 @@ class heapheuristics {
     hintt decision;
 
     debugc("Extrapolate", 1);
+    debugc("[extrapolate]: literal_table extrapolation = " << trans.literal_table, 1);
     assert (trans.literal_table.size() > 0 || trans.precision_hint.size() > 0);
 
     //debugc("[extrapolate]: hint before extrapolation = " << trans.hint, 0);

@@ -776,6 +776,8 @@ class heaptrans {
     heaplitp unit;
     bool unitb;
 
+    //assert(literal_table.size() > 0);
+
     debugc("[apply]: solution = " << sol, 1);
     debugc("[apply]: formula size = " << formula.size(), 0);
 
@@ -784,11 +786,21 @@ class heaptrans {
       callAgain |= apply_one_ded(*it, sol);
 
     debugc("[apply] : Check the enabled clauses: ", 1);
+
     literal_tablet tmp_literal_table;
+    tmp_literal_table.clear();
+
+    //assert(literal_table.size() > 0);
+    assert(tmp_literal_table.size() == 0);
+
+    //bool keep_record = false;
+
     for(literal_tablet::iterator it = literal_table.begin(); it != literal_table.end(); ++it) {
       heaplitp hl = it->first;
       meetIrreduciblep mi = new meetIrreducible(hl);
-      
+      //formulat tmp_literal_record;
+      //tmp_literal_record.clear();
+
       switch(sol.entails(mi)) {
       case entailResult::True:
 	// enabled
@@ -805,20 +817,40 @@ class heaptrans {
 	    }
 
 	    unit_clauses.push_back(unit);
-	  }
+	   }
+	  /*else {
+	    tmp_literal_record.push_back(*it1);
+	    }*/
 	  
 	}
+	// still clauses to be watched for the current literal
+	/*	if(tmp_literal_record.size() > 0) {
+	  // create a new record
+	  literal_recordt lr = std::make_pair(hl, tmp_literal_record);
+	  tmp_literal_table.push_back(lr);
+	  keep_record = true;
+	  }*/
+
 	break;
       case entailResult::False:
 	// clauses already satisfied
 	break;
       default:
 	// keep the record
+	debugc("[apply] : keep record " << *it, 1);
 	tmp_literal_table.push_back(*it);
+	//assert(tmp_literal_table.size() > 0);
+	//keep_record = true;
       }
     }
 
+    //assert(!(tmp_literal_table.size() == 0 && keep_record));
+    
+    //assert(tmp_literal_table.size() > 0);
+
     literal_table = tmp_literal_table;
+
+    //assert(literal_table.size() > 0);
 
     debugc("transformerResult: " << (int)callAgain, 0);
 
@@ -841,7 +873,7 @@ class heaptrans {
 
 
   // gamma completeness depends on both the abstraction and the transformers
-  downwardCompleteness::s isComplete(const heapabs& sol) const {
+  downwardCompleteness::s isComplete(heapabs& sol) const {
     bool satisfied = true;
    
     debugc("[isComplete]: gamma completeness check ", 1);
@@ -851,13 +883,25 @@ class heaptrans {
       debugc("[isComplete]: now trying clause " << **it1, 1);
       debugc("[isComplete]: trail = " << sol.trail, 1);
       for(clauset::const_iterator it2 = (*it1)->begin(); it2 != (*it1)->end(); ++it2) {
-      	if (satisfied)
-      	  break;
-	for(trailt::const_iterator it3 = sol.trail.begin(); it3 != sol.trail.end(); ++it3) {
-	  if (**it2 == *((*it3)->inference->lit)) {
-	    debugc("[isComplete]: clause satisfied: " << **it1, 1);
+      	//if (satisfied)
+	//break;
+
+	heaplitp hl = *it2;
+	if(hl->type == EQ || hl->type == PATH || hl->type == ONPATH || hl->type == DANGLING) {
+	  // check if the literal is true
+	  if(sol.entails_literal(hl)) {
 	    satisfied = true;
 	    break;
+	  }
+	}
+	else {
+	  // check if the clause was applied
+	  for(trailt::const_iterator it3 = sol.trail.begin(); it3 != sol.trail.end(); ++it3) {
+	    if (**it2 == *((*it3)->inference->lit)) {
+	      debugc("[isComplete]: clause satisfied: " << **it1, 1);
+	      satisfied = true;
+	      break;
+	    }
 	  }
 	}
       }

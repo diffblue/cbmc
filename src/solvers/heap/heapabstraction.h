@@ -612,11 +612,13 @@ public :
 
   bool entails_not_eq(const heapvar he1, const heapexpr he2) {
 
-    //debugc("[entails_not_eq] : he1 = " << he1 << " and he2 = " << he2, 1);
+    debugc("[entails_not_eq] : he1 = " << he1 << " and he2 = " << he2, 1);
 
     // find the representatives
     heapvar he1_ = aliases.find(he1);
     heapvar he2_ = aliases.find(he2.v);
+
+    debugc("[entails_not_eq] : he1 = " << he1_ << " and he2 = " << he2_, 1);
 
     for(not_eqst::const_iterator it = not_eqs.begin(); it != not_eqs.end(); ++it) {
       if (it->first == he1_ && it->second == heapexpr(he2_, he2.m, he2.f))
