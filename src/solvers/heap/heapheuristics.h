@@ -47,217 +47,6 @@ class heapheuristics {
     return upwardCompleteness::Top;
   }
 
-  hintt get_next_hint(heapabs& abs, heaptrans& trans, downwardCompleteness::s complete) {
-    hintt hint;
-    bool firsthint = false;
-    bool candidate_hint;
-
-    debugc("[get_next_hint] : hints = " << trans.hint, 1);
-
-    // propositional incompleteness or imprecise transformer?
-    hintPriority::s hintp = (complete == downwardCompleteness::IncompleteProp) ? hintPriority::High : hintPriority::Low;
-
-    debugc("[get_next_hint]", 0);
-
-    if(hintp == hintPriority::Low) {
-      debugc("[get_next_hint] : looking for a precision hint", 1);
-      
-      assert(trans.precision_hint.size() > 0);
-
-      for(hintst::iterator it = trans.precision_hint.begin(); it != trans.precision_hint.end(); ++it) {
-	solutiont new_hint;
-      
-	debugc("[get_next_hint] : precision hint = " << it->first, 0);
-	candidate_hint = false;
-      
-	// some preceding decision might have rendered the hint or some of its conjuncts obsolete
-	for(solutiont::iterator it1 = (it->first).begin(); it1 != (it->first).end(); ++it1) {
-	  debugc("[get_next_hint] : hint conjunct = " << *it1, 1);
-	
-	  entailResult::s ret1 = abs.entails(*it1);
-
-	  if (ret1 == entailResult::Incomplete) {
-	      // candidate hints
-	      new_hint.insert(*it1);
-	      candidate_hint = true;
-	      debugc("[get_next_hint] : precision candidate = " << *it1, 1);
-	  }
-
-	}
-
-	// found a hint?
-	if (candidate_hint) {
-	  hint = std::make_pair(new_hint, it->second);
-	  debugc("[get_next_hint] : (1) found precision hint " << hint, 1);
-	  return hint;
-	}
-      }
-      
-      // reaching here means that there is no adequate hint
-      assert(false);
-
-    }
-    else {
-
-      int max_priority = 0;
-      for(hintst::iterator it = trans.hint.begin(); it != trans.hint.end() /*&& !candidate_hint*/; ++it) {
-	solutiont new_hint;
-      
-	debugc("[get_next_hint] : hint = " << it->first, 0);
-	candidate_hint = false;
-      
-	if(it->second > max_priority || !firsthint) {
-	  // some preceding decision might have rendered the hint or some of its conjuncts obsolete
-	  for(solutiont::iterator it1 = (it->first).begin(); it1 != (it->first).end(); ++it1) {
-	    debugc("[get_next_hint] : hint conjunct = " << *it1, 1);
-	
-	    entailResult::s ret1 = abs.entails(*it1);
-
-	    if (ret1 == entailResult::Incomplete) {
-	      // candidate hints
-	      new_hint.insert(*it1);
-	      candidate_hint = true;
-	      debugc("[get_next_hint] : candidate = " << *it1, 1);
-	      debugc("[get_next_hint] : tmp hint = " << new_hint, 1);
-	    }
-
-	  }
-
-	  if (candidate_hint && !firsthint) {
-	    // a possible hint if case all the priorities are 0
-	    max_priority = it->second;
-	    hint = std::make_pair(new_hint, it->second);
-	    firsthint = true;
-	  }
-	
-	  // the desired priority?
-	  if (candidate_hint && /*it->second == hintp*/ it->second > max_priority) {
-	    max_priority = it->second;
-	    hint = std::make_pair(new_hint, it->second);
-	    debugc("[get_next_hint] : (1) found hint with higher priority " << hint, 1);
-	    //return hint;
-	  }
-	}
-      }
-    
-      assert(firsthint == true);
-    }
-
-    // ----no other option but returning a different priority hint
-    debugc("[get_next_hint] : (2) hint = " << hint, 1);
-    return hint;
-  }
-
-  hintt get_next_hint1(heapabs& abs, heaptrans& trans, downwardCompleteness::s complete) {
-    hintt hint;
-    bool firsthint = false;
-    bool candidate_hint;
-
-    debugc("[get_next_hint] : hints = " << trans.hint, 1);
-
-    // propositional incompleteness or imprecise transformer?
-    hintPriority::s hintp = (complete == downwardCompleteness::IncompleteProp) ? hintPriority::High : hintPriority::Low;
-
-    debugc("[get_next_hint]", 0);
-
-    if(hintp == hintPriority::Low) {
-      debugc("[get_next_hint] : looking for a precision hint", 1);
-      
-      assert(trans.precision_hint.size() > 0);
-
-      for(hintst::iterator it = trans.precision_hint.begin(); it != trans.precision_hint.end(); ++it) {
-	solutiont new_hint;
-      
-	debugc("[get_next_hint] : precision hint = " << it->first, 0);
-	candidate_hint = false;
-      
-	// some preceding decision might have rendered the hint or some of its conjuncts obsolete
-	for(solutiont::iterator it1 = (it->first).begin(); it1 != (it->first).end(); ++it1) {
-	  debugc("[get_next_hint] : hint conjunct = " << *it1, 1);
-	
-	  entailResult::s ret1 = abs.entails(*it1);
-
-	  if (ret1 == entailResult::Incomplete) {
-	      // candidate hints
-	      new_hint.insert(*it1);
-	      candidate_hint = true;
-	      debugc("[get_next_hint] : precision candidate = " << *it1, 1);
-	  }
-
-	}
-
-	// found a hint?
-	if (candidate_hint) {
-	  hint = std::make_pair(new_hint, it->second);
-	  debugc("[get_next_hint] : (1) found precision hint " << hint, 1);
-	  return hint;
-	}
-      }
-     
-      // reaching here means that there is no adequate hint
-      assert(false);
-
-    }
-    else {
-
-      int max_priority = 0;
-      for(hintst::iterator it = trans.hint.begin(); it != trans.hint.end() /*&& !candidate_hint*/; ++it) {
-	solutiont new_hint;
-      
-	debugc("[get_next_hint] : hint = " << it->first, 0);
-	candidate_hint = false;
-
-	// compute its weight
-	unsigned int w = 0;
-	for(literal_tablet::const_iterator lt_it = trans.literal_table.begin(); lt_it != trans.literal_table.end(); ++ lt_it) {
-	  if(*(lt_it->first) == *((*((it->first).begin()))->lit)) {
-	    w = (lt_it->second).size(); 
-	    break;
-	  }
-	}
-      
-	if(w > max_priority || !firsthint) {
-	  // some preceding decision might have rendered the hint or some of its conjuncts obsolete
-	  for(solutiont::iterator it1 = (it->first).begin(); it1 != (it->first).end(); ++it1) {
-	    debugc("[get_next_hint] : hint conjunct = " << *it1, 1);
-	
-	    entailResult::s ret1 = abs.entails(*it1);
-
-	    if (ret1 == entailResult::Incomplete) {
-	      // candidate hints
-	      new_hint.insert(*it1);
-	      candidate_hint = true;
-	      debugc("[get_next_hint] : candidate = " << *it1, 1);
-	      debugc("[get_next_hint] : tmp hint = " << new_hint, 1);
-	    }
-
-	  }
-
-	  if (candidate_hint && !firsthint) {
-	    // a possible hint if case all the priorities are 0
-	    max_priority = w;
-	    hint = std::make_pair(new_hint, w);
-	    firsthint = true;
-	  }
-	
-	  // the desired priority?
-	  if (candidate_hint && /*it->second == hintp*/ w > max_priority) {
-	    max_priority = w;
-	    hint = std::make_pair(new_hint, w);
-	    debugc("[get_next_hint] : (1) found hint with higher priority " << hint, 1);
-	    //return hint;
-	  }
-	}
-      }
-    
-      assert(firsthint == true);
-    }
-
-    // ----no other option but returning a different priority hint
-    debugc("[get_next_hint] : (2) hint = " << hint, 1);
-    return hint;
-  }
-  
   // return the weight for !hl
   unsigned int get_weight_neg(heaptrans& trans, heaplitp hl) {
     
@@ -279,7 +68,7 @@ class heapheuristics {
     bool firsthint = false;
     bool candidate_hint;
 
-    debugc("[get_next_hint2] : hints = " << trans.hint, 1);
+    //debugc("[get_next_hint2] : hints = " << trans.hint, 0);
 
     // propositional incompleteness or imprecise transformer?
     hintPriority::s hintp = (complete == downwardCompleteness::IncompleteProp) ? hintPriority::High : hintPriority::Low;
@@ -287,19 +76,20 @@ class heapheuristics {
     debugc("[get_next_hint2]", 0);
 
     if(hintp == hintPriority::Low) {
-      debugc("[get_next_hint2] : looking for a precision hint", 1);
+      // searching for a transformer imprecision hint
+
+      debugc("[get_next_hint2] : Transformer  imprecision hint required ", 1);
       
       assert(trans.precision_hint.size() > 0);
 
       for(hintst::iterator it = trans.precision_hint.begin(); it != trans.precision_hint.end(); ++it) {
 	solutiont new_hint;
       
-	debugc("[get_next_hint2] : precision hint = " << it->first, 0);
 	candidate_hint = false;
       
 	// some preceding decision might have rendered the hint or some of its conjuncts obsolete
 	for(solutiont::iterator it1 = (it->first).begin(); it1 != (it->first).end(); ++it1) {
-	  debugc("[get_next_hint] : hint conjunct = " << *it1, 1);
+	  debugc("[get_next_hint] : hint conjunct = " << *it1, 0);
 	
 	  entailResult::s ret1 = abs.entails(*it1);
 
@@ -307,7 +97,7 @@ class heapheuristics {
 	      // candidate hints
 	      new_hint.insert(*it1);
 	      candidate_hint = true;
-	      debugc("[get_next_hint2] : precision candidate = " << *it1, 1);
+	      debugc("[get_next_hint2] : precision hint candidate = " << *it1, 1);
 	  }
 
 	}
@@ -315,7 +105,7 @@ class heapheuristics {
 	// found a hint?
 	if (candidate_hint) {
 	  hint = std::make_pair(new_hint, it->second);
-	  debugc("[get_next_hint] : (1) found precision hint " << hint, 1);
+	  debugc("[get_next_hint] : precision hint found: " << hint, 1);
 	  return hint;
 	}
       }
@@ -325,33 +115,38 @@ class heapheuristics {
 
     }
     else {
+      // propositional incompleteness hint required
 
       unsigned int max_priority = 0;
-      debugc("[get_next_hint2] : literal_table = " << trans.literal_table, 1);
+      debugc("[get_next_hint2] : literal_table = " << trans.literal_table, 0);
       
       for(literal_tablet::const_iterator lt_it = trans.literal_table.begin(); lt_it != trans.literal_table.end(); ++ lt_it) {
   	solutiont new_hint;
-	unsigned int w;
+	unsigned int w, neg_w;
 
-	w = (lt_it->second).size() + get_weight_neg(trans, lt_it->first); 
-	debugc("[get_net_hint2] : current weight = " << w, 1);
-      
-	if(w > max_priority || !firsthint) {
+	neg_w = get_weight_neg(trans, lt_it->first); 
+	w = (lt_it->second).size();
+
+	// this heuristic prioritizes hints that may come from guards
+	if(w == neg_w) {
 	  meetIrreduciblep mi = copy_lit(*(lt_it->first));
 	  new_hint.insert(mi);
-	  candidate_hint = true;
+	  hint = std::make_pair(new_hint, w + neg_w);
+	  debugc("[get_next_hint2] : hint with w = neg_w: " << hint, 1);
+	  return hint;
+	}
+
+	// otherwise just pick the hint that appears in most clauses
+	if(w+neg_w > max_priority || !firsthint) {
+	  meetIrreduciblep mi = copy_lit(*(lt_it->first));
+	  new_hint.insert(mi);
+
+	  max_priority = w+neg_w;
+	  hint = std::make_pair(new_hint, w+neg_w);
+	  debugc("[get_next_hint2] : currently selected hint: " << hint, 1);
 
 	  if (!firsthint) {
-	    max_priority = w;
-	    hint = std::make_pair(new_hint, w);
 	    firsthint = true;
-	  }
-	
-	  // the desired priority?
-	  if (w > max_priority) {
-	    max_priority = w;
-	    hint = std::make_pair(new_hint, w);
-	    debugc("[get_next_hint2] : found hint with higher weight" << hint, 1);
 	  }
 	}
       }
@@ -359,7 +154,6 @@ class heapheuristics {
       assert(firsthint == true);
     }
 
-    // ----no other option but returning a different priority hint
     debugc("[get_next_hint2] : hint = " << hint, 1);
     return hint;
   }
@@ -375,8 +169,6 @@ class heapheuristics {
     //debugc("[extrapolate]: hint before extrapolation = " << trans.hint, 0);
 
     decision = get_next_hint2(sol, trans, complete);
-
-    //debugc("[extrapolate]: hint after extrapolation = " << trans.hint, 0);
 
     debugc("[extrapolate]: decision = " << decision.first << " and existent solution = " << sol, 0);
 
@@ -396,18 +188,9 @@ class heapheuristics {
     for(solutiont::iterator it = (decision.first).begin(); it!= (decision.first).end(); ++it) {
 	sol.add_lit(*it);
 	debugc("[extrapolate] : added to the solution : " << *it, 1);
-	//inferenceRecord* ir = new inferenceRecord(*it, this);
-	//sol.trail.insert(ir);
-
-	// add all the affected clauses to potential_unit_clauses
-	/* for(literal_tablet::const_iterator it1 = trans.literal_table.begin(); it1 != trans.literal_table.end(); ++it1) { */
-	/*   if(*(it1->first) == *((*it)->lit)) */
-	/*     trans.potential_unit_clauses.insert(trans.potential_unit_clauses.begin(), (it1->second).begin(), (it1->second).end()); */
-	/* } */
-
     }
     
-
+    // record in trail
     inferenceRecord* ir = new inferenceRecord(*(decision.first.begin()), this);
     sol.trail.insert(ir);
 
@@ -415,11 +198,9 @@ class heapheuristics {
     debugc("##################################################################", 1);
     debugc("[extrapolate]: Decision: " << decision_f, 1);
     debugc("##################################################################", 1);
-    //sol.add_lit(decision.first);
-    //inferenceRecord* ir = new inferenceRecord(decision.first, this);
-    //sol.trail.insert(ir);
 
-    // ---trans.hint.erase(decision);
+    // todo: delete the hint from the set (make sure you delete the correct thing)
+    //trans.precision_hint.erase(decision);
     return 1;
     }
 

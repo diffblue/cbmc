@@ -186,6 +186,7 @@ public:
   {
     subt::clear();
     uuf.clear();
+    reverse_number.clear();
   }  
 
 protected:

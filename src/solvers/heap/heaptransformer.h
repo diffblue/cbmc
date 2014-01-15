@@ -15,7 +15,7 @@
 class heaptrans {
  public:
     downwardCompleteness::s gamma;
-    hintst hint;
+    //hintst hint;
     hintst precision_hint;
 
     formulat formula;
@@ -26,8 +26,8 @@ class heaptrans {
 
     literal_tablet original_literal_table;
     literal_tablet literal_table;
-    //formulat potential_unit_clauses;
-    bool reset;
+
+    //bool reset;
 
     // after full CBMC integration this can be removed
     ssa_countst* ssa_count;
@@ -36,12 +36,12 @@ class heaptrans {
     // heapwatches watch;
 
     heaptrans() {
-      reset = true;
+      //reset = true;
       ssa_count = new ssa_countst;
     }
 
     heaptrans(formulat _formula) {
-      reset = true;
+      //reset = true;
       ssa_count = new ssa_countst;
       formula = _formula;
     }
@@ -771,56 +771,17 @@ class heaptrans {
   transformerResult::s apply(heapabs& sol) {
     bool callAgain = false;
     gamma = downwardCompleteness::Complete;
-    bool already_applied;
     heaplitp unit;
     bool unitb;
 
-
-    /* if(reset) { */
-    /*   simplify_formula(); */
-    /*   reset = false; */
-    /* } */
-
     debugc("[apply]: solution = " << sol, 1);
     debugc("[apply]: formula size = " << formula.size(), 0);
-    debugc("[apply]: reset = " << reset, 0);
-
-    for(unsigned int i = 0; i < formula.size(); ++i) {
-      debugc("[apply] : current processed clause = " << *formula[i], 0);
-      unitb = false;
-
-    	if (formula[i]->size() == 1) {
-    	  unitb = true;
-    	  unit = *(formula[i]->begin());
-      
-    	  // simplification
-    	  // checks whether the unit clause has already been applied
-    	  // todo: can be removed once the formula is simplified to start with..
-    	  already_applied = false;
-    	  for(unsigned int j = 0; j < i; ++j) {
-    	    if(formula[j]->size() == 1 && *(formula[i]) == *(formula[j])) {
-    	      already_applied = true;
-    	      debugc("[apply] : clause already applied", 1);
-    	      break;
-    	    }
-    	  }
-    	}
-
-    	debugc("[apply] : (2) unitb = " << unitb, 0);
-      
-      // unit clause application
-      if(unitb && !already_applied) {
-    	debugc("[apply] : apply the transformer for " << unit, 0);
-    	callAgain |= apply_one_ded(unit, sol);
-      }
-    }
-
 
     debugc("[apply] : Apply the unit clauses already computed: ", 1);
     for(clauset::iterator it = unit_clauses.begin(); it != unit_clauses.end(); ++it)
       callAgain |= apply_one_ded(*it, sol);
 
-    debugc("[apply] : Checking the enabled clauses", 1);
+    debugc("[apply] : Check the enabled clauses: ", 1);
     literal_tablet tmp_literal_table;
     for(literal_tablet::iterator it = literal_table.begin(); it != literal_table.end(); ++it) {
       heaplitp hl = it->first;
@@ -828,9 +789,11 @@ class heaptrans {
       
       switch(sol.entails(mi)) {
       case entailResult::True:
-	// record enabled
+	// enabled
+	debugc("[apply] : enabled clauses for mi = " << *mi, 1);
 	for(formulat::iterator it1 = (it->second).begin(); it1 != (it->second).end(); ++it1) {
 	  if(unit_clause(*it1, unit, sol)) {
+	    debugc("[apply]: found new enabled unit clause " << *unit, 1);
 	    callAgain |= apply_one_ded(unit, sol);
 	    unit_clauses.push_back(unit);
 	  }
@@ -850,23 +813,20 @@ class heaptrans {
 
     debugc("transformerResult: " << (int)callAgain, 0);
 
-    debugc("[apply] : check bottom ", 1);
+    debugc("[apply] : Did we reach bottom? ", 1);
     if  (sol.is_bottom()) {
-      debugc("[apply] : Bottom detected", 1);
+      debugc("[apply] : Bottom detected! ", 1);
       return transformerResult::Bottom;
     }
 
     debugc("[apply]: trail: " << sol.trail, 0);
-    debugc("[apply]: hint: " << hint, 0);
 
     if (callAgain) {
-      debugc("[apply]: transformerResult::CallAgain", 1);
+      debugc("[apply]: Transformer result is CallAgain", 1);
       return transformerResult::CallAgain;
     }
 
     debugc("[apply]: transformerResult::DoNotCallAgain", 1);
-    /* if(reset) */
-    /*   reset = false; */
     return transformerResult::DoNotCallAgain;
   }
 
@@ -1157,16 +1117,16 @@ class heaptrans {
   bool single_literal(const clauset*, const heaplitp) const;
 
   // add the pure literals in clause c as hints
-  void add_hints(const clauset*, heapabs&);
+  //void add_hints(const clauset*, heapabs&);
 
-  bool hint_heuristic(clauset*&,  heapabs&);
-  bool hint_heuristic_aggressive(clauset*&, heapabs&, hintst::iterator);
+  //bool hint_heuristic(clauset*&,  heapabs&);
+  //bool hint_heuristic_aggressive(clauset*&, heapabs&, hintst::iterator);
 
-  void set_hint(heaplitp&, clauset*&, heapabs&);
+  //void set_hint(heaplitp&, clauset*&, heapabs&);
   bool unit_clause (clauset*&, heaplitp&, heapabs&);
   clauset* create_disjunction(std::vector< meetIrreduciblep >&);
 
-  bool hint_contains(const meetIrreduciblep&) const;
+  //bool hint_contains(const meetIrreduciblep&) const;
   clauset* simplify_clause (clauset*, heapabs&);
   void simplify_formula (heapabs&);
 

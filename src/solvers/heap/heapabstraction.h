@@ -204,7 +204,7 @@ public :
 
     tmp_sel_eqs.clear();
 
-    debugc("[add_eq] adding x = " << x << " and y = " << y, 1);
+    debugc("[add_eq] adding x = " << x << " and y = " << y << " and state = " << (int)s, 1);
 
     if(s == stateTrue) {
       heapvar old_x = aliases.find(x);
@@ -252,7 +252,7 @@ public :
        return true;
       }
 
-
+      debugc("[add_eq]: make_union " << x << " and " << y.v, 1);
       ret = aliases.make_union(x, y.v);
       
       if(ret) {

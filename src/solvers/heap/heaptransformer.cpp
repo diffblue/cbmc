@@ -484,179 +484,7 @@ bool heaptrans::single_literal(const clauset* c, const heaplitp l) const {
 bool heaptrans::pure_literal(const heaplitp l) const {
   return l->type == PATH || l->type == ONPATH || l->type == DANGLING || l->type == EQ;
 }
-  
-//add the pure literals in clause c as hints
-void heaptrans::add_hints(const clauset* c, heapabs& sol) {
-  debugc("[add_hints]: trying clause = " << *c, 0);
-  debugc("[add_hints]: formula = " << heaptrans::formula, 0);
-  for(clauset::const_iterator it = c->begin(); it != c->end(); ++it) {
-    heaplitp hl = *it;
 
-    if (pure_literal(hl)) {
-      debugc("[add_hints]: checking literal " << hl, 0);
-
-      // check that the complemented literal is not in solution, hints, formula
-      // in order not to add facts already known as hints
-      meetIrreduciblep mi = copy_lit(*hl);
-
-      if(hint_contains(mi))
-	// already registered as a hint
-	continue;
-
-      mi->lit->complement();
-
-      if(hint_contains(mi))
-	// its negation is registered as a hint
-	continue;
-
-      entailResult::s insol = sol.entails(mi);
-      //bool informula = heaptrans::formula_contains_literal(mi->lit, sol);
-
-      debugc("[add_hints]: hl = " << hl << " and insol = " << insol, 0);
-      mi->lit->complement();
-
-      // not in solution, hint
-      if (/*!informula &&*/ insol==entailResult::Incomplete) {
-	solutiont new_hint;
-	new_hint.insert(mi);
-	hint.insert(std::make_pair(new_hint, /*hintPriority::High*/0));
-	debugc("[add_hints] : hints = " << hint, 1);
-	debugc("[add_hints] : " << new_hint, 1);
-      }
-      else {
-	delete mi;
-      }
-    }
-  }
-  return;
-}
-
-// heuristic that prioritizes those hints that can solve multiple clauses
-// for each non-unit clause check if there is already a hint that  
-// matches it, and if there is increment its weight
-// return true if a hint already exists, and false otherwise
-bool heaptrans::hint_heuristic(clauset*& c,  heapabs& sol) {
-  bool found_hint = false;
-  hintst::iterator it;
-
-  for(it = hint.begin(); it != hint.end(); ++it) {
-    meetIrreduciblep mi = *((it->first).begin());
-    debugc("[unit_clause] : trying existent hint " << mi, 0);
-    debugc("[unit_clause] : c = " << *c, 0);
-
-    for(clauset::iterator it1 = c->begin(); it1 != c->end(); ++it1) {
-      if(**it1 == *(mi->lit) && sol.entails(mi) != entailResult::False) {
-	debugc("[hint_heuristic] : hint already inserted (1) " << mi, 1);
-	found_hint = true;
-	break;
-      }
-
-      if(pure_literal(mi->lit)) {
-	meetIrreduciblep negmi = copy_lit(mi);
-	negmi->complement();
-	if(**it1 == *(negmi->lit) && sol.entails(negmi) == entailResult::Incomplete /*!= entailResult::True*/) {
-	  debugc("[hint_heuristic] : hint already inserted (2) " << negmi, 1);
-	  found_hint = true;
-	  break;
-	}
-	delete(negmi);
-      }
-    }
-
-    if(found_hint)
-      break;
-  }
-
-  if(found_hint) {
-    assert(it != hint.end());
-    hintt h = *it;
-    // increment the weight
-    ++(h.second);
-    hint.erase(it);
-    debugc("[hint_heuristic] : hint already inserted " << h, 1);
-    hint.insert(h);
-    return true;
-  }
-
-  // no appropriate hint was found
-  return false;
-}
-
-// more aggressive heuristic
-// return true if a hint already exists, and false otherwise
-bool heaptrans::hint_heuristic_aggressive(clauset*& c,  heapabs& sol, hintst::iterator start_it) {
-  bool found_hint = false;
-  hintst::iterator it;
-
-  if(start_it == hint.end())
-    return false;
-
-  for(it = start_it; it != hint.end(); ++it) {
-    meetIrreduciblep mi = *((it->first).begin());
-    debugc("[hint_heuristic_aggressive] : trying existent hint " << mi, 0);
-    debugc("[hint_heuristic_aggressive] : c = " << *c, 0);
-
-    for(clauset::iterator it1 = c->begin(); it1 != c->end(); ++it1) {
-      if(**it1 == *(mi->lit) && sol.entails(mi) != entailResult::False) {
-	debugc("[hint_heuristic] : hint already inserted (1) " << mi, 0);
-	found_hint = true;
-	break;
-      }
-
-      if(pure_literal(mi->lit)) {
-	meetIrreduciblep negmi = copy_lit(mi);
-	negmi->complement();
-	if(**it1 == *(negmi->lit) && sol.entails(negmi) != entailResult::True) {
-	  debugc("[hint_heuristic_aggressive] : hint already inserted (2) " << negmi, 0);
-	  found_hint = true;
-	  break;
-	}
-	delete(negmi);
-      }
-    }
-
-    if(found_hint)
-      break;
-  }
-
-  if(found_hint) {
-    assert(it != hint.end());
-    hintt h = *it;
-    // increment the weight
-    ++(h.second);
-    hint.erase(it);
-    debugc("[hint_heuristic_aggressive] : hint already inserted " << h, 1);
-    hint.insert(h);
-    bool res = hint_heuristic_aggressive(c, sol, ++it);
-    return true;
-  }
-
-  // no appropriate hint was found
-  return false;
-}
-
-// adds a new hint
-void heaptrans::set_hint(heaplitp& unit, clauset*& c, heapabs& sol) {
-
-  if(pure_literal(unit)) {
-    meetIrreduciblep h = copy_lit(*unit);
-    solutiont new_hint;
- 
-    debugc("[set_hint]: hints = " << hint, 0);
- 
-    // construct the new hint
-    new_hint.insert(h);
-    hint.insert(std::make_pair(new_hint, /*hintPriority::High*/0));
-    debugc("[set_hint]: inserted hint: " << h, 1);
-    debugc("[set_hint]: hints = " << hint, 0);
-  }
-  else {
-    // could not add the processed literal as a hint as it was not pure
-    // try the rest of the literals
-    add_hints(c, sol);
-  }
-
-}
 
 // returns true if c is unit clause, and false otherwise
 bool heaptrans::unit_clause (clauset*& c, heaplitp& unit, heapabs& sol) {
@@ -679,7 +507,7 @@ bool heaptrans::unit_clause (clauset*& c, heaplitp& unit, heapabs& sol) {
       meetIrreduciblep newl = copy_lit(*hl);
       debugc("[unit_clause] : literal currently processed = " << newl, 1);
       newl->complement();
-      debugc("[unit_clause] : newl complemented = " << newl, 1);
+      debugc("[unit_clause] : newl complemented = " << newl, 0);
     
 
       // the second conjunct corresponds to clauses that are false
@@ -817,21 +645,6 @@ clauset* heaptrans::create_disjunction(std::vector< meetIrreduciblep >& v ) {
   return clause;
 }
 
-bool heaptrans::hint_contains(const meetIrreduciblep& e) const {
-
-  for(hintst::const_iterator it = hint.begin(); it != hint.end(); ++it) {
-    for(solutiont::const_iterator it1 = (it->first).begin(); it1 != (it->first).end(); ++it1) {
-      meetIrreducible_comp comp;
-
-      if (!comp(*it1, e) && !comp(e, *it1)) {
-	return true;
-      }
-    }
-  }
-
-  return false;
-}
-
 void heaptrans::clear () {
   for(formulat::const_iterator it=heaptrans::formula.begin(); it!=heaptrans::formula.end(); ++it) {
     (*it)->clear();
@@ -858,50 +671,23 @@ void heaptrans::insert_clause(clauset* c) {
 
 void heaptrans::construct_literal_table() {
   literal_table.clear();
+  unit_clauses.clear();
   literal_tablet::iterator it_l;
 
   for(formulat::iterator it_f = formula.begin(); it_f != formula.end(); ++it_f) {
 
-    // already a unit clause; hence, no need to record it
-    if((*it_f)->size() == 1) {
-      unit_clauses.push_back(*((*it_f)->begin()));
-      continue;
-    }
-
     add_to_literal_table(*it_f);
-
-    // for(clauset::iterator it_c = (*it_f)->begin(); it_c != (*it_f)->end(); ++it_c) {
-
-    //   // record only pure literals as only these can constitute decisions
-    //   if((*it_c)->type != EQ && (*it_c)->type != PATH && (*it_c)->type != ONPATH && (*it_c)->type != DANGLING) {
-    // 	debugc("[construct_literal_table] : impure lit " << **it_c, 0);
-    // 	continue;
-    //   }
-
-    //   heaplitp hl = (copy_lit(**it_c))->lit;
-    //   hl->complement();
-      
-    //   for(it_l = literal_table.begin(); it_l != literal_table.end(); ++it_l) {
-
-    // 	if (*hl == *(it_l->first)) {
-    // 	  (it_l->second).push_back(*it_f);
-    // 	  break;
-    // 	}
-    //   }
-
-    //   if(it_l == literal_table.end()) {
-    // 	debugc("[construct_literal_table] : not found literal" << *hl, 0);
-    // 	formulat clauses;
-    // 	clauses.push_back(*it_f);
-    // 	literal_recordt lr = std::make_pair(hl, clauses);
-    // 	literal_table.push_back(lr);
-    //   }
-    // }
   }
 }
 
 void heaptrans::add_to_literal_table(clauset*& c) {
     literal_tablet::iterator it_l;
+
+    // already a unit clause -> record it in unit_clauses
+    if(c->size() == 1) {
+      unit_clauses.push_back(*(c->begin()));
+      return;
+    }
 
     for(clauset::iterator it_c = c->begin(); it_c != c->end(); ++it_c) {
       // record only pure literals as only these can constitute decisions
@@ -913,7 +699,6 @@ void heaptrans::add_to_literal_table(clauset*& c) {
       heaplitp hl = (copy_lit(**it_c))->lit;
       hl->complement();
 
-      //literal_tablet tmp_literal_table = literal_table;
       for (it_l = literal_table.begin(); it_l != literal_table.end(); ++it_l) {
 
 	if (*hl == *(it_l->first)) {
@@ -930,6 +715,195 @@ void heaptrans::add_to_literal_table(clauset*& c) {
 	literal_table.push_back(lr);
       }
     }
+
+// bool heaptrans::hint_contains(const meetIrreduciblep& e) const {
+
+//   for(hintst::const_iterator it = hint.begin(); it != hint.end(); ++it) {
+//     for(solutiont::const_iterator it1 = (it->first).begin(); it1 != (it->first).end(); ++it1) {
+//       meetIrreducible_comp comp;
+
+//       if (!comp(*it1, e) && !comp(e, *it1)) {
+// 	return true;
+//       }
+//     }
+//   }
+
+//   return false;
+// }
+
+//add the pure literals in clause c as hints
+// void heaptrans::add_hints(const clauset* c, heapabs& sol) {
+//   debugc("[add_hints]: trying clause = " << *c, 0);
+//   debugc("[add_hints]: formula = " << heaptrans::formula, 0);
+//   for(clauset::const_iterator it = c->begin(); it != c->end(); ++it) {
+//     heaplitp hl = *it;
+
+//     if (pure_literal(hl)) {
+//       debugc("[add_hints]: checking literal " << hl, 0);
+
+//       // check that the complemented literal is not in solution, hints, formula
+//       // in order not to add facts already known as hints
+//       meetIrreduciblep mi = copy_lit(*hl);
+
+//       if(hint_contains(mi))
+// 	// already registered as a hint
+// 	continue;
+
+//       mi->lit->complement();
+
+//       if(hint_contains(mi))
+// 	// its negation is registered as a hint
+// 	continue;
+
+//       entailResult::s insol = sol.entails(mi);
+//       //bool informula = heaptrans::formula_contains_literal(mi->lit, sol);
+
+//       debugc("[add_hints]: hl = " << hl << " and insol = " << insol, 0);
+//       mi->lit->complement();
+
+//       // not in solution, hint
+//       if (/*!informula &&*/ insol==entailResult::Incomplete) {
+// 	solutiont new_hint;
+// 	new_hint.insert(mi);
+// 	hint.insert(std::make_pair(new_hint, /*hintPriority::High*/0));
+// 	debugc("[add_hints] : hints = " << hint, 1);
+// 	debugc("[add_hints] : " << new_hint, 1);
+//       }
+//       else {
+// 	delete mi;
+//       }
+//     }
+//   }
+//   return;
+// }
+
+// heuristic that prioritizes those hints that can solve multiple clauses
+// for each non-unit clause check if there is already a hint that  
+// matches it, and if there is increment its weight
+// return true if a hint already exists, and false otherwise
+// bool heaptrans::hint_heuristic(clauset*& c,  heapabs& sol) {
+//   bool found_hint = false;
+//   hintst::iterator it;
+
+//   for(it = hint.begin(); it != hint.end(); ++it) {
+//     meetIrreduciblep mi = *((it->first).begin());
+//     debugc("[unit_clause] : trying existent hint " << mi, 0);
+//     debugc("[unit_clause] : c = " << *c, 0);
+
+//     for(clauset::iterator it1 = c->begin(); it1 != c->end(); ++it1) {
+//       if(**it1 == *(mi->lit) && sol.entails(mi) != entailResult::False) {
+// 	debugc("[hint_heuristic] : hint already inserted (1) " << mi, 1);
+// 	found_hint = true;
+// 	break;
+//       }
+
+//       if(pure_literal(mi->lit)) {
+// 	meetIrreduciblep negmi = copy_lit(mi);
+// 	negmi->complement();
+// 	if(**it1 == *(negmi->lit) && sol.entails(negmi) == entailResult::Incomplete /*!= entailResult::True*/) {
+// 	  debugc("[hint_heuristic] : hint already inserted (2) " << negmi, 1);
+// 	  found_hint = true;
+// 	  break;
+// 	}
+// 	delete(negmi);
+//       }
+//     }
+
+//     if(found_hint)
+//       break;
+//   }
+
+//   if(found_hint) {
+//     assert(it != hint.end());
+//     hintt h = *it;
+//     // increment the weight
+//     ++(h.second);
+//     hint.erase(it);
+//     debugc("[hint_heuristic] : hint already inserted " << h, 1);
+//     hint.insert(h);
+//     return true;
+//   }
+
+//   // no appropriate hint was found
+//   return false;
+// }
+
+// more aggressive heuristic
+// return true if a hint already exists, and false otherwise
+// bool heaptrans::hint_heuristic_aggressive(clauset*& c,  heapabs& sol, hintst::iterator start_it) {
+//   bool found_hint = false;
+//   hintst::iterator it;
+
+//   if(start_it == hint.end())
+//     return false;
+
+//   for(it = start_it; it != hint.end(); ++it) {
+//     meetIrreduciblep mi = *((it->first).begin());
+//     debugc("[hint_heuristic_aggressive] : trying existent hint " << mi, 0);
+//     debugc("[hint_heuristic_aggressive] : c = " << *c, 0);
+
+//     for(clauset::iterator it1 = c->begin(); it1 != c->end(); ++it1) {
+//       if(**it1 == *(mi->lit) && sol.entails(mi) != entailResult::False) {
+// 	debugc("[hint_heuristic] : hint already inserted (1) " << mi, 0);
+// 	found_hint = true;
+// 	break;
+//       }
+
+//       if(pure_literal(mi->lit)) {
+// 	meetIrreduciblep negmi = copy_lit(mi);
+// 	negmi->complement();
+// 	if(**it1 == *(negmi->lit) && sol.entails(negmi) != entailResult::True) {
+// 	  debugc("[hint_heuristic_aggressive] : hint already inserted (2) " << negmi, 0);
+// 	  found_hint = true;
+// 	  break;
+// 	}
+// 	delete(negmi);
+//       }
+//     }
+
+//     if(found_hint)
+//       break;
+//   }
+
+//   if(found_hint) {
+//     assert(it != hint.end());
+//     hintt h = *it;
+//     // increment the weight
+//     ++(h.second);
+//     hint.erase(it);
+//     debugc("[hint_heuristic_aggressive] : hint already inserted " << h, 1);
+//     hint.insert(h);
+//     bool res = hint_heuristic_aggressive(c, sol, ++it);
+//     return true;
+//   }
+
+//   // no appropriate hint was found
+//   return false;
+// }
+
+// adds a new hint
+// void heaptrans::set_hint(heaplitp& unit, clauset*& c, heapabs& sol) {
+
+//   if(pure_literal(unit)) {
+//     meetIrreduciblep h = copy_lit(*unit);
+//     solutiont new_hint;
+ 
+//     debugc("[set_hint]: hints = " << hint, 0);
+ 
+//     // construct the new hint
+//     new_hint.insert(h);
+//     hint.insert(std::make_pair(new_hint, /*hintPriority::High*/0));
+//     debugc("[set_hint]: inserted hint: " << h, 1);
+//     debugc("[set_hint]: hints = " << hint, 0);
+//   }
+//   else {
+//     // could not add the processed literal as a hint as it was not pure
+//     // try the rest of the literals
+//     add_hints(c, sol);
+//   }
+
+// }
+
 
 }
 

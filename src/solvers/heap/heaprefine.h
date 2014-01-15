@@ -5,13 +5,6 @@
 **
 */
 
-/* #include <string> */
-/* #include <iostream> */
-/* #include <stdint.h> */
-/* #include <assert.h> */
-/* #include <set> */
-/* #include <boost/shared_ptr.hpp> */
-
 #include "heaptransformer.h"
 
 #ifndef HEAPREFINE
@@ -45,7 +38,7 @@ template <class abst, class transt, class heurt>
       	  }
   	  debugc("[construct]: before extrapolation", 0);
       	  // Extrapolate
-      	} while (h.extrapolate(abs, trans, completeness)); ///h.extrapolate(abs);
+      	} while (h.extrapolate(abs, trans, completeness)); 
 	
       	return downwardCompleteness::Unknown;
       }
@@ -76,18 +69,17 @@ template <class abst, class transt, class heurt>
 	trans.original_literal_table = trans.literal_table;
 	trans.original_unit_clauses = trans.unit_clauses;
 
-	//debugc("[solve]: formula after simplification: " << trans.formula, 1);
 	
 	do {
-          debugc("[solve]: reset", 1);
+          debugc("[solve]: Reset! ", 1);
 	  abs.clear();
-	  trans.hint.clear();
+	  //trans.hint.clear();
 	  trans.precision_hint.clear();
 	  //trans.potential_unit_clauses.clear();
 	  
-	  trans.reset = true;
+	  //trans.reset = true;
 
-	  debugc("[solve]: hint after reset: " << trans.hint, 1);
+	  //debugc("[solve]: hint after reset: " << trans.hint, 1);
 	  debugc("[solve]: trail after reset: " << abs.trail, 0);
 	  debugc("[solve] : literal_table = " << trans.literal_table, 1);
 

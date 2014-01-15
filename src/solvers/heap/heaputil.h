@@ -11,17 +11,17 @@
 #ifndef HEAPUTIL
 #define HEAPUTIL
 
-#if DEBUG
+#if 0
 
 #define debugc(s, cond) if (cond) std::cout << s << std::endl;
-#define debug(s) std::cout << s << std::endl;
 
 #else
 
 #define debugc(s, cond);
-#define debug(s);
 
 #endif
+
+#define debug(s) std::cout << s << std::endl;
 
 /* Theory DSL */ 
 #define path(m, v1, v2, f) new path_lit(m, v1, v2, f, stateTrue)
