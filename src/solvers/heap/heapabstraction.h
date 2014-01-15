@@ -28,10 +28,10 @@ public :
   not_eqst not_eqs;
   not_pathst not_paths;
 
-  ~heapabs () {
-    /* for(solutiont::iterator it = contents.begin(); it != contents.end(); ++it) { */
-    /* 	delete *it; */
-    /* } */
+  heapabs () {
+    aliases.clear();
+    adj_list.clear();
+    sel_eqs.clear();
   }
 
   entailResult::s entails(const meetIrreduciblep& e) {
@@ -66,6 +66,7 @@ public :
     entailResult::s ret = entailResult::True;
 
     solutiont new_hint;
+    new_hint.clear();
 
     for(formulat::const_iterator it = f->begin(); it != f->end(); ++it) {
       if(entails(*it, new_hint) == entailResult::Incomplete) 
@@ -84,6 +85,7 @@ public :
     entailResult::s ret = entailResult::True;
 
     solutiont new_hint;
+    new_hint.clear();
 
     for(formulat::const_iterator it = f->begin(); it != f->end(); ++it) {
       if(entails(*it, new_hint) == entailResult::Incomplete) 
@@ -125,6 +127,10 @@ public :
     fld_adj_listt fal;
     mem_adj_listt mal;
     targetst targets;
+
+    fal.clear();
+    mal.clear();
+    targets.clear();
 
     // get the representatives
     heapvar x_ = aliases.find(x);
@@ -651,7 +657,9 @@ public :
 
     // BFS
     std::vector<heapvar> q;
+    q.clear();
     std::set<heapvar> visited;
+    visited.clear();
 
     // start the exploration with the representative of hv1
     q.push_back(hv1_);

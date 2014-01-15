@@ -36,11 +36,13 @@ class heaptrans {
     // heapwatches watch;
 
     heaptrans() {
+      precision_hint.clear();
       //reset = true;
       ssa_count = new ssa_countst;
     }
 
     heaptrans(formulat _formula) {
+      precision_hint.clear();
       //reset = true;
       ssa_count = new ssa_countst;
       formula = _formula;

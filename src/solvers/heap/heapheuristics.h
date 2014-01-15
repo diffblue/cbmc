@@ -12,6 +12,8 @@ class heapheuristics {
 
   upwardCompleteness::s interpolate(heapabs& sol, heaptrans& trans) {
     std::vector< meetIrreduciblep > v; 
+    v.clear();
+
     clauset* learntClause;
 
     debugc("Interpolate", 1);
@@ -84,6 +86,7 @@ class heapheuristics {
 
       for(hintst::iterator it = trans.precision_hint.begin(); it != trans.precision_hint.end(); ++it) {
 	solutiont new_hint;
+	new_hint.clear();
       
 	candidate_hint = false;
       

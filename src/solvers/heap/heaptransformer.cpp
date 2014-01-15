@@ -237,6 +237,7 @@ formula_ssat* heaptrans::process_conditional(formulat* cond,
 std::vector<std::pair<heapvar, int> >* heaptrans::ssa_literal(heaplitp hl) {
   int count;
   std::set<heapvar> vars;
+  vars.clear();
   ssa_countst* res = new ssa_countst;
   ssa_countst::iterator it1;
   debugc("[ssa_literal]: processing literal " << hl, 0);
@@ -351,6 +352,8 @@ ssa_countst* heaptrans::ssa(formulat* v) {
 // return the set of memory vars in the formula
 std::set<heapvar> heaptrans::get_mems() const {
   std::set<heapvar> ret, tmp;
+  ret.clear();
+  tmp.clear();
 
   for(formulat::const_iterator it = heaptrans::formula.begin(); it != heaptrans::formula.end(); ++it) {
     for(clauset::const_iterator clause_it = (*it)->begin(); clause_it != (*it)->end(); ++clause_it) {
@@ -364,6 +367,8 @@ std::set<heapvar> heaptrans::get_mems() const {
 // return the set of pointer vars in the formula
 std::set<heapvar> heaptrans::get_vars() const {
   std::set<heapvar> ret, tmp;
+  ret.clear();
+  tmp.clear();
 
   for(formulat::const_iterator it=heaptrans::formula.begin(); it!=heaptrans::formula.end(); ++it) {
     for(clauset::const_iterator clause_it = (*it)->begin(); clause_it != (*it)->end(); ++clause_it) {
@@ -376,6 +381,9 @@ std::set<heapvar> heaptrans::get_vars() const {
 
 std::set<heapvar> heaptrans::get_vars_before(heaplit* lit) const {
   std::set<heapvar> ret, tmp;
+  ret.clear();
+  tmp.clear();
+
   bool done = false;
 
   for(formulat::const_iterator it=heaptrans::formula.begin(); it!=heaptrans::formula.end() && !done; ++it) {
@@ -400,6 +408,7 @@ std::set<heapvar> heaptrans::get_vars_before(heaplit* lit) const {
 formulat* heaptrans::insert_lit_in_formula(const heaplitp e, formulat* f) {
     
   clauset* newclause = new std::vector<heaplitp>();
+  newclause->clear();
   newclause->push_back(e);
 
   f->push_back(newclause);
@@ -458,6 +467,7 @@ bool heaptrans::formula_contains_literal(const heaplitp hl, heapabs& sol) {
   // the literal must be unit clause
   bool ret =  false;
   clauset c;
+  c.clear();
   c.push_back(hl);
 
   for(formulat::const_iterator it = heaptrans::formula.begin(); it != heaptrans::formula.end(); ++it) {
@@ -491,6 +501,7 @@ bool heaptrans::unit_clause (clauset*& c, heaplitp& unit, heapabs& sol) {
   bool unit_flag = true;
   bool found;
   clauset* newc = new clauset();
+  newc->clear();
 
   debugc("[unit_clause]: clause = " << *c, 1);
 
@@ -573,6 +584,7 @@ clauset* heaptrans::simplify_clause (clauset* c, heapabs& sol) {
   }
 
   clauset* newc = new clauset;
+  newc->clear();
 
   for(i = 0; i < c->size(); ++i) {
     // current literal
@@ -637,6 +649,7 @@ void heaptrans::simplify_formula (heapabs& sol) {
 
 clauset* heaptrans::create_disjunction(std::vector< meetIrreduciblep >& v ) {
   clauset* clause = new clauset;
+  clause->clear();
     
   for(std::vector< meetIrreduciblep >::const_iterator it = v.begin(); it != v.end(); ++it) {
     clause->push_back((*it)->lit);
@@ -655,6 +668,7 @@ void heaptrans::clear () {
 
 void heaptrans::insert_literal(const heaplitp e) {
   clauset* newclause = new std::vector<heaplitp>();
+  newclause->clear();
   newclause->push_back(e);
 
   heaptrans::formula.push_back(newclause);

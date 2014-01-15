@@ -90,6 +90,7 @@ class formula_ssat {
   }
 };
 
+
 class condt {
  public:
   formulat* cond;
@@ -118,23 +119,6 @@ typedef std::vector< std::pair<heaplitp, watchlist*> > watcht;
    heapvar *mem;
    heaplitp hl;
  };
-
-
-// conditional
-class conditional {
- public:
-  heaplit* cond;
-  std::vector<heaplit*> if_b;
-  std::vector<heaplit*> else_b;
-
-  conditional(heaplit* _cond, 
-	      std::vector<heaplit*> _if_b, 
-	      std::vector<heaplit*> _else_b) {
-    cond = _cond;
-    if_b = _if_b;
-    else_b = _else_b;
-  }
-};
 
 // trail
 class inferenceRecord {
