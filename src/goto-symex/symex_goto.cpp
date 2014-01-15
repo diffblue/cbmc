@@ -343,7 +343,7 @@ void goto_symext::phi_function(
 
       if(p_it!=goto_state.propagation.values.end())
         goto_state_rhs=p_it->second;
-      else
+      else 
         goto_state_rhs=symbol_exprt(goto_state.level2.current_name(l1_identifier), type);
     }
     
@@ -380,7 +380,44 @@ void goto_symext::phi_function(
     dest_state.record_events=false;
     dest_state.assignment(new_lhs, rhs, ns, true);
     dest_state.record_events=record_events;
-    
+  
+    //for heap theory
+    if(is_heap_type(new_lhs.type()) && rhs.id()==ID_if)
+    {
+      //copy heap ids to newly created symbols (since only identifiers are available and not the symbol exprs we take them from the heap_id_map) TODO: better solution: attach heap id to symbolt?
+      irep_idt heap_id, heap_id1, heap_id2;
+      //      std::cout << "goto_state_rhs: " << goto_state_rhs << std::endl;
+      if(goto_state_rhs.id()==ID_symbol) 
+      {
+	irep_idt id1 = to_symbol_expr(goto_state_rhs).get_identifier();
+	heap_id1 = heap_id_map[id1];
+	std::cout  << "get from heap_id_map: " << id1<< ": " << heap_id1 << std::endl;
+	rhs.op1().set(ID_new_heap_id,heap_id1);
+	heap_id = heap_id1;
+      }
+      if(dest_state_rhs.id()==ID_symbol) 
+      {
+	irep_idt id2 = to_symbol_expr(dest_state_rhs).get_identifier();
+	heap_id2 = heap_id_map[id2];
+	std::cout  << "get from heap_id_map: " << id2 << ": " << heap_id2 << std::endl;
+	rhs.op2().set(ID_new_heap_id,heap_id2);
+	heap_id = heap_id2;
+      }
+
+      if(heap_id1!=heap_id2) 
+      {
+	struct_typet struct_type;
+	if(new_lhs.type().id()==ID_pointer) 
+	  struct_type = to_struct_type(ns.follow(new_lhs.type().subtype()));
+	else struct_type = to_struct_type(ns.follow(new_lhs.type()));
+	heap_id = make_new_heap_id(struct_type.get_tag());
+        update_heap_ids(struct_type.get_tag(),to_symbol_expr(new_lhs).get_identifier());
+      }
+      new_lhs.set(ID_new_heap_id,heap_id);
+      heap_id_map[to_symbol_expr(new_lhs).get_identifier()] = heap_id;
+      std::cout  << "add to heap_id_map1: " << to_symbol_expr(new_lhs).get_identifier() << ": " << heap_id << std::endl;
+    }
+  
     target.assignment(
       true_exprt(),
       new_lhs, lhs, new_lhs, lhs,

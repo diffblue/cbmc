@@ -36,7 +36,6 @@ void goto_symext::symex_assign(
 
   replace_nondet(lhs);
   replace_nondet(rhs);
-  replace_heap_member(rhs);
   
   if(rhs.id()==ID_sideeffect)
   {
@@ -203,6 +202,8 @@ void goto_symext::symex_assign_symbol(
   guardt &guard,
   visibilityt visibility)
 {
+  //  std::cout << std::endl << "assign : " << lhs << " ===== " << rhs << std::endl;
+
   exprt ssa_rhs=rhs;
   
   // put assignment guard into the rhs
@@ -221,8 +222,10 @@ void goto_symext::symex_assign_symbol(
   
   state.rename(ssa_rhs, ns);
   do_simplify(ssa_rhs);
-  
+  replace_heap_member(ssa_rhs);
+ 
   symbol_exprt ssa_lhs=lhs;
+
   state.rename(ssa_lhs, ns, goto_symex_statet::L1);
   state.assignment(ssa_lhs, ssa_rhs, ns, constant_propagation);
   
@@ -235,7 +238,20 @@ void goto_symext::symex_assign_symbol(
 
   guardt tmp_guard(state.guard);
   tmp_guard.append(guard);
-  
+
+ //heap theory
+  if(is_heap_type(ssa_lhs.type()))
+  {
+    struct_typet struct_type;
+    if(ssa_lhs.type().id()==ID_pointer) struct_type = 
+      to_struct_type(ns.follow(ssa_lhs.type().subtype()));
+    else struct_type = to_struct_type(ns.follow(ssa_lhs.type()));
+    ssa_lhs.set(ID_new_heap_id,ssa_rhs.get(ID_new_heap_id));
+    update_heap_ids(struct_type.get_tag(),to_symbol_expr(ssa_lhs).get_identifier());
+    heap_id_map[to_symbol_expr(ssa_lhs).get_identifier()] = ssa_rhs.get(ID_new_heap_id);
+    std::cout  << "add to heap_id_map2: " << to_symbol_expr(ssa_lhs).get_identifier() << ": " << ssa_rhs.get(ID_new_heap_id) << std::endl;
+  }
+
   // do the assignment
   target.assignment(
     tmp_guard.as_expr(),
@@ -432,13 +448,16 @@ void goto_symext::symex_assign_member(
   if(is_heap_type(struct_type))
   {
     irep_idt old_heap_id = make_heap_id(to_struct_type(struct_type).get_tag());
-    heap_counter++; //new heap
-    irep_idt new_heap_id = make_heap_id(to_struct_type(struct_type).get_tag());
+    irep_idt new_heap_id = make_new_heap_id(to_struct_type(struct_type).get_tag());
     heap_with_exprt new_rhs(lhs_struct, exprt(ID_member_name), 
       rhs,old_heap_id,new_heap_id);
     new_rhs.op1().set(ID_component_name, component_name);
     replace_heap_member(new_rhs);
-    exprt new_full_lhs=add_to_lhs(full_lhs, lhs);
+    exprt new_lhs = lhs;
+    lhs_struct.set(ID_new_heap_id,new_heap_id);
+    new_lhs.set(ID_new_heap_id,new_heap_id);
+    exprt new_full_lhs=add_to_lhs(full_lhs, new_lhs);
+
     symex_assign_rec(
       state, lhs_struct, new_full_lhs, new_rhs, guard, visibility);
   }

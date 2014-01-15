@@ -178,3 +178,13 @@ bool symex_bmct::is_heap_type(typet type) {
 	  ns.follow(to_pointer_type(type).subtype()).id()==ID_struct) ||
          (ns.follow(type).id()==ID_struct);
 }
+
+irep_idt symex_bmct::make_heap_id(irep_idt tag) 
+{ 
+  return /*id2string(tag)+*/"heap"+i2string(heap_counter); 
+}
+
+irep_idt symex_bmct::make_new_heap_id(irep_idt tag)
+{ 
+  return /*id2string(tag)+*/"heap"+i2string(++heap_counter); 
+}

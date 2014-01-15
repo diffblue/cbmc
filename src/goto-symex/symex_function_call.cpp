@@ -277,8 +277,9 @@ void goto_symext::symex_function_call_code(
       //     target.heap_objects.insert(lhs_symbol.get_identifier());
 
       irep_idt old_heap_id = make_heap_id(struct_type.get_tag());
-      heap_counter++; //new heap
-      irep_idt new_heap_id = make_heap_id(struct_type.get_tag());
+      irep_idt new_heap_id = make_new_heap_id(struct_type.get_tag());
+      lhs.set(ID_new_heap_id,new_heap_id);
+      update_heap_ids(struct_type.get_tag(),lhs_symbol.get_identifier());
 
       heap_function_application_exprt rhs = 
         heap_function_application_exprt(old_heap_id,new_heap_id);
@@ -311,8 +312,8 @@ void goto_symext::symex_function_call_code(
       lhs.type() = dummy.type;
 
       irep_idt old_heap_id = make_heap_id(struct_type.get_tag());
-      heap_counter++; //new heap
-      irep_idt new_heap_id = make_heap_id(struct_type.get_tag());
+      irep_idt new_heap_id = make_new_heap_id(struct_type.get_tag());
+      update_heap_ids(struct_type.get_tag(),to_symbol_expr(lhs).get_identifier());
 
       heap_function_application_exprt rhs = 
         heap_function_application_exprt(old_heap_id,new_heap_id);

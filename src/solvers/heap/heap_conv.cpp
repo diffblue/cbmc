@@ -3449,6 +3449,7 @@ heapexpr heap_convt::convert_heapexpr(const exprt &expr)
 #endif
 
       clauset* clause = new clauset();
+      clause->clear();
       clause->push_back(hl);
 #if 1
         std::cout << "adding clause " << *clause << std::endl;
@@ -3634,7 +3635,7 @@ literalt heap_convt::convert_equality(const equal_exprt &expr)
     assert(false);
   }
 
-  if(expr.lhs().id()==ID_symbol && expr.rhs().id()==ID_if)
+  if(expr.lhs().id()==ID_symbol && expr.rhs().id()==ID_if) //usually occurs in PHI functions
   {
     assert(expr.rhs().operands().size()==3);
 
@@ -3650,16 +3651,15 @@ literalt heap_convt::convert_equality(const equal_exprt &expr)
 
     heaplit* hli = new eq_lit(heapvar(op1),i,stateTrue);
     heaplit* hle = new eq_lit(heapvar(op1),e,stateTrue);
-
-#if DEBUG
-    std::cout << "create EQ literal (" << op1 << " == " << i << ")" << std::endl;
-    std::cout << "create EQ literal (" << op1 << " == " << e << ")" << std::endl;
-#endif
-
     unsigned li = ++no_boolean_variables;
     unsigned le = ++no_boolean_variables;
     heap_literal_map[li] = hli;
     heap_literal_map[le] = hle;
+
+#if DEBUG
+    std::cout << "adding heaplit " << li << " = " << *hli << std::endl;
+    std::cout << "adding heaplit " << le << " = " << *hle << std::endl;
+#endif
 
     literalt l(++no_boolean_variables,false);
     literal_map[l] = or_exprt(and_exprt(literal_exprt(c),
@@ -3671,7 +3671,44 @@ literalt heap_convt::convert_equality(const equal_exprt &expr)
     std::cout << "adding literal " << l << " = " << literal_map[l] << std::endl;
 #endif
 
-    return l;
+    if(expr.rhs().op1().id()==ID_symbol && expr.rhs().op2().id()==ID_symbol) 
+    {
+      //      std::cout << "phi = " << expr << std::endl;
+      std::string hid1 = convert_identifier(expr.rhs().op1().get(ID_new_heap_id));
+      std::string hid2 = convert_identifier(expr.rhs().op2().get(ID_new_heap_id));
+      //      std::cout << "hid1 = " << hid1 << std::endl;
+      //      std::cout << "hid2 = " << hid2 << std::endl;
+      if(hid1!=hid2)
+      { //generate if then else for heap ids
+	std::string hid0 = convert_identifier(expr.lhs().get(ID_new_heap_id));
+        heaplit* hli2 = new eq_lit(heapvar(hid0),heapexpr(hid1),stateTrue);
+        heaplit* hle2 = new eq_lit(heapvar(hid0),heapexpr(hid2),stateTrue);
+	unsigned li2 = ++no_boolean_variables;
+	unsigned le2 = ++no_boolean_variables;
+	heap_literal_map[li2] = hli2;
+	heap_literal_map[le2] = hle2;
+
+#if DEBUG
+    std::cout << "adding heaplit " << li2 << " = " << *hli2 << std::endl;
+    std::cout << "adding heaplit " << le2 << " = " << *hle2 << std::endl;
+#endif
+
+        literalt l2(++no_boolean_variables,false);
+        literal_map[l2] =  and_exprt(literal_map[l],
+                             or_exprt(and_exprt(literal_exprt(c),
+                                        literal_exprt(literalt(li2,false))),
+                                      and_exprt(literal_exprt(!c),
+					literal_exprt(literalt(le2,false)))));
+
+#if DEBUG
+        std::cout << "adding literal " << l2 << " = " << literal_map[l2] << std::endl;
+#endif
+      
+        return l2; 
+      }
+      return l;
+    }
+    else return l;
   }
 
   //equality between heap expressions
@@ -4263,6 +4300,7 @@ void heap_convt::set_to(const exprt &expr, bool value)
     if(heap_literal_map.find(l.var_no())!=heap_literal_map.end())
     {
       clauset* clause = new clauset(); 
+      clause->clear();
       heaplit* hl = heap_literal_map[l.var_no()];
       if(l.sign() || !value) hl = copy_lit(hl);
       if(l.sign()) hl->complement(); 
@@ -4310,6 +4348,7 @@ void heap_convt::set_to(const exprt &expr, bool value)
 #endif
 
         clauset* clause = new clauset(); 
+        clause->clear();
         forall_operands(it, cnf) 
         {          
           if(it->id()==ID_literal) 
@@ -4343,6 +4382,7 @@ void heap_convt::set_to(const exprt &expr, bool value)
 #endif
 
 	  clauset* clause = new clauset(); 
+          clause->clear();
           bool ignore_clause = false;
           if(it1->id()==ID_literal) 
           { 

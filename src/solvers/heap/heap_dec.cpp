@@ -50,6 +50,42 @@ Function: heap_dect::dec_solve
 
 \*******************************************************************/
 
+bool have_eq(heapabs sol, std::string id1, std::string id2) 
+{
+  heapvar v(id1);
+  heaplit* l = new eq_lit(heapvar(id1),heapexpr(id2),stateTrue);
+  if(sol.entails_literal(l))
+  {
+
+#if 1
+    std::cout << "have " << *l << std::endl;
+#endif
+    return true;
+  }
+#if 0
+  std::cout << "do not have " << *l << std::endl;
+#endif
+  return false;
+}
+
+bool have_sel(heapabs sol, std::string id1, std::string id2, std::string heap_id, std::string field) 
+{
+  heapvar v(id1);
+  heaplit* l = new eq_lit(heapvar(id1),heapexpr(id2,heap_id,field),stateTrue);
+  if(sol.entails_literal(l))
+  {
+
+#if 1
+    std::cout << "have " << *l << std::endl;
+#endif
+    return true;
+  }
+#if 1
+  std::cout << "do not have " << *l << std::endl;
+#endif
+  return false;
+}
+
 decision_proceduret::resultt heap_dect::dec_solve()
 {
   //call hippo
@@ -83,32 +119,46 @@ decision_proceduret::resultt heap_dect::dec_solve()
 
     // Theory variables
 
+    for(unsigned i=0;i<=6;i++) 
+      for(unsigned j=0;j<=6;j++) 
+        if(i!=j) have_eq(sol,"|heap"+i2string(i)+"|","|heap"+i2string(j)+"|");
+
+    for(unsigned i=0;i<=6;i++) 
+      have_sel(sol,"|c::main::1::one!0@1#1|","|c::main::1::p!0@1#3|","|heap"+i2string(i)+"|","|h|");
+
     for(identifier_mapt::iterator
         it=identifier_map.begin();
         it!=identifier_map.end();
         it++)
     {
-      if(it->second.type.id()==ID_pointer) 
+      if(it->second.type.id()==ID_pointer || it->second.type.id()==ID_struct) 
       {
         it->second.value.make_nil();
         std::string id = convert_identifier(it->first);
-        heapvar v(id);
-        heaplit* l = new eq_lit(v,heapexpr(std::string("NULL")),stateTrue);
-        if(sol.entails_literal(l))
-        {
-
-#if 0
-          status() << "have " << id << "==NULL" << eom;
-  	  status() << "type: " << ns.follow(it->second.type) << eom;
-#endif
-
-          pointer_typet type = to_pointer_type(ns.follow(it->second.type));
+        if(have_eq(sol,id,"NULL")) 
+	{
+	  pointer_typet type = (it->second.type.id()==ID_pointer) ? 
+            to_pointer_type(ns.follow(it->second.type)) : pointer_typet(ns.follow(it->second.type));
           it->second.value = null_pointer_exprt(type);
+          continue;
         }
-#if 0
-        else
-          status() << "do not have " << id << "==NULL" << eom;
-#endif
+	for(identifier_mapt::iterator
+	      it2=identifier_map.begin();
+	    it2!=identifier_map.end();
+	    it2++)
+	{
+	  if((it2->second.type.id()==ID_pointer || it2->second.type.id()==ID_struct) &&
+             it2->first!=it->first)
+	   { 
+             std::string id2 = convert_identifier(it2->first);
+	     if(have_eq(sol,id,id2)) 
+	       {
+		 //		 pointer_typet type = to_pointer_type(ns.follow(it->second.type));
+		 it->second.value = symbol_exprt(it2->first);
+		 continue;
+	       }
+	   }
+	}
       }
       else if(it->second.type.id()==ID_bool) 
       {

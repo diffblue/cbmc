@@ -272,9 +272,12 @@ protected:
 
   //heap theory
   virtual bool is_heap_type(typet type) { return false; }
-  irep_idt make_heap_id(irep_idt tag) { return /*id2string(tag)+*/"heap"+i2string(heap_counter); }
+  virtual irep_idt make_heap_id(irep_idt tag) { assert(false); }
+  virtual irep_idt make_new_heap_id(irep_idt tag) { assert(false); }
   void replace_heap_member(exprt &expr);
-
+  typedef std::map<irep_idt,irep_idt> heap_id_mapt;
+  heap_id_mapt heap_id_map;
+  void update_heap_ids(irep_idt tag,irep_idt updated_id);
 };
 
 #endif

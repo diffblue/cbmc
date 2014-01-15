@@ -42,7 +42,8 @@ public:
     no_boolean_variables(0),
     no_tmp_variables(0)
   {
-
+    formula.clear();
+    boolean_assignment.clear();
   }
 
   virtual ~heap_convt() { }

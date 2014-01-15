@@ -7,6 +7,7 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <cassert>
+#include <iostream>
 
 #include <util/i2string.h>
 #include <util/std_expr.h>
@@ -257,6 +258,7 @@ void symex_target_equationt::assignment(
   SSA_step.assignment_type=assignment_type;
 
   SSA_step.cond_expr=equal_exprt(SSA_step.ssa_lhs, SSA_step.ssa_rhs);
+
   SSA_step.type=goto_trace_stept::ASSIGNMENT;
   SSA_step.source=source;
 
