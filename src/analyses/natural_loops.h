@@ -89,8 +89,9 @@ template<class P, class T>
 void natural_loops_templatet<P, T>::compute(P &program)
 {
   cfg_dominators(program);
+
 #ifdef DEBUG
-  dominators.output(std::cout);
+  cfg_dominators.output(std::cout);
 #endif
 
   // find back-edges m->n

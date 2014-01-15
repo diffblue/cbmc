@@ -8,9 +8,14 @@
 
 //#define DEBUG
 
+#ifdef DEBUG
+#include <iostream>
+#endif
+
 static int num_symbols;
 
-symbolt scratch_programt::fresh_symbol(string base, typet type) {
+symbolt scratch_programt::fresh_symbol(string base, typet type)
+{
   string name = base + "_" + i2string(num_symbols++);
   symbolt ret;
   ret.module = "scratch";
@@ -24,7 +29,8 @@ symbolt scratch_programt::fresh_symbol(string base, typet type) {
   return ret;
 }
 
-bool scratch_programt::check_sat() {
+bool scratch_programt::check_sat()
+{
   fix_types();
 
   add_instruction(END_FUNCTION);
