@@ -881,7 +881,7 @@ class heaptrans {
     for(formulat::const_iterator it1 = formula.begin(); satisfied && it1 != formula.end(); ++it1) {
       satisfied = false;
       debugc("[isComplete]: now trying clause " << **it1, 1);
-      debugc("[isComplete]: trail = " << sol.trail, 1);
+      debugc("[isComplete]: trail = " << sol.trail, 0);
       for(clauset::const_iterator it2 = (*it1)->begin(); it2 != (*it1)->end(); ++it2) {
       	//if (satisfied)
 	//break;
