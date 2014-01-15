@@ -795,6 +795,13 @@ class heaptrans {
 	  if(unit_clause(*it1, unit, sol)) {
 	    debugc("[apply]: found new enabled unit clause " << *unit, 1);
 	    callAgain |= apply_one_ded(unit, sol);
+
+	    // early bottom detection for equalities and inequalities
+	    if  (sol.is_early_bottom()) {
+	      debugc("[apply] : Early bottom detected! ", 1);
+	      return transformerResult::Bottom;
+	    }
+
 	    unit_clauses.push_back(unit);
 	  }
 	  

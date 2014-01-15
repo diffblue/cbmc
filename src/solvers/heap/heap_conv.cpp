@@ -30,7 +30,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "heap_conv.h"
 
 #define DEBUG 0
-#define SIMPLIFY 0
+#define SIMPLIFY 1
 
 /*******************************************************************\
 

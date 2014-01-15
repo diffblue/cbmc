@@ -519,6 +519,24 @@ public :
     return false;
   }
 
+
+   // is the current solution bottom?
+   // early detection for eq
+   bool is_early_bottom() {
+     for(not_eqst::iterator it = not_eqs.begin(); it != not_eqs.end(); ++it) {
+       not_eqt eq = *it;
+       if (entails_eq(eq.first, eq.second)) {
+	 debugc("[is_early_bottom] : contradiction for " << eq.first << " != " << eq.second, 1);
+	 return true;
+       }
+     }
+
+
+     return false;
+   }
+
+
+
   /* downwardCompleteness::s isComplete() const { */
   /*   return gamma; */
   /* } */
