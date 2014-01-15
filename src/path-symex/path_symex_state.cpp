@@ -427,7 +427,7 @@ exprt path_symex_statet::read_symbol_member_index(
 
       #ifdef DEBUG
       std::cout << "read_symbol_member_index_rec " << identifier
-                << " var_info " << var_info.identifier << std::endl;
+                << " var_info " << var_info.full_identifier << std::endl;
       #endif
 
       // warning: reference is not stable      
