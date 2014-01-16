@@ -255,7 +255,9 @@ void goto_symext::symex_function_call_code(
   const irep_idt &identifier=
     to_symbol_expr(call.function()).get_identifier();
 
+#if 0
   std::cout << "symex_function_call: " << identifier << std::endl;  
+#endif
     
   // symex special functions
   if(identifier=="c::malloc") 

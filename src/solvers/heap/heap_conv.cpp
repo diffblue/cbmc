@@ -30,6 +30,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "heap_conv.h"
 
 #define DEBUG 0
+#define PRINT_CLAUSES 0
 #define SIMPLIFY 1
 
 /*******************************************************************\
@@ -3452,7 +3453,7 @@ heapexpr heap_convt::convert_heapexpr(const exprt &expr)
       clauset* clause = new clauset();
       clause->clear();
       clause->push_back(hl);
-#if 1
+#if PRINT_CLAUSES
         std::cout << "adding clause " << *clause << std::endl;
 #endif
       formula.push_back(clause);
@@ -4308,7 +4309,7 @@ void heap_convt::set_to(const exprt &expr, bool value)
       if(!value) hl->complement();
       clause->push_back(hl); 
 
-#if 1
+#if PRINT_CLAUSES
       std::cout << "adding clause " << *clause << std::endl;
 #endif
 
@@ -4363,7 +4364,7 @@ void heap_convt::set_to(const exprt &expr, bool value)
             clause->push_back(hl);
           }
         }
-#if 1
+#if PRINT_CLAUSES
         std::cout << "adding clause " << *clause << std::endl;
 #endif
 
@@ -4420,7 +4421,7 @@ void heap_convt::set_to(const exprt &expr, bool value)
           }
           if(!ignore_clause) 
 	  {
-#if 1
+#if PRINT_CLAUSES
 	    std::cout << "adding clause " << *clause << std::endl;
 #endif
 	    formula.push_back(clause);

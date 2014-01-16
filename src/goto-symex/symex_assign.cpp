@@ -202,8 +202,6 @@ void goto_symext::symex_assign_symbol(
   guardt &guard,
   visibilityt visibility)
 {
-  //  std::cout << std::endl << "assign : " << lhs << " ===== " << rhs << std::endl;
-
   exprt ssa_rhs=rhs;
   
   // put assignment guard into the rhs
@@ -249,7 +247,7 @@ void goto_symext::symex_assign_symbol(
     ssa_lhs.set(ID_new_heap_id,ssa_rhs.get(ID_new_heap_id));
     update_heap_ids(struct_type.get_tag(),to_symbol_expr(ssa_lhs).get_identifier());
     heap_id_map[to_symbol_expr(ssa_lhs).get_identifier()] = ssa_rhs.get(ID_new_heap_id);
-    std::cout  << "add to heap_id_map2: " << to_symbol_expr(ssa_lhs).get_identifier() << ": " << ssa_rhs.get(ID_new_heap_id) << std::endl;
+    //    std::cout  << "add to heap_id_map2: " << to_symbol_expr(ssa_lhs).get_identifier() << ": " << ssa_rhs.get(ID_new_heap_id) << std::endl;
   }
 
   // do the assignment

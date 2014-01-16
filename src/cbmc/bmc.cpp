@@ -120,7 +120,9 @@ void bmct::do_conversion(prop_convt &prop_conv)
   // convert HDL
   do_unwind_module(prop_conv);
 
+#if DEBUG
   equation.output(std::cout);
+#endif
 
   // convert SSA
   equation.convert(prop_conv);

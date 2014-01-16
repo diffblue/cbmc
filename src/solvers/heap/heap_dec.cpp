@@ -57,7 +57,7 @@ bool have_eq(heapabs sol, std::string id1, std::string id2)
   if(sol.entails_literal(l))
   {
 
-#if 1
+#if 0
     std::cout << "have " << *l << std::endl;
 #endif
     return true;
@@ -75,12 +75,12 @@ bool have_sel(heapabs sol, std::string id1, std::string id2, std::string heap_id
   if(sol.entails_literal(l))
   {
 
-#if 1
+#if 0
     std::cout << "have " << *l << std::endl;
 #endif
     return true;
   }
-#if 1
+#if 0
   std::cout << "do not have " << *l << std::endl;
 #endif
 
@@ -120,12 +120,14 @@ decision_proceduret::resultt heap_dect::dec_solve()
 
     // Theory variables
 
+    /*
     for(unsigned i=0;i<=6;i++) 
       for(unsigned j=0;j<=6;j++) 
         if(i!=j) have_eq(sol,"|heap"+i2string(i)+"|","|heap"+i2string(j)+"|");
 
     for(unsigned i=0;i<=6;i++) 
       have_sel(sol,"|c::main::1::one!0@1#1|","|c::main::1::p!0@1#3|","|heap"+i2string(i)+"|","|h|");
+    */
 
     for(identifier_mapt::iterator
         it=identifier_map.begin();

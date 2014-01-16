@@ -104,7 +104,7 @@ void goto_symext::replace_heap_member(exprt &expr)
       if(id2string(id).find("#")!=std::string::npos //TODO: dirty hack to add only L2 ids
          && heap_id_map.find(id)==heap_id_map.end()) { 
         heap_id_map[id] = heap_id;
-        std::cout  << "add to heap_id_map0: " << id << ": " << heap_id << std::endl;
+	//        std::cout  << "add to heap_id_map0: " << id << ": " << heap_id << std::endl;
       }
       return;
     }
@@ -138,6 +138,6 @@ void goto_symext::update_heap_ids(irep_idt tag, irep_idt updated_id)
       }
     }
     heap_id_map[id1+"#"+i2string(n1)] = heap_id;
-    std::cout << "update heap_id: " << id1+"#"+i2string(n1) << " == " << heap_id << std::endl;
+    //    std::cout << "update heap_id: " << id1+"#"+i2string(n1) << " == " << heap_id << std::endl;
   }
 }

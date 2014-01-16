@@ -391,7 +391,7 @@ void goto_symext::phi_function(
       {
 	irep_idt id1 = to_symbol_expr(goto_state_rhs).get_identifier();
 	heap_id1 = heap_id_map[id1];
-	std::cout  << "get from heap_id_map: " << id1<< ": " << heap_id1 << std::endl;
+	//	std::cout  << "get from heap_id_map: " << id1<< ": " << heap_id1 << std::endl;
 	rhs.op1().set(ID_new_heap_id,heap_id1);
 	heap_id = heap_id1;
       }
@@ -399,7 +399,7 @@ void goto_symext::phi_function(
       {
 	irep_idt id2 = to_symbol_expr(dest_state_rhs).get_identifier();
 	heap_id2 = heap_id_map[id2];
-	std::cout  << "get from heap_id_map: " << id2 << ": " << heap_id2 << std::endl;
+	//	std::cout  << "get from heap_id_map: " << id2 << ": " << heap_id2 << std::endl;
 	rhs.op2().set(ID_new_heap_id,heap_id2);
 	heap_id = heap_id2;
       }
@@ -415,7 +415,7 @@ void goto_symext::phi_function(
       }
       new_lhs.set(ID_new_heap_id,heap_id);
       heap_id_map[to_symbol_expr(new_lhs).get_identifier()] = heap_id;
-      std::cout  << "add to heap_id_map1: " << to_symbol_expr(new_lhs).get_identifier() << ": " << heap_id << std::endl;
+      //      std::cout  << "add to heap_id_map1: " << to_symbol_expr(new_lhs).get_identifier() << ": " << heap_id << std::endl;
     }
   
     target.assignment(
