@@ -117,16 +117,18 @@ void goto_symext::update_heap_ids(irep_idt tag, irep_idt updated_id)
 {
   irep_idt heap_id = make_heap_id(tag);
   std::string uid = id2string(updated_id);
+  std::set<std::string> updated_ids;
   //assume: occur in ssa order
   unsigned upos = uid.find("#");
   std::string uids = upos!=std::string::npos ? uid.substr(0,upos) : uid;
+  updated_ids.insert(uids);
   for(heap_id_mapt::iterator it1=heap_id_map.begin(); it1!=heap_id_map.end(); it1++)
   {
     std::string id1 = id2string(it1->first);
     unsigned pos1 = id1.find("#");
     unsigned n1 = safe_string2unsigned(id1.substr(pos1+1));
     id1 = id1.substr(0,pos1);
-    if(id1==uids) continue;
+    if(updated_ids.find(id1)!=updated_ids.end()) continue;
     for(heap_id_mapt::iterator it2=heap_id_map.begin(); it2!=heap_id_map.end(); it2++)
     {
       std::string id2 = id2string(it2->first);
@@ -138,6 +140,7 @@ void goto_symext::update_heap_ids(irep_idt tag, irep_idt updated_id)
       }
     }
     heap_id_map[id1+"#"+i2string(n1)] = heap_id;
+    updated_ids.insert(id1);
     //    std::cout << "update heap_id: " << id1+"#"+i2string(n1) << " == " << heap_id << std::endl;
   }
 }
