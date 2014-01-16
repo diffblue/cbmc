@@ -3615,18 +3615,20 @@ literalt heap_convt::convert_equality(const equal_exprt &expr)
       return l;
     }
 
-    if(to_symbol_expr(f.function()).get_identifier()=="c::free") 
+    if(to_symbol_expr(f.function()).get_identifier()=="c::__CPROVER_HEAP_free") 
     {
-      find_symbols(f);
+      find_symbols(expr.lhs());
+
       std::string op1 = convert_identifier(f.get_new_heap_id());
       std::string op2 = convert_identifier(f.get_old_heap_id());
       std::string op3;
-      if(f.arguments()[0].id()==ID_symbol) {
-        op3 = convert_identifier(to_symbol_expr(f.arguments()[0]).get_identifier());
+      exprt arg = expr.lhs(); //f.arguments()[0];
+      if(arg.id()==ID_symbol) {
+        op3 = convert_identifier(to_symbol_expr(arg).get_identifier());
       }
       else //introduce auxiliary EQ
       { 
-        heapexpr he = convert_heapexpr(f.arguments()[0]);
+        heapexpr he = convert_heapexpr(arg);
         op3 = convert_identifier("heap::tmp"+i2string(++no_tmp_variables));
         heaplit* hl2 = new eq_lit(heapvar(op3),he,stateTrue);
         heap_literal_map[++no_boolean_variables] = hl2;
@@ -3646,7 +3648,7 @@ literalt heap_convt::convert_equality(const equal_exprt &expr)
         *hl << std::endl;
 #endif
       
-      if(f.arguments()[0].id()!=ID_symbol)
+      if(arg.id()!=ID_symbol)
       {
         literalt l(++no_boolean_variables,false);
         literal_map[l] = and_exprt(

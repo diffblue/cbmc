@@ -85,6 +85,11 @@ inline void *malloc(__CPROVER_size_t malloc_size)
 */
 /* FUNCTION: free */
 
+#undef free
+
+extern void* __CPROVER_HEAP_free(void* x);
+
+inline void free(void *x) { x=__CPROVER_HEAP_free(x); }
  
  /*
 #undef free

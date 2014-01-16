@@ -296,25 +296,34 @@ void goto_symext::symex_function_call_code(
     }
   }
 
-  if(identifier=="c::free") 
+  if(identifier=="c::__CPROVER_HEAP_free") 
   {
     if(call.arguments().size()!=1) throw "free expected one operand";
 
-    struct_typet struct_type = to_struct_type(
-      ns.follow(call.arguments()[0].op0().type().subtype()));
-    pointer_typet type = pointer_typet(struct_type);
+    std::cout << "lhs: " << call.lhs() << std::endl << std::endl;
+    std::cout << "arg: " << call.arguments()[0] << std::endl << std::endl;
+    //struct_typet struct_type = to_struct_type(
+    //      ns.follow(call.arguments()[0].op0().type().subtype()));
+    //pointer_typet type =  to_pointer_type(ns.follow(call.lhs().type()));
+    //struct_typet struct_type = to_struct_type(ns.follow(type.subtype()));
+
+      //pointer_typet(struct_type);
     //    std::cout << "pointer type: " << type << std::endl;  
 
-    if(is_heap_type(type)) 
+    // if(is_heap_type(type)) 
     {
-      symbolt dummy; //pseudo-lhs
+      /*     symbolt dummy; //pseudo-lhs
       dummy.name = "symex://nil";
       new_name(dummy);
       exprt lhs = symbol_exprt(dummy.name); 
       lhs.type() = dummy.type;
+      */
+      exprt lhs = call.lhs();
+      //lhs.type() = type; // set to freed type
+      symbol_exprt lhs_symbol = to_symbol_expr(lhs);
 
-      irep_idt old_heap_id = make_heap_id(struct_type.get_tag());
-      irep_idt new_heap_id = make_new_heap_id(struct_type.get_tag());
+      irep_idt old_heap_id = make_heap_id(""); //struct_type.get_tag());
+      irep_idt new_heap_id = make_new_heap_id(""); //struct_type.get_tag());
       //     update_heap_ids(struct_type.get_tag(),to_symbol_expr(lhs).get_identifier());
 
       heap_function_application_exprt rhs = 
