@@ -14,4 +14,4 @@ show:
 	done;
 
 clean:
-	@rm -f */*.out
+	@rm -f */*.out tests.log
