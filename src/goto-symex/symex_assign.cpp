@@ -455,12 +455,13 @@ void goto_symext::symex_assign_member(
 
   if(is_heap_type(struct_type))
   {
+    exprt _rhs = rhs;
+    replace_heap_member(_rhs);
     irep_idt old_heap_id = make_heap_id(to_struct_type(struct_type).get_tag());
     irep_idt new_heap_id = make_new_heap_id(to_struct_type(struct_type).get_tag());
     heap_with_exprt new_rhs(lhs_struct, exprt(ID_member_name), 
-      rhs,old_heap_id,new_heap_id);
+      _rhs,old_heap_id,new_heap_id);
     new_rhs.op1().set(ID_component_name, component_name);
-    replace_heap_member(new_rhs);
     exprt new_lhs = lhs;
     /*   lhs_struct.set(ID_new_heap_id,new_heap_id);
 	 new_lhs.set(ID_new_heap_id,new_heap_id); */

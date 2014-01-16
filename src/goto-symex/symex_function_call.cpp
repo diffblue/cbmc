@@ -262,12 +262,13 @@ void goto_symext::symex_function_call_code(
   // symex special functions
   if(identifier=="c::malloc") 
   {
-    if(call.arguments().size()!=1) throw "malloc expected to have one operand";
+    if(call.arguments().size()!=1) throw "ERROR: malloc expected to have one operand";
     if(call.lhs().is_nil()) return; // ignore
 
     //get objecttype from sizeof
-    struct_typet struct_type = 
-      to_struct_type(ns.follow(c_sizeof_type_rec(call.arguments()[0])));  
+    typet stype = ns.follow(c_sizeof_type_rec(call.arguments()[0]));
+    if(stype.id()!=ID_struct) throw "ERROR: sizeof expected struct type operand";
+    struct_typet struct_type = to_struct_type(stype);  
     pointer_typet type = pointer_typet(struct_type);
 
     if(is_heap_type(type)) 
@@ -293,24 +294,24 @@ void goto_symext::symex_function_call_code(
     }
   }
 
-  if(identifier=="c::__CPROVER_HEAP_free") 
+  if(identifier=="c::free")
   {
-    if(call.arguments().size()!=1) throw "free expected one operand";
+    if(call.arguments().size()!=1) throw "ERROR: free expected one operand";
 
-    //TODO: type propagation needed (works without)
+    //TODO: fix the typecheck
 #if 0
     std::cout << "lhs: " << call.lhs() << std::endl << std::endl;
     std::cout << "arg: " << call.arguments()[0] << std::endl << std::endl;
 #endif
-    //struct_typet struct_type = to_struct_type(
-    //      ns.follow(call.arguments()[0].op0().type().subtype()));
-    //pointer_typet type =  to_pointer_type(ns.follow(call.lhs().type()));
+    /*struct_typet struct_type = to_struct_type(
+          ns.follow(call.arguments()[0].op0().type().subtype()));
+	  pointer_typet type =  to_pointer_type(ns.follow(call.lhs().type()));*/
     //struct_typet struct_type = to_struct_type(ns.follow(type.subtype()));
 
       //pointer_typet(struct_type);
     //    std::cout << "pointer type: " << type << std::endl;  
 
-    // if(is_heap_type(type)) 
+    //if(is_heap_type(type)) 
     {
       /*     symbolt dummy; //pseudo-lhs
       dummy.name = "symex://nil";
@@ -318,9 +319,9 @@ void goto_symext::symex_function_call_code(
       exprt lhs = symbol_exprt(dummy.name); 
       lhs.type() = dummy.type;
       */
-      exprt lhs = call.lhs();
+      exprt lhs = call.arguments()[0];
       //lhs.type() = type; // set to freed type
-      symbol_exprt lhs_symbol = to_symbol_expr(lhs);
+      //symbol_exprt lhs_symbol = to_symbol_expr(lhs);
 
       irep_idt old_heap_id = make_heap_id(""); //struct_type.get_tag());
       irep_idt new_heap_id = make_new_heap_id(""); //struct_type.get_tag());
@@ -355,15 +356,17 @@ void goto_symext::symex_function_call_code(
   {
     //check number of arguments
     if(identifier=="c::__CPROVER_HEAP_dangling" && call.arguments().size()!=1) 
-      throw id2string(identifier)+" expected one operand";
+      throw "ERROR: "+id2string(identifier)+" expected one operand";
     //    if(identifier=="c::__CPROVER_HEAP_disjoint" && call.arguments().size()!=2) 
     //      throw id2string(identifier)+" expected one operand";
     if((identifier=="c::__CPROVER_HEAP_path") && call.arguments().size()!=3) 
-      throw id2string(identifier)+" expected three operands";
+      throw "ERROR: "+id2string(identifier)+" expected three operands";
     if((identifier=="c::__CPROVER_HEAP_onpath") && call.arguments().size()!=4) 
-      throw id2string(identifier)+" expected four operands";
+      throw "ERROR: "+id2string(identifier)+" expected four operands";
 
     exprt lhs = call.lhs();
+    if(call.lhs().type().id()!=ID_bool) 
+      throw "ERROR: "+id2string(identifier)+" expected Boolean return type";
 
     //make heap id
     exprt arg0 = call.arguments()[0].op0(); //remove (void*)  typecast

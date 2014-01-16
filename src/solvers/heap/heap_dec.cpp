@@ -105,6 +105,8 @@ decision_proceduret::resultt heap_dect::dec_solve()
     boolean_assignment.clear();
     boolean_assignment.resize(no_boolean_variables, false);
 
+    //TODO: call the concrete counterexample construction
+
 /*    
     typedef hash_map_cont<std::string, std::string, string_hash> valuest;
     valuest values;
@@ -145,7 +147,8 @@ decision_proceduret::resultt heap_dect::dec_solve()
           it->second.value = null_pointer_exprt(type);
           continue;
         }
-	for(identifier_mapt::iterator
+        //takes long time and does not improve the counterexample right now
+	/*	for(identifier_mapt::iterator
 	      it2=identifier_map.begin();
 	    it2!=identifier_map.end();
 	    it2++)
@@ -161,7 +164,7 @@ decision_proceduret::resultt heap_dect::dec_solve()
 		 continue;
 	       }
 	   }
-	}
+	   }*/
       }
       else if(it->second.type.id()==ID_bool) 
       {

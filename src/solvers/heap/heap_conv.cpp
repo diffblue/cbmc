@@ -30,7 +30,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "heap_conv.h"
 
 #define DEBUG 0
-#define PRINT_CLAUSES 0
+#define PRINT_CLAUSES 1
 
 #define SIMPLIFY 1
 
@@ -3616,7 +3616,7 @@ literalt heap_convt::convert_equality(const equal_exprt &expr)
       return l;
     }
 
-    if(to_symbol_expr(f.function()).get_identifier()=="c::__CPROVER_HEAP_free") 
+    if(to_symbol_expr(f.function()).get_identifier()=="c::free") 
     {
       find_symbols(expr.lhs());
 
