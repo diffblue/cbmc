@@ -29,7 +29,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "heap_conv.h"
 
-#define DEBUG 0
+#define DEBUG 1
 #define PRINT_CLAUSES 1
 #define SIMPLIFY 1
 
@@ -679,7 +679,7 @@ void heap_convt::convert_literal(const literalt l)
   if(l.sign())
     out << ")";  
   */
-  heap_identifiers.insert("B"+i2string(l.var_no()));
+  //heap_identifiers.insert("B"+i2string(l.var_no()));
 }
 
 /*******************************************************************\
@@ -3413,7 +3413,7 @@ heapexpr heap_convt::convert_heapexpr(const exprt &expr)
   {
     const irep_idt &identifier=to_symbol_expr(expr).get_identifier();
     std::string id = convert_identifier(identifier);
-    heap_identifiers.insert(id);
+    //heap_identifiers.insert(id);
     return heapexpr(id);
   }
   if(expr.id()==ID_constant)
@@ -3488,7 +3488,7 @@ literalt heap_convt::convert_equality(const equal_exprt &expr)
     find_symbols(expr.lhs());
     const irep_idt &identifier=to_symbol_expr(expr.lhs()).get_identifier();
     std::string op3 = convert_identifier(identifier);
-    heap_identifiers.insert(op3);
+    //heap_identifiers.insert(op3);
 
     find_symbols(expr.rhs());
     heap_with_exprt with = to_heap_with_expr(expr.rhs());
@@ -3570,7 +3570,6 @@ literalt heap_convt::convert_equality(const equal_exprt &expr)
       find_symbols(expr.lhs());
       const irep_idt &identifier=to_symbol_expr(expr.lhs()).get_identifier();
       std::string op3 = convert_identifier(identifier);
-      heap_identifiers.insert(op3);
 
       find_symbols(expr.rhs());
       std::string op1 = convert_identifier(f.get_new_heap_id());
@@ -3584,7 +3583,36 @@ literalt heap_convt::convert_equality(const equal_exprt &expr)
         *hl << std::endl;
 #endif
         
-      return literalt(no_boolean_variables,false); 
+      if(heap_identifiers.size()==0) 
+      {
+        heap_identifiers.insert(op3);
+        return literalt(no_boolean_variables,false); 
+      }
+      //generate disequalities with all previously allocated symbols
+      and_exprt c;
+      c.operands().push_back(literal_exprt(literalt(no_boolean_variables,false)));
+      for(heap_identifierst::iterator it = heap_identifiers.begin();
+          it!=heap_identifiers.end();it++)
+      {
+        heaplit* hl2 =new eq_lit(heapvar(op3),heapexpr(*it),stateTrue);
+        hl2->complement();
+        heap_literal_map[++no_boolean_variables] = hl2;
+
+#if DEBUG
+      std::cout << "adding heaplit2 " << no_boolean_variables << " = " << 
+        *hl2 << std::endl;
+#endif
+
+        c.operands().push_back(literal_exprt(literalt(no_boolean_variables,false)));
+      }
+
+      literalt l(++no_boolean_variables,false);
+      literal_map[l] = c;
+#if DEBUG
+      std::cout << "adding literal " << l << " = " << literal_map[l] << std::endl;
+#endif
+      heap_identifiers.insert(op3);
+      return l;
     }
 
     if(to_symbol_expr(f.function()).get_identifier()=="c::free") 
@@ -3644,7 +3672,6 @@ literalt heap_convt::convert_equality(const equal_exprt &expr)
     find_symbols(expr.lhs());
     const irep_idt &identifier=to_symbol_expr(expr.lhs()).get_identifier();
     std::string op1 = convert_identifier(identifier);
-    heap_identifiers.insert(op1);
 
     find_symbols(expr.rhs());
     literalt c = convert_bool(expr.rhs().op0());
@@ -3675,15 +3702,15 @@ literalt heap_convt::convert_equality(const equal_exprt &expr)
 
     if(expr.rhs().op1().id()==ID_symbol && expr.rhs().op2().id()==ID_symbol) 
     {
-      std::cout << "phi = " << expr << std::endl;
+      //      std::cout << "phi = " << expr << std::endl;
       std::string hid1 = convert_identifier(expr.rhs().op1().get(ID_new_heap_id));
       std::string hid2 = convert_identifier(expr.rhs().op2().get(ID_new_heap_id));
-      std::cout << "hid1 = " << hid1 << std::endl;
-      std::cout << "hid2 = " << hid2 << std::endl;
+      //      std::cout << "hid1 = " << hid1 << std::endl;
+      //      std::cout << "hid2 = " << hid2 << std::endl;
       if(hid1!=hid2)
       { //generate if then else for heap ids
 	std::string hid0 = convert_identifier(expr.lhs().get(ID_new_heap_id));
-        std::cout << "hid0 = " << hid0 << std::endl;
+	//        std::cout << "hid0 = " << hid0 << std::endl;
         heaplit* hli2 = new mem_eq_lit(heapvar(hid0),heapvar(hid1),stateTrue);
         heaplit* hle2 = new mem_eq_lit(heapvar(hid0),heapvar(hid2),stateTrue);
 	unsigned li2 = ++no_boolean_variables;
