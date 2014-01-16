@@ -1,10 +1,13 @@
 default: tests.log
 
+UNWIND = 2
+
 test:
-	@../test.pl -c "time ../../../src/cbmc/cbmc --unwind 2"
+	@echo $(UNWIND) unwindings
+	@../test.pl -c "time perl -e 'alarm shift @ARGV; exec @ARGV' 900 ../../../src/cbmc/cbmc --unwind $(UNWIND)"
 
 tests.log: ../test.pl
-	@../test.pl -c "time ../../../src/cbmc/cbmc --unwind 2"
+	@../test.pl -c "time perl -e 'alarm shift @ARGV; exec @ARGV' 900 ../../../src/cbmc/cbmc --unwind $(UNWIND)"
 
 show:
 	@for dir in *; do \
