@@ -228,9 +228,11 @@ public :
 	if(sel_eqs.find(seleq) != sel_eqs.end())
 	  return false;
 
-	if(!(old_x == aliases.find(heapvar()))) {
+	// TODO: not sure this is a good decision but it does simplify the proof as there are way less precision related decisions
+	if(!(old_x == aliases.find(heapvar())) && !(old_y == aliases.find(heapvar()))) {
 	   // assume non-circularity
 	  not_eqt noteq = std::make_pair(old_x, heapexpr(old_y));
+	  debugc("adding not-circularity not_eq " << noteq, 1)
 	  not_eqs.insert(noteq);
 	}
 
