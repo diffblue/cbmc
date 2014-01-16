@@ -700,6 +700,7 @@ void heaptrans::add_to_literal_table(clauset*& c) {
 
     // already a unit clause -> record it in unit_clauses
     if(c->size() == 1) {
+      debugc("[add_to_literal_table] : found unit clause " << *c, 1);
       unit_clauses.push_back(*(c->begin()));
       return;
     }

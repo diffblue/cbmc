@@ -558,8 +558,9 @@ class heaptrans {
      * generation phase: generate disiqualities between the new var *
      * and all the existing ones                                    *
     \****************************************************************/
-    std::set<heapvar> var = this->get_vars_before(hl);
     heapvar v = hl->x;
+    /*
+    std::set<heapvar> var = this->get_vars_before(hl);
     for(std::set<heapvar>::const_iterator it = var.begin(); it != var.end(); ++it) {
       if (!(v == *it)) {
 	heapexpr* tmp = new heapexpr();
@@ -568,7 +569,7 @@ class heaptrans {
 	debugc("[ded_new] : hl = " << hl, 1);
 	callAgain |= sol.add_lit(hl);
       }
-    }
+      }*/
 
     /****************************************************************\
      * generation phase: generate newvar != null                    *
@@ -576,6 +577,12 @@ class heaptrans {
     heapexpr* tmp = new heapexpr();
     tmp->make_nil();
     callAgain |= sol.add_lit(new eq_lit(v, *tmp, stateFalse));
+
+    /********************************************************************************\
+     * generation phase: generate !Dangling(mnew, v)                                 *
+    \********************************************************************************/
+    callAgain |= sol.add_dangling(mnew, v, stateFalse);
+
 
     if (callAgain) {
       debugc("[ded_new]: transformerResult::CallAgain", 1);
@@ -876,7 +883,7 @@ class heaptrans {
 
 
   // gamma completeness depends on both the abstraction and the transformers
-  downwardCompleteness::s isComplete(heapabs& sol) const {
+  /*  downwardCompleteness::s isComplete(heapabs& sol) const {
     bool satisfied = true;
    
     debugc("[isComplete]: gamma completeness check ", 1);
@@ -893,6 +900,7 @@ class heaptrans {
 	if(hl->type == EQ || hl->type == PATH || hl->type == ONPATH || hl->type == DANGLING) {
 	  // check if the literal is true
 	  if(sol.entails_literal(hl)) {
+	    debugc("[isComplete] : satisfied clause by literal " << *it2, 1);
 	    satisfied = true;
 	    break;
 	  }
@@ -909,6 +917,70 @@ class heaptrans {
 	}
       }
     }
+    debugc("[isComplete]: end of completeness test ", 1);
+
+    // has been applied for each clause  
+    if (!satisfied) {
+      debugc("[isComplete] : incomplete (1) ", 1);
+      return downwardCompleteness::IncompleteProp;
+    }
+
+    // take into consideration the precision of the abstract transformer
+    return gamma; 
+    }*/
+
+
+  // gamma completeness depends on both the abstraction and the transformers
+  downwardCompleteness::s isComplete(heapabs& sol) {
+    bool satisfied = true;
+    formulat tmp_formula;
+    tmp_formula.clear();
+
+
+   
+    debugc("[isComplete]: gamma completeness check ", 1);
+    // each clause is satisfied
+    formulat::const_iterator it1;
+    for(it1 = formula.begin(); /*satisfied &&*/ it1 != formula.end(); ++it1) {
+      satisfied = false;
+      debugc("[isComplete]: now trying clause " << **it1, 1);
+      debugc("[isComplete]: trail = " << sol.trail, 1);
+
+      // check the current clause
+      for(clauset::const_iterator it2 = (*it1)->begin(); it2 != (*it1)->end(); ++it2) {
+
+	heaplitp hl = *it2;
+	if(hl->type == EQ || hl->type == PATH || hl->type == ONPATH || hl->type == DANGLING) {
+	  // check if the literal is true
+	  if(sol.entails_literal(hl)) {
+	    satisfied = true;
+	  }
+	}
+	else {
+	  // check if the clause was applied
+	  for(trailt::const_iterator it3 = sol.trail.begin(); it3 != sol.trail.end(); ++it3) {
+	    if (**it2 == *((*it3)->inference->lit)) {
+	      debugc("[isComplete]: clause satisfied: " << **it1, 1);
+	      satisfied = true;
+	      break;
+	    }
+	  }
+	}
+
+      	if (satisfied) 
+	  break;
+      }
+
+      if(!satisfied)
+	break;
+    }
+
+
+    for(formulat::const_iterator it4 = it1; it4 != formula.end(); ++it4)
+      tmp_formula.push_back(*it4);
+
+    formula = tmp_formula;
+
     debugc("[isComplete]: end of completeness test ", 0);
 
     // has been applied for each clause  
@@ -920,6 +992,7 @@ class heaptrans {
     // take into consideration the precision of the abstract transformer
     return gamma; 
   }
+
 
   //================================================
   // loops

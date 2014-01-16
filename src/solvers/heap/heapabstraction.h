@@ -116,6 +116,7 @@ public :
       //return add_onpath(hl->m, hl->x, hl->y, hl->z, hl->f, hl->state);
       break;
     case EQ:
+      debugc("[add_eq] (3) : " << hl->x << " = " << hl->rhs << " state = " << (int)hl->state, 1);
       return add_eq(hl->x, hl->rhs, hl->state);
     case DANGLING:
       return add_dangling(hl->m, hl->x, hl->state);
@@ -254,8 +255,10 @@ public :
 	  }
 	}
 
-	for(sel_eqst::const_iterator it = tmp_sel_eqs.begin(); it != tmp_sel_eqs.end(); ++it) 
+	for(sel_eqst::const_iterator it = tmp_sel_eqs.begin(); it != tmp_sel_eqs.end(); ++it) {
+	  debugc("[add_eq] (1) : " << it->first << " = " << it->second, 1);
 	  add_eq(it->first, it->second, stateTrue);
+	}
 
 
        // check whether sel_eqs generates any new disequality
@@ -431,8 +434,10 @@ public :
 	}
       }
 
-      for(sel_eqst::const_iterator it = tmp_sel_eqs.begin(); it != tmp_sel_eqs.end(); ++it) 
+      for(sel_eqst::const_iterator it = tmp_sel_eqs.begin(); it != tmp_sel_eqs.end(); ++it) {
+        debugc("[add_eq] (2) : " << it->first << " = " << it->second, 1);
 	add_eq(it->first, it->second, stateTrue);
+      }
 
 
       debugc("[add_eq/not_paths] : not_paths = " << not_paths, 1);
