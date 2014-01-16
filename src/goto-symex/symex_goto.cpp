@@ -309,9 +309,11 @@ void goto_symext::phi_function(
   irep_idt heap_id2 = make_heap_id("");
   if(heap_id1!=heap_id2) heap_id = make_new_heap_id("");
 
+#if 0
   std::cout << "goto_state.heap_id = " << heap_id1 << std::endl;
   std::cout << "dest_state.heap_id = " << heap_id2 << std::endl;
-    std::cout << "result.heap_id = " << heap_id << std::endl;
+  std::cout << "result.heap_id = " << heap_id << std::endl;
+#endif
 
   for(std::set<irep_idt>::const_iterator
       it=variables.begin();
@@ -394,36 +396,16 @@ void goto_symext::phi_function(
     //for heap theory
     if(is_heap_type(new_lhs.type()) && rhs.id()==ID_if)
     {
-      //copy heap ids to newly created symbols (since only identifiers are available and not the symbol exprs we take them from the heap_id_map) TODO: better solution: attach heap id to symbolt?
-      //      irep_idt heap_id, heap_id1, heap_id2;
       if(goto_state_rhs.id()==ID_symbol) 
       {
-	/*	irep_idt id1 = to_symbol_expr(goto_state_rhs).get_identifier();
-	heap_id1 = goto_state.heap_id; //heap_id_map[id1];
-	std::cout  << "get from heap_id_map: " << id1<< ": " << heap_id1 << std::endl;*/
 	rhs.op1().set(ID_new_heap_id,heap_id1);
-	//heap_id = heap_id1;
       }
       if(dest_state_rhs.id()==ID_symbol) 
       {
-	/*irep_idt id2 = to_symbol_expr(dest_state_rhs).get_identifier();
-	heap_id2 = make_heap_id(""); //heap_id_map[id2];
-	std::cout  << "get from heap_id_map: " << id2 << ": " << heap_id2 << std::endl;*/
 	rhs.op2().set(ID_new_heap_id,heap_id2);
-	//heap_id = heap_id2;
       }
-      /*
-      if(heap_id1!=heap_id2) 
-      {
-	heap_id = make_new_heap_id(struct_type.get_tag());
-        update_heap_ids(struct_type.get_tag(),to_symbol_expr(new_lhs).get_identifier());
-      } */
       new_lhs.set(ID_new_heap_id,heap_id);
-      /*     heap_id_map[to_symbol_expr(new_lhs).get_identifier()] = heap_id;
-	     std::cout  << "add to heap_id_map1: " << to_symbol_expr(new_lhs).get_identifier() << ": " << heap_id << std::endl;*/
     }
-
-    std::cout  << std::endl << "phi: " << new_lhs << " == " << rhs << std::endl;
   
     target.assignment(
       true_exprt(),

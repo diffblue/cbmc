@@ -269,19 +269,16 @@ void goto_symext::symex_function_call_code(
     struct_typet struct_type = 
       to_struct_type(ns.follow(c_sizeof_type_rec(call.arguments()[0])));  
     pointer_typet type = pointer_typet(struct_type);
-    //std::cout << "pointer type: " << type << std::endl;  
 
     if(is_heap_type(type)) 
     {
       exprt lhs = call.lhs();
       lhs.type() = type; // set to mallocked type
       symbol_exprt lhs_symbol = to_symbol_expr(lhs);
-      //     target.heap_objects.insert(lhs_symbol.get_identifier());
 
       irep_idt old_heap_id = make_heap_id(struct_type.get_tag());
       irep_idt new_heap_id = make_new_heap_id(struct_type.get_tag());
       lhs.set(ID_new_heap_id,new_heap_id);
-      //      update_heap_ids(struct_type.get_tag(),lhs_symbol.get_identifier());
 
       heap_function_application_exprt rhs = 
         heap_function_application_exprt(old_heap_id,new_heap_id);
@@ -300,8 +297,11 @@ void goto_symext::symex_function_call_code(
   {
     if(call.arguments().size()!=1) throw "free expected one operand";
 
+    //TODO: type propagation needed (works without)
+#if 0
     std::cout << "lhs: " << call.lhs() << std::endl << std::endl;
     std::cout << "arg: " << call.arguments()[0] << std::endl << std::endl;
+#endif
     //struct_typet struct_type = to_struct_type(
     //      ns.follow(call.arguments()[0].op0().type().subtype()));
     //pointer_typet type =  to_pointer_type(ns.follow(call.lhs().type()));
