@@ -95,7 +95,7 @@ void goto_symext::replace_heap_member(exprt &expr)
       expr.swap(hexpr);
       return;
     }
-    if(expr.id()==ID_symbol)
+    /*    if(expr.id()==ID_symbol)
     {
       //TODO: perhaps generate a heap_symbol in future
       irep_idt heap_id = make_heap_id(struct_type.get_tag());
@@ -104,10 +104,16 @@ void goto_symext::replace_heap_member(exprt &expr)
       if(id2string(id).find("#")!=std::string::npos //TODO: dirty hack to add only L2 ids
          && heap_id_map.find(id)==heap_id_map.end()) { 
         heap_id_map[id] = heap_id;
-	//        std::cout  << "add to heap_id_map0: " << id << ": " << heap_id << std::endl;
+	std::cout  << "add to heap_id_map0: " << id << ": " << heap_id << std::endl;
       }
       return;
     }
+    if(expr.id()==ID_constant)
+    {
+      irep_idt heap_id = make_heap_id(struct_type.get_tag());
+      expr.set(ID_new_heap_id,heap_id);
+      return;
+      }*/
   }
   Forall_operands(it, expr)
     replace_heap_member(*it);
@@ -115,7 +121,7 @@ void goto_symext::replace_heap_member(exprt &expr)
 
 void goto_symext::update_heap_ids(irep_idt tag, irep_idt updated_id)
 {
-  irep_idt heap_id = make_heap_id(tag);
+  /*  irep_idt heap_id = make_heap_id(tag);
   std::string uid = id2string(updated_id);
   std::set<std::string> updated_ids;
   //assume: occur in ssa order
@@ -142,5 +148,5 @@ void goto_symext::update_heap_ids(irep_idt tag, irep_idt updated_id)
     heap_id_map[id1+"#"+i2string(n1)] = heap_id;
     updated_ids.insert(id1);
     //    std::cout << "update heap_id: " << id1+"#"+i2string(n1) << " == " << heap_id << std::endl;
-  }
+    }*/
 }

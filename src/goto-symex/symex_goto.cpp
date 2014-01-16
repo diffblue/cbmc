@@ -112,6 +112,7 @@ void goto_symext::symex_goto(statet &state)
 
   goto_state_list.push_back(statet::goto_statet(state));
   statet::goto_statet &new_state=goto_state_list.back();
+  new_state.heap_id = make_heap_id("");//TEST
   
   // adjust guards
   if(new_guard.is_true())
@@ -302,7 +303,16 @@ void goto_symext::phi_function(
 
   goto_state.level2.get_variables(variables);
   dest_state.level2.get_variables(variables);
-  
+
+  irep_idt heap_id = "";
+  irep_idt heap_id1 = goto_state.heap_id;
+  irep_idt heap_id2 = make_heap_id("");
+  if(heap_id1!=heap_id2) heap_id = make_new_heap_id("");
+
+  std::cout << "goto_state.heap_id = " << heap_id1 << std::endl;
+  std::cout << "dest_state.heap_id = " << heap_id2 << std::endl;
+    std::cout << "result.heap_id = " << heap_id << std::endl;
+
   for(std::set<irep_idt>::const_iterator
       it=variables.begin();
       it!=variables.end();
@@ -385,38 +395,35 @@ void goto_symext::phi_function(
     if(is_heap_type(new_lhs.type()) && rhs.id()==ID_if)
     {
       //copy heap ids to newly created symbols (since only identifiers are available and not the symbol exprs we take them from the heap_id_map) TODO: better solution: attach heap id to symbolt?
-      irep_idt heap_id, heap_id1, heap_id2;
-      //      std::cout << "goto_state_rhs: " << goto_state_rhs << std::endl;
+      //      irep_idt heap_id, heap_id1, heap_id2;
       if(goto_state_rhs.id()==ID_symbol) 
       {
-	irep_idt id1 = to_symbol_expr(goto_state_rhs).get_identifier();
-	heap_id1 = heap_id_map[id1];
-	//	std::cout  << "get from heap_id_map: " << id1<< ": " << heap_id1 << std::endl;
+	/*	irep_idt id1 = to_symbol_expr(goto_state_rhs).get_identifier();
+	heap_id1 = goto_state.heap_id; //heap_id_map[id1];
+	std::cout  << "get from heap_id_map: " << id1<< ": " << heap_id1 << std::endl;*/
 	rhs.op1().set(ID_new_heap_id,heap_id1);
-	heap_id = heap_id1;
+	//heap_id = heap_id1;
       }
       if(dest_state_rhs.id()==ID_symbol) 
       {
-	irep_idt id2 = to_symbol_expr(dest_state_rhs).get_identifier();
-	heap_id2 = heap_id_map[id2];
-	//	std::cout  << "get from heap_id_map: " << id2 << ": " << heap_id2 << std::endl;
+	/*irep_idt id2 = to_symbol_expr(dest_state_rhs).get_identifier();
+	heap_id2 = make_heap_id(""); //heap_id_map[id2];
+	std::cout  << "get from heap_id_map: " << id2 << ": " << heap_id2 << std::endl;*/
 	rhs.op2().set(ID_new_heap_id,heap_id2);
-	heap_id = heap_id2;
+	//heap_id = heap_id2;
       }
-
+      /*
       if(heap_id1!=heap_id2) 
       {
-	struct_typet struct_type;
-	if(new_lhs.type().id()==ID_pointer) 
-	  struct_type = to_struct_type(ns.follow(new_lhs.type().subtype()));
-	else struct_type = to_struct_type(ns.follow(new_lhs.type()));
 	heap_id = make_new_heap_id(struct_type.get_tag());
         update_heap_ids(struct_type.get_tag(),to_symbol_expr(new_lhs).get_identifier());
-      }
+      } */
       new_lhs.set(ID_new_heap_id,heap_id);
-      heap_id_map[to_symbol_expr(new_lhs).get_identifier()] = heap_id;
-      //      std::cout  << "add to heap_id_map1: " << to_symbol_expr(new_lhs).get_identifier() << ": " << heap_id << std::endl;
+      /*     heap_id_map[to_symbol_expr(new_lhs).get_identifier()] = heap_id;
+	     std::cout  << "add to heap_id_map1: " << to_symbol_expr(new_lhs).get_identifier() << ": " << heap_id << std::endl;*/
     }
+
+    std::cout  << std::endl << "phi: " << new_lhs << " == " << rhs << std::endl;
   
     target.assignment(
       true_exprt(),

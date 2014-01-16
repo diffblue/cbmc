@@ -250,6 +250,7 @@ public:
     guardt guard;
     propagationt propagation;
     unsigned atomic_section_id;
+    irep_idt heap_id;
     
     explicit goto_statet(const goto_symex_statet &s):
       depth(s.depth),

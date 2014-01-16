@@ -30,7 +30,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "heap_conv.h"
 
 #define DEBUG 0
-#define PRINT_CLAUSES 0
+#define PRINT_CLAUSES 1
 #define SIMPLIFY 1
 
 /*******************************************************************\
@@ -3675,14 +3675,15 @@ literalt heap_convt::convert_equality(const equal_exprt &expr)
 
     if(expr.rhs().op1().id()==ID_symbol && expr.rhs().op2().id()==ID_symbol) 
     {
-      //      std::cout << "phi = " << expr << std::endl;
+      std::cout << "phi = " << expr << std::endl;
       std::string hid1 = convert_identifier(expr.rhs().op1().get(ID_new_heap_id));
       std::string hid2 = convert_identifier(expr.rhs().op2().get(ID_new_heap_id));
-      //      std::cout << "hid1 = " << hid1 << std::endl;
-      //      std::cout << "hid2 = " << hid2 << std::endl;
+      std::cout << "hid1 = " << hid1 << std::endl;
+      std::cout << "hid2 = " << hid2 << std::endl;
       if(hid1!=hid2)
       { //generate if then else for heap ids
 	std::string hid0 = convert_identifier(expr.lhs().get(ID_new_heap_id));
+        std::cout << "hid0 = " << hid0 << std::endl;
         heaplit* hli2 = new mem_eq_lit(heapvar(hid0),heapvar(hid1),stateTrue);
         heaplit* hle2 = new mem_eq_lit(heapvar(hid0),heapvar(hid2),stateTrue);
 	unsigned li2 = ++no_boolean_variables;

@@ -217,9 +217,19 @@ void goto_symext::symex_assign_symbol(
   
   symbol_exprt original_lhs=lhs;
   state.get_original_name(original_lhs);
+
+ //heap theory: quick hack to propgate types, TODO
+  if(is_heap_type(lhs.type()) && ssa_rhs.id()==ID_typecast)
+  {
+    ssa_rhs = ssa_rhs.op0();
+    ssa_rhs.type() = lhs.type();
+  }
   
   state.rename(ssa_rhs, ns);
   do_simplify(ssa_rhs);
+
+  //  std::cout << "lhs: " << lhs << std::endl  << std::endl;
+  //  std::cout << "rhs: " << ssa_rhs << std::endl  << std::endl;
   replace_heap_member(ssa_rhs);
  
   symbol_exprt ssa_lhs=lhs;
@@ -238,7 +248,7 @@ void goto_symext::symex_assign_symbol(
   tmp_guard.append(guard);
 
  //heap theory
-  if(is_heap_type(ssa_lhs.type()))
+  /*  if(is_heap_type(ssa_lhs.type()))
   {
     struct_typet struct_type;
     if(ssa_lhs.type().id()==ID_pointer) struct_type = 
@@ -247,8 +257,8 @@ void goto_symext::symex_assign_symbol(
     ssa_lhs.set(ID_new_heap_id,ssa_rhs.get(ID_new_heap_id));
     update_heap_ids(struct_type.get_tag(),to_symbol_expr(ssa_lhs).get_identifier());
     heap_id_map[to_symbol_expr(ssa_lhs).get_identifier()] = ssa_rhs.get(ID_new_heap_id);
-    //    std::cout  << "add to heap_id_map2: " << to_symbol_expr(ssa_lhs).get_identifier() << ": " << ssa_rhs.get(ID_new_heap_id) << std::endl;
-  }
+    std::cout  << "add to heap_id_map2: " << to_symbol_expr(ssa_lhs).get_identifier() << ": " << ssa_rhs.get(ID_new_heap_id) << std::endl;
+    }*/
 
   // do the assignment
   target.assignment(
@@ -283,7 +293,7 @@ void goto_symext::symex_assign_typecast(
   // these may come from dereferencing on the lhs
   
   assert(lhs.operands().size()==1);
-  
+
   exprt rhs_typecasted=rhs;
   rhs_typecasted.make_typecast(lhs.op0().type());
   
@@ -452,8 +462,8 @@ void goto_symext::symex_assign_member(
     new_rhs.op1().set(ID_component_name, component_name);
     replace_heap_member(new_rhs);
     exprt new_lhs = lhs;
-    lhs_struct.set(ID_new_heap_id,new_heap_id);
-    new_lhs.set(ID_new_heap_id,new_heap_id);
+    /*   lhs_struct.set(ID_new_heap_id,new_heap_id);
+	 new_lhs.set(ID_new_heap_id,new_heap_id); */
     exprt new_full_lhs=add_to_lhs(full_lhs, new_lhs);
 
     symex_assign_rec(

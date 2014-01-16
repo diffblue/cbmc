@@ -120,7 +120,7 @@ void bmct::do_conversion(prop_convt &prop_conv)
   // convert HDL
   do_unwind_module(prop_conv);
 
-#if DEBUG
+#if 1
   equation.output(std::cout);
 #endif
 

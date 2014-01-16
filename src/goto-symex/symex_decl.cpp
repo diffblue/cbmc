@@ -88,6 +88,7 @@ void goto_symext::symex_decl(statet &state)
   symbol_exprt original_lhs=to_symbol_expr(code.op0());
   symbol_exprt ssa_lhs=original_lhs;
   state.rename(ssa_lhs, ns);
+  //replace_heap_member(ssa_lhs);
   
   target.decl(
     state.guard.as_expr(),

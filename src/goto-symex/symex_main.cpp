@@ -7,6 +7,7 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <cassert>
+#include <iostream>
 
 #include <util/std_expr.h>
 #include <util/rename.h>
