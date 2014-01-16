@@ -56,6 +56,7 @@ int main() {
     not_null(p);
     p->n = t;
     not_null(p);
+    p->h = two; //BUG: all two
     p = p->n;
   }
   not_null(p);

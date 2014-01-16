@@ -33,7 +33,7 @@ void main() {
     t = (List) malloc(sizeof(struct node));
     if (t == NULL) exit(1);
     not_null(t);
-    t->h = one;
+    //t->h = one; // BUG: found with 2 unwindings
     not_null(t);
     t->n = p;
     p = t;
@@ -43,6 +43,9 @@ void main() {
     if (p->h != one) res = err; //goto ERROR;
     not_null(p);
     p = p->n; 
+    // another BUG : added a new dereferencing (found with 2 unwindings)
+    //not_null(p);
+    //p = p->n; 
   }
   assert(res!=err);
 }

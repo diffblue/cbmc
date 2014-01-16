@@ -38,7 +38,7 @@ void main() {
   
   /* Build a list of the form (1->2)*->3 */
   List a = (List) malloc(sizeof(struct node));
-  // if (a == NULL) exit(1);
+  if (a == NULL) exit(1);
   List t;
   List l1;
   List l2;
@@ -57,7 +57,7 @@ void main() {
       flag = _true;
     }
     t = (List) malloc(sizeof(struct node));
-    //if (t == NULL) exit(1);
+    if (t == NULL) exit(1);
     not_null(p);
     p->n = t;
     not_null(p);
