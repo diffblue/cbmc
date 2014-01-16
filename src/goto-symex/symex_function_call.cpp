@@ -319,7 +319,10 @@ void goto_symext::symex_function_call_code(
       exprt lhs = symbol_exprt(dummy.name); 
       lhs.type() = dummy.type;
       */
-      exprt lhs = call.arguments()[0];
+      exprt lhs = call.arguments()[0].op0(); //remove (void*)  typecast
+      if(lhs.id()==ID_member) {
+        lhs = lhs.op0();
+      }
       //lhs.type() = type; // set to freed type
       //symbol_exprt lhs_symbol = to_symbol_expr(lhs);
 
