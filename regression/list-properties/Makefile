@@ -1,10 +1,14 @@
 default: tests.log
 
+TIMEOUT = 900
+UNWIND = 3
+
 test:
-	@../test.pl -c "time ../../../src/cbmc/cbmc --unwind 2"
+	@echo $(UNWIND) unwindings
+	@../test.pl -c "time perl -e 'alarm shift @ARGV; exec @ARGV' $(TIMEOUT) ../../../src/cbmc/cbmc --unwind $(UNWIND)"
 
 tests.log: ../test.pl
-	@../test.pl -c "time ../../../src/cbmc/cbmc --unwind 2"
+	@../test.pl -c "time perl -e 'alarm shift @ARGV; exec @ARGV' $(TIMEOUT) ../../../src/cbmc/cbmc --unwind $(UNWIND)"
 
 show:
 	@for dir in *; do \
