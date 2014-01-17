@@ -22,7 +22,7 @@ void main() {
   }
 
   assert(tmp != NULL);
-  while(tmp->next != NULL) { 
+  while(tmp->next != NULL) {
     assert(tmp != NULL);
     tmp = tmp->next;
   }

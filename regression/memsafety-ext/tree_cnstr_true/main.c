@@ -5,7 +5,6 @@
  */
 
 #include <stdlib.h>
-#include "../heap_builtins.h"
 
 struct TreeNode {
 	struct TreeNode* left;
@@ -33,7 +32,7 @@ void main() {
 	while (nondet()) {
 		n = root;
 		not_null(n);	
-		while (n->left && n->right) { 
+		while (n->left && n->right) {
 		  if (nondet()) {
 		    not_null(n);	
 		    n = n->left;
@@ -44,7 +43,7 @@ void main() {
 		  }
 		  not_null(n);	
 		}
-		not_null(n->left);	
+		not_null(n);	
 		if (!n->left && nondet()) {
 		  	not_null(n);	
 			n->left = malloc(sizeof(*n));
@@ -80,7 +79,6 @@ void main() {
 			if (n->left) {
 	  			not_null(n);				
 				n = n->left;
-			    
 			}
 			else {
 	  			not_null(n);				
@@ -101,6 +99,7 @@ void main() {
 			root = NULL;
 		free(n);
 	}
+
 
 	assert(res!=err);
 	//return 0;

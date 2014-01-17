@@ -11,6 +11,8 @@ struct list {
 
 typedef struct list* list_t;
 
+#define not_null(x) if(x == NULL) res = err;
+
 void main() {
   list_t x, p, tmp;
   list_t val1, val2;
@@ -29,17 +31,17 @@ void main() {
   
     p = x;
     while(p != NULL &&  p->next != NULL) {
-      if(p == NULL) res=err;
+      not_null(p);
       tmp = p->next;
-      if(p == NULL) res=err;
-      if(tmp == NULL) res=err;
+      not_null(p);
+      not_null(tmp);
       if(p->value == a && tmp->value == b) {
-        if(p == NULL) res=err;
+        not_null(p);
         aux = p->value;
-        if(p == NULL) res=err;
-        if(tmp == NULL) res=err;
+        not_null(p);
+        not_null(tmp);
         p->value = tmp->value;
-        if(tmp == NULL) res=err;
+        not_null(tmp);
         tmp->value = aux;
         flag = val1; 
       }

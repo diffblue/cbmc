@@ -11,13 +11,18 @@ struct list {
 
 typedef struct list* list_t;
 
+#define not_null(x) if(x == NULL) res = err;
+
 void main() {
   list_t x, target;
   list_t aux, a, b;
+  list_t res, err;
+ 
+  __CPROVER_assume(res!=err);
 
   while(x != NULL && x->value == target) {
     aux = x;
-    assert(x != NULL);
+    not_null(x);
     x = x->next;
     free(aux); 
   }
@@ -25,7 +30,7 @@ void main() {
   a = x;
 
   if(x != NULL) {
-    assert(x != NULL);
+    not_null(x);
     b = x->next;
   }
 
@@ -33,21 +38,22 @@ void main() {
     b = NULL;    
   }
 
-  while(b != NULL) {
-    assert(b != NULL);
+  while(b != NULL) { 
+    not_null(b);
     if(b->value == target) {
-      assert(b != NULL);
+      not_null(b);
       aux = b->next;
-      assert(a != NULL);
+      not_null(a);
       a->next = aux;
       free(b);
       b = a;
     }
     a = b;
-    assert(b != NULL);
+    not_null(b);
     b = b->next;
   } 
 
+  assert(res!=err);
   assert(__CPROVER_HEAP_path(x, a, "next"));
 }
 
