@@ -5,6 +5,7 @@
  */
 
 #include <stdlib.h>
+#include "../heap_builtins.h"
 
 struct TreeNode {
 	struct TreeNode* left;
@@ -43,7 +44,7 @@ void main() {
 		  }
 		  not_null(n);	
 		}
-		not_null(n);	
+		not_null(n->left);	
 		if (!n->left && nondet()) {
 		  	not_null(n);	
 			n->left = malloc(sizeof(*n));
@@ -79,6 +80,7 @@ void main() {
 			if (n->left) {
 	  			not_null(n);				
 				n = n->left;
+			    
 			}
 			else {
 	  			not_null(n);				
@@ -98,6 +100,7 @@ void main() {
 		} else
 			root = NULL;
 		free(n);
+		//assert(!__CPROVER_HEAP_dangling(n));
 	}
 
 

@@ -116,7 +116,8 @@ void main() {
 		free(st);
 		not_null(n);
 		if (n->left) {
-		        st = malloc(sizeof(*st));
+		  // BUG: no allocation --> found with 2 unwindings
+		      /*st = malloc(sizeof(*st));*/
 		        not_null(st);
 			st->next = s;
 			not_null(st);
