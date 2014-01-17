@@ -26,8 +26,8 @@ void main() {
   while(count == val1) {
     aux = (struct list*)malloc(sizeof(struct list));
     assert(tmp != NULL);
-    tmp->next = aux;
-    tmp = aux;	  
+    tmp->next = NULL; //aux; BUG: found with 2 unwindings
+    tmp = tmp->next;	  
     count = val2;
   }
 

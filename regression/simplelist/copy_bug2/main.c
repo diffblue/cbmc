@@ -39,7 +39,8 @@ void main() {
     cell->value = tmpx->value;
     if(tmpy == NULL) res=err;
     tmpy->next = cell;
-    tmpy = cell;
+    cell->next = NULL; // BUG: line added
+    tmpy = cell->next; //->next added (found with 2 unwindings)
     if(tmpx == NULL) res=err;
     tmpx = tmpx->next; 
   }
