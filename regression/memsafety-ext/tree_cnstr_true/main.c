@@ -94,7 +94,9 @@ void main() {
 				pred->right = NULL;
 			}
 		} else
-			root = NULL;
+		  root = NULL;
+
+                not_null(n);
 		free(n);
 	}
 

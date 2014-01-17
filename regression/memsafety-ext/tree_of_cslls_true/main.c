@@ -7,7 +7,7 @@
  */
 
 #include <stdlib.h>
-#include "../heap_builtins.h"
+//#include "../heap_builtins.h"
 
 typedef struct TListNode
 {
@@ -23,8 +23,8 @@ typedef struct TTreeNode
 
 struct TreeNode* res, *err;
 
-#define not_null(x) if(x == NULL || __CPROVER_HEAP_dangling(x)) res = err;
-//#define not_null(x) if(x == NULL) res = err;
+//#define not_null(x) if(x == NULL || __CPROVER_HEAP_dangling(x)) res = err;
+#define not_null(x) if(x == NULL) res = err;
 
 extern __CPROVER_bool nondet();
 
@@ -67,7 +67,7 @@ void main()
 	  tmp = tree;
 
 		not_null(tmp);				
-		while (/*(NULL != tmp->left) &&*/ (NULL != tmp->right))
+		while ((NULL != tmp->left) && (NULL != tmp->right))
 		{
 			if (nondet())
 			{
