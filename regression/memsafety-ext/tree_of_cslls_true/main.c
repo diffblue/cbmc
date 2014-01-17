@@ -62,10 +62,10 @@ void main()
 
 	while (nondet())
 	{
-		tmp = tree;
+	  tmp = tree;
 
 		not_null(tmp);				
-		while ((NULL != tmp->left) && (NULL != tmp->right))
+		while (/*(NULL != tmp->left) &&*/ (NULL != tmp->right))
 		{
 			if (nondet())
 			{
@@ -90,7 +90,7 @@ void main()
 		}
 		else if ((NULL == tmp->right) && nondet())
 		{
-			newNode = malloc(sizeof(*newNode));
+		        newNode = malloc(sizeof(*newNode));
 			not_null(tmp);				
 			tmp->right = newNode;
 		}
