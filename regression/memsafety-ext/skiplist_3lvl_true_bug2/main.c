@@ -134,7 +134,7 @@ void destroy_sl(struct sl *sl)
 	        not_null(sl);
 		tmp = sl->head;
                	not_null(sl);
-		not_null(sl->head);
+		not_null(tmp);
 		sl->head = sl->head->n1;
 		free(tmp);
 	  	not_null(sl);

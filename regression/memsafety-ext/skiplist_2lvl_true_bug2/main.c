@@ -48,12 +48,12 @@ struct sl* create_sl_with_head_and_tail(void)
 	sl->tail = malloc(sizeof(struct sl_item));
 
 	not_null(sl);
-	not_null(sl->head);
         struct sl_item * head = sl->head;
+	not_null(head);
 	head->n2 = head->n1 = sl->tail;
 	not_null(sl);
-	not_null(sl->tail);
         struct sl_item * tail = sl->tail;
+	not_null(tail);
 	tail->n2 = tail->n1 = NULL;
 
 	return sl;
@@ -118,7 +118,7 @@ void destroy_sl(struct sl *sl)
 	        not_null(sl);
 		tmp = sl->head;
 		not_null(sl);
-		not_null(sl->head);
+		not_null(tmp);
 		sl->head = tmp->n1;
 		free(tmp);
 	}

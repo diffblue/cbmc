@@ -42,7 +42,8 @@ void main() {
 		  }
 		  not_null(n);	
 		}
-		not_null(n->left);	
+                struct TreeNode* aux = n->left;
+		not_null(aux);	
 		if (!n->left && nondet()) {
 		  	not_null(n);	
 			n->left = malloc(sizeof(*n));
