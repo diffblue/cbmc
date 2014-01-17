@@ -33,7 +33,7 @@ void main() {
 	while (nondet()) {
 		n = root;
 		not_null(n);	
-		while (n->left && n->right) { 
+		while (/*n->left &&*/ n->right) { // BUG found with 2 unwindings
 		  if (nondet()) {
 		    not_null(n);	
 		    n = n->left;
@@ -100,7 +100,9 @@ void main() {
 		} else
 			root = NULL;
 		free(n);
+		//assert(!__CPROVER_HEAP_dangling(n));
 	}
+
 
 	assert(res!=err);
 	//return 0;
