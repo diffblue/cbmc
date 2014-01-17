@@ -7,6 +7,7 @@
  */
 
 #include <stdlib.h>
+#include "../heap_builtins.h"
 
 struct TreeNode {
 	struct TreeNode* left;
@@ -19,8 +20,6 @@ struct StackItem {
 };
 
 struct TreeNode* res, *err;
-
-#define not_null(x) if(x == NULL) res = err;
 
 extern __CPROVER_bool nondet();
 
@@ -86,6 +85,7 @@ void main() {
 		s = s->next;
 		not_null(st);	
 		n = st->node;
+		not_null(st);
 		free(st);
 		not_null(n);	
 		if (n->left) {
@@ -107,6 +107,7 @@ void main() {
 			st->node = n->right;
 			s = st;
 		}
+		not_null(n);
 		free(n);
 	}
 
