@@ -6,6 +6,7 @@
  */
 #include <stdlib.h>
 /*  #include "assert.h" */
+#include "../heap_builtins.h"
 
 void exit(__CPROVER_bool s) {
  _EXIT: goto _EXIT;
@@ -17,8 +18,6 @@ typedef struct node {
 } *List;
 
 List res, err;
-
-#define not_null(x) if(x == NULL) res = err;
 
 extern __CPROVER_bool nondet();
 

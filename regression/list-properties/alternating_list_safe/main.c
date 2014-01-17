@@ -5,6 +5,7 @@ extern int __VERIFIER_nondet_int();
  * Then, it goes through and checks if the alternation holds.
  */
 #include <stdlib.h>
+#include "../heap_builtins.h"
 
 typedef struct node {
   struct node *h; //int
@@ -14,8 +15,6 @@ typedef struct node {
 void exit(__CPROVER_bool s) {
 	_EXIT: goto _EXIT;
 }
-
-#define not_null(x) ; //if(x == NULL) res = err;
 
 extern __CPROVER_bool nondet();
 

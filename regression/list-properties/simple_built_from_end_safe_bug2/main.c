@@ -4,6 +4,7 @@
  * finishes by a 0.
  */
 #include <stdlib.h>
+#include "../heap_builtins.h"
 
 void exit(__CPROVER_bool s) {
 	_EXIT: goto _EXIT;
@@ -13,8 +14,6 @@ typedef struct node {
   struct node *h; //int
   struct node *n;
 } *List;
-
-#define not_null(x) if(x == NULL) res = err;
 
 extern __CPROVER_bool nondet();
 

@@ -5,6 +5,7 @@ extern int __VERIFIER_nondet_int();
  * finishes by a 0.
  */
 #include <stdlib.h>
+#include "../heap_builtins.h"
 
 extern __CPROVER_bool nondet();
 
@@ -19,8 +20,6 @@ typedef struct node {
 
 
 List res, err;
-
-#define not_null(x) if(x == NULL) res = err;
 
 void main() {
   /* Build a list of the form 1->...->1->0 */
