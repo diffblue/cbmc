@@ -12,23 +12,21 @@ struct list {
 typedef struct list* list_t;
 
 void main() {
-  list_t root, new_root, res, err;
+  list_t root, new_root;
   list_t next;
 
-  __CPROVER_assume(res!=err);
   new_root = NULL;
 
   while (root != NULL) {
-    not_null(root);
+    assert(root != NULL);
     next = root->next;
-    not_null(root);
+    assert(root != NULL);
     root->next = new_root;
     new_root = root;
     root = next;
   }
 
   assert(__CPROVER_HEAP_path(new_root, NULL, "next"));
-  assert(res != err);
 }
 
 

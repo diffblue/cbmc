@@ -12,19 +12,16 @@ struct list {
 typedef struct list* list_t;
 
 void main() {
-  list_t x, p, res, err;
-
-  __CPROVER_assume(res!=err);
+  list_t x, p;
 
   p = x;
 
   while(p != NULL) {
-    not_null(p);
+    assert(p != NULL);
     p = p->next;
   }
 
   assert(__CPROVER_HEAP_path(x, NULL, "next"));
-  assert(res != err);
 }
 
 
