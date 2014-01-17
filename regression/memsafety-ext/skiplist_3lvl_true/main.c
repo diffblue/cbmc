@@ -13,6 +13,7 @@
  */
 
 #include <stdlib.h>
+#include "../heap_builtins.h"
 
 // a skip list node with three next pointers
 struct sl_item {
@@ -25,8 +26,6 @@ struct sl {
 };
 
 struct sl_item* res, *err;
-
-#define not_null(x) if(x == NULL) res = err;
 
 extern __CPROVER_bool nondet();
 

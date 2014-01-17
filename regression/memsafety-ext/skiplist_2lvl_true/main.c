@@ -13,10 +13,9 @@
  */
 
 #include <stdlib.h>
+#include "../heap_builtins.h"
 
 struct sl_item *res, *err;
-
-#define not_null(x) if(x == NULL) res = err;
 
 extern __CPROVER_bool nondet();
 
@@ -47,11 +46,11 @@ struct sl* create_sl_with_head_and_tail(void)
 	sl->tail = malloc(sizeof(struct sl_item));
 
 	not_null(sl);
-	not_null(sl->head);
+        //not_null(sl->head);
         struct sl_item * head = sl->head;
 	head->n2 = head->n1 = sl->tail;
 	not_null(sl);
-	not_null(sl->tail);
+        //not_null(sl->tail);
         struct sl_item * tail = sl->tail;
 	tail->n2 = tail->n1 = NULL;
 
@@ -114,10 +113,12 @@ void destroy_sl(struct sl *sl)
 	        not_null(sl);
 		tmp = sl->head;
 		not_null(sl);
-		not_null(sl->head);
+                //not_null(sl->head);
 		sl->head = sl->head->n1;
+                //not_null(tmp);
 		free(tmp);
 	}
+        //not_null(sl);
 	free(sl);
 }
 

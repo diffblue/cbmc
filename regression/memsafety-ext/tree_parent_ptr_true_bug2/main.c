@@ -92,7 +92,7 @@ void main() {
 		free(st);
 		not_null(n);
 		if (n->left) {
-                        st = malloc(sizeof(*st));
+                        /*st = malloc(sizeof(*st));*/
 			not_null(st);
 			st->next = s;
 			not_null(st);

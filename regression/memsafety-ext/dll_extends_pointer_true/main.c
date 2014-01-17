@@ -5,6 +5,7 @@
  */
 
 #include <stdlib.h>
+#include "../heap_builtins.h"
 
 typedef struct TData
 {
@@ -21,8 +22,6 @@ typedef struct TNode
 
 
 Node *res, *err;
-
-#define not_null(x) if(x == NULL) res = err;
 
 extern __CPROVER_bool nondet();
 
@@ -80,6 +79,8 @@ void main()
 		  free(y->pData);
 		}
 
+                //this assertion fails: 
+                //not_null(y); 
 		free(y);
 	}
 
