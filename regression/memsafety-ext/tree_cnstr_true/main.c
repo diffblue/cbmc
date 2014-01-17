@@ -14,11 +14,7 @@ struct TreeNode {
 
 struct TreeNode *res, *err;
 
-//#define not_null(x) if(x == NULL) res = err;
-#define not_null(x) if(x == NULL || __CPROVER_HEAP_dangling(x)) res = err;
-
 extern __CPROVER_bool nondet();
-
 
 void main() {
 
