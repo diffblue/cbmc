@@ -13,7 +13,8 @@
  */
 
 #include <stdlib.h>
-#include "../heap_builtins.h"
+
+#define not_null(x) if(x == NULL) res = err;
 
 // a skip list node with three next pointers
 struct sl_item {
@@ -134,7 +135,7 @@ void destroy_sl(struct sl *sl)
 	        not_null(sl);
 		tmp = sl->head;
                	not_null(sl);
-		not_null(tmp);
+		not_null(sl->head);
 		sl->head = sl->head->n1;
 		free(tmp);
 	  	not_null(sl);
