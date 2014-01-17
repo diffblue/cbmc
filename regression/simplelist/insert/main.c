@@ -12,9 +12,11 @@ struct list {
 typedef struct list* list_t;
 
 void main() {
-  list_t x, y;
+  list_t x, y, res, err;
   // value to be inserted
   list_t val;
+
+  __CPROVER_assume(res!=err);
 
   x = (list_t)malloc(sizeof(struct list));
   not_null(x);
@@ -23,6 +25,7 @@ void main() {
   x->next = y;
 
   assert(__CPROVER_HEAP_path(x, y, "next"));
+  assert(res != err);
 }
 
 

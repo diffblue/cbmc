@@ -12,9 +12,10 @@ struct list {
 typedef struct list* list_t;
 
 void main() {
-  list_t x, y, tmp, val1, val2, count;
+  list_t x, y, tmp, val1, val2, count, res, err;
   list_t aux;
 
+  __CPROVER_assume(res!=err);
   __CPROVER_assume(val1!=val2);
 
   x = (struct list*)malloc(sizeof(struct list));
@@ -35,6 +36,7 @@ void main() {
   tmp->next = NULL;
 
   assert(__CPROVER_HEAP_path(x, NULL, "next"));
+  assert(res != err);
 }
 
 

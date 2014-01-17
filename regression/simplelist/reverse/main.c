@@ -12,9 +12,10 @@ struct list {
 typedef struct list* list_t;
 
 void main() {
-  list_t root, new_root;
+  list_t root, new_root, res, err;
   list_t next;
 
+  __CPROVER_assume(res!=err);
   new_root = NULL;
 
   while (root != NULL) {
@@ -27,6 +28,7 @@ void main() {
   }
 
   assert(__CPROVER_HEAP_path(new_root, NULL, "next"));
+  assert(res != err);
 }
 
 
