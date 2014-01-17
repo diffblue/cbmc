@@ -31,6 +31,7 @@ void main() {
     while(p != NULL &&  p->next != NULL) {
       if(p == NULL) res=err;
       tmp = p->next;
+      tmp = tmp->next; // BUG: additional dereferencing (found with 2 unwindings)
       if(p == NULL) res=err;
       if(tmp == NULL) res=err;
       if(p->value == a && tmp->value == b) {
