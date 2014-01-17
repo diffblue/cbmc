@@ -13,13 +13,11 @@
  */
 
 #include <stdlib.h>
+#include "../heap_builtins.h"
 
 struct sl_item *res, *err;
 
 extern __CPROVER_bool __CPROVER_HEAP_dangling(void* ptr);
-
-#define not_null(x) if(x == NULL) res = err;
-#define not_dangling(x) if(__CPROVER_HEAP_dangling(x)) res = err;
 
 extern __CPROVER_bool nondet();
 
