@@ -21,13 +21,13 @@ void main() {
     return;
   }
 
-  assert(tmp != NULL);
+  not_null(tmp);
   while(tmp->next != NULL) {
-    assert(tmp != NULL);
+    not_null(tmp);
     tmp = tmp->next;
   }
 
-  assert(tmp != NULL);
+  not_null(tmp);
   tmp->next = y;
 
   assert(__CPROVER_HEAP_path(x, tmp, "next"));

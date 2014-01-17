@@ -24,28 +24,28 @@ void main() {
   }
 
   y = (list_t)malloc(sizeof(struct list));
-  if(y == NULL) res=err;
+  not_null(y);
   y->next = NULL;
-  if(x == NULL) res=err;
+  not_null(x);
   y->value = x->value;
-  if(x == NULL) res=err;
+  not_null(x);
   tmpx = x->next;
   tmpy = y;
 
   while(tmpx != NULL) {
     cell = (list_t)malloc(sizeof(struct list));
-    if(cell == NULL) res=err;
-    if(tmpx == NULL) res=err;
+    not_null(cell);
+    not_null(tmpx);
     cell->value = tmpx->value;
-    if(tmpy == NULL) res=err;
+    not_null(tmpy);
     tmpy->next = cell;
     cell->next = NULL; // BUG: line added
     tmpy = cell->next; //->next added (found with 2 unwindings)
-    if(tmpx == NULL) res=err;
+    not_null(tmpx);
     tmpx = tmpx->next; 
   }
 
-  if(tmpy == NULL) res=err;
+  not_null(tmpy);
   tmpy->next = NULL;
 
   assert(res!=err);

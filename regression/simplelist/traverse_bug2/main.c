@@ -17,8 +17,8 @@ void main() {
   p = x;
 
   while(p != NULL) {
-    not_null(p);
-    p = p->next;
+    assert(p->next != NULL);
+    p = p->next->next; //BUG: added 2nd dereferencing: found with 1 unwinding
   }
 
   assert(__CPROVER_HEAP_path(x, NULL, "next"));

@@ -20,7 +20,7 @@ void main() {
   tmp = x;
 
   while(tmp != NULL && tmp->value != a) { 
-    assert(tmp != NULL);
+    not_null(tmp);
     tmp = tmp->next;
   }
 

@@ -20,7 +20,7 @@ void main() {
   tmp = x;
 
   while(/*tmp != NULL &&*/ tmp->value != a) { //Bug: found in one iteration
-    assert(tmp != NULL);
+    not_null(tmp);
     tmp = tmp->next;
   }
 

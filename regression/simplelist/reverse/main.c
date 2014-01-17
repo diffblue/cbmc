@@ -18,9 +18,9 @@ void main() {
   new_root = NULL;
 
   while (root != NULL) {
-    assert(root != NULL);
+    not_null(root);
     next = root->next;
-    assert(root != NULL);
+    not_null(root);
     root->next = new_root;
     new_root = root;
     root = next;

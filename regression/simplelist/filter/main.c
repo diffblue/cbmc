@@ -11,8 +11,6 @@ struct list {
 
 typedef struct list* list_t;
 
-#define not_null(x) if(x == NULL) res = err;
-
 void main() {
   list_t x, target;
   list_t aux, a, b;

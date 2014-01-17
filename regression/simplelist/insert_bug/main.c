@@ -17,9 +17,9 @@ void main() {
   list_t val;
 
   x = (list_t)malloc(sizeof(struct list));
-  assert(x != NULL);
+  not_null(x);
   x->value = val;
-  assert(x != NULL);
+  not_null(x);
   // x->next = y; //BUG
 
   assert(__CPROVER_HEAP_path(x, y, "next"));

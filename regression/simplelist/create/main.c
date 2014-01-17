@@ -18,20 +18,20 @@ void main() {
   __CPROVER_assume(val1!=val2);
 
   x = (struct list*)malloc(sizeof(struct list));
-  assert(x != NULL);
+  not_null(x);
   x->next = NULL;
 
   tmp = x;
 
   while(count == val1) {
     aux = (struct list*)malloc(sizeof(struct list));
-    assert(tmp != NULL);
+    not_null(tmp);
     tmp->next = aux;
     tmp = aux;	  
     count = val2;
   }
 
-  assert(tmp != NULL);
+  not_null(tmp);
   tmp->next = NULL;
 
   assert(__CPROVER_HEAP_path(x, NULL, "next"));
