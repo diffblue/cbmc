@@ -7,7 +7,9 @@
  */
 
 #include <stdlib.h>
-#include "../heap_builtins.h"
+//#include "../heap_builtins.h"
+
+#define not_null(x) if(x == NULL) res = err;
 
 typedef struct TListNode
 {
@@ -22,9 +24,6 @@ typedef struct TTreeNode
 } TreeNode;
 
 struct TreeNode* res, *err;
-
-//#define not_null(x) if(x == NULL || __CPROVER_HEAP_dangling(x)) res = err;
-//#define not_null(x) if(x == NULL) res = err;
 
 extern __CPROVER_bool nondet();
 
@@ -171,7 +170,7 @@ void main()
 		}
 
 	        not_null(tmp);				
-	        not_null(tmp->list);				
+	        //not_null(tmp->list);				
 		while (tmp->list != tmp->list->next)
 		{
 		  not_null(tmp);				
