@@ -1,6 +1,6 @@
 KNOWNBUG
 main.c
---mm tso --unwind 3 --no-unwinding-assertions
+--mm tso
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

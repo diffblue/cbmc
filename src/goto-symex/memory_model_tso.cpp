@@ -134,7 +134,7 @@ void memory_model_tsot::program_order(
 
         if(is_memory_barrier(*e_it2))
         {
-          const codet &code=to_code((*e_it)->source.pc->code);
+          const codet &code=to_code((*e_it2)->source.pc->code);
 
           if(is_shared_read(*e_it) &&
              !code.get_bool(ID_RRfence) &&
@@ -156,17 +156,16 @@ void memory_model_tsot::program_order(
           continue;
         }
 
-        exprt cond;
+        exprt cond=true_exprt();
         if(program_order_is_relaxed(*e_it, *e_it2))
         {
           if(is_shared_read(*e_it2))
             cond=mb_guard_r;
           else
             cond=mb_guard_w;
+
+          simplify(cond, ns);
         }
-        else
-          cond.make_true();
-        simplify(cond, ns);
 
         if(!cond.is_false())
           add_constraint(

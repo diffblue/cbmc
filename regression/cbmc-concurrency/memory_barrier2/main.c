@@ -10,7 +10,7 @@ void* thr1(void * arg) { // frontend produces 12 transitions from this thread. I
   flag1 = 1;
   __asm__ __volatile__ ("mfence": : :"memory");
   turn = 1;
-  do {} while (flag2==1 && turn==1);
+  __CPROVER_assume(! (flag2==1 && turn==1) );
   // begin: critical section
   x = 0;
   assert(x<=0);
@@ -22,7 +22,7 @@ void* thr2(void * arg) {
   flag2 = 1;
   __asm__ __volatile__ ("mfence": : :"memory");
   turn = 0;
-  do {} while (flag1==1 && turn==0);
+  __CPROVER_assume(! (flag1==1 && turn==0) );
   // begin: critical section
   x = 1;
   assert (x>=1);
