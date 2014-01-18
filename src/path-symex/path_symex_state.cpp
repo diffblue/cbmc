@@ -614,6 +614,15 @@ exprt path_symex_statet::instantiate_rec_address(
   {
     return src;
   }
+  else if(src.id()==ID_byte_extract_big_endian ||
+          src.id()==ID_byte_extract_little_endian)
+  {
+    assert(src.operands().size()==2);
+    exprt tmp=src;
+    tmp.op0()=instantiate_rec_address(src.op0(), propagate);
+    tmp.op1()=instantiate_rec(src.op1(), propagate);
+    return tmp;
+  }
   else
   {
     // this shouldn't really happen

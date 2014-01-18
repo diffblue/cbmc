@@ -20,7 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "path_symex.h"
 
-#define DEBUG
+//#define DEBUG
 
 #ifdef DEBUG
 #include <iostream>
@@ -205,15 +205,18 @@ void path_symext::assign(
       throw "unexpected side-effect on rhs: "+id2string(statement);
   }
 
-  exprt::operandst _guard; // start with empty guard
+  // read the address of the lhs, with propagation
+  exprt lhs_address=state.read(address_of_exprt(lhs));
   
-  // don't propagate into the lhs
-  exprt ssa_lhs=state.read_no_propagate(lhs);
-  
-  // ok on the rhs
+  // now SSA it, no propagation
+  exprt ssa_lhs=
+    state.read_no_propagate(dereference_exprt(lhs_address));
+
+  // read the rhs
   exprt ssa_rhs=state.read(rhs);
 
-  // start recursion  
+  // start recursion on lhs
+  exprt::operandst _guard; // start with empty guard
   assign_rec(state, _guard, ssa_lhs, ssa_rhs);
 }
 
@@ -529,9 +532,6 @@ void path_symext::assign_rec(
   
     // assignment to byte_extract operators:
     // turn into byte_update operator
-    
-    // This requires a split over any struct fields, which
-    // is todo.
     
     irep_idt new_id;
     
