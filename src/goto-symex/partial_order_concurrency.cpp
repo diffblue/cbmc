@@ -167,12 +167,14 @@ Function: partial_order_concurrencyt::rw_clock_id
 
 \*******************************************************************/
 
-irep_idt partial_order_concurrencyt::rw_clock_id(event_it event)
+irep_idt partial_order_concurrencyt::rw_clock_id(
+  event_it event,
+  axiomt axiom)
 {
   if(event->is_shared_write())
-    return id2string(id(event))+"$wclk";
+    return id2string(id(event))+"$wclk$"+i2string(axiom);
   else if(event->is_shared_read())
-    return id2string(id(event))+"$rclk";
+    return id2string(id(event))+"$rclk$"+i2string(axiom);
   else
     assert(false);
 
@@ -191,7 +193,9 @@ Function: partial_order_concurrencyt::clock
 
 \*******************************************************************/
 
-symbol_exprt partial_order_concurrencyt::clock(event_it event)
+symbol_exprt partial_order_concurrencyt::clock(
+  event_it event,
+  axiomt axiom)
 {
   irep_idt identifier;
   assert(!numbering.empty());
@@ -199,19 +203,19 @@ symbol_exprt partial_order_concurrencyt::clock(event_it event)
   if(event->is_shared_write())
   {
     assert(is_shared_write(event));
-    identifier=rw_clock_id(event);
+    identifier=rw_clock_id(event, axiom);
   }
   else if(event->is_shared_read())
   {
     assert(is_shared_read(event));
-    identifier=rw_clock_id(event);
+    identifier=rw_clock_id(event, axiom);
   }
   else if(event->is_spawn())
   {
     assert(is_spawn(event));
     identifier=
       "t"+i2string(event->source.thread_nr+1)+"$"+
-      i2string(numbering[event])+"$spwnclk";
+      i2string(numbering[event])+"$spwnclk$"+i2string(axiom);
   }
   else
     assert(false);
@@ -296,13 +300,34 @@ Function: partial_order_concurrencyt::before
 \*******************************************************************/
 
 exprt partial_order_concurrencyt::before(
-  event_it e1, event_it e2)
+  event_it e1, event_it e2, unsigned axioms)
 {
-  if(e1->atomic_section_id!=0 &&
-     e1->atomic_section_id==e2->atomic_section_id)
-    return equal_exprt(clock(e1), clock(e2));
-  else
-    return binary_relation_exprt(clock(e1), ID_lt, clock(e2));
+  const axiomt axiom_bits[]={
+    AX_SC_PER_LOCATION,
+    AX_NO_THINAIR,
+    AX_OBSERVATION,
+    AX_PROPAGATION };
+
+  exprt::operandst ops;
+  ops.reserve(sizeof(axiom_bits)/sizeof(axiomt));
+
+  for(int i=0; i<sizeof(axiom_bits)/sizeof(axiomt); ++i)
+  {
+    const axiomt ax=axiom_bits[i];
+
+    if((axioms & ax)==0) continue;
+
+    if(e1->atomic_section_id!=0 &&
+       e1->atomic_section_id==e2->atomic_section_id)
+      ops.push_back(equal_exprt(clock(e1, ax), clock(e2, ax)));
+    else
+      ops.push_back(
+        binary_relation_exprt(clock(e1, ax), ID_lt, clock(e2, ax)));
+  }
+
+  assert(!ops.empty());
+
+  return conjunction(ops);
 }
 
 /*******************************************************************\
