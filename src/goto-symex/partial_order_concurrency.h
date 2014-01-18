@@ -24,7 +24,16 @@ public:
   typedef eventst::const_iterator event_it;
 
   // the name of a clock variable for a shared read/write
-  static irep_idt rw_clock_id(event_it e);
+  typedef enum {
+    AX_SC_PER_LOCATION=1,
+    AX_NO_THINAIR=2,
+    AX_OBSERVATION=4,
+    AX_PROPAGATION=8
+  } axiomt;
+
+  static irep_idt rw_clock_id(
+    event_it e,
+    axiomt axiom=AX_PROPAGATION);
   
 protected:
   const namespacet &ns;
@@ -61,7 +70,7 @@ protected:
 
   // produce a clock symbol for some event
   typet clock_type;
-  symbol_exprt clock(event_it e);
+  symbol_exprt clock(event_it e, axiomt axiom);
   void build_clock_type(const symex_target_equationt &);
 
   // preprocess and add a constraint to equation
@@ -72,7 +81,8 @@ protected:
     const symex_targett::sourcet &source) const;
   
   // the partial order constraint for two events
-  exprt before(event_it e1, event_it e2);
+  exprt before(event_it e1, event_it e2, unsigned axioms);
+  virtual exprt before(event_it e1, event_it e2)=0;
 
   // is it an assignment for a shared variable?
   bool is_shared_write(event_it e) const;
