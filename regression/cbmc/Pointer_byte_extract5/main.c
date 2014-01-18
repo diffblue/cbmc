@@ -20,6 +20,8 @@ int main()
   p->Count = 3;
   int po=0;
   int m=__CPROVER_malloc_size;
+
+  // this should be fine
   p->List[0].a = 555;
 
   __CPROVER_assert(p->List[0].b==555, "p->List[0].b==555");
