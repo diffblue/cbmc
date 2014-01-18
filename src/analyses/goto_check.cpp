@@ -982,6 +982,8 @@ void goto_checkt::bounds_check(
   std::string name=array_name(expr.array());
   
   const exprt &index=expr.index();
+  object_descriptor_exprt ode;
+  ode.build(expr, ns);
 
   if(index.type().id()!=ID_unsignedbv)
   {
@@ -1002,14 +1004,21 @@ void goto_checkt::bounds_check(
       }
       else
       {
-        exprt zero=gen_zero(index.type());
+        exprt eff_offset=ode.offset();
 
-        if(zero.is_nil())
-          throw "no zero constant of index type "+
-            index.type().to_string();
+        if(ode.root_object().id()==ID_dereference)
+        {
+          exprt p_offset=pointer_offset(
+            to_dereference_expr(ode.root_object()).pointer());
+          assert(p_offset.type()==eff_offset.type());
 
-        exprt inequality(ID_ge, bool_typet());
-        inequality.copy_to_operands(index, zero);
+          eff_offset=minus_exprt(eff_offset, p_offset);
+        }
+
+        exprt zero=gen_zero(ode.offset().type());
+        assert(zero.is_not_nil());
+
+        binary_relation_exprt inequality(eff_offset, ID_ge, zero);
 
         add_guarded_claim(
           inequality,
@@ -1022,7 +1031,38 @@ void goto_checkt::bounds_check(
     }
   }
 
-  if(to_array_type(array_type).size().is_nil())
+  if(ode.root_object().id()==ID_dereference)
+  {
+    const exprt &pointer=
+      to_dereference_expr(ode.root_object()).pointer();
+
+    if_exprt size(
+      dynamic_object(pointer),
+      typecast_exprt(dynamic_size(ns), object_size(pointer).type()),
+      object_size(pointer));
+
+    plus_exprt eff_offset(ode.offset(), pointer_offset(pointer));
+
+    assert(eff_offset.op0().type()==eff_offset.op1().type());
+    assert(eff_offset.type()==size.type());
+
+    binary_relation_exprt inequality(eff_offset, ID_lt, size);
+
+    or_exprt precond(
+      and_exprt(
+        dynamic_object(pointer),
+        not_exprt(malloc_object(pointer, ns))),
+      inequality);
+
+    add_guarded_claim(
+      precond,
+      name+" upper bound",
+      "array bounds",
+      expr.find_location(),
+      expr,
+      guard);
+  }
+  else if(to_array_type(array_type).size().is_nil())
   {
     // Linking didn't complete, we don't have a size.
     // Not clear what to do.
