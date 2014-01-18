@@ -4081,6 +4081,33 @@ bool simplify_exprt::simplify_index(exprt &expr)
       }
     }
   }
+  else if(array.id()==ID_byte_extract_little_endian ||
+          array.id()==ID_byte_extract_big_endian)
+  {
+    const typet &array_type=ns.follow(array.type());
+
+    if(array_type.id()==ID_array)
+    {
+      // This rewrites byte_extract(s, o, array_type)[i]
+      // to byte_extract(s, o+offset, sub_type)
+
+      mp_integer sub_size=pointer_offset_size(ns, array_type.subtype());
+      if(sub_size==-1) return true;
+
+      // add offset to index
+      mult_exprt offset(from_integer(sub_size, array.op1().type()), index);
+      plus_exprt final_offset(array.op1(), offset);
+      simplify_node(final_offset);
+
+      exprt result(array.id(), expr.type());
+      result.copy_to_operands(array.op0(), final_offset);
+      expr.swap(result);
+
+      simplify_rec(expr);
+
+      return false;
+    }
+  }
 
   return result;
 }
