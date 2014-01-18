@@ -1098,7 +1098,9 @@ const struct_exprt &to_struct_expr(const exprt &expr);
 */
 struct_exprt &to_struct_expr(exprt &expr);
 
-/*! \brief TO_BE_DOCUMENTED
+class namespacet;
+
+/*! \brief split an expression into a base object and a (byte) offset
 */
 class object_descriptor_exprt:public exprt
 {
@@ -1109,6 +1111,8 @@ public:
     op0().id(ID_unknown);
     op1().id(ID_unknown);
   }
+
+  void build(const exprt &expr, const namespacet &ns);
 
   inline exprt &object()
   {
