@@ -117,7 +117,7 @@ void memory_model_tsot::program_order(
           e_it2!=events.end();
           e_it2++)
       {
-        if(is_spawn(*e_it) ||
+        if((is_spawn(*e_it) && !is_memory_barrier(*e_it2)) ||
            is_spawn(*e_it2))
         {
           add_constraint(
