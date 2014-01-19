@@ -212,6 +212,7 @@ c_enum
 enum
 elements
 unknown
+uninitialized
 invalid
 C_invalid_object #invalid_object
 pointer_offset
@@ -537,7 +538,9 @@ task
 C_little_endian #little_endian
 C_offset #offset
 C_tag_only_declaration #tag_only_declaration
-tag_symbol
+struct_tag
+union_tag
+enum_tag
 generate_block
 generate_case
 generate_if
