@@ -52,14 +52,17 @@ private:
     const exprt &address,
     const exprt &offset,
     const typet &type);
+
   exprt dereference_if(
     const if_exprt &expr,
     const exprt &offset,
     const typet &type);
+
   exprt dereference_plus(
     const exprt &expr,
     const exprt &offset,
     const typet &type);
+
   exprt dereference_typecast(
     const typecast_exprt &expr,
     const exprt &offset,
@@ -77,26 +80,6 @@ private:
     const exprt &object,
     const exprt &offset,
     const typet &type);
-    
-  #if 0
-  bool memory_model(
-    exprt &value,
-    const typet &type,
-    const guardt &guard,
-    const exprt &offset);
-
-  bool memory_model_conversion(
-    exprt &value,
-    const typet &type,
-    const guardt &guard,
-    const exprt &offset);
-    
-  bool memory_model_bytes(
-    exprt &value,
-    const typet &type,
-    const guardt &guard,
-    const exprt &offset);
-  #endif
 };
 
 static inline exprt dereference(const exprt &pointer, const namespacet &ns)
