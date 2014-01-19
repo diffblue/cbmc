@@ -370,6 +370,10 @@ exprt boolean_negate(const exprt &src)
 {
   if(src.id()==ID_not && src.operands().size()==1)
     return src.op0();
+  else if(src.is_true())
+    return false_exprt();
+  else if(src.is_false())
+    return true_exprt();
   else
     return not_exprt(src);
 }
