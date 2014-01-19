@@ -623,6 +623,14 @@ exprt path_symex_statet::instantiate_rec_address(
     tmp.op1()=instantiate_rec(src.op1(), propagate);
     return tmp;
   }
+  else if(src.id()==ID_if)
+  {
+    if_exprt if_expr=to_if_expr(src);
+    if_expr.true_case()=instantiate_rec_address(if_expr.true_case(), propagate);
+    if_expr.false_case()=instantiate_rec_address(if_expr.false_case(), propagate);
+    if_expr.cond()=instantiate_rec(if_expr.cond(), propagate);
+    return if_expr;
+  }
   else
   {
     // this shouldn't really happen
