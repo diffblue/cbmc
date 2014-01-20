@@ -1182,9 +1182,8 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
      op.is_zero())
   {
     // zero typecasted to a pointer is NULL
-    expr.id(ID_constant);
-    expr.set(ID_value, ID_NULL);
-    expr.remove(ID_operands);
+    constant_exprt result(ID_NULL, expr_type);
+    expr=result;
     return;
   }
 

@@ -669,7 +669,7 @@ void c_typecheck_baset::typecheck_typeof_type(typet &type)
   c_qualifierst c_qualifiers;
   c_qualifiers.read(type);
 
-  if(type.find(ID_operands).is_nil())
+  if(!((const exprt &)type).has_operands())
   {
     typet t=static_cast<const typet &>(type.find(ID_type_arg));
     typecheck_type(t);
