@@ -838,7 +838,7 @@ void goto_checkt::pointer_validity_check(
     
   const typet &dereference_type=pointer_type.subtype();
 
-  if(flags.unknown || flags.null)
+  if(flags.is_unknown() || flags.is_null())
   {
     add_guarded_claim(
       not_exprt(null_pointer(pointer)),
@@ -849,7 +849,7 @@ void goto_checkt::pointer_validity_check(
       guard);
   }
 
-  if(flags.unknown)
+  if(flags.is_unknown())
     add_guarded_claim(
       not_exprt(invalid_pointer(pointer)),
       "dereference failure: pointer invalid",
@@ -858,7 +858,7 @@ void goto_checkt::pointer_validity_check(
       expr,
       guard);
 
-  if(flags.uninitialized)
+  if(flags.is_uninitialized())
     add_guarded_claim(
       not_exprt(invalid_pointer(pointer)),
       "dereference failure: pointer uninitialized",
@@ -867,7 +867,7 @@ void goto_checkt::pointer_validity_check(
       expr,
       guard);
 
-  if(flags.unknown || flags.dynamic_heap)
+  if(flags.is_unknown() || flags.is_dynamic_heap())
     add_guarded_claim(
       not_exprt(deallocated(pointer, ns)),
       "dereference failure: deallocated dynamic object",
@@ -876,7 +876,7 @@ void goto_checkt::pointer_validity_check(
       expr,
       guard);
 
-  if(flags.unknown || flags.dynamic_local)
+  if(flags.is_unknown() || flags.is_dynamic_local())
     add_guarded_claim(
       not_exprt(dead_object(pointer, ns)),
       "dereference failure: dead object",
@@ -887,7 +887,7 @@ void goto_checkt::pointer_validity_check(
 
   if(enable_bounds_check)
   {
-    if(flags.unknown || flags.dynamic_heap)
+    if(flags.is_unknown() || flags.is_dynamic_heap())
     {
       exprt dynamic_bounds=
         or_exprt(dynamic_object_lower_bound(pointer),
@@ -905,7 +905,9 @@ void goto_checkt::pointer_validity_check(
 
   if(enable_bounds_check)
   {
-    if(flags.unknown || flags.dynamic_local || flags.static_lifetime)
+    if(flags.is_unknown() ||
+       flags.is_dynamic_local() ||
+       flags.is_static_lifetime())
     {
       exprt object_bounds=
         or_exprt(object_lower_bound(pointer),

@@ -32,14 +32,14 @@ Function: local_bitvector_analysist::flagst::print
 
 void local_bitvector_analysist::flagst::print(std::ostream &out) const
 {
-  if(unknown) out << "+unknown";
-  if(uninitialized) out << "+uninitialized";
-  if(uses_offset) out << "+uses_offset";
-  if(dynamic_local) out << "+dynamic_local";
-  if(dynamic_heap) out << "+dynamic_heap";
-  if(null) out << "+null";
-  if(static_lifetime) out << "+static_lifetime";
-  if(integer_address) out << "+integer_address";
+  if(is_unknown()) out << "+unknown";
+  if(is_uninitialized()) out << "+uninitialized";
+  if(is_uses_offset()) out << "+uses_offset";
+  if(is_dynamic_local()) out << "+dynamic_local";
+  if(is_dynamic_heap()) out << "+dynamic_heap";
+  if(is_null()) out << "+null";
+  if(is_static_lifetime()) out << "+static_lifetime";
+  if(is_integer_address()) out << "+integer_address";
 }
 
 /*******************************************************************\
