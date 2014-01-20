@@ -9,15 +9,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_LOCAL_MAY_ALIAS_H
 #define CPROVER_LOCAL_MAY_ALIAS_H
 
-#include <ostream>
 #include <stack>
 
-#include <util/numbering.h>
-
-#include <goto-programs/goto_functions.h>
-
-#include "dirty.h"
 #include "locals.h"
+#include "dirty.h"
+#include "local_cfg.h"
 
 /*******************************************************************\
 
@@ -26,33 +22,6 @@ Author: Daniel Kroening, kroening@kroening.com
  Purpose:
 
 \*******************************************************************/
-
-class local_cfgt
-{
-public:
-  typedef std::vector<unsigned> successorst;
-
-  class loct
-  {
-  public:
-    goto_programt::const_targett t;
-    successorst successors;
-  };
-
-  typedef std::map<goto_programt::const_targett, unsigned> loc_mapt;
-  loc_mapt loc_map;
-  
-  typedef std::vector<loct> locst;
-  locst locs;
-  
-  inline explicit local_cfgt(const goto_programt &_goto_program)
-  {
-    build(_goto_program);
-  }
-
-protected:  
-  void build(const goto_programt &goto_program);
-};
 
 class local_may_aliast
 {
@@ -85,10 +54,6 @@ public:
     const goto_programt::const_targett t,
     const exprt &src1, const exprt &src2);
     
-  bool may_use_offset(
-    const goto_programt::const_targett t,
-    const exprt &src);
-  
 protected:
   void build(const goto_functiont &goto_function);
 
@@ -97,19 +62,24 @@ protected:
   // the following may eventually get merged  
   numbering<irep_idt> pointers;
   numbering<exprt> objects;
-
+  
   // The following struct describes what a pointer
   // may point to
   struct destt
   {
   public:
-    destt():may_use_offset(false) { }
+    inline destt()
+    {
+    }
   
     std::set<unsigned> objects;
-    bool may_use_offset;
     
     bool merge(const destt &);
-    void clear() { objects.clear(); may_use_offset=false; }
+
+    inline void clear()
+    { 
+      objects.clear();
+    }
   };
   
   // pointers -> destt

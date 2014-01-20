@@ -16,11 +16,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ansi-c/c_types.h>
 #include <langapi/language_util.h>
 
-#include "local_may_alias.h"
+#include "local_bitvector_analysis.h"
 
 /*******************************************************************\
 
-Function: local_may_aliast::destt::merge
+Function: local_bitvector_analysist::flagst::print
 
   Inputs:
 
@@ -30,22 +30,21 @@ Function: local_may_aliast::destt::merge
 
 \*******************************************************************/
 
-bool local_may_aliast::destt::merge(const destt &src)
+void local_bitvector_analysist::flagst::print(std::ostream &out) const
 {
-  bool result=false;
-
-  unsigned old_size=objects.size();
-  objects.insert(src.objects.begin(), src.objects.end());
-
-  if(objects.size()!=old_size)
-    result=true;
-
-  return result;
+  if(unknown) out << "+unknown";
+  if(uninitialized) out << "+uninitialized";
+  if(uses_offset) out << "+uses_offset";
+  if(dynamic_local) out << "+dynamic_local";
+  if(dynamic_heap) out << "+dynamic_heap";
+  if(null) out << "+null";
+  if(static_lifetime) out << "+static_lifetime";
+  if(integer_address) out << "+integer_address";
 }
 
 /*******************************************************************\
 
-Function: local_may_aliast::loc_infot::merge
+Function: local_bitvector_analysist::loc_infot::merge
 
   Inputs:
 
@@ -55,38 +54,17 @@ Function: local_may_aliast::loc_infot::merge
 
 \*******************************************************************/
 
-bool local_may_aliast::loc_infot::merge(const loc_infot &src)
+bool local_bitvector_analysist::loc_infot::merge(const loc_infot &src)
 {
   bool result=false;
   
-  points_tot::iterator dest_it=points_to.begin();
+  unsigned max_index=
+    std::max(src.points_to.size(), points_to.size());
 
-  for(points_tot::const_iterator
-      src_it=src.points_to.begin();
-      src_it!=src.points_to.end();
-      ) // no it++
+  for(unsigned i=0; i<max_index; i++)
   {
-    if(dest_it==points_to.end() || 
-       src_it->first<dest_it->first)
-    {
-      points_to.insert(dest_it, *src_it);
+    if(points_to[i].merge(src.points_to[i]))
       result=true;
-      src_it++;
-      continue;
-    }
-    else if(dest_it->first<src_it->first)
-    {
-      dest_it++;
-      continue;
-    }
-    
-    assert(dest_it->first==src_it->first);
-    
-    if(dest_it->second.merge(src_it->second))
-      result=true;
-
-    dest_it++;
-    src_it++;
   }
   
   return result;
@@ -94,7 +72,7 @@ bool local_may_aliast::loc_infot::merge(const loc_infot &src)
 
 /*******************************************************************\
 
-Function: local_may_aliast::is_tracked
+Function: local_bitvector_analysist::is_tracked
 
   Inputs:
 
@@ -105,7 +83,7 @@ Function: local_may_aliast::is_tracked
 
 \*******************************************************************/
 
-bool local_may_aliast::is_tracked(const irep_idt &identifier)
+bool local_bitvector_analysist::is_tracked(const irep_idt &identifier)
 {
   localst::locals_mapt::const_iterator it=locals.locals_map.find(identifier);
   if(it==locals.locals_map.end()) return false;
@@ -116,7 +94,7 @@ bool local_may_aliast::is_tracked(const irep_idt &identifier)
 
 /*******************************************************************\
 
-Function: local_may_aliast::assign
+Function: local_bitvector_analysist::assign_lhs
 
   Inputs:
 
@@ -126,7 +104,7 @@ Function: local_may_aliast::assign
 
 \*******************************************************************/
 
-void local_may_aliast::assign_lhs(
+void local_bitvector_analysist::assign_lhs(
   const exprt &lhs,
   const exprt &rhs,
   const loc_infot &loc_info_src,
@@ -139,9 +117,8 @@ void local_may_aliast::assign_lhs(
     if(is_tracked(identifier))
     {
       unsigned dest_pointer=pointers.number(identifier);
-      destt &dest_set=loc_info_dest.points_to[dest_pointer];
-      dest_set.clear();
-      get_rec(dest_set, rhs, loc_info_src);
+      flagst rhs_flags=get_rec(rhs, loc_info_src);
+      loc_info_dest.points_to[dest_pointer]=rhs_flags;
     }
   }
   else if(lhs.id()==ID_dereference)
@@ -168,7 +145,7 @@ void local_may_aliast::assign_lhs(
  
 /*******************************************************************\
 
-Function: local_may_aliast::get
+Function: local_bitvector_analysist::get
 
   Inputs:
 
@@ -178,7 +155,7 @@ Function: local_may_aliast::get
 
 \*******************************************************************/
 
-std::set<exprt> local_may_aliast::get(
+local_bitvector_analysist::flagst local_bitvector_analysist::get(
   const goto_programt::const_targett t,
   const exprt &rhs)
 {
@@ -187,26 +164,13 @@ std::set<exprt> local_may_aliast::get(
   assert(loc_it!=cfg.loc_map.end());
   
   const loc_infot &loc_info_src=loc_infos[loc_it->second];
-  
-  destt result_tmp;
-  get_rec(result_tmp, rhs, loc_info_src);
 
-  std::set<exprt> result;
-
-  for(std::set<unsigned>::const_iterator
-      it=result_tmp.objects.begin();
-      it!=result_tmp.objects.end();
-      it++)
-  {
-    result.insert(objects[*it]);
-  }  
-  
-  return result;
+  return get_rec(rhs, loc_info_src);
 }
 
 /*******************************************************************\
 
-Function: local_may_aliast::aliases
+Function: local_bitvector_analysist::get_rec
 
   Inputs:
 
@@ -216,57 +180,16 @@ Function: local_may_aliast::aliases
 
 \*******************************************************************/
 
-bool local_may_aliast::aliases(
-  const goto_programt::const_targett t,
-  const exprt &src1, const exprt &src2)
-{
-  local_cfgt::loc_mapt::const_iterator loc_it=cfg.loc_map.find(t);
-  
-  assert(loc_it!=cfg.loc_map.end());
-  
-  const loc_infot &loc_info_src=loc_infos[loc_it->second];
-  
-  destt tmp1, tmp2;
-  get_rec(tmp1, src1, loc_info_src);
-  get_rec(tmp2, src2, loc_info_src);
-
-  if(tmp1.objects.find(unknown_object)!=tmp1.objects.end() ||
-     tmp2.objects.find(unknown_object)!=tmp2.objects.end())
-    return true;
-
-  std::list<unsigned> result;
-  
-  std::set_intersection(
-    tmp1.objects.begin(), tmp1.objects.end(),
-    tmp2.objects.begin(), tmp2.objects.end(),
-    std::back_inserter(result));
-  
-  return !result.empty();
-}
-
-/*******************************************************************\
-
-Function: local_may_aliast::get_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose: 
-
-\*******************************************************************/
-
-void local_may_aliast::get_rec(
-  destt &dest,
+local_bitvector_analysist::flagst local_bitvector_analysist::get_rec(
   const exprt &rhs,
   const loc_infot &loc_info_src)
 {
   if(rhs.id()==ID_constant)
   {
     if(rhs.is_zero())
-      dest.objects.insert(objects.number(exprt(ID_null_object)));
+      return flagst::mk_null();
     else
-      dest.objects.insert(objects.number(exprt(ID_integer_address_object)));
+      return flagst::mk_integer_address();
   }
   else if(rhs.id()==ID_symbol)
   {
@@ -274,15 +197,10 @@ void local_may_aliast::get_rec(
     if(is_tracked(identifier))
     {
       unsigned src_pointer=pointers.number(identifier);
-      points_tot::const_iterator src_it=loc_info_src.points_to.find(src_pointer);
-      if(src_it!=loc_info_src.points_to.end())
-      {
-        const std::set<unsigned> &src=src_it->second.objects;
-        dest.objects.insert(src.begin(), src.end());
-      }
+      return loc_info_src.points_to[src_pointer];
     }
     else
-      dest.objects.insert(unknown_object);
+      return flagst::mk_unknown();
   }
   else if(rhs.id()==ID_address_of)
   {
@@ -290,71 +208,82 @@ void local_may_aliast::get_rec(
     
     if(object.id()==ID_symbol)
     {
-      unsigned object_nr=objects.number(object);
-      dest.objects.insert(object_nr);
+      if(locals.is_local(to_symbol_expr(object).get_identifier()))
+        return flagst::mk_dynamic_local();
+      else
+        return flagst::mk_static_lifetime();
     }
     else if(object.id()==ID_index)
     {
       const index_exprt &index_expr=to_index_expr(object);
       if(index_expr.array().id()==ID_symbol)
       {
-        index_exprt tmp=index_expr;
-        tmp.index()=gen_zero(index_type());
-        dest.objects.insert(objects.number(tmp));
+        if(locals.is_local(
+          to_symbol_expr(index_expr.array()).get_identifier()))
+          return flagst::mk_dynamic_local() | flagst::mk_uses_offset();
+        else
+          return flagst::mk_static_lifetime() | flagst::mk_uses_offset();
       }
       else
-        dest.objects.insert(unknown_object);
+        return flagst::mk_unknown();
     }
     else
-      dest.objects.insert(unknown_object);
+      return flagst::mk_unknown();
   }
   else if(rhs.id()==ID_typecast)
   {
-    get_rec(dest, to_typecast_expr(rhs).op(), loc_info_src);
+    return get_rec(to_typecast_expr(rhs).op(), loc_info_src);
+  }
+  else if(rhs.id()==ID_uninitialized)
+  {
+    return flagst::mk_uninitialized();
   }
   else if(rhs.id()==ID_plus)
   {
     if(rhs.operands().size()>=3)
     {
-      get_rec(dest, make_binary(rhs), loc_info_src);
+      return get_rec(make_binary(rhs), loc_info_src);
     }
     else if(rhs.operands().size()==2)
     {
       // one must be pointer, one an integer
       if(rhs.op0().type().id()==ID_pointer)
       {
-        get_rec(dest, rhs.op0(), loc_info_src);
+        return get_rec(rhs.op0(), loc_info_src) |
+               flagst::mk_uses_offset();
       }
       else if(rhs.op1().type().id()==ID_pointer)
       {
-        get_rec(dest, rhs.op1(), loc_info_src);
+        return get_rec(rhs.op1(), loc_info_src) |
+               flagst::mk_uses_offset();
       }
       else
-        dest.objects.insert(unknown_object);
+        return flagst::mk_unknown();
     }
     else
-      dest.objects.insert(unknown_object);
+      return flagst::mk_unknown();
   }
   else if(rhs.id()==ID_minus)
   {
     if(rhs.op0().type().id()==ID_pointer)
     {
-      get_rec(dest, rhs.op0(), loc_info_src);
+      return get_rec(rhs.op0(), loc_info_src) |
+             flagst::mk_uses_offset();
     }
     else
-      dest.objects.insert(unknown_object);
+      return flagst::mk_unknown();
   }
   else if(rhs.id()==ID_member)
   {
-    dest.objects.insert(unknown_object);
+    return flagst::mk_unknown();
   }
   else if(rhs.id()==ID_index)
   {
-    dest.objects.insert(unknown_object);
+    return flagst::mk_unknown();
   }
   else if(rhs.id()==ID_dereference)
   {
-    dest.objects.insert(unknown_object);
+    return flagst::mk_unknown();
   }
   else if(rhs.id()==ID_sideeffect)
   {
@@ -362,19 +291,17 @@ void local_may_aliast::get_rec(
     const irep_idt &statement=side_effect_expr.get_statement();
 
     if(statement==ID_malloc)
-    {
-      dest.objects.insert(objects.number(exprt(ID_dynamic_object)));
-    }
+      return flagst::mk_dynamic_heap();
     else
-      dest.objects.insert(unknown_object);
+      return flagst::mk_unknown();
   }
   else
-    dest.objects.insert(unknown_object);
+    return flagst::mk_unknown();
 }
  
 /*******************************************************************\
 
-Function: local_may_aliast::build
+Function: local_bitvector_analysist::build
 
   Inputs:
 
@@ -384,18 +311,16 @@ Function: local_may_aliast::build
 
 \*******************************************************************/
 
-void local_may_aliast::build(const goto_functiont &goto_function)
+void local_bitvector_analysist::build(const goto_functiont &goto_function)
 {
   if(cfg.locs.empty()) return;
 
   work_queuet work_queue;
   work_queue.push(0);  
   
-  unknown_object=objects.number(exprt(ID_unknown));
-  
   loc_infos.resize(cfg.locs.size());
-  
-  // feed in sufficiently bad defaults
+
+  // feed in sufficiently bad defaults for parameters
   for(code_typet::parameterst::const_iterator
       it=goto_function.type.parameters().begin();
       it!=goto_function.type.parameters().end();
@@ -403,16 +328,7 @@ void local_may_aliast::build(const goto_functiont &goto_function)
   {
     const irep_idt &identifier=it->get_identifier();
     if(is_tracked(identifier))
-      loc_infos[0].points_to[pointers.number(identifier)].objects.insert(unknown_object);
-  }
-
-  for(localst::locals_mapt::const_iterator
-      l_it=locals.locals_map.begin();
-      l_it!=locals.locals_map.end();
-      l_it++)
-  {
-    if(is_tracked(l_it->first))
-      loc_infos[0].points_to[pointers.number(l_it->first)].objects.insert(unknown_object);
+      loc_infos[0].points_to[pointers.number(identifier)]=flagst::mk_unknown();
   }
 
   while(!work_queue.empty())
@@ -437,14 +353,14 @@ void local_may_aliast::build(const goto_functiont &goto_function)
     case DECL:
       {
         const code_declt &code_decl=to_code_decl(instruction.code);
-        assign_lhs(code_decl.symbol(), nil_exprt(), loc_info_src, loc_info_dest);
+        assign_lhs(code_decl.symbol(), exprt(ID_uninitialized), loc_info_src, loc_info_dest);
       }
       break;
 
     case DEAD:
       {
         const code_deadt &code_dead=to_code_dead(instruction.code);
-        assign_lhs(code_dead.symbol(), nil_exprt(), loc_info_src, loc_info_dest);
+        assign_lhs(code_dead.symbol(), exprt(ID_uninitialized), loc_info_src, loc_info_dest);
       }
       break;
 
@@ -472,7 +388,7 @@ void local_may_aliast::build(const goto_functiont &goto_function)
 
 /*******************************************************************\
 
-Function: local_may_aliast::output
+Function: local_bitvector_analysist::output
 
   Inputs:
 
@@ -482,7 +398,7 @@ Function: local_may_aliast::output
 
 \*******************************************************************/
 
-void local_may_aliast::output(
+void local_bitvector_analysist::output(
   std::ostream &out,
   const goto_functiont &goto_function,
   const namespacet &ns) const
@@ -500,20 +416,10 @@ void local_may_aliast::output(
         p_it!=loc_info.points_to.end();
         p_it++)
     {
-      out << "  " << pointers[p_it->first] << " = { ";
-
-      for(std::set<unsigned>::const_iterator
-          s_it=p_it->second.objects.begin();
-          s_it!=p_it->second.objects.end();
-          s_it++)
-      {
-        if(s_it!=p_it->second.objects.begin()) out << ", ";
-        out << from_expr(ns, "", objects[*s_it]);
-      }
-        
-      out << " }";
-      
-      out << "\n";
+      out << "  " << pointers[p_it-loc_info.points_to.begin()]
+          << ": "
+          << *p_it
+          << "\n";
     }
 
     out << "\n";
