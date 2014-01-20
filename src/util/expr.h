@@ -43,11 +43,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class exprt:public irept
 {
 public:
-  #ifdef USE_LIST
-  typedef std::list<exprt> operandst;
-  #else
   typedef std::vector<exprt> operandst;
-  #endif
 
   // constructors
   inline exprt() { }
@@ -71,56 +67,28 @@ public:
   { return operands().front(); }
 
   inline exprt &op1()
-  #ifdef USE_LIST
-  { return *(++operands().begin()); }
-  #else
   { return operands()[1]; }
-  #endif
    
   inline exprt &op2()
-  #ifdef USE_LIST
-  { return *(++ ++operands().begin()); }
-  #else
   { return operands()[2]; }
-  #endif
    
   inline exprt &op3()
-  #ifdef USE_LIST
-  { return *(++ ++ ++operands().begin()); }
-  #else
   { return operands()[3]; }
-  #endif
    
   inline const exprt &op0() const
   { return operands().front(); }
 
   inline const exprt &op1() const
-  #ifdef USE_LIST
-  { return *(++operands().begin()); }
-  #else
   { return operands()[1]; }
-  #endif
   
   inline const exprt &op2() const
-  #ifdef USE_LIST
-  { return *(++ ++operands().begin()); }
-  #else
   { return operands()[2]; }
-  #endif
   
   inline const exprt &op3() const
-  #ifdef USE_LIST
-  { return *(++ ++ ++operands().begin()); }
-  #else
   { return operands()[3]; }
-  #endif
   
   inline void reserve_operands(unsigned n)
-  #ifdef USE_LIST
-  { }
-  #else
   { operands().reserve(n) ; }
-  #endif
    
   void move_to_operands(exprt &expr); // destroys expr
   void move_to_operands(exprt &e1, exprt &e2); // destroys e1, e2
