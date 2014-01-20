@@ -60,23 +60,24 @@ public:
       bits=0;
     }
 
-    union
+    // the bits for the "bitvector analysis"
+    typedef enum
     {
-      // the bits for the "bitvector analysis"
-      struct
-      {
-        bool unknown:1;
-        bool uninitialized:1;
-        bool uses_offset:1;
-        bool dynamic_local:1;
-        bool dynamic_heap:1;
-        bool null:1;
-        bool static_lifetime:1;
-        bool integer_address:1;
-      };
+      B_unknown=1<<0,
+      B_uninitialized=1<<1,
+      B_uses_offset=1<<2,
+      B_dynamic_local=1<<3,
+      B_dynamic_heap=1<<4,
+      B_null=1<<5,
+      B_static_lifetime=1<<6,
+      B_integer_address=1<<7
+    } bitst;
+
+    explicit inline flagst(const bitst _bits):bits(_bits)
+    {
+    }
       
-      unsigned bits;
-    };
+    unsigned bits;
     
     inline bool merge(const flagst &other)
     {
@@ -87,58 +88,82 @@ public:
     
     inline static flagst mk_unknown()
     {
-      flagst result;
-      result.unknown=true;
-      return result;
+      return flagst(B_unknown);
+    }
+
+    inline bool is_unknown() const
+    {
+      return (bits&B_unknown)!=0;
     }
 
     inline static flagst mk_uninitialized()
     {
-      flagst result;
-      result.uninitialized=true;
-      return result;
+      return flagst(B_uninitialized);
+    }
+
+    inline bool is_uninitialized() const
+    {
+      return (bits&B_uninitialized)!=0;
     }
 
     inline static flagst mk_uses_offset()
     {
-      flagst result;
-      result.uses_offset=true;
-      return result;
+      return flagst(B_uses_offset);
+    }
+
+    inline bool is_uses_offset() const
+    {
+      return (bits&B_uses_offset)!=0;
     }
 
     inline static flagst mk_dynamic_local()
     {
-      flagst result;
-      result.dynamic_local=true;
-      return result;
+      return flagst(B_dynamic_local);
+    }
+
+    inline bool is_dynamic_local() const
+    {
+      return (bits&B_dynamic_local)!=0;
     }
 
     inline static flagst mk_dynamic_heap()
     {
-      flagst result;
-      result.dynamic_heap=true;
-      return result;
+      return flagst(B_dynamic_heap);
+    }
+
+    inline bool is_dynamic_heap() const
+    {
+      return (bits&B_dynamic_heap)!=0;
     }
 
     inline static flagst mk_null()
     {
-      flagst result;
-      result.null=true;
-      return result;
+      return flagst(B_null);
+    }
+
+    inline bool is_null() const
+    {
+      return (bits&B_null)!=0;
     }
 
     inline static flagst mk_static_lifetime()
     {
-      flagst result;
-      result.static_lifetime=true;
-      return result;
+      return flagst(B_static_lifetime);
+    }
+
+    inline bool is_static_lifetime() const
+    {
+      return (bits&B_static_lifetime)!=0;
     }
 
     inline static flagst mk_integer_address()
     {
-      flagst result;
-      result.integer_address=true;
-      return result;
+      return flagst(B_integer_address);
+    }
+
+    inline bool is_integer_address() const
+    {
+      return (bits&B_integer_address)!=0;
     }
 
     void print(std::ostream &) const;
