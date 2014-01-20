@@ -21,7 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_predicates.h>
 #include <util/cprover_prefix.h>
 
-#include "local_may_alias.h"
+#include "local_bitvector_analysis.h"
 #include "goto_check.h"
 
 class goto_checkt
@@ -31,7 +31,7 @@ public:
     const namespacet &_ns,
     const optionst &_options):
     ns(_ns),
-    local_may_alias(0)
+    local_bitvector_analysis(0)
   {
     enable_bounds_check=_options.get_bool_option("bounds-check");
     enable_pointer_check=_options.get_bool_option("pointer-check");
@@ -56,7 +56,7 @@ public:
     
 protected:
   const namespacet &ns;
-  local_may_aliast *local_may_alias;
+  local_bitvector_analysist *local_bitvector_analysis;
   goto_programt::const_targett t;
 
   void check_rec(const exprt &expr, guardt &guard, bool address);
@@ -833,27 +833,12 @@ void goto_checkt::pointer_validity_check(
     guard);    
   #else
   
-  std::set<exprt> alias_set=local_may_alias->get(t, pointer);
-
-  //bool may_use_offset=local_may_alias->may_use_offset(t, pointer);
-  bool aliases_unknown=alias_set.find(exprt(ID_unknown))!=alias_set.end();
-  bool aliases_dynamic_object=alias_set.find(exprt(ID_dynamic_object))!=alias_set.end();
-  bool aliases_null_object=alias_set.find(exprt(ID_null_object))!=alias_set.end();
-  bool aliases_other_object=false;
-  
-  for(std::set<exprt>::const_iterator it=alias_set.begin();
-      it!=alias_set.end();
-      it++)
-    if(it->id()!=ID_unknown &&
-       it->id()!=ID_dynamic_object &&
-       it->id()!=ID_null_object)
-    {
-      aliases_other_object=true;
-    }
-
+  local_bitvector_analysist::flagst flags=
+    local_bitvector_analysis->get(t, pointer);
+    
   const typet &dereference_type=pointer_type.subtype();
 
-  if(aliases_unknown || aliases_null_object)
+  if(flags.unknown || flags.null)
   {
     add_guarded_claim(
       not_exprt(null_pointer(pointer)),
@@ -864,7 +849,7 @@ void goto_checkt::pointer_validity_check(
       guard);
   }
 
-  if(aliases_unknown)
+  if(flags.unknown)
     add_guarded_claim(
       not_exprt(invalid_pointer(pointer)),
       "dereference failure: pointer invalid",
@@ -873,7 +858,16 @@ void goto_checkt::pointer_validity_check(
       expr,
       guard);
 
-  if(aliases_unknown || aliases_dynamic_object)
+  if(flags.uninitialized)
+    add_guarded_claim(
+      not_exprt(invalid_pointer(pointer)),
+      "dereference failure: pointer uninitialized",
+      "pointer dereference",
+      expr.find_location(),
+      expr,
+      guard);
+
+  if(flags.unknown || flags.dynamic_heap)
     add_guarded_claim(
       not_exprt(deallocated(pointer, ns)),
       "dereference failure: deallocated dynamic object",
@@ -882,7 +876,7 @@ void goto_checkt::pointer_validity_check(
       expr,
       guard);
 
-  if(aliases_unknown || aliases_other_object)
+  if(flags.unknown || flags.dynamic_local)
     add_guarded_claim(
       not_exprt(dead_object(pointer, ns)),
       "dereference failure: dead object",
@@ -893,7 +887,7 @@ void goto_checkt::pointer_validity_check(
 
   if(enable_bounds_check)
   {
-    if(aliases_unknown || aliases_dynamic_object)
+    if(flags.unknown || flags.dynamic_heap)
     {
       exprt dynamic_bounds=
         or_exprt(dynamic_object_lower_bound(pointer),
@@ -911,7 +905,7 @@ void goto_checkt::pointer_validity_check(
 
   if(enable_bounds_check)
   {
-    if(aliases_unknown || aliases_other_object)
+    if(flags.unknown || flags.dynamic_local || flags.static_lifetime)
     {
       exprt object_bounds=
         or_exprt(object_lower_bound(pointer),
@@ -1347,8 +1341,8 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
 {
   assertions.clear();
   
-  local_may_aliast local_may_alias_obj(goto_function);
-  local_may_alias=&local_may_alias_obj;
+  local_bitvector_analysist local_bitvector_analysis_obj(goto_function);
+  local_bitvector_analysis=&local_bitvector_analysis_obj;
 
   goto_programt &goto_program=goto_function.body;
 
@@ -1452,7 +1446,7 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
         const symbol_exprt &variable=to_symbol_expr(i.code.op0());
         
         // is it dirty?
-        if(local_may_alias->dirty(variable))
+        if(local_bitvector_analysis->dirty(variable))
         {
           // need to mark the dead variable as dead
           goto_programt::targett t=new_code.add_instruction(ASSIGN);
