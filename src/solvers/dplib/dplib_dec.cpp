@@ -99,7 +99,8 @@ decision_proceduret::resultt dplib_dect::dec_solve()
   std::string command=
     "dplibl "+temp_out_filename+" > "+temp_result_filename+" 2>&1";
     
-  system(command.c_str());
+  int res=system(command.c_str());
+  assert(0 == res);
   
   status("Reading result from CVCL");
 
