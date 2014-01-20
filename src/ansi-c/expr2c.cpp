@@ -66,6 +66,7 @@ std::string expr2ct::id_shorthand(const exprt &expr) const
   const symbolt *symbol;
 
   if(!ns.lookup(identifier, symbol) &&
+     !symbol->base_name.empty() &&
       has_suffix(id2string(identifier), id2string(symbol->base_name)))
     return id2string(symbol->base_name);
 
