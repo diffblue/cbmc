@@ -41,10 +41,12 @@ public:
 
   virtual void transform(
     locationt from,
-    locationt to)=0;
+    locationt to,
+    const namespacet &ns)=0;
 
   virtual void output(
-    std::ostream &out) const
+    std::ostream &out,
+    const namespacet &ns) const
   {
   }
   
@@ -73,26 +75,29 @@ public:
   }
 
   inline void operator()(
-    const goto_programt &goto_program)
+    const goto_programt &goto_program,
+    const namespacet &ns)
   {
     goto_functionst goto_functions;
     initialize(goto_program);
-    fixedpoint(goto_program, goto_functions);
+    fixedpoint(goto_program, goto_functions, ns);
   }
     
   inline void operator()(
-    const goto_functionst &goto_functions)
+    const goto_functionst &goto_functions,
+    const namespacet &ns)
   {
     initialize(goto_functions);
-    fixedpoint(goto_functions);      
+    fixedpoint(goto_functions, ns);
   }
 
   inline void operator()(
-    const goto_functionst::goto_functiont &goto_function)
+    const goto_functionst::goto_functiont &goto_function,
+    const namespacet &ns)
   {
     goto_functionst goto_functions;
     initialize(goto_function);
-    fixedpoint(goto_function.body, goto_functions);
+    fixedpoint(goto_function.body, goto_functions, ns);
   }
 
   virtual void clear()
@@ -139,17 +144,20 @@ protected:
   // true = found s.th. new
   bool fixedpoint(
     const goto_programt &goto_program,
-    const goto_functionst &goto_functions);
+    const goto_functionst &goto_functions,
+    const namespacet &ns);
     
   void fixedpoint(
-    const goto_functionst &goto_functions);
+    const goto_functionst &goto_functions,
+    const namespacet &ns);
 
   // true = found s.th. new
   bool visit(
     locationt l,
     working_sett &working_set,
     const goto_programt &goto_program,
-    const goto_functionst &goto_functions);
+    const goto_functionst &goto_functions,
+    const namespacet &ns);
     
   static locationt successor(locationt l)
   {
@@ -165,13 +173,15 @@ protected:
     locationt l_call, locationt l_return,
     const exprt &function,
     const exprt::operandst &arguments,
-    const goto_functionst &goto_functions);
+    const goto_functionst &goto_functions,
+    const namespacet &ns);
 
   bool do_function_call(
     locationt l_call, locationt l_return,
     const goto_functionst &goto_functions,
     const goto_functionst::function_mapt::const_iterator f_it,
-    const exprt::operandst &arguments);
+    const exprt::operandst &arguments,
+    const namespacet &ns);
 
   // abstract methods
     
