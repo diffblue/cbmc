@@ -227,16 +227,16 @@ Function: language_uit::show_symbol_table
 
 \*******************************************************************/
 
-void language_uit::show_symbol_table()
+void language_uit::show_symbol_table(bool brief)
 {
   switch(get_ui())
   {
   case ui_message_handlert::PLAIN:
-    show_symbol_table_plain(std::cout);
+    show_symbol_table_plain(std::cout, brief);
     break;
 
   case ui_message_handlert::XML_UI:
-    show_symbol_table_xml_ui();
+    show_symbol_table_xml_ui(brief);
     break;
 
   default:
@@ -256,7 +256,7 @@ Function: language_uit::show_symbol_table_xml_ui
 
 \*******************************************************************/
 
-void language_uit::show_symbol_table_xml_ui()
+void language_uit::show_symbol_table_xml_ui(bool brief)
 {
   error("cannot show symbol table in this format");
 }
@@ -273,9 +273,10 @@ Function: language_uit::show_symbol_table_plain
 
 \*******************************************************************/
 
-void language_uit::show_symbol_table_plain(std::ostream &out)
+void language_uit::show_symbol_table_plain(std::ostream &out, bool brief)
 {
-  out << std::endl << "Symbols:" << std::endl << std::endl;
+  if(!brief)
+    out << std::endl << "Symbols:" << std::endl << std::endl;
   
   const namespacet ns(symbol_table);
 
@@ -302,6 +303,12 @@ void language_uit::show_symbol_table_plain(std::ostream &out)
     if(symbol.value.is_not_nil())
       p->from_expr(symbol.value, value_str, ns);
     
+    if(brief)
+    {
+      out << symbol.name << " " << type_str << std::endl;
+      continue;
+    }
+
     out << "Symbol......: " << symbol.name << std::endl;
     out << "Pretty name.: " << symbol.pretty_name << std::endl;
     out << "Module......: " << symbol.module << std::endl;
