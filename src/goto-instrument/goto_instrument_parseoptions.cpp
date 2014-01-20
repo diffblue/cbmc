@@ -306,6 +306,12 @@ int goto_instrument_parseoptionst::doit()
       return 0;
     }
 
+    if(cmdline.isset("list-symbols"))
+    {
+      show_symbol_table(true);
+      return 0;
+    }
+
     if(cmdline.isset("show-uninitialized"))
     {
       show_uninitialized(symbol_table, goto_functions, std::cout);
@@ -361,6 +367,15 @@ int goto_instrument_parseoptionst::doit()
       return 0;
     }
 
+    if(cmdline.isset("list-undefined-functions"))
+    {
+      Forall_goto_functions(it, goto_functions)
+        if(!it->second.body_available)
+          std::cout << it->first << std::endl;
+      return 0;
+    }
+
+    // experimental: print structs
     if(cmdline.isset("show-struct-alignment"))
     {
       print_struct_alignment_problems(symbol_table, std::cout);
@@ -923,7 +938,9 @@ void goto_instrument_parseoptionst::help()
     " --show-loops                 show the loops in the program\n"
     " --show-properties            show the properties\n"
     " --show-symbol-table          show symbol table\n"
+    " --list-symbols               list symbols with type information\n"
     " --show-goto-functions        show goto program\n"
+    " --list-undefined-functions   list functions without body\n"
     " --show-struct-alignment      show struct members that might be concurrently accessed\n"
     " --show-natural-loops         show natural loop heads\n"
     "\n"
@@ -943,7 +960,7 @@ void goto_instrument_parseoptionst::help()
     "\n"
     "Semantic transformations:\n"
     " --nondet-volatile            makes reads from volatile variables non-deterministic\n"
-    " --unwind <n>                 unwinds the loopds <n> times\n"
+    " --unwind <n>                 unwinds the loops <n> times\n"
     " --isr <function>             instruments an interrupt service routine\n"
     " --mmio                       instruments memory-mapped I/O\n"
     " --nondet-static              add nondeterministic initialization of variables with static lifetime\n"
