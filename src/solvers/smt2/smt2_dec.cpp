@@ -177,7 +177,8 @@ decision_proceduret::resultt smt2_dect::dec_solve()
   command+=" 2>&1";
   #endif
 
-  system(command.c_str());
+  int res=system(command.c_str());
+  assert(0 == res);
 
   std::ifstream in(temp_result_filename.c_str());
 

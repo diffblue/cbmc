@@ -128,7 +128,8 @@ bool pbs_dimacs_cnft::pbs_solve()
     
   command += " -a > temp.out";
 
-  system(command.c_str());
+  int res=system(command.c_str());
+  assert(0 == res);
 
   std::ifstream file("temp.out");
   std::string line;
