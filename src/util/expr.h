@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_EXPR_H
 #define CPROVER_EXPR_H
 
+//#define OPERANDS_IN_GETSUB
+
 #include "type.h"
 
 #define forall_operands(it, expr) \
@@ -55,13 +57,25 @@ public:
   inline const typet &type() const { return static_cast<const typet &>(find(ID_type)); }
 
   inline bool has_operands() const
+  #ifdef OPERANDS_IN_GETSUB
+  { return !get_sub().empty(); }
+  #else
   { return !find(ID_operands).is_nil(); }
+  #endif
 
   inline operandst &operands()
+  #ifdef OPERANDS_IN_GETSUB
+  { return (operandst &)get_sub(); }
+  #else
   { return (operandst &)(add(ID_operands).get_sub()); }
+  #endif
   
   inline const operandst &operands() const
+  #ifdef OPERANDS_IN_GETSUB
+  { return (const operandst &)get_sub(); }
+  #else
   { return (const operandst &)(find(ID_operands).get_sub()); }
+  #endif
    
   inline exprt &op0()
   { return operands().front(); }
