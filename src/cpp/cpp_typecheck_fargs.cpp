@@ -83,7 +83,7 @@ bool cpp_typecheck_fargst::match(
 {
   distance=0;
 
-  exprt::operandst ops = operands;
+  exprt::operandst ops=operands;
   const code_typet::parameterst &parameters=code_type.parameters();
 
   if(parameters.size()>ops.size())
@@ -109,7 +109,8 @@ bool cpp_typecheck_fargst::match(
       return false;
   }
 
-  for(std::size_t i=0; i<ops.size(); i++)
+  exprt::operandst::iterator it=ops.begin();
+  for(const auto &parameter : parameters)
   {
     // read
     // http://publib.boulder.ibm.com/infocenter/comphelp/v8v101/topic/com.ibm.xlcpp8a.doc/language/ref/implicit_conversion_sequences.htm
@@ -119,16 +120,9 @@ bool cpp_typecheck_fargst::match(
     // * User-defined conversion sequences
     // * Ellipsis conversion sequences
 
-    if(i>=parameters.size())
-    {
-      // Ellipsis is the 'worst' of the conversion sequences
-      distance+=1000;
-      continue;
-    }
-
-    exprt parameter=parameters[i];
-
-    exprt &operand=ops[i];
+    assert(it!=ops.end());
+    const exprt &operand=*it;
+    typet type=parameter.type();
 
     #if 0
     // unclear, todo
@@ -140,13 +134,13 @@ bool cpp_typecheck_fargst::match(
 
     // "this" is a special case -- we turn the pointer type
     // into a reference type to do the type matching
-    if(i==0 && parameter.get(ID_C_base_name)==ID_this)
+    if(it==ops.begin() && parameter.get(ID_C_base_name)==ID_this)
     {
-      parameter.type().set(ID_C_reference, true);
-      parameter.type().set("#this", true);
+      type.set(ID_C_reference, true);
+      type.set("#this", true);
     }
 
-    unsigned rank = 0;
+    unsigned rank=0;
     exprt new_expr;
 
     #if 0
@@ -156,7 +150,7 @@ bool cpp_typecheck_fargst::match(
 
     // can we do the standard conversion sequence?
     if(cpp_typecheck.implicit_conversion_sequence(
-        operand, parameter.type(), new_expr, rank))
+        operand, type, new_expr, rank))
     {
       // ok
       distance+=rank;
@@ -171,7 +165,14 @@ bool cpp_typecheck_fargst::match(
       #endif
       return false; // no conversion possible
     }
+
+    ++it;
   }
+
+  // we may not have used all operands
+  for( ; it!=ops.end(); ++it)
+    // Ellipsis is the 'worst' of the conversion sequences
+    distance+=1000;
 
   return true;
 }

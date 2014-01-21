@@ -41,15 +41,13 @@ bvt boolbvt::convert_struct(const struct_exprt &expr)
   bvt bv;
   bv.resize(width);
 
-  std::size_t offset=0, i=0;
+  std::size_t offset=0;
 
-  for(struct_typet::componentst::const_iterator
-      it=components.begin();
-      it!=components.end();
-      it++)
+  exprt::operandst::const_iterator op_it=expr.operands().begin();
+  for(const auto & comp : components)
   {
-    const typet &subtype=it->type();
-    const exprt &op=expr.operands()[i];
+    const typet &subtype=comp.type();
+    const exprt &op=*op_it;
 
     if(!base_type_eq(subtype, op.type(), ns))
     {
@@ -76,7 +74,7 @@ bvt boolbvt::convert_struct(const struct_exprt &expr)
       offset+=op_bv.size();
     }
 
-    i++;
+    ++op_it;
   }
 
   assert(offset==width);

@@ -301,11 +301,16 @@ bool base_type_eqt::base_type_eq_rec(
   if(!base_type_eq(expr1.type(), expr2.type()))
     return false;
 
-  if(expr1.operands().size()!=expr2.operands().size())
+  const exprt::operandst &expr1_op=expr1.operands();
+  const exprt::operandst &expr2_op=expr2.operands();
+  if(expr1_op.size()!=expr2_op.size())
     return false;
 
-  for(unsigned i=0; i<expr1.operands().size(); i++)
-    if(!base_type_eq(expr1.operands()[i], expr2.operands()[i]))
+  for(exprt::operandst::const_iterator
+      it1=expr1_op.begin(), it2=expr2_op.begin();
+      it1!=expr1_op.end() && it2!=expr2_op.end();
+      ++it1, ++it2)
+    if(!base_type_eq(*it1, *it2))
       return false;
 
   if(expr1.id()==ID_constant)

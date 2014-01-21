@@ -87,7 +87,7 @@ exprt flatten_byte_extract(
       // TODO this doesn't seem correct if size_bits%8!=0 as more
       // bits than the original expression will be returned.
       if(width_bytes==1)
-        return op[0];
+        return op.front();
       else // width_bytes>=2
       {
         concatenation_exprt concatenation(src.type());
