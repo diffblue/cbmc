@@ -359,7 +359,7 @@ exprt cpp_typecheck_resolvet::convert_identifier(
       {
         // the object is given to us in fargs
         assert(!fargs.operands.empty());
-        object=fargs.operands[0];
+        object=fargs.operands.front();
       }
       else if(this_expr.is_not_nil())
       {
@@ -840,7 +840,7 @@ exprt cpp_typecheck_resolvet::do_builtin(
         "but got "+i2string(arguments.size());
     }
 
-    const exprt &argument=arguments[0];
+    const exprt &argument=arguments.front();
 
     if(argument.id()==ID_type)
     {
@@ -2151,7 +2151,8 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
   const irept::subt &parameters=
     function_declarator.type().find(ID_parameters).get_sub();
   
-  for(std::size_t i=0; i<parameters.size(); i++)
+  exprt::operandst::const_iterator it=fargs.operands.begin();
+  for(std::size_t i=0; i<parameters.size(); i++, ++it)
   {
     if(i<fargs.operands.size() &&
        parameters[i].id()==ID_cpp_declaration)
@@ -2172,7 +2173,7 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
       // sorts of trouble.
       cpp_convert_plain_type(arg_type);
       
-      guess_template_args(arg_type, fargs.operands[i].type());
+      guess_template_args(arg_type, it->type());
     }
   }
   
@@ -2591,10 +2592,12 @@ void cpp_typecheck_resolvet::resolve_with_arguments(
   const cpp_typecheck_fargst &fargs)
 {
   // not clear what this is good for
-  for(std::size_t i=0; i<fargs.operands.size(); i++)
+  for(exprt::operandst::const_iterator it=fargs.operands.begin();
+      it!=fargs.operands.end();
+      ++it)
   {
     const typet &final_type=
-      cpp_typecheck.follow(fargs.operands[i].type());
+      cpp_typecheck.follow(it->type());
 
     if(final_type.id()!=ID_struct && final_type.id()!=ID_union)
       continue;

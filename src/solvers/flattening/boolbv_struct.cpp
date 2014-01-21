@@ -36,15 +36,16 @@ void boolbvt::convert_struct(const struct_exprt &expr, bvt &bv)
 
   bv.resize(width);
 
-  std::size_t offset=0, i=0;
+  std::size_t offset=0;
 
+  exprt::operandst::const_iterator op_it=expr.operands().begin();
   for(struct_typet::componentst::const_iterator
       it=components.begin();
       it!=components.end();
-      it++)
+      it++, ++op_it)
   {
     const typet &subtype=it->type();
-    const exprt &op=expr.operands()[i];
+    const exprt &op=*op_it;
 
     if(!base_type_eq(subtype, op.type(), ns))
       throw "struct: component type does not match: "+
@@ -66,8 +67,6 @@ void boolbvt::convert_struct(const struct_exprt &expr, bvt &bv)
 
       offset+=op_bv.size();
     }
-
-    i++;    
   }
   
   assert(offset==width);

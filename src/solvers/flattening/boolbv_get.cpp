@@ -211,11 +211,11 @@ exprt boolbvt::bv_get_rec(
       {
         std::size_t size=width/sub_width;
         exprt value(ID_vector, type);
-        value.operands().resize(size);
+        value.reserve_operands(size);
 
         for(std::size_t i=0; i<size; i++)
-          value.operands()[i]=
-            bv_get_rec(bv, unknown, i*sub_width, subtype);
+          value.operands().push_back(
+            bv_get_rec(bv, unknown, i*sub_width, subtype));
             
         return value;
       }

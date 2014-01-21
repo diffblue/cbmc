@@ -2520,25 +2520,26 @@ void cpp_typecheckt::typecheck_function_call_arguments(
     }
   }
 
-  for(std::size_t i=0; i<parameters.size(); i++)
+  exprt::operandst::iterator arg_it=expr.arguments().begin();
+  for(std::size_t i=0; i<parameters.size(); i++, ++arg_it)
   {
     if(parameters[i].get_bool("#call_by_value"))
     {
       assert(is_reference(parameters[i].type()));
 
-      if(expr.arguments()[i].id()!=ID_temporary_object)
+      if(arg_it->id()!=ID_temporary_object)
       {
         // create a temporary for the parameter
 
         exprt arg("already_typechecked");
-        arg.copy_to_operands(expr.arguments()[i]);
+        arg.copy_to_operands(*arg_it);
 
         exprt temporary;
-        new_temporary(expr.arguments()[i].source_location(),
+        new_temporary(arg_it->source_location(),
                       parameters[i].type().subtype(),
                       arg,
                       temporary);
-        expr.arguments()[i].swap(temporary);
+        arg_it->swap(temporary);
       }
 
     }

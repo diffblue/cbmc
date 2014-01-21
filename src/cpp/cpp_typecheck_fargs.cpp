@@ -109,7 +109,8 @@ bool cpp_typecheck_fargst::match(
       return false;
   }
 
-  for(std::size_t i=0; i<ops.size(); i++)
+  exprt::operandst::iterator it=ops.begin();
+  for(std::size_t i=0; i<ops.size(); i++, ++it)
   {
     // read
     // http://publib.boulder.ibm.com/infocenter/comphelp/v8v101/topic/com.ibm.xlcpp8a.doc/language/ref/implicit_conversion_sequences.htm
@@ -128,7 +129,7 @@ bool cpp_typecheck_fargst::match(
     
     exprt parameter=parameters[i];
 
-    exprt &operand=ops[i];
+    exprt &operand=*it;
 
     #if 0
     // unclear, todo

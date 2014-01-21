@@ -68,7 +68,7 @@ exprt flatten_byte_extract(
     {
       // get 'width'-many bytes, and concatenate
       exprt::operandst op;
-      op.resize(width_bytes);
+      op.reserve(width_bytes);
       
       for(std::size_t i=0; i<width_bytes; i++)
       {
@@ -80,11 +80,11 @@ exprt flatten_byte_extract(
         index_exprt index_expr(subtype);
         index_expr.array()=src.op0();
         index_expr.index()=offset;
-        op[i]=index_expr;
+        op.push_back(index_expr);
       }
       
       if(width_bytes==1)
-        return op[0];
+        return op.front();
       else // width_bytes>=2
       {
         concatenation_exprt concatenation(src.type());

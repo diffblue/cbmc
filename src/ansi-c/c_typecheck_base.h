@@ -71,45 +71,6 @@ protected:
   // service functions
   //
 
-  // initializers
-  struct init_statet
-  {
-  protected:
-    const exprt array;
-    size_t pos;
-
-  public:    
-    explicit init_statet(const exprt &_array):array(_array), pos(0)
-    {
-    }
-  
-    size_t remaining() const
-    {
-      return array.operands().size()-pos;
-    }
-    
-    bool has_next() const
-    {
-      return pos<array.operands().size();
-    }
-    
-    init_statet &operator ++(int x)
-    {
-      pos++;
-      return *this;
-    }
-    
-    const exprt &operator *() const
-    {
-      return array.operands()[pos];
-    }
-
-    const exprt *operator ->() const
-    {
-      return &(array.operands()[pos]);
-    }
-  };
-  
   virtual void do_initializer(
     exprt &initializer,
     const typet &type,

@@ -69,7 +69,7 @@ public:
   explicit code_blockt(const std::list<codet> &_list):codet(ID_block)
   {
     operandst &o=operands();
-    o.reserve(_list.size());
+    reserve_operands(_list.size());
     for(std::list<codet>::const_iterator
         it=_list.begin();
         it!=_list.end();
@@ -282,7 +282,7 @@ public:
   inline code_assumet():codet(ID_assume)
   {
     // will change to resize(1) in the future
-    operands().reserve(1);
+    reserve_operands(1);
   }
 
   inline explicit code_assumet(const exprt &expr):codet(ID_assume)
@@ -321,7 +321,7 @@ public:
   inline code_assertt():codet(ID_assert)
   {
     // will change to resize(1) in the future
-    operands().reserve(1);
+    reserve_operands(1);
   }
   
   inline explicit code_assertt(const exprt &expr):codet(ID_assert)
@@ -723,7 +723,7 @@ class code_returnt:public codet
 public:
   inline code_returnt():codet(ID_return)
   {
-    operands().reserve(1);
+    reserve_operands(1);
   }
   
   explicit inline code_returnt(const exprt &_op):codet(ID_return)

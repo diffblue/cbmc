@@ -352,7 +352,7 @@ void cpp_typecheckt::do_not_typechecked()
         }
         else if(symbol.value.operands().size()==1)
         {
-          exprt tmp = symbol.value.operands()[0];
+          exprt tmp = symbol.value.op0();
           symbol.value.swap(tmp);
           convert_function(symbol);
           cont=true;

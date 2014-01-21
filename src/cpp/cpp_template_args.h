@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #ifndef CPROVER_CPP_TEMPLATE_ARGS_H
 #define CPROVER_CPP_TEMPLATE_ARGS_H
 
-#include <util/irep.h>
+#include <util/expr.h>
 
 // A data structures for template arguments, i.e.,
 // a sequence of types/expressions of the form <E1, T2, ...>.
@@ -22,7 +22,7 @@ public:
   {
   }
 
-  typedef std::vector<exprt> argumentst;
+  typedef exprt::operandst argumentst;
 
   argumentst &arguments()
   {
