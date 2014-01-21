@@ -302,7 +302,7 @@ generic_selection:
         {
           init($$, ID_generic_selection);
           mto($$, $3);
-          stack($$).add(ID_generic_associations).get_sub().swap(stack($5).add(ID_operands).get_sub());
+          stack($$).add(ID_generic_associations).get_sub().swap((irept::subt&)stack($5).operands());
         }
         ;
 
@@ -1316,7 +1316,7 @@ aggregate_name:
         {
           typet &type=to_ansi_c_declaration(stack($3)).type();
           type.add(ID_components).get_sub().swap(
-            stack($5).add(ID_operands).get_sub());
+            (irept::subt&)stack($5).operands());
 
           // throw in the gcc attributes
           merge_types(type, stack($2));
@@ -1347,7 +1347,7 @@ aggregate_name:
         {
           typet &type=stack($4).type();
           type.add(ID_components).get_sub().swap(
-            stack($6).add(ID_operands).get_sub());
+            (irept::subt&)stack($6).operands());
 
           // throw in the gcc attributes
           merge_types(type, stack($2));
@@ -2222,7 +2222,7 @@ gcc_local_label_statement:
             i.base_name=base_name;
           }
 
-          stack($$).add(ID_label).get_sub().swap(stack($2).add(ID_operands).get_sub());
+          stack($$).add(ID_label).get_sub().swap((irept::subt&)stack($2).operands());
         }
         ;
 

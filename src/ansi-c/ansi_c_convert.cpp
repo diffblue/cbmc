@@ -545,7 +545,7 @@ void ansi_c_convertt::convert_type(
   {
     exprt &expr=(exprt &)type;
     
-    if(expr.operands().size()==0)
+    if(!expr.has_operands())
     {
       convert_type(static_cast<typet &>(type.add(ID_type_arg)));
     }

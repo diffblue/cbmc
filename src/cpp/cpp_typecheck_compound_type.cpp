@@ -1177,7 +1177,7 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
     // build declaration
     cpp_declarationt ctor;
     default_ctor(symbol.type.location(), symbol.base_name, ctor);
-    body.add(ID_operands).move_to_sub(ctor);
+    body.move_to_operands(ctor);
   }
 
   // Reset the access type
