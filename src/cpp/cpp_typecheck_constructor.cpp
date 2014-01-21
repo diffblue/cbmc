@@ -333,7 +333,7 @@ void cpp_typecheckt::default_cpctor(
       codet mem_init("member_initializer");
       mem_init.location() = location;
       mem_init.set(ID_member, cppname);
-      mem_init.add(ID_operands).get_sub().push_back(cpparg);
+      mem_init.copy_to_operands((const exprt&)cpparg);
       initializers.move_to_sub(mem_init);
     }
   }
@@ -396,13 +396,13 @@ void cpp_typecheckt::default_cpctor(
 
     exprt memberexpr(ID_member);
     memberexpr.set("component_cpp_name",cppname);
-    memberexpr.add(ID_operands).get_sub().push_back(cpparg);
+    memberexpr.copy_to_operands((const exprt&)cpparg);
     memberexpr.location() = location;
 
     if(mem_it->type().id()==ID_array)
       memberexpr.set("#array_ini", true);
 
-    mem_init.add(ID_operands).get_sub().push_back(memberexpr);
+    mem_init.move_to_operands(memberexpr);
     initializers.move_to_sub(mem_init);
   }
 }
@@ -1193,7 +1193,7 @@ void cpp_typecheckt::default_dtor(
 
   dtor.add(ID_type).id(ID_destructor);
   dtor.add(ID_storage_spec).id(ID_cpp_storage_spec);
-  dtor.add(ID_operands).move_to_sub(decl);
+  dtor.move_to_operands(decl);
 }
 
 /*******************************************************************\
