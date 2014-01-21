@@ -7,4 +7,9 @@ void bar() {
   iDebugRec[0]=1;
 }
 
+int main()
+{
+  bar();
+  return 0;
+}
 
