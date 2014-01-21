@@ -234,15 +234,18 @@ exprt make_binary(const exprt &expr)
 
   if(operands.size()<=2) return expr;
 
-  exprt previous=operands[0];
+  exprt previous=operands.front();
 
-  for(std::size_t i=1; i<operands.size(); i++)
+  for(exprt::operandst::const_iterator
+      it=++operands.begin();
+      it!=operands.end();
+      ++it)
   {
     exprt tmp=expr;
     tmp.operands().clear();
     tmp.operands().resize(2);
     tmp.op0().swap(previous);
-    tmp.op1()=operands[i];
+    tmp.op1()=*it;
     previous.swap(tmp);
   }
 
