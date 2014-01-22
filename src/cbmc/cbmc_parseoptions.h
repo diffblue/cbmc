@@ -26,7 +26,7 @@ class optionst;
   "(debug-level):(no-propagation)(no-simplify-if)" \
   "(document-subgoals)(outfile):" \
   "D:I:" \
-  "(depth):(partial-loops)(no-unwinding-assertions)" \
+  "(depth):(partial-loops)(no-unwinding-assertions)(unwinding-assertions)" \
   "(bounds-check)(pointer-check)(div-by-zero-check)(memory-leak-check)" \
   "(signed-overflow-check)(unsigned-overflow-check)(nan-check)" \
   "(no-assertions)(no-assumptions)" \
