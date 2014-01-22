@@ -83,10 +83,10 @@ int main() {<br>
 <hr>
 
 <p class="justified">
-One hundred iterations are obviously sufficient for the program above,
-but note that the loop may abort prematurely depending on the value
-that is returned by <code>f()</code>. CBMC is nevertheless able to automatically
-unwind the loop to completion.</p>
+The loop in the program above has an obvious upper bound on the number of
+iterations, but note that the loop may abort prematurely depending on the
+value that is returned by <code>f()</code>.  CBMC is nevertheless able to
+automatically unwind the loop to completion.</p>
 
 <p class="justified">
 This automatic detection of the unwinding
@@ -97,6 +97,21 @@ CBMC offers the command-line option <code>--unwind B</code>, where
 <code>B</code> denotes a number that corresponds to the maximal number
 of loop unwindings CBMC performs on any loop.
 </p>
+
+This automatic detection of the unwinding
+bound may fail if the number of loop iterations is highly data-dependent.
+Furthermore, the number of iterations that are executed by any given
+loop may be too large or may simply be unbounded. For this case,
+CBMC offers the command-line option <code>--unwind B</code>, where
+<code>B</code> denotes a number that corresponds to the maximal number
+of loop unwindings CBMC performs on any loop.
+</p>
+
+<p class="justified">
+Note that the number of unwindings is measured by counting the number of
+<i>backjumps</i>.  In the example above, note that the condition
+<code>i<100</code> is in fact evaluated 101 times before the loop
+terminates.  Thus, the loop requires a limit of 101, and not 100.</p>
 
 <h4>Setting Separate Unwinding Limits</h4>
 
@@ -119,6 +134,10 @@ use
 <code>
 &nbsp;&nbsp;--unwindset L:B,L:B,...
 </code>
+
+<p>
+where <code>L</code> denotes a loop ID and <code>B</code> denotes
+the bound for that loop.</p>
 
 <p class="justified">
 As an example, consider a program with two loops in the function
