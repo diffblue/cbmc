@@ -98,15 +98,6 @@ CBMC offers the command-line option <code>--unwind B</code>, where
 of loop unwindings CBMC performs on any loop.
 </p>
 
-This automatic detection of the unwinding
-bound may fail if the number of loop iterations is highly data-dependent.
-Furthermore, the number of iterations that are executed by any given
-loop may be too large or may simply be unbounded. For this case,
-CBMC offers the command-line option <code>--unwind B</code>, where
-<code>B</code> denotes a number that corresponds to the maximal number
-of loop unwindings CBMC performs on any loop.
-</p>
-
 <p class="justified">
 Note that the number of unwindings is measured by counting the number of
 <i>backjumps</i>.  In the example above, note that the condition
