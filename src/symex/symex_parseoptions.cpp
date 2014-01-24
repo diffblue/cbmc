@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <iostream>
 #include <fstream>
+#include <cstdlib>
 
 #include <util/config.h>
 #include <util/language.h>
