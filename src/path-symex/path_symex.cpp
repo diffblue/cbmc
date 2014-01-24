@@ -999,7 +999,7 @@ void path_symext::operator()(
     break;
 
   case ATOMIC_END:
-    if(state.inside_atomic_section)
+    if(!state.inside_atomic_section)
       throw "ATOMIC_END unmatched";
 
     state.record_step();
