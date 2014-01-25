@@ -1,7 +1,28 @@
+diff -rupN minisat-2.2.0/core/Solver.cc minisat-2.2.0.patched/core/Solver.cc
+--- minisat-2.2.0/core/Solver.cc	2010-07-10 17:07:36.000000000 +0100
++++ minisat-2.2.0.patched/core/Solver.cc	2014-01-25 23:08:57.000000000 +0000
+@@ -209,7 +209,7 @@ void Solver::cancelUntil(int level) {
+         for (int c = trail.size()-1; c >= trail_lim[level]; c--){
+             Var      x  = var(trail[c]);
+             assigns [x] = l_Undef;
+-            if (phase_saving > 1 || (phase_saving == 1) && c > trail_lim.last())
++            if (phase_saving > 1 || ((phase_saving == 1) && c > trail_lim.last()))
+                 polarity[x] = sign(trail[c]);
+             insertVarOrder(x); }
+         qhead = trail_lim[level];
+@@ -657,7 +657,7 @@ lbool Solver::search(int nof_conflicts)
+ 
+         }else{
+             // NO CONFLICT
+-            if (nof_conflicts >= 0 && conflictC >= nof_conflicts || !withinBudget()){
++            if ((nof_conflicts >= 0 && conflictC >= nof_conflicts) || !withinBudget()){
+                 // Reached bound on number of conflicts:
+                 progress_estimate = progressEstimate();
+                 cancelUntil(0);
 Binary files minisat-2.2.0/core/Solver.o and minisat-2.2.0.patched/core/Solver.o differ
 diff -rupN minisat-2.2.0/mtl/IntTypes.h minisat-2.2.0.patched/mtl/IntTypes.h
 --- minisat-2.2.0/mtl/IntTypes.h	2010-07-10 17:07:36.000000000 +0100
-+++ minisat-2.2.0.patched/mtl/IntTypes.h	2013-10-23 15:27:46.000000000 +0100
++++ minisat-2.2.0.patched/mtl/IntTypes.h	2014-01-25 23:08:57.000000000 +0000
 @@ -31,7 +31,9 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR
  #else
  
@@ -14,7 +35,7 @@ diff -rupN minisat-2.2.0/mtl/IntTypes.h minisat-2.2.0.patched/mtl/IntTypes.h
  
 diff -rupN minisat-2.2.0/mtl/Vec.h minisat-2.2.0.patched/mtl/Vec.h
 --- minisat-2.2.0/mtl/Vec.h	2010-07-10 17:07:36.000000000 +0100
-+++ minisat-2.2.0.patched/mtl/Vec.h	2014-01-25 22:58:23.000000000 +0000
++++ minisat-2.2.0.patched/mtl/Vec.h	2014-01-25 23:08:57.000000000 +0000
 @@ -96,7 +96,7 @@ template<class T>
  void vec<T>::capacity(int min_cap) {
      if (cap >= min_cap) return;
@@ -26,7 +47,7 @@ diff -rupN minisat-2.2.0/mtl/Vec.h minisat-2.2.0.patched/mtl/Vec.h
  
 diff -rupN minisat-2.2.0/simp/SimpSolver.cc minisat-2.2.0.patched/simp/SimpSolver.cc
 --- minisat-2.2.0/simp/SimpSolver.cc	2010-07-10 17:07:36.000000000 +0100
-+++ minisat-2.2.0.patched/simp/SimpSolver.cc	2013-10-23 17:18:00.000000000 +0100
++++ minisat-2.2.0.patched/simp/SimpSolver.cc	2014-01-25 23:09:46.000000000 +0000
 @@ -130,13 +130,16 @@ lbool SimpSolver::solve_(bool do_simp, b
      return result;
  }
@@ -45,10 +66,23 @@ diff -rupN minisat-2.2.0/simp/SimpSolver.cc minisat-2.2.0.patched/simp/SimpSolve
  #endif
  
      int nclauses = clauses.size();
+@@ -227,10 +230,12 @@ bool SimpSolver::merge(const Clause& _ps
+         if (var(qs[i]) != v){
+             for (int j = 0; j < ps.size(); j++)
+                 if (var(ps[j]) == var(qs[i]))
++                {
+                     if (ps[j] == ~qs[i])
+                         return false;
+                     else
+                         goto next;
++                }
+             out_clause.push(qs[i]);
+         }
+         next:;
 Binary files minisat-2.2.0/simp/SimpSolver.o and minisat-2.2.0.patched/simp/SimpSolver.o differ
 diff -rupN minisat-2.2.0/utils/Options.h minisat-2.2.0.patched/utils/Options.h
 --- minisat-2.2.0/utils/Options.h	2010-07-10 17:07:36.000000000 +0100
-+++ minisat-2.2.0.patched/utils/Options.h	2014-01-25 22:57:50.000000000 +0000
++++ minisat-2.2.0.patched/utils/Options.h	2014-01-25 23:08:57.000000000 +0000
 @@ -60,7 +60,7 @@ class Option
      struct OptionLt {
          bool operator()(const Option* x, const Option* y) {
@@ -60,7 +94,7 @@ diff -rupN minisat-2.2.0/utils/Options.h minisat-2.2.0.patched/utils/Options.h
  
 diff -rupN minisat-2.2.0/utils/ParseUtils.h minisat-2.2.0.patched/utils/ParseUtils.h
 --- minisat-2.2.0/utils/ParseUtils.h	2010-07-10 17:07:36.000000000 +0100
-+++ minisat-2.2.0.patched/utils/ParseUtils.h	2013-10-23 15:27:46.000000000 +0100
++++ minisat-2.2.0.patched/utils/ParseUtils.h	2014-01-25 23:08:57.000000000 +0000
 @@ -24,7 +24,7 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR
  #include <stdlib.h>
  #include <stdio.h>
