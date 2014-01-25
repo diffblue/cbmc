@@ -1,6 +1,7 @@
+Binary files minisat-2.2.0/core/Solver.o and minisat-2.2.0.patched/core/Solver.o differ
 diff -rupN minisat-2.2.0/mtl/IntTypes.h minisat-2.2.0.patched/mtl/IntTypes.h
 --- minisat-2.2.0/mtl/IntTypes.h	2010-07-10 17:07:36.000000000 +0100
-+++ minisat-2.2.0.patched/mtl/IntTypes.h	2011-07-15 12:05:38.144000000 +0100
++++ minisat-2.2.0.patched/mtl/IntTypes.h	2013-10-23 15:27:46.000000000 +0100
 @@ -31,7 +31,9 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR
  #else
  
@@ -11,9 +12,55 @@ diff -rupN minisat-2.2.0/mtl/IntTypes.h minisat-2.2.0.patched/mtl/IntTypes.h
  
  #endif
  
+diff -rupN minisat-2.2.0/mtl/Vec.h minisat-2.2.0.patched/mtl/Vec.h
+--- minisat-2.2.0/mtl/Vec.h	2010-07-10 17:07:36.000000000 +0100
++++ minisat-2.2.0.patched/mtl/Vec.h	2014-01-25 22:58:23.000000000 +0000
+@@ -96,7 +96,7 @@ template<class T>
+ void vec<T>::capacity(int min_cap) {
+     if (cap >= min_cap) return;
+     int add = imax((min_cap - cap + 1) & ~1, ((cap >> 1) + 2) & ~1);   // NOTE: grow by approximately 3/2
+-    if (add > INT_MAX - cap || ((data = (T*)::realloc(data, (cap += add) * sizeof(T))) == NULL) && errno == ENOMEM)
++    if (add > INT_MAX - cap || (((data = (T*)::realloc(data, (cap += add) * sizeof(T))) == NULL) && errno == ENOMEM))
+         throw OutOfMemoryException();
+  }
+ 
+diff -rupN minisat-2.2.0/simp/SimpSolver.cc minisat-2.2.0.patched/simp/SimpSolver.cc
+--- minisat-2.2.0/simp/SimpSolver.cc	2010-07-10 17:07:36.000000000 +0100
++++ minisat-2.2.0.patched/simp/SimpSolver.cc	2013-10-23 17:18:00.000000000 +0100
+@@ -130,13 +130,16 @@ lbool SimpSolver::solve_(bool do_simp, b
+     return result;
+ }
+ 
+-
++#include <iostream>
+ 
+ bool SimpSolver::addClause_(vec<Lit>& ps)
+ {
+ #ifndef NDEBUG
+     for (int i = 0; i < ps.size(); i++)
++    {
++        if(isEliminated(var(ps[i]))) std::cout << "E: " << var(ps[i]) << "\n";
+         assert(!isEliminated(var(ps[i])));
++    }
+ #endif
+ 
+     int nclauses = clauses.size();
+Binary files minisat-2.2.0/simp/SimpSolver.o and minisat-2.2.0.patched/simp/SimpSolver.o differ
+diff -rupN minisat-2.2.0/utils/Options.h minisat-2.2.0.patched/utils/Options.h
+--- minisat-2.2.0/utils/Options.h	2010-07-10 17:07:36.000000000 +0100
++++ minisat-2.2.0.patched/utils/Options.h	2014-01-25 22:57:50.000000000 +0000
+@@ -60,7 +60,7 @@ class Option
+     struct OptionLt {
+         bool operator()(const Option* x, const Option* y) {
+             int test1 = strcmp(x->category, y->category);
+-            return test1 < 0 || test1 == 0 && strcmp(x->type_name, y->type_name) < 0;
++            return test1 < 0 || (test1 == 0 && strcmp(x->type_name, y->type_name) < 0);
+         }
+     };
+ 
 diff -rupN minisat-2.2.0/utils/ParseUtils.h minisat-2.2.0.patched/utils/ParseUtils.h
 --- minisat-2.2.0/utils/ParseUtils.h	2010-07-10 17:07:36.000000000 +0100
-+++ minisat-2.2.0.patched/utils/ParseUtils.h	2011-07-15 12:06:14.362750000 +0100
++++ minisat-2.2.0.patched/utils/ParseUtils.h	2013-10-23 15:27:46.000000000 +0100
 @@ -24,7 +24,7 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR
  #include <stdlib.h>
  #include <stdio.h>
