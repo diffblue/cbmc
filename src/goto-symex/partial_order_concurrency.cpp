@@ -311,7 +311,7 @@ exprt partial_order_concurrencyt::before(
   exprt::operandst ops;
   ops.reserve(sizeof(axiom_bits)/sizeof(axiomt));
 
-  for(int i=0; i<sizeof(axiom_bits)/sizeof(axiomt); ++i)
+  for(int i=0; i<int(sizeof(axiom_bits)/sizeof(axiomt)); ++i)
   {
     const axiomt ax=axiom_bits[i];
 
