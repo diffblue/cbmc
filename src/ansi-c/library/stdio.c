@@ -209,7 +209,7 @@ inline int fileno(FILE *stream)
 #define __CPROVER_STDIO_H_INCLUDED
 #endif
 
-int fputs(const char *s, FILE *stream)
+inline int fputs(const char *s, FILE *stream)
 {
   // just return nondet
   int return_value;
@@ -228,7 +228,7 @@ int fputs(const char *s, FILE *stream)
 #define __CPROVER_STDIO_H_INCLUDED
 #endif
 
-int fflush(FILE *stream)
+inline int fflush(FILE *stream)
 {
   // just return nondet
   int return_value;
@@ -243,7 +243,7 @@ int fflush(FILE *stream)
 #define __CPROVER_STDIO_H_INCLUDED
 #endif
 
-int fpurge(FILE *stream)
+inline int fpurge(FILE *stream)
 {
   // just return nondet
   int return_value;
@@ -341,7 +341,7 @@ inline int fseek(FILE *stream, long offset, int whence)
 #define __CPROVER_STDIO_H_INCLUDED
 #endif
 
-long ftell(FILE *stream)
+inline long ftell(FILE *stream)
 {
   __CPROVER_HIDE:;
   int return_value;
@@ -414,13 +414,18 @@ void perror(const char *s)
 #define __CPROVER_STDIO_H_INCLUDED
 #endif
 
-int fscanf(FILE *restrict stream, const char *restrict format, ...)
+#ifndef __CPROVER_STDARG_H_INCLUDED
+#include <stdarg.h>
+#define __CPROVER_STDARG_H_INCLUDED
+#endif
+
+inline int fscanf(FILE *restrict stream, const char *restrict format, ...)
 {
   __CPOVER_HIDE:;
-  __builtin_va_list list;
-  __builtin_va_start(list, format);
+  va_list list;
+  va_start(list, format);
   int result=vfscanf(stream, format, list);
-  __builtin_va_end(list);
+  va_end(list);
   return result;
 }
 
@@ -431,13 +436,18 @@ int fscanf(FILE *restrict stream, const char *restrict format, ...)
 #define __CPROVER_STDIO_H_INCLUDED
 #endif
 
-int scanf(const char *restrict format, ...)
+#ifndef __CPROVER_STDARG_H_INCLUDED
+#include <stdarg.h>
+#define __CPROVER_STDARG_H_INCLUDED
+#endif
+
+inline int scanf(const char *restrict format, ...)
 {
   __CPOVER_HIDE:;
-  __builtin_va_list list;
-  __builtin_va_start(list, format);
+  va_list list;
+  va_start(list, format);
   int result=vfscanf(stdin, format, list);
-  __builtin_va_end(list);
+  va_end(list);
   return result;
 }
 
@@ -448,13 +458,18 @@ int scanf(const char *restrict format, ...)
 #define __CPROVER_STDIO_H_INCLUDED
 #endif
 
-int sscanf(const char *restrict s, const char *restrict format, ...)
+#ifndef __CPROVER_STDARG_H_INCLUDED
+#include <stdarg.h>
+#define __CPROVER_STDARG_H_INCLUDED
+#endif
+
+inline int sscanf(const char *restrict s, const char *restrict format, ...)
 {
   __CPOVER_HIDE:;
-  __builtin_va_list list;
-  __builtin_va_start(list, format);
+  va_list list;
+  va_start(list, format);
   int result=vsscanf(s, format, list);
-  __builtin_va_end(list);
+  va_end(list);
   return result;
 }
 
@@ -470,7 +485,7 @@ int sscanf(const char *restrict s, const char *restrict format, ...)
 #define __CPROVER_STDARG_H_INCLUDED
 #endif
 
-int vfscanf(FILE *restrict stream, const char *restrict format, va_list arg)
+inline int vfscanf(FILE *restrict stream, const char *restrict format, va_list arg)
 {
   __CPROVER_HIDE:;
   int result;
@@ -492,7 +507,7 @@ int vfscanf(FILE *restrict stream, const char *restrict format, va_list arg)
 #define __CPROVER_STDARG_H_INCLUDED
 #endif
 
-int vscanf(const char *restrict format, va_list arg)
+inline int vscanf(const char *restrict format, va_list arg)
 {
   __CPROVER_HIDE:;
   return vfscanf(stdin, format, arg);
@@ -510,7 +525,7 @@ int vscanf(const char *restrict format, va_list arg)
 #define __CPROVER_STDARG_H_INCLUDED
 #endif
 
-int vsscanf(const char *restrict s, const char *restrict format, va_list arg)
+inline int vsscanf(const char *restrict s, const char *restrict format, va_list arg)
 {
   __CPROVER_HIDE:;
   int result;
@@ -527,13 +542,18 @@ int vsscanf(const char *restrict s, const char *restrict format, va_list arg)
 #define __CPROVER_STDIO_H_INCLUDED
 #endif
 
-int fprintf(FILE *stream, const char *restrict format, ...)
+#ifndef __CPROVER_STDARG_H_INCLUDED
+#include <stdarg.h>
+#define __CPROVER_STDARG_H_INCLUDED
+#endif
+
+inline int fprintf(FILE *stream, const char *restrict format, ...)
 {
   __CPROVER_HIDE:;
-  __builtin_va_list list;
-  __builtin_va_start(list, format);
+  va_list list;
+  va_start(list, format);
   int result=vfprintf(stream, format, list);
-  __builtin_va_end(list);
+  va_end(list);
   return result;
 }
 
@@ -549,7 +569,7 @@ int fprintf(FILE *stream, const char *restrict format, ...)
 #define __CPROVER_STDARG_H_INCLUDED
 #endif
 
-int vfprintf(FILE *stream, const char *restrict format, va_list arg)
+inline int vfprintf(FILE *stream, const char *restrict format, va_list arg)
 {
   __CPROVER_HIDE:;
   int result;
