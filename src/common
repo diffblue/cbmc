@@ -1,8 +1,12 @@
-# Build platform (use one of AUTO, Unix, OSX_Universal, MSVC, Cygwin, MinGW)
+# Build platform
+# (use one of AUTO, Unix, OSX, OSX_Universal, MSVC, Cygwin, MinGW)
+
 ifeq ($(BUILD_ENV),AUTO)
 uname = $(shell uname)
 ifeq ($(uname),windows32)
   BUILD_ENV_ := MSVC
+else ifeq ($(uname),Darwin)
+  BUILD_ENV_ := OSX
 else ifeq ($(filter-out MINGW32_%, $(uname)),)
   BUILD_ENV_ := MinGW
 else ifeq ($(filter-out CYGWIN_%, $(uname)),)
@@ -14,8 +18,8 @@ else
   BUILD_ENV_ := $(BUILD_ENV)
 endif
 
-ifeq ($(filter-out Unix MinGW OSX_Universal,$(BUILD_ENV_)),)
-  # Linux etc.
+ifeq ($(filter-out Unix MinGW OSX OSX_Universal,$(BUILD_ENV_)),)
+  # Linux-ish
   LIBEXT = .a
   OBJEXT = .o
 ifeq ($(BUILD_ENV_),MinGW)
@@ -26,7 +30,11 @@ endif
   CFLAGS ?= -Wall -O2
   CXXFLAGS ?= -Wall -O2
   CP_CFLAGS = -MMD -MP
+ifeq ($(filter-out OSX OSX_Universal,$(BUILD_ENV_)),)
+  CP_CXXFLAGS = -MMD -MP -DSTL_HASH_STD
+else
   CP_CXXFLAGS = -MMD -MP -DSTL_HASH_TR1
+endif
   #LINKFLAGS = -static
 ifeq ($(BUILD_ENV_),OSX_Universal)
   # MacOS Fat Binaries
