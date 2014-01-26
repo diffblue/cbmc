@@ -72,7 +72,7 @@ void ai_baset::output(
     out << "**** " << i_it->location_number << " "
         << i_it->location << "\n";
 
-    find_state(i_it).output(out, ns);
+    find_state(i_it).output(out, *this, ns);
     out << "\n";
     #if 0
     goto_program.output_instruction(ns, identifier, out, i_it);
@@ -260,7 +260,7 @@ bool ai_baset::visit(
     }
     else
     {
-      new_values.transform(l, to_l, ns);
+      new_values.transform(l, to_l, *this, ns);
     
       if(merge(new_values, l, to_l))
         have_new_values=true;
@@ -310,7 +310,7 @@ bool ai_baset::do_function_call(
     // do the edge from the call site to the beginning of the function
     std::auto_ptr<statet> state(make_temporary_state(get_state(l_call)));
 
-    state->transform(l_call, l_begin, ns);
+    state->transform(l_call, l_begin, *this, ns);
     
     // merge the new stuff
     if(merge(*state, l_call, l_begin))
@@ -331,7 +331,7 @@ bool ai_baset::do_function_call(
 
     std::auto_ptr<statet> state(make_temporary_state(get_state(l_end)));
 
-    state->transform(l_end, l_next, ns);
+    state->transform(l_end, l_next, *this, ns);
 
     // Propagate those -- not exceedingly precise, this is.
     return merge(*state, l_end, l_next);

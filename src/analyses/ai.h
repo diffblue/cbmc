@@ -14,6 +14,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/goto_functions.h>
 
+// forward reference
+class ai_baset;
+
 // don't use me -- I am just a base class
 // please derive from me
 class ai_domain_baset
@@ -42,10 +45,12 @@ public:
   virtual void transform(
     locationt from,
     locationt to,
+    ai_baset &ai,
     const namespacet &ns)=0;
 
   virtual void output(
     std::ostream &out,
+    const ai_baset &ai,
     const namespacet &ns) const
   {
   }
