@@ -241,6 +241,8 @@ static
 auto
 register
 thread_local
+C_thread_local #thread_local
+C_static_lifetime #static_lifetime
 mutable
 void
 int8

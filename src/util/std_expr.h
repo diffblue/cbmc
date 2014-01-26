@@ -116,6 +116,72 @@ public:
   }
 };
 
+/*! \brief Expression to hold a symbol (variable)
+*/
+class decorated_symbol_exprt:public symbol_exprt
+{
+public:
+  inline decorated_symbol_exprt()
+  {
+  }
+
+  /*! \brief Constructor 
+   * \param identifier Name of symbol
+  */
+  inline explicit decorated_symbol_exprt(const irep_idt &identifier):
+    symbol_exprt(identifier)
+  {
+  }
+
+  /*! \brief Constructor 
+   * \param  type Type of symbol
+  */
+  inline explicit decorated_symbol_exprt(const typet &type):
+    symbol_exprt(type)
+  {
+  }
+
+  /*! \brief Constructor 
+   * \param identifier Name of symbol
+   * \param  type Type of symbol
+  */
+  inline decorated_symbol_exprt(
+    const irep_idt &identifier,
+    const typet &type):symbol_exprt(identifier, type)
+  {
+  }
+  
+  inline bool is_static_lifetime() const
+  {
+    return get_bool(ID_C_static_lifetime);
+  }
+  
+  inline void set_static_lifetime()
+  {
+    return set(ID_C_static_lifetime, true);
+  }
+  
+  inline void clear_static_lifetime()
+  {
+    remove(ID_C_static_lifetime);
+  }
+
+  inline bool is_thread_local() const
+  {
+    return get_bool(ID_C_thread_local);
+  }
+  
+  inline void set_thread_local()
+  {
+    return set(ID_C_thread_local, true);
+  }
+  
+  inline void clear_thread_local()
+  {
+    remove(ID_C_thread_local);
+  }
+};
+
 /*! \brief Cast a generic exprt to a \ref symbol_exprt
  *
  * This is an unchecked conversion. \a expr must be known to be \ref
