@@ -257,6 +257,7 @@ public:
     return i;
   }
 
+  bool is_incremental;
   bvt activate_assertions; //assumptions for incremental solving
   literalt current_activation_literal(); //returns last assumption literal
 

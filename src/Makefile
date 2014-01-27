@@ -56,6 +56,6 @@ minisat2-download:
 	@rm -Rf ../minisat-2.2.0
 	@mv minisat ../minisat-2.2.0
 	@(cd ../minisat-2.2.0; patch -p1 < ../scripts/minisat-2.2.0-patch)
-	@(cd ../minisat-2.2.0/core; patch Solver.cc < ../../scripts/minisat.patch)
+#	@(cd ../minisat-2.2.0/core; patch Solver.cc < ../../scripts/minisat.patch)
 	@rm minisat-2.2.0.tar.gz
 

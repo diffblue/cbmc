@@ -612,5 +612,9 @@ void bmct::setup_unwind()
   symex.incr_loop_id = options.get_option("incremental-check");
 
   //freeze variables where unrollings are stitched together
-  if(symex.incr_loop_id!="") symex.prop_conv.set_all_frozen();
+  if(symex.incr_loop_id!="") 
+  {
+    symex.prop_conv.set_all_frozen();
+    equation.is_incremental = true;
+  }
 }
