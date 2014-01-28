@@ -169,6 +169,9 @@ Function: simplify_exprt::simplify_isinf
 bool simplify_exprt::simplify_isinf(exprt &expr)
 {
   if(expr.operands().size()!=1) return true;
+
+  if(ns.follow(expr.op0().type()).id()!=ID_floatbv)
+    return true;
  
   if(expr.op0().is_constant())
   {
