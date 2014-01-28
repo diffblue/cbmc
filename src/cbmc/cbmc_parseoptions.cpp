@@ -198,6 +198,12 @@ void cbmc_parseoptionst::get_command_line_options(optionst &options)
   else
     options.set_option("unsigned-overflow-check", false);
 
+  // check overflow/underflow
+  if(cmdline.isset("float-overflow-check"))
+    options.set_option("float-overflow-check", true);
+  else
+    options.set_option("float-overflow-check", false);
+
   // check for NaN (not a number)
   if(cmdline.isset("nan-check"))
     options.set_option("nan-check", true);
@@ -850,6 +856,7 @@ void cbmc_parseoptionst::help()
     " --memory-leak-check          enable memory leak checks\n"
     " --signed-overflow-check      enable arithmetic over- and underflow checks\n"
     " --unsigned-overflow-check    enable arithmetic over- and underflow checks\n"
+    " --float-overflow-check       check floating-point for NaN\n"
     " --nan-check                  check floating-point for NaN\n"
     " --all-properties             report status of all properties\n"
     " --show-properties            show the properties\n"

@@ -570,6 +570,12 @@ void goto_instrument_parseoptionst::instrument_goto_program(
   else
     options.set_option("unsigned-overflow-check", false);
 
+  // check overflow/underflow
+  if(cmdline.isset("float-overflow-check"))
+    options.set_option("float-overflow-check", true);
+  else
+    options.set_option("float-overflow-check", false);
+
   // check for NaN (not a number)
   if(cmdline.isset("nan-check"))
     options.set_option("nan-check", true);
