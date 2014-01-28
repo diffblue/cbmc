@@ -39,7 +39,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(nondet-volatile)(isr):" \
   "(stack-depth):(nondet-static)" \
   "(function-enter):(function-exit):(branch):" \
-  "(signed-overflow-check)(unsigned-overflow-check)" \
+  "(signed-overflow-check)(unsigned-overflow-check)(float-overflow-check)" \
   "(show-goto-functions)(show-value-sets)(show-local-may-alias)" \
   "(show-local-bitvector-analysis)" \
   "(show-struct-alignment)(interval-analysis)(show-intervals)" \

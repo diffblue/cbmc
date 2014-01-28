@@ -623,28 +623,116 @@ void goto_checkt::float_overflow_check(
 
   // First, check type.
   const typet &type=ns.follow(expr.type());
-  
-  if(type.id()==ID_floatbv)
+
+  if(type.id()!=ID_floatbv)
     return;
 
   // add overflow subgoal
 
   if(expr.id()==ID_typecast)
   {
+    // Can overflow if casting from larger
+    // to smaller type.
+    assert(expr.operands().size()==1);
+    
+    if(ns.follow(expr.op0().type()).id()==ID_floatbv)
+    {
+      // float-to-float
+      unary_exprt op0_inf(ID_isinf, expr.op0(), bool_typet());
+      unary_exprt new_inf(ID_isinf, expr, bool_typet());
+    
+      or_exprt overflow_check(op0_inf, not_exprt(new_inf));
+    
+      add_guarded_claim(
+        overflow_check,
+        "arithmetic overflow on floating-point typecast",
+        "overflow",
+        expr.find_location(),
+        expr,
+        guard);
+    }
+    else
+    {
+      // non-float-to-float
+      unary_exprt new_inf(ID_isinf, expr, bool_typet());
+    
+      add_guarded_claim(
+        not_exprt(new_inf),
+        "arithmetic overflow on floating-point typecast",
+        "overflow",
+        expr.find_location(),
+        expr,
+        guard);
+    }
+
     return;
   }
   else if(expr.id()==ID_div)
   {
     assert(expr.operands().size()==2);
+
+    // Can overflow if dividing by something small
+    unary_exprt new_inf(ID_isinf, expr, bool_typet());
+    unary_exprt op0_inf(ID_isinf, expr.op0(), bool_typet());
+    
+    or_exprt overflow_check(op0_inf, not_exprt(new_inf));
+
+    add_guarded_claim(
+      overflow_check,
+      "arithmetic overflow on floating-point division",
+      "overflow",
+      expr.find_location(),
+      expr,
+      guard);
+
     return;
   }
   else if(expr.id()==ID_mod)
   {
+    // Can't overflow
     return;
   }
   else if(expr.id()==ID_unary_minus)
   {
+    // Can't overflow
     return;
+  }
+  else if(expr.id()==ID_plus || expr.id()==ID_mult ||
+          expr.id()==ID_minus)
+  {
+    if(expr.operands().size()==2)
+    {
+      // Can overflow
+      unary_exprt new_inf(ID_isinf, expr, bool_typet());      
+      unary_exprt op0_inf(ID_isinf, expr.op0(), bool_typet());
+      unary_exprt op1_inf(ID_isinf, expr.op1(), bool_typet());
+      
+      or_exprt overflow_check(op0_inf, op1_inf, not_exprt(new_inf));
+      
+      std::string kind=
+        expr.id()==ID_plus?"addition":
+        expr.id()==ID_minus?"subtraction":
+        expr.id()==ID_mult?"multiplication":"";
+      
+      add_guarded_claim(
+        overflow_check,
+        "arithmetic overflow on floating-point "+kind,
+        "overflow",
+        expr.find_location(),
+        expr,
+        guard);
+
+      return;
+    }
+    else if(expr.operands().size()>=3)
+    {
+      assert(expr.id()!=ID_minus);
+      
+      // break up
+      exprt tmp=make_binary(expr);
+      float_overflow_check(tmp, guard);
+      return;
+    }
   }
 }
 
@@ -1295,7 +1383,9 @@ void goto_checkt::check_rec(
   {
     if(expr.type().id()==ID_signedbv ||
        expr.type().id()==ID_unsignedbv)
+    {
       integer_overflow_check(expr, guard);
+    }
     else if(expr.type().id()==ID_floatbv)
     {
       nan_check(expr, guard);
