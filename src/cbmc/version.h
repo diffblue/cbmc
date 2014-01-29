@@ -1,1 +1,1 @@
-#define CBMC_VERSION "4.6"
+#define CBMC_VERSION "4.7"
