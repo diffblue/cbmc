@@ -246,25 +246,14 @@ void c_typecheck_baset::do_initializer(symbolt &symbol)
   }
   else if(!symbol.is_type)
   {
-    const typet &final_type=follow(symbol.type);
-    
-    if(final_type.id()==ID_incomplete_c_enum ||
-       final_type.id()==ID_c_enum)
+    if(symbol.is_macro)
     {
-      if(symbol.is_macro)
-      {
-        // these must have a constant value
-        assert(symbol.value.is_not_nil());
-        typecheck_expr(symbol.value);
-        locationt location=symbol.value.location();
-        do_initializer(symbol.value, symbol.type, true);
-        make_constant(symbol.value);
-      }
-      else
-      {
-        if(symbol.value.is_not_nil())
-          typecheck_expr(symbol.value);
-      }
+      // these must have a constant value
+      assert(symbol.value.is_not_nil());
+      typecheck_expr(symbol.value);
+      locationt location=symbol.value.location();
+      do_initializer(symbol.value, symbol.type, true);
+      make_constant(symbol.value);
     }
     else if(symbol.value.is_not_nil())
     {
