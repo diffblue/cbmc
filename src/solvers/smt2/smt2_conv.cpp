@@ -3383,13 +3383,20 @@ void smt2_convt::convert_member(const member_exprt &expr)
     }
     else
     {
-      // TODO
+      // we extract
+      unsigned member_width=boolbv_width(expr.type());
+      mp_integer member_offset=::member_offset(ns, struct_type, name);
+      if(member_offset==-1)
+        throw "failed to get struct member offset";
+        
+      out << "((_ extract " << (member_offset*8+member_width-1)
+          << " " << member_offset*8 << ") ";
+      convert_expr(struct_op);
+      out << ")";
     }
   }
   else if(struct_op_type.id()==ID_union)
   {
-    boolbv_widtht boolbv_width(ns);
-    
     unsigned width=boolbv_width(expr.type());
       
     if(width==0)
