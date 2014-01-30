@@ -3059,9 +3059,23 @@ void smt2_convt::convert_with(const with_exprt &expr)
 
       out << "(let ((distance? ";
       out << "(bvmul (_ bv" << sub_width << " " << array_width << ") ";
-      out << "((_ zero_extend " << array_width-index_width << ") ";
-      convert_expr(expr.where());
-      out << ")))) "; // distance?
+
+      // SMT2 says that the shift distance needs to be as wide
+      // as the stuff we are shifting.
+      if(array_width>index_width)
+      {
+        out << "((_ zero_extend " << array_width-index_width << ") ";
+        convert_expr(expr.where());
+        out << ")";
+      }
+      else
+      {
+        out << "((_ extract " << array_width-1 << " 0) ";
+        convert_expr(expr.where());
+        out << ")";
+      }
+      
+      out << "))) "; // bvmul, distance?
       
       out << "(bvor ";
       out << "(bvand ";
@@ -3069,7 +3083,7 @@ void smt2_convt::convert_with(const with_exprt &expr)
       out << "distance?) ";
       convert_expr(expr.old());
       out << ") "; // bvand
-      out << " (bvlshr ";
+      out << "(bvlshr ";
       out << "((_ zero_extend " << array_width-sub_width << ") ";
       convert_expr(expr.new_value());
       out << ") distance?)))"; // zero_extend, bvlshr, bvor, let
@@ -3259,22 +3273,36 @@ void smt2_convt::convert_index(const index_exprt &expr)
     else
     {
       // fixed size
-      unsigned width=boolbv_width(array_type);
-      assert(width!=0);
+      unsigned array_width=boolbv_width(array_type);
+      assert(array_width!=0);
 
       unflatten(BEGIN, array_type.subtype());
       
       unsigned sub_width=boolbv_width(array_type.subtype());
       unsigned index_width=boolbv_width(expr.index().type());
-      
+
       out << "((_ extract " << sub_width-1 << " 0) ";
       out << "(bvlshr ";
       convert_expr(expr.array());
       out << " ";
-      out << "(bvmul (_ bv" << sub_width << " " << width << ") ";
-      out << "((_ zero_extend " << width-index_width << ") ";
-      convert_expr(expr.index());
-      out << "))))"; // zero_extend, mult, bvlshr, extract
+      out << "(bvmul (_ bv" << sub_width << " " << array_width << ") ";
+
+      // SMT2 says that the shift distance must be the same as 
+      // the width of what we shift.
+      if(array_width>index_width)
+      {
+        out << "((_ zero_extend " << array_width-index_width << ") ";
+        convert_expr(expr.index());
+        out << ")"; // zero_extend
+      }
+      else
+      {
+        out << "((_ extract " << array_width-1 << " 0) ";
+        convert_expr(expr.index());
+        out << ")"; // extract
+      }
+      
+      out << ")))"; // mult, bvlshr, extract
       
       unflatten(END, array_type.subtype());
     }
