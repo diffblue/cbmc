@@ -178,7 +178,11 @@ decision_proceduret::resultt smt2_dect::dec_solve()
   #endif
 
   int res=system(command.c_str());
-  assert(0 == res);
+  if(res!=0)
+  {
+    error() << "error running SMT2 soler" << eom;
+    return decision_proceduret::D_ERROR;
+  }
 
   std::ifstream in(temp_result_filename.c_str());
 
