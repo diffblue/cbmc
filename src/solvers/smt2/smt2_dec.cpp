@@ -178,7 +178,7 @@ decision_proceduret::resultt smt2_dect::dec_solve()
   #endif
 
   int res=system(command.c_str());
-  if(res!=0)
+  if(res<0)
   {
     error() << "error running SMT2 soler" << eom;
     return decision_proceduret::D_ERROR;
