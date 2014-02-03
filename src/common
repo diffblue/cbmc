@@ -101,8 +101,8 @@ else ifeq ($(BUILD_ENV_),MSVC)
   LIBEXT = .lib
   OBJEXT = .obj
   EXEEXT = .exe
-  CFLAGS ?= /O2 /GF
-  CXXFLAGS ?= /O2 /GF
+  CFLAGS ?= /W3 /O2 /GF
+  CXXFLAGS ?= /W3 /D_CRT_SECURE_NO_WARNINGS /O2 /GF
   CP_CFLAGS =
   CP_CXXFLAGS = -DSTL_HASH_TR1
   LINKLIB = lib /NOLOGO /OUT:$@ $^
