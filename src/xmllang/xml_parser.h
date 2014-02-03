@@ -29,7 +29,7 @@ public:
    
   virtual bool parse()
   {
-    return yyxmlparse();
+    return yyxmlparse()!=0;
   }
   
   void new_level()

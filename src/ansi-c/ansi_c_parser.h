@@ -38,7 +38,7 @@ public:
   
   virtual bool parse()
   {
-    return yyansi_cparse();
+    return yyansi_cparse()!=0;
   }
 
   virtual void clear()

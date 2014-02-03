@@ -1027,10 +1027,10 @@ void configt::ansi_ct::set_from_symbol_table(const symbol_tablet &symbol_table)
   single_width=from_ns(ns, "single_width");
   double_width=from_ns(ns, "double_width");
   long_double_width=from_ns(ns, "long_double_width");
-  char_is_unsigned=from_ns(ns, "char_is_unsigned");
+  char_is_unsigned=from_ns(ns, "char_is_unsigned")!=0;
   wchar_t_width=from_ns(ns, "wchar_t_width");
   alignment=from_ns(ns, "alignment");
-  use_fixed_for_float=from_ns(ns, "fixed_for_float");
+  use_fixed_for_float=from_ns(ns, "fixed_for_float")!=0;
   endianness=(endiannesst)from_ns(ns, "endianness");
 
   //memory_operand_size=from_ns(ns, "memory_operand_size");

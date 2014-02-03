@@ -276,7 +276,7 @@ Function: irept::get_bool
 
 bool irept::get_bool(const irep_namet &name) const
 {
-  return bool(atoi(get(name).c_str()));
+  return atoi(get(name).c_str())!=0;
 }
 
 /*******************************************************************\
