@@ -671,7 +671,7 @@ void bv_pointerst::encode(unsigned addr, bvt &bv)
 
   // set variable part
   for(unsigned i=0; i<object_bits; i++)
-    bv[offset_bits+i]=const_literal(addr&(1<<i));
+    bv[offset_bits+i]=const_literal((addr&(1<<i))!=0);
 }
 
 /*******************************************************************\
