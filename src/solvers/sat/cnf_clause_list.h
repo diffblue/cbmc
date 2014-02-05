@@ -81,7 +81,7 @@ class cnf_clause_list_assignmentt:public cnf_clause_listt
 public:
   typedef std::vector<tvt> assignmentt;
   
-  assignmentt &get_assignment()
+  inline assignmentt &get_assignment()
   {
     return assignment;
   }

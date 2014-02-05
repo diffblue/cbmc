@@ -31,7 +31,7 @@ public:
   virtual literalt lselect(literalt a, literalt b, literalt c); // a?b:c
   virtual literalt new_variable();
   virtual size_t no_variables() const { return _no_variables; }
-  virtual void set_no_variables(unsigned no) { _no_variables=no; }
+  virtual void set_no_variables(size_t no) { _no_variables=no; }
   virtual size_t no_clauses() const=0;
 
   void gate_and(literalt a, literalt b, literalt o);

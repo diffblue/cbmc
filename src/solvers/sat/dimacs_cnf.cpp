@@ -95,7 +95,7 @@ static void write_dimacs_clause(
   std::ostream &out,
   bool break_lines)
 {
-  for(unsigned j=0; j<clause.size(); j++)
+  for(size_t j=0; j<clause.size(); j++)
   {
     out << clause[j].dimacs() << " ";
     // newline to avoid overflow in sat checkers

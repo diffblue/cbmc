@@ -42,8 +42,8 @@ public:
   virtual literalt limplies(literalt a, literalt b);
   virtual literalt lselect(literalt a, literalt b, literalt c); // a?b:c
   virtual literalt new_variable();
-  virtual unsigned no_variables() const { return _no_variables; }
-  virtual void set_no_variables(unsigned no) { assert(false); }
+  virtual size_t no_variables() const { return _no_variables; }
+  virtual void set_no_variables(size_t no) { assert(false); }
 
   virtual void lcnf(const bvt &bv);
 
