@@ -310,7 +310,8 @@ protected:
   dt *data;
   static dt empty_d;
   
-  void remove_ref(dt *old_data);  
+  static void remove_ref(dt *old_data);  
+  static void nonrecursive_destructor(dt *old_data);
   void detatch();
 
 public:  
