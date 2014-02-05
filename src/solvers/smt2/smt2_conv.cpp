@@ -401,7 +401,7 @@ void smt2_convt::set_value(
 
     // add elaborated expression as operand
     pointer_logict::pointert p;
-    p.object=integer2long(binary2integer(std::string(v, 0, BV_ADDR_BITS), false));
+    p.object=integer2unsigned(binary2integer(std::string(v, 0, BV_ADDR_BITS), false));
     p.offset=binary2integer(std::string(v, BV_ADDR_BITS, std::string::npos), true);
     
     result.copy_to_operands(pointer_logic.pointer_expr(p, type));

@@ -153,7 +153,7 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
 
     if(size>=1)
     {
-      entry.total_width=integer2long(address_bits(size));
+      entry.total_width=integer2unsigned(address_bits(size));
       assert(entry.total_width!=0);
     }
   }
@@ -170,7 +170,7 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
       entry.total_width=0;
     }
     else
-      entry.total_width=integer2long(array_size*sub_width);
+      entry.total_width=integer2unsigned(array_size*sub_width);
   }
   else if(type_id==ID_vector)
   {
@@ -185,12 +185,12 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
       entry.total_width=0;
     }
     else
-      entry.total_width=integer2long(vector_size*sub_width);
+      entry.total_width=integer2unsigned(vector_size*sub_width);
   }
   else if(type_id==ID_complex)
   {
     unsigned sub_width=operator()(type.subtype());
-    entry.total_width=integer2long(2*sub_width);
+    entry.total_width=integer2unsigned(2*sub_width);
   }
   else if(type_id==ID_code)
   {
@@ -200,7 +200,7 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
     // get number of necessary bits
 
     unsigned size=type.find(ID_elements).get_sub().size();
-    entry.total_width=integer2long(address_bits(size));
+    entry.total_width=integer2unsigned(address_bits(size));
     assert(entry.total_width!=0);
   }
   else if(type_id==ID_c_enum ||

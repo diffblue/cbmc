@@ -48,7 +48,7 @@ exprt flatten_byte_extract(
     throw "byte_extract flattening of big endian not done yet";
 
   unsigned width=
-    integer2long(pointer_offset_size(ns, src.type()));
+    integer2unsigned(pointer_offset_size(ns, src.type()));
   
   const typet &t=src.op0().type();
   
@@ -105,7 +105,7 @@ exprt flatten_byte_extract(
 
       // compute new root and offset
       concatenation_exprt concat(
-        unsignedbv_typet(integer2long(element_width*8*num_elements)));
+        unsignedbv_typet(integer2unsigned(element_width*8*num_elements)));
 
       exprt first_index=
         (element_width==1)?offset 
@@ -142,7 +142,7 @@ exprt flatten_byte_extract(
     mult_exprt times_eight(offset, from_integer(8, offset_type));
 
     // cast to generic bit-vector
-    unsigned op0_width=integer2long(pointer_offset_size(ns, src.op0().type()))*8;
+    unsigned op0_width=integer2unsigned(pointer_offset_size(ns, src.op0().type()))*8;
     typecast_exprt src_op0_tc(src.op0(), bv_typet(op0_width));
     lshr_exprt left_shift(src_op0_tc, times_eight);
 
@@ -296,7 +296,7 @@ exprt flatten_byte_update(
 
     // zero-extend the value
     concatenation_exprt value_extended(
-      from_integer(0, unsignedbv_typet(width-integer2long(element_size)*8)), 
+      from_integer(0, unsignedbv_typet(width-integer2unsigned(element_size)*8)), 
       src.op2(), t);
     
     // shift the value

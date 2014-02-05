@@ -969,7 +969,7 @@ bool configt::set(const cmdlinet &cmdline)
 
 /*******************************************************************\
 
-Function: configt::ansi_ct::set_from_symbol_table
+Function: from_ns
 
   Inputs:
 
@@ -979,7 +979,7 @@ Function: configt::ansi_ct::set_from_symbol_table
 
 \*******************************************************************/
 
-int configt::ansi_ct::from_ns(
+static unsigned from_ns(
   const namespacet &ns,
   const std::string &what)
 {
@@ -997,7 +997,7 @@ int configt::ansi_ct::from_ns(
   if(to_integer(tmp, int_value))
     throw "failed to convert symbol table configuration entry `"+id2string(id)+"'";
     
-  return integer2long(int_value);
+  return integer2unsigned(int_value);
 }
 
 /*******************************************************************\

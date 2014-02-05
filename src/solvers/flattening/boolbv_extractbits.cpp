@@ -65,7 +65,7 @@ void boolbvt::convert_extractbits(const extractbits_exprt &expr, bvt &bv)
           i2string(unsigned(integer2long(o1-o2+1)))+" but got "+
           i2string(width)+"): "+expr.to_string();
 
-  unsigned offset=integer2long(o2);
+  unsigned offset=integer2unsigned(o2);
 
   bv.resize(width);
 

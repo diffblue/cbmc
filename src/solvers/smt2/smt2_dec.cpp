@@ -403,10 +403,11 @@ decision_proceduret::resultt smt2_dect::read_result_mathsat(std::istream &in)
     {
       value = value.substr(8);
       size_t pos = value.find(' ');
-      unsigned long e = string2integer(value.substr(0, pos), 10).to_ulong();
+      unsigned e = integer2unsigned(
+        string2integer(value.substr(0, pos), 10));
       size_t pos2 = value.find(')');
-      unsigned long m =
-          string2integer(value.substr(pos+1, pos2-pos-1), 10).to_ulong();
+      unsigned m = integer2unsigned(
+          string2integer(value.substr(pos+1, pos2-pos-1), 10));
       //value = integer2binary(
       //    ieee_floatt::plus_infinity(ieee_float_spect(m, e)).pack(), e+m+1);
       it->second.value=ieee_floatt::plus_infinity(ieee_float_spect(m, e)).to_expr();
@@ -415,10 +416,11 @@ decision_proceduret::resultt smt2_dect::read_result_mathsat(std::istream &in)
     {
       value = value.substr(8);
       size_t pos = value.find(' ');
-      unsigned long e = string2integer(value.substr(0, pos), 10).to_ulong();
+      unsigned e = integer2unsigned(
+        string2integer(value.substr(0, pos), 10));
       size_t pos2 = value.find(')');
-      unsigned long m =
-          string2integer(value.substr(pos+1, pos2-pos-1), 10).to_ulong();
+      unsigned m = integer2unsigned(
+          string2integer(value.substr(pos+1, pos2-pos-1), 10));
       //value = integer2binary(
       //    ieee_floatt::minus_infinity(ieee_float_spect(m, e)).pack(), e+m+1);
       it->second.value=ieee_floatt::minus_infinity(ieee_float_spect(m, e)).to_expr();
@@ -427,10 +429,11 @@ decision_proceduret::resultt smt2_dect::read_result_mathsat(std::istream &in)
     {
       value = value.substr(7);
       size_t pos = value.find(' ');
-      unsigned long e = string2integer(value.substr(0, pos), 10).to_ulong();
+      unsigned e = integer2unsigned(
+        string2integer(value.substr(0, pos), 10));
       size_t pos2 = value.find(')');
-      unsigned long m =
-          string2integer(value.substr(pos+1, pos2-pos-1), 10).to_ulong();
+      unsigned m = integer2unsigned(
+          string2integer(value.substr(pos+1, pos2-pos-1), 10));
       //value = integer2binary(
       //    ieee_floatt::NaN(ieee_float_spect(m, e)).pack(), e+m+1);
       it->second.value=ieee_floatt::NaN(ieee_float_spect(m, e)).to_expr();
@@ -555,7 +558,7 @@ bool smt2_dect::string_to_expr_z3(
     std::string w=value.substr(p, value.find(']')-p);
 
     std::string binary=integer2binary(string2integer(v,10),
-                                      string2integer(w,10).to_ulong());
+                                      integer2unsigned(string2integer(w,10)));
 
     if(type.id()==ID_struct ||
        type.id()==ID_union)
@@ -762,7 +765,7 @@ decision_proceduret::resultt smt2_dect::read_result_cvc3(std::istream &in)
       std::string w=value.substr(p, value.find(']')-p);
 
       std::string binary=integer2binary(string2integer(v,10),
-                                        string2integer(w,10).to_ulong());
+                                        integer2unsigned(string2integer(w,10)));
 
       set_value(it->second, binary);
     }

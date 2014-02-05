@@ -76,7 +76,7 @@ void boolbvt::convert_byte_update(const exprt &expr, bvt &bv)
         endianness_mapt map_op0(op0.type(), little_endian, ns);
         endianness_mapt map_op2(op2.type(), little_endian, ns);
         
-        unsigned offset_i=integer2long(offset);
+        unsigned offset_i=integer2unsigned(offset);
         
         for(unsigned i=0; i<update_width; i++)
           bv[map_op0.map_bit(offset_i+i)]=op2_bv[map_op2.map_bit(i)];

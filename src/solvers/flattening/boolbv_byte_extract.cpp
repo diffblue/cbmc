@@ -76,7 +76,7 @@ void boolbvt::convert_byte_extract(const exprt &expr, bvt &bv)
 
     assert(width==byte_width*bv_map.size());
 
-    unsigned offset_i=integer2long(offset);
+    unsigned offset_i=integer2unsigned(offset);
 
     for(unsigned i=0; i<width; i++)
       // out of bounds

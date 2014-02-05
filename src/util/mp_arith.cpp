@@ -8,9 +8,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cstdlib>
 #include <cctype>
+#include <cassert>
 
 #include <sstream>
 #include <ostream>
+#include <limits>
 
 #include "mp_arith.h"
 #include "arith_tools.h"
@@ -263,7 +265,28 @@ Function:
 
 \*******************************************************************/
 
-unsigned long integer2long(const mp_integer &n)
+mp_integer::ullong_t integer2long(const mp_integer &n)
 {
+  assert(n.is_ulong());
   return n.to_ulong();
+}
+
+/*******************************************************************\
+
+Function: integer2unsigned
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+unsigned integer2unsigned(const mp_integer &n)
+{
+  assert(n>=0);
+  mp_integer::ullong_t ull=integer2long(n);
+  assert(ull <= std::numeric_limits<unsigned>::max());
+  return (unsigned)ull;
 }
