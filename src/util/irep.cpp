@@ -308,9 +308,9 @@ Function: irept::set
 
 \*******************************************************************/
 
-void irept::set(const irep_namet &name, const long value)
+void irept::set(const irep_namet &name, const long long value)
 {
-  add(name).id(i2string((int)value));
+  add(name).id(i2string(value));
 }  
 
 /*******************************************************************\

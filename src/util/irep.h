@@ -191,7 +191,7 @@ public:
   { add(name).id(value); }
   inline void set(const irep_namet &name, const irept &irep)
   { add(name, irep); }
-  void set(const irep_namet &name, const long value);
+  void set(const irep_namet &name, const long long value);
   
   void remove(const irep_namet &name);
   void move_to_sub(irept &irep);
