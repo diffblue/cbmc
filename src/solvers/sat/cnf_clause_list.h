@@ -35,7 +35,7 @@ public:
 
   virtual resultt prop_solve() { return P_ERROR; }
   
-  virtual unsigned no_clauses() const { return clauses.size(); }
+  virtual size_t no_clauses() const { return clauses.size(); }
   
   typedef std::list<bvt> clausest;
   

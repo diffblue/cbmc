@@ -47,7 +47,7 @@ public:
     return dest.new_node();
   }
   
-  virtual unsigned no_variables() const
+  virtual size_t no_variables() const
   { return dest.number_of_nodes(); }
 
   virtual const std::string solver_text()

@@ -577,7 +577,7 @@ bool smt1_dect::string_to_expr_z3(
     if(!string_to_expr_z3(type.subtype(), av, ae)) return false;
 
     array_of_exprt ao;
-    ao.type() = typet("array");
+    ao.type() = typet(ID_array);
     ao.type().subtype()=ae.type();
     ao.what() = ae;
 

@@ -58,7 +58,7 @@ public:
     return tvt(tvt::TV_UNKNOWN);
   }
   
-  virtual unsigned int no_clauses() const
+  virtual size_t no_clauses() const
   {
     return 0;
   }

@@ -61,7 +61,7 @@ Function: smt2_convt::l_get
 
 \*******************************************************************/
 
-tvt smt2_convt::l_get(const literalt l) const
+tvt smt2_convt::l_get(literalt l) const
 {
   if(l.is_true()) return tvt(true);
   if(l.is_false()) return tvt(false);

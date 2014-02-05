@@ -96,7 +96,7 @@ public:
   virtual exprt get(const exprt &expr) const;
   virtual std::string decision_procedure_text() const { return "SMT2"; }
   virtual void print_assignment(std::ostream &out) const;
-  virtual tvt l_get(const literalt l) const;
+  virtual tvt l_get(literalt l) const;
   virtual void set_assumptions(const bvt &bv) { assumptions=bv; }
 
 protected:
