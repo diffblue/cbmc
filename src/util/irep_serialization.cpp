@@ -156,7 +156,7 @@ void irep_serializationt::reference_convert(
 
   if(fi==ireps_container.ireps_on_write.end()) 
   {         
-    unsigned id=insert_on_write(h);
+    size_t id=insert_on_write(h);
     write_long(out, id);
     write_irep(out, irep);
   }
@@ -178,12 +178,11 @@ Function: irep_serializationt::insert_on_write
  
 \*******************************************************************/
 
-unsigned long irep_serializationt::insert_on_write(unsigned h) 
+size_t irep_serializationt::insert_on_write(unsigned h)
 {
   std::pair<ireps_containert::ireps_on_writet::const_iterator,bool> res=
     ireps_container.ireps_on_write.insert(
-      std::pair<unsigned, unsigned long>
-      (h, ireps_container.ireps_on_write.size()));
+      std::make_pair(h, ireps_container.ireps_on_write.size()));
 
   if(!res.second)
     return ireps_container.ireps_on_write.size();
@@ -204,7 +203,7 @@ Function: irep_serializationt::insert_on_read
  
 \*******************************************************************/
 
-unsigned long irep_serializationt::insert_on_read(
+size_t irep_serializationt::insert_on_read(
   unsigned id,
   const irept &i)
 {
@@ -238,6 +237,7 @@ Function: write_long
 
 void write_long(std::ostream &out, unsigned u)
 {
+  assert(sizeof(unsigned)==4);
   out.put((u & 0xFF000000) >> 24); 
   out.put((u & 0x00FF0000) >> 16);
   out.put((u & 0x0000FF00) >> 8);
@@ -258,6 +258,7 @@ Function: irep_serializationt::read_long
 
 unsigned irep_serializationt::read_long(std::istream &in)
 {
+  assert(sizeof(unsigned)==4);
   unsigned res=0;
 
   for(unsigned i=0; i<4 && in.good(); i++)
@@ -280,10 +281,12 @@ Function: write_string
 
 void write_string(std::ostream &out, const std::string &s)
 {
-  for(unsigned i=0; i<s.size(); i++)
+  for(std::string::const_iterator it=s.begin();
+      it!=s.end();
+      ++it)
   {
-    if(s[i]==0 || s[i]=='\\') out.put('\\'); // escape specials 
-    out << s[i];
+    if(*it==0 || *it=='\\') out.put('\\'); // escape specials
+    out << *it;
   }
 
   out.put(0);
@@ -304,7 +307,7 @@ Function: irep_serializationt::read_string
 irep_idt irep_serializationt::read_string(std::istream &in)
 {  
   char c;
-  unsigned i=0;
+  size_t i=0;
 
   while((c = in.get()) != 0)
   {
@@ -343,7 +346,7 @@ void irep_serializationt::write_string_ref(
   std::ostream &out, 
   const irep_idt &s)
 {
-  unsigned id=irep_id_hash()(s);
+  size_t id=irep_id_hash()(s);
   if(id>=ireps_container.string_map.size()) 
     ireps_container.string_map.resize(id+1, false);
      
