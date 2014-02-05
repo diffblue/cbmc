@@ -370,6 +370,23 @@ int irept::get_int(const irep_namet &name) const
 
 /*******************************************************************\
 
+Function: irept::get_long_long
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+long long irept::get_long_long(const irep_namet &name) const
+{
+  return atoll(get(name).c_str());
+}
+
+/*******************************************************************\
+
 Function: irept::set
 
   Inputs:
