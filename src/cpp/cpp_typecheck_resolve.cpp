@@ -648,7 +648,7 @@ void cpp_typecheck_resolvet::disambiguate_functions(
         bool f1_better=true;
         bool f2_better=true;
 
-        for(unsigned i=0; i < f1.arguments().size() && (f1_better || f2_better); i++)
+        for(std::size_t i=0; i < f1.arguments().size() && (f1_better || f2_better); i++)
         {
           typet type1 = f1.arguments()[i].type();
           typet type2 = f2.arguments()[i].type();
@@ -1254,7 +1254,7 @@ symbol_typet cpp_typecheck_resolvet::disambiguate_template_classes(
     // enter the scope of the template
     cpp_typecheck.cpp_scopes.go_to(*template_scope);
 
-    for(unsigned i=0; i<full_template_args_tc.arguments().size(); i++)
+    for(std::size_t i=0; i<full_template_args_tc.arguments().size(); i++)
     {
       if(full_template_args_tc.arguments()[i].id()==ID_type)
         guess_template_args(partial_specialization_args.arguments()[i].type(),
@@ -2163,7 +2163,7 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
   const irept::subt &arguments=
     function_declarator.type().find(ID_arguments).get_sub();
   
-  for(unsigned i=0; i<arguments.size(); i++)
+  for(std::size_t i=0; i<arguments.size(); i++)
   {
     if(i<fargs.operands.size() &&
        arguments[i].id()==ID_cpp_declaration)
@@ -2603,7 +2603,7 @@ void cpp_typecheck_resolvet::resolve_with_arguments(
   const cpp_typecheck_fargst &fargs)
 {
   // not clear what this is good for
-  for(unsigned i=0; i<fargs.operands.size(); i++)
+  for(std::size_t i=0; i<fargs.operands.size(); i++)
   {
     const typet &final_type=
       cpp_typecheck.follow(fargs.operands[i].type());

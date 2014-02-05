@@ -341,7 +341,7 @@ void interpretert::assign(
   {
     if(address<memory.size())
     {
-      memory_cellt &cell=memory[integer2long(address)];
+      memory_cellt &cell=memory[integer2unsigned(address)];
       std::cout << "** assigning " << cell.identifier
                 << "[" << cell.offset << "]:=" << rhs[i] << std::endl;
       cell.value=rhs[i];
@@ -433,7 +433,7 @@ void interpretert::execute_function_call()
   
   argument_values.resize(function_call.arguments().size());
   
-  for(unsigned i=0; i<function_call.arguments().size(); i++)
+  for(std::size_t i=0; i<function_call.arguments().size(); i++)
     evaluate(function_call.arguments()[i], argument_values[i]);
 
   // do the call
@@ -629,7 +629,7 @@ unsigned interpretert::get_size(const typet &type) const
 
     mp_integer i;
     if(!to_integer(size_expr, i))
-      return subtype_size*integer2long(i);
+      return subtype_size*integer2unsigned(i);
     else
       return subtype_size;
   }

@@ -35,7 +35,7 @@ std::string narrow(const wchar_t *s)
   size_t slength=wcslen(s);
   int rlength=WideCharToMultiByte(CP_UTF8, 0, s, slength, NULL, 0, NULL, NULL);
   std::string r(rlength, 0);
-  WideCharToMultiByte(CP_UTF8, 0, s, slength, &r[0], rlength, NULL, NULL);
+  WideCharToMultiByte(CP_UTF8, 0, s, (int)slength, &r[0], rlength, NULL, NULL);
   return r;
 
   #else
@@ -69,9 +69,9 @@ std::wstring widen(const char *s)
   #ifdef _WIN32
 
   size_t slength=strlen(s);
-  int rlength=MultiByteToWideChar(CP_UTF8, 0, s, slength, NULL, 0);
+  int rlength=MultiByteToWideChar(CP_UTF8, 0, s, (int)slength, NULL, 0);
   std::wstring r(rlength, 0);
-  MultiByteToWideChar(CP_UTF8, 0, s, slength, &r[0], rlength);
+  MultiByteToWideChar(CP_UTF8, 0, s, (int)slength, &r[0], rlength);
   return r;
 
   #else
@@ -105,9 +105,9 @@ std::string narrow(const std::wstring &s)
   #ifdef _WIN32
 
   size_t slength=s.size();
-  int rlength=WideCharToMultiByte(CP_UTF8, 0, &s[0], slength, NULL, 0, NULL, NULL);
+  int rlength=WideCharToMultiByte(CP_UTF8, 0, &s[0], (int)slength, NULL, 0, NULL, NULL);
   std::string r(rlength, 0);
-  WideCharToMultiByte(CP_UTF8, 0, &s[0], slength, &r[0], rlength, NULL, NULL);
+  WideCharToMultiByte(CP_UTF8, 0, &s[0], (int)slength, &r[0], rlength, NULL, NULL);
   return r;
   
   #else
@@ -133,7 +133,7 @@ std::wstring widen(const std::string &s)
   #ifdef _WIN32
 
   size_t slength=s.size();
-  int rlength=MultiByteToWideChar(CP_UTF8, 0, &s[0], slength, NULL, 0);
+  int rlength=MultiByteToWideChar(CP_UTF8, 0, &s[0], (int)slength, NULL, 0);
   std::wstring r(rlength, 0);
   MultiByteToWideChar(CP_UTF8, 0, &s[0], slength, &r[0], rlength);
   return r;

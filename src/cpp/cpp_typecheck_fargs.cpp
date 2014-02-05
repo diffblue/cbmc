@@ -60,7 +60,7 @@ void cpp_typecheck_fargst::build(
   operands.clear();
   operands.reserve(function_call.op1().operands().size());
 
-  for(unsigned i=0; i<function_call.op1().operands().size(); i++)
+  for(std::size_t i=0; i<function_call.op1().operands().size(); i++)
     operands.push_back(function_call.op1().operands()[i]);
 }
 
@@ -91,7 +91,7 @@ bool cpp_typecheck_fargst::match(
     // Check for default values.
     ops.reserve(arguments.size());
 
-    for(unsigned i=ops.size(); i<arguments.size(); i++)
+    for(std::size_t i=ops.size(); i<arguments.size(); i++)
     {
       const exprt &default_value=
         arguments[i].default_value();
@@ -109,7 +109,7 @@ bool cpp_typecheck_fargst::match(
       return false;
   }
 
-  for(unsigned i=0; i<ops.size(); i++)
+  for(std::size_t i=0; i<ops.size(); i++)
   {
     // read
     // http://publib.boulder.ibm.com/infocenter/comphelp/v8v101/topic/com.ibm.xlcpp8a.doc/language/ref/implicit_conversion_sequences.htm
