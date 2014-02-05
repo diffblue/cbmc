@@ -244,13 +244,13 @@ exprt path_symex_statet::instantiate_rec(
       if(to_integer(array_type.size(), size))
         throw "failed to convert array size";
         
-      signed long size_int=integer2long(size);
+      signed long long size_int=integer2long(size);
         
       array_exprt result(array_type);
       result.operands().resize(size_int);
     
       // split it up into elements
-      for(signed long i=0; i<size_int; ++i)
+      for(signed long long i=0; i<size_int; ++i)
       {
         exprt index=from_integer(i, array_type.size().type());
         exprt new_src=index_exprt(src, index, subtype);
@@ -282,7 +282,7 @@ exprt path_symex_statet::instantiate_rec(
     if(to_integer(vector_type.size(), size))
       throw "failed to convert vector size";
       
-    signed long int size_int=integer2long(size);
+    signed long long int size_int=integer2long(size);
     
     vector_exprt result(vector_type);
     exprt::operandst &operands=result.operands();

@@ -79,7 +79,7 @@ public:
     return get_value(bv, 0, bv.size());
   }
   
-  mp_integer get_value(const bvt &bv, unsigned offset, unsigned width);
+  mp_integer get_value(const bvt &bv, std::size_t offset, std::size_t width);
   
   const boolbv_mapt &get_map() const
   {

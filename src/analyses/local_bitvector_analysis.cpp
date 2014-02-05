@@ -58,10 +58,10 @@ bool local_bitvector_analysist::loc_infot::merge(const loc_infot &src)
 {
   bool result=false;
   
-  unsigned max_index=
+  std::size_t max_index=
     std::max(src.points_to.size(), points_to.size());
 
-  for(unsigned i=0; i<max_index; i++)
+  for(std::size_t i=0; i<max_index; i++)
   {
     if(points_to[i].merge(src.points_to[i]))
       result=true;

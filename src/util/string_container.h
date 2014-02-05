@@ -18,7 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 struct string_ptrt
 {
   const char *s;
-  unsigned len;
+  size_t len;
   
   inline const char *c_str() const
   {
@@ -60,18 +60,19 @@ public:
   ~string_containert();
 
   // the pointer is guaranteed to be stable  
-  inline const char *c_str(unsigned no) const
+  inline const char *c_str(size_t no) const
   {
     return string_vector[no]->c_str();
   }
   
   // the reference is guaranteed to be stable
-  inline const std::string &get_string(unsigned no) const
+  inline const std::string &get_string(size_t no) const
   {
     return *string_vector[no];
   }
   
 protected:
+  // the 'unsigned' ought to be size_t
   typedef hash_map_cont<string_ptrt, unsigned, string_ptr_hash> hash_tablet;
   hash_tablet hash_table;
   

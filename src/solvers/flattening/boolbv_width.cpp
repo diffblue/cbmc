@@ -80,12 +80,12 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
     const struct_typet::componentst &components=
       to_struct_type(type).components();
 
-    unsigned offset=0;
+    std::size_t offset=0;
     entry.members.resize(components.size());
   
-    for(unsigned i=0; i<entry.members.size(); i++)
+    for(std::size_t i=0; i<entry.members.size(); i++)
     {
-      unsigned sub_width=operator()(components[i].type());
+      std::size_t sub_width=operator()(components[i].type());
       entry.members[i].offset=offset;
       entry.members[i].width=sub_width;
       offset+=sub_width;
@@ -100,11 +100,11 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
 
     entry.members.resize(components.size());
     
-    unsigned max_width=0;
+    std::size_t max_width=0;
   
-    for(unsigned i=0; i<entry.members.size(); i++)
+    for(std::size_t i=0; i<entry.members.size(); i++)
     {
-      unsigned sub_width=operator()(components[i].type());
+      std::size_t sub_width=operator()(components[i].type());
       entry.members[i].width=sub_width;
       max_width=std::max(max_width, sub_width);
     }
@@ -160,7 +160,7 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
   else if(type_id==ID_array)
   {
     const array_typet &array_type=to_array_type(type);
-    unsigned sub_width=operator()(array_type.subtype());
+    std::size_t sub_width=operator()(array_type.subtype());
 
     mp_integer array_size;
 
@@ -175,7 +175,7 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
   else if(type_id==ID_vector)
   {
     const vector_typet &vector_type=to_vector_type(type);
-    unsigned sub_width=operator()(vector_type.subtype());
+    std::size_t sub_width=operator()(vector_type.subtype());
 
     mp_integer vector_size;
 
@@ -189,7 +189,7 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
   }
   else if(type_id==ID_complex)
   {
-    unsigned sub_width=operator()(type.subtype());
+    std::size_t sub_width=operator()(type.subtype());
     entry.total_width=integer2unsigned(2*sub_width);
   }
   else if(type_id==ID_code)
@@ -199,7 +199,7 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
   {
     // get number of necessary bits
 
-    unsigned size=type.find(ID_elements).get_sub().size();
+    std::size_t size=type.find(ID_elements).get_sub().size();
     entry.total_width=integer2unsigned(address_bits(size));
     assert(entry.total_width!=0);
   }
@@ -256,7 +256,7 @@ Function: boolbv_get_width
 #if 0
 bool boolbv_get_width(
   const typet &type,
-  unsigned &width,
+  std::size_t &width,
   const namespacet &ns)
 {
   boolbv_widtht boolbv_width(ns);
@@ -279,7 +279,7 @@ Function: boolbv_member_offset
 bool boolbv_member_offset(
   const struct_typet &type,
   const irep_idt &member,
-  unsigned &width,
+  std::size_t &width,
   const namespacet &ns)
 {
   boolbv_widtht boolbv_width(ns);

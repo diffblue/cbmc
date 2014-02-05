@@ -155,7 +155,7 @@ bool string_constantt::from_array_expr(const array_exprt &src)
   {
     mp_integer int_value=0;
     if(to_integer(*it, int_value)) return true;
-    unsigned long long_value=integer2long(int_value);
+    long long_value=integer2long(int_value);
     value+=(char)long_value;
   }
   

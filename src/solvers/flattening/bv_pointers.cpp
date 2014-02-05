@@ -54,7 +54,7 @@ literalt bv_pointerst::convert_rest(const exprt &expr)
         equal_invalid_bv.resize(object_bits);
         equal_null_bv.resize(object_bits);
 
-        for(unsigned i=0; i<object_bits; i++)
+        for(std::size_t i=0; i<object_bits; i++)
         {
           equal_invalid_bv[i]=prop.lequal(bv[offset_bits+i],
                                           invalid_bv[offset_bits+i]);
@@ -362,7 +362,7 @@ void bv_pointerst::convert_pointer_type(const exprt &expr, bvt &bv)
       throw "operator + takes at least two operands";
 
     mp_integer size=0;
-    unsigned count=0;
+    std::size_t count=0;
 
     forall_operands(it, expr)
     {
@@ -481,7 +481,7 @@ void bv_pointerst::convert_bitvector(const exprt &expr, bvt &bv)
     bvt op0=convert_bv(expr.op0());
     bvt op1=convert_bv(expr.op1());
 
-    unsigned width=boolbv_width(expr.type());
+    std::size_t width=boolbv_width(expr.type());
     
     if(width==0)
       return conversion_failed(expr, bv);
@@ -510,7 +510,7 @@ void bv_pointerst::convert_bitvector(const exprt &expr, bvt &bv)
   {
     bvt op0=convert_bv(expr.op0());
 
-    unsigned width=boolbv_width(expr.type());
+    std::size_t width=boolbv_width(expr.type());
 
     if(width==0)
       return conversion_failed(expr, bv);
@@ -528,11 +528,11 @@ void bv_pointerst::convert_bitvector(const exprt &expr, bvt &bv)
           is_ptr(expr.op0().type()))
   {
     // we postpone until we know the objects
-    unsigned width=boolbv_width(expr.type());
+    std::size_t width=boolbv_width(expr.type());
     
     bv.resize(width);
     
-    for(unsigned i=0; i<width; i++)
+    for(std::size_t i=0; i<width; i++)
       bv[i]=prop.new_variable();
     
     postponed_list.push_back(postponedt());
@@ -549,7 +549,7 @@ void bv_pointerst::convert_bitvector(const exprt &expr, bvt &bv)
   {
     bvt op0=convert_bv(expr.op0());
 
-    unsigned width=boolbv_width(expr.type());
+    std::size_t width=boolbv_width(expr.type());
     
     if(width==0)
       return conversion_failed(expr, bv);
@@ -572,7 +572,7 @@ void bv_pointerst::convert_bitvector(const exprt &expr, bvt &bv)
   
     // squeeze it in!
 
-    unsigned width=boolbv_width(expr.type());
+    std::size_t width=boolbv_width(expr.type());
 
     if(width==0)
       return conversion_failed(expr, bv);
@@ -608,10 +608,10 @@ exprt bv_pointerst::bv_get_rec(
 
   std::string value_addr, value_offset, value;
 
-  for(unsigned i=0; i<bits; i++)
+  for(std::size_t i=0; i<bits; i++)
   {
     char ch;
-    unsigned bit_nr=i+offset;
+    std::size_t bit_nr=i+offset;
 
     if(unknown[bit_nr])
       ch='0';
@@ -666,11 +666,11 @@ void bv_pointerst::encode(unsigned addr, bvt &bv)
   bv.resize(bits);
 
   // set offset to zero
-  for(unsigned i=0; i<offset_bits; i++)
+  for(std::size_t i=0; i<offset_bits; i++)
     bv[i]=const_literal(false);
 
   // set variable part
-  for(unsigned i=0; i<object_bits; i++)
+  for(std::size_t i=0; i<object_bits; i++)
     bv[offset_bits+i]=const_literal((addr&(1<<i))!=0);
 }
 
@@ -696,7 +696,7 @@ void bv_pointerst::offset_arithmetic(bvt &bv, const mp_integer &x)
   bvt tmp=bv_utils.add(bv1, bv2);
 
   // copy offset bits
-  for(unsigned i=0; i<offset_bits; i++)
+  for(std::size_t i=0; i<offset_bits; i++)
     bv[i]=tmp[i];
 }
 
@@ -760,7 +760,7 @@ void bv_pointerst::offset_arithmetic(
   bvt bv_tmp=bv_utils.add(bv, bv_index);
   
   // copy lower parts of result
-  for(unsigned i=0; i<offset_bits; i++)
+  for(std::size_t i=0; i<offset_bits; i++)
     bv[i]=bv_tmp[i];
 }
 
@@ -806,7 +806,7 @@ void bv_pointerst::do_postponed(
     const pointer_logict::objectst &objects=
       pointer_logic.objects;
       
-    unsigned number=0;
+    std::size_t number=0;
       
     for(pointer_logict::objectst::const_iterator
         it=objects.begin();
@@ -842,7 +842,7 @@ void bv_pointerst::do_postponed(
     const pointer_logict::objectst &objects=
       pointer_logic.objects;
       
-    unsigned number=0;
+    std::size_t number=0;
       
     for(pointer_logict::objectst::const_iterator
         it=objects.begin();

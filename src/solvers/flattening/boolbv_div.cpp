@@ -52,7 +52,7 @@ void boolbvt::convert_div(const exprt &expr, bvt &bv)
 
   if(expr.type().id()==ID_fixedbv)
   {
-    unsigned fraction_bits=
+    std::size_t fraction_bits=
       to_fixedbv_type(expr.type()).get_fraction_bits();
 
     bvt zeros;

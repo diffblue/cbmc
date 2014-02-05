@@ -20,7 +20,7 @@ public:
 
   typedef enum { SIGNED, UNSIGNED } representationt;
 
-  bvt build_constant(const mp_integer &i, unsigned width);
+  bvt build_constant(const mp_integer &i, std::size_t width);
 
   bvt incrementer(const bvt &op, literalt carry_in);
   bvt inc(const bvt &op) { return incrementer(op, const_literal(true)); }

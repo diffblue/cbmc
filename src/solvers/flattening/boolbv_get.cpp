@@ -472,13 +472,13 @@ Function: boolbvt::get_value
 
 mp_integer boolbvt::get_value(
   const bvt &bv,
-  unsigned offset,
-  unsigned width)
+  std::size_t offset,
+  std::size_t width)
 {
   mp_integer value=0;
   mp_integer weight=1;
 
-  for(unsigned bit_nr=offset; bit_nr<offset+width; bit_nr++)
+  for(std::size_t bit_nr=offset; bit_nr<offset+width; bit_nr++)
   {
     assert(bit_nr<bv.size());
     switch(prop.l_get(bv[bit_nr]).get_value())
