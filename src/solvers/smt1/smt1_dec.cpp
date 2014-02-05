@@ -550,7 +550,7 @@ bool smt1_dect::string_to_expr_z3(
     std::string w=value.substr(p, value.find(']')-p);
 
     std::string binary=integer2binary(string2integer(v,10),
-                                      string2integer(w,10).to_ulong());
+                                      integer2unsigned(string2integer(w,10)));
 
     if(type.id()==ID_struct)
     {
@@ -742,7 +742,7 @@ decision_proceduret::resultt smt1_dect::read_result_cvc3(std::istream &in)
       std::string w=value.substr(p, value.find(']')-p);
 
       std::string binary=integer2binary(string2integer(v,10),
-                                        string2integer(w,10).to_ulong());
+                                        integer2unsigned(string2integer(w,10)));
 
       set_value(it->second, "", binary);
     }

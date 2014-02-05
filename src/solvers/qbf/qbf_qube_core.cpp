@@ -128,9 +128,9 @@ propt::resultt qbf_qube_coret::prop_solve()
       {
         mp_integer b(line.substr(2).c_str());
         if(b<0)
-          assignment[b.negate().to_ulong()] = false;
+          assignment[integer2unsigned(b.negate())] = false;
         else
-          assignment[b.to_ulong()] = true;
+          assignment[integer2unsigned(b)] = true;
       }
       else if(line=="s cnf 1")
       {

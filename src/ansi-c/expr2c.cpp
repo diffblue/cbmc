@@ -2338,7 +2338,7 @@ std::string expr2ct::convert_array(
       assert(it->is_constant());
       mp_integer i;
       to_integer(*it, i);
-      unsigned int ch=integer2long(i);
+      unsigned int ch=integer2unsigned(i);
 
       if(last_was_hex)
       {

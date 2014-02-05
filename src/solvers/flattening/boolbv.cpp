@@ -86,7 +86,7 @@ bool boolbvt::literal(
       if(to_integer(index_expr.index(), index))
         throw "literal expects constant index";
 
-      unsigned offset=integer2long(index*element_width);
+      unsigned offset=integer2unsigned(index*element_width);
 
       return literal(index_expr.array(), bit+offset, dest);
     }
@@ -405,7 +405,7 @@ void boolbvt::convert_lambda(const exprt &expr, bvt &bv)
 
     const bvt &tmp=convert_bv(expr_op1);
 
-    unsigned offset=integer2long(i*tmp.size());
+    unsigned offset=integer2unsigned(i*tmp.size());
 
     if(size*tmp.size()!=width)
       throw "convert_lambda: unexpected operand width";

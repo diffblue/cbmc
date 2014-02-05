@@ -66,7 +66,7 @@ literalt boolbvt::convert_extractbit(const extractbit_exprt &expr)
       std::max(address_bits(width_op0), mp_integer(width_op1));
 
     unsignedbv_typet index_type;
-    index_type.set_width(integer2long(index_width));
+    index_type.set_width(integer2unsigned(index_width));
 
     equal_exprt equality;
     equality.lhs()=operands[1]; // index operand

@@ -107,9 +107,6 @@ public:
     typedef enum { LIB_NONE, LIB_FULL } libt;
     libt lib;
     bool string_abstraction;
-    
-  protected:
-    int from_ns(const namespacet &ns, const std::string &what);
   } ansi_c;
   
   struct verilogt

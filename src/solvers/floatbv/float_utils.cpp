@@ -483,7 +483,7 @@ bvt float_utilst::limit_distance(
     const bvt &dist,
     mp_integer limit)
 {
-  int nb_bits=address_bits(limit).to_ulong();
+  unsigned nb_bits=integer2unsigned(address_bits(limit));
 
   bvt upper_bits=dist;
   upper_bits.erase(upper_bits.begin(), upper_bits.begin()+nb_bits);
@@ -1073,7 +1073,7 @@ void float_utilst::normalization_shift(bvt &fraction, bvt &exponent)
   // The worst-case shift is the number of fraction
   // bits minus one, in case the faction is one exactly.
   assert(!fraction.empty());  
-  unsigned depth=address_bits(fraction.size()-1).to_long();
+  unsigned depth=integer2unsigned(address_bits(fraction.size()-1));
   
   if(exponent.size()<depth)
     exponent=bv_utils.sign_extension(exponent, depth);
