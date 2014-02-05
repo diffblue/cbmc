@@ -382,7 +382,11 @@ Function: irept::get_long_long
 
 long long irept::get_long_long(const irep_namet &name) const
 {
+  #ifdef _MSC_VER
+  return _atoi64(get(name).c_str());
+  #else
   return atoll(get(name).c_str());
+  #endif
 }
 
 /*******************************************************************\
