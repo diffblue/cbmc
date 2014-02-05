@@ -24,7 +24,7 @@ Function: aigt::label
 
 \*******************************************************************/
 
-std::string aigt::label(unsigned v) const
+std::string aigt::label(nodest::size_type v) const
 {
   return "var("+i2string(v)+")";
 }
@@ -41,7 +41,7 @@ Function: aigt::dot_label
 
 \*******************************************************************/
 
-std::string aigt::dot_label(unsigned v) const
+std::string aigt::dot_label(nodest::size_type v) const
 {
   return "var("+i2string(v)+")";
 }
@@ -60,7 +60,7 @@ Function: aigt::get_terminals
 
 void aigt::get_terminals(terminalst &terminals) const
 {
-  for(unsigned n=0; n<nodes.size(); n++)
+  for(nodest::size_type n=0; n<nodes.size(); n++)
     get_terminals_rec(n, terminals);
 }
 
@@ -179,7 +179,7 @@ Function: aigt::output_dot_node
 
 void aigt::output_dot_node(
   std::ostream &out,
-  unsigned v) const
+  nodest::size_type v) const
 {
   const aig_nodet &node=nodes[v];
 
@@ -210,7 +210,7 @@ Function: aigt::output_dot_edge
 
 void aigt::output_dot_edge(
   std::ostream& out,
-  unsigned v,
+  nodest::size_type v,
   literalt l) const
 {
   if(l.is_true())
@@ -249,7 +249,7 @@ void aigt::output_dot(std::ostream& out) const
   out << "TRUE [label=\"TRUE\", shape=box]" << "\n";
 
   // now the nodes
-  for(unsigned n=0; n<number_of_nodes(); n++)
+  for(nodest::size_type n=0; n<number_of_nodes(); n++)
     output_dot_node(out, n);
 }
 
@@ -267,7 +267,7 @@ Function: aigt::print
 
 void aigt::print(std::ostream &out) const
 {
-  for(unsigned n=0; n<number_of_nodes(); n++)
+  for(nodest::size_type n=0; n<number_of_nodes(); n++)
   {
     out << "n" << n << " = ";
     literalt l;
