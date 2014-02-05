@@ -22,10 +22,11 @@ Function: resolution_prooft::build_core
  Purpose:
 
 \*******************************************************************/
+
 template<class T>
 void resolution_prooft<T>::build_core(std::vector<bool> &in_core)
 {
-  std::stack<unsigned> s;
+  std::stack<typename clausest::size_type> s;
   std::vector<bool> seen;
 
   assert(!clauses.empty());
@@ -36,7 +37,7 @@ void resolution_prooft<T>::build_core(std::vector<bool> &in_core)
   
   while(!s.empty())
   {
-    unsigned int c_id=s.top();
+    typename clausest::size_type c_id=s.top();
     s.pop();
 
     if(seen[c_id]) continue;
@@ -46,7 +47,7 @@ void resolution_prooft<T>::build_core(std::vector<bool> &in_core)
     
     if(c.is_root)
     {
-      for(unsigned i=0; i<c.root_clause.size(); i++)
+      for(std::size_t i=0; i<c.root_clause.size(); i++)
       {
         unsigned v=c.root_clause[i].var_no();
         assert(v<in_core.size());
@@ -58,7 +59,7 @@ void resolution_prooft<T>::build_core(std::vector<bool> &in_core)
       assert(c.first_clause_id<c_id);
       s.push(c.first_clause_id);
 
-      for(unsigned i=0; i<c.steps.size(); i++)
+      for(clauset::stepst::size_type i=0; i<c.steps.size(); i++)
       {
         // must decrease
         assert(c.steps[i].clause_id<c_id);
