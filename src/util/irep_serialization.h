@@ -24,39 +24,6 @@ void write_string(std::ostream &, const std::string &);
 
 class irep_serializationt
 {
-private:
-  struct ul_hash
-  {
-    unsigned short operator()(const unsigned long l) const 
-    { 
-      return l & 0xFFFF;
-    }
-  };
-
-  struct ul_eq
-  {
-    bool operator()(const unsigned long l, const unsigned long r) const 
-    {
-      return l==r;
-    }
-  };
-
-  struct irep_full_hash
-  {
-    size_t operator()(const irept &i) const 
-    { 
-      return i.full_hash(); 
-    }
-  };
-
-  struct irep_content_eq
-  {
-    bool operator()(const irept &l, const irept &r) const 
-    {
-      return full_eq(l, r);
-    }
-  };
-  
 public:
   class ireps_containert
   {
@@ -65,7 +32,7 @@ public:
     ireps_on_readt ireps_on_read;
 
     irep_full_hash_containert irep_full_hash_container;
-    typedef std::map<unsigned, unsigned long> ireps_on_writet;
+    typedef std::map<unsigned, size_t> ireps_on_writet;
     ireps_on_writet ireps_on_write;
     
     typedef std::vector<bool> string_mapt;
@@ -91,8 +58,8 @@ public:
     clear(); 
   };
   
-  unsigned long insert_on_write(unsigned h);
-  unsigned long insert_on_read(unsigned id, const irept &);
+  size_t insert_on_write(unsigned h);
+  size_t insert_on_read(unsigned id, const irept &);
   
   void reference_convert(std::istream &, irept &irep);
   void reference_convert(const irept &irep, std::ostream &);
