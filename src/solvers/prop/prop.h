@@ -60,7 +60,7 @@ public:
   // variables
   virtual literalt new_variable()=0;
   virtual void set_variable_name(literalt a, const std::string &name) { }
-  virtual unsigned no_variables() const=0;
+  virtual size_t no_variables() const=0;
   bvt new_variables(unsigned width);
   
   // solving
