@@ -146,7 +146,7 @@ exprt zero_initializert::zero_initializer_rec(
       }
 
       array_exprt value(array_type);
-      value.operands().resize(integer2long(array_size), tmpval);
+      value.operands().resize(integer2unsigned(array_size), tmpval);
       value.location()=location;
       return value;
     }
@@ -176,7 +176,7 @@ exprt zero_initializert::zero_initializer_rec(
     }
 
     vector_exprt value(vector_type);
-    value.operands().resize(integer2long(vector_size), tmpval);
+    value.operands().resize(integer2unsigned(vector_size), tmpval);
     value.location()=location;
 
     return value;
