@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cstdlib>
 #include <cassert>
+#include <stack>
 
 #ifdef IREP_DEBUG
 #include <iostream>
@@ -143,6 +144,10 @@ Function: irept::remove_ref
 void irept::remove_ref(dt *old_data)
 {
   if(old_data==&empty_d) return;
+  
+  #if 0
+  nonrecursive_destructor(old_data);
+  #else
 
   assert(old_data->ref_count!=0);
 
@@ -160,12 +165,79 @@ void irept::remove_ref(dt *old_data)
     old_data->clear();
     std::cout << "DEALLOCATING " << old_data << "\n";
     #endif
-    
+
+    // may cause recursive call
     delete old_data;
 
     #ifdef IREP_DEBUG
     std::cout << "DONE\n";
     #endif
+  }
+  #endif
+}
+#endif
+
+/*******************************************************************\
+
+Function: irept::nonrecursive_destructor
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: Does the same as remove_ref, but
+          using an explicit stack instead of recursion.
+
+\*******************************************************************/
+
+#ifdef SHARING
+void irept::nonrecursive_destructor(dt *old_data)
+{
+  std::stack<dt *> stack;
+  
+  stack.push(old_data);
+  
+  while(!stack.empty())
+  {
+    dt *d=stack.top();
+    stack.pop();
+    if(d==&empty_d) continue;
+    
+    assert(d->ref_count!=0);
+    d->ref_count--;
+
+    if(d->ref_count==0)
+    {
+      for(named_subt::iterator
+          it=d->named_sub.begin();
+          it!=d->named_sub.end();
+          it++)
+      {
+        stack.push(it->second.data);
+        it->second.data=&empty_d;
+      }
+      
+      for(named_subt::iterator
+          it=d->comments.begin();
+          it!=d->comments.end();
+          it++)
+      {
+        stack.push(it->second.data);
+        it->second.data=&empty_d;
+      }
+      
+      for(subt::iterator
+          it=d->sub.begin();
+          it!=d->sub.end();
+          it++)
+      {
+        stack.push(it->data);
+        it->data=&empty_d;
+      }
+      
+      // now delete, won't do recursion
+      delete d;
+    }    
   }
 }
 #endif
