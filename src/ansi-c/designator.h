@@ -19,8 +19,8 @@ class designatort
 public:
   struct entryt
   {
-    unsigned index;
-    unsigned size;
+    size_t index;
+    size_t size;
     typet type, subtype;
     
     entryt():index(0), size(0)
@@ -29,9 +29,9 @@ public:
   };
 
   bool empty() const { return index_list.empty(); }  
-  unsigned size() const { return index_list.size(); }
-  const entryt &operator[](unsigned i) const { return index_list[i]; }
-  entryt &operator[](unsigned i) { return index_list[i]; }
+  size_t size() const { return index_list.size(); }
+  const entryt &operator[](size_t i) const { return index_list[i]; }
+  entryt &operator[](size_t i) { return index_list[i]; }
   const entryt &back() const { return index_list.back(); };
   const entryt &front() const { return index_list.front(); };
 
@@ -47,12 +47,18 @@ public:
     index_list.pop_back();
   }
 
+  void print(std::ostream &out) const;
+
 protected:
   // a list of indices into arrays or structs
   typedef std::vector<entryt> index_listt;
   index_listt index_list;
 };
 
-std::ostream &operator << (std::ostream &, const designatort &);
+inline std::ostream &operator << (std::ostream &os, const designatort &d)
+{
+  d.print(os);
+  return os;
+}
 
 #endif
