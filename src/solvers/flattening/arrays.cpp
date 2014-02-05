@@ -53,7 +53,7 @@ Function: arrayst::record_array_index
 
 void arrayst::record_array_index(const index_exprt &index)
 {
-  unsigned number=arrays.number(index.array());
+  std::size_t number=arrays.number(index.array());
   if(number>=index_map.size()) index_map.resize(number+1);
   index_map[number].insert(index.index());
 }
@@ -244,7 +244,7 @@ void arrayst::add_array_constraints()
   build_index_map();
   
   // add constraints for if, with, array_of
-  for(unsigned i=0; i<arrays.size(); i++)
+  for(std::size_t i=0; i<arrays.size(); i++)
     add_array_constraints(
       index_map[arrays.find_number(i)],
       arrays[i]);
@@ -279,7 +279,7 @@ void arrayst::add_array_Ackermann_constraints()
   // this is quadratic!
 
   // iterate over arrays
-  for(unsigned i=0; i<arrays.size(); i++)
+  for(std::size_t i=0; i<arrays.size(); i++)
   {
     const index_sett &index_set=index_map[arrays.find_number(i)];
     
@@ -352,11 +352,11 @@ void arrayst::build_index_map()
     index_map.resize(arrays.size());
 
   // iterate over non-roots
-  for(unsigned i=0; i<arrays.size(); i++)
+  for(std::size_t i=0; i<arrays.size(); i++)
   {
     if(arrays.is_root_number(i)) continue;
 
-    unsigned root_number=arrays.find_number(i);
+    std::size_t root_number=arrays.find_number(i);
     assert(root_number!=i);
 
     index_sett &root_index_set=index_map[root_number];

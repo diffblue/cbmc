@@ -47,8 +47,8 @@ void boolbvt::convert_byte_update(const exprt &expr, bvt &bv)
   bv=convert_bv(op0);
   
   const bvt &op2_bv=convert_bv(op2);
-  unsigned update_width=op2_bv.size();
-  unsigned byte_width=8;
+  std::size_t update_width=op2_bv.size();
+  std::size_t byte_width=8;
   
   if(update_width>bv.size()) update_width=bv.size();
 
@@ -68,7 +68,7 @@ void boolbvt::convert_byte_update(const exprt &expr, bvt &bv)
     {
       if(little_endian)
       {
-        for(unsigned i=0; i<update_width; i++)
+        for(std::size_t i=0; i<update_width; i++)
           bv[integer2long(offset+i)]=op2_bv[i];
       }
       else
@@ -76,9 +76,9 @@ void boolbvt::convert_byte_update(const exprt &expr, bvt &bv)
         endianness_mapt map_op0(op0.type(), little_endian, ns);
         endianness_mapt map_op2(op2.type(), little_endian, ns);
         
-        unsigned offset_i=integer2unsigned(offset);
+        std::size_t offset_i=integer2unsigned(offset);
         
-        for(unsigned i=0; i<update_width; i++)
+        for(std::size_t i=0; i<update_width; i++)
           bv[map_op0.map_bit(offset_i+i)]=op2_bv[map_op2.map_bit(i)];
       }
     }
@@ -87,7 +87,7 @@ void boolbvt::convert_byte_update(const exprt &expr, bvt &bv)
   }
 
   // byte_update with variable index
-  for(unsigned offset=0; offset<bv.size(); offset+=byte_width)
+  for(std::size_t offset=0; offset<bv.size(); offset+=byte_width)
   {
     // index condition
     equal_exprt equality;
@@ -98,11 +98,11 @@ void boolbvt::convert_byte_update(const exprt &expr, bvt &bv)
     endianness_mapt map_op0(op0.type(), little_endian, ns);
     endianness_mapt map_op2(op2.type(), little_endian, ns);
 
-    for(unsigned bit=0; bit<update_width; bit++)
+    for(std::size_t bit=0; bit<update_width; bit++)
       if(offset+bit<bv.size())
       {
-        unsigned bv_o=map_op0.map_bit(offset+bit);
-        unsigned op2_bv_o=map_op2.map_bit(bit);
+        std::size_t bv_o=map_op0.map_bit(offset+bit);
+        std::size_t op2_bv_o=map_op2.map_bit(bit);
         
         bv[bv_o]=prop.lselect(equal, op2_bv[op2_bv_o], bv[bv_o]);
       }

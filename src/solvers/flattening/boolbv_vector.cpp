@@ -35,7 +35,7 @@ void boolbvt::convert_vector(const exprt &expr, bvt &bv)
     
     if(!operands.empty())
     {
-      unsigned op_width=width/operands.size();
+      std::size_t op_width=width/operands.size();
     
       forall_expr(it, operands)
       {

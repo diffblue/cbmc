@@ -35,31 +35,8 @@ public:
 
   void operator()();
 
-  // statistics
+  // the goals
 
-  inline unsigned number_covered() const
-  {
-    return _number_covered;
-  }
-  
-  inline unsigned iterations() const
-  {
-    return _iterations;
-  }
-  
-  inline unsigned size() const
-  {
-    return goals.size();
-  }
-  
-  // managing the goals
-
-  inline void add(const literalt condition)
-  {
-    goals.push_back(cover_goalt());
-    goals.back().condition=condition;
-  }
-  
   struct cover_goalt
   {
     literalt condition;
@@ -72,6 +49,31 @@ public:
 
   typedef std::list<cover_goalt> goalst;
   goalst goals;
+  
+  // statistics
+
+  inline unsigned number_covered() const
+  {
+    return _number_covered;
+  }
+  
+  inline unsigned iterations() const
+  {
+    return _iterations;
+  }
+  
+  inline goalst::size_type size() const
+  {
+    return goals.size();
+  }
+  
+  // managing the goals
+
+  inline void add(const literalt condition)
+  {
+    goals.push_back(cover_goalt());
+    goals.back().condition=condition;
+  }
   
 protected:
   unsigned _number_covered, _iterations;

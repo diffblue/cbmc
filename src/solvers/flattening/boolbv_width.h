@@ -19,14 +19,14 @@ public:
   explicit boolbv_widtht(const namespacet &_ns);
   ~boolbv_widtht();
  
-  unsigned operator()(const typet &type) const
+  std::size_t operator()(const typet &type) const
   {
     return get_entry(type).total_width;
   }
   
   struct membert
   {
-    unsigned offset, width;
+    std::size_t offset, width;
   };
 
   const membert &get_member(
@@ -38,7 +38,7 @@ protected:
 
   struct entryt
   {
-    unsigned total_width;
+    std::size_t total_width;
     std::vector<membert> members;
   };
   
@@ -54,12 +54,12 @@ protected:
 bool boolbv_member_offset(
   const struct_typet &type,
   const irep_idt &member,
-  unsigned &offset,
+  std::size_t &offset,
   const namespacet &ns);
 
 bool boolbv_get_width(
   const typet &type,
-  unsigned &width,
+  std::size_t &width,
   const namespacet &ns);
 #endif
 

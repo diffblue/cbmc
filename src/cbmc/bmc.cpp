@@ -572,9 +572,9 @@ Function: bmct::setup_unwind
 void bmct::setup_unwind()
 {
   const std::string &set=options.get_option("unwindset");
-  unsigned int length=set.length();
+  std::string::size_type length=set.length();
 
-  for(unsigned int idx=0; idx<length; idx++)
+  for(std::string::size_type idx=0; idx<length; idx++)
   {
     std::string::size_type next=set.find(",", idx);
     std::string val=set.substr(idx, next-idx);

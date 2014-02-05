@@ -251,8 +251,8 @@ protected:
     goto_programt::targett break_target, continue_target,
       default_target, throw_target, leave_target;
     
-    unsigned break_stack_size, continue_stack_size, throw_stack_size,
-             leave_stack_size;
+    std::size_t break_stack_size, continue_stack_size, throw_stack_size,
+                leave_stack_size;
 
     targetst():
       return_set(false),

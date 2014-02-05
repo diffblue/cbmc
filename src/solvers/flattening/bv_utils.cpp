@@ -24,7 +24,7 @@ Function: bv_utilst::build_constant
 
 \*******************************************************************/
 
-bvt bv_utilst::build_constant(const mp_integer &n, unsigned width)
+bvt bv_utilst::build_constant(const mp_integer &n, std::size_t width)
 {
   std::string n_str=integer2binary(n, width);
   bvt result;
