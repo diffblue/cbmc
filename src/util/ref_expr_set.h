@@ -65,7 +65,7 @@ public:
   bool make_union(const expr_sett &s2)
   {
     expr_sett tmp(read().expr_set);
-    unsigned old_size=tmp.size();
+    size_t old_size=tmp.size();
     tmp.insert(s2.begin(), s2.end());
     
     // anything new?

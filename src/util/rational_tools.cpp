@@ -22,7 +22,7 @@ Function: power10
 
 \*******************************************************************/
 
-static mp_integer power10(unsigned i)
+static mp_integer power10(size_t i)
 {
   mp_integer result=1;
 
@@ -53,9 +53,11 @@ bool to_rational(const exprt &expr, rationalt &rational_value)
   std::string no1, no2;
   char mode=0;
 
-  for(unsigned i=0; i<value.size(); i++)
+  for(std::string::const_iterator it=value.begin();
+      it!=value.end();
+      ++it)
   {
-    char ch=value[i];
+    const char ch=*it;
 
     if(isdigit(ch))
     {
