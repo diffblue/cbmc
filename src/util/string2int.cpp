@@ -11,12 +11,6 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 #include <limits>
 #include <cassert>
 
-// _strtoi64 is available in Visual Studio, but not yet in MINGW
-
-#ifdef _MSC_VER
-#define strtoll _strtoi64
-#endif
-
 #include "string2int.h"
 
 /*******************************************************************\
@@ -37,13 +31,18 @@ inline T safe_str2number(const char *str, int base)
   int errno_bak=errno;
   errno=0;
   char * endptr;
+// _strtoi64 is available in Visual Studio, but not yet in MINGW
+#ifdef _MSC_VER
+  const __int64 val=_strtoi64(str, &endptr, base);
+#else
   const long long val=strtoll(str, &endptr, base);
+#endif
   assert(0 == errno);
   errno=errno_bak;
   assert(endptr!=str);
   assert(val <= std::numeric_limits<T>::max());
   assert(val >= std::numeric_limits<T>::min());
-  return val;
+  return (T)val;
 }
 
 /*******************************************************************\

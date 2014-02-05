@@ -1514,7 +1514,7 @@ bool simplify_exprt::simplify_plus(exprt &expr)
   else
   {
     // count the constants
-    unsigned count=0;
+    size_t count=0;
     forall_operands(it, expr)
       if(is_number(it->type()) && it->is_constant())
         count++;
@@ -2066,9 +2066,9 @@ bool simplify_exprt::simplify_concatenation(exprt &expr)
   if(is_bitvector_type(expr.type()))
   {
     // first, turn bool into bvec[1]
-    for(unsigned i=0; i<expr.operands().size(); i++)
+    Forall_operands(it, expr)
     {
-      exprt &op=expr.operands()[i];
+      exprt &op=*it;
       if(op.is_true() || op.is_false())
       {
         bool value=op.is_true();
@@ -2077,7 +2077,7 @@ bool simplify_exprt::simplify_concatenation(exprt &expr)
     }
     
     // search for neighboring constants to merge
-    unsigned i=0;
+    size_t i=0;
     
     while(i<expr.operands().size()-1)
     {
@@ -2105,7 +2105,7 @@ bool simplify_exprt::simplify_concatenation(exprt &expr)
   else if(expr.type().id()==ID_verilogbv)
   {
     // search for neighboring constants to merge
-    unsigned i=0;
+    size_t i=0;
     
     while(i<expr.operands().size()-1)
     {
@@ -2986,8 +2986,10 @@ bool simplify_exprt::simplify_bitnot(exprt &expr)
       {
         std::string value=op.get_string(ID_value);
 
-        for(unsigned i=0; i<value.size(); i++)
-          value[i]=(value[i]=='0')?'1':'0';
+        for(std::string::iterator it=value.begin();
+            it!=value.end();
+            ++it)
+          *it=(*it=='0')?'1':'0';
 
         exprt tmp(ID_constant, op.type());
         tmp.set(ID_value, value);
@@ -4071,7 +4073,7 @@ bool simplify_exprt::simplify_index(exprt &expr)
   else if(array.id()=="array-list")
   {
     // These are index/value pairs, alternating.
-    for(unsigned i=0; i<array.operands().size()/2; i++)
+    for(size_t i=0; i<array.operands().size()/2; i++)
     {
       exprt tmp_index=array.operands()[i*2];
       tmp_index.make_typecast(index.type());
@@ -4134,10 +4136,10 @@ bool simplify_exprt::simplify_object(exprt &expr)
     if(expr.type().id()==ID_pointer)
     {
       // kill integers from sum
-      for(unsigned i=0; i<expr.operands().size(); i++)
-        if(ns.follow(expr.operands()[i].type()).id()==ID_pointer)
+      Forall_operands(it, expr)
+        if(ns.follow(it->type()).id()==ID_pointer)
         {
-          exprt tmp=expr.operands()[i];
+          exprt tmp=*it;
           expr.swap(tmp);
           simplify_object(expr);
           return false;
@@ -5105,11 +5107,11 @@ bool simplify_exprt::sort_and_join(exprt &expr)
 
   // join expressions
 
-  for(unsigned i=0; i<expr.operands().size();)
+  for(size_t i=0; i<expr.operands().size();)
   {
     if(expr.operands()[i].id()==expr.id())
     {
-      unsigned no_joined=expr.operands()[i].operands().size();
+      size_t no_joined=expr.operands()[i].operands().size();
 
       expr.operands().insert(expr.operands().begin()+i+1,
         expr.operands()[i].operands().begin(), 

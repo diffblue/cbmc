@@ -101,7 +101,7 @@ public:
   inline const exprt &op3() const
   { return operands()[3]; }
   
-  inline void reserve_operands(unsigned n)
+  inline void reserve_operands(operandst::size_type n)
   { operands().reserve(n) ; }
    
   void move_to_operands(exprt &expr); // destroys expr

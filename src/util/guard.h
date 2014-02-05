@@ -17,6 +17,7 @@ class guardt
 {
 public:
   typedef expr_listt guard_listt;
+  typedef guard_listt::size_type size_type;
 
   void add(const exprt &expr);
 
@@ -58,12 +59,12 @@ public:
 
   friend std::ostream &operator << (std::ostream &out, const guardt &g);
   
-  unsigned size() const
+  size_type size() const
   {
     return guard_list.size();
   }
   
-  void resize(unsigned s)
+  void resize(size_type s)
   {
     guard_list.resize(s);
   }
