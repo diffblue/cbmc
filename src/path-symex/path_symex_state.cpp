@@ -668,11 +668,9 @@ void path_symex_statet::record_step()
   history.generate_successor();
   path_symex_stept &step=*history;
 
-  // copy PCs
-  step.pc_vector.resize(threads.size());
-  for(unsigned t=0; t<threads.size(); t++)
-    step.pc_vector[t]=threads[t].pc;
-  
+  // copy PC
+  assert(current_thread<threads.size());
+  step.pc=threads[current_thread].pc;
   step.thread_nr=current_thread;
 }
 

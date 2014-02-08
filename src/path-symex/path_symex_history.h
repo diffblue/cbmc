@@ -72,9 +72,12 @@ class path_symex_stept
 {
 public:
   path_symex_step_reft predecessor;
+  
+  // the thread that did the step
   unsigned thread_nr;
-  typedef std::vector<loc_reft> pc_vectort;
-  pc_vectort pc_vector;
+  
+  // the instruction that was executed
+  loc_reft pc;
 
   exprt guard, ssa_rhs;
   exprt full_lhs;
@@ -90,12 +93,6 @@ public:
   {
   }
   
-  inline loc_reft pc() const
-  {
-    assert(thread_nr<pc_vector.size());
-    return pc_vector[thread_nr];
-  }
-
   // interface to solvers; this converts a single step
   void convert(decision_proceduret &dest) const;
   
