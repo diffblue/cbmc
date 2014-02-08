@@ -25,16 +25,17 @@ void build_goto_trace(
   const decision_proceduret &decision_procedure,
   goto_tracet &goto_trace)
 {
-  // follow the history in the state
+  // follow the history in the state,
+  // but in a forwards-fashion
   
-  unsigned step_nr=0;
+  std::vector<path_symex_step_reft> steps;
+  state.history.build_history(steps);
   
-  for(path_symex_historyt::stepst::const_iterator
-      h_it=state.history.steps.begin();
-      h_it!=state.history.steps.end();
-      h_it++, step_nr++)
+  unsigned step_nr;
+  
+  for(step_nr=0; step_nr<steps.size(); step_nr++)
   {
-    const path_symex_stept &step=*h_it;
+    const path_symex_stept &step=*steps[step_nr];
   
     goto_trace_stept trace_step;
     

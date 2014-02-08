@@ -51,7 +51,7 @@ public:
     state.record_step();
     state.next_pc();
     exprt guard=state.read(not_exprt(instruction.guard));
-    state.history.steps.back().guard=guard;
+    state.history->guard=guard;
   }  
 
 protected:
@@ -444,7 +444,8 @@ void path_symext::assign_rec(
       }
 
       // record the step
-      path_symex_stept &step=state.record_step();
+      state.record_step();
+      path_symex_stept &step=*state.history;
       
       if(!guard.empty()) step.guard=conjunction(guard);
       step.full_lhs=ssa_lhs;
@@ -731,15 +732,15 @@ void path_symext::function_call_rec(
     {
       further_states.push_back(state);
       path_symex_statet &false_state=further_states.back();
-      path_symex_stept &step=false_state.record_step();
-      step.guard=not_exprt(guard);
+      false_state.record_step();
+      false_state.history->guard=not_exprt(guard);
       function_call_rec(further_states.back(), call, if_expr.false_case(), further_states);
     }
 
     // do the true-case in 'state'
     {
-      path_symex_stept &step=state.record_step();
-      step.guard=guard;
+      state.record_step();
+      state.history->guard=guard;
       function_call_rec(state, call, if_expr.true_case(), further_states);
     }
   }
@@ -803,8 +804,6 @@ void path_symext::do_goto(
   path_symex_statet &state,
   std::list<path_symex_statet> &further_states)
 {
-  state.record_step();
-
   const goto_programt::instructiont &instruction=
     *state.get_instruction();
 
@@ -821,6 +820,7 @@ void path_symext::do_goto(
   
   if(guard.is_true())
   {
+    state.record_step();
     state.set_pc(loc.branch_target);
     return; // we are done
   }
@@ -830,14 +830,16 @@ void path_symext::do_goto(
     // branch taken case
     // copy the state into 'furhter_states'
     further_states.push_back(state);
+    further_states.back().record_step();
     further_states.back().set_pc(loc.branch_target);
-    further_states.back().history.steps.back().guard=guard;
+    further_states.back().history->guard=guard;
   }
 
   // branch not taken case
   exprt negated_guard=not_exprt(guard);
+  state.record_step();
   state.next_pc();
-  state.history.steps.back().guard=negated_guard;
+  state.history->guard=negated_guard;
 }
 
 /*******************************************************************\
@@ -875,14 +877,14 @@ void path_symext::do_goto(
     const loct &loc=state.locs[state.pc()];
     assert(!loc.branch_target.is_nil());
     state.set_pc(loc.branch_target);
-    state.history.steps.back().guard=guard;
+    state.history->guard=guard;
   }
   else
   {
     // branch not taken case
     exprt negated_guard=not_exprt(guard);
     state.next_pc();
-    state.history.steps.back().guard=negated_guard;
+    state.history->guard=negated_guard;
   }
 }
 
@@ -971,7 +973,7 @@ void path_symext::operator()(
     else
     {
       exprt guard=state.read(instruction.guard);
-      state.history.steps.back().guard=guard;
+      state.history->guard=guard;
     }
     break;
     
