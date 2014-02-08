@@ -41,9 +41,10 @@ Function: initial_state
 
 path_symex_statet initial_state(
   var_mapt &var_map,
-  const locst &locs)
+  const locst &locs,
+  path_symex_historyt &path_symex_history)
 {
-  path_symex_statet s(var_map, locs);
+  path_symex_statet s(var_map, locs, path_symex_history);
   
   // create one new thread
   path_symex_statet::threadt &thread=s.add_thread();
@@ -653,16 +654,19 @@ Function: path_symex_statet::record_step
 
 \*******************************************************************/
 
-path_symex_stept &path_symex_statet::record_step()
+void path_symex_statet::record_step()
 {
   // is there a context switch happening?
-  if(!history.steps.empty() &&
-     history.steps.back().thread_nr!=current_thread)
+  if(!history.is_nil() &&
+     history->thread_nr!=current_thread)
     no_thread_interleavings++;
+    
+  // update our statistics
+  depth++;
   
   // add the step
-  history.steps.push_back(path_symex_stept());
-  path_symex_stept &step=history.steps.back();
+  history.generate_successor();
+  path_symex_stept &step=*history;
 
   // copy PCs
   step.pc_vector.resize(threads.size());
@@ -670,8 +674,6 @@ path_symex_stept &path_symex_statet::record_step()
     step.pc_vector[t]=threads[t].pc;
   
   step.thread_nr=current_thread;
-  
-  return step;
 }
 
 /*******************************************************************\

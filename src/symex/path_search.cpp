@@ -35,8 +35,11 @@ path_searcht::resultt path_searcht::operator()(
   var_mapt var_map(ns);
   
   locs.build(goto_functions);
+
+  // this is the container for the history-forest  
+  path_symex_historyt history;
   
-  queue.push_back(initial_state(var_map, locs));
+  queue.push_back(initial_state(var_map, locs, history));
   
   // set up the statistics
   number_of_dropped_states=0;
@@ -174,22 +177,25 @@ void path_searcht::do_show_vcc(
     out << instruction.location.get_comment() << "\n";
     
   unsigned count=1;
+  
+  std::vector<path_symex_step_reft> steps;
+  state.history.build_history(steps);
 
-  for(path_symex_historyt::stepst::const_iterator
-      s_it=state.history.steps.begin();
-      s_it!=state.history.steps.end();
+  for(std::vector<path_symex_step_reft>::const_iterator
+      s_it=steps.begin();
+      s_it!=steps.end();
       s_it++)
   {      
-    if(s_it->guard.is_not_nil())
+    if((*s_it)->guard.is_not_nil())
     {
-      std::string string_value=from_expr(ns, "", s_it->guard);
+      std::string string_value=from_expr(ns, "", (*s_it)->guard);
       out << "{-" << count << "} " << string_value << "\n";
       count++;
     }
 
-    if(s_it->ssa_rhs.is_not_nil())
+    if((*s_it)->ssa_rhs.is_not_nil())
     {
-      equal_exprt equality(s_it->ssa_lhs, s_it->ssa_rhs);
+      equal_exprt equality((*s_it)->ssa_lhs, (*s_it)->ssa_rhs);
       std::string string_value=from_expr(ns, "", equality);
       out << "{-" << count << "} " << string_value << "\n";
       count++;

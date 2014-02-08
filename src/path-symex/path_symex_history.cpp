@@ -14,7 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
-Function: path_symex_historyt::output
+Function: path_symex_stept::output
 
   Inputs:
 
@@ -24,13 +24,9 @@ Function: path_symex_historyt::output
 
 \*******************************************************************/
 
-void path_symex_historyt::output(std::ostream &out) const
+void path_symex_stept::output(std::ostream &out) const
 {
-  for(stepst::const_iterator s_it=steps.begin();
-      s_it!=steps.end();
-      s_it++)
-  {
-    out << "PCs:";
+  out << "PCs:";
 
 /*
     for(pc_vectort::const_iterator p_it=s_it->pc_vector.begin();
@@ -38,19 +34,18 @@ void path_symex_historyt::output(std::ostream &out) const
         p_it++)
       out << " " << *p_it;
  */     
-    out << "\n";
-    
-    out << "Guard: " << from_expr(s_it->guard) << "\n";
-    out << "Full LHS: " << from_expr(s_it->full_lhs) << "\n";
-    out << "SSA LHS: " << from_expr(s_it->ssa_lhs) << "\n";
-    out << "SSA RHS: " << from_expr(s_it->ssa_rhs) << "\n";
-    out << "\n";
-  }
+  out << "\n";
+  
+  out << "Guard: " << from_expr(guard) << "\n";
+  out << "Full LHS: " << from_expr(full_lhs) << "\n";
+  out << "SSA LHS: " << from_expr(ssa_lhs) << "\n";
+  out << "SSA RHS: " << from_expr(ssa_rhs) << "\n";
+  out << "\n";
 }
 
 /*******************************************************************\
 
-Function: path_symex_historyt::convert
+Function: path_symex_stept::convert
 
   Inputs:
 
@@ -60,16 +55,11 @@ Function: path_symex_historyt::convert
 
 \*******************************************************************/
 
-void path_symex_historyt::convert(decision_proceduret &dest) const
+void path_symex_stept::convert(decision_proceduret &dest) const
 {
-  for(stepst::const_iterator s_it=steps.begin();
-      s_it!=steps.end();
-      s_it++)
-  {
-    if(s_it->ssa_rhs.is_not_nil())
-      dest << equal_exprt(s_it->ssa_lhs, s_it->ssa_rhs);
+  if(ssa_rhs.is_not_nil())
+    dest << equal_exprt(ssa_lhs, ssa_rhs);
 
-    if(s_it->guard.is_not_nil())
-      dest << s_it->guard;
-  }
+  if(guard.is_not_nil())
+    dest << guard;
 }
