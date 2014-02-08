@@ -19,7 +19,8 @@ Author: Daniel Kroening, kroening@kroening.com
 class path_symex_stept;
 
 // This is a reference to a path_symex_stept,
-// and is really cheap to copy.
+// and is really cheap to copy. These references are stable,
+// even though the underlying vector is not.
 class path_symex_step_reft
 {
 public:
@@ -40,7 +41,7 @@ public:
     return index==std::numeric_limits<std::size_t>::max();
   }
   
-  inline path_symex_historyt &get_history()
+  inline path_symex_historyt &get_history() const
   {
     assert(history!=0);
     return *history;
@@ -62,7 +63,7 @@ protected:
   std::size_t index;
   class path_symex_historyt *history;
   
-  path_symex_stept &get() const;
+  inline path_symex_stept &get() const;
 };
 
 class decision_proceduret;
@@ -143,7 +144,8 @@ inline path_symex_stept &path_symex_step_reft::get() const
   return history->step_container[index];
 }
 
-inline void path_symex_step_reft::build_history(std::vector<path_symex_step_reft> &dest) const
+inline void path_symex_step_reft::build_history(
+  std::vector<path_symex_step_reft> &dest) const
 {
   path_symex_step_reft s=*this;
   while(!s.is_nil())
