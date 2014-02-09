@@ -153,6 +153,7 @@ int __builtin_parity(unsigned int x);
 int __builtin_ffsl(unsigned long);
 int __builtin_clzl(unsigned long);
 int __builtin_ctzl(unsigned long);
+short int __builtin_bswap16(short int x);
 long int __builtin_bswap32(long int x);
 long long int __builtin_bswap64(long long int x);
 int __builtin_classify_type();
