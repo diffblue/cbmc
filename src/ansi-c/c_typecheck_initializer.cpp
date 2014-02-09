@@ -433,7 +433,7 @@ void c_typecheck_baset::do_designated_initializer(
         else
         {
           err_location(value);
-          str << "index designator " << index
+          str << "array index designator " << index
               << " out of bounds (" << dest->operands().size() << ")";
           throw 0;
         }
@@ -443,8 +443,9 @@ void c_typecheck_baset::do_designated_initializer(
     }
     else if(type.id()==ID_struct)
     {
-      const struct_union_typet::componentst &components=
+      const struct_typet::componentst &components=
         to_struct_type(type).components();
+
       assert(index<components.size());
       assert(components[index].type().id()!=ID_code &&
              !components[index].get_is_padding());
@@ -452,7 +453,7 @@ void c_typecheck_baset::do_designated_initializer(
       if(index>=dest->operands().size())
       {
         err_location(value);
-        str << "index designator " << index
+        str << "structure member designator " << index
             << " out of bounds (" << dest->operands().size() << ")";
         throw 0;
       }
@@ -461,18 +462,31 @@ void c_typecheck_baset::do_designated_initializer(
     }
     else if(type.id()==ID_union)
     {
-      // union initialization is quite special -- always use the first
-      // component according to C standard section 6.7.9
       const union_typet &union_type=to_union_type(type);
-      const union_typet::componentt &component=union_type.components().front();
 
-      // build a union expression from first component
-      union_exprt union_expr(union_type);
-      union_expr.op()=zero_initializer(component.type(), value.location(), *this, get_message_handler());
-      union_expr.location()=value.location();
-      union_expr.set(ID_component_name, component.get_name());
+      const union_typet::componentst &components=
+        union_type.components();
 
-      *dest=union_expr;
+      assert(index<components.size());
+
+      const union_typet::componentt &component=union_type.components()[index];
+      
+      if(dest->id()==ID_union &&
+         dest->get(ID_component_name)==component.get_name())
+      {
+        // already right union component (can initialize multiple submembers)
+      }
+      else
+      {
+        // Note that gcc issues a warning if the union component is switched.
+        // Build a union expression from given component.
+        union_exprt union_expr(union_type);
+        union_expr.op()=zero_initializer(component.type(), value.location(), *this, get_message_handler());
+        union_expr.location()=value.location();
+        union_expr.set(ID_component_name, component.get_name());
+        *dest=union_expr;
+      }
+
       dest=&(dest->op0());
     }
     else
