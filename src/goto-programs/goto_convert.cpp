@@ -367,9 +367,10 @@ void goto_convertt::convert_gcc_switch_case_range(
   goto_programt tmp;
   convert(to_code(code.op2()), tmp);
   
-  goto_programt::targett target=tmp.instructions.begin();
+  //goto_programt::targett target=tmp.instructions.begin();
   dest.destructive_append(tmp);
 
+  #if 0
   cases_mapt::iterator cases_entry=targets.cases_map.find(target);
   if(cases_entry==targets.cases_map.end())
   {
@@ -378,7 +379,6 @@ void goto_convertt::convert_gcc_switch_case_range(
           target, --targets.cases.end())).first;
   }
 
-  #if 0
   // TODO
   exprt::operandst &case_op_dest=cases_entry->second->second;
   case_op_dest.push_back(code.case_op());
