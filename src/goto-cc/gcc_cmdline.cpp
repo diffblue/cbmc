@@ -148,6 +148,8 @@ const char *gcc_options_without_argument[]=
   "-print-multi-lib",
   "-print-search-dirs", 
   "-Q",
+  "-Qn",
+  "-Qy",
   "-pthread",
   "-save-temps", 
   "-time",
