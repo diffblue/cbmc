@@ -456,7 +456,7 @@ void goto_program_templatet<codeT, guardT>::get_successors(
         t_it++)
       successors.push_back(*t_it);
 
-    if(!i.guard.is_true())
+    if(!i.guard.is_true() && next!=instructions.end())
       successors.push_back(next);
   }
   else if(i.is_start_thread())
@@ -467,7 +467,8 @@ void goto_program_templatet<codeT, guardT>::get_successors(
         t_it++)
       successors.push_back(*t_it);
 
-    successors.push_back(next);
+    if(next!=instructions.end())
+      successors.push_back(next);
   }
   else if(i.is_end_thread())
   {
@@ -484,11 +485,14 @@ void goto_program_templatet<codeT, guardT>::get_successors(
   }
   else if(i.is_assume())
   {
-    if(!i.guard.is_false())
+    if(!i.guard.is_false() && next!=instructions.end())
       successors.push_back(next);
   }
   else
-    successors.push_back(next);
+  {
+    if(next!=instructions.end())
+      successors.push_back(next);
+  }
 }
 
 template <class codeT, class guardT>
@@ -512,7 +516,7 @@ void goto_program_templatet<codeT, guardT>::get_successors(
         t_it++)
       successors.push_back(*t_it);
 
-    if(!i.guard.is_true())
+    if(!i.guard.is_true() && next!=instructions.end())
       successors.push_back(next);
   }
   else if(i.is_start_thread())
@@ -523,7 +527,8 @@ void goto_program_templatet<codeT, guardT>::get_successors(
         t_it++)
       successors.push_back(*t_it);
 
-    successors.push_back(next);
+    if(next!=instructions.end())
+      successors.push_back(next);
   }
   else if(i.is_end_thread())
   {
@@ -536,11 +541,14 @@ void goto_program_templatet<codeT, guardT>::get_successors(
   }
   else if(i.is_assume())
   {
-    if(!i.guard.is_false())
+    if(!i.guard.is_false() && next!=instructions.end())
       successors.push_back(next);
   }
   else
-    successors.push_back(next);
+  {
+    if(next!=instructions.end())
+      successors.push_back(next);
+  }
 }
 
 #include <langapi/language_util.h>
