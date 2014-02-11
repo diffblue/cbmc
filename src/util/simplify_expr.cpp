@@ -414,6 +414,34 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
     }
   }
 
+  // Push a numerical typecast into pointer arithmetic
+  // (T)(x + y) ---> (T)((size_t)x + (size_t)y)
+  //
+  if((expr_type.id()==ID_signedbv || expr_type.id()==ID_unsignedbv) &&
+     op_type.id()==ID_pointer &&
+     expr.op0().id()==ID_plus)
+  {
+    const mp_integer step=pointer_offset_size(op_type.subtype(), ns);
+
+    if(step>0)
+    {
+      const unsignedbv_typet size_t_type(config.ansi_c.pointer_width);
+      expr.op0().type()=size_t_type;
+
+      Forall_operands(it, expr.op0())
+      {
+        it->make_typecast(size_t_type);
+
+        if(step>1 &&
+           it->type().id()!=ID_pointer)
+          *it=mult_exprt(from_integer(step, size_t_type), *it);
+      }
+
+      simplify_rec(expr);
+      return false;
+    }
+  }
+
   #if 0
   // (T)(a?b:c) --> a?(T)b:(T)c
   if(expr.op0().id()==ID_if &&
