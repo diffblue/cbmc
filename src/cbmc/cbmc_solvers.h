@@ -93,10 +93,15 @@ public:
   virtual ~cbmc_solverst() { 
   }
 
+  void set_ui(language_uit::uit _ui) { ui=_ui; }
+
 protected:
   const optionst &options;
   const symbol_tablet &symbol_table;
   namespacet ns;
+
+  // use gui format
+  language_uit::uit ui;
 
   solvert* get_default();
   solvert* get_dimacs();

@@ -174,6 +174,7 @@ cbmc_solverst::solvert* cbmc_solverst::get_bv_refinement()
   prop->set_verbosity(get_verbosity());
 
   bv_refinementt* bv_refinement = new bv_refinementt(ns, *prop);
+  bv_refinement->set_ui(ui);
 
   // we allow setting some parameters  
   if(options.get_option("max-node-refinement")!="")

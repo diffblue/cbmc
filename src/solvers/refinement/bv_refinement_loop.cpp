@@ -6,6 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <iostream>
+
+#include <util/i2string.h>
+#include <util/xml.h>
+
 #include "bv_refinement.h"
 
 /*******************************************************************\
@@ -75,7 +80,13 @@ decision_proceduret::resultt bv_refinementt::dec_solve()
     iteration++;
   
     status() << "BV-Refinement: iteration " << iteration << eom;
-  
+    if(ui==ui_message_handlert::XML_UI) {
+      xmlt xml("refinement-iteration");
+      xml.data=i2string(iteration);
+      std::cout << xml;
+      std::cout << "\n";
+    }
+
     switch(prop_solve())
     {
     case D_SATISFIABLE:

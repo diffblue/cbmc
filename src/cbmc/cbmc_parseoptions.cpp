@@ -370,6 +370,7 @@ int cbmc_parseoptionst::doit()
 
   //get solver
   cbmc_solverst cbmc_solvers(options, symbol_table, ui_message_handler);
+  cbmc_solvers.set_ui(get_ui());
   std::auto_ptr<cbmc_solverst::solvert> cbmc_solver = cbmc_solvers.get_solver();
   prop_convt& prop_conv = cbmc_solver->prop_conv();
 

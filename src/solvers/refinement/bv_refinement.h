@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_SOLVER_BV_REFINEMENT_H
 #define CPROVER_SOLVER_BV_REFINEMENT_H
 
+#include <langapi/language_ui.h>
+
 #include <solvers/flattening/bv_pointers.h>
 
 #define MAX_STATE 10000
@@ -30,6 +32,8 @@ public:
   unsigned max_node_refinement;
   
   using bv_pointerst::is_in_conflict;
+
+  void set_ui(language_uit::uit _ui) { ui=_ui; }
 
 protected:
   resultt prop_solve();
@@ -96,8 +100,10 @@ protected:
   // overloading
   virtual void set_assumptions(const bvt &_assumptions);
 
- protected:
   bvt parent_assumptions;
+
+  // use gui format
+  language_uit::uit ui;
 
 };
 
