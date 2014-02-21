@@ -2228,6 +2228,19 @@ void c_typecheck_baset::do_special_functions(
       isnan_expr.location()=location;
       expr.swap(isnan_expr);
     }
+    else if(identifier==CPROVER_PREFIX "isinf")
+    {
+      if(expr.arguments().size()!=1)
+      {
+        err_location(f_op);
+        throw "isinf expects one operand";
+      }
+
+      exprt isinf_expr(ID_isinf, bool_typet());
+      isinf_expr.operands()=expr.arguments();
+      isinf_expr.location()=location;
+      expr.swap(isinf_expr);
+    }
     else if(identifier==CPROVER_PREFIX "isfinitef" ||
             identifier==CPROVER_PREFIX "isfinited" ||
             identifier==CPROVER_PREFIX "isfiniteld")
