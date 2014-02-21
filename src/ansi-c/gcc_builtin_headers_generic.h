@@ -157,6 +157,7 @@ short int __builtin_bswap16(short int x);
 long int __builtin_bswap32(long int x);
 long long int __builtin_bswap64(long long int x);
 int __builtin_classify_type();
+int __builtin_isinf(double);
 int __builtin_isnan(double);
 int __builtin_isnanf(float);
 int __builtin_signbit(double);
