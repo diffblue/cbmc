@@ -46,11 +46,16 @@ We assume that you have a Debian/Ubuntu or Red Hat-like distribution.
 COMPILATION ON SOLARIS 11
 -------------------------
 
-0) Install the relevant development tools as root:
+0) We recommend you get OpenCSW. Follow the instructions at
 
-   pkg install developer/versioning/subversion flex bison gcc-3
+   http://www.opencsw.org/manual/for-administrators/getting-started.html
 
-1) As a user, get MiniSat2 by entering
+1) As root, get the necessary development tools:
+
+   pkg install system/header
+   /opt/csw/bin/pkgutil -i gzip coreutils wget CSWpm-libwww-perl subversion flex bison CSWgcc4g++
+
+2) As a user, get MiniSat2 by entering
 
    cd src
    wget http://minisat.se/downloads/minisat-2.2.0.tar.gz
@@ -58,14 +63,14 @@ COMPILATION ON SOLARIS 11
    mv minisat ../minisat-2.2.0
    (cd ../minisat-2.2.0; patch -p1 < ../scripts/minisat-2.2.0-patch)
 
-2) Adjust util/hash_cont.h to use STL_HASH_GNU
-
 3) Type
 
-   gmake CXX=/usr/sfw/bin/g++
+   gmake CXX=/opt/csw/bin/g++
 
-   That should do it. Do not compile with gcc-45. It will mis-optimize
-   MiniSat2.
+   That should do it.
+
+   Do not attempt to compile with gcc-45 that comes with Solaris 11.
+   It will mis-optimize MiniSat2.
 
 
 COMPILATION ON MACOS X
