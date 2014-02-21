@@ -102,6 +102,18 @@ inline double __builtin_inf(void) { return 1.0/0.0; }
 
 inline long double __builtin_infl(void) { return 1.0l/0.0l; }
 
+/* FUNCTION: __builtin_isinf */
+
+inline int __builtin_isinf(double d) { return __CPROVER_isinfd(d); }
+
+/* FUNCTION: __builtin_isinff */
+
+inline int __builtin_isinff(float f) { return __CPROVER_isinff(f); }
+
+/* FUNCTION: __builtin_isinf */
+
+inline int __builtin_isinfl(long double ld) { return __CPROVER_isinfld(ld); }
+
 /* FUNCTION: __builtin_isnan */
 
 inline int __builtin_isnan(double d) { return __CPROVER_isnand(d); }
