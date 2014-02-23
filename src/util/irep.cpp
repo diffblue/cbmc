@@ -8,7 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cstdlib>
 #include <cassert>
-#include <stack>
 
 #ifdef IREP_DEBUG
 #include <iostream>
@@ -193,14 +192,12 @@ Function: irept::nonrecursive_destructor
 #ifdef SHARING
 void irept::nonrecursive_destructor(dt *old_data)
 {
-  std::stack<dt *> stack;
-  
-  stack.push(old_data);
+  std::vector<dt *> stack(1, old_data);
   
   while(!stack.empty())
   {
-    dt *d=stack.top();
-    stack.pop();
+    dt *d=stack.back();
+    stack.erase(--stack.end());
     if(d==&empty_d) continue;
     
     assert(d->ref_count!=0);
@@ -208,12 +205,17 @@ void irept::nonrecursive_destructor(dt *old_data)
 
     if(d->ref_count==0)
     {
+      stack.reserve(stack.size()+
+                    d->named_sub.size()+
+                    d->comments.size()+
+                    d->sub.size());
+
       for(named_subt::iterator
           it=d->named_sub.begin();
           it!=d->named_sub.end();
           it++)
       {
-        stack.push(it->second.data);
+        stack.push_back(it->second.data);
         it->second.data=&empty_d;
       }
       
@@ -222,7 +224,7 @@ void irept::nonrecursive_destructor(dt *old_data)
           it!=d->comments.end();
           it++)
       {
-        stack.push(it->second.data);
+        stack.push_back(it->second.data);
         it->second.data=&empty_d;
       }
       
@@ -231,7 +233,7 @@ void irept::nonrecursive_destructor(dt *old_data)
           it!=d->sub.end();
           it++)
       {
-        stack.push(it->data);
+        stack.push_back(it->data);
         it->data=&empty_d;
       }
       
