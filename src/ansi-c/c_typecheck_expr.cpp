@@ -1404,14 +1404,12 @@ void c_typecheck_baset::typecheck_expr_rel(exprt &expr)
     if(type0.id()==ID_pointer && is_number(type1))
     {
       op1.make_typecast(type0);
-      typecheck_expr_typecast(op1);
       return;
     }
 
     if(type1.id()==ID_pointer && is_number(type0))
     {
       op0.make_typecast(type1);
-      typecheck_expr_typecast(op0);
       return;
     }
 
