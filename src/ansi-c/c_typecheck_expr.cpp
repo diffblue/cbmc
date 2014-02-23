@@ -961,7 +961,7 @@ void c_typecheck_baset::typecheck_expr_alignof(exprt &expr)
   }
 
   // we only care about the type
-  unsigned a=alignment(argument_type, *this);
+  mp_integer a=alignment(argument_type, *this);
   
   exprt tmp=from_integer(a, size_type());
   tmp.location()=expr.location();

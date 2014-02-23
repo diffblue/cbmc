@@ -26,7 +26,7 @@ Function: alignment
 
 \*******************************************************************/
 
-unsigned alignment(const typet &type, const namespacet &ns)
+mp_integer alignment(const typet &type, const namespacet &ns)
 {
   // is the alignment given?
   const exprt &given_alignment=
@@ -36,7 +36,7 @@ unsigned alignment(const typet &type, const namespacet &ns)
   {
     mp_integer a_int;
     if(!to_integer(given_alignment, a_int))
-      return integer2long(a_int);
+      return a_int;
       // we trust it blindly, no matter how nonsensical
   }
 
@@ -51,7 +51,7 @@ unsigned alignment(const typet &type, const namespacet &ns)
     const struct_union_typet::componentst &components=
       to_struct_union_type(type).components();
 
-    unsigned result=1;
+    mp_integer result=1;
 
     // get the max
     // (should really be the smallest common denominator)
@@ -162,7 +162,7 @@ void add_padding(struct_typet &type, const namespacet &ns)
 
   mp_integer offset=0;
   unsigned padding_counter=0;
-  unsigned max_alignment=0;
+  mp_integer max_alignment=0;
   unsigned bit_field_bits=0;
 
   for(struct_typet::componentst::iterator
@@ -176,7 +176,7 @@ void add_padding(struct_typet &type, const namespacet &ns)
     if(it->get_is_bit_field())
     {
       // we consider the type for max_alignment, however
-      unsigned a=alignment(it->get_bit_field_type(), ns);
+      mp_integer a=alignment(it->get_bit_field_type(), ns);
       if(max_alignment<a) 
         max_alignment=a;
 
@@ -195,7 +195,7 @@ void add_padding(struct_typet &type, const namespacet &ns)
     }
     else
     {
-      unsigned a=alignment(it_type, ns);
+      mp_integer a=alignment(it_type, ns);
       
       // check minimum alignment
       if(a<config.ansi_c.alignment)
@@ -207,14 +207,14 @@ void add_padding(struct_typet &type, const namespacet &ns)
       if(a!=1)
       {
         // we may need to align it
-        unsigned displacement=integer2long(offset%a);
+        mp_integer displacement=offset%a;
 
         if(displacement!=0)
         {
-          unsigned pad=a-displacement;
+          mp_integer pad=a-displacement;
         
           unsignedbv_typet padding_type;
-          padding_type.set_width(pad*8);
+          padding_type.set_width(integer2unsigned(pad*8));
           
           struct_typet::componentt component;
           component.type()=padding_type;
@@ -252,7 +252,7 @@ void add_padding(struct_typet &type, const namespacet &ns)
       simplify(tmp, ns);
       mp_integer tmp_i;
       if(!to_integer(tmp, tmp_i) && tmp_i>max_alignment)
-        max_alignment=integer2long(tmp_i);
+        max_alignment=tmp_i;
     }
   }
 
@@ -262,14 +262,14 @@ void add_padding(struct_typet &type, const namespacet &ns)
   if(max_alignment>1)
   {
     // we may need to align it
-    unsigned displacement=integer2long(offset%max_alignment);
+    mp_integer displacement=offset%max_alignment;
 
     if(displacement!=0)
     {
-      unsigned pad=max_alignment-displacement;
+      mp_integer pad=max_alignment-displacement;
     
       unsignedbv_typet padding_type;
-      padding_type.set_width(pad*8);
+      padding_type.set_width(integer2unsigned(pad*8));
 
       // we insert after any final 'flexible member'
       struct_typet::componentt component;
