@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/base_type.h>
 #include <util/symbol.h>
+#include <util/simplify_expr.h>
 
 #include "c_typecast.h"
 #include "c_types.h"
@@ -549,7 +550,7 @@ void c_typecastt::implicit_typecast_followed(
   {
     // special case: 0 == NULL
 
-    if(expr.is_zero() && (
+    if(simplify_expr(expr, ns).is_zero() && (
        src_type.id()==ID_unsignedbv ||
        src_type.id()==ID_signedbv ||
        src_type.id()==ID_natural ||
