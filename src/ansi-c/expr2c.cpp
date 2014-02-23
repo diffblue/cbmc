@@ -579,11 +579,6 @@ std::string expr2ct::convert_typecast(
      from_type.id()==ID_unsignedbv)
     return convert(src.op(), precedence);
 
-  if(to_type.id()==ID_pointer &&
-     ns.follow(to_type.subtype()).id()==ID_empty && // to (void *)?
-     src.op0().is_zero())
-    return "NULL";
-
   std::string dest="("+convert(to_type)+")";
 
   unsigned p;
@@ -2079,7 +2074,7 @@ std::string expr2ct::convert_constant(
   }
   else if(type.id()==ID_pointer)
   {
-    if(src.is_zero())
+    if(to_constant_expr(src).get_value()==ID_NULL)
     {
       dest="NULL";
       if(type.subtype().id()!=ID_empty)
