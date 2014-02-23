@@ -411,6 +411,8 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
   //
   // Doesn't work for many, e.g., pointer difference, floating-point,
   // division, modulo.
+  // Also excludes ID_bitnot, which fails if the width of T
+  // is bigger than that of (x OP y).
   //
   if((expr_type.id()==ID_signedbv || expr_type.id()==ID_unsignedbv) &&
      (op_type.id()==ID_signedbv || op_type.id()==ID_unsignedbv))
@@ -419,7 +421,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
 
     if(op_id==ID_plus || op_id==ID_minus || op_id==ID_mult ||
        op_id==ID_unary_minus || 
-       op_id==ID_bitnot || op_id==ID_bitxor || op_id==ID_bitor || op_id==ID_bitand)
+       op_id==ID_bitxor || op_id==ID_bitor || op_id==ID_bitand)
     {
       exprt result=expr.op0();
       
