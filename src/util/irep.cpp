@@ -44,7 +44,7 @@ const irept &get_nil_irep()
 
 /*******************************************************************\
 
-Function: irept::detatch
+Function: irept::detach
 
   Inputs:
 
@@ -55,7 +55,7 @@ Function: irept::detatch
 \*******************************************************************/
 
 #ifdef SHARING
-void irept::detatch()
+void irept::detach()
 {
   #ifdef IREP_DEBUG
   std::cout << "DETATCH1: " << data << std::endl;
@@ -92,7 +92,7 @@ void irept::detatch()
 
 /*******************************************************************\
 
-Function: irept::recursive_detatch
+Function: irept::recursive_detach
 
   Inputs:
 
@@ -103,27 +103,27 @@ Function: irept::recursive_detatch
 \*******************************************************************/
 
 #ifdef SHARING
-void irept::recursive_detatch()
+void irept::recursive_detach()
 {
-  detatch();
+  detach();
   
   for(named_subt::iterator
       it=data->named_sub.begin();
       it!=data->named_sub.end();
       it++)
-    it->second.recursive_detatch();
+    it->second.recursive_detach();
     
   for(named_subt::iterator
       it=data->comments.begin();
       it!=data->comments.end();
       it++)
-    it->second.recursive_detatch();
+    it->second.recursive_detach();
     
   for(subt::iterator
       it=data->sub.begin();
       it!=data->sub.end();
       it++)
-    it->recursive_detatch();
+    it->recursive_detach();
 }
 #endif
 
@@ -281,7 +281,7 @@ Function: irept::move_to_named_sub
 void irept::move_to_named_sub(const irep_namet &name, irept &irep)
 {
   #ifdef SHARING
-  detatch();
+  detach();
   #endif
   add(name).swap(irep);
   irep.clear();
@@ -302,7 +302,7 @@ Function: irept::move_to_sub
 void irept::move_to_sub(irept &irep)
 {
   #ifdef SHARING
-  detatch();
+  detach();
   #endif
   get_sub().push_back(get_nil_irep());
   get_sub().back().swap(irep);

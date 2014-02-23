@@ -313,7 +313,7 @@ protected:
   
   static void remove_ref(dt *old_data);  
   static void nonrecursive_destructor(dt *old_data);
-  void detatch();
+  void detach();
 
 public:  
   inline const dt &read() const
@@ -323,14 +323,14 @@ public:
 
   inline dt &write()
   {
-    detatch();
+    detach();
     #ifdef HASH_CODE
     data->hash_code=0;
     #endif
     return *data;
   }
   
-  void recursive_detatch();
+  void recursive_detach();
   
   #else
   dt data;
