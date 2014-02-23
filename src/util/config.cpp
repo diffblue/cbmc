@@ -1048,6 +1048,9 @@ void configt::ansi_ct::set_from_symbol_table(const symbol_tablet &symbol_table)
 
   //memory_operand_size=from_ns(ns, "memory_operand_size");
   memory_operand_size=int_width/8;
+  
+  //NULL_is_zero=from_ns("NULL_is_zero");
+  NULL_is_zero=true;
 }
 
 /*******************************************************************\
