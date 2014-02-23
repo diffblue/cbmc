@@ -1179,7 +1179,7 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
 
   // special case: NULL
   if(expr_type.id()==ID_pointer &&
-     op.is_zero())
+     simplify_expr(op, *this).is_zero())
   {
     // zero typecasted to a pointer is NULL
     constant_exprt result(ID_NULL, expr_type);
@@ -1400,31 +1400,18 @@ void c_typecheck_baset::typecheck_expr_rel(exprt &expr)
   }
   else
   {
-    // pointer and zero
-    if(type0.id()==ID_pointer && op1.is_zero())
-    {
-      op1=constant_exprt(type0);
-      op1.set(ID_value, ID_NULL);
-      return;
-    }
-
-    if(type1.id()==ID_pointer && op0.is_zero())
-    {
-      op0=constant_exprt(type1);
-      op0.set(ID_value, ID_NULL);
-      return;
-    }
-
     // pointer and integer
     if(type0.id()==ID_pointer && is_number(type1))
     {
       op1.make_typecast(type0);
+      typecheck_expr_typecast(op1);
       return;
     }
 
     if(type1.id()==ID_pointer && is_number(type0))
     {
       op0.make_typecast(type1);
+      typecheck_expr_typecast(op0);
       return;
     }
 
