@@ -316,6 +316,8 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
     return false;
   }
   
+  #if 0
+  // should be architecture-specific constant
   // casts from NULL to any integer
   if(op_type.id()==ID_pointer &&
      expr.op0().is_constant() &&
@@ -326,6 +328,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
     expr.swap(tmp);
     return false;
   }
+  #endif
   
   // casts from pointer to integer
   // where width of integer >= width of pointer
@@ -785,10 +788,15 @@ static bool is_dereference_integer_object(
        !to_integer(expr.op0().op0(), address))
       return true;
 
-    if(expr.op0().is_zero()) // NULL
+    if(expr.op0().is_constant())
     {
-      address=0;
-      return true;
+      /*if(to_constant_expr(expr.op0()).get_value()==ID_NULL) // NULL
+      {
+        address=XXX; // architecture-specific constant
+        return true;
+      }
+      else*/ if(!to_integer(expr.op0(), address))
+        return true;
     }
   }
   
@@ -3520,7 +3528,7 @@ bool simplify_exprt::simplify_inequality_constant(exprt &expr)
         // note that 'ptr' may be an integer
         exprt op=expr.op0().op0();
         expr.op0().swap(op);
-        expr.op1()=gen_zero(expr.op0().type());
+        expr.op1().type()=expr.op0().type();
         simplify_inequality(expr); // do again!
         return false;
       }

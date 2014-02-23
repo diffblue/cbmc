@@ -307,7 +307,6 @@ void bv_pointerst::convert_pointer_type(const exprt &expr, bvt &bv)
             op_type.id()==ID_c_enum)
     {
       // Cast from integer to pointer.
-      // We need to be able to convert the integer 0 to NULL.
       // We just do a zero extension.
       
       const bvt &op_bv=convert_bv(op);
