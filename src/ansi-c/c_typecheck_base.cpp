@@ -121,17 +121,16 @@ void c_typecheck_baset::typecheck_symbol(symbolt &symbol)
   // set a few flags
   symbol.is_lvalue=!symbol.is_type && !symbol.is_macro;
   
-  std::string prefix="c::";
-  std::string root_name=prefix+id2string(symbol.base_name);
-  std::string new_name=id2string(symbol.name);
+  irep_idt root_name=add_language_prefix(symbol.base_name);
+  irep_idt new_name=symbol.name;
 
   // do anon-tags first
   if(symbol.is_type &&
-     has_prefix(id2string(symbol.name), prefix+"tag-#anon"))
+     has_prefix(id2string(symbol.name), language_prefix+"tag-#anon"))
   {    
     // we rename them to make collisions unproblematic
     std::string typestr=type2name(symbol.type);
-    new_name=prefix+"tag-#anon#"+typestr;
+    new_name=add_language_prefix("tag-#anon#"+typestr);
     
     id_replace_map[symbol.name]=new_name;    
 
@@ -204,7 +203,7 @@ void c_typecheck_baset::typecheck_symbol(symbolt &symbol)
   {
     // just strip the c::
     symbol.pretty_name=
-      std::string(new_name, prefix.size(), std::string::npos);
+      std::string(id2string(new_name), language_prefix.size(), std::string::npos);
   }
   
   // see if we have it already
