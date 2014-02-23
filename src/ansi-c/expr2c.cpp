@@ -2074,7 +2074,16 @@ std::string expr2ct::convert_constant(
   }
   else if(type.id()==ID_pointer)
   {
-    if(to_constant_expr(src).get_value()==ID_NULL)
+    const irep_idt &value=to_constant_expr(src).get_value();
+    
+    if(value==ID_NULL)
+    {
+      dest="NULL";
+      if(type.subtype().id()!=ID_empty)
+        dest="(("+convert(type)+")"+dest+")";
+    }
+    else if(value==std::string(value.size(), '0') &&
+            config.ansi_c.NULL_is_zero)
     {
       dest="NULL";
       if(type.subtype().id()!=ID_empty)
