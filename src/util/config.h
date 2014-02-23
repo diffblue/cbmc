@@ -77,6 +77,9 @@ public:
                    ARCH_IA64, ARCH_X32 } archt;
     archt arch;
 
+    // architecture-specific integer value of null pointer constant
+    bool NULL_is_zero;
+
     void set_arch_spec_i386();
     void set_arch_spec_x86_64();
     void set_arch_spec_power(const irep_idt &subarch);
