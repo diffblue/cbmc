@@ -316,19 +316,17 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
     return false;
   }
   
-  #if 0
-  // should be architecture-specific constant
   // casts from NULL to any integer
   if(op_type.id()==ID_pointer &&
      expr.op0().is_constant() &&
      to_constant_expr(expr.op0()).get_value()==ID_NULL &&
-     (expr_type.id()==ID_unsignedbv || expr_type.id()==ID_signedbv))
+     (expr_type.id()==ID_unsignedbv || expr_type.id()==ID_signedbv) &&
+     config.ansi_c.NULL_is_zero)
   {
     exprt tmp=gen_zero(expr_type);
     expr.swap(tmp);
     return false;
   }
-  #endif
   
   // casts from pointer to integer
   // where width of integer >= width of pointer
@@ -790,12 +788,13 @@ static bool is_dereference_integer_object(
 
     if(expr.op0().is_constant())
     {
-      /*if(to_constant_expr(expr.op0()).get_value()==ID_NULL) // NULL
+      if(to_constant_expr(expr.op0()).get_value()==ID_NULL &&
+         config.ansi_c.NULL_is_zero) // NULL
       {
-        address=XXX; // architecture-specific constant
+        address=0;
         return true;
       }
-      else*/ if(!to_integer(expr.op0(), address))
+      else if(!to_integer(expr.op0(), address))
         return true;
     }
   }
