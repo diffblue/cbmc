@@ -6,12 +6,12 @@ INCLUDES= -I ..
 include ../config.inc
 include ../common
 
-CLEANFILES = path-symex$(LIBEXT)
+CLEANFILES = aa-path-symex$(LIBEXT)
 
-all: path-symex$(LIBEXT)
+all: aa-path-symex$(LIBEXT)
 
 ###############################################################################
 
-path-symex$(LIBEXT): $(OBJ)
+aa-path-symex$(LIBEXT): $(OBJ)
 	$(LINKLIB)
 
