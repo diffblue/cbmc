@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <cassert>
-#include <cstdlib>
 
+#include <util/string2int.h>
 #include <util/expr_util.h>
 #include <util/c_misc.h>
 #include <util/base_type.h>
@@ -775,7 +775,7 @@ Function: value_set_dereferencet::memory_model
 
 inline static unsigned bv_width(const typet &type)
 {
-  return atoi(type.get(ID_width).c_str());
+  return unsafe_string2unsigned(type.get_string(ID_width));
 }
 
 static bool is_a_bv_type(const typet &type)

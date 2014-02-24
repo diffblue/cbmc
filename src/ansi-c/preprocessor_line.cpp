@@ -6,9 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <cstdlib>
 #include <cctype>
 
+#include <util/string2int.h>
 #include <util/parser.h>
 
 #include "literals/unescape_string.h"
@@ -62,7 +62,7 @@ void preprocessor_line(
   // skip until "
   while(*ptr!='\n' && *ptr!='"') ptr++;
 
-  parser.set_line_no(atoi(line_number.c_str()));
+  parser.set_line_no(unsafe_string2unsigned(line_number));
 
   // skip "
   if(*ptr!='"')

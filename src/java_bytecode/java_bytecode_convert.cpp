@@ -12,10 +12,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 #endif
 
-#include <cstdlib>
 #include <set>
 #include <stack>
 
+#include <util/string2int.h>
 #include <util/std_expr.h>
 #include <util/arith_tools.h>
 #include <util/i2string.h>
@@ -100,7 +100,7 @@ protected:
   symbol_exprt variable(const exprt &arg, char type_char)
   {
     irep_idt number=to_constant_expr(arg).get_value();
-    std::string prefix=((unsigned)atoi(number.c_str())<number_of_parameters)?"arg":"local";
+    std::string prefix=(unsafe_string2unsigned(id2string(number))<number_of_parameters)?"arg":"local";
     irep_idt base_name=prefix+id2string(number)+type_char;
     irep_idt identifier=id2string(current_method)+"::"+id2string(base_name);
     symbol_exprt result(identifier, java_type(type_char));

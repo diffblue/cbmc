@@ -8,9 +8,9 @@ Date: May 2007
 
 \*******************************************************************/
 
-#include <cstdlib>
 #include <iostream>
 
+#include <util/string2int.h>
 #include <util/i2string.h>
 
 #include "goto_program_irep.h"
@@ -87,7 +87,7 @@ void convert(const irept &irep, goto_programt::instructiont &instruction)
   instruction.function = irep.find(ID_function).id();
   instruction.location = static_cast<const locationt&>(irep.find(ID_location));    
   instruction.type = static_cast<goto_program_instruction_typet>(
-                  atoi(irep.find(ID_type).id_string().c_str()));
+                  unsafe_string2unsigned(irep.find(ID_type).id_string()));
   instruction.guard = static_cast<const exprt&>(irep.find(ID_guard));
   
   // don't touch the targets, the goto_programt conversion does that
@@ -165,7 +165,7 @@ void convert( const irept &irep, goto_programt &program )
          tit++)
     {     
       number_targets_list.back().push_back(
-          atoi(tit->id_string().c_str()));      
+          unsafe_string2unsigned(tit->id_string()));
     }
   }
   

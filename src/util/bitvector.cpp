@@ -6,10 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <cstdlib>
-
-#include "bitvector.h"
+#include "string2int.h"
 #include "type.h"
+#include "bitvector.h"
 
 /*******************************************************************\
 
@@ -49,7 +48,7 @@ Function: bv_width
 
 unsigned bv_width(const typet &type)
 {
-  return atoi(type.get(ID_width).c_str());
+  return unsafe_string2unsigned(type.get_string(ID_width));
 }
 
 

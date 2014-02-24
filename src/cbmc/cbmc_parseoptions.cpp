@@ -9,8 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <fstream>
 #include <iostream>
 #include <memory>
-#include <cstdlib>
 
+#include <util/string2int.h>
 #include <util/config.h>
 #include <util/expr_util.h>
 #include <util/language.h>
@@ -100,7 +100,7 @@ void cbmc_parseoptionst::eval_verbosity()
   
   if(cmdline.isset("verbosity"))
   {
-    v=atoi(cmdline.getval("verbosity"));
+    v=unsafe_string2int(cmdline.getval("verbosity"));
     if(v<0)
       v=0;
     else if(v>10)

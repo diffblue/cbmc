@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <map>
 #include <list>
 
+#include <util/string2int.h>
 #include <util/config.h>
 #include <util/hash_cont.h>
 #include <util/language.h>
@@ -596,7 +597,7 @@ goto_programt::const_targett goto_program2codet::convert_assign(
 
             if(trail == mask_value.size())
             {
-              unsigned shl = atoi(right.get(ID_C_cformat).c_str());
+              unsigned shl = unsafe_string2unsigned(right.get_string(ID_C_cformat));
 
               if(r == shl)
               {
