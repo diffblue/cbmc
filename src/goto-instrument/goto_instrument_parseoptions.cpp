@@ -9,10 +9,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <fstream>
 #include <iostream>
 #include <memory>
-#include <cstdlib>
 
 #include <util/config.h>
 #include <util/expr_util.h>
+#include <util/string2int.h>
 
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/remove_function_pointers.h>
@@ -90,7 +90,7 @@ void goto_instrument_parseoptionst::eval_verbosity()
   
   if(cmdline.isset("verbosity"))
   {
-    v=atoi(cmdline.getval("verbosity"));
+    v=unsafe_string2int(cmdline.getval("verbosity"));
     if(v<0)
       v=0;
     else if(v>9)
@@ -653,7 +653,7 @@ void goto_instrument_parseoptionst::instrument_goto_program(
   {
     status() << "Adding check for maximum call stack size" << eom;
     stack_depth(symbol_table, goto_functions,
-        atoi(cmdline.getval("stack-depth")));
+        unsafe_string2unsigned(cmdline.getval("stack-depth")));
   }
 
   // ignore default/user-specified initialization of variables with static
@@ -730,11 +730,11 @@ void goto_instrument_parseoptionst::instrument_goto_program(
         inst_strategy=all;
       
       const unsigned unwind_loops = 
-        ( cmdline.isset("unwind")?atoi(cmdline.getval("unwind")):0 );
+        ( cmdline.isset("unwind")?unsafe_string2unsigned(cmdline.getval("unwind")):0 );
       const unsigned max_var =
-        ( cmdline.isset("max-var")?atoi(cmdline.getval("max-var")):0 );
+        ( cmdline.isset("max-var")?unsafe_string2unsigned(cmdline.getval("max-var")):0 );
       const unsigned max_po_trans =
-        ( cmdline.isset("max-po-trans")?atoi(cmdline.getval("max-po-trans")):0 );
+        ( cmdline.isset("max-po-trans")?unsafe_string2unsigned(cmdline.getval("max-po-trans")):0 );
 
       if(mm=="tso")
       {
@@ -835,7 +835,7 @@ void goto_instrument_parseoptionst::instrument_goto_program(
     else if(!step_case && !base_case)
       throw "please specify one of --step-case and --base-case";
 
-    unsigned k=atoi(cmdline.getval("k-induction"));
+    unsigned k=unsafe_string2unsigned(cmdline.getval("k-induction"));
     
     if(k==0)
       throw "please give k>=1";

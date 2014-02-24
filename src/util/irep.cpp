@@ -6,13 +6,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <cstdlib>
 #include <cassert>
 
 #ifdef IREP_DEBUG
 #include <iostream>
 #endif
 
+#include "string2int.h"
 #include "irep.h"
 #include "i2string.h"
 #include "string_hash.h"
@@ -350,7 +350,7 @@ Function: irept::get_bool
 
 bool irept::get_bool(const irep_namet &name) const
 {
-  return atoi(get(name).c_str())!=0;
+  return unsafe_string2int(get_string(name))!=0;
 }
 
 /*******************************************************************\
@@ -367,7 +367,7 @@ Function: irept::get_int
 
 int irept::get_int(const irep_namet &name) const
 {
-  return atoi(get(name).c_str());
+  return unsafe_string2int(get_string(name));
 }
 
 /*******************************************************************\
@@ -384,11 +384,7 @@ Function: irept::get_long_long
 
 long long irept::get_long_long(const irep_namet &name) const
 {
-  #ifdef _MSC_VER
-  return _atoi64(get(name).c_str());
-  #else
-  return atoll(get(name).c_str());
-  #endif
+  return unsafe_string2signedlonglong(get_string(name));
 }
 
 /*******************************************************************\

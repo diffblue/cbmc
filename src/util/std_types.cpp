@@ -6,8 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <cstdlib>
-
+#include "string2int.h"
 #include "arith_tools.h"
 #include "std_types.h"
 #include "std_expr.h"
@@ -45,7 +44,7 @@ unsigned fixedbv_typet::get_integer_bits() const
 {
   const std::string &integer_bits=get_string("integer_bits");
   assert(integer_bits!="");
-  return atoi(integer_bits.c_str());
+  return unsafe_string2unsigned(integer_bits);
 }
 
 /*******************************************************************\
@@ -64,7 +63,7 @@ unsigned floatbv_typet::get_f() const
 {
   const std::string &f=get_string(ID_f);
   assert(f!="");
-  return atoi(f.c_str());
+  return unsafe_string2unsigned(f);
 }
 
 /*******************************************************************\

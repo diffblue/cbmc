@@ -7,8 +7,8 @@ Author: CM Wintersteiger, 2006
 \*******************************************************************/
 
 #include <iostream>
-#include <cstdlib>
 
+#include <util/string2int.h>
 #include <util/message.h>
 #include <util/prefix.h>
 #include <util/config.h>
@@ -49,7 +49,7 @@ bool armcc_modet::doit()
   #endif
 
   if(cmdline.isset("verbosity"))
-    verbosity=atoi(cmdline.getval("verbosity"));
+    verbosity=unsafe_string2int(cmdline.getval("verbosity"));
 
   compiler.set_verbosity(verbosity);
   set_verbosity(verbosity);

@@ -7,10 +7,10 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <fstream>
-#include <cstdlib>
 #include <iostream>
 #include <memory>
 
+#include <util/string2int.h>
 #include <util/i2string.h>
 #include <util/location.h>
 #include <util/time_stopping.h>
@@ -585,14 +585,14 @@ void bmct::setup_unwind()
        val.find(":")!=std::string::npos)
     {
       std::string nr=val.substr(0, val.find(":"));
-      thread_nr=atol(nr.c_str());
+      thread_nr=unsafe_string2unsigned(nr);
       val.erase(0, nr.size()+1);
     }
 
     if(val.rfind(":")!=std::string::npos)
     {
       std::string id=val.substr(0, val.rfind(":"));
-      long uw=atol(val.substr(val.rfind(":")+1).c_str());
+      long uw=unsafe_string2int(val.substr(val.rfind(":")+1));
 
       symex.set_unwind_limit(id, thread_nr, uw);
     }

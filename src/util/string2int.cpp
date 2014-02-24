@@ -186,3 +186,37 @@ unsigned unsafe_string2unsigned(const std::string &str, int base)
   return str2number<unsigned>(str.c_str(), base, false);
 }
 
+/*******************************************************************\
+
+Function: unsafe_string2signedlonglong
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+signed long long int unsafe_string2signedlonglong(const std::string &str, int base)
+{
+  return str2number<signed long long int>(str.c_str(), base, false);
+}
+
+/*******************************************************************\
+
+Function: unsafe_string2unsignedlonglong
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+unsigned long long int unsafe_string2unsignedlonglong(const std::string &str, int base)
+{
+  return str2number<unsigned long long int>(str.c_str(), base, false);
+}
+

@@ -533,7 +533,7 @@ void goto_symext::symex_trace(
   if(code.arguments().size()<2)
     throw "CBMC_trace expects at least two arguments";
 
-  int debug_thresh=atol(options.get_option("debug-level").c_str());
+  int debug_thresh=unsafe_string2int(options.get_option("debug-level"));
   
   mp_integer debug_lvl;
 

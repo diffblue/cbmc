@@ -8,8 +8,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <iostream>
 #include <fstream>
-#include <cstdlib>
 
+#include <util/string2int.h>
 #include <util/config.h>
 #include <util/language.h>
 #include <util/options.h>
@@ -75,7 +75,7 @@ void symex_parseoptionst::eval_verbosity()
   
   if(cmdline.isset("verbosity"))
   {
-    v=atoi(cmdline.getval("verbosity"));
+    v=unsafe_string2int(cmdline.getval("verbosity"));
     if(v<0)
       v=0;
     else if(v>10)
@@ -239,13 +239,13 @@ int symex_parseoptionst::doit()
     path_search.set_verbosity(get_verbosity());
 
     if(cmdline.isset("depth"))
-      path_search.depth_limit=atoi(cmdline.getval("depth"));
+      path_search.depth_limit=unsafe_string2unsigned(cmdline.getval("depth"));
 
     if(cmdline.isset("context-bound"))
-      path_search.context_bound=atoi(cmdline.getval("context-bound"));
+      path_search.context_bound=unsafe_string2unsigned(cmdline.getval("context-bound"));
 
     if(cmdline.isset("unwind"))
-      path_search.unwind_limit=atoi(cmdline.getval("unwind"));
+      path_search.unwind_limit=unsafe_string2unsigned(cmdline.getval("unwind"));
 
     if(cmdline.isset("show-vcc"))
     {

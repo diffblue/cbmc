@@ -19,12 +19,19 @@ unsigned safe_str2unsigned(const char *str, int base=10);
 int safe_string2int(const std::string &str, int base=10);
 unsigned safe_string2unsigned(const std::string &str, int base=10);
 
-// These mimick atoi/atol: any errors are silently ignored.
+// The safe_* functions will eventually go away, and will be replaced
+// by C++11 std::stoi, std::stol, std::stoll, std::stoul and so on.
+
+// The below mimick C's atoi/atol: any errors are silently ignored.
 // They are meant to replace atoi/atol.
 int unsafe_str2int(const char *str, int base=10);
 unsigned unsafe_str2unsigned(const char *str, int base=10);
 
 int unsafe_string2int(const std::string &str, int base=10);
 unsigned unsafe_string2unsigned(const std::string &str, int base=10);
+
+// Same for atoll
+long long int unsafe_string2signedlonglong(const std::string &str, int base=10);
+long long unsigned int unsafe_string2unsignedlonglong(const std::string &str, int base=10);
 
 #endif
