@@ -12,7 +12,7 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
        ../util/util$(LIBEXT) \
        ../goto-symex/adjust_float_expressions$(OBJEXT) \
        ../pointer-analysis/dereference$(OBJEXT) \
-       ../path-symex/path-symex$(LIBEXT)
+       ../aa-path-symex/aa-path-symex$(LIBEXT)
 
 INCLUDES= -I ..
 
