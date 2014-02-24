@@ -7,6 +7,7 @@ Author: CM Wintersteiger, 2006
 \*******************************************************************/
 
 #include <cstdio>
+#include <cstdlib> // exit()
 #include <iostream>
 
 #include <util/string2int.h>
