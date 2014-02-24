@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <iostream>
 #include <fstream>
+#include <cstdlib>
 
 #include <util/string2int.h>
 #include <util/config.h>
@@ -102,7 +103,7 @@ void symex_parseoptionst::get_command_line_options(optionst &options)
   if(config.set(cmdline))
   {
     usage_error();
-    exit(1);
+    std::exit(1);
   }
 
   if(cmdline.isset("debug-level"))
