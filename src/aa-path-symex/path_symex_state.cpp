@@ -3,6 +3,7 @@
 Module: State of path-based symbolic simulator
 
 Author: Daniel Kroening, kroening@kroening.com
+        Alex Horn, alex.horn@cs.ox.ac.uk
 
 \*******************************************************************/
 

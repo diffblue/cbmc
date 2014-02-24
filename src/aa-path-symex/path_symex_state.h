@@ -3,6 +3,7 @@
 Module: State of path-based symbolic simulator
 
 Author: Daniel Kroening, kroening@kroening.com
+        Alex Horn, alex.horn@cs.ox.ac.uk
 
 \*******************************************************************/
 
@@ -13,7 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "var_map.h"
 #include "path_symex_history.h"
 
-struct path_symex_statet
+class path_symex_statet
 {
 public:
   inline path_symex_statet(
@@ -22,18 +23,65 @@ public:
     path_symex_historyt &_path_symex_history):
     var_map(_var_map),
     locs(_locs),
+    branches(),
+    branches_restore(0),
+    shared_vars(),
+    threads(),
     inside_atomic_section(false),
     history(_path_symex_history),
+    unwinding_map(),
+    recursion_map(),
     current_thread(0),
     no_thread_interleavings(0),
     depth(0)
   {
   }
 
+  // eagerly copy all fields including vectors etc.
+  path_symex_statet(const path_symex_statet& other):
+    var_map(other.var_map),
+    locs(other.locs),
+    branches(other.branches),
+    branches_restore(other.branches_restore),
+    shared_vars(other.shared_vars),
+    threads(other.threads),
+    inside_atomic_section(other.inside_atomic_section),
+    history(other.history),
+    unwinding_map(other.unwinding_map),
+    recursion_map(other.recursion_map),
+    current_thread(other.current_thread),
+    no_thread_interleavings(other.no_thread_interleavings),
+    depth(other.depth)
+  {
+  }
+
+  static path_symex_statet lazy_copy(const path_symex_statet& other)
+  {
+    // allow compiler to use RVO
+    return path_symex_statet(
+      other.var_map,
+      other.locs,
+      other.branches,
+      other.inside_atomic_section,
+      other.history,
+      other.current_thread,
+      other.no_thread_interleavings,
+      other.depth);
+  }
+
   // These are tied to a particular var_map
   // and a particular program.
   var_mapt &var_map;
   const locst &locs;
+
+  // use symbolic execution to repopulate composite fields
+
+  // TODO: consider std::bitset or chaining to shrink state size
+  typedef std::vector<bool> branchest;
+  branchest branches;
+
+  // restored state up to strictly less than this index
+  branchest::size_type branches_restore;
 
   // the value of a variable
   struct var_statet
@@ -102,7 +150,19 @@ public:
   }
   
   goto_programt::const_targett get_instruction() const;
-  
+
+  inline bool is_lazy() const
+  {
+    return branches_restore < branches.size();
+  }
+
+  // returns branch direction that should be taken
+  bool restore_branch()
+  {
+    assert(is_lazy());
+    return branches[branches_restore++];
+  }
+
   inline bool is_executable() const
   {
     return !threads.empty() &&
@@ -186,6 +246,32 @@ public:
   recursion_mapt recursion_map;
 
 protected:
+  // initialize composite fields to be empty
+  path_symex_statet(
+    var_mapt &_var_map,
+    const locst &_locs,
+    const branchest &_branches,
+    bool _inside_atomic_section,
+    path_symex_step_reft _history,
+    unsigned _current_thread,
+    unsigned _no_thread_interleavings,
+    unsigned _depth):
+    var_map(_var_map),
+    locs(_locs),
+    branches(_branches),
+    branches_restore(0),
+    shared_vars(/* lazy */),
+    threads(/* lazy */),
+    inside_atomic_section(_inside_atomic_section),
+    history(_history),
+    unwinding_map(/* lazy */),
+    recursion_map(/* lazy */),
+    current_thread(_current_thread),
+    no_thread_interleavings(_no_thread_interleavings),
+    depth(_depth)
+  {
+  }
+
   unsigned current_thread;
   unsigned no_thread_interleavings;
   unsigned depth;
