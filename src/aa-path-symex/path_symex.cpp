@@ -3,6 +3,7 @@
 Module: Concrete Symbolic Transformer
 
 Author: Daniel Kroening, kroening@kroening.com
+        Alex Horn, alex.horn@cs.ox.ac.uk
 
 \*******************************************************************/
 
@@ -25,6 +26,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifdef DEBUG
 #include <iostream>
 #endif
+
+#define STATELESS_PATH_SYMEX 1
 
 class path_symext
 {
@@ -726,22 +729,36 @@ void path_symext::function_call_rec(
   {
     const if_exprt &if_expr=to_if_expr(function);
     exprt guard=if_expr.cond();
-    
-    // add a 'further state' for the false-case
-    
-    {
-      further_states.push_back(state);
-      path_symex_statet &false_state=further_states.back();
-      false_state.record_step();
-      false_state.history->guard=not_exprt(guard);
-      function_call_rec(further_states.back(), call, if_expr.false_case(), further_states);
-    }
 
-    // do the true-case in 'state'
+    if (state.is_lazy())
     {
-      state.record_step();
-      state.history->guard=guard;
-      function_call_rec(state, call, if_expr.true_case(), further_states);
+      const exprt &case_expr=state.restore_branch()?
+        if_expr.true_case():if_expr.false_case();
+      function_call_rec(state, call, case_expr, further_states);
+    }
+    else
+    {
+      {
+        // add a 'further state' for the false-case
+#ifdef STATELESS_PATH_SYMEX
+        further_states.push_back(path_symex_statet::lazy_copy(state));
+#else
+        further_states.push_back(state);
+#endif
+        path_symex_statet &false_state=further_states.back();
+        false_state.record_step();
+        false_state.history->guard=not_exprt(guard);
+        false_state.branches.push_back(false);
+        function_call_rec(further_states.back(), call, if_expr.false_case(), further_states);
+      }
+
+      // do the true-case in 'state'
+      {
+        state.record_step();
+        state.history->guard=guard;
+        state.branches.push_back(true);
+        function_call_rec(state, call, if_expr.true_case(), further_states);
+      }
     }
   }
   else
@@ -833,6 +850,7 @@ void path_symext::do_goto(
     further_states.back().record_step();
     further_states.back().set_pc(loc.branch_target);
     further_states.back().history->guard=guard;
+    further_states.back().branches.push_back(true);
   }
 
   // branch not taken case
@@ -840,6 +858,7 @@ void path_symext::do_goto(
   state.record_step();
   state.next_pc();
   state.history->guard=negated_guard;
+  state.branches.push_back(false);
 }
 
 /*******************************************************************\
@@ -952,7 +971,10 @@ void path_symext::operator()(
     break;
     
   case GOTO:
-    do_goto(state, further_states);
+    if (state.is_lazy())
+      do_goto(state, state.restore_branch());
+    else
+      do_goto(state, further_states);
     break;
     
   case CATCH:
