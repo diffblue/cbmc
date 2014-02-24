@@ -7,6 +7,7 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <fstream>
+#include <cstdlib> // exit()
 #include <iostream>
 #include <memory>
 
