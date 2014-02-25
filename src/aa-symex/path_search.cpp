@@ -59,20 +59,32 @@ path_searcht::resultt path_searcht::operator()(
     // according to some heuristic.
     queuet::iterator state=pick_state();
 
-    // restore all fields of a lazy state by symbolic
-    // execution along previously recorded branch decisions
-    const queuet::size_type queue_size=queue.size();
-    for(; state->is_lazy() && state->is_executable();
-          number_of_fast_forward_steps++)
+    // fast forwarding required?
+    if(state->is_lazy())
     {
-      path_symex(*state, queue);
-      status() << "Fast forward thread " << state->get_current_thread()
-               << "/" << state->threads.size()
-               << " PC " << state->pc() << messaget::eom;
-    }
+      assert(state->is_executable());
 
-    // queue does not change during fast forwarding
-    assert(queue.size() == queue_size);
+      // keep allocated memory, this is faster than
+      // instantiating a new empty vector and map
+      history.clear();
+      var_map.clear();
+      state->history=path_symex_step_reft(history);
+
+      // restore all fields of a lazy state by symbolic
+      // execution along previously recorded branches
+      const queuet::size_type queue_size=queue.size();
+      do
+      {
+        number_of_fast_forward_steps++;
+
+        path_symex(*state, queue);
+        status() << "Fast forward thread " << state->get_current_thread()
+                 << "/" << state->threads.size()
+                 << " PC " << state->pc() << messaget::eom;
+      }
+      while(state->is_lazy() && state->is_executable());
+      assert(queue.size() == queue_size);
+    }
     
     // TODO: check lazy states before fast forwarding, or perhaps it
     // is better to even check before inserting into queue
