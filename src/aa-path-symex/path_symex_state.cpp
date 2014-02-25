@@ -661,10 +661,6 @@ void path_symex_statet::record_step()
     
   // update our statistics
   depth++;
-  
-  // we've already recorded the history
-  if(is_lazy())
-    return;
 
   // add the step
   history.generate_successor();
