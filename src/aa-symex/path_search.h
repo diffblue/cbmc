@@ -13,7 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/safety_checker.h>
 
-#include <path-symex/path_symex_state.h>
+#include <aa-path-symex/path_symex_state.h>
 
 class path_searcht:public safety_checkert
 {
