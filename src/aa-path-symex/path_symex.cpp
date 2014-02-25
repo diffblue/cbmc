@@ -850,13 +850,13 @@ void path_symext::do_goto(
     further_states.push_back(state);
 #endif
 
-    further_states.back().record_step();
     further_states.back().record_true_branch();
-
     if(!further_states.back().is_lazy())
+    {
+      further_states.back().record_step();
       further_states.back().set_pc(loc.branch_target);
-
-    further_states.back().history->guard=guard;
+      further_states.back().history->guard=guard;
+    }
   }
 
   // branch not taken case

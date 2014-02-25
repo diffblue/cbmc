@@ -49,13 +49,14 @@ public:
   }
 
   // like initial state except that branches are copied from "other"
+  // and history.is_nil()
   static path_symex_statet lazy_copy(const path_symex_statet& other)
   {
     // allow compiler to use RVO
     return path_symex_statet(
       other.var_map,
       other.locs,
-      other.history,
+      path_symex_step_reft(),
       other.branches);
   }
 

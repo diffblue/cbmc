@@ -63,6 +63,7 @@ path_searcht::resultt path_searcht::operator()(
     if(state->is_lazy())
     {
       assert(state->is_executable());
+      assert(state->history.is_nil());
 
       // keep allocated memory, this is faster than
       // instantiating a new empty vector and map
