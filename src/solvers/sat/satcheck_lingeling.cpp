@@ -217,3 +217,21 @@ void satcheck_lingelingt::set_assumptions(const bvt &bv)
     assert(!it->is_constant());
 }
 
+/*******************************************************************\
+
+Function: satcheck_lingelingt::set_frozen
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void satcheck_lingelingt::set_frozen(literalt a)
+{
+  assert(!a.is_constant());
+  lglfreeze(solver,a.dimacs());
+}
+
