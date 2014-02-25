@@ -41,6 +41,7 @@ public:
   unsigned number_of_VCCs;
   unsigned number_of_VCCs_after_simplification;
   unsigned number_of_failed_properties;
+  unsigned number_of_fast_forward_steps;
   absolute_timet start_time;
   time_periodt sat_time;
 

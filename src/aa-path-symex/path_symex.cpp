@@ -27,7 +27,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 #endif
 
-#define STATELESS_PATH_SYMEX 1
+#define STATELESS_PATH_SYMEX
 
 class path_symext
 {
@@ -740,15 +740,11 @@ void path_symext::function_call_rec(
     {
       {
         // add a 'further state' for the false-case
-#ifdef STATELESS_PATH_SYMEX
-        further_states.push_back(path_symex_statet::lazy_copy(state));
-#else
         further_states.push_back(state);
-#endif
         path_symex_statet &false_state=further_states.back();
         false_state.record_step();
         false_state.history->guard=not_exprt(guard);
-        false_state.branches.push_back(false);
+        false_state.record_false_branch();
         function_call_rec(further_states.back(), call, if_expr.false_case(), further_states);
       }
 
@@ -756,7 +752,7 @@ void path_symext::function_call_rec(
       {
         state.record_step();
         state.history->guard=guard;
-        state.branches.push_back(true);
+        state.record_true_branch();
         function_call_rec(state, call, if_expr.true_case(), further_states);
       }
     }
@@ -845,20 +841,30 @@ void path_symext::do_goto(
   if(!guard.is_false())
   {
     // branch taken case
-    // copy the state into 'furhter_states'
+
+#ifdef STATELESS_PATH_SYMEX
+    // lazily copy the state into 'furhter_states'
+    further_states.push_back(path_symex_statet::lazy_copy(state));
+#else
+    // eagerly copy the state into 'furhter_states'
     further_states.push_back(state);
+#endif
+
     further_states.back().record_step();
-    further_states.back().set_pc(loc.branch_target);
+    further_states.back().record_true_branch();
+
+    if(!further_states.back().is_lazy())
+      further_states.back().set_pc(loc.branch_target);
+
     further_states.back().history->guard=guard;
-    further_states.back().branches.push_back(true);
   }
 
   // branch not taken case
   exprt negated_guard=not_exprt(guard);
   state.record_step();
+  state.record_false_branch();
   state.next_pc();
   state.history->guard=negated_guard;
-  state.branches.push_back(false);
 }
 
 /*******************************************************************\

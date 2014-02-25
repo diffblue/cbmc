@@ -45,14 +45,11 @@ path_symex_statet initial_state(
   const locst &locs,
   path_symex_historyt &path_symex_history)
 {
-  path_symex_statet s(var_map, locs, path_symex_history);
-  
-  // create one new thread
-  path_symex_statet::threadt &thread=s.add_thread();
-  thread.pc=locs.entry_loc; // set its PC
-  s.set_current_thread(0);
-  
-  return s;
+  return path_symex_statet(
+    var_map,
+    locs,
+    path_symex_step_reft(path_symex_history),
+    path_symex_statet::branchest());
 }
 
 /*******************************************************************\
@@ -665,6 +662,10 @@ void path_symex_statet::record_step()
   // update our statistics
   depth++;
   
+  // we've already recorded the history
+  if(is_lazy())
+    return;
+
   // add the step
   history.generate_successor();
   path_symex_stept &step=*history;

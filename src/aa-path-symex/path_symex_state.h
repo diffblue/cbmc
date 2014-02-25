@@ -17,71 +17,52 @@ Author: Daniel Kroening, kroening@kroening.com
 class path_symex_statet
 {
 public:
-  inline path_symex_statet(
+  // use symbolic execution to repopulate composite fields
+
+  // TODO: consider std::bitset or chaining to shrink state size
+  typedef std::vector<bool> branchest;
+
+  // if _branches.empty(), then initial state; otherwise, lazy state
+
+  // \post: pc() is the entry point to the program under scrutiny
+  path_symex_statet(
     var_mapt &_var_map,
     const locst &_locs,
-    path_symex_historyt &_path_symex_history):
+    path_symex_step_reft _history,
+    const branchest &_branches):
     var_map(_var_map),
     locs(_locs),
-    branches(),
-    branches_restore(0),
     shared_vars(),
     threads(),
-    inside_atomic_section(false),
-    history(_path_symex_history),
+    inside_atomic_section(),
+    history(_history),
     unwinding_map(),
     recursion_map(),
+    branches(_branches),
+    branches_restore(0),
     current_thread(0),
     no_thread_interleavings(0),
     depth(0)
   {
+    path_symex_statet::threadt &thread=add_thread();
+    thread.pc=locs.entry_loc; // reset its PC
   }
 
-  // eagerly copy all fields including vectors etc.
-  path_symex_statet(const path_symex_statet& other):
-    var_map(other.var_map),
-    locs(other.locs),
-    branches(other.branches),
-    branches_restore(other.branches_restore),
-    shared_vars(other.shared_vars),
-    threads(other.threads),
-    inside_atomic_section(other.inside_atomic_section),
-    history(other.history),
-    unwinding_map(other.unwinding_map),
-    recursion_map(other.recursion_map),
-    current_thread(other.current_thread),
-    no_thread_interleavings(other.no_thread_interleavings),
-    depth(other.depth)
-  {
-  }
-
+  // like initial state except that branches are copied from "other"
   static path_symex_statet lazy_copy(const path_symex_statet& other)
   {
     // allow compiler to use RVO
     return path_symex_statet(
       other.var_map,
       other.locs,
-      other.branches,
-      other.inside_atomic_section,
       other.history,
-      other.current_thread,
-      other.no_thread_interleavings,
-      other.depth);
+      other.branches);
   }
 
   // These are tied to a particular var_map
   // and a particular program.
   var_mapt &var_map;
   const locst &locs;
-
-  // use symbolic execution to repopulate composite fields
-
-  // TODO: consider std::bitset or chaining to shrink state size
-  typedef std::vector<bool> branchest;
-  branchest branches;
-
-  // restored state up to strictly less than this index
-  branchest::size_type branches_restore;
 
   // the value of a variable
   struct var_statet
@@ -151,13 +132,25 @@ public:
   
   goto_programt::const_targett get_instruction() const;
 
+  // branch taken case
+  inline void record_true_branch()
+  {
+    branches_push_back(true);
+  }
+
+  // branch not taken case
+  inline void record_false_branch()
+  {
+    branches_push_back(false);
+  }
+
   inline bool is_lazy() const
   {
     return branches_restore < branches.size();
   }
 
   // returns branch direction that should be taken
-  bool restore_branch()
+  inline bool restore_branch()
   {
     assert(is_lazy());
     return branches[branches_restore++];
@@ -246,30 +239,16 @@ public:
   recursion_mapt recursion_map;
 
 protected:
-  // initialize composite fields to be empty
-  path_symex_statet(
-    var_mapt &_var_map,
-    const locst &_locs,
-    const branchest &_branches,
-    bool _inside_atomic_section,
-    path_symex_step_reft _history,
-    unsigned _current_thread,
-    unsigned _no_thread_interleavings,
-    unsigned _depth):
-    var_map(_var_map),
-    locs(_locs),
-    branches(_branches),
-    branches_restore(0),
-    shared_vars(/* lazy */),
-    threads(/* lazy */),
-    inside_atomic_section(_inside_atomic_section),
-    history(_history),
-    unwinding_map(/* lazy */),
-    recursion_map(/* lazy */),
-    current_thread(_current_thread),
-    no_thread_interleavings(_no_thread_interleavings),
-    depth(_depth)
+  branchest branches;
+  branchest::size_type branches_restore;
+
+  inline void branches_push_back(bool taken)
   {
+    branches.push_back(taken);
+    if(get_instruction()->is_goto())
+      branches_restore++;
+    else
+      assert(pc()==locs.entry_loc);
   }
 
   unsigned current_thread;
