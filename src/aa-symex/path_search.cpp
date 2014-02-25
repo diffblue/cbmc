@@ -148,6 +148,9 @@ void path_searcht::report_statistics()
   status() << "Number of dropped states: "
            << number_of_dropped_states << messaget::eom;
 
+  status() << "Number of fast forward steps: "
+           << number_of_fast_forward_steps << messaget::eom;
+
   status() << "Generated " << number_of_VCCs << " VCC(s), "
            << number_of_VCCs_after_simplification
            << " remaining after simplification"
