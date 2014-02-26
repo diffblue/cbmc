@@ -3,9 +3,11 @@
 Module: Path-based Symbolic Execution
 
 Author: Daniel Kroening, kroening@kroening.com
+        Alex Horn, alex.horn@cs.ox.ac.uk
 
 \*******************************************************************/
 
+#include <cerrno>
 #include <util/time_stopping.h>
 
 #include <solvers/flattening/bv_pointers.h>
@@ -15,6 +17,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <aa-path-symex/build_goto_trace.h>
 
 #include "path_search.h"
+
+#ifdef PATH_SYMEX_FORK
+// we've already check that the platform is (mostly) POSIX-compliant
+#include <sys/wait.h>
+#endif
 
 /*******************************************************************\
 
@@ -125,11 +132,50 @@ path_searcht::resultt path_searcht::operator()(
     // execute
     path_symex(*state, queue);
   }
+
+#ifdef PATH_SYMEX_FORK
+  await();
+#endif
   
   report_statistics();
   
   return number_of_failed_properties==0?SAFE:UNSAFE;
 }
+
+#ifdef PATH_SYMEX_FORK
+/*******************************************************************\
+
+Function: path_searcht::await()
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: waits for fork()'s child processes to complete
+
+\*******************************************************************/
+
+void path_searcht::await()
+{
+  int status;
+  for(;;)
+  {
+    pid_t pid=wait(&status);
+    if(pid==-1)
+    {
+      if(errno==ECHILD) break; // no more child processes
+    }
+    else
+    {
+      if(!WIFEXITED(status) || WEXITSTATUS(status)!=0)
+      {
+        error() << "pid " << pid << " failed" << messaget::eom;
+        break;
+      }
+    }
+  }
+}
+#endif
 
 /*******************************************************************\
 

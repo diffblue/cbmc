@@ -21,13 +21,25 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "path_symex.h"
 
+#ifdef PATH_SYMEX_FORK
+#if defined(__linux__) || \
+    defined(__FreeBSD_kernel__) || \
+    defined(__GNU__) || \
+    defined(__unix__) || \
+    defined(__CYGWIN__) || \
+    defined(__MACH__)
+#include <unistd.h>
+#include <sys/types.h>
+#else
+#error Cannot define PATH_SYMEX_FORK on non-POSIX systems
+#endif
+#endif
+
 //#define DEBUG
 
 #ifdef DEBUG
 #include <iostream>
 #endif
-
-#define PATH_SYMEX_LAZY
 
 class path_symext
 {
@@ -838,33 +850,77 @@ void path_symext::do_goto(
     return; // we are done
   }
 
+#ifdef PATH_SYMEX_FORK
+  pid_t pid=-1;
+#endif
+
   if(!guard.is_false())
   {
     // branch taken case
 
-#ifdef PATH_SYMEX_LAZY
-    // lazily copy the state into 'furhter_states'
-    further_states.push_back(path_symex_statet::lazy_copy(state));
-#else
-    // eagerly copy the state into 'furhter_states'
-    further_states.push_back(state);
+#ifdef PATH_SYMEX_FORK
+    pid=fork();
+    if(pid==0)
+    {
+      // child process explores paths starting from the
+      // new state thereby partitioning the search space
+      for(std::list<path_symex_statet>::iterator
+          s_it=further_states.begin(), s_end=further_states.end();
+          s_it!=s_end;
+          ++s_it)
+      {
+        if(&(*s_it)!=&state)
+          // iterators in std::list are stable
+          s_it=further_states.erase(s_it);
+      }
+
+      assert(further_states.size()==1);
+
+      // branch not taken case
+      state.record_step();
+      state.record_false_branch();
+      state.set_pc(loc.branch_target);
+      state.history->guard=guard;
+    }
 #endif
 
-    further_states.back().record_true_branch();
-    if(!further_states.back().is_lazy())
+#ifdef PATH_SYMEX_FORK
+    if (pid==-1)
+      // forking failed so continue as if PATH_SYMEX_FORK were undefined
+#endif
     {
-      further_states.back().record_step();
-      further_states.back().set_pc(loc.branch_target);
-      further_states.back().history->guard=guard;
+
+#ifdef PATH_SYMEX_LAZY
+      // lazily copy the state into 'further_states'
+      further_states.push_back(path_symex_statet::lazy_copy(state));
+#else
+      // eagerly copy the state into 'further_states'
+      further_states.push_back(state);
+#endif
+
+      further_states.back().record_true_branch();
+      if(!further_states.back().is_lazy())
+      {
+        further_states.back().record_step();
+        further_states.back().set_pc(loc.branch_target);
+        further_states.back().history->guard=guard;
+      }
     }
   }
 
-  // branch not taken case
-  exprt negated_guard=not_exprt(guard);
-  state.record_step();
-  state.record_false_branch();
-  state.next_pc();
-  state.history->guard=negated_guard;
+#ifdef PATH_SYMEX_FORK
+  if (pid!=0)
+    // parent process (regardless of any possible fork errors)
+    // should finish to explore all current 'further_states'
+#endif
+  {
+    // branch not taken case
+    exprt negated_guard=not_exprt(guard);
+    state.record_step();
+    state.record_false_branch();
+    state.next_pc();
+    state.history->guard=negated_guard;
+  }
 }
 
 /*******************************************************************\
