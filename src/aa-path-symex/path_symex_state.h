@@ -247,9 +247,14 @@ protected:
   {
     branches.push_back(taken);
     if(get_instruction()->is_goto())
+    {
       branches_restore++;
+    }
     else
+    {
       assert(pc()==locs.entry_loc);
+      assert(history.is_nil());
+    }
   }
 
   unsigned current_thread;
