@@ -27,7 +27,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 #endif
 
-#define STATELESS_PATH_SYMEX
+#define PATH_SYMEX_LAZY
 
 class path_symext
 {
@@ -842,7 +842,7 @@ void path_symext::do_goto(
   {
     // branch taken case
 
-#ifdef STATELESS_PATH_SYMEX
+#ifdef PATH_SYMEX_LAZY
     // lazily copy the state into 'furhter_states'
     further_states.push_back(path_symex_statet::lazy_copy(state));
 #else
