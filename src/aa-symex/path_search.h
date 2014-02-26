@@ -58,6 +58,12 @@ public:
   property_mapt property_map;
 
 protected:
+
+#ifdef PATH_SYMEX_FORK
+  // prints out errors while waiting for child processes
+  void await();
+#endif
+
   typedef path_symex_statet statet;
 
   // State queue. Iterators are stable.
