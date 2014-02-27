@@ -3,6 +3,7 @@
 Module: Concrete Symbolic Transformer
 
 Author: Daniel Kroening, kroening@kroening.com
+        Alex Horn, alex.horn@cs.ox.ac.uk
 
 \*******************************************************************/
 
@@ -18,7 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 // Transform a state by executing a single statement.
 // May occasionally yield more than one successor state
-// (branches, function calls with trinary operator),
+// (branches, function calls with ternary operator),
 // which are put into "further_states".
 
 // \pre: "!further_states.empty()" because "state" must
