@@ -13,10 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "locs.h"
 #include "path_symex_state.h"
 
-// These variables may be defined in this header file only.
-#define PATH_SYMEX_LAZY
-#define PATH_SYMEX_FORK
-
 // Transform a state by executing a single statement.
 // May occasionally yield more than one successor state
 // (branches, function calls with ternary operator),

@@ -38,6 +38,15 @@ Function: path_searcht::operator()
 path_searcht::resultt path_searcht::operator()(
   const goto_functionst &goto_functions)
 {
+#ifdef PATH_SYMEX_FORK
+  // Disable output because there is no meaningful way
+  // to write text when multiple path_search processes
+  // run concurrently. This could be remedied by piping
+  // to individual files or inter-process communication,
+  // a performance bottleneck, however.
+  *messaget::mstream.message_handler=NULL;
+#endif
+
   locst locs(ns);
   var_mapt var_map(ns);
   
@@ -128,18 +137,41 @@ path_searcht::resultt path_searcht::operator()(
           break;
       }
     }
-    
+
+#ifdef PATH_SYMEX_FORK
+    if(try_await())
+    {
+      debug() << "Child process has terminated "
+                 "so exit parent" << messaget::eom;
+      break;
+    }
+#endif
+
     // execute
     path_symex(*state, queue);
   }
 
 #ifdef PATH_SYMEX_FORK
-  await();
-#endif
-  
+  int exit_status=await();
+  if(exit_status==0 && number_of_failed_properties!=0)
+  {
+    // the eldest child process (if any) reports found bugs
+    report_statistics();
+    return UNSAFE;
+  }
+  else
+  {
+    // either a child found and reported a bug or
+    // the parent's search partition is safe
+
+    // TODO: add safety_checkert::IGNORE
+    return ERROR;
+  }
+#else
   report_statistics();
-  
+
   return number_of_failed_properties==0?SAFE:UNSAFE;
+#endif
 }
 
 #ifdef PATH_SYMEX_FORK
@@ -149,17 +181,23 @@ Function: path_searcht::await()
 
   Inputs:
 
- Outputs:
+ Outputs: returns zero if and only if every child process succeeds;
+          otherwise, the error of exactly one child is returned
 
- Purpose: waits for fork()'s child processes to complete
+ Purpose: POSIX-compliant (possibly blocking) wait on child
+          processes, writes to error() if anything goes wrong;
+          any earlier calls to try_await() do not affect await()
 
 \*******************************************************************/
 
-void path_searcht::await()
+int path_searcht::await()
 {
   int status;
   for(;;)
   {
+    // a process' entries for its child processes are deleted after
+    // the first call to waitpid(). When waitpid() is called again
+    // it returns -1 and errno is set to ECHILD.
     pid_t pid=wait(&status);
     if(pid==-1)
     {
@@ -169,11 +207,36 @@ void path_searcht::await()
     {
       if(!WIFEXITED(status) || WEXITSTATUS(status)!=0)
       {
-        error() << "pid " << pid << " failed" << messaget::eom;
-        break;
+        debug() << "PID " << pid << " failed, return code "
+                << WEXITSTATUS(status) << messaget::eom;
+
+        return WEXITSTATUS(status);
       }
     }
   }
+
+  return 0;
+}
+
+/*******************************************************************\
+
+Function: path_searcht::try_await()
+
+  Inputs:
+
+ Outputs: returns true if and only if at least one child process
+          has terminated 
+
+ Purpose: POSIX-compliant nonblocking wait on child processes,
+          child's status is preserved for await() function
+
+\*******************************************************************/
+
+bool path_searcht::try_await()
+{
+  int status;
+  pid_t pid=waitpid(-1, &status, WNOHANG | WNOWAIT);
+  return pid!=-1;
 }
 #endif
 

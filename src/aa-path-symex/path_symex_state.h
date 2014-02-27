@@ -14,6 +14,28 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "var_map.h"
 #include "path_symex_history.h"
 
+// These variables may be defined in this header file only because
+// it is (transitively) included by many essential path-symex files.
+// In addition, since these variables determine how states are
+// handled, it makes sense to define them in this header file.
+#define PATH_SYMEX_LAZY
+#define PATH_SYMEX_FORK
+
+// check POSIX-compliance
+#ifdef PATH_SYMEX_FORK
+#if defined(__linux__) || \
+    defined(__FreeBSD_kernel__) || \
+    defined(__GNU__) || \
+    defined(__unix__) || \
+    defined(__CYGWIN__) || \
+    defined(__MACH__)
+#include <unistd.h>
+#include <sys/types.h>
+#else
+#error Cannot define PATH_SYMEX_FORK on non-POSIX systems
+#endif
+#endif
+
 class path_symex_statet
 {
 public:
