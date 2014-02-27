@@ -21,20 +21,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "path_symex.h"
 
-#ifdef PATH_SYMEX_FORK
-#if defined(__linux__) || \
-    defined(__FreeBSD_kernel__) || \
-    defined(__GNU__) || \
-    defined(__unix__) || \
-    defined(__CYGWIN__) || \
-    defined(__MACH__)
-#include <unistd.h>
-#include <sys/types.h>
-#else
-#error Cannot define PATH_SYMEX_FORK on non-POSIX systems
-#endif
-#endif
-
 //#define DEBUG
 
 #ifdef DEBUG

@@ -3,6 +3,7 @@
 Module: Path-based Symbolic Execution
 
 Author: Daniel Kroening, kroening@kroening.com
+        Alex Horn, alex.horn@cs.ox.ac.uk
 
 \*******************************************************************/
 
@@ -60,8 +61,11 @@ public:
 protected:
 
 #ifdef PATH_SYMEX_FORK
-  // prints out errors while waiting for child processes
-  void await();
+  // blocks until child processes have terminated
+  int await();
+
+  // returns whether at least one child process has terminated
+  bool try_await();
 #endif
 
   typedef path_symex_statet statet;
