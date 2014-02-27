@@ -21,6 +21,8 @@ Author: Daniel Kroening, kroening@kroening.com
 // (branches, function calls with trinary operator),
 // which are put into "further_states".
 
+// \pre: "!further_states.empty()" because "state" must
+//       be stored inside "further_states"
 void path_symex(
   path_symex_statet &state,
   std::list<path_symex_statet> &further_states);

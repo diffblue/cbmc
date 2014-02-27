@@ -862,6 +862,9 @@ void path_symext::do_goto(
     pid=fork();
     if(pid==0)
     {
+      // "state" is stored in "further_states"
+      assert(!further_states.empty());
+
       // child process explores paths starting from the
       // new state thereby partitioning the search space
       for(std::list<path_symex_statet>::iterator
@@ -1174,6 +1177,9 @@ void path_symex(
   path_symex_statet &state,
   std::list<path_symex_statet> &further_states)
 {
+  // "state" is stored in "further_states"
+  assert(!further_states.empty());
+
   path_symext path_symex;
   path_symex(state, further_states);
 }
