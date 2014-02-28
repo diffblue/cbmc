@@ -232,6 +232,28 @@ Function: satcheck_lingelingt::set_frozen
 void satcheck_lingelingt::set_frozen(literalt a)
 {
   assert(!a.is_constant());
-  lglfreeze(solver,a.dimacs());
+  lglfreeze(solver, a.dimacs());
+}
+
+/*******************************************************************\
+
+Function: satcheck_lingelingt::is_in_conflict
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: Returns true if an assumed literal is in conflict if the
+ formula is UNSAT.
+
+ NOTE: if the literal is not in the assumption it causes an
+ assertion failure in lingeling.
+
+\*******************************************************************/
+
+bool satcheck_lingelingt::is_in_conflict(literalt a) const
+{
+  assert(!a.is_constant());
+  return lglfailed(solver, a.dimacs())!=0;
 }
 
