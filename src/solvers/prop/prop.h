@@ -73,7 +73,9 @@ public:
   virtual void set_assignment(literalt a, bool value);
   virtual void copy_assignment_from(const propt &prop);
 
-  // returns true if an assumption is in the final conflict
+  // Returns true if an assumption is in the final conflict.
+  // Note that only literals that are assumptions (see set_assumptions)
+  // may be queried.
   virtual bool is_in_conflict(literalt l) const;  
   virtual bool has_is_in_conflict() const { return false; }
   
