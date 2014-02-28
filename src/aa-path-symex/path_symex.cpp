@@ -853,14 +853,15 @@ void path_symext::do_goto(
 
       // child process explores paths starting from the
       // new state thereby partitioning the search space
-      for(std::list<path_symex_statet>::iterator
-          s_it=further_states.begin(), s_end=further_states.end();
-          s_it!=s_end;
-          ++s_it)
+      std::list<path_symex_statet>::iterator
+      s_it=further_states.begin(), s_end=further_states.end();
+      while(s_it!=s_end)
       {
         if(&(*s_it)!=&state)
           // iterators in std::list are stable
           s_it=further_states.erase(s_it);
+        else
+          ++s_it;
       }
 
       assert(further_states.size()==1);
