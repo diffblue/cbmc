@@ -832,6 +832,7 @@ void path_symext::do_goto(
   if(guard.is_true())
   {
     state.record_step();
+    state.record_true_branch();
     state.set_pc(loc.branch_target);
     return; // we are done
   }
