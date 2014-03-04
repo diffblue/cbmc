@@ -29,6 +29,8 @@ public:
     depth(0)
   {
   }
+  
+  typedef path_symex_stept stept;
 
   // These are tied to a particular var_map
   // and a particular program.

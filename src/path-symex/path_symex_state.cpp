@@ -666,7 +666,7 @@ void path_symex_statet::record_step()
   
   // add the step
   history.generate_successor();
-  path_symex_stept &step=*history;
+  stept &step=*history;
 
   // copy PC
   assert(current_thread<threads.size());
