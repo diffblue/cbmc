@@ -72,6 +72,25 @@ class decision_proceduret;
 class path_symex_stept
 {
 public:
+  enum kindt {
+    NON_BRANCH, BRANCH_TAKEN, BRANCH_NOT_TAKEN
+  } branch;
+  
+  inline bool is_branch_taken() const
+  {
+    return branch==BRANCH_TAKEN;
+  }
+
+  inline bool is_branch_not_taken() const
+  {
+    return branch==BRANCH_NOT_TAKEN;
+  }
+
+  inline bool is_branch() const
+  {
+    return branch==BRANCH_TAKEN || branch==BRANCH_NOT_TAKEN;
+  }
+
   path_symex_step_reft predecessor;
   
   // the thread that did the step
@@ -87,6 +106,7 @@ public:
   bool hidden; 
   
   path_symex_stept():
+    branch(NON_BRANCH),
     guard(nil_exprt()),
     ssa_rhs(nil_exprt()),
     full_lhs(nil_exprt()),
