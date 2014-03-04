@@ -53,6 +53,8 @@ public:
     exprt guard=state.read(not_exprt(instruction.guard));
     state.history->guard=guard;
   }  
+  
+  typedef path_symex_stept stept;
 
 protected:
   void do_goto(
@@ -445,7 +447,7 @@ void path_symext::assign_rec(
 
       // record the step
       state.record_step();
-      path_symex_stept &step=*state.history;
+      stept &step=*state.history;
       
       if(!guard.empty()) step.guard=conjunction(guard);
       step.full_lhs=ssa_lhs;
@@ -818,9 +820,10 @@ void path_symext::do_goto(
 
   exprt guard=state.read(instruction.guard);
   
-  if(guard.is_true())
+  if(guard.is_true()) // branch taken always
   {
     state.record_step();
+    state.history->branch=stept::BRANCH_TAKEN;
     state.set_pc(loc.branch_target);
     return; // we are done
   }
@@ -831,6 +834,7 @@ void path_symext::do_goto(
     // copy the state into 'furhter_states'
     further_states.push_back(state);
     further_states.back().record_step();
+    state.history->branch=stept::BRANCH_TAKEN;
     further_states.back().set_pc(loc.branch_target);
     further_states.back().history->guard=guard;
   }
@@ -838,6 +842,7 @@ void path_symext::do_goto(
   // branch not taken case
   exprt negated_guard=not_exprt(guard);
   state.record_step();
+  state.history->branch=stept::BRANCH_NOT_TAKEN;
   state.next_pc();
   state.history->guard=negated_guard;
 }
@@ -878,6 +883,7 @@ void path_symext::do_goto(
     assert(!loc.branch_target.is_nil());
     state.set_pc(loc.branch_target);
     state.history->guard=guard;
+    state.history->branch=stept::BRANCH_TAKEN;
   }
   else
   {
@@ -885,6 +891,7 @@ void path_symext::do_goto(
     exprt negated_guard=not_exprt(guard);
     state.next_pc();
     state.history->guard=negated_guard;
+    state.history->branch=stept::BRANCH_NOT_TAKEN;
   }
 }
 
