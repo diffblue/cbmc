@@ -281,8 +281,6 @@ protected:
 
   // On first call, O(N) where N is the length of the execution path
   // leading to this state. Subsequent calls run in constant time.
-
-  // \post: !history.is_nil() || branches.empty()
   const branchest& get_branches()
   {
     if(!branches.empty() || history.is_nil())
