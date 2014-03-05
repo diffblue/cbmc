@@ -740,17 +740,15 @@ void path_symext::function_call_rec(
         // add a 'further state' for the false-case
         further_states.push_back(state);
         path_symex_statet &false_state=further_states.back();
-        false_state.record_step();
+        false_state.record_branch_step(false);
         false_state.history->guard=not_exprt(guard);
-        false_state.record_false_branch();
         function_call_rec(further_states.back(), call, if_expr.false_case(), further_states);
       }
 
       // do the true-case in 'state'
       {
-        state.record_step();
+        state.record_branch_step(true);
         state.history->guard=guard;
-        state.record_true_branch();
         function_call_rec(state, call, if_expr.true_case(), further_states);
       }
     }
@@ -831,8 +829,7 @@ void path_symext::do_goto(
   
   if(guard.is_true())
   {
-    state.record_step();
-    state.record_true_branch();
+    state.record_branch_step(true);
     state.set_pc(loc.branch_target);
     return; // we are done
   }
@@ -868,8 +865,7 @@ void path_symext::do_goto(
       assert(further_states.size()==1);
 
       // branch not taken case
-      state.record_step();
-      state.record_false_branch();
+      state.record_branch_step(false);
       state.set_pc(loc.branch_target);
       state.history->guard=guard;
     }
@@ -884,18 +880,14 @@ void path_symext::do_goto(
 #ifdef PATH_SYMEX_LAZY
       // lazily copy the state into 'further_states'
       further_states.push_back(path_symex_statet::lazy_copy(state));
+      further_states.back().record_true_branch();
 #else
       // eagerly copy the state into 'further_states'
       further_states.push_back(state);
+      further_states.back().record_branch_step(true);
+      further_states.back().set_pc(loc.branch_target);
+      further_states.back().history->guard=guard;
 #endif
-
-      further_states.back().record_true_branch();
-      if(!further_states.back().is_lazy())
-      {
-        further_states.back().record_step();
-        further_states.back().set_pc(loc.branch_target);
-        further_states.back().history->guard=guard;
-      }
     }
   }
 
@@ -907,8 +899,7 @@ void path_symext::do_goto(
   {
     // branch not taken case
     exprt negated_guard=not_exprt(guard);
-    state.record_step();
-    state.record_false_branch();
+    state.record_branch_step(false);
     state.next_pc();
     state.history->guard=negated_guard;
   }

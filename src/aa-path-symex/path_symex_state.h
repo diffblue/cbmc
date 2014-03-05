@@ -10,6 +10,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_PATH_SYMEX_STATE_H
 #define CPROVER_PATH_SYMEX_STATE_H
 
+#include <algorithm>
+
 #include "locs.h"
 #include "var_map.h"
 #include "path_symex_history.h"
@@ -71,15 +73,15 @@ public:
   }
 
   // like initial state except that branches are copied from "other"
-  // and history.is_nil()
-  static path_symex_statet lazy_copy(const path_symex_statet& other)
+  // and history will be 'nil'
+  static path_symex_statet lazy_copy(path_symex_statet& other)
   {
     // allow compiler to use RVO
     return path_symex_statet(
       other.var_map,
       other.locs,
       path_symex_step_reft(),
-      other.branches);
+      other.get_branches());
   }
 
   // These are tied to a particular var_map
@@ -158,13 +160,13 @@ public:
   // branch taken case
   inline void record_true_branch()
   {
-    branches_push_back(true);
+    branches.push_back(true);
   }
 
   // branch not taken case
   inline void record_false_branch()
   {
-    branches_push_back(false);
+    branches.push_back(false);
   }
 
   inline bool is_lazy() const
@@ -190,6 +192,9 @@ public:
   
   // adds an entry to the history
   void record_step();
+
+  // like record_step() except that branch decision is also recorded
+  void record_branch_step(bool taken);
 
   // various state transformers
   
@@ -265,18 +270,47 @@ protected:
   branchest branches;
   branchest::size_type branches_restore;
 
-  inline void branches_push_back(bool taken)
+  // On first call, O(N) where N is the length of the execution path
+  // leading to this state. Subsequent calls run in constant time.
+
+  // \post: !history.is_nil() || branches.empty()
+  const branchest& get_branches()
   {
-    branches.push_back(taken);
-    if(get_instruction()->is_goto())
+    if(!branches.empty() || history.is_nil())
+      return branches;
+
+    // Contrarily, suppose this state is lazy. Since we did not
+    // return above, branches.empty(). By definition of is_lazy(),
+    // branches_restore must have been a negative number. Since
+    // its type is unsigned, however, this is impossible.
+    assert(!is_lazy());
+
+    path_symex_step_reft step_ref=history;
+    assert(!step_ref.is_nil());
+    loc_reft next_loc_ref=pc();
+    for(;;)
     {
-      branches_restore++;
+      if(step_ref.is_nil())
+        break;
+
+      const loct &loc=locs[step_ref->pc];
+      if(loc.target->is_goto())
+      {
+        branches.push_back(loc.branch_target==next_loc_ref);
+      }
+
+      next_loc_ref=step_ref->pc;
+      step_ref=step_ref->predecessor;
     }
-    else
-    {
-      assert(pc()==locs.entry_loc);
-      assert(history.is_nil());
-    }
+
+    // preserve non-laziness of this state (see first assertion)
+    branches_restore=branches.size();
+
+    // TODO: add "path_symex_step::branch_depth" field so we can
+    // reserve() the right capacity of vector and avoid reverse().
+    std::reverse(branches.begin(), branches.end());
+
+    return branches;
   }
 
   unsigned current_thread;

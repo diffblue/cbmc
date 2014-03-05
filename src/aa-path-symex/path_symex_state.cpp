@@ -674,6 +674,41 @@ void path_symex_statet::record_step()
 
 /*******************************************************************\
 
+Function: path_symex_statet::record_branch_step
+
+  Inputs: whether branch was taken, or not
+
+ Outputs:
+
+ Purpose: like record_step() and record branch decision
+
+\*******************************************************************/
+
+void path_symex_statet::record_branch_step(bool taken)
+{
+  assert(get_instruction()->is_goto());
+
+  if(!branches.empty() || history.is_nil())
+  {
+    // get_branches() relies on branch decisions
+    branches.push_back(taken);
+
+    if(get_instruction()->is_goto())
+    {
+      branches_restore++;
+    }
+    else
+    {
+      assert(pc()==locs.entry_loc);
+      assert(history.is_nil());
+    }
+  }
+
+  record_step();
+}
+
+/*******************************************************************\
+
 Function: path_symex_statet::is_feasible
 
   Inputs:
