@@ -877,7 +877,7 @@ void path_symext::do_goto(
 #endif
     {
 
-#ifdef PATH_SYMEX_LAZY
+#ifdef PATH_SYMEX_LAZY_STATE
       // lazily copy the state into 'further_states'
       further_states.push_back(path_symex_statet::lazy_copy(state));
       further_states.back().record_true_branch();

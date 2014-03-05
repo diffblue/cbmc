@@ -688,7 +688,9 @@ void path_symex_statet::record_branch_step(bool taken)
 {
   assert(get_instruction()->is_goto());
 
+#ifdef PATH_SYMEX_LAZY_BRANCH
   if(!branches.empty() || history.is_nil())
+#endif
   {
     // get_branches() relies on branch decisions
     branches.push_back(taken);
