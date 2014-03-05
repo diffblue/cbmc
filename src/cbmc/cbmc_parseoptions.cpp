@@ -337,6 +337,11 @@ int cbmc_parseoptionst::doit()
     std::cout << CBMC_VERSION << std::endl;
     return 0;
   }
+  
+  //
+  // Print a banner
+  //
+  status("CBMC version " CBMC_VERSION);
 
   //
   // unwinding of transition systems
