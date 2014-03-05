@@ -297,6 +297,7 @@ protected:
       if(loc.target->is_goto())
       {
         branches.push_back(loc.branch_target==next_loc_ref);
+        assert(branches.back() || step_ref->pc.next_loc()==next_loc_ref);
       }
 
       next_loc_ref=step_ref->pc;
