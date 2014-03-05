@@ -83,14 +83,14 @@ inline int pthread_mutex_trylock(pthread_mutex_t *mutex)
 inline int pthread_mutex_unlock(pthread_mutex_t *mutex)
 {
   __CPROVER_HIDE:;
+  // the fence must be before the unlock
+  __CPROVER_fence("WWfence", "RRfence", "RWfence", "WRfence",
+                    "WWcumul", "RRcumul", "RWcumul", "WRcumul");
   __CPROVER_atomic_begin();
   __CPROVER_assert(*((signed char *)mutex)==1,
     "must hold lock upon unlock");
   *((signed char *)mutex)=0;
   __CPROVER_atomic_end();
-
-  __CPROVER_fence("WWfence", "RRfence", "RWfence", "WRfence",
-                  "WWcumul", "RRcumul", "RWcumul", "WRcumul");
 
   return 0; // we never fail
 }
@@ -288,6 +288,8 @@ void __actual_thread_spawn(
   __CPROVER_HIDE:;
   __CPROVER_ASYNC_1: __CPROVER_thread_id=id,
                        start_routine(arg),
+                       __CPROVER_fence("WWfence", "RRfence", "RWfence", "WRfence",
+                                         "WWcumul", "RRcumul", "RWcumul", "WRcumul"),
                        __CPROVER_threads_exited[id]=1;
 }
 
@@ -422,7 +424,8 @@ int pthread_spin_lock(pthread_spinlock_t *lock)
 int pthread_spin_unlock(pthread_spinlock_t *lock)
 {
   __CPROVER_HIDE:;
-  // this is atomic_full_barrier() in glibc
+  // This is atomic_full_barrier() in glibc.
+  // The fence must be before the unlock.
   __CPROVER_fence("WWfence", "RRfence", "RWfence", "WRfence",
                   "WWcumul", "RRcumul", "RWcumul", "WRcumul");
   *((unsigned *)lock) = 0;
