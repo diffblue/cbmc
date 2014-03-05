@@ -20,8 +20,17 @@ Author: Daniel Kroening, kroening@kroening.com
 // it is (transitively) included by many essential path-symex files.
 // In addition, since these variables determine how states are
 // handled, it makes sense to define them in this header file.
-#define PATH_SYMEX_LAZY
+#define PATH_SYMEX_LAZY_STATE
 #define PATH_SYMEX_FORK
+
+// This flag is particularly useful for regression testing purposes.
+//
+// If PATH_SYMEX_LAZY_BRANCH is undefined, then branches are always
+// recorded and the control logic in get_branches() is bypassed. But
+// the output of path_search() should be identical in this setting;
+// otherwise, the assumptions about GOTO programs or the history
+// data structure should be revisited.
+#define PATH_SYMEX_LAZY_BRANCH
 
 // check POSIX-compliance
 #ifdef PATH_SYMEX_FORK
