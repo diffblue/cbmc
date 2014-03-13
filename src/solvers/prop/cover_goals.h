@@ -7,7 +7,7 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #ifndef CPROVER_COVER_GOALS_H
-#define CPROCER_COVER_GOALS_H
+#define CPROVER_COVER_GOALS_H
 
 #include <util/message.h>
 
