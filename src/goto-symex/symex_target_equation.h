@@ -260,6 +260,7 @@ public:
   bool is_incremental;
   bvt activate_assertions; //assumptions for incremental solving
   literalt current_activation_literal(); //returns last assumption literal
+  void new_activation_literal(prop_convt &prop_conv); //creates new assumption literal
 
   typedef std::list<SSA_stept> SSA_stepst;
   SSA_stepst SSA_steps;
