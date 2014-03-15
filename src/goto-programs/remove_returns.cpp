@@ -27,7 +27,7 @@ public:
 protected:
   symbol_tablet &symbol_table;
 
-  void do_return_value(
+  void replace_returns(
     goto_functionst::function_mapt::iterator f_it);
 
   void do_function_calls(
@@ -37,26 +37,28 @@ protected:
 
 /*******************************************************************\
 
-Function: remove_returnst::do_return_value
+Function: remove_returnst::replace_returns
 
 Inputs:
 
 Outputs:
 
-Purpose: turns 'return x' into an assignment to fkt#return_value
-         and a 'goto the_end_of_the_function'
+Purpose: turns 'return x' into an assignment to fkt#return_value,
+         if needed, and a 'goto the_end_of_the_function'
 
 \*******************************************************************/
 
-void remove_returnst::do_return_value(
+void remove_returnst::replace_returns(
   goto_functionst::function_mapt::iterator f_it)
 {
   typet return_type=f_it->second.type.return_type();
 
   const irep_idt function_id=f_it->first;
-
+  
   // returns something but void?
-  if(return_type!=empty_typet())
+  bool has_return_value=return_type!=empty_typet();
+
+  if(has_return_value)
   {
     // look up the function symbol
     symbol_tablet::symbolst::iterator s_it=
@@ -96,32 +98,46 @@ void remove_returnst::do_return_value(
 
   assert(end_function->is_end_function());
 
-  Forall_goto_program_instructions(i_it, goto_program)
+  if(has_return_value)
   {
-    if(i_it->is_return())
+    Forall_goto_program_instructions(i_it, goto_program)
     {
-      assert(i_it->code.operands().size()==1);
+      if(i_it->is_return())
+      {
+        assert(i_it->code.operands().size()==1);
 
-      // replace "return x;" by "fkt#return_value=x; goto end_function;"
-      symbol_exprt lhs_expr;
-      lhs_expr.set_identifier(id2string(function_id)+"#return_value");
-      lhs_expr.type()=return_type;
+        // replace "return x;" by "fkt#return_value=x; goto end_function;"
+        symbol_exprt lhs_expr;
+        lhs_expr.set_identifier(id2string(function_id)+"#return_value");
+        lhs_expr.type()=return_type;
 
-      code_assignt assignment(lhs_expr, i_it->code.op0());
+        code_assignt assignment(lhs_expr, i_it->code.op0());
 
-      // now turn return into goto
-      i_it->make_goto(end_function);
+        // now turn the `return' into `goto'
+        i_it->make_goto(end_function);
+  
+        goto_programt::instructiont tmp_i;
+        tmp_i.make_assignment();
+        tmp_i.code=assignment;
+        tmp_i.location=i_it->location;
+        tmp_i.function=i_it->function;
 
-      goto_programt::instructiont tmp_i;
-      tmp_i.make_assignment();
-      tmp_i.code=assignment;
-      tmp_i.location=i_it->location;
-      tmp_i.function=i_it->function;
+        // inserts the assignment
+        goto_program.insert_before_swap(i_it, tmp_i);
 
-      // inserts the assignment
-      goto_program.insert_before_swap(i_it, tmp_i);
+        // i_it is now the assignment, advance to the `goto'
+        i_it++;
+      }
+    }
+  }
+  else
+  {
+    // simply replace all the returns by gotos
 
-      i_it++;
+    Forall_goto_program_instructions(i_it, goto_program)
+    {
+      if(i_it->is_return())
+        i_it->make_goto(end_function);
     }
   }
 }
@@ -247,7 +263,7 @@ void remove_returnst::operator()(goto_functionst &goto_functions)
 {
   Forall_goto_functions(it, goto_functions)
   {
-    do_return_value(it);
+    replace_returns(it);
     do_function_calls(goto_functions, it->second.body);
   }
 }
