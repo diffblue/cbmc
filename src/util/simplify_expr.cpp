@@ -169,6 +169,9 @@ Function: simplify_exprt::simplify_isinf
 bool simplify_exprt::simplify_isinf(exprt &expr)
 {
   if(expr.operands().size()!=1) return true;
+
+  if(ns.follow(expr.op0().type()).id()!=ID_floatbv)
+    return true;
  
   if(expr.op0().is_constant())
   {
@@ -317,7 +320,8 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
   if(op_type.id()==ID_pointer &&
      expr.op0().is_constant() &&
      to_constant_expr(expr.op0()).get_value()==ID_NULL &&
-     (expr_type.id()==ID_unsignedbv || expr_type.id()==ID_signedbv))
+     (expr_type.id()==ID_unsignedbv || expr_type.id()==ID_signedbv) &&
+     config.ansi_c.NULL_is_zero)
   {
     exprt tmp=gen_zero(expr_type);
     expr.swap(tmp);
@@ -408,6 +412,8 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
   //
   // Doesn't work for many, e.g., pointer difference, floating-point,
   // division, modulo.
+  // Also excludes ID_bitnot, which fails if the width of T
+  // is bigger than that of (x OP y).
   //
   if((expr_type.id()==ID_signedbv || expr_type.id()==ID_unsignedbv) &&
      (op_type.id()==ID_signedbv || op_type.id()==ID_unsignedbv))
@@ -416,7 +422,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
 
     if(op_id==ID_plus || op_id==ID_minus || op_id==ID_mult ||
        op_id==ID_unary_minus || 
-       op_id==ID_bitnot || op_id==ID_bitxor || op_id==ID_bitor || op_id==ID_bitand)
+       op_id==ID_bitxor || op_id==ID_bitor || op_id==ID_bitand)
     {
       exprt result=expr.op0();
       
@@ -780,10 +786,16 @@ static bool is_dereference_integer_object(
        !to_integer(expr.op0().op0(), address))
       return true;
 
-    if(expr.op0().is_zero()) // NULL
+    if(expr.op0().is_constant())
     {
-      address=0;
-      return true;
+      if(to_constant_expr(expr.op0()).get_value()==ID_NULL &&
+         config.ansi_c.NULL_is_zero) // NULL
+      {
+        address=0;
+        return true;
+      }
+      else if(!to_integer(expr.op0(), address))
+        return true;
     }
   }
   
@@ -1511,7 +1523,7 @@ bool simplify_exprt::simplify_plus(exprt &expr)
   else
   {
     // count the constants
-    unsigned count=0;
+    size_t count=0;
     forall_operands(it, expr)
       if(is_number(it->type()) && it->is_constant())
         count++;
@@ -2063,9 +2075,9 @@ bool simplify_exprt::simplify_concatenation(exprt &expr)
   if(is_bitvector_type(expr.type()))
   {
     // first, turn bool into bvec[1]
-    for(unsigned i=0; i<expr.operands().size(); i++)
+    Forall_operands(it, expr)
     {
-      exprt &op=expr.operands()[i];
+      exprt &op=*it;
       if(op.is_true() || op.is_false())
       {
         bool value=op.is_true();
@@ -2074,7 +2086,7 @@ bool simplify_exprt::simplify_concatenation(exprt &expr)
     }
     
     // search for neighboring constants to merge
-    unsigned i=0;
+    size_t i=0;
     
     while(i<expr.operands().size()-1)
     {
@@ -2102,7 +2114,7 @@ bool simplify_exprt::simplify_concatenation(exprt &expr)
   else if(expr.type().id()==ID_verilogbv)
   {
     // search for neighboring constants to merge
-    unsigned i=0;
+    size_t i=0;
     
     while(i<expr.operands().size()-1)
     {
@@ -2983,8 +2995,10 @@ bool simplify_exprt::simplify_bitnot(exprt &expr)
       {
         std::string value=op.get_string(ID_value);
 
-        for(unsigned i=0; i<value.size(); i++)
-          value[i]=(value[i]=='0')?'1':'0';
+        for(std::string::iterator it=value.begin();
+            it!=value.end();
+            ++it)
+          *it=(*it=='0')?'1':'0';
 
         exprt tmp(ID_constant, op.type());
         tmp.set(ID_value, value);
@@ -3513,7 +3527,7 @@ bool simplify_exprt::simplify_inequality_constant(exprt &expr)
         // note that 'ptr' may be an integer
         exprt op=expr.op0().op0();
         expr.op0().swap(op);
-        expr.op1()=gen_zero(expr.op0().type());
+        expr.op1().type()=expr.op0().type();
         simplify_inequality(expr); // do again!
         return false;
       }
@@ -4068,7 +4082,7 @@ bool simplify_exprt::simplify_index(exprt &expr)
   else if(array.id()=="array-list")
   {
     // These are index/value pairs, alternating.
-    for(unsigned i=0; i<array.operands().size()/2; i++)
+    for(size_t i=0; i<array.operands().size()/2; i++)
     {
       exprt tmp_index=array.operands()[i*2];
       tmp_index.make_typecast(index.type());
@@ -4079,6 +4093,33 @@ bool simplify_exprt::simplify_index(exprt &expr)
         expr.swap(tmp);
         return false;
       }
+    }
+  }
+  else if(array.id()==ID_byte_extract_little_endian ||
+          array.id()==ID_byte_extract_big_endian)
+  {
+    const typet &array_type=ns.follow(array.type());
+
+    if(array_type.id()==ID_array)
+    {
+      // This rewrites byte_extract(s, o, array_type)[i]
+      // to byte_extract(s, o+offset, sub_type)
+
+      mp_integer sub_size=pointer_offset_size(ns, array_type.subtype());
+      if(sub_size==-1) return true;
+
+      // add offset to index
+      mult_exprt offset(from_integer(sub_size, array.op1().type()), index);
+      plus_exprt final_offset(array.op1(), offset);
+      simplify_node(final_offset);
+
+      exprt result(array.id(), expr.type());
+      result.copy_to_operands(array.op0(), final_offset);
+      expr.swap(result);
+
+      simplify_rec(expr);
+
+      return false;
     }
   }
 
@@ -4104,10 +4145,10 @@ bool simplify_exprt::simplify_object(exprt &expr)
     if(expr.type().id()==ID_pointer)
     {
       // kill integers from sum
-      for(unsigned i=0; i<expr.operands().size(); i++)
-        if(ns.follow(expr.operands()[i].type()).id()==ID_pointer)
+      Forall_operands(it, expr)
+        if(ns.follow(it->type()).id()==ID_pointer)
         {
-          exprt tmp=expr.operands()[i];
+          exprt tmp=*it;
           expr.swap(tmp);
           simplify_object(expr);
           return false;
@@ -5075,11 +5116,11 @@ bool simplify_exprt::sort_and_join(exprt &expr)
 
   // join expressions
 
-  for(unsigned i=0; i<expr.operands().size();)
+  for(size_t i=0; i<expr.operands().size();)
   {
     if(expr.operands()[i].id()==expr.id())
     {
-      unsigned no_joined=expr.operands()[i].operands().size();
+      size_t no_joined=expr.operands()[i].operands().size();
 
       expr.operands().insert(expr.operands().begin()+i+1,
         expr.operands()[i].operands().begin(), 

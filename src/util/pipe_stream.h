@@ -15,6 +15,9 @@ Author:
 
 #ifdef _WIN32
 #include <windows.h>
+#else
+#include <unistd.h>
+#include <sys/types.h>
 #endif
 
 // a class much like __gnu_cxx::stdio_filebuf

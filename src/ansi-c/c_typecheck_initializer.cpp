@@ -246,25 +246,14 @@ void c_typecheck_baset::do_initializer(symbolt &symbol)
   }
   else if(!symbol.is_type)
   {
-    const typet &final_type=follow(symbol.type);
-    
-    if(final_type.id()==ID_incomplete_c_enum ||
-       final_type.id()==ID_c_enum)
+    if(symbol.is_macro)
     {
-      if(symbol.is_macro)
-      {
-        // these must have a constant value
-        assert(symbol.value.is_not_nil());
-        typecheck_expr(symbol.value);
-        locationt location=symbol.value.location();
-        do_initializer(symbol.value, symbol.type, true);
-        make_constant(symbol.value);
-      }
-      else
-      {
-        if(symbol.value.is_not_nil())
-          typecheck_expr(symbol.value);
-      }
+      // these must have a constant value
+      assert(symbol.value.is_not_nil());
+      typecheck_expr(symbol.value);
+      locationt location=symbol.value.location();
+      do_initializer(symbol.value, symbol.type, true);
+      make_constant(symbol.value);
     }
     else if(symbol.value.is_not_nil())
     {
@@ -419,9 +408,9 @@ void c_typecheck_baset::do_designated_initializer(
 
   // first phase: follow given designator
 
-  for(unsigned i=0; i<designator.size(); i++)
+  for(size_t i=0; i<designator.size(); i++)
   {
-    unsigned index=designator[i].index;
+    size_t index=designator[i].index;
     const typet &type=designator[i].type;
     
     assert(type.id()!=ID_symbol);
@@ -444,7 +433,7 @@ void c_typecheck_baset::do_designated_initializer(
         else
         {
           err_location(value);
-          str << "index designator " << index
+          str << "array index designator " << index
               << " out of bounds (" << dest->operands().size() << ")";
           throw 0;
         }
@@ -454,8 +443,9 @@ void c_typecheck_baset::do_designated_initializer(
     }
     else if(type.id()==ID_struct)
     {
-      const struct_union_typet::componentst &components=
+      const struct_typet::componentst &components=
         to_struct_type(type).components();
+
       assert(index<components.size());
       assert(components[index].type().id()!=ID_code &&
              !components[index].get_is_padding());
@@ -463,7 +453,7 @@ void c_typecheck_baset::do_designated_initializer(
       if(index>=dest->operands().size())
       {
         err_location(value);
-        str << "index designator " << index
+        str << "structure member designator " << index
             << " out of bounds (" << dest->operands().size() << ")";
         throw 0;
       }
@@ -472,18 +462,31 @@ void c_typecheck_baset::do_designated_initializer(
     }
     else if(type.id()==ID_union)
     {
-      // union initialization is quite special -- always use the first
-      // component according to C standard section 6.7.9
       const union_typet &union_type=to_union_type(type);
-      const union_typet::componentt &component=union_type.components().front();
 
-      // build a union expression from first component
-      union_exprt union_expr(union_type);
-      union_expr.op()=zero_initializer(component.type(), value.location(), *this, get_message_handler());
-      union_expr.location()=value.location();
-      union_expr.set(ID_component_name, component.get_name());
+      const union_typet::componentst &components=
+        union_type.components();
 
-      *dest=union_expr;
+      assert(index<components.size());
+
+      const union_typet::componentt &component=union_type.components()[index];
+      
+      if(dest->id()==ID_union &&
+         dest->get(ID_component_name)==component.get_name())
+      {
+        // already right union component (can initialize multiple submembers)
+      }
+      else
+      {
+        // Note that gcc issues a warning if the union component is switched.
+        // Build a union expression from given component.
+        union_exprt union_expr(union_type);
+        union_expr.op()=zero_initializer(component.type(), value.location(), *this, get_message_handler());
+        union_expr.location()=value.location();
+        union_expr.set(ID_component_name, component.get_name());
+        *dest=union_expr;
+      }
+
       dest=&(dest->op0());
     }
     else
@@ -874,7 +877,7 @@ exprt c_typecheck_baset::do_initializer_list(
      to_array_type(type).size().is_nil())
   {
     // make complete by setting array size
-    unsigned size=result.operands().size();
+    size_t size=result.operands().size();
     result.type().id(ID_array);
     result.type().set(ID_size, from_integer(size, index_type()));
   }

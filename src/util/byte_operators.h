@@ -174,19 +174,19 @@ public:
     build(type, little_endian);
   }
 
-  inline unsigned map_bit(unsigned bit) const
+  inline size_t map_bit(size_t bit) const
   {
-    unsigned byte=bit/8;
+    size_t byte=bit/8;
     return map_byte(byte)*8+bit%8;
   }
   
-  inline unsigned map_byte(unsigned byte) const
+  inline size_t map_byte(size_t byte) const
   {
     assert(byte<map.size());
     return map[byte];
   }
   
-  unsigned size() const
+  size_t size() const
   {
     return map.size();
   }
@@ -200,7 +200,7 @@ public:
 
 protected:
   const namespacet &ns;
-  std::vector<unsigned> map;
+  std::vector<size_t> map;
 
   void build_rec(const typet &type, bool little_endian);
 };

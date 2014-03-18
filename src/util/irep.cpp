@@ -6,13 +6,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <cstdlib>
 #include <cassert>
 
 #ifdef IREP_DEBUG
 #include <iostream>
 #endif
 
+#include "string2int.h"
 #include "irep.h"
 #include "i2string.h"
 #include "string_hash.h"
@@ -44,7 +44,7 @@ const irept &get_nil_irep()
 
 /*******************************************************************\
 
-Function: irept::detatch
+Function: irept::detach
 
   Inputs:
 
@@ -55,7 +55,7 @@ Function: irept::detatch
 \*******************************************************************/
 
 #ifdef SHARING
-void irept::detatch()
+void irept::detach()
 {
   #ifdef IREP_DEBUG
   std::cout << "DETATCH1: " << data << std::endl;
@@ -92,7 +92,7 @@ void irept::detatch()
 
 /*******************************************************************\
 
-Function: irept::recursive_detatch
+Function: irept::recursive_detach
 
   Inputs:
 
@@ -103,27 +103,27 @@ Function: irept::recursive_detatch
 \*******************************************************************/
 
 #ifdef SHARING
-void irept::recursive_detatch()
+void irept::recursive_detach()
 {
-  detatch();
+  detach();
   
   for(named_subt::iterator
       it=data->named_sub.begin();
       it!=data->named_sub.end();
       it++)
-    it->second.recursive_detatch();
+    it->second.recursive_detach();
     
   for(named_subt::iterator
       it=data->comments.begin();
       it!=data->comments.end();
       it++)
-    it->second.recursive_detatch();
+    it->second.recursive_detach();
     
   for(subt::iterator
       it=data->sub.begin();
       it!=data->sub.end();
       it++)
-    it->recursive_detatch();
+    it->recursive_detach();
 }
 #endif
 
@@ -143,6 +143,10 @@ Function: irept::remove_ref
 void irept::remove_ref(dt *old_data)
 {
   if(old_data==&empty_d) return;
+  
+  #if 0
+  nonrecursive_destructor(old_data);
+  #else
 
   assert(old_data->ref_count!=0);
 
@@ -160,12 +164,82 @@ void irept::remove_ref(dt *old_data)
     old_data->clear();
     std::cout << "DEALLOCATING " << old_data << "\n";
     #endif
-    
+
+    // may cause recursive call
     delete old_data;
 
     #ifdef IREP_DEBUG
     std::cout << "DONE\n";
     #endif
+  }
+  #endif
+}
+#endif
+
+/*******************************************************************\
+
+Function: irept::nonrecursive_destructor
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: Does the same as remove_ref, but
+          using an explicit stack instead of recursion.
+
+\*******************************************************************/
+
+#ifdef SHARING
+void irept::nonrecursive_destructor(dt *old_data)
+{
+  std::vector<dt *> stack(1, old_data);
+  
+  while(!stack.empty())
+  {
+    dt *d=stack.back();
+    stack.erase(--stack.end());
+    if(d==&empty_d) continue;
+    
+    assert(d->ref_count!=0);
+    d->ref_count--;
+
+    if(d->ref_count==0)
+    {
+      stack.reserve(stack.size()+
+                    d->named_sub.size()+
+                    d->comments.size()+
+                    d->sub.size());
+
+      for(named_subt::iterator
+          it=d->named_sub.begin();
+          it!=d->named_sub.end();
+          it++)
+      {
+        stack.push_back(it->second.data);
+        it->second.data=&empty_d;
+      }
+      
+      for(named_subt::iterator
+          it=d->comments.begin();
+          it!=d->comments.end();
+          it++)
+      {
+        stack.push_back(it->second.data);
+        it->second.data=&empty_d;
+      }
+      
+      for(subt::iterator
+          it=d->sub.begin();
+          it!=d->sub.end();
+          it++)
+      {
+        stack.push_back(it->data);
+        it->data=&empty_d;
+      }
+      
+      // now delete, won't do recursion
+      delete d;
+    }    
   }
 }
 #endif
@@ -207,7 +281,7 @@ Function: irept::move_to_named_sub
 void irept::move_to_named_sub(const irep_namet &name, irept &irep)
 {
   #ifdef SHARING
-  detatch();
+  detach();
   #endif
   add(name).swap(irep);
   irep.clear();
@@ -228,7 +302,7 @@ Function: irept::move_to_sub
 void irept::move_to_sub(irept &irep)
 {
   #ifdef SHARING
-  detatch();
+  detach();
   #endif
   get_sub().push_back(get_nil_irep());
   get_sub().back().swap(irep);
@@ -276,7 +350,7 @@ Function: irept::get_bool
 
 bool irept::get_bool(const irep_namet &name) const
 {
-  return bool(atoi(get(name).c_str()));
+  return unsafe_string2int(get_string(name))!=0;
 }
 
 /*******************************************************************\
@@ -293,7 +367,24 @@ Function: irept::get_int
 
 int irept::get_int(const irep_namet &name) const
 {
-  return atoi(get(name).c_str());
+  return unsafe_string2int(get_string(name));
+}
+
+/*******************************************************************\
+
+Function: irept::get_long_long
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+long long irept::get_long_long(const irep_namet &name) const
+{
+  return unsafe_string2signedlonglong(get_string(name));
 }
 
 /*******************************************************************\
@@ -308,9 +399,9 @@ Function: irept::set
 
 \*******************************************************************/
 
-void irept::set(const irep_namet &name, const long value)
+void irept::set(const irep_namet &name, const long long value)
 {
-  add(name).id(i2string((int)value));
+  add(name).id(i2string(value));
 }  
 
 /*******************************************************************\

@@ -248,6 +248,7 @@ void configt::ansi_ct::set_arch_spec_i386()
   arch=ARCH_I386;
   endianness=IS_LITTLE_ENDIAN;
   char_is_unsigned=false;
+  NULL_is_zero=true;
 
   switch(mode)
   {
@@ -290,6 +291,7 @@ void configt::ansi_ct::set_arch_spec_x86_64()
   endianness=IS_LITTLE_ENDIAN;
   long_double_width=16*8;
   char_is_unsigned=false;
+  NULL_is_zero=true;
 
   switch(mode)
   {
@@ -340,6 +342,7 @@ void configt::ansi_ct::set_arch_spec_power(const irep_idt &subarch)
   endianness=IS_BIG_ENDIAN;
   long_double_width=16*8;
   char_is_unsigned=true;
+  NULL_is_zero=true;
 
   switch(mode)
   {
@@ -392,6 +395,7 @@ void configt::ansi_ct::set_arch_spec_arm(const irep_idt &subarch)
   arch=ARCH_ARM;
   endianness=IS_LITTLE_ENDIAN;
   char_is_unsigned=true;
+  NULL_is_zero=true;
 
   switch(mode)
   {
@@ -432,6 +436,7 @@ void configt::ansi_ct::set_arch_spec_alpha()
   endianness=IS_LITTLE_ENDIAN;
   long_double_width=16*8;
   char_is_unsigned=false;
+  NULL_is_zero=true;
 
   switch(mode)
   {
@@ -473,6 +478,7 @@ void configt::ansi_ct::set_arch_spec_mips(const irep_idt &subarch)
     endianness=IS_BIG_ENDIAN;
   long_double_width=8*8;
   char_is_unsigned=false;
+  NULL_is_zero=true;
 
   switch(mode)
   {
@@ -513,6 +519,7 @@ void configt::ansi_ct::set_arch_spec_s390()
   endianness=IS_BIG_ENDIAN;
   long_double_width=16*8;
   char_is_unsigned=true;
+  NULL_is_zero=true;
 
   switch(mode)
   {
@@ -550,6 +557,7 @@ void configt::ansi_ct::set_arch_spec_s390x()
   arch=ARCH_S390X;
   endianness=IS_BIG_ENDIAN;
   char_is_unsigned=true;
+  NULL_is_zero=true;
 
   switch(mode)
   {
@@ -588,6 +596,7 @@ void configt::ansi_ct::set_arch_spec_sparc()
   endianness=IS_BIG_ENDIAN;
   long_double_width=16*8;
   char_is_unsigned=false;
+  NULL_is_zero=true;
 
   switch(mode)
   {
@@ -626,6 +635,7 @@ void configt::ansi_ct::set_arch_spec_ia64()
   long_double_width=16*8;
   endianness=IS_LITTLE_ENDIAN;
   char_is_unsigned=false;
+  NULL_is_zero=true;
 
   switch(mode)
   {
@@ -667,6 +677,7 @@ void configt::ansi_ct::set_arch_spec_x32()
   arch=ARCH_X32;
   endianness=IS_LITTLE_ENDIAN;
   char_is_unsigned=false;
+  NULL_is_zero=true;
 
   switch(mode)
   {
@@ -713,6 +724,7 @@ bool configt::set(const cmdlinet &cmdline)
   ansi_c.os=ansi_ct::NO_OS;
   ansi_c.arch=ansi_ct::NO_ARCH;
   ansi_c.lib=configt::ansi_ct::LIB_NONE;
+  ansi_c.NULL_is_zero=(size_t)((void*)0)==0;
   
   // Default is ROUND_TO_EVEN, justified by C99:
   // 1 At program startup the floating-point environment is initialized as
@@ -824,6 +836,7 @@ bool configt::set(const cmdlinet &cmdline)
     ansi_c.arch=configt::ansi_ct::NO_ARCH;
     ansi_c.endianness=configt::ansi_ct::NO_ENDIANNESS;
     ansi_c.lib=configt::ansi_ct::LIB_NONE;
+    ansi_c.NULL_is_zero=false;
 
     if(sizeof(long int)==8)
       ansi_c.set_64();
@@ -969,7 +982,7 @@ bool configt::set(const cmdlinet &cmdline)
 
 /*******************************************************************\
 
-Function: configt::ansi_ct::set_from_symbol_table
+Function: from_ns
 
   Inputs:
 
@@ -979,7 +992,7 @@ Function: configt::ansi_ct::set_from_symbol_table
 
 \*******************************************************************/
 
-int configt::ansi_ct::from_ns(
+static unsigned from_ns(
   const namespacet &ns,
   const std::string &what)
 {
@@ -997,7 +1010,7 @@ int configt::ansi_ct::from_ns(
   if(to_integer(tmp, int_value))
     throw "failed to convert symbol table configuration entry `"+id2string(id)+"'";
     
-  return integer2long(int_value);
+  return integer2unsigned(int_value);
 }
 
 /*******************************************************************\
@@ -1027,14 +1040,17 @@ void configt::ansi_ct::set_from_symbol_table(const symbol_tablet &symbol_table)
   single_width=from_ns(ns, "single_width");
   double_width=from_ns(ns, "double_width");
   long_double_width=from_ns(ns, "long_double_width");
-  char_is_unsigned=from_ns(ns, "char_is_unsigned");
+  char_is_unsigned=from_ns(ns, "char_is_unsigned")!=0;
   wchar_t_width=from_ns(ns, "wchar_t_width");
   alignment=from_ns(ns, "alignment");
-  use_fixed_for_float=from_ns(ns, "fixed_for_float");
+  use_fixed_for_float=from_ns(ns, "fixed_for_float")!=0;
   endianness=(endiannesst)from_ns(ns, "endianness");
 
   //memory_operand_size=from_ns(ns, "memory_operand_size");
   memory_operand_size=int_width/8;
+  
+  //NULL_is_zero=from_ns("NULL_is_zero");
+  NULL_is_zero=true;
 }
 
 /*******************************************************************\

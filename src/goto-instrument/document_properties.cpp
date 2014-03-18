@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <fstream>
-#include <cstdlib>
 
+#include <util/string2int.h>
 #include <util/i2string.h>
 
 #include <ansi-c/expr2c.h>
@@ -224,7 +224,7 @@ void document_propertiest::get_code(
     return;
   }
 
-  int line_int=atoi(line.c_str());
+  int line_int=unsafe_string2int(id2string(line));
 
   int line_start=line_int-3,
       line_end=line_int+3;

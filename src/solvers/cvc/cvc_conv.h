@@ -31,7 +31,7 @@ public:
   // API methods
   virtual void set_to(const exprt &expr, bool value);
   virtual literalt convert(const exprt &expr);
-  virtual tvt l_get(const literalt) const;
+  virtual tvt l_get(literalt) const;
   virtual void print_assignment(std::ostream &out) const;
 
 protected:

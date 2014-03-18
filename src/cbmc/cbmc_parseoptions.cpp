@@ -7,10 +7,11 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <fstream>
+#include <cstdlib> // exit()
 #include <iostream>
 #include <memory>
-#include <cstdlib>
 
+#include <util/string2int.h>
 #include <util/config.h>
 #include <util/expr_util.h>
 #include <util/language.h>
@@ -105,7 +106,7 @@ void cbmc_parseoptionst::eval_verbosity()
   
   if(cmdline.isset("verbosity"))
   {
-    v=atoi(cmdline.getval("verbosity"));
+    v=unsafe_string2int(cmdline.getval("verbosity"));
     if(v<0)
       v=0;
     else if(v>10)
@@ -212,6 +213,12 @@ void cbmc_parseoptionst::get_command_line_options(optionst &options)
     options.set_option("unsigned-overflow-check", true);
   else
     options.set_option("unsigned-overflow-check", false);
+
+  // check overflow/underflow
+  if(cmdline.isset("float-overflow-check"))
+    options.set_option("float-overflow-check", true);
+  else
+    options.set_option("float-overflow-check", false);
 
   // check for NaN (not a number)
   if(cmdline.isset("nan-check"))
@@ -345,6 +352,11 @@ int cbmc_parseoptionst::doit()
     std::cout << CBMC_VERSION << std::endl;
     return 0;
   }
+  
+  //
+  // Print a banner
+  //
+  status("CBMC version " CBMC_VERSION);
 
   //
   // unwinding of transition systems
@@ -818,7 +830,7 @@ void cbmc_parseoptionst::help()
 {
   std::cout <<
     "\n"
-    "* *   CBMC " CBMC_VERSION " - Copyright (C) 2001-2013 ";
+    "* *   CBMC " CBMC_VERSION " - Copyright (C) 2001-2014 ";
     
   std::cout << "(" << (sizeof(void *)*8) << "-bit version)";
     
@@ -871,6 +883,7 @@ void cbmc_parseoptionst::help()
     " --memory-leak-check          enable memory leak checks\n"
     " --signed-overflow-check      enable arithmetic over- and underflow checks\n"
     " --unsigned-overflow-check    enable arithmetic over- and underflow checks\n"
+    " --float-overflow-check       check floating-point for NaN\n"
     " --nan-check                  check floating-point for NaN\n"
     " --all-properties             report status of all properties\n"
     " --show-properties            show the properties\n"

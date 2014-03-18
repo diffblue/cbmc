@@ -212,6 +212,7 @@ c_enum
 enum
 elements
 unknown
+uninitialized
 invalid
 C_invalid_object #invalid_object
 pointer_offset
@@ -240,6 +241,8 @@ static
 auto
 register
 thread_local
+C_thread_local #thread_local
+C_static_lifetime #static_lifetime
 mutable
 void
 int8
@@ -537,7 +540,9 @@ task
 C_little_endian #little_endian
 C_offset #offset
 C_tag_only_declaration #tag_only_declaration
-tag_symbol
+struct_tag
+union_tag
+enum_tag
 generate_block
 generate_case
 generate_if

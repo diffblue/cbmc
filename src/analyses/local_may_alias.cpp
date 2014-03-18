@@ -20,83 +20,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
-Function: cfgt::build
-
-  Inputs:
-
- Outputs:
-
- Purpose: 
-
-\*******************************************************************/
-
-void local_cfgt::build(const goto_programt &goto_program)
-{
-  locs.resize(goto_program.instructions.size());
-
-  {  
-    unsigned loc_nr=0;
-  
-    for(goto_programt::const_targett it=goto_program.instructions.begin();
-        it!=goto_program.instructions.end();
-        it++, loc_nr++)
-    {
-      loc_map[it]=loc_nr;
-      locs[loc_nr].t=it;
-    }
-  }
-
-  for(unsigned loc_nr=0; loc_nr<locs.size(); loc_nr++)
-  {
-    loct &loc=locs[loc_nr];
-    const goto_programt::instructiont &instruction=*loc.t;
-    
-    switch(instruction.type)
-    {
-    case GOTO:
-      if(!instruction.guard.is_true())
-        loc.successors.push_back(loc_nr+1);
-        
-      for(goto_programt::targetst::const_iterator
-          t_it=instruction.targets.begin();
-          t_it!=instruction.targets.end();
-          t_it++)
-      {
-        unsigned l=loc_map.find(*t_it)->second;
-        loc.successors.push_back(l); 
-      }
-      break;
-      
-    case START_THREAD:
-      loc.successors.push_back(loc_nr+1);
-        
-      for(goto_programt::targetst::const_iterator
-          t_it=instruction.targets.begin();
-          t_it!=instruction.targets.end();
-          t_it++)
-      {
-        unsigned l=loc_map.find(*t_it)->second;
-        loc.successors.push_back(l); 
-      }
-      break;
-      
-    case RETURN:
-      loc.successors.push_back(locs.size()-1);
-      break;
-      
-    case THROW:
-    case END_FUNCTION:
-    case END_THREAD:
-      break; // no successor
-
-    default:
-      loc.successors.push_back(loc_nr+1);
-    }
-  }  
-}
-
-/*******************************************************************\
-
 Function: local_may_aliast::destt::merge
 
   Inputs:
@@ -117,13 +40,6 @@ bool local_may_aliast::destt::merge(const destt &src)
   if(objects.size()!=old_size)
     result=true;
 
-  // the following does an "OR"
-  if(!may_use_offset && src.may_use_offset)
-  {
-    may_use_offset=true;
-    result=true;
-  }
-  
   return result;
 }
 
@@ -290,34 +206,6 @@ std::set<exprt> local_may_aliast::get(
 
 /*******************************************************************\
 
-Function: local_may_aliast::may_use_offset
-
-  Inputs:
-
- Outputs:
-
- Purpose: 
-
-\*******************************************************************/
-
-bool local_may_aliast::may_use_offset(
-  const goto_programt::const_targett t,
-  const exprt &rhs)
-{
-  local_cfgt::loc_mapt::const_iterator loc_it=cfg.loc_map.find(t);
-  
-  assert(loc_it!=cfg.loc_map.end());
-  
-  const loc_infot &loc_info_src=loc_infos[loc_it->second];
-  
-  destt result_tmp;
-  get_rec(result_tmp, rhs, loc_info_src);
-
-  return result_tmp.may_use_offset;
-}
-
-/*******************************************************************\
-
 Function: local_may_aliast::aliases
 
   Inputs:
@@ -391,7 +279,6 @@ void local_may_aliast::get_rec(
       {
         const std::set<unsigned> &src=src_it->second.objects;
         dest.objects.insert(src.begin(), src.end());
-        dest.may_use_offset=dest.may_use_offset || src_it->second.may_use_offset;
       }
     }
     else
@@ -414,7 +301,6 @@ void local_may_aliast::get_rec(
         index_exprt tmp=index_expr;
         tmp.index()=gen_zero(index_type());
         dest.objects.insert(objects.number(tmp));
-        dest.may_use_offset=true;
       }
       else
         dest.objects.insert(unknown_object);
@@ -438,12 +324,10 @@ void local_may_aliast::get_rec(
       if(rhs.op0().type().id()==ID_pointer)
       {
         get_rec(dest, rhs.op0(), loc_info_src);
-        dest.may_use_offset=true;
       }
       else if(rhs.op1().type().id()==ID_pointer)
       {
         get_rec(dest, rhs.op1(), loc_info_src);
-        dest.may_use_offset=true;
       }
       else
         dest.objects.insert(unknown_object);
@@ -456,7 +340,6 @@ void local_may_aliast::get_rec(
     if(rhs.op0().type().id()==ID_pointer)
     {
       get_rec(dest, rhs.op0(), loc_info_src);
-      dest.may_use_offset=true;
     }
     else
       dest.objects.insert(unknown_object);
@@ -513,9 +396,9 @@ void local_may_aliast::build(const goto_functiont &goto_function)
   loc_infos.resize(cfg.locs.size());
   
   // feed in sufficiently bad defaults
-  for(code_typet::argumentst::const_iterator
-      it=goto_function.type.arguments().begin();
-      it!=goto_function.type.arguments().end();
+  for(code_typet::parameterst::const_iterator
+      it=goto_function.type.parameters().begin();
+      it!=goto_function.type.parameters().end();
       it++)
   {
     const irep_idt &identifier=it->get_identifier();
@@ -629,9 +512,6 @@ void local_may_aliast::output(
       }
         
       out << " }";
-      
-      if(p_it->second.may_use_offset)
-        out << " + ?";
       
       out << "\n";
     }

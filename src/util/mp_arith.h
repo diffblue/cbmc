@@ -24,6 +24,7 @@ const std::string integer2string(const mp_integer &n, unsigned base=10);
 const mp_integer string2integer(const std::string &n, unsigned base=10);
 const std::string integer2binary(const mp_integer &n, unsigned width);
 const mp_integer binary2integer(const std::string &n, bool is_signed);
-unsigned long integer2long(const mp_integer &n);
+mp_integer::ullong_t integer2long(const mp_integer &n);
+unsigned integer2unsigned(const mp_integer &n);
 
 #endif

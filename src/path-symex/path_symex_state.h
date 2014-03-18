@@ -18,14 +18,19 @@ struct path_symex_statet
 public:
   inline path_symex_statet(
     var_mapt &_var_map,
-    const locst &_locs):
+    const locst &_locs,
+    path_symex_historyt &_path_symex_history):
     var_map(_var_map),
     locs(_locs),
     inside_atomic_section(false),
+    history(_path_symex_history),
     current_thread(0),
-    no_thread_interleavings(0)
+    no_thread_interleavings(0),
+    depth(0)
   {
   }
+  
+  typedef path_symex_stept stept;
 
   // These are tied to a particular var_map
   // and a particular program.
@@ -106,21 +111,11 @@ public:
            threads[current_thread].active;
   }
 
-  inline void swap(path_symex_statet &other)
-  {
-    threads.swap(other.threads);
-    std::swap(inside_atomic_section, other.inside_atomic_section);
-    std::swap(current_thread, other.current_thread);
-    std::swap(no_thread_interleavings, other.no_thread_interleavings);
-    std::swap(unwinding_map, other.unwinding_map);
-    std::swap(recursion_map, other.recursion_map);
-  }
-  
   // execution history
-  path_symex_historyt history;
+  path_symex_step_reft history;
   
   // adds an entry to the history
-  path_symex_stept &record_step();
+  void record_step();
 
   // various state transformers
   
@@ -177,7 +172,7 @@ public:
   
   inline unsigned get_depth() const
   {
-    return history.steps.size();
+    return depth;
   }
   
   bool is_feasible(class decision_proceduret &) const;
@@ -195,6 +190,7 @@ public:
 protected:
   unsigned current_thread;
   unsigned no_thread_interleavings;
+  unsigned depth;
 
   exprt read(
     const exprt &src,
@@ -215,6 +211,7 @@ protected:
 
 path_symex_statet initial_state(
   var_mapt &var_map,
-  const locst &locs);
+  const locst &locs,
+  path_symex_historyt &);
   
 #endif

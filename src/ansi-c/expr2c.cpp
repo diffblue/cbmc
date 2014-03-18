@@ -66,6 +66,7 @@ std::string expr2ct::id_shorthand(const exprt &expr) const
   const symbolt *symbol;
 
   if(!ns.lookup(identifier, symbol) &&
+     !symbol->base_name.empty() &&
       has_suffix(id2string(identifier), id2string(symbol->base_name)))
     return id2string(symbol->base_name);
 
@@ -578,11 +579,6 @@ std::string expr2ct::convert_typecast(
      from_type.id()==ID_unsignedbv)
     return convert(src.op(), precedence);
 
-  if(to_type.id()==ID_pointer &&
-     ns.follow(to_type.subtype()).id()==ID_empty && // to (void *)?
-     src.op0().is_zero())
-    return "NULL";
-
   std::string dest="("+convert(to_type)+")";
 
   unsigned p;
@@ -738,7 +734,7 @@ std::string expr2ct::convert_with(
 
   dest+=" WITH [";
 
-  for(unsigned i=1; i<src.operands().size(); i+=2)
+  for(size_t i=1; i<src.operands().size(); i+=2)
   {
     std::string op1, op2;
     unsigned p1, p2;
@@ -2078,7 +2074,16 @@ std::string expr2ct::convert_constant(
   }
   else if(type.id()==ID_pointer)
   {
-    if(src.is_zero())
+    const irep_idt &value=to_constant_expr(src).get_value();
+    
+    if(value==ID_NULL)
+    {
+      dest="NULL";
+      if(type.subtype().id()!=ID_empty)
+        dest="(("+convert(type)+")"+dest+")";
+    }
+    else if(value==std::string(value.size(), '0') &&
+            config.ansi_c.NULL_is_zero)
     {
       dest="NULL";
       if(type.subtype().id()!=ID_empty)
@@ -2147,7 +2152,7 @@ std::string expr2ct::convert_struct(
 
   bool first=true;
   bool newline=false;
-  unsigned last_size=0;
+  size_t last_size=0;
 
   for(struct_typet::componentst::const_iterator
       c_it=components.begin();
@@ -2217,7 +2222,7 @@ std::string expr2ct::convert_vector(
 
   bool first=true;
   bool newline=false;
-  unsigned last_size=0;
+  size_t last_size=0;
 
   forall_operands(it, src)
   {
@@ -2337,7 +2342,7 @@ std::string expr2ct::convert_array(
       assert(it->is_constant());
       mp_integer i;
       to_integer(*it, i);
-      unsigned int ch=integer2long(i);
+      unsigned int ch=integer2unsigned(i);
 
       if(last_was_hex)
       {
@@ -2538,18 +2543,14 @@ std::string expr2ct::convert_function_application(
 
   dest+="(";
 
-  unsigned i=0;
-
   forall_expr(it, src.arguments())
   {
     unsigned p;
     std::string arg_str=convert(*it, p);
 
-    if(i>0) dest+=", ";
+    if(it!=src.arguments().begin()) dest+=", ";
     // TODO: ggf. Klammern je nach p
     dest+=arg_str;
-
-    i++;
   }
 
   dest+=")";
@@ -2583,18 +2584,14 @@ std::string expr2ct::convert_side_effect_expr_function_call(
 
   dest+="(";
 
-  unsigned i=0;
-
   forall_expr(it, src.arguments())
   {
     unsigned p;
     std::string arg_str=convert(*it, p);
 
-    if(i>0) dest+=", ";
+    if(it!=src.arguments().begin()) dest+=", ";
     // TODO: ggf. Klammern je nach p
     dest+=arg_str;
-
-    i++;
   }
 
   dest+=")";
@@ -2659,9 +2656,7 @@ Function: expr2ct::indent_str
 
 std::string expr2ct::indent_str(unsigned indent)
 {
-  std::string dest;
-  for(unsigned j=0; j<indent; j++) dest+=' ';
-  return dest;
+  return std::string(indent, ' ');
 }
 
 /*******************************************************************\
@@ -2927,9 +2922,10 @@ std::string expr2ct::convert_code_switch(
   dest+=indent_str(indent);
   dest+="{\n";
 
-  for(unsigned i=1; i<src.operands().size(); i++)
+  forall_operands(it, src)
   {
-    const exprt &op=src.operands()[i];
+    if(it==src.operands().begin()) continue;
+    const exprt &op=*it;
 
     if(op.get(ID_statement)!=ID_block)
     {
@@ -2938,8 +2934,8 @@ std::string expr2ct::convert_code_switch(
     }
     else
     {
-      forall_operands(it, op)
-        dest+=convert_code(to_code(*it), indent+2);
+      forall_operands(it2, op)
+        dest+=convert_code(to_code(*it2), indent+2);
     }
   }
 
@@ -3068,17 +3064,16 @@ std::string expr2ct::convert_code_for(
   std::string dest=indent_str(indent);
   dest+="for(";
 
-  unsigned i;
-  for(i=0; i<=2; i++)
-  {
-    if(!src.operands()[i].is_nil())
-    {
-      if(i!=0) dest+=" ";
-      dest+=convert(src.operands()[i]);
-    }
-
-    if(i!=2) dest+=";";
-  }
+  if(!src.op0().is_nil())
+    dest+=convert(src.op0());
+  else
+    dest+=" ";
+  dest+="; ";
+  if(!src.op1().is_nil())
+    dest+=convert(src.op1());
+  dest+="; ";
+  if(!src.op2().is_nil())
+    dest+=convert(src.op2());
 
   if(src.body().is_nil())
     dest+=");\n";
@@ -3442,8 +3437,6 @@ std::string expr2ct::convert_code_function_call(
 
   dest+="(";
 
-  unsigned i=0;
-
   const exprt::operandst &arguments=src.arguments();
 
   forall_expr(it, arguments)
@@ -3451,11 +3444,9 @@ std::string expr2ct::convert_code_function_call(
     unsigned p;
     std::string arg_str=convert(*it, p);
 
-    if(i>0) dest+=", ";
+    if(it!=arguments.begin()) dest+=", ";
     // TODO: ggf. Klammern je nach p
     dest+=arg_str;
-
-    i++;
   }
 
   dest+=");";

@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #if defined(__linux__) || \
     defined(__FreeBSD_kernel__) || \
     defined(__GNU__) || \
+    defined(__unix__) || \
     defined(__CYGWIN__) || \
     defined(__MACH__)
 #include <unistd.h>
@@ -175,7 +176,12 @@ decision_proceduret::resultt smt1_dect::dec_solve()
   command+=" 2>&1";
   #endif
 
-  system(command.c_str());
+  int res=system(command.c_str());
+  if(res<0)
+  {
+    error() << "error running SMT1 solver" << eom;
+    return decision_proceduret::D_ERROR;
+  }
 
   std::ifstream in(temp_result_filename.c_str());
 
@@ -545,7 +551,7 @@ bool smt1_dect::string_to_expr_z3(
     std::string w=value.substr(p, value.find(']')-p);
 
     std::string binary=integer2binary(string2integer(v,10),
-                                      string2integer(w,10).to_ulong());
+                                      integer2unsigned(string2integer(w,10)));
 
     if(type.id()==ID_struct)
     {
@@ -572,7 +578,7 @@ bool smt1_dect::string_to_expr_z3(
     if(!string_to_expr_z3(type.subtype(), av, ae)) return false;
 
     array_of_exprt ao;
-    ao.type() = typet("array");
+    ao.type() = typet(ID_array);
     ao.type().subtype()=ae.type();
     ao.what() = ae;
 
@@ -737,7 +743,7 @@ decision_proceduret::resultt smt1_dect::read_result_cvc3(std::istream &in)
       std::string w=value.substr(p, value.find(']')-p);
 
       std::string binary=integer2binary(string2integer(v,10),
-                                        string2integer(w,10).to_ulong());
+                                        integer2unsigned(string2integer(w,10)));
 
       set_value(it->second, "", binary);
     }

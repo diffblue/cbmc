@@ -96,7 +96,7 @@ public:
   virtual exprt get(const exprt &expr) const;
   virtual std::string decision_procedure_text() const { return "SMT2"; }
   virtual void print_assignment(std::ostream &out) const;
-  virtual tvt l_get(const literalt l) const;
+  virtual tvt l_get(literalt l) const;
   virtual void set_assumptions(const bvt &bv) { assumptions=bv; }
 
 protected:
@@ -114,6 +114,8 @@ protected:
   void convert_expr(const exprt &expr);
   void convert_type(const typet &type);
   void convert_literal(const literalt);
+  
+  bool use_array_theory(const array_typet &);
   
   // specific expressions go here
   void convert_byte_update(const exprt &expr);
@@ -136,7 +138,7 @@ protected:
   void convert_index(const index_exprt &expr);
   void convert_member(const member_exprt &expr);
   void convert_overflow(const exprt &expr);
-  void convert_with(const exprt &expr);
+  void convert_with(const with_exprt &expr);
   void convert_update(const exprt &expr);
   
   std::string convert_identifier(const irep_idt &identifier);

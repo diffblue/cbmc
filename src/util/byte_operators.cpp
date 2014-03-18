@@ -56,10 +56,12 @@ Function: endianness_mapt::output
 
 void endianness_mapt::output(std::ostream &out) const
 {
-  for(unsigned i=0; i<map.size(); i++)
+  for(std::vector<size_t>::const_iterator it=map.begin();
+      it!=map.end();
+      ++it)
   {
-    if(i!=0) out << ", ";
-    out << map[i];
+    if(it!=map.begin()) out << ", ";
+    out << *it;
   }
 }
 
@@ -97,9 +99,9 @@ void endianness_mapt::build_rec(const typet &src, bool little_endian)
           src.id()==ID_c_enum)
   {
     mp_integer s=pointer_offset_size(ns, src); // error is -1
-    unsigned s_int=integer2long(s), base=map.size();
+    size_t s_int=integer2long(s), base=map.size();
 
-    for(unsigned i=0; i<s_int; i++)
+    for(size_t i=0; i<s_int; i++)
     {
       if(little_endian)
         map.push_back(base+i);

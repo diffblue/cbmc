@@ -84,7 +84,7 @@ std::string expr2cppt::convert_struct(
   exprt::operandst::const_iterator o_it=src.operands().begin();
 
   bool first=true;
-  unsigned last_size=0;
+  size_t last_size=0;
 
   for(struct_typet::componentst::const_iterator
       c_it=components.begin();
@@ -342,11 +342,13 @@ std::string expr2cppt::convert_rec(
       const code_typet::argumentst &args = code_type.arguments();
       dest += "(";
 
-      if(args.size() > 0)
-        dest+=convert_rec(args[0].type(), c_qualifierst(), "");
-
-      for(unsigned i = 1; i < args.size();i++)
-        dest += ", " +convert_rec(args[i].type(), c_qualifierst(), "");
+      for(code_typet::argumentst::const_iterator it=args.begin();
+          it!=args.end();
+          ++it)
+      {
+        if(it!=args.begin()) dest+=", ";
+        dest+=convert_rec(it->type(), c_qualifierst(), "");
+      }
 
       dest += ")";
       dest+=d;

@@ -41,8 +41,8 @@ public:
   virtual literalt lselect(literalt a, literalt b, literalt c); // a?b:c
 
   virtual literalt new_variable();
-  virtual unsigned no_variables() const { return _no_variables; }
-  virtual void set_no_variables(unsigned no) { assert(false); }
+  virtual size_t no_variables() const { return _no_variables; }
+  virtual void set_no_variables(size_t no) { assert(false); }
 
   virtual void lcnf(const bvt &bv);
 
@@ -71,7 +71,7 @@ public:
   void finalize();
 
 protected:
-  unsigned _no_variables;
+  size_t _no_variables;
   std::ostream &out;
   
   std::string smt2_literal(literalt l);

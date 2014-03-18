@@ -526,9 +526,12 @@ bool goto_symex_statet::l2_thread_read_encoding(
           it!=a_s_writes->second.end();
           ++it)
       {
-        if(it->as_expr()==guard.as_expr())
+        guardt g=*it;
+        g-=guard;
+        if(g.is_true())
           // there has already been a write to l1_identifier within
-          // this atomic section under the same guard
+          // this atomic section under the same guard, or a guard
+          // that implies the current one
           return false;
 
         write_guard|=*it;
@@ -548,9 +551,12 @@ bool goto_symex_statet::l2_thread_read_encoding(
         it!=a_s_read.second.end();
         ++it)
     {
-      if(it->as_expr()==guard.as_expr())
+      guardt g=*it;
+      g-=guard;
+      if(g.is_true())
         // there has already been a read l1_identifier within
-        // this atomic section under the same guard
+        // this atomic section under the same guard, or a guard
+        // that implies the current one
         return false;
 
       read_guard|=*it;
@@ -563,30 +569,27 @@ bool goto_symex_statet::l2_thread_read_encoding(
     {
       level2.increase_counter(l1_identifier);
       a_s_read.first=level2.current_count(l1_identifier);
-      level2(to_symbol_expr(tmp.false_case()));
-
-      const bool record_events_bak=record_events;
-      record_events=false;
-      assignment(expr, tmp, ns, true);
-      record_events=record_events_bak;
-
-      symbol_exprt lhs=ns.lookup(orig_identifier).symbol_expr();
-      symex_target->assignment(
-        guard.as_expr(),
-        expr, lhs, expr, lhs,
-        tmp,
-        source,
-        symex_targett::PHI);
     }
-    else
-    {
-      to_symbol_expr(tmp.false_case()).set_identifier(
-        level2.name(l1_identifier, a_s_read.first));
-      expr.swap(tmp);
-    }
+
+    to_symbol_expr(tmp.false_case()).set_identifier(
+      level2.name(l1_identifier, a_s_read.first));
+
+    const bool record_events_bak=record_events;
+    record_events=false;
+    assignment(expr, tmp, ns, true);
+    record_events=record_events_bak;
+
+    symbol_exprt lhs=ns.lookup(orig_identifier).symbol_expr();
+    symex_target->assignment(
+      guard.as_expr(),
+      expr, lhs, expr, lhs,
+      tmp,
+      source,
+      symex_targett::PHI);
 
     a_s_read.second.push_back(guard);
-    a_s_read.second.back().add(no_write);
+    if(!no_write.op().is_false())
+      a_s_read.second.back().add(no_write);
 
     return true;
   }

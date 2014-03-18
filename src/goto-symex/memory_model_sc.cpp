@@ -38,6 +38,46 @@ void memory_model_sct::operator()(symex_target_equationt &equation)
 
 /*******************************************************************\
 
+Function: memory_model_sct::before
+
+  Inputs: 
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+exprt memory_model_sct::before(event_it e1, event_it e2)
+{
+  return partial_order_concurrencyt::before(
+    e1, e2, AX_PROPAGATION);
+}
+
+/*******************************************************************\
+
+Function: memory_model_sct::program_order_is_relaxed
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool memory_model_sct::program_order_is_relaxed(
+  partial_order_concurrencyt::event_it e1,
+  partial_order_concurrencyt::event_it e2) const
+{
+  assert(is_shared_read(e1) || is_shared_write(e1));
+  assert(is_shared_read(e2) || is_shared_write(e2));
+
+  return false;
+}
+
+/*******************************************************************\
+
 Function: memory_model_sct::build_per_thread_map
 
   Inputs:
@@ -283,15 +323,17 @@ void memory_model_sct::from_read(symex_target_equationt &equation)
       {
         exprt ws1, ws2;
         
-        if(po(*w_prime, *w))
+        if(po(*w_prime, *w) &&
+           !program_order_is_relaxed(*w_prime, *w))
         {
-          ws1=true_exprt(); // true on SC only!
-          ws2=false_exprt(); // true on SC only!
+          ws1=true_exprt();
+          ws2=false_exprt();
         }
-        else if(po(*w, *w_prime))
+        else if(po(*w, *w_prime) &&
+                !program_order_is_relaxed(*w, *w_prime))
         {
-          ws1=false_exprt(); // true on SC only!
-          ws2=true_exprt(); // true on SC only!
+          ws1=false_exprt();
+          ws2=true_exprt();
         }
         else
         {

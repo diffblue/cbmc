@@ -20,7 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "path_symex.h"
 
-#define DEBUG
+//#define DEBUG
 
 #ifdef DEBUG
 #include <iostream>
@@ -51,8 +51,10 @@ public:
     state.record_step();
     state.next_pc();
     exprt guard=state.read(not_exprt(instruction.guard));
-    state.history.steps.back().guard=guard;
+    state.history->guard=guard;
   }  
+  
+  typedef path_symex_stept stept;
 
 protected:
   void do_goto(
@@ -205,15 +207,18 @@ void path_symext::assign(
       throw "unexpected side-effect on rhs: "+id2string(statement);
   }
 
-  exprt::operandst _guard; // start with empty guard
+  // read the address of the lhs, with propagation
+  exprt lhs_address=state.read(address_of_exprt(lhs));
   
-  // don't propagate into the lhs
-  exprt ssa_lhs=state.read_no_propagate(lhs);
-  
-  // ok on the rhs
+  // now SSA it, no propagation
+  exprt ssa_lhs=
+    state.read_no_propagate(dereference_exprt(lhs_address));
+
+  // read the rhs
   exprt ssa_rhs=state.read(rhs);
 
-  // start recursion  
+  // start recursion on lhs
+  exprt::operandst _guard; // start with empty guard
   assign_rec(state, _guard, ssa_lhs, ssa_rhs);
 }
 
@@ -441,7 +446,8 @@ void path_symext::assign_rec(
       }
 
       // record the step
-      path_symex_stept &step=state.record_step();
+      state.record_step();
+      stept &step=*state.history;
       
       if(!guard.empty()) step.guard=conjunction(guard);
       step.full_lhs=ssa_lhs;
@@ -529,9 +535,6 @@ void path_symext::assign_rec(
   
     // assignment to byte_extract operators:
     // turn into byte_update operator
-    
-    // This requires a split over any struct fields, which
-    // is todo.
     
     irep_idt new_id;
     
@@ -731,15 +734,15 @@ void path_symext::function_call_rec(
     {
       further_states.push_back(state);
       path_symex_statet &false_state=further_states.back();
-      path_symex_stept &step=false_state.record_step();
-      step.guard=not_exprt(guard);
+      false_state.record_step();
+      false_state.history->guard=not_exprt(guard);
       function_call_rec(further_states.back(), call, if_expr.false_case(), further_states);
     }
 
     // do the true-case in 'state'
     {
-      path_symex_stept &step=state.record_step();
-      step.guard=guard;
+      state.record_step();
+      state.history->guard=guard;
       function_call_rec(state, call, if_expr.true_case(), further_states);
     }
   }
@@ -803,8 +806,6 @@ void path_symext::do_goto(
   path_symex_statet &state,
   std::list<path_symex_statet> &further_states)
 {
-  state.record_step();
-
   const goto_programt::instructiont &instruction=
     *state.get_instruction();
 
@@ -819,8 +820,10 @@ void path_symext::do_goto(
 
   exprt guard=state.read(instruction.guard);
   
-  if(guard.is_true())
+  if(guard.is_true()) // branch taken always
   {
+    state.record_step();
+    state.history->branch=stept::BRANCH_TAKEN;
     state.set_pc(loc.branch_target);
     return; // we are done
   }
@@ -830,14 +833,18 @@ void path_symext::do_goto(
     // branch taken case
     // copy the state into 'furhter_states'
     further_states.push_back(state);
+    further_states.back().record_step();
+    state.history->branch=stept::BRANCH_TAKEN;
     further_states.back().set_pc(loc.branch_target);
-    further_states.back().history.steps.back().guard=guard;
+    further_states.back().history->guard=guard;
   }
 
   // branch not taken case
   exprt negated_guard=not_exprt(guard);
+  state.record_step();
+  state.history->branch=stept::BRANCH_NOT_TAKEN;
   state.next_pc();
-  state.history.steps.back().guard=negated_guard;
+  state.history->guard=negated_guard;
 }
 
 /*******************************************************************\
@@ -875,14 +882,16 @@ void path_symext::do_goto(
     const loct &loc=state.locs[state.pc()];
     assert(!loc.branch_target.is_nil());
     state.set_pc(loc.branch_target);
-    state.history.steps.back().guard=guard;
+    state.history->guard=guard;
+    state.history->branch=stept::BRANCH_TAKEN;
   }
   else
   {
     // branch not taken case
     exprt negated_guard=not_exprt(guard);
     state.next_pc();
-    state.history.steps.back().guard=negated_guard;
+    state.history->guard=negated_guard;
+    state.history->branch=stept::BRANCH_NOT_TAKEN;
   }
 }
 
@@ -971,7 +980,7 @@ void path_symext::operator()(
     else
     {
       exprt guard=state.read(instruction.guard);
-      state.history.steps.back().guard=guard;
+      state.history->guard=guard;
     }
     break;
     
@@ -999,7 +1008,7 @@ void path_symext::operator()(
     break;
 
   case ATOMIC_END:
-    if(state.inside_atomic_section)
+    if(!state.inside_atomic_section)
       throw "ATOMIC_END unmatched";
 
     state.record_step();

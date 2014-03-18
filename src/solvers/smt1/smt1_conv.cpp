@@ -62,7 +62,7 @@ Function: smt1_convt::l_get
 
 \*******************************************************************/
 
-tvt smt1_convt::l_get(const literalt l) const
+tvt smt1_convt::l_get(literalt l) const
 {
   if(l.is_true()) return tvt(true);
   if(l.is_false()) return tvt(false);
@@ -225,7 +225,7 @@ exprt smt1_convt::ce_value(
     // add the elaborated expression as operand
     
     pointer_logict::pointert p;
-    p.object=integer2long(
+    p.object=integer2unsigned(
       binary2integer(
         value.substr(0, BV_ADDR_BITS), false));
         
@@ -255,7 +255,7 @@ exprt smt1_convt::ce_value(
         
       if(!to_integer(to_array_type(type).size(), size))
       {
-        unsigned size_int=integer2long(size);
+        unsigned size_int=integer2unsigned(size);
         unsigned sub_width=value.size()/size_int;
         exprt array_list(ID_array, type);
         array_list.operands().resize(size_int);

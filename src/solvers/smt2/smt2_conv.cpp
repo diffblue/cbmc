@@ -61,7 +61,7 @@ Function: smt2_convt::l_get
 
 \*******************************************************************/
 
-tvt smt2_convt::l_get(const literalt l) const
+tvt smt2_convt::l_get(literalt l) const
 {
   if(l.is_true()) return tvt(true);
   if(l.is_false()) return tvt(false);
@@ -401,7 +401,7 @@ void smt2_convt::set_value(
 
     // add elaborated expression as operand
     pointer_logict::pointert p;
-    p.object=integer2long(binary2integer(std::string(v, 0, BV_ADDR_BITS), false));
+    p.object=integer2unsigned(binary2integer(std::string(v, 0, BV_ADDR_BITS), false));
     p.offset=binary2integer(std::string(v, BV_ADDR_BITS, std::string::npos), true);
     
     result.copy_to_operands(pointer_logic.pointer_expr(p, type));
@@ -1101,7 +1101,7 @@ void smt2_convt::convert_expr(const exprt &expr)
   }
   else if(expr.id()==ID_with)
   {
-    convert_with(expr);
+    convert_with(to_with_expr(expr));
   }
   else if(expr.id()==ID_update)
   {
@@ -3006,7 +3006,7 @@ Function: smt2_convt::convert_with
 
 \*******************************************************************/
 
-void smt2_convt::convert_with(const exprt &expr)
+void smt2_convt::convert_with(const with_exprt &expr)
 {
   // get rid of "with" that has more than three operands
   
@@ -3036,14 +3036,58 @@ void smt2_convt::convert_with(const exprt &expr)
   if(expr_type.id()==ID_array)
   {
     const array_typet &array_type=to_array_type(expr_type);
-  
-    out << "(store ";
-    convert_expr(expr.op0());
-    out << " ";
-    convert_expr(typecast_exprt(expr.op1(), array_type.size().type()));
-    out << " ";
-    convert_expr(expr.op2());
-    out << ")";
+    
+    if(use_array_theory(array_type))
+    {
+      out << "(store ";
+      convert_expr(expr.old());
+      out << " ";
+      convert_expr(typecast_exprt(expr.where(), array_type.size().type()));
+      out << " ";
+      convert_expr(expr.new_value());
+      out << ")";
+    }
+    else
+    {
+      // fixed-width
+      unsigned array_width=boolbv_width(array_type);
+      unsigned sub_width=boolbv_width(array_type.subtype());
+      unsigned index_width=boolbv_width(expr.where().type());
+      
+      // We mask out the updated bit with AND,
+      // and then OR-in the shifted new value.
+
+      out << "(let ((distance? ";
+      out << "(bvmul (_ bv" << sub_width << " " << array_width << ") ";
+
+      // SMT2 says that the shift distance needs to be as wide
+      // as the stuff we are shifting.
+      if(array_width>index_width)
+      {
+        out << "((_ zero_extend " << array_width-index_width << ") ";
+        convert_expr(expr.where());
+        out << ")";
+      }
+      else
+      {
+        out << "((_ extract " << array_width-1 << " 0) ";
+        convert_expr(expr.where());
+        out << ")";
+      }
+      
+      out << "))) "; // bvmul, distance?
+      
+      out << "(bvor ";
+      out << "(bvand ";
+      out << "(bvlshr (_ bv" << power(2, array_width)-1 << " " << array_width << ") ";
+      out << "distance?) ";
+      convert_expr(expr.old());
+      out << ") "; // bvand
+      out << "(bvlshr ";
+      out << "((_ zero_extend " << array_width-sub_width << ") ";
+      convert_expr(expr.new_value());
+      out << ") distance?)))"; // zero_extend, bvlshr, bvor, let
+    }
   }
   else if(expr_type.id()==ID_struct)
   {
@@ -3205,29 +3249,7 @@ void smt2_convt::convert_index(const index_exprt &expr)
   {
     const array_typet &array_type=to_array_type(array_op_type);
     
-    // fixed size?
-    unsigned width=boolbv_width(array_type);
-    
-    if(width!=0)
-    {
-      // yes
-      unflatten(BEGIN, array_type.subtype());
-      
-      unsigned sub_width=boolbv_width(array_type.subtype());
-      unsigned index_width=boolbv_width(expr.index().type());
-      
-      out << "((_ extract " << sub_width-1 << " 0) ";
-      out << "(bvlshr ";
-      convert_expr(expr.array());
-      out << " ";
-      out << "(bvmul (_ bv" << sub_width << " " << width << ") ";
-      out << "((_ zero_extend " << width-index_width << ") ";
-      convert_expr(expr.index());
-      out << "))))"; // zero_extend, mult, bvlshr, extract
-      
-      unflatten(END, array_type.subtype());
-    }
-    else
+    if(use_array_theory(array_type))
     {
       if(ns.follow(expr.type()).id()==ID_bool && !use_array_of_bool)
       {
@@ -3247,6 +3269,42 @@ void smt2_convt::convert_index(const index_exprt &expr)
         convert_expr(typecast_exprt(expr.index(), array_type.size().type()));
         out << ")";
       }
+    }
+    else
+    {
+      // fixed size
+      unsigned array_width=boolbv_width(array_type);
+      assert(array_width!=0);
+
+      unflatten(BEGIN, array_type.subtype());
+      
+      unsigned sub_width=boolbv_width(array_type.subtype());
+      unsigned index_width=boolbv_width(expr.index().type());
+
+      out << "((_ extract " << sub_width-1 << " 0) ";
+      out << "(bvlshr ";
+      convert_expr(expr.array());
+      out << " ";
+      out << "(bvmul (_ bv" << sub_width << " " << array_width << ") ";
+
+      // SMT2 says that the shift distance must be the same as 
+      // the width of what we shift.
+      if(array_width>index_width)
+      {
+        out << "((_ zero_extend " << array_width-index_width << ") ";
+        convert_expr(expr.index());
+        out << ")"; // zero_extend
+      }
+      else
+      {
+        out << "((_ extract " << array_width-1 << " 0) ";
+        convert_expr(expr.index());
+        out << ")"; // extract
+      }
+      
+      out << ")))"; // mult, bvlshr, extract
+      
+      unflatten(END, array_type.subtype());
     }
   }
   else if(array_op_type.id()==ID_vector)
@@ -3325,13 +3383,20 @@ void smt2_convt::convert_member(const member_exprt &expr)
     }
     else
     {
-      // TODO
+      // we extract
+      unsigned member_width=boolbv_width(expr.type());
+      mp_integer member_offset=::member_offset(ns, struct_type, name);
+      if(member_offset==-1)
+        throw "failed to get struct member offset";
+        
+      out << "((_ extract " << (member_offset*8+member_width-1)
+          << " " << member_offset*8 << ") ";
+      convert_expr(struct_op);
+      out << ")";
     }
   }
   else if(struct_op_type.id()==ID_union)
   {
-    boolbv_widtht boolbv_width(ns);
-    
     unsigned width=boolbv_width(expr.type());
       
     if(width==0)
@@ -3736,6 +3801,29 @@ void smt2_convt::find_symbols(const exprt &expr)
 
 /*******************************************************************\
 
+Function: smt2_convt::use_array_theory
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool smt2_convt::use_array_theory(const array_typet &type)
+{
+  // fixed-size array?
+  unsigned width=boolbv_width(type);
+  
+  if(width!=0)
+    return false; // flatten
+  else
+    return true; // use array theory
+}
+
+/*******************************************************************\
+
 Function: smt2_convt::convert_type
 
   Inputs:
@@ -3751,18 +3839,10 @@ void smt2_convt::convert_type(const typet &type)
   if(type.id()==ID_array)
   {
     const array_typet &array_type=to_array_type(type);
-
-    // fixed-size array?
-    unsigned width=boolbv_width(array_type);
     
-    if(width!=0)
+    if(use_array_theory(array_type))
     {
-      // yes, flatten
-      out << "(_ BitVec " << width << ")";
-    }
-    else
-    {
-      // no, use array theory
+      // use array theory
       const typet &subtype=ns.follow(array_type.subtype());
 
       out << "(Array ";
@@ -3775,6 +3855,14 @@ void smt2_convt::convert_type(const typet &type)
         convert_type(array_type.subtype());
       
       out << ")";
+    }
+    else
+    {
+      // flatten
+      unsigned width=boolbv_width(array_type);
+      assert(width!=0);
+
+      out << "(_ BitVec " << width << ")";
     }
   }
   else if(type.id()==ID_bool)

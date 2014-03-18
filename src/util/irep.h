@@ -186,12 +186,13 @@ public:
   const irep_idt &get(const irep_namet &name) const;
   bool get_bool(const irep_namet &name) const;
   int get_int(const irep_namet &name) const;
+  long long get_long_long(const irep_namet &name) const;
 
   inline void set(const irep_namet &name, const irep_idt &value)
   { add(name).id(value); }
   inline void set(const irep_namet &name, const irept &irep)
   { add(name, irep); }
-  void set(const irep_namet &name, const long value);
+  void set(const irep_namet &name, const long long value);
   
   void remove(const irep_namet &name);
   void move_to_sub(irept &irep);
@@ -310,8 +311,9 @@ protected:
   dt *data;
   static dt empty_d;
   
-  void remove_ref(dt *old_data);  
-  void detatch();
+  static void remove_ref(dt *old_data);  
+  static void nonrecursive_destructor(dt *old_data);
+  void detach();
 
 public:  
   inline const dt &read() const
@@ -321,14 +323,14 @@ public:
 
   inline dt &write()
   {
-    detatch();
+    detach();
     #ifdef HASH_CODE
     data->hash_code=0;
     #endif
     return *data;
   }
   
-  void recursive_detatch();
+  void recursive_detach();
   
   #else
   dt data;

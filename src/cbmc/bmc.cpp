@@ -7,10 +7,10 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <fstream>
-#include <cstdlib>
 #include <iostream>
 #include <memory>
 
+#include <util/string2int.h>
 #include <util/i2string.h>
 #include <util/string2int.h>
 #include <util/location.h>
@@ -573,9 +573,9 @@ Function: bmct::setup_unwind
 void bmct::setup_unwind()
 {
   const std::string &set=options.get_option("unwindset");
-  unsigned int length=set.length();
+  std::string::size_type length=set.length();
 
-  for(unsigned int idx=0; idx<length; idx++)
+  for(std::string::size_type idx=0; idx<length; idx++)
   {
     std::string::size_type next=set.find(",", idx);
     std::string val=set.substr(idx, next-idx);
@@ -586,7 +586,7 @@ void bmct::setup_unwind()
        val.find(":")!=std::string::npos)
     {
       std::string nr=val.substr(0, val.find(":"));
-      thread_nr=atol(nr.c_str());
+      thread_nr=unsafe_string2unsigned(nr);
       val.erase(0, nr.size()+1);
     }
 

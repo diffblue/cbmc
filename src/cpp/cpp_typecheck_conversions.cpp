@@ -13,6 +13,7 @@ Author:
 #include <util/expr_util.h>
 #include <util/std_types.h>
 #include <util/std_expr.h>
+#include <util/simplify_expr.h>
 
 #include <ansi-c/c_qualifiers.h>
 #include <ansi-c/c_types.h>
@@ -560,7 +561,7 @@ bool cpp_typecheckt::standard_conversion_pointer(
     return false;
     
   // integer 0 to NULL pointer conversion?
-  if(expr.is_zero() &&
+  if(simplify_expr(expr, *this).is_zero() &&
      expr.type().id()!=ID_pointer)
   {
     new_expr = expr;
@@ -2088,7 +2089,7 @@ bool cpp_typecheckt::reinterpret_typecast(
      && !is_reference(type))
   {
     // integer to pointer
-    if(e.is_zero())
+    if(simplify_expr(e, *this).is_zero())
     {
       // NULL
       new_expr = e;

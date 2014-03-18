@@ -34,7 +34,7 @@ void boolbvt::convert_array(const exprt &expr, bvt &bv)
     assert(expr.has_operands());
     const exprt::operandst &operands=expr.operands();
     assert(!operands.empty());
-    unsigned op_width=width/operands.size();
+    std::size_t op_width=width/operands.size();
     
     forall_expr(it, operands)
     {

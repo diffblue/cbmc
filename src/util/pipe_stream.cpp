@@ -344,7 +344,7 @@ std::streamsize filedescriptor_streambuf::xsputn(
 {
 #ifdef _WIN32
   DWORD len;
-  WriteFile(proc_in, str, count, &len, NULL);
+  WriteFile(proc_in, str, (DWORD)count, &len, NULL);
   return len;
 #else
   return write(proc_in, str, count);

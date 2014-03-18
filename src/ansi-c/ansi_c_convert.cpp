@@ -543,13 +543,14 @@ void ansi_c_convertt::convert_type(
   }
   else if(type.id()==ID_typeof)
   {
-    if(type.find(ID_operands).is_nil())
+    exprt &expr=(exprt &)type;
+    
+    if(!expr.has_operands())
     {
       convert_type(static_cast<typet &>(type.add(ID_type_arg)));
     }
     else
     {
-      exprt &expr=(exprt &)type;
       assert(expr.operands().size()==1);
       convert_expr(expr.op0());
     }

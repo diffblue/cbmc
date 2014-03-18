@@ -40,6 +40,24 @@ void memory_model_tsot::operator()(symex_target_equationt &equation)
 
 /*******************************************************************\
 
+Function: memory_model_tsot::before
+
+  Inputs: 
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+exprt memory_model_tsot::before(event_it e1, event_it e2)
+{
+  return partial_order_concurrencyt::before(
+    e1, e2, AX_SC_PER_LOCATION | AX_PROPAGATION);
+}
+
+/*******************************************************************\
+
 Function: memory_model_tsot::program_order_is_relaxed
 
   Inputs:
@@ -117,7 +135,7 @@ void memory_model_tsot::program_order(
           e_it2!=events.end();
           e_it2++)
       {
-        if(is_spawn(*e_it) ||
+        if((is_spawn(*e_it) && !is_memory_barrier(*e_it2)) ||
            is_spawn(*e_it2))
         {
           add_constraint(
@@ -134,7 +152,7 @@ void memory_model_tsot::program_order(
 
         if(is_memory_barrier(*e_it2))
         {
-          const codet &code=to_code((*e_it)->source.pc->code);
+          const codet &code=to_code((*e_it2)->source.pc->code);
 
           if(is_shared_read(*e_it) &&
              !code.get_bool(ID_RRfence) &&
@@ -156,24 +174,36 @@ void memory_model_tsot::program_order(
           continue;
         }
 
-        exprt cond;
-        if(program_order_is_relaxed(*e_it, *e_it2))
+        exprt cond=true_exprt();
+        exprt ordering=nil_exprt();
+
+        if(address(*e_it)==address(*e_it2))
+        {
+          ordering=partial_order_concurrencyt::before(
+            *e_it, *e_it2, AX_SC_PER_LOCATION);
+        }
+        else if(program_order_is_relaxed(*e_it, *e_it2))
         {
           if(is_shared_read(*e_it2))
             cond=mb_guard_r;
           else
             cond=mb_guard_w;
+
+          simplify(cond, ns);
         }
-        else
-          cond.make_true();
-        simplify(cond, ns);
 
         if(!cond.is_false())
+        {
+          if(ordering.is_nil())
+            ordering=partial_order_concurrencyt::before(
+              *e_it, *e_it2, AX_PROPAGATION);
+
           add_constraint(
             equation,
-            implies_exprt(cond, before(*e_it, *e_it2)),
+            implies_exprt(cond, ordering),
             "po",
             (*e_it)->source);
+        }
       }
     }
   }

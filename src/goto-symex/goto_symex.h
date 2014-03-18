@@ -142,7 +142,8 @@ protected:
   exprt address_arithmetic(
     const exprt &expr,
     statet &state,
-    guardt &guard);
+    guardt &guard,
+    bool keep_array);
   
   // guards
   

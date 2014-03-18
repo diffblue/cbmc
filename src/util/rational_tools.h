@@ -7,7 +7,7 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #ifndef CPROVER_RATIONAL_TOOLS_H
-#define CPROVER_RAITONAL_TOOLS_H
+#define CPROVER_RATIONAL_TOOLS_H
 
 #include "rational.h"
 

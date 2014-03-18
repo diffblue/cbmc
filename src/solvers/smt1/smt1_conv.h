@@ -57,7 +57,7 @@ public:
   virtual literalt convert(const exprt &expr);
   virtual void set_to(const exprt &expr, bool value);
   virtual exprt get(const exprt &expr) const;
-  virtual tvt l_get(const literalt) const;
+  virtual tvt l_get(literalt) const;
   virtual std::string decision_procedure_text() const { return "SMT1"; }
   virtual void print_assignment(std::ostream &out) const;
 

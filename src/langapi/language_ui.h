@@ -37,9 +37,9 @@ public:
     language_files.clear();
   }
   
-  virtual void show_symbol_table();
-  virtual void show_symbol_table_plain(std::ostream &out);
-  virtual void show_symbol_table_xml_ui();
+  virtual void show_symbol_table(bool brief=false);
+  virtual void show_symbol_table_plain(std::ostream &out, bool brief);
+  virtual void show_symbol_table_xml_ui(bool brief);
 
   typedef ui_message_handlert::uit uit;
   

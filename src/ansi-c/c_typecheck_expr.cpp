@@ -961,7 +961,7 @@ void c_typecheck_baset::typecheck_expr_alignof(exprt &expr)
   }
 
   // we only care about the type
-  unsigned a=alignment(argument_type, *this);
+  mp_integer a=alignment(argument_type, *this);
   
   exprt tmp=from_integer(a, size_type());
   tmp.location()=expr.location();
@@ -1179,12 +1179,11 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
 
   // special case: NULL
   if(expr_type.id()==ID_pointer &&
-     op.is_zero())
+     simplify_expr(op, *this).is_zero())
   {
     // zero typecasted to a pointer is NULL
-    expr.id(ID_constant);
-    expr.set(ID_value, ID_NULL);
-    expr.remove(ID_operands);
+    constant_exprt result(ID_NULL, expr_type);
+    expr=result;
     return;
   }
 
@@ -1401,21 +1400,6 @@ void c_typecheck_baset::typecheck_expr_rel(exprt &expr)
   }
   else
   {
-    // pointer and zero
-    if(type0.id()==ID_pointer && op1.is_zero())
-    {
-      op1=constant_exprt(type0);
-      op1.set(ID_value, ID_NULL);
-      return;
-    }
-
-    if(type1.id()==ID_pointer && op0.is_zero())
-    {
-      op0=constant_exprt(type1);
-      op0.set(ID_value, ID_NULL);
-      return;
-    }
-
     // pointer and integer
     if(type0.id()==ID_pointer && is_number(type1))
     {
@@ -2032,7 +2016,8 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
       symbolt new_symbol;
 
       new_symbol.name=identifier;
-      new_symbol.base_name=std::string(id2string(identifier), 3, std::string::npos);
+      new_symbol.base_name=
+        std::string(id2string(identifier), language_prefix.size(), std::string::npos);
       new_symbol.location=expr.location();
       new_symbol.type=code_typet();
       new_symbol.type.set(ID_C_incomplete, true);

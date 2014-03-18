@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <cassert>
-#include <cstdlib>
 
+#include <util/string2int.h>
 #include <util/expr_util.h>
 #include <util/c_misc.h>
 #include <util/base_type.h>
@@ -775,7 +775,7 @@ Function: value_set_dereferencet::memory_model
 
 inline static unsigned bv_width(const typet &type)
 {
-  return atoi(type.get(ID_width).c_str());
+  return unsafe_string2unsigned(type.get_string(ID_width));
 }
 
 static bool is_a_bv_type(const typet &type)
@@ -804,7 +804,18 @@ bool value_set_dereferencet::memory_model(
      is_a_bv_type(to_type))
   {
     if(bv_width(from_type)==bv_width(to_type))
-      return memory_model_conversion(value, to_type, guard, offset);
+    {
+      // avoid semantic conversion in case of
+      // cast to float or fixed-point,
+      // or cast from float or fixed-point
+
+      if(to_type.id()==ID_fixedbv || to_type.id()==ID_floatbv ||
+         from_type.id()==ID_fixedbv || from_type.id()==ID_floatbv)
+      {
+      }
+      else
+        return memory_model_conversion(value, to_type, guard, offset);
+    }
   }
 
   // we are willing to do the same for pointers
@@ -839,22 +850,9 @@ bool value_set_dereferencet::memory_model_conversion(
   const guardt &guard,
   const exprt &offset)
 {
-  const typet from_type=value.type();
-
-  // avoid semantic conversion in case of
-  // cast to float or fixed-point
-  if(from_type.id()!=ID_bv &&
-     (to_type.id()==ID_fixedbv || to_type.id()==ID_floatbv))
-  {
-    value.make_typecast(bv_typet(bv_width(from_type)));
-    value.make_typecast(to_type);
-  }
-  else
-  {
-    // only doing type conversion
-    // just do the typecast
-    value.make_typecast(to_type);
-  }
+  // only doing type conversion
+  // just do the typecast
+  value.make_typecast(to_type);
 
   // also assert that offset is zero
 

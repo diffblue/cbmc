@@ -22,6 +22,11 @@ public:
   virtual void operator()(symex_target_equationt &equation);
   
 protected:
+  virtual exprt before(event_it e1, event_it e2);
+  virtual bool program_order_is_relaxed(
+    partial_order_concurrencyt::event_it e1,
+    partial_order_concurrencyt::event_it e2) const;
+
   void build_per_thread_map(
     const symex_target_equationt &equation,
     per_thread_mapt &dest) const;

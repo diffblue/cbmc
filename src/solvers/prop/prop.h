@@ -61,7 +61,7 @@ public:
   // variables
   virtual literalt new_variable()=0;
   virtual void set_variable_name(literalt a, const std::string &name) { }
-  virtual unsigned no_variables() const=0;
+  virtual size_t no_variables() const=0;
   bvt new_variables(unsigned width);
   
   // solving
@@ -74,7 +74,9 @@ public:
   virtual void set_assignment(literalt a, bool value);
   virtual void copy_assignment_from(const propt &prop);
 
-  // returns true if an assumption is in the final conflict
+  // Returns true if an assumption is in the final conflict.
+  // Note that only literals that are assumptions (see set_assumptions)
+  // may be queried.
   virtual bool is_in_conflict(literalt l) const;  
   virtual bool has_is_in_conflict() const { return false; }
   

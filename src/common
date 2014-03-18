@@ -1,8 +1,12 @@
-# Build platform (use one of AUTO, Unix, OSX_Universal, MSVC, Cygwin, MinGW)
+# Build platform
+# (use one of AUTO, Unix, OSX, OSX_Universal, MSVC, Cygwin, MinGW)
+
 ifeq ($(BUILD_ENV),AUTO)
 uname = $(shell uname)
 ifeq ($(uname),windows32)
   BUILD_ENV_ := MSVC
+else ifeq ($(uname),Darwin)
+  BUILD_ENV_ := OSX
 else ifeq ($(filter-out MINGW32_%, $(uname)),)
   BUILD_ENV_ := MinGW
 else ifeq ($(filter-out CYGWIN_%, $(uname)),)
@@ -14,8 +18,8 @@ else
   BUILD_ENV_ := $(BUILD_ENV)
 endif
 
-ifeq ($(filter-out Unix MinGW OSX_Universal,$(BUILD_ENV_)),)
-  # Linux etc.
+ifeq ($(filter-out Unix MinGW OSX OSX_Universal,$(BUILD_ENV_)),)
+  # Linux-ish
   LIBEXT = .a
   OBJEXT = .o
 ifeq ($(BUILD_ENV_),MinGW)
@@ -26,13 +30,19 @@ endif
   CFLAGS ?= -Wall -O2
   CXXFLAGS ?= -Wall -O2
   CP_CFLAGS = -MMD -MP
+ifeq ($(filter-out OSX OSX_Universal,$(BUILD_ENV_)),)
+  CP_CXXFLAGS = -MMD -MP -DSTL_HASH_TR1 -mmacosx-version-min=10.6
+  LINKFLAGS += -mmacosx-version-min=10.6
+  LINKNATIVE += -mmacosx-version-min=10.6
+else
   CP_CXXFLAGS = -MMD -MP -DSTL_HASH_TR1
+endif
   #LINKFLAGS = -static
 ifeq ($(BUILD_ENV_),OSX_Universal)
   # MacOS Fat Binaries
-  CP_CXXFLAGS += -force_cpusubtype_ALL -arch i386 -arch ppc -arch x86_64
-  CP_CFLAGS += -force_cpusubtype_ALL -arch i386 -arch ppc -arch x86_64
-  LINKFLAGS += -force_cpusubtype_ALL -arch i386 -arch ppc -arch x86_64
+  CP_CXXFLAGS += -force_cpusubtype_ALL -arch i386 -arch x86_64
+  CP_CFLAGS += -force_cpusubtype_ALL -arch i386 -arch x86_64
+  LINKFLAGS += -force_cpusubtype_ALL -arch i386 -arch x86_64
   LINKLIB = /usr/bin/libtool -static -o $@ $^
 else
   LINKLIB = ld -r -o $@ $^
@@ -93,8 +103,8 @@ else ifeq ($(BUILD_ENV_),MSVC)
   LIBEXT = .lib
   OBJEXT = .obj
   EXEEXT = .exe
-  CFLAGS ?= /O2 /GF
-  CXXFLAGS ?= /O2 /GF
+  CFLAGS ?= /W3 /O2 /GF
+  CXXFLAGS ?= /W3 /D_CRT_SECURE_NO_WARNINGS /O2 /GF
   CP_CFLAGS =
   CP_CXXFLAGS = -DSTL_HASH_TR1
   LINKLIB = lib /NOLOGO /OUT:$@ $^

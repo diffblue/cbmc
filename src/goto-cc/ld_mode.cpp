@@ -6,9 +6,9 @@ Author: Daniel Kroening, 2013
 
 \*******************************************************************/
 
-#include <cstdlib>
 #include <iostream>
 
+#include <util/string2int.h>
 #include <util/config.h>
 
 #include <cbmc/version.h>
@@ -58,7 +58,7 @@ bool ld_modet::doit()
   }
 
   if(cmdline.isset("verbosity"))
-    verbosity=atoi(cmdline.getval("verbosity"));
+    verbosity=unsafe_string2int(cmdline.getval("verbosity"));
 
   compiler.set_verbosity(verbosity);
   set_verbosity(verbosity);

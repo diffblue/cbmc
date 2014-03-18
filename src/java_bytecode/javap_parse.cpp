@@ -32,6 +32,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #if defined(__linux__) || \
     defined(__FreeBSD_kernel__) || \
     defined(__GNU__) || \
+    defined(__unix__) || \
     defined(__CYGWIN__) || \
     defined(__MACH__)
 #include <unistd.h>
@@ -115,7 +116,7 @@ protected:
   {
     // follow a #number
     assert(!ref.empty() && ref[0]=='#');
-    return constants[atoi(ref.c_str()+1)].value_string;
+    return constants[unsafe_string2unsigned(ref.c_str()+1)].value_string;
   }
   
   typedef std::map<unsigned, unsigned> address_to_linet;
@@ -433,7 +434,7 @@ void javap_parsert::rcode(membert &dest_member)
   //    0:	bipush	123
   irep_idt t;
   t=token(); // address
-  instruction.address=atoi(t.c_str());
+  instruction.address=unsafe_string2unsigned(id2string(t));
   
   t=token(); // :
   
@@ -448,7 +449,7 @@ void javap_parsert::rcode(membert &dest_member)
     {
       // a constant from the constant table
       t=token();
-      instruction.args.push_back(constants[atoi(t.c_str())].value_expr);
+      instruction.args.push_back(constants[unsafe_string2unsigned(id2string(t))].value_expr);
     }
     else if(t!="" && isdigit(t[0]))
       instruction.args.push_back(constant_exprt(t, integer_typet())); // some number
@@ -504,9 +505,9 @@ void javap_parsert::rmembers(classt &dest_class)
     else if(has_prefix(line, "   line "))
     {
       unsigned line_no=
-        atoi(std::string(line, 3+4+1, std::string::npos).c_str());
+        unsafe_string2unsigned(std::string(line, 3+4+1, std::string::npos));
       unsigned address=
-        atoi(std::string(line, line.find(':')+1, std::string::npos).c_str());
+        unsafe_string2unsigned(std::string(line, line.find(':')+1, std::string::npos));
       address_to_line[address]=line_no;
     }
     else if(line.size()>=4 &&

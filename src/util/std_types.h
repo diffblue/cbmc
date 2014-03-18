@@ -442,6 +442,100 @@ extern inline union_typet &to_union_type(typet &type)
   return static_cast<union_typet &>(type);
 }
 
+/*! \brief A generic tag-based type
+*/
+
+class tag_typet:public typet
+{
+public:
+  inline explicit tag_typet(const irep_idt &_id):typet(_id)
+  {
+  }
+
+  inline explicit tag_typet(
+    const irep_idt &_id,
+    const irep_idt &identifier):typet(_id)
+  {
+    set_identifier(identifier);
+  }
+
+  inline void set_identifier(const irep_idt &identifier)
+  {
+    set(ID_identifier, identifier);
+  }
+
+  inline const irep_idt &get_identifier() const
+  {
+    return get(ID_identifier);
+  }  
+};
+
+/*! \brief A struct tag type
+*/
+
+class struct_tag_typet:public tag_typet
+{
+public:
+  explicit inline struct_tag_typet(const irep_idt &identifier):
+    tag_typet(ID_struct_tag, identifier)
+  {
+  }
+
+  inline void set_identifier(const irep_idt &identifier)
+  {
+    set(ID_identifier, identifier);
+  }
+
+  inline const irep_idt &get_identifier() const
+  {
+    return get(ID_identifier);
+  }  
+};
+
+/*! \brief A union tag type
+*/
+
+class union_tag_typet:public tag_typet
+{
+public:
+  explicit inline union_tag_typet(const irep_idt &identifier):
+    tag_typet(ID_union_tag, identifier)
+  {
+  }
+
+  inline void set_identifier(const irep_idt &identifier)
+  {
+    set(ID_identifier, identifier);
+  }
+
+  inline const irep_idt &get_identifier() const
+  {
+    return get(ID_identifier);
+  }  
+};
+
+/*! \brief An enum tag type
+*/
+
+class enum_tag_typet:public tag_typet
+{
+public:
+  explicit inline enum_tag_typet(const irep_idt &identifier):
+    tag_typet(ID_enum_tag, identifier)
+  {
+  }
+
+  inline void set_identifier(const irep_idt &identifier)
+  {
+    set(ID_identifier, identifier);
+  }
+
+  inline const irep_idt &get_identifier() const
+  {
+    return get(ID_identifier);
+  }  
+};
+
 /*! \brief Base type of functions
 */
 class code_typet:public typet

@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #if defined(__linux__) || \
     defined(__FreeBSD_kernel__) || \
     defined(__GNU__) || \
+    defined(__unix__) || \
     defined(__CYGWIN__) || \
     defined(__MACH__)
 #include <unistd.h>
@@ -97,7 +98,8 @@ decision_proceduret::resultt cvc_dect::dec_solve()
   std::string command=
     "cvcl "+temp_out_filename+" > "+temp_result_filename+" 2>&1";
     
-  system(command.c_str());
+  int res=system(command.c_str());
+  assert(0 == res);
   
   status("Reading result from CVCL");
 

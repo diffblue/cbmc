@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/base_type.h>
 #include <util/symbol.h>
+#include <util/simplify_expr.h>
 
 #include "c_typecast.h"
 #include "c_types.h"
@@ -454,20 +455,7 @@ void c_typecastt::implicit_typecast_arithmetic(
   }
 
   if(new_type!=expr_type)
-  {
-    if(new_type.id()==ID_pointer &&
-       expr_type.id()==ID_array)
-    {
-      exprt index_expr(ID_index, expr_type.subtype());
-      index_expr.reserve_operands(2);
-      index_expr.move_to_operands(expr);
-      index_expr.copy_to_operands(gen_zero(index_type()));
-      expr=exprt(ID_address_of, new_type);
-      expr.move_to_operands(index_expr);
-    }
-    else
-      do_typecast(expr, new_type);
-  }
+    do_typecast(expr, new_type);
 }
 
 /*******************************************************************\
@@ -562,7 +550,7 @@ void c_typecastt::implicit_typecast_followed(
   {
     // special case: 0 == NULL
 
-    if(expr.is_zero() && (
+    if(simplify_expr(expr, ns).is_zero() && (
        src_type.id()==ID_unsignedbv ||
        src_type.id()==ID_signedbv ||
        src_type.id()==ID_natural ||

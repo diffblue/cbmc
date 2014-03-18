@@ -769,6 +769,8 @@ Function: symex_target_equationt::convert_assertions
 
 \*******************************************************************/
 
+#define ASSUME_OPT 0
+
 void symex_target_equationt::convert_assertions(
   prop_convt &prop_conv)
 {
@@ -791,11 +793,23 @@ void symex_target_equationt::convert_assertions(
       literalt last_activation_literal = activate_assertions.back();
       activate_assertions.pop_back();
       activate_assertions.push_back(!last_activation_literal);    
+#if ASSUME_OPT
+      //optimisation, assuming only last literal, asserting others as unit clause
+      prop_conv.set_to_true(literal_exprt(activate_assertions.back()));
+#endif
     }
     activate_assertions.push_back(!activation_literal);
 
     //set assumptions (a_0 ... -a_k) for incremental solving
+#if ASSUME_OPT
+    //optimisation, assuming only last literal, asserting others as unit clause
+    bvt assumption;
+    assumption.reserve(1);
+    assumption.push_back(activate_assertions.back());
+    prop_conv.set_assumptions(assumption);
+#else
     prop_conv.set_assumptions(activate_assertions);
+#endif
   }
 
   if(number_of_assertions==1)
@@ -869,6 +883,79 @@ void symex_target_equationt::convert_assertions(
 
 /*******************************************************************\
 
+Function: symex_target_equationt::current_activation_literal
+
+  Inputs: 
+
+ Outputs: current activation literal
+
+ Purpose: get activation literal used for the assertions that have been 
+          translated in the most recent call to convert()
+
+\*******************************************************************/
+
+literalt symex_target_equationt::current_activation_literal() {
+  return !activate_assertions.back();
+}
+
+/*******************************************************************\
+
+Function: symex_target_equationt::new_activation_literal
+
+  Inputs: 
+
+ Outputs: current activation literal
+
+ Purpose: generate activation literal, to be used if convert_assertions()
+          is never called in conversion, e.g. in cover_goals
+
+\*******************************************************************/
+
+void symex_target_equationt::new_activation_literal(prop_convt &prop_conv) {
+  literalt activation_literal; 
+  if(is_incremental)
+  {
+    activation_literal = prop_conv.convert(
+      symbol_exprt("goto_symex::\\act$"+
+      i2string(activate_assertions.size()), bool_typet()));
+
+    if(!activate_assertions.empty()) {
+      literalt last_activation_literal = activate_assertions.back();
+      activate_assertions.pop_back();
+      activate_assertions.push_back(!last_activation_literal);    
+#if ASSUME_OPT
+      //optimisation, assuming only last literal, asserting others as unit clause
+      prop_conv.set_to_true(literal_exprt(activate_assertions.back()));
+#endif
+    }
+    activate_assertions.push_back(!activation_literal);
+
+    //set assumptions (a_0 ... -a_k) for incremental solving
+#if ASSUME_OPT
+    //optimisation, assuming only last literal, asserting others as unit clause
+    bvt assumption;
+    assumption.reserve(1);
+    assumption.push_back(activate_assertions.back());
+    prop_conv.set_assumptions(assumption);
+#else
+    prop_conv.set_assumptions(activate_assertions);
+#endif
+
+
+#if 0
+    std::cout << "assumptions: "; 
+    for(bvt::iterator it = activate_assertions.begin();
+        it!=activate_assertions.end();it++) {
+      std::cout << *it << " ";
+    }
+#endif
+
+    std::cout << std::endl;
+  }
+}
+
+/*******************************************************************\
+
 Function: symex_target_equationt::convert_io
 
   Inputs: decision procedure, first SSA step to be converted
@@ -914,6 +1001,7 @@ void symex_target_equationt::convert_io(
       }
     }
 }
+
 
 /*******************************************************************\
 
@@ -1098,49 +1186,3 @@ std::ostream &operator<<(
   return out;
 }
 
-/*******************************************************************\
-
-Function: symex_target_equationt::current_activation_literal
-
-  Inputs: 
-
- Outputs: current activation literal
-
- Purpose: get activation literal used for the assertions that have been 
-          translated in the most recent call to convert()
-
-\*******************************************************************/
-
-literalt symex_target_equationt::current_activation_literal() {
-  return !activate_assertions.back();
-}
-
-void symex_target_equationt::new_activation_literal(prop_convt &prop_conv) {
-  literalt activation_literal; 
-  if(is_incremental)
-  {
-    activation_literal = prop_conv.convert(
-      symbol_exprt("goto_symex::\\act$"+
-      i2string(activate_assertions.size()), bool_typet()));
-
-    if(!activate_assertions.empty()) {
-      literalt last_activation_literal = activate_assertions.back();
-      activate_assertions.pop_back();
-      activate_assertions.push_back(!last_activation_literal);    
-    }
-    activate_assertions.push_back(!activation_literal);
-
-    //set assumptions (a_0 ... -a_k) for incremental solving
-    prop_conv.set_assumptions(activate_assertions);
-
-#if 0
-    std::cout << "assumptions: "; 
-    for(bvt::iterator it = activate_assertions.begin();
-        it!=activate_assertions.end();it++) {
-      std::cout << *it << " ";
-    }
-#endif
-
-    std::cout << std::endl;
-  }
-}

@@ -41,9 +41,10 @@ Function: initial_state
 
 path_symex_statet initial_state(
   var_mapt &var_map,
-  const locst &locs)
+  const locst &locs,
+  path_symex_historyt &path_symex_history)
 {
-  path_symex_statet s(var_map, locs);
+  path_symex_statet s(var_map, locs, path_symex_history);
   
   // create one new thread
   path_symex_statet::threadt &thread=s.add_thread();
@@ -244,13 +245,13 @@ exprt path_symex_statet::instantiate_rec(
       if(to_integer(array_type.size(), size))
         throw "failed to convert array size";
         
-      signed long size_int=integer2long(size);
+      unsigned long long size_int=integer2unsigned(size);
         
       array_exprt result(array_type);
       result.operands().resize(size_int);
     
       // split it up into elements
-      for(signed long i=0; i<size_int; ++i)
+      for(unsigned long long i=0; i<size_int; ++i)
       {
         exprt index=from_integer(i, array_type.size().type());
         exprt new_src=index_exprt(src, index, subtype);
@@ -282,14 +283,14 @@ exprt path_symex_statet::instantiate_rec(
     if(to_integer(vector_type.size(), size))
       throw "failed to convert vector size";
       
-    signed long int size_int=integer2long(size);
+    unsigned long long int size_int=integer2unsigned(size);
     
     vector_exprt result(vector_type);
     exprt::operandst &operands=result.operands();
     operands.resize(size_int);
   
     // split it up into elements
-    for(signed long i=0; i<size_int; ++i)
+    for(unsigned long long i=0; i<size_int; ++i)
     {
       exprt index=from_integer(i, vector_type.size().type());
       exprt new_src=index_exprt(src, index, subtype);
@@ -427,7 +428,7 @@ exprt path_symex_statet::read_symbol_member_index(
 
       #ifdef DEBUG
       std::cout << "read_symbol_member_index_rec " << identifier
-                << " var_info " << var_info.identifier << std::endl;
+                << " var_info " << var_info.full_identifier << std::endl;
       #endif
 
       // warning: reference is not stable      
@@ -614,6 +615,23 @@ exprt path_symex_statet::instantiate_rec_address(
   {
     return src;
   }
+  else if(src.id()==ID_byte_extract_big_endian ||
+          src.id()==ID_byte_extract_little_endian)
+  {
+    assert(src.operands().size()==2);
+    exprt tmp=src;
+    tmp.op0()=instantiate_rec_address(src.op0(), propagate);
+    tmp.op1()=instantiate_rec(src.op1(), propagate);
+    return tmp;
+  }
+  else if(src.id()==ID_if)
+  {
+    if_exprt if_expr=to_if_expr(src);
+    if_expr.true_case()=instantiate_rec_address(if_expr.true_case(), propagate);
+    if_expr.false_case()=instantiate_rec_address(if_expr.false_case(), propagate);
+    if_expr.cond()=instantiate_rec(if_expr.cond(), propagate);
+    return if_expr;
+  }
   else
   {
     // this shouldn't really happen
@@ -636,25 +654,24 @@ Function: path_symex_statet::record_step
 
 \*******************************************************************/
 
-path_symex_stept &path_symex_statet::record_step()
+void path_symex_statet::record_step()
 {
   // is there a context switch happening?
-  if(!history.steps.empty() &&
-     history.steps.back().thread_nr!=current_thread)
+  if(!history.is_nil() &&
+     history->thread_nr!=current_thread)
     no_thread_interleavings++;
+    
+  // update our statistics
+  depth++;
   
   // add the step
-  history.steps.push_back(path_symex_stept());
-  path_symex_stept &step=history.steps.back();
+  history.generate_successor();
+  stept &step=*history;
 
-  // copy PCs
-  step.pc_vector.resize(threads.size());
-  for(unsigned t=0; t<threads.size(); t++)
-    step.pc_vector[t]=threads[t].pc;
-  
+  // copy PC
+  assert(current_thread<threads.size());
+  step.pc=threads[current_thread].pc;
   step.thread_nr=current_thread;
-  
-  return step;
 }
 
 /*******************************************************************\

@@ -1,6 +1,7 @@
 /*******************************************************************\
 
-Module: Stack depth checks
+Module: Nondeterministic initialization of certain global scope
+        variables
 
 Author: Daniel Kroening, Michael Tautschnig
 
@@ -48,8 +49,17 @@ void nondet_static(
     {
       const symbol_exprt &sym=to_symbol_expr(
           to_code_assign(instruction.code).lhs());
-      if(has_prefix(id2string(sym.get_identifier()), CPROVER_PREFIX) ||
-          !ns.lookup(sym.get_identifier()).is_static_lifetime)
+
+      // is it a __CPROVER_* variable?
+      if(has_prefix(id2string(sym.get_identifier()), CPROVER_PREFIX))
+        continue;
+        
+      // static lifetime?
+      if(!ns.lookup(sym.get_identifier()).is_static_lifetime)
+        continue;
+
+      // constant?
+      if(sym.type().get_bool(ID_C_constant))
         continue;
 
       i_it=init.insert_before(++i_it);

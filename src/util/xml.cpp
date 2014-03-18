@@ -6,9 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <cstdlib>
 #include <ostream>
 
+#include "string2int.h"
 #include "i2string.h"
 #include "xml.h"
 
@@ -356,7 +356,7 @@ std::string xmlt::unescape(const std::string &str)
       else if(tmp=="amp") result+='&';
       else if(tmp[0]=='#' && tmp[1]!='x')
       {
-        char c=atoi(tmp.substr(1, tmp.size()-1).c_str());
+        char c=unsafe_string2int(tmp.substr(1, tmp.size()-1));
         result+=c;
       }
       else

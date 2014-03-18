@@ -123,9 +123,10 @@ propt::resultt qbf_qubet::prop_solve()
   std::string options="";
 
   // solve it
-  system(("QuBE "+qbf_tmp_file+
+  int res=system(("QuBE "+qbf_tmp_file+
          options+
          " > "+result_tmp_file).c_str());
+  assert(0 == res);
 
   bool result=false;
 

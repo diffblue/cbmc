@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <map>
 #include <list>
 
+#include <util/string2int.h>
 #include <util/config.h>
 #include <util/hash_cont.h>
 #include <util/language.h>
@@ -596,7 +597,7 @@ goto_programt::const_targett goto_program2codet::convert_assign(
 
             if(trail == mask_value.size())
             {
-              unsigned shl = atoi(right.get(ID_C_cformat).c_str());
+              unsigned shl = unsafe_string2unsigned(right.get_string(ID_C_cformat));
 
               if(r == shl)
               {
@@ -2264,6 +2265,7 @@ void goto2sourcet::operator()(std::ostream &os)
   }
 
   // collect all declarations we might need, include local static variables
+  bool skip_function_main=false;
   for(std::set<std::string>::const_iterator
       it=symbols_sorted.begin();
       it!=symbols_sorted.end();
@@ -2286,6 +2288,17 @@ void goto2sourcet::operator()(std::ostream &os)
           symbol,
           global_var_stream,
           local_static_decls);
+    else if(symbol.type.id()==ID_code)
+    {
+      goto_functionst::function_mapt::const_iterator func_entry=
+        goto_functions.function_map.find(symbol.name);
+
+      if(func_entry!=goto_functions.function_map.end() &&
+         func_entry->second.body_available &&
+         (symbol.name=="c::main" ||
+          (!config.main.empty() && symbol.name==config.main)))
+        skip_function_main=true;
+    }
   }
 
   // function declarations and definitions
@@ -2296,14 +2309,18 @@ void goto2sourcet::operator()(std::ostream &os)
   {
     const symbolt &symbol=ns.lookup(*it);
 
-    if(symbol.type.id()==ID_code)
-      convert_function_declaration(
-          symbol,
-          func_decl_stream,
-          func_body_stream,
-          local_type_decls[symbol.base_name],
-          local_static_decls[symbol.base_name],
-          original_tags);
+    if(symbol.type.id()!=ID_code) continue;
+
+    // don't dump artificial main
+    if(skip_function_main && symbol.name==ID_main) continue;
+
+    convert_function_declaration(
+      symbol,
+      func_decl_stream,
+      func_body_stream,
+      local_type_decls[symbol.base_name],
+      local_static_decls[symbol.base_name],
+      original_tags);
   }
 
   os << std::endl;
@@ -2679,7 +2696,7 @@ void goto2sourcet::convert_function_declaration(
   if(ignore(symbol.name))
     return;
 
-  if(symbol.name!="main" &&
+  if(symbol.name!=ID_main &&
       symbol.name!="c::main" &&
       symbol.name!="c::assert")
   {
@@ -2692,11 +2709,6 @@ void goto2sourcet::convert_function_declaration(
     goto_functions.function_map.find(symbol.name);
   if(func_entry==goto_functions.function_map.end() ||
       !func_entry->second.body_available)
-    return;
-
-  // don't dump artificial main
-  if(symbol.name=="main" &&
-      (config.main=="c::main" || config.main==""))
     return;
 
   code_blockt b(local_static_decls);

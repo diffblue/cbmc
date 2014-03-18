@@ -6,11 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <cstdlib>
 #include <cassert>
 
 #include <stack>
 
+#include "string2int.h"
 #include "mp_arith.h"
 #include "fixedbv.h"
 #include "ieee_float.h"
@@ -477,7 +477,6 @@ bool exprt::is_zero() const
     }
     else if(type_id==ID_pointer)
     {
-      if(constant.get_value()==ID_NULL) return true;
       return constant.value_is_zero_string();
     }
   }
@@ -576,7 +575,7 @@ bool exprt::sum(const exprt &expr)
     set(ID_value, integer2binary(
       binary2integer(get_string(ID_value), false)+
       binary2integer(expr.get_string(ID_value), false),
-      atoi(type().get(ID_width).c_str())));
+      unsafe_string2unsigned(type().get_string(ID_width))));
     return false;
   }
   else if(type_id==ID_fixedbv)
@@ -584,7 +583,7 @@ bool exprt::sum(const exprt &expr)
     set(ID_value, integer2binary(
       binary2integer(get_string(ID_value), false)+
       binary2integer(expr.get_string(ID_value), false),
-      atoi(type().get(ID_width).c_str())));
+      unsafe_string2unsigned(type().get_string(ID_width))));
     return false;
   }
   else if(type_id==ID_floatbv)
@@ -640,7 +639,7 @@ bool exprt::mul(const exprt &expr)
     set(ID_value, integer2binary(
       binary2integer(get_string(ID_value), false)*
       binary2integer(expr.get_string(ID_value), false),
-      atoi(type().get(ID_width).c_str())));
+      unsafe_string2unsigned(type().get_string(ID_width))));
     return false;
   }
   else if(type_id==ID_fixedbv)
@@ -703,7 +702,7 @@ bool exprt::subtract(const exprt &expr)
     set(ID_value, integer2binary(
       binary2integer(get_string(ID_value), false)-
       binary2integer(expr.get_string(ID_value), false),
-      atoi(type().get(ID_width).c_str())));
+      unsafe_string2unsigned(type().get_string(ID_width))));
     return false;
   }
 

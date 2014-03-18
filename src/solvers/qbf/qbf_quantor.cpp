@@ -117,9 +117,10 @@ propt::resultt qbf_quantort::prop_solve()
   std::string options="";
 
   // solve it
-  system(("quantor "+qbf_tmp_file+
+  int res=system(("quantor "+qbf_tmp_file+
          options+
          " -o "+result_tmp_file).c_str());
+  assert(0 == res);
 
   bool result=false;
   

@@ -21,7 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_predicates.h>
 #include <util/cprover_prefix.h>
 
-#include "local_may_alias.h"
+#include "local_bitvector_analysis.h"
 #include "goto_check.h"
 
 class goto_checkt
@@ -31,7 +31,7 @@ public:
     const namespacet &_ns,
     const optionst &_options):
     ns(_ns),
-    local_may_alias(0)
+    local_bitvector_analysis(0)
   {
     enable_bounds_check=_options.get_bool_option("bounds-check");
     enable_pointer_check=_options.get_bool_option("pointer-check");
@@ -56,7 +56,7 @@ public:
     
 protected:
   const namespacet &ns;
-  local_may_aliast *local_may_alias;
+  local_bitvector_analysist *local_bitvector_analysis;
   goto_programt::const_targett t;
 
   void check_rec(const exprt &expr, guardt &guard, bool address);
@@ -623,28 +623,116 @@ void goto_checkt::float_overflow_check(
 
   // First, check type.
   const typet &type=ns.follow(expr.type());
-  
-  if(type.id()==ID_floatbv)
+
+  if(type.id()!=ID_floatbv)
     return;
 
   // add overflow subgoal
 
   if(expr.id()==ID_typecast)
   {
+    // Can overflow if casting from larger
+    // to smaller type.
+    assert(expr.operands().size()==1);
+    
+    if(ns.follow(expr.op0().type()).id()==ID_floatbv)
+    {
+      // float-to-float
+      unary_exprt op0_inf(ID_isinf, expr.op0(), bool_typet());
+      unary_exprt new_inf(ID_isinf, expr, bool_typet());
+    
+      or_exprt overflow_check(op0_inf, not_exprt(new_inf));
+    
+      add_guarded_claim(
+        overflow_check,
+        "arithmetic overflow on floating-point typecast",
+        "overflow",
+        expr.find_location(),
+        expr,
+        guard);
+    }
+    else
+    {
+      // non-float-to-float
+      unary_exprt new_inf(ID_isinf, expr, bool_typet());
+    
+      add_guarded_claim(
+        not_exprt(new_inf),
+        "arithmetic overflow on floating-point typecast",
+        "overflow",
+        expr.find_location(),
+        expr,
+        guard);
+    }
+
     return;
   }
   else if(expr.id()==ID_div)
   {
     assert(expr.operands().size()==2);
+
+    // Can overflow if dividing by something small
+    unary_exprt new_inf(ID_isinf, expr, bool_typet());
+    unary_exprt op0_inf(ID_isinf, expr.op0(), bool_typet());
+    
+    or_exprt overflow_check(op0_inf, not_exprt(new_inf));
+
+    add_guarded_claim(
+      overflow_check,
+      "arithmetic overflow on floating-point division",
+      "overflow",
+      expr.find_location(),
+      expr,
+      guard);
+
     return;
   }
   else if(expr.id()==ID_mod)
   {
+    // Can't overflow
     return;
   }
   else if(expr.id()==ID_unary_minus)
   {
+    // Can't overflow
     return;
+  }
+  else if(expr.id()==ID_plus || expr.id()==ID_mult ||
+          expr.id()==ID_minus)
+  {
+    if(expr.operands().size()==2)
+    {
+      // Can overflow
+      unary_exprt new_inf(ID_isinf, expr, bool_typet());      
+      unary_exprt op0_inf(ID_isinf, expr.op0(), bool_typet());
+      unary_exprt op1_inf(ID_isinf, expr.op1(), bool_typet());
+      
+      or_exprt overflow_check(op0_inf, op1_inf, not_exprt(new_inf));
+      
+      std::string kind=
+        expr.id()==ID_plus?"addition":
+        expr.id()==ID_minus?"subtraction":
+        expr.id()==ID_mult?"multiplication":"";
+      
+      add_guarded_claim(
+        overflow_check,
+        "arithmetic overflow on floating-point "+kind,
+        "overflow",
+        expr.find_location(),
+        expr,
+        guard);
+
+      return;
+    }
+    else if(expr.operands().size()>=3)
+    {
+      assert(expr.id()!=ID_minus);
+      
+      // break up
+      exprt tmp=make_binary(expr);
+      float_overflow_check(tmp, guard);
+      return;
+    }
   }
 }
 
@@ -833,27 +921,12 @@ void goto_checkt::pointer_validity_check(
     guard);    
   #else
   
-  std::set<exprt> alias_set=local_may_alias->get(t, pointer);
-
-  //bool may_use_offset=local_may_alias->may_use_offset(t, pointer);
-  bool aliases_unknown=alias_set.find(exprt(ID_unknown))!=alias_set.end();
-  bool aliases_dynamic_object=alias_set.find(exprt(ID_dynamic_object))!=alias_set.end();
-  bool aliases_null_object=alias_set.find(exprt(ID_null_object))!=alias_set.end();
-  bool aliases_other_object=false;
-  
-  for(std::set<exprt>::const_iterator it=alias_set.begin();
-      it!=alias_set.end();
-      it++)
-    if(it->id()!=ID_unknown &&
-       it->id()!=ID_dynamic_object &&
-       it->id()!=ID_null_object)
-    {
-      aliases_other_object=true;
-    }
-
+  local_bitvector_analysist::flagst flags=
+    local_bitvector_analysis->get(t, pointer);
+    
   const typet &dereference_type=pointer_type.subtype();
 
-  if(aliases_unknown || aliases_null_object)
+  if(flags.is_unknown() || flags.is_null())
   {
     add_guarded_claim(
       not_exprt(null_pointer(pointer)),
@@ -864,7 +937,7 @@ void goto_checkt::pointer_validity_check(
       guard);
   }
 
-  if(aliases_unknown)
+  if(flags.is_unknown())
     add_guarded_claim(
       not_exprt(invalid_pointer(pointer)),
       "dereference failure: pointer invalid",
@@ -873,7 +946,16 @@ void goto_checkt::pointer_validity_check(
       expr,
       guard);
 
-  if(aliases_unknown || aliases_dynamic_object)
+  if(flags.is_uninitialized())
+    add_guarded_claim(
+      not_exprt(invalid_pointer(pointer)),
+      "dereference failure: pointer uninitialized",
+      "pointer dereference",
+      expr.find_location(),
+      expr,
+      guard);
+
+  if(flags.is_unknown() || flags.is_dynamic_heap())
     add_guarded_claim(
       not_exprt(deallocated(pointer, ns)),
       "dereference failure: deallocated dynamic object",
@@ -882,7 +964,7 @@ void goto_checkt::pointer_validity_check(
       expr,
       guard);
 
-  if(aliases_unknown || aliases_other_object)
+  if(flags.is_unknown() || flags.is_dynamic_local())
     add_guarded_claim(
       not_exprt(dead_object(pointer, ns)),
       "dereference failure: dead object",
@@ -893,7 +975,7 @@ void goto_checkt::pointer_validity_check(
 
   if(enable_bounds_check)
   {
-    if(aliases_unknown || aliases_dynamic_object)
+    if(flags.is_unknown() || flags.is_dynamic_heap())
     {
       exprt dynamic_bounds=
         or_exprt(dynamic_object_lower_bound(pointer),
@@ -911,7 +993,9 @@ void goto_checkt::pointer_validity_check(
 
   if(enable_bounds_check)
   {
-    if(aliases_unknown || aliases_other_object)
+    if(flags.is_unknown() ||
+       flags.is_dynamic_local() ||
+       flags.is_static_lifetime())
     {
       exprt object_bounds=
         or_exprt(object_lower_bound(pointer),
@@ -982,6 +1066,8 @@ void goto_checkt::bounds_check(
   std::string name=array_name(expr.array());
   
   const exprt &index=expr.index();
+  object_descriptor_exprt ode;
+  ode.build(expr, ns);
 
   if(index.type().id()!=ID_unsignedbv)
   {
@@ -1002,14 +1088,21 @@ void goto_checkt::bounds_check(
       }
       else
       {
-        exprt zero=gen_zero(index.type());
+        exprt eff_offset=ode.offset();
 
-        if(zero.is_nil())
-          throw "no zero constant of index type "+
-            index.type().to_string();
+        if(ode.root_object().id()==ID_dereference)
+        {
+          exprt p_offset=pointer_offset(
+            to_dereference_expr(ode.root_object()).pointer());
+          assert(p_offset.type()==eff_offset.type());
 
-        exprt inequality(ID_ge, bool_typet());
-        inequality.copy_to_operands(index, zero);
+          eff_offset=minus_exprt(eff_offset, p_offset);
+        }
+
+        exprt zero=gen_zero(ode.offset().type());
+        assert(zero.is_not_nil());
+
+        binary_relation_exprt inequality(eff_offset, ID_ge, zero);
 
         add_guarded_claim(
           inequality,
@@ -1022,7 +1115,38 @@ void goto_checkt::bounds_check(
     }
   }
 
-  if(to_array_type(array_type).size().is_nil())
+  if(ode.root_object().id()==ID_dereference)
+  {
+    const exprt &pointer=
+      to_dereference_expr(ode.root_object()).pointer();
+
+    if_exprt size(
+      dynamic_object(pointer),
+      typecast_exprt(dynamic_size(ns), object_size(pointer).type()),
+      object_size(pointer));
+
+    plus_exprt eff_offset(ode.offset(), pointer_offset(pointer));
+
+    assert(eff_offset.op0().type()==eff_offset.op1().type());
+    assert(eff_offset.type()==size.type());
+
+    binary_relation_exprt inequality(eff_offset, ID_lt, size);
+
+    or_exprt precond(
+      and_exprt(
+        dynamic_object(pointer),
+        not_exprt(malloc_object(pointer, ns))),
+      inequality);
+
+    add_guarded_claim(
+      precond,
+      name+" upper bound",
+      "array bounds",
+      expr.find_location(),
+      expr,
+      guard);
+  }
+  else if(to_array_type(array_type).size().is_nil())
   {
     // Linking didn't complete, we don't have a size.
     // Not clear what to do.
@@ -1259,7 +1383,9 @@ void goto_checkt::check_rec(
   {
     if(expr.type().id()==ID_signedbv ||
        expr.type().id()==ID_unsignedbv)
+    {
       integer_overflow_check(expr, guard);
+    }
     else if(expr.type().id()==ID_floatbv)
     {
       nan_check(expr, guard);
@@ -1307,8 +1433,8 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
 {
   assertions.clear();
   
-  local_may_aliast local_may_alias_obj(goto_function);
-  local_may_alias=&local_may_alias_obj;
+  local_bitvector_analysist local_bitvector_analysis_obj(goto_function);
+  local_bitvector_analysis=&local_bitvector_analysis_obj;
 
   goto_programt &goto_program=goto_function.body;
 
@@ -1412,7 +1538,7 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
         const symbol_exprt &variable=to_symbol_expr(i.code.op0());
         
         // is it dirty?
-        if(local_may_alias->dirty(variable))
+        if(local_bitvector_analysis->dirty(variable))
         {
           // need to mark the dead variable as dead
           goto_programt::targett t=new_code.add_instruction(ASSIGN);

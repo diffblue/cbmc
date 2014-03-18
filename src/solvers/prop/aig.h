@@ -57,6 +57,10 @@ public:
   {
   }
   
+  typedef aig_nodet nodet;  
+  typedef std::vector<nodet> nodest;
+  nodest nodes;
+
   inline void clear()
   {
     nodes.clear();
@@ -79,7 +83,7 @@ public:
     return nodes[l.var_no()];
   }
   
-  inline unsigned number_of_nodes() const
+  inline nodest::size_type number_of_nodes() const
   {
     return nodes.size();
   }
@@ -116,18 +120,14 @@ public:
     return nodes.empty();
   }
 
-  typedef aig_nodet nodet;  
-  typedef std::vector<nodet> nodest;
-  nodest nodes;
-
   void print(std::ostream &out) const;
   void print(std::ostream &out, literalt a) const;
-  void output_dot_node(std::ostream &out, unsigned v) const;
-  void output_dot_edge(std::ostream &out, unsigned v, literalt l) const;
+  void output_dot_node(std::ostream &out, nodest::size_type v) const;
+  void output_dot_edge(std::ostream &out, nodest::size_type v, literalt l) const;
   void output_dot(std::ostream &out) const;
 
-  std::string label(unsigned v) const;
-  std::string dot_label(unsigned v) const;
+  std::string label(nodest::size_type v) const;
+  std::string dot_label(nodest::size_type v) const;
 
 protected:  
   const std::set<unsigned> &get_terminals_rec(

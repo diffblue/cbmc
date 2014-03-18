@@ -84,14 +84,14 @@ protected:
   {
   protected:
     const exprt array;
-    unsigned pos;
+    size_t pos;
 
   public:    
     explicit init_statet(const exprt &_array):array(_array), pos(0)
     {
     }
   
-    unsigned remaining() const
+    size_t remaining() const
     {
       return array.operands().size()-pos;
     }

@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_EXPR_H
 #define CPROVER_EXPR_H
 
+//#define OPERANDS_IN_GETSUB
+
 #include "type.h"
 
 #define forall_operands(it, expr) \
@@ -43,84 +45,61 @@ Author: Daniel Kroening, kroening@kroening.com
 class exprt:public irept
 {
 public:
-  #ifdef USE_LIST
-  typedef std::list<exprt> operandst;
-  #else
   typedef std::vector<exprt> operandst;
-  #endif
 
   // constructors
   inline exprt() { }
   inline explicit exprt(const irep_idt &_id):irept(_id) { }
   inline exprt(const irep_idt &_id, const typet &_type):irept(_id) { add(ID_type, _type); }
  
-  /// returns the type of the expression
+  // returns the type of the expression
   inline typet &type() { return static_cast<typet &>(add(ID_type)); }
   inline const typet &type() const { return static_cast<const typet &>(find(ID_type)); }
 
+  // returns true if there is at least one operand
   inline bool has_operands() const
-  { return !find(ID_operands).is_nil(); }
+  { return !operands().empty(); }
 
   inline operandst &operands()
+  #ifdef OPERANDS_IN_GETSUB
+  { return (operandst &)get_sub(); }
+  #else
   { return (operandst &)(add(ID_operands).get_sub()); }
+  #endif
   
   inline const operandst &operands() const
+  #ifdef OPERANDS_IN_GETSUB
+  { return (const operandst &)get_sub(); }
+  #else
   { return (const operandst &)(find(ID_operands).get_sub()); }
+  #endif
    
   inline exprt &op0()
   { return operands().front(); }
 
   inline exprt &op1()
-  #ifdef USE_LIST
-  { return *(++operands().begin()); }
-  #else
   { return operands()[1]; }
-  #endif
    
   inline exprt &op2()
-  #ifdef USE_LIST
-  { return *(++ ++operands().begin()); }
-  #else
   { return operands()[2]; }
-  #endif
    
   inline exprt &op3()
-  #ifdef USE_LIST
-  { return *(++ ++ ++operands().begin()); }
-  #else
   { return operands()[3]; }
-  #endif
    
   inline const exprt &op0() const
   { return operands().front(); }
 
   inline const exprt &op1() const
-  #ifdef USE_LIST
-  { return *(++operands().begin()); }
-  #else
   { return operands()[1]; }
-  #endif
   
   inline const exprt &op2() const
-  #ifdef USE_LIST
-  { return *(++ ++operands().begin()); }
-  #else
   { return operands()[2]; }
-  #endif
   
   inline const exprt &op3() const
-  #ifdef USE_LIST
-  { return *(++ ++ ++operands().begin()); }
-  #else
   { return operands()[3]; }
-  #endif
   
-  inline void reserve_operands(unsigned n)
-  #ifdef USE_LIST
-  { }
-  #else
+  inline void reserve_operands(operandst::size_type n)
   { operands().reserve(n) ; }
-  #endif
    
   void move_to_operands(exprt &expr); // destroys expr
   void move_to_operands(exprt &e1, exprt &e2); // destroys e1, e2

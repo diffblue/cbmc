@@ -35,7 +35,7 @@ public:
 
   virtual resultt prop_solve() { return P_ERROR; }
   
-  virtual unsigned no_clauses() const { return clauses.size(); }
+  virtual size_t no_clauses() const { return clauses.size(); }
   
   typedef std::list<bvt> clausest;
   
@@ -81,7 +81,7 @@ class cnf_clause_list_assignmentt:public cnf_clause_listt
 public:
   typedef std::vector<tvt> assignmentt;
   
-  assignmentt &get_assignment()
+  inline assignmentt &get_assignment()
   {
     return assignment;
   }

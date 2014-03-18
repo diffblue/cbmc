@@ -35,13 +35,14 @@ void boolbvt::convert_replication(const exprt &expr, bvt &bv)
   mp_integer times;
   if(to_integer(expr.op0(), times))
     throw "replication takes constant as first parameter";
+  const unsigned u_times=integer2unsigned(times);
 
   const bvt &op=convert_bv(expr.op1());
 
   unsigned offset=0;
   bv.resize(width);
 
-  for(unsigned i=0; i<integer2long(times); i++)
+  for(unsigned i=0; i<u_times; i++)
   {
     if(op.size()+offset>width)
       throw "replication operand width too big";
