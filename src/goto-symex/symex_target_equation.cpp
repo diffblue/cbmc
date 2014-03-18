@@ -769,7 +769,7 @@ Function: symex_target_equationt::convert_assertions
 
 \*******************************************************************/
 
-#define ASSUME_OPT 0
+#define ASSUME_OPT 1
 
 void symex_target_equationt::convert_assertions(
   prop_convt &prop_conv)
