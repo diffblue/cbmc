@@ -769,8 +769,6 @@ Function: symex_target_equationt::convert_assertions
 
 \*******************************************************************/
 
-#define ASSUME_OPT 1
-
 void symex_target_equationt::convert_assertions(
   prop_convt &prop_conv)
 {
@@ -793,23 +791,11 @@ void symex_target_equationt::convert_assertions(
       literalt last_activation_literal = activate_assertions.back();
       activate_assertions.pop_back();
       activate_assertions.push_back(!last_activation_literal);    
-#if ASSUME_OPT
-      //optimisation, assuming only last literal, asserting others as unit clause
-      prop_conv.set_to_true(literal_exprt(activate_assertions.back()));
-#endif
     }
     activate_assertions.push_back(!activation_literal);
 
     //set assumptions (a_0 ... -a_k) for incremental solving
-#if ASSUME_OPT
-    //optimisation, assuming only last literal, asserting others as unit clause
-    bvt assumption;
-    assumption.reserve(1);
-    assumption.push_back(activate_assertions.back());
-    prop_conv.set_assumptions(assumption);
-#else
     prop_conv.set_assumptions(activate_assertions);
-#endif
   }
 
   if(number_of_assertions==1)
@@ -923,23 +909,11 @@ void symex_target_equationt::new_activation_literal(prop_convt &prop_conv) {
       literalt last_activation_literal = activate_assertions.back();
       activate_assertions.pop_back();
       activate_assertions.push_back(!last_activation_literal);    
-#if ASSUME_OPT
-      //optimisation, assuming only last literal, asserting others as unit clause
-      prop_conv.set_to_true(literal_exprt(activate_assertions.back()));
-#endif
     }
     activate_assertions.push_back(!activation_literal);
 
     //set assumptions (a_0 ... -a_k) for incremental solving
-#if ASSUME_OPT
-    //optimisation, assuming only last literal, asserting others as unit clause
-    bvt assumption;
-    assumption.reserve(1);
-    assumption.push_back(activate_assertions.back());
-    prop_conv.set_assumptions(assumption);
-#else
     prop_conv.set_assumptions(activate_assertions);
-#endif
 
 
 #if 0
