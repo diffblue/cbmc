@@ -19,7 +19,8 @@ using namespace std;
 
 void acceleratet::find_paths(goto_programt::targett &loop_header,
                              pathst &loop_paths,
-                             pathst &exit_paths) {
+                             pathst &exit_paths,
+                             goto_programt::targett &back_jump) {
   patht empty_path;
   natural_loops_mutablet::natural_loopt loop;
 
@@ -30,7 +31,7 @@ void acceleratet::find_paths(goto_programt::targett &loop_header,
   loop = natural_loops.loop_map.find(loop_header)->second;
 
   return extend_path(loop_header, loop_header, loop, empty_path, loop_paths,
-                         exit_paths);
+                         exit_paths, back_jump);
 }
 
 void acceleratet::extend_path(goto_programt::targett &t,
@@ -38,7 +39,8 @@ void acceleratet::extend_path(goto_programt::targett &t,
                               natural_loops_mutablet::natural_loopt &loop,
                               patht &prefix,
                               pathst &loop_paths,
-                              pathst &exit_paths) {
+                              pathst &exit_paths,
+                              goto_programt::targett &back_jump) {
   if (t == loop_header && !prefix.empty()) {
     // We've expanded a path that has returned to the loop header -- 
     // store this as a looping path.
@@ -81,10 +83,14 @@ void acceleratet::extend_path(goto_programt::targett &t,
         continue;
       }
 
-      extend_path(x, loop_header, loop, taken_prefix, loop_paths, exit_paths);
+      if (x == loop_header) {
+        back_jump = t;
+      }
+
+      extend_path(x, loop_header, loop, taken_prefix, loop_paths, exit_paths, back_jump);
     }
 
-    extend_path(next, loop_header, loop, not_taken_prefix, loop_paths, exit_paths);
+    extend_path(next, loop_header, loop, not_taken_prefix, loop_paths, exit_paths, back_jump);
   } else if (t->is_assert()) {
     // The assertion failing is an exit path, the assertion passing is a looping
     // path.
@@ -94,7 +100,7 @@ void acceleratet::extend_path(goto_programt::targett &t,
     patht pass_prefix(prefix);
     pass_prefix.push_back(path_nodet(t, t->guard));
 
-    extend_path(next, loop_header, loop, pass_prefix, loop_paths, exit_paths);
+    extend_path(next, loop_header, loop, pass_prefix, loop_paths, exit_paths, back_jump);
 
     patht fail_path(prefix);
     fail_path.push_back(path_nodet(t, not_exprt(t->guard)));
@@ -109,13 +115,14 @@ void acceleratet::extend_path(goto_programt::targett &t,
     for (goto_programt::targetst::iterator it = succs.begin();
          it != succs.end();
          ++it) {
-      extend_path(*it, loop_header, loop, new_prefix, loop_paths, exit_paths);
+      extend_path(*it, loop_header, loop, new_prefix, loop_paths, exit_paths, back_jump);
     }
   }
 }
 
 int acceleratet::accelerate_loop(goto_programt::targett &loop_header) {
   pathst loop_paths, exit_paths;
+  goto_programt::targett back_jump;
   int num_accelerated = 0;
 
   goto_programt::instructiont skip(SKIP);
@@ -126,15 +133,20 @@ int acceleratet::accelerate_loop(goto_programt::targett &loop_header) {
 
   natural_loops.loop_map.find(loop_header)->second.insert(new_inst);
 
-  find_paths(loop_header, loop_paths, exit_paths);
+  back_jump = loop_header;
+  find_paths(loop_header, loop_paths, exit_paths, back_jump);
 
   for (pathst::iterator it = loop_paths.begin();
        it != loop_paths.end();
        ++it) {
-    goto_programt accelerator;
+    path_acceleratort accelerator;
 
-    if (accelerate(*it, accelerator)) {
-      add_accelerator(loop_header, accelerator);
+    if (accelerate_path(*it, accelerator)) {
+      subsumed_patht inserted(*it);
+
+      insert_accelerator(loop_header, back_jump, accelerator, inserted);
+      subsumed.push_back(inserted);
+
       num_accelerated++;
     }
   }
@@ -142,8 +154,56 @@ int acceleratet::accelerate_loop(goto_programt::targett &loop_header) {
   return num_accelerated;
 }
 
-void acceleratet::add_accelerator(goto_programt::targett &loop_header,
-                                  goto_programt &accelerator) {
+bool acceleratet::accelerate_path(patht &path, path_acceleratort &accelerator) {
+#ifdef DEBUG
+  cout << "Accelerating:" << endl;
+
+  for (patht::iterator it = path.begin();
+       it != path.end();
+       ++it) {
+    program.output_instruction(ns, "OMG", cout, it->loc);
+  }
+#endif
+
+  polynomial_acceleratort polynomial_accelerator(ns.get_symbol_table(),
+      goto_functions);
+
+  if (polynomial_accelerator.accelerate(path, accelerator)) {
+#ifdef DEBUG
+    cout << "Accelerated!" << endl;
+    accelerated_path.output(ns, "accelerator", cout);
+#endif
+
+    return true;
+  }
+
+  return false;
+}
+
+void acceleratet::insert_accelerator(goto_programt::targett &loop_header,
+    goto_programt::targett &back_jump,
+    path_acceleratort &accelerator,
+    subsumed_patht &subsumed) {
+  insert_looping_path(loop_header, back_jump, accelerator.pure_accelerator,
+      subsumed.accelerator);
+
+  if (!accelerator.overflow_path.instructions.empty()) {
+    insert_looping_path(loop_header, back_jump, accelerator.overflow_path,
+        subsumed.residue);
+  }
+}
+
+/*
+ * Insert a looping path (usually an accelerator) into a goto-program,
+ * beginning at loop_header and jumping back to loop_header via back_jump.
+ * Stores the locations at which the looping path was added in inserted_path.
+ *
+ * THIS DESTROYS looping_path!!
+ */
+void acceleratet::insert_looping_path(goto_programt::targett &loop_header,
+    goto_programt::targett &back_jump,
+    goto_programt &looping_path,
+    patht &inserted_path) {
   goto_programt::targett loop_body = loop_header;
   ++loop_body;
 
@@ -152,12 +212,42 @@ void acceleratet::add_accelerator(goto_programt::targett &loop_header,
   jump->guard = side_effect_expr_nondett(bool_typet());
   jump->targets.push_back(loop_body);
 
-  program.destructive_insert(loop_body, accelerator);
+  program.destructive_insert(loop_body, looping_path);
 
   jump = program.insert_before(loop_body);
   jump->make_goto();
   jump->guard = true_exprt();
-  jump->targets.push_back(loop_header);
+  jump->targets.push_back(back_jump);
+
+  for (goto_programt::targett t = loop_header;
+       t != loop_body;
+       ++t) {
+    inserted_path.push_back(path_nodet(t));
+  }
+}
+
+void acceleratet::restrict_traces() {
+#if 0
+  trace_automatont automaton;
+
+  for (subsumed_pathst::iterator it = subsumed.begin();
+       it != subsumed.end();
+       ++it) {
+    automaton.add_path(it->subsumed);
+
+    patht double_accelerator;
+    patht::iterator jt = double_accelerator.begin();
+    double_accelerator.insert(jt, it->accelerator.begin(), it->accelerator.end());
+    double_accelerator.insert(jt, it->accelerator.begin(), it->accelerator.end());
+    automaton.add_path(double_accelerator);
+  }
+
+  automaton.minimize();
+  insert_automaton(automaton);
+#endif
+}
+
+void acceleratet::insert_automaton(trace_automatont &automaton) {
 }
 
 int acceleratet::accelerate_loops()
@@ -175,30 +265,6 @@ int acceleratet::accelerate_loops()
   return num_accelerated;
 }
 
-bool acceleratet::accelerate(patht &path, goto_programt &accelerator) {
-#ifdef DEBUG
-  cout << "Accelerating:" << endl;
-
-  for (patht::iterator it = path.begin();
-       it != path.end();
-       ++it) {
-    program.output_instruction(ns, "OMG", cout, it->loc);
-  }
-#endif
-
-  polynomial_acceleratort polynomial_accelerator(ns.get_symbol_table(), goto_functions);
-
-  if (polynomial_accelerator.accelerate(path, accelerator)) {
-#ifdef DEBUG
-    cout << "Accelerated!" << endl;
-    accelerator.output(ns, "accelerator", cout);
-#endif
-
-    return true;
-  } else {
-    return false;
-  }
-}
 
 void accelerate_functions(
   goto_functionst &functions,
