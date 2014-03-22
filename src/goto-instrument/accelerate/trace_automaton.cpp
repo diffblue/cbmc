@@ -1,20 +1,22 @@
+#include <utility>
+
 #include "trace_automaton.h"
 #include "path.h"
+
+void trace_automatont::build() {
+  determinise();
+}
 
 /*
  * Build the trace automaton alphabet.
  *
- * The alphabet is the set of basic block headers, i.e. the
- * location of the first instruction in the program, along
- * with any location with more than one predecessor.
+ * The alphabet is the set of basic block headers, i.e.
+ * any location with more than one predecessor.
  */
 void trace_automatont::build_alphabet(goto_programt &program) {
   alphabett seen;
 
-  // The first location is a basic block header...
-  alphabet.insert(program.instructions.begin());
-
-  // Now loop over each instruction in the program & see which successors
+  // Loop over each instruction in the program & see which successors
   // the instruction has.  If we encounter a successor we've already seen,
   // that location has multiple predecessors & so is a basic block header.
   for (goto_programt::targett it = program.instructions.begin();
@@ -207,7 +209,7 @@ void automatont::add_trans(statet s, goto_programt::targett a, statet t) {
   assert(s < transitions.size());
   transitionst &trans = transitions[s];
 
-  trans.insert(std::pair<goto_programt::targett, statet>(a, t));
+  trans.insert(std::make_pair(a, t));
 }
 
 /*
@@ -248,10 +250,21 @@ void automatont::move(state_sett &s, goto_programt::targett a, state_sett &t) {
   }
 }
 
-bool automatont::is_accepting(statet s) {
-  return accept_states.find(s) != accept_states.end();
-}
+void trace_automatont::get_transitions(sym_mapt &transitions) {
+  automatont::transition_tablet &dtrans = dta.transitions;
 
-void automatont::set_accepting(statet s) {
-  accept_states.insert(s);
+  for (unsigned int i = 0; i < dtrans.size(); ++i) {
+    automatont::transitionst &dta_transitions = dtrans[i];
+
+    for (automatont::transitionst::iterator it = dta_transitions.begin();
+         it != dta_transitions.end();
+         ++it) {
+      goto_programt::targett l = it->first;
+      unsigned int j = it->second;
+
+      // We have a transition: i -l-> j.
+      state_pairt state_pair(i, j);
+      transitions.insert(std::make_pair(l, state_pair));
+    }
+  }
 }

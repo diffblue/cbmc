@@ -3,6 +3,7 @@
 #include <goto-programs/goto_functions.h>
 
 #include <util/std_expr.h>
+#include <util/arith_tools.h>
 
 #include <iostream>
 #include <list>
@@ -227,8 +228,7 @@ void acceleratet::insert_looping_path(goto_programt::targett &loop_header,
 }
 
 void acceleratet::restrict_traces() {
-#if 0
-  trace_automatont automaton;
+  trace_automatont automaton(program);
 
   for (subsumed_pathst::iterator it = subsumed.begin();
        it != subsumed.end();
@@ -242,12 +242,113 @@ void acceleratet::restrict_traces() {
     automaton.add_path(double_accelerator);
   }
 
-  automaton.minimize();
+  automaton.build();
   insert_automaton(automaton);
-#endif
+}
+
+symbolt acceleratet::make_symbol(string name, typet type) {
+  symbolt ret;
+  ret.module = "accelerate";
+  ret.name = name;
+  ret.base_name = name;
+  ret.pretty_name = name;
+  ret.type = type;
+ 
+  symbol_table.add(ret);
+
+  return ret;
+}
+
+void acceleratet::decl(symbol_exprt &sym, goto_programt::targett t) {
+  goto_programt::targett decl = program.insert_before(t);
+  code_declt code(sym);
+
+  decl->make_decl();
+  decl->code = code;
+}
+
+void acceleratet::decl(symbol_exprt &sym, goto_programt::targett t, exprt init) {
+  decl(sym, t);
+
+  goto_programt::targett assign = program.insert_before(t);
+  code_assignt code(sym, init);
+
+  assign->make_assignment();
+  assign->code = code;
 }
 
 void acceleratet::insert_automaton(trace_automatont &automaton) {
+  symbolt state_sym = make_symbol("trace_automaton::state",
+      unsignedbv_typet(32));
+  symbolt next_state_sym = make_symbol("trace_automaton::next_state",
+      unsignedbv_typet(32));
+  symbol_exprt state = state_sym.symbol_expr();
+  symbol_exprt next_state = next_state_sym.symbol_expr();
+
+  trace_automatont::sym_mapt transitions;
+  state_sett accept_states;
+
+  automaton.get_transitions(transitions);
+  automaton.accept_states(accept_states);
+
+  // Declare the variables we'll use to encode the state machine.
+  goto_programt::targett t = program.instructions.begin();
+  decl(state, t, from_integer(automaton.init_state(), state.type()));
+  decl(next_state, t);
+
+  // Now for each program location that appears as a symbol in the
+  // trace automaton, add the appropriate code to drive the state
+  // machine.
+  for (trace_automatont::alphabett::iterator it = automaton.alphabet.begin();
+       it != automaton.alphabet.end();
+       ++it) {
+    scratch_programt state_machine(symbol_table);
+    trace_automatont::sym_range_pairt p = transitions.equal_range(*it);
+
+    build_state_machine(p.first, p.second, accept_states, state, next_state,
+        state_machine);
+
+    program.insert_before_swap(*it, state_machine);
+  }
+}
+
+void acceleratet::build_state_machine(trace_automatont::sym_mapt::iterator p,
+                                      trace_automatont::sym_mapt::iterator end,
+                                      state_sett &accept_states,
+                                      symbol_exprt state,
+                                      symbol_exprt next_state,
+                                      scratch_programt &state_machine) {
+  for ( ; p != end; ++p) {
+    trace_automatont::state_pairt state_pair = p->second;
+    unsigned int from = state_pair.first;
+    unsigned int to = state_pair.second;
+
+    // We're encoding the transition
+    //
+    //   from -loc-> to
+    //
+    // which we encode by inserting:
+    //
+    //   if (state == from) next_state = to;
+    //
+    // just before loc.
+
+    equal_exprt guard(state, from_integer(from, state.type()));
+    goto_programt::targett assignment = state_machine.assign(next_state,
+        from_integer(to, next_state.type()));
+    assignment->guard = guard;
+  }
+
+  // Update the state and assume(false) if we've hit an accept state.
+  state_machine.assign(state, next_state);
+
+  for (state_sett::iterator it = accept_states.begin();
+       it != accept_states.end();
+       ++it) {
+    state_machine.assume(not_exprt(equal_exprt(state,
+                                               from_integer(*it, state.type())
+                                              )));
+  }
 }
 
 int acceleratet::accelerate_loops()
@@ -268,12 +369,12 @@ int acceleratet::accelerate_loops()
 
 void accelerate_functions(
   goto_functionst &functions,
-  const namespacet &ns)
+  symbol_tablet &symbol_table)
 {
   Forall_goto_functions (it, functions)
   {
     cout << "Accelerating function " << it->first << endl;
-    acceleratet accelerate(it->second.body, functions, ns);
+    acceleratet accelerate(it->second.body, functions, symbol_table);
 
     int num_accelerated = accelerate.accelerate_loops();
 
