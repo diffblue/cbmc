@@ -9,52 +9,78 @@
 #include <vector>
 #include <set>
 
+typedef unsigned int statet;
+typedef std::set<statet> state_sett;
+
+class automatont {
+ public:
+  automatont() :
+    num_states(0)
+  {
+  }
+
+  statet add_state();
+  void add_trans(statet s, goto_programt::targett a, statet t);
+
+  bool is_accepting(statet s);
+  void set_accepting(statet s);
+
+  void move(statet s, goto_programt::targett a, state_sett &t);
+  void move(state_sett &s, goto_programt::targett a, state_sett &t);
+
+  statet init_state;
+
+ protected:
+  typedef std::multimap<goto_programt::targett, statet> transitionst;
+  typedef std::pair<transitionst::iterator, transitionst::iterator> transition_ranget;
+  typedef std::vector<transitionst> transition_tablet;
+
+  statet num_states;
+  transition_tablet transitions;
+  state_sett accept_states;
+};
+
 class trace_automatont {
  public:
   trace_automatont(goto_programt &_goto_program) :
     goto_program(_goto_program)
   {
+    build_alphabet(goto_program);
+    init_nta();
   }
 
-  void add_path(patht &path) {
-    paths.push_back(path);
-  }
+  void add_path(patht &path);
 
   void build();
 
  protected:
-  typedef struct {
-    goto_programt::targett sym;
-    int from;
-    int to;
-  } transitiont;
+  void build_alphabet(goto_programt &program);
+  void init_nta();
 
-  typedef std::set<transitiont> transitionst;
-  typedef std::vector<int> statet;
-  typedef std::vector<statet> statest;
-  typedef std::map<statet, int> state_mapt;
-  typedef std::map<goto_programt::targett, transitionst> transition_mapt;
+  bool in_alphabet(goto_programt::targett t) {
+    return alphabet.find(t) != alphabet.end();
+  }
+
+  state_sett &pop_unmarked_dstate();
+
+  void determinise();
+  void epsilon_closure(state_sett &s);
+
+  statet add_dstate(state_sett &s);
+  statet find_dstate(state_sett &s);
+  void add_dtrans(state_sett &s, goto_programt::targett a, state_sett &t);
+
   typedef std::set<goto_programt::targett> alphabett;
-
-  void build_alphabet();
-
-  int find_state(statet &state);
-  int add_state(statet &state);
-
-  void step(statet &state, goto_programt::targett &sym, statet &to);
-  void add_transition(statet &from, goto_programt::targett &sym, statet &to);
-
-  int max_index(patht &path, int idx, goto_programt::targett &sym);
-
-  pathst paths;
-  statest states;
-  state_mapt state_map;
-  alphabett alphabet;
-  transitionst transitions;
-  statet init_state;
-  statet accept_state;
+  typedef std::map<state_sett, statet> state_mapt;
 
   goto_programt &goto_program;
+  alphabett alphabet;
+  goto_programt::targett epsilon;
+  std::vector<state_sett> unmarked_dstates;
+  state_mapt dstates;
+
+  automatont nta;
+  automatont dta;
 };
 
 #endif // TRACE_AUTOMATON_H
