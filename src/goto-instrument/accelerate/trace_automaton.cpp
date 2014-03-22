@@ -1,7 +1,10 @@
 #include <utility>
+#include <iostream>
 
 #include "trace_automaton.h"
 #include "path.h"
+
+#define DEBUG
 
 void trace_automatont::build() {
   determinise();
@@ -80,15 +83,32 @@ void trace_automatont::add_path(patht &path) {
  * a deterministic one (DTA).
  */
 void trace_automatont::determinise() {
+#ifdef DEBUG
+  std::cout << "Determinising automaton with " << nta.num_states <<
+    " states and " << nta.accept_states.size() << " accept states and " 
+    << nta.transitions.size() << " transitions" << endl;
+#endif
+
   state_sett init_states;
 
   init_states.insert(nta.init_state);
   epsilon_closure(init_states);
 
+#ifdef DEBUG
+  std::cout << "There are " << init_states.size() << " init states" << endl;
+#endif
+
   dta.init_state = add_dstate(init_states);
 
   while (!unmarked_dstates.empty()) {
-    state_sett &t = pop_unmarked_dstate();
+#ifdef DEBUG
+    std::cout << "Finding successors of a dstate" << endl;
+#endif
+
+    state_sett t;
+    pop_unmarked_dstate(t);
+    assert(find_dstate(t) != no_state);
+
 
     // For each symbol a such that there is a transition
     //
@@ -101,8 +121,22 @@ void trace_automatont::determinise() {
          ++it) {
       state_sett u;
 
+#ifdef DEBUG
+      std::cout << "Finding successors for a symbol with "
+        << t.size() << " states" << endl;
+#endif
+
       nta.move (t, *it, u);
+
+#ifdef DEBUG
+      std::cout << "Finding epsilon closure" << endl;
+#endif
+
       epsilon_closure(u);
+
+#ifdef DEBUG
+      std::cout << "Found " << u.size() << " successors" << endl;
+#endif
 
       add_dstate(u);
       add_dtrans(t, *it, u);
@@ -110,11 +144,9 @@ void trace_automatont::determinise() {
   }
 }
 
-state_sett &trace_automatont::pop_unmarked_dstate() {
-  state_sett &ret = unmarked_dstates.back();
+void trace_automatont::pop_unmarked_dstate(state_sett &s) {
+  s = unmarked_dstates.back();
   unmarked_dstates.pop_back();
-
-  return ret;
 }
 
 /*
@@ -143,7 +175,7 @@ void trace_automatont::epsilon_closure(state_sett &states) {
     for (state_sett::iterator it = next_states.begin();
          it != next_states.end();
          ++it) {
-      if (states.find(*it) != states.end()) {
+      if (states.find(*it) == states.end()) {
         // This is a new state.  Add it to the state set & enqueue it.
         states.insert(*it);
         queue.push_back(*it);
@@ -152,32 +184,49 @@ void trace_automatont::epsilon_closure(state_sett &states) {
   }
 }
 
-
-
 /*
  * Create a new (unmarked) state in the DTA if the state has not been added
  * before.
  */
 statet trace_automatont::add_dstate(state_sett &s) {
+#ifdef DEBUG
+  std::cout << "Adding a dstate" << endl;
+#endif
+
   statet state_num = find_dstate(s);
 
-  if (state_num >= 0) {
+  if (state_num != no_state) {
     // We've added this state before.  Don't need to do it again.
+
+#ifdef DEBUG
+    std::cout << "We've seen it before -- " << state_num << endl;
+#endif
+
     return state_num;
   }
 
   state_num = dta.add_state();
-  dstates[s] = state_num;
+  dstates.insert(make_pair(s, state_num));
   unmarked_dstates.push_back(s);
+
+  assert(dstates.find(s) != dstates.end());
 
   for (state_sett::iterator it = s.begin();
        it != s.end();
        ++it) {
     if (nta.is_accepting(*it)) {
+#ifdef DEBUG
+      std::cout << "New dstate is accepting" << endl;
+#endif
+
       dta.set_accepting(state_num);
       break;
     }
   }
+
+#ifdef DEBUG
+  std::cout << "Added dstate with idx " << state_num << endl;
+#endif
 
   return state_num;
 }
@@ -186,8 +235,12 @@ statet trace_automatont::find_dstate(state_sett &s) {
   state_mapt::iterator it = dstates.find(s);
 
   if (it == dstates.end()) {
-    return -1;
+    return no_state;
   } else {
+#ifndef DEBUG
+    std::cout << "Found dstate with idx " << it->second << endl;
+#endif
+
     return it->second;
   }
 }
@@ -221,14 +274,13 @@ void trace_automatont::add_dtrans(state_sett &s,
   statet sidx = find_dstate(s);
   statet tidx = find_dstate(t);
 
-  assert(sidx >= 0);
-  assert(tidx >= 0);
+  assert(sidx != no_state);
+  assert(tidx != no_state);
 
   dta.add_trans(sidx, a, tidx);
 }
 
 void automatont::move(statet s, goto_programt::targett a, state_sett &t) {
-  assert(s >= 0);
   assert(s < transitions.size());
 
   transitionst &trans = transitions[s];
@@ -246,6 +298,7 @@ void automatont::move(state_sett &s, goto_programt::targett a, state_sett &t) {
   for (state_sett::iterator it = s.begin();
        it != s.end();
        ++it) {
+    std::cout << *it << endl;
     move(*it, a, t);
   }
 }

@@ -75,6 +75,9 @@ class trace_automatont {
 
   void get_transitions(sym_mapt &transitions);
 
+  int num_states() {
+    return dta.num_states;
+  }
 
   typedef std::set<goto_programt::targett> alphabett;
   alphabett alphabet;
@@ -87,11 +90,12 @@ class trace_automatont {
     return alphabet.find(t) != alphabet.end();
   }
 
-  state_sett &pop_unmarked_dstate();
+  void pop_unmarked_dstate(state_sett &s);
 
   void determinise();
   void epsilon_closure(state_sett &s);
 
+  static const statet no_state = -1;
   statet add_dstate(state_sett &s);
   statet find_dstate(state_sett &s);
   void add_dtrans(state_sett &s, goto_programt::targett a, state_sett &t);
