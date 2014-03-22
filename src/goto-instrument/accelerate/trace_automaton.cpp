@@ -4,7 +4,7 @@
 #include "trace_automaton.h"
 #include "path.h"
 
-#define DEBUG
+//#define DEBUG
 
 void trace_automatont::build() {
   determinise();

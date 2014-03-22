@@ -29,7 +29,7 @@
 #include "accelerator.h"
 #include "util.h"
 
-#define DEBUG
+//#define DEBUG
 
 
 bool polynomial_acceleratort::accelerate(patht &loop,

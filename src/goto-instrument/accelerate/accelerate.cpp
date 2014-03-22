@@ -13,7 +13,7 @@
 #include "polynomial_accelerator.h"
 //#include "symbolic_accelerator.h"
 
-#define DEBUG
+//#define DEBUG
 
 using namespace std;
 
@@ -243,9 +243,7 @@ void acceleratet::restrict_traces() {
     automaton.add_path(double_accelerator);
   }
 
-#ifdef DEBUG
   cout << "Building trace automaton..." << endl;
-#endif
 
   automaton.build();
   insert_automaton(automaton);
@@ -380,16 +378,14 @@ int acceleratet::accelerate_loops()
 
   program.update();
 
-#ifdef DEBUG
-  cout << "Engaging crush mode..." << endl;
-#endif
+  if (num_accelerated > 0) {
+    cout << "Engaging crush mode..." << endl;
 
-  restrict_traces();
-  program.update();
+    restrict_traces();
+    program.update();
 
-#ifdef DEBUG
-  cout << "Crush mode engaged." << endl;
-#endif
+    cout << "Crush mode engaged." << endl;
+  }
 
   return num_accelerated;
 }
