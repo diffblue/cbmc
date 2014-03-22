@@ -13,7 +13,7 @@
 #include "polynomial_accelerator.h"
 //#include "symbolic_accelerator.h"
 
-//#define DEBUG
+#define DEBUG
 
 using namespace std;
 
@@ -152,6 +152,16 @@ int acceleratet::accelerate_loop(goto_programt::targett &loop_header) {
     }
   }
 
+#ifdef DEBUG
+  cout << "Engaging crush mode..." << endl;
+#endif
+
+  restrict_traces();
+
+#ifdef DEBUG
+  cout << "Crush mode engaged." << endl;
+#endif
+
   return num_accelerated;
 }
 
@@ -172,7 +182,7 @@ bool acceleratet::accelerate_path(patht &path, path_acceleratort &accelerator) {
   if (polynomial_accelerator.accelerate(path, accelerator)) {
 #ifdef DEBUG
     cout << "Accelerated!" << endl;
-    accelerated_path.output(ns, "accelerator", cout);
+    //accelerated_path.output(ns, "accelerator", cout);
 #endif
 
     return true;
@@ -242,6 +252,10 @@ void acceleratet::restrict_traces() {
     automaton.add_path(double_accelerator);
   }
 
+#ifdef DEBUG
+  cout << "Building trace automaton..." << endl;
+#endif
+
   automaton.build();
   insert_automaton(automaton);
 }
@@ -291,6 +305,13 @@ void acceleratet::insert_automaton(trace_automatont &automaton) {
   automaton.get_transitions(transitions);
   automaton.accept_states(accept_states);
 
+#ifdef DEBUG
+  cout << "Inserting trace automaton with "
+    << automaton.num_states() << " states, "
+    << accept_states.size() << " accepting states and "
+    << transitions.size() << " transitions" << endl;
+#endif
+
   // Declare the variables we'll use to encode the state machine.
   goto_programt::targett t = program.instructions.begin();
   decl(state, t, from_integer(automaton.init_state(), state.type()));
@@ -329,14 +350,15 @@ void acceleratet::build_state_machine(trace_automatont::sym_mapt::iterator p,
     //
     // which we encode by inserting:
     //
-    //   if (state == from) next_state = to;
+    //   next_state = (state == from) ? to : next_state;
     //
     // just before loc.
 
     equal_exprt guard(state, from_integer(from, state.type()));
+    if_exprt rhs(guard, from_integer(to, next_state.type()), next_state);
+
     goto_programt::targett assignment = state_machine.assign(next_state,
-        from_integer(to, next_state.type()));
-    assignment->guard = guard;
+        rhs);
   }
 
   // Update the state and assume(false) if we've hit an accept state.

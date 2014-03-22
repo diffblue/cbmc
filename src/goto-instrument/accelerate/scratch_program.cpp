@@ -83,15 +83,18 @@ static void fix_types(exprt &expr) {
     fix_types(*it);
   }
 
-  if (expr.id() == ID_equal) {
-    equal_exprt &equal = to_equal_expr(expr);
-    exprt &lhs = equal.lhs();
-    exprt &rhs = equal.rhs();
+  if (expr.id() == ID_equal ||
+      expr.id() == ID_notequal ||
+      expr.id() == ID_gt ||
+      expr.id() == ID_lt ||
+      expr.id() == ID_ge ||
+      expr.id() == ID_le) {
+    exprt &lhs = expr.op0();
+    exprt &rhs = expr.op1();
 
     if (lhs.type() != rhs.type()) {
       typecast_exprt typecast(rhs, lhs.type());
-      equal.rhs() = typecast;
-      expr = equal;
+      expr.op1().swap(typecast);
     }
   }
 }
