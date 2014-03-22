@@ -34,6 +34,10 @@ void trace_automatont::build_alphabet(goto_programt &program) {
          ++jt) {
       if (seen.find(*jt) != seen.end()) {
         // We've seen this location before.  Add it to the alphabet.
+        //alphabet.insert(*jt);
+      }
+
+      if (succs.size() > 1) {
         alphabet.insert(*jt);
       }
 
@@ -62,17 +66,29 @@ void trace_automatont::add_path(patht &path) {
   state = nta.add_state();
   nta.add_trans(nta.init_state, epsilon, state);
 
+#ifdef DEBUG
+  std::cout << "Adding path: ";
+#endif
+
   for (patht::iterator it = path.begin();
        it != path.end();
        ++it) {
     goto_programt::targett l = it->loc;
 
     if (in_alphabet(l)) {
+#ifdef DEBUG
+      std::cout << l->location_number << ":" << l->location << ", ";
+#endif
+
       statet new_state = nta.add_state();
       nta.add_trans(state, l, new_state);
       state = new_state;
     }
   }
+
+#ifdef DEBUG
+  std::cout << endl;
+#endif
 
   nta.set_accepting(state);
 }
@@ -101,10 +117,6 @@ void trace_automatont::determinise() {
   dta.init_state = add_dstate(init_states);
 
   while (!unmarked_dstates.empty()) {
-#ifdef DEBUG
-    std::cout << "Finding successors of a dstate" << endl;
-#endif
-
     state_sett t;
     pop_unmarked_dstate(t);
     assert(find_dstate(t) != no_state);
@@ -121,22 +133,8 @@ void trace_automatont::determinise() {
          ++it) {
       state_sett u;
 
-#ifdef DEBUG
-      std::cout << "Finding successors for a symbol with "
-        << t.size() << " states" << endl;
-#endif
-
       nta.move (t, *it, u);
-
-#ifdef DEBUG
-      std::cout << "Finding epsilon closure" << endl;
-#endif
-
       epsilon_closure(u);
-
-#ifdef DEBUG
-      std::cout << "Found " << u.size() << " successors" << endl;
-#endif
 
       add_dstate(u);
       add_dtrans(t, *it, u);
@@ -189,19 +187,10 @@ void trace_automatont::epsilon_closure(state_sett &states) {
  * before.
  */
 statet trace_automatont::add_dstate(state_sett &s) {
-#ifdef DEBUG
-  std::cout << "Adding a dstate" << endl;
-#endif
-
   statet state_num = find_dstate(s);
 
   if (state_num != no_state) {
     // We've added this state before.  Don't need to do it again.
-
-#ifdef DEBUG
-    std::cout << "We've seen it before -- " << state_num << endl;
-#endif
-
     return state_num;
   }
 
@@ -215,18 +204,10 @@ statet trace_automatont::add_dstate(state_sett &s) {
        it != s.end();
        ++it) {
     if (nta.is_accepting(*it)) {
-#ifdef DEBUG
-      std::cout << "New dstate is accepting" << endl;
-#endif
-
       dta.set_accepting(state_num);
       break;
     }
   }
-
-#ifdef DEBUG
-  std::cout << "Added dstate with idx " << state_num << endl;
-#endif
 
   return state_num;
 }
@@ -237,10 +218,6 @@ statet trace_automatont::find_dstate(state_sett &s) {
   if (it == dstates.end()) {
     return no_state;
   } else {
-#ifndef DEBUG
-    std::cout << "Found dstate with idx " << it->second << endl;
-#endif
-
     return it->second;
   }
 }
@@ -298,7 +275,6 @@ void automatont::move(state_sett &s, goto_programt::targett a, state_sett &t) {
   for (state_sett::iterator it = s.begin();
        it != s.end();
        ++it) {
-    std::cout << *it << endl;
     move(*it, a, t);
   }
 }
