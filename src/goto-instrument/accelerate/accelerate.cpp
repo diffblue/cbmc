@@ -152,15 +152,6 @@ int acceleratet::accelerate_loop(goto_programt::targett &loop_header) {
     }
   }
 
-#ifdef DEBUG
-  cout << "Engaging crush mode..." << endl;
-#endif
-
-  restrict_traces();
-
-#ifdef DEBUG
-  cout << "Crush mode engaged." << endl;
-#endif
 
   return num_accelerated;
 }
@@ -274,6 +265,8 @@ symbolt acceleratet::make_symbol(string name, typet type) {
 }
 
 void acceleratet::decl(symbol_exprt &sym, goto_programt::targett t) {
+  return;
+
   goto_programt::targett decl = program.insert_before(t);
   code_declt code(sym);
 
@@ -384,6 +377,19 @@ int acceleratet::accelerate_loops()
     goto_programt::targett t = it->first;
     num_accelerated += accelerate_loop(t);
   }
+
+  program.update();
+
+#ifdef DEBUG
+  cout << "Engaging crush mode..." << endl;
+#endif
+
+  restrict_traces();
+  program.update();
+
+#ifdef DEBUG
+  cout << "Crush mode engaged." << endl;
+#endif
 
   return num_accelerated;
 }
