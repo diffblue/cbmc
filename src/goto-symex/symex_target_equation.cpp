@@ -589,16 +589,16 @@ void symex_target_equationt::constraint(
 
 Function: symex_target_equationt::convert
 
-  Inputs:
+  Inputs: converter
 
- Outputs:
+ Outputs: 
 
  Purpose:
 
 \*******************************************************************/
 
 void symex_target_equationt::convert(
-  prop_convt &prop_conv)
+   prop_convt &prop_conv)
 {
   convert_guards(prop_conv);
   convert_assignments(prop_conv);
@@ -613,11 +613,11 @@ void symex_target_equationt::convert(
 
 Function: symex_target_equationt::convert_assignments
 
-  Inputs:
+  Inputs: decision procedure
 
- Outputs:
+ Outputs: -
 
- Purpose:
+ Purpose: converts assignments
 
 \*******************************************************************/
 
@@ -636,11 +636,11 @@ void symex_target_equationt::convert_assignments(
 
 Function: symex_target_equationt::convert_decls
 
-  Inputs:
+  Inputs: converter
 
- Outputs:
+ Outputs: -
 
- Purpose:
+ Purpose: converts declarations
 
 \*******************************************************************/
 
@@ -663,11 +663,11 @@ void symex_target_equationt::convert_decls(
 
 Function: symex_target_equationt::convert_guards
 
-  Inputs:
+  Inputs: converter
 
- Outputs:
+ Outputs: -
 
- Purpose:
+ Purpose: converts guards
 
 \*******************************************************************/
 
@@ -688,11 +688,11 @@ void symex_target_equationt::convert_guards(
 
 Function: symex_target_equationt::convert_assumptions
 
-  Inputs:
+  Inputs: converter
 
- Outputs:
+ Outputs: -
 
- Purpose:
+ Purpose: converts assumptions
 
 \*******************************************************************/
 
@@ -716,11 +716,11 @@ void symex_target_equationt::convert_assumptions(
 
 Function: symex_target_equationt::convert_constraints
 
-  Inputs:
+  Inputs: decision procedure
 
- Outputs:
+ Outputs: -
 
- Purpose:
+ Purpose: converts constraints
 
 \*******************************************************************/
 
@@ -745,11 +745,11 @@ void symex_target_equationt::convert_constraints(
 
 Function: symex_target_equationt::convert_assertions
 
-  Inputs:
+  Inputs: converter
 
- Outputs:
+ Outputs: -
 
- Purpose:
+ Purpose: converts assertions
 
 \*******************************************************************/
 
@@ -758,16 +758,17 @@ void symex_target_equationt::convert_assertions(
 {
   // we find out if there is only _one_ assertion,
   // which allows for a simpler formula
-  
+
   unsigned number_of_assertions=count_assertions();
 
   if(number_of_assertions==0)
     return;
-    
+
   if(number_of_assertions==1)
   {
     for(SSA_stepst::iterator it=SSA_steps.begin();
         it!=SSA_steps.end(); it++)
+    {
       if(it->is_assert())
       {
         prop_conv.set_to_false(it->cond_expr);
@@ -776,6 +777,7 @@ void symex_target_equationt::convert_assertions(
       }
       else if(it->is_assume())
         prop_conv.set_to_true(it->cond_expr);
+    }
 
     assert(false); // unreachable
   }
@@ -789,6 +791,7 @@ void symex_target_equationt::convert_assertions(
 
   for(SSA_stepst::iterator it=SSA_steps.begin();
       it!=SSA_steps.end(); it++)
+  {
     if(it->is_assert())
     {
       implies_exprt implication(
@@ -807,6 +810,7 @@ void symex_target_equationt::convert_assertions(
       assumption=
         and_exprt(assumption, literal_exprt(it->cond_literal));
     }
+  }
 
   // the below is 'true' if there are no assertions
   prop_conv.set_to_true(disjunction(disjuncts));
@@ -816,11 +820,11 @@ void symex_target_equationt::convert_assertions(
 
 Function: symex_target_equationt::convert_io
 
-  Inputs:
+  Inputs: decision procedure
 
- Outputs:
+ Outputs: -
 
- Purpose:
+ Purpose: converts I/O
 
 \*******************************************************************/
 
@@ -858,6 +862,7 @@ void symex_target_equationt::convert_io(
       }
     }
 }
+
 
 /*******************************************************************\
 
