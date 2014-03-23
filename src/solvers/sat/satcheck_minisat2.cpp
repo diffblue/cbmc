@@ -12,7 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 #include <stack>
-#include <iostream>
 
 #include <util/i2string.h>
 #include <util/threeval.h>

@@ -7,7 +7,6 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <cassert>
-#include <iostream>
 
 #include <util/arith_tools.h>
 
@@ -195,9 +194,8 @@ bvt bv_utilst::select(literalt s, const bvt &a, const bvt &b)
   bvt result;
 
   result.resize(a.size());
-  for(unsigned i=0; i<result.size(); i++) {
+  for(unsigned i=0; i<result.size(); i++)
     result[i]=prop.lselect(s, a[i], b[i]);
-  }
 
   return result;
 }
