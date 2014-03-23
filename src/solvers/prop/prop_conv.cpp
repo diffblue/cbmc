@@ -28,7 +28,7 @@ Function: prop_convt::is_in_conflict
 
  Outputs:
 
- Purpose:
+ Purpose: determine whether a variable is in the final conflict
 
 \*******************************************************************/
 
