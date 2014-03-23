@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <limits>
+
 #include <util/location.h>
 #include <util/i2string.h>
 
@@ -27,7 +29,8 @@ symex_bmct::symex_bmct(
   const namespacet &_ns,
   symbol_tablet &_new_symbol_table,
   symex_targett &_target):
-  goto_symext(_ns, _new_symbol_table, _target)
+  goto_symext(_ns, _new_symbol_table, _target),
+  max_unwind_is_set(false)
 {
 }
 
@@ -79,19 +82,35 @@ bool symex_bmct::get_unwind(
   unsigned unwind)
 {
   const irep_idt id=goto_programt::loop_id(source.pc);
-  const long this_loop_max_unwind=
-    std::max(max_unwind,
-             std::max(thread_loop_limits[(unsigned)-1][id],
-                      thread_loop_limits[source.thread_nr][id]));
 
-  #if 1
-  statistics() << "Unwinding loop " << id << " iteration "
+  // We use the most specific limit we have,
+  // and 'infinity' when we have none.
+
+  unsigned this_loop_limit=std::numeric_limits<unsigned>::max();
+  
+  loop_limitst &this_thread_limits=
+    thread_loop_limits[source.thread_nr];
+    
+  loop_limitst::const_iterator l_it=this_thread_limits.find(id);
+  if(l_it!=this_thread_limits.end())
+    this_loop_limit=l_it->second;
+  else
+  {
+    l_it=loop_limits.find(id);
+    if(l_it!=loop_limits.end())
+      this_loop_limit=l_it->second;
+    else if(max_unwind_is_set)
+      this_loop_limit=max_unwind;
+  }
+
+  bool abort=unwind>=this_loop_limit;
+
+  statistics() << (abort?"Not unwinding":"Unwinding")
+               << " loop " << id << " iteration "
                << unwind << " " << source.pc->location
                << " thread " << source.thread_nr << eom;
-  #endif
 
-  return this_loop_max_unwind!=0 &&
-         unwind>=this_loop_max_unwind;
+  return abort;
 }
 
 /*******************************************************************\
