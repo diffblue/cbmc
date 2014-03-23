@@ -80,7 +80,25 @@ Function: optionst::set_option
 \*******************************************************************/
 
 void optionst::set_option(const std::string &option,
-                          const int value)
+                          const signed int value)
+{
+  set_option(option, i2string(value));
+}
+
+/*******************************************************************\
+
+Function: optionst::set_option
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void optionst::set_option(const std::string &option,
+                          const unsigned int value)
 {
   set_option(option, i2string(value));
 }
@@ -105,7 +123,7 @@ bool optionst::get_bool_option(const std::string &option) const
 
 /*******************************************************************\
 
-Function: optionst::get_int_option
+Function: optionst::get_signed_int_option
 
   Inputs:
 
@@ -115,10 +133,28 @@ Function: optionst::get_int_option
 
 \*******************************************************************/
 
-int optionst::get_int_option(const std::string &option) const
+signed int optionst::get_signed_int_option(const std::string &option) const
 {
   const std::string value=get_option(option);
   return value.empty()?0:safe_str2int(value.c_str());
+}
+
+/*******************************************************************\
+
+Function: optionst::get_unsigned_int_option
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+unsigned int optionst::get_unsigned_int_option(const std::string &option) const
+{
+  const std::string value=get_option(option);
+  return value.empty()?0:safe_str2unsigned(value.c_str());
 }
 
 /*******************************************************************\
