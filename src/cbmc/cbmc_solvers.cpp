@@ -245,7 +245,8 @@ bool bmct::decide_bv_refinement()
 
   // we allow setting some parameters  
   if(options.get_option("max-node-refinement")!="")
-    bv_refinement.max_node_refinement=options.get_int_option("max-node-refinement");
+    bv_refinement.max_node_refinement=
+      options.get_unsigned_int_option("max-node-refinement");
   
   return decide(bv_refinement);
 }
