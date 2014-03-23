@@ -176,6 +176,8 @@ protected:
     const statet::goto_statet &goto_state,
     statet &state);
   
+  // determine whether to unwind a loop -- true indicates abort,
+  // with false we continue.
   virtual bool get_unwind(
     const symex_targett::sourcet &source,
     unsigned unwind);
