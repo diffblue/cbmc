@@ -446,8 +446,7 @@ int goto_instrument_parseoptionst::doit()
 
     if(cmdline.isset("accelerate"))
     {
-      namespacet ns(symbol_table);
-      accelerate_functions(goto_functions, ns);
+      accelerate_functions(goto_functions, symbol_table);
       remove_skip(goto_functions);
       goto_functions.update();
     }

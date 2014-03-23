@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <limits>
+
 #include <util/location.h>
 #include <util/i2string.h>
 #include <util/xml.h>
@@ -34,11 +36,12 @@ Function: symex_bmct::symex_bmct
 symex_bmct::symex_bmct(
   const namespacet &_ns,
   symbol_tablet &_new_symbol_table,
-  symex_target_equationt &_target,
+  symex_targett &_target,
   prop_convt& _prop_conv):
   goto_symext(_ns, _new_symbol_table, _target),
   prop_conv(_prop_conv),
-  ui(ui_message_handlert::PLAIN)
+  ui(ui_message_handlert::PLAIN),
+  max_unwind_is_set(false)
 {
 }
 
@@ -112,37 +115,44 @@ bool symex_bmct::get_unwind(
   unsigned unwind)
 {
   const irep_idt id=goto_programt::loop_id(source.pc);
-  unsigned this_loop_max_unwind=
-    std::max(max_unwind,
-             std::max(thread_loop_limits[(unsigned)-1][id],
-                      thread_loop_limits[source.thread_nr][id]));
 
-  if(this_loop_max_unwind==0) // 0 if unbounded => set to UINT_MAX
-    this_loop_max_unwind = (unsigned)-1;
+  // We use the most specific limit we have,
+  // and 'infinity' when we have none.
+
+  unsigned this_loop_limit=std::numeric_limits<unsigned>::max();
+  
+  loop_limitst &this_thread_limits=
+    thread_loop_limits[source.thread_nr];
+    
+  loop_limitst::const_iterator l_it=this_thread_limits.find(id);
+  if(l_it!=this_thread_limits.end())
+    this_loop_limit=l_it->second;
+  else
+  {
+    l_it=loop_limits.find(id);
+    if(l_it!=loop_limits.end())
+      this_loop_limit=l_it->second;
+    else if(max_unwind_is_set)
+      this_loop_limit=max_unwind;
+  }
 
   if(id==incr_loop_id) {
-    this_loop_max_unwind = incr_max_unwind;
+    this_loop_limit = incr_max_unwind;
     if(unwind+1>=incr_min_unwind) ignore_assertions = false;
   }
 
-  #if 1
-  statistics() << "Unwinding loop " << id << " iteration "
-               << unwind << " " << source.pc->location
+  bool abort=unwind>=this_loop_limit;
+
+  statistics() << (abort?"Not unwinding":"Unwinding")
+               << " loop " << id << " iteration "
+               << unwind;
+
+  if(this_loop_limit!=std::numeric_limits<unsigned>::max())
+    statistics() << " (" << this_loop_limit << " max)";
+
+  statistics() << " " << source.pc->location
                << " thread " << source.thread_nr << eom;
-
-  if(ui==ui_message_handlert::XML_UI) {
-      xmlt xml("current-unwinding");
-      xml.data=i2string(unwind);
-      std::cout << xml;
-      std::cout << "\n";
-  }
-  #endif
-
-  #if 0
-    statistics() << "Unwind bound = " << this_loop_max_unwind << eom;
-  #endif
-
-  return unwind>=this_loop_max_unwind;
+  return abort;
 }
 
 /*******************************************************************\
@@ -162,30 +172,44 @@ bool symex_bmct::get_unwind_recursion(
   const unsigned thread_nr,
   unsigned unwind)
 {
-  unsigned this_loop_max_unwind=
-    std::max(max_unwind,
-             std::max(thread_loop_limits[(unsigned)-1][id],
-                      thread_loop_limits[thread_nr][id]));
+  // We use the most specific limit we have,
+  // and 'infinity' when we have none.
 
-  if(this_loop_max_unwind==0) // 0 if unbounded => set to UINT_MAX
-    this_loop_max_unwind = (unsigned)-1;
+  unsigned this_loop_limit=std::numeric_limits<unsigned>::max();
 
-  #if 1
-  if(unwind!=0)
+  loop_limitst &this_thread_limits=
+    thread_loop_limits[thread_nr];
+    
+  loop_limitst::const_iterator l_it=this_thread_limits.find(id);
+  if(l_it!=this_thread_limits.end())
+    this_loop_limit=l_it->second;
+  else
+  {
+    l_it=loop_limits.find(id);
+    if(l_it!=loop_limits.end())
+      this_loop_limit=l_it->second;
+    else if(max_unwind_is_set)
+      this_loop_limit=max_unwind;
+  }
+
+  bool abort=unwind>this_loop_limit;
+
+  if(unwind>0 || abort)
   {
     const symbolt &symbol=ns.lookup(id);
 
-    statistics() << "Unwinding recursion "
+    statistics() << (abort?"Not unwinding":"Unwinding")
+                 << " recursion "
                  << symbol.display_name()
                  << " iteration " << unwind;
-      
-    statistics() << " (" << this_loop_max_unwind << " max)";
+    
+    if(this_loop_limit!=std::numeric_limits<unsigned>::max())
+      statistics() << " (" << this_loop_limit << " max)";
 
     statistics() << eom;
   }
-  #endif
 
-  return unwind>=this_loop_max_unwind;
+  return abort;
 }
 
 /*******************************************************************\

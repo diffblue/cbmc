@@ -12,6 +12,7 @@
 #include "scratch_program.h"
 #include "polynomial.h"
 #include "path.h"
+#include "accelerator.h"
 
 using namespace std;
 
@@ -26,7 +27,7 @@ class polynomial_acceleratort {
     loop_counter = nil_exprt();
   }
 
-  virtual bool accelerate(patht &loop, goto_programt &accelerator);
+  virtual bool accelerate(patht &loop, path_acceleratort &accelerator);
 
   bool fit_polynomial(goto_programt::instructionst &loop_body,
                       exprt &target,

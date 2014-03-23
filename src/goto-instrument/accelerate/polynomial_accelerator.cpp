@@ -26,13 +26,14 @@
 #include <util/arith_tools.h>
 
 #include "polynomial_accelerator.h"
+#include "accelerator.h"
 #include "util.h"
 
-#define DEBUG
+//#define DEBUG
 
 
 bool polynomial_acceleratort::accelerate(patht &loop,
-    goto_programt &accelerator) {
+    path_acceleratort &accelerator) {
   goto_programt::instructionst body;
 
   for (patht::iterator it = loop.begin();
@@ -194,7 +195,7 @@ bool polynomial_acceleratort::accelerate(patht &loop,
     ensure_no_overflows(program);
   }
 
-  accelerator.instructions = program.instructions;
+  accelerator.pure_accelerator.instructions.swap(program.instructions);
 
   return true;
 }

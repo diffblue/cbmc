@@ -29,6 +29,6 @@ class path_nodet {
 };
 
 typedef list<path_nodet> patht;
-typedef list<patht> pathst;
+typedef list<patht> pathst; 
 
 #endif // PATH_H

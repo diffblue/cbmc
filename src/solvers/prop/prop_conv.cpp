@@ -29,7 +29,7 @@ Function: prop_convt::is_in_conflict
 
  Outputs:
 
- Purpose: freezes all variables in the bitvector
+ Purpose: determine whether a variable is in the final conflict
 
 \*******************************************************************/
 

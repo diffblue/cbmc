@@ -70,8 +70,10 @@ bool goto_symext::symex_goto(statet &state)
       frame.loop_iterations[goto_programt::loop_id(state.source.pc)].count;
     unwind++;
     
-    if(get_unwind(state.source, unwind)) //loop bound exceeded
+    // continue unwinding?
+    if(get_unwind(state.source, unwind))
     {
+      // no!
       loop_bound_exceeded(state, new_guard);
 
       // reset unwinding
@@ -479,5 +481,6 @@ bool goto_symext::get_unwind(
   const symex_targett::sourcet &source,
   unsigned unwind)
 {
+  // by default, we keep going
   return false;
 }

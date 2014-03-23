@@ -591,11 +591,11 @@ void symex_target_equationt::constraint(
 
 Function: symex_target_equationt::convert
 
- Inputs: converter, first SSA step to be converted
+ Inputs: converter
 
- Outputs: last converted SSA step
+ Outputs: 
 
- Purpose: converts starting from given SSA step
+ Purpose: 
 
 \*******************************************************************/
 
@@ -623,11 +623,11 @@ void symex_target_equationt::convert(
 
 Function: symex_target_equationt::convert_assignments
 
-  Inputs: decision procedure, first SSA step to be converted
+ Inputs: decision procedure
 
  Outputs: -
 
- Purpose: converts assignments from the given SSA step
+ Purpose: converts assignments
 
 \*******************************************************************/
 
@@ -650,11 +650,11 @@ void symex_target_equationt::convert_assignments(
 
 Function: symex_target_equationt::convert_decls
 
-  Inputs: converter, first SSA step to be converted
+ Inputs: converter
 
  Outputs: -
 
- Purpose: converts declarations from given SSA step
+ Purpose: converts declarations
 
 \*******************************************************************/
 
@@ -678,11 +678,11 @@ void symex_target_equationt::convert_decls(
 
 Function: symex_target_equationt::convert_guards
 
-  Inputs: converter, first SSA step to be converted
+ Inputs: converter
 
  Outputs: -
 
- Purpose: converts guards from given SSA step
+ Purpose: converts guards
 
 \*******************************************************************/
 
@@ -703,11 +703,11 @@ void symex_target_equationt::convert_guards(
 
 Function: symex_target_equationt::convert_assumptions
 
-  Inputs: converter, first SSA step to be converted
+ Inputs: converter
 
  Outputs: -
 
- Purpose: converts assumptions from given SSA step
+ Purpose: converts assumptions
 
 \*******************************************************************/
 
@@ -731,11 +731,11 @@ void symex_target_equationt::convert_assumptions(
 
 Function: symex_target_equationt::convert_constraints
 
-  Inputs: decision procedure, first SSA step to be converted
+ Inputs: decision procedure
 
  Outputs: -
 
- Purpose: converts constraints from given SSA step
+ Purpose: converts constraints
 
 \*******************************************************************/
 
@@ -761,17 +761,20 @@ void symex_target_equationt::convert_constraints(
 
 Function: symex_target_equationt::convert_assertions
 
-  Inputs: converter, first SSA step to be converted
+ Inputs: converter
 
  Outputs: -
 
- Purpose: converts assertions from given SSA step
+ Purpose: converts assertions
 
 \*******************************************************************/
 
 void symex_target_equationt::convert_assertions(
   prop_convt &prop_conv)
 {
+  // we find out if there is only _one_ assertion,
+  // which allows for a simpler formula
+
   unsigned number_of_assertions=count_assertions();
 
   if(number_of_assertions==0)
@@ -802,6 +805,7 @@ void symex_target_equationt::convert_assertions(
   {
     for(SSA_stepst::iterator it=SSA_steps.begin();
         it!=SSA_steps.end(); it++)
+    {
       if(it->is_assert())
       {
         if(is_incremental) { 
@@ -824,6 +828,7 @@ void symex_target_equationt::convert_assertions(
           prop_conv.set_to_true(it->cond_expr);
 	}
       }
+    }
 
     assert(false); // unreachable
   }
@@ -932,11 +937,11 @@ void symex_target_equationt::new_activation_literal(prop_convt &prop_conv) {
 
 Function: symex_target_equationt::convert_io
 
-  Inputs: decision procedure, first SSA step to be converted
+ Inputs: decision procedure
 
  Outputs: -
 
- Purpose: converts I/O from given SSA step
+ Purpose: converts I/O
 
 \*******************************************************************/
 
