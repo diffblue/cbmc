@@ -27,21 +27,42 @@ public:
   // To show progress
   irept last_location;
 
-  // control unwinding  
-  long max_unwind;
-
-  void set_unwind_limit(
-    const irep_idt &id,
-    long thread_nr,
-    long limit)
+  // Control unwinding.
+  
+  void set_unwind_limit(unsigned limit)
   {
-    unsigned t=thread_nr>=0 ? thread_nr : (unsigned)-1;
+    max_unwind=limit;
+    max_unwind_is_set=true;
+  }
+  
+  void set_unwind_thread_loop_limit(
+    unsigned thread_nr,
+    const irep_idt &id,
+    unsigned limit)
+  {
+    thread_loop_limits[thread_nr][id]=limit;
+  }
 
-    thread_loop_limits[t][id]=limit;
+  void set_unwind_loop_limit(
+    const irep_idt &id,
+    unsigned limit)
+  {
+    loop_limits[id]=limit;
   }
 
 protected:  
-  typedef hash_map_cont<irep_idt, long, irep_id_hash> loop_limitst;
+  // We have
+  // 1) a global limit (max_unwind)
+  // 2) a limit per loop, all threads
+  // 3) a limit for a particular thread.
+  // We use the most specific of the above.
+
+  unsigned max_unwind;
+  bool max_unwind_is_set;
+
+  typedef hash_map_cont<irep_idt, unsigned, irep_id_hash> loop_limitst;
+  loop_limitst loop_limits;
+  
   typedef std::map<unsigned, loop_limitst> thread_loop_limitst;
   thread_loop_limitst thread_loop_limits;
 
