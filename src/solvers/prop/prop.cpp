@@ -18,7 +18,7 @@ Function: propt::set_equal
 
  Outputs:
 
- Purpose:
+ Purpose: asserts a==b in the propositional formula
 
 \*******************************************************************/
 
@@ -75,9 +75,9 @@ Function: propt::is_in_conflict
 
   Inputs:
 
- Outputs:
+ Outputs: true iff the given literal is part of the final conflict
 
- Purpose:
+ Purpose:  
 
 \*******************************************************************/
 
@@ -91,11 +91,11 @@ bool propt::is_in_conflict(literalt l) const
 
 Function: propt::new_variables
 
-  Inputs:
+  Inputs: width
 
- Outputs:
+ Outputs: bitvector 
 
- Purpose:
+ Purpose: generates a bitvector of given width with new variables 
 
 \*******************************************************************/
 
@@ -107,3 +107,5 @@ bvt propt::new_variables(unsigned width)
     result[i]=new_variable();
   return result;
 }
+
+
