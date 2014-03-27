@@ -488,11 +488,6 @@ bool bmct::run(const goto_functionst &goto_functions)
     error() << "Out of memory" << eom;
     return true;
   }
-  catch(signal_catchert::exceptiont& e)
-  {
-    error() << e.what() << eom;
-    return true;
-  }
 }
 
 /*******************************************************************\

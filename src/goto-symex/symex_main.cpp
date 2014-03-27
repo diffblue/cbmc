@@ -13,8 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/symbol_table.h>
 #include <util/replace_symbol.h>
 
-#include <util/signal_catcher.h>
-
 #include "goto_symex.h"
 
 /*******************************************************************\
@@ -169,7 +167,6 @@ bool goto_symext::operator()(
 
   while(!state.call_stack().empty())
   {
-    signal_catchert::check_caught_signal();
     if(symex_step(goto_functions, state)) return false;
     
     // is there another thread to execute?
