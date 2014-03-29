@@ -43,7 +43,7 @@ void boolbvt::convert_shift(const exprt &expr, bvt &bv)
   const bvt &dist=convert_bv(expr.op1());
 
   if(op.size()!=width)
-    throw "convert_shift: unexpected operand width";
+    throw "convert_shift: unexpected operand 0 width";
 
   bv_utilst::shiftt shift;
 
@@ -54,7 +54,7 @@ void boolbvt::convert_shift(const exprt &expr, bvt &bv)
   else if(expr.id()==ID_lshr)
     shift=bv_utilst::LRIGHT;
   else
-    throw "unexpected operand";
+    throw "unexpected shift operator";
 
   bv=bv_utils.shift(op, shift, dist);
 }
