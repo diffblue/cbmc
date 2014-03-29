@@ -136,21 +136,20 @@ bool symex_bmct::get_unwind(
       this_loop_limit=max_unwind;
   }
 
-  if(id==incr_loop_id) {
+  if(id==incr_loop_id)
+  {
     this_loop_limit = incr_max_unwind;
     if(unwind+1>=incr_min_unwind) ignore_assertions = false;
   }
 
   bool abort=unwind>=this_loop_limit;
-  
-  if(!abort)
+
+  // report where we are  
+  if(ui==ui_message_handlert::XML_UI)
   {
-    if(ui==ui_message_handlert::XML_UI)
-    {
-      xmlt xml("current-unwinding");
-      xml.data=i2string(unwind);
-      std::cout << xml << "\n";
-    }
+    xmlt xml("current-unwinding");
+    xml.data=i2string(unwind);
+    std::cout << xml << "\n";
   }
 
   statistics() << (abort?"Not unwinding":"Unwinding")
