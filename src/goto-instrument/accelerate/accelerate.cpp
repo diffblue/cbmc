@@ -125,6 +125,7 @@ int acceleratet::accelerate_loop(goto_programt::targett &loop_header) {
   pathst loop_paths, exit_paths;
   goto_programt::targett back_jump;
   int num_accelerated = 0;
+  int num_tried = 0;
 
   goto_programt::instructiont skip(SKIP);
   program.insert_before_swap(loop_header, skip);
@@ -141,6 +142,10 @@ int acceleratet::accelerate_loop(goto_programt::targett &loop_header) {
        it != loop_paths.end();
        ++it) {
     path_acceleratort accelerator;
+
+    if (num_accelerated++ > accelerate_limit) {
+      break;
+    }
 
     if (accelerate_path(*it, accelerator)) {
       subsumed_patht inserted(*it);
@@ -296,12 +301,10 @@ void acceleratet::insert_automaton(trace_automatont &automaton) {
   automaton.get_transitions(transitions);
   automaton.accept_states(accept_states);
 
-#ifdef DEBUG
   cout << "Inserting trace automaton with "
     << automaton.num_states() << " states, "
     << accept_states.size() << " accepting states and "
     << transitions.size() << " transitions" << endl;
-#endif
 
   // Declare the variables we'll use to encode the state machine.
   goto_programt::targett t = program.instructions.begin();
