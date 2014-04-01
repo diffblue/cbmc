@@ -42,6 +42,10 @@ void acceleratet::extend_path(goto_programt::targett &t,
                               pathst &loop_paths,
                               pathst &exit_paths,
                               goto_programt::targett &back_jump) {
+  if (loop_paths.size() >= accelerate_limit) {
+    return;
+  }
+
   if (t == loop_header && !prefix.empty()) {
     // We've expanded a path that has returned to the loop header -- 
     // store this as a looping path.
@@ -125,7 +129,6 @@ int acceleratet::accelerate_loop(goto_programt::targett &loop_header) {
   pathst loop_paths, exit_paths;
   goto_programt::targett back_jump;
   int num_accelerated = 0;
-  int num_tried = 0;
 
   goto_programt::instructiont skip(SKIP);
   program.insert_before_swap(loop_header, skip);
@@ -143,10 +146,6 @@ int acceleratet::accelerate_loop(goto_programt::targett &loop_header) {
        ++it) {
     path_acceleratort accelerator;
 
-    if (num_accelerated++ > accelerate_limit) {
-      break;
-    }
-
     if (accelerate_path(*it, accelerator)) {
       subsumed_patht inserted(*it);
 
@@ -156,7 +155,6 @@ int acceleratet::accelerate_loop(goto_programt::targett &loop_header) {
       num_accelerated++;
     }
   }
-
 
   return num_accelerated;
 }
