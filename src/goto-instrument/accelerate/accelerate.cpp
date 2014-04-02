@@ -348,9 +348,7 @@ void acceleratet::build_state_machine(trace_automatont::sym_mapt::iterator p,
 
     equal_exprt guard(state, from_integer(from, state.type()));
     if_exprt rhs(guard, from_integer(to, next_state.type()), next_state);
-
-    goto_programt::targett assignment = state_machine.assign(next_state,
-        rhs);
+    state_machine.assign(next_state, rhs);
   }
 
   // Update the state and assume(false) if we've hit an accept state.
