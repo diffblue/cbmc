@@ -30,7 +30,7 @@ class acceleratet {
 
   void restrict_traces();
 
-  static const int accelerate_limit = 5;
+  static const unsigned int accelerate_limit = 5;
 
  protected:
   void find_paths(goto_programt::targett &loop_header,

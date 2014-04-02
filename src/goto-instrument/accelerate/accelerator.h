@@ -14,10 +14,12 @@
 
 class path_acceleratort {
  public:
-  path_acceleratort(goto_programt &pure,
+  path_acceleratort(patht &_path,
+               goto_programt &pure,
                goto_programt &overflow,
                std::set<exprt> &changed,
                std::set<exprt> &dirty) :
+    path(_path),
     pure_accelerator(pure),
     overflow_path(overflow),
     changed_vars(changed),
@@ -27,6 +29,7 @@ class path_acceleratort {
 
   path_acceleratort() { }
 
+  patht path;
   goto_programt pure_accelerator;
   goto_programt overflow_path;
   std::set<exprt> changed_vars;

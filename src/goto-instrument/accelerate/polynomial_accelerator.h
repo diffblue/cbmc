@@ -13,10 +13,11 @@
 #include "polynomial.h"
 #include "path.h"
 #include "accelerator.h"
+#include "path_acceleration.h"
 
 using namespace std;
 
-class polynomial_acceleratort { 
+class polynomial_acceleratort : public path_accelerationt {
  public:
   polynomial_acceleratort(const symbol_tablet &_symbol_table,
                           const goto_functionst &_goto_functions) :
