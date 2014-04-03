@@ -1,6 +1,6 @@
 /*******************************************************************\
 
-Module: Set Claims
+Module: Set Properties
 
 Author: Daniel Kroening, kroening@kroening.com
 
