@@ -1116,3 +1116,132 @@ bool disjunctive_polynomial_accelerationt::expr2poly(exprt &expr,
 
   return true;
 }
+
+void disjunctive_polynomial_accelerationt::find_distinguishing_points() {
+  // XXX THIS IS A HACK TO BUILD A FRESH SYMBOL.  REFACTOR THIS PROPERLY.
+  scratch_programt scratch(symbol_table);
+
+  for (natural_loops_mutablet::natural_loopt::iterator it = loop.begin();
+       it != loop.end();
+       ++it) {
+    goto_programt::targetst succs;
+
+    goto_program.get_successors(*it, succs);
+
+    if (succs.size() > 1) {
+      // This location has multiple successors -- each successor is a
+      // distinguishing point.
+      for (goto_programt::targetst::iterator jt = succs.begin();
+           jt != succs.end();
+           ++jt) {
+        symbolt distinguisher_sym =
+          scratch.fresh_symbol("distinguisher", bool_typet());
+        symbol_table.add(distinguisher_sym);
+        symbol_exprt distinguisher = distinguisher_sym.symbol_expr();
+
+        distinguishing_points[*jt] = distinguisher;
+        distinguishers.push_back(distinguisher);
+      }
+    }
+  }
+}
+
+void disjunctive_polynomial_accelerationt::build_path(
+    scratch_programt &scratch_program, patht &path) {
+  goto_programt::targett t = loop_header;
+
+  do {
+    goto_programt::targett next;
+    goto_programt::targetst succs;
+
+    goto_program.get_successors(t, succs);
+
+    // We should have a looping path, so we should never hit a location
+    // with no successors.
+    assert(succs.size() > 0);
+
+    if (succs.size() == 1) {
+      // Only one successor -- accumulate it and move on.
+      path.push_back(path_nodet(t));
+      t = succs.front();
+      continue;
+    }
+
+    // We have multiple successors.  Examine the distinguisher variables
+    // to see which branch was taken.
+    bool found_branch = false;
+
+    for (goto_programt::targetst::iterator it = succs.begin();
+         it != succs.end();
+         ++it) {
+      exprt &distinguisher = distinguishing_points[*it];
+      bool taken = scratch_program.eval(distinguisher).is_true();
+
+      if (taken) {
+        assert(!found_branch);
+        next = *it;
+      }
+    }
+
+    assert(found_branch);
+
+    exprt cond = nil_exprt();
+
+    if (t->is_goto()) {
+      // If this was a conditional branch (it probably was), figure out
+      // if we hit the "taken" or "not taken" branch & accumulate the
+      // appropriate guard.
+      cond = not_exprt(t->guard);
+
+      for (goto_programt::targetst::iterator it = t->targets.begin();
+           it != t->targets.end();
+           ++it) {
+        if (next == *it) {
+          cond = t->guard;
+          break;
+        }
+      }
+    }
+
+    path.push_back(path_nodet(t, cond));
+
+    t = next;
+  } while (t != loop_header);
+}
+
+void disjunctive_polynomial_accelerationt::build_choosers() {
+  chooser_program.copy_from(goto_program);
+  chosen_program.copy_from(goto_program);
+
+  // We're going to iterate over the 3 programs in lockstep, which allows
+  // us to figure out which distinguishing point we've hit & instrument
+  // the relevant distinguisher variables.
+  goto_programt::targett chooserit = chooser_program.instructions.begin();
+  goto_programt::targett chosenit = chosen_program.instructions.begin();
+
+  for (goto_programt::targett t = goto_program.instructions.begin();
+       t != goto_program.instructions.end();
+       ++t) {
+    distinguish_mapt::iterator d = distinguishing_points.find(t);
+
+    if (d != distinguishing_points.end()) {
+      exprt &distinguisher = d->second;
+
+      // Instrument distinguisher = true into the chooser program.
+      goto_programt::targett assign =
+        chooser_program.insert_before(chooserit);
+      code_assignt code(distinguisher, true_exprt());
+      assign->make_assignment();
+      assign->code = code;
+
+      // Instrument assume(distinguisher) into the chosen program.
+      goto_programt::targett assume =
+        chosen_program.insert_before(chosenit);
+      assume->make_assumption(distinguisher);
+    }
+
+    // Bump the iterators so we remain in lockstep.
+    ++chooserit;
+    ++chosenit;
+  }
+}
