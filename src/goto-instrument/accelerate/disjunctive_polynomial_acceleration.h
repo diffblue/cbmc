@@ -34,6 +34,8 @@ class disjunctive_polynomial_accelerationt : public loop_accelerationt {
       loop_header(_loop_header)
   {
     loop_counter = nil_exprt();
+    find_distinguishing_points();
+    build_choosers();
   }
 
   virtual bool accelerate(path_acceleratort &accelerator);
@@ -98,6 +100,10 @@ class disjunctive_polynomial_accelerationt : public loop_accelerationt {
 
   void ensure_no_overflows(goto_programt &program);
 
+  void find_distinguishing_points();
+  void build_path(scratch_programt &scratch_program, patht &path);
+  void build_choosers();
+
 
   symbol_tablet &symbol_table;
   namespacet ns;
@@ -106,7 +112,14 @@ class disjunctive_polynomial_accelerationt : public loop_accelerationt {
   natural_loops_mutablet::natural_loopt &loop;
   goto_programt::targett loop_header;
 
+  typedef map<goto_programt::targett, exprt> distinguish_mapt;
+
   exprt loop_counter;
+  distinguish_mapt distinguishing_points;
+  list<exprt> distinguishers;
+  goto_programt chooser_program;
+  goto_programt chosen_program;
+  list<expr_listt> accelerated_paths;
 };
 
 set<exprt> find_modified(goto_programt::instructionst &body);
