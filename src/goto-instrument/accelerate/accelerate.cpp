@@ -11,9 +11,10 @@
 #include "accelerate.h"
 #include "path.h"
 #include "polynomial_accelerator.h"
+#include "enumerating_loop_acceleration.h"
 //#include "symbolic_accelerator.h"
 
-//#define DEBUG
+#define DEBUG
 
 using namespace std;
 
@@ -125,10 +126,36 @@ void acceleratet::extend_path(goto_programt::targett &t,
   }
 }
 
+goto_programt::targett acceleratet::find_back_jump(
+    goto_programt::targett loop_header) {
+  natural_loops_mutablet::natural_loopt &loop =
+    natural_loops.loop_map[loop_header];
+  goto_programt::targett back_jump = loop_header;
+
+  for (natural_loops_mutablet::natural_loopt::iterator it = loop.begin();
+       it != loop.end();
+       ++it) {
+    goto_programt::targett t = *it;
+    if (t->is_goto() &&
+        t->guard.is_true() &&
+        t->targets.size() == 1 &&
+        t->targets.front() == loop_header &&
+        t->location_number > back_jump->location_number) {
+      back_jump = t;
+    }
+  }
+
+  return back_jump;
+}
+
 int acceleratet::accelerate_loop(goto_programt::targett &loop_header) {
   pathst loop_paths, exit_paths;
   goto_programt::targett back_jump;
   int num_accelerated = 0;
+  natural_loops_mutablet::natural_loopt &loop =
+    natural_loops.loop_map[loop_header];
+
+  back_jump = find_back_jump(loop_header);
 
   goto_programt::instructiont skip(SKIP);
   program.insert_before_swap(loop_header, skip);
@@ -136,24 +163,19 @@ int acceleratet::accelerate_loop(goto_programt::targett &loop_header) {
   goto_programt::targett new_inst = loop_header;
   ++new_inst;
 
-  natural_loops.loop_map.find(loop_header)->second.insert(new_inst);
+  loop.insert(new_inst);
 
-  back_jump = loop_header;
-  find_paths(loop_header, loop_paths, exit_paths, back_jump);
+  enumerating_loop_accelerationt acceleration(symbol_table, goto_functions,
+      program, loop, loop_header, accelerate_limit);
 
-  for (pathst::iterator it = loop_paths.begin();
-       it != loop_paths.end();
-       ++it) {
-    path_acceleratort accelerator;
+  path_acceleratort accelerator;
 
-    if (accelerate_path(*it, accelerator)) {
-      subsumed_patht inserted(*it);
+  while (acceleration.accelerate(accelerator)) {
+    subsumed_patht inserted(accelerator.path);
 
-      insert_accelerator(loop_header, back_jump, accelerator, inserted);
-      subsumed.push_back(inserted);
-
-      num_accelerated++;
-    }
+    insert_accelerator(loop_header, back_jump, accelerator, inserted);
+    subsumed.push_back(inserted);
+    num_accelerated++;
   }
 
   return num_accelerated;

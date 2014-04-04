@@ -834,6 +834,10 @@ bool polynomial_acceleratort::do_arrays(goto_programt::instructionst &loop_body,
   
   array_assignments = gather_array_assignments(loop_body, arrays_written);
 
+#ifdef DEBUG
+  std::cout << "Found " << array_assignments.size() << " array assignments" << std::endl;
+#endif
+
   if (array_assignments.size() == 0) {
     // The loop doesn't write to any arrays.  We're done!
     return true;

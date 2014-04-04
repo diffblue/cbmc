@@ -17,14 +17,16 @@ class enumerating_loop_accelerationt : public loop_accelerationt {
       goto_functionst &_goto_functions,
       goto_programt &_goto_program,
       natural_loops_mutablet::natural_loopt &_loop,
-      goto_programt::targett _loop_header) :
+      goto_programt::targett _loop_header,
+      int _path_limit) :
     symbol_table(_symbol_table),
     goto_functions(_goto_functions),
     goto_program(_goto_program),
     loop(_loop),
     loop_header(_loop_header),
     path_enumerator(_goto_program, _loop, _loop_header),
-    polynomial_accelerator(symbol_table, goto_functions)
+    polynomial_accelerator(symbol_table, goto_functions),
+    path_limit(_path_limit)
   {
   }
 
@@ -38,6 +40,7 @@ class enumerating_loop_accelerationt : public loop_accelerationt {
   goto_programt::targett loop_header;
   path_enumeratort path_enumerator;
   polynomial_acceleratort polynomial_accelerator;
+  int path_limit;
 };
 
 #endif // ENUMERATING_LOOP_ACCELERATION_H

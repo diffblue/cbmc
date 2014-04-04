@@ -1,4 +1,8 @@
+#include <iostream>
+
 #include "path_enumerator.h"
+
+//#define DEBUG
 
 bool path_enumeratort::next(patht &path) {
   if (last_path.empty()) {
@@ -21,6 +25,10 @@ bool path_enumeratort::next(patht &path) {
   }
 
   do {
+#ifdef DEBUG
+    std::cout << "Enumerating next path..." << std::endl;
+#endif
+
     int decision = backtrack(last_path);
     complete_path(last_path, decision);
 
@@ -36,7 +44,10 @@ bool path_enumeratort::next(patht &path) {
 }
 
 int path_enumeratort::backtrack(patht &path) {
+  // If we have a path of length 1 or 0, we can't backtrack any further.
+  // That means we're done enumerating paths!
   if (path.size() < 2) {
+    path.clear();
     return 0;
   }
 
@@ -61,6 +72,11 @@ int path_enumeratort::backtrack(patht &path) {
 
   if ((ret + 1) < succs.size()) {
     // We can take the next branch here...
+
+#ifdef DEBUG
+    std::cout << "Backtracked to a path of size " << path.size() << std::endl;
+#endif
+
     return ret + 1;
   }
 
