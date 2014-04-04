@@ -46,6 +46,8 @@ class acceleratet {
                    pathst &exit_paths,
                    goto_programt::targett &back_jump);
 
+  goto_programt::targett find_back_jump(goto_programt::targett loop_header);
+
   void insert_looping_path(goto_programt::targett &loop_header,
                            goto_programt::targett &back_jump,
                            goto_programt &looping_path,
