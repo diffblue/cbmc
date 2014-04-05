@@ -1029,10 +1029,9 @@ void configt::ansi_ct::set_from_symbol_table(const symbol_tablet &symbol_table)
 {
   namespacet ns(symbol_table);
 
-  bool_width=1*8;
   int_width=from_ns(ns, "int_width");
   long_int_width=from_ns(ns, "long_int_width");
-  long_int_width=from_ns(ns, "long_int_width");
+  bool_width=1*8;
   char_width=from_ns(ns, "char_width");
   short_int_width=from_ns(ns, "short_int_width");
   long_long_int_width=from_ns(ns, "long_long_int_width");
@@ -1040,17 +1039,28 @@ void configt::ansi_ct::set_from_symbol_table(const symbol_tablet &symbol_table)
   single_width=from_ns(ns, "single_width");
   double_width=from_ns(ns, "double_width");
   long_double_width=from_ns(ns, "long_double_width");
-  char_is_unsigned=from_ns(ns, "char_is_unsigned")!=0;
   wchar_t_width=from_ns(ns, "wchar_t_width");
-  alignment=from_ns(ns, "alignment");
+
+  char_is_unsigned=from_ns(ns, "char_is_unsigned")!=0;
+  wchar_t_is_unsigned=from_ns(ns, "wchar_t_is_unsigned")!=0;
   use_fixed_for_float=from_ns(ns, "fixed_for_float")!=0;
-  endianness=(endiannesst)from_ns(ns, "endianness");
+  // for_has_scope, single_precision_constant, rounding_mode not
+  // stored in namespace
+
+  alignment=from_ns(ns, "alignment");
 
   //memory_operand_size=from_ns(ns, "memory_operand_size");
   memory_operand_size=int_width/8;
-  
+
+  endianness=(endiannesst)from_ns(ns, "endianness");
+
+  // os, arch not stored in namespace
+
   //NULL_is_zero=from_ns("NULL_is_zero");
   NULL_is_zero=true;
+
+  // mode, preprocessor (and all preprocessor command line options),
+  // lib, string_abstraction not stored in namespace
 }
 
 /*******************************************************************\

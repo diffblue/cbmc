@@ -282,23 +282,23 @@ void ansi_c_architecture_strings(std::string &code)
 
   code+="# 1 \"<builtin-architecture-strings>\"\n";
 
-  code+=architecture_string(config.ansi_c.bool_width, "bool_width");
   code+=architecture_string(config.ansi_c.int_width, "int_width");
+  code+=architecture_string(config.ansi_c.int_width, "word_size"); // old
   code+=architecture_string(config.ansi_c.long_int_width, "long_int_width");
+  code+=architecture_string(config.ansi_c.bool_width, "bool_width");
   code+=architecture_string(config.ansi_c.char_width, "char_width");
   code+=architecture_string(config.ansi_c.short_int_width, "short_int_width");
   code+=architecture_string(config.ansi_c.long_long_int_width, "long_long_int_width");
   code+=architecture_string(config.ansi_c.pointer_width, "pointer_width");
-  code+=architecture_string(config.ansi_c.char_is_unsigned, "char_is_unsigned");
-  code+=architecture_string(config.ansi_c.wchar_t_is_unsigned, "wchar_t_is_unsigned");
-  code+=architecture_string(config.ansi_c.int_width, "word_size"); // old 
-  code+=architecture_string(config.ansi_c.use_fixed_for_float, "fixed_for_float");
-  code+=architecture_string(config.ansi_c.alignment, "alignment");
-  code+=architecture_string(config.ansi_c.memory_operand_size, "memory_operand_size");
   code+=architecture_string(config.ansi_c.single_width, "single_width");
   code+=architecture_string(config.ansi_c.double_width, "double_width");
   code+=architecture_string(config.ansi_c.long_double_width, "long_double_width");
   code+=architecture_string(config.ansi_c.wchar_t_width, "wchar_t_width");
+  code+=architecture_string(config.ansi_c.char_is_unsigned, "char_is_unsigned");
+  code+=architecture_string(config.ansi_c.wchar_t_is_unsigned, "wchar_t_is_unsigned");
+  code+=architecture_string(config.ansi_c.use_fixed_for_float, "fixed_for_float");
+  code+=architecture_string(config.ansi_c.alignment, "alignment");
+  code+=architecture_string(config.ansi_c.memory_operand_size, "memory_operand_size");
   code+=architecture_string(config.ansi_c.endianness, "endianness");
   code+=architecture_string(config.ansi_c.NULL_is_zero, "NULL_is_zero");
 }
