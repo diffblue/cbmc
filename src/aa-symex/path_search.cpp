@@ -163,9 +163,12 @@ path_searcht::resultt path_searcht::operator()(
   {
     // either a child found and reported a bug or
     // the parent's search partition is safe
-
-    // TODO: add safety_checkert::IGNORE
-    return ERROR;
+    switch (exit_status)
+    {
+    case 0: return SAFE;
+    case 10: return UNSAFE;
+    default: return ERROR;
+    }
   }
 #else
   report_statistics();
