@@ -793,18 +793,24 @@ bool configt::set(const cmdlinet &cmdline)
     // MinGW needs --win32 --gcc
     ansi_c.lib=configt::ansi_ct::LIB_FULL;
     ansi_c.os=configt::ansi_ct::OS_WIN;
-    ansi_c.mode=ansi_ct::MODE_VISUAL_STUDIO_C_CPP;
-    // there are gcc versions that target Windows
+
     if(cmdline.isset("gcc"))
     {
+      // There are gcc versions that target Windows (MinGW for example),
+      // and we support that.
       ansi_c.preprocessor=ansi_ct::PP_GCC;
+      ansi_c.mode=ansi_ct::MODE_GCC_C;
     }
     else
     {
+      // On Windows, our default is Visual Studio.
+      // On anything else, it's GCC.
       #ifndef _WIN32
       ansi_c.preprocessor=ansi_ct::PP_GCC;
+      ansi_c.mode=ansi_ct::MODE_GCC_C;
       #else
       ansi_c.preprocessor=ansi_ct::PP_VISUAL_STUDIO;
+      ansi_c.mode=ansi_ct::MODE_VISUAL_STUDIO_C_CPP;
       #endif
     }
   }
