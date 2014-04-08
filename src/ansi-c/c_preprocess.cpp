@@ -571,109 +571,101 @@ bool c_preprocess_gcc(
   
   command="gcc -E -undef -D__CPROVER__";
 
-  if(config.ansi_c.os!=configt::ansi_ct::OS_WIN)
+  command+=" -D__null=0";
+  command+=" -D__WORDSIZE="+i2string(config.ansi_c.pointer_width);
+  
+  command+=" -D__DBL_MIN_EXP__=\"(-1021)\"";
+  command+=" -D__FLT_MIN__=1.17549435e-38F";
+  command+=" -D__DEC64_SUBNORMAL_MIN__=0.000000000000001E-383DD";
+  command+=" -D__CHAR_BIT__=8";
+  command+=" -D__DBL_DENORM_MIN__=4.9406564584124654e-324";
+  command+=" -D__FLT_EVAL_METHOD__=0";
+  command+=" -D__DBL_MIN_10_EXP__=\"(-307)\"";
+  command+=" -D__FINITE_MATH_ONLY__=0";
+  command+=" -D__DEC64_MAX_EXP__=384";
+  command+=" -D__SHRT_MAX__=32767";
+  command+=" -D__LDBL_MAX__=1.18973149535723176502e+4932L";
+  command+=" -D__DEC32_EPSILON__=1E-6DF";
+  command+=" -D__SCHAR_MAX__=127";
+  command+=" -D__USER_LABEL_PREFIX__=_";
+  command+=" -D__DEC64_MIN_EXP__=\"(-383)\"";
+  command+=" -D__DBL_DIG__=15";
+  command+=" -D__FLT_EPSILON__=1.19209290e-7F";
+  command+=" -D__LDBL_MIN__=3.36210314311209350626e-4932L";
+  command+=" -D__DEC32_MAX__=9.999999E96DF";
+  command+=" -D__DECIMAL_DIG__=21";
+  command+=" -D__LDBL_HAS_QUIET_NAN__=1";
+  command+=" -D__DYNAMIC__=1";
+  command+=" -D__GNUC__=4";
+  command+=" -D__FLT_HAS_DENORM__=1";
+  command+=" -D__DBL_MAX__=1.7976931348623157e+308";
+  command+=" -D__DBL_HAS_INFINITY__=1";
+  command+=" -D__DEC32_MIN_EXP__=\"(-95)\"";
+  command+=" -D__LDBL_HAS_DENORM__=1";
+  command+=" -D__DEC32_MIN__=1E-95DF";
+  command+=" -D__DBL_MAX_EXP__=1024";
+  command+=" -D__DEC128_EPSILON__=1E-33DL";
+  command+=" -D__SSE2_MATH__=1";
+  command+=" -D__GXX_ABI_VERSION=1002";
+  command+=" -D__FLT_MIN_EXP__=\"(-125)\"";
+  command+=" -D__DBL_MIN__=2.2250738585072014e-308";
+  command+=" -D__DBL_HAS_QUIET_NAN__=1";
+  command+=" -D__DEC128_MIN__=1E-6143DL";
+  command+=" -D__REGISTER_PREFIX__=";
+  command+=" -D__DBL_HAS_DENORM__=1";
+  command+=" -D__DEC_EVAL_METHOD__=2";
+  command+=" -D__DEC128_MAX__=9.999999999999999999999999999999999E6144DL";
+  command+=" -D__FLT_MANT_DIG__=24";
+  command+=" -D__DEC64_EPSILON__=1E-15DD";
+  command+=" -D__DEC128_MIN_EXP__=\"(-6143)\"";
+  command+=" -D__DEC32_SUBNORMAL_MIN__=0.000001E-95DF";
+  command+=" -D__FLT_RADIX__=2";
+  command+=" -D__LDBL_EPSILON__=1.08420217248550443401e-19L";
+  command+=" -D__k8=1";
+  command+=" -D__LDBL_DIG__=18";
+  command+=" -D__FLT_HAS_QUIET_NAN__=1";
+  command+=" -D__FLT_MAX_10_EXP__=38";
+  command+=" -D__FLT_HAS_INFINITY__=1";
+  command+=" -D__DEC64_MAX__=9.999999999999999E384DD";
+  command+=" -D__DEC64_MANT_DIG__=16";
+  command+=" -D__DEC32_MAX_EXP__=96";
+  command+=" -D__DEC128_SUBNORMAL_MIN__=0.000000000000000000000000000000001E-6143DL";
+  command+=" -D__LDBL_MANT_DIG__=64";
+  command+=" -D__CONSTANT_CFSTRINGS__=1";
+  command+=" -D__DEC32_MANT_DIG__=7";
+  command+=" -D__k8__=1";
+  command+=" -D__pic__=2";
+  command+=" -D__FLT_DIG__=6";
+  command+=" -D__FLT_MAX_EXP__=128";
+  //command+=" -D__BLOCKS__=1";
+  command+=" -D__DBL_MANT_DIG__=53";
+  command+=" -D__DEC64_MIN__=1E-383DD";
+  command+=" -D__LDBL_MIN_EXP__=\"(-16381)\"";
+  command+=" -D__LDBL_MAX_EXP__=16384";
+  command+=" -D__LDBL_MAX_10_EXP__=4932";
+  command+=" -D__DBL_EPSILON__=2.2204460492503131e-16";
+  command+=" -D__GNUC_PATCHLEVEL__=1";
+  command+=" -D__LDBL_HAS_INFINITY__=1";
+  command+=" -D__INTMAX_MAX__=9223372036854775807L";
+  command+=" -D__FLT_DENORM_MIN__=1.40129846e-45F";
+  command+=" -D__PIC__=2";
+  command+=" -D__FLT_MAX__=3.40282347e+38F";
+  command+=" -D__FLT_MIN_10_EXP__=\"(-37)\"";
+  command+=" -D__DEC128_MAX_EXP__=6144";
+  command+=" -D__GNUC_MINOR__=2";
+  command+=" -D__DBL_MAX_10_EXP__=308";
+  command+=" -D__LDBL_DENORM_MIN__=3.64519953188247460253e-4951L";
+  command+=" -D__DEC128_MANT_DIG__=34";
+  command+=" -D__LDBL_MIN_10_EXP__=\"(-4931)\"";
+
+  if(config.ansi_c.int_width==16)
+    command+=GCC_DEFINES_16;
+  else if(config.ansi_c.int_width==32)
   {
-    command+=" -D__null=0";
-    command+=" -D__WORDSIZE="+i2string(config.ansi_c.pointer_width);
-    
-    // Tell the system library which standards we support.
-    // these are not gcc-default!
-    //command+=" -D_POSIX_SOURCE=1 -D_POSIX_C_SOURCE=200112L";
-    //command+=" -D__STRICT_ANSI__=1";
-
-    command+=" -D__DBL_MIN_EXP__=\"(-1021)\"";
-    command+=" -D__FLT_MIN__=1.17549435e-38F";
-    command+=" -D__DEC64_SUBNORMAL_MIN__=0.000000000000001E-383DD";
-    command+=" -D__CHAR_BIT__=8";
-    command+=" -D__DBL_DENORM_MIN__=4.9406564584124654e-324";
-    command+=" -D__FLT_EVAL_METHOD__=0";
-    command+=" -D__DBL_MIN_10_EXP__=\"(-307)\"";
-    command+=" -D__FINITE_MATH_ONLY__=0";
-    command+=" -D__DEC64_MAX_EXP__=384";
-    command+=" -D__SHRT_MAX__=32767";
-    command+=" -D__LDBL_MAX__=1.18973149535723176502e+4932L";
-    command+=" -D__DEC32_EPSILON__=1E-6DF";
-    command+=" -D__SCHAR_MAX__=127";
-    command+=" -D__USER_LABEL_PREFIX__=_";
-    command+=" -D__DEC64_MIN_EXP__=\"(-383)\"";
-    command+=" -D__DBL_DIG__=15";
-    command+=" -D__FLT_EPSILON__=1.19209290e-7F";
-    command+=" -D__LDBL_MIN__=3.36210314311209350626e-4932L";
-    command+=" -D__DEC32_MAX__=9.999999E96DF";
-    command+=" -D__DECIMAL_DIG__=21";
-    command+=" -D__LDBL_HAS_QUIET_NAN__=1";
-    command+=" -D__DYNAMIC__=1";
-    command+=" -D__GNUC__=4";
-    command+=" -D__FLT_HAS_DENORM__=1";
-    command+=" -D__DBL_MAX__=1.7976931348623157e+308";
-    command+=" -D__DBL_HAS_INFINITY__=1";
-    command+=" -D__DEC32_MIN_EXP__=\"(-95)\"";
-    command+=" -D__LDBL_HAS_DENORM__=1";
-    command+=" -D__DEC32_MIN__=1E-95DF";
-    command+=" -D__DBL_MAX_EXP__=1024";
-    command+=" -D__DEC128_EPSILON__=1E-33DL";
-    command+=" -D__SSE2_MATH__=1";
-    command+=" -D__GXX_ABI_VERSION=1002";
-    command+=" -D__FLT_MIN_EXP__=\"(-125)\"";
-    command+=" -D__DBL_MIN__=2.2250738585072014e-308";
-    command+=" -D__DBL_HAS_QUIET_NAN__=1";
-    command+=" -D__DEC128_MIN__=1E-6143DL";
-    command+=" -D__REGISTER_PREFIX__=";
-    command+=" -D__DBL_HAS_DENORM__=1";
-    command+=" -D__DEC_EVAL_METHOD__=2";
-    command+=" -D__DEC128_MAX__=9.999999999999999999999999999999999E6144DL";
-    command+=" -D__FLT_MANT_DIG__=24";
-    command+=" -D__DEC64_EPSILON__=1E-15DD";
-    command+=" -D__DEC128_MIN_EXP__=\"(-6143)\"";
-    command+=" -D__DEC32_SUBNORMAL_MIN__=0.000001E-95DF";
-    command+=" -D__FLT_RADIX__=2";
-    command+=" -D__LDBL_EPSILON__=1.08420217248550443401e-19L";
-    command+=" -D__k8=1";
-    command+=" -D__LDBL_DIG__=18";
-    command+=" -D__FLT_HAS_QUIET_NAN__=1";
-    command+=" -D__FLT_MAX_10_EXP__=38";
-    command+=" -D__FLT_HAS_INFINITY__=1";
-    command+=" -D__DEC64_MAX__=9.999999999999999E384DD";
-    command+=" -D__DEC64_MANT_DIG__=16";
-    command+=" -D__DEC32_MAX_EXP__=96";
-    command+=" -D__DEC128_SUBNORMAL_MIN__=0.000000000000000000000000000000001E-6143DL";
-    command+=" -D__LDBL_MANT_DIG__=64";
-    command+=" -D__CONSTANT_CFSTRINGS__=1";
-    command+=" -D__DEC32_MANT_DIG__=7";
-    command+=" -D__k8__=1";
-    command+=" -D__pic__=2";
-    command+=" -D__FLT_DIG__=6";
-    command+=" -D__FLT_MAX_EXP__=128";
-    //command+=" -D__BLOCKS__=1";
-    command+=" -D__DBL_MANT_DIG__=53";
-    command+=" -D__DEC64_MIN__=1E-383DD";
-    command+=" -D__LDBL_MIN_EXP__=\"(-16381)\"";
-    command+=" -D__LDBL_MAX_EXP__=16384";
-    command+=" -D__LDBL_MAX_10_EXP__=4932";
-    command+=" -D__DBL_EPSILON__=2.2204460492503131e-16";
-    command+=" -D__GNUC_PATCHLEVEL__=1";
-    command+=" -D__LDBL_HAS_INFINITY__=1";
-    command+=" -D__INTMAX_MAX__=9223372036854775807L";
-    command+=" -D__FLT_DENORM_MIN__=1.40129846e-45F";
-    command+=" -D__PIC__=2";
-    command+=" -D__FLT_MAX__=3.40282347e+38F";
-    command+=" -D__FLT_MIN_10_EXP__=\"(-37)\"";
-    command+=" -D__DEC128_MAX_EXP__=6144";
-    command+=" -D__GNUC_MINOR__=2";
-    command+=" -D__DBL_MAX_10_EXP__=308";
-    command+=" -D__LDBL_DENORM_MIN__=3.64519953188247460253e-4951L";
-    command+=" -D__DEC128_MANT_DIG__=34";
-    command+=" -D__LDBL_MIN_10_EXP__=\"(-4931)\"";
-
-    if(config.ansi_c.int_width==16)
-      command+=GCC_DEFINES_16;
-    else if(config.ansi_c.int_width==32)
-    {
-      if(config.ansi_c.pointer_width==64)
-        command+=GCC_DEFINES_LP64;
-      else
-      command+=GCC_DEFINES_32;
-    }
+    if(config.ansi_c.pointer_width==64)
+      command+=GCC_DEFINES_LP64;
+    else
+    command+=GCC_DEFINES_32;
   }
   
   switch(config.ansi_c.os)
