@@ -635,6 +635,13 @@ __decltype          { if(PARSER.cpp && PARSER.mode==ansi_c_parsert::GCC)
                     BEGIN(MSC_DECLSPEC);
                     PARSER.parenthesis_counter=0;
                   }
+                  else if(PARSER.mode==ansi_c_parsert::GCC)
+                  {
+                    // GCC supports this on Windows as an exception!
+                    // Should likely reject on other targets.
+                    BEGIN(MSC_DECLSPEC);
+                    PARSER.parenthesis_counter=0;
+                  }
                   else
                     return make_identifier();
                 }
