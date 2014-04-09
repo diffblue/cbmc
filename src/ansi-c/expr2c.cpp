@@ -2019,10 +2019,11 @@ std::string expr2ct::convert_constant(
 
       if(src.find(ID_C_c_sizeof_type).is_not_nil())
       {
-        dest+=" ";
-        if(sizeof_nesting++ == 0) dest+="/*";
-        dest+="[["+convert(static_cast<const typet &>(src.find(ID_C_c_sizeof_type)))+"]]";
-        if(--sizeof_nesting == 0) dest+="*/";
+        if(sizeof_nesting++ == 0)
+          dest=
+            "sizeof("+convert(static_cast<const typet &>(src.find(ID_C_c_sizeof_type)))+")"
+            +"/*"+dest;
+        if(--sizeof_nesting == 0) dest+="*/ ";
       }
     }
   }
