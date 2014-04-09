@@ -34,19 +34,8 @@
 
 bool disjunctive_polynomial_accelerationt::accelerate(
     path_acceleratort &accelerator) {
-#if 0
-  goto_programt::instructionst body;
-
-  for (patht::iterator it = loop.begin();
-       it != loop.end();
-       ++it) {
-    body.push_back(*(it->loc));
-  }
-
-  set<exprt> targets = find_modified(body);
   map<exprt, polynomialt> polynomials;
   scratch_programt program(symbol_table);
-  goto_programt::instructionst assigns;
 
 #ifdef DEBUG
   std::cout << "Polynomial accelerating program:" << endl;
@@ -66,14 +55,6 @@ bool disjunctive_polynomial_accelerationt::accelerate(
   }
 #endif
 
-  for (goto_programt::instructionst::iterator it = body.begin();
-       it != body.end();
-       ++it) {
-    if (it->is_assign() || it->is_decl()) {
-      assigns.push_back(*it);
-    }
-  }
-
   if (loop_counter.is_nil()) {
     symbolt loop_sym = program.fresh_symbol("polynomial::loop_counter",
         unsignedbv_typet(32));
@@ -81,8 +62,10 @@ bool disjunctive_polynomial_accelerationt::accelerate(
     loop_counter = loop_sym.symbol_expr();
   }
 
-  for (set<exprt>::iterator it = targets.begin();
-       it != targets.end();
+  patht path;
+
+  for (set<exprt>::iterator it = modified.begin();
+       it != modified.end();
        ++it) {
     polynomialt poly;
     exprt target = *it;
@@ -92,12 +75,17 @@ bool disjunctive_polynomial_accelerationt::accelerate(
       continue;
     }
 
-    if (fit_polynomial(assigns, target, poly)) {
+    if (fit_polynomial(target, poly, path)) {
       map<exprt, polynomialt> this_poly;
       this_poly[target] = poly;
 
-      if (check_inductive(this_poly, assigns)) {
+      if (check_inductive(this_poly, path)) {
+#ifdef DEBUG
+        std::cout << "Fitted a polynomial for " << expr2c(target, ns) <<
+          std::endl;
+#endif
         polynomials.insert(make_pair(target, poly));
+        break;
       }
     }
   }
@@ -114,13 +102,13 @@ bool disjunctive_polynomial_accelerationt::accelerate(
   */
 
   substitutiont stashed;
-  stash_polynomials(program, polynomials, stashed, body);
+  stash_polynomials(program, polynomials, stashed, path);
 
   exprt guard;
   bool path_is_monotone;
   
   try {
-    path_is_monotone = do_assumptions(polynomials, loop, guard);
+    path_is_monotone = do_assumptions(polynomials, path, guard);
   } catch (string s) {
     // Couldn't do WP.
     std::cout << "Assumptions error: " << s << endl;
@@ -181,12 +169,14 @@ bool disjunctive_polynomial_accelerationt::accelerate(
     program.assign(it->first, it->second.to_expr());
   }
 
+#if 0
   // Add in any array assignments we can do now.
   if (!do_arrays(assigns, polynomials, loop_counter, stashed, program)) {
     // We couldn't model some of the array assignments with polynomials...
     // Unfortunately that means we just have to bail out.
     return false;
   }
+#endif
 
 
   program.add_instruction(ASSUME)->guard = guard;
@@ -198,15 +188,15 @@ bool disjunctive_polynomial_accelerationt::accelerate(
 
   accelerator.pure_accelerator.instructions.swap(program.instructions);
 
-#endif // 0
   return true;
 }
 
-bool disjunctive_polynomial_accelerationt::fit_polynomial(goto_programt::instructionst &body,
+bool disjunctive_polynomial_accelerationt::fit_polynomial(
                                              exprt &var,
-                                             polynomialt &polynomial) {
+                                             polynomialt &polynomial,
+                                             patht &path) {
   // These are the variables that var depends on with respect to the body.
-  set<exprt> influence = cone_of_influence(body, var);
+  set<exprt> influence = cone_of_influence(var);
   vector<expr_listt> parameters;
   set<pair<expr_listt, exprt> > coefficients;
   expr_listt exprs;
@@ -260,41 +250,70 @@ bool disjunctive_polynomial_accelerationt::fit_polynomial(goto_programt::instruc
   // Build a set of values for all the parameters that allow us to fit a
   // unique polynomial.
 
-  // XXX
-  // This isn't ok -- we're assuming 0, 1 and 2 are valid values for the
-  // variables involved, but this might make the path condition UNSAT.  Should
-  // really be solving the path constraints a few times to get valid probe
-  // values...
-
-  map<exprt, int> values;
+  map<exprt, exprt> ivals1;
+  map<exprt, exprt> ivals2;
+  map<exprt, exprt> ivals3;
 
   for (set<exprt>::iterator it = influence.begin();
        it != influence.end();
        ++it) {
-    values[*it] = 0;
+    symbolt ival1 = program.fresh_symbol("polynomial::init",
+        it->type());
+    symbolt ival2 = program.fresh_symbol("polynomial::init",
+        it->type());
+    symbolt ival3 = program.fresh_symbol("polynomial::init",
+        it->type());
+
+    program.assume(notequal_exprt(ival1.symbol_expr(),
+          ival2.symbol_expr()));
+    program.assume(notequal_exprt(ival1.symbol_expr(),
+          ival3.symbol_expr()));
+    program.assume(notequal_exprt(ival2.symbol_expr(),
+          ival3.symbol_expr()));
+
+    ivals1[*it] = ival1.symbol_expr();
+    ivals2[*it] = ival2.symbol_expr();
+    ivals3[*it] = ival3.symbol_expr();
+  }
+
+  map<exprt, exprt> values;
+
+  for (set<exprt>::iterator it = influence.begin();
+       it != influence.end();
+       ++it) {
+    values[*it] = ivals1[*it];
+  }
+
+  // Start building the program.  We begin by initialising the
+  // distinguisher variables to 0.
+  for (list<exprt>::iterator it = distinguishers.begin();
+       it != distinguishers.end();
+       ++it) {
+    program.assign(*it, from_integer(0, it->type()));
   }
 
   for (int n = 0; n <= 2; n++) {
     for (set<exprt>::iterator it = influence.begin();
          it != influence.end();
          ++it) {
-      values[*it] = 1;
-      assert_for_values(program, values, coefficients, n, body, var);
-      values[*it] = 0;
+      values[*it] = ivals2[*it];
+      assert_for_values(program, values, coefficients, n, chosen_program,
+          var);
+      values[*it] = ivals1[*it];
     }
   }
 
   // Now just need to assert the case where all values are 0 and all are 2.
-  assert_for_values(program, values, coefficients, 0, body, var);
-  assert_for_values(program, values, coefficients, 2, body, var);
+  assert_for_values(program, values, coefficients, 0, chosen_program, var);
+  assert_for_values(program, values, coefficients, 2, chosen_program, var);
 
   for (set<exprt>::iterator it = influence.begin();
        it != influence.end();
        ++it) {
-    values[*it] = 2;
+    values[*it] = ivals3[*it];
   }
 
-  assert_for_values(program, values, coefficients, 2, body, var);
+  assert_for_values(program, values, coefficients, 2, chooser_program, var);
 
   // Now do an ASSERT(false) to grab a counterexample
   goto_programt::targett assertion = program.add_instruction(ASSERT);
@@ -312,6 +331,7 @@ bool disjunctive_polynomial_accelerationt::fit_polynomial(goto_programt::instruc
   try {
     if (program.check_sat()) {
       extract_polynomial(program, coefficients, polynomial);
+      build_path(program, path);
       return true;
     }
   } catch (string s) {
@@ -324,17 +344,16 @@ bool disjunctive_polynomial_accelerationt::fit_polynomial(goto_programt::instruc
 }
 
 void disjunctive_polynomial_accelerationt::assert_for_values(scratch_programt &program,
-                                                map<exprt, int> &values,
+                                                map<exprt, exprt> &values,
                                                 set<pair<expr_listt, exprt> >
                                                    &coefficients,
                                                 int num_unwindings,
-                                                goto_programt::instructionst
-                                                   &loop_body,
+                                                goto_programt &loop_body,
                                                 exprt &target) {
   // First figure out what the appropriate type for this expression is.
   typet expr_type = nil_typet();
 
-  for (map<exprt, int>::iterator it = values.begin();
+  for (map<exprt, exprt>::iterator it = values.begin();
       it != values.end();
       ++it) {
     if (expr_type == nil_typet()) {
@@ -345,10 +364,10 @@ void disjunctive_polynomial_accelerationt::assert_for_values(scratch_programt &p
   }
 
   // Now set the initial values of the all the variables...
-  for (map<exprt, int>::iterator it = values.begin();
+  for (map<exprt, exprt>::iterator it = values.begin();
        it != values.end();
        ++it) {
-    program.assign(it->first, from_integer(it->second, it->first.type()));
+    program.assign(it->first, it->second);
   }
 
   // Now unwind the loop as many times as we need to.
@@ -362,7 +381,7 @@ void disjunctive_polynomial_accelerationt::assert_for_values(scratch_programt &p
   for (set<pair<expr_listt, exprt> >::iterator it = coefficients.begin();
        it != coefficients.end();
        ++it) {
-    int concrete_value = 1;
+    exprt concrete_value = from_integer(1, expr_type);
 
     for (expr_listt::const_iterator e_it = it->first.begin();
          e_it != it->first.end();
@@ -370,13 +389,16 @@ void disjunctive_polynomial_accelerationt::assert_for_values(scratch_programt &p
       exprt e = *e_it;
 
       if (e == loop_counter) {
-        concrete_value *= num_unwindings;
+        mult_exprt mult(from_integer(num_unwindings, expr_type),
+            concrete_value);
+        mult.swap(concrete_value);
       } else {
-        map<exprt, int>::iterator v_it = values.find(e);
+        map<exprt, exprt>::iterator v_it = values.find(e);
 
         assert(v_it != values.end());
 
-        concrete_value *= v_it->second;
+        mult_exprt mult(concrete_value, v_it->second);
+        mult.swap(concrete_value);
       }
     }
 
@@ -384,7 +406,7 @@ void disjunctive_polynomial_accelerationt::assert_for_values(scratch_programt &p
     // multiplied together.  Create the term concrete_value*coefficient and add
     // it into the polynomial.
     typecast_exprt cast(it->second, expr_type);
-    exprt term = mult_exprt(from_integer(concrete_value, expr_type), cast);
+    exprt term = mult_exprt(concrete_value, cast);
 
     if (rhs.is_nil()) {
       rhs = term;
@@ -449,8 +471,8 @@ void disjunctive_polynomial_accelerationt::extract_polynomial(scratch_programt &
   }
 }
 
-#if 0
-void gather_rvalues(const exprt &expr, set<exprt> &rvalues) {
+void disjunctive_polynomial_accelerationt::gather_rvalues(const exprt &expr,
+    set<exprt> &rvalues) {
   if (expr.id() == ID_symbol ||
       expr.id() == ID_index ||
       expr.id() == ID_member ||
@@ -462,13 +484,30 @@ void gather_rvalues(const exprt &expr, set<exprt> &rvalues) {
     }
   }
 }
-#endif // 0
 
-set<exprt> disjunctive_polynomial_accelerationt::cone_of_influence(goto_programt::instructionst
-                                                        &body,
+set<exprt> disjunctive_polynomial_accelerationt::cone_of_influence(
                                                       exprt &target) {
   set<exprt> cone;
 
+  gather_rvalues(target, cone);
+
+  for (natural_loops_mutablet::natural_loopt::iterator it = loop.begin();
+       it != loop.end();
+       ++it) {
+    goto_programt::targett t = *it;
+
+    gather_rvalues(t->guard, cone);
+
+    if (t->is_assign()) {
+      code_assignt assignment = to_code_assign(t->code);
+      gather_rvalues(assignment.rhs(), cone);
+    }
+  }
+
+  return cone;
+
+
+#if 0
   //gather_rvalues(target, cone);
 
   for (goto_programt::instructionst::reverse_iterator r_it = body.rbegin();
@@ -498,27 +537,35 @@ set<exprt> disjunctive_polynomial_accelerationt::cone_of_influence(goto_programt
   }
 
   return cone;
+#endif
 }
 
-#if 0
-set<exprt> find_modified(goto_programt::instructionst &body) {
-  set<exprt> ret;
-
-  for (goto_programt::instructionst::iterator it = body.begin();
-       it != body.end();
+void disjunctive_polynomial_accelerationt::find_modified(goto_programt &body,
+    set<exprt> &modified) {
+  for (goto_programt::instructionst::iterator it = body.instructions.begin();
+       it != body.instructions.end();
        ++it) {
     if (it->is_assign()) {
       code_assignt assignment = to_code_assign(it->code);
-      ret.insert(assignment.lhs());
+      modified.insert(assignment.lhs());
     }
   }
-
-  return ret;
 }
-#endif // 0
+
+void disjunctive_polynomial_accelerationt::find_modified(patht &path,
+    set<exprt> &modified) {
+  for (patht::iterator it = path.begin();
+       it != path.end();
+       ++it) {
+    if (it->loc->is_assign()) {
+      code_assignt assignment = to_code_assign(it->loc->code);
+      modified.insert(assignment.lhs());
+    }
+  }
+}
 
 bool disjunctive_polynomial_accelerationt::check_inductive(map<exprt, polynomialt> polynomials,
-                                              goto_programt::instructionst &body) {
+                                              patht &path) {
   // Checking that our polynomial is inductive with respect to the loop body is
   // equivalent to checking safety of the following program:
   //
@@ -534,7 +581,7 @@ bool disjunctive_polynomial_accelerationt::check_inductive(map<exprt, polynomial
   vector<exprt> polynomials_hold;
   substitutiont substitution;
 
-  stash_polynomials(program, polynomials, substitution, body);
+  stash_polynomials(program, polynomials, substitution, path);
  
   for (map<exprt, polynomialt>::iterator it = polynomials.begin();
        it != polynomials.end();
@@ -545,7 +592,7 @@ bool disjunctive_polynomial_accelerationt::check_inductive(map<exprt, polynomial
     polynomials_hold.push_back(holds);
   }
 
-  program.append(body);
+  program.append_path(path);
 
   codet inc_loop_counter = code_assignt(loop_counter,
                                         plus_exprt(loop_counter, from_integer(1, loop_counter.type())));
@@ -585,9 +632,10 @@ void disjunctive_polynomial_accelerationt::stash_polynomials(
     scratch_programt &program,
     map<exprt, polynomialt> &polynomials,
     substitutiont &substitution,
-    goto_programt::instructionst &body) {
+    patht &path) {
+  set<exprt> modified;
 
-  set<exprt> modified = find_modified(body);
+  find_modified(path, modified);
   stash_variables(program, modified, substitution);
 
   for (map<exprt, polynomialt>::iterator it = polynomials.begin();
@@ -669,20 +717,8 @@ exprt disjunctive_polynomial_accelerationt::precondition(patht &path) {
 }
 
 bool disjunctive_polynomial_accelerationt::do_assumptions(map<exprt, polynomialt> polynomials,
-                                             patht &loop,
+                                             patht &path,
                                              exprt &guard) {
-  exprt condition = precondition(loop);
-
-  goto_programt::instructionst body;
-
-  for (patht::iterator it = loop.begin();
-       it != loop.end();
-       ++it) {
-    body.push_back(*it->loc);
-  }
-
-  scratch_programt program(symbol_table);
-
   // We want to check that if an assumption fails, the next iteration can't be
   // feasible again.  To do this we check the following program for safety:
   //
@@ -707,8 +743,11 @@ bool disjunctive_polynomial_accelerationt::do_assumptions(map<exprt, polynomialt
   // assume(no overflows in above program)
   // assert(!precondition);
 
+  exprt condition = precondition(path);
+  scratch_programt program(symbol_table); 
+
   substitutiont substitution;
-  stash_polynomials(program, polynomials, substitution, body);
+  stash_polynomials(program, polynomials, substitution, path);
 
   vector<exprt> polynomials_hold;
 

@@ -13,6 +13,8 @@
 
 #include <solvers/smt2/smt2_dec.h>
 
+#include "path.h"
+
 using namespace std;
 
 class scratch_programt : public goto_programt {
@@ -30,6 +32,8 @@ class scratch_programt : public goto_programt {
 
   symbolt fresh_symbol(string base, typet type);
   void append(goto_programt::instructionst &instructions);
+  void append(goto_programt &program);
+  void append_path(patht &path);
 
   targett assign(const exprt &lhs, const exprt &rhs);
   targett assume(const exprt &guard);
