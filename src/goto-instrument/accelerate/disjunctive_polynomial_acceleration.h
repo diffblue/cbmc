@@ -40,31 +40,31 @@ class disjunctive_polynomial_accelerationt : public loop_accelerationt {
 
   virtual bool accelerate(path_acceleratort &accelerator);
 
-  bool fit_polynomial(goto_programt::instructionst &loop_body,
-                      exprt &target,
-                      polynomialt &polynomial);
+  bool fit_polynomial(exprt &target,
+                      polynomialt &polynomial,
+                      patht &path);
 
  protected:
   void assert_for_values(scratch_programt &program,
-                         map<exprt, int> &values,
+                         map<exprt, exprt> &values,
                          set<pair<expr_listt, exprt> > &coefficients,
                          int num_unwindings,
-                         goto_programt::instructionst &loop_body,
+                         goto_programt &loop_body,
                          exprt &target);
   void extract_polynomial(scratch_programt &program,
                           set<pair<expr_listt, exprt> > &coefficients,
                           polynomialt &polynomial);
-  set<exprt> cone_of_influence(goto_programt::instructionst &body, exprt &target);
+  set<exprt> cone_of_influence(exprt &target);
 
   bool check_inductive(map<exprt, polynomialt> polynomials,
-                       goto_programt::instructionst &body);
+                       patht &path);
   void stash_variables(scratch_programt &program,
                        set<exprt> modified,
                        substitutiont &substitution);
   void stash_polynomials(scratch_programt &program,
                          map<exprt, polynomialt> &polynomials,
                          map<exprt, exprt> &stashed,
-                         goto_programt::instructionst &body);
+                         patht &path);
 
   exprt precondition(patht &path);
 
@@ -98,9 +98,13 @@ class disjunctive_polynomial_accelerationt : public loop_accelerationt {
                  map<exprt, polynomialt> &polynomials,
                  polynomialt &poly);
 
+  void gather_rvalues(const exprt &expr, set<exprt> &rvalues);
+
   void ensure_no_overflows(goto_programt &program);
 
   void find_distinguishing_points();
+  void find_modified(patht &path, set<exprt> &modified);
+  void find_modified(goto_programt &program, set<exprt> &modified);
   void build_path(scratch_programt &scratch_program, patht &path);
   void build_choosers();
 
@@ -117,6 +121,7 @@ class disjunctive_polynomial_accelerationt : public loop_accelerationt {
   exprt loop_counter;
   distinguish_mapt distinguishing_points;
   list<exprt> distinguishers;
+  set<exprt> modified;
   goto_programt chooser_program;
   goto_programt chosen_program;
   list<expr_listt> accelerated_paths;

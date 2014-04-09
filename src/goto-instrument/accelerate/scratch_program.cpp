@@ -115,3 +115,11 @@ void scratch_programt::fix_types() {
     }
   }
 }
+
+void scratch_programt::append_path(patht &path) {
+  assert(!"Not implemented!");
+}
+
+void scratch_programt::append(goto_programt &program) {
+  assert(!"Not implemented!");
+}
