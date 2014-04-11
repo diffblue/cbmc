@@ -3813,13 +3813,7 @@ Function: smt2_convt::use_array_theory
 
 bool smt2_convt::use_array_theory(const array_typet &type)
 {
-  // fixed-size array?
-  unsigned width=boolbv_width(type);
-  
-  if(width!=0)
-    return false; // flatten
-  else
-    return true; // use array theory
+  return true; // always use array theory
 }
 
 /*******************************************************************\
@@ -3858,7 +3852,7 @@ void smt2_convt::convert_type(const typet &type)
     }
     else
     {
-      // flatten
+      // we flatten into a bitvector
       unsigned width=boolbv_width(array_type);
       assert(width!=0);
 
