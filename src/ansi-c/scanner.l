@@ -285,6 +285,14 @@ void ansi_c_scanner_init()
                    // http://msdn.microsoft.com/en-us/library/2e70t5y1%28v=vs.80%29.aspx
 		 }
 
+<GRAMMAR>{cppstart}"pragma"{ws}"pack"{ws}"("{ws}")"{ws}{newline} {
+                   // Done by Visual Studio and gcc
+                   // should be equivalent to pop-all
+                   PARSER.pragma_pack=0;
+                   // needs push, pop
+                   // http://msdn.microsoft.com/en-us/library/2e70t5y1%28v=vs.80%29.aspx
+		 }
+
 <GRAMMAR>{cppstart}"pragma"{ws}.* {
                    // silently ignore other pragmas
 		 }
