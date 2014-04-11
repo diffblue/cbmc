@@ -804,10 +804,12 @@ bool configt::set(const cmdlinet &cmdline)
     else
     {
       // On Windows, our default is Visual Studio.
-      // On anything else, it's GCC.
+      // On anything else, it's GCC as the preprocessor,
+      // but we recognize the Visual Studio language,
+      // which is somewhat inconsistent.
       #ifndef _WIN32
       ansi_c.preprocessor=ansi_ct::PP_GCC;
-      ansi_c.mode=ansi_ct::MODE_GCC_C;
+      ansi_c.mode=ansi_ct::MODE_VISUAL_STUDIO_C_CPP;
       #else
       ansi_c.preprocessor=ansi_ct::PP_VISUAL_STUDIO;
       ansi_c.mode=ansi_ct::MODE_VISUAL_STUDIO_C_CPP;
@@ -890,7 +892,8 @@ bool configt::set(const cmdlinet &cmdline)
     if(arch=="x86_64")
       ansi_c.set_LLP64();
     
-    // On Windows, wchar_t is unsigned 16 bit.
+    // On Windows, wchar_t is unsigned 16 bit, regardless
+    // of the compiler used.
     ansi_c.wchar_t_width=2*8;
     ansi_c.wchar_t_is_unsigned=true;
 
