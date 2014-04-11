@@ -22,11 +22,20 @@ typedef union RTFLOAT80U
 
 STATIC_ASSERT(sizeof(RTFLOAT80U)==10);
 
+struct S
+{
+  char c;
+  int i;
+};
+
+STATIC_ASSERT(sizeof(struct S)==2*sizeof(int));
+
 #include <stdio.h>
 
 int main()
 {
-  printf("RTFLOAT80U: %u\n", sizeof(RTFLOAT80U));
+  printf("RTFLOAT80U: %lu\n", sizeof(RTFLOAT80U));
+  printf("struct S: %lu\n", sizeof(struct S));
   return 0;
 }
 
