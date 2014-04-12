@@ -12,6 +12,7 @@
 #include "path.h"
 #include "polynomial_accelerator.h"
 #include "enumerating_loop_acceleration.h"
+#include "disjunctive_polynomial_acceleration.h"
 //#include "symbolic_accelerator.h"
 
 #define DEBUG
@@ -57,8 +58,12 @@ int acceleratet::accelerate_loop(goto_programt::targett &loop_header) {
 
   loop.insert(new_inst);
 
+  /*
   enumerating_loop_accelerationt acceleration(symbol_table, goto_functions,
       program, loop, loop_header, accelerate_limit);
+      */
+  disjunctive_polynomial_accelerationt acceleration(symbol_table, goto_functions,
+      program, loop, loop_header);
 
   path_acceleratort accelerator;
 

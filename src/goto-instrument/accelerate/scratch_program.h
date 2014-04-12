@@ -13,6 +13,9 @@
 
 #include <solvers/smt2/smt2_dec.h>
 
+#include <solvers/flattening/bv_pointers.h>
+#include <solvers/sat/satcheck.h>
+
 #include "path.h"
 
 using namespace std;
@@ -24,16 +27,22 @@ class scratch_programt : public goto_programt {
       symbol_table(_symbol_table),
       shadow_symbol_table(_symbol_table),
       ns(shadow_symbol_table),
-      checker(ns, "scratch", "", "AUFBV", smt2_dect::Z3),
       equation(ns),
-      symex(ns, shadow_symbol_table, equation)
+      symex(ns, shadow_symbol_table, equation),
+      satcheck(new satcheckt),
+      checker(ns, *satcheck)
   {
+  }
+
+  ~scratch_programt() {
+    delete satcheck;
   }
 
   symbolt fresh_symbol(string base, typet type);
   void append(goto_programt::instructionst &instructions);
   void append(goto_programt &program);
   void append_path(patht &path);
+  void append_loop(goto_programt &program, goto_programt::targett loop_header);
 
   targett assign(const exprt &lhs, const exprt &rhs);
   targett assume(const exprt &guard);
@@ -52,10 +61,11 @@ class scratch_programt : public goto_programt {
   const symbol_tablet &symbol_table;
   symbol_tablet shadow_symbol_table;
   const namespacet ns;
-  smt2_dect checker;
   symex_target_equationt equation;
   goto_symext symex;
 
+  propt *satcheck;
+  bv_pointerst checker;
 };
 
 #endif // SCRATCH_PROGRAM_H

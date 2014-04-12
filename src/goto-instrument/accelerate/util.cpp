@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include <util/std_types.h>
 
 #include "util.h"
@@ -8,7 +10,8 @@
 bool is_bitvector(const typet &t) {
   return t.id() == ID_bv ||
          t.id() == ID_signedbv ||
-         t.id() == ID_unsignedbv;
+         t.id() == ID_unsignedbv ||
+         t.id() == ID_pointer;
 }
 
 /**
@@ -24,7 +27,8 @@ bool is_signed(const typet &t) {
  */
 bool is_unsigned(const typet &t) {
   return t.id() == ID_bv ||
-         t.id() == ID_unsignedbv;
+         t.id() == ID_unsignedbv ||
+         t.id() == ID_pointer;
 }
 
 /**
