@@ -50,13 +50,13 @@ bool scratch_programt::check_sat()
 
   symex(symex_state, functions, *this);
   slice(equation);
-  equation.convert(checker);
+  equation.convert(*checker);
 
 #ifdef DEBUG
   cout << "Finished symex, invoking decision procedure." << endl;
 #endif
 
-  return (checker.dec_solve() == decision_proceduret::D_SATISFIABLE);
+  return (checker->dec_solve() == decision_proceduret::D_SATISFIABLE);
 }
 
 exprt scratch_programt::eval(exprt &e) {
@@ -64,7 +64,7 @@ exprt scratch_programt::eval(exprt &e) {
 
   symex_state.rename(ssa, ns);
 
-  return checker.get(ssa);
+  return checker->get(ssa);
 }
 
 void scratch_programt::append(goto_programt::instructionst &new_instructions) {

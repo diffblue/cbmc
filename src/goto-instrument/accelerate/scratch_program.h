@@ -30,7 +30,11 @@ class scratch_programt : public goto_programt {
       equation(ns),
       symex(ns, shadow_symbol_table, equation),
       satcheck(new satcheckt),
-      checker(ns, *satcheck)
+      satchecker(ns, *satcheck),
+      z3(ns, "accelerate", "", "", smt2_dect::Z3),
+
+      // XXX Z3 appears to be much faster than minisat... investigate
+      checker(&z3)
   {
   }
 
@@ -65,7 +69,9 @@ class scratch_programt : public goto_programt {
   goto_symext symex;
 
   propt *satcheck;
-  bv_pointerst checker;
+  bv_pointerst satchecker;
+  smt2_dect z3;
+  prop_convt *checker;
 };
 
 #endif // SCRATCH_PROGRAM_H
