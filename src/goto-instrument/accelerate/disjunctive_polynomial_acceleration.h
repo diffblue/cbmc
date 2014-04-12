@@ -36,6 +36,7 @@ class disjunctive_polynomial_accelerationt : public loop_accelerationt {
     loop_counter = nil_exprt();
     find_distinguishing_points();
     build_choosers();
+    find_modified(loop, modified);
   }
 
   virtual bool accelerate(path_acceleratort &accelerator);
@@ -105,8 +106,14 @@ class disjunctive_polynomial_accelerationt : public loop_accelerationt {
   void find_distinguishing_points();
   void find_modified(patht &path, set<exprt> &modified);
   void find_modified(goto_programt &program, set<exprt> &modified);
+  void find_modified(natural_loops_mutablet::natural_loopt &loop,
+      set<exprt> &modified);
+  void find_modified(goto_programt::targett t, set<exprt> &modified);
+
   void build_path(scratch_programt &scratch_program, patht &path);
   void build_choosers();
+
+  void record_path(scratch_programt &scratch_program);
 
 
   symbol_tablet &symbol_table;
@@ -117,6 +124,7 @@ class disjunctive_polynomial_accelerationt : public loop_accelerationt {
   goto_programt::targett loop_header;
 
   typedef map<goto_programt::targett, exprt> distinguish_mapt;
+  typedef map<exprt, bool> distinguish_valuest;
 
   exprt loop_counter;
   distinguish_mapt distinguishing_points;
@@ -124,9 +132,7 @@ class disjunctive_polynomial_accelerationt : public loop_accelerationt {
   set<exprt> modified;
   goto_programt chooser_program;
   goto_programt chosen_program;
-  list<expr_listt> accelerated_paths;
+  list<distinguish_valuest> accelerated_paths;
 };
-
-set<exprt> find_modified(goto_programt::instructionst &body);
 
 #endif // DISJUNCTIVE_POLYNOMIAL_ACCELERATION_H

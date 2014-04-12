@@ -4,9 +4,11 @@
 
 #include <goto-symex/slice.h>
 
+#include <goto-programs/remove_skip.h>
+
 #include "scratch_program.h"
 
-//#define DEBUG
+#define DEBUG
 
 #ifdef DEBUG
 #include <iostream>
@@ -35,6 +37,9 @@ bool scratch_programt::check_sat()
 
   add_instruction(END_FUNCTION);
 
+  remove_skip(*this);
+  update();
+
 #ifdef DEBUG
   cout << "Checking following program for satness:" << endl;
   output(ns, "scratch", cout);
@@ -46,6 +51,10 @@ bool scratch_programt::check_sat()
   symex(symex_state, functions, *this);
   slice(equation);
   equation.convert(checker);
+
+#ifdef DEBUG
+  cout << "Finished symex, invoking decision procedure." << endl;
+#endif
 
   return (checker.dec_solve() == decision_proceduret::D_SATISFIABLE);
 }
@@ -117,9 +126,46 @@ void scratch_programt::fix_types() {
 }
 
 void scratch_programt::append_path(patht &path) {
-  assert(!"Not implemented!");
+  for (patht::iterator it = path.begin();
+       it != path.end();
+       ++it) {
+    if (it->loc->is_assign() || it->loc->is_assume()) {
+      instructions.push_back(*it->loc);
+    } else if (it->loc->is_goto()) {
+      if (it->guard.id() != ID_nil) {
+        add_instruction(ASSUME)->guard = it->guard;
+      }
+    } else if (it->loc->is_assert()) {
+      add_instruction(ASSUME)->guard = it->loc->guard;
+    }
+  }
 }
 
 void scratch_programt::append(goto_programt &program) {
-  assert(!"Not implemented!");
+  goto_programt scratch;
+
+  scratch.copy_from(program);
+  destructive_append(scratch);
+}
+
+void scratch_programt::append_loop(goto_programt &program,
+    goto_programt::targett loop_header) {
+  goto_programt::targett start = instructions.end();
+  append(program);
+
+  // Update any back jumps to the loop header.
+  assume(false_exprt());
+
+  goto_programt::targett end = add_instruction(SKIP);
+
+  update();
+
+  for (goto_programt::targett t = instructions.begin();
+       t != instructions.end();
+       ++t) {
+    if (t->is_backwards_goto()) {
+      t->targets.clear();
+      t->targets.push_back(end);
+    }
+  }
 }
