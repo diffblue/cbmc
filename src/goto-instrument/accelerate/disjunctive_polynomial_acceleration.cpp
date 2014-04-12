@@ -185,7 +185,7 @@ bool disjunctive_polynomial_accelerationt::accelerate(
   program.fix_types();
 
   if (path_is_monotone) {
-    ensure_no_overflows(program);
+    //ensure_no_overflows(program);
   }
 
   accelerator.pure_accelerator.instructions.swap(program.instructions);
@@ -247,6 +247,14 @@ bool disjunctive_polynomial_accelerationt::fit_polynomial(
         signedbv_typet(32));
     symbol_table.add(coeff);
     coefficients.insert(make_pair(*it, coeff.symbol_expr()));
+
+    // XXX HACK HACK HACK
+    // I'm just constraining these coefficients to prevent overflows messing things
+    // up later...  Should really do this properly somehow.
+    program.assume(binary_relation_exprt(from_integer(-(1 << 10), signedbv_typet(32)),
+            "<", coeff.symbol_expr()));
+    program.assume(binary_relation_exprt(coeff.symbol_expr(), "<",
+        from_integer(1 << 10, signedbv_typet(32))));
   }
 
   // Build a set of values for all the parameters that allow us to fit a
@@ -266,20 +274,18 @@ bool disjunctive_polynomial_accelerationt::fit_polynomial(
     symbolt ival3 = program.fresh_symbol("polynomial::init",
         it->type());
 
-    program.assume(notequal_exprt(ival1.symbol_expr(),
+    program.assume(binary_relation_exprt(ival1.symbol_expr(), "<",
           ival2.symbol_expr()));
-    program.assume(notequal_exprt(ival1.symbol_expr(),
-          ival3.symbol_expr()));
-    program.assume(notequal_exprt(ival2.symbol_expr(),
+    program.assume(binary_relation_exprt(ival2.symbol_expr(), "<",
           ival3.symbol_expr()));
 
     ivals1[*it] = ival1.symbol_expr();
     ivals2[*it] = ival2.symbol_expr();
     ivals3[*it] = ival3.symbol_expr();
 
-    program.assign(ival1.symbol_expr(), from_integer(0, it->type()));
-    program.assign(ival2.symbol_expr(), from_integer(1, it->type()));
-    program.assign(ival3.symbol_expr(), from_integer(2, it->type()));
+    //program.assign(ival1.symbol_expr(), from_integer(0, it->type()));
+    //program.assign(ival2.symbol_expr(), from_integer(2, it->type()));
+    //program.assign(ival3.symbol_expr(), from_integer(4, it->type()));
   }
 
   map<exprt, exprt> values;
@@ -291,36 +297,24 @@ bool disjunctive_polynomial_accelerationt::fit_polynomial(
   }
 
   // Start building the program.  We begin by initialising the
-  // distinguisher variables to 0.
+  // distinguisher variables to false.
   for (list<exprt>::iterator it = distinguishers.begin();
        it != distinguishers.end();
        ++it) {
-    program.assign(*it, from_integer(0, it->type()));
+    program.assign(*it, false_exprt());
   }
 
-  bool first = true;
+  assert_for_values(program, values, coefficients, 1, chooser_program, var);
 
-  for (int n = 0; n <= 2; n++) {
+  for (int n = 0; n <= 1; n++) {
     for (set<exprt>::iterator it = influence.begin();
          it != influence.end();
          ++it) {
       values[*it] = ivals2[*it];
-
-      if (first && n == 1) {
-        assert_for_values(program, values, coefficients, n, chooser_program,
-            var);
-        first = false;
-      } else {
-        assert_for_values(program, values, coefficients, n, chosen_program,
-            var);
-      }
+      assert_for_values(program, values, coefficients, n, chosen_program, var);
       values[*it] = ivals1[*it];
     }
   }
-
-  // Now just need to assert the case where all values are 0 and all are 2.
-  assert_for_values(program, values, coefficients, 0, chosen_program, var);
-  assert_for_values(program, values, coefficients, 2, chosen_program, var);
 
   for (set<exprt>::iterator it = influence.begin();
        it != influence.end();
@@ -328,8 +322,10 @@ bool disjunctive_polynomial_accelerationt::fit_polynomial(
     values[*it] = ivals3[*it];
   }
 
+  assert_for_values(program, values, coefficients, 0, chosen_program, var);
+  assert_for_values(program, values, coefficients, 1, chosen_program, var);
   assert_for_values(program, values, coefficients, 2, chosen_program, var);
-
+ 
   // Let's make sure that we get a path we have not seen before.
   for (list<distinguish_valuest>::iterator it = accelerated_paths.begin();
        it != accelerated_paths.end();
@@ -663,6 +659,8 @@ bool disjunctive_polynomial_accelerationt::check_inductive(map<exprt, polynomial
     program.add_instruction(ASSERT)->guard = *it;
   }
 
+  //ensure_no_overflows(program);
+
 #ifdef DEBUG
   std::cout << "Checking following program for inductiveness:" << endl;
   program.output(std::cout);
@@ -851,7 +849,7 @@ bool disjunctive_polynomial_accelerationt::do_assumptions(map<exprt, polynomialt
 
   guard = not_exprt(condition);
 
-  ensure_no_overflows(program);
+  //ensure_no_overflows(program);
 
 #ifdef DEBUG
   std::cout << "Checking following program for monotonicity:" << endl;
@@ -886,7 +884,7 @@ void disjunctive_polynomial_accelerationt::ensure_no_overflows(goto_programt &pr
   checker_options.set_option("assumptions", true);
   checker_options.set_option("simplify", true);
 
-  //goto_check(ns, checker_options, goto_functions);
+  goto_check(ns, checker_options, goto_functions);
 }
 
 disjunctive_polynomial_accelerationt::expr_pairst disjunctive_polynomial_accelerationt::gather_array_assignments(
