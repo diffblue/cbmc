@@ -31,7 +31,9 @@ class disjunctive_polynomial_accelerationt : public loop_accelerationt {
       goto_functions(_goto_functions),
       goto_program(_goto_program),
       loop(_loop),
-      loop_header(_loop_header)
+      loop_header(_loop_header),
+      chooser_program(_symbol_table),
+      chosen_program(_symbol_table)
   {
     loop_counter = nil_exprt();
     find_distinguishing_points();
@@ -130,8 +132,8 @@ class disjunctive_polynomial_accelerationt : public loop_accelerationt {
   distinguish_mapt distinguishing_points;
   list<exprt> distinguishers;
   set<exprt> modified;
-  goto_programt chooser_program;
-  goto_programt chosen_program;
+  scratch_programt chooser_program;
+  scratch_programt chosen_program;
   list<distinguish_valuest> accelerated_paths;
 };
 
