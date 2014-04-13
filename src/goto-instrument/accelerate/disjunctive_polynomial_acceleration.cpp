@@ -296,13 +296,7 @@ bool disjunctive_polynomial_accelerationt::fit_polynomial(
     values[*it] = ivals1[*it];
   }
 
-  // Start building the program.  We begin by initialising the
-  // distinguisher variables to false.
-  for (list<exprt>::iterator it = distinguishers.begin();
-       it != distinguishers.end();
-       ++it) {
-    program.assign(*it, false_exprt());
-  }
+  // Start building the program
 
   assert_for_values(program, values, coefficients, 1, chooser_program, var);
 
@@ -355,12 +349,6 @@ bool disjunctive_polynomial_accelerationt::fit_polynomial(
   assertion->guard = false_exprt();
 
   //ensure_no_overflows(program);
-
-#ifdef DEBUG
-  program.update();
-  std::cout << "Fitting polynomial with program:" << endl;
-  program.output(std::cout);
-#endif
 
   // If the path is satisfiable, we've fitted a polynomial.  Extract the
   // relevant coefficients and return the expression.
@@ -1231,7 +1219,7 @@ void disjunctive_polynomial_accelerationt::find_distinguishing_points() {
            jt != succs.end();
            ++jt) {
         symbolt distinguisher_sym =
-          scratch.fresh_symbol("distinguisher", bool_typet());
+          scratch.fresh_symbol("polynomial::distinguisher", bool_typet());
         symbol_table.add(distinguisher_sym);
         symbol_exprt distinguisher = distinguisher_sym.symbol_expr();
 
@@ -1278,10 +1266,21 @@ void disjunctive_polynomial_accelerationt::build_path(
       exprt &distinguisher = distinguishing_points[*it];
       bool taken = scratch_program.eval(distinguisher).is_true();
 
+#ifdef DEBUG
+      std::cout << "Checking if successor is:" << std::endl;
+      scratch_program.output_instruction(ns, "scratch", std::cout, *it);
+
+      std::cout << "Distinguisher " << expr2c(distinguisher, ns) << " is " <<
+        expr2c(scratch_program.eval(distinguisher), ns) << std::endl;
+#endif
+
       if (taken) {
-        assert(!found_branch);
+        if (!found_branch ||
+            ((*it)->location_number < next->location_number)) {
+          next = *it;
+        }
+
         found_branch = true;
-        next = *it;
       }
     }
 
@@ -1315,11 +1314,45 @@ void disjunctive_polynomial_accelerationt::build_choosers() {
   chooser_program.copy_from(goto_program);
   chosen_program.copy_from(goto_program);
 
+  scratch_programt scratch(symbol_table);
+  map<exprt, exprt> shadow_distinguishers;
+
   // We're going to iterate over the 3 programs in lockstep, which allows
   // us to figure out which distinguishing point we've hit & instrument
   // the relevant distinguisher variables.
   goto_programt::targett chooserit = chooser_program.instructions.begin();
   goto_programt::targett chosenit = chosen_program.instructions.begin();
+
+  for (list<exprt>::iterator it = distinguishers.begin();
+       it != distinguishers.end();
+       ++it) {
+    exprt &distinguisher = *it;
+    symbolt shadow_sym = scratch.fresh_symbol("polynomial::shadow_distinguisher",
+        bool_typet());
+    symbol_table.add(shadow_sym);
+    exprt shadow = shadow_sym.symbol_expr();
+    shadow_distinguishers[distinguisher] = shadow;
+
+    goto_programt::targett decl = chosen_program.insert_before(chosenit);
+    decl->make_decl();
+    decl->code = code_declt(shadow);
+
+    decl = chooser_program.insert_before(chooserit);
+    decl->make_decl();
+    decl->code = code_declt(shadow);
+
+    goto_programt::targett assign = chosen_program.insert_before(chosenit);
+    assign->make_assignment();
+    assign->code = code_assignt(shadow, false_exprt());
+
+    assign = chooser_program.insert_before(chooserit);
+    assign->make_assignment();
+    assign->code = code_assignt(shadow, false_exprt());
+
+    decl = chooser_program.insert_before(chooserit);
+    decl->make_decl();
+    decl->code = code_declt(distinguisher);
+  }
 
   for (goto_programt::targett t = goto_program.instructions.begin();
        t != goto_program.instructions.end();
@@ -1331,24 +1364,34 @@ void disjunctive_polynomial_accelerationt::build_choosers() {
       chosenit->make_skip();
     } else if (d != distinguishing_points.end()) {
       exprt &distinguisher = d->second;
+      exprt &shadow = shadow_distinguishers[distinguisher];
 
       // Instrument distinguisher = true into the chooser program.
       goto_programt::targett assign =
         chooser_program.insert_before(chooserit);
-      code_assignt code(distinguisher, true_exprt());
       assign->make_assignment();
-      assign->code = code;
+      assign->code = code_assignt(shadow, true_exprt());
 
       // Instrument assume(distinguisher) into the chosen program.
-      goto_programt::targett assume =
-        chosen_program.insert_before(chosenit);
-      assume->make_assumption(distinguisher);
+      assign = chosen_program.insert_before(chosenit);
+      assign->make_assignment();
+      assign->code = code_assignt(shadow, true_exprt());
     }
-
 
     // Bump the iterators so we remain in lockstep.
     ++chooserit;
     ++chosenit;
+  }
+
+  for (list<exprt>::iterator it = distinguishers.begin();
+       it != distinguishers.end();
+       ++it) {
+    exprt &shadow = shadow_distinguishers[*it];
+
+    chosen_program.add_instruction(ASSUME)->guard =
+      equal_exprt(*it, shadow);
+    chooser_program.add_instruction(ASSUME)->guard =
+      equal_exprt(*it, shadow);
   }
 }
 

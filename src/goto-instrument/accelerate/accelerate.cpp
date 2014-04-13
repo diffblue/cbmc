@@ -45,18 +45,9 @@ int acceleratet::accelerate_loop(goto_programt::targett &loop_header) {
   pathst loop_paths, exit_paths;
   goto_programt::targett back_jump;
   int num_accelerated = 0;
+  list<path_acceleratort> accelerators;
   natural_loops_mutablet::natural_loopt &loop =
     natural_loops.loop_map[loop_header];
-
-  back_jump = find_back_jump(loop_header);
-
-  goto_programt::instructiont skip(SKIP);
-  program.insert_before_swap(loop_header, skip);
-
-  goto_programt::targett new_inst = loop_header;
-  ++new_inst;
-
-  loop.insert(new_inst);
 
   /*
   enumerating_loop_accelerationt acceleration(symbol_table, goto_functions,
@@ -68,9 +59,26 @@ int acceleratet::accelerate_loop(goto_programt::targett &loop_header) {
   path_acceleratort accelerator;
 
   while (acceleration.accelerate(accelerator)) {
-    subsumed_patht inserted(accelerator.path);
+    accelerators.push_back(accelerator);
+    num_accelerated++;
+  }
 
-    insert_accelerator(loop_header, back_jump, accelerator, inserted);
+  back_jump = find_back_jump(loop_header);
+
+  goto_programt::instructiont skip(SKIP);
+  program.insert_before_swap(loop_header, skip);
+
+  goto_programt::targett new_inst = loop_header;
+  ++new_inst;
+
+  loop.insert(new_inst);
+
+  for (list<path_acceleratort>::iterator it = accelerators.begin();
+       it != accelerators.end();
+       ++it) {
+    subsumed_patht inserted(it->path);
+
+    insert_accelerator(loop_header, back_jump, *it, inserted);
     subsumed.push_back(inserted);
     num_accelerated++;
   }
