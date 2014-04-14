@@ -280,11 +280,26 @@ bool disjunctive_polynomial_accelerationt::fit_polynomial(
     program.assume(binary_relation_exprt(ival2.symbol_expr(), "<",
           ival3.symbol_expr()));
 
+    program.assume(binary_relation_exprt(ival1.symbol_expr(), ">",
+          from_integer(-100, it->type())));
+    program.assume(binary_relation_exprt(ival1.symbol_expr(), "<",
+          from_integer(100, it->type())));
+
+    program.assume(binary_relation_exprt(ival2.symbol_expr(), ">",
+          from_integer(-100, it->type())));
+    program.assume(binary_relation_exprt(ival2.symbol_expr(), "<",
+          from_integer(100, it->type())));
+
+    program.assume(binary_relation_exprt(ival3.symbol_expr(), ">",
+          from_integer(-100, it->type())));
+    program.assume(binary_relation_exprt(ival3.symbol_expr(), "<",
+          from_integer(100, it->type())));
+
     ivals1[*it] = ival1.symbol_expr();
     ivals2[*it] = ival2.symbol_expr();
     ivals3[*it] = ival3.symbol_expr();
 
-    ivals1[*it] = from_integer(0, it->type());
+    //ivals1[*it] = from_integer(1, it->type());
   }
 
   map<exprt, exprt> values;
@@ -312,8 +327,10 @@ bool disjunctive_polynomial_accelerationt::fit_polynomial(
          ++it) {
       values[*it] = ivals2[*it];
       assert_for_values(program, values, coefficients, n, fixed, var);
+
       values[*it] = ivals3[*it];
       assert_for_values(program, values, coefficients, n, fixed, var);
+
       values[*it] = ivals1[*it];
     }
   }
