@@ -33,8 +33,7 @@ class scratch_programt : public goto_programt {
       satchecker(ns, *satcheck),
       z3(ns, "accelerate", "", "", smt2_dect::Z3),
 
-      // XXX Z3 appears to be much faster than minisat... investigate
-      checker(&z3)
+      checker(&satchecker)
   {
   }
 
