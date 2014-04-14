@@ -17,6 +17,8 @@
 #include "accelerator.h"
 #include "loop_acceleration.h"
 
+#define DEBUG
+
 using namespace std;
 
 class disjunctive_polynomial_accelerationt : public loop_accelerationt {
@@ -31,13 +33,11 @@ class disjunctive_polynomial_accelerationt : public loop_accelerationt {
       goto_functions(_goto_functions),
       goto_program(_goto_program),
       loop(_loop),
-      loop_header(_loop_header),
-      chooser_program(_symbol_table),
-      chosen_program(_symbol_table)
+      loop_header(_loop_header)
   {
     loop_counter = nil_exprt();
     find_distinguishing_points();
-    build_choosers();
+    build_fixed();
     find_modified(loop, modified);
   }
 
@@ -113,7 +113,7 @@ class disjunctive_polynomial_accelerationt : public loop_accelerationt {
   void find_modified(goto_programt::targett t, set<exprt> &modified);
 
   void build_path(scratch_programt &scratch_program, patht &path);
-  void build_choosers();
+  void build_fixed();
 
   void record_path(scratch_programt &scratch_program);
 
@@ -132,8 +132,7 @@ class disjunctive_polynomial_accelerationt : public loop_accelerationt {
   distinguish_mapt distinguishing_points;
   list<exprt> distinguishers;
   set<exprt> modified;
-  scratch_programt chooser_program;
-  scratch_programt chosen_program;
+  goto_programt fixed;
   list<distinguish_valuest> accelerated_paths;
 };
 

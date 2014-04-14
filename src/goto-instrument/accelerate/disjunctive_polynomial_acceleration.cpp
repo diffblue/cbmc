@@ -6,6 +6,7 @@
 
 #include <goto-programs/goto_program.h>
 #include <goto-programs/wp.h>
+#include <goto-programs/remove_skip.h>
 
 #include <goto-symex/goto_symex.h>
 #include <goto-symex/symex_target_equation.h>
@@ -283,9 +284,7 @@ bool disjunctive_polynomial_accelerationt::fit_polynomial(
     ivals2[*it] = ival2.symbol_expr();
     ivals3[*it] = ival3.symbol_expr();
 
-    //program.assign(ival1.symbol_expr(), from_integer(0, it->type()));
-    //program.assign(ival2.symbol_expr(), from_integer(2, it->type()));
-    //program.assign(ival3.symbol_expr(), from_integer(4, it->type()));
+    ivals1[*it] = from_integer(0, it->type());
   }
 
   map<exprt, exprt> values;
@@ -296,16 +295,25 @@ bool disjunctive_polynomial_accelerationt::fit_polynomial(
     values[*it] = ivals1[*it];
   }
 
-  // Start building the program
+  // Start building the program.  Begin by decl'ing each of the
+  // master distinguishers.
+  for (list<exprt>::iterator it = distinguishers.begin();
+       it != distinguishers.end();
+       ++it) {
+    program.add_instruction(DECL)->code = code_declt(*it);
+  }
 
-  assert_for_values(program, values, coefficients, 1, chooser_program, var);
+  // Now assume our polynomial fits at each of our sample points.
+  assert_for_values(program, values, coefficients, 1, fixed, var);
 
   for (int n = 0; n <= 1; n++) {
     for (set<exprt>::iterator it = influence.begin();
          it != influence.end();
          ++it) {
       values[*it] = ivals2[*it];
-      assert_for_values(program, values, coefficients, n, chosen_program, var);
+      assert_for_values(program, values, coefficients, n, fixed, var);
+      values[*it] = ivals3[*it];
+      assert_for_values(program, values, coefficients, n, fixed, var);
       values[*it] = ivals1[*it];
     }
   }
@@ -316,9 +324,9 @@ bool disjunctive_polynomial_accelerationt::fit_polynomial(
     values[*it] = ivals3[*it];
   }
 
-  assert_for_values(program, values, coefficients, 0, chosen_program, var);
-  assert_for_values(program, values, coefficients, 1, chosen_program, var);
-  assert_for_values(program, values, coefficients, 2, chosen_program, var);
+  assert_for_values(program, values, coefficients, 0, fixed, var);
+  assert_for_values(program, values, coefficients, 1, fixed, var);
+  assert_for_values(program, values, coefficients, 2, fixed, var);
  
   // Let's make sure that we get a path we have not seen before.
   for (list<distinguish_valuest>::iterator it = accelerated_paths.begin();
@@ -345,8 +353,7 @@ bool disjunctive_polynomial_accelerationt::fit_polynomial(
   }
 
   // Now do an ASSERT(false) to grab a counterexample
-  goto_programt::targett assertion = program.add_instruction(ASSERT);
-  assertion->guard = false_exprt();
+  program.add_instruction(ASSERT)->guard = false_exprt();
 
   //ensure_no_overflows(program);
 
@@ -402,7 +409,7 @@ void disjunctive_polynomial_accelerationt::assert_for_values(scratch_programt &p
 
   // Now unwind the loop as many times as we need to.
   for (int i = 0; i < num_unwindings; i++) {
-    program.append_loop(loop_body, loop_body.instructions.begin());
+    program.append(loop_body);
   }
 
   // Now build the polynomial for this point and assert it fits.
@@ -1255,24 +1262,11 @@ void disjunctive_polynomial_accelerationt::build_path(
     // to see which branch was taken.
     bool found_branch = false;
 
-#ifdef DEBUG
-    std::cout << "Searching for successor..." << std::endl;
-    scratch_program.output_instruction(ns, "scratch", std::cout, t);
-#endif
-
     for (goto_programt::targetst::iterator it = succs.begin();
          it != succs.end();
          ++it) {
       exprt &distinguisher = distinguishing_points[*it];
       bool taken = scratch_program.eval(distinguisher).is_true();
-
-#ifdef DEBUG
-      std::cout << "Checking if successor is:" << std::endl;
-      scratch_program.output_instruction(ns, "scratch", std::cout, *it);
-
-      std::cout << "Distinguisher " << expr2c(distinguisher, ns) << " is " <<
-        expr2c(scratch_program.eval(distinguisher), ns) << std::endl;
-#endif
 
       if (taken) {
         if (!found_branch ||
@@ -1310,19 +1304,36 @@ void disjunctive_polynomial_accelerationt::build_path(
   } while (t != loop_header && (loop.find(t) != loop.end()));
 }
 
-void disjunctive_polynomial_accelerationt::build_choosers() {
-  chooser_program.copy_from(goto_program);
-  chosen_program.copy_from(goto_program);
-
+/*
+ * Take the body of the loop we are accelerating and produce a fixed-path
+ * version of that body, suitable for use in the fixed-path acceleration we
+ * will be doing later.
+ */
+void disjunctive_polynomial_accelerationt::build_fixed() {
   scratch_programt scratch(symbol_table);
   map<exprt, exprt> shadow_distinguishers;
 
-  // We're going to iterate over the 3 programs in lockstep, which allows
-  // us to figure out which distinguishing point we've hit & instrument
-  // the relevant distinguisher variables.
-  goto_programt::targett chooserit = chooser_program.instructions.begin();
-  goto_programt::targett chosenit = chosen_program.instructions.begin();
+  fixed.copy_from(goto_program);
 
+  // We're only interested in paths that loop back to the loop header.
+  // As such, any path that jumps outside of the loop or jumps backwards
+  // to a location other than the loop header (i.e. a nested loop) is not
+  // one we're interested in, and we'll redirect it to this assume(false).
+  goto_programt::targett kill = fixed.add_instruction(ASSUME);
+  kill->guard = false_exprt();
+
+  // Make a sentinel instruction to mark the end of the loop body.
+  // We'll use this as the new target for any back-jumps to the loop
+  // header.
+  goto_programt::targett end = fixed.add_instruction(SKIP);
+
+  // A pointer to the start of the fixed-path body.  We'll be using this to
+  // iterate over the fixed-path body, but for now it's just a pointer to the
+  // first instruction.
+  goto_programt::targett fixedt = fixed.instructions.begin();
+
+  // Create shadow distinguisher variables.  These guys identify the path that
+  // is taken through the fixed-path body.
   for (list<exprt>::iterator it = distinguishers.begin();
        it != distinguishers.end();
        ++it) {
@@ -1333,66 +1344,99 @@ void disjunctive_polynomial_accelerationt::build_choosers() {
     exprt shadow = shadow_sym.symbol_expr();
     shadow_distinguishers[distinguisher] = shadow;
 
-    goto_programt::targett decl = chosen_program.insert_before(chosenit);
+    goto_programt::targett decl = fixed.insert_before(fixedt);
     decl->make_decl();
     decl->code = code_declt(shadow);
 
-    decl = chooser_program.insert_before(chooserit);
-    decl->make_decl();
-    decl->code = code_declt(shadow);
-
-    goto_programt::targett assign = chosen_program.insert_before(chosenit);
+    goto_programt::targett assign = fixed.insert_before(fixedt);
     assign->make_assignment();
     assign->code = code_assignt(shadow, false_exprt());
-
-    assign = chooser_program.insert_before(chooserit);
-    assign->make_assignment();
-    assign->code = code_assignt(shadow, false_exprt());
-
-    decl = chooser_program.insert_before(chooserit);
-    decl->make_decl();
-    decl->code = code_declt(distinguisher);
   }
 
+  // We're going to iterate over the 2 programs in lockstep, which allows
+  // us to figure out which distinguishing point we've hit & instrument
+  // the relevant distinguisher variables.
   for (goto_programt::targett t = goto_program.instructions.begin();
        t != goto_program.instructions.end();
-       ++t) {
+       ++t, ++fixedt) {
     distinguish_mapt::iterator d = distinguishing_points.find(t);
 
     if (loop.find(t) == loop.end()) {
-      chooserit->make_skip();
-      chosenit->make_skip();
-    } else if (d != distinguishing_points.end()) {
+      // This instruction isn't part of the loop...  Just remove it.
+      fixedt->make_skip();
+      continue;
+    }
+    
+    if (d != distinguishing_points.end()) {
+      // We've hit a distinguishing point.  Set the relevant shadow
+      // distinguisher to true.
       exprt &distinguisher = d->second;
       exprt &shadow = shadow_distinguishers[distinguisher];
 
-      // Instrument distinguisher = true into the chooser program.
-      goto_programt::targett assign =
-        chooser_program.insert_before(chooserit);
+      goto_programt::targett assign = fixed.insert_after(fixedt);
       assign->make_assignment();
       assign->code = code_assignt(shadow, true_exprt());
 
-      // Instrument assume(distinguisher) into the chosen program.
-      assign = chosen_program.insert_before(chosenit);
-      assign->make_assignment();
-      assign->code = code_assignt(shadow, true_exprt());
+      assign->swap(*fixedt);
+      fixedt = assign;
     }
 
-    // Bump the iterators so we remain in lockstep.
-    ++chooserit;
-    ++chosenit;
+    if (t->is_goto()) {
+      assert(fixedt->is_goto());
+      // If this is a forwards jump, it's either jumping inside the loop
+      // (in which case we leave it alone), or it jumps outside the loop.
+      // If it jumps out of the loop, it's on a path we don't care about
+      // so we kill it.
+      //
+      // Otherwise, it's a backwards jump.  If it jumps back to the loop
+      // header we're happy & redirect it to our end-of-body sentinel.
+      // If it jumps somewhere else, it's part of a nested loop and we
+      // kill it.
+      for (goto_programt::targetst::iterator target = t->targets.begin();
+           target != t->targets.end();
+           ++target) {
+        if ((*target)->location_number > t->location_number) {
+          // A forward jump...
+          if (loop.find(*target) != loop.end()) {
+            // Case 1: a forward jump within the loop.  Do nothing.
+            continue;
+          } else {
+            // Case 2: a forward jump out of the loop.  Kill.
+            fixedt->targets.clear();
+            fixedt->targets.push_back(kill);
+          }
+        } else {
+          // A backwards jump...
+          if (*target == loop_header) {
+            // Case 3: a backwards jump to the loop header.  Redirect to sentinel.
+            fixedt->targets.clear();
+            fixedt->targets.push_back(end);
+          } else {
+            // Case 4: a nested loop.  Kill.
+            fixedt->targets.clear();
+            fixedt->targets.push_back(kill);
+          }
+        }
+      }
+    }
   }
 
+  // OK, now let's assume that the path we took through the fixed-path
+  // body is the same as the master path.  We do this by assuming that
+  // each of the shadow-distinguisher variables is equal to its corresponding
+  // master-distinguisher.
   for (list<exprt>::iterator it = distinguishers.begin();
        it != distinguishers.end();
        ++it) {
     exprt &shadow = shadow_distinguishers[*it];
 
-    chosen_program.add_instruction(ASSUME)->guard =
-      equal_exprt(*it, shadow);
-    chooser_program.add_instruction(ASSUME)->guard =
-      equal_exprt(*it, shadow);
+    fixed.insert_after(end)->make_assumption(equal_exprt(*it, shadow));
   }
+
+  // Finally, let's remove all the skips we introduced and fix the
+  // jump targets.
+  fixed.update();
+  remove_skip(fixed);
 }
 
 void disjunctive_polynomial_accelerationt::record_path(scratch_programt &program) {
