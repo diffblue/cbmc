@@ -1361,10 +1361,6 @@ void disjunctive_polynomial_accelerationt::build_fixed() {
     exprt shadow = shadow_sym.symbol_expr();
     shadow_distinguishers[distinguisher] = shadow;
 
-    goto_programt::targett decl = fixed.insert_before(fixedt);
-    decl->make_decl();
-    decl->code = code_declt(shadow);
-
     goto_programt::targett assign = fixed.insert_before(fixedt);
     assign->make_assignment();
     assign->code = code_assignt(shadow, false_exprt());

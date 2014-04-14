@@ -50,6 +50,15 @@ bool scratch_programt::check_sat()
 
   symex(symex_state, functions, *this);
   slice(equation);
+
+  if (equation.count_assertions() == 0) {
+    // Symex sliced away all our assertions.
+#ifdef DEBUG
+    std::cout << "Trivially unsat" << std::endl;
+#endif
+    return false;
+  }
+
   equation.convert(*checker);
 
 #ifdef DEBUG
