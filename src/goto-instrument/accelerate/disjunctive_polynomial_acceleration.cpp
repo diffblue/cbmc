@@ -3,6 +3,7 @@
 #include <set>
 #include <string>
 #include <sstream>
+#include <algorithm>
 
 #include <goto-programs/goto_program.h>
 #include <goto-programs/wp.h>
@@ -170,6 +171,7 @@ bool disjunctive_polynomial_accelerationt::accelerate(
        it != polynomials.end();
        ++it) {
     program.assign(it->first, it->second.to_expr());
+    accelerator.changed_vars.insert(it->first);
   }
 
 #if 0
@@ -190,6 +192,14 @@ bool disjunctive_polynomial_accelerationt::accelerate(
   }
 
   accelerator.pure_accelerator.instructions.swap(program.instructions);
+
+  find_modified(accelerator.path, accelerator.dirty_vars);
+
+  for (set<exprt>::iterator it = accelerator.changed_vars.begin();
+       it != accelerator.changed_vars.end();
+       ++it) {
+    accelerator.dirty_vars.erase(*it);
+  }
 
   return true;
 }
