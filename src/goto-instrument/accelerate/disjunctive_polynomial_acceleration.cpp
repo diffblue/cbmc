@@ -290,18 +290,24 @@ bool disjunctive_polynomial_accelerationt::fit_polynomial(
     program.assume(binary_relation_exprt(ival2.symbol_expr(), "<",
           ival3.symbol_expr()));
 
-    program.assume(binary_relation_exprt(ival1.symbol_expr(), ">",
-          from_integer(-100, it->type())));
+    if (it->type() == signedbv_typet()) {
+      program.assume(binary_relation_exprt(ival1.symbol_expr(), ">",
+            from_integer(-100, it->type())));
+    }
     program.assume(binary_relation_exprt(ival1.symbol_expr(), "<",
           from_integer(100, it->type())));
 
-    program.assume(binary_relation_exprt(ival2.symbol_expr(), ">",
-          from_integer(-100, it->type())));
+    if (it->type() == signedbv_typet()) {
+      program.assume(binary_relation_exprt(ival2.symbol_expr(), ">",
+            from_integer(-100, it->type())));
+    }
     program.assume(binary_relation_exprt(ival2.symbol_expr(), "<",
           from_integer(100, it->type())));
 
-    program.assume(binary_relation_exprt(ival3.symbol_expr(), ">",
-          from_integer(-100, it->type())));
+    if (it->type() == signedbv_typet()) {
+      program.assume(binary_relation_exprt(ival3.symbol_expr(), ">",
+            from_integer(-100, it->type())));
+    }
     program.assume(binary_relation_exprt(ival3.symbol_expr(), "<",
           from_integer(100, it->type())));
 
