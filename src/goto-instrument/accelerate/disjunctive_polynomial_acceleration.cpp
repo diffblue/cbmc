@@ -66,7 +66,7 @@ bool disjunctive_polynomial_accelerationt::accelerate(
     loop_counter = loop_sym.symbol_expr();
   }
 
-  patht path;
+  patht &path = accelerator.path;
 
   for (set<exprt>::iterator it = modified.begin();
        it != modified.end();
