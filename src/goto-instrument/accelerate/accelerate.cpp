@@ -138,7 +138,9 @@ void acceleratet::restrict_traces() {
   for (subsumed_pathst::iterator it = subsumed.begin();
        it != subsumed.end();
        ++it) {
-    automaton.add_path(it->subsumed);
+    if (!it->subsumed.empty()) {
+      automaton.add_path(it->subsumed);
+    }
 
     patht double_accelerator;
     patht::iterator jt = double_accelerator.begin();
