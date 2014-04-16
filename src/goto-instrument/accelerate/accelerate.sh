@@ -13,6 +13,6 @@ $goto_instrument --accelerate $ofile $accfile
 $cbmc --unwind 2 $accfile
 retcode=$?
 
-rm $ofile $acfile
+rm $ofile $accfile
 
 exit $retcode
