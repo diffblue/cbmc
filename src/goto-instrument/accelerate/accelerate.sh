@@ -15,4 +15,4 @@ retcode=$?
 
 rm $ofile $acfile
 
-exit $?
+exit $retcode
