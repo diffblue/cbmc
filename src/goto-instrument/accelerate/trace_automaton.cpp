@@ -4,10 +4,25 @@
 #include "trace_automaton.h"
 #include "path.h"
 
-//#define DEBUG
+#define DEBUG
 
 void trace_automatont::build() {
   determinise();
+
+#ifdef DEBUG
+  std::cout << "NTA:" << std::endl;
+  nta.output(std::cout);
+
+  std::cout << "DTA:" << std::endl;
+  dta.output(std::cout);
+#endif
+
+  //minimise();
+
+#ifdef DEBUG
+  std::cout << "Minimised:" << std::endl;
+  dta.output(std::cout);
+#endif
 }
 
 /*
@@ -74,7 +89,6 @@ void trace_automatont::add_path(patht &path) {
        it != path.end();
        ++it) {
     goto_programt::targett l = it->loc;
-
     if (in_alphabet(l)) {
 #ifdef DEBUG
       std::cout << l->location_number << ":" << l->location << ", ";
@@ -87,7 +101,9 @@ void trace_automatont::add_path(patht &path) {
   }
 
 #ifdef DEBUG
-  std::cout << endl;
+  std::cout << std::endl;
+
+  std::cout << "Final state: " << state << std::endl;
 #endif
 
   nta.set_accepting(state);
@@ -195,7 +211,7 @@ statet trace_automatont::add_dstate(state_sett &s) {
   }
 
   state_num = dta.add_state();
-  dstates.insert(make_pair(s, state_num));
+  dstates[s] = state_num;
   unmarked_dstates.push_back(s);
 
   assert(dstates.find(s) != dstates.end());
@@ -204,6 +220,11 @@ statet trace_automatont::add_dstate(state_sett &s) {
        it != s.end();
        ++it) {
     if (nta.is_accepting(*it)) {
+#ifdef DEBUG
+      std::cout << "NTA state " << *it << " is accepting, so accepting DTA state " <<
+        state_num << std::endl;
+#endif
+
       dta.set_accepting(state_num);
       break;
     }
@@ -294,6 +315,93 @@ void trace_automatont::get_transitions(sym_mapt &transitions) {
       // We have a transition: i -l-> j.
       state_pairt state_pair(i, j);
       transitions.insert(std::make_pair(l, state_pair));
+    }
+  }
+}
+
+void automatont::reverse(goto_programt::targett epsilon) {
+  transition_tablet old_table;
+  statet new_init;
+
+  old_table.swap(transitions);
+
+  for (unsigned int i = 0; i < old_table.size(); i++) {
+    transitions.push_back(transitionst());
+  }
+
+  if (accept_states.size() == 0) {
+    num_states = 0;
+    return;
+  } else if (accept_states.size() == 1) {
+    new_init = *(accept_states.begin());
+  } else {
+    // More than one accept state.  Introduce a new state with
+    // epsilon transitions to each accept state.
+    new_init = add_state();
+
+    for (state_sett::iterator it = accept_states.begin();
+         it != accept_states.end();
+         ++it) {
+      add_trans(new_init, epsilon, *it);
+    }
+  }
+
+  accept_states.clear();
+  set_accepting(init_state);
+
+  init_state = new_init;
+
+  for (unsigned int i = 0; i < old_table.size(); i++) {
+    transitionst &trans = old_table[i];
+
+    for (transitionst::iterator it = trans.begin();
+         it != trans.end();
+         ++it) {
+      goto_programt::targett l = it->first;
+      unsigned int j = it->second;
+
+      // There was a transition i -l-> j, so add a transition
+      // j -l-> i.
+      add_trans(j, l, i);
+    }
+  }
+}
+
+// Take the DTA and minimise it, using Brzozowski's algorithm.
+void trace_automatont::minimise() {
+  nta.swap(dta);
+  nta.reverse(epsilon);
+
+  dta.clear();
+  dstates.clear();
+  unmarked_dstates.clear();
+
+  determinise();
+  assert(dta.accept_states.size() == 1);
+  dta.reverse(epsilon);
+}
+
+void automatont::output(std::ostream &str) {
+  str << "Init: " << init_state << std::endl;
+
+  str << "Accept states: ";
+
+  for (state_sett::iterator it = accept_states.begin();
+       it != accept_states.end();
+       ++it) {
+    str << *it << " ";
+  }
+
+  str << std::endl;
+
+  for (unsigned int i = 0; i < transitions.size(); ++i) {
+    for (transitionst::iterator it = transitions[i].begin();
+         it != transitions[i].end();
+         ++it) {
+      goto_programt::targett l = it->first;
+      statet j = it->second;
+
+      str << i << " -- " << l->location_number << " --> " << j << std::endl;
     }
   }
 }
