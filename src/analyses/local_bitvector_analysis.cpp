@@ -319,17 +319,16 @@ void local_bitvector_analysist::build(const goto_functiont &goto_function)
   work_queue.push(0);  
   
   loc_infos.resize(cfg.locs.size());
-
-  // feed in sufficiently bad defaults for parameters
-  for(code_typet::parameterst::const_iterator
-      it=goto_function.type.parameters().begin();
-      it!=goto_function.type.parameters().end();
+  
+  // Gather the objects we track, and
+  // feed in sufficiently bad defaults for their value
+  // in the entry location.
+  for(localst::locals_mapt::const_iterator
+      it=locals.locals_map.begin();
+      it!=locals.locals_map.end();
       it++)
-  {
-    const irep_idt &identifier=it->get_identifier();
-    if(is_tracked(identifier))
-      loc_infos[0].points_to[pointers.number(identifier)]=flagst::mk_unknown();
-  }
+    if(is_tracked(it->first))
+      loc_infos[0].points_to[pointers.number(it->first)]=flagst::mk_unknown();
 
   while(!work_queue.empty())
   {
