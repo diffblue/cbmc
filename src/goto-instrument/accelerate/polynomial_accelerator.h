@@ -28,6 +28,16 @@ class polynomial_acceleratort : public path_accelerationt {
     loop_counter = nil_exprt();
   }
 
+  polynomial_acceleratort(const symbol_tablet &_symbol_table,
+                          const goto_functionst &_goto_functions,
+                          exprt &_loop_counter) :
+      symbol_table(const_cast<symbol_tablet &>(_symbol_table)),
+      ns(symbol_table),
+      goto_functions(_goto_functions),
+      loop_counter(_loop_counter)
+  {
+  }
+
   virtual bool accelerate(patht &loop, path_acceleratort &accelerator);
 
   bool fit_polynomial(goto_programt::instructionst &loop_body,

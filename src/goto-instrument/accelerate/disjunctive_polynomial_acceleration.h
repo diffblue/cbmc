@@ -117,7 +117,6 @@ class disjunctive_polynomial_accelerationt : public loop_accelerationt {
 
   void record_path(scratch_programt &scratch_program);
 
-
   symbol_tablet &symbol_table;
   namespacet ns;
   goto_functionst &goto_functions;

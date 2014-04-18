@@ -28,6 +28,7 @@
 #include <util/arith_tools.h>
 
 #include "disjunctive_polynomial_acceleration.h"
+#include "polynomial_accelerator.h"
 #include "accelerator.h"
 #include "util.h"
 
@@ -89,7 +90,8 @@ bool disjunctive_polynomial_accelerationt::accelerate(
         std::cout << "Fitted a polynomial for " << expr2c(target, ns) <<
           std::endl;
 #endif
-        polynomials.insert(make_pair(target, poly));
+        polynomials[target] = poly;
+        accelerator.changed_vars.insert(target);
         break;
       }
     }
@@ -98,6 +100,48 @@ bool disjunctive_polynomial_accelerationt::accelerate(
   if (polynomials.empty()) {
     return false;
   }
+
+  // Fit polynomials for the other variables.
+  set<exprt> dirty;
+  find_modified(accelerator.path, dirty);
+  polynomial_acceleratort path_acceleration(symbol_table, goto_functions,
+      loop_counter);
+  goto_programt::instructionst assigns;
+
+  for (patht::iterator it = accelerator.path.begin();
+       it != accelerator.path.end();
+       ++it) {
+    if (it->loc->is_assign() || it->loc->is_decl()) {
+      assigns.push_back(*(it->loc));
+    }
+  }
+
+  for (set<exprt>::iterator it = dirty.begin();
+       it != dirty.end();
+       ++it) {
+    if (accelerator.changed_vars.find(*it) != accelerator.changed_vars.end()) {
+      // We've accelerated variable this already.
+      continue;
+    }
+
+    polynomialt poly;
+    exprt target(*it);
+
+    if (path_acceleration.fit_polynomial(assigns, target, poly)) {
+      map<exprt, polynomialt> this_poly;
+      this_poly[target] = poly;
+
+      if (check_inductive(this_poly, accelerator.path)) {
+        polynomials[target] = poly;
+        accelerator.changed_vars.insert(target);
+        continue;
+      }
+    }
+
+    // We weren't able to accelerate this target...
+    accelerator.dirty_vars.insert(target);
+  }
+
 
   /*
   if (!check_inductive(polynomials, assigns)) {
@@ -193,14 +237,6 @@ bool disjunctive_polynomial_accelerationt::accelerate(
   }
 
   accelerator.pure_accelerator.instructions.swap(program.instructions);
-
-  find_modified(accelerator.path, accelerator.dirty_vars);
-
-  for (set<exprt>::iterator it = accelerator.changed_vars.begin();
-       it != accelerator.changed_vars.end();
-       ++it) {
-    accelerator.dirty_vars.erase(*it);
-  }
 
   return true;
 }
