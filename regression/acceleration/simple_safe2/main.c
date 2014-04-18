@@ -1,5 +1,5 @@
 int main(void) {
-  int x;
+  unsigned int x;
 
   while (x < 100) {
     x++;
