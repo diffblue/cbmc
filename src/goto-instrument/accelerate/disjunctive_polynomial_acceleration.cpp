@@ -8,6 +8,7 @@
 #include <goto-programs/goto_program.h>
 #include <goto-programs/wp.h>
 #include <goto-programs/remove_skip.h>
+#include <goto-programs/goto_functions.h>
 
 #include <goto-symex/goto_symex.h>
 #include <goto-symex/symex_target_equation.h>
@@ -233,7 +234,7 @@ bool disjunctive_polynomial_accelerationt::accelerate(
   program.fix_types();
 
   if (path_is_monotone) {
-    //ensure_no_overflows(program);
+    ensure_no_overflows(program);
   }
 
   accelerator.pure_accelerator.instructions.swap(program.instructions);
@@ -425,7 +426,7 @@ bool disjunctive_polynomial_accelerationt::fit_polynomial(
   // Now do an ASSERT(false) to grab a counterexample
   program.add_instruction(ASSERT)->guard = false_exprt();
 
-  //ensure_no_overflows(program);
+  ensure_no_overflows(program);
 
   // If the path is satisfiable, we've fitted a polynomial.  Extract the
   // relevant coefficients and return the expression.
@@ -724,7 +725,7 @@ bool disjunctive_polynomial_accelerationt::check_inductive(map<exprt, polynomial
     program.add_instruction(ASSERT)->guard = *it;
   }
 
-  //ensure_no_overflows(program);
+  ensure_no_overflows(program);
 
 #ifdef DEBUG
   std::cout << "Checking following program for inductiveness:" << endl;
@@ -914,7 +915,7 @@ bool disjunctive_polynomial_accelerationt::do_assumptions(map<exprt, polynomialt
 
   guard = not_exprt(condition);
 
-  //ensure_no_overflows(program);
+  ensure_no_overflows(program);
 
 #ifdef DEBUG
   std::cout << "Checking following program for monotonicity:" << endl;
@@ -949,7 +950,11 @@ void disjunctive_polynomial_accelerationt::ensure_no_overflows(goto_programt &pr
   checker_options.set_option("assumptions", true);
   checker_options.set_option("simplify", true);
 
-  goto_check(ns, checker_options, goto_functions);
+  goto_functionst::goto_functiont fn;
+  fn.body.instructions.swap(program.instructions);
+
+  goto_check(ns, checker_options, fn);
+  fn.body.instructions.swap(program.instructions);
 }
 
 disjunctive_polynomial_accelerationt::expr_pairst disjunctive_polynomial_accelerationt::gather_array_assignments(
