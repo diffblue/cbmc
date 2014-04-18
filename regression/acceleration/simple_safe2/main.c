@@ -1,9 +1,9 @@
 int main(void) {
   unsigned int x;
 
-  while (x < 100) {
+  while (x < 0x0fffffff) {
     x++;
   }
 
-  assert(x >= 100);
+  assert(x >= 0x0fffffff);
 }
