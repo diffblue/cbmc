@@ -234,6 +234,8 @@ void acceleratet::build_state_machine(trace_automatont::sym_mapt::iterator p,
                                       symbol_exprt state,
                                       symbol_exprt next_state,
                                       scratch_programt &state_machine) {
+  set<unsigned int> successors;
+
   for ( ; p != end; ++p) {
     trace_automatont::state_pairt state_pair = p->second;
     unsigned int from = state_pair.first;
@@ -248,6 +250,7 @@ void acceleratet::build_state_machine(trace_automatont::sym_mapt::iterator p,
     //   next_state = (state == from) ? to : next_state;
     //
     // just before loc.
+    successors.insert(to);
 
     equal_exprt guard(state, from_integer(from, state.type()));
     if_exprt rhs(guard, from_integer(to, next_state.type()), next_state);
@@ -263,6 +266,22 @@ void acceleratet::build_state_machine(trace_automatont::sym_mapt::iterator p,
     state_machine.assume(not_exprt(equal_exprt(state,
                                                from_integer(*it, state.type())
                                               )));
+  }
+
+  // Optimisation: if there is only one possible successor state, just
+  // jump straight to it instead of driving the whole machine as above.
+  if (successors.size() == 1) {
+    unsigned int the_state = *(successors.begin());
+
+    state_machine.instructions.clear();
+
+    if (accept_states.find(the_state) != accept_states.end()) {
+      // It's an accept state.  Just assume(false).
+      state_machine.assume(false_exprt());
+    } else {
+      state_machine.assign(state,
+          from_integer(the_state, next_state.type()));
+    }
   }
 }
 
