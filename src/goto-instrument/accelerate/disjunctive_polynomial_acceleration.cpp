@@ -67,6 +67,7 @@ bool disjunctive_polynomial_accelerationt::accelerate(
   }
 
   patht &path = accelerator.path;
+  path.clear();
 
   for (set<exprt>::iterator it = modified.begin();
        it != modified.end();
