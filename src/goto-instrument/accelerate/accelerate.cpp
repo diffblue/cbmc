@@ -228,18 +228,63 @@ void acceleratet::insert_automaton(trace_automatont &automaton) {
   }
 }
 
-void acceleratet::build_state_machine(trace_automatont::sym_mapt::iterator p,
+void acceleratet::build_state_machine(trace_automatont::sym_mapt::iterator begin,
                                       trace_automatont::sym_mapt::iterator end,
                                       state_sett &accept_states,
                                       symbol_exprt state,
                                       symbol_exprt next_state,
                                       scratch_programt &state_machine) {
-  set<unsigned int> successors;
+  map<unsigned int, unsigned int> successor_counts;
+  unsigned int max_count = 0;
+  unsigned int likely_next = 0;
 
-  for ( ; p != end; ++p) {
+  // Optimisation: find the most common successor state and initialise
+  // next_state to that value.  This reduces the size of the state machine
+  // driver substantially.
+  for (trace_automatont::sym_mapt::iterator p = begin; p != end; ++p) {
+    trace_automatont::state_pairt state_pair = p->second;
+    unsigned int to = state_pair.second;
+    unsigned int count = 0;
+
+    if (successor_counts.find(to) == successor_counts.end()) {
+      count = 1;
+    } else {
+      count = successor_counts[to] + 1;
+    }
+
+    successor_counts[to] = count;
+
+    if (count > max_count) {
+      max_count = count;
+      likely_next = to;
+    }
+  }
+
+  // Optimisation: if there is only one possible successor state, just
+  // jump straight to it instead of driving the whole machine.
+  if (successor_counts.size() == 1) {
+    if (accept_states.find(likely_next) != accept_states.end()) {
+      // It's an accept state.  Just assume(false).
+      state_machine.assume(false_exprt());
+    } else {
+      state_machine.assign(state,
+          from_integer(likely_next, next_state.type()));
+    }
+
+    return;
+  }
+
+  state_machine.assign(next_state,
+      from_integer(likely_next, next_state.type()));
+
+  for (trace_automatont::sym_mapt::iterator p = begin; p != end; ++p) {
     trace_automatont::state_pairt state_pair = p->second;
     unsigned int from = state_pair.first;
     unsigned int to = state_pair.second;
+
+    if (to == likely_next) {
+      continue;
+    }
 
     // We're encoding the transition
     //
@@ -250,8 +295,6 @@ void acceleratet::build_state_machine(trace_automatont::sym_mapt::iterator p,
     //   next_state = (state == from) ? to : next_state;
     //
     // just before loc.
-    successors.insert(to);
-
     equal_exprt guard(state, from_integer(from, state.type()));
     if_exprt rhs(guard, from_integer(to, next_state.type()), next_state);
     state_machine.assign(next_state, rhs);
@@ -266,22 +309,6 @@ void acceleratet::build_state_machine(trace_automatont::sym_mapt::iterator p,
     state_machine.assume(not_exprt(equal_exprt(state,
                                                from_integer(*it, state.type())
                                               )));
-  }
-
-  // Optimisation: if there is only one possible successor state, just
-  // jump straight to it instead of driving the whole machine as above.
-  if (successors.size() == 1) {
-    unsigned int the_state = *(successors.begin());
-
-    state_machine.instructions.clear();
-
-    if (accept_states.find(the_state) != accept_states.end()) {
-      // It's an accept state.  Just assume(false).
-      state_machine.assume(false_exprt());
-    } else {
-      state_machine.assign(state,
-          from_integer(the_state, next_state.type()));
-    }
   }
 }
 
