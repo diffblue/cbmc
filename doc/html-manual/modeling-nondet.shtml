@@ -19,7 +19,7 @@ computation that results from any choice of inputs.</p>
 <p>The CPROVER tools support the following sources of nondeterminism:</p>
 
 <ul>
-<li>functions that read inputs from the environments;<li>
+<li>functions that read inputs from the environments;</li>
 <li>the thread schedule in concurrent programs;</li>
 <li>initial values of local-scoped variables and memory allocated with
 <code>malloc</code>;</li>
