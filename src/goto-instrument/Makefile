@@ -16,6 +16,7 @@ SRC = goto_instrument_main.cpp goto_instrument_parseoptions.cpp \
 			accelerate/enumerating_loop_acceleration.cpp \
 			accelerate/path_enumerator.cpp \
 			accelerate/disjunctive_polynomial_acceleration.cpp \
+			accelerate/cone_of_influence.cpp \
 			count_eloc.cpp reachability_slicer.cpp
 
 OBJ += ../ansi-c/ansi-c$(LIBEXT) \

@@ -16,6 +16,7 @@
 #include "path.h"
 #include "accelerator.h"
 #include "loop_acceleration.h"
+#include "cone_of_influence.h"
 
 #define DEBUG
 
@@ -57,12 +58,12 @@ class disjunctive_polynomial_accelerationt : public loop_accelerationt {
   void extract_polynomial(scratch_programt &program,
                           set<pair<expr_listt, exprt> > &coefficients,
                           polynomialt &polynomial);
-  set<exprt> cone_of_influence(exprt &target);
+  void cone_of_influence(const exprt &target, expr_sett &cone);
 
   bool check_inductive(map<exprt, polynomialt> polynomials,
                        patht &path);
   void stash_variables(scratch_programt &program,
-                       set<exprt> modified,
+                       expr_sett modified,
                        substitutiont &substitution);
   void stash_polynomials(scratch_programt &program,
                          map<exprt, polynomialt> &polynomials,
@@ -92,7 +93,7 @@ class disjunctive_polynomial_accelerationt : public loop_accelerationt {
                  substitutiont &substitution,
                  scratch_programt &program);
   expr_pairst gather_array_assignments(goto_programt::instructionst &loop_body,
-                                       set<exprt> &arrays_written);
+                                       expr_sett &arrays_written);
   bool array_assignments2polys(expr_pairst &array_assignments,
                                map<exprt, polynomialt> &polynomials,
                                polynomial_array_assignmentst &array_polynomials,
@@ -101,16 +102,16 @@ class disjunctive_polynomial_accelerationt : public loop_accelerationt {
                  map<exprt, polynomialt> &polynomials,
                  polynomialt &poly);
 
-  void gather_rvalues(const exprt &expr, set<exprt> &rvalues);
+  void gather_rvalues(const exprt &expr, expr_sett &rvalues);
 
   void ensure_no_overflows(goto_programt &program);
 
   void find_distinguishing_points();
-  void find_modified(patht &path, set<exprt> &modified);
-  void find_modified(goto_programt &program, set<exprt> &modified);
+  void find_modified(patht &path, expr_sett &modified);
+  void find_modified(goto_programt &program, expr_sett &modified);
   void find_modified(natural_loops_mutablet::natural_loopt &loop,
-      set<exprt> &modified);
-  void find_modified(goto_programt::targett t, set<exprt> &modified);
+      expr_sett &modified);
+  void find_modified(goto_programt::targett t, expr_sett &modified);
 
   void build_path(scratch_programt &scratch_program, patht &path);
   void build_fixed();
@@ -130,7 +131,7 @@ class disjunctive_polynomial_accelerationt : public loop_accelerationt {
   exprt loop_counter;
   distinguish_mapt distinguishing_points;
   list<exprt> distinguishers;
-  set<exprt> modified;
+  expr_sett modified;
   goto_programt fixed;
   list<distinguish_valuest> accelerated_paths;
 };
