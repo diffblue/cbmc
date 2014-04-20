@@ -116,7 +116,7 @@ void cone_of_influencet::cone_of_influence(
       }
     }
 
-    //next.erase(assignment.lhs());
+    next.erase(assignment.lhs());
 
     if (care) {
       gather_rvalues(assignment.rhs(), next);
