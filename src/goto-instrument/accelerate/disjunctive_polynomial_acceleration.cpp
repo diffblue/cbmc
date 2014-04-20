@@ -4,6 +4,7 @@
 #include <string>
 #include <sstream>
 #include <algorithm>
+#include <ctime>
 
 #include <goto-programs/goto_program.h>
 #include <goto-programs/wp.h>
@@ -32,8 +33,9 @@
 #include "polynomial_accelerator.h"
 #include "accelerator.h"
 #include "util.h"
+#include "cone_of_influence.h"
 
-#define DEBUG
+//#define DEBUG
 
 
 bool disjunctive_polynomial_accelerationt::accelerate(
@@ -54,7 +56,7 @@ bool disjunctive_polynomial_accelerationt::accelerate(
 
   std::cout << "Modified:" << endl;
 
-  for (set<exprt>::iterator it = modified.begin();
+  for (expr_sett::iterator it = modified.begin();
        it != modified.end();
        ++it) {
     std::cout << expr2c(*it, ns) << endl;
@@ -71,7 +73,7 @@ bool disjunctive_polynomial_accelerationt::accelerate(
   patht &path = accelerator.path;
   path.clear();
 
-  for (set<exprt>::iterator it = modified.begin();
+  for (expr_sett::iterator it = modified.begin();
        it != modified.end();
        ++it) {
     polynomialt poly;
@@ -103,7 +105,7 @@ bool disjunctive_polynomial_accelerationt::accelerate(
   }
 
   // Fit polynomials for the other variables.
-  set<exprt> dirty;
+  expr_sett dirty;
   find_modified(accelerator.path, dirty);
   polynomial_acceleratort path_acceleration(symbol_table, goto_functions,
       loop_counter);
@@ -117,7 +119,7 @@ bool disjunctive_polynomial_accelerationt::accelerate(
     }
   }
 
-  for (set<exprt>::iterator it = dirty.begin();
+  for (expr_sett::iterator it = dirty.begin();
        it != dirty.end();
        ++it) {
     if (accelerator.changed_vars.find(*it) != accelerator.changed_vars.end()) {
@@ -247,24 +249,26 @@ bool disjunctive_polynomial_accelerationt::fit_polynomial(
                                              polynomialt &polynomial,
                                              patht &path) {
   // These are the variables that var depends on with respect to the body.
-  set<exprt> influence = cone_of_influence(var);
   vector<expr_listt> parameters;
   set<pair<expr_listt, exprt> > coefficients;
   expr_listt exprs;
   scratch_programt program(symbol_table);
+  expr_sett influence;
+
+  cone_of_influence(var, influence);
 
 #ifdef DEBUG
   std::cout << "Fitting a polynomial for " << expr2c(var, ns) << ", which depends on:"
        << endl;
 
-  for (set<exprt>::iterator it = influence.begin();
+  for (expr_sett::iterator it = influence.begin();
        it != influence.end();
        ++it) {
     std::cout << expr2c(*it, ns) << endl;
   }
 #endif
 
-  for (set<exprt>::iterator it = influence.begin();
+  for (expr_sett::iterator it = influence.begin();
        it != influence.end();
        ++it) {
     exprs.clear();
@@ -283,7 +287,7 @@ bool disjunctive_polynomial_accelerationt::fit_polynomial(
 
   // N^2
   exprs.push_back(loop_counter);
-  //parameters.push_back(exprs);
+  parameters.push_back(exprs);
 
   // Constant
   exprs.clear();
@@ -313,7 +317,7 @@ bool disjunctive_polynomial_accelerationt::fit_polynomial(
   map<exprt, exprt> ivals2;
   map<exprt, exprt> ivals3;
 
-  for (set<exprt>::iterator it = influence.begin();
+  for (expr_sett::iterator it = influence.begin();
        it != influence.end();
        ++it) {
     symbolt ival1 = program.fresh_symbol("polynomial::init",
@@ -358,7 +362,7 @@ bool disjunctive_polynomial_accelerationt::fit_polynomial(
 
   map<exprt, exprt> values;
 
-  for (set<exprt>::iterator it = influence.begin();
+  for (expr_sett::iterator it = influence.begin();
        it != influence.end();
        ++it) {
     values[*it] = ivals1[*it];
@@ -376,7 +380,7 @@ bool disjunctive_polynomial_accelerationt::fit_polynomial(
   assert_for_values(program, values, coefficients, 1, fixed, var);
 
   for (int n = 0; n <= 1; n++) {
-    for (set<exprt>::iterator it = influence.begin();
+    for (expr_sett::iterator it = influence.begin();
          it != influence.end();
          ++it) {
       values[*it] = ivals2[*it];
@@ -389,7 +393,7 @@ bool disjunctive_polynomial_accelerationt::fit_polynomial(
     }
   }
 
-  for (set<exprt>::iterator it = influence.begin();
+  for (expr_sett::iterator it = influence.begin();
        it != influence.end();
        ++it) {
     values[*it] = ivals3[*it];
@@ -580,7 +584,7 @@ void disjunctive_polynomial_accelerationt::extract_polynomial(scratch_programt &
 }
 
 void disjunctive_polynomial_accelerationt::gather_rvalues(const exprt &expr,
-    set<exprt> &rvalues) {
+    expr_sett &rvalues) {
   if (expr.id() == ID_symbol ||
       expr.id() == ID_index ||
       expr.id() == ID_member ||
@@ -593,63 +597,15 @@ void disjunctive_polynomial_accelerationt::gather_rvalues(const exprt &expr,
   }
 }
 
-set<exprt> disjunctive_polynomial_accelerationt::cone_of_influence(
-                                                      exprt &target) {
-  set<exprt> cone;
-
-  gather_rvalues(target, cone);
-
-  for (natural_loops_mutablet::natural_loopt::iterator it = loop.begin();
-       it != loop.end();
-       ++it) {
-    goto_programt::targett t = *it;
-
-    gather_rvalues(t->guard, cone);
-
-    if (t->is_assign()) {
-      code_assignt assignment = to_code_assign(t->code);
-      gather_rvalues(assignment.rhs(), cone);
-    }
-  }
-
-  return cone;
-
-
-#if 0
-  //gather_rvalues(target, cone);
-
-  for (goto_programt::instructionst::reverse_iterator r_it = body.rbegin();
-       r_it != body.rend();
-       ++r_it) {
-    if (r_it->is_assign()) {
-      // XXX -- this doesn't work if the assignment is not to a symbol, e.g.
-      // A[i] = 0;
-      // or
-      // *p = x;
-      code_assignt assignment = to_code_assign(r_it->code);
-      set<exprt> lhs_syms;
-
-      //gather_rvalues(assignment.lhs(), lhs_syms);
-
-      for (set<exprt>::iterator s_it = lhs_syms.begin();
-           s_it != lhs_syms.end();
-           ++s_it) {
-        if (cone.find(*s_it) != cone.end()) {
-          // We're assigning to something in the cone of influence -- expand the
-          // cone.
-          //gather_rvalues(assignment.rhs(), cone);
-          break;
-        }
-      }
-    }
-  }
-
-  return cone;
-#endif
+void disjunctive_polynomial_accelerationt::cone_of_influence(
+    const exprt &target,
+    expr_sett &cone) {
+  cone_of_influencet influence(fixed, symbol_table);
+  influence.cone_of_influence(target, cone);
 }
 
 void disjunctive_polynomial_accelerationt::find_modified(goto_programt &body,
-    set<exprt> &modified) {
+    expr_sett &modified) {
   for (goto_programt::instructionst::iterator it = body.instructions.begin();
        it != body.instructions.end();
        ++it) {
@@ -658,7 +614,7 @@ void disjunctive_polynomial_accelerationt::find_modified(goto_programt &body,
 }
 
 void disjunctive_polynomial_accelerationt::find_modified(patht &path,
-    set<exprt> &modified) {
+    expr_sett &modified) {
   for (patht::iterator it = path.begin();
        it != path.end();
        ++it) {
@@ -668,7 +624,7 @@ void disjunctive_polynomial_accelerationt::find_modified(patht &path,
 
 void disjunctive_polynomial_accelerationt::find_modified(
     natural_loops_mutablet::natural_loopt &loop,
-    set<exprt> &modified) {
+    expr_sett &modified) {
   for (natural_loops_mutablet::natural_loopt::iterator it = loop.begin();
        it != loop.end();
        ++it) {
@@ -677,7 +633,7 @@ void disjunctive_polynomial_accelerationt::find_modified(
 }
 
 void disjunctive_polynomial_accelerationt::find_modified(goto_programt::targett t,
-  set<exprt> &modified) {
+  expr_sett &modified) {
   if (t->is_assign()) {
     code_assignt assignment = to_code_assign(t->code);
     modified.insert(assignment.lhs());
@@ -756,7 +712,7 @@ void disjunctive_polynomial_accelerationt::stash_polynomials(
     map<exprt, polynomialt> &polynomials,
     substitutiont &substitution,
     patht &path) {
-  set<exprt> modified;
+  expr_sett modified;
 
   find_modified(path, modified);
   stash_variables(program, modified, substitution);
@@ -769,11 +725,11 @@ void disjunctive_polynomial_accelerationt::stash_polynomials(
 }
 
 void disjunctive_polynomial_accelerationt::stash_variables(scratch_programt &program,
-                                              set<exprt> modified,
+                                              expr_sett modified,
                                               substitutiont &substitution) {
   find_symbols_sett vars;
 
-  for (set<exprt>::iterator it = modified.begin();
+  for (expr_sett::iterator it = modified.begin();
        it != modified.end();
        ++it) {
     find_symbols(*it, vars);
@@ -953,13 +909,23 @@ void disjunctive_polynomial_accelerationt::ensure_no_overflows(goto_programt &pr
   goto_functionst::goto_functiont fn;
   fn.body.instructions.swap(program.instructions);
 
+#ifdef DEBUG
+  time_t now = time(0);
+  std::cout << "Adding overflow checks at " << now << "..." << std::endl;
+#endif
+
   goto_check(ns, checker_options, fn);
   fn.body.instructions.swap(program.instructions);
+
+#ifdef DEBUG
+  now = time(0);
+  std::cout << "Done at " << now << "." << std::endl;
+#endif
 }
 
 disjunctive_polynomial_accelerationt::expr_pairst disjunctive_polynomial_accelerationt::gather_array_assignments(
     goto_programt::instructionst &loop_body,
-    set<exprt> &arrays_written) {
+    expr_sett &arrays_written) {
   expr_pairst assignments;
 
   for (goto_programt::instructionst::reverse_iterator r_it = loop_body.rbegin();
@@ -1001,7 +967,7 @@ bool disjunctive_polynomial_accelerationt::do_arrays(goto_programt::instructions
   std::cout << "Doing arrays..." << endl;
 #endif
 
-  set<exprt> arrays_written;
+  expr_sett arrays_written;
   expr_pairst array_assignments;
   
   array_assignments = gather_array_assignments(loop_body, arrays_written);
@@ -1029,7 +995,7 @@ bool disjunctive_polynomial_accelerationt::do_arrays(goto_programt::instructions
   }
 
   // First make all written-to arrays nondeterministic.
-  for (set<exprt>::iterator it = arrays_written.begin();
+  for (expr_sett::iterator it = arrays_written.begin();
        it != arrays_written.end();
        ++it) {
     program.assign(*it, side_effect_expr_nondett(it->type()));
@@ -1074,7 +1040,7 @@ bool disjunctive_polynomial_accelerationt::do_arrays(goto_programt::instructions
 
   // Now have to encode that the array doesn't change at indices we didn't
   // touch.
-  for (set<exprt>::iterator a_it = arrays_written.begin();
+  for (expr_sett::iterator a_it = arrays_written.begin();
        a_it != arrays_written.end();
        ++a_it) {
     exprt array = *a_it;
