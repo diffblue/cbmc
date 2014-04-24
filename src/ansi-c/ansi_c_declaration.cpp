@@ -41,12 +41,15 @@ Function: ansi_c_declarationt::to_symbol
 void ansi_c_declarationt::to_symbol(symbolt &symbol) const
 {
   symbol.clear();    
-  symbol.location=location();
   symbol.value=value();
   symbol.type=type();
   symbol.name="c::"+id2string(get_name());
   symbol.base_name=get_base_name();
   symbol.is_type=get_is_type();
+  if(symbol.is_type)
+    symbol.location=symbol.type.location();
+  else
+    symbol.location=location();
   symbol.is_extern=get_is_extern();
   symbol.is_macro=get_is_macro();
   symbol.is_parameter=get_is_parameter();
