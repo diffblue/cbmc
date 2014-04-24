@@ -837,24 +837,10 @@ goto_programt::const_targett goto_program2codet::convert_return(
   code_returnt ret=to_code_return(target->code);
 
   // catch the specific case where the original code was missing a return
-  // statement to avoid NONDET() in output when the instruction is dead anyway
   if(ret.has_return_value() &&
      ret.return_value().id()==ID_sideeffect &&
      to_side_effect_expr(ret.return_value()).get_statement()==ID_nondet)
-  {
-    const cfg_dominatorst &dominators=loops.get_dominator_info();
-    cfg_dominatorst::node_mapt::const_iterator i_entry=
-      dominators.node_map.find(target);
-    assert(i_entry!=dominators.node_map.end());
-    const cfg_dominatorst::nodet &n=i_entry->second;
-
-    if(n.dominators.empty())
-    {
-      if(target->is_target())
-        dest.copy_to_operands(code_skipt());
-      return target;
-    }
-  }
+    return target;
   else if(ret.has_return_value() &&
           (ret.return_value().id()==ID_vector ||
            ret.return_value().id()==ID_array))
