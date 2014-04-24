@@ -3745,7 +3745,11 @@ std::string expr2ct::convert_code_switch_case(
     labels_string+=":\n";
   }
 
-  std::string tmp=convert_code(src.code(), indent+2);
+  unsigned next_indent=indent;
+  if(src.code().get_statement()!=ID_block &&
+     src.code().get_statement()!=ID_switch_case)
+    next_indent+=2;
+  std::string tmp=convert_code(src.code(), next_indent);
 
   return labels_string+tmp;
 }
