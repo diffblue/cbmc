@@ -1067,7 +1067,26 @@ goto_programt::const_targett goto_program2codet::convert_goto_while(
     w.body().move_to_operands(i);
   }
 
+  if(w.body().has_operands() &&
+     to_code(w.body().operands().back()).get_statement()==ID_assign)
+  {
+    code_fort f;
+
+    f.init().make_nil();
+
+    f.cond()=w.cond();
+
+    f.iter()=w.body().operands().back();
+    w.body().operands().pop_back();
+    f.iter().id(ID_sideeffect);
+
+    f.body().swap(w.body());
+
+    f.swap(w);
+  }
+
   dest.move_to_operands(w);
+
   return target;
 }
 
