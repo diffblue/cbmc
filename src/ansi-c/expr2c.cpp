@@ -2921,7 +2921,7 @@ std::string expr2ct::convert_code_switch(
   dest+=")\n";
 
   dest+=indent_str(indent);
-  dest+="{\n";
+  dest+="{";
 
   forall_operands(it, src)
   {

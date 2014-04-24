@@ -63,6 +63,26 @@ class goto_program2codet
   typedef std::map<goto_programt::const_targett, goto_programt::const_targett> loopt;
   typedef hash_map_cont<irep_idt, irep_idt, irep_id_hash> tag_mapt;
   typedef hash_map_cont<irep_idt, unsigned, irep_id_hash> dead_mapt;
+  typedef std::list<std::pair<goto_programt::const_targett, bool> >
+    loop_last_stackt;
+
+  struct caset
+  {
+    const exprt value; // condition upon which this case is taken
+    goto_programt::const_targett case_selector; // branching from ...
+    goto_programt::const_targett case_start; // ... to
+    goto_programt::const_targett case_last; // last instruction of case
+
+    caset(const goto_programt &goto_program,
+          const exprt &v,
+          goto_programt::const_targett sel,
+          goto_programt::const_targett st):
+      value(v), case_selector(sel), case_start(st),
+      case_last(goto_program.instructions.end())
+    {
+    }
+  };
+  typedef std::list<caset> cases_listt;
 
 public:
   goto_program2codet(
@@ -101,6 +121,7 @@ protected:
   tag_mapt reverse_tag_map;
   id_sett expanded_symbols;
   dead_mapt dead_map;
+  loop_last_stackt loop_last_stack;
 
   void build_loop_map();
   void build_dead_map();
@@ -173,6 +194,10 @@ protected:
   goto_programt::const_targett convert_goto_if(
       goto_programt::const_targett target,
       goto_programt::const_targett upper_bound,
+      codet &dest);
+
+  goto_programt::const_targett convert_goto_break_continue(
+      goto_programt::const_targett target,
       codet &dest);
 
   goto_programt::const_targett convert_goto_goto(
@@ -932,8 +957,12 @@ goto_programt::const_targett goto_program2codet::convert_do_while(
   simplify(d.cond(), ns);
   d.body()=code_blockt();
 
+  loop_last_stack.push_back(std::make_pair(loop_end, true));
+
   for( ; target!=loop_end; ++target)
     target=convert_instruction(target, loop_end, d.body());
+
+  loop_last_stack.pop_back();
 
   convert_labels(loop_end, d.body());
 
@@ -970,6 +999,8 @@ goto_programt::const_targett goto_program2codet::convert_goto(
     return convert_goto_while(target, loop_entry->second, dest);
   else if(!target->guard.is_true())
     return convert_goto_switch(target, upper_bound, dest);
+  else if(!loop_last_stack.empty())
+    return convert_goto_break_continue(target, dest);
   else
     return convert_goto_goto(target, dest);
 }
@@ -1006,14 +1037,23 @@ goto_programt::const_targett goto_program2codet::convert_goto_while(
     w.cond()=not_exprt(target->guard);
     simplify(w.cond(), ns);
   }
+  else if(target->guard.is_true())
+  {
+    w.cond()=true_exprt();
+    target=convert_goto_goto(target, w.body());
+  }
   else
   {
     w.cond()=true_exprt();
-    convert_goto_goto(target, w.body());
+    target=convert_goto_switch(target, loop_end, w.body());
   }
+
+  loop_last_stack.push_back(std::make_pair(loop_end, true));
 
   for(++target; target!=loop_end; ++target)
     target=convert_instruction(target, loop_end, w.body());
+
+  loop_last_stack.pop_back();
 
   convert_labels(loop_end, w.body());
   if(!loop_end->guard.is_true())
@@ -1049,9 +1089,12 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
     codet &dest)
 {
   // try to figure out whether this was a switch/case
+  exprt eq_cand=target->guard;
+  if(eq_cand.id()==ID_or) eq_cand=eq_cand.op0();
+
   if(target->is_backwards_goto() ||
-     target->guard.id()!=ID_equal ||
-     !skip_typecast(to_equal_expr(target->guard).rhs()).is_constant())
+     eq_cand.id()!=ID_equal ||
+     !skip_typecast(to_equal_expr(eq_cand).rhs()).is_constant())
     return convert_goto_if(target, upper_bound, dest);
 
   const cfg_dominatorst &dominators=loops.get_dominator_info();
@@ -1065,9 +1108,8 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
     return convert_goto_if(target, upper_bound, dest);
 
   // maybe, let's try some more
-  const equal_exprt &e1=to_equal_expr(target->guard);
   code_switcht s;
-  s.value()=e1.lhs();
+  s.value()=to_equal_expr(eq_cand).lhs();
   s.body()=code_blockt();
 
   // find the cases or fall back to convert_goto_if
@@ -1075,11 +1117,10 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
   goto_programt::const_targett last_target=goto_program.instructions.end();
   std::set<goto_programt::const_targett> unique_targets;
 
-  // list of <branch conditions, branch instruction, branch target>
-  typedef std::list<std::pair<exprt, std::pair<
-    goto_programt::const_targett,
-    goto_programt::const_targett> > > cases_listt;
   cases_listt cases;
+  goto_programt::const_targett default_target=
+    goto_program.instructions.end();
+
   goto_programt::const_targett cases_it=target;
   for( ;
       cases_it!=upper_bound && cases_it!=first_target;
@@ -1089,7 +1130,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
        !cases_it->is_backwards_goto() &&
        cases_it->guard.is_true())
     {
-      goto_programt::const_targett default_target=cases_it->get_target();
+      default_target=cases_it->get_target();
 
       if(first_target==goto_program.instructions.end() ||
          first_target->location_number > default_target->location_number)
@@ -1098,9 +1139,11 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
          last_target->location_number < default_target->location_number)
         last_target=default_target;
 
-      cases.push_back(std::make_pair(nil_exprt(),
-                                     std::make_pair(cases_it,
-                                                    default_target)));
+      cases.push_back(caset(
+          goto_program,
+          nil_exprt(),
+          cases_it,
+          default_target));
       unique_targets.insert(default_target);
 
       ++cases_it;
@@ -1108,38 +1151,64 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
     }
     else if(cases_it->is_goto() &&
             !cases_it->is_backwards_goto() &&
-            cases_it->guard.id()==ID_equal &&
-            skip_typecast(to_equal_expr(cases_it->guard).rhs()).is_constant() &&
-            s.value()==to_equal_expr(cases_it->guard).lhs())
+            (cases_it->guard.id()==ID_equal ||
+             cases_it->guard.id()==ID_or))
     {
-      cases.push_back(std::make_pair(to_equal_expr(cases_it->guard).rhs(),
-                                     std::make_pair(cases_it,
-                                                    cases_it->get_target())));
-      assert(cases.back().first.is_not_nil());
+      exprt::operandst eqs;
+      if(cases_it->guard.id()==ID_equal)
+        eqs.push_back(cases_it->guard);
+      else
+        eqs=cases_it->guard.operands();
 
-      if(first_target==goto_program.instructions.end() ||
-         first_target->location_number > cases.back().second.second->location_number)
-        first_target=cases.back().second.second;
-      if(last_target==goto_program.instructions.end() ||
-         last_target->location_number < cases.back().second.second->location_number)
-        last_target=cases.back().second.second;
+      // goto conversion builds disjunctions in reverse order
+      // to ensure convergence, we turn this around again
+      for(exprt::operandst::const_reverse_iterator
+          e_it=eqs.rbegin();
+          e_it!=eqs.rend();
+          ++e_it)
+      {
+        if(e_it->id()!=ID_equal ||
+           !skip_typecast(to_equal_expr(*e_it).rhs()).is_constant() ||
+           s.value()!=to_equal_expr(*e_it).lhs())
+          return convert_goto_if(target, upper_bound, dest);
 
-      unique_targets.insert(cases.back().second.second);
+        cases.push_back(caset(
+            goto_program,
+            to_equal_expr(*e_it).rhs(),
+            cases_it,
+            cases_it->get_target()));
+        assert(cases.back().value.is_not_nil());
+
+        if(first_target==goto_program.instructions.end() ||
+           first_target->location_number > cases.back().case_start->location_number)
+          first_target=cases.back().case_start;
+        if(last_target==goto_program.instructions.end() ||
+           last_target->location_number < cases.back().case_start->location_number)
+          last_target=cases.back().case_start;
+
+        unique_targets.insert(cases.back().case_start);
+      }
     }
     else
       return convert_goto_if(target, upper_bound, dest);
   }
 
-  // make sure we don't have some overlap of gotos and switch/case
-  if(cases_it==upper_bound ||
-     (upper_bound!=goto_program.instructions.end() &&
-      upper_bound->location_number < last_target->location_number))
-    return convert_goto_if(target, upper_bound, dest);
-
   // if there are less than 3 targets, we revert to if/else instead; this should
   // help convergence
   if(unique_targets.size()<3)
     return convert_goto_if(target, upper_bound, dest);
+
+  // make sure we don't have some overlap of gotos and switch/case
+  if(cases_it==upper_bound ||
+     (upper_bound!=goto_program.instructions.end() &&
+      upper_bound->location_number < last_target->location_number) ||
+     (last_target!=goto_program.instructions.end() &&
+      last_target->location_number > default_target->location_number) ||
+     target->get_target()==default_target)
+    return convert_goto_if(target, upper_bound, dest);
+
+  // backup the top-level block as we might have to backtrack
+  code_blockt toplevel_block_bak=toplevel_block;
 
   // add any instructions that go in the body of the switch before any cases
   goto_programt::const_targett orig_target=target;
@@ -1147,50 +1216,22 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
     target=convert_instruction(target, first_target, s.body());
 
   std::set<unsigned> processed_locations;
-  goto_programt::const_targett max_target=target;
   std::map<goto_programt::const_targett, unsigned> targets_done;
 
-  // iterate over all <branch conditions, branch instruction, branch target>
-  // triples, build their corresponding code
-  for(cases_listt::const_iterator it=cases.begin();
+  // iterate over all cases to identify block end points
+  for(cases_listt::iterator it=cases.begin();
       it!=cases.end();
       ++it)
   {
-    code_switch_caset csc;
-    // branch condition is nil_exprt for default case;
-    if(it->first.is_nil())
-      csc.set_default();
-    else
-      csc.case_op()=it->first;
-
     // some branch targets may be shared by multiple branch instructions,
     // as in case 1: case 2: code; we build a nested code_switch_caset
-    if(targets_done.find(it->second.second)!=targets_done.end())
-    {
-      assert(!it->second.first->is_target());
-
-      // maintain the order to ensure convergence -> go to the innermost
-      code_switch_caset *cscp=&to_code_switch_case(
-        to_code(s.body().operands()[targets_done[it->second.second]]));
-      while(cscp->code().get_statement()==ID_switch_case)
-        cscp=&to_code_switch_case(cscp->code());
-
-      csc.code().swap(cscp->code());
-      cscp->code().swap(csc);
-
+    if(targets_done.find(it->case_start)!=targets_done.end())
       continue;
-    }
-
-    code_blockt c;
-    if(it->second.first!=orig_target)
-      convert_labels(it->second.first, c);
 
     // compute the block that belongs to this case
-    target=it->second.second;
-    goto_programt::const_targett case_end=target;
-    goto_programt::const_targett last_non_dead=target;
-    for( ;
+    for(goto_programt::const_targett case_end=it->case_start;
         case_end!=goto_program.instructions.end() &&
+        case_end->type!=END_FUNCTION &&
         case_end!=upper_bound;
         ++case_end)
     {
@@ -1205,32 +1246,144 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
 
       // is this instruction dominated by at least one of the cases
       bool some_goto_dom=
-        n.dominators.find(it->second.first)!=n.dominators.end();
+        n.dominators.find(it->case_selector)!=n.dominators.end();
       for(cases_listt::const_iterator it2=cases.begin();
           it2!=it && !some_goto_dom;
           ++it2)
-        some_goto_dom=n.dominators.find(it2->second.first)!=n.dominators.end();
+        some_goto_dom=
+          n.dominators.find(it2->case_selector)!=n.dominators.end();
 
-      // this still kills some legitimate cases; in this case we will drop back
-      // to convert_goto_if in the check we do below on processed_locations
-      if(n.dominators.find(target)==n.dominators.end() || !some_goto_dom)
-        break;
+      // for code that has jumps into one of the cases from outside the
+      // switch/case we better use convert_goto_if
+      if(n.dominators.find(it->case_start)==n.dominators.end() ||
+         !some_goto_dom)
+      {
+        toplevel_block.swap(toplevel_block_bak);
+        return convert_goto_if(orig_target, upper_bound, dest);
+      }
       else if(!processed_locations.insert(case_end->location_number).second)
         assert(false);
 
-      last_non_dead=case_end;
-      ++last_non_dead;
+      it->case_last=case_end;
     }
-    case_end=last_non_dead;
+
+    targets_done[it->case_start]=1;
+  }
+
+  // figure out whether we really had a default target by testing
+  // whether all cases eventually jump to the default case
+  for(cases_listt::const_iterator it=cases.begin();
+      it!=cases.end();
+      ++it)
+  {
+    // ignore empty cases
+    if(it->case_last==goto_program.instructions.end()) continue;
+
+    // the last case before default is the most interesting
+    cases_listt::const_iterator last=--cases.end();
+    if(last->case_start==default_target &&
+       it==--last)
+    {
+      // ignore dead instructions for the following checks
+      goto_programt::const_targett next_case=it->case_last;
+      for(++next_case;
+          next_case!=goto_program.instructions.end();
+          ++next_case)
+      {
+        cfg_dominatorst::node_mapt::const_iterator i_entry=
+          dominators.node_map.find(next_case);
+        assert(i_entry!=dominators.node_map.end());
+        const cfg_dominatorst::nodet &n=i_entry->second;
+
+        if(!n.dominators.empty())
+          break;
+      }
+
+      if(next_case!=goto_program.instructions.end() &&
+         next_case==default_target &&
+         (!it->case_last->is_goto() ||
+          (it->case_last->guard.is_true() &&
+           it->case_last->get_target()==default_target)))
+      {
+        // if there is no goto here, yet we got here, all others would
+        // branch to this - we don't need default
+        cases.pop_back();
+        default_target=goto_program.instructions.end();
+      }
+    }
+
+    // jumps to default are ok
+    if(it->case_last->is_goto() &&
+       it->case_last->guard.is_true() &&
+       it->case_last->get_target()==default_target)
+      continue;
+
+    // fall-through is ok
+    if(!it->case_last->is_goto()) continue;
+
+    break;
+  }
+
+  // find the last instruction belonging to any of the cases
+  goto_programt::const_targett max_target=target;
+  for(cases_listt::const_iterator it=cases.begin();
+      it!=cases.end();
+      ++it)
+    if(it->case_last!=goto_program.instructions.end() &&
+       it->case_last->location_number > max_target->location_number)
+      max_target=it->case_last;
+
+  targets_done.clear();
+  loop_last_stack.push_back(std::make_pair(max_target, false));
+
+  // iterate over all <branch conditions, branch instruction, branch target>
+  // triples, build their corresponding code
+  for(cases_listt::const_iterator it=cases.begin();
+      it!=cases.end();
+      ++it)
+  {
+    code_switch_caset csc;
+    // branch condition is nil_exprt for default case;
+    if(it->value.is_nil())
+      csc.set_default();
+    else
+      csc.case_op()=it->value;
+
+    // some branch targets may be shared by multiple branch instructions,
+    // as in case 1: case 2: code; we build a nested code_switch_caset
+    if(targets_done.find(it->case_start)!=targets_done.end())
+    {
+      assert(it->case_selector==orig_target ||
+             !it->case_selector->is_target());
+
+      // maintain the order to ensure convergence -> go to the innermost
+      code_switch_caset *cscp=&to_code_switch_case(
+        to_code(s.body().operands()[targets_done[it->case_start]]));
+      while(cscp->code().get_statement()==ID_switch_case)
+        cscp=&to_code_switch_case(cscp->code());
+
+      csc.code().swap(cscp->code());
+      cscp->code().swap(csc);
+
+      continue;
+    }
+
+    code_blockt c;
+    if(it->case_selector!=orig_target)
+      convert_labels(it->case_selector, c);
+
+    // convert the block that belongs to this case
+    target=it->case_start;
 
     // empty case
-    if(case_end==target)
+    if(it->case_last==goto_program.instructions.end())
     {
       // only emit the jump out of the switch if it's not the last case
       // this improves convergence
       if(it!=--cases.end())
       {
-        goto_programt::instructiont i=*(it->second.first);
+        assert(false);
+        goto_programt::instructiont i=*(it->case_selector);
         i.guard=true_exprt();
         goto_programt tmp;
         tmp.insert_before_swap(tmp.insert_before(tmp.instructions.end()), i);
@@ -1239,16 +1392,18 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
     }
     else
     {
-      for( ; target!=case_end; ++target)
-        target=convert_instruction(target, case_end, c);
-      if((--case_end)->location_number > max_target->location_number)
-        max_target=case_end;
+      goto_programt::const_targett after_last=it->case_last;
+      ++after_last;
+      for( ; target!=after_last; ++target)
+        target=convert_instruction(target, after_last, c);
     }
 
     csc.code().swap(c);
-    targets_done[it->second.second]=s.body().operands().size();
+    targets_done[it->case_start]=s.body().operands().size();
     s.body().move_to_operands(csc);
   }
+
+  loop_last_stack.pop_back();
 
   // make sure we didn't miss any non-dead instruction
   for(goto_programt::const_targett it=first_target;
@@ -1263,7 +1418,10 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
       const cfg_dominatorst::nodet &n=it_entry->second;
 
       if(!n.dominators.empty())
+      {
+        toplevel_block.swap(toplevel_block_bak);
         return convert_goto_if(orig_target, upper_bound, dest);
+      }
     }
 
   dest.move_to_operands(s);
@@ -1308,7 +1466,9 @@ goto_programt::const_targett goto_program2codet::convert_goto_if(
 
     has_else=before_else->is_goto() &&
       before_else->get_target()->location_number > end_if->location_number &&
-      before_else->guard.is_true();
+      before_else->guard.is_true() &&
+      (upper_bound==goto_program.instructions.end() ||
+       upper_bound->location_number >= before_else->get_target()->location_number);
 
     if(has_else)
       end_if=before_else->get_target();
@@ -1349,6 +1509,62 @@ goto_programt::const_targett goto_program2codet::convert_goto_if(
 
 /*******************************************************************\
 
+Function: goto_program2codet::convert_goto_break_continue
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
+goto_programt::const_targett goto_program2codet::convert_goto_break_continue(
+    goto_programt::const_targett target,
+    codet &dest)
+{
+  assert(!loop_last_stack.empty());
+  assert(target->guard.is_true());
+
+  goto_programt::const_targett loop_end=loop_last_stack.back().first;
+
+  if(target->get_target()==loop_end &&
+     loop_last_stack.back().second)
+  {
+    code_continuet cont;
+    dest.move_to_operands(cont);
+
+    return target;
+  }
+
+  const cfg_dominatorst &dominators=loops.get_dominator_info();
+  goto_programt::const_targett after_loop=loop_end;
+  for(++after_loop;
+      after_loop!=goto_program.instructions.end();
+      ++after_loop)
+  {
+    cfg_dominatorst::node_mapt::const_iterator i_entry=
+      dominators.node_map.find(after_loop);
+    assert(i_entry!=dominators.node_map.end());
+    const cfg_dominatorst::nodet &n=i_entry->second;
+
+    if(!n.dominators.empty())
+      break;
+  }
+
+  if(target->get_target()==after_loop)
+  {
+    code_breakt brk;
+    dest.move_to_operands(brk);
+
+    return target;
+  }
+
+  return convert_goto_goto(target, dest);
+}
+
+/*******************************************************************\
+
 Function: goto_program2codet::convert_goto_goto
 
 Inputs:
@@ -1367,6 +1583,17 @@ goto_programt::const_targett goto_program2codet::convert_goto_goto(
   goto_programt::const_targett next=target;
   ++next;
   if(target->get_target()==next)
+    return target;
+
+  const cfg_dominatorst &dominators=loops.get_dominator_info();
+  cfg_dominatorst::node_mapt::const_iterator it_entry=
+    dominators.node_map.find(target);
+  assert(it_entry!=dominators.node_map.end());
+  const cfg_dominatorst::nodet &n=it_entry->second;
+
+  // skip dead goto L as the label might be skipped if it is dead
+  // as well and at the end of a case block
+  if(n.dominators.empty())
     return target;
 
   std::stringstream label;
