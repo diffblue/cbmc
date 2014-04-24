@@ -828,6 +828,23 @@ exprt c_typecheck_baset::do_initializer_list(
       // start with zero everywhere
       result=zero_initializer(type, value.location(), *this, get_message_handler());
     }
+
+    // 6.7.9, 14: An array of character type may be initialized by a character
+    // string literal or UTF−8 string literal, optionally enclosed in braces.
+    if(value.operands().size()>=1 &&
+       value.op0().id()==ID_string_constant &&
+       (type.subtype().id()==ID_signedbv ||
+        type.subtype().id()==ID_unsignedbv) &&
+       type.subtype().get(ID_width)==char_type().get(ID_width))
+    {
+      if(value.operands().size()>1)
+      {
+        err_location(value);
+        warning("ignoring excess operands");
+      }
+
+      return do_initializer_rec(value.op0(), type, force_constant);
+    }
   }
   else
   {
