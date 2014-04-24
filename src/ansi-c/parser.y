@@ -2568,6 +2568,14 @@ KnR_sue_declaration_specifier:
           merge_types($$, $1);
           merge_types($$, $4); // type attribute
         }
+        | KnR_declaration_qualifier_list enum_key identifier_or_typedef_name gcc_type_attribute_opt
+        {
+          do_tag($2, $3);
+          $$=$3;
+          // type attributes
+          merge_types($$, $1);
+          merge_types($$, $4); // type attribute
+        }
         ;
 
         /* The following is stripped down because of conflicts due to gcc type attributes! */
