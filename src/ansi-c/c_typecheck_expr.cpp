@@ -1400,6 +1400,21 @@ void c_typecheck_baset::typecheck_expr_rel(exprt &expr)
   }
   else
   {
+    // pointer and zero
+    if(type0.id()==ID_pointer &&
+       simplify_expr(op1, *this).is_zero())
+    {
+      op1=constant_exprt(ID_NULL, type0);
+      return;
+    }
+
+    if(type1.id()==ID_pointer &&
+       simplify_expr(op0, *this).is_zero())
+    {
+      op0=constant_exprt(ID_NULL, type1);
+      return;
+    }
+
     // pointer and integer
     if(type0.id()==ID_pointer && is_number(type1))
     {
