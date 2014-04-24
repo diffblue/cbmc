@@ -11,7 +11,7 @@ int main()
 
   // zero initialization
   assert(some_int_array[1]==0); 
-//  if(i>=0 && i<10) assert(some_int_array[i]==0);
+  if(i>=0 && i<10) assert(some_int_array[i]==0);
 
   some_int_array[5]=5;
   assert(some_int_array[1]==0); 
