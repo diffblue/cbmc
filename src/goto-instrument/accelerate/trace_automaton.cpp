@@ -28,15 +28,10 @@ void trace_automatont::build() {
 /*
  * Build the trace automaton alphabet.
  *
- * The alphabet is the set of basic block headers, i.e.
- * any location with more than one predecessor.
+ * The alphabet is the set of distinguishing points, i.e. the
+ * successors of any location with multiple successors.
  */
 void trace_automatont::build_alphabet(goto_programt &program) {
-  alphabett seen;
-
-  // Loop over each instruction in the program & see which successors
-  // the instruction has.  If we encounter a successor we've already seen,
-  // that location has multiple predecessors & so is a basic block header.
   for (goto_programt::targett it = program.instructions.begin();
        it != program.instructions.end();
        ++it) {
@@ -44,19 +39,8 @@ void trace_automatont::build_alphabet(goto_programt &program) {
 
     program.get_successors(it, succs);
 
-    for (goto_programt::targetst::iterator jt = succs.begin();
-         jt != succs.end();
-         ++jt) {
-      if (seen.find(*jt) != seen.end()) {
-        // We've seen this location before.  Add it to the alphabet.
-        //alphabet.insert(*jt);
-      }
-
-      if (succs.size() > 1) {
-        alphabet.insert(*jt);
-      }
-
-      seen.insert(*jt);
+    if (succs.size() > 1) {
+      alphabet.insert(succs.begin(), succs.end());
     }
   }
 }
@@ -147,6 +131,10 @@ void trace_automatont::determinise() {
     for (alphabett::iterator it = alphabet.begin();
          it != alphabet.end();
          ++it) {
+      if (*it == epsilon) {
+        continue;
+      }
+
       state_sett u;
 
       nta.move (t, *it, u);
