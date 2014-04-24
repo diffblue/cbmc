@@ -2299,6 +2299,8 @@ void goto_program2codet::cleanup_expr(exprt &expr)
       expr.swap(call);
     }
   }
+  else if(expr.id()==ID_isnan)
+    system_headers.insert("math.h");
 }
 
 class goto2sourcet

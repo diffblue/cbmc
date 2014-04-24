@@ -2468,7 +2468,8 @@ std::string expr2ct::convert_initializer_list(
   const exprt &src,
   unsigned &precedence)
 {
-  std::string dest="{ ";
+  std::string dest;
+  if(src.id()!=ID_compound_literal) dest+="{ ";
 
   forall_operands(it, src)
   {
@@ -2483,7 +2484,7 @@ std::string expr2ct::convert_initializer_list(
     dest+=tmp;
   }
 
-  dest+=" }";
+  if(src.id()!=ID_compound_literal) dest+=" }";
 
   return dest;
 }
@@ -4326,7 +4327,8 @@ std::string expr2ct::convert(
   else if(src.id()==ID_extractbits)
     return convert_extractbits(src, precedence);
 
-  else if(src.id()==ID_initializer_list)
+  else if(src.id()==ID_initializer_list ||
+          src.id()==ID_compound_literal)
     return convert_initializer_list(src, precedence=15);
 
   else if(src.id()==ID_designated_initializer)
