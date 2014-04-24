@@ -392,7 +392,8 @@ std::string expr2ct::convert_rec(
     // The star gets attached to the declarator.
     std::string new_declarator="*";
 
-    if(q!="" && !declarator.empty())
+    if(q!="" &&
+       (!declarator.empty() || src.subtype().id()==ID_pointer))
       new_declarator+=" "+q;
     
     new_declarator+=declarator;

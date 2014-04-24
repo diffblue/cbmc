@@ -107,6 +107,27 @@ bool c_typecheck_baset::gcc_types_compatible_p(
     return gcc_types_compatible_p(type1.subtype(), type2.subtype());
   else if(type1.id()==ID_array && type2.id()==ID_array)
     return gcc_types_compatible_p(type1.subtype(), type2.subtype()); // ignore size
+  else if(type1.id()==ID_code && type2.id()==ID_code)
+  {
+    const code_typet &c_type1=to_code_type(type1);
+    const code_typet &c_type2=to_code_type(type2);
+
+    if(!gcc_types_compatible_p(
+        c_type1.return_type(),
+        c_type2.return_type()))
+      return false;
+
+    if(c_type1.parameters().size()!=c_type2.parameters().size())
+      return false;
+
+    for(std::size_t i=0; i<c_type1.parameters().size(); i++)
+      if(!gcc_types_compatible_p(
+          c_type1.parameters()[i].type(),
+          c_type2.parameters()[i].type()))
+        return false;
+
+    return true;
+  }
   else
   {
     if(type1==type2)
