@@ -3081,7 +3081,9 @@ std::string expr2ct::convert_code_for(
   else
   {
     dest+=")\n";
-    dest+=convert_code(src.body(), indent+2);
+    dest+=convert_code(
+        src.body(),
+        src.body().get_statement()==ID_block ? indent : indent+2);
   }
 
   return dest;
