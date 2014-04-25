@@ -57,10 +57,6 @@ class acceleratet {
                           path_acceleratort &accelerator,
                           subsumed_patht &subsumed);
 
-  void make_overflow_loc(goto_programt::targett loop_header,
-                         goto_programt::targett &loop_end,
-                         goto_programt::targett &overflow_loc);
-
   void insert_automaton(trace_automatont &automaton);
   void build_state_machine(trace_automatont::sym_mapt::iterator p,
                            trace_automatont::sym_mapt::iterator end,

@@ -104,7 +104,7 @@ class disjunctive_polynomial_accelerationt : public loop_accelerationt {
 
   void gather_rvalues(const exprt &expr, expr_sett &rvalues);
 
-  void ensure_no_overflows(scratch_programt &program);
+  void ensure_no_overflows(goto_programt &program);
 
   void find_distinguishing_points();
   void find_modified(patht &path, expr_sett &modified);

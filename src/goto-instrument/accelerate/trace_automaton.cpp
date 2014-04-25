@@ -73,13 +73,9 @@ void trace_automatont::add_path(patht &path) {
        it != path.end();
        ++it) {
     goto_programt::targett l = it->loc;
-#ifdef DEBUG
-      std::cout << ", " << l->location_number << ":" << l->location;
-#endif
-
     if (in_alphabet(l)) {
 #ifdef DEBUG
-      std::cout << "(*) ";
+      std::cout << l->location_number << ":" << l->location << ", ";
 #endif
 
       statet new_state = nta.add_state();
