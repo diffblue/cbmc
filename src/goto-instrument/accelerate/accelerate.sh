@@ -27,6 +27,6 @@ $goto_instrument --accelerate $ofile $accfile
 $cbmc --unwind 2 $cbmcargs $accfile
 retcode=$?
 
-#rm $ofile $accfile
+rm $ofile $accfile
 
 exit $retcode

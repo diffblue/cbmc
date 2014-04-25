@@ -34,7 +34,6 @@
 #include "accelerator.h"
 #include "util.h"
 #include "cone_of_influence.h"
-#include "overflow_instrumenter.h"
 
 //#define DEBUG
 
@@ -428,10 +427,10 @@ bool disjunctive_polynomial_accelerationt::fit_polynomial(
     program.assume(new_path);
   }
 
-  ensure_no_overflows(program);
-
   // Now do an ASSERT(false) to grab a counterexample
   program.add_instruction(ASSERT)->guard = false_exprt();
+
+  ensure_no_overflows(program);
 
   // If the path is satisfiable, we've fitted a polynomial.  Extract the
   // relevant coefficients and return the expression.
@@ -676,13 +675,13 @@ bool disjunctive_polynomial_accelerationt::check_inductive(map<exprt, polynomial
                                         plus_exprt(loop_counter, from_integer(1, loop_counter.type())));
   program.add_instruction(ASSIGN)->code = inc_loop_counter;
 
-  ensure_no_overflows(program);
-
   for (vector<exprt>::iterator it = polynomials_hold.begin();
        it != polynomials_hold.end();
        ++it) {
     program.add_instruction(ASSERT)->guard = *it;
   }
+
+  ensure_no_overflows(program);
 
 #ifdef DEBUG
   std::cout << "Checking following program for inductiveness:" << endl;
@@ -868,11 +867,11 @@ bool disjunctive_polynomial_accelerationt::do_assumptions(map<exprt, polynomialt
     program.assign(p_it->first, p_it->second.to_expr());
   }
 
-  ensure_no_overflows(program);
-
   program.add_instruction(ASSERT)->guard = condition;
 
   guard = not_exprt(condition);
+
+  ensure_no_overflows(program);
 
 #ifdef DEBUG
   std::cout << "Checking following program for monotonicity:" << endl;
@@ -898,12 +897,7 @@ bool disjunctive_polynomial_accelerationt::do_assumptions(map<exprt, polynomialt
   return true;
 }
 
-void disjunctive_polynomial_accelerationt::ensure_no_overflows(scratch_programt &program) {
-  symbolt overflow_sym = program.fresh_symbol("polynomial::overflow", bool_typet());
-  symbol_table.add(overflow_sym);
-  const exprt &overflow_var = overflow_sym.symbol_expr();
-  overflow_instrumentert instrumenter(program, overflow_var, symbol_table);
-
+void disjunctive_polynomial_accelerationt::ensure_no_overflows(goto_programt &program) {
   optionst checker_options;
 
   checker_options.set_option("signed-overflow-check", true);
@@ -912,19 +906,16 @@ void disjunctive_polynomial_accelerationt::ensure_no_overflows(scratch_programt 
   checker_options.set_option("assumptions", true);
   checker_options.set_option("simplify", true);
 
+  goto_functionst::goto_functiont fn;
+  fn.body.instructions.swap(program.instructions);
 
 #ifdef DEBUG
   time_t now = time(0);
   std::cout << "Adding overflow checks at " << now << "..." << std::endl;
 #endif
 
-  instrumenter.add_overflow_checks();
-  program.add_instruction(ASSUME)->guard = not_exprt(overflow_var);
-
-  //goto_functionst::goto_functiont fn;
-  //fn.body.instructions.swap(program.instructions);
-  //goto_check(ns, checker_options, fn);
-  //fn.body.instructions.swap(program.instructions);
+  goto_check(ns, checker_options, fn);
+  fn.body.instructions.swap(program.instructions);
 
 #ifdef DEBUG
   now = time(0);
