@@ -131,7 +131,6 @@ void overflow_instrumentert::add_overflow_checks(goto_programt::targett t,
     // A generic arithmetic operation.
     exprt overflow("overflow-" + expr.id_string(), bool_typet());
     overflow.operands() = expr.operands();
-    int assumptions = 0;
 
     if (expr.operands().size() >= 3) {
       // The overflow checks are binary.
