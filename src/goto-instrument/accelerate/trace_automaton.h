@@ -35,6 +35,9 @@ class automatont {
   void move(state_sett &s, goto_programt::targett a, state_sett &t);
 
   void reverse(goto_programt::targett epsilon);
+  void trim();
+
+  unsigned int count_transitions();
 
   void output(std::ostream &str);
 
@@ -48,15 +51,16 @@ class automatont {
     transitions.swap(that.transitions);
     accept_states.swap(that.accept_states);
     num_states = that.num_states;
+    init_state = that.init_state;
   }
-
-  statet init_state;
 
  //protected:
   typedef std::multimap<goto_programt::targett, statet> transitionst;
   typedef std::pair<transitionst::iterator, transitionst::iterator> transition_ranget;
   typedef std::vector<transitionst> transition_tablet;
 
+  statet init_state;
+  statet accept_state;
   statet num_states;
   transition_tablet transitions;
   state_sett accept_states;
@@ -120,8 +124,6 @@ class trace_automatont {
   statet find_dstate(state_sett &s);
   void add_dtrans(state_sett &s, goto_programt::targett a, state_sett &t);
 
-  void build_sym_map();
-
   typedef std::map<state_sett, statet> state_mapt;
 
   goto_programt &goto_program;
@@ -131,8 +133,6 @@ class trace_automatont {
 
   automatont nta;
   automatont dta;
-
-  sym_mapt sym_map;
 };
 
 #endif // TRACE_AUTOMATON_H

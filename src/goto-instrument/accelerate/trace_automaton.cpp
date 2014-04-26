@@ -7,20 +7,16 @@
 #define DEBUG
 
 void trace_automatont::build() {
-  determinise();
-
 #ifdef DEBUG
   std::cout << "NTA:" << std::endl;
   nta.output(std::cout);
-
-  std::cout << "DTA:" << std::endl;
-  dta.output(std::cout);
 #endif
 
-  //minimise();
+  //determinise();
+  minimise();
 
 #ifdef DEBUG
-  std::cout << "Minimised:" << std::endl;
+  std::cout << "DTA:" << std::endl;
   dta.output(std::cout);
 #endif
 }
@@ -106,11 +102,14 @@ void trace_automatont::determinise() {
 #ifdef DEBUG
   std::cout << "Determinising automaton with " << nta.num_states <<
     " states and " << nta.accept_states.size() << " accept states and " 
-    << nta.transitions.size() << " transitions" << endl;
+    << nta.count_transitions() << " transitions" << endl;
 #endif
 
-  state_sett init_states;
+  dstates.clear();
+  unmarked_dstates.clear();
+  dta.clear();
 
+  state_sett init_states;
   init_states.insert(nta.init_state);
   epsilon_closure(init_states);
 
@@ -148,6 +147,14 @@ void trace_automatont::determinise() {
       add_dtrans(t, *it, u);
     }
   }
+
+  dta.trim();
+
+#ifdef DEBUG
+  std::cout << "Produced DTA with " << dta.num_states <<
+    " states and " << dta.accept_states.size() << " accept states and "
+    << dta.count_transitions() << " transitions" << std::endl;
+#endif
 }
 
 void trace_automatont::pop_unmarked_dstate(state_sett &s) {
@@ -338,6 +345,10 @@ void automatont::reverse(goto_programt::targett epsilon) {
     }
   }
 
+  std::cout << "Reversing automaton, old init=" << init_state << ", new init="
+    << new_init << ", old accept=" << *(accept_states.begin()) << "/" << accept_states.size()
+    << " new accept=" << init_state << std::endl;
+
   accept_states.clear();
   set_accepting(init_state);
 
@@ -359,18 +370,52 @@ void automatont::reverse(goto_programt::targett epsilon) {
   }
 }
 
-// Take the DTA and minimise it, using Brzozowski's algorithm.
+void automatont::trim() {
+  state_sett reachable;
+  state_sett new_states;
+
+  reachable.insert(init_state);
+  new_states.insert(init_state);
+
+  do {
+    state_sett tmp;
+
+    for (state_sett::iterator it = new_states.begin();
+         it != new_states.end();
+         ++it) {
+      transitionst &trans = transitions[*it];
+
+      for (transitionst::iterator jt = trans.begin();
+           jt != trans.end();
+           ++jt) {
+        unsigned int j = jt->second;
+
+        if (reachable.find(j) == reachable.end()) {
+          reachable.insert(j);
+          tmp.insert(j);
+        }
+      }
+    }
+
+    tmp.swap(new_states);
+  } while (!new_states.empty());
+
+  for (unsigned int i = 0; i < num_states; i++) {
+    if (reachable.find(i) == reachable.end()) {
+      transitions[i] = transitionst();
+      accept_states.erase(i);
+    }
+  }
+}
+
+// Produce a minimal DTA using Brzozowski's algorithm.
 void trace_automatont::minimise() {
+  nta.reverse(epsilon);
+  determinise();
+
   nta.swap(dta);
   nta.reverse(epsilon);
-
-  dta.clear();
-  dstates.clear();
-  unmarked_dstates.clear();
-
   determinise();
-  assert(dta.accept_states.size() == 1);
-  dta.reverse(epsilon);
 }
 
 void automatont::output(std::ostream &str) {
@@ -396,4 +441,16 @@ void automatont::output(std::ostream &str) {
       str << i << " -- " << l->location_number << " --> " << j << std::endl;
     }
   }
+}
+
+unsigned int automatont::count_transitions() {
+  unsigned int ret = 0;
+
+  for (transition_tablet::iterator it = transitions.begin();
+       it != transitions.end();
+       ++it) {
+    ret += it->size();
+  }
+
+  return ret;
 }
