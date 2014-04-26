@@ -92,11 +92,6 @@ public:
   const symbolt &lookup(const irep_idt &identifier) const;
 };
 
-// old name, will go away
-class contextt:public symbol_tablet
-{
-};
-
 std::ostream &operator << (
   std::ostream &out,
   const symbol_tablet &symbol_table);
