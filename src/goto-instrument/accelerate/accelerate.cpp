@@ -13,6 +13,7 @@
 #include "polynomial_accelerator.h"
 #include "enumerating_loop_acceleration.h"
 #include "disjunctive_polynomial_acceleration.h"
+#include "overflow_instrumenter.h"
 //#include "symbolic_accelerator.h"
 
 #define DEBUG
@@ -43,7 +44,7 @@ goto_programt::targett acceleratet::find_back_jump(
 
 int acceleratet::accelerate_loop(goto_programt::targett &loop_header) {
   pathst loop_paths, exit_paths;
-  goto_programt::targett back_jump;
+  goto_programt::targett back_jump = find_back_jump(loop_header);
   int num_accelerated = 0;
   list<path_acceleratort> accelerators;
   natural_loops_mutablet::natural_loopt &loop =
@@ -63,8 +64,6 @@ int acceleratet::accelerate_loop(goto_programt::targett &loop_header) {
     num_accelerated++;
   }
 
-  back_jump = find_back_jump(loop_header);
-
   goto_programt::instructiont skip(SKIP);
   program.insert_before_swap(loop_header, skip);
 
@@ -72,6 +71,13 @@ int acceleratet::accelerate_loop(goto_programt::targett &loop_header) {
   ++new_inst;
 
   loop.insert(new_inst);
+
+  goto_programt::targett overflow_loc;
+  make_overflow_loc(loop_header, back_jump, overflow_loc);
+  program.update();
+
+  std::cout << "Overflow loc is " << overflow_loc->location_number << std::endl;
+  std::cout << "Back jump is " << back_jump->location_number << std::endl;
 
   for (list<path_acceleratort>::iterator it = accelerators.begin();
        it != accelerators.end();
@@ -130,7 +136,50 @@ void acceleratet::insert_looping_path(goto_programt::targett &loop_header,
        ++t) {
     inserted_path.push_back(path_nodet(t));
   }
+
+  inserted_path.push_back(path_nodet(back_jump));
 }
+
+void acceleratet::make_overflow_loc(goto_programt::targett loop_header,
+                                    goto_programt::targett &loop_end,
+                                    goto_programt::targett &overflow_loc) {
+  scratch_programt scratch(symbol_table);
+  symbolt overflow_sym = scratch.fresh_symbol("accelerate::overflow", bool_typet());
+  symbol_table.add(overflow_sym);
+
+  const exprt &overflow_var = overflow_sym.symbol_expr();
+  natural_loops_mutablet::natural_loopt &loop =
+    natural_loops.loop_map[loop_header];
+  overflow_instrumentert instrumenter(program, overflow_var, symbol_table);
+
+  for (natural_loops_mutablet::natural_loopt::iterator it = loop.begin();
+       it != loop.end();
+       ++it) {
+    instrumenter.add_overflow_checks(*it);
+  }
+
+
+  goto_programt::targett t = program.insert_after(loop_header);
+  t->make_assignment();
+  t->code = code_assignt(overflow_var, false_exprt());
+  t->swap(*loop_header);
+  loop.insert(t);
+
+  goto_programt::instructiont s(SKIP);
+  overflow_loc = program.insert_after(loop_end);
+  *overflow_loc = s;
+  overflow_loc->swap(*loop_end);
+
+  goto_programt::instructiont g(GOTO);
+  g.guard = not_exprt(overflow_var);
+  g.targets.push_back(overflow_loc);
+  program.insert_before_swap(loop_end, g);
+
+  goto_programt::targett tmp = overflow_loc;
+  overflow_loc = loop_end;
+  loop_end = tmp;
+}
+
 
 void acceleratet::restrict_traces() {
   trace_automatont automaton(program);
