@@ -10,7 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 
 #include <util/namespace.h>
-#include <util/context.h>
 #include <util/simplify_expr.h>
 #include <util/config.h>
 #include <util/arith_tools.h>
