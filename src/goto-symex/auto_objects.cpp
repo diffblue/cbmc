@@ -61,7 +61,7 @@ void goto_symext::initialize_auto_object(
   statet &state)
 {
   const typet &type=ns.follow(expr.type());
-
+  
   if(type.id()==ID_struct)
   {
     const struct_typet &struct_type=to_struct_type(type);
@@ -72,35 +72,36 @@ void goto_symext::initialize_auto_object(
         it!=components.end();
         it++)
     {
-      const typet &t=ns.follow(it->type());
-      if(t.id()==ID_pointer)
-      {
-        const typet &subtype=ns.follow(t.subtype());
-        
-        // we don't like function pointers and
-        // we don't like void *
-        if(subtype.id()!=ID_code &&
-           subtype.id()!=ID_empty)
-        {
-          member_exprt member_expr;
-          member_expr.struct_op()=expr;
-          member_expr.set_component_name(it->get_name());
-          member_expr.type()=it->type();
-          
-          // could be NULL nondeterministically
-          
-          address_of_exprt address_of_expr=
-            address_of_exprt(make_auto_object(t.subtype()));
+      member_exprt member_expr;
+      member_expr.struct_op()=expr;
+      member_expr.set_component_name(it->get_name());
+      member_expr.type()=it->type();
 
-          if_exprt rhs(
-            side_effect_expr_nondett(bool_typet()),
-            null_pointer_exprt(to_pointer_type(t)),
-            address_of_expr);
-          
-          code_assignt assignment(member_expr, rhs);
-          symex_assign(state, assignment); /* TODO: needs clean */
-        }
-      }
+      initialize_auto_object(member_expr, state);
+    }
+  }
+  else if(type.id()==ID_pointer)
+  {
+    const pointer_typet &pointer_type=to_pointer_type(type);
+    const typet &subtype=ns.follow(type.subtype());
+    
+    // we don't like function pointers and
+    // we don't like void *
+    if(subtype.id()!=ID_code &&
+       subtype.id()!=ID_empty)
+    {
+      // could be NULL nondeterministically
+      
+      address_of_exprt address_of_expr=
+        address_of_exprt(make_auto_object(type.subtype()));
+
+      if_exprt rhs(
+        side_effect_expr_nondett(bool_typet()),
+        null_pointer_exprt(pointer_type),
+        address_of_expr);
+      
+      code_assignt assignment(expr, rhs);
+      symex_assign(state, assignment); /* TODO: needs clean */
     }
   }
 }
