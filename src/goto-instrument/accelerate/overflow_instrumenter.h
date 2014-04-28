@@ -23,11 +23,14 @@ class overflow_instrumentert {
 
   void add_overflow_checks();
   void add_overflow_checks(goto_programt::targett t);
+  void add_overflow_checks(goto_programt::targett t, goto_programt::targetst &added);
 
  protected:
-  void add_overflow_checks(goto_programt::targett t, const exprt &expr);
+  void add_overflow_checks(goto_programt::targett t, const exprt &expr,
+      goto_programt::targetst &added);
 
-  void accumulate_overflow(goto_programt::targett t, const exprt &expr);
+  void accumulate_overflow(goto_programt::targett t, const exprt &expr,
+      goto_programt::targetst &added);
 
   goto_programt &program;
   symbol_tablet &symbol_table;

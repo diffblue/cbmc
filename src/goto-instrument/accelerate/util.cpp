@@ -11,7 +11,8 @@ bool is_bitvector(const typet &t) {
   return t.id() == ID_bv ||
          t.id() == ID_signedbv ||
          t.id() == ID_unsignedbv ||
-         t.id() == ID_pointer;
+         t.id() == ID_pointer ||
+         t.id() == ID_bool;
 }
 
 /**
@@ -28,7 +29,8 @@ bool is_signed(const typet &t) {
 bool is_unsigned(const typet &t) {
   return t.id() == ID_bv ||
          t.id() == ID_unsignedbv ||
-         t.id() == ID_pointer;
+         t.id() == ID_pointer ||
+         t.id() == ID_bool;
 }
 
 /**

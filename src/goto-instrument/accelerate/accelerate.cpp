@@ -50,13 +50,9 @@ int acceleratet::accelerate_loop(goto_programt::targett &loop_header) {
   natural_loops_mutablet::natural_loopt &loop =
     natural_loops.loop_map[loop_header];
 
-  goto_programt::instructiont skip(SKIP);
-  program.insert_before_swap(loop_header, skip);
-
-  goto_programt::targett new_inst = loop_header;
-  ++new_inst;
-
-  loop.insert(new_inst);
+  goto_programt::targett overflow_loc;
+  make_overflow_loc(loop_header, back_jump, overflow_loc);
+  program.update();
 
   /*
   enumerating_loop_accelerationt acceleration(symbol_table, goto_functions,
@@ -70,11 +66,21 @@ int acceleratet::accelerate_loop(goto_programt::targett &loop_header) {
   while (acceleration.accelerate(accelerator)) {
     accelerators.push_back(accelerator);
     num_accelerated++;
+
+#ifdef DEBUG
+    std::cout << "Accelerated path:" << std::endl;
+    output_path(accelerator.path, program, ns, std::cout);
+#endif
   }
 
-  goto_programt::targett overflow_loc;
-  make_overflow_loc(loop_header, back_jump, overflow_loc);
-  program.update();
+  goto_programt::instructiont skip(SKIP);
+  program.insert_before_swap(loop_header, skip);
+
+  goto_programt::targett new_inst = loop_header;
+  ++new_inst;
+
+  loop.insert(new_inst);
+
 
   std::cout << "Overflow loc is " << overflow_loc->location_number << std::endl;
   std::cout << "Back jump is " << back_jump->location_number << std::endl;
@@ -83,7 +89,9 @@ int acceleratet::accelerate_loop(goto_programt::targett &loop_header) {
        it != accelerators.end();
        ++it) {
     subsumed_patht inserted(it->path);
-    inserted.subsumed.push_back(path_nodet(back_jump, true_exprt()));
+
+    //inserted.subsumed.push_back(path_nodet(back_jump));
+    //inserted.subsumed.back().loc = back_jump;
 
     insert_accelerator(loop_header, back_jump, *it, inserted);
     subsumed.push_back(inserted);
@@ -156,7 +164,11 @@ void acceleratet::make_overflow_loc(goto_programt::targett loop_header,
   for (natural_loops_mutablet::natural_loopt::iterator it = loop.begin();
        it != loop.end();
        ++it) {
-    instrumenter.add_overflow_checks(*it);
+    overflow_locs[*it] = goto_programt::targetst();
+    goto_programt::targetst &added = overflow_locs[*it];
+
+    instrumenter.add_overflow_checks(*it, added);
+    loop.insert(added.begin(), added.end());
   }
 
 
@@ -165,22 +177,49 @@ void acceleratet::make_overflow_loc(goto_programt::targett loop_header,
   t->code = code_assignt(overflow_var, false_exprt());
   t->swap(*loop_header);
   loop.insert(t);
+  overflow_locs[loop_header].push_back(t);
 
   goto_programt::instructiont s(SKIP);
   overflow_loc = program.insert_after(loop_end);
   *overflow_loc = s;
   overflow_loc->swap(*loop_end);
+  loop.insert(overflow_loc);
 
   goto_programt::instructiont g(GOTO);
   g.guard = not_exprt(overflow_var);
   g.targets.push_back(overflow_loc);
-  program.insert_before_swap(loop_end, g);
+  goto_programt::targett t2 = program.insert_after(loop_end);
+  *t2 = g;
+  t2->swap(*loop_end);
+  overflow_locs[overflow_loc].push_back(t2);
+  loop.insert(t2);
 
   goto_programt::targett tmp = overflow_loc;
   overflow_loc = loop_end;
   loop_end = tmp;
 }
 
+void acceleratet::insert_overflow_locs(patht &path) {
+  patht::iterator it, next;
+
+  it = path.begin();
+
+  for (it = path.begin();
+       it != path.end();
+       it = next) {
+    next = it;
+    ++next;
+
+    goto_programt::targetst &added = overflow_locs[it->loc];
+    patht::iterator p = next;
+
+    for (goto_programt::targetst::iterator jt = added.begin();
+         jt != added.end();
+         ++jt) {
+      p = path.insert(p, path_nodet(*jt));
+    }
+  }
+}
 
 void acceleratet::restrict_traces() {
   trace_automatont automaton(program);
@@ -189,6 +228,7 @@ void acceleratet::restrict_traces() {
        it != subsumed.end();
        ++it) {
     if (!it->subsumed.empty()) {
+      //insert_overflow_locs(it->subsumed);
 #ifdef DEBUG
       namespacet ns(symbol_table);
       std::cout << "Restricting path:" << std::endl;
@@ -202,6 +242,7 @@ void acceleratet::restrict_traces() {
     patht::iterator jt = double_accelerator.begin();
     double_accelerator.insert(jt, it->accelerator.begin(), it->accelerator.end());
     double_accelerator.insert(jt, it->accelerator.begin(), it->accelerator.end());
+    //insert_overflow_locs(double_accelerator);
 
 #ifdef DEBUG
       namespacet ns(symbol_table);
