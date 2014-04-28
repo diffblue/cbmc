@@ -80,6 +80,11 @@ bool disjunctive_polynomial_accelerationt::accelerate(
     polynomialt poly;
     exprt target = *it;
 
+    if (it->type().id() == ID_bool) {
+      // Hack: don't try to accelerate booleans.
+      continue;
+    }
+
     if (target.id() == ID_index) {
       // We'll handle this later.
       continue;
@@ -123,6 +128,11 @@ bool disjunctive_polynomial_accelerationt::accelerate(
   for (expr_sett::iterator it = dirty.begin();
        it != dirty.end();
        ++it) {
+    if (it->type().id() == ID_bool) {
+      // Hack: don't try to accelerate booleans.
+      continue;
+    }
+
     if (accelerator.changed_vars.find(*it) != accelerator.changed_vars.end()) {
       // We've accelerated variable this already.
       continue;
@@ -167,6 +177,8 @@ bool disjunctive_polynomial_accelerationt::accelerate(
     std::cout << "Assumptions error: " << s << endl;
     return false;
   }
+
+  exprt pre_guard(guard);
 
   for (map<exprt, polynomialt>::iterator it = polynomials.begin();
        it != polynomials.end();
@@ -214,6 +226,7 @@ bool disjunctive_polynomial_accelerationt::accelerate(
   // assume(guard);
   // assume(no overflows in previous code);
 
+  program.add_instruction(ASSUME)->guard = pre_guard;
   program.assign(loop_counter, side_effect_expr_nondett(loop_counter.type()));
 
   for (map<exprt, polynomialt>::iterator it = polynomials.begin();
@@ -231,7 +244,6 @@ bool disjunctive_polynomial_accelerationt::accelerate(
     return false;
   }
 #endif
-
 
   program.add_instruction(ASSUME)->guard = guard;
   program.fix_types();

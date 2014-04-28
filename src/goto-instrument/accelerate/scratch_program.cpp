@@ -37,7 +37,7 @@ bool scratch_programt::check_sat()
 
   add_instruction(END_FUNCTION);
 
-  remove_skip(*this);
+  //remove_skip(*this);
   update();
 
 #ifdef DEBUG

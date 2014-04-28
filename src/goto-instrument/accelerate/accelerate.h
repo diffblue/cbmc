@@ -60,6 +60,7 @@ class acceleratet {
   void make_overflow_loc(goto_programt::targett loop_header,
                          goto_programt::targett &loop_end,
                          goto_programt::targett &overflow_loc);
+  void insert_overflow_locs(patht &path);
 
   void insert_automaton(trace_automatont &automaton);
   void build_state_machine(trace_automatont::sym_mapt::iterator p,
@@ -79,6 +80,9 @@ class acceleratet {
   namespacet ns;
   natural_loops_mutablet natural_loops;
   subsumed_pathst subsumed;
+
+  typedef map<goto_programt::targett, goto_programt::targetst> overflow_mapt;
+  overflow_mapt overflow_locs;
 
   typedef map<patht, goto_programt> accelerator_mapt;
 };
