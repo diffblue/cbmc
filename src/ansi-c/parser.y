@@ -111,6 +111,7 @@ extern char *yyansi_ctext;
 %token TOK_PTR32       "__ptr32"
 %token TOK_PTR64       "__ptr64"
 %token TOK_TYPEOF      "typeof"
+%token TOK_GCC_AUTO_TYPE "__auto_type"
 %token TOK_GCC_FLOAT128 "__float128"
 %token TOK_GCC_INT128 "__int128"
 %token TOK_GCC_DECIMAL32 "_Decimal32"
