@@ -1,6 +1,6 @@
 int main(void) {
   unsigned int x = 0;
-  unsigned int N;
+  unsigned short N;
 
   while (x < N) {
     x += 2;
