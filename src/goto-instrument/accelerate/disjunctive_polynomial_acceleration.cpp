@@ -345,6 +345,7 @@ bool disjunctive_polynomial_accelerationt::fit_polynomial(
     program.assume(binary_relation_exprt(ival2.symbol_expr(), "<",
           ival3.symbol_expr()));
 
+#if 0
     if (it->type() == signedbv_typet()) {
       program.assume(binary_relation_exprt(ival1.symbol_expr(), ">",
             from_integer(-100, it->type())));
@@ -365,6 +366,7 @@ bool disjunctive_polynomial_accelerationt::fit_polynomial(
     }
     program.assume(binary_relation_exprt(ival3.symbol_expr(), "<",
           from_integer(100, it->type())));
+#endif
 
     ivals1[*it] = ival1.symbol_expr();
     ivals2[*it] = ival2.symbol_expr();
