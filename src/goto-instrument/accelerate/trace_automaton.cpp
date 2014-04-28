@@ -12,8 +12,8 @@ void trace_automatont::build() {
   nta.output(std::cout);
 #endif
 
-  //determinise();
-  minimise();
+  determinise();
+  //minimise();
 
 #ifdef DEBUG
   std::cout << "DTA:" << std::endl;

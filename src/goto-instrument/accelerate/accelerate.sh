@@ -24,7 +24,7 @@ done
 $goto_cc $cfile -o $ofile
 $goto_instrument --accelerate $ofile $accfile
 
-$cbmc --unwind 2 $cbmcargs $accfile
+$cbmc --unwind 3 $cbmcargs $accfile
 retcode=$?
 
 #rm $ofile $accfile
