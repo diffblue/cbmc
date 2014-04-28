@@ -1,9 +1,11 @@
 #ifndef PATH_H
 #define PATH_H
 
+#include <iostream>
 #include <list>
 
 #include <util/std_expr.h>
+#include <util/namespace.h>
 
 #include <goto-programs/goto_program.h>
 
@@ -24,11 +26,15 @@ class path_nodet {
   {
   }
 
+  void output(goto_programt &program, std::ostream &str);
+
   goto_programt::targett loc;
   const exprt guard;
 };
 
 typedef list<path_nodet> patht;
 typedef list<patht> pathst; 
+
+void output_path(patht &path, goto_programt &program, namespacet &ns, std::ostream &str);
 
 #endif // PATH_H

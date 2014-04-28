@@ -50,6 +50,14 @@ int acceleratet::accelerate_loop(goto_programt::targett &loop_header) {
   natural_loops_mutablet::natural_loopt &loop =
     natural_loops.loop_map[loop_header];
 
+  goto_programt::instructiont skip(SKIP);
+  program.insert_before_swap(loop_header, skip);
+
+  goto_programt::targett new_inst = loop_header;
+  ++new_inst;
+
+  loop.insert(new_inst);
+
   /*
   enumerating_loop_accelerationt acceleration(symbol_table, goto_functions,
       program, loop, loop_header, accelerate_limit);
@@ -64,14 +72,6 @@ int acceleratet::accelerate_loop(goto_programt::targett &loop_header) {
     num_accelerated++;
   }
 
-  goto_programt::instructiont skip(SKIP);
-  program.insert_before_swap(loop_header, skip);
-
-  goto_programt::targett new_inst = loop_header;
-  ++new_inst;
-
-  loop.insert(new_inst);
-
   goto_programt::targett overflow_loc;
   make_overflow_loc(loop_header, back_jump, overflow_loc);
   program.update();
@@ -83,6 +83,7 @@ int acceleratet::accelerate_loop(goto_programt::targett &loop_header) {
        it != accelerators.end();
        ++it) {
     subsumed_patht inserted(it->path);
+    inserted.subsumed.push_back(path_nodet(back_jump, true_exprt()));
 
     insert_accelerator(loop_header, back_jump, *it, inserted);
     subsumed.push_back(inserted);
@@ -188,6 +189,12 @@ void acceleratet::restrict_traces() {
        it != subsumed.end();
        ++it) {
     if (!it->subsumed.empty()) {
+#ifdef DEBUG
+      namespacet ns(symbol_table);
+      std::cout << "Restricting path:" << std::endl;
+      output_path(it->subsumed, program, ns, std::cout);
+#endif
+
       automaton.add_path(it->subsumed);
     }
 
@@ -195,6 +202,12 @@ void acceleratet::restrict_traces() {
     patht::iterator jt = double_accelerator.begin();
     double_accelerator.insert(jt, it->accelerator.begin(), it->accelerator.end());
     double_accelerator.insert(jt, it->accelerator.begin(), it->accelerator.end());
+
+#ifdef DEBUG
+      namespacet ns(symbol_table);
+      std::cout << "Restricting path:" << std::endl;
+      output_path(double_accelerator, program, ns, std::cout);
+#endif
     automaton.add_path(double_accelerator);
   }
 
