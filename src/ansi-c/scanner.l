@@ -134,9 +134,9 @@ binary		{bindigit}+
 msiw_suffix     ([iI]("8"|"16"|"32"|"64"|"128"))
 int_suffix      [uUlLiIjJ]*|[uU]?{msiw_suffix}
 bininteger	"0"[bB]{bindigit}+{int_suffix}
-decinteger	[1-9]{digit}*{int_suffix}
-octinteger	"0"{octdigit}*{int_suffix}
-hexinteger	"0"[xX]{hexdigit}+{int_suffix}
+decinteger	[1-9]({digit}|"'")*{int_suffix}
+octinteger	"0"({octdigit}|"'")*{int_suffix}
+hexinteger	"0"[xX]{hexdigit}({hexdigit}|"'")*{int_suffix}
 integer_s       {decinteger}|{bininteger}|{octinteger}|{hexinteger}
 octchar		"\\"{octdigit}{1,3}
 hexchar		"\\x"{hexdigit}+
@@ -347,6 +347,12 @@ void ansi_c_scanner_init()
 "void"		{ loc(); return TOK_VOID; }
 "volatile"	{ loc(); return TOK_VOLATILE; }
 "while"		{ loc(); return TOK_WHILE; }
+
+"__auto_type"   { if(PARSER.mode==ansi_c_parsert::GCC && !PARSER.cpp)
+                    { loc(); return TOK_GCC_AUTO_TYPE; }
+                  else
+                    return make_identifier();
+                }
 
 "__float128"	{ if(PARSER.mode==ansi_c_parsert::GCC)
                     { loc(); return TOK_GCC_FLOAT128; }
