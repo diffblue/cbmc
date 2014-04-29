@@ -27,14 +27,14 @@ extern __CPROVER_bool __CPROVER_HEAP_dangling(void* ptr);
 #define not_dangling(x) if(__CPROVER_HEAP_dangling(x)) res = err;
 #endif
 
-#define not_null(x) if(x == NULL) res = err; //CBMC_NO_HEAP does not find the bug
-//#define not_null(x) assert(x != NULL); //CBMC_NO_HEAP finds the bug only if the assume in line 152 is commented out?!
+#define not_null(x) if(x == NULL) res = err; 
 
 
 #ifdef GCC
 int nondet() { return 1; }
 #else
 extern __CPROVER_bool nondet();
+extern struct sl_item * nondet_sl_item();
 #endif
 
 // a skip list node with three next pointers
@@ -149,6 +149,10 @@ int main()
   res = (struct sl_item *)0;
   err = (struct sl_item *)1;
 #else
+#ifdef CBMC_NO_HEAP
+  res = nondet_sl_item();
+  err = nondet_sl_item();
+#endif
   __CPROVER_assume(res!=err);
 #endif
 
