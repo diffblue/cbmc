@@ -12,16 +12,30 @@
  * Taken from Forester.
  */
 
+//choose one
+#define CBMC_HEAP
+//#define CBMC_NO_HEAP
+//#define GCC
+
+#include <assert.h>
 #include <stdlib.h>
 
 struct sl_item *res, *err;
 
+#ifdef CBMC_HEAP
 extern __CPROVER_bool __CPROVER_HEAP_dangling(void* ptr);
-
-#define not_null(x) if(x == NULL) res = err;
 #define not_dangling(x) if(__CPROVER_HEAP_dangling(x)) res = err;
+#endif
 
+#define not_null(x) if(x == NULL) res = err; //CBMC_NO_HEAP does not find the bug
+//#define not_null(x) assert(x != NULL); //CBMC_NO_HEAP finds the bug only if the assume in line 152 is commented out?!
+
+
+#ifdef GCC
+int nondet() { return 1; }
+#else
 extern __CPROVER_bool nondet();
+#endif
 
 // a skip list node with three next pointers
 struct sl_item {
@@ -127,11 +141,16 @@ void destroy_sl(struct sl *sl)
 	free(sl);
 }
 
-void main()
+int main()
 {
   struct sl *sl = create_sl_with_head_and_tail();
 
-	__CPROVER_assume(res!=err);
+#ifdef GCC
+  res = (struct sl_item *)0;
+  err = (struct sl_item *)1;
+#else
+  __CPROVER_assume(res!=err);
+#endif
 
 	while (nondet())
 		sl_random_insert(sl);
@@ -139,5 +158,5 @@ void main()
 	destroy_sl(sl);
 
 	assert(res!=err);
-	//return 0;
+	return 0;
 }
