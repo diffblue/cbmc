@@ -130,7 +130,7 @@ bool disjunctive_polynomial_accelerationt::accelerate(
        ++it) {
     if (it->type().id() == ID_bool) {
       // Hack: don't try to accelerate booleans.
-      accelerator.dirty_vars.insert(target);
+      accelerator.dirty_vars.insert(*it);
       continue;
     }
 
