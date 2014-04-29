@@ -1,4 +1,6 @@
 #include <util/namespace.h>
+#include <util/hash_cont.h>
+#include <util/expr.h>
 
 #include <analyses/natural_loops.h>
 
@@ -57,6 +59,9 @@ class acceleratet {
                           path_acceleratort &accelerator,
                           subsumed_patht &subsumed);
 
+  void set_dirty_vars(path_acceleratort &accelerator);
+  void add_dirty_checks();
+
   void make_overflow_loc(goto_programt::targett loop_header,
                          goto_programt::targett &loop_end,
                          goto_programt::targett &overflow_loc);
@@ -83,7 +88,8 @@ class acceleratet {
   typedef map<goto_programt::targett, goto_programt::targetst> overflow_mapt;
   overflow_mapt overflow_locs;
 
-  typedef map<patht, goto_programt> accelerator_mapt;
+  typedef hash_map_cont<exprt, exprt, irep_hash> expr_mapt;
+  expr_mapt dirty_vars_map;
 };
 
 void accelerate_functions(

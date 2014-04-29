@@ -4,6 +4,9 @@
 
 #include <util/std_expr.h>
 #include <util/arith_tools.h>
+#include <util/find_symbols.h>
+
+#include <ansi-c/expr2c.h>
 
 #include <iostream>
 #include <list>
@@ -64,12 +67,17 @@ int acceleratet::accelerate_loop(goto_programt::targett &loop_header) {
   path_acceleratort accelerator;
 
   while (acceleration.accelerate(accelerator)) {
+    //set_dirty_vars(accelerator);
+
     accelerators.push_back(accelerator);
     num_accelerated++;
 
 #ifdef DEBUG
     std::cout << "Accelerated path:" << std::endl;
     output_path(accelerator.path, program, ns, std::cout);
+
+    std::cout << "Accelerator has " << accelerator.pure_accelerator.instructions.size()
+      << " instructions" << std::endl;
 #endif
   }
 
@@ -229,6 +237,91 @@ void acceleratet::restrict_traces() {
 
   automaton.build();
   insert_automaton(automaton);
+}
+
+void acceleratet::set_dirty_vars(path_acceleratort &accelerator) {
+  for (set<exprt>::iterator it = accelerator.dirty_vars.begin();
+       it != accelerator.dirty_vars.end();
+       ++it) {
+    expr_mapt::iterator jt = dirty_vars_map.find(*it);
+    exprt dirty_var;
+
+    if (jt == dirty_vars_map.end()) {
+      scratch_programt scratch(symbol_table);
+      symbolt new_sym = scratch.fresh_symbol("accelerate::dirty", bool_typet());
+      symbol_table.add(new_sym);
+      dirty_var = new_sym.symbol_expr();
+      dirty_vars_map[*it] = dirty_var;
+    } else {
+      dirty_var = jt->second;
+    }
+
+#ifdef DEBUG
+    std::cout << "Setting dirty flag " << expr2c(dirty_var, ns)
+      << " for " << expr2c(*it, ns) << std::endl;
+#endif
+
+    accelerator.pure_accelerator.add_instruction(ASSIGN)->code =
+      code_assignt(dirty_var, true_exprt());
+  }
+}
+
+void acceleratet::add_dirty_checks() {
+  for (expr_mapt::iterator it = dirty_vars_map.begin();
+       it != dirty_vars_map.end();
+       ++it) {
+    goto_programt::instructiont assign(ASSIGN);
+    assign.code = code_assignt(it->second, false_exprt());
+    program.insert_before_swap(program.instructions.begin(), assign);
+  }
+
+  goto_programt::targett next;
+
+  for (goto_programt::targett it = program.instructions.begin();
+       it != program.instructions.end();
+       it = next) {
+    next = it;
+    ++next;
+
+    // If this is an assign to a tracked variable, clear the dirty flag.
+    // Note: this order of insertions means that we assume each of the read
+    // variables is clean _before_ clearing any dirty flags.
+    if (it->is_assign()) {
+      exprt &lhs = it->code.op0();
+      expr_mapt::iterator dirty_var = dirty_vars_map.find(lhs);
+
+      if (dirty_var != dirty_vars_map.end()) {
+        goto_programt::instructiont clear_flag(ASSIGN);
+        clear_flag.code = code_assignt(dirty_var->second, false_exprt());
+        program.insert_before_swap(it, clear_flag);
+      }
+    }
+
+    // Find which symbols are read, i.e. those appearing in a guard or on
+    // the right hand side of an assignment.  Assume each is not dirty.
+    find_symbols_sett read;
+
+    find_symbols(it->guard, read);
+
+    if (it->is_assign()) {
+      find_symbols(it->code.op1(), read);
+    }
+
+    for (find_symbols_sett::iterator jt = read.begin();
+         jt != read.end();
+         ++jt) {
+      const exprt &var = ns.lookup(*jt).symbol_expr();
+      expr_mapt::iterator dirty_var = dirty_vars_map.find(var);
+
+      if (dirty_var == dirty_vars_map.end()) {
+        continue;
+      }
+
+      goto_programt::instructiont not_dirty(ASSUME);
+      not_dirty.guard = not_exprt(dirty_var->second);
+      program.insert_before_swap(it, not_dirty);
+    }
+  }
 }
 
 symbolt acceleratet::make_symbol(string name, typet type) {
@@ -406,6 +499,7 @@ int acceleratet::accelerate_loops()
     cout << "Engaging crush mode..." << endl;
 
     restrict_traces();
+    //add_dirty_checks();
     program.update();
 
     cout << "Crush mode engaged." << endl;
