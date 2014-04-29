@@ -90,9 +90,6 @@ int acceleratet::accelerate_loop(goto_programt::targett &loop_header) {
        ++it) {
     subsumed_patht inserted(it->path);
 
-    //inserted.subsumed.push_back(path_nodet(back_jump));
-    //inserted.subsumed.back().loc = back_jump;
-
     insert_accelerator(loop_header, back_jump, *it, inserted);
     subsumed.push_back(inserted);
     num_accelerated++;
@@ -199,28 +196,6 @@ void acceleratet::make_overflow_loc(goto_programt::targett loop_header,
   loop_end = tmp;
 }
 
-void acceleratet::insert_overflow_locs(patht &path) {
-  patht::iterator it, next;
-
-  it = path.begin();
-
-  for (it = path.begin();
-       it != path.end();
-       it = next) {
-    next = it;
-    ++next;
-
-    goto_programt::targetst &added = overflow_locs[it->loc];
-    patht::iterator p = next;
-
-    for (goto_programt::targetst::iterator jt = added.begin();
-         jt != added.end();
-         ++jt) {
-      p = path.insert(p, path_nodet(*jt));
-    }
-  }
-}
-
 void acceleratet::restrict_traces() {
   trace_automatont automaton(program);
 
@@ -228,7 +203,6 @@ void acceleratet::restrict_traces() {
        it != subsumed.end();
        ++it) {
     if (!it->subsumed.empty()) {
-      //insert_overflow_locs(it->subsumed);
 #ifdef DEBUG
       namespacet ns(symbol_table);
       std::cout << "Restricting path:" << std::endl;
@@ -242,7 +216,6 @@ void acceleratet::restrict_traces() {
     patht::iterator jt = double_accelerator.begin();
     double_accelerator.insert(jt, it->accelerator.begin(), it->accelerator.end());
     double_accelerator.insert(jt, it->accelerator.begin(), it->accelerator.end());
-    //insert_overflow_locs(double_accelerator);
 
 #ifdef DEBUG
       namespacet ns(symbol_table);
