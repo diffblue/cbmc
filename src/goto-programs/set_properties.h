@@ -15,8 +15,9 @@ void set_properties(
   goto_functionst &goto_functions,
   const std::list<std::string> &properties);
 
-void make_assertions_false(goto_functionst &goto_functions);
-  
-void label_properties(goto_functionst &goto_functions);
+void make_assertions_false(goto_functionst &);  
+
+void label_properties(goto_functionst &);
+void label_properties(goto_programt &);
 
 #endif

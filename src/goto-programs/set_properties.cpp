@@ -84,6 +84,24 @@ void label_properties(
 
 /*******************************************************************\
 
+Function: label_properties
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void label_properties(goto_programt &goto_program)
+{
+  std::map<irep_idt, unsigned> property_counters;
+  label_properties(goto_program, property_counters);
+}
+
+/*******************************************************************\
+
 Function: set_properties
 
   Inputs:
