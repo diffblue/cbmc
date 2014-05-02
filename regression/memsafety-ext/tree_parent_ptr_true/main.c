@@ -20,13 +20,12 @@ struct StackItem {
 	struct TreeNode* node;
 };
 
-struct TreeNode* res, *err;
-
 extern __CPROVER_bool nondet();
 
 
 void main() {
 
+        struct TreeNode* res, *err;
 	__CPROVER_assume(res!=err);
 
 	struct TreeNode* root = malloc(sizeof(*root)), *n;

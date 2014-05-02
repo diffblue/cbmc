@@ -12,8 +12,6 @@ struct TreeNode {
 	struct TreeNode* right;
 };
 
-struct TreeNode *res, *err;
-
 extern __CPROVER_bool nondet();
 
 
@@ -21,6 +19,7 @@ void main() {
 
 	struct TreeNode* root = malloc(sizeof(*root)), *n;
 
+        struct TreeNode *res, *err;
 	__CPROVER_assume(res!=err);
 
 	not_null(root);	

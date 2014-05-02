@@ -16,7 +16,6 @@ typedef struct node {
   struct node *n;
 } *List;
 
-List res, err;
 
 #define not_null(x) if(x == NULL) res = err;
 
@@ -34,7 +33,9 @@ void main() {
   __CPROVER_assume(one != three);
   __CPROVER_assume(two != three);
 
+  List res, err;
   __CPROVER_assume(res != err);
+
   __CPROVER_assume(flag == _true);
 
     a = (List) malloc(sizeof(struct node));

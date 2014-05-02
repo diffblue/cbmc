@@ -21,8 +21,6 @@ typedef struct TNode
 } Node;
 
 
-Node *res, *err;
-
 extern __CPROVER_bool nondet();
 
 void main()
@@ -30,6 +28,7 @@ void main()
 	Node* list = NULL;
 	Node* y = NULL;
 
+        Node *res, *err;
 	__CPROVER_assume(res!=err);
 
 	y = malloc(sizeof(*y));

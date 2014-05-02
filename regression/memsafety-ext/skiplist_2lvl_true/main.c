@@ -18,6 +18,7 @@
 
 struct sl_item *res, *err;
 
+extern struct sl_item * nondet_sl_item();
 extern __CPROVER_bool nondet();
 
 // a skip list node with three next pointers
@@ -127,7 +128,9 @@ void main()
 {
   struct sl *sl = create_sl_with_head_and_tail();
 
-	__CPROVER_assume(res!=err);
+  res = nondet_sl_item();
+  err = nondet_sl_item();
+  __CPROVER_assume(res!=err);
 
 	while (nondet())
 		sl_random_insert(sl);

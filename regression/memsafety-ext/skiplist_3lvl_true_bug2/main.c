@@ -28,6 +28,7 @@ struct sl {
 
 struct sl_item* res, *err;
 
+extern sl_item* nondet_sl_item();
 extern __CPROVER_bool nondet();
 
 struct sl_item* alloc_or_die(void)
@@ -147,6 +148,8 @@ void main()
 {
 	struct sl *sl = create_sl_with_head_and_tail();
 
+        res = nondet_sl_item();
+        err = nondet_sl_item();
 	__CPROVER_assume(res!=err);
 
 	while (nondet())

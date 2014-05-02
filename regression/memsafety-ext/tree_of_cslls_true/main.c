@@ -23,14 +23,13 @@ typedef struct TTreeNode
 	ListNode* list;
 } TreeNode;
 
-struct TreeNode* res, *err;
-
 extern __CPROVER_bool nondet();
 
 
 void main()
 {
 
+        struct TreeNode* res, *err;
 	__CPROVER_assume(res!=err);
 
 	TreeNode* tree = malloc(sizeof(*tree));

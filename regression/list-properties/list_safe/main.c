@@ -16,7 +16,6 @@ typedef struct node {
   struct node *n;
 } *List;
 
-List res, err;
 
 extern __CPROVER_bool nondet();
 
@@ -26,6 +25,7 @@ void main() {
   __CPROVER_assume(one != three);
   __CPROVER_assume(two != three);
 
+  List res, err;
   __CPROVER_assume(res != err);
 
   /* Build a list of the form 1->...->1->2->....->2->3 */

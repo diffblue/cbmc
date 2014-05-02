@@ -19,13 +19,14 @@ typedef struct node {
 } *List;
 
 
-List res, err;
 
 void main() {
   /* Build a list of the form 1->...->1->0 */
 
   List zero, one;
   __CPROVER_assume(zero!=one);
+
+  List res, err;
   __CPROVER_assume(res!=err);
 
   List a = (List) malloc(sizeof(struct node));
