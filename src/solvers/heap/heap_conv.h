@@ -186,6 +186,11 @@ protected:
   typedef std::map<unsigned,heaplit*> heap_literal_mapt;
   heap_literal_mapt heap_literal_map;
 
+ private:
+  void add_unit_clause(heaplit* hl);
+  literalt add_heap_literal(heaplit* hl);
+  heapvar add_aux_equality(heapexpr he);
+
 };
 
 

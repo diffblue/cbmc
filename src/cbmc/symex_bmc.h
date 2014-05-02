@@ -70,6 +70,7 @@ protected:
   virtual bool is_heap_type(typet type);
   virtual irep_idt make_heap_id(irep_idt tag);
   virtual irep_idt make_new_heap_id(irep_idt tag);
+  virtual irep_idt make_old_heap_id(irep_idt tag);
 
 };
 

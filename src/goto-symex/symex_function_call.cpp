@@ -394,12 +394,11 @@ void goto_symext::symex_function_call_code(
     state.source.pc++;
     return;
   }
-  if(identifier=="c::__CPROVER_initialize") {
-    //ignore 
-
+    //cannot ignore because of global variable initialisations
+  /*  if(identifier=="c::__CPROVER_initialize") {
     state.source.pc++;
     return;
-  }
+    }*/
   
   // find code in function map
   

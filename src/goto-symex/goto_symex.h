@@ -274,6 +274,7 @@ protected:
   virtual bool is_heap_type(typet type) { return false; }
   virtual irep_idt make_heap_id(irep_idt tag) { assert(false); }
   virtual irep_idt make_new_heap_id(irep_idt tag) { assert(false); }
+  virtual irep_idt make_old_heap_id(irep_idt tag) { assert(false); }
   void replace_heap_member(exprt &expr);
   typedef std::map<irep_idt,irep_idt> heap_id_mapt;
   heap_id_mapt heap_id_map;

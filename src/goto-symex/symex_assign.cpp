@@ -457,14 +457,20 @@ void goto_symext::symex_assign_member(
   {
     exprt _rhs = rhs;
     replace_heap_member(_rhs);
-    irep_idt old_heap_id = make_heap_id(to_struct_type(struct_type).get_tag());
-    irep_idt new_heap_id = make_new_heap_id(to_struct_type(struct_type).get_tag());
+    irep_idt old_heap_id, new_heap_id;
+    if(_rhs.id()!=ID_heap_with) //new heap id only for innermost "with"
+    {
+      old_heap_id = make_heap_id(to_struct_type(struct_type).get_tag());
+      new_heap_id = make_new_heap_id(to_struct_type(struct_type).get_tag());
+    }
+    else
+    { 
+      new_heap_id = old_heap_id = make_old_heap_id(to_struct_type(struct_type).get_tag());
+    }
     heap_with_exprt new_rhs(lhs_struct, exprt(ID_member_name), 
       _rhs,old_heap_id,new_heap_id);
     new_rhs.op1().set(ID_component_name, component_name);
     exprt new_lhs = lhs;
-    /*   lhs_struct.set(ID_new_heap_id,new_heap_id);
-	 new_lhs.set(ID_new_heap_id,new_heap_id); */
     exprt new_full_lhs=add_to_lhs(full_lhs, new_lhs);
 
     symex_assign_rec(

@@ -188,3 +188,8 @@ irep_idt symex_bmct::make_new_heap_id(irep_idt tag)
 { 
   return /*id2string(tag)+*/"heap"+i2string(++heap_counter); 
 }
+
+irep_idt symex_bmct::make_old_heap_id(irep_idt tag)
+{ 
+  return /*id2string(tag)+*/"heap"+i2string(heap_counter-1); 
+}
