@@ -69,6 +69,11 @@ int acceleratet::accelerate_loop(goto_programt::targett &loop_header) {
   while (acceleration.accelerate(accelerator)) {
     //set_dirty_vars(accelerator);
 
+    if (is_underapproximate(accelerator)) {
+      // We have some underapproximated variables -- just punt for now.
+      continue;
+    }
+
     accelerators.push_back(accelerator);
     num_accelerated++;
 
@@ -322,6 +327,25 @@ void acceleratet::add_dirty_checks() {
       program.insert_before_swap(it, not_dirty);
     }
   }
+}
+
+bool acceleratet::is_underapproximate(path_acceleratort &accelerator) {
+  for (set<exprt>::iterator it = accelerator.dirty_vars.begin();
+       it != accelerator.dirty_vars.end();
+       ++it) {
+    if (it->id() == ID_symbol && it->type() == bool_typet()) {
+      const irep_idt &id = to_symbol_expr(*it).get_identifier();
+      const symbolt &sym = symbol_table.lookup(id);
+
+      if (sym.module == "scratch") {
+        continue;
+      }
+    }
+
+    return true;
+  }
+
+  return false;
 }
 
 symbolt acceleratet::make_symbol(string name, typet type) {

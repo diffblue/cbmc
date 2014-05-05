@@ -61,6 +61,7 @@ class acceleratet {
 
   void set_dirty_vars(path_acceleratort &accelerator);
   void add_dirty_checks();
+  bool is_underapproximate(path_acceleratort &accelerator);
 
   void make_overflow_loc(goto_programt::targett loop_header,
                          goto_programt::targett &loop_end,
