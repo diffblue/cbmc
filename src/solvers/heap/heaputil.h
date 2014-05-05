@@ -11,7 +11,7 @@
 #ifndef HEAPUTIL
 #define HEAPUTIL
 
-#if 0
+#if 1
 
 #define debugc(s, cond) if (cond) std::cout << s << std::endl;
 
@@ -53,6 +53,9 @@ typedef meetIrreducible* meetIrreduciblep;
 typedef std::set< meetIrreduciblep, meetIrreducible_comp> solutiont;
 
 typedef union_find<heapvar> aliasest;
+
+typedef std::pair<heapvar, heapvar> danglingt;
+typedef std::set<danglingt> danglingst;
 
 typedef std::pair<heapvar, heapexpr> not_eqt;
 typedef std::set<not_eqt> not_eqst;

@@ -187,6 +187,7 @@ class heapheuristics {
 	decision_f.push_back(newclause);
     }
 
+
     entailResult::s res = sol.entails(&decision_f);
     assert(res == entailResult::Incomplete); 
 
@@ -195,7 +196,7 @@ class heapheuristics {
 	sol.add_lit(*it);
 	debugc("[extrapolate] : added to the solution : " << *it, 1);
     }
-    
+
     // record in trail
     inferenceRecord* ir = new inferenceRecord(*(decision.first.begin()), this);
     sol.trail.insert(ir);

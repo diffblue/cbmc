@@ -95,6 +95,7 @@ decision_proceduret::resultt heap_dect::dec_solve()
   heapheuristics h;
 
   std::cout << "Number of clauses: " << formula.size() << std::endl;
+  //std::cout << "Formula = " << formula << std::endl;
 
   heaptrans t(formula);
 

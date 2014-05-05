@@ -24,17 +24,22 @@ public :
   adj_listt adj_list;
   // eqs of the form v1 = sel(m, v2, n)
   sel_eqst sel_eqs;
+  // dangling pointers
+  danglingst danglings;
 
   // negative heap facts
   not_eqst not_eqs;
   not_pathst not_paths;
+  danglingst not_danglings;
 
   heapabs () {
     aliases.clear();
     adj_list.clear();
     sel_eqs.clear();
+    danglings.clear();
     not_eqs.clear();
     not_paths.clear();
+    not_danglings.clear();
   }
 
   entailResult::s entails(const meetIrreduciblep& e) {
@@ -100,7 +105,6 @@ public :
 
     return ret;
   }
-
 
   bool add_lit(meetIrreduciblep mi) {
     debugc("[add_lit] : mi = " << mi, 0);
@@ -205,7 +209,26 @@ public :
   }
 
   bool add_dangling(heapvar m, heapvar x, uint8_t s) {
-    return add_eq(x, heapexpr(heapvar("dangling")), s);
+
+    heapvar representative_x = aliases.find(x);
+    danglingt dangling = std::make_pair(m, representative_x);
+
+    if (s == stateTrue) {
+
+      if (danglings.find(dangling) != danglings.end())
+	return false;
+
+      danglings.insert(dangling);
+    }
+    else {
+      if (not_danglings.find(dangling) != not_danglings.end())
+	return false;
+
+      not_danglings.insert(dangling);
+    }
+
+    return true;
+    //return add_eq(x, heapexpr(heapvar("dangling")), s);
   }
 
   bool add_eq(heapvar x, heapexpr y, uint8_t s) {
@@ -440,7 +463,7 @@ public :
         debugc("[add_eq] (2) : " << it->first << " = " << it->second, 1);
 	add_eq(it->first, it->second, stateTrue);
       }
-
+  
 
       debugc("[add_eq/not_paths] : not_paths = " << not_paths, 1);
        // update not_paths 
@@ -479,6 +502,54 @@ public :
 	    not_path->y = new_x;
 	    not_paths.insert(not_path);
 	    debugc("[add_eq/not_path] : after replacement not_paths = " << not_paths, 0);
+	  }
+	}
+      }
+
+      // update danglings
+      for(danglingst::iterator danglings_it = danglings.begin(); danglings_it != danglings.end(); ++danglings_it) {
+	if(!(old_x == new_x)) {
+	  if(danglings_it->second == old_x) {
+	    //debugc("[add_eq/not_path] : replacing old_x = " << old_x, 0);
+	    danglingt dangling = *danglings_it;
+	    danglings.erase(danglings_it);
+	    dangling.first = new_x;
+	    danglings.insert(dangling);
+	    //debugc("[add_eq/not_path] : after replacement not_paths = " << not_paths, 0);
+	  }
+	}
+	if(!(old_y == new_x)) {
+	  if(danglings_it->second == old_y) {
+	    //debugc("[add_eq/not_path] : replacing old_x = " << old_x, 0);
+	    danglingt dangling = *danglings_it;
+	    danglings.erase(danglings_it);
+	    dangling.first = new_x;
+	    danglings.insert(dangling);
+	    //debugc("[add_eq/not_path] : after replacement not_paths = " << not_paths, 0);
+	  }
+	}
+      }
+
+      // update danglings
+      for(danglingst::iterator not_danglings_it = not_danglings.begin(); not_danglings_it != not_danglings.end(); ++not_danglings_it) {
+	if(!(old_x == new_x)) {
+	  if(not_danglings_it->second == old_x) {
+	    //debugc("[add_eq/not_path] : replacing old_x = " << old_x, 0);
+	    danglingt not_dangling = *not_danglings_it;
+	    not_danglings.erase(not_danglings_it);
+	    not_dangling.second = new_x;
+	    not_danglings.insert(not_dangling);
+	    //debugc("[add_eq/not_path] : after replacement not_paths = " << not_paths, 0);
+	  }
+	}
+	if(!(old_y == new_x)) {
+	  if(not_danglings_it->second == old_y) {
+	    //debugc("[add_eq/not_path] : replacing old_x = " << old_x, 0);
+	    danglingt not_dangling = *not_danglings_it;
+	    not_danglings.erase(not_danglings_it);
+	    not_dangling.second = new_x;
+	    not_danglings.insert(not_dangling);
+	    //debugc("[add_eq/not_path] : after replacement not_paths = " << not_paths, 0);
 	  }
 	}
       }
@@ -744,11 +815,19 @@ public :
   }
 
   bool entails_dangling(heapvar m, heapvar hv1) {
-    return aliases.find(hv1) == aliases.find(heapvar("dangling"));
+    heapvar representative_hv1 = aliases.find(hv1);
+    danglingt dangling = std::make_pair(m, representative_hv1);
+    return danglings.find(dangling) != danglings.end(); 
+
+    //return aliases.find(hv1) == aliases.find(heapvar("dangling"));
   } 
 
   bool entails_not_dangling(heapvar m, heapvar hv1) {
-    return !(aliases.find(hv1) == aliases.find(heapvar("dangling")));
+    heapvar representative_hv1 = aliases.find(hv1);
+    danglingt dangling = std::make_pair(m, representative_hv1);
+    return not_danglings.find(dangling) != not_danglings.end(); 
+
+    //return !(aliases.find(hv1) == aliases.find(heapvar("dangling")));
   } 
 
   bool entails_literal(const meetIrreduciblep& e) {
