@@ -134,6 +134,10 @@ bool disjunctive_polynomial_accelerationt::accelerate(
       continue;
     }
 
+    if (it->id() == ID_index) {
+      continue;
+    }
+
     if (accelerator.changed_vars.find(*it) != accelerator.changed_vars.end()) {
       // We've accelerated variable this already.
       continue;
@@ -237,14 +241,12 @@ bool disjunctive_polynomial_accelerationt::accelerate(
     accelerator.changed_vars.insert(it->first);
   }
 
-#if 0
   // Add in any array assignments we can do now.
   if (!do_arrays(assigns, polynomials, loop_counter, stashed, program)) {
     // We couldn't model some of the array assignments with polynomials...
     // Unfortunately that means we just have to bail out.
     return false;
   }
-#endif
 
   program.add_instruction(ASSUME)->guard = guard;
   program.fix_types();
@@ -791,6 +793,8 @@ exprt disjunctive_polynomial_accelerationt::precondition(patht &path) {
 
       if (lhs.id() == ID_symbol) {
         replace_expr(lhs, rhs, ret);
+      } else if (lhs.id() == ID_index) {
+        continue;
       } else {
         throw "Couldn't take WP of " + expr2c(lhs, ns) + " = " + expr2c(rhs, ns);
       }
