@@ -22,6 +22,7 @@ struct StackItem {
 
 extern __CPROVER_bool nondet();
 
+#define not_null(x) if(x == NULL) res = err;
 
 void main() {
 
@@ -34,10 +35,12 @@ void main() {
 	not_null(root);	
 	root->right = NULL;
 
+
 	while (nondet()) {
-		n = root;
+	  	n = root;
 		not_null(n);	
 		while (n->left && n->right) {
+		  
 		  if (nondet()) {
 		    not_null(n);	
 		    n = n->left;
@@ -46,7 +49,7 @@ void main() {
 		    not_null(n);	
 		    n = n->right;
 		  }
-
+		  
 		  not_null(n);	
 		  if (!n->left && nondet()) {
 		    not_null(n);	
@@ -70,17 +73,19 @@ void main() {
 		  not_null(n);	
 		}
 	}
-
+	
+	//root = NULL;
 	n = NULL;
 
-	struct StackItem* s = malloc(sizeof(*s)), *st;
+	struct StackItem *s = malloc(sizeof(*s)), *st;
 	not_null(s);	
 	s->next = NULL;
 	not_null(s);	
 	s->node = root;
 
+
 	while (s != NULL) {
-		st = s;
+	        st = s;
 		not_null(s);	
 		s = s->next;
 		not_null(st);	
@@ -89,7 +94,7 @@ void main() {
 		free(st);
 		not_null(n);	
 		if (n->left) {
-			st = malloc(sizeof(*st));
+		        st = malloc(sizeof(*st));
 			not_null(st);	
 			st->next = s;
 			not_null(st);	
@@ -99,7 +104,7 @@ void main() {
 		}
 		not_null(n);	
 		if (n->right) {
-			st = malloc(sizeof(*st));
+		        st = malloc(sizeof(*st));
 			not_null(st);	
 			st->next = s;
 			not_null(st);	
@@ -109,7 +114,7 @@ void main() {
 		}
 		not_null(n);
 		free(n);
-	}
+		}
 
 	assert(res!=err);
 	//return 0;

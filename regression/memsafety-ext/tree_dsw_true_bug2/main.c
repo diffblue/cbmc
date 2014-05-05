@@ -85,13 +85,14 @@ void main() {
 	  not_null(n);
 	  n->left = n->right;
 	  not_null(n);
-	  n->right = pred;
+	  n->right = pred->left;
 	  pred = n;
 	  n = succ;
 	  if (!n) {
 	    n = pred;
 	    pred = NULL;
 	  }
+	  sentinel = sentinel->left;
 	}
 
 	if (pred != root)
@@ -118,7 +119,9 @@ void main() {
 		  // BUG: no allocation --> found with 2 unwindings
 		      /*st = malloc(sizeof(*st));*/
 		        not_null(st);
-			st->next = s;
+			/*st->next = s;
+			  not_null(st);*/
+			st = st->next;
 			not_null(st);
 			not_null(n);
 			st->node = n->left;

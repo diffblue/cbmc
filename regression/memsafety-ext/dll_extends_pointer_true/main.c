@@ -31,12 +31,17 @@ void main()
         Node *res, *err;
 	__CPROVER_assume(res!=err);
 
-	y = malloc(sizeof(*y));
+	y = malloc(sizeof(Node));
+
+	//not_null(y);	
+	//free(y);
 	not_null(y);	
+	
 	y->next = NULL;
 	not_null(y);	
 	y->prev = NULL;
-	
+
+
 	not_null(y);	
 	__CPROVER_assume(y->data!=NULL);
 	y->pData = y->data;
@@ -82,7 +87,7 @@ void main()
                 //not_null(y); 
 		free(y);
 	}
-
-	assert(res!=err);
+	
+	assert(res!=err); 
 	//return 0;
 }

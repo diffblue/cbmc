@@ -47,6 +47,8 @@ void main()
 
 	while (nondet()) {
 	  y = malloc(sizeof(*y));
+	  // bug
+	  free(y);
 	  not_null(y);	
 	  y->next = list;
 	  not_null(list);	

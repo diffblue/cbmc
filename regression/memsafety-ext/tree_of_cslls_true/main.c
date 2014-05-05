@@ -36,6 +36,8 @@ void main()
 	TreeNode* tmp;
 	ListNode* tmpList;
 
+	tree = NULL;
+
 	not_null(tree);				
 	tree->left  = NULL;
 	not_null(tree);				
