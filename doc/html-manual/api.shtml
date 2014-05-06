@@ -224,7 +224,24 @@ This type is only available in the C frontend.  It is used
 to specify an IEEE-754 floating point number with arbitrary
 but fixed size.  The first parameter is the total size (in bits)
 of the number, and the second is the size (in bits) of the
-mantissa, or significand.
+mantissa, or significand (not including the hidden bit, thus for
+single precision this should be 23).
+</p>
+
+<h4>__CPROVER_fixedbv</h4>
+
+<hr>
+<code>
+__CPROVER_fixedbv [ <i>expression</i> ] [ <i>expression</i> ]
+</code>
+<hr>
+
+<p class="justified">
+This type is only available in the C frontend.  It is used
+to specify a fixed-point bit vector with arbitrary
+but fixed size.  The first parameter is the total size (in bits)
+of the type, and the second is the number of bits after the radix
+point.
 </p>
 
 <h4>__CPROVER_size_t</h4>
