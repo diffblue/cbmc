@@ -4069,8 +4069,13 @@ std::string expr2ct::convert(
       return convert_norep(src, precedence);
     else if(src.type().id()==ID_code)
       return convert_unary(src, "", precedence=15);
-    else if(src.op0().id()==ID_plus && src.op0().operands().size()==2)
+    else if(src.op0().id()==ID_plus &&
+            src.op0().operands().size()==2 &&
+            ns.follow(src.op0().op0().type()).id()==ID_pointer)
+    {
+      // Note that index[pointer] is legal C, but we avoid it nevertheless.
       return convert(index_exprt(src.op0().op0(), src.op0().op1()));
+    }
     else
       return convert_unary(src, "*", precedence=15);
   }
