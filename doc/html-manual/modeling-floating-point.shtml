@@ -95,6 +95,20 @@
   and <code>-fsignaling-nans</code> are needed for GCC to be strictly
   compliant with IEEE-754.</p>
 
+<h3>Rounding Mode</h3>
+
+<p class="justified">CPROVER supports the four rounding modes given by
+  IEEE-754 1985; round to nearest (ties to even), round up, round
+  down and round towards zero.  By default, round to nearest is used.
+  However, command line options (<tt>--round-to-zero</tt>, etc.) can
+  be used to over-ride this.  If more control is needed, CPROVER has
+  models of <tt>fesetround</tt> (for POSIX systems)
+  and <tt>_controlfp</tt> (for Windows), which can be used to change
+  the rounding mode during program execution.  The rounding mode is
+  stored in the (thread local)
+  variable <tt>__CPROVER_rounding_mode</tt>, but users are strongly
+  advised not to use this directly.</p>
+
 <h3>Math Library</h3>
 
 <p class="justified">CPROVER implements some of <code>math.h</code>,
