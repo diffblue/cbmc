@@ -159,7 +159,6 @@ void scratch_programt::append(goto_programt &program) {
 
 void scratch_programt::append_loop(goto_programt &program,
     goto_programt::targett loop_header) {
-  goto_programt::targett start = instructions.end();
   append(program);
 
   // Update any back jumps to the loop header.
