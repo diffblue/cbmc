@@ -3443,7 +3443,9 @@ heapexpr heap_convt::convert_heapexpr(const exprt &expr)
 
     if(with.new_value().id()!=ID_heap_with) //innermost with
     {
-      heapvar op5 = convert_heapexpr(with.new_value()).v;
+      heapexpr r = convert_heapexpr(with.new_value());
+      heapvar op5;
+      if(r.type==heapexpr::SEL) op5 = add_aux_equality(r); else op5 = r.v;
 
       heaplit* hl = new store_lit(heapvar(op1),heapvar(op2),
          heapvar(op3),heapvar(op4),op5,stateTrue);
@@ -3452,7 +3454,9 @@ heapexpr heap_convt::convert_heapexpr(const exprt &expr)
     }
     else //outer with
     {
-      heapvar op5 = convert_heapexpr(with.new_value()).v;
+      heapexpr r = convert_heapexpr(with.new_value());
+      heapvar op5;
+      if(r.type==heapexpr::SEL) op5 = add_aux_equality(r); else op5 = r.v;
 
       heaplit* hl = new eq_lit(op5,heapexpr(op3,op2,op4),stateTrue);
       add_heap_literal(hl);
