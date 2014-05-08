@@ -86,6 +86,11 @@ bool polynomial_acceleratort::accelerate(patht &loop,
     polynomialt poly;
     exprt target = *it;
 
+    if (target.type() == bool_typet()) {
+      // Hack: don't accelerate booleans.
+      continue;
+    }
+
     if (target.id() == ID_index) {
       // We'll handle this later.
       continue;
@@ -224,6 +229,12 @@ bool polynomial_acceleratort::fit_polynomial(goto_programt::instructionst &body,
   for (set<exprt>::iterator it = influence.begin();
        it != influence.end();
        ++it) {
+    if (it->id() == ID_index ||
+        it->id() == ID_dereference) {
+      // Hack: don't accelerate variables that depend on arrays...
+      return false;
+    }
+
     exprs.clear();
 
     exprs.push_back(*it);
@@ -642,6 +653,9 @@ exprt polynomial_acceleratort::precondition(patht &path) {
 
       if (lhs.id() == ID_symbol) {
         replace_expr(lhs, rhs, ret);
+      } else if (lhs.id() == ID_index ||
+                 lhs.id() == ID_dereference) {
+        continue;
       } else {
         throw "Couldn't take WP of " + expr2c(lhs, ns) + " = " + expr2c(rhs, ns);
       }

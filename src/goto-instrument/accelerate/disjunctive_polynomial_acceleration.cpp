@@ -85,7 +85,8 @@ bool disjunctive_polynomial_accelerationt::accelerate(
       continue;
     }
 
-    if (target.id() == ID_index) {
+    if (target.id() == ID_index ||
+        target.id() == ID_dereference) {
       // We'll handle this later.
       continue;
     }
@@ -134,7 +135,8 @@ bool disjunctive_polynomial_accelerationt::accelerate(
       continue;
     }
 
-    if (it->id() == ID_index) {
+    if (it->id() == ID_index ||
+        it->id() == ID_dereference) {
       continue;
     }
 
@@ -287,6 +289,13 @@ bool disjunctive_polynomial_accelerationt::fit_polynomial(
   for (expr_sett::iterator it = influence.begin();
        it != influence.end();
        ++it) {
+    if (it->id() == ID_index ||
+        it->id() == ID_dereference) {
+      // Hack: don't accelerate anything that depends on an array
+      // yet...
+      return false;
+    }
+
     exprs.clear();
 
     exprs.push_back(*it);
@@ -793,7 +802,8 @@ exprt disjunctive_polynomial_accelerationt::precondition(patht &path) {
 
       if (lhs.id() == ID_symbol) {
         replace_expr(lhs, rhs, ret);
-      } else if (lhs.id() == ID_index) {
+      } else if (lhs.id() == ID_index ||
+                 lhs.id() == ID_dereference) {
         continue;
       } else {
         throw "Couldn't take WP of " + expr2c(lhs, ns) + " = " + expr2c(rhs, ns);
