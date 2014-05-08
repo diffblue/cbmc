@@ -57,12 +57,13 @@ int acceleratet::accelerate_loop(goto_programt::targett &loop_header) {
   make_overflow_loc(loop_header, back_jump, overflow_loc);
   program.update();
 
-  /*
+#if 0
   enumerating_loop_accelerationt acceleration(symbol_table, goto_functions,
       program, loop, loop_header, accelerate_limit);
-      */
+#else
   disjunctive_polynomial_accelerationt acceleration(symbol_table, goto_functions,
       program, loop, loop_header);
+#endif
 
   path_acceleratort accelerator;
 
