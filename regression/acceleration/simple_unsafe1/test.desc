@@ -1,7 +1,6 @@
 CORE
 main.c
 --no-unwinding-assertions
---z3
 
 ^EXIT=10$
 ^SIGNAL=0$
