@@ -707,3 +707,48 @@ bool acceleration_utilst::expr2poly(exprt &expr,
 
   return true;
 }
+
+void acceleration_utilst::extract_polynomial(scratch_programt &program,
+                                                 set<pair<expr_listt, exprt> >
+                                                   &coefficients,
+                                                 polynomialt &polynomial) {
+  for (set<pair<expr_listt, exprt> >::iterator it = coefficients.begin();
+       it != coefficients.end();
+       ++it) {
+    monomialt monomial;
+    expr_listt terms = it->first;
+    exprt coefficient = it->second;
+    constant_exprt concrete_term = to_constant_expr(program.eval(coefficient));
+    map<exprt, int> degrees;
+
+    mp_integer mp = binary2integer(concrete_term.get_value().c_str(), true);
+    monomial.coeff = mp.to_long();
+
+    if (monomial.coeff == 0) {
+      continue;
+    }
+
+    for (expr_listt::iterator it = terms.begin();
+         it != terms.end();
+         ++it) {
+      exprt term = *it;
+
+      if (degrees.find(term) != degrees.end()) {
+        degrees[term]++;
+      } else {
+        degrees[term] = 1;
+      }
+    }
+
+    for (map<exprt, int>::iterator it = degrees.begin();
+         it != degrees.end();
+         ++it) {
+      monomialt::termt term;
+      term.var = it->first;
+      term.exp = it->second;
+      monomial.terms.push_back(term);
+    }
+
+    polynomial.monomials.push_back(monomial);
+  }
+}

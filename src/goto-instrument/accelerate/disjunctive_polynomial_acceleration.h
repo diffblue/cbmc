@@ -17,6 +17,7 @@
 #include "accelerator.h"
 #include "loop_acceleration.h"
 #include "cone_of_influence.h"
+#include "acceleration_utils.h"
 
 #define DEBUG
 
@@ -34,12 +35,13 @@ class disjunctive_polynomial_accelerationt : public loop_accelerationt {
       goto_functions(_goto_functions),
       goto_program(_goto_program),
       loop(_loop),
-      loop_header(_loop_header)
+      loop_header(_loop_header),
+      utils(symbol_table, goto_functions, loop_counter)
   {
     loop_counter = nil_exprt();
     find_distinguishing_points();
     build_fixed();
-    find_modified(loop, modified);
+    utils.find_modified(loop, modified);
   }
 
   virtual bool accelerate(path_acceleratort &accelerator);
@@ -55,63 +57,9 @@ class disjunctive_polynomial_accelerationt : public loop_accelerationt {
                          int num_unwindings,
                          goto_programt &loop_body,
                          exprt &target);
-  void extract_polynomial(scratch_programt &program,
-                          set<pair<expr_listt, exprt> > &coefficients,
-                          polynomialt &polynomial);
   void cone_of_influence(const exprt &target, expr_sett &cone);
 
-  bool check_inductive(map<exprt, polynomialt> polynomials,
-                       patht &path);
-  void stash_variables(scratch_programt &program,
-                       expr_sett modified,
-                       substitutiont &substitution);
-  void stash_polynomials(scratch_programt &program,
-                         map<exprt, polynomialt> &polynomials,
-                         map<exprt, exprt> &stashed,
-                         patht &path);
-
-  exprt precondition(patht &path);
-
-  bool do_assumptions(map<exprt, polynomialt> polynomials,
-                      patht &body,
-                      exprt &guard);
-
-  typedef pair<exprt, exprt> expr_pairt;
-  typedef vector<expr_pairt> expr_pairst;
-
-  typedef struct polynomial_array_assignment {
-    exprt array;
-    polynomialt index;
-    polynomialt value;
-  } polynomial_array_assignmentt;
-
-  typedef vector<polynomial_array_assignmentt> polynomial_array_assignmentst;
-
-  bool do_arrays(goto_programt::instructionst &loop_body,
-                 map<exprt, polynomialt> &polynomials,
-                 exprt &loop_counter,
-                 substitutiont &substitution,
-                 scratch_programt &program);
-  expr_pairst gather_array_assignments(goto_programt::instructionst &loop_body,
-                                       expr_sett &arrays_written);
-  bool array_assignments2polys(expr_pairst &array_assignments,
-                               map<exprt, polynomialt> &polynomials,
-                               polynomial_array_assignmentst &array_polynomials,
-                               polynomialst &nondet_indices);
-  bool expr2poly(exprt &expr,
-                 map<exprt, polynomialt> &polynomials,
-                 polynomialt &poly);
-
-  void gather_rvalues(const exprt &expr, expr_sett &rvalues);
-
-  void ensure_no_overflows(scratch_programt &program);
-
   void find_distinguishing_points();
-  void find_modified(patht &path, expr_sett &modified);
-  void find_modified(goto_programt &program, expr_sett &modified);
-  void find_modified(natural_loops_mutablet::natural_loopt &loop,
-      expr_sett &modified);
-  void find_modified(goto_programt::targett t, expr_sett &modified);
 
   void build_path(scratch_programt &scratch_program, patht &path);
   void build_fixed();
@@ -128,6 +76,7 @@ class disjunctive_polynomial_accelerationt : public loop_accelerationt {
   typedef map<goto_programt::targett, exprt> distinguish_mapt;
   typedef map<exprt, bool> distinguish_valuest;
 
+  acceleration_utilst utils;
   exprt loop_counter;
   distinguish_mapt distinguishing_points;
   list<exprt> distinguishers;
