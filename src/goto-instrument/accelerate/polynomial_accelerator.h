@@ -14,6 +14,8 @@
 #include "path.h"
 #include "accelerator.h"
 #include "path_acceleration.h"
+#include "acceleration_utils.h"
+#include "cone_of_influence.h"
 
 using namespace std;
 
@@ -23,7 +25,8 @@ class polynomial_acceleratort : public path_accelerationt {
                           const goto_functionst &_goto_functions) :
       symbol_table(const_cast<symbol_tablet &>(_symbol_table)),
       ns(symbol_table),
-      goto_functions(_goto_functions)
+      goto_functions(_goto_functions),
+      utils(symbol_table, goto_functions, loop_counter)
   {
     loop_counter = nil_exprt();
   }
@@ -34,6 +37,7 @@ class polynomial_acceleratort : public path_accelerationt {
       symbol_table(const_cast<symbol_tablet &>(_symbol_table)),
       ns(symbol_table),
       goto_functions(_goto_functions),
+      utils(symbol_table, goto_functions, loop_counter),
       loop_counter(_loop_counter)
   {
   }
@@ -54,12 +58,12 @@ class polynomial_acceleratort : public path_accelerationt {
   void extract_polynomial(scratch_programt &program,
                           set<pair<expr_listt, exprt> > &coefficients,
                           polynomialt &polynomial);
-  set<exprt> cone_of_influence(goto_programt::instructionst &body, exprt &target);
+  expr_sett cone_of_influence(goto_programt::instructionst &body, exprt &target);
 
   bool check_inductive(map<exprt, polynomialt> polynomials,
                        goto_programt::instructionst &body);
   void stash_variables(scratch_programt &program,
-                       set<exprt> modified,
+                       expr_sett modified,
                        substitutiont &substitution);
   void stash_polynomials(scratch_programt &program,
                          map<exprt, polynomialt> &polynomials,
@@ -89,7 +93,7 @@ class polynomial_acceleratort : public path_accelerationt {
                  substitutiont &substitution,
                  scratch_programt &program);
   expr_pairst gather_array_assignments(goto_programt::instructionst &loop_body,
-                                       set<exprt> &arrays_written);
+                                       expr_sett &arrays_written);
   bool array_assignments2polys(expr_pairst &array_assignments,
                                map<exprt, polynomialt> &polynomials,
                                polynomial_array_assignmentst &array_polynomials,
@@ -104,10 +108,11 @@ class polynomial_acceleratort : public path_accelerationt {
   symbol_tablet &symbol_table;
   const namespacet ns;
   const goto_functionst &goto_functions;
+  acceleration_utilst utils;
 
   exprt loop_counter;
 };
 
-set<exprt> find_modified(goto_programt::instructionst &body);
+expr_sett find_modified(goto_programt::instructionst &body);
 
 #endif // POLYNOMIAL_ACCELERATOR_H

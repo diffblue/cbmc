@@ -85,6 +85,8 @@ class acceleration_utilst {
 
   void find_modified(patht &path, expr_sett &modified);
   void find_modified(goto_programt &program, expr_sett &modified);
+  void find_modified(goto_programt::instructionst &instructions,
+      expr_sett &modified);
   void find_modified(natural_loops_mutablet::natural_loopt &loop,
       expr_sett &modified);
   void find_modified(goto_programt::targett t, expr_sett &modified);
