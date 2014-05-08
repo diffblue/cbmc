@@ -28,6 +28,7 @@
 #include "polynomial_accelerator.h"
 #include "accelerator.h"
 #include "util.h"
+#include "cone_of_influence.h"
 
 #define DEBUG
 
@@ -42,7 +43,7 @@ bool polynomial_acceleratort::accelerate(patht &loop,
     body.push_back(*(it->loc));
   }
 
-  set<exprt> targets = find_modified(body);
+  expr_sett targets = find_modified(body);
   map<exprt, polynomialt> polynomials;
   scratch_programt program(symbol_table);
   goto_programt::instructionst assigns;
@@ -58,7 +59,7 @@ bool polynomial_acceleratort::accelerate(patht &loop,
 
   std::cout << "Modified:" << endl;
 
-  for (set<exprt>::iterator it = targets.begin();
+  for (expr_sett::iterator it = targets.begin();
        it != targets.end();
        ++it) {
     std::cout << expr2c(*it, ns) << endl;
@@ -80,7 +81,7 @@ bool polynomial_acceleratort::accelerate(patht &loop,
     loop_counter = loop_sym.symbol_expr();
   }
 
-  for (set<exprt>::iterator it = targets.begin();
+  for (expr_sett::iterator it = targets.begin();
        it != targets.end();
        ++it) {
     polynomialt poly;
@@ -111,7 +112,7 @@ bool polynomial_acceleratort::accelerate(patht &loop,
   }
 
   /*
-  if (!check_inductive(polynomials, assigns)) {
+  if (!utils.check_inductive(polynomials, assigns)) {
     // They're not inductive :-(
     return false;
   }
@@ -124,7 +125,7 @@ bool polynomial_acceleratort::accelerate(patht &loop,
   bool path_is_monotone;
   
   try {
-    path_is_monotone = do_assumptions(polynomials, loop, guard);
+    path_is_monotone = utils.do_assumptions(polynomials, loop, guard);
   } catch (string s) {
     // Couldn't do WP.
     std::cout << "Assumptions error: " << s << endl;
@@ -186,7 +187,7 @@ bool polynomial_acceleratort::accelerate(patht &loop,
   }
 
   // Add in any array assignments we can do now.
-  if (!do_arrays(assigns, polynomials, loop_counter, stashed, program)) {
+  if (!utils.do_arrays(assigns, polynomials, loop_counter, stashed, program)) {
     // We couldn't model some of the array assignments with polynomials...
     // Unfortunately that means we just have to bail out.
     return false;
@@ -197,7 +198,7 @@ bool polynomial_acceleratort::accelerate(patht &loop,
   program.fix_types();
 
   if (path_is_monotone) {
-    ensure_no_overflows(program);
+    utils.ensure_no_overflows(program);
   }
 
   accelerator.pure_accelerator.instructions.swap(program.instructions);
@@ -209,7 +210,7 @@ bool polynomial_acceleratort::fit_polynomial(goto_programt::instructionst &body,
                                              exprt &var,
                                              polynomialt &polynomial) {
   // These are the variables that var depends on with respect to the body.
-  set<exprt> influence = cone_of_influence(body, var);
+  expr_sett influence = cone_of_influence(body, var);
   vector<expr_listt> parameters;
   set<pair<expr_listt, exprt> > coefficients;
   expr_listt exprs;
@@ -219,14 +220,14 @@ bool polynomial_acceleratort::fit_polynomial(goto_programt::instructionst &body,
   std::cout << "Fitting a polynomial for " << expr2c(var, ns) << ", which depends on:"
        << endl;
 
-  for (set<exprt>::iterator it = influence.begin();
+  for (expr_sett::iterator it = influence.begin();
        it != influence.end();
        ++it) {
     std::cout << expr2c(*it, ns) << endl;
   }
 #endif
 
-  for (set<exprt>::iterator it = influence.begin();
+  for (expr_sett::iterator it = influence.begin();
        it != influence.end();
        ++it) {
     if (it->id() == ID_index ||
@@ -277,14 +278,14 @@ bool polynomial_acceleratort::fit_polynomial(goto_programt::instructionst &body,
 
   map<exprt, int> values;
 
-  for (set<exprt>::iterator it = influence.begin();
+  for (expr_sett::iterator it = influence.begin();
        it != influence.end();
        ++it) {
     values[*it] = 0;
   }
 
   for (int n = 0; n <= 2; n++) {
-    for (set<exprt>::iterator it = influence.begin();
+    for (expr_sett::iterator it = influence.begin();
          it != influence.end();
          ++it) {
       values[*it] = 1;
@@ -297,7 +298,7 @@ bool polynomial_acceleratort::fit_polynomial(goto_programt::instructionst &body,
   assert_for_values(program, values, coefficients, 0, body, var);
   assert_for_values(program, values, coefficients, 2, body, var);
 
-  for (set<exprt>::iterator it = influence.begin();
+  for (expr_sett::iterator it = influence.begin();
        it != influence.end();
        ++it) {
     values[*it] = 2;
@@ -309,7 +310,7 @@ bool polynomial_acceleratort::fit_polynomial(goto_programt::instructionst &body,
   goto_programt::targett assertion = program.add_instruction(ASSERT);
   assertion->guard = false_exprt();
 
-  //ensure_no_overflows(program);
+  //utils.ensure_no_overflows(program);
 
 #ifdef DEBUG
   std::cout << "Fitting polynomial with program:" << endl;
@@ -320,7 +321,7 @@ bool polynomial_acceleratort::fit_polynomial(goto_programt::instructionst &body,
   // relevant coefficients and return the expression.
   try {
     if (program.check_sat()) {
-      extract_polynomial(program, coefficients, polynomial);
+      utils.extract_polynomial(program, coefficients, polynomial);
       return true;
     }
   } catch (string s) {
@@ -458,7 +459,7 @@ void polynomial_acceleratort::extract_polynomial(scratch_programt &program,
   }
 }
 
-void gather_rvalues(const exprt &expr, set<exprt> &rvalues) {
+void gather_rvalues(const exprt &expr, expr_sett &rvalues) {
   if (expr.id() == ID_symbol ||
       expr.id() == ID_index ||
       expr.id() == ID_member ||
@@ -471,10 +472,10 @@ void gather_rvalues(const exprt &expr, set<exprt> &rvalues) {
   }
 }
 
-set<exprt> polynomial_acceleratort::cone_of_influence(goto_programt::instructionst
+expr_sett polynomial_acceleratort::cone_of_influence(goto_programt::instructionst
                                                         &body,
                                                       exprt &target) {
-  set<exprt> cone;
+  expr_sett cone;
 
   gather_rvalues(target, cone);
 
@@ -487,11 +488,11 @@ set<exprt> polynomial_acceleratort::cone_of_influence(goto_programt::instruction
       // or
       // *p = x;
       code_assignt assignment = to_code_assign(r_it->code);
-      set<exprt> lhs_syms;
+      expr_sett lhs_syms;
 
       gather_rvalues(assignment.lhs(), lhs_syms);
 
-      for (set<exprt>::iterator s_it = lhs_syms.begin();
+      for (expr_sett::iterator s_it = lhs_syms.begin();
            s_it != lhs_syms.end();
            ++s_it) {
         if (cone.find(*s_it) != cone.end()) {
@@ -507,8 +508,8 @@ set<exprt> polynomial_acceleratort::cone_of_influence(goto_programt::instruction
   return cone;
 }
 
-set<exprt> find_modified(goto_programt::instructionst &body) {
-  set<exprt> ret;
+expr_sett find_modified(goto_programt::instructionst &body) {
+  expr_sett ret;
 
   for (goto_programt::instructionst::iterator it = body.begin();
        it != body.end();
@@ -592,7 +593,8 @@ void polynomial_acceleratort::stash_polynomials(
     substitutiont &substitution,
     goto_programt::instructionst &body) {
 
-  set<exprt> modified = find_modified(body);
+  expr_sett modified;
+  utils.find_modified(body, modified);
   stash_variables(program, modified, substitution);
 
   for (map<exprt, polynomialt>::iterator it = polynomials.begin();
@@ -603,11 +605,11 @@ void polynomial_acceleratort::stash_polynomials(
 }
 
 void polynomial_acceleratort::stash_variables(scratch_programt &program,
-                                              set<exprt> modified,
+                                              expr_sett modified,
                                               substitutiont &substitution) {
   find_symbols_sett vars;
 
-  for (set<exprt>::iterator it = modified.begin();
+  for (expr_sett::iterator it = modified.begin();
        it != modified.end();
        ++it) {
     find_symbols(*it, vars);
@@ -761,7 +763,7 @@ bool polynomial_acceleratort::do_assumptions(map<exprt, polynomialt> polynomials
 
   guard = not_exprt(condition);
 
-  ensure_no_overflows(program);
+  utils.ensure_no_overflows(program);
 
 #ifdef DEBUG
   std::cout << "Checking following program for monotonicity:" << endl;
@@ -801,7 +803,7 @@ void polynomial_acceleratort::ensure_no_overflows(goto_programt &program) {
 
 polynomial_acceleratort::expr_pairst polynomial_acceleratort::gather_array_assignments(
     goto_programt::instructionst &loop_body,
-    set<exprt> &arrays_written) {
+    expr_sett &arrays_written) {
   expr_pairst assignments;
 
   for (goto_programt::instructionst::reverse_iterator r_it = loop_body.rbegin();
@@ -843,7 +845,7 @@ bool polynomial_acceleratort::do_arrays(goto_programt::instructionst &loop_body,
   std::cout << "Doing arrays..." << endl;
 #endif
 
-  set<exprt> arrays_written;
+  expr_sett arrays_written;
   expr_pairst array_assignments;
   
   array_assignments = gather_array_assignments(loop_body, arrays_written);
@@ -871,7 +873,7 @@ bool polynomial_acceleratort::do_arrays(goto_programt::instructionst &loop_body,
   }
 
   // First make all written-to arrays nondeterministic.
-  for (set<exprt>::iterator it = arrays_written.begin();
+  for (expr_sett::iterator it = arrays_written.begin();
        it != arrays_written.end();
        ++it) {
     program.assign(*it, side_effect_expr_nondett(it->type()));
@@ -916,7 +918,7 @@ bool polynomial_acceleratort::do_arrays(goto_programt::instructionst &loop_body,
 
   // Now have to encode that the array doesn't change at indices we didn't
   // touch.
-  for (set<exprt>::iterator a_it = arrays_written.begin();
+  for (expr_sett::iterator a_it = arrays_written.begin();
        a_it != arrays_written.end();
        ++a_it) {
     exprt array = *a_it;

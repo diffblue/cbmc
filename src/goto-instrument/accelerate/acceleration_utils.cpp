@@ -54,12 +54,18 @@ void acceleration_utilst::gather_rvalues(const exprt &expr,
 
 void acceleration_utilst::find_modified(goto_programt &body,
     expr_sett &modified) {
-  for (goto_programt::instructionst::iterator it = body.instructions.begin();
-       it != body.instructions.end();
+  find_modified(body.instructions, modified);
+}
+
+void acceleration_utilst::find_modified(goto_programt::instructionst &instructions,
+    expr_sett &modified) {
+  for (goto_programt::instructionst::iterator it = instructions.begin();
+       it != instructions.end();
        ++it) {
     find_modified(it, modified);
   }
 }
+
 
 void acceleration_utilst::find_modified(patht &path,
     expr_sett &modified) {
