@@ -68,11 +68,11 @@ class heaptrans {
     if (res == entailResult::Incomplete) {
       debugc("[check_constraint] : gamma incomplete", 1);
       debugc("[check_constraint] : constraint = " << *constraint, 1);
-      debugc("[check_constraint] : add hint " << h, 1);
+      debugc("[check_constraint] : add hint " << h, 0);
       gamma = downwardCompleteness::IncompleteTransformer;
-      debugc("[check_constraint] : (1) hints " << precision_hint, 1); 
+      debugc("[check_constraint] : (1) hints " << precision_hint, 0); 
       precision_hint.insert(h);
-      debugc("[check_constraint] : (2) hints " << precision_hint, 1);
+      debugc("[check_constraint] : (2) hints " << precision_hint, 0);
     }
 
     return res;
@@ -188,7 +188,13 @@ class heaptrans {
 			 heapvar v1, heapabs& sol) {
 
     return sol.add_dangling(mnew, v1, stateTrue);
+  }
 
+
+  bool ded_free_not_dangling(heapvar m, heapvar mnew, heapvar v,
+			 heapvar v1, heapabs& sol) {
+
+    return sol.add_dangling(mnew, v1, stateFalse);
   }
 
 
@@ -244,6 +250,17 @@ class heaptrans {
     	callAgain |= ded_free_not_sel(m, mnew, v, (it->second).v, it->first, (it->second).f, sol);
       }
 
+    for(danglingst::iterator it = sol.danglings.begin(); it != sol.danglings.end(); ++it)
+      if(it->first == m) {
+    	callAgain |= ded_free_dangling(m, mnew, v, it->second, sol);
+      }
+
+    for(danglingst::iterator it = sol.not_danglings.begin(); it != sol.not_danglings.end(); ++it)
+      if(it->first == m) {
+    	callAgain |= ded_free_not_dangling(m, mnew, v, it->second, sol);
+      }
+
+
     /********************************************************************************\
      * generation phase: generate Dangling(mnew, v)                                 *
     \********************************************************************************/
@@ -278,17 +295,17 @@ class heaptrans {
 				not_equal(v2, heapexpr(v4)));
 
     debugc("[ded_store_sel] : " << v4 << " = sel(" << m << ", "
-	   << v3 << ", " << f << ")", 1);
+	   << v3 << ", " << f << ")", 0);
     entailResult::s ret = check_constraint(constraint, sol);
-    debugc("[ded_store_sel] : constraint = " << *constraint, 1);
+    debugc("[ded_store_sel] : constraint = " << *constraint, 0);
     delete constraint;
  
     switch(ret) {
     case entailResult::True:
-      debugc("[ded_store_sel] : constraint satisfied", 1);
+      debugc("[ded_store_sel] : constraint satisfied", 0);
       return sol.add_eq(v4, heapexpr(v3, mnew, f), stateFalse);
     case entailResult::False:
-      debugc("[ded_store_sel] : constraint not satisfied ", 1);
+      debugc("[ded_store_sel] : constraint not satisfied ", 0);
       return sol.add_eq(v4, heapexpr(v3, mnew, f), stateTrue);
     case entailResult::Incomplete:
     default: 
@@ -350,10 +367,10 @@ class heaptrans {
 
     switch(ret) {
     case entailResult::True:
-      debugc("[ded_store_path]: add path( " << mnew << ", " << v3 << ", " << v4 << ", false)", 1);
+      debugc("[ded_store_path]: add path( " << mnew << ", " << v3 << ", " << v4 << ", false)", 0);
       return sol.add_path(mnew, v3, v4, f, stateFalse);
     case entailResult::False:
-      debugc("[ded_store_path]: add path( " << mnew << ", " << v3 << ", " << v4 << ", true)", 1);
+      debugc("[ded_store_path]: add path( " << mnew << ", " << v3 << ", " << v4 << ", true)", 0);
       return sol.add_path(mnew, v3, v4, f, stateTrue);
     case entailResult::Incomplete:
     default: 
@@ -380,10 +397,10 @@ class heaptrans {
 
     switch (ret) {
     case entailResult::True:
-      debugc("[ded_store_not_path]: add path( " << mnew << ", " << v3 << ", " << v4 << ", true)", 1);
+      debugc("[ded_store_not_path]: add path( " << mnew << ", " << v3 << ", " << v4 << ", true)", 0);
       return sol.add_path(mnew, v3, v4, f, stateTrue);
     case entailResult::False:
-      debugc("[ded_store_not_path]: add path( " << mnew << ", " << v3 << ", " << v4 << ", false)", 1);
+      debugc("[ded_store_not_path]: add path( " << mnew << ", " << v3 << ", " << v4 << ", false)", 0);
       return sol.add_path(mnew, v3, v4, f, stateFalse);
     case entailResult::Incomplete:
     default: 
@@ -396,16 +413,16 @@ class heaptrans {
    * transformer for  mnew = store(m, v1, f, v2) with respect to     *
    * Dangling(m, v3) and !Dangling(m, v3)                            *
   \*******************************************************************/
-  bool ded_store_dangling(heapvar m, heapvar mnew, heapvar v1,
+  bool ded_store_dangling(heapvar m, heapvar mnew, heapvar v3,
 			  heapabs& sol) {
   
-    return sol.add_dangling(mnew, v1, stateTrue);
+    return sol.add_dangling(mnew, v3, stateTrue);
   }
 
-  bool ded_store_not_dangling(heapvar m, heapvar mnew, heapvar v1,
+  bool ded_store_not_dangling(heapvar m, heapvar mnew, heapvar v3,
 			      heapabs& sol) {
   
-    return sol.add_dangling(mnew, v1, stateFalse);
+    return sol.add_dangling(mnew, v3, stateFalse);
   }
 
   /******************************************************************\
@@ -434,11 +451,11 @@ class heaptrans {
 	    // field sensitivity
 	    if(!(it->first == f)) {
 	      callAgain |= sol.add_path(mnew, v3, v4, it->first, stateTrue);
-	      debugc("[ded_store] : (1) callAgain = " << callAgain, 1);
+	      debugc("[ded_store] : (1) callAgain = " << callAgain, 0);
 	    }
 	    else {
 	      callAgain |= ded_store_path(m, mnew, v1, v2, v3, v4, f, sol);
-      	      debugc("[ded_store] : (2) callAgain = " << callAgain, 1);
+      	      debugc("[ded_store] : (2) callAgain = " << callAgain, 0);
 	    }
 	  }
 	}
@@ -454,11 +471,11 @@ class heaptrans {
 
 	if(!(f == fpath)) {
 	  callAgain |= sol.add_path(mnew, v3, v4, fpath, stateFalse);
-	  debugc("[ded_store] : (3) callAgain = " << callAgain, 1);
+	  debugc("[ded_store] : (3) callAgain = " << callAgain, 0);
 	}
 	else {
 	  callAgain |= ded_store_not_path(m, mnew, v1, v2, v3, v4, f, sol);
-	  debugc("[ded_store] : (4) callAgain = " << callAgain, 1);
+	  debugc("[ded_store] : (4) callAgain = " << callAgain, 0);
 	}
       }
     }
@@ -468,11 +485,11 @@ class heaptrans {
       if((it->second).m == m) {
 	if ((it->second).f == f) {
 	  callAgain |= ded_store_sel(m, mnew, v1, v2, (it->second).v, it->first, (it->second).f, sol);
-	  debugc("[ded_store] : (5) callAgain = " << callAgain, 1);	  
+	  debugc("[ded_store] : (5) callAgain = " << callAgain, 0);	  
 	}
 	else {
 	  callAgain |= sol.add_eq(it->first, heapexpr((it->second).v, mnew, (it->second).f), stateTrue);
-	  debugc("[ded_store] : (6) callAgain = " << callAgain, 1);
+	  debugc("[ded_store] : (6) callAgain = " << callAgain, 0);
 	}
       }
 
@@ -480,22 +497,34 @@ class heaptrans {
       if((it->second).is_sel() && (it->second).m == m) {
 	if ((it->second).f == f) {
 	  callAgain |= ded_store_not_sel(m, mnew, v1, v2, (it->second).v, it->first, (it->second).f, sol);
-	  debugc("[ded_store] : (7) callAgain = " << callAgain, 1);
+	  debugc("[ded_store] : (7) callAgain = " << callAgain, 0);
 	}
 	else {
   	  callAgain |= sol.add_eq(it->first, heapexpr((it->second).v, mnew, (it->second).f), stateFalse);
-	  debugc("[ded_store] : (8) callAgain = " << callAgain, 1);	  
+	  debugc("[ded_store] : (8) callAgain = " << callAgain, 0);	  
 	}
       }
+
+
+    for(danglingst::iterator it = sol.danglings.begin(); it != sol.danglings.end(); ++it)
+      if(it->first == m) {
+    	callAgain |= ded_store_dangling(m, mnew, it->second, sol);
+      }
+
+    for(danglingst::iterator it = sol.not_danglings.begin(); it != sol.not_danglings.end(); ++it)
+      if(it->first == m) {
+    	callAgain |= ded_store_not_dangling(m, mnew, it->second, sol);
+      }
+
 
     heapexpr* tmp = new heapexpr(hl->x, hl->mnew, hl->f);
     callAgain |= ded_eq(new eq_lit(hl->y, *tmp, stateTrue), sol);
 
     if (callAgain) {
-      debugc("[ded_store]: transformerResult::CallAgain", 1);
+      debugc("[ded_store]: transformerResult::CallAgain", 0);
     }
     else {
-      debugc("[ded_store]: transformerResult::DoNotCallAgain", 1);
+      debugc("[ded_store]: transformerResult::DoNotCallAgain", 0);
     }
 
     return callAgain;
@@ -553,6 +582,16 @@ class heaptrans {
 	callAgain |= sol.add_eq(it->first, heapexpr((it->second).v,  mnew, (it->second).f), stateFalse);
 
 
+    for(danglingst::iterator it = sol.danglings.begin(); it != sol.danglings.end(); ++it)
+      if(it->first == m) {
+    	callAgain |= sol.add_dangling(mnew, it->second, stateTrue);
+      }
+
+    for(danglingst::iterator it = sol.not_danglings.begin(); it != sol.not_danglings.end(); ++it)
+      if(it->first == m) {
+    	callAgain |= sol.add_dangling(mnew, it->second, stateFalse);
+      }
+
 
     /****************************************************************\
      * generation phase: generate disiqualities between the new var *
@@ -585,10 +624,10 @@ class heaptrans {
 
 
     if (callAgain) {
-      debugc("[ded_new]: transformerResult::CallAgain", 1);
+      debugc("[ded_new]: transformerResult::CallAgain", 0);
     }
     else {
-      debugc("[ded_new]: transformerResult::DoNotCallAgain", 1);
+      debugc("[ded_new]: transformerResult::DoNotCallAgain", 0);
     }
 
 
@@ -647,11 +686,22 @@ class heaptrans {
 	callAgain |= sol.add_eq(it->first, heapexpr((it->second).v,  mnew, (it->second).f), stateFalse);
 
 
+    for(danglingst::iterator it = sol.danglings.begin(); it != sol.danglings.end(); ++it)
+      if(it->first == m) {
+    	callAgain |= sol.add_dangling(mnew, it->second, stateTrue);
+      }
+
+    for(danglingst::iterator it = sol.not_danglings.begin(); it != sol.not_danglings.end(); ++it)
+      if(it->first == m) {
+    	callAgain |= sol.add_dangling(mnew, it->second, stateFalse);
+      }
+
+
     if (callAgain) {
-      debugc("[ded_mem_eq]: transformerResult::CallAgain", 1);
+      debugc("[ded_mem_eq]: transformerResult::CallAgain", 0);
     }
     else {
-      debugc("[ded_mem_eq]: transformerResult::DoNotCallAgain", 1);
+      debugc("[ded_mem_eq]: transformerResult::DoNotCallAgain", 0);
     }
 
     return callAgain;
@@ -668,10 +718,10 @@ class heaptrans {
     bool callAgain = sol.add_lit(copy_lit(*hl));
 
     if (callAgain) {
-      debugc("[ded_path]: transformerResult::CallAgain", 1);
+      debugc("[ded_path]: transformerResult::CallAgain", 0);
     }
     else {
-      debugc("[ded_path]: transformerResult::DoNotCallAgain", 1);
+      debugc("[ded_path]: transformerResult::DoNotCallAgain", 0);
     }
 
     return callAgain;
@@ -701,10 +751,10 @@ class heaptrans {
     bool callAgain = sol.add_lit(copy_lit(*hl));
 
     if (callAgain) {
-      debugc("[ded_dangling]: transformerResult::CallAgain", 1);
+      debugc("[ded_dangling]: transformerResult::CallAgain", 0);
     }
     else {
-      debugc("[ded_dangling]: transformerResult::DoNotCallAgain", 1);
+      debugc("[ded_dangling]: transformerResult::DoNotCallAgain", 0);
     }
 
     return callAgain;
@@ -726,10 +776,10 @@ class heaptrans {
     callAgain |= sol.add_lit(copy_lit(*hl));
 
     if (callAgain) {
-      debugc("[ded_eq]: transformerResult::CallAgain", 1);
+      debugc("[ded_eq]: transformerResult::CallAgain", 0);
     }
     else {
-      debugc("[ded_eq]: transformerResult::DoNotCallAgain", 1);
+      debugc("[ded_eq]: transformerResult::DoNotCallAgain", 0);
     }
 
     return callAgain;
@@ -771,7 +821,7 @@ class heaptrans {
     case NO_TERM:;
     default:;  
     }
-    debugc("sol = " << sol, 1);
+    debugc("sol = " << sol, 0);
 
     inferenceRecord* ir = new inferenceRecord(new meetIrreducible(unit), this);
     sol.trail.insert(ir);
@@ -814,7 +864,7 @@ class heaptrans {
       switch(sol.entails(mi)) {
       case entailResult::True:
 	// enabled
-	debugc("[apply] : enabled clauses for mi = " << *mi, 1);
+	debugc("[apply] : enabled clauses for mi = " << *mi, 0);
 	for(formulat::iterator it1 = (it->second).begin(); it1 != (it->second).end(); ++it1) {
 	  if(unit_clause(*it1, unit, sol)) {
 	    debugc("[apply]: found new enabled unit clause " << *unit, 1);

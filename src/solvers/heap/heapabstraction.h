@@ -144,7 +144,7 @@ public :
     heapvar x_ = aliases.find(x);
     heapvar y_ = aliases.find(y);
 
-    debugc("[add_path] : add path(" << m << ", " << x << ", " << y << ", " << f << ")", 1);
+    debugc("[add_path] : add path(" << m << ", " << x << ", " << y << ", " << f << ")", 0);
     debugc("[add path] : x_ = :" << x_, 0); 
     debugc("[add path] : y_ = :" << y_, 0); 
     debugc("[add path] : adj list :" << adj_list, 0); 
@@ -218,12 +218,14 @@ public :
       if (danglings.find(dangling) != danglings.end())
 	return false;
 
+      debugc("[add_dangling] : adding dangling " << representative_x << " for mem config " << m, 1);
       danglings.insert(dangling);
     }
     else {
       if (not_danglings.find(dangling) != not_danglings.end())
 	return false;
 
+      debugc("[add_dangling] : adding not-dangling " << representative_x  << " for mem config " << m, 1);
       not_danglings.insert(dangling);
     }
 
@@ -237,14 +239,14 @@ public :
 
     tmp_sel_eqs.clear();
 
-    debugc("[add_eq] adding x = " << x << " and y = " << y << " and state = " << (int)s, 1);
+    debugc("[add_eq] adding x = " << x << " and y = " << y << " and state = " << (int)s, 0);
 
     if(s == stateTrue) {
       heapvar old_x = aliases.find(x);
       heapvar old_y = aliases.find(y.v);
 
-      debugc("[add_eq] : x = " << x << " and old_x = " << old_x, 1);
-      debugc("[add_eq] : y.v = " << y.v << " and old_y = " << old_y, 1);
+      debugc("[add_eq] : x = " << x << " and old_x = " << old_x, 0);
+      debugc("[add_eq] : y.v = " << y.v << " and old_y = " << old_y, 0);
 
       if(y.is_sel()) {
 	not_eqt seleq = std::make_pair(old_x, heapexpr(old_y, y.m, y.f));
@@ -255,11 +257,11 @@ public :
 	if(!(old_x == aliases.find(heapvar())) && !(old_y == aliases.find(heapvar()))) {
 	   // assume non-circularity
 	  not_eqt noteq = std::make_pair(old_x, heapexpr(old_y));
-	  debugc("adding not-circularity not_eq " << noteq, 1)
+	  debugc("adding not-circularity not_eq " << noteq, 0)
 	  not_eqs.insert(noteq);
 	}
 
-	debugc("[add_eq] : adding sel_eq " << seleq, 1);
+	debugc("[add_eq] : adding sel_eq " << seleq, 0);
 	sel_eqs.insert(seleq);
 	
 
@@ -272,7 +274,7 @@ public :
 	    if(sel_eqs_it != it && sel1 == it->second) {
 	      debugc("[add_eq] : found sel_eq (2) " << *it, 0);
 	      // todo: add_eq also modifies sel_eqs...
-	      debugc("[add_eq] : add eq (6) " << sel_eqs_it->first << " = " << heapexpr(it->first), 1);
+	      debugc("[add_eq] : add eq (6) " << sel_eqs_it->first << " = " << heapexpr(it->first), 0);
 	      tmp_sel_eqs.insert(std::make_pair(sel_eqs_it->first, heapexpr(it->first)));
 
 	      //add_eq(sel_eqs_it->first, heapexpr(it->first), stateTrue);
@@ -281,7 +283,7 @@ public :
 	}
 
 	for(sel_eqst::const_iterator it = tmp_sel_eqs.begin(); it != tmp_sel_eqs.end(); ++it) {
-	  debugc("[add_eq] (1) : " << it->first << " = " << it->second, 1);
+	  debugc("[add_eq] (1) : " << it->first << " = " << it->second, 0);
 	  add_eq(it->first, it->second, stateTrue);
 	}
 
@@ -296,7 +298,7 @@ public :
        return true;
       }
 
-      debugc("[add_eq]: make_union " << x << " and " << y.v, 1);
+      debugc("[add_eq]: make_union " << x << " and " << y.v, 0);
       ret = aliases.make_union(x, y.v);
       
       if(ret) {
@@ -373,21 +375,21 @@ public :
 
        // update not_eqs 
       for(not_eqst::iterator not_eqs_it = tmp_not_eqs.begin(); not_eqs_it != tmp_not_eqs.end(); ++not_eqs_it) {
-	debugc("[add_eq] : not_eq = " << *not_eqs_it, 1);
+	debugc("[add_eq] : not_eq = " << *not_eqs_it, 0);
 	if(!(old_x == new_x)) {
 	  not_eqt noteq;
 	  if(not_eqs_it->first == old_x) {
 	    noteq = *not_eqs_it;
 	    not_eqs.erase(*not_eqs_it);
 	    noteq.first = new_x;
-	    debugc("[add_eq]: add not_eq (1) " << noteq, 1);
+	    debugc("[add_eq]: add not_eq (1) " << noteq, 0);
 	    not_eqs.insert(noteq);
 	  }
 	  if((not_eqs_it->second).v == old_x) {
 	    noteq = *not_eqs_it;
 	    not_eqs.erase(*not_eqs_it);
 	    noteq.second.v = new_x;
-	    debugc("[add_eq]: add not_eq (2) " << noteq, 1);
+	    debugc("[add_eq]: add not_eq (2) " << noteq, 0);
 	    not_eqs.insert(noteq);
 	  }
 	}
@@ -396,14 +398,14 @@ public :
 	    not_eqt noteq = *not_eqs_it;
 	    not_eqs.erase(*not_eqs_it);
 	    noteq.first = new_x;
-	    debugc("[add_eq]: add not_eq (3) " << noteq, 1);
+	    debugc("[add_eq]: add not_eq (3) " << noteq, 0);
 	    not_eqs.insert(noteq);
 	  }
 	  if((not_eqs_it->second).v == old_y) {
 	    not_eqt noteq = *not_eqs_it;
 	    not_eqs.erase(*not_eqs_it);
 	    noteq.second.v = new_x;
-	    debugc("[add_eq]: add not_eq (4) " << noteq, 1);
+	    debugc("[add_eq]: add not_eq (4) " << noteq, 0);
 	    not_eqs.insert(noteq);
 	  }
 	}
@@ -465,7 +467,7 @@ public :
       }
   
 
-      debugc("[add_eq/not_paths] : not_paths = " << not_paths, 1);
+      debugc("[add_eq/not_paths] : not_paths = " << not_paths, 0);
        // update not_paths 
       for(not_pathst::iterator not_paths_it = not_paths.begin(); not_paths_it != not_paths.end(); ++not_paths_it) {
 	if(!(old_x == new_x)) {
@@ -566,7 +568,7 @@ public :
 	return false;
 
       not_eqt noteq = std::make_pair(x_, heapexpr(y_, y.m, y.f)); 
-      debugc("[add_eq]: add not_eq (5) " << noteq, 1);
+      debugc("[add_eq]: add not_eq (5) " << noteq, 0);
       not_eqs.insert(noteq);
       return true;
     }
@@ -592,10 +594,10 @@ public :
 
     for(not_pathst::const_iterator it = not_paths.begin(); it != not_paths.end(); ++it) {
       heaplitp hl = *it;
-      debugc("[is_bottom] : try " << hl, 1);
-      debugc("[is_bottom] : hl->x = " << aliases.find(hl->x) << " and hl->y = " << aliases.find(hl->y), 1);
+      debugc("[is_bottom] : try " << hl, 0);
+      debugc("[is_bottom] : hl->x = " << aliases.find(hl->x) << " and hl->y = " << aliases.find(hl->y), 0);
       if (entails_path(hl->m, hl->x, hl->y, hl->f)) {
-	debugc("[is_bottom] : contradiction for " << hl, 1);
+	debugc("[is_bottom] : contradiction for " << hl, 0);
 	debugc("[is_bottom] : hl->x = " << aliases.find(hl->x) << " and hl->y = " << aliases.find(hl->y), 0);
 	return true;
       }
@@ -604,9 +606,18 @@ public :
     for(not_eqst::iterator it = not_eqs.begin(); it != not_eqs.end(); ++it) {
       not_eqt eq = *it;
       if (entails_eq(eq.first, eq.second)) {
-	debugc("[is_bottom] : contradiction for " << eq.first << " != " << eq.second, 1);
+	debugc("[is_bottom] : contradiction for " << eq.first << " != " << eq.second, 0);
 	return true;
       }
+    }
+
+    debugc("[is_bottom] : checking dangling contradiction", 1);
+    for(danglingst::iterator it = danglings.begin(); it != danglings.end(); ++it) {
+      if (entails_not_dangling(it->first, it->second)) {
+	debugc("[is_bottom] : contradiction for " << it->first << " != " << it->second, 1);
+	return true;
+      }
+
     }
 
 
@@ -692,7 +703,7 @@ public :
     if(he2.is_sel()) {
       debugc("[is_eq/sel] : sel_eqs = " << sel_eqs, 0);
       heapvar m_ = aliases.find(he2.m);
-      debugc("[is_eq/sel] : m_ = " << m_, 1);
+      debugc("[is_eq/sel] : m_ = " << m_, 0);
       not_eqt hl = std::make_pair(he1_, heapexpr(he2_, he2.m, he2.f));
       return sel_eqs.find(hl) != sel_eqs.end();
     }
@@ -728,7 +739,7 @@ public :
     heapvar hv1_ = aliases.find(hv1);
     heapvar hv2_ = aliases.find(hv2);
 
-    debugc("[entails_path] : path(" << m << ", " << hv1 << ", " << hv2 << ", " << f << ")", 1);
+    debugc("[entails_path] : path(" << m << ", " << hv1 << ", " << hv2 << ", " << f << ")", 0);
     debugc("[entails_path] : hv1_ = :" << hv1_, 0); 
     debugc("[entails_path] : hv2_ = :" << hv2_, 0); 
 
@@ -799,7 +810,7 @@ public :
     heapvar hv1_ = aliases.find(hv1);
     heapvar hv2_ = aliases.find(hv2);
 
-    debugc("[entails_not_path] : path(" << m << ", " << hv1 << ", " << hv2 << ", " << f << ", false)", 1);
+    debugc("[entails_not_path] : path(" << m << ", " << hv1 << ", " << hv2 << ", " << f << ", false)", 0);
     debugc("[entails_not_path] : hv1_ = :" << hv1_, 0); 
     debugc("[entails_not_path] : hv2_ = :" << hv2_, 0); 
     debugc("[entails_not_path] : not_paths = :" << not_paths, 0); 
