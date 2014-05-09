@@ -1,13 +1,13 @@
 int main(void) {
-  int A[2048];
-  int B[2048];
+  int A[10];
+  int B[10];
   int i;
   int tmp;
 
-  for (i = 0; i < 1024 && A[i] != 0; i++) {
+  for (i = 0; i < 10 && A[i] != 0; i++) {
     tmp = A[i];
     B[i] = tmp;
   }
 
-  assert(A[1023] == B[1023]);
+  assert(A[5] == B[5]);
 }
