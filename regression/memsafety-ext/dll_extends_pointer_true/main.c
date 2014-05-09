@@ -33,39 +33,38 @@ void main()
 
 	y = malloc(sizeof(Node));
 
-	//not_null(y);	
-	//free(y);
-	not_null(y);	
-	
+	not_null(y);
 	y->next = NULL;
-	not_null(y);	
+	not_null(y);
 	y->prev = NULL;
 
 
-	not_null(y);	
+	not_null(y);
 	__CPROVER_assume(y->data!=NULL);
 	y->pData = y->data;
 	list = y;
 
 	while (nondet())
 	{
-		y = malloc(sizeof(*y));
-		not_null(y);	
+		y = malloc(sizeof(Node));
+		not_null(y);
 		y->next = list;
-		not_null(list);	
+		not_null(list);
 		list->prev = y;
 
 		if (nondet())
 		{
-		  not_null(y);	
+		  not_null(y);
 		  y->pData = malloc(sizeof(*y->pData));
 		}
 		else
 		{
-		  not_null(y);	
+		  not_null(y);
 		  y->pData = y->data;
 		  __CPROVER_assume(y->data!=NULL);
 		}
+
+		not_null(y);
 
 		list = y;
 	}
@@ -73,18 +72,17 @@ void main()
 	while (NULL != list)
 	{
 		y = list;
-		not_null(list);	
+		not_null(list);
 		list = list->next;
 
-		not_null(y);	
+		not_null(y);
 		if (y->data != y->pData)
 		{
-  		  not_null(y);	
+  		  not_null(y);
 		  free(y->pData);
 		}
 
-                //this assertion fails: 
-                //not_null(y); 
+                not_null(y);
 		free(y);
 	}
 	
