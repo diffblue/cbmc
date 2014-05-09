@@ -112,12 +112,13 @@ void goto_symext::symex_goto(statet &state)
 
   goto_state_list.push_back(statet::goto_statet(state));
   statet::goto_statet &new_state=goto_state_list.back();
-  new_state.heap_id = make_heap_id("");//TEST
+  new_state.heap_id = state.current_heap_id; //make_heap_id(); //assign current heap id
   
   // adjust guards
   if(new_guard.is_true())
   {
     state.guard.make_false();
+    state.current_heap_id = UINT_MAX; //invalidate heap id
   }
   else
   {
@@ -135,7 +136,7 @@ void goto_symext::symex_goto(statet &state)
         symbol_exprt(guard_identifier, bool_typet());
       exprt new_rhs=new_guard;
       new_rhs.make_not();
-      replace_heap_member(new_rhs);
+      replace_heap_member(state, new_rhs);
       
       symbol_exprt new_lhs=guard_symbol_expr;
       state.rename(new_lhs, ns, goto_symex_statet::L1);
@@ -304,10 +305,12 @@ void goto_symext::phi_function(
   goto_state.level2.get_variables(variables);
   dest_state.level2.get_variables(variables);
 
-  irep_idt heap_id = "";
-  irep_idt heap_id1 = goto_state.heap_id;
-  irep_idt heap_id2 = make_heap_id("");
-  if(heap_id1!=heap_id2) heap_id = make_new_heap_id("");
+  if(dest_state.current_heap_id == UINT_MAX) 
+    dest_state.current_heap_id = goto_state.heap_id; // update current heap id
+  irep_idt heap_id = dest_state.make_heap_id(goto_state.heap_id);   
+  irep_idt heap_id1 = dest_state.make_heap_id(goto_state.heap_id);
+  irep_idt heap_id2 = dest_state.make_heap_id();
+  if(heap_id1!=heap_id2) heap_id = dest_state.make_new_heap_id();
 
 #if 0
   std::cout << "goto_state.heap_id = " << heap_id1 << std::endl;
@@ -394,7 +397,7 @@ void goto_symext::phi_function(
     dest_state.record_events=record_events;
   
     //for heap theory
-    if(is_heap_type(new_lhs.type()) && rhs.id()==ID_if)
+   if(is_heap_type(new_lhs.type()) && rhs.id()==ID_if)
     {
       if(goto_state_rhs.id()==ID_symbol) 
       {
@@ -406,7 +409,7 @@ void goto_symext::phi_function(
       }
       new_lhs.set(ID_new_heap_id,heap_id);
     }
-  
+
     target.assignment(
       true_exprt(),
       new_lhs, lhs, new_lhs, lhs,

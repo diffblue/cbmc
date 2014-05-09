@@ -264,7 +264,6 @@ protected:
 
   static unsigned nondet_count;
   static unsigned dynamic_counter;
-  static unsigned heap_counter;
   
   void read(exprt &expr);
   void replace_nondet(exprt &expr);
@@ -272,13 +271,12 @@ protected:
 
   //heap theory
   virtual bool is_heap_type(typet type) { return false; }
-  virtual irep_idt make_heap_id(irep_idt tag) { assert(false); }
+  /*
+  virtual irep_idt make_heap_id(irep_idt tag,goto_symex_statet state) { assert(false); }
   virtual irep_idt make_new_heap_id(irep_idt tag) { assert(false); }
   virtual irep_idt make_old_heap_id(irep_idt tag) { assert(false); }
-  void replace_heap_member(exprt &expr);
-  typedef std::map<irep_idt,irep_idt> heap_id_mapt;
-  heap_id_mapt heap_id_map;
-  void update_heap_ids(irep_idt tag,irep_idt updated_id);
+  */
+  void replace_heap_member(goto_symex_statet &state, exprt &expr);
 };
 
 #endif

@@ -30,7 +30,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "heap_conv.h"
 
-#define DEBUG 1
+#define DEBUG 0
 #define PRINT_CLAUSES 1
 
 #define SIMPLIFY 1
@@ -3319,13 +3319,14 @@ literalt heap_convt::convert_function(const heap_function_application_exprt &f)
    {
      find_symbols(f);
      std::string op1 = convert_identifier(f.get_heap_id());
-     heapexpr op2 = convert_heapexpr(f.arguments()[0]);
+     heapexpr arg = convert_heapexpr(f.arguments()[0]);
 
-     assert(f.arguments()[0].id()==ID_symbol ||
-             f.arguments()[0].id()==ID_constant);
-       //otherwise introduce an EQ
-
-     heaplit* hl = new dangling_lit(heapvar(op1),op2.v,stateTrue);
+     heapvar op2 = arg.v;
+     if(!(f.arguments()[0].id()==ID_symbol ||
+	  f.arguments()[0].id()==ID_constant))       //otherwise introduce an EQ
+       op2 = add_aux_equality(arg);
+ 
+     heaplit* hl = new dangling_lit(heapvar(op1),op2,stateTrue);
      return add_heap_literal(hl);
    }
    if(to_symbol_expr(f.function()).get_identifier()==
@@ -3333,17 +3334,21 @@ literalt heap_convt::convert_function(const heap_function_application_exprt &f)
    {
      find_symbols(f);
      std::string op1 = convert_identifier(f.get_heap_id());
-     heapexpr op2 = convert_heapexpr(f.arguments()[0]);
-     heapexpr op3 = convert_heapexpr(f.arguments()[1]);
+     heapexpr arg0 = convert_heapexpr(f.arguments()[0]);
+     heapexpr arg1 = convert_heapexpr(f.arguments()[1]);
      std::string op4 = 
        convert_identifier(f.arguments()[2].op0().op0().get(ID_value));
 
-     assert((f.arguments()[0].id()==ID_symbol ||
-             f.arguments()[0].id()==ID_constant) &&
-            (f.arguments()[1].id()==ID_symbol ||
-             f.arguments()[1].id()==ID_constant)); //otherwise introduce an EQ
+     heapvar op2 = arg0.v;
+     heapvar op3 = arg1.v;
+     if(!(f.arguments()[0].id()==ID_symbol ||
+	  f.arguments()[0].id()==ID_constant))       //otherwise introduce an EQ
+       op2 = add_aux_equality(arg0);
+     if(!(f.arguments()[1].id()==ID_symbol ||
+	  f.arguments()[1].id()==ID_constant))       //otherwise introduce an EQ
+       op3 = add_aux_equality(arg1);
        
-     heaplit* hl = new path_lit(heapvar(op1),op2.v,op3.v,
+     heaplit* hl = new path_lit(heapvar(op1),op2,op3,
        heapvar(op4),stateTrue);
      return add_heap_literal(hl);
   }

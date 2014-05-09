@@ -230,7 +230,7 @@ void goto_symext::symex_assign_symbol(
 
   //  std::cout << "lhs: " << lhs << std::endl  << std::endl;
   //  std::cout << "rhs: " << ssa_rhs << std::endl  << std::endl;
-  replace_heap_member(ssa_rhs);
+  replace_heap_member(state, ssa_rhs);
  
   symbol_exprt ssa_lhs=lhs;
 
@@ -246,19 +246,6 @@ void goto_symext::symex_assign_symbol(
 
   guardt tmp_guard(state.guard);
   tmp_guard.append(guard);
-
- //heap theory
-  /*  if(is_heap_type(ssa_lhs.type()))
-  {
-    struct_typet struct_type;
-    if(ssa_lhs.type().id()==ID_pointer) struct_type = 
-      to_struct_type(ns.follow(ssa_lhs.type().subtype()));
-    else struct_type = to_struct_type(ns.follow(ssa_lhs.type()));
-    ssa_lhs.set(ID_new_heap_id,ssa_rhs.get(ID_new_heap_id));
-    update_heap_ids(struct_type.get_tag(),to_symbol_expr(ssa_lhs).get_identifier());
-    heap_id_map[to_symbol_expr(ssa_lhs).get_identifier()] = ssa_rhs.get(ID_new_heap_id);
-    std::cout  << "add to heap_id_map2: " << to_symbol_expr(ssa_lhs).get_identifier() << ": " << ssa_rhs.get(ID_new_heap_id) << std::endl;
-    }*/
 
   // do the assignment
   target.assignment(
@@ -456,16 +443,16 @@ void goto_symext::symex_assign_member(
   if(is_heap_type(struct_type))
   {
     exprt _rhs = rhs;
-    replace_heap_member(_rhs);
+    replace_heap_member(state, _rhs);
     irep_idt old_heap_id, new_heap_id;
     if(_rhs.id()!=ID_heap_with) //new heap id only for innermost "with"
     {
-      old_heap_id = make_heap_id(to_struct_type(struct_type).get_tag());
-      new_heap_id = make_new_heap_id(to_struct_type(struct_type).get_tag());
+      old_heap_id = state.make_heap_id(); //to_struct_type(struct_type).get_tag());
+      new_heap_id = state.make_new_heap_id(); //to_struct_type(struct_type).get_tag());
     }
     else
     { 
-      new_heap_id = old_heap_id = make_old_heap_id(to_struct_type(struct_type).get_tag());
+      new_heap_id = old_heap_id = state. make_old_heap_id(); //to_struct_type(struct_type).get_tag());
     }
     heap_with_exprt new_rhs(lhs_struct, exprt(ID_member_name), 
       _rhs,old_heap_id,new_heap_id);

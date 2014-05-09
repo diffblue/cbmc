@@ -11,6 +11,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "symex_bmc.h"
 
+/*
+unsigned symex_bmct::heap_counter=0;
+unsigned symex_bmct::old_heap=0;
+unsigned symex_bmct::current_heap=0;
+*/
+
 /*******************************************************************\
 
 Function: symex_bmct::symex_bmct
@@ -179,17 +185,22 @@ bool symex_bmct::is_heap_type(typet type) {
          (ns.follow(type).id()==ID_struct);
 }
 
-irep_idt symex_bmct::make_heap_id(irep_idt tag) 
+/*
+irep_idt symex_bmct::make_heap_id(irep_idt tag,goto_symex_statet state) 
 { 
-  return /*id2string(tag)+*/"heap"+i2string(heap_counter); 
+   return "heap"+i2string(current_heap); //id2string(tag)+
 }
 
 irep_idt symex_bmct::make_new_heap_id(irep_idt tag)
 { 
-  return /*id2string(tag)+*/"heap"+i2string(++heap_counter); 
+  old_heap = current_heap;
+  current_heap = ++heap_counter;
+  return "heap"+i2string(current_heap); 
 }
 
 irep_idt symex_bmct::make_old_heap_id(irep_idt tag)
 { 
-  return /*id2string(tag)+*/"heap"+i2string(heap_counter-1); 
+  return "heap"+i2string(old_heap); 
 }
+*/
+

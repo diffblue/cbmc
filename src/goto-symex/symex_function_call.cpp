@@ -277,8 +277,8 @@ void goto_symext::symex_function_call_code(
       lhs.type() = type; // set to mallocked type
       symbol_exprt lhs_symbol = to_symbol_expr(lhs);
 
-      irep_idt old_heap_id = make_heap_id(struct_type.get_tag());
-      irep_idt new_heap_id = make_new_heap_id(struct_type.get_tag());
+      irep_idt old_heap_id = state.make_heap_id(); //struct_type.get_tag());
+      irep_idt new_heap_id = state.make_new_heap_id(); //(struct_type.get_tag());
       lhs.set(ID_new_heap_id,new_heap_id);
 
       heap_function_application_exprt rhs = 
@@ -326,9 +326,8 @@ void goto_symext::symex_function_call_code(
       //lhs.type() = type; // set to freed type
       //symbol_exprt lhs_symbol = to_symbol_expr(lhs);
 
-      irep_idt old_heap_id = make_heap_id(""); //struct_type.get_tag());
-      irep_idt new_heap_id = make_new_heap_id(""); //struct_type.get_tag());
-      //     update_heap_ids(struct_type.get_tag(),to_symbol_expr(lhs).get_identifier());
+      irep_idt old_heap_id = state.make_heap_id(); //struct_type.get_tag());
+      irep_idt new_heap_id = state.make_new_heap_id(); //struct_type.get_tag());
 
       heap_function_application_exprt rhs = 
         heap_function_application_exprt(old_heap_id,new_heap_id);
@@ -341,7 +340,7 @@ void goto_symext::symex_function_call_code(
            rhs.arguments().begin();it!=rhs.arguments().end(); it++) 
       {
         if(it->id()==ID_typecast) *it = it->op0();
-        replace_heap_member(*it);
+        replace_heap_member(state, *it);
       }
 
       code_assignt assignment(lhs, rhs);
@@ -374,7 +373,7 @@ void goto_symext::symex_function_call_code(
     //make heap id
     exprt arg0 = call.arguments()[0].op0(); //remove (void*)  typecast
     struct_typet struct_type = to_struct_type(ns.follow(arg0.type().subtype()));
-    irep_idt heap_id = make_heap_id(struct_type.get_tag());
+    irep_idt heap_id = state.make_heap_id(); //struct_type.get_tag()
 
     //replace by function application expression
     heap_function_application_exprt rhs = heap_function_application_exprt(heap_id);
@@ -386,7 +385,7 @@ void goto_symext::symex_function_call_code(
          rhs.arguments().begin();it!=rhs.arguments().end(); it++) 
     {
       if(it->id()==ID_typecast) *it = it->op0();
-      replace_heap_member(*it);
+      replace_heap_member(state, *it);
     }
     code_assignt assignment(lhs, rhs);
     symex_assign(state, assignment); 

@@ -67,10 +67,16 @@ protected:
   hash_set_cont<irep_idt, irep_id_hash> body_warnings;
 
   //heap theory
+  /*  static unsigned heap_counter;
+  static unsigned old_heap;
+  static unsigned current_heap;
+  */
   virtual bool is_heap_type(typet type);
-  virtual irep_idt make_heap_id(irep_idt tag);
-  virtual irep_idt make_new_heap_id(irep_idt tag);
-  virtual irep_idt make_old_heap_id(irep_idt tag);
+  /*
+  virtual irep_idt make_heap_id(irep_idt tag, goto_symex_statet state); //tag currently not used
+  virtual irep_idt make_new_heap_id(irep_idt tag); //tag currently not used
+  virtual irep_idt make_old_heap_id(irep_idt tag); //tag currently not used
+  */
 
 };
 

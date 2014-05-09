@@ -31,6 +31,9 @@ goto_symex_statet::goto_symex_statet():
   depth(0),
   symex_target(NULL),
   atomic_section_id(0),
+  current_heap_id(0),
+  old_heap_id(0),
+  new_heap_id(1),
   record_events(true)
 {
   threads.resize(1);

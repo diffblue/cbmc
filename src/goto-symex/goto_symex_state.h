@@ -250,7 +250,9 @@ public:
     guardt guard;
     propagationt propagation;
     unsigned atomic_section_id;
-    irep_idt heap_id;
+
+    //heap theory
+    unsigned heap_id;
     
     explicit goto_statet(const goto_symex_statet &s):
       depth(s.depth),
@@ -258,7 +260,8 @@ public:
       value_set(s.value_set),
       guard(s.guard),
       propagation(s.propagation),
-      atomic_section_id(s.atomic_section_id)
+      atomic_section_id(s.atomic_section_id),
+      heap_id(s.current_heap_id)
     {
     }
   };
@@ -349,6 +352,18 @@ public:
   read_in_atomic_sectiont read_in_atomic_section;
   written_in_atomic_sectiont written_in_atomic_section;
   
+  //heap theory
+  unsigned current_heap_id;
+  unsigned old_heap_id;
+  unsigned new_heap_id;
+  irep_idt make_old_heap_id() {  return "heap"+i2string(old_heap_id); }
+  irep_idt make_heap_id() {  return "heap"+i2string(current_heap_id); }
+  irep_idt make_heap_id(unsigned heap_id) {  return "heap"+i2string(heap_id); }
+  irep_idt make_new_heap_id() {  
+    old_heap_id = current_heap_id; current_heap_id = new_heap_id++;
+    return "heap"+i2string(current_heap_id); 
+  }
+
   class threadt
   {
   public:

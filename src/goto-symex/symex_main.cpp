@@ -66,7 +66,7 @@ void goto_symext::claim(
 
   if(expr.is_true()) return;
   
-  replace_heap_member(expr);
+  replace_heap_member(state, expr);
 
   state.guard.guard_expr(expr);
   
@@ -91,7 +91,7 @@ void goto_symext::symex_assume(statet &state, const exprt &cond)
   exprt simplified_cond=cond;
 
   do_simplify(simplified_cond);
-  replace_heap_member(simplified_cond);
+  replace_heap_member(state, simplified_cond);
 
   if(simplified_cond.is_true()) return;
 
