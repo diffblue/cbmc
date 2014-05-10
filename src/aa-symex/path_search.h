@@ -39,6 +39,7 @@ public:
 
   // statistics
   unsigned number_of_paths;
+  unsigned number_of_instructions;
   unsigned number_of_dropped_states;
   unsigned number_of_VCCs;
   unsigned number_of_VCCs_after_simplification;
