@@ -8,6 +8,7 @@
 #include <goto-programs/goto_program.h>
 
 #include "overflow_instrumenter.h"
+#include "util.h"
 
 /*
  * This code is copied wholesale from analyses/goto_check.cpp.
@@ -167,11 +168,27 @@ void overflow_instrumentert::add_overflow_checks(goto_programt::targett t,
         overflow.op0() = tmp;
         overflow.op1() = expr.operands()[i];
 
+        fix_types(overflow);
         accumulate_overflow(t, overflow, added);
       }
     } else {
+      fix_types(overflow);
       accumulate_overflow(t, overflow, added);
     }
+  }
+}
+
+void overflow_instrumentert::fix_types(exprt &overflow) {
+  typet &t1 = overflow.op0().type();
+  typet &t2 = overflow.op1().type();
+  const typet &t = join_types(t1, t2);
+
+  if (t1 != t) {
+    overflow.op0() = typecast_exprt(overflow.op0(), t);
+  }
+
+  if (t2 != t) {
+    overflow.op1() = typecast_exprt(overflow.op1(), t);
   }
 }
 

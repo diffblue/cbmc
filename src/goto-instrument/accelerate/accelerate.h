@@ -92,7 +92,6 @@ class acceleratet {
   typedef map<goto_programt::targett, goto_programt::targetst> overflow_mapt;
   overflow_mapt overflow_locs;
 
-  typedef hash_map_cont<exprt, exprt, irep_hash> expr_mapt;
   expr_mapt dirty_vars_map;
 };
 
