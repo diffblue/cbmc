@@ -17,10 +17,15 @@ void cone_of_influencet::cone_of_influence(const expr_sett &targets,
           program.instructions.rbegin();
        rit != program.instructions.rend();
        ++rit) {
-    expr_sett curr = targets;
+    expr_sett curr;// = targets;
     expr_sett next;
 
-    get_succs(rit, curr);
+    if (rit == program.instructions.rbegin()) {
+      curr = targets;
+    } else {
+      get_succs(rit, curr);
+    }
+
     cone_of_influence(*rit, curr, next);
 
     cone_map[rit->location_number] = next;
@@ -34,7 +39,7 @@ void cone_of_influencet::cone_of_influence(const expr_sett &targets,
       std::cout << expr2c(*it, ns) << " ";
     }
 
-    std::cout << "Current cone: " << std::endl;
+    std::cout << std::endl << "Current cone: " << std::endl;
     
     for (expr_sett::iterator it = next.begin();
          it != next.end();
@@ -78,20 +83,18 @@ void cone_of_influencet::get_succs(
       }
     }
 
-    if (!rit->guard.is_true()) {
-      unsigned int loc = next->location_number;
-      expr_sett &s = cone_map[loc];
-      targets.insert(s.begin(), s.end());
+    if (rit->guard.is_true()) {
+      return;
     }
   } else if (rit->is_assume() || rit->is_assert()) {
     if (rit->guard.is_false()) {
       return;
     }
-  } else {
-    unsigned int loc = next->location_number;
-    expr_sett &s = cone_map[loc];
-    targets.insert(s.begin(), s.end());
   }
+  
+  unsigned int loc = next->location_number;
+  expr_sett &s = cone_map[loc];
+  targets.insert(s.begin(), s.end());
 }
 
 void cone_of_influencet::cone_of_influence(
