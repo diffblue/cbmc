@@ -37,7 +37,6 @@
 
 //#define DEBUG
 
-
 void acceleration_utilst::gather_rvalues(const exprt &expr,
     expr_sett &rvalues) {
   if (expr.id() == ID_symbol ||
@@ -196,10 +195,7 @@ void acceleration_utilst::stash_variables(scratch_programt &program,
        it != vars.end();
        ++it) {
     symbolt orig = symbol_table.lookup(*it);
-    symbolt stashed_sym = program.fresh_symbol("polynomial::stash",
-        orig.type);
-
-    symbol_table.add(stashed_sym);
+    symbolt stashed_sym = fresh_symbol("polynomial::stash", orig.type);
     substitution[orig.symbol_expr()] = stashed_sym.symbol_expr();
     program.assign(stashed_sym.symbol_expr(), orig.symbol_expr());
   }
@@ -227,11 +223,10 @@ exprt acceleration_utilst::precondition(patht &path) {
       const exprt &lhs = assignment.lhs();
       const exprt &rhs = assignment.rhs();
 
-      if (lhs.id() == ID_symbol) {
+      if (lhs.id() == ID_symbol ||
+          lhs.id() == ID_index ||
+          lhs.id() == ID_dereference) {
         replace_expr(lhs, rhs, ret);
-      } else if (lhs.id() == ID_index ||
-                 lhs.id() == ID_dereference) {
-        continue;
       } else {
         throw "Couldn't take WP of " + expr2c(lhs, ns) + " = " + expr2c(rhs, ns);
       }
@@ -247,10 +242,46 @@ exprt acceleration_utilst::precondition(patht &path) {
     }
   }
 
+  // Hack: replace array accesses with nondet.
+  //abstract_arrays(ret);
+
   simplify(ret, ns);
 
   return ret;
 }
+
+void acceleration_utilst::abstract_arrays(exprt &expr) {
+  if (expr.id() == ID_index ||
+      expr.id() == ID_dereference) {
+    expr = side_effect_expr_nondett(expr.type());
+  } else {
+    Forall_operands(it, expr) {
+      abstract_arrays(*it);
+    }
+  }
+}
+
+void acceleration_utilst::push_nondet(exprt &expr) {
+  Forall_operands(it, expr) {
+    push_nondet(*it);
+  }
+
+  if (expr.id() == ID_not &&
+      expr.op0().id() == ID_nondet) {
+    expr = side_effect_expr_nondett(expr.type());
+  } else if (expr.id() == ID_equal ||
+             expr.id() == ID_lt ||
+             expr.id() == ID_gt ||
+             expr.id() == ID_le ||
+             expr.id() == ID_ge) {
+    if (expr.op0().id() == ID_nondet ||
+        expr.op1().id() == ID_nondet) {
+      expr = side_effect_expr_nondett(expr.type());
+    }
+  }
+}
+
+
 
 bool acceleration_utilst::do_assumptions(map<exprt, polynomialt> polynomials,
                                              patht &path,
@@ -355,8 +386,7 @@ bool acceleration_utilst::do_assumptions(map<exprt, polynomialt> polynomials,
 }
 
 void acceleration_utilst::ensure_no_overflows(scratch_programt &program) {
-  symbolt overflow_sym = program.fresh_symbol("polynomial::overflow", bool_typet());
-  symbol_table.add(overflow_sym);
+  symbolt overflow_sym = fresh_symbol("polynomial::overflow", bool_typet());
   const exprt &overflow_var = overflow_sym.symbol_expr();
   overflow_instrumentert instrumenter(program, overflow_var, symbol_table);
 
@@ -485,9 +515,7 @@ bool acceleration_utilst::do_arrays(goto_programt::instructionst &loop_body,
 
   exprt arrays_expr=conjunction(array_operands);
 
-  symbolt k_sym = program.fresh_symbol("polynomial::k",
-      unsignedbv_typet(32));
-  symbol_table.add(k_sym);
+  symbolt k_sym = fresh_symbol("polynomial::k", unsignedbv_typet(32));
   exprt k = k_sym.symbol_expr();
 
   exprt k_bound = and_exprt(binary_relation_exprt(from_integer(0, k.type()), ID_le, k),
@@ -532,9 +560,7 @@ bool acceleration_utilst::do_arrays(goto_programt::instructionst &loop_body,
     }
 
     exprt idx_never_touched = nil_exprt();
-    symbolt idx_sym = program.fresh_symbol("polynomial::idx",
-        signedbv_typet(32));
-    symbol_table.add(idx_sym);
+    symbolt idx_sym = fresh_symbol("polynomial::idx", signedbv_typet(32));
     exprt idx = idx_sym.symbol_expr();
 
 
@@ -599,9 +625,7 @@ bool acceleration_utilst::do_arrays(goto_programt::instructionst &loop_body,
       // OK, we have an expression saying idx is not touched by the
       // loop_counter'th iteration.  Let's quantify that to say that idx is not
       // touched at all.
-      symbolt l_sym = program.fresh_symbol("polynomial::l",
-          signedbv_typet(32));
-      symbol_table.add(l_sym);
+      symbolt l_sym = fresh_symbol("polynomial::l", signedbv_typet(32));
       exprt l = l_sym.symbol_expr();
 
       replace_expr(loop_counter, l, idx_not_touched);
@@ -758,3 +782,21 @@ void acceleration_utilst::extract_polynomial(scratch_programt &program,
     polynomial.monomials.push_back(monomial);
   }
 }
+
+symbolt acceleration_utilst::fresh_symbol(string base, typet type)
+{
+  static int num_symbols = 0;
+
+  string name = base + "_" + i2string(num_symbols++);
+  symbolt ret;
+  ret.module = "scratch";
+  ret.name = name;
+  ret.base_name = name;
+  ret.pretty_name = name;
+  ret.type = type;
+
+  symbol_table.add(ret);
+
+  return ret;
+}
+

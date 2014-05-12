@@ -11,6 +11,7 @@
 #include "trace_automaton.h"
 #include "subsumed.h"
 #include "scratch_program.h"
+#include "acceleration_utils.h"
 
 class acceleratet {
  public:
@@ -20,7 +21,8 @@ class acceleratet {
       program(_program),
       goto_functions(_goto_functions),
       symbol_table(_symbol_table),
-      ns(symbol_table)
+      ns(symbol_table),
+      utils(symbol_table, goto_functions)
   {
     natural_loops(program);
   }
@@ -85,6 +87,7 @@ class acceleratet {
   namespacet ns;
   natural_loops_mutablet natural_loops;
   subsumed_pathst subsumed;
+  acceleration_utilst utils;
 
   typedef map<goto_programt::targett, goto_programt::targetst> overflow_mapt;
   overflow_mapt overflow_locs;
