@@ -22,13 +22,13 @@ using namespace std;
 
 class scratch_programt : public goto_programt {
  public:
-  scratch_programt(const symbol_tablet &_symbol_table) :
+  scratch_programt(symbol_tablet &_symbol_table) :
       constant_propagation(true),
       symbol_table(_symbol_table),
       shadow_symbol_table(_symbol_table),
-      ns(shadow_symbol_table),
+      ns(symbol_table),
       equation(ns),
-      symex(ns, shadow_symbol_table, equation),
+      symex(ns, symbol_table, equation),
       satcheck(new satcheckt),
       satchecker(ns, *satcheck),
       z3(ns, "accelerate", "", "", smt2_dect::Z3),
@@ -62,7 +62,7 @@ class scratch_programt : public goto_programt {
 
   goto_symex_statet symex_state;
   goto_functionst functions;
-  const symbol_tablet &symbol_table;
+  symbol_tablet &symbol_table;
   symbol_tablet shadow_symbol_table;
   const namespacet ns;
   symex_target_equationt equation;

@@ -26,7 +26,7 @@ symbolt scratch_programt::fresh_symbol(string base, typet type)
   ret.pretty_name = name;
   ret.type = type;
 
-  shadow_symbol_table.add(ret);
+  symbol_table.add(ret);
 
   return ret;
 }

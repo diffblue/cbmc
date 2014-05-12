@@ -33,6 +33,15 @@ class acceleration_utilst {
   {
   }
 
+  acceleration_utilst(symbol_tablet &_symbol_table,
+                      const goto_functionst &_goto_functions) :
+      symbol_table(_symbol_table),
+      ns(symbol_table),
+      goto_functions(_goto_functions),
+      loop_counter(nil)
+  {
+  }
+
   void extract_polynomial(scratch_programt &program,
                           set<pair<expr_listt, exprt> > &coefficients,
                           polynomialt &polynomial);
@@ -48,6 +57,8 @@ class acceleration_utilst {
                          patht &path);
 
   exprt precondition(patht &path);
+  void abstract_arrays(exprt &expr);
+  void push_nondet(exprt &expr);
 
   bool do_assumptions(map<exprt, polynomialt> polynomials,
                       patht &body,
@@ -91,10 +102,15 @@ class acceleration_utilst {
       expr_sett &modified);
   void find_modified(goto_programt::targett t, expr_sett &modified);
 
+  symbolt fresh_symbol(string base, typet type);
+
   symbol_tablet &symbol_table;
   namespacet ns;
   const goto_functionst &goto_functions;
   exprt &loop_counter;
+  nil_exprt nil;
+
+  static int num_symbols;
 };
 
 #endif // ACCELERATION_UTILS_H
