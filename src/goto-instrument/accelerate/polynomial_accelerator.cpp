@@ -77,9 +77,8 @@ bool polynomial_acceleratort::accelerate(patht &loop,
   }
 
   if (loop_counter.is_nil()) {
-    symbolt loop_sym = program.fresh_symbol("polynomial::loop_counter",
+    symbolt loop_sym = utils.fresh_symbol("polynomial::loop_counter",
         unsignedbv_typet(32));
-    symbol_table.add(loop_sym);
     loop_counter = loop_sym.symbol_expr();
   }
 
@@ -149,9 +148,7 @@ bool polynomial_acceleratort::accelerate(patht &loop,
   } else {
     // The path is not monotone, so we need to introduce a quantifier to ensure
     // that the condition held for all 0 <= k < n.
-    symbolt k_sym = program.fresh_symbol("polynomial::k",
-        unsignedbv_typet(32));
-    symbol_table.add(k_sym);
+    symbolt k_sym = utils.fresh_symbol("polynomial::k", unsignedbv_typet(32));
     exprt k = k_sym.symbol_expr();
 
     exprt k_bound = and_exprt(binary_relation_exprt(from_integer(0, k.type()), "<=", k),
@@ -263,9 +260,8 @@ bool polynomial_acceleratort::fit_polynomial(goto_programt::instructionst &body,
   for (vector<expr_listt>::iterator it = parameters.begin();
        it != parameters.end();
        ++it) {
-    symbolt coeff = program.fresh_symbol("polynomial::coeff",
+    symbolt coeff = utils.fresh_symbol("polynomial::coeff",
         signedbv_typet(32));
-    symbol_table.add(coeff);
     coefficients.insert(make_pair(*it, coeff.symbol_expr()));
   }
 
@@ -551,10 +547,7 @@ void polynomial_acceleratort::stash_variables(scratch_programt &program,
        it != vars.end();
        ++it) {
     symbolt orig = symbol_table.lookup(*it);
-    symbolt stashed_sym = program.fresh_symbol("polynomial::stash",
-        orig.type);
-
-    symbol_table.add(stashed_sym);
+    symbolt stashed_sym = utils.fresh_symbol("polynomial::stash", orig.type);
     substitution[orig.symbol_expr()] = stashed_sym.symbol_expr();
     program.assign(stashed_sym.symbol_expr(), orig.symbol_expr());
   }

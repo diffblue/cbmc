@@ -163,10 +163,7 @@ void acceleratet::insert_looping_path(goto_programt::targett &loop_header,
 void acceleratet::make_overflow_loc(goto_programt::targett loop_header,
                                     goto_programt::targett &loop_end,
                                     goto_programt::targett &overflow_loc) {
-  scratch_programt scratch(symbol_table);
-  symbolt overflow_sym = scratch.fresh_symbol("accelerate::overflow", bool_typet());
-  symbol_table.add(overflow_sym);
-
+  symbolt overflow_sym = utils.fresh_symbol("accelerate::overflow", bool_typet());
   const exprt &overflow_var = overflow_sym.symbol_expr();
   natural_loops_mutablet::natural_loopt &loop =
     natural_loops.loop_map[loop_header];
@@ -254,8 +251,7 @@ void acceleratet::set_dirty_vars(path_acceleratort &accelerator) {
 
     if (jt == dirty_vars_map.end()) {
       scratch_programt scratch(symbol_table);
-      symbolt new_sym = scratch.fresh_symbol("accelerate::dirty", bool_typet());
-      symbol_table.add(new_sym);
+      symbolt new_sym = utils.fresh_symbol("accelerate::dirty", bool_typet());
       dirty_var = new_sym.symbol_expr();
       dirty_vars_map[*it] = dirty_var;
     } else {

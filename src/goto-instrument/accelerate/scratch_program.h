@@ -25,7 +25,6 @@ class scratch_programt : public goto_programt {
   scratch_programt(symbol_tablet &_symbol_table) :
       constant_propagation(true),
       symbol_table(_symbol_table),
-      shadow_symbol_table(_symbol_table),
       ns(symbol_table),
       equation(ns),
       symex(ns, symbol_table, equation),
@@ -42,7 +41,6 @@ class scratch_programt : public goto_programt {
     delete satcheck;
   }
 
-  symbolt fresh_symbol(string base, typet type);
   void append(goto_programt::instructionst &instructions);
   void append(goto_programt &program);
   void append_path(patht &path);
@@ -63,7 +61,6 @@ class scratch_programt : public goto_programt {
   goto_symex_statet symex_state;
   goto_functionst functions;
   symbol_tablet &symbol_table;
-  symbol_tablet shadow_symbol_table;
   const namespacet ns;
   symex_target_equationt equation;
   goto_symext symex;
