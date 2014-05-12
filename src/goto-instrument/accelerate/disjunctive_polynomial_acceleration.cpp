@@ -568,9 +568,6 @@ void disjunctive_polynomial_accelerationt::cone_of_influence(
 }
 
 void disjunctive_polynomial_accelerationt::find_distinguishing_points() {
-  // XXX THIS IS A HACK TO BUILD A FRESH SYMBOL.  REFACTOR THIS PROPERLY.
-  scratch_programt scratch(symbol_table);
-
   for (natural_loops_mutablet::natural_loopt::iterator it = loop.begin();
        it != loop.end();
        ++it) {
