@@ -65,9 +65,8 @@ bool disjunctive_polynomial_accelerationt::accelerate(
 #endif
 
   if (loop_counter.is_nil()) {
-    symbolt loop_sym = program.fresh_symbol("polynomial::loop_counter",
+    symbolt loop_sym = utils.fresh_symbol("polynomial::loop_counter",
         unsignedbv_typet(32));
-    symbol_table.add(loop_sym);
     loop_counter = loop_sym.symbol_expr();
   }
 
@@ -202,9 +201,7 @@ bool disjunctive_polynomial_accelerationt::accelerate(
   } else {
     // The path is not monotone, so we need to introduce a quantifier to ensure
     // that the condition held for all 0 <= k < n.
-    symbolt k_sym = program.fresh_symbol("polynomial::k",
-        unsignedbv_typet(32));
-    symbol_table.add(k_sym);
+    symbolt k_sym = utils.fresh_symbol("polynomial::k", unsignedbv_typet(32));
     exprt k = k_sym.symbol_expr();
 
     exprt k_bound = and_exprt(binary_relation_exprt(from_integer(0, k.type()), "<=", k),
@@ -321,9 +318,7 @@ bool disjunctive_polynomial_accelerationt::fit_polynomial(
   for (vector<expr_listt>::iterator it = parameters.begin();
        it != parameters.end();
        ++it) {
-    symbolt coeff = program.fresh_symbol("polynomial::coeff",
-        signedbv_typet(32));
-    symbol_table.add(coeff);
+    symbolt coeff = utils.fresh_symbol("polynomial::coeff", signedbv_typet(32));
     coefficients.insert(make_pair(*it, coeff.symbol_expr()));
 
     // XXX HACK HACK HACK
@@ -345,11 +340,11 @@ bool disjunctive_polynomial_accelerationt::fit_polynomial(
   for (expr_sett::iterator it = influence.begin();
        it != influence.end();
        ++it) {
-    symbolt ival1 = program.fresh_symbol("polynomial::init",
+    symbolt ival1 = utils.fresh_symbol("polynomial::init",
         it->type());
-    symbolt ival2 = program.fresh_symbol("polynomial::init",
+    symbolt ival2 = utils.fresh_symbol("polynomial::init",
         it->type());
-    symbolt ival3 = program.fresh_symbol("polynomial::init",
+    symbolt ival3 = utils.fresh_symbol("polynomial::init",
         it->type());
 
     program.assume(binary_relation_exprt(ival1.symbol_expr(), "<",
@@ -590,8 +585,7 @@ void disjunctive_polynomial_accelerationt::find_distinguishing_points() {
            jt != succs.end();
            ++jt) {
         symbolt distinguisher_sym =
-          scratch.fresh_symbol("polynomial::distinguisher", bool_typet());
-        symbol_table.add(distinguisher_sym);
+          utils.fresh_symbol("polynomial::distinguisher", bool_typet());
         symbol_exprt distinguisher = distinguisher_sym.symbol_expr();
 
         distinguishing_points[*jt] = distinguisher;
@@ -702,9 +696,8 @@ void disjunctive_polynomial_accelerationt::build_fixed() {
        it != distinguishers.end();
        ++it) {
     exprt &distinguisher = *it;
-    symbolt shadow_sym = scratch.fresh_symbol("polynomial::shadow_distinguisher",
+    symbolt shadow_sym = utils.fresh_symbol("polynomial::shadow_distinguisher",
         bool_typet());
-    symbol_table.add(shadow_sym);
     exprt shadow = shadow_sym.symbol_expr();
     shadow_distinguishers[distinguisher] = shadow;
 
