@@ -144,6 +144,14 @@ bool disjunctive_polynomial_accelerationt::accelerate(
       continue;
     }
 
+    // Hack: ignore variables that depend on array values..
+    exprt array_rhs;
+
+    if (depends_on_array(*it, array_rhs)) {
+      continue;
+    }
+
+
     polynomialt poly;
     exprt target(*it);
 
@@ -670,6 +678,12 @@ void disjunctive_polynomial_accelerationt::build_fixed() {
 
   fixed.copy_from(goto_program);
 
+  Forall_goto_program_instructions(it, fixed) {
+    if (it->is_assert()) {
+      it->type = ASSUME;
+    }
+  }
+
   // We're only interested in paths that loop back to the loop header.
   // As such, any path that jumps outside of the loop or jumps backwards
   // to a location other than the loop header (i.e. a nested loop) is not
@@ -799,4 +813,22 @@ void disjunctive_polynomial_accelerationt::record_path(scratch_programt &program
   }
 
   accelerated_paths.push_back(path_val);
+}
+
+bool disjunctive_polynomial_accelerationt::depends_on_array(const exprt &e, exprt &array) {
+  expr_sett influence;
+
+  cone_of_influence(e, influence);
+
+  for (expr_sett::iterator it = influence.begin();
+       it != influence.end();
+       ++it) {
+    if (it->id() == ID_index ||
+        it->id() == ID_dereference) {
+      array = *it;
+      return true;
+    }
+  }
+
+  return false;
 }

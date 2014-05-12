@@ -72,6 +72,10 @@ int acceleratet::accelerate_loop(goto_programt::targett &loop_header) {
 
     if (is_underapproximate(accelerator)) {
       // We have some underapproximated variables -- just punt for now.
+#ifdef DEBUG
+      std::cout << "Not inserting accelerator because of underapproximation" << std::endl;
+#endif
+
       continue;
     }
 
@@ -339,6 +343,9 @@ bool acceleratet::is_underapproximate(path_acceleratort &accelerator) {
       }
     }
 
+#ifdef DEBUG
+    std::cout << "Underapproximate variable: " << expr2c(*it, ns) << std::endl;
+#endif
     return true;
   }
 
