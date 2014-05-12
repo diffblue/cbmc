@@ -11,7 +11,7 @@
 #ifndef HEAPUTIL
 #define HEAPUTIL
 
-#if 1
+#if 0
 
 #define debugc(s, cond) if (cond) std::cout << s << std::endl;
 

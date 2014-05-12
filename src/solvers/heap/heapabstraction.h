@@ -583,6 +583,8 @@ public :
     not_paths.clear();
     sel_eqs.clear();
     aliases.clear();
+    danglings.clear();
+    not_danglings.clear();
   }
 
 
@@ -614,7 +616,7 @@ public :
     debugc("[is_bottom] : checking dangling contradiction", 1);
     for(danglingst::iterator it = danglings.begin(); it != danglings.end(); ++it) {
       if (entails_not_dangling(it->first, it->second)) {
-	debugc("[is_bottom] : contradiction for " << it->first << " != " << it->second, 1);
+	debugc("[is_bottom] : contradiction for dangling(" << it->first << ", " << it->second << ")", 1);
 	return true;
       }
 
