@@ -74,7 +74,7 @@ typet join_types(const typet &t1, const typet &t2) {
                                                   b2.get_width();
       unsigned int unsigned_width = is_signed(t1) ? b2.get_width() :
                                                     b1.get_width();
-      unsigned_width++;
+      //unsigned_width++;
 
       unsigned int width = std::max(signed_width, unsigned_width);
 

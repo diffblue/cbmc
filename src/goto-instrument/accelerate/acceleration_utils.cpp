@@ -243,20 +243,29 @@ exprt acceleration_utilst::precondition(patht &path) {
   }
 
   // Hack: replace array accesses with nondet.
-  //abstract_arrays(ret);
+  expr_mapt array_abstractions;
+  abstract_arrays(ret, array_abstractions);
 
   simplify(ret, ns);
 
   return ret;
 }
 
-void acceleration_utilst::abstract_arrays(exprt &expr) {
+void acceleration_utilst::abstract_arrays(exprt &expr, expr_mapt &abstractions) {
   if (expr.id() == ID_index ||
       expr.id() == ID_dereference) {
-    expr = side_effect_expr_nondett(expr.type());
+    expr_mapt::iterator it = abstractions.find(expr);
+
+    if (it == abstractions.end()) {
+      symbolt sym = fresh_symbol("accelerate::array_abstraction", expr.type());
+      abstractions[expr] = sym.symbol_expr();
+      expr = sym.symbol_expr();
+    } else {
+      expr = it->second;
+    }
   } else {
     Forall_operands(it, expr) {
-      abstract_arrays(*it);
+      abstract_arrays(*it, abstractions);
     }
   }
 }

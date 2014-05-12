@@ -5,6 +5,7 @@
 #include <set>
 
 #include <util/symbol_table.h>
+#include <util/hash_cont.h>
 
 #include <goto-programs/goto_program.h>
 #include <goto-programs/goto_functions.h>
@@ -20,6 +21,8 @@
 #define DEBUG
 
 using namespace std;
+
+typedef hash_map_cont<exprt, exprt, irep_hash> expr_mapt;
 
 class acceleration_utilst {
  public:
@@ -57,7 +60,7 @@ class acceleration_utilst {
                          patht &path);
 
   exprt precondition(patht &path);
-  void abstract_arrays(exprt &expr);
+  void abstract_arrays(exprt &expr, expr_mapt &abstractions);
   void push_nondet(exprt &expr);
 
   bool do_assumptions(map<exprt, polynomialt> polynomials,
