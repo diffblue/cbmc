@@ -58,7 +58,13 @@ class polynomial_acceleratort : public path_accelerationt {
   void extract_polynomial(scratch_programt &program,
                           set<pair<expr_listt, exprt> > &coefficients,
                           polynomialt &polynomial);
-  expr_sett cone_of_influence(goto_programt::instructionst &body, exprt &target);
+  expr_sett cone_of_influence(goto_programt::instructionst &orig_body,
+                              goto_programt::instructionst &body,
+                              exprt &target);
+
+  bool fit_const(goto_programt::instructionst &loop_body,
+                 exprt &target,
+                 polynomialt &polynomial);
 
   bool check_inductive(map<exprt, polynomialt> polynomials,
                        goto_programt::instructionst &body);

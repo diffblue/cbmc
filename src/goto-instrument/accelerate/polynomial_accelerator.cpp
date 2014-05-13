@@ -205,11 +205,12 @@ bool polynomial_acceleratort::accelerate(patht &loop,
   return true;
 }
 
-bool polynomial_acceleratort::fit_polynomial(goto_programt::instructionst &body,
+bool polynomial_acceleratort::fit_polynomial(goto_programt::instructionst &orig_body,
                                              exprt &var,
                                              polynomialt &polynomial) {
   // These are the variables that var depends on with respect to the body.
-  expr_sett influence = cone_of_influence(body, var);
+  goto_programt::instructionst body;
+  expr_sett influence = cone_of_influence(orig_body, body, var);
   vector<expr_listt> parameters;
   set<pair<expr_listt, exprt> > coefficients;
   expr_listt exprs;
@@ -225,6 +226,10 @@ bool polynomial_acceleratort::fit_polynomial(goto_programt::instructionst &body,
     std::cout << expr2c(*it, ns) << endl;
   }
 #endif
+
+  if (influence.empty()) {
+    return fit_const(body, var, polynomial);
+  }
 
   for (expr_sett::iterator it = influence.begin();
        it != influence.end();
@@ -331,6 +336,44 @@ bool polynomial_acceleratort::fit_polynomial(goto_programt::instructionst &body,
   return false;
 }
 
+bool polynomial_acceleratort::fit_const(goto_programt::instructionst &body,
+                                        exprt &target,
+                                        polynomialt &poly) {
+  return false;
+
+  scratch_programt program(symbol_table);
+
+  program.append(body);
+  program.add_instruction(ASSERT)->guard = equal_exprt(target, not_exprt(target));
+
+  try {
+    if (program.check_sat(false)) {
+#ifdef DEBUG
+      std::cout << "Fitting constant, eval'd to: " << expr2c(program.eval(target), ns) << std::endl;
+#endif
+      constant_exprt val = to_constant_expr(program.eval(target));
+      mp_integer mp = binary2integer(val.get_value().c_str(), true);
+      monomialt mon;
+      monomialt::termt term;
+
+      term.var = from_integer(1, target.type());
+      term.exp = 1;
+      mon.terms.push_back(term);
+      mon.coeff = mp.to_long();
+
+      poly.monomials.push_back(mon);
+
+      return true;
+    }
+  } catch (string s) {
+    std::cout << "Error in fitting polynomial SAT check: " << s << endl;
+  } catch (const char *s) {
+    std::cout << "Error in fitting polynomial SAT check: " << s << endl;
+  }
+
+  return false;
+}
+
 void polynomial_acceleratort::assert_for_values(scratch_programt &program,
                                                 map<exprt, int> &values,
                                                 set<pair<expr_listt, exprt> >
@@ -382,9 +425,9 @@ void polynomial_acceleratort::assert_for_values(scratch_programt &program,
       } else {
         map<exprt, int>::iterator v_it = values.find(e);
 
-        assert(v_it != values.end());
-
-        concrete_value *= v_it->second;
+        if (v_it != values.end()) {
+          concrete_value *= v_it->second;
+        }
       }
     }
 
@@ -412,15 +455,16 @@ void polynomial_acceleratort::assert_for_values(scratch_programt &program,
   assumption->guard = polynomial_holds;
 }
 
-expr_sett polynomial_acceleratort::cone_of_influence(goto_programt::instructionst
-                                                        &body,
-                                                      exprt &target) {
+expr_sett polynomial_acceleratort::cone_of_influence(
+    goto_programt::instructionst &orig_body,
+    goto_programt::instructionst &body,
+    exprt &target) {
   expr_sett cone;
 
   utils.gather_rvalues(target, cone);
 
-  for (goto_programt::instructionst::reverse_iterator r_it = body.rbegin();
-       r_it != body.rend();
+  for (goto_programt::instructionst::reverse_iterator r_it = orig_body.rbegin();
+       r_it != orig_body.rend();
        ++r_it) {
     if (r_it->is_assign()) {
       // XXX -- this doesn't work if the assignment is not to a symbol, e.g.
@@ -438,6 +482,8 @@ expr_sett polynomial_acceleratort::cone_of_influence(goto_programt::instructions
         if (cone.find(*s_it) != cone.end()) {
           // We're assigning to something in the cone of influence -- expand the
           // cone.
+          body.push_front(*r_it);
+          cone.erase(assignment.lhs());
           utils.gather_rvalues(assignment.rhs(), cone);
           break;
         }

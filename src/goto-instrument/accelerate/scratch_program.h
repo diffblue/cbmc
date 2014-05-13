@@ -49,7 +49,12 @@ class scratch_programt : public goto_programt {
   targett assign(const exprt &lhs, const exprt &rhs);
   targett assume(const exprt &guard);
 
-  bool check_sat();
+  bool check_sat(bool do_slice);
+
+  bool check_sat() {
+    return check_sat(true);
+  }
+
   exprt eval(exprt &e);
 
   void fix_types();

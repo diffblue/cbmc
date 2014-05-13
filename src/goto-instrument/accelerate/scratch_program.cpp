@@ -14,7 +14,7 @@
 #include <iostream>
 #endif
 
-bool scratch_programt::check_sat()
+bool scratch_programt::check_sat(bool do_slice)
 {
   fix_types();
 
@@ -32,7 +32,10 @@ bool scratch_programt::check_sat()
   goto_symex_statet::propagationt::valuest constants;
 
   symex(symex_state, functions, *this);
-  slice(equation);
+
+  if (do_slice) {
+    slice(equation);
+  }
 
   if (equation.count_assertions() == 0) {
     // Symex sliced away all our assertions.
