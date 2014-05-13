@@ -57,7 +57,7 @@ int acceleratet::accelerate_loop(goto_programt::targett &loop_header) {
   make_overflow_loc(loop_header, back_jump, overflow_loc);
   program.update();
 
-#if 1
+#if 0
   enumerating_loop_accelerationt acceleration(symbol_table, goto_functions,
       program, loop, loop_header, accelerate_limit);
 #else
@@ -540,12 +540,13 @@ int acceleratet::accelerate_loops()
 
 void accelerate_functions(
   goto_functionst &functions,
-  symbol_tablet &symbol_table)
+  symbol_tablet &symbol_table,
+  bool use_z3)
 {
   Forall_goto_functions (it, functions)
   {
     cout << "Accelerating function " << it->first << endl;
-    acceleratet accelerate(it->second.body, functions, symbol_table);
+    acceleratet accelerate(it->second.body, functions, symbol_table, use_z3);
 
     int num_accelerated = accelerate.accelerate_loops();
 

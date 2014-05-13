@@ -244,7 +244,7 @@ exprt acceleration_utilst::precondition(patht &path) {
 
   // Hack: replace array accesses with nondet.
   expr_mapt array_abstractions;
-  abstract_arrays(ret, array_abstractions);
+  //abstract_arrays(ret, array_abstractions);
 
   simplify(ret, ns);
 
