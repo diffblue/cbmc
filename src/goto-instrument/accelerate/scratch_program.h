@@ -32,8 +32,8 @@ class scratch_programt : public goto_programt {
       satchecker(ns, *satcheck),
       z3(ns, "accelerate", "", "", smt2_dect::Z3),
 
-      //checker(&z3)
-      checker(&satchecker)
+      checker(&z3)
+      //checker(&satchecker)
   {
   }
 

@@ -456,7 +456,7 @@ int goto_instrument_parseoptionst::doit()
       goto_inline(goto_functions, ns, ui_message_handler);
 
       status() << "Accelerating" << eom;
-      accelerate_functions(goto_functions, symbol_table);
+      accelerate_functions(goto_functions, symbol_table, cmdline.isset("z3"));
       remove_skip(goto_functions);
       goto_functions.update();
     }

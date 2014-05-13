@@ -17,12 +17,14 @@ class acceleratet {
  public:
   acceleratet(goto_programt &_program,
               goto_functionst &_goto_functions,
-              symbol_tablet &_symbol_table) :
+              symbol_tablet &_symbol_table,
+              bool _use_z3) :
       program(_program),
       goto_functions(_goto_functions),
       symbol_table(_symbol_table),
       ns(symbol_table),
-      utils(symbol_table, goto_functions)
+      utils(symbol_table, goto_functions),
+      use_z3(_use_z3)
   {
     natural_loops(program);
   }
@@ -93,8 +95,11 @@ class acceleratet {
   overflow_mapt overflow_locs;
 
   expr_mapt dirty_vars_map;
+
+  bool use_z3;
 };
 
 void accelerate_functions(
   goto_functionst &functions,
-  symbol_tablet &ns);
+  symbol_tablet &ns,
+  bool use_z3);
