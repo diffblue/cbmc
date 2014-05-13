@@ -38,6 +38,14 @@ class path_acceleratort {
     overflow_path.copy_from(that.overflow_path);
   }
 
+  void clear() {
+    path.clear();
+    pure_accelerator.clear();
+    overflow_path.clear();
+    changed_vars.clear();
+    dirty_vars.clear();
+  }
+
   patht path;
   goto_programt pure_accelerator;
   goto_programt overflow_path;
