@@ -36,7 +36,7 @@
 #include "cone_of_influence.h"
 #include "overflow_instrumenter.h"
 
-//#define DEBUG
+#define DEBUG
 
 
 bool disjunctive_polynomial_accelerationt::accelerate(
@@ -75,6 +75,12 @@ bool disjunctive_polynomial_accelerationt::accelerate(
   patht &path = accelerator.path;
   path.clear();
 
+  if (!find_path(path)) {
+    // No more paths!
+    return false;
+  }
+
+#if 0
   for (expr_sett::iterator it = modified.begin();
        it != modified.end();
        ++it) {
@@ -111,6 +117,7 @@ bool disjunctive_polynomial_accelerationt::accelerate(
   if (polynomials.empty()) {
     return false;
   }
+#endif
 
   // Fit polynomials for the other variables.
   expr_sett dirty;
@@ -287,6 +294,57 @@ bool disjunctive_polynomial_accelerationt::accelerate(
   accelerator.pure_accelerator.instructions.swap(program.instructions);
 
   return true;
+}
+
+bool disjunctive_polynomial_accelerationt::find_path(patht &path) {
+  scratch_programt program(symbol_table);
+
+  program.append(fixed);
+  program.append(fixed);
+
+  // Let's make sure that we get a path we have not seen before.
+  for (list<distinguish_valuest>::iterator it = accelerated_paths.begin();
+       it != accelerated_paths.end();
+       ++it) {
+    exprt new_path = false_exprt();
+
+    for (distinguish_valuest::iterator jt = it->begin();
+         jt != it->end();
+         ++jt) {
+      exprt distinguisher = jt->first;
+      bool taken = jt->second;
+
+      if (taken) {
+        not_exprt negated(distinguisher);
+        distinguisher.swap(negated);
+      }
+
+      or_exprt disjunct(new_path, distinguisher);
+      new_path.swap(disjunct);
+    }
+
+    program.assume(new_path);
+  }
+
+  program.add_instruction(ASSERT)->guard = false_exprt();
+
+  try {
+    if (program.check_sat()) {
+#ifdef DEBUG
+      std::cout << "Found a path" << std::endl;
+#endif
+      build_path(program, path);
+      record_path(program);
+
+      return true;
+    }
+  } catch (string s) {
+    std::cout << "Error in fitting polynomial SAT check: " << s << endl;
+  } catch (const char *s) {
+    std::cout << "Error in fitting polynomial SAT check: " << s << endl;
+  }
+
+  return false;
 }
 
 bool disjunctive_polynomial_accelerationt::fit_polynomial(
