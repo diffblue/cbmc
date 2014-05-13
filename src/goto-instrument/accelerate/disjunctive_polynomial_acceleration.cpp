@@ -44,6 +44,8 @@ bool disjunctive_polynomial_accelerationt::accelerate(
   map<exprt, polynomialt> polynomials;
   scratch_programt program(symbol_table);
 
+  accelerator.clear();
+
 #ifdef DEBUG
   std::cout << "Polynomial accelerating program:" << endl;
 
@@ -128,19 +130,32 @@ bool disjunctive_polynomial_accelerationt::accelerate(
   for (expr_sett::iterator it = dirty.begin();
        it != dirty.end();
        ++it) {
+#ifdef DEBUG
+    std::cout << "Trying to accelerate " << expr2c(*it, ns) << std::endl;
+#endif
+
     if (it->type().id() == ID_bool) {
       // Hack: don't try to accelerate booleans.
       accelerator.dirty_vars.insert(*it);
+#ifdef DEBUG
+      std::cout << "Ignoring boolean" << std::endl;
+#endif
       continue;
     }
 
     if (it->id() == ID_index ||
         it->id() == ID_dereference) {
+#ifdef DEBUG
+      std::cout << "Ignoring array reference" << std::endl;
+#endif
       continue;
     }
 
     if (accelerator.changed_vars.find(*it) != accelerator.changed_vars.end()) {
       // We've accelerated variable this already.
+#ifdef DEBUG
+      std::cout << "We've accelerated it already" << std::endl;
+#endif
       continue;
     }
 
@@ -148,6 +163,9 @@ bool disjunctive_polynomial_accelerationt::accelerate(
     exprt array_rhs;
 
     if (depends_on_array(*it, array_rhs)) {
+#ifdef DEBUG
+      std::cout << "Ignoring because it depends on an array" << std::endl;
+#endif
       continue;
     }
 
@@ -165,6 +183,10 @@ bool disjunctive_polynomial_accelerationt::accelerate(
         continue;
       }
     }
+
+#ifdef DEBUG
+    std::cout << "Failed to accelerate " << expr2c(*it, ns) << std::endl;
+#endif
 
     // We weren't able to accelerate this target...
     accelerator.dirty_vars.insert(target);
