@@ -23,8 +23,7 @@ done
 
 $goto_cc $cfile -o $ofile
 timeout 30 $goto_instrument --accelerate $ofile $accfile
-
-timeout 30 $cbmc --unwind 4 $cbmcargs $accfile
+timeout 30 $cbmc --unwind 6 $cbmcargs $accfile
 retcode=$?
 
 #rm $ofile $accfile

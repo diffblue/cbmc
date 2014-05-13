@@ -109,7 +109,7 @@ bool polynomial_acceleratort::accelerate(patht &loop,
   }
 
   if (polynomials.empty()) {
-    return false;
+    //return false;
   }
 
   /*
