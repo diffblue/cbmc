@@ -8,7 +8,7 @@
 
 #include "scratch_program.h"
 
-#define DEBUG
+//#define DEBUG
 
 #ifdef DEBUG
 #include <iostream>

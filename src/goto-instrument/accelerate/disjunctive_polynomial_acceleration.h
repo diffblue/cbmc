@@ -19,8 +19,6 @@
 #include "cone_of_influence.h"
 #include "acceleration_utils.h"
 
-#define DEBUG
-
 using namespace std;
 
 class disjunctive_polynomial_accelerationt : public loop_accelerationt {

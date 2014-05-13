@@ -18,8 +18,6 @@
 #include "accelerator.h"
 #include "cone_of_influence.h"
 
-#define DEBUG
-
 using namespace std;
 
 typedef hash_map_cont<exprt, exprt, irep_hash> expr_mapt;
