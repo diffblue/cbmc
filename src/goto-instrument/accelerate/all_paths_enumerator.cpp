@@ -1,10 +1,10 @@
 #include <iostream>
 
-#include "path_enumerator.h"
+#include "all_paths_enumerator.h"
 
 //#define DEBUG
 
-bool path_enumeratort::next(patht &path) {
+bool all_paths_enumeratort::next(patht &path) {
   if (last_path.empty()) {
     // This is the first time we've been called -- build an initial
     // path.
@@ -43,7 +43,7 @@ bool path_enumeratort::next(patht &path) {
   return false;
 }
 
-int path_enumeratort::backtrack(patht &path) {
+int all_paths_enumeratort::backtrack(patht &path) {
   // If we have a path of length 1 or 0, we can't backtrack any further.
   // That means we're done enumerating paths!
   if (path.size() < 2) {
@@ -84,7 +84,7 @@ int path_enumeratort::backtrack(patht &path) {
   return backtrack(path);
 }
 
-void path_enumeratort::complete_path(patht &path, int succ) {
+void all_paths_enumeratort::complete_path(patht &path, int succ) {
   if (path.empty()) {
     return;
   }
@@ -101,7 +101,7 @@ void path_enumeratort::complete_path(patht &path, int succ) {
   complete_path(path, 0);
 }
 
-void path_enumeratort::extend_path(patht &path,
+void all_paths_enumeratort::extend_path(patht &path,
     goto_programt::targett t,
     int succ) {
   goto_programt::targett next;
@@ -137,6 +137,6 @@ void path_enumeratort::extend_path(patht &path,
   path.push_back(path_nodet(next, guard));
 }
 
-bool path_enumeratort::is_looping(patht &path) {
+bool all_paths_enumeratort::is_looping(patht &path) {
   return path.size() > 1 && path.back().loc == loop_header;
 }

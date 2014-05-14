@@ -8,6 +8,7 @@
 #include "loop_acceleration.h"
 #include "polynomial_accelerator.h"
 #include "path_enumerator.h"
+#include "all_paths_enumerator.h"
 
 
 class enumerating_loop_accelerationt : public loop_accelerationt {
@@ -24,10 +25,14 @@ class enumerating_loop_accelerationt : public loop_accelerationt {
     goto_program(_goto_program),
     loop(_loop),
     loop_header(_loop_header),
-    path_enumerator(_goto_program, _loop, _loop_header),
     polynomial_accelerator(symbol_table, goto_functions),
     path_limit(_path_limit)
   {
+    path_enumerator = new all_paths_enumeratort(goto_program, loop, loop_header);
+  }
+
+  ~enumerating_loop_accelerationt() {
+    delete path_enumerator;
   }
 
   virtual bool accelerate(path_acceleratort &accelerator);
@@ -38,9 +43,10 @@ class enumerating_loop_accelerationt : public loop_accelerationt {
   goto_programt &goto_program;
   natural_loops_mutablet::natural_loopt &loop;
   goto_programt::targett loop_header;
-  path_enumeratort path_enumerator;
   polynomial_acceleratort polynomial_accelerator;
   int path_limit;
+
+  path_enumeratort *path_enumerator;
 };
 
 #endif // ENUMERATING_LOOP_ACCELERATION_H
