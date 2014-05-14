@@ -51,7 +51,7 @@ exprt polynomialt::to_expr() {
   return ret;
 }
 
-void polynomialt::from_expr(exprt &expr) {
+void polynomialt::from_expr(const exprt &expr) {
   if (expr.id() == ID_symbol) {
     monomialt monomial;
     monomialt::termt term;
@@ -63,13 +63,18 @@ void polynomialt::from_expr(exprt &expr) {
     monomial.coeff = 1;
 
     monomials.push_back(monomial);
-  } else if (expr.id() == ID_plus || expr.id() == ID_mult) {
+  } else if (expr.id() == ID_plus ||
+             expr.id() == ID_minus ||
+             expr.id() == ID_mult) {
     polynomialt poly2;
 
     from_expr(expr.op0());
     poly2.from_expr(expr.op1());
 
-    if (expr.id() == ID_plus) {
+    if (expr.id() == ID_minus) {
+      poly2.mult(-1);
+      add(poly2);
+    } else if (expr.id() == ID_plus) {
       add(poly2);
     } else if (expr.id() == ID_mult) {
       mult(poly2);
@@ -300,7 +305,7 @@ int monomialt::compare(monomialt &other) {
   assert(!"NOTREACHEDBITCHES");
 }
 
-int polynomialt::max_degree(exprt &var) {
+int polynomialt::max_degree(const exprt &var) {
   // We want the degree of the highest degree monomial in which `var' appears.
   int maxd = 0;
 
@@ -315,7 +320,7 @@ int polynomialt::max_degree(exprt &var) {
   return maxd;
 }
 
-int polynomialt::coeff(exprt &var) {
+int polynomialt::coeff(const exprt &var) {
   // We want the coefficient for the given monomial...
   polynomialt p;
   p.from_expr(var);
@@ -353,7 +358,7 @@ int monomialt::degree() {
   return deg;
 }
 
-bool monomialt::contains(exprt &var) {
+bool monomialt::contains(const exprt &var) {
   // Does this monomial contain `var'?
   if (var.id() != ID_symbol) {
     // We're not interested.

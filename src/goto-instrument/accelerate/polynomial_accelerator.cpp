@@ -96,11 +96,6 @@ bool polynomial_acceleratort::accelerate(patht &loop,
       continue;
     }
 
-    if (target.id() == ID_index) {
-      // We'll handle this later.
-      //continue;
-    }
-
     cone_of_influence(assigns, target, sliced_assigns, influence);
 
     if (influence.find(target) == influence.end()) {
@@ -109,6 +104,13 @@ bool polynomial_acceleratort::accelerate(patht &loop,
 #endif
 
       nonrecursive.insert(target);
+      continue;
+    }
+
+    if (target.id() == ID_index ||
+        target.id() == ID_dereference) {
+      // We can't accelerate a recursive indirect access...
+      accelerator.dirty_vars.insert(target);
       continue;
     }
 

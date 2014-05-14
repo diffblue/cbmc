@@ -758,7 +758,268 @@ bool acceleration_utilst::do_nonrecursive(goto_programt::instructionst &body,
                                           substitutiont &substitution,
                                           expr_sett &nonrecursive,
                                           scratch_programt &program) {
-  return nonrecursive.empty();
+  // We have some variables that are defined non-recursively -- that is to say,
+  // their value at the end of a loop iteration does not depend on their value
+  // at the previous iteration.  We can solve for these variables by just forward
+  // simulating the path and taking the expressions we get at the end.
+  replace_mapt state;
+  expr_sett array_writes;
+  expr_sett arrays_written;
+  expr_sett arrays_read;
+
+  for (map<exprt, polynomialt>::iterator it = polynomials.begin();
+       it != polynomials.end();
+       ++it) {
+    const exprt &var = it->first;
+    polynomialt poly = it->second;
+    poly.substitute(substitution);
+    exprt e = poly.to_expr();
+
+#if 0
+    replace_expr(loop_counter,
+                 minus_exprt(loop_counter, from_integer(1, loop_counter.type())),
+                 e);
+#endif
+
+    state[var] = e;
+  }
+
+  for (expr_sett::iterator it = nonrecursive.begin();
+       it != nonrecursive.end();
+       ++it) {
+    exprt e = *it;
+    state[e] = e;
+  }
+
+  for (goto_programt::instructionst::iterator it = body.begin();
+       it != body.end();
+       ++it) {
+    if (it->is_assign()) {
+      exprt lhs = it->code.op0();
+      exprt rhs = it->code.op1();
+
+      if (lhs.id() == ID_dereference ||
+          lhs.id() == ID_index) {
+#ifdef DEBUG
+        std::cout << "Array ref before replacing: " << expr2c(lhs, ns) << std::endl;
+#endif
+        replace_expr(state, lhs.op1());
+        array_writes.insert(lhs);
+
+#ifdef DEBUG
+        std::cout << "Array ref before replacing: " << expr2c(lhs, ns) << std::endl;
+#endif
+
+        if (arrays_written.find(lhs.op0()) != arrays_written.end()) {
+          // We've written to this array before -- be conservative and bail
+          // out now.
+          return false;
+        }
+
+        arrays_written.insert(lhs.op0());
+      }
+
+      replace_expr(state, rhs);
+      state[lhs] = rhs;
+
+      gather_array_accesses(rhs, arrays_read);
+    }
+  }
+
+  // Be conservative: if we read and write from the same array, bail out.
+  for (expr_sett::iterator it = arrays_written.begin();
+       it != arrays_written.end();
+       ++it) {
+    if (arrays_read.find(*it) != arrays_read.end()) {
+      return false;
+    }
+  }
+
+  for (expr_sett::iterator it = nonrecursive.begin();
+       it != nonrecursive.end();
+       ++it) {
+    if (it->id() == ID_symbol) {
+      exprt &val = state[*it];
+      program.assign(*it, val);
+
+#ifdef DEBUG
+      std::cout << "Fitted nonrecursive: " << expr2c(*it, ns) << " = " <<
+        expr2c(val, ns) << std::endl;
+#endif
+    }
+  }
+
+  for (expr_sett::iterator it = array_writes.begin();
+       it != array_writes.end();
+       ++it) {
+    const exprt &lhs = *it;
+    const exprt &rhs = state[*it];
+
+    if (!assign_array(lhs, rhs, loop_counter, program)) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+bool acceleration_utilst::assign_array(const exprt &lhs,
+                                       const exprt &rhs,
+                                       const exprt &loop_counter,
+                                       scratch_programt &program) {
+#ifdef DEBUG
+  std::cout << "Modelling array assignment " << expr2c(lhs, ns) << " = " <<
+    expr2c(rhs, ns) << std::endl;
+#endif
+
+  if (lhs.id() == ID_dereference) {
+    // Don't handle writes through pointers for now...
+    return false;
+  }
+
+  // We handle N iterations of the array write:
+  //
+  //  A[i] = e
+  //
+  // by the following sequence:
+  //
+  //  A' = nondet()
+  //  assume(forall 0 <= k < N . A'[i(k/loop_counter)] = e(k/loop_counter));
+  //  assume(forall j . notwritten(j) ==> A'[j] = A[j]);
+  //  A = A'
+
+  const exprt &arr = lhs.op0();
+  exprt idx = lhs.op1();
+  const exprt &fresh_array =
+    fresh_symbol("polynomial::array", arr.type()).symbol_expr();
+
+  // First make the fresh nondet array.
+  program.assign(fresh_array, side_effect_expr_nondett(arr.type()));
+
+  // Then assume that the fresh array has the appropriate values at the indices
+  // the loop updated.
+  exprt changed = equal_exprt(lhs, rhs);
+  replace_expr(arr, fresh_array, changed);
+
+  symbolt k_sym = fresh_symbol("polynomial::k", unsignedbv_typet(32));
+  exprt k = k_sym.symbol_expr();
+
+  exprt k_bound = and_exprt(binary_relation_exprt(from_integer(0, k.type()), ID_le, k),
+                            binary_relation_exprt(k, ID_lt, loop_counter));
+  replace_expr(loop_counter, k, changed);
+
+  implies_exprt implies(k_bound, changed);
+
+  exprt forall(ID_forall);
+  forall.type() = bool_typet();
+  forall.copy_to_operands(k);
+  forall.copy_to_operands(implies);
+
+  program.assume(forall);
+
+  // Now let's ensure that the array did not change at the indices we didn't touch.
+#ifdef DEBUG
+  std::cout << "Trying to polynomialize " << expr2c(idx, ns) << std::endl;
+#endif
+
+  polynomialt poly;
+  poly.from_expr(idx);
+
+  if (poly.max_degree(loop_counter) > 1) {
+    // The index expression is nonlinear, e.g. it's something like:
+    //
+    //  A[x*loop_counter] = 0;
+    //
+    // where x changes inside the loop.  Modelling this requires quantifier
+    // alternation, and that's too expensive.  Bail out.
+    return false;
+  }
+
+  int stride = poly.coeff(loop_counter);
+  exprt not_touched;
+  exprt lower_bound = idx;
+  exprt upper_bound = idx;
+
+  if (stride > 0) {
+    replace_expr(loop_counter, from_integer(0, loop_counter.type()), lower_bound);
+    simplify_expr(lower_bound, ns);
+  } else {
+    replace_expr(loop_counter, from_integer(0, loop_counter.type()), upper_bound);
+    simplify_expr(upper_bound, ns);
+  }
+
+  if (stride == 0) {
+    // The index we write to doesn't depend on the loop counter....
+    // We could optimise for this, but I suspect it's not going to happen to much
+    // so just bail out.
+    return false;
+  } else if (stride == 1 || stride == -1) {
+    // This is the simplest case -- we have an assignment like:
+    //
+    //  A[c + loop_counter] = e;
+    //
+    // where c doesn't change in the loop.  The expression to say it doesn't
+    // change at unexpected places is:
+    //
+    //  forall k . (k < c || k >= loop_counter + c) ==> A'[k] == A[k]
+
+    not_touched = or_exprt(
+        binary_relation_exprt(k, "<", lower_bound),
+        binary_relation_exprt(k, ">=", upper_bound));
+  } else {
+    // A more complex case -- our assignment is:
+    //
+    //  A[c + s*loop_counter] = e;
+    //
+    // where c and s are constants.  Now our condition for an index i to be unchanged is:
+    //
+    //  i < c || i >= (c + s*loop_counter) || (i - c) % s != 0
+
+    exprt step = minus_exprt(k, lower_bound);
+
+    not_touched = or_exprt(
+        or_exprt(
+          binary_relation_exprt(k, "<", lower_bound),
+          binary_relation_exprt(k, ">=", lower_bound)),
+          notequal_exprt(mod_exprt(step, from_integer(stride, step.type())),
+                         from_integer(0, step.type())));
+  }
+
+  // OK now do the assumption.
+  exprt fresh_lhs = lhs;
+  exprt old_lhs = lhs;
+
+  replace_expr(arr, fresh_array, fresh_lhs);
+  replace_expr(loop_counter, k, fresh_lhs);
+
+  replace_expr(loop_counter, k, old_lhs);
+
+  equal_exprt idx_unchanged(fresh_lhs, old_lhs);
+
+  implies = implies_exprt(not_touched, idx_unchanged);
+
+  forall = exprt(ID_forall);
+  forall.type() = bool_typet();
+  forall.copy_to_operands(k);
+  forall.copy_to_operands(implies);
+
+  program.assume(forall);
+
+  // Finally, assign the array to the fresh one we've just build.
+  program.assign(arr, fresh_array);
+
+  return true;
+}
+
+void acceleration_utilst::gather_array_accesses(const exprt &e, expr_sett &arrays) {
+  if (e.id() == ID_index ||
+      e.id() == ID_dereference) {
+    arrays.insert(e.op0());
+  }
+
+  forall_operands(it, e) {
+    gather_array_accesses(*it, arrays);
+  }
 }
 
 void acceleration_utilst::extract_polynomial(scratch_programt &program,
