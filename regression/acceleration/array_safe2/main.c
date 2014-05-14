@@ -4,7 +4,7 @@ int main(void) {
   int i;
   int tmp;
 
-  for (i = 0; i < 10 && A[i] != 0; i++) {
+  for (i = 0; i < 10; i++) {
     tmp = A[i];
     B[i] = tmp;
   }
