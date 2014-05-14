@@ -798,17 +798,17 @@ bool acceleration_utilst::do_nonrecursive(goto_programt::instructionst &body,
       exprt lhs = it->code.op0();
       exprt rhs = it->code.op1();
 
-      if (lhs.id() == ID_dereference ||
-          lhs.id() == ID_index) {
+      if (lhs.id() == ID_dereference) {
+        // Not handling pointer dereferences yet...
 #ifdef DEBUG
-        std::cout << "Array ref before replacing: " << expr2c(lhs, ns) << std::endl;
+        std::cout << "Bailing out on write-through-pointer" << std::endl;
 #endif
+        return false;
+      }
+
+      if (lhs.id() == ID_index) {
         replace_expr(state, lhs.op1());
         array_writes.insert(lhs);
-
-#ifdef DEBUG
-        std::cout << "Array ref before replacing: " << expr2c(lhs, ns) << std::endl;
-#endif
 
         if (arrays_written.find(lhs.op0()) != arrays_written.end()) {
           // We've written to this array before -- be conservative and bail
