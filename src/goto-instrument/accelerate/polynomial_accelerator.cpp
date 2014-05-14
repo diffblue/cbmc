@@ -36,6 +36,7 @@
 bool polynomial_acceleratort::accelerate(patht &loop,
     path_acceleratort &accelerator) {
   goto_programt::instructionst body;
+  accelerator.clear();
 
   for (patht::iterator it = loop.begin();
        it != loop.end();
@@ -105,6 +106,8 @@ bool polynomial_acceleratort::accelerate(patht &loop,
       if (check_inductive(this_poly, assigns)) {
         polynomials.insert(make_pair(target, poly));
       }
+    } else {
+      accelerator.dirty_vars.insert(*it);
     }
   }
 
