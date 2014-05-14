@@ -48,9 +48,9 @@ class disjunctive_polynomial_accelerationt : public loop_accelerationt {
                       polynomialt &polynomial,
                       patht &path);
 
- protected:
   bool find_path(patht &path);
 
+ protected:
   void assert_for_values(scratch_programt &program,
                          map<exprt, exprt> &values,
                          set<pair<expr_listt, exprt> > &coefficients,

@@ -12,7 +12,7 @@ bool enumerating_loop_accelerationt::accelerate(
   // Note: we use enumerated != path_limit rather than
   // enumerated < path_limit so that passing in path_limit=-1 causes
   // us to enumerate all the paths (or at least 2^31 of them...)
-  while (path_enumerator.next(path) && enumerated++ != path_limit) {
+  while (path_enumerator->next(path) && enumerated++ != path_limit) {
 #ifdef DEBUG
     std::cout << "Found a path..." << std::endl;
     namespacet ns(symbol_table);
