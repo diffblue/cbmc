@@ -20,7 +20,7 @@ public:
   int compare(monomialt &other);
 
   int degree();
-  bool contains(exprt &var);
+  bool contains(const exprt &var);
 };
 
 typedef std::map<exprt, exprt> substitutiont;
@@ -33,7 +33,7 @@ public:
   std::vector<monomialt> monomials;
 
   exprt to_expr();
-  void from_expr(exprt &expr);
+  void from_expr(const exprt &expr);
 
   void substitute(substitutiont &substitution);
 
@@ -43,8 +43,8 @@ public:
   void mult(int scalar);
   void mult(polynomialt &other);
 
-  int max_degree(exprt &var);
-  int coeff(exprt &expr);
+  int max_degree(const exprt &var);
+  int coeff(const exprt &expr);
 };
 
 typedef std::vector<polynomialt> polynomialst;

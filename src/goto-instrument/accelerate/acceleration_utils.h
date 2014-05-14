@@ -97,6 +97,12 @@ class acceleration_utilst {
                        substitutiont &substitution,
                        expr_sett &nonrecursive,
                        scratch_programt &program);
+  bool assign_array(const exprt &lhs,
+                    const exprt &rhs,
+                    const exprt &loop_counter,
+                    scratch_programt &program);
+
+  void gather_array_accesses(const exprt &expr, expr_sett &arrays);
 
   void gather_rvalues(const exprt &expr, expr_sett &rvalues);
 
