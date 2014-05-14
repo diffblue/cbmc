@@ -35,7 +35,7 @@
 #include "cone_of_influence.h"
 #include "overflow_instrumenter.h"
 
-//#define DEBUG
+#define DEBUG
 
 void acceleration_utilst::gather_rvalues(const exprt &expr,
     expr_sett &rvalues) {
@@ -305,8 +305,8 @@ bool acceleration_utilst::do_assumptions(map<exprt, polynomialt> polynomials,
   // assume(precondition);
   //
   // loop_counter = *;
-  // assume(target1 == polynomial1);
-  // assume(target2 == polynomial2);
+  // target1 = polynomial1);
+  // target2 = polynomial2);
   // ...
   // assume(!precondition);
   //
@@ -348,10 +348,10 @@ bool acceleration_utilst::do_assumptions(map<exprt, polynomialt> polynomials,
 
   program.assign(loop_counter, side_effect_expr_nondett(loop_counter.type()));
 
-  for (vector<exprt>::iterator it = polynomials_hold.begin();
-       it != polynomials_hold.end();
-       ++it) {
-    program.assume(*it);
+  for (map<exprt, polynomialt>::iterator p_it = polynomials.begin();
+       p_it != polynomials.end();
+       ++p_it) {
+    program.assign(p_it->first, p_it->second.to_expr());
   }
 
   program.assume(condition);
@@ -390,6 +390,10 @@ bool acceleration_utilst::do_assumptions(map<exprt, polynomialt> polynomials,
     std::cout << "Error in monotonicity SAT check: " << s << endl;
      return false;
   }
+
+#ifdef DEBUG
+  std::cout << "Path is monotone" << std::endl;
+#endif
 
   return true;
 }

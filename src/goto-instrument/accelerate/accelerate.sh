@@ -22,8 +22,8 @@ esac
 done
 
 $goto_cc $cfile -o $ofile
-timeout 30 $goto_instrument --accelerate $ofile $accfile
-timeout 30 $cbmc --unwind 6 $cbmcargs $accfile
+timeout 20 $goto_instrument --accelerate $ofile $accfile
+timeout 20 $cbmc --unwind 3 --z3 $cbmcargs $accfile
 retcode=$?
 
 #rm $ofile $accfile
