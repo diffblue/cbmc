@@ -14,7 +14,8 @@ SRC = goto_instrument_main.cpp goto_instrument_parseoptions.cpp \
       accelerate/scratch_program.cpp accelerate/polynomial_accelerator.cpp \
 			accelerate/util.cpp accelerate/trace_automaton.cpp \
 			accelerate/enumerating_loop_acceleration.cpp \
-			accelerate/path_enumerator.cpp \
+			accelerate/all_paths_enumerator.cpp \
+			accelerate/sat_path_enumerator.cpp \
 			accelerate/disjunctive_polynomial_acceleration.cpp \
 			accelerate/cone_of_influence.cpp accelerate/overflow_instrumenter.cpp\
 			accelerate/path.cpp accelerate/acceleration_utils.cpp \
