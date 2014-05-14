@@ -91,6 +91,13 @@ class acceleration_utilst {
                  map<exprt, polynomialt> &polynomials,
                  polynomialt &poly);
 
+  bool do_nonrecursive(goto_programt::instructionst &loop_body,
+                       map<exprt, polynomialt> &polynomials,
+                       exprt &loop_counter,
+                       substitutiont &substitution,
+                       expr_sett &nonrecursive,
+                       scratch_programt &program);
+
   void gather_rvalues(const exprt &expr, expr_sett &rvalues);
 
   void ensure_no_overflows(scratch_programt &program);

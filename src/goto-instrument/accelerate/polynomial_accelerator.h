@@ -49,6 +49,11 @@ class polynomial_acceleratort : public path_accelerationt {
                       polynomialt &polynomial);
 
  protected:
+  bool fit_polynomial_sliced(goto_programt::instructionst &sliced_body,
+                             exprt &target,
+                             expr_sett &influence,
+                             polynomialt &polynomial);
+
   void assert_for_values(scratch_programt &program,
                          map<exprt, int> &values,
                          set<pair<expr_listt, exprt> > &coefficients,
@@ -58,9 +63,10 @@ class polynomial_acceleratort : public path_accelerationt {
   void extract_polynomial(scratch_programt &program,
                           set<pair<expr_listt, exprt> > &coefficients,
                           polynomialt &polynomial);
-  expr_sett cone_of_influence(goto_programt::instructionst &orig_body,
-                              goto_programt::instructionst &body,
-                              exprt &target);
+  void cone_of_influence(goto_programt::instructionst &orig_body,
+                         exprt &target,
+                         goto_programt::instructionst &body,
+                         expr_sett &influence);
 
   bool fit_const(goto_programt::instructionst &loop_body,
                  exprt &target,
@@ -117,6 +123,8 @@ class polynomial_acceleratort : public path_accelerationt {
   acceleration_utilst utils;
 
   exprt loop_counter;
+
+  expr_sett nonrecursive;
 };
 
 expr_sett find_modified(goto_programt::instructionst &body);

@@ -88,6 +88,8 @@ bool polynomial_acceleratort::accelerate(patht &loop,
        ++it) {
     polynomialt poly;
     exprt target = *it;
+    expr_sett influence;
+    goto_programt::instructionst sliced_assigns;
 
     if (target.type() == bool_typet()) {
       // Hack: don't accelerate booleans.
@@ -96,10 +98,21 @@ bool polynomial_acceleratort::accelerate(patht &loop,
 
     if (target.id() == ID_index) {
       // We'll handle this later.
+      //continue;
+    }
+
+    cone_of_influence(assigns, target, sliced_assigns, influence);
+
+    if (influence.find(target) == influence.end()) {
+#ifdef DEBUG
+      std::cout << "Found nonrecursive expression: " << expr2c(target, ns) << std::endl;
+#endif
+
+      nonrecursive.insert(target);
       continue;
     }
 
-    if (fit_polynomial(assigns, target, poly)) {
+    if (fit_polynomial_sliced(sliced_assigns, target, influence, poly)) {
       map<exprt, polynomialt> this_poly;
       this_poly[target] = poly;
 
@@ -196,9 +209,13 @@ bool polynomial_acceleratort::accelerate(patht &loop,
   }
 
   // Add in any array assignments we can do now.
-  if (!utils.do_arrays(assigns, polynomials, loop_counter, stashed, program)) {
+  if (!utils.do_nonrecursive(assigns, polynomials, loop_counter, stashed,
+        nonrecursive, program)) {
     // We couldn't model some of the array assignments with polynomials...
     // Unfortunately that means we just have to bail out.
+#ifdef DEBUG
+    std::cout << "Failed to accelerate a nonrecursive expression" << std::endl;
+#endif
     return false;
   }
 
@@ -215,12 +232,11 @@ bool polynomial_acceleratort::accelerate(patht &loop,
   return true;
 }
 
-bool polynomial_acceleratort::fit_polynomial(goto_programt::instructionst &orig_body,
-                                             exprt &var,
-                                             polynomialt &polynomial) {
+bool polynomial_acceleratort::fit_polynomial_sliced(goto_programt::instructionst &body,
+                                                    exprt &var,
+                                                    expr_sett &influence,
+                                                    polynomialt &polynomial) {
   // These are the variables that var depends on with respect to the body.
-  goto_programt::instructionst body;
-  expr_sett influence = cone_of_influence(orig_body, body, var);
   vector<expr_listt> parameters;
   set<pair<expr_listt, exprt> > coefficients;
   expr_listt exprs;
@@ -236,10 +252,6 @@ bool polynomial_acceleratort::fit_polynomial(goto_programt::instructionst &orig_
     std::cout << expr2c(*it, ns) << endl;
   }
 #endif
-
-  if (influence.empty()) {
-    return fit_const(body, var, polynomial);
-  }
 
   for (expr_sett::iterator it = influence.begin();
        it != influence.end();
@@ -344,6 +356,17 @@ bool polynomial_acceleratort::fit_polynomial(goto_programt::instructionst &orig_
   }
 
   return false;
+}
+
+bool polynomial_acceleratort::fit_polynomial(goto_programt::instructionst &body,
+                                             exprt &target,
+                                             polynomialt &polynomial) {
+  goto_programt::instructionst sliced;
+  expr_sett influence;
+
+  cone_of_influence(body, target, sliced, influence);
+
+  return fit_polynomial_sliced(sliced, target, influence, polynomial);
 }
 
 bool polynomial_acceleratort::fit_const(goto_programt::instructionst &body,
@@ -465,12 +488,11 @@ void polynomial_acceleratort::assert_for_values(scratch_programt &program,
   assumption->guard = polynomial_holds;
 }
 
-expr_sett polynomial_acceleratort::cone_of_influence(
+void polynomial_acceleratort::cone_of_influence(
     goto_programt::instructionst &orig_body,
+    exprt &target,
     goto_programt::instructionst &body,
-    exprt &target) {
-  expr_sett cone;
-
+    expr_sett &cone) {
   utils.gather_rvalues(target, cone);
 
   for (goto_programt::instructionst::reverse_iterator r_it = orig_body.rbegin();
@@ -500,8 +522,6 @@ expr_sett polynomial_acceleratort::cone_of_influence(
       }
     }
   }
-
-  return cone;
 }
 
 bool polynomial_acceleratort::check_inductive(map<exprt, polynomialt> polynomials,
