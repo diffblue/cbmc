@@ -123,6 +123,8 @@ bool polynomial_acceleratort::accelerate(patht &loop,
   stash_polynomials(program, polynomials, stashed, body);
 
   exprt guard;
+  exprt guard_last;
+
   bool path_is_monotone;
   
   try {
@@ -133,18 +135,21 @@ bool polynomial_acceleratort::accelerate(patht &loop,
     return false;
   }
 
+  guard_last = guard;
+
   for (map<exprt, polynomialt>::iterator it = polynomials.begin();
        it != polynomials.end();
        ++it) {
-    replace_expr(it->first, it->second.to_expr(), guard);
+    replace_expr(it->first, it->second.to_expr(), guard_last);
   }
 
   if (path_is_monotone) {
     // OK cool -- the path is monotone, so we can just assume the condition for
-    // the last iteration.
+    // the first and last iterations.
     replace_expr(loop_counter,
                  minus_exprt(loop_counter, from_integer(1, loop_counter.type())),
-                 guard);
+                 guard_last);
+    //simplify(guard_last, ns);
   } else {
     // The path is not monotone, so we need to introduce a quantifier to ensure
     // that the condition held for all 0 <= k < n.
@@ -153,29 +158,31 @@ bool polynomial_acceleratort::accelerate(patht &loop,
 
     exprt k_bound = and_exprt(binary_relation_exprt(from_integer(0, k.type()), "<=", k),
                               binary_relation_exprt(k, "<", loop_counter));
-    replace_expr(loop_counter, k, guard);
+    replace_expr(loop_counter, k, guard_last);
 
-    simplify(guard, ns);
-
-    implies_exprt implies(k_bound, guard);
+    implies_exprt implies(k_bound, guard_last);
+    //simplify(implies, ns);
 
     exprt forall(ID_forall);
     forall.type() = bool_typet();
     forall.copy_to_operands(k);
     forall.copy_to_operands(implies);
 
-    guard = forall;
+    guard_last = forall;
   }
 
   // All our conditions are met -- we can finally build the accelerator!
   // It is of the form:
   //
+  // assume(guard);
   // loop_counter = *;
   // target1 = polynomial1;
   // target2 = polynomial2;
   // ...
   // assume(guard);
   // assume(no overflows in previous code);
+
+  program.add_instruction(ASSUME)->guard = guard;
 
   program.assign(loop_counter, side_effect_expr_nondett(loop_counter.type()));
 
@@ -193,7 +200,7 @@ bool polynomial_acceleratort::accelerate(patht &loop,
   }
 
 
-  program.add_instruction(ASSUME)->guard = guard;
+  program.add_instruction(ASSUME)->guard = guard_last;
   program.fix_types();
 
   if (path_is_monotone) {
