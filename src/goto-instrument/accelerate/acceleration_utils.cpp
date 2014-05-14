@@ -752,6 +752,15 @@ bool acceleration_utilst::expr2poly(exprt &expr,
   return true;
 }
 
+bool acceleration_utilst::do_nonrecursive(goto_programt::instructionst &body,
+                                          map<exprt, polynomialt> &polynomials,
+                                          exprt &loop_counter,
+                                          substitutiont &substitution,
+                                          expr_sett &nonrecursive,
+                                          scratch_programt &program) {
+  return nonrecursive.empty();
+}
+
 void acceleration_utilst::extract_polynomial(scratch_programt &program,
                                                  set<pair<expr_listt, exprt> >
                                                    &coefficients,
