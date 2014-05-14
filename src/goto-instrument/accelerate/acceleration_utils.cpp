@@ -369,6 +369,7 @@ bool acceleration_utilst::do_assumptions(map<exprt, polynomialt> polynomials,
   program.add_instruction(ASSERT)->guard = condition;
 
   guard = not_exprt(condition);
+  simplify(guard, ns);
 
 #ifdef DEBUG
   std::cout << "Checking following program for monotonicity:" << endl;
