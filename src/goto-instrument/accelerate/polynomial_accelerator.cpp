@@ -80,7 +80,7 @@ bool polynomial_acceleratort::accelerate(patht &loop,
 
   if (loop_counter.is_nil()) {
     symbolt loop_sym = utils.fresh_symbol("polynomial::loop_counter",
-        unsignedbv_typet(32));
+        unsignedbv_typet(POLY_WIDTH));
     loop_counter = loop_sym.symbol_expr();
   }
 
@@ -172,7 +172,7 @@ bool polynomial_acceleratort::accelerate(patht &loop,
   } else {
     // The path is not monotone, so we need to introduce a quantifier to ensure
     // that the condition held for all 0 <= k < n.
-    symbolt k_sym = utils.fresh_symbol("polynomial::k", unsignedbv_typet(32));
+    symbolt k_sym = utils.fresh_symbol("polynomial::k", unsignedbv_typet(POLY_WIDTH));
     exprt k = k_sym.symbol_expr();
 
     exprt k_bound = and_exprt(binary_relation_exprt(from_integer(0, k.type()), "<=", k),
@@ -291,7 +291,7 @@ bool polynomial_acceleratort::fit_polynomial_sliced(goto_programt::instructionst
        it != parameters.end();
        ++it) {
     symbolt coeff = utils.fresh_symbol("polynomial::coeff",
-        signedbv_typet(32));
+        signedbv_typet(POLY_WIDTH));
     coefficients.insert(make_pair(*it, coeff.symbol_expr()));
   }
 
