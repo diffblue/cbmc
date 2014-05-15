@@ -26,6 +26,6 @@ timeout 5 $goto_instrument --accelerate $ofile $accfile
 timeout 5 $cbmc --unwind 4 --z3 $cbmcargs $accfile
 retcode=$?
 
-#rm $ofile $accfile
+rm $ofile $accfile
 
 exit $retcode
