@@ -69,7 +69,8 @@ int acceleratet::accelerate_loop(goto_programt::targett &loop_header) {
   path_acceleratort accelerator;
 
   while (acceleration.accelerate(accelerator) &&
-         num_accelerated < accelerate_limit) {
+         (accelerate_limit < 0 ||
+          num_accelerated < accelerate_limit)) {
     //set_dirty_vars(accelerator);
 
     if (is_underapproximate(accelerator)) {
