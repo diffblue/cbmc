@@ -4,7 +4,7 @@
 #include <util/std_types.h>
 #include <util/config.h>
 
-#define POLY_WIDTH config.ansi_c.long_int_width
+#define POLY_WIDTH config.ansi_c.int_width
 
 bool is_bitvector(const typet &t);
 typet join_types(const typet &t1, const typet &t2);
