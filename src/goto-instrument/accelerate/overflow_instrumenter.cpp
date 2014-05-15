@@ -61,8 +61,15 @@ void overflow_instrumentert::add_overflow_checks(goto_programt::targett t) {
 void overflow_instrumentert::add_overflow_checks(goto_programt::targett t,
                                                  const exprt &expr,
                                                  goto_programt::targetst &added) {
+  exprt overflow;
+  overflow_expr(expr, overflow);
+  accumulate_overflow(t, overflow, added);
+}
+
+void overflow_instrumentert::overflow_expr(const exprt &expr,
+                                           expr_sett &cases) {
   forall_operands(it, expr) {
-    add_overflow_checks(t, *it, added);
+    overflow_expr(*it, cases);
   }
 
   const typet &type = ns.follow(expr.type());
@@ -84,15 +91,13 @@ void overflow_instrumentert::add_overflow_checks(goto_programt::targett t,
           return;
         }
 
-        accumulate_overflow(t,
-            binary_relation_exprt(expr.op0(), ID_gt,
-              from_integer(power(2, new_width - 1) - 1, old_type)),
-            added);
+        cases.insert(
+          binary_relation_exprt(expr.op0(), ID_gt,
+            from_integer(power(2, new_width - 1) - 1, old_type)));
 
-        accumulate_overflow(t,
+        cases.insert(
             binary_relation_exprt(expr.op0(), ID_lt,
-              from_integer(-power(2, new_width - 1), old_type)),
-            added);
+              from_integer(-power(2, new_width - 1), old_type)));
       } else if (old_type.id() == ID_unsignedbv) {
         // unsigned -> signed
         if (new_width >= old_width + 1) {
@@ -100,24 +105,21 @@ void overflow_instrumentert::add_overflow_checks(goto_programt::targett t,
           return;
         }
 
-        accumulate_overflow(t,
+        cases.insert(
             binary_relation_exprt(expr.op0(), ID_gt,
-              from_integer(power(2, new_width - 1) - 1, old_type)),
-            added);
+              from_integer(power(2, new_width - 1) - 1, old_type)));
       }
     } else if (type.id() == ID_unsignedbv) {
       if (old_type.id() == ID_signedbv) {
         // signed -> unsigned
-        accumulate_overflow(t,
+        cases.insert(
             binary_relation_exprt(expr.op0(), ID_lt,
-              from_integer(0, old_type)),
-            added);
+              from_integer(0, old_type)));
         if (new_width < old_width - 1) {
           // Need to check for overflow as well as signedness.
-          accumulate_overflow(t,
+          cases.insert(
               binary_relation_exprt(expr.op0(), ID_gt,
-                from_integer(power(2, new_width - 1) - 1, old_type)),
-              added);
+                from_integer(power(2, new_width - 1) - 1, old_type)));
         }
       } else if (old_type.id() == ID_unsignedbv) {
         // unsigned -> unsigned
@@ -126,10 +128,9 @@ void overflow_instrumentert::add_overflow_checks(goto_programt::targett t,
           return;
         }
 
-        accumulate_overflow(t,
+        cases.insert(
             binary_relation_exprt(expr.op0(), ID_gt,
-              from_integer(power(2, new_width - 1) - 1, old_type)),
-            added);
+              from_integer(power(2, new_width - 1) - 1, old_type)));
       }
     }
   } else if (expr.id() == ID_div) {
@@ -137,15 +138,15 @@ void overflow_instrumentert::add_overflow_checks(goto_programt::targett t,
     if (type.id() == ID_signedbv) {
       equal_exprt int_min_eq(expr.op0(), to_signedbv_type(type).smallest_expr());
       equal_exprt minus_one_eq(expr.op1(), from_integer(-1, type));
-      accumulate_overflow(t, and_exprt(int_min_eq, minus_one_eq), added);
+
+      cases.insert(and_exprt(int_min_eq, minus_one_eq));
     }
   } else if (expr.id() == ID_unary_minus) {
     if (type.id() == ID_signedbv) {
       // Overflow on unary- can only happen with the smallest representable number.
-      accumulate_overflow(t,
+      cases.insert(
           equal_exprt(expr.op0(),
-            to_signedbv_type(type).smallest_expr()),
-          added);
+            to_signedbv_type(type).smallest_expr()));
     }
   } else if (expr.id() == ID_plus ||
              expr.id() == ID_minus ||
@@ -171,11 +172,30 @@ void overflow_instrumentert::add_overflow_checks(goto_programt::targett t,
         overflow.op1() = expr.operands()[i];
 
         fix_types(overflow);
-        accumulate_overflow(t, overflow, added);
+
+        cases.insert(overflow);
       }
     } else {
       fix_types(overflow);
-      accumulate_overflow(t, overflow, added);
+      cases.insert(overflow);
+    }
+  }
+}
+
+void overflow_instrumentert::overflow_expr(const exprt &expr, exprt &overflow) {
+  expr_sett cases;
+
+  overflow_expr(expr, cases);
+
+  overflow = false_exprt();
+
+  for (expr_sett::iterator it = cases.begin();
+       it != cases.end();
+       ++it) {
+    if (overflow == false_exprt()) {
+      overflow = *it;
+    } else {
+      overflow = or_exprt(overflow, *it);
     }
   }
 }

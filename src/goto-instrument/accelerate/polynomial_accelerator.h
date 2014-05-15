@@ -16,6 +16,7 @@
 #include "path_acceleration.h"
 #include "acceleration_utils.h"
 #include "cone_of_influence.h"
+#include "overflow_instrumenter.h"
 
 using namespace std;
 
@@ -59,7 +60,8 @@ class polynomial_acceleratort : public path_accelerationt {
                          set<pair<expr_listt, exprt> > &coefficients,
                          int num_unwindings,
                          goto_programt::instructionst &loop_body,
-                         exprt &target);
+                         exprt &target,
+                         overflow_instrumentert &overflow);
   void extract_polynomial(scratch_programt &program,
                           set<pair<expr_listt, exprt> > &coefficients,
                           polynomialt &polynomial);

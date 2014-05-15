@@ -8,6 +8,7 @@ cfile=""
 cbmcargs=""
 ofile=`mktemp`
 accfile=`mktemp`
+instrfile=`mktemp`
 
 for a in "$@"
 do
@@ -17,15 +18,16 @@ case $a in
     ;;
   *)
     cfile=$a
-    ;;
+   ;;
 esac
 done
 
 $goto_cc $cfile -o $ofile
-timeout 5 $goto_instrument --accelerate $ofile $accfile
-timeout 5 $cbmc --unwind 4 --z3 $cbmcargs $accfile
+$goto_instrument --inline --remove-pointers $ofile $instrfile
+timeout 5 $goto_instrument --accelerate $instrfile $accfile
+timeout 5 $cbmc --unwind 5 --z3 $cbmcargs $accfile
 retcode=$?
 
-rm $ofile $accfile
+rm -f $ofile $accfile $instrfile
 
 exit $retcode

@@ -30,6 +30,7 @@
 #include "accelerator.h"
 #include "util.h"
 #include "cone_of_influence.h"
+#include "overflow_instrumenter.h"
 
 #define DEBUG
 
@@ -123,6 +124,9 @@ bool polynomial_acceleratort::accelerate(patht &loop,
         polynomials.insert(make_pair(target, poly));
       }
     } else {
+#ifdef DEBUG
+      std::cout << "Failed to fit a polynomial for " << expr2c(target, ns) << std::endl;
+#endif
       accelerator.dirty_vars.insert(*it);
     }
   }
@@ -244,6 +248,9 @@ bool polynomial_acceleratort::fit_polynomial_sliced(goto_programt::instructionst
   set<pair<expr_listt, exprt> > coefficients;
   expr_listt exprs;
   scratch_programt program(symbol_table);
+  exprt overflow_var =
+    utils.fresh_symbol("polynomial::overflow", bool_typet()).symbol_expr();
+  overflow_instrumentert overflow(program, overflow_var, symbol_table);
 
 #ifdef DEBUG
   std::cout << "Fitting a polynomial for " << expr2c(var, ns) << ", which depends on:"
@@ -321,14 +328,14 @@ bool polynomial_acceleratort::fit_polynomial_sliced(goto_programt::instructionst
          it != influence.end();
          ++it) {
       values[*it] = 1;
-      assert_for_values(program, values, coefficients, n, body, var);
+      assert_for_values(program, values, coefficients, n, body, var, overflow);
       values[*it] = 0;
     }
   }
 
   // Now just need to assert the case where all values are 0 and all are 2.
-  assert_for_values(program, values, coefficients, 0, body, var);
-  assert_for_values(program, values, coefficients, 2, body, var);
+  assert_for_values(program, values, coefficients, 0, body, var, overflow);
+  assert_for_values(program, values, coefficients, 2, body, var, overflow);
 
   for (expr_sett::iterator it = influence.begin();
        it != influence.end();
@@ -336,14 +343,12 @@ bool polynomial_acceleratort::fit_polynomial_sliced(goto_programt::instructionst
     values[*it] = 2;
   }
 
-  assert_for_values(program, values, coefficients, 2, body, var);
+  assert_for_values(program, values, coefficients, 2, body, var, overflow);
 
 #ifdef DEBUG
   std::cout << "Fitting polynomial with program:" << endl;
   program.output(std::cout);
 #endif
-
-  utils.ensure_no_overflows(program);
 
   // Now do an ASSERT(false) to grab a counterexample
   goto_programt::targett assertion = program.add_instruction(ASSERT);
@@ -422,9 +427,10 @@ void polynomial_acceleratort::assert_for_values(scratch_programt &program,
                                                 int num_unwindings,
                                                 goto_programt::instructionst
                                                    &loop_body,
-                                                exprt &target) {
+                                                exprt &target,
+                                                overflow_instrumentert &overflow) {
   // First figure out what the appropriate type for this expression is.
-  typet expr_type = nil_typet();
+  typet expr_type = signedbv_typet(POLY_WIDTH);
 
   for (map<exprt, int>::iterator it = values.begin();
       it != values.end();
@@ -448,16 +454,7 @@ void polynomial_acceleratort::assert_for_values(scratch_programt &program,
   for (map<exprt, int>::iterator it = values.begin();
        it != values.end();
        ++it) {
-    typet t = it->first.type();
-
-    if (t.id() == ID_pointer) {
-#ifdef DEBUG
-      std::cout << "Overriding pointer type" << std::endl;
-#endif
-      t = unsignedbv_typet(config.ansi_c.pointer_width);
-    }
-
-    program.assign(it->first, from_integer(it->second, t));
+    program.assign(it->first, from_integer(it->second, expr_type));
   }
 
   // Now unwind the loop as many times as we need to.
@@ -507,6 +504,11 @@ void polynomial_acceleratort::assert_for_values(scratch_programt &program,
   // We now have the RHS of the polynomial.  Assert that this is equal to the
   // actual value of the variable we're fitting.
   exprt polynomial_holds = equal_exprt(target, rhs);
+
+  exprt overflow_expr;
+  overflow.overflow_expr(rhs, overflow_expr);
+
+  program.add_instruction(ASSUME)->guard = not_exprt(overflow_expr);
 
   // Finally, assert that the polynomial equals the variable we're fitting.
   goto_programt::targett assumption = program.add_instruction(ASSUME);
