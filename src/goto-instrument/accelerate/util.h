@@ -6,6 +6,7 @@
 
 #define POLY_WIDTH config.ansi_c.long_int_width
 
+bool is_bitvector(const typet &t);
 typet join_types(const typet &t1, const typet &t2);
 
 #endif // ACCELERATE_UTIL_H

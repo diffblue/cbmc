@@ -294,11 +294,18 @@ bool polynomial_acceleratort::fit_polynomial_sliced(goto_programt::instructionst
   exprs.clear();
   parameters.push_back(exprs);
 
+  if (!is_bitvector(var.type())) {
+    // We don't really know how to accelerate non-bitvectors anyway...
+    return false;
+  }
+
+  const bitvector_typet &bvt = to_bitvector_type(var.type());
+
   for (vector<expr_listt>::iterator it = parameters.begin();
        it != parameters.end();
        ++it) {
     symbolt coeff = utils.fresh_symbol("polynomial::coeff",
-        signedbv_typet(POLY_WIDTH));
+        signedbv_typet(bvt.get_width()));
     coefficients.insert(make_pair(*it, coeff.symbol_expr()));
   }
 
