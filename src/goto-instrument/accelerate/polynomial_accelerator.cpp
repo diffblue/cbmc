@@ -24,6 +24,7 @@
 #include <util/simplify_expr.h>
 #include <util/replace_expr.h>
 #include <util/arith_tools.h>
+#include <util/config.h>
 
 #include "polynomial_accelerator.h"
 #include "accelerator.h"
@@ -311,6 +312,10 @@ bool polynomial_acceleratort::fit_polynomial_sliced(goto_programt::instructionst
     values[*it] = 0;
   }
 
+#ifdef DEBUG
+  std::cout << "Fitting polynomial over " << values.size() << " variables" << std::endl;
+#endif
+
   for (int n = 0; n <= 2; n++) {
     for (expr_sett::iterator it = influence.begin();
          it != influence.end();
@@ -333,16 +338,17 @@ bool polynomial_acceleratort::fit_polynomial_sliced(goto_programt::instructionst
 
   assert_for_values(program, values, coefficients, 2, body, var);
 
-  // Now do an ASSERT(false) to grab a counterexample
-  goto_programt::targett assertion = program.add_instruction(ASSERT);
-  assertion->guard = false_exprt();
-
-  //utils.ensure_no_overflows(program);
-
 #ifdef DEBUG
   std::cout << "Fitting polynomial with program:" << endl;
   program.output(std::cout);
 #endif
+
+  utils.ensure_no_overflows(program);
+
+  // Now do an ASSERT(false) to grab a counterexample
+  goto_programt::targett assertion = program.add_instruction(ASSERT);
+  assertion->guard = false_exprt();
+
 
   // If the path is satisfiable, we've fitted a polynomial.  Extract the
   // relevant coefficients and return the expression.
@@ -430,11 +436,28 @@ void polynomial_acceleratort::assert_for_values(scratch_programt &program,
     }
   }
 
+  if (expr_type.id() == ID_pointer) {
+#ifdef DEBUG
+    std::cout << "Overriding pointer type" << std::endl;
+#endif
+    expr_type = unsignedbv_typet(config.ansi_c.pointer_width);
+  }
+
+
   // Now set the initial values of the all the variables...
   for (map<exprt, int>::iterator it = values.begin();
        it != values.end();
        ++it) {
-    program.assign(it->first, from_integer(it->second, it->first.type()));
+    typet t = it->first.type();
+
+    if (t.id() == ID_pointer) {
+#ifdef DEBUG
+      std::cout << "Overriding pointer type" << std::endl;
+#endif
+      t = unsignedbv_typet(config.ansi_c.pointer_width);
+    }
+
+    program.assign(it->first, from_integer(it->second, t));
   }
 
   // Now unwind the loop as many times as we need to.
