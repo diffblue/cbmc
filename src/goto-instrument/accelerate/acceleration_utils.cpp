@@ -923,7 +923,20 @@ bool acceleration_utilst::assign_array(const exprt &lhs,
 #endif
 
   polynomialt poly;
-  poly.from_expr(idx);
+
+  try {
+    if (idx.id() == ID_pointer_offset) {
+      poly.from_expr(idx.op0());
+    } else {
+      poly.from_expr(idx);
+    }
+  } catch(...) {
+    // idx is probably nonlinear... bail out.
+#ifdef DEBUG
+    std::cout << "Failed to polynomialize" << std::endl;
+#endif
+    return false;
+  }
 
   if (poly.max_degree(loop_counter) > 1) {
     // The index expression is nonlinear, e.g. it's something like:
