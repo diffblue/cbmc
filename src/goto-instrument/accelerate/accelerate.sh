@@ -7,6 +7,7 @@ cbmc="$bindir/../../cbmc/cbmc"
 cfile=""
 cbmcargs=""
 ofile=`mktemp`
+instrfile=`mktemp`
 accfile=`mktemp`
 instrfile=`mktemp`
 

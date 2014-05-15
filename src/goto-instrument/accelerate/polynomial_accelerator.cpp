@@ -437,7 +437,8 @@ void polynomial_acceleratort::assert_for_values(scratch_programt &program,
                                                 exprt &target,
                                                 overflow_instrumentert &overflow) {
   // First figure out what the appropriate type for this expression is.
-  typet expr_type = signedbv_typet(POLY_WIDTH);
+  const bitvector_typet &bvt = to_bitvector_type(target.type());
+  typet expr_type = signedbv_typet(bvt.get_width());
 
   for (map<exprt, int>::iterator it = values.begin();
       it != values.end();
