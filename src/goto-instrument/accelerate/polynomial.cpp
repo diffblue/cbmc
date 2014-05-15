@@ -31,7 +31,15 @@ exprt polynomialt::to_expr() {
        m_it != monomials.end();
        ++m_it)
   {
-    exprt mon_expr = from_integer(m_it->coeff, itype);
+    int coeff = m_it->coeff;
+    bool neg = false;
+
+    if (coeff < 0) {
+      neg = true;
+      coeff = -coeff;
+    }
+
+    exprt mon_expr = from_integer(coeff, itype);
 
     for (std::vector<monomialt::termt>::iterator t_it = m_it->terms.begin();
          t_it != m_it->terms.end();
@@ -42,9 +50,17 @@ exprt polynomialt::to_expr() {
     }
 
     if (ret.id() == ID_nil) {
-      ret = mon_expr;
+      if (neg) {
+        ret = unary_minus_exprt(mon_expr, itype);
+      } else {
+        ret = mon_expr;
+      }
     } else {
-      ret = plus_exprt(ret, mon_expr);
+      if (neg) {
+        ret = minus_exprt(ret, mon_expr);
+      } else {
+        ret = plus_exprt(ret, mon_expr);
+      }
     }
   }
 
