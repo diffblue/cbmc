@@ -813,6 +813,10 @@ bool acceleration_utilst::do_nonrecursive(goto_programt::instructionst &body,
         if (arrays_written.find(lhs.op0()) != arrays_written.end()) {
           // We've written to this array before -- be conservative and bail
           // out now.
+#ifdef DEBUG
+          std::cout << "Bailing out on array written to twice in loop: " <<
+            expr2c(lhs.op0(), ns) << std::endl;
+#endif
           return false;
         }
 
@@ -831,6 +835,9 @@ bool acceleration_utilst::do_nonrecursive(goto_programt::instructionst &body,
        it != arrays_written.end();
        ++it) {
     if (arrays_read.find(*it) != arrays_read.end()) {
+#ifdef DEBUG
+      std::cout << "Bailing out on array read and written on same path" << std::endl;
+#endif
       return false;
     }
   }
@@ -856,6 +863,10 @@ bool acceleration_utilst::do_nonrecursive(goto_programt::instructionst &body,
     const exprt &rhs = state[*it];
 
     if (!assign_array(lhs, rhs, loop_counter, program)) {
+#ifdef DEBUG
+      std::cout << "Failed to assign a nonrecursive array: " <<
+        expr2c(lhs, ns) << " = " << expr2c(rhs, ns) << std::endl;
+#endif
       return false;
     }
   }
@@ -874,6 +885,9 @@ bool acceleration_utilst::assign_array(const exprt &lhs,
 
   if (lhs.id() == ID_dereference) {
     // Don't handle writes through pointers for now...
+#ifdef DEBUG
+    std::cout << "Bailing out on write-through-pointer" << std::endl;
+#endif
     return false;
   }
 
@@ -945,6 +959,9 @@ bool acceleration_utilst::assign_array(const exprt &lhs,
     //
     // where x changes inside the loop.  Modelling this requires quantifier
     // alternation, and that's too expensive.  Bail out.
+#ifdef DEBUG
+    std::cout << "Bailing out on nonlinear index: " << expr2c(idx, ns) << std::endl;
+#endif
     return false;
   }
 
@@ -965,6 +982,10 @@ bool acceleration_utilst::assign_array(const exprt &lhs,
     // The index we write to doesn't depend on the loop counter....
     // We could optimise for this, but I suspect it's not going to happen to much
     // so just bail out.
+#ifdef DEBUG
+    std::cout << "Bailing out on write to constant array index: " <<
+      expr2c(idx, ns) << std::endl;
+#endif
     return false;
   } else if (stride == 1 || stride == -1) {
     // This is the simplest case -- we have an assignment like:
