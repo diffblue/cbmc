@@ -499,16 +499,16 @@ void polynomial_acceleratort::assert_for_values(scratch_programt &program,
     }
   }
 
+  exprt overflow_expr;
+  overflow.overflow_expr(rhs, overflow_expr);
+
+  program.add_instruction(ASSUME)->guard = not_exprt(overflow_expr);
+
   rhs = typecast_exprt(rhs, target.type());
 
   // We now have the RHS of the polynomial.  Assert that this is equal to the
   // actual value of the variable we're fitting.
   exprt polynomial_holds = equal_exprt(target, rhs);
-
-  exprt overflow_expr;
-  overflow.overflow_expr(rhs, overflow_expr);
-
-  program.add_instruction(ASSUME)->guard = not_exprt(overflow_expr);
 
   // Finally, assert that the polynomial equals the variable we're fitting.
   goto_programt::targett assumption = program.add_instruction(ASSUME);

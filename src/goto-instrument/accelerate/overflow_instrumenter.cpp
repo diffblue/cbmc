@@ -63,7 +63,10 @@ void overflow_instrumentert::add_overflow_checks(goto_programt::targett t,
                                                  goto_programt::targetst &added) {
   exprt overflow;
   overflow_expr(expr, overflow);
-  accumulate_overflow(t, overflow, added);
+
+  if (overflow != false_exprt()) {
+    accumulate_overflow(t, overflow, added);
+  }
 }
 
 void overflow_instrumentert::overflow_expr(const exprt &expr,
