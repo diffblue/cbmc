@@ -83,6 +83,8 @@ class acceleratet {
   void decl(symbol_exprt &sym, goto_programt::targett t);
   void decl(symbol_exprt &sym, goto_programt::targett t, exprt init);
 
+  bool contains_nested_loops(goto_programt::targett &loop_header);
+
   goto_programt &program;
   goto_functionst &goto_functions;
   symbol_tablet &symbol_table;
