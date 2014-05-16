@@ -20,7 +20,7 @@
 #include "util.h"
 //#include "symbolic_accelerator.h"
 
-//#define DEBUG
+#define DEBUG
 
 using namespace std;
 
@@ -46,6 +46,31 @@ goto_programt::targett acceleratet::find_back_jump(
   return back_jump;
 }
 
+bool acceleratet::contains_nested_loops(goto_programt::targett &loop_header) {
+  natural_loops_mutablet::natural_loopt &loop =
+    natural_loops.loop_map[loop_header];
+
+  for (natural_loops_mutablet::natural_loopt::iterator it = loop.begin();
+       it != loop.end();
+       ++it) {
+    const goto_programt::targett &t = *it;
+
+    if (t->is_backwards_goto()) {
+      if (t->targets.size() != 1 ||
+          t->get_target() != loop_header) {
+        return true;
+      }
+    }
+
+    if (t != loop_header &&
+        natural_loops.loop_map.find(t) != natural_loops.loop_map.end()) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 int acceleratet::accelerate_loop(goto_programt::targett &loop_header) {
   pathst loop_paths, exit_paths;
   goto_programt::targett back_jump = find_back_jump(loop_header);
@@ -53,6 +78,14 @@ int acceleratet::accelerate_loop(goto_programt::targett &loop_header) {
   list<path_acceleratort> accelerators;
   natural_loops_mutablet::natural_loopt &loop =
     natural_loops.loop_map[loop_header];
+
+  if (contains_nested_loops(loop_header)) {
+    // For now, only accelerate innermost loops.
+#ifdef DEBUG
+    std::cout << "Not accelerating an outer loop" << std::endl;
+#endif
+    return 0;
+  }
 
   goto_programt::targett overflow_loc;
   make_overflow_loc(loop_header, back_jump, overflow_loc);
