@@ -952,6 +952,26 @@ void goto_convertt::do_function_call_symbol(
       throw id2string(identifier)+" expected not to have LHS";
     }
   }
+  else if(identifier=="c::__VERIFIER_error")
+  {
+    if(!arguments.empty())
+    {
+      err_location(function);
+      throw "`"+id2string(identifier)+"' expected to have no arguments";
+    }
+
+    goto_programt::targett t=dest.add_instruction(ASSERT);
+    t->guard=false_exprt();
+    t->location=function.location();
+    t->location.set("user-provided", true);
+    t->location.set_property_class(ID_assertion);
+
+    if(lhs.is_not_nil())
+    {
+      err_location(function);
+      throw id2string(identifier)+" expected not to have LHS";
+    }
+  }
   else if(has_prefix(id2string(identifier), "java::java.lang.AssertionError.<init>:"))
   {
     // insert function call anyway
