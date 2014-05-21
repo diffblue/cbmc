@@ -39,6 +39,8 @@ public:
   {
     return convert(expr);
   }
+  
+  using decision_proceduret::operator();
 
   // specialised variant of get
   virtual tvt l_get(literalt a) const=0;
