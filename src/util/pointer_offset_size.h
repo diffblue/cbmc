@@ -16,6 +16,7 @@ class exprt;
 class namespacet;
 class struct_typet;
 class typet;
+class member_exprt;
 
 // these return -1 on failure
 
@@ -33,6 +34,10 @@ mp_integer compute_pointer_offset(
   const exprt &expr);
 
 // these return 'nil' on failure
+
+exprt member_offset_expr(
+  const member_exprt &,
+  const namespacet &ns);
 
 exprt member_offset_expr(
   const struct_typet &type,
