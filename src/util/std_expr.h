@@ -1072,6 +1072,15 @@ public:
   {
   }
  
+  explicit inline union_exprt(
+    const irep_idt &_component_name,
+    const exprt &_value,
+    const typet &_type):
+    unary_exprt(ID_union, _value, _type)
+  {
+    set_component_name(_component_name);
+  }
+ 
   friend inline const union_exprt &to_union_expr(const exprt &expr)
   {
     assert(expr.id()==ID_union && expr.operands().size()==1);
