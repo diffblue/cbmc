@@ -215,6 +215,33 @@ Function: member_offset_expr
 \*******************************************************************/
 
 exprt member_offset_expr(
+  const member_exprt &member_expr,
+  const namespacet &ns)
+{
+  // need to distinguish structs and unions
+  const typet &type=ns.follow(member_expr.struct_op().type());
+  if(type.id()==ID_struct)
+    return member_offset_expr(
+      to_struct_type(type), member_expr.get_component_name(), ns);
+  else if(type.id()==ID_union)
+    return gen_zero(signedbv_typet(config.ansi_c.pointer_width));
+  else
+    return nil_exprt();
+}
+
+/*******************************************************************\
+
+Function: member_offset_expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+exprt member_offset_expr(
   const struct_typet &type,
   const irep_idt &member,
   const namespacet &ns)
