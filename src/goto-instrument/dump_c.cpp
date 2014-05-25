@@ -1923,7 +1923,9 @@ void goto_program2codet::cleanup_code_block(
 
   if(operands.empty() && !is_top)
     code=code_skipt();
-  else if(operands.size()==1 && !is_top)
+  else if(operands.size()==1 &&
+          !is_top &&
+          to_code(code.op0()).get_statement()!=ID_decl)
   {
     codet tmp;
     tmp.swap(code.op0());
