@@ -105,6 +105,12 @@ bool replace_symbolt::replace(exprt &dest) const
     if(!replace(*it))
       result=false;
 
+  const irept &c_sizeof_type=dest.find(ID_C_c_sizeof_type);
+
+  if(c_sizeof_type.is_not_nil() &&
+     !replace(static_cast<typet&>(dest.add(ID_C_c_sizeof_type))))
+    result=false;
+
   return result;
 }
 
@@ -135,6 +141,11 @@ bool replace_symbolt::have_to_replace(const exprt &dest) const
   forall_operands(it, dest)
     if(have_to_replace(*it))
       return true;
+
+  const irept &c_sizeof_type=dest.find(ID_C_c_sizeof_type);
+
+  if(c_sizeof_type.is_not_nil())
+    return have_to_replace(static_cast<const typet &>(c_sizeof_type));
 
   return false;
 }
