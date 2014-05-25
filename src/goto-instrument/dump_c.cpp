@@ -1169,7 +1169,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
       // to ensure convergence, we turn this around again
       for(exprt::operandst::const_reverse_iterator
           e_it=eqs.rbegin();
-          e_it!=eqs.rend();
+          e_it!=(exprt::operandst::const_reverse_iterator)eqs.rend();
           ++e_it)
       {
         if(e_it->id()!=ID_equal ||
