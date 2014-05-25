@@ -65,7 +65,7 @@ exprt convert_float_literal(const std::string &src)
   else if(is_float128)
   {
     result.type()=ieee_float_spect::quadruple_precision().to_type();
-    result.type().set(ID_C_c_type, ID_long_double);
+    result.type().set(ID_C_c_type, ID_gcc_float128);
   }
   else
   {
