@@ -1,4 +1,4 @@
-void *malloc(int);
+void *malloc(__CPROVER_size_t);
 
 int foo(int *x)
 {
