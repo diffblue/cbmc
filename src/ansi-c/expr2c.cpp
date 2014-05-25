@@ -32,6 +32,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/lispexpr.h>
 #include <util/symbol.h>
 #include <util/suffix.h>
+#include <util/find_symbols.h>
 
 #include "expr2c.h"
 #include "c_types.h"
@@ -60,15 +61,14 @@ Function: expr2ct::id_shorthand
 
 \*******************************************************************/
 
-std::string expr2ct::id_shorthand(const exprt &expr) const
+irep_idt expr2ct::id_shorthand(const irep_idt &identifier) const
 {
-  const irep_idt &identifier=expr.get(ID_identifier);
   const symbolt *symbol;
 
   if(!ns.lookup(identifier, symbol) &&
      !symbol->base_name.empty() &&
       has_suffix(id2string(identifier), id2string(symbol->base_name)))
-    return id2string(symbol->base_name);
+    return symbol->base_name;
 
   std::string sh=id2string(identifier);
 
@@ -77,27 +77,6 @@ std::string expr2ct::id_shorthand(const exprt &expr) const
     sh.erase(0, pos+2);
 
   return sh;
-}
-
-/*******************************************************************\
-
-Function: expr2ct::get_symbols
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void expr2ct::get_symbols(const exprt &expr)
-{
-  if(expr.id()==ID_symbol)
-    symbols.insert(expr);
-
-  forall_operands(it, expr)
-    get_symbols(*it);
 }
 
 /*******************************************************************\
@@ -114,25 +93,52 @@ Function: expr2ct::get_shorthands
 
 void expr2ct::get_shorthands(const exprt &expr)
 {
-  get_symbols(expr);
+  find_symbols_sett symbols;
+  find_symbols(expr, symbols);
 
-  for(std::set<exprt>::const_iterator it=
-      symbols.begin();
+  for(find_symbols_sett::const_iterator
+      it=symbols.begin();
       it!=symbols.end();
       it++)
   {
-    std::string sh=id_shorthand(*it);
+    irep_idt sh=id_shorthand(*it);
 
-    std::pair<std::map<irep_idt, exprt>::iterator, bool> result=
-      shorthands.insert(
-        std::pair<irep_idt, exprt>(sh, *it));
+    bool has_collision=
+      ns_collision[irep_idt()].find(sh)!=
+      ns_collision[irep_idt()].end();
 
-    if(!result.second)
-      if(result.first->second!=*it)
-      {
-        ns_collision.insert(it->get(ID_identifier));
-        ns_collision.insert(result.first->second.get(ID_identifier));
-      }
+    if(!has_collision)
+    {
+      irep_idt func;
+
+      const symbolt *symbol;
+      if(!ns.lookup(*it, symbol))
+        func=symbol->location.get_function();
+
+      has_collision=!ns_collision[func].insert(sh).second;
+    }
+
+    if(has_collision)
+    {
+      std::string dest=id2string(*it);
+      if(has_prefix(dest, "c::"))
+        dest.erase(0,3);
+      std::string::size_type c_pos=dest.find("::");
+      if(c_pos!=std::string::npos &&
+         dest.rfind("::")==c_pos)
+        dest.erase(0, c_pos+2);
+      else if(c_pos!=std::string::npos)
+        for(std::string::iterator it2=dest.begin();
+            it2!=dest.end();
+            ++it2)
+          if(*it2==':')
+            *it2='$';
+
+      sh=dest;
+    }
+
+    if(!shorthands.insert(std::make_pair(*it, sh)).second)
+      assert(false);
   }
 }
 
@@ -1734,26 +1740,23 @@ std::string expr2ct::convert_symbol(
   const irep_idt &id=src.get(ID_identifier);
   std::string dest;
 
-  if(ns_collision.find(id)==ns_collision.end())
-    dest=id_shorthand(src);
-  else if(src.operands().size()==1 &&
-        src.op0().id()==ID_predicate_passive_symbol)
+  if(src.operands().size()==1 &&
+     src.op0().id()==ID_predicate_passive_symbol)
     dest=src.op0().get_string(ID_identifier);
   else
   {
-    dest=id2string(id);
-    if(has_prefix(dest, "c::"))
-      dest.erase(0,3);
-    std::string::size_type c_pos=dest.find("::");
-    if(c_pos!=std::string::npos &&
-        dest.rfind("::")==c_pos)
-      dest.erase(0, c_pos+2);
-    else if(c_pos!=std::string::npos)
-      for(std::string::iterator it=dest.begin();
-          it!=dest.end();
-          ++it)
-        if(*it==':')
-          *it='$';
+    hash_map_cont<irep_idt, irep_idt, irep_id_hash>::const_iterator
+      entry=shorthands.find(id);
+    // we might be called from conversion of a type
+    if(entry==shorthands.end())
+    {
+      get_shorthands(src);
+
+      entry=shorthands.find(id);
+      assert(entry!=shorthands.end());
+    }
+
+    dest=id2string(entry->second);
   }
 
   if(src.id()==ID_next_symbol)
