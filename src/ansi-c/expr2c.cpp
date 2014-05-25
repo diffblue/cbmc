@@ -954,9 +954,13 @@ std::string expr2ct::convert_unary(
   std::string op=convert(src.op0(), p);
 
   std::string dest=symbol;
-  if(precedence>=p) dest+='(';
+  if(precedence>=p ||
+     (!symbol.empty() && has_prefix(op, symbol)))
+    dest+='(';
   dest+=op;
-  if(precedence>=p) dest+=')';
+  if(precedence>=p ||
+     (!symbol.empty() && has_prefix(op, symbol)))
+    dest+=')';
 
   return dest;
 }
