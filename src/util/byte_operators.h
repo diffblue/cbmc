@@ -32,6 +32,12 @@ public:
     operands().resize(2);
   }
 
+  explicit inline byte_extract_exprt(irep_idt _id, const typet &_type):
+    exprt(_id, _type)
+  {
+    operands().resize(2);
+  }
+
   inline exprt &op() { return op0(); }
   inline exprt &offset() { return op1(); }
 
