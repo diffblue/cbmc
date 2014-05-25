@@ -3161,7 +3161,9 @@ std::string expr2ct::convert_code_expression(
     expr_str=convert_norep(src, precedence);
   }
 
-  dest+=expr_str+";";
+  dest+=expr_str;
+  if(dest.empty() || *dest.rbegin()!=';') dest+=';';
+
   return dest;
 }
 
