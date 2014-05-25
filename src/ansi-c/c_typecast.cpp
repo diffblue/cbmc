@@ -516,8 +516,6 @@ void c_typecastt::implicit_typecast_followed(
   const typet &src_type,
   const typet &dest_type)
 {
-  if(dest_type.id()==ID_union)
-
   // do transparent union
   if(dest_type.id()==ID_union &&
      dest_type.get_bool(ID_C_transparent_union) &&
