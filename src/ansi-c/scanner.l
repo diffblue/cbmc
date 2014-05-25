@@ -149,8 +149,10 @@ hexfloat1       "0"[xX]{hexdigit}+"."{hexdigit}+[pP][+-]?{integer}
 hexfloat2       "0"[xX]{hexdigit}+"."[pP][+-]?{integer}
 hexfloat3       "0"[xX]{hexdigit}+[pP][+-]?{integer}
 float_suffix    [fFlLiIjJ]*
+gcc_ext_float_suffix    [wWqQ]|[dD][fFdDlL]?
 float		{float1}|{float2}|{float3}|{hexfloat1}|{hexfloat2}|{hexfloat3}
 float_s         {float}{float_suffix}|{integer}[fF]
+gcc_ext_float_s         {float}{gcc_ext_float_suffix}
 bitvector	{binary}[bB]
 bitvector_u	{binary}([uU][bB]|[bB][uU])
 cppstart	{ws}"#"{ws}
@@ -1089,6 +1091,17 @@ __decltype          { if(PARSER.cpp && PARSER.mode==ansi_c_parsert::GCC)
                   PARSER.set_location(stack(yyansi_clval));
                   return TOK_INTEGER;
                 }
+
+{gcc_ext_float_s}	{ if(PARSER.mode!=ansi_c_parsert::GCC)
+                    {
+		                  yyansi_cerror("Preprocessor directive found");
+		                  return TOK_SCANNER_ERROR;
+                    }
+                  newstack(yyansi_clval); 
+                  stack(yyansi_clval)=convert_float_literal(yytext);
+                  PARSER.set_location(stack(yyansi_clval));
+		  return TOK_FLOATING;
+		}
 
 {float_s}	{ newstack(yyansi_clval); 
                   stack(yyansi_clval)=convert_float_literal(yytext);
