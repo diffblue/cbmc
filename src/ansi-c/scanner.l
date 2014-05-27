@@ -1171,7 +1171,8 @@ __decltype          { if(PARSER.cpp && PARSER.mode==ansi_c_parsert::GCC)
 }
 
 <GCC_ATTRIBUTE1>{
-"("{ws}"("      { BEGIN(GCC_ATTRIBUTE2); PARSER.parenthesis_counter=0; }
+"("{ws}"(" |
+"("{newline}"(" { BEGIN(GCC_ATTRIBUTE2); PARSER.parenthesis_counter=0; }
 {ws}            { /* ignore */ }
 {newline}       { /* ignore */ }
 .               { BEGIN(GRAMMAR); loc(); return yytext[0]; }
