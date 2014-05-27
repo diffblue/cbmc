@@ -103,6 +103,7 @@ static std::string clean_identifier(const irep_idt &id)
      dest.rfind("::")==c_pos)
     dest.erase(0, c_pos+2);
   else if(c_pos!=std::string::npos)
+  {
     for(std::string::iterator it2=dest.begin();
         it2!=dest.end();
         ++it2)
@@ -110,6 +111,7 @@ static std::string clean_identifier(const irep_idt &id)
         *it2='$';
       else if(*it2=='-')
         *it2='_';
+  }
 
   return dest;
 }
