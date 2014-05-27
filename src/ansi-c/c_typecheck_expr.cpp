@@ -1685,11 +1685,29 @@ void c_typecheck_baset::typecheck_expr_trinary(if_exprt &expr)
      operands[2].type().id()==ID_pointer &&
      operands[1].type()!=operands[2].type())
   {
-    // make it void *
-    expr.type()=typet(ID_pointer);
-    expr.type().subtype()=typet(ID_empty);
-    implicit_typecast(operands[1], expr.type());
-    implicit_typecast(operands[2], expr.type());
+    if(operands[1].type().subtype().id()!=ID_code ||
+       operands[2].type().subtype().id()!=ID_code)
+    {
+      // make it void *
+      expr.type()=typet(ID_pointer);
+      expr.type().subtype()=typet(ID_empty);
+      implicit_typecast(operands[1], expr.type());
+      implicit_typecast(operands[2], expr.type());
+    }
+    else
+    {
+      // maybe functions without parameter lists
+      const code_typet &c_type1=to_code_type(operands[1].type().subtype());
+      const code_typet &c_type2=to_code_type(operands[2].type().subtype());
+
+      if(c_type1.return_type()==c_type2.return_type())
+      {
+        if(c_type1.arguments().empty() && c_type1.has_ellipsis())
+          implicit_typecast(operands[1], operands[2].type());
+        else if(c_type2.arguments().empty() && c_type2.has_ellipsis())
+          implicit_typecast(operands[2], operands[1].type());
+      }
+    }
   }
 
   if(operands[1].type().id()==ID_empty ||
