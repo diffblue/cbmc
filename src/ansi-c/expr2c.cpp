@@ -1278,6 +1278,18 @@ std::string expr2ct::convert_complex(
   const exprt &src,
   unsigned precedence)
 {
+  if(src.operands().size()==2 &&
+     src.op0().is_zero() &&
+     src.op1().id()==ID_constant)
+  {
+    const irep_idt &cformat=src.op1().get(ID_C_cformat);
+
+    if(!cformat.empty())
+      return id2string(cformat);
+    else
+      return convert(src.op1(), precedence)+"i";
+  }
+
   // ISO C11 offers:
   // double complex CMPLX(double x, double y);
   // float complex CMPLXF(float x, float y);
