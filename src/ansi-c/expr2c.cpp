@@ -2398,7 +2398,7 @@ std::string expr2ct::convert_array(
       case '\r': dest+="\\r"; break; /* CR (0x0d) */
       case '\f': dest+="\\f"; break; /* FF (0x0c) */
       case '\a': dest+="\\a"; break; /* BEL (0x07) */
-      case '\\': dest+="\\"; break;
+      case '\\': dest+="\\\\"; break;
       case '"': dest+="\\\""; break;
       
       default:
