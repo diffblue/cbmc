@@ -559,11 +559,11 @@ std::string expr2ct::convert_rec(
       dest+="df";
     else
     {
-      dest="VECTOR(";
+      const std::string subtype=convert(vector_type.subtype());
+      dest=subtype;
+      dest+=" __attribute__((vector_size (";
       dest+=convert(vector_type.size());
-      dest+=", ";
-      dest+=convert(vector_type.subtype());
-      dest+=")";
+      dest+="*sizeof("+subtype+"))))";
     }
 
     return q+dest+d;
