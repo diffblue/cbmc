@@ -3035,10 +3035,18 @@ std::string expr2ct::convert_code_decl(
   std::string dest=indent_str(indent);
 
   const symbolt *symbol=0;
-  if(!ns.lookup(to_symbol_expr(src.op0()).get_identifier(), symbol) &&
-      symbol->is_file_local &&
-      (src.op0().type().id()==ID_code || symbol->is_static_lifetime))
-    dest+="static ";
+  if(!ns.lookup(to_symbol_expr(src.op0()).get_identifier(), symbol))
+  {
+    if(symbol->is_file_local &&
+       (src.op0().type().id()==ID_code || symbol->is_static_lifetime))
+      dest+="static ";
+    else if(symbol->is_extern)
+      dest+="extern ";
+
+    if(symbol->type.id()==ID_code &&
+       to_code_type(symbol->type).get_inlined())
+      dest+="inline ";
+  }
 
   dest+=convert_rec(src.op0().type(), c_qualifierst(), declarator);
 
