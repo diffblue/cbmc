@@ -96,16 +96,44 @@ void expr2ct::get_shorthands(const exprt &expr)
   find_symbols_sett symbols;
   find_symbols(expr, symbols);
 
+  // avoid renaming parameters
   for(find_symbols_sett::const_iterator
       it=symbols.begin();
       it!=symbols.end();
       it++)
   {
+    const symbolt *symbol;
+    bool is_param=!ns.lookup(*it, symbol) && symbol->is_parameter;
+
+    if(!is_param) continue;
+
+    irep_idt sh=id_shorthand(*it);
+
+    ns_collision[symbol->location.get_function()].insert(sh);
+
+    if(!shorthands.insert(std::make_pair(*it, sh)).second)
+      assert(false);
+  }
+
+  for(find_symbols_sett::const_iterator
+      it=symbols.begin();
+      it!=symbols.end();
+      it++)
+  {
+    if(shorthands.find(*it)!=shorthands.end())
+      continue;
+
     irep_idt sh=id_shorthand(*it);
 
     bool has_collision=
       ns_collision[irep_idt()].find(sh)!=
       ns_collision[irep_idt()].end();
+
+    if(!has_collision)
+    {
+      const symbolt *symbol;
+      has_collision=!ns.lookup("c::"+id2string(sh), symbol);
+    }
 
     if(!has_collision)
     {
@@ -137,8 +165,7 @@ void expr2ct::get_shorthands(const exprt &expr)
       sh=dest;
     }
 
-    if(!shorthands.insert(std::make_pair(*it, sh)).second)
-      assert(false);
+    shorthands.insert(std::make_pair(*it, sh));
   }
 }
 
