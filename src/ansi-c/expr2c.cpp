@@ -81,6 +81,41 @@ irep_idt expr2ct::id_shorthand(const irep_idt &identifier) const
 
 /*******************************************************************\
 
+Function: clean_identifier
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+static std::string clean_identifier(const irep_idt &id)
+{
+  std::string dest=id2string(id);
+
+  if(has_prefix(dest, "c::"))
+    dest.erase(0,3);
+
+  std::string::size_type c_pos=dest.find("::");
+  if(c_pos!=std::string::npos &&
+     dest.rfind("::")==c_pos)
+    dest.erase(0, c_pos+2);
+  else if(c_pos!=std::string::npos)
+    for(std::string::iterator it2=dest.begin();
+        it2!=dest.end();
+        ++it2)
+      if(*it2==':')
+        *it2='$';
+      else if(*it2=='-')
+        *it2='_';
+
+  return dest;
+}
+
+/*******************************************************************\
+
 Function: expr2ct::get_shorthands
 
   Inputs:
@@ -147,23 +182,7 @@ void expr2ct::get_shorthands(const exprt &expr)
     }
 
     if(has_collision)
-    {
-      std::string dest=id2string(*it);
-      if(has_prefix(dest, "c::"))
-        dest.erase(0,3);
-      std::string::size_type c_pos=dest.find("::");
-      if(c_pos!=std::string::npos &&
-         dest.rfind("::")==c_pos)
-        dest.erase(0, c_pos+2);
-      else if(c_pos!=std::string::npos)
-        for(std::string::iterator it2=dest.begin();
-            it2!=dest.end();
-            ++it2)
-          if(*it2==':')
-            *it2='$';
-
-      sh=dest;
-    }
+      sh=clean_identifier(*it);
 
     shorthands.insert(std::make_pair(*it, sh));
   }
@@ -2900,7 +2919,7 @@ std::string expr2ct::convert_code_goto(
 {
   std:: string dest=indent_str(indent);
   dest+="goto ";
-  dest+=src.get_string(ID_destination);
+  dest+=clean_identifier(src.get(ID_destination));
   dest+=";";
 
   return dest;
@@ -3749,7 +3768,7 @@ std::string expr2ct::convert_code_label(
   
   labels_string+="\n";
   labels_string+=indent_str(indent);
-  labels_string+=name2string(label);
+  labels_string+=clean_identifier(label);
   labels_string+=":\n";
 
   std::string tmp=convert_code(src.code(), indent+2);
