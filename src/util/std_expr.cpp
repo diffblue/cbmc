@@ -194,13 +194,13 @@ static void build_object_descriptor_rec(
 
     build_object_descriptor_rec(ns, index.array(), dest);
 
-    mp_integer sub_size=pointer_offset_size(ns, expr.type());
-    assert(sub_size>0);
+    exprt sub_size=size_of_expr(expr.type(), ns);
+    assert(sub_size.is_not_nil());
 
     dest.offset()=
       plus_exprt(dest.offset(),
                  mult_exprt(typecast_exprt(index.index(), index_type),
-                            from_integer(sub_size, index_type)));
+                            typecast_exprt(sub_size, index_type)));
   }
   else if(expr.id()==ID_member)
   {
