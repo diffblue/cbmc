@@ -3306,7 +3306,13 @@ bool simplify_exprt::eliminate_common_addends(
   exprt &op1)
 {
   // we can't eliminate zeros
-  if(op0.is_zero() || op1.is_zero()) return true;
+  if(op0.is_zero() ||
+     op1.is_zero() ||
+     (op0.is_constant() &&
+      to_constant_expr(op0).get_value()==ID_NULL) ||
+     (op1.is_constant() &&
+      to_constant_expr(op1).get_value()==ID_NULL))
+    return true;
   
   if(op0.id()==ID_plus)
   {
