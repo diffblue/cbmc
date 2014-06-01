@@ -436,6 +436,18 @@ bvt float_utilst::add_sub(
       prop.lnot(result.NaN),
       prop.lor(unpacked1.infinity, unpacked2.infinity));
 
+  // zero?
+  // Note that:
+  //  1. The zero flag isn't used apart from in divide and
+  //     is only set on unpack
+  //  2. Subnormals mean that addition or subtraction can't round to 0,
+  //     thus we can perform this test now
+  //  3. The rules for sign are different for zero
+  result.zero = prop.land(
+      prop.lnot(prop.lor(result.infinity, result.NaN)),
+      prop.lnot(prop.lor(result.fraction)));
+
+
   // sign
   literalt add_sub_sign=
     prop.lxor(prop.lselect(src2_bigger, unpacked2.sign, unpacked1.sign),
@@ -444,10 +456,24 @@ bvt float_utilst::add_sub(
   literalt infinity_sign=
     prop.lselect(unpacked1.infinity, unpacked1.sign, unpacked2.sign);
 
+  #if 1
+  literalt zero_sign=
+    prop.lselect(rounding_mode_bits.round_to_minus_inf,
+		 prop.lor(unpacked1.sign, unpacked2.sign),
+		 prop.land(unpacked1.sign, unpacked2.sign));
+
+  result.sign=prop.lselect( 
+    result.infinity,
+    infinity_sign,
+    prop.lselect(result.zero,
+		 zero_sign,
+		 add_sub_sign));
+  #else
   result.sign=prop.lselect(
     result.infinity,
     infinity_sign,
     add_sub_sign);
+  #endif
 
   #if 0
   result.sign=const_literal(false);
@@ -1138,11 +1164,37 @@ void float_utilst::denormalization_shift(bvt &fraction, bvt &exponent)
     prop.lnot(distance.back()),
     prop.lnot(bv_utils.is_zero(distance)));
 
+#if 1
+  // Care must be taken to not loose information required for the
+  // guard and sticky bits.  +3 is for the hidden, guard and sticky bits.
+  if (fraction.size() < (spec.f + 3)) 
+  { 
+    // Add zeros at the LSB end for the guard bit to shift into
+    fraction=
+      bv_utils.concatenate(bv_utils.zeros((spec.f + 3) - fraction.size()),
+			   fraction);
+  }
+
+  bvt denormalisedFraction = fraction;
+
+  literalt sticky_bit = const_literal(false);
+  denormalisedFraction = 
+    sticky_right_shift(fraction, bv_utilst::LRIGHT, distance, sticky_bit);
+  denormalisedFraction[0] = prop.lor(denormalisedFraction[0], sticky_bit);
+
+  fraction=
+    bv_utils.select(
+      denormal,
+      denormalisedFraction,
+      fraction);
+
+#else
   fraction=
     bv_utils.select(
       denormal,
       bv_utils.shift(fraction, bv_utilst::LRIGHT, distance),
       fraction);
+#endif
 
   exponent=
     bv_utils.select(denormal,
@@ -1646,7 +1698,12 @@ bvt float_utilst::sticky_right_shift(
     {
       bvt tmp=bv_utils.shift(result, shift_type, d);
 
-      bvt lost_bits=bv_utils.extract(result, 0, d-1);
+      bvt lost_bits;
+
+      if (d <= result.size())
+	lost_bits=bv_utils.extract(result, 0, d-1);
+      else
+	lost_bits=result;
 
       sticky=prop.lor(
           prop.land(dist[stage],prop.lor(lost_bits)),
