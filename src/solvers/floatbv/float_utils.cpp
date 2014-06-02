@@ -1153,8 +1153,20 @@ void float_utilst::denormalization_shift(bvt &fraction, bvt &exponent)
   // Is the exponent strictly less than -bias+1, i.e., exponent<-bias+1?
   // This is transformed to distance=(-bias+1)-exponent
   // i.e., distance>0
-
+  // Note that 1-bias is the exponent represented by 0...01,
+  // i.e. the exponent of the smallest normal number and thus the 'base'
+  // exponent for subnormal numbers.
+  
   assert(exponent.size()>=spec.e);
+
+#if 1
+  // Need to sign extend to avoid overflow.  Note that this is a
+  // relatively rare problem as the value needs to be close to the top
+  // of the exponent range and then range must not have been
+  // previously extended as add, multiply, etc. do.  This is primarily
+  // to handle casting down from larger ranges.
+  exponent = bv_utils.sign_extension(exponent, exponent.size() + 1);
+#endif
 
   bvt distance=bv_utils.sub(
     bv_utils.build_constant(-bias+1, exponent.size()), exponent);
@@ -1457,6 +1469,8 @@ void float_utilst::round_exponent(unbiased_floatt &result)
     bvt old_exponent=result.exponent;
     result.exponent.resize(spec.e);
 
+    // max_exponent is the maximum representable
+    // i.e. 1 higher than the maximum possible for a normal number
     bvt max_exponent=
       bv_utils.build_constant(
         spec.max_exponent()-spec.bias(), old_exponent.size());
@@ -1469,7 +1483,38 @@ void float_utilst::round_exponent(unbiased_floatt &result)
           bv_utils.signed_less_than(old_exponent, max_exponent)),
         prop.lnot(bv_utils.is_zero(result.fraction)));
 
+#if 1
+    // Directed rounding modes round overflow to the maximum normal
+    // depending on the particular mode and the sign
+    literalt overflow_to_inf=
+      prop.lor(rounding_mode_bits.round_to_even,
+      prop.lor(prop.land(rounding_mode_bits.round_to_plus_inf,
+                         prop.lnot(result.sign)),
+               prop.land(rounding_mode_bits.round_to_minus_inf,
+                         result.sign)));
+
+    literalt set_to_max=
+      prop.land(exponent_too_large, prop.lnot(overflow_to_inf));
+
+
+    bvt largest_normal_exponent=
+      bv_utils.build_constant(
+        spec.max_exponent()-(spec.bias() + 1), result.exponent.size());
+
+    result.exponent=
+      bv_utils.select(set_to_max, largest_normal_exponent, result.exponent);
+
+    result.fraction=
+      bv_utils.select(set_to_max,
+		      bv_utils.inverted(bv_utils.zeros(result.fraction.size())),
+		      result.fraction);
+
+    result.infinity=prop.lor(result.infinity, 
+			     prop.land(exponent_too_large,
+				       overflow_to_inf));
+#else
     result.infinity=prop.lor(result.infinity, exponent_too_large);
+#endif
   }
 }
 
