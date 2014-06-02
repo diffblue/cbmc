@@ -288,3 +288,21 @@ void remove_returns(
   rr(goto_functions);
 }
 
+/*******************************************************************\
+
+Function: remove_returns
+
+Inputs:
+
+Outputs:
+
+Purpose: removes returns
+
+\*******************************************************************/
+
+void remove_returns(goto_modelt &goto_model)
+{
+  remove_returnst rr(goto_model.symbol_table);
+  rr(goto_model.goto_functions);
+}
+
