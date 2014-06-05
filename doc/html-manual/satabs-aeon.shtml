@@ -50,11 +50,11 @@ Aeon:
 </p>
 
 <p>
-<code>satabs *.c --pointer-check --bounds-check --show-claims</code>
+<code>satabs *.c --pointer-check --bounds-check --show-properties</code>
 </p>
 
 <p class="justified">
-SATABS will show about 300 claims in various functions
+SATABS will show about 300 properties in various functions
 (read <a href="properties.shtml">this</a> for more information
 on the property instrumentation).
 Now consider the first few lines of the <code>main</code> function 
@@ -126,7 +126,7 @@ matches  the  string  at <code>NAME</code>. If a variable name matches,
 SATABS has no information whatsoever about the content of
 <code>environ</code>. Even if SATABS could access the
 en&shy;vi&shy;ron&shy;ment variables on your computer, a successful verification
-of <code>Aeon</code> would then only guarantee that the claims for
+of <code>Aeon</code> would then only guarantee that the properties for
 this program hold on your computer with a specific set of
 en&shy;vi&shy;ron&shy;ment variables. We have to assume that <code>environ</code>
 contains en&shy;vi&shy;ron&shy;ment variables that have an arbitrary content
@@ -137,10 +137,10 @@ can be modified by the user.  The approximation of the behavior of
 content of the string.</p>
 
 <p class="justified">
-Now let us have another look at the claims that SATABS generates for the
+Now let us have another look at the properties that SATABS generates for the
 models of the the string library and for <code>getenv</code>.  Most of these
-claims require that we verify that the upper and lower bounds of buffers or
-arrays are not violated.  Let us look at one of the claims that SATABS
+properties require that we verify that the upper and lower bounds of buffers or
+arrays are not violated.  Let us look at one of the properties that SATABS
 generates for the code in function <code>getConfig</code>:
 </p>
 
@@ -156,12 +156,12 @@ Claim getConfig.3:<br>
 <p class="justified">The model of the function <code>strcpy</code>
 dereferences the pointer returned by <code>getenv</code>, which may
 return a NULL pointer. This possibility is detected by the static
-analysis, and thus a corresponding claim is generated. Let us 
-check this specific claim:
+analysis, and thus a corresponding property is generated. Let us 
+check this specific property:
 </p>
 
 <p>
-<code>satabs *.c --pointer-check --bounds-check --claim getConfig.3</code>
+<code>satabs *.c --pointer-check --bounds-check --property getConfig.3</code>
 </p>
 
 <p class="justified">SATABS immediately returns a counterexample path
@@ -171,7 +171,7 @@ bug in this program: it requires that the environment variable
 HOME is set, and crashes otherwise.
 </p>
 
-<p class="justified">Let us examine one more claim in the
+<p class="justified">Let us examine one more property in the
 same function:</p>
 
 <p><code>
@@ -182,7 +182,7 @@ Claim getConfig.7:<br>
 </code></p>
 
 <p class="justified">
-This claim asserts that the upper bound of the array <code>home</code>
+This property asserts that the upper bound of the array <code>home</code>
 is not violated. The variable <code>home</code>
 looks familiar: We encountered it in the function <code>getConfig</code>
 given above. The function <code>getenv</code> in combination with functions
@@ -192,7 +192,7 @@ to check the upper bound of the array <code>home</code>:
 </p>
 
 <p>
-<code>satabs *.c --pointer-check --bounds-check --claim getConfig.7</code>
+<code>satabs *.c --pointer-check --bounds-check --property getConfig.7</code>
 </p>
 
 <p class="justified">
@@ -212,7 +212,7 @@ such loops and will therefore unroll the loop body as often as necessary.
 The array <code>home</code> has <code>MAX_LEN</code> elements, and 
 <code>MAX_LEN</code> is defined to be 512 in <code>aeon.h</code>. 
 Therefore, SATABS would have to run through at least 512 iterations, only to
-verify (or reject) one of the more than 300 claims! Does this fact
+verify (or reject) one of the more than 300 properties! Does this fact
 defeat the purpose of static verification?
 </p>
 
@@ -242,7 +242,7 @@ use BOPPO instead of the default model checker SMV:
 </p>
 
 <p>
-<code>satabs --claim 5 --modelchecker boppo --loop-detection \</code><br>
+<code>satabs --property 5 --modelchecker boppo --loop-detection \</code><br>
 <code>&nbsp;&nbsp;aeon.c base64.c lib_aeon.c</code>
 </p>
 
