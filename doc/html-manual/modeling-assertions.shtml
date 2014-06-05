@@ -35,7 +35,7 @@ to specify assertions, using the built-in function __CPROVER_assert:</p>
 
 <p class="justified">The (mandatory) string that is passed as the
 second argument provides an informal description of the assertion.
-It is shown in the list of claims together with the condition.</p>
+It is shown in the list of properties together with the condition.</p>
 
 <p class="justified">The assertion language of the CPROVER tools is
 identical to the language used for expressions.  Note that <a

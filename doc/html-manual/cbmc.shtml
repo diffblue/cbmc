@@ -45,13 +45,13 @@ Now, run CBMC as follows:
 </p>
 
 <code>
-&nbsp;&nbsp;cbmc file1.c --show-claims --bounds-check --pointer-check
+&nbsp;&nbsp;cbmc file1.c --show-properties --bounds-check --pointer-check
 </code>
 
 <p class="justified">The two options <code>--bounds-check</code> and <code>--pointer-check</code>
 instruct CBMC to look for errors related to pointers and array bounds.
 CBMC will print the list of properties it checks. Note that it prints a
-claim labeled with "array argv upper bound" together with the
+property labeled with "array argv upper bound" together with the
 location of the faulty array access. As you can see, CBMC largely
 determines the property it needs to check itself. This is realized
 by means of a preliminary static analysis, which relies on computing a fixed
@@ -60,10 +60,10 @@ domains</a>. More detail on automatically generated properties
 is provided <a href="properties.shtml">here</a>.</p>
 
 <p class="justified">
-Note that automatically generated claims
-need not necessarily correspond to bugs &ndash; these are just <i>potential</i>
-flaws. Whether one of these claims corresponds to a bug needs to be
-determined by further analysis.
+Note that automatically generated properties need not necessarily correspond
+to bugs &ndash; these are just <i>potential</i> flaws.  Whether one of these
+properties holds or corresponds to a bug needs to be determined by
+further analysis.
 </p>
 
 <p class="justified">

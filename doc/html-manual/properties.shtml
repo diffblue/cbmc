@@ -14,7 +14,7 @@ cover this topic in more detail in this section.</p>
 
 <p class="justified">
 Both CBMC and SATABS use <i><a href="http://en.wikipedia.org/wiki/Assertion_(computing)">
-assertions</a></i> to specify program properties. Assertions are claims about
+assertions</a></i> to specify program properties. Assertions are properties of
 the state of the program when the program reaches a particular program
 location. Assertions are often written by the programmer by means of the
 <code>assert</code> macro.</p>
@@ -167,7 +167,7 @@ as follows:
 
 <p>
 <code>
-&nbsp;&nbsp;goto-instrument out.gb --show-claims
+&nbsp;&nbsp;goto-instrument out.gb --show-properties
 </code>
 </p>
 

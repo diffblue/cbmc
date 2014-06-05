@@ -77,20 +77,20 @@ CBMC</a> will never terminate.</p>
 <h3>Working with Claims</h3>
 
 <p class="justified">
-The two assertions will give rise to two <i>claims</i>.
-Each claim is associated to a specific line of code, i.e., a claim is violated when the
+The two assertions will give rise to two <i>properties</i>.
+Each property is associated to a specific line of code, i.e., a property is violated when
 some condition can become false at the corresponding program location.
-SATABS will generate a list of all claims for the programs as follows:
+SATABS will generate a list of all properties for the programs as follows:
 </p>
 
 <center>
 <code>
-satabs lock-example-fixed.c --show-claims
+satabs lock-example-fixed.c --show-properties
 </code>
 </center>
 
-<p>SATABS will list two claims; each claim corresponds to one of the
-two assertions. We can use SATABS to verify both claims
+<p>SATABS will list two properties; each property corresponds to one of the
+two assertions. We can use SATABS to verify both properties
 as follows:
 </p>
 
@@ -106,13 +106,13 @@ assertions hold for execution traces of any length.
 </p>
 
 <p class="justified">
-By default, SATABS attempts to verify all claims at once.
-A single claim can be verified (or refuted) by using the
-<code>--claim <i>id</i></code> option of SATABS,
-where <code><i>id</i></code> denotes the identifier of the claim in the list
-obtained by calling SATABS with the <code>--show-claims</code> flag. Whenever
-a claim is violated, SATABS reports a feasible path that leads to a state
-in which the condition that corresponds to the violated claim evaluates to
+By default, SATABS attempts to verify all properties at once.
+A single property can be verified (or refuted) by using the
+<code>--property <i>id</i></code> option of SATABS,
+where <code><i>id</i></code> denotes the identifier of the property in the list
+obtained by calling SATABS with the <code>--show-properties</code> flag. Whenever
+a property is violated, SATABS reports a feasible path that leads to a state
+in which the condition that corresponds to the violated property evaluates to
 false.
 </p>
 
@@ -159,7 +159,7 @@ achieve <b>full</b> path and state coverage (due to the fact that
 predicate abstraction implicitly detects equivalence classes).
 However, it is not guaranteed that SATABS terminates in all cases.
 Keep in mind that you must not make any assumptions about the
-validity of the claims if SATABS did not run to completion!
+validity of the properties if SATABS did not run to completion!
 </p>
 
 <div class="box1">
