@@ -27,9 +27,7 @@ public:
   typedef enum { PASS, FAIL, ERROR } resultt;
 
   // Check whether all properties in goto_functions hold.
-
-  virtual resultt operator()(
-    const goto_modelt &goto_model)=0;
+  virtual resultt operator()(const goto_modelt &)=0;
 
   struct property_statust
   {
