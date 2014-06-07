@@ -10,6 +10,7 @@ verilogbv
 floatbv
 fixedbv
 C_location #location
+C_source_loc #source_loc
 C_end_location #end_location
 C_is_padding #is_padding
 is_bit_field
