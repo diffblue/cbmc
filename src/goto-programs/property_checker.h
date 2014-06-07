@@ -19,12 +19,16 @@ Author: Daniel Kroening, kroening@kroening.com
 class property_checkert:public messaget
 {
 public:
-  property_checkert();
+  property_checkert()
+  {
+  }
 
   explicit property_checkert(
     message_handlert &_message_handler);
 
-  typedef enum { PASS, FAIL, ERROR } resultt;
+  typedef enum { PASS, FAIL, ERROR, UNKNOWN } resultt;
+  
+  static std::string as_string(resultt);
 
   // Check whether all properties in goto_functions hold.
   virtual resultt operator()(const goto_modelt &)=0;
@@ -34,11 +38,15 @@ public:
     // this is the counterexample  
     goto_tracet error_trace;
     resultt result;
+    goto_programt::const_targett location;
   };
   
-  typedef goto_programt::const_targett loct;
-  typedef std::map<loct, property_statust> property_mapt;
+  // the irep_idt is the property id
+  typedef std::map<irep_idt, property_statust> property_mapt;
   property_mapt property_map;
+
+protected:
+  void initialize_property_map(const goto_functionst &);
 };
 
 #endif
