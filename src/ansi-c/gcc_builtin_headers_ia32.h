@@ -609,7 +609,7 @@ void __builtin_ia32_vzeroall(void);
 void __builtin_ia32_vzeroupper(void);
 __gcc_v4df __builtin_ia32_xorpd256(__gcc_v4df,__gcc_v4df);
 __gcc_v8sf __builtin_ia32_xorps256(__gcc_v8sf,__gcc_v8sf);
-__gcc_v32qi __builtin_ia32_mpsadbw256(__gcc_v32qi,__gcc_v32qi,__gcc_v32qi,int);
+__gcc_v32qi __builtin_ia32_mpsadbw256(__gcc_v32qi,__gcc_v32qi,int);
 __gcc_v32qi __builtin_ia32_pabsb256(__gcc_v32qi);
 __gcc_v16hi __builtin_ia32_pabsw256(__gcc_v16hi);
 __gcc_v8si __builtin_ia32_pabsd256(__gcc_v8si);
