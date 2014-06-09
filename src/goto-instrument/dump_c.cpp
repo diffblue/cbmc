@@ -2907,9 +2907,15 @@ void goto2sourcet::convert_global_variable(
     return;
 
   code_declt d(symbol.symbol_expr());
+
+  find_symbols_sett syms;
+  if(symbol.value.is_not_nil())
+    find_symbols(symbol.value, syms);
+
   // add a tentative declaration to cater for symbols in the initializer
   // relying on it this symbol
-  if(symbol.location.get_function().empty() || symbol.is_extern)
+  if((symbol.location.get_function().empty() || symbol.is_extern) &&
+     (symbol.value.is_nil() || !syms.empty()))
   {
     os << "// " << symbol.name << std::endl;
     os << "// " << symbol.location << std::endl;
@@ -2919,9 +2925,6 @@ void goto2sourcet::convert_global_variable(
   if(!symbol.value.is_nil())
   {
     d.copy_to_operands(symbol.value);
-
-    find_symbols_sett syms;
-    find_symbols(symbol.value, syms);
 
     std::set<std::string> symbols_sorted;
     for(find_symbols_sett::const_iterator
