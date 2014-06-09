@@ -643,15 +643,15 @@ void cpp_typecheck_resolvet::disambiguate_functions(
           to_code_type(it2->type());
 
         // TODO: may fail when using ellipsis
-        assert(f1.arguments().size() == f2.arguments().size());
+        assert(f1.parameters().size() == f2.parameters().size());
 
         bool f1_better=true;
         bool f2_better=true;
 
-        for(std::size_t i=0; i < f1.arguments().size() && (f1_better || f2_better); i++)
+        for(std::size_t i=0; i < f1.parameters().size() && (f1_better || f2_better); i++)
         {
-          typet type1 = f1.arguments()[i].type();
-          typet type2 = f2.arguments()[i].type();
+          typet type1 = f1.parameters()[i].type();
+          typet type2 = f2.parameters()[i].type();
 
           if(type1 == type2)
             continue;
@@ -753,8 +753,8 @@ void cpp_typecheck_resolvet::make_constructors(
       {
         code_typet t2;
         t2.return_type()=it->type();
-        t2.arguments().resize(1);
-        t2.arguments()[0].type()=it->type();
+        t2.parameters().resize(1);
+        t2.parameters()[0].type()=it->type();
         exprt pod_constructor2("pod_constructor", t2);
         new_identifiers.push_back(pod_constructor2);
       }
@@ -764,8 +764,8 @@ void cpp_typecheck_resolvet::make_constructors(
       {
         code_typet t3;
         t3.return_type()=it->type();
-        t3.arguments().resize(1);
-        t3.arguments()[0].type()=signed_int_type();
+        t3.parameters().resize(1);
+        t3.parameters()[0].type()=signed_int_type();
         exprt pod_constructor3("pod_constructor", t3);
         new_identifiers.push_back(pod_constructor3);
       }
@@ -2303,8 +2303,8 @@ void cpp_typecheck_resolvet::apply_template_args(
     // check if it is a method
     const code_typet &code_type=to_code_type(new_symbol.type);
 
-    if(!code_type.arguments().empty() && 
-        code_type.arguments()[0].get(ID_C_base_name)==ID_this)
+    if(!code_type.parameters().empty() && 
+        code_type.parameters()[0].get(ID_C_base_name)==ID_this)
     {
       // do we have an object?
       if(fargs.has_object)

@@ -899,10 +899,10 @@ void goto_convertt::convert_cpp_delete(
   // now do "free"
   exprt delete_symbol=ns.lookup(delete_identifier).symbol_expr();
   
-  assert(to_code_type(delete_symbol.type()).arguments().size()==1);
+  assert(to_code_type(delete_symbol.type()).parameters().size()==1);
 
   typet arg_type=
-    to_code_type(delete_symbol.type()).arguments().front().type();
+    to_code_type(delete_symbol.type()).parameters().front().type();
   
   code_function_callt delete_call;
   delete_call.function()=delete_symbol;

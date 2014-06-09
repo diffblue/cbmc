@@ -230,11 +230,11 @@ object_id_sett full_slicert::transform(cfgt::iterator e)
         to_code_type(code_function_call.function().type());
 
       assert(code_function_call.arguments().size()>=
-             code_type.arguments().size());
+             code_type.parameters().size());
 
-      for(unsigned i=0; i<code_type.arguments().size(); i++)
+      for(unsigned i=0; i<code_type.parameters().size(); i++)
       {
-        object_idt lhs_id=object_idt(code_type.arguments()[i].get_identifier());
+        object_idt lhs_id=object_idt(code_type.parameters()[i].get_identifier());
 
         if(old_set.find(lhs_id)!=old_set.end())
         {
