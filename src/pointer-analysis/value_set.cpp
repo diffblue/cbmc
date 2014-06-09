@@ -770,7 +770,7 @@ void value_sett::get_value_set_rec(
       insert(dest, it->first, object);
     }
   }
-  else if(expr.id()==ID_sideeffect)
+  else if(expr.id()==ID_side_effect)
   {
     const irep_idt &statement=expr.get(ID_statement);
     

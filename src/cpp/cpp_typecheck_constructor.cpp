@@ -101,7 +101,7 @@ static void copy_member(
 
   code.set(ID_statement, ID_expression);
   code.add(ID_type)=typet(ID_code);
-  code.operands().push_back(exprt(ID_sideeffect));
+  code.operands().push_back(exprt(ID_side_effect));
   code.op0().set(ID_statement, ID_assign);
   code.op0().operands().push_back(exprt(ID_cpp_name));
   code.location() = location;
@@ -161,7 +161,7 @@ static void copy_array(
 
   code.set(ID_statement, ID_expression);
   code.add(ID_type)=typet(ID_code);
-  code.operands().push_back(exprt(ID_sideeffect));
+  code.operands().push_back(exprt(ID_side_effect));
   code.op0().set(ID_statement, ID_assign);
   code.op0().operands().push_back(exprt(ID_index));
   exprt& op0 = code.op0().op0();

@@ -737,7 +737,7 @@ void goto_convertt::convert_assign(
 
   clean_expr(lhs, dest);
 
-  if(rhs.id()==ID_sideeffect &&
+  if(rhs.id()==ID_side_effect &&
      rhs.get(ID_statement)==ID_function_call)
   {
     if(rhs.operands().size()!=2)
@@ -751,7 +751,7 @@ void goto_convertt::convert_assign(
 
     do_function_call(lhs, rhs.op0(), rhs.op1().operands(), dest);
   }
-  else if(rhs.id()==ID_sideeffect &&
+  else if(rhs.id()==ID_side_effect &&
           (rhs.get(ID_statement)==ID_cpp_new ||
            rhs.get(ID_statement)==ID_cpp_new_array))
   {
@@ -760,7 +760,7 @@ void goto_convertt::convert_assign(
 
     do_cpp_new(lhs, to_side_effect_expr(rhs), dest);
   }
-  else if(rhs.id()==ID_sideeffect &&
+  else if(rhs.id()==ID_side_effect &&
           (rhs.get(ID_statement)==ID_java_new ||
            rhs.get(ID_statement)==ID_java_new_array))
   {
@@ -769,7 +769,7 @@ void goto_convertt::convert_assign(
 
     do_java_new(lhs, to_side_effect_expr(rhs), dest);
   }
-  else if(rhs.id()==ID_sideeffect &&
+  else if(rhs.id()==ID_side_effect &&
           rhs.get(ID_statement)==ID_malloc)
   {
     // just preserve

@@ -36,7 +36,7 @@ void java_bytecode_typecheckt::typecheck_expr(exprt &expr)
 
   if(expr.id()==ID_symbol)
     typecheck_expr_symbol(to_symbol_expr(expr));
-  else if(expr.id()==ID_sideeffect)
+  else if(expr.id()==ID_side_effect)
   {
     const irep_idt &statement=to_side_effect_expr(expr).get_statement();
     if(statement==ID_java_new || statement==ID_java_new_array)

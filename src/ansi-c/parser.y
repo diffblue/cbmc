@@ -440,7 +440,7 @@ quantifier_expression:
         ;
 
 statement_expression: '(' compound_statement ')'
-        { init($$, ID_sideeffect);
+        { init($$, ID_side_effect);
           stack($$).set(ID_statement, ID_statement_expression);
           stack($$).location()=stack($1).location();
           mto($$, $2);
@@ -453,7 +453,7 @@ postfix_expression:
         { binary($$, $1, $2, ID_index, $3); }
         | postfix_expression '(' ')'
         { $$=$2;
-          set($$, ID_sideeffect);
+          set($$, ID_side_effect);
           stack($$).operands().resize(2);
           stack($$).op0().swap(stack($1));
           stack($$).op1().clear();
@@ -463,7 +463,7 @@ postfix_expression:
         | postfix_expression '(' argument_expression_list ')'
         { $$=$2;
           locationt location=stack($2).location();
-          init($$, ID_sideeffect);
+          init($$, ID_side_effect);
           stack($$).set(ID_statement, ID_function_call);
           stack($$).operands().resize(2);
           stack($$).op0().swap(stack($1));
@@ -486,7 +486,7 @@ postfix_expression:
         | postfix_expression TOK_INCR
         { $$=$2;
           locationt location=stack($2).location();
-          init($$, ID_sideeffect);
+          init($$, ID_side_effect);
           mto($$, $1);
           stack($$).set(ID_statement, ID_postincrement);
           stack($$).location()=location;
@@ -494,7 +494,7 @@ postfix_expression:
         | postfix_expression TOK_DECR
         { $$=$2;
           locationt location=stack($2).location();
-          init($$, ID_sideeffect);
+          init($$, ID_side_effect);
           mto($$, $1);
           stack($$).set(ID_statement, ID_postdecrement);
           stack($$).location()=location;
@@ -545,13 +545,13 @@ unary_expression:
           postfix_expression
         | TOK_INCR unary_expression
         { $$=$1;
-          set($$, ID_sideeffect);
+          set($$, ID_side_effect);
           stack($$).set(ID_statement, ID_preincrement);
           mto($$, $2);
         }
         | TOK_DECR unary_expression
         { $$=$1;
-          set($$, ID_sideeffect);
+          set($$, ID_side_effect);
           stack($$).set(ID_statement, ID_predecrement);
           mto($$, $2);
         }
@@ -744,7 +744,7 @@ conditional_expression:
         }
         | logical_equivalence_expression '?' ':' conditional_expression
         { $$=$2;
-          stack($$).id(ID_sideeffect);
+          stack($$).id(ID_side_effect);
           stack($$).set(ID_statement, ID_gcc_conditional_expression);
           mto($$, $1);
           mto($$, $4);
@@ -754,27 +754,27 @@ conditional_expression:
 assignment_expression:
           conditional_expression
         | cast_expression '=' assignment_expression
-        { binary($$, $1, $2, ID_sideeffect, $3); stack($$).set(ID_statement, ID_assign); }
+        { binary($$, $1, $2, ID_side_effect, $3); stack($$).set(ID_statement, ID_assign); }
         | cast_expression TOK_MULTASSIGN assignment_expression
-        { binary($$, $1, $2, ID_sideeffect, $3); stack($$).set(ID_statement, ID_assign_mult); }
+        { binary($$, $1, $2, ID_side_effect, $3); stack($$).set(ID_statement, ID_assign_mult); }
         | cast_expression TOK_DIVASSIGN assignment_expression
-        { binary($$, $1, $2, ID_sideeffect, $3); stack($$).set(ID_statement, ID_assign_div); }
+        { binary($$, $1, $2, ID_side_effect, $3); stack($$).set(ID_statement, ID_assign_div); }
         | cast_expression TOK_MODASSIGN assignment_expression
-        { binary($$, $1, $2, ID_sideeffect, $3); stack($$).set(ID_statement, ID_assign_mod); }
+        { binary($$, $1, $2, ID_side_effect, $3); stack($$).set(ID_statement, ID_assign_mod); }
         | cast_expression TOK_PLUSASSIGN assignment_expression
-        { binary($$, $1, $2, ID_sideeffect, $3); stack($$).set(ID_statement, ID_assign_plus); }
+        { binary($$, $1, $2, ID_side_effect, $3); stack($$).set(ID_statement, ID_assign_plus); }
         | cast_expression TOK_MINUSASSIGN assignment_expression
-        { binary($$, $1, $2, ID_sideeffect, $3); stack($$).set(ID_statement, ID_assign_minus); }
+        { binary($$, $1, $2, ID_side_effect, $3); stack($$).set(ID_statement, ID_assign_minus); }
         | cast_expression TOK_SHLASSIGN assignment_expression
-        { binary($$, $1, $2, ID_sideeffect, $3); stack($$).set(ID_statement, ID_assign_shl); }
+        { binary($$, $1, $2, ID_side_effect, $3); stack($$).set(ID_statement, ID_assign_shl); }
         | cast_expression TOK_SHRASSIGN assignment_expression
-        { binary($$, $1, $2, ID_sideeffect, $3); stack($$).set(ID_statement, ID_assign_shr); }
+        { binary($$, $1, $2, ID_side_effect, $3); stack($$).set(ID_statement, ID_assign_shr); }
         | cast_expression TOK_ANDASSIGN assignment_expression
-        { binary($$, $1, $2, ID_sideeffect, $3); stack($$).set(ID_statement, ID_assign_bitand); }
+        { binary($$, $1, $2, ID_side_effect, $3); stack($$).set(ID_statement, ID_assign_bitand); }
         | cast_expression TOK_XORASSIGN assignment_expression
-        { binary($$, $1, $2, ID_sideeffect, $3); stack($$).set(ID_statement, ID_assign_bitxor); }
+        { binary($$, $1, $2, ID_side_effect, $3); stack($$).set(ID_statement, ID_assign_bitxor); }
         | cast_expression TOK_ORASSIGN assignment_expression
-        { binary($$, $1, $2, ID_sideeffect, $3); stack($$).set(ID_statement, ID_assign_bitor); }
+        { binary($$, $1, $2, ID_side_effect, $3); stack($$).set(ID_statement, ID_assign_bitor); }
         ;
 
 comma_expression:

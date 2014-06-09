@@ -3719,7 +3719,7 @@ bool Parser::rExpression(exprt &exp)
     exprt left;
     left.swap(exp);
 
-    exp=exprt(ID_sideeffect);
+    exp=exprt(ID_side_effect);
 
     if(t=='=')
       exp.set(ID_statement, ID_assign);
@@ -4385,7 +4385,7 @@ bool Parser::rUnaryExpr(exprt &exp)
 
     case TOK_INCR:
     case TOK_DECR:
-      exp=exprt(ID_sideeffect);
+      exp=exprt(ID_side_effect);
       exp.set(ID_statement,
         tk.text=="++"?ID_preincrement:ID_predecrement);
       break;
@@ -4649,12 +4649,12 @@ bool Parser::rAllocateExpr(exprt &exp)
       if(lex.GetToken(tk)!=']')
         return false;
 
-      exp=exprt(ID_sideeffect);
+      exp=exprt(ID_side_effect);
       exp.set(ID_statement, ID_cpp_delete_array);
     }
     else
     {
-      exp=exprt(ID_sideeffect);
+      exp=exprt(ID_side_effect);
       exp.set(ID_statement, ID_cpp_delete);
     }
 
@@ -4673,7 +4673,7 @@ bool Parser::rAllocateExpr(exprt &exp)
     std::cout << "Parser::rAllocateExpr 3\n";
     #endif
 
-    exp=exprt(ID_sideeffect);
+    exp=exprt(ID_side_effect);
     exp.set(ID_statement, ID_cpp_new);
     set_location(exp, tk);
 
@@ -4954,7 +4954,7 @@ bool Parser::rPostfixExpr(exprt &exp)
       lex.GetToken(op);
 
       {
-        exprt tmp(ID_sideeffect);
+        exprt tmp(ID_side_effect);
         tmp.move_to_operands(exp);
         tmp.set(ID_statement,
           op.text=="++"?ID_postincrement:ID_postdecrement);
@@ -5252,7 +5252,7 @@ bool Parser::rPrimaryExpr(exprt &exp)
       if(!rCompoundStatement(code))
         return false;
 
-      exp=exprt(ID_sideeffect);
+      exp=exprt(ID_side_effect);
       exp.set(ID_statement, ID_statement_expression);
       set_location(exp, tk);
       exp.move_to_operands(code);

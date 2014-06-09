@@ -609,7 +609,7 @@ void value_set_fivrnst::get_value_set_rec(
       return;
     }
   }
-  else if(expr.id()==ID_sideeffect)
+  else if(expr.id()==ID_side_effect)
   {
     const irep_idt &statement=expr.get(ID_statement);
     
