@@ -150,7 +150,7 @@ void cpp_convert_typet::read_rec(const typet &type)
     typedef_cnt++;
   else if(type.id()==ID_identifier)
   {
-    // from arguments
+    // from parameters
   }
   else if(type.id()==ID_cpp_name)
   {
@@ -248,7 +248,7 @@ void cpp_convert_typet::read_function_type(const typet &type)
     cpp_convert_plain_type(return_type);
 
   // take care of parameter types
-  irept &parameters=t.add(ID_arguments);
+  irept &parameters=t.add(ID_parameters);
 
   // see if we have an ellipsis
   if(!parameters.get_sub().empty() &&

@@ -57,11 +57,11 @@ void template_mapt::apply(typet &type) const
   {
     apply(static_cast<typet &>(type.add(ID_return_type)));
 
-    irept::subt &arguments=type.add(ID_arguments).get_sub();
+    irept::subt &parameters=type.add(ID_parameters).get_sub();
 
-    Forall_irep(it, arguments)
+    Forall_irep(it, parameters)
     {
-      if(it->id()==ID_argument)
+      if(it->id()==ID_parameter)
         apply(static_cast<typet &>(it->add(ID_type)));
     }
   }
