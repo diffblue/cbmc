@@ -63,12 +63,12 @@ void goto_symext::argument_assignments(
   exprt::operandst::const_iterator it1=arguments.begin();
 
   // these are the types of the arguments
-  const code_typet::argumentst &argument_types=function_type.arguments();
+  const code_typet::parameterst &parameter_types=function_type.parameters();
 
-  // iterates over the types of the arguments
-  for(code_typet::argumentst::const_iterator
-      it2=argument_types.begin();
-      it2!=argument_types.end();
+  // iterates over the types of the parameters
+  for(code_typet::parameterst::const_iterator
+      it2=parameter_types.begin();
+      it2!=parameter_types.end();
       it2++)
   {
     // if you run out of actual arguments there was a mismatch
@@ -80,15 +80,15 @@ void goto_symext::argument_assignments(
       throw error;
     }
 
-    const code_typet::argumentt &argument=*it2;
+    const code_typet::parametert &parameter=*it2;
 
     // this is the type the n-th argument should be
-    const typet &arg_type=argument.type();
+    const typet &arg_type=parameter.type();
 
-    const irep_idt &identifier=argument.get_identifier();
+    const irep_idt &identifier=parameter.get_identifier();
     
     if(identifier==irep_idt())
-      throw "no identifier for function argument";
+      throw "no identifier for function parameter";
 
     const symbolt &symbol=ns.lookup(identifier);
     symbol_exprt lhs=symbol.symbol_expr();

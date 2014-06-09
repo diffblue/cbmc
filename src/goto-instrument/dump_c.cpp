@@ -135,24 +135,29 @@ protected:
   loop_last_stackt loop_last_stack;
   id_sett local_static_set;
   id_sett type_names_set;
+  id_sett const_removed;
 
   void build_loop_map();
   void build_dead_map();
   void scan_for_varargs();
 
-  void cleanup_code(codet &code, const bool is_top);
+  void cleanup_code(codet &code, const irep_idt parent_stmt);
 
   void cleanup_code_block(
-      codet &code,
-      const bool is_top);
+    codet &code,
+    const irep_idt parent_stmt);
 
-  void cleanup_code_ifthenelse(codet &code);
+  void cleanup_code_ifthenelse(
+    codet &code,
+    const irep_idt parent_stmt);
 
   void expand_reverse_tag_map(const irep_idt identifier);
   void expand_reverse_tag_map(const typet &type);
   void cleanup_expr(exprt &expr, bool no_typecast);
 
   void add_local_types(const typet &type);
+
+  void remove_const(typet &type);
 
   goto_programt::const_targett convert_instruction(
       goto_programt::const_targett target,
@@ -284,7 +289,7 @@ void goto_program2codet::operator()()
     replace_symbols.replace(symbol.type);
   }
 
-  cleanup_code(toplevel_block, true);
+  cleanup_code(toplevel_block, ID_nil);
 }
 
 /*******************************************************************\
@@ -806,7 +811,11 @@ void goto_program2codet::convert_assign_rec(
         it!=components.end();
         ++it)
     {
-      if(!it->get_is_padding())
+      const bool is_zero_bit_field=
+        it->get_is_bit_field() &&
+        to_bitvector_type(ns.follow(it->type())).get_width()==0;
+
+      if(!it->get_is_padding() && !is_zero_bit_field)
       {
         member_exprt member(assign.lhs(), it->get_name(), it->type());
         convert_assign_rec(code_assignt(member, *o_it), dest);
@@ -911,17 +920,8 @@ goto_programt::const_targett goto_program2codet::convert_decl(
   }
   // if we have a constant but can't initialize them right away, we need to
   // remove the const marker
-  else if(symbol.type().get_bool(ID_C_constant))
-    symbol.type().remove(ID_C_constant);
-  else if(symbol.type().id()==ID_array)
-  {
-    for(typet * t=&(symbol.type());
-        t->id()==ID_array;
-        t=&(t->subtype()))
-      if(t->subtype().id()!=ID_array &&
-          t->subtype().get_bool(ID_C_constant))
-        t->subtype().remove(ID_C_constant);
-  }
+  else
+    remove_const(symbol.type());
 
   if(move_to_dest)
     dest.move_to_operands(d);
@@ -1054,7 +1054,13 @@ goto_programt::const_targett goto_program2codet::convert_goto_while(
   loop_last_stack.pop_back();
 
   convert_labels(loop_end, w.body());
-  if(!loop_end->guard.is_true())
+  if(loop_end->guard.is_false())
+  {
+    code_breakt brk;
+
+    w.body().move_to_operands(brk);
+  }
+  else if(!loop_end->guard.is_true())
   {
     code_ifthenelset i;
 
@@ -1081,6 +1087,26 @@ goto_programt::const_targett goto_program2codet::convert_goto_while(
     f.body().swap(w.body());
 
     f.swap(w);
+  }
+  else if(w.body().has_operands() &&
+          w.cond().is_true())
+  {
+    const codet &back=to_code(w.body().operands().back());
+
+    if(back.get_statement()==ID_break ||
+       (back.get_statement()==ID_ifthenelse &&
+        to_code_ifthenelse(back).cond().is_true() &&
+        to_code_ifthenelse(back).then_case().get_statement()==ID_break))
+    {
+      code_dowhilet d;
+
+      d.cond()=false_exprt();
+
+      w.body().operands().pop_back();
+      d.body().swap(w.body());
+
+      d.swap(w);
+    }
   }
 
   dest.move_to_operands(w);
@@ -1610,17 +1636,15 @@ goto_programt::const_targett goto_program2codet::convert_goto_break_continue(
   {
     code_breakt brk;
 
-    if(!target->guard.is_true())
-    {
-      code_ifthenelset i;
-      i.cond()=target->guard;
-      simplify(i.cond(), ns);
-      i.then_case().swap(brk);
+    code_ifthenelset i;
+    i.cond()=target->guard;
+    simplify(i.cond(), ns);
+    i.then_case().swap(brk);
 
-      dest.move_to_operands(i);
-    }
+    if(i.cond().is_true())
+      dest.move_to_operands(i.then_case());
     else
-      dest.move_to_operands(brk);
+      dest.move_to_operands(i);
 
     return target;
   }
@@ -1939,7 +1963,7 @@ Purpose:
 
 void goto_program2codet::cleanup_code(
     codet &code,
-    const bool is_top)
+    const irep_idt parent_stmt)
 {
   if(code.get_statement()==ID_decl)
   {
@@ -1960,7 +1984,7 @@ void goto_program2codet::cleanup_code(
     Forall_expr(it, operands)
     {
       if(it->id()==ID_code)
-        cleanup_code(to_code(*it), false);
+        cleanup_code(to_code(*it), code.get_statement());
       else
         cleanup_expr(*it, false);
     }
@@ -1982,9 +2006,9 @@ void goto_program2codet::cleanup_code(
     }
   }
   else if(statement==ID_block)
-    cleanup_code_block(code, is_top);
+    cleanup_code_block(code, parent_stmt);
   else if(statement==ID_ifthenelse)
-    cleanup_code_ifthenelse(code);
+    cleanup_code_ifthenelse(code, parent_stmt);
   else if(statement==ID_dowhile)
   {
     code_dowhilet &do_while=to_code_dowhile(code);
@@ -1993,6 +2017,10 @@ void goto_program2codet::cleanup_code(
     // to ensure convergence
     if(do_while.body().get_statement()==ID_skip)
       do_while.set_statement(ID_while);
+    // do stmt while(false) is just stmt
+    else if(do_while.cond().is_false() &&
+            do_while.body().get_statement()!=ID_block)
+      code=do_while.body();
   }
 }
 
@@ -2010,7 +2038,7 @@ Purpose:
 
 void goto_program2codet::cleanup_code_block(
     codet &code,
-    const bool is_top)
+    const irep_idt parent_stmt)
 {
   assert(code.get_statement()==ID_block);
 
@@ -2034,8 +2062,18 @@ void goto_program2codet::cleanup_code_block(
           break;
         }
 
+      // nested blocks with declarations become do { } while(false)
+      // to ensure the inner block is never lost
       if(has_decl)
+      {
+        code_dowhilet d;
+        d.cond()=false_exprt();
+        d.body().swap(*it);
+
+        it->swap(d);
+
         ++i;
+      }
       else
       {
         operands.insert(operands.begin()+i+1,
@@ -2048,15 +2086,61 @@ void goto_program2codet::cleanup_code_block(
       ++i;
   }
 
-  if(operands.empty() && !is_top)
+  if(operands.empty() && parent_stmt!=ID_nil)
     code=code_skipt();
   else if(operands.size()==1 &&
-          !is_top &&
+          parent_stmt!=ID_nil &&
           to_code(code.op0()).get_statement()!=ID_decl)
   {
     codet tmp;
     tmp.swap(code.op0());
     code.swap(tmp);
+  }
+}
+
+/*******************************************************************\
+
+Function: goto_program2codet::remove_const
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
+void goto_program2codet::remove_const(typet &type)
+{
+  if(type.get_bool(ID_C_constant))
+    type.remove(ID_C_constant);
+
+  if(type.id()==ID_symbol)
+  {
+    const irep_idt &identifier=to_symbol_type(type).get_identifier();
+    if(!const_removed.insert(identifier).second)
+      return;
+
+    symbol_tablet::symbolst::iterator it=
+      symbol_table.symbols.find(identifier);
+    assert(it!=symbol_table.symbols.end());
+    assert(it->second.is_type);
+
+    remove_const(it->second.type);
+  }
+  else if(type.id()==ID_array)
+    remove_const(type.subtype());
+  else if(type.id()==ID_struct ||
+          type.id()==ID_union)
+  {
+    struct_union_typet &sut=to_struct_union_type(type);
+    struct_union_typet::componentst &c=sut.components();
+
+    for(struct_union_typet::componentst::iterator
+        it=c.begin();
+        it!=c.end();
+        ++it)
+      remove_const(it->type());
   }
 }
 
@@ -2133,7 +2217,9 @@ Purpose:
 
 \*******************************************************************/
 
-void goto_program2codet::cleanup_code_ifthenelse(codet &code)
+void goto_program2codet::cleanup_code_ifthenelse(
+  codet &code,
+  const irep_idt parent_stmt)
 {
   code_ifthenelset &i_t_e=to_code_ifthenelse(code);
 
@@ -2157,13 +2243,28 @@ void goto_program2codet::cleanup_code_ifthenelse(codet &code)
       code.swap(tmp);
     }
   }
-  else if(to_code(i_t_e.then_case()).get_statement()==ID_ifthenelse)
+  else
   {
-    // we re-introduce 1-code blocks with if-then-else to avoid dangling-else
-    // ambiguity
-    code_blockt b;
-    b.move_to_operands(i_t_e.then_case());
-    i_t_e.then_case().swap(b);
+    if(i_t_e.then_case().is_not_nil() &&
+       to_code(i_t_e.then_case()).get_statement()==ID_ifthenelse)
+    {
+      // we re-introduce 1-code blocks with if-then-else to avoid dangling-else
+      // ambiguity
+      code_blockt b;
+      b.move_to_operands(i_t_e.then_case());
+      i_t_e.then_case().swap(b);
+    }
+
+    if(i_t_e.else_case().is_not_nil() &&
+       to_code(i_t_e.then_case()).get_statement()==ID_skip &&
+       to_code(i_t_e.else_case()).get_statement()==ID_ifthenelse)
+    {
+      // we re-introduce 1-code blocks with if-then-else to avoid dangling-else
+      // ambiguity
+      code_blockt b;
+      b.move_to_operands(i_t_e.else_case());
+      i_t_e.else_case().swap(b);
+    }
   }
 
   // move labels at end of then or else case out
@@ -2184,7 +2285,7 @@ void goto_program2codet::cleanup_code_ifthenelse(codet &code)
       b.move_to_operands(then_label);
       b.move_to_operands(else_label);
       code.swap(b);
-      cleanup_code(code, false);
+      cleanup_code(code, parent_stmt);
     }
   }
 
@@ -2570,7 +2671,6 @@ protected:
 
   void convert_compound_declaration(
       const symbolt &symbol,
-      std::ostream &os_decl,
       std::ostream &os_body);
   void convert_compound(
       const typet &type,
@@ -2592,6 +2692,7 @@ protected:
 
   void convert_function_declaration(
       const symbolt &symbol,
+      const bool skip_main,
       std::ostream &os_decl,
       std::ostream &os_body,
       local_static_declst &local_static_decls,
@@ -2744,10 +2845,15 @@ void goto2sourcet::operator()(std::ostream &os)
          symbol.type.id()==ID_incomplete_struct ||
          symbol.type.id()==ID_union ||
          symbol.type.id()==ID_incomplete_union))
-      convert_compound_declaration(
-          symbol,
-          os,
-          compound_body_stream);
+    {
+      if(symbol.location.get_function().empty())
+      {
+        os << "// " << symbol.name << std::endl;
+        os << "// " << symbol.location << std::endl;
+        os << type_to_string(symbol.type) << ";" << std::endl;
+        os << std::endl;
+      }
+    }
     else if(symbol.is_static_lifetime && symbol.type.id()!=ID_code)
       convert_global_variable(
           symbol,
@@ -2777,15 +2883,31 @@ void goto2sourcet::operator()(std::ostream &os)
 
     if(symbol.type.id()!=ID_code) continue;
 
-    // don't dump artificial main
-    if(skip_function_main && symbol.name==ID_main) continue;
-
     convert_function_declaration(
       symbol,
+      skip_function_main,
       func_decl_stream,
       func_body_stream,
       local_static_decls,
       original_tags);
+  }
+
+  // (possibly modified) compound types
+  for(std::set<std::string>::const_iterator
+      it=symbols_sorted.begin();
+      it!=symbols_sorted.end();
+      ++it)
+  {
+    const symbolt &symbol=ns.lookup(*it);
+
+    if(symbol.is_type &&
+        (symbol.type.id()==ID_struct ||
+         symbol.type.id()==ID_incomplete_struct ||
+         symbol.type.id()==ID_union ||
+         symbol.type.id()==ID_incomplete_union))
+      convert_compound_declaration(
+          symbol,
+          compound_body_stream);
   }
 
   os << std::endl;
@@ -2807,10 +2929,10 @@ void goto2sourcet::operator()(std::ostream &os)
      << "#define FENCE(x) ((void)0)" << std::endl
      << "#endif" << std::endl;
   os << "#ifndef IEEE_FLOAT_EQUAL" << std::endl
-     << "#define IEEE_FLOAT_EQUAL(x,y) (x==y)" << std::endl
+     << "#define IEEE_FLOAT_EQUAL(x,y) ((x)==(y))" << std::endl
      << "#endif" << std::endl;
   os << "#ifndef IEEE_FLOAT_NOTEQUAL" << std::endl
-     << "#define IEEE_FLOAT_NOTEQUAL(x,y) (x!=y)" << std::endl
+     << "#define IEEE_FLOAT_NOTEQUAL(x,y) ((x)!=(y))" << std::endl
      << "#endif" << std::endl;
 
   os << std::endl;
@@ -2844,7 +2966,6 @@ Purpose: declare compound types
 
 void goto2sourcet::convert_compound_declaration(
     const symbolt &symbol,
-    std::ostream &os_decl,
     std::ostream &os_body)
 {
   if(!symbol.location.get_function().empty())
@@ -2857,11 +2978,6 @@ void goto2sourcet::convert_compound_declaration(
         to_struct_union_type(symbol.type),
         true,
         os_body);
-
-  os_decl << "// " << symbol.name << std::endl;
-  os_decl << "// " << symbol.location << std::endl;
-  os_decl << type_to_string(symbol.type) << ";" << std::endl;
-  os_decl << std::endl;
 }
 
 /*******************************************************************\
@@ -2985,7 +3101,7 @@ void goto2sourcet::convert_compound(
     if(recursive && comp_type.id()!=ID_pointer)
       convert_compound(comp_type, recursive, os);
 
-    const irep_idt &comp_name=comp.get_name();
+    irep_idt comp_name=comp.get_name();
 
     struct_body << indent(1) << "// " << comp_name << std::endl;
     struct_body << indent(1);
@@ -2996,8 +3112,19 @@ void goto2sourcet::convert_compound(
     std::string s=make_decl(fake_unique_name, comp_type);
     assert(s.find("NO/SUCH/NS")==std::string::npos);
 
+    if(comp.get_is_bit_field() &&
+       to_bitvector_type(comp_type).get_width()==0)
+    {
+      comp_name="";
+      s=type_to_string(comp_type);
+    }
+
     if(s.find("__CPROVER_bitvector")==std::string::npos)
+    {
       struct_body << s;
+      if(comp.get_is_bit_field())
+        struct_body << " : " << to_bitvector_type(comp_type).get_width();
+    }
     else if(comp_type.id()==ID_signedbv)
     {
       const signedbv_typet &t=to_signedbv_type(comp_type);
@@ -3051,8 +3178,10 @@ void goto2sourcet::convert_compound(
      */
 
   os << "}";
-  if(ns.follow(type).get_bool(ID_C_transparent_union))
+  if(type.get_bool(ID_C_transparent_union))
     os << " __attribute__ ((__transparent_union__))";
+  if(type.get_bool(ID_C_packed))
+    os << " __attribute__ ((__packed__))";
   os << ";";
   os << std::endl;
   os << std::endl;
@@ -3158,7 +3287,7 @@ void goto2sourcet::convert_global_variable(
     return;
 
   const irep_idt &func=symbol.location.get_function();
-  if((func.empty() || symbol.is_extern) &&
+  if((func.empty() || symbol.is_extern || symbol.value.is_not_nil()) &&
       !converted.insert(symbol.name).second)
     return;
 
@@ -3229,6 +3358,7 @@ Purpose:
 
 void goto2sourcet::convert_function_declaration(
     const symbolt& symbol,
+    const bool skip_main,
     std::ostream &os_decl,
     std::ostream &os_body,
     local_static_declst &local_static_decls,
@@ -3237,6 +3367,20 @@ void goto2sourcet::convert_function_declaration(
   const code_typet &code_type=to_code_type(symbol.type);
 
   if(ignore(symbol.name))
+    return;
+
+  // don't dump artificial main
+  if(skip_main && symbol.name==ID_main)
+    return;
+
+  // don't dump GCC builtins
+  if((symbol.location.get_file()=="gcc_builtin_headers_alpha.h" ||
+      symbol.location.get_file()=="gcc_builtin_headers_arm.h" ||
+      symbol.location.get_file()=="gcc_builtin_headers_ia32.h" ||
+      symbol.location.get_file()=="gcc_builtin_headers_mips.h" ||
+      symbol.location.get_file()=="gcc_builtin_headers_power.h" ||
+      symbol.location.get_file()=="gcc_builtin_headers_generic.h") &&
+     has_prefix(id2string(symbol.name), "c::__builtin_"))
     return;
 
   if(symbol.name=="c::__builtin_va_start" ||
@@ -3357,7 +3501,11 @@ void goto2sourcet::cleanup_expr(exprt &expr)
         it!=old_components.end();
         ++it)
     {
-      if(!it->get_is_padding())
+      const bool is_zero_bit_field=
+        it->get_is_bit_field() &&
+        to_bitvector_type(ns.follow(it->type())).get_width()==0;
+
+      if(!it->get_is_padding() && !is_zero_bit_field)
       {
         type.components().push_back(*it);
         expr.move_to_operands(*o_it);

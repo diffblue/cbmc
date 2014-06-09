@@ -40,11 +40,11 @@ void get_symbols_rec(
   if(symbol.type.id()==ID_code)
   {
     const code_typet &code_type=to_code_type(symbol.type);
-    const code_typet::argumentst &arguments=code_type.arguments();
+    const code_typet::parameterst &parameters=code_type.parameters();
 
-    for(code_typet::argumentst::const_iterator
-        it=arguments.begin();
-        it!=arguments.end();
+    for(code_typet::parameterst::const_iterator
+        it=parameters.begin();
+        it!=parameters.end();
         it++)
     {
       irep_idt id=it->get_identifier();

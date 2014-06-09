@@ -296,7 +296,7 @@ void cpp_typecheckt::default_cpctor(
   argdecl.move_to_operands(argtor);
   argdecl.location() = location;
 
-  // Add argument to function type
+  // Add parameter to function type
   decl0.add(ID_type).add("arguments").get_sub().push_back(argdecl);
   decl0.location() = location;
 
@@ -1043,14 +1043,14 @@ bool cpp_typecheckt::find_cpctor(const symbolt &symbol) const
 
     const code_typet& code_type = to_code_type(component.type());
 
-    const code_typet::argumentst& args = code_type.arguments();
+    const code_typet::parameterst& args = code_type.parameters();
 
-    // First argument is the this pointer. Therefore, copy
-    // constructors have at least two arguments
+    // First parameter is the this pointer. Therefore, copy
+    // constructors have at least two parameters
     if(args.size() < 2)
       continue;
 
-    const code_typet::argumentt& arg1 = args[1];
+    const code_typet::parametert& arg1 = args[1];
 
     const typet &arg1_type=arg1.type();
 
@@ -1108,12 +1108,12 @@ bool cpp_typecheckt::find_assignop(const symbolt& symbol) const
 
     const code_typet&  code_type = to_code_type(component.type());
 
-    const code_typet::argumentst& args = code_type.arguments();
+    const code_typet::parameterst& args = code_type.parameters();
 
     if(args.size()!=2)
       continue;
 
-    const code_typet::argumentt& arg1 = args[1];
+    const code_typet::parametert& arg1 = args[1];
 
     const typet &arg1_type= arg1.type();
 

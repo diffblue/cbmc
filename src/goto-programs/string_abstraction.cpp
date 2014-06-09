@@ -270,13 +270,13 @@ void string_abstractiont::add_str_arguments(
   assert(sym_entry!=symbol_table.symbols.end());
   symbolt &fct_symbol=sym_entry->second;
 
-  code_typet::argumentst &arguments=
-    to_code_type(fct.type).arguments();
-  code_typet::argumentst str_args;
+  code_typet::parameterst &parameters=
+    to_code_type(fct.type).parameters();
+  code_typet::parameterst str_args;
 
-  for(code_typet::argumentst::iterator
-      it=arguments.begin();
-      it!=arguments.end();
+  for(code_typet::parameterst::iterator
+      it=parameters.begin();
+      it!=parameters.end();
       ++it)
   {
     const typet &abstract_type=build_abstraction_type(it->type());
@@ -302,10 +302,10 @@ void string_abstractiont::add_str_arguments(
       abstract_ret_val_name(fct_symbol));
   }
 
-  arguments.insert(arguments.end(), str_args.begin(), str_args.end());
-  code_typet::argumentst &symb_arguments=
-    to_code_type(fct_symbol.type).arguments();
-  symb_arguments.insert(symb_arguments.end(), str_args.begin(), str_args.end());
+  parameters.insert(parameters.end(), str_args.begin(), str_args.end());
+  code_typet::parameterst &symb_parameters=
+    to_code_type(fct_symbol.type).parameters();
+  symb_parameters.insert(symb_parameters.end(), str_args.begin(), str_args.end());
 }
 
 /*******************************************************************\
@@ -321,7 +321,7 @@ Function: string_abstractiont::add_argument
 \*******************************************************************/
 
 void string_abstractiont::add_argument(
-    code_typet::argumentst &str_args,
+    code_typet::parameterst &str_args,
     const symbolt &fct_symbol,
     const typet &type,
     const irep_idt &base_name,
@@ -330,7 +330,7 @@ void string_abstractiont::add_argument(
   typet final_type=is_ptr_argument(type)?
     type:pointer_typet(type);
 
-  str_args.push_back(code_typet::argumentt(final_type));
+  str_args.push_back(code_typet::parametert(final_type));
   str_args.back().location()=fct_symbol.location;
   str_args.back().set_base_name(base_name);
   str_args.back().set_identifier(identifier);
@@ -756,11 +756,11 @@ void string_abstractiont::abstract_function_call(
   code_function_callt::argumentst str_args;
 
   const symbolt &fct_symbol=ns.lookup(call.function().get(ID_identifier));
-  const code_typet::argumentst &formal_params=
-    to_code_type(fct_symbol.type).arguments();
+  const code_typet::parameterst &formal_params=
+    to_code_type(fct_symbol.type).parameters();
 
   code_function_callt::argumentst::const_iterator it1=arguments.begin();
-  for(code_typet::argumentst::const_iterator it2=formal_params.begin();
+  for(code_typet::parameterst::const_iterator it2=formal_params.begin();
       it2!=formal_params.end();
       it2++, it1++)
   {

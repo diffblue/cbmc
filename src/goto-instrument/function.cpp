@@ -49,7 +49,7 @@ code_function_callt function_to_call(
     code_typet function_type;
     function_type.return_type()=empty_typet();
     function_type.arguments().push_back(
-      code_typet::argumentt(p));
+      code_typet::parametert(p));
 
     symbolt new_symbol;
     new_symbol.name=full_id;
@@ -65,8 +65,8 @@ code_function_callt function_to_call(
   // signature is expected to be
   // (type *) -> ...
   if(s_it->second.type.id()!=ID_code ||
-     to_code_type(s_it->second.type).arguments().size()!=1 ||
-     to_code_type(s_it->second.type).arguments()[0].type().id()!=ID_pointer)
+     to_code_type(s_it->second.type).parameters().size()!=1 ||
+     to_code_type(s_it->second.type).parameters()[0].type().id()!=ID_pointer)
   {
     std::string error="function `"+id2string(id)+"' has wrong signature";
     throw error;
@@ -83,7 +83,7 @@ code_function_callt function_to_call(
     typecast_exprt(
       address_of_exprt(index_exprt(
         function_id_string, gen_zero(index_type()))),
-      to_code_type(s_it->second.type).arguments()[0].type());
+      to_code_type(s_it->second.type).parameters()[0].type());
 
   return call;
 }
