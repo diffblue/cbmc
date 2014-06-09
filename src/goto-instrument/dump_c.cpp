@@ -2940,9 +2940,12 @@ void goto2sourcet::convert_function_declaration(
   if(ignore(symbol.name))
     return;
 
-  if(symbol.name!=ID_main &&
-      symbol.name!="c::main" &&
-      symbol.name!="c::assert")
+  if(symbol.name=="c::__builtin_va_start" ||
+     symbol.name=="c::__builtin_va_end")
+    system_headers.insert("stdarg.h");
+  else if(symbol.name!=ID_main &&
+          symbol.name!="c::main" &&
+          symbol.name!="c::assert")
   {
     os_decl << "// " << symbol.name << std::endl;
     os_decl << "// " << symbol.location << std::endl;
