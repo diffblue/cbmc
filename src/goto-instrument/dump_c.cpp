@@ -3066,8 +3066,10 @@ void goto2sourcet::convert_compound(
      */
 
   os << "}";
-  if(ns.follow(type).get_bool(ID_C_transparent_union))
+  if(type.get_bool(ID_C_transparent_union))
     os << " __attribute__ ((__transparent_union__))";
+  if(type.get_bool(ID_C_packed))
+    os << " __attribute__ ((__packed__))";
   os << ";";
   os << std::endl;
   os << std::endl;
