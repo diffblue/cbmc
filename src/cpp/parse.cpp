@@ -1815,10 +1815,10 @@ bool Parser::rConstructorDecl(
   if(lex.GetToken(op)!='(')
     return false;
 
-  irept &arguments=constructor.type().add(ID_arguments);
+  irept &parameters=constructor.type().add(ID_parameters);
 
   if(lex.LookAhead(0)!=')')
-    if(!rArgDeclList(arguments))
+    if(!rArgDeclList(parameters))
       return false;
 
   Token cp;
@@ -2214,7 +2214,7 @@ bool Parser::rDeclarator(
       {
         typet function_type("function_type");
         function_type.subtype().swap(d_outer);
-        function_type.add(ID_arguments).swap(args);
+        function_type.add(ID_parameters).swap(args);
 
         // make this subtype of d_inner
         make_subtype(function_type, d_inner);
