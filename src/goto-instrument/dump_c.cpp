@@ -135,6 +135,7 @@ protected:
   loop_last_stackt loop_last_stack;
   id_sett local_static_set;
   id_sett type_names_set;
+  id_sett const_removed;
 
   void build_loop_map();
   void build_dead_map();
@@ -153,6 +154,8 @@ protected:
   void cleanup_expr(exprt &expr, bool no_typecast);
 
   void add_local_types(const typet &type);
+
+  void remove_const(typet &type);
 
   goto_programt::const_targett convert_instruction(
       goto_programt::const_targett target,
@@ -915,17 +918,8 @@ goto_programt::const_targett goto_program2codet::convert_decl(
   }
   // if we have a constant but can't initialize them right away, we need to
   // remove the const marker
-  else if(symbol.type().get_bool(ID_C_constant))
-    symbol.type().remove(ID_C_constant);
-  else if(symbol.type().id()==ID_array)
-  {
-    for(typet * t=&(symbol.type());
-        t->id()==ID_array;
-        t=&(t->subtype()))
-      if(t->subtype().id()!=ID_array &&
-          t->subtype().get_bool(ID_C_constant))
-        t->subtype().remove(ID_C_constant);
-  }
+  else
+    remove_const(symbol.type());
 
   if(move_to_dest)
     dest.move_to_operands(d);
@@ -2066,6 +2060,52 @@ void goto_program2codet::cleanup_code_block(
 
 /*******************************************************************\
 
+Function: goto_program2codet::remove_const
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
+void goto_program2codet::remove_const(typet &type)
+{
+  if(type.get_bool(ID_C_constant))
+    type.remove(ID_C_constant);
+
+  if(type.id()==ID_symbol)
+  {
+    const irep_idt &identifier=to_symbol_type(type).get_identifier();
+    if(!const_removed.insert(identifier).second)
+      return;
+
+    symbol_tablet::symbolst::iterator it=
+      symbol_table.symbols.find(identifier);
+    assert(it!=symbol_table.symbols.end());
+    assert(it->second.is_type);
+
+    remove_const(it->second.type);
+  }
+  else if(type.id()==ID_array)
+    remove_const(type.subtype());
+  else if(type.id()==ID_struct ||
+          type.id()==ID_union)
+  {
+    struct_union_typet &sut=to_struct_union_type(type);
+    struct_union_typet::componentst &c=sut.components();
+
+    for(struct_union_typet::componentst::iterator
+        it=c.begin();
+        it!=c.end();
+        ++it)
+      remove_const(it->type());
+  }
+}
+
+/*******************************************************************\
+
 Function: has_labels
 
 Inputs:
@@ -2574,7 +2614,6 @@ protected:
 
   void convert_compound_declaration(
       const symbolt &symbol,
-      std::ostream &os_decl,
       std::ostream &os_body);
   void convert_compound(
       const typet &type,
@@ -2748,10 +2787,15 @@ void goto2sourcet::operator()(std::ostream &os)
          symbol.type.id()==ID_incomplete_struct ||
          symbol.type.id()==ID_union ||
          symbol.type.id()==ID_incomplete_union))
-      convert_compound_declaration(
-          symbol,
-          os,
-          compound_body_stream);
+    {
+      if(symbol.location.get_function().empty())
+      {
+        os << "// " << symbol.name << std::endl;
+        os << "// " << symbol.location << std::endl;
+        os << type_to_string(symbol.type) << ";" << std::endl;
+        os << std::endl;
+      }
+    }
     else if(symbol.is_static_lifetime && symbol.type.id()!=ID_code)
       convert_global_variable(
           symbol,
@@ -2790,6 +2834,24 @@ void goto2sourcet::operator()(std::ostream &os)
       func_body_stream,
       local_static_decls,
       original_tags);
+  }
+
+  // (possibly modified) compound types
+  for(std::set<std::string>::const_iterator
+      it=symbols_sorted.begin();
+      it!=symbols_sorted.end();
+      ++it)
+  {
+    const symbolt &symbol=ns.lookup(*it);
+
+    if(symbol.is_type &&
+        (symbol.type.id()==ID_struct ||
+         symbol.type.id()==ID_incomplete_struct ||
+         symbol.type.id()==ID_union ||
+         symbol.type.id()==ID_incomplete_union))
+      convert_compound_declaration(
+          symbol,
+          compound_body_stream);
   }
 
   os << std::endl;
@@ -2848,7 +2910,6 @@ Purpose: declare compound types
 
 void goto2sourcet::convert_compound_declaration(
     const symbolt &symbol,
-    std::ostream &os_decl,
     std::ostream &os_body)
 {
   if(!symbol.location.get_function().empty())
@@ -2861,11 +2922,6 @@ void goto2sourcet::convert_compound_declaration(
         to_struct_union_type(symbol.type),
         true,
         os_body);
-
-  os_decl << "// " << symbol.name << std::endl;
-  os_decl << "// " << symbol.location << std::endl;
-  os_decl << type_to_string(symbol.type) << ";" << std::endl;
-  os_decl << std::endl;
 }
 
 /*******************************************************************\
