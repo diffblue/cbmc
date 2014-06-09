@@ -129,6 +129,7 @@ cpp_name
 C_id_class #id_class
 declaration
 declaration_list
+declarator
 struct
 c_bitfield
 union
@@ -407,6 +408,7 @@ initializer
 anonymous
 C_is_anonymous #is_anonymous
 is_macro
+is_enum_constant
 is_inline
 is_extern
 is_global
@@ -546,6 +548,7 @@ C_tag_only_declaration #tag_only_declaration
 struct_tag
 union_tag
 enum_tag
+enum_constant
 generate_block
 generate_case
 generate_if
