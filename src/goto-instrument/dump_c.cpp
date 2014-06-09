@@ -2692,6 +2692,7 @@ protected:
 
   void convert_function_declaration(
       const symbolt &symbol,
+      const bool skip_main,
       std::ostream &os_decl,
       std::ostream &os_body,
       local_static_declst &local_static_decls,
@@ -2882,11 +2883,9 @@ void goto2sourcet::operator()(std::ostream &os)
 
     if(symbol.type.id()!=ID_code) continue;
 
-    // don't dump artificial main
-    if(skip_function_main && symbol.name==ID_main) continue;
-
     convert_function_declaration(
       symbol,
+      skip_function_main,
       func_decl_stream,
       func_body_stream,
       local_static_decls,
@@ -3359,6 +3358,7 @@ Purpose:
 
 void goto2sourcet::convert_function_declaration(
     const symbolt& symbol,
+    const bool skip_main,
     std::ostream &os_decl,
     std::ostream &os_body,
     local_static_declst &local_static_decls,
@@ -3367,6 +3367,20 @@ void goto2sourcet::convert_function_declaration(
   const code_typet &code_type=to_code_type(symbol.type);
 
   if(ignore(symbol.name))
+    return;
+
+  // don't dump artificial main
+  if(skip_main && symbol.name==ID_main)
+    return;
+
+  // don't dump GCC builtins
+  if((symbol.location.get_file()=="gcc_builtin_headers_alpha.h" ||
+      symbol.location.get_file()=="gcc_builtin_headers_arm.h" ||
+      symbol.location.get_file()=="gcc_builtin_headers_ia32.h" ||
+      symbol.location.get_file()=="gcc_builtin_headers_mips.h" ||
+      symbol.location.get_file()=="gcc_builtin_headers_power.h" ||
+      symbol.location.get_file()=="gcc_builtin_headers_generic.h") &&
+     has_prefix(id2string(symbol.name), "c::__builtin_"))
     return;
 
   if(symbol.name=="c::__builtin_va_start" ||
