@@ -14,22 +14,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
-Function: ansi_c_declarationt::ansi_c_declarationt
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-ansi_c_declarationt::ansi_c_declarationt():exprt(ID_declaration)
-{
-}
-  
-/*******************************************************************\
-
 Function: ansi_c_declarationt::to_symbol
 
   Inputs:
