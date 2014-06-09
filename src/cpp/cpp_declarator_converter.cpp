@@ -276,9 +276,9 @@ void cpp_declarator_convertert::combine_types(
       symbol_code_type.set_inlined(true);
 
     if(decl_code_type.return_type()==symbol_code_type.return_type() &&
-       decl_code_type.arguments().size()==symbol_code_type.arguments().size())
+       decl_code_type.parameters().size()==symbol_code_type.parameters().size())
     {
-      for(unsigned i=0; i<decl_code_type.arguments().size(); i++)
+      for(unsigned i=0; i<decl_code_type.parameters().size(); i++)
       {
         const code_typet::parametert &decl_parameter=decl_code_type.parameters()[i];
         code_typet::parametert &symbol_parameter=symbol_code_type.parameters()[i];

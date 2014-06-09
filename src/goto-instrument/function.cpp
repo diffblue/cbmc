@@ -48,7 +48,7 @@ code_function_callt function_to_call(
     
     code_typet function_type;
     function_type.return_type()=empty_typet();
-    function_type.arguments().push_back(
+    function_type.parameters().push_back(
       code_typet::parametert(p));
 
     symbolt new_symbol;

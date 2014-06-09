@@ -1702,9 +1702,9 @@ void c_typecheck_baset::typecheck_expr_trinary(if_exprt &expr)
 
       if(c_type1.return_type()==c_type2.return_type())
       {
-        if(c_type1.arguments().empty() && c_type1.has_ellipsis())
+        if(c_type1.parameters().empty() && c_type1.has_ellipsis())
           implicit_typecast(operands[1], operands[2].type());
-        else if(c_type2.arguments().empty() && c_type2.has_ellipsis())
+        else if(c_type2.parameters().empty() && c_type2.has_ellipsis())
           implicit_typecast(operands[2], operands[1].type());
       }
     }
