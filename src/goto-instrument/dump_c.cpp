@@ -2929,10 +2929,10 @@ void goto2sourcet::operator()(std::ostream &os)
      << "#define FENCE(x) ((void)0)" << std::endl
      << "#endif" << std::endl;
   os << "#ifndef IEEE_FLOAT_EQUAL" << std::endl
-     << "#define IEEE_FLOAT_EQUAL(x,y) (x==y)" << std::endl
+     << "#define IEEE_FLOAT_EQUAL(x,y) ((x)==(y))" << std::endl
      << "#endif" << std::endl;
   os << "#ifndef IEEE_FLOAT_NOTEQUAL" << std::endl
-     << "#define IEEE_FLOAT_NOTEQUAL(x,y) (x!=y)" << std::endl
+     << "#define IEEE_FLOAT_NOTEQUAL(x,y) ((x)!=(y))" << std::endl
      << "#endif" << std::endl;
 
   os << std::endl;
