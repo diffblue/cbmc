@@ -14,6 +14,70 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
+Function: ansi_c_declarationt::output
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void ansi_c_declarationt::output(std::ostream &out) const
+{
+  out << "Flags:";
+  if(get_is_type()) out << " is_type";
+  if(get_is_typedef()) out << " is_typedef";
+  if(get_is_enum_constant()) out << " is_enum_constant";
+  if(get_is_static()) out << " is_static";
+  if(get_is_parameter()) out << " is_parameter";
+  if(get_is_global()) out << " is_global";
+  if(get_is_register()) out << " is_register";
+  if(get_is_thread_local()) out << " is_thread_local";
+  if(get_is_inline()) out << " is_inline";
+  if(get_is_extern()) out << " is_extern";
+  if(get_is_static_assert()) out << " is_static_assert";
+  out << "\n";
+
+  out << "Type: " << type().pretty() << "\n";
+  
+  for(declaratorst::const_iterator d_it=declarators().begin();
+      d_it!=declarators().end();
+      d_it++)
+    out << "Declarator: " << d_it->pretty() << "\n";
+}
+
+/*******************************************************************\
+
+Function: ansi_c_declarationt::full_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+typet ansi_c_declarationt::full_type(
+  const ansi_c_declaratort &declarator) const
+{
+  typet result=declarator.type();
+  typet *p=&result;
+  
+  while(p->is_not_nil())
+  {
+    assert(p->id()==ID_pointer || p->id()==ID_array);
+    p=&p->subtype();
+  }
+  
+  *p=type();
+  return result;
+}
+
+/*******************************************************************\
+
 Function: ansi_c_declarationt::to_symbol
 
   Inputs:
@@ -30,7 +94,7 @@ void ansi_c_declarationt::to_symbol(
 {
   symbol.clear();    
   symbol.value=declarator.value();
-  symbol.type=type();
+  symbol.type=full_type(declarator);
   symbol.name="c::"+id2string(declarator.get_name());
   symbol.base_name=declarator.get_base_name();
   symbol.is_type=get_is_type();
@@ -39,7 +103,7 @@ void ansi_c_declarationt::to_symbol(
   else
     symbol.location=location();
   symbol.is_extern=get_is_extern();
-  symbol.is_macro=get_is_macro();
+  symbol.is_macro=get_is_typedef() || get_is_enum_constant();
   symbol.is_parameter=get_is_parameter();
 
   bool is_code=symbol.type.id()==ID_code;

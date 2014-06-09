@@ -460,14 +460,16 @@ void ansi_c_convertt::convert_type(
         ansi_c_declarationt &declaration=
           to_ansi_c_declaration(*it);
 
+        assert(declaration.declarators().size()==1);
+
         convert_type(declaration.type());
 
-        irep_idt base_name=declaration.get_base_name();
+        irep_idt base_name=declaration.declarator().get_base_name();
 
         parameter.type().swap(declaration.type());
         parameter.set_base_name(base_name);
         parameter.location()=declaration.location();
-        parameter.set_identifier(declaration.get_name());
+        parameter.set_identifier(declaration.declarator().get_name());
 
         it->swap(parameter);
       }
@@ -512,36 +514,51 @@ void ansi_c_convertt::convert_type(
   else if(type.id()==ID_struct ||
           type.id()==ID_union)
   {
-    irept::subt &components=type.add(ID_components).get_sub();
+    struct_union_typet::componentst old_components;
+    old_components.swap(to_struct_union_type(type).components());
+    struct_union_typet::componentst &new_components=
+      to_struct_union_type(type).components();
 
-    Forall_irep(it, components)
+    for(struct_union_typet::componentst::iterator
+        it=old_components.begin();
+        it!=old_components.end();
+        it++)
     {
-      // the arguments are declarations or static assertions
-      if(it->id()==ID_declaration)
+      // the arguments are member declarations or static assertions
+      assert(it->id()==ID_declaration);
+      
+      ansi_c_declarationt &declaration=
+        to_ansi_c_declaration(static_cast<exprt &>(*it));
+        
+      if(declaration.get_is_static_assert())
       {
-        ansi_c_declarationt &component=
-          to_ansi_c_declaration(static_cast<exprt &>(*it));
-  
-        exprt new_component(ID_component);
-
-        new_component.location()=component.location();
-        new_component.set(ID_name, component.get_base_name());
-        new_component.set(ID_pretty_name, component.get_base_name());
-        new_component.type().swap(component.type());
-
-        convert_type(new_component.type());
-
-        it->swap(new_component);
-      }
-      else if(it->id()==ID_code && it->get(ID_statement)==ID_static_assert)
-      {
-        codet &assertion=static_cast<codet &>(*it);
-        assert(assertion.operands().size()==2);
-        convert_expr(assertion.op0());
-        convert_expr(assertion.op1());
+        struct_union_typet::componentt new_component;
+        new_component.id(ID_static_assert);
+        new_component.operands().swap(declaration.operands());
+        assert(new_component.operands().size()==2);
+        convert_expr(new_component.op0());
+        convert_expr(new_component.op1());
+        new_components.push_back(new_component);
       }
       else
-        assert(0);
+      {
+        for(ansi_c_declarationt::declaratorst::iterator
+            d_it=declaration.declarators().begin();
+            d_it!=declaration.declarators().end();
+            d_it++)
+        {
+          struct_union_typet::componentt new_component;
+
+          new_component.location()=d_it->location();
+          new_component.set(ID_name, d_it->get_base_name());
+          new_component.set(ID_pretty_name, d_it->get_base_name());
+          new_component.type()=declaration.full_type(*d_it);
+
+          convert_type(new_component.type());
+
+          new_components.push_back(new_component);
+        }
+      }
     }
   }
   else if(type.id()==ID_typeof)

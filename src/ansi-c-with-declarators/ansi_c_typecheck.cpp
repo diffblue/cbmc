@@ -33,6 +33,31 @@ void ansi_c_typecheckt::typecheck()
 
 /*******************************************************************\
 
+Function: ansi_c_typecheckt::typecheck_declaration
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void ansi_c_typecheckt::typecheck_declaration(
+  ansi_c_declarationt &declaration)
+{
+  for(ansi_c_declarationt::declaratorst::iterator
+      d_it=declaration.declarators().begin();
+      d_it!=declaration.declarators().end();
+      d_it++)
+  {
+    symbolt symbol;
+    
+  }
+}
+
+/*******************************************************************\
+
 Function: ansi_c_typecheck
 
   Inputs:
