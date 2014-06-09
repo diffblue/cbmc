@@ -152,7 +152,7 @@ void ansi_c_parsert::convert_declarator(
 
 /*******************************************************************\
 
-Function: ansi_c_parsert::new_declaration
+Function: ansi_c_parsert::add_declarator
 
   Inputs:
 
@@ -162,12 +162,11 @@ Function: ansi_c_parsert::new_declaration
 
 \*******************************************************************/
 
-void ansi_c_parsert::new_declaration(
-  const irept &type,
-  irept &declarator,
-  exprt &dest,
-  decl_typet decl_type)
+void ansi_c_parsert::add_declarator(
+  exprt &declaration,
+  exprt &declarator)
 {
+  #if 0
   assert(declarator.is_not_nil());
 
   exprt identifier;
@@ -242,6 +241,7 @@ void ansi_c_parsert::new_declaration(
   declaration.set_is_global(is_global);
 
   dest.swap(declaration);
+  #endif
 }
 
 /*******************************************************************\

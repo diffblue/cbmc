@@ -261,9 +261,9 @@ void c_typecheck_baset::typecheck_new_symbol(symbolt &symbol)
     {
       // we don't need the identifiers
       code_typet &code_type=to_code_type(symbol.type);
-      for(code_typet::argumentst::iterator
-          it=code_type.arguments().begin();
-          it!=code_type.arguments().end();
+      for(code_typet::parameterst::iterator
+          it=code_type.parameters().begin();
+          it!=code_type.parameters().end();
           it++)
         it->set_identifier(irep_idt());
     }
@@ -436,7 +436,7 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
     if(final_new.id()==ID_code)
     {
       err_location(new_symbol.location);
-      throw "function type not allowed for K&R function argument";
+      throw "function type not allowed for K&R function parameter";
     }
     
     // fix up old symbol -- we now got the type
@@ -515,7 +515,7 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
       // move body
       old_symbol.value.swap(new_symbol.value);
 
-      // overwrite type (because of argument names)
+      // overwrite type (because of parameter names)
       old_symbol.type=new_symbol.type;
     }
 

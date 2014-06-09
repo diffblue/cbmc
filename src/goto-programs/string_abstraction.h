@@ -148,7 +148,7 @@ protected:
       goto_functionst::goto_functiont &fct);
 
   void add_argument(
-    code_typet::argumentst &str_args,
+    code_typet::parameterst &str_args,
     const symbolt &fct_symbol,
     const typet &type,
     const irep_idt &base_name,

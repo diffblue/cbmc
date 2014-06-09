@@ -3487,11 +3487,11 @@ void smt1_convt::find_symbols_rec(
   }
   else if(type.id()==ID_code)
   {
-    const code_typet::argumentst &arguments=
-      to_code_type(type).arguments();
+    const code_typet::parameterst &parameters=
+      to_code_type(type).parameters();
 
-    for(unsigned i=0; i<arguments.size(); i++)
-      find_symbols_rec(arguments[i].type(), recstack);
+    for(unsigned i=0; i<parameters.size(); i++)
+      find_symbols_rec(parameters[i].type(), recstack);
 
     find_symbols_rec(to_code_type(type).return_type(), recstack);
   }

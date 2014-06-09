@@ -238,7 +238,7 @@ protected:
 
   void convert_argument(
     const irep_idt &mode,
-    code_typet::argumentt &argument);
+    code_typet::parametert &parameter);
 
   //
   // Misc

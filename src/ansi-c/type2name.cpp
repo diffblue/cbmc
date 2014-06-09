@@ -68,21 +68,21 @@ std::string type2name(const typet &type)
   else if(type.id()==ID_code)
   {
     const code_typet &t=to_code_type(type);
-    const code_typet::argumentst arguments=t.arguments();
+    const code_typet::parameterst parameters=t.parameters();
     result+="P(";
 
-    for(code_typet::argumentst::const_iterator
-        it=arguments.begin();
-        it!=arguments.end();
+    for(code_typet::parameterst::const_iterator
+        it=parameters.begin();
+        it!=parameters.end();
         it++)
     {      
-      if(it!=arguments.begin()) result+="|";
+      if(it!=parameters.begin()) result+="|";
       result+=type2name(it->type());
     }
 
     if(t.has_ellipsis())
     {
-      if(!arguments.empty()) result+="|";
+      if(!parameters.empty()) result+="|";
       result+="...";
     }
 

@@ -349,7 +349,7 @@ void linkingt::duplicate_non_type_symbol(
       {
         // the one with body wins!
         old_symbol.value=new_symbol.value;
-        old_symbol.type=new_symbol.type; // for argument identifiers
+        old_symbol.type=new_symbol.type; // for parameter identifiers
       }
       else if(to_code_type(old_symbol.type).get_inlined())
       {
@@ -558,15 +558,15 @@ void linkingt::inspect_src_symbol(const irep_idt &identifier)
   find_symbols_sett symbols;
   find_type_and_expr_symbols(new_symbol.value, symbols);
   find_type_and_expr_symbols(new_symbol.type, symbols);
-  // also add function arguments
+  // also add function parameters
   if(new_symbol.type.id()==ID_code)
   {
     const code_typet &code_type=to_code_type(new_symbol.type);
-    const code_typet::argumentst &arguments=code_type.arguments();
+    const code_typet::parameterst &parameters=code_type.parameters();
 
-    for(code_typet::argumentst::const_iterator
-        it=arguments.begin();
-        it!=arguments.end();
+    for(code_typet::parameterst::const_iterator
+        it=parameters.begin();
+        it!=parameters.end();
         it++)
       // identifiers for prototypes need not exist
       if(!it->get_identifier().empty() &&
@@ -584,15 +584,15 @@ void linkingt::inspect_src_symbol(const irep_idt &identifier)
   // first order of business is to apply renaming
   replace_symbol.replace(new_symbol.value);
   replace_symbol.replace(new_symbol.type);        
-  // also rename function arguments, if necessary
+  // also rename function parameters, if necessary
   if(new_symbol.type.id()==ID_code)
   {
     code_typet &code_type=to_code_type(new_symbol.type);
-    code_typet::argumentst &arguments=code_type.arguments();
+    code_typet::parameterst &parameters=code_type.parameters();
 
-    for(code_typet::argumentst::iterator
-        it=arguments.begin();
-        it!=arguments.end();
+    for(code_typet::parameterst::iterator
+        it=parameters.begin();
+        it!=parameters.end();
         it++)
     {
       replace_symbolt::expr_mapt::const_iterator r=

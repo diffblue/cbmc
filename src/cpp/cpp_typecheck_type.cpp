@@ -152,10 +152,10 @@ void cpp_typecheckt::typecheck_type(typet &type)
     code_typet &code_type=to_code_type(type);
     typecheck_type(code_type.return_type());
 
-    code_typet::argumentst &arguments=code_type.arguments();
+    code_typet::parameterst &parameters=code_type.parameters();
 
-    for(code_typet::argumentst::iterator it=arguments.begin();
-        it!=arguments.end();
+    for(code_typet::parameterst::iterator it=parameters.begin();
+        it!=parameters.end();
         it++)
     {
       typecheck_type(it->type());
@@ -244,7 +244,7 @@ void cpp_typecheckt::typecheck_type(typet &type)
   }
   else if(type.id()==ID_unassigned)
   {
-    // ignore, for template argument guessing
+    // ignore, for template parameter guessing
   }
   else if(type.id()==ID_template_class_instance)
   {

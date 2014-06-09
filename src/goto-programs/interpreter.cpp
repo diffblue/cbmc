@@ -479,15 +479,15 @@ void interpretert::execute_function_call()
     }
         
     // assign the arguments
-    const code_typet::argumentst &arguments=
-      to_code_type(f_it->second.type).arguments();
+    const code_typet::parameterst &parameters=
+      to_code_type(f_it->second.type).parameters();
 
-    if(argument_values.size()<arguments.size())
+    if(argument_values.size()<parameters.size())
       throw "not enough arguments";
 
-    for(unsigned i=0; i<arguments.size(); i++)
+    for(unsigned i=0; i<parameters.size(); i++)
     {
-      const code_typet::argumentt &a=arguments[i];
+      const code_typet::parametert &a=parameters[i];
       exprt symbol_expr(ID_symbol, a.type());
       symbol_expr.set(ID_identifier, a.get_identifier());
       assert(i<argument_values.size());

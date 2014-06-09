@@ -1583,7 +1583,7 @@ void value_sett::do_function_call(
   const symbolt &symbol=ns.lookup(function);
 
   const code_typet &type=to_code_type(symbol.type);
-  const code_typet::argumentst &argument_types=type.arguments();
+  const code_typet::parameterst &parameter_types=type.parameters();
 
   // these first need to be assigned to dummy, temporary arguments
   // and only thereafter to the actuals, in order
@@ -1601,9 +1601,9 @@ void value_sett::do_function_call(
 
   unsigned i=0;
 
-  for(code_typet::argumentst::const_iterator
-      it=argument_types.begin();
-      it!=argument_types.end();
+  for(code_typet::parameterst::const_iterator
+      it=parameter_types.begin();
+      it!=parameter_types.end();
       it++)
   {
     const irep_idt &identifier=it->get_identifier();

@@ -495,23 +495,23 @@ std::string expr2ct::convert_rec(
     // i.e., the following won't parse without declarator
     std::string dest=declarator+"(";
 
-    const code_typet::argumentst &arguments=code_type.arguments();
+    const code_typet::parameterst &parameters=code_type.parameters();
     
-    if(arguments.empty())
+    if(parameters.empty())
     {
       if(code_type.has_ellipsis())
         dest+=""; // empty!
       else
-        dest+="void"; // means 'no arguments'
+        dest+="void"; // means 'no parameters'
     }
     else
     {
-      for(code_typet::argumentst::const_iterator
-          it=arguments.begin();
-          it!=arguments.end();
+      for(code_typet::parameterst::const_iterator
+          it=parameters.begin();
+          it!=parameters.end();
           it++)
       {
-        if(it!=arguments.begin())
+        if(it!=parameters.begin())
           dest+=", ";
 
         if(it->get_identifier().empty())

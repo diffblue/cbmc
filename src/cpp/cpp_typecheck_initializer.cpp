@@ -89,9 +89,9 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
 
       const code_typet &code_type=to_code_type(symbol.type.subtype());
 
-      for(code_typet::argumentst::const_iterator
-          ait=code_type.arguments().begin();
-          ait!=code_type.arguments().end();
+      for(code_typet::parameterst::const_iterator
+          ait=code_type.parameters().begin();
+          ait!=code_type.parameters().end();
           ait++)
       {
         exprt new_object("new_object");

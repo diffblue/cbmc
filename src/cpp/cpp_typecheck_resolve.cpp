@@ -1476,24 +1476,24 @@ void cpp_typecheck_resolvet::show_identifiers(
       {
         const code_typet &code_type=to_code_type(id_expr.type());
         const typet &return_type=code_type.return_type();
-        const code_typet::argumentst &arguments=code_type.arguments();
+        const code_typet::parameterst &parameters=code_type.parameters();
         out << cpp_typecheck.to_string(return_type);
         out << " " << id << "(";
 
-        for(code_typet::argumentst::const_iterator
-            it=arguments.begin(); it!=arguments.end(); it++)
+        for(code_typet::parameterst::const_iterator
+            it=parameters.begin(); it!=parameters.end(); it++)
         {
-          const typet &argument_type=it->type();
+          const typet &parameter_type=it->type();
 
-          if(it!=arguments.begin())
+          if(it!=parameters.begin())
             out << ", ";
 
-          out << cpp_typecheck.to_string(argument_type);
+          out << cpp_typecheck.to_string(parameter_type);
         }
         
         if(code_type.has_ellipsis())
         {
-          if(!arguments.empty()) out << ", ";
+          if(!parameters.empty()) out << ", ";
           out << "...";
         }
 
@@ -2364,15 +2364,15 @@ bool cpp_typecheck_resolvet::disambiguate_functions(
     // we add one
     if(!fargs.has_object)
     {
-      const code_typet::argumentst &arguments=type.arguments();
-      const code_typet::argumentt &argument = arguments.front();
+      const code_typet::parameterst &parameters=type.parameters();
+      const code_typet::parametert &parameter = parameters.front();
 
-      assert(argument.get(ID_C_base_name)==ID_this);
+      assert(parameter.get(ID_C_base_name)==ID_this);
 
       if(type.return_type().id() == ID_constructor)
       {
         // it's a constructor
-        const typet &object_type = argument.type().subtype();
+        const typet &object_type = parameter.type().subtype();
         exprt object(ID_symbol, object_type);
         object.set(ID_C_lvalue, true);
 
@@ -2383,7 +2383,7 @@ bool cpp_typecheck_resolvet::disambiguate_functions(
       else
       {
         if(expr.type().get_bool("#is_operator") &&
-           fargs.operands.size() == arguments.size())
+           fargs.operands.size() == parameters.size())
         {
           return fargs.match(type, args_distance, cpp_typecheck);
         }

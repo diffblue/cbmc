@@ -36,14 +36,14 @@ Function: build_function_environment
 \*******************************************************************/
 
 exprt::operandst build_function_environment(
-  const code_typet::argumentst &arguments)
+  const code_typet::parameterst &parameters)
 {
   exprt::operandst result;
-  result.resize(arguments.size());
+  result.resize(parameters.size());
 
-  for(unsigned i=0; i<arguments.size(); i++)
+  for(unsigned i=0; i<parameters.size(); i++)
   {
-    result[i]=side_effect_expr_nondett(arguments[i].type());
+    result[i]=side_effect_expr_nondett(parameters[i].type());
   }
   
   return result;
@@ -289,16 +289,16 @@ bool entry_point(
   call_main.location()=symbol.location;
   call_main.function()=symbol.symbol_expr();
 
-  const code_typet::argumentst &arguments=
-    to_code_type(symbol.type).arguments();
+  const code_typet::parameterst &parameters=
+    to_code_type(symbol.type).parameters();
 
   if(symbol.name==standard_main)
   {
-    if(arguments.size()==0)
+    if(parameters.size()==0)
     {
       // ok
     }
-    else if(arguments.size()==2 || arguments.size()==3)
+    else if(parameters.size()==2 || parameters.size()==3)
     {
       namespacet ns(symbol_table);
 
@@ -334,7 +334,7 @@ bool entry_point(
         init_code.move_to_operands(assumption);
       }
       
-      if(arguments.size()==3)
+      if(parameters.size()==3)
       {        
         const symbolt &envp_size_symbol=ns.lookup("c::envp_size'");
 
@@ -404,7 +404,7 @@ bool entry_point(
         init_code.copy_to_operands(code_assignt(index_expr, null));
       }
 
-      if(arguments.size()==3)
+      if(parameters.size()==3)
       {        
         const symbolt &envp_symbol=ns.lookup("c::envp'");
         const symbolt &envp_size_symbol=ns.lookup("c::envp_size'");
@@ -433,7 +433,7 @@ bool entry_point(
       {
         exprt::operandst &operands=call_main.arguments();
 
-        if(arguments.size()==3)
+        if(parameters.size()==3)
           operands.resize(3);
         else 
           operands.resize(2);
@@ -444,7 +444,7 @@ bool entry_point(
         op0=argc_symbol.symbol_expr();
         
         {
-          const exprt &arg1=arguments[1];
+          const exprt &arg1=parameters[1];
 
           exprt index_expr(ID_index, arg1.type().subtype());
           index_expr.copy_to_operands(argv_symbol.symbol_expr(), gen_zero(index_type()));
@@ -457,12 +457,12 @@ bool entry_point(
         }
 
         // do we need envp?
-        if(arguments.size()==3)
+        if(parameters.size()==3)
         {
           const symbolt &envp_symbol=ns.lookup("c::envp'");
           exprt &op2=operands[2];
 
-          const exprt &arg2=arguments[2];
+          const exprt &arg2=parameters[2];
           
           exprt index_expr(ID_index, arg2.type().subtype());
           index_expr.copy_to_operands(
@@ -479,7 +479,7 @@ bool entry_point(
   else
   {
     // produce nondet arguments
-    call_main.arguments()=build_function_environment(arguments);
+    call_main.arguments()=build_function_environment(parameters);
   }
 
   init_code.move_to_operands(call_main);

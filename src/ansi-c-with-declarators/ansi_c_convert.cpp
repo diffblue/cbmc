@@ -60,18 +60,21 @@ void ansi_c_convertt::convert_declaration(ansi_c_declarationt &declaration)
   declaration.set_is_extern(c_storage_spec.is_extern);
   declaration.set_is_thread_local(c_storage_spec.is_thread_local);
   declaration.set_is_register(c_storage_spec.is_register);
+  // we do not overwrite is_typedef -- it's already done by the parser
 
-  // do not overwrite is_typedef -- it's done by the parser
-  // typedefs are macros
-  if(declaration.get_is_typedef())
-    declaration.set_is_macro(true);
-
-  if(declaration.value().is_not_nil())
+  // convert the values of the declarators
+  for(ansi_c_declarationt::declaratorst::iterator
+      d_it=declaration.declarators().begin();
+      d_it!=declaration.declarators().end();
+      d_it++)
   {
-    if(declaration.value().type().id()==ID_code)
-      convert_code(to_code(declaration.value()));
-    else
-      convert_expr(declaration.value());
+    if(d_it->value().is_not_nil())
+    {
+      if(d_it->value().type().id()==ID_code)
+        convert_code(to_code(d_it->value()));
+      else
+        convert_expr(d_it->value());
+    }
   }
 }
 
@@ -434,25 +437,25 @@ void ansi_c_convertt::convert_type(
     code_type.return_type().swap(type.subtype());
     type.remove(ID_subtype);
 
-    // take care of argument types
-    code_typet::argumentst &arguments=code_type.arguments();
+    // take care of parameter types
+    code_typet::parameterst &parameters=code_type.parameters();
 
     // see if we have an ellipsis
-    if(!arguments.empty() &&
-       arguments.back().id()==ID_ellipsis)
+    if(!parameters.empty() &&
+       parameters.back().id()==ID_ellipsis)
     {
       code_type.make_ellipsis();
-      arguments.pop_back();
+      parameters.pop_back();
     }
 
-    for(code_typet::argumentst::iterator
-        it=arguments.begin();
-        it!=arguments.end();
+    for(code_typet::parameterst::iterator
+        it=parameters.begin();
+        it!=parameters.end();
         it++)
     {
       if(it->id()==ID_declaration)
       {
-        code_typet::argumentt argument;
+        code_typet::parametert parameter;
 
         ansi_c_declarationt &declaration=
           to_ansi_c_declaration(*it);
@@ -461,17 +464,17 @@ void ansi_c_convertt::convert_type(
 
         irep_idt base_name=declaration.get_base_name();
 
-        argument.type().swap(declaration.type());
-        argument.set_base_name(base_name);
-        argument.location()=declaration.location();
-        argument.set_identifier(declaration.get_name());
+        parameter.type().swap(declaration.type());
+        parameter.set_base_name(base_name);
+        parameter.location()=declaration.location();
+        parameter.set_identifier(declaration.get_name());
 
-        it->swap(argument);
+        it->swap(parameter);
       }
       else if(it->id()==ID_ellipsis)
-        throw "ellipsis only allowed as last argument";
+        throw "ellipsis only allowed as last parameter";
       else
-        throw "unexpected argument: "+it->id_string();
+        throw "unexpected parameter: "+it->id_string();
     }
   }
   else if(type.id()==ID_array)

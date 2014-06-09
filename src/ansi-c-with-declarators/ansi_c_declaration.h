@@ -195,6 +195,21 @@ public:
   {
     return (declaratorst &)operands();
   }
+
+  // special case of a declaration with exactly one declarator  
+  inline const ansi_c_declaratort &declarator() const
+  {
+    assert(declarators().size()==1);
+    return declarators()[0];
+  }
+
+  inline ansi_c_declaratort &declarator()
+  {
+    assert(declarators().size()==1);
+    return declarators()[0];
+  }
+  
+  void output(std::ostream &) const;
 };
 
 extern inline ansi_c_declarationt &to_ansi_c_declaration(exprt &expr)

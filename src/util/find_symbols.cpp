@@ -228,11 +228,11 @@ void find_symbols(kindt kind, const typet &src, find_symbols_sett &dest)
   {
     const code_typet &code_type=to_code_type(src);
     find_symbols(kind, code_type.return_type(), dest);
-    const code_typet::argumentst &arguments=code_type.arguments();
+    const code_typet::parameterst &parameters=code_type.parameters();
 
-    for(code_typet::argumentst::const_iterator
-        it=arguments.begin();
-        it!=arguments.end();
+    for(code_typet::parameterst::const_iterator
+        it=parameters.begin();
+        it!=parameters.end();
         it++)
     {
       find_symbols(kind, *it, dest);
