@@ -13,9 +13,8 @@ Date: June 2006
 #include <util/symbol_table.h>
 #include <util/irep_serialization.h>
 
+#include "goto_functions.h"
 #include "read_bin_goto_object.h"
-#include "goto_function_serialization.h"
-#include "goto_program_irep.h"
 
 /*******************************************************************\
  
@@ -35,8 +34,7 @@ bool read_bin_goto_object_v2(
   symbol_tablet &symbol_table,
   goto_functionst &functions,
   message_handlert &message_handler,
-  irep_serializationt &irepconverter,
-  goto_function_serializationt &gfconverter)
+  irep_serializationt &irepconverter)
 { 
   unsigned count = irepconverter.read_long(in); // # of symbols
 
@@ -213,7 +211,6 @@ bool read_bin_goto_object(
   irep_serializationt::ireps_containert ic;
   irep_serializationt irepconverter(ic);
   //symbol_serializationt symbolconverter(ic);
-  goto_function_serializationt gfconverter(ic);
   
   {
     unsigned version=irepconverter.read_long(in);
@@ -230,8 +227,7 @@ bool read_bin_goto_object(
       return read_bin_goto_object_v2(in, filename, 
                                      symbol_table, functions, 
                                      message_handler,
-                                     irepconverter,
-                                     gfconverter); 
+                                     irepconverter);
       break;
 
     default:
