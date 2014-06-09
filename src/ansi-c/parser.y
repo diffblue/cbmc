@@ -1704,7 +1704,7 @@ parameter_type_list:
 KnR_parameter_list:
           KnR_parameter
         {
-          init($$, ID_arguments);
+          init($$, ID_parameters);
           mts($$, $1);
         }
         | KnR_parameter_list ',' KnR_parameter
@@ -1725,7 +1725,7 @@ KnR_parameter: identifier
 parameter_list:
           parameter_declaration
         {
-          init($$, ID_arguments);
+          init($$, ID_parameters);
           mts($$, $1);
         }
         | parameter_list ',' parameter_declaration
@@ -2823,7 +2823,7 @@ postfixing_abstract_declarator:
           $$=$1;
           set($$, ID_code);
           stack($$).add(ID_subtype)=irept(ID_abstract);
-          stack($$).add(ID_arguments);
+          stack($$).add(ID_parameters);
           stack($$).set(ID_C_KnR, true);
         }
         | '('
@@ -2839,10 +2839,10 @@ postfixing_abstract_declarator:
           $$=$1;
           set($$, ID_code);
           stack($$).add(ID_subtype)=irept(ID_abstract);
-          stack($$).add(ID_arguments).get_sub().
+          stack($$).add(ID_parameters).get_sub().
             swap(stack($3).add(ID_subtypes).get_sub());
           PARSER.pop_scope();
-          adjust_KnR_parameters(stack($$).add(ID_arguments), stack($5));
+          adjust_KnR_parameters(stack($$).add(ID_parameters), stack($5));
           stack($$).set(ID_C_KnR, true);
         }
         ;
@@ -2853,7 +2853,7 @@ parameter_postfixing_abstract_declarator:
         {
           $$=$1;
           set($$, ID_code);
-          stack($$).add(ID_arguments);
+          stack($$).add(ID_parameters);
           stack($$).add(ID_subtype)=irept(ID_abstract);
         }
         | '('
@@ -2868,7 +2868,7 @@ parameter_postfixing_abstract_declarator:
           $$=$1;
           set($$, ID_code);
           stack($$).add(ID_subtype)=irept(ID_abstract);
-          stack($$).add(ID_arguments).get_sub().
+          stack($$).add(ID_parameters).get_sub().
             swap(stack($3).add(ID_subtypes).get_sub());
           PARSER.pop_scope();
         }

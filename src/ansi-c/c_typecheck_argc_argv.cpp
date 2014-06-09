@@ -25,23 +25,23 @@ Function: c_typecheck_baset::add_argc_argv
 
 void c_typecheck_baset::add_argc_argv(const symbolt &main_symbol)
 {
-  const irept &arguments=
-    main_symbol.type.find(ID_arguments);
+  const code_typet::parameterst &parameters=
+    to_code_type(main_symbol.type).parameters();
 
-  if(arguments.get_sub().size()==0)
+  if(parameters.size()==0)
     return;
 
-  if(arguments.get_sub().size()!=2 &&
-     arguments.get_sub().size()!=3)
+  if(parameters.size()!=2 &&
+     parameters.size()!=3)
   {
     err_location(main_symbol.location);
-    throw "main expected to have no or two or three arguments";
+    throw "main expected to have no or two or three parameters";
   }
 
   symbolt *argc_new_symbol;
   
-  const exprt &op0=static_cast<const exprt &>(arguments.get_sub()[0]);
-  const exprt &op1=static_cast<const exprt &>(arguments.get_sub()[1]);
+  const exprt &op0=static_cast<const exprt &>(parameters[0]);
+  const exprt &op1=static_cast<const exprt &>(parameters[1]);
 
   {
     symbolt argc_symbol;
@@ -99,12 +99,12 @@ void c_typecheck_baset::add_argc_argv(const symbolt &main_symbol)
     move_symbol(argv_symbol, argv_new_symbol);
   }
   
-  if(arguments.get_sub().size()==3)
+  if(parameters.size()==3)
   {    
     symbolt envp_symbol;    
     envp_symbol.base_name="envp'";
     envp_symbol.name="c::envp'";
-    envp_symbol.type=(static_cast<const exprt&>(arguments.get_sub()[2])).type();
+    envp_symbol.type=(static_cast<const exprt&>(parameters[2])).type();
     envp_symbol.is_static_lifetime=true;
     
     symbolt envp_size_symbol, *envp_new_size_symbol;
