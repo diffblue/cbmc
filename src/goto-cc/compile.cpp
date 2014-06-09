@@ -23,7 +23,6 @@ Date: June 2006
 #include <util/file_util.h>
 #include <util/unicode.h>
 #include <util/irep_serialization.h>
-#include <util/symbol_serialization.h>
 
 #include <ansi-c/ansi_c_language.h>
 
