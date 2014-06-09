@@ -602,6 +602,8 @@ void goto_convertt::convert_expression(
   {
     clean_expr(expr, dest, false); // result _not_ used
 
+    // Any residual expression? 
+    // We keep it to add checks later.
     if(expr.is_not_nil())
     {
       codet tmp=code;
