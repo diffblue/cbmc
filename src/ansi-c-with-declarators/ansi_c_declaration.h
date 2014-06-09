@@ -184,6 +184,8 @@ public:
     const ansi_c_declaratort &,
     symbolt &symbol) const;
 
+  typet full_type(const ansi_c_declaratort &) const;
+
   typedef std::vector<ansi_c_declaratort> declaratorst;
 
   inline const declaratorst &declarators() const
