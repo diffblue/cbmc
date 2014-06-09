@@ -1195,6 +1195,8 @@ __decltype          { if(PARSER.cpp && PARSER.mode==ansi_c_parsert::GCC)
 "mode" |
 "__mode__"          { BEGIN(GCC_ATTRIBUTE3); loc(); return TOK_GCC_ATTRIBUTE_MODE; }
 
+"__gnu_inline__"    { BEGIN(GCC_ATTRIBUTE3); loc(); return TOK_GCC_ATTRIBUTE_GNU_INLINE; }
+
 {ws}                { /* ignore */ }
 {newline}           { /* ignore */ }
 {identifier}        { BEGIN(GCC_ATTRIBUTE4); }
