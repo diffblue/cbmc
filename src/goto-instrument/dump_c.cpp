@@ -2289,6 +2289,14 @@ void goto_program2codet::cleanup_expr(exprt &expr)
   }
   else if(expr.id()==ID_isnan)
     system_headers.insert("math.h");
+  else if(expr.id()==ID_constant &&
+          expr.type().id()==ID_floatbv)
+  {
+    const ieee_floatt f(to_constant_expr(expr));
+    if(f.is_NaN() || f.is_infinity())
+      system_headers.insert("math.h");
+  }
+
 }
 
 class goto2sourcet
