@@ -1958,7 +1958,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
       }
 
       // get the virtual table
-      typet this_type =  to_code_type(expr.function().type()).arguments().front().type();
+      typet this_type =  to_code_type(expr.function().type()).parameters().front().type();
       irep_idt vtable_name = this_type.subtype().get_string(ID_identifier) +"::@vtable_pointer";
 
       const struct_typet &vt_struct=
@@ -2276,14 +2276,14 @@ void cpp_typecheckt::typecheck_method_application(
   if(!expr.function().type().get_bool("#is_static"))
   {
     const code_typet &func_type=to_code_type(symbol.type);
-    typet this_type=func_type.arguments().front().type();
+    typet this_type=func_type.parameters().front().type();
 
     // Special case. Make it a reference.
     assert(this_type.id()==ID_pointer);
     this_type.set(ID_C_reference, true);
     this_type.set("#this", true);
     
-    if(expr.arguments().size()==func_type.arguments().size())
+    if(expr.arguments().size()==func_type.parameters().size())
     {
       implicit_typecast(expr.arguments().front(), this_type);
       assert(is_reference(expr.arguments().front().type()));

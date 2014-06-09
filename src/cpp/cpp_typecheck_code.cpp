@@ -214,7 +214,7 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
   {
     const code_typet &code_type=to_code_type(symbol_expr.type());
     
-    assert(code_type.arguments().size()>=1);
+    assert(code_type.parameters().size()>=1);
   
     // It's a parent. Call the constructor that we got.
     side_effect_expr_function_callt function_call;
@@ -229,7 +229,7 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
   
     make_ptr_typecast(
       this_expr,
-      code_type.arguments().front().type());
+      code_type.parameters().front().type());
 
     function_call.arguments().push_back(this_expr);
     

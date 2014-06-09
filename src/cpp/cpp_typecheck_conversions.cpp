@@ -668,7 +668,7 @@ bool cpp_typecheckt::standard_conversion_pointer_to_member(
        expr.type().subtype().id()==ID_code)
     {
       code_typet code1 = to_code_type(expr.type().subtype());
-      assert(code1.arguments().size()>0);
+      assert(code1.parameters().size()>0);
       code_typet::parametert this1 = code1.parameters()[0];
       assert(this1.get(ID_C_base_name)==ID_this);
       code1.parameters().erase(code1.parameters().begin());
@@ -1476,10 +1476,10 @@ bool cpp_typecheckt::reference_binding(
       if(!is_reference(component_type.return_type()))
         continue;
 
-      assert(component_type.arguments().size()==1);
+      assert(component_type.parameters().size()==1);
 
       typet this_type =
-        component_type.arguments().front().type();
+        component_type.parameters().front().type();
       this_type.set(ID_C_reference, true);
 
       exprt this_expr(expr);

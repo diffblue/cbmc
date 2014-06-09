@@ -206,9 +206,9 @@ symbol_exprt get_isr(
 
   symbol_exprt isr=matches.front();
   
-  if(!to_code_type(isr.type()).arguments().empty())
+  if(!to_code_type(isr.type()).parameters().empty())
     throw "interrupt handler `"+id2string(interrupt_handler)+
-          "' must not have arguments";
+          "' must not have parameters";
 
   return isr;
 }
