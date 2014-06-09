@@ -1498,7 +1498,12 @@ goto_programt::const_targett goto_program2codet::convert_goto_if(
   if(target->is_backwards_goto() ||
       (upper_bound!=goto_program.instructions.end() &&
        upper_bound->location_number < end_if->location_number))
-    return convert_goto_goto(target, dest);
+  {
+    if(!loop_last_stack.empty())
+      return convert_goto_break_continue(target, dest);
+    else
+      return convert_goto_goto(target, dest);
+  }
 
   i.cond()=not_exprt(target->guard);
   simplify(i.cond(), ns);
@@ -1541,7 +1546,29 @@ goto_programt::const_targett goto_program2codet::convert_goto_break_continue(
     codet &dest)
 {
   assert(!loop_last_stack.empty());
-  assert(target->guard.is_true());
+  const cfg_dominatorst &dominators=loops.get_dominator_info();
+
+  // goto 1
+  // 1: ...
+  goto_programt::const_targett next=target;
+  for(++next;
+      next!=goto_program.instructions.end();
+      ++next)
+  {
+    cfg_dominatorst::node_mapt::const_iterator i_entry=
+      dominators.node_map.find(next);
+    assert(i_entry!=dominators.node_map.end());
+    const cfg_dominatorst::nodet &n=i_entry->second;
+
+    if(!n.dominators.empty())
+      break;
+  }
+
+  if(target->get_target()==next)
+  {
+    dest.copy_to_operands(code_skipt());
+    return target;
+  }
 
   goto_programt::const_targett loop_end=loop_last_stack.back().first;
 
@@ -1549,12 +1576,22 @@ goto_programt::const_targett goto_program2codet::convert_goto_break_continue(
      loop_last_stack.back().second)
   {
     code_continuet cont;
-    dest.move_to_operands(cont);
+
+    if(!target->guard.is_true())
+    {
+      code_ifthenelset i;
+      i.cond()=target->guard;
+      simplify(i.cond(), ns);
+      i.then_case().swap(cont);
+
+      dest.move_to_operands(i);
+    }
+    else
+      dest.move_to_operands(cont);
 
     return target;
   }
 
-  const cfg_dominatorst &dominators=loops.get_dominator_info();
   goto_programt::const_targett after_loop=loop_end;
   for(++after_loop;
       after_loop!=goto_program.instructions.end();
@@ -1572,7 +1609,18 @@ goto_programt::const_targett goto_program2codet::convert_goto_break_continue(
   if(target->get_target()==after_loop)
   {
     code_breakt brk;
-    dest.move_to_operands(brk);
+
+    if(!target->guard.is_true())
+    {
+      code_ifthenelset i;
+      i.cond()=target->guard;
+      simplify(i.cond(), ns);
+      i.then_case().swap(brk);
+
+      dest.move_to_operands(i);
+    }
+    else
+      dest.move_to_operands(brk);
 
     return target;
   }
