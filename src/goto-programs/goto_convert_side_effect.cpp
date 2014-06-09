@@ -35,7 +35,7 @@ bool goto_convertt::has_function_call(const exprt &expr)
     if(has_function_call(*it))
       return true;
 
-  if(expr.id()==ID_sideeffect &&
+  if(expr.id()==ID_side_effect &&
      expr.get(ID_statement)==ID_function_call)
     return true;
 
@@ -393,7 +393,7 @@ void goto_convertt::remove_function_call(
 
   // get name of function, if available
 
-  if(expr.id()!=ID_sideeffect ||
+  if(expr.id()!=ID_side_effect ||
      expr.get(ID_statement)!=ID_function_call)
     throw "expected function call";
 

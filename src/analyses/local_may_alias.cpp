@@ -356,7 +356,7 @@ void local_may_aliast::get_rec(
   {
     dest.objects.insert(unknown_object);
   }
-  else if(rhs.id()==ID_sideeffect)
+  else if(rhs.id()==ID_side_effect)
   {
     const side_effect_exprt &side_effect_expr=to_side_effect_expr(rhs);
     const irep_idt &statement=side_effect_expr.get_statement();

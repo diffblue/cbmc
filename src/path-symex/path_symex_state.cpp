@@ -323,7 +323,7 @@ exprt path_symex_statet::instantiate_rec(
     tmp.op0()=instantiate_rec_address(tmp.op0(), propagate);
     return tmp;
   }
-  else if(src.id()==ID_sideeffect)
+  else if(src.id()==ID_side_effect)
   {
     // could be done separately
     const irep_idt &statement=to_side_effect_expr(src).get_statement();
