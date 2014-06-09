@@ -3287,7 +3287,7 @@ void goto2sourcet::convert_global_variable(
     return;
 
   const irep_idt &func=symbol.location.get_function();
-  if((func.empty() || symbol.is_extern) &&
+  if((func.empty() || symbol.is_extern || symbol.value.is_not_nil()) &&
       !converted.insert(symbol.name).second)
     return;
 
