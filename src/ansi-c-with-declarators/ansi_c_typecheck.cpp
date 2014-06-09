@@ -46,13 +46,20 @@ Function: ansi_c_typecheckt::typecheck_declaration
 void ansi_c_typecheckt::typecheck_declaration(
   ansi_c_declarationt &declaration)
 {
+  // first typecheck the type of the declaration
+  typecheck_type(declaration.type());
+
+  // Now do declarators, if any.
   for(ansi_c_declarationt::declaratorst::iterator
       d_it=declaration.declarators().begin();
       d_it!=declaration.declarators().end();
       d_it++)
   {
+    typecheck_type(d_it->type());
+  
     symbolt symbol;
-    
+    declaration.to_symbol(*d_it, symbol);
+    typecheck_symbol(symbol);
   }
 }
 
