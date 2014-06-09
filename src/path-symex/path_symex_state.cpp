@@ -695,7 +695,6 @@ bool path_symex_statet::is_feasible(
   // check whether SAT
   switch(decision_procedure())
   {
-  case decision_proceduret::D_TAUTOLOGY:
   case decision_proceduret::D_SATISFIABLE: return true;
   
   case decision_proceduret::D_UNSATISFIABLE: return false;
@@ -741,7 +740,6 @@ bool path_symex_statet::check_assertion(
   // check whether SAT  
   switch(decision_procedure.dec_solve())
   {
-  case decision_proceduret::D_TAUTOLOGY:
   case decision_proceduret::D_SATISFIABLE:
     return false; // error
    

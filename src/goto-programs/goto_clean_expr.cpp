@@ -199,7 +199,7 @@ void goto_convertt::clean_expr(
   //   && || ?: comma (control-dependency)
   //   function calls
   //   object constructors like arrays, string constants, structs
-  //   ++ --
+  //   ++ -- (pre and post)
   //   compound assignments
   //   compound literals
 

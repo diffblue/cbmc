@@ -149,8 +149,10 @@ hexfloat1       "0"[xX]{hexdigit}+"."{hexdigit}+[pP][+-]?{integer}
 hexfloat2       "0"[xX]{hexdigit}+"."[pP][+-]?{integer}
 hexfloat3       "0"[xX]{hexdigit}+[pP][+-]?{integer}
 float_suffix    [fFlLiIjJ]*
+gcc_ext_float_suffix    [wWqQ]|[dD][fFdDlL]?
 float		{float1}|{float2}|{float3}|{hexfloat1}|{hexfloat2}|{hexfloat3}
 float_s         {float}{float_suffix}|{integer}[fF]
+gcc_ext_float_s         {float}{gcc_ext_float_suffix}
 bitvector	{binary}[bB]
 bitvector_u	{binary}([uU][bB]|[bB][uU])
 cppstart	{ws}"#"{ws}
@@ -1090,6 +1092,17 @@ __decltype          { if(PARSER.cpp && PARSER.mode==ansi_c_parsert::GCC)
                   return TOK_INTEGER;
                 }
 
+{gcc_ext_float_s}	{ if(PARSER.mode!=ansi_c_parsert::GCC)
+                    {
+		                  yyansi_cerror("Preprocessor directive found");
+		                  return TOK_SCANNER_ERROR;
+                    }
+                  newstack(yyansi_clval); 
+                  stack(yyansi_clval)=convert_float_literal(yytext);
+                  PARSER.set_location(stack(yyansi_clval));
+		  return TOK_FLOATING;
+		}
+
 {float_s}	{ newstack(yyansi_clval); 
                   stack(yyansi_clval)=convert_float_literal(yytext);
                   PARSER.set_location(stack(yyansi_clval));
@@ -1158,7 +1171,8 @@ __decltype          { if(PARSER.cpp && PARSER.mode==ansi_c_parsert::GCC)
 }
 
 <GCC_ATTRIBUTE1>{
-"("{ws}"("      { BEGIN(GCC_ATTRIBUTE2); PARSER.parenthesis_counter=0; }
+"("{ws}"(" |
+"("{newline}"(" { BEGIN(GCC_ATTRIBUTE2); PARSER.parenthesis_counter=0; }
 {ws}            { /* ignore */ }
 {newline}       { /* ignore */ }
 .               { BEGIN(GRAMMAR); loc(); return yytext[0]; }
@@ -1180,6 +1194,8 @@ __decltype          { if(PARSER.cpp && PARSER.mode==ansi_c_parsert::GCC)
 
 "mode" |
 "__mode__"          { BEGIN(GCC_ATTRIBUTE3); loc(); return TOK_GCC_ATTRIBUTE_MODE; }
+
+"__gnu_inline__"    { BEGIN(GCC_ATTRIBUTE3); loc(); return TOK_GCC_ATTRIBUTE_GNU_INLINE; }
 
 {ws}                { /* ignore */ }
 {newline}           { /* ignore */ }

@@ -11,11 +11,15 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/message.h>
 
-#include "goto_functions.h"
+#include "goto_model.h"
 
 void link_to_library(
-  symbol_tablet &symbol_table,
-  goto_functionst &goto_functions,
-  message_handlert &message_handler);
+  symbol_tablet &,
+  goto_functionst &,
+  message_handlert &);
+
+void link_to_library(
+  goto_modelt &,
+  message_handlert &);
 
 #endif

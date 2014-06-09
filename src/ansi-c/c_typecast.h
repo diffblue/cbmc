@@ -73,7 +73,7 @@ protected:
                  LONGLONG, ULONGLONG,
                  LARGE_SIGNED_INT, LARGE_UNSIGNED_INT,
                  INTEGER, // these are unbounded integers
-                 SINGLE, DOUBLE, LONGDOUBLE, // float
+                 SINGLE, DOUBLE, LONGDOUBLE, FLOAT128, // float
                  RATIONAL, REAL, // these are infinite precision
                  COMPLEX,
                  VOIDPTR, PTR, OTHER };

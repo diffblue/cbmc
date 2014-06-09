@@ -12,3 +12,7 @@ show:
 			vim -o "$$dir/*.c" "$$dir/*.out"; \
 		fi; \
 	done;
+
+clean:
+	rm -f tests.log
+	rm -f */main.out

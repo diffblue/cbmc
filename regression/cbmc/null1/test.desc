@@ -1,9 +1,8 @@
 CORE
 main.c
---all-claims --no-simplify
+--no-simplify
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main\.1\] assertion NULL == NULL: OK$
-^\*\* 0 of 1 failed (1 iterations)$
+^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring

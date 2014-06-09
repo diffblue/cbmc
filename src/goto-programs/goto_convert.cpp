@@ -602,6 +602,8 @@ void goto_convertt::convert_expression(
   {
     clean_expr(expr, dest, false); // result _not_ used
 
+    // Any residual expression? 
+    // We keep it to add checks later.
     if(expr.is_not_nil())
     {
       codet tmp=code;
@@ -2389,6 +2391,7 @@ symbolt &goto_convertt::new_tmp_symbol(
     new_symbol.is_thread_local=true;
     new_symbol.is_file_local=true;
     new_symbol.type=type;    
+    new_symbol.location=location;
   } while(symbol_table.move(new_symbol, symbol_ptr));    
   
   tmp_symbols.push_back(symbol_ptr->name);

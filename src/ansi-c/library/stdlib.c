@@ -20,6 +20,16 @@ inline void exit(int status)
   __CPROVER_assume(0);
 }
 
+/* FUNCTION: _Exit */
+
+#undef _Exit
+
+inline void _Exit(int status)
+{
+  (void)status;
+  __CPROVER_assume(0);
+}
+
 /* FUNCTION: abort */
 
 #undef abort

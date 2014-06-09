@@ -58,6 +58,23 @@ Function: label_properties
 
 \*******************************************************************/
 
+void label_properties(goto_modelt &goto_model)
+{
+  label_properties(goto_model.goto_functions);
+}
+
+/*******************************************************************\
+
+Function: label_properties
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void label_properties(
   goto_programt &goto_program,
   std::map<irep_idt, unsigned> &property_counters)
@@ -98,6 +115,25 @@ void label_properties(goto_programt &goto_program)
 {
   std::map<irep_idt, unsigned> property_counters;
   label_properties(goto_program, property_counters);
+}
+
+/*******************************************************************\
+
+Function: set_properties
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void set_properties(
+  goto_modelt &goto_model,
+  const std::list<std::string> &properties)
+{
+  set_properties(goto_model.goto_functions, properties);
 }
 
 /*******************************************************************\
@@ -157,6 +193,23 @@ void label_properties(goto_functionst &goto_functions)
       it++)
     if(!it->second.is_inlined())
       label_properties(it->second.body, property_counters);
+}
+
+/*******************************************************************\
+
+Function: make_assertions_false
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void make_assertions_false(goto_modelt &goto_model)
+{
+  make_assertions_false(goto_model.goto_functions);
 }
 
 /*******************************************************************\

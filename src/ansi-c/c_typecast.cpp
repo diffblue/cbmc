@@ -373,6 +373,8 @@ c_typecastt::c_typet c_typecastt::get_c_type(
       return DOUBLE;
     else if(width<=config.ansi_c.long_double_width)
       return LONGDOUBLE;
+    else if(width<=128)
+      return FLOAT128;
   }
   else if(type.id()==ID_pointer)
   {
@@ -447,6 +449,7 @@ void c_typecastt::implicit_typecast_arithmetic(
   case SINGLE:     new_type=float_type(); break;
   case DOUBLE:     new_type=double_type(); break;
   case LONGDOUBLE: new_type=long_double_type(); break;
+  case FLOAT128:   new_type=ieee_float_spect::quadruple_precision().to_type(); break;
   case RATIONAL:   new_type=rational_typet(); break;
   case REAL:       new_type=real_typet(); break;
   case INTEGER:    new_type=integer_typet(); break;
@@ -516,8 +519,6 @@ void c_typecastt::implicit_typecast_followed(
   const typet &src_type,
   const typet &dest_type)
 {
-  if(dest_type.id()==ID_union)
-
   // do transparent union
   if(dest_type.id()==ID_union &&
      dest_type.get_bool(ID_C_transparent_union) &&
@@ -713,7 +714,8 @@ void c_typecastt::implicit_typecast_arithmetic(
 
     return;
   }
-  else if(max_type==SINGLE || max_type==DOUBLE || max_type==LONGDOUBLE)
+  else if(max_type==SINGLE || max_type==DOUBLE ||
+          max_type==LONGDOUBLE || max_type==FLOAT128)
   {
     // Special-case optimisation:
     // If we have two non-standard sized floats, don't do implicit type
@@ -724,7 +726,7 @@ void c_typecastt::implicit_typecast_arithmetic(
 
   implicit_typecast_arithmetic(expr1, max_type);
   implicit_typecast_arithmetic(expr2, max_type);
-  
+
   if(max_type==PTR)
   {
     if(c_type1==VOIDPTR)
