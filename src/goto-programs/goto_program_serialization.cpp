@@ -53,9 +53,8 @@ Function: goto_program_serializationt::convert
 
 void goto_program_serializationt::convert( 
   std::istream &in,
-  irept& gprep)
+  irept &gprep)
 {
   irepconverter.reference_convert(in, gprep);
   // reference is not resolved here! 
 }
-
