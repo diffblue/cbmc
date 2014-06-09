@@ -806,7 +806,11 @@ void goto_program2codet::convert_assign_rec(
         it!=components.end();
         ++it)
     {
-      if(!it->get_is_padding())
+      const bool is_zero_bit_field=
+        it->get_is_bit_field() &&
+        to_bitvector_type(ns.follow(it->type())).get_width()==0;
+
+      if(!it->get_is_padding() && !is_zero_bit_field)
       {
         member_exprt member(assign.lhs(), it->get_name(), it->type());
         convert_assign_rec(code_assignt(member, *o_it), dest);
@@ -2985,7 +2989,7 @@ void goto2sourcet::convert_compound(
     if(recursive && comp_type.id()!=ID_pointer)
       convert_compound(comp_type, recursive, os);
 
-    const irep_idt &comp_name=comp.get_name();
+    irep_idt comp_name=comp.get_name();
 
     struct_body << indent(1) << "// " << comp_name << std::endl;
     struct_body << indent(1);
@@ -2996,8 +3000,19 @@ void goto2sourcet::convert_compound(
     std::string s=make_decl(fake_unique_name, comp_type);
     assert(s.find("NO/SUCH/NS")==std::string::npos);
 
+    if(comp.get_is_bit_field() &&
+       to_bitvector_type(comp_type).get_width()==0)
+    {
+      comp_name="";
+      s=type_to_string(comp_type);
+    }
+
     if(s.find("__CPROVER_bitvector")==std::string::npos)
+    {
       struct_body << s;
+      if(comp.get_is_bit_field())
+        struct_body << " : " << to_bitvector_type(comp_type).get_width();
+    }
     else if(comp_type.id()==ID_signedbv)
     {
       const signedbv_typet &t=to_signedbv_type(comp_type);
@@ -3357,7 +3372,11 @@ void goto2sourcet::cleanup_expr(exprt &expr)
         it!=old_components.end();
         ++it)
     {
-      if(!it->get_is_padding())
+      const bool is_zero_bit_field=
+        it->get_is_bit_field() &&
+        to_bitvector_type(ns.follow(it->type())).get_width()==0;
+
+      if(!it->get_is_padding() && !is_zero_bit_field)
       {
         type.components().push_back(*it);
         expr.move_to_operands(*o_it);
