@@ -62,6 +62,7 @@ class goto_program2codet
   typedef hash_set_cont<irep_idt,irep_id_hash> id_sett;
   typedef std::map<goto_programt::const_targett, goto_programt::const_targett> loopt;
   typedef hash_map_cont<irep_idt, irep_idt, irep_id_hash> tag_mapt;
+  typedef std::multimap<irep_idt, irep_idt> r_tag_mapt;
   typedef hash_map_cont<irep_idt, unsigned, irep_id_hash> dead_mapt;
   typedef std::list<std::pair<goto_programt::const_targett, bool> >
     loop_last_stackt;
@@ -118,7 +119,7 @@ protected:
   loopt loop_map;
   id_sett labels_in_use;
   replace_symbolt replace_symbols;
-  tag_mapt reverse_tag_map;
+  r_tag_mapt reverse_tag_map;
   id_sett expanded_symbols;
   dead_mapt dead_map;
   loop_last_stackt loop_last_stack;
@@ -2105,13 +2106,7 @@ void goto_program2codet::expand_reverse_tag_map(const irep_idt identifier)
   if(entry==tag_map.end())
     return;
 
-  if(!reverse_tag_map.insert(std::make_pair(
-          entry->second, entry->first)).second)
-  {
-    // TODO - ignored for now, as the linker presently produces several
-    // symbols for the same type
-    // assert(false);
-  }
+  reverse_tag_map.insert(std::make_pair(entry->second, entry->first));
 
   const symbolt &symbol=symbol_table.lookup(identifier);
   assert(symbol.is_type);
@@ -2172,20 +2167,28 @@ void goto_program2codet::cleanup_expr(exprt &expr)
     const typet &t=expr.type();
 
     const irep_idt tag=t.get(ID_tag);
-    tag_mapt::const_iterator reverse_tag_entry=reverse_tag_map.find(tag);
+    std::pair<r_tag_mapt::const_iterator, r_tag_mapt::const_iterator>
+      reverse_tag_entry=reverse_tag_map.equal_range(tag);
 
-    if(reverse_tag_entry!=reverse_tag_map.end())
+    for( ;
+        reverse_tag_entry.first!=reverse_tag_entry.second;
+        ++reverse_tag_entry.first)
     {
-      symbol_typet new_type(reverse_tag_entry->second);
+      symbol_typet new_type(reverse_tag_entry.first->second);
+      if(base_type_eq(t, new_type, ns))
+      {
+        if(expr.id()==ID_union &&
+           ns.follow(expr.type()).get_bool(ID_C_transparent_union) !=
+           ns.follow(new_type).get_bool(ID_C_transparent_union))
+          expr.type()=new_type;
 
-      if(expr.id()==ID_union &&
-          ns.follow(expr.type()).get_bool(ID_C_transparent_union) !=
-          ns.follow(new_type).get_bool(ID_C_transparent_union))
-        expr.type()=new_type;
+        expr.make_typecast(new_type);
 
-      expr.make_typecast(new_type);
+        break;
+      }
     }
-    else
+
+    if(reverse_tag_entry.first==reverse_tag_entry.second)
     {
       std::string sym_name=id2string(tag);
       if(!t.location().get_function().empty())
