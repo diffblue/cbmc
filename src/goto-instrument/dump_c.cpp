@@ -2481,6 +2481,9 @@ void goto2sourcet::operator()(std::ostream &os)
   hash_map_cont<irep_idt, code_blockt, irep_id_hash> local_static_decls;
   hash_map_cont<irep_idt, irep_idt, irep_id_hash> original_tags;
 
+  typedef hash_map_cont<irep_idt, unsigned, irep_id_hash> unique_tagst;
+  unique_tagst unique_tags;
+
   // replace all #anon, fix $link in types, and prepare lexicographic order
   std::set<std::string> symbols_sorted;
   Forall_symbols(it, copied_symbol_table.symbols)
@@ -2488,15 +2491,15 @@ void goto2sourcet::operator()(std::ostream &os)
     irep_idt original_tag=it->second.type.get(ID_tag);
     cleanup_type(it->second.type);
 
-    std::string name_str=id2string(it->first);
+    const std::string name_str=id2string(it->first);
     if(it->second.is_type && !it->second.type.get(ID_tag).empty())
     {
       original_tags[it->first]=original_tag;
+      std::string new_tag=id2string(it->second.type.get(ID_tag));
 
       std::string::size_type link_pos=name_str.rfind("$link");
       if(link_pos!=std::string::npos)
       {
-        std::string new_tag=id2string(it->second.type.get(ID_tag));
         if(new_tag.rfind("$link")==std::string::npos)
         {
           new_tag+=name_str.substr(link_pos);
@@ -2504,6 +2507,22 @@ void goto2sourcet::operator()(std::ostream &os)
         }
         else
           assert(has_suffix(name_str, new_tag));
+      }
+
+      std::string::size_type tag_pos=new_tag.rfind("tag-");
+      if(tag_pos!=std::string::npos)
+      {
+        new_tag.erase(0, tag_pos+4);
+        it->second.type.set(ID_tag, new_tag);
+      }
+
+      std::pair<unique_tagst::iterator, bool> unique_entry=
+        unique_tags.insert(std::make_pair(it->second.type.get(ID_tag), 0));
+      if(!unique_entry.second)
+      {
+        new_tag+="$"+i2string(unique_entry.first->second);
+        it->second.type.set(ID_tag, new_tag);
+        ++(unique_entry.first->second);
       }
     }
 
