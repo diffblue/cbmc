@@ -2108,6 +2108,18 @@ std::string expr2ct::convert_constant(
       else if(src.type()==long_double_type())
         dest+="l";
     }
+    else if(dest.size()==4 &&
+            (dest[0]=='+' || dest[0]=='-'))
+    {
+      if(dest=="+inf")
+        dest="+INFINITY";
+      else if(dest=="-inf")
+        dest="-INFINITY";
+      else if(dest=="+NaN")
+        dest="+NAN";
+      else if(dest=="-NaN")
+        dest="-NAN";
+    }
   }
   else if(type.id()==ID_fixedbv)
   {
