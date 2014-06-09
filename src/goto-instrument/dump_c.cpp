@@ -2493,7 +2493,7 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
         if(!has_prefix(id2string(it->second.base_name), "nondet_")) continue;
         const code_typet &code_type=to_code_type(it->second.type);
         if(!type_eq(code_type.return_type(), expr.type(), ns)) continue;
-        if(!code_type.arguments().empty()) continue;
+        if(!code_type.parameters().empty()) continue;
         id=it->second.name;
         break;
       }

@@ -465,8 +465,8 @@ void goto_convertt::do_cpp_new(
     const typet &return_type=
       code_type.return_type();
 
-    assert(code_type.arguments().size()==1 ||
-           code_type.arguments().size()==2);
+    assert(code_type.parameters().size()==1 ||
+           code_type.parameters().size()==2);
 
     const symbolt &tmp_symbol=
       new_tmp_symbol(return_type, "new", dest, rhs.location());
@@ -494,8 +494,8 @@ void goto_convertt::do_cpp_new(
 
     const typet &return_type=code_type.return_type();
     
-    assert(code_type.arguments().size()==2 ||
-           code_type.arguments().size()==3);
+    assert(code_type.parameters().size()==2 ||
+           code_type.parameters().size()==3);
 
     const symbolt &tmp_symbol=
       new_tmp_symbol(return_type, "new", dest, rhs.location());
@@ -511,9 +511,9 @@ void goto_convertt::do_cpp_new(
     new_call.lhs()=tmp_symbol_expr;
     new_call.location()=rhs.location();
 
-    for(unsigned i=0; i<code_type.arguments().size(); i++)
-      if(new_call.arguments()[i].type()!=code_type.arguments()[i].type())
-        new_call.arguments()[i].make_typecast(code_type.arguments()[i].type());
+    for(unsigned i=0; i<code_type.parameters().size(); i++)
+      if(new_call.arguments()[i].type()!=code_type.parameters()[i].type())
+        new_call.arguments()[i].make_typecast(code_type.parameters()[i].type());
     
     convert(new_call, dest);
   }

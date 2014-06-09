@@ -48,9 +48,9 @@ code_function_callt get_destructor(
         const code_typet &code_type=to_code_type(it->type());
         
         if(code_type.return_type().id()==ID_destructor &&
-           code_type.arguments().size()==1)
+           code_type.parameters().size()==1)
         {
-          const typet &arg_type=code_type.arguments().front().type();
+          const typet &arg_type=code_type.parameters().front().type();
           
           if(arg_type.id()==ID_pointer &&
              ns.follow(arg_type.subtype())==type)
