@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <util/config.h>
 #include <linking/zero_initializer.h>
 
 #include "c_typecheck_base.h"
@@ -663,9 +664,15 @@ void c_typecheck_baset::typecheck_for(codet &code)
   // to
   //
   //   { a; for(;b;c) d; }
+  //
+  // if config.ansi_c.for_has_scope
 
-  if(code.op0().is_nil())
+  if(!config.ansi_c.for_has_scope ||
+     code.op0().is_nil())
   {
+    if(code.op0().is_not_nil())
+      typecheck_code(to_code(code.op0()));
+
     if(code.op1().is_nil())
       code.op1()=true_exprt();
     else
@@ -697,6 +704,14 @@ void c_typecheck_baset::typecheck_for(codet &code)
   {
     code_blockt code_block;
     code_block.location()=code.location();
+    if(to_code(code.op3()).get_statement()==ID_block)
+      code_block.set(
+        ID_C_end_location,
+        to_code_block(to_code(code.op3())).end_location());
+    else
+      code_block.set(
+        ID_C_end_location,
+        code.op3().location());;
 
     code_block.reserve_operands(2);
     code_block.move_to_operands(code.op0());

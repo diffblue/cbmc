@@ -514,6 +514,11 @@ void goto_convertt::convert(
   }
   else if(statement==ID_dead)
     copy(code, DEAD, dest);
+  else if(statement==ID_decl_block)
+  {
+    forall_operands(it, code)
+      convert(to_code(*it), dest);
+  }
   else
     copy(code, OTHER, dest);
 
@@ -1009,12 +1014,8 @@ void goto_convertt::convert_for(
   // z: ;                <-- break target
 
   // A;
-  code_blockt block;  
   if(code.init().is_not_nil())
-  {
-    block.copy_to_operands(code.init());
-    convert(block, dest);
-  }
+    convert(to_code(code.init()), dest);
     
   exprt cond=code.cond();
 
