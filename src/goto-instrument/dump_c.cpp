@@ -141,13 +141,15 @@ protected:
   void build_dead_map();
   void scan_for_varargs();
 
-  void cleanup_code(codet &code, const bool is_top);
+  void cleanup_code(codet &code, const irep_idt parent_stmt);
 
   void cleanup_code_block(
-      codet &code,
-      const bool is_top);
+    codet &code,
+    const irep_idt parent_stmt);
 
-  void cleanup_code_ifthenelse(codet &code);
+  void cleanup_code_ifthenelse(
+    codet &code,
+    const irep_idt parent_stmt);
 
   void expand_reverse_tag_map(const irep_idt identifier);
   void expand_reverse_tag_map(const typet &type);
@@ -287,7 +289,7 @@ void goto_program2codet::operator()()
     replace_symbols.replace(symbol.type);
   }
 
-  cleanup_code(toplevel_block, true);
+  cleanup_code(toplevel_block, ID_nil);
 }
 
 /*******************************************************************\
@@ -1052,7 +1054,13 @@ goto_programt::const_targett goto_program2codet::convert_goto_while(
   loop_last_stack.pop_back();
 
   convert_labels(loop_end, w.body());
-  if(!loop_end->guard.is_true())
+  if(loop_end->guard.is_false())
+  {
+    code_breakt brk;
+
+    w.body().move_to_operands(brk);
+  }
+  else if(!loop_end->guard.is_true())
   {
     code_ifthenelset i;
 
@@ -1079,6 +1087,26 @@ goto_programt::const_targett goto_program2codet::convert_goto_while(
     f.body().swap(w.body());
 
     f.swap(w);
+  }
+  else if(w.body().has_operands() &&
+          w.cond().is_true())
+  {
+    const codet &back=to_code(w.body().operands().back());
+
+    if(back.get_statement()==ID_break ||
+       (back.get_statement()==ID_ifthenelse &&
+        to_code_ifthenelse(back).cond().is_true() &&
+        to_code_ifthenelse(back).then_case().get_statement()==ID_break))
+    {
+      code_dowhilet d;
+
+      d.cond()=false_exprt();
+
+      w.body().operands().pop_back();
+      d.body().swap(w.body());
+
+      d.swap(w);
+    }
   }
 
   dest.move_to_operands(w);
@@ -1608,17 +1636,15 @@ goto_programt::const_targett goto_program2codet::convert_goto_break_continue(
   {
     code_breakt brk;
 
-    if(!target->guard.is_true())
-    {
-      code_ifthenelset i;
-      i.cond()=target->guard;
-      simplify(i.cond(), ns);
-      i.then_case().swap(brk);
+    code_ifthenelset i;
+    i.cond()=target->guard;
+    simplify(i.cond(), ns);
+    i.then_case().swap(brk);
 
-      dest.move_to_operands(i);
-    }
+    if(i.cond().is_true())
+      dest.move_to_operands(i.then_case());
     else
-      dest.move_to_operands(brk);
+      dest.move_to_operands(i);
 
     return target;
   }
@@ -1937,7 +1963,7 @@ Purpose:
 
 void goto_program2codet::cleanup_code(
     codet &code,
-    const bool is_top)
+    const irep_idt parent_stmt)
 {
   if(code.get_statement()==ID_decl)
   {
@@ -1958,7 +1984,7 @@ void goto_program2codet::cleanup_code(
     Forall_expr(it, operands)
     {
       if(it->id()==ID_code)
-        cleanup_code(to_code(*it), false);
+        cleanup_code(to_code(*it), code.get_statement());
       else
         cleanup_expr(*it, false);
     }
@@ -1980,9 +2006,9 @@ void goto_program2codet::cleanup_code(
     }
   }
   else if(statement==ID_block)
-    cleanup_code_block(code, is_top);
+    cleanup_code_block(code, parent_stmt);
   else if(statement==ID_ifthenelse)
-    cleanup_code_ifthenelse(code);
+    cleanup_code_ifthenelse(code, parent_stmt);
   else if(statement==ID_dowhile)
   {
     code_dowhilet &do_while=to_code_dowhile(code);
@@ -1991,6 +2017,10 @@ void goto_program2codet::cleanup_code(
     // to ensure convergence
     if(do_while.body().get_statement()==ID_skip)
       do_while.set_statement(ID_while);
+    // do stmt while(false) is just stmt
+    else if(do_while.cond().is_false() &&
+            do_while.body().get_statement()!=ID_block)
+      code=do_while.body();
   }
 }
 
@@ -2008,7 +2038,7 @@ Purpose:
 
 void goto_program2codet::cleanup_code_block(
     codet &code,
-    const bool is_top)
+    const irep_idt parent_stmt)
 {
   assert(code.get_statement()==ID_block);
 
@@ -2032,8 +2062,18 @@ void goto_program2codet::cleanup_code_block(
           break;
         }
 
+      // nested blocks with declarations become do { } while(false)
+      // to ensure the inner block is never lost
       if(has_decl)
+      {
+        code_dowhilet d;
+        d.cond()=false_exprt();
+        d.body().swap(*it);
+
+        it->swap(d);
+
         ++i;
+      }
       else
       {
         operands.insert(operands.begin()+i+1,
@@ -2046,10 +2086,10 @@ void goto_program2codet::cleanup_code_block(
       ++i;
   }
 
-  if(operands.empty() && !is_top)
+  if(operands.empty() && parent_stmt!=ID_nil)
     code=code_skipt();
   else if(operands.size()==1 &&
-          !is_top &&
+          parent_stmt!=ID_nil &&
           to_code(code.op0()).get_statement()!=ID_decl)
   {
     codet tmp;
@@ -2177,7 +2217,9 @@ Purpose:
 
 \*******************************************************************/
 
-void goto_program2codet::cleanup_code_ifthenelse(codet &code)
+void goto_program2codet::cleanup_code_ifthenelse(
+  codet &code,
+  const irep_idt parent_stmt)
 {
   code_ifthenelset &i_t_e=to_code_ifthenelse(code);
 
@@ -2228,7 +2270,7 @@ void goto_program2codet::cleanup_code_ifthenelse(codet &code)
       b.move_to_operands(then_label);
       b.move_to_operands(else_label);
       code.swap(b);
-      cleanup_code(code, false);
+      cleanup_code(code, parent_stmt);
     }
   }
 
