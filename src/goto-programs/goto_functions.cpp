@@ -28,13 +28,13 @@ void get_local_identifiers(
 {
   goto_function.body.get_decl_identifiers(dest);
   
-  const code_typet::argumentst &arguments=
-    goto_function.type.arguments();
+  const code_typet::parameterst &parameters=
+    goto_function.type.parameters();
   
-  // add arguments
-  for(code_typet::argumentst::const_iterator
-      a_it=arguments.begin();
-      a_it!=arguments.end();
+  // add parameters
+  for(code_typet::parameterst::const_iterator
+      a_it=parameters.begin();
+      a_it!=parameters.end();
       a_it++)
   {
     const irep_idt &identifier=a_it->get_identifier();

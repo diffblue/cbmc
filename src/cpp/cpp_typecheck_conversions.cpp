@@ -669,15 +669,15 @@ bool cpp_typecheckt::standard_conversion_pointer_to_member(
     {
       code_typet code1 = to_code_type(expr.type().subtype());
       assert(code1.arguments().size()>0);
-      code_typet::argumentt this1 = code1.arguments()[0];
+      code_typet::parametert this1 = code1.parameters()[0];
       assert(this1.get(ID_C_base_name)==ID_this);
-      code1.arguments().erase(code1.arguments().begin());
+      code1.parameters().erase(code1.parameters().begin());
 
       code_typet code2 = to_code_type(type.subtype());
-      assert(code2.arguments().size()>0);
-      code_typet::argumentt this2 = code2.arguments()[0];
+      assert(code2.parameters().size()>0);
+      code_typet::parametert this2 = code2.parameters()[0];
       assert(this2.get(ID_C_base_name)==ID_this);
-      code2.arguments().erase(code2.arguments().begin());
+      code2.parameters().erase(code2.parameters().begin());
 
       if(this2.type().subtype().get_bool(ID_C_constant) &&
          !this1.type().subtype().get_bool(ID_C_constant))
@@ -1061,12 +1061,12 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
 
         // TODO: ellipsis
 
-        const irept &arguments = comp_type.find(ID_arguments);
+        const irept &parameters = comp_type.find(ID_arguments);
 
-        if(arguments.get_sub().size() != 2)
+        if(parameters.get_sub().size() != 2)
           continue;
 
-        exprt curr_arg1 = static_cast<const exprt&> (arguments.get_sub()[1]);
+        exprt curr_arg1 = static_cast<const exprt&> (parameters.get_sub()[1]);
         typet arg1_type = curr_arg1.type();
 
         if(is_reference(arg1_type))

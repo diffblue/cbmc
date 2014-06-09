@@ -55,6 +55,8 @@ public:
 
 protected:
   ansi_c_parse_treet &parse_tree;
+
+  void typecheck_declaration(ansi_c_declarationt &); 
 };
 
 #endif

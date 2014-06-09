@@ -61,8 +61,6 @@ void ansi_c_parse_treet::output(std::ostream &out) const
       it!=items.end();
       it++)
   {
-    symbolt tmp;
-    it->to_symbol(tmp);
-    out << tmp;
+    it->output(out);
   }
 }

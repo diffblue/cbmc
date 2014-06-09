@@ -216,19 +216,19 @@ bool base_type_eqt::base_type_eq_rec(
   }
   else if(type1.id()==ID_code)
   {
-    const code_typet::argumentst &arguments1=
-      to_code_type(type1).arguments();
+    const code_typet::parameterst &parameters1=
+      to_code_type(type1).parameters();
 
-    const code_typet::argumentst &arguments2=
-      to_code_type(type2).arguments();
+    const code_typet::parameterst &parameters2=
+      to_code_type(type2).parameters();
     
-    if(arguments1.size()!=arguments2.size())
+    if(parameters1.size()!=parameters2.size())
       return false;
       
-    for(unsigned i=0; i<arguments1.size(); i++)
+    for(unsigned i=0; i<parameters1.size(); i++)
     {
-      const typet &subtype1=arguments1[i].type();
-      const typet &subtype2=arguments2[i].type();
+      const typet &subtype1=parameters1[i].type();
+      const typet &subtype2=parameters2[i].type();
       if(!base_type_eq_rec(subtype1, subtype2)) return false;
     }
     

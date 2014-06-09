@@ -440,8 +440,8 @@ void c_typecheck_baset::typecheck_expr_builtin_va_arg(exprt &expr)
   
   code_typet new_type;
   new_type.return_type().swap(type);
-  new_type.arguments().resize(1);
-  new_type.arguments()[0].type()=pointer_typet(empty_typet());
+  new_type.parameters().resize(1);
+  new_type.parameters()[0].type()=pointer_typet(empty_typet());
 
   assert(expr.operands().size()==1);  
   exprt arg=expr.op0();
@@ -2595,8 +2595,8 @@ void c_typecheck_baset::typecheck_function_call_arguments(
   const exprt &f_op=expr.function();
   const code_typet &code_type=to_code_type(f_op.type());
   exprt::operandst &arguments=expr.arguments();
-  const code_typet::argumentst &argument_types=
-    code_type.arguments();
+  const code_typet::parameterst &parameter_types=
+    code_type.parameters();
     
   // no. of arguments test
 
@@ -2609,22 +2609,22 @@ void c_typecheck_baset::typecheck_function_call_arguments(
     // We are generous on KnR; any number is ok.
     // We will in missing ones with "NIL".
 
-    while(argument_types.size()>arguments.size())
+    while(parameter_types.size()>arguments.size())
       arguments.push_back(nil_exprt());
   }
   else if(code_type.has_ellipsis())
   {
-    if(argument_types.size()>arguments.size())
+    if(parameter_types.size()>arguments.size())
     {
       err_location(expr);
       throw "not enough function arguments";
     }
   }
-  else if(argument_types.size()!=arguments.size())
+  else if(parameter_types.size()!=arguments.size())
   {
     err_location(expr);
     str << "wrong number of function arguments: "
-        << "expected " << argument_types.size()
+        << "expected " << parameter_types.size()
         << ", but got " << arguments.size();
     throw 0;
   }
@@ -2637,12 +2637,12 @@ void c_typecheck_baset::typecheck_function_call_arguments(
     {
       // ignore
     }
-    else if(i<argument_types.size())
+    else if(i<parameter_types.size())
     {
-      const code_typet::argumentt &argument_type=
-        argument_types[i];
+      const code_typet::parametert &parameter_type=
+        parameter_types[i];
 
-      const typet &op_type=argument_type.type();
+      const typet &op_type=parameter_type.type();
 
       if(op_type.id()==ID_bool &&
          op.id()==ID_sideeffect &&

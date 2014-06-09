@@ -339,10 +339,10 @@ std::string expr2cppt::convert_rec(
       const typet& return_type = code_type.return_type();
       dest = convert_rec(return_type, c_qualifierst(), "") +" " + dest;
 
-      const code_typet::argumentst &args = code_type.arguments();
+      const code_typet::parameterst &args = code_type.parameters();
       dest += "(";
 
-      for(code_typet::argumentst::const_iterator it=args.begin();
+      for(code_typet::parameterst::const_iterator it=args.begin();
           it!=args.end();
           ++it)
       {
@@ -372,14 +372,14 @@ std::string expr2cppt::convert_rec(
     std::string dest="auto ";
 
     dest+="(";
-    const code_typet::argumentst &arguments=code_type.arguments();
+    const code_typet::parameterst &parameters=code_type.parameters();
 
-    for(code_typet::argumentst::const_iterator
-        it=arguments.begin();
-        it!=arguments.end();
+    for(code_typet::parameterst::const_iterator
+        it=parameters.begin();
+        it!=parameters.end();
         it++)
     {
-      if(it!=arguments.begin())
+      if(it!=parameters.begin())
         dest+=", ";
 
       dest+=convert(it->type());
@@ -387,7 +387,7 @@ std::string expr2cppt::convert_rec(
     
     if(code_type.has_ellipsis())
     {
-      if(!arguments.empty()) dest+=", ";
+      if(!parameters.empty()) dest+=", ";
       dest+="...";
     }
 

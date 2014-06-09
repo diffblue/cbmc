@@ -512,8 +512,8 @@ void cpp_typecheckt::typecheck_compound_declarator(
         {
           is_virtual=true;
           const code_typet& code_type = to_code_type(it->type());
-          assert(code_type.arguments().size()>0);
-          const typet& pointer_type = code_type.arguments()[0].type();
+          assert(code_type.parameters().size()>0);
+          const typet& pointer_type = code_type.parameters()[0].type();
           assert(pointer_type.id() == ID_pointer);
           virtual_bases.insert(pointer_type.subtype().get(ID_identifier));
         }
@@ -633,14 +633,14 @@ void cpp_typecheckt::typecheck_compound_declarator(
 
         // change the type of the 'this' pointer
         code_typet& code_type = to_code_type(func_symb.type);
-        code_typet::argumentt& arg= code_type.arguments().front();
+        code_typet::parametert& arg= code_type.parameters().front();
         arg.type().subtype().set(ID_identifier, virtual_base);
 
-        // create symbols for the arguments
-        code_typet::argumentst& args =  code_type.arguments();
+        // create symbols for the parameters
+        code_typet::parameterst& args =  code_type.parameters();
         for(unsigned i=0; i<args.size(); i++)
         {
-          code_typet::argumentt& arg = args[i];
+          code_typet::parametert& arg = args[i];
           irep_idt base_name = arg.get_base_name();
 
           if(base_name==irep_idt())
@@ -656,13 +656,13 @@ void cpp_typecheckt::typecheck_compound_declarator(
 
           arg.set(ID_C_identifier, arg_symb.name);
 
-          // add the argument to the symbol table
+          // add the parameter to the symbol table
           bool failed = symbol_table.move(arg_symb);
           assert(!failed);
         }
 
         // do the body of the function
-        typecast_exprt late_cast(to_code_type(component.type()).arguments()[0].type());
+        typecast_exprt late_cast(to_code_type(component.type()).parameters()[0].type());
 
         late_cast.op0()=
           namespacet(symbol_table).lookup(
@@ -1454,24 +1454,24 @@ void cpp_typecheckt::adjust_method_type(
   typet &type,
   const typet &method_qualifier)
 {
-  irept &arguments=type.add(ID_arguments);
+  irept &parameters=type.add(ID_arguments);
 
-  arguments.get_sub().insert(arguments.get_sub().begin(), irept(ID_argument));
+  parameters.get_sub().insert(parameters.get_sub().begin(), irept(ID_argument));
 
-  exprt &argument=static_cast<exprt &>(arguments.get_sub().front());
-  argument.type()=typet(ID_pointer);
+  exprt &parameter=static_cast<exprt &>(parameters.get_sub().front());
+  parameter.type()=typet(ID_pointer);
 
-  argument.type().subtype()=typet(ID_symbol);
-  argument.type().subtype().set(ID_identifier, compound_symbol);
+  parameter.type().subtype()=typet(ID_symbol);
+  parameter.type().subtype().set(ID_identifier, compound_symbol);
 
-  argument.set(ID_C_identifier, ID_this);
-  argument.set(ID_C_base_name, ID_this);
+  parameter.set(ID_C_identifier, ID_this);
+  parameter.set(ID_C_base_name, ID_this);
 
   if(has_const(method_qualifier))
-    argument.type().subtype().set(ID_C_constant, true);
+    parameter.type().subtype().set(ID_C_constant, true);
   
   if(has_volatile(method_qualifier))
-    argument.type().subtype().set(ID_C_volatile, true);
+    parameter.type().subtype().set(ID_C_volatile, true);
 }
 
 /*******************************************************************\
