@@ -17,6 +17,34 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
+Function: map_bv
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bvt map_bv(const endianness_mapt &map, const bvt &src)
+{
+  // don't do anything for a byte or less
+  if(src.size()<=8) return src;
+
+  assert(map.size()*8==src.size());
+
+  bvt result;
+  result.resize(src.size(), const_literal(false));
+  
+  for(unsigned i=0; i<src.size(); i++)
+    result[i]=src[map.map_bit(i)];
+  
+  return result;
+}
+
+/*******************************************************************\
+
 Function: boolbvt::convert_byte_extract
 
   Inputs:
@@ -59,104 +87,99 @@ void boolbvt::convert_byte_extract(const exprt &expr, bvt &bv)
 
   // first do op0
   
-  const bvt &op0_bv=convert_bv(op0);
-  
+  endianness_mapt op0_map(op0.type(), little_endian, ns);
+  const bvt op0_bv=map_bv(op0_map, convert_bv(op0));
+
+  // do result
+  endianness_mapt result_map(expr.type(), little_endian, ns);
+  bv.resize(width);
+
   // see if the byte number is constant
+  unsigned byte_width=8;
 
   mp_integer index;
   if(!to_integer(op1, index))
   {
-    bv.resize(width);
-    
-    unsigned byte_width=8;
     mp_integer offset=index*byte_width;
     
-    endianness_mapt op0_map(op0.type(), little_endian, ns);
-    endianness_mapt bv_map(expr.type(), little_endian, ns);
-
-    assert(width==byte_width*bv_map.size());
-
     unsigned offset_i=integer2unsigned(offset);
 
     for(unsigned i=0; i<width; i++)
-      // out of bounds
+      // out of bounds?
       if(offset<0 || offset_i+i>=op0_bv.size())
         bv[i]=prop.new_variable();
       else
-        bv[bv_map.map_bit(i)]=
-          op0_bv[op0_map.map_bit(offset_i+i)];
-    
-    return;
-  }
-
-  unsigned byte_width=8;
-  unsigned bytes=op0_bv.size()/byte_width;
-  
-  if(prop.has_set_to())
-  {
-    // free variables
-
-    bv.resize(width);
-    for(unsigned i=0; i<width; i++)
-      bv[i]=prop.new_variable();
-
-    // add implications
-
-    equal_exprt equality;
-    equality.lhs()=op1; // index operand
-
-    typet constant_type=op1.type(); // type of index operand
-
-    bvt equal_bv;
-    equal_bv.resize(width);
-
-    for(unsigned i=0; i<bytes; i++)
-    {
-      equality.rhs()=from_integer(i, constant_type);
-
-      unsigned offset=i*byte_width;
-
-      for(unsigned j=0; j<width; j++)
-        if(offset+j<op0_bv.size())
-          equal_bv[j]=prop.lequal(bv[j], op0_bv[offset+j]);
-        else
-          equal_bv[j]=const_literal(true);
-
-      prop.l_set_to_true(
-        prop.limplies(convert(equality), prop.land(equal_bv)));
-    }
+        bv[i]=op0_bv[offset_i+i];
   }
   else
   {
-    bv.resize(width);
-
-    equal_exprt equality;
-    equality.lhs()=op1; // index operand
-
-    typet constant_type(op1.type()); // type of index operand
+    unsigned bytes=op0_bv.size()/byte_width;
     
-    for(unsigned i=0; i<bytes; i++)
+    if(prop.has_set_to())
     {
-      equality.rhs()=from_integer(i, constant_type);
-        
-      literalt e=convert(equality);
+      // free variables
+      for(unsigned i=0; i<width; i++)
+        bv[i]=prop.new_variable();
 
-      unsigned offset=i*byte_width;
+      // add implications
 
-      for(unsigned j=0; j<width; j++)
+      equal_exprt equality;
+      equality.lhs()=op1; // index operand
+
+      typet constant_type=op1.type(); // type of index operand
+
+      bvt equal_bv;
+      equal_bv.resize(width);
+
+      for(unsigned i=0; i<bytes; i++)
       {
-        literalt l;
-        
-        if(offset+j<op0_bv.size())
-          l=op0_bv[offset+j];
-        else
-          l=const_literal(false);
+        equality.rhs()=from_integer(i, constant_type);
 
-        if(i==0)
-          bv[j]=l;
-        else
-          bv[j]=prop.lselect(e, l, bv[j]);
+        unsigned offset=i*byte_width;
+
+        for(unsigned j=0; j<width; j++)
+          if(offset+j<op0_bv.size())
+            equal_bv[j]=prop.lequal(bv[j], op0_bv[offset+j]);
+          else
+            equal_bv[j]=const_literal(true);
+
+        prop.l_set_to_true(
+          prop.limplies(convert(equality), prop.land(equal_bv)));
       }
-    }    
+    }
+    else
+    {
+      equal_exprt equality;
+      equality.lhs()=op1; // index operand
+
+      typet constant_type(op1.type()); // type of index operand
+      
+      for(unsigned i=0; i<bytes; i++)
+      {
+        equality.rhs()=from_integer(i, constant_type);
+          
+        literalt e=convert(equality);
+
+        unsigned offset=i*byte_width;
+
+        for(unsigned j=0; j<width; j++)
+        {
+          literalt l;
+          
+          if(offset+j<op0_bv.size())
+            l=op0_bv[offset+j];
+          else
+            l=const_literal(false);
+
+          if(i==0)
+            bv[j]=l;
+          else
+            bv[j]=prop.lselect(e, l, bv[j]);
+        }
+      }    
+    }
   }
+
+  // shuffle the result
+  bv=map_bv(result_map, bv);
 }

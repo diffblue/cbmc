@@ -91,6 +91,8 @@ const char *ld_options_with_argument[]=
   "--version-exports-section",
   "--dynamic-list",
   "--wrap",
+  "--hash-style",
+  "-z",
   "--verbosity", // non-ld
   "--arch", // Apple only
   "--ios_version_min", // Apple only
@@ -224,6 +226,9 @@ const char *ld_options_without_argument[]=
   "--warn-unresolved-symbols",
   "--error-unresolved-symbols",
   "--whole-archive",
+  "--build-id",
+  "--eh-frame-hdr",
+  "--enable-new-dtags",
   "--dylib", // Apple only
   "--dylinker", // Apple only
   "--bundle", // Apple only
@@ -249,7 +254,6 @@ bool ld_cmdlinet::parse(int argc, const char **argv)
     // file?
     if(argv_i=="-" || !has_prefix(argv_i, "-"))
     {
-      args.push_back(argv_i);
       add_infile_arg(argv_i);
       continue;
     }    

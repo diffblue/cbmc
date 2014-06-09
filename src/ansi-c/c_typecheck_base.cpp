@@ -487,6 +487,9 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
            (config.ansi_c.mode==configt::ansi_ct::MODE_GCC_C ||
             config.ansi_c.mode==configt::ansi_ct::MODE_ARM_C_CPP))
         {
+          // overwrite "extern inline" properties
+          old_symbol.is_extern=new_symbol.is_extern;
+          old_symbol.is_file_local=new_symbol.is_file_local;
         }
         else
         {
@@ -496,6 +499,12 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
           error();
           throw 0;
         }
+      }
+      else if(inlined)
+      {
+        // preserve "extern inline" properties
+        old_symbol.is_extern=new_symbol.is_extern;
+        old_symbol.is_file_local=new_symbol.is_file_local;
       }
 
       typecheck_function_body(new_symbol);

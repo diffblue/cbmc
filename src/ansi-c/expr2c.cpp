@@ -32,6 +32,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/lispexpr.h>
 #include <util/symbol.h>
 #include <util/suffix.h>
+#include <util/find_symbols.h>
 
 #include "expr2c.h"
 #include "c_types.h"
@@ -60,15 +61,14 @@ Function: expr2ct::id_shorthand
 
 \*******************************************************************/
 
-std::string expr2ct::id_shorthand(const exprt &expr) const
+irep_idt expr2ct::id_shorthand(const irep_idt &identifier) const
 {
-  const irep_idt &identifier=expr.get(ID_identifier);
   const symbolt *symbol;
 
   if(!ns.lookup(identifier, symbol) &&
      !symbol->base_name.empty() &&
       has_suffix(id2string(identifier), id2string(symbol->base_name)))
-    return id2string(symbol->base_name);
+    return symbol->base_name;
 
   std::string sh=id2string(identifier);
 
@@ -81,7 +81,7 @@ std::string expr2ct::id_shorthand(const exprt &expr) const
 
 /*******************************************************************\
 
-Function: expr2ct::get_symbols
+Function: clean_identifier
 
   Inputs:
 
@@ -91,13 +91,29 @@ Function: expr2ct::get_symbols
 
 \*******************************************************************/
 
-void expr2ct::get_symbols(const exprt &expr)
+static std::string clean_identifier(const irep_idt &id)
 {
-  if(expr.id()==ID_symbol)
-    symbols.insert(expr);
+  std::string dest=id2string(id);
 
-  forall_operands(it, expr)
-    get_symbols(*it);
+  if(has_prefix(dest, "c::"))
+    dest.erase(0,3);
+
+  std::string::size_type c_pos=dest.find("::");
+  if(c_pos!=std::string::npos &&
+     dest.rfind("::")==c_pos)
+    dest.erase(0, c_pos+2);
+  else if(c_pos!=std::string::npos)
+  {
+    for(std::string::iterator it2=dest.begin();
+        it2!=dest.end();
+        ++it2)
+      if(*it2==':')
+        *it2='$';
+      else if(*it2=='-')
+        *it2='_';
+  }
+
+  return dest;
 }
 
 /*******************************************************************\
@@ -114,25 +130,63 @@ Function: expr2ct::get_shorthands
 
 void expr2ct::get_shorthands(const exprt &expr)
 {
-  get_symbols(expr);
+  find_symbols_sett symbols;
+  find_symbols(expr, symbols);
 
-  for(std::set<exprt>::const_iterator it=
-      symbols.begin();
+  // avoid renaming parameters
+  for(find_symbols_sett::const_iterator
+      it=symbols.begin();
       it!=symbols.end();
       it++)
   {
-    std::string sh=id_shorthand(*it);
+    const symbolt *symbol;
+    bool is_param=!ns.lookup(*it, symbol) && symbol->is_parameter;
 
-    std::pair<std::map<irep_idt, exprt>::iterator, bool> result=
-      shorthands.insert(
-        std::pair<irep_idt, exprt>(sh, *it));
+    if(!is_param) continue;
 
-    if(!result.second)
-      if(result.first->second!=*it)
-      {
-        ns_collision.insert(it->get(ID_identifier));
-        ns_collision.insert(result.first->second.get(ID_identifier));
-      }
+    irep_idt sh=id_shorthand(*it);
+
+    ns_collision[symbol->location.get_function()].insert(sh);
+
+    if(!shorthands.insert(std::make_pair(*it, sh)).second)
+      assert(false);
+  }
+
+  for(find_symbols_sett::const_iterator
+      it=symbols.begin();
+      it!=symbols.end();
+      it++)
+  {
+    if(shorthands.find(*it)!=shorthands.end())
+      continue;
+
+    irep_idt sh=id_shorthand(*it);
+
+    bool has_collision=
+      ns_collision[irep_idt()].find(sh)!=
+      ns_collision[irep_idt()].end();
+
+    if(!has_collision)
+    {
+      const symbolt *symbol;
+      has_collision=!ns.lookup("c::"+id2string(sh), symbol);
+    }
+
+    if(!has_collision)
+    {
+      irep_idt func;
+
+      const symbolt *symbol;
+      if(!ns.lookup(*it, symbol))
+        func=symbol->location.get_function();
+
+      has_collision=!ns_collision[func].insert(sh).second;
+    }
+
+    if(has_collision)
+      sh=clean_identifier(*it);
+
+    shorthands.insert(std::make_pair(*it, sh));
   }
 }
 
@@ -526,11 +580,11 @@ std::string expr2ct::convert_rec(
       dest+="df";
     else
     {
-      dest="VECTOR(";
+      const std::string subtype=convert(vector_type.subtype());
+      dest=subtype;
+      dest+=" __attribute__((vector_size (";
       dest+=convert(vector_type.size());
-      dest+=", ";
-      dest+=convert(vector_type.subtype());
-      dest+=")";
+      dest+="*sizeof("+subtype+"))))";
     }
 
     return q+dest+d;
@@ -954,9 +1008,13 @@ std::string expr2ct::convert_unary(
   std::string op=convert(src.op0(), p);
 
   std::string dest=symbol;
-  if(precedence>=p) dest+='(';
+  if(precedence>=p ||
+     (!symbol.empty() && has_prefix(op, symbol)))
+    dest+='(';
   dest+=op;
-  if(precedence>=p) dest+=')';
+  if(precedence>=p ||
+     (!symbol.empty() && has_prefix(op, symbol)))
+    dest+=')';
 
   return dest;
 }
@@ -1222,6 +1280,18 @@ std::string expr2ct::convert_complex(
   const exprt &src,
   unsigned precedence)
 {
+  if(src.operands().size()==2 &&
+     src.op0().is_zero() &&
+     src.op1().id()==ID_constant)
+  {
+    const irep_idt &cformat=src.op1().get(ID_C_cformat);
+
+    if(!cformat.empty())
+      return id2string(cformat);
+    else
+      return convert(src.op1(), precedence)+"i";
+  }
+
   // ISO C11 offers:
   // double complex CMPLX(double x, double y);
   // float complex CMPLXF(float x, float y);
@@ -1730,26 +1800,23 @@ std::string expr2ct::convert_symbol(
   const irep_idt &id=src.get(ID_identifier);
   std::string dest;
 
-  if(ns_collision.find(id)==ns_collision.end())
-    dest=id_shorthand(src);
-  else if(src.operands().size()==1 &&
-        src.op0().id()==ID_predicate_passive_symbol)
+  if(src.operands().size()==1 &&
+     src.op0().id()==ID_predicate_passive_symbol)
     dest=src.op0().get_string(ID_identifier);
   else
   {
-    dest=id2string(id);
-    if(has_prefix(dest, "c::"))
-      dest.erase(0,3);
-    std::string::size_type c_pos=dest.find("::");
-    if(c_pos!=std::string::npos &&
-        dest.rfind("::")==c_pos)
-      dest.erase(0, c_pos+2);
-    else if(c_pos!=std::string::npos)
-      for(std::string::iterator it=dest.begin();
-          it!=dest.end();
-          ++it)
-        if(*it==':')
-          *it='$';
+    hash_map_cont<irep_idt, irep_idt, irep_id_hash>::const_iterator
+      entry=shorthands.find(id);
+    // we might be called from conversion of a type
+    if(entry==shorthands.end())
+    {
+      get_shorthands(src);
+
+      entry=shorthands.find(id);
+      assert(entry!=shorthands.end());
+    }
+
+    dest=id2string(entry->second);
   }
 
   if(src.id()==ID_next_symbol)
@@ -2040,6 +2107,18 @@ std::string expr2ct::convert_constant(
         dest+=""; // ANSI-C: double is default
       else if(src.type()==long_double_type())
         dest+="l";
+    }
+    else if(dest.size()==4 &&
+            (dest[0]=='+' || dest[0]=='-'))
+    {
+      if(dest=="+inf")
+        dest="+INFINITY";
+      else if(dest=="-inf")
+        dest="-INFINITY";
+      else if(dest=="+NaN")
+        dest="+NAN";
+      else if(dest=="-NaN")
+        dest="-NAN";
     }
   }
   else if(type.id()==ID_fixedbv)
@@ -2364,7 +2443,7 @@ std::string expr2ct::convert_array(
       case '\r': dest+="\\r"; break; /* CR (0x0d) */
       case '\f': dest+="\\f"; break; /* FF (0x0c) */
       case '\a': dest+="\\a"; break; /* BEL (0x07) */
-      case '\\': dest+="\\"; break;
+      case '\\': dest+="\\\\"; break;
       case '"': dest+="\\\""; break;
       
       default:
@@ -2866,7 +2945,7 @@ std::string expr2ct::convert_code_goto(
 {
   std:: string dest=indent_str(indent);
   dest+="goto ";
-  dest+=src.get_string(ID_destination);
+  dest+=clean_identifier(src.get(ID_destination));
   dest+=";";
 
   return dest;
@@ -3001,10 +3080,18 @@ std::string expr2ct::convert_code_decl(
   std::string dest=indent_str(indent);
 
   const symbolt *symbol=0;
-  if(!ns.lookup(to_symbol_expr(src.op0()).get_identifier(), symbol) &&
-      symbol->is_file_local &&
-      (src.op0().type().id()==ID_code || symbol->is_static_lifetime))
-    dest+="static ";
+  if(!ns.lookup(to_symbol_expr(src.op0()).get_identifier(), symbol))
+  {
+    if(symbol->is_file_local &&
+       (src.op0().type().id()==ID_code || symbol->is_static_lifetime))
+      dest+="static ";
+    else if(symbol->is_extern)
+      dest+="extern ";
+
+    if(symbol->type.id()==ID_code &&
+       to_code_type(symbol->type).get_inlined())
+      dest+="inline ";
+  }
 
   dest+=convert_rec(src.op0().type(), c_qualifierst(), declarator);
 
@@ -3154,7 +3241,9 @@ std::string expr2ct::convert_code_expression(
     expr_str=convert_norep(src, precedence);
   }
 
-  dest+=expr_str+";";
+  dest+=expr_str;
+  if(dest.empty() || *dest.rbegin()!=';') dest+=';';
+
   return dest;
 }
 
@@ -3705,7 +3794,7 @@ std::string expr2ct::convert_code_label(
   
   labels_string+="\n";
   labels_string+=indent_str(indent);
-  labels_string+=name2string(label);
+  labels_string+=clean_identifier(label);
   labels_string+=":\n";
 
   std::string tmp=convert_code(src.code(), indent+2);

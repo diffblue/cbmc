@@ -1,4 +1,4 @@
-void * malloc(unsigned);
+void *malloc(__CPROVER_size_t);
 
 int main(int argc, char* argv[]) {
   unsigned short len;

@@ -1,4 +1,4 @@
-void *malloc(unsigned size);
+void *malloc(__CPROVER_size_t size);
 
 struct S {
   int (* func) ();

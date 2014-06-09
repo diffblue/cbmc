@@ -95,7 +95,7 @@ protected:
   
   void remove_side_effect(side_effect_exprt &expr, goto_programt &dest, bool result_is_used);
   void remove_assignment(side_effect_exprt &expr, goto_programt &dest, bool result_is_used);
-  void remove_pre(side_effect_exprt &expr, goto_programt &dest);
+  void remove_pre(side_effect_exprt &expr, goto_programt &dest, bool result_is_used);
   void remove_post(side_effect_exprt &expr, goto_programt &dest, bool result_is_used);
   void remove_function_call(side_effect_exprt &expr, goto_programt &dest, bool result_is_used);
   void remove_cpp_new(side_effect_exprt &expr, goto_programt &dest, bool result_is_used);

@@ -28,6 +28,25 @@ Function: show_loop_ids
 
 void show_loop_ids(
   ui_message_handlert::uit ui,
+  const goto_modelt &goto_model)
+{
+  show_loop_ids(ui, goto_model.goto_functions);
+}
+
+/*******************************************************************\
+
+Function: show_loop_ids
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void show_loop_ids(
+  ui_message_handlert::uit ui,
   const goto_programt &goto_program)
 {
   for(goto_programt::instructionst::const_iterator

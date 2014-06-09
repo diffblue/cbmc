@@ -368,7 +368,7 @@ void goto_inlinet::expand_function_call(
     replace_return(tmp2, lhs, constrain);
 
     goto_programt tmp;
-    parameter_assignments(tmp2.instructions.front().location, identifier, f.type, arguments, tmp);
+    parameter_assignments(target->location, identifier, f.type, arguments, tmp);
     tmp.destructive_append(tmp2);
 
     if(f.type.get_bool("#hide"))

@@ -10,6 +10,7 @@ verilogbv
 floatbv
 fixedbv
 C_location #location
+C_source_loc #source_loc
 C_end_location #end_location
 C_is_padding #is_padding
 is_bit_field
@@ -376,6 +377,7 @@ C_qualifier #qualifier
 C_ptr32 #ptr32
 C_ptr64 #ptr64
 C_atomic #atomic
+C_noreturn #noreturn
 restrict
 byte_extract_big_endian
 byte_extract_little_endian

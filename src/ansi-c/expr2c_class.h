@@ -9,8 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_EXPR2C_CLASS_H
 #define CPROVER_EXPR2C_CLASS_H
 
-#include <set>
-#include <map>
+#include <string>
 
 #include <util/expr.h>
 #include <util/std_code.h>
@@ -40,13 +39,14 @@ protected:
 
   static std::string indent_str(unsigned indent);
 
-  std::set<exprt> symbols;
-  std::map<irep_idt, exprt> shorthands;
-  std::set<irep_idt> ns_collision;
+  hash_map_cont<irep_idt,
+                hash_set_cont<irep_idt, irep_id_hash>,
+                irep_id_hash> ns_collision;
+  hash_map_cont<irep_idt, irep_idt, irep_id_hash> shorthands;
+
   unsigned sizeof_nesting;
 
-  void get_symbols(const exprt &expr);
-  std::string id_shorthand(const exprt &expr) const;
+  irep_idt id_shorthand(const irep_idt &identifier) const;
 
   std::string convert_typecast(
     const typecast_exprt &src, unsigned &precedence);

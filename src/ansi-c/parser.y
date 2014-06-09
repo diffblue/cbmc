@@ -124,6 +124,7 @@ extern char *yyansi_ctext;
 %token TOK_GCC_ATTRIBUTE_PACKED "packed"
 %token TOK_GCC_ATTRIBUTE_VECTOR_SIZE "vector_size"
 %token TOK_GCC_ATTRIBUTE_MODE "mode"
+%token TOK_GCC_ATTRIBUTE_GNU_INLINE "__gnu_inline__"
 %token TOK_GCC_ATTRIBUTE_END ")"
 %token TOK_GCC_LABEL   "__label__"
 %token TOK_MSC_ASM     "__asm"
@@ -1410,6 +1411,8 @@ gcc_type_attribute:
         { $$=$1; set($$, ID_aligned); stack($$).set(ID_size, stack($3)); }
         | TOK_GCC_ATTRIBUTE_MODE '(' identifier ')' TOK_GCC_ATTRIBUTE_END
         { $$=$1; set($$, ID_gcc_attribute_mode); stack($$).set(ID_size, stack($3).get(ID_identifier)); }
+        | TOK_GCC_ATTRIBUTE_GNU_INLINE TOK_GCC_ATTRIBUTE_END
+        { $$=$1; set($$, ID_static); } /* GCC extern inline - cleanup in ansi_c_declarationt::to_symbol */
         ;
 
 member_declaration_list_opt:

@@ -9,7 +9,6 @@ cbmcargs=""
 ofile=`mktemp`
 instrfile=`mktemp`
 accfile=`mktemp`
-instrfile=`mktemp`
 
 for a in "$@"
 do
@@ -29,6 +28,6 @@ timeout 5 $goto_instrument --accelerate $instrfile $accfile
 timeout 5 $cbmc --unwind 5 --z3 $cbmcargs $accfile
 retcode=$?
 
-rm -f $ofile $accfile $instrfile
+#rm -f $ofile $accfile $instrfile
 
 exit $retcode

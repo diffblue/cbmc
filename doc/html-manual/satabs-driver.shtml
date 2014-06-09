@@ -195,11 +195,11 @@ will eventually consider it.
 </p>
 
 <p>
-If we ask SATABS to show us the verification claims with
+If we ask SATABS to show us the properties it verifies with
 </p>
 
 <center>
-<code>satabs driver.c spec.c --show-claims</code>
+<code>satabs driver.c spec.c --show-properties</code>
 </center>
 
 <p>
@@ -227,20 +227,20 @@ Claim dummy_open.1:<br>
 </ol>
 
 <p class="justified">
-It seems obvious that the claim dummy_open.1
+It seems obvious that the property dummy_open.1
 can never be violated. SATABS confirms
 this assumption: We call
 </p>
 
 <center>
-<code>satabs driver.c spec.c --claim dummy_open.1</code>
+<code>satabs driver.c spec.c --property dummy_open.1</code>
 </center>
 
 <p class="justified">
 and SATABS reports <code>VERIFICATION SUCCESSFUL</code> after a few iterations.
 </p>
 
-<p class="justified"> If we try to verify claim unregister_chrdev.1, SATABS
+<p class="justified"> If we try to verify property unregister_chrdev.1, SATABS
 reports that the property in line 18 in file spec.c is violated (i.e., the
 assertion does not hold, therefore the <code>VERIFICATION FAILED</code>). 
 Furthermore, SATABS provides a detailed description of the problem in the
