@@ -2686,7 +2686,22 @@ void goto2sourcet::convert_compound_rec(
   if(type.id()==ID_symbol)
     convert_compound_rec(ns.follow(type), os);
   else if(type.id()==ID_array || type.id()==ID_pointer)
+  {
     convert_compound_rec(type.subtype(), os);
+
+    // sizeof may contain a type symbol that has to be declared first
+    if(type.id()==ID_array)
+    {
+      find_symbols_sett syms;
+      find_type_symbols(to_array_type(type).size(), syms);
+
+      for(find_symbols_sett::const_iterator
+          it=syms.begin();
+          it!=syms.end();
+          ++it)
+        convert_compound_rec(symbol_typet(*it), os);
+    }
+  }
   else if(type.id()==ID_struct || type.id()==ID_union)
     convert_compound_rec(to_struct_union_type(type), os);
 }
