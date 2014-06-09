@@ -280,32 +280,32 @@ void cpp_declarator_convertert::combine_types(
     {
       for(unsigned i=0; i<decl_code_type.arguments().size(); i++)
       {
-        const code_typet::argumentt &decl_argument=decl_code_type.arguments()[i];
-        code_typet::argumentt &symbol_argument=symbol_code_type.arguments()[i];
+        const code_typet::parametert &decl_parameter=decl_code_type.parameters()[i];
+        code_typet::parametert &symbol_parameter=symbol_code_type.parameters()[i];
 
         // first check type
-        if(decl_argument.type()!=symbol_argument.type())
+        if(decl_parameter.type()!=symbol_parameter.type())
         {
-          // The 'this' argument of virtual functions mismatches
+          // The 'this' parameter of virtual functions mismatches
           if(i!=0 || !symbol_code_type.get_bool("#is_virtual"))
           {
             cpp_typecheck.err_location(location);
             cpp_typecheck.str << "symbol `" << symbol.display_name()
-                              << "': argument " << (i+1) << " type mismatch"
+                              << "': parameter " << (i+1) << " type mismatch"
                               << std::endl;
             cpp_typecheck.str << "previous type: "
-                              << cpp_typecheck.to_string(symbol_argument.type()) << std::endl;
+                              << cpp_typecheck.to_string(symbol_parameter.type()) << std::endl;
             cpp_typecheck.str << "new type: "
-                              << cpp_typecheck.to_string(decl_argument.type());
+                              << cpp_typecheck.to_string(decl_parameter.type());
             throw 0;
           }
         }
 
         if(symbol.value.is_nil())
         {
-          symbol_argument.set_base_name(decl_argument.get_base_name());
-          symbol_argument.set_identifier(decl_argument.get_identifier());
-          symbol_argument.location()=decl_argument.location();
+          symbol_parameter.set_base_name(decl_parameter.get_base_name());
+          symbol_parameter.set_identifier(decl_parameter.get_identifier());
+          symbol_parameter.location()=decl_parameter.location();
         }
       }
 
@@ -637,19 +637,19 @@ irep_idt cpp_declarator_convertert::get_pretty_name()
 {
   if(is_code)
   {
-    const irept::subt &arguments=
-      final_type.find(ID_arguments).get_sub();
+    const irept::subt &parameters=
+      final_type.find(ID_parameters).get_sub();
 
     std::string result=scope->prefix+id2string(base_name)+"(";
 
-    forall_irep(it, arguments)
+    forall_irep(it, parameters)
     {
-      const typet &argument_type=((exprt &)*it).type();
+      const typet &parameter_type=((exprt &)*it).type();
 
-      if(it!=arguments.begin())
+      if(it!=parameters.begin())
         result+=", ";
 
-      result+=cpp_typecheck.to_string(argument_type);
+      result+=cpp_typecheck.to_string(parameter_type);
     }
 
     result+=")";

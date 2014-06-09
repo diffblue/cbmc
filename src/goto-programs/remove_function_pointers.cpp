@@ -175,29 +175,29 @@ bool remove_function_pointerst::is_type_compatible(
       return false;
   }
 
-  // let's look at the arguments
-  const code_typet::argumentst &call_arguments=call_type.arguments();
-  const code_typet::argumentst &function_arguments=function_type.arguments();
+  // let's look at the parameters
+  const code_typet::parameterst &call_parameters=call_type.parameters();
+  const code_typet::parameterst &function_parameters=function_type.parameters();
 
   if(function_type.has_ellipsis() &&
-     function_arguments.empty())
+     function_parameters.empty())
   {
     // always ok
   }
   else if(call_type.has_ellipsis() &&
-          call_arguments.empty())
+          call_parameters.empty())
   {
     // always ok
   }
   else
   {
     // we are quite strict here, could be much more generous
-    if(call_arguments.size()!=function_arguments.size())
+    if(call_parameters.size()!=function_parameters.size())
       return false;
     
-    for(unsigned i=0; i<call_arguments.size(); i++)
-      if(!arg_is_type_compatible(call_arguments[i].type(),
-                                 function_arguments[i].type()))
+    for(unsigned i=0; i<call_parameters.size(); i++)
+      if(!arg_is_type_compatible(call_parameters[i].type(),
+                                 function_parameters[i].type()))
         return false;
   }
   
@@ -222,20 +222,20 @@ void remove_function_pointerst::fix_argument_types(
   const code_typet &code_type=
     to_code_type(ns.follow(function_call.function().type()));
 
-  const code_typet::argumentst &function_arguments=
-    code_type.arguments();
+  const code_typet::parameterst &function_parameters=
+    code_type.parameters();
   
   code_function_callt::argumentst &call_arguments=
     function_call.arguments();
     
-  for(unsigned i=0; i<function_arguments.size(); i++)
+  for(unsigned i=0; i<function_parameters.size(); i++)
   {
     if(i<call_arguments.size())
     {
       if(!type_eq(call_arguments[i].type(),
-                  function_arguments[i].type(), ns))
+                  function_parameters[i].type(), ns))
       {
-        call_arguments[i].make_typecast(function_arguments[i].type());
+        call_arguments[i].make_typecast(function_parameters[i].type());
       }
     }
   }

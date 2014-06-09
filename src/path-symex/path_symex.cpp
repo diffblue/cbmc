@@ -693,22 +693,22 @@ void path_symext::function_call_rec(
 
     const code_typet &code_type=function_entry.type;
 
-    const code_typet::argumentst &function_arguments=code_type.arguments();
+    const code_typet::parameterst &function_parameters=code_type.parameters();
 
     const exprt::operandst &call_arguments=call.arguments();
   
     // now assign the argument values
     for(unsigned i=0; i<call_arguments.size(); i++)
     {
-      if(i<function_arguments.size())
+      if(i<function_parameters.size())
       {
-        const code_typet::argumentt &function_argument=function_arguments[i];
-        irep_idt identifier=function_argument.get_identifier();
+        const code_typet::parametert &function_parameter=function_parameters[i];
+        irep_idt identifier=function_parameter.get_identifier();
 
         if(identifier==irep_idt())
-          throw "function_call " + id2string(function_identifier) + " no identifier for function argument";
+          throw "function_call " + id2string(function_identifier) + " no identifier for function parameter";
 
-        symbol_exprt lhs(identifier, function_argument.type());
+        symbol_exprt lhs(identifier, function_parameter.type());
             
         // TODO: need to save+restore
 

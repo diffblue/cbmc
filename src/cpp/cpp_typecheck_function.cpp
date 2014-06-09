@@ -31,30 +31,30 @@ Function: cpp_typecheckt::convert_argument
 
 void cpp_typecheckt::convert_argument(
   const irep_idt &mode,
-  code_typet::argumentt &argument)
+  code_typet::parametert &parameter)
 {
-  std::string identifier=id2string(argument.get_identifier());
+  std::string identifier=id2string(parameter.get_identifier());
 
   if(identifier.empty())
   {
     identifier="#anon_arg"+i2string(anon_counter++);
-    argument.set_base_name(identifier);
+    parameter.set_base_name(identifier);
   }
 
   identifier=language_prefix+
              cpp_scopes.current_scope().prefix+
              id2string(identifier);
 
-  argument.set_identifier(identifier);
+  parameter.set_identifier(identifier);
 
   symbolt symbol;
 
   symbol.name=identifier;
-  symbol.base_name=argument.get_base_name();
-  symbol.location=argument.location();
+  symbol.base_name=parameter.get_base_name();
+  symbol.location=parameter.location();
   symbol.mode=mode;
   symbol.module=module;
-  symbol.type=argument.type();
+  symbol.type=parameter.type();
   symbol.is_state_var=true;
   symbol.is_lvalue=!is_reference(symbol.type);
 
@@ -90,12 +90,12 @@ void cpp_typecheckt::convert_arguments(
   const irep_idt &mode,
   code_typet &function_type)
 {
-  code_typet::argumentst &arguments=
-    function_type.arguments();
+  code_typet::parameterst &parameters=
+    function_type.parameters();
 
-  for(code_typet::argumentst::iterator
-      it=arguments.begin();
-      it!=arguments.end();
+  for(code_typet::parameterst::iterator
+      it=parameters.begin();
+      it!=parameters.end();
       it++)
     convert_argument(mode, *it);
 }
@@ -146,11 +146,11 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
   if(function_scope.is_method &&
      !function_scope.is_static_member)
   {
-    code_typet::argumentst &arguments=function_type.arguments();
-    assert(arguments.size()>=1);
-    code_typet::argumentt &this_argument_expr=arguments.front();
-    function_scope.this_expr=exprt(ID_symbol, this_argument_expr.type());
-    function_scope.this_expr.set(ID_identifier, this_argument_expr.get(ID_C_identifier));
+    code_typet::parameterst &parameters=function_type.parameters();
+    assert(parameters.size()>=1);
+    code_typet::parametert &this_parameter_expr=parameters.front();
+    function_scope.this_expr=exprt(ID_symbol, this_parameter_expr.type());
+    function_scope.this_expr.set(ID_identifier, this_parameter_expr.get(ID_C_identifier));
   }
   else
     function_scope.this_expr.make_nil();
@@ -192,8 +192,8 @@ irep_idt cpp_typecheckt::function_identifier(const typet &type)
   const code_typet &function_type=
     to_code_type(template_subtype(type));
 
-  const code_typet::argumentst &arguments=
-    function_type.arguments();
+  const code_typet::parameterst &parameters=
+    function_type.parameters();
 
   std::string result;
   bool first=true;
@@ -205,10 +205,10 @@ irep_idt cpp_typecheckt::function_identifier(const typet &type)
   // but we must distinguish "const" and "non-const" member
   // functions
 
-  code_typet::argumentst::const_iterator it=
-    arguments.begin();
+  code_typet::parameterst::const_iterator it=
+    parameters.begin();
 
-  if(it!=arguments.end() &&
+  if(it!=parameters.end() &&
      it->get_identifier()==ID_this)
   {
     const typet &pointer=it->type();
@@ -222,7 +222,7 @@ irep_idt cpp_typecheckt::function_identifier(const typet &type)
 
   // we skipped the "this", on purpose!
 
-  for(; it!=arguments.end(); it++)
+  for(; it!=parameters.end(); it++)
   {
     if(first) first=false; else result+=",";
     typet tmp_type=it->type();

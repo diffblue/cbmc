@@ -163,17 +163,17 @@ std::string cpp_type2name(const typet &type)
   else if(type.id()==ID_code)
   {
     // we do (args)->(return_type)
-    const code_typet::argumentst &arguments=to_code_type(type).arguments();
+    const code_typet::parameterst &parameters=to_code_type(type).parameters();
     const typet &return_type=to_code_type(type).return_type();
     
     result+="(";
 
-    for(code_typet::argumentst::const_iterator
-        arg_it=arguments.begin();
-        arg_it!=arguments.end();
+    for(code_typet::parameterst::const_iterator
+        arg_it=parameters.begin();
+        arg_it!=parameters.end();
         arg_it++)
     {
-      if(arg_it!=arguments.begin()) result+=",";
+      if(arg_it!=parameters.begin()) result+=",";
       result+=cpp_type2name(arg_it->type());
     }
         

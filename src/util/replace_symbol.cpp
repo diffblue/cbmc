@@ -195,9 +195,9 @@ bool replace_symbolt::replace(typet &dest) const
   {
     code_typet &code_type=to_code_type(dest);
     replace(code_type.return_type());
-    code_typet::argumentst &arguments=code_type.arguments();
-    for(code_typet::argumentst::iterator it = arguments.begin();
-        it!=arguments.end();
+    code_typet::parameterst &parameters=code_type.parameters();
+    for(code_typet::parameterst::iterator it = parameters.begin();
+        it!=parameters.end();
         it++)
       if(!replace(*it))
         result=false;
@@ -267,11 +267,11 @@ bool replace_symbolt::have_to_replace(const typet &dest) const
     if(have_to_replace(code_type.return_type()))
       return true;
       
-    const code_typet::argumentst &arguments=code_type.arguments();
+    const code_typet::parameterst &parameters=code_type.parameters();
 
-    for(code_typet::argumentst::const_iterator
-        it=arguments.begin();
-        it!=arguments.end();
+    for(code_typet::parameterst::const_iterator
+        it=parameters.begin();
+        it!=parameters.end();
         it++)
       if(have_to_replace(*it))
         return true;

@@ -142,14 +142,14 @@ bool java_entry_point(
   call_main.location()=symbol.location;
   call_main.function()=symbol.symbol_expr();
 
-  const code_typet::argumentst &arguments=
-    to_code_type(symbol.type).arguments();
+  const code_typet::parameterst &parameters=
+    to_code_type(symbol.type).parameters();
 
   exprt::operandst main_arguments;
-  main_arguments.resize(arguments.size());
+  main_arguments.resize(parameters.size());
 
-  for(unsigned i=0; i<arguments.size(); i++)
-    main_arguments[i]=gen_argument(arguments[i].type());
+  for(unsigned i=0; i<parameters.size(); i++)
+    main_arguments[i]=gen_argument(parameters[i].type());
   
   call_main.arguments()=main_arguments;
 
