@@ -2243,13 +2243,28 @@ void goto_program2codet::cleanup_code_ifthenelse(
       code.swap(tmp);
     }
   }
-  else if(to_code(i_t_e.then_case()).get_statement()==ID_ifthenelse)
+  else
   {
-    // we re-introduce 1-code blocks with if-then-else to avoid dangling-else
-    // ambiguity
-    code_blockt b;
-    b.move_to_operands(i_t_e.then_case());
-    i_t_e.then_case().swap(b);
+    if(i_t_e.then_case().is_not_nil() &&
+       to_code(i_t_e.then_case()).get_statement()==ID_ifthenelse)
+    {
+      // we re-introduce 1-code blocks with if-then-else to avoid dangling-else
+      // ambiguity
+      code_blockt b;
+      b.move_to_operands(i_t_e.then_case());
+      i_t_e.then_case().swap(b);
+    }
+
+    if(i_t_e.else_case().is_not_nil() &&
+       to_code(i_t_e.then_case()).get_statement()==ID_skip &&
+       to_code(i_t_e.else_case()).get_statement()==ID_ifthenelse)
+    {
+      // we re-introduce 1-code blocks with if-then-else to avoid dangling-else
+      // ambiguity
+      code_blockt b;
+      b.move_to_operands(i_t_e.else_case());
+      i_t_e.else_case().swap(b);
+    }
   }
 
   // move labels at end of then or else case out
