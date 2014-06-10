@@ -238,7 +238,7 @@ grammar:
         {
           ansi_c_declarationt ansi_c_declaration;
           ansi_c_declaration.declarators().resize(1);
-          ansi_c_declaration.declarators().back().value()=stack($2);
+          ansi_c_declaration.add_initializer(stack($2));
           PARSER.copy_item(ansi_c_declaration);
         }
         | TOK_PARSE_TYPE type_name
@@ -817,7 +817,7 @@ declaration:
 static_assert_declaration:
           TOK_STATIC_ASSERT '(' assignment_expression ',' assignment_expression ')'
         {
-          init($$);
+          init($$, ID_declaration);
           to_ansi_c_declaration(stack($$)).set_is_static_assert(true);
           mto($$, $3);
           mto($$, $5);
@@ -829,36 +829,30 @@ default_declaring_list:
           {
             init($$, ID_declaration);
             stack($$).type().swap(stack($1));
-            PARSER.add_declarator(
-              to_ansi_c_declaration(stack($$)), 
-              to_ansi_c_declarator(stack($2)));
+            PARSER.add_declarator(stack($$), stack($2));
           }
           initializer_opt
         {
           // patch on the initializer
           $$=$3;
-          to_ansi_c_declaration(stack($$)).declarators().back().value()=stack($4);
+          to_ansi_c_declaration(stack($$)).add_initializer(stack($4));
         }
         | type_qualifier_list identifier_declarator
           {
             init($$, ID_declaration);
             stack($$).type().swap(stack($1));
-            PARSER.add_declarator(
-              to_ansi_c_declaration(stack($$)), 
-              to_ansi_c_declarator(stack($2)));
+            PARSER.add_declarator(stack($$), stack($2));
           }
           initializer_opt
         {
           // patch on the initializer
           $$=$3;
-          to_ansi_c_declaration(stack($$)).declarators().back().value()=stack($4);
+          to_ansi_c_declaration(stack($$)).add_initializer(stack($4));
         }
         | default_declaring_list ',' identifier_declarator
           {
             // just add the declarator
-            PARSER.add_declarator(
-              to_ansi_c_declaration(stack($1)),
-              to_ansi_c_declarator(stack($3)));
+            PARSER.add_declarator(stack($1), stack($3));
             // Needs to be done before initializer, as we want to see that identifier
             // already there!
           }
@@ -866,7 +860,7 @@ default_declaring_list:
         {
           // patch on the initializer
           $$=$1;
-          to_ansi_c_declaration(stack($$)).declarators().back().value()=stack($5);
+          to_ansi_c_declaration(stack($$)).add_initializer(stack($5));
         }
         ;
 
@@ -905,15 +899,13 @@ declaring_list:
             // the symbol has to be visible during initialization
             init($$, ID_declaration);
             stack($$).type().swap(stack($1));
-            PARSER.add_declarator(
-              to_ansi_c_declaration(stack($$)),
-              to_ansi_c_declarator(stack($2)));
+            PARSER.add_declarator(stack($$), stack($2));
           }
           initializer_opt
         {
           // add the initializer
           $$=$4;
-          to_ansi_c_declaration(stack($$)).declarators().back().value()=stack($5);
+          to_ansi_c_declaration(stack($$)).add_initializer(stack($5));
         }
         | type_specifier declarator
           post_declarator_attributes_opt
@@ -923,30 +915,26 @@ declaring_list:
             // the symbol has to be visible during initialization
             init($$, ID_declaration);
             stack($$).type().swap(stack($1));
-            PARSER.add_declarator(
-              to_ansi_c_declaration(stack($$)),
-              to_ansi_c_declarator(stack($2)));
+            PARSER.add_declarator(stack($$), stack($2));
           }
           initializer_opt
         {
           // add the initializer
           $$=$4;
-          to_ansi_c_declaration(stack($$)).declarators().back().value()=stack($5);
+          to_ansi_c_declaration(stack($$)).add_initializer(stack($5));
         }
         | declaring_list ',' declarator
           post_declarator_attributes_opt
           {
             // type attribute goes into declarator
             merge_types(stack($3), stack($4));
-            PARSER.add_declarator(
-              to_ansi_c_declaration(stack($1)),
-              to_ansi_c_declarator(stack($3)));
+            PARSER.add_declarator(stack($1), stack($3));
           }
           initializer_opt
         {
           // add in the initializer
           $$=$1;
-          to_ansi_c_declaration(stack($$)).declarators().back().value()=stack($6);
+          to_ansi_c_declaration(stack($$)).add_initializer(stack($6));
         }
         ;
 
@@ -1642,7 +1630,7 @@ enumerator_declaration:
           stack($$).type()=typet(ID_int);
           to_ansi_c_declaration(stack($$)).set_is_enum_constant(true);
           PARSER.add_declarator(stack($$), stack($1));
-          to_ansi_c_declaration(stack($$)).declarators().back().value()=stack($2);
+          to_ansi_c_declaration(stack($$)).add_initializer(stack($2));
         }
         ;
 
@@ -1746,7 +1734,7 @@ parameter_declaration:
         }
         | declaration_qualifier_list identifier_declarator gcc_type_attribute_opt
         {
-          merge_types(stack($2), stack($3));
+          merge_types(stack($2), stack($3)); // type attribute
           init($$, ID_declaration);
           to_ansi_c_declaration(stack($$)).set_is_parameter(true);
           PARSER.add_declarator(stack($$), stack($2));
@@ -1766,7 +1754,7 @@ parameter_declaration:
         }
         | type_specifier identifier_declarator gcc_type_attribute_opt
         {
-          merge_types(stack($2), stack($3));
+          merge_types(stack($2), stack($3)); // type attribute
           init($$, ID_declaration);
           to_ansi_c_declaration(stack($$)).set_is_parameter(true);
           stack($1), stack($2), stack($$);
