@@ -14,6 +14,58 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
+Function: ansi_c_declaratort::build
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void ansi_c_declaratort::build(irept &src)
+{
+  typet *p=static_cast<typet *>(&src);
+  
+  // walk down subtype until we hit symbol or "abstract"
+  while(true)
+  {
+    typet &t=*p;
+
+    if(t.id()==ID_symbol)
+    {
+      set_base_name(t.get(ID_identifier));
+      location()=t.location();
+      t.make_nil();
+      break;
+    }
+    else if(t.id()==irep_idt() ||
+            t.is_nil())
+    {
+      //std::cerr << "D: " << src.pretty() << std::endl;
+      assert(0);
+    }
+    else if(t.id()==ID_abstract)
+    {
+      t.make_nil();
+      break;
+    }
+    else if(t.id()==ID_merged_type)
+    {
+      assert(!t.subtypes().empty());
+      p=&(t.subtypes().back());
+    }
+    else
+      p=&t.subtype();
+  }
+  
+  type()=static_cast<const typet &>(src);
+  value().make_nil();
+}
+
+/*******************************************************************\
+
 Function: ansi_c_declarationt::output
 
   Inputs:

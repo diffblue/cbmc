@@ -49,6 +49,8 @@ public:
   {
     return set(ID_base_name, base_name);
   }
+
+  void build(irept &src);
 };
 
 extern inline ansi_c_declaratort &to_ansi_c_declarator(exprt &expr)
@@ -217,6 +219,20 @@ public:
   {
     assert(!declarators().empty());
     declarators().back().value().swap(value);
+  }
+  
+  static bool is_a_typedef(const typet &src)
+  {
+    if(src.id()==ID_typedef)
+      return true;
+    else if(src.id()==ID_merged_type)
+    {
+      forall_subtypes(it, src)
+        if(is_a_typedef(*it))
+          return true;
+    }
+    
+    return false;
   }
 };
 

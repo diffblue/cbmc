@@ -62,5 +62,6 @@ void ansi_c_parse_treet::output(std::ostream &out) const
       it++)
   {
     it->output(out);
+    out << "\n";
   }
 }

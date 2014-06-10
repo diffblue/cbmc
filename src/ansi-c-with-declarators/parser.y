@@ -1311,21 +1311,15 @@ aggregate_name:
           '{' member_declaration_list_opt '}'
           gcc_type_attribute_opt
         {
-          #if 0
-          typet &type=to_ansi_c_declaration(stack($3)).type();
-          type.add(ID_components).get_sub().swap(
-            (irept::subt&)stack($5).operands());
+          $$=$1;
+          
+          // save the members
+          stack($$).add(ID_components).get_sub().swap(
+            (irept::subt &)stack($5).operands());
 
           // throw in the gcc attributes
-          merge_types(type, stack($2));
-          merge_types(type, stack($7));
-
-          // grab symbol
-          init($$, ID_symbol);
-          stack($$).set(ID_identifier, to_ansi_c_declaration(stack($3)).get_name());
-          stack($$).location()=to_ansi_c_declaration(stack($3)).location();
-          PARSER.copy_item(to_ansi_c_declaration(stack($3)));
-          #endif
+          merge_types($$, $2);
+          merge_types($$, $7);
         }
         | aggregate_key
           gcc_type_attribute_opt
@@ -1337,25 +1331,22 @@ aggregate_name:
           '{' member_declaration_list_opt '}'
           gcc_type_attribute_opt
         {
-          typet &type=stack($4).type();
-          type.add(ID_components).get_sub().swap(
-            (irept::subt&)stack($6).operands());
+          $$=$1;
+          
+          // save the members
+          stack($$).add(ID_components).get_sub().swap(
+            (irept::subt &)stack($6).operands());
 
           // throw in the gcc attributes
-          merge_types(type, stack($2));
-          merge_types(type, stack($8));
-
-          // grab symbol
-          init($$, ID_symbol);
-          stack($$).set(ID_identifier, stack($4).get(ID_name));
-          stack($$).location()=stack($4).location();
-          PARSER.copy_item(to_ansi_c_declaration(stack($4)));
+          merge_types($$, $2);
+          merge_types($$, $8);
         }
         | aggregate_key
           gcc_type_attribute_opt
           identifier_or_typedef_name
           gcc_type_attribute_opt
         {
+          // just the tag
           do_tag($1, $3);
           $$=$3;
           // type attributes

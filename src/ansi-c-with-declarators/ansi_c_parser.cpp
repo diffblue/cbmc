@@ -100,58 +100,6 @@ int yyansi_cerror(const std::string &error)
 
 /*******************************************************************\
 
-Function: ansi_c_parsert::convert_declarator
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void ansi_c_parsert::convert_declarator(
-  irept &declarator,
-  const typet &type,
-  irept &identifier)
-{
-  typet *p=(typet *)&declarator;
-  
-  // walk down subtype until we hit symbol or "abstract"
-  while(true)
-  {
-    typet &t=*p;
-
-    if(t.id()==ID_symbol)
-    {
-      identifier=t;
-      t=type;
-      break;
-    }
-    else if(t.id()==irep_idt() ||
-            t.is_nil())
-    {
-      std::cerr << "D: " << declarator.pretty() << std::endl;
-      assert(0);
-    }
-    else if(t.id()==ID_abstract)
-    {
-      identifier.make_nil();
-      t=type;
-      break;
-    }
-    else if(t.id()==ID_merged_type)
-    {
-      assert(!t.subtypes().empty());
-      p=&(t.subtypes().back());
-    }
-    else
-      p=&t.subtype();
-  }
-}
-
-/*******************************************************************\
-
 Function: ansi_c_parsert::add_declarator
 
   Inputs:
@@ -164,18 +112,42 @@ Function: ansi_c_parsert::add_declarator
 
 void ansi_c_parsert::add_declarator(
   exprt &declaration,
-  exprt &declarator)
+  irept &declarator)
 {
-  #if 0
   assert(declarator.is_not_nil());
-
-  exprt identifier;
-
-  convert_declarator(declarator, static_cast<const typet &>(type), identifier);
-  typet final_type=static_cast<typet &>(declarator);
+  ansi_c_declarationt &ansi_c_declaration=
+    to_ansi_c_declaration(declaration);
   
-  std::string base_name=identifier.get_string(ID_C_base_name);
+  ansi_c_declaratort new_declarator;
+  new_declarator.build(declarator);
 
+  irep_idt base_name=new_declarator.get_base_name();
+
+  if(base_name!="")
+  {
+    bool is_typedef=
+      ansi_c_declarationt::is_a_typedef(ansi_c_declaration.type());
+    bool force_root_scope=false;
+  
+    if(ansi_c_declaration.type().id()==ID_code)
+    {
+      // functions always go into global scope
+      force_root_scope=true;
+    }
+
+    ansi_c_id_classt id_class=
+      is_typedef?ANSI_C_TYPEDEF:ANSI_C_SYMBOL;
+
+    scopet &scope=
+      force_root_scope?root_scope():current_scope();
+
+    // add to scope  
+    scope.name_map[base_name].id_class=id_class;
+  }
+  
+  ansi_c_declaration.declarators().push_back(new_declarator);
+
+  #if 0
   // Visual Studio has global-scope tags  
   bool is_global=current_scope().prefix=="" ||
                  (mode==MSC && decl_type==TAG);

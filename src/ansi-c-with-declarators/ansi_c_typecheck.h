@@ -9,8 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_ANSI_C_TYPECHECK_H
 #define CPROVER_ANSI_C_TYPECHECK_H
 
-#include <ansi-c/c_typecheck_base.h>
-
+#include "c_typecheck_base.h"
 #include "ansi_c_parse_tree.h"
 
 bool ansi_c_typecheck(
