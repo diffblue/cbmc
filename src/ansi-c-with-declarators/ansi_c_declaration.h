@@ -212,6 +212,12 @@ public:
   }
   
   void output(std::ostream &) const;
+  
+  inline void add_initializer(exprt &value)
+  {
+    assert(!declarators().empty());
+    declarators().back().value().swap(value);
+  }
 };
 
 extern inline ansi_c_declarationt &to_ansi_c_declaration(exprt &expr)
