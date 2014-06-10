@@ -111,9 +111,6 @@ void c_typecheck_baset::typecheck_symbol(symbolt &symbol)
 {
   current_symbol_id=symbol.name;
 
-  // first of all, we typecheck the type
-  typecheck_type(symbol.type);
-
   bool is_function=symbol.type.id()==ID_code;
 
   const typet &final_type=follow(symbol.type);

@@ -144,15 +144,10 @@ public:
     return scopes.back();
   }
 
-  static void convert_declarator(
-    irept &declarator,
-    const typet &type,
-    irept &identifier);
-
   typedef enum { TAG, MEMBER, PARAMETER, OTHER } decl_typet;
 
   // convert a declarator and then add it to existing an declaration
-  void add_declarator(exprt &declaration, exprt &declarator);
+  void add_declarator(exprt &declaration, irept &declarator);
 
   void copy_item(const ansi_c_declarationt &declaration)
   {

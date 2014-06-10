@@ -12,7 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/i2string.h>
 #include <util/std_expr.h>
 
-#include <ansi-c/c_types.h>
+#include "../c_types.h"
 
 #include "unescape_string.h"
 #include "convert_character_literal.h"
