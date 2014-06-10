@@ -22,13 +22,13 @@ static int isatty(int) { return 0; }
 #include <util/arith_tools.h>
 #include <util/config.h>
 
-#include <ansi-c/c_types.h>
-#include <ansi-c/preprocessor_line.h>
+#include "c_types.h"
+#include "preprocessor_line.h"
 
-#include <ansi-c/literals/convert_float_literal.h>
-#include <ansi-c/literals/convert_integer_literal.h>
-#include <ansi-c/literals/convert_character_literal.h>
-#include <ansi-c/literals/convert_string_literal.h>
+#include "literals/convert_float_literal.h"
+#include "literals/convert_integer_literal.h"
+#include "literals/convert_character_literal.h"
+#include "literals/convert_string_literal.h"
 
 #define PARSER ansi_c_parser
 #define YYSTYPE unsigned
