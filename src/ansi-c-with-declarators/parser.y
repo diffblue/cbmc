@@ -876,8 +876,7 @@ post_declarator_attribute:
 post_declarator_attributes:
           post_declarator_attributes post_declarator_attribute
         {
-          $$=$1;
-          merge_types($1, $2);
+          $$=merge($1, $2);
         }
         | post_declarator_attribute
         ;
@@ -894,7 +893,7 @@ declaring_list:
           declaration_specifier declarator
           post_declarator_attributes_opt
           {
-            merge_types($2, $3); // type attribute
+            $2=merge($3, $2); // type attribute
             
             // the symbol has to be visible during initialization
             init($$, ID_declaration);
@@ -910,7 +909,7 @@ declaring_list:
         | type_specifier declarator
           post_declarator_attributes_opt
           {
-            merge_types($2, $3); // type attribute
+            $2=merge($3, $2);
             
             // the symbol has to be visible during initialization
             init($$, ID_declaration);
@@ -927,7 +926,7 @@ declaring_list:
           post_declarator_attributes_opt
           {
             // type attribute goes into declarator
-            merge_types(stack($3), stack($4));
+            $3=merge($4, $3);
             PARSER.add_declarator(stack($1), stack($3));
           }
           initializer_opt
@@ -956,19 +955,16 @@ declaration_qualifier_list:
           storage_class
         | type_qualifier_list storage_class
         {
-          $$=$1;
-          merge_types($$, $2);
+          $$=merge($1, $2);
         }
         | gcc_type_attribute
         | declaration_qualifier_list gcc_type_attribute
         {
-          $$=$1;
-          merge_types($$, $2);
+          $$=merge($1, $2);
         }
         | declaration_qualifier_list declaration_qualifier
         {
-          $$=$1;
-          merge_types($$, $2);
+          $$=merge($1, $2);
         }
         ;
 
@@ -976,16 +972,14 @@ type_qualifier_list:
           type_qualifier
         | type_qualifier_list type_qualifier
         {
-          $$=$1;
-          merge_types($$, $2);
+          $$=merge($1, $2);
         }
         /* The following is to allow mixing of type attributes with
            type qualifiers, but the list has to start with a
            proper type qualifier. */
         | type_qualifier_list gcc_type_attribute
         {
-          $$=$1;
-          merge_types($$, $2);
+          $$=merge($1, $2);
         }
         ;
 
@@ -993,8 +987,7 @@ attribute_type_qualifier_list:
           attribute_or_type_qualifier
         | type_qualifier_list attribute_or_type_qualifier
         {
-          $$=$1;
-          merge_types($$, $2);
+          $$=merge($1, $2);
         }
         ;
 
@@ -1022,52 +1015,38 @@ attribute_or_type_qualifier:
 basic_declaration_specifier:
           declaration_qualifier_list basic_type_name gcc_type_attribute_opt
         {
-          $$=$1;
-          merge_types($$, $2);
-          merge_types($$, $3); // type attribute
+          $$=merge($1, merge($2, $3));
         }
         | basic_type_specifier storage_class gcc_type_attribute_opt
         {
-          $$=$1;
-          merge_types($$, $2);
-          merge_types($$, $3); // type attribute
+          $$=merge($1, merge($2, $3));
         }
         | basic_declaration_specifier declaration_qualifier gcc_type_attribute_opt
         {
-          $$=$1;
-          merge_types($$, $2);
-          merge_types($$, $3); // type attribute
+          $$=merge($1, merge($2, $3));
         }
         | basic_declaration_specifier basic_type_name gcc_type_attribute_opt
         {
-          $$=$1;
-          merge_types($$, $2);
-          merge_types($$, $3); // type attribute
+          $$=merge($1, merge($2, $3));
         }
         ;
 
 basic_type_specifier:
           basic_type_name gcc_type_attribute_opt
         {
-          $$=$1;
-          merge_types($$, $2); // type attribute
+          $$=merge($1, $2); // type attribute
         }
         | type_qualifier_list basic_type_name gcc_type_attribute_opt
         {
-          $$=$1;
-          merge_types($$, $2);
-          merge_types($$, $3); // type attribute
+          $$=merge($1, merge($2, $3));
         }
         | basic_type_specifier type_qualifier
         {
-          $$=$1;
-          merge_types($$, $2);
+          $$=merge($1, $2);
         }
         | basic_type_specifier basic_type_name gcc_type_attribute_opt
         {
-          $$=$1;
-          merge_types($$, $2);
-          merge_types($$, $3); // type attribute
+          $$=merge($1, merge($2, $3));
         }
         ;
 
@@ -1075,18 +1054,15 @@ basic_type_specifier:
 sue_declaration_specifier:
           declaration_qualifier_list elaborated_type_name
         {
-          $$=$1;
-          merge_types($$, $2);
+          $$=merge($1, $2);
         }
         | sue_type_specifier storage_class
         {
-          $$=$1;
-          merge_types($$, $2);
+          $$=merge($1, $2);
         }
         | sue_declaration_specifier declaration_qualifier
         {
-          $$=$1;
-          merge_types($$, $2);
+          $$=merge($1, $2);
         }
         ;
 
@@ -1095,75 +1071,56 @@ sue_type_specifier:
           elaborated_type_name
         | type_qualifier_list elaborated_type_name
         {
-          $$=$1;
-          merge_types($$, $2);
+          $$=merge($1, $2);
         }
         | sue_type_specifier type_qualifier
         {
-          $$=$1;
-          merge_types($$, $2);
+          $$=merge($1, $2);
         }
         ;
 
 typedef_declaration_specifier:
           typedef_type_specifier storage_class gcc_type_attribute_opt
         {
-          $$=$1;
-          merge_types($$, $2);
-          merge_types($$, $3); // type attribute
+          $$=merge($1, merge($2, $3));
         }
         | declaration_qualifier_list typedef_name gcc_type_attribute_opt
         {
-          $$=$1;
-          merge_types($$, $2);
-          merge_types($$, $3); // type attribute
+          $$=merge($1, merge($2, $3));
         }
         | typedef_declaration_specifier declaration_qualifier gcc_type_attribute_opt
         {
-          $$=$1;
-          merge_types($$, $2);
-          merge_types($$, $3); // type attribute
+          $$=merge($1, merge($2, $3));
         }
         ;
 
 typeof_declaration_specifier:
           typeof_type_specifier storage_class gcc_type_attribute_opt
         {
-          $$=$1;
-          merge_types($$, $2);
-          merge_types($$, $3); // type attribute
+          $$=merge($1, merge($2, $3));
         }
         | declaration_qualifier_list typeof_specifier gcc_type_attribute_opt
         {
-          $$=$1;
-          merge_types($$, $2);
-          merge_types($$, $3); // type attribute
+          $$=merge($1, merge($2, $3));
         }
         | typeof_declaration_specifier declaration_qualifier gcc_type_attribute_opt
         {
-          $$=$1;
-          merge_types($$, $2);
-          merge_types($$, $3); // type attribute
+          $$=merge($1, merge($2, $3));
         }
         ;
 
 typedef_type_specifier:
           typedef_name gcc_type_attribute_opt
         {
-          $$=$1;
-          merge_types($$, $2); // type attribute
+          $$=merge($1, $2);
         }
         | type_qualifier_list typedef_name gcc_type_attribute_opt
         {
-          $$=$1;
-          merge_types($$, $2);
-          merge_types($$, $3); // type attribute
+          $$=merge($1, merge($2, $3));
         }
         | typedef_type_specifier type_qualifier gcc_type_attribute_opt
         {
-          $$=$1;
-          merge_types($$, $2);
-          merge_types($$, $3); // type attribute
+          $$=merge($1, merge($2, $3));
         }
         ;
 
@@ -1184,19 +1141,15 @@ typeof_type_specifier:
           typeof_specifier
         | type_qualifier_list typeof_specifier
         {
-          $$=$1;
-          merge_types($$, $2);
+          $$=merge($1, $2);
         }
         | type_qualifier_list typeof_specifier type_qualifier_list
         {
-          $$=$1;
-          merge_types($$, $3);
-          merge_types($$, $2);
+          $$=merge($1, merge($2, $3));
         }
         | typeof_specifier type_qualifier_list
         {
-          $$=$2;
-          merge_types($$, $1);
+          $$=merge($1, $2);
         }
         ;
 
@@ -1311,15 +1264,12 @@ aggregate_name:
           '{' member_declaration_list_opt '}'
           gcc_type_attribute_opt
         {
-          $$=$1;
-          
           // save the members
-          stack($$).add(ID_components).get_sub().swap(
+          stack($1).add(ID_components).get_sub().swap(
             (irept::subt &)stack($5).operands());
 
           // throw in the gcc attributes
-          merge_types($$, $2);
-          merge_types($$, $7);
+          $$=merge($1, merge($2, $7));
         }
         | aggregate_key
           gcc_type_attribute_opt
@@ -1331,15 +1281,12 @@ aggregate_name:
           '{' member_declaration_list_opt '}'
           gcc_type_attribute_opt
         {
-          $$=$1;
-          
           // save the members
-          stack($$).add(ID_components).get_sub().swap(
+          stack($1).add(ID_components).get_sub().swap(
             (irept::subt &)stack($6).operands());
 
           // throw in the gcc attributes
-          merge_types($$, $2);
-          merge_types($$, $8);
+          $$=merge($1, merge($2, $8));
         }
         | aggregate_key
           gcc_type_attribute_opt
@@ -1348,10 +1295,8 @@ aggregate_name:
         {
           // just the tag
           do_tag($1, $3);
-          $$=$3;
           // type attributes
-          merge_types($$, $2);
-          merge_types($$, $4);
+          $$=merge($1, merge($2, $4));
         }
         ;
 
@@ -1375,7 +1320,7 @@ gcc_type_attribute_list:
           gcc_type_attribute
         | gcc_type_attribute_list gcc_type_attribute
         {
-          merge_types($1, $2);
+          $$=merge($1, $2);
         }
         ;
 
@@ -1435,7 +1380,7 @@ member_default_declaring_list:
           type_qualifier_list
           member_identifier_declarator
         {
-          merge_types($2, $1); // dest=$2, type attribute
+          $2=merge($2, $1);
 
           init($$, ID_declaration);
           stack($$).type().swap(stack($2));
@@ -1453,7 +1398,7 @@ member_declaring_list:
           type_specifier
           member_declarator
         {
-          merge_types($2, $1); // dest=$2, type attribute
+          $2=merge($2, $1);
 
           init($$, ID_declaration);
           stack($$).type().swap(stack($2));
@@ -1475,10 +1420,7 @@ member_declarator:
             make_subtype($$, $2);
 
           if(stack($3).is_not_nil()) // type attribute
-          {
-            merge_types(stack($3), stack($$));
-            stack($$).swap(stack($3));
-          }
+            $$=merge($3, $$);
         }
         | /* empty */
         {
@@ -1490,10 +1432,7 @@ member_declarator:
           stack($$).add(ID_subtype)=irept(ID_abstract);
 
           if(stack($2).is_not_nil()) // type attribute
-          {
-            merge_types(stack($2), stack($$));
-            stack($$).swap(stack($2));
-          }
+            $$=merge($2, $$);
         }
         ;
 
@@ -1505,10 +1444,7 @@ member_identifier_declarator:
             make_subtype($$, $2);
           
           if(stack($3).is_not_nil()) // type attribute
-          {
-            merge_types(stack($3), stack($$));
-            stack($$).swap(stack($3));
-          }
+            $$=merge($3, $$);
         }
         | bit_field_size gcc_type_attribute_opt
         {
@@ -1516,10 +1452,7 @@ member_identifier_declarator:
           stack($$).add(ID_subtype)=irept(ID_abstract);
 
           if(stack($2).is_not_nil()) // type attribute
-          {
-            merge_types(stack($2), stack($$));
-            stack($$).swap(stack($2));
-          }
+            $$=merge($2, $$);
         }
         ;
 
@@ -1550,14 +1483,13 @@ enum_name:
             init($$, ID_symbol);
             stack($$).set(ID_C_base_name, PARSER.get_anon_name());
             do_tag($1, $$);
-            merge_types($$, $2);
+            $$=merge($$, $2);
           }
           '{' enumerator_list '}'
           gcc_type_attribute_opt
         {
-          $$=$1;
-          do_enum_members($$, $5);
-          merge_types($$, $7); // throw in the gcc attribute
+          do_enum_members($1, $5);
+          $$=merge($1, $7); // throw in the gcc attribute
         }
         | enum_key
           gcc_type_attribute_opt
@@ -1565,23 +1497,20 @@ enum_name:
           {
             // we want the tag to be visible before the members
             do_tag($1, $3);
-            $$=$3;
-            merge_types($$, $2);
+            $$=merge($3, $2);
           }
           '{' enumerator_list '}'
           gcc_type_attribute_opt
         {
-          $$=$1;
-          do_enum_members($$, $6);
-          merge_types($$, $8); // throw in the gcc attribute
+          do_enum_members($1, $6);
+          $$=merge($1, $8); // throw in the gcc attribute
         }
         | enum_key
           gcc_type_attribute_opt
           identifier_or_typedef_name
         {
           do_tag($1, $3);
-          $$=$1;
-          merge_types($$, $2);
+          $$=merge_types($1, $2);
         }
         ;
         
@@ -1690,7 +1619,7 @@ parameter_declaration:
         }
         | declaration_specifier identifier_declarator gcc_type_attribute_opt
         {
-          merge_types(stack($2), stack($3));
+          $2=merge($2, $3);
           init($$, ID_declaration);
           to_ansi_c_declaration(stack($$)).set_is_parameter(true);
           PARSER.add_declarator(stack($$), stack($2));
@@ -1718,7 +1647,7 @@ parameter_declaration:
         }
         | declaration_qualifier_list identifier_declarator gcc_type_attribute_opt
         {
-          merge_types(stack($2), stack($3)); // type attribute
+          $2=merge($2, $3); // type attribute
           init($$, ID_declaration);
           to_ansi_c_declaration(stack($$)).set_is_parameter(true);
           PARSER.add_declarator(stack($$), stack($2));
@@ -1738,7 +1667,7 @@ parameter_declaration:
         }
         | type_specifier identifier_declarator gcc_type_attribute_opt
         {
-          merge_types(stack($2), stack($3)); // type attribute
+          $2=merge($2, $3); // type attribute
           init($$, ID_declaration);
           to_ansi_c_declaration(stack($$)).set_is_parameter(true);
           stack($1), stack($2), stack($$);
@@ -1766,7 +1695,7 @@ parameter_declaration:
         }
         | type_qualifier_list identifier_declarator gcc_type_attribute_opt
         {
-          merge_types(stack($2), stack($3));
+          $2=merge($2, $3);
           init($$, ID_declaration);
           to_ansi_c_declaration(stack($$)).set_is_parameter(true);
           PARSER.add_declarator(stack($$), stack($2));
@@ -1781,25 +1710,19 @@ identifier_or_typedef_name:
 type_name:
           gcc_type_attribute_opt type_specifier
         {
-          $$=$2;
-          merge_types($$, $1);
+          $$=merge($2, $1);
         }
         | gcc_type_attribute_opt type_specifier abstract_declarator
         {
-          $$=$2;
-          merge_types($$, $1);
-          make_subtype($$, $3);
+          $$=merge($3, merge($2, $1));
         }
         | gcc_type_attribute_opt type_qualifier_list
         {
-          $$=$2;
-          merge_types($$, $1);
+          $$=merge($2, $1);
         }
         | gcc_type_attribute_opt type_qualifier_list abstract_declarator
         {
-          $$=$2;
-          merge_types($$, $1);
-          make_subtype($$, $3);
+          $$=merge($3, merge($2, $1));
         }
         ;
 
@@ -2470,40 +2393,30 @@ KnR_declaration_qualifier_list:
           storage_class
         | type_qualifier storage_class
         {
-          $$=$1;
-          merge_types($$, $2);
+          $$=merge($2, $1);
         }
         | KnR_declaration_qualifier_list declaration_qualifier
         {
-          $$=$1;
-          merge_types($$, $2);
+          $$=merge($2, $1);
         }
         ;
 
 KnR_basic_declaration_specifier:
           KnR_declaration_qualifier_list basic_type_name gcc_type_attribute_opt
         {
-          $$=$1;
-          merge_types($$, $2);
-          merge_types($$, $3); // type attribute
+          $$=merge($1, merge($2, $3));
         }
         | basic_type_specifier storage_class gcc_type_attribute_opt
         {
-          $$=$1;
-          merge_types($$, $2);
-          merge_types($$, $3); // type attribute
+          $$=merge($1, merge($2, $3));
         }
         | KnR_basic_declaration_specifier declaration_qualifier gcc_type_attribute_opt
         {
-          $$=$1;
-          merge_types($$, $2);
-          merge_types($$, $3); // type attribute
+          $$=merge($1, merge($2, $3));
         }
         | KnR_basic_declaration_specifier basic_type_name gcc_type_attribute_opt
         {
-          $$=$1;
-          merge_types($$, $2);
-          merge_types($$, $3); // type attribute
+          $$=merge($1, merge($2, $3));
         }
         ;
 
@@ -2511,21 +2424,15 @@ KnR_basic_declaration_specifier:
 KnR_typedef_declaration_specifier:
           typedef_type_specifier storage_class gcc_type_attribute_opt
         {
-          $$=$1;
-          merge_types($$, $2);
-          merge_types($$, $3); // type attribute
+          $$=merge($1, merge($2, $3));
         }
         | KnR_declaration_qualifier_list typedef_name gcc_type_attribute_opt
         {
-          $$=$1;
-          merge_types($$, $2);
-          merge_types($$, $3); // type attribute
+          $$=merge($1, merge($2, $3));
         }
         | KnR_typedef_declaration_specifier declaration_qualifier gcc_type_attribute_opt
         {
-          $$=$1;
-          merge_types($$, $2);
-          merge_types($$, $3); // type attribute
+          $$=merge($1, merge($2, $3));
         }
         ;
 
@@ -2534,18 +2441,12 @@ KnR_sue_declaration_specifier:
         KnR_declaration_qualifier_list aggregate_key identifier_or_typedef_name gcc_type_attribute_opt
         {
           do_tag($2, $3);
-          $$=$3;
-          // type attributes
-          merge_types($$, $1);
-          merge_types($$, $4); // type attribute
+          $$=merge($3, merge($1, $4));
         }
         | KnR_declaration_qualifier_list enum_key identifier_or_typedef_name gcc_type_attribute_opt
         {
           do_tag($2, $3);
-          $$=$3;
-          // type attributes
-          merge_types($$, $1);
-          merge_types($$, $4); // type attribute
+          $$=merge($3, merge($1, $4));
         }
         ;
 
@@ -2644,8 +2545,7 @@ clean_typedef_declarator:
         }
         | '*' attribute_type_qualifier_list parameter_typedef_declarator
         {
-          merge_types($2, $3);
-          $$=$2;
+          $$=merge($2, $3);
           do_pointer($1, $2);
         }
         ;
@@ -2672,8 +2572,7 @@ paren_typedef_declarator:
         | '*' attribute_type_qualifier_list '(' simple_paren_typedef_declarator ')'
         {
           // not sure where the type qualifiers belong
-          merge_types($2, $4);
-          $$=$2;
+          $$=merge($2, $4);
           do_pointer($1, $2);
         }
         | '*' paren_typedef_declarator
@@ -2683,8 +2582,7 @@ paren_typedef_declarator:
         }
         | '*' attribute_type_qualifier_list paren_typedef_declarator
         {
-          merge_types($2, $3);
-          $$=$2;
+          $$=merge($2, $3);
           do_pointer($1, $2);
         }
         ;
@@ -2730,7 +2628,7 @@ unary_identifier_declarator:
           // and not the identifier_declarator
           stack($1).id(ID_pointer);
           stack($1).add(ID_subtype)=irept(ID_abstract);
-          merge_types($2, $1); // dest=$2
+          $2=merge($2, $1); // dest=$2
           make_subtype($3, $2); // dest=$3
           $$=$3;
         }
@@ -2854,8 +2752,7 @@ array_abstract_declarator:
           set($1, ID_array);
           stack($1).add(ID_subtype)=irept(ID_abstract);
           stack($1).add(ID_size).make_nil();
-          merge_types($2, $1); // dest=$2
-          $$=$2;
+          $$=merge($2, $1);
         }
         | '[' '*' ']'
         {
@@ -2886,8 +2783,7 @@ array_abstract_declarator:
           set($1, ID_array);
           stack($1).add(ID_size).swap(stack($3));
           stack($1).add(ID_subtype)=irept(ID_abstract);
-          merge_types($2, $1); // dest=$2
-          $$=$2;
+          $$=merge($2, $1); // dest=$2
         }
         | array_abstract_declarator '[' constant_expression ']'
         {
@@ -2920,10 +2816,9 @@ unary_abstract_declarator:
         {
           // The type_qualifier_list belongs to the pointer,
           // not to the (missing) abstract declarator.
-          $$=$2;
           set($1, ID_pointer);
           stack($1).add(ID_subtype)=irept(ID_abstract);
-          merge_types($$, $1);
+          $$=merge($2, $1);
         }
         | '*' abstract_declarator
         {
@@ -2936,7 +2831,7 @@ unary_abstract_declarator:
           // not to the abstract declarator.
           stack($1).id(ID_pointer);
           stack($1).add(ID_subtype)=irept(ID_abstract);
-          merge_types($2, $1); // dest=$2
+          $2=merge($2, $1); // dest=$2
           make_subtype($3, $2); // dest=$3
           $$=$3;
         }
@@ -2961,10 +2856,9 @@ parameter_unary_abstract_declarator:
         {
           // The type_qualifier_list belongs to the pointer,
           // not to the (missing) abstract declarator.
-          $$=$2;
           set($1, ID_pointer);
           stack($1).add(ID_subtype)=irept(ID_abstract);
-          merge_types($$, $1);
+          $$=merge($2, $1);
         }
         | '*' parameter_abstract_declarator
         {
@@ -2977,7 +2871,7 @@ parameter_unary_abstract_declarator:
           // not to the (missing) abstract declarator.
           stack($1).id(ID_pointer);
           stack($1).add(ID_subtype)=irept(ID_abstract);
-          merge_types($2, $1); // dest=$2
+          $2=merge($2, $1); // dest=$2
           make_subtype($3, $2); // dest=$3
           $$=$3;
         }

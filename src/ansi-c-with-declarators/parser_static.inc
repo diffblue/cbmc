@@ -110,6 +110,12 @@ static void merge_types(irept &dest, irept &src)
   if(src.is_nil())
     return;
 
+  if(dest.is_nil())
+  {
+    dest=src;
+    return;
+  }
+
   if(dest.id()!=ID_merged_type)
   {
     locationt location=static_cast<const exprt &>(dest).location();
@@ -134,9 +140,29 @@ Function: merge_types
 
 \*******************************************************************/
 
+#if 0
 static void merge_types(const YYSTYPE dest, const YYSTYPE src)
 {
   merge_types(stack(dest), stack(src));
+}
+#endif
+
+/*******************************************************************\
+
+Function: merge
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+static YYSTYPE merge(const YYSTYPE src1, const YYSTYPE src2)
+{
+  merge_types(stack(src1), stack(src2));
+  return src1;
 }
 
 /*******************************************************************\
