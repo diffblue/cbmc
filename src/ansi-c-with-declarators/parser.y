@@ -2429,8 +2429,11 @@ function_definition:
           // The head is a declaration with one declarator,
           // and the body becomes the 'value'.
           $$=$1;
-          to_ansi_c_declaration(stack($$)).declarators().
-            back().value().swap(stack($2));
+          ansi_c_declarationt &ansi_c_declaration=
+            to_ansi_c_declaration(stack($$));
+            
+          assert(ansi_c_declaration.declarators().size()==1);
+          ansi_c_declaration.add_initializer(stack($2));
           
           // Kill the scope that 'function_head' creates.
           PARSER.pop_scope();
@@ -2593,28 +2596,28 @@ function_head:
         {
           init($$, ID_declaration);
           stack($$).type().swap(stack($1));
-          PARSER.add_declarator(stack($$), stack($1));
+          PARSER.add_declarator(stack($$), stack($2));
           create_function_scope(stack($$));
         }
         | type_specifier declarator
         {
           init($$, ID_declaration);
           stack($$).type().swap(stack($1));
-          PARSER.add_declarator(stack($$), stack($1));
+          PARSER.add_declarator(stack($$), stack($2));
           create_function_scope(stack($$));
         }
         | declaration_qualifier_list identifier_declarator
         {
           init($$, ID_declaration);
           stack($$).type().swap(stack($1));
-          PARSER.add_declarator(stack($$), stack($1));
+          PARSER.add_declarator(stack($$), stack($2));
           create_function_scope(stack($$));
         }
         | type_qualifier_list identifier_declarator
         {
           init($$, ID_declaration);
           stack($$).type().swap(stack($1));
-          PARSER.add_declarator(stack($$), stack($1));
+          PARSER.add_declarator(stack($$), stack($2));
           create_function_scope(stack($$));
         }
         ;
