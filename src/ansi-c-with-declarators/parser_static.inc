@@ -345,7 +345,7 @@ Function: do_tag
 
 \*******************************************************************/
 
-static void do_tag(YYSTYPE &key, YYSTYPE &tag)
+static void do_tag(exprt &key, exprt &tag)
 {
 #if 0
   irep_idt id_class_str=stack(tag).get(ID_C_id_class);
@@ -368,6 +368,23 @@ static void do_tag(YYSTYPE &key, YYSTYPE &tag)
   declaration.type().id("incomplete_"+declaration.type().id_string());
   PARSER.copy_item(declaration);                    
 #endif
+}
+
+/*******************************************************************\
+
+Function: do_tag
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+inline static void do_tag(YYSTYPE &key, YYSTYPE &tag)
+{
+  do_tag(stack(key), stack(tag));
 }
 
 /*******************************************************************\
