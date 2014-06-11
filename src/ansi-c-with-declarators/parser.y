@@ -1510,7 +1510,7 @@ enum_name:
           identifier_or_typedef_name
         {
           do_tag($1, $3);
-          $$=merge_types($1, $2);
+          $$=merge($1, $2);
         }
         ;
         
