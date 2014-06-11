@@ -1304,9 +1304,9 @@ aggregate_name:
           gcc_type_attribute_opt
           {
             // an anon struct/union
-            init($$, ID_symbol);
-            stack($$).set(ID_C_base_name, PARSER.get_anon_name());
-            do_tag($1, $$);
+            symbol_exprt anon_symbol;
+            anon_symbol.set(ID_C_base_name, PARSER.get_anon_name());
+            do_tag(stack($1), anon_symbol);
           }
           '{' member_declaration_list_opt '}'
           gcc_type_attribute_opt
