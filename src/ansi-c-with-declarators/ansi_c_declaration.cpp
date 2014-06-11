@@ -120,7 +120,7 @@ typet ansi_c_declarationt::full_type(
   
   while(p->is_not_nil())
   {
-    assert(p->id()==ID_pointer || p->id()==ID_array);
+    assert(p->id()==ID_pointer || p->id()==ID_array || p->id()==ID_code);
     p=&p->subtype();
   }
   
