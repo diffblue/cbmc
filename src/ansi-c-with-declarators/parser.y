@@ -1555,11 +1555,9 @@ enum_name:
           '{' enumerator_list '}'
           gcc_type_attribute_opt
         {
-          // throw in the gcc attribute
-          $$=$3;
-          merge_types($$, $7);
-
-          do_enum_members((const typet &)stack($$), stack($5));
+          $$=$1;
+          do_enum_members($$, $5);
+          merge_types($$, $7); // throw in the gcc attribute
         }
         | enum_key
           gcc_type_attribute_opt
@@ -1573,17 +1571,16 @@ enum_name:
           '{' enumerator_list '}'
           gcc_type_attribute_opt
         {
-          // throw in the gcc attribute
-          $$=$4;
-          merge_types($$, $8);
-          do_enum_members((const typet &)stack($$), stack($6));
+          $$=$1;
+          do_enum_members($$, $6);
+          merge_types($$, $8); // throw in the gcc attribute
         }
         | enum_key
           gcc_type_attribute_opt
           identifier_or_typedef_name
         {
           do_tag($1, $3);
-          $$=$3;
+          $$=$1;
           merge_types($$, $2);
         }
         ;
@@ -1598,7 +1595,7 @@ enum_key: TOK_ENUM
 enumerator_list:
           enumerator_declaration
         {
-          init($$);
+          init($$, ID_declaration_list);
           mto($$, $1);
         }
         | enumerator_list ',' enumerator_declaration
@@ -1615,11 +1612,7 @@ enumerator_list:
 enumerator_declaration:
           identifier_or_typedef_name enumerator_value_opt
         {
-          // enum constants in C have signed int type,
-          // not the enum type!
           init($$, ID_declaration);
-          stack($$).type()=typet(ID_int);
-          to_ansi_c_declaration(stack($$)).set_is_enum_constant(true);
           PARSER.add_declarator(stack($$), stack($1));
           to_ansi_c_declaration(stack($$)).add_initializer(stack($2));
         }
@@ -2590,35 +2583,35 @@ function_head:
           irept return_type(ID_int);
           stack($$).type().swap(return_type);
           PARSER.add_declarator(stack($$), stack($1));
-          create_function_scope(stack($$));
+          create_function_scope($$);
         }
         | declaration_specifier declarator
         {
           init($$, ID_declaration);
           stack($$).type().swap(stack($1));
           PARSER.add_declarator(stack($$), stack($2));
-          create_function_scope(stack($$));
+          create_function_scope($$);
         }
         | type_specifier declarator
         {
           init($$, ID_declaration);
           stack($$).type().swap(stack($1));
           PARSER.add_declarator(stack($$), stack($2));
-          create_function_scope(stack($$));
+          create_function_scope($$);
         }
         | declaration_qualifier_list identifier_declarator
         {
           init($$, ID_declaration);
           stack($$).type().swap(stack($1));
           PARSER.add_declarator(stack($$), stack($2));
-          create_function_scope(stack($$));
+          create_function_scope($$);
         }
         | type_qualifier_list identifier_declarator
         {
           init($$, ID_declaration);
           stack($$).type().swap(stack($1));
           PARSER.add_declarator(stack($$), stack($2));
-          create_function_scope(stack($$));
+          create_function_scope($$);
         }
         ;
 

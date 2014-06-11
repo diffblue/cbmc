@@ -302,35 +302,40 @@ Function: do_enum_members
 \*******************************************************************/
 
 static void do_enum_members(
-  const typet &enum_type,
-  exprt &members)
+  const YYSTYPE enum_type_ptr,
+  const YYSTYPE members)
 {  
-#if 0
-  exprt value;
-
   // This assigns increasing values to enum constants
   // that do not have an explicit value. We start with 0.
+  // We should likely move this functionality into
+  // the type checker.
+
   // In C, enum constants always have type "int".
-  value=gen_zero(::enum_type());
+  typet member_type=::enum_type();
 
-  Forall_operands(it, members)
+  exprt value=gen_zero(member_type);
+
+  exprt &member_op=stack(members);
+
+  Forall_operands(it, member_op)
   {
-    ansi_c_declarationt &ansi_c_declaration=
-      to_ansi_c_declaration(*it);
+    ansi_c_declarationt &ansi_c_declaration=to_ansi_c_declaration(*it);
+    ansi_c_declaratort &declarator=ansi_c_declaration.declarator();
+    ansi_c_declaration.type()=typet(ID_int);
 
-    exprt &v=ansi_c_declaration.value();
+    exprt &v=declarator.value();
+
     if(v.is_nil())
       v=value;
 
     exprt symbol_expr(ID_symbol);
-    symbol_expr.set(ID_identifier, ansi_c_declaration.get_name());
+    symbol_expr.set(ID_identifier, declarator.get_base_name());
     
     value=exprt(ID_plus);
-    value.copy_to_operands(symbol_expr, gen_one(::enum_type()));
-    
-    PARSER.copy_item(ansi_c_declaration);
+    value.copy_to_operands(symbol_expr, gen_one(member_type));
   }
-#endif
+
+  stack(enum_type_ptr).operands().swap(member_op.operands());
 }
 
 /*******************************************************************\
@@ -401,26 +406,30 @@ Function: create_function_scope
 
 #include <iostream>
 
-static void create_function_scope(exprt &expr)
+static void create_function_scope(const YYSTYPE d)
 {
-#if 0
-  ansi_c_declarationt &declaration=to_ansi_c_declaration(expr);
+  ansi_c_declarationt &declaration=to_ansi_c_declaration(stack(d));
+  ansi_c_declaratort &declarator=declaration.declarator();
 
-  PARSER.location.set_function(declaration.get_base_name());
+  irep_idt function_name=declarator.get_base_name();
+
+  // record which function we are in
+  PARSER.location.set_function(function_name);
 
   std::string prefix=PARSER.current_scope().prefix+
-                     id2string(declaration.get_base_name())+"::";
+                     id2string(function_name)+"::";
   PARSER.new_scope(prefix);
-  
-  if(declaration.type().id()==ID_code)
+
+  // The grammar doesn't actually enforce that a function type
+  // is used to define a function body. We will complain in the
+  // type checker about it.
+  if(declarator.type().id()==ID_code)
   {
-    code_typet &code_type=to_code_type(declaration.type());
+    code_typet &code_type=to_code_type(declarator.type());
     
     code_typet::parameterst &parameters=code_type.parameters();
     
-    unsigned anon_count=0;
-    
-    // do the parameter declarations
+    // Add the parameter declarations to the scope.
     for(code_typet::parameterst::iterator
         it=parameters.begin();
         it!=parameters.end();
@@ -431,29 +440,17 @@ static void create_function_scope(exprt &expr)
         ansi_c_declarationt &param_decl=to_ansi_c_declaration(*it);
 
         // we record the function name in the location
-        param_decl.location().set_function(declaration.get_base_name());
+        param_decl.location().set_function(function_name);
        
-        // make sure we know it's a parameter
-        param_decl.set_is_parameter(true);
-
-        if(param_decl.get_base_name()==irep_idt())
-        {
-          param_decl.set_base_name("#anon_param"+i2string(anon_count++));
-          param_decl.set_name(prefix+id2string(param_decl.get_base_name()));
-        }
-        else
+        if(!param_decl.declarators().empty())
         {
           // add to scope
           PARSER.current_scope().name_map
-            [param_decl.get_base_name()].id_class=ANSI_C_SYMBOL;
+            [param_decl.declarator().get_base_name()].id_class=ANSI_C_SYMBOL;
         }
-
-        // copy declaration
-        PARSER.copy_item(param_decl);        
       }
     }
   }
-#endif
 }
 
 /*******************************************************************\
