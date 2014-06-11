@@ -53,6 +53,7 @@ void ansi_c_declaratort::build(irept &src)
     }
     else if(t.id()==ID_merged_type)
     {
+      // we always walk down the _last_ member of a merged type
       assert(!t.subtypes().empty());
       p=&(t.subtypes().back());
     }
