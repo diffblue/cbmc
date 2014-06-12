@@ -682,6 +682,7 @@ void c_typecheck_baset::typecheck_function_body(symbolt &symbol)
     p_symbol.is_type=false;
     p_symbol.is_lvalue=true;
     p_symbol.is_state_var=true;
+    p_symbol.is_thread_local=true;
 
     symbolt *new_p_symbol;
     move_symbol(p_symbol, new_p_symbol);
