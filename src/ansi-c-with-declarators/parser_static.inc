@@ -366,60 +366,6 @@ static void do_enum_members(
 
 /*******************************************************************\
 
-Function: do_tag
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-static void do_tag(exprt &key, exprt &tag)
-{
-#if 0
-  irep_idt id_class_str=stack(tag).get(ID_C_id_class);
-
-  ansi_c_id_classt id_class=
-    (ansi_c_id_classt)atoi(id_class_str.c_str());
-
-  if(id_class==ANSI_C_TAG) // we have it already
-    return;
-
-  // it's new
-  ansi_c_declarationt declaration;
-  PARSER.new_declaration(stack(key), stack(tag), declaration, ansi_c_parsert::TAG);
-
-  // grab symbol
-  stack(tag).id(ID_symbol);
-  stack(tag).set(ID_identifier, declaration.get_name());
-  stack(tag).location()=declaration.location();
-
-  declaration.type().id("incomplete_"+declaration.type().id_string());
-  PARSER.copy_item(declaration);                    
-#endif
-}
-
-/*******************************************************************\
-
-Function: do_tag
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-inline static void do_tag(YYSTYPE &key, YYSTYPE &tag)
-{
-  do_tag(stack(key), stack(tag));
-}
-
-/*******************************************************************\
-
 Function: create_function_scope
 
   Inputs:
