@@ -394,6 +394,8 @@ Function: ansi_c_convertt::convert_type
 
 \*******************************************************************/
 
+#include <iostream>
+
 void ansi_c_convertt::convert_type(
   typet &type,
   c_storage_spect &c_storage_spec)
@@ -429,27 +431,13 @@ void ansi_c_convertt::convert_type(
   }
   else if(type.id()==ID_code)
   {
-    c_storage_spect sub_storage_spec;
-
-    convert_type(type.subtype(), sub_storage_spec);
-    c_storage_spec|=sub_storage_spec;
-
     code_typet &code_type=to_code_type(type);
-
-    // change subtype to return_type
-    code_type.return_type().swap(type.subtype());
-    type.remove(ID_subtype);
-
+    
+    code_type.remove(ID_subtype);
+    code_type.return_type().make_nil();
+    
     // take care of parameter declarations
     code_typet::parameterst &parameters=code_type.parameters();
-
-    // see if we have an ellipsis
-    if(!parameters.empty() &&
-       parameters.back().id()==ID_ellipsis)
-    {
-      code_type.make_ellipsis();
-      parameters.pop_back();
-    }
 
     for(code_typet::parameterst::iterator
         it=parameters.begin();
@@ -458,28 +446,19 @@ void ansi_c_convertt::convert_type(
     {
       if(it->id()==ID_declaration)
       {
-        code_typet::parametert parameter;
-
         ansi_c_declarationt &declaration=
           to_ansi_c_declaration(*it);
 
         assert(declaration.declarators().size()==1);
 
         convert_type(declaration.type());
-
-        irep_idt base_name=declaration.declarator().get_base_name();
-
-        parameter.type().swap(declaration.type());
-        parameter.set_base_name(base_name);
-        parameter.location()=declaration.location();
-        parameter.set_identifier(declaration.declarator().get_name());
-
-        it->swap(parameter);
+        convert_type(declaration.declarator().type());
       }
       else if(it->id()==ID_ellipsis)
-        throw "ellipsis only allowed as last parameter";
+      {
+      }
       else
-        throw "unexpected parameter: "+it->id_string();
+        throw "unexpected parameter during conversion: "+it->id_string();
     }
   }
   else if(type.id()==ID_array)
