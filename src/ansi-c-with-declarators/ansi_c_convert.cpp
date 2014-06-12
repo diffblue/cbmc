@@ -60,8 +60,8 @@ void ansi_c_convertt::convert_declaration(ansi_c_declarationt &declaration)
   declaration.set_is_extern(c_storage_spec.is_extern);
   declaration.set_is_thread_local(c_storage_spec.is_thread_local);
   declaration.set_is_register(c_storage_spec.is_register);
-  // we do not overwrite is_typedef -- it's already done by the parser
-
+  declaration.set_is_typedef(c_storage_spec.is_typedef);
+  
   // convert the types and values of the declarators
   for(ansi_c_declarationt::declaratorst::iterator
       d_it=declaration.declarators().begin();

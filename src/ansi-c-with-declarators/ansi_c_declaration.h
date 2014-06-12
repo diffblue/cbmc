@@ -72,16 +72,6 @@ public:
   {
   }
   
-  inline bool get_is_type() const
-  {
-    return get_bool(ID_is_type);
-  }
-  
-  inline void set_is_type(bool is_type)
-  {
-    set(ID_is_type, is_type);
-  }
-  
   inline bool get_is_typedef() const
   {
     return get_bool(ID_is_typedef);
