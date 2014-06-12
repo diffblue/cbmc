@@ -161,10 +161,7 @@ void ansi_c_declarationt::to_symbol(
   symbol.name="c::"+id2string(declarator.get_name());
   symbol.base_name=declarator.get_base_name();
   symbol.is_type=get_is_typedef();
-  if(symbol.is_type)
-    symbol.location=symbol.type.location();
-  else
-    symbol.location=location();
+  symbol.location=declarator.location();
   symbol.is_extern=get_is_extern();
   symbol.is_macro=get_is_typedef() || get_is_enum_constant();
   symbol.is_parameter=get_is_parameter();

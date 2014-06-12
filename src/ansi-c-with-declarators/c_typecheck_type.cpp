@@ -683,6 +683,9 @@ Function: c_typecheck_baset::typecheck_typeof_type
 
 void c_typecheck_baset::typecheck_typeof_type(typet &type)
 {
+  // save location
+  locationt location=type.location();
+
   // retain the qualifiers as is
   c_qualifierst c_qualifiers;
   c_qualifiers.read(type);
@@ -711,6 +714,7 @@ void c_typecheck_baset::typecheck_typeof_type(typet &type)
     type.swap(expr.type());
   }
   
+  type.location()=location;
   c_qualifiers.write(type);
 }
 
