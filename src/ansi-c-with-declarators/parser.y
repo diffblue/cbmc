@@ -1608,6 +1608,7 @@ parameter_declaration:
         {
           init($$, ID_declaration);
           to_ansi_c_declaration(stack($$)).set_is_parameter(true);
+          to_ansi_c_declaration(stack($$)).type().swap(stack($1));
           exprt declarator=exprt(ID_abstract);
           PARSER.add_declarator(stack($$), declarator);
         }
@@ -1615,13 +1616,15 @@ parameter_declaration:
         {
           init($$, ID_declaration);
           to_ansi_c_declaration(stack($$)).set_is_parameter(true);
+          to_ansi_c_declaration(stack($$)).type().swap(stack($1));
           PARSER.add_declarator(stack($$), stack($2));
         }
         | declaration_specifier identifier_declarator gcc_type_attribute_opt
         {
-          $2=merge($2, $3);
+          $2=merge($2, $3); // type attribute to go into declarator
           init($$, ID_declaration);
           to_ansi_c_declaration(stack($$)).set_is_parameter(true);
+          to_ansi_c_declaration(stack($$)).type().swap(stack($1));
           PARSER.add_declarator(stack($$), stack($2));
         }
         | declaration_specifier parameter_typedef_declarator
@@ -1630,12 +1633,14 @@ parameter_declaration:
           // of the type!
           init($$, ID_declaration);
           to_ansi_c_declaration(stack($$)).set_is_parameter(true);
+          to_ansi_c_declaration(stack($$)).type().swap(stack($1));
           PARSER.add_declarator(stack($$), stack($2));
         }
         | declaration_qualifier_list
         {
           init($$, ID_declaration);
           to_ansi_c_declaration(stack($$)).set_is_parameter(true);
+          to_ansi_c_declaration(stack($$)).type().swap(stack($1));
           exprt declarator=exprt(ID_abstract);
           PARSER.add_declarator(stack($$), declarator);
         }
@@ -1643,6 +1648,7 @@ parameter_declaration:
         {
           init($$, ID_declaration);
           to_ansi_c_declaration(stack($$)).set_is_parameter(true);
+          to_ansi_c_declaration(stack($$)).type().swap(stack($1));
           PARSER.add_declarator(stack($$), stack($2));
         }
         | declaration_qualifier_list identifier_declarator gcc_type_attribute_opt
@@ -1650,12 +1656,14 @@ parameter_declaration:
           $2=merge($2, $3); // type attribute
           init($$, ID_declaration);
           to_ansi_c_declaration(stack($$)).set_is_parameter(true);
+          to_ansi_c_declaration(stack($$)).type().swap(stack($1));
           PARSER.add_declarator(stack($$), stack($2));
         }
         | type_specifier
         {
           init($$, ID_declaration);
           to_ansi_c_declaration(stack($$)).set_is_parameter(true);
+          to_ansi_c_declaration(stack($$)).type().swap(stack($1));
           exprt declarator=exprt(ID_abstract);
           PARSER.add_declarator(stack($$), declarator);
         }
@@ -1663,6 +1671,7 @@ parameter_declaration:
         {
           init($$, ID_declaration);
           to_ansi_c_declaration(stack($$)).set_is_parameter(true);
+          to_ansi_c_declaration(stack($$)).type().swap(stack($1));
           PARSER.add_declarator(stack($$), stack($2));
         }
         | type_specifier identifier_declarator gcc_type_attribute_opt
@@ -1670,7 +1679,7 @@ parameter_declaration:
           $2=merge($2, $3); // type attribute
           init($$, ID_declaration);
           to_ansi_c_declaration(stack($$)).set_is_parameter(true);
-          stack($1), stack($2), stack($$);
+          to_ansi_c_declaration(stack($$)).type().swap(stack($1));
           PARSER.add_declarator(stack($$), stack($2));
         }
         | type_specifier parameter_typedef_declarator
@@ -1678,12 +1687,14 @@ parameter_declaration:
           // the second tree is really the declarator -- not part of the type!
           init($$, ID_declaration);
           to_ansi_c_declaration(stack($$)).set_is_parameter(true);
+          to_ansi_c_declaration(stack($$)).type().swap(stack($1));
           PARSER.add_declarator(stack($$), stack($2));
         }
         | type_qualifier_list
         {
           init($$, ID_declaration);
           to_ansi_c_declaration(stack($$)).set_is_parameter(true);
+          to_ansi_c_declaration(stack($$)).type().swap(stack($1));
           exprt declarator=exprt(ID_abstract);
           PARSER.add_declarator(stack($$), declarator);
         }
@@ -1691,6 +1702,7 @@ parameter_declaration:
         {
           init($$, ID_declaration);
           to_ansi_c_declaration(stack($$)).set_is_parameter(true);
+          to_ansi_c_declaration(stack($$)).type().swap(stack($1));
           PARSER.add_declarator(stack($$), stack($2));
         }
         | type_qualifier_list identifier_declarator gcc_type_attribute_opt
@@ -1698,6 +1710,7 @@ parameter_declaration:
           $2=merge($2, $3);
           init($$, ID_declaration);
           to_ansi_c_declaration(stack($$)).set_is_parameter(true);
+          to_ansi_c_declaration(stack($$)).type().swap(stack($1));
           PARSER.add_declarator(stack($$), stack($2));
         }
         ;
