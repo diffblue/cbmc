@@ -400,7 +400,8 @@ void c_typecheck_baset::typecheck_vector_type(vector_typet &type)
      subtype.id()!=ID_fixedbv)
   {
     err_location(size_location);
-    error("cannot make a vector of this type");
+    str << "cannot make a vector of subtype "
+        << to_string(subtype);
     throw 0;
   }
 
