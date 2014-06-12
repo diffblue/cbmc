@@ -123,10 +123,12 @@ void ansi_c_parsert::add_declarator(
 
   irep_idt base_name=new_declarator.get_base_name();
 
+  // abstract?
   if(base_name!="")
   {
     bool is_typedef=
       ansi_c_declarationt::is_a_typedef(ansi_c_declaration.type());
+
     bool force_root_scope=false;
   
     if(ansi_c_declaration.type().id()==ID_code)
@@ -143,6 +145,12 @@ void ansi_c_parsert::add_declarator(
 
     // add to scope  
     scope.name_map[base_name].id_class=id_class;
+
+    // set the final name    
+    irep_idt name=force_root_scope?
+             base_name:
+             current_scope().prefix+id2string(base_name);
+    new_declarator.set_name(name);
   }
   
   ansi_c_declaration.declarators().push_back(new_declarator);
