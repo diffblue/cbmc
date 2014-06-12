@@ -246,7 +246,6 @@ grammar:
           ansi_c_declarationt ansi_c_declaration;
           ansi_c_declaration.type()=
             static_cast<const typet &>(static_cast<const irept &>(stack($2)));
-          ansi_c_declaration.set_is_type(true);
           PARSER.copy_item(ansi_c_declaration);
         }
         ;

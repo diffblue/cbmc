@@ -81,7 +81,6 @@ Function: ansi_c_declarationt::output
 void ansi_c_declarationt::output(std::ostream &out) const
 {
   out << "Flags:";
-  if(get_is_type()) out << " is_type";
   if(get_is_typedef()) out << " is_typedef";
   if(get_is_enum_constant()) out << " is_enum_constant";
   if(get_is_static()) out << " is_static";
@@ -161,7 +160,7 @@ void ansi_c_declarationt::to_symbol(
   symbol.type=full_type(declarator);
   symbol.name="c::"+id2string(declarator.get_name());
   symbol.base_name=declarator.get_base_name();
-  symbol.is_type=get_is_type();
+  symbol.is_type=get_is_typedef();
   if(symbol.is_type)
     symbol.location=symbol.type.location();
   else
