@@ -680,9 +680,11 @@ void c_typecheck_baset::typecheck_function_body(symbolt &symbol)
     p_symbol.name=p_it->get_identifier();
     p_symbol.is_static_lifetime=false;
     p_symbol.is_type=false;
+    p_symbol.is_lvalue=true;
+    p_symbol.is_state_var=true;
 
-    symbolt *new_symbol;
-    move_symbol(p_symbol, new_symbol);
+    symbolt *new_p_symbol;
+    move_symbol(p_symbol, new_p_symbol);
   }
 
   // typecheck the body code  
