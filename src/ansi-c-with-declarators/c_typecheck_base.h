@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/std_types.h>
 
+#include "ansi_c_declaration.h"
 #include "designator.h"
 
 class c_typecheck_baset:
@@ -166,7 +167,6 @@ protected:
   virtual void typecheck_decl(codet &code);
   virtual void typecheck_decl(codet &code, std::list<codet> &clean_code);
   virtual void typecheck_decl_type(codet &code);
-  virtual void typecheck_decl_block(codet &code);
   virtual void typecheck_expression(codet &code);
   virtual void typecheck_for(codet &code);
   virtual void typecheck_goto(codet &code);
@@ -264,6 +264,7 @@ protected:
   { symbolt *new_symbol; move_symbol(symbol, new_symbol); }
   
   // top level stuff
+  void typecheck_declaration(ansi_c_declarationt &); 
   void typecheck_symbol(symbolt &symbol);
   void typecheck_new_symbol(symbolt &symbol);
   void typecheck_redefinition_type(symbolt &old_symbol, symbolt &new_symbol);
