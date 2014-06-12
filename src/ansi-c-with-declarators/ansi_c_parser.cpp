@@ -53,7 +53,7 @@ Function: ansi_c_parsert::lookup
 ansi_c_id_classt ansi_c_parsert::lookup(
   std::string &name,
   bool tag,
-  bool label) const
+  bool label)
 {
   // labels and tags have a separate name space
   const std::string scope_name=
@@ -73,6 +73,15 @@ ansi_c_id_classt ansi_c_parsert::lookup(
       name=it->prefix+scope_name;
       return n_it->second.id_class;
     }
+  }
+  
+  // Not found.
+  // If it's a tag, we will add to current scope.
+  if(tag)
+  {
+    current_scope().name_map[scope_name].id_class=ANSI_C_TAG;
+    name=current_scope().prefix+scope_name;
+    return ANSI_C_TAG;
   }
 
   return ANSI_C_UNKNOWN;

@@ -165,7 +165,7 @@ public:
   ansi_c_id_classt lookup(
     std::string &name,
     bool tag,
-    bool label) const;
+    bool label);
 
   static ansi_c_id_classt get_class(const typet &type);
   
