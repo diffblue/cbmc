@@ -122,7 +122,7 @@ bool ansi_c_languaget::parse(
   // parsing
 
   std::string code;
-  //ansi_c_internal_additions(code);
+  ansi_c_internal_additions(code);
   std::istringstream codestr(code);
 
   ansi_c_parser.clear();
@@ -161,9 +161,9 @@ bool ansi_c_languaget::parse(
 
   ansi_c_scanner_init();
 
-  bool result; //=ansi_c_parser.parse();
+  bool result=ansi_c_parser.parse();
 
-  //if(!result)
+  if(!result)
   {
     ansi_c_parser.set_line_no(0);
     ansi_c_parser.set_file(path);
