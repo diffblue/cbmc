@@ -121,8 +121,16 @@ typet ansi_c_declarationt::full_type(
   
   while(p->is_not_nil())
   {
-    assert(p->id()==ID_pointer || p->id()==ID_array || p->id()==ID_code);
-    p=&p->subtype();
+    if(p->id()==ID_merged_type)
+    {
+      // we always walk down the last type in a merged_type
+      p=&p->subtypes().back();
+    }
+    else
+    {
+      assert(p->id()==ID_pointer || p->id()==ID_array || p->id()==ID_code);
+      p=&p->subtype();
+    }
   }
   
   *p=type();
