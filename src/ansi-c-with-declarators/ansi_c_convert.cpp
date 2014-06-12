@@ -200,24 +200,11 @@ void ansi_c_convertt::convert_code(codet &code)
     assert(code.operands().size()==1);
     convert_expr(code.op0());
   }
-  else if(statement==ID_decl_type)
-  {
-    // type only
-    assert(code.operands().size()==0);
-    convert_type(static_cast<typet &>(code.add(ID_type_arg)));
-  }
   else if(statement==ID_decl)
   {
-    // 1 or 2 operands
-    if(code.operands().size()==1)
-      convert_expr(code.op0());
-    else if(code.operands().size()==2)
-    {
-      convert_expr(code.op0());
-      convert_expr(code.op1());
-    }
-    else
-      assert(false);
+    // 1 operand, whch is a declaration
+    assert(code.operands().size()==1);
+    convert_declaration(to_ansi_c_declaration(code.op0()));
   }
   else if(statement==ID_label)
   {
@@ -237,8 +224,7 @@ void ansi_c_convertt::convert_code(codet &code)
     convert_expr(code.op1());
     convert_code(to_code(code.op2()));
   }
-  else if(statement==ID_block ||
-          statement==ID_decl_block)
+  else if(statement==ID_block)
   {
     Forall_operands(it, code)
       convert_code(to_code(*it));
