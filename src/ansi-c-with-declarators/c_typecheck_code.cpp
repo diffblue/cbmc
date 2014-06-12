@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/config.h>
 #include <linking/zero_initializer.h>
 
+#include "ansi_c_declaration.h"
 #include "c_typecheck_base.h"
 
 /*******************************************************************\
@@ -83,8 +84,6 @@ void c_typecheck_baset::typecheck_code(codet &code)
     typecheck_decl(code);
   else if(statement==ID_decl_type)
     typecheck_decl_type(code);
-  else if(statement==ID_decl_block)
-    typecheck_decl_block(code);
   else if(statement==ID_assign)
     typecheck_assign(code);
   else if(statement==ID_skip)
@@ -189,47 +188,6 @@ void c_typecheck_baset::typecheck_assign(codet &code)
 
 /*******************************************************************\
 
-Function: c_typecheck_baset::typecheck_decl_block
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void c_typecheck_baset::typecheck_decl_block(codet &code)
-{
-  Forall_operands(it, code)
-    typecheck_code(to_code(*it));
-
-  // unwind any decl-blocks inside the decl block
-  
-  exprt::operandst new_ops;
-  new_ops.reserve(code.operands().size());
-
-  Forall_operands(it1, code)
-  {
-    if(it1->is_nil()) continue;
-
-    codet &code_op=to_code(*it1);
-  
-    if(code_op.get_statement()==ID_decl_block)
-    {
-      Forall_operands(it2, code_op)
-        if(it2->is_not_nil())
-          new_ops.push_back(*it2);
-    }
-    else
-      new_ops.push_back(code_op);
-  }
-
-  code.operands().swap(new_ops);
-}
-
-/*******************************************************************\
-
 Function: c_typecheck_baset::typecheck_block
 
   Inputs:
@@ -256,13 +214,7 @@ void c_typecheck_baset::typecheck_block(codet &code)
 
     codet &code_op=to_code(*it1);
   
-    if(code_op.get_statement()==ID_decl_block)
-    {
-      Forall_operands(it2, code_op)
-        if(it2->is_not_nil())
-          new_ops.move_to_operands(*it2);
-    }
-    else if(code_op.get_statement()==ID_label)
+    if(code_op.get_statement()==ID_label)
     {
       // these may be nested
       codet *code_ptr=&code_op;
@@ -275,21 +227,7 @@ void c_typecheck_baset::typecheck_block(codet &code)
       
       codet &label_op=*code_ptr;
 
-      // move declaration out of label
-      if(label_op.get_statement()==ID_decl_block)
-      {
-        codet tmp;
-        tmp.swap(label_op);
-        label_op=codet(ID_skip);
-        
-        new_ops.move_to_operands(code_op);
-
-        Forall_operands(it2, tmp)
-          if(it2->is_not_nil())
-            new_ops.move_to_operands(*it2);
-      }
-      else
-        new_ops.move_to_operands(code_op);
+      new_ops.move_to_operands(code_op);
     }
     else
       new_ops.move_to_operands(code_op);
@@ -447,21 +385,26 @@ void c_typecheck_baset::typecheck_decl(
   codet &code,
   std::list<codet> &clean_code)
 {
-  // this may have 1 or 2 operands
-  if(code.operands().size()!=1 &&
-     code.operands().size()!=2)
+  // this comes with 1 operand, which is a declaration
+  if(code.operands().size()!=1)
   {
     err_location(code);
-    throw "decl expected to have 1 or 2 arguments";
+    throw "decl expected to have 1 operand";
   }
 
-  // op0 must be symbol
-  if(code.op0().id()!=ID_symbol)
+  // op0 must be declaration
+  if(code.op0().id()!=ID_declaration)
   {
     err_location(code);
-    throw "decl expected to have symbol as first operand";
+    throw "decl statement expected to have declaration as operand";
   }
 
+  ansi_c_declarationt declaration;
+  declaration.swap(code.op0());
+  
+  typecheck_declaration(declaration);
+  
+  #if 0
   // add prefix
   {
     symbol_exprt &symbol_expr=to_symbol_expr(code.op0());
@@ -528,6 +471,7 @@ void c_typecheck_baset::typecheck_decl(
     err_location(code);
     throw "incomplete type not permitted here";
   }
+  #endif
 }
 
 /*******************************************************************\
@@ -939,6 +883,7 @@ void c_typecheck_baset::typecheck_ifthenelse(code_ifthenelset &code)
     code_block.move_to_operands(code.then_case());
     code.then_case().swap(code_block);
   }
+  
   typecheck_code(to_code(code.then_case()));
 
   if(!code.else_case().is_nil())
