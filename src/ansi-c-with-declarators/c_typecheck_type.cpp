@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "c_types.h"
 #include "c_sizeof.h"
 #include "c_qualifiers.h"
+#include "ansi_c_declaration.h"
 #include "padding.h"
 
 /*******************************************************************\
@@ -215,41 +216,58 @@ void c_typecheck_baset::typecheck_code_type(code_typet &type)
   {
     type.make_ellipsis();
   }
-  else
+  else // we do have parameters
   {
-    // we do have parameters
+    // is the last one ellipsis?
+    if(type.parameters().back().id()==ID_ellipsis)
+    {
+      type.make_ellipsis();
+      type.parameters().pop_back();
+    }
     
     parameter_map.clear();
   
-    for(unsigned i=0; i<type.parameters().size(); i++)
+    for(code_typet::parameterst::iterator
+        p_it=type.parameters().begin();
+        p_it!=type.parameters().end();
+        p_it++)
     {
-      code_typet::parametert &parameter=type.parameters()[i];
-
-      // first fix type
-      typet &type=parameter.type();
-
-      typecheck_type(type);
-      
-      adjust_function_parameter(type);
-      
-      // adjust the identifier
-
-      irep_idt identifier=parameter.get_identifier();
-
-      if(identifier!=irep_idt())
+      // turn the declarations into parameters
+      if(p_it->id()==ID_declaration)
       {
-        identifier=add_language_prefix(identifier);
+        ansi_c_declarationt &declaration=to_ansi_c_declaration(*p_it);
+        typecheck_type(declaration.type());
+        typecheck_type(declaration.declarator().type());
+      
+        code_typet::parametert parameter;
+
+        // first fix type
+        typet &type=parameter.type();
+        type=declaration.full_type(declaration.declarator());
+        adjust_function_parameter(type);
+      
+        // adjust the identifier
+        irep_idt identifier=declaration.declarator().get_name();
+
+        // abstract or not?
+        if(identifier!=irep_idt())
+        {
+          identifier=add_language_prefix(identifier);
     
-        id_replace_mapt::const_iterator
-          m_it=id_replace_map.find(identifier);
+          id_replace_mapt::const_iterator
+            m_it=id_replace_map.find(identifier);
 
-        if(m_it!=id_replace_map.end())
-          identifier=m_it->second;
+          if(m_it!=id_replace_map.end())
+            identifier=m_it->second;
 
-        parameter.set_identifier(identifier);
+          parameter.set_identifier(identifier);
 
-        // make visible now, later parameters might use it
-        parameter_map[identifier]=type;
+          // make visible now, later parameters might use it
+          parameter_map[identifier]=type;
+        }
+        
+        // put the parameter in place of the declaration
+        p_it->swap(parameter);
       }
     }
     
