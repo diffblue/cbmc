@@ -131,6 +131,10 @@ void ansi_c_parsert::add_declarator(
   new_declarator.build(declarator);
 
   irep_idt base_name=new_declarator.get_base_name();
+  
+  // global?
+  if(current_scope().prefix=="")
+    ansi_c_declaration.set_is_global(true);
 
   // abstract?
   if(base_name!="")
