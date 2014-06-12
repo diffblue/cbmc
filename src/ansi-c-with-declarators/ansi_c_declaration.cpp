@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 
 #include <util/config.h>
+#include <util/std_types.h>
 
 #include "ansi_c_declaration.h"
 
@@ -113,23 +114,25 @@ Function: ansi_c_declarationt::full_type
 
 \*******************************************************************/
 
+#include <iostream>
+
 typet ansi_c_declarationt::full_type(
   const ansi_c_declaratort &declarator) const
 {
   typet result=declarator.type();
   typet *p=&result;
-  
+
+  // this gets converted types as of now  
   while(p->is_not_nil())
   {
-    if(p->id()==ID_merged_type)
-    {
-      // we always walk down the last type in a merged_type
-      p=&p->subtypes().back();
-    }
+    if(p->id()==ID_pointer || p->id()==ID_array)
+      p=&p->subtype();
+    else if(p->id()==ID_code)
+      p=&(to_code_type(*p).return_type());
     else
     {
-      assert(p->id()==ID_pointer || p->id()==ID_array || p->id()==ID_code);
-      p=&p->subtype();
+      std::cout << "p: " << p->pretty() << "\n";
+      assert(false);
     }
   }
   
