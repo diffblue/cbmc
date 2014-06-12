@@ -1257,9 +1257,6 @@ aggregate_name:
           gcc_type_attribute_opt
           {
             // an anon struct/union
-            symbol_exprt anon_symbol;
-            anon_symbol.set(ID_C_base_name, PARSER.get_anon_name());
-            do_tag(stack($1), anon_symbol);
           }
           '{' member_declaration_list_opt '}'
           gcc_type_attribute_opt
@@ -1276,7 +1273,7 @@ aggregate_name:
           identifier_or_typedef_name
           {
             // a struct/union with tag
-            do_tag($1, $3);
+            stack($1).set(ID_tag, stack($3));
           }
           '{' member_declaration_list_opt '}'
           gcc_type_attribute_opt
@@ -1293,8 +1290,7 @@ aggregate_name:
           identifier_or_typedef_name
           gcc_type_attribute_opt
         {
-          // just the tag
-          do_tag($1, $3);
+          stack($1).set(ID_tag, stack($3));
           // type attributes
           $$=merge($1, merge($2, $4));
         }
@@ -1478,38 +1474,32 @@ enum_name:
           enum_key
           gcc_type_attribute_opt
           {
-            // an anon enum, we want that to be visible before the
-            // members
-            init($$, ID_symbol);
-            stack($$).set(ID_C_base_name, PARSER.get_anon_name());
-            do_tag($1, $$);
-            $$=merge($$, $2);
+            // an anon enum
           }
           '{' enumerator_list '}'
           gcc_type_attribute_opt
         {
           do_enum_members($1, $5);
-          $$=merge($1, $7); // throw in the gcc attribute
+          $$=merge($1, merge($2, $7)); // throw in the gcc attributes
         }
         | enum_key
           gcc_type_attribute_opt
           identifier_or_typedef_name
           {
-            // we want the tag to be visible before the members
-            do_tag($1, $3);
-            $$=merge($3, $2);
+            // an enum with tag
+            stack($1).set(ID_tag, stack($3));
           }
           '{' enumerator_list '}'
           gcc_type_attribute_opt
         {
           do_enum_members($1, $6);
-          $$=merge($1, $8); // throw in the gcc attribute
+          $$=merge($1, merge($2, $8)); // throw in the gcc attribute
         }
         | enum_key
           gcc_type_attribute_opt
           identifier_or_typedef_name
         {
-          do_tag($1, $3);
+          stack($1).set(ID_tag, stack($3));
           $$=merge($1, $2);
         }
         ;
@@ -1894,8 +1884,8 @@ declaration_statement:
           declaration
         {
           init($$);
-          statement($$, ID_decl_block);
-          stack($$).operands().swap(stack($1).operands());
+          statement($$, ID_decl);
+          mto($$, $1);
         }
         ;
 
@@ -2453,12 +2443,12 @@ KnR_typedef_declaration_specifier:
 KnR_sue_declaration_specifier:
         KnR_declaration_qualifier_list aggregate_key identifier_or_typedef_name gcc_type_attribute_opt
         {
-          do_tag($2, $3);
+          stack($2).set(ID_tag, stack($3));
           $$=merge($3, merge($1, $4));
         }
         | KnR_declaration_qualifier_list enum_key identifier_or_typedef_name gcc_type_attribute_opt
         {
-          do_tag($2, $3);
+          stack($2).set(ID_tag, stack($3));
           $$=merge($3, merge($1, $4));
         }
         ;
