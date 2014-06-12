@@ -62,12 +62,15 @@ void ansi_c_convertt::convert_declaration(ansi_c_declarationt &declaration)
   declaration.set_is_register(c_storage_spec.is_register);
   // we do not overwrite is_typedef -- it's already done by the parser
 
-  // convert the values of the declarators
+  // convert the types and values of the declarators
   for(ansi_c_declarationt::declaratorst::iterator
       d_it=declaration.declarators().begin();
       d_it!=declaration.declarators().end();
       d_it++)
   {
+    c_storage_spect declarator_storage_spec;
+    convert_type(d_it->type(), declarator_storage_spec);
+  
     if(d_it->value().is_not_nil())
     {
       if(d_it->value().type().id()==ID_code)
@@ -437,7 +440,7 @@ void ansi_c_convertt::convert_type(
     code_type.return_type().swap(type.subtype());
     type.remove(ID_subtype);
 
-    // take care of parameter types
+    // take care of parameter declarations
     code_typet::parameterst &parameters=code_type.parameters();
 
     // see if we have an ellipsis
