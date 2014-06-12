@@ -666,6 +666,24 @@ void c_typecheck_baset::typecheck_function_body(symbolt &symbol)
     
   // set return type
   return_type=code_type.return_type();
+  
+  // add parameter declarations into the symbol table
+  const code_typet::parameterst &parameters=code_type.parameters();
+  for(code_typet::parameterst::const_iterator
+      p_it=parameters.begin();
+      p_it!=parameters.end();
+      p_it++)
+  {
+    symbolt p_symbol;
+    
+    p_symbol.type=p_it->type();
+    p_symbol.name=p_it->get_identifier();
+    p_symbol.is_static_lifetime=false;
+    p_symbol.is_type=false;
+
+    symbolt *new_symbol;
+    move_symbol(p_symbol, new_symbol);
+  }
 
   // typecheck the body code  
   typecheck_code(to_code(symbol.value));
