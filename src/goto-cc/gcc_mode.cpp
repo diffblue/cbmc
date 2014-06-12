@@ -234,8 +234,8 @@ bool gcc_modet::doit()
   if(cmdline.isset("std"))
   {
     std::string std_string=cmdline.getval("std");
-    if(std_string=="gnu99" || std_string=="c99" ||
-       std_string=="gnu9x" || std_string=="c9x" ||
+    if(std_string=="gnu99" || std_string=="c99" || std_string=="iso9899:1999" ||
+       std_string=="gnu9x" || std_string=="c9x" || std_string=="iso9899:199x" ||
        std_string=="gnu11" || std_string=="c11" ||
        std_string=="gnu1x" || std_string=="c1x")
       config.ansi_c.for_has_scope=true;
