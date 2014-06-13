@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <cassert>
+
 #include <util/find_symbols.h>
 #include <util/location.h>
 #include <util/base_type.h>
@@ -14,7 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_types.h>
 #include <util/simplify_expr.h>
 
-#include <ansi-c/expr2c.h>
+#include <langapi/language_util.h>
 
 #include "linking_type_eq.h"
 #include "linking.h"
@@ -22,7 +24,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
-Function: linkingt::to_string
+Function: linkingt::expr_to_string
 
   Inputs:
 
@@ -32,14 +34,17 @@ Function: linkingt::to_string
 
 \*******************************************************************/
 
-std::string linkingt::to_string(const exprt &expr)
+std::string linkingt::expr_to_string(
+  const namespacet &ns,
+  const irep_idt &identifier,
+  const exprt &expr) const
 { 
-  return expr2c(expr, ns);
+  return from_expr(ns, identifier, expr);
 }
 
 /*******************************************************************\
 
-Function: linkingt::to_string
+Function: linkingt::type_to_string
 
   Inputs:
 
@@ -49,14 +54,17 @@ Function: linkingt::to_string
 
 \*******************************************************************/
 
-std::string linkingt::to_string(const typet &type)
+std::string linkingt::type_to_string(
+  const namespacet &ns,
+  const irep_idt &identifier,
+  const typet &type) const
 { 
-  return type2c(type, ns);
+  return from_type(ns, identifier, type);
 }
 
 /*******************************************************************\
 
-Function: linkingt::to_string_verbose
+Function: linkingt::type_to_string_verbose
 
   Inputs:
 
@@ -66,7 +74,10 @@ Function: linkingt::to_string_verbose
 
 \*******************************************************************/
 
-std::string linkingt::to_string_verbose(const typet &type)
+std::string linkingt::type_to_string_verbose(
+  const namespacet &ns,
+  const symbolt &symbol,
+  const typet &type) const
 { 
   const typet &followed=ns.follow(type);
 
@@ -88,7 +99,7 @@ std::string linkingt::to_string_verbose(const typet &type)
     {
       const typet &subtype=it->type();
       result+="  ";
-      result+=to_string(subtype);
+      result+=type_to_string(ns, symbol.name, subtype);
       result+=" ";
 
       if(it->get_base_name()!="")
@@ -105,10 +116,15 @@ std::string linkingt::to_string_verbose(const typet &type)
   }
   else if(followed.id()==ID_pointer)
   {
-    return to_string_verbose(followed.subtype())+" *";
+    return type_to_string_verbose(ns, symbol, followed.subtype())+" *";
+  }
+  else if(followed.id()==ID_incomplete_struct ||
+          followed.id()==ID_incomplete_union)
+  {
+    return type_to_string(ns, symbol.name, type)+"   (incomplete)";
   }
 
-  return to_string(type);
+  return type_to_string(ns, symbol.name, type);
 }
 
 /*******************************************************************\
@@ -135,10 +151,10 @@ void linkingt::link_error(
       << "\"" << std::endl;
   str << "old definition in module " << old_symbol.module
       << " " << old_symbol.location << std::endl
-      << to_string_verbose(old_symbol.type) << std::endl;
+      << type_to_string_verbose(ns, old_symbol) << std::endl;
   str << "new definition in module " << new_symbol.module
       << " " << new_symbol.location << std::endl
-      << to_string_verbose(new_symbol.type);
+      << type_to_string_verbose(ns, new_symbol);
 
   throw 0;
 }
@@ -165,10 +181,10 @@ void linkingt::link_warning(
       << "\"" << std::endl;
   str << "old definition in module " << old_symbol.module
       << " " << old_symbol.location << std::endl
-      << to_string_verbose(old_symbol.type) << std::endl;
+      << type_to_string_verbose(ns, old_symbol) << std::endl;
   str << "new definition in module " << new_symbol.module
       << " " << new_symbol.location << std::endl
-      << to_string_verbose(new_symbol.type);
+      << type_to_string_verbose(ns, new_symbol);
 
   warning();
 }
@@ -523,10 +539,10 @@ void linkingt::duplicate_non_type_symbol(
               << "\"" << std::endl;
           str << "old value in module " << old_symbol.module
               << " " << old_symbol.value.find_location() << std::endl
-              << to_string(tmp_old) << std::endl;
+              << expr_to_string(ns, old_symbol.name, tmp_old) << std::endl;
           str << "new value in module " << new_symbol.module
               << " " << new_symbol.value.find_location() << std::endl
-              << to_string(tmp_new);
+              << expr_to_string(ns, new_symbol.name, tmp_new);
           throw 0;
         }
       }
