@@ -121,10 +121,10 @@ typet ansi_c_declarationt::full_type(
   typet result=declarator.type();
   typet *p=&result;
 
-  // this gets converted types as of now  
+  // this gets types that are converted but not type-checked as of now  
   while(p->is_not_nil())
   {
-    if(p->id()==ID_pointer || p->id()==ID_array)
+    if(p->id()==ID_pointer || p->id()==ID_array || p->id()==ID_vector)
       p=&p->subtype();
     else if(p->id()==ID_code)
       p=&(to_code_type(*p).return_type());
