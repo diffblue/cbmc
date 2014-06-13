@@ -419,7 +419,10 @@ Function: bmct::decide_cvc
 
 bool bmct::decide_cvc()
 {
-  return decide_smt1(smt1_dect::CVC3);
+  if(options.get_bool_option("smt1"))
+    return decide_smt1(smt1_dect::CVC3);
+  else
+    return decide_smt2(smt2_dect::CVC3);
 }
 
 /*******************************************************************\
@@ -436,7 +439,10 @@ Function: bmct::decide_boolector
 
 bool bmct::decide_boolector()
 {
-  return decide_smt1(smt1_dect::BOOLECTOR);
+  if(options.get_bool_option("smt1"))
+    return decide_smt1(smt1_dect::BOOLECTOR);
+  else
+    return decide_smt2(smt2_dect::BOOLECTOR);
 }
 
 /*******************************************************************\
