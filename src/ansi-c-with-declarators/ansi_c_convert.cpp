@@ -529,6 +529,8 @@ void ansi_c_convertt::convert_type(
       }
       else
       {
+        convert_type(declaration.type());
+        
         for(ansi_c_declarationt::declaratorst::iterator
             d_it=declaration.declarators().begin();
             d_it!=declaration.declarators().end();
@@ -536,12 +538,12 @@ void ansi_c_convertt::convert_type(
         {
           struct_union_typet::componentt new_component;
 
+          convert_type(d_it->type());
+          
           new_component.location()=d_it->location();
           new_component.set(ID_name, d_it->get_base_name());
           new_component.set(ID_pretty_name, d_it->get_base_name());
           new_component.type()=declaration.full_type(*d_it);
-
-          convert_type(new_component.type());
 
           new_components.push_back(new_component);
         }
