@@ -1,6 +1,6 @@
 /*******************************************************************\
 
-Module: C++ Language Type Checking
+Module: C Language Type Checking
 
 Author: Daniel Kroening, kroening@kroening.com
 
@@ -329,16 +329,104 @@ Function: c_typecheck_baset::typecheck_decl
 
 void c_typecheck_baset::typecheck_decl(codet &code)
 {
-  std::list<codet> clean_code;
-  typecheck_decl(code, clean_code);
+  // this comes with 1 operand, which is a declaration
+  if(code.operands().size()!=1)
+  {
+    err_location(code);
+    throw "decl expected to have 1 operand";
+  }
 
-  if(!clean_code.empty())
+  // op0 must be declaration
+  if(code.op0().id()!=ID_declaration)
+  {
+    err_location(code);
+    throw "decl statement expected to have declaration as operand";
+  }
+
+  ansi_c_declarationt declaration;
+  declaration.swap(code.op0());
+  
+  typecheck_declaration(declaration);
+  
+  std::list<codet> new_code;
+  
+  // iterate over declarators
+  
+  for(ansi_c_declarationt::declaratorst::const_iterator
+      d_it=declaration.declarators().begin();
+      d_it!=declaration.declarators().end();
+      d_it++)
+  {
+    // add prefix
+    irep_idt identifier=
+      add_language_prefix(d_it->get_name());
+
+    // look it up
+    symbol_tablet::symbolst::iterator s_it=
+      symbol_table.symbols.find(identifier);
+
+    if(s_it==symbol_table.symbols.end())
+    {
+      err_location(code);
+      str << "failed to find decl symbol `" << identifier << "' in symbol table";
+      throw 0;
+    }
+
+    symbolt &symbol=s_it->second;
+    
+    // There may be side-effects in the type.  
+    clean_type(symbol.name, symbol.type, new_code);
+
+    // this must not be an incomplete type
+    if(!is_complete_type(symbol.type))
+    {
+      err_location(symbol.location);
+      throw "incomplete type not permitted here";
+    }
+  
+    // see if it's a typedef
+    // or a function
+    // or static
+    if(symbol.is_type ||
+       symbol.type.id()==ID_code ||
+       symbol.is_static_lifetime)
+    {
+      // we ignore
+    }
+    else
+    {
+      code_declt code;
+      code.location()=symbol.location;
+      code.symbol()=symbol.symbol_expr();
+      code.symbol().location()=symbol.location;
+      
+      // add initializer, if any
+      if(symbol.value.is_not_nil())
+      {
+        code.operands().resize(2);
+        code.op1()=symbol.value; 
+      }
+      
+      new_code.push_back(code);
+    }
+  }
+  
+  if(new_code.empty())
+  {
+    locationt location=code.location();
+    code=code_skipt();
+    code.location()=location;
+  }
+  else if(new_code.size()==1)
+  {
+    code.swap(new_code.front());
+  }
+  else
   {
     // build a decl-block
-    code_blockt code_block(clean_code);
+    code_blockt code_block(new_code);
     code_block.set_statement(ID_decl_block);
-    code_block.copy_to_operands(code);
-    code.swap(code_block);    
+    code.swap(code_block);
   }
 }
 
@@ -367,111 +455,6 @@ static void move_declarations(
     clean_code.push_back(code_skipt());
     code.swap(clean_code.back());
   }
-}
-
-/*******************************************************************\
-
-Function: c_typecheck_baset::typecheck_decl
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void c_typecheck_baset::typecheck_decl(
-  codet &code,
-  std::list<codet> &clean_code)
-{
-  // this comes with 1 operand, which is a declaration
-  if(code.operands().size()!=1)
-  {
-    err_location(code);
-    throw "decl expected to have 1 operand";
-  }
-
-  // op0 must be declaration
-  if(code.op0().id()!=ID_declaration)
-  {
-    err_location(code);
-    throw "decl statement expected to have declaration as operand";
-  }
-
-  ansi_c_declarationt declaration;
-  declaration.swap(code.op0());
-  
-  typecheck_declaration(declaration);
-  
-  #if 0
-  // add prefix
-  {
-    symbol_exprt &symbol_expr=to_symbol_expr(code.op0());
-    symbol_expr.set_identifier(add_language_prefix(symbol_expr.get_identifier()));
-  }
-
-  // replace if needed
-  replace_symbol(code.op0());
-
-  // look it up
-  const irep_idt &identifier=to_symbol_expr(code.op0()).get_identifier();
-
-  symbol_tablet::symbolst::iterator s_it=symbol_table.symbols.find(identifier);
-
-  if(s_it==symbol_table.symbols.end())
-  {
-    err_location(code);
-    str << "failed to find decl symbol `" << identifier << "' in symbol table";
-    throw 0;
-  }
-
-  symbolt &symbol=s_it->second;
-  
-  // There may be side-effects in the type.  
-  clean_type(symbol.name, symbol.type, clean_code);
-  code.type()=symbol.type;
-  
-  // see if it's a typedef
-  // or a function
-  // or static
-  if(symbol.is_type ||
-     symbol.type.id()==ID_code ||
-     symbol.is_static_lifetime)
-  {
-    locationt location=code.location();
-    code=code_skipt();
-    code.location()=location;
-    return;
-  }
-
-  code.location()=symbol.location;
-  
-  // handle the initializer, if any
-  if(code.operands().size()==2)
-  {
-    // the symbol must have a non-nil value, and its initializer has
-    // been type checked via typecheck_redefinition_non_type already
-    assert(symbol.value.is_not_nil());
-    // move any declarations towards clean_code to make sure these
-    // symbols (e.g., $array_size) have the same lifetime as symbol
-    // and aren't marked dead immediately
-    move_declarations(symbol.value, clean_code);
-    // add typecast, if necessary
-    implicit_typecast(symbol.value, symbol.type);
-    code.op1()=symbol.value;
-  }
-  
-  // set type now (might be changed by initializer)
-  code.op0().type()=symbol.type;
-
-  // this must not be an incomplete type
-  if(!is_complete_type(code.op0().type()))
-  {
-    err_location(code);
-    throw "incomplete type not permitted here";
-  }
-  #endif
 }
 
 /*******************************************************************\
