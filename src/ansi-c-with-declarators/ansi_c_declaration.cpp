@@ -124,7 +124,8 @@ typet ansi_c_declarationt::full_type(
   // this gets types that are converted but not type-checked as of now  
   while(p->is_not_nil())
   {
-    if(p->id()==ID_pointer || p->id()==ID_array || p->id()==ID_vector)
+    if(p->id()==ID_pointer || p->id()==ID_array || 
+       p->id()==ID_vector || p->id()==ID_c_bitfield)
       p=&p->subtype();
     else if(p->id()==ID_code)
       p=&(to_code_type(*p).return_type());
