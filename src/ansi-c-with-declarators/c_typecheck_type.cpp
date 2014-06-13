@@ -35,6 +35,12 @@ Function: c_typecheck_baset::typecheck_type
 
 void c_typecheck_baset::typecheck_type(typet &type)
 {
+  if(type.id()==ID_already_typechecked)
+  {
+    type.swap(type.subtype());
+    return; // done
+  }
+
   // we first convert, and then check
   
   // do we have alignment?
@@ -236,14 +242,13 @@ void c_typecheck_baset::typecheck_code_type(code_typet &type)
       if(p_it->id()==ID_declaration)
       {
         ansi_c_declarationt &declaration=to_ansi_c_declaration(*p_it);
-        typecheck_type(declaration.type());
-        typecheck_type(declaration.declarator().type());
       
         code_typet::parametert parameter;
 
         // first fix type
         typet &type=parameter.type();
         type=declaration.full_type(declaration.declarator());
+        typecheck_type(type);
         adjust_function_parameter(type);
       
         // adjust the identifier
