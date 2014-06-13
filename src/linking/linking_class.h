@@ -59,6 +59,15 @@ protected:
 
   virtual std::string to_string_verbose(const typet &type);
 
+  void link_error(
+    const symbolt &old_symbol,
+    const symbolt &new_symbol,
+    const std::string &msg);
+  void link_warning(
+    const symbolt &old_symbol,
+    const symbolt &new_symbol,
+    const std::string &msg);
+
   symbol_tablet &main_symbol_table;
   symbol_tablet &src_symbol_table;
   namespacet ns;
