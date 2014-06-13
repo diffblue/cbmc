@@ -113,6 +113,68 @@ std::string linkingt::to_string_verbose(const typet &type)
 
 /*******************************************************************\
 
+Function: linkingt::link_error
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void linkingt::link_error(
+    const symbolt &old_symbol,
+    const symbolt &new_symbol,
+    const std::string &msg)
+{
+  err_location(new_symbol.location);
+
+  str << "error: " << msg << " \""
+      << old_symbol.display_name()
+      << "\"" << std::endl;
+  str << "old definition in module " << old_symbol.module
+      << " " << old_symbol.location << std::endl
+      << to_string_verbose(old_symbol.type) << std::endl;
+  str << "new definition in module " << new_symbol.module
+      << " " << new_symbol.location << std::endl
+      << to_string_verbose(new_symbol.type);
+
+  throw 0;
+}
+
+/*******************************************************************\
+
+Function: linkingt::link_warning
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void linkingt::link_warning(
+    const symbolt &old_symbol,
+    const symbolt &new_symbol,
+    const std::string &msg)
+{
+  str << "warning: " << msg << " \""
+      << old_symbol.display_name()
+      << "\"" << std::endl;
+  str << "old definition in module " << old_symbol.module
+      << " " << old_symbol.location << std::endl
+      << to_string_verbose(old_symbol.type) << std::endl;
+  str << "new definition in module " << new_symbol.module
+      << " " << new_symbol.location << std::endl
+      << to_string_verbose(new_symbol.type);
+
+  warning();
+}
+
+/*******************************************************************\
+
 Function: linkingt::duplicate_symbol
 
   Inputs:
@@ -323,19 +385,10 @@ void linkingt::duplicate_non_type_symbol(
   bool is_code_new_symbol=new_symbol.type.id()==ID_code;
 
   if(is_code_old_symbol!=is_code_new_symbol)
-  {
-    err_location(new_symbol.location);
-    str << "error: conflicting definition for symbol \""
-        << old_symbol.display_name()
-        << "\"" << std::endl;
-    str << "old definition in module " << old_symbol.module
-        << " " << old_symbol.location << std::endl
-        << to_string(old_symbol.type) << std::endl;
-    str << "new definition in module " << new_symbol.module
-        << " " << new_symbol.location << std::endl
-        << to_string(new_symbol.type);
-    throw 0;
-  }
+    link_error(
+      old_symbol,
+      new_symbol,
+      "conflicting definition for symbol");
 
   if(is_code_old_symbol)
   {
@@ -364,15 +417,10 @@ void linkingt::duplicate_non_type_symbol(
         warning();
       }
       else
-      {
-        err_location(new_symbol.value);
-        str << "error: duplicate definition of function `"
-            << old_symbol.name
-            << "'" << std::endl;
-        str << "In module `" << old_symbol.module
-            << "' and module `" << new_symbol.module << "'";
-        throw 0;
-      }
+        link_error(
+          old_symbol,
+          new_symbol,
+          "duplicate definition of function");
     }
   }
   else
@@ -400,9 +448,10 @@ void linkingt::duplicate_non_type_symbol(
           // ok, we will use the old type
         }
         else
-        {
-          // size seems different, ignore for now
-        }
+          link_error(
+            old_symbol,
+            new_symbol,
+            "conflicting array sizes for variable");
       }
       else if(old_type.id()==ID_pointer && new_type.id()==ID_array)
       {
@@ -414,31 +463,31 @@ void linkingt::duplicate_non_type_symbol(
         // ignore
       }
       else if(old_type.id()==ID_pointer && new_type.id()==ID_pointer)
-      {
-        // ignore, generally ok
-      }
-      else if(old_type.id()==ID_incomplete_struct && new_type.id()==ID_struct)
+        link_warning(
+          old_symbol,
+          new_symbol,
+          "conflicting pointer types for variable");
+      else if((old_type.id()==ID_incomplete_struct &&
+               new_type.id()==ID_struct) ||
+              (old_type.id()==ID_incomplete_union &&
+               new_type.id()==ID_union))
       {
         // store new type
         old_symbol.type=new_symbol.type;
       }
-      else if(old_type.id()==ID_struct && new_type.id()==ID_incomplete_struct)
+      else if((old_type.id()==ID_struct &&
+               new_type.id()==ID_incomplete_struct) ||
+              (old_type.id()==ID_union &&
+               new_type.id()==ID_incomplete_union))
       {
         // ignore
       }
       else
       {
-        err_location(new_symbol.location);
-        str << "error: conflicting types for variable `"
-            << old_symbol.name
-            << "'" << std::endl;
-        str << "old definition in module " << old_symbol.module
-            << " " << old_symbol.location << std::endl
-            << to_string_verbose(old_symbol.type) << std::endl;
-        str << "new definition in module " << new_symbol.module
-            << " " << new_symbol.location << std::endl
-            << to_string_verbose(new_symbol.type);
-        throw 0;
+        link_error(
+          old_symbol,
+          new_symbol,
+          "conflicting types for variable");
       }
     }
 
@@ -469,9 +518,9 @@ void linkingt::duplicate_non_type_symbol(
         else
         {
           err_location(new_symbol.value);
-          str << "error: conflicting initializers for variable `"
+          str << "error: conflicting initializers for variable \""
               << old_symbol.name
-              << "'" << std::endl;
+              << "\"" << std::endl;
           str << "old value in module " << old_symbol.module
               << " " << old_symbol.value.find_location() << std::endl
               << to_string(tmp_old) << std::endl;
