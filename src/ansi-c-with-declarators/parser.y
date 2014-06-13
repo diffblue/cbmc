@@ -1290,6 +1290,7 @@ aggregate_name:
           gcc_type_attribute_opt
         {
           stack($1).set(ID_tag, stack($3));
+          stack($1).set(ID_components, ID_nil);
           // type attributes
           $$=merge($1, merge($2, $4));
         }

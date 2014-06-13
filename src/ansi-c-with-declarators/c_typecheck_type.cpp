@@ -478,11 +478,103 @@ Function: c_typecheck_baset::typecheck_compound_type
 
 \*******************************************************************/
 
+#include <iostream>
+
 void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
 {
-  struct_union_typet::componentst &components=type.components();
+  // These get replaced by symbol types.
+  
+  irep_idt identifier=add_language_prefix(type.find(ID_tag).get(ID_identifier));
+  bool have_body=type.find(ID_components).is_not_nil();
+  
+  std::cout << type.pretty() << std::endl;
 
-  // mark bit-fields
+  if(type.find(ID_tag).is_nil())
+  {
+    // anonymous?
+  }
+  
+  // does it exist already?
+  symbol_tablet::symbolst::iterator s_it=
+    symbol_table.symbols.find(identifier);
+
+  if(s_it==symbol_table.symbols.end())
+  {
+    // no, add new symbol
+    type.remove(ID_tag);
+    irep_idt base_name=type.find(ID_tag).get(ID_C_base_name);
+    type.set(ID_tag, base_name);
+
+    symbolt compound_symbol;
+    compound_symbol.is_type=true;
+    compound_symbol.name=identifier;
+    compound_symbol.base_name=base_name;
+    compound_symbol.type=type;
+    compound_symbol.location=type.location();
+
+    if(have_body)
+    {
+      typecheck_compound_body(compound_symbol);
+    }
+    else
+    {
+      if(compound_symbol.type.id()==ID_struct)
+        compound_symbol.type.id(ID_incomplete_struct);
+      else if(compound_symbol.type.id()==ID_union)
+        compound_symbol.type.id(ID_incomplete_union);
+      else
+        assert(false);
+    }
+    
+    symbolt *new_symbol;
+    move_symbol(compound_symbol, new_symbol);
+  }
+  else
+  {
+    // yes, it exists already
+    if(s_it->second.type.id()==ID_incomplete_struct ||
+       s_it->second.type.id()==ID_incomplete_union)
+    {
+      // Maybe we got a body now.
+      if(have_body)
+      {
+        s_it->second.type=type;
+        typecheck_compound_body(s_it->second);
+      }
+    }
+    else if(have_body)
+    {
+      err_location(type);
+      error("redefinition of compound body");
+      throw 0;
+    }
+  }
+
+  symbol_typet symbol_type;
+  symbol_type.location()=type.location();
+  symbol_type.set_identifier(identifier);
+
+  type.swap(symbol_type);
+}
+
+/*******************************************************************\
+
+Function: c_typecheck_baset::typecheck_compound_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void c_typecheck_baset::typecheck_compound_body(symbolt &symbol)
+{
+  struct_union_typet::componentst &components=
+    to_struct_union_type(symbol.type).components();
+
+  // mark bit-fields as such
   for(struct_union_typet::componentst::iterator
       it=components.begin();
       it!=components.end();
@@ -536,7 +628,7 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
   // We allow an incomplete (C99) array as _last_ member!
   // Zero-length is allowed everywhere.
 
-  if(type.id()==ID_struct)
+  if(symbol.type.id()==ID_struct)
   {
     for(struct_union_typet::componentst::iterator
         it=components.begin();
@@ -566,8 +658,8 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
   // unless there is an attribute that says that the struct is
   // 'packed'
 
-  if(type.id()==ID_struct)
-    add_padding(to_struct_type(type), *this);
+  if(symbol.type.id()==ID_struct)
+    add_padding(to_struct_type(symbol.type), *this);
 
   // finally, check _Static_assert inside the compound
   for(struct_union_typet::componentst::iterator
