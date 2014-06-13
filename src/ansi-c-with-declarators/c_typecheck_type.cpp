@@ -64,8 +64,7 @@ void c_typecheck_baset::typecheck_type(typet &type)
           type.id()==ID_union)
     typecheck_compound_type(to_struct_union_type(type));
   else if(type.id()==ID_c_enum)
-  {
-  }
+    typecheck_c_enum_type(type);
   else if(type.id()==ID_c_bitfield)
     typecheck_c_bit_field_type(type);
   else if(type.id()==ID_typeof)
@@ -600,6 +599,36 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
     else
       it++;
   }  
+}
+
+/*******************************************************************\
+
+Function: c_typecheck_baset::typecheck_c_enum_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void c_typecheck_baset::typecheck_c_enum_type(typet &type)
+{
+  // these have the declarations of the enum constants as operands
+  exprt &as_expr=static_cast<exprt &>(static_cast<irept &>(type));
+  locationt location=type.location();
+  
+  Forall_operands(it, as_expr)
+  {
+    ansi_c_declarationt &declaration=to_ansi_c_declaration(*it);
+    typecheck_declaration(declaration);
+  }
+  
+  // Replace the enum by an 'int'. GCC may pick smaller types
+  // as well.
+  type=enum_type();
+  type.location()=location;
 }
 
 /*******************************************************************\

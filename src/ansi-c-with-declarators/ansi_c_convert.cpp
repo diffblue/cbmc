@@ -380,8 +380,6 @@ Function: ansi_c_convertt::convert_type
 
 \*******************************************************************/
 
-#include <iostream>
-
 void ansi_c_convertt::convert_type(
   typet &type,
   c_storage_spect &c_storage_spec)
@@ -445,6 +443,27 @@ void ansi_c_convertt::convert_type(
       }
       else
         throw "unexpected parameter during conversion: "+it->id_string();
+    }
+  }
+  else if(type.id()==ID_c_enum)
+  {
+    // take care of enum constant declarations
+    exprt &as_expr=static_cast<exprt &>(static_cast<irept &>(type));
+    
+    Forall_operands(it, as_expr)
+    {
+      if(it->id()==ID_declaration)
+      {
+        ansi_c_declarationt &declaration=
+          to_ansi_c_declaration(*it);
+
+        assert(declaration.declarators().size()==1);
+
+        convert_type(declaration.type());
+        convert_type(declaration.declarator().type());
+      }
+      else
+        throw "unexpected enum constant during conversion: "+it->id_string();
     }
   }
   else if(type.id()==ID_array)
