@@ -713,6 +713,9 @@ void c_typecheck_baset::typecheck_declaration(
 {
   // first typecheck the type of the declaration
   typecheck_type(declaration.type());
+  
+  // mark as 'already typechecked'
+  make_already_typechecked(declaration.type());
 
   // Now do declarators, if any.
   for(ansi_c_declarationt::declaratorst::iterator
@@ -720,10 +723,12 @@ void c_typecheck_baset::typecheck_declaration(
       d_it!=declaration.declarators().end();
       d_it++)
   {
-    typecheck_type(d_it->type());
-  
     symbolt symbol;
     declaration.to_symbol(*d_it, symbol);
+
+    // now check other half of type
+    typecheck_type(symbol.type);
+
     typecheck_symbol(symbol);
   }
 }
