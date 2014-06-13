@@ -234,6 +234,7 @@ protected:
   // types
   virtual void typecheck_type(typet &type);
   virtual void typecheck_compound_type(struct_union_typet &type);
+  virtual void typecheck_c_enum_type(typet &type);
   virtual void typecheck_code_type(code_typet &type);
   virtual void typecheck_symbol_type(typet &type);
   virtual void typecheck_c_bit_field_type(typet &type);

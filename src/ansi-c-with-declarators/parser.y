@@ -1531,6 +1531,7 @@ enumerator_declaration:
           identifier_or_typedef_name enumerator_value_opt
         {
           init($$, ID_declaration);
+          to_ansi_c_declaration(stack($$)).set_is_enum_constant(true);
           PARSER.add_declarator(stack($$), stack($1));
           to_ansi_c_declaration(stack($$)).add_initializer(stack($2));
         }
