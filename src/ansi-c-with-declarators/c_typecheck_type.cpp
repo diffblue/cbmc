@@ -487,8 +487,6 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
   irep_idt identifier=add_language_prefix(type.find(ID_tag).get(ID_identifier));
   bool have_body=type.find(ID_components).is_not_nil();
   
-  std::cout << type.pretty() << std::endl;
-
   if(type.find(ID_tag).is_nil())
   {
     // anonymous?
