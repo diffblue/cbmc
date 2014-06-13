@@ -41,6 +41,7 @@ public:
     benchmark(_benchmark),
     source(_source),
     logic(_logic),
+    solver(_solver),
     out(_out),
     boolbv_width(_ns),
     pointer_logic(_ns),
