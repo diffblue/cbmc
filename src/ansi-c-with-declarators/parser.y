@@ -1717,7 +1717,8 @@ type_name:
         }
         | gcc_type_attribute_opt type_specifier abstract_declarator
         {
-          $$=merge($3, merge($2, $1));
+          $$=merge($2, $1);
+          make_subtype($$, $3);
         }
         | gcc_type_attribute_opt type_qualifier_list
         {
@@ -1725,7 +1726,8 @@ type_name:
         }
         | gcc_type_attribute_opt type_qualifier_list abstract_declarator
         {
-          $$=merge($3, merge($2, $1));
+          $$=merge($2, $1);
+          make_subtype($$, $3);
         }
         ;
 
