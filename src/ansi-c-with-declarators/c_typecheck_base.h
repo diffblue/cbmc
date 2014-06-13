@@ -243,6 +243,13 @@ protected:
   virtual void typecheck_custom_type(typet &type);
   virtual void adjust_function_parameter(typet &type) const;
   virtual bool is_complete_type(const typet &type) const;
+  
+  void make_already_typechecked(typet &dest)
+  {
+    typet result(ID_already_typechecked);
+    result.subtype().swap(dest);
+    result.swap(dest);
+  }
 
   // this cleans expressions in array types
   virtual void clean_type(
