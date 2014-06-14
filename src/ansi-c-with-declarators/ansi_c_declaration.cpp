@@ -138,7 +138,16 @@ typet ansi_c_declarationt::full_type(
     }
   }
   
+  // save 'packed' and 'alignment'  
+  bool packed=p->get_bool(ID_C_packed);
+  irept alignment=p->find(ID_C_alignment);
+  
   *p=type();
+  
+  // restore 'packed' and 'alignment'
+  if(packed) p->set(ID_C_packed, true);
+  if(alignment.is_not_nil()) p->set(ID_C_alignment, alignment);
+  
   return result;
 }
 
