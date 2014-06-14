@@ -91,23 +91,7 @@ void ansi_c_convert_typet::read_rec(const typet &type)
     gcc_int128_cnt++;
   else if(type.id()==ID_gcc_attribute_mode)
   {
-    const exprt &size_expr=
-      static_cast<const exprt &>(type.find(ID_size));
-      
-    if(size_expr.id()=="__QI__")
-      gcc_mode_QI=true;
-    else if(size_expr.id()=="__HI__")
-      gcc_mode_HI=true;
-    else if(size_expr.id()=="__SI__")
-      gcc_mode_SI=true;
-    else if(size_expr.id()=="__DI__")
-      gcc_mode_DI=true;
-    else if(size_expr.id()=="__TI__")
-      gcc_mode_TI=true;
-    else
-    {
-      // we ignore without whining
-    }
+    gcc_mode=type;
   }
   else if(type.id()==ID_custom_bv)
   {
