@@ -309,10 +309,12 @@ void c_typecheck_baset::typecheck_decl(codet &code)
   
   if(declaration.get_is_static_assert())
   {
+    assert(declaration.operands().size()==2);
     codet new_code(ID_static_assert);
     new_code.location()=code.location();
-    new_code.operands().swap(code.operands());
+    new_code.operands().swap(declaration.operands());
     code.swap(new_code);
+    typecheck_code(code);
     return; // done
   }
   
