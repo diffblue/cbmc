@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <cassert>
+
 #include <util/find_symbols.h>
 #include <util/location.h>
 #include <util/base_type.h>
@@ -14,7 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_types.h>
 #include <util/simplify_expr.h>
 
-#include <ansi-c/expr2c.h>
+#include <langapi/language_util.h>
 
 #include "linking_type_eq.h"
 #include "linking.h"
@@ -22,7 +24,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
-Function: linkingt::to_string
+Function: linkingt::expr_to_string
 
   Inputs:
 
@@ -32,14 +34,17 @@ Function: linkingt::to_string
 
 \*******************************************************************/
 
-std::string linkingt::to_string(const exprt &expr)
+std::string linkingt::expr_to_string(
+  const namespacet &ns,
+  const irep_idt &identifier,
+  const exprt &expr) const
 { 
-  return expr2c(expr, ns);
+  return from_expr(ns, identifier, expr);
 }
 
 /*******************************************************************\
 
-Function: linkingt::to_string
+Function: linkingt::type_to_string
 
   Inputs:
 
@@ -49,14 +54,17 @@ Function: linkingt::to_string
 
 \*******************************************************************/
 
-std::string linkingt::to_string(const typet &type)
+std::string linkingt::type_to_string(
+  const namespacet &ns,
+  const irep_idt &identifier,
+  const typet &type) const
 { 
-  return type2c(type, ns);
+  return from_type(ns, identifier, type);
 }
 
 /*******************************************************************\
 
-Function: linkingt::to_string_verbose
+Function: linkingt::type_to_string_verbose
 
   Inputs:
 
@@ -66,7 +74,10 @@ Function: linkingt::to_string_verbose
 
 \*******************************************************************/
 
-std::string linkingt::to_string_verbose(const typet &type)
+std::string linkingt::type_to_string_verbose(
+  const namespacet &ns,
+  const symbolt &symbol,
+  const typet &type) const
 { 
   const typet &followed=ns.follow(type);
 
@@ -88,7 +99,7 @@ std::string linkingt::to_string_verbose(const typet &type)
     {
       const typet &subtype=it->type();
       result+="  ";
-      result+=to_string(subtype);
+      result+=type_to_string(ns, symbol.name, subtype);
       result+=" ";
 
       if(it->get_base_name()!="")
@@ -105,10 +116,77 @@ std::string linkingt::to_string_verbose(const typet &type)
   }
   else if(followed.id()==ID_pointer)
   {
-    return to_string_verbose(followed.subtype())+" *";
+    return type_to_string_verbose(ns, symbol, followed.subtype())+" *";
+  }
+  else if(followed.id()==ID_incomplete_struct ||
+          followed.id()==ID_incomplete_union)
+  {
+    return type_to_string(ns, symbol.name, type)+"   (incomplete)";
   }
 
-  return to_string(type);
+  return type_to_string(ns, symbol.name, type);
+}
+
+/*******************************************************************\
+
+Function: linkingt::link_error
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void linkingt::link_error(
+    const symbolt &old_symbol,
+    const symbolt &new_symbol,
+    const std::string &msg)
+{
+  err_location(new_symbol.location);
+
+  str << "error: " << msg << " \""
+      << old_symbol.display_name()
+      << "\"" << std::endl;
+  str << "old definition in module " << old_symbol.module
+      << " " << old_symbol.location << std::endl
+      << type_to_string_verbose(ns, old_symbol) << std::endl;
+  str << "new definition in module " << new_symbol.module
+      << " " << new_symbol.location << std::endl
+      << type_to_string_verbose(ns, new_symbol);
+
+  throw 0;
+}
+
+/*******************************************************************\
+
+Function: linkingt::link_warning
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void linkingt::link_warning(
+    const symbolt &old_symbol,
+    const symbolt &new_symbol,
+    const std::string &msg)
+{
+  str << "warning: " << msg << " \""
+      << old_symbol.display_name()
+      << "\"" << std::endl;
+  str << "old definition in module " << old_symbol.module
+      << " " << old_symbol.location << std::endl
+      << type_to_string_verbose(ns, old_symbol) << std::endl;
+  str << "new definition in module " << new_symbol.module
+      << " " << new_symbol.location << std::endl
+      << type_to_string_verbose(ns, new_symbol);
+
+  warning();
 }
 
 /*******************************************************************\
@@ -323,19 +401,10 @@ void linkingt::duplicate_non_type_symbol(
   bool is_code_new_symbol=new_symbol.type.id()==ID_code;
 
   if(is_code_old_symbol!=is_code_new_symbol)
-  {
-    err_location(new_symbol.location);
-    str << "error: conflicting definition for symbol \""
-        << old_symbol.display_name()
-        << "\"" << std::endl;
-    str << "old definition in module " << old_symbol.module
-        << " " << old_symbol.location << std::endl
-        << to_string(old_symbol.type) << std::endl;
-    str << "new definition in module " << new_symbol.module
-        << " " << new_symbol.location << std::endl
-        << to_string(new_symbol.type);
-    throw 0;
-  }
+    link_error(
+      old_symbol,
+      new_symbol,
+      "conflicting definition for symbol");
 
   if(is_code_old_symbol)
   {
@@ -349,7 +418,7 @@ void linkingt::duplicate_non_type_symbol(
       {
         // the one with body wins!
         old_symbol.value=new_symbol.value;
-        old_symbol.type=new_symbol.type; // for argument identifiers
+        old_symbol.type=new_symbol.type; // for parameter identifiers
       }
       else if(to_code_type(old_symbol.type).get_inlined())
       {
@@ -364,15 +433,10 @@ void linkingt::duplicate_non_type_symbol(
         warning();
       }
       else
-      {
-        err_location(new_symbol.value);
-        str << "error: duplicate definition of function `"
-            << old_symbol.name
-            << "'" << std::endl;
-        str << "In module `" << old_symbol.module
-            << "' and module `" << new_symbol.module << "'";
-        throw 0;
-      }
+        link_error(
+          old_symbol,
+          new_symbol,
+          "duplicate definition of function");
     }
   }
   else
@@ -400,9 +464,10 @@ void linkingt::duplicate_non_type_symbol(
           // ok, we will use the old type
         }
         else
-        {
-          // size seems different, ignore for now
-        }
+          link_error(
+            old_symbol,
+            new_symbol,
+            "conflicting array sizes for variable");
       }
       else if(old_type.id()==ID_pointer && new_type.id()==ID_array)
       {
@@ -414,31 +479,31 @@ void linkingt::duplicate_non_type_symbol(
         // ignore
       }
       else if(old_type.id()==ID_pointer && new_type.id()==ID_pointer)
-      {
-        // ignore, generally ok
-      }
-      else if(old_type.id()==ID_incomplete_struct && new_type.id()==ID_struct)
+        link_warning(
+          old_symbol,
+          new_symbol,
+          "conflicting pointer types for variable");
+      else if((old_type.id()==ID_incomplete_struct &&
+               new_type.id()==ID_struct) ||
+              (old_type.id()==ID_incomplete_union &&
+               new_type.id()==ID_union))
       {
         // store new type
         old_symbol.type=new_symbol.type;
       }
-      else if(old_type.id()==ID_struct && new_type.id()==ID_incomplete_struct)
+      else if((old_type.id()==ID_struct &&
+               new_type.id()==ID_incomplete_struct) ||
+              (old_type.id()==ID_union &&
+               new_type.id()==ID_incomplete_union))
       {
         // ignore
       }
       else
       {
-        err_location(new_symbol.location);
-        str << "error: conflicting types for variable `"
-            << old_symbol.name
-            << "'" << std::endl;
-        str << "old definition in module " << old_symbol.module
-            << " " << old_symbol.location << std::endl
-            << to_string_verbose(old_symbol.type) << std::endl;
-        str << "new definition in module " << new_symbol.module
-            << " " << new_symbol.location << std::endl
-            << to_string_verbose(new_symbol.type);
-        throw 0;
+        link_error(
+          old_symbol,
+          new_symbol,
+          "conflicting types for variable");
       }
     }
 
@@ -469,15 +534,15 @@ void linkingt::duplicate_non_type_symbol(
         else
         {
           err_location(new_symbol.value);
-          str << "error: conflicting initializers for variable `"
+          str << "error: conflicting initializers for variable \""
               << old_symbol.name
-              << "'" << std::endl;
+              << "\"" << std::endl;
           str << "old value in module " << old_symbol.module
               << " " << old_symbol.value.find_location() << std::endl
-              << to_string(tmp_old) << std::endl;
+              << expr_to_string(ns, old_symbol.name, tmp_old) << std::endl;
           str << "new value in module " << new_symbol.module
               << " " << new_symbol.value.find_location() << std::endl
-              << to_string(tmp_new);
+              << expr_to_string(ns, new_symbol.name, tmp_new);
           throw 0;
         }
       }
@@ -558,15 +623,15 @@ void linkingt::inspect_src_symbol(const irep_idt &identifier)
   find_symbols_sett symbols;
   find_type_and_expr_symbols(new_symbol.value, symbols);
   find_type_and_expr_symbols(new_symbol.type, symbols);
-  // also add function arguments
+  // also add function parameters
   if(new_symbol.type.id()==ID_code)
   {
     const code_typet &code_type=to_code_type(new_symbol.type);
-    const code_typet::argumentst &arguments=code_type.arguments();
+    const code_typet::parameterst &parameters=code_type.parameters();
 
-    for(code_typet::argumentst::const_iterator
-        it=arguments.begin();
-        it!=arguments.end();
+    for(code_typet::parameterst::const_iterator
+        it=parameters.begin();
+        it!=parameters.end();
         it++)
       // identifiers for prototypes need not exist
       if(!it->get_identifier().empty() &&
@@ -584,15 +649,15 @@ void linkingt::inspect_src_symbol(const irep_idt &identifier)
   // first order of business is to apply renaming
   replace_symbol.replace(new_symbol.value);
   replace_symbol.replace(new_symbol.type);        
-  // also rename function arguments, if necessary
+  // also rename function parameters, if necessary
   if(new_symbol.type.id()==ID_code)
   {
     code_typet &code_type=to_code_type(new_symbol.type);
-    code_typet::argumentst &arguments=code_type.arguments();
+    code_typet::parameterst &parameters=code_type.parameters();
 
-    for(code_typet::argumentst::iterator
-        it=arguments.begin();
-        it!=arguments.end();
+    for(code_typet::parameterst::iterator
+        it=parameters.begin();
+        it!=parameters.end();
         it++)
     {
       replace_symbolt::expr_mapt::const_iterator r=

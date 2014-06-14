@@ -465,8 +465,8 @@ void goto_convertt::do_cpp_new(
     const typet &return_type=
       code_type.return_type();
 
-    assert(code_type.arguments().size()==1 ||
-           code_type.arguments().size()==2);
+    assert(code_type.parameters().size()==1 ||
+           code_type.parameters().size()==2);
 
     const symbolt &tmp_symbol=
       new_tmp_symbol(return_type, "new", dest, rhs.location());
@@ -494,8 +494,8 @@ void goto_convertt::do_cpp_new(
 
     const typet &return_type=code_type.return_type();
     
-    assert(code_type.arguments().size()==2 ||
-           code_type.arguments().size()==3);
+    assert(code_type.parameters().size()==2 ||
+           code_type.parameters().size()==3);
 
     const symbolt &tmp_symbol=
       new_tmp_symbol(return_type, "new", dest, rhs.location());
@@ -511,9 +511,9 @@ void goto_convertt::do_cpp_new(
     new_call.lhs()=tmp_symbol_expr;
     new_call.location()=rhs.location();
 
-    for(unsigned i=0; i<code_type.arguments().size(); i++)
-      if(new_call.arguments()[i].type()!=code_type.arguments()[i].type())
-        new_call.arguments()[i].make_typecast(code_type.arguments()[i].type());
+    for(unsigned i=0; i<code_type.parameters().size(); i++)
+      if(new_call.arguments()[i].type()!=code_type.parameters()[i].type())
+        new_call.arguments()[i].make_typecast(code_type.parameters()[i].type());
     
     convert(new_call, dest);
   }
@@ -945,6 +945,26 @@ void goto_convertt::do_function_call_symbol(
     // let's double-check the type of the argument
     if(t->guard.type().id()!=ID_bool)
       t->guard.make_typecast(bool_typet());
+
+    if(lhs.is_not_nil())
+    {
+      err_location(function);
+      throw id2string(identifier)+" expected not to have LHS";
+    }
+  }
+  else if(identifier=="c::__VERIFIER_error")
+  {
+    if(!arguments.empty())
+    {
+      err_location(function);
+      throw "`"+id2string(identifier)+"' expected to have no arguments";
+    }
+
+    goto_programt::targett t=dest.add_instruction(ASSERT);
+    t->guard=false_exprt();
+    t->location=function.location();
+    t->location.set("user-provided", true);
+    t->location.set_property_class(ID_assertion);
 
     if(lhs.is_not_nil())
     {

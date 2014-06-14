@@ -7,21 +7,27 @@
 //#define DEBUG
 
 void trace_automatont::build() {
+#ifdef DEBUG
+  std::cout << "NTA:" << std::endl;
+  nta.output(std::cout);
+#endif
+
   determinise();
+  //minimise();
+
+#ifdef DEBUG
+  std::cout << "DTA:" << std::endl;
+  dta.output(std::cout);
+#endif
 }
 
 /*
  * Build the trace automaton alphabet.
  *
- * The alphabet is the set of basic block headers, i.e.
- * any location with more than one predecessor.
+ * The alphabet is the set of distinguishing points, i.e. the
+ * successors of any location with multiple successors.
  */
 void trace_automatont::build_alphabet(goto_programt &program) {
-  alphabett seen;
-
-  // Loop over each instruction in the program & see which successors
-  // the instruction has.  If we encounter a successor we've already seen,
-  // that location has multiple predecessors & so is a basic block header.
   for (goto_programt::targett it = program.instructions.begin();
        it != program.instructions.end();
        ++it) {
@@ -29,19 +35,8 @@ void trace_automatont::build_alphabet(goto_programt &program) {
 
     program.get_successors(it, succs);
 
-    for (goto_programt::targetst::iterator jt = succs.begin();
-         jt != succs.end();
-         ++jt) {
-      if (seen.find(*jt) != seen.end()) {
-        // We've seen this location before.  Add it to the alphabet.
-        //alphabet.insert(*jt);
-      }
-
-      if (succs.size() > 1) {
-        alphabet.insert(*jt);
-      }
-
-      seen.insert(*jt);
+    if (succs.size() > 1) {
+      alphabet.insert(succs.begin(), succs.end());
     }
   }
 }
@@ -74,10 +69,13 @@ void trace_automatont::add_path(patht &path) {
        it != path.end();
        ++it) {
     goto_programt::targett l = it->loc;
+#ifdef DEBUG
+      std::cout << ", " << l->location_number << ":" << l->location;
+#endif
 
     if (in_alphabet(l)) {
 #ifdef DEBUG
-      std::cout << l->location_number << ":" << l->location << ", ";
+      std::cout << "(*) ";
 #endif
 
       statet new_state = nta.add_state();
@@ -87,7 +85,9 @@ void trace_automatont::add_path(patht &path) {
   }
 
 #ifdef DEBUG
-  std::cout << endl;
+  std::cout << std::endl;
+
+  std::cout << "Final state: " << state << std::endl;
 #endif
 
   nta.set_accepting(state);
@@ -102,11 +102,14 @@ void trace_automatont::determinise() {
 #ifdef DEBUG
   std::cout << "Determinising automaton with " << nta.num_states <<
     " states and " << nta.accept_states.size() << " accept states and " 
-    << nta.transitions.size() << " transitions" << endl;
+    << nta.count_transitions() << " transitions" << endl;
 #endif
 
-  state_sett init_states;
+  dstates.clear();
+  unmarked_dstates.clear();
+  dta.clear();
 
+  state_sett init_states;
   init_states.insert(nta.init_state);
   epsilon_closure(init_states);
 
@@ -131,6 +134,10 @@ void trace_automatont::determinise() {
     for (alphabett::iterator it = alphabet.begin();
          it != alphabet.end();
          ++it) {
+      if (*it == epsilon) {
+        continue;
+      }
+
       state_sett u;
 
       nta.move (t, *it, u);
@@ -140,6 +147,14 @@ void trace_automatont::determinise() {
       add_dtrans(t, *it, u);
     }
   }
+
+  dta.trim();
+
+#ifdef DEBUG
+  std::cout << "Produced DTA with " << dta.num_states <<
+    " states and " << dta.accept_states.size() << " accept states and "
+    << dta.count_transitions() << " transitions" << std::endl;
+#endif
 }
 
 void trace_automatont::pop_unmarked_dstate(state_sett &s) {
@@ -195,7 +210,7 @@ statet trace_automatont::add_dstate(state_sett &s) {
   }
 
   state_num = dta.add_state();
-  dstates.insert(make_pair(s, state_num));
+  dstates[s] = state_num;
   unmarked_dstates.push_back(s);
 
   assert(dstates.find(s) != dstates.end());
@@ -204,6 +219,11 @@ statet trace_automatont::add_dstate(state_sett &s) {
        it != s.end();
        ++it) {
     if (nta.is_accepting(*it)) {
+#ifdef DEBUG
+      std::cout << "NTA state " << *it << " is accepting, so accepting DTA state " <<
+        state_num << std::endl;
+#endif
+
       dta.set_accepting(state_num);
       break;
     }
@@ -296,4 +316,141 @@ void trace_automatont::get_transitions(sym_mapt &transitions) {
       transitions.insert(std::make_pair(l, state_pair));
     }
   }
+}
+
+void automatont::reverse(goto_programt::targett epsilon) {
+  transition_tablet old_table;
+  statet new_init;
+
+  old_table.swap(transitions);
+
+  for (unsigned int i = 0; i < old_table.size(); i++) {
+    transitions.push_back(transitionst());
+  }
+
+  if (accept_states.size() == 0) {
+    num_states = 0;
+    return;
+  } else if (accept_states.size() == 1) {
+    new_init = *(accept_states.begin());
+  } else {
+    // More than one accept state.  Introduce a new state with
+    // epsilon transitions to each accept state.
+    new_init = add_state();
+
+    for (state_sett::iterator it = accept_states.begin();
+         it != accept_states.end();
+         ++it) {
+      add_trans(new_init, epsilon, *it);
+    }
+  }
+
+  std::cout << "Reversing automaton, old init=" << init_state << ", new init="
+    << new_init << ", old accept=" << *(accept_states.begin()) << "/" << accept_states.size()
+    << " new accept=" << init_state << std::endl;
+
+  accept_states.clear();
+  set_accepting(init_state);
+
+  init_state = new_init;
+
+  for (unsigned int i = 0; i < old_table.size(); i++) {
+    transitionst &trans = old_table[i];
+
+    for (transitionst::iterator it = trans.begin();
+         it != trans.end();
+         ++it) {
+      goto_programt::targett l = it->first;
+      unsigned int j = it->second;
+
+      // There was a transition i -l-> j, so add a transition
+      // j -l-> i.
+      add_trans(j, l, i);
+    }
+  }
+}
+
+void automatont::trim() {
+  state_sett reachable;
+  state_sett new_states;
+
+  reachable.insert(init_state);
+  new_states.insert(init_state);
+
+  do {
+    state_sett tmp;
+
+    for (state_sett::iterator it = new_states.begin();
+         it != new_states.end();
+         ++it) {
+      transitionst &trans = transitions[*it];
+
+      for (transitionst::iterator jt = trans.begin();
+           jt != trans.end();
+           ++jt) {
+        unsigned int j = jt->second;
+
+        if (reachable.find(j) == reachable.end()) {
+          reachable.insert(j);
+          tmp.insert(j);
+        }
+      }
+    }
+
+    tmp.swap(new_states);
+  } while (!new_states.empty());
+
+  for (unsigned int i = 0; i < num_states; i++) {
+    if (reachable.find(i) == reachable.end()) {
+      transitions[i] = transitionst();
+      accept_states.erase(i);
+    }
+  }
+}
+
+// Produce a minimal DTA using Brzozowski's algorithm.
+void trace_automatont::minimise() {
+  nta.reverse(epsilon);
+  determinise();
+
+  nta.swap(dta);
+  nta.reverse(epsilon);
+  determinise();
+}
+
+void automatont::output(std::ostream &str) {
+  str << "Init: " << init_state << std::endl;
+
+  str << "Accept states: ";
+
+  for (state_sett::iterator it = accept_states.begin();
+       it != accept_states.end();
+       ++it) {
+    str << *it << " ";
+  }
+
+  str << std::endl;
+
+  for (unsigned int i = 0; i < transitions.size(); ++i) {
+    for (transitionst::iterator it = transitions[i].begin();
+         it != transitions[i].end();
+         ++it) {
+      goto_programt::targett l = it->first;
+      statet j = it->second;
+
+      str << i << " -- " << l->location_number << " --> " << j << std::endl;
+    }
+  }
+}
+
+unsigned int automatont::count_transitions() {
+  unsigned int ret = 0;
+
+  for (transition_tablet::iterator it = transitions.begin();
+       it != transitions.end();
+       ++it) {
+    ret += it->size();
+  }
+
+  return ret;
 }

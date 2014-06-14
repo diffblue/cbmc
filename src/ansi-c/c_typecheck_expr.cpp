@@ -107,6 +107,27 @@ bool c_typecheck_baset::gcc_types_compatible_p(
     return gcc_types_compatible_p(type1.subtype(), type2.subtype());
   else if(type1.id()==ID_array && type2.id()==ID_array)
     return gcc_types_compatible_p(type1.subtype(), type2.subtype()); // ignore size
+  else if(type1.id()==ID_code && type2.id()==ID_code)
+  {
+    const code_typet &c_type1=to_code_type(type1);
+    const code_typet &c_type2=to_code_type(type2);
+
+    if(!gcc_types_compatible_p(
+        c_type1.return_type(),
+        c_type2.return_type()))
+      return false;
+
+    if(c_type1.parameters().size()!=c_type2.parameters().size())
+      return false;
+
+    for(std::size_t i=0; i<c_type1.parameters().size(); i++)
+      if(!gcc_types_compatible_p(
+          c_type1.parameters()[i].type(),
+          c_type2.parameters()[i].type()))
+        return false;
+
+    return true;
+  }
   else
   {
     if(type1==type2)
@@ -419,8 +440,8 @@ void c_typecheck_baset::typecheck_expr_builtin_va_arg(exprt &expr)
   
   code_typet new_type;
   new_type.return_type().swap(type);
-  new_type.arguments().resize(1);
-  new_type.arguments()[0].type()=pointer_typet(empty_typet());
+  new_type.parameters().resize(1);
+  new_type.parameters()[0].type()=pointer_typet(empty_typet());
 
   assert(expr.operands().size()==1);  
   exprt arg=expr.op0();
@@ -1400,6 +1421,21 @@ void c_typecheck_baset::typecheck_expr_rel(exprt &expr)
   }
   else
   {
+    // pointer and zero
+    if(type0.id()==ID_pointer &&
+       simplify_expr(op1, *this).is_zero())
+    {
+      op1=constant_exprt(ID_NULL, type0);
+      return;
+    }
+
+    if(type1.id()==ID_pointer &&
+       simplify_expr(op0, *this).is_zero())
+    {
+      op0=constant_exprt(ID_NULL, type1);
+      return;
+    }
+
     // pointer and integer
     if(type0.id()==ID_pointer && is_number(type1))
     {
@@ -1649,11 +1685,29 @@ void c_typecheck_baset::typecheck_expr_trinary(if_exprt &expr)
      operands[2].type().id()==ID_pointer &&
      operands[1].type()!=operands[2].type())
   {
-    // make it void *
-    expr.type()=typet(ID_pointer);
-    expr.type().subtype()=typet(ID_empty);
-    implicit_typecast(operands[1], expr.type());
-    implicit_typecast(operands[2], expr.type());
+    if(operands[1].type().subtype().id()!=ID_code ||
+       operands[2].type().subtype().id()!=ID_code)
+    {
+      // make it void *
+      expr.type()=typet(ID_pointer);
+      expr.type().subtype()=typet(ID_empty);
+      implicit_typecast(operands[1], expr.type());
+      implicit_typecast(operands[2], expr.type());
+    }
+    else
+    {
+      // maybe functions without parameter lists
+      const code_typet &c_type1=to_code_type(operands[1].type().subtype());
+      const code_typet &c_type2=to_code_type(operands[2].type().subtype());
+
+      if(c_type1.return_type()==c_type2.return_type())
+      {
+        if(c_type1.parameters().empty() && c_type1.has_ellipsis())
+          implicit_typecast(operands[1], operands[2].type());
+        else if(c_type2.parameters().empty() && c_type2.has_ellipsis())
+          implicit_typecast(operands[2], operands[1].type());
+      }
+    }
   }
 
   if(operands[1].type().id()==ID_empty ||
@@ -2541,8 +2595,8 @@ void c_typecheck_baset::typecheck_function_call_arguments(
   const exprt &f_op=expr.function();
   const code_typet &code_type=to_code_type(f_op.type());
   exprt::operandst &arguments=expr.arguments();
-  const code_typet::argumentst &argument_types=
-    code_type.arguments();
+  const code_typet::parameterst &parameter_types=
+    code_type.parameters();
     
   // no. of arguments test
 
@@ -2555,22 +2609,22 @@ void c_typecheck_baset::typecheck_function_call_arguments(
     // We are generous on KnR; any number is ok.
     // We will in missing ones with "NIL".
 
-    while(argument_types.size()>arguments.size())
+    while(parameter_types.size()>arguments.size())
       arguments.push_back(nil_exprt());
   }
   else if(code_type.has_ellipsis())
   {
-    if(argument_types.size()>arguments.size())
+    if(parameter_types.size()>arguments.size())
     {
       err_location(expr);
       throw "not enough function arguments";
     }
   }
-  else if(argument_types.size()!=arguments.size())
+  else if(parameter_types.size()!=arguments.size())
   {
     err_location(expr);
     str << "wrong number of function arguments: "
-        << "expected " << argument_types.size()
+        << "expected " << parameter_types.size()
         << ", but got " << arguments.size();
     throw 0;
   }
@@ -2583,12 +2637,12 @@ void c_typecheck_baset::typecheck_function_call_arguments(
     {
       // ignore
     }
-    else if(i<argument_types.size())
+    else if(i<parameter_types.size())
     {
-      const code_typet::argumentt &argument_type=
-        argument_types[i];
+      const code_typet::parametert &parameter_type=
+        parameter_types[i];
 
-      const typet &op_type=argument_type.type();
+      const typet &op_type=parameter_type.type();
 
       if(op_type.id()==ID_bool &&
          op.id()==ID_sideeffect &&

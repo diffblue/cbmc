@@ -793,18 +793,26 @@ bool configt::set(const cmdlinet &cmdline)
     // MinGW needs --win32 --gcc
     ansi_c.lib=configt::ansi_ct::LIB_FULL;
     ansi_c.os=configt::ansi_ct::OS_WIN;
-    ansi_c.mode=ansi_ct::MODE_VISUAL_STUDIO_C_CPP;
-    // there are gcc versions that target Windows
+
     if(cmdline.isset("gcc"))
     {
+      // There are gcc versions that target Windows (MinGW for example),
+      // and we support that.
       ansi_c.preprocessor=ansi_ct::PP_GCC;
+      ansi_c.mode=ansi_ct::MODE_GCC_C;
     }
     else
     {
+      // On Windows, our default is Visual Studio.
+      // On anything else, it's GCC as the preprocessor,
+      // but we recognize the Visual Studio language,
+      // which is somewhat inconsistent.
       #ifndef _WIN32
       ansi_c.preprocessor=ansi_ct::PP_GCC;
+      ansi_c.mode=ansi_ct::MODE_VISUAL_STUDIO_C_CPP;
       #else
       ansi_c.preprocessor=ansi_ct::PP_VISUAL_STUDIO;
+      ansi_c.mode=ansi_ct::MODE_VISUAL_STUDIO_C_CPP;
       #endif
     }
   }
@@ -884,7 +892,8 @@ bool configt::set(const cmdlinet &cmdline)
     if(arch=="x86_64")
       ansi_c.set_LLP64();
     
-    // On Windows, wchar_t is unsigned 16 bit.
+    // On Windows, wchar_t is unsigned 16 bit, regardless
+    // of the compiler used.
     ansi_c.wchar_t_width=2*8;
     ansi_c.wchar_t_is_unsigned=true;
 
@@ -1029,10 +1038,9 @@ void configt::ansi_ct::set_from_symbol_table(const symbol_tablet &symbol_table)
 {
   namespacet ns(symbol_table);
 
-  bool_width=1*8;
   int_width=from_ns(ns, "int_width");
   long_int_width=from_ns(ns, "long_int_width");
-  long_int_width=from_ns(ns, "long_int_width");
+  bool_width=1*8;
   char_width=from_ns(ns, "char_width");
   short_int_width=from_ns(ns, "short_int_width");
   long_long_int_width=from_ns(ns, "long_long_int_width");
@@ -1040,17 +1048,28 @@ void configt::ansi_ct::set_from_symbol_table(const symbol_tablet &symbol_table)
   single_width=from_ns(ns, "single_width");
   double_width=from_ns(ns, "double_width");
   long_double_width=from_ns(ns, "long_double_width");
-  char_is_unsigned=from_ns(ns, "char_is_unsigned")!=0;
   wchar_t_width=from_ns(ns, "wchar_t_width");
-  alignment=from_ns(ns, "alignment");
+
+  char_is_unsigned=from_ns(ns, "char_is_unsigned")!=0;
+  wchar_t_is_unsigned=from_ns(ns, "wchar_t_is_unsigned")!=0;
   use_fixed_for_float=from_ns(ns, "fixed_for_float")!=0;
-  endianness=(endiannesst)from_ns(ns, "endianness");
+  // for_has_scope, single_precision_constant, rounding_mode not
+  // stored in namespace
+
+  alignment=from_ns(ns, "alignment");
 
   //memory_operand_size=from_ns(ns, "memory_operand_size");
   memory_operand_size=int_width/8;
-  
+
+  endianness=(endiannesst)from_ns(ns, "endianness");
+
+  // os, arch not stored in namespace
+
   //NULL_is_zero=from_ns("NULL_is_zero");
   NULL_is_zero=true;
+
+  // mode, preprocessor (and all preprocessor command line options),
+  // lib, string_abstraction not stored in namespace
 }
 
 /*******************************************************************\

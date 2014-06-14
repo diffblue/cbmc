@@ -8,6 +8,7 @@
 #include <map>
 #include <vector>
 #include <set>
+#include <iostream>
 
 typedef unsigned int statet;
 typedef std::set<statet> state_sett;
@@ -33,13 +34,33 @@ class automatont {
   void move(statet s, goto_programt::targett a, state_sett &t);
   void move(state_sett &s, goto_programt::targett a, state_sett &t);
 
-  statet init_state;
+  void reverse(goto_programt::targett epsilon);
+  void trim();
+
+  unsigned int count_transitions();
+
+  void output(std::ostream &str);
+
+  void clear() {
+    transitions.clear();
+    accept_states.clear();
+    num_states = 0;
+  }
+
+  void swap(automatont &that) {
+    transitions.swap(that.transitions);
+    accept_states.swap(that.accept_states);
+    num_states = that.num_states;
+    init_state = that.init_state;
+  }
 
  //protected:
   typedef std::multimap<goto_programt::targett, statet> transitionst;
   typedef std::pair<transitionst::iterator, transitionst::iterator> transition_ranget;
   typedef std::vector<transitionst> transition_tablet;
 
+  statet init_state;
+  statet accept_state;
   statet num_states;
   transition_tablet transitions;
   state_sett accept_states;
@@ -95,12 +116,13 @@ class trace_automatont {
   void determinise();
   void epsilon_closure(state_sett &s);
 
+  void minimise();
+  void reverse();
+
   static const statet no_state = -1;
   statet add_dstate(state_sett &s);
   statet find_dstate(state_sett &s);
   void add_dtrans(state_sett &s, goto_programt::targett a, state_sett &t);
-
-  void build_sym_map();
 
   typedef std::map<state_sett, statet> state_mapt;
 
@@ -111,8 +133,6 @@ class trace_automatont {
 
   automatont nta;
   automatont dta;
-
-  sym_mapt sym_map;
 };
 
 #endif // TRACE_AUTOMATON_H

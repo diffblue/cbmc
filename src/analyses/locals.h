@@ -25,9 +25,9 @@ public:
 
   void output(std::ostream &out) const;
 
-  // returns true for all procedure-local variables,
+  // Returns true for all procedure-local variables,
   // not including those with static storage duration,
-  // but including parameters.
+  // but including the function parameters.
   inline bool is_local(const irep_idt &identifier) const
   {
     return locals_map.find(identifier)!=locals_map.end();

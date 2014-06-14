@@ -22,7 +22,7 @@ Function: dimacs_cnft::dimacs_cnft
 
 \*******************************************************************/
 
-dimacs_cnft::dimacs_cnft():break_lines(true)
+dimacs_cnft::dimacs_cnft():break_lines(false)
 {
 }
 
@@ -95,6 +95,16 @@ static void write_dimacs_clause(
   std::ostream &out,
   bool break_lines)
 {
+  // The DIMACS CNF format allows line breaks in clauses:
+  // "Each clauses is terminated by the value 0. Unlike many formats
+  // that represent the end of a clause by a new-line character,
+  // this format allows clauses to be on multiple lines."
+  // Some historic solvers (zchaff e.g.) have silently swallowed
+  // literals in clauses that exceed some fixed buffer size.
+  
+  // However, the SAT competition format does not allow line
+  // breaks in clauses, so we offer both options. 
+
   for(size_t j=0; j<clause.size(); j++)
   {
     out << clause[j].dimacs() << " ";

@@ -94,15 +94,18 @@ void smt2_convt::write_header()
   case YICES: out << "; Generated for Yices\n"; break;
   case Z3: out << "; Generated for Z3\n"; break;
   }
-  
-  out << "(set-info :source \"" << notes << "\")" << "\n";
-  out << "(set-option :produce-models true)" << "\n";
 
   // We use a broad mixture of logics, so on some solvers
   // its better not to declare here.
-
+  // set-logic should be the first command.
   if(emit_set_logic)
     out << "(set-logic " << logic << ")" << "\n";
+
+  out << "(set-info :source \"" << notes << "\")" << "\n";
+  
+  // boolector doesn't seem to like set-option at all
+  if(solver!=BOOLECTOR)
+    out << "(set-option :produce-models true)" << "\n";
 }
 
 /*******************************************************************\
@@ -134,23 +137,74 @@ void smt2_convt::write_footer()
       out << ")" << "\n";
     }
   }
+
+  // fix up the object sizes
+  for(defined_expressionst::iterator it = object_sizes.begin();
+      it != object_sizes.end();
+      ++it) {
+    define_object_size(it->second, it->first);
+  }
   
   out << "(check-sat)" << "\n";
   out << "\n";
   
-  for(smt2_identifierst::const_iterator
-      it=smt2_identifiers.begin();
-      it!=smt2_identifiers.end();
-      it++)
-    out << "(get-value (" << *it << "))" << "\n";
+  // Boolector doesn't like get-value
+  if(solver!=BOOLECTOR)
+  {
+    for(smt2_identifierst::const_iterator
+        it=smt2_identifiers.begin();
+        it!=smt2_identifiers.end();
+        it++)
+      out << "(get-value (" << *it << "))" << "\n";
+  }
 
   // pop the assumptions, if any
   if(!assumptions.empty())
     out << "(pop 1)\n";
-  
+    
   out << "\n";
 
+  out << "(exit)\n";
+  
   out << "; end of SMT2 file" << "\n";
+}
+
+void smt2_convt::define_object_size(const irep_idt &id, const exprt &expr) {
+  assert(expr.id() == ID_object_size);
+  const exprt &ptr = expr.op0();
+  unsigned size_width = boolbv_width(expr.type());
+  unsigned pointer_width = boolbv_width(ptr.type());
+  unsigned int number = 0;
+  unsigned int h = pointer_width - 1;
+  unsigned int l = pointer_width - BV_ADDR_BITS;
+
+  for (pointer_logict::objectst::const_iterator it = pointer_logic.objects.begin();
+       it != pointer_logic.objects.end();
+       ++it, number++) {
+    const exprt &o = *it;
+    const typet &type = ns.follow(o.type());
+    exprt size_expr = size_of_expr(type, ns);
+    mp_integer object_size;
+
+    if (o.id() != ID_symbol) {
+      continue;
+    }
+
+    if (size_expr.is_nil()) {
+      continue;
+    }
+
+    if (to_integer(size_expr, object_size)) {
+      continue;
+    }
+
+    out << "(assert (implies (= " <<
+      "((_ extract " << h << " " << l << ") ";
+    convert_expr(ptr);
+    out << ") (_ bv" << number << " " << BV_ADDR_BITS << "))" <<
+      "(= " << id << " (_ bv" << object_size.to_ulong() << " " <<
+      size_width << "))))\n";
+  }
 }
 
 /*******************************************************************\
@@ -1151,7 +1205,7 @@ void smt2_convt::convert_expr(const exprt &expr)
     if(ext>0)
       out << ")"; // zero_extend
   }
-  else if(expr.id()=="is_dynamic_object")
+  else if(expr.id()==ID_dynamic_object)
   {
     convert_is_dynamic_object(expr);
   }
@@ -1611,7 +1665,25 @@ void smt2_convt::convert_expr(const exprt &expr)
     }
 
     out << ")"; // mk-... or concat
-  }  
+  }
+  else if (expr.id()==ID_object_size)
+  {
+    out << object_sizes[expr];
+  }
+  else if (expr.id()=="same-object")
+  {
+    unsigned pointer_width=boolbv_width(expr.op0().type());
+
+    out << "(= ((_ extract " <<
+      pointer_width - 1 << " " <<
+      pointer_width - BV_ADDR_BITS << ") ";
+    convert_expr(expr.op0());
+    out << ") ((_ extract " <<
+      pointer_width - 1 << " " <<
+      pointer_width - BV_ADDR_BITS << ") ";
+    convert_expr(expr.op1());
+    out << "))";
+  }
   else
     throw "smt2_convt::convert_expr: `"+
           expr.id_string()+"' is unsupported";
@@ -3796,6 +3868,25 @@ void smt2_convt::find_symbols(const exprt &expr)
       defined_expressions[expr]=id;
     }
   }
+  else if(expr.id()==ID_object_size &&
+          expr.operands().size()==1)
+  {
+    const exprt &op = expr.op0();
+
+    if (op.type().id() == ID_pointer ||
+        op.type().id() == ID_reference)
+    {
+      if (object_sizes.find(expr)==object_sizes.end())
+      {
+        irep_idt id="object_size."+i2string(object_sizes.size());
+        out << "(declare-fun " << id << " () ";
+        convert_type(expr.type());
+        out << ")" << "\n";
+
+        object_sizes[expr]=id;
+      }
+    }
+  }
 
 }
 
@@ -3813,13 +3904,7 @@ Function: smt2_convt::use_array_theory
 
 bool smt2_convt::use_array_theory(const array_typet &type)
 {
-  // fixed-size array?
-  unsigned width=boolbv_width(type);
-  
-  if(width!=0)
-    return false; // flatten
-  else
-    return true; // use array theory
+  return true; // always use array theory
 }
 
 /*******************************************************************\
@@ -3858,7 +3943,7 @@ void smt2_convt::convert_type(const typet &type)
     }
     else
     {
-      // flatten
+      // we flatten into a bitvector
       unsigned width=boolbv_width(array_type);
       assert(width!=0);
 
@@ -4171,10 +4256,10 @@ void smt2_convt::find_symbols_rec(
    }
    else if(type.id()==ID_code)
    {
-     const code_typet::argumentst &arguments=
-         to_code_type(type).arguments();
-     for(unsigned i=0; i<arguments.size(); i++)
-       find_symbols_rec(arguments[i].type(), recstack);
+     const code_typet::parameterst &parameters=
+         to_code_type(type).parameters();
+     for(unsigned i=0; i<parameters.size(); i++)
+       find_symbols_rec(parameters[i].type(), recstack);
 
      find_symbols_rec(to_code_type(type).return_type(), recstack);
    }

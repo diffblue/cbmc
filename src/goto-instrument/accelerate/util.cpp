@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include <util/std_types.h>
 
 #include "util.h"
@@ -8,7 +10,9 @@
 bool is_bitvector(const typet &t) {
   return t.id() == ID_bv ||
          t.id() == ID_signedbv ||
-         t.id() == ID_unsignedbv;
+         t.id() == ID_unsignedbv ||
+         t.id() == ID_pointer ||
+         t.id() == ID_bool;
 }
 
 /**
@@ -24,7 +28,9 @@ bool is_signed(const typet &t) {
  */
 bool is_unsigned(const typet &t) {
   return t.id() == ID_bv ||
-         t.id() == ID_unsignedbv;
+         t.id() == ID_unsignedbv ||
+         t.id() == ID_pointer ||
+         t.id() == ID_bool;
 }
 
 /**
@@ -68,7 +74,7 @@ typet join_types(const typet &t1, const typet &t2) {
                                                   b2.get_width();
       unsigned int unsigned_width = is_signed(t1) ? b2.get_width() :
                                                     b1.get_width();
-      unsigned_width++;
+      //unsigned_width++;
 
       unsigned int width = std::max(signed_width, unsigned_width);
 
@@ -76,5 +82,7 @@ typet join_types(const typet &t1, const typet &t2) {
     }
   }
 
+  std::cerr << "Tried to join types: " << t1.to_string() << " and " <<
+    t2.to_string() << std::endl;
   assert(!"Couldn't join types");
 }

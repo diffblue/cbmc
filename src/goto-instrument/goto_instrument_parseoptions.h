@@ -56,7 +56,8 @@ Author: Daniel Kroening, kroening@kroening.com
   "(k-induction):(step-case)(base-case)" \
   "(show-call-sequences)(check-call-sequence)" \
   "(interpreter)(show-reaching-definitions)(count-eloc)" \
-  "(list-symbols)(list-undefined-functions)"
+  "(list-symbols)(list-undefined-functions)" \
+  "(z3)"
 
 class goto_instrument_parseoptionst:
   public parseoptions_baset,

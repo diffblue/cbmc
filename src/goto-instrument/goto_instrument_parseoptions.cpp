@@ -446,7 +446,17 @@ int goto_instrument_parseoptionst::doit()
 
     if(cmdline.isset("accelerate"))
     {
-      accelerate_functions(goto_functions, symbol_table);
+      namespacet ns(symbol_table);
+
+      status() << "Function Pointer Removal" << eom;
+      remove_function_pointers(
+        symbol_table, goto_functions, cmdline.isset("pointer-check"));
+
+      status() << "Performing full inlining" << eom;
+      goto_inline(goto_functions, ns, ui_message_handler);
+
+      status() << "Accelerating" << eom;
+      accelerate_functions(goto_functions, symbol_table, cmdline.isset("z3"));
       remove_skip(goto_functions);
       goto_functions.update();
     }

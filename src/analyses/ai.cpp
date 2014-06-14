@@ -183,9 +183,9 @@ bool ai_baset::fixedpoint(
   
   working_sett working_set;
 
-  put_in_working_set(
-    working_set,
-    goto_program.instructions.begin());
+  // We will put all locations at least once into the working set.
+  forall_goto_program_instructions(i_it, goto_program)
+    put_in_working_set(working_set, i_it);
     
   bool new_data=false;
 

@@ -170,7 +170,8 @@ Function: goto_convertt::remove_pre
 
 void goto_convertt::remove_pre(
   side_effect_exprt &expr,
-  goto_programt &dest)
+  goto_programt &dest,
+  bool result_is_used)
 {
   if(expr.operands().size()!=1)
     throw "preincrement/predecrement must have one operand";
@@ -238,9 +239,14 @@ void goto_convertt::remove_pre(
   
   convert(assignment, dest);
 
-  // revert to argument of pre-inc/pre-dec
-  exprt op=expr.op0();
-  expr.swap(op);
+  if(result_is_used)
+  {
+    // revert to argument of pre-inc/pre-dec
+    exprt tmp=expr.op0();
+    expr.swap(tmp);
+  }
+  else
+    expr.make_nil();
 }
 
 /*******************************************************************\
@@ -755,7 +761,7 @@ void goto_convertt::remove_side_effect(
     remove_post(expr, dest, result_is_used);
   else if(statement==ID_preincrement ||
           statement==ID_predecrement)
-    remove_pre(expr, dest);
+    remove_pre(expr, dest, result_is_used);
   else if(statement==ID_cpp_new ||
           statement==ID_cpp_new_array)
     remove_cpp_new(expr, dest, result_is_used);

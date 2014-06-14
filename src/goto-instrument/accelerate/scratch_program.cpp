@@ -4,6 +4,8 @@
 
 #include <goto-symex/slice.h>
 
+#include <goto-programs/remove_skip.h>
+
 #include "scratch_program.h"
 
 //#define DEBUG
@@ -12,28 +14,14 @@
 #include <iostream>
 #endif
 
-static int num_symbols;
-
-symbolt scratch_programt::fresh_symbol(string base, typet type)
-{
-  string name = base + "_" + i2string(num_symbols++);
-  symbolt ret;
-  ret.module = "scratch";
-  ret.name = name;
-  ret.base_name = name;
-  ret.pretty_name = name;
-  ret.type = type;
-
-  shadow_symbol_table.add(ret);
-
-  return ret;
-}
-
-bool scratch_programt::check_sat()
+bool scratch_programt::check_sat(bool do_slice)
 {
   fix_types();
 
   add_instruction(END_FUNCTION);
+
+  remove_skip(*this);
+  update();
 
 #ifdef DEBUG
   cout << "Checking following program for satness:" << endl;
@@ -44,10 +32,26 @@ bool scratch_programt::check_sat()
   goto_symex_statet::propagationt::valuest constants;
 
   symex(symex_state, functions, *this);
-  slice(equation);
-  equation.convert(checker);
 
-  return (checker.dec_solve() == decision_proceduret::D_SATISFIABLE);
+  if (do_slice) {
+    slice(equation);
+  }
+
+  if (equation.count_assertions() == 0) {
+    // Symex sliced away all our assertions.
+#ifdef DEBUG
+    std::cout << "Trivially unsat" << std::endl;
+#endif
+    return false;
+  }
+
+  equation.convert(*checker);
+
+#ifdef DEBUG
+  cout << "Finished symex, invoking decision procedure." << endl;
+#endif
+
+  return (checker->dec_solve() == decision_proceduret::D_SATISFIABLE);
 }
 
 exprt scratch_programt::eval(exprt &e) {
@@ -55,7 +59,7 @@ exprt scratch_programt::eval(exprt &e) {
 
   symex_state.rename(ssa, ns);
 
-  return checker.get(ssa);
+  return checker->get(ssa);
 }
 
 void scratch_programt::append(goto_programt::instructionst &new_instructions) {
@@ -112,6 +116,50 @@ void scratch_programt::fix_types() {
       }
     } else if (it->is_assume() || it->is_assert()) {
       ::fix_types(it->guard);
+    }
+  }
+}
+
+void scratch_programt::append_path(patht &path) {
+  for (patht::iterator it = path.begin();
+       it != path.end();
+       ++it) {
+    if (it->loc->is_assign() || it->loc->is_assume()) {
+      instructions.push_back(*it->loc);
+    } else if (it->loc->is_goto()) {
+      if (it->guard.id() != ID_nil) {
+        add_instruction(ASSUME)->guard = it->guard;
+      }
+    } else if (it->loc->is_assert()) {
+      add_instruction(ASSUME)->guard = it->loc->guard;
+    }
+  }
+}
+
+void scratch_programt::append(goto_programt &program) {
+  goto_programt scratch;
+
+  scratch.copy_from(program);
+  destructive_append(scratch);
+}
+
+void scratch_programt::append_loop(goto_programt &program,
+    goto_programt::targett loop_header) {
+  append(program);
+
+  // Update any back jumps to the loop header.
+  assume(false_exprt());
+
+  goto_programt::targett end = add_instruction(SKIP);
+
+  update();
+
+  for (goto_programt::targett t = instructions.begin();
+       t != instructions.end();
+       ++t) {
+    if (t->is_backwards_goto()) {
+      t->targets.clear();
+      t->targets.push_back(end);
     }
   }
 }

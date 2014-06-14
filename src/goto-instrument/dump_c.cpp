@@ -58,11 +58,32 @@ static const exprt& skip_typecast(const exprt &expr)
 
 class goto_program2codet
 {
-  typedef std::list<irep_idt> type_namest;
+  typedef std::list<irep_idt> id_listt;
   typedef hash_set_cont<irep_idt,irep_id_hash> id_sett;
   typedef std::map<goto_programt::const_targett, goto_programt::const_targett> loopt;
   typedef hash_map_cont<irep_idt, irep_idt, irep_id_hash> tag_mapt;
+  typedef std::multimap<irep_idt, irep_idt> r_tag_mapt;
   typedef hash_map_cont<irep_idt, unsigned, irep_id_hash> dead_mapt;
+  typedef std::list<std::pair<goto_programt::const_targett, bool> >
+    loop_last_stackt;
+
+  struct caset
+  {
+    const exprt value; // condition upon which this case is taken
+    goto_programt::const_targett case_selector; // branching from ...
+    goto_programt::const_targett case_start; // ... to
+    goto_programt::const_targett case_last; // last instruction of case
+
+    caset(const goto_programt &goto_program,
+          const exprt &v,
+          goto_programt::const_targett sel,
+          goto_programt::const_targett st):
+      value(v), case_selector(sel), case_start(st),
+      case_last(goto_program.instructions.end())
+    {
+    }
+  };
+  typedef std::list<caset> cases_listt;
 
 public:
   goto_program2codet(
@@ -70,16 +91,25 @@ public:
       symbol_tablet &_symbol_table,
       const tag_mapt &_tag_map,
       code_blockt &_dest,
-      type_namest &_type_names,
+      id_listt &_local_static,
+      id_listt &_type_names,
       std::set<std::string> &_system_headers):
     goto_program(_goto_program),
     symbol_table(_symbol_table),
     tag_map(_tag_map),
     ns(_symbol_table),
     toplevel_block(_dest),
+    local_static(_local_static),
     type_names(_type_names),
     system_headers(_system_headers)
   {
+    assert(local_static.empty());
+
+    for(id_listt::const_iterator
+        it=type_names.begin();
+        it!=type_names.end();
+        ++it)
+      type_names_set.insert(*it);
   }
 
   void operator()();
@@ -90,7 +120,8 @@ protected:
   const tag_mapt &tag_map;
   const namespacet ns;
   code_blockt &toplevel_block;
-  type_namest &type_names;
+  id_listt &local_static;
+  id_listt &type_names;
   std::set<std::string> &system_headers;
   exprt va_list_expr;
 
@@ -98,25 +129,35 @@ protected:
   loopt loop_map;
   id_sett labels_in_use;
   replace_symbolt replace_symbols;
-  tag_mapt reverse_tag_map;
+  r_tag_mapt reverse_tag_map;
   id_sett expanded_symbols;
   dead_mapt dead_map;
+  loop_last_stackt loop_last_stack;
+  id_sett local_static_set;
+  id_sett type_names_set;
+  id_sett const_removed;
 
   void build_loop_map();
   void build_dead_map();
   void scan_for_varargs();
 
-  void cleanup_code(codet &code, const bool is_top);
+  void cleanup_code(codet &code, const irep_idt parent_stmt);
 
   void cleanup_code_block(
-      codet &code,
-      const bool is_top);
+    codet &code,
+    const irep_idt parent_stmt);
 
-  void cleanup_code_ifthenelse(codet &code);
+  void cleanup_code_ifthenelse(
+    codet &code,
+    const irep_idt parent_stmt);
 
   void expand_reverse_tag_map(const irep_idt identifier);
   void expand_reverse_tag_map(const typet &type);
-  void cleanup_expr(exprt &expr);
+  void cleanup_expr(exprt &expr, bool no_typecast);
+
+  void add_local_types(const typet &type);
+
+  void remove_const(typet &type);
 
   goto_programt::const_targett convert_instruction(
       goto_programt::const_targett target,
@@ -173,6 +214,10 @@ protected:
   goto_programt::const_targett convert_goto_if(
       goto_programt::const_targett target,
       goto_programt::const_targett upper_bound,
+      codet &dest);
+
+  goto_programt::const_targett convert_goto_break_continue(
+      goto_programt::const_targett target,
       codet &dest);
 
   goto_programt::const_targett convert_goto_goto(
@@ -235,7 +280,7 @@ void goto_program2codet::operator()()
         toplevel_block);
 
   replace_symbols.replace(toplevel_block);
-  for(type_namest::const_iterator
+  for(id_listt::const_iterator
       it=type_names.begin();
       it!=type_names.end();
       ++it)
@@ -244,7 +289,7 @@ void goto_program2codet::operator()()
     replace_symbols.replace(symbol.type);
   }
 
-  cleanup_code(toplevel_block, true);
+  cleanup_code(toplevel_block, ID_nil);
 }
 
 /*******************************************************************\
@@ -766,7 +811,11 @@ void goto_program2codet::convert_assign_rec(
         it!=components.end();
         ++it)
     {
-      if(!it->get_is_padding())
+      const bool is_zero_bit_field=
+        it->get_is_bit_field() &&
+        to_bitvector_type(ns.follow(it->type())).get_width()==0;
+
+      if(!it->get_is_padding() && !is_zero_bit_field)
       {
         member_exprt member(assign.lhs(), it->get_name(), it->type());
         convert_assign_rec(code_assignt(member, *o_it), dest);
@@ -812,28 +861,10 @@ goto_programt::const_targett goto_program2codet::convert_return(
   code_returnt ret=to_code_return(target->code);
 
   // catch the specific case where the original code was missing a return
-  // statement to avoid NONDET() in output when the instruction is dead anyway
   if(ret.has_return_value() &&
      ret.return_value().id()==ID_sideeffect &&
      to_side_effect_expr(ret.return_value()).get_statement()==ID_nondet)
-  {
-    const cfg_dominatorst &dominators=loops.get_dominator_info();
-    cfg_dominatorst::node_mapt::const_iterator i_entry=
-      dominators.node_map.find(target);
-    assert(i_entry!=dominators.node_map.end());
-    const cfg_dominatorst::nodet &n=i_entry->second;
-
-    if(n.dominators.empty())
-    {
-      if(target->is_target())
-        dest.copy_to_operands(code_skipt());
-      return target;
-    }
-  }
-  else if(ret.has_return_value() &&
-          (ret.return_value().id()==ID_vector ||
-           ret.return_value().id()==ID_array))
-    ret.return_value().make_typecast(ret.return_value().type());
+    return target;
 
   dest.copy_to_operands(ret);
 
@@ -882,23 +913,15 @@ goto_programt::const_targett goto_program2codet::convert_decl(
        (va_list_expr.is_nil() || a.lhs()!=va_list_expr))
     {
       d.copy_to_operands(a.rhs());
+
       ++target;
       convert_labels(target, dest);
     }
   }
   // if we have a constant but can't initialize them right away, we need to
   // remove the const marker
-  else if(symbol.type().get_bool(ID_C_constant))
-    symbol.type().remove(ID_C_constant);
-  else if(symbol.type().id()==ID_array)
-  {
-    for(typet * t=&(symbol.type());
-        t->id()==ID_array;
-        t=&(t->subtype()))
-      if(t->subtype().id()!=ID_array &&
-          t->subtype().get_bool(ID_C_constant))
-        t->subtype().remove(ID_C_constant);
-  }
+  else
+    remove_const(symbol.type());
 
   if(move_to_dest)
     dest.move_to_operands(d);
@@ -932,8 +955,12 @@ goto_programt::const_targett goto_program2codet::convert_do_while(
   simplify(d.cond(), ns);
   d.body()=code_blockt();
 
+  loop_last_stack.push_back(std::make_pair(loop_end, true));
+
   for( ; target!=loop_end; ++target)
     target=convert_instruction(target, loop_end, d.body());
+
+  loop_last_stack.pop_back();
 
   convert_labels(loop_end, d.body());
 
@@ -970,6 +997,8 @@ goto_programt::const_targett goto_program2codet::convert_goto(
     return convert_goto_while(target, loop_entry->second, dest);
   else if(!target->guard.is_true())
     return convert_goto_switch(target, upper_bound, dest);
+  else if(!loop_last_stack.empty())
+    return convert_goto_break_continue(target, dest);
   else
     return convert_goto_goto(target, dest);
 }
@@ -1006,17 +1035,32 @@ goto_programt::const_targett goto_program2codet::convert_goto_while(
     w.cond()=not_exprt(target->guard);
     simplify(w.cond(), ns);
   }
+  else if(target->guard.is_true())
+  {
+    w.cond()=true_exprt();
+    target=convert_goto_goto(target, w.body());
+  }
   else
   {
     w.cond()=true_exprt();
-    convert_goto_goto(target, w.body());
+    target=convert_goto_switch(target, loop_end, w.body());
   }
+
+  loop_last_stack.push_back(std::make_pair(loop_end, true));
 
   for(++target; target!=loop_end; ++target)
     target=convert_instruction(target, loop_end, w.body());
 
+  loop_last_stack.pop_back();
+
   convert_labels(loop_end, w.body());
-  if(!loop_end->guard.is_true())
+  if(loop_end->guard.is_false())
+  {
+    code_breakt brk;
+
+    w.body().move_to_operands(brk);
+  }
+  else if(!loop_end->guard.is_true())
   {
     code_ifthenelset i;
 
@@ -1027,7 +1071,46 @@ goto_programt::const_targett goto_program2codet::convert_goto_while(
     w.body().move_to_operands(i);
   }
 
+  if(w.body().has_operands() &&
+     to_code(w.body().operands().back()).get_statement()==ID_assign)
+  {
+    code_fort f;
+
+    f.init().make_nil();
+
+    f.cond()=w.cond();
+
+    f.iter()=w.body().operands().back();
+    w.body().operands().pop_back();
+    f.iter().id(ID_sideeffect);
+
+    f.body().swap(w.body());
+
+    f.swap(w);
+  }
+  else if(w.body().has_operands() &&
+          w.cond().is_true())
+  {
+    const codet &back=to_code(w.body().operands().back());
+
+    if(back.get_statement()==ID_break ||
+       (back.get_statement()==ID_ifthenelse &&
+        to_code_ifthenelse(back).cond().is_true() &&
+        to_code_ifthenelse(back).then_case().get_statement()==ID_break))
+    {
+      code_dowhilet d;
+
+      d.cond()=false_exprt();
+
+      w.body().operands().pop_back();
+      d.body().swap(w.body());
+
+      d.swap(w);
+    }
+  }
+
   dest.move_to_operands(w);
+
   return target;
 }
 
@@ -1049,9 +1132,12 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
     codet &dest)
 {
   // try to figure out whether this was a switch/case
+  exprt eq_cand=target->guard;
+  if(eq_cand.id()==ID_or) eq_cand=eq_cand.op0();
+
   if(target->is_backwards_goto() ||
-     target->guard.id()!=ID_equal ||
-     !skip_typecast(to_equal_expr(target->guard).rhs()).is_constant())
+     eq_cand.id()!=ID_equal ||
+     !skip_typecast(to_equal_expr(eq_cand).rhs()).is_constant())
     return convert_goto_if(target, upper_bound, dest);
 
   const cfg_dominatorst &dominators=loops.get_dominator_info();
@@ -1065,9 +1151,8 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
     return convert_goto_if(target, upper_bound, dest);
 
   // maybe, let's try some more
-  const equal_exprt &e1=to_equal_expr(target->guard);
   code_switcht s;
-  s.value()=e1.lhs();
+  s.value()=to_equal_expr(eq_cand).lhs();
   s.body()=code_blockt();
 
   // find the cases or fall back to convert_goto_if
@@ -1075,11 +1160,10 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
   goto_programt::const_targett last_target=goto_program.instructions.end();
   std::set<goto_programt::const_targett> unique_targets;
 
-  // list of <branch conditions, branch instruction, branch target>
-  typedef std::list<std::pair<exprt, std::pair<
-    goto_programt::const_targett,
-    goto_programt::const_targett> > > cases_listt;
   cases_listt cases;
+  goto_programt::const_targett default_target=
+    goto_program.instructions.end();
+
   goto_programt::const_targett cases_it=target;
   for( ;
       cases_it!=upper_bound && cases_it!=first_target;
@@ -1089,7 +1173,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
        !cases_it->is_backwards_goto() &&
        cases_it->guard.is_true())
     {
-      goto_programt::const_targett default_target=cases_it->get_target();
+      default_target=cases_it->get_target();
 
       if(first_target==goto_program.instructions.end() ||
          first_target->location_number > default_target->location_number)
@@ -1098,9 +1182,11 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
          last_target->location_number < default_target->location_number)
         last_target=default_target;
 
-      cases.push_back(std::make_pair(nil_exprt(),
-                                     std::make_pair(cases_it,
-                                                    default_target)));
+      cases.push_back(caset(
+          goto_program,
+          nil_exprt(),
+          cases_it,
+          default_target));
       unique_targets.insert(default_target);
 
       ++cases_it;
@@ -1108,38 +1194,64 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
     }
     else if(cases_it->is_goto() &&
             !cases_it->is_backwards_goto() &&
-            cases_it->guard.id()==ID_equal &&
-            skip_typecast(to_equal_expr(cases_it->guard).rhs()).is_constant() &&
-            s.value()==to_equal_expr(cases_it->guard).lhs())
+            (cases_it->guard.id()==ID_equal ||
+             cases_it->guard.id()==ID_or))
     {
-      cases.push_back(std::make_pair(to_equal_expr(cases_it->guard).rhs(),
-                                     std::make_pair(cases_it,
-                                                    cases_it->get_target())));
-      assert(cases.back().first.is_not_nil());
+      exprt::operandst eqs;
+      if(cases_it->guard.id()==ID_equal)
+        eqs.push_back(cases_it->guard);
+      else
+        eqs=cases_it->guard.operands();
 
-      if(first_target==goto_program.instructions.end() ||
-         first_target->location_number > cases.back().second.second->location_number)
-        first_target=cases.back().second.second;
-      if(last_target==goto_program.instructions.end() ||
-         last_target->location_number < cases.back().second.second->location_number)
-        last_target=cases.back().second.second;
+      // goto conversion builds disjunctions in reverse order
+      // to ensure convergence, we turn this around again
+      for(exprt::operandst::const_reverse_iterator
+          e_it=eqs.rbegin();
+          e_it!=(exprt::operandst::const_reverse_iterator)eqs.rend();
+          ++e_it)
+      {
+        if(e_it->id()!=ID_equal ||
+           !skip_typecast(to_equal_expr(*e_it).rhs()).is_constant() ||
+           s.value()!=to_equal_expr(*e_it).lhs())
+          return convert_goto_if(target, upper_bound, dest);
 
-      unique_targets.insert(cases.back().second.second);
+        cases.push_back(caset(
+            goto_program,
+            to_equal_expr(*e_it).rhs(),
+            cases_it,
+            cases_it->get_target()));
+        assert(cases.back().value.is_not_nil());
+
+        if(first_target==goto_program.instructions.end() ||
+           first_target->location_number > cases.back().case_start->location_number)
+          first_target=cases.back().case_start;
+        if(last_target==goto_program.instructions.end() ||
+           last_target->location_number < cases.back().case_start->location_number)
+          last_target=cases.back().case_start;
+
+        unique_targets.insert(cases.back().case_start);
+      }
     }
     else
       return convert_goto_if(target, upper_bound, dest);
   }
 
-  // make sure we don't have some overlap of gotos and switch/case
-  if(cases_it==upper_bound ||
-     (upper_bound!=goto_program.instructions.end() &&
-      upper_bound->location_number < last_target->location_number))
-    return convert_goto_if(target, upper_bound, dest);
-
   // if there are less than 3 targets, we revert to if/else instead; this should
   // help convergence
   if(unique_targets.size()<3)
     return convert_goto_if(target, upper_bound, dest);
+
+  // make sure we don't have some overlap of gotos and switch/case
+  if(cases_it==upper_bound ||
+     (upper_bound!=goto_program.instructions.end() &&
+      upper_bound->location_number < last_target->location_number) ||
+     (last_target!=goto_program.instructions.end() &&
+      last_target->location_number > default_target->location_number) ||
+     target->get_target()==default_target)
+    return convert_goto_if(target, upper_bound, dest);
+
+  // backup the top-level block as we might have to backtrack
+  code_blockt toplevel_block_bak=toplevel_block;
 
   // add any instructions that go in the body of the switch before any cases
   goto_programt::const_targett orig_target=target;
@@ -1147,50 +1259,22 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
     target=convert_instruction(target, first_target, s.body());
 
   std::set<unsigned> processed_locations;
-  goto_programt::const_targett max_target=target;
   std::map<goto_programt::const_targett, unsigned> targets_done;
 
-  // iterate over all <branch conditions, branch instruction, branch target>
-  // triples, build their corresponding code
-  for(cases_listt::const_iterator it=cases.begin();
+  // iterate over all cases to identify block end points
+  for(cases_listt::iterator it=cases.begin();
       it!=cases.end();
       ++it)
   {
-    code_switch_caset csc;
-    // branch condition is nil_exprt for default case;
-    if(it->first.is_nil())
-      csc.set_default();
-    else
-      csc.case_op()=it->first;
-
     // some branch targets may be shared by multiple branch instructions,
     // as in case 1: case 2: code; we build a nested code_switch_caset
-    if(targets_done.find(it->second.second)!=targets_done.end())
-    {
-      assert(!it->second.first->is_target());
-
-      // maintain the order to ensure convergence -> go to the innermost
-      code_switch_caset *cscp=&to_code_switch_case(
-        to_code(s.body().operands()[targets_done[it->second.second]]));
-      while(cscp->code().get_statement()==ID_switch_case)
-        cscp=&to_code_switch_case(cscp->code());
-
-      csc.code().swap(cscp->code());
-      cscp->code().swap(csc);
-
+    if(targets_done.find(it->case_start)!=targets_done.end())
       continue;
-    }
-
-    code_blockt c;
-    if(it->second.first!=orig_target)
-      convert_labels(it->second.first, c);
 
     // compute the block that belongs to this case
-    target=it->second.second;
-    goto_programt::const_targett case_end=target;
-    goto_programt::const_targett last_non_dead=target;
-    for( ;
+    for(goto_programt::const_targett case_end=it->case_start;
         case_end!=goto_program.instructions.end() &&
+        case_end->type!=END_FUNCTION &&
         case_end!=upper_bound;
         ++case_end)
     {
@@ -1205,32 +1289,144 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
 
       // is this instruction dominated by at least one of the cases
       bool some_goto_dom=
-        n.dominators.find(it->second.first)!=n.dominators.end();
+        n.dominators.find(it->case_selector)!=n.dominators.end();
       for(cases_listt::const_iterator it2=cases.begin();
           it2!=it && !some_goto_dom;
           ++it2)
-        some_goto_dom=n.dominators.find(it2->second.first)!=n.dominators.end();
+        some_goto_dom=
+          n.dominators.find(it2->case_selector)!=n.dominators.end();
 
-      // this still kills some legitimate cases; in this case we will drop back
-      // to convert_goto_if in the check we do below on processed_locations
-      if(n.dominators.find(target)==n.dominators.end() || !some_goto_dom)
-        break;
+      // for code that has jumps into one of the cases from outside the
+      // switch/case we better use convert_goto_if
+      if(n.dominators.find(it->case_start)==n.dominators.end() ||
+         !some_goto_dom)
+      {
+        toplevel_block.swap(toplevel_block_bak);
+        return convert_goto_if(orig_target, upper_bound, dest);
+      }
       else if(!processed_locations.insert(case_end->location_number).second)
         assert(false);
 
-      last_non_dead=case_end;
-      ++last_non_dead;
+      it->case_last=case_end;
     }
-    case_end=last_non_dead;
+
+    targets_done[it->case_start]=1;
+  }
+
+  // figure out whether we really had a default target by testing
+  // whether all cases eventually jump to the default case
+  for(cases_listt::const_iterator it=cases.begin();
+      it!=cases.end();
+      ++it)
+  {
+    // ignore empty cases
+    if(it->case_last==goto_program.instructions.end()) continue;
+
+    // the last case before default is the most interesting
+    cases_listt::const_iterator last=--cases.end();
+    if(last->case_start==default_target &&
+       it==--last)
+    {
+      // ignore dead instructions for the following checks
+      goto_programt::const_targett next_case=it->case_last;
+      for(++next_case;
+          next_case!=goto_program.instructions.end();
+          ++next_case)
+      {
+        cfg_dominatorst::node_mapt::const_iterator i_entry=
+          dominators.node_map.find(next_case);
+        assert(i_entry!=dominators.node_map.end());
+        const cfg_dominatorst::nodet &n=i_entry->second;
+
+        if(!n.dominators.empty())
+          break;
+      }
+
+      if(next_case!=goto_program.instructions.end() &&
+         next_case==default_target &&
+         (!it->case_last->is_goto() ||
+          (it->case_last->guard.is_true() &&
+           it->case_last->get_target()==default_target)))
+      {
+        // if there is no goto here, yet we got here, all others would
+        // branch to this - we don't need default
+        cases.pop_back();
+        default_target=goto_program.instructions.end();
+      }
+    }
+
+    // jumps to default are ok
+    if(it->case_last->is_goto() &&
+       it->case_last->guard.is_true() &&
+       it->case_last->get_target()==default_target)
+      continue;
+
+    // fall-through is ok
+    if(!it->case_last->is_goto()) continue;
+
+    break;
+  }
+
+  // find the last instruction belonging to any of the cases
+  goto_programt::const_targett max_target=target;
+  for(cases_listt::const_iterator it=cases.begin();
+      it!=cases.end();
+      ++it)
+    if(it->case_last!=goto_program.instructions.end() &&
+       it->case_last->location_number > max_target->location_number)
+      max_target=it->case_last;
+
+  targets_done.clear();
+  loop_last_stack.push_back(std::make_pair(max_target, false));
+
+  // iterate over all <branch conditions, branch instruction, branch target>
+  // triples, build their corresponding code
+  for(cases_listt::const_iterator it=cases.begin();
+      it!=cases.end();
+      ++it)
+  {
+    code_switch_caset csc;
+    // branch condition is nil_exprt for default case;
+    if(it->value.is_nil())
+      csc.set_default();
+    else
+      csc.case_op()=it->value;
+
+    // some branch targets may be shared by multiple branch instructions,
+    // as in case 1: case 2: code; we build a nested code_switch_caset
+    if(targets_done.find(it->case_start)!=targets_done.end())
+    {
+      assert(it->case_selector==orig_target ||
+             !it->case_selector->is_target());
+
+      // maintain the order to ensure convergence -> go to the innermost
+      code_switch_caset *cscp=&to_code_switch_case(
+        to_code(s.body().operands()[targets_done[it->case_start]]));
+      while(cscp->code().get_statement()==ID_switch_case)
+        cscp=&to_code_switch_case(cscp->code());
+
+      csc.code().swap(cscp->code());
+      cscp->code().swap(csc);
+
+      continue;
+    }
+
+    code_blockt c;
+    if(it->case_selector!=orig_target)
+      convert_labels(it->case_selector, c);
+
+    // convert the block that belongs to this case
+    target=it->case_start;
 
     // empty case
-    if(case_end==target)
+    if(it->case_last==goto_program.instructions.end())
     {
       // only emit the jump out of the switch if it's not the last case
       // this improves convergence
       if(it!=--cases.end())
       {
-        goto_programt::instructiont i=*(it->second.first);
+        assert(false);
+        goto_programt::instructiont i=*(it->case_selector);
         i.guard=true_exprt();
         goto_programt tmp;
         tmp.insert_before_swap(tmp.insert_before(tmp.instructions.end()), i);
@@ -1239,16 +1435,18 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
     }
     else
     {
-      for( ; target!=case_end; ++target)
-        target=convert_instruction(target, case_end, c);
-      if((--case_end)->location_number > max_target->location_number)
-        max_target=case_end;
+      goto_programt::const_targett after_last=it->case_last;
+      ++after_last;
+      for( ; target!=after_last; ++target)
+        target=convert_instruction(target, after_last, c);
     }
 
     csc.code().swap(c);
-    targets_done[it->second.second]=s.body().operands().size();
+    targets_done[it->case_start]=s.body().operands().size();
     s.body().move_to_operands(csc);
   }
+
+  loop_last_stack.pop_back();
 
   // make sure we didn't miss any non-dead instruction
   for(goto_programt::const_targett it=first_target;
@@ -1263,7 +1461,10 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
       const cfg_dominatorst::nodet &n=it_entry->second;
 
       if(!n.dominators.empty())
+      {
+        toplevel_block.swap(toplevel_block_bak);
         return convert_goto_if(orig_target, upper_bound, dest);
+      }
     }
 
   dest.move_to_operands(s);
@@ -1308,7 +1509,9 @@ goto_programt::const_targett goto_program2codet::convert_goto_if(
 
     has_else=before_else->is_goto() &&
       before_else->get_target()->location_number > end_if->location_number &&
-      before_else->guard.is_true();
+      before_else->guard.is_true() &&
+      (upper_bound==goto_program.instructions.end() ||
+       upper_bound->location_number >= before_else->get_target()->location_number);
 
     if(has_else)
       end_if=before_else->get_target();
@@ -1321,7 +1524,12 @@ goto_programt::const_targett goto_program2codet::convert_goto_if(
   if(target->is_backwards_goto() ||
       (upper_bound!=goto_program.instructions.end() &&
        upper_bound->location_number < end_if->location_number))
-    return convert_goto_goto(target, dest);
+  {
+    if(!loop_last_stack.empty())
+      return convert_goto_break_continue(target, dest);
+    else
+      return convert_goto_goto(target, dest);
+  }
 
   i.cond()=not_exprt(target->guard);
   simplify(i.cond(), ns);
@@ -1349,6 +1557,103 @@ goto_programt::const_targett goto_program2codet::convert_goto_if(
 
 /*******************************************************************\
 
+Function: goto_program2codet::convert_goto_break_continue
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
+goto_programt::const_targett goto_program2codet::convert_goto_break_continue(
+    goto_programt::const_targett target,
+    codet &dest)
+{
+  assert(!loop_last_stack.empty());
+  const cfg_dominatorst &dominators=loops.get_dominator_info();
+
+  // goto 1
+  // 1: ...
+  goto_programt::const_targett next=target;
+  for(++next;
+      next!=goto_program.instructions.end();
+      ++next)
+  {
+    cfg_dominatorst::node_mapt::const_iterator i_entry=
+      dominators.node_map.find(next);
+    assert(i_entry!=dominators.node_map.end());
+    const cfg_dominatorst::nodet &n=i_entry->second;
+
+    if(!n.dominators.empty())
+      break;
+  }
+
+  if(target->get_target()==next)
+  {
+    dest.copy_to_operands(code_skipt());
+    return target;
+  }
+
+  goto_programt::const_targett loop_end=loop_last_stack.back().first;
+
+  if(target->get_target()==loop_end &&
+     loop_last_stack.back().second)
+  {
+    code_continuet cont;
+
+    if(!target->guard.is_true())
+    {
+      code_ifthenelset i;
+      i.cond()=target->guard;
+      simplify(i.cond(), ns);
+      i.then_case().swap(cont);
+
+      dest.move_to_operands(i);
+    }
+    else
+      dest.move_to_operands(cont);
+
+    return target;
+  }
+
+  goto_programt::const_targett after_loop=loop_end;
+  for(++after_loop;
+      after_loop!=goto_program.instructions.end();
+      ++after_loop)
+  {
+    cfg_dominatorst::node_mapt::const_iterator i_entry=
+      dominators.node_map.find(after_loop);
+    assert(i_entry!=dominators.node_map.end());
+    const cfg_dominatorst::nodet &n=i_entry->second;
+
+    if(!n.dominators.empty())
+      break;
+  }
+
+  if(target->get_target()==after_loop)
+  {
+    code_breakt brk;
+
+    code_ifthenelset i;
+    i.cond()=target->guard;
+    simplify(i.cond(), ns);
+    i.then_case().swap(brk);
+
+    if(i.cond().is_true())
+      dest.move_to_operands(i.then_case());
+    else
+      dest.move_to_operands(i);
+
+    return target;
+  }
+
+  return convert_goto_goto(target, dest);
+}
+
+/*******************************************************************\
+
 Function: goto_program2codet::convert_goto_goto
 
 Inputs:
@@ -1367,6 +1672,17 @@ goto_programt::const_targett goto_program2codet::convert_goto_goto(
   goto_programt::const_targett next=target;
   ++next;
   if(target->get_target()==next)
+    return target;
+
+  const cfg_dominatorst &dominators=loops.get_dominator_info();
+  cfg_dominatorst::node_mapt::const_iterator it_entry=
+    dominators.node_map.find(target);
+  assert(it_entry!=dominators.node_map.end());
+  const cfg_dominatorst::nodet &n=it_entry->second;
+
+  // skip dead goto L as the label might be skipped if it is dead
+  // as well and at the end of a case block
+  if(n.dominators.empty())
     return target;
 
   std::stringstream label;
@@ -1581,6 +1897,60 @@ goto_programt::const_targett goto_program2codet::convert_catch(
 
 /*******************************************************************\
 
+Function: goto_program2codet::add_local_types
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
+void goto_program2codet::add_local_types(const typet &type)
+{
+  if(type.id()==ID_symbol)
+  {
+    const typet &full_type=ns.follow(type);
+
+    if(full_type.id()==ID_pointer ||
+       full_type.id()==ID_array)
+    {
+      add_local_types(full_type.subtype());
+    }
+    else if(full_type.id()==ID_struct ||
+            full_type.id()==ID_union)
+    {
+      const irep_idt &identifier=to_symbol_type(type).get_identifier();
+      const symbolt &symbol=ns.lookup(identifier);
+
+      if(symbol.location.get_function().empty() ||
+         !type_names_set.insert(identifier).second)
+        return;
+
+      const struct_union_typet &struct_union_type=
+        to_struct_union_type(full_type);
+      const struct_union_typet::componentst &components=
+        struct_union_type.components();
+
+      for(struct_union_typet::componentst::const_iterator
+          it=components.begin();
+          it!=components.end();
+          ++it)
+        add_local_types(it->type());
+
+      type_names.push_back(identifier);
+    }
+  }
+  else if(type.id()==ID_pointer ||
+          type.id()==ID_array)
+  {
+    add_local_types(type.subtype());
+  }
+}
+
+/*******************************************************************\
+
 Function: goto_program2codet::cleanup_code
 
 Inputs:
@@ -1593,17 +1963,30 @@ Purpose:
 
 void goto_program2codet::cleanup_code(
     codet &code,
-    const bool is_top)
+    const irep_idt parent_stmt)
 {
+  if(code.get_statement()==ID_decl)
+  {
+    Forall_operands(it, code)
+      cleanup_expr(*it, true);
+
+    if(code.op0().type().id()==ID_array)
+      cleanup_expr(to_array_type(code.op0().type()).size(), true);
+
+    add_local_types(code.op0().type());
+
+    return;
+  }
+
   if(code.has_operands())
   {
     exprt::operandst &operands=code.operands();
     Forall_expr(it, operands)
     {
       if(it->id()==ID_code)
-        cleanup_code(to_code(*it), false);
+        cleanup_code(to_code(*it), code.get_statement());
       else
-        cleanup_expr(*it);
+        cleanup_expr(*it, false);
     }
   }
 
@@ -1623,9 +2006,9 @@ void goto_program2codet::cleanup_code(
     }
   }
   else if(statement==ID_block)
-    cleanup_code_block(code, is_top);
+    cleanup_code_block(code, parent_stmt);
   else if(statement==ID_ifthenelse)
-    cleanup_code_ifthenelse(code);
+    cleanup_code_ifthenelse(code, parent_stmt);
   else if(statement==ID_dowhile)
   {
     code_dowhilet &do_while=to_code_dowhile(code);
@@ -1634,6 +2017,10 @@ void goto_program2codet::cleanup_code(
     // to ensure convergence
     if(do_while.body().get_statement()==ID_skip)
       do_while.set_statement(ID_while);
+    // do stmt while(false) is just stmt
+    else if(do_while.cond().is_false() &&
+            do_while.body().get_statement()!=ID_block)
+      code=do_while.body();
   }
 }
 
@@ -1651,7 +2038,7 @@ Purpose:
 
 void goto_program2codet::cleanup_code_block(
     codet &code,
-    const bool is_top)
+    const irep_idt parent_stmt)
 {
   assert(code.get_statement()==ID_block);
 
@@ -1675,8 +2062,18 @@ void goto_program2codet::cleanup_code_block(
           break;
         }
 
+      // nested blocks with declarations become do { } while(false)
+      // to ensure the inner block is never lost
       if(has_decl)
+      {
+        code_dowhilet d;
+        d.cond()=false_exprt();
+        d.body().swap(*it);
+
+        it->swap(d);
+
         ++i;
+      }
       else
       {
         operands.insert(operands.begin()+i+1,
@@ -1689,13 +2086,61 @@ void goto_program2codet::cleanup_code_block(
       ++i;
   }
 
-  if(operands.empty() && !is_top)
+  if(operands.empty() && parent_stmt!=ID_nil)
     code=code_skipt();
-  else if(operands.size()==1 && !is_top)
+  else if(operands.size()==1 &&
+          parent_stmt!=ID_nil &&
+          to_code(code.op0()).get_statement()!=ID_decl)
   {
     codet tmp;
     tmp.swap(code.op0());
     code.swap(tmp);
+  }
+}
+
+/*******************************************************************\
+
+Function: goto_program2codet::remove_const
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
+void goto_program2codet::remove_const(typet &type)
+{
+  if(type.get_bool(ID_C_constant))
+    type.remove(ID_C_constant);
+
+  if(type.id()==ID_symbol)
+  {
+    const irep_idt &identifier=to_symbol_type(type).get_identifier();
+    if(!const_removed.insert(identifier).second)
+      return;
+
+    symbol_tablet::symbolst::iterator it=
+      symbol_table.symbols.find(identifier);
+    assert(it!=symbol_table.symbols.end());
+    assert(it->second.is_type);
+
+    remove_const(it->second.type);
+  }
+  else if(type.id()==ID_array)
+    remove_const(type.subtype());
+  else if(type.id()==ID_struct ||
+          type.id()==ID_union)
+  {
+    struct_union_typet &sut=to_struct_union_type(type);
+    struct_union_typet::componentst &c=sut.components();
+
+    for(struct_union_typet::componentst::iterator
+        it=c.begin();
+        it!=c.end();
+        ++it)
+      remove_const(it->type());
   }
 }
 
@@ -1772,7 +2217,9 @@ Purpose:
 
 \*******************************************************************/
 
-void goto_program2codet::cleanup_code_ifthenelse(codet &code)
+void goto_program2codet::cleanup_code_ifthenelse(
+  codet &code,
+  const irep_idt parent_stmt)
 {
   code_ifthenelset &i_t_e=to_code_ifthenelse(code);
 
@@ -1796,13 +2243,28 @@ void goto_program2codet::cleanup_code_ifthenelse(codet &code)
       code.swap(tmp);
     }
   }
-  else if(to_code(i_t_e.then_case()).get_statement()==ID_ifthenelse)
+  else
   {
-    // we re-introduce 1-code blocks with if-then-else to avoid dangling-else
-    // ambiguity
-    code_blockt b;
-    b.move_to_operands(i_t_e.then_case());
-    i_t_e.then_case().swap(b);
+    if(i_t_e.then_case().is_not_nil() &&
+       to_code(i_t_e.then_case()).get_statement()==ID_ifthenelse)
+    {
+      // we re-introduce 1-code blocks with if-then-else to avoid dangling-else
+      // ambiguity
+      code_blockt b;
+      b.move_to_operands(i_t_e.then_case());
+      i_t_e.then_case().swap(b);
+    }
+
+    if(i_t_e.else_case().is_not_nil() &&
+       to_code(i_t_e.then_case()).get_statement()==ID_skip &&
+       to_code(i_t_e.else_case()).get_statement()==ID_ifthenelse)
+    {
+      // we re-introduce 1-code blocks with if-then-else to avoid dangling-else
+      // ambiguity
+      code_blockt b;
+      b.move_to_operands(i_t_e.else_case());
+      i_t_e.else_case().swap(b);
+    }
   }
 
   // move labels at end of then or else case out
@@ -1823,7 +2285,7 @@ void goto_program2codet::cleanup_code_ifthenelse(codet &code)
       b.move_to_operands(then_label);
       b.move_to_operands(else_label);
       code.swap(b);
-      cleanup_code(code, false);
+      cleanup_code(code, parent_stmt);
     }
   }
 
@@ -1834,7 +2296,7 @@ void goto_program2codet::cleanup_code_ifthenelse(codet &code)
     not_exprt tmp(i_t_e.cond());
     simplify(tmp, ns);
     // simplification might have removed essential type casts
-    cleanup_expr(tmp);
+    cleanup_expr(tmp, false);
     i_t_e.cond().swap(tmp);
     i_t_e.then_case().swap(i_t_e.else_case());
   }
@@ -1871,13 +2333,7 @@ void goto_program2codet::expand_reverse_tag_map(const irep_idt identifier)
   if(entry==tag_map.end())
     return;
 
-  if(!reverse_tag_map.insert(std::make_pair(
-          entry->second, entry->first)).second)
-  {
-    // TODO - ignored for now, as the linker presently produces several
-    // symbols for the same type
-    // assert(false);
-  }
+  reverse_tag_map.insert(std::make_pair(entry->second, entry->first));
 
   const symbolt &symbol=symbol_table.lookup(identifier);
   assert(symbol.is_type);
@@ -1925,33 +2381,61 @@ Purpose:
 
 \*******************************************************************/
 
-void goto_program2codet::cleanup_expr(exprt &expr)
+void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
 {
   expand_reverse_tag_map(expr.type());
 
-  Forall_operands(it, expr)
-    cleanup_expr(*it);
+  // we might have to do array -> pointer conversions
+  if(no_typecast &&
+     (expr.id()==ID_address_of || expr.id()==ID_member))
+  {
+    Forall_operands(it, expr)
+      cleanup_expr(*it, false);
+  }
+  else if(!no_typecast &&
+          (expr.id()==ID_union || expr.id()==ID_struct ||
+           expr.id()==ID_array || expr.id()==ID_vector))
+  {
+    Forall_operands(it, expr)
+      cleanup_expr(*it, true);
+  }
+  else
+  {
+    Forall_operands(it, expr)
+      cleanup_expr(*it, no_typecast);
+  }
 
   if(expr.id()==ID_union ||
      expr.id()==ID_struct)
   {
+    if(no_typecast) return;
+
     const typet &t=expr.type();
 
     const irep_idt tag=t.get(ID_tag);
-    tag_mapt::const_iterator reverse_tag_entry=reverse_tag_map.find(tag);
+    std::pair<r_tag_mapt::const_iterator, r_tag_mapt::const_iterator>
+      reverse_tag_entry=reverse_tag_map.equal_range(tag);
 
-    if(reverse_tag_entry!=reverse_tag_map.end())
+    for( ;
+        reverse_tag_entry.first!=reverse_tag_entry.second;
+        ++reverse_tag_entry.first)
     {
-      symbol_typet new_type(reverse_tag_entry->second);
+      symbol_typet new_type(reverse_tag_entry.first->second);
+      if(base_type_eq(t, new_type, ns))
+      {
+        if(expr.id()==ID_union &&
+           ns.follow(expr.type()).get_bool(ID_C_transparent_union) !=
+           ns.follow(new_type).get_bool(ID_C_transparent_union))
+          expr.type()=new_type;
 
-      if(expr.id()==ID_union &&
-          ns.follow(expr.type()).get_bool(ID_C_transparent_union) !=
-          ns.follow(new_type).get_bool(ID_C_transparent_union))
-        expr.type()=new_type;
+        expr.make_typecast(new_type);
+        add_local_types(new_type);
 
-      expr.make_typecast(new_type);
+        break;
+      }
     }
-    else
+
+    if(reverse_tag_entry.first==reverse_tag_entry.second)
     {
       std::string sym_name=id2string(tag);
       if(!t.location().get_function().empty())
@@ -1968,13 +2452,26 @@ void goto_program2codet::cleanup_expr(exprt &expr)
         t_s.is_type=true;
         t_s.is_macro=false;
 
+        if(!type_names_set.insert(t_s.name).second)
+          assert(false);
         type_names.push_back(t_s.name);
         if(symbol_table.add(t_s))
           assert(false);
       }
 
       expr.make_typecast(t);
+      add_local_types(t);
     }
+  }
+  else if(expr.id()==ID_array ||
+          expr.id()==ID_vector)
+  {
+    if(no_typecast) return;
+
+    const typet &t=expr.type();
+
+    expr.make_typecast(t);
+    add_local_types(t);
   }
   else if(expr.id()==ID_sideeffect)
   {
@@ -1996,7 +2493,7 @@ void goto_program2codet::cleanup_expr(exprt &expr)
         if(!has_prefix(id2string(it->second.base_name), "nondet_")) continue;
         const code_typet &code_type=to_code_type(it->second.type);
         if(!type_eq(code_type.return_type(), expr.type(), ns)) continue;
-        if(!code_type.arguments().empty()) continue;
+        if(!code_type.parameters().empty()) continue;
         id=it->second.name;
         break;
       }
@@ -2051,6 +2548,49 @@ void goto_program2codet::cleanup_expr(exprt &expr)
       call.type()=expr.type();
       
       expr.swap(call);
+    }
+  }
+  else if(expr.id()==ID_isnan)
+    system_headers.insert("math.h");
+  else if(expr.id()==ID_constant)
+  {
+    if(expr.type().id()==ID_floatbv)
+    {
+      const ieee_floatt f(to_constant_expr(expr));
+      if(f.is_NaN() || f.is_infinity())
+        system_headers.insert("math.h");
+    }
+    else if(expr.type().id()==ID_pointer)
+      add_local_types(expr.type());
+
+    const irept &c_sizeof_type=expr.find(ID_C_c_sizeof_type);
+
+    if(c_sizeof_type.is_not_nil())
+      add_local_types(static_cast<const typet &>(c_sizeof_type));
+  }
+  else if(expr.id()==ID_typecast)
+    add_local_types(expr.type());
+  else if(expr.id()==ID_symbol)
+  {
+    if(expr.type().id()!=ID_code)
+    {
+      const irep_idt &identifier=to_symbol_expr(expr).get_identifier();
+      const symbolt &symbol=ns.lookup(identifier);
+
+      if(symbol.is_static_lifetime &&
+         symbol.type.id()!=ID_code &&
+         !symbol.is_extern &&
+         !symbol.location.get_function().empty() &&
+         local_static_set.insert(identifier).second)
+      {
+        if(symbol.value.is_not_nil())
+        {
+          exprt value=symbol.value;
+          cleanup_expr(value, true);
+        }
+
+        local_static.push_back(identifier);
+      }
     }
   }
 }
@@ -2131,31 +2671,40 @@ protected:
 
   void convert_compound_declaration(
       const symbolt &symbol,
-      std::ostream &os_decl,
-      std::ostream &os_body,
-      hash_map_cont<irep_idt, std::list<irep_idt>, irep_id_hash> &local_type_decls);
-  void convert_compound_rec(
+      std::ostream &os_body);
+  void convert_compound(
       const typet &type,
+      bool recursive,
       std::ostream &os);
-  void convert_compound_rec(
+  void convert_compound(
       const struct_union_typet &type,
+      bool recursive,
       std::ostream &os);
+
+  typedef hash_map_cont<irep_idt, code_declt, irep_id_hash>
+          local_static_declst;
 
   void convert_global_variable(
       const symbolt &symbol,
       std::ostream &os,
-      hash_map_cont<irep_idt, code_blockt, irep_id_hash> &local_static_decls);
+      local_static_declst &local_static_decls,
+      const hash_map_cont<irep_idt, irep_idt, irep_id_hash> &original_tags);
 
   void convert_function_declaration(
       const symbolt &symbol,
+      const bool skip_main,
       std::ostream &os_decl,
       std::ostream &os_body,
-      std::list<irep_idt> &local_type_decls,
-      const code_blockt &local_static_decls,
+      local_static_declst &local_static_decls,
       const hash_map_cont<irep_idt, irep_idt, irep_id_hash> &original_tags);
 
   void cleanup_expr(exprt &expr);
   void cleanup_type(typet &type);
+  void cleanup_decl(
+    code_declt &decl,
+    std::list<irep_idt> &local_static,
+    std::list<irep_idt> &local_type_decls,
+    const hash_map_cont<irep_idt, irep_idt, irep_id_hash> &original_tags);
 
 #if 0
   std::string implicit_declarations(const exprt &expr);
@@ -2230,9 +2779,11 @@ void goto2sourcet::operator()(std::ostream &os)
   std::stringstream compound_body_stream;
   std::stringstream global_var_stream;
   std::stringstream func_body_stream;
-  hash_map_cont<irep_idt, std::list<irep_idt>, irep_id_hash> local_type_decls;
-  hash_map_cont<irep_idt, code_blockt, irep_id_hash> local_static_decls;
+  local_static_declst local_static_decls;
   hash_map_cont<irep_idt, irep_idt, irep_id_hash> original_tags;
+
+  typedef hash_map_cont<irep_idt, unsigned, irep_id_hash> unique_tagst;
+  unique_tagst unique_tags;
 
   // replace all #anon, fix $link in types, and prepare lexicographic order
   std::set<std::string> symbols_sorted;
@@ -2241,15 +2792,15 @@ void goto2sourcet::operator()(std::ostream &os)
     irep_idt original_tag=it->second.type.get(ID_tag);
     cleanup_type(it->second.type);
 
-    std::string name_str=id2string(it->first);
+    const std::string name_str=id2string(it->first);
     if(it->second.is_type && !it->second.type.get(ID_tag).empty())
     {
       original_tags[it->first]=original_tag;
+      std::string new_tag=id2string(it->second.type.get(ID_tag));
 
       std::string::size_type link_pos=name_str.rfind("$link");
       if(link_pos!=std::string::npos)
       {
-        std::string new_tag=id2string(it->second.type.get(ID_tag));
         if(new_tag.rfind("$link")==std::string::npos)
         {
           new_tag+=name_str.substr(link_pos);
@@ -2257,6 +2808,22 @@ void goto2sourcet::operator()(std::ostream &os)
         }
         else
           assert(has_suffix(name_str, new_tag));
+      }
+
+      std::string::size_type tag_pos=new_tag.rfind("tag-");
+      if(tag_pos!=std::string::npos)
+      {
+        new_tag.erase(0, tag_pos+4);
+        it->second.type.set(ID_tag, new_tag);
+      }
+
+      std::pair<unique_tagst::iterator, bool> unique_entry=
+        unique_tags.insert(std::make_pair(it->second.type.get(ID_tag), 0));
+      if(!unique_entry.second)
+      {
+        new_tag+="$"+i2string(unique_entry.first->second);
+        it->second.type.set(ID_tag, new_tag);
+        ++(unique_entry.first->second);
       }
     }
 
@@ -2278,16 +2845,21 @@ void goto2sourcet::operator()(std::ostream &os)
          symbol.type.id()==ID_incomplete_struct ||
          symbol.type.id()==ID_union ||
          symbol.type.id()==ID_incomplete_union))
-      convert_compound_declaration(
-          symbol,
-          os,
-          compound_body_stream,
-          local_type_decls);
+    {
+      if(symbol.location.get_function().empty())
+      {
+        os << "// " << symbol.name << std::endl;
+        os << "// " << symbol.location << std::endl;
+        os << type_to_string(symbol.type) << ";" << std::endl;
+        os << std::endl;
+      }
+    }
     else if(symbol.is_static_lifetime && symbol.type.id()!=ID_code)
       convert_global_variable(
           symbol,
           global_var_stream,
-          local_static_decls);
+          local_static_decls,
+          original_tags);
     else if(symbol.type.id()==ID_code)
     {
       goto_functionst::function_mapt::const_iterator func_entry=
@@ -2311,16 +2883,31 @@ void goto2sourcet::operator()(std::ostream &os)
 
     if(symbol.type.id()!=ID_code) continue;
 
-    // don't dump artificial main
-    if(skip_function_main && symbol.name==ID_main) continue;
-
     convert_function_declaration(
       symbol,
+      skip_function_main,
       func_decl_stream,
       func_body_stream,
-      local_type_decls[symbol.base_name],
-      local_static_decls[symbol.base_name],
+      local_static_decls,
       original_tags);
+  }
+
+  // (possibly modified) compound types
+  for(std::set<std::string>::const_iterator
+      it=symbols_sorted.begin();
+      it!=symbols_sorted.end();
+      ++it)
+  {
+    const symbolt &symbol=ns.lookup(*it);
+
+    if(symbol.is_type &&
+        (symbol.type.id()==ID_struct ||
+         symbol.type.id()==ID_incomplete_struct ||
+         symbol.type.id()==ID_union ||
+         symbol.type.id()==ID_incomplete_union))
+      convert_compound_declaration(
+          symbol,
+          compound_body_stream);
   }
 
   os << std::endl;
@@ -2342,11 +2929,12 @@ void goto2sourcet::operator()(std::ostream &os)
      << "#define FENCE(x) ((void)0)" << std::endl
      << "#endif" << std::endl;
   os << "#ifndef IEEE_FLOAT_EQUAL" << std::endl
-     << "#define IEEE_FLOAT_EQUAL(x,y) (x==y)" << std::endl
+     << "#define IEEE_FLOAT_EQUAL(x,y) ((x)==(y))" << std::endl
      << "#endif" << std::endl;
   os << "#ifndef IEEE_FLOAT_NOTEQUAL" << std::endl
-     << "#define IEEE_FLOAT_NOTEQUAL(x,y) (x!=y)" << std::endl
+     << "#define IEEE_FLOAT_NOTEQUAL(x,y) ((x)!=(y))" << std::endl
      << "#endif" << std::endl;
+
   os << std::endl;
 
   os << func_decl_stream.str();
@@ -2378,32 +2966,23 @@ Purpose: declare compound types
 
 void goto2sourcet::convert_compound_declaration(
     const symbolt &symbol,
-    std::ostream &os_decl,
-    std::ostream &os_body,
-    hash_map_cont<irep_idt, std::list<irep_idt>, irep_id_hash> &local_type_decls)
+    std::ostream &os_body)
 {
   if(!symbol.location.get_function().empty())
-  {
-    local_type_decls[symbol.location.get_function()].push_back(symbol.name);
     return;
-  }
 
   // do compound type body
   if(symbol.type.id()!=ID_incomplete_struct &&
       symbol.type.id()!=ID_incomplete_union)
-    convert_compound_rec(
+    convert_compound(
         to_struct_union_type(symbol.type),
+        true,
         os_body);
-
-  os_decl << "// " << symbol.name << std::endl;
-  os_decl << "// " << symbol.location << std::endl;
-  os_decl << type_to_string(symbol.type) << ";" << std::endl;
-  os_decl << std::endl;
 }
 
 /*******************************************************************\
 
-Function: goto2sourcet::convert_compound_rec
+Function: goto2sourcet::convert_compound
 
 Inputs:
 
@@ -2413,21 +2992,39 @@ Purpose:
 
 \*******************************************************************/
 
-void goto2sourcet::convert_compound_rec(
+void goto2sourcet::convert_compound(
   const typet &type,
+  bool recursive,
   std::ostream &os)
 {
   if(type.id()==ID_symbol)
-    convert_compound_rec(ns.follow(type), os);
+    convert_compound(ns.follow(type), recursive, os);
   else if(type.id()==ID_array || type.id()==ID_pointer)
-    convert_compound_rec(type.subtype(), os);
+  {
+    if(!recursive) return;
+
+    convert_compound(type.subtype(), recursive, os);
+
+    // sizeof may contain a type symbol that has to be declared first
+    if(type.id()==ID_array)
+    {
+      find_symbols_sett syms;
+      find_type_symbols(to_array_type(type).size(), syms);
+
+      for(find_symbols_sett::const_iterator
+          it=syms.begin();
+          it!=syms.end();
+          ++it)
+        convert_compound(symbol_typet(*it), recursive, os);
+    }
+  }
   else if(type.id()==ID_struct || type.id()==ID_union)
-    convert_compound_rec(to_struct_union_type(type), os);
+    convert_compound(to_struct_union_type(type), recursive, os);
 }
 
 /*******************************************************************\
 
-Function: goto2sourcet::convert_compound_rec
+Function: goto2sourcet::convert_compound
 
 Inputs:
 
@@ -2437,8 +3034,9 @@ Purpose:
 
 \*******************************************************************/
 
-void goto2sourcet::convert_compound_rec(
+void goto2sourcet::convert_compound(
   const struct_union_typet &type,
+  bool recursive,
   std::ostream &os)
 {
   const irep_idt &name=type.get(ID_tag);
@@ -2500,10 +3098,10 @@ void goto2sourcet::convert_compound_rec(
        comp.get_is_padding())
       continue;
 
-    if(comp_type.id()!=ID_pointer)
-      convert_compound_rec(comp_type, os);
+    if(recursive && comp_type.id()!=ID_pointer)
+      convert_compound(comp_type, recursive, os);
 
-    const irep_idt &comp_name=comp.get_name();
+    irep_idt comp_name=comp.get_name();
 
     struct_body << indent(1) << "// " << comp_name << std::endl;
     struct_body << indent(1);
@@ -2514,8 +3112,19 @@ void goto2sourcet::convert_compound_rec(
     std::string s=make_decl(fake_unique_name, comp_type);
     assert(s.find("NO/SUCH/NS")==std::string::npos);
 
+    if(comp.get_is_bit_field() &&
+       to_bitvector_type(comp_type).get_width()==0)
+    {
+      comp_name="";
+      s=type_to_string(comp_type);
+    }
+
     if(s.find("__CPROVER_bitvector")==std::string::npos)
+    {
       struct_body << s;
+      if(comp.get_is_bit_field())
+        struct_body << " : " << to_bitvector_type(comp_type).get_width();
+    }
     else if(comp_type.id()==ID_signedbv)
     {
       const signedbv_typet &t=to_signedbv_type(comp_type);
@@ -2569,8 +3178,10 @@ void goto2sourcet::convert_compound_rec(
      */
 
   os << "}";
-  if(ns.follow(type).get_bool(ID_C_transparent_union))
+  if(type.get_bool(ID_C_transparent_union))
     os << " __attribute__ ((__transparent_union__))";
+  if(type.get_bool(ID_C_packed))
+    os << " __attribute__ ((__packed__))";
   os << ";";
   os << std::endl;
   os << std::endl;
@@ -2602,6 +3213,59 @@ bool goto2sourcet::ignore(const irep_idt &identifier)
 
 /*******************************************************************\
 
+Function: goto2sourcet::cleanup_decl
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
+void goto2sourcet::cleanup_decl(
+  code_declt &decl,
+  std::list<irep_idt> &local_static,
+  std::list<irep_idt> &local_type_decls,
+  const hash_map_cont<irep_idt, irep_idt, irep_id_hash> &original_tags)
+{
+  exprt value=nil_exprt();
+
+  if(decl.operands().size()==2)
+  {
+    value=decl.op1();
+    decl.operands().resize(1);
+  }
+
+  goto_programt tmp;
+  goto_programt::targett t=tmp.add_instruction(DECL);
+  t->code=decl;
+
+  if(value.is_not_nil())
+  {
+    t=tmp.add_instruction(ASSIGN);
+    t->code=code_assignt(decl.op0(), value);
+  }
+
+  tmp.add_instruction(END_FUNCTION);
+
+  code_blockt b;
+  goto_program2codet p2s(
+    tmp,
+    copied_symbol_table,
+    original_tags,
+    b,
+    local_static,
+    local_type_decls,
+    system_headers);
+  p2s();
+
+  assert(b.operands().size()==1);
+  decl.swap(b.op0());
+}
+
+/*******************************************************************\
+
 Function: goto2sourcet::convert_global_variables
 
 Inputs:
@@ -2615,20 +3279,28 @@ Purpose:
 void goto2sourcet::convert_global_variable(
     const symbolt &symbol,
     std::ostream &os,
-    hash_map_cont<irep_idt, code_blockt, irep_id_hash> &local_static_decls)
+    local_static_declst &local_static_decls,
+    const hash_map_cont<irep_idt, irep_idt, irep_id_hash> &original_tags)
 {
   // we suppress some declarations
   if(ignore(symbol.name))
     return;
 
-  if((symbol.location.get_function().empty() || symbol.is_extern) &&
+  const irep_idt &func=symbol.location.get_function();
+  if((func.empty() || symbol.is_extern || symbol.value.is_not_nil()) &&
       !converted.insert(symbol.name).second)
     return;
 
   code_declt d(symbol.symbol_expr());
+
+  find_symbols_sett syms;
+  if(symbol.value.is_not_nil())
+    find_symbols(symbol.value, syms);
+
   // add a tentative declaration to cater for symbols in the initializer
   // relying on it this symbol
-  if(symbol.location.get_function().empty() || symbol.is_extern)
+  if((func.empty() || symbol.is_extern) &&
+     (symbol.value.is_nil() || !syms.empty()))
   {
     os << "// " << symbol.name << std::endl;
     os << "// " << symbol.location << std::endl;
@@ -2637,11 +3309,6 @@ void goto2sourcet::convert_global_variable(
 
   if(!symbol.value.is_nil())
   {
-    d.copy_to_operands(symbol.value);
-
-    find_symbols_sett syms;
-    find_symbols(symbol.value, syms);
-
     std::set<std::string> symbols_sorted;
     for(find_symbols_sett::const_iterator
         it=syms.begin();
@@ -2657,16 +3324,22 @@ void goto2sourcet::convert_global_variable(
     {
       const symbolt &sym=ns.lookup(*it);
       if(!sym.is_type && sym.is_static_lifetime && sym.type.id()!=ID_code)
-        convert_global_variable(sym, os, local_static_decls);
+        convert_global_variable(sym, os, local_static_decls, original_tags);
     }
+
+    d.copy_to_operands(symbol.value);
   }
 
-  if(!symbol.location.get_function().empty() && !symbol.is_extern)
-    local_static_decls[symbol.location.get_function()].move_to_operands(d);
+  if(!func.empty() && !symbol.is_extern)
+    local_static_decls[symbol.name]=d;
   else if(!symbol.value.is_nil())
   {
     os << "// " << symbol.name << std::endl;
     os << "// " << symbol.location << std::endl;
+
+    std::list<irep_idt> empty_static, empty_types;
+    cleanup_decl(d, empty_static, empty_types, original_tags);
+    assert(empty_static.empty());
     os << expr_to_string(d) << std::endl;
   }
 }
@@ -2685,10 +3358,10 @@ Purpose:
 
 void goto2sourcet::convert_function_declaration(
     const symbolt& symbol,
+    const bool skip_main,
     std::ostream &os_decl,
     std::ostream &os_body,
-    std::list<irep_idt> &local_type_decls,
-    const code_blockt &local_static_decls,
+    local_static_declst &local_static_decls,
     const hash_map_cont<irep_idt, irep_idt, irep_id_hash> &original_tags)
 {
   const code_typet &code_type=to_code_type(symbol.type);
@@ -2696,9 +3369,26 @@ void goto2sourcet::convert_function_declaration(
   if(ignore(symbol.name))
     return;
 
-  if(symbol.name!=ID_main &&
-      symbol.name!="c::main" &&
-      symbol.name!="c::assert")
+  // don't dump artificial main
+  if(skip_main && symbol.name==ID_main)
+    return;
+
+  // don't dump GCC builtins
+  if((symbol.location.get_file()=="gcc_builtin_headers_alpha.h" ||
+      symbol.location.get_file()=="gcc_builtin_headers_arm.h" ||
+      symbol.location.get_file()=="gcc_builtin_headers_ia32.h" ||
+      symbol.location.get_file()=="gcc_builtin_headers_mips.h" ||
+      symbol.location.get_file()=="gcc_builtin_headers_power.h" ||
+      symbol.location.get_file()=="gcc_builtin_headers_generic.h") &&
+     has_prefix(id2string(symbol.name), "c::__builtin_"))
+    return;
+
+  if(symbol.name=="c::__builtin_va_start" ||
+     symbol.name=="c::__builtin_va_end")
+    system_headers.insert("stdarg.h");
+  else if(symbol.name!=ID_main &&
+          symbol.name!="c::main" &&
+          symbol.name!="c::assert")
   {
     os_decl << "// " << symbol.name << std::endl;
     os_decl << "// " << symbol.location << std::endl;
@@ -2711,15 +3401,48 @@ void goto2sourcet::convert_function_declaration(
       !func_entry->second.body_available)
     return;
 
-  code_blockt b(local_static_decls);
+  code_blockt b;
+  std::list<irep_idt> type_decls, local_static;
+
   goto_program2codet p2s(
       func_entry->second.body,
       copied_symbol_table,
       original_tags,
       b,
-      local_type_decls,
+      local_static,
+      type_decls,
       system_headers);
   p2s();
+
+  if(!local_static.empty())
+  {
+    code_blockt b2;
+    b2.reserve_operands(local_static.size()+b.operands().size());
+
+    for(std::list<irep_idt>::const_iterator
+        it=local_static.begin();
+        it!=local_static.end();
+        ++it)
+    {
+      local_static_declst::const_iterator d_it=
+        local_static_decls.find(*it);
+      assert(d_it!=local_static_decls.end());
+
+      code_declt d=d_it->second;
+      std::list<irep_idt> redundant;
+      cleanup_decl(d, redundant, type_decls, original_tags);
+
+      b2.move_to_operands(d);
+    }
+
+    if(b.has_operands())
+      b2.operands().insert(
+        b2.operands().end(),
+        b.operands().begin(),
+        b.operands().end());
+
+    b.swap(b2);
+  }
 
   os_body << "// " << symbol.name << std::endl;
   os_body << "// " << symbol.location << std::endl;
@@ -2728,12 +3451,12 @@ void goto2sourcet::convert_function_declaration(
 
   convertedt converted_bak(converted);
   for(std::list<irep_idt>::const_iterator
-      it=local_type_decls.begin();
-      it!=local_type_decls.end();
+      it=type_decls.begin();
+      it!=type_decls.end();
       ++it)
   {
     os_body << std::endl;
-    convert_compound_rec(ns.lookup(*it).type, os_body);
+    convert_compound(ns.lookup(*it).type, false, os_body);
   }
   converted.swap(converted_bak);
 
@@ -2778,7 +3501,11 @@ void goto2sourcet::cleanup_expr(exprt &expr)
         it!=old_components.end();
         ++it)
     {
-      if(!it->get_is_padding())
+      const bool is_zero_bit_field=
+        it->get_is_bit_field() &&
+        to_bitvector_type(ns.follow(it->type())).get_width()==0;
+
+      if(!it->get_is_padding() && !is_zero_bit_field)
       {
         type.components().push_back(*it);
         expr.move_to_operands(*o_it);

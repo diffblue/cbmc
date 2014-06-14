@@ -844,7 +844,7 @@ void cpp_typecheckt::typecheck_expr_address_of(exprt &expr)
     // must be the address of a function
     code_typet& code_type = to_code_type(op.type().subtype());
 
-    code_typet::argumentst& args = code_type.arguments();
+    code_typet::parameterst& args = code_type.parameters();
     if(args.size() > 0 && args[0].get(ID_C_base_name)==ID_this)
     {
       // it's a pointer to member function
@@ -1673,7 +1673,7 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
       result.location()=location;
       result.set_identifier(language_prefix+id2string(identifier));
       code_typet t;
-      t.arguments().push_back(code_typet::argumentt(ptr_arg.type()));
+      t.parameters().push_back(code_typet::parametert(ptr_arg.type()));
       t.make_ellipsis();
       t.return_type()=ptr_arg.type().subtype();
       result.type()=t;
@@ -1958,7 +1958,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
       }
 
       // get the virtual table
-      typet this_type =  to_code_type(expr.function().type()).arguments().front().type();
+      typet this_type =  to_code_type(expr.function().type()).parameters().front().type();
       irep_idt vtable_name = this_type.subtype().get_string(ID_identifier) +"::@vtable_pointer";
 
       const struct_typet &vt_struct=
@@ -2040,12 +2040,12 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
   {
     assert(expr.function().id() == ID_symbol);
 
-    const code_typet::argumentst &arguments=
-      to_code_type(expr.function().type()).arguments();
+    const code_typet::parameterst &parameters=
+      to_code_type(expr.function().type()).parameters();
 
-    assert(arguments.size()>=1);
+    assert(parameters.size()>=1);
 
-    const typet &this_type=arguments[0].type();
+    const typet &this_type=parameters[0].type();
 
     // change type from 'constructor' to object type
     expr.type() = this_type.subtype();
@@ -2154,29 +2154,29 @@ void cpp_typecheckt::typecheck_function_call_arguments(
 {
   exprt &f_op=expr.function();
   const code_typet &code_type=to_code_type(f_op.type());
-  const code_typet::argumentst &arguments=code_type.arguments();
+  const code_typet::parameterst &parameters=code_type.parameters();
 
   // do default arguments
 
-  if(arguments.size()>expr.arguments().size())
+  if(parameters.size()>expr.arguments().size())
   {
     unsigned i=expr.arguments().size();
 
-    for(; i<arguments.size(); i++)
+    for(; i<parameters.size(); i++)
     {
-      if(!arguments[i].has_default_value())
+      if(!parameters[i].has_default_value())
         break;
 
-      const exprt &value=arguments[i].default_value();
+      const exprt &value=parameters[i].default_value();
       expr.arguments().push_back(value);
     }
   }
 
-  for(unsigned i=0; i<arguments.size(); i++)
+  for(unsigned i=0; i<parameters.size(); i++)
   {
-    if(arguments[i].get_bool("#call_by_value"))
+    if(parameters[i].get_bool("#call_by_value"))
     {
-      assert(is_reference(arguments[i].type()));
+      assert(is_reference(parameters[i].type()));
 
       if(expr.arguments()[i].id()!=ID_temporary_object)
       {
@@ -2187,7 +2187,7 @@ void cpp_typecheckt::typecheck_function_call_arguments(
 
         exprt temporary;
         new_temporary(expr.arguments()[i].location(),
-                      arguments[i].type().subtype(),
+                      parameters[i].type().subtype(),
                       arg,
                       temporary);
         expr.arguments()[i].swap(temporary);
@@ -2276,14 +2276,14 @@ void cpp_typecheckt::typecheck_method_application(
   if(!expr.function().type().get_bool("#is_static"))
   {
     const code_typet &func_type=to_code_type(symbol.type);
-    typet this_type=func_type.arguments().front().type();
+    typet this_type=func_type.parameters().front().type();
 
     // Special case. Make it a reference.
     assert(this_type.id()==ID_pointer);
     this_type.set(ID_C_reference, true);
     this_type.set("#this", true);
     
-    if(expr.arguments().size()==func_type.arguments().size())
+    if(expr.arguments().size()==func_type.parameters().size())
     {
       implicit_typecast(expr.arguments().front(), this_type);
       assert(is_reference(expr.arguments().front().type()));

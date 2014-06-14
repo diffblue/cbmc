@@ -514,6 +514,11 @@ void goto_convertt::convert(
   }
   else if(statement==ID_dead)
     copy(code, DEAD, dest);
+  else if(statement==ID_decl_block)
+  {
+    forall_operands(it, code)
+      convert(to_code(*it), dest);
+  }
   else
     copy(code, OTHER, dest);
 
@@ -602,6 +607,8 @@ void goto_convertt::convert_expression(
   {
     clean_expr(expr, dest, false); // result _not_ used
 
+    // Any residual expression? 
+    // We keep it to add checks later.
     if(expr.is_not_nil())
     {
       codet tmp=code;
@@ -892,10 +899,10 @@ void goto_convertt::convert_cpp_delete(
   // now do "free"
   exprt delete_symbol=ns.lookup(delete_identifier).symbol_expr();
   
-  assert(to_code_type(delete_symbol.type()).arguments().size()==1);
+  assert(to_code_type(delete_symbol.type()).parameters().size()==1);
 
   typet arg_type=
-    to_code_type(delete_symbol.type()).arguments().front().type();
+    to_code_type(delete_symbol.type()).parameters().front().type();
   
   code_function_callt delete_call;
   delete_call.function()=delete_symbol;
@@ -1007,12 +1014,8 @@ void goto_convertt::convert_for(
   // z: ;                <-- break target
 
   // A;
-  code_blockt block;  
   if(code.init().is_not_nil())
-  {
-    block.copy_to_operands(code.init());
-    convert(block, dest);
-  }
+    convert(to_code(code.init()), dest);
     
   exprt cond=code.cond();
 
@@ -2389,6 +2392,7 @@ symbolt &goto_convertt::new_tmp_symbol(
     new_symbol.is_thread_local=true;
     new_symbol.is_file_local=true;
     new_symbol.type=type;    
+    new_symbol.location=location;
   } while(symbol_table.move(new_symbol, symbol_ptr));    
   
   tmp_symbols.push_back(symbol_ptr->name);

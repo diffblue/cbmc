@@ -118,6 +118,8 @@ public:
   
   inline irep_idt entry_point() const
   {
+    // will change to ID__start to avoid confusion
+    // with C's main() function
     return ID_main;
   }
   

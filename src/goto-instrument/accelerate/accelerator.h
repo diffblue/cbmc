@@ -14,19 +14,39 @@
 
 class path_acceleratort {
  public:
-  path_acceleratort(goto_programt &pure,
+  path_acceleratort(patht &_path,
+               goto_programt &pure,
                goto_programt &overflow,
                std::set<exprt> &changed,
                std::set<exprt> &dirty) :
-    pure_accelerator(pure),
-    overflow_path(overflow),
+    path(_path),
     changed_vars(changed),
     dirty_vars(dirty)
   {
+    pure_accelerator.copy_from(pure);
+    overflow_path.copy_from(overflow);
   }
 
   path_acceleratort() { }
 
+  path_acceleratort(const path_acceleratort &that) :
+    path(that.path),
+    changed_vars(that.changed_vars),
+    dirty_vars(that.dirty_vars) 
+  {
+    pure_accelerator.copy_from(that.pure_accelerator);
+    overflow_path.copy_from(that.overflow_path);
+  }
+
+  void clear() {
+    path.clear();
+    pure_accelerator.clear();
+    overflow_path.clear();
+    changed_vars.clear();
+    dirty_vars.clear();
+  }
+
+  patht path;
   goto_programt pure_accelerator;
   goto_programt overflow_path;
   std::set<exprt> changed_vars;

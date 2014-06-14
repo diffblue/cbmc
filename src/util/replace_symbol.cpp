@@ -105,6 +105,12 @@ bool replace_symbolt::replace(exprt &dest) const
     if(!replace(*it))
       result=false;
 
+  const irept &c_sizeof_type=dest.find(ID_C_c_sizeof_type);
+
+  if(c_sizeof_type.is_not_nil() &&
+     !replace(static_cast<typet&>(dest.add(ID_C_c_sizeof_type))))
+    result=false;
+
   return result;
 }
 
@@ -135,6 +141,11 @@ bool replace_symbolt::have_to_replace(const exprt &dest) const
   forall_operands(it, dest)
     if(have_to_replace(*it))
       return true;
+
+  const irept &c_sizeof_type=dest.find(ID_C_c_sizeof_type);
+
+  if(c_sizeof_type.is_not_nil())
+    return have_to_replace(static_cast<const typet &>(c_sizeof_type));
 
   return false;
 }
@@ -184,9 +195,9 @@ bool replace_symbolt::replace(typet &dest) const
   {
     code_typet &code_type=to_code_type(dest);
     replace(code_type.return_type());
-    code_typet::argumentst &arguments=code_type.arguments();
-    for(code_typet::argumentst::iterator it = arguments.begin();
-        it!=arguments.end();
+    code_typet::parameterst &parameters=code_type.parameters();
+    for(code_typet::parameterst::iterator it = parameters.begin();
+        it!=parameters.end();
         it++)
       if(!replace(*it))
         result=false;
@@ -256,11 +267,11 @@ bool replace_symbolt::have_to_replace(const typet &dest) const
     if(have_to_replace(code_type.return_type()))
       return true;
       
-    const code_typet::argumentst &arguments=code_type.arguments();
+    const code_typet::parameterst &parameters=code_type.parameters();
 
-    for(code_typet::argumentst::const_iterator
-        it=arguments.begin();
-        it!=arguments.end();
+    for(code_typet::parameterst::const_iterator
+        it=parameters.begin();
+        it!=parameters.end();
         it++)
       if(have_to_replace(*it))
         return true;

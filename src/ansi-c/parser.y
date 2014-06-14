@@ -111,6 +111,7 @@ extern char *yyansi_ctext;
 %token TOK_PTR32       "__ptr32"
 %token TOK_PTR64       "__ptr64"
 %token TOK_TYPEOF      "typeof"
+%token TOK_GCC_AUTO_TYPE "__auto_type"
 %token TOK_GCC_FLOAT128 "__float128"
 %token TOK_GCC_INT128 "__int128"
 %token TOK_GCC_DECIMAL32 "_Decimal32"
@@ -123,6 +124,7 @@ extern char *yyansi_ctext;
 %token TOK_GCC_ATTRIBUTE_PACKED "packed"
 %token TOK_GCC_ATTRIBUTE_VECTOR_SIZE "vector_size"
 %token TOK_GCC_ATTRIBUTE_MODE "mode"
+%token TOK_GCC_ATTRIBUTE_GNU_INLINE "__gnu_inline__"
 %token TOK_GCC_ATTRIBUTE_END ")"
 %token TOK_GCC_LABEL   "__label__"
 %token TOK_MSC_ASM     "__asm"
@@ -1409,6 +1411,8 @@ gcc_type_attribute:
         { $$=$1; set($$, ID_aligned); stack($$).set(ID_size, stack($3)); }
         | TOK_GCC_ATTRIBUTE_MODE '(' identifier ')' TOK_GCC_ATTRIBUTE_END
         { $$=$1; set($$, ID_gcc_attribute_mode); stack($$).set(ID_size, stack($3).get(ID_identifier)); }
+        | TOK_GCC_ATTRIBUTE_GNU_INLINE TOK_GCC_ATTRIBUTE_END
+        { $$=$1; set($$, ID_static); } /* GCC extern inline - cleanup in ansi_c_declarationt::to_symbol */
         ;
 
 member_declaration_list_opt:
@@ -2568,6 +2572,14 @@ KnR_sue_declaration_specifier:
           merge_types($$, $1);
           merge_types($$, $4); // type attribute
         }
+        | KnR_declaration_qualifier_list enum_key identifier_or_typedef_name gcc_type_attribute_opt
+        {
+          do_tag($2, $3);
+          $$=$3;
+          // type attributes
+          merge_types($$, $1);
+          merge_types($$, $4); // type attribute
+        }
         ;
 
         /* The following is stripped down because of conflicts due to gcc type attributes! */
@@ -2958,9 +2970,11 @@ unary_abstract_declarator:
         {
           // The type_qualifier_list belongs to the pointer,
           // not to the abstract declarator.
-          $$=$2;
-          do_pointer($1, $3);
-          merge_types($$, $3);
+          stack($1).id(ID_pointer);
+          stack($1).add(ID_subtype)=irept(ID_abstract);
+          merge_types($2, $1); // dest=$2
+          make_subtype($3, $2); // dest=$3
+          $$=$3;
         }
         | '^'
         {
@@ -2984,8 +2998,8 @@ parameter_unary_abstract_declarator:
           // The type_qualifier_list belongs to the pointer,
           // not to the (missing) abstract declarator.
           $$=$2;
-          set($$, ID_pointer);
-          stack($$).add(ID_subtype)=irept(ID_abstract);
+          set($1, ID_pointer);
+          stack($1).add(ID_subtype)=irept(ID_abstract);
           merge_types($$, $1);
         }
         | '*' parameter_abstract_declarator
@@ -2997,9 +3011,11 @@ parameter_unary_abstract_declarator:
         {
           // The type_qualifier_list belongs to the pointer,
           // not to the (missing) abstract declarator.
-          $$=$2;
-          do_pointer($1, $3);
-          merge_types($$, $3);
+          stack($1).id(ID_pointer);
+          stack($1).add(ID_subtype)=irept(ID_abstract);
+          merge_types($2, $1); // dest=$2
+          make_subtype($3, $2); // dest=$3
+          $$=$3;
         }
         | '^'
         {

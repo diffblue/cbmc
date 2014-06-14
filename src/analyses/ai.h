@@ -134,6 +134,7 @@ protected:
     const irep_idt &identifier,
     std::ostream &out) const;
 
+  // the work-queue is sorted by location number
   typedef std::map<unsigned, locationt> working_sett;
   
   locationt get_next(working_sett &working_set);

@@ -247,24 +247,24 @@ void cpp_convert_typet::read_function_type(const typet &type)
   if(return_type.is_not_nil())
     cpp_convert_plain_type(return_type);
 
-  // take care of argument types
-  irept &arguments=t.add(ID_arguments);
+  // take care of parameter types
+  irept &parameters=t.add(ID_arguments);
 
   // see if we have an ellipsis
-  if(!arguments.get_sub().empty() &&
-     arguments.get_sub().back().id()==ID_ellipsis)
+  if(!parameters.get_sub().empty() &&
+     parameters.get_sub().back().id()==ID_ellipsis)
   {
-    arguments.set(ID_ellipsis, true);
-    arguments.get_sub().erase(--arguments.get_sub().end());
+    parameters.set(ID_ellipsis, true);
+    parameters.get_sub().erase(--parameters.get_sub().end());
   }
 
-  Forall_irep(it, arguments.get_sub())
+  Forall_irep(it, parameters.get_sub())
   {
-    exprt &argument_expr=static_cast<exprt &>(*it);
+    exprt &parameter_expr=static_cast<exprt &>(*it);
 
-    if(argument_expr.id()==ID_cpp_declaration)
+    if(parameter_expr.id()==ID_cpp_declaration)
     {
-      cpp_declarationt &declaration=to_cpp_declaration(argument_expr);
+      cpp_declarationt &declaration=to_cpp_declaration(parameter_expr);
       locationt type_location=declaration.type().location();
 
       cpp_convert_plain_type(declaration.type());
@@ -278,8 +278,8 @@ void cpp_convert_typet::read_function_type(const typet &type)
       // do we have a declarator?
       if(declarator.is_nil())
       {
-        argument_expr=exprt(ID_argument, declaration.type());
-        argument_expr.location()=type_location;
+        parameter_expr=exprt(ID_argument, declaration.type());
+        parameter_expr.location()=type_location;
       }
       else
       {
@@ -293,43 +293,43 @@ void cpp_convert_typet::read_function_type(const typet &type)
           final_type.remove(ID_size);
         }
 
-        code_typet::argumentt new_argument(final_type);
+        code_typet::parametert new_parameter(final_type);
 
         if(cpp_name.is_nil())
         {
-          new_argument.location()=type_location;
+          new_parameter.location()=type_location;
         }
         else if(cpp_name.is_simple_name())
         {
           irep_idt base_name=cpp_name.get_base_name();
           assert(!base_name.empty());
-          new_argument.set_identifier(base_name);
-          new_argument.set_base_name(base_name);
-          new_argument.location()=cpp_name.location();
+          new_parameter.set_identifier(base_name);
+          new_parameter.set_base_name(base_name);
+          new_parameter.location()=cpp_name.location();
         }
         else
         {
-          throw "expected simple name as argument";
+          throw "expected simple name as parameter";
         }
 
         if(declarator.value().is_not_nil())
-          new_argument.default_value().swap(declarator.value());
+          new_parameter.default_value().swap(declarator.value());
 
-        argument_expr.swap(new_argument);
+        parameter_expr.swap(new_parameter);
       }
     }
-    else if(argument_expr.id()==ID_ellipsis)
+    else if(parameter_expr.id()==ID_ellipsis)
     {
-      throw "ellipsis only allowed as last argument";
+      throw "ellipsis only allowed as last parameter";
     }
     else
       assert(false);
   }
 
-  // if we just have one argument of type void, remove it
-  if(arguments.get_sub().size()==1 &&
-     arguments.get_sub().front().find(ID_type).id()==ID_empty)
-    arguments.get_sub().clear();
+  // if we just have one parameter of type void, remove it
+  if(parameters.get_sub().size()==1 &&
+     parameters.get_sub().front().find(ID_type).id()==ID_empty)
+    parameters.get_sub().clear();
 }
 
 /*******************************************************************\

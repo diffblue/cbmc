@@ -41,13 +41,13 @@ void goto_inlinet::parameter_assignments(
   // iterates over the operands
   exprt::operandst::const_iterator it1=arguments.begin();
 
-  const code_typet::argumentst &argument_types=
-    code_type.arguments();
+  const code_typet::parameterst &parameter_types=
+    code_type.parameters();
   
-  // iterates over the types of the arguments
-  for(code_typet::argumentst::const_iterator
-      it2=argument_types.begin();
-      it2!=argument_types.end();
+  // iterates over the types of the parameters
+  for(code_typet::parameterst::const_iterator
+      it2=parameter_types.begin();
+      it2!=parameter_types.end();
       it2++)
   {
     // if you run out of actual arguments there was a mismatch
@@ -58,17 +58,17 @@ void goto_inlinet::parameter_assignments(
       throw 0;
     }
 
-    const code_typet::argumentt &argument=*it2;
+    const code_typet::parametert &parameter=*it2;
 
     // this is the type the n-th argument should be
-    const typet &arg_type=ns.follow(argument.type());
+    const typet &arg_type=ns.follow(parameter.type());
 
-    const irep_idt &identifier=argument.get_identifier();
+    const irep_idt &identifier=parameter.get_identifier();
 
     if(identifier==irep_idt())
     {
       err_location(location);
-      throw "no identifier for function argument";
+      throw "no identifier for function parameter";
     }
 
     {
@@ -368,7 +368,7 @@ void goto_inlinet::expand_function_call(
     replace_return(tmp2, lhs, constrain);
 
     goto_programt tmp;
-    parameter_assignments(tmp2.instructions.front().location, identifier, f.type, arguments, tmp);
+    parameter_assignments(target->location, identifier, f.type, arguments, tmp);
     tmp.destructive_append(tmp2);
 
     if(f.type.get_bool("#hide"))

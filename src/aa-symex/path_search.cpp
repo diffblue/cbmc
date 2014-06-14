@@ -58,6 +58,8 @@ path_searcht::resultt path_searcht::operator()(
   queue.push_back(initial_state(var_map, locs, history));
   
   // set up the statistics
+  number_of_paths=0;
+  number_of_instructions=0;
   number_of_dropped_states=0;
   number_of_VCCs=0;
   number_of_VCCs_after_simplification=0;
@@ -95,9 +97,11 @@ path_searcht::resultt path_searcht::operator()(
         number_of_fast_forward_steps++;
 
         path_symex(*state, queue);
+#ifdef PATH_SYMEX_OUTPUT
         status() << "Fast forward thread " << state->get_current_thread()
                  << "/" << state->threads.size()
                  << " PC " << state->pc() << messaget::eom;
+#endif
       }
       while(state->is_lazy() && state->is_executable());
       assert(queue.size() == queue_size);
@@ -118,10 +122,15 @@ path_searcht::resultt path_searcht::operator()(
       continue;
     }
     
+    // count only executable instructions
+    number_of_instructions++;
+
+#ifdef PATH_SYMEX_OUTPUT
     status() << "Queue " << queue.size()
              << " thread " << state->get_current_thread()
              << "/" << state->threads.size()
              << " PC " << state->pc() << messaget::eom;
+#endif
 
     // an error, possibly?
     if(state->get_instruction()->is_assert())
@@ -147,8 +156,12 @@ path_searcht::resultt path_searcht::operator()(
     }
 #endif
 
-    // execute
+    // execute and record whether a "branch" occurred
+    const queuet::size_type queue_size = queue.size();
     path_symex(*state, queue);
+
+    assert(queue_size <= queue.size());
+    number_of_paths += (queue.size() - queue_size);
   }
 
 #ifdef PATH_SYMEX_FORK
@@ -163,9 +176,12 @@ path_searcht::resultt path_searcht::operator()(
   {
     // either a child found and reported a bug or
     // the parent's search partition is safe
-
-    // TODO: add safety_checkert::IGNORE
-    return ERROR;
+    switch (exit_status)
+    {
+    case 0: return SAFE;
+    case 10: return UNSAFE;
+    default: return ERROR;
+    }
   }
 #else
   report_statistics();
@@ -255,6 +271,12 @@ Function: path_searcht::report_statistics
 void path_searcht::report_statistics()
 {
   // report a bit
+  status() << "Number of paths: "
+           << number_of_paths << messaget::eom;
+
+  status() << "Number of instructions: "
+           << number_of_instructions << messaget::eom;
+
   status() << "Number of dropped states: "
            << number_of_dropped_states << messaget::eom;
 

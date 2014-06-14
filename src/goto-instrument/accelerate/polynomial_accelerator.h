@@ -13,18 +13,34 @@
 #include "polynomial.h"
 #include "path.h"
 #include "accelerator.h"
+#include "path_acceleration.h"
+#include "acceleration_utils.h"
+#include "cone_of_influence.h"
+#include "overflow_instrumenter.h"
 
 using namespace std;
 
-class polynomial_acceleratort { 
+class polynomial_acceleratort : public path_accelerationt {
  public:
   polynomial_acceleratort(const symbol_tablet &_symbol_table,
                           const goto_functionst &_goto_functions) :
       symbol_table(const_cast<symbol_tablet &>(_symbol_table)),
       ns(symbol_table),
-      goto_functions(_goto_functions)
+      goto_functions(_goto_functions),
+      utils(symbol_table, goto_functions, loop_counter)
   {
     loop_counter = nil_exprt();
+  }
+
+  polynomial_acceleratort(const symbol_tablet &_symbol_table,
+                          const goto_functionst &_goto_functions,
+                          exprt &_loop_counter) :
+      symbol_table(const_cast<symbol_tablet &>(_symbol_table)),
+      ns(symbol_table),
+      goto_functions(_goto_functions),
+      utils(symbol_table, goto_functions, loop_counter),
+      loop_counter(_loop_counter)
+  {
   }
 
   virtual bool accelerate(patht &loop, path_acceleratort &accelerator);
@@ -34,21 +50,34 @@ class polynomial_acceleratort {
                       polynomialt &polynomial);
 
  protected:
+  bool fit_polynomial_sliced(goto_programt::instructionst &sliced_body,
+                             exprt &target,
+                             expr_sett &influence,
+                             polynomialt &polynomial);
+
   void assert_for_values(scratch_programt &program,
                          map<exprt, int> &values,
                          set<pair<expr_listt, exprt> > &coefficients,
                          int num_unwindings,
                          goto_programt::instructionst &loop_body,
-                         exprt &target);
+                         exprt &target,
+                         overflow_instrumentert &overflow);
   void extract_polynomial(scratch_programt &program,
                           set<pair<expr_listt, exprt> > &coefficients,
                           polynomialt &polynomial);
-  set<exprt> cone_of_influence(goto_programt::instructionst &body, exprt &target);
+  void cone_of_influence(goto_programt::instructionst &orig_body,
+                         exprt &target,
+                         goto_programt::instructionst &body,
+                         expr_sett &influence);
+
+  bool fit_const(goto_programt::instructionst &loop_body,
+                 exprt &target,
+                 polynomialt &polynomial);
 
   bool check_inductive(map<exprt, polynomialt> polynomials,
                        goto_programt::instructionst &body);
   void stash_variables(scratch_programt &program,
-                       set<exprt> modified,
+                       expr_sett modified,
                        substitutiont &substitution);
   void stash_polynomials(scratch_programt &program,
                          map<exprt, polynomialt> &polynomials,
@@ -78,7 +107,7 @@ class polynomial_acceleratort {
                  substitutiont &substitution,
                  scratch_programt &program);
   expr_pairst gather_array_assignments(goto_programt::instructionst &loop_body,
-                                       set<exprt> &arrays_written);
+                                       expr_sett &arrays_written);
   bool array_assignments2polys(expr_pairst &array_assignments,
                                map<exprt, polynomialt> &polynomials,
                                polynomial_array_assignmentst &array_polynomials,
@@ -93,10 +122,13 @@ class polynomial_acceleratort {
   symbol_tablet &symbol_table;
   const namespacet ns;
   const goto_functionst &goto_functions;
+  acceleration_utilst utils;
 
   exprt loop_counter;
+
+  expr_sett nonrecursive;
 };
 
-set<exprt> find_modified(goto_programt::instructionst &body);
+expr_sett find_modified(goto_programt::instructionst &body);
 
 #endif // POLYNOMIAL_ACCELERATOR_H

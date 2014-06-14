@@ -116,7 +116,7 @@ void boolbv_mapt::show() const
 
 /*******************************************************************\
 
-Function: boolbv_mapt::get_literal
+Function: boolbv_mapt::get_literals
 
   Inputs:
 
@@ -133,8 +133,10 @@ void boolbv_mapt::get_literals(
   bvt &literals)
 {
   map_entryt &map_entry=get_map_entry(identifier, type);
-
+  
   assert(literals.size()==width);
+  assert(map_entry.literal_map.size()==width);
+  
   Forall_literals(it, literals)
   {
     literalt &l=*it;

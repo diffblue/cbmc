@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <util/config.h>
 #include <linking/zero_initializer.h>
 
 #include "c_typecheck_base.h"
@@ -663,9 +664,15 @@ void c_typecheck_baset::typecheck_for(codet &code)
   // to
   //
   //   { a; for(;b;c) d; }
+  //
+  // if config.ansi_c.for_has_scope
 
-  if(code.op0().is_nil())
+  if(!config.ansi_c.for_has_scope ||
+     code.op0().is_nil())
   {
+    if(code.op0().is_not_nil())
+      typecheck_code(to_code(code.op0()));
+
     if(code.op1().is_nil())
       code.op1()=true_exprt();
     else
@@ -686,6 +693,14 @@ void c_typecheck_baset::typecheck_for(codet &code)
       break_is_allowed=continue_is_allowed=true;
 
       // recursive call
+      if(to_code(code.op3()).get_statement()==ID_decl_block)
+      {
+        code_blockt code_block;
+        code_block.location()=code.op3().location();
+
+        code_block.move_to_operands(code.op3());
+        code.op3().swap(code_block);
+      }
       typecheck_code(to_code(code.op3()));
 
       // restore flags
@@ -697,6 +712,14 @@ void c_typecheck_baset::typecheck_for(codet &code)
   {
     code_blockt code_block;
     code_block.location()=code.location();
+    if(to_code(code.op3()).get_statement()==ID_block)
+      code_block.set(
+        ID_C_end_location,
+        to_code_block(to_code(code.op3())).end_location());
+    else
+      code_block.set(
+        ID_C_end_location,
+        code.op3().location());;
 
     code_block.reserve_operands(2);
     code_block.move_to_operands(code.op0());
@@ -908,10 +931,29 @@ void c_typecheck_baset::typecheck_ifthenelse(code_ifthenelset &code)
 
   implicit_typecast_bool(cond);
 
+  if(to_code(code.then_case()).get_statement()==ID_decl_block)
+  {
+    code_blockt code_block;
+    code_block.location()=code.then_case().location();
+
+    code_block.move_to_operands(code.then_case());
+    code.then_case().swap(code_block);
+  }
   typecheck_code(to_code(code.then_case()));
 
   if(!code.else_case().is_nil())
+  {
+    if(to_code(code.else_case()).get_statement()==ID_decl_block)
+    {
+      code_blockt code_block;
+      code_block.location()=code.else_case().location();
+
+      code_block.move_to_operands(code.else_case());
+      code.else_case().swap(code_block);
+    }
+
     typecheck_code(to_code(code.else_case()));
+  }
 }
 
 /*******************************************************************\
@@ -1043,6 +1085,14 @@ void c_typecheck_baset::typecheck_while(code_whilet &code)
 
   break_is_allowed=continue_is_allowed=true;
 
+  if(code.body().get_statement()==ID_decl_block)
+  {
+    code_blockt code_block;
+    code_block.location()=code.body().location();
+
+    code_block.move_to_operands(code.body());
+    code.body().swap(code_block);
+  }
   typecheck_code(code.body());
 
   // restore flags
@@ -1076,6 +1126,14 @@ void c_typecheck_baset::typecheck_dowhile(code_dowhilet &code)
 
   break_is_allowed=continue_is_allowed=true;
 
+  if(code.body().get_statement()==ID_decl_block)
+  {
+    code_blockt code_block;
+    code_block.location()=code.body().location();
+
+    code_block.move_to_operands(code.body());
+    code.body().swap(code_block);
+  }
   typecheck_code(code.body());
 
   // restore flags

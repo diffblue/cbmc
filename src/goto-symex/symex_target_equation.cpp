@@ -885,7 +885,9 @@ Function: symex_target_equationt::current_activation_literal
 
 \*******************************************************************/
 
-literalt symex_target_equationt::current_activation_literal() {
+literalt symex_target_equationt::current_activation_literal() 
+{
+  if(!is_incremental) return const_literal(false);
   return !activate_assertions.back();
 }
 
@@ -902,11 +904,11 @@ Function: symex_target_equationt::new_activation_literal
 
 \*******************************************************************/
 
-void symex_target_equationt::new_activation_literal(prop_convt &prop_conv) {
-  literalt activation_literal; 
+void symex_target_equationt::new_activation_literal(prop_convt &prop_conv) 
+{
   if(is_incremental)
   {
-    activation_literal = prop_conv.convert(
+    literalt activation_literal = prop_conv.convert(
       symbol_exprt("goto_symex::\\act$"+
       i2string(activate_assertions.size()), bool_typet()));
 
@@ -920,16 +922,15 @@ void symex_target_equationt::new_activation_literal(prop_convt &prop_conv) {
     //set assumptions (a_0 ... -a_k) for incremental solving
     prop_conv.set_assumptions(activate_assertions);
 
-
 #if 0
     std::cout << "assumptions: "; 
     for(bvt::iterator it = activate_assertions.begin();
         it!=activate_assertions.end();it++) {
       std::cout << *it << " ";
     }
+    std::cout << std::endl;
 #endif
 
-    std::cout << std::endl;
   }
 }
 
