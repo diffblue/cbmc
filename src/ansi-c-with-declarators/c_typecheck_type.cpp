@@ -86,6 +86,38 @@ void c_typecheck_baset::typecheck_type(typet &type)
           type.id()==ID_custom_floatbv ||
           type.id()==ID_custom_fixedbv)
     typecheck_custom_type(type);
+  else if(type.id()==ID_gcc_attribute_mode)
+  {
+    // A list of all modes ist at
+    // http://www.delorie.com/gnu/docs/gcc/gccint_53.html
+    typecheck_type(type.subtype());
+    
+    bool is_signed=type.subtype().id()==ID_signedbv;
+    
+    // get width
+    irep_idt mode=type.get(ID_size);
+    
+    if(mode=="__QI__") // 8 bits
+      type=is_signed?signed_char_type():unsigned_char_type();
+    else if(mode=="__HI__") // 16 bits
+      type=is_signed?signed_short_int_type():unsigned_short_int_type();
+    else if(mode=="__SI__") // 32 bits
+      type=is_signed?signed_int_type():unsigned_int_type();
+    else if(mode=="__DI__") // 64 bits
+    {
+      if(config.ansi_c.long_int_width==64)
+        type=is_signed?signed_long_int_type():unsigned_long_int_type();
+      else
+      {
+        assert(config.ansi_c.long_long_int_width==64);
+        type=is_signed?signed_long_long_int_type():unsigned_long_long_int_type();
+      }
+    }
+    else if(mode=="__TI__") // 128 bits
+      type=is_signed?gcc_signed_int128_type():gcc_unsigned_int128_type();
+    else // give up, use base
+      type=type.subtype();
+  }
 
   // do a bit of rule checking
 
