@@ -445,8 +445,8 @@ void goto_convertt::convert(
     convert_continue(to_code_continue(code), dest);
   else if(statement==ID_goto)
     convert_goto(code, dest);
-  else if(statement=="computed-goto")
-    convert_computed_goto(code, dest);
+  else if(statement==ID_gcc_computed_goto)
+    convert_gcc_computed_goto(code, dest);
   else if(statement==ID_skip)
     convert_skip(code, dest);
   else if(statement=="non-deterministic-goto")
@@ -1531,7 +1531,7 @@ void goto_convertt::convert_goto(
 
 /*******************************************************************\
 
-Function: goto_convertt::convert_computed_goto
+Function: goto_convertt::convert_gcc_computed_goto
 
   Inputs:
 
@@ -1541,7 +1541,7 @@ Function: goto_convertt::convert_computed_goto
 
 \*******************************************************************/
 
-void goto_convertt::convert_computed_goto(
+void goto_convertt::convert_gcc_computed_goto(
   const codet &code,
   goto_programt &dest)
 {
