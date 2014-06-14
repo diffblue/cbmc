@@ -132,6 +132,16 @@ void ansi_c_parsert::add_declarator(
 
   irep_idt base_name=new_declarator.get_base_name();
   
+  bool is_member=ansi_c_declaration.get_is_member();
+  
+  if(is_member)
+  {
+    // we don't put them into a struct scope (unlike C++)
+    new_declarator.set_name(base_name);
+    ansi_c_declaration.declarators().push_back(new_declarator);
+    return; // done
+  }
+  
   // global?
   if(current_scope().prefix=="")
     ansi_c_declaration.set_is_global(true);

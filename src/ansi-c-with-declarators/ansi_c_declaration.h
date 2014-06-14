@@ -112,6 +112,16 @@ public:
     set(ID_is_parameter, is_parameter);
   }
   
+  inline bool get_is_member() const
+  {
+    return get_bool(ID_is_member);
+  }
+  
+  inline void set_is_member(bool is_member)
+  {
+    set(ID_is_member, is_member);
+  }
+  
   inline bool get_is_global() const
   {
     return get_bool(ID_is_global);
