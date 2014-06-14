@@ -493,7 +493,7 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
     // Anonymous? Must come with body.
     assert(have_body);
 
-    // add new symbol
+    // produce symbol
     symbolt compound_symbol;
     compound_symbol.is_type=true;
     compound_symbol.type=type;
@@ -506,8 +506,14 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
     compound_symbol.name=add_language_prefix("tag-#anon#"+typestr);
     identifier=compound_symbol.name;
     
-    symbolt *new_symbol;
-    move_symbol(compound_symbol, new_symbol);
+    // We might already have the same anonymous union/struct,
+    // and this is simply ok. Note that the C standard treats
+    // these as different types.
+    if(symbol_table.symbols.find(identifier)==symbol_table.symbols.end())
+    {
+      symbolt *new_symbol;
+      move_symbol(compound_symbol, new_symbol);
+    }
   }
   else
   {
@@ -533,7 +539,11 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
 
       if(have_body)
       {
-        typecheck_compound_body(compound_symbol);
+        // add before doing the body (may be recursive)      
+        symbolt *new_symbol;
+        move_symbol(compound_symbol, new_symbol);
+
+        typecheck_compound_body(*new_symbol);
       }
       else
       {
@@ -543,10 +553,10 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
           compound_symbol.type.id(ID_incomplete_union);
         else
           assert(false);
+
+        symbolt *new_symbol;
+        move_symbol(compound_symbol, new_symbol);
       }
-      
-      symbolt *new_symbol;
-      move_symbol(compound_symbol, new_symbol);
     }
     else
     {
