@@ -47,7 +47,11 @@ void c_typecheck_baset::typecheck_type(typet &type)
   
   if(type.id()==ID_already_typechecked)
   {
+    // need to preserve any qualifiers
+    c_qualifierst c_qualifiers(type);
+    c_qualifiers+=c_qualifierst(type.subtype());
     type.swap(type.subtype());
+    c_qualifiers.write(type);
     return; // done
   }
 
