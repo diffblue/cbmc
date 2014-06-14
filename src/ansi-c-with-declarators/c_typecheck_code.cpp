@@ -82,8 +82,6 @@ void c_typecheck_baset::typecheck_code(codet &code)
     typecheck_return(code);
   else if(statement==ID_decl)
     typecheck_decl(code);
-  else if(statement==ID_decl_type)
-    typecheck_decl_type(code);
   else if(statement==ID_assign)
     typecheck_assign(code);
   else if(statement==ID_skip)
@@ -290,43 +288,6 @@ Function: c_typecheck_baset::typecheck_decl
 
 \*******************************************************************/
 
-void c_typecheck_baset::typecheck_decl_type(codet &code)
-{
-  assert(code.operands().size()==0);
-  // Type only! May have side-effects in it!
-  
-  std::list<codet> clean_code;
-  
-  typet &type=static_cast<typet &>(code.add(ID_type_arg));
-
-  // typecheck
-  typecheck_type(type);
-
-  // clean
-  clean_type(irep_idt(), type, clean_code);
-  
-  if(!clean_code.empty())
-  {
-    // build a decl-block
-    code_blockt code_block(clean_code);
-    code_block.set_statement(ID_decl_block);
-    code_block.copy_to_operands(code);
-    code.swap(code_block);
-  }
-}
-
-/*******************************************************************\
-
-Function: c_typecheck_baset::typecheck_decl
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void c_typecheck_baset::typecheck_decl(codet &code)
 {
   // this comes with 1 operand, which is a declaration
@@ -345,6 +306,15 @@ void c_typecheck_baset::typecheck_decl(codet &code)
 
   ansi_c_declarationt declaration;
   declaration.swap(code.op0());
+  
+  if(declaration.get_is_static_assert())
+  {
+    codet new_code(ID_static_assert);
+    new_code.location()=code.location();
+    new_code.operands().swap(code.operands());
+    code.swap(new_code);
+    return; // done
+  }
   
   typecheck_declaration(declaration);
   

@@ -711,25 +711,34 @@ Function: c_typecheck_baset::typecheck_declaration
 void c_typecheck_baset::typecheck_declaration(
   ansi_c_declarationt &declaration)
 {
-  // first typecheck the type of the declaration
-  typecheck_type(declaration.type());
-  
-  // mark as 'already typechecked'
-  make_already_typechecked(declaration.type());
-
-  // Now do declarators, if any.
-  for(ansi_c_declarationt::declaratorst::iterator
-      d_it=declaration.declarators().begin();
-      d_it!=declaration.declarators().end();
-      d_it++)
+  if(declaration.get_is_static_assert())
   {
-    symbolt symbol;
-    declaration.to_symbol(*d_it, symbol);
+    assert(declaration.operands().size()==2);
+    typecheck_expr(declaration.op0());
+    typecheck_expr(declaration.op1());
+  }
+  else
+  {
+    // first typecheck the type of the declaration
+    typecheck_type(declaration.type());
+    
+    // mark as 'already typechecked'
+    make_already_typechecked(declaration.type());
 
-    // now check other half of type
-    typecheck_type(symbol.type);
+    // Now do declarators, if any.
+    for(ansi_c_declarationt::declaratorst::iterator
+        d_it=declaration.declarators().begin();
+        d_it!=declaration.declarators().end();
+        d_it++)
+    {
+      symbolt symbol;
+      declaration.to_symbol(*d_it, symbol);
 
-    typecheck_symbol(symbol);
+      // now check other half of type
+      typecheck_type(symbol.type);
+
+      typecheck_symbol(symbol);
+    }
   }
 }
 
