@@ -52,6 +52,7 @@ STATIC_ASSERT(__builtin_types_compatible_p(typeof (hot), typeof (laura)));
 STATIC_ASSERT(__builtin_types_compatible_p(int[5], int[]));
 STATIC_ASSERT(__builtin_types_compatible_p(same1, same2));
 STATIC_ASSERT(__builtin_types_compatible_p(typeof (hot) *, int *));
+STATIC_ASSERT(__builtin_types_compatible_p(typeof (hot), typeof (janette)));
 STATIC_ASSERT(__builtin_types_compatible_p(__int128, signed __int128));
 
 /* Incompatible types */
