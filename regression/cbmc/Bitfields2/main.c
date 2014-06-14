@@ -12,7 +12,8 @@ struct S0 {
    int32_t  f1;
    int64_t  f2;
    uint32_t  f3;
-   signed : 0; // skipped over during initialization
+   // skipped over during initialization
+   signed : 0; 
    volatile int16_t  f4;
    volatile uint32_t  f5;
    int32_t  f6;
