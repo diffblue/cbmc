@@ -229,7 +229,7 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
     typecheck_type(subtypes[1]);
     locationt location=expr.location();
     
-    // ignores top level qualifiers
+    // ignores top-level qualifiers
     subtypes[0].remove(ID_C_constant);
     subtypes[0].remove(ID_C_volatile);
     subtypes[0].remove(ID_C_restricted);
