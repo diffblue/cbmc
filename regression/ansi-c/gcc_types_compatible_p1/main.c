@@ -65,7 +65,7 @@ STATIC_ASSERT(!__builtin_types_compatible_p(const char *, char *));
 STATIC_ASSERT(!__builtin_types_compatible_p(long double, double));
 STATIC_ASSERT(!__builtin_types_compatible_p(double, float));
 STATIC_ASSERT(!__builtin_types_compatible_p(typeof (i), typeof (d)));
-STATIC_ASSERT(!__builtin_types_compatible_p(typeof (dingos), typeof (cranberry)));
+STATIC_ASSERT(!__builtin_types_compatible_p(dingos, cranberry));
 STATIC_ASSERT(!__builtin_types_compatible_p(typeof (_dingos), typeof (_cranberry)));
 STATIC_ASSERT(!__builtin_types_compatible_p(char, int));
 STATIC_ASSERT(!__builtin_types_compatible_p(char *, char **));
