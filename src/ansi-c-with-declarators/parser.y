@@ -1251,6 +1251,13 @@ array_of_construct:
         { $$=$1; ((typet &)stack($$)).subtype().swap(stack($2)); }
         ;
 
+pragma_packed:
+        {
+          init($$);
+          if(PARSER.pragma_pack!=0) set($$, ID_packed);
+        }
+        ;
+
 aggregate_name:
           aggregate_key
           gcc_type_attribute_opt
@@ -1259,13 +1266,14 @@ aggregate_name:
           }
           '{' member_declaration_list_opt '}'
           gcc_type_attribute_opt
+          pragma_packed
         {
           // save the members
           stack($1).add(ID_components).get_sub().swap(
             (irept::subt &)stack($5).operands());
 
           // throw in the gcc attributes
-          $$=merge($1, merge($2, $7));
+          $$=merge($1, merge($2, merge($7, $8)));
         }
         | aggregate_key
           gcc_type_attribute_opt
@@ -1276,13 +1284,14 @@ aggregate_name:
           }
           '{' member_declaration_list_opt '}'
           gcc_type_attribute_opt
+          pragma_packed
         {
           // save the members
           stack($1).add(ID_components).get_sub().swap(
             (irept::subt &)stack($6).operands());
 
           // throw in the gcc attributes
-          $$=merge($1, merge($2, $8));
+          $$=merge($1, merge($2, merge($8, $9)));
         }
         | aggregate_key
           gcc_type_attribute_opt
@@ -1307,7 +1316,6 @@ gcc_type_attribute_opt:
           /* empty */
         {
           init($$);
-          if(PARSER.pragma_pack!=0) set($$, ID_packed);
         }
         | gcc_type_attribute_list
         ;
