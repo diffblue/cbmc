@@ -472,6 +472,7 @@ void ansi_c_convertt::convert_type(
 
         convert_type(declaration.type());
         convert_type(declaration.declarator().type());
+        convert_expr(declaration.declarator().value());
       }
       else
         throw "unexpected enum constant during conversion: "+it->id_string();
