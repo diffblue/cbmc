@@ -847,10 +847,8 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
     typecheck_declaration(declaration);
   }
   
-  // Replace the enum by an 'int'. GCC may pick smaller types
-  // as well.
-  type=enum_type();
-  type.location()=location;
+  // remove these now
+  as_expr.operands().clear();
 }
 
 /*******************************************************************\
