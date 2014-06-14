@@ -177,7 +177,7 @@ protected:
   void convert_ifthenelse(const code_ifthenelset &code, goto_programt &dest);
   void convert_init(const codet &code, goto_programt &dest);
   void convert_goto(const codet &code, goto_programt &dest);
-  void convert_computed_goto(const codet &code, goto_programt &dest);
+  void convert_gcc_computed_goto(const codet &code, goto_programt &dest);
   void convert_skip(const codet &code, goto_programt &dest);
   void convert_non_deterministic_goto(const codet &code, goto_programt &dest);
   void convert_label(const code_labelt &code, goto_programt &dest);
