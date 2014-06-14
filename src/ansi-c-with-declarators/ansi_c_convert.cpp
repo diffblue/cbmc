@@ -417,8 +417,8 @@ void ansi_c_convertt::convert_type(
   {
     code_typet &code_type=to_code_type(type);
     
+    code_type.return_type().swap(code_type.subtype());
     code_type.remove(ID_subtype);
-    code_type.return_type().make_nil();
     
     // take care of parameter declarations
     code_typet::parameterst &parameters=code_type.parameters();
