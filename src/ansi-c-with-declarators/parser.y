@@ -1612,7 +1612,7 @@ parameter_declaration:
         }
         | declaration_specifier identifier_declarator gcc_type_attribute_opt
         {
-          $2=merge($2, $3); // type attribute to go into declarator
+          $2=merge($3, $2); // type attribute to go into declarator
           init($$, ID_declaration);
           to_ansi_c_declaration(stack($$)).set_is_parameter(true);
           to_ansi_c_declaration(stack($$)).type().swap(stack($1));
@@ -1644,7 +1644,7 @@ parameter_declaration:
         }
         | declaration_qualifier_list identifier_declarator gcc_type_attribute_opt
         {
-          $2=merge($2, $3); // type attribute
+          $2=merge($3, $2); // type attribute to go into declarator
           init($$, ID_declaration);
           to_ansi_c_declaration(stack($$)).set_is_parameter(true);
           to_ansi_c_declaration(stack($$)).type().swap(stack($1));
@@ -1667,7 +1667,7 @@ parameter_declaration:
         }
         | type_specifier identifier_declarator gcc_type_attribute_opt
         {
-          $2=merge($2, $3); // type attribute
+          $2=merge($3, $2); // type attribute to go into declarator
           init($$, ID_declaration);
           to_ansi_c_declaration(stack($$)).set_is_parameter(true);
           to_ansi_c_declaration(stack($$)).type().swap(stack($1));
@@ -1698,7 +1698,7 @@ parameter_declaration:
         }
         | type_qualifier_list identifier_declarator gcc_type_attribute_opt
         {
-          $2=merge($2, $3);
+          $2=merge($3, $2); // type attribute to go into declarator
           init($$, ID_declaration);
           to_ansi_c_declaration(stack($$)).set_is_parameter(true);
           to_ansi_c_declaration(stack($$)).type().swap(stack($1));
