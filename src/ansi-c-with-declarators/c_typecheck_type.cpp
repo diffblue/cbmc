@@ -50,8 +50,10 @@ void c_typecheck_baset::typecheck_type(typet &type)
     // need to preserve any qualifiers
     c_qualifierst c_qualifiers(type);
     c_qualifiers+=c_qualifierst(type.subtype());
+    bool packed=type.get_bool(ID_C_packed);
     type.swap(type.subtype());
     c_qualifiers.write(type);
+    if(packed) type.set(ID_C_packed, true);
     return; // done
   }
 
@@ -674,10 +676,14 @@ void c_typecheck_baset::typecheck_compound_body(symbolt &symbol)
       new_component.location()=declaration.location();
       new_component.operands().swap(declaration.operands());
       assert(new_component.operands().size()==2);
-      // should perhaps check the assertion
+      components.push_back(new_component);
     }
     else
     {
+      // do first half of type
+      typecheck_type(declaration.type());
+      make_already_typechecked(declaration.type());
+    
       for(ansi_c_declarationt::declaratorst::iterator
           d_it=declaration.declarators().begin();
           d_it!=declaration.declarators().end();
@@ -690,30 +696,21 @@ void c_typecheck_baset::typecheck_compound_body(symbolt &symbol)
         new_component.set(ID_pretty_name, d_it->get_base_name());
         new_component.type()=declaration.full_type(*d_it);
 
+        // mark bit-fields as such
+        if(new_component.type().id()==ID_c_bitfield)
+        {
+          new_component.set_is_bit_field(true);
+          typet tmp=new_component.type().subtype();
+          typecheck_type(tmp);
+          new_component.set_bit_field_type(tmp);
+        }
+        
+        typecheck_type(new_component.type());
+
         components.push_back(new_component);
       }
     }
   }
-
-  // mark bit-fields as such
-  for(struct_union_typet::componentst::iterator
-      it=components.begin();
-      it!=components.end();
-      it++)
-    if(it->type().id()==ID_c_bitfield)
-    {
-      it->set_is_bit_field(true);
-      typet tmp=it->type().subtype();
-      typecheck_type(tmp);
-      it->set_bit_field_type(tmp);
-    }
-
-  // check subtypes
-  for(struct_union_typet::componentst::iterator
-      it=components.begin();
-      it!=components.end();
-      it++)
-    typecheck_type(it->type());
 
   unsigned anon_member_counter=0;
 
@@ -801,7 +798,7 @@ void c_typecheck_baset::typecheck_compound_body(symbolt &symbol)
       it!=components.end();
       ) // no it++
   {
-    if(it->id()==ID_code && it->get(ID_statement)==ID_static_assert)
+    if(it->id()==ID_static_assert)
     {
       assert(it->operands().size()==2);
       exprt &assertion=it->op0();
@@ -855,7 +852,8 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
   as_expr.operands().clear();
   
   // We need to determine a width, and a signedness.
-  // We just do int, but gcc might pick smaller widths.
+  // We just do int, but gcc might pick smaller widths
+  // if the type is marked as 'packed'.
   type.set(ID_width, config.ansi_c.int_width);
 }
 
