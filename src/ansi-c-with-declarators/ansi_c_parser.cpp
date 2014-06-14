@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 
 #include "ansi_c_parser.h"
+#include "c_storage_spec.h"
 
 ansi_c_parsert ansi_c_parser;
 
@@ -149,16 +150,19 @@ void ansi_c_parsert::add_declarator(
   // abstract?
   if(base_name!="")
   {
-    bool is_typedef=
-      ansi_c_declarationt::is_a_typedef(ansi_c_declaration.type());
+    c_storage_spect c_storage_spec(ansi_c_declaration.type());
+    bool is_typedef=c_storage_spec.is_typedef;
+    bool is_extern=c_storage_spec.is_extern;
 
     bool force_root_scope=false;
   
+    // functions always go into global scope
     if(new_declarator.type().id()==ID_code)
-    {
-      // functions always go into global scope
       force_root_scope=true;
-    }
+    
+    // variables marked as 'extern' always go into global scope
+    if(is_extern)
+      force_root_scope=true;
 
     ansi_c_id_classt id_class=
       is_typedef?ANSI_C_TYPEDEF:ANSI_C_SYMBOL;

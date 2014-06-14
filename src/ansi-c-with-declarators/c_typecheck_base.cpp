@@ -52,27 +52,6 @@ std::string c_typecheck_baset::to_string(const typet &type)
 
 /*******************************************************************\
 
-Function: c_typecheck_baset::replace_symbol
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void c_typecheck_baset::replace_symbol(irept &symbol)
-{
-  id_replace_mapt::const_iterator it=
-    id_replace_map.find(symbol.get(ID_identifier));
-  
-  if(it!=id_replace_map.end())
-    symbol.set(ID_identifier, it->second);
-}
-
-/*******************************************************************\
-
 Function: c_typecheck_baset::move_symbol
 
   Inputs:
@@ -130,8 +109,6 @@ void c_typecheck_baset::typecheck_symbol(symbolt &symbol)
     std::string typestr=type2name(symbol.type);
     new_name=add_language_prefix("tag-#anon#"+typestr);
     
-    id_replace_map[symbol.name]=new_name;    
-
     symbol_tablet::symbolst::const_iterator it=symbol_table.symbols.find(new_name);
     if(it!=symbol_table.symbols.end())
       return; // bail out, we have an appropriate symbol already.
@@ -157,12 +134,6 @@ void c_typecheck_baset::typecheck_symbol(symbolt &symbol)
     throw "only functions can have a function body";
   }
   
-  if(symbol.name!=new_name)
-  {
-    id_replace_map[symbol.name]=new_name;
-    symbol.name=new_name;
-  }
-
   #if 0
   {
     // and now that we have the proper name
