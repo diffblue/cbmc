@@ -63,14 +63,8 @@ protected:
   const std::string language_prefix;
   irep_idt current_symbol_id;
 
-  typedef hash_map_cont<irep_idt, irep_idt, irep_id_hash> id_replace_mapt;
-  id_replace_mapt id_replace_map;
-  
   typedef hash_map_cont<irep_idt, typet, irep_id_hash> id_type_mapt;
   id_type_mapt parameter_map;
-  
-  // apply id_replace_map
-  void replace_symbol(irept &symbol);
   
   // overload to use language specific syntax
   virtual std::string to_string(const exprt &expr);

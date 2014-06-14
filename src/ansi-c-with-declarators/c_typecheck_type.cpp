@@ -304,16 +304,13 @@ void c_typecheck_baset::typecheck_code_type(code_typet &type)
         irep_idt identifier=declaration.declarator().get_name();
 
         // abstract or not?
-        if(identifier!=irep_idt())
+        if(identifier==irep_idt())
+        {
+        }
+        else
         {
           identifier=add_language_prefix(identifier);
     
-          id_replace_mapt::const_iterator
-            m_it=id_replace_map.find(identifier);
-
-          if(m_it!=id_replace_map.end())
-            identifier=m_it->second;
-
           parameter.set_identifier(identifier);
 
           // make visible now, later parameters might use it
@@ -998,9 +995,6 @@ void c_typecheck_baset::typecheck_symbol_type(typet &type)
     symbol_typet &symbol_type=to_symbol_type(type);
     symbol_type.set_identifier(add_language_prefix(symbol_type.get_identifier()));
   }
-
-  // adjust identifier, if needed
-  replace_symbol(type);
 
   const irep_idt &identifier=
     to_symbol_type(type).get_identifier();

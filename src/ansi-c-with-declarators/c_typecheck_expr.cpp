@@ -720,9 +720,6 @@ void c_typecheck_baset::typecheck_expr_symbol(exprt &expr)
     symbol_expr.set_identifier(add_language_prefix(symbol_expr.get_identifier()));
   }
 
-  // adjust identifier, if needed
-  replace_symbol(expr);
-  
   const irep_idt &identifier=to_symbol_expr(expr).get_identifier();
   
   // Is it a parameter? We do this while checking parameter lists.

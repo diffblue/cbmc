@@ -220,20 +220,6 @@ public:
     assert(!declarators().empty());
     declarators().back().value().swap(value);
   }
-  
-  static bool is_a_typedef(const typet &src)
-  {
-    if(src.id()==ID_typedef)
-      return true;
-    else if(src.id()==ID_merged_type)
-    {
-      forall_subtypes(it, src)
-        if(is_a_typedef(*it))
-          return true;
-    }
-    
-    return false;
-  }
 };
 
 extern inline ansi_c_declarationt &to_ansi_c_declaration(exprt &expr)
