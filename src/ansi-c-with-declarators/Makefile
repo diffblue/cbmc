@@ -6,7 +6,7 @@ SRC = c_typecast.cpp ansi_c_y.tab.cpp ansi_c_lex.yy.cpp ansi_c_parser.cpp \
       c_typecheck_typecast.cpp c_typecheck_code.cpp \
       c_typecheck_expr.cpp c_typecheck_type.cpp string_constant.cpp \
       c_qualifiers.cpp c_typecheck_argc_argv.cpp ansi_c_parse_tree.cpp \
-      preprocessor_line.cpp ansi_c_convert.cpp ansi_c_convert_type.cpp \
+      preprocessor_line.cpp ansi_c_convert_type.cpp \
       type2name.cpp cprover_library.cpp anonymous_member.cpp \
       printf_formatter.cpp ansi_c_internal_additions.cpp padding.cpp \
       ansi_c_declaration.cpp designator.cpp \

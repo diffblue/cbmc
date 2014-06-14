@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "c_typecheck_base.h"
 #include "expr2c.h"
 #include "type2name.h"
+#include "c_storage_spec.h"
 
 /*******************************************************************\
 
@@ -719,6 +720,16 @@ void c_typecheck_baset::typecheck_declaration(
   }
   else
   {
+    // get storage spec
+    c_storage_spect c_storage_spec(declaration.type());
+  
+    declaration.set_is_inline(c_storage_spec.is_inline);
+    declaration.set_is_static(c_storage_spec.is_static);
+    declaration.set_is_extern(c_storage_spec.is_extern);
+    declaration.set_is_thread_local(c_storage_spec.is_thread_local);
+    declaration.set_is_register(c_storage_spec.is_register);
+    declaration.set_is_typedef(c_storage_spec.is_typedef);
+
     // first typecheck the type of the declaration
     typecheck_type(declaration.type());
     

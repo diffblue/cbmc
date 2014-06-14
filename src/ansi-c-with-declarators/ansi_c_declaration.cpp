@@ -121,15 +121,19 @@ typet ansi_c_declarationt::full_type(
   typet result=declarator.type();
   typet *p=&result;
 
-  // this gets types that are converted but not type-checked as of now  
+  // this gets types that are still raw parse trees
   while(p->is_not_nil())
   {
     if(p->id()==ID_pointer || p->id()==ID_array || 
        p->id()==ID_vector || p->id()==ID_c_bitfield ||
-       p->id()==ID_block_pointer)
+       p->id()==ID_block_pointer || p->id()==ID_code)
       p=&p->subtype();
-    else if(p->id()==ID_code)
-      p=&(to_code_type(*p).return_type());
+    else if(p->id()==ID_merged_type)
+    {
+      // we always go down on the right-most subtype
+      assert(!p->subtypes().empty());
+      p=&(p->subtypes().back());
+    }
     else
     {
       std::cout << "result: " << result.pretty() << "\n";
@@ -137,16 +141,8 @@ typet ansi_c_declarationt::full_type(
       assert(false);
     }
   }
-  
-  // save 'packed' and 'alignment'  
-  bool packed=p->get_bool(ID_C_packed);
-  irept alignment=p->find(ID_C_alignment);
-  
+
   *p=type();
-  
-  // restore 'packed' and 'alignment'
-  if(packed) p->set(ID_C_packed, true);
-  if(alignment.is_not_nil()) p->set(ID_C_alignment, alignment);
   
   return result;
 }
