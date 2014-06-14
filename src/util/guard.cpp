@@ -12,7 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
-Function: guardt::as_expr
+Function: guardt::guard_expr
 
   Inputs:
 

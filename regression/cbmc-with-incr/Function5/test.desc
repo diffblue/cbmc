@@ -1,0 +1,10 @@
+CORE
+main.c
+--pointer-check --bounds-check
+^SIGNAL=0$
+^EXIT=10$
+^Counterexample:$
+^VERIFICATION FAILED$
+^  dereference failure: object bounds$
+--
+^warning: ignoring

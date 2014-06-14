@@ -301,11 +301,13 @@ public:
     {
       loop_infot():
         count(0),
+	fully_unwound(false),
         is_recursion(false)
       {
       }
 
       unsigned count;
+      bool fully_unwound;
       bool is_recursion;
     };
     typedef hash_map_cont<irep_idt, loop_infot, irep_id_hash>

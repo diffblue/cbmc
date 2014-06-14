@@ -163,9 +163,9 @@ void cbmc_parseoptionst::get_command_line_options(optionst &options)
     options.set_option("unwind-max", cmdline.getval("unwind-max"));
   if(cmdline.isset("unwind-min"))
     options.set_option("unwind-min", cmdline.getval("unwind-min"));
-  if(cmdline.isset("unwind")) {
+  if(cmdline.isset("unwind")) 
     options.set_option("unwind", cmdline.getval("unwind"));
-  }
+
   if(cmdline.isset("ignore-assertions-before-unwind-min"))
     options.set_option("ignore-assertions-before-unwind-min", true);
 
@@ -181,6 +181,8 @@ void cbmc_parseoptionst::get_command_line_options(optionst &options)
   if(cmdline.isset("unwindset"))
     options.set_option("unwindset", cmdline.getval("unwindset"));
 
+  if(cmdline.isset("incremental"))
+    options.set_option("incremental", true);
   if(cmdline.isset("incremental-check"))
     options.set_option("incremental-check", cmdline.getval("incremental-check"));
 
@@ -368,6 +370,12 @@ int cbmc_parseoptionst::doit()
   {
     error() << "This version of CBMC has no support for "
                " hardware modules. Please use hw-cbmc." << eom;
+    return 1;
+  }
+
+  if(cmdline.isset("incremental") && cmdline.isset("unwind")) 
+  {
+    error() << "--unwind cannot be used with --incremental" << eom;
     return 1;
   }
   
@@ -901,6 +909,7 @@ void cbmc_parseoptionst::help()
     " --unwind nr                  unwind nr times\n"
     " --unwindset L:B,...          unwind loop L with a bound of B\n"
     "                              (use --show-loops to get the loop IDs)\n"
+    " --incremental                check after each unwinding\n"
     " --incremental-check L        check after each unwinding of loop L\n"
     " --unwind-min nr              start incremental check after nr unwindings\n"
     " --unwind-max nr              stop incremental check after nr unwindings\n"

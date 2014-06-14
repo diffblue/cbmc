@@ -75,7 +75,7 @@ protected:
   virtual decision_proceduret::resultt
     run_decision_procedure(prop_convt &prop_conv);
     
-  virtual bool decide(prop_convt &prop_conv);
+  virtual bool decide(prop_convt &prop_conv, bool show_report=true);
     
   virtual bool write_dimacs(prop_convt &prop_conv);
   

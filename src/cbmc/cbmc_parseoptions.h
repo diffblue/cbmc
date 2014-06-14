@@ -45,7 +45,7 @@ class optionst;
   "(all-claims)(all-properties)" \
   "(error-label):(verbosity):(no-library)" \
   "(version)" \
-  "(incremental-check):" \
+  "(incremental-check):(incremental)" \
   "(ignore-assertions-before-unwind-min)" \
   "(cover-assertions)" \
   "(mm):" \

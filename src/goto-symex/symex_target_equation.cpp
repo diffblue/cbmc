@@ -806,8 +806,12 @@ void symex_target_equationt::convert_assertions(
     for(SSA_stepst::iterator it=SSA_steps.begin();
         it!=SSA_steps.end(); it++)
     {
-      if(it->is_assert())
+      if(it->is_assert() && !it->converted)
       {
+        it->converted = true;
+
+        std::cout << "assertion: " << from_expr(ns,"",it->cond_expr) << std::endl;
+
         if(is_incremental) { 
           prop_conv.set_to_true(or_exprt(literal_exprt(activation_literal),
             not_exprt(it->cond_expr)));
@@ -849,11 +853,15 @@ void symex_target_equationt::convert_assertions(
   for(SSA_stepst::iterator it=SSA_steps.begin();
       it!=SSA_steps.end(); it++) 
   {
-    if(it->is_assert())
+    if(it->is_assert() && !it->converted)
     {
+      it->converted = true;
+
       implies_exprt implication(
         assumption,
         it->cond_expr);
+
+      std::cout << "assertion: " << from_expr(ns,"",it->cond_expr) << std::endl;
       
       // do the conversion
       it->cond_literal=prop_conv.convert(implication);

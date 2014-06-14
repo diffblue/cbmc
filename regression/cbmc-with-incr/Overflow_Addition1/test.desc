@@ -1,0 +1,8 @@
+CORE
+main.c
+--signed-overflow-check
+^SIGNAL=0$
+^Counterexample:$
+^VERIFICATION FAILED$
+--
+^warning: ignoring

@@ -39,6 +39,7 @@ symex_bmct::symex_bmct(
   symex_targett &_target,
   prop_convt& _prop_conv):
   goto_symext(_ns, _new_symbol_table, _target),
+  is_incremental(false),
   prop_conv(_prop_conv),
   ui(ui_message_handlert::PLAIN),
   max_unwind_is_set(false)
@@ -91,10 +92,63 @@ Function: symex_bmct::check_break
 
 \*******************************************************************/
 
-bool symex_bmct::check_break(const symex_targett::sourcet &source,
-                             unsigned unwind) {
-  const irep_idt id=goto_programt::loop_id(source.pc);
-  return (unwind>=incr_min_unwind) && (id==incr_loop_id);
+bool symex_bmct::check_break(statet& state, const exprt &cond, 
+                             unsigned unwind) 
+{
+  if(!is_incremental) return false;
+  if(unwind < incr_min_unwind) return false;
+
+  const irep_idt id=goto_programt::loop_id(state.source.pc);
+  loop_limitst &this_thread_limits=
+    thread_loop_limits[state.source.thread_nr];
+  if(incr_loop_id=="" && 
+     this_thread_limits.find(id)==this_thread_limits.end() &&
+     loop_limits.find(id)==loop_limits.end()) 
+  {
+    //not a statically unwound loop when --incremental
+
+    //memorise unwinding assertion for loop check
+    exprt simplified_cond=not_exprt(cond);
+    state.rename(simplified_cond, ns);
+    do_simplify(simplified_cond);
+    state.guard.guard_expr(simplified_cond);
+
+    loop_cond.id = id;
+    loop_cond.cond = simplified_cond;
+    loop_cond.guard = state.guard.as_expr();
+    loop_cond.loop_info = &(state.top().loop_iterations[id]);
+    loop_cond.source = state.source;
+
+    return true;
+  }
+
+  //loop specified by --incremental-check
+  return (id == incr_loop_id);
+}
+
+bool symex_bmct::add_loop_check()
+{
+  if(loop_cond.id=="") return false;
+
+  status() << "Checking loop " << loop_cond.id << eom;
+
+  debug() << "Loop condition: " << from_expr(ns,"",loop_cond.cond) << eom;
+
+  target.assertion(loop_cond.guard, loop_cond.cond, 
+    "loop_condition_check", loop_cond.source);
+
+  return true;
+}
+
+void symex_bmct::update_loop_info(bool fully_unwound)
+{
+  if(loop_cond.id=="") return;
+
+  debug() << "Loop " << loop_cond.id 
+	  << (fully_unwound ? " fully unwound" : " not fully unwound") << eom;
+
+  loop_cond.loop_info->fully_unwound = fully_unwound;
+  loop_cond.id = "";
 }
 
 

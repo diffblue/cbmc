@@ -382,88 +382,112 @@ bool bmct::run(const goto_functionst &goto_functions)
 		   << " steps" << eom;
 
       try
+      {
+        if(options.get_option("slice-by-trace")!="")
+        {
+          symex_slice_by_tracet symex_slice_by_trace(ns);
+
+          symex_slice_by_trace.slice_by_trace
+     	    (options.get_option("slice-by-trace"), equation);
+	}
+
+	if(equation.has_threads())
 	{
-	  if(options.get_option("slice-by-trace")!="")
-	    {
-	      symex_slice_by_tracet symex_slice_by_trace(ns);
-
-	      symex_slice_by_trace.slice_by_trace
-		(options.get_option("slice-by-trace"), equation);
-	    }
-
-	  if(equation.has_threads())
-	    {
-	      // we should build a thread-aware SSA slicer
-	      statistics() << "no slicing due to threads" << eom;
-	    }
-	  else
-	    {
-	      if(options.get_bool_option("slice-formula"))
-		{
-		  slice(equation);
-		  statistics() << "slicing removed "
-			       << equation.count_ignored_SSA_steps()
-			       << " assignments" << eom;
-		}
-	      else
-		{
-		  simple_slice(equation);
-		  statistics() << "simple slicing removed "
-			       << equation.count_ignored_SSA_steps()
-			       << " assignments" << eom;
-		}
-	    }
-
-	  if(options.get_bool_option("program-only"))
-	    {
-	      show_program();
-	      return false;
-	    }
-
+	  // we should build a thread-aware SSA slicer
+	  statistics() << "no slicing due to threads" << eom;
+	}
+	else
+	{
+	  if(options.get_bool_option("slice-formula"))
 	  {
-	    statistics() << "Generated " << symex.total_claims
+	    slice(equation);
+	    statistics() << "slicing removed "
+			       << equation.count_ignored_SSA_steps()
+			       << " assignments" << eom;
+	  }
+	  else
+	  {
+	    simple_slice(equation);
+	    statistics() << "simple slicing removed "
+			       << equation.count_ignored_SSA_steps()
+			       << " assignments" << eom;
+	  }
+	}
+
+	if(options.get_bool_option("program-only"))
+	{
+	  show_program();
+	  return false;
+	}
+
+	{
+	  statistics() << "Generated " << symex.total_claims
 			 << " VCC(s), " << symex.remaining_claims
 			 << " remaining after simplification" << eom;
-	  }
+	}
 
-	  if(options.get_bool_option("show-vcc"))
-	    {
-	      show_vcc();
-	      return false;
-	    }
+	if(options.get_bool_option("show-vcc"))
+	{
+	  show_vcc();
+	  if(!symex.is_incremental) return false;
+	}
   
-	  if(options.get_bool_option("cover-assertions"))
-	    {
-              if(options.get_option("incremental-check")!="")
+	if(options.get_bool_option("cover-assertions"))
+	{
+          if(options.get_option("incremental-check")!="")
                 throw "incremental vacuity checks not supported";
-	      cover_assertions(goto_functions,symex.prop_conv);
-	      return false;
-	    }
-	  if(symex.remaining_claims==0)
-	    {
-	      report_success();
-              continue;
-	    }
+	  cover_assertions(goto_functions,symex.prop_conv);
+	  return false;
+	}
 
-          //call decision procedure
-	  if(options.get_bool_option("all-claims")) {
-	    if(all_claims(goto_functions,symex.prop_conv)) return true; //all claims FAILED, exit
+	if(symex.remaining_claims==0)
+	{
+	  report_success();
+
+          if(symex.is_incremental)
+          {
+            if(symex.add_loop_check())
+	    {
+              symex.update_loop_info(!decide(symex.prop_conv,false));
+	    }
 	  }
-          else {
+
+          continue;
+	}
+
+        //call decision procedure
+	if(options.get_bool_option("all-claims")) 
+        {
+	  if(all_claims(goto_functions,symex.prop_conv)) 
+            return true; //all claims FAILED, exit
+	}
+        else 
+        {
+          if(symex.remaining_claims>0)
+	  {
             verification_result = decide(symex.prop_conv);
             if(verification_result) return true; //bug found, exit
 	  }
+	    
+          if(symex.is_incremental)
+          {
+            if(symex.add_loop_check())
+	    {
+              symex.update_loop_info(!decide(symex.prop_conv,false));
+	    }
+	  }
 	}
+      }
       catch(std::string &error_str)
-	{
-	  error(error_str);
-	  return true;
-	}
+      {
+        error(error_str);
+        return true;
+      }
       catch(const char *error_str)
-	{
-	  error(error_str);
-	  return true;
-	}
+      {
+        error(error_str);
+        return true;
+      }
 
     } //while
 
@@ -502,7 +526,7 @@ Function: bmct::decide
 
 \*******************************************************************/
 
-bool bmct::decide(prop_convt &prop_conv)
+bool bmct::decide(prop_convt &prop_conv, bool show_report)
 {
   prop_conv.set_message_handler(get_message_handler());
   prop_conv.set_verbosity(get_verbosity());
@@ -527,7 +551,7 @@ bool bmct::decide(prop_convt &prop_conv)
       counterexample_beautificationt()(
         bv_cbmc, equation, ns);
     }
-    error_trace(prop_conv);
+    if(show_report) error_trace(prop_conv);
     report_failure();
     break;
 
@@ -590,16 +614,18 @@ void bmct::setup_unwind()
       val.erase(0, nr.size()+1);
     }
 
+    unsigned uw = std::numeric_limits<unsigned>::max();
+    std::string id = val;
     if(val.rfind(":")!=std::string::npos)
     {
-      std::string id=val.substr(0, val.rfind(":"));
-      unsigned uw=safe_str2unsigned(val.substr(val.rfind(":")+1).c_str());
-
-      if(thread_nr_set)
-        symex.set_unwind_thread_loop_limit(thread_nr, id, uw);
-      else
-        symex.set_unwind_loop_limit(id, uw);
+      id=val.substr(0, val.rfind(":"));
+      uw=safe_str2unsigned(val.substr(val.rfind(":")+1).c_str());
     }
+
+    if(thread_nr_set)
+      symex.set_unwind_thread_loop_limit(thread_nr, id, uw);
+    else
+      symex.set_unwind_loop_limit(id, uw);
     
     if(next==std::string::npos) break;
     idx=next;
@@ -618,8 +644,10 @@ void bmct::setup_unwind()
   symex.incr_loop_id = options.get_option("incremental-check");
 
   //freeze variables where unrollings are stitched together
-  if(symex.incr_loop_id!="") 
+  if(symex.incr_loop_id!="" || options.get_bool_option("incremental")) 
   {
+    status() << "Using incremental mode" << eom;
+    symex.is_incremental = true;
     symex.prop_conv.set_all_frozen();
     equation.is_incremental = true;
   }
