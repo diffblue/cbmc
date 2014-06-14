@@ -2919,6 +2919,15 @@ void c_typecheck_baset::typecheck_expr_shifts(shift_exprt &expr)
     }
   }
 
+  if(o_type0.id()==ID_vector &&
+     is_number(follow(o_type0.subtype())) &&
+     is_number(o_type1))
+  {
+    // {a0, a1, ..., an} >> b == {a0 >> b, a1 >> b, ..., an >> b}
+    expr.type()=op0.type();
+    return;
+  }
+
   // must do the promotions _separately_!
   implicit_typecast_arithmetic(op0);
   implicit_typecast_arithmetic(op1);
