@@ -22,6 +22,15 @@ struct S2
 
 STATIC_ASSERT(sizeof(struct S2)==sizeof(char));
 
+struct S3
+{
+  char my_bit : 1;
+  int : 0; // zero width, causes padding to alignment of int
+  char other;
+};
+
+STATIC_ASSERT(sizeof(struct S3)==sizeof(int)+sizeof(char));
+
 int main()
 {
 }
