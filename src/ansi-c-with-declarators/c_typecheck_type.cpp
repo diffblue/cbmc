@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "c_qualifiers.h"
 #include "ansi_c_declaration.h"
 #include "padding.h"
+#include "type2name.h"
 
 /*******************************************************************\
 
@@ -483,69 +484,90 @@ Function: c_typecheck_baset::typecheck_compound_type
 void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
 {
   // These get replaced by symbol types.
+  irep_idt identifier;
   
-  irep_idt identifier=add_language_prefix(type.find(ID_tag).get(ID_identifier));
   bool have_body=type.find(ID_components).is_not_nil();
   
   if(type.find(ID_tag).is_nil())
   {
-    // anonymous?
-  }
-  
-  // does it exist already?
-  symbol_tablet::symbolst::iterator s_it=
-    symbol_table.symbols.find(identifier);
+    // Anonymous? Must come with body.
+    assert(have_body);
 
-  if(s_it==symbol_table.symbols.end())
-  {
-    // no, add new symbol
-    type.remove(ID_tag);
-    irep_idt base_name=type.find(ID_tag).get(ID_C_base_name);
-    type.set(ID_tag, base_name);
-
+    // add new symbol
     symbolt compound_symbol;
     compound_symbol.is_type=true;
-    compound_symbol.name=identifier;
-    compound_symbol.base_name=base_name;
     compound_symbol.type=type;
     compound_symbol.location=type.location();
 
-    if(have_body)
-    {
-      typecheck_compound_body(compound_symbol);
-    }
-    else
-    {
-      if(compound_symbol.type.id()==ID_struct)
-        compound_symbol.type.id(ID_incomplete_struct);
-      else if(compound_symbol.type.id()==ID_union)
-        compound_symbol.type.id(ID_incomplete_union);
-      else
-        assert(false);
-    }
+    typecheck_compound_body(compound_symbol);
+
+    std::string typestr=type2name(compound_symbol.type);
+    compound_symbol.base_name="#anon-"+typestr;
+    compound_symbol.name=add_language_prefix("tag-#anon#"+typestr);
+    identifier=compound_symbol.name;
     
     symbolt *new_symbol;
     move_symbol(compound_symbol, new_symbol);
   }
   else
   {
-    // yes, it exists already
-    if(s_it->second.type.id()==ID_incomplete_struct ||
-       s_it->second.type.id()==ID_incomplete_union)
+    identifier=add_language_prefix(type.find(ID_tag).get(ID_identifier));
+    
+    // does it exist already?
+    symbol_tablet::symbolst::iterator s_it=
+      symbol_table.symbols.find(identifier);
+
+    if(s_it==symbol_table.symbols.end())
     {
-      // Maybe we got a body now.
+      // no, add new symbol
+      type.remove(ID_tag);
+      irep_idt base_name=type.find(ID_tag).get(ID_C_base_name);
+      type.set(ID_tag, base_name);
+
+      symbolt compound_symbol;
+      compound_symbol.is_type=true;
+      compound_symbol.name=identifier;
+      compound_symbol.base_name=base_name;
+      compound_symbol.type=type;
+      compound_symbol.location=type.location();
+
       if(have_body)
       {
-        s_it->second.type=type;
-        typecheck_compound_body(s_it->second);
+        typecheck_compound_body(compound_symbol);
       }
+      else
+      {
+        if(compound_symbol.type.id()==ID_struct)
+          compound_symbol.type.id(ID_incomplete_struct);
+        else if(compound_symbol.type.id()==ID_union)
+          compound_symbol.type.id(ID_incomplete_union);
+        else
+          assert(false);
+      }
+      
+      symbolt *new_symbol;
+      move_symbol(compound_symbol, new_symbol);
     }
-    else if(have_body)
+    else
     {
-      err_location(type);
-      str << "redefinition of " << type.id() << " body";
-      error();
-      throw 0;
+      // yes, it exists already
+      if(s_it->second.type.id()==ID_incomplete_struct ||
+         s_it->second.type.id()==ID_incomplete_union)
+      {
+        // Maybe we got a body now.
+        if(have_body)
+        {
+          s_it->second.type=type;
+          typecheck_compound_body(s_it->second);
+        }
+      }
+      else if(have_body)
+      {
+        err_location(type);
+        str << "redefinition of " << type.id() << " body";
+        error();
+        throw 0;
+      }
     }
   }
 
