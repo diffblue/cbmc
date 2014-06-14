@@ -154,7 +154,7 @@ void ansi_c_parsert::add_declarator(
 
     bool force_root_scope=false;
   
-    if(ansi_c_declaration.type().id()==ID_code)
+    if(new_declarator.type().id()==ID_code)
     {
       // functions always go into global scope
       force_root_scope=true;
