@@ -543,7 +543,8 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
     else if(have_body)
     {
       err_location(type);
-      error("redefinition of compound body");
+      str << "redefinition of " << type.id() << " body";
+      error();
       throw 0;
     }
   }
