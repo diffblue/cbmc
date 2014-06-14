@@ -2094,6 +2094,13 @@ jump_statement:
             mto($$, $2);
           }
         }
+        | TOK_GOTO typedef_name ';'
+        {
+          $$=$1;
+          statement($$, ID_goto);
+          irep_idt identifier=PARSER.lookup_label(stack($2).get(ID_C_base_name));
+          stack($$).set(ID_destination, identifier);
+        }
         | TOK_CONTINUE ';'
         { $$=$1; statement($$, ID_continue); }
         | TOK_BREAK ';'
