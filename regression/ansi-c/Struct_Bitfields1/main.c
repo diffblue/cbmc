@@ -27,9 +27,10 @@ struct S3
   char my_bit : 1;
   int : 0; // zero width, causes padding to alignment of int
   char other;
+  int whatnot;
 };
 
-STATIC_ASSERT(sizeof(struct S3)==sizeof(int)+sizeof(char));
+STATIC_ASSERT(sizeof(struct S3)==sizeof(int)+sizeof(int)+sizeof(int));
 
 int main()
 {
