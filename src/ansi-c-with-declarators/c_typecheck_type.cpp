@@ -692,6 +692,19 @@ void c_typecheck_baset::typecheck_compound_body(symbolt &symbol)
   if(symbol.type.id()==ID_struct)
     add_padding(to_struct_type(symbol.type), *this);
 
+  // now remove zero-width bit-fields
+  for(struct_typet::componentst::iterator
+      it=components.begin();
+      it!=components.end();
+      ) // blank
+  {
+    if(it->get_is_bit_field() &&
+       it->type().get_int(ID_width)==0)
+      it=components.erase(it);
+    else
+      it++;
+  }
+
   // finally, check _Static_assert inside the compound
   for(struct_union_typet::componentst::iterator
       it=components.begin();
