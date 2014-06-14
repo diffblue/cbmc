@@ -51,6 +51,14 @@ Function: ansi_c_convertt::convert_declaration
 
 void ansi_c_convertt::convert_declaration(ansi_c_declarationt &declaration)
 {
+  if(declaration.get_is_static_assert())
+  {
+    assert(declaration.operands().size()==2);
+    convert_expr(declaration.op0());
+    convert_expr(declaration.op1());
+    return;
+  }
+
   c_storage_spect c_storage_spec;
 
   convert_type(declaration.type(), c_storage_spec);
