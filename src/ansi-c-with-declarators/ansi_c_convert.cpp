@@ -420,6 +420,9 @@ void ansi_c_convertt::convert_type(
     code_type.return_type().swap(code_type.subtype());
     code_type.remove(ID_subtype);
     
+    // recursive call on return type
+    convert_type(code_type.return_type());
+    
     // take care of parameter declarations
     code_typet::parameterst &parameters=code_type.parameters();
 
