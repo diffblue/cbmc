@@ -21,6 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "ansi_c_declaration.h"
 #include "padding.h"
 #include "type2name.h"
+#include "ansi_c_convert_type.h"
 
 /*******************************************************************\
 

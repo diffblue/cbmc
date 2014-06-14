@@ -74,7 +74,7 @@ void c_typecheck_baset::typecheck_code(codet &code)
     typecheck_break(code);
   else if(statement==ID_goto)
     typecheck_goto(code);
-  else if(statement=="computed-goto")
+  else if(statement==ID_computed_goto)
     typecheck_computed_goto(code);
   else if(statement==ID_continue)
     typecheck_continue(code);

@@ -300,7 +300,7 @@ void ansi_c_convertt::convert_code(codet &code)
   else if(statement==ID_goto)
   {
   }
-  else if(statement=="computed-goto")
+  else if(statement==ID_computed_goto)
   {
     assert(code.operands().size()==1);
 

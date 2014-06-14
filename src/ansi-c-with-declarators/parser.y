@@ -2082,7 +2082,7 @@ jump_statement:
           {
             // this is a gcc extension.
             // the original grammar uses identifier_or_typedef_name
-            statement($$, "computed-goto");
+            statement($$, ID_gcc_computed_goto);
             mto($$, $2);
           }
         }
