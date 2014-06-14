@@ -670,7 +670,7 @@ void c_typecheck_baset::typecheck_compound_body(symbolt &symbol)
       new_component.location()=declaration.location();
       new_component.operands().swap(declaration.operands());
       assert(new_component.operands().size()==2);
-      components.push_back(new_component);
+      // should perhaps check the assertion
     }
     else
     {
