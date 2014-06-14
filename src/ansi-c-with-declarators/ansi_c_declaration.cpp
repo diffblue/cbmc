@@ -125,12 +125,14 @@ typet ansi_c_declarationt::full_type(
   while(p->is_not_nil())
   {
     if(p->id()==ID_pointer || p->id()==ID_array || 
-       p->id()==ID_vector || p->id()==ID_c_bitfield)
+       p->id()==ID_vector || p->id()==ID_c_bitfield ||
+       p->id()==ID_block_pointer)
       p=&p->subtype();
     else if(p->id()==ID_code)
       p=&(to_code_type(*p).return_type());
     else
     {
+      std::cout << "result: " << result.pretty() << "\n";
       std::cout << "p: " << p->pretty() << "\n";
       assert(false);
     }
