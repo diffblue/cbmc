@@ -414,6 +414,7 @@ is_extern
 is_global
 is_thread_local
 is_parameter
+is_member
 is_type
 is_register
 is_typedef

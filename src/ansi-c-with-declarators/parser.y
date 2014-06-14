@@ -1379,6 +1379,7 @@ member_default_declaring_list:
           $2=merge($2, $1);
 
           init($$, ID_declaration);
+          to_ansi_c_declaration(stack($$)).set_is_member(true);
           stack($$).type().swap(stack($2));
           PARSER.add_declarator(stack($$), stack($3));
         }
@@ -1397,6 +1398,7 @@ member_declaring_list:
           $2=merge($2, $1);
 
           init($$, ID_declaration);
+          to_ansi_c_declaration(stack($$)).set_is_member(true);
           stack($$).type().swap(stack($2));
           PARSER.add_declarator(stack($$), stack($3));
         }
