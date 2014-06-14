@@ -37,14 +37,20 @@ Function: c_typecheck_baset::typecheck_type
 
 void c_typecheck_baset::typecheck_type(typet &type)
 {
+  // we first convert, and then check
+  {
+    ansi_c_convert_typet ansi_c_convert_type(get_message_handler());
+
+    ansi_c_convert_type.read(type);
+    ansi_c_convert_type.write(type);
+  }
+  
   if(type.id()==ID_already_typechecked)
   {
     type.swap(type.subtype());
     return; // done
   }
 
-  // we first convert, and then check
-  
   // do we have alignment?
   if(type.find(ID_C_alignment).is_not_nil())
   {
@@ -216,6 +222,10 @@ Function: c_typecheck_baset::typecheck_code_type
 
 void c_typecheck_baset::typecheck_code_type(code_typet &type)
 {
+  // the return type is still 'subtype()'
+  type.return_type()=type.subtype();
+  type.remove(ID_subtype);
+
   code_typet::parameterst &parameters=type.parameters();
   
   // if we don't have any parameters, we assume it's (...)
@@ -605,6 +615,49 @@ void c_typecheck_baset::typecheck_compound_body(symbolt &symbol)
 {
   struct_union_typet::componentst &components=
     to_struct_union_type(symbol.type).components();
+
+  struct_union_typet::componentst old_components;
+  old_components.swap(components);
+
+  // We get these as declarations!
+  for(struct_union_typet::componentst::iterator
+      it=old_components.begin();
+      it!=old_components.end();
+      it++)
+  {
+    // the arguments are member declarations or static assertions
+    assert(it->id()==ID_declaration);
+    
+    ansi_c_declarationt &declaration=
+      to_ansi_c_declaration(static_cast<exprt &>(*it));
+      
+    if(declaration.get_is_static_assert())
+    {
+      struct_union_typet::componentt new_component;
+      new_component.id(ID_static_assert);
+      new_component.location()=declaration.location();
+      new_component.operands().swap(declaration.operands());
+      assert(new_component.operands().size()==2);
+      components.push_back(new_component);
+    }
+    else
+    {
+      for(ansi_c_declarationt::declaratorst::iterator
+          d_it=declaration.declarators().begin();
+          d_it!=declaration.declarators().end();
+          d_it++)
+      {
+        struct_union_typet::componentt new_component;
+
+        new_component.location()=d_it->location();
+        new_component.set(ID_name, d_it->get_base_name());
+        new_component.set(ID_pretty_name, d_it->get_base_name());
+        new_component.type()=declaration.full_type(*d_it);
+
+        components.push_back(new_component);
+      }
+    }
+  }
 
   // mark bit-fields as such
   for(struct_union_typet::componentst::iterator
