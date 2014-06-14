@@ -74,8 +74,8 @@ void c_typecheck_baset::typecheck_code(codet &code)
     typecheck_break(code);
   else if(statement==ID_goto)
     typecheck_goto(code);
-  else if(statement==ID_computed_goto)
-    typecheck_computed_goto(code);
+  else if(statement==ID_gcc_computed_goto)
+    typecheck_gcc_computed_goto(code);
   else if(statement==ID_continue)
     typecheck_continue(code);
   else if(statement==ID_return)
@@ -767,7 +767,7 @@ void c_typecheck_baset::typecheck_goto(codet &code)
 
 /*******************************************************************\
 
-Function: c_typecheck_baset::typecheck_computed_goto
+Function: c_typecheck_baset::typecheck_gcc_computed_goto
 
   Inputs:
 
@@ -777,7 +777,7 @@ Function: c_typecheck_baset::typecheck_computed_goto
 
 \*******************************************************************/
 
-void c_typecheck_baset::typecheck_computed_goto(codet &code)
+void c_typecheck_baset::typecheck_gcc_computed_goto(codet &code)
 {
   if(code.operands().size()!=1)
   {
