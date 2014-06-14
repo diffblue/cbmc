@@ -849,6 +849,10 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
   
   // remove these now
   as_expr.operands().clear();
+  
+  // We need to determine a width, and a signedness.
+  // We just do int, but gcc might pick smaller widths.
+  type.set(ID_width, config.ansi_c.int_width);
 }
 
 /*******************************************************************\
