@@ -18,7 +18,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "c_types.h"
 #include "c_sizeof.h"
 #include "c_qualifiers.h"
+#include "ansi_c_declaration.h"
 #include "padding.h"
+#include "type2name.h"
+#include "ansi_c_convert_type.h"
 
 /*******************************************************************\
 
@@ -35,7 +38,25 @@ Function: c_typecheck_baset::typecheck_type
 void c_typecheck_baset::typecheck_type(typet &type)
 {
   // we first convert, and then check
+  {
+    ansi_c_convert_typet ansi_c_convert_type(get_message_handler());
+
+    ansi_c_convert_type.read(type);
+    ansi_c_convert_type.write(type);
+  }
   
+  if(type.id()==ID_already_typechecked)
+  {
+    // need to preserve any qualifiers
+    c_qualifierst c_qualifiers(type);
+    c_qualifiers+=c_qualifierst(type.subtype());
+    bool packed=type.get_bool(ID_C_packed);
+    type.swap(type.subtype());
+    c_qualifiers.write(type);
+    if(packed) type.set(ID_C_packed, true);
+    return; // done
+  }
+
   // do we have alignment?
   if(type.find(ID_C_alignment).is_not_nil())
   {
@@ -57,8 +78,7 @@ void c_typecheck_baset::typecheck_type(typet &type)
           type.id()==ID_union)
     typecheck_compound_type(to_struct_union_type(type));
   else if(type.id()==ID_c_enum)
-  {
-  }
+    typecheck_c_enum_type(type);
   else if(type.id()==ID_c_bitfield)
     typecheck_c_bit_field_type(type);
   else if(type.id()==ID_typeof)
@@ -72,6 +92,38 @@ void c_typecheck_baset::typecheck_type(typet &type)
           type.id()==ID_custom_floatbv ||
           type.id()==ID_custom_fixedbv)
     typecheck_custom_type(type);
+  else if(type.id()==ID_gcc_attribute_mode)
+  {
+    // A list of all modes ist at
+    // http://www.delorie.com/gnu/docs/gcc/gccint_53.html
+    typecheck_type(type.subtype());
+    
+    bool is_signed=type.subtype().id()==ID_signedbv;
+    
+    // get width
+    irep_idt mode=type.get(ID_size);
+    
+    if(mode=="__QI__") // 8 bits
+      type=is_signed?signed_char_type():unsigned_char_type();
+    else if(mode=="__HI__") // 16 bits
+      type=is_signed?signed_short_int_type():unsigned_short_int_type();
+    else if(mode=="__SI__") // 32 bits
+      type=is_signed?signed_int_type():unsigned_int_type();
+    else if(mode=="__DI__") // 64 bits
+    {
+      if(config.ansi_c.long_int_width==64)
+        type=is_signed?signed_long_int_type():unsigned_long_int_type();
+      else
+      {
+        assert(config.ansi_c.long_long_int_width==64);
+        type=is_signed?signed_long_long_int_type():unsigned_long_long_int_type();
+      }
+    }
+    else if(mode=="__TI__") // 128 bits
+      type=is_signed?gcc_signed_int128_type():gcc_unsigned_int128_type();
+    else // give up, use base
+      type=type.subtype();
+  }
 
   // do a bit of rule checking
 
@@ -208,6 +260,10 @@ Function: c_typecheck_baset::typecheck_code_type
 
 void c_typecheck_baset::typecheck_code_type(code_typet &type)
 {
+  // the return type is still 'subtype()'
+  type.return_type()=type.subtype();
+  type.remove(ID_subtype);
+
   code_typet::parameterst &parameters=type.parameters();
   
   // if we don't have any parameters, we assume it's (...)
@@ -215,41 +271,56 @@ void c_typecheck_baset::typecheck_code_type(code_typet &type)
   {
     type.make_ellipsis();
   }
-  else
+  else // we do have parameters
   {
-    // we do have parameters
+    // is the last one ellipsis?
+    if(type.parameters().back().id()==ID_ellipsis)
+    {
+      type.make_ellipsis();
+      type.parameters().pop_back();
+    }
     
     parameter_map.clear();
   
-    for(unsigned i=0; i<type.parameters().size(); i++)
+    for(code_typet::parameterst::iterator
+        p_it=type.parameters().begin();
+        p_it!=type.parameters().end();
+        p_it++)
     {
-      code_typet::parametert &parameter=type.parameters()[i];
-
-      // first fix type
-      typet &type=parameter.type();
-
-      typecheck_type(type);
-      
-      adjust_function_parameter(type);
-      
-      // adjust the identifier
-
-      irep_idt identifier=parameter.get_identifier();
-
-      if(identifier!=irep_idt())
+      // turn the declarations into parameters
+      if(p_it->id()==ID_declaration)
       {
-        identifier=add_language_prefix(identifier);
+        ansi_c_declarationt &declaration=to_ansi_c_declaration(*p_it);
+      
+        code_typet::parametert parameter;
+
+        // first fix type
+        typet &type=parameter.type();
+        type=declaration.full_type(declaration.declarator());
+        std::list<codet> tmp_clean_code;
+        tmp_clean_code.swap(clean_code); // ignore side-effects
+        typecheck_type(type);
+        tmp_clean_code.swap(clean_code);
+        adjust_function_parameter(type);
+      
+        // adjust the identifier
+        irep_idt identifier=declaration.declarator().get_name();
+
+        // abstract or not?
+        if(identifier==irep_idt())
+        {
+        }
+        else
+        {
+          identifier=add_language_prefix(identifier);
     
-        id_replace_mapt::const_iterator
-          m_it=id_replace_map.find(identifier);
-
-        if(m_it!=id_replace_map.end())
-          identifier=m_it->second;
-
-        parameter.set_identifier(identifier);
-
-        // make visible now, later parameters might use it
-        parameter_map[identifier]=type;
+          // make visible now, later parameters might use it
+          parameter_map[identifier]=type;
+          parameter.set_base_name(declaration.declarator().get_base_name());
+        }
+        
+        // put the parameter in place of the declaration
+        p_it->swap(parameter);
       }
     }
     
@@ -347,7 +418,82 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
       size=tmp_size;
     }
     else if(tmp_size.id()==ID_infinity)
+    {
       size=tmp_size;
+    }
+    else if(tmp_size.id()==ID_symbol &&
+            tmp_size.type().get_bool(ID_C_constant))
+    {
+      // We allow a constant variable as array size, assuming
+      // it won't change.
+      // This criterion can be tricked:
+      // Of course we can modify a 'const' symbol, e.g.,
+      // using a pointer type cast. Interestingly,
+      // at least gcc 4.2.1 makes the very same mistake!
+      size=tmp_size;
+    }
+    else
+    {
+      // not a constant and not infinity
+    
+      assert(current_symbol_id!=irep_idt());
+        
+      const symbolt &base_symbol=
+        lookup(
+          //base_symbol_identifier!=irep_idt()?
+          //base_symbol_identifier:
+          current_symbol_id);
+      
+      // Need to pull out! We insert new symbol.
+      locationt location=size.find_location();
+      unsigned count=0;
+      irep_idt temp_identifier;
+      std::string suffix;
+
+      do
+      {
+        suffix="$array_size"+i2string(count);
+        temp_identifier=id2string(base_symbol.name)+suffix;
+        count++;
+      }
+      while(symbol_table.symbols.find(temp_identifier)!=symbol_table.symbols.end());
+
+      // add the symbol to symbol table
+      symbolt new_symbol;
+      new_symbol.name=temp_identifier;
+      new_symbol.pretty_name=id2string(base_symbol.pretty_name)+suffix;
+      new_symbol.base_name=id2string(base_symbol.base_name)+suffix;
+      new_symbol.type=size.type();
+      new_symbol.type.set(ID_C_constant, true);
+      new_symbol.is_file_local=true;
+      new_symbol.is_type=false;
+      new_symbol.is_thread_local=true;
+      new_symbol.is_static_lifetime=false;
+      new_symbol.value.make_nil();
+      new_symbol.location=location;
+      
+      symbol_table.add(new_symbol);
+
+      // produce the code that declares and initializes the symbol
+      symbol_exprt symbol_expr;
+      symbol_expr.set_identifier(temp_identifier);
+      symbol_expr.type()=new_symbol.type;
+      
+      code_declt declaration(symbol_expr);
+      declaration.location()=location;
+
+      code_assignt assignment;
+      assignment.lhs()=symbol_expr;
+      assignment.rhs()=size;
+      assignment.location()=location;
+
+      // store the code
+      clean_code.push_back(declaration);
+      clean_code.push_back(assignment);
+
+      // fix type
+      size=symbol_expr;
+    }
   }
 }
 
@@ -382,7 +528,8 @@ void c_typecheck_baset::typecheck_vector_type(vector_typet &type)
      subtype.id()!=ID_fixedbv)
   {
     err_location(size_location);
-    error("cannot make a vector of this type");
+    str << "cannot make a vector of subtype "
+        << to_string(subtype);
     throw 0;
   }
 
@@ -455,29 +602,190 @@ Function: c_typecheck_baset::typecheck_compound_type
 
 \*******************************************************************/
 
+#include <iostream>
+
 void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
 {
-  struct_union_typet::componentst &components=type.components();
+  // These get replaced by symbol types.
+  irep_idt identifier;
+  
+  bool have_body=type.find(ID_components).is_not_nil();
+  
+  if(type.find(ID_tag).is_nil())
+  {
+    // Anonymous? Must come with body.
+    assert(have_body);
 
-  // mark bit-fields
-  for(struct_union_typet::componentst::iterator
-      it=components.begin();
-      it!=components.end();
-      it++)
-    if(it->type().id()==ID_c_bitfield)
+    // produce symbol
+    symbolt compound_symbol;
+    compound_symbol.is_type=true;
+    compound_symbol.type=type;
+    compound_symbol.location=type.location();
+
+    typecheck_compound_body(compound_symbol);
+
+    std::string typestr=type2name(compound_symbol.type);
+    compound_symbol.base_name="#anon-"+typestr;
+    compound_symbol.name=add_language_prefix("tag-#anon#"+typestr);
+    identifier=compound_symbol.name;
+    
+    // We might already have the same anonymous union/struct,
+    // and this is simply ok. Note that the C standard treats
+    // these as different types.
+    if(symbol_table.symbols.find(identifier)==symbol_table.symbols.end())
     {
-      it->set_is_bit_field(true);
-      typet tmp=it->type().subtype();
-      typecheck_type(tmp);
-      it->set_bit_field_type(tmp);
+      symbolt *new_symbol;
+      move_symbol(compound_symbol, new_symbol);
     }
+  }
+  else
+  {
+    identifier=add_language_prefix(type.find(ID_tag).get(ID_identifier));
+    
+    // does it exist already?
+    symbol_tablet::symbolst::iterator s_it=
+      symbol_table.symbols.find(identifier);
 
-  // check subtypes
+    if(s_it==symbol_table.symbols.end())
+    {
+      // no, add new symbol
+      irep_idt base_name=type.find(ID_tag).get(ID_C_base_name);
+      type.remove(ID_tag);
+      type.set(ID_tag, base_name);
+
+      symbolt compound_symbol;
+      compound_symbol.is_type=true;
+      compound_symbol.name=identifier;
+      compound_symbol.base_name=base_name;
+      compound_symbol.type=type;
+      compound_symbol.location=type.location();
+      compound_symbol.pretty_name=id2string(type.id())+" "+id2string(base_name);
+
+      if(have_body)
+      {
+        // add before doing the body (may be recursive)      
+        symbolt *new_symbol;
+        move_symbol(compound_symbol, new_symbol);
+
+        typecheck_compound_body(*new_symbol);
+      }
+      else
+      {
+        if(compound_symbol.type.id()==ID_struct)
+          compound_symbol.type.id(ID_incomplete_struct);
+        else if(compound_symbol.type.id()==ID_union)
+          compound_symbol.type.id(ID_incomplete_union);
+        else
+          assert(false);
+
+        symbolt *new_symbol;
+        move_symbol(compound_symbol, new_symbol);
+      }
+    }
+    else
+    {
+      // yes, it exists already
+      if(s_it->second.type.id()==ID_incomplete_struct ||
+         s_it->second.type.id()==ID_incomplete_union)
+      {
+        // Maybe we got a body now.
+        if(have_body)
+        {
+          s_it->second.type=type;
+          typecheck_compound_body(s_it->second);
+        }
+      }
+      else if(have_body)
+      {
+        err_location(type);
+        str << "redefinition of body of `" << s_it->second.pretty_name << "'";
+        error();
+        throw 0;
+      }
+    }
+  }
+
+  symbol_typet symbol_type;
+  symbol_type.location()=type.location();
+  symbol_type.set_identifier(identifier);
+
+  type.swap(symbol_type);
+}
+
+/*******************************************************************\
+
+Function: c_typecheck_baset::typecheck_compound_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void c_typecheck_baset::typecheck_compound_body(symbolt &symbol)
+{
+  struct_union_typet::componentst &components=
+    to_struct_union_type(symbol.type).components();
+
+  struct_union_typet::componentst old_components;
+  old_components.swap(components);
+
+  // We get these as declarations!
   for(struct_union_typet::componentst::iterator
-      it=components.begin();
-      it!=components.end();
+      it=old_components.begin();
+      it!=old_components.end();
       it++)
-    typecheck_type(it->type());
+  {
+    // the arguments are member declarations or static assertions
+    assert(it->id()==ID_declaration);
+    
+    ansi_c_declarationt &declaration=
+      to_ansi_c_declaration(static_cast<exprt &>(*it));
+      
+    if(declaration.get_is_static_assert())
+    {
+      struct_union_typet::componentt new_component;
+      new_component.id(ID_static_assert);
+      new_component.location()=declaration.location();
+      new_component.operands().swap(declaration.operands());
+      assert(new_component.operands().size()==2);
+      components.push_back(new_component);
+    }
+    else
+    {
+      // do first half of type
+      typecheck_type(declaration.type());
+      make_already_typechecked(declaration.type());
+    
+      for(ansi_c_declarationt::declaratorst::iterator
+          d_it=declaration.declarators().begin();
+          d_it!=declaration.declarators().end();
+          d_it++)
+      {
+        struct_union_typet::componentt new_component;
+
+        new_component.location()=d_it->location();
+        new_component.set(ID_name, d_it->get_base_name());
+        new_component.set(ID_pretty_name, d_it->get_base_name());
+        new_component.type()=declaration.full_type(*d_it);
+
+        // mark bit-fields as such
+        if(new_component.type().id()==ID_c_bitfield)
+        {
+          new_component.set_is_bit_field(true);
+          typet tmp=new_component.type().subtype();
+          typecheck_type(tmp);
+          new_component.set_bit_field_type(tmp);
+        }
+        
+        typecheck_type(new_component.type());
+
+        components.push_back(new_component);
+      }
+    }
+  }
 
   unsigned anon_member_counter=0;
 
@@ -513,7 +821,7 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
   // We allow an incomplete (C99) array as _last_ member!
   // Zero-length is allowed everywhere.
 
-  if(type.id()==ID_struct)
+  if(symbol.type.id()==ID_struct)
   {
     for(struct_union_typet::componentst::iterator
         it=components.begin();
@@ -543,8 +851,21 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
   // unless there is an attribute that says that the struct is
   // 'packed'
 
-  if(type.id()==ID_struct)
-    add_padding(to_struct_type(type), *this);
+  if(symbol.type.id()==ID_struct)
+    add_padding(to_struct_type(symbol.type), *this);
+
+  // now remove zero-width bit-fields
+  for(struct_typet::componentst::iterator
+      it=components.begin();
+      it!=components.end();
+      ) // blank
+  {
+    if(it->get_is_bit_field() &&
+       it->type().get_int(ID_width)==0)
+      it=components.erase(it);
+    else
+      it++;
+  }
 
   // finally, check _Static_assert inside the compound
   for(struct_union_typet::componentst::iterator
@@ -552,7 +873,7 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
       it!=components.end();
       ) // no it++
   {
-    if(it->id()==ID_code && it->get(ID_statement)==ID_static_assert)
+    if(it->id()==ID_static_assert)
     {
       assert(it->operands().size()==2);
       exprt &assertion=it->op0();
@@ -576,6 +897,39 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
     else
       it++;
   }  
+}
+
+/*******************************************************************\
+
+Function: c_typecheck_baset::typecheck_c_enum_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void c_typecheck_baset::typecheck_c_enum_type(typet &type)
+{
+  // these have the declarations of the enum constants as operands
+  exprt &as_expr=static_cast<exprt &>(static_cast<irept &>(type));
+  locationt location=type.location();
+  
+  Forall_operands(it, as_expr)
+  {
+    ansi_c_declarationt &declaration=to_ansi_c_declaration(*it);
+    typecheck_declaration(declaration);
+  }
+  
+  // remove these now
+  as_expr.operands().clear();
+  
+  // We need to determine a width, and a signedness.
+  // We just do int, but gcc might pick smaller widths
+  // if the type is marked as 'packed'.
+  type.set(ID_width, config.ansi_c.int_width);
 }
 
 /*******************************************************************\
@@ -665,6 +1019,9 @@ Function: c_typecheck_baset::typecheck_typeof_type
 
 void c_typecheck_baset::typecheck_typeof_type(typet &type)
 {
+  // save location
+  locationt location=type.location();
+
   // retain the qualifiers as is
   c_qualifierst c_qualifiers;
   c_qualifiers.read(type);
@@ -693,6 +1050,7 @@ void c_typecheck_baset::typecheck_typeof_type(typet &type)
     type.swap(expr.type());
   }
   
+  type.location()=location;
   c_qualifiers.write(type);
 }
 
@@ -715,9 +1073,6 @@ void c_typecheck_baset::typecheck_symbol_type(typet &type)
     symbol_typet &symbol_type=to_symbol_type(type);
     symbol_type.set_identifier(add_language_prefix(symbol_type.get_identifier()));
   }
-
-  // adjust identifier, if needed
-  replace_symbol(type);
 
   const irep_idt &identifier=
     to_symbol_type(type).get_identifier();
@@ -789,7 +1144,8 @@ void c_typecheck_baset::adjust_function_parameter(typet &type) const
   }
   else if(type.id()==ID_code)
   {
-    // see ISO/IEC 9899:1999 page 199 clause 8
+    // see ISO/IEC 9899:1999 page 199 clause 8,
+    // may be hidden in typedef
     pointer_typet tmp;
     tmp.subtype()=type;
     type.swap(tmp);
@@ -798,140 +1154,6 @@ void c_typecheck_baset::adjust_function_parameter(typet &type) const
   {
     // any KnR args without type yet?
     type=signed_int_type(); // the default is integer!
-  }
-}
-
-/*******************************************************************\
-
-Function: c_typecheck_baset::clean_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void c_typecheck_baset::clean_type(
-  const irep_idt &base_symbol_identifier,
-  typet &type,
-  std::list<codet> &code)
-{
-  if(type.id()==ID_symbol)
-  {
-    // we need to follow for structs and such, but only once
-    irep_idt identifier=to_symbol_type(type).get_identifier();
-    if(already_cleaned.insert(identifier).second)
-    {
-      symbol_tablet::symbolst::iterator s_it=symbol_table.symbols.find(identifier);
-      assert(s_it!=symbol_table.symbols.end());
-      clean_type(identifier, s_it->second.type, code);
-    }
-  }
-  else if(type.id()==ID_array)
-  {
-    array_typet &array_type=to_array_type(type);
-  
-    clean_type(base_symbol_identifier, array_type.subtype(), code);
-
-    // The size need not be a constant!
-    // This was simplified already by typecheck_array_type.
-    
-    exprt &size=array_type.size();
-    
-    if(size.is_not_nil() &&
-       !size.is_constant() &&
-       size.id()!=ID_infinity &&
-       !(size.id()==ID_symbol && size.type().get_bool(ID_C_constant)))
-    {
-      // The criterion above can be tricked:
-      // Of course we can modify a 'const' symbol, e.g.,
-      // using a pointer type cast. Interestingly,
-      // at least gcc 4.2.1 makes the very same mistake!
-    
-      assert(current_symbol_id!=irep_idt());
-        
-      const symbolt &base_symbol=
-        lookup(
-          base_symbol_identifier!=irep_idt()?
-          base_symbol_identifier:
-          current_symbol_id);
-      
-      // Need to pull out! We insert new symbol.
-      locationt location=size.find_location();
-      unsigned count=0;
-      irep_idt temp_identifier;
-      std::string suffix;
-
-      do
-      {
-        suffix="$array_size"+i2string(count);
-        temp_identifier=id2string(base_symbol.name)+suffix;
-        count++;
-      }
-      while(symbol_table.symbols.find(temp_identifier)!=symbol_table.symbols.end());
-
-      // add the symbol to symbol table
-      symbolt new_symbol;
-      new_symbol.name=temp_identifier;
-      new_symbol.pretty_name=id2string(base_symbol.pretty_name)+suffix;
-      new_symbol.base_name=id2string(base_symbol.base_name)+suffix;
-      new_symbol.type=size.type();
-      new_symbol.type.set(ID_C_constant, true);
-      new_symbol.is_file_local=true;
-      new_symbol.is_type=false;
-      new_symbol.is_thread_local=true;
-      new_symbol.is_static_lifetime=false;
-      new_symbol.value.make_nil();
-      new_symbol.location=location;
-      
-      symbol_table.add(new_symbol);
-
-      // produce the code that declares and initializes the symbol
-      symbol_exprt symbol_expr;
-      symbol_expr.set_identifier(temp_identifier);
-      symbol_expr.type()=new_symbol.type;
-      
-      code_declt declaration(symbol_expr);
-      declaration.location()=location;
-
-      code_assignt assignment;
-      assignment.lhs()=symbol_expr;
-      assignment.rhs()=size;
-      assignment.location()=location;
-
-      // store the code
-      code.push_back(declaration);
-      code.push_back(assignment);
-
-      // fix type
-      size=symbol_expr;
-    }
-  }
-  else if(type.id()==ID_struct ||
-          type.id()==ID_union)
-  {
-    struct_union_typet::componentst &components=
-      to_struct_union_type(type).components();
-
-    for(struct_union_typet::componentst::iterator
-        it=components.begin();
-        it!=components.end();
-        it++)
-      clean_type(base_symbol_identifier, it->type(), code);
-  }
-  else if(type.id()==ID_code)
-  {
-    // done, can't contain arrays
-  }
-  else if(type.id()==ID_pointer)
-  {
-    clean_type(base_symbol_identifier, type.subtype(), code);
-  }
-  else if(type.id()==ID_vector)
-  {
-    // should be clean
   }
 }
 

@@ -144,19 +144,11 @@ public:
     return scopes.back();
   }
 
-  static void convert_declarator(
-    irept &declarator,
-    const typet &type,
-    irept &identifier);
-    
   typedef enum { TAG, MEMBER, PARAMETER, OTHER } decl_typet;
 
-  void new_declaration(
-    const irept &type,
-    irept &declarator,
-    exprt &declaration,
-    decl_typet decl_type);
-   
+  // convert a declarator and then add it to existing an declaration
+  void add_declarator(exprt &declaration, irept &declarator);
+
   void copy_item(const ansi_c_declarationt &declaration)
   {
     assert(declaration.id()==ID_declaration);
@@ -173,7 +165,7 @@ public:
   ansi_c_id_classt lookup(
     std::string &name,
     bool tag,
-    bool label) const;
+    bool label);
 
   static ansi_c_id_classt get_class(const typet &type);
   

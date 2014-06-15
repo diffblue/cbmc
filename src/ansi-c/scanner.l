@@ -45,8 +45,8 @@ int make_identifier()
 {
   loc();
 
-  std::string base_name(yytext);
-  std::string identifier(base_name);
+  irep_idt base_name=yytext;
+  std::string identifier(id2string(base_name));
 
   // figure out if this is a typedef or something else
   ansi_c_id_classt result=

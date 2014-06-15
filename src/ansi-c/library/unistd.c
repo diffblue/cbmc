@@ -30,15 +30,6 @@ int unlink(const char *s)
 #define __CPROVER_ERRNO_H_INCLUDED
 #endif
 
-#ifndef __CPROVER_pipet_declared
-struct __CPROVER_pipet {
-  _Bool widowed;
-  char data[4];
-  short next_avail;
-  short next_unread;
-};
-#define __CPROVER_pipet_declared
-#endif
 extern struct __CPROVER_pipet __CPROVER_pipes[];
 // offset to make sure we don't collide with other fds
 extern const int __CPROVER_pipe_offset;
@@ -82,15 +73,6 @@ int pipe(int fildes[2])
 #endif
 #endif
 
-#ifndef __CPROVER_pipet_declared
-struct __CPROVER_pipet {
-  _Bool widowed;
-  char data[4];
-  short next_avail;
-  short next_unread;
-};
-#define __CPROVER_pipet_declared
-#endif
 extern struct __CPROVER_pipet __CPROVER_pipes[];
 // offset to make sure we don't collide with other fds
 extern const int __CPROVER_pipe_offset;
@@ -127,15 +109,6 @@ int close(int fildes)
 #endif
 #endif
 
-#ifndef __CPROVER_pipet_declared
-struct __CPROVER_pipet {
-  _Bool widowed;
-  char data[4];
-  short next_avail;
-  short next_unread;
-};
-#define __CPROVER_pipet_declared
-#endif
 extern struct __CPROVER_pipet __CPROVER_pipes[];
 // offset to make sure we don't collide with other fds
 extern const int __CPROVER_pipe_offset;
@@ -184,15 +157,6 @@ ssize_t write(int fildes, const void *buf, size_t nbyte)
 #endif
 #endif
 
-#ifndef __CPROVER_pipet_declared
-struct __CPROVER_pipet {
-  _Bool widowed;
-  char data[4];
-  short next_avail;
-  short next_unread;
-};
-#define __CPROVER_pipet_declared
-#endif
 extern struct __CPROVER_pipet __CPROVER_pipes[];
 // offset to make sure we don't collide with other fds
 extern const int __CPROVER_pipe_offset;

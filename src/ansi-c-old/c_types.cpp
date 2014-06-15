@@ -43,7 +43,7 @@ Function: enum_type
 
 typet enum_type()
 {
-  // same as 'int', but might be unsigned, or shorter than 'int'
+  // same as 'int', but might be unsigned
   return signed_int_type();
 }
 

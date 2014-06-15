@@ -90,6 +90,45 @@ static void statement(YYSTYPE &expr, const irep_idt &id)
 
 /*******************************************************************\
 
+Function: decl_statement
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+static void decl_statement(
+  YYSTYPE &dest,
+  YYSTYPE &decl,
+  YYSTYPE &initializer)
+{
+  ansi_c_declarationt &ansi_c_declaration=
+    to_ansi_c_declaration(stack(decl));
+
+  codet decl_statement(ID_decl);
+  
+  symbol_exprt symbol;
+  symbol.set_identifier(ansi_c_declaration.get_name());
+  
+  decl_statement.move_to_operands(symbol);
+  
+  if(stack(initializer).is_not_nil())
+  {
+    // repeat declaration to set the initializer
+    ansi_c_declaration.value()=stack(initializer);
+    PARSER.copy_item(ansi_c_declaration);
+  
+    decl_statement.move_to_operands(stack(initializer));
+  }
+  
+  stack(dest).move_to_operands(decl_statement);
+}
+
+/*******************************************************************\
+
 Function: merge_types
 
   Inputs:
@@ -109,12 +148,6 @@ static void merge_types(irept &dest, irept &src)
 
   if(src.is_nil())
     return;
-
-  if(dest.is_nil())
-  {
-    dest=src;
-    return;
-  }
 
   if(dest.id()!=ID_merged_type)
   {
@@ -140,29 +173,9 @@ Function: merge_types
 
 \*******************************************************************/
 
-#if 0
 static void merge_types(const YYSTYPE dest, const YYSTYPE src)
 {
   merge_types(stack(dest), stack(src));
-}
-#endif
-
-/*******************************************************************\
-
-Function: merge
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-static YYSTYPE merge(const YYSTYPE src1, const YYSTYPE src2)
-{
-  merge_types(stack(src1), stack(src2));
-  return src1;
 }
 
 /*******************************************************************\
@@ -328,40 +341,68 @@ Function: do_enum_members
 \*******************************************************************/
 
 static void do_enum_members(
-  const YYSTYPE enum_type_ptr,
-  const YYSTYPE members)
+  const typet &enum_type,
+  exprt &members)
 {  
+  exprt value;
+
   // This assigns increasing values to enum constants
   // that do not have an explicit value. We start with 0.
-  // We should likely move this functionality into
-  // the type checker.
-
   // In C, enum constants always have type "int".
-  typet member_type=::enum_type();
+  value=gen_zero(::enum_type());
 
-  exprt value=gen_zero(member_type);
-
-  exprt &member_op=stack(members);
-
-  Forall_operands(it, member_op)
+  Forall_operands(it, members)
   {
-    ansi_c_declarationt &ansi_c_declaration=to_ansi_c_declaration(*it);
-    ansi_c_declaratort &declarator=ansi_c_declaration.declarator();
-    ansi_c_declaration.type()=typet(ID_int);
+    ansi_c_declarationt &ansi_c_declaration=
+      to_ansi_c_declaration(*it);
 
-    exprt &v=declarator.value();
-
+    exprt &v=ansi_c_declaration.value();
     if(v.is_nil())
       v=value;
 
     exprt symbol_expr(ID_symbol);
-    symbol_expr.set(ID_identifier, declarator.get_base_name());
+    symbol_expr.set(ID_identifier, ansi_c_declaration.get_name());
     
     value=exprt(ID_plus);
-    value.copy_to_operands(symbol_expr, gen_one(member_type));
+    value.copy_to_operands(symbol_expr, gen_one(::enum_type()));
+    
+    PARSER.copy_item(ansi_c_declaration);
   }
+}
 
-  stack(enum_type_ptr).operands().swap(member_op.operands());
+/*******************************************************************\
+
+Function: do_tag
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+static void do_tag(YYSTYPE &key, YYSTYPE &tag)
+{
+  irep_idt id_class_str=stack(tag).get(ID_C_id_class);
+
+  ansi_c_id_classt id_class=
+    (ansi_c_id_classt)atoi(id_class_str.c_str());
+
+  if(id_class==ANSI_C_TAG) // we have it already
+    return;
+
+  // it's new
+  ansi_c_declarationt declaration;
+  PARSER.new_declaration(stack(key), stack(tag), declaration, ansi_c_parsert::TAG);
+
+  // grab symbol
+  stack(tag).id(ID_symbol);
+  stack(tag).set(ID_identifier, declaration.get_name());
+  stack(tag).location()=declaration.location();
+
+  declaration.type().id("incomplete_"+declaration.type().id_string());
+  PARSER.copy_item(declaration);                    
 }
 
 /*******************************************************************\
@@ -378,30 +419,25 @@ Function: create_function_scope
 
 #include <iostream>
 
-static void create_function_scope(const YYSTYPE d)
+static void create_function_scope(exprt &expr)
 {
-  ansi_c_declarationt &declaration=to_ansi_c_declaration(stack(d));
-  ansi_c_declaratort &declarator=declaration.declarator();
+  ansi_c_declarationt &declaration=to_ansi_c_declaration(expr);
 
-  irep_idt function_name=declarator.get_base_name();
-
-  // record which function we are in
-  PARSER.location.set_function(function_name);
+  PARSER.location.set_function(declaration.get_base_name());
 
   std::string prefix=PARSER.current_scope().prefix+
-                     id2string(function_name)+"::";
+                     id2string(declaration.get_base_name())+"::";
   PARSER.new_scope(prefix);
-
-  // The grammar doesn't actually enforce that a function type
-  // is used to define a function body. We will complain in the
-  // type checker about it.
-  if(declarator.type().id()==ID_code)
+  
+  if(declaration.type().id()==ID_code)
   {
-    code_typet &code_type=to_code_type(declarator.type());
+    code_typet &code_type=to_code_type(declaration.type());
     
     code_typet::parameterst &parameters=code_type.parameters();
     
-    // Add the parameter declarations to the scope.
+    unsigned anon_count=0;
+    
+    // do the parameter declarations
     for(code_typet::parameterst::iterator
         it=parameters.begin();
         it!=parameters.end();
@@ -412,14 +448,25 @@ static void create_function_scope(const YYSTYPE d)
         ansi_c_declarationt &param_decl=to_ansi_c_declaration(*it);
 
         // we record the function name in the location
-        param_decl.location().set_function(function_name);
+        param_decl.location().set_function(declaration.get_base_name());
        
-        if(!param_decl.declarators().empty())
+        // make sure we know it's a parameter
+        param_decl.set_is_parameter(true);
+
+        if(param_decl.get_base_name()==irep_idt())
+        {
+          param_decl.set_base_name("#anon_param"+i2string(anon_count++));
+          param_decl.set_name(prefix+id2string(param_decl.get_base_name()));
+        }
+        else
         {
           // add to scope
           PARSER.current_scope().name_map
-            [param_decl.declarator().get_base_name()].id_class=ANSI_C_SYMBOL;
+            [param_decl.get_base_name()].id_class=ANSI_C_SYMBOL;
         }
+
+        // copy declaration
+        PARSER.copy_item(param_decl);        
       }
     }
   }
@@ -438,45 +485,21 @@ Function: adjust_KnR_parameters
 
 \*******************************************************************/
 
-static void adjust_KnR_parameters(
-  irept &parameters,
-  exprt &declarations)
+static void adjust_KnR_parameters(irept &parameters, irept &declarations)
 {
-  // the below is probably better done in the type checker
-
-  Forall_operands(d_it, declarations)
+  Forall_irep(d_it, declarations.get_sub())
   {
     assert(d_it->id()==ID_declaration);
-    ansi_c_declarationt &declaration=
-      to_ansi_c_declaration(static_cast<exprt &>(*d_it));
+    irep_idt base_name=d_it->get(ID_base_name);
 
-    // Go over declarators
-    ansi_c_declarationt::declaratorst &declarators=
-      declaration.declarators();
-
-    for(ansi_c_declarationt::declaratorst::const_iterator
-        it=declarators.begin();
-        it!=declarators.end();
-        it++)
+    // we just do a linear search over the parameters
+    // this could be improved with a hash map
+    Forall_irep(a_it, parameters.get_sub())
     {
-      irep_idt base_name=it->get_base_name();
-
-      // we just do a linear search over the parameters
-      // this could be improved with a hash map
-      Forall_irep(a_it, parameters.get_sub())
+      if(a_it->get(ID_base_name)==base_name)
       {
-        ansi_c_declarationt &p_decl=
-          to_ansi_c_declaration(static_cast<exprt &>(*a_it));
-
-        if(p_decl.declarator().get_base_name()==base_name)
-        {
-          // match
-          // This copies the declaration type, which can be a
-          // problem if there are compound bodies in there.
-          p_decl.type()=declaration.type();
-          p_decl.declarator().type()=it->type();
-          break;
-        }
+        a_it->add(ID_type)=d_it->find(ID_type);
+        break;
       }
     }
   }
