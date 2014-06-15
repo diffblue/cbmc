@@ -309,18 +309,33 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
     const typet &op_type=follow(expr.op0().type());
     if(op_type.id()!=ID_complex)
     {
-      err_location(expr);
-      throw "expected complex-typed operand";
-    }
-
-    expr.type()=op_type.subtype();
-    
-    // these are lvalues if the operand is one
-    if(expr.op0().get_bool(ID_C_lvalue))
-      expr.set(ID_C_lvalue, true);
+      if(!is_number(op_type))
+      {
+        err_location(expr.op0());
+        throw "expected numerical operand";
+      }
       
-    if(expr.op0().get_bool(ID_C_constant))
-      expr.set(ID_C_constant, true);
+      if(expr.id()==ID_complex_real)
+        expr=expr.op0(); // __real__ x is just a nop
+      else if(expr.id()==ID_complex_imag)
+      {
+        // __imag__ x is simply a zero constant
+        exprt result=gen_zero(op_type);
+        result.location()=expr.location();
+        expr=result;
+      }
+    }
+    else
+    {
+      expr.type()=op_type.subtype();
+    
+      // these are lvalues if the operand is one
+      if(expr.op0().get_bool(ID_C_lvalue))
+        expr.set(ID_C_lvalue, true);
+      
+      if(expr.op0().get_bool(ID_C_constant))
+        expr.set(ID_C_constant, true);
+    }
   }
   else if(expr.id()==ID_generic_selection)
   {
