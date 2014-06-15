@@ -2267,7 +2267,8 @@ void c_typecheck_baset::do_special_functions(
     }
     else if(identifier==CPROVER_PREFIX "isnanf" || 
             identifier==CPROVER_PREFIX "isnand" ||
-            identifier==CPROVER_PREFIX "isnanld")
+            identifier==CPROVER_PREFIX "isnanld" ||
+            identifier=="c::__builtin_isnan")
     {
       if(expr.arguments().size()!=1)
       {
@@ -2350,7 +2351,8 @@ void c_typecheck_baset::do_special_functions(
     }
     else if(identifier==CPROVER_PREFIX "isinff" ||
             identifier==CPROVER_PREFIX "isinfd" ||
-            identifier==CPROVER_PREFIX "isinfld")
+            identifier==CPROVER_PREFIX "isinfld" ||
+            identifier=="c::__builtin_isinf")
     {
       if(expr.arguments().size()!=1)
       {
@@ -2380,7 +2382,8 @@ void c_typecheck_baset::do_special_functions(
     }
     else if(identifier==CPROVER_PREFIX "signf" ||            
             identifier==CPROVER_PREFIX "signd" ||
-            identifier==CPROVER_PREFIX "signld")
+            identifier==CPROVER_PREFIX "signld" ||
+            identifier=="c::__builtin_signbit")
     {
       if(expr.arguments().size()!=1)
       {
@@ -2532,6 +2535,24 @@ void c_typecheck_baset::do_special_functions(
       exprt tmp2=from_integer(is_constant, expr.type());
       tmp2.location()=location;
       expr.swap(tmp2);
+    }
+    else if(identifier=="c::__builtin_classify_type")
+    {
+      // This is a gcc extension that produces an integer
+      // constant for the type of the argument expression.
+      if(expr.arguments().size()!=1)
+      {
+        err_location(f_op);
+        throw "__builtin_classify_type expects one argument";
+      }
+
+      // The value doesn't matter at all, we only care about the type.
+      // Need to sync with typeclass.h.
+      unsigned type_number=1;
+      
+      exprt tmp=from_integer(type_number, expr.type());
+      tmp.location()=location;
+      expr.swap(tmp);
     }
     else if(identifier==CPROVER_PREFIX "float_debug1" ||
             identifier==CPROVER_PREFIX "float_debug2")
