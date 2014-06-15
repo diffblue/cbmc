@@ -1,0 +1,1937 @@
+Test 'Array_Access1'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: 
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc  main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'Array_Access2'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: 
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc  main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'Array_Access3'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: 
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc  main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'Array_Pointer1'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: 
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc  main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'Array_Pointer2'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: 
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc  main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'Array_Pointer3'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: 
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc  main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'Array_Pointer4'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: 
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc  main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'Array_Pointer5'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: 
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc  main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'Array_Pointer6'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: 
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc  main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'Array_Pointer7'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: 
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc  main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'Array_operations1'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: 
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc  main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'End_thread1'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: 
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc  main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'Failed_Symbols1'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: 
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc  main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'Linked_List1'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: 
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc  main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'Malloc1'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: --pointer-check
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+Running ../../../src/cbmc/cbmc --pointer-check main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+
+Test 'Malloc10'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: --pointer-check
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+Running ../../../src/cbmc/cbmc --pointer-check main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+
+Test 'Malloc11'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: --pointer-check
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+Running ../../../src/cbmc/cbmc --pointer-check main.c >main.out 2>&1
+  Exit: 10
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [FAILED]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [FAILED]
+
+Test 'Malloc2'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: --pointer-check
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+Running ../../../src/cbmc/cbmc --pointer-check main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+
+Test 'Malloc3'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: --pointer-check
+  Results:
+    ^EXIT=10$
+    ^SIGNAL=0$
+    ^Counterexample:$
+    ^VERIFICATION FAILED$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc --pointer-check main.c >main.out 2>&1
+  Exit: 10
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=10\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^Counterexample:\r\\?$ [OK]
+^VERIFICATION FAILED\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'Malloc4'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: --pointer-check --bounds-check
+  Results:
+    ^SIGNAL=0$
+    ^EXIT=10$
+    ^Counterexample:$
+    ^VERIFICATION FAILED$
+    ^  dereference failure: dynamic object upper bound$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc --pointer-check --bounds-check main.c >main.out 2>&1
+  Exit: 10
+  Signal: 0
+  Core: 0
+Execution [OK]
+^SIGNAL=0\r\\?$ [OK]
+^EXIT=10\r\\?$ [OK]
+^Counterexample:\r\\?$ [OK]
+^VERIFICATION FAILED\r\\?$ [OK]
+^  dereference failure: dynamic object upper bound\r\\?$ [FAILED]
+^warning: ignoring [OK]
+
+Test 'Malloc5'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: --pointer-check --bounds-check
+  Results:
+    ^SIGNAL=0$
+    ^EXIT=10$
+    ^Counterexample:$
+    ^VERIFICATION FAILED$
+    ^  dereference failure: dynamic object upper bound$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc --pointer-check --bounds-check main.c >main.out 2>&1
+  Exit: 10
+  Signal: 0
+  Core: 0
+Execution [OK]
+^SIGNAL=0\r\\?$ [OK]
+^EXIT=10\r\\?$ [OK]
+^Counterexample:\r\\?$ [OK]
+^VERIFICATION FAILED\r\\?$ [OK]
+^  dereference failure: dynamic object upper bound\r\\?$ [FAILED]
+^warning: ignoring [OK]
+
+Test 'Malloc6'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: --pointer-check
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+Running ../../../src/cbmc/cbmc --pointer-check main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+
+Test 'Malloc7'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: --pointer-check
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+Running ../../../src/cbmc/cbmc --pointer-check main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+
+Test 'Malloc8'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: --pointer-check
+  Results:
+    ^EXIT=10$
+    ^SIGNAL=0$
+    ^VERIFICATION FAILED$
+    ^  dereference failure: invalid pointer$
+    --
+Running ../../../src/cbmc/cbmc --pointer-check main.c >main.out 2>&1
+  Exit: 10
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=10\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION FAILED\r\\?$ [OK]
+^  dereference failure: invalid pointer\r\\?$ [FAILED]
+
+Test 'Malloc9'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: --pointer-check
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+Running ../../../src/cbmc/cbmc --pointer-check main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+
+Test 'Minisat_Simp1'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: --fixedbv
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc --fixedbv main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'Nondet1'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: 
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc  main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'Pointer1'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: --pointer-check
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc --pointer-check main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'Pointer10'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: --pointer-check
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc --pointer-check main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'Pointer11'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: --pointer-check
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc --pointer-check main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'Pointer12'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: --pointer-check
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc --pointer-check main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'Pointer14'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: --pointer-check
+  Results:
+    ^SIGNAL=0$
+    ^Counterexample:$
+    ^VERIFICATION FAILED$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc --pointer-check main.c >main.out 2>&1
+  Exit: 10
+  Signal: 0
+  Core: 0
+Execution [OK]
+^SIGNAL=0\r\\?$ [OK]
+^Counterexample:\r\\?$ [OK]
+^VERIFICATION FAILED\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'Pointer15'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: --pointer-check
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc --pointer-check main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'Pointer17'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: --pointer-check
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc --pointer-check main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'Pointer18'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: --unwind 1 --no-unwinding-assertions --pointer-check
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc --unwind 1 --no-unwinding-assertions --pointer-check main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'Pointer20'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: --pointer-check
+  Results:
+    ^SIGNAL=0$
+    ^Counterexample:$
+    ^VERIFICATION FAILED$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc --pointer-check main.c >main.out 2>&1
+  Exit: 10
+  Signal: 0
+  Core: 0
+Execution [OK]
+^SIGNAL=0\r\\?$ [OK]
+^Counterexample:\r\\?$ [OK]
+^VERIFICATION FAILED\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'Pointer21'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: --pointer-check
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc --pointer-check main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'Pointer23'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: --pointer-check
+  Results:
+    ^SIGNAL=0$
+    ^Counterexample:$
+    ^VERIFICATION FAILED$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc --pointer-check main.c >main.out 2>&1
+  Exit: 10
+  Signal: 0
+  Core: 0
+Execution [OK]
+^SIGNAL=0\r\\?$ [OK]
+^Counterexample:\r\\?$ [OK]
+^VERIFICATION FAILED\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'Pointer24'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: --pointer-check
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc --pointer-check main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'Pointer25'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: 
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc  main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'Pointer26'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: 
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc  main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'Pointer27'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: 
+  Results:
+    ^SIGNAL=0$
+    ^Counterexample:$
+    ^VERIFICATION FAILED$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc  main.c >main.out 2>&1
+  Exit: 10
+  Signal: 0
+  Core: 0
+Execution [OK]
+^SIGNAL=0\r\\?$ [OK]
+^Counterexample:\r\\?$ [OK]
+^VERIFICATION FAILED\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'Pointer28'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: --pointer-check --little-endian
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc --pointer-check --little-endian main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'Pointer29'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: 
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc  main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'Pointer3'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: --pointer-check
+  Results:
+    ^SIGNAL=0$
+    ^Counterexample:$
+    ^VERIFICATION FAILED$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc --pointer-check main.c >main.out 2>&1
+  Exit: 10
+  Signal: 0
+  Core: 0
+Execution [OK]
+^SIGNAL=0\r\\?$ [OK]
+^Counterexample:\r\\?$ [OK]
+^VERIFICATION FAILED\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'Pointer30'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: --pointer-check
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc --pointer-check main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'Pointer31'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: --pointer-check
+  Results:
+    ^SIGNAL=0$
+    ^Counterexample:$
+    ^VERIFICATION FAILED$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc --pointer-check main.c >main.out 2>&1
+  Exit: 10
+  Signal: 0
+  Core: 0
+Execution [OK]
+^SIGNAL=0\r\\?$ [OK]
+^Counterexample:\r\\?$ [OK]
+^VERIFICATION FAILED\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'Pointer4'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: --pointer-check
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc --pointer-check main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'Pointer6'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: --pointer-check
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc --pointer-check main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'Pointer7'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: --pointer-check
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc --pointer-check main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'Pointer8'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: --pointer-check
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc --pointer-check main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'Pointer9'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: --pointer-check
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc --pointer-check main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'Pointer_Object_Type1'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: --pointer-check --bounds-check
+  Results:
+    ^SIGNAL=0$
+    ^Counterexample:$
+    ^VERIFICATION FAILED$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc --pointer-check --bounds-check main.c >main.out 2>&1
+  Exit: 10
+  Signal: 0
+  Core: 0
+Execution [OK]
+^SIGNAL=0\r\\?$ [OK]
+^Counterexample:\r\\?$ [OK]
+^VERIFICATION FAILED\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'Same_Basename1'
+  Level: CORE
+  Input: bar.c
+  Output: bar.out
+  Options: foo/bar.c
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+Running ../../../src/cbmc/cbmc foo/bar.c bar.c >bar.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+
+Test 'Sizeof1'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: 
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc  main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'String_Abstraction1'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: --string-abstraction --pointer-check --bounds-check
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc --string-abstraction --pointer-check --bounds-check main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'String_Abstraction10'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: --string-abstraction --pointer-check --bounds-check
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc --string-abstraction --pointer-check --bounds-check main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'String_Abstraction11'
+  Level: CORE
+  Input: anon-retval.c
+  Output: anon-retval.out
+  Options: --string-abstraction
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc --string-abstraction anon-retval.c >anon-retval.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'String_Abstraction12'
+  Level: CORE
+  Input: char-array.c
+  Output: char-array.out
+  Options: --string-abstraction
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc --string-abstraction char-array.c >char-array.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'String_Abstraction13'
+  Level: CORE
+  Input: constant.c
+  Output: constant.out
+  Options: --string-abstraction
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc --string-abstraction constant.c >constant.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'String_Abstraction14'
+  Level: CORE
+  Input: pass-in-implicit.c
+  Output: pass-in-implicit.out
+  Options: --string-abstraction
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc --string-abstraction pass-in-implicit.c >pass-in-implicit.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'String_Abstraction15'
+  Level: CORE
+  Input: pass-in.c
+  Output: pass-in.out
+  Options: --string-abstraction
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc --string-abstraction pass-in.c >pass-in.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'String_Abstraction16'
+  Level: CORE
+  Input: ptr-arith.c
+  Output: ptr-arith.out
+  Options: --string-abstraction
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc --string-abstraction ptr-arith.c >ptr-arith.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'String_Abstraction17'
+  Level: CORE
+  Input: strcpy-no-decl.c
+  Output: strcpy-no-decl.out
+  Options: --string-abstraction
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc --string-abstraction strcpy-no-decl.c >strcpy-no-decl.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'String_Abstraction18'
+  Level: CORE
+  Input: strcpy.c
+  Output: strcpy.out
+  Options: --string-abstraction
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc --string-abstraction strcpy.c >strcpy.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'String_Abstraction19'
+  Level: CORE
+  Input: structs.c
+  Output: structs.out
+  Options: --string-abstraction
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc --string-abstraction structs.c >structs.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'String_Abstraction2'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: --string-abstraction --pointer-check --bounds-check
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc --string-abstraction --pointer-check --bounds-check main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'String_Abstraction20'
+  Level: CORE
+  Input: structs2.c
+  Output: structs2.out
+  Options: --string-abstraction
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc --string-abstraction structs2.c >structs2.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'String_Abstraction21'
+  Level: CORE
+  Input: strcpy2.c
+  Output: strcpy2.out
+  Options: --string-abstraction
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc --string-abstraction strcpy2.c >strcpy2.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'String_Abstraction22'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: --string-abstraction
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc --string-abstraction main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'String_Abstraction23'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: --string-abstraction --pointer-check --bounds-check
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc --string-abstraction --pointer-check --bounds-check main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'String_Abstraction3'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: --string-abstraction --pointer-check --bounds-check
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc --string-abstraction --pointer-check --bounds-check main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'String_Abstraction4'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: --string-abstraction --pointer-check --bounds-check
+  Results:
+    ^EXIT=10$
+    ^SIGNAL=0$
+    ^VERIFICATION FAILED$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc --string-abstraction --pointer-check --bounds-check main.c >main.out 2>&1
+  Exit: 10
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=10\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION FAILED\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'String_Abstraction5'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: --string-abstraction --pointer-check --bounds-check
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc --string-abstraction --pointer-check --bounds-check main.c >main.out 2>&1
+  Exit: 10
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [FAILED]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [FAILED]
+^warning: ignoring [OK]
+
+Test 'String_Abstraction6'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: --string-abstraction --pointer-check --bounds-check
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc --string-abstraction --pointer-check --bounds-check main.c >main.out 2>&1
+  Exit: 10
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [FAILED]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [FAILED]
+^warning: ignoring [OK]
+
+Test 'String_Abstraction7'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: --string-abstraction --pointer-check --bounds-check
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc --string-abstraction --pointer-check --bounds-check main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'String_Abstraction8'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: --string-abstraction --unwind 5 --pointer-check --bounds-check
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc --string-abstraction --unwind 5 --pointer-check --bounds-check main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'String_Abstraction9'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: --string-abstraction --pointer-check --bounds-check
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc --string-abstraction --pointer-check --bounds-check main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'Struct_Array1'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: 
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc  main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'Struct_Pointer1'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: 
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc  main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'Struct_Pointer2'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: --pointer-check
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc --pointer-check main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'Struct_Pointer3'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: 
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc  main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'Struct_Pointer_Array1'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: 
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc  main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'Type_Error1'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: 
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc  main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'Unbounded_Array1'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: 
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+Running ../../../src/cbmc/cbmc  main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+
+Test 'Unbounded_Array2'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: 
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+Running ../../../src/cbmc/cbmc  main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+
+Test 'Unbounded_Array3'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: 
+  Results:
+    ^EXIT=10$
+    ^SIGNAL=0$
+    ^VERIFICATION FAILED$
+    --
+Running ../../../src/cbmc/cbmc  main.c >main.out 2>&1
+  Exit: 10
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=10\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION FAILED\r\\?$ [OK]
+
+Test 'Unbounded_Array4'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: 
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+Running ../../../src/cbmc/cbmc  main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+
+Test 'Unbounded_Array5'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: 
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+Running ../../../src/cbmc/cbmc  main.c >main.out 2>&1
+  Exit: 10
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [FAILED]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [FAILED]
+
+Test 'extern3'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: 
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc  main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'extern4'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: 
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc  main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'return1'
+  Level: CORE
+  Input: main.c
+  Output: main.out
+  Options: 
+  Results:
+    ^EXIT=0$
+    ^SIGNAL=0$
+    ^VERIFICATION SUCCESSFUL$
+    --
+    ^warning: ignoring
+Running ../../../src/cbmc/cbmc  main.c >main.out 2>&1
+  Exit: 0
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=0\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^warning: ignoring [OK]
+
+Test 'return2'
+  Level: CORE
+  Input: tcas_v23_523.c
+  Output: tcas_v23_523.out
+  Options: --bounds-check
+  Results:
+    ^EXIT=10$
+    ^SIGNAL=0$
+    ^VERIFICATION FAILED$
+    upper bound$
+    --
+Running ../../../src/cbmc/cbmc --bounds-check tcas_v23_523.c >tcas_v23_523.out 2>&1
+  Exit: 10
+  Signal: 0
+  Core: 0
+Execution [OK]
+^EXIT=10\r\\?$ [OK]
+^SIGNAL=0\r\\?$ [OK]
+^VERIFICATION FAILED\r\\?$ [OK]
+upper bound\r\\?$ [OK]
+

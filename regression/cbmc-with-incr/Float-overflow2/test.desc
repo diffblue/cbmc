@@ -1,0 +1,7 @@
+CORE
+main.c
+--floatbv --float-overflow-check
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--

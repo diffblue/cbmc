@@ -1,0 +1,9 @@
+CORE
+main.c
+--all-claims
+^EXIT=0$
+^SIGNAL=0$
+^\[main\.2\] .*: FAILED$
+^\*\* 1 of 2 failed (2 iterations)$
+--
+^warning: ignoring

@@ -1,0 +1,9 @@
+CORE
+main.c
+--all-claims --bounds-check --32
+^EXIT=0$
+^SIGNAL=0$
+^\[main\.11\] array.List upper bound: FAILED$
+^\*\* 1 of 11 failed (2 iterations)$
+--
+^warning: ignoring

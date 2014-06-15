@@ -1,0 +1,8 @@
+CORE
+strcpy-no-decl.c
+--string-abstraction
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
