@@ -297,7 +297,10 @@ void c_typecheck_baset::typecheck_code_type(code_typet &type)
         // first fix type
         typet &type=parameter.type();
         type=declaration.full_type(declaration.declarator());
+        std::list<codet> tmp_clean_code;
+        tmp_clean_code.swap(clean_code); // ignore side-effects
         typecheck_type(type);
+        tmp_clean_code.swap(clean_code);
         adjust_function_parameter(type);
       
         // adjust the identifier
@@ -311,10 +314,9 @@ void c_typecheck_baset::typecheck_code_type(code_typet &type)
         {
           identifier=add_language_prefix(identifier);
     
-          parameter.set_identifier(identifier);
-
           // make visible now, later parameters might use it
           parameter_map[identifier]=type;
+          parameter.set_base_name(declaration.declarator().get_base_name());
         }
         
         // put the parameter in place of the declaration
@@ -1142,7 +1144,8 @@ void c_typecheck_baset::adjust_function_parameter(typet &type) const
   }
   else if(type.id()==ID_code)
   {
-    // see ISO/IEC 9899:1999 page 199 clause 8
+    // see ISO/IEC 9899:1999 page 199 clause 8,
+    // may be hidden in typedef
     pointer_typet tmp;
     tmp.subtype()=type;
     type.swap(tmp);
