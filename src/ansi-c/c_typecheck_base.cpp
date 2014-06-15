@@ -10,10 +10,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/prefix.h>
 #include <util/config.h>
 #include <util/std_types.h>
+#include <util/i2string.h>
 
 #include "c_typecheck_base.h"
 #include "expr2c.h"
 #include "type2name.h"
+#include "c_storage_spec.h"
 
 /*******************************************************************\
 
@@ -47,27 +49,6 @@ Function: c_typecheck_baset::to_string
 std::string c_typecheck_baset::to_string(const typet &type)
 { 
   return type2c(type, *this);
-}
-
-/*******************************************************************\
-
-Function: c_typecheck_baset::replace_symbol
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void c_typecheck_baset::replace_symbol(irept &symbol)
-{
-  id_replace_mapt::const_iterator it=
-    id_replace_map.find(symbol.get(ID_identifier));
-  
-  if(it!=id_replace_map.end())
-    symbol.set(ID_identifier, it->second);
 }
 
 /*******************************************************************\
@@ -111,9 +92,6 @@ void c_typecheck_baset::typecheck_symbol(symbolt &symbol)
 {
   current_symbol_id=symbol.name;
 
-  // first of all, we typecheck the type
-  typecheck_type(symbol.type);
-
   bool is_function=symbol.type.id()==ID_code;
 
   const typet &final_type=follow(symbol.type);
@@ -132,8 +110,6 @@ void c_typecheck_baset::typecheck_symbol(symbolt &symbol)
     std::string typestr=type2name(symbol.type);
     new_name=add_language_prefix("tag-#anon#"+typestr);
     
-    id_replace_map[symbol.name]=new_name;    
-
     symbol_tablet::symbolst::const_iterator it=symbol_table.symbols.find(new_name);
     if(it!=symbol_table.symbols.end())
       return; // bail out, we have an appropriate symbol already.
@@ -159,27 +135,6 @@ void c_typecheck_baset::typecheck_symbol(symbolt &symbol)
     throw "only functions can have a function body";
   }
   
-  if(symbol.name!=new_name)
-  {
-    id_replace_map[symbol.name]=new_name;
-    symbol.name=new_name;
-  }
-
-  #if 0
-  {
-    // and now that we have the proper name
-    // we clean the type of any side-effects
-    // (needs to be done before next symbol)
-    std::list<codet> clean_type_code;
-    clean_type(symbol, symbol.type, clean_type_code);
-    
-    // We store the code that was generated for the type
-    // for later use when we see the declaration.
-    if(!clean_type_code.empty())
-      clean_code[symbol.name]=code_blockt(clean_type_code);
-  }
-  #endif
-    
   // set the pretty name
   if(symbol.is_type &&
      (final_type.id()==ID_struct ||
@@ -669,6 +624,43 @@ void c_typecheck_baset::typecheck_function_body(symbolt &symbol)
     
   // set return type
   return_type=code_type.return_type();
+  
+  unsigned anon_counter=0;
+  
+  // Add the parameter declarations into the symbol table.
+  code_typet::parameterst &parameters=code_type.parameters();
+  for(code_typet::parameterst::iterator
+      p_it=parameters.begin();
+      p_it!=parameters.end();
+      p_it++)
+  {
+    // may be anonymous
+    if(p_it->get_base_name()==irep_idt())
+    {
+      irep_idt base_name="#anon"+i2string(anon_counter++);
+      p_it->set_base_name(base_name);
+    }
+    
+    // produce identifier
+    irep_idt base_name=p_it->get_base_name();
+    irep_idt identifier=id2string(symbol.name)+"::"+id2string(base_name);
+
+    p_it->set_identifier(identifier);
+
+    symbolt p_symbol;
+    
+    p_symbol.type=p_it->type();
+    p_symbol.name=identifier;
+    p_symbol.base_name=base_name;
+    p_symbol.is_static_lifetime=false;
+    p_symbol.is_type=false;
+    p_symbol.is_lvalue=true;
+    p_symbol.is_state_var=true;
+    p_symbol.is_thread_local=true;
+
+    symbolt *new_p_symbol;
+    move_symbol(p_symbol, new_p_symbol);
+  }
 
   // typecheck the body code  
   typecheck_code(to_code(symbol.value));
@@ -677,3 +669,60 @@ void c_typecheck_baset::typecheck_function_body(symbolt &symbol)
   if(symbol.name=="c::main")
     add_argc_argv(symbol);
 }
+
+/*******************************************************************\
+
+Function: c_typecheck_baset::typecheck_declaration
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void c_typecheck_baset::typecheck_declaration(
+  ansi_c_declarationt &declaration)
+{
+  if(declaration.get_is_static_assert())
+  {
+    assert(declaration.operands().size()==2);
+    typecheck_expr(declaration.op0());
+    typecheck_expr(declaration.op1());
+  }
+  else
+  {
+    // get storage spec
+    c_storage_spect c_storage_spec(declaration.type());
+  
+    declaration.set_is_inline(c_storage_spec.is_inline);
+    declaration.set_is_static(c_storage_spec.is_static);
+    declaration.set_is_extern(c_storage_spec.is_extern);
+    declaration.set_is_thread_local(c_storage_spec.is_thread_local);
+    declaration.set_is_register(c_storage_spec.is_register);
+    declaration.set_is_typedef(c_storage_spec.is_typedef);
+
+    // first typecheck the type of the declaration
+    typecheck_type(declaration.type());
+    
+    // mark as 'already typechecked'
+    make_already_typechecked(declaration.type());
+
+    // Now do declarators, if any.
+    for(ansi_c_declarationt::declaratorst::iterator
+        d_it=declaration.declarators().begin();
+        d_it!=declaration.declarators().end();
+        d_it++)
+    {
+      symbolt symbol;
+      declaration.to_symbol(*d_it, symbol);
+
+      // now check other half of type
+      typecheck_type(symbol.type);
+
+      typecheck_symbol(symbol);
+    }
+  }
+}
+

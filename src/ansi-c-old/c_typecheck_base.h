@@ -16,7 +16,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/std_types.h>
 
-#include "ansi_c_declaration.h"
 #include "designator.h"
 
 class c_typecheck_baset:
@@ -63,8 +62,14 @@ protected:
   const std::string language_prefix;
   irep_idt current_symbol_id;
 
+  typedef hash_map_cont<irep_idt, irep_idt, irep_id_hash> id_replace_mapt;
+  id_replace_mapt id_replace_map;
+  
   typedef hash_map_cont<irep_idt, typet, irep_id_hash> id_type_mapt;
   id_type_mapt parameter_map;
+  
+  // apply id_replace_map
+  void replace_symbol(irept &symbol);
   
   // overload to use language specific syntax
   virtual std::string to_string(const exprt &expr);
@@ -159,13 +164,16 @@ protected:
   virtual void typecheck_break(codet &code);
   virtual void typecheck_continue(codet &code);
   virtual void typecheck_decl(codet &code);
+  virtual void typecheck_decl(codet &code, std::list<codet> &clean_code);
+  virtual void typecheck_decl_type(codet &code);
+  virtual void typecheck_decl_block(codet &code);
   virtual void typecheck_expression(codet &code);
   virtual void typecheck_for(codet &code);
   virtual void typecheck_goto(codet &code);
+  virtual void typecheck_computed_goto(codet &code);
   virtual void typecheck_ifthenelse(code_ifthenelset &code);
   virtual void typecheck_label(code_labelt &code);
   virtual void typecheck_switch_case(code_switch_caset &code);
-  virtual void typecheck_gcc_computed_goto(codet &code);
   virtual void typecheck_gcc_switch_case_range(codet &code);
   virtual void typecheck_gcc_local_label(codet &code);
   virtual void typecheck_return(codet &code);
@@ -216,8 +224,7 @@ protected:
   virtual void typecheck_side_effect_statement_expression(side_effect_exprt &expr);
   virtual void typecheck_function_call_arguments(side_effect_expr_function_callt &expr);
   virtual void do_special_functions(side_effect_expr_function_callt &expr);
-
-  virtual void make_index_type(exprt &expr);
+  
   virtual void make_constant(exprt &expr);
   virtual void make_constant_index(exprt &expr);
   virtual void make_constant_rec(exprt &expr);
@@ -227,8 +234,6 @@ protected:
   // types
   virtual void typecheck_type(typet &type);
   virtual void typecheck_compound_type(struct_union_typet &type);
-  virtual void typecheck_compound_body(symbolt &);
-  virtual void typecheck_c_enum_type(typet &type);
   virtual void typecheck_code_type(code_typet &type);
   virtual void typecheck_symbol_type(typet &type);
   virtual void typecheck_c_bit_field_type(typet &type);
@@ -238,16 +243,17 @@ protected:
   virtual void typecheck_custom_type(typet &type);
   virtual void adjust_function_parameter(typet &type) const;
   virtual bool is_complete_type(const typet &type) const;
-  
-  void make_already_typechecked(typet &dest)
-  {
-    typet result(ID_already_typechecked);
-    result.subtype().swap(dest);
-    result.swap(dest);
-  }
 
   // this cleans expressions in array types
-  std::list<codet> clean_code;
+  virtual void clean_type(
+    const irep_idt &base_symbol_identifier,
+    typet &type,
+    std::list<codet> &code);
+  
+  typedef hash_set_cont<irep_idt, irep_id_hash> already_cleanedt;
+  already_cleanedt already_cleaned;
+
+  void make_index_type(exprt &expr);
 
   // environment
   void add_argc_argv(const symbolt &main_symbol);
@@ -257,8 +263,7 @@ protected:
   void move_symbol(symbolt &symbol)
   { symbolt *new_symbol; move_symbol(symbol, new_symbol); }
   
-  // top-level stuff
-  void typecheck_declaration(ansi_c_declarationt &);
+  // top level stuff
   void typecheck_symbol(symbolt &symbol);
   void typecheck_new_symbol(symbolt &symbol);
   void typecheck_redefinition_type(symbolt &old_symbol, symbolt &new_symbol);

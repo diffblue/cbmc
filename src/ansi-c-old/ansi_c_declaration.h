@@ -13,13 +13,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/symbol.h>
 
-class ansi_c_declaratort:public exprt
+class ansi_c_declarationt:public exprt
 {
 public:
-  inline ansi_c_declaratort():exprt(ID_declarator)
+  inline ansi_c_declarationt():exprt(ID_declaration)
   {
   }
-
+  
   inline exprt &value()
   {
     return static_cast<exprt &>(add(ID_value));
@@ -49,27 +49,15 @@ public:
   {
     return set(ID_base_name, base_name);
   }
-
-  void build(irept &src);
-};
-
-extern inline ansi_c_declaratort &to_ansi_c_declarator(exprt &expr)
-{
-  assert(expr.id()==ID_declarator);
-  return static_cast<ansi_c_declaratort &>(expr);
-}
-
-extern inline const ansi_c_declaratort &to_ansi_c_declarator(const exprt &expr)
-{
-  assert(expr.id()==ID_declarator);
-  return static_cast<const ansi_c_declaratort &>(expr);
-}
-
-class ansi_c_declarationt:public exprt
-{
-public:
-  inline ansi_c_declarationt():exprt(ID_declaration)
+  
+  inline bool get_is_type() const
   {
+    return get_bool(ID_is_type);
+  }
+  
+  inline void set_is_type(bool is_type)
+  {
+    set(ID_is_type, is_type);
   }
   
   inline bool get_is_typedef() const
@@ -82,14 +70,14 @@ public:
     set(ID_is_typedef, is_typedef);
   }
   
-  inline bool get_is_enum_constant() const
+  inline bool get_is_macro() const
   {
-    return get_bool(ID_is_enum_constant);
+    return get_bool(ID_is_macro);
   }
   
-  inline void set_is_enum_constant(bool is_enum_constant)
+  inline void set_is_macro(bool is_macro)
   {
-    set(ID_is_enum_constant, is_enum_constant);
+    set(ID_is_macro, is_macro);
   }
   
   inline bool get_is_static() const
@@ -110,16 +98,6 @@ public:
   inline void set_is_parameter(bool is_parameter)
   {
     set(ID_is_parameter, is_parameter);
-  }
-  
-  inline bool get_is_member() const
-  {
-    return get_bool(ID_is_member);
-  }
-  
-  inline void set_is_member(bool is_member)
-  {
-    set(ID_is_member, is_member);
   }
   
   inline bool get_is_global() const
@@ -182,44 +160,7 @@ public:
     set(ID_is_static_assert, is_static_assert);
   }
   
-  void to_symbol(
-    const ansi_c_declaratort &,
-    symbolt &symbol) const;
-
-  typet full_type(const ansi_c_declaratort &) const;
-
-  typedef std::vector<ansi_c_declaratort> declaratorst;
-
-  inline const declaratorst &declarators() const
-  {
-    return (const declaratorst &)operands();
-  }
-
-  inline declaratorst &declarators()
-  {
-    return (declaratorst &)operands();
-  }
-
-  // special case of a declaration with exactly one declarator  
-  inline const ansi_c_declaratort &declarator() const
-  {
-    assert(declarators().size()==1);
-    return declarators()[0];
-  }
-
-  inline ansi_c_declaratort &declarator()
-  {
-    assert(declarators().size()==1);
-    return declarators()[0];
-  }
-  
-  void output(std::ostream &) const;
-  
-  inline void add_initializer(exprt &value)
-  {
-    assert(!declarators().empty());
-    declarators().back().value().swap(value);
-  }
+  void to_symbol(symbolt &symbol) const;
 };
 
 extern inline ansi_c_declarationt &to_ansi_c_declaration(exprt &expr)
