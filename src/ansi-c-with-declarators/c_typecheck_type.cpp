@@ -416,7 +416,82 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
       size=tmp_size;
     }
     else if(tmp_size.id()==ID_infinity)
+    {
       size=tmp_size;
+    }
+    else if(tmp_size.id()==ID_symbol &&
+            tmp_size.type().get_bool(ID_C_constant))
+    {
+      // We allow a constant variable as array size, assuming
+      // it won't change.
+      // This criterion can be tricked:
+      // Of course we can modify a 'const' symbol, e.g.,
+      // using a pointer type cast. Interestingly,
+      // at least gcc 4.2.1 makes the very same mistake!
+      size=tmp_size;
+    }
+    else
+    {
+      // not a constant and not infinity
+    
+      assert(current_symbol_id!=irep_idt());
+        
+      const symbolt &base_symbol=
+        lookup(
+          //base_symbol_identifier!=irep_idt()?
+          //base_symbol_identifier:
+          current_symbol_id);
+      
+      // Need to pull out! We insert new symbol.
+      locationt location=size.find_location();
+      unsigned count=0;
+      irep_idt temp_identifier;
+      std::string suffix;
+
+      do
+      {
+        suffix="$array_size"+i2string(count);
+        temp_identifier=id2string(base_symbol.name)+suffix;
+        count++;
+      }
+      while(symbol_table.symbols.find(temp_identifier)!=symbol_table.symbols.end());
+
+      // add the symbol to symbol table
+      symbolt new_symbol;
+      new_symbol.name=temp_identifier;
+      new_symbol.pretty_name=id2string(base_symbol.pretty_name)+suffix;
+      new_symbol.base_name=id2string(base_symbol.base_name)+suffix;
+      new_symbol.type=size.type();
+      new_symbol.type.set(ID_C_constant, true);
+      new_symbol.is_file_local=true;
+      new_symbol.is_type=false;
+      new_symbol.is_thread_local=true;
+      new_symbol.is_static_lifetime=false;
+      new_symbol.value.make_nil();
+      new_symbol.location=location;
+      
+      symbol_table.add(new_symbol);
+
+      // produce the code that declares and initializes the symbol
+      symbol_exprt symbol_expr;
+      symbol_expr.set_identifier(temp_identifier);
+      symbol_expr.type()=new_symbol.type;
+      
+      code_declt declaration(symbol_expr);
+      declaration.location()=location;
+
+      code_assignt assignment;
+      assignment.lhs()=symbol_expr;
+      assignment.rhs()=size;
+      assignment.location()=location;
+
+      // store the code
+      clean_code.push_back(declaration);
+      clean_code.push_back(assignment);
+
+      // fix type
+      size=symbol_expr;
+    }
   }
 }
 
@@ -1076,140 +1151,6 @@ void c_typecheck_baset::adjust_function_parameter(typet &type) const
   {
     // any KnR args without type yet?
     type=signed_int_type(); // the default is integer!
-  }
-}
-
-/*******************************************************************\
-
-Function: c_typecheck_baset::clean_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void c_typecheck_baset::clean_type(
-  const irep_idt &base_symbol_identifier,
-  typet &type,
-  std::list<codet> &code)
-{
-  if(type.id()==ID_symbol)
-  {
-    // we need to follow for structs and such, but only once
-    irep_idt identifier=to_symbol_type(type).get_identifier();
-    if(already_cleaned.insert(identifier).second)
-    {
-      symbol_tablet::symbolst::iterator s_it=symbol_table.symbols.find(identifier);
-      assert(s_it!=symbol_table.symbols.end());
-      clean_type(identifier, s_it->second.type, code);
-    }
-  }
-  else if(type.id()==ID_array)
-  {
-    array_typet &array_type=to_array_type(type);
-  
-    clean_type(base_symbol_identifier, array_type.subtype(), code);
-
-    // The size need not be a constant!
-    // This was simplified already by typecheck_array_type.
-    
-    exprt &size=array_type.size();
-    
-    if(size.is_not_nil() &&
-       !size.is_constant() &&
-       size.id()!=ID_infinity &&
-       !(size.id()==ID_symbol && size.type().get_bool(ID_C_constant)))
-    {
-      // The criterion above can be tricked:
-      // Of course we can modify a 'const' symbol, e.g.,
-      // using a pointer type cast. Interestingly,
-      // at least gcc 4.2.1 makes the very same mistake!
-    
-      assert(current_symbol_id!=irep_idt());
-        
-      const symbolt &base_symbol=
-        lookup(
-          base_symbol_identifier!=irep_idt()?
-          base_symbol_identifier:
-          current_symbol_id);
-      
-      // Need to pull out! We insert new symbol.
-      locationt location=size.find_location();
-      unsigned count=0;
-      irep_idt temp_identifier;
-      std::string suffix;
-
-      do
-      {
-        suffix="$array_size"+i2string(count);
-        temp_identifier=id2string(base_symbol.name)+suffix;
-        count++;
-      }
-      while(symbol_table.symbols.find(temp_identifier)!=symbol_table.symbols.end());
-
-      // add the symbol to symbol table
-      symbolt new_symbol;
-      new_symbol.name=temp_identifier;
-      new_symbol.pretty_name=id2string(base_symbol.pretty_name)+suffix;
-      new_symbol.base_name=id2string(base_symbol.base_name)+suffix;
-      new_symbol.type=size.type();
-      new_symbol.type.set(ID_C_constant, true);
-      new_symbol.is_file_local=true;
-      new_symbol.is_type=false;
-      new_symbol.is_thread_local=true;
-      new_symbol.is_static_lifetime=false;
-      new_symbol.value.make_nil();
-      new_symbol.location=location;
-      
-      symbol_table.add(new_symbol);
-
-      // produce the code that declares and initializes the symbol
-      symbol_exprt symbol_expr;
-      symbol_expr.set_identifier(temp_identifier);
-      symbol_expr.type()=new_symbol.type;
-      
-      code_declt declaration(symbol_expr);
-      declaration.location()=location;
-
-      code_assignt assignment;
-      assignment.lhs()=symbol_expr;
-      assignment.rhs()=size;
-      assignment.location()=location;
-
-      // store the code
-      code.push_back(declaration);
-      code.push_back(assignment);
-
-      // fix type
-      size=symbol_expr;
-    }
-  }
-  else if(type.id()==ID_struct ||
-          type.id()==ID_union)
-  {
-    struct_union_typet::componentst &components=
-      to_struct_union_type(type).components();
-
-    for(struct_union_typet::componentst::iterator
-        it=components.begin();
-        it!=components.end();
-        it++)
-      clean_type(base_symbol_identifier, it->type(), code);
-  }
-  else if(type.id()==ID_code)
-  {
-    // done, can't contain arrays
-  }
-  else if(type.id()==ID_pointer)
-  {
-    clean_type(base_symbol_identifier, type.subtype(), code);
-  }
-  else if(type.id()==ID_vector)
-  {
-    // should be clean
   }
 }
 
