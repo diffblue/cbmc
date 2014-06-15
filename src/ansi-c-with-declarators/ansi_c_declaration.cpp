@@ -36,7 +36,7 @@ void ansi_c_declaratort::build(irept &src)
 
     if(t.id()==ID_symbol)
     {
-      set_base_name(t.get(ID_identifier));
+      set_base_name(t.get(ID_C_base_name));
       location()=t.location();
       t.make_nil();
       break;
