@@ -405,33 +405,6 @@ void c_typecheck_baset::typecheck_decl(codet &code)
 
 /*******************************************************************\
 
-Function: move_declarations
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-static void move_declarations(
-  exprt &code,
-  std::list<codet> &clean_code)
-{
-  Forall_operands(it, code)
-    move_declarations(*it, clean_code);
-
-  if(code.id()==ID_code &&
-     to_code(code).get_statement()==ID_decl)
-  {
-    clean_code.push_back(code_skipt());
-    code.swap(clean_code.back());
-  }
-}
-
-/*******************************************************************\
-
 Function: c_typecheck_baset::is_complete_type
 
   Inputs:
