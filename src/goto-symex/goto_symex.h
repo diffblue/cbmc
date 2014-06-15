@@ -197,19 +197,19 @@ protected:
   {
   }
 
-  virtual void symex_function_call(
+  virtual bool symex_function_call(
     const goto_functionst &goto_functions,
     statet &state,
     const code_function_callt &call);
 
   virtual void symex_end_of_function(statet &state);
 
-  virtual void symex_function_call_symbol(
+  virtual bool symex_function_call_symbol(
     const goto_functionst &goto_functions,
     statet &state,
     const code_function_callt &call);
 
-  virtual void symex_function_call_code(
+  virtual bool symex_function_call_code(
     const goto_functionst &goto_functions,
     statet &state,
     const code_function_callt &call);

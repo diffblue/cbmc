@@ -217,6 +217,8 @@ void build_goto_trace(
        SSA_step.assignment_type!=symex_target_equationt::STATE)
       continue;
 
+    if(SSA_step.comment=="loop_condition_check") continue;
+
     goto_tracet::stepst &steps=time_map[current_time];
     steps.push_back(goto_trace_stept());    
     goto_trace_stept &goto_trace_step=steps.back();

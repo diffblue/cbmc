@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <list>
 #include <ostream>
+#include <iostream> 
 
 #include <util/merge_irep.h>
 
@@ -226,7 +227,6 @@ public:
       std::ostream &out) const;
   };
 
- 
   unsigned count_assertions() const
   {
     unsigned i=0;

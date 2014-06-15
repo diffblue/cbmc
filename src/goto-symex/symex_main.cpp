@@ -351,7 +351,7 @@ bool goto_symext::symex_step(
       Forall_expr(it, deref_code.arguments())
         clean_expr(*it, state, false);
     
-      symex_function_call(goto_functions, state, deref_code);
+      return symex_function_call(goto_functions, state, deref_code);
     }
     else
       state.source.pc++;

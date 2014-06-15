@@ -334,7 +334,6 @@ bool bmct::run(const goto_functionst &goto_functions)
   else
     throw "Invalid memory model "+mm+" -- use one of sc, tso, pso";
 
-  //symex.total_claims=0;
   symex.set_message_handler(get_message_handler());
   symex.set_verbosity(get_verbosity());
   symex.options=options;
@@ -362,6 +361,8 @@ bool bmct::run(const goto_functionst &goto_functions)
 
     //THE MAIN LOOP FOR INCREMENTAL UNWINDING
     while(!symex_done) { 
+      symex.total_claims=0;
+      symex.remaining_claims=0;
       symex_done = symex(symex_state,goto_functions,body);
 
       undo_slice(equation); //undo all previous slicings

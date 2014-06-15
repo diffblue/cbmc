@@ -1,6 +1,6 @@
 CORE
 main.c
-
+--unwind-max 11
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

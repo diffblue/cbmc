@@ -177,7 +177,7 @@ Function: goto_symext::symex_function_call
 
 \*******************************************************************/
 
-void goto_symext::symex_function_call(
+bool goto_symext::symex_function_call(
   const goto_functionst &goto_functions,
   statet &state,
   const code_function_callt &code)
@@ -185,7 +185,7 @@ void goto_symext::symex_function_call(
   const exprt &function=code.function();
 
   if(function.id()==ID_symbol)
-    symex_function_call_symbol(goto_functions, state, code);
+    return symex_function_call_symbol(goto_functions, state, code);
   else if(function.id()==ID_if)
     throw "symex_function_call can't do if";
   else if(function.id()==ID_dereference)
@@ -206,7 +206,7 @@ Function: goto_symext::symex_function_call_symbol
 
 \*******************************************************************/
 
-void goto_symext::symex_function_call_symbol(
+bool goto_symext::symex_function_call_symbol(
   const goto_functionst &goto_functions,
   statet &state,
   const code_function_callt &code)
@@ -231,7 +231,9 @@ void goto_symext::symex_function_call_symbol(
     symex_macro(state, code);
   }
   else
-    symex_function_call_code(goto_functions, state, code);
+    return symex_function_call_code(goto_functions, state, code);
+
+  return false;
 }
 
 /*******************************************************************\
@@ -246,7 +248,7 @@ Function: goto_symext::symex_function_call_code
 
 \*******************************************************************/
 
-void goto_symext::symex_function_call_code(
+bool goto_symext::symex_function_call_code(
   const goto_functionst &goto_functions,
   statet &state,
   const code_function_callt &call)
@@ -286,7 +288,7 @@ void goto_symext::symex_function_call_code(
     }
 
     state.source.pc++;
-    return;
+    return false;
   }
   
   // record the call
@@ -309,7 +311,7 @@ void goto_symext::symex_function_call_code(
     }
 
     state.source.pc++;
-    return;
+    return false;
   }
   
   // read the arguments -- before the locality renaming
@@ -345,6 +347,8 @@ void goto_symext::symex_function_call_code(
 
   state.source.is_set=true;
   state.source.pc=goto_function.body.instructions.begin();
+
+  return false;
 }
 
 /*******************************************************************\

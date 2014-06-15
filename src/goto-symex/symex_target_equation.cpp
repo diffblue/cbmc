@@ -810,7 +810,10 @@ void symex_target_equationt::convert_assertions(
       {
         it->converted = true;
 
-        std::cout << "assertion: " << from_expr(ns,"",it->cond_expr) << std::endl;
+#if 0
+        std::cout << "assertion: " << from_expr(ns,"",it->cond_expr) 
+          << std::endl;
+#endif
 
         if(is_incremental) { 
           prop_conv.set_to_true(or_exprt(literal_exprt(activation_literal),

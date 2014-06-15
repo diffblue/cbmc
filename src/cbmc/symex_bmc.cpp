@@ -132,7 +132,15 @@ bool symex_bmct::add_loop_check()
 
   status() << "Checking loop " << loop_cond.id << eom;
 
+#if 0
   debug() << "Loop condition: " << from_expr(ns,"",loop_cond.cond) << eom;
+#endif
+
+  if(loop_cond.cond.is_false()) 
+  {
+    debug() << "Loop " << loop_cond.id << " not fully unwound" << eom;
+    return false;
+  }
 
   target.assertion(loop_cond.guard, loop_cond.cond, 
     "loop_condition_check", loop_cond.source);
@@ -144,7 +152,7 @@ void symex_bmct::update_loop_info(bool fully_unwound)
 {
   if(loop_cond.id=="") return;
 
-  debug() << "Loop " << loop_cond.id 
+  status() << "Loop " << loop_cond.id 
 	  << (fully_unwound ? " fully unwound" : " not fully unwound") << eom;
 
   loop_cond.loop_info->fully_unwound = fully_unwound;
@@ -190,7 +198,12 @@ bool symex_bmct::get_unwind(
       this_loop_limit=max_unwind;
   }
 
-  if(id==incr_loop_id || (incr_loop_id=="" && is_incremental))
+  // use the incremental limits if 
+  // it is the specified incremental loop or
+  // there was no non-incremental limit
+  if(id==incr_loop_id || 
+     (incr_loop_id=="" && is_incremental && 
+      this_loop_limit==std::numeric_limits<unsigned>::max()))
   {
     this_loop_limit = incr_max_unwind;
     if(unwind+1>=incr_min_unwind) ignore_assertions = false;
@@ -253,6 +266,12 @@ bool symex_bmct::get_unwind_recursion(
       this_loop_limit=l_it->second;
     else if(max_unwind_is_set)
       this_loop_limit=max_unwind;
+  }
+
+  if(id==incr_loop_id || (incr_loop_id=="" && is_incremental))
+  {
+    this_loop_limit = incr_max_unwind;
+    if(unwind+1>=incr_min_unwind) ignore_assertions = false;
   }
 
   bool abort=unwind>this_loop_limit;
