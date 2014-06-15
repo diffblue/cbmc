@@ -82,7 +82,7 @@ int main()
   // inside a typecast (function pointer)
   x=1;
   (int (*)(int a[x++]))0; // This is ignored by gcc! Haha!
-  assert(x==2);
+  assert(x==1);
   
   // inside sizeof
   x=1;
