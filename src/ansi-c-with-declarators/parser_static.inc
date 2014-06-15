@@ -438,21 +438,45 @@ Function: adjust_KnR_parameters
 
 \*******************************************************************/
 
-static void adjust_KnR_parameters(irept &parameters, irept &declarations)
+static void adjust_KnR_parameters(
+  irept &parameters,
+  exprt &declarations)
 {
-  Forall_irep(d_it, declarations.get_sub())
+  // the below is probably better done in the type checker
+
+  Forall_operands(d_it, declarations)
   {
     assert(d_it->id()==ID_declaration);
-    irep_idt base_name=d_it->get(ID_base_name);
+    ansi_c_declarationt &declaration=
+      to_ansi_c_declaration(static_cast<exprt &>(*d_it));
 
-    // we just do a linear search over the parameters
-    // this could be improved with a hash map
-    Forall_irep(a_it, parameters.get_sub())
+    // Go over declarators
+    ansi_c_declarationt::declaratorst &declarators=
+      declaration.declarators();
+
+    for(ansi_c_declarationt::declaratorst::const_iterator
+        it=declarators.begin();
+        it!=declarators.end();
+        it++)
     {
-      if(a_it->get(ID_base_name)==base_name)
+      irep_idt base_name=it->get_base_name();
+
+      // we just do a linear search over the parameters
+      // this could be improved with a hash map
+      Forall_irep(a_it, parameters.get_sub())
       {
-        a_it->add(ID_type)=d_it->find(ID_type);
-        break;
+        ansi_c_declarationt &p_decl=
+          to_ansi_c_declaration(static_cast<exprt &>(*a_it));
+
+        if(p_decl.declarator().get_base_name()==base_name)
+        {
+          // match
+          // This copies the declaration type, which can be a
+          // problem if there are compound bodies in there.
+          p_decl.type()=declaration.type();
+          p_decl.declarator().type()=it->type();
+          break;
+        }
       }
     }
   }
