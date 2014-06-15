@@ -2397,13 +2397,13 @@ KnR_parameter_header_opt:
 KnR_parameter_header:
           KnR_parameter_declaration
         {
-          $$=$1;
+          init($$, ID_decl_block);
+          mto($$, $1);
         }
         | KnR_parameter_header KnR_parameter_declaration
         {
           $$=$1;
-          Forall_irep(it, stack($2).get_sub())
-            stack($$).move_to_sub(*it);
+          mto($$, $2);
         }
         ;
 
@@ -2713,7 +2713,8 @@ postfixing_abstract_declarator:
         }
         | '('
           {
-            // use last declarator (i.e., function name)
+            // Use last declarator (i.e., function name) to name
+            // the scope.
             PARSER.new_scope(
               id2string(PARSER.current_scope().last_declarator)+"::");
           }
@@ -2743,7 +2744,8 @@ parameter_postfixing_abstract_declarator:
         }
         | '('
           {
-            // use last declarator (i.e., function name)
+            // Use last declarator (i.e., function name) to name
+            // the scope.
             PARSER.new_scope(
               id2string(PARSER.current_scope().last_declarator)+"::");
           }
