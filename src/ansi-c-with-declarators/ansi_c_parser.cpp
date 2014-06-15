@@ -158,9 +158,10 @@ void ansi_c_parsert::add_declarator(
     bool force_root_scope=false;
   
     // Functions always go into global scope, unless
-    // declared as a parameter.
+    // declared as a parameter or are typedefs.
     if(new_declarator.type().id()==ID_code &&
-       !is_parameter)
+       !is_parameter &&
+       !is_typedef)
       force_root_scope=true;
     
     // variables marked as 'extern' always go into global scope
