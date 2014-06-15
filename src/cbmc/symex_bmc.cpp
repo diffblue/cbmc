@@ -190,7 +190,7 @@ bool symex_bmct::get_unwind(
       this_loop_limit=max_unwind;
   }
 
-  if(id==incr_loop_id)
+  if(id==incr_loop_id || (incr_loop_id=="" && is_incremental))
   {
     this_loop_limit = incr_max_unwind;
     if(unwind+1>=incr_min_unwind) ignore_assertions = false;
