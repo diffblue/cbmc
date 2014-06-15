@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/prefix.h>
 #include <util/config.h>
 #include <util/std_types.h>
+#include <util/i2string.h>
 
 #include "c_typecheck_base.h"
 #include "expr2c.h"
@@ -639,13 +640,24 @@ void c_typecheck_baset::typecheck_function_body(symbolt &symbol)
   // set return type
   return_type=code_type.return_type();
   
+  unsigned anon_counter=0;
+  
   // add parameter declarations into the symbol table
-  const code_typet::parameterst &parameters=code_type.parameters();
-  for(code_typet::parameterst::const_iterator
+  code_typet::parameterst &parameters=code_type.parameters();
+  for(code_typet::parameterst::iterator
       p_it=parameters.begin();
       p_it!=parameters.end();
       p_it++)
   {
+    // may be anonymous
+    if(p_it->get_identifier()==irep_idt())
+    {
+      irep_idt base_name="#anon"+i2string(anon_counter++);
+      irep_idt identifier=id2string(symbol.name)+"::"+id2string(base_name);
+      p_it->set_base_name(base_name);
+      p_it->set_identifier(identifier);
+    }
+
     symbolt p_symbol;
     
     p_symbol.type=p_it->type();
