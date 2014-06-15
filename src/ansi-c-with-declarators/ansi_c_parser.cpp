@@ -134,6 +134,7 @@ void ansi_c_parsert::add_declarator(
   irep_idt base_name=new_declarator.get_base_name();
   
   bool is_member=ansi_c_declaration.get_is_member();
+  bool is_parameter=ansi_c_declaration.get_is_parameter();
   
   if(is_member)
   {
@@ -156,8 +157,10 @@ void ansi_c_parsert::add_declarator(
 
     bool force_root_scope=false;
   
-    // functions always go into global scope
-    if(new_declarator.type().id()==ID_code)
+    // Functions always go into global scope, unless
+    // declared as a parameter.
+    if(new_declarator.type().id()==ID_code &&
+       !is_parameter)
       force_root_scope=true;
     
     // variables marked as 'extern' always go into global scope
