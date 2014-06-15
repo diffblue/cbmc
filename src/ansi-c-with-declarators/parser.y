@@ -2464,12 +2464,12 @@ KnR_sue_declaration_specifier:
         KnR_declaration_qualifier_list aggregate_key identifier_or_typedef_name gcc_type_attribute_opt
         {
           stack($2).set(ID_tag, stack($3));
-          $$=merge($3, merge($1, $4));
+          $$=merge($1, merge($2, $4));
         }
         | KnR_declaration_qualifier_list enum_key identifier_or_typedef_name gcc_type_attribute_opt
         {
           stack($2).set(ID_tag, stack($3));
-          $$=merge($3, merge($1, $4));
+          $$=merge($1, merge($2, $4));
         }
         ;
 
