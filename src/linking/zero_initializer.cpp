@@ -251,7 +251,12 @@ exprt zero_initializert::zero_initializer_rec(
   }
   else if(type_id==ID_symbol)
   {
-    return zero_initializer_rec(ns.follow(type), location);
+    exprt result=zero_initializer_rec(ns.follow(type), location);
+    // we might have mangled the type for arrays, so keep that
+    if(ns.follow(type).id()!=ID_array)
+      result.type()=type;
+
+    return result;
   }
   else
   {

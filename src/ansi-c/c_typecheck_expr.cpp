@@ -1062,7 +1062,7 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
       if(base_type_eq(it->type(), op.type(), *this))
       {
         // found! build union constructor
-        union_exprt union_expr(union_type);
+        union_exprt union_expr(expr.type());
         union_expr.location()=expr.location();
         union_expr.op()=op;
         union_expr.set_component_name(it->get_name());
@@ -1085,13 +1085,13 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
   if(op.id()==ID_initializer_list)
   {
     // just do a normal initialization
-    do_initializer(op, expr_type, false);
+    do_initializer(op, expr.type(), false);
     
     // This produces a struct-expression,
     // union-expression, array-expression,
     // or an expression for a pointer or scalar.
     // We produce a compound_literal expression.
-    exprt tmp(ID_compound_literal, expr_type);
+    exprt tmp(ID_compound_literal, expr.type());
     tmp.move_to_operands(op);
     expr=tmp;
     expr.set(ID_C_lvalue, true); // these are l-values
@@ -1203,7 +1203,7 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
      simplify_expr(op, *this).is_zero())
   {
     // zero typecasted to a pointer is NULL
-    constant_exprt result(ID_NULL, expr_type);
+    constant_exprt result(ID_NULL, expr.type());
     expr=result;
     return;
   }
