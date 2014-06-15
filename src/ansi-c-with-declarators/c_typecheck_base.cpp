@@ -627,7 +627,7 @@ void c_typecheck_baset::typecheck_function_body(symbolt &symbol)
   
   unsigned anon_counter=0;
   
-  // add parameter declarations into the symbol table
+  // Add the parameter declarations into the symbol table.
   code_typet::parameterst &parameters=code_type.parameters();
   for(code_typet::parameterst::iterator
       p_it=parameters.begin();
@@ -635,18 +635,23 @@ void c_typecheck_baset::typecheck_function_body(symbolt &symbol)
       p_it++)
   {
     // may be anonymous
-    if(p_it->get_identifier()==irep_idt())
+    if(p_it->get_base_name()==irep_idt())
     {
       irep_idt base_name="#anon"+i2string(anon_counter++);
-      irep_idt identifier=id2string(symbol.name)+"::"+id2string(base_name);
       p_it->set_base_name(base_name);
-      p_it->set_identifier(identifier);
     }
+    
+    // produce identifier
+    irep_idt base_name=p_it->get_base_name();
+    irep_idt identifier=id2string(symbol.name)+"::"+id2string(base_name);
+
+    p_it->set_identifier(identifier);
 
     symbolt p_symbol;
     
     p_symbol.type=p_it->type();
-    p_symbol.name=p_it->get_identifier();
+    p_symbol.name=identifier;
+    p_symbol.base_name=base_name;
     p_symbol.is_static_lifetime=false;
     p_symbol.is_type=false;
     p_symbol.is_lvalue=true;
