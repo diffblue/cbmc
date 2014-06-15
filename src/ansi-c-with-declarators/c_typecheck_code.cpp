@@ -223,7 +223,7 @@ void c_typecheck_baset::typecheck_block(codet &code)
         code_ptr=&to_code(code_ptr->op0());
       }
       
-      codet &label_op=*code_ptr;
+      //codet &label_op=*code_ptr;
 
       new_ops.move_to_operands(code_op);
     }
