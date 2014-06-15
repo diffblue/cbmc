@@ -572,8 +572,8 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
     if(s_it==symbol_table.symbols.end())
     {
       // no, add new symbol
-      type.remove(ID_tag);
       irep_idt base_name=type.find(ID_tag).get(ID_C_base_name);
+      type.remove(ID_tag);
       type.set(ID_tag, base_name);
 
       symbolt compound_symbol;
@@ -582,6 +582,7 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
       compound_symbol.base_name=base_name;
       compound_symbol.type=type;
       compound_symbol.location=type.location();
+      compound_symbol.pretty_name=id2string(type.id())+" "+id2string(base_name);
 
       if(have_body)
       {
@@ -620,7 +621,7 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
       else if(have_body)
       {
         err_location(type);
-        str << "redefinition of " << type.id() << " body";
+        str << "redefinition of body of `" << s_it->second.pretty_name << "'";
         error();
         throw 0;
       }
