@@ -216,7 +216,8 @@ protected:
   virtual void typecheck_side_effect_statement_expression(side_effect_exprt &expr);
   virtual void typecheck_function_call_arguments(side_effect_expr_function_callt &expr);
   virtual void do_special_functions(side_effect_expr_function_callt &expr);
-  
+
+  virtual void make_index_type(exprt &expr);
   virtual void make_constant(exprt &expr);
   virtual void make_constant_index(exprt &expr);
   virtual void make_constant_rec(exprt &expr);
@@ -246,15 +247,7 @@ protected:
   }
 
   // this cleans expressions in array types
-  virtual void clean_type(
-    const irep_idt &base_symbol_identifier,
-    typet &type,
-    std::list<codet> &code);
-  
-  typedef hash_set_cont<irep_idt, irep_id_hash> already_cleanedt;
-  already_cleanedt already_cleaned;
-
-  void make_index_type(exprt &expr);
+  std::list<codet> clean_code;
 
   // environment
   void add_argc_argv(const symbolt &main_symbol);
@@ -264,8 +257,8 @@ protected:
   void move_symbol(symbolt &symbol)
   { symbolt *new_symbol; move_symbol(symbol, new_symbol); }
   
-  // top level stuff
-  void typecheck_declaration(ansi_c_declarationt &); 
+  // top-level stuff
+  void typecheck_declaration(ansi_c_declarationt &);
   void typecheck_symbol(symbolt &symbol);
   void typecheck_new_symbol(symbolt &symbol);
   void typecheck_redefinition_type(symbolt &old_symbol, symbolt &new_symbol);

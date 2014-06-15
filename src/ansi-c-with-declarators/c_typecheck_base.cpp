@@ -135,21 +135,6 @@ void c_typecheck_baset::typecheck_symbol(symbolt &symbol)
     throw "only functions can have a function body";
   }
   
-  #if 0
-  {
-    // and now that we have the proper name
-    // we clean the type of any side-effects
-    // (needs to be done before next symbol)
-    std::list<codet> clean_type_code;
-    clean_type(symbol, symbol.type, clean_type_code);
-    
-    // We store the code that was generated for the type
-    // for later use when we see the declaration.
-    if(!clean_type_code.empty())
-      clean_code[symbol.name]=code_blockt(clean_type_code);
-  }
-  #endif
-    
   // set the pretty name
   if(symbol.is_type &&
      (final_type.id()==ID_struct ||

@@ -347,9 +347,6 @@ void c_typecheck_baset::typecheck_decl(codet &code)
 
     symbolt &symbol=s_it->second;
     
-    // There may be side-effects in the type.  
-    clean_type(symbol.name, symbol.type, new_code);
-
     // this must not be an incomplete type
     if(!is_complete_type(symbol.type))
     {
@@ -383,6 +380,9 @@ void c_typecheck_baset::typecheck_decl(codet &code)
       new_code.push_back(code);
     }
   }
+  
+  // stash away any side-effects in the declaration
+  new_code.splice(new_code.end(), clean_code);
   
   if(new_code.empty())
   {
@@ -463,51 +463,6 @@ void c_typecheck_baset::typecheck_expression(codet &code)
 
   exprt &op=code.op0();
   typecheck_expr(op);
-
-  #if 0
-  // Goes away since stuff like x=({y=1;});
-  // needs the inner side-effect.
-  if(op.id()==ID_sideeffect)
-  {
-    const irep_idt &statement=op.get(ID_statement);
-    
-    if(statement==ID_assign)
-    {
-      assert(op.operands().size()==2);
-      
-      // pull assignment statements up
-      exprt::operandst operands;
-      operands.swap(op.operands());
-      code.set_statement(ID_assign);
-      code.operands().swap(operands);
-      code.location()=op.location();
-      
-      if(code.op1().id()==ID_sideeffect &&
-         code.op1().get(ID_statement)==ID_function_call)
-      {
-        assert(code.op1().operands().size()==2);
-  
-        code_function_callt function_call;
-        function_call.location().swap(code.op1().location());
-        function_call.lhs()=code.op0();
-        function_call.function()=code.op1().op0();
-        function_call.arguments()=code.op1().op1().operands();
-        code.swap(function_call);
-      }
-    }
-    else if(statement==ID_function_call)
-    {
-      assert(op.operands().size()==2);
-      
-      // pull function calls up
-      code_function_callt function_call;
-      function_call.location()=code.location();
-      function_call.function()=op.op0();
-      function_call.arguments()=op.op1().operands();
-      code.swap(function_call);
-    }
-  }
-  #endif
 }
 
 /*******************************************************************\

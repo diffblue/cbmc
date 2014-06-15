@@ -952,7 +952,7 @@ void c_typecheck_baset::typecheck_expr_sizeof(exprt &expr)
            "but got " << expr.operands().size();
     throw 0;
   }
-
+  
   exprt new_expr=c_sizeof(type, *this);
 
   if(new_expr.is_nil())
@@ -966,6 +966,26 @@ void c_typecheck_baset::typecheck_expr_sizeof(exprt &expr)
   new_expr.swap(expr);
 
   expr.add(ID_C_c_sizeof_type)=type;
+
+  // The type may contain side-effects.
+  if(!clean_code.empty())
+  {
+    side_effect_exprt side_effect_expr(ID_statement_expression, empty_typet());
+    code_blockt decl_block(clean_code);
+    decl_block.set_statement(ID_decl_block);
+    side_effect_expr.copy_to_operands(decl_block);
+    clean_code.clear();
+  
+    // We merge the side-effect into the operand of the typecast,
+    // using a comma-expression.
+    // I.e., (type)e becomes (type)(side-effect, e)
+    // It is not obvious whether the type or 'e' should be evaluated
+    // first.
+  
+    exprt comma_expr(ID_comma, expr.type());
+    comma_expr.copy_to_operands(side_effect_expr, expr);
+    expr.swap(comma_expr);
+  }
 }
 
 /*******************************************************************\
@@ -1026,25 +1046,25 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
   exprt &op=expr.op0();
 
   typecheck_type(expr.type());
-  
-  {
-    // first clean the type of any side-effects
-    std::list<codet> clean_code;
-    clean_type(irep_idt(), expr.type(), clean_code);
 
-    if(!clean_code.empty())
-    {
-      side_effect_exprt side_effect_expr(ID_statement_expression, empty_typet());
-      side_effect_expr.copy_to_operands(code_blockt(clean_code));
-    
-      // We merge the side-effect into the operand, using
-      // a comma-expression.
-      // I.e., (type)e becomes (type)(side-effect, e)
-    
-      exprt comma_expr(ID_comma, op.type());
-      comma_expr.copy_to_operands(side_effect_expr, op);
-      op.swap(comma_expr);
-    }
+  // The type may contain side-effects.
+  if(!clean_code.empty())
+  {
+    side_effect_exprt side_effect_expr(ID_statement_expression, empty_typet());
+    code_blockt decl_block(clean_code);
+    decl_block.set_statement(ID_decl_block);
+    side_effect_expr.copy_to_operands(decl_block);
+    clean_code.clear();
+  
+    // We merge the side-effect into the operand of the typecast,
+    // using a comma-expression.
+    // I.e., (type)e becomes (type)(side-effect, e)
+    // It is not obvious whether the type or 'e' should be evaluated
+    // first.
+  
+    exprt comma_expr(ID_comma, op.type());
+    comma_expr.copy_to_operands(side_effect_expr, op);
+    op.swap(comma_expr);
   }
 
   const typet expr_type=follow(expr.type());
