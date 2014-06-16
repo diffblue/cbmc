@@ -1003,7 +1003,7 @@ type_qualifier:
         | TOK_CPROVER_ATOMIC { $$=$1; set($$, ID_cprover_atomic); }
         | TOK_PTR32    { $$=$1; set($$, ID_ptr32); }
         | TOK_PTR64    { $$=$1; set($$, ID_ptr64); }
-        | TOK_MSC_BASED '(' comma_expression ')' { $$=$1; set($$, ID_msc_based); }
+        | TOK_MSC_BASED '(' comma_expression ')' { $$=$1; set($$, ID_msc_based); mto($$, $3); }
         ;
 
 attribute_or_type_qualifier:

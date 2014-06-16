@@ -93,6 +93,12 @@ void ansi_c_convert_typet::read_rec(const typet &type)
   {
     gcc_attribute_mode=type;
   }
+  else if(type.id()==ID_msc_based)
+  {
+    const exprt &as_expr=static_cast<const exprt &>(static_cast<const irept &>(type));
+    assert(as_expr.operands().size()==1);
+    msc_based=as_expr.op0();
+  }
   else if(type.id()==ID_custom_bv)
   {
     bv_cnt++;
