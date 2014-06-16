@@ -7,6 +7,8 @@ CPROVER compiles in the following environments:
 
 - MacOS X
 
+- Solaris 11
+
 - Cygwin
   (We recommend g++-3. Don't use the i686-pc-mingw32-g++ cross compiler.)
 
@@ -55,15 +57,19 @@ COMPILATION ON SOLARIS 11
    pkg install system/header
    /opt/csw/bin/pkgutil -i gzip coreutils wget CSWpm-libwww-perl subversion flex bison CSWgcc4g++
 
-2) As a user, get MiniSat2 by entering
+2) As a user, get the CBMC source via
+
+   svn co http://www.cprover.org/svn/cbmc/trunk cbmc-trunk
+
+3) Get MiniSat2 by entering
 
    cd src
-   wget http://minisat.se/downloads/minisat-2.2.0.tar.gz
-   gtar xfz minisat-2.2.0.tar.gz
-   mv minisat ../minisat-2.2.0
+   wget http://ftp.debian.org/debian/pool/main/m/minisat2/minisat2_2.2.0.orig.tar.gz
+   gtar xfz minisat_2.2.0.orig.tar.gz
+   mv minisat-2.2.0 ../
    (cd ../minisat-2.2.0; patch -p1 < ../scripts/minisat-2.2.0-patch)
 
-3) Type
+4) Type
 
    gmake CXX=/opt/csw/bin/g++
 
