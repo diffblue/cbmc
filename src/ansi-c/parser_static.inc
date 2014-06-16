@@ -327,8 +327,6 @@ Function: create_function_scope
 
 \*******************************************************************/
 
-#include <iostream>
-
 static void create_function_scope(const YYSTYPE d)
 {
   ansi_c_declarationt &declaration=to_ansi_c_declaration(stack(d));
