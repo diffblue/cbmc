@@ -602,8 +602,6 @@ Function: c_typecheck_baset::typecheck_compound_type
 
 \*******************************************************************/
 
-#include <iostream>
-
 void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
 {
   // These get replaced by symbol types.
@@ -691,6 +689,10 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
         // Maybe we got a body now.
         if(have_body)
         {
+          irep_idt base_name=type.find(ID_tag).get(ID_C_base_name);
+          type.remove(ID_tag);
+          type.set(ID_tag, base_name);
+
           s_it->second.type=type;
           typecheck_compound_body(s_it->second);
         }
