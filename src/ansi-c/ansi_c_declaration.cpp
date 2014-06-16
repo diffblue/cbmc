@@ -113,8 +113,6 @@ Function: ansi_c_declarationt::full_type
 
 \*******************************************************************/
 
-#include <iostream>
-
 typet ansi_c_declarationt::full_type(
   const ansi_c_declaratort &declarator) const
 {
@@ -135,11 +133,7 @@ typet ansi_c_declarationt::full_type(
       p=&(p->subtypes().back());
     }
     else
-    {
-      std::cout << "result: " << result.pretty() << "\n";
-      std::cout << "p: " << p->pretty() << "\n";
       assert(false);
-    }
   }
 
   *p=type();
