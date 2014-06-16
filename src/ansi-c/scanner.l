@@ -531,6 +531,12 @@ void ansi_c_scanner_init()
                     return make_identifier();
                 }
 
+"__wchar_t"     { if(PARSER.mode==ansi_c_parsert::MSC)  
+                    { loc(); return TOK_WCHAR_T; }  
+                  else
+                    return make_identifier();
+                }                                                                          
+
 %{
 /* C++ Keywords and Operators */
 %}
