@@ -616,16 +616,6 @@ unary_expression:
           stack($$).id(ID_alignof);
           stack($$).add(ID_type_arg).swap(stack($3));
         }
-        | TOK_REAL unary_expression
-        { $$=$1;
-          set($$, ID_complex_real);
-          mto($$, $2);
-        }
-        | TOK_IMAG unary_expression
-        { $$=$1;
-          set($$, ID_complex_imag);
-          mto($$, $2);
-        }
         ;
 
 cast_expression:
@@ -636,6 +626,16 @@ cast_expression:
           set($$, ID_typecast);
           mto($$, $4);
           stack($$).type().swap(stack($2));
+        }
+        | TOK_REAL cast_expression
+        { $$=$1;
+          set($$, ID_complex_real);
+          mto($$, $2);
+        }
+        | TOK_IMAG cast_expression
+        { $$=$1;
+          set($$, ID_complex_imag);
+          mto($$, $2);
         }
         ;
 
