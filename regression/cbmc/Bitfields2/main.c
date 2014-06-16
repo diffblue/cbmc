@@ -1,4 +1,12 @@
+
+#ifdef _WIN32
+typedef unsigned __int64 uint64_t;
+typedef int int32_t;
+typedef unsigned int uint32_t;
+#else
 #include <inttypes.h>
+#endif
+
 #include <assert.h>
 
 union U {
