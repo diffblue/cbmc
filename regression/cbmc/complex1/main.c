@@ -4,7 +4,7 @@
 int main()
 {
   #ifdef __GNUC__
-  _Complex c;
+  _Complex c; // this is usually '_Complex double'
   c=1.0i+2;
 
   assert(__real__ c == 2);
@@ -26,9 +26,12 @@ int main()
   assert(((signed char *)&char_complex)[0]==-2);
   assert(((signed char *)&char_complex)[1]==3);
   #endif
-
+  
   assert(__real__ char_complex == -2);
   assert(__imag__ char_complex == 3);
+  
+  // the precedence of __imag__ is higher than that of +
+  assert((__imag__ 1.0i + 1.0i) == 1.0i + 1.0);
   
   // complex conjugate
   char_complex2 = ~ char_complex;
