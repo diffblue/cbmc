@@ -109,7 +109,7 @@ void __stdcall f10();
 
 // __w64
 
-// __wchar_t some_wchar;
+__wchar_t some_wchar;
 
 // wchar_t some_other_wchar;
 
