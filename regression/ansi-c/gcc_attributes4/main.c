@@ -15,6 +15,14 @@ STATIC_ASSERT(sizeof(int16)==2);
 STATIC_ASSERT(sizeof(int32)==4);
 STATIC_ASSERT(sizeof(int64)==8);
 
+uchar v1 __attribute__ ((vector_size (1))),
+      v2 __attribute__ ((vector_size (2))),
+      v4 __attribute__ ((vector_size (4)));
+
+STATIC_ASSERT(sizeof(v1)==1);
+STATIC_ASSERT(sizeof(v2)==2);
+STATIC_ASSERT(sizeof(v4)==4);
+
 #endif
 
 int main()
