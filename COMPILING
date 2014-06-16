@@ -63,15 +63,14 @@ COMPILATION ON SOLARIS 11
 
 3) Get MiniSat2 by entering
 
-   cd src
+   cd cbmc-trunk
    wget http://ftp.debian.org/debian/pool/main/m/minisat2/minisat2_2.2.0.orig.tar.gz
    gtar xfz minisat_2.2.0.orig.tar.gz
-   mv minisat-2.2.0 ../
-   (cd ../minisat-2.2.0; patch -p1 < ../scripts/minisat-2.2.0-patch)
+   (cd minisat-2.2.0; patch -p1 < ../scripts/minisat-2.2.0-patch)
 
 4) Type
 
-   gmake CXX=/opt/csw/bin/g++
+   cd src; gmake CXX=/opt/csw/bin/g++
 
    That should do it.
 
