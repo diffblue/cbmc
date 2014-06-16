@@ -347,8 +347,11 @@ void c_typecheck_baset::typecheck_decl(codet &code)
 
     symbolt &symbol=s_it->second;
     
-    // this must not be an incomplete type
-    if(!is_complete_type(symbol.type))
+    // This must not be an incomplete type, unless it's 'extern' 
+    // or a typedef.
+    if(!symbol.is_type &&
+       !symbol.is_extern &&
+       !is_complete_type(symbol.type))
     {
       err_location(symbol.location);
       throw "incomplete type not permitted here";
