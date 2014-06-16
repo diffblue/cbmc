@@ -1,7 +1,14 @@
 #define STATIC_ASSERT(condition) \
   int some_array##__LINE__[(condition) ? 1 : -1]
 
+#ifdef _WIN32
+typedef unsigned __int64 uint64_t;
+typedef unsigned int uint32_t;
+typedef unsigned short uint16_t;
+typedef unsigned char uint8_t;
+#else
 #include <inttypes.h>
+#endif
 
 #pragma pack(1)
 typedef union RTFLOAT80U
