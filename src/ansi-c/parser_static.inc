@@ -317,55 +317,6 @@ static void do_pointer(const YYSTYPE ptr, const YYSTYPE dest)
 
 /*******************************************************************\
 
-Function: do_enum_members
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-static void do_enum_members(
-  const YYSTYPE enum_type_ptr,
-  const YYSTYPE members)
-{  
-  // This assigns increasing values to enum constants
-  // that do not have an explicit value. We start with 0.
-  // We should likely move this functionality into
-  // the type checker.
-
-  // In C, enum constants always have type "int".
-  typet member_type=::enum_type();
-
-  exprt value=gen_zero(member_type);
-
-  exprt &member_op=stack(members);
-
-  Forall_operands(it, member_op)
-  {
-    ansi_c_declarationt &ansi_c_declaration=to_ansi_c_declaration(*it);
-    ansi_c_declaratort &declarator=ansi_c_declaration.declarator();
-    ansi_c_declaration.type()=typet(ID_int);
-
-    exprt &v=declarator.value();
-
-    if(v.is_nil())
-      v=value;
-
-    exprt symbol_expr(ID_symbol);
-    symbol_expr.set(ID_identifier, declarator.get_base_name());
-    
-    value=exprt(ID_plus);
-    value.copy_to_operands(symbol_expr, gen_one(member_type));
-  }
-
-  stack(enum_type_ptr).operands().swap(member_op.operands());
-}
-
-/*******************************************************************\
-
 Function: create_function_scope
 
   Inputs:

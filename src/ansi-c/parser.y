@@ -1489,7 +1489,7 @@ enum_name:
           '{' enumerator_list '}'
           gcc_type_attribute_opt
         {
-          do_enum_members($1, $5);
+          stack($1).operands().swap(stack($5).operands());
           $$=merge($1, merge($2, $7)); // throw in the gcc attributes
         }
         | enum_key
@@ -1502,7 +1502,7 @@ enum_name:
           '{' enumerator_list '}'
           gcc_type_attribute_opt
         {
-          do_enum_members($1, $6);
+          stack($1).operands().swap(stack($6).operands());
           $$=merge($1, merge($2, $8)); // throw in the gcc attribute
         }
         | enum_key

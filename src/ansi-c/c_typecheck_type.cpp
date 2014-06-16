@@ -916,11 +916,30 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
   // these have the declarations of the enum constants as operands
   exprt &as_expr=static_cast<exprt &>(static_cast<irept &>(type));
   locationt location=type.location();
+
+  // enums start at zero
+  typet constant_type=enum_type();
+  exprt value=gen_zero(constant_type);
   
   Forall_operands(it, as_expr)
   {
     ansi_c_declarationt &declaration=to_ansi_c_declaration(*it);
+    
+    // In C, enum constants always have type "int". They do not
+    // have the enum type.
+    declaration.type()=typet(ID_int);
+
+    exprt &v=declaration.declarator().value();
+
+    if(v.is_nil()) v=value; // no value given
+
     typecheck_declaration(declaration);
+
+    symbol_exprt symbol_expr(
+      declaration.declarator().get_name(), constant_type);
+
+    // value for next constant    
+    value=binary_exprt(symbol_expr, ID_plus, gen_one(constant_type), constant_type);
   }
   
   // remove these now
