@@ -4,6 +4,7 @@ typedef signed __int64 int64_t;
 typedef unsigned __int64 uint64_t;
 typedef signed int int32_t;
 typedef unsigned int uint32_t;
+typedef signed short int int16_t;
 #else
 #include <inttypes.h>
 #endif
