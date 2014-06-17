@@ -789,7 +789,20 @@ Function: irept::hash
 
 static inline size_t hash_rotl(const size_t value, int shift)
 {
+  #ifdef _MSC_VER
+  // The below intentionally limits the hash key to 32 bits.
+  // This is because Visual Studio's STL masks away anything
+  // but the least significant n bits, where 2^n is the size of
+  // the hash table. On systems with 64-bit size_t, we then see
+  // performance degradation as too much of the hash key is
+  // contained in bits that will be masked away. There is no such
+  // issue when using the GNU C++ STL.
+
+  unsigned int int_value=value;
+  return (int_value << shift) | (value >> (sizeof(int_value)*8 - shift));
+  #else
   return (value << shift) | (value >> (sizeof(value)*8 - shift));
+  #endif
 }
 
 static inline size_t hash_combine(size_t h1, size_t h2)
