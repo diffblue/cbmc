@@ -439,10 +439,12 @@ Function: bmct::decide_boolector
 
 bool bmct::decide_boolector()
 {
-  if(options.get_bool_option("smt1"))
-    return decide_smt1(smt1_dect::BOOLECTOR);
-  else
+  // Boolector's default is SMT1 for the time being,
+  // as we can't get countermodels in SMT2 mode.
+  if(options.get_bool_option("smt2"))
     return decide_smt2(smt2_dect::BOOLECTOR);
+  else
+    return decide_smt1(smt1_dect::BOOLECTOR);
 }
 
 /*******************************************************************\
@@ -459,6 +461,7 @@ Function: bmct::decide_mathsat
 
 bool bmct::decide_mathsat()
 {
+  // Mathsat defaults to SMT2.
   if(options.get_bool_option("smt1"))
     return decide_smt1(smt1_dect::MATHSAT);
   else
@@ -496,6 +499,7 @@ Function: bmct::decide_z3
 
 bool bmct::decide_z3()
 {
+  // Z3 defaults to SMT2.
   if(options.get_bool_option("smt1"))
     return decide_smt1(smt1_dect::Z3);
   else
