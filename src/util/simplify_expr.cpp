@@ -3336,10 +3336,13 @@ bool simplify_exprt::eliminate_common_addends(
   }
   else if(op0==op1)
   {
-    // elimination!
-    op0=gen_zero(op0.type());
-    op1=gen_zero(op1.type());
-    return false;
+    if(!op0.is_zero())
+    {
+      // elimination!
+      op0=gen_zero(op0.type());
+      op1=gen_zero(op1.type());
+      return false;
+    }
   }
   
   return true;
@@ -3471,7 +3474,7 @@ bool simplify_exprt::simplify_inequality_not_constant(exprt &expr)
       // remove zeros
       simplify_node(expr.op0());
       simplify_node(expr.op1());
-      simplify_inequality(expr);
+      simplify_inequality(expr); // recursive call
       return false;
     }
   
