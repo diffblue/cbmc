@@ -3336,7 +3336,8 @@ bool simplify_exprt::eliminate_common_addends(
   }
   else if(op0==op1)
   {
-    if(!op0.is_zero())
+    if(!op0.is_zero() &&
+       op0.type().id()!=ID_complex)
     {
       // elimination!
       op0=gen_zero(op0.type());
@@ -3466,9 +3467,10 @@ bool simplify_exprt::simplify_inequality_not_constant(exprt &expr)
     }
   }
   
-  // see if we can eliminate common addends on both sides
-  // on bit-vectors, this is only sound on '='
+  // See if we can eliminate common addends on both sides.
+  // On bit-vectors, this is only sound on '='.
   if(expr.id()==ID_equal)
+  {
     if(!eliminate_common_addends(expr.op0(), expr.op1()))
     {
       // remove zeros
@@ -3477,6 +3479,7 @@ bool simplify_exprt::simplify_inequality_not_constant(exprt &expr)
       simplify_inequality(expr); // recursive call
       return false;
     }
+  }
   
   return true;
 }  
