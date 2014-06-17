@@ -123,7 +123,7 @@ exprt gen_one(const typet &type)
   {
     exprt real=gen_one(type.subtype());
     exprt imag=gen_zero(type.subtype());
-    return complex_exprt(real, imag, type);
+    return complex_exprt(real, imag, to_complex_type(type));
   }
   else
     return nil_exprt();
