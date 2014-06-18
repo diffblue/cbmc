@@ -861,7 +861,7 @@ void cbmc_parseoptionst::help()
     " --memory-leak-check          enable memory leak checks\n"
     " --signed-overflow-check      enable arithmetic over- and underflow checks\n"
     " --unsigned-overflow-check    enable arithmetic over- and underflow checks\n"
-    " --float-overflow-check       check floating-point for NaN\n"
+    " --float-overflow-check       check floating-point for +/-Inf\n"
     " --nan-check                  check floating-point for NaN\n"
     " --all-properties             report status of all properties\n"
     " --show-properties            show the properties\n"
