@@ -29,10 +29,7 @@ Function: map_bv
 
 bvt map_bv(const endianness_mapt &map, const bvt &src)
 {
-  // don't do anything for a byte or less
-  if(src.size()<=8) return src;
-
-  assert(map.size()*8==src.size());
+  assert(map.size()*8>=src.size());
 
   bvt result;
   result.resize(src.size(), const_literal(false));
