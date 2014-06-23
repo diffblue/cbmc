@@ -913,6 +913,8 @@ Function: c_typecheck_baset::typecheck_c_enum_type
 
 \*******************************************************************/
 
+#include <iostream>
+
 void c_typecheck_baset::typecheck_c_enum_type(typet &type)
 {
   // these have the declarations of the enum constants as operands
@@ -920,8 +922,10 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
   locationt location=type.location();
 
   // enums start at zero
-  typet constant_type=enum_type();
-  exprt value=gen_zero(constant_type);
+  mp_integer value=0;
+  
+  // track min and max to find a nice base type
+  mp_integer min_value=0, max_value=0;
   
   Forall_operands(it, as_expr)
   {
@@ -933,24 +937,61 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
 
     exprt &v=declaration.declarator().value();
 
-    if(v.is_nil()) v=value; // no value given
+    if(v.is_nil()) // no value given
+      v=from_integer(value, int_type());
 
     typecheck_declaration(declaration);
-
-    symbol_exprt symbol_expr(
-      declaration.declarator().get_name(), constant_type);
-
-    // value for next constant    
-    value=binary_exprt(symbol_expr, ID_plus, gen_one(constant_type), constant_type);
+    
+    // produce value for next constant
+    const symbolt &symbol=
+      lookup(language_prefix+id2string(declaration.declarator().get_name()));
+    to_integer(symbol.value, value);
+    
+    if(value<min_value) min_value=value;
+    if(value>max_value) max_value=value;
+    
+    ++value;
   }
   
   // remove these now
   as_expr.operands().clear();
-  
+
   // We need to determine a width, and a signedness.
   // We just do int, but gcc might pick smaller widths
   // if the type is marked as 'packed'.
-  type.set(ID_width, config.ansi_c.int_width);
+
+  unsigned bytes=0;
+  bool is_signed=min_value<0;
+
+  if(type.get_bool(ID_C_packed))
+  {
+    if(is_signed)
+    {
+      if(max_value<(1<<7) && min_value>=-(1<<7))
+        bytes=1;
+      else if(max_value<(1<<15) && min_value>=-(1<<15))
+        bytes=2;
+      else if(max_value<(mp_integer(1)<<31) && min_value>=-(mp_integer(1)<<31))
+        bytes=4;
+      else
+        bytes=8;
+    }
+    else // unsigned
+    {
+      if(max_value<(1<<8))
+        bytes=1;
+      else if(max_value<(1<<16))
+        bytes=2;
+      else if(max_value<(mp_integer(1)<<32))
+        bytes=4;
+      else
+        bytes=8;
+    }
+
+    type.set(ID_width, bytes*8);
+  }
+  else
+    type.set(ID_width, config.ansi_c.int_width);
 }
 
 /*******************************************************************\
