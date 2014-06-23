@@ -455,8 +455,8 @@ void c_typecheck_baset::typecheck_expr_builtin_va_arg(exprt &expr)
   
   code_typet new_type;
   new_type.return_type().swap(type);
-  new_type.arguments().resize(1);
-  new_type.arguments()[0].type()=pointer_typet(empty_typet());
+  new_type.parameters().resize(1);
+  new_type.parameters()[0].type()=pointer_typet(empty_typet());
 
   assert(expr.operands().size()==1);  
   exprt arg=expr.op0();
@@ -1734,9 +1734,9 @@ void c_typecheck_baset::typecheck_expr_trinary(if_exprt &expr)
 
       if(c_type1.return_type()==c_type2.return_type())
       {
-        if(c_type1.arguments().empty() && c_type1.has_ellipsis())
+        if(c_type1.parameters().empty() && c_type1.has_ellipsis())
           implicit_typecast(operands[1], operands[2].type());
-        else if(c_type2.arguments().empty() && c_type2.has_ellipsis())
+        else if(c_type2.parameters().empty() && c_type2.has_ellipsis())
           implicit_typecast(operands[2], operands[1].type());
       }
     }
