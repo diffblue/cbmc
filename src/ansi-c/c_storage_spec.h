@@ -19,6 +19,12 @@ public:
     clear();
   }
   
+  explicit c_storage_spect(const typet &type)
+  {
+    clear();
+    read(type);
+  }
+  
   void clear()
   {
     is_typedef=false;
@@ -65,6 +71,31 @@ public:
     a.is_thread_local |=b.is_thread_local;
     
     return a;
+  }
+  
+  void read(const typet &type)
+  {
+    if(type.id()==ID_merged_type)
+    {
+      forall_subtypes(it, type)
+        read(*it);
+    }
+    else if(type.id()==ID_static)
+      is_static=true;
+    else if(type.id()==ID_thread_local)
+      is_thread_local=true;
+    else if(type.id()==ID_inline)
+      is_inline=true;
+    else if(type.id()==ID_extern)
+      is_extern=true;
+    else if(type.id()==ID_typedef)
+      is_typedef=true;
+    else if(type.id()==ID_register)
+      is_register=true;
+    else if(type.id()==ID_auto)
+    {
+      // ignore
+    }
   }
 };
 

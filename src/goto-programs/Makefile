@@ -6,7 +6,6 @@ SRC = goto_convert.cpp goto_convert_function_call.cpp \
       builtin_functions.cpp show_properties.cpp set_properties.cpp \
       read_goto_binary.cpp goto_asm.cpp elf_reader.cpp \
       string_abstraction.cpp destructor.cpp \
-      goto_program_serialization.cpp goto_function_serialization.cpp \
       read_bin_goto_object.cpp goto_program_irep.cpp interpreter.cpp \
       interpreter_evaluate.cpp flow_insensitive_analysis.cpp \
       format_strings.cpp loop_ids.cpp pointer_arithmetic.cpp \

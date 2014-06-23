@@ -17,9 +17,9 @@
 
 #ifdef _WIN32
 #define _Alignof __alignof
-#endif
-
+#else
 #define _Alignof __alignof__
+#endif
 
 int f();
 int some_var;

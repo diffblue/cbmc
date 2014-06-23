@@ -3,11 +3,13 @@ struct stmt
   int x;
 };
 
+#ifdef __GNUC__
 static void
 deadstmt(s, last)
    register struct stmt * __attribute__((aligned)) s;
 {
 }
+#endif
 
 static void
 deadstmt_const(s, last)

@@ -1,6 +1,5 @@
-double fabs(double);
-int abs(int);
-int isnan(double);
+#include <math.h>
+#include <stdlib.h>
 
 int main()
 {

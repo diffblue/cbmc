@@ -22,13 +22,13 @@ static int isatty(int) { return 0; }
 #include <util/arith_tools.h>
 #include <util/config.h>
 
-#include <ansi-c/c_types.h>
-#include <ansi-c/preprocessor_line.h>
+#include "c_types.h"
+#include "preprocessor_line.h"
 
-#include <ansi-c/literals/convert_float_literal.h>
-#include <ansi-c/literals/convert_integer_literal.h>
-#include <ansi-c/literals/convert_character_literal.h>
-#include <ansi-c/literals/convert_string_literal.h>
+#include "literals/convert_float_literal.h"
+#include "literals/convert_integer_literal.h"
+#include "literals/convert_character_literal.h"
+#include "literals/convert_string_literal.h"
 
 #define PARSER ansi_c_parser
 #define YYSTYPE unsigned
@@ -45,8 +45,8 @@ int make_identifier()
 {
   loc();
 
-  std::string base_name(yytext);
-  std::string identifier(base_name);
+  irep_idt base_name=yytext;
+  std::string identifier(id2string(base_name));
 
   // figure out if this is a typedef or something else
   ansi_c_id_classt result=
@@ -530,6 +530,12 @@ void ansi_c_scanner_init()
                   else
                     return make_identifier();
                 }
+
+"__wchar_t"     { if(PARSER.mode==ansi_c_parsert::MSC)  
+                    { loc(); return TOK_WCHAR_T; }  
+                  else
+                    return make_identifier();
+                }                                                                          
 
 %{
 /* C++ Keywords and Operators */

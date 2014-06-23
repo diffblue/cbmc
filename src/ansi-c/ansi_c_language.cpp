@@ -19,7 +19,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <linking/entry_point.h>
 
 #include "ansi_c_language.h"
-#include "ansi_c_convert.h"
 #include "ansi_c_typecheck.h"
 #include "ansi_c_parser.h"
 #include "expr2c.h"
@@ -198,9 +197,6 @@ bool ansi_c_languaget::typecheck(
   const std::string &module,
   message_handlert &message_handler)
 {
-  if(ansi_c_convert(parse_tree, module, message_handler))
-    return true;
-
   symbol_tablet new_symbol_table;
 
   if(ansi_c_typecheck(parse_tree, new_symbol_table, module, message_handler))
@@ -352,13 +348,10 @@ bool ansi_c_languaget::to_expr(
     result=true;
   else
   {
-    expr=ansi_c_parser.parse_tree.items.front().value();
+    expr=ansi_c_parser.parse_tree.items.front().declarator().value();
     
-    result=ansi_c_convert(expr, "", message_handler);
-
     // typecheck it
-    if(!result)
-      result=ansi_c_typecheck(expr, message_handler, ns);
+    result=ansi_c_typecheck(expr, message_handler, ns);
   }
 
   // save some memory

@@ -2,6 +2,8 @@ typedef int INTTYPE;
 
 int func1();
 
+// typeof is GCC only
+#ifdef __GNUC__
 typeof(int) v1;
 typeof(INTTYPE) v2;
 typeof(v2) v3;
@@ -16,6 +18,7 @@ static volatile typeof(int) const *v10;
 void func2(typeof(int) *some_arg)
 {
 }
+#endif
 
 int main()
 {

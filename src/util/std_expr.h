@@ -1173,6 +1173,72 @@ const struct_exprt &to_struct_expr(const exprt &expr);
 */
 struct_exprt &to_struct_expr(exprt &expr);
 
+/*! \brief complex constructor from list of elements
+*/
+class complex_exprt:public binary_exprt
+{
+public:
+  inline complex_exprt():binary_exprt(ID_complex)
+  {
+  }
+ 
+  explicit inline complex_exprt(const complex_typet &_type):
+    binary_exprt(ID_complex, _type)
+  {
+  }
+  
+  explicit inline complex_exprt(
+    const exprt &_real, const exprt &_imag, const complex_typet &_type):
+    binary_exprt(_real, ID_complex, _imag, _type)
+  {
+  }
+  
+  inline exprt real()
+  {
+    return op0();
+  }
+
+  inline const exprt &real() const
+  {
+    return op0();
+  }
+
+  inline exprt imag()
+  {
+    return op1();
+  }
+
+  inline const exprt &imag() const
+  {
+    return op1();
+  }
+};
+
+/*! \brief Cast a generic exprt to a \ref complex_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * complex_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref complex_exprt
+ *
+ * \ingroup gr_std_expr
+*/
+static inline const complex_exprt &to_complex_expr(const exprt &expr)
+{
+  assert(expr.id()==ID_complex && expr.operands().size()==2);
+  return static_cast<const complex_exprt &>(expr);
+}
+
+/*! \copydoc to_complex_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
+static inline complex_exprt &to_complex_expr(exprt &expr)
+{
+  assert(expr.id()==ID_complex && expr.operands().size()==2);
+  return static_cast<complex_exprt &>(expr);
+}
+
 class namespacet;
 
 /*! \brief split an expression into a base object and a (byte) offset
