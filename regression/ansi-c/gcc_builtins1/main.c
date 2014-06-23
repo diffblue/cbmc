@@ -5,6 +5,7 @@ enum { E4 = __builtin_signbit(-1.0) };
 enum { E5 = __builtin_classify_type(1) };
 enum { E6 = sizeof(int) };
 enum { E7 = __alignof__(int) };
+enum { E8 = (int)1.0 };
 
 int main()
 {
