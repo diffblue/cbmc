@@ -1530,7 +1530,7 @@ void c_typecheck_baset::typecheck_expr_rel_vector(exprt &expr)
     throw 0;
   }
 
-  expr.type()=vector_typet(int_typet(), to_vector_type(o_type0).size());
+  expr.type()=vector_typet(int_type(), to_vector_type(o_type0).size());
 }
 
 /*******************************************************************\
@@ -2316,7 +2316,8 @@ void c_typecheck_baset::do_special_functions(
       isfinite_expr.location()=location;
       expr.swap(isfinite_expr);
     }
-    else if(identifier==CPROVER_PREFIX "inf")
+    else if(identifier==CPROVER_PREFIX "inf" ||
+            identifier=="c::__builtin_inf")
     {
       constant_exprt inf_expr=
         ieee_floatt::plus_infinity(ieee_float_spect::double_precision()).to_expr();
