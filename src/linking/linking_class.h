@@ -53,11 +53,34 @@ protected:
   
   irep_idt rename(const irep_idt &old_identifier);
 
-  // overload to use language specific syntax
-  virtual std::string to_string(const exprt &expr);
-  virtual std::string to_string(const typet &type);
+  std::string expr_to_string(
+    const namespacet &ns,
+    const irep_idt &identifier,
+    const exprt &expr) const;
+  std::string type_to_string(
+    const namespacet &ns,
+    const irep_idt &identifier,
+    const typet &type) const;
 
-  virtual std::string to_string_verbose(const typet &type);
+  std::string type_to_string_verbose(
+    const namespacet &ns,
+    const symbolt &symbol,
+    const typet &type) const;
+  std::string type_to_string_verbose(
+    const namespacet &ns,
+    const symbolt &symbol) const
+  {
+    return type_to_string_verbose(ns, symbol, symbol.type);
+  }
+
+  void link_error(
+    const symbolt &old_symbol,
+    const symbolt &new_symbol,
+    const std::string &msg);
+  void link_warning(
+    const symbolt &old_symbol,
+    const symbolt &new_symbol,
+    const std::string &msg);
 
   symbol_tablet &main_symbol_table;
   symbol_tablet &src_symbol_table;

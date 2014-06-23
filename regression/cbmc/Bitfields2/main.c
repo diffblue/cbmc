@@ -1,4 +1,14 @@
+
+#ifdef _WIN32
+typedef signed __int64 int64_t;
+typedef unsigned __int64 uint64_t;
+typedef signed int int32_t;
+typedef unsigned int uint32_t;
+typedef signed short int int16_t;
+#else
 #include <inttypes.h>
+#endif
+
 #include <assert.h>
 
 union U {
@@ -12,7 +22,8 @@ struct S0 {
    int32_t  f1;
    int64_t  f2;
    uint32_t  f3;
-   signed : 0;
+   // skipped over during initialization
+   signed : 0; 
    volatile int16_t  f4;
    volatile uint32_t  f5;
    int32_t  f6;

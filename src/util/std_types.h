@@ -1194,7 +1194,7 @@ public:
   {
   }
   
-  inline complex_typet(const typet &_subtype):typet(ID_complex, _subtype)
+  explicit inline complex_typet(const typet &_subtype):typet(ID_complex, _subtype)
   {
   }
 };

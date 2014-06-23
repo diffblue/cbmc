@@ -7,7 +7,6 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <cassert>
-#include <iostream>
 
 #include <util/namespace.h>
 #include <util/simplify_expr.h>
@@ -91,23 +90,13 @@ void ansi_c_convert_typet::read_rec(const typet &type)
     gcc_int128_cnt++;
   else if(type.id()==ID_gcc_attribute_mode)
   {
-    const exprt &size_expr=
-      static_cast<const exprt &>(type.find(ID_size));
-      
-    if(size_expr.id()=="__QI__")
-      gcc_mode_QI=true;
-    else if(size_expr.id()=="__HI__")
-      gcc_mode_HI=true;
-    else if(size_expr.id()=="__SI__")
-      gcc_mode_SI=true;
-    else if(size_expr.id()=="__DI__")
-      gcc_mode_DI=true;
-    else if(size_expr.id()=="__TI__")
-      gcc_mode_TI=true;
-    else
-    {
-      // we ignore without whining
-    }
+    gcc_attribute_mode=type;
+  }
+  else if(type.id()==ID_msc_based)
+  {
+    const exprt &as_expr=static_cast<const exprt &>(static_cast<const irept &>(type));
+    assert(as_expr.operands().size()==1);
+    msc_based=as_expr.op0();
   }
   else if(type.id()==ID_custom_bv)
   {
@@ -380,32 +369,7 @@ void ansi_c_convert_typet::write(typet &type)
     else if(signed_cnt)
       is_signed=true;
 
-    // get width
-
-    if(gcc_mode_QI || gcc_mode_HI || gcc_mode_SI || gcc_mode_DI || gcc_mode_TI)
-    {
-      if(gcc_mode_QI) // 8 bits
-        type=is_signed?signed_char_type():unsigned_char_type();
-      else if(gcc_mode_HI) // 16 bits
-        type=is_signed?signed_short_int_type():unsigned_short_int_type();
-      else if(gcc_mode_SI) // 32 bits
-        type=is_signed?signed_int_type():unsigned_int_type();
-      else if(gcc_mode_DI) // 64 bits
-      {
-        if(config.ansi_c.long_int_width==64)
-          type=is_signed?signed_long_int_type():unsigned_long_int_type();
-        else
-        {
-          assert(config.ansi_c.long_long_int_width==64);
-          type=is_signed?signed_long_long_int_type():unsigned_long_long_int_type();
-        }
-      }
-      else if(gcc_mode_TI) // 128 bits
-        type=is_signed?gcc_signed_int128_type():gcc_unsigned_int128_type();
-      else
-        assert(false);
-    }
-    else if(int8_cnt || int16_cnt || int32_cnt || int64_cnt)
+    if(int8_cnt || int16_cnt || int32_cnt || int64_cnt)
     {
       if(long_cnt || char_cnt || short_cnt || gcc_int128_cnt || bv_cnt)
       {
@@ -499,6 +463,13 @@ void ansi_c_convert_typet::write(typet &type)
     type.swap(new_type);
   }
 
+  if(gcc_attribute_mode.is_not_nil())
+  {
+    typet new_type=gcc_attribute_mode;
+    new_type.subtype()=type;
+    type.swap(new_type);
+  }
+  
   c_qualifiers.write(type);
 
   if(packed)

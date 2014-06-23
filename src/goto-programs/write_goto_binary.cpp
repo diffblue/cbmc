@@ -10,10 +10,7 @@ Author: CM Wintersteiger
 
 #include <util/message.h>
 #include <util/irep_serialization.h>
-#include <util/symbol_serialization.h>
 #include <util/symbol_table.h>
-
-#include <goto-programs/goto_function_serialization.h>
 
 #include "write_goto_binary.h"
 
@@ -33,8 +30,7 @@ bool write_goto_binary_v2(
   std::ostream &out,
   const symbol_tablet &lsymbol_table,
   const goto_functionst &functions,
-  irep_serializationt &irepconverter,  
-  goto_function_serializationt &gfconverter)
+  irep_serializationt &irepconverter)
 {
   // first write symbol table
 
@@ -163,7 +159,6 @@ bool write_goto_binary(
 
   irep_serializationt::ireps_containert irepc;
   irep_serializationt irepconverter(irepc);    
-  goto_function_serializationt gfconverter(irepc);
     
   switch(version)
   {
@@ -173,8 +168,7 @@ bool write_goto_binary(
   case 2:
     return write_goto_binary_v2(
       out, lsymbol_table, functions,
-      irepconverter,
-      gfconverter); 
+      irepconverter);
 
   default: 
     throw "Unknown goto binary version";
