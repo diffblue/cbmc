@@ -1530,7 +1530,7 @@ void c_typecheck_baset::typecheck_expr_rel_vector(exprt &expr)
     throw 0;
   }
 
-  expr.type()=vector_typet(bool_typet(), to_vector_type(o_type0).size());
+  expr.type()=vector_typet(int_typet(), to_vector_type(o_type0).size());
 }
 
 /*******************************************************************\
