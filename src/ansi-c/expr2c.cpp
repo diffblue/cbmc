@@ -4016,7 +4016,7 @@ std::string expr2ct::convert(
 
   else if(src.id()==ID_floatbv_typecast)
   {
-    #if 0
+    #if 1
     return convert_function(src, "FLOAT_TYPECAST", precedence=16);
     #else
     const typet &to_type=ns.follow(src.type());
