@@ -913,8 +913,6 @@ Function: c_typecheck_baset::typecheck_c_enum_type
 
 \*******************************************************************/
 
-#include <iostream>
-
 void c_typecheck_baset::typecheck_c_enum_type(typet &type)
 {
   // these have the declarations of the enum constants as operands
@@ -960,38 +958,40 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
   // We just do int, but gcc might pick smaller widths
   // if the type is marked as 'packed'.
 
-  unsigned bytes=0;
+  unsigned bits=0;
   bool is_signed=min_value<0;
-
-  if(type.get_bool(ID_C_packed))
+  
+  if(is_signed)
   {
-    if(is_signed)
-    {
-      if(max_value<(1<<7) && min_value>=-(1<<7))
-        bytes=1;
-      else if(max_value<(1<<15) && min_value>=-(1<<15))
-        bytes=2;
-      else if(max_value<(mp_integer(1)<<31) && min_value>=-(mp_integer(1)<<31))
-        bytes=4;
-      else
-        bytes=8;
-    }
-    else // unsigned
-    {
-      if(max_value<(1<<8))
-        bytes=1;
-      else if(max_value<(1<<16))
-        bytes=2;
-      else if(max_value<(mp_integer(1)<<32))
-        bytes=4;
-      else
-        bytes=8;
-    }
-
-    type.set(ID_width, bytes*8);
+    if(max_value<(1<<7) && min_value>=-(1<<7))
+      bits=1*8;
+    else if(max_value<(1<<15) && min_value>=-(1<<15))
+      bits=2*8;
+    else if(max_value<(mp_integer(1)<<31) && min_value>=-(mp_integer(1)<<31))
+      bits=4*8;
+    else
+      bits=8*8;
   }
-  else
-    type.set(ID_width, config.ansi_c.int_width);
+  else // unsigned
+  {
+    if(max_value<(1<<8))
+      bits=1*8;
+    else if(max_value<(1<<16))
+      bits=2*8;
+    else if(max_value<(mp_integer(1)<<32))
+      bits=4*8;
+    else
+      bits=8*8;
+  }
+
+  if(!type.get_bool(ID_C_packed))
+  {
+    // we do int as a minimum
+    if(bits<config.ansi_c.int_width)
+      bits=config.ansi_c.int_width;
+  }
+
+  type.set(ID_width, bits);
 }
 
 /*******************************************************************\
