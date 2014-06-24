@@ -167,7 +167,7 @@ std::string utf32_to_utf8(const std::basic_string<unsigned int> &s)
       it!=s.end();
       it++)
   {  
-    register unsigned int c=*it;
+    unsigned int c=*it;
   
     if(c<=0x7f)           
       result+=char(c);
