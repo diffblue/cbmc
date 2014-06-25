@@ -98,6 +98,11 @@ inline oexprt operator|(const exprt &a, const exprt &b)
   return oexprt(a, ID_bitor, b, a.type());
 }
 
+inline oexprt operator~(const exprt &a)
+{
+  return oexprt(ID_bitnot, a, a.type());
+}
+
 inline oexprt operator>>(const exprt &a, const exprt &b)
 {
   return oexprt(a, ID_shr, b, a.type());
