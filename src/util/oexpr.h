@@ -15,6 +15,10 @@ Author: Daniel Kroening, kroening@kroening.com
 class oexprt:public exprt
 {
 public:
+  explicit inline oexprt(const exprt &src):exprt(src)
+  {
+  }
+
   inline oexprt(const irep_idt &_id, const typet &_type):exprt(_id, _type)
   {
   }
@@ -31,6 +35,11 @@ public:
     const typet &_type):exprt(_id, _type)
   {
     copy_to_operands(a);
+  }
+  
+  inline oexprt operator[](const exprt &_index) const
+  {
+    return oexprt(*this, ID_index, _index, type().subtype());
   }
 };
 
@@ -58,13 +67,6 @@ inline exprt operator*(const exprt &a)
 {
   return oexprt(ID_dereference, a, a.type().subtype());
 }
-
-#if 0
-inline exprt operator[](const exprt &a, const exprt &b)
-{
-  return oexprt(a, ID_index, b, a.type().subtype());
-}
-#endif
 
 inline oexprt operator/(const exprt &a, const exprt &b)
 {
