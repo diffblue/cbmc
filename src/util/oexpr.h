@@ -148,14 +148,14 @@ inline oexprt operator>=(const oexprt &a, const oexprt &b)
   return oexprt(a, ID_ge, b, bool_typet());
 }
 
-static inline oexprt ite(const exprt &cond, const exprt &a, const exprt &b)
+static inline oexprt ite(const oexprt &cond, const oexprt &a, const oexprt &b)
 {
   oexprt result(ID_if, a.type());
   result.copy_to_operands(cond, a, b);
   return result;
 }
 
-static inline oexprt typecast(const exprt &a, const typet &t)
+static inline oexprt typecast(const oexprt &a, const typet &t)
 {
   return oexprt(ID_typecast, a, t);
 }
