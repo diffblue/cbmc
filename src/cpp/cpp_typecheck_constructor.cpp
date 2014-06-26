@@ -333,7 +333,7 @@ void cpp_typecheckt::default_cpctor(
       codet mem_init("member_initializer");
       mem_init.location() = location;
       mem_init.set(ID_member, cppname);
-      mem_init.copy_to_operands((const exprt&)cpparg);
+      mem_init.copy_to_operands(static_cast<const exprt &>(static_cast<const irept &>(cpparg)));
       initializers.move_to_sub(mem_init);
     }
   }
@@ -396,7 +396,7 @@ void cpp_typecheckt::default_cpctor(
 
     exprt memberexpr(ID_member);
     memberexpr.set("component_cpp_name",cppname);
-    memberexpr.copy_to_operands((const exprt&)cpparg);
+    memberexpr.copy_to_operands(static_cast<const exprt &>(static_cast<const irept &>(cpparg)));
     memberexpr.location() = location;
 
     if(mem_it->type().id()==ID_array)
