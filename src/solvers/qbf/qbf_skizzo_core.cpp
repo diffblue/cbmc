@@ -358,9 +358,9 @@ bool qbf_skizzo_coret::get_certificate(void)
       DdNode *negNode = bdds[2*i+1];
 
       if(Cudd_DagSize(posNode) <= Cudd_DagSize(negNode))
-        model_bdds[cur]=new BDD(bdd_manager, posNode);
+        model_bdds[cur]=new BDD(*bdd_manager, posNode);
       else
-        model_bdds[cur]=new BDD(bdd_manager, Cudd_Not(negNode));
+        model_bdds[cur]=new BDD(*bdd_manager, Cudd_Not(negNode));
     }
 
     // tell CUDD that we don't need those BDDs anymore.
