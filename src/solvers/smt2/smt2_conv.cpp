@@ -27,6 +27,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "smt2_conv.h"
 
+// Mark different kinds of error condition
+#define TODO(S) throw "TODO: " S
+#define UNREACHABLE throw "Supposidly unreachable location reached"
+
 /*******************************************************************\
 
 Function: smt2_convt::print_assignment
@@ -90,22 +94,26 @@ void smt2_convt::write_header()
   case GENERIC: break;
   case BOOLECTOR: out << "; Generated for Boolector\n"; break;
   case CVC3: out << "; Generated for CVC 3\n"; break;
+  case CVC4: out << "; Generated for CVC 4\n"; break;
   case MATHSAT: out << "; Generated for MathSAT\n"; break;
+  case OPENSMT: out << "; Generated for OPENSMT\n"; break;
   case YICES: out << "; Generated for Yices\n"; break;
   case Z3: out << "; Generated for Z3\n"; break;
   }
-
-  // We use a broad mixture of logics, so on some solvers
-  // its better not to declare here.
-  // set-logic should be the first command.
-  if(emit_set_logic)
-    out << "(set-logic " << logic << ")" << "\n";
 
   out << "(set-info :source \"" << notes << "\")" << "\n";
   
   // boolector doesn't seem to like set-option at all
   if(solver!=BOOLECTOR)
     out << "(set-option :produce-models true)" << "\n";
+
+  // We use a broad mixture of logics, so on some solvers
+  // its better not to declare here.
+  // set-logic should come after setting options
+  if(emit_set_logic)
+    out << "(set-logic " << logic << ")" << "\n";
+
+
 }
 
 /*******************************************************************\
@@ -450,6 +458,7 @@ void smt2_convt::set_value(
   else if(type.id()==ID_pointer)
   {
     // TODO
+    TODO("Pointer handling may not be correct");
     constant_exprt result = parse_literal(v, type);
     assert(boolbv_width(type) == boolbv_width(result.type()));
 
@@ -469,6 +478,7 @@ void smt2_convt::set_value(
   else if(type.id()==ID_union)
   {
     // TODO
+    TODO("Union not implemented");
   }
 }
 
@@ -745,16 +755,18 @@ void smt2_convt::convert_literal(const literalt l)
     out << "false";
   else if(l==const_literal(true))
     out << "true";
+  else
+  {
+    if(l.sign())
+      out << "(not ";
 
-  if(l.sign())
-    out << "(not ";
-
-  out << "B" << l.var_no();
+    out << "B" << l.var_no();
   
-  if(l.sign())
-    out << ")";  
+    if(l.sign())
+      out << ")";  
 
-  smt2_identifiers.insert("B"+i2string(l.var_no()));
+    smt2_identifiers.insert("B"+i2string(l.var_no()));
+  }
 }
 
 /*******************************************************************\
@@ -910,7 +922,7 @@ void smt2_convt::convert_expr(const exprt &expr)
       }
       else
       {
-        throw "TODO: unary minus for floatbv";
+        TODO("unary minus for floatbv");
       }
     }
     else if(expr.type().id()==ID_vector)
@@ -1023,6 +1035,7 @@ void smt2_convt::convert_expr(const exprt &expr)
     else
     {
       // TODO: NAN check!
+      TODO("NAN Check!");
       if(expr.id()==ID_ieee_float_notequal)
       {
         out << "(not (= ";
@@ -1226,6 +1239,7 @@ void smt2_convt::convert_expr(const exprt &expr)
     assert(expr.operands().size()==1);
 
     out << "false"; // TODO
+    TODO("pointer_object_has_type not implemented");
   }
   else if(expr.id()==ID_string_constant)
   {
@@ -1434,7 +1448,7 @@ void smt2_convt::convert_expr(const exprt &expr)
       }
       else
       {
-        throw "TODO: isNaN for floatbv";
+        TODO("isNaN for floatbv");
       }
     }
     else
@@ -1466,7 +1480,7 @@ void smt2_convt::convert_expr(const exprt &expr)
       }
       else
       {
-        throw "TODO: isfinite for floatbv";
+        TODO("isfinite for floatbv");
       }
     }
     else
@@ -1499,7 +1513,7 @@ void smt2_convt::convert_expr(const exprt &expr)
       }
       else
       {
-        throw "TODO: isinf for floatbv";
+        TODO("isinf for floatbv");
       }
     }
     else
@@ -1525,7 +1539,7 @@ void smt2_convt::convert_expr(const exprt &expr)
       }
       else
       {
-        throw "TODO: isNormal for floatbv";
+        TODO("isNormal for floatbv");
       }
     }
     else
@@ -1796,7 +1810,7 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
         out << ")";
       }
       else
-        throw "TODO: floatbv -> int";
+        TODO("floatbv -> int");
     }
     else if(op_type.id()==ID_bool) // from boolean to int
     {
@@ -1920,6 +1934,7 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
       unsigned from_width=from_fixedbv_type.get_width();
 
       // TODO: use let for op
+      TODO("use let for op");
       out << "(concat ";
 
       if(to_integer_bits<=from_integer_bits)
@@ -2009,7 +2024,7 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
   }
   else if(expr_type.id()==ID_range)
   {
-    throw "TODO range typecast";
+    TODO("range typecast");
   }
   else if(expr_type.id()==ID_floatbv)
   {
@@ -2027,7 +2042,7 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
       }
       else
       {
-        throw "TODO typecast4 floatbv -> floatbv";
+        TODO("typecast4 floatbv -> floatbv");
       }
     }
     else if(op_type.id()==ID_signedbv)
@@ -2043,7 +2058,7 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
       }
       else
       {
-        throw "TODO typecast5 floatbv -> int";
+        TODO("typecast5 floatbv -> int");
       }
     }
     else if(op_type.id()==ID_unsignedbv)
@@ -2060,7 +2075,7 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
       }
       else
       {
-        throw "TODO typecast6 int -> floatbv";
+        TODO("typecast6 int -> floatbv");
       }
     }
     else
@@ -2572,7 +2587,7 @@ void smt2_convt::convert_plus(const plus_exprt &expr)
     }
     else
     {
-      throw "TODO: + for floatbv";
+      TODO("for floatbv");
     }
   }
   else if(expr.type().id()==ID_pointer)
@@ -2713,7 +2728,7 @@ void smt2_convt::convert_floatbv_plus(const exprt &expr)
   }
   else
   {
-    throw "TODO: + for floatbv";
+    TODO("+ for floatbv");
   }
 }
 
@@ -2755,7 +2770,7 @@ void smt2_convt::convert_minus(const minus_exprt &expr)
     }
     else
     {
-      throw "TODO: - for floatbv";
+      TODO(" - for floatbv");
     }
   }
   else if(expr.type().id()==ID_pointer)
@@ -2834,7 +2849,7 @@ void smt2_convt::convert_floatbv_minus(const exprt &expr)
   }
   else
   {
-    throw "TODO: binary - for floatbv";
+    TODO("binary - for floatbv");
   }
 }
 
@@ -2897,7 +2912,7 @@ void smt2_convt::convert_div(const div_exprt &expr)
     }
     else
     {
-      throw "TODO: / for floatbv";
+      TODO(" / for floatbv");
     }
   }
   else
@@ -2933,7 +2948,7 @@ void smt2_convt::convert_floatbv_div(const exprt &expr)
   }
   else
   {
-    throw "TODO: / for floatbv";
+    TODO("/ for floatbv");
   }
 }
 
@@ -2993,7 +3008,7 @@ void smt2_convt::convert_mult(const mult_exprt &expr)
     }
     else
     {
-      throw "TODO: * for floatbv";
+      TODO(" * for floatbv");
     }
   }
   else if(expr.type().id()==ID_fixedbv)
@@ -3062,7 +3077,7 @@ void smt2_convt::convert_floatbv_mult(const exprt &expr)
   }
   else
   {
-    throw "TODO: * for floatbv";
+    TODO("* for floatbv");
   }
 }
 
@@ -3188,6 +3203,7 @@ void smt2_convt::convert_with(const with_exprt &expr)
     else
     {
       // TODO
+      TODO("");
     }
   }
   else if(expr_type.id()==ID_union)
@@ -3248,6 +3264,7 @@ void smt2_convt::convert_with(const with_exprt &expr)
     typecast_exprt index_tc(index, expr_type);
 
     // TODO: SMT2-ify
+    TODO("SMT2-ify");
     out << "(bvor ";
     out << "(band ";
 
@@ -3610,6 +3627,7 @@ void smt2_convt::unflatten(wheret where, const typet &type)
         {
           out << " ";
           // TODO: need to deal with nesting here
+	  TODO("need to deal with nesting here");
           out << "((_ extract " << offset+subtype_width-1 << " "
               << offset << ") op?)";
         }
