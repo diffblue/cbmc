@@ -26,6 +26,82 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
+Function: bmct::get_smt1_solver_type
+
+  Inputs: None
+
+ Outputs: An smt1_dect::solvert giving the solver to use.
+
+ Purpose: Uses the options to pick an SMT 1.2 solver
+
+\*******************************************************************/
+
+smt1_dect::solvert bmct::get_smt1_solver_type() const
+{
+  assert(options.get_bool_option("smt1"));
+
+  smt1_dect::solvert s = smt1_dect::GENERIC;
+  
+  if(options.get_bool_option("boolector"))
+    s = smt1_dect::BOOLECTOR;
+  else if(options.get_bool_option("mathsat"))
+    s = smt1_dect::MATHSAT;
+  else if(options.get_bool_option("cv3"))
+    s = smt1_dect::CVC3;
+  else if(options.get_bool_option("cv4"))
+    s = smt1_dect::CVC4;
+  else if(options.get_bool_option("opensmt"))
+    s = smt1_dect::OPENSMT;
+  else if(options.get_bool_option("yices"))
+    s = smt1_dect::YICES;
+  else if(options.get_bool_option("z3"))
+    s = smt1_dect::Z3;
+  else if(options.get_bool_option("generic"))
+    s = smt1_dect::GENERIC;
+
+  return s;
+}
+
+/*******************************************************************\
+
+Function: bmct::get_smt2_solver_type
+
+  Inputs: None
+
+ Outputs: An smt2_dect::solvert giving the solver to use.
+
+ Purpose: Uses the options to pick an SMT 2.0 solver
+
+\*******************************************************************/
+
+smt2_dect::solvert bmct::get_smt2_solver_type() const
+{
+  assert(options.get_bool_option("smt2"));
+
+  smt2_dect::solvert s = smt2_dect::GENERIC;
+  
+  if(options.get_bool_option("boolector"))
+    s = smt2_dect::BOOLECTOR;
+  else if(options.get_bool_option("mathsat"))
+    s = smt2_dect::MATHSAT;
+  else if(options.get_bool_option("cv3"))
+    s = smt2_dect::CVC3;
+  else if(options.get_bool_option("cv4"))
+    s = smt2_dect::CVC4;
+  else if(options.get_bool_option("opensmt"))
+    s = smt2_dect::OPENSMT;
+  else if(options.get_bool_option("yices"))
+    s = smt2_dect::YICES;
+  else if(options.get_bool_option("z3"))
+    s = smt2_dect::Z3;
+  else if(options.get_bool_option("generic"))
+    s = smt2_dect::GENERIC;
+
+  return s;
+}
+
+/*******************************************************************\
+
 Function: bmct::solver_factory
 
   Inputs:
@@ -263,8 +339,9 @@ Function: bmct::decide_smt1
 
 \*******************************************************************/
 
-bool bmct::decide_smt1(smt1_dect::solvert solver)
+bool bmct::decide_smt1()
 {
+  smt1_dect::solvert solver=get_smt1_solver_type();
   const std::string &filename=options.get_option("outfile");
   
   if(filename=="")
@@ -336,8 +413,9 @@ Function: bmct::decide_smt2
 
 \*******************************************************************/
 
-bool bmct::decide_smt2(smt2_dect::solvert solver)
+bool bmct::decide_smt2()
 {
+  smt2_dect::solvert solver=get_smt2_solver_type();
   const std::string &filename=options.get_option("outfile");
   
   if(filename=="")
@@ -405,120 +483,3 @@ void bmct::smt2_convert(
   smt2_conv.dec_solve();
 }
 
-/*******************************************************************\
-
-Function: bmct::decide_cvc
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-bool bmct::decide_cvc()
-{
-  if(options.get_bool_option("smt1"))
-    return decide_smt1(smt1_dect::CVC3);
-  else
-    return decide_smt2(smt2_dect::CVC3);
-}
-
-/*******************************************************************\
-
-Function: bmct::decide_boolector
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-bool bmct::decide_boolector()
-{
-  // Boolector's default is SMT1 for the time being,
-  // as we can't get countermodels in SMT2 mode.
-  if(options.get_bool_option("smt2"))
-    return decide_smt2(smt2_dect::BOOLECTOR);
-  else
-    return decide_smt1(smt1_dect::BOOLECTOR);
-}
-
-/*******************************************************************\
-
-Function: bmct::decide_mathsat
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-bool bmct::decide_mathsat()
-{
-  // Mathsat defaults to SMT2.
-  if(options.get_bool_option("smt1"))
-    return decide_smt1(smt1_dect::MATHSAT);
-  else
-    return decide_smt2(smt2_dect::MATHSAT);
-}
-
-/*******************************************************************\
-
-Function: bmct::decide_opensmt
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-bool bmct::decide_opensmt()
-{
-  return decide_smt1(smt1_dect::OPENSMT);
-}
-
-/*******************************************************************\
-
-Function: bmct::decide_z3
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-bool bmct::decide_z3()
-{
-  // Z3 defaults to SMT2.
-  if(options.get_bool_option("smt1"))
-    return decide_smt1(smt1_dect::Z3);
-  else
-    return decide_smt2(smt2_dect::Z3);
-}
-
-/*******************************************************************\
-
-Function: bmct::decide_yices
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-bool bmct::decide_yices()
-{
-  return decide_smt1(smt1_dect::YICES);
-}
