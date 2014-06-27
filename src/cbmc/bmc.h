@@ -74,14 +74,10 @@ protected:
   virtual bool decide_default();
   virtual bool decide_bv_refinement();
   virtual bool decide_aig();
-  virtual bool decide_cvc();
-  virtual bool decide_yices();
-  virtual bool decide_smt1(smt1_dect::solvert solver);
-  virtual bool decide_smt2(smt2_dect::solvert solver);
-  virtual bool decide_boolector();
-  virtual bool decide_mathsat();
-  virtual bool decide_opensmt();
-  virtual bool decide_z3();
+  virtual bool decide_smt1();
+  virtual bool decide_smt2();
+  smt1_dect::solvert get_smt1_solver_type() const;
+  smt2_dect::solvert get_smt2_solver_type() const;
   virtual void smt1_convert(smt1_dect::solvert solver, std::ostream &out);
   virtual void smt2_convert(smt2_dect::solvert solver, std::ostream &out);
   virtual bool write_dimacs();
