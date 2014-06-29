@@ -150,7 +150,6 @@ bool cpp_languaget::parse(
   cpp_parser.set_file(path);
   cpp_parser.in=&i_preprocessed;
   cpp_parser.set_message_handler(get_message_handler());
-  cpp_parser.set_verbosity(get_verbosity());
   cpp_parser.grammar=cpp_parsert::LANGUAGE;
 
   switch(config.ansi_c.mode)
@@ -415,7 +414,6 @@ bool cpp_languaget::to_expr(
   cpp_parser.set_file(irep_idt());
   cpp_parser.in=&i_preprocessed;
   cpp_parser.set_message_handler(get_message_handler());
-  cpp_parser.set_verbosity(get_verbosity());
   cpp_parser.grammar=cpp_parsert::EXPRESSION;
   cpp_scanner_init();
 

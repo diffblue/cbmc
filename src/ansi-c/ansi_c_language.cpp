@@ -126,7 +126,6 @@ bool ansi_c_languaget::parse(
   ansi_c_parser.set_file(ID_built_in);
   ansi_c_parser.in=&codestr;
   ansi_c_parser.set_message_handler(get_message_handler());
-  ansi_c_parser.set_verbosity(get_verbosity());
   ansi_c_parser.grammar=ansi_c_parsert::LANGUAGE;
   ansi_c_parser.for_has_scope=config.ansi_c.for_has_scope;
 
@@ -334,7 +333,6 @@ bool ansi_c_languaget::to_expr(
   ansi_c_parser.set_file(irep_idt());
   ansi_c_parser.in=&i_preprocessed;
   ansi_c_parser.set_message_handler(get_message_handler());
-  ansi_c_parser.set_verbosity(get_verbosity());
   ansi_c_parser.grammar=ansi_c_parsert::EXPRESSION;
   ansi_c_parser.mode=ansi_c_parsert::GCC;
   ansi_c_scanner_init();

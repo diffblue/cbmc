@@ -108,7 +108,7 @@ void cbmc_parseoptionst::eval_verbosity()
       v=10;
   }
   
-  set_verbosity(v);
+  ui_message_handler.set_verbosity(v);
 }
 
 /*******************************************************************\
@@ -441,7 +441,6 @@ int cbmc_parseoptionst::doit()
 
   bmct bmc(options, symbol_table, ui_message_handler);
   eval_verbosity();
-  bmc.set_verbosity(get_verbosity());
   
   if(cmdline.isset("preprocess"))
   {
@@ -595,7 +594,6 @@ bool cbmc_parseoptionst::get_goto_program(
       }
       
       language->set_message_handler(get_message_handler());
-      language->set_verbosity(get_verbosity());
                                                                 
       status("Parsing", filename);
   

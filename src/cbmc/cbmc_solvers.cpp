@@ -164,7 +164,6 @@ prop_convt *bmct::solver_factory()
       solver=std::auto_ptr<propt>(new satcheck_minisat_no_simplifiert);
 
     solver->set_message_handler(get_message_handler());
-    solver->set_verbosity(get_verbosity());
       
     bv_cbmct bv_cbmc(ns, *solver);
       
@@ -206,7 +205,6 @@ bool bmct::decide_default()
     solver=std::auto_ptr<propt>(new satcheck_minisat_no_simplifiert);
 
   solver->set_message_handler(get_message_handler());
-  solver->set_verbosity(get_verbosity());
     
   bv_cbmct bv_cbmc(ns, *solver);
     
@@ -264,7 +262,6 @@ bool bmct::decide_aig()
   aig_prop_solvert solver(*sub_solver);
 
   solver.set_message_handler(get_message_handler());
-  solver.set_verbosity(get_verbosity());
     
   bv_cbmct bv_cbmc(ns, solver);
     
@@ -315,7 +312,6 @@ bool bmct::decide_bv_refinement()
     solver=std::auto_ptr<propt>(new satcheck_minisat_no_simplifiert);
   
   solver->set_message_handler(get_message_handler());
-  solver->set_verbosity(get_verbosity());
 
   bv_refinementt bv_refinement(ns, *solver);
 
