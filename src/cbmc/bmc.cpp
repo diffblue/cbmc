@@ -147,7 +147,6 @@ bmct::run_decision_procedure(prop_convt &prop_conv)
            << prop_conv.decision_procedure_text() << eom;
 
   prop_conv.set_message_handler(get_message_handler());
-  prop_conv.set_verbosity(get_verbosity());
 
   // stop the time
   absolute_timet sat_start=current_time();
@@ -323,7 +322,6 @@ bool bmct::run(const goto_functionst &goto_functions)
 
   //symex.total_claims=0;
   symex.set_message_handler(get_message_handler());
-  symex.set_verbosity(get_verbosity());
   symex.options=options;
 
   status() << "Starting Bounded Model Checking" << eom;
@@ -421,10 +419,8 @@ bool bmct::run(const goto_functionst &goto_functions)
     {
       satcheckt satcheck;
       satcheck.set_message_handler(get_message_handler());
-      satcheck.set_verbosity(get_verbosity());
       bv_cbmct bv_cbmc(ns, satcheck);
       bv_cbmc.set_message_handler(get_message_handler());
-      bv_cbmc.set_verbosity(get_verbosity());
 
       if(options.get_option("arrays-uf")=="never")
         bv_cbmc.unbounded_array=bv_cbmct::U_NONE;
@@ -447,10 +443,8 @@ bool bmct::run(const goto_functionst &goto_functions)
     {
       satcheckt satcheck;
       satcheck.set_message_handler(get_message_handler());
-      satcheck.set_verbosity(get_verbosity());
       bv_cbmct bv_cbmc(ns, satcheck);
       bv_cbmc.set_message_handler(get_message_handler());
-      bv_cbmc.set_verbosity(get_verbosity());
 
       if(options.get_option("arrays-uf")=="never")
         bv_cbmc.unbounded_array=bv_cbmct::U_NONE;
@@ -518,7 +512,6 @@ bool bmct::decide(prop_convt &prop_conv)
     throw "sorry, this solver does not support beautification";
 
   prop_conv.set_message_handler(get_message_handler());
-  prop_conv.set_verbosity(get_verbosity());
   
   bool result=true;
 
