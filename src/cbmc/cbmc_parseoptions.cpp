@@ -587,16 +587,19 @@ bool cbmc_parseoptionst::get_goto_program(
       }
                               
       languaget *language=get_language_from_filename(filename);
-                                                
+      
       if(language==NULL)
       {
         error() << "failed to figure out type of file `" <<  filename << "'" << eom;
         return true;
       }
+      
+      language->set_message_handler(get_message_handler());
+      language->set_verbosity(get_verbosity());
                                                                 
       status("Parsing", filename);
   
-      if(language->parse(infile, filename, get_message_handler()))
+      if(language->parse(infile, filename))
       {
         error() << "PARSING ERROR" << eom;
         return true;
@@ -708,11 +711,12 @@ void cbmc_parseoptionst::preprocessing()
       error() << "failed to figure out type of file" << eom;
       return;
     }
+    
+    ptr->set_message_handler(get_message_handler());
 
     std::auto_ptr<languaget> language(ptr);
   
-    if(language->preprocess(
-      infile, filename, std::cout, get_message_handler()))
+    if(language->preprocess(infile, filename, std::cout))
       error() << "PREPROCESSING ERROR" << eom;
   }
 
