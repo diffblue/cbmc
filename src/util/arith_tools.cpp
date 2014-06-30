@@ -170,11 +170,11 @@ mp_integer address_bits(const mp_integer &size)
 
 Function: power
 
-  Inputs:
+  Inputs: Two mp_integers, base and exponent
 
- Outputs:
+ Outputs: One mp_integer with the value base^{exponent}
 
- Purpose:
+ Purpose: A multi-precision implementation of the power operator.
 
 \*******************************************************************/
 
@@ -183,8 +183,37 @@ mp_integer power(const mp_integer &base,
 {
   assert(exponent>=0);
 
+  /* There are a number of special cases which are:
+   *  A. very common
+   *  B. handled more efficiently
+   */
+  if(base.is_long() && exponent.is_long())
+  {
+    switch(base.to_long())
+    {
+    case 2:
+      {
+	mp_integer result;
+	result.setPower2(exponent.to_ulong());
+	return result;
+      }
+    case 1: return 1;
+    case 0: return 0;
+    default:;
+    }
+  }
+
   if(exponent==0)
     return 1;
+
+  if(base<0)
+  {
+    mp_integer result = power(-base, exponent);
+    if(exponent.is_odd())
+      return -result;
+    else
+      return result;
+  }
 
   mp_integer result=base;
   mp_integer count=exponent-1;
