@@ -108,16 +108,19 @@ void ui_message_handlert::print(
   unsigned level,
   const std::string &message)
 {
-  if(get_ui()==XML_UI)
+  if(verbosity>=level)
   {
-    locationt location;
-    location.make_nil();
-    print(level, message, -1, location);
-  }
-  else
-  {
-    console_message_handlert console_message_handler;
-    console_message_handler.print(level, message);
+    if(get_ui()==XML_UI)
+    {
+      locationt location;
+      location.make_nil();
+      print(level, message, -1, location);
+    }
+    else
+    {
+      console_message_handlert console_message_handler;
+      console_message_handler.print(level, message);
+    }
   }
 }
 
@@ -139,51 +142,28 @@ void ui_message_handlert::print(
   int sequence_number,
   const locationt &location)
 {
-  if(get_ui()==XML_UI)
+  if(verbosity>=level)
   {
-    std::string tmp_message(message);
+    if(get_ui()==XML_UI)
+    {
+      std::string tmp_message(message);
 
-    if(tmp_message.size()!=0 && tmp_message[tmp_message.size()-1]=='\n')
-      tmp_message.resize(tmp_message.size()-1);
-  
-    const char *type=level_string(level);
+      if(tmp_message.size()!=0 && tmp_message[tmp_message.size()-1]=='\n')
+        tmp_message.resize(tmp_message.size()-1);
     
-    std::string sequence_number_str=
-      sequence_number>=0?i2string(sequence_number):"";
+      const char *type=level_string(level);
+      
+      std::string sequence_number_str=
+        sequence_number>=0?i2string(sequence_number):"";
 
-    ui_msg(type, tmp_message, sequence_number_str, location);
+      ui_msg(type, tmp_message, sequence_number_str, location);
+    }
+    else
+    {
+      message_handlert::print(
+        level, message, sequence_number, location);
+    }
   }
-  else
-  {
-    message_handlert::print(
-      level, message, sequence_number, location);
-  }
-}
-
-/*******************************************************************\
-
-Function: ui_message_handlert::old_gui_msg
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void ui_message_handlert::old_gui_msg(
-  const std::string &type,
-  const std::string &msg1,
-  const std::string &msg2,
-  const locationt &location)
-{
-  std::cout << type   << "\n"
-            << msg1   << "\n"
-            << msg2   << "\n"
-            << location.get_file() << "\n"
-            << location.get_line() << "\n"
-            << location.get_column() << std::endl;
 }
 
 /*******************************************************************\
