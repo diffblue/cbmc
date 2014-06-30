@@ -82,7 +82,7 @@ void symex_parseoptionst::eval_verbosity()
       v=10;
   }
   
-  set_verbosity(v);
+  ui_message_handler.set_verbosity(v);
 }
 
 /*******************************************************************\
@@ -236,7 +236,6 @@ int symex_parseoptionst::doit()
     path_searcht path_search(ns);
     
     path_search.set_message_handler(get_message_handler());
-    path_search.set_verbosity(get_verbosity());
 
     if(cmdline.isset("depth"))
       path_search.depth_limit=unsafe_string2unsigned(cmdline.getval("depth"));
@@ -410,10 +409,12 @@ bool symex_parseoptionst::get_goto_program(
         error() << "failed to figure out type of file `" <<  filename << "'" << eom;
         return true;
       }
+      
+      language->set_message_handler(get_message_handler());
                                                                 
       status("Parsing", filename);
   
-      if(language->parse(infile, filename, get_message_handler()))
+      if(language->parse(infile, filename))
       {
         error() << "PARSING ERROR" << eom;
         return true;

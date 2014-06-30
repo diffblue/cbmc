@@ -42,11 +42,13 @@ Function: smt1_dect::decision_procedure_text
 std::string smt1_dect::decision_procedure_text() const
 {
   return "SMT1 "+logic+" using "+
-    (solver==BOOLECTOR?"Boolector":
+    (solver==GENERIC?"Generic":
+     solver==BOOLECTOR?"Boolector":
      solver==CVC3?"CVC3":
+     solver==CVC4?"CVC3":
+     solver==MATHSAT?"MathSAT":
      solver==OPENSMT?"OpenSMT":
      solver==YICES?"Yices":
-     solver==MATHSAT?"MathSAT":
      solver==Z3?"Z3":
      "(unknown)");
 }
@@ -125,6 +127,17 @@ decision_proceduret::resultt smt1_dect::dec_solve()
 
   switch(solver)
   {
+  case BOOLECTOR:
+    // -rwl0 disables rewriting, which makes things slower,
+    // but in return values for arrays appear
+    // command = "boolector -rwl0 --smt "
+    // Removed as not necessarily needed on newer versions
+    command = "boolector --smt "
+            + temp_out_filename
+            + " --model --output "
+            + temp_result_filename;
+    break;
+
   case CVC3:
     command = "cvc3 +model -lang smtlib -output-lang smtlib "
             + temp_out_filename
@@ -132,24 +145,8 @@ decision_proceduret::resultt smt1_dect::dec_solve()
             + temp_result_filename;
     break;
 
-  case BOOLECTOR:
-    // -rwl0 disables rewriting, which makes things slower,
-    // but in return values for arrays appear
-    command = "boolector -rwl0 --smt1 "
-            + temp_out_filename
-            + " --model --output "
-            + temp_result_filename;
-    break;
-
-  case OPENSMT:
-    command = "todo "
-            + temp_out_filename
-            + " > "
-            + temp_result_filename;
-    break;
-
-  case YICES:
-    command = "yices -smt -e "
+  case CVC4:
+    command = "cvc4 -L smt1 "
             + temp_out_filename
             + " > "
             + temp_result_filename;
@@ -159,6 +156,21 @@ decision_proceduret::resultt smt1_dect::dec_solve()
     command = "mathsat -model -input=smt"
               " < "+temp_out_filename
             + " > "+temp_result_filename;
+    break;
+
+  case OPENSMT:
+    command = "opensmt "
+            + temp_out_filename
+            + " > "
+            + temp_result_filename;
+    break;
+
+  case YICES:
+    //    command = "yices -smt -e "   // Calling convention for older versions
+    command = "yices-smt --full-model "  //  Calling for 2.2.1
+            + temp_out_filename
+            + " > "
+            + temp_result_filename;
     break;
 
   case Z3:
@@ -193,14 +205,18 @@ decision_proceduret::resultt smt1_dect::dec_solve()
   case CVC3:
     return read_result_cvc3(in);
 
+  case CVC4:
+    assert(false);
+    break;
+
+  case MATHSAT:
+    return read_result_mathsat(in);
+
   case OPENSMT:
     return read_result_opensmt(in);
 
   case YICES:
     return read_result_yices(in);
-
-  case MATHSAT:
-    return read_result_mathsat(in);
 
   case Z3:
     return read_result_z3(in);

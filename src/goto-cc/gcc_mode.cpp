@@ -114,7 +114,7 @@ bool gcc_modet::doit()
   if(cmdline.isset("verbosity"))
     verbosity=unsafe_string2int(cmdline.getval("verbosity"));
 
-  set_verbosity(verbosity);
+  ui_message_handler.set_verbosity(verbosity);
 
   if(act_as_ld)
   {
@@ -183,7 +183,7 @@ bool gcc_modet::doit()
 
   // determine actions to be undertaken
   compilet compiler(cmdline);  
-  compiler.set_verbosity(verbosity);
+  compiler.ui_message_handler.set_verbosity(verbosity);
   
   if(act_as_ld)
     compiler.mode=compilet::LINK_LIBRARY;

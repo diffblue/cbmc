@@ -29,10 +29,9 @@ public:
   bool to_expr(
     const std::string &code,
     const std::string &module,
-    exprt &expr,
-    message_handlert &message_handler)
+    exprt &expr)
   {
-    return language->to_expr(code, module, expr, message_handler, ns);
+    return language->to_expr(code, module, expr, ns);
   }
   
   // constructor / destructor

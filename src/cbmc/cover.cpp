@@ -77,7 +77,6 @@ void bmct::cover_assertions(
   // try to cover those
   cover_goalst cover_goals(solver);
   cover_goals.set_message_handler(get_message_handler());
-  cover_goals.set_verbosity(get_verbosity());
 
   for(goal_mapt::const_iterator
       it=goal_map.begin();

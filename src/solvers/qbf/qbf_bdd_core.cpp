@@ -356,8 +356,6 @@ literalt qbf_bdd_coret::lor(literalt a, literalt b)
 {
   literalt nl = new_variable();
   
-  std::cout << "LOR2" << std::endl;
-  
   BDD abdd(*bdd_variable_map[a.var_no()]);
   BDD bbdd(*bdd_variable_map[b.var_no()]);
   
@@ -388,8 +386,6 @@ literalt qbf_bdd_coret::lor(const bvt &bv)
       return const_literal(true);
   
   literalt nl = new_variable();
-  
-  std::cout << "LORX" << std::endl;
   
   BDD &orbdd = *bdd_variable_map[nl.var_no()];
 

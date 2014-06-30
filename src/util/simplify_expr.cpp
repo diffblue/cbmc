@@ -152,6 +152,7 @@ void simplify_exprt::setup_jump_table()
   ENTRY(ID_isnan, simplify_isnan);
   ENTRY(ID_isnormal, simplify_isnormal);
   ENTRY(ID_abs, simplify_abs);
+  ENTRY(ID_sign, simplify_sign);
 }
 
 /*******************************************************************\
@@ -279,6 +280,47 @@ bool simplify_exprt::simplify_abs(exprt &expr)
           expr=from_integer(value, type);
           return false;
         }
+      }
+    }
+  }
+  
+  return true; 
+}
+
+/*******************************************************************\
+
+Function: simplify_exprt::simplify_sign
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool simplify_exprt::simplify_sign(exprt &expr)
+{
+  if(expr.operands().size()!=1) return true;
+ 
+  if(expr.op0().is_constant())
+  {
+    const typet &type=ns.follow(expr.op0().type());
+    
+    if(type.id()==ID_floatbv)
+    {
+      ieee_floatt value(to_constant_expr(expr.op0()));
+      expr.make_bool(value.get_sign());
+      return false;
+    }
+    else if(type.id()==ID_signedbv ||
+            type.id()==ID_unsignedbv)
+    {
+      mp_integer value;
+      if(!to_integer(expr.op0(), value))
+      {
+        expr.make_bool(value>=0);
+        return false;
       }
     }
   }
@@ -5445,6 +5487,8 @@ bool simplify_exprt::simplify_node(exprt &expr)
     result=simplify_isnormal(expr) && result;
   else if(expr.id()==ID_abs)
     result=simplify_abs(expr) && result;
+  else if(expr.id()==ID_sign)
+    result=simplify_sign(expr) && result;
   #else
   
   unsigned no=expr.id().get_no();
