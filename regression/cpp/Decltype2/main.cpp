@@ -9,3 +9,6 @@ derived d;
 
 decltype(static_cast<derived *>(&d)) z;
 
+int main()
+{
+}
