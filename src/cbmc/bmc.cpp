@@ -147,7 +147,6 @@ bmct::run_decision_procedure(prop_convt &prop_conv)
            << prop_conv.decision_procedure_text() << eom;
 
   prop_conv.set_message_handler(get_message_handler());
-  prop_conv.set_verbosity(get_verbosity());
 
   // stop the time
   absolute_timet sat_start=current_time();
@@ -323,7 +322,6 @@ bool bmct::run(const goto_functionst &goto_functions)
 
   //symex.total_claims=0;
   symex.set_message_handler(get_message_handler());
-  symex.set_verbosity(get_verbosity());
   symex.options=options;
 
   status() << "Starting Bounded Model Checking" << eom;
@@ -421,10 +419,8 @@ bool bmct::run(const goto_functionst &goto_functions)
     {
       satcheckt satcheck;
       satcheck.set_message_handler(get_message_handler());
-      satcheck.set_verbosity(get_verbosity());
       bv_cbmct bv_cbmc(ns, satcheck);
       bv_cbmc.set_message_handler(get_message_handler());
-      bv_cbmc.set_verbosity(get_verbosity());
 
       if(options.get_option("arrays-uf")=="never")
         bv_cbmc.unbounded_array=bv_cbmct::U_NONE;
@@ -447,10 +443,8 @@ bool bmct::run(const goto_functionst &goto_functions)
     {
       satcheckt satcheck;
       satcheck.set_message_handler(get_message_handler());
-      satcheck.set_verbosity(get_verbosity());
       bv_cbmct bv_cbmc(ns, satcheck);
       bv_cbmc.set_message_handler(get_message_handler());
-      bv_cbmc.set_verbosity(get_verbosity());
 
       if(options.get_option("arrays-uf")=="never")
         bv_cbmc.unbounded_array=bv_cbmct::U_NONE;
@@ -460,30 +454,14 @@ bool bmct::run(const goto_functionst &goto_functions)
       return all_claims(goto_functions, bv_cbmc);
     }
     
-    if(options.get_bool_option("boolector"))
-      return decide_boolector();
-    else if(options.get_bool_option("mathsat"))
-      return decide_mathsat();
-    else if(options.get_bool_option("cvc"))
-      return decide_cvc();
-    else if(options.get_bool_option("dimacs"))
-      return write_dimacs();
-    else if(options.get_bool_option("opensmt"))
-      return decide_opensmt();
+    if(options.get_bool_option("smt1"))
+      return decide_smt1();
+    else if(options.get_bool_option("smt2"))
+      return decide_smt2();
     else if(options.get_bool_option("refine"))
       return decide_bv_refinement();
     else if(options.get_bool_option("aig"))
       return decide_aig();
-    else if(options.get_bool_option("smt1"))
-      // this is the 'default' smt1 solver
-      return decide_smt1(smt1_dect::BOOLECTOR);
-    else if(options.get_bool_option("smt2"))
-      // this is the 'default' smt2 solver
-      return decide_smt2(smt2_dect::MATHSAT);
-    else if(options.get_bool_option("yices"))
-      return decide_yices();
-    else if(options.get_bool_option("z3"))
-      return decide_z3();
     else
     {
       if(options.get_bool_option("program-only"))
@@ -534,7 +512,6 @@ bool bmct::decide(prop_convt &prop_conv)
     throw "sorry, this solver does not support beautification";
 
   prop_conv.set_message_handler(get_message_handler());
-  prop_conv.set_verbosity(get_verbosity());
   
   bool result=true;
 

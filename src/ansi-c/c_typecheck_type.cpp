@@ -920,8 +920,10 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
   locationt location=type.location();
 
   // enums start at zero
-  typet constant_type=enum_type();
-  exprt value=gen_zero(constant_type);
+  mp_integer value=0;
+  
+  // track min and max to find a nice base type
+  mp_integer min_value=0, max_value=0;
   
   Forall_operands(it, as_expr)
   {
@@ -933,24 +935,63 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
 
     exprt &v=declaration.declarator().value();
 
-    if(v.is_nil()) v=value; // no value given
+    if(v.is_nil()) // no value given
+      v=from_integer(value, int_type());
 
     typecheck_declaration(declaration);
-
-    symbol_exprt symbol_expr(
-      declaration.declarator().get_name(), constant_type);
-
-    // value for next constant    
-    value=binary_exprt(symbol_expr, ID_plus, gen_one(constant_type), constant_type);
+    
+    // produce value for next constant
+    const symbolt &symbol=
+      lookup(language_prefix+id2string(declaration.declarator().get_name()));
+    to_integer(symbol.value, value);
+    
+    if(value<min_value) min_value=value;
+    if(value>max_value) max_value=value;
+    
+    ++value;
   }
   
   // remove these now
   as_expr.operands().clear();
-  
+
   // We need to determine a width, and a signedness.
   // We just do int, but gcc might pick smaller widths
   // if the type is marked as 'packed'.
-  type.set(ID_width, config.ansi_c.int_width);
+
+  unsigned bits=0;
+  bool is_signed=min_value<0;
+  
+  if(is_signed)
+  {
+    if(max_value<(1<<7) && min_value>=-(1<<7))
+      bits=1*8;
+    else if(max_value<(1<<15) && min_value>=-(1<<15))
+      bits=2*8;
+    else if(max_value<(mp_integer(1)<<31) && min_value>=-(mp_integer(1)<<31))
+      bits=4*8;
+    else
+      bits=8*8;
+  }
+  else // unsigned
+  {
+    if(max_value<(1<<8))
+      bits=1*8;
+    else if(max_value<(1<<16))
+      bits=2*8;
+    else if(max_value<(mp_integer(1)<<32))
+      bits=4*8;
+    else
+      bits=8*8;
+  }
+
+  if(!type.get_bool(ID_C_packed))
+  {
+    // we do int as a minimum
+    if(bits<config.ansi_c.int_width)
+      bits=config.ansi_c.int_width;
+  }
+
+  type.set(ID_width, bits);
 }
 
 /*******************************************************************\

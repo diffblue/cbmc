@@ -27,7 +27,7 @@ class member_exprt;
 class smt2_convt:public prop_convt
 {
 public:
-  typedef enum { GENERIC, BOOLECTOR, CVC3, MATHSAT, YICES, Z3 } solvert;
+  typedef enum { GENERIC, BOOLECTOR, CVC3, CVC4, MATHSAT, OPENSMT, YICES, Z3 } solvert;
 
   smt2_convt(
     const namespacet &_ns,
@@ -64,8 +64,13 @@ public:
     case CVC3:
       break;
 
+    case CVC4:
+      break;
+
     case MATHSAT:
-      use_FPA_theory=true;
+      break;
+
+    case OPENSMT:
       break;
       
     case YICES:
@@ -73,7 +78,6 @@ public:
     
     case Z3:
       use_array_of_bool=true;
-      use_FPA_theory=true;
       emit_set_logic=false;
       use_datatypes=true;
       break;

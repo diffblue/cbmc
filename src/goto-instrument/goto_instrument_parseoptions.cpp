@@ -97,7 +97,7 @@ void goto_instrument_parseoptionst::eval_verbosity()
       v=9;
   }
   
-  set_verbosity(v);
+  ui_message_handler.set_verbosity(v);
 }
 
 /*******************************************************************\

@@ -141,10 +141,11 @@ bool language_uit::parse(const std::string &filename)
   }
   
   languaget &language=*lf.language;
+  language.set_message_handler(get_message_handler());
 
   status("Parsing", filename);
 
-  if(language.parse(infile, filename, get_message_handler()))
+  if(language.parse(infile, filename))
   {
     if(get_ui()==ui_message_handlert::PLAIN)
       std::cerr << "PARSING ERROR" << std::endl;
@@ -174,7 +175,6 @@ bool language_uit::typecheck()
   status("Converting");
   
   language_files.set_message_handler(*message_handler);
-  language_files.set_verbosity(get_verbosity());
 
   if(language_files.typecheck(symbol_table))
   {
@@ -202,7 +202,6 @@ Function: language_uit::final
 bool language_uit::final()
 {
   language_files.set_message_handler(*message_handler);
-  language_files.set_verbosity(get_verbosity());
 
   if(language_files.final(symbol_table))
   {

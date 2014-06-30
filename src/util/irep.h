@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define USE_DSTRING
 #define SHARING
 //#define HASH_CODE
+//#define USE_MOVE
 
 #ifdef USE_DSTRING
 #include "dstring.h"
@@ -113,7 +114,7 @@ public:
   // Copy from rvalue reference.
   // Note that this does avoid a branch compared to the
   // standard copy constructor above.
-  inline irept(const irept &&irep):data(irep.data)
+  inline irept(irept &&irep):data(irep.data)
   {
     #ifdef IREP_DEBUG
     std::cout << "COPY MOVE\n";
@@ -142,7 +143,7 @@ public:
   #ifdef USE_MOVE
   // Note that the move assignment operator does avoid
   // three branches compared to standard operator above.
-  inline irept &operator=(const irept &&irep)
+  inline irept &operator=(irept &&irep)
   {
     #ifdef IREP_DEBUG
     std::cout << "ASSIGN MOVE\n";

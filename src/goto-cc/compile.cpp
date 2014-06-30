@@ -525,6 +525,8 @@ bool compilet::parse(const std::string &file_name)
   }
 
   languaget &language=*languagep;
+  language.set_message_handler(get_message_handler());
+  
   language_filet language_file;
 
   std::pair<language_filest::filemapt::iterator, bool>
@@ -555,13 +557,13 @@ bool compilet::parse(const std::string &file_name)
       }
     }
 
-    language.preprocess(infile, file_name, *os, get_message_handler());
+    language.preprocess(infile, file_name, *os);
   }
   else
   {
     print(8, "Parsing: "+file_name);
 
-    if(language.parse(infile, file_name, get_message_handler()))
+    if(language.parse(infile, file_name))
     {
       if(get_ui()==ui_message_handlert::PLAIN)
         error() << "PARSING ERROR" << eom;
@@ -588,6 +590,8 @@ Function: compilet::parse_stdin
 bool compilet::parse_stdin()
 {
   ansi_c_languaget language;
+  
+  language.set_message_handler(get_message_handler());
 
   print(8, "Parsing: (stdin)");
 
@@ -609,11 +613,11 @@ bool compilet::parse_stdin()
       }
     }
 
-    language.preprocess(std::cin, "", *os, get_message_handler());
+    language.preprocess(std::cin, "", *os);
   }
   else
   {
-    if(language.parse(std::cin, "", get_message_handler()))
+    if(language.parse(std::cin, ""))
     {
       if(get_ui()==ui_message_handlert::PLAIN)
         error() << "PARSING ERROR" << eom;
@@ -764,8 +768,6 @@ bool compilet::read_object(
 
   linkingt linking(symbol_table, temp_symbol_table, ui_message_handler);
   
-  linking.set_verbosity(verbosity);
-
   if(linking.typecheck_main())
     return true;
     

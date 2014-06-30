@@ -43,11 +43,14 @@ std::string smt2_dect::decision_procedure_text() const
   return "SMT2 "+logic+
     (use_FPA_theory?" (with FPA)":"")+
     " using "+
-    (solver==BOOLECTOR?"Boolector":
+    (solver==GENERIC?"Generic":
+     solver==BOOLECTOR?"Boolector":
      solver==CVC3?"CVC3":
+     solver==CVC4?"CVC3":
      solver==MATHSAT?"MathSAT":
-     solver==Z3?"Z3":
+     solver==OPENSMT?"OpenSMT":
      solver==YICES?"Yices":
+     solver==Z3?"Z3":
      "(unknown)");
 }
 
@@ -121,6 +124,13 @@ decision_proceduret::resultt smt2_dect::dec_solve()
 
   switch(solver)
   {
+  case BOOLECTOR:
+    command = "boolector --smt2 "
+            + temp_out_filename
+            + " -m --output "
+            + temp_result_filename;
+    break;
+
   case CVC3:
     command = "cvc3 +model -lang smtlib -output-lang smtlib "
             + temp_out_filename
@@ -128,17 +138,10 @@ decision_proceduret::resultt smt2_dect::dec_solve()
             + temp_result_filename;
     break;
 
-  case YICES:
-    command = "yices -smt -e "
+  case CVC4:
+    command = "cvc4 -L smt2 "
             + temp_out_filename
             + " > "
-            + temp_result_filename;
-    break;
-
-  case BOOLECTOR:
-    command = "boolector --smt2 "
-            + temp_out_filename
-            + " --model --output "
             + temp_result_filename;
     break;
 
@@ -161,6 +164,22 @@ decision_proceduret::resultt smt2_dect::dec_solve()
  -theory.arr.mode=1"
               " < "+temp_out_filename
             + " > "+temp_result_filename;
+    break;
+
+  case OPENSMT:
+    command = "opensmt "
+            + temp_out_filename
+            + " > "
+            + temp_result_filename;
+    break;
+
+
+  case YICES:
+    //    command = "yices -smt -e "   // Calling convention for older versions
+    command = "yices-smt2 "  //  Calling for 2.2.1
+            + temp_out_filename
+            + " > "
+            + temp_result_filename;
     break;
 
   case Z3:
@@ -189,18 +208,26 @@ decision_proceduret::resultt smt2_dect::dec_solve()
 
   switch(solver)
   {
+  case BOOLECTOR:
+    return read_result_boolector(in);
+
   case CVC3:
     return read_result_cvc3(in);
+
+  case CVC4:
+    assert(false);
+    break;
+
+  case MATHSAT:
+    return read_result_mathsat(in);
+
+  case OPENSMT:
+    assert(false);
+    break;
 
   case YICES:
     return read_result_yices(in);
     
-  case MATHSAT:
-    return read_result_mathsat(in);
-
-  case BOOLECTOR:
-    return read_result_boolector(in);
-
   case Z3:
     return read_result_z3(in);
 
@@ -292,11 +319,20 @@ decision_proceduret::resultt smt2_dect::read_result_yices(std::istream &in)
 {
   std::string line;
 
-  while(std::getline(in, line))
-  {
-  }
+  std::getline(in, line);
 
-  error("Unexpected result from SMT-Solver");
+  if(line=="sat")
+  {
+    while(std::getline(in, line))
+    {
+    }
+
+    return D_SATISFIABLE;
+  }
+  else if(line=="unsat")
+    return D_UNSATISFIABLE;
+  else
+    error("Unexpected result from SMT-Solver: "+line);
 
   return D_ERROR;
 }

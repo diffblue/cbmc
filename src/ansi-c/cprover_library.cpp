@@ -78,11 +78,12 @@ void add_cprover_library(
   {
     std::istringstream in(library_text.str());
     ansi_c_languaget ansi_c_language;
-    ansi_c_language.parse(in, "", message_handler);
+    ansi_c_language.set_message_handler(message_handler);
+    ansi_c_language.parse(in, "");
 
     symbol_tablet new_symbol_table;
     ansi_c_language.typecheck(
-      new_symbol_table, "<built-in-library>", message_handler);
+      new_symbol_table, "<built-in-library>");
 
     linking(symbol_table, new_symbol_table, message_handler);
   }

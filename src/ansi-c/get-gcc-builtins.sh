@@ -22,6 +22,15 @@ svn export http://gcc.gnu.org/svn/gcc/trunk/gcc/omp-builtins.def > /dev/null
 echo Downloading http://gcc.gnu.org/svn/gcc/trunk/gcc/gtm-builtins.def
 svn export http://gcc.gnu.org/svn/gcc/trunk/gcc/gtm-builtins.def > /dev/null
 
+echo Downloading http://gcc.gnu.org/svn/gcc/trunk/gcc/cilk-builtins.def
+svn export http://gcc.gnu.org/svn/gcc/trunk/gcc/cilk-builtins.def > /dev/null
+
+echo Downloading http://gcc.gnu.org/svn/gcc/trunk/gcc/cilkplus.def
+svn export http://gcc.gnu.org/svn/gcc/trunk/gcc/cilkplus.def > /dev/null
+
+echo Downloading http://gcc.gnu.org/svn/gcc/trunk/gcc/sanitizer.def
+svn export http://gcc.gnu.org/svn/gcc/trunk/gcc/sanitizer.def > /dev/null
+
 cat > gcc-builtins.h <<EOF
 #include <inttypes.h>
 #include <complex.h>
@@ -62,6 +71,7 @@ cat > builtins.h <<EOF
 #define va_list_arg_type_node va_list
 #define va_list_ref_type_node va_list
 #define wint_type_node wint_t
+#define uint16_type_node uint16_t
 #define uint32_type_node uint32_t
 #define uint64_type_node uint64_t
 #define pid_type_node pid_t
@@ -93,6 +103,8 @@ NEXTDEF ENUM(name) RETURN name(ARG1, ARG2, ARG3, ARG4, ARG5)
 NEXTDEF ENUM(name) RETURN name(ARG1, ARG2, ARG3, ARG4, ARG5, ARG6)
 #define DEF_FUNCTION_TYPE_7(ENUM, RETURN, ARG1, ARG2, ARG3, ARG4, ARG5, ARG6, ARG7) \
 NEXTDEF ENUM(name) RETURN name(ARG1, ARG2, ARG3, ARG4, ARG5, ARG6, ARG7)
+#define DEF_FUNCTION_TYPE_8(ENUM, RETURN, ARG1, ARG2, ARG3, ARG4, ARG5, ARG6, ARG7, ARG8)
+NEXTDEF ENUM(name) RETURN name(ARG1, ARG2, ARG3, ARG4, ARG5, ARG6, ARG7, ARG8)
 
 #define DEF_FUNCTION_TYPE_VAR_0(ENUM, RETURN) \
 NEXTDEF ENUM(name) /* RETURN name(...) -- this is a macro */
@@ -122,7 +134,7 @@ gcc -E builtins.h | sed 's/^NEXTDEF/#define/' | cat - builtins.def | \
   sed 's/MANGLE("__builtin_" "\(.*\)")/__builtin_\1/' | \
   sed '/^;$/d' >> gcc-builtins.h
 
-rm builtin-types.def builtins.def sync-builtins.def omp-builtins.def gtm-builtins.def
+rm builtin-types.def builtins.def sync-builtins.def omp-builtins.def gtm-builtins.def cilk-builtins.def cilkplus.def sanitizer.def
 rm builtins.h
 
 # for some we don't know how to handle them - removing symbols should be safe

@@ -39,7 +39,7 @@ exprt convert_integer_literal(const std::string &src)
   
   for(unsigned i=0; i<src.size(); i++)
   {
-    register char ch=src[i];
+    char ch=src[i];
 
     if(ch=='u' || ch=='U')
       is_unsigned=true;

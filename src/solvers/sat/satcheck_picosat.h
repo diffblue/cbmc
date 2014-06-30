@@ -11,10 +11,13 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 
 #include "cnf.h"
 
+struct PicoSAT;
+
 class satcheck_picosatt:public cnf_solvert
 {
 public:
   satcheck_picosatt();
+  ~satcheck_picosatt();
 
   virtual const std::string solver_text();
   virtual resultt prop_solve();
@@ -30,6 +33,9 @@ public:
 
 protected:
   bvt assumptions;
+
+private:
+  PicoSAT *picosat;
 };
 
 #endif
