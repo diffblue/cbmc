@@ -413,12 +413,20 @@ int cbmc_parseoptionst::doit()
   }
   
   //
+  // command line options
+  //
+
+  optionst options;
+  get_command_line_options(options);
+  eval_verbosity();
+
+  //
   // Print a banner
   //
   status("CBMC version " CBMC_VERSION);
 
   //
-  // unwinding of transition systems
+  // Unwinding of transition systems is done by hw-cbmc.
   //
 
   if(cmdline.isset("module") ||
@@ -432,16 +440,6 @@ int cbmc_parseoptionst::doit()
   
   register_languages();
 
-  //
-  // command line options
-  //
-
-  optionst options;
-  get_command_line_options(options);
-
-  bmct bmc(options, symbol_table, ui_message_handler);
-  eval_verbosity();
-  
   if(cmdline.isset("preprocess"))
   {
     preprocessing();
@@ -449,6 +447,7 @@ int cbmc_parseoptionst::doit()
   }
 
   goto_functionst goto_functions;
+  bmct bmc(options, symbol_table, ui_message_handler);
 
   if(get_goto_program(options, bmc, goto_functions))
     return 6;
@@ -527,7 +526,7 @@ Function: cbmc_parseoptionst::get_goto_program
   
 bool cbmc_parseoptionst::get_goto_program(
   const optionst &options,
-  bmct &bmc,
+  bmct &bmc, // for get_modules
   goto_functionst &goto_functions)
 {
   if(cmdline.args.size()==0)
