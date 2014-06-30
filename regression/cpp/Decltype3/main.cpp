@@ -12,3 +12,7 @@ struct whatever {
 };
 
 whatever<int,float> thing;
+
+int main()
+{
+}
