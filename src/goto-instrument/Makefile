@@ -9,17 +9,17 @@ SRC = goto_instrument_main.cpp goto_instrument_parseoptions.cpp \
       wmm/weak_memory.cpp wmm/fence.cpp wmm/event_graph.cpp \
       wmm/goto2graph.cpp wmm/data_dp.cpp wmm/abstract_event.cpp \
       wmm/instrumenter_strategies.cpp wmm/cycle_collection.cpp \
-      call_sequences.cpp unwind.cpp \
+      call_sequences.cpp unwind.cpp function_modifies.cpp \
       accelerate/accelerate.cpp accelerate/polynomial.cpp \
       accelerate/scratch_program.cpp accelerate/polynomial_accelerator.cpp \
-			accelerate/util.cpp accelerate/trace_automaton.cpp \
-			accelerate/enumerating_loop_acceleration.cpp \
-			accelerate/all_paths_enumerator.cpp \
-			accelerate/sat_path_enumerator.cpp \
-			accelerate/disjunctive_polynomial_acceleration.cpp \
-			accelerate/cone_of_influence.cpp accelerate/overflow_instrumenter.cpp\
-			accelerate/path.cpp accelerate/acceleration_utils.cpp \
-			count_eloc.cpp reachability_slicer.cpp
+      accelerate/util.cpp accelerate/trace_automaton.cpp \
+      accelerate/enumerating_loop_acceleration.cpp \
+      accelerate/all_paths_enumerator.cpp \
+      accelerate/sat_path_enumerator.cpp \
+      accelerate/disjunctive_polynomial_acceleration.cpp \
+      accelerate/cone_of_influence.cpp accelerate/overflow_instrumenter.cpp\
+      accelerate/path.cpp accelerate/acceleration_utils.cpp \
+      count_eloc.cpp reachability_slicer.cpp
 
 OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../linking/linking$(LIBEXT) \
