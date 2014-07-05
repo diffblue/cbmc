@@ -1684,20 +1684,6 @@ void smt2_convt::convert_expr(const exprt &expr)
   {
     out << object_sizes[expr];
   }
-  else if (expr.id()=="same-object")
-  {
-    unsigned pointer_width=boolbv_width(expr.op0().type());
-
-    out << "(= ((_ extract " <<
-      pointer_width - 1 << " " <<
-      pointer_width - BV_ADDR_BITS << ") ";
-    convert_expr(expr.op0());
-    out << ") ((_ extract " <<
-      pointer_width - 1 << " " <<
-      pointer_width - BV_ADDR_BITS << ") ";
-    convert_expr(expr.op1());
-    out << "))";
-  }
   else
     throw "smt2_convt::convert_expr: `"+
           expr.id_string()+"' is unsupported";

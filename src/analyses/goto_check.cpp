@@ -873,8 +873,7 @@ void goto_checkt::pointer_rel_check(
 
     if(enable_pointer_check)
     {
-      exprt same_object("same-object", bool_typet());
-      same_object.copy_to_operands(expr.op0(), expr.op1());
+      exprt same_object=::same_object(expr.op0(), expr.op1());
 
       add_guarded_claim(
         same_object,
