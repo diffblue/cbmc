@@ -3000,18 +3000,6 @@ extern inline concatenation_exprt &to_concatenation_expr(exprt &expr)
   return static_cast<concatenation_exprt &>(expr);
 }
 
-/*! \brief Evaluates to true if the two pointer
-           operands point to the same object
-*/
-class same_object_exprt:public binary_relation_exprt
-{
-public:
-  inline same_object_exprt(const exprt &ptr1, const exprt &ptr2):
-    binary_relation_exprt(ptr1, "same-object", ptr2)
-  {
-  }
-};
-
 /*! \brief An expression denoting infinity
 */
 class infinity_exprt:public exprt
