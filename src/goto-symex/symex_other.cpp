@@ -12,6 +12,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/rename.h>
 #include <util/base_type.h>
 #include <util/std_expr.h>
+#include <util/byte_operators.h>
+
+#include <ansi-c/c_types.h>
 
 #include "goto_symex.h"
 
@@ -103,20 +106,16 @@ void goto_symext::symex_other(
     process_array_expr(clean_code.op0());
     process_array_expr(clean_code.op1());
     
-    if(ns.follow(clean_code.op0().type()).id()!=ID_array)
-      throw "array_copy expects array-typed operand";
-    
-    if(ns.follow(clean_code.op1().type()).id()!=ID_array)
-      throw "array_copy expects array-typed operand";
-    
-    if(!base_type_eq(clean_code.op0().type().subtype(),
-                     clean_code.op1().type().subtype(), ns))
-      throw "array_copy expects array types with matching subtypes";
 
     if(!base_type_eq(clean_code.op0().type(),
                      clean_code.op1().type(), ns))
     {
-      clean_code.op1().make_typecast(clean_code.op0().type());
+      byte_extract_exprt be(byte_extract_id());
+      be.type()=clean_code.op0().type();
+      be.op()=clean_code.op1();
+      be.offset()=gen_zero(index_type());
+
+      clean_code.op1()=be;
     }
     
     code_assignt assignment;
