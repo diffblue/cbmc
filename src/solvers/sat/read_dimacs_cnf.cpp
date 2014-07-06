@@ -7,6 +7,7 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <istream>
+#include <cstdlib> // for abs()
 
 #include <util/string2int.h>
 
