@@ -2042,6 +2042,7 @@ void goto_program2codet::cleanup_code_block(
       {
         code_dowhilet d;
         d.cond()=false_exprt();
+        cleanup_expr(d.cond(), false);
         d.body().swap(*it);
 
         it->swap(d);
@@ -2196,17 +2197,18 @@ void goto_program2codet::cleanup_code_ifthenelse(
   const irep_idt parent_stmt)
 {
   code_ifthenelset &i_t_e=to_code_ifthenelse(code);
+  const exprt cond=simplify_expr(i_t_e.cond(), ns);
 
   // assert(false) expands to if(true) assert(false), simplify again (and also
   // simplify other cases)
-  if(i_t_e.cond().is_true() &&
+  if(cond.is_true() &&
       (i_t_e.else_case().is_nil() || !has_labels(to_code(i_t_e.else_case()))))
   {
     codet tmp;
     tmp.swap(i_t_e.then_case());
     code.swap(tmp);
   }
-  else if(i_t_e.cond().is_false() && !has_labels(to_code(i_t_e.then_case())))
+  else if(cond.is_false() && !has_labels(to_code(i_t_e.then_case())))
   {
     if(i_t_e.else_case().is_nil())
       code=code_skipt();
@@ -2539,6 +2541,22 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
     }
     else if(expr.type().id()==ID_pointer)
       add_local_types(expr.type());
+    else if(expr.type().id()==ID_bool)
+    {
+      expr=from_integer(
+        expr.is_true()?1:0,
+        signedbv_typet(config.ansi_c.int_width));
+      expr.make_typecast(bool_typet());
+    }
+    else if((expr.type().id()==ID_unsignedbv ||
+             expr.type().id()==ID_signedbv) &&
+            expr.type().get(ID_C_c_type)==ID_bool)
+    {
+      expr=from_integer(
+        expr.is_zero()?0:1,
+        signedbv_typet(config.ansi_c.int_width));
+      expr.make_typecast(bool_typet());
+    }
 
     const irept &c_sizeof_type=expr.find(ID_C_c_sizeof_type);
 
@@ -2887,12 +2905,8 @@ void goto2sourcet::operator()(std::ostream &os)
       it!=system_headers.end();
       ++it)
     os << "#include <" << *it << ">" << std::endl;
-  os << "#ifndef TRUE" << std::endl
-     << "#define TRUE (_Bool)1" << std::endl
-     << "#endif" << std::endl;
-  os << "#ifndef FALSE" << std::endl
-     << "#define FALSE (_Bool)0" << std::endl
-     << "#endif" << std::endl;
+  if(!system_headers.empty()) os << std::endl;
+
   os << "#ifndef NULL" << std::endl
      << "#define NULL ((void*)0)" << std::endl
      << "#endif" << std::endl;
