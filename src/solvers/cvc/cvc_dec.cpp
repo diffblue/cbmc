@@ -7,7 +7,6 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <cstring>
-#include <cstdlib>
 #include <cassert>
 
 #if defined(__linux__) || \
@@ -26,6 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/i2string.h>
 #include <util/prefix.h>
+#include <util/string2int.h>
 
 #include "cvc_dec.h"
 
@@ -166,7 +166,7 @@ void cvc_dect::read_assert(std::istream &in, std::string &line)
     
     if(line[0]=='l')
     {
-      unsigned number=atoi(line.c_str()+1);
+      unsigned number=unsafe_str2unsigned(line.c_str()+1);
       assert(number<no_boolean_variables);
       assert(no_boolean_variables==boolean_assignment.size());
       boolean_assignment[number]=value;

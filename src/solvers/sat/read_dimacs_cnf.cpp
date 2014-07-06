@@ -6,8 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <cstdlib>
 #include <istream>
+
+#include <util/string2int.h>
 
 #include "read_dimacs_cnf.h"
 
@@ -75,7 +76,7 @@ void read_dimacs_cnf(std::istream &in, cnft &dest)
 		}
 	      if(pos_char == std::string::npos) //no char present in the clause
 		{
-		  int parsed_lit = atoi(decision.c_str());
+		  int parsed_lit = unsafe_string2int(decision);
 #ifdef VERBOSE
 		  std::cout << "parsed_lit " << parsed_lit << " " << std::endl;
 #endif

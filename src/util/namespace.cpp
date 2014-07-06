@@ -7,7 +7,6 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <cassert>
-#include <cstdlib>
 
 #include "string2int.h"
 #include "namespace.h"
@@ -35,7 +34,7 @@ unsigned get_max(
   forall_symbols(it, symbols)
     if(has_prefix(id2string(it->first), prefix))
       max_nr=
-        std::max(unsafe_string2unsigned(it->first.c_str()+prefix.size()),
+        std::max(unsafe_str2unsigned(it->first.c_str()+prefix.size()),
                  max_nr);
 
   return max_nr;
