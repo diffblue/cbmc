@@ -499,7 +499,11 @@ void c_typecastt::implicit_typecast(
   typet src_type=follow_with_qualifiers(expr.type()),
         dest_type=follow_with_qualifiers(type);
   
-  implicit_typecast_followed(expr, src_type, dest_type);
+  typet type_qual=type;
+  c_qualifierst qualifiers(dest_type);
+  qualifiers.write(type_qual);
+
+  implicit_typecast_followed(expr, src_type, type_qual, dest_type);
 }
 
 /*******************************************************************\
@@ -517,6 +521,7 @@ Function: c_typecastt::implicit_typecast_followed
 void c_typecastt::implicit_typecast_followed(
   exprt &expr,
   const typet &src_type,
+  const typet &orig_dest_type,
   const typet &dest_type)
 {
   // do transparent union
@@ -538,7 +543,7 @@ void c_typecastt::implicit_typecast_followed(
       if(!check_c_implicit_typecast(src_type, it->type()))
       {
         // build union constructor
-        exprt union_expr(ID_union, dest_union_type);
+        exprt union_expr(ID_union, orig_dest_type);
         union_expr.move_to_operands(expr);
         union_expr.set(ID_component_name, it->get_name());
         expr=union_expr;
@@ -557,7 +562,7 @@ void c_typecastt::implicit_typecast_followed(
        src_type.id()==ID_natural ||
        src_type.id()==ID_integer))
     {
-      expr=exprt(ID_constant, dest_type);
+      expr=exprt(ID_constant, orig_dest_type);
       expr.set(ID_value, ID_NULL);
       return; // ok
     }
@@ -581,7 +586,7 @@ void c_typecastt::implicit_typecast_followed(
         // very generous:
         // between any two function pointers it's ok
       }
-      else if(base_type_eq(src_type.subtype(), dest_type.subtype(), ns))
+      else if(base_type_eq(src_sub, dest_sub, ns))
       {
         // ok
       }
@@ -611,7 +616,7 @@ void c_typecastt::implicit_typecast_followed(
         expr.type()=src_type; // because of qualifiers
       }
       else
-        do_typecast(expr, dest_type);
+        do_typecast(expr, orig_dest_type);
 
       return; // ok
     }
@@ -620,7 +625,7 @@ void c_typecastt::implicit_typecast_followed(
   if(check_c_implicit_typecast(src_type, dest_type))
     errors.push_back("implicit conversion not permitted");
   else if(src_type!=dest_type)
-    do_typecast(expr, dest_type);
+    do_typecast(expr, orig_dest_type);
 }
 
 /*******************************************************************\
