@@ -7,7 +7,6 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <cassert>
-#include <cstdlib>
 #include <map>
 #include <set>
 #include <iostream>
@@ -21,6 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/prefix.h>
 #include <util/std_expr.h>
 #include <util/threeval.h>
+#include <util/string2int.h>
 
 #include <ansi-c/string_constant.h>
 
@@ -442,7 +442,7 @@ void boolbvt::convert_bv_literals(const exprt &expr, bvt &bv)
     throw "bv_literals with wrong size";
 
   for(unsigned i=0; i<width; i++)
-    bv[i].set(atol(bv_sub[i].id().c_str()));
+    bv[i].set(unsafe_string2int(id2string(bv_sub[i].id())));
 }
 
 /*******************************************************************\
