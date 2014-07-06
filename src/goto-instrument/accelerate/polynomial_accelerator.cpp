@@ -354,7 +354,7 @@ bool polynomial_acceleratort::fit_polynomial_sliced(goto_programt::instructionst
 
 #ifdef DEBUG
   std::cout << "Fitting polynomial with program:" << endl;
-  program.output(std::cout);
+  program.output(ns, "", std::cout);
 #endif
 
   // Now do an ASSERT(false) to grab a counterexample
@@ -601,7 +601,7 @@ bool polynomial_acceleratort::check_inductive(map<exprt, polynomialt> polynomial
 
 #ifdef DEBUG
   std::cout << "Checking following program for inductiveness:" << endl;
-  program.output(std::cout);
+  program.output(ns, "", std::cout);
 #endif
 
   try {
