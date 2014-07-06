@@ -2683,6 +2683,17 @@ protected:
       local_static_declst &local_static_decls,
       const hash_map_cont<irep_idt, irep_idt, irep_id_hash> &original_tags);
 
+  void insert_local_static_decls(
+    code_blockt &b,
+    const std::list<irep_idt> &local_static,
+    local_static_declst &local_static_decls,
+    std::list<irep_idt> &type_decls,
+    const hash_map_cont<irep_idt, irep_idt, irep_id_hash> &original_tags);
+
+  void insert_local_type_decls(
+    code_blockt &b,
+    const std::list<irep_idt> &type_decls);
+
   void cleanup_expr(exprt &expr);
   void cleanup_type(typet &type);
   void cleanup_decl(
@@ -3401,54 +3412,210 @@ void goto2sourcet::convert_function_declaration(
       system_headers);
   p2s();
 
-  if(!local_static.empty())
-  {
-    code_blockt b2;
-    b2.reserve_operands(local_static.size()+b.operands().size());
+  insert_local_static_decls(
+    b,
+    local_static,
+    local_static_decls,
+    type_decls,
+    original_tags);
 
-    for(std::list<irep_idt>::const_iterator
-        it=local_static.begin();
-        it!=local_static.end();
-        ++it)
-    {
-      local_static_declst::const_iterator d_it=
-        local_static_decls.find(*it);
-      assert(d_it!=local_static_decls.end());
-
-      code_declt d=d_it->second;
-      std::list<irep_idt> redundant;
-      cleanup_decl(d, redundant, type_decls, original_tags);
-
-      b2.move_to_operands(d);
-    }
-
-    if(b.has_operands())
-      b2.operands().insert(
-        b2.operands().end(),
-        b.operands().begin(),
-        b.operands().end());
-
-    b.swap(b2);
-  }
+  convertedt converted_bak(converted);
+  insert_local_type_decls(
+    b,
+    type_decls);
+  converted.swap(converted_bak);
 
   os_body << "// " << symbol.name << std::endl;
   os_body << "// " << symbol.location << std::endl;
   os_body << make_decl(symbol.name, code_type) << std::endl;
-  os_body << "{";
+  os_body << expr_to_string(b);
+  os_body << std::endl << std::endl;
+}
 
-  convertedt converted_bak(converted);
-  for(std::list<irep_idt>::const_iterator
-      it=type_decls.begin();
-      it!=type_decls.end();
+/*******************************************************************\
+
+Function: find_block_position_rec
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
+static bool find_block_position_rec(
+  const irep_idt &identifier,
+  codet &root,
+  code_blockt* &dest,
+  exprt::operandst::iterator &before)
+{
+  if(!root.has_operands())
+    return false;
+
+  code_blockt* our_dest=0;
+
+  exprt::operandst &operands=root.operands();
+  exprt::operandst::iterator first_found=operands.end();
+
+  Forall_expr(it, operands)
+  {
+    bool found=false;
+
+    // be aware of the skip-carries-type hack
+    if(it->id()==ID_code &&
+       to_code(*it).get_statement()!=ID_skip)
+      found=find_block_position_rec(
+        identifier,
+        to_code(*it),
+        our_dest,
+        before);
+    else
+    {
+      find_symbols_sett syms;
+      find_type_and_expr_symbols(*it, syms);
+
+      found=syms.find(identifier)!=syms.end();
+    }
+
+    if(!found) continue;
+
+    if(!our_dest)
+    {
+      // first containing block
+      if(root.get_statement()==ID_block)
+      {
+        dest=&(to_code_block(root));
+        before=it;
+      }
+
+      return true;
+    }
+    else
+    {
+      // there is a containing block and this is the first operand
+      // that contains identifier
+      if(first_found==operands.end())
+        first_found=it;
+      // we have seen it already - pick the first occurrence in this
+      // block
+      else if(root.get_statement()==ID_block)
+      {
+        dest=&(to_code_block(root));
+        before=first_found;
+
+        return true;
+      }
+      // we have seen it already - outer block has to deal with this
+      else
+        return true;
+    }
+  }
+
+  if(first_found!=operands.end())
+  {
+    dest=our_dest;
+
+    return true;
+  }
+
+  return false;
+}
+
+/*******************************************************************\
+
+Function: goto2sourcet::insert_local_static_decls
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
+void goto2sourcet::insert_local_static_decls(
+  code_blockt &b,
+  const std::list<irep_idt> &local_static,
+  local_static_declst &local_static_decls,
+  std::list<irep_idt> &type_decls,
+  const hash_map_cont<irep_idt, irep_idt, irep_id_hash> &original_tags)
+{
+  // look up last identifier first as its value may introduce the
+  // other ones
+  for(std::list<irep_idt>::const_reverse_iterator
+      it=local_static.rbegin();
+      it!=local_static.rend();
       ++it)
   {
-    os_body << std::endl;
-    convert_compound(ns.lookup(*it).type, false, os_body);
-  }
-  converted.swap(converted_bak);
+    local_static_declst::const_iterator d_it=
+      local_static_decls.find(*it);
+    assert(d_it!=local_static_decls.end());
 
-  os_body << expr_to_string(b).substr(1);
-  os_body << std::endl << std::endl;
+    code_declt d=d_it->second;
+    std::list<irep_idt> redundant;
+    cleanup_decl(d, redundant, type_decls, original_tags);
+
+    code_blockt* dest_ptr=0;
+    exprt::operandst::iterator before=b.operands().end();
+
+    // some use of static variables might be optimised out if it is
+    // within an if(false) { ... } block
+    if(find_block_position_rec(*it, b, dest_ptr, before))
+    {
+      assert(dest_ptr!=0);
+      dest_ptr->operands().insert(before, d);
+    }
+  }
+}
+
+/*******************************************************************\
+
+Function: goto2sourcet::insert_local_type_decls
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
+void goto2sourcet::insert_local_type_decls(
+  code_blockt &b,
+  const std::list<irep_idt> &type_decls)
+{
+  // look up last identifier first as its value may introduce the
+  // other ones
+  for(std::list<irep_idt>::const_reverse_iterator
+      it=type_decls.rbegin();
+      it!=type_decls.rend();
+      ++it)
+  {
+    const typet &type=ns.lookup(*it).type;
+    // feed through plain C to expr2c by ending and re-starting
+    // a comment block ...
+    std::ostringstream os_body;
+    os_body << *it << " */\n";
+    convert_compound(type, false, os_body);
+    os_body << "/*";
+
+    code_skipt skip;
+    skip.set_location().set_comment(os_body.str());
+    // another hack to ensure symbols inside types are seen
+    skip.type()=type;
+
+    code_blockt* dest_ptr=0;
+    exprt::operandst::iterator before=b.operands().end();
+
+    // we might not find it in case a transparent union type cast
+    // has been removed by cleanup operations
+    if(find_block_position_rec(*it, b, dest_ptr, before))
+    {
+      assert(dest_ptr!=0);
+      dest_ptr->operands().insert(before, skip);
+    }
+  }
 }
 
 /*******************************************************************\
