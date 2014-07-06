@@ -139,8 +139,14 @@ void goto_symext::argument_assignments(
 
   if(function_type.has_ellipsis())
   {
-    // These are va_arg arguments.
-    for(unsigned va_count=0; it1!=arguments.end(); it1++, va_count++)
+    // These are va_arg arguments; their types may differ from call to call
+    unsigned va_count=0;
+    const symbolt *va_sym=0;
+    while(!ns.lookup(id2string(function_identifier)+"::va_arg"+i2string(va_count),
+                    va_sym))
+      ++va_count;
+
+    for( ; it1!=arguments.end(); it1++, va_count++)
     {
       irep_idt id=id2string(function_identifier)+"::va_arg"+i2string(va_count);
       
