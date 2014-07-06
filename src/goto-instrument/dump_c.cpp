@@ -3574,7 +3574,7 @@ void goto2sourcet::insert_local_type_decls(
     os_body << "/*";
 
     code_skipt skip;
-    skip.set_location().set_comment(os_body.str());
+    skip.location().set_comment(os_body.str());
     // another hack to ensure symbols inside types are seen
     skip.type()=type;
 
