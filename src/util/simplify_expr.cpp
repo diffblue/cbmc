@@ -3112,9 +3112,15 @@ bool simplify_exprt::simplify_inequality_address_of(exprt &expr)
   exprt tmp0=expr.op0();
   if(tmp0.id()==ID_typecast)
     tmp0=expr.op0().op0();
+  if(tmp0.op0().id()==ID_index &&
+     to_index_expr(tmp0.op0()).index().is_zero())
+    tmp0=address_of_exprt(to_index_expr(tmp0.op0()).array());
   exprt tmp1=expr.op1();
   if(tmp1.id()==ID_typecast)
     tmp1=expr.op1().op0();
+  if(tmp1.op0().id()==ID_index &&
+     to_index_expr(tmp1.op0()).index().is_zero())
+    tmp1=address_of_exprt(to_index_expr(tmp1.op0()).array());
   assert(tmp0.id()==ID_address_of);
   assert(tmp1.id()==ID_address_of);
 
