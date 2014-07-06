@@ -52,7 +52,7 @@ irep_idt cpp_enum_typet::generate_anon_tag() const
   
   forall_irep(it, b)
   {
-    result+="#";
+    result+='#';
     result+=id2string(it->get(ID_name));
   }
   

@@ -127,27 +127,27 @@ void value_set_fivrt::output(
 
       if(o.id()==ID_invalid)
       {
-        result+="#";
+        result+='#';
         result+=", *, "; // offset unknown
         if (o.type().id()==ID_unknown)
-          result+="*";
+          result+='*';
         else if (o.type().id()==ID_invalid)
-          result+="#";
+          result+='#';
         else
           result+=from_type(ns, identifier, o.type());        
-        result+=">";
+        result+='>';
       }
       else if (o.id()==ID_unknown)
       {
-        result+="*";
+        result+='*';
         result+=", *, "; // offset unknown
         if (o.type().id()==ID_unknown)
-          result+="*";
+          result+='*';
         else if (o.type().id()==ID_invalid)
-          result+="#";
+          result+='#';
         else
           result+=from_type(ns, identifier, o.type());        
-        result+=">";
+        result+='>';
       }
       else
       {
@@ -156,12 +156,12 @@ void value_set_fivrt::output(
         if(o_it->second.offset_is_set)
           result+=integer2string(o_it->second.offset)+"";
         else
-          result+="*";
+          result+='*';
         
         result+=", ";
         
         if (o.type().id()==ID_unknown)
-          result+="*";
+          result+='*';
         else
         {
           if (o.type().id()=="#REF#")
@@ -171,7 +171,7 @@ void value_set_fivrt::output(
         }
           
       
-        result+=">";
+        result+='>';
       }
 
       out << result << std::endl;

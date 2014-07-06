@@ -31,40 +31,40 @@ std::string type2name(const typet &type)
   
   // qualifiers first
   if(type.get_bool(ID_C_constant))
-    result+="c";
+    result+='c';
 
   if(type.get_bool(ID_C_restricted))
-    result+="r";
+    result+='r';
 
   if(type.get_bool(ID_C_volatile))
-    result+="v";
+    result+='v';
 
   if(type.id()==irep_idt())
     throw "Empty type encountered.";
   else if(type.id()==ID_empty)
-    result+="V";   
+    result+='V';
   else if(type.id()==ID_signedbv)
     result+="S" + type.get_string(ID_width);
   else if(type.id()==ID_unsignedbv)
     result+="U" + type.get_string(ID_width);
   else if(type.id()==ID_bool) 
-    result+="B";
+    result+='B';
   else if(type.id()==ID_integer) 
-    result+="I";
+    result+='I';
   else if(type.id()==ID_real) 
-    result+="R";
+    result+='R';
   else if(type.id()==ID_complex) 
-    result+="C";
+    result+='C';
   else if(type.id()==ID_floatbv) 
     result+="F" + type.get_string(ID_width);
   else if(type.id()==ID_fixedbv) 
     result+="X" + type.get_string(ID_width);
   else if(type.id()==ID_natural)
-    result+="N";
+    result+='N';
   else if(type.id()==ID_pointer)
-    result+="*";
+    result+='*';
   else if(type.id()==ID_reference)
-    result+="&";
+    result+='&';
   else if(type.id()==ID_code)
   {
     const code_typet &t=to_code_type(type);
@@ -76,13 +76,13 @@ std::string type2name(const typet &type)
         it!=parameters.end();
         it++)
     {      
-      if(it!=parameters.begin()) result+="|";
+      if(it!=parameters.begin()) result+='|';
       result+=type2name(it->type());
     }
 
     if(t.has_ellipsis())
     {
-      if(!parameters.empty()) result+="|";
+      if(!parameters.empty()) result+='|';
       result+="...";
     }
 
@@ -108,17 +108,17 @@ std::string type2name(const typet &type)
     if(type.id()==ID_union) result+="UN";
     const struct_union_typet &t=to_struct_union_type(type);
     const struct_union_typet::componentst &components = t.components();
-    result+="[";
+    result+='[';
     for(struct_union_typet::componentst::const_iterator
         it=components.begin();
         it!=components.end();
         it++)
     {            
-      if(it!=components.begin()) result+="|";
+      if(it!=components.begin()) result+='|';
       result+=type2name(it->type());
       result+="'"+it->get_string(ID_name)+"'|";
     }
-    result+="]";
+    result+=']';
   }
   else if(type.id()==ID_incomplete_struct)
     result +="ST?";
@@ -139,21 +139,21 @@ std::string type2name(const typet &type)
     
   if(type.has_subtype())
   {
-    result+="{";
+    result+='{';
     result+=type2name(type.subtype());    
-    result+="}";
+    result+='}';
   }
 
   if(type.has_subtypes())
   {
-    result+="$";
+    result+='$';
     forall_subtypes(it, type)
     {      
       result+=type2name(*it);
       result+="|";      
     }
     result.resize(result.size()-1);
-    result+="$";
+    result+='$';
   }
   
   return result;

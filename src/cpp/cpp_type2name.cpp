@@ -60,16 +60,16 @@ static void irep2name(const irept &irep, std::string &result)
      irep.get_comments().empty())
     return;
 
-  result+="(";
+  result+='(';
   bool first=true;
 
   forall_named_irep(it, irep.get_named_sub())
   {
-    if(first) first=false; else result+=",";
+    if(first) first=false; else result+=',';
 
     result+=do_prefix(name2string(it->first));
 
-    result+="=";
+    result+='=';
     std::string tmp;
     irep2name(it->second, tmp);
     result+=tmp;
@@ -80,9 +80,9 @@ static void irep2name(const irept &irep, std::string &result)
        it->first==ID_C_volatile ||
        it->first==ID_C_restricted)
     {
-      if(first) first=false; else result+=",";
+      if(first) first=false; else result+=',';
       result+=do_prefix(name2string(it->first));
-      result+="=";
+      result+='=';
       std::string tmp;
       irep2name(it->second, tmp);
       result+=tmp;
@@ -90,13 +90,13 @@ static void irep2name(const irept &irep, std::string &result)
 
   forall_irep(it, irep.get_sub())
   {
-    if(first) first=false; else result+=",";
+    if(first) first=false; else result+=',';
     std::string tmp;
     irep2name(*it, tmp);
     result+=tmp;
   }
 
-  result+=")";
+  result+=')';
 }
 
 /*******************************************************************\
@@ -166,21 +166,21 @@ std::string cpp_type2name(const typet &type)
     const code_typet::parameterst &parameters=to_code_type(type).parameters();
     const typet &return_type=to_code_type(type).return_type();
     
-    result+="(";
+    result+='(';
 
     for(code_typet::parameterst::const_iterator
         arg_it=parameters.begin();
         arg_it!=parameters.end();
         arg_it++)
     {
-      if(arg_it!=parameters.begin()) result+=",";
+      if(arg_it!=parameters.begin()) result+=',';
       result+=cpp_type2name(arg_it->type());
     }
         
-    result+=")";
+    result+=')';
     result+="->(";
     result+=cpp_type2name(return_type);
-    result+=")";
+    result+=')';
   }
   else
   {

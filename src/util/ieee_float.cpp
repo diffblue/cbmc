@@ -223,9 +223,9 @@ std::string ieee_floatt::to_string_decimal(unsigned precision) const
 {
   std::string result;
 
-  if(sign_flag) result+="-";
+  if(sign_flag) result+='-';
   
-  if((NaN_flag || infinity_flag) && !sign_flag) result+="+";
+  if((NaN_flag || infinity_flag) && !sign_flag) result+='+';
 
   // special cases
   if(NaN_flag)
@@ -234,7 +234,7 @@ std::string ieee_floatt::to_string_decimal(unsigned precision) const
     result+="inf";
   else if(is_zero())
   {
-    result+="0";
+    result+='0';
 
     // add zeros, if needed
     if(precision>0)
@@ -325,9 +325,9 @@ std::string ieee_floatt::to_string_scientific(unsigned precision) const
 {
   std::string result;
 
-  if(sign_flag) result+="-";
+  if(sign_flag) result+='-';
   
-  if((NaN_flag || infinity_flag) && !sign_flag) result+="+";
+  if((NaN_flag || infinity_flag) && !sign_flag) result+='+';
 
   // special cases
   if(NaN_flag)
@@ -336,7 +336,7 @@ std::string ieee_floatt::to_string_scientific(unsigned precision) const
     result+="inf";
   else if(is_zero())
   {
-    result+="0";
+    result+='0';
 
     // add zeros, if needed
     if(precision>0)

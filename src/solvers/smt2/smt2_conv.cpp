@@ -798,7 +798,7 @@ std::string smt2_convt::convert_identifier(const irep_idt &identifier)
     case '|':
     case '\\':
     case '&': // we use the & for escaping
-      result+="&";
+      result+='&';
       result+=i2string(ch);
       result+=';';
       break;

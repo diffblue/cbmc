@@ -652,7 +652,7 @@ irep_idt cpp_declarator_convertert::get_pretty_name()
       result+=cpp_typecheck.to_string(parameter_type);
     }
 
-    result+=")";
+    result+=')';
 
     return result;
   }

@@ -43,11 +43,11 @@ std::string lispexprt::expr2string() const
         result+=" . ";
       }
       else if(j!=0)
-        result+=" ";
+        result+=' ';
 
       result+=(*this)[j].expr2string();
     }
-    result+=")";
+    result+=')';
     break;
 
    case String:

@@ -195,14 +195,14 @@ void value_sett::output(
         if(o_it->second.offset_is_set)
           result+=integer2string(o_it->second.offset)+"";
         else
-          result+="*";
+          result+='*';
 
         if(o.type().is_nil())
           result+=", ?";
         else
           result+=", "+from_type(ns, identifier, o.type());
       
-        result+=">";
+        result+='>';
       }
 
       out << result;
