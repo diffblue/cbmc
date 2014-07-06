@@ -4171,6 +4171,16 @@ void smt2_convt::find_symbols_rec(
    }
    else if(type.id()==ID_struct)
    {
+     // Cater for mutually recursive struct types
+     bool need_decl=false;
+     if(use_datatypes &&
+        datatype_map.find(type)==datatype_map.end())
+     {
+       std::string smt_typename = "struct."+i2string(datatype_map.size());
+       datatype_map[type] = smt_typename;
+       need_decl=true;
+     }
+
      const struct_typet::componentst &components=
        to_struct_type(type).components();
 
@@ -4178,11 +4188,9 @@ void smt2_convt::find_symbols_rec(
        find_symbols_rec(components[i].type(), recstack);
 
      // Declare the corresponding SMT type if we haven't already.
-     if(use_datatypes &&
-        datatype_map.find(type)==datatype_map.end())
+     if(need_decl)
      {
-       std::string smt_typename = "struct."+i2string(datatype_map.size());
-       datatype_map[type] = smt_typename;
+       std::string smt_typename = datatype_map[type];
 
        // We're going to create a datatype named something like `struct.0'.
        // It's going to have a single constructor named `mk-struct.0' with an
