@@ -531,6 +531,16 @@ void c_typecastt::implicit_typecast_followed(
   {
     // The argument corresponding to a transparent union type can be of any
     // type in the union; no explicit cast is required.
+
+    // GCC docs say:
+    //  If the union member type is a pointer, qualifiers like const on the
+    //  referenced type must be respected, just as with normal pointer
+    //  conversions.
+    // But it is accepted, and Clang doesn't even emit a warning (GCC 4.7 does)
+    typet src_type_no_const=src_type;
+    if(src_type.id()==ID_pointer &&
+       src_type.subtype().get_bool(ID_C_constant))
+      src_type_no_const.subtype().remove(ID_C_constant);
     
     // Check union members.
     const union_typet &dest_union_type=to_union_type(dest_type);
@@ -540,11 +550,13 @@ void c_typecastt::implicit_typecast_followed(
         it!=dest_union_type.components().end();
         it++)
     {
-      if(!check_c_implicit_typecast(src_type, it->type()))
+      if(!check_c_implicit_typecast(src_type_no_const, it->type()))
       {
         // build union constructor
         exprt union_expr(ID_union, orig_dest_type);
         union_expr.move_to_operands(expr);
+        if(!full_eq(src_type, src_type_no_const))
+          do_typecast(union_expr.op0(), src_type_no_const);
         union_expr.set(ID_component_name, it->get_name());
         expr=union_expr;
         return; // ok
