@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <map>
 #include <set>
 #include <iostream>
+#include <cstdlib> // abort()
 
 #include <util/symbol.h>
 #include <util/mp_arith.h>
