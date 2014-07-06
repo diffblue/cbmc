@@ -796,34 +796,7 @@ void goto_program2codet::convert_assign_rec(
     const code_assignt &assign,
     codet &dest)
 {
-  if(assign.rhs().id()==ID_struct)
-  {
-    const struct_typet &type=
-      to_struct_type(ns.follow(assign.rhs().type()));
-
-    const struct_union_typet::componentst &components=
-      type.components();
-
-    assert(components.size()==assign.rhs().operands().size());
-    exprt::operandst::const_iterator o_it=assign.rhs().operands().begin();
-    for(struct_union_typet::componentst::const_iterator
-        it=components.begin();
-        it!=components.end();
-        ++it)
-    {
-      const bool is_zero_bit_field=
-        it->get_is_bit_field() &&
-        to_bitvector_type(ns.follow(it->type())).get_width()==0;
-
-      if(!it->get_is_padding() && !is_zero_bit_field)
-      {
-        member_exprt member(assign.lhs(), it->get_name(), it->type());
-        convert_assign_rec(code_assignt(member, *o_it), dest);
-      }
-      ++o_it;
-    }
-  }
-  else if(assign.rhs().id()==ID_array)
+  if(assign.rhs().id()==ID_array)
   {
     const array_typet &type=
       to_array_type(ns.follow(assign.rhs().type()));
