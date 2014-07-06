@@ -516,25 +516,68 @@ decision_proceduret::resultt smt2_dect::read_result_z3(std::istream &in)
     if(line=="sat")
       res = D_SATISFIABLE;
     else if(line=="unsat")
+    {
       res = D_UNSATISFIABLE;
-    else
+      break;
+    }
+    else if(line.compare(0, 7, "(error ")==0)
+    {
+      res = D_ERROR;
+      break;
+    }
+    else if(!line.empty())
     {
       // Values look like:
       //
       // ((identifer value))
-      size_t start, mid, end;
 
-      for (start = 0; start < line.size() && line[start] == '('; start++);
-      for (mid = start; mid < line.size() && line[mid] != ' '; mid++);
-      for (end = mid; end < line.size() && line[end] != ')'; end++);
+      unsigned missing_close=0;
+      for(std::string::const_iterator
+          it=line.begin();
+          it!=line.end();
+          ++it)
+        if(*it=='(') ++missing_close;
+        else if(*it==')')
+        {
+          assert(missing_close>0);
+          --missing_close;
+        }
 
-      if (start < line.size() && mid < line.size() && end < line.size())
+      std::string next_line;
+      while(missing_close>0 && std::getline(in, next_line))
       {
-        std::string identifier = line.substr(start, mid-start);
-        std::string value = line.substr(mid+1, end-(mid+1));
+        line+=' ';
+        while(!next_line.empty() && next_line[0]==' ')
+          next_line.erase(0, 1);
+        line+=next_line;
 
-        values[identifier] = value;
+        for(std::string::const_iterator
+            it=next_line.begin();
+            it!=next_line.end();
+            ++it)
+          if(*it=='(') ++missing_close;
+          else if(*it==')')
+          {
+            assert(missing_close>0);
+            --missing_close;
+          }
       }
+
+      std::string::size_type start, mid, end;
+
+      start=line.find_first_not_of('(');
+      assert(start!=std::string::npos);
+
+      mid=line.find_first_of(' ', start);
+      assert(mid!=std::string::npos);
+
+      end=line.find_last_not_of(')');
+      assert(end!=std::string::npos);
+
+      std::string identifier = line.substr(start, mid-start);
+      std::string value = line.substr(mid+1, end-mid);
+
+      values[identifier] = value;
     }
   }
 
