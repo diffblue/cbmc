@@ -2386,8 +2386,14 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
   {
     if(no_typecast) return;
 
+    assert(expr.type().id()==ID_symbol);
+
     const typet &t=expr.type();
 
+    add_local_types(t);
+    expr=typecast_exprt(expr, t);
+
+#if 0
     irep_idt tag=t.get(ID_tag);
     if(tag.empty()) tag=ID_anonymous;
 
@@ -2441,6 +2447,7 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
       expr.make_typecast(t);
       add_local_types(t);
     }
+#endif
   }
   else if(expr.id()==ID_array ||
           expr.id()==ID_vector)
