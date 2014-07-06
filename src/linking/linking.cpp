@@ -100,7 +100,7 @@ std::string linkingt::type_to_string_verbose(
       const typet &subtype=it->type();
       result+="  ";
       result+=type_to_string(ns, symbol.name, subtype);
-      result+=" ";
+      result+=' ';
 
       if(it->get_base_name()!="")
         result+=id2string(it->get_base_name());
@@ -110,7 +110,7 @@ std::string linkingt::type_to_string_verbose(
       result+=";\n";
     }
     
-    result+="}";
+    result+='}';
     
     return result;
   }

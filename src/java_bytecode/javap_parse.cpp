@@ -548,7 +548,7 @@ irep_idt javap_parsert::rname()
     result+=id2string(t);
     if(lookahead()!=".") break;
     token(); // read .
-    result+=".";
+    result+='.';
   }
   
   return result;
@@ -583,7 +583,7 @@ typet javap_parsert::rtype()
     while(lookahead()==".")
     {
       token(); // read .
-      identifier+=".";
+      identifier+='.';
       identifier+=id2string(token());
     }
     type.set(ID_identifier, identifier);

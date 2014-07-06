@@ -266,7 +266,7 @@ std::string fixedbvt::format(
 
   if(int_value.is_negative())
   {
-    dest+="-";
+    dest+='-';
     int_value.negate();
   }
 
