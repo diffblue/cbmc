@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "std_expr.h"
 #include "symbol.h"
 #include "namespace.h"
+#include "arith_tools.h"
 
 /*******************************************************************\
 
@@ -64,6 +65,22 @@ exprt gen_zero(const typet &type)
   else if(type_id==ID_pointer)
   {
     return constant_exprt(ID_NULL, type);
+  }
+  else if(type_id==ID_vector &&
+          to_vector_type(type).size().id()==ID_constant)
+  {
+    exprt sub_zero=gen_zero(type.subtype());
+    mp_integer s;
+
+    if(sub_zero.is_nil() ||
+       to_integer(to_vector_type(type).size(), s))
+      return sub_zero;
+
+    exprt::operandst ops(integer2unsigned(s), sub_zero);
+    vector_exprt v(to_vector_type(type));
+    v.operands().swap(ops);
+
+    return v;
   }
   else
     return nil_exprt();
@@ -124,6 +141,22 @@ exprt gen_one(const typet &type)
     exprt real=gen_one(type.subtype());
     exprt imag=gen_zero(type.subtype());
     return complex_exprt(real, imag, to_complex_type(type));
+  }
+  else if(type_id==ID_vector &&
+          to_vector_type(type).size().id()==ID_constant)
+  {
+    exprt sub_one=gen_one(type.subtype());
+    mp_integer s;
+
+    if(sub_one.is_nil() ||
+       to_integer(to_vector_type(type).size(), s))
+      return sub_one;
+
+    exprt::operandst ops(integer2unsigned(s), sub_one);
+    vector_exprt v(to_vector_type(type));
+    v.operands().swap(ops);
+
+    return v;
   }
   else
     return nil_exprt();
