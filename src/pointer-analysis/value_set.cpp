@@ -1061,7 +1061,8 @@ void value_sett::get_reference_set_rec(
 
   if(expr.id()==ID_symbol ||
      expr.id()==ID_dynamic_object ||
-     expr.id()==ID_string_constant)
+     expr.id()==ID_string_constant ||
+     expr.id()==ID_array)
   {
     if(expr.type().id()==ID_array &&
        expr.type().subtype().id()==ID_array)
