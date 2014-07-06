@@ -102,22 +102,7 @@ void c_typecheck_baset::typecheck_symbol(symbolt &symbol)
   irep_idt root_name=add_language_prefix(symbol.base_name);
   irep_idt new_name=symbol.name;
 
-  // do anon-tags first
-  if(symbol.is_type &&
-     has_prefix(id2string(symbol.name), language_prefix+"tag-#anon"))
-  {    
-    // we rename them to make collisions unproblematic
-    std::string typestr=type2name(symbol.type);
-    new_name=add_language_prefix("tag-#anon#"+typestr);
-    
-    symbol_tablet::symbolst::const_iterator it=symbol_table.symbols.find(new_name);
-    if(it!=symbol_table.symbols.end())
-      return; // bail out, we have an appropriate symbol already.
-
-    irep_idt newtag=std::string("#anon#")+typestr;
-    symbol.type.set(ID_tag, newtag);
-  }
-  else if(symbol.is_file_local)
+  if(symbol.is_file_local)
   {
     // file-local stuff -- stays as is
     // collisions are resolved during linking
