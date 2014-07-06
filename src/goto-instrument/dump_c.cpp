@@ -1939,6 +1939,7 @@ void goto_program2codet::add_local_types(const typet &type)
           ++it)
         add_local_types(it->type());
 
+      assert(!identifier.empty());
       type_names.push_back(identifier);
     }
   }
@@ -2412,7 +2413,9 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
 
     const typet &t=expr.type();
 
-    const irep_idt tag=t.get(ID_tag);
+    irep_idt tag=t.get(ID_tag);
+    if(tag.empty()) tag=ID_anonymous;
+
     std::pair<r_tag_mapt::const_iterator, r_tag_mapt::const_iterator>
       reverse_tag_entry=reverse_tag_map.equal_range(tag);
 
@@ -2454,6 +2457,7 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
 
         if(!type_names_set.insert(t_s.name).second)
           assert(false);
+        assert(!t_s.name.empty());
         type_names.push_back(t_s.name);
         if(symbol_table.add(t_s))
           assert(false);
@@ -2625,25 +2629,6 @@ protected:
   typedef hash_set_cont<irep_idt, irep_id_hash> convertedt;
   convertedt converted;
 
-  typedef hash_map_cont<typet, unsigned, irep_hash, std::equal_to<irept> > anon_mapt;
-  anon_mapt anon_renaming;
-
-  static irep_idt get_type_name(
-      const typet& type,
-      const std::string &prefix,
-      goto2sourcet::anon_mapt &map,
-      bool &is_new)
-  {
-    anon_mapt::const_iterator entry=map.find(type);
-    is_new=entry==map.end();
-    if(is_new)
-      entry=map.insert(std::make_pair(type, map.size())).first;
-
-    std::stringstream new_name;
-    new_name << prefix << entry->second;
-    return new_name.str();
-  }
-
   std::set<std::string> system_headers;
 
   std::string type_to_string(const typet &type);
@@ -2785,45 +2770,47 @@ void goto2sourcet::operator()(std::ostream &os)
   typedef hash_map_cont<irep_idt, unsigned, irep_id_hash> unique_tagst;
   unique_tagst unique_tags;
 
-  // replace all #anon, fix $link in types, and prepare lexicographic order
+  // add tags to anonymous union/struct,
+  // and prepare lexicographic order
   std::set<std::string> symbols_sorted;
   Forall_symbols(it, copied_symbol_table.symbols)
   {
-    irep_idt original_tag=it->second.type.get(ID_tag);
-    cleanup_type(it->second.type);
+    symbolt &symbol=it->second;
+
+    if((symbol.type.id()==ID_union || symbol.type.id()==ID_struct) &&
+       symbol.type.get(ID_tag).empty())
+    {
+      assert(symbol.is_type);
+      symbol.type.set(ID_tag, ID_anonymous);
+    }
 
     const std::string name_str=id2string(it->first);
-    if(it->second.is_type && !it->second.type.get(ID_tag).empty())
+    if(symbol.is_type && !symbol.type.get(ID_tag).empty())
     {
+      irep_idt original_tag=symbol.type.get(ID_tag);
       original_tags[it->first]=original_tag;
-      std::string new_tag=id2string(it->second.type.get(ID_tag));
-
-      std::string::size_type link_pos=name_str.rfind("$link");
-      if(link_pos!=std::string::npos)
-      {
-        if(new_tag.rfind("$link")==std::string::npos)
-        {
-          new_tag+=name_str.substr(link_pos);
-          it->second.type.set(ID_tag, new_tag);
-        }
-        else
-          assert(has_suffix(name_str, new_tag));
-      }
+      std::string new_tag=id2string(original_tag);
 
       std::string::size_type tag_pos=new_tag.rfind("tag-");
       if(tag_pos!=std::string::npos)
       {
         new_tag.erase(0, tag_pos+4);
-        it->second.type.set(ID_tag, new_tag);
+        symbol.type.set(ID_tag, new_tag);
       }
 
       std::pair<unique_tagst::iterator, bool> unique_entry=
-        unique_tags.insert(std::make_pair(it->second.type.get(ID_tag), 0));
+        unique_tags.insert(std::make_pair(symbol.type.get(ID_tag), 0));
       if(!unique_entry.second)
       {
-        new_tag+="$"+i2string(unique_entry.first->second);
-        it->second.type.set(ID_tag, new_tag);
-        ++(unique_entry.first->second);
+        do
+        {
+          symbol.type.set(
+            ID_tag,
+            new_tag+"$"+i2string(unique_entry.first->second));
+          ++(unique_entry.first->second);
+        }
+        while(!unique_tags.insert(std::make_pair(
+              symbol.type.get(ID_tag), 0)).second);
       }
     }
 
@@ -3568,14 +3555,8 @@ void goto2sourcet::cleanup_type(typet &type)
   if(type.id()==ID_array)
     cleanup_expr(to_array_type(type).size());
 
-  if(!type.get(ID_tag).empty() &&
-      has_prefix(type.get_string(ID_tag), "#anon"))
-  {
-    typet tmp=type;
-    bool b;
-    tmp.set(ID_tag, get_type_name(type, "anon$", anon_renaming, b));
-    type.swap(tmp);
-  }
+  assert((type.id()!=ID_union && type.id()!=ID_struct) ||
+         !type.get(ID_tag).empty());
 }
 
 /*******************************************************************\
