@@ -2769,6 +2769,45 @@ void goto2sourcet::operator()(std::ostream &os)
   local_static_declst local_static_decls;
   hash_map_cont<irep_idt, irep_idt, irep_id_hash> original_tags;
 
+  // add copies of struct types when ID_C_transparent_union is only
+  // annotated to parameter
+  symbol_tablet symbols_transparent;
+  Forall_symbols(it, copied_symbol_table.symbols)
+  {
+    symbolt &symbol=it->second;
+
+    if(symbol.type.id()!=ID_code) continue;
+
+    code_typet &code_type=to_code_type(symbol.type);
+    code_typet::parameterst &parameters=code_type.parameters();
+
+    for(code_typet::parameterst::iterator
+        it2=parameters.begin();
+        it2!=parameters.end();
+        ++it2)
+    {
+      typet &type=it2->type();
+
+      if(type.id()==ID_symbol &&
+         type.get_bool(ID_C_transparent_union))
+      {
+        symbolt new_type_sym=
+          ns.lookup(to_symbol_type(type).get_identifier());
+
+        new_type_sym.name=id2string(new_type_sym.name)+"$transparent";
+        new_type_sym.type.set(ID_C_transparent_union, true);
+
+        // we might have it already, in which case this has no effect
+        symbols_transparent.add(new_type_sym);
+
+        to_symbol_type(type).set_identifier(new_type_sym.name);
+        type.remove(ID_C_transparent_union);
+      }
+    }
+  }
+  forall_symbols(it, symbols_transparent.symbols)
+    copied_symbol_table.add(it->second);
+
   typedef hash_map_cont<irep_idt, unsigned, irep_id_hash> unique_tagst;
   unique_tagst unique_tags;
 
@@ -3656,7 +3695,8 @@ void goto2sourcet::cleanup_expr(exprt &expr)
     expr.type().swap(type);
   }
   else if(expr.id()==ID_union &&
-      ns.follow(expr.type()).get_bool(ID_C_transparent_union))
+          (expr.type().get_bool(ID_C_transparent_union) ||
+           ns.follow(expr.type()).get_bool(ID_C_transparent_union)))
   {
     union_exprt &u=to_union_expr(expr);
 
