@@ -3858,11 +3858,11 @@ bool simplify_exprt::simplify_with(exprt &expr)
         const irep_idt &component_name=
           expr.op1().get(ID_component_name);
 
-        if(!to_struct_type(expr.op0().type()).
+        if(!to_struct_type(op0_type).
            has_component(component_name))
           return result;
 
-        unsigned number=to_struct_type(expr.op0().type()).
+        unsigned number=to_struct_type(op0_type).
            component_number(component_name);
 
         expr.op0().operands()[number].swap(expr.op2());
