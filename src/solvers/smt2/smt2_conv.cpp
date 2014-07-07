@@ -2118,17 +2118,17 @@ void smt2_convt::convert_struct(const struct_exprt &expr)
     else
     {
       // SMT-LIB 2 concat is binary only
-      for(unsigned i=0; i<components.size()-1; i++)
-        out << "(concat ";
-
-      convert_expr(expr.op0());
-
-      for(unsigned i=1; i<expr.operands().size(); i++)
+      for(unsigned i=components.size(); i>1; i--)
       {
+        out << "(concat ";
+        convert_expr(expr.operands()[i-1]);
         out << " ";
-        convert_expr(expr.operands()[i]);
-        out << ")";
       }
+      
+      convert_expr(expr.op0());
+      
+      for(unsigned i=1; i<components.size(); i++)
+        out << ")";
     }
   }
 }
@@ -3199,24 +3199,26 @@ void smt2_convt::convert_with(const with_exprt &expr)
       else if(m.offset==0)
       {
         // the member is at the beginning
-        out << "(concat ";
+        out << "(concat "
+            << "((_ extract " << (struct_width-1) << " " << m.width << ") ?withop) ";
         convert_expr(value);
-        out << " ((_ extract " << (struct_width-1) << " " << m.width << ") ?withop))";
+        out << ")"; // concat
       }
       else if(m.offset+m.width==struct_width)
       {
         // the member is at the end
-        out << "(concat ((_ extract " << (m.offset-1) << " 0) ?withop) ";
+        out << "(concat ";
         convert_expr(value);
-        out << ")";
+        out << "((_ extract " << (m.offset-1) << " 0) ?withop))";
       }
       else
       {
         // most general case, need two concat-s
-        out << "(concat "
-            << "(concat ((_ extract " << (m.offset-1) << " 0) ?withop) ";
+        out << "(concat (concat "
+            << "((_ extract " << (struct_width-1) << " " << (m.offset+m.width) << ") ?withop) ";
         convert_expr(value);
-        out << ") ((_ extract " << (m.offset-1) << " 0) ?withop))";
+        out << ") ((_ extract " << (m.offset-1) << " 0) ?withop)";
+        out << ")"; // concat
       }
 
       out << ")"; // let ?withop
