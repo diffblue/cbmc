@@ -1704,65 +1704,65 @@ Function: smt2_convt::convert_typecast
 void smt2_convt::convert_typecast(const typecast_exprt &expr)
 {
   assert(expr.operands().size()==1);
-  const exprt &op=expr.op0();
-  const typet &expr_type=ns.follow(expr.type());
-  const typet &op_type=ns.follow(op.type());
+  const exprt &src=expr.op0();
+  const typet &dest_type=ns.follow(expr.type());
+  const typet &src_type=ns.follow(src.type());
 
-  if(expr_type.id()==ID_bool)
+  if(dest_type.id()==ID_bool)
   {
     // this is comparison with zero
-    if(op_type.id()==ID_signedbv ||
-       op_type.id()==ID_unsignedbv ||
-       op_type.id()==ID_fixedbv ||
-       op_type.id()==ID_pointer)
+    if(src_type.id()==ID_signedbv ||
+       src_type.id()==ID_unsignedbv ||
+       src_type.id()==ID_fixedbv ||
+       src_type.id()==ID_pointer)
     {
       out << "(not (= ";
-      convert_expr(op);
+      convert_expr(src);
       out << " ";
-      convert_expr(gen_zero(op_type));
+      convert_expr(gen_zero(src_type));
       out << "))";
     }
     else
     {
-      throw "TODO typecast1 "+op_type.id_string()+" -> bool";
+      throw "TODO typecast1 "+src_type.id_string()+" -> bool";
     }
   }
-  else if(expr_type.id()==ID_signedbv ||
-          expr_type.id()==ID_unsignedbv ||
-          expr_type.id()==ID_c_enum)
+  else if(dest_type.id()==ID_signedbv ||
+          dest_type.id()==ID_unsignedbv ||
+          dest_type.id()==ID_c_enum)
   {
-    unsigned to_width=boolbv_width(expr_type);
+    unsigned to_width=boolbv_width(dest_type);
 
-    if(op_type.id()==ID_signedbv || // from signedbv
-       op_type.id()==ID_unsignedbv || // from unsigedbv
-       op_type.id()==ID_c_enum)
+    if(src_type.id()==ID_signedbv || // from signedbv
+       src_type.id()==ID_unsignedbv || // from unsigedbv
+       src_type.id()==ID_c_enum)
     {
-      unsigned from_width=boolbv_width(op_type);
+      unsigned from_width=boolbv_width(src_type);
 
       if(from_width==to_width)
-        convert_expr(op); // ignore
+        convert_expr(src); // ignore
       else if(from_width<to_width) // extend
       {
-        if(op_type.id()==ID_signedbv)
+        if(src_type.id()==ID_signedbv)
           out << "((_ sign_extend ";
         else
           out << "((_ zero_extend ";
 
         out << (to_width-from_width)
             << ") "; // ind
-        convert_expr(op);
+        convert_expr(src);
         out << ")";
       }
       else // chop off extra bits
       {
         out << "((_ extract " << (to_width-1) << " 0) ";
-        convert_expr(op);
+        convert_expr(src);
         out << ")";
       }
     }
-    else if(op_type.id()==ID_fixedbv) // from fixedbv to int
+    else if(src_type.id()==ID_fixedbv) // from fixedbv to int
     {
-      const fixedbv_typet &fixedbv_type=to_fixedbv_type(op_type);
+      const fixedbv_typet &fixedbv_type=to_fixedbv_type(src_type);
 
       unsigned from_width=fixedbv_type.get_width();
       unsigned from_integer_bits=fixedbv_type.get_integer_bits();
@@ -1774,38 +1774,38 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
             << (to_width-from_integer_bits) << ") ";
         out << "((_ extract " << (from_width-1) << " "
             << from_fraction_bits << ") ";
-        convert_expr(op);
+        convert_expr(src);
         out << "))";
       }
       else
       {
         out << "((_ extract " << (from_fraction_bits+to_width-1)
             << " " << from_fraction_bits << ") ";
-        convert_expr(op);
+        convert_expr(src);
         out << ")";
       }
     }
-    else if(op_type.id()==ID_floatbv) // from floatbv to int
+    else if(src_type.id()==ID_floatbv) // from floatbv to int
     {
-      //const floatbv_typet &floatbv_type=to_floatbv_type(op_type);
+      //const floatbv_typet &floatbv_type=to_floatbv_type(src_type);
 
       if(use_FPA_theory)
       {
         out << "((_ fp.to_sbv " << to_width << ") ";
-        convert_expr(op);
+        convert_expr(src);
         out << ")";
       }
       else
         TODO("floatbv -> int");
     }
-    else if(op_type.id()==ID_bool) // from boolean to int
+    else if(src_type.id()==ID_bool) // from boolean to int
     {
       out << "(ite ";
-      convert_expr(op);
+      convert_expr(src);
 
-      if(expr_type.id()==ID_fixedbv)
+      if(dest_type.id()==ID_fixedbv)
       {
-        fixedbv_spect spec(to_fixedbv_type(expr_type));
+        fixedbv_spect spec(to_fixedbv_type(dest_type));
         out << " (concat (_ bv1 "
             << spec.integer_bits << ") " <<
                "(_ bv0 " << spec.get_fraction_bits() << ")) " <<
@@ -1819,32 +1819,32 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
 
       out << ")";
     }
-    else if(op_type.id()==ID_pointer) // from pointer to int
+    else if(src_type.id()==ID_pointer) // from pointer to int
     {
-      unsigned from_width=boolbv_width(op_type);
+      unsigned from_width=boolbv_width(src_type);
 
       if(from_width<to_width) // extend
       {
         out << "((_ sign_extend ";
         out << (to_width-from_width)
             << ") ";
-        convert_expr(op);
+        convert_expr(src);
         out << ")";
       }
       else // chop off extra bits
       {
         out << "((_ extract " << (to_width-1) << " 0) ";
-        convert_expr(op);
+        convert_expr(src);
         out << ")";
       }
     }
-    else if(op_type.id()==ID_integer) // from integer to bit-vector
+    else if(src_type.id()==ID_integer) // from integer to bit-vector
     {
       // must be constant
-      if(op.is_constant())
+      if(src.is_constant())
       {
         mp_integer i;
-        to_integer(op, i);
+        to_integer(src, i);
         out << "(_ bv" << i << " " << to_width << ")";
       }
       else
@@ -1852,50 +1852,50 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
     }
     else
     {
-      throw "TODO typecast2 "+op_type.id_string()+
-            " -> "+expr_type.id_string() + " op == " + from_expr(ns, "", op);
+      throw "TODO typecast2 "+src_type.id_string()+
+            " -> "+dest_type.id_string() + " src == " + from_expr(ns, "", src);
     }
   }
-  else if(expr_type.id()==ID_fixedbv) // to fixedbv
+  else if(dest_type.id()==ID_fixedbv) // to fixedbv
   {
-    const fixedbv_typet &fixedbv_type=to_fixedbv_type(expr_type);
+    const fixedbv_typet &fixedbv_type=to_fixedbv_type(dest_type);
     unsigned to_fraction_bits=fixedbv_type.get_fraction_bits();
     unsigned to_integer_bits=fixedbv_type.get_integer_bits();
 
-    if(op_type.id()==ID_unsignedbv ||
-       op_type.id()==ID_signedbv ||
-       op_type.id()==ID_c_enum)
+    if(src_type.id()==ID_unsignedbv ||
+       src_type.id()==ID_signedbv ||
+       src_type.id()==ID_c_enum)
     {
       // integer to fixedbv
       
-      unsigned from_width=to_bitvector_type(op_type).get_width();
+      unsigned from_width=to_bitvector_type(src_type).get_width();
       out << "(concat ";
 
       if(from_width==to_integer_bits)
-        convert_expr(op);
+        convert_expr(src);
       else if(from_width>to_integer_bits)
       {
         // too many integer bits
         out << "((_ extract " << (to_integer_bits-1) << " 0) ";
-        convert_expr(op);
+        convert_expr(src);
         out << ")";
       }
       else
       {
         // too few integer bits
         assert(from_width<to_integer_bits);
-        if(expr_type.id()==ID_unsignedbv)
+        if(dest_type.id()==ID_unsignedbv)
         {
           out << "(_ zero_extend "
               << (to_integer_bits-from_width) << ") ";
-          convert_expr(op);
+          convert_expr(src);
           out << ")";
         }
         else
         {
           out << "((_ sign_extend "
               << (to_integer_bits-from_width) << ") ";
-          convert_expr(op);
+          convert_expr(src);
           out << ")";
         }
       }
@@ -1903,18 +1903,18 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
       out << "(_ bv0 " << to_fraction_bits << ")";
       out << ")"; // concat
     }
-    else if(op_type.id()==ID_bool)
+    else if(src_type.id()==ID_bool)
     {
       out << "(concat (concat"
-          << " (_ bv0 " << (to_integer_bits-1) << ")";
-      flatten2bv(op); // produces bit0 or bit1
+          << " (_ bv0 " << (to_integer_bits-1) << ") ";
+      flatten2bv(src); // produces #b0 or #b1
       out << ") (_ bv0 "
           << to_fraction_bits
           << "))";
     }
-    else if(op_type.id()==ID_fixedbv)
+    else if(src_type.id()==ID_fixedbv)
     {
-      const fixedbv_typet &from_fixedbv_type=to_fixedbv_type(op_type);
+      const fixedbv_typet &from_fixedbv_type=to_fixedbv_type(src_type);
       unsigned from_fraction_bits=from_fixedbv_type.get_fraction_bits();
       unsigned from_integer_bits=from_fixedbv_type.get_integer_bits();
       unsigned from_width=from_fixedbv_type.get_width();
@@ -1929,7 +1929,7 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
             << (from_fraction_bits+to_integer_bits-1) << " "
             << from_fraction_bits
             << ") ";
-        convert_expr(op);
+        convert_expr(src);
         out << ")";
       }
       else
@@ -1941,7 +1941,7 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
             << (from_width-1) << " "
             << from_fraction_bits
             << ") ";
-        convert_expr(op);
+        convert_expr(src);
         out << "))";
       }
 
@@ -1953,7 +1953,7 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
             << (from_fraction_bits-1) << " "
             << (from_fraction_bits-to_fraction_bits)
             << ") ";
-        convert_expr(op);
+        convert_expr(src);
         out << ")";
       }
       else
@@ -1961,7 +1961,7 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
         assert(to_fraction_bits>from_fraction_bits);
         out << "(concat ((_ extract "
             << (from_fraction_bits-1) << " 0) ";
-        convert_expr(op);
+        convert_expr(src);
         out << ")"
             << " (_ bv0 " << to_fraction_bits-from_fraction_bits
             << "))";
@@ -1972,58 +1972,58 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
     else
       throw "unexpected typecast to fixedbv";
   }
-  else if(expr_type.id()==ID_pointer)
+  else if(dest_type.id()==ID_pointer)
   {
-    unsigned to_width=boolbv_width(expr_type);
+    unsigned to_width=boolbv_width(dest_type);
   
-    if(op_type.id()==ID_pointer)
+    if(src_type.id()==ID_pointer)
     {
       // this just passes through
-      convert_expr(op);
+      convert_expr(src);
     }
-    else if(op_type.id()==ID_unsignedbv ||
-            op_type.id()==ID_signedbv)
+    else if(src_type.id()==ID_unsignedbv ||
+            src_type.id()==ID_signedbv)
     {
       // integer to pointer
     
-      unsigned from_width=boolbv_width(op_type);
+      unsigned from_width=boolbv_width(src_type);
 
       if(from_width==to_width)
-        convert_expr(op);
+        convert_expr(src);
       else if(from_width<to_width)
       {
         out << "((_ sign_extend "
             << (to_width-from_width)
             << ") ";
-        convert_expr(op);
+        convert_expr(src);
         out << ")"; // sign_extend
       }
       else // from_width>to_width
       {
         out << "((_ extract " << to_width << " 0) ";
-        convert_expr(op);
+        convert_expr(src);
         out << ")"; // extract
       }
     }
     else
-      throw "TODO typecast3 "+op_type.id_string()+" -> pointer";
+      throw "TODO typecast3 "+src_type.id_string()+" -> pointer";
   }
-  else if(expr_type.id()==ID_range)
+  else if(dest_type.id()==ID_range)
   {
     TODO("range typecast");
   }
-  else if(expr_type.id()==ID_floatbv)
+  else if(dest_type.id()==ID_floatbv)
   {
-    if(op_type.id()==ID_floatbv)
+    if(src_type.id()==ID_floatbv)
     {
-//      const floatbv_typet &src=to_floatbv_type(op_type);
-      const floatbv_typet &dst=to_floatbv_type(expr_type);
+//      const floatbv_typet &src=to_floatbv_type(src_type);
+      const floatbv_typet &dst=to_floatbv_type(dest_type);
 
       if(use_FPA_theory)
       {
         out << "((_ to_fp " << dst.get_e() << " "
             << dst.get_f() + 1 << ") roundNearestTiesToEven ";
-        convert_expr(op);
+        convert_expr(src);
         out << ")";
       }
       else
@@ -2031,15 +2031,15 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
         TODO("typecast4 floatbv -> floatbv");
       }
     }
-    else if(op_type.id()==ID_signedbv)
+    else if(src_type.id()==ID_signedbv)
     {
-      const floatbv_typet &dst=to_floatbv_type(expr_type);
+      const floatbv_typet &dst=to_floatbv_type(dest_type);
 
       if(use_FPA_theory)
       {
         out << "((_ to_fp " << dst.get_e() << " "
             << dst.get_f() + 1 << ") roundNearestTiesToEven ";
-        convert_expr(op);
+        convert_expr(src);
         out << ")";
       }
       else
@@ -2047,16 +2047,16 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
         TODO("typecast5 floatbv -> int");
       }
     }
-    else if(op_type.id()==ID_unsignedbv)
+    else if(src_type.id()==ID_unsignedbv)
     {
       // unsignedbv to floatbv
-      const floatbv_typet &dst=to_floatbv_type(expr_type);
+      const floatbv_typet &dst=to_floatbv_type(dest_type);
 
       if(use_FPA_theory)
       {
         out << "((_ to_fp_unsigned " << dst.get_e() << " "
             << dst.get_f() + 1 << ") roundNearestTiesToEven ";
-        convert_expr(op);
+        convert_expr(src);
         out << ")";
       }
       else
@@ -2065,10 +2065,10 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
       }
     }
     else
-      throw "TODO typecast7 "+op_type.id_string()+" -> floatbv";
+      throw "TODO typecast7 "+src_type.id_string()+" -> floatbv";
   }
   else
-    throw "TODO typecast8 "+op_type.id_string()+" -> "+expr_type.id_string();
+    throw "TODO typecast8 "+src_type.id_string()+" -> "+dest_type.id_string();
 }
 
 /*******************************************************************\
@@ -3334,7 +3334,7 @@ void smt2_convt::convert_index(const index_exprt &expr)
         out << " ";
         convert_expr(typecast_exprt(expr.index(), array_type.size().type()));
         out << ")";
-        out << " bit1 bit0)";
+        out << " #b1 #b0)";
       }
       else
       {
@@ -3511,7 +3511,7 @@ void smt2_convt::flatten2bv(const exprt &expr)
   {
     out << "(ite ";
     convert_expr(expr); // this returns a Bool
-    out << " bit1 bit0)";
+    out << " #b1 #b0)"; // this is a one-bit bit-vector
   }
   else if(type.id()==ID_vector)
   {
