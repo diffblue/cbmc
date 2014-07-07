@@ -1903,7 +1903,7 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
       out << "(_ bv0 " << to_fraction_bits << ")";
       out << ")"; // concat
     }
-    else if(src_type.id()==ID_bool)
+    else if(src_type.id()==ID_bool) // bool to fixedbv
     {
       out << "(concat (concat"
           << " (_ bv0 " << (to_integer_bits-1) << ") ";
@@ -1912,12 +1912,15 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
           << to_fraction_bits
           << "))";
     }
-    else if(src_type.id()==ID_fixedbv)
+    else if(src_type.id()==ID_fixedbv) // fixedbv to fixedbv
     {
       const fixedbv_typet &from_fixedbv_type=to_fixedbv_type(src_type);
       unsigned from_fraction_bits=from_fixedbv_type.get_fraction_bits();
       unsigned from_integer_bits=from_fixedbv_type.get_integer_bits();
       unsigned from_width=from_fixedbv_type.get_width();
+
+      //out << "(let ((?op ";
+      //convert_expr(src);
 
       // TODO: use let for op
       TODO("use let for op");
@@ -1976,7 +1979,7 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
   {
     unsigned to_width=boolbv_width(dest_type);
   
-    if(src_type.id()==ID_pointer)
+    if(src_type.id()==ID_pointer) // pointer to pointer
     {
       // this just passes through
       convert_expr(src);
