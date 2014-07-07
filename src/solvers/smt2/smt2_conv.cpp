@@ -1470,12 +1470,12 @@ void smt2_convt::convert_expr(const exprt &expr)
       {
         size_t e = floatbv_type.get_e();
         size_t f = floatbv_type.get_f() + 1;
-        out << "(let ((?op ";
+        out << "(let ((?isfiniteop ";
         convert_expr(expr.op0());
         out << ")) ";
         out << "(and ";
-        out << "(fp.lt (_ -oo " << e << " " << f << ") ?op) ";
-        out << "(fp.lt ?op (_ +oo " << e << " " << f << ")))";
+        out << "(fp.lt (_ -oo " << e << " " << f << ") ?isfiniteop) ";
+        out << "(fp.lt ?isfiniteop (_ +oo " << e << " " << f << ")))";
         out << ")";
       }
       else
@@ -1502,13 +1502,13 @@ void smt2_convt::convert_expr(const exprt &expr)
       {
         size_t e = floatbv_type.get_e();
         size_t f = floatbv_type.get_f() + 1;
-        out << "(let ((?op ";
+        out << "(let ((?isinfop ";
         convert_expr(expr.op0());
         out << ")) ";
         out << "(or "
-            << "(= ?op (_ NaN " << e << " " << f << "))"
-            << "(= ?op (_ +oo " << e << " " << f << "))"
-            << "(= ?op (_ -oo " << e << " " << f << "))"
+            << "(= ?isinfop (_ NaN " << e << " " << f << "))"
+            << "(= ?isinfop (_ +oo " << e << " " << f << "))"
+            << "(= ?isinfop (_ -oo " << e << " " << f << "))"
             << "))";
       }
       else
@@ -1919,7 +1919,7 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
       unsigned from_integer_bits=from_fixedbv_type.get_integer_bits();
       unsigned from_width=from_fixedbv_type.get_width();
 
-      out << "(let ((?op ";
+      out << "(let ((?tcop ";
       convert_expr(src);
       out << ")) ";
 
@@ -1930,7 +1930,7 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
         out << "((_ extract "
             << (from_fraction_bits+to_integer_bits-1) << " "
             << from_fraction_bits
-            << ") op?)";
+            << ") ?tcop)";
       }
       else
       {
@@ -1940,7 +1940,7 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
             << ") ((_ extract "
             << (from_width-1) << " "
             << from_fraction_bits
-            << ") op?))";
+            << ") ?tcop))";
       }
 
       out << " ";
@@ -1950,7 +1950,7 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
         out << "((_ extract "
             << (from_fraction_bits-1) << " "
             << (from_fraction_bits-to_fraction_bits)
-            << ") op?)";
+            << ") ?tcop)";
       }
       else
       {
@@ -3561,7 +3561,7 @@ void smt2_convt::flatten2bv(const exprt &expr)
       if(to_integer(vector_type.size(), size))
         throw "failed to convert vector size to constant";
         
-      out << "(let ((op? ";
+      out << "(let ((?flop ";
       convert_expr(expr);
       out << ")) ";
         
@@ -3569,7 +3569,7 @@ void smt2_convt::flatten2bv(const exprt &expr)
 
       for(mp_integer i=0; i!=size; ++i)        
       {
-        out << " (" << smt_typename << "." << i << " op?)";
+        out << " (" << smt_typename << "." << i << " ?flop)";
       }
 
       out << "))"; // concat, let
@@ -3632,7 +3632,7 @@ void smt2_convt::unflatten(wheret where, const typet &type)
         throw "failed to convert vector size to constant";
 
       if(where==BEGIN)
-        out << "(let ((op? ";
+        out << "(let ((?ufop ";
       else
       {
         out << ")) ";
@@ -3647,7 +3647,7 @@ void smt2_convt::unflatten(wheret where, const typet &type)
           // TODO: need to deal with nesting here
 	  TODO("need to deal with nesting here");
           out << "((_ extract " << offset+subtype_width-1 << " "
-              << offset << ") op?)";
+              << offset << ") ?ufop)";
         }
 
         out << "))"; // mk-, let
