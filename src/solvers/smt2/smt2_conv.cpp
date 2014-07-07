@@ -1768,6 +1768,15 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
       unsigned from_integer_bits=fixedbv_type.get_integer_bits();
       unsigned from_fraction_bits=fixedbv_type.get_fraction_bits();
 
+      // we might need to round up in case of negative numbers
+      // e.g., (int)(-1.00001)==1
+      
+      out << "(let ((?tcop ";
+      convert_expr(src);
+      out << ")) ";
+      
+      out << "(bvadd ";
+
       if(to_width>from_integer_bits)
       {
         out << "((_ sign_extend "
@@ -1784,6 +1793,22 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
         convert_expr(src);
         out << ")";
       }
+      
+      out << " (ite (and ";
+      
+      // some faction bit is not zero
+      out << "(not (= ((_ extract " << (from_fraction_bits-1) << " 0) ?tcop) "
+             "(_ bv0 " << from_fraction_bits << ")))";
+
+      // number negative
+      out << " (= ((_ extract " << (from_width-1) << " " << (from_width-1) << ") ?tcop) "
+             "(_ bv1 1))";
+      
+      out << ")"; // and
+
+      out << " (_ bv1 " << to_width << ") (_ bv0 " << to_width << "))"; // ite
+      out << ")"; // bvadd
+      out << ")"; // let
     }
     else if(src_type.id()==ID_floatbv) // from floatbv to int
     {
