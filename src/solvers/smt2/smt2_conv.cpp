@@ -2717,18 +2717,35 @@ Function: smt2_convt::convert_floatbv_plus
 
 void smt2_convt::convert_floatbv_plus(const exprt &expr)
 {
+  const typet &type=expr.type();
+
   assert(expr.operands().size()==3);
-  assert(expr.type().id()==ID_floatbv);
+  assert(type.id()==ID_floatbv ||
+         (type.id()==ID_complex && type.subtype().id()==ID_floatbv) ||
+         (type.id()==ID_vector && type.subtype().id()==ID_floatbv));
 
   if(use_FPA_theory)
   {
-    out << "(fp.add ";
-    out << "roundNearestTiesToEven"; // hard-wired : FIX!
-    out << " ";
-    convert_expr(expr.op0());
-    out << " ";
-    convert_expr(expr.op1());
-    out << ")";
+    if(type.id()==ID_floatbv)
+    {
+      out << "(fp.add ";
+      out << "roundNearestTiesToEven"; // hard-wired: FIX!
+      out << " ";
+      convert_expr(expr.op0());
+      out << " ";
+      convert_expr(expr.op1());
+      out << ")";
+    }
+    else if(type.id()==ID_complex)
+    {
+      TODO("+ for floatbv complex");
+    }
+    else if(type.id()==ID_vector)
+    {
+      TODO("+ for floatbv vector");
+    }
+    else
+      assert(false);
   }
   else
   {
