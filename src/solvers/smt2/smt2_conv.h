@@ -125,8 +125,8 @@ protected:
   void convert_byte_update(const exprt &expr);
   void convert_byte_extract(const exprt &expr);
   void convert_typecast(const typecast_exprt &expr);
-  void convert_struct(const exprt &expr);
-  void convert_union(const exprt &expr);
+  void convert_struct(const struct_exprt &expr);
+  void convert_union(const union_exprt &expr);
   void convert_constant(const constant_exprt &expr);
   void convert_relation(const exprt &expr);
   void convert_is_dynamic_object(const exprt &expr);

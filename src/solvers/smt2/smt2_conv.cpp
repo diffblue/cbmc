@@ -846,11 +846,11 @@ void smt2_convt::convert_expr(const exprt &expr)
   }
   else if(expr.id()==ID_struct)
   {
-    convert_struct(expr);
+    convert_struct(to_struct_expr(expr));
   }
   else if(expr.id()==ID_union)
   {
-    convert_union(expr);
+    convert_union(to_union_expr(expr));
   }
   else if(expr.id()==ID_constant)
   {
@@ -2079,7 +2079,7 @@ Function: smt2_convt::convert_struct
 
 \*******************************************************************/
 
-void smt2_convt::convert_struct(const exprt &expr)
+void smt2_convt::convert_struct(const struct_exprt &expr)
 {
   const struct_typet &struct_type=to_struct_type(expr.type());
 
@@ -2117,19 +2117,18 @@ void smt2_convt::convert_struct(const exprt &expr)
       convert_expr(expr.op0());
     else
     {
-      out << "(concat";
-      unsigned i=0;
-      for(struct_typet::componentst::const_iterator
-          it=components.begin();
-          it!=components.end();
-          it++, i++)
+      // SMT-LIB 2 concat is binary only
+      for(unsigned i=0; i<components.size()-1; i++)
+        out << "(concat ";
+
+      convert_expr(expr.op0());
+
+      for(unsigned i=1; i<expr.operands().size(); i++)
       {
         out << " ";
-        const exprt &op=expr.operands()[i];
-        convert_expr(op);
+        convert_expr(expr.operands()[i]);
+        out << ")";
       }
-
-      out << ")";
     }
   }
 }
@@ -2146,12 +2145,10 @@ Function: smt2_convt::convert_union
 
 \*******************************************************************/
 
-void smt2_convt::convert_union(const exprt &expr)
+void smt2_convt::convert_union(const union_exprt &expr)
 {
   const union_typet &union_type=to_union_type(expr.type());
-
-  assert(expr.operands().size()==1);
-  const exprt &op=expr.op0();
+  const exprt &op=expr.op();
 
   boolbv_widtht boolbv_width(ns);
 
