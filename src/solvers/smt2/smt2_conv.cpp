@@ -1919,11 +1919,10 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
       unsigned from_integer_bits=from_fixedbv_type.get_integer_bits();
       unsigned from_width=from_fixedbv_type.get_width();
 
-      //out << "(let ((?op ";
-      //convert_expr(src);
+      out << "(let ((?op ";
+      convert_expr(src);
+      out << ")) ";
 
-      // TODO: use let for op
-      TODO("use let for op");
       out << "(concat ";
 
       if(to_integer_bits<=from_integer_bits)
@@ -1931,9 +1930,7 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
         out << "((_ extract "
             << (from_fraction_bits+to_integer_bits-1) << " "
             << from_fraction_bits
-            << ") ";
-        convert_expr(src);
-        out << ")";
+            << ") op?)";
       }
       else
       {
@@ -1943,9 +1940,7 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
             << ") ((_ extract "
             << (from_width-1) << " "
             << from_fraction_bits
-            << ") ";
-        convert_expr(src);
-        out << "))";
+            << ") op?))";
       }
 
       out << " ";
@@ -1955,9 +1950,7 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
         out << "((_ extract "
             << (from_fraction_bits-1) << " "
             << (from_fraction_bits-to_fraction_bits)
-            << ") ";
-        convert_expr(src);
-        out << ")";
+            << ") op?)";
       }
       else
       {
@@ -1970,7 +1963,7 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
             << "))";
       }
 
-      out << ")"; // concat
+      out << "))"; // concat, let
     }
     else
       throw "unexpected typecast to fixedbv";
@@ -3191,8 +3184,45 @@ void smt2_convt::convert_with(const with_exprt &expr)
     }
     else
     {
-      // TODO
-      TODO("");
+      unsigned struct_width=boolbv_width(struct_type);
+      
+      // figure out the offset and width of the member
+      boolbv_widtht::membert m=
+        boolbv_width.get_member(struct_type, component_name);
+        
+      out << "(let ((?withop ";
+      convert_expr(expr.op0());
+      out << ")) ";
+      
+      if(m.width==struct_width)
+      {
+        // the struct is the same as the member, no concat needed
+        out << "withop?";
+      }
+      else if(m.offset==0)
+      {
+        // the member is at the beginning
+        out << "(concat ";
+        convert_expr(value);
+        out << " ((_ extract " << (struct_width-1) << " " << m.width << ") ?withop))";
+      }
+      else if(m.offset+m.width==struct_width)
+      {
+        // the member is at the end
+        out << "(concat ((_ extract " << (m.offset-1) << " 0) ?withop) ";
+        convert_expr(value);
+        out << ")";
+      }
+      else
+      {
+        // most general case, need two concat-s
+        out << "(concat "
+            << "(concat ((_ extract " << (m.offset-1) << " 0) ?withop) ";
+        convert_expr(value);
+        out << ") ((_ extract " << (m.offset-1) << " 0) ?withop))";
+      }
+
+      out << ")"; // let ?withop
     }
   }
   else if(expr_type.id()==ID_union)
