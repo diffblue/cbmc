@@ -1844,7 +1844,8 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
   }
   else if(dest_type.id()==ID_signedbv ||
           dest_type.id()==ID_unsignedbv ||
-          dest_type.id()==ID_c_enum)
+          dest_type.id()==ID_c_enum ||
+          dest_type.id()==ID_bv)
   {
     unsigned to_width=boolbv_width(dest_type);
 
