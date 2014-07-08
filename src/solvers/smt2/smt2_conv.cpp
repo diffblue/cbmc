@@ -332,7 +332,8 @@ constant_exprt smt2_convt::parse_literal(
      type.id()==ID_floatbv ||
      type.id()==ID_pointer ||
      type.id()==ID_signedbv ||
-     type.id()==ID_unsignedbv)
+     type.id()==ID_unsignedbv ||
+     type.id()==ID_c_enum)
   {
     unsigned width=boolbv_width(type);
     return constant_exprt(integer2binary(value, width), type);
