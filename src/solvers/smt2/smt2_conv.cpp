@@ -1919,12 +1919,30 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
 
       if(use_FPA_theory)
       {
-        out << "((_ fp.to_sbv " << to_width << ") ";
-        convert_expr(src);
-        out << ")";
+        if(dest_type.id()==ID_bv)
+        {
+          // this is _NOT_ a semantic conversion, but bit-wise
+          TODO("bit-wise floatbv to bv");
+        }
+        else
+        {
+          out << "((_ fp.to_sbv " << to_width << ") ";
+          convert_expr(src);
+          out << ")";
+        }
       }
       else
-        TODO("floatbv -> int");
+      {
+        if(dest_type.id()==ID_bv)
+        {
+          // this is _NOT_ a semantic conversion, but bit-wise
+          convert_expr(src);
+        }
+        else
+        {
+          TODO("floatbv -> int");
+        }
+      }
     }
     else if(src_type.id()==ID_bool) // from boolean to int
     {
