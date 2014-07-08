@@ -1978,6 +1978,24 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
       else
         throw "can't convert non-constant integer to bitvector";
     }
+    else if(src_type.id()==ID_struct) // flatten a struct
+    {
+      if(use_datatypes)
+      {
+        // need to stitch together
+        TODO("flatten structs with datatypes");
+      }
+      else
+      {
+        assert(boolbv_width(src_type)==boolbv_width(dest_type));
+        convert_expr(src); // nothing else to do!
+      }
+    }
+    else if(src_type.id()==ID_union) // flatten a union
+    {
+      assert(boolbv_width(src_type)==boolbv_width(dest_type));
+      convert_expr(src); // nothing else to do!
+    }
     else
     {
       throw "TODO typecast2 "+src_type.id_string()+
