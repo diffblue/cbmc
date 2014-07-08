@@ -147,6 +147,11 @@ protected:
   
   std::string convert_identifier(const irep_idt &identifier);
   
+  // helpers for floating-point numbers
+  void is_nan(const floatbv_typet &, const char *);
+  void is_zero(const floatbv_typet &, const char *);
+  void is_equal(const floatbv_typet &, const char *, const char *);
+  
   // auxiliary methods
   void find_symbols(const exprt &expr);
   void find_symbols(const typet &type);
