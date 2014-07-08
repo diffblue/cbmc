@@ -894,6 +894,7 @@ void smt2_convt::convert_expr(const exprt &expr)
     
     if(expr.type().id()==ID_vector)
     {
+      TODO("bitnot for vectors");
     }
     else
     {
@@ -927,6 +928,7 @@ void smt2_convt::convert_expr(const exprt &expr)
     }
     else if(expr.type().id()==ID_vector)
     {
+      TODO("unary minus for vector");
     }
     else
     {
@@ -1008,51 +1010,40 @@ void smt2_convt::convert_expr(const exprt &expr)
   else if(expr.id()==ID_ieee_float_equal ||
           expr.id()==ID_ieee_float_notequal)
   {
+    // These are not the same as (= A B)
+    // because of NaN and negative zero.
     assert(expr.operands().size()==2);
     assert(base_type_eq(expr.op0().type(), expr.op1().type(), ns));
 
-    // These are not the same as (= A B)!
-
+    if(expr.id()==ID_ieee_float_notequal)
+      out << "(not ";
+      
     if(use_FPA_theory)
     {
-      if(expr.id()==ID_ieee_float_notequal)
-      {
-        out << "(not (fp.eq ";
-        convert_expr(expr.op0());
-        out << " ";
-        convert_expr(expr.op1());
-        out << "))";
-      }
-      else
-      {
-        out << "(fp.eq ";
-        convert_expr(expr.op0());
-        out << " ";
-        convert_expr(expr.op1());
-        out << ")";
-      }
+      // The FPA theory properly treats NaN and negative zero.
+      out << "(fp.eq ";
+      convert_expr(expr.op0());
+      out << " ";
+      convert_expr(expr.op1());
+      out << ")";
     }
     else
     {
-      // TODO: NAN check!
-      TODO("NAN Check!");
-      if(expr.id()==ID_ieee_float_notequal)
-      {
-        out << "(not (= ";
-        convert_expr(expr.op0());
-        out << " ";
-        convert_expr(expr.op1());
-        out << "))";
-      }
-      else
-      {
-        out << "(= ";
-        convert_expr(expr.op0());
-        out << " ";
-        convert_expr(expr.op1());
-        out << ")";
-      }
+      const typet &op_type=expr.op0().type();
+      assert(op_type.id()==ID_floatbv);
+      const floatbv_typet &floatbv_type=to_floatbv_type(op_type);
+
+      out << "(let ((?feqop0 ";
+      convert_expr(expr.op0());
+      out << ")) (let ((?feqop1 ";
+      convert_expr(expr.op1());
+      out << ")) ";
+      is_equal(floatbv_type, "?feqop0", "?feqop1");
+      out << "))"; // and, let, let
     }
+
+    if(expr.id()==ID_ieee_float_notequal)
+      out << ")";
   }
   else if(expr.id()==ID_le ||
           expr.id()==ID_lt ||
@@ -1448,7 +1439,18 @@ void smt2_convt::convert_expr(const exprt &expr)
       }
       else
       {
-        TODO("isNaN for floatbv");
+        // The exponent is all ones, and the fraction is not zero.
+        unsigned width=floatbv_type.get_width(),
+                 e=floatbv_type.get_e(),
+                 f=floatbv_type.get_f();
+        out << "(let ((?isnanop ";
+        convert_expr(expr.op0());
+        out << ")) (and";
+        out << " (= (bvnot (_ bv0 " << e << ")) "
+               "((_ extract " << width-2 << f << ")))";
+        out << " (not (= (_ bv0 " << f << ") "
+               "((_ extract " << f-1 << 0 << "))))";
+        out << "))"; // and, let
       }
     }
     else
@@ -1687,6 +1689,118 @@ void smt2_convt::convert_expr(const exprt &expr)
   else
     throw "smt2_convt::convert_expr: `"+
           expr.id_string()+"' is unsupported";
+}
+
+/*******************************************************************\
+
+Function: smt2_convt::is_nan
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void smt2_convt::is_nan(
+  const floatbv_typet &floatbv_type, 
+  const char *op)
+{
+  if(use_FPA_theory)
+  {
+    out << "(= " << op << " (_ NaN " << floatbv_type.get_e()
+        << " " << floatbv_type.get_f() + 1 << "))";
+  }
+  else
+  {
+    // The exponent is all ones, and the fraction is not zero.
+    unsigned width=floatbv_type.get_width(),
+             e=floatbv_type.get_e(),
+             f=floatbv_type.get_f();
+    out << "(and"
+           " (= (bvnot (_ bv0 " << e << ")) "
+           "((_ extract " << width-2 << " " << f << ") " << op << "))"
+           " (not (= (_ bv0 " << f << ") "
+           "((_ extract " << f-1 << " " << 0 << ") " << op << ")))"
+           ")"; // and
+  }
+}
+
+/*******************************************************************\
+
+Function: smt2_convt::is_equal
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void smt2_convt::is_equal(
+  const floatbv_typet &floatbv_type, 
+  const char *op0, const char *op1)
+{
+  if(use_FPA_theory)
+  {
+    // The FPA theory properly treats NaN and negative zero.
+    out << "(fp.eq " << op0 << " " << op1 << ")";
+  }
+  else
+  {
+    // NaN is always different from anything else.
+    out << "(and";
+    
+    out << " (not ";
+    is_nan(floatbv_type, op0);
+    out << ")";
+
+    out << " (not ";
+    is_nan(floatbv_type, op1);
+    out << ")";
+    
+    out << " (or (= " << op0 << " " << op1 << ") (and ";
+    is_zero(floatbv_type, op0);
+    out << " ";
+    is_zero(floatbv_type, op1);
+    out << "))"; // and, or
+    
+    out << ")"; // and
+  }
+}
+
+/*******************************************************************\
+
+Function: smt2_convt::is_zero
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void smt2_convt::is_zero(
+  const floatbv_typet &floatbv_type, 
+  const char *op)
+{
+  if(use_FPA_theory)
+  {
+    // need to use fp.eq because of negative zeros
+    out << "(fp.eq " << op << " ";
+    convert_expr(gen_zero(floatbv_type));
+    out << ")";
+  }
+  else
+  {
+    // Everything but the sign bit has to be zero
+    unsigned width=floatbv_type.get_width();
+    out << "(= (_ bv0 " << width-1 << ") "
+           "((_ extract " << width-2 << " " << 0 << ") " << op << "))";
+  }
 }
 
 /*******************************************************************\
@@ -2253,25 +2367,25 @@ void smt2_convt::convert_constant(const constant_exprt &expr)
       /* CBMC stores floating point literals in the most
 	 computationally useful form; biased exponents and
 	 significands including the hidden bit.  Thus some encoding
-	 is needed to get to IEEE-754 style representations*/
+	 is needed to get to IEEE-754 style representations. */
 
       ieee_floatt v=ieee_floatt(expr);
       size_t e = floatbv_type.get_e();
       size_t f = floatbv_type.get_f() + 1;
 
-      /* Should be sufficient but not currently supported by mathsat */
-#if 0
+      /* Should be sufficient, but not currently supported by mathsat */
+      #if 0
       mp_integer binary = v.pack();
 
       out << "((_ to_fp " << e << " " << f << ")"
           << " #b" << integer2binary(v.pack(), v.spec.width()) << ")";
-#endif
+      #endif
 
-      if (v.is_NaN())
+      if(v.is_NaN())
       {
 	out << "(_ NaN " << e << " " << f << ")";
       }
-      else if (v.is_infinity())
+      else if(v.is_infinity())
       {
 	if (v.get_sign())
 	  out << "(_ -oo " << e << " " << f << ")";
@@ -2286,9 +2400,9 @@ void smt2_convt::convert_constant(const constant_exprt &expr)
 	std::string binaryString(integer2binary(v.pack(), v.spec.width()));
 
 	out << "(fp "
-            << "#b" << binaryString.substr(0,1) << " "
-            << "#b" << binaryString.substr(1,e) << " "
-            << "#b" << binaryString.substr(1+e,f-1) << ")";
+            << "#b" << binaryString.substr(0, 1) << " "
+            << "#b" << binaryString.substr(1, e) << " "
+            << "#b" << binaryString.substr(1+e, f-1) << ")";
       }
     }
     else
