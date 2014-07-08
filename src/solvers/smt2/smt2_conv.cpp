@@ -342,7 +342,7 @@ constant_exprt smt2_convt::parse_literal(
           type.id()==ID_range)
     return from_integer(value, type);
   else
-    throw "smt2_convt::parse_constant can't do type "+type.id_string();
+    throw "smt2_convt::parse_literal can't do type "+type.id_string();
 }
 
 /*******************************************************************\
