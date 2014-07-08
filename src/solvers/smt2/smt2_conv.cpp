@@ -2888,11 +2888,36 @@ void smt2_convt::convert_minus(const minus_exprt &expr)
      expr.type().id()==ID_signedbv ||
      expr.type().id()==ID_fixedbv)
   {
-    out << "(bvsub ";
-    convert_expr(expr.op0());
-    out << " ";
-    convert_expr(expr.op1());
-    out << ")";
+    if(expr.op0().type().id()==ID_pointer &&
+       expr.op1().type().id()==ID_pointer)
+    {
+      // Pointer difference. 
+      mp_integer element_size=
+        pointer_offset_size(ns, expr.op0().type().subtype());
+
+      if(element_size>=2)
+        out << "(bvsdiv ";
+
+      assert(boolbv_width(expr.op0().type())==boolbv_width(expr.type()));
+      
+      out << "(bvsub ";
+      convert_expr(expr.op0());
+      out << " ";
+      convert_expr(expr.op1());
+      out << ")";
+
+      if(element_size>=2)
+        out << " (_ bv" << element_size
+            << " " << boolbv_width(expr.type()) << "))";
+    }
+    else
+    {
+      out << "(bvsub ";
+      convert_expr(expr.op0());
+      out << " ";
+      convert_expr(expr.op1());
+      out << ")";
+    }
   }
   else if(expr.type().id()==ID_floatbv)
   {
@@ -2911,11 +2936,7 @@ void smt2_convt::convert_minus(const minus_exprt &expr)
   }
   else if(expr.type().id()==ID_pointer)
   {
-    convert_expr(binary_exprt(
-        expr.op0(),
-        "+",
-        unary_minus_exprt(expr.op1(), expr.op1().type()),
-        expr.type()));
+    assert(false);
   }
   else if(expr.type().id()==ID_vector)
   {
