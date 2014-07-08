@@ -924,7 +924,11 @@ void smt2_convt::convert_expr(const exprt &expr)
       }
       else
       {
-        TODO("unary minus for floatbv");
+        // All that's needed is to flip the most-significant bit.
+        out << "(bvxor ";
+        convert_expr(expr.op0());
+        unsigned width=boolbv_width(expr.op0().type());
+        out << " (_ bv" << power(2, width-1) << " " << width << "))";
       }
     }
     else if(expr.type().id()==ID_vector)
@@ -1431,28 +1435,11 @@ void smt2_convt::convert_expr(const exprt &expr)
     else if(op_type.id()==ID_floatbv)
     {
       const floatbv_typet &floatbv_type=to_floatbv_type(op_type);
-      if(use_FPA_theory)
-      {
-        out << "(= ";
-        convert_expr(expr.op0());
-        out << " (_ NaN " << floatbv_type.get_e()
-            << " " << floatbv_type.get_f() + 1 << "))";
-      }
-      else
-      {
-        // The exponent is all ones, and the fraction is not zero.
-        unsigned width=floatbv_type.get_width(),
-                 e=floatbv_type.get_e(),
-                 f=floatbv_type.get_f();
-        out << "(let ((?isnanop ";
-        convert_expr(expr.op0());
-        out << ")) (and";
-        out << " (= (bvnot (_ bv0 " << e << ")) "
-               "((_ extract " << width-2 << f << ")))";
-        out << " (not (= (_ bv0 " << f << ") "
-               "((_ extract " << f-1 << 0 << "))))";
-        out << "))"; // and, let
-      }
+      out << "(let ((?isnanop ";
+      convert_expr(expr.op0());
+      out << ")) ";
+      is_nan(floatbv_type, "?isnanop");
+      out << ")";
     }
     else
       throw "isnan with unsupported operand type";
