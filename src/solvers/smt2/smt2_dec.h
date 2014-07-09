@@ -50,15 +50,7 @@ public:
   virtual bool has_set_assumptions() const { return true; }
   
 protected:
-  resultt read_result_boolector(std::istream &in);
-  resultt read_result_cvc3(std::istream &in);
-  resultt read_result_mathsat(std::istream &in);
-  resultt read_result_yices(std::istream &in);
-  resultt read_result_z3(std::istream &in);
-  
-  bool string_to_expr_z3(
-    const typet &type, 
-    const std::string &value, exprt &e) const;  
+  resultt read_result(std::istream &in);
 };
 
 #endif
