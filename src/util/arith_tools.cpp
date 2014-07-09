@@ -114,9 +114,23 @@ constant_exprt from_integer(
     result.set_value(integer2binary(int_value, width));
     return result;
   }
+  else if(type_id==ID_bv)
+  {
+    unsigned width=to_bv_type(type).get_width();
+    constant_exprt result(type);
+    result.set_value(integer2binary(int_value, width));
+    return result;
+  }
   else if(type_id==ID_signedbv)
   {
     unsigned width=to_signedbv_type(type).get_width();
+    constant_exprt result(type);
+    result.set_value(integer2binary(int_value, width));
+    return result;
+  }
+  else if(type_id==ID_c_enum)
+  {
+    unsigned width=type.get_int(ID_width);
     constant_exprt result(type);
     result.set_value(integer2binary(int_value, width));
     return result;
