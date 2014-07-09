@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_offset_size.h>
 #include <util/ieee_float.h>
 #include <util/base_type.h>
+#include <util/string2int.h>
 
 #include <ansi-c/string_constant.h>
 
@@ -280,7 +281,7 @@ Function: smt2_convt::parse_literal
 \*******************************************************************/
 
 constant_exprt smt2_convt::parse_literal(
-  const std::string &s,
+  const irept &src,
   const typet &type)
 {
   // See http://www.grammatech.com/resources/smt/SMTLIBTutorial.pdf for the
@@ -302,38 +303,81 @@ constant_exprt smt2_convt::parse_literal(
   
   mp_integer value;
 
-  if(s.size()>=2 && s[0]=='#' && s[1]=='b')
+  if(src.id()!=irep_idt())
   {
-    // Binary
-    value=string2integer(s.substr(2), 2);
-  }
-  else if(s.size()>=2 && s[0]=='#' && s[1]=='x')
-  {
-    // Hex
-    value=string2integer(s.substr(2), 16);
-  }
-  else
-  {
-    std::size_t dot_pos=s.find('.');
-    
-    if(dot_pos==std::string::npos)
+    std::string s=src.id_string();
+
+    if(s.size()>=2 && s[0]=='#' && s[1]=='b')
     {
-      // Numeral
-      value=string2integer(s);
+      // Binary #b010101
+      value=string2integer(s.substr(2), 2);
+    }
+    else if(s.size()>=2 && s[0]=='#' && s[1]=='x')
+    {
+      // Hex #x012345
+      value=string2integer(s.substr(2), 16);
     }
     else
+      throw "smt2_convt::parse_literal can't parse \""+s+"\"";
+  }
+  else if(src.get_sub().size()==3 &&
+          src.get_sub()[0].id()=="_" &&
+          src.get_sub()[1].id_string().substr(0, 2)=="bv") // (_ bvDECIMAL_VALUE SIZE)
+  {
+    value=string2integer(src.get_sub()[2].id_string().substr(2));
+  }
+  else if(src.get_sub().size()==4 &&
+          src.get_sub()[0].id()=="fp") // (fp signbv exponentbv significandbv)
+  {
+    if(type.id()==ID_floatbv)
     {
-      // Decimal
-      throw "smt2_convt::parse_constant can't do Decimal";
+      const floatbv_typet &floatbv_type=to_floatbv_type(type);
+      constant_exprt s1=parse_literal(src.get_sub()[1], bv_typet(1));
+      constant_exprt s2=parse_literal(src.get_sub()[2], bv_typet(floatbv_type.get_e()));
+      constant_exprt s3=parse_literal(src.get_sub()[3], bv_typet(floatbv_type.get_f()));
+      // stitch the bits together
+      std::string bits=id2string(s1.get_value())+
+                       id2string(s2.get_value())+
+                       id2string(s3.get_value());
+      value=binary2integer(bits, 2);
     }
+    else
+      value=0;
+  }
+  else if(src.get_sub().size()==4 &&
+          src.get_sub()[0].id()=="_" &&
+          src.get_sub()[1].id()=="+oo") // (_ +oo e s)
+  {
+    unsigned e=unsafe_string2unsigned(src.get_sub()[2].id_string());
+    unsigned s=unsafe_string2unsigned(src.get_sub()[3].id_string());
+    return ieee_floatt::plus_infinity(ieee_float_spect(s, e)).to_expr();
+  }
+  else if(src.get_sub().size()==4 &&
+          src.get_sub()[0].id()=="_" &&
+          src.get_sub()[1].id()=="+oo") // (_ +oo e s)
+  {
+    unsigned e=unsafe_string2unsigned(src.get_sub()[2].id_string());
+    unsigned s=unsafe_string2unsigned(src.get_sub()[3].id_string());
+    return ieee_floatt::minus_infinity(ieee_float_spect(s, e)).to_expr();
+  }
+  else if(src.get_sub().size()==4 &&
+          src.get_sub()[0].id()=="_" &&
+          src.get_sub()[1].id()=="NaN") // (_ +oo e s)
+  {
+    unsigned e=unsafe_string2unsigned(src.get_sub()[2].id_string());
+    unsigned s=unsafe_string2unsigned(src.get_sub()[3].id_string());
+    return ieee_floatt::NaN(ieee_float_spect(s, e)).to_expr();
   }
   
-  if(type.id()==ID_fixedbv ||
-     type.id()==ID_floatbv ||
-     type.id()==ID_pointer ||
-     type.id()==ID_signedbv ||
+  if(type.id()==ID_signedbv ||
      type.id()==ID_unsignedbv ||
+     type.id()==ID_bv ||
      type.id()==ID_c_enum)
+  {
+    return from_integer(value, type);
+  }
+  else if(type.id()==ID_fixedbv ||
+          type.id()==ID_floatbv)
   {
     unsigned width=boolbv_width(type);
     return constant_exprt(integer2binary(value, width), type);
@@ -358,19 +402,24 @@ Function: smt2_convt::parse_struct
 \*******************************************************************/
 
 exprt smt2_convt::parse_struct(
-  const std::string &s,
-  const typet &type)
+  const irept &src,
+  const struct_typet &type)
 {
   const struct_typet::componentst &components =
-    to_struct_type(type).components();
+    type.components();
 
   struct_exprt result(type);
 
-  size_t p=0;
   result.operands().resize(components.size());
+  
+  if(components.size()==0)
+    return result;
 
   if(use_datatypes)
   {
+    #if 0
+    size_t p=0;
+
     assert(datatype_map.find(type) != datatype_map.end());
 
     const std::string smt_typename=
@@ -403,16 +452,39 @@ exprt smt2_convt::parse_struct(
         }
 
         std::string val = s.substr(p, (end-p));
-        result.operands()[i]=parse_literal(val, sub_type);
+        result.operands()[i]=parse_rec(val, sub_type);
 
         p = end+1;
       }
       else
         throw "Unsupported struct member type "+sub_type.id_string();
     }
+    #endif
   }
   else
   {
+    // These are just flattened, i.e., we expect to see a monster bit vector.
+    unsigned total_width=boolbv_width(type);
+    exprt l=parse_literal(src, bv_typet(total_width));
+    if(!l.is_constant()) return nil_exprt();
+    
+    irep_idt binary=to_constant_expr(l).get_value();
+    if(binary.size()!=total_width) return nil_exprt();
+    
+    unsigned offset=0;
+
+    for(unsigned i=0; i<components.size(); i++)
+    {
+      unsigned component_width=boolbv_width(components[i].type());
+      
+      assert(offset+component_width<=total_width);
+      std::string component_binary=
+        "#b"+id2string(binary).substr(total_width-offset-component_width, component_width);
+        
+      result.operands()[i]=parse_rec(irept(component_binary), components[i].type());
+    
+      offset+=component_width;
+    }
   }
 
   return result;
@@ -420,7 +492,7 @@ exprt smt2_convt::parse_struct(
 
 /*******************************************************************\
 
-Function: smt2_convt::set_value
+Function: smt2_convt::parse_rec
 
   Inputs:
 
@@ -430,13 +502,9 @@ Function: smt2_convt::set_value
 
 \*******************************************************************/
 
-void smt2_convt::set_value(
-  identifiert &identifier,
-  const std::string &v)
+exprt smt2_convt::parse_rec(const irept &src, const typet &_type)
 {
-  identifier.value.make_nil();
-
-  const typet &type=ns.follow(identifier.type);
+  const typet &type=ns.follow(_type);
 
   if(type.id()==ID_signedbv ||
      type.id()==ID_unsignedbv ||
@@ -444,43 +512,42 @@ void smt2_convt::set_value(
      type.id()==ID_fixedbv ||
      type.id()==ID_floatbv)
   {
-    constant_exprt c=parse_literal(v, type);
-    identifier.value=c;
-
-    assert(boolbv_width(type) == boolbv_width(c.type()));
+    return parse_literal(src, type);
   }
   else if(type.id()==ID_bool)
   {
-    if(v=="1" || v=="true")
-      identifier.value=true_exprt();
-    else if(v=="0" || v=="false")
-      identifier.value=false_exprt();
+    if(src.id()==ID_1 || src.id()==ID_true)
+      return true_exprt();
+    else if(src.id()==ID_0 || src.id()==ID_false)
+      return false_exprt();
   }
   else if(type.id()==ID_pointer)
   {
-    // TODO
-    TODO("Pointer handling may not be correct");
-    constant_exprt result = parse_literal(v, type);
-    assert(boolbv_width(type) == boolbv_width(result.type()));
+    // these come in as bit-vector literals
+    unsigned width=boolbv_width(type);
+    constant_exprt bv_expr=parse_literal(src, bv_typet(width));
 
-    // add elaborated expression as operand
-    pointer_logict::pointert p;
-    p.object=integer2unsigned(binary2integer(std::string(v, 0, BV_ADDR_BITS), false));
-    p.offset=binary2integer(std::string(v, BV_ADDR_BITS, std::string::npos), true);
-    
-    result.copy_to_operands(pointer_logic.pointer_expr(p, type));
+    mp_integer v;
+    to_integer(bv_expr, v);
 
-    identifier.value=result;
+    // split into object and offset
+    mp_integer pow=power(2, width-BV_ADDR_BITS);
+    pointer_logict::pointert ptr;
+    ptr.object=integer2long(v/pow);
+    ptr.offset=v%pow;
+    return pointer_logic.pointer_expr(ptr, type);
   }
   else if(type.id()==ID_struct)
   {
-    identifier.value = parse_struct(v, type);
+    return parse_struct(src, to_struct_type(type));
   }
   else if(type.id()==ID_union)
   {
     // TODO
     TODO("Union not implemented");
   }
+  
+  return nil_exprt();
 }
 
 /*******************************************************************\

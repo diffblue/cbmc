@@ -157,8 +157,9 @@ protected:
   void find_symbols(const typet &type);
   void find_symbols_rec(const typet &type, std::set<irep_idt> &recstack);
 
-  constant_exprt parse_literal(const std::string &s, const typet &type);
-  exprt parse_struct(const std::string &s, const typet &type);
+  constant_exprt parse_literal(const irept &, const typet &type);
+  exprt parse_struct(const irept &s, const struct_typet &type);
+  exprt parse_rec(const irept &s, const typet &type);
   
   // flattens any non-bitvector type into a bitvector,
   // e.g., booleans, vectors, structs, arrays, ...
@@ -186,10 +187,6 @@ protected:
       value.make_nil();
     }
   };
-  
-  void set_value(
-    identifiert &identifier,
-    const std::string &v);
   
   typedef hash_map_cont<irep_idt, identifiert, irep_id_hash>
     identifier_mapt;
