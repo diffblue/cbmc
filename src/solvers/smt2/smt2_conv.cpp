@@ -305,7 +305,7 @@ constant_exprt smt2_convt::parse_literal(
 
   if(src.id()!=irep_idt())
   {
-    std::string s=src.id_string();
+    const std::string &s=src.id_string();
 
     if(s.size()>=2 && s[0]=='#' && s[1]=='b')
     {
@@ -324,7 +324,7 @@ constant_exprt smt2_convt::parse_literal(
           src.get_sub()[0].id()=="_" &&
           src.get_sub()[1].id_string().substr(0, 2)=="bv") // (_ bvDECIMAL_VALUE SIZE)
   {
-    value=string2integer(src.get_sub()[2].id_string().substr(2));
+    value=string2integer(src.get_sub()[1].id_string().substr(2));
   }
   else if(src.get_sub().size()==4 &&
           src.get_sub()[0].id()=="fp") // (fp signbv exponentbv significandbv)
