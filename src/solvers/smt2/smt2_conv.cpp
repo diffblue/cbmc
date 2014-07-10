@@ -426,9 +426,7 @@ exprt smt2_convt::parse_struct(
     for(unsigned i=0; i<components.size(); i++)
     {
       const struct_typet::componentt &c=components[i];
-      const typet &sub_type=ns.follow(c.type());
-      
-      result.operands()[i]=parse_rec(src.get_sub()[i+1]);
+      result.operands()[i]=parse_rec(src.get_sub()[i+1], c.type());
     }
   }
   else
