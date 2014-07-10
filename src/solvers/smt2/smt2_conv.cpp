@@ -410,56 +410,26 @@ exprt smt2_convt::parse_struct(
 
   struct_exprt result(type);
 
-  result.operands().resize(components.size());
+  result.operands().resize(components.size(), nil_exprt());
   
   if(components.size()==0)
     return result;
 
   if(use_datatypes)
   {
-    #if 0
-    size_t p=0;
-
-    assert(datatype_map.find(type) != datatype_map.end());
-
-    const std::string smt_typename=
-      datatype_map.find(type)->second;
-
     // Structs look like:
     //  (mk-struct.1 <component0> <component1> ... <componentN>)
-    std::string constructor = "(mk-" + smt_typename + " ";
-    assert(s.find(constructor) == 0);
-    p=constructor.length();
 
+    if(src.get_sub().size()!=components.size()+1)
+      return result; // give up
+    
     for(unsigned i=0; i<components.size(); i++)
     {
       const struct_typet::componentt &c=components[i];
-      const typet &sub_type = ns.follow(c.type());
-
-      if(sub_type.id()==ID_signedbv ||
-         sub_type.id()==ID_unsignedbv ||
-         sub_type.id()==ID_fixedbv ||
-         sub_type.id()==ID_floatbv ||
-         sub_type.id()==ID_bv ||
-         sub_type.id()==ID_pointer)
-      {
-        // Find the terminating space or ')'.
-        size_t end = s.find(' ', p);
-
-        if(end == std::string::npos)
-        {
-          end = s.find(')', p);
-        }
-
-        std::string val = s.substr(p, (end-p));
-        result.operands()[i]=parse_rec(val, sub_type);
-
-        p = end+1;
-      }
-      else
-        throw "Unsupported struct member type "+sub_type.id_string();
+      const typet &sub_type=ns.follow(c.type());
+      
+      result.operands()[i]=parse_rec(src.get_sub()[i+1]);
     }
-    #endif
   }
   else
   {
