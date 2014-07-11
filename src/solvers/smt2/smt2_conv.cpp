@@ -178,7 +178,22 @@ void smt2_convt::write_footer()
   out << "; end of SMT2 file" << "\n";
 }
 
-void smt2_convt::define_object_size(const irep_idt &id, const exprt &expr) {
+/*******************************************************************\
+
+Function: smt2_convt::define_object_size
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void smt2_convt::define_object_size(
+  const irep_idt &id,
+  const exprt &expr)
+{
   assert(expr.id() == ID_object_size);
   const exprt &ptr = expr.op0();
   unsigned size_width = boolbv_width(expr.type());
@@ -189,7 +204,8 @@ void smt2_convt::define_object_size(const irep_idt &id, const exprt &expr) {
 
   for (pointer_logict::objectst::const_iterator it = pointer_logic.objects.begin();
        it != pointer_logic.objects.end();
-       ++it, number++) {
+       ++it, number++)
+  {
     const exprt &o = *it;
     const typet &type = ns.follow(o.type());
     exprt size_expr = size_of_expr(type, ns);
@@ -2389,7 +2405,15 @@ void smt2_convt::convert_struct(const struct_exprt &expr)
       for(unsigned i=components.size(); i>1; i--)
       {
         out << "(concat ";
-        convert_expr(expr.operands()[i-1]);
+        
+        exprt op=expr.operands()[i-1];
+        
+        // may need to flatten array-theory arrays in there
+        if(ns.follow(op.type()).id()==ID_array)
+          flatten_array(op);
+        else
+          convert_expr(op);
+        
         out << " ";
       }
       
@@ -2399,6 +2423,50 @@ void smt2_convt::convert_struct(const struct_exprt &expr)
         out << ")";
     }
   }
+}
+
+/*******************************************************************\
+
+Function: smt2_convt::flatten_array
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: produce a flat bit-vector for a given array of fixed size
+
+\*******************************************************************/
+
+void smt2_convt::flatten_array(const exprt &expr)
+{
+  const array_typet &array_type=
+    to_array_type(ns.follow(expr.type()));
+
+  mp_integer size;
+  if(to_integer(array_type.size(), size))
+    throw "failed to convert array size for flattening";
+    
+  if(size==0)
+    throw "can't convert zero-sized array";
+    
+  out << "(let ((?far ";
+  convert_expr(expr);
+  out << ")) ";
+
+  for(mp_integer i=size; i!=0; --i)
+  {
+    if(i!=1) out << "(concat ";
+    out << "(select ?far ";
+    convert_expr(from_integer(i-1, array_type.size().type()));
+    out << ")";
+    if(i!=1) out << " ";
+  }
+  
+  // close the many parentheses
+  for(mp_integer i=size; i>1; --i)
+    out << ")";
+  
+  out << ")"; // let
 }
 
 /*******************************************************************\
@@ -3409,7 +3477,7 @@ void smt2_convt::convert_with(const with_exprt &expr)
   {
     const array_typet &array_type=to_array_type(expr_type);
     
-    if(use_array_theory(array_type))
+    if(use_array_theory(expr))
     {
       out << "(store ";
       convert_expr(expr.old());
@@ -3662,7 +3730,7 @@ void smt2_convt::convert_index(const index_exprt &expr)
   {
     const array_typet &array_type=to_array_type(array_op_type);
     
-    if(use_array_theory(array_type))
+    if(use_array_theory(expr.array()))
     {
       if(ns.follow(expr.type()).id()==ID_bool && !use_array_of_bool)
       {
@@ -4244,9 +4312,26 @@ Function: smt2_convt::use_array_theory
 
 \*******************************************************************/
 
-bool smt2_convt::use_array_theory(const array_typet &type)
+bool smt2_convt::use_array_theory(const exprt &expr)
 {
-  return true; // always use array theory
+  const typet &type=ns.follow(expr.type());
+  assert(type.id()==ID_array);
+  //const array_typet &array_type=to_array_type(ns.follow(expr.type()));
+  
+  if(use_datatypes)
+  {
+    return true; // always use array theory when we have datatypes
+  }
+  else
+  {
+    // arrays inside structs get flattened
+    if(expr.id()==ID_with)
+      return use_array_theory(to_with_expr(expr).old());
+    else if(expr.id()==ID_member)
+      return false;
+    else
+      return true;
+  }
 }
 
 /*******************************************************************\
@@ -4266,31 +4351,20 @@ void smt2_convt::convert_type(const typet &type)
   if(type.id()==ID_array)
   {
     const array_typet &array_type=to_array_type(type);
-    
-    if(use_array_theory(array_type))
-    {
-      // use array theory
-      const typet &subtype=ns.follow(array_type.subtype());
 
-      out << "(Array ";
-      convert_type(array_type.size().type());
-      out << " ";
+    // we always use array theory for top-level arrays
+    const typet &subtype=ns.follow(array_type.subtype());
 
-      if(subtype.id()==ID_bool && !use_array_of_bool)
-        out << "(_ BitVec 1)";
-      else
-        convert_type(array_type.subtype());
-      
-      out << ")";
-    }
+    out << "(Array ";
+    convert_type(array_type.size().type());
+    out << " ";
+
+    if(subtype.id()==ID_bool && !use_array_of_bool)
+      out << "(_ BitVec 1)";
     else
-    {
-      // we flatten into a bitvector
-      unsigned width=boolbv_width(array_type);
-      assert(width!=0);
-
-      out << "(_ BitVec " << width << ")";
-    }
+      convert_type(array_type.subtype());
+    
+    out << ")";
   }
   else if(type.id()==ID_bool)
   {
@@ -4305,8 +4379,6 @@ void smt2_convt::convert_type(const typet &type)
     }
     else
     {
-      boolbv_widtht boolbv_width(ns);
-    
       unsigned width=boolbv_width(type);
       
       if(width==0)
