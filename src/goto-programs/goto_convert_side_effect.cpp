@@ -407,7 +407,7 @@ void goto_convertt::remove_function_call(
     
     std::string new_base_name=id2string(new_symbol.base_name);
     
-    new_base_name+="_";
+    new_base_name+='_';
     new_base_name+=id2string(symbol.base_name);
     new_base_name+="$"+i2string(++temporary_counter);
     

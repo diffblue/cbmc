@@ -170,7 +170,13 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
       entry.total_width=0;
     }
     else
-      entry.total_width=integer2unsigned(array_size*sub_width);
+    {
+      mp_integer total=array_size*sub_width;
+      if(total>(1<<30)) // realistic limit
+        throw "array too large for flattening";
+
+      entry.total_width=integer2unsigned(total);
+    }
   }
   else if(type_id==ID_vector)
   {
@@ -185,7 +191,13 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
       entry.total_width=0;
     }
     else
+    {
+      mp_integer total=vector_size*sub_width;
+      if(total>(1<<30)) // realistic limit
+        throw "vector too large for flattening";
+
       entry.total_width=integer2unsigned(vector_size*sub_width);
+    }
   }
   else if(type_id==ID_complex)
   {

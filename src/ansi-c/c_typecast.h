@@ -90,6 +90,7 @@ protected:
   virtual void implicit_typecast_followed(
     exprt &expr,
     const typet &src_type,
+    const typet &orig_dest_type,
     const typet &dest_type);
 
   void do_typecast(exprt &dest, const typet &type);

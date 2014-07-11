@@ -195,14 +195,14 @@ void value_sett::output(
         if(o_it->second.offset_is_set)
           result+=integer2string(o_it->second.offset)+"";
         else
-          result+="*";
+          result+='*';
 
         if(o.type().is_nil())
           result+=", ?";
         else
           result+=", "+from_type(ns, identifier, o.type());
       
-        result+=">";
+        result+='>';
       }
 
       out << result;
@@ -1061,7 +1061,8 @@ void value_sett::get_reference_set_rec(
 
   if(expr.id()==ID_symbol ||
      expr.id()==ID_dynamic_object ||
-     expr.id()==ID_string_constant)
+     expr.id()==ID_string_constant ||
+     expr.id()==ID_array)
   {
     if(expr.type().id()==ID_array &&
        expr.type().subtype().id()==ID_array)

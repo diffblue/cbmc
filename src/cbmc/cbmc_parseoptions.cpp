@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/language.h>
 #include <util/unicode.h>
 #include <util/memory_info.h>
+#include <util/i2string.h>
 
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/remove_function_pointers.h>
@@ -423,7 +424,9 @@ int cbmc_parseoptionst::doit()
   //
   // Print a banner
   //
-  status("CBMC version " CBMC_VERSION);
+  status("CBMC version " CBMC_VERSION " "+
+         i2string(sizeof(void *)*8)+"-bit "+
+         id2string(config.this_operating_system()));
 
   //
   // Unwinding of transition systems is done by hw-cbmc.

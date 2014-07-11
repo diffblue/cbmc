@@ -8,7 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 #include <cctype>
-#include <cstdlib>
 
 #include <util/arith_tools.h>
 #include <util/std_types.h>
@@ -18,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/expr_util.h>
 #include <util/find_symbols.h>
 #include <util/pointer_offset_size.h>
+#include <util/string2int.h>
 
 #include <ansi-c/string_constant.h>
 
@@ -404,11 +404,11 @@ void dplib_convt::convert_dplib_expr(const exprt &expr)
     else if(expr.type().id()==ID_signedbv ||
             expr.type().id()==ID_unsignedbv)
     {
-      unsigned to_width=atoi(expr.type().get(ID_width).c_str());
+      unsigned to_width=unsafe_string2unsigned(id2string(expr.type().get(ID_width)));
       
       if(op.type().id()==ID_signedbv)
       {
-        unsigned from_width=atoi(op.type().get(ID_width).c_str());
+        unsigned from_width=unsafe_string2unsigned(id2string(op.type().get(ID_width)));
         
         if(from_width==to_width)
           convert_dplib_expr(op);
@@ -427,7 +427,7 @@ void dplib_convt::convert_dplib_expr(const exprt &expr)
       }
       else if(op.type().id()==ID_unsignedbv)
       {
-        unsigned from_width=atoi(op.type().get(ID_width).c_str());
+        unsigned from_width=unsafe_string2unsigned(id2string(op.type().get(ID_width)));
         
         if(from_width==to_width)
           convert_dplib_expr(op);

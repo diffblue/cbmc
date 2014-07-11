@@ -42,7 +42,7 @@ std::string cpp_typecheckt::template_suffix(
       it!=arguments.end();
       it++)
   {
-    if(first) first=false; else result+=",";
+    if(first) first=false; else result+=',';
 
     const exprt expr=*it;
 
