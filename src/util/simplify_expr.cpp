@@ -1656,15 +1656,16 @@ bool simplify_exprt::simplify_minus(exprt &expr)
     return true;
   
   if(is_number(expr.type()) &&
-     is_number(operands.front().type()) &&
-     is_number(operands.back().type()))
+     is_number(operands[0].type()) &&
+     is_number(operands[1].type()))
   {
+    // rewrite "a-b" to "a+(-b)"
     exprt tmp2(ID_unary_minus, expr.type());
-    tmp2.move_to_operands(operands.back());
+    tmp2.move_to_operands(operands[1]);
     simplify_node(tmp2);
 
     exprt tmp(ID_plus, expr.type());
-    tmp.move_to_operands(operands.front());
+    tmp.move_to_operands(operands[0]);
     tmp.move_to_operands(tmp2);
 
     expr.swap(tmp);
@@ -1673,15 +1674,15 @@ bool simplify_exprt::simplify_minus(exprt &expr)
     return false;
   }
   else if(expr.type().id()==ID_pointer &&
-          is_number(operands.back().type()))
+          is_number(operands[0].type()))
   {
-    // pointer arithmetic
-    exprt tmp2(ID_unary_minus, operands.back().type());
-    tmp2.move_to_operands(operands.back());
+    // pointer arithmetic: rewrite "p-i" to "p+(-i)"
+    exprt tmp2(ID_unary_minus, operands[1].type());
+    tmp2.move_to_operands(operands[1]);
     simplify_node(tmp2);
 
     exprt tmp(ID_plus, expr.type());
-    tmp.move_to_operands(operands.front());
+    tmp.move_to_operands(operands[0]);
     tmp.move_to_operands(tmp2);
 
     expr.swap(tmp);
@@ -5312,6 +5313,7 @@ bool simplify_exprt::simplify_unary_minus(exprt &expr)
 
   if(operand.id()==ID_unary_minus)
   {
+    // cancel out "-(-x)" to "x"
     if(operand.operands().size()!=1)
       return true;
 
