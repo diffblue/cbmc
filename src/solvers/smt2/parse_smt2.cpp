@@ -56,7 +56,7 @@ std::string get_simple_symbol(char first, std::istream &in)
 
 /*******************************************************************\
 
-Function: get_quoted_symbol()
+Function: get_quoted_symbol
 
   Inputs:
 
@@ -88,7 +88,7 @@ std::string get_quoted_symbol(std::istream &in)
 
 /*******************************************************************\
 
-Function: parse_smt2
+Function: get_string_literal
 
   Inputs:
 
@@ -98,7 +98,37 @@ Function: parse_smt2
 
 \*******************************************************************/
 
-#include <iostream>
+std::string get_string_literal(std::istream &in)
+{
+  // any sequence of printable ASCII characters delimited by
+  // double quotes (") and possibly containing the C-style escape
+  // sequences \" and double-backslash
+  
+  std::string result;
+  
+  char ch;
+  while(in.get(ch))
+  {
+    if(ch=='"') return result;
+    if(ch=='\\') in.get(ch); // quote
+    result+=ch;
+  }
+
+  // Hmpf. Eof before end of string literal.
+  return result;
+}
+
+/*******************************************************************\
+
+Function: parse_smt2
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 irept parse_smt2(std::istream &in)
 {
@@ -151,6 +181,16 @@ irept parse_smt2(std::istream &in)
           stack.top().get_sub().push_back(irept(symbol));
       }
       break;
+      
+    case '"': // string literal
+      {
+        irep_idt literal=get_string_literal(in);
+
+        if(stack.empty())
+          return irept(literal);
+        else
+          stack.top().get_sub().push_back(irept(literal));
+      }
 
     default: // likely a simple symbol
       {
