@@ -4174,7 +4174,7 @@ void smt2_convt::find_symbols(const exprt &expr)
 
       for(unsigned i=0; i<expr.operands().size(); i++)
       {
-        out << "(assert (= (select " << id;
+        out << "(assert (= (select " << id << " ";
         convert_expr(from_integer(i, array_type.size().type()));
         out << ") "; // select
         convert_expr(expr.operands()[i]);
