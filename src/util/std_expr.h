@@ -919,18 +919,17 @@ index_exprt &to_index_expr(exprt &expr);
 
 /*! \brief array constructor from single element
 */
-class array_of_exprt:public exprt
+class array_of_exprt:public unary_exprt
 {
 public:
-  inline array_of_exprt():exprt(ID_array_of)
+  inline array_of_exprt():unary_exprt(ID_array_of)
   {
-    operands().resize(1);
   }
  
   explicit inline array_of_exprt(
-    const exprt &_what, const typet &_type):exprt(ID_array_of, _type)
+    const exprt &_what, const array_typet &_type):
+    unary_exprt(ID_array_of, _what, _type)
   {
-    copy_to_operands(_what);
   }
  
   inline exprt &what()

@@ -502,7 +502,7 @@ exprt string_abstractiont::make_val_or_dummy_rec(goto_programt &dest,
         eff_type.subtype(), source_subt);
 
     if(eff_type.id()==ID_array)
-      return array_of_exprt(sym_expr, eff_type);
+      return array_of_exprt(sym_expr, to_array_type(eff_type));
     else
       return address_of_exprt(sym_expr);
   }
