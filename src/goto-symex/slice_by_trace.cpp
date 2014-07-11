@@ -336,7 +336,7 @@ void symex_slice_by_tracet::compute_ts_back(
 	      equal_cond.operands().reserve(2);
 	      equal_cond.copy_to_operands(*pvi);
 	      // Should eventually change to handle non-bv types!
-	      exprt constant_value=from_integer(unsafe_string2int(k->c_str()), (*pvi).type());
+	      exprt constant_value=from_integer(unsafe_string2int(id2string(*k)), (*pvi).type());
 	      equal_cond.move_to_operands(constant_value);
 	      eq_conds.push_back(equal_cond);
 	      pvi++;
@@ -619,7 +619,7 @@ std::set<exprt> symex_slice_by_tracet::implied_guards(exprt e)
       s.insert(e_copy);
       return s;
     } else {
-      int i = unsafe_string2int(merge_loc+1);
+      int i = unsafe_str2int(merge_loc+1);
       if (merge_impl_cache_back[i].first) {
 	return merge_impl_cache_back[i].second;
       } else {

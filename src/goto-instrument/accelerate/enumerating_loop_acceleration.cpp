@@ -33,6 +33,8 @@ bool enumerating_loop_accelerationt::accelerate(
       accelerator.path.swap(path);
       return true;
     }
+
+    path.clear();
   }
 
   // No more paths, or we hit the enumeration limit.

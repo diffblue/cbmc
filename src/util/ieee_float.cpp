@@ -223,9 +223,9 @@ std::string ieee_floatt::to_string_decimal(unsigned precision) const
 {
   std::string result;
 
-  if(sign_flag) result+="-";
+  if(sign_flag) result+='-';
   
-  if((NaN_flag || infinity_flag) && !sign_flag) result+="+";
+  if((NaN_flag || infinity_flag) && !sign_flag) result+='+';
 
   // special cases
   if(NaN_flag)
@@ -234,7 +234,7 @@ std::string ieee_floatt::to_string_decimal(unsigned precision) const
     result+="inf";
   else if(is_zero())
   {
-    result+="0";
+    result+='0';
 
     // add zeros, if needed
     if(precision>0)
@@ -325,9 +325,9 @@ std::string ieee_floatt::to_string_scientific(unsigned precision) const
 {
   std::string result;
 
-  if(sign_flag) result+="-";
+  if(sign_flag) result+='-';
   
-  if((NaN_flag || infinity_flag) && !sign_flag) result+="+";
+  if((NaN_flag || infinity_flag) && !sign_flag) result+='+';
 
   // special cases
   if(NaN_flag)
@@ -336,7 +336,7 @@ std::string ieee_floatt::to_string_scientific(unsigned precision) const
     result+="inf";
   else if(is_zero())
   {
-    result+="0";
+    result+='0';
 
     // add zeros, if needed
     if(precision>0)
@@ -740,31 +740,25 @@ void ieee_floatt::align()
   }
 
   // 'usual case'
-
   mp_integer f_power=power(2, spec.f);
   mp_integer f_power_next=power(2, spec.f+1);
 
+  unsigned lowPower2 = fraction.floorPow2();
   mp_integer exponent_offset=0;
 
-  if(fraction<f_power) // too small?
+  if (lowPower2 < spec.f) // too small
   {
-    mp_integer tmp_fraction=fraction;
+    exponent_offset -= (spec.f - lowPower2);
 
-    while(tmp_fraction<f_power)
-    {
-      tmp_fraction*=2;
-      --exponent_offset;
-    }
+    assert(fraction * power(2,(spec.f - lowPower2)) >= f_power);
+    assert(fraction * power(2,(spec.f - lowPower2)) < f_power_next);
   }
-  else if(fraction>=f_power_next) // too big?
+  else if (lowPower2 > spec.f)  // too large
   {
-    mp_integer tmp_fraction=fraction;
+    exponent_offset += (lowPower2 - spec.f);
 
-    while(tmp_fraction>=f_power_next)
-    {
-      tmp_fraction/=2;
-      ++exponent_offset;
-    }
+    assert(fraction / power(2,(lowPower2 - spec.f)) >= f_power);
+    assert(fraction / power(2,(lowPower2 - spec.f)) < f_power_next);
   }
 
   mp_integer biased_exponent=exponent+exponent_offset+spec.bias();

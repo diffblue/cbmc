@@ -138,7 +138,7 @@ bool acceleration_utilst::check_inductive(map<exprt, polynomialt> polynomials,
 
 #ifdef DEBUG
   std::cout << "Checking following program for inductiveness:" << endl;
-  program.output(std::cout);
+  program.output(ns, "", std::cout);
 #endif
 
   try {
@@ -373,7 +373,7 @@ bool acceleration_utilst::do_assumptions(map<exprt, polynomialt> polynomials,
 
 #ifdef DEBUG
   std::cout << "Checking following program for monotonicity:" << endl;
-  program.output(std::cout);
+  program.output(ns, "", std::cout);
 #endif
 
   try {

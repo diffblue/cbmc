@@ -6,9 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <cstdlib>
 #include <fstream>
 #include <sstream>
+#include <cstdlib> // for system()
 
 #include <util/parser.h>
 #include <util/message_stream.h>
@@ -116,7 +116,7 @@ protected:
   {
     // follow a #number
     assert(!ref.empty() && ref[0]=='#');
-    return constants[unsafe_string2unsigned(ref.c_str()+1)].value_string;
+    return constants[unsafe_str2unsigned(ref.c_str()+1)].value_string;
   }
   
   typedef std::map<unsigned, unsigned> address_to_linet;
@@ -548,7 +548,7 @@ irep_idt javap_parsert::rname()
     result+=id2string(t);
     if(lookahead()!=".") break;
     token(); // read .
-    result+=".";
+    result+='.';
   }
   
   return result;
@@ -583,7 +583,7 @@ typet javap_parsert::rtype()
     while(lookahead()==".")
     {
       token(); // read .
-      identifier+=".";
+      identifier+='.';
       identifier+=id2string(token());
     }
     type.set(ID_identifier, identifier);

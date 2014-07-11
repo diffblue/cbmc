@@ -299,13 +299,16 @@ bool polynomial_acceleratort::fit_polynomial_sliced(goto_programt::instructionst
     return false;
   }
 
-  const bitvector_typet &bvt = to_bitvector_type(var.type());
+  unsigned width=to_bitvector_type(var.type()).get_width();
+  if(var.type().id()==ID_pointer)
+    width=config.ansi_c.pointer_width;
+  assert(width>0);
 
   for (vector<expr_listt>::iterator it = parameters.begin();
        it != parameters.end();
        ++it) {
     symbolt coeff = utils.fresh_symbol("polynomial::coeff",
-        signedbv_typet(bvt.get_width()));
+        signedbv_typet(width));
     coefficients.insert(make_pair(*it, coeff.symbol_expr()));
   }
 
@@ -354,7 +357,7 @@ bool polynomial_acceleratort::fit_polynomial_sliced(goto_programt::instructionst
 
 #ifdef DEBUG
   std::cout << "Fitting polynomial with program:" << endl;
-  program.output(std::cout);
+  program.output(ns, "", std::cout);
 #endif
 
   // Now do an ASSERT(false) to grab a counterexample
@@ -437,25 +440,27 @@ void polynomial_acceleratort::assert_for_values(scratch_programt &program,
                                                 exprt &target,
                                                 overflow_instrumentert &overflow) {
   // First figure out what the appropriate type for this expression is.
-  const bitvector_typet &bvt = to_bitvector_type(target.type());
-  typet expr_type = signedbv_typet(bvt.get_width());
+  typet expr_type = nil_typet();
 
   for (map<exprt, int>::iterator it = values.begin();
       it != values.end();
       ++it) {
+    typet this_type=it->first.type();
+    if (this_type.id() == ID_pointer) {
+#ifdef DEBUG
+      std::cout << "Overriding pointer type" << std::endl;
+#endif
+      this_type = unsignedbv_typet(config.ansi_c.pointer_width);
+    }
+
     if (expr_type == nil_typet()) {
-      expr_type = it->first.type();
+      expr_type = this_type;
     } else {
-      expr_type = join_types(expr_type, it->first.type());
+      expr_type = join_types(expr_type, this_type);
     }
   }
 
-  if (expr_type.id() == ID_pointer) {
-#ifdef DEBUG
-    std::cout << "Overriding pointer type" << std::endl;
-#endif
-    expr_type = unsignedbv_typet(config.ansi_c.pointer_width);
-  }
+  assert(to_bitvector_type(expr_type).get_width()>0);
 
 
   // Now set the initial values of the all the variables...
@@ -601,7 +606,7 @@ bool polynomial_acceleratort::check_inductive(map<exprt, polynomialt> polynomial
 
 #ifdef DEBUG
   std::cout << "Checking following program for inductiveness:" << endl;
-  program.output(std::cout);
+  program.output(ns, "", std::cout);
 #endif
 
   try {

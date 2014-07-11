@@ -213,7 +213,8 @@ exprt goto_symext::address_arithmetic(
   }
   else if(expr.id()==ID_symbol ||
           expr.id()==ID_string_constant ||
-          expr.id()==ID_label)
+          expr.id()==ID_label ||
+          expr.id()==ID_array)
   {
     // give up, just dereference
     result=expr;

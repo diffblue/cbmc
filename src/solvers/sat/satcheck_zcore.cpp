@@ -10,10 +10,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <fstream>
 
 #include <util/i2string.h>
+#include <util/string2int.h>
 
 #include "satcheck_zcore.h"
 
-#include <cstdlib>
 #include <cstring>
 
 /*******************************************************************\
@@ -138,7 +138,7 @@ propt::resultt satcheck_zcoret::prop_solve()
         
         while(true)
         {
-          int l=atoi(p);
+          int l=unsafe_str2int(p);
           if(l==0) break;
           
           if(l<0) l=-l;
