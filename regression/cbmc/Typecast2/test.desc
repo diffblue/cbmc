@@ -1,6 +1,6 @@
-KNOWNBUG
+CORE
 main.c
---no-propagation
+--no-propagation --64
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
