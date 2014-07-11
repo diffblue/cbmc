@@ -11,6 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/irep.h>
 
-irept parse_smt2(const std::string &);
+irept parse_smt2(std::istream &);
 
 #endif

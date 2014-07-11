@@ -233,20 +233,20 @@ decision_proceduret::resultt smt2_dect::read_result(std::istream &in)
   typedef hash_map_cont<irep_idt, irept, irep_id_hash> valuest;
   valuest values;
 
-  while(std::getline(in, line))
+  while(in)
   {
-    irept line_parsed=parse_smt2(line);
+    irept parsed=parse_smt2(in);
     
-    if(line_parsed.id()=="sat")
+    if(parsed.id()=="sat")
       res=D_SATISFIABLE;
-    else if(line_parsed.id()=="unsat")
+    else if(parsed.id()=="unsat")
       res=D_UNSATISFIABLE;
-    else if(line_parsed.id()=="" &&
-            line_parsed.get_sub().size()==1 &&
-            line_parsed.get_sub().front().get_sub().size()==2)
+    else if(parsed.id()=="" &&
+            parsed.get_sub().size()==1 &&
+            parsed.get_sub().front().get_sub().size()==2)
     {
-      const irept &s0=line_parsed.get_sub().front().get_sub()[0];
-      const irept &s1=line_parsed.get_sub().front().get_sub()[1];
+      const irept &s0=parsed.get_sub().front().get_sub()[0];
+      const irept &s1=parsed.get_sub().front().get_sub()[1];
 
       // ( (B0 true) )
       // ( (|c::__CPROVER_pipe_count#1| (_ bv0 32)) )
