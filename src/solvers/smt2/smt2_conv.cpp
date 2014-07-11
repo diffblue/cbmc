@@ -432,6 +432,32 @@ exprt smt2_convt::parse_array(
 
 /*******************************************************************\
 
+Function: smt2_convt::parse_union
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+exprt smt2_convt::parse_union(
+  const irept &src,
+  const union_typet &type)
+{
+  // these are always flat
+  assert(!type.components().empty());
+  const union_typet::componentt &first=type.components().front();
+  unsigned width=boolbv_width(type);
+  exprt value=parse_rec(src, bv_typet(width));
+  if(value.is_nil()) return nil_exprt();
+  exprt converted=typecast_exprt(value, first.type());
+  return union_exprt(first.get_name(), converted, type);
+}
+
+/*******************************************************************\
+
 Function: smt2_convt::parse_struct
 
   Inputs:
@@ -552,8 +578,7 @@ exprt smt2_convt::parse_rec(const irept &src, const typet &_type)
   }
   else if(type.id()==ID_union)
   {
-    // TODO
-    TODO("Union not implemented");
+    return parse_union(src, to_union_type(type));
   }
   else if(type.id()==ID_array)
   {
