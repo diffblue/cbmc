@@ -454,38 +454,45 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
   //
   // Doesn't work for many, e.g., pointer difference, floating-point,
   // division, modulo.
-  // Also excludes ID_bitnot, which fails if the width of T
-  // is bigger than that of (x OP y).
+  // Many operations fail if the width of T
+  // is bigger than that of (x OP y). This includes ID_bitnot and
+  // anything that might overflow, e.g., ID_plus.
   //
   if((expr_type.id()==ID_signedbv || expr_type.id()==ID_unsignedbv) &&
      (op_type.id()==ID_signedbv || op_type.id()==ID_unsignedbv))
   {
-    irep_idt op_id=expr.op0().id();
+    bool enlarge=
+      to_bitvector_type(expr_type).get_width() > to_bitvector_type(op_type).get_width();
 
-    if(op_id==ID_plus || op_id==ID_minus || op_id==ID_mult ||
-       op_id==ID_unary_minus || 
-       op_id==ID_bitxor || op_id==ID_bitor || op_id==ID_bitand)
+    if(!enlarge)
     {
-      exprt result=expr.op0();
-      
-      if(result.operands().size()>=1 && 
-         base_type_eq(result.op0().type(), result.type(), ns))
+      irep_idt op_id=expr.op0().id();
+    
+      if(op_id==ID_plus || op_id==ID_minus || op_id==ID_mult ||
+         op_id==ID_unary_minus || 
+         op_id==ID_bitxor || op_id==ID_bitor || op_id==ID_bitand)
       {
-        result.type()=expr.type();
-
-        Forall_operands(it, result)
+        exprt result=expr.op0();
+        
+        if(result.operands().size()>=1 && 
+           base_type_eq(result.op0().type(), result.type(), ns))
         {
-          it->make_typecast(expr.type());
-          simplify_typecast(*it); // recursive call
-        }
+          result.type()=expr.type();
 
-        simplify_node(result); // possibly recursive call
-        expr.swap(result);
-        return false;
+          Forall_operands(it, result)
+          {
+            it->make_typecast(expr.type());
+            simplify_typecast(*it); // recursive call
+          }
+
+          simplify_node(result); // possibly recursive call
+          expr.swap(result);
+          return false;
+        }
       }
-    }
-    else if(op_id==ID_ashr || op_id==ID_lshr || op_id==ID_shl)
-    {
+      else if(op_id==ID_ashr || op_id==ID_lshr || op_id==ID_shl)
+      {
+      }
     }
   }
 
