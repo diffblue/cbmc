@@ -164,7 +164,7 @@ void smt2_convt::write_footer()
         it=smt2_identifiers.begin();
         it!=smt2_identifiers.end();
         it++)
-      out << "(get-value (" << *it << "))" << "\n";
+      out << "(get-value (|" << *it << "|))" << "\n";
   }
 
   // pop the assumptions, if any
@@ -391,6 +391,47 @@ constant_exprt smt2_convt::parse_literal(
 
 /*******************************************************************\
 
+Function: smt2_convt::parse_array
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+exprt smt2_convt::parse_array(
+  const irept &src,
+  const array_typet &type)
+{
+  if(src.get_sub().size()==4 && src.get_sub()[0].id()=="store")
+  {
+    // (store array index value)
+    if(src.get_sub().size()!=4) return nil_exprt();
+    
+    exprt array=parse_array(src.get_sub()[1], type);
+    exprt index=parse_rec(src.get_sub()[2], type.size().type());
+    exprt value=parse_rec(src.get_sub()[3], type.subtype());
+
+    return with_exprt(array, index, value);
+  }
+  else if(src.get_sub().size()==2 &&
+          src.get_sub()[0].get_sub().size()==3 &&
+          src.get_sub()[0].get_sub()[0].id()=="as" &&
+          src.get_sub()[0].get_sub()[1].id()=="const")
+  {
+    // This is produced by Z3.
+    // ((as const (Array (_ BitVec 64) (_ BitVec 8))) #x00)))
+    exprt value=parse_rec(src.get_sub()[1], type.subtype());
+    return array_of_exprt(value, type);
+  }
+  else
+    return nil_exprt();
+}
+
+/*******************************************************************\
+
 Function: smt2_convt::parse_struct
 
   Inputs:
@@ -473,7 +514,7 @@ Function: smt2_convt::parse_rec
 exprt smt2_convt::parse_rec(const irept &src, const typet &_type)
 {
   const typet &type=ns.follow(_type);
-
+  
   if(type.id()==ID_signedbv ||
      type.id()==ID_unsignedbv ||
      type.id()==ID_bv ||
@@ -513,6 +554,10 @@ exprt smt2_convt::parse_rec(const irept &src, const typet &_type)
   {
     // TODO
     TODO("Union not implemented");
+  }
+  else if(type.id()==ID_array)
+  {
+    return parse_array(src, to_array_type(type));
   }
   
   return nil_exprt();
@@ -823,7 +868,7 @@ std::string smt2_convt::convert_identifier(const irep_idt &identifier)
   // Otherwise, for Common Lisp compatibility they would have to be treated
   // as escaping symbols.
   
-  std::string result="|";
+  std::string result;
   
   for(unsigned i=0; i<identifier.size(); i++)
   {
@@ -845,7 +890,6 @@ std::string smt2_convt::convert_identifier(const irep_idt &identifier)
     }
   }
   
-  result+='|';
   return result;
 }
 
@@ -868,13 +912,13 @@ void smt2_convt::convert_expr(const exprt &expr)
     irep_idt id=to_symbol_expr(expr).get_identifier();
     assert(id!="");
 
-    out << convert_identifier(id);
+    out << '|' << convert_identifier(id) << '|';
   }
   else if(expr.id()==ID_nondet_symbol)
   {
     irep_idt id=expr.get(ID_identifier);
     assert(id!="");
-    out << convert_identifier("nondet_"+id2string(id));
+    out << '|' << convert_identifier("nondet_"+id2string(id)) << '|';
   }
   else if(expr.id()==ID_typecast)
   {
@@ -3983,7 +4027,7 @@ void smt2_convt::set_to(const exprt &expr, bool value)
         smt2_identifiers.insert(smt2_identifier);
 
         out << "; set_to true\n";
-        out << "(define-fun " << smt2_identifier << " () ";
+        out << "(define-fun |" << smt2_identifier << "| () ";
 
         convert_type(equal_expr.lhs().type());
         out << " ";
@@ -4062,9 +4106,9 @@ void smt2_convt::find_symbols(const exprt &expr)
       smt2_identifiers.insert(smt2_identifier);
 
       out << "; find_symbols\n";
-      out << "(declare-fun "
+      out << "(declare-fun |"
           << smt2_identifier
-          << " () ";
+          << "| () ";
       convert_type(expr.type());
       out << ")" << "\n";
     }
