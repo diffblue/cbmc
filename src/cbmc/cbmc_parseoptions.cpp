@@ -425,7 +425,8 @@ int cbmc_parseoptionst::doit()
   // Print a banner
   //
   status("CBMC version " CBMC_VERSION " "+
-         i2string(sizeof(void *)*8)+"-bit");
+         i2string(sizeof(void *)*8)+"-bit "+
+         id2string(config.this_operating_system()));
 
   //
   // Unwinding of transition systems is done by hw-cbmc.
