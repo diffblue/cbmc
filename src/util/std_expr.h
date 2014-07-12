@@ -312,6 +312,11 @@ public:
     unary_exprt(ID_unary_minus, _op, _type)
   {
   }
+
+  explicit inline unary_minus_exprt(const exprt &_op):
+    unary_exprt(ID_unary_minus, _op, _op.type())
+  {
+  }
 };
 
 /*! \brief Cast a generic exprt to a \ref unary_minus_exprt
