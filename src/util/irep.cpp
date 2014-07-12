@@ -509,8 +509,15 @@ Function: operator==
 
 \*******************************************************************/
 
+#ifdef IREP_HASH_STATS
+unsigned long long irep_cmp_cnt=0;
+#endif
+
 bool operator==(const irept &i1, const irept &i2)
 {
+  #ifdef IREP_HASH_STATS
+  ++irep_cmp_cnt;
+  #endif
   #ifdef SHARING
   if(i1.data==i2.data) return true;
   #endif
@@ -810,6 +817,10 @@ static inline size_t hash_combine(size_t h1, size_t h2)
   return hash_rotl(h1, 7)^h2;
 }
 
+#ifdef IREP_HASH_STATS
+unsigned long long irep_hash_cnt=0;
+#endif
+
 size_t irept::hash() const
 {
   #ifdef HASH_CODE
@@ -832,6 +843,9 @@ size_t irept::hash() const
 
   #ifdef HASH_CODE
   read().hash_code=result;
+  #endif
+  #ifdef HASH_STATS
+  ++irep_hash_cnt;
   #endif
   return result;
 }
