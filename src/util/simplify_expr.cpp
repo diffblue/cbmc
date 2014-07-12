@@ -1666,47 +1666,28 @@ bool simplify_exprt::simplify_minus(exprt &expr)
      is_number(operands[0].type()) &&
      is_number(operands[1].type()))
   {
-    if(operands[1].is_zero())
-    {
-      // rewrite "a-0" to "a"
-      expr=operands[1];
-      return false;
-    }
-    else
-    {
-      // rewrite "a-b" to "a+(-b)"
-      unary_exprt tmp2(operands[1]);
-      simplify_node(tmp2);
+    // rewrite "a-b" to "a+(-b)"
+    unary_minus_exprt tmp2(operands[1]);
+    simplify_unary_minus(tmp2);
 
-      plus_exprt tmp(operands[0], tmp2);
+    plus_exprt tmp(operands[0], tmp2);
+    simplify_plus(tmp);
 
-      expr.swap(tmp);
-      simplify_node(expr);
-      return false;
-    }
+    expr.swap(tmp);
+    return false;
   }
   else if(expr.type().id()==ID_pointer &&
           operands[0].type().id()==ID_pointer &&
           is_number(operands[1].type()))
   {
-    if(operands[1].is_zero())
-    {
-      // rewrite "p-0" to "p"
-      expr=operands[1];
-      return false;
-    }
-    else
-    {
-      // pointer arithmetic: rewrite "p-i" to "p+(-i)"
-      unary_exprt tmp2(operands[1]);
-      simplify_node(tmp2);
+    // pointer arithmetic: rewrite "p-i" to "p+(-i)"
+    unary_minus_exprt tmp2(operands[1]);
+    simplify_unary_minus(tmp2);
 
-      plus_exprt tmp(operands[0], tmp2);
+    plus_exprt tmp(operands[0], tmp2);
+    simplify_plus(tmp);
 
-      expr.swap(tmp);
-      simplify_node(expr);
-    }
-
+    expr.swap(tmp);
     return false;
   }
 
