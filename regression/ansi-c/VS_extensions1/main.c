@@ -111,7 +111,7 @@ int __unaligned *unaligned_int_ptr;
 
 // __w64
 
-__wchar_t some_wchar;
+// __wchar_t some_wchar;
 
 // wchar_t some_other_wchar;
 
