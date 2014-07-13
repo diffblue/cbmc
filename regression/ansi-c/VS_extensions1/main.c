@@ -97,7 +97,7 @@ void __stdcall f10();
 
 // __try_cast
 
-//int __unaligned *unaligned_int_ptr;
+int __unaligned *unaligned_int_ptr;
 
 // __unhook
 
