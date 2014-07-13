@@ -1192,7 +1192,17 @@ gcc_attribute_parameters:
 
 msc_decl_identifier:
           TOK_IDENTIFIER
+        {
+          stack($$).id(stack($$).get(ID_identifier));
+        }
         | TOK_TYPEDEFNAME
+        {
+          stack($$).id(stack($$).get(ID_identifier));
+        }
+        | TOK_RESTRICT
+        {
+          stack($$).id(ID_restrict);
+        }
         ;
 
 msc_decl_modifier:
