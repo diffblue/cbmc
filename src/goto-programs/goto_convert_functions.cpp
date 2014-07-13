@@ -224,7 +224,9 @@ void goto_convert_functionst::convert_function(const irep_idt &identifier)
   temporary_counter=0;
   
   f.type=to_code_type(symbol.type);
-  f.body_available=symbol.value.is_not_nil();
+  f.body_available=
+    symbol.value.is_not_nil() &&
+    symbol.value.id()!="compiled"; /* goto_inline may have removed the body */
 
   if(!f.body_available) return;
   
