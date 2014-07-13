@@ -71,7 +71,7 @@ void irep_serializationt::reference_convert(
   std::istream &in,
   irept &irep)
 {
-  unsigned id = read_long(in);
+  std::size_t id = read_gb_word(in);
   
   if(id < ireps_container.ireps_on_read.size() && 
      ireps_container.ireps_on_read[id].first)
@@ -148,7 +148,7 @@ void irep_serializationt::reference_convert(
   const irept &irep,
   std::ostream &out)
 {
-  unsigned h=ireps_container.irep_full_hash_container.number(irep);
+  std::size_t h=ireps_container.irep_full_hash_container.number(irep);
 
   // should be merged with insert
   ireps_containert::ireps_on_writet::const_iterator fi=
@@ -170,7 +170,7 @@ void irep_serializationt::reference_convert(
  
 Function: irep_serializationt::insert_on_write
  
-  Inputs: an unsigned long and an irep
+  Inputs: a size_t and an irep
  
  Outputs: true on success, false otherwise
  
@@ -178,7 +178,7 @@ Function: irep_serializationt::insert_on_write
  
 \*******************************************************************/
 
-size_t irep_serializationt::insert_on_write(unsigned h)
+std::size_t irep_serializationt::insert_on_write(std::size_t h)
 {
   std::pair<ireps_containert::ireps_on_writet::const_iterator,bool> res=
     ireps_container.ireps_on_write.insert(
@@ -194,7 +194,7 @@ size_t irep_serializationt::insert_on_write(unsigned h)
  
 Function: irep_serializationt::insert_on_read
  
-  Inputs: an unsigned long and an irep
+  Inputs: a size_t and an irep
  
  Outputs: true on success, false otherwise
  
@@ -203,8 +203,8 @@ Function: irep_serializationt::insert_on_read
  
 \*******************************************************************/
 
-size_t irep_serializationt::insert_on_read(
-  unsigned id,
+std::size_t irep_serializationt::insert_on_read(
+  std::size_t id,
   const irept &i)
 {
   if(id>=ireps_container.ireps_on_read.size())
@@ -246,7 +246,7 @@ void write_gb_word(std::ostream &out, std::size_t u)
 
 /*******************************************************************\
  
-Function: irep_serializationt::read_long
+Function: irep_serializationt::read_gb_word
 
   Inputs: a stream
  
@@ -256,7 +256,7 @@ Function: irep_serializationt::read_long
  
 \*******************************************************************/
 
-unsigned irep_serializationt::read_long(std::istream &in)
+std::size_t irep_serializationt::read_gb_word(std::istream &in)
 {
   assert(sizeof(unsigned)==4);
   unsigned res=0;
@@ -294,7 +294,7 @@ void write_gb_string(std::ostream &out, const std::string &s)
 
 /*******************************************************************\
  
-Function: irep_serializationt::read_string
+Function: irep_serializationt::read_gb_string
 
   Inputs: a stream
  
@@ -304,7 +304,7 @@ Function: irep_serializationt::read_string
  
 \*******************************************************************/
 
-irep_idt irep_serializationt::read_string(std::istream &in)
+irep_idt irep_serializationt::read_gb_string(std::istream &in)
 {  
   char c;
   size_t i=0;
@@ -374,7 +374,7 @@ Function: irep_serializationt::read_string_ref
 
 irep_idt irep_serializationt::read_string_ref(std::istream &in)
 {  
-  unsigned id = read_long(in);
+  std::size_t id = read_gb_word(in);
   
   if(id>=ireps_container.string_rev_map.size()) 
     ireps_container.string_rev_map.resize(1+id*2, 
@@ -386,7 +386,7 @@ irep_idt irep_serializationt::read_string_ref(std::istream &in)
   }
   else
   {
-    irep_idt s=read_string(in);
+    irep_idt s=read_gb_string(in);
     ireps_container.string_rev_map[id] = 
       std::pair<bool,irep_idt>(true, s);
     return ireps_container.string_rev_map[id].second; 
