@@ -141,6 +141,7 @@ extern char *yyansi_ctext;
 %token TOK_MSC_FINALLY "finally"
 %token TOK_MSC_EXCEPT  "except"
 %token TOK_MSC_LEAVE   "leave"
+%token TOK_MSC_DECLSPEC "__declspec"
 %token TOK_INTERFACE   "__interface"
 %token TOK_CDECL       "__cdecl"
 %token TOK_STDCALL     "__stdcall"
