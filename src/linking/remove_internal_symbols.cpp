@@ -71,9 +71,9 @@ void get_symbols_rec(
 
 Function: remove_internal_symbols
 
-  Inputs: 
+  Inputs: symbol table
 
- Outputs: 
+ Outputs: symbol table, with internal symbols removed
 
  Purpose: A symbol is EXPORTED if it is a
           * non-static function with body that is not extern inline
