@@ -34,7 +34,7 @@ bool write_goto_binary_v2(
 {
   // first write symbol table
 
-  write_long(out, lsymbol_table.symbols.size());
+  write_gb_word(out, lsymbol_table.symbols.size());
 
   forall_symbols(it, lsymbol_table.symbols)
   {
@@ -53,7 +53,7 @@ bool write_goto_binary_v2(
     irepconverter.write_string_ref(out, sym.mode);
     irepconverter.write_string_ref(out, sym.pretty_name);
     
-    write_long(out, 0); // old: sym.ordering
+    write_gb_word(out, 0); // old: sym.ordering
 
     unsigned flags=0;    
     flags = (flags << 1) | (int)sym.is_type; 
@@ -73,7 +73,7 @@ bool write_goto_binary_v2(
     flags = (flags << 1) | (int)sym.is_extern;
     flags = (flags << 1) | (int)sym.is_volatile;
     
-    write_long(out, flags);
+    write_gb_word(out, flags);
   }
 
   // now write functions, but only those with body
@@ -83,7 +83,7 @@ bool write_goto_binary_v2(
     if(it->second.body_available)
       cnt++;
 
-  write_long(out, cnt);
+  write_gb_word(out, cnt);
 
   for(goto_functionst::function_mapt::const_iterator
       it=functions.function_map.begin();
@@ -95,8 +95,8 @@ bool write_goto_binary_v2(
       // In version 2, goto functions are not converted to ireps,
       // instead they are saved in a custom binary format      
       
-      write_string(out, id2string(it->first)); // name      
-      write_long(out, it->second.body.instructions.size()); // # instructions
+      write_gb_string(out, id2string(it->first)); // name      
+      write_gb_word(out, it->second.body.instructions.size()); // # instructions
       
       forall_goto_program_instructions(i_it, it->second.body)
       {
@@ -105,20 +105,20 @@ bool write_goto_binary_v2(
         irepconverter.reference_convert(instruction.code, out);
         irepconverter.write_string_ref(out, instruction.function);
         irepconverter.reference_convert(instruction.location, out);
-        write_long(out, (long)instruction.type);
+        write_gb_word(out, (long)instruction.type);
         irepconverter.reference_convert(instruction.guard, out);        
         irepconverter.write_string_ref(out, irep_idt()); // former event
-        write_long(out, instruction.target_number);
+        write_gb_word(out, instruction.target_number);
                 
-        write_long(out, instruction.targets.size());
+        write_gb_word(out, instruction.targets.size());
 
         for(goto_programt::targetst::const_iterator
             t_it=instruction.targets.begin();
             t_it!=instruction.targets.end();
             t_it++)
-          write_long(out, (*t_it)->target_number);
+          write_gb_word(out, (*t_it)->target_number);
           
-        write_long(out, instruction.labels.size());
+        write_gb_word(out, instruction.labels.size());
 
         for(goto_programt::instructiont::labelst::const_iterator
             l_it=instruction.labels.begin();
@@ -155,7 +155,7 @@ bool write_goto_binary(
 {
   // header
   out << char(0x7f) << "GBF";
-  write_long(out, version);
+  write_gb_word(out, version);
 
   irep_serializationt::ireps_containert irepc;
   irep_serializationt irepconverter(irepc);    

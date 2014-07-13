@@ -19,8 +19,8 @@ Date: May 2007
 #include "irep_hash_container.h"
 #include "irep.h"
 
-void write_long(std::ostream &, unsigned); 
-void write_string(std::ostream &, const std::string &);
+void write_gb_word(std::ostream &, std::size_t);
+void write_gb_string(std::ostream &, const std::string &);
 
 class irep_serializationt
 {
@@ -69,8 +69,8 @@ public:
 
   void clear() { ireps_container.clear(); }
 
-  static unsigned read_long(std::istream &);
-  irep_idt read_string(std::istream &);
+  static std::size_t read_gb_word(std::istream &);
+  irep_idt read_gb_string(std::istream &);
 
 private:
   ireps_containert &ireps_container;
