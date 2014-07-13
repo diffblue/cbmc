@@ -137,7 +137,7 @@ void remove_internal_symbols(
     }
     else if(is_function)
     {
-      // body? not local?
+      // body? not local (i.e., "static")?
       if(has_body && !is_file_local)
         get_symbols_rec(ns, symbol, exported);
     }
@@ -148,7 +148,6 @@ void remove_internal_symbols(
       if((has_initializer || !symbol.is_extern) && 
          !is_file_local)
       {
-        exported.insert(symbol.name);
         get_symbols_rec(ns, symbol, exported);
       }
     }
