@@ -1249,6 +1249,14 @@ msc_declspec:
         }
         ;
 
+msc_declspec_opt:
+          /* blank */
+        {
+          init($$, ID_nil);
+        }
+        | msc_declspec
+        ;
+
 storage_class:
           TOK_TYPEDEF      { $$=$1; set($$, ID_typedef); }
         | TOK_EXTERN       { $$=$1; set($$, ID_extern); }
@@ -1326,26 +1334,9 @@ pragma_packed:
 aggregate_name:
           aggregate_key
           gcc_type_attribute_opt
+          msc_declspec_opt
           {
             // an anon struct/union
-          }
-          '{' member_declaration_list_opt '}'
-          gcc_type_attribute_opt
-          pragma_packed
-        {
-          // save the members
-          stack($1).add(ID_components).get_sub().swap(
-            (irept::subt &)stack($5).operands());
-
-          // throw in the gcc attributes
-          $$=merge($1, merge($2, merge($7, $8)));
-        }
-        | aggregate_key
-          gcc_type_attribute_opt
-          identifier_or_typedef_name
-          {
-            // a struct/union with tag
-            stack($1).set(ID_tag, stack($3));
           }
           '{' member_declaration_list_opt '}'
           gcc_type_attribute_opt
@@ -1360,13 +1351,33 @@ aggregate_name:
         }
         | aggregate_key
           gcc_type_attribute_opt
+          msc_declspec_opt
+          identifier_or_typedef_name
+          {
+            // a struct/union with tag
+            stack($1).set(ID_tag, stack($4));
+          }
+          '{' member_declaration_list_opt '}'
+          gcc_type_attribute_opt
+          pragma_packed
+        {
+          // save the members
+          stack($1).add(ID_components).get_sub().swap(
+            (irept::subt &)stack($7).operands());
+
+          // throw in the gcc attributes
+          $$=merge($1, merge($2, merge($9, $10)));
+        }
+        | aggregate_key
+          gcc_type_attribute_opt
+          msc_declspec_opt
           identifier_or_typedef_name
           gcc_type_attribute_opt
         {
-          stack($1).set(ID_tag, stack($3));
+          stack($1).set(ID_tag, stack($4));
           stack($1).set(ID_components, ID_nil);
           // type attributes
-          $$=merge($1, merge($2, $4));
+          $$=merge($1, merge($2, $5));
         }
         ;
 
