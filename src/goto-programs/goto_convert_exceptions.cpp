@@ -39,7 +39,7 @@ void goto_convertt::convert_msc_try_finally(
     // save 'leave' target
     leave_targett leave_target(targets);
     targets.set_leave(tmp.instructions.begin());
-  
+    
     // first put 'finally' code onto destructor stack
     targets.destructor_stack.push_back(to_code(code.op1()));
   
@@ -102,7 +102,7 @@ void goto_convertt::convert_msc_leave(
   const codet &code,
   goto_programt &dest)
 {
-  if(targets.leave_set)
+  if(!targets.leave_set)
   {
     err_location(code);
     throw "leave without target";
