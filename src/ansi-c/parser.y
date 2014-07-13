@@ -1190,6 +1190,55 @@ gcc_attribute_parameters:
         ;
 */
 
+msc_decl_identifier:
+          TOK_IDENTIFIER
+        | TOK_TYPEDEFNAME
+        ;
+
+msc_decl_modifier:
+          msc_decl_identifier
+        | msc_decl_identifier '(' TOK_STRING ')'
+        {
+          $$=$1; mto($$, $3);
+        }
+        | msc_decl_identifier '(' TOK_INTEGER ')'
+        {
+          $$=$1; mto($$, $3);
+        }
+        | msc_decl_identifier '(' msc_decl_identifier '=' msc_decl_identifier ')'
+        {
+          $$=$1; mto($$, $3); mto($$, $5);
+        }
+        | msc_decl_identifier '(' msc_decl_identifier '=' msc_decl_identifier ',' msc_decl_identifier '=' msc_decl_identifier ')'
+        {
+          $$=$1; mto($$, $3); mto($$, $5); mto($$, $7); mto($$, $9);
+        }
+        | ',' { init($$, ID_nil); }
+        ;
+
+msc_declspec_seq:
+          msc_decl_modifier
+        {
+          init($$); mto($$, $1);
+        }
+        | msc_declspec_seq msc_decl_modifier
+        {
+          $$=$1; mto($$, $2);
+        }
+        ;
+
+msc_declspec:
+          TOK_MSC_DECLSPEC '(' msc_declspec_seq ')'
+        {
+          $$=$1; set($$, ID_msc_declspec);
+          stack($$).operands().swap(stack($3).operands());
+        }
+        | TOK_MSC_DECLSPEC '(' ')'
+        {
+          $$=$1; set($$, ID_msc_declspec);
+        }
+        ;
+
 storage_class:
           TOK_TYPEDEF      { $$=$1; set($$, ID_typedef); }
         | TOK_EXTERN       { $$=$1; set($$, ID_extern); }
@@ -1199,6 +1248,7 @@ storage_class:
         | TOK_INLINE       { $$=$1; set($$, ID_inline); }
         | TOK_THREAD_LOCAL { $$=$1; set($$, ID_thread_local); }
         | TOK_GCC_ASM      { $$=$1; set($$, ID_asm); }
+        | msc_declspec     { $$=$1; }
         ;
 
 basic_type_name:

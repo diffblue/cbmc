@@ -18,6 +18,8 @@ void __cdecl f3();
 
 __declspec(thread) int thread_local;
 
+struct __declspec(dllimport) some_struct_tag { int x; };
+
 //__delegate int GetDayOfWeek();
 
 // __event 

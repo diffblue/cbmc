@@ -185,6 +185,26 @@ void ansi_c_convert_typet::read_rec(const typet &type)
     tmp.id(ID_empty);
     other.push_back(tmp);
   }
+  else if(type.id()==ID_msc_declspec)
+  {
+    const exprt &as_expr=
+      static_cast<const exprt &>(static_cast<const irept &>(type));
+      
+    forall_operands(it, as_expr)
+    {
+      // these are symbols
+      const irep_idt &id=it->get(ID_identifier);
+
+      if(id=="thread")
+        c_storage_spec.is_thread_local=true;
+      else if(id=="align")
+      {
+        assert(it->operands().size()==1);
+        aligned=true;
+        alignment=it->op0();
+      }
+    }
+  }
   else
     other.push_back(type);
 }
