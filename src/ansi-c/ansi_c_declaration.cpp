@@ -208,6 +208,8 @@ void ansi_c_declarationt::to_symbol(
        
     symbol.is_file_local=
       symbol.is_macro || 
-      (!get_is_global() && !get_is_extern());
+      (!get_is_global() && !get_is_extern()) ||
+      (get_is_global() && get_is_static()) ||
+      symbol.is_parameter;
   }
 }
