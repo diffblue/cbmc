@@ -19,8 +19,8 @@ Date: May 2007
 #include "irep_hash_container.h"
 #include "irep.h"
 
-void write_long(std::ostream &, unsigned); 
-void write_string(std::ostream &, const std::string &);
+void write_gb_word(std::ostream &, std::size_t);
+void write_gb_string(std::ostream &, const std::string &);
 
 class irep_serializationt
 {
