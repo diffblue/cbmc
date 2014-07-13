@@ -543,6 +543,12 @@ void goto_instrument_parseoptionst::instrument_goto_program(
 {
   optionst options;
 
+  // disable simplify when adding various checks?
+  if(cmdline.isset("no-simplify"))
+    options.set_option("simplify", false);
+  else
+    options.set_option("simplify", true);
+
   // use assumptions instead of assertions?
   if(cmdline.isset("assert-to-assume"))
     options.set_option("assert-to-assume", true);

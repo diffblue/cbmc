@@ -115,11 +115,14 @@ protected:
   void write_footer();
 
   // new stuff
-  void convert_expr(const exprt &expr);
-  void convert_type(const typet &type);
+  void convert_expr(const exprt &);
+  void convert_type(const typet &);
   void convert_literal(const literalt);
-  
-  bool use_array_theory(const array_typet &);
+
+  // tweaks for arrays  
+  bool use_array_theory(const exprt &);
+  void flatten_array(const exprt &);
+  void unflatten_array(const exprt &);
   
   // specific expressions go here
   void convert_byte_update(const exprt &expr);
