@@ -58,8 +58,8 @@ public:
     clear(); 
   };
   
-  size_t insert_on_write(unsigned h);
-  size_t insert_on_read(unsigned id, const irept &);
+  std::size_t insert_on_write(std::size_t h);
+  std::size_t insert_on_read(std::size_t id, const irept &);
   
   void reference_convert(std::istream &, irept &irep);
   void reference_convert(const irept &irep, std::ostream &);
