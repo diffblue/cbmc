@@ -805,7 +805,7 @@ static inline size_t hash_rotl(const size_t value, int shift)
   // contained in bits that will be masked away. There is no such
   // issue when using the GNU C++ STL.
 
-  unsigned int int_value=value;
+  unsigned int int_value=(unsigned)value; // loose data here
   return (int_value << shift) | (int_value >> (sizeof(int_value)*8 - shift));
   #else
   return (value << shift) | (value >> (sizeof(value)*8 - shift));
