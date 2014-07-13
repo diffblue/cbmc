@@ -36,9 +36,9 @@ bool read_bin_goto_object_v2(
   message_handlert &message_handler,
   irep_serializationt &irepconverter)
 { 
-  unsigned count = irepconverter.read_gb_word(in); // # of symbols
+  std::size_t count = irepconverter.read_gb_word(in); // # of symbols
 
-  for(unsigned i=0; i<count; i++)
+  for(std::size_t i=0; i<count; i++)
   {
     symbolt sym;
       
@@ -87,7 +87,7 @@ bool read_bin_goto_object_v2(
   
   count=irepconverter.read_gb_word(in); // # of functions
   
-  for(unsigned i=0; i<count; i++)
+  for(std::size_t i=0; i<count; i++)
   {    
     irep_idt fname=irepconverter.read_gb_string(in);
     goto_functionst::goto_functiont &f = functions.function_map[fname];
@@ -97,8 +97,8 @@ bool read_bin_goto_object_v2(
     typedef std::map<unsigned, goto_programt::targett> rev_target_mapt;
     rev_target_mapt rev_target_map;
     
-    unsigned ins_count = irepconverter.read_gb_word(in); // # of instructions
-    for (unsigned i=0; i<ins_count; i++)
+    std::size_t ins_count = irepconverter.read_gb_word(in); // # of instructions
+    for(std::size_t i=0; i<ins_count; i++)
     {
       goto_programt::targett itarget = f.body.add_instruction();
       goto_programt::instructiont &instruction=*itarget;
@@ -117,13 +117,13 @@ bool read_bin_goto_object_v2(
             std::make_pair(instruction.target_number, itarget))->second!=itarget)
         assert(false);
       
-      unsigned t_count = irepconverter.read_gb_word(in); // # of targets
-      for (unsigned i=0; i<t_count; i++)
+      std::size_t t_count = irepconverter.read_gb_word(in); // # of targets
+      for(std::size_t i=0; i<t_count; i++)
         // just save the target numbers
         target_map[itarget].push_back(irepconverter.read_gb_word(in));
         
-      unsigned l_count = irepconverter.read_gb_word(in); // # of labels
-      for (unsigned i=0; i<l_count; i++)
+      std::size_t l_count = irepconverter.read_gb_word(in); // # of labels
+      for(std::size_t i=0; i<l_count; i++)
         instruction.labels.push_back(irepconverter.read_string_ref(in));
     }
     
@@ -213,7 +213,7 @@ bool read_bin_goto_object(
   //symbol_serializationt symbolconverter(ic);
   
   {
-    unsigned version=irepconverter.read_gb_word(in);
+    std::size_t version=irepconverter.read_gb_word(in);
         
     switch(version)
     {

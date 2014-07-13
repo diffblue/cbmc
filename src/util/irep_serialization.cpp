@@ -148,7 +148,7 @@ void irep_serializationt::reference_convert(
   const irept &irep,
   std::ostream &out)
 {
-  unsigned h=ireps_container.irep_full_hash_container.number(irep);
+  std::size_t h=ireps_container.irep_full_hash_container.number(irep);
 
   // should be merged with insert
   ireps_containert::ireps_on_writet::const_iterator fi=
@@ -170,7 +170,7 @@ void irep_serializationt::reference_convert(
  
 Function: irep_serializationt::insert_on_write
  
-  Inputs: an unsigned long and an irep
+  Inputs: a size_t and an irep
  
  Outputs: true on success, false otherwise
  
@@ -178,7 +178,7 @@ Function: irep_serializationt::insert_on_write
  
 \*******************************************************************/
 
-size_t irep_serializationt::insert_on_write(unsigned h)
+std::size_t irep_serializationt::insert_on_write(std::size_t h)
 {
   std::pair<ireps_containert::ireps_on_writet::const_iterator,bool> res=
     ireps_container.ireps_on_write.insert(
@@ -194,7 +194,7 @@ size_t irep_serializationt::insert_on_write(unsigned h)
  
 Function: irep_serializationt::insert_on_read
  
-  Inputs: an unsigned long and an irep
+  Inputs: a size_t and an irep
  
  Outputs: true on success, false otherwise
  
@@ -203,8 +203,8 @@ Function: irep_serializationt::insert_on_read
  
 \*******************************************************************/
 
-size_t irep_serializationt::insert_on_read(
-  unsigned id,
+std::size_t irep_serializationt::insert_on_read(
+  std::size_t id,
   const irept &i)
 {
   if(id>=ireps_container.ireps_on_read.size())
