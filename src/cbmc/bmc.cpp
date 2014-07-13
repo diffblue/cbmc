@@ -458,6 +458,8 @@ bool bmct::run(const goto_functionst &goto_functions)
       return decide_smt1();
     else if(options.get_bool_option("smt2"))
       return decide_smt2();
+    else if(options.get_bool_option("dimacs"))
+      return write_dimacs();
     else if(options.get_bool_option("refine"))
       return decide_bv_refinement();
     else if(options.get_bool_option("aig"))

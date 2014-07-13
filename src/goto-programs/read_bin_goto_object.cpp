@@ -36,7 +36,7 @@ bool read_bin_goto_object_v2(
   message_handlert &message_handler,
   irep_serializationt &irepconverter)
 { 
-  unsigned count = irepconverter.read_long(in); // # of symbols
+  unsigned count = irepconverter.read_gb_word(in); // # of symbols
 
   for(unsigned i=0; i<count; i++)
   {
@@ -53,9 +53,9 @@ bool read_bin_goto_object_v2(
     sym.pretty_name = irepconverter.read_string_ref(in);
     
     // obsolete: symordering
-    irepconverter.read_long(in);
+    irepconverter.read_gb_word(in);
 
-    unsigned flags=irepconverter.read_long(in);
+    unsigned flags=irepconverter.read_gb_word(in);
     
     sym.is_type = (flags & (1 << 15))!=0;
     sym.is_property = (flags & (1 << 14))!=0; 
@@ -85,11 +85,11 @@ bool read_bin_goto_object_v2(
     symbol_table.add(sym);
   }
   
-  count=irepconverter.read_long(in); // # of functions
+  count=irepconverter.read_gb_word(in); // # of functions
   
   for(unsigned i=0; i<count; i++)
   {    
-    irep_idt fname=irepconverter.read_string(in);
+    irep_idt fname=irepconverter.read_gb_string(in);
     goto_functionst::goto_functiont &f = functions.function_map[fname];
     
     typedef std::map<goto_programt::targett, std::list<unsigned> > target_mapt;
@@ -97,7 +97,7 @@ bool read_bin_goto_object_v2(
     typedef std::map<unsigned, goto_programt::targett> rev_target_mapt;
     rev_target_mapt rev_target_map;
     
-    unsigned ins_count = irepconverter.read_long(in); // # of instructions
+    unsigned ins_count = irepconverter.read_gb_word(in); // # of instructions
     for (unsigned i=0; i<ins_count; i++)
     {
       goto_programt::targett itarget = f.body.add_instruction();
@@ -107,22 +107,22 @@ bool read_bin_goto_object_v2(
       instruction.function = irepconverter.read_string_ref(in);      
       irepconverter.reference_convert(in, instruction.location);
       instruction.type = (goto_program_instruction_typet) 
-                              irepconverter.read_long(in);
+                              irepconverter.read_gb_word(in);
       instruction.guard.make_nil();
       irepconverter.reference_convert(in, instruction.guard);
       irepconverter.read_string_ref(in); // former event
-      instruction.target_number = irepconverter.read_long(in);
+      instruction.target_number = irepconverter.read_gb_word(in);
       if(instruction.is_target() &&
           rev_target_map.insert(rev_target_map.end(),
             std::make_pair(instruction.target_number, itarget))->second!=itarget)
         assert(false);
       
-      unsigned t_count = irepconverter.read_long(in); // # of targets
+      unsigned t_count = irepconverter.read_gb_word(in); // # of targets
       for (unsigned i=0; i<t_count; i++)
         // just save the target numbers
-        target_map[itarget].push_back(irepconverter.read_long(in));
+        target_map[itarget].push_back(irepconverter.read_gb_word(in));
         
-      unsigned l_count = irepconverter.read_long(in); // # of labels
+      unsigned l_count = irepconverter.read_gb_word(in); // # of labels
       for (unsigned i=0; i<l_count; i++)
         instruction.labels.push_back(irepconverter.read_string_ref(in));
     }
@@ -213,7 +213,7 @@ bool read_bin_goto_object(
   //symbol_serializationt symbolconverter(ic);
   
   {
-    unsigned version=irepconverter.read_long(in);
+    unsigned version=irepconverter.read_gb_word(in);
         
     switch(version)
     {
