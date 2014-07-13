@@ -173,7 +173,7 @@ string_lit      ("L"|"u"|"U"|"u8")?["]{s_char}*["]
 %x STRING_LITERAL_COMMENT
 %x ASM_BLOCK
 %x MSC_ASM
-%x MSC_DECLSPEC
+%x IGNORE_PARENS
 %x MSC_PRAGMA
 %x MSC_ANNOTATION
 %x GCC_ATTRIBUTE1
@@ -660,15 +660,13 @@ __decltype          { if(PARSER.cpp && PARSER.mode==ansi_c_parsert::GCC)
                      PARSER.mode==ansi_c_parsert::CW ||
                      PARSER.mode==ansi_c_parsert::ARM)
                   {
-                    BEGIN(MSC_DECLSPEC);
-                    PARSER.parenthesis_counter=0;
+                    loc(); return TOK_MSC_DECLSPEC;
                   }
                   else if(PARSER.mode==ansi_c_parsert::GCC)
                   {
                     // GCC supports this on Windows as an exception!
                     // Should likely reject on other targets.
-                    BEGIN(MSC_DECLSPEC);
-                    PARSER.parenthesis_counter=0;
+                    loc(); return TOK_MSC_DECLSPEC;
                   }
                   else
                     return make_identifier();
@@ -730,7 +728,7 @@ __decltype          { if(PARSER.cpp && PARSER.mode==ansi_c_parsert::GCC)
 "__align"       { /* an ARM extension */
                   if(PARSER.mode==ansi_c_parsert::ARM)
                   {
-                    BEGIN(MSC_DECLSPEC);
+                    BEGIN(IGNORE_PARENS);
                     PARSER.parenthesis_counter=0;
                   }
                   else
@@ -740,7 +738,7 @@ __decltype          { if(PARSER.cpp && PARSER.mode==ansi_c_parsert::GCC)
 "__smc"         { /* an ARM extension */
                   if(PARSER.mode==ansi_c_parsert::ARM)
                   {
-                    BEGIN(MSC_DECLSPEC);
+                    BEGIN(IGNORE_PARENS);
                     PARSER.parenthesis_counter=0;
                   }
                   else
@@ -804,7 +802,7 @@ __decltype          { if(PARSER.cpp && PARSER.mode==ansi_c_parsert::GCC)
 "__global_reg"  { /* an ARM extension */
                   if(PARSER.mode==ansi_c_parsert::ARM)
                   {
-                    BEGIN(MSC_DECLSPEC);
+                    BEGIN(IGNORE_PARENS);
                     PARSER.parenthesis_counter=0;
                   }
                   else
@@ -814,7 +812,7 @@ __decltype          { if(PARSER.cpp && PARSER.mode==ansi_c_parsert::GCC)
 "__svc"         { /* an ARM extension */
                   if(PARSER.mode==ansi_c_parsert::ARM)
                   {
-                    BEGIN(MSC_DECLSPEC);
+                    BEGIN(IGNORE_PARENS);
                     PARSER.parenthesis_counter=0;
                   }
                   else
@@ -824,7 +822,7 @@ __decltype          { if(PARSER.cpp && PARSER.mode==ansi_c_parsert::GCC)
 "__svc_indirect" { /* an ARM extension */
                   if(PARSER.mode==ansi_c_parsert::ARM)
                   {
-                    BEGIN(MSC_DECLSPEC);
+                    BEGIN(IGNORE_PARENS);
                     PARSER.parenthesis_counter=0;
                   }
                   else
@@ -834,7 +832,7 @@ __decltype          { if(PARSER.cpp && PARSER.mode==ansi_c_parsert::GCC)
 "__svc_indirect_r7" { /* an ARM extension */
                   if(PARSER.mode==ansi_c_parsert::ARM)
                   {
-                    BEGIN(MSC_DECLSPEC);
+                    BEGIN(IGNORE_PARENS);
                     PARSER.parenthesis_counter=0;
                   }
                   else
@@ -1156,11 +1154,11 @@ __decltype          { if(PARSER.cpp && PARSER.mode==ansi_c_parsert::GCC)
 <ASM_BLOCK>"}"  { PARSER.asm_block_following=false;
                   BEGIN(GRAMMAR); loc(); return '}'; }
 
-<MSC_DECLSPEC>")"    { PARSER.parenthesis_counter--;
+<IGNORE_PARENS>")"    { PARSER.parenthesis_counter--;
                         if(PARSER.parenthesis_counter==0)
                           BEGIN(GRAMMAR); }
-<MSC_DECLSPEC>"("    { PARSER.parenthesis_counter++; }
-<MSC_DECLSPEC>.      { /* Throw away */ }
+<IGNORE_PARENS>"("    { PARSER.parenthesis_counter++; }
+<IGNORE_PARENS>.      { /* Throw away */ }
 
 <MSC_PRAGMA>")"    { PARSER.parenthesis_counter--;
                         if(PARSER.parenthesis_counter==0)
