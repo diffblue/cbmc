@@ -245,6 +245,7 @@ static
 auto
 register
 thread_local
+thread
 C_thread_local #thread_local
 C_static_lifetime #static_lifetime
 mutable
