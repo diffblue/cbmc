@@ -153,6 +153,19 @@ void partial_order_concurrencyt::build_event_lists(
       numbering[e_it]=cnt;
     }
   }
+
+  for(address_mapt::const_iterator
+      a_it=address_map.begin();
+      a_it!=address_map.end();
+      a_it++)
+  {
+    const a_rect &a_rec=a_it->second;
+    if(a_rec.reads.empty()) continue;
+
+    statistics() << "Shared " << a_it->first << ": "
+                 << a_rec.reads.size() << "R/"
+                 << a_rec.writes.size() << "W" << eom;
+  }
 }
 
 /*******************************************************************\
