@@ -229,8 +229,8 @@ public:
   inline named_subt &get_comments() { return write().comments; } // DANGEROUS
   inline const named_subt &get_comments() const { return read().comments; }
   
-  size_t hash() const;
-  size_t full_hash() const;
+  std::size_t hash() const;
+  std::size_t full_hash() const;
   
   friend bool full_eq(const irept &a, const irept &b);
   
@@ -261,7 +261,7 @@ public:
     subt sub;
 
     #ifdef HASH_CODE
-    mutable size_t hash_code;
+    mutable std::size_t hash_code;
     #endif
 
     void clear()
@@ -354,12 +354,12 @@ public:
 
 struct irep_hash
 {
-  inline size_t operator()(const irept &irep) const { return irep.hash(); }
+  inline std::size_t operator()(const irept &irep) const { return irep.hash(); }
 };
 
 struct irep_full_hash
 {
-  inline size_t operator()(const irept &irep) const { return irep.full_hash(); }
+  inline std::size_t operator()(const irept &irep) const { return irep.full_hash(); }
 };
 
 struct irep_full_eq

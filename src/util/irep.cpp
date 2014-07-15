@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "irep.h"
 #include "i2string.h"
 #include "string_hash.h"
+#include "irep_hash.h"
 
 irept nil_rep_storage;
 
@@ -799,34 +800,12 @@ Function: irept::hash
 
 \*******************************************************************/
 
-static inline size_t hash_rotl(const size_t value, int shift)
-{
-  #ifdef _MSC_VER
-  // The below intentionally limits the hash key to 32 bits.
-  // This is because Visual Studio's STL masks away anything
-  // but the least significant n bits, where 2^n is the size of
-  // the hash table. On systems with 64-bit size_t, we then see
-  // performance degradation as too much of the hash key is
-  // contained in bits that will be masked away. There is no such
-  // issue when using the GNU C++ STL.
-
-  unsigned int int_value=(unsigned)value; // loose data here
-  return (int_value << shift) | (int_value >> (sizeof(int_value)*8 - shift));
-  #else
-  return (value << shift) | (value >> (sizeof(value)*8 - shift));
-  #endif
-}
-
-static inline size_t hash_combine(size_t h1, size_t h2)
-{
-  return hash_rotl(h1, 7)^h2;
-}
 
 #ifdef IREP_HASH_STATS
 unsigned long long irep_hash_cnt=0;
 #endif
 
-size_t irept::hash() const
+std::size_t irept::hash() const
 {
   #ifdef HASH_CODE
   if(read().hash_code!=0)
@@ -836,7 +815,7 @@ size_t irept::hash() const
   const irept::subt &sub=get_sub();
   const irept::named_subt &named_sub=get_named_sub();
 
-  size_t result=hash_string(id());
+  std::size_t result=hash_string(id());
 
   forall_irep(it, sub) result=hash_combine(result, it->hash());
 
@@ -845,6 +824,8 @@ size_t irept::hash() const
     result=hash_combine(result, hash_string(it->first));
     result=hash_combine(result, it->second.hash());
   }
+
+  result=hash_finalize(result, named_sub.size()+sub.size());
 
   #ifdef HASH_CODE
   read().hash_code=result;
@@ -867,13 +848,13 @@ Function: irept::full_hash
 
 \*******************************************************************/
 
-size_t irept::full_hash() const
+std::size_t irept::full_hash() const
 {
   const irept::subt &sub=get_sub();
   const irept::named_subt &named_sub=get_named_sub();
   const irept::named_subt &comments=get_comments();
 
-  size_t result=hash_string(id());
+  std::size_t result=hash_string(id());
 
   forall_irep(it, sub) result=hash_combine(result, it->full_hash());
 
@@ -888,6 +869,10 @@ size_t irept::full_hash() const
     result=hash_combine(result, hash_string(it->first));
     result=hash_combine(result, it->second.full_hash());
   }
+
+  result=hash_finalize(
+    result,
+    named_sub.size()+sub.size()+comments.size());
 
   return result;
 }
