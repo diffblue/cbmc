@@ -6,8 +6,10 @@ int main() {
   void* z2 = z1;
   unsigned int* pi = z2;
 
-  // This is probably not ok.
+  // This is probably not ok, but we shall expect it to pass anyway.
   assert(((char)*pi) == 50);
+
+  // This should really, really fail.
   assert(*pi == 50);
 
   return 0;
