@@ -511,6 +511,7 @@ Function: operator==
 
 #ifdef IREP_HASH_STATS
 unsigned long long irep_cmp_cnt=0;
+unsigned long long irep_cmp_ne_cnt=0;
 #endif
 
 bool operator==(const irept &i1, const irept &i2)
@@ -522,11 +523,15 @@ bool operator==(const irept &i1, const irept &i2)
   if(i1.data==i2.data) return true;
   #endif
 
-  if(i1.id()!=i2.id()) return false;
-
-  if(i1.get_sub()!=i2.get_sub()) return false; // recursive call
-
-  if(i1.get_named_sub()!=i2.get_named_sub()) return false; // recursive call
+  if(i1.id()!=i2.id() ||
+     i1.get_sub()!=i2.get_sub() || // recursive call
+     i1.get_named_sub()!=i2.get_named_sub()) // recursive call
+  {
+    #ifdef IREP_HASH_STATS
+    ++irep_cmp_ne_cnt;
+    #endif
+    return false;
+  }
 
   // comments are NOT checked
 
@@ -844,7 +849,7 @@ size_t irept::hash() const
   #ifdef HASH_CODE
   read().hash_code=result;
   #endif
-  #ifdef HASH_STATS
+  #ifdef IREP_HASH_STATS
   ++irep_hash_cnt;
   #endif
   return result;
