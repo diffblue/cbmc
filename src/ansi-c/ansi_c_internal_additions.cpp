@@ -115,6 +115,7 @@ void ansi_c_internal_additions(std::string &code)
     "void __CPROVER_atomic_begin();\n"
     "void __CPROVER_atomic_end();\n"
     "void __CPROVER_fence(const char *kind, ...);\n"
+    "__CPROVER_thread_local unsigned long __CPROVER_thread_id=0;\n"
     "__CPROVER_bool __CPROVER_threads_exited[__CPROVER_constant_infinity_uint];\n"
     "unsigned long __CPROVER_next_thread_id=0;\n"
 
