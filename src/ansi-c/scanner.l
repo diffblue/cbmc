@@ -892,35 +892,30 @@ __decltype          { if(PARSER.cpp && PARSER.mode==ansi_c_parsert::GCC)
                 }
 
 "__try"         { if(PARSER.mode==ansi_c_parsert::MSC)
-                    { loc(); return TOK_TRY; }
+                    { loc(); return TOK_MSC_TRY; }
                   else
                     return make_identifier();
                 }
 
 "try"           { if(PARSER.cpp) // C++?
                     { loc(); return TOK_TRY; }
-                  else if(PARSER.mode==ansi_c_parsert::MSC)
-                    { loc(); return TOK_TRY; }                    
                   else
                     return make_identifier();
                 }
 
-"__finally" |
-"finally"       { if(PARSER.mode==ansi_c_parsert::MSC)
+"__finally"     { if(PARSER.mode==ansi_c_parsert::MSC)
                     { loc(); return TOK_MSC_FINALLY; }
                   else
                     return make_identifier();
                 }
 
-"__except" |
-"except"        { if(PARSER.mode==ansi_c_parsert::MSC)
+"__except"      { if(PARSER.mode==ansi_c_parsert::MSC)
                     { loc(); return TOK_MSC_EXCEPT; }
                   else
                     return make_identifier();
                 }
 
-"__leave" |
-"leave"         { if(PARSER.mode==ansi_c_parsert::MSC)
+"__leave"       { if(PARSER.mode==ansi_c_parsert::MSC)
                     { loc(); return TOK_MSC_LEAVE; }
                   else
                     return make_identifier();
