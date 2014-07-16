@@ -2258,7 +2258,7 @@ msc_asm_statement:
         ;
 
 msc_seh_statement:
-          TOK_TRY compound_statement
+          TOK_MSC_TRY compound_statement
           TOK_MSC_EXCEPT '(' comma_expression ')' compound_statement
         {
           $$=$1;
@@ -2267,7 +2267,7 @@ msc_seh_statement:
           mto($$, $5);
           mto($$, $7);
         }
-        | TOK_TRY compound_statement
+        | TOK_MSC_TRY compound_statement
           TOK_MSC_FINALLY compound_statement
         {
           $$=$1;
