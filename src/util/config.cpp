@@ -687,6 +687,7 @@ void configt::ansi_ct::set_arch_spec_x32()
   // This is a variant of x86_64 that has
   // 32-bit long int and 32-bit pointers.
   set_ILP32();
+  long_double_width=16*8; // different from i386
   arch=ARCH_X32;
   endianness=IS_LITTLE_ENDIAN;
   char_is_unsigned=false;
