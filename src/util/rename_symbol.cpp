@@ -195,11 +195,23 @@ bool rename_symbolt::rename(typet &dest) const
     code_typet &code_type=to_code_type(dest);
     rename(code_type.return_type());
     code_typet::parameterst &parameters=code_type.parameters();
+
     for(code_typet::parameterst::iterator it = parameters.begin();
         it!=parameters.end();
         it++)
-      if(!rename(*it))
+    {
+      if(!rename(it->type()))
         result=false;
+
+      expr_mapt::const_iterator e_it=
+        expr_map.find(it->get_identifier());
+
+      if(e_it!=expr_map.end())
+      {
+        it->set_identifier(e_it->second);
+        result=false;
+      }
+    }
   }
   else if(dest.id()==ID_symbol)
   {
@@ -272,8 +284,13 @@ bool rename_symbolt::have_to_rename(const typet &dest) const
         it=parameters.begin();
         it!=parameters.end();
         it++)
-      if(have_to_rename(*it))
+    {
+      if(have_to_rename(it->type()))
         return true;
+
+      if(expr_map.find(it->get_identifier())!=expr_map.end())
+        return true;
+    }
   }
   else if(dest.id()==ID_symbol)
     return type_map.find(dest.get(ID_identifier))!=type_map.end();
