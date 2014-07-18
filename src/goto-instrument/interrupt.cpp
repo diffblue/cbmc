@@ -244,7 +244,7 @@ void interrupt(
   Forall_goto_functions(f_it, goto_functions)
     if(f_it->first!=CPROVER_PREFIX "initialize" &&
        f_it->first!=ID_main &&
-       f_it->first!=interrupt_handler)
+       f_it->first!=isr.get_identifier())
       interrupt(
         value_sets, symbol_table, f_it->second.body, isr, isr_rw_set);
 
