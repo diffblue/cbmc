@@ -754,7 +754,7 @@ void linkingt::typecheck()
   // be renamed, and then build the renaming, and finally apply this
   // renaming in the second pass over the symbol table.
   
-  // PHASE 1
+  // PHASE 1: identify symbols to be renamed
 
   id_sett needs_to_be_renamed;
   
@@ -771,10 +771,10 @@ void linkingt::typecheck()
   // renaming types may trigger further renaming
   do_type_dependencies(needs_to_be_renamed);
   
-  // PHASE 2
+  // PHASE 2: rename them
   rename_symbols(needs_to_be_renamed);
 
-  // PHASE 3
+  // PHASE 3: copy new symbols to main table
   copy_symbols();
 }
 
