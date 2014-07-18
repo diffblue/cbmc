@@ -429,7 +429,7 @@ void linkingt::duplicate_non_type_symbol(
 
 /*******************************************************************\
 
-Function: linkingt::inspect_src_symbol
+Function: linkingt::duplicate_type_symbol
 
   Inputs:
 
@@ -439,112 +439,73 @@ Function: linkingt::inspect_src_symbol
 
 \*******************************************************************/
 
-#if 0
-void linkingt::inspect_src_symbol(const irep_idt &identifier)
+void linkingt::duplicate_type_symbol(
+  symbolt &old_symbol,
+  symbolt &new_symbol)
 {
-  // is it done already?
-  if(completed.find(identifier)!=completed.end())
-    return;
+  assert(new_symbol.is_type);
+  
+  if(!old_symbol.is_type)
+    link_error(
+      old_symbol,
+      new_symbol,
+      "conflicting definition for symbol");
 
-  // look it up, it must be there
-  symbolt &new_symbol=src_symbol_table.lookup(identifier);
-
-  // resolve recursion on types; we shouldn't need specific care
-  // for non-types even though recursion may occur via initializers
-  if(!processing.insert(identifier).second)
+  if(old_symbol.type.id()==ID_incomplete_struct &&
+     new_symbol.type.id()==ID_struct)
   {
-    if(!main_symbol_table.has_symbol(identifier))
+    old_symbol.type=new_symbol.type;
+    old_symbol.location=new_symbol.location;
+    return;
+  }
+  
+  if(old_symbol.type.id()==ID_struct &&
+     new_symbol.type.id()==ID_incomplete_struct)
+  {
+    // ok, keep old
+    return;
+  }
+  
+  if(old_symbol.type.id()==ID_incomplete_union &&
+     new_symbol.type.id()==ID_union)
+  {
+    old_symbol.type=new_symbol.type;
+    old_symbol.location=new_symbol.location;
+    return;
+  }
+  
+  if(old_symbol.type.id()==ID_union &&
+     new_symbol.type.id()==ID_incomplete_union)
+  {
+    // ok, keep old
+    return;
+  }
+
+  if(old_symbol.type.id()==ID_array &&
+     new_symbol.type.id()==ID_array &&
+     base_type_eq(old_symbol.type.subtype(), new_symbol.type.subtype(), ns))
+  {
+    if(to_array_type(old_symbol.type).size().is_nil() &&
+       to_array_type(new_symbol.type).size().is_not_nil())
+    {
+      to_array_type(old_symbol.type).size()=
+        to_array_type(new_symbol.type).size();
       return;
-
-    symbolt &old_symbol=main_symbol_table.lookup(identifier);
-    bool move=false;
-    if(new_symbol.is_type && old_symbol.is_type)
-      duplicate_type_symbol(old_symbol, new_symbol, move);
-
-    if(move)
-    {
-      irep_idt old_identifier=new_symbol.name;
-      irep_idt new_identifier=rename(old_identifier);
-
-      replace_symbol.insert(old_identifier, symbol_typet(new_identifier));
     }
 
-    return;
-  }
-
-  // first find out what symbols this uses
-  find_symbols_sett symbols;
-  find_type_and_expr_symbols(new_symbol.value, symbols);
-  find_type_and_expr_symbols(new_symbol.type, symbols);
-  // also add function parameters
-  if(new_symbol.type.id()==ID_code)
-  {
-    const code_typet &code_type=to_code_type(new_symbol.type);
-    const code_typet::parameterst &parameters=code_type.parameters();
-
-    for(code_typet::parameterst::const_iterator
-        it=parameters.begin();
-        it!=parameters.end();
-        it++)
-      // identifiers for prototypes need not exist
-      if(!it->get_identifier().empty() &&
-          src_symbol_table.has_symbol(it->get_identifier()))
-        symbols.insert(it->get_identifier());
-  }
-
-  // make sure we inspect those first!
-  for(find_symbols_sett::const_iterator
-      s_it=symbols.begin();
-      s_it!=symbols.end();
-      s_it++)
-    inspect_src_symbol(*s_it);
-    
-  // first order of business is to apply renaming
-  replace_symbol.replace(new_symbol.value);
-  replace_symbol.replace(new_symbol.type);        
-  // also rename function parameters, if necessary
-  if(new_symbol.type.id()==ID_code)
-  {
-    code_typet &code_type=to_code_type(new_symbol.type);
-    code_typet::parameterst &parameters=code_type.parameters();
-
-    for(code_typet::parameterst::iterator
-        it=parameters.begin();
-        it!=parameters.end();
-        it++)
+    if(to_array_type(new_symbol.type).size().is_nil() &&
+       to_array_type(old_symbol.type).size().is_not_nil())
     {
-      replace_symbolt::expr_mapt::const_iterator r=
-        replace_symbol.expr_map.find(it->get_identifier());
-      if(r!=replace_symbol.expr_map.end())
-        it->set_identifier(to_symbol_expr(r->second).get_identifier());
+      // ok, keep old
+      return;
     }
   }
-    
-  // any symbols contained in new_symbol are now renamed within src_symbol_table and
-  // the (possibly renamed) contained symbols are in main_symbol_table
-  // any checks for duplicates are now safe to exclusively use lookups on
-  // main_symbol_table (via ns)
 
-  // ok, now check if we are to expect a collision
-  const symbol_tablet::symbolst::iterator main_s_it=
-    main_symbol_table.symbols.find(identifier);
-    
-  if(main_s_it!=main_symbol_table.symbols.end())
-    duplicate_symbol(main_s_it->second, new_symbol); // handle the collision
-  else
-  {
-    // add into destination symbol_table -- should never fail,
-    // as there is no collision
-    
-    bool result=main_symbol_table.move(new_symbol);
-    assert(!result);    
-  }
-
-  // symbol is really done and can now be used within main_symbol_table
-  completed.insert(identifier);
-  processing.erase(identifier);
+  link_error(
+    old_symbol,
+    new_symbol,
+    "unexpected difference between type symbols");
 }
-#endif
 
 /*******************************************************************\
 
@@ -587,7 +548,8 @@ bool linkingt::needs_renaming_type(
     return false; // not different
 
   if(old_symbol.type.id()==ID_array &&
-     new_symbol.type.id()==ID_array)
+     new_symbol.type.id()==ID_array &&
+     base_type_eq(old_symbol.type.subtype(), new_symbol.type.subtype(), ns))
   {
     if(to_array_type(old_symbol.type).size().is_nil() &&
        to_array_type(new_symbol.type).size().is_not_nil())
