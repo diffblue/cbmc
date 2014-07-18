@@ -8,6 +8,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 
+#include <stack>
+
 #include <util/find_symbols.h>
 #include <util/location.h>
 #include <util/base_type.h>
@@ -18,9 +20,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <langapi/language_util.h>
 
-#include "linking_type_eq.h"
+//#include "linking_type_eq.h"
 #include "linking.h"
-#include "linking_class.h"
+#include "linking_class_new.h"
 
 /*******************************************************************\
 
@@ -191,6 +193,38 @@ void linkingt::link_warning(
 
 /*******************************************************************\
 
+Function: linkingt::compute_used_by
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void linkingt::compute_used_by()
+{
+  forall_symbols(s_it, src_symbol_table.symbols)
+  {
+    if(s_it->second.is_type)
+    {
+      find_symbols_sett type_symbols_used;
+      find_type_symbols(s_it->second.type, type_symbols_used);
+
+      for(find_symbols_sett::const_iterator
+          it=type_symbols_used.begin();
+          it!=type_symbols_used.end();
+          it++)
+      {
+        used_by[*it].insert(s_it->first);
+      }
+    }
+  }
+}
+
+/*******************************************************************\
+
 Function: linkingt::duplicate_symbol
 
   Inputs:
@@ -201,20 +235,20 @@ Function: linkingt::duplicate_symbol
 
 \*******************************************************************/
 
+#if 0
 void linkingt::duplicate_symbol(
   symbolt &old_symbol,
   symbolt &new_symbol)
 {
   if(new_symbol.is_file_local ||
       (!new_symbol.is_type && !old_symbol.is_type))
+  {
     duplicate_non_type_symbol(old_symbol, new_symbol);
+  }
   else if(new_symbol.is_type && old_symbol.is_type)
   {
-    bool move=true;
-    duplicate_type_symbol(old_symbol, new_symbol, move);
+    duplicate_type_symbol(old_symbol, new_symbol);
   }
-  else if(new_symbol.is_type && old_symbol.is_file_local)
-    rename_type_symbol(new_symbol);
   else
   {
     str << "symbol category conflict on symbol `"
@@ -222,6 +256,7 @@ void linkingt::duplicate_symbol(
     throw 0;
   }
 }
+#endif
 
 /*******************************************************************\
 
@@ -235,6 +270,7 @@ Function: linkingt::rename
 
 \*******************************************************************/
 
+#if 0
 irep_idt linkingt::rename(const irep_idt &old_identifier)
 {
   irep_idt new_identifier;
@@ -251,10 +287,11 @@ irep_idt linkingt::rename(const irep_idt &old_identifier)
         
   return new_identifier;
 }
+#endif
 
 /*******************************************************************\
 
-Function: linkingt::rename_type_symbol
+Function: linkingt::rename_type
 
   Inputs:
 
@@ -264,8 +301,9 @@ Function: linkingt::rename_type_symbol
 
 \*******************************************************************/
 
-void linkingt::rename_type_symbol(symbolt &new_symbol)
+void linkingt::rename_type(irep_idt id)
 {
+  #if 0
   replace_symbolt::type_mapt::const_iterator replace_entry=
     replace_symbol.type_map.find(new_symbol.name);
 
@@ -290,6 +328,9 @@ void linkingt::rename_type_symbol(symbolt &new_symbol)
   // move over!
   bool result=main_symbol_table.move(new_symbol);
   assert(!result);
+  #endif
+  
+  
 }
 
 /*******************************************************************\
@@ -304,6 +345,7 @@ Function: linkingt::duplicate_type_symbol
 
 \*******************************************************************/
 
+#if 0
 void linkingt::duplicate_type_symbol(
   symbolt &old_symbol,
   symbolt &new_symbol,
@@ -356,6 +398,7 @@ void linkingt::duplicate_type_symbol(
     move=true;
   }
 }
+#endif
 
 /*******************************************************************\
 
@@ -369,6 +412,7 @@ Function: linkingt::duplicate_non_type_symbol
 
 \*******************************************************************/
 
+#if 0
 void linkingt::duplicate_non_type_symbol(
   symbolt &old_symbol,
   symbolt &new_symbol)
@@ -554,26 +598,7 @@ void linkingt::duplicate_non_type_symbol(
     old_symbol.is_extern=old_symbol.is_extern && new_symbol.is_extern;
   }
 }
-
-/*******************************************************************\
-
-Function: linkingt::typecheck
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void linkingt::typecheck()
-{
-  // we inspect all the symbols in src_symbol_table
-  
-  forall_symbols(it, src_symbol_table.symbols)
-    inspect_src_symbol(it->first);
-}
+#endif
 
 /*******************************************************************\
 
@@ -587,6 +612,7 @@ Function: linkingt::inspect_src_symbol
 
 \*******************************************************************/
 
+#if 0
 void linkingt::inspect_src_symbol(const irep_idt &identifier)
 {
   // is it done already?
@@ -690,6 +716,180 @@ void linkingt::inspect_src_symbol(const irep_idt &identifier)
   // symbol is really done and can now be used within main_symbol_table
   completed.insert(identifier);
   processing.erase(identifier);
+}
+#endif
+
+/*******************************************************************\
+
+Function: linkingt::is_different_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool linkingt::is_different_type(
+  const symbolt &old_symbol,
+  const symbolt &new_symbol)
+{
+  assert(new_symbol.is_type);
+  
+  if(!old_symbol.is_type)
+    return true;
+
+  if(old_symbol.type==new_symbol.type)
+    return false;
+  
+  if(old_symbol.type.id()==ID_incomplete_struct &&
+     new_symbol.type.id()==ID_struct)
+    return false; // not different
+  
+  if(old_symbol.type.id()==ID_struct &&
+     new_symbol.type.id()==ID_incomplete_struct)
+    return false; // not different
+  
+  if(old_symbol.type.id()==ID_incomplete_union &&
+     new_symbol.type.id()==ID_union)
+    return false; // not different
+  
+  if(old_symbol.type.id()==ID_union &&
+     new_symbol.type.id()==ID_incomplete_union)
+    return false; // not different
+
+  if(old_symbol.type.id()==ID_array &&
+     new_symbol.type.id()==ID_array)
+  {
+    if(to_array_type(old_symbol.type).size().is_nil() &&
+       to_array_type(new_symbol.type).size().is_not_nil())
+      return false; // not different
+
+    if(to_array_type(new_symbol.type).size().is_nil() &&
+       to_array_type(old_symbol.type).size().is_not_nil())
+      return false; // not different
+  }
+  
+  return true; // different
+}
+
+/*******************************************************************\
+
+Function: linkingt::do_type_symbols
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void linkingt::do_type_symbols()
+{
+  // compute symbol dependencies
+  compute_used_by();
+
+  // we first compare all the duplicate type symbols
+  
+  id_sett different;
+  
+  forall_symbols(s_it, src_symbol_table.symbols)
+  {
+    if(s_it->second.is_type)
+    {
+      symbol_tablet::symbolst::const_iterator
+        m_it=main_symbol_table.symbols.find(s_it->first);
+    
+      if(m_it!=main_symbol_table.symbols.end())
+      {
+        // duplicate
+  
+        if(is_different_type(m_it->second, s_it->second))
+          different.insert(s_it->first); // and different
+      }
+    }
+  }
+  
+  // Any type that uses a "different type" is also different,
+  // and so on, until saturation.
+  std::stack<irep_idt> queue;
+
+  for(id_sett::const_iterator
+      d_it=different.begin();
+      d_it!=different.end();
+      d_it++)
+    queue.push(*d_it);
+
+  while(!queue.empty())
+  {
+    irep_idt id=queue.top();
+    queue.pop();
+
+    const id_sett &u=used_by[id];
+
+    for(id_sett::const_iterator
+        d_it=u.begin();
+        d_it!=u.end();
+        d_it++)
+      if(different.insert(*d_it).second)
+        queue.push(*d_it);
+  }
+  
+  // now rename all the different ones
+  for(id_sett::const_iterator
+      d_it=different.begin();
+      d_it!=different.end();
+      d_it++)
+    rename_type(*d_it);
+}
+
+/*******************************************************************\
+
+Function: linkingt::do_non_type_symbols
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void linkingt::do_non_type_symbols()
+{
+  forall_symbols(s_it, src_symbol_table.symbols)
+  {
+    if(!s_it->second.is_type)
+    {
+      symbol_tablet::symbolst::const_iterator
+        m_it=main_symbol_table.symbols.find(s_it->first);
+    
+      if(m_it!=main_symbol_table.symbols.end())
+      {
+        // duplicate
+      }
+    }
+  }
+}
+
+/*******************************************************************\
+
+Function: linkingt::typecheck
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void linkingt::typecheck()
+{
+  do_type_symbols();
+  do_non_type_symbols();
 }
 
 /*******************************************************************\

@@ -24,8 +24,7 @@ public:
     typecheckt(_message_handler),
     main_symbol_table(_main_symbol_table),
     src_symbol_table(_src_symbol_table),
-    ns(_main_symbol_table),
-    renaming_counter(0)
+    ns(_main_symbol_table)
   {
   }
    
@@ -34,29 +33,18 @@ public:
   replace_symbolt replace_symbol;
  
 protected:
-  void duplicate_symbol(
-    symbolt &old_symbol,
-    symbolt &new_symbol);
-
-  void duplicate_type_symbol(
-    symbolt &old_symbol, 
-    symbolt &new_symbol,
-    bool &move);
-
-  void duplicate_non_type_symbol(
-    symbolt &old_symbol,
-    symbolt &new_symbol);
-
-  void rename_type_symbol(symbolt &new_symbol);
-
-  void inspect_src_symbol(const irep_idt &identifier);
+  bool is_different_type(
+    const symbolt &old_symbol,
+    const symbolt &new_symbol);
+    
+  void do_type_symbols();
+  void do_non_type_symbols();
   
-  irep_idt rename(const irep_idt &old_identifier);
-
   std::string expr_to_string(
     const namespacet &ns,
     const irep_idt &identifier,
     const exprt &expr) const;
+
   std::string type_to_string(
     const namespacet &ns,
     const irep_idt &identifier,
@@ -66,6 +54,7 @@ protected:
     const namespacet &ns,
     const symbolt &symbol,
     const typet &type) const;
+
   std::string type_to_string_verbose(
     const namespacet &ns,
     const symbolt &symbol) const
@@ -77,6 +66,7 @@ protected:
     const symbolt &old_symbol,
     const symbolt &new_symbol,
     const std::string &msg);
+
   void link_warning(
     const symbolt &old_symbol,
     const symbolt &new_symbol,
@@ -84,12 +74,17 @@ protected:
 
   symbol_tablet &main_symbol_table;
   symbol_tablet &src_symbol_table;
+
   namespacet ns;
-  
-  unsigned renaming_counter;
-  
+
   typedef hash_set_cont<irep_idt, irep_id_hash> id_sett;
-  id_sett processing, completed;
+
+  // X -> Y iff Y uses X for new symbol type IDs X and Y
+  typedef hash_map_cont<irep_idt, id_sett, irep_id_hash> used_byt;
+  used_byt used_by;
+  
+  void compute_used_by();
+  void rename_type(irep_idt);
 };
 
 #endif
