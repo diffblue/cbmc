@@ -10,7 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_LINKING_LINKING_CLASS_H
 
 #include <util/namespace.h>
-#include <util/replace_symbol.h>
+#include <util/rename_symbol.h>
 #include <util/hash_cont.h>
 #include <util/typecheck.h>
 
@@ -30,15 +30,38 @@ public:
    
   virtual void typecheck();
   
-  replace_symbolt replace_symbol;
+  rename_symbolt replace_symbol;
  
 protected:
-  bool is_different_type(
+
+  typedef hash_set_cont<irep_idt, irep_id_hash> id_sett;
+
+  bool needs_renaming_type(
     const symbolt &old_symbol,
     const symbolt &new_symbol);
     
-  void do_type_symbols();
-  void do_non_type_symbols();
+  bool needs_renaming_non_type(
+    const symbolt &old_symbol,
+    const symbolt &new_symbol);
+
+  bool needs_renaming(
+    const symbolt &old_symbol,
+    const symbolt &new_symbol)
+  {
+    if(new_symbol.is_type)
+      return needs_renaming_type(old_symbol, new_symbol);
+    else
+      return needs_renaming_non_type(old_symbol, new_symbol);
+  }
+
+  void do_type_dependencies(id_sett &);
+    
+  void rename_symbols(const id_sett &needs_to_be_renamed);
+  void copy_symbols();
+
+  void duplicate_non_type_symbol(
+    symbolt &old_symbol,
+    symbolt &new_symbol);
   
   std::string expr_to_string(
     const namespacet &ns,
@@ -77,14 +100,13 @@ protected:
 
   namespacet ns;
 
-  typedef hash_set_cont<irep_idt, irep_id_hash> id_sett;
-
   // X -> Y iff Y uses X for new symbol type IDs X and Y
   typedef hash_map_cont<irep_idt, id_sett, irep_id_hash> used_byt;
-  used_byt used_by;
-  
-  void compute_used_by();
-  void rename_type(irep_idt);
+
+  irep_idt rename(irep_idt);
+
+  // the new IDs created by renaming  
+  id_sett renamed_ids;
 };
 
 #endif
