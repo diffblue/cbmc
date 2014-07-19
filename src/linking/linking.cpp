@@ -7,6 +7,7 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <cassert>
+#include <stack>
 
 #include <util/find_symbols.h>
 #include <util/location.h>
@@ -145,14 +146,14 @@ void linkingt::link_error(
 {
   err_location(new_symbol.location);
 
-  str << "error: " << msg << " \""
+  str << "error: " << msg << " `"
       << old_symbol.display_name()
-      << "\"" << std::endl;
-  str << "old definition in module " << old_symbol.module
-      << " " << old_symbol.location << std::endl
+      << "'" << std::endl;
+  str << "old definition in module `" << old_symbol.module
+      << "' " << old_symbol.location << std::endl
       << type_to_string_verbose(ns, old_symbol) << std::endl;
-  str << "new definition in module " << new_symbol.module
-      << " " << new_symbol.location << std::endl
+  str << "new definition in module `" << new_symbol.module
+      << "' " << new_symbol.location << std::endl
       << type_to_string_verbose(ns, new_symbol);
 
   throw 0;
@@ -190,40 +191,6 @@ void linkingt::link_warning(
 
 /*******************************************************************\
 
-Function: linkingt::duplicate_symbol
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void linkingt::duplicate_symbol(
-  symbolt &old_symbol,
-  symbolt &new_symbol)
-{
-  if(new_symbol.is_file_local ||
-      (!new_symbol.is_type && !old_symbol.is_type))
-    duplicate_non_type_symbol(old_symbol, new_symbol);
-  else if(new_symbol.is_type && old_symbol.is_type)
-  {
-    bool move=true;
-    duplicate_type_symbol(old_symbol, new_symbol, move);
-  }
-  else if(new_symbol.is_type && old_symbol.is_file_local)
-    rename_type_symbol(new_symbol);
-  else
-  {
-    str << "symbol category conflict on symbol `"
-      << old_symbol.name << "'";
-    throw 0;
-  }
-}
-
-/*******************************************************************\
-
 Function: linkingt::rename
 
   Inputs:
@@ -234,26 +201,29 @@ Function: linkingt::rename
 
 \*******************************************************************/
 
-irep_idt linkingt::rename(const irep_idt &old_identifier)
+irep_idt linkingt::rename(irep_idt id)
 {
-  irep_idt new_identifier;
+  unsigned cnt=0;
+
+  while(true)
+  {
+    irep_idt new_identifier=
+      id2string(id)+"$link"+i2string(++cnt);
+
+    if(main_symbol_table.symbols.find(new_identifier)!=
+       main_symbol_table.symbols.end())
+      continue; // already in main symbol table
     
-  do
-  {
-    new_identifier=
-      id2string(old_identifier)+"$link"+i2string(renaming_counter++);        
+    if(!renamed_ids.insert(new_identifier).second)
+      continue; // used this for renaming already
+
+    return new_identifier;
   }
-  while(main_symbol_table.symbols.find(new_identifier)!=
-        main_symbol_table.symbols.end() ||
-        src_symbol_table.symbols.find(new_identifier)!=
-        src_symbol_table.symbols.end());
-        
-  return new_identifier;
 }
 
 /*******************************************************************\
 
-Function: linkingt::rename_type_symbol
+Function: linkingt::needs_renaming_non_type
 
   Inputs:
 
@@ -263,99 +233,20 @@ Function: linkingt::rename_type_symbol
 
 \*******************************************************************/
 
-void linkingt::rename_type_symbol(symbolt &new_symbol)
+bool linkingt::needs_renaming_non_type(
+  const symbolt &old_symbol,
+  const symbolt &new_symbol)
 {
-  replace_symbolt::type_mapt::const_iterator replace_entry=
-    replace_symbol.type_map.find(new_symbol.name);
-
-  if(replace_entry!=replace_symbol.type_map.end())
-  {
-    new_symbol.name=to_symbol_type(replace_entry->second).get_identifier();
-  }
-  else
-  {
-    // rename!
-    irep_idt old_identifier=new_symbol.name;
-    irep_idt new_identifier=rename(old_identifier);
-
-    replace_symbol.insert(old_identifier, symbol_typet(new_identifier));
-
-    new_symbol.name=new_identifier;
-  }
-
-  // need to replace again
-  replace_symbol.replace(new_symbol.type);
-
-  // move over!
-  bool result=main_symbol_table.move(new_symbol);
-  assert(!result);
+  // We first take care of file-local non-type symbols.
+  // These are static functions, or static variables
+  // inside static function bodies.
+  if(new_symbol.is_file_local ||
+     old_symbol.is_file_local)
+    return true;
+  
+  return false;
 }
-
-/*******************************************************************\
-
-Function: linkingt::duplicate_type_symbol
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void linkingt::duplicate_type_symbol(
-  symbolt &old_symbol,
-  symbolt &new_symbol,
-  bool &move)
-{
-  // check if it is really the same
-  // -- use base_type_eq, not linking_type_eq
-  // first make sure that base_type_eq can soundly use ns/main_symbol_table only
-  find_symbols_sett symbols;
-  find_type_and_expr_symbols(new_symbol.type, symbols);
-  bool ok=true;
-  for(find_symbols_sett::const_iterator
-      s_it=symbols.begin();
-      ok && s_it!=symbols.end();
-      s_it++)
-    ok&=completed.find(*s_it)!=completed.end();
-  if(ok && base_type_eq(old_symbol.type, new_symbol.type, ns))
-  {
-    move=false;
-    return;
-  }
-
-  // they are different
-  if(old_symbol.type.id()==ID_incomplete_struct &&
-     new_symbol.type.id()==ID_struct)
-  {
-    if(move)
-      old_symbol.type=new_symbol.type; // store new type
-    move=false;
-  }
-  else if(old_symbol.type.id()==ID_struct &&
-          new_symbol.type.id()==ID_incomplete_struct)
-  {
-    // ignore
-    move=false;
-  }
-  else if(ns.follow(old_symbol.type).id()==ID_array &&
-          ns.follow(new_symbol.type).id()==ID_array)
-  {
-    if(move &&
-       to_array_type(ns.follow(old_symbol.type)).size().is_nil() &&
-       to_array_type(ns.follow(new_symbol.type)).size().is_not_nil())
-      old_symbol.type=new_symbol.type; // store new type
-    move=false;
-  }
-  else
-  {
-    if(move)
-      rename_type_symbol(new_symbol);
-    move=true;
-  }
-}
-
+  
 /*******************************************************************\
 
 Function: linkingt::duplicate_non_type_symbol
@@ -372,28 +263,6 @@ void linkingt::duplicate_non_type_symbol(
   symbolt &old_symbol,
   symbolt &new_symbol)
 {
-  // We first take care of file-local non-type symbols.
-  // These are static functions, or static variables
-  // inside function bodies.
-  if(new_symbol.is_file_local ||
-     old_symbol.is_file_local)
-  {
-    // we just always rename these
-    irep_idt old_identifier=new_symbol.name;
-    irep_idt new_identifier=rename(old_identifier);
-    replace_symbol.insert(
-        old_identifier,
-        symbol_exprt(new_identifier, new_symbol.type));
-
-    new_symbol.name=new_identifier;
-    
-    // move over!
-    bool result=main_symbol_table.move(new_symbol);
-    assert(!result);
-    
-    return;
-  }
-  
   // see if it is a function or a variable
 
   bool is_code_old_symbol=old_symbol.type.id()==ID_code;
@@ -416,6 +285,8 @@ void linkingt::duplicate_non_type_symbol(
       if(old_symbol.value.is_nil())
       {
         // the one with body wins!
+        rename_symbol(new_symbol.value);
+        rename_symbol(new_symbol.type);
         old_symbol.value=new_symbol.value;
         old_symbol.type=new_symbol.type; // for parameter identifiers
       }
@@ -478,10 +349,12 @@ void linkingt::duplicate_non_type_symbol(
         // ignore
       }
       else if(old_type.id()==ID_pointer && new_type.id()==ID_pointer)
+      {
         link_warning(
           old_symbol,
           new_symbol,
           "conflicting pointer types for variable");
+      }
       else if((old_type.id()==ID_incomplete_struct &&
                new_type.id()==ID_struct) ||
               (old_type.id()==ID_incomplete_union &&
@@ -556,6 +429,296 @@ void linkingt::duplicate_non_type_symbol(
 
 /*******************************************************************\
 
+Function: linkingt::duplicate_type_symbol
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void linkingt::duplicate_type_symbol(
+  symbolt &old_symbol,
+  symbolt &new_symbol)
+{
+  assert(new_symbol.is_type);
+  
+  if(!old_symbol.is_type)
+    link_error(
+      old_symbol,
+      new_symbol,
+      "conflicting definition for symbol");
+
+  if(old_symbol.type==new_symbol.type)
+    return;
+
+  if(old_symbol.type.id()==ID_incomplete_struct &&
+     new_symbol.type.id()==ID_struct)
+  {
+    old_symbol.type=new_symbol.type;
+    old_symbol.location=new_symbol.location;
+    return;
+  }
+  
+  if(old_symbol.type.id()==ID_struct &&
+     new_symbol.type.id()==ID_incomplete_struct)
+  {
+    // ok, keep old
+    return;
+  }
+  
+  if(old_symbol.type.id()==ID_incomplete_union &&
+     new_symbol.type.id()==ID_union)
+  {
+    old_symbol.type=new_symbol.type;
+    old_symbol.location=new_symbol.location;
+    return;
+  }
+  
+  if(old_symbol.type.id()==ID_union &&
+     new_symbol.type.id()==ID_incomplete_union)
+  {
+    // ok, keep old
+    return;
+  }
+
+  if(old_symbol.type.id()==ID_array &&
+     new_symbol.type.id()==ID_array &&
+     base_type_eq(old_symbol.type.subtype(), new_symbol.type.subtype(), ns))
+  {
+    if(to_array_type(old_symbol.type).size().is_nil() &&
+       to_array_type(new_symbol.type).size().is_not_nil())
+    {
+      to_array_type(old_symbol.type).size()=
+        to_array_type(new_symbol.type).size();
+      return;
+    }
+
+    if(to_array_type(new_symbol.type).size().is_nil() &&
+       to_array_type(old_symbol.type).size().is_not_nil())
+    {
+      // ok, keep old
+      return;
+    }
+  }
+
+  link_error(
+    old_symbol,
+    new_symbol,
+    "unexpected difference between type symbols");
+}
+
+/*******************************************************************\
+
+Function: linkingt::needs_renaming_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool linkingt::needs_renaming_type(
+  const symbolt &old_symbol,
+  const symbolt &new_symbol)
+{
+  assert(new_symbol.is_type);
+  
+  if(!old_symbol.is_type)
+    return true;
+
+  if(old_symbol.type==new_symbol.type)
+    return false;
+  
+  if(old_symbol.type.id()==ID_incomplete_struct &&
+     new_symbol.type.id()==ID_struct)
+    return false; // not different
+  
+  if(old_symbol.type.id()==ID_struct &&
+     new_symbol.type.id()==ID_incomplete_struct)
+    return false; // not different
+  
+  if(old_symbol.type.id()==ID_incomplete_union &&
+     new_symbol.type.id()==ID_union)
+    return false; // not different
+  
+  if(old_symbol.type.id()==ID_union &&
+     new_symbol.type.id()==ID_incomplete_union)
+    return false; // not different
+
+  if(old_symbol.type.id()==ID_array &&
+     new_symbol.type.id()==ID_array &&
+     base_type_eq(old_symbol.type.subtype(), new_symbol.type.subtype(), ns))
+  {
+    if(to_array_type(old_symbol.type).size().is_nil() &&
+       to_array_type(new_symbol.type).size().is_not_nil())
+      return false; // not different
+
+    if(to_array_type(new_symbol.type).size().is_nil() &&
+       to_array_type(old_symbol.type).size().is_not_nil())
+      return false; // not different
+  }
+  
+  return true; // different
+}
+
+/*******************************************************************\
+
+Function: linkingt::do_type_dependencies
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void linkingt::do_type_dependencies(id_sett &needs_to_be_renamed)
+{
+  // Any type that uses a type that will be renamed also
+  // needs to be renamed, and so on, until saturation.
+
+  used_byt used_by;
+
+  forall_symbols(s_it, src_symbol_table.symbols)
+  {
+    if(s_it->second.is_type)
+    {
+      find_symbols_sett type_symbols_used;
+      find_type_symbols(s_it->second.type, type_symbols_used);
+
+      for(find_symbols_sett::const_iterator
+          it=type_symbols_used.begin();
+          it!=type_symbols_used.end();
+          it++)
+      {
+        used_by[*it].insert(s_it->first);
+      }
+    }
+  }
+
+  std::stack<irep_idt> queue;
+
+  for(id_sett::const_iterator
+      d_it=needs_to_be_renamed.begin();
+      d_it!=needs_to_be_renamed.end();
+      d_it++)
+    queue.push(*d_it);
+
+  while(!queue.empty())
+  {
+    irep_idt id=queue.top();
+    queue.pop();
+
+    const id_sett &u=used_by[id];
+
+    for(id_sett::const_iterator
+        d_it=u.begin();
+        d_it!=u.end();
+        d_it++)
+      if(needs_to_be_renamed.insert(*d_it).second)
+      {
+        queue.push(*d_it);
+        #ifdef DEBUG
+        str << "LINKING: needs to be renamed (dependency): " << s_it->first;
+        debug();
+        #endif
+      }
+  }
+}
+  
+/*******************************************************************\
+
+Function: linkingt::rename_symbols
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void linkingt::rename_symbols(const id_sett &needs_to_be_renamed)
+{
+  for(id_sett::const_iterator
+      it=needs_to_be_renamed.begin();
+      it!=needs_to_be_renamed.end();
+      it++)
+  {
+    symbolt &new_symbol=src_symbol_table.symbols[*it];
+
+    irep_idt new_identifier=rename(*it);
+    new_symbol.name=new_identifier;
+    
+    #ifdef DEBUG
+    str << "LINKING: renaming " << *it << " to "
+        << new_identifier;
+    debug();
+    #endif
+
+    if(new_symbol.is_type)
+      rename_symbol.insert_type(*it, new_identifier);
+    else
+      rename_symbol.insert_expr(*it, new_identifier);
+  }
+}
+
+/*******************************************************************\
+
+Function: linkingt::copy_symbols
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void linkingt::copy_symbols()
+{
+  Forall_symbols(s_it, src_symbol_table.symbols)
+  {
+    // apply the renaming
+    rename_symbol(s_it->second.type);
+    rename_symbol(s_it->second.value);
+  
+    // renamed?
+    if(s_it->first!=s_it->second.name)
+    {
+      // new
+      main_symbol_table.add(s_it->second);
+    }
+    else
+    {
+      symbol_tablet::symbolst::iterator
+        m_it=main_symbol_table.symbols.find(s_it->first);
+    
+      if(m_it==main_symbol_table.symbols.end())
+      {
+        // new
+        main_symbol_table.add(s_it->second);
+      }
+      else
+      {
+        // duplicate
+        if(s_it->second.is_type)
+          duplicate_type_symbol(m_it->second, s_it->second);
+        else
+          duplicate_non_type_symbol(m_it->second, s_it->second);
+      }
+    }
+  }
+}
+
+/*******************************************************************\
+
 Function: linkingt::typecheck
 
   Inputs:
@@ -568,127 +731,38 @@ Function: linkingt::typecheck
 
 void linkingt::typecheck()
 {
-  // we inspect all the symbols in src_symbol_table
+  // We do this in three phases. We first figure out which symbols need to
+  // be renamed, and then build the renaming, and finally apply this
+  // renaming in the second pass over the symbol table.
   
-  forall_symbols(it, src_symbol_table.symbols)
-    inspect_src_symbol(it->first);
-}
-
-/*******************************************************************\
-
-Function: linkingt::inspect_src_symbol
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void linkingt::inspect_src_symbol(const irep_idt &identifier)
-{
-  // is it done already?
-  if(completed.find(identifier)!=completed.end())
-    return;
-
-  // look it up, it must be there
-  symbolt &new_symbol=src_symbol_table.lookup(identifier);
-
-  // resolve recursion on types; we shouldn't need specific care
-  // for non-types even though recursion may occur via initializers
-  if(!processing.insert(identifier).second)
+  // PHASE 1: identify symbols to be renamed
+  
+  id_sett needs_to_be_renamed;
+  
+  forall_symbols(s_it, src_symbol_table.symbols)
   {
-    if(!main_symbol_table.has_symbol(identifier))
-      return;
-
-    symbolt &old_symbol=main_symbol_table.lookup(identifier);
-    bool move=false;
-    if(new_symbol.is_type && old_symbol.is_type)
-      duplicate_type_symbol(old_symbol, new_symbol, move);
-
-    if(move)
+    symbol_tablet::symbolst::const_iterator
+      m_it=main_symbol_table.symbols.find(s_it->first);
+  
+    if(m_it!=main_symbol_table.symbols.end() && // duplicate
+       needs_renaming(m_it->second, s_it->second))
     {
-      irep_idt old_identifier=new_symbol.name;
-      irep_idt new_identifier=rename(old_identifier);
-
-      replace_symbol.insert(old_identifier, symbol_typet(new_identifier));
-    }
-
-    return;
-  }
-
-  // first find out what symbols this uses
-  find_symbols_sett symbols;
-  find_type_and_expr_symbols(new_symbol.value, symbols);
-  find_type_and_expr_symbols(new_symbol.type, symbols);
-  // also add function parameters
-  if(new_symbol.type.id()==ID_code)
-  {
-    const code_typet &code_type=to_code_type(new_symbol.type);
-    const code_typet::parameterst &parameters=code_type.parameters();
-
-    for(code_typet::parameterst::const_iterator
-        it=parameters.begin();
-        it!=parameters.end();
-        it++)
-      // identifiers for prototypes need not exist
-      if(!it->get_identifier().empty() &&
-          src_symbol_table.has_symbol(it->get_identifier()))
-        symbols.insert(it->get_identifier());
-  }
-
-  // make sure we inspect those first!
-  for(find_symbols_sett::const_iterator
-      s_it=symbols.begin();
-      s_it!=symbols.end();
-      s_it++)
-    inspect_src_symbol(*s_it);
-    
-  // first order of business is to apply renaming
-  replace_symbol.replace(new_symbol.value);
-  replace_symbol.replace(new_symbol.type);        
-  // also rename function parameters, if necessary
-  if(new_symbol.type.id()==ID_code)
-  {
-    code_typet &code_type=to_code_type(new_symbol.type);
-    code_typet::parameterst &parameters=code_type.parameters();
-
-    for(code_typet::parameterst::iterator
-        it=parameters.begin();
-        it!=parameters.end();
-        it++)
-    {
-      replace_symbolt::expr_mapt::const_iterator r=
-        replace_symbol.expr_map.find(it->get_identifier());
-      if(r!=replace_symbol.expr_map.end())
-        it->set_identifier(to_symbol_expr(r->second).get_identifier());
+      needs_to_be_renamed.insert(s_it->first);
+      #ifdef DEBUG
+      str << "LINKING: needs to be renamed: " << s_it->first;
+      debug();
+      #endif
     }
   }
-    
-  // any symbols contained in new_symbol are now renamed within src_symbol_table and
-  // the (possibly renamed) contained symbols are in main_symbol_table
-  // any checks for duplicates are now safe to exclusively use lookups on
-  // main_symbol_table (via ns)
+  
+  // renaming types may trigger further renaming
+  do_type_dependencies(needs_to_be_renamed);
+  
+  // PHASE 2: rename them
+  rename_symbols(needs_to_be_renamed);
 
-  // ok, now check if we are to expect a collision
-  const symbol_tablet::symbolst::iterator main_s_it=
-    main_symbol_table.symbols.find(identifier);
-    
-  if(main_s_it!=main_symbol_table.symbols.end())
-    duplicate_symbol(main_s_it->second, new_symbol); // handle the collision
-  else
-  {
-    // add into destination symbol_table -- should never fail,
-    // as there is no collision
-    
-    bool result=main_symbol_table.move(new_symbol);
-    assert(!result);    
-  }
-
-  // symbol is really done and can now be used within main_symbol_table
-  completed.insert(identifier);
-  processing.erase(identifier);
+  // PHASE 3: copy new symbols to main table
+  copy_symbols();
 }
 
 /*******************************************************************\
