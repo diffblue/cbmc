@@ -146,14 +146,14 @@ void linkingt::link_error(
 {
   err_location(new_symbol.location);
 
-  str << "error: " << msg << " \""
+  str << "error: " << msg << " `"
       << old_symbol.display_name()
-      << "\"" << std::endl;
-  str << "old definition in module " << old_symbol.module
-      << " " << old_symbol.location << std::endl
+      << "'" << std::endl;
+  str << "old definition in module `" << old_symbol.module
+      << "' " << old_symbol.location << std::endl
       << type_to_string_verbose(ns, old_symbol) << std::endl;
-  str << "new definition in module " << new_symbol.module
-      << " " << new_symbol.location << std::endl
+  str << "new definition in module `" << new_symbol.module
+      << "' " << new_symbol.location << std::endl
       << type_to_string_verbose(ns, new_symbol);
 
   throw 0;
@@ -449,6 +449,9 @@ void linkingt::duplicate_type_symbol(
       old_symbol,
       new_symbol,
       "conflicting definition for symbol");
+
+  if(old_symbol.type==new_symbol.type)
+    return;
 
   if(old_symbol.type.id()==ID_incomplete_struct &&
      new_symbol.type.id()==ID_struct)
