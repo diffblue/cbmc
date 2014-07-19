@@ -7,7 +7,6 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <cassert>
-
 #include <stack>
 
 #include <util/find_symbols.h>
@@ -619,7 +618,13 @@ void linkingt::do_type_dependencies(id_sett &needs_to_be_renamed)
         d_it!=u.end();
         d_it++)
       if(needs_to_be_renamed.insert(*d_it).second)
+      {
         queue.push(*d_it);
+        #ifdef DEBUG
+        str << "LINKING: needs to be renamed (dependency): " << s_it->first;
+        debug();
+        #endif
+      }
   }
 }
   
@@ -647,6 +652,12 @@ void linkingt::rename_symbols(const id_sett &needs_to_be_renamed)
     irep_idt new_identifier=rename(*it);
     new_symbol.name=new_identifier;
     
+    #ifdef DEBUG
+    str << "LINKING: renaming " << *it << " to "
+        << new_identifier;
+    debug();
+    #endif
+
     if(new_symbol.is_type)
       replace_symbol.insert_type(*it, new_identifier);
     else
@@ -682,7 +693,7 @@ void linkingt::copy_symbols()
     }
     else
     {
-      symbol_tablet::symbolst::const_iterator
+      symbol_tablet::symbolst::iterator
         m_it=main_symbol_table.symbols.find(s_it->first);
     
       if(m_it==main_symbol_table.symbols.end())
@@ -693,6 +704,10 @@ void linkingt::copy_symbols()
       else
       {
         // duplicate
+        if(s_it->second.is_type)
+          duplicate_type_symbol(m_it->second, s_it->second);
+        else
+          duplicate_non_type_symbol(m_it->second, s_it->second);
       }
     }
   }
@@ -717,7 +732,7 @@ void linkingt::typecheck()
   // renaming in the second pass over the symbol table.
   
   // PHASE 1: identify symbols to be renamed
-
+  
   id_sett needs_to_be_renamed;
   
   forall_symbols(s_it, src_symbol_table.symbols)
@@ -727,7 +742,13 @@ void linkingt::typecheck()
   
     if(m_it!=main_symbol_table.symbols.end() && // duplicate
        needs_renaming(m_it->second, s_it->second))
+    {
       needs_to_be_renamed.insert(s_it->first);
+      #ifdef DEBUG
+      str << "LINKING: needs to be renamed: " << s_it->first;
+      debug();
+      #endif
+    }
   }
   
   // renaming types may trigger further renaming
