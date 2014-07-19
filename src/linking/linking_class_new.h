@@ -30,7 +30,7 @@ public:
    
   virtual void typecheck();
   
-  rename_symbolt replace_symbol;
+  rename_symbolt rename_symbol;
  
 protected:
 

@@ -285,8 +285,8 @@ void linkingt::duplicate_non_type_symbol(
       if(old_symbol.value.is_nil())
       {
         // the one with body wins!
-        replace_symbol(new_symbol.value);
-        replace_symbol(new_symbol.type);
+        rename_symbol(new_symbol.value);
+        rename_symbol(new_symbol.type);
         old_symbol.value=new_symbol.value;
         old_symbol.type=new_symbol.type; // for parameter identifiers
       }
@@ -663,9 +663,9 @@ void linkingt::rename_symbols(const id_sett &needs_to_be_renamed)
     #endif
 
     if(new_symbol.is_type)
-      replace_symbol.insert_type(*it, new_identifier);
+      rename_symbol.insert_type(*it, new_identifier);
     else
-      replace_symbol.insert_expr(*it, new_identifier);
+      rename_symbol.insert_expr(*it, new_identifier);
   }
 }
 
@@ -685,9 +685,9 @@ void linkingt::copy_symbols()
 {
   Forall_symbols(s_it, src_symbol_table.symbols)
   {
-    // apply the replacement map
-    replace_symbol(s_it->second.type);
-    replace_symbol(s_it->second.value);
+    // apply the renaming
+    rename_symbol(s_it->second.type);
+    rename_symbol(s_it->second.value);
   
     // renamed?
     if(s_it->first!=s_it->second.name)
