@@ -11,8 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/config.h>
 #include <util/replace_symbol.h>
 
-#include <linking/linking.h>
-
 #include "cprover_library.h"
 #include "ansi_c_language.h"
 
