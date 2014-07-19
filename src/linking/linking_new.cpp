@@ -207,16 +207,17 @@ irep_idt linkingt::rename(irep_idt id)
 
   while(true)
   {
-    irep_idt new_identifier=id2string(id)+"$link"+i2string(++cnt);
+    irep_idt new_identifier=
+      id2string(id)+"$link"+i2string(++cnt);
 
-    if(main_symbol_table.symbols.find(new_identifier)==
-       main_symbol_table.symbols.end() &&
-       renamed_ids.find(new_identifier)==
-       renamed_ids.end())
-    {
-      renamed_ids.insert(new_identifier);
-      return new_identifier;
-    }
+    if(main_symbol_table.symbols.find(new_identifier)!=
+       main_symbol_table.symbols.end())
+      continue; // already in main symbol table
+    
+    if(!renamed_ids.insert(new_identifier).second)
+      continue; // used this for renaming already
+
+    return new_identifier;
   }
 }
 
