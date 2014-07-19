@@ -683,12 +683,19 @@ Function: linkingt::copy_symbols
 
 void linkingt::copy_symbols()
 {
+  // First apply the renaming
   Forall_symbols(s_it, src_symbol_table.symbols)
   {
     // apply the renaming
     rename_symbol(s_it->second.type);
     rename_symbol(s_it->second.value);
+  }
+
+  // Move over all the non-colliding ones
+  id_sett collisions;
   
+  Forall_symbols(s_it, src_symbol_table.symbols)
+  {
     // renamed?
     if(s_it->first!=s_it->second.name)
     {
@@ -706,15 +713,25 @@ void linkingt::copy_symbols()
         main_symbol_table.add(s_it->second);
       }
       else
-      {
-        // duplicate
-        if(s_it->second.is_type)
-          duplicate_type_symbol(m_it->second, s_it->second);
-        else
-          duplicate_non_type_symbol(m_it->second, s_it->second);
-      }
+        collisions.insert(s_it->first);
     }
   }
+  
+  // Now do the collisions
+  for(id_sett::const_iterator
+      i_it=collisions.begin();
+      i_it!=collisions.end();
+      i_it++)
+  {
+    symbolt &old_symbol=main_symbol_table.symbols[*i_it];
+    symbolt &new_symbol=src_symbol_table.symbols[*i_it];
+    
+    if(new_symbol.is_type)
+      duplicate_type_symbol(old_symbol, new_symbol);
+    else
+      duplicate_non_type_symbol(old_symbol, new_symbol);
+  }
+
 }
 
 /*******************************************************************\
