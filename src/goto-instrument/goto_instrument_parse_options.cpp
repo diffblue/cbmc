@@ -326,10 +326,10 @@ int goto_instrument_parse_optionst::doit()
 
       status() << "Interval Analysis" << eom;
       namespacet ns(symbol_table);
-      static_analysist<interval_domaint> interval_analysis(ns);
-      interval_analysis(goto_functions);
+      ait<interval_domaint> interval_analysis;
+      interval_analysis(goto_functions, ns);
       
-      interval_analysis.output(goto_functions, std::cout);
+      interval_analysis.output(ns, goto_functions, std::cout);
       return 0;
     }
     
