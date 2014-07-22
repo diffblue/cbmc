@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "is_threaded.h"
 
+#define USE_DEPRECATED_STATIC_ANALYSIS_H
 #include "static_analysis.h"
 
 /*******************************************************************\

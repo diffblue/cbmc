@@ -23,15 +23,21 @@ Function: invariant_set_domaint::transform
 \*******************************************************************/
 
 void invariant_set_domaint::transform(
-  const namespacet &ns,
   locationt from_l,
-  locationt to_l)
+  locationt to_l,
+  ai_baset &ai,
+  const namespacet &ns)
 {
   switch(from_l->type)
   {
   case GOTO:
     {
-      exprt tmp(static_analysis_baset::get_guard(from_l, to_l));
+      exprt tmp(from_l->guard);
+
+      goto_programt::const_targett next=from_l;
+      next++;
+      if(next==to_l) tmp.make_not();
+
       simplify(tmp, ns);
       invariant_set.strengthen(tmp);
     }

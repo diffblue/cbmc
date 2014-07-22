@@ -30,8 +30,9 @@ Function: interval_domaint::output
 \*******************************************************************/
 
 void interval_domaint::output(
-  const namespacet &ns,
-  std::ostream &out) const
+  std::ostream &out,
+  const ai_baset &ai,
+  const namespacet &ns) const
 {
   for(int_mapt::const_iterator
       i_it=int_map.begin(); i_it!=int_map.end(); i_it++)
@@ -71,9 +72,10 @@ Function: interval_domaint::transform
 \*******************************************************************/
 
 void interval_domaint::transform(
-  const namespacet &ns,
   locationt from,
-  locationt to)
+  locationt to,
+  ai_baset &ai,
+  const namespacet &ns)
 {
   const goto_programt::instructiont &instruction=*from;
   switch(instruction.type)
@@ -130,7 +132,10 @@ Function: interval_domaint::merge
 
 \*******************************************************************/
 
-bool interval_domaint::merge(const interval_domaint &b, locationt to)
+bool interval_domaint::merge(
+  const interval_domaint &b,
+  locationt from,
+  locationt to)
 {
   if(!b.seen) return false;
   if(!seen) { *this=b; return true; }
