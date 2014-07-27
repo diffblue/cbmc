@@ -4384,10 +4384,13 @@ bool Parser::rUnaryExpr(exprt &exp)
       break;
 
     case TOK_INCR:
+      exp=exprt(ID_sideeffect);
+      exp.set(ID_statement, ID_preincrement);
+      break;
+
     case TOK_DECR:
       exp=exprt(ID_sideeffect);
-      exp.set(ID_statement,
-        tk.text=="++"?ID_preincrement:ID_predecrement);
+      exp.set(ID_statement, ID_predecrement);
       break;
 
     default:
@@ -4950,16 +4953,25 @@ bool Parser::rPostfixExpr(exprt &exp)
       break;
 
     case TOK_INCR:
+      lex.GetToken(op);
+
+      {
+        exprt tmp(ID_sideeffect);
+        tmp.move_to_operands(exp);
+        tmp.set(ID_statement, ID_postincrement);
+        set_location(tmp, op);
+        exp.swap(tmp);
+      }
+      break;
+
     case TOK_DECR:
       lex.GetToken(op);
 
       {
         exprt tmp(ID_sideeffect);
         tmp.move_to_operands(exp);
-        tmp.set(ID_statement,
-          op.text=="++"?ID_postincrement:ID_postdecrement);
+        tmp.set(ID_statement, ID_postdecrement);
         set_location(tmp, op);
-
         exp.swap(tmp);
       }
       break;
