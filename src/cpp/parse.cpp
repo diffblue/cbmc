@@ -496,14 +496,14 @@ bool Parser::rNamespaceSpec(cpp_namespace_spect &namespace_spec)
   if(lex.GetToken(tk1)!=TOK_NAMESPACE)
     return false;
 
-  std::string name;
+  irep_idt name;
 
   if(lex.LookAhead(0)=='{')
     name="";
   else
   {
     if(lex.GetToken(tk2)==TOK_IDENTIFIER)
-      name.swap(tk2.text);
+      name=tk2.data.get(ID_C_base_name);
     else
       return false;
   }
@@ -1672,17 +1672,37 @@ bool Parser::optIntegralTypeOrClassSpec(typet &p)
     std::cout << "Parser::optIntegralTypeOrClassSpec 1\n";
     #endif // DEBUG
 
-    if(t==TOK_CHAR || t==TOK_INT || t==TOK_SHORT || t==TOK_LONG || t==TOK_SIGNED
-       || t==TOK_WCHAR_T || t==TOK_COMPLEX // new !!!
-       || t==TOK_UNSIGNED || t==TOK_FLOAT || t==TOK_DOUBLE || t==TOK_VOID
-       || t==TOK_INT8 || t==TOK_INT16 || t==TOK_INT32 || t==TOK_INT64
-       || t==TOK_GCC_FLOAT128 || t==TOK_BOOL || t==TOK_CPROVER_BOOL
-       )
+    irep_idt type_id;
+
+    switch(t)
+    {
+    case TOK_CHAR: type_id=ID_char; break;
+    case TOK_INT: type_id=ID_int; break;
+    case TOK_SHORT: type_id=ID_short; break;
+    case TOK_LONG: type_id=ID_long; break;
+    case TOK_SIGNED: type_id=ID_signed; break;
+    case TOK_WCHAR_T: type_id=ID_wchar_t; break;
+    case TOK_COMPLEX: type_id=ID_complex; break;
+    case TOK_UNSIGNED: type_id=ID_unsigned; break;
+    case TOK_FLOAT: type_id=ID_float; break;
+    case TOK_DOUBLE: type_id=ID_double; break;
+    case TOK_VOID: type_id=ID_void; break;
+    case TOK_INT8: type_id=ID_int8; break;
+    case TOK_INT16: type_id=ID_int16; break;
+    case TOK_INT32: type_id=ID_int32; break;
+    case TOK_INT64: type_id=ID_int64; break;
+    case TOK_GCC_FLOAT128: type_id=ID_gcc_float128; break;
+    case TOK_BOOL: type_id=ID_bool; break;
+    case TOK_CPROVER_BOOL: type_id=ID_proper_bool; break;
+    default: type_id=irep_idt();
+    }
+    
+    if(type_id!=irep_idt())
     {
       Token tk;
       typet kw;
       lex.GetToken(tk);
-      kw=typet(tk.text);
+      kw=typet(type_id);
       set_location(kw, tk);
 
       merge_types(kw, p);
