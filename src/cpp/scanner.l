@@ -443,9 +443,9 @@ __CPROVER_bool      { loc(); return TOK_CPROVER_BOOL; }
                       return TOK_STRING;
                     }
 
-"("                 { loc(); return yytext[0]; }
-")"                 { loc(); return yytext[0]; }
-","                 { loc(); return yytext[0]; }
+"("                 { loc(); return '('; }
+")"                 { loc(); return ')'; }
+","                 { loc(); return ','; }
 
 {cpplineno}         { set_line_no(); }
 {pragma}            { /* ignore it */ }
