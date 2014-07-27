@@ -79,6 +79,7 @@ public:
 
   inline void set_location(exprt &e)
   {
+    // Only set line number when needed, as this destroys sharing.
     if(previous_line_no!=line_no)
     {
       previous_line_no=line_no;
