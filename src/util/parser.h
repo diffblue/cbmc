@@ -12,7 +12,6 @@ class parsert:public messaget
 {
 public:
   std::istream *in;
-  locationt location;
   
   std::string last_line;
   
@@ -21,15 +20,17 @@ public:
   virtual void clear()
   {
     line_no=0;
+    previous_line_no=0;
     stack.clear();
     location.clear();
     last_line.clear();
   }
   
   inline parsert() { clear(); }
-  
   virtual ~parsert() { }
 
+  // The following are for the benefit of the scanner
+  
   inline bool read(char &ch)
   {
     if(!in->read(&ch, 1)) return false;
@@ -56,16 +57,14 @@ public:
     const std::string &message,
     const std::string &before);
     
-  void inc_line_no()
+  inline void inc_line_no()
   {
     ++line_no;
-    location.set_line(line_no);
   }
   
   inline void set_line_no(unsigned _line_no)
   {
     line_no=_line_no;
-    location.set_line(line_no);
   }
   
   inline void set_file(const irep_idt &file)
@@ -80,11 +79,23 @@ public:
 
   inline void set_location(exprt &e)
   {
+    if(previous_line_no!=line_no)
+    {
+      previous_line_no=line_no;
+      location.set_line(line_no);
+    }
+    
     e.location()=location;
   }
-
-private:
-  unsigned line_no;
+  
+  inline void set_function(const irep_idt &function)
+  {
+    location.set_function(function);
+  }
+  
+protected:
+  locationt location;
+  unsigned line_no, previous_line_no;
 };
  
 exprt &_newstack(parsert &parser, unsigned &x);
