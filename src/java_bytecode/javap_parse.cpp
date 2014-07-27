@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <fstream>
 #include <sstream>
 #include <cstdlib> // for system()
+#include <map>
 
 #include <util/parser.h>
 #include <util/message_stream.h>
