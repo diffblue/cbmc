@@ -23,19 +23,19 @@ public:
     line_no=0;
     stack.clear();
     location.clear();
-    char_buffer.clear();
+    last_line.clear();
   }
   
   inline parsert() { clear(); }
   
   virtual ~parsert() { }
 
-  virtual bool read(char &ch)
+  inline bool read(char &ch)
   {
-    if(!read2(ch)) return false;
+    if(!in->read(&ch, 1)) return false;
 
     if(ch=='\n')
-      last_line="";
+      last_line.clear();
     else
       last_line+=ch;
     
@@ -46,25 +46,10 @@ public:
   {
     return true;
   }
-   
-  virtual bool peek(char &ch)
+
+  inline bool eof()
   {
-    if(!char_buffer.empty())
-    {
-      ch=char_buffer.front();
-      return true;
-    }
-    
-    if(!in->read(&ch, 1)) 
-      return false;
-     
-    char_buffer.push_back(ch);
-    return true;
-  }
-  
-  virtual bool eof()
-  {
-    return char_buffer.empty() && in->eof();
+    return in->eof();
   }
   
   void parse_error(
@@ -77,7 +62,7 @@ public:
     location.set_line(line_no);
   }
   
-  void set_line_no(unsigned _line_no)
+  inline void set_line_no(unsigned _line_no)
   {
     line_no=_line_no;
     location.set_line(line_no);
@@ -99,20 +84,7 @@ public:
   }
 
 private:
-  virtual bool read2(char &ch)
-  {
-    if(!char_buffer.empty())
-    {
-      ch=char_buffer.front();
-      char_buffer.pop_front();
-      return true;
-    }
-    
-    return in->read(&ch, 1)!=0;
-  }
-   
   unsigned line_no;
-  std::list<char> char_buffer;
 };
  
 exprt &_newstack(parsert &parser, unsigned &x);
