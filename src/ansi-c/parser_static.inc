@@ -334,7 +334,7 @@ static void create_function_scope(const YYSTYPE d)
   irep_idt function_name=declarator.get_base_name();
 
   // record which function we are in
-  PARSER.location.set_function(function_name);
+  PARSER.set_function(function_name);
 
   std::string prefix=PARSER.current_scope().prefix+
                      id2string(function_name)+"::";

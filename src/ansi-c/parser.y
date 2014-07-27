@@ -2456,7 +2456,7 @@ function_definition:
           PARSER.pop_scope();
           
           // We are no longer in any function.
-          PARSER.location.set_function(irep_idt());
+          PARSER.set_function(irep_idt());
         }
         ;
 
