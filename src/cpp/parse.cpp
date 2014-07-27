@@ -831,9 +831,8 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
       lex.GetToken(tk2);
 
       exprt name(ID_name);
+      name.set(ID_identifier, tk2.data.get(ID_C_base_name));
       set_location(name, tk2);
-      name.set(ID_identifier, tk2.text);
-      set_location(name,tk1);
       cpp_name.get_sub().push_back(name);
       declarator.name().swap(cpp_name);
     }
@@ -1625,16 +1624,16 @@ bool Parser::rAttribute()
 
   switch(tk.kind)
   {
-   case '(':
+  case '(':
     rAttribute();
     if(lex.LookAhead(0)!=')') return false;
     lex.GetToken(tk);
     break;
 
-   case TOK_IDENTIFIER:
+  case TOK_IDENTIFIER:
     break;
 
-   default:
+  default:
     return false;
   }
 
@@ -2567,7 +2566,7 @@ bool Parser::rName(irept &name)
       #endif
       lex.GetToken(tk);
       components.push_back(irept(ID_name));
-      components.back().set(ID_identifier, tk.text);
+      components.back().set(ID_identifier, tk.data.get(ID_C_base_name));
       set_location(components.back(), tk);
 
       {
@@ -2818,7 +2817,7 @@ bool Parser::rPtrToMember(irept &ptr_to_mem)
     case TOK_IDENTIFIER:
       lex.GetToken(tk);
       components.push_back(irept(ID_name));
-      components.back().set(ID_identifier, tk.text);
+      components.back().set(ID_identifier, tk.data.get(ID_C_base_name));
       set_location(components.back(), tk);
 
       {
@@ -3293,7 +3292,7 @@ bool Parser::rEnumBody(irept &body)
     body.get_sub().push_back(irept());
     irept &n=body.get_sub().back();
     set_location(n, tk);
-    n.set(ID_name, tk.text);
+    n.set(ID_name, tk.data.get(ID_C_base_name));
 
     if(lex.LookAhead(0, tk2)=='=') // set the constant
     {
@@ -5415,7 +5414,7 @@ bool Parser::rVarNameCore(exprt &name)
 
       lex.GetToken(tk);
       components.push_back(irept(ID_name));
-      components.back().set(ID_identifier, tk.text);
+      components.back().set(ID_identifier, tk.data.get(ID_C_base_name));
       set_location(components.back(), tk);
 
       // may be followed by template arguments
@@ -5802,7 +5801,7 @@ bool Parser::rStatement(codet &statement)
     if(lex.GetToken(tk3)!=';')
       return false;
 
-    statement.set(ID_destination, tk2.text);
+    statement.set(ID_destination, tk2.data.get(ID_C_base_name));
 
     return true;
 
@@ -5893,7 +5892,7 @@ bool Parser::rStatement(codet &statement)
 
       statement=codet(ID_label);
       set_location(statement, tk1);
-      statement.set(ID_label, tk1.text);
+      statement.set(ID_label, tk1.data.get(ID_C_base_name));
 
       lex.GetToken(tk2);
 

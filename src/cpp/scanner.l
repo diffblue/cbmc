@@ -57,6 +57,9 @@ void cpp_scanner_init()
 static inline int make_identifier()
 {
   loc();
+  irep_idt base_name=yytext;
+  PARSER.current_token().data.id(ID_symbol);
+  PARSER.current_token().data.set(ID_C_base_name, base_name);
   return TOK_IDENTIFIER;
 }
 
