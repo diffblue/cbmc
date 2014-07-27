@@ -2661,65 +2661,97 @@ bool Parser::rOperatorName(irept &name)
   Token tk;
 
   int t=lex.LookAhead(0);
-  if(t=='+' || t=='-' || t=='*' || t=='/' || t=='%' || t=='^' ||
-     t=='&' || t=='|' || t=='~' || t=='!' || t=='=' || t=='<' ||
-     t=='>' || 
-     t==TOK_MULTASSIGN || t==TOK_DIVASSIGN || t==TOK_MODASSIGN ||
-     t==TOK_PLUSASSIGN || t==TOK_MINUSASSIGN || t==TOK_SHLASSIGN ||
-     t==TOK_SHRASSIGN  || t==TOK_ANDASSIGN ||
-     t==TOK_XORASSIGN  || t==TOK_ORASSIGN ||     
-     t==TOK_SHIFTLEFT  || t==TOK_SHIFTRIGHT ||
-     t==TOK_EQ || t==TOK_NE ||
-     t==TOK_LE || t==TOK_GE || 
-     t==TOK_ANDAND || t==TOK_OROR || 
-     t==TOK_INCR || t==TOK_DECR ||
-     t==',' || t==TOK_DOTPM || t==TOK_ARROWPM || t==TOK_ARROW)
+  
+  irep_idt operator_id;
+  
+  switch(t)
   {
-    lex.GetToken(tk);
-    name=irept(tk.text);
-    set_location(name, tk);
-  }
-  else if(t==TOK_NEW || t==TOK_DELETE)
-  {
-    lex.GetToken(tk);
+  case '+':
+  case '-':
+  case '*':
+  case '/':
+  case '%':
+  case '^':
+  case '&':
+  case '|':
+  case '~':
+  case '!':
+  case '=':
+  case '<':
+  case '>':
+  case ',':
+    operator_id=irep_idt(std::string(char(t), 1));
+    break;
 
-    if(lex.LookAhead(0)!='[')
+  case TOK_MULTASSIGN: operator_id="*="; break;
+  case TOK_DIVASSIGN: operator_id="/="; break;
+  case TOK_MODASSIGN: operator_id="%="; break;
+  case TOK_PLUSASSIGN: operator_id="+="; break;
+  case TOK_MINUSASSIGN: operator_id="-="; break;
+  case TOK_SHLASSIGN: operator_id="<<="; break;
+  case TOK_SHRASSIGN: operator_id=">>="; break;
+  case TOK_ANDASSIGN: operator_id="&="; break;
+  case TOK_XORASSIGN: operator_id="^="; break;
+  case TOK_ORASSIGN: operator_id="|="; break;
+  case TOK_SHIFTLEFT: operator_id="<<"; break;
+  case TOK_SHIFTRIGHT: operator_id=">>"; break;
+  case TOK_EQ: operator_id="=="; break;
+  case TOK_NE: operator_id="!="; break;
+  case TOK_LE: operator_id="<="; break;
+  case TOK_GE: operator_id=">="; break;
+  case TOK_ANDAND: operator_id="&&"; break;
+  case TOK_OROR: operator_id="||"; break;
+  case TOK_INCR: operator_id="++"; break;
+  case TOK_DECR: operator_id="--"; break;
+  case TOK_DOTPM: operator_id=".*"; break;
+  case TOK_ARROWPM: operator_id="->*"; break;
+  case TOK_ARROW: operator_id="->"; break;
+  
+  case TOK_NEW:
+  case TOK_DELETE:
     {
-      name=irept(t==TOK_NEW?ID_cpp_new:ID_cpp_delete);
-      set_location(name, tk);
-    }
-    else
-    {
-      name=irept(t==TOK_NEW?ID_cpp_new_array:ID_cpp_delete_array);
-      set_location(name, tk);
-
       lex.GetToken(tk);
 
-      if(lex.GetToken(tk)!=']')
-        return false;
+      if(lex.LookAhead(0)!='[')
+      {
+        name=irept(t==TOK_NEW?ID_cpp_new:ID_cpp_delete);
+        set_location(name, tk);
+      }
+      else
+      {
+        name=irept(t==TOK_NEW?ID_cpp_new_array:ID_cpp_delete_array);
+        set_location(name, tk);
+
+        lex.GetToken(tk);
+
+        if(lex.GetToken(tk)!=']')
+          return false;
+      }
+      
     }
-  }
-  else if(t=='(')
-  {
+    return true;
+
+  case '(':
     lex.GetToken(tk);
     name=irept("()");
     set_location(name, tk);
+    return lex.GetToken(tk)==')';
 
-    if(lex.GetToken(tk)!=')')
-      return false;
-  }
-  else if(t=='[')
-  {
+  case '[':
     lex.GetToken(tk);
     name=irept("[]");
     set_location(name, tk);
+    return lex.GetToken(tk)==']';
 
-    if(lex.GetToken(tk)!=']')
-      return false;
-  }
-  else
+  default:
     return rCastOperatorName(name);
-
+  }
+  
+  assert(operator_id!=irep_idt());
+  lex.GetToken(tk);
+  name=irept(operator_id);
+  set_location(name, tk);
+  
   return true;
 }
 
@@ -4082,8 +4114,18 @@ bool Parser::rRelationalExpr(exprt &exp, bool temp_args)
 
     exprt left;
     left.swap(exp);
+    
+    irep_idt id;
 
-    exp=exprt(tk.text);
+    switch(t)
+    {
+    case TOK_LE: id=ID_le; break;
+    case TOK_GE: id=ID_ge; break;
+    case '<': id=ID_lt; break;
+    case '>': id=ID_gt; break;
+    }
+
+    exp=exprt(id);
     exp.move_to_operands(left, right);
     set_location(exp, tk);
   }
@@ -4160,8 +4202,15 @@ bool Parser::rAdditiveExpr(exprt &exp)
 
     exprt left;
     left.swap(exp);
+    
+    irep_idt id;
+    switch(t)
+    {
+    case '+': id=ID_plus; break;
+    case '-': id=ID_minus; break;
+    }
 
-    exp=exprt(tk.text);
+    exp=exprt(id);
     exp.move_to_operands(left, right);
     set_location(exp, tk);
   }
@@ -4199,8 +4248,16 @@ bool Parser::rMultiplyExpr(exprt &exp)
 
     exprt left;
     left.swap(exp);
-
-    exp=exprt((tk.text=="%")?ID_mod:tk.text);
+    
+    irep_idt id;
+    switch(t)
+    {
+    case '*': id=ID_mult; break;
+    case '/': id=ID_div; break;
+    case '%': id=ID_mod; break;
+    }
+    
+    exp=exprt(id);
     exp.move_to_operands(left, right);
     set_location(exp, tk);
   }
