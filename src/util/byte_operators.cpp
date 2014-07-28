@@ -77,7 +77,10 @@ Function: endianness_mapt::build_rec
 
 \*******************************************************************/
 
-void endianness_mapt::build_rec(const typet &src, bool little_endian)
+void endianness_mapt::build_rec(
+  const typet &src,
+  bool little_endian,
+  size_t &bit_field_bits)
 {
   if(little_endian)
   {
@@ -91,7 +94,7 @@ void endianness_mapt::build_rec(const typet &src, bool little_endian)
   }  
 
   if(src.id()==ID_symbol)
-    build_rec(ns.follow(src), little_endian);
+    build_rec(ns.follow(src), little_endian, bit_field_bits);
   else if(src.id()==ID_unsignedbv ||
           src.id()==ID_signedbv ||
           src.id()==ID_fixedbv ||
@@ -100,6 +103,12 @@ void endianness_mapt::build_rec(const typet &src, bool little_endian)
   {
     mp_integer s=pointer_offset_size(ns, src); // error is -1
     size_t s_int=integer2long(s), base=map.size();
+
+    if(s_int>0 && bit_field_bits>=8)
+    {
+      --s_int;
+      bit_field_bits%=8;
+    }
 
     for(size_t i=0; i<s_int; i++)
     {
@@ -119,9 +128,20 @@ void endianness_mapt::build_rec(const typet &src, bool little_endian)
         it!=struct_type.components().end();
         it++)
     {
-      // todo: worry about non-byte granularity bitfields
-    
-      build_rec(it->type(), little_endian);
+      if(it->get_is_bit_field())
+      {
+        size_t width=to_bitvector_type(it->type()).get_width();
+
+        if(bit_field_bits>0 &&
+           bit_field_bits+width<8)
+        {
+          bit_field_bits+=width;
+          continue;
+        }
+
+        bit_field_bits+=width;
+      }
+      build_rec(it->type(), little_endian, bit_field_bits);
     }
   }
   else if(src.id()==ID_array)
@@ -134,7 +154,7 @@ void endianness_mapt::build_rec(const typet &src, bool little_endian)
     {
       while(s>0)
       {
-        build_rec(array_type.subtype(), little_endian);
+        build_rec(array_type.subtype(), little_endian, bit_field_bits);
         --s;
       }
     }
