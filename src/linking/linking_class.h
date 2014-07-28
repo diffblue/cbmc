@@ -62,6 +62,14 @@ protected:
   void duplicate_non_type_symbol(
     symbolt &old_symbol,
     symbolt &new_symbol);
+
+  void duplicate_code_symbol(
+    symbolt &old_symbol,
+    symbolt &new_symbol);
+
+  void duplicate_object_symbol(
+    symbolt &old_symbol,
+    symbolt &new_symbol);
   
   void duplicate_type_symbol(
     symbolt &old_symbol,
