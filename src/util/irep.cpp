@@ -8,6 +8,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 
+#ifdef SUB_IS_LIST
+#include <algorithm>
+#endif
+
 #ifdef IREP_DEBUG
 #include <iostream>
 #endif
@@ -22,6 +26,39 @@ irept nil_rep_storage;
 
 #ifdef SHARING
 irept::dt irept::empty_d;
+#endif
+
+/*******************************************************************\
+
+Function: named_subt_lower_bound
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+#ifdef SUB_IS_LIST
+static inline bool named_subt_order(
+  const std::pair<irep_namet, irept> &a,
+  const irep_namet &b)
+{
+  return a.first<b;
+}
+
+static inline irept::named_subt::const_iterator named_subt_lower_bound(
+  const irept::named_subt &s, const irep_namet &id)
+{
+  return std::lower_bound(s.begin(), s.end(), id, named_subt_order);
+}
+
+static inline irept::named_subt::iterator named_subt_lower_bound(
+  irept::named_subt &s, const irep_namet &id)
+{
+  return std::lower_bound(s.begin(), s.end(), id, named_subt_order);
+}
 #endif
 
 /*******************************************************************\
@@ -326,13 +363,24 @@ const irep_idt &irept::get(const irep_namet &name) const
   const named_subt &s=
     is_comment(name)?get_comments():get_named_sub();
 
-  named_subt::const_iterator it=s.find(name);
+  #ifdef SUB_IS_LIST
+  named_subt::const_iterator it=named_subt_lower_bound(s, name);
 
+  if(it==s.end() ||
+     it->first!=name)
+  {
+    const static irep_idt empty;
+    return empty;
+  }
+  #else
+  named_subt::const_iterator it=s.find(name);
+  
   if(it==s.end())
   {
     const static irep_idt empty;
     return empty;
   }
+  #endif
 
   return it->second.id();
 }
@@ -422,9 +470,13 @@ void irept::remove(const irep_namet &name)
   named_subt &s=
     is_comment(name)?get_comments():get_named_sub();
 
-  named_subt::iterator it=s.find(name);
+  #ifdef SUB_IS_LIST
+  named_subt::iterator it=named_subt_lower_bound(s, name);
 
-  if(it!=s.end()) s.erase(it);
+  if(it!=s.end() && it->first==name) s.erase(it);
+  #else
+  s.erase(name);
+  #endif
 }  
 
 /*******************************************************************\
@@ -444,10 +496,18 @@ const irept &irept::find(const irep_namet &name) const
   const named_subt &s=
     is_comment(name)?get_comments():get_named_sub();
 
+  #ifdef SUB_IS_LIST
+  named_subt::const_iterator it=named_subt_lower_bound(s, name);
+
+  if(it==s.end() ||
+     it->first!=name)
+    return get_nil_irep();
+  #else
   named_subt::const_iterator it=s.find(name);
 
   if(it==s.end())
     return get_nil_irep();
+  #endif
 
   return it->second;
 }
@@ -469,7 +529,17 @@ irept &irept::add(const irep_namet &name)
   named_subt &s=
     is_comment(name)?get_comments():get_named_sub();
 
+  #ifdef SUB_IS_LIST
+  named_subt::iterator it=named_subt_lower_bound(s, name);
+
+  if(it==s.end() ||
+     it->first!=name)
+    it=s.insert(it, std::make_pair(name, irept()));
+
+  return it->second;
+  #else
   return s[name];
+  #endif
 }
 
 /*******************************************************************\
@@ -489,6 +559,17 @@ irept &irept::add(const irep_namet &name, const irept &irep)
   named_subt &s=
     is_comment(name)?get_comments():get_named_sub();
 
+  #ifdef SUB_IS_LIST
+  named_subt::iterator it=named_subt_lower_bound(s, name);
+
+  if(it==s.end() ||
+     it->first!=name)
+    it=s.insert(it, std::make_pair(name, irep));
+  else
+    it->second=irep;
+
+  return it->second;
+  #else
   std::pair<named_subt::iterator, bool> entry=
     s.insert(std::make_pair(name, irep));
 
@@ -496,6 +577,7 @@ irept &irept::add(const irep_namet &name, const irept &irep)
     entry.first->second=irep;
 
   return entry.first->second;
+  #endif
 }
 
 /*******************************************************************\
