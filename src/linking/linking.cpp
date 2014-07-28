@@ -264,8 +264,172 @@ void linkingt::duplicate_code_symbol(
   symbolt &new_symbol)
 {
   // Both are functions.
-  // We don't compare the types, they will be too different;
-  // we just care about the code
+  if(!base_type_eq(old_symbol.type, new_symbol.type, ns))
+  {
+    const code_typet &old_t=to_code_type(old_symbol.type);
+    const code_typet &new_t=to_code_type(new_symbol.type);
+
+    // if one of them was an implicit declaration, just issue a warning
+    if(!old_symbol.location.get_function().empty() &&
+       old_symbol.value.is_nil())
+    {
+      // issue a warning and overwrite
+      link_warning(
+        old_symbol,
+        new_symbol,
+        "implicit function declaration");
+
+      old_symbol.type=new_symbol.type;
+      old_symbol.location=new_symbol.location;
+    }
+    else if(!new_symbol.location.get_function().empty() &&
+            new_symbol.value.is_nil())
+    {
+      // issue a warning
+      link_warning(
+        old_symbol,
+        new_symbol,
+        "ignoring conflicting implicit function declaration");
+    }
+    // handle (incomplete) function prototypes
+    else if(base_type_eq(old_t.return_type(), new_t.return_type(), ns) &&
+            ((old_t.parameters().empty() && old_t.has_ellipsis()) ||
+             (new_t.parameters().empty() && new_t.has_ellipsis())))
+    {
+      if(old_t.parameters().empty() && old_t.has_ellipsis())
+      {
+        old_symbol.type=new_symbol.type;
+        old_symbol.location=new_symbol.location;
+      }
+    }
+    // mismatch on number of parameters is definitively an error
+    else if(old_t.parameters().size()!=new_t.parameters().size())
+    {
+      link_error(
+        old_symbol,
+        new_symbol,
+        "conflicting parameter counts of function declarations");
+    }
+    else
+    {
+      // the number of parameters matches, collect all the conflicts
+      // and see whether they can be cured
+      std::string warn_msg;
+      bool replace=false;
+      typedef std::deque<std::pair<typet, typet> > conflictst;
+      conflictst conflicts;
+
+      if(!base_type_eq(old_t.return_type(), new_t.return_type(), ns))
+        conflicts.push_back(
+          std::make_pair(old_t.return_type(), new_t.return_type()));
+
+      code_typet::parameterst::const_iterator n_it=
+        new_t.parameters().begin();
+      for(code_typet::parameterst::const_iterator
+          o_it=old_t.parameters().begin();
+          o_it!=old_t.parameters().end();
+          ++o_it, ++n_it)
+      {
+        if(!base_type_eq(o_it->type(), n_it->type(), ns))
+          conflicts.push_back(
+            std::make_pair(o_it->type(), n_it->type()));
+      }
+
+      while(!conflicts.empty())
+      {
+        const typet &t1=ns.follow(conflicts.front().first);
+        const typet &t2=ns.follow(conflicts.front().second);
+
+        // void vs. non-void return type may be acceptable if the
+        // return value is never used
+        if((t1.id()==ID_empty || t2.id()==ID_empty) &&
+           (old_symbol.value.is_nil() || new_symbol.value.is_nil()))
+        {
+          if(warn_msg.empty())
+            warn_msg="void/non-void return type conflict on function";
+          replace=
+            new_symbol.value.is_not_nil() ||
+            (old_symbol.value.is_nil() && t2.id()==ID_empty);
+        }
+        // different pointer arguments without implementation may work
+        else if(t1.id()==ID_pointer && t2.id()==ID_pointer &&
+                old_symbol.value.is_nil() && new_symbol.value.is_nil())
+        {
+          if(warn_msg.empty())
+            warn_msg="different pointer types in extern function";
+        }
+        // different pointer arguments with implementation - the
+        // implementation is always right, even though such code may
+        // be severely broken
+        else if(t1.id()==ID_pointer && t2.id()==ID_pointer &&
+                old_symbol.value.is_nil()!=new_symbol.value.is_nil())
+        {
+          if(warn_msg.empty())
+            warn_msg="different pointer types in function";
+          replace=new_symbol.value.is_not_nil();
+        }
+        // transparent union with (or entirely without) implementation is
+        // ok -- this primarily helps all those people that don't get
+        // _GNU_SOURCE consistent
+        else if((t1.id()==ID_union &&
+                 (t1.get_bool(ID_C_transparent_union) ||
+                  conflicts.front().first.get_bool(ID_C_transparent_union)) &&
+                 new_symbol.value.is_nil()) ||
+                (t2.id()==ID_union &&
+                 (t2.get_bool(ID_C_transparent_union) ||
+                  conflicts.front().second.get_bool(ID_C_transparent_union)) &&
+                 old_symbol.value.is_nil()))
+        {
+          const bool use_old=
+            t1.id()==ID_union &&
+            (t1.get_bool(ID_C_transparent_union) ||
+             conflicts.front().first.get_bool(ID_C_transparent_union)) &&
+            new_symbol.value.is_nil();
+
+          const union_typet &dest_union_type=
+            to_union_type(use_old?t1:t2);
+          const typet &src_type=use_old?t2:t1;
+
+          bool found=false;
+          for(union_typet::componentst::const_iterator
+              it=dest_union_type.components().begin();
+              !found && it!=dest_union_type.components().end();
+              it++)
+            if(base_type_eq(it->type(), src_type, ns))
+            {
+              found=true;
+              if(warn_msg.empty())
+                warn_msg="conflict on transparent union parameter in function";
+              replace=!use_old;
+            }
+
+          if(!found)
+            break;
+        }
+        else
+          break;
+
+        conflicts.pop_front();
+      }
+
+      if(!conflicts.empty())
+        link_error(
+          old_symbol,
+          new_symbol,
+          "conflicting function declarations");
+      else
+      {
+        // warns about the first inconsistency
+        link_warning(old_symbol, new_symbol, warn_msg);
+
+        if(replace)
+        {
+          old_symbol.type=new_symbol.type;
+          old_symbol.location=new_symbol.location;
+        }
+      }
+    }
+  }
 
   if(!new_symbol.value.is_nil())
   {
