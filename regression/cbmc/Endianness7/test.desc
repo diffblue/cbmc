@@ -1,6 +1,6 @@
 CORE
 main.c
---32 --little-endian
+--big-endian --no-simplify
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

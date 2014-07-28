@@ -18,6 +18,8 @@ void __cdecl f3();
 
 __declspec(thread) int thread_local;
 
+struct __declspec(dllimport) some_struct_tag { int x; };
+
 //__delegate int GetDayOfWeek();
 
 // __event 
@@ -97,7 +99,7 @@ void __stdcall f10();
 
 // __try_cast
 
-//int __unaligned *unaligned_int_ptr;
+int __unaligned *unaligned_int_ptr;
 
 // __unhook
 
@@ -109,7 +111,7 @@ void __stdcall f10();
 
 // __w64
 
-__wchar_t some_wchar;
+// __wchar_t some_wchar;
 
 // wchar_t some_other_wchar;
 

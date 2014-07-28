@@ -1,7 +1,11 @@
 typedef void ** __builtin_va_list;
+typedef void ** __builtin_ms_va_list;
+
 void __builtin_va_start(void *ap, ...);
 void __builtin_va_end(void *ap);
 void __builtin_va_copy(__builtin_va_list dest, __builtin_va_list src);
+void __builtin_ms_va_start(void *ap, ...);
+void __builtin_ms_va_end(void *ap);
 void *__builtin_va_arg_pack();
 int __builtin_va_arg_pack_len();
 int __builtin_constant_p();

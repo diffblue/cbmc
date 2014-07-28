@@ -8,7 +8,11 @@ int main (int argc, char **argv) {
 
   float result = f + g;
 
-  assert(result == target && signbit(result) == signbit(target));
+  assert(result == target);
+  
+  #ifndef _MSC_VER
+  assert(signbit(result) == signbit(target));
+  #endif
 
   return 0;
 }
