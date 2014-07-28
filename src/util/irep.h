@@ -10,7 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_IREP_H
 
 #include <vector>
-#include <map>
 #include <string>
 #include <cassert>
 #include <iosfwd>
@@ -19,6 +18,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #define SHARING
 //#define HASH_CODE
 //#define USE_MOVE
+//#define SUB_IS_LIST
+
+#ifdef SUB_IS_LIST
+#include <list>
+#else
+#include <map>
+#endif
 
 #ifdef USE_DSTRING
 #include "dstring.h"
@@ -80,8 +86,18 @@ extern inline const std::string &name2string(const irep_namet &n)
 class irept
 {
 public:
+  // These are not stable.
   typedef std::vector<irept> subt;
+
+  // named_subt has to provide stable references; with C++11 we could
+  // use std::forward_list or std::vector< unique_ptr<T> > to save
+  // memory and increase efficiency.
+  
+  #ifdef SUB_IS_LIST
+  typedef std::list<std::pair<irep_namet, irept> > named_subt;
+  #else
   typedef std::map<irep_namet, irept> named_subt;
+  #endif
 
   inline bool is_nil() const { return id()==ID_nil; }
   inline bool is_not_nil() const { return id()!=ID_nil; }
