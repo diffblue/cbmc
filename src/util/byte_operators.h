@@ -66,6 +66,7 @@ extern inline byte_extract_exprt &to_byte_extract_expr(exprt &expr)
 }
 
 irep_idt byte_extract_id();
+irep_idt byte_update_id();
 
 /*! \brief TO_BE_DOCUMENTED
 */
