@@ -55,7 +55,7 @@ bool read_bin_goto_object_v2(
     // obsolete: symordering
     irepconverter.read_gb_word(in);
 
-    unsigned flags=irepconverter.read_gb_word(in);
+    std::size_t flags=irepconverter.read_gb_word(in);
     
     sym.is_type = (flags & (1 << 15))!=0;
     sym.is_property = (flags & (1 << 14))!=0; 

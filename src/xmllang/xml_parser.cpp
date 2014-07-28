@@ -35,7 +35,7 @@ bool parse_xml(
   xmlt &dest)
 {
   xml_parser.clear();
-  xml_parser.location.set_file(filename);
+  xml_parser.set_file(filename);
   xml_parser.in=&in;
   xml_parser.set_message_handler(message_handler);
 

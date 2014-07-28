@@ -12,7 +12,7 @@ Date: June 2006
 #define GOTO_CC_COMPILE_H
 
 #include <util/symbol.h>
-#include <util/replace_symbol.h>
+#include <util/rename_symbol.h>
 
 #include <langapi/language_ui.h>
 #include <goto-programs/goto_functions.h>
@@ -69,7 +69,7 @@ public:
 protected:
   cmdlinet &cmdline;
   
-  unsigned function_body_count( const goto_functionst &functions );
+  unsigned function_body_count(const goto_functionst &);
   
   void add_compiler_specific_defines(class configt &config) const;
 
@@ -78,11 +78,11 @@ protected:
     goto_functionst &dest_functions,
     symbol_tablet &src_symbol_table,
     goto_functionst &src_functions,
-    const replace_symbolt &replace_symbol);
+    const rename_symbolt &replace_symbol);
   
-  void replace_symbols_in_function(
-    goto_functionst::goto_functiont &function,
-    const replace_symbolt &replace_symbol) const;
+  void rename_symbols_in_function(
+    goto_functionst::goto_functiont &,
+    const rename_symbolt &) const;
 
   void convert_symbols(goto_functionst &dest);
 };

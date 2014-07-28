@@ -16,7 +16,6 @@ Date: June 2006
 
 #include <util/config.h>
 #include <util/tempdir.h>
-#include <util/replace_symbol.h>
 #include <util/base_type.h>
 #include <util/i2string.h>
 #include <util/cmdline.h>
@@ -773,7 +772,7 @@ bool compilet::read_object(
     
   if(link_functions(symbol_table, functions,
                     temp_symbol_table, temp_functions,
-                    linking.replace_symbol))
+                    linking.rename_symbol))
     return true;
 
   return false;
@@ -866,21 +865,19 @@ bool compilet::link_functions(
   goto_functionst &dest_functions,
   symbol_tablet &src_symbol_table,
   goto_functionst &src_functions,
-  const replace_symbolt &replace_symbol)
+  const rename_symbolt &rename_symbol)
 {
   // merge functions
   Forall_goto_functions(src_it, src_functions)
   {
     // the function might have been renamed    
-    replace_symbolt::expr_mapt::const_iterator e_it=
-      replace_symbol.expr_map.find(src_it->first);
+    rename_symbolt::expr_mapt::const_iterator e_it=
+      rename_symbol.expr_map.find(src_it->first);
+
     irep_idt final_id=src_it->first;
-    if(e_it!=replace_symbol.expr_map.end())
-    {
-      const exprt &rep_exp=e_it->second;
-      if(rep_exp.id()==ID_symbol)
-        final_id=rep_exp.get(ID_identifier);
-    }
+
+    if(e_it!=rename_symbol.expr_map.end())
+      final_id=e_it->second;
   
     // already there?
     goto_functionst::function_mapt::iterator dest_f_it=
@@ -888,7 +885,7 @@ bool compilet::link_functions(
 
     if(dest_f_it==dest_functions.function_map.end()) // not there yet
     {
-      replace_symbols_in_function(src_it->second, replace_symbol);
+      rename_symbols_in_function(src_it->second, rename_symbol);
 
       goto_functionst::goto_functiont &in_dest_symbol_table=
         dest_functions.function_map[final_id];
@@ -907,7 +904,7 @@ bool compilet::link_functions(
       if(in_dest_symbol_table.body.instructions.empty())
       {
         // the one with body wins!
-        replace_symbols_in_function(src_func, replace_symbol);
+        rename_symbols_in_function(src_func, rename_symbol);
         
         in_dest_symbol_table.body.swap(src_func.body);
         in_dest_symbol_table.body_available=src_func.body_available;
@@ -924,7 +921,7 @@ bool compilet::link_functions(
       else
       {
         // the linking code will have ensured that types match
-        replace_symbol.replace(src_func.type);
+        rename_symbol(src_func.type);
         assert(base_type_eq(in_dest_symbol_table.type, src_func.type, ns));
       }
     }
@@ -935,7 +932,7 @@ bool compilet::link_functions(
 
 /*******************************************************************\
 
-Function: compilet::replace_symbols_in_function
+Function: compilet::rename_symbols_in_function
 
   Inputs:
 
@@ -945,17 +942,17 @@ Function: compilet::replace_symbols_in_function
 
 \*******************************************************************/
 
-void compilet::replace_symbols_in_function(
+void compilet::rename_symbols_in_function(
   goto_functionst::goto_functiont &function,
-  const replace_symbolt &replace_symbol) const
+  const rename_symbolt &rename_symbol) const
 {
   goto_programt &program=function.body;
-  replace_symbol.replace(function.type);
+  rename_symbol(function.type);
 
   Forall_goto_program_instructions(iit, program)
   {
-    replace_symbol.replace(iit->code);
-    replace_symbol.replace(iit->guard);
+    rename_symbol(iit->code);
+    rename_symbol(iit->guard);
   }
 }
 

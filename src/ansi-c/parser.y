@@ -123,6 +123,7 @@ extern char *yyansi_ctext;
 %token TOK_GCC_DECIMAL128 "_Decimal128"
 %token TOK_GCC_ASM     "__asm__"
 %token TOK_GCC_ASM_PAREN "__asm__ (with parentheses)"
+%token TOK_GCC_ATTRIBUTE
 %token TOK_GCC_ATTRIBUTE_ALIGNED "aligned"
 %token TOK_GCC_ATTRIBUTE_TRANSPARENT_UNION "transparent_union"
 %token TOK_GCC_ATTRIBUTE_PACKED "packed"
@@ -138,9 +139,11 @@ extern char *yyansi_ctext;
 %token TOK_GCC_BUILTIN_TYPES_COMPATIBLE_P "__builtin_types_compatible_p"
 %token TOK_OFFSETOF    "__offsetof"
 %token TOK_ALIGNOF     "__alignof__"
-%token TOK_MSC_FINALLY "finally"
-%token TOK_MSC_EXCEPT  "except"
-%token TOK_MSC_LEAVE   "leave"
+%token TOK_MSC_TRY     "__try"
+%token TOK_MSC_FINALLY "__finally"
+%token TOK_MSC_EXCEPT  "__except"
+%token TOK_MSC_LEAVE   "__leave"
+%token TOK_MSC_DECLSPEC "__declspec"
 %token TOK_INTERFACE   "__interface"
 %token TOK_CDECL       "__cdecl"
 %token TOK_STDCALL     "__stdcall"
@@ -201,9 +204,9 @@ extern char *yyansi_ctext;
 %token TOK_THROW       "throw"
 %token TOK_TYPEID      "typeid"
 %token TOK_TYPENAME    "typename"
+%token TOK_TRY         "try"
 %token TOK_USING       "using"
 %token TOK_VIRTUAL     "virtual"
-%token TOK_TRY         "try"
 %token TOK_SCOPE       "::"
 %token TOK_DOTPM       ".*"
 %token TOK_ARROWPM     "->*"
@@ -1189,6 +1192,73 @@ gcc_attribute_parameters:
         ;
 */
 
+msc_decl_identifier:
+          TOK_IDENTIFIER
+        {
+          stack($$).id(stack($$).get(ID_identifier));
+        }
+        | TOK_TYPEDEFNAME
+        {
+          stack($$).id(stack($$).get(ID_identifier));
+        }
+        | TOK_RESTRICT
+        {
+          stack($$).id(ID_restrict);
+        }
+        ;
+
+msc_decl_modifier:
+          msc_decl_identifier
+        | msc_decl_identifier '(' TOK_STRING ')'
+        {
+          $$=$1; mto($$, $3);
+        }
+        | msc_decl_identifier '(' TOK_INTEGER ')'
+        {
+          $$=$1; mto($$, $3);
+        }
+        | msc_decl_identifier '(' msc_decl_identifier '=' msc_decl_identifier ')'
+        {
+          $$=$1; mto($$, $3); mto($$, $5);
+        }
+        | msc_decl_identifier '(' msc_decl_identifier '=' msc_decl_identifier ',' msc_decl_identifier '=' msc_decl_identifier ')'
+        {
+          $$=$1; mto($$, $3); mto($$, $5); mto($$, $7); mto($$, $9);
+        }
+        | ',' { init($$, ID_nil); }
+        ;
+
+msc_declspec_seq:
+          msc_decl_modifier
+        {
+          init($$); mto($$, $1);
+        }
+        | msc_declspec_seq msc_decl_modifier
+        {
+          $$=$1; mto($$, $2);
+        }
+        ;
+
+msc_declspec:
+          TOK_MSC_DECLSPEC '(' msc_declspec_seq ')'
+        {
+          $$=$1; set($$, ID_msc_declspec);
+          stack($$).operands().swap(stack($3).operands());
+        }
+        | TOK_MSC_DECLSPEC '(' ')'
+        {
+          $$=$1; set($$, ID_msc_declspec);
+        }
+        ;
+
+msc_declspec_opt:
+          /* blank */
+        {
+          init($$, ID_nil);
+        }
+        | msc_declspec
+        ;
+
 storage_class:
           TOK_TYPEDEF      { $$=$1; set($$, ID_typedef); }
         | TOK_EXTERN       { $$=$1; set($$, ID_extern); }
@@ -1198,6 +1268,7 @@ storage_class:
         | TOK_INLINE       { $$=$1; set($$, ID_inline); }
         | TOK_THREAD_LOCAL { $$=$1; set($$, ID_thread_local); }
         | TOK_GCC_ASM      { $$=$1; set($$, ID_asm); }
+        | msc_declspec     { $$=$1; }
         ;
 
 basic_type_name:
@@ -1265,26 +1336,9 @@ pragma_packed:
 aggregate_name:
           aggregate_key
           gcc_type_attribute_opt
+          msc_declspec_opt
           {
             // an anon struct/union
-          }
-          '{' member_declaration_list_opt '}'
-          gcc_type_attribute_opt
-          pragma_packed
-        {
-          // save the members
-          stack($1).add(ID_components).get_sub().swap(
-            (irept::subt &)stack($5).operands());
-
-          // throw in the gcc attributes
-          $$=merge($1, merge($2, merge($7, $8)));
-        }
-        | aggregate_key
-          gcc_type_attribute_opt
-          identifier_or_typedef_name
-          {
-            // a struct/union with tag
-            stack($1).set(ID_tag, stack($3));
           }
           '{' member_declaration_list_opt '}'
           gcc_type_attribute_opt
@@ -1299,13 +1353,33 @@ aggregate_name:
         }
         | aggregate_key
           gcc_type_attribute_opt
+          msc_declspec_opt
+          identifier_or_typedef_name
+          {
+            // a struct/union with tag
+            stack($1).set(ID_tag, stack($4));
+          }
+          '{' member_declaration_list_opt '}'
+          gcc_type_attribute_opt
+          pragma_packed
+        {
+          // save the members
+          stack($1).add(ID_components).get_sub().swap(
+            (irept::subt &)stack($7).operands());
+
+          // throw in the gcc attributes
+          $$=merge($1, merge($2, merge($9, $10)));
+        }
+        | aggregate_key
+          gcc_type_attribute_opt
+          msc_declspec_opt
           identifier_or_typedef_name
           gcc_type_attribute_opt
         {
-          stack($1).set(ID_tag, stack($3));
+          stack($1).set(ID_tag, stack($4));
           stack($1).set(ID_components, ID_nil);
           // type attributes
-          $$=merge($1, merge($2, $4));
+          $$=merge($1, merge($2, $5));
         }
         ;
 
@@ -2184,7 +2258,7 @@ msc_asm_statement:
         ;
 
 msc_seh_statement:
-          TOK_TRY compound_statement
+          TOK_MSC_TRY compound_statement
           TOK_MSC_EXCEPT '(' comma_expression ')' compound_statement
         {
           $$=$1;
@@ -2193,7 +2267,7 @@ msc_seh_statement:
           mto($$, $5);
           mto($$, $7);
         }
-        | TOK_TRY compound_statement
+        | TOK_MSC_TRY compound_statement
           TOK_MSC_FINALLY compound_statement
         {
           $$=$1;
@@ -2382,7 +2456,7 @@ function_definition:
           PARSER.pop_scope();
           
           // We are no longer in any function.
-          PARSER.location.set_function(irep_idt());
+          PARSER.set_function(irep_idt());
         }
         ;
 

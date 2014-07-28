@@ -37,6 +37,7 @@ Function: main / wmain
 #ifdef IREP_HASH_STATS
 extern unsigned long long irep_hash_cnt;
 extern unsigned long long irep_cmp_cnt;
+extern unsigned long long irep_cmp_ne_cnt;
 #endif
 
 #ifdef _MSC_VER
@@ -54,6 +55,7 @@ int main(int argc, const char **argv)
   #ifdef IREP_HASH_STATS
   std::cout << "IREP_HASH_CNT=" << irep_hash_cnt << std::endl;
   std::cout << "IREP_CMP_CNT=" << irep_cmp_cnt << std::endl;
+  std::cout << "IREP_CMP_NE_CNT=" << irep_cmp_ne_cnt << std::endl;
   #endif
 
   return res;

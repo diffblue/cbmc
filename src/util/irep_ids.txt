@@ -245,6 +245,7 @@ static
 auto
 register
 thread_local
+thread
 C_thread_local #thread_local
 C_static_lifetime #static_lifetime
 mutable
@@ -501,6 +502,7 @@ friend
 explicit
 storage_spec
 member_spec
+msc_declspec
 gcc_attribute
 packed
 C_packed #packed

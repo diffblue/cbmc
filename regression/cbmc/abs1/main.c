@@ -1,6 +1,11 @@
 #include <math.h>
 #include <stdlib.h>
 
+#ifdef _WIN32
+#include <float.h>
+#define isnan _isnan
+#endif
+
 int main()
 {
   int my_i, iabs;
