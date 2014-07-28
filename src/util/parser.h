@@ -21,6 +21,7 @@ public:
   {
     line_no=0;
     previous_line_no=0;
+    column=1;
     stack.clear();
     location.clear();
     last_line.clear();
@@ -60,6 +61,7 @@ public:
   inline void inc_line_no()
   {
     ++line_no;
+    column=1;
   }
   
   inline void set_line_no(unsigned _line_no)
@@ -94,9 +96,15 @@ public:
     location.set_function(function);
   }
   
+  inline void advance_column(unsigned token_width)
+  {
+    column+=token_width;
+  }
+  
 protected:
   locationt location;
   unsigned line_no, previous_line_no;
+  unsigned column;
 };
  
 exprt &_newstack(parsert &parser, unsigned &x);
@@ -123,5 +131,10 @@ exprt &_newstack(parsert &parser, unsigned &x);
           } \
         } \
     } while(0)
+
+// The following tracks the column of the token, and is nicely explained here:
+// http://oreilly.com/linux/excerpts/9780596155971/error-reporting-recovery.html
+
+#define YY_USER_ACTION PARSER.advance_column(yyleng);
 
 #endif
