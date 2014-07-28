@@ -57,6 +57,8 @@ void parsert::parse_error(
 {
   std::string tmp=message;
   if(before!="") tmp+=" before `"+before+"'";
-  print(1, tmp, -1, location);
+  locationt tmp_location=location;
+  tmp_location.set_column(column-before.size());
+  print(1, tmp, -1, tmp_location);
 }
 
