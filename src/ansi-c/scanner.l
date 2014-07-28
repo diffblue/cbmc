@@ -120,7 +120,6 @@ delimiter       [ \t\b\r]
 newline         [\n\f\v]|"\\\n"
 whitespace      {delimiter}+
 ws              {delimiter}*
-ws_or_newline   ({delimiter}|{newline})*
 ucletter	[A-Z]
 lcletter	[a-z]
 letter		({ucletter}|{lcletter})
