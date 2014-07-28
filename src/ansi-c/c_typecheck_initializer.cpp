@@ -753,6 +753,8 @@ designatort c_typecheck_baset::make_designator(
               entry.type=tmp_type;
             }
             else if(c_it->get_anonymous() &&
+                    (follow(c_it->type()).id()==ID_struct ||
+                     follow(c_it->type()).id()==ID_union) &&
                     has_component_rec(
                       c_it->type(), component_name, *this))
             {

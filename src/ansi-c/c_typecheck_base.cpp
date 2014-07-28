@@ -109,7 +109,7 @@ void c_typecheck_baset::typecheck_symbol(symbolt &symbol)
   }
   else if(symbol.is_extern && !is_function)
   {
-    // variables mared as "extern" go into the global namespace
+    // variables marked as "extern" go into the global namespace
     // and have static lifetime
     new_name=root_name;
     symbol.is_static_lifetime=true;
@@ -579,6 +579,9 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
   }
   
   // take care of some flags
+  if(old_symbol.is_extern && !new_symbol.is_extern)
+    old_symbol.location=new_symbol.location;
+
   old_symbol.is_extern=old_symbol.is_extern && new_symbol.is_extern;
   
   // We should likely check is_volatile and
