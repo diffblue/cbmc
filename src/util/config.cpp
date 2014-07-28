@@ -817,7 +817,7 @@ bool configt::set(const cmdlinet &cmdline)
 
       // enable Cygwin
       #ifdef _WIN32
-      defines.push_back("__CYGWIN__");
+      ansi_c.defines.push_back("__CYGWIN__");
       #endif
     }
     else
