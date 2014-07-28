@@ -38,8 +38,6 @@ public:
   bool is_typedef, is_extern, is_static, is_register,
        is_inline, is_thread_local;
   
-  std::string as_string() const;
-
   friend bool operator == (
     const c_storage_spect &a,
     const c_storage_spect &b)

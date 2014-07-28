@@ -604,7 +604,9 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
               c_it!=components.end();
               c_it++)
           {
-            if(c_it->get_anonymous())
+            if(c_it->get_anonymous() &&
+               (follow(c_it->type()).id()==ID_struct ||
+                follow(c_it->type()).id()==ID_union))
             {
               if(has_component_rec(c_it->type(), component_name, *this))
               {
