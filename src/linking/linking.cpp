@@ -249,6 +249,182 @@ bool linkingt::needs_renaming_non_type(
   
 /*******************************************************************\
 
+Function: linkingt::duplicate_code_symbol
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void linkingt::duplicate_code_symbol(
+  symbolt &old_symbol,
+  symbolt &new_symbol)
+{
+  // Both are functions.
+  // We don't compare the types, they will be too different;
+  // we just care about the code
+
+  if(!new_symbol.value.is_nil())
+  {
+    if(old_symbol.value.is_nil())
+    {
+      // the one with body wins!
+      rename_symbol(new_symbol.value);
+      rename_symbol(new_symbol.type);
+      old_symbol.value=new_symbol.value;
+      old_symbol.type=new_symbol.type; // for parameter identifiers
+    }
+    else if(to_code_type(old_symbol.type).get_inlined())
+    {
+      // ok, silently ignore
+    }
+    else if(base_type_eq(old_symbol.type, new_symbol.type, ns))
+    {
+      // keep the one in old_symbol -- libraries come last!
+      str << "warning: function `" << old_symbol.name << "' in module `" << 
+        new_symbol.module << "' is shadowed by a definition in module `" << 
+        old_symbol.module << "'";
+      warning();
+    }
+    else
+      link_error(
+        old_symbol,
+        new_symbol,
+        "duplicate definition of function");
+  }
+}
+
+/*******************************************************************\
+
+Function: linkingt::duplicate_object_symbol
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void linkingt::duplicate_object_symbol(
+  symbolt &old_symbol,
+  symbolt &new_symbol)
+{
+  // both are variables
+
+  if(!base_type_eq(old_symbol.type, new_symbol.type, ns))
+  {
+    const typet &old_type=ns.follow(old_symbol.type);
+    const typet &new_type=ns.follow(new_symbol.type);
+  
+    if(old_type.id()==ID_array && new_type.id()==ID_array &&
+       base_type_eq(old_type.subtype(), new_type.subtype(), ns))
+    {
+      // still need to compare size
+      const exprt &old_size=to_array_type(old_type).size();
+      const exprt &new_size=to_array_type(new_type).size();
+      
+      if(old_size.is_nil() && new_size.is_not_nil())
+      {
+        old_symbol.type=new_symbol.type; // store new type
+      }
+      else if(old_size.is_not_nil() && new_size.is_nil())
+      {
+        // ok, we will use the old type
+      }
+      else
+        link_error(
+          old_symbol,
+          new_symbol,
+          "conflicting array sizes for variable");
+    }
+    else if(old_type.id()==ID_pointer && new_type.id()==ID_array)
+    {
+      // store new type
+      old_symbol.type=new_symbol.type;
+    }
+    else if(old_type.id()==ID_array && new_type.id()==ID_pointer)
+    {
+      // ignore
+    }
+    else if(old_type.id()==ID_pointer && new_type.id()==ID_pointer)
+    {
+      link_warning(
+        old_symbol,
+        new_symbol,
+        "conflicting pointer types for variable");
+    }
+    else if((old_type.id()==ID_incomplete_struct &&
+             new_type.id()==ID_struct) ||
+            (old_type.id()==ID_incomplete_union &&
+             new_type.id()==ID_union))
+    {
+      // store new type
+      old_symbol.type=new_symbol.type;
+    }
+    else if((old_type.id()==ID_struct &&
+             new_type.id()==ID_incomplete_struct) ||
+            (old_type.id()==ID_union &&
+             new_type.id()==ID_incomplete_union))
+    {
+      // ignore
+    }
+    else
+    {
+      link_error(
+        old_symbol,
+        new_symbol,
+        "conflicting types for variable");
+    }
+  }
+
+  // care about initializers    
+  
+  if(!new_symbol.value.is_nil() &&
+     !new_symbol.value.get_bool(ID_C_zero_initializer))
+  {
+    if(old_symbol.value.is_nil() ||
+       old_symbol.value.get_bool(ID_C_zero_initializer))
+    {
+      // new_symbol wins
+      old_symbol.value=new_symbol.value;
+    }
+    else
+    {
+      // try simplifier
+      exprt tmp_old=old_symbol.value,
+            tmp_new=new_symbol.value;
+            
+      simplify(tmp_old, ns);
+      simplify(tmp_new, ns);
+      
+      if(base_type_eq(tmp_old, tmp_new, ns))
+      {
+        // ok, the same
+      }
+      else
+      {
+        err_location(new_symbol.value);
+        str << "error: conflicting initializers for variable \""
+            << old_symbol.name
+            << "\"" << std::endl;
+        str << "old value in module " << old_symbol.module
+            << " " << old_symbol.value.find_location() << std::endl
+            << expr_to_string(ns, old_symbol.name, tmp_old) << std::endl;
+        str << "new value in module " << new_symbol.module
+            << " " << new_symbol.value.find_location() << std::endl
+            << expr_to_string(ns, new_symbol.name, tmp_new);
+        throw 0;
+      }
+    }
+  }
+}
+
+/*******************************************************************\
+
 Function: linkingt::duplicate_non_type_symbol
 
   Inputs:
@@ -275,151 +451,9 @@ void linkingt::duplicate_non_type_symbol(
       "conflicting definition for symbol");
 
   if(is_code_old_symbol)
-  {
-    // Both are functions.
-    // We don't compare the types, they will be too different;
-    // we just care about the code
-
-    if(!new_symbol.value.is_nil())
-    {
-      if(old_symbol.value.is_nil())
-      {
-        // the one with body wins!
-        rename_symbol(new_symbol.value);
-        rename_symbol(new_symbol.type);
-        old_symbol.value=new_symbol.value;
-        old_symbol.type=new_symbol.type; // for parameter identifiers
-      }
-      else if(to_code_type(old_symbol.type).get_inlined())
-      {
-        // ok, silently ignore
-      }
-      else if(base_type_eq(old_symbol.type, new_symbol.type, ns))
-      {
-        // keep the one in old_symbol -- libraries come last!
-        str << "warning: function `" << old_symbol.name << "' in module `" << 
-          new_symbol.module << "' is shadowed by a definition in module `" << 
-          old_symbol.module << "'";
-        warning();
-      }
-      else
-        link_error(
-          old_symbol,
-          new_symbol,
-          "duplicate definition of function");
-    }
-  }
+    duplicate_code_symbol(old_symbol, new_symbol);
   else
-  {
-    // both are variables
-
-    if(!base_type_eq(old_symbol.type, new_symbol.type, ns))
-    {
-      const typet &old_type=ns.follow(old_symbol.type);
-      const typet &new_type=ns.follow(new_symbol.type);
-    
-      if(old_type.id()==ID_array && new_type.id()==ID_array &&
-         base_type_eq(old_type.subtype(), new_type.subtype(), ns))
-      {
-        // still need to compare size
-        const exprt &old_size=to_array_type(old_type).size();
-        const exprt &new_size=to_array_type(new_type).size();
-        
-        if(old_size.is_nil() && new_size.is_not_nil())
-        {
-          old_symbol.type=new_symbol.type; // store new type
-        }
-        else if(old_size.is_not_nil() && new_size.is_nil())
-        {
-          // ok, we will use the old type
-        }
-        else
-          link_error(
-            old_symbol,
-            new_symbol,
-            "conflicting array sizes for variable");
-      }
-      else if(old_type.id()==ID_pointer && new_type.id()==ID_array)
-      {
-        // store new type
-        old_symbol.type=new_symbol.type;
-      }
-      else if(old_type.id()==ID_array && new_type.id()==ID_pointer)
-      {
-        // ignore
-      }
-      else if(old_type.id()==ID_pointer && new_type.id()==ID_pointer)
-      {
-        link_warning(
-          old_symbol,
-          new_symbol,
-          "conflicting pointer types for variable");
-      }
-      else if((old_type.id()==ID_incomplete_struct &&
-               new_type.id()==ID_struct) ||
-              (old_type.id()==ID_incomplete_union &&
-               new_type.id()==ID_union))
-      {
-        // store new type
-        old_symbol.type=new_symbol.type;
-      }
-      else if((old_type.id()==ID_struct &&
-               new_type.id()==ID_incomplete_struct) ||
-              (old_type.id()==ID_union &&
-               new_type.id()==ID_incomplete_union))
-      {
-        // ignore
-      }
-      else
-      {
-        link_error(
-          old_symbol,
-          new_symbol,
-          "conflicting types for variable");
-      }
-    }
-
-    // care about initializers    
-    
-    if(!new_symbol.value.is_nil() &&
-       !new_symbol.value.get_bool(ID_C_zero_initializer))
-    {
-      if(old_symbol.value.is_nil() ||
-         old_symbol.value.get_bool(ID_C_zero_initializer))
-      {
-        // new_symbol wins
-        old_symbol.value=new_symbol.value;
-      }
-      else
-      {
-        // try simplifier
-        exprt tmp_old=old_symbol.value,
-              tmp_new=new_symbol.value;
-              
-        simplify(tmp_old, ns);
-        simplify(tmp_new, ns);
-        
-        if(base_type_eq(tmp_old, tmp_new, ns))
-        {
-          // ok, the same
-        }
-        else
-        {
-          err_location(new_symbol.value);
-          str << "error: conflicting initializers for variable \""
-              << old_symbol.name
-              << "\"" << std::endl;
-          str << "old value in module " << old_symbol.module
-              << " " << old_symbol.value.find_location() << std::endl
-              << expr_to_string(ns, old_symbol.name, tmp_old) << std::endl;
-          str << "new value in module " << new_symbol.module
-              << " " << new_symbol.value.find_location() << std::endl
-              << expr_to_string(ns, new_symbol.name, tmp_new);
-          throw 0;
-        }
-      }
-    }
-  }
+    duplicate_object_symbol(old_symbol, new_symbol);
 
   // care about flags
 
