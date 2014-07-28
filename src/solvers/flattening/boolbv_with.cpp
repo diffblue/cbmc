@@ -309,6 +309,9 @@ void boolbvt::convert_with_union(
   bvt &next_bv)
 {
   next_bv=prev_bv;
+  
+  // Should use byte_update_exprt, see above,
+  // as the below doesn't work on big endian.
 
   const bvt &op2_bv=convert_bv(op2);
 
