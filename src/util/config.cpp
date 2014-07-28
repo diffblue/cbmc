@@ -814,6 +814,11 @@ bool configt::set(const cmdlinet &cmdline)
       // and we support that.
       ansi_c.preprocessor=ansi_ct::PP_GCC;
       ansi_c.mode=ansi_ct::MODE_GCC_C;
+
+      // enable Cygwin
+      #ifdef _WIN32
+      defines.push_back("__CYGWIN__");
+      #endif
     }
     else
     {
