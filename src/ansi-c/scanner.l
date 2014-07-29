@@ -509,13 +509,26 @@ void ansi_c_scanner_init()
                     BEGIN(MSC_ASM);
                     return TOK_MSC_ASM;
                   }
+                  else if(PARSER.cpp)
+                  {
+                    loc();
+                    return TOK_GCC_ASM;
+                  }
                   else
                     BEGIN(GCC_ASM);
                 }
 
 "asm"           { if(PARSER.mode==ansi_c_parsert::GCC ||
                      PARSER.mode==ansi_c_parsert::CW)
-                    BEGIN(GCC_ASM);
+                  {
+                    if(PARSER.cpp)
+                    {
+                      loc();
+                      return TOK_GCC_ASM;
+                    }
+                    else
+                      BEGIN(GCC_ASM);
+                  }
                   else
                     return make_identifier();
                 }
@@ -523,7 +536,15 @@ void ansi_c_scanner_init()
 "__asm__"       { if(PARSER.mode==ansi_c_parsert::GCC ||
                      PARSER.mode==ansi_c_parsert::CW ||
                      PARSER.mode==ansi_c_parsert::ARM)
-                    BEGIN(GCC_ASM);
+                  {
+                    if(PARSER.cpp)
+                    {
+                      loc();
+                      return TOK_GCC_ASM;
+                    }
+                    else
+                      BEGIN(GCC_ASM);
+                  }
                   else
                     return make_identifier();
                 }
@@ -659,9 +680,13 @@ __decltype          { if(PARSER.cpp && PARSER.mode==ansi_c_parsert::GCC)
                  }
 
 "__declspec" |
-"_declspec"     { if(PARSER.mode==ansi_c_parsert::MSC ||
-                     PARSER.mode==ansi_c_parsert::CW ||
-                     PARSER.mode==ansi_c_parsert::ARM)
+"_declspec"     { if(PARSER.cpp)
+                  {
+                    BEGIN(IGNORE_PARENS);
+                  }
+                  else if(PARSER.mode==ansi_c_parsert::MSC ||
+                          PARSER.mode==ansi_c_parsert::CW ||
+                          PARSER.mode==ansi_c_parsert::ARM)
                   {
                     loc(); return TOK_MSC_DECLSPEC;
                   }
