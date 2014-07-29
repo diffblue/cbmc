@@ -216,12 +216,6 @@ extern char *yyansi_ctext;
 %token TOK_MSC_IF_EXISTS "__if_exists"
 %token TOK_MSC_IF_NOT_EXISTS "__if_not_exists"
 
-/*** grammar selection ***/
-
-%token TOK_PARSE_LANGUAGE
-%token TOK_PARSE_EXPRESSION
-%token TOK_PARSE_TYPE
-
 /*** priority, associativity, etc. definitions **************************/
 
 %start grammar
@@ -237,24 +231,8 @@ extern char *yyansi_ctext;
 %}
 %%
 
-/*** Grammar selection **************************************************/
-
-grammar:
-          TOK_PARSE_LANGUAGE translation_unit
-        | TOK_PARSE_EXPRESSION comma_expression
-        {
-          ansi_c_declarationt ansi_c_declaration;
-          ansi_c_declaration.declarators().resize(1);
-          ansi_c_declaration.add_initializer(stack($2));
-          PARSER.copy_item(ansi_c_declaration);
-        }
-        | TOK_PARSE_TYPE type_name
-        {
-          ansi_c_declarationt ansi_c_declaration;
-          ansi_c_declaration.type()=
-            static_cast<const typet &>(static_cast<const irept &>(stack($2)));
-          PARSER.copy_item(ansi_c_declaration);
-        }
+grammar: 
+        translation_unit
         ;
 
 /*** Token with values **************************************************/
