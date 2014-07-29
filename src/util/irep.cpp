@@ -8,6 +8,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 
+#include "string2int.h"
+#include "irep.h"
+#include "i2string.h"
+#include "string_hash.h"
+#include "irep_hash.h"
+
 #ifdef SUB_IS_LIST
 #include <algorithm>
 #endif
@@ -15,12 +21,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifdef IREP_DEBUG
 #include <iostream>
 #endif
-
-#include "string2int.h"
-#include "irep.h"
-#include "i2string.h"
-#include "string_hash.h"
-#include "irep_hash.h"
 
 irept nil_rep_storage;
 
