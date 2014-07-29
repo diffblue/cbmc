@@ -195,13 +195,6 @@ void ansi_c_scanner_init()
 
 <INITIAL>.|\n   { BEGIN(GRAMMAR);
 		  yyless(0);		/* start again with this character */
-		  //yy_current_buffer->yy_at_bol = 1; /* at beginning of line */
-		  switch(PARSER.grammar)
-		   {
-                   case ansi_c_parsert::EXPRESSION: return TOK_PARSE_EXPRESSION;
-                   case ansi_c_parsert::LANGUAGE: return TOK_PARSE_LANGUAGE;
-		   default: assert(0);
-		   }
 		 }
 
 <GRAMMAR>"/*"   { BEGIN(COMMENT1); } /* begin C comment state */
