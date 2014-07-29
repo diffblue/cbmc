@@ -420,7 +420,7 @@ bool Parser::isTypeSpecifier()
   int t=lex.LookAhead(0);
 
   if(t==TOK_IDENTIFIER || t==TOK_SCOPE
-       || t==TOK_CONST || t==TOK_VOLATILE
+       || t==TOK_CONST || t==TOK_VOLATILE || t==TOK_RESTRICT
        || t==TOK_CHAR || t==TOK_INT || t==TOK_SHORT || t==TOK_LONG
        || t==TOK_WCHAR_T || t==TOK_COMPLEX // new !!!
        || t==TOK_SIGNED || t==TOK_UNSIGNED || t==TOK_FLOAT || t==TOK_DOUBLE
@@ -1559,14 +1559,14 @@ bool Parser::optStorageSpec(cpp_storage_spect &storage_spec)
 }
 
 /*
-  cv.qualify : (CONST | VOLATILE)+
+  cv.qualify : (CONST | VOLATILE | RESTRICT)+
 */
 bool Parser::optCvQualify(typet &cv)
 {
   for(;;)
   {
     int t=lex.LookAhead(0);
-    if(t==TOK_CONST || t==TOK_VOLATILE ||
+    if(t==TOK_CONST || t==TOK_VOLATILE || t==TOK_RESTRICT ||
        t==TOK_PTR32 || t==TOK_PTR64 ||
        t==TOK_GCC_ATTRIBUTE)
     {
@@ -1584,6 +1584,12 @@ bool Parser::optCvQualify(typet &cv)
 
       case TOK_VOLATILE:
         p=typet(ID_volatile);
+        set_location(p, tk);
+        merge_types(p, cv);
+        break;
+
+      case TOK_RESTRICT:
+        p=typet(ID_restrict);
         set_location(p, tk);
         merge_types(p, cv);
         break;
