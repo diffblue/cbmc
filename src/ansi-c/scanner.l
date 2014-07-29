@@ -45,24 +45,35 @@ int make_identifier()
 {
   loc();
 
+  // this hashes the identifier
   irep_idt base_name=yytext;
-  std::string identifier(id2string(base_name));
-
-  // figure out if this is a typedef or something else
-  ansi_c_id_classt result=
-    PARSER.lookup(identifier, PARSER.tag_following, false);
-
-  PARSER.tag_following=false;
-
-  stack(yyansi_clval).id(ID_symbol);
-  stack(yyansi_clval).set(ID_C_base_name, base_name);
-  stack(yyansi_clval).set(ID_identifier, identifier);
-  stack(yyansi_clval).set(ID_C_id_class, result);
-
-  if(result==ANSI_C_TYPEDEF)
-    return TOK_TYPEDEFNAME;
-  else
+  
+  if(PARSER.cpp)
+  {
+    stack(yyansi_clval).id(ID_symbol);
+    stack(yyansi_clval).set(ID_C_base_name, base_name);
     return TOK_IDENTIFIER;
+  }
+  else
+  {
+    std::string identifier(id2string(base_name));
+
+    // figure out if this is a typedef or something else
+    ansi_c_id_classt result=
+      PARSER.lookup(identifier, PARSER.tag_following, false);
+
+    PARSER.tag_following=false;
+
+    stack(yyansi_clval).id(ID_symbol);
+    stack(yyansi_clval).set(ID_C_base_name, base_name);
+    stack(yyansi_clval).set(ID_identifier, identifier);
+    stack(yyansi_clval).set(ID_C_id_class, result);
+
+    if(result==ANSI_C_TYPEDEF)
+      return TOK_TYPEDEFNAME;
+    else
+      return TOK_IDENTIFIER;
+  }
 }
 
 int MSC_Keyword(int token)
