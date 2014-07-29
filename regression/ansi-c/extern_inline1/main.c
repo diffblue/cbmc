@@ -6,6 +6,7 @@ extern inline int foo(int a)
   return 42;
 }
 
+// this is not allowed with C99 or above
 int foo(int a)
 {
   return 0;
