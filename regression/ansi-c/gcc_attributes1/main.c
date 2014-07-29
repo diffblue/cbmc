@@ -21,11 +21,6 @@ char *__attribute__((aligned(8))) *fptrasd1;
 char *__attribute__((aligned(8))) fptrasd2;
 char __attribute__((aligned(8))) *fptrasd3;
 
-int (__attribute__((aligned)) xx);
-int (__attribute__((aligned)) (xx));
-void (__attribute__((aligned)) *****f1)(void);
-void (__attribute__((aligned)) f3)(void);
-
 enum __attribute__((aligned)) { asd1 };
 enum { asd2 } __attribute__((aligned));
 enum __attribute__((aligned)) my_enum { asd3 };
