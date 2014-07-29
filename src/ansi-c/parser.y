@@ -123,7 +123,7 @@ extern char *yyansi_ctext;
 %token TOK_GCC_DECIMAL128 "_Decimal128"
 %token TOK_GCC_ASM     "__asm__"
 %token TOK_GCC_ASM_PAREN "__asm__ (with parentheses)"
-%token TOK_GCC_ATTRIBUTE
+%token TOK_GCC_ATTRIBUTE "__attribute__"
 %token TOK_GCC_ATTRIBUTE_ALIGNED "aligned"
 %token TOK_GCC_ATTRIBUTE_TRANSPARENT_UNION "transparent_union"
 %token TOK_GCC_ATTRIBUTE_PACKED "packed"
@@ -1130,39 +1130,6 @@ typeof_type_specifier:
         }
         ;
 
-/*
-gcc_attribute_expression_list:
-          assignment_expression
-        {
-          init($$, ID_expression_list);
-          mto($$, $1);
-        }
-        | gcc_attribute_expression_list ',' assignment_expression
-        {
-          $$=$1;
-          mto($$, $3);
-        }
-        ;
-*/
-
-/*
-gcc_attribute_expression_list_opt:
-*/
-          /* empty */
-/*
-        {
-          init($$, ID_expression_list);
-        }
-        | gcc_attribute_expression_list
-        ;
-*/
-
-/*
-gcc_attribute_parameters:
-          '(' gcc_attribute_expression_list_opt ')'
-        ;
-*/
-
 msc_decl_identifier:
           TOK_IDENTIFIER
         {
@@ -1361,6 +1328,49 @@ aggregate_key:
         { $$=$1; set($$, ID_union); }
         ;
         
+gcc_attribute_expression_list:
+          assignment_expression
+        {
+          init($$, ID_expression_list);
+          mto($$, $1);
+        }
+        | gcc_attribute_expression_list ',' assignment_expression
+        {
+          $$=$1;
+          mto($$, $3);
+        }
+        ;
+
+gcc_attribute_expression_list_opt:
+          /* empty */
+        {
+          init($$, ID_expression_list);
+        }
+        | gcc_attribute_expression_list
+        ;
+
+gcc_attribute:
+          /* empty */
+        {
+          init($$);
+        }
+        | identifier
+        | identifier '(' gcc_attribute_expression_list_opt ')'
+        ;
+
+gcc_attribute_list:
+          gcc_attribute
+        | gcc_attribute_list ',' gcc_attribute
+        {
+          $$=merge($1, $2);
+        }
+        ;          
+
+gcc_attribute_specifier:
+          TOK_GCC_ATTRIBUTE '(' '(' gcc_attribute_list ')' ')'
+        { $$=$4; }
+        ;
+
 gcc_type_attribute_opt:
           /* empty */
         {
@@ -1392,6 +1402,7 @@ gcc_type_attribute:
         { $$=$1; set($$, ID_gcc_attribute_mode); stack($$).set(ID_size, stack($3).get(ID_identifier)); }
         | TOK_GCC_ATTRIBUTE_GNU_INLINE TOK_GCC_ATTRIBUTE_END
         { $$=$1; set($$, ID_static); } /* GCC extern inline - cleanup in ansi_c_declarationt::to_symbol */
+        | gcc_attribute_specifier
         ;
 
 member_declaration_list_opt:
