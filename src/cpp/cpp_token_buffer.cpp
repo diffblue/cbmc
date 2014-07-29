@@ -144,7 +144,10 @@ void cpp_token_buffert::read_token()
   #else
   ansi_c_parser.cpp=true;
   ansi_c_parser.in=cpp_parser.in;
-  ansi_c_parser.mode=ansi_c_parsert::GCC;
+  if(cpp_parser.mode==cpp_parsert::MSC)
+    ansi_c_parser.mode=ansi_c_parsert::MSC;
+  else
+    ansi_c_parser.mode=ansi_c_parsert::GCC;
   kind=yyansi_clex();
   tokens.back().text=yyansi_ctext;
   if(ansi_c_parser.stack.size()==1)
