@@ -688,7 +688,12 @@ __decltype          { if(PARSER.cpp && PARSER.mode==ansi_c_parsert::GCC)
 "__attribute"   { if(PARSER.mode==ansi_c_parsert::GCC ||
                      PARSER.mode==ansi_c_parsert::CW ||
                      PARSER.mode==ansi_c_parsert::ARM)
-                    BEGIN(GCC_ATTRIBUTE1);
+                  {
+                    if(PARSER.cpp)
+                      BEGIN(IGNORE_PARENS);
+                    else
+                      BEGIN(GCC_ATTRIBUTE1);
+                  }
                   else
                     return make_identifier();
                 }
