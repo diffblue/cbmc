@@ -126,6 +126,12 @@ Function: cpp_token_buffert::read_token
 int yycpplex();
 int yyansi_clex();
 
+extern char *yyansi_ctext;
+
+#include <ansi-c/ansi_c_parser.h>
+#include "cpp_parser.h"
+#include <iostream>
+
 void cpp_token_buffert::read_token()
 {
   tokens.push_back(cpp_tokent());
@@ -136,11 +142,26 @@ void cpp_token_buffert::read_token()
   #if 1
   kind=yycpplex();
   #else
+  ansi_c_parser.cpp=true;
+  ansi_c_parser.in=cpp_parser.in;
+  ansi_c_parser.mode=ansi_c_parsert::GCC;
   kind=yyansi_clex();
+  tokens.back().text=yyansi_ctext;
+  if(ansi_c_parser.stack.size()==1)
+  {
+    tokens.back().data=ansi_c_parser.stack.front();
+    tokens.back().line_no=ansi_c_parser.get_line_no();
+    tokens.back().filename=ansi_c_parser.get_file();
+    ansi_c_parser.stack.pop_back();
+  }
+  
   #endif
+
+  //std::cout << "TOKEN: " << kind << " " << tokens.back().text << std::endl;
 
   tokens.back().kind=kind;
   tokens.back().pos=token_vector.size()-1;
+
   //std::cout << "II: " << token_vector.back()->kind << std::endl;
   //std::cout << "I2: " << token_vector.size() << std::endl;
 }
