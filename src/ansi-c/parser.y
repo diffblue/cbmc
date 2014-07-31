@@ -397,6 +397,8 @@ quantifier_expression:
         }
         | TOK_ACSL_FORALL compound_scope declaration primary_expression
         {
+          // The precedence of this operator is too high; it is meant
+          // to bind only very weakly.
           $$=$1;
           set($$, ID_forall);
           mto($$, $3);
@@ -413,6 +415,8 @@ quantifier_expression:
         }
         | TOK_ACSL_EXISTS compound_scope declaration primary_expression
         {
+          // The precedence of this operator is too high; it is meant
+          // to bind only very weakly.
           $$=$1;
           set($$, ID_exists);
           mto($$, $3);

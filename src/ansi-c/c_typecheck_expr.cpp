@@ -277,15 +277,14 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
     assert(expr.operands().size()==2);
     expr.type()=bool_typet();
     
-    if(expr.op0().operands().size()!=1 ||
-       expr.op0().op0().get(ID_statement)!=ID_decl)
+    if(expr.op0().get(ID_statement)!=ID_decl)
     {
       err_location(expr);
       throw "expected declaration as operand of quantifier";
     }
 
     // replace declaration by symbol expression
-    symbol_exprt bound=to_symbol_expr(expr.op0().op0().op0());
+    symbol_exprt bound=to_symbol_expr(expr.op0().op0());
     expr.op0().swap(bound);
   }
   else if(expr.id()==ID_label)
@@ -690,6 +689,8 @@ Function: c_typecheck_baset::typecheck_expr_operands
 
 \*******************************************************************/
 
+#include <iostream>
+
 void c_typecheck_baset::typecheck_expr_operands(exprt &expr)
 {
   if(expr.id()==ID_sideeffect &&
@@ -707,7 +708,50 @@ void c_typecheck_baset::typecheck_expr_operands(exprt &expr)
   }
   else if(expr.id()==ID_forall || expr.id()==ID_exists)
   {
-    typecheck_decl(to_code(expr.op0().op0()));
+    assert(expr.operands().size()==2);
+
+    ansi_c_declarationt &declaration=
+      to_ansi_c_declaration(expr.op0());
+
+    typecheck_declaration(declaration);
+    
+    if(declaration.declarators().size()!=1)
+    {
+      err_location(expr);
+      throw "expected one declarator exactly";
+    }
+
+    // add prefix
+    irep_idt identifier=
+      add_language_prefix(declaration.declarators().front().get_name());
+
+    // look it up
+    symbol_tablet::symbolst::iterator s_it=
+      symbol_table.symbols.find(identifier);
+
+    if(s_it==symbol_table.symbols.end())
+    {
+      err_location(expr);
+      str << "failed to find decl symbol `" << identifier
+          << "' in symbol table";
+      throw 0;
+    }
+
+    symbolt &symbol=s_it->second;
+    
+    if(symbol.is_type || symbol.is_extern || symbol.is_static_lifetime ||
+       !is_complete_type(symbol.type) || symbol.type.id()==ID_code)
+    {
+      err_location(expr);
+      throw "unexpected quantified symbol";
+    }
+    
+    code_declt decl;
+    decl.location()=declaration.location();
+    decl.symbol()=symbol_expr(symbol);
+
+    expr.op0()=decl;    
+
     typecheck_expr(expr.op1());
   }
   else
