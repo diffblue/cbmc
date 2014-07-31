@@ -123,7 +123,7 @@ extern char *yyansi_ctext;
 %token TOK_GCC_DECIMAL128 "_Decimal128"
 %token TOK_GCC_ASM     "__asm__"
 %token TOK_GCC_ASM_PAREN "__asm__ (with parentheses)"
-%token TOK_GCC_ATTRIBUTE
+%token TOK_GCC_ATTRIBUTE "__attribute__"
 %token TOK_GCC_ATTRIBUTE_ALIGNED "aligned"
 %token TOK_GCC_ATTRIBUTE_TRANSPARENT_UNION "transparent_union"
 %token TOK_GCC_ATTRIBUTE_PACKED "packed"
@@ -216,12 +216,6 @@ extern char *yyansi_ctext;
 %token TOK_MSC_IF_EXISTS "__if_exists"
 %token TOK_MSC_IF_NOT_EXISTS "__if_not_exists"
 
-/*** grammar selection ***/
-
-%token TOK_PARSE_LANGUAGE
-%token TOK_PARSE_EXPRESSION
-%token TOK_PARSE_TYPE
-
 /*** priority, associativity, etc. definitions **************************/
 
 %start grammar
@@ -237,24 +231,8 @@ extern char *yyansi_ctext;
 %}
 %%
 
-/*** Grammar selection **************************************************/
-
-grammar:
-          TOK_PARSE_LANGUAGE translation_unit
-        | TOK_PARSE_EXPRESSION comma_expression
-        {
-          ansi_c_declarationt ansi_c_declaration;
-          ansi_c_declaration.declarators().resize(1);
-          ansi_c_declaration.add_initializer(stack($2));
-          PARSER.copy_item(ansi_c_declaration);
-        }
-        | TOK_PARSE_TYPE type_name
-        {
-          ansi_c_declarationt ansi_c_declaration;
-          ansi_c_declaration.type()=
-            static_cast<const typet &>(static_cast<const irept &>(stack($2)));
-          PARSER.copy_item(ansi_c_declaration);
-        }
+grammar: 
+        translation_unit
         ;
 
 /*** Token with values **************************************************/
@@ -309,7 +287,8 @@ primary_expression:
 generic_selection:
           TOK_GENERIC '(' assignment_expression ',' generic_assoc_list ')'
         {
-          init($$, ID_generic_selection);
+          $$=$1;
+          set($$, ID_generic_selection);
           mto($$, $3);
           stack($$).add(ID_generic_associations).get_sub().swap((irept::subt&)stack($5).operands());
         }
@@ -410,36 +389,36 @@ offsetof_member_designator:
 quantifier_expression:
           TOK_FORALL compound_scope '{' declaration comma_expression '}'
         {
-          init($$);
-          stack($$).id(ID_forall);
-          stack($$).location()=stack($1).location();
+          $$=$1;
+          set($$, ID_forall);
           mto($$, $4);
           mto($$, $5);
           PARSER.pop_scope();
         }
         | TOK_ACSL_FORALL compound_scope declaration primary_expression
         {
-          init($$);
-          stack($$).id(ID_forall);
-          stack($$).location()=stack($1).location();
+          // The precedence of this operator is too high; it is meant
+          // to bind only very weakly.
+          $$=$1;
+          set($$, ID_forall);
           mto($$, $3);
           mto($$, $4);
           PARSER.pop_scope();
         }
         | TOK_EXISTS compound_scope '{' declaration comma_expression '}'
         {
-          init($$);
-          stack($$).id(ID_exists);
-          stack($$).location()=stack($1).location();
+          $$=$1;
+          set($$, ID_exists);
           mto($$, $4);
           mto($$, $5);
           PARSER.pop_scope();
         }
         | TOK_ACSL_EXISTS compound_scope declaration primary_expression
         {
-          init($$);
-          stack($$).id(ID_exists);
-          stack($$).location()=stack($1).location();
+          // The precedence of this operator is too high; it is meant
+          // to bind only very weakly.
+          $$=$1;
+          set($$, ID_exists);
           mto($$, $3);
           mto($$, $4);
           PARSER.pop_scope();
@@ -447,9 +426,10 @@ quantifier_expression:
         ;
 
 statement_expression: '(' compound_statement ')'
-        { init($$, ID_side_effect);
+        { 
+          $$=$1;
+          set($$, ID_side_effect);
           stack($$).set(ID_statement, ID_statement_expression);
-          stack($$).location()=stack($1).location();
           mto($$, $2);
         }
         ;
@@ -461,22 +441,20 @@ postfix_expression:
         | postfix_expression '(' ')'
         { $$=$2;
           set($$, ID_side_effect);
+          stack($$).set(ID_statement, ID_function_call);
           stack($$).operands().resize(2);
           stack($$).op0().swap(stack($1));
           stack($$).op1().clear();
           stack($$).op1().id(ID_arguments);
-          stack($$).set(ID_statement, ID_function_call);
         }
         | postfix_expression '(' argument_expression_list ')'
         { $$=$2;
-          locationt location=stack($2).location();
-          init($$, ID_side_effect);
+          set($$, ID_side_effect);
           stack($$).set(ID_statement, ID_function_call);
           stack($$).operands().resize(2);
           stack($$).op0().swap(stack($1));
           stack($$).op1().swap(stack($3));
           stack($$).op1().id(ID_arguments);
-          stack($$).location()=location;
         }
         | postfix_expression '.' member_name
         { $$=$2;
@@ -492,19 +470,15 @@ postfix_expression:
         }
         | postfix_expression TOK_INCR
         { $$=$2;
-          locationt location=stack($2).location();
-          init($$, ID_side_effect);
-          mto($$, $1);
+          set($$, ID_side_effect);
           stack($$).set(ID_statement, ID_postincrement);
-          stack($$).location()=location;
+          mto($$, $1);
         }
         | postfix_expression TOK_DECR
         { $$=$2;
-          locationt location=stack($2).location();
-          init($$, ID_side_effect);
-          mto($$, $1);
+          set($$, ID_side_effect);
           stack($$).set(ID_statement, ID_postdecrement);
-          stack($$).location()=location;
+          mto($$, $1);
         }
         /* The following is a) GCC and b) ISO C 11 compliant */
         | '(' type_name ')' '{' initializer_list_opt '}'
@@ -823,7 +797,8 @@ declaration:
 static_assert_declaration:
           TOK_STATIC_ASSERT '(' assignment_expression ',' assignment_expression ')'
         {
-          init($$, ID_declaration);
+          $$=$1;
+          set($$, ID_declaration);
           to_ansi_c_declaration(stack($$)).set_is_static_assert(true);
           mto($$, $3);
           mto($$, $5);
@@ -1159,39 +1134,6 @@ typeof_type_specifier:
         }
         ;
 
-/*
-gcc_attribute_expression_list:
-          assignment_expression
-        {
-          init($$, ID_expression_list);
-          mto($$, $1);
-        }
-        | gcc_attribute_expression_list ',' assignment_expression
-        {
-          $$=$1;
-          mto($$, $3);
-        }
-        ;
-*/
-
-/*
-gcc_attribute_expression_list_opt:
-*/
-          /* empty */
-/*
-        {
-          init($$, ID_expression_list);
-        }
-        | gcc_attribute_expression_list
-        ;
-*/
-
-/*
-gcc_attribute_parameters:
-          '(' gcc_attribute_expression_list_opt ')'
-        ;
-*/
-
 msc_decl_identifier:
           TOK_IDENTIFIER
         {
@@ -1390,6 +1332,49 @@ aggregate_key:
         { $$=$1; set($$, ID_union); }
         ;
         
+gcc_attribute_expression_list:
+          assignment_expression
+        {
+          init($$, ID_expression_list);
+          mto($$, $1);
+        }
+        | gcc_attribute_expression_list ',' assignment_expression
+        {
+          $$=$1;
+          mto($$, $3);
+        }
+        ;
+
+gcc_attribute_expression_list_opt:
+          /* empty */
+        {
+          init($$, ID_expression_list);
+        }
+        | gcc_attribute_expression_list
+        ;
+
+gcc_attribute:
+          /* empty */
+        {
+          init($$);
+        }
+        | identifier
+        | identifier '(' gcc_attribute_expression_list_opt ')'
+        ;
+
+gcc_attribute_list:
+          gcc_attribute
+        | gcc_attribute_list ',' gcc_attribute
+        {
+          $$=merge($1, $2);
+        }
+        ;          
+
+gcc_attribute_specifier:
+          TOK_GCC_ATTRIBUTE '(' '(' gcc_attribute_list ')' ')'
+        { $$=$4; }
+        ;
+
 gcc_type_attribute_opt:
           /* empty */
         {
@@ -1421,6 +1406,7 @@ gcc_type_attribute:
         { $$=$1; set($$, ID_gcc_attribute_mode); stack($$).set(ID_size, stack($3).get(ID_identifier)); }
         | TOK_GCC_ATTRIBUTE_GNU_INLINE TOK_GCC_ATTRIBUTE_END
         { $$=$1; set($$, ID_static); } /* GCC extern inline - cleanup in ansi_c_declarationt::to_symbol */
+        | gcc_attribute_specifier
         ;
 
 member_declaration_list_opt:
@@ -2033,9 +2019,9 @@ compound_statement:
         }
         | compound_scope '{' TOK_ASM_STRING '}'
         {
-          init($$);
+          $$=$2;
           statement($$, ID_asm);
-          stack($$).location()=stack($2).location();
+          stack($$).set(ID_C_end_location, stack($4).location());
           mto($$, $3);
           PARSER.pop_scope();
         }

@@ -40,13 +40,11 @@ symbol_exprt goto_convertt::make_compound_literal(
   
   do
   {
-    // The lifetime of compound literals is really that of
-    // the block they are in.
     new_symbol.base_name="literal$"+i2string(++temporary_counter);
     new_symbol.name=tmp_symbol_prefix+id2string(new_symbol.base_name);
     new_symbol.is_lvalue=true;
-    new_symbol.is_thread_local=false;
-    new_symbol.is_static_lifetime=true;
+    new_symbol.is_thread_local=true;
+    new_symbol.is_static_lifetime=location.get_function().empty();
     new_symbol.is_file_local=true;
     new_symbol.value=expr;
     new_symbol.type=expr.type();
@@ -59,10 +57,21 @@ symbol_exprt goto_convertt::make_compound_literal(
 
   symbol_exprt result=symbol_ptr->symbol_expr();
   result.location()=location;
+
+  // The lifetime of compound literals is really that of
+  // the block they are in.
+  copy(code_declt(result), DECL, dest);
   
   code_assignt code_assign(result, expr);
   code_assign.location()=location;
   convert(code_assign, dest);
+
+  // now create a 'dead' instruction
+  if(!symbol_ptr->is_static_lifetime)
+  {
+    code_deadt code_dead(result);
+    targets.destructor_stack.push_back(code_dead);
+  }
 
   return result;
 }

@@ -204,7 +204,8 @@ void ansi_c_declarationt::to_symbol(
       (get_is_global() || get_is_static());
       
     symbol.is_thread_local=
-      !symbol.is_static_lifetime || get_is_thread_local();
+      (!symbol.is_static_lifetime && !get_is_extern()) ||
+      get_is_thread_local();
        
     symbol.is_file_local=
       symbol.is_macro || 

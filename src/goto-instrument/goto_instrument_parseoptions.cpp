@@ -986,6 +986,7 @@ void goto_instrument_parseoptionst::help()
     " --mmio                       instruments memory-mapped I/O\n"
     " --nondet-static              add nondeterministic initialization of variables with static lifetime\n"
     " --check-invariant function   instruments invariant checking function\n"
+    " --remove-pointers            converts pointer arithmetic to base+offset expressions\n"
     "\n"
     "Loop transformations:\n"
     " --k-induction <k>            check loops with k-induction\n"

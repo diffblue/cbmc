@@ -309,6 +309,8 @@ void c_typecheck_baset::typecheck_code_type(code_typet &type)
         // abstract or not?
         if(identifier==irep_idt())
         {
+          // abstract
+          parameter.location()=declaration.type().location();
         }
         else
         {
@@ -317,6 +319,7 @@ void c_typecheck_baset::typecheck_code_type(code_typet &type)
           // make visible now, later parameters might use it
           parameter_map[identifier]=type;
           parameter.set_base_name(declaration.declarator().get_base_name());
+          parameter.location()=declaration.declarator().location();
         }
         
         // put the parameter in place of the declaration

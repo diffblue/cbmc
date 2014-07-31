@@ -385,7 +385,7 @@ void c_typecheck_baset::typecheck_decl(codet &code)
   }
   
   // stash away any side-effects in the declaration
-  new_code.splice(new_code.end(), clean_code);
+  new_code.splice(new_code.begin(), clean_code);
   
   if(new_code.empty())
   {
