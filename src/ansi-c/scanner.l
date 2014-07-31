@@ -45,24 +45,35 @@ int make_identifier()
 {
   loc();
 
+  // this hashes the identifier
   irep_idt base_name=yytext;
-  std::string identifier(id2string(base_name));
-
-  // figure out if this is a typedef or something else
-  ansi_c_id_classt result=
-    PARSER.lookup(identifier, PARSER.tag_following, false);
-
-  PARSER.tag_following=false;
-
-  stack(yyansi_clval).id(ID_symbol);
-  stack(yyansi_clval).set(ID_C_base_name, base_name);
-  stack(yyansi_clval).set(ID_identifier, identifier);
-  stack(yyansi_clval).set(ID_C_id_class, result);
-
-  if(result==ANSI_C_TYPEDEF)
-    return TOK_TYPEDEFNAME;
-  else
+  
+  if(PARSER.cpp)
+  {
+    stack(yyansi_clval).id(ID_symbol);
+    stack(yyansi_clval).set(ID_C_base_name, base_name);
     return TOK_IDENTIFIER;
+  }
+  else
+  {
+    std::string identifier(id2string(base_name));
+
+    // figure out if this is a typedef or something else
+    ansi_c_id_classt result=
+      PARSER.lookup(identifier, PARSER.tag_following, false);
+
+    PARSER.tag_following=false;
+
+    stack(yyansi_clval).id(ID_symbol);
+    stack(yyansi_clval).set(ID_C_base_name, base_name);
+    stack(yyansi_clval).set(ID_identifier, identifier);
+    stack(yyansi_clval).set(ID_C_id_class, result);
+
+    if(result==ANSI_C_TYPEDEF)
+      return TOK_TYPEDEFNAME;
+    else
+      return TOK_IDENTIFIER;
+  }
 }
 
 int MSC_Keyword(int token)
@@ -195,13 +206,6 @@ void ansi_c_scanner_init()
 
 <INITIAL>.|\n   { BEGIN(GRAMMAR);
 		  yyless(0);		/* start again with this character */
-		  //yy_current_buffer->yy_at_bol = 1; /* at beginning of line */
-		  switch(PARSER.grammar)
-		   {
-                   case ansi_c_parsert::EXPRESSION: return TOK_PARSE_EXPRESSION;
-                   case ansi_c_parsert::LANGUAGE: return TOK_PARSE_LANGUAGE;
-		   default: assert(0);
-		   }
 		 }
 
 <GRAMMAR>"/*"   { BEGIN(COMMENT1); } /* begin C comment state */
@@ -505,13 +509,26 @@ void ansi_c_scanner_init()
                     BEGIN(MSC_ASM);
                     return TOK_MSC_ASM;
                   }
+                  else if(PARSER.cpp)
+                  {
+                    loc();
+                    return TOK_GCC_ASM;
+                  }
                   else
                     BEGIN(GCC_ASM);
                 }
 
 "asm"           { if(PARSER.mode==ansi_c_parsert::GCC ||
                      PARSER.mode==ansi_c_parsert::CW)
-                    BEGIN(GCC_ASM);
+                  {
+                    if(PARSER.cpp)
+                    {
+                      loc();
+                      return TOK_GCC_ASM;
+                    }
+                    else
+                      BEGIN(GCC_ASM);
+                  }
                   else
                     return make_identifier();
                 }
@@ -519,7 +536,15 @@ void ansi_c_scanner_init()
 "__asm__"       { if(PARSER.mode==ansi_c_parsert::GCC ||
                      PARSER.mode==ansi_c_parsert::CW ||
                      PARSER.mode==ansi_c_parsert::ARM)
-                    BEGIN(GCC_ASM);
+                  {
+                    if(PARSER.cpp)
+                    {
+                      loc();
+                      return TOK_GCC_ASM;
+                    }
+                    else
+                      BEGIN(GCC_ASM);
+                  }
                   else
                     return make_identifier();
                 }
@@ -655,9 +680,13 @@ __decltype          { if(PARSER.cpp && PARSER.mode==ansi_c_parsert::GCC)
                  }
 
 "__declspec" |
-"_declspec"     { if(PARSER.mode==ansi_c_parsert::MSC ||
-                     PARSER.mode==ansi_c_parsert::CW ||
-                     PARSER.mode==ansi_c_parsert::ARM)
+"_declspec"     { if(PARSER.cpp)
+                  {
+                    BEGIN(IGNORE_PARENS);
+                  }
+                  else if(PARSER.mode==ansi_c_parsert::MSC ||
+                          PARSER.mode==ansi_c_parsert::CW ||
+                          PARSER.mode==ansi_c_parsert::ARM)
                   {
                     loc(); return TOK_MSC_DECLSPEC;
                   }
@@ -684,7 +713,12 @@ __decltype          { if(PARSER.cpp && PARSER.mode==ansi_c_parsert::GCC)
 "__attribute"   { if(PARSER.mode==ansi_c_parsert::GCC ||
                      PARSER.mode==ansi_c_parsert::CW ||
                      PARSER.mode==ansi_c_parsert::ARM)
-                    BEGIN(GCC_ATTRIBUTE1);
+                  {
+                    if(PARSER.cpp)
+                      BEGIN(IGNORE_PARENS);
+                    else
+                      BEGIN(GCC_ATTRIBUTE1);
+                  }
                   else
                     return make_identifier();
                 }

@@ -13,7 +13,7 @@ class parsert:public messaget
 public:
   std::istream *in;
   
-  std::string last_line;
+  std::string this_line, last_line;
   
   std::vector<exprt> stack;
   
@@ -37,9 +37,12 @@ public:
     if(!in->read(&ch, 1)) return false;
 
     if(ch=='\n')
-      last_line.clear();
+    {
+      last_line.swap(this_line);
+      this_line.clear();
+    }
     else
-      last_line+=ch;
+      this_line+=ch;
     
     return true;
   }
@@ -72,6 +75,11 @@ public:
   inline void set_file(const irep_idt &file)
   {
     location.set_file(file);
+  }
+  
+  inline irep_idt get_file() const
+  {
+    return location.get_file();
   }
   
   inline unsigned get_line_no() const

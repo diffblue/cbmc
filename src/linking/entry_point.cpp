@@ -288,6 +288,7 @@ bool entry_point(
   code_function_callt call_main;
   call_main.location()=symbol.location;
   call_main.function()=symbol.symbol_expr();
+  call_main.function().location()=symbol.location;
 
   const code_typet::parameterst &parameters=
     to_code_type(symbol.type).parameters();
