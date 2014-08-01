@@ -73,6 +73,8 @@ Function: bmct::error_trace
 
 void bmct::error_trace(const prop_convt &prop_conv)
 {
+  if(options.get_bool_option("stop-when-unsat")) return; 
+
   status() << "Building error trace" << eom;
 
   goto_tracet goto_trace;
@@ -467,7 +469,10 @@ bool bmct::run(const goto_functionst &goto_functions)
           if(symex.remaining_claims>0)
 	  {
             verification_result = decide(symex.prop_conv);
-            if(verification_result) return true; //bug found, exit
+            if(options.get_bool_option("stop-when-unsat") ? 
+               !verification_result : //verification succeeds, exit
+               verification_result)  //bug found, exit
+              return verification_result;
 	  }
 	    
           if(symex.is_incremental)

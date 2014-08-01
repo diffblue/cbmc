@@ -168,6 +168,8 @@ void cbmc_parseoptionst::get_command_line_options(optionst &options)
 
   if(cmdline.isset("ignore-assertions-before-unwind-min"))
     options.set_option("ignore-assertions-before-unwind-min", true);
+  if(cmdline.isset("stop-when-unsat"))
+    options.set_option("stop-when-unsat", true);
 
   if(cmdline.isset("depth"))
     options.set_option("depth", cmdline.getval("depth"));
@@ -914,6 +916,7 @@ void cbmc_parseoptionst::help()
     " --unwind-min nr              start incremental check after nr unwindings\n"
     " --unwind-max nr              stop incremental check after nr unwindings\n"
     " --ignore-assertions-before-unwind-min\n"
+    " --stop-when-unsat            for step case in k-induction checks\n"
     " --show-vcc                   show the verification conditions\n"
     " --slice-formula              remove assignments unrelated to property\n"
     " --no-unwinding-assertions    do not generate unwinding assertions\n"

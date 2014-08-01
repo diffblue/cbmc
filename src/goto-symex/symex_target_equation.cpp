@@ -640,7 +640,6 @@ void symex_target_equationt::convert_assignments(
     if(it->is_assignment() && !it->ignore && !it->converted)
     {
       it->converted = true;
-      //      std::cout << "convert assignment: " << it->cond_expr << std::endl;
       decision_procedure.set_to_true(it->cond_expr);
     }
   }
