@@ -68,8 +68,12 @@ mp_integer alignment(const typet &type, const namespacet &ns)
           type.id()==ID_fixedbv ||
           type.id()==ID_floatbv)
   {
-    unsigned width=type.get_int(ID_width);
+    unsigned width=to_bitvector_type(type).get_width();
     return width%8?width/8+1:width/8;
+  }
+  else if(type.id()==ID_c_enum)
+  {
+    return alignment(type.subtype(), ns);
   }
   else if(type.id()==ID_pointer)
   {
@@ -111,10 +115,10 @@ void add_padding(struct_typet &type, const namespacet &ns)
         it++)
     {
       if(it->get_is_bit_field() &&
-         it->type().get_int(ID_width)!=0)
+         it->get_bit_field_bits()!=0)
       {
         // count the bits
-        unsigned width=it->type().get_int(ID_width);
+        unsigned width=it->get_bit_field_bits();
         bit_field_bits+=width;
       }
       else if(bit_field_bits!=0)
@@ -181,7 +185,7 @@ void add_padding(struct_typet &type, const namespacet &ns)
       a=alignment(it->get_bit_field_type(), ns);
       
       // A zero-width bit-field causes alignment to the base-type.
-      if(it->type().get_int(ID_width)==0)
+      if(it->get_bit_field_bits()==0)
       {
       }
       else
@@ -191,7 +195,7 @@ void add_padding(struct_typet &type, const namespacet &ns)
         if(max_alignment<a) 
           max_alignment=a;
         
-        unsigned w=it->type().get_int(ID_width);
+        unsigned w=it->get_bit_field_bits();
         unsigned bytes;
         for(bytes=0; w>bit_field_bits; ++bytes, bit_field_bits+=8);
         bit_field_bits-=w;

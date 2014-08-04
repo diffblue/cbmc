@@ -91,22 +91,24 @@ bool c_typecheck_baset::gcc_types_compatible_p(
 
   if(type1.id()==ID_c_enum)
   {
-    if(type2==signed_int_type())
-      return true;
-    else if(type2==type1) // compares the tag
+    if(type2.id()==ID_c_enum) // both are enums
+      return type1==type2; // compares the tag 
+    else if(type2==type1.subtype())
       return true;
   }
   else if(type2.id()==ID_c_enum)
   {
-    if(type1==signed_int_type())
-      return true;
-    else if(type1==type2) // compares the tag
+    if(type1==type2.subtype())
       return true;
   }
   else if(type1.id()==ID_pointer && type2.id()==ID_pointer)
+  {
     return gcc_types_compatible_p(type1.subtype(), type2.subtype());
+  }
   else if(type1.id()==ID_array && type2.id()==ID_array)
+  {
     return gcc_types_compatible_p(type1.subtype(), type2.subtype()); // ignore size
+  }
   else if(type1.id()==ID_code && type2.id()==ID_code)
   {
     const code_typet &c_type1=to_code_type(type1);

@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 
 #include <ansi-c/c_qualifiers.h>
+#include <ansi-c/c_types.h>
 
 #include "cpp_typecheck.h"
 #include "cpp_enum_type.h"
@@ -97,7 +98,7 @@ void cpp_typecheckt::typecheck_enum_type(typet &type)
   c_qualifierst qualifiers;
   qualifiers.read(type);
   
-  // these behave like special struct types
+  // These behave like special struct types.
   // replace by type symbol
   
   cpp_enum_typet &enum_type=to_cpp_enum_type(type);
@@ -156,6 +157,9 @@ void cpp_typecheckt::typecheck_enum_type(typet &type)
   {
     std::string pretty_name=
       cpp_scopes.current_scope().prefix+id2string(base_name);
+      
+    // these have a subtype
+    type.subtype()=int_type();
 
     symbolt symbol;
 

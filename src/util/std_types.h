@@ -234,6 +234,8 @@ public:
     {
       set(ID_C_bit_field_type, _type);
     }
+    
+    unsigned get_bit_field_bits() const;
   };
 
   typedef std::vector<componentt> componentst;

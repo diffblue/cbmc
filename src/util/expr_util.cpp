@@ -111,16 +111,24 @@ exprt gen_one(const typet &type)
     return constant_exprt(ID_1, type);
   }
   else if(type_id==ID_unsignedbv ||
-          type_id==ID_signedbv ||
-          type_id==ID_c_enum)
+          type_id==ID_signedbv)
   {
     std::string value;
     unsigned width=to_bitvector_type(type).get_width();
-    value.reserve(width);
-    for(unsigned i=0; i<width-1; i++)
-      value+='0';
-    value+='1';
+    
+    if(width!=0)
+    {
+      value.reserve(width);
+      for(unsigned i=0; i<width-1; i++)
+        value+='0';
+      value+='1';
+    }
+
     return constant_exprt(value, type);
+  }
+  else if(type_id==ID_c_enum)
+  {
+    return constant_exprt(ID_1, type);
   }
   else if(type_id==ID_fixedbv)
   {
