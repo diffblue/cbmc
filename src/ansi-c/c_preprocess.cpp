@@ -26,20 +26,21 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/message_stream.h>
 #include <util/tempfile.h>
 #include <util/unicode.h>
+#include <util/arith_tools.h>
+#include <util/std_types.h>
 
+#include "c_types.h"
 #include "c_preprocess.h"
 
 #define GCC_DEFINES_16 \
   " -D__INT_MAX__=32767"\
   " -D__CHAR_BIT__=8"\
-  " -D__WCHAR_MAX__=32767"\
   " -D__SCHAR_MAX__=127"\
   " -D__SHRT_MAX__=32767"\
   " -D__LONG_LONG_MAX__=2147483647L"\
   " -D__LONG_MAX__=2147483647" \
   " -D__SIZE_TYPE__=\"unsigned int\""\
   " -D__PTRDIFF_TYPE__=int"\
-  " -D__WCHAR_TYPE__=int"\
   " -D__WINT_TYPE__=\"unsigned int\""\
   " -D__INTMAX_TYPE__=\"long long int\""\
   " -D__UINTMAX_TYPE__=\"long long unsigned int\""
@@ -47,14 +48,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #define GCC_DEFINES_32 \
   " -D__INT_MAX__=2147483647"\
   " -D__CHAR_BIT__=8"\
-  " -D__WCHAR_MAX__=2147483647"\
   " -D__SCHAR_MAX__=127"\
   " -D__SHRT_MAX__=32767"\
   " -D__LONG_LONG_MAX__=9223372036854775807LL"\
   " -D__LONG_MAX__=2147483647L" \
   " -D__SIZE_TYPE__=\"long unsigned int\""\
   " -D__PTRDIFF_TYPE__=int"\
-  " -D__WCHAR_TYPE__=int"\
   " -D__WINT_TYPE__=\"unsigned int\""\
   " -D__INTMAX_TYPE__=\"long long int\""\
   " -D__UINTMAX_TYPE__=\"long long unsigned int\""
@@ -62,17 +61,39 @@ Author: Daniel Kroening, kroening@kroening.com
 #define GCC_DEFINES_LP64 \
   " -D__INT_MAX__=2147483647"\
   " -D__CHAR_BIT__=8"\
-  " -D__WCHAR_MAX__=2147483647"\
   " -D__SCHAR_MAX__=127"\
   " -D__SHRT_MAX__=32767"\
   " -D__LONG_LONG_MAX__=9223372036854775807LL"\
   " -D__LONG_MAX__=9223372036854775807L"\
   " -D__SIZE_TYPE__=\"long unsigned int\""\
   " -D__PTRDIFF_TYPE__=long"\
-  " -D__WCHAR_TYPE__=int"\
   " -D__WINT_TYPE__=\"unsigned int\""\
   " -D__INTMAX_TYPE__=\"long int\""\
   " -D__UINTMAX_TYPE__=\"long unsigned int\""
+
+/*******************************************************************\
+
+Function: type_max
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: produce a string with the maximum value of a given type
+
+\*******************************************************************/
+
+static std::string type_max(const typet &src)
+{
+  if(src.id()==ID_signedbv)
+    return integer2string(
+      power(2, to_signedbv_type(src).get_width()-1)-1);
+  else if(src.id()==ID_unsignedbv)
+    return integer2string(
+      power(2, to_unsignedbv_type(src).get_width()-1)-1);
+  else
+    assert(false);
+}
 
 /*******************************************************************\
 
@@ -665,7 +686,21 @@ bool c_preprocess_gcc(
     if(config.ansi_c.pointer_width==64)
       command+=GCC_DEFINES_LP64;
     else
-    command+=GCC_DEFINES_32;
+      command+=GCC_DEFINES_32;
+  }
+  
+  // The width of wchar_t depends on the OS!
+  {
+    command+=" -D__WCHAR_MAX__="+type_max(wchar_t_type());
+
+    std::string sig=config.ansi_c.wchar_t_is_unsigned?"unsigned":"signed";
+    
+    if(config.ansi_c.wchar_t_width==config.ansi_c.short_int_width)
+      command+=" -D__WCHAR_TYPE__=\""+sig+" short int\"";
+    else if(config.ansi_c.wchar_t_width==config.ansi_c.int_width)
+      command+=" -D__WCHAR_TYPE__=\""+sig+" int\"";
+    else
+      assert(false);
   }
   
   switch(config.ansi_c.os)
