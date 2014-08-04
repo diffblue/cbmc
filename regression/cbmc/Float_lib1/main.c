@@ -1,11 +1,10 @@
 #include <math.h>
 #include <float.h>
 
-
 int main() {
   double xxx;
 
-  #ifdef _WIN32
+  #if defined(_WIN32) && !defined(__CYGWIN__)
   // see http://www.johndcook.com/math_h.html
 
   #else
