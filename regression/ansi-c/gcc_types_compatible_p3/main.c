@@ -14,6 +14,10 @@ enum help_format {
 enum help_format help_format = HELP_FORMAT_MAN;
 STATIC_ASSERT(__builtin_types_compatible_p(typeof(&help_format), unsigned int*));
 
+// Ha! The constants themselves are 'signed int'
+STATIC_ASSERT(__builtin_types_compatible_p(typeof(HELP_FORMAT_WEB), signed int));
+STATIC_ASSERT(!__builtin_types_compatible_p(typeof(HELP_FORMAT_WEB), unsigned int));
+
 enum help_format_neg {
   N_HELP_FORMAT_NONE,
   N_HELP_FORMAT_MAN=-1,
