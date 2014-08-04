@@ -313,7 +313,8 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
       if(!is_number(op_type))
       {
         err_location(expr.op0());
-        throw "expected numerical operand";
+        throw "real/imag expect numerical operand, "
+              "but got `"+to_string(op_type)+"'";
       }
       
       if(expr.id()==ID_complex_real)
