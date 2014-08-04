@@ -33,7 +33,7 @@ bool has_nondet(const exprt &dest)
     if(has_nondet(*it))
       return true;
 
-  if(dest.id()==ID_sideeffect)
+  if(dest.id()==ID_side_effect)
   {
     const side_effect_exprt &side_effect_expr=to_side_effect_expr(dest);
     const irep_idt &statement=side_effect_expr.get_statement();
@@ -59,7 +59,7 @@ Function: approximate_nondet_rec
 
 void approximate_nondet_rec(exprt &dest, unsigned &count)
 {
-  if(dest.id()==ID_sideeffect &&
+  if(dest.id()==ID_side_effect &&
      to_side_effect_expr(dest).get_statement()==ID_nondet)
   {
     count++;

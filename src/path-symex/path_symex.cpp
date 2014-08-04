@@ -189,7 +189,7 @@ void path_symext::assign(
   const exprt &lhs,
   const exprt &rhs)
 {
-  if(rhs.id()==ID_sideeffect) // catch side effects on rhs
+  if(rhs.id()==ID_side_effect) // catch side effects on rhs
   {
     const side_effect_exprt &side_effect_expr=to_side_effect_expr(rhs);
     const irep_idt &statement=side_effect_expr.get_statement();

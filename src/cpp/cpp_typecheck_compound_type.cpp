@@ -1454,7 +1454,7 @@ void cpp_typecheckt::adjust_method_type(
   typet &type,
   const typet &method_qualifier)
 {
-  irept &parameters=type.add(ID_arguments);
+  irept &parameters=type.add(ID_parameters);
 
   parameters.get_sub().insert(parameters.get_sub().begin(), irept(ID_argument));
 

@@ -428,7 +428,7 @@ quantifier_expression:
 statement_expression: '(' compound_statement ')'
         { 
           $$=$1;
-          set($$, ID_sideeffect);
+          set($$, ID_side_effect);
           stack($$).set(ID_statement, ID_statement_expression);
           mto($$, $2);
         }
@@ -440,7 +440,7 @@ postfix_expression:
         { binary($$, $1, $2, ID_index, $3); }
         | postfix_expression '(' ')'
         { $$=$2;
-          set($$, ID_sideeffect);
+          set($$, ID_side_effect);
           stack($$).set(ID_statement, ID_function_call);
           stack($$).operands().resize(2);
           stack($$).op0().swap(stack($1));
@@ -449,7 +449,7 @@ postfix_expression:
         }
         | postfix_expression '(' argument_expression_list ')'
         { $$=$2;
-          set($$, ID_sideeffect);
+          set($$, ID_side_effect);
           stack($$).set(ID_statement, ID_function_call);
           stack($$).operands().resize(2);
           stack($$).op0().swap(stack($1));
@@ -470,13 +470,13 @@ postfix_expression:
         }
         | postfix_expression TOK_INCR
         { $$=$2;
-          set($$, ID_sideeffect);
+          set($$, ID_side_effect);
           stack($$).set(ID_statement, ID_postincrement);
           mto($$, $1);
         }
         | postfix_expression TOK_DECR
         { $$=$2;
-          set($$, ID_sideeffect);
+          set($$, ID_side_effect);
           stack($$).set(ID_statement, ID_postdecrement);
           mto($$, $1);
         }
@@ -526,13 +526,13 @@ unary_expression:
           postfix_expression
         | TOK_INCR unary_expression
         { $$=$1;
-          set($$, ID_sideeffect);
+          set($$, ID_side_effect);
           stack($$).set(ID_statement, ID_preincrement);
           mto($$, $2);
         }
         | TOK_DECR unary_expression
         { $$=$1;
-          set($$, ID_sideeffect);
+          set($$, ID_side_effect);
           stack($$).set(ID_statement, ID_predecrement);
           mto($$, $2);
         }
@@ -725,7 +725,7 @@ conditional_expression:
         }
         | logical_equivalence_expression '?' ':' conditional_expression
         { $$=$2;
-          stack($$).id(ID_sideeffect);
+          stack($$).id(ID_side_effect);
           stack($$).set(ID_statement, ID_gcc_conditional_expression);
           mto($$, $1);
           mto($$, $4);
@@ -735,27 +735,27 @@ conditional_expression:
 assignment_expression:
           conditional_expression
         | cast_expression '=' assignment_expression
-        { binary($$, $1, $2, ID_sideeffect, $3); stack($$).set(ID_statement, ID_assign); }
+        { binary($$, $1, $2, ID_side_effect, $3); stack($$).set(ID_statement, ID_assign); }
         | cast_expression TOK_MULTASSIGN assignment_expression
-        { binary($$, $1, $2, ID_sideeffect, $3); stack($$).set(ID_statement, ID_assign_mult); }
+        { binary($$, $1, $2, ID_side_effect, $3); stack($$).set(ID_statement, ID_assign_mult); }
         | cast_expression TOK_DIVASSIGN assignment_expression
-        { binary($$, $1, $2, ID_sideeffect, $3); stack($$).set(ID_statement, ID_assign_div); }
+        { binary($$, $1, $2, ID_side_effect, $3); stack($$).set(ID_statement, ID_assign_div); }
         | cast_expression TOK_MODASSIGN assignment_expression
-        { binary($$, $1, $2, ID_sideeffect, $3); stack($$).set(ID_statement, ID_assign_mod); }
+        { binary($$, $1, $2, ID_side_effect, $3); stack($$).set(ID_statement, ID_assign_mod); }
         | cast_expression TOK_PLUSASSIGN assignment_expression
-        { binary($$, $1, $2, ID_sideeffect, $3); stack($$).set(ID_statement, ID_assign_plus); }
+        { binary($$, $1, $2, ID_side_effect, $3); stack($$).set(ID_statement, ID_assign_plus); }
         | cast_expression TOK_MINUSASSIGN assignment_expression
-        { binary($$, $1, $2, ID_sideeffect, $3); stack($$).set(ID_statement, ID_assign_minus); }
+        { binary($$, $1, $2, ID_side_effect, $3); stack($$).set(ID_statement, ID_assign_minus); }
         | cast_expression TOK_SHLASSIGN assignment_expression
-        { binary($$, $1, $2, ID_sideeffect, $3); stack($$).set(ID_statement, ID_assign_shl); }
+        { binary($$, $1, $2, ID_side_effect, $3); stack($$).set(ID_statement, ID_assign_shl); }
         | cast_expression TOK_SHRASSIGN assignment_expression
-        { binary($$, $1, $2, ID_sideeffect, $3); stack($$).set(ID_statement, ID_assign_shr); }
+        { binary($$, $1, $2, ID_side_effect, $3); stack($$).set(ID_statement, ID_assign_shr); }
         | cast_expression TOK_ANDASSIGN assignment_expression
-        { binary($$, $1, $2, ID_sideeffect, $3); stack($$).set(ID_statement, ID_assign_bitand); }
+        { binary($$, $1, $2, ID_side_effect, $3); stack($$).set(ID_statement, ID_assign_bitand); }
         | cast_expression TOK_XORASSIGN assignment_expression
-        { binary($$, $1, $2, ID_sideeffect, $3); stack($$).set(ID_statement, ID_assign_bitxor); }
+        { binary($$, $1, $2, ID_side_effect, $3); stack($$).set(ID_statement, ID_assign_bitxor); }
         | cast_expression TOK_ORASSIGN assignment_expression
-        { binary($$, $1, $2, ID_sideeffect, $3); stack($$).set(ID_statement, ID_assign_bitor); }
+        { binary($$, $1, $2, ID_side_effect, $3); stack($$).set(ID_statement, ID_assign_bitor); }
         ;
 
 comma_expression:
@@ -1637,7 +1637,7 @@ parameter_type_list:
 KnR_parameter_list:
           KnR_parameter
         {
-          init($$, ID_arguments);
+          init($$, ID_parameters);
           mts($$, $1);
         }
         | KnR_parameter_list ',' KnR_parameter
@@ -1658,7 +1658,7 @@ KnR_parameter: identifier
 parameter_list:
           parameter_declaration
         {
-          init($$, ID_arguments);
+          init($$, ID_parameters);
           mts($$, $1);
         }
         | parameter_list ',' parameter_declaration
@@ -2772,7 +2772,7 @@ postfixing_abstract_declarator:
           $$=$1;
           set($$, ID_code);
           stack($$).add(ID_subtype)=irept(ID_abstract);
-          stack($$).add(ID_arguments);
+          stack($$).add(ID_parameters);
           stack($$).set(ID_C_KnR, true);
         }
         | '('
@@ -2789,10 +2789,10 @@ postfixing_abstract_declarator:
           $$=$1;
           set($$, ID_code);
           stack($$).add(ID_subtype)=irept(ID_abstract);
-          stack($$).add(ID_arguments).get_sub().
+          stack($$).add(ID_parameters).get_sub().
             swap(stack($3).add(ID_subtypes).get_sub());
           PARSER.pop_scope();
-          adjust_KnR_parameters(stack($$).add(ID_arguments), stack($5));
+          adjust_KnR_parameters(stack($$).add(ID_parameters), stack($5));
           stack($$).set(ID_C_KnR, true);
         }
         ;
@@ -2803,7 +2803,7 @@ parameter_postfixing_abstract_declarator:
         {
           $$=$1;
           set($$, ID_code);
-          stack($$).add(ID_arguments);
+          stack($$).add(ID_parameters);
           stack($$).add(ID_subtype)=irept(ID_abstract);
         }
         | '('
@@ -2819,7 +2819,7 @@ parameter_postfixing_abstract_declarator:
           $$=$1;
           set($$, ID_code);
           stack($$).add(ID_subtype)=irept(ID_abstract);
-          stack($$).add(ID_arguments).get_sub().
+          stack($$).add(ID_parameters).get_sub().
             swap(stack($3).add(ID_subtypes).get_sub());
           PARSER.pop_scope();
         }

@@ -332,7 +332,7 @@ void cpp_typecheckt::new_temporary(
   exprt &temporary)
 {
   // create temporary object
-  exprt tmp_object_expr=exprt(ID_sideeffect, type);
+  exprt tmp_object_expr=exprt(ID_side_effect, type);
   tmp_object_expr.set(ID_statement, ID_temporary_object);
   tmp_object_expr.location()= location;
 

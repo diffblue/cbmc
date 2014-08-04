@@ -511,7 +511,7 @@ std::string expr2cppt::convert(
     return convert_extractbit(src, precedence=15);
   else if(src.id()==ID_extractbits)
     return convert_extractbits(src, precedence=15);
-  else if(src.id()==ID_sideeffect &&
+  else if(src.id()==ID_side_effect &&
           (src.get(ID_statement)==ID_cpp_new ||
            src.get(ID_statement)==ID_cpp_new_array))
     return convert_cpp_new(src, precedence=15);
