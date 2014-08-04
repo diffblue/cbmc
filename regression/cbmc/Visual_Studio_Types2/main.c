@@ -12,11 +12,14 @@ int main()
   assert(sizeof(ll)==8);
   
   // oh, and these pointer qualifiers are MS-specific
+  #ifdef _MSC_VER
   int * __ptr32 p32;
   int * __ptr64 p64;
 
   // requires --winx64 to work
   assert(sizeof(p32)==4);
   assert(sizeof(p64)==8);
+  #endif
+  
   assert(sizeof(void *)==8);
 }
