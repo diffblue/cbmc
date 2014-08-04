@@ -138,6 +138,10 @@ inline long double __builtin_huge_vall(void) { return 1.0l/0.0l; }
 
 inline int signbit(double d) { return __CPROVER_signd(d); }
 
+/* FUNCTION: __signbitd */
+
+inline int __signbitd(double d) { return __CPROVER_signd(d); }
+
 /* FUNCTION: __signbitf */
 
 inline int __signbitf(float f) { return __CPROVER_signf(f); }
