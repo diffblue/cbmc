@@ -718,8 +718,8 @@ bool c_preprocess_gcc(
     break;
 
   case configt::ansi_ct::OS_WIN:
-    command+=" -D _MSC_VER=1400";
     command+=" -D _WIN32";
+
     if(config.ansi_c.mode!=configt::ansi_ct::MODE_VISUAL_STUDIO_C_CPP)
       command+=" -D _M_IX86=Blend";
 
