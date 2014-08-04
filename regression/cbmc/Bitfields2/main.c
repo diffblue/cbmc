@@ -1,5 +1,5 @@
 
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(__CYGWIN__)
 typedef signed __int64 int64_t;
 typedef unsigned __int64 uint64_t;
 typedef signed int int32_t;
