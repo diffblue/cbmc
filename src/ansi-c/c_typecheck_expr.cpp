@@ -160,7 +160,7 @@ Function: c_typecheck_baset::typecheck_expr_main
 
 void c_typecheck_baset::typecheck_expr_main(exprt &expr)
 {
-  if(expr.id()==ID_sideeffect)
+  if(expr.id()==ID_side_effect)
     typecheck_expr_side_effect(to_side_effect_expr(expr));
   else if(expr.id()==ID_constant)
     typecheck_expr_constant(expr);
@@ -696,7 +696,7 @@ Function: c_typecheck_baset::typecheck_expr_operands
 
 void c_typecheck_baset::typecheck_expr_operands(exprt &expr)
 {
-  if(expr.id()==ID_sideeffect &&
+  if(expr.id()==ID_side_effect &&
      expr.get(ID_statement)==ID_function_call)
   {
     // don't do function operand
@@ -704,7 +704,7 @@ void c_typecheck_baset::typecheck_expr_operands(exprt &expr)
 
     typecheck_expr(expr.op1()); // arguments
   }
-  else if(expr.id()==ID_sideeffect &&
+  else if(expr.id()==ID_side_effect &&
           expr.get(ID_statement)==ID_statement_expression)
   {
     typecheck_code(to_code(expr.op0()));
@@ -955,7 +955,7 @@ void c_typecheck_baset::typecheck_side_effect_statement_expression(
       codet code_expr(ID_expression);
       code_expr.location() = fc.location();
 
-      exprt assign(ID_sideeffect);
+      exprt assign(ID_side_effect);
       assign.set(ID_statement, ID_assign);
       assign.location()=fc.location();
       assign.move_to_operands(fc.lhs(), sideeffect);
@@ -2748,7 +2748,7 @@ void c_typecheck_baset::typecheck_function_call_arguments(
       const typet &op_type=parameter_type.type();
 
       if(op_type.id()==ID_bool &&
-         op.id()==ID_sideeffect &&
+         op.id()==ID_side_effect &&
          op.get(ID_statement)==ID_assign &&
          op.type().id()!=ID_bool)
       {
@@ -3119,7 +3119,7 @@ void c_typecheck_baset::typecheck_expr_pointer_arithmetic(exprt &expr)
   const typet &type1=follow(op1.type());
 
   if(expr.id()==ID_minus ||
-     (expr.id()==ID_sideeffect && expr.get(ID_statement)==ID_assign_minus))
+     (expr.id()==ID_side_effect && expr.get(ID_statement)==ID_assign_minus))
   {
     if(type0.id()==ID_pointer &&
        type1.id()==ID_pointer)
@@ -3145,7 +3145,7 @@ void c_typecheck_baset::typecheck_expr_pointer_arithmetic(exprt &expr)
     }
   }
   else if(expr.id()==ID_plus ||
-          (expr.id()==ID_sideeffect && expr.get(ID_statement)==ID_assign_plus))
+          (expr.id()==ID_side_effect && expr.get(ID_statement)==ID_assign_plus))
   {
     exprt *p_op, *int_op;
 

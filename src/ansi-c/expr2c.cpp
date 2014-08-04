@@ -4184,7 +4184,7 @@ std::string expr2ct::convert(
   else if(src.id()==ID_function_application)
     return convert_function_application(to_function_application_expr(src), precedence);
     
-  else if(src.id()==ID_sideeffect)
+  else if(src.id()==ID_side_effect)
   {
     const irep_idt &statement=src.get(ID_statement);
     if(statement==ID_preincrement)

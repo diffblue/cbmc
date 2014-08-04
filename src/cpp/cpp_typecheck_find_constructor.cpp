@@ -48,15 +48,15 @@ void cpp_typecheckt::find_constructor(
 
     if(type.find(ID_return_type).id()==ID_constructor)
     {
-      const irept::subt &arguments=
-        type.find(ID_arguments).get_sub();
+      const irept::subt &parameters=
+        type.find(ID_parameters).get_sub();
 
       namespacet ns(symbol_table);
 
-      if(arguments.size()==1)
+      if(parameters.size()==1)
       {
-        const exprt &argument=(exprt &)arguments.front();
-        const typet &arg_type=argument.type();
+        const exprt &parameter=(exprt &)parameters.front();
+        const typet &arg_type=parameter.type();
 
         if(arg_type.id()==ID_pointer &&
            type_eq(arg_type.subtype(), dest_type, ns))

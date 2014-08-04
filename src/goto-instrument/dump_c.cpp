@@ -384,7 +384,7 @@ void goto_program2codet::scan_for_varargs()
     {
       const exprt &r=to_code_assign(target->code).rhs();
 
-      if(r.id()==ID_sideeffect &&
+      if(r.id()==ID_side_effect &&
          to_side_effect_expr(r).get_statement()==ID_gcc_builtin_va_arg_next)
       {
         assert(r.has_operands());
@@ -720,7 +720,7 @@ goto_programt::const_targett goto_program2codet::convert_assign_varargs(
 
     dest.move_to_operands(f);
   }
-  else if(r.id()==ID_sideeffect &&
+  else if(r.id()==ID_side_effect &&
           to_side_effect_expr(r).get_statement()==ID_gcc_builtin_va_arg_next)
   {
     f.function()=symbol_exprt("va_arg", code_typet());
@@ -835,7 +835,7 @@ goto_programt::const_targett goto_program2codet::convert_return(
 
   // catch the specific case where the original code was missing a return
   if(ret.has_return_value() &&
-     ret.return_value().id()==ID_sideeffect &&
+     ret.return_value().id()==ID_side_effect &&
      to_side_effect_expr(ret.return_value()).get_statement()==ID_nondet)
     return target;
 
@@ -1055,7 +1055,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_while(
 
     f.iter()=w.body().operands().back();
     w.body().operands().pop_back();
-    f.iter().id(ID_sideeffect);
+    f.iter().id(ID_side_effect);
 
     f.body().swap(w.body());
 
@@ -2459,7 +2459,7 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
     expr.make_typecast(t);
     add_local_types(t);
   }
-  else if(expr.id()==ID_sideeffect)
+  else if(expr.id()==ID_side_effect)
   {
     const irep_idt &statement=to_side_effect_expr(expr).get_statement();
 
@@ -4054,7 +4054,7 @@ std::string goto2sourcet::expr_to_string(const exprt &expr)
     return "((" + expr_to_string(expr.op0()) + ")[ "
            + expr_to_string(expr.op1()) + " ])";
   }
-  else if(expr.id()==ID_sideeffect)
+  else if(expr.id()==ID_side_effect)
   {
     const irep_idt &statement=to_sideeffect_expr(expr).get_statement();
   

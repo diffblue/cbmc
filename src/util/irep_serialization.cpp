@@ -237,11 +237,21 @@ Function: write_gb_word
 
 void write_gb_word(std::ostream &out, std::size_t u)
 {
-  assert(sizeof(unsigned)==4);
-  out.put((u & 0xFF000000) >> 24); 
-  out.put((u & 0x00FF0000) >> 16);
-  out.put((u & 0x0000FF00) >> 8);
-  out.put(u & 0x000000FF);
+  // we write 7 bits each time, until we have zero
+  
+  while(true)
+  {
+    unsigned char value=u&0x7f;
+    u>>=7;
+
+    if(u==0)
+    {
+      out.put(value);
+      break;
+    }
+    
+    out.put(value | 0x80);
+  }
 }
 
 /*******************************************************************\
@@ -258,11 +268,17 @@ Function: irep_serializationt::read_gb_word
 
 std::size_t irep_serializationt::read_gb_word(std::istream &in)
 {
-  assert(sizeof(unsigned)==4);
-  unsigned res=0;
+  std::size_t res=0;
+  
+  unsigned shift_distance=0;
 
-  for(unsigned i=0; i<4 && in.good(); i++)
-    res = (res << 8) | in.get();
+  while(in.good())
+  {
+    unsigned char ch=in.get();
+    res|=(size_t(ch&0x7f))<<shift_distance;
+    shift_distance+=7;
+    if((ch&0x80)==0) break;
+  }
 
   return res;
 }

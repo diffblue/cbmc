@@ -951,26 +951,26 @@ const code_expressiont &to_code_expression(const codet &code);
 class side_effect_exprt:public exprt
 {
 public:
-  inline explicit side_effect_exprt(const irep_idt &statement):exprt(ID_sideeffect)
+  inline explicit side_effect_exprt(const irep_idt &statement):exprt(ID_side_effect)
   {
     set_statement(statement);
   }
 
   inline side_effect_exprt(const irep_idt &statement, const typet &_type):
-    exprt(ID_sideeffect, _type)
+    exprt(ID_side_effect, _type)
   {
     set_statement(statement);
   }
 
   inline friend side_effect_exprt &to_side_effect_expr(exprt &expr)
   {
-    assert(expr.id()==ID_sideeffect);
+    assert(expr.id()==ID_side_effect);
     return static_cast<side_effect_exprt &>(expr);
   }
 
   inline friend const side_effect_exprt &to_side_effect_expr(const exprt &expr)
   {
-    assert(expr.id()==ID_sideeffect);
+    assert(expr.id()==ID_side_effect);
     return static_cast<const side_effect_exprt &>(expr);
   }
   
@@ -1036,14 +1036,14 @@ public:
 
   inline friend side_effect_expr_function_callt &to_side_effect_expr_function_call(exprt &expr)
   {
-    assert(expr.id()==ID_sideeffect);
+    assert(expr.id()==ID_side_effect);
     assert(expr.get(ID_statement)==ID_function_call);
     return static_cast<side_effect_expr_function_callt &>(expr);
   }
 
   inline friend const side_effect_expr_function_callt &to_side_effect_expr_function_call(const exprt &expr)
   {
-    assert(expr.id()==ID_sideeffect);
+    assert(expr.id()==ID_side_effect);
     assert(expr.get(ID_statement)==ID_function_call);
     return static_cast<const side_effect_expr_function_callt &>(expr);
   }
@@ -1070,14 +1070,14 @@ public:
 
 extern inline side_effect_expr_throwt &to_side_effect_expr_throw(exprt &expr)
 {
-  assert(expr.id()==ID_sideeffect);
+  assert(expr.id()==ID_side_effect);
   assert(expr.get(ID_statement)==ID_throw);
   return static_cast<side_effect_expr_throwt &>(expr);
 }
 
 extern inline const side_effect_expr_throwt &to_side_effect_expr_throw(const exprt &expr)
 {
-  assert(expr.id()==ID_sideeffect);
+  assert(expr.id()==ID_side_effect);
   assert(expr.get(ID_statement)==ID_throw);
   return static_cast<const side_effect_expr_throwt &>(expr);
 }

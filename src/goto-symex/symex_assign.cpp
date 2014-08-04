@@ -35,7 +35,7 @@ void goto_symext::symex_assign(
   replace_nondet(lhs);
   replace_nondet(rhs);
   
-  if(rhs.id()==ID_sideeffect)
+  if(rhs.id()==ID_side_effect)
   {
     const side_effect_exprt &side_effect_expr=to_side_effect_expr(rhs);
     const irep_idt &statement=side_effect_expr.get_statement();
