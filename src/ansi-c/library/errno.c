@@ -34,3 +34,14 @@ inline int *_errno(void)
   return &__CPROVER_errno;
 }
 
+/* FUNCTION: __errno */
+
+// This has been spotted in CYGWIN
+
+__CPROVER_thread_local int __CPROVER_errno;
+
+extern int *__errno(void)
+{
+  return &__CPROVER_errno;
+}
+
