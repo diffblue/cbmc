@@ -49,4 +49,7 @@ int main()
   assert(sizeof(u8""[0])==sizeof(char));
   assert(sizeof(u""[0])==2);
   assert(sizeof(U""[0])==4);
+  
+  // generic wide string, OS-dependent
+  assert(sizeof(L""[0])==sizeof(wchar_t));
 }
