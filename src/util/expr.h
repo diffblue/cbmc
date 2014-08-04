@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_EXPR_H
 #define CPROVER_EXPR_H
 
-//#define OPERANDS_IN_GETSUB
+#define OPERANDS_IN_GETSUB
 
 #include "type.h"
 
