@@ -245,68 +245,69 @@ Function: cpp_typecheckt::default_cpctor
 \*******************************************************************/
 
 void cpp_typecheckt::default_cpctor(
-  const symbolt& symbol,
-  cpp_declarationt& cpctor) const
+  const symbolt &symbol,
+  cpp_declarationt &cpctor) const
 {
   locationt location = symbol.type.location();
 
   location.set_function(
     id2string(symbol.base_name)+
     "::"+id2string(symbol.base_name)+
-    "( const "+id2string(symbol.base_name)+"&)");
+    "(const "+id2string(symbol.base_name)+" &)");
 
+  // Produce default constructor first
   default_ctor(location, symbol.base_name, cpctor);
-  cpp_declaratort& decl0 = cpctor.declarators()[0];
+  cpp_declaratort &decl0 = cpctor.declarators()[0];
 
-  std::string arg_name("ref");
+  std::string param_identifier("ref");
 
   // Compound name
-  irept compname(ID_name);
-  compname.set(ID_identifier, symbol.base_name);
-  compname.set(ID_C_location, location);
+  irept comp_name(ID_name);
+  comp_name.set(ID_identifier, symbol.base_name);
+  comp_name.set(ID_C_location, location);
 
   cpp_namet cppcomp;
-  cppcomp.move_to_sub(compname);
+  cppcomp.move_to_sub(comp_name);
 
-  // Argument name
-  exprt argname(ID_name);
-  argname.location()=location;
-  argname.set(ID_identifier, arg_name);
+  // Parameter name
+  exprt param_name(ID_name);
+  param_name.location()=location;
+  param_name.set(ID_identifier, param_identifier);
   
-  cpp_namet cpparg;
-  cpparg.move_to_sub(argname);
+  cpp_namet cpp_parameter;
+  cpp_parameter.move_to_sub(param_name);
 
-  // Argument declarator
-  cpp_declaratort argtor;
-  argtor.add(ID_value).make_nil();
-  argtor.set(ID_name, cpparg);
-  argtor.type()=reference_typet();
-  argtor.type().subtype().make_nil();
-  argtor.type().add("#qualifier").make_nil();
-  argtor.location() = location;
+  // Parameter declarator
+  cpp_declaratort parameter_tor;
+  parameter_tor.add(ID_value).make_nil();
+  parameter_tor.set(ID_name, cpp_parameter);
+  parameter_tor.type()=reference_typet();
+  parameter_tor.type().subtype().make_nil();
+  parameter_tor.type().add(ID_C_qualifier).make_nil();
+  parameter_tor.location() = location;
 
-    // Argument declaration
-  cpp_declarationt argdecl;
-  argdecl.set(ID_type, ID_merged_type);
-  irept& subt = argdecl.add(ID_type).add(ID_subtypes);
+  // Parameter declaration
+  cpp_declarationt parameter_decl;
+  parameter_decl.set(ID_type, ID_merged_type);
+  irept &subt = parameter_decl.add(ID_type).add(ID_subtypes);
   subt.get_sub().push_back(cppcomp);
   irept constnd(ID_const);
   subt.get_sub().push_back(constnd);
-  argdecl.move_to_operands(argtor);
-  argdecl.location() = location;
+  parameter_decl.move_to_operands(parameter_tor);
+  parameter_decl.location() = location;
 
   // Add parameter to function type
-  decl0.add(ID_type).add(ID_parameters).get_sub().push_back(argdecl);
+  decl0.add(ID_type).add(ID_parameters).get_sub().push_back(parameter_decl);
   decl0.location() = location;
 
-  irept& initializers = decl0.add(ID_member_initializers);
+  irept &initializers = decl0.add(ID_member_initializers);
   initializers.id(ID_member_initializers);
 
-  cpp_declaratort& declarator = (cpp_declaratort&) cpctor.op0();
-  exprt& block = declarator.value();
+  cpp_declaratort &declarator = (cpp_declaratort &) cpctor.op0();
+  exprt &block = declarator.value();
 
   // First, we need to call the parent copy constructors
-  const irept& bases = symbol.type.find(ID_bases);
+  const irept &bases = symbol.type.find(ID_bases);
   forall_irep(parent_it, bases.get_sub())
   {
     assert(parent_it->id() == ID_base);
@@ -316,7 +317,7 @@ void cpp_typecheckt::default_cpctor(
       lookup(parent_it->find(ID_type).get(ID_identifier));
 
     if(cpp_is_pod(parsymb.type))
-      copy_parent(location, parsymb.base_name, arg_name, block);
+      copy_parent(location, parsymb.base_name, param_identifier, block);
     else
     {
       irep_idt ctor_name = parsymb.base_name;
@@ -332,7 +333,7 @@ void cpp_typecheckt::default_cpctor(
       codet mem_init(ID_member_initializer);
       mem_init.location() = location;
       mem_init.set(ID_member, cppname);
-      mem_init.copy_to_operands(static_cast<const exprt &>(static_cast<const irept &>(cpparg)));
+      mem_init.copy_to_operands(static_cast<const exprt &>(static_cast<const irept &>(cpp_parameter)));
       initializers.move_to_sub(mem_init);
     }
   }
@@ -395,7 +396,7 @@ void cpp_typecheckt::default_cpctor(
 
     exprt memberexpr(ID_member);
     memberexpr.set("component_cpp_name", cppname);
-    memberexpr.copy_to_operands(static_cast<const exprt &>(static_cast<const irept &>(cpparg)));
+    memberexpr.copy_to_operands(static_cast<const exprt &>(static_cast<const irept &>(cpp_parameter)));
     memberexpr.location() = location;
 
     if(mem_it->type().id()==ID_array)
