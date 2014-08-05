@@ -296,7 +296,7 @@ void cpp_typecheckt::default_cpctor(
   argdecl.location() = location;
 
   // Add parameter to function type
-  decl0.add(ID_type).add(ID_arguments).get_sub().push_back(argdecl);
+  decl0.add(ID_type).add(ID_parameters).get_sub().push_back(argdecl);
   decl0.location() = location;
 
   irept& initializers = decl0.add(ID_member_initializers);
@@ -456,7 +456,7 @@ void cpp_typecheckt::default_assignop(
   declarator_type.subtype().add("#qualifier").make_nil();
   declarator_type.subtype().subtype().make_nil();
 
-  exprt& args = (exprt&) declarator.type().add(ID_arguments);
+  exprt& args = (exprt&) declarator.type().add(ID_parameters);
   args.location() = location;
 
   args.get_sub().push_back(irept(ID_cpp_declaration));
