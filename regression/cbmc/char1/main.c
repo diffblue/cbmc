@@ -2,7 +2,7 @@
 
 int main()
 {
-  #ifdef _MSCVER
+  #ifdef _MSC_VER
   #ifndef _CHAR_UNSIGNED
   #error _CHAR_UNSIGNED should be set
   #endif
