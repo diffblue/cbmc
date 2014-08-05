@@ -702,7 +702,10 @@ bool c_preprocess_gcc(
     else
       assert(false);
   }
-  
+
+  if(config.ansi_c.char_is_unsigned)
+    command+=" -D __CHAR_UNSIGNED__"; // gcc
+
   switch(config.ansi_c.os)
   {
   case configt::ansi_ct::OS_LINUX:
@@ -727,7 +730,7 @@ bool c_preprocess_gcc(
       command+=" -D _WIN64"; // yes, both _WIN32 and _WIN64 get defined
 
     if(config.ansi_c.char_is_unsigned)
-      command+=" -D _CHAR_UNSIGNED";
+      command+=" -D _CHAR_UNSIGNED"; // This is Visual Studio
     break;
 
   case configt::ansi_ct::NO_OS:
