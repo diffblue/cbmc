@@ -2530,7 +2530,7 @@ bool Parser::rName(irept &name)
   std::cout << "Parser::rName 0\n";
   #endif
 
-  name=irept(ID_cpp_name);
+  name=cpp_namet();
   irept::subt &components=name.get_sub();
 
   if(lex.LookAhead(0)==TOK_TYPENAME)
@@ -2835,9 +2835,8 @@ bool Parser::rPtrToMember(irept &ptr_to_mem)
   #endif
 
   irept ptm(ID_pointer);
-  irept& name = ptm.add("to-member");
-  name.id(ID_cpp_name);
-
+  irept &name = ptm.add("to-member");
+  name=cpp_namet();
   irept::subt &components=name.get_sub();
 
   {
@@ -5466,7 +5465,7 @@ bool Parser::rVarNameCore(exprt &name)
   {
     Token tk;
     lex.GetToken(tk);
-    name.set("typename", true);
+    name.set(ID_typename, true);
   }
 
   {
