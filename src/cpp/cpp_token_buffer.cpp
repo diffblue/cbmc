@@ -130,7 +130,6 @@ extern char *yyansi_ctext;
 
 #include <ansi-c/ansi_c_parser.h>
 #include "cpp_parser.h"
-#include <iostream>
 
 void cpp_token_buffert::read_token()
 {

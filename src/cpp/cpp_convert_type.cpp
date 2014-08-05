@@ -7,7 +7,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 \*******************************************************************/
 
 #include <cassert>
-#include <iostream>
 
 #include <util/config.h>
 #include <util/arith_tools.h>

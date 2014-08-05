@@ -6,8 +6,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#include <iostream>
-
 #include <util/expr_util.h>
 #include <util/i2string.h>
 #include <util/simplify_expr_class.h>
@@ -192,7 +190,7 @@ void cpp_typecheckt::typecheck_class_template(
       
       previous_symbol->second.type.swap(declaration);
       
-      #if 1
+      #if 0
       std::cout << "*****\n";
       std::cout << *cpp_scopes.id_map[symbol_name];
       std::cout << "*****\n";
@@ -432,7 +430,7 @@ void cpp_typecheckt::typecheck_class_template_member(
   }
   else if((*(id_set.begin()))->id_class!=cpp_idt::TEMPLATE)
   {
-    std::cerr << *(*id_set.begin()) << std::endl;
+    // std::cerr << *(*id_set.begin()) << std::endl;
     err_location(cpp_name);
     str << "class template `"
         << cpp_name.get_sub().front().get(ID_identifier)
