@@ -6,7 +6,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#include <iostream>
 #include <cstdlib>
 
 #include <util/expr_util.h>
@@ -97,12 +96,16 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
   }
   else if(expr.is_nil())
   {
+    #if 0
     std::cerr << "cpp_typecheckt::typecheck_expr_main got nil" << std::endl;
+    #endif
     abort();
   }
   else if(expr.id()==ID_code)
   {
+    #if 0
     std::cerr << "cpp_typecheckt::typecheck_expr_main got code" << std::endl;
+    #endif
     abort();
   }
   else if(expr.id()==ID_symbol)

@@ -5663,7 +5663,6 @@ bool Parser::isTemplateArgs()
   function.body  : compound.statement
                  | { asm }
 */
-#include <iostream>
 
 bool Parser::rFunctionBody(cpp_declaratort &declarator)
 {
