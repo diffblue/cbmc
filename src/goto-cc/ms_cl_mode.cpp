@@ -112,6 +112,9 @@ bool ms_cl_modet::doit()
     if(cmdline.args.size()>=1)
       compiler.output_file_executable=get_base_name(cmdline.args[0])+".exe";
   }
+  
+  if(cmdline.isset('J'))
+    config.ansi_c.char_is_unsigned=true;
 
   if(verbosity>8)
   {
