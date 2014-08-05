@@ -45,7 +45,7 @@ Function: c_typecheck_baset::typecheck_expr
 
 void c_typecheck_baset::typecheck_expr(exprt &expr)
 {
-  if(expr.id()=="already_typechecked")
+  if(expr.id()==ID_already_typechecked)
   {
     assert(expr.operands().size()==1);
     exprt tmp;
