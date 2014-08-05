@@ -2655,7 +2655,14 @@ void cpp_typecheckt::typecheck_expr(exprt &expr)
   // Needs to be done before the operands!
   explicit_typecast_ambiguity(expr);
   
-  c_typecheck_baset::typecheck_expr(expr);
+  // cpp_name uses get_sub, which can get confused with expressions.
+  if(expr.id()==ID_cpp_name)
+    typecheck_expr_cpp_name(expr, cpp_typecheck_fargst());
+  else
+  {
+    // This does the operands, and then calls typecheck_expr_main.
+    c_typecheck_baset::typecheck_expr(expr);
+  }
 
   if(override_constantness)
     expr.type().set(ID_C_constant, false);
