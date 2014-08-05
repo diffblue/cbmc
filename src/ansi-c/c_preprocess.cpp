@@ -331,6 +331,9 @@ bool c_preprocess_visual_studio(
       command_file << "/U_WIN64" << std::endl;
     }
 
+    if(config.ansi_c.char_is_unsigned)
+      command_file << " /J" << "\n"; // This causes _CHAR_UNSIGNED to be defined
+
     // Standard Defines, ANSI9899 6.10.8
     command_file << "/D__STDC_VERSION__=199901L" << std::endl;
     command_file << "/D__STDC_IEC_559__=1" << std::endl;
