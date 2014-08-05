@@ -314,53 +314,53 @@ bool c_preprocess_visual_studio(
     // understands.
     command_file << char(0xef) << char(0xbb) << char(0xbf);
   
-    command_file << "/nologo" << std::endl;
-    command_file << "/E" << std::endl;
-    command_file << "/D__CPROVER__" << std::endl;
-    command_file << "/D__WORDSIZE=" << config.ansi_c.pointer_width << std::endl;
+    command_file << "/nologo" << "\n";
+    command_file << "/E" << "\n";
+    command_file << "/D__CPROVER__" << "\n";
+    command_file << "/D__WORDSIZE=" << config.ansi_c.pointer_width << "\n";
 
     if(config.ansi_c.pointer_width==64)
     {
-      command_file << "\"/D__PTRDIFF_TYPE__=long long int\""  << std::endl;
+      command_file << "\"/D__PTRDIFF_TYPE__=long long int\""  << "\n";
       // yes, both _WIN32 and _WIN64 get defined
-      command_file << "/D_WIN64" << std::endl;
+      command_file << "/D_WIN64" << "\n";
     }
     else
     {
-      command_file << "/D__PTRDIFF_TYPE__=int" << std::endl;
-      command_file << "/U_WIN64" << std::endl;
+      command_file << "/D__PTRDIFF_TYPE__=int" << "\n";
+      command_file << "/U_WIN64" << "\n";
     }
 
     if(config.ansi_c.char_is_unsigned)
-      command_file << " /J" << "\n"; // This causes _CHAR_UNSIGNED to be defined
+      command_file << "/J" << "\n"; // This causes _CHAR_UNSIGNED to be defined
 
     // Standard Defines, ANSI9899 6.10.8
-    command_file << "/D__STDC_VERSION__=199901L" << std::endl;
-    command_file << "/D__STDC_IEC_559__=1" << std::endl;
-    command_file << "/D__STDC_IEC_559_COMPLEX__=1" << std::endl;
-    command_file << "/D__STDC_ISO_10646__=1" << std::endl;
+    command_file << "/D__STDC_VERSION__=199901L" << "\n";
+    command_file << "/D__STDC_IEC_559__=1" << "\n";
+    command_file << "/D__STDC_IEC_559_COMPLEX__=1" << "\n";
+    command_file << "/D__STDC_ISO_10646__=1" << "\n";
   
     for(std::list<std::string>::const_iterator
         it=config.ansi_c.defines.begin();
         it!=config.ansi_c.defines.end();
         it++)
-      command_file << "/D" << shell_quote(*it) << std::endl;
+      command_file << "/D" << shell_quote(*it) << "\n";
 
     for(std::list<std::string>::const_iterator
         it=config.ansi_c.include_paths.begin();
         it!=config.ansi_c.include_paths.end();
         it++)
-      command_file << "/I" << shell_quote(*it) << std::endl;
+      command_file << "/I" << shell_quote(*it) << "\n";
 
        for(std::list<std::string>::const_iterator
                it=config.ansi_c.include_files.begin();
                it!=config.ansi_c.include_files.end();
                it++)
-         command_file << "/FI" << shell_quote(*it) << std::endl;
+         command_file << "/FI" << shell_quote(*it) << "\n";
 
     // Finally, the file to be preprocessed
     // (this is already in UTF-8).
-    command_file << shell_quote(file) << std::endl;
+    command_file << shell_quote(file) << "\n";
   }
   
   std::string tmpi=get_temporary_file("tmp.cl", "");
@@ -456,10 +456,10 @@ void postprocess_codewarrior(
     else if(line.size()>=3 &&
             line[0]=='/' && line[1]=='*' && line[2]==' ')
     {
-      outstream << line.c_str()+3 << std::endl; // strip the '/* '
+      outstream << line.c_str()+3 << "\n"; // strip the '/* '
     }
     else
-      outstream << line << std::endl;
+      outstream << line << "\n";
   }
 }
 
