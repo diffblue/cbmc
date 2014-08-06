@@ -249,9 +249,12 @@ bool gcc_modet::doit()
   if(cmdline.isset("short-double"))
     config.ansi_c.double_width=32;
     
-  // gcc's default is signed chars
+  // gcc's default is signed chars on most architectures
   if(cmdline.isset("funsigned-char"))
     config.ansi_c.char_is_unsigned=true;
+
+  if(cmdline.isset("fsigned-char"))
+    config.ansi_c.char_is_unsigned=false;
 
   if(cmdline.isset('U'))
     config.ansi_c.undefines=cmdline.get_values('U');
