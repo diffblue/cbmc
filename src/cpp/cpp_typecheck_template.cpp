@@ -601,7 +601,7 @@ void cpp_typecheckt::convert_class_template_specialization(
   if(cpp_name.is_qualified())
   {
     err_location(cpp_name.location());
-    str << "qualifiers not excpected here";
+    str << "qualifiers not expected here";
     throw 0;
   }
   
@@ -747,7 +747,7 @@ void cpp_typecheckt::convert_template_function_or_member_specialization(
   if(cpp_name.is_qualified())
   {
     err_location(cpp_name.location());
-    str << "qualifiers not excpected here";
+    str << "qualifiers not expected here";
     throw 0;
   }
   
