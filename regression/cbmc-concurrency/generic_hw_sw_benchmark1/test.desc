@@ -1,0 +1,8 @@
+KNOWNBUG
+main.c
+-D_ENABLE_CBMC_
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring

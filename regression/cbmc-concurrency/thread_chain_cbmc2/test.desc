@@ -1,0 +1,8 @@
+CORE
+main.c
+-D_SANITY_CHECK_
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
