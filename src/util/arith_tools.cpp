@@ -57,7 +57,8 @@ bool to_integer(const constant_exprt &expr, mp_integer &int_value)
   }
   else if(type_id==ID_integer ||
           type_id==ID_natural ||
-          type_id==ID_c_enum)
+          type_id==ID_c_enum ||
+          type_id==ID_incomplete_c_enum)
   {
     int_value=string2integer(id2string(value));
     return false;
