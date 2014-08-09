@@ -1418,17 +1418,13 @@ void cpp_typecheckt::typecheck_member_function(
   if(symbol_table.move(symbol, new_symbol))
   {
     err_location(symbol.location);
-    str << "failed to insert new symbol: " << symbol.name.c_str() << std::endl;
+    str << "failed to insert new symbol: "
+        << symbol.name.c_str() << "\n";
 
-    symbol_tablet::symbolst::iterator symb_it =
-      symbol_table.symbols.find(symbol.name);
-
-    if(symb_it != symbol_table.symbols.end())
-    {
-      str << "name of previous symbol: " << symb_it->second.name << std::endl;
-      str << "location of previous symbol: ";
-      err_location(symb_it->second.location);
-    }
+    str << "name of previous symbol: "
+        << new_symbol->name << "\n";
+    str << "location of previous symbol: "
+        << new_symbol->location;
 
     throw 0;
   }
@@ -1456,7 +1452,8 @@ void cpp_typecheckt::adjust_method_type(
 {
   irept &parameters=type.add(ID_parameters);
 
-  parameters.get_sub().insert(parameters.get_sub().begin(), irept(ID_argument));
+  parameters.get_sub().insert(
+    parameters.get_sub().begin(), irept(ID_parameter));
 
   exprt &parameter=static_cast<exprt &>(parameters.get_sub().front());
   parameter.type()=typet(ID_pointer);
