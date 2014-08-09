@@ -1,6 +1,6 @@
 CORE
 main.cpp
--I ../../libs/stl module.cpp 
+module.cpp 
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
