@@ -1,6 +1,6 @@
 CORE
 main.cpp
---pointer-check -I ../../libs/stl 
+--pointer-check
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
