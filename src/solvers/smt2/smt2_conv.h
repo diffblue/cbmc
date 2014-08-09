@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/hash_cont.h>
 #include <util/std_expr.h>
+#include <util/byte_operators.h>
 
 #include <solvers/prop/prop_conv.h>
 #include <solvers/flattening/boolbv_width.h>
@@ -125,8 +126,8 @@ protected:
   void unflatten_array(const exprt &);
   
   // specific expressions go here
-  void convert_byte_update(const exprt &expr);
-  void convert_byte_extract(const exprt &expr);
+  void convert_byte_update(const byte_update_exprt &expr);
+  void convert_byte_extract(const byte_extract_exprt &expr);
   void convert_typecast(const typecast_exprt &expr);
   void convert_struct(const struct_exprt &expr);
   void convert_union(const union_exprt &expr);
