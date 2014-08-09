@@ -38,15 +38,19 @@ int main (int argc, char **argv) {
   testAdd(FE_TONEAREST,plusZero,minusZero,0);
   testAdd(FE_TONEAREST,var,-var,0);
 
+  #ifdef FE_UPWARD
   testAdd(FE_UPWARD,plusZero,plusZero,0);
   testAdd(FE_UPWARD,minusZero,minusZero,1);
   testAdd(FE_UPWARD,plusZero,minusZero,0);
   testAdd(FE_UPWARD,var,-var,0);
+  #endif
 
+  #ifdef FE_DOWNWARD
   testAdd(FE_DOWNWARD,plusZero,plusZero,0);
   testAdd(FE_DOWNWARD,minusZero,minusZero,1);
   testAdd(FE_DOWNWARD,plusZero,minusZero,1);
   testAdd(FE_DOWNWARD,var,-var,1);
+  #endif
 
   testAdd(FE_TOWARDZERO,plusZero,plusZero,0);
   testAdd(FE_TOWARDZERO,minusZero,minusZero,1);

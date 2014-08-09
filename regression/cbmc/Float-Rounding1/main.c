@@ -17,12 +17,14 @@ void roundingTest (float f1, float f2) {
   float roundToNearestSum = f1 + f2;
   assert(roundToNearestSum == 0x1.000002p+0f);
 
+  #ifdef FE_DOWNWARD
   // Change the rounding mode
   fesetround(FE_DOWNWARD);
 
   // Should now round down to 0x1p+0;
   float roundDownSum = f1 + f2;
   assert(roundDownSum == 0x1.0p+0f);
+  #endif
 
   return;
 }
