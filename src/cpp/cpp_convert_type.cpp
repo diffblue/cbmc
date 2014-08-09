@@ -277,7 +277,7 @@ void cpp_convert_typet::read_function_type(const typet &type)
       // do we have a declarator?
       if(declarator.is_nil())
       {
-        parameter_expr=exprt(ID_argument, declaration.type());
+        parameter_expr=exprt(ID_parameter, declaration.type());
         parameter_expr.location()=type_location;
       }
       else
