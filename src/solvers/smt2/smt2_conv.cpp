@@ -1024,7 +1024,39 @@ void smt2_convt::convert_expr(const exprt &expr)
     
     if(expr.type().id()==ID_vector)
     {
-      TODO("bitnot for vectors");
+      if(use_datatypes)
+      {
+        assert(datatype_map.find(expr.type()) != datatype_map.end());
+
+        const std::string smt_typename=
+          datatype_map.find(expr.type())->second;
+
+        // extract elements
+        const vector_typet &vector_type=to_vector_type(expr.type());
+        
+        mp_integer size;
+        if(to_integer(vector_type.size(), size))
+          throw "failed to convert vector size to constant";
+
+        out << "(let ((?vectorop ";
+        convert_expr(expr.op0());
+        out << ")) ";
+          
+        out << "(mk-" << smt_typename;
+
+        typet index_type=vector_type.size().type();
+
+        // do bitnot component-by-component
+        for(mp_integer i=0; i!=size; ++i)
+        {
+          out << " (bvnot (" << smt_typename << "." << i
+              << " ?vectorop))";
+        }
+
+        out << "))"; // mk-, let
+      }
+      else
+        TODO("bitnot for vectors");
     }
     else
     {
@@ -1062,7 +1094,39 @@ void smt2_convt::convert_expr(const exprt &expr)
     }
     else if(expr.type().id()==ID_vector)
     {
-      TODO("unary minus for vector");
+      if(use_datatypes)
+      {
+        assert(datatype_map.find(expr.type()) != datatype_map.end());
+
+        const std::string smt_typename=
+          datatype_map.find(expr.type())->second;
+
+        // extract elements
+        const vector_typet &vector_type=to_vector_type(expr.type());
+        
+        mp_integer size;
+        if(to_integer(vector_type.size(), size))
+          throw "failed to convert vector size to constant";
+
+        out << "(let ((?vectorop ";
+        convert_expr(expr.op0());
+        out << ")) ";
+          
+        out << "(mk-" << smt_typename;
+
+        typet index_type=vector_type.size().type();
+
+        // negate component-by-component
+        for(mp_integer i=0; i!=size; ++i)
+        {
+          out << " (bvneg (" << smt_typename << "." << i
+              << " ?vectorop))";
+        }
+
+        out << "))"; // mk-, let
+      }
+      else
+        TODO("unary minus for vector");
     }
     else
     {
@@ -4020,7 +4084,10 @@ Function: smt2_convt::unflatten
 
 \*******************************************************************/
 
-void smt2_convt::unflatten(wheret where, const typet &type)
+void smt2_convt::unflatten(
+  wheret where,
+  const typet &type,
+  unsigned nesting)
 {
   if(type.id()==ID_symbol)
     return unflatten(where, ns.follow(type));
@@ -4051,7 +4118,7 @@ void smt2_convt::unflatten(wheret where, const typet &type)
         throw "failed to convert vector size to constant";
 
       if(where==BEGIN)
-        out << "(let ((?ufop ";
+        out << "(let ((?ufop" << nesting << " ";
       else
       {
         out << ")) ";
@@ -4063,10 +4130,10 @@ void smt2_convt::unflatten(wheret where, const typet &type)
         for(mp_integer i=0; i!=size; ++i, offset+=subtype_width)
         {
           out << " ";
-          // TODO: need to deal with nesting here
-	  TODO("need to deal with nesting here");
+	  unflatten(BEGIN, vector_type.subtype(), nesting+1);
           out << "((_ extract " << offset+subtype_width-1 << " "
-              << offset << ") ?ufop)";
+              << offset << ") ?ufop" << nesting << ")";
+          unflatten(END, vector_type.subtype(), nesting+1);
         }
 
         out << "))"; // mk-, let
@@ -4083,7 +4150,7 @@ void smt2_convt::unflatten(wheret where, const typet &type)
     {
       // extract members
       if(where==BEGIN)
-        out << "(let ((?ufop ";
+        out << "(let ((?ufop" << nesting << " ";
       else
       {
         out << ")) ";
@@ -4111,9 +4178,10 @@ void smt2_convt::unflatten(wheret where, const typet &type)
           unsigned member_width=boolbv_width(it->type());
           
           out << " ";
+          unflatten(BEGIN, it->type(), nesting+1);
           out << "((_ extract " << offset+member_width-1 << " "
-              << offset << ") ?ufop)";
-          
+              << offset << ") ?ufop" << nesting << ")";
+          unflatten(END, it->type(), nesting+1);
           offset+=member_width;
         }
 

@@ -172,7 +172,7 @@ protected:
   // unflatten() does the opposite.
   typedef enum { BEGIN, END } wheret;
   void flatten2bv(const exprt &);
-  void unflatten(wheret, const typet &);
+  void unflatten(wheret, const typet &, unsigned nesting=0);
   
   // pointers
   pointer_logict pointer_logic;
