@@ -5031,19 +5031,30 @@ bool simplify_exprt::simplify_byte_update(exprt &expr)
       const typet& tp = ns.follow(with.type());
       if(tp.id()==ID_struct) 
       {
-        // new offset = offset + component offset
-        mp_integer i = member_offset(ns, to_struct_type(tp), 
-                                     with.op1().get(ID_component_name));
-        if(i != -1) 
+        const struct_typet &struct_type=to_struct_type(tp);
+        const irep_idt &component_name=with.op1().get(ID_component_name);
+        
+        // is this a bit field?
+        if(struct_type.get_component(component_name).get_is_bit_field())
         {
-          exprt compo_offset = from_integer(i, offset.type());
-          plus_exprt new_offset (offset, compo_offset);
-          simplify_node (new_offset);
-          exprt new_value(with.op2());
-          expr.op1().swap(new_offset);
-          expr.op2().swap(new_value);
-          simplify_byte_update(expr); // do this recursively
-          return false;
+          // don't touch -- might not be byte-aligned
+        }
+        else
+        {
+          // new offset = offset + component offset
+          mp_integer i = member_offset(ns, struct_type, 
+                                       component_name);
+          if(i != -1) 
+          {
+            exprt compo_offset = from_integer(i, offset.type());
+            plus_exprt new_offset (offset, compo_offset);
+            simplify_node (new_offset);
+            exprt new_value(with.op2());
+            expr.op1().swap(new_offset);
+            expr.op2().swap(new_value);
+            simplify_byte_update(expr); // do this recursively
+            return false;
+          }
         }
       }
       else if(tp.id()==ID_array)

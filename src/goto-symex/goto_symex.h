@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 */
 
 #include <util/options.h>
+#include <util/byte_operators.h>
 
 #include <goto-programs/goto_functions.h>
 
@@ -246,9 +247,9 @@ protected:
   void symex_assign_symbol(statet &state, const symbol_exprt &lhs, const exprt &full_lhs, const exprt &rhs, guardt &guard, visibilityt visibility);
   void symex_assign_typecast(statet &state, const typecast_exprt &lhs, const exprt &full_lhs, const exprt &rhs, guardt &guard, visibilityt visibility);
   void symex_assign_array(statet &state, const index_exprt &lhs, const exprt &full_lhs, const exprt &rhs, guardt &guard, visibilityt visibility);
-  void symex_assign_member(statet &state, const member_exprt &lhs, const exprt &full_lhs, const exprt &rhs, guardt &guard, visibilityt visibility);
+  void symex_assign_struct_member(statet &state, const member_exprt &lhs, const exprt &full_lhs, const exprt &rhs, guardt &guard, visibilityt visibility);
   void symex_assign_if(statet &state, const if_exprt &lhs, const exprt &full_lhs, const exprt &rhs, guardt &guard, visibilityt visibility);
-  void symex_assign_byte_extract(statet &state, const exprt &lhs, const exprt &full_lhs, const exprt &rhs, guardt &guard, visibilityt visibility);
+  void symex_assign_byte_extract(statet &state, const byte_extract_exprt &lhs, const exprt &full_lhs, const exprt &rhs, guardt &guard, visibilityt visibility);
   
   static exprt add_to_lhs(const exprt &lhs, const exprt &what);
   
@@ -267,6 +268,7 @@ protected:
   static unsigned dynamic_counter;
   
   void read(exprt &expr);
+  void replace_union_members(exprt &expr);
   void replace_nondet(exprt &expr);
   void rewrite_quantifiers(exprt &expr, statet &state);
 };
