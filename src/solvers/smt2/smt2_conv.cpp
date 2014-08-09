@@ -724,11 +724,13 @@ Function: smt2_convt::convert_byte_extract
 
 \*******************************************************************/
 
-void smt2_convt::convert_byte_extract(const exprt &expr)
+void smt2_convt::convert_byte_extract(const byte_extract_exprt &expr)
 {
   // we just run the flattener
   exprt flattened_expr=flatten_byte_extract(expr, ns);
+  unflatten(BEGIN, expr.type());
   convert_expr(flattened_expr);
+  unflatten(END, expr.type());
 }
 
 /*******************************************************************\
@@ -743,7 +745,7 @@ Function: smt2_convt::convert_byte_update
 
 \*******************************************************************/
 
-void smt2_convt::convert_byte_update(const exprt &expr)
+void smt2_convt::convert_byte_update(const byte_update_exprt &expr)
 {
   assert(expr.operands().size()==3);
 
@@ -756,36 +758,42 @@ void smt2_convt::convert_byte_update(const exprt &expr)
   if(to_integer(expr.op1(), i))
     throw "byte_extract takes constant as second parameter";
 
-  boolbv_widtht boolbv_width(ns);
-  
-  unsigned w=boolbv_width(expr.op0().type());
+  unsigned total_width=boolbv_width(expr.op().type());
+  unsigned value_width=boolbv_width(expr.value().type());
 
-  if(w==0)
-    throw "failed to get width of byte_extract operand";
+  if(total_width==0)
+    throw "failed to get width of byte_update";
 
   mp_integer upper, lower; // of the byte
-  mp_integer max=w-1;
+  mp_integer max=total_width-1;
+
   if(expr.id()==ID_byte_update_little_endian)
   {
-    upper = ((i+1)*8)-1;
     lower = i*8;
+    upper = lower+value_width-1;
   }
-  else
+  else if(expr.id()==ID_byte_update_big_endian)
   {
     upper = max-(i*8);
     lower = max-((i+1)*8-1);
   }
-
+  else
+    assert(false);
+    
+  unflatten(BEGIN, expr.type());
+    
   if(upper==max)
   {
-    if(lower==0) // there was only one byte
-      convert_expr(expr.op2());
+    if(lower==0) // the update expression is expr.op2()
+    {
+      flatten2bv(expr.op2());
+    }
     else // uppermost byte selected, only R needed
     {
       out << "(concat ";
-      convert_expr(expr.op2());
+      flatten2bv(expr.op2());
       out << " ((_ extract " << lower-1 << " 0) ";
-      convert_expr(expr.op0());
+      flatten2bv(expr.op0());
       out << "))";
     }
   }
@@ -795,24 +803,25 @@ void smt2_convt::convert_byte_update(const exprt &expr)
     {
       out << "(concat ";
       out << "((_ extract " << max << " " << (upper+1) << ") ";
-      convert_expr(expr.op0());
+      flatten2bv(expr.op0());
       out << ") ";
-      convert_expr(expr.op2());
+      flatten2bv(expr.op2());
       out << ")";
     }
     else // byte in the middle selected, L & R needed
     {
       out << "(concat (concat ";
       out << "((_ extract " << max << " " << (upper+1) << ") ";
-      convert_expr(expr.op0());
+      flatten2bv(expr.op0());
       out << ") ";
-      convert_expr(expr.op2());
+      flatten2bv(expr.op2());
       out << ") ((_ extract " << (lower-1) << " 0) ";
-      convert_expr(expr.op0());
+      flatten2bv(expr.op0());
       out << "))";
     }
   }
 
+  unflatten(END, expr.type());    
 }
 
 /*******************************************************************\
@@ -1456,12 +1465,12 @@ void smt2_convt::convert_expr(const exprt &expr)
   else if(expr.id()==ID_byte_extract_little_endian ||
           expr.id()==ID_byte_extract_big_endian)
   {
-    convert_byte_extract(expr);
+    convert_byte_extract(to_byte_extract_expr(expr));
   }
   else if(expr.id()==ID_byte_update_little_endian ||
           expr.id()==ID_byte_update_big_endian)
   {
-    convert_byte_update(expr);
+    convert_byte_update(to_byte_update_expr(expr));
   }
   else if(expr.id()==ID_width)
   {
