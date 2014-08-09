@@ -1049,7 +1049,7 @@ void smt2_convt::convert_expr(const exprt &expr)
         // do bitnot component-by-component
         for(mp_integer i=0; i!=size; ++i)
         {
-          out << " (bvnot (" << smt_typename << "." << i
+          out << " (bvnot (" << smt_typename << "." << (size-i-1)
               << " ?vectorop))";
         }
 
@@ -1119,7 +1119,7 @@ void smt2_convt::convert_expr(const exprt &expr)
         // negate component-by-component
         for(mp_integer i=0; i!=size; ++i)
         {
-          out << " (bvneg (" << smt_typename << "." << i
+          out << " (bvneg (" << smt_typename << "." << (size-i-1)
               << " ?vectorop))";
         }
 
@@ -3076,7 +3076,7 @@ void smt2_convt::convert_plus(const plus_exprt &expr)
       exprt tmp(ID_plus, vector_type.subtype());
       forall_operands(it, expr)
         tmp.copy_to_operands(
-          index_exprt(*it, from_integer(i, index_type), vector_type.subtype()));
+          index_exprt(*it, from_integer(size-i-1, index_type), vector_type.subtype()));
 
       out << " ";
       convert_expr(tmp);
@@ -3236,7 +3236,7 @@ void smt2_convt::convert_minus(const minus_exprt &expr)
       exprt tmp(ID_minus, vector_type.subtype());
       forall_operands(it, expr)
         tmp.copy_to_operands(
-          index_exprt(*it, from_integer(i, index_type), vector_type.subtype()));
+          index_exprt(*it, from_integer(size-i-1, index_type), vector_type.subtype()));
 
       out << " ";
       convert_expr(tmp);
