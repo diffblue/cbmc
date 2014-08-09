@@ -34,8 +34,8 @@ void cpp_typecheckt::salvage_default_parameters(
   const template_typet &old_type,
   template_typet &new_type)
 {
-  const template_typet::parameterst &old_parameters=old_type.parameters();
-  template_typet::parameterst &new_parameters=new_type.parameters();
+  const template_typet::template_parameterst &old_parameters=old_type.template_parameters();
+  template_typet::template_parameterst &new_parameters=new_type.template_parameters();
 
   for(unsigned i=0; i<new_parameters.size(); i++)
   {
@@ -504,9 +504,9 @@ std::string cpp_typecheckt::class_template_identifier(
 
   // these are probably not needed -- templates
   // should be unique in a namespace
-  for(template_typet::parameterst::const_iterator
-      it=template_type.parameters().begin();
-      it!=template_type.parameters().end();
+  for(template_typet::template_parameterst::const_iterator
+      it=template_type.template_parameters().begin();
+      it!=template_type.template_parameters().end();
       it++)
   {
     if(counter!=0) identifier+=',';
@@ -705,7 +705,7 @@ void cpp_typecheckt::convert_class_template_specialization(
     // We can't typecheck arguments yet, they are used
     // for guessing later. But we can check the number.
     if(template_args_non_tc.arguments().size()!=
-       to_cpp_declaration(template_symbol.type).template_type().parameters().size())
+       to_cpp_declaration(template_symbol.type).template_type().template_parameters().size())
     {
       err_location(cpp_name.location());
       throw "template specialization with wrong number of arguments";
@@ -857,11 +857,11 @@ cpp_scopet &cpp_typecheckt::typecheck_template_parameters(
   cpp_scopes.go_to(template_scope);
 
   // put template parameters into this scope
-  template_typet::parameterst &parameters=type.parameters();
+  template_typet::template_parameterst &parameters=type.template_parameters();
 
   unsigned anon_count=0;
 
-  for(template_typet::parameterst::iterator
+  for(template_typet::template_parameterst::iterator
       it=parameters.begin();
       it!=parameters.end();
       it++)
@@ -939,7 +939,7 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
   const cpp_template_args_non_tct &template_args)
 {
   // old stuff
-  assert(template_args.id()!="already_typechecked");
+  assert(template_args.id()!=ID_already_typechecked);
 
   assert(template_symbol.type.get_bool(ID_is_template));
 
@@ -953,8 +953,8 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
   cpp_template_args_tct::argumentst &args=
     result.arguments();
     
-  const template_typet::parameterst &parameters=
-    template_type.parameters();
+  const template_typet::template_parameterst &parameters=
+    template_type.template_parameters();
     
   if(parameters.size()<args.size())
   {
@@ -1132,7 +1132,7 @@ void cpp_typecheckt::convert_template_declaration(
 
     // Is it function template specialization?
     // Only full specialization is allowed!
-    if(declaration.template_type().parameters().empty())
+    if(declaration.template_type().template_parameters().empty())
     {
       convert_template_function_or_member_specialization(declaration);
       return;
