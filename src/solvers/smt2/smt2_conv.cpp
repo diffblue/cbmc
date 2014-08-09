@@ -2116,12 +2116,12 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
       else
         throw "can't convert non-constant integer to bitvector";
     }
-    else if(src_type.id()==ID_struct) // flatten a struct
+    else if(src_type.id()==ID_struct) // flatten a struct to a bit-vector
     {
       if(use_datatypes)
       {
-        // need to stitch together
-        TODO("flatten structs with datatypes");
+        assert(boolbv_width(src_type)==boolbv_width(dest_type));
+        flatten2bv(src);
       }
       else
       {
@@ -2531,7 +2531,8 @@ void smt2_convt::convert_constant(const constant_exprt &expr)
   if(expr.type().id()==ID_unsignedbv ||
      expr.type().id()==ID_signedbv ||
      expr.type().id()==ID_bv ||
-     expr.type().id()==ID_c_enum)
+     expr.type().id()==ID_c_enum ||
+     expr.type().id()==ID_incomplete_c_enum)
   {
     mp_integer value;
 
@@ -3929,13 +3930,13 @@ void smt2_convt::flatten2bv(const exprt &expr)
         datatype_map.find(type)->second;
 
       // concatenate elements
-      const vector_typet &vector_type=to_vector_type(expr.type());
+      const vector_typet &vector_type=to_vector_type(type);
       
       mp_integer size;
       if(to_integer(vector_type.size(), size))
         throw "failed to convert vector size to constant";
         
-      out << "(let ((?flop ";
+      out << "(let ((?vflop ";
       convert_expr(expr);
       out << ")) ";
         
@@ -3943,7 +3944,7 @@ void smt2_convt::flatten2bv(const exprt &expr)
 
       for(mp_integer i=0; i!=size; ++i)        
       {
-        out << " (" << smt_typename << "." << i << " ?flop)";
+        out << " (" << smt_typename << "." << i << " ?vflop)";
       }
 
       out << "))"; // concat, let
@@ -3957,7 +3958,42 @@ void smt2_convt::flatten2bv(const exprt &expr)
   }
   else if(type.id()==ID_struct)
   {
-    convert_expr(expr);
+    if(use_datatypes)
+    {
+      assert(datatype_map.find(type) != datatype_map.end());
+
+      const std::string smt_typename=
+        datatype_map.find(type)->second;
+
+      // concatenate elements
+      const struct_typet &struct_type=to_struct_type(type);
+      
+      out << "(let ((?sflop ";
+      convert_expr(expr);
+      out << ")) ";
+        
+      const struct_typet::componentst &components=
+        struct_type.components();
+
+      // SMT-LIB 2 concat is binary only
+      for(unsigned i=components.size(); i>1; i--)
+      {
+        out << "(concat (" << smt_typename << "."
+            << components[i-1].get_name() << " ?sflop)";
+
+        out << " ";
+      }
+      
+      out << "(" << smt_typename << "." 
+          << components[0].get_name() << " ?sflop)";
+
+      for(unsigned i=1; i<components.size(); i++)
+        out << ")"; // concat
+
+      out << ")"; // let
+    }
+    else
+      convert_expr(expr);
   }
   else
     convert_expr(expr);
@@ -4034,6 +4070,51 @@ void smt2_convt::unflatten(wheret where, const typet &type)
   }
   else if(type.id()==ID_struct)
   {
+    if(use_datatypes)
+    {
+      // extract members
+      if(where==BEGIN)
+        out << "(let ((?ufop ";
+      else
+      {
+        out << ")) ";
+        
+        assert(datatype_map.find(type) != datatype_map.end());
+
+        const std::string smt_typename=
+          datatype_map.find(type)->second;
+
+        out << "(mk-" << smt_typename;
+
+        const struct_typet &struct_type=to_struct_type(type);
+      
+        const struct_typet::componentst &components=
+          struct_type.components();
+
+        unsigned offset=0;
+
+        unsigned i=0;
+        for(struct_typet::componentst::const_iterator
+            it=components.begin();
+            it!=components.end();
+            it++, i++)
+        {
+          unsigned member_width=boolbv_width(it->type());
+          
+          out << " ";
+          out << "((_ extract " << offset+member_width-1 << " "
+              << offset << ") ?ufop)";
+          
+          offset+=member_width;
+        }
+
+        out << "))"; // mk-, let
+      }
+    }
+    else
+    {
+      // nop, already a bv
+    }
   }
   else
   {
@@ -4119,7 +4200,7 @@ void smt2_convt::set_to(const exprt &expr, bool value)
         std::string smt2_identifier=convert_identifier(identifier);
         smt2_identifiers.insert(smt2_identifier);
 
-        out << "; set_to true\n";
+        out << "; set_to true (equal)\n";
         out << "(define-fun |" << smt2_identifier << "| () ";
 
         convert_type(equal_expr.lhs().type());
@@ -4151,7 +4232,7 @@ void smt2_convt::set_to(const exprt &expr, bool value)
   else
     convert_expr(expr);
 
-  out << ")" << "\n";
+  out << ")" << "\n"; // assert
 
   return;
 }
@@ -4433,11 +4514,17 @@ void smt2_convt::convert_type(const typet &type)
   else if(type.id()==ID_bv ||
           type.id()==ID_fixedbv ||
           type.id()==ID_unsignedbv ||
-          type.id()==ID_signedbv ||
-          type.id()==ID_c_enum)
+          type.id()==ID_signedbv)
   {
     out << "(_ BitVec "
         << to_bitvector_type(type).get_width() << ")";
+  }
+  else if(type.id()==ID_c_enum ||
+          type.id()==ID_incomplete_c_enum)
+  {
+    // these have a subtype
+    out << "(_ BitVec "
+        << to_bitvector_type(type.subtype()).get_width() << ")";
   }
   else if(type.id()==ID_floatbv)
   {
