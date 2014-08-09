@@ -401,7 +401,10 @@ void configt::ansi_ct::set_arch_spec_arm(const irep_idt &subarch)
   {
   case MODE_GCC_C:
   case MODE_GCC_CPP:
-    defines.push_back("__arm__");
+    if(subarch=="arm64")
+      defines.push_back("__aarch64__");
+    else
+      defines.push_back("__arm__");
     if(subarch=="armhf")
       defines.push_back("__ARM_PCS_VFP");
     break;
@@ -1117,7 +1120,7 @@ irep_idt configt::this_architecture()
   this_arch="alpha";
   #elif __armel__
   this_arch="armel";
-  #elif __arm64__
+  #elif __aarch64__
   this_arch="arm64";
   #elif __arm__
     #ifdef __ARM_PCS_VFP
