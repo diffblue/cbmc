@@ -476,11 +476,17 @@ void c_typecheck_baset::typecheck_expr_builtin_va_arg(exprt &expr)
   
   expr.swap(result);
   
-  // make sure symbol exists
+  // Make sure symbol exists, but we have it return void
+  // to avoid collisions of the same symbol with different
+  // types.
+  
+  code_typet symbol_type=new_type;
+  symbol_type.return_type()=empty_typet();
+  
   symbolt symbol;
   symbol.base_name=ID_gcc_builtin_va_arg;
   symbol.name=ID_gcc_builtin_va_arg;
-  symbol.type=new_type;
+  symbol.type=symbol_type;
   
   symbol_table.move(symbol);
 }
