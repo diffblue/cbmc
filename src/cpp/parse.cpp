@@ -729,13 +729,13 @@ bool Parser::rTemplateDecl2(typet &decl, TemplateDeclKind &kind)
   if(lex.GetToken(tk)!='<')
     return false;
 
-  irept &args=decl.add(ID_arguments);
+  irept &template_parameters=decl.add(ID_template_parameters);
 
-  if(!rTempArgList(args))
-      return false;
+  if(!rTempArgList(template_parameters))
+    return false;
 
   if(lex.GetToken(tk)!='>')
-      return false;
+    return false;
 
   // ignore nested TEMPLATE
   while (lex.LookAhead(0)==TOK_TEMPLATE)
@@ -753,7 +753,7 @@ bool Parser::rTemplateDecl2(typet &decl, TemplateDeclKind &kind)
       return false;
   }
 
-  if(args.get_sub().empty())
+  if(template_parameters.get_sub().empty())
     // template < > declaration
     kind=tdk_specialization;
   else
