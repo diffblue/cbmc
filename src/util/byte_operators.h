@@ -148,6 +148,18 @@ public:
   inline const exprt &value() const { return op2(); }
 };
 
+extern inline const byte_update_exprt &to_byte_update_expr(const exprt &expr)
+{
+  assert(expr.operands().size()==3);
+  return static_cast<const byte_update_exprt &>(expr);
+}
+
+extern inline byte_update_exprt &to_byte_update_expr(exprt &expr)
+{
+  assert(expr.operands().size()==3);
+  return static_cast<byte_update_exprt &>(expr);
+}
+
 /*! \brief TO_BE_DOCUMENTED
 */
 class byte_update_little_endian_exprt:public byte_update_exprt
