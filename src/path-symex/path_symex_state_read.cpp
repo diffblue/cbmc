@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <pointer-analysis/dereference.h>
 
 #include <goto-symex/adjust_float_expressions.h>
+#include <goto-symex/rewrite_union.h>
 
 #include "path_symex_state.h"
 
@@ -43,25 +44,29 @@ exprt path_symex_statet::read(const exprt &src, bool propagate)
   
   // This has four phases!
   // 1. Floating-point expression adjustment (rounding mode)
-  // 2. Dereferencing, including propagation of pointers.
-  // 3. Rewriting to SSA symbols
-  // 4. Simplifier
+  // 2. Rewrite unions into byte operators
+  // 3. Dereferencing, including propagation of pointers.
+  // 4. Rewriting to SSA symbols
+  // 5. Simplifier
   
   exprt tmp1=src;
   adjust_float_expressions(tmp1, var_map.ns);
+  
+  exprt tmp2=tmp1;
+  rewrite_union(tmp2, var_map.ns);
 
   // we force propagation for dereferencing
-  exprt tmp2=dereference_rec(tmp1, true);
+  exprt tmp3=dereference_rec(tmp2, true);
   
-  exprt tmp3=instantiate_rec(tmp2, propagate);
+  exprt tmp4=instantiate_rec(tmp3, propagate);
   
-  exprt tmp4=simplify_expr(tmp3, var_map.ns);
+  exprt tmp5=simplify_expr(tmp4, var_map.ns);
 
   #ifdef DEBUG
   //std::cout << " ==> " << tmp.pretty() << std::endl;
   #endif
 
-  return tmp4;
+  return tmp5;
 }
 
 /*******************************************************************\
@@ -150,7 +155,7 @@ exprt path_symex_statet::instantiate_rec(
     }
     else
     {
-      // TODO
+      // TODO: variable-sized array
     }
   }
   else if(src_type.id()==ID_vector) // src is a vector
@@ -242,6 +247,7 @@ exprt path_symex_statet::instantiate_rec(
     }
     else if(compound_type.id()==ID_union)
     {
+      // should already have been rewritten to byte_extract
       member_exprt tmp=to_member_expr(src);
       tmp.struct_op()=instantiate_rec(tmp.struct_op(), propagate);
       return tmp;
@@ -250,6 +256,10 @@ exprt path_symex_statet::instantiate_rec(
     {
       throw "member expects struct or union type"+src.pretty();
     }
+  }
+  else if(src.id()==ID_byte_extract_little_endian ||
+          src.id()==ID_byte_extract_big_endian)
+  {
   }
 
   if(!src.has_operands())
