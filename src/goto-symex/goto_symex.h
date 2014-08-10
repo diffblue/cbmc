@@ -268,7 +268,6 @@ protected:
   static unsigned dynamic_counter;
   
   void read(exprt &expr);
-  void replace_union_members(exprt &expr);
   void replace_nondet(exprt &expr);
   void rewrite_quantifiers(exprt &expr, statet &state);
 };
