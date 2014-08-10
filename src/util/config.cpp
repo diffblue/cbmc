@@ -1145,9 +1145,11 @@ irep_idt configt::this_architecture()
     this_arch="mips64";
     #endif
   #elif __powerpc__
-  this_arch="powerpc";
-  #elif __ppc64__
-  this_arch="ppc64";
+    #ifdef __ppc64__
+    this_arch="ppc64";
+    #else
+    this_arch="powerpc";
+    #endif
   #elif __sparc__
   this_arch="sparc";
   #elif __ia64__
