@@ -224,7 +224,7 @@ irep_idt cpp_typecheckt::function_identifier(const typet &type)
 
   for(; it!=parameters.end(); it++)
   {
-    if(first) first=false; else result+=",";
+    if(first) first=false; else result+=',';
     typet tmp_type=it->type();
     result+=cpp_type2name(it->type());
   }

@@ -39,8 +39,6 @@ Function: cpp_enum_typet::generate_anon_tag
 
 \*******************************************************************/
 
-#include <iostream>
-
 irep_idt cpp_enum_typet::generate_anon_tag() const
 {
   // This will only clash with anon enums that would have
@@ -52,7 +50,7 @@ irep_idt cpp_enum_typet::generate_anon_tag() const
   
   forall_irep(it, b)
   {
-    result+="#";
+    result+='#';
     result+=id2string(it->get(ID_name));
   }
   

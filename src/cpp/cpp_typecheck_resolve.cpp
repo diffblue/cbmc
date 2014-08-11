@@ -8,7 +8,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <cstdlib>
 #include <algorithm>
-#include <iostream>
 
 #include <util/expr_util.h>
 #include <util/std_types.h>
@@ -2159,17 +2158,17 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
   // enter the scope of the template
   cpp_typecheck.cpp_scopes.go_to(*template_scope);
 
-  // walk through the function arguments
-  const irept::subt &arguments=
-    function_declarator.type().find(ID_arguments).get_sub();
+  // walk through the function parameters
+  const irept::subt &parameters=
+    function_declarator.type().find(ID_parameters).get_sub();
   
-  for(std::size_t i=0; i<arguments.size(); i++)
+  for(std::size_t i=0; i<parameters.size(); i++)
   {
     if(i<fargs.operands.size() &&
-       arguments[i].id()==ID_cpp_declaration)
+       parameters[i].id()==ID_cpp_declaration)
     {
       const cpp_declarationt &arg_declaration=
-        to_cpp_declaration(arguments[i]);
+        to_cpp_declaration(parameters[i]);
         
       // again, there should be one declarator
       assert(arg_declaration.declarators().size()==1);

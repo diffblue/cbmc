@@ -1,0 +1,8 @@
+CORE
+main.c
+--string-abstraction --pointer-check --bounds-check
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring

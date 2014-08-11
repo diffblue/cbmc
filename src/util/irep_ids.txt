@@ -64,7 +64,7 @@ predicate_symbol
 predicate_next_symbol
 nondet_bool
 empty
-sideeffect
+side_effect
 statement
 statement_expression
 value
@@ -89,6 +89,7 @@ assume
 assert
 assertion
 goto
+gcc_computed_goto
 ifthenelse
 label
 break
@@ -97,7 +98,6 @@ function_call
 return
 skip
 arguments
-argument
 array
 size
 pointer
@@ -154,7 +154,7 @@ base_name
 C_base_name #base_name
 string
 C_string_constant #string_constant
-string_constant string-constant
+string_constant
 width
 components
 bv
@@ -244,6 +244,7 @@ static
 auto
 register
 thread_local
+thread
 C_thread_local #thread_local
 C_static_lifetime #static_lifetime
 mutable
@@ -440,6 +441,7 @@ template_function_instance
 template_type
 template_args
 template_parameter
+template_parameters
 C_template #template
 C_template_arguments #template_arguments
 typename
@@ -500,6 +502,7 @@ friend
 explicit
 storage_spec
 member_spec
+msc_declspec
 gcc_attribute
 packed
 C_packed #packed

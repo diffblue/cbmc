@@ -31,10 +31,10 @@ std::string locationt::as_string() const
   const irep_idt &column=get_column();
   const irep_idt &function=get_function();
 
-  if(file!="") { if(dest!="") dest+=" "; dest+="file "+id2string(file); }
-  if(line!="") { if(dest!="") dest+=" "; dest+="line "+id2string(line); }
-  if(column!="") { if(dest!="") dest+=" "; dest+="column "+id2string(column); }
-  if(function!="") { if(dest!="") dest+=" "; dest+="function "+id2string(function); }
+  if(file!="") { if(dest!="") dest+=' '; dest+="file "+id2string(file); }
+  if(line!="") { if(dest!="") dest+=' '; dest+="line "+id2string(line); }
+  if(column!="") { if(dest!="") dest+=' '; dest+="column "+id2string(column); }
+  if(function!="") { if(dest!="") dest+=' '; dest+="function "+id2string(function); }
 
   return dest;
 }

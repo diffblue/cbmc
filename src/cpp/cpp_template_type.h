@@ -17,6 +17,10 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 class template_parametert:public exprt
 {
 public:
+  template_parametert():exprt(ID_template_parameter)
+  {
+  }
+
   inline exprt &default_parameter()
   {
     return static_cast<exprt &>(add(ID_C_default_value));
@@ -40,18 +44,16 @@ public:
   {
   }
 
-  typedef std::vector<template_parametert> parameterst;
+  typedef std::vector<template_parametert> template_parameterst;
 
-  inline parameterst &parameters()
+  inline template_parameterst &template_parameters()
   {
-    // todo: will change to 'parameters'
-    return (parameterst &)add(ID_arguments).get_sub();
+    return (template_parameterst &)add(ID_template_parameters).get_sub();
   }
 
-  inline const parameterst &parameters() const
+  inline const template_parameterst &template_parameters() const
   {
-    // todo: will change to 'parameters'
-    return (const parameterst &)find(ID_arguments).get_sub();
+    return (const template_parameterst &)find(ID_template_parameters).get_sub();
   }
 };
 

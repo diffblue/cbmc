@@ -384,7 +384,7 @@ void goto_program2codet::scan_for_varargs()
     {
       const exprt &r=to_code_assign(target->code).rhs();
 
-      if(r.id()==ID_sideeffect &&
+      if(r.id()==ID_side_effect &&
          to_side_effect_expr(r).get_statement()==ID_gcc_builtin_va_arg_next)
       {
         assert(r.has_operands());
@@ -720,7 +720,7 @@ goto_programt::const_targett goto_program2codet::convert_assign_varargs(
 
     dest.move_to_operands(f);
   }
-  else if(r.id()==ID_sideeffect &&
+  else if(r.id()==ID_side_effect &&
           to_side_effect_expr(r).get_statement()==ID_gcc_builtin_va_arg_next)
   {
     f.function()=symbol_exprt("va_arg", code_typet());
@@ -796,34 +796,7 @@ void goto_program2codet::convert_assign_rec(
     const code_assignt &assign,
     codet &dest)
 {
-  if(assign.rhs().id()==ID_struct)
-  {
-    const struct_typet &type=
-      to_struct_type(ns.follow(assign.rhs().type()));
-
-    const struct_union_typet::componentst &components=
-      type.components();
-
-    assert(components.size()==assign.rhs().operands().size());
-    exprt::operandst::const_iterator o_it=assign.rhs().operands().begin();
-    for(struct_union_typet::componentst::const_iterator
-        it=components.begin();
-        it!=components.end();
-        ++it)
-    {
-      const bool is_zero_bit_field=
-        it->get_is_bit_field() &&
-        to_bitvector_type(ns.follow(it->type())).get_width()==0;
-
-      if(!it->get_is_padding() && !is_zero_bit_field)
-      {
-        member_exprt member(assign.lhs(), it->get_name(), it->type());
-        convert_assign_rec(code_assignt(member, *o_it), dest);
-      }
-      ++o_it;
-    }
-  }
-  else if(assign.rhs().id()==ID_array)
+  if(assign.rhs().id()==ID_array)
   {
     const array_typet &type=
       to_array_type(ns.follow(assign.rhs().type()));
@@ -862,7 +835,7 @@ goto_programt::const_targett goto_program2codet::convert_return(
 
   // catch the specific case where the original code was missing a return
   if(ret.has_return_value() &&
-     ret.return_value().id()==ID_sideeffect &&
+     ret.return_value().id()==ID_side_effect &&
      to_side_effect_expr(ret.return_value()).get_statement()==ID_nondet)
     return target;
 
@@ -1082,7 +1055,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_while(
 
     f.iter()=w.body().operands().back();
     w.body().operands().pop_back();
-    f.iter().id(ID_sideeffect);
+    f.iter().id(ID_side_effect);
 
     f.body().swap(w.body());
 
@@ -1939,6 +1912,7 @@ void goto_program2codet::add_local_types(const typet &type)
           ++it)
         add_local_types(it->type());
 
+      assert(!identifier.empty());
       type_names.push_back(identifier);
     }
   }
@@ -2068,6 +2042,7 @@ void goto_program2codet::cleanup_code_block(
       {
         code_dowhilet d;
         d.cond()=false_exprt();
+        cleanup_expr(d.cond(), false);
         d.body().swap(*it);
 
         it->swap(d);
@@ -2222,17 +2197,18 @@ void goto_program2codet::cleanup_code_ifthenelse(
   const irep_idt parent_stmt)
 {
   code_ifthenelset &i_t_e=to_code_ifthenelse(code);
+  const exprt cond=simplify_expr(i_t_e.cond(), ns);
 
   // assert(false) expands to if(true) assert(false), simplify again (and also
   // simplify other cases)
-  if(i_t_e.cond().is_true() &&
+  if(cond.is_true() &&
       (i_t_e.else_case().is_nil() || !has_labels(to_code(i_t_e.else_case()))))
   {
     codet tmp;
     tmp.swap(i_t_e.then_case());
     code.swap(tmp);
   }
-  else if(i_t_e.cond().is_false() && !has_labels(to_code(i_t_e.then_case())))
+  else if(cond.is_false() && !has_labels(to_code(i_t_e.then_case())))
   {
     if(i_t_e.else_case().is_nil())
       code=code_skipt();
@@ -2410,9 +2386,17 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
   {
     if(no_typecast) return;
 
+    assert(expr.type().id()==ID_symbol);
+
     const typet &t=expr.type();
 
-    const irep_idt tag=t.get(ID_tag);
+    add_local_types(t);
+    expr=typecast_exprt(expr, t);
+
+#if 0
+    irep_idt tag=t.get(ID_tag);
+    if(tag.empty()) tag=ID_anonymous;
+
     std::pair<r_tag_mapt::const_iterator, r_tag_mapt::const_iterator>
       reverse_tag_entry=reverse_tag_map.equal_range(tag);
 
@@ -2454,6 +2438,7 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
 
         if(!type_names_set.insert(t_s.name).second)
           assert(false);
+        assert(!t_s.name.empty());
         type_names.push_back(t_s.name);
         if(symbol_table.add(t_s))
           assert(false);
@@ -2462,6 +2447,7 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
       expr.make_typecast(t);
       add_local_types(t);
     }
+#endif
   }
   else if(expr.id()==ID_array ||
           expr.id()==ID_vector)
@@ -2473,7 +2459,7 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
     expr.make_typecast(t);
     add_local_types(t);
   }
-  else if(expr.id()==ID_sideeffect)
+  else if(expr.id()==ID_side_effect)
   {
     const irep_idt &statement=to_side_effect_expr(expr).get_statement();
 
@@ -2562,6 +2548,22 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
     }
     else if(expr.type().id()==ID_pointer)
       add_local_types(expr.type());
+    else if(expr.type().id()==ID_bool)
+    {
+      expr=from_integer(
+        expr.is_true()?1:0,
+        signedbv_typet(config.ansi_c.int_width));
+      expr.make_typecast(bool_typet());
+    }
+    else if((expr.type().id()==ID_unsignedbv ||
+             expr.type().id()==ID_signedbv) &&
+            expr.type().get(ID_C_c_type)==ID_bool)
+    {
+      expr=from_integer(
+        expr.is_zero()?0:1,
+        signedbv_typet(config.ansi_c.int_width));
+      expr.make_typecast(bool_typet());
+    }
 
     const irept &c_sizeof_type=expr.find(ID_C_c_sizeof_type);
 
@@ -2625,25 +2627,6 @@ protected:
   typedef hash_set_cont<irep_idt, irep_id_hash> convertedt;
   convertedt converted;
 
-  typedef hash_map_cont<typet, unsigned, irep_hash, std::equal_to<irept> > anon_mapt;
-  anon_mapt anon_renaming;
-
-  static irep_idt get_type_name(
-      const typet& type,
-      const std::string &prefix,
-      goto2sourcet::anon_mapt &map,
-      bool &is_new)
-  {
-    anon_mapt::const_iterator entry=map.find(type);
-    is_new=entry==map.end();
-    if(is_new)
-      entry=map.insert(std::make_pair(type, map.size())).first;
-
-    std::stringstream new_name;
-    new_name << prefix << entry->second;
-    return new_name.str();
-  }
-
   std::set<std::string> system_headers;
 
   std::string type_to_string(const typet &type);
@@ -2697,6 +2680,17 @@ protected:
       std::ostream &os_body,
       local_static_declst &local_static_decls,
       const hash_map_cont<irep_idt, irep_idt, irep_id_hash> &original_tags);
+
+  void insert_local_static_decls(
+    code_blockt &b,
+    const std::list<irep_idt> &local_static,
+    local_static_declst &local_static_decls,
+    std::list<irep_idt> &type_decls,
+    const hash_map_cont<irep_idt, irep_idt, irep_id_hash> &original_tags);
+
+  void insert_local_type_decls(
+    code_blockt &b,
+    const std::list<irep_idt> &type_decls);
 
   void cleanup_expr(exprt &expr);
   void cleanup_type(typet &type);
@@ -2782,48 +2776,89 @@ void goto2sourcet::operator()(std::ostream &os)
   local_static_declst local_static_decls;
   hash_map_cont<irep_idt, irep_idt, irep_id_hash> original_tags;
 
+  // add copies of struct types when ID_C_transparent_union is only
+  // annotated to parameter
+  symbol_tablet symbols_transparent;
+  Forall_symbols(it, copied_symbol_table.symbols)
+  {
+    symbolt &symbol=it->second;
+
+    if(symbol.type.id()!=ID_code) continue;
+
+    code_typet &code_type=to_code_type(symbol.type);
+    code_typet::parameterst &parameters=code_type.parameters();
+
+    for(code_typet::parameterst::iterator
+        it2=parameters.begin();
+        it2!=parameters.end();
+        ++it2)
+    {
+      typet &type=it2->type();
+
+      if(type.id()==ID_symbol &&
+         type.get_bool(ID_C_transparent_union))
+      {
+        symbolt new_type_sym=
+          ns.lookup(to_symbol_type(type).get_identifier());
+
+        new_type_sym.name=id2string(new_type_sym.name)+"$transparent";
+        new_type_sym.type.set(ID_C_transparent_union, true);
+
+        // we might have it already, in which case this has no effect
+        symbols_transparent.add(new_type_sym);
+
+        to_symbol_type(type).set_identifier(new_type_sym.name);
+        type.remove(ID_C_transparent_union);
+      }
+    }
+  }
+  forall_symbols(it, symbols_transparent.symbols)
+    copied_symbol_table.add(it->second);
+
   typedef hash_map_cont<irep_idt, unsigned, irep_id_hash> unique_tagst;
   unique_tagst unique_tags;
 
-  // replace all #anon, fix $link in types, and prepare lexicographic order
+  // add tags to anonymous union/struct,
+  // and prepare lexicographic order
   std::set<std::string> symbols_sorted;
   Forall_symbols(it, copied_symbol_table.symbols)
   {
-    irep_idt original_tag=it->second.type.get(ID_tag);
-    cleanup_type(it->second.type);
+    symbolt &symbol=it->second;
+
+    if((symbol.type.id()==ID_union || symbol.type.id()==ID_struct) &&
+       symbol.type.get(ID_tag).empty())
+    {
+      assert(symbol.is_type);
+      symbol.type.set(ID_tag, ID_anonymous);
+    }
 
     const std::string name_str=id2string(it->first);
-    if(it->second.is_type && !it->second.type.get(ID_tag).empty())
+    if(symbol.is_type && !symbol.type.get(ID_tag).empty())
     {
+      irep_idt original_tag=symbol.type.get(ID_tag);
       original_tags[it->first]=original_tag;
-      std::string new_tag=id2string(it->second.type.get(ID_tag));
-
-      std::string::size_type link_pos=name_str.rfind("$link");
-      if(link_pos!=std::string::npos)
-      {
-        if(new_tag.rfind("$link")==std::string::npos)
-        {
-          new_tag+=name_str.substr(link_pos);
-          it->second.type.set(ID_tag, new_tag);
-        }
-        else
-          assert(has_suffix(name_str, new_tag));
-      }
+      std::string new_tag=id2string(original_tag);
 
       std::string::size_type tag_pos=new_tag.rfind("tag-");
       if(tag_pos!=std::string::npos)
       {
         new_tag.erase(0, tag_pos+4);
-        it->second.type.set(ID_tag, new_tag);
+        symbol.type.set(ID_tag, new_tag);
       }
 
       std::pair<unique_tagst::iterator, bool> unique_entry=
-        unique_tags.insert(std::make_pair(it->second.type.get(ID_tag), 0));
+        unique_tags.insert(std::make_pair(symbol.type.get(ID_tag), 0));
       if(!unique_entry.second)
       {
-        new_tag+="$"+i2string(unique_entry.first->second);
-        it->second.type.set(ID_tag, new_tag);
-        ++(unique_entry.first->second);
+        do
+        {
+          symbol.type.set(
+            ID_tag,
+            new_tag+"$"+i2string(unique_entry.first->second));
+          ++(unique_entry.first->second);
+        }
+        while(!unique_tags.insert(std::make_pair(
+              symbol.type.get(ID_tag), 0)).second);
       }
     }
 
@@ -2916,12 +2951,8 @@ void goto2sourcet::operator()(std::ostream &os)
       it!=system_headers.end();
       ++it)
     os << "#include <" << *it << ">" << std::endl;
-  os << "#ifndef TRUE" << std::endl
-     << "#define TRUE (_Bool)1" << std::endl
-     << "#endif" << std::endl;
-  os << "#ifndef FALSE" << std::endl
-     << "#define FALSE (_Bool)0" << std::endl
-     << "#endif" << std::endl;
+  if(!system_headers.empty()) os << std::endl;
+
   os << "#ifndef NULL" << std::endl
      << "#define NULL ((void*)0)" << std::endl
      << "#endif" << std::endl;
@@ -3414,54 +3445,210 @@ void goto2sourcet::convert_function_declaration(
       system_headers);
   p2s();
 
-  if(!local_static.empty())
-  {
-    code_blockt b2;
-    b2.reserve_operands(local_static.size()+b.operands().size());
+  insert_local_static_decls(
+    b,
+    local_static,
+    local_static_decls,
+    type_decls,
+    original_tags);
 
-    for(std::list<irep_idt>::const_iterator
-        it=local_static.begin();
-        it!=local_static.end();
-        ++it)
-    {
-      local_static_declst::const_iterator d_it=
-        local_static_decls.find(*it);
-      assert(d_it!=local_static_decls.end());
-
-      code_declt d=d_it->second;
-      std::list<irep_idt> redundant;
-      cleanup_decl(d, redundant, type_decls, original_tags);
-
-      b2.move_to_operands(d);
-    }
-
-    if(b.has_operands())
-      b2.operands().insert(
-        b2.operands().end(),
-        b.operands().begin(),
-        b.operands().end());
-
-    b.swap(b2);
-  }
+  convertedt converted_bak(converted);
+  insert_local_type_decls(
+    b,
+    type_decls);
+  converted.swap(converted_bak);
 
   os_body << "// " << symbol.name << std::endl;
   os_body << "// " << symbol.location << std::endl;
   os_body << make_decl(symbol.name, code_type) << std::endl;
-  os_body << "{";
+  os_body << expr_to_string(b);
+  os_body << std::endl << std::endl;
+}
 
-  convertedt converted_bak(converted);
-  for(std::list<irep_idt>::const_iterator
-      it=type_decls.begin();
-      it!=type_decls.end();
+/*******************************************************************\
+
+Function: find_block_position_rec
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
+static bool find_block_position_rec(
+  const irep_idt &identifier,
+  codet &root,
+  code_blockt* &dest,
+  exprt::operandst::iterator &before)
+{
+  if(!root.has_operands())
+    return false;
+
+  code_blockt* our_dest=0;
+
+  exprt::operandst &operands=root.operands();
+  exprt::operandst::iterator first_found=operands.end();
+
+  Forall_expr(it, operands)
+  {
+    bool found=false;
+
+    // be aware of the skip-carries-type hack
+    if(it->id()==ID_code &&
+       to_code(*it).get_statement()!=ID_skip)
+      found=find_block_position_rec(
+        identifier,
+        to_code(*it),
+        our_dest,
+        before);
+    else
+    {
+      find_symbols_sett syms;
+      find_type_and_expr_symbols(*it, syms);
+
+      found=syms.find(identifier)!=syms.end();
+    }
+
+    if(!found) continue;
+
+    if(!our_dest)
+    {
+      // first containing block
+      if(root.get_statement()==ID_block)
+      {
+        dest=&(to_code_block(root));
+        before=it;
+      }
+
+      return true;
+    }
+    else
+    {
+      // there is a containing block and this is the first operand
+      // that contains identifier
+      if(first_found==operands.end())
+        first_found=it;
+      // we have seen it already - pick the first occurrence in this
+      // block
+      else if(root.get_statement()==ID_block)
+      {
+        dest=&(to_code_block(root));
+        before=first_found;
+
+        return true;
+      }
+      // we have seen it already - outer block has to deal with this
+      else
+        return true;
+    }
+  }
+
+  if(first_found!=operands.end())
+  {
+    dest=our_dest;
+
+    return true;
+  }
+
+  return false;
+}
+
+/*******************************************************************\
+
+Function: goto2sourcet::insert_local_static_decls
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
+void goto2sourcet::insert_local_static_decls(
+  code_blockt &b,
+  const std::list<irep_idt> &local_static,
+  local_static_declst &local_static_decls,
+  std::list<irep_idt> &type_decls,
+  const hash_map_cont<irep_idt, irep_idt, irep_id_hash> &original_tags)
+{
+  // look up last identifier first as its value may introduce the
+  // other ones
+  for(std::list<irep_idt>::const_reverse_iterator
+      it=local_static.rbegin();
+      it!=local_static.rend();
       ++it)
   {
-    os_body << std::endl;
-    convert_compound(ns.lookup(*it).type, false, os_body);
-  }
-  converted.swap(converted_bak);
+    local_static_declst::const_iterator d_it=
+      local_static_decls.find(*it);
+    assert(d_it!=local_static_decls.end());
 
-  os_body << expr_to_string(b).substr(1);
-  os_body << std::endl << std::endl;
+    code_declt d=d_it->second;
+    std::list<irep_idt> redundant;
+    cleanup_decl(d, redundant, type_decls, original_tags);
+
+    code_blockt* dest_ptr=0;
+    exprt::operandst::iterator before=b.operands().end();
+
+    // some use of static variables might be optimised out if it is
+    // within an if(false) { ... } block
+    if(find_block_position_rec(*it, b, dest_ptr, before))
+    {
+      assert(dest_ptr!=0);
+      dest_ptr->operands().insert(before, d);
+    }
+  }
+}
+
+/*******************************************************************\
+
+Function: goto2sourcet::insert_local_type_decls
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
+void goto2sourcet::insert_local_type_decls(
+  code_blockt &b,
+  const std::list<irep_idt> &type_decls)
+{
+  // look up last identifier first as its value may introduce the
+  // other ones
+  for(std::list<irep_idt>::const_reverse_iterator
+      it=type_decls.rbegin();
+      it!=type_decls.rend();
+      ++it)
+  {
+    const typet &type=ns.lookup(*it).type;
+    // feed through plain C to expr2c by ending and re-starting
+    // a comment block ...
+    std::ostringstream os_body;
+    os_body << *it << " */\n";
+    convert_compound(type, false, os_body);
+    os_body << "/*";
+
+    code_skipt skip;
+    skip.location().set_comment(os_body.str());
+    // another hack to ensure symbols inside types are seen
+    skip.type()=type;
+
+    code_blockt* dest_ptr=0;
+    exprt::operandst::iterator before=b.operands().end();
+
+    // we might not find it in case a transparent union type cast
+    // has been removed by cleanup operations
+    if(find_block_position_rec(*it, b, dest_ptr, before))
+    {
+      assert(dest_ptr!=0);
+      dest_ptr->operands().insert(before, skip);
+    }
+  }
 }
 
 /*******************************************************************\
@@ -3515,7 +3702,8 @@ void goto2sourcet::cleanup_expr(exprt &expr)
     expr.type().swap(type);
   }
   else if(expr.id()==ID_union &&
-      ns.follow(expr.type()).get_bool(ID_C_transparent_union))
+          (expr.type().get_bool(ID_C_transparent_union) ||
+           ns.follow(expr.type()).get_bool(ID_C_transparent_union)))
   {
     union_exprt &u=to_union_expr(expr);
 
@@ -3568,14 +3756,8 @@ void goto2sourcet::cleanup_type(typet &type)
   if(type.id()==ID_array)
     cleanup_expr(to_array_type(type).size());
 
-  if(!type.get(ID_tag).empty() &&
-      has_prefix(type.get_string(ID_tag), "#anon"))
-  {
-    typet tmp=type;
-    bool b;
-    tmp.set(ID_tag, get_type_name(type, "anon$", anon_renaming, b));
-    type.swap(tmp);
-  }
+  assert((type.id()!=ID_union && type.id()!=ID_struct) ||
+         !type.get(ID_tag).empty());
 }
 
 /*******************************************************************\
@@ -3872,7 +4054,7 @@ std::string goto2sourcet::expr_to_string(const exprt &expr)
     return "((" + expr_to_string(expr.op0()) + ")[ "
            + expr_to_string(expr.op1()) + " ])";
   }
-  else if(expr.id()==ID_sideeffect)
+  else if(expr.id()==ID_side_effect)
   {
     const irep_idt &statement=to_sideeffect_expr(expr).get_statement();
   

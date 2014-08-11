@@ -6,7 +6,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#include <iostream>
 #include <cstdlib>
 
 #include <util/expr_util.h>
@@ -97,12 +96,16 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
   }
   else if(expr.is_nil())
   {
+    #if 0
     std::cerr << "cpp_typecheckt::typecheck_expr_main got nil" << std::endl;
+    #endif
     abort();
   }
   else if(expr.id()==ID_code)
   {
+    #if 0
     std::cerr << "cpp_typecheckt::typecheck_expr_main got code" << std::endl;
+    #endif
     abort();
   }
   else if(expr.id()==ID_symbol)
@@ -1848,7 +1851,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
     if(expr.arguments().size()==0)
     {
       // create temporary object
-      exprt tmp_object_expr(ID_sideeffect, pod);
+      exprt tmp_object_expr(ID_side_effect, pod);
       tmp_object_expr.set(ID_statement, ID_temporary_object);
       tmp_object_expr.set(ID_C_lvalue, true);
       tmp_object_expr.set(ID_mode, ID_cpp);
@@ -2051,7 +2054,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
     expr.type() = this_type.subtype();
 
     // create temporary object
-    exprt tmp_object_expr(ID_sideeffect, this_type.subtype());
+    exprt tmp_object_expr(ID_side_effect, this_type.subtype());
     tmp_object_expr.set(ID_statement, ID_temporary_object);
     tmp_object_expr.set(ID_C_lvalue, true);
     tmp_object_expr.set(ID_mode, ID_cpp);
@@ -2655,7 +2658,14 @@ void cpp_typecheckt::typecheck_expr(exprt &expr)
   // Needs to be done before the operands!
   explicit_typecast_ambiguity(expr);
   
-  c_typecheck_baset::typecheck_expr(expr);
+  // cpp_name uses get_sub, which can get confused with expressions.
+  if(expr.id()==ID_cpp_name)
+    typecheck_expr_cpp_name(expr, cpp_typecheck_fargst());
+  else
+  {
+    // This does the operands, and then calls typecheck_expr_main.
+    c_typecheck_baset::typecheck_expr(expr);
+  }
 
   if(override_constantness)
     expr.type().set(ID_C_constant, false);

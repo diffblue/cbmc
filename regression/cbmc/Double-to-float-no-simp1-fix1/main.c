@@ -19,7 +19,7 @@ void test (int mode, double d, float result) {
 
 int main (void)
 {
-  #ifdef __GNUC__
+  #if defined(__GNUC__) && defined(FE_DOWNWARD)
   test(FE_DOWNWARD, 0x1.0p+128, 0x1.fffffep+127f);
   #endif
 

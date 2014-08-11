@@ -330,6 +330,14 @@ public:
   bool operator>= (unsigned long b) const	{ return compare ((ullong_t)b) >= 0; }	\
   bool operator== (unsigned long b) const	{ return compare ((ullong_t)b) == 0; }	\
   bool operator!= (unsigned long b) const	{ return compare ((ullong_t)b) != 0; }
+
+  // Returns the largest x such that 2^x <= abs() or 0 if input is 0
+  // Not part of original BigInt.
+  unsigned floorPow2 () const _fast;
+
+  // Sets the number to the power of two given by the exponent
+  // Not part of original BigInt.
+  void setPower2 (unsigned exponent) _fast;
 };
 
 

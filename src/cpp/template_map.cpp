@@ -57,11 +57,11 @@ void template_mapt::apply(typet &type) const
   {
     apply(static_cast<typet &>(type.add(ID_return_type)));
 
-    irept::subt &arguments=type.add(ID_arguments).get_sub();
+    irept::subt &parameters=type.add(ID_parameters).get_sub();
 
-    Forall_irep(it, arguments)
+    Forall_irep(it, parameters)
     {
-      if(it->id()==ID_argument)
+      if(it->id()==ID_parameter)
         apply(static_cast<typet &>(it->add(ID_type)));
     }
   }
@@ -224,13 +224,13 @@ void template_mapt::build(
   const template_typet &template_type,
   const cpp_template_args_tct &template_args)
 {
-  const template_typet::parameterst &template_parameters=
-    template_type.parameters();
+  const template_typet::template_parameterst &template_parameters=
+    template_type.template_parameters();
 
   cpp_template_args_tct::argumentst instance=
     template_args.arguments();
 
-  template_typet::parameterst::const_iterator t_it=
+  template_typet::template_parameterst::const_iterator t_it=
     template_parameters.begin();
 
   if(instance.size()<template_parameters.size())
@@ -315,10 +315,10 @@ Function: template_mapt::build_unassigned
 void template_mapt::build_unassigned(
   const template_typet &template_type)
 {
-  const template_typet::parameterst &template_parameters=
-    template_type.parameters();
+  const template_typet::template_parameterst &template_parameters=
+    template_type.template_parameters();
 
-  for(template_typet::parameterst::const_iterator
+  for(template_typet::template_parameterst::const_iterator
       t_it=template_parameters.begin();
       t_it!=template_parameters.end();
       t_it++)
@@ -357,8 +357,8 @@ Function: template_mapt::build_template_args
 cpp_template_args_tct template_mapt::build_template_args(
   const template_typet &template_type) const
 {
-  const template_typet::parameterst &template_parameters=
-    template_type.parameters();
+  const template_typet::template_parameterst &template_parameters=
+    template_type.template_parameters();
 
   cpp_template_args_tct template_args;
   template_args.arguments().resize(template_parameters.size());

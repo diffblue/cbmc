@@ -229,7 +229,7 @@ bool bv_pointerst::convert_address_of_rec(
   }
   else if(expr.id()==ID_constant ||
           expr.id()==ID_string_constant ||
-          expr.id()=="zero_string")
+          expr.id()==ID_array)
   { // constant
     add_addr(expr, bv);
     return false;

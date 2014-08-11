@@ -1,7 +1,11 @@
 typedef void ** __builtin_va_list;
+typedef void ** __builtin_ms_va_list;
+
 void __builtin_va_start(void *ap, ...);
 void __builtin_va_end(void *ap);
 void __builtin_va_copy(__builtin_va_list dest, __builtin_va_list src);
+void __builtin_ms_va_start(void *ap, ...);
+void __builtin_ms_va_end(void *ap);
 void *__builtin_va_arg_pack();
 int __builtin_va_arg_pack_len();
 int __builtin_constant_p();
@@ -127,7 +131,11 @@ long double __builtin_ldexpl(long double, int);
 float __builtin_logf(float);
 long double __builtin_logl(long double);
 float __builtin_log10f(float);
+double __builtin_log10(double);
 long double __builtin_log10l(long double);
+float __builtin_log2f(float);
+double __builtin_log2(double);
+long double __builtin_log2l(float);
 float __builtin_modff(float, float*);
 long double __builtin_modfl(long double, long double*);
 float __builtin_powf(float, float);

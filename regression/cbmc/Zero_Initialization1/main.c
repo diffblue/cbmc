@@ -1,6 +1,8 @@
 #include <assert.h>
 
-// gcc allows the following
+// gcc allows the following 'tentative definitions'.
+// Note that none of these has a size at the time of the
+// variable definition.
 
 union U my_u;
 

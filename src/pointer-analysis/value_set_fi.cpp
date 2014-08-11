@@ -103,10 +103,10 @@ void value_set_fit::output(
         result+=from_expr(ns, identifier, o);
         result+=", *, "; // offset unknown
         if (o.type().id()==ID_unknown)
-          result+="*";
+          result+='*';
         else
           result+=from_type(ns, identifier, o.type());        
-        result+=">";
+        result+='>';
       }
       else
       {
@@ -115,16 +115,16 @@ void value_set_fit::output(
         if(o_it->second.offset_is_set)
           result+=integer2string(o_it->second.offset)+"";
         else
-          result+="*";
+          result+='*';
         
         result+=", ";
         
         if (o.type().id()==ID_unknown)
-          result+="*";
+          result+='*';
         else
           result+=from_type(ns, identifier, o.type());
       
-        result+=">";
+        result+='>';
       }
 
       out << result;
@@ -708,7 +708,7 @@ void value_set_fit::get_value_set_rec(
       return;
     }
   }
-  else if(expr.id()==ID_sideeffect)
+  else if(expr.id()==ID_side_effect)
   {
     const irep_idt &statement=expr.get(ID_statement);
     

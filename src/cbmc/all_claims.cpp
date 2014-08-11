@@ -53,7 +53,6 @@ bool bmct::all_claims(
   status() << "Passing problem to " << solver.decision_procedure_text() << eom;
 
   solver.set_message_handler(get_message_handler());
-  solver.set_verbosity(get_verbosity());
 
   // stop the time
   absolute_timet sat_start=current_time();

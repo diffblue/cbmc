@@ -35,11 +35,15 @@ int main(void)
   assert((castWithRounding(FE_TONEAREST,x) == high) ==
 	 (x == 33554435));
 
+  #ifdef FE_UPWARD
   assert(castWithRounding(FE_UPWARD,x) == high);
   assert(castWithRounding(FE_UPWARD,-x) == -low);
+  #endif
 
+  #ifdef FE_DOWNWARD
   assert(castWithRounding(FE_DOWNWARD,x) == low);
   assert(castWithRounding(FE_DOWNWARD,-x) == -high);
+  #endif
   
   assert(castWithRounding(FE_TOWARDZERO,x) == low);
   assert(castWithRounding(FE_TOWARDZERO,-x) == -low);

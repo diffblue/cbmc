@@ -40,13 +40,11 @@ symbol_exprt goto_convertt::make_compound_literal(
   
   do
   {
-    // The lifetime of compound literals is really that of
-    // the block they are in.
     new_symbol.base_name="literal$"+i2string(++temporary_counter);
     new_symbol.name=tmp_symbol_prefix+id2string(new_symbol.base_name);
     new_symbol.is_lvalue=true;
-    new_symbol.is_thread_local=false;
-    new_symbol.is_static_lifetime=true;
+    new_symbol.is_thread_local=true;
+    new_symbol.is_static_lifetime=location.get_function().empty();
     new_symbol.is_file_local=true;
     new_symbol.value=expr;
     new_symbol.type=expr.type();
@@ -59,10 +57,21 @@ symbol_exprt goto_convertt::make_compound_literal(
 
   symbol_exprt result=symbol_ptr->symbol_expr();
   result.location()=location;
+
+  // The lifetime of compound literals is really that of
+  // the block they are in.
+  copy(code_declt(result), DECL, dest);
   
   code_assignt code_assign(result, expr);
   code_assign.location()=location;
   convert(code_assign, dest);
+
+  // now create a 'dead' instruction
+  if(!symbol_ptr->is_static_lifetime)
+  {
+    code_deadt code_dead(result);
+    targets.destructor_stack.push_back(code_dead);
+  }
 
   return result;
 }
@@ -82,7 +91,7 @@ Function: goto_convertt::needs_cleaning
 bool goto_convertt::needs_cleaning(const exprt &expr)
 {
   if(expr.id()==ID_dereference ||
-     expr.id()==ID_sideeffect ||
+     expr.id()==ID_side_effect ||
      expr.id()==ID_compound_literal ||
      expr.id()==ID_comma)
     return true;
@@ -360,7 +369,7 @@ void goto_convertt::clean_expr(
     
     return;
   }
-  else if(expr.id()==ID_sideeffect)
+  else if(expr.id()==ID_side_effect)
   {
     // some of the side-effects need special treatment!
     const irep_idt statement=to_side_effect_expr(expr).get_statement();
@@ -383,7 +392,7 @@ void goto_convertt::clean_expr(
       // we do a special treatment for x=f(...)
       assert(expr.operands().size()==2);
 
-      if(expr.op1().id()==ID_sideeffect &&
+      if(expr.op1().id()==ID_side_effect &&
          to_side_effect_expr(expr.op1()).get_statement()==ID_function_call)
       {
         clean_expr(expr.op0(), dest);
@@ -436,7 +445,7 @@ void goto_convertt::clean_expr(
   Forall_operands(it, expr)
     clean_expr(*it, dest);
 
-  if(expr.id()==ID_sideeffect)
+  if(expr.id()==ID_side_effect)
   {
     remove_side_effect(to_side_effect_expr(expr), dest, result_is_used);
   }

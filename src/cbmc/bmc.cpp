@@ -157,7 +157,6 @@ bmct::run_decision_procedure(prop_convt &prop_conv)
            << prop_conv.decision_procedure_text() << eom;
 
   prop_conv.set_message_handler(get_message_handler());
-  prop_conv.set_verbosity(get_verbosity());
 
   // stop the time
   absolute_timet sat_start=current_time();
@@ -337,7 +336,6 @@ bool bmct::run(const goto_functionst &goto_functions)
     throw "Invalid memory model "+mm+" -- use one of sc, tso, pso";
 
   symex.set_message_handler(get_message_handler());
-  symex.set_verbosity(get_verbosity());
   symex.options=options;
 
   status() << "Starting Bounded Model Checking" << eom;
@@ -535,7 +533,6 @@ Function: bmct::decide
 bool bmct::decide(prop_convt &prop_conv, bool show_report)
 {
   prop_conv.set_message_handler(get_message_handler());
-  prop_conv.set_verbosity(get_verbosity());
  
   if(options.get_bool_option("dimacs")) {
     do_conversion(prop_conv);

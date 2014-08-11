@@ -7,7 +7,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 \*******************************************************************/
 
 #include <cassert>
-#include <iostream>
 
 #include <util/config.h>
 #include <util/arith_tools.h>
@@ -114,29 +113,29 @@ void cpp_convert_typet::read_rec(const typet &type)
     double_cnt++;
   else if(type.id()==ID_float)
     float_cnt++;
-  else if(type.id()=="__float128")
+  else if(type.id()==ID_gcc_float128)
     float128_cnt++;
-  else if(type.id()=="__int128")
+  else if(type.id()==ID_gcc_int128)
     int128_cnt++;
-  else if(type.id()=="__complex__" || type.id()=="_Complex")
+  else if(type.id()==ID_complex)
     complex_cnt++;
   else if(type.id()==ID_bool)
     cpp_bool_cnt++;
-  else if(type.id()=="__CPROVER_bool")
+  else if(type.id()==ID_proper_bool)
     proper_bool_cnt++;
   else if(type.id()==ID_wchar_t)
     wchar_t_cnt++;
-  else if(type.id()=="__int8")
+  else if(type.id()==ID_int8)
     int8_cnt++;
-  else if(type.id()=="__int16")
+  else if(type.id()==ID_int16)
     int16_cnt++;
-  else if(type.id()=="__int32")
+  else if(type.id()==ID_int32)
     int32_cnt++;
-  else if(type.id()=="__int64")
+  else if(type.id()==ID_int64)
     int64_cnt++;
-  else if(type.id()=="__ptr32")
+  else if(type.id()==ID_ptr32)
     ptr32_cnt++;
-  else if(type.id()=="__ptr64")
+  else if(type.id()==ID_ptr64)
     ptr64_cnt++;
   else if(type.id()==ID_const)
     const_cnt++;
@@ -150,7 +149,7 @@ void cpp_convert_typet::read_rec(const typet &type)
     typedef_cnt++;
   else if(type.id()==ID_identifier)
   {
-    // from arguments
+    // from parameters
   }
   else if(type.id()==ID_cpp_name)
   {
@@ -248,7 +247,7 @@ void cpp_convert_typet::read_function_type(const typet &type)
     cpp_convert_plain_type(return_type);
 
   // take care of parameter types
-  irept &parameters=t.add(ID_arguments);
+  irept &parameters=t.add(ID_parameters);
 
   // see if we have an ellipsis
   if(!parameters.get_sub().empty() &&
@@ -278,7 +277,7 @@ void cpp_convert_typet::read_function_type(const typet &type)
       // do we have a declarator?
       if(declarator.is_nil())
       {
-        parameter_expr=exprt(ID_argument, declaration.type());
+        parameter_expr=exprt(ID_parameter, declaration.type());
         parameter_expr.location()=type_location;
       }
       else

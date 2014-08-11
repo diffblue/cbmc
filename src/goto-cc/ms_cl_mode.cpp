@@ -60,8 +60,8 @@ bool ms_cl_modet::doit()
   if(cmdline.isset("verbosity"))
     verbosity=unsafe_string2int(cmdline.getval("verbosity"));
 
-  compiler.set_verbosity(verbosity);
-  set_verbosity(verbosity);
+  compiler.ui_message_handler.set_verbosity(verbosity);
+  ui_message_handler.set_verbosity(verbosity);
 
   debug("Visual Studio mode");
   
@@ -112,6 +112,9 @@ bool ms_cl_modet::doit()
     if(cmdline.args.size()>=1)
       compiler.output_file_executable=get_base_name(cmdline.args[0])+".exe";
   }
+  
+  if(cmdline.isset('J'))
+    config.ansi_c.char_is_unsigned=true;
 
   if(verbosity>8)
   {

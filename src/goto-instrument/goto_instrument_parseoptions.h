@@ -23,7 +23,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(bounds-check)(no-bounds-check)" \
   "(pointer-check)(memory-leak-check)(no-pointer-check)" \
   "(remove-pointers)" \
-  "(leak-check)" \
+  "(no-simplify)" \
   "(assert-to-assume)" \
   "(div-by-zero-check)(no-div-by-zero-check)" \
   "(undefined-shift-check)" \

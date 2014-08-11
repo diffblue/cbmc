@@ -66,6 +66,7 @@ extern inline byte_extract_exprt &to_byte_extract_expr(exprt &expr)
 }
 
 irep_idt byte_extract_id();
+irep_idt byte_update_id();
 
 /*! \brief TO_BE_DOCUMENTED
 */
@@ -146,6 +147,18 @@ public:
   inline const exprt &offset() const { return op1(); }
   inline const exprt &value() const { return op2(); }
 };
+
+extern inline const byte_update_exprt &to_byte_update_expr(const exprt &expr)
+{
+  assert(expr.operands().size()==3);
+  return static_cast<const byte_update_exprt &>(expr);
+}
+
+extern inline byte_update_exprt &to_byte_update_expr(exprt &expr)
+{
+  assert(expr.operands().size()==3);
+  return static_cast<byte_update_exprt &>(expr);
+}
 
 /*! \brief TO_BE_DOCUMENTED
 */
@@ -236,7 +249,8 @@ public:
   
   inline void build(const typet &type, bool little_endian)
   {
-    build_rec(type, little_endian);
+    size_t bit_field_bits=0;
+    build_rec(type, little_endian, bit_field_bits);
   }
   
   void output(std::ostream &) const;
@@ -245,7 +259,10 @@ protected:
   const namespacet &ns;
   std::vector<size_t> map;
 
-  void build_rec(const typet &type, bool little_endian);
+  void build_rec(
+    const typet &type,
+    bool little_endian,
+    size_t &bit_field_bits);
 };
 
 extern inline std::ostream &operator << (std::ostream &out, const endianness_mapt &m)

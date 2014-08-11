@@ -189,7 +189,7 @@ void path_symext::assign(
   const exprt &lhs,
   const exprt &rhs)
 {
-  if(rhs.id()==ID_sideeffect) // catch side effects on rhs
+  if(rhs.id()==ID_side_effect) // catch side effects on rhs
   {
     const side_effect_exprt &side_effect_expr=to_side_effect_expr(rhs);
     const irep_idt &statement=side_effect_expr.get_statement();
@@ -210,7 +210,7 @@ void path_symext::assign(
   // read the address of the lhs, with propagation
   exprt lhs_address=state.read(address_of_exprt(lhs));
   
-  // now SSA it, no propagation
+  // now SSA the lhs, no propagation
   exprt ssa_lhs=
     state.read_no_propagate(dereference_exprt(lhs_address));
 
@@ -397,7 +397,7 @@ void path_symext::assign_rec(
   
   if(ssa_lhs.id()==ID_symbol)
   {
-    // These are expected to the SSA symbols
+    // These are expected to be SSA symbols
     assert(ssa_lhs.get_bool(ID_C_SSA_symbol));
     
     const symbol_exprt &symbol_expr=to_symbol_expr(ssa_lhs);
@@ -473,17 +473,26 @@ void path_symext::assign_rec(
   
     if(compound_type.id()==ID_struct)
     {
+      // We only flatten top-level structs, so this one is inside an
+      // array or a union.
+
+      exprt member_name(ID_member_name);
+      member_name.set(ID_component_name, ssa_lhs_member_expr.get_component_name());
+            
+      with_exprt new_rhs(ssa_rhs, member_name, ssa_rhs);
+      
+      assign_rec(state, guard, struct_op, new_rhs);
+    
       throw "unexpected struct member on lhs";
     }
     else if(compound_type.id()==ID_union)
     {
-      // adjust the rhs
-      union_exprt new_rhs;
-      new_rhs.type()=struct_op.type();
-      new_rhs.set_component_name(ssa_lhs_member_expr.get_component_name());
-      new_rhs.op()=ssa_rhs;
+      // rewrite into byte_extract, and do again
+      exprt offset=gen_zero(index_type());
+
+      byte_extract_exprt new_lhs(byte_update_id(), struct_op, offset, ssa_rhs.type());
       
-      assign_rec(state, guard, struct_op, new_rhs);
+      assign_rec(state, guard, new_lhs, ssa_rhs);
     }
     else
       throw "assign_rec: member expects struct or union type";

@@ -6,10 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <cstdlib>
 #include <cassert>
 
 #include <util/prefix.h>
+#include <util/string2int.h>
 
 #include "boolbv.h"
 
@@ -119,7 +119,7 @@ literalt boolbvt::convert_overflow(const exprt &expr)
   }
   else if(has_prefix(expr.id_string(), "overflow-typecast-"))
   {
-    unsigned bits=atoi(expr.id().c_str()+18);
+    unsigned bits=unsafe_str2unsigned(expr.id().c_str()+18);
 
     const exprt::operandst &operands=expr.operands();
 

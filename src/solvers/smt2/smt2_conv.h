@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/hash_cont.h>
 #include <util/std_expr.h>
+#include <util/byte_operators.h>
 
 #include <solvers/prop/prop_conv.h>
 #include <solvers/flattening/boolbv_width.h>
@@ -27,7 +28,7 @@ class member_exprt;
 class smt2_convt:public prop_convt
 {
 public:
-  typedef enum { GENERIC, BOOLECTOR, CVC3, MATHSAT, YICES, Z3 } solvert;
+  typedef enum { GENERIC, BOOLECTOR, CVC3, CVC4, MATHSAT, OPENSMT, YICES, Z3 } solvert;
 
   smt2_convt(
     const namespacet &_ns,
@@ -64,8 +65,13 @@ public:
     case CVC3:
       break;
 
+    case CVC4:
+      break;
+
     case MATHSAT:
-      use_FPA_theory=true;
+      break;
+
+    case OPENSMT:
       break;
       
     case YICES:
@@ -73,7 +79,6 @@ public:
     
     case Z3:
       use_array_of_bool=true;
-      use_FPA_theory=true;
       emit_set_logic=false;
       use_datatypes=true;
       break;
@@ -111,18 +116,21 @@ protected:
   void write_footer();
 
   // new stuff
-  void convert_expr(const exprt &expr);
-  void convert_type(const typet &type);
+  void convert_expr(const exprt &);
+  void convert_type(const typet &);
   void convert_literal(const literalt);
-  
-  bool use_array_theory(const array_typet &);
+
+  // tweaks for arrays  
+  bool use_array_theory(const exprt &);
+  void flatten_array(const exprt &);
+  void unflatten_array(const exprt &);
   
   // specific expressions go here
-  void convert_byte_update(const exprt &expr);
-  void convert_byte_extract(const exprt &expr);
+  void convert_byte_update(const byte_update_exprt &expr);
+  void convert_byte_extract(const byte_extract_exprt &expr);
   void convert_typecast(const typecast_exprt &expr);
-  void convert_struct(const exprt &expr);
-  void convert_union(const exprt &expr);
+  void convert_struct(const struct_exprt &expr);
+  void convert_union(const union_exprt &expr);
   void convert_constant(const constant_exprt &expr);
   void convert_relation(const exprt &expr);
   void convert_is_dynamic_object(const exprt &expr);
@@ -143,20 +151,28 @@ protected:
   
   std::string convert_identifier(const irep_idt &identifier);
   
+  // helpers for floating-point numbers
+  void is_nan(const floatbv_typet &, const char *);
+  void is_zero(const floatbv_typet &, const char *);
+  void is_equal(const floatbv_typet &, const char *, const char *);
+  
   // auxiliary methods
   void find_symbols(const exprt &expr);
   void find_symbols(const typet &type);
   void find_symbols_rec(const typet &type, std::set<irep_idt> &recstack);
 
-  constant_exprt parse_literal(const std::string &s, const typet &type);
-  exprt parse_struct(const std::string &s, const typet &type);
+  constant_exprt parse_literal(const irept &, const typet &type);
+  exprt parse_struct(const irept &s, const struct_typet &type);
+  exprt parse_union(const irept &s, const union_typet &type);
+  exprt parse_array(const irept &s, const array_typet &type);
+  exprt parse_rec(const irept &s, const typet &type);
   
   // flattens any non-bitvector type into a bitvector,
   // e.g., booleans, vectors, structs, arrays, ...
   // unflatten() does the opposite.
   typedef enum { BEGIN, END } wheret;
   void flatten2bv(const exprt &);
-  void unflatten(wheret, const typet &);
+  void unflatten(wheret, const typet &, unsigned nesting=0);
   
   // pointers
   pointer_logict pointer_logic;
@@ -177,10 +193,6 @@ protected:
       value.make_nil();
     }
   };
-  
-  void set_value(
-    identifiert &identifier,
-    const std::string &v);
   
   typedef hash_map_cont<irep_idt, identifiert, irep_id_hash>
     identifier_mapt;

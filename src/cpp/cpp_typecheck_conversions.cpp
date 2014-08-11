@@ -1014,7 +1014,7 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
           deref.type() = address.type().subtype();
 
           // create temporary object
-          exprt tmp_object_expr=exprt(ID_sideeffect, type);
+          exprt tmp_object_expr=exprt(ID_side_effect, type);
           tmp_object_expr.set(ID_statement, ID_temporary_object);
           tmp_object_expr.location()=expr.location();
           tmp_object_expr.copy_to_operands(deref);
@@ -1061,7 +1061,7 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
 
         // TODO: ellipsis
 
-        const irept &parameters = comp_type.find(ID_arguments);
+        const irept &parameters = comp_type.find(ID_parameters);
 
         if(parameters.get_sub().size() != 2)
           continue;
@@ -1202,10 +1202,10 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
         continue;
 
       assert(component.get(ID_type)==ID_code &&
-             component.find(ID_type).find(ID_arguments).get_sub().size()==1);
+             component.find(ID_type).find(ID_parameters).get_sub().size()==1);
 
       typet this_type =
-        static_cast<const typet&>(comp_type.find(ID_arguments)
+        static_cast<const typet&>(comp_type.find(ID_parameters)
                                            .get_sub()
                                            .front()
                                            .find(ID_type));
@@ -1575,7 +1575,7 @@ bool cpp_typecheckt::reference_binding(
   {
     {
       // create temporary object
-      exprt tmp=exprt(ID_sideeffect, type.subtype());
+      exprt tmp=exprt(ID_side_effect, type.subtype());
       tmp.set(ID_statement, ID_temporary_object);
       tmp.location()=expr.location();
       //tmp.set(ID_C_lvalue, true);

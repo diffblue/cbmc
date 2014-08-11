@@ -1,6 +1,6 @@
 /*******************************************************************\
 
-Module: C++ Language Type Checking
+Module: C Language Type Checking
 
 Author: Daniel Kroening, kroening@kroening.com
 
@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/config.h>
 #include <linking/zero_initializer.h>
 
+#include "ansi_c_declaration.h"
 #include "c_typecheck_base.h"
 
 /*******************************************************************\
@@ -73,18 +74,14 @@ void c_typecheck_baset::typecheck_code(codet &code)
     typecheck_break(code);
   else if(statement==ID_goto)
     typecheck_goto(code);
-  else if(statement=="computed-goto")
-    typecheck_computed_goto(code);
+  else if(statement==ID_gcc_computed_goto)
+    typecheck_gcc_computed_goto(code);
   else if(statement==ID_continue)
     typecheck_continue(code);
   else if(statement==ID_return)
     typecheck_return(code);
   else if(statement==ID_decl)
     typecheck_decl(code);
-  else if(statement==ID_decl_type)
-    typecheck_decl_type(code);
-  else if(statement==ID_decl_block)
-    typecheck_decl_block(code);
   else if(statement==ID_assign)
     typecheck_assign(code);
   else if(statement==ID_skip)
@@ -189,47 +186,6 @@ void c_typecheck_baset::typecheck_assign(codet &code)
 
 /*******************************************************************\
 
-Function: c_typecheck_baset::typecheck_decl_block
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void c_typecheck_baset::typecheck_decl_block(codet &code)
-{
-  Forall_operands(it, code)
-    typecheck_code(to_code(*it));
-
-  // unwind any decl-blocks inside the decl block
-  
-  exprt::operandst new_ops;
-  new_ops.reserve(code.operands().size());
-
-  Forall_operands(it1, code)
-  {
-    if(it1->is_nil()) continue;
-
-    codet &code_op=to_code(*it1);
-  
-    if(code_op.get_statement()==ID_decl_block)
-    {
-      Forall_operands(it2, code_op)
-        if(it2->is_not_nil())
-          new_ops.push_back(*it2);
-    }
-    else
-      new_ops.push_back(code_op);
-  }
-
-  code.operands().swap(new_ops);
-}
-
-/*******************************************************************\
-
 Function: c_typecheck_baset::typecheck_block
 
   Inputs:
@@ -256,13 +212,7 @@ void c_typecheck_baset::typecheck_block(codet &code)
 
     codet &code_op=to_code(*it1);
   
-    if(code_op.get_statement()==ID_decl_block)
-    {
-      Forall_operands(it2, code_op)
-        if(it2->is_not_nil())
-          new_ops.move_to_operands(*it2);
-    }
-    else if(code_op.get_statement()==ID_label)
+    if(code_op.get_statement()==ID_label)
     {
       // these may be nested
       codet *code_ptr=&code_op;
@@ -273,23 +223,9 @@ void c_typecheck_baset::typecheck_block(codet &code)
         code_ptr=&to_code(code_ptr->op0());
       }
       
-      codet &label_op=*code_ptr;
+      //codet &label_op=*code_ptr;
 
-      // move declaration out of label
-      if(label_op.get_statement()==ID_decl_block)
-      {
-        codet tmp;
-        tmp.swap(label_op);
-        label_op=codet(ID_skip);
-        
-        new_ops.move_to_operands(code_op);
-
-        Forall_operands(it2, tmp)
-          if(it2->is_not_nil())
-            new_ops.move_to_operands(*it2);
-      }
-      else
-        new_ops.move_to_operands(code_op);
+      new_ops.move_to_operands(code_op);
     }
     else
       new_ops.move_to_operands(code_op);
@@ -352,181 +288,121 @@ Function: c_typecheck_baset::typecheck_decl
 
 \*******************************************************************/
 
-void c_typecheck_baset::typecheck_decl_type(codet &code)
-{
-  assert(code.operands().size()==0);
-  // Type only! May have side-effects in it!
-  
-  std::list<codet> clean_code;
-  
-  typet &type=static_cast<typet &>(code.add(ID_type_arg));
-
-  // typecheck
-  typecheck_type(type);
-
-  // clean
-  clean_type(irep_idt(), type, clean_code);
-  
-  if(!clean_code.empty())
-  {
-    // build a decl-block
-    code_blockt code_block(clean_code);
-    code_block.set_statement(ID_decl_block);
-    code_block.copy_to_operands(code);
-    code.swap(code_block);
-  }
-}
-
-/*******************************************************************\
-
-Function: c_typecheck_baset::typecheck_decl
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void c_typecheck_baset::typecheck_decl(codet &code)
 {
-  std::list<codet> clean_code;
-  typecheck_decl(code, clean_code);
-
-  if(!clean_code.empty())
-  {
-    // build a decl-block
-    code_blockt code_block(clean_code);
-    code_block.set_statement(ID_decl_block);
-    code_block.copy_to_operands(code);
-    code.swap(code_block);    
-  }
-}
-
-/*******************************************************************\
-
-Function: move_declarations
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-static void move_declarations(
-  exprt &code,
-  std::list<codet> &clean_code)
-{
-  Forall_operands(it, code)
-    move_declarations(*it, clean_code);
-
-  if(code.id()==ID_code &&
-     to_code(code).get_statement()==ID_decl)
-  {
-    clean_code.push_back(code_skipt());
-    code.swap(clean_code.back());
-  }
-}
-
-/*******************************************************************\
-
-Function: c_typecheck_baset::typecheck_decl
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void c_typecheck_baset::typecheck_decl(
-  codet &code,
-  std::list<codet> &clean_code)
-{
-  // this may have 1 or 2 operands
-  if(code.operands().size()!=1 &&
-     code.operands().size()!=2)
+  // this comes with 1 operand, which is a declaration
+  if(code.operands().size()!=1)
   {
     err_location(code);
-    throw "decl expected to have 1 or 2 arguments";
+    throw "decl expected to have 1 operand";
   }
 
-  // op0 must be symbol
-  if(code.op0().id()!=ID_symbol)
+  // op0 must be declaration
+  if(code.op0().id()!=ID_declaration)
   {
     err_location(code);
-    throw "decl expected to have symbol as first operand";
+    throw "decl statement expected to have declaration as operand";
   }
 
-  // add prefix
-  {
-    symbol_exprt &symbol_expr=to_symbol_expr(code.op0());
-    symbol_expr.set_identifier(add_language_prefix(symbol_expr.get_identifier()));
-  }
-
-  // replace if needed
-  replace_symbol(code.op0());
-
-  // look it up
-  const irep_idt &identifier=to_symbol_expr(code.op0()).get_identifier();
-
-  symbol_tablet::symbolst::iterator s_it=symbol_table.symbols.find(identifier);
-
-  if(s_it==symbol_table.symbols.end())
-  {
-    err_location(code);
-    str << "failed to find decl symbol `" << identifier << "' in symbol table";
-    throw 0;
-  }
-
-  symbolt &symbol=s_it->second;
+  ansi_c_declarationt declaration;
+  declaration.swap(code.op0());
   
-  // There may be side-effects in the type.  
-  clean_type(symbol.name, symbol.type, clean_code);
-  code.type()=symbol.type;
+  if(declaration.get_is_static_assert())
+  {
+    assert(declaration.operands().size()==2);
+    codet new_code(ID_static_assert);
+    new_code.location()=code.location();
+    new_code.operands().swap(declaration.operands());
+    code.swap(new_code);
+    typecheck_code(code);
+    return; // done
+  }
   
-  // see if it's a typedef
-  // or a function
-  // or static
-  if(symbol.is_type ||
-     symbol.type.id()==ID_code ||
-     symbol.is_static_lifetime)
+  typecheck_declaration(declaration);
+  
+  std::list<codet> new_code;
+  
+  // iterate over declarators
+  
+  for(ansi_c_declarationt::declaratorst::const_iterator
+      d_it=declaration.declarators().begin();
+      d_it!=declaration.declarators().end();
+      d_it++)
+  {
+    // add prefix
+    irep_idt identifier=
+      add_language_prefix(d_it->get_name());
+
+    // look it up
+    symbol_tablet::symbolst::iterator s_it=
+      symbol_table.symbols.find(identifier);
+
+    if(s_it==symbol_table.symbols.end())
+    {
+      err_location(code);
+      str << "failed to find decl symbol `" << identifier
+          << "' in symbol table";
+      throw 0;
+    }
+
+    symbolt &symbol=s_it->second;
+    
+    // This must not be an incomplete type, unless it's 'extern' 
+    // or a typedef.
+    if(!symbol.is_type &&
+       !symbol.is_extern &&
+       !is_complete_type(symbol.type))
+    {
+      err_location(symbol.location);
+      throw "incomplete type not permitted here";
+    }
+  
+    // see if it's a typedef
+    // or a function
+    // or static
+    if(symbol.is_type ||
+       symbol.type.id()==ID_code ||
+       symbol.is_static_lifetime)
+    {
+      // we ignore
+    }
+    else
+    {
+      code_declt code;
+      code.location()=symbol.location;
+      code.symbol()=symbol.symbol_expr();
+      code.symbol().location()=symbol.location;
+      
+      // add initializer, if any
+      if(symbol.value.is_not_nil())
+      {
+        code.operands().resize(2);
+        code.op1()=symbol.value; 
+      }
+      
+      new_code.push_back(code);
+    }
+  }
+  
+  // stash away any side-effects in the declaration
+  new_code.splice(new_code.begin(), clean_code);
+  
+  if(new_code.empty())
   {
     locationt location=code.location();
     code=code_skipt();
     code.location()=location;
-    return;
   }
-
-  code.location()=symbol.location;
-  
-  // handle the initializer, if any
-  if(code.operands().size()==2)
+  else if(new_code.size()==1)
   {
-    // the symbol must have a non-nil value, and its initializer has
-    // been type checked via typecheck_redefinition_non_type already
-    assert(symbol.value.is_not_nil());
-    // move any declarations towards clean_code to make sure these
-    // symbols (e.g., $array_size) have the same lifetime as symbol
-    // and aren't marked dead immediately
-    move_declarations(symbol.value, clean_code);
-    // add typecast, if necessary
-    implicit_typecast(symbol.value, symbol.type);
-    code.op1()=symbol.value;
+    code.swap(new_code.front());
   }
-  
-  // set type now (might be changed by initializer)
-  code.op0().type()=symbol.type;
-
-  // this must not be an incomplete type
-  if(!is_complete_type(code.op0().type()))
+  else
   {
-    err_location(code);
-    throw "incomplete type not permitted here";
+    // build a decl-block
+    code_blockt code_block(new_code);
+    code_block.set_statement(ID_decl_block);
+    code.swap(code_block);
   }
 }
 
@@ -590,51 +466,6 @@ void c_typecheck_baset::typecheck_expression(codet &code)
 
   exprt &op=code.op0();
   typecheck_expr(op);
-
-  #if 0
-  // Goes away since stuff like x=({y=1;});
-  // needs the inner side-effect.
-  if(op.id()==ID_sideeffect)
-  {
-    const irep_idt &statement=op.get(ID_statement);
-    
-    if(statement==ID_assign)
-    {
-      assert(op.operands().size()==2);
-      
-      // pull assignment statements up
-      exprt::operandst operands;
-      operands.swap(op.operands());
-      code.set_statement(ID_assign);
-      code.operands().swap(operands);
-      code.location()=op.location();
-      
-      if(code.op1().id()==ID_sideeffect &&
-         code.op1().get(ID_statement)==ID_function_call)
-      {
-        assert(code.op1().operands().size()==2);
-  
-        code_function_callt function_call;
-        function_call.location().swap(code.op1().location());
-        function_call.lhs()=code.op0();
-        function_call.function()=code.op1().op0();
-        function_call.arguments()=code.op1().op1().operands();
-        code.swap(function_call);
-      }
-    }
-    else if(statement==ID_function_call)
-    {
-      assert(op.operands().size()==2);
-      
-      // pull function calls up
-      code_function_callt function_call;
-      function_call.location()=code.location();
-      function_call.function()=op.op0();
-      function_call.arguments()=op.op1().operands();
-      code.swap(function_call);
-    }
-  }
-  #endif
 }
 
 /*******************************************************************\
@@ -867,7 +698,7 @@ void c_typecheck_baset::typecheck_goto(codet &code)
 
 /*******************************************************************\
 
-Function: c_typecheck_baset::typecheck_computed_goto
+Function: c_typecheck_baset::typecheck_gcc_computed_goto
 
   Inputs:
 
@@ -877,7 +708,7 @@ Function: c_typecheck_baset::typecheck_computed_goto
 
 \*******************************************************************/
 
-void c_typecheck_baset::typecheck_computed_goto(codet &code)
+void c_typecheck_baset::typecheck_gcc_computed_goto(codet &code)
 {
   if(code.operands().size()!=1)
   {
@@ -939,6 +770,7 @@ void c_typecheck_baset::typecheck_ifthenelse(code_ifthenelset &code)
     code_block.move_to_operands(code.then_case());
     code.then_case().swap(code_block);
   }
+  
   typecheck_code(to_code(code.then_case()));
 
   if(!code.else_case().is_nil())

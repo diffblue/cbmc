@@ -31,6 +31,7 @@ int main(void)
   assert(castWithRounding(FE_TONEAREST,33554439) == higher);
   assert(castWithRounding(FE_TONEAREST,33554440) == higher);
 
+  #ifdef FE_UPWARD
   assert(castWithRounding(FE_UPWARD,33554432) == low);
   assert(castWithRounding(FE_UPWARD,33554433) == high);
   assert(castWithRounding(FE_UPWARD,33554434) == high);
@@ -41,7 +42,9 @@ int main(void)
   assert(castWithRounding(FE_UPWARD,-33554434) == -low);
   assert(castWithRounding(FE_UPWARD,-33554435) == -low);
   assert(castWithRounding(FE_UPWARD,-33554436) == -high);
+  #endif
 
+  #ifdef FE_DOWNWARD
   assert(castWithRounding(FE_DOWNWARD,33554432) == low);
   assert(castWithRounding(FE_DOWNWARD,33554433) == low);
   assert(castWithRounding(FE_DOWNWARD,33554434) == low);
@@ -52,6 +55,7 @@ int main(void)
   assert(castWithRounding(FE_DOWNWARD,-33554434) == -high);
   assert(castWithRounding(FE_DOWNWARD,-33554435) == -high);
   assert(castWithRounding(FE_DOWNWARD,-33554436) == -high);
+  #endif
 
   assert(castWithRounding(FE_TOWARDZERO,33554432) == low);
   assert(castWithRounding(FE_TOWARDZERO,33554433) == low);

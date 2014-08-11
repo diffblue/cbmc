@@ -28,10 +28,12 @@ public:
            ptr32_cnt, ptr64_cnt,
            gcc_float128_cnt, gcc_int128_cnt, bv_cnt,
            floatbv_cnt, fixedbv_cnt;
-  bool gcc_mode_QI, gcc_mode_HI, gcc_mode_SI, gcc_mode_DI, gcc_mode_TI;
+
+  typet gcc_attribute_mode;
            
   bool packed, aligned;
   exprt vector_size, alignment, bv_width, fraction_width;
+  exprt msc_based; // this is Visual Studio
 
   // storage spec
   c_storage_spect c_storage_spec;
@@ -62,7 +64,8 @@ public:
     alignment.make_nil();
     bv_width.make_nil();
     fraction_width.make_nil();
-    gcc_mode_QI=gcc_mode_HI=gcc_mode_SI=gcc_mode_DI=gcc_mode_TI=false;
+    msc_based.make_nil();
+    gcc_attribute_mode.make_nil();
     
     packed=aligned=false;
 

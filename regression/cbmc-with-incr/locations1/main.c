@@ -1,5 +1,4 @@
-#include "stdlib.h"
-
+typedef signed char int8_t;
 
 typedef enum _dummyEnum{
 
