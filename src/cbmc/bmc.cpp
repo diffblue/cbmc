@@ -451,9 +451,9 @@ bool bmct::run(const goto_functionst &goto_functions)
 	    {
               symex.update_loop_info(!decide(symex.prop_conv,false));
 	    }
+            continue;
 	  }
-
-          continue;
+          else return false;  //nothing to check, exit
 	}
 
         //call decision procedure

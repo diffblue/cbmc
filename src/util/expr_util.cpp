@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "std_expr.h"
 #include "symbol.h"
 #include "namespace.h"
+#include "arith_tools.h"
 
 /*******************************************************************\
 
@@ -28,11 +29,7 @@ Function: gen_zero
 
 exprt gen_zero(const typet &type)
 {
-  exprt result;
-
   const irep_idt type_id=type.id();
-
-  result=constant_exprt(type);
 
   if(type_id==ID_rational ||
      type_id==ID_real ||
@@ -40,7 +37,7 @@ exprt gen_zero(const typet &type)
      type_id==ID_natural ||
      type_id==ID_c_enum)
   {
-    result.set(ID_value, ID_0);
+    return constant_exprt(ID_0, type);
   }
   else if(type_id==ID_unsignedbv ||
           type_id==ID_signedbv ||
@@ -54,26 +51,39 @@ exprt gen_zero(const typet &type)
     for(unsigned i=0; i<width; i++)
       value+='0';
 
-    result.set(ID_value, value);
+    return constant_exprt(value, type);
   }
   else if(type_id==ID_complex)
   {
-    result=exprt(ID_complex, type);
     exprt sub_zero=gen_zero(type.subtype());
-    result.operands().resize(2, sub_zero);
+    return complex_exprt(sub_zero, sub_zero, to_complex_type(type));
   }
   else if(type_id==ID_bool)
   {
-    result=false_exprt();
+    return false_exprt();
   }
   else if(type_id==ID_pointer)
   {
-    result.set(ID_value, ID_NULL);
+    return constant_exprt(ID_NULL, type);
+  }
+  else if(type_id==ID_vector &&
+          to_vector_type(type).size().id()==ID_constant)
+  {
+    exprt sub_zero=gen_zero(type.subtype());
+    mp_integer s;
+
+    if(sub_zero.is_nil() ||
+       to_integer(to_vector_type(type).size(), s))
+      return sub_zero;
+
+    exprt::operandst ops(integer2unsigned(s), sub_zero);
+    vector_exprt v(to_vector_type(type));
+    v.operands().swap(ops);
+
+    return v;
   }
   else
-    result.make_nil();
-
-  return result;
+    return nil_exprt();
 }
 
 /*******************************************************************\
@@ -91,7 +101,6 @@ Function: gen_one
 exprt gen_one(const typet &type)
 {
   const irep_idt type_id=type.id();
-  exprt result=constant_exprt(type);
 
   if(type_id==ID_bool ||
      type_id==ID_rational ||
@@ -99,44 +108,66 @@ exprt gen_one(const typet &type)
      type_id==ID_integer ||
      type_id==ID_natural)
   {
-    result.set(ID_value, ID_1);
+    return constant_exprt(ID_1, type);
   }
   else if(type_id==ID_unsignedbv ||
-          type_id==ID_signedbv ||
-          type_id==ID_c_enum)
+          type_id==ID_signedbv)
   {
     std::string value;
     unsigned width=to_bitvector_type(type).get_width();
-    for(unsigned i=0; i<width-1; i++)
-      value+='0';
-    value+='1';
-    result.set(ID_value, value);
+    
+    if(width!=0)
+    {
+      value.reserve(width);
+      for(unsigned i=0; i<width-1; i++)
+        value+='0';
+      value+='1';
+    }
+
+    return constant_exprt(value, type);
+  }
+  else if(type_id==ID_c_enum)
+  {
+    return constant_exprt(ID_1, type);
   }
   else if(type_id==ID_fixedbv)
   {
     fixedbvt fixedbv;
     fixedbv.spec=to_fixedbv_type(type);
     fixedbv.from_integer(1);
-    result=fixedbv.to_expr();
+    return fixedbv.to_expr();
   }
   else if(type_id==ID_floatbv)
   {
     ieee_floatt ieee_float;
     ieee_float.spec=to_floatbv_type(type);
     ieee_float.from_integer(1);
-    result=ieee_float.to_expr();
+    return ieee_float.to_expr();
   }
   else if(type_id==ID_complex)
   {
-    result=exprt(ID_complex, type);
-    result.operands().resize(2);
-    result.op0()=gen_one(type.subtype());
-    result.op1()=gen_zero(type.subtype());
+    exprt real=gen_one(type.subtype());
+    exprt imag=gen_zero(type.subtype());
+    return complex_exprt(real, imag, to_complex_type(type));
+  }
+  else if(type_id==ID_vector &&
+          to_vector_type(type).size().id()==ID_constant)
+  {
+    exprt sub_one=gen_one(type.subtype());
+    mp_integer s;
+
+    if(sub_one.is_nil() ||
+       to_integer(to_vector_type(type).size(), s))
+      return sub_one;
+
+    exprt::operandst ops(integer2unsigned(s), sub_one);
+    vector_exprt v(to_vector_type(type));
+    v.operands().swap(ops);
+
+    return v;
   }
   else
-    result.make_nil();
-
-  return result;
+    return nil_exprt();
 }
 
 /*******************************************************************\
