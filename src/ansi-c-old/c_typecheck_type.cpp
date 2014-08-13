@@ -18,9 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "c_types.h"
 #include "c_sizeof.h"
 #include "c_qualifiers.h"
-#include "ansi_c_declaration.h"
 #include "padding.h"
-#include "type2name.h"
 
 /*******************************************************************\
 
@@ -36,12 +34,6 @@ Function: c_typecheck_baset::typecheck_type
 
 void c_typecheck_baset::typecheck_type(typet &type)
 {
-  if(type.id()==ID_already_typechecked)
-  {
-    type.swap(type.subtype());
-    return; // done
-  }
-
   // we first convert, and then check
   
   // do we have alignment?
@@ -65,7 +57,8 @@ void c_typecheck_baset::typecheck_type(typet &type)
           type.id()==ID_union)
     typecheck_compound_type(to_struct_union_type(type));
   else if(type.id()==ID_c_enum)
-    typecheck_c_enum_type(type);
+  {
+  }
   else if(type.id()==ID_c_bitfield)
     typecheck_c_bit_field_type(type);
   else if(type.id()==ID_typeof)
@@ -222,57 +215,41 @@ void c_typecheck_baset::typecheck_code_type(code_typet &type)
   {
     type.make_ellipsis();
   }
-  else // we do have parameters
+  else
   {
-    // is the last one ellipsis?
-    if(type.parameters().back().id()==ID_ellipsis)
-    {
-      type.make_ellipsis();
-      type.parameters().pop_back();
-    }
+    // we do have parameters
     
     parameter_map.clear();
   
-    for(code_typet::parameterst::iterator
-        p_it=type.parameters().begin();
-        p_it!=type.parameters().end();
-        p_it++)
+    for(unsigned i=0; i<type.parameters().size(); i++)
     {
-      // turn the declarations into parameters
-      if(p_it->id()==ID_declaration)
+      code_typet::parametert &parameter=type.parameters()[i];
+
+      // first fix type
+      typet &type=parameter.type();
+
+      typecheck_type(type);
+      
+      adjust_function_parameter(type);
+      
+      // adjust the identifier
+
+      irep_idt identifier=parameter.get_identifier();
+
+      if(identifier!=irep_idt())
       {
-        ansi_c_declarationt &declaration=to_ansi_c_declaration(*p_it);
-      
-        code_typet::parametert parameter;
-
-        // first fix type
-        typet &type=parameter.type();
-        type=declaration.full_type(declaration.declarator());
-        typecheck_type(type);
-        adjust_function_parameter(type);
-      
-        // adjust the identifier
-        irep_idt identifier=declaration.declarator().get_name();
-
-        // abstract or not?
-        if(identifier!=irep_idt())
-        {
-          identifier=add_language_prefix(identifier);
+        identifier=add_language_prefix(identifier);
     
-          id_replace_mapt::const_iterator
-            m_it=id_replace_map.find(identifier);
+        id_replace_mapt::const_iterator
+          m_it=id_replace_map.find(identifier);
 
-          if(m_it!=id_replace_map.end())
-            identifier=m_it->second;
+        if(m_it!=id_replace_map.end())
+          identifier=m_it->second;
 
-          parameter.set_identifier(identifier);
+        parameter.set_identifier(identifier);
 
-          // make visible now, later parameters might use it
-          parameter_map[identifier]=type;
-        }
-        
-        // put the parameter in place of the declaration
-        p_it->swap(parameter);
+        // make visible now, later parameters might use it
+        parameter_map[identifier]=type;
       }
     }
     
@@ -405,8 +382,7 @@ void c_typecheck_baset::typecheck_vector_type(vector_typet &type)
      subtype.id()!=ID_fixedbv)
   {
     err_location(size_location);
-    str << "cannot make a vector of subtype "
-        << to_string(subtype);
+    error("cannot make a vector of this type");
     throw 0;
   }
 
@@ -479,123 +455,11 @@ Function: c_typecheck_baset::typecheck_compound_type
 
 \*******************************************************************/
 
-#include <iostream>
-
 void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
 {
-  // These get replaced by symbol types.
-  irep_idt identifier;
-  
-  bool have_body=type.find(ID_components).is_not_nil();
-  
-  if(type.find(ID_tag).is_nil())
-  {
-    // Anonymous? Must come with body.
-    assert(have_body);
+  struct_union_typet::componentst &components=type.components();
 
-    // add new symbol
-    symbolt compound_symbol;
-    compound_symbol.is_type=true;
-    compound_symbol.type=type;
-    compound_symbol.location=type.location();
-
-    typecheck_compound_body(compound_symbol);
-
-    std::string typestr=type2name(compound_symbol.type);
-    compound_symbol.base_name="#anon-"+typestr;
-    compound_symbol.name=add_language_prefix("tag-#anon#"+typestr);
-    identifier=compound_symbol.name;
-    
-    symbolt *new_symbol;
-    move_symbol(compound_symbol, new_symbol);
-  }
-  else
-  {
-    identifier=add_language_prefix(type.find(ID_tag).get(ID_identifier));
-    
-    // does it exist already?
-    symbol_tablet::symbolst::iterator s_it=
-      symbol_table.symbols.find(identifier);
-
-    if(s_it==symbol_table.symbols.end())
-    {
-      // no, add new symbol
-      type.remove(ID_tag);
-      irep_idt base_name=type.find(ID_tag).get(ID_C_base_name);
-      type.set(ID_tag, base_name);
-
-      symbolt compound_symbol;
-      compound_symbol.is_type=true;
-      compound_symbol.name=identifier;
-      compound_symbol.base_name=base_name;
-      compound_symbol.type=type;
-      compound_symbol.location=type.location();
-
-      if(have_body)
-      {
-        typecheck_compound_body(compound_symbol);
-      }
-      else
-      {
-        if(compound_symbol.type.id()==ID_struct)
-          compound_symbol.type.id(ID_incomplete_struct);
-        else if(compound_symbol.type.id()==ID_union)
-          compound_symbol.type.id(ID_incomplete_union);
-        else
-          assert(false);
-      }
-      
-      symbolt *new_symbol;
-      move_symbol(compound_symbol, new_symbol);
-    }
-    else
-    {
-      // yes, it exists already
-      if(s_it->second.type.id()==ID_incomplete_struct ||
-         s_it->second.type.id()==ID_incomplete_union)
-      {
-        // Maybe we got a body now.
-        if(have_body)
-        {
-          s_it->second.type=type;
-          typecheck_compound_body(s_it->second);
-        }
-      }
-      else if(have_body)
-      {
-        err_location(type);
-        str << "redefinition of " << type.id() << " body";
-        error();
-        throw 0;
-      }
-    }
-  }
-
-  symbol_typet symbol_type;
-  symbol_type.location()=type.location();
-  symbol_type.set_identifier(identifier);
-
-  type.swap(symbol_type);
-}
-
-/*******************************************************************\
-
-Function: c_typecheck_baset::typecheck_compound_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void c_typecheck_baset::typecheck_compound_body(symbolt &symbol)
-{
-  struct_union_typet::componentst &components=
-    to_struct_union_type(symbol.type).components();
-
-  // mark bit-fields as such
+  // mark bit-fields
   for(struct_union_typet::componentst::iterator
       it=components.begin();
       it!=components.end();
@@ -649,7 +513,7 @@ void c_typecheck_baset::typecheck_compound_body(symbolt &symbol)
   // We allow an incomplete (C99) array as _last_ member!
   // Zero-length is allowed everywhere.
 
-  if(symbol.type.id()==ID_struct)
+  if(type.id()==ID_struct)
   {
     for(struct_union_typet::componentst::iterator
         it=components.begin();
@@ -679,8 +543,8 @@ void c_typecheck_baset::typecheck_compound_body(symbolt &symbol)
   // unless there is an attribute that says that the struct is
   // 'packed'
 
-  if(symbol.type.id()==ID_struct)
-    add_padding(to_struct_type(symbol.type), *this);
+  if(type.id()==ID_struct)
+    add_padding(to_struct_type(type), *this);
 
   // finally, check _Static_assert inside the compound
   for(struct_union_typet::componentst::iterator
@@ -712,36 +576,6 @@ void c_typecheck_baset::typecheck_compound_body(symbolt &symbol)
     else
       it++;
   }  
-}
-
-/*******************************************************************\
-
-Function: c_typecheck_baset::typecheck_c_enum_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void c_typecheck_baset::typecheck_c_enum_type(typet &type)
-{
-  // these have the declarations of the enum constants as operands
-  exprt &as_expr=static_cast<exprt &>(static_cast<irept &>(type));
-  locationt location=type.location();
-  
-  Forall_operands(it, as_expr)
-  {
-    ansi_c_declarationt &declaration=to_ansi_c_declaration(*it);
-    typecheck_declaration(declaration);
-  }
-  
-  // Replace the enum by an 'int'. GCC may pick smaller types
-  // as well.
-  type=enum_type();
-  type.location()=location;
 }
 
 /*******************************************************************\
@@ -831,9 +665,6 @@ Function: c_typecheck_baset::typecheck_typeof_type
 
 void c_typecheck_baset::typecheck_typeof_type(typet &type)
 {
-  // save location
-  locationt location=type.location();
-
   // retain the qualifiers as is
   c_qualifierst c_qualifiers;
   c_qualifiers.read(type);
@@ -862,7 +693,6 @@ void c_typecheck_baset::typecheck_typeof_type(typet &type)
     type.swap(expr.type());
   }
   
-  type.location()=location;
   c_qualifiers.write(type);
 }
 

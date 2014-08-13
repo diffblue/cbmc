@@ -352,7 +352,7 @@ bool ansi_c_languaget::to_expr(
     result=true;
   else
   {
-    expr=ansi_c_parser.parse_tree.items.front().declarator().value();
+    expr=ansi_c_parser.parse_tree.items.front().value();
     
     result=ansi_c_convert(expr, "", message_handler);
 

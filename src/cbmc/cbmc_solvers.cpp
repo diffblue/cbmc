@@ -88,7 +88,6 @@ cbmc_solverst::solvert* cbmc_solverst::get_default()
     // simplifier won't work with beautification
     propt* prop = new satcheck_minisat_no_simplifiert();
     prop->set_message_handler(get_message_handler());
-    prop->set_verbosity(get_verbosity());
     
     bv_cbmct* bv_cbmc = new bv_cbmct(ns, *prop);
     
@@ -104,14 +103,12 @@ cbmc_solverst::solvert* cbmc_solverst::get_default()
   #if 1
     propt* prop = new satcheckt();
     prop->set_message_handler(get_message_handler());
-    prop->set_verbosity(get_verbosity());
     bv_cbmct* bv_cbmc = new bv_cbmct(ns, *prop);
     solver = new cbmc_solver_with_propt(bv_cbmc,prop);
   #else
     aigt* aig = new aigt();
     propt* prop = new aig_propt(*aig);
     prop->set_message_handler(get_message_handler());
-    prop->set_verbosity(get_verbosity());
     bv_cbmct* bv_cbmc = new bv_cbmct(ns, *prop);
     solver = new cbmc_solver_with_aigpropt(bv_cbmc,prop,aig);
   #endif
@@ -171,7 +168,6 @@ cbmc_solverst::solvert* cbmc_solverst::get_bv_refinement()
     prop=new satcheck_minisat_no_simplifiert();
   
   prop->set_message_handler(get_message_handler());
-  prop->set_verbosity(get_verbosity());
 
   bv_refinementt* bv_refinement = new bv_refinementt(ns, *prop);
   bv_refinement->set_ui(ui);

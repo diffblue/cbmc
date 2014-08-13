@@ -873,8 +873,7 @@ void goto_checkt::pointer_rel_check(
 
     if(enable_pointer_check)
     {
-      exprt same_object("same-object", bool_typet());
-      same_object.copy_to_operands(expr.op0(), expr.op1());
+      exprt same_object=::same_object(expr.op0(), expr.op1());
 
       add_guarded_claim(
         same_object,
@@ -1552,26 +1551,31 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
         }
       }
     }
-    else if(i.is_end_function() &&
-            i.function==ID_main &&
-            enable_memory_leak_check)
+    else if(i.is_end_function())
     {
-      const symbolt &leak=ns.lookup("c::__CPROVER_memory_leak");
-      const symbol_exprt leak_expr=leak.symbol_expr();
+      if(i.function==ID_main &&
+         enable_memory_leak_check)
+      {
+        const symbolt &leak=ns.lookup("c::__CPROVER_memory_leak");
+        const symbol_exprt leak_expr=leak.symbol_expr();
 
-      // add self-assignment to get helpful counterexample output
-      goto_programt::targett t=new_code.add_instruction();
-      t->make_assignment();
-      t->code=code_assignt(leak_expr, leak_expr);
+        // add self-assignment to get helpful counterexample output
+        goto_programt::targett t=new_code.add_instruction();
+        t->make_assignment();
+        t->code=code_assignt(leak_expr, leak_expr);
+        
+        locationt location;
+        location.set_function(ID_main);
 
-      equal_exprt eq(leak_expr, gen_zero(ns.follow(leak.type)));
-      add_guarded_claim(
-        eq,
-        "dynamically allocated memory never freed",
-        "memory-leak",
-        i.location,
-        eq,
-        guardt());
+        equal_exprt eq(leak_expr, gen_zero(ns.follow(leak.type)));
+        add_guarded_claim(
+          eq,
+          "dynamically allocated memory never freed",
+          "memory-leak",
+          location,
+          eq,
+          guardt());
+      }
     }
 
     for(goto_programt::instructionst::iterator

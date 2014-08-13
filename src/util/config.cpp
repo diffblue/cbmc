@@ -470,13 +470,26 @@ Function: configt::ansi_ct::set_arch_spec_mips
 
 void configt::ansi_ct::set_arch_spec_mips(const irep_idt &subarch)
 {
-  set_ILP32();
   arch=ARCH_MIPS;
-  if(subarch=="mipsel")
+  if(subarch=="mipsel" ||
+     subarch=="mips" ||
+     subarch=="mipsn32el" ||
+     subarch=="mipsn32")
+  {
+    set_ILP32();
+    long_double_width=8*8;
+  }
+  else
+  {
+    set_LP64();
+    long_double_width=16*8;
+  }
+  if(subarch=="mipsel" ||
+     subarch=="mipsn32el" ||
+     subarch=="mips64el")
     endianness=IS_LITTLE_ENDIAN;
   else
     endianness=IS_BIG_ENDIAN;
-  long_double_width=8*8;
   char_is_unsigned=false;
   NULL_is_zero=true;
 
@@ -674,6 +687,7 @@ void configt::ansi_ct::set_arch_spec_x32()
   // This is a variant of x86_64 that has
   // 32-bit long int and 32-bit pointers.
   set_ILP32();
+  long_double_width=16*8; // different from i386
   arch=ARCH_X32;
   endianness=IS_LITTLE_ENDIAN;
   char_is_unsigned=false;
@@ -800,6 +814,11 @@ bool configt::set(const cmdlinet &cmdline)
       // and we support that.
       ansi_c.preprocessor=ansi_ct::PP_GCC;
       ansi_c.mode=ansi_ct::MODE_GCC_C;
+
+      // enable Cygwin
+      #ifdef _WIN32
+      ansi_c.defines.push_back("__CYGWIN__");
+      #endif
     }
     else
     {
@@ -858,7 +877,11 @@ bool configt::set(const cmdlinet &cmdline)
           arch=="armhf" ||
           arch=="arm")
     ansi_c.set_arch_spec_arm(arch);
-  else if(arch=="mipsel" ||
+  else if(arch=="mips64el" ||
+          arch=="mipsn32el" ||
+          arch=="mipsel" ||
+          arch=="mips64" ||
+          arch=="mipsn32" ||
           arch=="mips")
     ansi_c.set_arch_spec_mips(arch);
   else if(arch=="powerpc" ||
@@ -1103,9 +1126,21 @@ irep_idt configt::this_architecture()
     this_arch="arm";
     #endif
   #elif __mipsel__
-  this_arch="mipsel";
+    #if _MIPS_SIM==_ABIO32
+    this_arch="mipsel";
+    #elif _MIPS_SIM==_ABIN32
+    this_arch="mipsn32el";
+    #else
+    this_arch="mips64el";
+    #endif
   #elif __mips__
-  this_arch="mips";
+    #if _MIPS_SIM==_ABIO32
+    this_arch="mips";
+    #elif _MIPS_SIM==_ABIN32
+    this_arch="mipsn32";
+    #else
+    this_arch="mips64";
+    #endif
   #elif __powerpc__
   this_arch="powerpc";
   #elif __ppc64__

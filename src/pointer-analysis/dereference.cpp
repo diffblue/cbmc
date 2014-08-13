@@ -6,6 +6,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+//#define DEBUG
+
+#ifdef DEBUG
+#include <iostream>
+#include <langapi/language_util.h>
+#endif
+
 #include <util/std_expr.h>
 #include <util/expr_util.h>
 #include <util/byte_operators.h>
@@ -39,7 +46,7 @@ exprt dereferencet::operator()(const exprt &pointer)
   // type of the object
   const typet &type=pointer.type().subtype();
 
-  #if 0
+  #ifdef DEBUG
   std::cout << "DEREF: " << from_expr(ns, "", pointer) << std::endl;
   #endif
 

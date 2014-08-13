@@ -152,6 +152,7 @@ void goto_convert_functionst::add_return(
   goto_functionst::goto_functiont &f,
   const locationt &location)
 {
+  #if 0
   if(!f.body.instructions.empty() &&
      f.body.instructions.back().is_return())
     return; // not needed, we have one already
@@ -161,6 +162,36 @@ void goto_convert_functionst::add_return(
      f.body.instructions.back().is_goto() &&
      f.body.instructions.back().guard.is_true())
     return;
+  #else
+
+  if(!f.body.instructions.empty())
+  {
+    goto_programt::const_targett last_instruction=
+      f.body.instructions.end();
+    last_instruction--;
+
+    while(true)
+    {
+      // unconditional goto, say from while(1)?
+      if(last_instruction->is_goto() &&
+         last_instruction->guard.is_true())
+        return;
+
+      // return?        
+      if(last_instruction->is_return())
+        return;
+
+      // advance if it's a 'dead' without branch target
+      if(last_instruction->is_dead() &&
+         last_instruction!=f.body.instructions.begin() &&
+         !last_instruction->is_target())
+        last_instruction--;
+      else
+        break; // give up
+    }
+  }
+  
+  #endif
 
   goto_programt::targett t=f.body.add_instruction();
   t->make_return();
@@ -193,7 +224,9 @@ void goto_convert_functionst::convert_function(const irep_idt &identifier)
   temporary_counter=0;
   
   f.type=to_code_type(symbol.type);
-  f.body_available=symbol.value.is_not_nil();
+  f.body_available=
+    symbol.value.is_not_nil() &&
+    symbol.value.id()!="compiled"; /* goto_inline may have removed the body */
 
   if(!f.body_available) return;
   

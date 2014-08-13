@@ -12,6 +12,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/rename.h>
 #include <util/base_type.h>
 #include <util/std_expr.h>
+#include <util/byte_operators.h>
+
+#include <ansi-c/c_types.h>
 
 #include "goto_symex.h"
 
@@ -103,20 +106,16 @@ void goto_symext::symex_other(
     process_array_expr(clean_code.op0());
     process_array_expr(clean_code.op1());
     
-    if(ns.follow(clean_code.op0().type()).id()!=ID_array)
-      throw "array_copy expects array-typed operand";
-    
-    if(ns.follow(clean_code.op1().type()).id()!=ID_array)
-      throw "array_copy expects array-typed operand";
-    
-    if(!base_type_eq(clean_code.op0().type().subtype(),
-                     clean_code.op1().type().subtype(), ns))
-      throw "array_copy expects array types with matching subtypes";
 
     if(!base_type_eq(clean_code.op0().type(),
                      clean_code.op1().type(), ns))
     {
-      clean_code.op1().make_typecast(clean_code.op0().type());
+      byte_extract_exprt be(byte_extract_id());
+      be.type()=clean_code.op0().type();
+      be.op()=clean_code.op1();
+      be.offset()=gen_zero(index_type());
+
+      clean_code.op1()=be;
     }
     
     code_assignt assignment;
@@ -141,18 +140,21 @@ void goto_symext::symex_other(
     
     process_array_expr(clean_code.op0());
     
-    const typet &array_type=ns.follow(clean_code.op0().type());
+    const typet &op0_type=ns.follow(clean_code.op0().type());
     
-    if(array_type.id()!=ID_array)
+    if(op0_type.id()!=ID_array)
       throw "array_set expects array operand";
 
+    const array_typet &array_type=
+      to_array_type(op0_type);
+    
     if(!base_type_eq(array_type.subtype(),
                      clean_code.op1().type(), ns))
       clean_code.op1().make_typecast(array_type.subtype());
     
     code_assignt assignment;
     assignment.lhs()=clean_code.op0();
-    assignment.rhs()=array_of_exprt(clean_code.op1(), clean_code.op0().type());
+    assignment.rhs()=array_of_exprt(clean_code.op1(), array_type);
     symex_assign(state, assignment);    
   }
   else if(statement==ID_user_specified_predicate ||

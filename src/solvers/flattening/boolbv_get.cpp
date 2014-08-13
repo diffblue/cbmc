@@ -169,7 +169,7 @@ exprt boolbvt::bv_get_rec(
         }
       }
 
-      exprt dest=exprt(ID_struct, type);
+      struct_exprt dest(type);
       dest.operands().swap(op);
       return dest;
     }
@@ -183,15 +183,14 @@ exprt boolbvt::bv_get_rec(
       // Any idea that's better than just returning the first component?      
       unsigned component_nr=0;      
 
-      exprt value(ID_union, type);
-      value.operands().resize(1);
+      union_exprt value(union_type);
 
-      value.set(ID_component_name,
-                components[component_nr].get_name());
+      value.set_component_name(
+        components[component_nr].get_name());
       
       const typet &subtype=components[component_nr].type();
 
-      value.op0()=bv_get_rec(bv, unknown, offset, subtype);
+      value.op()=bv_get_rec(bv, unknown, offset, subtype);
 
       return value;
     }

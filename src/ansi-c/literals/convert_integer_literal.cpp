@@ -7,7 +7,6 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <cassert>
-#include <cstdlib>
 #include <cctype>
 
 #include <util/arith_tools.h>
@@ -15,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_types.h>
 #include <util/std_expr.h>
 #include <util/expr_util.h>
+#include <util/string2int.h>
 
 #include "convert_integer_literal.h"
 
@@ -39,7 +39,7 @@ exprt convert_integer_literal(const std::string &src)
   
   for(unsigned i=0; i<src.size(); i++)
   {
-    register char ch=src[i];
+    char ch=src[i];
 
     if(ch=='u' || ch=='U')
       is_unsigned=true;
@@ -51,7 +51,7 @@ exprt convert_integer_literal(const std::string &src)
       // and "10i" (imaginary) for GCC.
       // If it's followed by a number, we do MS mode.
       if((i+1)<src.size() && isdigit(src[i+1]))
-        width_suffix=atoi(src.c_str()+i+1);
+        width_suffix=unsafe_str2int(src.c_str()+i+1);
       else 
         is_imaginary=true;
     }

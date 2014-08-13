@@ -111,6 +111,9 @@ void c_typecheck_baset::typecheck_symbol(symbolt &symbol)
 {
   current_symbol_id=symbol.name;
 
+  // first of all, we typecheck the type
+  typecheck_type(symbol.type);
+
   bool is_function=symbol.type.id()==ID_code;
 
   const typet &final_type=follow(symbol.type);
@@ -666,27 +669,6 @@ void c_typecheck_baset::typecheck_function_body(symbolt &symbol)
     
   // set return type
   return_type=code_type.return_type();
-  
-  // add parameter declarations into the symbol table
-  const code_typet::parameterst &parameters=code_type.parameters();
-  for(code_typet::parameterst::const_iterator
-      p_it=parameters.begin();
-      p_it!=parameters.end();
-      p_it++)
-  {
-    symbolt p_symbol;
-    
-    p_symbol.type=p_it->type();
-    p_symbol.name=p_it->get_identifier();
-    p_symbol.is_static_lifetime=false;
-    p_symbol.is_type=false;
-    p_symbol.is_lvalue=true;
-    p_symbol.is_state_var=true;
-    p_symbol.is_thread_local=true;
-
-    symbolt *new_p_symbol;
-    move_symbol(p_symbol, new_p_symbol);
-  }
 
   // typecheck the body code  
   typecheck_code(to_code(symbol.value));
@@ -695,41 +677,3 @@ void c_typecheck_baset::typecheck_function_body(symbolt &symbol)
   if(symbol.name=="c::main")
     add_argc_argv(symbol);
 }
-
-/*******************************************************************\
-
-Function: c_typecheck_baset::typecheck_declaration
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void c_typecheck_baset::typecheck_declaration(
-  ansi_c_declarationt &declaration)
-{
-  // first typecheck the type of the declaration
-  typecheck_type(declaration.type());
-  
-  // mark as 'already typechecked'
-  make_already_typechecked(declaration.type());
-
-  // Now do declarators, if any.
-  for(ansi_c_declarationt::declaratorst::iterator
-      d_it=declaration.declarators().begin();
-      d_it!=declaration.declarators().end();
-      d_it++)
-  {
-    symbolt symbol;
-    declaration.to_symbol(*d_it, symbol);
-
-    // now check other half of type
-    typecheck_type(symbol.type);
-
-    typecheck_symbol(symbol);
-  }
-}
-

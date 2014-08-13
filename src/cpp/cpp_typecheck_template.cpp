@@ -511,7 +511,7 @@ std::string cpp_typecheckt::class_template_identifier(
       it!=template_type.parameters().end();
       it++)
   {
-    if(counter!=0) identifier+=",";
+    if(counter!=0) identifier+=',';
   
     if(it->id()==ID_type)
       identifier+="Type"+i2string(counter);
@@ -533,7 +533,7 @@ std::string cpp_typecheckt::class_template_identifier(
         it!=partial_specialization_args.arguments().end();
         it++, counter++)
     {  
-      if(counter!=0) identifier+=",";
+      if(counter!=0) identifier+=',';
 
       if(it->id()==ID_type || it->id()=="ambiguous")
         identifier+=cpp_type2name(it->type());
@@ -541,7 +541,7 @@ std::string cpp_typecheckt::class_template_identifier(
         identifier+=cpp_expr2name(*it);
     }
     
-    identifier+=">";
+    identifier+='>';
   }
   
   return identifier;

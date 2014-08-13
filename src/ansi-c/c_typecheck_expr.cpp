@@ -229,7 +229,7 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
     typecheck_type(subtypes[1]);
     locationt location=expr.location();
     
-    // ignores top level qualifiers
+    // ignores top-level qualifiers
     subtypes[0].remove(ID_C_constant);
     subtypes[0].remove(ID_C_volatile);
     subtypes[0].remove(ID_C_restricted);
@@ -277,15 +277,14 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
     assert(expr.operands().size()==2);
     expr.type()=bool_typet();
     
-    if(expr.op0().operands().size()!=1 ||
-       expr.op0().op0().get(ID_statement)!=ID_decl)
+    if(expr.op0().get(ID_statement)!=ID_decl)
     {
       err_location(expr);
       throw "expected declaration as operand of quantifier";
     }
 
     // replace declaration by symbol expression
-    symbol_exprt bound=to_symbol_expr(expr.op0().op0().op0());
+    symbol_exprt bound=to_symbol_expr(expr.op0().op0());
     expr.op0().swap(bound);
   }
   else if(expr.id()==ID_label)
@@ -309,18 +308,33 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
     const typet &op_type=follow(expr.op0().type());
     if(op_type.id()!=ID_complex)
     {
-      err_location(expr);
-      throw "expected complex-typed operand";
-    }
-
-    expr.type()=op_type.subtype();
-    
-    // these are lvalues if the operand is one
-    if(expr.op0().get_bool(ID_C_lvalue))
-      expr.set(ID_C_lvalue, true);
+      if(!is_number(op_type))
+      {
+        err_location(expr.op0());
+        throw "expected numerical operand";
+      }
       
-    if(expr.op0().get_bool(ID_C_constant))
-      expr.set(ID_C_constant, true);
+      if(expr.id()==ID_complex_real)
+        expr=expr.op0(); // __real__ x is just a nop
+      else if(expr.id()==ID_complex_imag)
+      {
+        // __imag__ x is simply a zero constant
+        exprt result=gen_zero(op_type);
+        result.location()=expr.location();
+        expr=result;
+      }
+    }
+    else
+    {
+      expr.type()=op_type.subtype();
+    
+      // these are lvalues if the operand is one
+      if(expr.op0().get_bool(ID_C_lvalue))
+        expr.set(ID_C_lvalue, true);
+      
+      if(expr.op0().get_bool(ID_C_constant))
+        expr.set(ID_C_constant, true);
+    }
   }
   else if(expr.id()==ID_generic_selection)
   {
@@ -589,7 +603,9 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
               c_it!=components.end();
               c_it++)
           {
-            if(c_it->get_anonymous())
+            if(c_it->get_anonymous() &&
+               (follow(c_it->type()).id()==ID_struct ||
+                follow(c_it->type()).id()==ID_union))
             {
               if(has_component_rec(c_it->type(), component_name, *this))
               {
@@ -673,6 +689,8 @@ Function: c_typecheck_baset::typecheck_expr_operands
 
 \*******************************************************************/
 
+#include <iostream>
+
 void c_typecheck_baset::typecheck_expr_operands(exprt &expr)
 {
   if(expr.id()==ID_sideeffect &&
@@ -690,7 +708,50 @@ void c_typecheck_baset::typecheck_expr_operands(exprt &expr)
   }
   else if(expr.id()==ID_forall || expr.id()==ID_exists)
   {
-    typecheck_decl(to_code(expr.op0().op0()));
+    assert(expr.operands().size()==2);
+
+    ansi_c_declarationt &declaration=
+      to_ansi_c_declaration(expr.op0());
+
+    typecheck_declaration(declaration);
+    
+    if(declaration.declarators().size()!=1)
+    {
+      err_location(expr);
+      throw "expected one declarator exactly";
+    }
+
+    // add prefix
+    irep_idt identifier=
+      add_language_prefix(declaration.declarators().front().get_name());
+
+    // look it up
+    symbol_tablet::symbolst::iterator s_it=
+      symbol_table.symbols.find(identifier);
+
+    if(s_it==symbol_table.symbols.end())
+    {
+      err_location(expr);
+      str << "failed to find decl symbol `" << identifier
+          << "' in symbol table";
+      throw 0;
+    }
+
+    symbolt &symbol=s_it->second;
+    
+    if(symbol.is_type || symbol.is_extern || symbol.is_static_lifetime ||
+       !is_complete_type(symbol.type) || symbol.type.id()==ID_code)
+    {
+      err_location(expr);
+      throw "unexpected quantified symbol";
+    }
+    
+    code_declt decl;
+    decl.location()=declaration.location();
+    decl.symbol()=symbol_expr(symbol);
+
+    expr.op0()=decl;    
+
     typecheck_expr(expr.op1());
   }
   else
@@ -720,9 +781,6 @@ void c_typecheck_baset::typecheck_expr_symbol(exprt &expr)
     symbol_expr.set_identifier(add_language_prefix(symbol_expr.get_identifier()));
   }
 
-  // adjust identifier, if needed
-  replace_symbol(expr);
-  
   const irep_idt &identifier=to_symbol_expr(expr).get_identifier();
   
   // Is it a parameter? We do this while checking parameter lists.
@@ -940,7 +998,7 @@ void c_typecheck_baset::typecheck_expr_sizeof(exprt &expr)
            "but got " << expr.operands().size();
     throw 0;
   }
-
+  
   exprt new_expr=c_sizeof(type, *this);
 
   if(new_expr.is_nil())
@@ -954,6 +1012,26 @@ void c_typecheck_baset::typecheck_expr_sizeof(exprt &expr)
   new_expr.swap(expr);
 
   expr.add(ID_C_c_sizeof_type)=type;
+
+  // The type may contain side-effects.
+  if(!clean_code.empty())
+  {
+    side_effect_exprt side_effect_expr(ID_statement_expression, empty_typet());
+    code_blockt decl_block(clean_code);
+    decl_block.set_statement(ID_decl_block);
+    side_effect_expr.copy_to_operands(decl_block);
+    clean_code.clear();
+  
+    // We merge the side-effect into the operand of the typecast,
+    // using a comma-expression.
+    // I.e., (type)e becomes (type)(side-effect, e)
+    // It is not obvious whether the type or 'e' should be evaluated
+    // first.
+  
+    exprt comma_expr(ID_comma, expr.type());
+    comma_expr.copy_to_operands(side_effect_expr, expr);
+    expr.swap(comma_expr);
+  }
 }
 
 /*******************************************************************\
@@ -1014,25 +1092,25 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
   exprt &op=expr.op0();
 
   typecheck_type(expr.type());
-  
-  {
-    // first clean the type of any side-effects
-    std::list<codet> clean_code;
-    clean_type(irep_idt(), expr.type(), clean_code);
 
-    if(!clean_code.empty())
-    {
-      side_effect_exprt side_effect_expr(ID_statement_expression, empty_typet());
-      side_effect_expr.copy_to_operands(code_blockt(clean_code));
-    
-      // We merge the side-effect into the operand, using
-      // a comma-expression.
-      // I.e., (type)e becomes (type)(side-effect, e)
-    
-      exprt comma_expr(ID_comma, op.type());
-      comma_expr.copy_to_operands(side_effect_expr, op);
-      op.swap(comma_expr);
-    }
+  // The type may contain side-effects.
+  if(!clean_code.empty())
+  {
+    side_effect_exprt side_effect_expr(ID_statement_expression, empty_typet());
+    code_blockt decl_block(clean_code);
+    decl_block.set_statement(ID_decl_block);
+    side_effect_expr.copy_to_operands(decl_block);
+    clean_code.clear();
+  
+    // We merge the side-effect into the operand of the typecast,
+    // using a comma-expression.
+    // I.e., (type)e becomes (type)(side-effect, e)
+    // It is not obvious whether the type or 'e' should be evaluated
+    // first.
+  
+    exprt comma_expr(ID_comma, op.type());
+    comma_expr.copy_to_operands(side_effect_expr, op);
+    op.swap(comma_expr);
   }
 
   const typet expr_type=follow(expr.type());
@@ -1062,7 +1140,7 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
       if(base_type_eq(it->type(), op.type(), *this))
       {
         // found! build union constructor
-        union_exprt union_expr(union_type);
+        union_exprt union_expr(expr.type());
         union_expr.location()=expr.location();
         union_expr.op()=op;
         union_expr.set_component_name(it->get_name());
@@ -1085,13 +1163,13 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
   if(op.id()==ID_initializer_list)
   {
     // just do a normal initialization
-    do_initializer(op, expr_type, false);
+    do_initializer(op, expr.type(), false);
     
     // This produces a struct-expression,
     // union-expression, array-expression,
     // or an expression for a pointer or scalar.
     // We produce a compound_literal expression.
-    exprt tmp(ID_compound_literal, expr_type);
+    exprt tmp(ID_compound_literal, expr.type());
     tmp.move_to_operands(op);
     expr=tmp;
     expr.set(ID_C_lvalue, true); // these are l-values
@@ -1203,7 +1281,7 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
      simplify_expr(op, *this).is_zero())
   {
     // zero typecasted to a pointer is NULL
-    constant_exprt result(ID_NULL, expr_type);
+    constant_exprt result(ID_NULL, expr.type());
     expr=result;
     return;
   }
@@ -1498,7 +1576,7 @@ void c_typecheck_baset::typecheck_expr_rel_vector(exprt &expr)
     throw 0;
   }
 
-  expr.type()=vector_typet(bool_typet(), to_vector_type(o_type0).size());
+  expr.type()=vector_typet(int_type(), to_vector_type(o_type0).size());
 }
 
 /*******************************************************************\
@@ -2255,7 +2333,8 @@ void c_typecheck_baset::do_special_functions(
     }
     else if(identifier==CPROVER_PREFIX "isnanf" || 
             identifier==CPROVER_PREFIX "isnand" ||
-            identifier==CPROVER_PREFIX "isnanld")
+            identifier==CPROVER_PREFIX "isnanld" ||
+            identifier=="c::__builtin_isnan")
     {
       if(expr.arguments().size()!=1)
       {
@@ -2283,7 +2362,8 @@ void c_typecheck_baset::do_special_functions(
       isfinite_expr.location()=location;
       expr.swap(isfinite_expr);
     }
-    else if(identifier==CPROVER_PREFIX "inf")
+    else if(identifier==CPROVER_PREFIX "inf" ||
+            identifier=="c::__builtin_inf")
     {
       constant_exprt inf_expr=
         ieee_floatt::plus_infinity(ieee_float_spect::double_precision()).to_expr();
@@ -2338,7 +2418,8 @@ void c_typecheck_baset::do_special_functions(
     }
     else if(identifier==CPROVER_PREFIX "isinff" ||
             identifier==CPROVER_PREFIX "isinfd" ||
-            identifier==CPROVER_PREFIX "isinfld")
+            identifier==CPROVER_PREFIX "isinfld" ||
+            identifier=="c::__builtin_isinf")
     {
       if(expr.arguments().size()!=1)
       {
@@ -2368,7 +2449,8 @@ void c_typecheck_baset::do_special_functions(
     }
     else if(identifier==CPROVER_PREFIX "signf" ||            
             identifier==CPROVER_PREFIX "signd" ||
-            identifier==CPROVER_PREFIX "signld")
+            identifier==CPROVER_PREFIX "signld" ||
+            identifier=="c::__builtin_signbit")
     {
       if(expr.arguments().size()!=1)
       {
@@ -2520,6 +2602,24 @@ void c_typecheck_baset::do_special_functions(
       exprt tmp2=from_integer(is_constant, expr.type());
       tmp2.location()=location;
       expr.swap(tmp2);
+    }
+    else if(identifier=="c::__builtin_classify_type")
+    {
+      // This is a gcc extension that produces an integer
+      // constant for the type of the argument expression.
+      if(expr.arguments().size()!=1)
+      {
+        err_location(f_op);
+        throw "__builtin_classify_type expects one argument";
+      }
+
+      // The value doesn't matter at all, we only care about the type.
+      // Need to sync with typeclass.h.
+      unsigned type_number=1;
+      
+      exprt tmp=from_integer(type_number, expr.type());
+      tmp.location()=location;
+      expr.swap(tmp);
     }
     else if(identifier==CPROVER_PREFIX "float_debug1" ||
             identifier==CPROVER_PREFIX "float_debug2")
@@ -2917,6 +3017,15 @@ void c_typecheck_baset::typecheck_expr_shifts(shift_exprt &expr)
       expr.type()=op0.type();
       return;
     }
+  }
+
+  if(o_type0.id()==ID_vector &&
+     is_number(follow(o_type0.subtype())) &&
+     is_number(o_type1))
+  {
+    // {a0, a1, ..., an} >> b == {a0 >> b, a1 >> b, ..., an >> b}
+    expr.type()=op0.type();
+    return;
   }
 
   // must do the promotions _separately_!

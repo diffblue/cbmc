@@ -921,6 +921,8 @@ bvt bv_utilst::unsigned_multiplier(const bvt &_op0, const bvt &_op1)
 
   return product;
   #else
+  // Wallace tree multiplier. This is disabled, as runtimes have
+  // been observed to go up by 5%-10%, and on some models even by 20%.
   
   // build the usual quadratic number of partial products
 

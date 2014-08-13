@@ -6,7 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <cstdlib>
 #include <cstring>
 #include <cassert>
 
@@ -26,6 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/i2string.h>
 #include <util/prefix.h>
+#include <util/string2int.h>
 
 #include "dplib_dec.h"
 
@@ -168,7 +168,7 @@ void dplib_dect::read_assert(std::istream &in, std::string &line)
     
     if(line[0]=='l')
     {
-      unsigned number=atoi(line.c_str()+1);
+      unsigned number=unsafe_str2unsigned(line.c_str()+1);
       assert(number<dplib_prop.no_variables());
       dplib_prop.assignment[number]=value;
     }

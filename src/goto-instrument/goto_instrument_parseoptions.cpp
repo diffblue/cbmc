@@ -97,7 +97,7 @@ void goto_instrument_parseoptionst::eval_verbosity()
       v=9;
   }
   
-  set_verbosity(v);
+  ui_message_handler.set_verbosity(v);
 }
 
 /*******************************************************************\
@@ -543,6 +543,12 @@ void goto_instrument_parseoptionst::instrument_goto_program(
 {
   optionst options;
 
+  // disable simplify when adding various checks?
+  if(cmdline.isset("no-simplify"))
+    options.set_option("simplify", false);
+  else
+    options.set_option("simplify", true);
+
   // use assumptions instead of assertions?
   if(cmdline.isset("assert-to-assume"))
     options.set_option("assert-to-assume", true);
@@ -980,6 +986,7 @@ void goto_instrument_parseoptionst::help()
     " --mmio                       instruments memory-mapped I/O\n"
     " --nondet-static              add nondeterministic initialization of variables with static lifetime\n"
     " --check-invariant function   instruments invariant checking function\n"
+    " --remove-pointers            converts pointer arithmetic to base+offset expressions\n"
     "\n"
     "Loop transformations:\n"
     " --k-induction <k>            check loops with k-induction\n"
@@ -1003,6 +1010,9 @@ void goto_instrument_parseoptionst::help()
     "Slicing:\n"
     " --reachability-slicer        slice away instructions that can't reach assertions\n"
     " --full-slice                 slice away instructions that don't affect assertions\n"
+    "\n"
+    "Further transformations:\n"
+    " --inline                     perform full inlining\n"
     "\n"
     "Other options:\n"
     " --version                    show version and exit\n"

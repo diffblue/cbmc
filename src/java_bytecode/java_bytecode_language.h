@@ -19,22 +19,18 @@ public:
   virtual bool preprocess(
     std::istream &instream,
     const std::string &path,
-    std::ostream &outstream,
-    message_handlert &message_handler);
+    std::ostream &outstream);
 
   virtual bool parse(
     std::istream &instream,
-    const std::string &path,
-    message_handlert &message_handler);
+    const std::string &path);
              
   virtual bool typecheck(
     symbol_tablet &context,
-    const std::string &module,
-    message_handlert &message_handler);
+    const std::string &module);
 
   virtual bool final(
-    symbol_tablet &context,
-    message_handlert &message_handler);
+    symbol_tablet &context);
 
   virtual void show_parse(std::ostream &out);
   
@@ -55,7 +51,6 @@ public:
     const std::string &code,
     const std::string &module,
     exprt &expr,
-    message_handlert &message_handler,
     const namespacet &ns);
                        
   virtual languaget *new_language()

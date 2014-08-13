@@ -8,8 +8,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/std_types.h>
 #include <util/std_expr.h>
+#include <util/expr_util.h>
 #include <util/arith_tools.h>
 #include <util/base_type.h>
+#include <util/byte_operators.h>
 
 #include "boolbv.h"
 
@@ -32,6 +34,19 @@ void boolbvt::convert_with(const exprt &expr, bvt &bv)
 
   if((expr.operands().size()%2)!=1)
     throw "with takes an odd number of operands";
+
+  if(expr.op0().type().id()==ID_union)
+  {
+    assert(expr.operands().size()==3);
+
+    bv=convert_bv(
+      byte_update_exprt(byte_update_id(),
+                        expr.op0(),
+                        gen_zero(integer_typet()),
+                        expr.op2()));
+
+    return;
+  }
 
   bv=convert_bv(expr.op0());
 
@@ -294,6 +309,9 @@ void boolbvt::convert_with_union(
   bvt &next_bv)
 {
   next_bv=prev_bv;
+  
+  // Should use byte_update_exprt, see above,
+  // as the below doesn't work on big endian.
 
   const bvt &op2_bv=convert_bv(op2);
 

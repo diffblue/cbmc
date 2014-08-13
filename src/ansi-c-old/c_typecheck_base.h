@@ -16,7 +16,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/std_types.h>
 
-#include "ansi_c_declaration.h"
 #include "designator.h"
 
 class c_typecheck_baset:
@@ -165,7 +164,9 @@ protected:
   virtual void typecheck_break(codet &code);
   virtual void typecheck_continue(codet &code);
   virtual void typecheck_decl(codet &code);
+  virtual void typecheck_decl(codet &code, std::list<codet> &clean_code);
   virtual void typecheck_decl_type(codet &code);
+  virtual void typecheck_decl_block(codet &code);
   virtual void typecheck_expression(codet &code);
   virtual void typecheck_for(codet &code);
   virtual void typecheck_goto(codet &code);
@@ -233,8 +234,6 @@ protected:
   // types
   virtual void typecheck_type(typet &type);
   virtual void typecheck_compound_type(struct_union_typet &type);
-  virtual void typecheck_compound_body(symbolt &);
-  virtual void typecheck_c_enum_type(typet &type);
   virtual void typecheck_code_type(code_typet &type);
   virtual void typecheck_symbol_type(typet &type);
   virtual void typecheck_c_bit_field_type(typet &type);
@@ -244,13 +243,6 @@ protected:
   virtual void typecheck_custom_type(typet &type);
   virtual void adjust_function_parameter(typet &type) const;
   virtual bool is_complete_type(const typet &type) const;
-  
-  void make_already_typechecked(typet &dest)
-  {
-    typet result(ID_already_typechecked);
-    result.subtype().swap(dest);
-    result.swap(dest);
-  }
 
   // this cleans expressions in array types
   virtual void clean_type(
@@ -272,7 +264,6 @@ protected:
   { symbolt *new_symbol; move_symbol(symbol, new_symbol); }
   
   // top level stuff
-  void typecheck_declaration(ansi_c_declarationt &); 
   void typecheck_symbol(symbolt &symbol);
   void typecheck_new_symbol(symbolt &symbol);
   void typecheck_redefinition_type(symbolt &old_symbol, symbolt &new_symbol);

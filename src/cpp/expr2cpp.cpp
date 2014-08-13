@@ -113,9 +113,9 @@ std::string expr2cppt::convert_struct(
       }
 
       dest+=sep;
-      dest+=".";
+      dest+='.';
       dest+=c_it->get_string(ID_pretty_name);
-      dest+="=";
+      dest+='=';
       dest+=tmp;
     }
 
@@ -371,7 +371,7 @@ std::string expr2cppt::convert_rec(
   
     std::string dest="auto ";
 
-    dest+="(";
+    dest+='(';
     const code_typet::parameterst &parameters=code_type.parameters();
 
     for(code_typet::parameterst::const_iterator
@@ -391,7 +391,7 @@ std::string expr2cppt::convert_rec(
       dest+="...";
     }
 
-    dest+=")";
+    dest+=')';
     
     const typet &return_type=code_type.return_type();
     dest+=" -> "+convert(return_type);
@@ -446,11 +446,11 @@ std::string expr2cppt::convert_cpp_new(
     std::string tmp_size=
       convert(static_cast<const exprt &>(src.find(ID_size)));
 
-    dest+=" ";
+    dest+=' ';
     dest+=convert(src.type().subtype());
-    dest+="[";
+    dest+='[';
     dest+=tmp_size;
-    dest+="]";
+    dest+=']';
   }
   else
     dest="new "+convert(src.type().subtype());

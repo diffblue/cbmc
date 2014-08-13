@@ -312,6 +312,11 @@ public:
     unary_exprt(ID_unary_minus, _op, _type)
   {
   }
+
+  explicit inline unary_minus_exprt(const exprt &_op):
+    unary_exprt(ID_unary_minus, _op, _op.type())
+  {
+  }
 };
 
 /*! \brief Cast a generic exprt to a \ref unary_minus_exprt
@@ -919,18 +924,17 @@ index_exprt &to_index_expr(exprt &expr);
 
 /*! \brief array constructor from single element
 */
-class array_of_exprt:public exprt
+class array_of_exprt:public unary_exprt
 {
 public:
-  inline array_of_exprt():exprt(ID_array_of)
+  inline array_of_exprt():unary_exprt(ID_array_of)
   {
-    operands().resize(1);
   }
  
   explicit inline array_of_exprt(
-    const exprt &_what, const typet &_type):exprt(ID_array_of, _type)
+    const exprt &_what, const array_typet &_type):
+    unary_exprt(ID_array_of, _what, _type)
   {
-    copy_to_operands(_what);
   }
  
   inline exprt &what()
@@ -1172,6 +1176,72 @@ const struct_exprt &to_struct_expr(const exprt &expr);
  * \ingroup gr_std_expr
 */
 struct_exprt &to_struct_expr(exprt &expr);
+
+/*! \brief complex constructor from list of elements
+*/
+class complex_exprt:public binary_exprt
+{
+public:
+  inline complex_exprt():binary_exprt(ID_complex)
+  {
+  }
+ 
+  explicit inline complex_exprt(const complex_typet &_type):
+    binary_exprt(ID_complex, _type)
+  {
+  }
+  
+  explicit inline complex_exprt(
+    const exprt &_real, const exprt &_imag, const complex_typet &_type):
+    binary_exprt(_real, ID_complex, _imag, _type)
+  {
+  }
+  
+  inline exprt real()
+  {
+    return op0();
+  }
+
+  inline const exprt &real() const
+  {
+    return op0();
+  }
+
+  inline exprt imag()
+  {
+    return op1();
+  }
+
+  inline const exprt &imag() const
+  {
+    return op1();
+  }
+};
+
+/*! \brief Cast a generic exprt to a \ref complex_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * complex_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref complex_exprt
+ *
+ * \ingroup gr_std_expr
+*/
+static inline const complex_exprt &to_complex_expr(const exprt &expr)
+{
+  assert(expr.id()==ID_complex && expr.operands().size()==2);
+  return static_cast<const complex_exprt &>(expr);
+}
+
+/*! \copydoc to_complex_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
+static inline complex_exprt &to_complex_expr(exprt &expr)
+{
+  assert(expr.id()==ID_complex && expr.operands().size()==2);
+  return static_cast<complex_exprt &>(expr);
+}
 
 class namespacet;
 
@@ -2933,18 +3003,6 @@ extern inline concatenation_exprt &to_concatenation_expr(exprt &expr)
   assert(expr.id()==ID_concatenation);
   return static_cast<concatenation_exprt &>(expr);
 }
-
-/*! \brief Evaluates to true if the two pointer
-           operands point to the same object
-*/
-class same_object_exprt:public binary_relation_exprt
-{
-public:
-  inline same_object_exprt(const exprt &ptr1, const exprt &ptr2):
-    binary_relation_exprt(ptr1, "same-object", ptr2)
-  {
-  }
-};
 
 /*! \brief An expression denoting infinity
 */

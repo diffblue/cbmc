@@ -528,7 +528,7 @@ std::string expr2ct::convert_rec(
         dest+=", ...";
     }
 
-    dest+=")";
+    dest+=')';
 
     c_qualifierst ret_qualifiers;
     ret_qualifiers.read(code_type.return_type());
@@ -824,7 +824,7 @@ std::string expr2ct::convert_with(
     dest+=op2;
   }
 
-  dest+="]";
+  dest+=']';
 
   return dest;
 }
@@ -876,7 +876,7 @@ std::string expr2ct::convert_update(
   dest+=op2;
   if(precedence>p2) dest+=')';
 
-  dest+=")";
+  dest+=')';
 
   return dest;
 }
@@ -1971,11 +1971,11 @@ std::string expr2ct::convert_object_descriptor(
   result+=", ";
   
   if(src.type().is_nil())
-    result+="?";
+    result+='?';
   else
     result+=convert(src.type());
 
-  result+=">";
+  result+='>';
 
   return result;
 }
@@ -2075,11 +2075,11 @@ std::string expr2ct::convert_constant(
       irep_idt c_type=type.get(ID_C_c_type);
 
       if(c_type==ID_unsigned_int)
-        dest+="u";
+        dest+='u';
       else if(c_type==ID_unsigned_long_int)
         dest+="ul";
       else if(c_type==ID_signed_long_int)
-        dest+="l";
+        dest+='l';
       else if(c_type==ID_unsigned_long_long_int)
         dest+="ull";
       else if(c_type==ID_signed_long_long_int)
@@ -2102,11 +2102,11 @@ std::string expr2ct::convert_constant(
     if(dest!="" && isdigit(dest[dest.size()-1]))
     {
       if(src.type()==float_type())
-        dest+="f";
+        dest+='f';
       else if(src.type()==double_type())
         dest+=""; // ANSI-C: double is default
       else if(src.type()==long_double_type())
-        dest+="l";
+        dest+='l';
     }
     else if(dest.size()==4 &&
             (dest[0]=='+' || dest[0]=='-'))
@@ -2128,9 +2128,9 @@ std::string expr2ct::convert_constant(
     if(dest!="" && isdigit(dest[dest.size()-1]))
     {
       if(src.type()==float_type())
-        dest+="f";
+        dest+='f';
       else if(src.type()==long_double_type())
-        dest+="l";
+        dest+='l';
     }
   }
   else if(type.id()==ID_array ||
@@ -2247,12 +2247,12 @@ std::string expr2ct::convert_struct(
       first=false;
     else
     {
-      dest+=",";
+      dest+=',';
 
       if(newline)
         dest+="\n    ";
       else
-        dest+=" ";
+        dest+=' ';
     }
 
     std::string tmp=convert(*o_it);
@@ -2265,9 +2265,9 @@ std::string expr2ct::convert_struct(
     else
       newline=false;
 
-    dest+=".";
+    dest+='.';
     dest+=c_it->get_string(ID_name);
-    dest+="=";
+    dest+='=';
     dest+=tmp;
 
     o_it++;
@@ -2311,12 +2311,12 @@ std::string expr2ct::convert_vector(
       first=false;
     else
     {
-      dest+=",";
+      dest+=',';
 
       if(newline)
         dest+="\n    ";
       else
-        dest+=" ";
+        dest+=' ';
     }
 
     std::string tmp=convert(*it);
@@ -2360,9 +2360,9 @@ std::string expr2ct::convert_union(
 
   std::string tmp=convert(src.op0());
 
-  dest+=".";
+  dest+='.';
   dest+=src.get_string(ID_component_name);
-  dest+="=";
+  dest+='=';
   dest+=tmp;
 
   dest+=" }";
@@ -2406,7 +2406,7 @@ std::string expr2ct::convert_array(
     bool wide=subtype==wchar_t_type();
   
     if(wide)
-      dest+="L";
+      dest+='L';
 
     dest+="\"";
     
@@ -2593,7 +2593,7 @@ std::string expr2ct::convert_designated_initializer(
 
   std::string dest=".";
   // TODO it->find(ID_member)
-  dest+="=";
+  dest+='=';
   dest+=convert(src.op0());
 
   return dest;
@@ -2623,7 +2623,7 @@ std::string expr2ct::convert_function_application(
     dest+=function_str;
   }
 
-  dest+="(";
+  dest+='(';
 
   forall_expr(it, src.arguments())
   {
@@ -2635,7 +2635,7 @@ std::string expr2ct::convert_function_application(
     dest+=arg_str;
   }
 
-  dest+=")";
+  dest+=')';
 
   return dest;
 }
@@ -2664,7 +2664,7 @@ std::string expr2ct::convert_side_effect_expr_function_call(
     dest+=function_str;
   }
 
-  dest+="(";
+  dest+='(';
 
   forall_expr(it, src.arguments())
   {
@@ -2676,7 +2676,7 @@ std::string expr2ct::convert_side_effect_expr_function_call(
     dest+=arg_str;
   }
 
-  dest+=")";
+  dest+=')';
 
   return dest;
 }
@@ -2719,7 +2719,7 @@ std::string expr2ct::convert_overflow(
     dest+=arg_str;
   }
 
-  dest+=")";
+  dest+=')';
 
   return dest;
 }
@@ -2872,7 +2872,7 @@ std::string expr2ct::convert_code_ifthenelse(
   if(src.then_case().is_nil())
   {
     dest+=indent_str(indent+2);
-    dest+=";";
+    dest+=';';
   }
   else
     dest+=convert_code(
@@ -2922,7 +2922,7 @@ std::string expr2ct::convert_code_return(
   if(src.operands().size()==1)
     dest+=" "+convert(src.op0());
 
-  dest+=";";
+  dest+=';';
 
   return dest;
 }
@@ -2946,7 +2946,7 @@ std::string expr2ct::convert_code_goto(
   std:: string dest=indent_str(indent);
   dest+="goto ";
   dest+=clean_identifier(src.get(ID_destination));
-  dest+=";";
+  dest+=';';
 
   return dest;
 }
@@ -2969,7 +2969,7 @@ std::string expr2ct::convert_code_break(
 {
   std::string dest=indent_str(indent);
   dest+="break";
-  dest+=";";
+  dest+=';';
 
   return dest;
 }
@@ -3002,7 +3002,7 @@ std::string expr2ct::convert_code_switch(
   dest+=")\n";
 
   dest+=indent_str(indent);
-  dest+="{";
+  dest+='{';
 
   forall_operands(it, src)
   {
@@ -3023,7 +3023,7 @@ std::string expr2ct::convert_code_switch(
 
   dest+="\n";
   dest+=indent_str(indent);
-  dest+="}";
+  dest+='}';
 
   return dest;
 }
@@ -3046,7 +3046,7 @@ std::string expr2ct::convert_code_continue(
 {
   std::string dest=indent_str(indent);
   dest+="continue";
-  dest+=";";
+  dest+=';';
 
   return dest;
 }
@@ -3098,7 +3098,7 @@ std::string expr2ct::convert_code_decl(
   if(src.operands().size()==2)
     dest+=" = "+convert(src.op1());
 
-  dest+=";";
+  dest+=';';
 
   return dest;
 }
@@ -3157,7 +3157,7 @@ std::string expr2ct::convert_code_for(
   if(!src.op0().is_nil())
     dest+=convert(src.op0());
   else
-    dest+=" ";
+    dest+=' ';
   dest+="; ";
   if(!src.op1().is_nil())
     dest+=convert(src.op1());
@@ -3209,7 +3209,7 @@ std::string expr2ct::convert_code_block(
   }
 
   dest+=indent_str(indent);
-  dest+="}";
+  dest+='}';
 
   return dest;
 }
@@ -3520,7 +3520,7 @@ std::string expr2ct::convert_code_function_call(
 
     // TODO: ggf. Klammern je nach p
     dest+=lhs_str;
-    dest+="=";
+    dest+='=';
   }
 
   {
@@ -3529,7 +3529,7 @@ std::string expr2ct::convert_code_function_call(
     dest+=function_str;
   }
 
-  dest+="(";
+  dest+='(';
 
   const exprt::operandst &arguments=src.arguments();
 
@@ -3613,7 +3613,7 @@ std::string expr2ct::convert_code_fence(
       if(first)
         first=false;
       else
-        dest+="+";
+        dest+='+';
 
       dest+=id2string(att[i]);
     }
@@ -3886,7 +3886,7 @@ std::string expr2ct::convert_Hoare(const exprt &src)
     static_cast<const codet &>(src.find(ID_code));
 
   std::string dest="\n";
-  dest+="{";
+  dest+='{';
 
   if(!assumption.is_nil())
   {
@@ -3911,7 +3911,7 @@ std::string expr2ct::convert_Hoare(const exprt &src)
     dest+=");\n";
   }
 
-  dest+="}";
+  dest+='}';
 
   return dest;
 }
@@ -4016,7 +4016,7 @@ std::string expr2ct::convert(
 
   else if(src.id()==ID_floatbv_typecast)
   {
-    #if 0
+    #if 1
     return convert_function(src, "FLOAT_TYPECAST", precedence=16);
     #else
     const typet &to_type=ns.follow(src.type());

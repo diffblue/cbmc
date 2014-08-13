@@ -115,7 +115,7 @@ bool language_filest::parse()
 
     languaget &language=*(it->second.language);
 
-    if(language.parse(infile, it->first, get_message_handler()))
+    if(language.parse(infile, it->first))
     {
       error("Parsing of "+it->first+" failed");
       return true;
@@ -148,7 +148,7 @@ bool language_filest::typecheck(symbol_tablet &symbol_table)
   for(filemapt::iterator it=filemap.begin();
       it!=filemap.end(); it++)
   {
-    if(it->second.language->interfaces(symbol_table, get_message_handler()))
+    if(it->second.language->interfaces(symbol_table))
       return true;
   }
 
@@ -190,7 +190,7 @@ bool language_filest::typecheck(symbol_tablet &symbol_table)
       it!=filemap.end(); it++)
   {
     if(it->second.modules.empty())
-      if(it->second.language->typecheck(symbol_table, "", get_message_handler()))
+      if(it->second.language->typecheck(symbol_table, ""))
         return true;
   }
 
@@ -227,7 +227,7 @@ bool language_filest::final(
       it!=filemap.end(); it++)
   {
     if(languages.insert(it->second.language->id()).second)
-      if(it->second.language->final(symbol_table, get_message_handler()))
+      if(it->second.language->final(symbol_table))
         return true;
   }
 
@@ -252,7 +252,7 @@ bool language_filest::interfaces(
   for(filemapt::iterator it=filemap.begin();
       it!=filemap.end(); it++)
   {
-    if(it->second.language->interfaces(symbol_table, get_message_handler()))
+    if(it->second.language->interfaces(symbol_table))
       return true;
   }
 
@@ -341,7 +341,7 @@ bool language_filest::typecheck_module(
 
   status("Type-checking "+module.name);
 
-  if(module.file->language->typecheck(symbol_table, module.name, get_message_handler()))
+  if(module.file->language->typecheck(symbol_table, module.name))
   {
     module.in_progress=false;
     return true;

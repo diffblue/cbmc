@@ -1,17 +1,16 @@
 /*******************************************************************\
 
-Module: ANSI-C Linking
+Module:
 
 Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_LINKING_TYPE_EQ_H
-#define CPROVER_LINKING_TYPE_EQ_H
+#ifndef CPROVER_SOLVER_PARSE_SMT2_H
+#define CPROVER_SOLVER_PARSE_SMT2_H
 
-bool linking_type_eq(
-  const typet &type1,
-  const typet &type2,
-  const namespacet &ns);
+#include <util/irep.h>
+
+irept parse_smt2(std::istream &);
 
 #endif
