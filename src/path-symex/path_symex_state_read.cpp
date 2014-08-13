@@ -42,7 +42,7 @@ exprt path_symex_statet::read(const exprt &src, bool propagate)
   //std::cout << "path_symex_statet::read " << src.pretty() << std::endl;
   #endif
   
-  // This has four phases!
+  // This has five phases!
   // 1. Floating-point expression adjustment (rounding mode)
   // 2. Rewrite unions into byte operators
   // 3. Dereferencing, including propagation of pointers.
@@ -71,7 +71,7 @@ exprt path_symex_statet::read(const exprt &src, bool propagate)
 
 /*******************************************************************\
 
-Function: path_symex_statet::instantiate_rec
+Function: path_symex_statet::expand_structs_and_arrays
 
   Inputs:
 
@@ -81,15 +81,13 @@ Function: path_symex_statet::instantiate_rec
 
 \*******************************************************************/
 
-exprt path_symex_statet::instantiate_rec(
-  const exprt &src,
-  bool propagate)
+exprt path_symex_statet::expand_structs_and_arrays(const exprt &src)
 {
   #ifdef DEBUG
-  std::cout << "instantiate_rec: "
+  std::cout << "expand_structs_and_arrays: "
             << from_expr(var_map.ns, "", src) << std::endl;
   #endif
-
+  
   const typet &src_type=var_map.ns.follow(src.type());
   
   if(src_type.id()==ID_struct) // src is a struct
@@ -116,7 +114,7 @@ exprt path_symex_statet::instantiate_rec(
         new_src=member_exprt(src, component_name, subtype);
       
       // recursive call
-      result.operands()[i]=instantiate_rec(new_src, propagate);
+      result.operands()[i]=expand_structs_and_arrays(new_src);
     }
 
     return result; // done
@@ -148,7 +146,7 @@ exprt path_symex_statet::instantiate_rec(
           new_src=simplify_expr(new_src, var_map.ns);
         
         // recursive call
-        result.operands()[i]=instantiate_rec(new_src, propagate);
+        result.operands()[i]=expand_structs_and_arrays(new_src);
       }
       
       return result; // done
@@ -187,20 +185,45 @@ exprt path_symex_statet::instantiate_rec(
         new_src=simplify_expr(new_src, var_map.ns);
       
       // recursive call
-      operands[i]=instantiate_rec(new_src, propagate);
+      operands[i]=expand_structs_and_arrays(new_src);
     }
 
     return result; // done
   }
+  
+  return src;
+}
+
+/*******************************************************************\
+
+Function: path_symex_statet::instantiate_rec
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+exprt path_symex_statet::instantiate_rec(
+  const exprt &src,
+  bool propagate)
+{
+  #ifdef DEBUG
+  std::cout << "instantiate_rec: "
+            << from_expr(var_map.ns, "", src) << std::endl;
+  #endif
 
   // check whether this is a symbol(.member|[index])*
   
+  if(is_symbol_member_index(src))  
   {
     exprt tmp_symbol_member_index=
       read_symbol_member_index(src, propagate);
   
-    if(tmp_symbol_member_index.is_not_nil())
-      return tmp_symbol_member_index; // yes!
+    assert(tmp_symbol_member_index.is_not_nil());
+    return tmp_symbol_member_index; // yes!
   }
   
   if(src.id()==ID_address_of)
@@ -242,15 +265,12 @@ exprt path_symex_statet::instantiate_rec(
       
     if(compound_type.id()==ID_struct)
     {  
-      // avoids indefinite recursion above
-      return src;
+      // do nothing
     }
     else if(compound_type.id()==ID_union)
     {
       // should already have been rewritten to byte_extract
-      member_exprt tmp=to_member_expr(src);
-      tmp.struct_op()=instantiate_rec(tmp.struct_op(), propagate);
-      return tmp;
+      throw "unexpected union member";
     }
     else
     {
@@ -260,6 +280,12 @@ exprt path_symex_statet::instantiate_rec(
   else if(src.id()==ID_byte_extract_little_endian ||
           src.id()==ID_byte_extract_big_endian)
   {
+  }
+  else if(src.id()==ID_symbol)
+  {
+    // must be SSA already, or code
+    assert(src.type().id()==ID_code ||
+           src.get_bool(ID_C_SSA_symbol));
   }
 
   if(!src.has_operands())
@@ -293,15 +319,28 @@ exprt path_symex_statet::read_symbol_member_index(
   const exprt &src,
   bool propagate)
 {
-  std::string suffix="";
-  exprt current=src;
-  const typet final_type=src.type();
-  exprt::operandst indices;
-  
+  const typet &src_type=var_map.ns.follow(src.type());
+
   // don't touch function symbols
-  if(var_map.ns.follow(final_type).id()==ID_code)
+  if(src_type.id()==ID_code)
     return nil_exprt();
 
+  // is this a struct/array/vector that needs expanding?
+  exprt final=expand_structs_and_arrays(src);
+  
+  if(final.id()==ID_struct ||
+     final.id()==ID_array ||
+     final.id()==ID_vector)
+  {
+    Forall_operands(it, final)
+      *it=read_symbol_member_index(*it, propagate); // rec. call
+    return final;
+  }
+
+  std::string suffix="";
+  exprt current=src;
+  exprt::operandst indices;
+  
   // the loop avoids recursion
   while(true)
   {
@@ -316,7 +355,7 @@ exprt path_symex_statet::read_symbol_member_index(
         to_symbol_expr(current).get_identifier();
 
       var_mapt::var_infot &var_info=
-        var_map(identifier, suffix, final_type);
+        var_map(identifier, suffix, src.type());
 
       #ifdef DEBUG
       std::cout << "read_symbol_member_index_rec " << identifier
@@ -378,6 +417,71 @@ exprt path_symex_statet::read_symbol_member_index(
 
     // next round  
     assert(next.is_not_nil());
+    current=next;
+  }
+}
+
+/*******************************************************************\
+
+Function: path_symex_statet::is_symbol_member_index
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool path_symex_statet::is_symbol_member_index(const exprt &src) const
+{
+  const typet final_type=src.type();
+  
+  // don't touch function symbols
+  if(var_map.ns.follow(final_type).id()==ID_code)
+    return false;
+
+  const exprt *current=&src;
+
+  // the loop avoids recursion
+  while(true)
+  {
+    const exprt *next=0;
+  
+    if(current->id()==ID_symbol)
+    {
+      if(current->get_bool(ID_C_SSA_symbol))
+        return false; // SSA already
+
+      return true;    
+    }
+    else if(current->id()==ID_member)
+    {
+      const member_exprt &member_expr=to_member_expr(*current);
+      
+      const typet &compound_type=
+        var_map.ns.follow(member_expr.struct_op().type());
+      
+      if(compound_type.id()==ID_struct)
+      { 
+        // go into next iteration
+        next=&(member_expr.struct_op());
+      }
+      else
+        return false; // includes unions, deliberatley
+    }
+    else if(current->id()==ID_index)
+    {
+      const index_exprt &index_expr=to_index_expr(*current);
+      
+      // go into next iteration
+      next=&(index_expr.array());
+    }
+    else
+      return false;
+
+    // next round  
+    assert(next!=0);
     current=next;
   }
 }
@@ -530,7 +634,7 @@ exprt path_symex_statet::instantiate_rec_address(
     #ifdef DEBUG
     std::cout << "SRC: " << src.pretty() << std::endl;
     #endif
-    throw "address of unexpected "+src.id_string();
+    throw "address of unexpected `"+src.id_string()+"'";
   }
 }
 
