@@ -605,12 +605,21 @@ Function: configt::ansi_ct::set_arch_spec_sparc
 
 \*******************************************************************/
 
-void configt::ansi_ct::set_arch_spec_sparc()
+void configt::ansi_ct::set_arch_spec_sparc(const irep_idt &subarch)
 {
-  set_ILP32();
+  if(subarch=="sparc64")
+  {
+    set_LP64();
+    long_double_width=16*8;
+  }
+  else
+  {
+    set_ILP32();
+    long_double_width=8*8;
+  }
+
   arch=ARCH_SPARC;
   endianness=IS_BIG_ENDIAN;
-  long_double_width=16*8;
   char_is_unsigned=false;
   NULL_is_zero=true;
 
@@ -619,6 +628,8 @@ void configt::ansi_ct::set_arch_spec_sparc()
   case MODE_GCC_C:
   case MODE_GCC_CPP:
     defines.push_back("__sparc__");
+    if(subarch=="sparc64")
+      defines.push_back("__arch64__");
     break;
   case MODE_VISUAL_STUDIO_C_CPP:
     assert(false); // not supported by Visual Studio
@@ -890,8 +901,9 @@ bool configt::set(const cmdlinet &cmdline)
   else if(arch=="powerpc" ||
           arch=="ppc64")
     ansi_c.set_arch_spec_power(arch);
-  else if(arch=="sparc")
-    ansi_c.set_arch_spec_sparc();
+  else if(arch=="sparc" ||
+          arch=="sparc64")
+    ansi_c.set_arch_spec_sparc(arch);
   else if(arch=="ia64")
     ansi_c.set_arch_spec_ia64();
   else if(arch=="s390x")
@@ -1151,7 +1163,11 @@ irep_idt configt::this_architecture()
     this_arch="powerpc";
     #endif
   #elif __sparc__
-  this_arch="sparc";
+    #ifdef __arch64__
+    this_arch="sparc64";
+    #else
+    this_arch="sparc";
+    #endif
   #elif __ia64__
   this_arch="ia64";
   #elif __s390x__
