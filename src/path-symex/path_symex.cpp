@@ -473,17 +473,15 @@ void path_symext::assign_rec(
   
     if(compound_type.id()==ID_struct)
     {
-      // We only flatten top-level structs, so this one is inside an
+      // We flatten the top-level structs, so this one is inside an
       // array or a union.
 
       exprt member_name(ID_member_name);
       member_name.set(ID_component_name, ssa_lhs_member_expr.get_component_name());
             
-      with_exprt new_rhs(ssa_rhs, member_name, ssa_rhs);
+      with_exprt new_rhs(struct_op, member_name, ssa_rhs);
       
       assign_rec(state, guard, struct_op, new_rhs);
-    
-      throw "unexpected struct member on lhs";
     }
     else if(compound_type.id()==ID_union)
     {
