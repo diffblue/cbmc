@@ -20,6 +20,9 @@ const char gcc_builtin_headers_ia32[]=
 "# 1 \"gcc_builtin_headers_ia32.h\"\n"
 #include "gcc_builtin_headers_ia32.inc"
 ;
+const char gcc_builtin_headers_ia32_2[]=
+#include "gcc_builtin_headers_ia32-2.inc"
+;
 
 const char gcc_builtin_headers_alpha[]=
 "# 1 \"gcc_builtin_headers_alpha.h\"\n"
@@ -216,6 +219,7 @@ void ansi_c_internal_additions(std::string &code)
     case configt::ansi_ct::ARCH_X86_64:
     case configt::ansi_ct::ARCH_X32:
       code+=gcc_builtin_headers_ia32;
+      code+=gcc_builtin_headers_ia32_2;
       break;
       
     case configt::ansi_ct::ARCH_ARM:

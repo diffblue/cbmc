@@ -30,7 +30,7 @@ CLEANFILES = ansi-c$(LIBEXT) \
   arm_builtin_headers.inc cw_builtin_headers.inc \
   gcc_builtin_headers_arm.inc gcc_builtin_headers_alpha.inc \
   gcc_builtin_headers_mips.inc gcc_builtin_headers_power.inc \
-	clang_builtin_headers.inc
+	clang_builtin_headers.inc gcc_builtin_headers_ia32-2.inc
 
 all: ansi-c$(LIBEXT)
 
@@ -90,6 +90,7 @@ cprover_library.cpp: cprover_library.inc
 
 ansi_c_internal_additions$(OBJEXT): gcc_builtin_headers_generic.inc
 ansi_c_internal_additions$(OBJEXT): gcc_builtin_headers_ia32.inc
+ansi_c_internal_additions$(OBJEXT): gcc_builtin_headers_ia32-2.inc
 ansi_c_internal_additions$(OBJEXT): gcc_builtin_headers_alpha.inc
 ansi_c_internal_additions$(OBJEXT): gcc_builtin_headers_arm.inc
 ansi_c_internal_additions$(OBJEXT): gcc_builtin_headers_mips.inc
@@ -103,7 +104,7 @@ generated_files: cprover_library.inc gcc_builtin_headers_generic.inc \
 	gcc_builtin_headers_arm.inc gcc_builtin_headers_mips.inc \
 	gcc_builtin_headers_power.inc arm_builtin_headers.inc \
 	cw_builtin_headers.inc ansi_c_y.tab.cpp ansi_c_lex.yy.cpp \
-	ansi_c_y.tab.h clang_builtin_headers.inc
+	ansi_c_y.tab.h clang_builtin_headers.inc gcc_builtin_headers_ia32-2.inc
 
 ###############################################################################
 
