@@ -77,7 +77,7 @@ void goto_symext::argument_assignments(
       std::string error=
         "call to `"+id2string(function_identifier)+"': "
         "not enough arguments";
-      throw error;
+      throw state.source.pc->location.as_string()+": "+error;
     }
 
     const code_typet::parametert &parameter=*it2;
@@ -508,8 +508,13 @@ void goto_symext::return_assignment(statet &state)
     {
       code_assignt assignment(frame.return_value, value);
 
-      assert(base_type_eq(assignment.lhs().type(),
-            assignment.rhs().type(), ns));
+      if(!base_type_eq(assignment.lhs().type(),
+                       assignment.rhs().type(), ns))
+        throw "goto_symext::return_assignment type mismatch at "+
+              instruction.location.as_string()+":\n"+
+              "assignment.lhs().type():\n"+assignment.lhs().type().pretty()+"\n"+
+              "assignment.rhs().type():\n"+assignment.rhs().type().pretty();
+
       symex_assign(state, assignment);
     }
   }

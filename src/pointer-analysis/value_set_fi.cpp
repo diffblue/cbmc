@@ -1175,7 +1175,10 @@ void value_set_fit::assign(
       }
       else
       {
-        assert(base_type_eq(rhs.type(), type, ns));
+        if(!base_type_eq(rhs.type(), type, ns))
+          throw "value_set_fit::assign type mismatch: "
+                "rhs.type():\n"+rhs.type().pretty()+
+                "type:\n"+type.pretty();
       
         if(rhs.id()==ID_struct ||
            rhs.id()==ID_constant)
@@ -1229,7 +1232,10 @@ void value_set_fit::assign(
     }
     else
     {
-      assert(base_type_eq(rhs.type(), type, ns));
+      if(!base_type_eq(rhs.type(), type, ns))
+        throw "value_set_fit::assign type mismatch: "
+              "rhs.type():\n"+rhs.type().pretty()+
+              "type:\n"+type.pretty();
         
       if(rhs.id()==ID_array_of)
       {
