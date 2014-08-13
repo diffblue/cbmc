@@ -228,9 +228,7 @@ exprt goto_symext::address_arithmetic(
     result=address_of_exprt(result);
   }
   else
-  {
-    assert(false);
-  }
+    throw "goto_symext::address_arithmetic does not handle "+expr.id_string();
 
   const typet &expr_type=ns.follow(expr.type());
   assert((expr_type.id()==ID_array && !keep_array) ||

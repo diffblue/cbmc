@@ -47,8 +47,10 @@ exprt flatten_byte_extract(
   if(src.id()==ID_byte_extract_big_endian) 
     throw "byte_extract flattening of big endian not done yet";
 
-  unsigned width=
-    integer2unsigned(pointer_offset_size(ns, src.type()));
+  mp_integer size=pointer_offset_size(ns, src.type());
+  if(size<0)
+    throw "byte_extract flatting with non-constant size: "+src.pretty();
+  unsigned width=integer2unsigned(size);
   
   const typet &t=src.op0().type();
   
@@ -141,8 +143,12 @@ exprt flatten_byte_extract(
 
     mult_exprt times_eight(offset, from_integer(8, offset_type));
 
+    mp_integer op0_bytes=pointer_offset_size(ns, src.op0().type());
+    if(op0_bytes<0)
+      throw "byte_extract flatting of non-constant source size: "+src.pretty();
+
     // cast to generic bit-vector
-    unsigned op0_width=integer2unsigned(pointer_offset_size(ns, src.op0().type()))*8;
+    unsigned op0_width=integer2unsigned(op0_bytes*8);
     typecast_exprt src_op0_tc(src.op0(), bv_typet(op0_width));
     lshr_exprt left_shift(src_op0_tc, times_eight);
 
