@@ -1,5 +1,6 @@
 #include <stdarg.h>
 #include <stdio.h>
+#include <assert.h>
 
 // how to do it:
 // once an ellipsis is seen in the called function, declare an array of
@@ -11,8 +12,7 @@
 // va_arg returns casted memory at pointer and increments pointer afterwards by
 // given size (+padding)
 
-  int
-add_em_up (int count,...)
+int add_em_up (int count,...)
 {
   va_list ap;
   int i, sum;
@@ -27,8 +27,7 @@ add_em_up (int count,...)
   return sum;
 }
 
-  int
-main (void)
+int main (void)
 {
   /* This call prints 16. */
   assert(16 == add_em_up (3, 5, 5, 6));

@@ -1,6 +1,6 @@
 CORE
 main.c
---unwind-max 2 --no-unwinding-assertions
+--unwind 1
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$

@@ -1,3 +1,4 @@
+#include <wchar.h>
 #include <assert.h>
 
 int main()
@@ -26,4 +27,11 @@ int main()
   assert(sptr[1]=='s');
   assert(sptr[2]=='d');
   assert(sptr[3]==0);
+  
+  const wchar_t *wsptr;
+  wsptr=L"asd";
+  assert(wsptr[0]=='a');
+  assert(wsptr[1]=='s');
+  assert(wsptr[2]=='d');
+  assert(wsptr[3]==0);
 }

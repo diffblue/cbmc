@@ -1,7 +1,7 @@
 #include <assert.h>
 
-typedef union {
-  struct {
+typedef union my_U {
+  struct my_S {
     unsigned      : 1;
     unsigned f1   : 1;
   };

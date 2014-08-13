@@ -1,4 +1,4 @@
-void *malloc(unsigned);
+void *malloc(__CPROVER_size_t);
 void free(void *);
 
 struct S
@@ -6,8 +6,6 @@ struct S
   int x;
   char a[];
 };
-
-void *malloc(int);
 
 int main()
 {

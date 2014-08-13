@@ -452,13 +452,13 @@ Test 'Malloc6'
     ^VERIFICATION SUCCESSFUL$
     --
 Running ../../../src/cbmc/cbmc --pointer-check main.c >main.out 2>&1
-  Exit: 0
+  Exit: 10
   Signal: 0
   Core: 0
 Execution [OK]
-^EXIT=0\r\\?$ [OK]
+^EXIT=0\r\\?$ [FAILED]
 ^SIGNAL=0\r\\?$ [OK]
-^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [FAILED]
 
 Test 'Malloc7'
   Level: CORE
@@ -471,13 +471,13 @@ Test 'Malloc7'
     ^VERIFICATION SUCCESSFUL$
     --
 Running ../../../src/cbmc/cbmc --pointer-check main.c >main.out 2>&1
-  Exit: 0
+  Exit: 10
   Signal: 0
   Core: 0
 Execution [OK]
-^EXIT=0\r\\?$ [OK]
+^EXIT=0\r\\?$ [FAILED]
 ^SIGNAL=0\r\\?$ [OK]
-^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [FAILED]
 
 Test 'Malloc8'
   Level: CORE
@@ -511,13 +511,13 @@ Test 'Malloc9'
     ^VERIFICATION SUCCESSFUL$
     --
 Running ../../../src/cbmc/cbmc --pointer-check main.c >main.out 2>&1
-  Exit: 0
+  Exit: 10
   Signal: 0
   Core: 0
 Execution [OK]
-^EXIT=0\r\\?$ [OK]
+^EXIT=0\r\\?$ [FAILED]
 ^SIGNAL=0\r\\?$ [OK]
-^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [FAILED]
 
 Test 'Minisat_Simp1'
   Level: CORE
@@ -1159,13 +1159,13 @@ Test 'String_Abstraction1'
     --
     ^warning: ignoring
 Running ../../../src/cbmc/cbmc --string-abstraction --pointer-check --bounds-check main.c >main.out 2>&1
-  Exit: 0
+  Exit: 10
   Signal: 0
   Core: 0
 Execution [OK]
-^EXIT=0\r\\?$ [OK]
+^EXIT=0\r\\?$ [FAILED]
 ^SIGNAL=0\r\\?$ [OK]
-^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [FAILED]
 ^warning: ignoring [OK]
 
 Test 'String_Abstraction10'
@@ -1180,13 +1180,13 @@ Test 'String_Abstraction10'
     --
     ^warning: ignoring
 Running ../../../src/cbmc/cbmc --string-abstraction --pointer-check --bounds-check main.c >main.out 2>&1
-  Exit: 0
+  Exit: 10
   Signal: 0
   Core: 0
 Execution [OK]
-^EXIT=0\r\\?$ [OK]
+^EXIT=0\r\\?$ [FAILED]
 ^SIGNAL=0\r\\?$ [OK]
-^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [FAILED]
 ^warning: ignoring [OK]
 
 Test 'String_Abstraction11'
@@ -1306,13 +1306,13 @@ Test 'String_Abstraction16'
     --
     ^warning: ignoring
 Running ../../../src/cbmc/cbmc --string-abstraction ptr-arith.c >ptr-arith.out 2>&1
-  Exit: 0
+  Exit: 10
   Signal: 0
   Core: 0
 Execution [OK]
-^EXIT=0\r\\?$ [OK]
+^EXIT=0\r\\?$ [FAILED]
 ^SIGNAL=0\r\\?$ [OK]
-^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [FAILED]
 ^warning: ignoring [OK]
 
 Test 'String_Abstraction17'
@@ -1348,13 +1348,13 @@ Test 'String_Abstraction18'
     --
     ^warning: ignoring
 Running ../../../src/cbmc/cbmc --string-abstraction strcpy.c >strcpy.out 2>&1
-  Exit: 0
+  Exit: 10
   Signal: 0
   Core: 0
 Execution [OK]
-^EXIT=0\r\\?$ [OK]
+^EXIT=0\r\\?$ [FAILED]
 ^SIGNAL=0\r\\?$ [OK]
-^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [FAILED]
 ^warning: ignoring [OK]
 
 Test 'String_Abstraction19'
@@ -1390,13 +1390,13 @@ Test 'String_Abstraction2'
     --
     ^warning: ignoring
 Running ../../../src/cbmc/cbmc --string-abstraction --pointer-check --bounds-check main.c >main.out 2>&1
-  Exit: 0
+  Exit: 10
   Signal: 0
   Core: 0
 Execution [OK]
-^EXIT=0\r\\?$ [OK]
+^EXIT=0\r\\?$ [FAILED]
 ^SIGNAL=0\r\\?$ [OK]
-^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [FAILED]
 ^warning: ignoring [OK]
 
 Test 'String_Abstraction20'
@@ -1432,13 +1432,13 @@ Test 'String_Abstraction21'
     --
     ^warning: ignoring
 Running ../../../src/cbmc/cbmc --string-abstraction strcpy2.c >strcpy2.out 2>&1
-  Exit: 0
+  Exit: 10
   Signal: 0
   Core: 0
 Execution [OK]
-^EXIT=0\r\\?$ [OK]
+^EXIT=0\r\\?$ [FAILED]
 ^SIGNAL=0\r\\?$ [OK]
-^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [FAILED]
 ^warning: ignoring [OK]
 
 Test 'String_Abstraction22'
@@ -1453,13 +1453,13 @@ Test 'String_Abstraction22'
     --
     ^warning: ignoring
 Running ../../../src/cbmc/cbmc --string-abstraction main.c >main.out 2>&1
-  Exit: 0
+  Exit: 10
   Signal: 0
   Core: 0
 Execution [OK]
-^EXIT=0\r\\?$ [OK]
+^EXIT=0\r\\?$ [FAILED]
 ^SIGNAL=0\r\\?$ [OK]
-^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [FAILED]
 ^warning: ignoring [OK]
 
 Test 'String_Abstraction23'
@@ -1495,13 +1495,13 @@ Test 'String_Abstraction3'
     --
     ^warning: ignoring
 Running ../../../src/cbmc/cbmc --string-abstraction --pointer-check --bounds-check main.c >main.out 2>&1
-  Exit: 0
+  Exit: 10
   Signal: 0
   Core: 0
 Execution [OK]
-^EXIT=0\r\\?$ [OK]
+^EXIT=0\r\\?$ [FAILED]
 ^SIGNAL=0\r\\?$ [OK]
-^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [FAILED]
 ^warning: ignoring [OK]
 
 Test 'String_Abstraction4'
@@ -1558,13 +1558,13 @@ Test 'String_Abstraction6'
     --
     ^warning: ignoring
 Running ../../../src/cbmc/cbmc --string-abstraction --pointer-check --bounds-check main.c >main.out 2>&1
-  Exit: 10
+  Exit: 0
   Signal: 0
   Core: 0
 Execution [OK]
-^EXIT=0\r\\?$ [FAILED]
+^EXIT=0\r\\?$ [OK]
 ^SIGNAL=0\r\\?$ [OK]
-^VERIFICATION SUCCESSFUL\r\\?$ [FAILED]
+^VERIFICATION SUCCESSFUL\r\\?$ [OK]
 ^warning: ignoring [OK]
 
 Test 'String_Abstraction7'
@@ -1621,13 +1621,13 @@ Test 'String_Abstraction9'
     --
     ^warning: ignoring
 Running ../../../src/cbmc/cbmc --string-abstraction --pointer-check --bounds-check main.c >main.out 2>&1
-  Exit: 0
+  Exit: 10
   Signal: 0
   Core: 0
 Execution [OK]
-^EXIT=0\r\\?$ [OK]
+^EXIT=0\r\\?$ [FAILED]
 ^SIGNAL=0\r\\?$ [OK]
-^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [FAILED]
 ^warning: ignoring [OK]
 
 Test 'Struct_Array1'
@@ -1863,13 +1863,13 @@ Test 'extern3'
     --
     ^warning: ignoring
 Running ../../../src/cbmc/cbmc  main.c >main.out 2>&1
-  Exit: 0
+  Exit: 10
   Signal: 0
   Core: 0
 Execution [OK]
-^EXIT=0\r\\?$ [OK]
+^EXIT=0\r\\?$ [FAILED]
 ^SIGNAL=0\r\\?$ [OK]
-^VERIFICATION SUCCESSFUL\r\\?$ [OK]
+^VERIFICATION SUCCESSFUL\r\\?$ [FAILED]
 ^warning: ignoring [OK]
 
 Test 'extern4'

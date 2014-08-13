@@ -1,6 +1,6 @@
 CORE
 main.c
---all-claims
+--all-properties --little-endian
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[main\.2\] .*: FAILED$

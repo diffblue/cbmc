@@ -32,8 +32,10 @@ int main()
   }
 
   // wide strings
-  #ifdef _WIN32
-  // Visual Studio has a built-in wchar_t
+
+  #ifdef _MSC_VER
+  // Visual Studio has a built-in wchar_t,
+  // available without header file.
   typedef wchar_t wide_char_type;
   #else
   typedef __typeof__(L'X') wide_char_type;
