@@ -449,7 +449,10 @@ bool bmct::run(const goto_functionst &goto_functions)
           {
             if(symex.add_loop_check())
 	    {
-              symex.update_loop_info(!decide(symex.prop_conv,false));
+              bool result = !decide(symex.prop_conv,false);
+              if(options.get_bool_option("earliest-loop-exit"))
+                result = !result;
+              symex.update_loop_info(result);
 	    }
             continue;
 	  }

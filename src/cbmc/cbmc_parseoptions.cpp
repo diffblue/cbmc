@@ -188,6 +188,8 @@ void cbmc_parseoptionst::get_command_line_options(optionst &options)
     options.set_option("incremental", true);
   if(cmdline.isset("incremental-check"))
     options.set_option("incremental-check", cmdline.getval("incremental-check"));
+  if(cmdline.isset("earliest-loop-exit"))
+    options.set_option("earliest-loop-exit", true);
 
   // constant propagation
   if(cmdline.isset("no-propagation"))
@@ -994,6 +996,7 @@ void cbmc_parseoptionst::help()
     " --incremental-check L        check after each unwinding of loop L\n"
     " --unwind-min nr              start incremental check after nr unwindings\n"
     " --unwind-max nr              stop incremental check after nr unwindings\n"
+    " --earliest-loop-exit         stop unwinding as soon as possible\n"
     " --ignore-assertions-before-unwind-min\n"
     " --stop-when-unsat            for step case in k-induction checks\n"
     " --show-vcc                   show the verification conditions\n"

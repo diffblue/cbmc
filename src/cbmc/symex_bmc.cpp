@@ -153,8 +153,12 @@ bool symex_bmct::add_loop_check()
     return false;
   }
 
-  target.assertion(loop_cond.guard, loop_cond.cond, 
-    "loop_condition_check", loop_cond.source);
+  if(options.get_bool_option("earliest-loop-exit"))
+    target.assertion(loop_cond.guard, not_exprt(loop_cond.cond), 
+      "loop_condition_check", loop_cond.source);
+  else 
+    target.assertion(loop_cond.guard, loop_cond.cond, 
+      "loop_condition_check", loop_cond.source);
 
   return true;
 }

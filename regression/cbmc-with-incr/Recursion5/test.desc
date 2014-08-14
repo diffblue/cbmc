@@ -1,6 +1,6 @@
-KNOWNBUG
+CORE
 main.c
-
+--earliest-loop-exit
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
