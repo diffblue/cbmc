@@ -39,6 +39,8 @@ bool goto_symext::symex_goto(statet &state)
   replace_nondet(new_guard);
   do_simplify(new_guard);
   
+  const irep_idt loop_id = goto_programt::loop_id(state.source.pc);
+
   if(new_guard.is_false() ||
      state.guard.is_false())
   {
@@ -46,7 +48,7 @@ bool goto_symext::symex_goto(statet &state)
     if(instruction.is_backwards_goto())
     {
       goto_symex_statet::framet::loop_infot &loop_info = 
-        frame.loop_iterations[goto_programt::loop_id(state.source.pc)];
+        frame.loop_iterations[loop_id];
       loop_info.count=0;
       loop_info.fully_unwound=false;
     }
@@ -72,7 +74,7 @@ bool goto_symext::symex_goto(statet &state)
   if(!forward) // backwards?
   {
     goto_symex_statet::framet::loop_infot &loop_info = 
-      frame.loop_iterations[goto_programt::loop_id(state.source.pc)];
+      frame.loop_iterations[loop_id];
     unsigned &unwind = loop_info.count;
     unwind++;
     
@@ -92,7 +94,7 @@ bool goto_symext::symex_goto(statet &state)
   
     if(new_guard.is_true()) //continue looping
     {
-      bool do_break = check_break(state,new_guard,unwind);
+      bool do_break = check_break(loop_id,false,state,new_guard,unwind);
       state.source.pc=goto_target;
       return do_break;
     }
@@ -192,8 +194,12 @@ Function: goto_symext::check_break
 
 \*******************************************************************/
 
-bool goto_symext::check_break(statet& state, const exprt &cond,
-             unsigned unwind) {
+bool goto_symext::check_break(const irep_idt &id, 
+                           bool is_function, 
+                           statet& state, 
+                           const exprt &cond, 
+                           unsigned unwind) 
+{
   //dummy implementation
   return false;
 }

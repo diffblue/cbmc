@@ -74,7 +74,10 @@ protected:
   // incremental unwinding
 
   // returns true if the symbolic execution is to be interrupted for checking
-  virtual bool check_break(statet& state, const exprt &cond, 
+  virtual bool check_break(const irep_idt &id, 
+                           bool is_function, 
+                           statet& state, 
+                           const exprt &cond, 
                            unsigned unwind);
 
   // stores info to check whether loop has been fully unwound
@@ -84,6 +87,7 @@ protected:
     exprt cond;
     goto_symex_statet::framet::loop_infot *loop_info;
     symex_targett::sourcet source;
+    bool checked_function;
   } loop_condt;
 
   loop_condt loop_cond;

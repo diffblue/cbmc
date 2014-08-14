@@ -351,7 +351,25 @@ bool goto_symext::symex_step(
       Forall_expr(it, deref_code.arguments())
         clean_expr(*it, state, false);
     
-      return symex_function_call(goto_functions, state, deref_code);
+      const irep_idt &identifier =
+        to_symbol_expr(deref_code.function()).get_identifier();
+      const goto_symex_statet::framet::loop_infot &loop_info = 
+        state.top().loop_iterations[identifier];
+
+      if(!loop_info.fully_unwound)
+      {
+        // interrupt for checking guard if in incremental mode
+        if(!state.guard.is_true())
+	{
+          exprt guard = state.guard.as_expr();
+          bool do_break = check_break(identifier, true, state,
+                                    guard, loop_info.count);
+          if(do_break) return true;
+	}
+        return symex_function_call(goto_functions, state, deref_code);
+      }
+      else
+        state.source.pc++;
     }
     else
       state.source.pc++;

@@ -44,6 +44,7 @@ symex_bmct::symex_bmct(
   ui(ui_message_handlert::PLAIN),
   max_unwind_is_set(false)
 {
+  loop_cond.checked_function = false;
 }
 
 
@@ -92,13 +93,15 @@ Function: symex_bmct::check_break
 
 \*******************************************************************/
 
-bool symex_bmct::check_break(statet& state, const exprt &cond, 
+bool symex_bmct::check_break(const irep_idt &id,
+                             bool is_function, 
+                             statet& state, 
+                             const exprt &cond, 
                              unsigned unwind) 
 {
   if(!is_incremental) return false;
   if(unwind < incr_min_unwind) return false;
 
-  const irep_idt id=goto_programt::loop_id(state.source.pc);
   loop_limitst &this_thread_limits=
     thread_loop_limits[state.source.thread_nr];
   if(incr_loop_id=="" && 
@@ -106,6 +109,12 @@ bool symex_bmct::check_break(statet& state, const exprt &cond,
      loop_limits.find(id)==loop_limits.end()) 
   {
     //not a statically unwound loop when --incremental
+
+    if(loop_cond.checked_function) 
+    {
+      loop_cond.checked_function = false;
+      return false;
+    }
 
     //memorise unwinding assertion for loop check
     exprt simplified_cond=not_exprt(cond);
@@ -118,6 +127,7 @@ bool symex_bmct::check_break(statet& state, const exprt &cond,
     loop_cond.guard = state.guard.as_expr();
     loop_cond.loop_info = &(state.top().loop_iterations[id]);
     loop_cond.source = state.source;
+    if(is_function) loop_cond.checked_function = true;
 
     return true;
   }
@@ -138,7 +148,8 @@ bool symex_bmct::add_loop_check()
 
   if(loop_cond.cond.is_false()) 
   {
-    debug() << "Loop " << loop_cond.id << " not fully unwound" << eom;
+    debug() << "Loop/recursive call " << loop_cond.id 
+            << " not fully unwound" << eom;
     return false;
   }
 
@@ -152,7 +163,7 @@ void symex_bmct::update_loop_info(bool fully_unwound)
 {
   if(loop_cond.id=="") return;
 
-  status() << "Loop " << loop_cond.id 
+  status() << "Loop/recursive call " << loop_cond.id 
 	  << (fully_unwound ? " fully unwound" : " not fully unwound") << eom;
 
   loop_cond.loop_info->fully_unwound = fully_unwound;
@@ -268,11 +279,11 @@ bool symex_bmct::get_unwind_recursion(
       this_loop_limit=max_unwind;
   }
 
-  if(id==incr_loop_id || (incr_loop_id=="" && is_incremental))
+  /*  if(id==incr_loop_id || (incr_loop_id=="" && is_incremental))
   {
     this_loop_limit = incr_max_unwind;
     if(unwind+1>=incr_min_unwind) ignore_assertions = false;
-  }
+  }*/
 
   bool abort=unwind>this_loop_limit;
 

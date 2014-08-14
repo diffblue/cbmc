@@ -7,7 +7,7 @@ void rec()
 
 void loop()
 {
-  while(nondet_bool())
+  while(nondet_bool()) //with --incremental this will unwind forever
     rec();
 }
 

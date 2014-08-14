@@ -105,7 +105,11 @@ protected:
 
   friend class symex_dereference_statet;
   
-  virtual bool check_break(statet& state, const exprt &cond, unsigned unwind);
+  virtual bool check_break(const irep_idt &id, 
+                           bool is_function, 
+                           statet& state, 
+                           const exprt &cond, 
+                           unsigned unwind);
 
   void new_name(symbolt &symbol);
   

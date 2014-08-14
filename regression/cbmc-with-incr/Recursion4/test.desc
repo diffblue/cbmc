@@ -1,6 +1,6 @@
 CORE
 main.c
---no-propagation --unwind 1
+--no-propagation
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
