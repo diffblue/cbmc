@@ -47,6 +47,7 @@ class optionst;
   "(version)" \
   "(incremental-check):(incremental)(earliest-loop-exit)" \
   "(ignore-assertions-before-unwind-min)(stop-when-unsat)" \
+  "(magic-numbers)" \
   "(cover-assertions)" \
   "(mm):" \
   "(i386-linux)(i386-macos)(i386-win32)(win32)(winx64)(gcc)" \

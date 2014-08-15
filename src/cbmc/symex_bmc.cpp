@@ -45,6 +45,24 @@ symex_bmct::symex_bmct(
   max_unwind_is_set(false)
 {
   loop_cond.checked_function = false;
+
+#if 1
+  magic_numbers.insert(1);
+  magic_numbers.insert(2);
+  magic_numbers.insert(6);
+  magic_numbers.insert(12);
+  magic_numbers.insert(17);
+  magic_numbers.insert(21);
+  magic_numbers.insert(40);
+  magic_numbers.insert(60);
+  magic_numbers.insert(80);
+  magic_numbers.insert(100);
+  magic_numbers.insert(120);
+  magic_numbers.insert(140);
+  magic_numbers.insert(160);
+  magic_numbers.insert(180);
+  magic_numbers.insert(200);
+#endif
 }
 
 
@@ -109,6 +127,12 @@ bool symex_bmct::check_break(const irep_idt &id,
      loop_limits.find(id)==loop_limits.end()) 
   {
     //not a statically unwound loop when --incremental
+
+#if 1
+    if(options.get_bool_option("magic-numbers") &&
+         magic_numbers.find(unwind)==magic_numbers.end())
+      return false;
+#endif
 
     if(loop_cond.checked_function) 
     {

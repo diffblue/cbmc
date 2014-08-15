@@ -107,6 +107,10 @@ protected:
   typedef std::map<unsigned, loop_limitst> thread_loop_limitst;
   thread_loop_limitst thread_loop_limits;
 
+#if 1
+  std::set<unsigned> magic_numbers;
+#endif
+
   //
   // overloaded from goto_symext
   //

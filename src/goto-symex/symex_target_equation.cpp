@@ -863,8 +863,6 @@ void symex_target_equationt::convert_assertions(
         assumption,
         it->cond_expr);
 
-      std::cout << "assertion: " << from_expr(ns,"",it->cond_expr) << std::endl;
-      
       // do the conversion
       it->cond_literal=prop_conv.convert(implication);
       // store disjunct

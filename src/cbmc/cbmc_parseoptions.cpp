@@ -190,6 +190,8 @@ void cbmc_parseoptionst::get_command_line_options(optionst &options)
     options.set_option("incremental-check", cmdline.getval("incremental-check"));
   if(cmdline.isset("earliest-loop-exit"))
     options.set_option("earliest-loop-exit", true);
+  if(cmdline.isset("magic-numbers"))
+    options.set_option("magic-numbers", true);
 
   // constant propagation
   if(cmdline.isset("no-propagation"))
