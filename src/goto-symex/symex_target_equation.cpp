@@ -805,7 +805,10 @@ void symex_target_equationt::convert_assertions(
     for(SSA_stepst::iterator it=SSA_steps.begin();
         it!=SSA_steps.end(); it++)
     {
-      if(it->is_assert() && !it->converted)
+      //ignore already converted assertions in the error trace
+      if(it->is_assert() && it->converted) it->ignore = true;
+
+      if(it->is_assert() && !it->ignore && !it->converted)
       {
         it->converted = true;
 
@@ -855,7 +858,10 @@ void symex_target_equationt::convert_assertions(
   for(SSA_stepst::iterator it=SSA_steps.begin();
       it!=SSA_steps.end(); it++) 
   {
-    if(it->is_assert() && !it->converted)
+    //ignore already converted assertions in the error trace
+    if(it->is_assert() && it->converted) it->ignore = true;
+
+    if(it->is_assert() && !it->ignore && !it->converted)
     {
       it->converted = true;
 
