@@ -233,7 +233,7 @@ public:
     for(SSA_stepst::const_iterator
         it=SSA_steps.begin();
         it!=SSA_steps.end(); it++)
-      if(it->is_assert() && !it->converted) i++;
+      if(it->is_assert() && !it->ignore && !it->converted) i++;
     return i;
   }
   
