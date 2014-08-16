@@ -9,6 +9,7 @@ Author: Daniel Kroening
 \*******************************************************************/
 
 #include <cassert>
+#include <ostream>
 
 #include <util/arith_tools.h>
 #include <util/symbol.h>

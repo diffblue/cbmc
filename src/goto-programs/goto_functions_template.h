@@ -11,7 +11,7 @@ Date: June 2003
 #ifndef CPROVER_GOTO_FUNCTIONS_TEMPLATE_H
 #define CPROVER_GOTO_FUNCTIONS_TEMPLATE_H
 
-#include <iosfwd>
+#include <ostream>
 #include <cassert>
 
 #include <util/std_types.h>

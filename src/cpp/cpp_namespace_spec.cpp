@@ -23,5 +23,5 @@ Function: cpp_namespace_spect::output
 
 void cpp_namespace_spect::output(std::ostream &out) const
 {
-  out << "  namespace: " << get_namespace() << std::endl;
+  out << "  namespace: " << get_namespace() << "\n";
 }
