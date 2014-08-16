@@ -154,24 +154,24 @@ bool cpp_languaget::parse(
   switch(config.ansi_c.mode)
   {
   case configt::ansi_ct::MODE_CODEWARRIOR_C_CPP:
-    cpp_parser.mode=cpp_parsert::CW;
+    cpp_parser.mode=ansi_c_parsert::CW;
     break;
    
   case configt::ansi_ct::MODE_VISUAL_STUDIO_C_CPP:
-    cpp_parser.mode=cpp_parsert::MSC;
+    cpp_parser.mode=ansi_c_parsert::MSC;
     break;
     
   case configt::ansi_ct::MODE_ANSI_C_CPP:
-    cpp_parser.mode=cpp_parsert::ANSI;
+    cpp_parser.mode=ansi_c_parsert::ANSI;
     break;
     
   case configt::ansi_ct::MODE_GCC_C:
   case configt::ansi_ct::MODE_GCC_CPP:
-    cpp_parser.mode=cpp_parsert::GCC;
+    cpp_parser.mode=ansi_c_parsert::GCC;
     break;
     
   case configt::ansi_ct::MODE_ARM_C_CPP:
-    cpp_parser.mode=cpp_parsert::ARM;
+    cpp_parser.mode=ansi_c_parsert::ARM;
     break;
     
   default:

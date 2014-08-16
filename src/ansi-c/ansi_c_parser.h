@@ -67,7 +67,8 @@ public:
   std::string string_literal;
   mp_integer pragma_pack;
   
-  enum { ANSI, GCC, MSC, ICC, CW, ARM } mode;
+  typedef enum { ANSI, GCC, MSC, ICC, CW, ARM } modet;
+  modet mode;
   // ANSI is strict ANSI-C
   // GCC is, well, gcc
   // MSC is Microsoft Visual Studio
