@@ -26,7 +26,7 @@ public:
   {
   }
 
-  bool parse();
+  bool operator()();
 
 protected:
   cpp_token_buffert &lex;
@@ -6843,7 +6843,7 @@ void Parser::SkipTo(int token)
 
 /*******************************************************************\
 
-Function: Parser::parse
+Function: Parser::operator()
 
   Inputs:
 
@@ -6853,7 +6853,7 @@ Function: Parser::parse
 
 \*******************************************************************/
 
-bool Parser::parse()
+bool Parser::operator()()
 {
   number_of_errors=0;
 
@@ -6893,5 +6893,5 @@ Function: cpp_parse
 bool cpp_parse()
 {
   Parser parser(cpp_parser);
-  return parser.parse();
+  return parser();
 }
