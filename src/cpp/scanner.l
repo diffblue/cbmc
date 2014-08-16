@@ -71,7 +71,7 @@ static inline int token(int x)
 
 static inline int MSC_Keyword(int x)
 {
-  if(PARSER.mode==cpp_parsert::MSC)
+  if(PARSER.mode==ansi_c_parsert::MSC)
     return token(x);
   else
     return make_identifier();
@@ -210,7 +210,7 @@ pragma          "#"{horizontal_white}*pragma{horizontal_white}.*"\n"
 
 __alignof__         { return token(TOK_ALIGNOF); }
 
-"__asm"         { if(PARSER.mode==cpp_parsert::MSC)
+"__asm"         { if(PARSER.mode==ansi_c_parsert::MSC)
                   {
                     BEGIN(MSC_ASM);
                     return token(TOK_MSC_ASM);
@@ -222,8 +222,8 @@ __alignof__         { return token(TOK_ALIGNOF); }
                   }
                 }
 
-"asm"           { if(PARSER.mode==cpp_parsert::GCC ||
-                     PARSER.mode==cpp_parsert::CW)
+"asm"           { if(PARSER.mode==ansi_c_parsert::GCC ||
+                     PARSER.mode==ansi_c_parsert::CW)
                   {
                     PARSER.asm_block_following=true;
                     return token(TOK_GCC_ASM);
@@ -232,9 +232,9 @@ __alignof__         { return token(TOK_ALIGNOF); }
                     return make_identifier();
                 }
 
-"__asm__"       { if(PARSER.mode==cpp_parsert::GCC ||
-                     PARSER.mode==cpp_parsert::CW ||
-                     PARSER.mode==cpp_parsert::ARM)
+"__asm__"       { if(PARSER.mode==ansi_c_parsert::GCC ||
+                     PARSER.mode==ansi_c_parsert::CW ||
+                     PARSER.mode==ansi_c_parsert::ARM)
                   {
                     PARSER.asm_block_following=true;
                     return token(TOK_GCC_ASM);
@@ -348,20 +348,20 @@ void                { return token(TOK_VOID); }
 volatile            { return token(TOK_VOLATILE); }
 wchar_t	            { // CodeWarrior has an option to
                       // enable/disable wchar_t
-                      if(PARSER.mode==cpp_parsert::CW &&
+                      if(PARSER.mode==ansi_c_parsert::CW &&
                          !PARSER.recognize_wchar_t)
                         return make_identifier();
                       else
                         return token(TOK_WCHAR_T);
                     }
 __float128	    {
-                      if(PARSER.mode==cpp_parsert::GCC)
+                      if(PARSER.mode==ansi_c_parsert::GCC)
                         return token(TOK_GCC_FLOAT128);
                       else
                         return make_identifier();
                     }
 __int128	    {
-                      if(PARSER.mode==cpp_parsert::GCC)
+                      if(PARSER.mode==ansi_c_parsert::GCC)
                         return token(TOK_GCC_INT128);
                       else
                         return make_identifier();

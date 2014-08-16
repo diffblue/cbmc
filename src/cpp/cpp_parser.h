@@ -16,6 +16,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/parser.h>
 #include <util/expr.h>
 
+#include <ansi-c/ansi_c_parser.h>
+
 #include "cpp_parse_tree.h"
 #include "cpp_token_buffer.h"
 
@@ -35,7 +37,7 @@ public:
   }
   
   cpp_parsert():
-    mode(ANSI),
+    mode(ansi_c_parsert::ANSI),
     recognize_wchar_t(true),
     asm_block_following(false)    
   {
@@ -43,8 +45,8 @@ public:
 
 public:
   // internal state
-  
-  enum { ANSI, GCC, MSC, ICC, CW, ARM } mode;
+
+  ansi_c_parsert::modet mode;  
   // ANSI is strict ANSI-C
   // GCC is, well, gcc
   // MSC is Microsoft Visual Studio
