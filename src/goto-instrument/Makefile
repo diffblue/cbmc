@@ -67,7 +67,7 @@ endif
 ###############################################################################
 
 goto-instrument$(EXEEXT): $(OBJ)
-	$(LINKBIN) --static
+	$(LINKBIN)
 
 .PHONY: goto-instrument-mac-signed
 

@@ -60,7 +60,7 @@ endif
 ###############################################################################
 
 cbmc$(EXEEXT): $(OBJ)
-	$(LINKBIN) --static
+	$(LINKBIN)
 
 .PHONY: cbmc-mac-signed
 
