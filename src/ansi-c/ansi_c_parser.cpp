@@ -15,32 +15,6 @@ ansi_c_parsert ansi_c_parser;
 
 /*******************************************************************\
 
-Function: ansi_c_parsert::scopet::print
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void ansi_c_parsert::scopet::print(std::ostream &out) const
-{
-  out << "Prefix: " << prefix << std::endl;
-
-  for(scopet::name_mapt::const_iterator n_it=name_map.begin();
-      n_it!=name_map.end();
-      n_it++)
-  {
-    out << "  ID: " << n_it->first
-        << " CLASS: " << n_it->second.id_class
-        << std::endl;
-  }
-}
-
-/*******************************************************************\
-
 Function: ansi_c_parsert::lookup
 
   Inputs:
