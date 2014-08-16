@@ -11,7 +11,7 @@ Date: February 2004
 #ifndef CPROVER_TIME_STOPPING_H
 #define CPROVER_TIME_STOPPING_H
 
-#include <ostream>
+#include <iosfwd>
 #include <string>
 
 class fine_timet

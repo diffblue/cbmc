@@ -11,7 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_MESSAGE_H
 
 #include <string>
-#include <ostream>
+#include <iosfwd>
 #include <sstream>
 
 #include "location.h"

@@ -1,7 +1,7 @@
 #ifndef PATH_H
 #define PATH_H
 
-#include <iostream>
+#include <iosfwd>
 #include <list>
 
 #include <util/std_expr.h>

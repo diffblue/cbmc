@@ -10,7 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_ANALYSES_AI_H
 
 #include <map>
-#include <ostream>
+#include <iosfwd>
 
 #include <goto-programs/goto_functions.h>
 

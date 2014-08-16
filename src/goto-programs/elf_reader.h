@@ -9,7 +9,7 @@ Author:
 #ifndef CPROVER_ELF_READER_H
 #define CPROVER_ELF_READER_H
 
-#include <istream>
+#include <iosfwd>
 #include <string>
 #include <vector>
 

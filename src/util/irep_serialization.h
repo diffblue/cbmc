@@ -12,7 +12,7 @@ Date: May 2007
 #define CPROVER_IREP_SERIALIZATION_H
 
 #include <map>
-#include <ostream>
+#include <iosfwd>
 #include <string>
 #include <vector>
 

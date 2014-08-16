@@ -11,7 +11,7 @@ Author: CM Wintersteiger
 
 #define GOTO_BINARY_VERSION 2
 
-#include <ostream>
+#include <iosfwd>
 #include <string>
 
 #include "goto_functions.h"

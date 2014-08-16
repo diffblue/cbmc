@@ -9,7 +9,7 @@ Author:
 #ifndef CPROVER_UTIL_PIPE_STREAM
 #define CPROVER_UTIL_PIPE_STREAM
 
-#include <istream>
+#include <iosfwd>
 #include <string>
 #include <list>
 

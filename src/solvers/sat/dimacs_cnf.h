@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_DIMACS_CNF_H
 #define CPROVER_DIMACS_CNF_H
 
-#include <ostream>
+#include <iosfwd>
 
 #include "cnf_clause_list.h"
 
