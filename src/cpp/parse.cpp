@@ -175,7 +175,7 @@ protected:
 
   void set_location(irept &dest, const cpp_tokent &token)
   {
-    locationt &location=(locationt &)dest.add(ID_C_location);
+    locationt &location=static_cast<locationt &>(dest.add(ID_C_location));
     location.set_file(token.filename);
     location.set_line(token.line_no);
     if(!current_function.empty())
@@ -189,9 +189,9 @@ protected:
       p=&p->subtype();
     p->swap(src);
   }
-};
 
-const unsigned int MaxErrors=10;
+  unsigned int max_errors;
+};
 
 bool Parser::rString(Token &tk)
 {
@@ -249,7 +249,7 @@ bool Parser::SyntaxError()
     parser.print(1, message, -1, location);
   }
 
-  return bool(++number_of_errors < MaxErrors);
+  return bool(++number_of_errors < max_errors);
 }
 
 bool Parser::rProgram(cpp_itemt &item)
@@ -6854,6 +6854,7 @@ Function: Parser::operator()
 bool Parser::operator()()
 {
   number_of_errors=0;
+  max_errors=10;
 
   #if 1
   cpp_itemt item;
