@@ -41,7 +41,6 @@ protected:
   bool rProgram(cpp_itemt &item);
 
   bool SyntaxError();
-  void ShowMessageHead(char*);
 
   bool rDefinition(cpp_itemt &);
   bool rNullDeclaration(cpp_declarationt &);
@@ -135,9 +134,6 @@ protected:
   bool rAllocateInitializer(exprt &);
   bool rPostfixExpr(exprt &);
   bool rPrimaryExpr(exprt &);
-  bool rMSCTypePredicate(exprt &);
-  bool rMSCuuidof(exprt &);
-  bool rMSC_if_existsExpr(exprt &);
   bool rVarName(exprt &);
   bool rVarNameCore(exprt &);
   bool isTemplateArgs();
@@ -151,11 +147,6 @@ protected:
   bool rDoStatement(codet &);
   bool rForStatement(codet &);
   bool rTryStatement(codet &);
-  bool rMSC_tryStatement(codet &);
-  bool rMSC_leaveStatement(codet &);
-  bool rGCCAsmStatement(codet &);
-  bool rMSCAsmStatement(codet &);
-  bool rMSC_if_existsStatement(codet &);
 
   bool rExprStatement(codet &);
   bool rDeclarationStatement(codet &);
@@ -167,6 +158,18 @@ protected:
   bool moreVarName();
 
   bool rString(Token &tk);
+  
+  // GCC extensions
+  bool rGCCAsmStatement(codet &);
+  
+  // MSC extensions
+  bool rMSC_tryStatement(codet &);
+  bool rMSC_leaveStatement(codet &);
+  bool rMSCAsmStatement(codet &);
+  bool rMSC_if_existsStatement(codet &);
+  bool rMSCTypePredicate(exprt &);
+  bool rMSCuuidof(exprt &);
+  bool rMSC_if_existsExpr(exprt &);
 
   unsigned number_of_errors;
   irep_idt current_function;
