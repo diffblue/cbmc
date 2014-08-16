@@ -73,7 +73,7 @@ protected:
   bool optCvQualify(typet &);
   bool rAttribute();
   bool optIntegralTypeOrClassSpec(typet &);
-  bool rConstructorDecl(cpp_declaratort &, typet &);
+  bool rConstructorDecl(cpp_declaratort &, typet &, typet &trailing_return_type);
   bool optThrowDecl(irept &);
 
   bool rDeclarators(cpp_declarationt::declaratorst &, bool, bool=false);
@@ -1300,7 +1300,8 @@ bool Parser::rOtherDeclaration(
     type.get_sub().erase(type.get_sub().begin());
 
     cpp_declaratort conv_operator_declarator;
-    if(!rConstructorDecl(conv_operator_declarator, type_name))
+    typet trailing_return_type;
+    if(!rConstructorDecl(conv_operator_declarator, type_name, trailing_return_type))
       return false;
 
     type_name=typet("cpp-cast-operator");
@@ -1320,16 +1321,20 @@ bool Parser::rOtherDeclaration(
       if(it->id()=="~") { is_destructor=true; break; }
 
     cpp_declaratort constructor_declarator;
-    if(!rConstructorDecl(constructor_declarator, type_name))
+    typet trailing_return_type;
+    if(!rConstructorDecl(constructor_declarator, type_name, trailing_return_type))
       return false;
 
     #ifdef DEBUG
     std::cout << "Parser::rOtherDeclaration 7\n";
     #endif
 
-    // it's the name (declarator), not the return type
-
-    type_name=typet(is_destructor?ID_destructor:ID_constructor);
+    // type_name above is the name declarator, not the return type
+    if(storage_spec.is_auto())
+      type_name=trailing_return_type;
+    else
+      type_name=typet(is_destructor?ID_destructor:ID_constructor);
+      
     declaration.declarators().push_back(constructor_declarator);
   }
   else if(!member_spec.is_empty() && lex.LookAhead(0)==';')
@@ -1385,7 +1390,7 @@ bool Parser::rOtherDeclaration(
   else
   {
     #ifdef DEBUG
-    std::cout << "Parser::rOtherDeclaration 12;\n";
+    std::cout << "Parser::rOtherDeclaration 12\n";
     #endif
 
     if(declaration.declarators().size()!=1)
@@ -1834,11 +1839,14 @@ bool Parser::optIntegralTypeOrClassSpec(typet &p)
 */
 bool Parser::rConstructorDecl(
   cpp_declaratort &constructor,
-  typet &type_name)
+  typet &type_name,
+  typet &trailing_return_type)
 {
   #ifdef DEBUG
   std::cout << "Parser::rConstructorDecl 0\n";
   #endif
+  
+  trailing_return_type.make_nil();
 
   constructor=cpp_declaratort(typet("function_type"));
   constructor.type().subtype().make_nil();
@@ -1847,6 +1855,10 @@ bool Parser::rConstructorDecl(
   Token op;
   if(lex.GetToken(op)!='(')
     return false;
+
+  #ifdef DEBUG
+  std::cout << "Parser::rConstructorDecl 1\n";
+  #endif
 
   irept &parameters=constructor.type().add(ID_parameters);
 
@@ -1857,11 +1869,33 @@ bool Parser::rConstructorDecl(
   Token cp;
   lex.GetToken(cp);
 
+  #ifdef DEBUG
+  std::cout << "Parser::rConstructorDecl 2\n";
+  #endif
+
   typet &cv=(typet &)constructor.add(ID_method_qualifier);
   cv.make_nil();
   optCvQualify(cv);
 
   optThrowDecl(constructor.throw_decl());
+
+  if(lex.LookAhead(0)==TOK_ARROW)
+  {
+    #ifdef DEBUG
+    std::cout << "Parser::rConstructorDecl 3\n";
+    #endif
+
+    // C++11 trailing return type
+    Token arrow;
+    lex.GetToken(arrow);
+    
+    if(!rTypeSpecifier(trailing_return_type, false))
+      return false;
+  }
+
+  #ifdef DEBUG
+  std::cout << "Parser::rConstructorDecl 4\n";
+  #endif
 
   if(lex.LookAhead(0)==':')
   {
@@ -1872,6 +1906,10 @@ bool Parser::rConstructorDecl(
     else
       return false;
   }
+
+  #ifdef DEBUG
+  std::cout << "Parser::rConstructorDecl 5\n";
+  #endif
 
   if(lex.LookAhead(0)=='=')
   {
@@ -2188,6 +2226,10 @@ bool Parser::rDeclarator(
     if(!rDeclarator(declarator2, kind, true, true, false))
       return false;
 
+    #ifdef DEBUG
+    std::cout << "Parser::rDeclarator2 4\n";
+    #endif
+
     Token cp;
 
     if(lex.GetToken(cp)!=')')
@@ -2201,6 +2243,10 @@ bool Parser::rDeclarator(
           return false;
       }
 
+    #ifdef DEBUG
+    std::cout << "Parser::rDeclarator2 5\n";
+    #endif
+
     d_inner.swap(declarator2.type());
     name.swap(declarator2.name());
   }
@@ -2208,7 +2254,7 @@ bool Parser::rDeclarator(
           (kind==kDeclarator || t==TOK_IDENTIFIER || t==TOK_SCOPE))
   {
     #ifdef DEBUG
-    std::cout << "Parser::rDeclarator2 4\n";
+    std::cout << "Parser::rDeclarator2 6\n";
     #endif
     
     // if this is an argument declarator, "int (*)()" is valid.
@@ -2217,7 +2263,7 @@ bool Parser::rDeclarator(
   }
 
   #ifdef DEBUG
-  std::cout << "Parser::rDeclarator2 5\n";
+  std::cout << "Parser::rDeclarator2 7\n";
   #endif
 
   exprt init_args(static_cast<const exprt &>(get_nil_irep()));
@@ -2228,6 +2274,10 @@ bool Parser::rDeclarator(
     t=lex.LookAhead(0);
     if(t=='(') // function
     {
+      #ifdef DEBUG
+      std::cout << "Parser::rDeclarator2 8\n";
+      #endif
+
       Token op, cp;
       exprt args;
       bool is_args=true;
@@ -2261,15 +2311,40 @@ bool Parser::rDeclarator(
         // loop should end here
       }
 
+      #ifdef DEBUG
+      std::cout << "Parser::rDeclarator2 9\n";
+      #endif
+
       irept throw_decl;
       optThrowDecl(throw_decl); // ignore in this version
+      
+      if(lex.LookAhead(0)==TOK_ARROW)
+      {
+        #ifdef DEBUG
+        std::cout << "Parser::rDeclarator2 10\n";
+        #endif
+
+        // C++11 trailing return type, but we already have
+        // a return type. We should report this as an error.
+        Token arrow;
+        lex.GetToken(arrow);
+        
+        typet return_type;
+        if(!rTypeSpecifier(return_type, false))
+          return false;
+      }
 
       if(lex.LookAhead(0)==':')
       {
+        #ifdef DEBUG
+        std::cout << "Parser::rDeclarator2 11\n";
+        #endif
+
         irept mi;
         if(rMemberInitializers(mi))
         {
-          // TODO
+          // TODO: these are only meant to show up in a
+          // constructor!
         }
         else
           return false;
@@ -2279,6 +2354,10 @@ bool Parser::rDeclarator(
     }
     else if(t=='[')         // array
     {
+      #ifdef DEBUG
+      std::cout << "Parser::rDeclarator2 12\n";
+      #endif
+
       Token ob, cb;
       exprt expr;
       lex.GetToken(ob);
@@ -2291,28 +2370,32 @@ bool Parser::rDeclarator(
       if(lex.GetToken(cb)!=']')
         return false;
 
-        std::list<typet> tl;
-        tl.push_back(d_outer);
-        while(tl.back().id() == ID_array)
-        {
-          tl.push_back(tl.back().subtype());
-        }
+      std::list<typet> tl;
+      tl.push_back(d_outer);
+      while(tl.back().id() == ID_array)
+      {
+        tl.push_back(tl.back().subtype());
+      }
 
-        typet array_type(ID_array);
-        array_type.add(ID_size).swap(expr);
-        array_type.subtype().swap(tl.back());
+      typet array_type(ID_array);
+      array_type.add(ID_size).swap(expr);
+      array_type.subtype().swap(tl.back());
+      tl.pop_back();
+      d_outer.swap(array_type);
+      while(!tl.empty())
+      {
+        tl.back().subtype().swap(d_outer);
+        d_outer.swap(tl.back());
         tl.pop_back();
-        d_outer.swap(array_type);
-        while(!tl.empty())
-        {
-          tl.back().subtype().swap(d_outer);
-          d_outer.swap(tl.back());
-          tl.pop_back();
-        }
+      }
     }
     else
       break;
   }
+
+  #ifdef DEBUG
+  std::cout << "Parser::rDeclarator2 13\n";
+  #endif
 
   declarator=cpp_declaratort();
 
@@ -2563,7 +2646,7 @@ bool Parser::rName(irept &name)
     Token tk;
 
     #ifdef DEBUG
-    std::cout << "Parser::rName 2 " << "\n";
+    std::cout << "Parser::rName 2 " << lex.LookAhead(0) << "\n";
     #endif
 
     switch(lex.LookAhead(0))
@@ -2654,8 +2737,8 @@ bool Parser::rName(irept &name)
 
     default:
       return false;
+    }
   }
-}
 }
 
 /*
