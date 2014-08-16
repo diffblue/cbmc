@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
+#include <ostream>
+
 #include "cpp_declaration.h"
 
 /*******************************************************************\
@@ -22,17 +24,17 @@ Function: cpp_declarationt::output
 
 void cpp_declarationt::output(std::ostream &out) const
 {
-  out << "is_template: " << is_template() << std::endl;
-  out << "storage: " << storage_spec().pretty() << std::endl;
-  out << "template_type: " << template_type().pretty() << std::endl;
-  out << "type: " << type().pretty() << std::endl;
+  out << "is_template: " << is_template() << "\n";
+  out << "storage: " << storage_spec().pretty() << "\n";
+  out << "template_type: " << template_type().pretty() << "\n";
+  out << "type: " << type().pretty() << "\n";
 
-  out << "Declarators:" << std::endl;
+  out << "Declarators:" << "\n";
 
   forall_cpp_declarators(it, *this)
   {
     it->output(out);
-    out << std::endl;
+    out << "\n";
   }
 }
 

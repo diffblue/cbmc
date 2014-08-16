@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
+#include <ostream>
+
 #include <util/i2string.h>
 
 #include "cpp_scopes.h"
@@ -109,7 +111,7 @@ void cpp_scopest::print_current(std::ostream &out) const
   do
   {
     scope->print_fields(out);
-    out << std::endl;
+    out << "\n";
     scope=&scope->get_parent();
   }
   while(!scope->is_root_scope());

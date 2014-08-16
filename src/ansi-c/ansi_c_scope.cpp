@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <ostream>
+
 #include "ansi_c_scope.h"
 
 /*******************************************************************\
@@ -22,7 +24,7 @@ Function: ansi_c_scopet::print
 
 void ansi_c_scopet::print(std::ostream &out) const
 {
-  out << "Prefix: " << prefix << std::endl;
+  out << "Prefix: " << prefix << "\n";
 
   for(ansi_c_scopet::name_mapt::const_iterator
       n_it=name_map.begin();
@@ -31,7 +33,7 @@ void ansi_c_scopet::print(std::ostream &out) const
   {
     out << "  ID: " << n_it->first
         << " CLASS: " << n_it->second.id_class
-        << std::endl;
+        << "\n";
   }
 }
 

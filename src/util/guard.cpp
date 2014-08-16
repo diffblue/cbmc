@@ -6,8 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include "std_expr.h"
+#include <ostream>
 
+#include "std_expr.h"
 #include "guard.h"
 
 /*******************************************************************\

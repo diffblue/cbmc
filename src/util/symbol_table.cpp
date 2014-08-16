@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <ostream>
+
 #include "symbol_table.h"
 
 /*******************************************************************\
@@ -125,7 +127,7 @@ Function: symbol_tablet::show
 
 void symbol_tablet::show(std::ostream &out) const
 {
-  out << std::endl << "Symbols:" << std::endl;
+  out << "\n" << "Symbols:" << "\n";
 
   forall_symbols(it, symbols)
     out << it->second;

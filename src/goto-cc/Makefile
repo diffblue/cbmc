@@ -33,7 +33,7 @@ endif
 ###############################################################################
 
 goto-cc$(EXEEXT): $(OBJ)
-	$(LINKBIN)
+	$(LINKBIN) --static
 
 .PHONY: goto-cc-mac-signed
 
