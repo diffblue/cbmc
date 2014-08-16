@@ -14,7 +14,7 @@ Date: 2012
 #include <list>
 #include <set>
 #include <map>
-#include <ostream>
+#include <iosfwd>
 
 #include <util/graph.h>
 

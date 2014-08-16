@@ -10,7 +10,7 @@ Author: Georg Weissenbacher, georg@weissenbacher.name
 #define CPROVER_NATURAL_LOOPS_H
 
 #include <stack>
-#include <ostream>
+#include <iosfwd>
 #include <set>
 
 #include <goto-programs/goto_program.h>

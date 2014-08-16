@@ -10,7 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_PROPDEC_LITERAL_H
 
 #include <vector>
-#include <ostream>
+#include <iosfwd>
 
 // a pair of a variable number and a sign, encoded as follows:
 //
@@ -180,10 +180,7 @@ protected:
   unsigned l;  
 };
 
-static inline std::ostream & operator << (std::ostream &out, literalt l)
-{
-  return out << (l.sign()?"-":"") << l.var_no();
-}
+inline std::ostream & operator << (std::ostream &out, literalt l);
 
 // constants
 literalt const_literal(bool value);

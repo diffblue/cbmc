@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_IEEE_FLOAT_H
 #define CPROVER_IEEE_FLOAT_H
 
-#include <ostream>
+#include <iosfwd>
 
 #include "mp_arith.h"
 #include "format_spec.h"

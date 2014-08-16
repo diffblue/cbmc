@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GUARD_H
 #define CPROVER_GUARD_H
 
-#include <ostream>
+#include <iosfwd>
 
 #include "expr.h"
 

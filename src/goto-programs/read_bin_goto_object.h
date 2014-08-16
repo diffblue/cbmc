@@ -11,7 +11,7 @@ Date: May 2007
 #ifndef CPROVER_READ_BIN_GOTO_OBJECT_H
 #define CPROVER_READ_BIN_GOTO_OBJECT_H
 
-#include <istream>
+#include <iosfwd>
 #include <string>
 
 class symbol_tablet;

@@ -10,7 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_GOTO_PROGRAMS_STATIC_ANALYSIS_H
 
 #include <map>
-#include <ostream>
+#include <iosfwd>
 
 #include <goto-programs/goto_functions.h>
 

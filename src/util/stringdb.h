@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_STRINGDB_H
 #define CPROVER_STRINGDB_H
 
-#include <ostream>
+#include <iosfwd>
 
 #include <algorithm>
 #include <string>

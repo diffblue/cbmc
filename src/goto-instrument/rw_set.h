@@ -11,7 +11,7 @@ Date: February 2006
 #ifndef CPROVER_GOTO_PROGRAMS_RW_SET
 #define CPROVER_GOTO_PROGRAMS_RW_SET
 
-#include <ostream>
+#include <iosfwd>
 
 #include <util/hash_cont.h>
 #include <util/guard.h>

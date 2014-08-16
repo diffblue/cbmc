@@ -12,7 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 /*! \defgroup gr_goto_programs Goto programs */
 
 #include <cassert>
-#include <ostream>
+#include <iosfwd>
 #include <set>
 
 #include <util/namespace.h>

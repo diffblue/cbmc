@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_LOC_REF_H
 #define CPROVER_LOC_REF_H
 
-#include <ostream>
+#include <iosfwd>
 
 class loc_reft
 {

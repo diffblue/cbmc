@@ -8,7 +8,7 @@
 #include <map>
 #include <vector>
 #include <set>
-#include <iostream>
+#include <iosfwd>
 
 typedef unsigned int statet;
 typedef std::set<statet> state_sett;

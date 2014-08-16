@@ -1,7 +1,7 @@
 #ifndef CPROVER_PARSER_H
 #define CPROVER_PARSER_H
 
-#include <istream>
+#include <iosfwd>
 #include <string>
 #include <vector>
 

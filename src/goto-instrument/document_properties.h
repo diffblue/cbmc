@@ -6,7 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <ostream>
+#include <iosfwd>
 
 #include <goto-programs/goto_functions.h>
 

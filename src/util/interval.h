@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_INTERVAL_H
 #define CPROVER_INTERVAL_H
 
-#include <ostream>
+#include <iosfwd>
 
 #include "threeval.h"
 
