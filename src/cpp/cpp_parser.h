@@ -44,8 +44,6 @@ public:
 public:
   // internal state
   
-  enum { LANGUAGE, EXPRESSION } grammar;
-
   enum { ANSI, GCC, MSC, ICC, CW, ARM } mode;
   // ANSI is strict ANSI-C
   // GCC is, well, gcc
