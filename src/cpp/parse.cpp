@@ -32,8 +32,6 @@ protected:
   cpp_token_buffert &lex;
   cpp_parsert &parser;
 
-  typedef irept Ptree;
-
   enum DeclKind { kDeclarator, kArgDeclarator, kCastDeclarator };
   enum TemplateDeclKind { tdk_unknown, tdk_decl, tdk_instantiation,
                           tdk_specialization, num_tdks };
@@ -2265,7 +2263,7 @@ bool Parser::rDeclarator(
 
       if(lex.LookAhead(0)==':')
       {
-        Ptree mi;
+        irept mi;
         if(rMemberInitializers(mi))
         {
           // TODO
