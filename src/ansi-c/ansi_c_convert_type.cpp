@@ -92,6 +92,9 @@ void ansi_c_convert_typet::read_rec(const typet &type)
   {
     gcc_attribute_mode=type;
   }
+  else if(type.id()==ID_gcc_attribute)
+  {
+  }
   else if(type.id()==ID_msc_based)
   {
     const exprt &as_expr=static_cast<const exprt &>(static_cast<const irept &>(type));

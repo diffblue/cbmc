@@ -715,10 +715,14 @@ __decltype          { if(PARSER.cpp && PARSER.mode==ansi_c_parsert::GCC)
                      PARSER.mode==ansi_c_parsert::CW ||
                      PARSER.mode==ansi_c_parsert::ARM)
                   {
+                    #if 1
                     if(PARSER.cpp)
                       BEGIN(IGNORE_PARENS);
                     else
                       BEGIN(GCC_ATTRIBUTE1);
+                    #else
+                    loc(); return TOK_GCC_ATTRIBUTE;
+                    #endif
                   }
                   else
                     return make_identifier();

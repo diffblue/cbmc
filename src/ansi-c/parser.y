@@ -1358,8 +1358,23 @@ gcc_attribute:
         {
           init($$);
         }
+        | TOK_CONST
+        {
+          $$=$1;
+          stack($$).id(ID_gcc_attribute);
+          stack($$).set(ID_identifier, ID_const);
+        }
         | identifier
+        {
+          $$=$1;
+          stack($$).id(ID_gcc_attribute);
+        }
         | identifier '(' gcc_attribute_expression_list_opt ')'
+        {
+          $$=$1;
+          stack($$).id(ID_gcc_attribute);
+          stack($$).operands().swap(stack($3).operands());
+        }
         ;
 
 gcc_attribute_list:
@@ -1603,12 +1618,12 @@ enumerator_list:
         ;
 
 enumerator_declaration:
-          identifier_or_typedef_name enumerator_value_opt
+          identifier_or_typedef_name gcc_type_attribute_opt enumerator_value_opt
         {
           init($$, ID_declaration);
           to_ansi_c_declaration(stack($$)).set_is_enum_constant(true);
           PARSER.add_declarator(stack($$), stack($1));
-          to_ansi_c_declaration(stack($$)).add_initializer(stack($2));
+          to_ansi_c_declaration(stack($$)).add_initializer(stack($3));
         }
         ;
 
