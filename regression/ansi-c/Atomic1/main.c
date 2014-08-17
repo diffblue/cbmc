@@ -11,6 +11,9 @@
 _Atomic(int) x1; // type specifier
 _Atomic volatile int x2; // type qualifier
 _Atomic const volatile int *p1;
+typedef _Atomic(int) atomic_int_t; // as a typedef
+typedef _Atomic int atomic_int_t2; // as a typedef
+atomic_int_t x3;
 #endif
 
 int main()
@@ -18,5 +21,6 @@ int main()
   #ifdef __GNUC__
   p1=&x1;
   p1=&x2;
+  p1=&x3;
   #endif
 }
