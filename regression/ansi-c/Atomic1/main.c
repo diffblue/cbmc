@@ -10,8 +10,13 @@
 #ifdef __GNUC__
 _Atomic(int) x1; // type specifier
 _Atomic volatile int x2; // type qualifier
+_Atomic const volatile int *p1;
 #endif
 
 int main()
 {
+  #ifdef __GNUC__
+  p1=&x1;
+  p1=&x2;
+  #endif
 }
