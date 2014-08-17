@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <algorithm>
+
 #include <util/decision_procedure.h>
 
 #include <langapi/language_util.h>
@@ -62,4 +64,32 @@ void path_symex_stept::convert(decision_proceduret &dest) const
 
   if(guard.is_not_nil())
     dest << guard;
+}
+
+/*******************************************************************\
+
+Function: path_symex_step_reft::build_history
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void path_symex_step_reft::build_history(
+  std::vector<path_symex_step_reft> &dest) const
+{
+  dest.clear();
+
+  path_symex_step_reft s=*this;
+  while(!s.is_nil())
+  {
+    dest.push_back(s);
+    --s;
+  }
+  
+  // the above goes backwards: now need to reverse
+  std::reverse(dest.begin(), dest.end());
 }
