@@ -32,12 +32,13 @@ public:
     is_constant=false;
     is_volatile=false;
     is_restricted=false;
+    is_atomic=false;
     is_ptr32=is_ptr64=false;
     is_transparent_union=false;
   }
 
   // standard ones
-  bool is_constant, is_volatile, is_restricted;
+  bool is_constant, is_volatile, is_restricted, is_atomic;
   
   // MS Visual Studio extension
   bool is_ptr32, is_ptr64;
@@ -58,6 +59,7 @@ public:
     return (!is_constant || q.is_constant) &&
            (!is_volatile || q.is_volatile) &&
            (!is_restricted || q.is_restricted) &&
+           (!is_atomic || q.is_atomic) &&
            (!is_ptr32 || q.is_ptr32) &&
            (!is_ptr64 || q.is_ptr64);
 
@@ -71,6 +73,7 @@ public:
     return a.is_constant==b.is_constant &&
            a.is_volatile==b.is_volatile &&
            a.is_restricted==b.is_restricted &&
+           a.is_atomic==b.is_atomic &&
            a.is_ptr32==b.is_ptr32 &&
            a.is_ptr64==b.is_ptr64 &&
            a.is_transparent_union==b.is_transparent_union;
@@ -89,6 +92,7 @@ public:
     is_constant|=b.is_constant;
     is_volatile|=b.is_volatile;
     is_restricted|=b.is_restricted;
+    is_atomic|=b.is_atomic;
     is_ptr32|=b.is_ptr32;
     is_ptr64|=b.is_ptr64;
     is_transparent_union|=b.is_transparent_union;
@@ -97,7 +101,7 @@ public:
   
   friend unsigned count(const c_qualifierst &q)
   {
-    return q.is_constant+q.is_volatile+q.is_restricted+
+    return q.is_constant+q.is_volatile+q.is_restricted+q.is_atomic+
            q.is_ptr32+q.is_ptr64;
   }
 };

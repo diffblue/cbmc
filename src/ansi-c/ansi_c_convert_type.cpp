@@ -72,6 +72,14 @@ void ansi_c_convert_typet::read_rec(const typet &type)
     c_qualifiers.is_constant=true;
   else if(type.id()==ID_restrict)
     c_qualifiers.is_restricted=true;
+  else if(type.id()==ID_atomic)
+    c_qualifiers.is_atomic=true;
+  else if(type.id()==ID_atomic_type_specifier)
+  {
+    // this gets turned into the qualifier, uh
+    c_qualifiers.is_atomic=true;
+    read_rec(type.subtype());
+  }
   else if(type.id()==ID_char)
     char_cnt++;
   else if(type.id()==ID_int)
