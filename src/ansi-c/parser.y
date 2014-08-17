@@ -170,7 +170,8 @@ extern char *yyansi_ctext;
 %token TOK_REAL        "__real__"
 %token TOK_IMAG        "__imag__"
 %token TOK_ALIGNAS     "_Alignas"
-%token TOK_ATOMIC      "_Atomic"
+%token TOK_ATOMIC_TYPE_QUALIFIER "_Atomic"
+%token TOK_ATOMIC_TYPE_SPECIFIER "_Atomic()"
 %token TOK_GENERIC     "_Generic"
 %token TOK_IMAGINARY   "_Imaginary"
 %token TOK_NORETURN    "_Noreturn"
@@ -930,6 +931,7 @@ type_specifier:
         | sue_type_specifier
         | typedef_type_specifier
         | typeof_type_specifier
+        | atomic_type_specifier
         ;
 
 declaration_qualifier_list:
@@ -978,13 +980,13 @@ declaration_qualifier:
         ;
 
 type_qualifier:
-          TOK_ATOMIC   { $$=$1; set($$, ID_atomic); }
-        | TOK_CONST    { $$=$1; set($$, ID_const); }
-        | TOK_RESTRICT { $$=$1; set($$, ID_restrict); }
-        | TOK_VOLATILE { $$=$1; set($$, ID_volatile); }
-        | TOK_CPROVER_ATOMIC { $$=$1; set($$, ID_cprover_atomic); }
-        | TOK_PTR32    { $$=$1; set($$, ID_ptr32); }
-        | TOK_PTR64    { $$=$1; set($$, ID_ptr64); }
+          TOK_ATOMIC_TYPE_QUALIFIER { $$=$1; set($$, ID_atomic); }
+        | TOK_CONST                 { $$=$1; set($$, ID_const); }
+        | TOK_RESTRICT              { $$=$1; set($$, ID_restrict); }
+        | TOK_VOLATILE              { $$=$1; set($$, ID_volatile); }
+        | TOK_CPROVER_ATOMIC        { $$=$1; set($$, ID_cprover_atomic); }
+        | TOK_PTR32                 { $$=$1; set($$, ID_ptr32); }
+        | TOK_PTR64                 { $$=$1; set($$, ID_ptr64); }
         | TOK_MSC_BASED '(' comma_expression ')' { $$=$1; set($$, ID_msc_based); mto($$, $3); }
         ;
 
@@ -1131,6 +1133,15 @@ typeof_type_specifier:
         | typeof_specifier type_qualifier_list
         {
           $$=merge($1, $2);
+        }
+        ;
+
+atomic_type_specifier:
+          TOK_ATOMIC_TYPE_SPECIFIER '(' type_name ')'
+        {
+          $$=$1;
+          stack($$).id(ID_atomic_type_specifier);
+          stack($$).add(ID_subtype)=stack($3);
         }
         ;
 

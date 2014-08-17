@@ -1025,8 +1025,9 @@ __decltype          { if(PARSER.cpp && PARSER.mode==ansi_c_parsert::GCC)
 
   /* This is a C11 keyword */
 
-"_Alignas"      { if(PARSER.mode==ansi_c_parsert::GCC ||
-                     PARSER.mode==ansi_c_parsert::ARM)
+"_Alignas"      { if(!PARSER.cpp &&
+                     (PARSER.mode==ansi_c_parsert::GCC ||
+                      PARSER.mode==ansi_c_parsert::ARM))
                     { loc(); return TOK_ALIGNAS; }
                   else
                     return make_identifier();
@@ -1034,26 +1035,49 @@ __decltype          { if(PARSER.cpp && PARSER.mode==ansi_c_parsert::GCC)
 
   /* This is a C11 keyword */
 
-"_Alignof"      { if(PARSER.mode==ansi_c_parsert::GCC ||
-                     PARSER.mode==ansi_c_parsert::ARM)
+"_Alignof"      { if(!PARSER.cpp &&
+                     (PARSER.mode==ansi_c_parsert::GCC ||
+                      PARSER.mode==ansi_c_parsert::ARM))
                     { loc(); return TOK_ALIGNOF; }
                   else
                     return make_identifier();
                 }
 
-  /* This is a C11 keyword */
+  /* This is a C11 keyword. It can be used as a type qualifier
+     and as a type specifier, which introduces ambiguity into the grammar.
+     We thus have two different tokens.
+     
+     6.7.2.4 - 4: If the _Atomic keyword is immediately followed by a left
+     parenthesis, it is interpreted as a type specifier (with a type name),
+     not as a type qualifier.  
+   */
 
-"_Atomic"       { if(PARSER.mode==ansi_c_parsert::GCC ||
-                     PARSER.mode==ansi_c_parsert::ARM)
-                    { loc(); return TOK_ATOMIC; }
+"_Atomic"{ws}"(" { if(!PARSER.cpp &&
+                      (PARSER.mode==ansi_c_parsert::GCC ||
+                       PARSER.mode==ansi_c_parsert::ARM))
+                  {
+                    // put back all but _Atomic
+                    yyless(7);
+                    loc();
+                    return TOK_ATOMIC_TYPE_SPECIFIER;
+                  }
+                  else
+                    return make_identifier();
+                }
+
+"_Atomic"       { if(!PARSER.cpp &&
+                     (PARSER.mode==ansi_c_parsert::GCC ||
+                      PARSER.mode==ansi_c_parsert::ARM))
+                    { loc(); return TOK_ATOMIC_TYPE_QUALIFIER; }
                   else
                     return make_identifier();
                 }
 
   /* This is a C11 keyword */
 
-"_Generic"      { if(PARSER.mode==ansi_c_parsert::GCC ||
-                     PARSER.mode==ansi_c_parsert::ARM)
+"_Generic"      { if(!PARSER.cpp &&
+                     (PARSER.mode==ansi_c_parsert::GCC ||
+                      PARSER.mode==ansi_c_parsert::ARM))
                     { loc(); return TOK_GENERIC; }
                   else
                     return make_identifier();
@@ -1061,8 +1085,9 @@ __decltype          { if(PARSER.cpp && PARSER.mode==ansi_c_parsert::GCC)
 
   /* This is a C11 keyword */
 
-"_Imaginary"    { if(PARSER.mode==ansi_c_parsert::GCC ||
-                     PARSER.mode==ansi_c_parsert::ARM)
+"_Imaginary"    { if(!PARSER.cpp &&
+                     (PARSER.mode==ansi_c_parsert::GCC ||
+                      PARSER.mode==ansi_c_parsert::ARM))
                     { loc(); return TOK_IMAGINARY; }
                   else
                     return make_identifier();
@@ -1070,8 +1095,9 @@ __decltype          { if(PARSER.cpp && PARSER.mode==ansi_c_parsert::GCC)
 
   /* This is a C11 keyword */
 
-"_Noreturn"     { if(PARSER.mode==ansi_c_parsert::GCC ||
-                     PARSER.mode==ansi_c_parsert::ARM)
+"_Noreturn"     { if(!PARSER.cpp &&
+                     (PARSER.mode==ansi_c_parsert::GCC ||
+                      PARSER.mode==ansi_c_parsert::ARM))
                     { loc(); return TOK_NORETURN; }
                   else
                     return make_identifier();
@@ -1079,8 +1105,9 @@ __decltype          { if(PARSER.cpp && PARSER.mode==ansi_c_parsert::GCC)
 
   /* This is a C11 keyword */
 
-"_Static_assert" { if(PARSER.mode==ansi_c_parsert::GCC ||
-                      PARSER.mode==ansi_c_parsert::ARM)
+"_Static_assert" { if(!PARSER.cpp &&
+                      (PARSER.mode==ansi_c_parsert::GCC ||
+                       PARSER.mode==ansi_c_parsert::ARM))
                     { loc(); return TOK_STATIC_ASSERT; }
                   else
                     return make_identifier();
@@ -1088,8 +1115,9 @@ __decltype          { if(PARSER.cpp && PARSER.mode==ansi_c_parsert::GCC)
 
   /* This is a C11 keyword */
 
-"_Thread_local" { if(PARSER.mode==ansi_c_parsert::GCC ||
-                     PARSER.mode==ansi_c_parsert::ARM)
+"_Thread_local" { if(!PARSER.cpp &&
+                     (PARSER.mode==ansi_c_parsert::GCC ||
+                      PARSER.mode==ansi_c_parsert::ARM))
                     { loc(); return TOK_THREAD_LOCAL; }
                   else
                     return make_identifier();
