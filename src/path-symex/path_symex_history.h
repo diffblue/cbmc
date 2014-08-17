@@ -164,15 +164,4 @@ inline path_symex_stept &path_symex_step_reft::get() const
   return history->step_container[index];
 }
 
-inline void path_symex_step_reft::build_history(
-  std::vector<path_symex_step_reft> &dest) const
-{
-  path_symex_step_reft s=*this;
-  while(!s.is_nil())
-  {
-    dest.push_back(s);
-    --s;
-  }
-}
-
 #endif
