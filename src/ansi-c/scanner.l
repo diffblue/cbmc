@@ -1052,15 +1052,13 @@ __decltype          { if(PARSER.cpp && PARSER.mode==ansi_c_parsert::GCC)
      not as a type qualifier.  
    */
 
-"_Atomic"{ws}"(" { if(!PARSER.cpp &&
+"_Atomic"{ws}"(" { // put back all but _Atomic
+                   yyless(7);
+
+                   if(!PARSER.cpp &&
                       (PARSER.mode==ansi_c_parsert::GCC ||
                        PARSER.mode==ansi_c_parsert::ARM))
-                  {
-                    // put back all but _Atomic
-                    yyless(7);
-                    loc();
-                    return TOK_ATOMIC_TYPE_SPECIFIER;
-                  }
+                    { loc(); return TOK_ATOMIC_TYPE_SPECIFIER; }
                   else
                     return make_identifier();
                 }
