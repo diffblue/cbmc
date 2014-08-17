@@ -924,6 +924,7 @@ declaration_specifier:
         | sue_declaration_specifier
         | typedef_declaration_specifier
         | typeof_declaration_specifier
+        | atomic_declaration_specifier
         ;
 
 type_specifier:
@@ -1092,6 +1093,21 @@ typeof_declaration_specifier:
         }
         ;
 
+atomic_declaration_specifier:
+          atomic_type_specifier storage_class gcc_type_attribute_opt
+        {
+          $$=merge($1, merge($2, $3));
+        }
+        | declaration_qualifier_list atomic_specifier gcc_type_attribute_opt
+        {
+          $$=merge($1, merge($2, $3));
+        }
+        | atomic_declaration_specifier declaration_qualifier gcc_type_attribute_opt
+        {
+          $$=merge($1, merge($2, $3));
+        }
+        ;
+
 typedef_type_specifier:
           typedef_name gcc_type_attribute_opt
         {
@@ -1136,12 +1152,28 @@ typeof_type_specifier:
         }
         ;
 
-atomic_type_specifier:
+atomic_specifier:
           TOK_ATOMIC_TYPE_SPECIFIER '(' type_name ')'
         {
           $$=$1;
           stack($$).id(ID_atomic_type_specifier);
           stack($$).add(ID_subtype)=stack($3);
+        }
+        ;
+
+atomic_type_specifier:
+          atomic_specifier
+        | type_qualifier_list atomic_specifier
+        {
+          $$=merge($1, $2);
+        }
+        | type_qualifier_list atomic_specifier type_qualifier_list
+        {
+          $$=merge($1, merge($2, $3));
+        }
+        | atomic_specifier type_qualifier_list
+        {
+          $$=merge($1, $2);
         }
         ;
 
