@@ -358,8 +358,14 @@ bool goto_symext::symex_step(
 
       if(!loop_info.fully_unwound)
       {
+        goto_functionst::function_mapt::const_iterator it=
+          goto_functions.function_map.find(identifier);
+        assert(goto_functions.function_map.find(identifier) != 
+	  goto_functions.function_map.end());
         // interrupt for checking guard if in incremental mode
-        if(!state.guard.is_true())
+        if(!state.guard.is_true() &&
+           // no need to check recursive call if function body is not available
+           it->second.body_available)
 	{
           exprt guard = state.guard.as_expr();
           bool do_break = check_break(identifier, true, state,

@@ -1,4 +1,4 @@
-DIRS = cbmc cbmc-incr cbmc-with-incr
+DIRS = cbmc cbmc-incr cbmc-incr-oneloop cbmc-with-incr
 
 test:
 	$(foreach var,$(DIRS), make -C $(var) test;)

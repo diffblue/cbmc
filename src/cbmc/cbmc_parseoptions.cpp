@@ -418,6 +418,50 @@ void cbmc_parseoptionst::get_command_line_options(optionst &options)
 
 /*******************************************************************\
 
+Function: cbmc_parseoptionst::options_exclusive
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: check conflicts between options: not allowed together
+
+\*******************************************************************/
+
+bool cbmc_parseoptionst::options_exclusive(const char *opt1, const char *opt2)
+{
+  if(cmdline.isset(opt1) && cmdline.isset(opt2)) 
+  {
+    error() << "--" << opt1 << " cannot be used with --" << opt2 << eom;
+    return true;
+  }
+  return false;
+}
+
+/*******************************************************************\
+
+Function: cbmc_parseoptionst::options_inclusive
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: check conflicts between options: opt1 only if opt2
+
+\*******************************************************************/
+
+bool cbmc_parseoptionst::options_inclusive(const char *opt1, const char *opt2)
+{
+  if(cmdline.isset(opt1) && cmdline.isset(opt2)) 
+  {
+    error() << "--" << opt1 << " can only be used with --" << opt2 << eom;
+    return true;
+  }
+  return false;
+}
+
+/*******************************************************************\
+
 Function: cbmc_parseoptionst::doit
 
   Inputs:
@@ -464,9 +508,11 @@ int cbmc_parseoptionst::doit()
     return 1;
   }
 
-  if(cmdline.isset("incremental") && cmdline.isset("unwind")) 
+  if(options_exclusive("incremental","unwind") ||
+     options_exclusive("incremental","incremental-check") ||
+     options_inclusive("incremental","earliest-loop-exit")
+    ) 
   {
-    error() << "--unwind cannot be used with --incremental" << eom;
     return 1;
   }
   

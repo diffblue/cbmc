@@ -91,6 +91,9 @@ protected:
   
   void eval_verbosity();
   
+  bool options_exclusive(const char *opt1, const char *opt2);
+  bool options_inclusive(const char *opt1, const char *opt2);
+
   // get any additional stuff before finalizing
   virtual bool get_modules(bmct &bmc)
   {

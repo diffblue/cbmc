@@ -55,7 +55,7 @@ void bmct::show_vcc(std::ostream &out)
       s_it!=equation.SSA_steps.end();
       s_it++)
   {
-    if(!s_it->is_assert()) continue;
+    if(!s_it->is_assert() /* || s_it->ignore || s_it->converted*/) continue;
     
     if(s_it->source.pc->location.is_not_nil())
       out << s_it->source.pc->location << "\n";

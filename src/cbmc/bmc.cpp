@@ -447,6 +447,7 @@ bool bmct::run(const goto_functionst &goto_functions)
 
           if(symex.is_incremental)
           {
+            //at this point all other assertions have been checked
             if(symex.add_loop_check())
 	    {
               bool result = !decide(symex.prop_conv,false);
@@ -478,6 +479,7 @@ bool bmct::run(const goto_functionst &goto_functions)
 	    
           if(symex.is_incremental)
           {
+            //at this point all other assertions have been checked
             if(symex.add_loop_check())
 	    {
               symex.update_loop_info(!decide(symex.prop_conv,false));
@@ -629,9 +631,13 @@ void bmct::setup_unwind()
     }
 
     if(thread_nr_set)
+    {
       symex.set_unwind_thread_loop_limit(thread_nr, id, uw);
+    }
     else
+    {
       symex.set_unwind_loop_limit(id, uw);
+    }
     
     if(next==std::string::npos) break;
     idx=next;

@@ -120,13 +120,22 @@ bool symex_bmct::check_break(const irep_idt &id,
   if(!is_incremental) return false;
   if(unwind < incr_min_unwind) return false;
 
+#if 0
+  std::cout << "loop limit for " << id 
+            << (loop_limits.find(id)!=loop_limits.end() ? 
+               " exists" : " does not exist") << std::endl;
+#endif
+
   loop_limitst &this_thread_limits=
     thread_loop_limits[state.source.thread_nr];
   if(incr_loop_id=="" && 
      this_thread_limits.find(id)==this_thread_limits.end() &&
      loop_limits.find(id)==loop_limits.end()) 
   {
+#if 0
+    std::cout << "not statically unwound" << std::endl;
     //not a statically unwound loop when --incremental
+#endif
 
 #if 1
     if(options.get_bool_option("magic-numbers") &&
@@ -164,10 +173,10 @@ bool symex_bmct::add_loop_check()
 {
   if(loop_cond.id=="") return false;
 
-  status() << "Checking loop " << loop_cond.id << eom;
+  status() << "Checking loop/recursive call " << loop_cond.id << eom;
 
 #if 0
-  debug() << "Loop condition: " << from_expr(ns,"",loop_cond.cond) << eom;
+  debug() << "Loop/recursive call condition: " << from_expr(ns,"",loop_cond.cond) << eom;
 #endif
 
   if(loop_cond.cond.is_false()) 
@@ -307,13 +316,15 @@ bool symex_bmct::get_unwind_recursion(
       this_loop_limit=max_unwind;
   }
 
-  /*  if(id==incr_loop_id || (incr_loop_id=="" && is_incremental))
+  if(id==incr_loop_id || 
+     (incr_loop_id=="" && is_incremental && 
+      this_loop_limit==std::numeric_limits<unsigned>::max()))
   {
     this_loop_limit = incr_max_unwind;
     if(unwind+1>=incr_min_unwind) ignore_assertions = false;
-  }*/
+  }
 
-  bool abort=unwind>this_loop_limit;
+  bool abort=unwind>=this_loop_limit;
 
   if(unwind>0 || abort)
   {

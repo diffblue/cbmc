@@ -1,0 +1,8 @@
+CORE
+main.c
+--incremental-check c::main.0
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring

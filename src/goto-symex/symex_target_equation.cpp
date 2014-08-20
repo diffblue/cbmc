@@ -813,8 +813,8 @@ void symex_target_equationt::convert_assertions(
         it->converted = true;
 
 #if 0
-        std::cout << "assertion: " << from_expr(ns,"",it->cond_expr) 
-          << std::endl;
+        std::cout << "assertion (" << it->comment << "): " 
+          << from_expr(ns,"",it->cond_expr) << std::endl;
 #endif
 
         if(is_incremental) { 
@@ -870,8 +870,8 @@ void symex_target_equationt::convert_assertions(
         it->cond_expr);
 
 #if 0
-      std::cout << "assertion: " << from_expr(ns,"",it->cond_expr) 
-                << std::endl;
+        std::cout << "assertion (" << it->comment << "): " 
+          << from_expr(ns,"",it->cond_expr) << std::endl;
 #endif
 
       // do the conversion
