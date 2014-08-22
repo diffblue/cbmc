@@ -201,6 +201,7 @@ protected:
     bool propagate);
 
   exprt expand_structs_and_arrays(const exprt &src);
+  exprt array_theory(const exprt &src, bool propagate);
 
   exprt instantiate_rec_address(
     const exprt &src,

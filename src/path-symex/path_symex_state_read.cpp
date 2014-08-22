@@ -196,6 +196,71 @@ exprt path_symex_statet::expand_structs_and_arrays(const exprt &src)
 
 /*******************************************************************\
 
+Function: path_symex_statet::array_theory
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+exprt path_symex_statet::array_theory(const exprt &src, bool propagate)
+{
+  // top-level constant-sized arrays only right now
+  
+  if(src.id()==ID_index)
+  {
+    const index_exprt &index_expr=to_index_expr(src);
+    exprt index_tmp1=read(index_expr.index(), propagate);    
+    exprt index_tmp2=simplify_expr(index_tmp1, var_map.ns);
+
+    if(!index_tmp2.is_constant())
+    {
+      const array_typet &array_type=to_array_type(index_expr.array().type());
+      const typet &subtype=array_type.subtype();
+      
+      if(array_type.size().is_constant())
+      {
+        mp_integer size;
+        if(to_integer(array_type.size(), size))
+          throw "failed to convert array size";
+          
+        unsigned long long size_int=integer2unsigned(size);
+        
+        exprt result=nil_exprt();
+        
+        // split it up
+        for(unsigned long long i=0; i<size_int; ++i)
+        {
+          exprt index=from_integer(i, index_expr.index().type());
+          exprt new_src=index_exprt(index_expr.array(), index, subtype);
+
+          if(result.is_nil())
+            result=new_src;
+          else
+          {
+            equal_exprt index_equal(index_expr.index(), index);
+            result=if_exprt(index_equal, new_src, result);
+          }
+        }
+        
+        return result; // done
+      }
+      else
+      {
+        // TODO: variable-sized array
+      }
+      
+    }
+  }
+
+  return src;
+}
+
+/*******************************************************************\
+
 Function: path_symex_statet::instantiate_rec
 
   Inputs:
@@ -320,7 +385,7 @@ exprt path_symex_statet::read_symbol_member_index(
   if(src_type.id()==ID_code)
     return nil_exprt();
 
-  // is this a struct/array/vector that needs expanding?
+  // is this a struct/array/vector that needs to be expanded?
   exprt final=expand_structs_and_arrays(src);
   
   if(final.id()==ID_struct ||
@@ -331,52 +396,28 @@ exprt path_symex_statet::read_symbol_member_index(
       *it=read_symbol_member_index(*it, propagate); // rec. call
     return final;
   }
+  
+  // now do array theory
+  final=array_theory(final, propagate);
+  
+  if(final.id()==ID_if)
+  {
+    assert(final.operands().size()==3);
+    final.op0()=instantiate_rec(final.op0(), propagate); // rec. call
+    final.op1()=read_symbol_member_index(final.op1(), propagate); // rec. call
+    final.op2()=read_symbol_member_index(final.op2(), propagate); // rec. call
+    return final;
+  }
 
   std::string suffix="";
   exprt current=src;
-  exprt::operandst indices;
   
   // the loop avoids recursion
-  while(true)
+  while(current.id()!=ID_symbol)
   {
     exprt next=nil_exprt();
   
-    if(current.id()==ID_symbol)
-    {
-      if(current.get_bool(ID_C_SSA_symbol))
-        return nil_exprt(); // SSA already
-    
-      irep_idt identifier=
-        to_symbol_expr(current).get_identifier();
-
-      var_mapt::var_infot &var_info=
-        var_map(identifier, suffix, src.type());
-
-      #ifdef DEBUG
-      std::cout << "read_symbol_member_index_rec " << identifier
-                << " var_info " << var_info.full_identifier << std::endl;
-      #endif
-
-      // warning: reference is not stable      
-      var_statet &var_state=get_var_state(var_info);
-
-      if(propagate && var_state.value.is_not_nil())
-      {
-        return var_state.value; // propagate a value
-      }
-      else
-      {
-        // we do some SSA symbol
-        if(var_state.ssa_symbol.get_identifier()==irep_idt())
-        {
-          // produce one
-          var_state.ssa_symbol=var_info.ssa_symbol();
-        }
-            
-        return var_state.ssa_symbol;
-      }
-    }
-    else if(current.id()==ID_member)
+    if(current.id()==ID_member)
     {
       const member_exprt &member_expr=to_member_expr(current);
       
@@ -397,7 +438,6 @@ exprt path_symex_statet::read_symbol_member_index(
       const index_exprt &index_expr=to_index_expr(current);
       
       exprt index_tmp=read(index_expr.index(), propagate);
-      indices.push_back(index_tmp);
       
       std::string index_string=array_index_as_string(index_tmp);
       
@@ -406,14 +446,48 @@ exprt path_symex_statet::read_symbol_member_index(
       suffix=index_string+suffix;
     }
     else
-    {
       return nil_exprt();
-    }
 
     // next round  
     assert(next.is_not_nil());
     current=next;
   }
+
+  assert(current.id()==ID_symbol);
+  
+  if(current.get_bool(ID_C_SSA_symbol))
+    return nil_exprt(); // SSA already
+
+  irep_idt identifier=
+    to_symbol_expr(current).get_identifier();
+
+  var_mapt::var_infot &var_info=
+    var_map(identifier, suffix, src.type());
+
+  #ifdef DEBUG
+  std::cout << "read_symbol_member_index_rec " << identifier
+            << " var_info " << var_info.full_identifier << std::endl;
+  #endif
+
+  // warning: reference is not stable      
+  var_statet &var_state=get_var_state(var_info);
+
+  if(propagate && var_state.value.is_not_nil())
+  {
+    return var_state.value; // propagate a value
+  }
+  else
+  {
+    // we do some SSA symbol
+    if(var_state.ssa_symbol.get_identifier()==irep_idt())
+    {
+      // produce one
+      var_state.ssa_symbol=var_info.ssa_symbol();
+    }
+        
+    return var_state.ssa_symbol;
+  }
+
 }
 
 /*******************************************************************\
