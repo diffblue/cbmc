@@ -253,11 +253,6 @@ exprt path_symex_statet::instantiate_rec(
     // integer addresses. Will transform into __CPROVER_memory[]
     // eventually.
   }
-  else if(src.id()==ID_index)
-  {
-    // avoids indefinite recursion above
-    return src;
-  }
   else if(src.id()==ID_member)
   {
     const typet &compound_type=
