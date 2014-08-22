@@ -160,6 +160,11 @@ bmct::run_decision_procedure(prop_convt &prop_conv)
 
   // stop the time
   absolute_timet sat_start=current_time();
+
+#if 0
+  statistics() << "ignored: " <<  equation.count_ignored_SSA_steps() << eom;
+  statistics() << "converted: " <<  equation.count_converted_SSA_steps() << eom;
+#endif
   
   do_conversion(prop_conv);  
 
@@ -361,6 +366,7 @@ bool bmct::run(const goto_functionst &goto_functions)
 
     //THE MAIN LOOP FOR INCREMENTAL UNWINDING
     while(!symex_done) { 
+
       symex.total_claims=0;
       symex.remaining_claims=0;
       symex_done = symex(symex_state,goto_functions,body);
@@ -448,13 +454,13 @@ bool bmct::run(const goto_functionst &goto_functions)
           if(symex.is_incremental)
           {
             //at this point all other assertions have been checked
-            if(symex.add_loop_check())
+	    if(symex.add_loop_check())
 	    {
               bool result = !decide(symex.prop_conv,false);
               if(options.get_bool_option("earliest-loop-exit"))
                 result = !result;
               symex.update_loop_info(result);
-	    }
+	    } 
             continue;
 	  }
           else return false;  //nothing to check, exit
@@ -468,9 +474,9 @@ bool bmct::run(const goto_functionst &goto_functions)
 	}
         else 
         {
-          if(symex.remaining_claims>0)
+         if(symex.remaining_claims>0)
 	  {
-            verification_result = decide(symex.prop_conv);
+             verification_result = decide(symex.prop_conv);
             if(options.get_bool_option("stop-when-unsat") ? 
                !verification_result : //verification succeeds, exit
                verification_result)  //bug found, exit

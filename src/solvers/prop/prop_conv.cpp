@@ -493,7 +493,7 @@ Function: prop_conv_solvert::set_to
 
 void prop_conv_solvert::set_to(const exprt &expr, bool value)
 {
-  //  std::cout << "set to: " << expr << std::endl; 
+  //std::cout << "set to: " << expr << std::endl; 
 
   if(expr.type().id()!=ID_bool)
   {
@@ -650,7 +650,7 @@ decision_proceduret::resultt prop_conv_solvert::dec_solve()
   {
     print(8, "Post-processing");
     post_process();
-    post_processing_done=true;
+    //post_processing_done=true; //TODO: not clear where it might break
   }
 
   print(7, "Solving with "+prop.solver_text());

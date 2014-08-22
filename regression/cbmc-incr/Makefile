@@ -1,7 +1,7 @@
 default: tests.log
 
-PARAM = --incremental --refine --slice-formula 
-# --magic-numbers 
+PARAM = --incremental --magic-numbers
+#  --refine    --slice-formula
 
 test:
 	@../test.pl -c "perl -e 'alarm shift @ARGV; exec @ARGV' 30 ../../../src/cbmc/cbmc $(PARAM)"
