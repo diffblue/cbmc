@@ -196,6 +196,18 @@ protected:
   unsigned int max_errors;
 };
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool Parser::rString(Token &tk)
 {
   if(lex.GetToken(tk)!=TOK_STRING)
@@ -203,6 +215,18 @@ bool Parser::rString(Token &tk)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void Parser::merge_types(typet &src, typet &dest)
 {
@@ -222,6 +246,18 @@ void Parser::merge_types(typet &src, typet &dest)
     dest.move_to_subtypes(src);
   }
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool Parser::SyntaxError()
 {
@@ -255,6 +291,18 @@ bool Parser::SyntaxError()
   return bool(++number_of_errors < max_errors);
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool Parser::rProgram(cpp_itemt &item)
 {
   while(lex.LookAhead(0)!='\0')
@@ -273,6 +321,18 @@ bool Parser::rProgram(cpp_itemt &item)
 
   return false;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   definition
@@ -315,6 +375,18 @@ bool Parser::rDefinition(cpp_itemt &item)
   return res;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool Parser::rNullDeclaration(cpp_declarationt &decl)
 {
   Token tk;
@@ -326,6 +398,18 @@ bool Parser::rNullDeclaration(cpp_declarationt &decl)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   typedef
@@ -370,12 +454,36 @@ bool Parser::rTypedef(cpp_declarationt &declaration)
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool Parser::rTypedefStatement(codet &statement)
 {
   statement=codet(ID_decl);
   statement.operands().resize(1);
   return rTypedef((cpp_declarationt &)statement.op0());
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   type.specifier
@@ -414,6 +522,18 @@ bool Parser::rTypeSpecifier(typet &tspec, bool check)
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 // isTypeSpecifier() returns true if the next is probably a type specifier.
 
 bool Parser::isTypeSpecifier()
@@ -437,6 +557,18 @@ bool Parser::isTypeSpecifier()
 
   return false;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   linkage.spec
@@ -475,6 +607,18 @@ bool Parser::rLinkageSpec(cpp_linkage_spect &linkage_spec)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   namespace.spec
@@ -532,6 +676,18 @@ bool Parser::rNamespaceSpec(cpp_namespace_spect &namespace_spec)
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   using.declaration : USING { NAMESPACE } name ';'
 */
@@ -559,6 +715,18 @@ bool Parser::rUsing(cpp_usingt &cpp_using)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   static_assert.declaration : STATIC_ASSERT ( expression , expression ) ';'
@@ -594,6 +762,18 @@ bool Parser::rStaticAssert(cpp_static_assertt &cpp_static_assert)
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   linkage.body : '{' (definition)* '}'
 
@@ -628,6 +808,18 @@ bool Parser::rLinkageBody(cpp_linkage_spect::itemst &items)
   lex.GetToken(cp);
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   template.decl
@@ -710,6 +902,18 @@ bool Parser::rTemplateDecl(cpp_declarationt &decl)
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool Parser::rTemplateDecl2(typet &decl, TemplateDeclKind &kind)
 {
   Token tk;
@@ -764,6 +968,18 @@ bool Parser::rTemplateDecl2(typet &decl, TemplateDeclKind &kind)
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   temp.arg.list
   : empty
@@ -795,6 +1011,18 @@ bool Parser::rTempArgList(irept &args)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   temp.arg.declaration
@@ -913,6 +1141,18 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
    extern.template.decl
    : EXTERN TEMPLATE declaration
@@ -935,6 +1175,18 @@ bool Parser::rExternTemplateDecl(irept &decl)
   //                               Ptree::List(new Leaf(tk2), body));
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   declaration
@@ -1044,6 +1296,18 @@ bool Parser::rDeclaration(cpp_declarationt &declaration)
   }
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /* single declaration, for use in a condition (controlling
    expression of switch/while/if) */
 bool Parser::rSimpleDeclaration(cpp_declarationt &declaration)
@@ -1103,6 +1367,18 @@ bool Parser::rSimpleDeclaration(cpp_declarationt &declaration)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool Parser::rIntegralDeclaration(
   cpp_declarationt &declaration,
@@ -1209,6 +1485,18 @@ bool Parser::rIntegralDeclaration(
   }
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool Parser::rConstDeclaration(
   cpp_declarationt &declaration,
   cpp_storage_spect &storage_spec,
@@ -1232,6 +1520,18 @@ bool Parser::rConstDeclaration(
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool Parser::rOtherDeclaration(
   cpp_declarationt &declaration,
@@ -1403,6 +1703,18 @@ bool Parser::rOtherDeclaration(
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   This returns true for an declaration like:
         T (a);
@@ -1440,6 +1752,18 @@ bool Parser::isConstructorDecl()
     return true;
   }
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   ptr.to.member
@@ -1498,6 +1822,18 @@ bool Parser::isPtrToMember(int i)
   return false;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   member.spec
   : (FRIEND | INLINE | VIRTUAL | EXPLICIT)+
@@ -1527,6 +1863,18 @@ bool Parser::optMemberSpec(cpp_member_spect &member_spec)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   storage.spec : STATIC | EXTERN | AUTO | REGISTER | MUTABLE | ASM | THREAD_LOCAL
@@ -1563,6 +1911,18 @@ bool Parser::optStorageSpec(cpp_storage_spect &storage_spec)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   cv.qualify : (CONSTEXPR | CONST | VOLATILE | RESTRICT)+
@@ -1636,6 +1996,18 @@ bool Parser::optCvQualify(typet &cv)
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool Parser::rAttribute()
 {
   Token tk;
@@ -1659,9 +2031,19 @@ bool Parser::rAttribute()
   return true;
 }
 
-/*
+/*******************************************************************\
 
-  !!! added WCHAR_T
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+/*
 
   integral.or.class.spec
   : (CHAR | WCHAR_T | INT | SHORT | LONG | SIGNED | UNSIGNED | FLOAT | DOUBLE
@@ -1832,6 +2214,18 @@ bool Parser::optIntegralTypeOrClassSpec(typet &p)
   }
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   constructor.decl
   : '(' {arg.decl.list} ')' {cv.qualify} {throw.decl}
@@ -1950,6 +2344,18 @@ bool Parser::rConstructorDecl(
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   throw.decl : THROW '(' (name {','})* {name} ')'
              : THROW '(' '...' ')'
@@ -2008,6 +2414,18 @@ bool Parser::optThrowDecl(irept &throw_decl)
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   declarators : declarator.with.init (',' declarator.with.init)*
 
@@ -2034,6 +2452,18 @@ bool Parser::rDeclarators(
       return true;
   }
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   declarator.with.init
@@ -2137,6 +2567,18 @@ bool Parser::rDeclaratorWithInit(
   }
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /* __stdcall, __fastcall, __clrcall, __cdecl 
 
    These are Visual-Studio specific.
@@ -2158,6 +2600,18 @@ bool Parser::rDeclaratorQualifier()
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   declarator
@@ -2412,6 +2866,18 @@ bool Parser::rDeclarator(
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   ptr.operator
   : (('*' | ptr.to.member)['&'] {cv.qualify})+
@@ -2513,6 +2979,18 @@ bool Parser::optPtrOperator(typet &ptrs)
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   member.initializers
   : ':' member.init (',' member.init)*
@@ -2544,6 +3022,18 @@ bool Parser::rMemberInitializers(irept &init)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   member.init
@@ -2603,6 +3093,18 @@ bool Parser::rMemberInit(exprt &init)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   name : {'::'} name2 ('::' name2)*
@@ -2741,6 +3243,18 @@ bool Parser::rName(irept &name)
   }
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   operator.name
   : '+' | '-' | '*' | '/' | '%' | '^' | '&' | '|' | '~'
@@ -2852,6 +3366,18 @@ bool Parser::rOperatorName(irept &name)
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   cast.operator.name
   : {cv.qualify} (integral.or.class.spec | name) {cv.qualify}
@@ -2914,6 +3440,18 @@ bool Parser::rCastOperatorName(irept &name)
     return true;
   }
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   ptr.to.member
@@ -3004,6 +3542,18 @@ bool Parser::rPtrToMember(irept &ptr_to_mem)
   }
   return false;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   template.args
@@ -3119,6 +3669,18 @@ bool Parser::rTemplateArgs(irept &template_args)
   }
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   arg.decl.list.or.init
     : arg.decl.list
@@ -3164,6 +3726,18 @@ bool Parser::rArgDeclListOrInit(
     }
   }
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   arg.decl.list
@@ -3215,6 +3789,18 @@ bool Parser::rArgDeclList(irept &arglist)
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   arg.declaration
     : {userdef.keyword | REGISTER} type.specifier arg.declarator
@@ -3257,6 +3843,18 @@ bool Parser::rArgDeclaration(cpp_declarationt &declaration)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   initialize.expr
@@ -3340,6 +3938,18 @@ bool Parser::rInitializeExpr(exprt &expr)
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   function.arguments
   : empty
@@ -3369,6 +3979,18 @@ bool Parser::rFunctionArguments(exprt &args)
       lex.GetToken(tk);
   }
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   enum.spec
@@ -3418,6 +4040,18 @@ bool Parser::rEnumSpec(typet &spec)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   enum.body
@@ -3469,6 +4103,18 @@ bool Parser::rEnumBody(irept &body)
     lex.GetToken(tk);
   }
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   class.spec
@@ -3572,6 +4218,18 @@ bool Parser::rClassSpec(typet &spec)
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   base.specifiers
   : ':' base.specifier (',' base.specifier)*
@@ -3640,6 +4298,18 @@ bool Parser::rBaseSpecifiers(irept &bases)
   }
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   class.body : '{' (class.members)* '}'
 */
@@ -3684,6 +4354,18 @@ bool Parser::rClassBody(exprt &body)
   body.swap(members);
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   class.member
@@ -3759,6 +4441,18 @@ bool Parser::rClassMember(cpp_itemt &member)
   }
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   access.decl
   : name ';'                e.g. <qualified class>::<member name>;
@@ -3778,6 +4472,18 @@ bool Parser::rAccessDecl(irept &mem)
   //                           Ptree::List(new Leaf(tk)));
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   comma.expression
@@ -3821,6 +4527,18 @@ bool Parser::rCommaExpression(exprt &exp)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   expression
@@ -3902,6 +4620,18 @@ bool Parser::rExpression(exprt &exp)
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   conditional.expr
   : logical.or.expr {'?' comma.expression ':' conditional.expr}  right-to-left
@@ -3949,6 +4679,18 @@ bool Parser::rConditionalExpr(exprt &exp)
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   logical.or.expr
   : logical.and.expr
@@ -3986,6 +4728,18 @@ bool Parser::rLogicalOrExpr(exprt &exp, bool temp_args)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   logical.and.expr
@@ -4025,6 +4779,18 @@ bool Parser::rLogicalAndExpr(exprt &exp, bool temp_args)
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   inclusive.or.expr
   : exclusive.or.expr
@@ -4062,6 +4828,18 @@ bool Parser::rInclusiveOrExpr(exprt &exp, bool temp_args)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   exclusive.or.expr
@@ -4101,6 +4879,18 @@ bool Parser::rExclusiveOrExpr(exprt &exp, bool temp_args)
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   and.expr
   : equality.expr
@@ -4138,6 +4928,18 @@ bool Parser::rAndExpr(exprt &exp, bool temp_args)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   equality.expr
@@ -4177,6 +4979,18 @@ bool Parser::rEqualityExpr(exprt &exp, bool temp_args)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   relational.expr
@@ -4229,6 +5043,18 @@ bool Parser::rRelationalExpr(exprt &exp, bool temp_args)
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   shift.expr
   : additive.expr
@@ -4267,6 +5093,18 @@ bool Parser::rShiftExpr(exprt &exp)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   additive.expr
@@ -4313,6 +5151,18 @@ bool Parser::rAdditiveExpr(exprt &exp)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   multiply.expr
@@ -4365,6 +5215,18 @@ bool Parser::rMultiplyExpr(exprt &exp)
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   pm.expr        (pointer to member .*, ->*)
   : cast.expr
@@ -4408,6 +5270,18 @@ bool Parser::rPmExpr(exprt &exp)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   cast.expr
@@ -4469,6 +5343,18 @@ bool Parser::rCastExpr(exprt &exp)
   }
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   type.name
   : type.specifier cast.declarator
@@ -4492,6 +5378,18 @@ bool Parser::rTypeName(typet &tname)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   unary.expr
@@ -4602,6 +5500,18 @@ bool Parser::rUnaryExpr(exprt &exp)
     return rPostfixExpr(exp);
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   throw.expression
   : THROW {expression}
@@ -4638,6 +5548,18 @@ bool Parser::rThrowExpr(exprt &exp)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   typeid.expr
@@ -4697,6 +5619,18 @@ bool Parser::rTypeidExpr(exprt &exp)
   return false;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   sizeof.expr
   : SIZEOF unary.expr
@@ -4745,6 +5679,18 @@ bool Parser::rSizeofExpr(exprt &exp)
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   alignof.expr
   | ALIGNOF '(' type.name ')'
@@ -4781,6 +5727,18 @@ bool Parser::isAllocateExpr(int t)
 
   return t==TOK_NEW || t==TOK_DELETE;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   allocate.expr
@@ -4868,6 +5826,18 @@ bool Parser::rAllocateExpr(exprt &exp)
   else
     return false;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   allocate.type
@@ -4960,6 +5930,18 @@ bool Parser::rAllocateType(
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   new.declarator
   : empty
@@ -4994,6 +5976,18 @@ bool Parser::rNewDeclarator(typet &decl)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   allocate.initializer
@@ -5035,6 +6029,18 @@ bool Parser::rAllocateInitializer(exprt &init)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   postfix.exp
@@ -5186,9 +6192,22 @@ bool Parser::rPostfixExpr(exprt &exp)
   }
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   __uuidof( expression )
   __uuidof( type )
+  This is a Visual Studio Extension.
 */  
 
 bool Parser::rMSCuuidof(exprt &expr)
@@ -5234,6 +6253,18 @@ bool Parser::rMSCuuidof(exprt &expr)
   set_location(expr, tk);
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   __if_exists ( identifier ) { token stream }
@@ -5284,6 +6315,18 @@ bool Parser::rMSC_if_existsExpr(exprt &expr)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool Parser::rMSC_if_existsStatement(codet &code)
 {
@@ -5337,6 +6380,18 @@ bool Parser::rMSC_if_existsStatement(codet &code)
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   __is_base_of ( base, derived )
   __is_convertible_to ( from, to )
@@ -5380,6 +6435,18 @@ bool Parser::rMSCTypePredicate(exprt &expr)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   primary.exp
@@ -5521,6 +6588,18 @@ bool Parser::rPrimaryExpr(exprt &exp)
   }
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   var.name : {'::'} name2 ('::' name2)*
 
@@ -5542,6 +6621,18 @@ bool Parser::rVarName(exprt &name)
   else
     return false;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool Parser::rVarNameCore(exprt &name)
 {
@@ -5657,6 +6748,18 @@ bool Parser::rVarNameCore(exprt &name)
   }
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool Parser::moreVarName()
 {
   if(lex.LookAhead(0)==TOK_SCOPE)
@@ -5668,6 +6771,18 @@ bool Parser::moreVarName()
 
   return false;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   template.args : '<' any* '>'
@@ -5750,6 +6865,18 @@ bool Parser::isTemplateArgs()
   return false;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   function.body  : compound.statement
                  | { asm }
@@ -5798,6 +6925,18 @@ bool Parser::rFunctionBody(cpp_declaratort &declarator)
   }
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   compound.statement
   : '{' (statement)* '}'
@@ -5842,6 +6981,18 @@ bool Parser::rCompoundStatement(codet &statement)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   statement
@@ -6109,6 +7260,18 @@ bool Parser::rStatement(codet &statement)
   }
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   if.statement
   : IF '(' comma.expression ')' statement { ELSE statement }
@@ -6157,6 +7320,18 @@ bool Parser::rIfStatement(codet &statement)
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   switch.statement
   : SWITCH '(' comma.expression ')' statement
@@ -6190,6 +7365,18 @@ bool Parser::rSwitchStatement(codet &statement)
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   while.statement
   : WHILE '(' comma.expression ')' statement
@@ -6222,6 +7409,18 @@ bool Parser::rWhileStatement(codet &statement)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   do.statement
@@ -6261,6 +7460,18 @@ bool Parser::rDoStatement(codet &statement)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   for.statement
@@ -6322,6 +7533,18 @@ bool Parser::rForStatement(codet &statement)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   try.statement
@@ -6409,6 +7632,18 @@ bool Parser::rTryStatement(codet &statement)
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool Parser::rMSC_tryStatement(codet &statement)
 {
   // These are for 'structured exception handling',
@@ -6464,6 +7699,18 @@ bool Parser::rMSC_tryStatement(codet &statement)
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool Parser::rMSC_leaveStatement(codet &statement)
 {
   // These are for 'structured exception handling',
@@ -6479,6 +7726,18 @@ bool Parser::rMSC_leaveStatement(codet &statement)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool Parser::rGCCAsmStatement(codet &statement)
 {
@@ -6567,6 +7826,18 @@ bool Parser::rGCCAsmStatement(codet &statement)
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool Parser::rMSCAsmStatement(codet &statement)
 {
   Token tk;
@@ -6631,6 +7902,18 @@ bool Parser::rMSCAsmStatement(codet &statement)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   expr.statement
@@ -6710,6 +7993,18 @@ bool Parser::rExprStatement(codet &statement)
   }
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool Parser::rCondition(exprt &statement)
 {
   cpp_token_buffert::post pos=lex.Save();
@@ -6734,6 +8029,18 @@ bool Parser::rCondition(exprt &statement)
     return true;
   }
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
   declaration.statement
@@ -6808,6 +8115,18 @@ bool Parser::rDeclarationStatement(codet &statement)
   }
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /*
   integral.decl.statement
   : decl.head integral.or.class.spec {cv.qualify} {declarators} ';'
@@ -6852,6 +8171,18 @@ bool Parser::rIntegralDeclStatement(
 
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
    other.decl.statement
@@ -6906,10 +8237,34 @@ bool Parser::rOtherDeclStatement(
   return true;
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool Parser::MaybeTypeNameOrClassTemplate(Token&)
 {
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void Parser::SkipTo(int token)
 {
