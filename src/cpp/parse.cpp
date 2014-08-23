@@ -20,19 +20,76 @@
 class new_scopet
 {
 public:
-  typedef enum { NAMESPACE, TAG, BLOCK } kindt;
+  typedef enum { MEMBER, FUNCTION, VARIABLE, TAG,
+                 NAMESPACE, TEMPLATE, BLOCK } kindt;
   kindt kind;
   
-  class identifiert
-  {
-  public:
-    typedef enum { MEMBER, FUNCTION, VARIABLE, TAG, NAMESPACE } kindt;
-    kindt kind;
-  };
-  
-  typedef std::map<irep_idt, identifiert> id_mapt;
+  typedef std::map<irep_idt, new_scopet> id_mapt;
   id_mapt id_map;
+  
+  void print(std::ostream &out) const
+  {
+    print_rec(out, 0);
+  }
+ 
+protected:
+  void print_rec(std::ostream &, unsigned indent) const;
 };
+
+class save_scopet
+{
+public:
+  inline save_scopet(new_scopet *&_scope):
+    scope_ptr(_scope), old_scope(_scope)
+  {
+  }
+  
+  inline ~save_scopet()
+  {
+    scope_ptr=old_scope;
+  }
+  
+protected:
+  new_scopet *&scope_ptr;
+  new_scopet *old_scope;
+};
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void new_scopet::print_rec(std::ostream &out, unsigned indent) const
+{
+  for(id_mapt::const_iterator
+      it=id_map.begin();
+      it!=id_map.end();
+      it++)
+  {
+    out << std::string(' ', indent) << it->first << ": ";
+
+    switch(it->second.kind)
+    {
+    case MEMBER: out << "MEMBER"; break;
+    case FUNCTION: out << "FUNCTION"; break;
+    case VARIABLE: out << "VARIABLE"; break;
+    case TAG: out << "TAG"; break;
+    case NAMESPACE: out << "NAMESPACE"; break;
+    case TEMPLATE: out << "TEMPLATE"; break;
+    case BLOCK: out << "BLOCK"; break;
+    }
+
+    out << "\n";
+    it->second.print_rec(out, indent+2);
+  }
+}
 
 class Parser
 {
@@ -41,6 +98,8 @@ public:
     lex(_cpp_parser.token_buffer),
     parser(_cpp_parser)
   {
+    root_scope.kind=new_scopet::NAMESPACE;
+    current_scope=&root_scope;
   }
 
   bool operator()();
@@ -50,6 +109,7 @@ protected:
   cpp_parsert &parser;
   
   new_scopet root_scope;
+  new_scopet *current_scope;
 
   enum DeclKind { kDeclarator, kArgDeclarator, kCastDeclarator };
   enum TemplateDeclKind { tdk_unknown, tdk_decl, tdk_instantiation,
@@ -686,9 +746,6 @@ bool Parser::rNamespaceSpec(cpp_namespace_spect &namespace_spec)
     namespace_spec.items().push_back(cpp_itemt());
     return rDefinition(namespace_spec.items().back());
   }
-
-  // unreachable
-  return true;
 }
 
 /*******************************************************************\
