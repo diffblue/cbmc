@@ -6778,9 +6778,19 @@ bool Parser::rVarNameCore(exprt &name)
 
     switch(lex.LookAhead(0))
     {
-    case TOK_IDENTIFIER:
+    case TOK_TEMPLATE:
+      // this may be a template member function, for example
       #ifdef DEBUG
       std::cout << "Parser::rVarNameCore 2\n";
+      #endif
+      lex.GetToken(tk);
+      // Skip template token, next will be identifier
+      if(lex.LookAhead(0)!=TOK_IDENTIFIER) return false;
+      break;
+    
+    case TOK_IDENTIFIER:
+      #ifdef DEBUG
+      std::cout << "Parser::rVarNameCore 3\n";
       #endif
 
       lex.GetToken(tk);
@@ -6792,7 +6802,7 @@ bool Parser::rVarNameCore(exprt &name)
       if(isTemplateArgs())
       {
         #ifdef DEBUG
-        std::cout << "Parser::rVarNameCore 3\n";
+        std::cout << "Parser::rVarNameCore 4\n";
         #endif
 
         irept args;
@@ -6808,7 +6818,7 @@ bool Parser::rVarNameCore(exprt &name)
 
     case TOK_SCOPE:
       #ifdef DEBUG
-      std::cout << "Parser::rVarNameCore 4\n";
+      std::cout << "Parser::rVarNameCore 5\n";
       #endif
 
       lex.GetToken(tk);
@@ -6818,7 +6828,7 @@ bool Parser::rVarNameCore(exprt &name)
 
     case '~':
       #ifdef DEBUG
-      std::cout << "Parser::rVarNameCore 5\n";
+      std::cout << "Parser::rVarNameCore 6\n";
       #endif
 
       lex.GetToken(tk);
@@ -6832,7 +6842,7 @@ bool Parser::rVarNameCore(exprt &name)
 
     case TOK_OPERATOR:
       #ifdef DEBUG
-      std::cout << "Parser::rVarNameCore 6\n";
+      std::cout << "Parser::rVarNameCore 7\n";
       #endif
 
       lex.GetToken(tk);
