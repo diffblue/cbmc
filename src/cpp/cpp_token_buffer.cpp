@@ -141,6 +141,7 @@ void cpp_token_buffert::read_token()
   #if 0
   kind=yycpplex();
   #else
+  ansi_c_parser.stack.clear();
   kind=yyansi_clex();
   tokens.back().text=yyansi_ctext;
   if(ansi_c_parser.stack.size()==1)
@@ -148,7 +149,6 @@ void cpp_token_buffert::read_token()
     tokens.back().data=ansi_c_parser.stack.front();
     tokens.back().line_no=ansi_c_parser.get_line_no();
     tokens.back().filename=ansi_c_parser.get_file();
-    ansi_c_parser.stack.pop_back();
   }  
   #endif
 
