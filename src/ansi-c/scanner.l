@@ -748,6 +748,9 @@ __decltype          { if(PARSER.cpp && PARSER.mode==ansi_c_parsert::GCC)
 "__stdcall"     { /* ignore */ }
 "_fastcall"     { /* ignore */ }
 "__fastcall"    { /* ignore */ }
+"__thiscall"    { /* ignore */ }
+"__clrcall"     { /* ignore */ }
+"__vectorcall"  { /* ignore */ }
 "__w64"         { /* ignore */ }
 
 "__const"       { loc(); return TOK_CONST; }
