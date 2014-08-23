@@ -628,6 +628,7 @@ bool Parser::isTypeSpecifier()
        || t==TOK_TYPENAME
        || t==TOK_TYPEOF
        || t==TOK_DECLTYPE
+       || t==TOK_MSC_UNDERLYING_TYPE
      )
     return true;
 
@@ -2277,6 +2278,32 @@ bool Parser::optIntegralTypeOrClassSpec(typet &p)
     if(lex.GetToken(tk)!=')') return false;
 
     p.add(ID_expr_arg).swap(expr);
+
+    return true;
+  }
+  else if(t==TOK_MSC_UNDERLYING_TYPE)
+  {
+    // A Visual Studio extension that returns the underlying
+    // type of an enum.
+    Token underlying_type_tk;
+    lex.GetToken(underlying_type_tk);
+
+    p=typet(ID_msc_underlying_type);
+    set_location(p, underlying_type_tk);
+
+    Token tk;
+    if(lex.GetToken(tk)!='(') return false;
+    
+    // the argument is always a type
+    
+    typet tname;
+
+    if(!rTypeName(tname))
+      return false;
+
+    if(lex.GetToken(tk)!=')') return false;
+
+    p.add(ID_type_arg).swap(tname);
 
     return true;
   }

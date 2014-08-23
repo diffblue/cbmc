@@ -662,6 +662,7 @@ __decltype          { if(PARSER.cpp && PARSER.mode==ansi_c_parsert::GCC)
 
 "__if_exists"       { loc(); return MSC_cpp_keyword(TOK_MSC_IF_EXISTS); }
 "__if_not_exists"   { loc(); return MSC_cpp_keyword(TOK_MSC_IF_NOT_EXISTS); }
+"__underlying_type" { loc(); return MSC_cpp_keyword(TOK_MSC_UNDERLYING_TYPE); }
 
 "["{ws}"repeatable" |
 "["{ws}"source_annotation_attribute" |
