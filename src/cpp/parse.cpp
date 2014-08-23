@@ -17,6 +17,23 @@
 #include <iostream>
 #endif
 
+class new_scopet
+{
+public:
+  typedef enum { NAMESPACE, TAG, BLOCK } kindt;
+  kindt kind;
+  
+  class identifiert
+  {
+  public:
+    typedef enum { MEMBER, FUNCTION, VARIABLE, TAG, NAMESPACE } kindt;
+    kindt kind;
+  };
+  
+  typedef std::map<irep_idt, identifiert> id_mapt;
+  id_mapt id_map;
+};
+
 class Parser
 {
 public:
@@ -31,6 +48,8 @@ public:
 protected:
   cpp_token_buffert &lex;
   cpp_parsert &parser;
+  
+  new_scopet root_scope;
 
   enum DeclKind { kDeclarator, kArgDeclarator, kCastDeclarator };
   enum TemplateDeclKind { tdk_unknown, tdk_decl, tdk_instantiation,
@@ -347,32 +366,28 @@ Function:
 */
 bool Parser::rDefinition(cpp_itemt &item)
 {
-  bool res;
-
   int t=lex.LookAhead(0);
 
   if(t==';')
-    res=rNullDeclaration(item.make_declaration());
+    return rNullDeclaration(item.make_declaration());
   else if(t==TOK_TYPEDEF)
-    res=rTypedef(item.make_declaration());
+    return rTypedef(item.make_declaration());
   else if(t==TOK_TEMPLATE)
-    res=rTemplateDecl(item.make_declaration());
+    return rTemplateDecl(item.make_declaration());
   else if(t==TOK_EXTERN && lex.LookAhead(1)==TOK_STRING)
-    res=rLinkageSpec(item.make_linkage_spec());
+    return rLinkageSpec(item.make_linkage_spec());
   else if(t==TOK_EXTERN && lex.LookAhead(1)==TOK_TEMPLATE)
-    res=rExternTemplateDecl(item.make_declaration());
+    return rExternTemplateDecl(item.make_declaration());
   else if(t==TOK_NAMESPACE)
-    res=rNamespaceSpec(item.make_namespace_spec());
+    return rNamespaceSpec(item.make_namespace_spec());
   else if(t==TOK_INLINE && lex.LookAhead(1)==TOK_NAMESPACE)
-    res=rNamespaceSpec(item.make_namespace_spec());
+    return rNamespaceSpec(item.make_namespace_spec());
   else if(t==TOK_USING)
-    res=rUsing(item.make_using());
+    return rUsing(item.make_using());
   else if(t==TOK_STATIC_ASSERT)
-    res=rStaticAssert(item.make_static_assert());
+    return rStaticAssert(item.make_static_assert());
   else
-    res=rDeclaration(item.make_declaration());
-
-  return res;
+    return rDeclaration(item.make_declaration());
 }
 
 /*******************************************************************\
