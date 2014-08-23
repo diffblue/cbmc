@@ -8,8 +8,9 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <cassert>
 
+#include <ansi-c/ansi_c_y.tab.h>
+
 #include "cpp_token_buffer.h"
-#include "tokens.h"
 
 /*******************************************************************\
 
