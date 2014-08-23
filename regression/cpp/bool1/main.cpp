@@ -1,14 +1,9 @@
-// Visual Studio does NOT have a built-in 'bool'
-
-#ifdef _MSC_VER
+// _Bool is not a C++ keyword
 
 typedef bool _Bool;
 
-#else
-
-#endif
-
-bool some_bool;
+_Bool some_bool;
+bool some_other_bool;
 
 int main()
 {
