@@ -317,7 +317,11 @@ void ansi_c_scanner_init()
 
 <GRAMMAR,GCC_ATTRIBUTE3>{
 "auto"		{ loc(); return TOK_AUTO; }
-"_Bool"		{ loc(); return TOK_BOOL; }
+"_Bool"		{ if(PARSER.cpp)
+                    return make_identifier();
+                  else
+                  { loc(); return TOK_BOOL; }
+                }
 "break"		{ loc(); return TOK_BREAK; }
 "case"		{ loc(); return TOK_CASE; }
 "char"		{ loc(); return TOK_CHAR; }
@@ -571,12 +575,7 @@ void ansi_c_scanner_init()
 /* C++ Keywords and Operators */
 %}
 
-bool                { // Visual Studio does NOT have a built-in 'bool'                    
-                      if(PARSER.mode==ansi_c_parsert::MSC)
-                        return make_identifier();
-                      else
-                        return cpp_keyword(TOK_BOOL);
-                    }
+bool                { return cpp_keyword(TOK_BOOL); }
 catch               { return cpp_keyword(TOK_CATCH); }
 class               { return cpp_keyword(TOK_CLASS); }
 constexpr           { return cpp_keyword(TOK_CONSTEXPR); } // C++11
