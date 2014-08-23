@@ -1,5 +1,5 @@
 SRC = cpp_id.cpp cpp_language.cpp expr2cpp.cpp cpp_parser.cpp \
-      cpp_lex.yy.cpp cpp_typecheck.cpp cpp_convert_type.cpp \
+      cpp_typecheck.cpp cpp_convert_type.cpp \
       cpp_typecheck_expr.cpp cpp_typecheck_code.cpp \
       cpp_typecheck_type.cpp parse.cpp cpp_parse_tree.cpp \
       cpp_token_buffer.cpp cpp_typecheck_fargs.cpp \
@@ -26,7 +26,7 @@ INCLUDES= -I ..
 include ../config.inc
 include ../common
 
-CLEANFILES = cpp$(LIBEXT) cpp_lex.yy.cpp cpp_y.tab.cpp.output
+CLEANFILES = cpp$(LIBEXT)
 
 all: cpp$(LIBEXT)
 
@@ -35,10 +35,4 @@ all: cpp$(LIBEXT)
 cpp$(LIBEXT): $(OBJ)
 	$(LINKLIB)
 
-cpp_lex.yy.cpp: scanner.l
-	$(LEX) -Pyycpp -o$@ scanner.l
-
-generated_files: cpp_lex.yy.cpp
-
-cpp_lex.yy$(OBJEXT): cpp_lex.yy.cpp
 

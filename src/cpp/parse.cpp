@@ -5,7 +5,8 @@
 #include <util/std_types.h>
 #include <util/i2string.h>
 
-#include "tokens.h"
+#include <ansi-c/ansi_c_y.tab.h>
+
 #include "cpp_token_buffer.h"
 #include "cpp_parser.h"
 #include "cpp_member_spec.h"
