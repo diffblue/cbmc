@@ -77,6 +77,5 @@ public:
 };
 
 extern cpp_parsert cpp_parser;
-void cpp_scanner_init();
 
 #endif
