@@ -571,7 +571,12 @@ void ansi_c_scanner_init()
 /* C++ Keywords and Operators */
 %}
 
-bool                { return cpp_keyword(TOK_BOOL); }
+bool                { // Visual Studio does NOT have a built-in 'bool'                    
+                      if(PARSER.mode==ansi_c_parsert::MSC)
+                        return make_identifier();
+                      else
+                        return cpp_keyword(TOK_BOOL);
+                    }
 catch               { return cpp_keyword(TOK_CATCH); }
 class               { return cpp_keyword(TOK_CLASS); }
 constexpr           { return cpp_keyword(TOK_CONSTEXPR); } // C++11
