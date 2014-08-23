@@ -2136,6 +2136,13 @@ bool Parser::optIntegralTypeOrClassSpec(typet &p)
   std::cout << "Parser::optIntegralTypeOrClassSpec 0\n";
   #endif // DEBUG
 
+  // This makes no sense, but is used in Visual Studio header files.
+  if(lex.LookAhead(0)==TOK_TYPENAME)
+  {
+    Token tk;
+    lex.GetToken(tk);
+  }
+
   is_integral=false;
   p.make_nil();
 
