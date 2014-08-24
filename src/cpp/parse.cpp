@@ -1146,7 +1146,7 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
 
       lex.GetToken(tk1);
       if(!rTypeName(default_type))
-          return false;
+        return false;
 
       declarator.value()=exprt(ID_type);
       declarator.value().type().swap(default_type);
