@@ -857,7 +857,8 @@ cpp_scopet &cpp_typecheckt::typecheck_template_parameters(
   cpp_scopes.go_to(template_scope);
 
   // put template parameters into this scope
-  template_typet::template_parameterst &parameters=type.template_parameters();
+  template_typet::template_parameterst &parameters=
+    type.template_parameters();
 
   unsigned anon_count=0;
 
@@ -886,13 +887,15 @@ cpp_scopet &cpp_typecheckt::typecheck_template_parameters(
       declarator.name()=cpp_namet();
       declarator.name().get_sub().push_back(name);
     }
-
+    
+    // is it a type or not?
     cpp_declarator_converter.is_typedef=declaration.get_bool(ID_is_type);
+
     cpp_declarator_converter.is_template_argument=true;
 
     // There might be a default type or value.
     // We store it for later, as it can't be typechecked now
-    // because of dependencies on earlier parameters!
+    // because of possible dependencies on earlier parameters!
     exprt default_value=declarator.value();
     declarator.value().make_nil();
 
