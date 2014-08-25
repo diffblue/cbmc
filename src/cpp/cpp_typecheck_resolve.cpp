@@ -1615,19 +1615,25 @@ exprt cpp_typecheck_resolvet::resolve(
 
     cpp_typecheck.show_instantiation_stack(cpp_typecheck.str);
     cpp_typecheck.err_location(location);
-    cpp_typecheck.str
-      << "symbol `"
-      << base_name << "' not found";
 
     if(qualified)
     {
+      cpp_typecheck.str
+        << "symbol `"
+        << base_name << "' not found";
+
       if(cpp_typecheck.cpp_scopes.current_scope().is_root_scope())
         cpp_typecheck.str << " in root scope";
       else
         cpp_typecheck.str << " in scope `"
-                          <<
-          cpp_typecheck.cpp_scopes.current_scope().prefix
+                          << cpp_typecheck.cpp_scopes.current_scope().prefix
                           << "'";
+    }
+    else
+    {
+      cpp_typecheck.str
+        << "symbol `"
+        << base_name << "' is unknown";
     }
 
     //cpp_typecheck.cpp_scopes.get_root_scope().print(std::cout);
