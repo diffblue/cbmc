@@ -49,7 +49,7 @@ protected:
     const cpp_typecheck_fargst &fargs,
     resolve_identifierst &identifiers);
     
-  exprt convert_template_argument(
+  exprt convert_template_parameter(
     const cpp_idt &id);
     
   exprt convert_identifier(
