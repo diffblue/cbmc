@@ -244,8 +244,8 @@ void template_mapt::build(
     {
       const template_parametert &param=template_parameters[i];
 
-      if(param.has_default_parameter())
-        instance.push_back(param.default_parameter());
+      if(param.has_default_argument())
+        instance.push_back(param.default_argument());
       else
         break;
     }
@@ -325,7 +325,7 @@ void template_mapt::build_unassigned(
       t_it!=template_parameters.end();
       t_it++)
   {
-    const exprt &t=*t_it;
+    const template_parametert &t=*t_it;
     
     if(t.id()==ID_type)
     {
@@ -367,7 +367,7 @@ cpp_template_args_tct template_mapt::build_template_args(
   
   for(unsigned i=0; i<template_parameters.size(); i++)
   {
-    const exprt &t=template_parameters[i];
+    const template_parametert &t=template_parameters[i];
     
     if(t.id()==ID_type)
     {
