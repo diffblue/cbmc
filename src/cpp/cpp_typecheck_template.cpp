@@ -891,7 +891,8 @@ cpp_scopet &cpp_typecheckt::typecheck_template_parameters(
     // is it a type or not?
     cpp_declarator_converter.is_typedef=declaration.get_bool(ID_is_type);
 
-    cpp_declarator_converter.is_template_argument=true;
+    // say it a template parameter
+    cpp_declarator_converter.is_template_parameter=true;
 
     // There might be a default type or value.
     // We store it for later, as it can't be typechecked now

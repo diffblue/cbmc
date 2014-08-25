@@ -305,7 +305,7 @@ exprt cpp_typecheck_resolvet::convert_identifier(
   const wantt want,
   const cpp_typecheck_fargst &fargs)
 {
-  if(identifier.id_class==cpp_scopet::TEMPLATE_ARGUMENT)
+  if(identifier.id_class==cpp_scopet::TEMPLATE_PARAMETER)
     return convert_template_argument(identifier);
 
   exprt e;
@@ -1907,8 +1907,8 @@ void cpp_typecheck_resolvet::guess_template_args(
           it++)
       {
         const cpp_idt &id=**it;
-        // template argument?
-        if(id.id_class==cpp_idt::TEMPLATE_ARGUMENT)
+        // template parameter?
+        if(id.id_class==cpp_idt::TEMPLATE_PARAMETER)
         {
           // see if unassigned
           exprt &e=cpp_typecheck.template_map.expr_map[id.identifier];
@@ -2011,7 +2011,7 @@ void cpp_typecheck_resolvet::guess_template_args(
           const cpp_idt &id=**it;
 
           // template argument?
-          if(id.id_class==cpp_idt::TEMPLATE_ARGUMENT)
+          if(id.id_class==cpp_idt::TEMPLATE_PARAMETER)
           {
             // see if unassigned
             typet &t=cpp_typecheck.template_map.type_map[id.identifier];
@@ -2497,10 +2497,10 @@ void cpp_typecheck_resolvet::filter_for_named_scopes(
       }
       #endif
     }
-    else if(id.id_class==cpp_scopet::TEMPLATE_ARGUMENT)
+    else if(id.id_class==cpp_scopet::TEMPLATE_PARAMETER)
     {
       // std::cout << "X4\n";
-      // a template argument may be a scope: it could
+      // a template parameter may evaluate to be a scope: it could
       // be instantiated with a class/struct/union/enum
       exprt e=cpp_typecheck.template_map.lookup(id.identifier);
 
