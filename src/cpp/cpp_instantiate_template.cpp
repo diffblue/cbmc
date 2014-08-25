@@ -296,7 +296,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
   std::cout << ">" << std::endl;
   #endif
 
-  // do we have args?
+  // do we have arguments?
   if(full_template_args.arguments().empty())
   {
     err_location(location);
@@ -308,7 +308,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
   // produce new symbol name
   std::string suffix=template_suffix(full_template_args);
   
-  // we need the template scope to see the parameters
+  // we need the template scope to see the template parameters
   cpp_scopet *template_scope=
     static_cast<cpp_scopet *>(cpp_scopes.id_map[template_symbol.name]);
 
@@ -324,8 +324,8 @@ const symbolt &cpp_typecheckt::instantiate_template(
   // produce new declaration
   cpp_declarationt new_decl=to_cpp_declaration(template_symbol.type);
 
-  // the new one is not a template any longer, but we remember the 
-  // template type
+  // The new one is not a template any longer, but we remember the 
+  // template type that was used.
   template_typet template_type=new_decl.template_type();
   new_decl.remove(ID_is_template);
   new_decl.remove(ID_template_type);
