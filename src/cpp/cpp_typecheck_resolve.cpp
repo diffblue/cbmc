@@ -257,7 +257,7 @@ void cpp_typecheck_resolvet::remove_duplicates(
 
 /*******************************************************************\
 
-Function: cpp_typecheck_resolvet::convert_template_argument
+Function: cpp_typecheck_resolvet::convert_template_parameter
 
 Inputs:
 
@@ -267,10 +267,10 @@ Purpose:
 
 \*******************************************************************/
 
-exprt cpp_typecheck_resolvet::convert_template_argument(
+exprt cpp_typecheck_resolvet::convert_template_parameter(
   const cpp_idt &identifier)
 {
-  // look up in template map
+  // look up the parameter in the template map
   exprt e=cpp_typecheck.template_map.lookup(identifier.identifier);
   
   if(e.is_nil() ||
@@ -306,7 +306,7 @@ exprt cpp_typecheck_resolvet::convert_identifier(
   const cpp_typecheck_fargst &fargs)
 {
   if(identifier.id_class==cpp_scopet::TEMPLATE_PARAMETER)
-    return convert_template_argument(identifier);
+    return convert_template_parameter(identifier);
 
   exprt e;
 
