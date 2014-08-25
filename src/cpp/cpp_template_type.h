@@ -14,29 +14,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_template_parameter.h"
 
-class template_parametert:public exprt
-{
-public:
-  template_parametert():exprt(ID_template_parameter)
-  {
-  }
-
-  inline exprt &default_parameter()
-  {
-    return static_cast<exprt &>(add(ID_C_default_value));
-  }
-
-  inline const exprt &default_parameter() const
-  {
-    return static_cast<const exprt &>(find(ID_C_default_value));
-  }
-  
-  bool has_default_parameter() const
-  {
-    return find(ID_C_default_value).is_not_nil();
-  }
-};
-
 class template_typet:public typet
 {
 public:
