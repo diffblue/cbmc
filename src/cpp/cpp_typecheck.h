@@ -132,7 +132,7 @@ protected:
   //
   // Templates
   //
-  void salvage_default_parameters(
+  void salvage_default_arguments(
     const template_typet &old_type,
     template_typet &new_type);
 
@@ -171,7 +171,8 @@ protected:
     const locationt &location,
     const symbolt &template_symbol,
     const cpp_template_args_non_tct &template_args);
-    
+
+  // template instantiations    
   class instantiationt
   {
   public:
