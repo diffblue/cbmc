@@ -888,7 +888,7 @@ cpp_scopet &cpp_typecheckt::typecheck_template_parameters(
       declarator.name().get_sub().push_back(name);
     }
 
-    #if 0
+    #if 1
     // The declarator needs to be just a name
     if(declarator.name().get_sub().size()!=1 ||
        declarator.name().get_sub().front().id()!=ID_name)
@@ -1015,7 +1015,7 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
   template_mapt old_template_map;
   old_template_map=template_map;
 
-  // check for default parameters
+  // check for default arguments
   for(unsigned i=0; i<parameters.size(); i++)
   {
     const template_parametert &parameter=parameters[i];
@@ -1080,13 +1080,28 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
         arg.swap(e);
       }
 
+      typet type=parameter.type();
+
+      // First check the parameter type (might have ealier
+      // type parameters in it). Needs to be checked in scope
+      // of template.
+      {
+        cpp_save_scopet cpp_saved_scope(cpp_scopes);
+        cpp_idt *template_scope=cpp_scopes.id_map[template_symbol.name];
+        assert(template_scope!=NULL);
+        cpp_scopes.go_to(*template_scope);
+        typecheck_type(type);
+      }
+      
+      // Now check the argument to match that.
       typecheck_expr(arg);
       simplify(arg, *this);
-      implicit_typecast(arg, parameter.type());
+      implicit_typecast(arg, type);
     }
     
-    // set right away -- this is for the benefit of default
-    // parameters
+    // Set right away -- this is for the benefit of default
+    // arguments and later parameters whose type might
+    // depend on an earlier parameter.
     
     template_map.set(parameter, arg);
   }
