@@ -1090,7 +1090,8 @@ void cpp_typecheckt::convert_template_declaration(
   // there are
   // 1) function templates
   // 2) class templates
-  // 3) members of class templates (static or methods)
+  // 3) template members of class templates (static or methods)
+  // 4) variable templates (C++14)
 
   if(declaration.is_class_template())
   {
@@ -1121,13 +1122,13 @@ void cpp_typecheckt::convert_template_declaration(
     typecheck_class_template(declaration);
     return;
   }
-  else // maybe function template, maybe class template member
+  else // maybe function template, maybe class template member, maye template variable
   {
     // there should be declarators in either case
     if(declaration.declarators().empty())
     {
       err_location(declaration);
-      throw "function template or class template member expected to have declarator";
+      throw "non-class template is expected to have a declarator";
     }
 
     // Is it function template specialization?
