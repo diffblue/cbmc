@@ -698,19 +698,10 @@ void cpp_typecheckt::convert_class_template_specialization(
   #endif
   
   {
-    // partial -- we typecheck
+    // partial specialization -- we typecheck
     declaration.partial_specialization_args()=template_args_non_tc;
     declaration.set_specialization_of(template_symbol.name);
 
-    // We can't typecheck arguments yet, they are used
-    // for guessing later. But we can check the number.
-    if(template_args_non_tc.arguments().size()!=
-       to_cpp_declaration(template_symbol.type).template_type().template_parameters().size())
-    {
-      err_location(cpp_name.location());
-      throw "template specialization with wrong number of arguments";
-    }    
-    
     typecheck_class_template(declaration);
   }
 }

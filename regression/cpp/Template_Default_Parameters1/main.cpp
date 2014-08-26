@@ -14,3 +14,6 @@ template<>
 struct p<long double>
 { typedef long double type; };
 
+int main()
+{
+}
