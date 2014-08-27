@@ -20,7 +20,7 @@ Date: 2012
                           abstract event
 \*******************************************************************/
 
-class abstract_eventt:public graph_nodet<empty_nodet>
+class abstract_eventt:public graph_nodet<empty_edget>
 {
 protected:
   bool unsafe_pair_lwfence_param(const abstract_eventt& next,
