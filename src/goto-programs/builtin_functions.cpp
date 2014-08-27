@@ -1320,7 +1320,7 @@ void goto_convertt::do_function_call_symbol(
     {
       side_effect_exprt rhs(ID_gcc_builtin_va_arg_next, list_arg.type());
       rhs.copy_to_operands(list_arg);
-      rhs.set("#va_arg_type", to_code_type(function.type()).return_type());
+      rhs.set(ID_C_va_arg_type, to_code_type(function.type()).return_type());
       goto_programt::targett t1=dest.add_instruction(ASSIGN);
       t1->location=function.location();
       t1->code=code_assignt(list_arg, rhs);
