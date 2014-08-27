@@ -292,12 +292,12 @@ void c_typecheck_baset::designator_enter(
   
   if(full_type.id()==ID_struct)
   {
-    const struct_union_typet &struct_type=to_struct_type(full_type);
+    const struct_typet &struct_type=to_struct_type(full_type);
 
     entry.size=struct_type.components().size();
     entry.subtype.make_nil();
 
-    for(struct_union_typet::componentst::const_iterator
+    for(struct_typet::componentst::const_iterator
         it=struct_type.components().begin();
         it!=struct_type.components().end();
         ++it)
@@ -890,11 +890,11 @@ exprt c_typecheck_baset::do_initializer_list(
     assert(result.operands().size()==
            to_struct_type(full_type).components().size());
 
-    const struct_union_typet::componentst &components=
+    const struct_typet::componentst &components=
       to_struct_type(full_type).components();
 
     exprt::operandst::const_iterator o_it=result.operands().begin();
-    for(struct_union_typet::componentst::const_iterator
+    for(struct_typet::componentst::const_iterator
         c_it=components.begin();
         c_it!=components.end();
         c_it++, ++o_it)
