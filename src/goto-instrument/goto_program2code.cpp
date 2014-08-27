@@ -61,10 +61,6 @@ void goto_program2codet::operator()()
   // find loops first
   build_loop_map();
 
-  // start with a fresh reverse tag map
-  reverse_tag_map.clear();
-  expanded_symbols.clear();
-
   // gather variable scope information
   build_dead_map();
 
@@ -2052,63 +2048,6 @@ void goto_program2codet::cleanup_code_ifthenelse(
 
 /*******************************************************************\
 
-Function: goto_program2codet::expand_reverse_tag_map
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
-
-void goto_program2codet::expand_reverse_tag_map(const irep_idt identifier)
-{
-  if(!expanded_symbols.insert(identifier).second)
-    return;
-
-  tag_mapt::const_iterator entry=tag_map.find(identifier);
-  if(entry==tag_map.end())
-    return;
-
-  reverse_tag_map.insert(std::make_pair(entry->second, entry->first));
-
-  const symbolt &symbol=symbol_table.lookup(identifier);
-  assert(symbol.is_type);
-  expand_reverse_tag_map(symbol.type);
-}
-
-/*******************************************************************\
-
-Function: goto_program2codet::expand_reverse_tag_map
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
-
-void goto_program2codet::expand_reverse_tag_map(const typet &type)
-{
-  if(type.id()==ID_symbol)
-    expand_reverse_tag_map(to_symbol_type(type).get_identifier());
-  else
-  {
-    find_symbols_sett syms;
-    find_type_symbols(type, syms);
-
-    for(find_symbols_sett::const_iterator
-        it=syms.begin();
-        it!=syms.end();
-        ++it)
-      expand_reverse_tag_map(*it);
-  }
-}
-
-/*******************************************************************\
-
 Function: goto_program2codet::cleanup_expr
 
 Inputs:
@@ -2121,8 +2060,6 @@ Purpose:
 
 void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
 {
-  expand_reverse_tag_map(expr.type());
-
   // we might have to do array -> pointer conversions
   if(no_typecast &&
      (expr.id()==ID_address_of || expr.id()==ID_member))
@@ -2154,62 +2091,6 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
 
     add_local_types(t);
     expr=typecast_exprt(expr, t);
-
-#if 0
-    irep_idt tag=t.get(ID_tag);
-    if(tag.empty()) tag=ID_anonymous;
-
-    std::pair<r_tag_mapt::const_iterator, r_tag_mapt::const_iterator>
-      reverse_tag_entry=reverse_tag_map.equal_range(tag);
-
-    for( ;
-        reverse_tag_entry.first!=reverse_tag_entry.second;
-        ++reverse_tag_entry.first)
-    {
-      symbol_typet new_type(reverse_tag_entry.first->second);
-      if(base_type_eq(t, new_type, ns))
-      {
-        if(expr.id()==ID_union &&
-           ns.follow(expr.type()).get_bool(ID_C_transparent_union) !=
-           ns.follow(new_type).get_bool(ID_C_transparent_union))
-          expr.type()=new_type;
-
-        expr.make_typecast(new_type);
-        add_local_types(new_type);
-
-        break;
-      }
-    }
-
-    if(reverse_tag_entry.first==reverse_tag_entry.second)
-    {
-      std::string sym_name=id2string(tag);
-      if(!t.location().get_function().empty())
-        sym_name=id2string(t.location().get_function())+"::"+sym_name;
-
-      if(t.id()!=ID_symbol &&
-          !symbol_table.has_symbol(sym_name))
-      {
-        symbolt t_s;
-        t_s.name=sym_name;
-        t_s.base_name=t.get(ID_tag);
-        t_s.location=expr.location();
-        t_s.type=t;
-        t_s.is_type=true;
-        t_s.is_macro=false;
-
-        if(!type_names_set.insert(t_s.name).second)
-          assert(false);
-        assert(!t_s.name.empty());
-        type_names.push_back(t_s.name);
-        if(symbol_table.add(t_s))
-          assert(false);
-      }
-
-      expr.make_typecast(t);
-      add_local_types(t);
-    }
-#endif
   }
   else if(expr.id()==ID_array ||
           expr.id()==ID_vector)

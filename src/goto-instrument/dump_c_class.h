@@ -86,23 +86,20 @@ protected:
   void convert_global_variable(
       const symbolt &symbol,
       std::ostream &os,
-      local_static_declst &local_static_decls,
-      const hash_map_cont<irep_idt, irep_idt, irep_id_hash> &original_tags);
+      local_static_declst &local_static_decls);
 
   void convert_function_declaration(
       const symbolt &symbol,
       const bool skip_main,
       std::ostream &os_decl,
       std::ostream &os_body,
-      local_static_declst &local_static_decls,
-      const hash_map_cont<irep_idt, irep_idt, irep_id_hash> &original_tags);
+      local_static_declst &local_static_decls);
 
   void insert_local_static_decls(
     code_blockt &b,
     const std::list<irep_idt> &local_static,
     local_static_declst &local_static_decls,
-    std::list<irep_idt> &type_decls,
-    const hash_map_cont<irep_idt, irep_idt, irep_id_hash> &original_tags);
+    std::list<irep_idt> &type_decls);
 
   void insert_local_type_decls(
     code_blockt &b,
@@ -113,7 +110,6 @@ protected:
   void cleanup_decl(
     code_declt &decl,
     std::list<irep_idt> &local_static,
-    std::list<irep_idt> &local_type_decls,
-    const hash_map_cont<irep_idt, irep_idt, irep_id_hash> &original_tags);
+    std::list<irep_idt> &local_type_decls);
 };
 
