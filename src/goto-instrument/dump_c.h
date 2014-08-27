@@ -13,11 +13,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 void dump_c(
   const goto_functionst &src,
+  const bool use_system_headers,
   const namespacet &ns,
   std::ostream &out);
 
 void dump_cpp(
   const goto_functionst &src,
+  const bool use_system_headers,
   const namespacet &ns,
   std::ostream &out);
 
