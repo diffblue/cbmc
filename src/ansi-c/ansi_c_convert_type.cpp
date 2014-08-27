@@ -480,7 +480,7 @@ void ansi_c_convert_typet::write(typet &type)
   {
     vector_typet new_type;
     new_type.size()=vector_size;
-    new_type.location()=vector_size.location();
+    new_type.add_source_location()=vector_size.location();
     new_type.subtype().swap(type);
     type=new_type;
   }
@@ -489,7 +489,7 @@ void ansi_c_convert_typet::write(typet &type)
   {
     // These take more or less arbitrary subtypes.
     complex_typet new_type;
-    new_type.location()=location;
+    new_type.add_source_location()=location;
     new_type.subtype()=type;
     type.swap(new_type);
   }

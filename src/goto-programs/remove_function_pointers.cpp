@@ -453,7 +453,7 @@ void remove_function_pointerst::remove_function_pointer(
   // We preserve the original dereferencing to possibly catch
   // further pointer-related errors.
   code_expressiont code_expression;
-  code_expression.location()=function.location();
+  code_expression.add_source_location()=function.location();
   code_expression.expression()=function;
   target->code.swap(code_expression);
   target->type=OTHER;

@@ -118,7 +118,7 @@ void interrupt(
       const locationt &location=original_instruction.location;
       
       code_function_callt isr_call;
-      isr_call.location()=location;
+      isr_call.add_source_location()=location;
       isr_call.function()=interrupt_handler;
       
       goto_programt::targett t_goto=i_it;      
@@ -151,7 +151,7 @@ void interrupt(
       const locationt &location=i_it->location;
       
       code_function_callt isr_call;
-      isr_call.location()=location;
+      isr_call.add_source_location()=location;
       isr_call.function()=interrupt_handler;
       
       t_goto->make_goto(t_orig);

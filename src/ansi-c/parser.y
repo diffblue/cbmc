@@ -369,7 +369,7 @@ offsetof_member_designator:
           init($$, ID_designated_initializer);
           stack($$).operands().resize(1);
           stack($$).op0().id(ID_member);
-          stack($$).op0().location()=stack($1).location();
+          stack($$).op0().add_source_location()=stack($1).location();
           stack($$).op0().set(ID_component_name, stack($1).get(ID_C_base_name));
         }
         | offsetof_member_designator '.' member_name
@@ -486,7 +486,7 @@ postfix_expression:
         | '(' type_name ')' '{' initializer_list_opt '}'
         {
           exprt tmp(ID_initializer_list);
-          tmp.location()=stack($4).location();
+          tmp.add_source_location()=stack($4).location();
           tmp.operands().swap(stack($5).operands());
           $$=$1;
           set($$, ID_typecast);
@@ -497,7 +497,7 @@ postfix_expression:
         {
           // same as above
           exprt tmp(ID_initializer_list);
-          tmp.location()=stack($4).location();
+          tmp.add_source_location()=stack($4).location();
           tmp.operands().swap(stack($5).operands());
           $$=$1;
           set($$, ID_typecast);

@@ -77,7 +77,7 @@ void goto_inlinet::parameter_assignments(
       goto_programt::targett decl=dest.add_instruction();
       decl->make_decl();
       decl->code=code_declt(symbol.symbol_expr());
-      decl->code.location()=location;
+      decl->code.add_source_location()=location;
       decl->location=location;
       decl->function=function_name; 
     }
@@ -132,7 +132,7 @@ void goto_inlinet::parameter_assignments(
 
       // adds an assignment of the actual parameter to the formal parameter
       code_assignt assignment(symbol_exprt(identifier, arg_type), actual);
-      assignment.location()=location;
+      assignment.add_source_location()=location;
 
       dest.add_instruction(ASSIGN);
       dest.instructions.back().location=location;
@@ -268,7 +268,7 @@ void replace_location(exprt &dest, const locationt &new_location)
     replace_location(*it, new_location);
 
   if(dest.find(ID_C_source_location).is_not_nil())
-    replace_location(dest.location(), new_location);
+    replace_location(dest.add_source_location(), new_location);
 }
 
 /*******************************************************************\
@@ -427,10 +427,10 @@ void goto_inlinet::expand_function_call(
     if(lhs.is_not_nil())
     {
       side_effect_expr_nondett rhs(lhs.type());
-      rhs.location()=target->location;
+      rhs.add_source_location()=target->location;
 
       code_assignt code(lhs, rhs);
-      code.location()=target->location;
+      code.add_source_location()=target->location;
     
       goto_programt::targett t=tmp.add_instruction(ASSIGN);
       t->location=target->location;

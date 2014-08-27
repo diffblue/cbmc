@@ -456,7 +456,7 @@ goto_programt::const_targett goto_program2codet::convert_instruction(
     case ASSERT:
       system_headers.insert("assert.h");
       dest.copy_to_operands(code_assertt(target->guard));
-      dest.operands().back().location().set_comment(
+      dest.operands().back().add_source_location().set_comment(
           target->location.get_comment());
       return target;
 
@@ -472,7 +472,7 @@ goto_programt::const_targett goto_program2codet::convert_instruction(
 
     case END_THREAD:
       dest.copy_to_operands(code_assumet(false_exprt()));
-      dest.operands().back().location().set_comment("END_THREAD");
+      dest.operands().back().add_source_location().set_comment("END_THREAD");
       return target;
 
     case ATOMIC_BEGIN:
@@ -529,7 +529,7 @@ void goto_program2codet::convert_labels(
     std::stringstream label;
     label << "__CPROVER_DUMP_L" << target->target_number;
     code_labelt l(label.str(), code_blockt());
-    l.location()=target->location;
+    l.add_source_location()=target->location;
     target_label=l.get_label();
     latest_block->move_to_operands(l);
     latest_block=&to_code_label(
@@ -549,7 +549,7 @@ void goto_program2codet::convert_labels(
     labels_in_use.insert(*it);
 
     code_labelt l(*it, code_blockt());
-    l.location()=target->location;
+    l.add_source_location()=target->location;
     latest_block->move_to_operands(l);
     latest_block=&to_code_label(
         to_code(latest_block->operands().back())).code();
@@ -1746,7 +1746,7 @@ goto_programt::const_targett goto_program2codet::convert_start_thread(
 
         code_labelt l(*it);
         l.code().swap(b);
-        l.location()=target->location;
+        l.add_source_location()=target->location;
         b.swap(l);
       }
 
@@ -1816,7 +1816,7 @@ goto_programt::const_targett goto_program2codet::convert_start_thread(
 
       code_labelt l(*it);
       l.code().swap(b);
-      l.location()=target->location;
+      l.add_source_location()=target->location;
       b.swap(l);
     }
 
@@ -2525,10 +2525,10 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
       const symbolt &symbol=ns.lookup(id);
       
       symbol_exprt symbol_expr(symbol.name, symbol.type);
-      symbol_expr.location()=expr.location();
+      symbol_expr.add_source_location()=expr.location();
       
       side_effect_exprt call(ID_function_call);
-      call.location()=expr.location();
+      call.add_source_location()=expr.location();
       call.operands().resize(2);
       call.op0()=symbol_expr;
       call.type()=expr.type();
@@ -3638,7 +3638,7 @@ void goto2sourcet::insert_local_type_decls(
     os_body << "/*";
 
     code_skipt skip;
-    skip.location().set_comment(os_body.str());
+    skip.add_source_location().set_comment(os_body.str());
     // another hack to ensure symbols inside types are seen
     skip.type()=type;
 

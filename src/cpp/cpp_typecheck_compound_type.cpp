@@ -446,7 +446,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
   component.set(ID_access, access);
   component.set(ID_base_name, base_name);
   component.set(ID_pretty_name, base_name);
-  component.location()=cpp_name.location();
+  component.add_source_location()=cpp_name.location();
 
   if(cpp_name.is_operator())
   {
@@ -613,7 +613,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
       vt_entry.set(ID_base_name, virtual_name);
       vt_entry.set(ID_pretty_name, virtual_name);
       vt_entry.set(ID_access, ID_public);
-      vt_entry.location() = symbol.location;
+      vt_entry.add_source_location() = symbol.location;
       virtual_table.components().push_back(vt_entry);
 
       // take care of overloading
@@ -1588,7 +1588,7 @@ void cpp_typecheckt::convert_anon_struct_union_member(
   component.set_base_name(base_name);
   component.set_pretty_name(base_name);
   component.set_anonymous(true);
-  component.location()=declaration.location();
+  component.add_source_location()=declaration.location();
 
   components.push_back(component);
   
@@ -1637,7 +1637,7 @@ bool cpp_typecheckt::get_component(
 
     exprt tmp(ID_member, component.type());
     tmp.set(ID_component_name, component.get_name());
-    tmp.location()=location;
+    tmp.add_source_location()=location;
     tmp.copy_to_operands(object);
 
     if(component.get_name()==component_name)
@@ -1672,7 +1672,7 @@ bool cpp_typecheckt::get_component(
          !component.get_bool("is_mutable"))
         member.type().set(ID_C_constant, true);
 
-      member.location() = location;
+      member.add_source_location() = location;
 
       return true; // component found
     }
@@ -1706,7 +1706,7 @@ bool cpp_typecheckt::get_component(
              !component.get_bool("is_mutable"))
             member.type().set(ID_C_constant, true);
 
-          member.location() = location;
+          member.add_source_location() = location;
           return true; // component found
         }
       }

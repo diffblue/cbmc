@@ -139,7 +139,7 @@ bool java_entry_point(
   // build call to main method
   
   code_function_callt call_main;
-  call_main.location()=symbol.location;
+  call_main.add_source_location()=symbol.location;
   call_main.function()=symbol.symbol_expr();
 
   const code_typet::parameterst &parameters=

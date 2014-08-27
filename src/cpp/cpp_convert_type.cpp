@@ -280,7 +280,7 @@ void cpp_convert_typet::read_function_type(const typet &type)
       if(declarator.is_nil())
       {
         parameter_expr=exprt(ID_parameter, declaration.type());
-        parameter_expr.location()=type_location;
+        parameter_expr.add_source_location()=type_location;
       }
       else
       {
@@ -298,7 +298,7 @@ void cpp_convert_typet::read_function_type(const typet &type)
 
         if(cpp_name.is_nil())
         {
-          new_parameter.location()=type_location;
+          new_parameter.add_source_location()=type_location;
         }
         else if(cpp_name.is_simple_name())
         {
@@ -306,7 +306,7 @@ void cpp_convert_typet::read_function_type(const typet &type)
           assert(!base_name.empty());
           new_parameter.set_identifier(base_name);
           new_parameter.set_base_name(base_name);
-          new_parameter.location()=cpp_name.location();
+          new_parameter.add_source_location()=cpp_name.location();
         }
         else
         {

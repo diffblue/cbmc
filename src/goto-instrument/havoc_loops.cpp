@@ -118,7 +118,7 @@ void havoc_loopst::build_havoc_code(
     t->function=loop_head->function;
     t->location=loop_head->location;
     t->code=code_assignt(lhs, rhs);
-    t->code.location()=loop_head->location;
+    t->code.add_source_location()=loop_head->location;
   }
 }
 

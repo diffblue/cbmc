@@ -97,7 +97,7 @@ codet cpp_typecheckt::cpp_constructor(
       object_tc.type().set("#constant", false);
       object_tc.set("#lvalue", true);
       side_effect_exprt assign("assign");
-      assign.location()=location;
+      assign.add_source_location()=location;
       assign.copy_to_operands(object_tc, op_tc);
       typecheck_side_effect_assignment(assign);
       new_code.expression()=assign;
@@ -113,19 +113,19 @@ codet cpp_typecheckt::cpp_constructor(
         exprt::operandst tmp_operands;
 
         exprt constant=from_integer(i, index_type());
-        constant.location()=location;
+        constant.add_source_location()=location;
 
         exprt index(ID_index);
         index.copy_to_operands(object);
         index.copy_to_operands(constant);
-        index.location()=location;
+        index.add_source_location()=location;
 
         if(!operands.empty())
         {
           exprt operand(ID_index);
           operand.copy_to_operands(operands.front());
           operand.copy_to_operands(constant);
-          operand.location()=location;
+          operand.add_source_location()=location;
           tmp_operands.push_back(operand);
         }
 
@@ -168,7 +168,7 @@ codet cpp_typecheckt::cpp_constructor(
       object_tc.type().set(ID_C_constant, false);
       object_tc.set(ID_C_lvalue, true);
       side_effect_exprt assign(ID_assign);
-      assign.location()=location;
+      assign.add_source_location()=location;
       assign.copy_to_operands(object_tc, operands_tc.front());
       typecheck_side_effect_assignment(assign);
       new_code.expression()=assign;
@@ -214,7 +214,7 @@ codet cpp_typecheckt::cpp_constructor(
       exprt member(ID_member, bool_typet());
       member.set(ID_component_name, component.get(ID_name));
       member.copy_to_operands(object_tc);
-      member.location() = location;
+      member.add_source_location() = location;
       member.set(ID_C_lvalue, object_tc.get_bool(ID_C_lvalue));
 
       exprt val=false_exprt();
@@ -223,7 +223,7 @@ codet cpp_typecheckt::cpp_constructor(
         val=true_exprt();
 
       side_effect_exprt assign(ID_assign);
-      assign.location()=location;
+      assign.add_source_location()=location;
       assign.move_to_operands(member,val);
       typecheck_side_effect_assignment(assign);
       code_expressiont code_exp;
@@ -266,7 +266,7 @@ codet cpp_typecheckt::cpp_constructor(
     cpp_name.get_sub().back().set(ID_C_source_location, location);
 
     side_effect_expr_function_callt function_call;
-    function_call.location()=location;
+    function_call.add_source_location()=location;
     function_call.function().swap(static_cast<exprt&>(cpp_name));
     function_call.arguments().reserve(operands_tc.size());
 
@@ -334,10 +334,10 @@ void cpp_typecheckt::new_temporary(
   // create temporary object
   exprt tmp_object_expr=exprt(ID_side_effect, type);
   tmp_object_expr.set(ID_statement, ID_temporary_object);
-  tmp_object_expr.location()= location;
+  tmp_object_expr.add_source_location()= location;
 
   exprt new_object(ID_new_object);
-  new_object.location() = tmp_object_expr.location();
+  new_object.add_source_location() = tmp_object_expr.location();
   new_object.set(ID_C_lvalue, true);
   new_object.type() = tmp_object_expr.type();
 

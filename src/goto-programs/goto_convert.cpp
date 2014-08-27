@@ -260,7 +260,7 @@ void goto_convertt::convert_label(
     // this is like a START_THREAD
     codet tmp_code(ID_start_thread);
     tmp_code.copy_to_operands(code.op0());
-    tmp_code.location()=code.location();
+    tmp_code.add_source_location()=code.location();
     convert(tmp_code, tmp);
   }
   else
@@ -595,12 +595,12 @@ void goto_convertt::convert_expression(
     // by compiling to if(c) t; else f;
     const if_exprt &if_expr=to_if_expr(expr);
     code_ifthenelset tmp_code;
-    tmp_code.location()=expr.location();
+    tmp_code.add_source_location()=expr.location();
     tmp_code.cond()=if_expr.cond();
     tmp_code.then_case()=code_expressiont(if_expr.true_case());
-    tmp_code.then_case().location()=expr.location();
+    tmp_code.then_case().add_source_location()=expr.location();
     tmp_code.else_case()=code_expressiont(if_expr.false_case());
-    tmp_code.else_case().location()=expr.location();
+    tmp_code.else_case().add_source_location()=expr.location();
     convert_ifthenelse(tmp_code, dest);
   }
   else
@@ -613,7 +613,7 @@ void goto_convertt::convert_expression(
     {
       codet tmp=code;
       tmp.op0()=expr;
-      tmp.location()=expr.location();
+      tmp.add_source_location()=expr.location();
       copy(tmp, OTHER, dest);
     }
   }
@@ -669,7 +669,7 @@ void goto_convertt::convert_decl(
     copy(tmp, DECL, dest);
 
     code_assignt assign(code.op0(), initializer);
-    assign.location()=tmp.location();
+    assign.add_source_location()=tmp.location();
 
     convert_assign(assign, dest);
   }
@@ -908,7 +908,7 @@ void goto_convertt::convert_cpp_delete(
   delete_call.function()=delete_symbol;
   delete_call.arguments().push_back(typecast_exprt(tmp_op, arg_type));
   delete_call.lhs().make_nil();
-  delete_call.location()=code.location();
+  delete_call.add_source_location()=code.location();
   
   convert(delete_call, dest);  
 }
@@ -1966,8 +1966,8 @@ void goto_convertt::convert_ifthenelse(
     code_ifthenelset new_if0, new_if1;
     new_if0.cond()=code.cond().op0();
     new_if1.cond()=code.cond().op1();
-    new_if0.location()=location;
-    new_if1.location()=location;
+    new_if0.add_source_location()=location;
+    new_if1.add_source_location()=location;
     new_if1.then_case()=code.then_case();
     new_if0.then_case()=new_if1;
     return convert_ifthenelse(new_if0, dest);
@@ -2429,7 +2429,7 @@ void goto_convertt::make_temp_symbol(
   code_assignt assignment;
   assignment.lhs()=new_symbol.symbol_expr();
   assignment.rhs()=expr;
-  assignment.location()=location;
+  assignment.add_source_location()=location;
 
   convert(assignment, dest);
 

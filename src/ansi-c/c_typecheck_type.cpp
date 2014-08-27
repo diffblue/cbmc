@@ -310,7 +310,7 @@ void c_typecheck_baset::typecheck_code_type(code_typet &type)
         if(identifier==irep_idt())
         {
           // abstract
-          parameter.location()=declaration.type().location();
+          parameter.add_source_location()=declaration.type().location();
         }
         else
         {
@@ -319,7 +319,7 @@ void c_typecheck_baset::typecheck_code_type(code_typet &type)
           // make visible now, later parameters might use it
           parameter_map[identifier]=type;
           parameter.set_base_name(declaration.declarator().get_base_name());
-          parameter.location()=declaration.declarator().location();
+          parameter.add_source_location()=declaration.declarator().location();
         }
         
         // put the parameter in place of the declaration
@@ -483,12 +483,12 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
       symbol_expr.type()=new_symbol.type;
       
       code_declt declaration(symbol_expr);
-      declaration.location()=location;
+      declaration.add_source_location()=location;
 
       code_assignt assignment;
       assignment.lhs()=symbol_expr;
       assignment.rhs()=size;
-      assignment.location()=location;
+      assignment.add_source_location()=location;
 
       // store the code
       clean_code.push_back(declaration);
@@ -711,7 +711,7 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
   }
 
   symbol_typet symbol_type;
-  symbol_type.location()=type.location();
+  symbol_type.add_source_location()=type.location();
   symbol_type.set_identifier(identifier);
 
   type.swap(symbol_type);
@@ -753,7 +753,7 @@ void c_typecheck_baset::typecheck_compound_body(symbolt &symbol)
     {
       struct_union_typet::componentt new_component;
       new_component.id(ID_static_assert);
-      new_component.location()=declaration.location();
+      new_component.add_source_location()=declaration.location();
       new_component.operands().swap(declaration.operands());
       assert(new_component.operands().size()==2);
       components.push_back(new_component);
@@ -771,7 +771,7 @@ void c_typecheck_baset::typecheck_compound_body(symbolt &symbol)
       {
         struct_union_typet::componentt new_component;
 
-        new_component.location()=d_it->location();
+        new_component.add_source_location()=d_it->location();
         new_component.set(ID_name, d_it->get_base_name());
         new_component.set(ID_pretty_name, d_it->get_base_name());
         new_component.type()=declaration.full_type(*d_it);
@@ -1168,7 +1168,7 @@ void c_typecheck_baset::typecheck_c_bit_field_type(typet &type)
     // We don't use bool, as it's really a byte long.
     type=unsignedbv_typet(1);
     type.set(ID_C_c_type, ID_bool);
-    type.location()=location;
+    type.add_source_location()=location;
   }
   else if(subtype.id()==ID_signedbv ||
           subtype.id()==ID_unsignedbv)
@@ -1184,7 +1184,7 @@ void c_typecheck_baset::typecheck_c_bit_field_type(typet &type)
     typet tmp(subtype);
     type.swap(tmp);
     type.set(ID_width, integer2string(i));
-    type.location()=location;
+    type.add_source_location()=location;
   }
   else if(subtype.id()==ID_c_enum)
   {
@@ -1200,7 +1200,7 @@ void c_typecheck_baset::typecheck_c_bit_field_type(typet &type)
     typet tmp=subtype;
     type.swap(tmp);
     type.subtype().set(ID_width, integer2string(i));
-    type.location()=location;
+    type.add_source_location()=location;
   }
   else
   {
@@ -1256,7 +1256,7 @@ void c_typecheck_baset::typecheck_typeof_type(typet &type)
     type.swap(expr.type());
   }
   
-  type.location()=location;
+  type.add_source_location()=location;
   c_qualifiers.write(type);
 }
 

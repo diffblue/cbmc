@@ -307,7 +307,7 @@ void cpp_typecheckt::static_and_dynamic_initialization()
     if(symbol.value.is_not_nil())
     {
       code_assignt code(symbol_expr, symbol.value);
-      code.location()=symbol.location;
+      code.add_source_location()=symbol.location;
 
       init_block.move_to_operands(code);
 
@@ -384,7 +384,7 @@ void cpp_typecheckt::do_not_typechecked()
         if(symbol.base_name =="operator=")
         {
           cpp_declaratort declarator;
-          declarator.location() = symbol.location;
+          declarator.add_source_location() = symbol.location;
           default_assignop_value(
             lookup(symbol.type.get(ID_C_member_name)), declarator);
           symbol.value.swap(declarator.value());

@@ -42,7 +42,7 @@ void adjust_float_expressions(
     symbol_exprt rounding_mode=
       ns.lookup(CPROVER_PREFIX "rounding_mode").symbol_expr();
       
-    rounding_mode.location()=expr.location();
+    rounding_mode.add_source_location()=expr.location();
   
     if(expr.id()==ID_plus || expr.id()==ID_minus ||
        expr.id()==ID_mult || expr.id()==ID_div)

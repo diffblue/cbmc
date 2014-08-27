@@ -283,7 +283,7 @@ exprt cpp_typecheck_resolvet::convert_template_parameter(
     throw 0;
   }
 
-  e.location()=location;
+  e.add_source_location()=location;
   
   return e;
 }
@@ -341,7 +341,7 @@ exprt cpp_typecheck_resolvet::convert_identifier(
       // There has to be an object.
       e=exprt(ID_member);
       e.set(ID_component_name, identifier.identifier);
-      e.location()=location;
+      e.add_source_location()=location;
 
       exprt object;
       object.make_nil();
@@ -370,7 +370,7 @@ exprt cpp_typecheck_resolvet::convert_identifier(
         object.type().set(ID_C_constant,
                           this_expr.type().subtype().get_bool(ID_C_constant));
         object.set(ID_C_lvalue, true);
-        object.location()=location;
+        object.add_source_location()=location;
       }
 
       // check if the member can be applied to the object
@@ -456,7 +456,7 @@ exprt cpp_typecheck_resolvet::convert_identifier(
     }
   }
   
-  e.location()=location;
+  e.add_source_location()=location;
 
   return e;
 }
@@ -1035,7 +1035,7 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
         symbol_typet instance=
           disambiguate_template_classes(final_base_name, id_set, template_args);
           
-        instance.location()=location;
+        instance.add_source_location()=location;
           
         // the "::" triggers template elaboration
         cpp_typecheck.elaborate_class_template(instance);
@@ -1334,7 +1334,7 @@ symbol_typet cpp_typecheck_resolvet::disambiguate_template_classes(
   }
 
   symbol_typet result(instance.name);
-  result.location()=location;
+  result.add_source_location()=location;
 
   return result;
   #else
@@ -1348,7 +1348,7 @@ symbol_typet cpp_typecheck_resolvet::disambiguate_template_classes(
       match.full_args);   
 
   symbol_typet result(instance.name);
-  result.location()=location;
+  result.add_source_location()=location;
 
   return result;  
   #endif
@@ -1560,13 +1560,13 @@ exprt cpp_typecheck_resolvet::resolve(
     if(base_name==ID_true)
     {
       exprt result=true_exprt();
-      result.location()=location;
+      result.add_source_location()=location;
       return result;
     }
     else if(base_name==ID_false)
     {
       exprt result=false_exprt();
-      result.location()=location;
+      result.add_source_location()=location;
       return result;
     }
     else if(base_name=="__nullptr" ||
@@ -1576,7 +1576,7 @@ exprt cpp_typecheck_resolvet::resolve(
       result.set_value(ID_NULL);
       result.type()=pointer_typet();
       result.type().subtype()=empty_typet();
-      result.location()=location;
+      result.add_source_location()=location;
       return result;
     }
     else if(base_name=="__func__" ||
@@ -1587,7 +1587,7 @@ exprt cpp_typecheck_resolvet::resolve(
       // __FUNCTION__ and __PRETTY_FUNCTION__ are GCC-specific
       string_constantt s;
       s.set_value(location.get_function());
-      s.location()=location;
+      s.add_source_location()=location;
       return s;
     }
   }
@@ -2293,7 +2293,7 @@ void cpp_typecheck_resolvet::apply_template_args(
         template_args_tc);
 
     expr=exprt(ID_type, symbol_typet(new_symbol.name));
-    expr.location()=location;
+    expr.add_source_location()=location;
   }
   else
   {
@@ -2326,7 +2326,7 @@ void cpp_typecheck_resolvet::apply_template_args(
         member_exprt member(code_type);
         member.set_component_name(new_symbol.name);
         member.struct_op()=*fargs.operands.begin();
-        member.location()=location;
+        member.add_source_location()=location;
         expr.swap(member);
         return;
       }
@@ -2334,7 +2334,7 @@ void cpp_typecheck_resolvet::apply_template_args(
     }
 
     expr=cpp_symbol_expr(new_symbol);
-    expr.location()=location;
+    expr.add_source_location()=location;
   }
 }
 

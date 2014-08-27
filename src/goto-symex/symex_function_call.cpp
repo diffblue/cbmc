@@ -308,7 +308,7 @@ void goto_symext::symex_function_call_code(
     if(call.lhs().is_not_nil())
     {
       side_effect_expr_nondett rhs(call.lhs().type());
-      rhs.location()=call.location();
+      rhs.add_source_location()=call.location();
       state.rename(rhs, ns, goto_symex_statet::L1);
       code_assignt code(call.lhs(), rhs);
       symex_assign(state, to_code_assign(code)); /* TODO: clean_expr? */

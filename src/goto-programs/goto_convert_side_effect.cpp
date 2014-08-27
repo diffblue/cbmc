@@ -132,13 +132,13 @@ void goto_convertt::remove_assignment(
       rhs.id(new_id);
       rhs.copy_to_operands(expr.op0(), expr.op1());
       rhs.type()=expr.op0().type();
-      rhs.location()=expr.location();
+      rhs.add_source_location()=expr.location();
     }
     
     exprt lhs=expr.op0();
     
     code_assignt assignment(lhs, rhs);
-    assignment.location()=expr.location();
+    assignment.add_source_location()=expr.location();
     
     convert(assignment, dest);
   }
@@ -182,6 +182,7 @@ void goto_convertt::remove_pre(
          statement==ID_predecrement);
 
   exprt rhs;
+  rhs.add_source_location()=expr.location();
 
   if(statement==ID_preincrement)
     rhs.id(ID_plus);
@@ -235,7 +236,7 @@ void goto_convertt::remove_pre(
   }
 
   code_assignt assignment(expr.op0(), rhs);
-  assignment.location()=expr.find_location();
+  assignment.add_source_location()=expr.find_location();
   
   convert(assignment, dest);
 
@@ -279,6 +280,7 @@ void goto_convertt::remove_post(
          statement==ID_postdecrement);
 
   exprt rhs;
+  rhs.add_source_location()=expr.location();
 
   if(statement==ID_postincrement)
     rhs.id(ID_plus);
@@ -332,7 +334,7 @@ void goto_convertt::remove_post(
   }
 
   code_assignt assignment(expr.op0(), rhs);
-  assignment.location()=expr.find_location();
+  assignment.add_source_location()=expr.find_location();
   
   convert(assignment, tmp2);
 
@@ -374,7 +376,7 @@ void goto_convertt::remove_function_call(
     code_function_callt call;
     call.function()=expr.op0();
     call.arguments()=expr.op1().operands();
-    call.location()=expr.location();
+    call.add_source_location()=expr.location();
     call.lhs().make_nil();
     convert_function_call(call, dest);
     expr.make_nil();
@@ -424,7 +426,7 @@ void goto_convertt::remove_function_call(
   {
     code_declt decl;
     decl.symbol()=new_symbol.symbol_expr();
-    decl.location()=new_symbol.location;
+    decl.add_source_location()=new_symbol.location;
     convert_decl(decl, dest);
   }
 
@@ -434,7 +436,7 @@ void goto_convertt::remove_function_call(
     call.lhs()=new_symbol.symbol_expr();
     call.function()=expr.op0();
     call.arguments()=expr.op1().operands();
-    call.location()=new_symbol.location;
+    call.add_source_location()=new_symbol.location;
     convert_function_call(call, dest);
   }
 
@@ -526,7 +528,7 @@ void goto_convertt::remove_cpp_delete(
   codet tmp;
   
   tmp.set_statement(expr.get_statement());
-  tmp.location()=expr.location();
+  tmp.add_source_location()=expr.location();
   tmp.copy_to_operands(expr.op0());
   tmp.set(ID_destructor, expr.find(ID_destructor));
 
@@ -680,20 +682,20 @@ void goto_convertt::remove_statement_expression(
     new_tmp_symbol(expr.type(), "statement_expression", dest, location);
     
   symbol_exprt tmp_symbol_expr(new_symbol.name, new_symbol.type);
-  tmp_symbol_expr.location()=location;
+  tmp_symbol_expr.add_source_location()=location;
 
   if(last.get(ID_statement)==ID_expression)
   {
     // we turn this into an assignment
     exprt e=to_code_expression(last).expression();
     last=code_assignt(tmp_symbol_expr, e);
-    last.location()=location;
+    last.add_source_location()=location;
   }
   else if(last.get(ID_statement)==ID_assign)
   {
     exprt e=to_code_assign(last).lhs();
     code_assignt assignment(tmp_symbol_expr, e);
-    assignment.location()=location;
+    assignment.add_source_location()=location;
     code.operands().push_back(assignment);
   }
   else
@@ -781,7 +783,7 @@ void goto_convertt::remove_side_effect(
     goto_programt::targett t=dest.add_instruction(THROW);
     t->code=code_expressiont(side_effect_expr_throwt(expr.find(ID_exception_list)));
     t->code.op0().operands().swap(expr.operands());
-    t->code.location()=expr.location();
+    t->code.add_source_location()=expr.location();
     t->location=expr.location();
  
     // the result can't be used, these are void

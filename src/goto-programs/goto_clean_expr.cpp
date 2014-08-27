@@ -56,14 +56,14 @@ symbol_exprt goto_convertt::make_compound_literal(
   // generate code for this.
 
   symbol_exprt result=symbol_ptr->symbol_expr();
-  result.location()=location;
+  result.add_source_location()=location;
 
   // The lifetime of compound literals is really that of
   // the block they are in.
   copy(code_declt(result), DECL, dest);
   
   code_assignt code_assign(result, expr);
-  code_assign.location()=location;
+  code_assign.add_source_location()=location;
   convert(code_assign, dest);
 
   // now create a 'dead' instruction
@@ -275,13 +275,13 @@ void goto_convertt::clean_expr(
       code_assignt assignment_true;
       assignment_true.lhs()=new_symbol.symbol_expr();
       assignment_true.rhs()=if_expr.true_case();
-      assignment_true.location()=location;
+      assignment_true.add_source_location()=location;
       convert(assignment_true, tmp_true);
 
       code_assignt assignment_false;
       assignment_false.lhs()=new_symbol.symbol_expr();
       assignment_false.rhs()=if_expr.false_case();
-      assignment_false.location()=location;
+      assignment_false.add_source_location()=location;
       convert(assignment_false, tmp_false);
 
       // overwrites expr
@@ -402,7 +402,7 @@ void goto_convertt::clean_expr(
         code_assignt assignment;
         assignment.lhs()=lhs;
         assignment.rhs()=expr.op1();
-        assignment.location()=expr.location();
+        assignment.add_source_location()=expr.location();
         convert_assign(assignment, dest);
 
         if(result_is_used)
@@ -561,7 +561,7 @@ void goto_convertt::remove_gcc_conditional_expression(
   if_expr.true_case()=expr.op0();
   if_expr.false_case()=expr.op1();
   if_expr.type()=expr.type();
-  if_expr.location()=expr.location();
+  if_expr.add_source_location()=expr.location();
 
   if(if_expr.cond().type()!=bool_typet())
     if_expr.cond().make_typecast(bool_typet());

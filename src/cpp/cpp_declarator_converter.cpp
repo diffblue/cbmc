@@ -305,7 +305,7 @@ void cpp_declarator_convertert::combine_types(
         {
           symbol_parameter.set_base_name(decl_parameter.get_base_name());
           symbol_parameter.set_identifier(decl_parameter.get_identifier());
-          symbol_parameter.location()=decl_parameter.location();
+          symbol_parameter.add_source_location()=decl_parameter.location();
         }
       }
 

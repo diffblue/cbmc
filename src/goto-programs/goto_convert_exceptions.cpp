@@ -114,7 +114,7 @@ void goto_convertt::convert_msc_leave(
       d--)
   {
     codet d_code=targets.destructor_stack[d-1];
-    d_code.location()=code.location();
+    d_code.add_source_location()=code.location();
     convert(d_code, dest);
   }
 
@@ -221,7 +221,7 @@ void goto_convertt::convert_CPROVER_try_catch(
   // now put 'catch' code onto destructor stack
   code_ifthenelset catch_code;
   catch_code.cond()=exception_flag();
-  catch_code.location()=code.location();
+  catch_code.add_source_location()=code.location();
   catch_code.then_case()=to_code(code.op1());
 
   targets.destructor_stack.push_back(catch_code);
@@ -284,7 +284,7 @@ void goto_convertt::convert_CPROVER_throw(
         d_it++)
     {
       codet d_code=*d_it;
-      d_code.location()=code.location();
+      d_code.add_source_location()=code.location();
       convert(d_code, dest);
     }
 
@@ -389,7 +389,7 @@ void goto_convertt::unwind_destructor_stack(
   while(targets.destructor_stack.size()>stack_size)
   {
     codet d_code=targets.destructor_stack.back();
-    d_code.location()=location;
+    d_code.add_source_location()=location;
     
     // pop now to avoid doing this again
     targets.destructor_stack.pop_back();

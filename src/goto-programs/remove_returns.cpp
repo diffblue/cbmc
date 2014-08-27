@@ -224,10 +224,10 @@ void remove_returnst::do_function_calls(
         if(function_call.lhs().is_not_nil())
         {
           exprt rhs=side_effect_expr_nondett(function_call.lhs().type());
-          rhs.location()=i_it->location;
+          rhs.add_source_location()=i_it->location;
 
           code_assignt code(function_call.lhs(), rhs);
-          code.location()=i_it->location;
+          code.add_source_location()=i_it->location;
 
           goto_programt::targett t=tmp.add_instruction(ASSIGN);
           t->location=i_it->location;

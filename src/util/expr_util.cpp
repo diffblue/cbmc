@@ -380,7 +380,7 @@ exprt is_not_zero(
   assert(zero.is_not_nil());
 
   binary_exprt comparison(src, id, zero, bool_typet());
-  comparison.location()=src.location();
+  comparison.add_source_location()=src.location();
   
   return comparison;
 }

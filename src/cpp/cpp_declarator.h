@@ -20,14 +20,14 @@ public:
   {
     value().make_nil();
     name().make_nil();
-    location().make_nil();
+    add_source_location().make_nil();
   }
   
   explicit cpp_declaratort(const typet &type):exprt(ID_cpp_declarator, type)
   {
     value().make_nil();
     name().make_nil();
-    location().make_nil();
+    add_source_location().make_nil();
   }
   
   cpp_namet &name() { return static_cast<cpp_namet &>(add(ID_name)); }

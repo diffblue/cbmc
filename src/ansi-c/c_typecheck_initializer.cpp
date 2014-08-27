@@ -490,7 +490,7 @@ void c_typecheck_baset::do_designated_initializer(
         // Build a union expression from given component.
         union_exprt union_expr(type);
         union_expr.op()=zero_initializer(component.type(), value.location(), *this, get_message_handler());
-        union_expr.location()=value.location();
+        union_expr.add_source_location()=value.location();
         union_expr.set_component_name(component.get_name());
         *dest=union_expr;
       }
@@ -547,7 +547,7 @@ void c_typecheck_baset::do_designated_initializer(
 
         union_exprt union_expr(type);
         union_expr.op()=zero_initializer(component.type(), value.location(), *this, get_message_handler());
-        union_expr.location()=value.location();
+        union_expr.add_source_location()=value.location();
         union_expr.set_component_name(component.get_name());
         *dest=union_expr;
       }
@@ -857,7 +857,7 @@ exprt c_typecheck_baset::do_initializer_list(
     {
       // start with empty array
       result=exprt(ID_array, full_type);
-      result.location()=value.location();
+      result.add_source_location()=value.location();
     }
     else
     {

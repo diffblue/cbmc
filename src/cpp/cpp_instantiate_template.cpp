@@ -179,7 +179,7 @@ const symbolt &cpp_typecheckt::class_template_symbol(
   new_symbol.location=template_symbol.location;
   new_symbol.type=typet(ID_incomplete_struct);
   new_symbol.type.set(ID_template_class_instance, true);
-  new_symbol.type.location()=template_symbol.location;
+  new_symbol.type.add_source_location()=template_symbol.location;
   new_symbol.type.set("specialization_template_args", specialization_template_args);
   new_symbol.type.set("full_template_args", full_template_args);
   new_symbol.type.set(ID_identifier, template_symbol.name);
@@ -423,7 +423,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
       if(declaration_type.id()==ID_struct)
       {
         declaration_type=specialization;
-        declaration_type.location()=location;
+        declaration_type.add_source_location()=location;
       }
       else
       {

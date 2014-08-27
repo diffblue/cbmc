@@ -240,7 +240,7 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
     subtypes[1].remove(ID_C_restricted);
     
     expr.make_bool(gcc_types_compatible_p(subtypes[0], subtypes[1]));
-    expr.location()=location;
+    expr.add_source_location()=location;
   }
   else if(expr.id()==ID_builtin_offsetof)
     typecheck_expr_builtin_offsetof(expr);
@@ -323,7 +323,7 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
       {
         // __imag__ x is simply a zero constant
         exprt result=gen_zero(op_type);
-        result.location()=expr.location();
+        result.add_source_location()=expr.location();
         expr=result;
       }
     }
@@ -467,9 +467,9 @@ void c_typecheck_baset::typecheck_expr_builtin_va_arg(exprt &expr)
 
   // turn into function call
   side_effect_expr_function_callt result;
-  result.location()=expr.location();
+  result.add_source_location()=expr.location();
   result.function()=symbol_exprt(ID_gcc_builtin_va_arg);
-  result.function().location()=expr.location();
+  result.function().add_source_location()=expr.location();
   result.function().type()=new_type;
   result.arguments().push_back(arg);
   result.type()=new_type.return_type();
@@ -681,7 +681,7 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
   // We make an effort to produce a constant,
   // but this may depend on variables
   simplify(result, *this);
-  result.location()=expr.location();
+  result.add_source_location()=expr.location();
 
   expr.swap(result);
 }
@@ -756,7 +756,7 @@ void c_typecheck_baset::typecheck_expr_operands(exprt &expr)
     }
     
     code_declt decl;
-    decl.location()=declaration.location();
+    decl.add_source_location()=declaration.location();
     decl.symbol()=symbol_expr(symbol);
 
     expr.op0()=decl;    
@@ -829,14 +829,14 @@ void c_typecheck_baset::typecheck_expr_symbol(exprt &expr)
     expr=symbol.value;
 
     // put it back
-    expr.location()=location;
+    expr.add_source_location()=location;
   }
   else if(has_prefix(id2string(identifier), CPROVER_PREFIX "constant_infinity"))
   {
     expr=infinity_exprt(symbol.type);
 
     // put it back
-    expr.location()=location;
+    expr.add_source_location()=location;
   }
   else if(identifier=="c::__func__" ||
           identifier=="c::__FUNCTION__" ||
@@ -845,7 +845,7 @@ void c_typecheck_baset::typecheck_expr_symbol(exprt &expr)
     // __func__ is an ANSI-C standard compliant hack to get the function name
     // __FUNCTION__ and __PRETTY_FUNCTION__ are GCC-specific
     string_constantt s(location.get_function());
-    s.location()=location;
+    s.add_source_location()=location;
     s.set(ID_C_lvalue, true);
     expr.swap(s);
   }
@@ -854,7 +854,7 @@ void c_typecheck_baset::typecheck_expr_symbol(exprt &expr)
     expr=symbol.symbol_expr();
 
     // put it back
-    expr.location()=location;
+    expr.add_source_location()=location;
 
     if(symbol.is_lvalue)
       expr.set(ID_C_lvalue, true);
@@ -864,7 +864,7 @@ void c_typecheck_baset::typecheck_expr_symbol(exprt &expr)
       exprt tmp(ID_address_of, pointer_typet());
       tmp.set("#implicit", true);
       tmp.type().subtype()=expr.type();
-      tmp.location()=expr.location();
+      tmp.add_source_location()=expr.location();
       tmp.move_to_operands(expr);
       expr.swap(tmp);
     }
@@ -926,7 +926,7 @@ void c_typecheck_baset::typecheck_side_effect_statement_expression(
 
     sideeffect.function()=fc.function();
     sideeffect.arguments()=fc.arguments();
-    sideeffect.location()=fc.location();
+    sideeffect.add_source_location()=fc.location();
 
     sideeffect.type()=
       static_cast<const typet &>(fc.function().type().find(ID_return_type));
@@ -936,18 +936,18 @@ void c_typecheck_baset::typecheck_side_effect_statement_expression(
     if(fc.lhs().is_nil())
     {
       codet code_expr(ID_expression);
-      code_expr.location() = fc.location();
+      code_expr.add_source_location() = fc.location();
       code_expr.move_to_operands(sideeffect);
       last.swap(code_expr);
     }
     else
     {
       codet code_expr(ID_expression);
-      code_expr.location() = fc.location();
+      code_expr.add_source_location() = fc.location();
 
       exprt assign(ID_side_effect);
       assign.set(ID_statement, ID_assign);
-      assign.location()=fc.location();
+      assign.add_source_location()=fc.location();
       assign.move_to_operands(fc.lhs(), sideeffect);
       assign.type()=assign.op1().type();
 
@@ -1056,7 +1056,7 @@ void c_typecheck_baset::typecheck_expr_alignof(exprt &expr)
   mp_integer a=alignment(argument_type, *this);
   
   exprt tmp=from_integer(a, size_type());
-  tmp.location()=expr.location();
+  tmp.add_source_location()=expr.location();
   
   expr.swap(tmp);
 }
@@ -1134,7 +1134,7 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
       {
         // found! build union constructor
         union_exprt union_expr(expr.type());
-        union_expr.location()=expr.location();
+        union_expr.add_source_location()=expr.location();
         union_expr.op()=op;
         union_expr.set_component_name(it->get_name());
         expr=union_expr;
@@ -1265,7 +1265,7 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
     // we replace (_Bool)x by x!=0; use ieee_float_notequal for floats
     locationt l=expr.location();
     expr=is_not_zero(expr.op0(), *this);
-    expr.location()=l;
+    expr.add_source_location()=l;
     return;
   }
 
@@ -1609,7 +1609,7 @@ void c_typecheck_baset::typecheck_expr_ptrmember(exprt &expr)
 
   exprt deref(ID_dereference);
   deref.move_to_operands(expr.op0());
-  deref.location()=expr.location();
+  deref.add_source_location()=expr.location();
 
   typecheck_expr_dereference(deref);
 
@@ -1843,7 +1843,7 @@ void c_typecheck_baset::typecheck_side_effect_gcc_conditional_expression(
   if_expr.cond()=operands[0];
   if_expr.true_case()=operands[0];
   if_expr.false_case()=operands[1];
-  if_expr.location()=expr.location();
+  if_expr.add_source_location()=expr.location();
 
   typecheck_expr_trinary(if_expr);
 
@@ -2001,7 +2001,7 @@ void c_typecheck_baset::typecheck_expr_function_identifier(exprt &expr)
     exprt tmp(ID_address_of, pointer_typet());
     tmp.set(ID_C_implicit, true);
     tmp.type().subtype()=expr.type();
-    tmp.location()=expr.location();
+    tmp.add_source_location()=expr.location();
     tmp.move_to_operands(expr);
     expr.swap(tmp);
   }
@@ -2185,7 +2185,7 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
   {
     exprt tmp(ID_dereference, f_op_type.subtype());
     tmp.set(ID_C_implicit, true);
-    tmp.location()=f_op.location();
+    tmp.add_source_location()=f_op.location();
     tmp.move_to_operands(f_op);
     f_op.swap(tmp);
   }
@@ -2237,7 +2237,7 @@ void c_typecheck_baset::do_special_functions(
       }
 
       exprt same_object_expr=same_object(expr.arguments()[0], expr.arguments()[1]);
-      same_object_expr.location()=location;
+      same_object_expr.add_source_location()=location;
       expr.swap(same_object_expr);
     }
     else if(identifier==CPROVER_PREFIX "invalid_pointer")
@@ -2250,7 +2250,7 @@ void c_typecheck_baset::do_special_functions(
 
       predicate_exprt same_object_expr(ID_invalid_pointer);
       same_object_expr.operands()=expr.arguments();
-      same_object_expr.location()=location;
+      same_object_expr.add_source_location()=location;
       expr.swap(same_object_expr);
     }
     else if(identifier==CPROVER_PREFIX "buffer_size")
@@ -2263,7 +2263,7 @@ void c_typecheck_baset::do_special_functions(
 
       exprt buffer_size_expr("buffer_size", size_type());
       buffer_size_expr.operands()=expr.arguments();
-      buffer_size_expr.location()=location;
+      buffer_size_expr.add_source_location()=location;
       expr.swap(buffer_size_expr);
     }
     else if(identifier==CPROVER_PREFIX "is_zero_string")
@@ -2277,7 +2277,7 @@ void c_typecheck_baset::do_special_functions(
       predicate_exprt is_zero_string_expr("is_zero_string");
       is_zero_string_expr.operands()=expr.arguments();
       is_zero_string_expr.set(ID_C_lvalue, true); // make it an lvalue
-      is_zero_string_expr.location()=location;
+      is_zero_string_expr.add_source_location()=location;
       expr.swap(is_zero_string_expr);
     }
     else if(identifier==CPROVER_PREFIX "zero_string_length")
@@ -2291,7 +2291,7 @@ void c_typecheck_baset::do_special_functions(
       exprt zero_string_length_expr("zero_string_length", size_type());
       zero_string_length_expr.operands()=expr.arguments();
       zero_string_length_expr.set(ID_C_lvalue, true); // make it an lvalue
-      zero_string_length_expr.location()=location;
+      zero_string_length_expr.add_source_location()=location;
       expr.swap(zero_string_length_expr);
     }
     else if(identifier==CPROVER_PREFIX "DYNAMIC_OBJECT")
@@ -2301,7 +2301,7 @@ void c_typecheck_baset::do_special_functions(
 
       exprt dynamic_object_expr=exprt(ID_dynamic_object, expr.type());
       dynamic_object_expr.operands()=expr.arguments();
-      dynamic_object_expr.location()=location;
+      dynamic_object_expr.add_source_location()=location;
       expr.swap(dynamic_object_expr);
     }
     else if(identifier==CPROVER_PREFIX "POINTER_OFFSET")
@@ -2311,7 +2311,7 @@ void c_typecheck_baset::do_special_functions(
 
       exprt pointer_offset_expr=exprt(ID_pointer_offset, expr.type());
       pointer_offset_expr.operands()=expr.arguments();
-      pointer_offset_expr.location()=location;
+      pointer_offset_expr.add_source_location()=location;
       expr.swap(pointer_offset_expr);
     }
     else if(identifier==CPROVER_PREFIX "POINTER_OBJECT")
@@ -2321,7 +2321,7 @@ void c_typecheck_baset::do_special_functions(
 
       exprt pointer_object_expr=exprt(ID_pointer_object, expr.type());
       pointer_object_expr.operands()=expr.arguments();
-      pointer_object_expr.location()=location;
+      pointer_object_expr.add_source_location()=location;
       expr.swap(pointer_object_expr);
     }
     else if(identifier==CPROVER_PREFIX "isnanf" || 
@@ -2337,7 +2337,7 @@ void c_typecheck_baset::do_special_functions(
 
       exprt isnan_expr(ID_isnan, bool_typet());
       isnan_expr.operands()=expr.arguments();
-      isnan_expr.location()=location;
+      isnan_expr.add_source_location()=location;
       expr.swap(isnan_expr);
     }
     else if(identifier==CPROVER_PREFIX "isfinitef" ||
@@ -2352,7 +2352,7 @@ void c_typecheck_baset::do_special_functions(
 
       exprt isfinite_expr(ID_isfinite, bool_typet());
       isfinite_expr.operands()=expr.arguments();
-      isfinite_expr.location()=location;
+      isfinite_expr.add_source_location()=location;
       expr.swap(isfinite_expr);
     }
     else if(identifier==CPROVER_PREFIX "inf" ||
@@ -2360,14 +2360,14 @@ void c_typecheck_baset::do_special_functions(
     {
       constant_exprt inf_expr=
         ieee_floatt::plus_infinity(ieee_float_spect::double_precision()).to_expr();
-      inf_expr.location()=location;
+      inf_expr.add_source_location()=location;
       expr.swap(inf_expr);
     }
     else if(identifier==CPROVER_PREFIX "inff")
     {
       constant_exprt inff_expr=
         ieee_floatt::plus_infinity(ieee_float_spect::single_precision()).to_expr();
-      inff_expr.location()=location;
+      inff_expr.add_source_location()=location;
       expr.swap(inff_expr);
     }
     else if(identifier==CPROVER_PREFIX "infl")
@@ -2375,7 +2375,7 @@ void c_typecheck_baset::do_special_functions(
       floatbv_typet type=to_floatbv_type(long_double_type());
       constant_exprt infl_expr=
         ieee_floatt::plus_infinity(ieee_float_spect(type)).to_expr();
-      infl_expr.location()=location;
+      infl_expr.add_source_location()=location;
       expr.swap(infl_expr);
     }
     else if(identifier==CPROVER_PREFIX "abs" ||
@@ -2392,7 +2392,7 @@ void c_typecheck_baset::do_special_functions(
 
       exprt abs_expr(ID_abs, expr.type());
       abs_expr.operands()=expr.arguments();
-      abs_expr.location()=location;
+      abs_expr.add_source_location()=location;
       expr.swap(abs_expr);
     }
     else if(identifier==CPROVER_PREFIX "malloc")
@@ -2405,7 +2405,7 @@ void c_typecheck_baset::do_special_functions(
 
       exprt malloc_expr=side_effect_exprt(ID_malloc);
       malloc_expr.type()=expr.type();
-      malloc_expr.location()=location;
+      malloc_expr.add_source_location()=location;
       malloc_expr.operands()=expr.arguments();
       expr.swap(malloc_expr);
     }
@@ -2422,7 +2422,7 @@ void c_typecheck_baset::do_special_functions(
 
       exprt isinf_expr(ID_isinf, bool_typet());
       isinf_expr.operands()=expr.arguments();
-      isinf_expr.location()=location;
+      isinf_expr.add_source_location()=location;
       expr.swap(isinf_expr);
     }
     else if(identifier==CPROVER_PREFIX "isnormalf" ||
@@ -2437,7 +2437,7 @@ void c_typecheck_baset::do_special_functions(
 
       exprt isnormal_expr(ID_isnormal, bool_typet());
       isnormal_expr.operands()=expr.arguments();
-      isnormal_expr.location()=location;
+      isnormal_expr.add_source_location()=location;
       expr.swap(isnormal_expr);
     }
     else if(identifier==CPROVER_PREFIX "signf" ||            
@@ -2453,7 +2453,7 @@ void c_typecheck_baset::do_special_functions(
 
       exprt sign_expr(ID_sign, bool_typet());
       sign_expr.operands()=expr.arguments();
-      sign_expr.location()=location;
+      sign_expr.add_source_location()=location;
       expr.swap(sign_expr);
     }
     else if(identifier==CPROVER_PREFIX "equal")
@@ -2466,7 +2466,7 @@ void c_typecheck_baset::do_special_functions(
       
       equal_exprt equality_expr;
       equality_expr.operands()=expr.arguments();
-      equality_expr.location()=location;
+      equality_expr.add_source_location()=location;
       
       if(!base_type_eq(equality_expr.lhs().type(),
                        equality_expr.rhs().type(), *this))
@@ -2528,12 +2528,12 @@ void c_typecheck_baset::do_special_functions(
       if(arg1==0 || arg1==1)
       {
         tmp=from_integer(-1, size_type());
-        tmp.location()=f_op.location();
+        tmp.add_source_location()=f_op.location();
       }
       else
       {
         tmp=from_integer(0, size_type());
-        tmp.location()=f_op.location();
+        tmp.add_source_location()=f_op.location();
       }
       
       tmp.swap(expr);
@@ -2593,7 +2593,7 @@ void c_typecheck_baset::do_special_functions(
         is_constant=tmp1.is_constant();
       
       exprt tmp2=from_integer(is_constant, expr.type());
-      tmp2.location()=location;
+      tmp2.add_source_location()=location;
       expr.swap(tmp2);
     }
     else if(identifier=="c::__builtin_classify_type")
@@ -2611,7 +2611,7 @@ void c_typecheck_baset::do_special_functions(
       unsigned type_number=1;
       
       exprt tmp=from_integer(type_number, expr.type());
-      tmp.location()=location;
+      tmp.add_source_location()=location;
       expr.swap(tmp);
     }
     else if(identifier==CPROVER_PREFIX "float_debug1" ||
@@ -2628,7 +2628,7 @@ void c_typecheck_baset::do_special_functions(
         "float_debug1":"float_debug2";
       exprt float_debug_expr(id, expr.type());
       float_debug_expr.operands()=expr.arguments();
-      float_debug_expr.location()=location;
+      float_debug_expr.add_source_location()=location;
       expr.swap(float_debug_expr);
     }
     else if(identifier=="c::__sync_fetch_and_add" ||
