@@ -18,14 +18,14 @@ public:
   {
   }
   
-  locationt &location()
+  source_locationt &location()
   {
-    return static_cast<locationt &>(add(ID_C_location));
+    return static_cast<source_locationt &>(add(ID_C_source_location));
   }
 
-  const locationt &location() const
+  const source_locationt &location() const
   {
-    return static_cast<const locationt &>(find(ID_C_location));
+    return static_cast<const source_locationt &>(find(ID_C_source_location));
   }
 
   bool is_static()       const { return get_bool(ID_static); }

@@ -711,7 +711,7 @@ bool exprt::subtract(const exprt &expr)
 
 /*******************************************************************\
 
-Function: exprt::find_location
+Function: exprt::find_source_location
 
   Inputs:
 
@@ -721,19 +721,19 @@ Function: exprt::find_location
 
 \*******************************************************************/
 
-const locationt &exprt::find_location() const
+const locationt &exprt::find_source_location() const
 {
-  const locationt &l=location();
+  const source_locationt &l=source_location();
 
   if(l.is_not_nil()) return l;
 
   forall_operands(it, (*this))
   {
-    const locationt &l=it->find_location();
+    const source_locationt &l=it->find_source_location();
     if(l.is_not_nil()) return l;
   }
 
-  return static_cast<const locationt &>(get_nil_irep());
+  return static_cast<const source_locationt &>(get_nil_irep());
 }
 
 /*******************************************************************\

@@ -125,13 +125,13 @@ codet cpp_typecheckt::cpp_destructor(
 
     cpp_name.get_sub().push_back(irept(ID_name));
     cpp_name.get_sub().back().set(ID_identifier, symb.base_name);
-    cpp_name.get_sub().back().set(ID_C_location, location);
+    cpp_name.get_sub().back().set(ID_C_source_location, location);
 
     cpp_name.get_sub().push_back(irept("::"));
 
     cpp_name.get_sub().push_back(irept(ID_name));
     cpp_name.get_sub().back().set(ID_identifier, dtor_name);
-    cpp_name.get_sub().back().set(ID_C_location, location);
+    cpp_name.get_sub().back().set(ID_C_source_location, location);
 
     exprt member_expr(ID_member);
     member_expr.copy_to_operands(object);

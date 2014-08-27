@@ -473,7 +473,7 @@ void cpp_typecheckt::typecheck_function_expr(
       cpp_namet cpp_name;
       cpp_name.get_sub().push_back(irept(ID_name));
       cpp_name.get_sub().back().set(ID_identifier, op_name);
-      cpp_name.get_sub().back().add(ID_C_location)=expr.location();
+      cpp_name.get_sub().back().add(ID_C_source_location)=expr.location();
 
       function_call.function()=
         static_cast<const exprt &>(
@@ -604,7 +604,7 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
     cpp_namet cpp_name;
     cpp_name.get_sub().push_back(irept(ID_name));
     cpp_name.get_sub().back().set(ID_identifier, op_name);
-    cpp_name.get_sub().back().add(ID_C_location)=expr.location();
+    cpp_name.get_sub().back().add(ID_C_source_location)=expr.location();
 
     // See if the struct decalares the cast operator as a member
     bool found_in_struct = false;
@@ -686,7 +686,7 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
       cpp_namet cpp_name;
       cpp_name.get_sub().push_back(irept(ID_name));
       cpp_name.get_sub().back().set(ID_identifier, op_name);
-      cpp_name.get_sub().back().add(ID_C_location)=expr.location();
+      cpp_name.get_sub().back().add(ID_C_source_location)=expr.location();
 
       // turn this into a function call
       side_effect_expr_function_callt function_call;
@@ -1491,7 +1491,7 @@ void cpp_typecheckt::typecheck_expr_ptrmember(
 
   op.id(ID_dereference);
   op.move_to_operands(tmp);
-  op.set(ID_C_location, expr.find(ID_C_location));
+  op.add_source_location()=expr.source_location();
   typecheck_expr_dereference(op);
 
   expr.id(ID_member);
@@ -2012,7 +2012,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
   {
     irept name(ID_name);
     name.set(ID_identifier, "operator()");
-    name.set(ID_C_location, expr.location());
+    name.set(ID_C_source_location, expr.location());
 
     cpp_namet cppname;
     cppname.get_sub().push_back(name);
@@ -2383,7 +2383,7 @@ void cpp_typecheckt::typecheck_side_effect_assignment(exprt &expr)
   cpp_namet cpp_name;
   cpp_name.get_sub().push_back(irept(ID_name));
   cpp_name.get_sub().front().set(ID_identifier, strop);
-  cpp_name.get_sub().front().set(ID_C_location, expr.location());
+  cpp_name.get_sub().front().set(ID_C_source_location, expr.location());
 
   // expr.op0() is already typechecked
   exprt already_typechecked("already_typechecked");
@@ -2466,7 +2466,7 @@ void cpp_typecheckt::typecheck_side_effect_inc_dec(
   cpp_namet cpp_name;
   cpp_name.get_sub().push_back(irept(ID_name));
   cpp_name.get_sub().front().set(ID_identifier, str_op);
-  cpp_name.get_sub().front().set(ID_C_location, expr.location());
+  cpp_name.get_sub().front().set(ID_C_source_location, expr.location());
 
   exprt already_typechecked("already_typechecked");
   already_typechecked.move_to_operands(expr.op0());

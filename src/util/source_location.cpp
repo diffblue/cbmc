@@ -12,7 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
-Function: locationt::as_string
+Function: source_locationt::as_string
 
   Inputs:
 
@@ -22,7 +22,7 @@ Function: locationt::as_string
 
 \*******************************************************************/
 
-std::string locationt::as_string() const
+std::string source_locationt::as_string() const
 {
   std::string dest;
 
@@ -51,11 +51,13 @@ Function: operator<<
 
 \*******************************************************************/
 
-std::ostream &operator << (std::ostream &out, const locationt &location)
+std::ostream &operator << (
+  std::ostream &out,
+  const source_locationt &source_location)
 {
-  if(location.is_nil()) return out;
+  if(source_location.is_nil()) return out;
 
-  out << location.as_string();
+  out << source_location.as_string();
   
   return out;
 }

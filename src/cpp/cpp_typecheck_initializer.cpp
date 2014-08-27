@@ -297,7 +297,7 @@ void cpp_typecheckt::zero_initializer(
     {
       irept name(ID_name);
       name.set(ID_identifier, comp.get(ID_base_name));
-      name.set(ID_C_location, location);
+      name.set(ID_C_source_location, location);
       
       cpp_namet cpp_name;
       cpp_name.move_to_sub(name);
