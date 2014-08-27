@@ -217,6 +217,10 @@ irep_idt linkingt::rename(irep_idt id)
     if(!renamed_ids.insert(new_identifier).second)
       continue; // used this for renaming already
 
+    if(src_symbol_table.symbols.find(new_identifier)!=
+       src_symbol_table.symbols.end())
+      continue; // used by some earlier linking call already
+
     return new_identifier;
   }
 }
