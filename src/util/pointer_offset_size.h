@@ -17,6 +17,7 @@ class namespacet;
 class struct_typet;
 class typet;
 class member_exprt;
+class constant_exprt;
 
 // these return -1 on failure
 
@@ -46,6 +47,10 @@ exprt member_offset_expr(
 
 exprt size_of_expr(
   const typet &type,
+  const namespacet &ns);
+
+exprt build_sizeof_expr(
+  const constant_exprt &expr,
   const namespacet &ns);
 
 #endif

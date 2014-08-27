@@ -33,6 +33,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/symbol.h>
 #include <util/suffix.h>
 #include <util/find_symbols.h>
+#include <util/pointer_offset_size.h>
 
 #include "expr2c.h"
 #include "c_types.h"
@@ -2086,13 +2087,18 @@ std::string expr2ct::convert_constant(
       else if(c_type==ID_signed_long_long_int)
         dest+="ll";
 
-      if(src.find(ID_C_c_sizeof_type).is_not_nil())
+      if(src.find(ID_C_c_sizeof_type).is_not_nil() &&
+         sizeof_nesting==0)
       {
-        if(sizeof_nesting++ == 0)
-          dest=
-            "sizeof("+convert(static_cast<const typet &>(src.find(ID_C_c_sizeof_type)))+")"
-            +"/*"+dest;
-        if(--sizeof_nesting == 0) dest+="*/ ";
+        exprt sizeof_expr=nil_exprt();
+        sizeof_expr=build_sizeof_expr(to_constant_expr(src), ns);
+
+        if(sizeof_expr.is_not_nil())
+        {
+          ++sizeof_nesting;
+          dest=convert(sizeof_expr)+" /*"+dest+"*/ ";
+          --sizeof_nesting;
+        }
       }
     }
   }
@@ -3975,6 +3981,32 @@ std::string expr2ct::convert_extractbits(
 
 /*******************************************************************\
 
+Function: expr2ct::convert_sizeof
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+std::string expr2ct::convert_sizeof(
+  const exprt &src,
+  unsigned &precedence)
+{
+  if(src.has_operands())
+    return convert_norep(src, precedence);
+
+  std::string dest="sizeof(";
+  dest+=convert(static_cast<const typet&>(src.find(ID_type_arg)));
+  dest+=')';
+
+  return dest;
+}
+
+/*******************************************************************\
+
 Function: expr2ct::convert
 
   Inputs:
@@ -4433,6 +4465,9 @@ std::string expr2ct::convert(
 
   else if(src.id()==ID_designated_initializer)
     return convert_designated_initializer(src, precedence=15);
+
+  else if(src.id()==ID_sizeof)
+    return convert_sizeof(src, precedence);
 
   // no C language expression for internal representation
   return convert_norep(src, precedence);
