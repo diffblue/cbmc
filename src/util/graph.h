@@ -16,11 +16,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ostream>
 #include <cassert>
 
-class empty_nodet
+class empty_edget
 {
 };
 
-template<class E=empty_nodet>
+template<class E=empty_edget>
 class graph_nodet
 {
 public:
