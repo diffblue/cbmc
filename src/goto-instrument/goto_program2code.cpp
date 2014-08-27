@@ -481,9 +481,9 @@ goto_programt::const_targett goto_program2codet::convert_assign_varargs(
     }
 
     // assignment not found, still need a proper typeof expression
-    assert(r.find("#va_arg_type").is_not_nil());
+    assert(r.find(ID_C_va_arg_type).is_not_nil());
     const typet &va_arg_type=
-      static_cast<typet const&>(r.find("#va_arg_type"));
+      static_cast<typet const&>(r.find(ID_C_va_arg_type));
 
     dereference_exprt deref(
       typecast_exprt(
