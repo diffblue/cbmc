@@ -130,11 +130,31 @@ void endianness_mapt::build_rec(
           src.id()==ID_c_enum)
   {
     mp_integer s=pointer_offset_size(ns, src); // error is -1
+    assert(s>=0);
+
     size_t s_int=integer2long(s), base=map.size();
 
-    if(s_int>0 && bit_field_bits>=8)
+    // from struct_union_typet::componentt::get_bit_field_bits
+    size_t bits=8*s_int;
+    if(src.id()==ID_signedbv ||
+       src.id()==ID_unsignedbv)
+      bits=to_bitvector_type(src).get_width();
+    else if(src.id()==ID_c_enum)
+      bits=src.subtype().get_int(ID_width);
+
+    assert(bit_field_bits<8);
+    if((bit_field_bits+bits)%8==0)
+      bit_field_bits=0;
+    else if(bit_field_bits+bits<8)
     {
-      --s_int;
+      // keep accumulating
+      bit_field_bits+=bits;
+      if(s>0) --s_int;
+    }
+    else
+    {
+      bit_field_bits+=bits;
+      if(bit_field_bits<s_int*8) --s_int;
       bit_field_bits%=8;
     }
 
@@ -155,22 +175,7 @@ void endianness_mapt::build_rec(
         it=struct_type.components().begin();
         it!=struct_type.components().end();
         it++)
-    {
-      if(it->get_is_bit_field())
-      {
-        size_t width=to_bitvector_type(it->type()).get_width();
-
-        if(bit_field_bits>0 &&
-           bit_field_bits+width<8)
-        {
-          bit_field_bits+=width;
-          continue;
-        }
-
-        bit_field_bits+=width;
-      }
       build_rec(it->type(), little_endian, bit_field_bits);
-    }
   }
   else if(src.id()==ID_array)
   {
