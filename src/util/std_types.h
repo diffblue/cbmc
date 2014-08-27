@@ -825,6 +825,12 @@ public:
 */
 inline const bitvector_typet &to_bitvector_type(const typet &type)
 {
+  assert(type.id()==ID_signedbv ||
+         type.id()==ID_unsignedbv ||
+         type.id()==ID_fixedbv ||
+         type.id()==ID_floatbv ||
+         type.id()==ID_bv ||
+         type.id()==ID_pointer);
   return static_cast<const bitvector_typet &>(type);
 }
 

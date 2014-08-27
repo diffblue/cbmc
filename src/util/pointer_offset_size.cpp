@@ -177,10 +177,16 @@ mp_integer pointer_offset_size(
           type.id()==ID_unsignedbv ||
           type.id()==ID_fixedbv ||
           type.id()==ID_floatbv ||
-          type.id()==ID_bv ||
-          type.id()==ID_c_enum)
+          type.id()==ID_bv)
   {
     unsigned width=to_bitvector_type(type).get_width();
+    unsigned bytes=width/8;
+    if(bytes*8!=width) bytes++;
+    return bytes;
+  }
+  else if(type.id()==ID_c_enum)
+  {
+    unsigned width=to_bitvector_type(type.subtype()).get_width();
     unsigned bytes=width/8;
     if(bytes*8!=width) bytes++;
     return bytes;
@@ -407,10 +413,16 @@ exprt size_of_expr(
           type.id()==ID_unsignedbv ||
           type.id()==ID_fixedbv ||
           type.id()==ID_floatbv ||
-          type.id()==ID_bv ||
-          type.id()==ID_c_enum)
+          type.id()==ID_bv)
   {
     unsigned width=to_bitvector_type(type).get_width();
+    unsigned bytes=width/8;
+    if(bytes*8!=width) bytes++;
+    return from_integer(bytes, signedbv_typet(config.ansi_c.pointer_width));
+  }
+  else if(type.id()==ID_c_enum)
+  {
+    unsigned width=to_bitvector_type(type.subtype()).get_width();
     unsigned bytes=width/8;
     if(bytes*8!=width) bytes++;
     return from_integer(bytes, signedbv_typet(config.ansi_c.pointer_width));
