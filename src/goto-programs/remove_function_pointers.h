@@ -24,4 +24,10 @@ void remove_function_pointers(
   goto_functionst &goto_functions,
   bool add_safety_assertion);
 
+bool remove_function_pointers(
+  symbol_tablet &symbol_table,
+  const goto_functionst &goto_functions,
+  goto_programt &goto_program,
+  bool add_safety_assertion);
+
 #endif
