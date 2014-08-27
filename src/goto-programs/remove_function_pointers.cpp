@@ -11,7 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/i2string.h>
 #include <util/replace_expr.h>
 #include <util/expr_util.h>
-#include <util/location.h>
+#include <util/source_location.h>
 #include <util/std_expr.h>
 #include <util/config.h>
 #include <util/std_expr.h>

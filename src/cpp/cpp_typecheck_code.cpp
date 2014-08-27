@@ -8,7 +8,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <util/i2string.h>
 #include <util/expr_util.h>
-#include <util/location.h>
+#include <util/source_location.h>
 
 #include "cpp_typecheck.h"
 #include "cpp_convert_type.h"
