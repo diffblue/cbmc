@@ -158,7 +158,7 @@ public:
   
   void remove_edge(unsigned a, unsigned b)
   {
-    nodes[a].erase_out(a);
+    nodes[a].erase_out(b);
     nodes[b].erase_in(a);
   }
   
