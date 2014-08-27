@@ -894,7 +894,7 @@ void c_typecheck_baset::typecheck_side_effect_statement_expression(
   }
 
   codet &code=to_code(expr.op0());
-
+  
   assert(code.get(ID_statement)==ID_block);
 
   // the type is the type of the last statement in the
@@ -930,10 +930,19 @@ void c_typecheck_baset::typecheck_side_effect_statement_expression(
   if(last_statement==ID_expression)
   {
     assert(last->operands().size()==1);
-    expr.type()=last->op0().type();
+    exprt &op=last->op0();
+
+    // arrays here turn into pointers (array decay)
+    if(op.type().id()==ID_array)
+      implicit_typecast(op, pointer_typet(op.type().subtype()));
+
+    expr.type()=op.type();    
   }
   else if(last_statement==ID_function_call)
   {
+    // this is suspected to be dead
+    assert(false);
+  
     // make the last statement an expression
 
     code_function_callt &fc=to_code_function_call(*last);
