@@ -387,9 +387,6 @@ void goto_symext::symex_assign_struct_member(
   // takes one operand, which must be a structure.
 
   exprt lhs_struct=lhs.op0();
-  const struct_typet &struct_type=to_struct_type(ns.follow(lhs_struct.type()));
-
-  const irep_idt &component_name=lhs.get_component_name();
 
   // typecasts involved? C++ does that for inheritance.
   if(lhs_struct.id()==ID_typecast)
@@ -414,6 +411,8 @@ void goto_symext::symex_assign_struct_member(
     }
   }
 
+  const irep_idt &component_name=lhs.get_component_name();
+
   #ifdef USE_UPDATE
   
   // turn
@@ -421,7 +420,7 @@ void goto_symext::symex_assign_struct_member(
   // into
   //   a'==UPDATE(a, .c, e)
 
-  update_exprt new_rhs(struct_type);
+  update_exprt new_rhs(lhs_struct.type());
   new_rhs.old()=lhs_struct;
   new_rhs.designator().push_back(member_designatort(component_name));
   new_rhs.new_value()=rhs;
@@ -437,7 +436,7 @@ void goto_symext::symex_assign_struct_member(
   // into
   //   a'==a WITH [c:=e]
 
-  exprt new_rhs(ID_with, struct_type);
+  exprt new_rhs(ID_with, lhs_struct.type());
   new_rhs.copy_to_operands(lhs_struct, exprt(ID_member_name), rhs);
   new_rhs.op1().set(ID_component_name, component_name);
   
