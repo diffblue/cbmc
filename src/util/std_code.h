@@ -87,6 +87,31 @@ public:
   {
     return static_cast<const locationt &>(find(ID_C_end_location));
   }
+
+  codet &find_last_statement()
+  {
+    codet *last=this;
+
+    while(true)
+    {
+      const irep_idt &statement=last->get_statement();
+
+      if(statement==ID_block &&
+         !last->operands().empty())
+      {
+        last=&to_code(last->operands().back());
+      }
+      else if(statement==ID_label)
+      {
+        assert(last->operands().size()==1);
+        last=&(to_code(last->op0()));
+      }
+      else
+        break;
+    }
+
+    return *last;
+  }
 };
 
 extern inline const code_blockt &to_code_block(const codet &code)
