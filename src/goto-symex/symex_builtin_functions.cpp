@@ -77,17 +77,9 @@ void goto_symext::symex_malloc(
   {
     exprt tmp_size=size;
     state.rename(tmp_size, ns); // to allow constant propagation
+    simplify(tmp_size, ns);
     
     // special treatment for sizeof(T)*x
-    if(tmp_size.id()==ID_mult &&
-       tmp_size.operands().size()==2 &&
-       tmp_size.op0().find(ID_C_c_sizeof_type).is_not_nil())
-    {
-      object_type=array_typet(
-        c_sizeof_type_rec(tmp_size.op0()),
-        tmp_size.op1());      
-    }
-    else
     {
       typet tmp_type=c_sizeof_type_rec(tmp_size);
       
