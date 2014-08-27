@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #ifndef CPROVER_CPP_CPP_MEMBER_SPEC_H
 #define CPROVER_CPP_CPP_MEMBER_SPEC_H
 
-#include <util/location.h>
+#include <util/source_location.h>
 #include <util/irep.h>
 
 class cpp_member_spect:public irept

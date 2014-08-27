@@ -17,7 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/namespace.h>
 #include <util/symbol_table.h>
-#include <util/location.h>
+#include <util/source_location.h>
 #include <util/std_expr.h>
 
 typedef enum { NO_INSTRUCTION_TYPE=0,

@@ -13,7 +13,7 @@ Date: 2012
 
 #include <set>
 
-#include <util/location.h>
+#include <util/source_location.h>
 
 class abstract_eventt;
 

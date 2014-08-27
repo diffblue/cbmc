@@ -10,7 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <stack>
 
 #include <util/find_symbols.h>
-#include <util/location.h>
+#include <util/source_location.h>
 #include <util/base_type.h>
 #include <util/i2string.h>
 #include <util/std_expr.h>

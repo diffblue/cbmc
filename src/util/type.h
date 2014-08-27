@@ -11,7 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <list>
 
-#include <util/location.h>
+#include <util/source_location.h>
 
 /*! \brief The type of an expression
 */

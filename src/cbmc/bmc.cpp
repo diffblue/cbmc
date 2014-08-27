@@ -12,7 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/string2int.h>
 #include <util/i2string.h>
-#include <util/location.h>
+#include <util/source_location.h>
 #include <util/time_stopping.h>
 #include <util/message_stream.h>
 
