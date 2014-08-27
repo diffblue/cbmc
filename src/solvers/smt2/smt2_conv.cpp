@@ -4421,7 +4421,7 @@ void smt2_convt::find_symbols(const exprt &expr)
       irep_idt id="string."+i2string(defined_expressions.size());
       out << "; the following is a substitute for a string" << "\n";
       out << "(declare-fun " << id << " () ";
-      convert_type(expr.type());
+      convert_type(array_type);
       out << ")" << "\n";
 
       for(unsigned i=0; i<tmp.operands().size(); i++)
