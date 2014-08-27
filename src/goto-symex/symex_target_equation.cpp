@@ -807,8 +807,12 @@ void symex_target_equationt::convert_assertions(
     else if(it->is_assume())
     {
       // the assumptions have been converted before
-      assumption=
-        and_exprt(assumption, literal_exprt(it->cond_literal));
+      // avoid deep nesting of ID_and expressions
+      if(assumption.id()==ID_and)
+        assumption.copy_to_operands(literal_exprt(it->cond_literal));
+      else
+        assumption=
+          and_exprt(assumption, literal_exprt(it->cond_literal));
     }
   }
 
