@@ -323,6 +323,8 @@ void c_typecheck_baset::designator_enter(
     }
     else
     {
+      // The default is to unitialize using the first member of the
+      // union.
       entry.size=1;
       entry.subtype=union_type.components().front().type();
     }
@@ -475,11 +477,12 @@ void c_typecheck_baset::do_designated_initializer(
       assert(index<components.size());
 
       const union_typet::componentt &component=union_type.components()[index];
-      
+
       if(dest->id()==ID_union &&
          dest->get(ID_component_name)==component.get_name())
       {
-        // already right union component (can initialize multiple submembers)
+        // Already right union component. We can initialize multiple submembers,
+        // so do not overwrite this.
       }
       else
       {
@@ -488,7 +491,7 @@ void c_typecheck_baset::do_designated_initializer(
         union_exprt union_expr(type);
         union_expr.op()=zero_initializer(component.type(), value.location(), *this, get_message_handler());
         union_expr.location()=value.location();
-        union_expr.set(ID_component_name, component.get_name());
+        union_expr.set_component_name(component.get_name());
         *dest=union_expr;
       }
 
@@ -527,6 +530,27 @@ void c_typecheck_baset::do_designated_initializer(
       assert(full_type==follow(dest->type()));
       
       return; // done
+    }
+    
+    // union? The component in the zero initializer might
+    // not be the first one.
+    if(full_type.id()==ID_union)
+    {
+      const union_typet &union_type=to_union_type(full_type);
+
+      const union_typet::componentst &components=
+        union_type.components();
+
+      if(!components.empty())
+      {
+        const union_typet::componentt &component=union_type.components().front();
+
+        union_exprt union_expr(type);
+        union_expr.op()=zero_initializer(component.type(), value.location(), *this, get_message_handler());
+        union_expr.location()=value.location();
+        union_expr.set_component_name(component.get_name());
+        *dest=union_expr;
+      }
     }
 
     // see what initializer we are given
@@ -575,7 +599,7 @@ void c_typecheck_baset::do_designated_initializer(
     if(dest->operands().empty())
     {
       err_location(value);
-      str << "cannot initialize compound type `"
+      str << "cannot initialize type `"
           << to_string(dest_type) << "' using value `"
           << to_string(value) << "'";
       throw 0;
@@ -842,7 +866,7 @@ exprt c_typecheck_baset::do_initializer_list(
     }
 
     // 6.7.9, 14: An array of character type may be initialized by a character
-    // string literal or UTF−8 string literal, optionally enclosed in braces.
+    // string literal or UTF-8 string literal, optionally enclosed in braces.
     if(value.operands().size()>=1 &&
        value.op0().id()==ID_string_constant &&
        (full_type.subtype().id()==ID_signedbv ||
@@ -852,7 +876,7 @@ exprt c_typecheck_baset::do_initializer_list(
       if(value.operands().size()>1)
       {
         err_location(value);
-        warning("ignoring excess operands");
+        warning("ignoring excess initializers");
       }
 
       return do_initializer_rec(value.op0(), type, force_constant);
