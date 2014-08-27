@@ -659,6 +659,11 @@ public:
     add(ID_parameters).set(ID_ellipsis, true);
   }
 
+  inline void remove_ellipsis()
+  {
+    add(ID_parameters).remove(ID_ellipsis);
+  }
+
   typedef std::vector<parametert> parameterst;
 
   inline const typet &return_type() const
