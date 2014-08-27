@@ -336,7 +336,16 @@ void remove_function_pointerst::remove_function_pointer(
   const exprt &function=code.function();
   
   // this better have the right type
-  const code_typet &call_type=to_code_type(function.type());
+  code_typet call_type=to_code_type(function.type());
+  // refine the type in case the forward declaration was incomplete
+  if(call_type.has_ellipsis() &&
+     call_type.parameters().empty())
+  {
+    call_type.remove_ellipsis();
+    forall_expr(it, code.arguments())
+      call_type.parameters().push_back(
+        code_typet::parametert(it->type()));
+  }
   
   assert(function.id()==ID_dereference);
   assert(function.operands().size()==1);
