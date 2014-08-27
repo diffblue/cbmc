@@ -39,7 +39,7 @@ static int isatty(int) { return 0; }
 #include "ansi_c_y.tab.h"
 
 #define loc() \
-  { newstack(yyansi_clval); PARSER.set_location(stack(yyansi_clval)); }
+  { newstack(yyansi_clval); PARSER.add_location(stack(yyansi_clval)); }
 
 int make_identifier()
 {
@@ -238,7 +238,7 @@ void ansi_c_scanner_init()
 <GRAMMAR>{char_lit} {
                   newstack(yyansi_clval);
                   stack(yyansi_clval)=convert_character_literal(yytext, true);
-                  PARSER.set_location(stack(yyansi_clval));
+                  PARSER.add_location(stack(yyansi_clval));
                   return TOK_CHARACTER;
                 }
 
@@ -246,7 +246,7 @@ void ansi_c_scanner_init()
                   PARSER.string_literal.clear();
                   PARSER.string_literal.append(yytext);
                   newstack(yyansi_clval);
-                  PARSER.set_location(stack(yyansi_clval));
+                  PARSER.add_location(stack(yyansi_clval));
                   // String literals can be continued in
                   // the next line
                   BEGIN(STRING_LITERAL);
@@ -1165,7 +1165,7 @@ __decltype          { if(PARSER.cpp && PARSER.mode==ansi_c_parsert::GCC)
 
 {integer_s}     { newstack(yyansi_clval);
                   stack(yyansi_clval)=convert_integer_literal(yytext);
-                  PARSER.set_location(stack(yyansi_clval));
+                  PARSER.add_location(stack(yyansi_clval));
                   return TOK_INTEGER;
                 }
 
@@ -1176,13 +1176,13 @@ __decltype          { if(PARSER.cpp && PARSER.mode==ansi_c_parsert::GCC)
                     }
                   newstack(yyansi_clval); 
                   stack(yyansi_clval)=convert_float_literal(yytext);
-                  PARSER.set_location(stack(yyansi_clval));
+                  PARSER.add_location(stack(yyansi_clval));
 		  return TOK_FLOATING;
 		}
 
 {float_s}	{ newstack(yyansi_clval); 
                   stack(yyansi_clval)=convert_float_literal(yytext);
-                  PARSER.set_location(stack(yyansi_clval));
+                  PARSER.add_location(stack(yyansi_clval));
 		  return TOK_FLOATING;
 		}
 
@@ -1310,7 +1310,7 @@ __decltype          { if(PARSER.cpp && PARSER.mode==ansi_c_parsert::GCC)
                 }
 {integer_s}     { newstack(yyansi_clval);
                   stack(yyansi_clval)=convert_integer_literal(yytext);
-                  PARSER.set_location(stack(yyansi_clval));
+                  PARSER.add_location(stack(yyansi_clval));
                   return TOK_INTEGER;
                 }
 {ws}            { /* ignore */ }

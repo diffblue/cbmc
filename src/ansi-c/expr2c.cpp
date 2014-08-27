@@ -1121,10 +1121,11 @@ std::string expr2ct::convert_statement_expression(
   const exprt &src,
   unsigned &precedence)
 {
-  if(src.operands().size()!=1)
+  if(src.operands().size()!=1 ||
+     to_code(src.op0()).get_statement()!=ID_block)
     return convert_norep(src, precedence);
 
-  return "({"+convert_code(to_code(src.op0()), 0)+"})";
+  return "("+convert_code(to_code_block(to_code(src.op0())), 0)+")";
 }
 
 /*******************************************************************\

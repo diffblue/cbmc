@@ -672,15 +672,9 @@ void goto_convertt::remove_statement_expression(
     throw "statement_expression takes non-empty block as operand";
   
   // get last statement from block, following labels
-  codet *last=&to_code(code.operands().back());
-    
-  while(last->get_statement()==ID_label)
-  {
-    assert(last->operands().size()==1);
-    last=&to_code(last->op0());
-  }
+  codet &last=to_code_block(code).find_last_statement();
 
-  locationt location=last->find_location();
+  locationt location=last.find_location();
 
   symbolt &new_symbol=
     new_tmp_symbol(expr.type(), "statement_expression", dest, location);
@@ -688,16 +682,16 @@ void goto_convertt::remove_statement_expression(
   symbol_exprt tmp_symbol_expr(new_symbol.name, new_symbol.type);
   tmp_symbol_expr.location()=location;
 
-  if(last->get(ID_statement)==ID_expression)
+  if(last.get(ID_statement)==ID_expression)
   {
     // we turn this into an assignment
-    exprt e=to_code_expression(*last).expression();
-    *last=code_assignt(tmp_symbol_expr, e);
-    last->location()=location;
+    exprt e=to_code_expression(last).expression();
+    last=code_assignt(tmp_symbol_expr, e);
+    last.location()=location;
   }
-  else if(last->get(ID_statement)==ID_assign)
+  else if(last.get(ID_statement)==ID_assign)
   {
-    exprt e=to_code_assign(*last).lhs();
+    exprt e=to_code_assign(last).lhs();
     code_assignt assignment(tmp_symbol_expr, e);
     assignment.location()=location;
     code.operands().push_back(assignment);
@@ -705,7 +699,7 @@ void goto_convertt::remove_statement_expression(
   else
     throw "statement_expression expects expression as "
            "last statement, but got `"+
-           id2string(last->get(ID_statement))+"'";
+           id2string(last.get(ID_statement))+"'";
 
   {
     // this likely needs to be a proper stack

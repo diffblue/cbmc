@@ -894,43 +894,18 @@ void c_typecheck_baset::typecheck_side_effect_statement_expression(
   }
 
   codet &code=to_code(expr.op0());
-  
-  assert(code.get(ID_statement)==ID_block);
 
   // the type is the type of the last statement in the
   // block, but do worry about labels!
   
-  codet *last=&code;
+  codet &last=to_code_block(code).find_last_statement();
   
-  while(true)
-  {
-    const irep_idt &statement=last->get_statement();
-    
-    if(statement==ID_block)
-    {
-      if(last->operands().size()==0)
-      {
-        expr.type()=typet(ID_empty);
-        return;
-      }
-      
-      last=&to_code(last->operands().back());
-    }
-    else if(statement==ID_label)
-    {
-      assert(last->operands().size()==1);
-      last=&(to_code(last->op0()));
-    }
-    else
-      break;
-  }
-  
-  irep_idt last_statement=last->get_statement();
+  irep_idt last_statement=last.get_statement();
 
   if(last_statement==ID_expression)
   {
-    assert(last->operands().size()==1);
-    exprt &op=last->op0();
+    assert(last.operands().size()==1);
+    exprt &op=last.op0();
 
     // arrays here turn into pointers (array decay)
     if(op.type().id()==ID_array)
@@ -945,7 +920,7 @@ void c_typecheck_baset::typecheck_side_effect_statement_expression(
   
     // make the last statement an expression
 
-    code_function_callt &fc=to_code_function_call(*last);
+    code_function_callt &fc=to_code_function_call(last);
 
     side_effect_expr_function_callt sideeffect;
 
@@ -963,7 +938,7 @@ void c_typecheck_baset::typecheck_side_effect_statement_expression(
       codet code_expr(ID_expression);
       code_expr.location() = fc.location();
       code_expr.move_to_operands(sideeffect);
-      last->swap(code_expr);
+      last.swap(code_expr);
     }
     else
     {
@@ -977,7 +952,7 @@ void c_typecheck_baset::typecheck_side_effect_statement_expression(
       assign.type()=assign.op1().type();
 
       code_expr.move_to_operands(assign);
-      last->swap(code_expr);
+      last.swap(code_expr);
     }
   }
   else
