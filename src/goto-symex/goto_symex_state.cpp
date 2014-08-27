@@ -232,24 +232,6 @@ bool goto_symex_statet::constant_propagation(const exprt &expr) const
 
     return true;
   }
-  else if(expr.id()==ID_union)
-  {
-    forall_operands(it, expr)
-      if(!constant_propagation(*it))
-        return false;
-
-    return true;
-  }
-  // byte_update works, byte_extract may be out-of-bounds
-  else if(expr.id()==ID_byte_update_big_endian ||
-          expr.id()==ID_byte_update_little_endian)
-  {
-    forall_operands(it, expr)
-      if(!constant_propagation(*it))
-        return false;
-
-    return true;
-  }
 
   return false;
 }
