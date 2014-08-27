@@ -30,7 +30,7 @@ codet cpp_typecheckt::cpp_destructor(
   const exprt &object)
 {
   codet new_code;
-  new_code.location()=location;
+  new_code.add_source_location()=location;
 
   typet tmp_type(type);
   follow_symbol(tmp_type);
@@ -69,19 +69,19 @@ codet cpp_typecheckt::cpp_destructor(
     }
 
     new_code.type().id(ID_code);
-    new_code.location()=location;
+    new_code.add_source_location()=location;
     new_code.set_statement(ID_block);
 
     // for each element of the array, call the destructor
     for(mp_integer i = 0; i < s; ++i)
     {
       exprt constant=from_integer(i, index_type());
-      constant.location()=location;
+      constant.add_source_location()=location;
 
       exprt index(ID_index);
       index.copy_to_operands(object);
       index.copy_to_operands(constant);
-      index.location()=location;
+      index.add_source_location()=location;
 
       exprt i_code =
         cpp_destructor(location, tmp_type.subtype(), index);
@@ -137,14 +137,14 @@ codet cpp_typecheckt::cpp_destructor(
     member_expr.copy_to_operands(object);
     member_expr.op0().type().set(ID_C_constant, false);
     member_expr.add("component_cpp_name").swap(cpp_name);
-    member_expr.location()=location;
+    member_expr.add_source_location()=location;
 
     side_effect_expr_function_callt function_call;
     function_call.function()=member_expr;
-    function_call.location()=location;
+    function_call.add_source_location()=location;
 
     new_code.set_statement(ID_expression);
-    new_code.location()=location;
+    new_code.add_source_location()=location;
     new_code.move_to_operands(function_call);
   }
 

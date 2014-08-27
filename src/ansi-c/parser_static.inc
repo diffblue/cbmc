@@ -13,7 +13,7 @@
 #define mto(x, y) stack(x).move_to_operands(stack(y))
 #define mts(x, y) ((typet &)stack(x)).move_to_subtypes((typet &)stack(y))
 #define binary(x, y, l, id, z) { init(x, id); \
-  stack(x).location()=stack(l).location(); \
+  stack(x).add_source_location()=stack(l).location(); \
   stack(x).reserve_operands(2); mto(x, y); mto(x, z); }
 
 /*******************************************************************\
@@ -121,7 +121,7 @@ static void merge_types(irept &dest, irept &src)
     typet new_type(ID_merged_type);
     new_type.move_to_subtypes((typet &)(dest));
     dest.swap(new_type);
-    static_cast<exprt &>(dest).location()=location;
+    static_cast<exprt &>(dest).add_source_location()=location;
   }
 
   static_cast<typet &>(dest).move_to_subtypes(static_cast<typet &>(src));
@@ -360,7 +360,7 @@ static void create_function_scope(const YYSTYPE d)
         ansi_c_declarationt &param_decl=to_ansi_c_declaration(*it);
 
         // we record the function name in the location
-        param_decl.location().set_function(function_name);
+        param_decl.add_source_location().set_function(function_name);
        
         if(!param_decl.declarators().empty())
         {

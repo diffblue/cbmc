@@ -514,7 +514,7 @@ void shared_bufferst::assignment(
     t=goto_program.insert_before(t);
     t->type=ASSIGN;
     t->code=code_assignt(symbol, value);
-    t->code.location()=location;
+    t->code.add_source_location()=location;
     t->location=location;
  
     //instrumentations.insert((const irep_idt) (t->code.id()));
@@ -670,7 +670,7 @@ void shared_bufferst::write(
   target->guard=cond_expr;
   target->type=ASSERT;
   target->code=code_assertt();
-  target->code.location()=location;
+  target->code.add_source_location()=location;
   target->location=location;
   target++;
 

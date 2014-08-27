@@ -58,12 +58,6 @@ public:
     return (const source_locationt &)find(ID_C_source_location);
   }
 
-  // will go away
-  locationt &location()
-  {
-    return static_cast<source_locationt &>(add(ID_C_source_location));
-  }
-  
   source_locationt &add_source_location()
   {
     return static_cast<source_locationt &>(add(ID_C_source_location));

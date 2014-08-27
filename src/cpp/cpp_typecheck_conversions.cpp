@@ -1016,7 +1016,7 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
           // create temporary object
           exprt tmp_object_expr=exprt(ID_side_effect, type);
           tmp_object_expr.set(ID_statement, ID_temporary_object);
-          tmp_object_expr.location()=expr.location();
+          tmp_object_expr.add_source_location()=expr.location();
           tmp_object_expr.copy_to_operands(deref);
           tmp_object_expr.set(ID_C_lvalue, true);
 
@@ -1097,7 +1097,7 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
               if(expr.get_bool(ID_C_lvalue))
                 tmp_expr.set(ID_C_lvalue, true);
 
-              tmp_expr.location() = expr.location();
+              tmp_expr.add_source_location() = expr.location();
 
               exprt func_symb = cpp_symbol_expr(lookup(component.get(ID_name)));
               func_symb.type() = comp_type;
@@ -1109,7 +1109,7 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
 
               // create temporary object
               side_effect_expr_function_callt ctor_expr;
-              ctor_expr.location() = expr.location();
+              ctor_expr.add_source_location() = expr.location();
               ctor_expr.function().swap(func_symb);
               ctor_expr.arguments().push_back(tmp_expr);
               typecheck_side_effect_function_call(ctor_expr);
@@ -1148,7 +1148,7 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
                 exprt expr_deref = exprt(ID_dereference, expr_ptmp.type().subtype());
                 expr_deref.set(ID_C_lvalue, true);
                 expr_deref.copy_to_operands(expr_ptmp);
-                expr_deref.location() = expr.location();
+                expr_deref.add_source_location() = expr.location();
 
                 exprt new_object("new_object", type);
                 new_object.set(ID_C_lvalue, true);
@@ -1163,7 +1163,7 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
                 }
 
                 side_effect_expr_function_callt ctor_expr;
-                ctor_expr.location() = expr.location();
+                ctor_expr.add_source_location() = expr.location();
                 ctor_expr.function().swap(func_symb);
                 ctor_expr.arguments().push_back(expr_deref);
                 typecheck_side_effect_function_call(ctor_expr);
@@ -1234,7 +1234,7 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
         member_func.copy_to_operands(ac);
 
         side_effect_expr_function_callt func_expr;
-        func_expr.location() = expr.location();
+        func_expr.add_source_location() = expr.location();
         func_expr.function().swap(member_func);
         typecheck_side_effect_function_call(func_expr);
 
@@ -1429,7 +1429,7 @@ bool cpp_typecheckt::reference_binding(
     {
       {
         address_of_exprt tmp;
-        tmp.location()=expr.location();
+        tmp.add_source_location()=expr.location();
         tmp.object()=expr;
         tmp.type()=pointer_typet();
         tmp.type().set(ID_C_reference, true);
@@ -1506,7 +1506,7 @@ bool cpp_typecheckt::reference_binding(
         member_func.copy_to_operands(ac);
 
         side_effect_expr_function_callt func_expr;
-        func_expr.location() = expr.location();
+        func_expr.add_source_location() = expr.location();
         func_expr.function().swap(member_func);
         typecheck_side_effect_function_call(func_expr);
 
@@ -1565,7 +1565,7 @@ bool cpp_typecheckt::reference_binding(
     tmp.object()=new_expr;
     tmp.type().set(ID_C_reference, true);
     tmp.type().subtype()= new_expr.type();
-    tmp.location()=new_expr.location();
+    tmp.add_source_location()=new_expr.location();
     new_expr.swap(tmp);
     return true;
   }
@@ -1577,7 +1577,7 @@ bool cpp_typecheckt::reference_binding(
       // create temporary object
       exprt tmp=exprt(ID_side_effect, type.subtype());
       tmp.set(ID_statement, ID_temporary_object);
-      tmp.location()=expr.location();
+      tmp.add_source_location()=expr.location();
       //tmp.set(ID_C_lvalue, true);
       tmp.move_to_operands(new_expr);
       new_expr.swap(tmp);
@@ -1587,7 +1587,7 @@ bool cpp_typecheckt::reference_binding(
     tmp.copy_to_operands(new_expr);
     tmp.type().set(ID_C_reference, true);
     tmp.type().subtype()= new_expr.type();
-    tmp.location()=new_expr.location();
+    tmp.add_source_location()=new_expr.location();
     new_expr.swap(tmp);
     return true;
   }

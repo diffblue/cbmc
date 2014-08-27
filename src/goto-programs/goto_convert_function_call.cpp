@@ -211,7 +211,7 @@ void goto_convertt::do_function_call_dereference(
   goto_programt::targett t=dest.add_instruction(FUNCTION_CALL);
 
   code_function_callt function_call;
-  function_call.location()=function.location();
+  function_call.add_source_location()=function.location();
   function_call.lhs()=lhs;
   function_call.function()=function;
   function_call.arguments()=arguments;

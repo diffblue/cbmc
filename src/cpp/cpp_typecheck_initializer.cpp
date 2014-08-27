@@ -236,7 +236,7 @@ void cpp_typecheckt::zero_initializer(
       code_assignt assign;
       assign.lhs()=obj;
       assign.rhs()=value;
-      assign.location()=location;
+      assign.add_source_location()=location;
       ops.push_back(assign);
     }
     else
@@ -320,7 +320,7 @@ void cpp_typecheckt::zero_initializer(
     code_assignt assign;
     assign.lhs()=object;
     assign.rhs()=zero;
-    assign.location()=location;
+    assign.add_source_location()=location;
 
     typecheck_expr(assign.lhs());
     assign.lhs().type().set(ID_C_constant, false);
@@ -343,7 +343,7 @@ void cpp_typecheckt::zero_initializer(
     code_assignt assign;
     assign.lhs()=object;
     assign.rhs()=gen_zero(final_type);
-    assign.location()=location;
+    assign.add_source_location()=location;
 
     typecheck_expr(assign.op0());
     assign.lhs().type().set(ID_C_constant, false);

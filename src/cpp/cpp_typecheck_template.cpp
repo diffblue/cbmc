@@ -906,7 +906,7 @@ cpp_scopet &cpp_typecheckt::typecheck_template_parameters(
     {
       parameter=exprt(ID_type, typet(ID_symbol));
       parameter.type().set(ID_identifier, identifier);
-      parameter.type().location()=declaration.find_location();
+      parameter.type().add_source_location()=declaration.find_location();
     }
     else
     {
@@ -942,7 +942,7 @@ cpp_scopet &cpp_typecheckt::typecheck_template_parameters(
     {
       parameter=exprt(ID_type, typet(ID_symbol));
       parameter.type().set(ID_identifier, symbol.name);
-      parameter.type().location()=declaration.find_location();
+      parameter.type().add_source_location()=declaration.find_location();
     }
     else
       parameter=symbol.symbol_expr();
@@ -951,7 +951,7 @@ cpp_scopet &cpp_typecheckt::typecheck_template_parameters(
     if(default_value.is_not_nil())
       parameter.add(ID_C_default_value)=default_value;
 
-    parameter.location()=declaration.find_location();
+    parameter.add_source_location()=declaration.find_location();
     #endif
   }
 

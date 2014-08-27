@@ -70,7 +70,7 @@ void cpp_typecheckt::find_constructor(
 
           constructor_expr=exprt(ID_symbol, type);
           constructor_expr.set(ID_identifier, identifier);
-          constructor_expr.location()=location;
+          constructor_expr.add_source_location()=location;
           return;
         }
       }

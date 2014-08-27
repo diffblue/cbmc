@@ -75,7 +75,7 @@ exprt zero_initializert::zero_initializer_rec(
   if(type_id==ID_bool)
   {
     exprt result=false_exprt();
-    result.location()=location;
+    result.add_source_location()=location;
     return result;
   }
   else if(type_id==ID_unsignedbv ||
@@ -86,7 +86,7 @@ exprt zero_initializert::zero_initializer_rec(
           type_id==ID_complex)
   {
     exprt result=gen_zero(type);
-    result.location()=location;
+    result.add_source_location()=location;
     return result;
   }
   else if(type_id==ID_code)
@@ -100,7 +100,7 @@ exprt zero_initializert::zero_initializer_rec(
   {
     constant_exprt value(type);
     value.set_value(ID_0);
-    value.location()=location;
+    value.add_source_location()=location;
     return value;
   }
   else if(type_id==ID_array)
@@ -114,7 +114,7 @@ exprt zero_initializert::zero_initializer_rec(
       array_exprt value(array_type);
       value.type().id(ID_array);
       value.type().set(ID_size, gen_zero(size_type()));
-      value.location()=location;
+      value.add_source_location()=location;
       return value;
     }
     else
@@ -127,7 +127,7 @@ exprt zero_initializert::zero_initializer_rec(
       {
         exprt value(ID_array_of, type);
         value.copy_to_operands(tmpval);
-        value.location()=location;
+        value.add_source_location()=location;
         return value;
       }
       else if(to_integer(array_type.size(), array_size))
@@ -148,7 +148,7 @@ exprt zero_initializert::zero_initializer_rec(
 
       array_exprt value(array_type);
       value.operands().resize(integer2unsigned(array_size), tmpval);
-      value.location()=location;
+      value.add_source_location()=location;
       return value;
     }
   }
@@ -178,7 +178,7 @@ exprt zero_initializert::zero_initializer_rec(
 
     vector_exprt value(vector_type);
     value.operands().resize(integer2unsigned(vector_size), tmpval);
-    value.location()=location;
+    value.add_source_location()=location;
 
     return value;
   }
@@ -200,14 +200,14 @@ exprt zero_initializert::zero_initializer_rec(
       {
         constant_exprt code_value(it->type());
         code_value.set_value(ID_nil);
-        code_value.location()=location;
+        code_value.add_source_location()=location;
         value.copy_to_operands(code_value);
       }
       else
         value.copy_to_operands(zero_initializer_rec(it->type(), location));
     }
 
-    value.location()=location;
+    value.add_source_location()=location;
 
     return value;
   }
@@ -248,7 +248,7 @@ exprt zero_initializert::zero_initializer_rec(
     value.set(ID_component_name, component.get_name());
     value.copy_to_operands(
       zero_initializer_rec(component.type(), location));
-    value.location()=location;
+    value.add_source_location()=location;
 
     return value;
   }

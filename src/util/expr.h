@@ -146,12 +146,6 @@ public:
     return static_cast<const source_locationt &>(find(ID_C_source_location));
   }
 
-  // will go away
-  inline source_locationt &location()
-  {
-    return static_cast<source_locationt &>(add(ID_C_source_location));
-  }
-  
   inline source_locationt &add_source_location()
   {
     return static_cast<source_locationt &>(add(ID_C_source_location));

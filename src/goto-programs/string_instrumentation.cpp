@@ -387,7 +387,7 @@ void string_instrumentationt::do_sprintf(
     return_assignment->location=target->location;
     
     exprt rhs=side_effect_expr_nondett(call.lhs().type());
-    rhs.location()=target->location;
+    rhs.add_source_location()=target->location;
       
     return_assignment->code=code_assignt(call.lhs(), rhs);
   }
@@ -439,7 +439,7 @@ void string_instrumentationt::do_snprintf(
     return_assignment->location=target->location;
       
     exprt rhs=side_effect_expr_nondett(call.lhs().type());
-    rhs.location()=target->location;
+    rhs.add_source_location()=target->location;
       
     return_assignment->code=code_assignt(call.lhs(), rhs);
   }
@@ -483,7 +483,7 @@ void string_instrumentationt::do_fscanf(
     return_assignment->location=target->location;
       
     exprt rhs=side_effect_expr_nondett(call.lhs().type());
-    rhs.location()=target->location;
+    rhs.add_source_location()=target->location;
       
     return_assignment->code=code_assignt(call.lhs(), rhs);
   }
@@ -713,7 +713,7 @@ void string_instrumentationt::do_format_string_write(
           lhs.copy_to_operands(argument);
           
           exprt rhs=side_effect_expr_nondett(lhs.type());
-          rhs.location()=target->location;
+          rhs.add_source_location()=target->location;
            
           assignment->code=code_assignt(lhs, rhs);
           
@@ -758,7 +758,7 @@ void string_instrumentationt::do_format_string_write(
         lhs.copy_to_operands(arguments[i]);
         
         exprt rhs=side_effect_expr_nondett(lhs.type());
-        rhs.location()=target->location;
+        rhs.add_source_location()=target->location;
          
         assignment->code=code_assignt(lhs, rhs);
       }

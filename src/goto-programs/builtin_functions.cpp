@@ -60,7 +60,7 @@ void goto_convertt::do_prob_uniform(
   }
 
   exprt rhs=side_effect_exprt("prob_uniform", lhs.type());
-  rhs.location()=function.location();
+  rhs.add_source_location()=function.location();
 
   if(lhs.type().id()!=ID_unsignedbv &&
      lhs.type().id()!=ID_signedbv)
@@ -101,7 +101,7 @@ void goto_convertt::do_prob_uniform(
   rhs.copy_to_operands(arguments[0], arguments[1]);
 
   code_assignt assignment(lhs, rhs);
-  assignment.location()=function.location();
+  assignment.add_source_location()=function.location();
   copy(assignment, ASSIGN, dest);
 }
 
@@ -139,7 +139,7 @@ void goto_convertt::do_prob_coin(
   }
 
   exprt rhs=side_effect_exprt("prob_coin", lhs.type());
-  rhs.location()=function.location();
+  rhs.add_source_location()=function.location();
 
   if(lhs.type()!=bool_typet())
   {
@@ -182,7 +182,7 @@ void goto_convertt::do_prob_coin(
   rhs.copy_to_operands(from_rational(prob));
 
   code_assignt assignment(lhs, rhs);
-  assignment.location()=function.location();
+  assignment.add_source_location()=function.location();
   copy(assignment, ASSIGN, dest);
 }
 
@@ -213,12 +213,12 @@ void goto_convertt::do_printf(
     side_effect_exprt printf_code(ID_printf, return_type);
 
     printf_code.operands()=arguments;
-    printf_code.location()=function.location();
+    printf_code.add_source_location()=function.location();
 
     if(lhs.is_not_nil())
     {
       code_assignt assignment(lhs, printf_code);
-      assignment.location()=function.location();
+      assignment.add_source_location()=function.location();
       copy(assignment, ASSIGN, dest);
     }
     else
@@ -253,7 +253,7 @@ void goto_convertt::do_input(
   codet input_code;
   input_code.set_statement(ID_input);
   input_code.operands()=arguments;
-  input_code.location()=function.location();
+  input_code.add_source_location()=function.location();
   
   if(arguments.size()<2)
   {
@@ -284,7 +284,7 @@ void goto_convertt::do_cover(
 {
   codet output_code;
   output_code.set_statement(ID_output);
-  output_code.location()=function.location();
+  output_code.add_source_location()=function.location();
 
   if(arguments.size()!=1)
   {
@@ -332,7 +332,7 @@ void goto_convertt::do_output(
   codet output_code;
   output_code.set_statement(ID_output);
   output_code.operands()=arguments;
-  output_code.location()=function.location();
+  output_code.add_source_location()=function.location();
   
   if(arguments.size()<2)
   {
@@ -479,7 +479,7 @@ void goto_convertt::do_cpp_new(
     new_call.arguments().push_back(object_size);
     new_call.set("#type", lhs.type().subtype());
     new_call.lhs()=tmp_symbol_expr;
-    new_call.location()=rhs.location();
+    new_call.add_source_location()=rhs.location();
     
     convert(new_call, dest);
   }
@@ -509,7 +509,7 @@ void goto_convertt::do_cpp_new(
     new_call.arguments().push_back(rhs.op0()); // memory location
     new_call.set("#type", lhs.type().subtype());
     new_call.lhs()=tmp_symbol_expr;
-    new_call.location()=rhs.location();
+    new_call.add_source_location()=rhs.location();
 
     for(unsigned i=0; i<code_type.parameters().size(); i++)
       if(new_call.arguments()[i].type()!=code_type.parameters()[i].type())
@@ -979,7 +979,7 @@ void goto_convertt::do_function_call_symbol(
     function_call.lhs()=lhs;
     function_call.function()=function;
     function_call.arguments()=arguments;
-    function_call.location()=function.location();
+    function_call.add_source_location()=function.location();
 
     copy(function_call, FUNCTION_CALL, dest);
 
@@ -1093,11 +1093,11 @@ void goto_convertt::do_function_call_symbol(
     if(lhs.is_nil()) return;
 
     exprt rhs=side_effect_expr_nondett(lhs.type());
-    rhs.location()=function.location();
+    rhs.add_source_location()=function.location();
     rhs.set(ID_C_identifier, identifier);
 
     code_assignt assignment(lhs, rhs);
-    assignment.location()=function.location();
+    assignment.add_source_location()=function.location();
     copy(assignment, ASSIGN, dest);
   }
   else if(has_prefix(id2string(identifier), CPROVER_PREFIX "uninterpreted_"))
@@ -1107,12 +1107,12 @@ void goto_convertt::do_function_call_symbol(
 
     function_application_exprt rhs;
     rhs.type()=lhs.type();
-    rhs.location()=function.location();
+    rhs.add_source_location()=function.location();
     rhs.function()=function;
     rhs.arguments()=arguments;
 
     code_assignt assignment(lhs, rhs);
-    assignment.location()=function.location();
+    assignment.add_source_location()=function.location();
     copy(assignment, ASSIGN, dest);
   }
   else if(has_prefix(id2string(identifier), CPROVER_PREFIX "array_set"))
@@ -1332,7 +1332,7 @@ void goto_convertt::do_function_call_symbol(
       t.subtype()=lhs.type();
       dereference_exprt rhs(lhs.type());
       rhs.op0()=typecast_exprt(list_arg, t);
-      rhs.location()=function.location();
+      rhs.add_source_location()=function.location();
       goto_programt::targett t2=dest.add_instruction(ASSIGN);
       t2->location=function.location();
       t2->code=code_assignt(lhs, rhs);
@@ -1684,7 +1684,7 @@ void goto_convertt::do_function_call_symbol(
     function_call.lhs()=lhs;
     function_call.function()=function;
     function_call.arguments()=arguments;
-    function_call.location()=function.location();
+    function_call.add_source_location()=function.location();
 
     copy(function_call, FUNCTION_CALL, dest);
   }

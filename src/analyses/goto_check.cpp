@@ -1547,7 +1547,7 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
             side_effect_expr_nondett(bool_typet()), address_of_expr, lhs, lhs.type());
           t->location=i.location;
           t->code=code_assignt(lhs, rhs);
-          t->code.location()=i.location;
+          t->code.add_source_location()=i.location;
         }
       }
     }

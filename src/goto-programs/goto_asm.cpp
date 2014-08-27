@@ -96,7 +96,7 @@ void goto_convertt::convert_asm(
         goto_programt::targett t=tmp_dest.add_instruction(OTHER);
         t->location=code.location();
         t->code=codet(ID_fence);
-        t->code.location()=code.location();
+        t->code.add_source_location()=code.location();
         t->code.set(ID_WWfence, true);
         t->code.set(ID_RRfence, true);
         t->code.set(ID_RWfence, true);
@@ -110,7 +110,7 @@ void goto_convertt::convert_asm(
         goto_programt::targett t=tmp_dest.add_instruction(OTHER);
         t->location=code.location();
         t->code=codet(ID_fence);
-        t->code.location()=code.location();
+        t->code.add_source_location()=code.location();
         t->code.set(ID_WWfence, true);
         t->code.set(ID_RRfence, true);
         t->code.set(ID_RWfence, true);
@@ -121,7 +121,7 @@ void goto_convertt::convert_asm(
         goto_programt::targett t=tmp_dest.add_instruction(OTHER);
         t->location=code.location();
         t->code=codet(ID_fence);
-        t->code.location()=code.location();
+        t->code.add_source_location()=code.location();
         t->code.set(ID_WWfence, true);
         t->code.set(ID_RRfence, true);
         t->code.set(ID_RWfence, true);
@@ -136,7 +136,7 @@ void goto_convertt::convert_asm(
         goto_programt::targett t=tmp_dest.add_instruction(OTHER);
         t->location=code.location();
         t->code=codet(ID_fence);
-        t->code.location()=code.location();
+        t->code.add_source_location()=code.location();
         t->code.set(ID_WWfence, true);
         t->code.set(ID_RRfence, true);
         t->code.set(ID_RWfence, true);
@@ -149,7 +149,7 @@ void goto_convertt::convert_asm(
         goto_programt::targett t=tmp_dest.add_instruction(OTHER);
         t->location=code.location();
         t->code=codet(ID_fence);
-        t->code.location()=code.location();
+        t->code.add_source_location()=code.location();
         // doesn't do anything by itself,
         // needs to be combined with branch
       }
@@ -158,7 +158,7 @@ void goto_convertt::convert_asm(
         goto_programt::targett t=tmp_dest.add_instruction(OTHER);
         t->location=code.location();
         t->code=codet(ID_fence);
-        t->code.location()=code.location();
+        t->code.add_source_location()=code.location();
         t->code.set(ID_WWfence, true);
         t->code.set(ID_RRfence, true);
         t->code.set(ID_RWfence, true);
@@ -173,7 +173,7 @@ void goto_convertt::convert_asm(
         goto_programt::targett t=tmp_dest.add_instruction(OTHER);
         t->location=code.location();
         t->code=codet(ID_fence);
-        t->code.location()=code.location();
+        t->code.add_source_location()=code.location();
         // doesn't do anything by itself,
         // needs to be combined with branch
       }

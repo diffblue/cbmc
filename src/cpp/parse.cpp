@@ -3722,7 +3722,7 @@ bool Parser::rTemplateArgs(irept &template_args)
 
       // ok
       exp=exprt(ID_type);
-      exp.location()=a.location();
+      exp.add_source_location()=a.location();
       exp.type().swap(a);
 
       // but could also be an expr
@@ -7367,7 +7367,7 @@ bool Parser::rStatement(codet &statement)
         return false;
         
       statement.set_statement(ID_static_assert);
-      statement.location()=cpp_static_assert.location();
+      statement.add_source_location()=cpp_static_assert.location();
       statement.operands().swap(cpp_static_assert.operands());
       
       return true;
@@ -8104,7 +8104,7 @@ bool Parser::rExprStatement(codet &statement)
       #endif
 
       statement=codet(ID_expression);
-      statement.location()=exp.location();
+      statement.add_source_location()=exp.location();
       statement.move_to_operands(exp);
       return true;
     }
