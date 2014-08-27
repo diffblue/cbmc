@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/config.h>
 #include <util/prefix.h>
+#include <util/suffix.h>
 #include <util/find_symbols.h>
 #include <util/base_type.h>
 #include <util/i2string.h>
@@ -108,12 +109,14 @@ void dump_ct::operator()(std::ostream &os)
   Forall_symbols(it, copied_symbol_table.symbols)
   {
     symbolt &symbol=it->second;
+    bool tag_added=false;
 
     if((symbol.type.id()==ID_union || symbol.type.id()==ID_struct) &&
        symbol.type.get(ID_tag).empty())
     {
       assert(symbol.is_type);
       symbol.type.set(ID_tag, ID_anonymous);
+      tag_added=true;
     }
 
     const std::string name_str=id2string(it->first);
@@ -144,6 +147,10 @@ void dump_ct::operator()(std::ostream &os)
               symbol.type.get(ID_tag), 0)).second);
       }
     }
+
+    // we don't want to dump in full all definitions
+    if(!tag_added && ignore(symbol))
+      continue;
 
     if(!symbols_sorted.insert(name_str).second)
       assert(false);
@@ -226,7 +233,6 @@ void dump_ct::operator()(std::ostream &os)
           compound_body_stream);
   }
 
-  os << std::endl;
   for(std::set<std::string>::const_iterator
       it=system_headers.begin();
       it!=system_headers.end();
@@ -234,28 +240,38 @@ void dump_ct::operator()(std::ostream &os)
     os << "#include <" << *it << ">" << std::endl;
   if(!system_headers.empty()) os << std::endl;
 
-  os << "#ifndef NULL" << std::endl
-     << "#define NULL ((void*)0)" << std::endl
-     << "#endif" << std::endl;
-  os << "#ifndef FENCE" << std::endl
-     << "#define FENCE(x) ((void)0)" << std::endl
-     << "#endif" << std::endl;
-  os << "#ifndef IEEE_FLOAT_EQUAL" << std::endl
-     << "#define IEEE_FLOAT_EQUAL(x,y) ((x)==(y))" << std::endl
-     << "#endif" << std::endl;
-  os << "#ifndef IEEE_FLOAT_NOTEQUAL" << std::endl
-     << "#define IEEE_FLOAT_NOTEQUAL(x,y) ((x)!=(y))" << std::endl
-     << "#endif" << std::endl;
+  if(global_var_stream.str().find("NULL")!=std::string::npos ||
+     func_body_stream.str().find("NULL")!=std::string::npos)
+  {
+    os << "#ifndef NULL" << std::endl
+       << "#define NULL ((void*)0)" << std::endl
+       << "#endif" << std::endl;
+    os << std::endl;
+  }
+  if(func_body_stream.str().find("FENCE")!=std::string::npos)
+  {
+    os << "#ifndef FENCE" << std::endl
+       << "#define FENCE(x) ((void)0)" << std::endl
+       << "#endif" << std::endl;
+    os << std::endl;
+  }
+  if(func_body_stream.str().find("IEEE_FLOAT_")!=std::string::npos)
+  {
+    os << "#ifndef IEEE_FLOAT_EQUAL" << std::endl
+       << "#define IEEE_FLOAT_EQUAL(x,y) ((x)==(y))" << std::endl
+       << "#endif" << std::endl;
+    os << "#ifndef IEEE_FLOAT_NOTEQUAL" << std::endl
+       << "#define IEEE_FLOAT_NOTEQUAL(x,y) ((x)!=(y))" << std::endl
+       << "#endif" << std::endl;
+    os << std::endl;
+  }
 
-  os << std::endl;
-
-  os << func_decl_stream.str();
-  os << std::endl;
-  os << compound_body_stream.str();
-  os << std::endl;
-
-  os << global_var_stream.str();
-  os << std::endl;
+  if(!func_decl_stream.str().empty())
+    os << func_decl_stream.str() << std::endl;
+  if(!compound_body_stream.str().empty())
+    os << compound_body_stream.str() << std::endl;
+  if(!global_var_stream.str().empty())
+    os << global_var_stream.str() << std::endl;
   os << func_body_stream.str();
 }
 
@@ -305,7 +321,14 @@ void dump_ct::convert_compound(
   std::ostream &os)
 {
   if(type.id()==ID_symbol)
-    convert_compound(ns.follow(type), recursive, os);
+  {
+    const symbolt &symbol=
+      ns.lookup(to_symbol_type(type).get_identifier());
+    assert(symbol.is_type);
+
+    if(!ignore(symbol))
+      convert_compound(symbol.type, recursive, os);
+  }
   else if(type.id()==ID_array || type.id()==ID_pointer)
   {
     if(!recursive) return;
@@ -406,7 +429,7 @@ void dump_ct::convert_compound(
       continue;
 
     if(recursive && comp_type.id()!=ID_pointer)
-      convert_compound(comp_type, recursive, os);
+      convert_compound(comp.type(), recursive, os);
 
     irep_idt comp_name=comp.get_name();
 
@@ -511,16 +534,153 @@ Purpose:
 
 \*******************************************************************/
 
-bool dump_ct::ignore(const irep_idt &identifier)
+bool dump_ct::ignore(const symbolt &symbol)
 {
-  return (has_prefix(id2string(identifier), "c::__CPROVER_") ||
-     identifier=="c::__func__" ||
-     identifier=="c::__FUNCTION__" ||
-     identifier=="c::__PRETTY_FUNCTION__" ||
-     identifier=="c::argc'" ||
-     identifier=="c::argv'" ||
-     identifier=="c::envp'" ||
-     identifier=="c::envp_size'");
+  const std::string &name_str=id2string(symbol.name);
+
+  if(has_prefix(name_str, "c::__CPROVER_") ||
+     name_str=="c::__func__" ||
+     name_str=="c::__FUNCTION__" ||
+     name_str=="c::__PRETTY_FUNCTION__" ||
+     name_str=="c::argc'" ||
+     name_str=="c::argv'" ||
+     name_str=="c::envp'" ||
+     name_str=="c::envp_size'")
+    return true;
+
+  const std::string &file_str=id2string(symbol.location.get_file());
+
+  // don't dump internal GCC builtins
+  if((file_str=="gcc_builtin_headers_alpha.h" ||
+      file_str=="gcc_builtin_headers_arm.h" ||
+      file_str=="gcc_builtin_headers_ia32.h" ||
+      file_str=="gcc_builtin_headers_mips.h" ||
+      file_str=="gcc_builtin_headers_power.h" ||
+      file_str=="gcc_builtin_headers_generic.h") &&
+     has_prefix(name_str, "c::__builtin_"))
+    return true;
+
+  if(name_str=="c::__builtin_va_start" ||
+     name_str=="c::__builtin_va_end" ||
+     has_prefix(name_str, id2string(ID_gcc_builtin_va_arg)))
+  {
+    system_headers.insert("stdarg.h");
+    return true;
+  }
+
+  if(!use_system_headers ||
+     name_str.find("$link")!=std::string::npos)
+    return false;
+
+  if(!has_prefix(file_str, "/usr/include/"))
+    return false;
+
+  if(file_str=="/usr/include/ctype.h")
+  {
+    system_headers.insert("ctype.h");
+    return true;
+  }
+
+  if(file_str=="/usr/include/fcntl.h" ||
+     has_suffix(file_str, "/bits/fcntl2.h"))
+  {
+    system_headers.insert("fcntl.h");
+    return true;
+  }
+
+  if(file_str=="/usr/include/math.h" ||
+     has_suffix(file_str, "/bits/mathinline.h"))
+  {
+    system_headers.insert("math.h");
+    return true;
+  }
+
+  if(file_str=="/usr/include/pthread.h" ||
+     has_suffix(file_str, "/bits/pthreadtypes.h"))
+  {
+    system_headers.insert("pthread.h");
+    return true;
+  }
+
+  if(file_str=="/usr/include/setjmp.h")
+  {
+    system_headers.insert("setjmp.h");
+    return true;
+  }
+
+  if(file_str=="/usr/include/stdio.h" ||
+     file_str=="/usr/include/libio.h" ||
+     has_suffix(file_str, "/bits/stdio.h") ||
+     has_suffix(file_str, "/bits/stdio2.h"))
+  {
+    system_headers.insert("stdio.h");
+    return true;
+  }
+
+  if(file_str=="/usr/include/stdlib.h" ||
+     has_suffix(file_str, "/bits/stdlib-float.h"))
+  {
+    system_headers.insert("stdlib.h");
+    return true;
+  }
+
+  if(file_str=="/usr/include/string.h" ||
+     has_suffix(file_str, "/bits/string2.h") ||
+     has_suffix(file_str, "/bits/string3.h"))
+  {
+    system_headers.insert("string.h");
+    return true;
+  }
+
+  if(file_str=="/usr/include/time.h" ||
+     has_suffix(file_str, "/bits/time.h"))
+  {
+    system_headers.insert("time.h");
+    return true;
+  }
+
+  if(file_str=="/usr/include/unistd.h" ||
+     has_suffix(file_str, "/bits/unistd.h"))
+  {
+    system_headers.insert("unistd.h");
+    return true;
+  }
+
+  if(has_suffix(file_str, "/sys/select.h") ||
+     has_suffix(file_str, "/bits/select.h"))
+  {
+    system_headers.insert("sys/select.h");
+    return true;
+  }
+
+  if(has_suffix(file_str, "/sys/socket.h") ||
+     has_suffix(file_str, "/bits/socket.h"))
+  {
+    system_headers.insert("sys/socket.h");
+    return true;
+  }
+
+  if(has_suffix(file_str, "/sys/stat.h") ||
+     has_suffix(file_str, "/bits/stat.h"))
+  {
+    system_headers.insert("sys/stat.h");
+    return true;
+  }
+
+  if(has_suffix(file_str, "/sys/types.h") ||
+     has_suffix(file_str, "/bits/types.h"))
+  {
+    system_headers.insert("sys/types.h");
+    return true;
+  }
+
+  if(has_suffix(file_str, "/sys/wait.h"))
+  {
+    system_headers.insert("sys/wait.h");
+    return true;
+  }
+
+  return false;
 }
 
 /*******************************************************************\
@@ -592,10 +752,6 @@ void dump_ct::convert_global_variable(
     std::ostream &os,
     local_static_declst &local_static_decls)
 {
-  // we suppress some declarations
-  if(ignore(symbol.name))
-    return;
-
   const irep_idt &func=symbol.location.get_function();
   if((func.empty() || symbol.is_extern || symbol.value.is_not_nil()) &&
       !converted.insert(symbol.name).second)
@@ -673,30 +829,9 @@ void dump_ct::convert_function_declaration(
     std::ostream &os_body,
     local_static_declst &local_static_decls)
 {
-  if(ignore(symbol.name))
-    return;
-
   // don't dump artificial main
   if(skip_main && symbol.name==ID_main)
     return;
-
-  // don't dump GCC builtins
-  if((symbol.location.get_file()=="gcc_builtin_headers_alpha.h" ||
-      symbol.location.get_file()=="gcc_builtin_headers_arm.h" ||
-      symbol.location.get_file()=="gcc_builtin_headers_ia32.h" ||
-      symbol.location.get_file()=="gcc_builtin_headers_mips.h" ||
-      symbol.location.get_file()=="gcc_builtin_headers_power.h" ||
-      symbol.location.get_file()=="gcc_builtin_headers_generic.h") &&
-     has_prefix(id2string(symbol.name), "c::__builtin_"))
-    return;
-
-  if(symbol.name=="c::__builtin_va_start" ||
-     symbol.name=="c::__builtin_va_end" ||
-     has_prefix(id2string(symbol.name), id2string(ID_gcc_builtin_va_arg)))
-  {
-    system_headers.insert("stdarg.h");
-    return;
-  }
 
   // convert the goto program back to code - this might change
   // the function type
@@ -1147,10 +1282,11 @@ Function: dump_c
 
 void dump_c(
   const goto_functionst &src,
+  const bool use_system_headers,
   const namespacet &ns,
   std::ostream &out)
 {
-  dump_ct goto2c(src, ns, new_ansi_c_language);
+  dump_ct goto2c(src, use_system_headers, ns, new_ansi_c_language);
   out << goto2c;
 }
 
@@ -1168,10 +1304,11 @@ Function: dump_cpp
 
 void dump_cpp(
   const goto_functionst &src,
+  const bool use_system_headers,
   const namespacet &ns,
   std::ostream &out)
 {
-  dump_ct goto2cpp(src, ns, new_cpp_language);
+  dump_ct goto2cpp(src, use_system_headers, ns, new_cpp_language);
   out << goto2cpp;
 }
 

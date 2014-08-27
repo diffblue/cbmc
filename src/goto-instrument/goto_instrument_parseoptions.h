@@ -19,7 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(all)" \
   "(document-claims-latex)(document-claims-html)" \
   "(document-properties-latex)(document-properties-html)" \
-  "(dump-c)(dump-cpp)(dot)(xml)" \
+  "(dump-c)(dump-cpp)(use-system-headers)(dot)(xml)" \
   "(bounds-check)(no-bounds-check)" \
   "(pointer-check)(memory-leak-check)(no-pointer-check)" \
   "(remove-pointers)" \

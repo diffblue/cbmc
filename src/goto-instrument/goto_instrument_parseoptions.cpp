@@ -391,6 +391,7 @@ int goto_instrument_parseoptionst::doit()
     if(cmdline.isset("dump-c") || cmdline.isset("dump-cpp"))
     {
       const bool is_cpp=cmdline.isset("dump-cpp");
+      const bool h=cmdline.isset("use-system-headers");
       namespacet ns(symbol_table);
       
       if(cmdline.args.size()==2)
@@ -401,10 +402,10 @@ int goto_instrument_parseoptionst::doit()
           error() << "failed to write to `" << cmdline.args[1] << "'";
           return 10;
         }
-        (is_cpp ? dump_cpp : dump_c)(goto_functions, ns, out);
+        (is_cpp ? dump_cpp : dump_c)(goto_functions, h, ns, out);
       }
       else
-        (is_cpp ? dump_cpp : dump_c)(goto_functions, ns, std::cout);
+        (is_cpp ? dump_cpp : dump_c)(goto_functions, h, ns, std::cout);
         
       return 0;
     }
@@ -951,6 +952,7 @@ void goto_instrument_parseoptionst::help()
     " --document-properties-html   generate HTML property documentation\n"
     " --document-properties-latex  generate Latex property documentation\n"
     " --dump-c                     generate C source\n"
+    " --dump-cpp                   generate C++ source\n"
     " --dot                        generate CFG graph in DOT format\n"
     " --interpreter                do concrete execution\n"
     " --count-eloc                 count effective lines of code\n"
@@ -978,6 +980,7 @@ void goto_instrument_parseoptionst::help()
     " --uninitialized-check        add checks for uninitialized locals (experimental)\n"
     " --error-label label          check that label is unreachable\n"
     " --stack-depth n              add check that call stack size of non-inlined functions never exceeds n\n"
+    " --race-check                 add floating-point data race checks\n"
     "\n"
     "Semantic transformations:\n"
     " --nondet-volatile            makes reads from volatile variables non-deterministic\n"
@@ -1015,6 +1018,7 @@ void goto_instrument_parseoptionst::help()
     " --inline                     perform full inlining\n"
     "\n"
     "Other options:\n"
+    " --use-system-headers         with --dump-c/--dump-cpp: generate C source with includes\n"
     " --version                    show version and exit\n"
     " --xml-ui                     use XML-formatted output\n"
     "\n";
