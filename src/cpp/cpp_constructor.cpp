@@ -263,7 +263,7 @@ codet cpp_typecheckt::cpp_constructor(
     irept cpp_name(ID_cpp_name);
     cpp_name.get_sub().push_back(irept(ID_name));
     cpp_name.get_sub().back().set(ID_identifier, constructor_name);
-    cpp_name.get_sub().back().set(ID_C_location, location);
+    cpp_name.get_sub().back().set(ID_C_source_location, location);
 
     side_effect_expr_function_callt function_call;
     function_call.location()=location;

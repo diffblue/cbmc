@@ -258,11 +258,12 @@ protected:
 
   void set_location(irept &dest, const cpp_tokent &token)
   {
-    locationt &location=static_cast<locationt &>(dest.add(ID_C_location));
-    location.set_file(token.filename);
-    location.set_line(token.line_no);
+    source_locationt &source_location=
+      static_cast<source_locationt &>(dest.add(ID_C_source_location));
+    source_location.set_file(token.filename);
+    source_location.set_line(token.line_no);
     if(!current_function.empty())
-      location.set_function(current_function);
+      source_location.set_function(current_function);
   }
 
   void make_subtype(typet &src, typet &dest)

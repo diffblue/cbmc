@@ -532,6 +532,9 @@ std::string cpp_typecheckt::class_template_identifier(
         it++, counter++)
     {  
       if(counter!=0) identifier+=',';
+      
+      // These are not yet typechecked, as they may depend
+      // on unassigned template parameters.
 
       if(it->id()==ID_type || it->id()=="ambiguous")
         identifier+=cpp_type2name(it->type());

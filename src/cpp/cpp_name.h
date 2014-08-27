@@ -25,12 +25,12 @@ public:
     sub.front().set(ID_identifier, base_name);
   }
 
-  const locationt &location() const
+  const source_locationt &location() const
   {
     if(get_sub().empty())
-      return static_cast<const locationt &>(get_nil_irep());
+      return static_cast<const source_locationt &>(get_nil_irep());
     else
-      return static_cast<const locationt &>(get_sub().front().find(ID_C_location));
+      return static_cast<const source_locationt &>(get_sub().front().find(ID_C_source_location));
   }
 
   //void convert(std::string &identifier, std::string &base_name) const;

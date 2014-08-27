@@ -60,7 +60,7 @@ void cpp_typecheckt::typecheck_enum_body(symbolt &enum_symbol)
     symbol.name=id2string(enum_symbol.name)+"::"+id2string(name);
     symbol.base_name=name;
     symbol.value.swap(final_value);
-    symbol.location=static_cast<const locationt &>(it->find(ID_C_location));
+    symbol.location=static_cast<const source_locationt &>(it->find(ID_C_source_location));
     symbol.mode=ID_cpp;
     symbol.module=module;
     symbol.type=enum_type;

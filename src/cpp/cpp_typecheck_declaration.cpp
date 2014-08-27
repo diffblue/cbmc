@@ -61,7 +61,7 @@ void cpp_typecheckt::convert_anonymous_union(
 
   irept name(ID_name);
   name.set(ID_identifier, identifier);
-  name.set(ID_C_location, declaration.location());
+  name.set(ID_C_source_location, declaration.location());
 
   cpp_namet cpp_name;
   cpp_name.move_to_sub(name);
