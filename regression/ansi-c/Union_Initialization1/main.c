@@ -1,7 +1,7 @@
-typedef struct
+typedef struct some_struct
 {
-  union {
-    struct {
+  union some_union {
+    struct inner_struct {
       int one;
     };
     long two;
