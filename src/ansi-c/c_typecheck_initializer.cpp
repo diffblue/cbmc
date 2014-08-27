@@ -575,8 +575,9 @@ void c_typecheck_baset::do_designated_initializer(
     if(dest->operands().empty())
     {
       err_location(value);
-      str << "cannot initialize compound type "
-          << to_string(dest_type) << " using " << to_string(value);
+      str << "cannot initialize compound type `"
+          << to_string(dest_type) << "' using value `"
+          << to_string(value) << "'";
       throw 0;
     }
 
